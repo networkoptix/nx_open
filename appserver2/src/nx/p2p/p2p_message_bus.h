@@ -228,6 +228,24 @@ public:
         const QnUuid& peerId,
         const QMap<ApiPersistentIdData, P2pConnectionPtr>& currentSubscription) const;
     static ConnectionContext* context(const P2pConnectionPtr& connection);
+
+    struct DelayIntervals
+    {
+        // How often send 'peers' message to the peer if something is changed
+        // As soon as connection is opened first message is sent immediately
+        std::chrono::milliseconds sendPeersInfoInterval = std::chrono::seconds(15);
+
+        // If new connection is recently established/closed, don't sent subscribe request to the peer
+        std::chrono::milliseconds subscribeIntervalLow = std::chrono::seconds(3);
+
+        // If new connections always established/closed too long time, send subscribe request anyway
+        std::chrono::milliseconds subscribeIntervalHigh = std::chrono::seconds(15);
+
+        std::chrono::milliseconds outConnectionsInterval = std::chrono::seconds(1);
+    };
+
+    void setDelayIntervals(const DelayIntervals& intervals);
+    DelayIntervals delayIntervals() const;
 private:
     QMap<QnUuid, P2pConnectionPtr> m_connections; //< Actual connection list
     QMap<QnUuid, P2pConnectionPtr> m_outgoingConnections; //< Temporary list of outgoing connections
@@ -271,6 +289,7 @@ private:
     int m_connectionTries = 0;
     QElapsedTimer m_outConnectionsTimer;
     std::set<ApiPeerData> m_alivePeers;
+    DelayIntervals m_intervals;
 };
 
 } // namespace p2p

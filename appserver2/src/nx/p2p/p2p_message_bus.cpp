@@ -16,24 +16,8 @@
 #include <nx/p2p/p2p_serialization.h>
 
 namespace {
-
-    // todo: move these timeouts to the globalSettings
-
-    // How often send 'peers' message to the peer if something is changed
-    // As soon as connection is opened first message is sent immediately
-    std::chrono::seconds sendPeersInfoInterval(15);
-
-    // If new connection is recently established/closed, don't sent subscribe request to the peer
-    std::chrono::seconds subscribeIntervalLow(3);
-
-    // If new connections always established/closed too long time, send subscribe request anyway
-    std::chrono::seconds subscribeIntervalHigh(15);
-
     int commitIntervalMs = 1000;
     static const int kMaxSelectDataSize = 1024 * 32;
-
-    static const int kOutConnectionsInterval = 1000;
-
 } // namespace
 
 namespace nx {
@@ -79,6 +63,7 @@ void MessageBus::dropConnections()
     QnMutexLocker lock(&m_mutex);
     m_connections.clear();
     m_outgoingConnections.clear();
+    m_remoteUrls.clear();
     if (m_peers)
     {
         m_peers->clear();
@@ -226,8 +211,9 @@ void MessageBus::createOutgoingConnections(const QMap<ApiPersistentIdData, P2pCo
 {
     if (hasStartingConnections())
         return;
-
-    if (m_outConnectionsTimer.isValid() && !m_outConnectionsTimer.hasExpired(kOutConnectionsInterval))
+    int intervalMs = std::chrono::duration_cast<std::chrono::milliseconds>(
+        m_intervals.outConnectionsInterval).count();
+    if (m_outConnectionsTimer.isValid() && !m_outConnectionsTimer.hasExpired(intervalMs))
         return;
     m_outConnectionsTimer.restart();
 
@@ -356,13 +342,14 @@ void MessageBus::sendAlivePeersMessage(const P2pConnectionPtr& connection)
         const qint16 peerNumber = m_localShortPeerInfo.encode(itr.key());
         records.push_back(PeerDistanceRecord(peerNumber, minDistance));
     }
+    NX_ASSERT(!records.isEmpty());
     QByteArray data = serializePeersMessage(records, 1);
     data.data()[0] = (quint8) MessageType::alivePeers;
 
     auto sendAlivePeersMessage = [this](const P2pConnectionPtr& connection, const QByteArray& data)
     {
         int peersIntervalMs = std::chrono::duration_cast<std::chrono::milliseconds>(
-            sendPeersInfoInterval).count();
+            m_intervals.sendPeersInfoInterval).count();
         auto connectionContext = context(connection);
         if (connectionContext->localPeersTimer.isValid() && !connectionContext->localPeersTimer.hasExpired(peersIntervalMs))
             return;
@@ -454,12 +441,12 @@ bool MessageBus::needSubscribeDelay()
     {
         std::chrono::milliseconds lastPeerInfoElapsed(m_lastPeerInfoTimer.elapsed());
 
-        if (lastPeerInfoElapsed < subscribeIntervalLow)
+        if (lastPeerInfoElapsed < m_intervals.subscribeIntervalLow)
         {
             if (!m_wantToSubscribeTimer.isValid())
                 m_wantToSubscribeTimer.restart();
             std::chrono::milliseconds wantToSubscribeElapsed(m_wantToSubscribeTimer.elapsed());
-            if (wantToSubscribeElapsed < subscribeIntervalHigh)
+            if (wantToSubscribeElapsed < m_intervals.subscribeIntervalHigh)
                 return true;
         }
     }
@@ -708,7 +695,6 @@ ApiPeerDataEx MessageBus::localPeerEx() const
 void MessageBus::startReading(P2pConnectionPtr connection)
 {
     context(connection)->encode(ApiPersistentIdData(connection->remotePeer()), 0);
-    //emit peerFound(connection->remotePeer());
     connection->startReading();
 }
 
@@ -1423,13 +1409,37 @@ void MessageBus::emitPeerFoundLostSignals()
         newAlivePeers.end(),
         std::inserter(lostPeers, lostPeers.begin()));
 
-    m_alivePeers = newAlivePeers;
-
     for (const auto& peer: newPeers)
+    {
+        NX_DEBUG(QnLog::P2P_TRAN_LOG,
+            lit("Peer %1 has found peer %2")
+            .arg(qnStaticCommon->moduleDisplayName(localPeer().id))
+            .arg(qnStaticCommon->moduleDisplayName(peer.id)));
         emit peerFound(peer);
+    }
 
-    for (const auto& peer: lostPeers)
+    for (const auto& peer : lostPeers)
+    {
+        NX_DEBUG(QnLog::P2P_TRAN_LOG,
+            lit("Peer %1 has lost peer %2")
+            .arg(qnStaticCommon->moduleDisplayName(localPeer().id))
+            .arg(qnStaticCommon->moduleDisplayName(peer.id)));
         emit peerLost(peer);
+    }
+
+    m_alivePeers = newAlivePeers;
+}
+
+void MessageBus::setDelayIntervals(const DelayIntervals& intervals)
+{
+    QnMutexLocker lock(&m_mutex);
+    m_intervals = intervals;
+}
+
+MessageBus::DelayIntervals MessageBus::delayIntervals() const
+{
+    QnMutexLocker lock(&m_mutex);
+    return m_intervals;
 }
 
 } // namespace p2p

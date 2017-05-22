@@ -46,14 +46,20 @@ BidirectionRoutingInfo::BidirectionRoutingInfo(
 :
     m_localPeer(localPeer)
 {
-    auto& peerData = alivePeers[localPeer].routeTo[localPeer] = RoutingRecord(0, 0);
-    allPeerDistances[localPeer].insert(localPeer, RoutingRecord(0, 0));
+    addLocalPeer();
 }
 
 void BidirectionRoutingInfo::clear()
 {
     alivePeers.clear();
     allPeerDistances.clear();
+    addLocalPeer();
+}
+
+void BidirectionRoutingInfo::addLocalPeer()
+{
+    auto& peerData = alivePeers[m_localPeer].routeTo[m_localPeer] = RoutingRecord(0, 0);
+    allPeerDistances[m_localPeer].insert(m_localPeer, RoutingRecord(0, 0));
 }
 
 void BidirectionRoutingInfo::removePeer(const ApiPersistentIdData& via)

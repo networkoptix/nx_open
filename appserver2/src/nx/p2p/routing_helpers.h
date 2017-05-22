@@ -72,6 +72,8 @@ struct BidirectionRoutingInfo
     AlivePeersMap alivePeers; //< alive peers in the system. key - route via, value - route to
     RouteToPeerMap allPeerDistances;  //< vice versa
 private:
+    void addLocalPeer();
+private:
     ApiPersistentIdData m_localPeer;
 };
 
