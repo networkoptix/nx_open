@@ -5,6 +5,7 @@ namespace network {
 namespace websocket {
 
 static const auto kPingTimeout = std::chrono::seconds(100);
+static const int kDefaultPingTimeoutMultiplier = 4;
 
 WebSocket::WebSocket(
     std::unique_ptr<AbstractStreamSocket> streamSocket,
@@ -20,7 +21,8 @@ WebSocket::WebSocket(
     m_isLastFrame(false),
     m_isFirstFrame(true),
     m_pingTimer(new nx::network::aio::Timer),
-    m_lastError(SystemError::noError)
+    m_lastError(SystemError::noError),
+    m_pingTimeoutMultiplier(kDefaultPingTimeoutMultiplier)
 {
     m_socket->bindToAioThread(getAioThread());
     m_pingTimer->bindToAioThread(getAioThread());
@@ -262,7 +264,7 @@ void WebSocket::resetPingTimeoutBySocketTimeout(nx::utils::MoveOnlyFunc<void()> 
 
         m_pingTimeout = socketRecvTimeoutMs == 0
             ? kPingTimeout
-            : std::chrono::milliseconds(socketRecvTimeoutMs / 4);
+            : std::chrono::milliseconds(socketRecvTimeoutMs / m_pingTimeoutMultiplier);
 
         NX_LOG(lit("[WebSocket, Ping] Socket read timeout: %1. Ping timeout: %2")
             .arg(socketRecvTimeoutMs)
@@ -273,14 +275,21 @@ void WebSocket::resetPingTimeoutBySocketTimeout(nx::utils::MoveOnlyFunc<void()> 
     });
 }
 
+void WebSocket::setAliveTimeoutEx(std::chrono::milliseconds timeout, int multiplier)
+{
+    NX_ASSERT(multiplier > 0);
+    dispatch(
+        [this, timeout, multiplier]()
+    {
+        m_pingTimeoutMultiplier = multiplier;
+        m_socket->setRecvTimeout(timeout);
+        resetPingTimeoutBySocketTimeout([]() {});
+    });
+}
+
 void WebSocket::setAliveTimeout(std::chrono::milliseconds timeout)
 {
-    dispatch(
-        [this, timeout]()
-        {
-            m_socket->setRecvTimeout(timeout);
-            resetPingTimeoutBySocketTimeout([]() {});
-        });
+    setAliveTimeoutEx(timeout, kDefaultPingTimeoutMultiplier);
 }
 
 void WebSocket::sendCloseAsync()

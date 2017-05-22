@@ -64,6 +64,13 @@ public:
      * read handler (if any) will be invoked with SystemError::timedOut.
      */
     void setAliveTimeout(std::chrono::milliseconds timeout);
+    /**
+     * @param timeout - stream socket recv timeout
+     * @param multiplier - affect internal ping pong timeout.
+     *
+     * Default multiplier is 4. Ping timeout = timeout / multiplier.
+     */
+    void setAliveTimeoutEx(std::chrono::milliseconds timeout, int multiplier);
     AbstractStreamSocket* socket() { return m_socket.get(); }
 
 protected:
@@ -116,6 +123,7 @@ private:
     std::unique_ptr<nx::network::aio::Timer> m_pingTimer;
     nx::utils::ObjectDestructionFlag m_destructionFlag;
     SystemError::ErrorCode m_lastError;
+    int m_pingTimeoutMultiplier;
 };
 
 } // namespace websocket
