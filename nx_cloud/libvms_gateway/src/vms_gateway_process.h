@@ -46,7 +46,6 @@ private:
 
     int m_argc;
     char** m_argv;
-    std::atomic<bool> m_terminated;
     int m_timerID;
     std::vector<SocketAddress> m_httpEndpoints;
     QnMutex m_mutex;
