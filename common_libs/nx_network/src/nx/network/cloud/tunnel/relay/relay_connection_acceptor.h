@@ -4,7 +4,7 @@
 
 #include <QtCore/QUrl>
 
-#include <nx/network/abstract_acceptor.h>
+#include <nx/network/abstract_stream_socket_acceptor.h>
 #include <nx/network/http/server/http_server_connection.h>
 #include <nx/network/reverse_connection_acceptor.h>
 #include <nx/network/socket_common.h>

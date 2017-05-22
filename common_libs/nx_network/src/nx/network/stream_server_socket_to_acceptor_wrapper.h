@@ -1,16 +1,16 @@
 #pragma once
 
-#include "abstract_acceptor.h"
+#include "abstract_stream_socket_acceptor.h"
 #include "abstract_socket.h"
 
 namespace nx {
 namespace network {
 
-// TODO: #ak Remove this class when AbstractStreamServerSocket inherits AbstractAcceptor.
+// TODO: #ak Remove this class when AbstractStreamServerSocket inherits AbstractStreamSocketAcceptor.
 class StreamServerSocketToAcceptorWrapper:
-    public AbstractAcceptor
+    public AbstractStreamSocketAcceptor
 {
-    using base_type = AbstractAcceptor;
+    using base_type = AbstractStreamSocketAcceptor;
 
 public:
     StreamServerSocketToAcceptorWrapper(

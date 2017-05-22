@@ -1,13 +1,13 @@
 #pragma once
 
-#include <nx/network/abstract_acceptor.h>
+#include <nx/network/abstract_stream_socket_acceptor.h>
 
 namespace nx {
 namespace network {
 namespace cloud {
 
 class AbstractConnectionAcceptor:
-    public AbstractAcceptor
+    public AbstractStreamSocketAcceptor
 {
 public:
     /** 
