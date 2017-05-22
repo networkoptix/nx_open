@@ -17,7 +17,7 @@ void NX_UTILS_API initialize(
     const QString& baseName = QLatin1String("log_file"),
     std::shared_ptr<Logger> logger = nullptr);
 
-void NX_UTILS_API initializeGlobaly(const nx::utils::ArgumentParser& arguments);
+void NX_UTILS_API initializeGlobally(const nx::utils::ArgumentParser& arguments);
 
 } // namespace log
 } // namespace utils

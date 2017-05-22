@@ -36,7 +36,7 @@ inline int runTest(int argc, const char* argv[], InitFunction extraInit = nullpt
 
     ArgumentParser args(argc, argv);
     TestOptions::applyArguments(args);
-    nx::utils::log::initializeGlobaly(args);
+    nx::utils::log::initializeGlobally(args);
 
     DeinitFunctions deinitFunctions;
     if (extraInit)

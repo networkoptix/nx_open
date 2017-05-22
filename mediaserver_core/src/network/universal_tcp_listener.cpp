@@ -72,7 +72,8 @@ void QnUniversalTcpListener::addProxySenderConnections(
     for (int i = 0; i < size; ++i)
     {
         auto connect = new QnProxySenderConnection(
-            proxyUrl, commonModule()->moduleGUID(), this);
+            proxyUrl, commonModule()->moduleGUID(), this, needAuth());
+
         connect->start();
         addOwnership(connect);
     }

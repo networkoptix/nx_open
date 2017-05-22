@@ -7,14 +7,14 @@ namespace nx {
 namespace utils {
 namespace log {
 
-/** Returns pointer to main logger. */
-std::shared_ptr<Logger> NX_UTILS_API main();
+/** @return Main logger. */
+std::shared_ptr<Logger> NX_UTILS_API mainLogger();
 
-/** Creates logger for specific filters. */
-std::shared_ptr<Logger> NX_UTILS_API add(const std::set<QString>& filters);
+/** Creates a logger for specific filters. */
+std::shared_ptr<Logger> NX_UTILS_API addLogger(const std::set<QString>& filters);
 
-/** Get logger by tag or main if no specific logger is set. */
-std::shared_ptr<Logger> NX_UTILS_API get(const QString& tag, bool allowMain = true);
+/** @return Logger by tag or main if no specific logger is set. */
+std::shared_ptr<Logger> NX_UTILS_API getLogger(const QString& tag, bool allowMain = true);
 
 /**
  * Indicates if a message is going to be logged by any logger.
@@ -23,19 +23,19 @@ template<typename Tag = QString>
 bool isToBeLogged(Level level, const Tag& tag = {})
 {
     const auto tagString = ::toString(tag);
-    return get(tagString)->isToBeLogged(level, tagString);
+    return getLogger(tagString)->isToBeLogged(level, tagString);
 }
 
 /**
  * Calculate and log message if it's supposed to be logged.
  */
 #define NX_UTILS_LOG(LEVEL, TAG, MESSAGE) do \
-    { \
-        const auto tag = ::toString(TAG); \
-        const auto logger = nx::utils::log::get(tag); \
-        if (logger->isToBeLogged(LEVEL, tag)) \
-            logger->log(LEVEL, tag, ::toString(MESSAGE)); \
-    } while (0)
+{ \
+    const auto tag = ::toString(TAG); \
+    const auto logger = nx::utils::log::getLogger(tag); \
+    if (logger->isToBeLogged(LEVEL, tag)) \
+        logger->log(LEVEL, tag, ::toString(MESSAGE)); \
+} while (0)
 
 #define NX_ALWAYS(TAG, MESSAGE) NX_UTILS_LOG(nx::utils::log::Level::always, TAG, MESSAGE)
 #define NX_ERROR(TAG, MESSAGE) NX_UTILS_LOG(nx::utils::log::Level::error, TAG, MESSAGE)
