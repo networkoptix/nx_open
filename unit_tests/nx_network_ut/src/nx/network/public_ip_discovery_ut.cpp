@@ -11,11 +11,11 @@ namespace test {
 
 static const QString kPublicIpAddress(lit("127.0.0.1"));
 
-class nx::network::PublicIPDiscovery:
+class PublicIPDiscovery:
     public ::testing::Test
 {
 public:
-    nx::network::PublicIPDiscovery():
+    PublicIPDiscovery():
         m_testHttpServer(std::make_unique<TestHttpServer>())
     {
         init();
@@ -94,14 +94,14 @@ private:
     }
 };
 
-TEST_F(nx::network::PublicIPDiscovery, finds_ip_address)
+TEST_F(PublicIPDiscovery, finds_ip_address)
 {
     registerEventHandler();
     invokeFinder();
     assertIfIpAddressHasNotBeenFound();
 }
 
-TEST_F(nx::network::PublicIPDiscovery, cancellation)
+TEST_F(PublicIPDiscovery, cancellation)
 {
     registerEventHandler(withDelay);
     invokeFinder();
