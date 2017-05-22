@@ -145,7 +145,7 @@ ShaderEffect
 
             vec2 textureCoords = rotatedPointOnSphere.z < 0.999
                 ? (textureMatrix * vec4(project(rotatedPointOnSphere), 0.0, 1.0)).xy
-                : vec2(1.0);
+                : vec2(2.0); // somewhere outside
 
             gl_FragColor = texture2DBlackBorder(sourceTexture, textureCoords);
         }"
