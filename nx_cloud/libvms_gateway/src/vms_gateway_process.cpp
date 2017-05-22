@@ -12,6 +12,7 @@
 #include <nx/network/http/auth_restriction_list.h>
 #include <nx/network/http/auth_tools.h>
 #include <nx/network/http/server/http_message_dispatcher.h>
+#include <nx/network/public_ip_discovery.h>
 #include <nx/network/socket_global.h>
 #include <nx/network/ssl_socket.h>
 
@@ -21,17 +22,13 @@
 #include <nx/utils/std/cpp14.h>
 #include <nx/utils/scope_guard.h>
 #include <nx/utils/system_error.h>
-
-//#include <platform/process/current_process.h>
-//#include <utils/common/app_info.h>
-#include <nx/network/public_ip_discovery.h>
+#include <nx/utils/platform/current_process.h>
 
 #include "access_control/authentication_manager.h"
 #include "http/connect_handler.h"
 #include "http/proxy_handler.h"
 #include "libvms_gateway_app_info.h"
 #include "stree/cdb_ns.h"
-
 
 static int registerQtResources()
 {
@@ -164,7 +161,7 @@ int VmsGatewayProcess::exec()
         {
             network::ssl::Engine::useOrCreateCertificate(
                 settings.http().sslCertPath, 
-                QnAppInfo::productName().toUtf8(),
+                nx::utils::AppInfo::productName().toUtf8(),
                 "US", nx::utils::AppInfo::organizationName().toUtf8());
         }
 
@@ -178,7 +175,7 @@ int VmsGatewayProcess::exec()
             return 3;
 
         // process privilege reduction
-        CurrentProcess::changeUser(settings.general().changeUser);
+        nx::utils::CurrentProcess::changeUser(settings.general().changeUser);
 
         if (!multiAddressHttpServer.listen())
             return 5;

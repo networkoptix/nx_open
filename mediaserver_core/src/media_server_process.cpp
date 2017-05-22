@@ -2365,8 +2365,8 @@ void MediaServerProcess::run()
         qnServerModule->roSettings()->value(
             nx_ms_conf::SSL_CERTIFICATE_PATH,
             getDataDirectory() + lit( "/ssl/cert.pem")).toString(),
-        QnAppInfo::productName().toUtf8(), "US",
-        QnAppInfo::organizationName().toUtf8());
+        nx::utils::AppInfo::productName().toUtf8(), "US",
+        nx::utils::AppInfo::organizationName().toUtf8());
 
     commonModule()->createMessageProcessor<QnServerMessageProcessor>();
     std::unique_ptr<HostSystemPasswordSynchronizer> hostSystemPasswordSynchronizer( new HostSystemPasswordSynchronizer(commonModule()) );
