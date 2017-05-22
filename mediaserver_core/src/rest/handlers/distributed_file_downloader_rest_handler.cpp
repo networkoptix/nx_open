@@ -114,10 +114,10 @@ int RequestHelper::handleAddDownload()
     const auto md5String = params.value("md5").toUtf8();
     if (!md5String.isEmpty())
     {
-        fileInfo.md5 = QByteArray::fromBase64(md5String);
-        /* QByteArray::fromBase64() silently ignores all invalid characters,
-           so converting md5 back to base64 to check the checksum format validity. */
-        if (fileInfo.md5.toBase64() != md5String)
+        fileInfo.md5 = QByteArray::fromHex(md5String);
+        /* QByteArray::fromHex() silently ignores all invalid characters,
+           so converting md5 back to hex to check the checksum format validity. */
+        if (fileInfo.md5.toHex() != md5String)
             return makeInvalidParameterError("md5");
     }
 
