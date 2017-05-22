@@ -49,6 +49,8 @@
 #include <utils/common/event_processors.h>
 #include <utils/common/delayed.h>
 
+#include <nx/client/desktop/utils/license_helpers.h>
+
 namespace {
 
 class QnLicenseListSortProxyModel : public QSortFilterProxyModel
@@ -505,6 +507,35 @@ void QnLicenseManagerWidget::removeSelectedLicenses()
 {
     for (const QnLicensePtr& license : selectedLicenses())
     {
+        using namespace nx::client::desktop::helpers::license;
+        deactivateAsync(license->hardwareId(),
+            [](DeactivationResult result)
+            {
+                auto message = lit("+++++ license deactivation: ");
+                switch(result)
+                {
+                    case DeactivationResult::Success:
+                        message += lit("success");
+                        break;
+                    case DeactivationResult::UnspecifiedError:
+                        message += lit("unspecified error");
+                        break;
+                    case DeactivationResult::InvalidParameters:
+                        message += lit("wrong parameters");
+                        break;
+                    case DeactivationResult::TransportProblem:
+                        message += lit("transport problem");
+                        break;
+                    case DeactivationResult::ServerError:
+                        message += lit("server error");
+                        break;
+                    case DeactivationResult::DeactivationError:
+                        message += lit("deactivation problem");
+                        break;
+                }
+            });
+
+        /*
         if (!canRemoveLicense(license))
             continue;
 
@@ -514,6 +545,7 @@ void QnLicenseManagerWidget::removeSelectedLicenses()
         };
 
         commonModule()->ec2Connection()->getLicenseManager(Qn::kSystemAccess)->removeLicense(license, this, removeLisencesHandler);
+        */
     }
 }
 
@@ -534,7 +566,7 @@ void QnLicenseManagerWidget::updateButtons()
         return canRemoveLicense(license);
     });
 
-    ui->removeButton->setEnabled(canRemoveAny);
+    ui->removeButton->setEnabled(true || canRemoveAny);
 }
 
 
