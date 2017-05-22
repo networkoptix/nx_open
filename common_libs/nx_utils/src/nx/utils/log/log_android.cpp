@@ -19,14 +19,15 @@ static android_LogPriority toAndroidLogLevel(Level logLevel)
             return ANDROID_LOG_SILENT;
 
         case Level::always:
-        case Level::info:
-            return ANDROID_LOG_INFO;
-
+            // The hihgest log level, pass to ERROR.
         case Level::error:
             return ANDROID_LOG_ERROR;
 
         case Level::warning:
             return ANDROID_LOG_WARN;
+
+        case Level::info:
+            return ANDROID_LOG_INFO;
 
         case Level::debug:
             return ANDROID_LOG_DEBUG;

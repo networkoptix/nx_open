@@ -36,16 +36,16 @@ void ModuleConnector::newEndpoints(std::set<SocketAddress> endpoints, const QnUu
 {
     NX_ASSERT(endpoints.size());
     dispatch(
-        [this, endpoints, id]()
+        [this, endpoints = std::move(endpoints), id]() mutable
         {
-            getModule(id)->addEndpoints(endpoints);
+            getModule(id)->addEndpoints(std::move(endpoints));
         });
 }
 
 void ModuleConnector::setForbiddenEndpoints(std::set<SocketAddress> endpoints, const QnUuid& id)
 {
     dispatch(
-        [this, endpoints = std::move(endpoints), id]()
+        [this, endpoints = std::move(endpoints), id]() mutable
         {
             getModule(id)->setForbiddenEndpoints(std::move(endpoints));
         });
@@ -100,9 +100,17 @@ void ModuleConnector::Module::addEndpoints(std::set<SocketAddress> endpoints)
 {
     NX_VERBOSE(this, lm("Add endpoints %1").container(endpoints));
     const auto getGroup =
-        [&](Priority p){ return m_endpoints.emplace(p, std::set<SocketAddress>()).first; };
+        [&](Priority p)
+        {
+            return m_endpoints.emplace(p, std::set<SocketAddress>()).first;
+        };
+
     const auto insertIntoGroup =
-        [&](Endpoints::iterator g, SocketAddress e) { return g->second.insert(e).second; };
+        [&](Endpoints::iterator groupIterator, SocketAddress endpoint)
+        {
+            auto& group = groupIterator->second;
+            return group.insert(std::move(endpoint)).second;
+        };
 
     if (m_id.isNull())
     {
@@ -111,14 +119,14 @@ void ModuleConnector::Module::addEndpoints(std::set<SocketAddress> endpoints)
         for (const auto& endpoint: endpoints)
         {
             if (insertIntoGroup(group, endpoint) && !m_parent->m_isPassiveMode)
-                connect(endpoint, group);
+                connectToEndpoint(endpoint, group);
         }
     }
     else
     {
         // For known server sort endpoints by acessibility type and connect by order.
         bool hasNewEndpoints = false;
-        for (const auto& endpoint: endpoints)
+        for (auto& endpoint: endpoints)
         {
             Endpoints::iterator group;
             if (endpoint.address == HostAddress::localhost)
@@ -126,11 +134,11 @@ void ModuleConnector::Module::addEndpoints(std::set<SocketAddress> endpoints)
             else if (endpoint.address.isLocal())
                 group = getGroup(kLocalNetwork);
             else if (endpoint.address.isIpAddress())
-                group = getGroup(kIp); // TODO: check if we have such interface?
+                group = getGroup(kIp); //< TODO: Consider to check if we have such interface.
             else
                 group = getGroup(kOther);
 
-            hasNewEndpoints |= insertIntoGroup(group, endpoint);
+            hasNewEndpoints |= insertIntoGroup(group, std::move(endpoint));
         }
 
         if (hasNewEndpoints)
@@ -141,17 +149,17 @@ void ModuleConnector::Module::addEndpoints(std::set<SocketAddress> endpoints)
 void ModuleConnector::Module::ensureConnection()
 {
     if ((m_id.isNull()) || (m_httpClients.empty() && !m_socket))
-        connect(m_endpoints.begin());
+        connectToGroup(m_endpoints.begin());
 }
 
 void ModuleConnector::Module::setForbiddenEndpoints(std::set<SocketAddress> endpoints)
 {
     NX_VERBOSE(this, lm("Forbid endpoints %1").container(endpoints));
-    NX_ASSERT(!m_id.isNull(), "Does it make sense to block endpoints for unknown servers?");
+    NX_ASSERT(!m_id.isNull(), "Does not make sense to block endpoints for unknown servers");
     m_forbiddenEndpoints = std::move(endpoints);
 }
 
-void ModuleConnector::Module::connect(Endpoints::iterator endpointsGroup)
+void ModuleConnector::Module::connectToGroup(Endpoints::iterator endpointsGroup)
 {
     if (m_parent->m_isPassiveMode)
     {
@@ -167,13 +175,14 @@ void ModuleConnector::Module::connect(Endpoints::iterator endpointsGroup)
         {
             const auto reconnectInterval = m_parent->m_reconnectInterval;
             NX_VERBOSE(this, lm("No more endpoints, retry in %1").arg(reconnectInterval));
-            m_timer.start(reconnectInterval, [this](){ connect(m_endpoints.begin()); });
+            m_timer.start(reconnectInterval, [this](){ connectToGroup(m_endpoints.begin()); });
             m_parent->m_disconnectedHandler(m_id);
         }
 
         return;
     }
 
+    // Initiate parallel connects to each endpoint in a group.
     size_t endpointsInProgress = 0;
     m_timer.cancelSync();
     for (const auto& endpoint: endpointsGroup->second)
@@ -182,14 +191,15 @@ void ModuleConnector::Module::connect(Endpoints::iterator endpointsGroup)
             continue;
 
         ++endpointsInProgress;
-        connect(endpoint, endpointsGroup);
+        connectToEndpoint(endpoint, endpointsGroup);
     }
 
+    // Go to a next group if we could not stat any connects in current group.
     if (endpointsInProgress == 0)
-        return connect(++endpointsGroup);
+        return connectToGroup(++endpointsGroup);
 }
 
-void ModuleConnector::Module::connect(
+void ModuleConnector::Module::connectToEndpoint(
     const SocketAddress& endpoint, Endpoints::iterator endpointsGroup)
 {
     NX_VERBOSE(this, lm("Attempt to connect to %1 by %2").args(m_id, endpoint));
@@ -223,10 +233,9 @@ void ModuleConnector::Module::connect(
                 return;
             }
 
-            if (!m_httpClients.empty())
-                return; //< Wait for other HTTP clients.
-
-            connect(++endpointsGroup);
+            // When the last endpoint in a group fails try the next group.
+            if (m_httpClients.empty())
+                connectToGroup(++endpointsGroup);
         });
 }
 
@@ -295,7 +304,7 @@ bool ModuleConnector::Module::saveConnection(
     }
 
     const auto buffer = std::make_shared<Buffer>();
-    buffer->reserve(100);
+    buffer->reserve(1);
 
     m_socket = std::move(socket);
     m_socket->readSomeAsync(buffer.get(),
@@ -305,7 +314,7 @@ bool ModuleConnector::Module::saveConnection(
                 size, SystemError::toString(code)));
 
             m_socket.reset();
-            connect(m_endpoints.begin()); //< Reconnect attempt.
+            connectToGroup(m_endpoints.begin()); //< Reconnect attempt.
         });
 
     auto ip = m_socket->getForeignAddress().address;

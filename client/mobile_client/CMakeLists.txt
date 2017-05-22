@@ -29,10 +29,5 @@ else()
 endif()
 
 if(ANDROID)
-    target_link_libraries(mobile_client
-        PUBLIC
-            common
-            nx_streaming
-            nx_network
-            GLESv2 z log)
+    target_link_libraries(mobile_client PUBLIC GLESv2 z log)
 endif()

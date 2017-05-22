@@ -22,7 +22,7 @@ std::vector<ApiDiscoveredServerData> getServers(nx::vms::discovery::Manager* man
         else
             serverData.remoteAddresses.insert(module.endpoint.toString());
 
-        // TODO: Check if it is compatable?
+        // TODO: Check if it is compatible?
         serverData.status = Qn::ResourceStatus::Online;
         result.push_back(serverData);
     }

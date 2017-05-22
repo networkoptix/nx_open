@@ -134,7 +134,7 @@ QnCommonModule::QnCommonModule(bool clientMode, QObject *parent):
     m_mediaServerUserAttributesPool = new QnMediaServerUserAttributesPool(this);
     m_resourcePropertyDictionary = new QnResourcePropertyDictionary(this);
     m_resourceStatusDictionary = new QnResourceStatusDictionary(this);
-    instance<QnServerAdditionalAddressesDictionary>(); // todo: static common or common?
+    m_serverAdditionalAddressesDictionary = new QnServerAdditionalAddressesDictionary(this);
 
     m_resourcePool = new QnResourcePool(this);  /*< Depends on nothing. */
     m_layoutTourManager = new QnLayoutTourManager(this);  //< Depends on nothing.
