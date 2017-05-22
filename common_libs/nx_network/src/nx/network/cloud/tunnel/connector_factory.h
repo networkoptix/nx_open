@@ -48,7 +48,7 @@ public:
     static int getEnabledCloudConnectMask();
 
 private:
-    CloudConnectors defaultFunc(
+    CloudConnectors defaultFactoryFunction(
         const AddressEntry& targetAddress,
         const nx::String& connectSessionId,
         const hpm::api::ConnectResponse& response,
@@ -57,13 +57,13 @@ private:
 
 //-------------------------------------------------------------------------------------------------
 
-typedef std::unique_ptr<AbstractCrossNatConnector> (CrossNatConnectorFunc)(
-    const AddressEntry&);
+using CrossNatConnectorFactoryFunction = 
+    std::unique_ptr<AbstractCrossNatConnector>(const AddressEntry&);
 
 class NX_NETWORK_API CrossNatConnectorFactory:
-    public nx::utils::BasicFactory<CrossNatConnectorFunc>
+    public nx::utils::BasicFactory<CrossNatConnectorFactoryFunction>
 {
-    using base_type = nx::utils::BasicFactory<CrossNatConnectorFunc>;
+    using base_type = nx::utils::BasicFactory<CrossNatConnectorFactoryFunction>;
 
 public:
     CrossNatConnectorFactory();
@@ -71,7 +71,7 @@ public:
     static CrossNatConnectorFactory& instance();
 
 private:
-    std::unique_ptr<AbstractCrossNatConnector> defaultFunc(
+    std::unique_ptr<AbstractCrossNatConnector> defaultFactoryFunction(
         const AddressEntry& address);
 };
 
