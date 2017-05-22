@@ -92,6 +92,7 @@ class ConnectSessionManager:
 public:
     ConnectSessionManager():
         m_clientSessionPool(m_settings),
+        m_listeningPeerPool(m_settings),
         m_connectSessionManager(
             std::make_unique<controller::ConnectSessionManager>(
                 m_settings,
