@@ -27,7 +27,7 @@ TEST(P2pSerialization, WriterFlushBits)
         QByteArray data2;
         writeData(data1, 0);
         writeData(data2, 0xff);
-        ASSERT_EQ(data1, data2);
+        ASSERT_EQ(data1.toHex(), data2.toHex());
     }
     catch (...)
     {
@@ -91,7 +91,7 @@ TEST(P2pSerialization, PeersMessage)
     auto deserializedPeers = deserializePeersMessage(serializedData, &success);
     QByteArray serializedData2 = serializePeersMessage(deserializedPeers, 0);
     ASSERT_TRUE(success);
-    ASSERT_EQ(serializedData, serializedData2);
+    ASSERT_EQ(serializedData.toHex(), serializedData2.toHex());
 }
 
 TEST(P2pSerialization, SubscribeRequest)
@@ -107,7 +107,7 @@ TEST(P2pSerialization, SubscribeRequest)
     auto deserializedPeers = deserializeSubscribeRequest(serializedData, &success);
     QByteArray serializedData2 = serializeSubscribeRequest(deserializedPeers, 0);
     ASSERT_TRUE(success);
-    ASSERT_EQ(serializedData, serializedData2);
+    ASSERT_EQ(serializedData.toHex(), serializedData2.toHex());
 }
 
 TEST(P2pSerialization, ResolvePeerNumberResponse)
@@ -126,7 +126,7 @@ TEST(P2pSerialization, ResolvePeerNumberResponse)
     auto deserializedPeers = deserializeResolvePeerNumberResponse(serializedData, &success);
     QByteArray serializedData2 = serializeResolvePeerNumberResponse(deserializedPeers, 0);
     ASSERT_TRUE(success);
-    ASSERT_EQ(serializedData, serializedData2);
+    ASSERT_EQ(serializedData.toHex(), serializedData2.toHex());
 }
 
 TEST(P2pSerialization, TransactionList)
@@ -147,7 +147,7 @@ TEST(P2pSerialization, TransactionList)
     auto deserializedTransactions = deserializeTransactionList(serializedData, &success);
     QByteArray serializedData2 = serializeTransactionList(deserializedTransactions, 0);
     ASSERT_TRUE(success);
-    ASSERT_EQ(serializedData, serializedData2);
+    ASSERT_EQ(serializedData.toHex(), serializedData2.toHex());
 }
 
 } // namespace test

@@ -12,7 +12,7 @@
 
 namespace {
     static const int kByteArrayAlignFactor = sizeof(unsigned);
-    static const int kPeerRecordSize = 7;
+    static const int kPeerRecordSize = 7; // 2 bytes number + 4 bytes distance + online flag
     static const int kResolvePeerResponseRecordSize = 16 * 2 + 2; //< two guid + uncompressed PeerNumber per record
 }
 
@@ -178,7 +178,7 @@ QVector<PeerNumberType> deserializeCompressedPeers(const QByteArray& data, bool*
 QByteArray serializeSubscribeRequest(const QVector<SubscribeRecord>& request, int reservedSpaceAtFront)
 {
     QByteArray result;
-    result.resize(qPower2Ceil(unsigned(request.size() * kPeerRecordSize + 1), kByteArrayAlignFactor));
+    result.resize(qPower2Ceil(unsigned(request.size() * kPeerRecordSize + reservedSpaceAtFront), kByteArrayAlignFactor));
     BitStreamWriter writer;
     writer.setBuffer((quint8*) result.data(), result.size());
     writer.putBits(reservedSpaceAtFront * 8, 0);
