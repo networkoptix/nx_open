@@ -276,14 +276,14 @@ QnWorkbenchDisplay::QnWorkbenchDisplay(QObject *parent):
             action::ToggleSyncAction, //< S
             action::JumpToEndAction,  //< X
             action::JumpToStartAction,//< Z
-            action::PlayPauseAction,  //< Space
 
             /* "Delete" button */
             action::DeleteVideowallMatrixAction,
             action::RemoveLayoutItemAction,
             action::RemoveLayoutItemFromSceneAction,
             action::RemoveFromServerAction,
-            action::StopSharingLayoutAction
+            action::StopSharingLayoutAction,
+            action::RemoveLayoutTourAction
         })
             action(actionId)->setEnabled(!isWebView);
     });

@@ -86,6 +86,7 @@
 #include <nx/client/desktop/ui/actions/action_manager.h>
 #include <nx/client/desktop/ui/actions/action_target_provider.h>
 
+#include <ui/widgets/main_window.h>
 #include <ui/workaround/hidpi_workarounds.h>
 
 #include "workbench_layout.h"
@@ -663,99 +664,117 @@ void QnWorkbenchController::updateDraggedItems()
 // Handlers
 // -------------------------------------------------------------------------- //
 
-void QnWorkbenchController::at_scene_keyPressed(QGraphicsScene *, QEvent *event) {
+void QnWorkbenchController::at_scene_keyPressed(QGraphicsScene *, QEvent *event)
+{
     if (event->type() != QEvent::KeyPress)
         return;
 
     event->accept(); /* Accept by default. */
 
     QKeyEvent *e = static_cast<QKeyEvent *>(event);
-    switch(e->key()) {
-    case Qt::Key_Enter:
-    case Qt::Key_Return: {
-        toggleCurrentItemMaximizationState();
-        break;
-    }
-    case Qt::Key_Up:
-        if (e->modifiers() & Qt::AltModifier)
-            m_handScrollInstrument->emulate(QPoint(0, -15));
-        else
-            moveCursor(QPoint(0, -1), QPoint(-1, 0));
-        break;
-    case Qt::Key_Down:
-        if (e->modifiers() & Qt::AltModifier)
-            m_handScrollInstrument->emulate(QPoint(0, 15));
-        else
-            moveCursor(QPoint(0, 1), QPoint(1, 0));
-        break;
-    case Qt::Key_Left:
-        if (e->modifiers() & Qt::AltModifier)
-            m_handScrollInstrument->emulate(QPoint(-15, 0));
-        else if (tourIsRunning(context()))
-            menu()->trigger(action::LayoutTourPrevStepAction);
-        else
-            moveCursor(QPoint(-1, 0), QPoint(0, -1));
-        break;
-    case Qt::Key_Right:
-        if (e->modifiers() & Qt::AltModifier)
-            m_handScrollInstrument->emulate(QPoint(15, 0));
-        else if (tourIsRunning(context()))
-            menu()->trigger(action::LayoutTourNextStepAction);
-        else
-            moveCursor(QPoint(1, 0), QPoint(0, 1));
-        break;
-    case Qt::Key_Plus:
-    case Qt::Key_Equal:
-        m_wheelZoomInstrument->emulate(30);
-        break;
-    case Qt::Key_Minus:
-        m_wheelZoomInstrument->emulate(-30);
-        break;
-    case Qt::Key_PageUp:
-    case Qt::Key_PageDown:
-        break; /* Don't let the view handle these and scroll. */
-    case Qt::Key_Menu: {
-        QGraphicsView *view = display()->view();
-        QList<QGraphicsItem *> items = display()->scene()->selectedItems();
-        QPoint offset = view->mapToGlobal(QPoint(0, 0));
-        if (items.count() == 0) {
-            showContextMenuAt(offset);
-        } else {
-            QRectF rect = items[0]->mapToScene(items[0]->boundingRect()).boundingRect();
-            QRect testRect = QnSceneTransformations::mapRectFromScene(view, rect); /* Where is the static analogue? */
-            showContextMenuAt(offset + testRect.bottomRight());
+
+    auto w = qobject_cast<MainWindow*>(mainWindow());
+    NX_EXPECT(w);
+    if (w && w->handleKeyPress(e->key()))
+        return;
+
+    switch (e->key())
+    {
+        case Qt::Key_Enter:
+        case Qt::Key_Return:
+        {
+            toggleCurrentItemMaximizationState();
+            break;
         }
-        break;
-    }
-    case Qt::Key_0:
-    case Qt::Key_1:
-    case Qt::Key_2:
-    case Qt::Key_3:
-    case Qt::Key_4:
-    case Qt::Key_5:
-    case Qt::Key_6:
-    case Qt::Key_7:
-    case Qt::Key_8:
-    case Qt::Key_9: {
-        QnMediaResourceWidget *widget = dynamic_cast<QnMediaResourceWidget*>(display()->widget(Qn::CentralRole));
-        if(!widget || !widget->ptzController())
+        case Qt::Key_Up:
+        {
+            if (e->modifiers() & Qt::AltModifier)
+                m_handScrollInstrument->emulate(QPoint(0, -15));
+            else
+                moveCursor(QPoint(0, -1), QPoint(-1, 0));
             break;
-
-        int hotkey = e->key() - Qt::Key_0;
-
-        QnPtzHotkeysResourcePropertyAdaptor adaptor;
-        adaptor.setResource(widget->resource()->toResourcePtr());
-
-        QString objectId = adaptor.value().value(hotkey);
-        if (objectId.isEmpty())
+        }
+        case Qt::Key_Down:
+        {
+            if (e->modifiers() & Qt::AltModifier)
+                m_handScrollInstrument->emulate(QPoint(0, 15));
+            else
+                moveCursor(QPoint(0, 1), QPoint(1, 0));
             break;
+        }
+        case Qt::Key_Left:
+        {
+            if (e->modifiers() & Qt::AltModifier)
+                m_handScrollInstrument->emulate(QPoint(-15, 0));
+            else
+                moveCursor(QPoint(-1, 0), QPoint(0, -1));
+            break;
+        }
+        case Qt::Key_Right:
+        {
+            if (e->modifiers() & Qt::AltModifier)
+                m_handScrollInstrument->emulate(QPoint(15, 0));
+            else
+                moveCursor(QPoint(1, 0), QPoint(0, 1));
+            break;
+        }
+        case Qt::Key_Plus:
+        case Qt::Key_Equal:
+            m_wheelZoomInstrument->emulate(30);
+            break;
+        case Qt::Key_Minus:
+            m_wheelZoomInstrument->emulate(-30);
+            break;
+        case Qt::Key_PageUp:
+        case Qt::Key_PageDown:
+            break;
+        case Qt::Key_Menu:
+        {
+            QGraphicsView *view = display()->view();
+            QList<QGraphicsItem *> items = display()->scene()->selectedItems();
+            QPoint offset = view->mapToGlobal(QPoint(0, 0));
+            if (items.count() == 0)
+            {
+                showContextMenuAt(offset);
+            }
+            else
+            {
+                QRectF rect = items[0]->mapToScene(items[0]->boundingRect()).boundingRect();
+                QRect testRect = QnSceneTransformations::mapRectFromScene(view, rect); /* Where is the static analogue? */
+                showContextMenuAt(offset + testRect.bottomRight());
+            }
+            break;
+        }
+        case Qt::Key_0:
+        case Qt::Key_1:
+        case Qt::Key_2:
+        case Qt::Key_3:
+        case Qt::Key_4:
+        case Qt::Key_5:
+        case Qt::Key_6:
+        case Qt::Key_7:
+        case Qt::Key_8:
+        case Qt::Key_9:
+        {
+            QnMediaResourceWidget *widget = dynamic_cast<QnMediaResourceWidget*>(display()->widget(Qn::CentralRole));
+            if (!widget || !widget->ptzController())
+                break;
 
-        menu()->trigger(action::PtzActivateObjectAction, action::Parameters(widget).withArgument(Qn::PtzObjectIdRole, objectId));
-        break;
-    }
-    default:
-        event->ignore(); /* Wasn't recognized? Ignore. */
-        break;
+            int hotkey = e->key() - Qt::Key_0;
+
+            QnPtzHotkeysResourcePropertyAdaptor adaptor;
+            adaptor.setResource(widget->resource()->toResourcePtr());
+
+            QString objectId = adaptor.value().value(hotkey);
+            if (objectId.isEmpty())
+                break;
+
+            menu()->trigger(action::PtzActivateObjectAction, action::Parameters(widget).withArgument(Qn::PtzObjectIdRole, objectId));
+            break;
+        }
+        default:
+            event->ignore(); /* Wasn't recognized? Ignore. */
+            break;
     }
 }
 

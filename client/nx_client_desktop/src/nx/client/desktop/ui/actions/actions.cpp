@@ -1555,9 +1555,10 @@ void initialize(Manager* manager, Action* root)
 
     factory(PlayPauseAction)
         .flags(ScopelessHotkey | HotkeyOnly | Slider | SingleTarget)
-        .shortcut(lit("Space"))
+//        .shortcut(lit("Space")) - hotkey is handled directly in Main Window due to Qt issue
         .text(tr("Play"))
         .toggledText(tr("Pause"))
+        .autoRepeat(false)
         .condition(ConditionWrapper(new ArchiveCondition())
             && !condition::tourIsRunning());
 

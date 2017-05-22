@@ -375,7 +375,8 @@ bool Action::event(QEvent* event)
     if (checkCondition(scope, parameters) == EnabledAction)
         QnWorkbenchContextAware::menu()->trigger(id(), parameters);
 
-    /* Skip shortcut to be handled as usual key event. */
+    // Qt shortcuts handling works incorrect. If we have a shortcut set for an action, it will
+    // block key event passing in any case (even if we did not handle the event).
     return false;
 }
 

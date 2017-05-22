@@ -276,11 +276,7 @@ void LayoutTourExecutor::processTourStepInternal(bool forward, bool force)
             break;
         }
         default:
-        {
-            NX_EXPECT(false);
-            stopCurrentTour();
             break;
-        }
     }
 }
 
