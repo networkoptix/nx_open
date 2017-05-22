@@ -77,19 +77,13 @@ protected:
         m_acceptor->acceptAsync(
             [this](SystemError::ErrorCode ecode, std::unique_ptr<AbstractStreamSocket> clientSocket)
             {
-                //std::cout << "accept async" << std::endl;
-
                 ASSERT_EQ(SystemError::noError, ecode);
                 ASSERT_TRUE(clientSocket->setNonBlockingMode(true));
-
-                //std::cout << "accept async 1" << std::endl;
 
                 m_acceptor.reset();
                 clientSocket1 = std::unique_ptr<TestStreamSocketDelegate>(
                     new TestStreamSocketDelegate(clientSocket.release()));
                 clientSocket1->setNonBlockingMode(true);
-
-                //std::cout << "accept async 2" << std::endl;
 
                 clientWebSocket.reset(
                     new TestWebSocket(
@@ -104,12 +98,7 @@ protected:
                         serverReceiveMode,
                         serverRole));
 
-                //std::cout << "accept async 3" << std::endl;
-
                 clientWebSocket->bindToAioThread(serverWebSocket->getAioThread());
-
-                //std::cout << "accept async finished" << std::endl;
-
                 startPromise.set_value();
             });
 
@@ -263,15 +252,6 @@ protected:
 
     virtual void TearDown() override
     {
-        //std::cout << "stopping client" << std::endl;
-        if (clientWebSocket)
-            clientWebSocket->pleaseStopSync(false);
-        //std::cout << "stopping client. DONE" << std::endl;
-
-        //std::cout << "stopping server, server is alive: " << (bool)serverWebSocket << std::endl;
-        if (serverWebSocket)
-            serverWebSocket->pleaseStopSync(false);
-        //std::cout << "stopping server. DONE" << std::endl;
     }
 
     void prepareTestData(nx::Buffer* payload, int size)
