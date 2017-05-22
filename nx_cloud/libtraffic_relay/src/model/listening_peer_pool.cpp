@@ -15,7 +15,6 @@ ListeningPeerPool::ListeningPeerPool(const conf::Settings& settings):
     m_settings(settings),
     m_terminated(false)
 {
-    // TODO: Take timeout from settings.
     m_periodicTasksTimer.start(
         m_settings.listeningPeer().internalTimerPeriod,
         std::bind(&ListeningPeerPool::doPeriodicTasks, this));
