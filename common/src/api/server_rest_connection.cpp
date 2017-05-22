@@ -309,6 +309,25 @@ Handle ServerConnection::downloaderDownloadChunk(
         targetThread);
 }
 
+Handle ServerConnection::downloaderDownloadChunkFromInternet(
+    const QString& fileName,
+    const QUrl& url,
+    int chunkIndex,
+    int chunkSize,
+    Result<QByteArray>::type callback,
+    QThread* targetThread)
+{
+    return executeGet(
+        lit("/api/downloader/downloadChunkFromInternet"),
+        QnRequestParamList{
+            {lit("fileName"), fileName},
+            {lit("url"), url.toString()},
+            {lit("chunkIndex"), QString::number(chunkIndex)},
+            {lit("chunkSize"), QString::number(chunkSize)}},
+        callback,
+        targetThread);
+}
+
 Handle ServerConnection::downloaderUploadChunk(
     const QString& fileName,
     int index,

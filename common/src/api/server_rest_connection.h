@@ -132,6 +132,14 @@ namespace rest
             Result<QByteArray>::type callback,
             QThread* targetThread = nullptr);
 
+        Handle downloaderDownloadChunkFromInternet(
+            const QString& fileName,
+            const QUrl& url,
+            int chunkIndex,
+            int chunkSize,
+            Result<QByteArray>::type callback,
+            QThread* targetThread = nullptr);
+
         Handle downloaderUploadChunk(
             const QString& fileName,
             int index,
