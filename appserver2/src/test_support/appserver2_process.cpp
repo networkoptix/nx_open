@@ -308,12 +308,11 @@ int Appserver2Process::exec()
     tcpListener.start();
 
     m_commonModule->messageProcessor()->init(ec2Connection);
+    m_ecConnection = ec2Connection.get();
     //ec2Connection->startReceivingNotifications();
 
     processStartResult = true;
     triggerOnStartedEventHandlerGuard.fire();
-
-    m_ecConnection = ec2Connection.get();
 
     m_eventLoop.exec();
 

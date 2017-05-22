@@ -14,6 +14,7 @@
 #include <ui/animation/variant_animator.h>
 #include <ui/common/palette.h>
 #include <ui/graphics/instruments/hand_scroll_instrument.h>
+#include <ui/graphics/instruments/motion_selection_instrument.h>
 #include <ui/graphics/items/generic/image_button_widget.h>
 #include <ui/graphics/items/generic/masked_proxy_widget.h>
 #include <ui/processors/hover_processor.h>
@@ -86,6 +87,7 @@ CalendarWorkbenchPanel::CalendarWorkbenchPanel(
     item->setWidget(m_widget);
     item->resize(kCalendarSize);
     item->setProperty(Qn::NoHandScrollOver, true);
+    item->setProperty(Qn::BlockMotionSelection, true);
     item->setZValue(ContentItemZOrder);
     opacityAnimator(item)->setTimeLimit(kShowHideAnimationPeriodMs);
     m_widget->installEventFilter(item);
@@ -117,6 +119,7 @@ CalendarWorkbenchPanel::CalendarWorkbenchPanel(
     m_dayTimeWidget->installEventFilter(item);
     m_dayTimeItem->resize(kDayTimeWidgetSize);
     m_dayTimeItem->setProperty(Qn::NoHandScrollOver, true);
+    m_dayTimeItem->setProperty(Qn::BlockMotionSelection, true);
     m_dayTimeItem->setZValue(ContentItemZOrder);
     opacityAnimator(m_dayTimeItem)->setTimeLimit(kShowHideAnimationPeriodMs);
 

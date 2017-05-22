@@ -1,6 +1,6 @@
 #include <nx/utils/log/log.h>
 
-#include "config.h"
+#include "ini.h"
 #include "ffmpeg_video_decoder.h"
 
 extern "C" {

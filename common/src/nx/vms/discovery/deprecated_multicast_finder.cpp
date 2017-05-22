@@ -353,8 +353,6 @@ void DeprecatedMulticastFinder::run()
         }
 
         currentClock = QDateTime::currentMSecsSinceEpoch();
-        const auto& settings = commonModule()->globalSettings();
-
         if (currentClock - m_prevPingClock >= m_pingTimeoutMillis)
         {
             QnMutexLocker lk(&m_mutex);

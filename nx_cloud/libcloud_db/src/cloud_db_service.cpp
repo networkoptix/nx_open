@@ -91,7 +91,7 @@ int CloudDbService::serviceMain(const utils::AbstractServiceSettings& abstractSe
     nx::utils::log::initialize(
         settings.vmsSynchronizationLogging(), settings.dataDir(),
         QnLibCloudDbAppInfo::applicationDisplayName(), QString(),
-        "sync_log", nx::utils::log::add({QnLog::EC2_TRAN_LOG}));
+        "sync_log", nx::utils::log::addLogger({QnLog::EC2_TRAN_LOG}));
 
     const auto& httpAddrToListenList = settings.endpointsToListen();
     m_settings = &settings;

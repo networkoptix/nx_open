@@ -43,8 +43,12 @@ void QnServerConnector::addConnection(const nx::vms::discovery::Manager::ModuleD
         QnMutexLocker lock(&m_mutex);
         auto& value = m_urls[module.id];
         if (value == newUrl)
+        {
+            NX_VERBOSE(this, lm("Module %1 change does not affect URL %2").args(module.id, newUrl));
             return;
+        }
 
+        oldUrl = value;
         value = newUrl;
     }
 
@@ -63,7 +67,7 @@ void QnServerConnector::removeConnection(const QnUuid& id)
     if (moduleUrl.isNull())
         return;
 
-    NX_DEBUG(this, lm("Removing connection to module %1").args(id, (moduleUrl)));
+    NX_LOGX(lm("Removing connection to module %1 by URL %2").args(id, (moduleUrl)), cl_logINFO);
     commonModule()->ec2Connection()->deleteRemotePeer(id);
 
     const auto server = resourcePool()->getResourceById(id);
@@ -73,6 +77,7 @@ void QnServerConnector::removeConnection(const QnUuid& id)
 
 void QnServerConnector::start()
 {
+    NX_DEBUG(this, "Started");
     commonModule()->moduleDiscoveryManager()->onSignals(this,
         &QnServerConnector::at_moduleChanged,
         &QnServerConnector::at_moduleChanged,
@@ -81,6 +86,7 @@ void QnServerConnector::start()
 
 void QnServerConnector::stop()
 {
+    NX_DEBUG(this, "Stopped");
     commonModule()->moduleDiscoveryManager()->disconnect(this);
 
     decltype(m_urls) usedUrls;
@@ -109,8 +115,8 @@ void QnServerConnector::at_moduleFound(nx::vms::discovery::Manager::ModuleData m
     if (QnConnectionValidator::isCompatibleToCurrentSystem(module, commonModule()))
         return addConnection(module);
 
-    NX_LOGX(lm("QnServerConnector: Ignore incompatable server %1 %2 %3 %4")
-        .args(module.id, module.endpoint, module.systemName, module.version), cl_logDEBUG1);
+    NX_VERBOSE(this, lm("Ignore incompatable server %1 %2 %3 %4")
+        .args(module.id, module.endpoint, module.systemName, module.version));
 }
 
 void QnServerConnector::at_moduleChanged(nx::vms::discovery::Manager::ModuleData module)

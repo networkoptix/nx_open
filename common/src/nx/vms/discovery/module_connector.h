@@ -12,7 +12,7 @@ namespace vms {
 namespace discovery {
 
 /**
- * Verifies module access posibility by maintaining stream connection to first avaliable address.
+ * Verifies module access possibility by maintaining stream connection to first available address.
  */
 class ModuleConnector:
     public network::aio::BasicPollable
@@ -51,8 +51,8 @@ private:
         enum Priority { kDefault, kLocalHost, kLocalNetwork, kIp, kOther };
         typedef std::map<Priority, std::set<SocketAddress>> Endpoints;
 
-        void connect(Endpoints::iterator endpointsGroup);
-        void connect(const SocketAddress& endpoint, Endpoints::iterator endpointsGroup);
+        void connectToGroup(Endpoints::iterator endpointsGroup);
+        void connectToEndpoint(const SocketAddress& endpoint, Endpoints::iterator endpointsGroup);
         boost::optional<QnModuleInformation> getInformation(nx_http::AsyncHttpClientPtr client);
         bool saveConnection(SocketAddress endpoint, nx_http::AsyncHttpClientPtr client,
             const QnModuleInformation& information);

@@ -83,6 +83,7 @@ LIBS_TO_COPY=(
     libmediaserver_core
     libnx_email
     libnx_fusion
+    libnx_kit
     libnx_network
     libnx_streaming
     libnx_utils

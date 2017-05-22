@@ -89,8 +89,8 @@ QString demangleTypeName(const char* type)
 {
     auto typeName = boost::core::demangle(type);
 
-    #ifdef _MSC_VER
-        static const std::vector<std::string> kTypePrefixes = { "struct ", "class " };
+    #if defined(_MSC_VER)
+        static const std::vector<std::string> kTypePrefixes = {"struct ", "class "};
         for (const auto& preffix: kTypePrefixes)
         {
             if (boost::starts_with(typeName, preffix))

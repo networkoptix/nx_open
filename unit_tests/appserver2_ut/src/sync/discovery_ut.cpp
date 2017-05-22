@@ -10,6 +10,10 @@
 #include <nx/vms/discovery/manager.h>
 #include <test_support/appserver2_process.h>
 
+static const std::chrono::milliseconds kDiscoveryTimeouts(100);
+size_t kInitialServerCount = 3;
+size_t kAditionalServerCount = 2;
+
 class DiscoveryTest: public testing::Test
 {
 protected:
@@ -27,11 +31,16 @@ protected:
         ASSERT_TRUE(server->startAndWaitUntilStarted());
 
         const auto module = server->moduleInstance().get();
+        module->commonModule()->updateRunningInstanceGuid();
+        ASSERT_TRUE(module);
         initServerData(module);
         NX_ALWAYS(this, lm("Server %1 started at %2").args(
             module->commonModule()->moduleGUID(), server->moduleInstance()->endpoint()));
 
-        module->commonModule()->moduleDiscoveryManager()->start();
+        const auto discoveryManager = module->commonModule()->moduleDiscoveryManager();
+        discoveryManager->setReconnectInterval(kDiscoveryTimeouts);
+        discoveryManager->setMulticastInterval(kDiscoveryTimeouts);
+        discoveryManager->start();
         m_servers.emplace(module->commonModule()->moduleGUID(), std::move(server));
     }
 
@@ -39,15 +48,19 @@ protected:
     {
         QnSoftwareVersion version(1, 2, 3, 123);
         const auto connection = module->ecConnection();
+        ASSERT_TRUE(connection);
+
+        const auto resourceManager = connection->getResourceManager(Qn::kSystemAccess);
+        ASSERT_TRUE(resourceManager);
 
         QList<QnResourceTypePtr> resourceTypeList;
-        ASSERT_EQ(ec2::ErrorCode::ok, connection->getResourceManager(Qn::kSystemAccess)
-             ->getResourceTypesSync(&resourceTypeList));
+        ASSERT_EQ(ec2::ErrorCode::ok, resourceManager->getResourceTypesSync(&resourceTypeList));
         qnResTypePool->replaceResourceTypeList(resourceTypeList);
 
-        ec2::ApiMediaServerData serverData;
         auto resTypePtr = qnResTypePool->getResourceTypeByName("Server");
         ASSERT_TRUE(!resTypePtr.isNull());
+
+        ec2::ApiMediaServerData serverData;
         serverData.typeId = resTypePtr->getId();
         serverData.id = module->commonModule()->moduleGUID();
         serverData.authKey = QnUuid::createUuid().toString();
@@ -65,12 +78,15 @@ protected:
         information.id = serverData.id;
         information.name = serverData.name;
         information.version = version;
+        information.runtimeId = module->commonModule()->runningInstanceGUID();
         module->commonModule()->setModuleInformation(information);
     }
 
     void checkVisibility()
     {
-        std::this_thread::sleep_for(std::chrono::seconds(10));
+        // Wait enough time for servers to discover each other.
+        std::this_thread::sleep_for(kDiscoveryTimeouts * m_servers.size() * m_servers.size());
+
         size_t totalDiscoveryLinks = 0;
         for (const auto& server: m_servers)
         {
@@ -97,9 +113,9 @@ protected:
                     const auto error = lm("Module %1 failed to discover %2").args(
                         server.first, otherServer.first);
 
-                    #ifdef Q_OS_MAC
-                        // Can join different UDT sockets to the same multicast group on OSX
-                        NX_WARNING(TAG, error);
+                    #if defined(Q_OS_MAC)
+                        // Can join different UDT sockets to the same multicast group on OSX...
+                        NX_WARNING(this, error);
                     #else
                         FAIL() << error.toStdString();
                     #endif
@@ -107,8 +123,8 @@ protected:
             }
         }
 
-        #ifdef Q_OS_MAC
-            EXPECT_GE(totalDiscoveryLinks, (m_servers.size() - 1) * 2);
+        #if defined(Q_OS_MAC)
+            EXPECT_GE(totalDiscoveryLinks, m_servers.size() - 1);
         #else
             EXPECT_EQ(m_servers.size() * (m_servers.size() - 1), totalDiscoveryLinks);
         #endif
@@ -121,11 +137,11 @@ private:
 
 TEST_F(DiscoveryTest, main)
 {
-    for (size_t i = 0; i < 5; ++i)
+    for (size_t i = 0; i < kInitialServerCount; ++i)
         addServer();
     checkVisibility();
 
-    for (size_t i = 0; i < 3; ++i)
+    for (size_t i = 0; i < kAditionalServerCount; ++i)
         addServer();
     checkVisibility();
 }
