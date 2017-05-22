@@ -11,7 +11,7 @@
 namespace nx {
 namespace network {
 
-class PublicIPDiscovery:
+class NX_NETWORK_API PublicIPDiscovery:
     public QObject,
     public nx::network::aio::BasicPollable
 {
