@@ -32,7 +32,7 @@
 
 static int registerQtResources()
 {
-    Q_INIT_RESOURCE( libvms_gateway );
+    Q_INIT_RESOURCE(libvms_gateway);
     return 0;
 }
 
@@ -40,27 +40,11 @@ namespace nx {
 namespace cloud {
 namespace gateway {
 
-VmsGatewayProcess::VmsGatewayProcess( int argc, char **argv ):
-    m_argc( argc ),
-    m_argv( argv ),
-    m_terminated( false ),
-    m_timerID( -1 )
+VmsGatewayProcess::VmsGatewayProcess(int argc, char **argv):
+    base_type(argc, argv, "VmsGateway")
 {
-    //if call Q_INIT_RESOURCE directly, linker will search for nx::cdb::libcloud_db and fail...
+    //if call Q_INIT_RESOURCE directly, linker will search for nx::cloud::gateway::libvms_gateway and fail...
     registerQtResources();
-}
-
-void VmsGatewayProcess::pleaseStop()
-{
-    QnMutexLocker lk(&m_mutex);
-    m_terminated = true;
-    m_cond.wakeAll();
-}
-
-void VmsGatewayProcess::setOnStartedEventHandler(
-    nx::utils::MoveOnlyFunc<void(bool /*result*/)> handler)
-{
-    m_startedEventHandler = std::move(handler);
 }
 
 const std::vector<SocketAddress>& VmsGatewayProcess::httpEndpoints() const
@@ -73,38 +57,26 @@ void VmsGatewayProcess::enforceSslFor(const SocketAddress& targetAddress, bool e
     m_runTimeOptions.enforceSsl(targetAddress, enabled);
 }
 
-int VmsGatewayProcess::exec()
+std::unique_ptr<nx::utils::AbstractServiceSettings> VmsGatewayProcess::createSettings()
+{
+    return std::make_unique<conf::Settings>();
+}
+
+int VmsGatewayProcess::serviceMain(
+    const nx::utils::AbstractServiceSettings& abstractSettings)
 {
     using namespace std::placeholders;
 
-    bool processStartResult = false;
-    auto triggerOnStartedEventHandlerGuard = makeScopeGuard(
-        [this, &processStartResult]
-        {
-            if (m_startedEventHandler)
-                m_startedEventHandler(processStartResult);
-        });
+    const conf::Settings& settings = static_cast<const conf::Settings&>(abstractSettings);
 
     try
     {
-        //reading settings
-        conf::Settings settings;
-        //parsing command line arguments
-        settings.load(m_argc, (const char**) m_argv);
-        if (settings.isShowHelpRequested())
-        {
-            settings.printCmdLineArgsHelp();
-            return 0;
-        }
-
-        nx::utils::log::initialize(
-            settings.logging(), settings.general().dataDir,
-            QnLibVmsGatewayAppInfo::applicationDisplayName());
-
         //enabling nat traversal
         if (!settings.general().mediatorEndpoint.isEmpty())
+        {
             nx::network::SocketGlobals::mediatorConnector().mockupAddress(
                 SocketAddress(settings.general().mediatorEndpoint));
+        }
         nx::network::SocketGlobals::mediatorConnector().enable(true);
 
         std::unique_ptr<nx::network::PublicIPDiscovery> publicAddressFetcher;
@@ -188,19 +160,12 @@ int VmsGatewayProcess::exec()
             .arg(QnLibVmsGatewayAppInfo::applicationDisplayName())
             .container(m_httpEndpoints), cl_logALWAYS);
 
-        processStartResult = true;
-        triggerOnStartedEventHandlerGuard.fire();
-
-        {
-            QnMutexLocker lk(&m_mutex);
-            while (!m_terminated)
-                m_cond.wait(lk.mutex());
-        }
+        const auto result = runMainLoop();
 
         NX_LOG(lm("%1 has been stopped")
             .arg(QnLibVmsGatewayAppInfo::applicationDisplayName()), cl_logALWAYS);
 
-        return 0;
+        return result;
     }
     catch (const std::exception& e)
     {
@@ -266,6 +231,6 @@ void VmsGatewayProcess::publicAddressFetched(
     }
 }
 
-}   //namespace cloud
-}   //namespace gateway
-}   //namespace nx
+} // namespace cloud
+} // namespace gateway
+} // namespace nx
