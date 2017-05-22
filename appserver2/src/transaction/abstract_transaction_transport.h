@@ -17,9 +17,7 @@ namespace ec2 {
         virtual const ec2::ApiPeerData& localPeer() const = 0;
         virtual const ec2::ApiPeerData& remotePeer() const = 0;
 
-        bool transactionShouldBeSentToRemotePeer(const QnAbstractTransaction& transaction);
-    private:
-        static bool skipTransactionForMobileClient(ApiCommand::Value command);
+        bool shouldTransactionBeSentToPeer(const QnAbstractTransaction& transaction);
     };
 
 } // namespace ec2

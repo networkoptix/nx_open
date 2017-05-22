@@ -106,8 +106,8 @@ private:
     template<class T>
     void sendTransactionImpl(const P2pConnectionPtr& connection, const ec2::QnTransaction<T>& tran)
     {
-        if (!connection->transactionShouldBeSentToRemotePeer(tran))
-            return; //< this peer doesn't handle transactions of such type
+        if (!connection->shouldTransactionBeSentToPeer(tran))
+            return; //< This peer doesn't handle transactions of such type.
 
         auto remoteAccess = ec2::getTransactionDescriptorByTransaction(tran)->
             checkRemotePeerAccessFunc(commonModule(), connection->userAccessData(), tran.params);

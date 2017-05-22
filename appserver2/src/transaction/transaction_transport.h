@@ -40,7 +40,7 @@ public:
     template<class T>
     void sendTransaction(const QnTransaction<T>& transaction, const QnTransactionTransportHeader& header)
     {
-        if (!transactionShouldBeSentToRemotePeer(transaction))
+        if (!shouldTransactionBeSentToPeer(transaction))
             return;
 
         auto remoteAccess = ec2::getTransactionDescriptorByTransaction(transaction)->checkRemotePeerAccessFunc(m_bus->commonModule(), m_userAccessData, transaction.params);
@@ -58,7 +58,7 @@ public:
     template<template<typename, typename> class Cont, typename Param, typename A>
     void sendTransaction(const QnTransaction<Cont<Param, A>>& transaction, const QnTransactionTransportHeader& header)
     {
-        if (!transactionShouldBeSentToRemotePeer(transaction))
+        if (!shouldTransactionBeSentToPeer(transaction))
             return;
 
         auto td = ec2::getTransactionDescriptorByTransaction(transaction);
