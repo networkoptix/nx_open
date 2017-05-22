@@ -394,6 +394,11 @@ angular.module('nxCommon').controller('ViewCtrl',
 
             var userId = result.data.reply.id;
             $scope.camerasProvider.requestResources().then(function(res){
+                if(!$scope.storage.cameraId)
+                {
+                    $scope.storage.cameraId = $scope.camerasProvider.getFirstCam();
+
+                }
                 $scope.activeCamera = $scope.camerasProvider.getCamera($scope.storage.cameraId);
                 $scope.camerasProvider.startPoll();
             });

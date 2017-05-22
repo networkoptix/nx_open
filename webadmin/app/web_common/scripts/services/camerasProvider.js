@@ -293,8 +293,8 @@ angular.module('nxCommon')
                     return type.name === 'SERVER_DESKTOP_CAMERA';
                 });
                 self.desktopCameraTypeId = self.desktopCameraTypeId ? self.desktopCameraTypeId.id : null;
-                self.reloadTree().then(function(){
-                    deferred.resolve();
+                self.reloadTree().then(function(cams){
+                    deferred.resolve(cams);
                 });
             });
             return deferred.promise;
@@ -313,6 +313,19 @@ angular.module('nxCommon')
         camerasProvider.prototype.abortTree = function(){
             if(this.treeRequest){
                 this.treeRequest.abort('updateVideoSource'); //abort tree reloading request to speed up loading new video
+            }
+        };
+
+        camerasProvider.prototype.getFirstCam = function(){
+            var tmpServerList = this.mediaServers;
+            var tmpCamerasList = this.cameras;
+            for(var i in tmpServerList){
+                var serverId = tmpServerList[i].id;
+                for(var j in tmpCamerasList[serverId]){
+                    if(tmpCamerasList[serverId][j] && tmpCamerasList[serverId][j].id){
+                        return tmpCamerasList[serverId][j].id;
+                    }
+                }
             }
         };
 
