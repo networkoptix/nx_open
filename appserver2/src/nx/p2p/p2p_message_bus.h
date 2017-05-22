@@ -75,8 +75,7 @@ public:
     virtual void start() override;
     virtual void stop() override;
 
-    virtual QMap<QnUuid, ApiPeerData> aliveServerPeers() const override;
-    virtual QMap<QnUuid, ApiPeerData> aliveClientPeers(int maxDistance = std::numeric_limits<int>::max()) const override;
+    virtual QSet<QnUuid> directlyConnectedClientPeers() const override;
     virtual QnUuid routeToPeerVia(const QnUuid& dstPeer, int* distance) const override;
     virtual int distanceToPeer(const QnUuid& dstPeer) const override;
     virtual void dropConnections() override;

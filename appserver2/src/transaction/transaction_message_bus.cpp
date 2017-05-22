@@ -1708,21 +1708,31 @@ QMap<QnUuid, ApiPeerData> QnTransactionMessageBus::aliveServerPeers() const
     return result;
 }
 
-QMap<QnUuid, ApiPeerData> QnTransactionMessageBus::aliveClientPeers(int maxDistance) const
+QnTransactionMessageBus::AlivePeersMap QnTransactionMessageBus::aliveClientPeers() const
 {
     QnMutexLocker lock(&m_mutex);
-    QMap<QnUuid, ApiPeerData> result;
+    AlivePeersMap result;
     for (AlivePeersMap::const_iterator itr = m_alivePeers.begin(); itr != m_alivePeers.end(); ++itr)
     {
         if (itr->peer.isClient())
-        {
-            int distance = std::numeric_limits<int>::max();
-            for (const RoutingRecord& rec: itr->routingInfo)
-                distance = std::min(distance, (int) rec.distance);
-            if (distance < maxDistance)
-                continue;
-        }
+            result.insert(itr.key(), itr.value());
     }
+
+    return result;
+}
+
+QSet<QnUuid> QnTransactionMessageBus::directlyConnectedClientPeers() const
+{
+    QSet<QnUuid> result;
+
+    auto clients = aliveClientPeers();
+    for (auto it = clients.begin(); it != clients.end(); ++it)
+    {
+        const auto& clientId = it.key();
+        if (it->routingInfo.contains(clientId))
+            result.insert(clientId);
+    }
+
     return result;
 }
 

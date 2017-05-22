@@ -168,7 +168,7 @@ int QnDiscoveryManager<QueryProcessorType>::sendDiscoveredServer(
     const ApiDiscoveredServerData &discoveredServer,
     impl::SimpleHandlerPtr handler)
 {
-    const auto peers = messageBus->aliveClientPeers(/*distance*/ 0); // directly connected
+    const auto peers = messageBus->directlyConnectedClientPeers();
     if (peers.isEmpty())
         return -1;
 
@@ -179,10 +179,7 @@ int QnDiscoveryManager<QueryProcessorType>::sendDiscoveredServer(
 
     const int reqId = generateRequestID();
 
-    QSet<QnUuid> dstPeers;
-    for (const auto& p : peers)
-        dstPeers.insert(p.id);
-    sendTransaction(messageBus, transaction, dstPeers);
+    sendTransaction(messageBus, transaction, peers);
 
     nx::utils::concurrent::run(Ec2ThreadPool::instance(),
         [handler, reqId]{ handler->done(reqId, ErrorCode::ok); });
@@ -196,7 +193,7 @@ int QnDiscoveryManager<QueryProcessorType>::sendDiscoveredServersList(
     const ApiDiscoveredServerDataList &discoveredServersList,
     impl::SimpleHandlerPtr handler)
 {
-    const auto peers = messageBus->aliveClientPeers(/*distance*/ 0); // directly connected
+    const auto peers = messageBus->directlyConnectedClientPeers();
     if (peers.isEmpty())
         return -1;
 
@@ -207,10 +204,7 @@ int QnDiscoveryManager<QueryProcessorType>::sendDiscoveredServersList(
 
     const int reqId = generateRequestID();
 
-    QSet<QnUuid> dstPeers;
-    for (const auto& p: peers)
-        dstPeers.insert(p.id);
-    sendTransaction(messageBus, transaction, dstPeers);
+    sendTransaction(messageBus, transaction, peers);
 
     nx::utils::concurrent::run(Ec2ThreadPool::instance(),
         [handler, reqId]{ handler->done(reqId, ErrorCode::ok); });

@@ -113,15 +113,17 @@ public:
     typedef QMap<QnUuid, AlivePeerInfo> AlivePeersMap;
 
     /*
-    * Return all alive peers
-    */
+     * Return all alive peers
+     */
     AlivePeersMap alivePeers() const;
 
     /*
-    * Return all alive server peers
-    */
-    virtual QMap<QnUuid, ApiPeerData> aliveServerPeers() const override;
-    virtual QMap<QnUuid, ApiPeerData> aliveClientPeers(int maxDistance = std::numeric_limits<int>::max()) const override;
+     * Return all alive server peers
+     */
+    QMap<QnUuid, ApiPeerData> aliveServerPeers() const;
+    AlivePeersMap aliveClientPeers() const;
+
+    virtual QSet<QnUuid> directlyConnectedClientPeers() const override;
     virtual void dropConnections() override;
 signals:
 

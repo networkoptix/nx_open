@@ -1308,16 +1308,15 @@ int MessageBus::connectionTries() const
     return m_connectionTries;
 }
 
-QMap<QnUuid, ApiPeerData> MessageBus::aliveServerPeers() const
+QSet<QnUuid> MessageBus::directlyConnectedClientPeers() const
 {
-    // todo: implement me
-    return QMap<QnUuid, ApiPeerData>();
-}
-
-QMap<QnUuid, ApiPeerData> MessageBus::aliveClientPeers(int maxDistance) const
-{
-    // todo: implement me
-    return QMap<QnUuid, ApiPeerData>();
+    QSet<QnUuid> result;
+    for (const auto& connection: m_connections)
+    {
+        if (connection->remotePeer().isClient())
+            result.insert(connection->remotePeer().id);
+    }
+    return result;
 }
 
 QnUuid MessageBus::routeToPeerVia(const QnUuid& peerId, int* distance) const

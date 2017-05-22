@@ -48,8 +48,7 @@ namespace ec2
         virtual void start();
         virtual void stop();
 
-        virtual QMap<QnUuid, ApiPeerData> aliveServerPeers() const = 0;
-        virtual QMap<QnUuid, ApiPeerData> aliveClientPeers(int maxDistance = std::numeric_limits<int>::max()) const = 0;
+        virtual QSet<QnUuid> directlyConnectedClientPeers() const = 0;
 
         virtual QnUuid routeToPeerVia(const QnUuid& dstPeer, int* distance) const = 0;
         virtual int distanceToPeer(const QnUuid& dstPeer) const = 0;
