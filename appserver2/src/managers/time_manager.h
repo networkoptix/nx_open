@@ -17,7 +17,7 @@
 #include <nx/utils/safe_direct_connection.h>
 #include <nx/utils/singleton.h>
 #include <nx/network/time/abstract_accurate_time_fetcher.h>
-#include <nx/network/http/httptypes.h>
+#include <nx/network/http/http_types.h>
 
 #include "nx_ec/data/api_data.h"
 #include "transaction/transaction.h"

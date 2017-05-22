@@ -14,7 +14,7 @@
 #include "nx/network/aio/timer.h"
 
 #include "auth_cache.h"
-#include "httpstreamreader.h"
+#include "http_stream_reader.h"
 
 namespace nx_http {
 

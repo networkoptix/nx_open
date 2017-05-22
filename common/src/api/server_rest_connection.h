@@ -2,7 +2,7 @@
 
 #include "server_rest_connection_fwd.h"
 
-#include <nx/network/http/httptypes.h>
+#include <nx/network/http/http_types.h>
 #include <nx/utils/system_error.h>
 #include "utils/common/request_param.h"
 #include "nx_ec/data/api_fwd.h"

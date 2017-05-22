@@ -9,7 +9,7 @@
 #include <core/resource_access/resource_access_manager.h>
 
 #include <nx/utils/log/log.h>
-#include <nx/network/http/httptypes.h>
+#include <nx/network/http/http_types.h>
 #include <nx/fusion/model_functions.h>
 #include <network/tcp_connection_priv.h>
 #include <rest/server/rest_connection_processor.h>

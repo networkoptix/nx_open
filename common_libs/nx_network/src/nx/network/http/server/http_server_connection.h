@@ -5,7 +5,7 @@
 #include <nx/network/connection_server/base_stream_protocol_connection.h>
 #include <nx/network/connection_server/stream_socket_server.h>
 #include <nx/network/http/abstract_msg_body_source.h>
-#include <nx/network/http/httptypes.h>
+#include <nx/network/http/http_types.h>
 #include <nx/network/http/http_parser.h>
 #include <nx/network/http/http_serializer.h>
 

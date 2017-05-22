@@ -7,7 +7,7 @@
 
 #include <QtCore/QTextStream>
 
-#include <nx/network/http/httptypes.h>
+#include <nx/network/http/http_types.h>
 #include <nx/streaming/av_codec_media_context.h>
 #include <nx/utils/app_info.h>
 #include <nx/utils/log/log.h>

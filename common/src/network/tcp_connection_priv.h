@@ -7,8 +7,8 @@
 #include "tcp_connection_processor.h"
 
 #include "utils/common/byte_array.h"
-#include <nx/network/http/httptypes.h>
-#include <nx/network/http/httpstreamreader.h>
+#include <nx/network/http/http_types.h>
+#include <nx/network/http/http_stream_reader.h>
 #include <core/resource_access/user_access_data.h>
 
 

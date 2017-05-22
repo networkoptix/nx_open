@@ -8,7 +8,7 @@
 #include <nx/utils/move_only_func.h>
 #include <nx/utils/system_error.h>
 
-#include "httptypes.h"
+#include "http_types.h"
 
 namespace nx_http {
 

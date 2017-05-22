@@ -2,7 +2,7 @@
 
 #include <initializer_list>
 
-#include "../httptypes.h"
+#include "../http_types.h"
 
 namespace nx_http {
 namespace rest {

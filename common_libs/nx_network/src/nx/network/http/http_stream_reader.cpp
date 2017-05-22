@@ -1,4 +1,4 @@
-#include "httpstreamreader.h"
+#include "http_stream_reader.h"
 
 #include <algorithm>
 

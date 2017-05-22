@@ -5,7 +5,7 @@
 #include <common/common_module.h>
 
 #include <nx/fusion/model_functions.h>
-#include <nx/network/http/httptypes.h>
+#include <nx/network/http/http_types.h>
 
 #include <api/model/setup_local_system_data.h>
 #include <api/resource_property_adaptor.h>

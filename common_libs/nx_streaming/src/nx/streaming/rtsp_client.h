@@ -18,7 +18,7 @@ extern "C"
 #include <QtCore/QUrl>
 
 #include <nx/network/socket.h>
-#include <nx/network/http/httptypes.h>
+#include <nx/network/http/http_types.h>
 
 #include <utils/common/threadqueue.h>
 #include <utils/common/byte_array.h>

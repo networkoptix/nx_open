@@ -4,7 +4,7 @@
 
 #include <QtCore/QString>
 
-#include <nx/network/http/httptypes.h>
+#include <nx/network/http/http_types.h>
 
 namespace nx_http {
 
