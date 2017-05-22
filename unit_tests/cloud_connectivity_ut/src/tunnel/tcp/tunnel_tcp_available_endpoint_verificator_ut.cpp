@@ -54,7 +54,7 @@ protected:
         ASSERT_EQ(
             AbstractEndpointVerificator::VerificationResult::passed,
             m_verificationResults.pop());
-        ASSERT_EQ(SystemError::noError, m_verificator->lastSysErrorCode());
+        ASSERT_EQ(SystemError::noError, m_verificator->lastSystemErrorCode());
     }
 
     void thenErrorHasBeenReported()
@@ -62,7 +62,7 @@ protected:
         ASSERT_EQ(
             AbstractEndpointVerificator::VerificationResult::ioError,
             m_verificationResults.pop());
-        ASSERT_NE(SystemError::noError, m_verificator->lastSysErrorCode());
+        ASSERT_NE(SystemError::noError, m_verificator->lastSystemErrorCode());
     }
 
 private:

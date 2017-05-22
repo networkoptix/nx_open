@@ -47,9 +47,9 @@ void AvailableEndpointVerificator::verifyHost(
         std::bind(&AvailableEndpointVerificator::onConnectDone, this, _1));
 }
 
-SystemError::ErrorCode AvailableEndpointVerificator::lastSysErrorCode() const
+SystemError::ErrorCode AvailableEndpointVerificator::lastSystemErrorCode() const
 {
-    return m_lastSysErrorCode;
+    return m_lastSystemErrorCode;
 }
 
 std::unique_ptr<AbstractStreamSocket> AvailableEndpointVerificator::takeSocket()
@@ -67,7 +67,7 @@ void AvailableEndpointVerificator::stopWhileInAioThread()
 void AvailableEndpointVerificator::onConnectDone(
     SystemError::ErrorCode sysErrorCode)
 {
-    m_lastSysErrorCode = sysErrorCode;
+    m_lastSystemErrorCode = sysErrorCode;
 
     m_completionHandler(
         sysErrorCode == SystemError::noError
