@@ -2037,7 +2037,7 @@ Qn::ServerFlags MediaServerProcess::calcServerFlags()
 
 void MediaServerProcess::initPublicIpDiscovery()
 {
-    m_ipDiscovery.reset(new QnPublicIPDiscovery(
+    m_ipDiscovery.reset(new nx::network::PublicIPDiscovery(
         qnServerModule->roSettings()->value(nx_ms_conf::PUBLIC_IP_SERVERS).toString().split(";", QString::SkipEmptyParts)));
 
     if (qnServerModule->roSettings()->value("publicIPEnabled").isNull())
@@ -2057,8 +2057,8 @@ void MediaServerProcess::initPublicIpDiscovery()
     at_updatePublicAddress(m_ipDiscovery->publicIP());
 
     m_updatePiblicIpTimer.reset(new QTimer());
-    connect(m_updatePiblicIpTimer.get(), &QTimer::timeout, m_ipDiscovery.get(), &QnPublicIPDiscovery::update);
-    connect(m_ipDiscovery.get(), &QnPublicIPDiscovery::found, this, &MediaServerProcess::at_updatePublicAddress);
+    connect(m_updatePiblicIpTimer.get(), &QTimer::timeout, m_ipDiscovery.get(), &nx::network::PublicIPDiscovery::update);
+    connect(m_ipDiscovery.get(), &nx::network::PublicIPDiscovery::found, this, &MediaServerProcess::at_updatePublicAddress);
     m_updatePiblicIpTimer->start(kPublicIpUpdateTimeoutMs);
 }
 

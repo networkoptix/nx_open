@@ -22,9 +22,9 @@
 #include <nx/utils/scope_guard.h>
 #include <nx/utils/system_error.h>
 
-#include <platform/process/current_process.h>
-#include <utils/common/app_info.h>
-#include <utils/common/public_ip_discovery.h>
+//#include <platform/process/current_process.h>
+//#include <utils/common/app_info.h>
+#include <nx/network/public_ip_discovery.h>
 
 #include "access_control/authentication_manager.h"
 #include "http/connect_handler.h"
@@ -110,7 +110,7 @@ int VmsGatewayProcess::exec()
                 SocketAddress(settings.general().mediatorEndpoint));
         nx::network::SocketGlobals::mediatorConnector().enable(true);
 
-        std::unique_ptr<QnPublicIPDiscovery> publicAddressFetcher;
+        std::unique_ptr<nx::network::PublicIPDiscovery> publicAddressFetcher;
         if (settings.cloudConnect().replaceHostAddressWithPublicAddress)
         {
             if (!settings.cloudConnect().publicIpAddress.isEmpty())
@@ -119,11 +119,11 @@ int VmsGatewayProcess::exec()
             }
             else
             {
-                publicAddressFetcher = std::make_unique<QnPublicIPDiscovery>(
+                publicAddressFetcher = std::make_unique<nx::network::PublicIPDiscovery>(
                     QStringList() << settings.cloudConnect().fetchPublicIpUrl);
 
                 QObject::connect(
-                    publicAddressFetcher.get(), &QnPublicIPDiscovery::found,
+                    publicAddressFetcher.get(), &nx::network::PublicIPDiscovery::found,
                     [this, &settings](const QHostAddress& publicAddress)
                     {
                         publicAddressFetched(settings, publicAddress.toString());
