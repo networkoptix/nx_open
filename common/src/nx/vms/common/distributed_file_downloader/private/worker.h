@@ -88,7 +88,7 @@ private:
     void finish();
     void fail();
 
-    QString logMessage(const char* message) const;
+    void updateLogTag();
 
     bool addAvailableChunksInfo(const QBitArray& chunks);
     QList<QnUuid> peersForChunk(int chunkIndex) const;
@@ -120,6 +120,7 @@ private:
     AbstractPeerManager* m_peerManager;
     const QString m_fileName;
 
+    QString m_logTag;
     bool m_printSelfPeerInLogs = false;
 
     State m_state = State::initial;
