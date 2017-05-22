@@ -128,7 +128,7 @@ private:
 
     virtual void SetUp() override
     {
-        addArg(("--trafficRelay/url="+m_relayUrl).c_str());
+        addArg(("--trafficRelay/url=" + m_relayUrl).c_str());
 
         ASSERT_TRUE(startAndWaitUntilStarted());
         const auto system = addRandomSystem();
