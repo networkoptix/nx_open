@@ -52,7 +52,7 @@ function(detect_package_versions)
     set(directx_version ${_directx_version} CACHE STRING "")
     set(gcc_version ${_gcc_version} CACHE STRING "")
 
-    set(help_version "${customization}-${releaseVersion}" PARENT_SCOPE)
+    set(help_version "${customization}-${releaseVersion.short}" PARENT_SCOPE)
 endfunction()
 
 detect_package_versions()

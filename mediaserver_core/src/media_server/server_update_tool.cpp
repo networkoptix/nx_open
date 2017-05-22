@@ -321,7 +321,7 @@ bool QnServerUpdateTool::installUpdate(const QString &updateId, UpdateType updat
         NX_LOG(lit("QnServerUpdateTool: The specified executable doesn't have an execute permission: %1").arg(executable), cl_logWARNING);
         executableFile.setPermissions(executableFile.permissions() | QFile::ExeOwner);
     }
-    if (nx::utils::log::main()->isToBeLogged(nx::utils::log::Level::debug))
+    if (nx::utils::log::mainLogger()->isToBeLogged(nx::utils::log::Level::debug))
     {
         QString argumentsStr(" APPSERVER_PASSWORD=\"\" APPSERVER_PASSWORD_CONFIRM=\"\" SERVER_PASSWORD=\"\" SERVER_PASSWORD_CONFIRM=\"\"");
         for( const QString& arg: arguments )

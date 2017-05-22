@@ -222,13 +222,13 @@ void QnCommonMessageProcessor::on_gotDiscoveryData(const ec2::ApiDiscoveryData &
     QnMediaServerResourcePtr server = resourcePool()->getResourceById<QnMediaServerResource>(data.id);
     if (!server) {
         if (!data.ignore) {
-            QList<QUrl> urls = QnServerAdditionalAddressesDictionary::instance()->additionalUrls(data.id);
+            QList<QUrl> urls = commonModule()->serverAdditionalAddressesDictionary()->additionalUrls(data.id);
             urls.append(url);
-            QnServerAdditionalAddressesDictionary::instance()->setAdditionalUrls(data.id, urls);
+            commonModule()->serverAdditionalAddressesDictionary()->setAdditionalUrls(data.id, urls);
         } else {
-            QList<QUrl> urls = QnServerAdditionalAddressesDictionary::instance()->ignoredUrls(data.id);
+            QList<QUrl> urls = commonModule()->serverAdditionalAddressesDictionary()->ignoredUrls(data.id);
             urls.append(url);
-            QnServerAdditionalAddressesDictionary::instance()->setIgnoredUrls(data.id, urls);
+            commonModule()->serverAdditionalAddressesDictionary()->setIgnoredUrls(data.id, urls);
         }
         return;
     }
@@ -673,7 +673,7 @@ void QnCommonMessageProcessor::onGotInitialNotification(const ec2::ApiFullInfoDa
     resourceAccessManager()->beginUpdate();
     resourceAccessProvider()->beginUpdate();
 
-    QnServerAdditionalAddressesDictionary::instance()->clear();
+    commonModule()->serverAdditionalAddressesDictionary()->clear();
 
     resetResourceTypes(fullData.resourceTypes);
     resetResources(fullData);

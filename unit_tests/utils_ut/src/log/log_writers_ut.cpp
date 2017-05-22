@@ -11,7 +11,7 @@ namespace utils {
 namespace log {
 namespace test {
 
-#ifdef Q_OS_WIN
+#if defined(Q_OS_WIN)
     const QByteArray kLineSplit("\r\n");
 #else
     const QByteArray kLineSplit("\n");

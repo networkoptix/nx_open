@@ -52,12 +52,12 @@ WinDriveInfoList getWinDrivesInfo()
                                         NULL);
         if (driveHandle == INVALID_HANDLE_VALUE)
             continue;
-        WORD bytesReturned;
+        DWORD bytesReturned;
         bool success = DeviceIoControl(driveHandle,
                                         IOCTL_STORAGE_CHECK_VERIFY2,
                                         NULL, 0,
                                         NULL, 0,
-                                        (LPDWORD)&bytesReturned,
+                                        &bytesReturned,
                                         NULL);
         if (!success)
         {
@@ -69,7 +69,7 @@ WinDriveInfoList getWinDrivesInfo()
                                   IOCTL_DISK_IS_WRITABLE,
                                   NULL, 0,
                                   NULL, 0,
-                                  (LPDWORD)&bytesReturned,
+                                  &bytesReturned,
                                   NULL);
         driveInfo.access |= success ? WinDriveInfo::Writable : 0;
         driveInfo.type = GetDriveType((LPCWSTR) driveInfo.path.data());

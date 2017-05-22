@@ -48,7 +48,7 @@
 #include <nx/mobile_client/controllers/web_admin_controller.h>
 #include <nx/mobile_client/helpers/inter_client_message.h>
 
-#include <config.h>
+#include <ini.h>
 
 // TODO: #muskov Introduce a convenient cross-platform entity for crash handlers.
 #include <nx/utils/crash_dump/systemexcept.h>
@@ -257,7 +257,7 @@ void initLog(const QString& logLevel)
                     : (QString::fromUtf8(ini().iniFileDir()) + lit("log_file")));
     }
 
-    const auto ec2logger = nx::utils::log::add({QnLog::EC2_TRAN_LOG});
+    const auto ec2logger = nx::utils::log::addLogger({QnLog::EC2_TRAN_LOG});
     if (ini().enableEc2TranLog)
     {
         nx::utils::log::initialize(

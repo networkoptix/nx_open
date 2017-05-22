@@ -444,7 +444,7 @@ void QnClientModule::initLog(const QnStartupParameters& startupParams)
     nx::utils::log::initialize(
         logSettings, dataLocation, qApp->applicationName(), qApp->applicationFilePath());
 
-    const auto ec2logger = nx::utils::log::add({QnLog::EC2_TRAN_LOG});
+    const auto ec2logger = nx::utils::log::addLogger({QnLog::EC2_TRAN_LOG});
     if (ec2TranLogLevel != lit("none"))
     {
         logSettings.level = nx::utils::log::levelFromString(ec2TranLogLevel);

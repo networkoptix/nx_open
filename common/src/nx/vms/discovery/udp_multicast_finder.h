@@ -10,12 +10,15 @@ namespace vms {
 namespace discovery {
 
 /**
- * Multicasts module information and listen for such multicasts to discover VMS modules.
+ * Multicasts module information and listens for such multicasts to discover VMS modules.
  */
 class UdpMulticastFinder:
     public network::aio::BasicPollable
 {
 public:
+    using ModuleHandler = nx::utils::MoveOnlyFunc<void(
+        const QnModuleInformationWithAddresses& module, const SocketAddress& endpoint)>;
+
     static const SocketAddress kMulticastEndpoint;
     static const std::chrono::milliseconds kUpdateInterfacesInterval;
     static const std::chrono::milliseconds kSendInterval;
@@ -29,7 +32,7 @@ public:
     void multicastInformation(const QnModuleInformationWithAddresses& information);
 
     /** Listens to module information multicasts, executes handler on each message recieved. */
-    void listen(nx::utils::MoveOnlyFunc<void(const QnModuleInformationWithAddresses& module)> handler);
+    void listen(ModuleHandler handler);
 
     virtual void stopWhileInAioThread() override;
     void updateInterfaces();
@@ -53,7 +56,7 @@ private:
 
     Buffer m_inData;
     std::unique_ptr<network::UDPSocket> m_receiver;
-    nx::utils::MoveOnlyFunc<void(const QnModuleInformationWithAddresses& module)> m_moduleHandler;
+    ModuleHandler m_moduleHandler;
 };
 
 } // namespace discovery

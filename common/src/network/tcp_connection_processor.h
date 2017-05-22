@@ -66,7 +66,8 @@ public:
     int redirectTo(const QByteArray& page, QByteArray& contentType);
     int notFound(QByteArray& contentType);
     QnAuthSession authSession() const;
-
+protected:
+    virtual void applyModToRequest() {}
 protected:
     QString extractPath() const;
     static QString extractPath(const QString& fullUrl);

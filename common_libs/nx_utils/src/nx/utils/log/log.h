@@ -22,14 +22,13 @@ struct QnLog
     static NX_UTILS_API const QString HWID_LOG;
     static NX_UTILS_API const QString PERMISSIONS_LOG;
 
-    static NX_UTILS_API std::vector<QString> kAllLogs;
-
     static NX_UTILS_API void initLog(QnLog* log);
     static NX_UTILS_API QnLogs& instance();
 };
 
 struct QnLogs
 {
+    static NX_UTILS_API std::shared_ptr<nx::utils::log::Logger> logger(int id);
     static NX_UTILS_API QnLog* get();
 };
 
