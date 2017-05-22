@@ -1,6 +1,7 @@
 #include "distributed_file_downloader_rest_handler.h"
 
 #include <nx/network/http/httptypes.h>
+#include <nx/network/http/httpclient.h>
 #include <nx/fusion/model_functions.h>
 #include <nx/vms/common/distributed_file_downloader/downloader.h>
 #include <rest/server/json_rest_result.h>
@@ -14,6 +15,8 @@ namespace {
 
 static const QByteArray kJsonContentType("application/json");
 static const QByteArray kOctetStreamContentType("application/octet-stream");
+static const int kDownloadRequestTimeoutMs = 10 * 60 * 1000;
+static const int kMaxChunkSize = 10 * 1024 * 1024;
 
 enum class Command
 {
@@ -21,6 +24,7 @@ enum class Command
     removeDownload,
     chunkChecksums,
     downloadChunk,
+    downloadChunkFromInternet,
     uploadChunk,
     status,
     unknown
@@ -33,6 +37,7 @@ Command commandFromPath(const QString& path)
         {"removeDownload", Command::removeDownload},
         {"chunkChecksums", Command::chunkChecksums},
         {"downloadChunk", Command::downloadChunk},
+        {"downloadChunkFromInternet", Command::downloadChunkFromInternet},
         {"uploadChunk", Command::uploadChunk},
         {"status", Command::status}
     };
@@ -55,6 +60,7 @@ public:
     int handleRemoveDownload();
     int handleGetChunkChecksums();
     int handleDownloadChunk();
+    int handleDownloadChunkFromInternet();
     int handleUploadChunk(const QByteArray& body, const QByteArray& contentType);
     int handleStatus();
 
@@ -180,6 +186,82 @@ int RequestHelper::handleDownloadChunk()
 
     result = data;
     resultContentType = kOctetStreamContentType;
+    return nx_http::StatusCode::ok;
+}
+
+int RequestHelper::handleDownloadChunkFromInternet()
+{
+    const auto fileName = params.value("fileName");
+    if (fileName.isEmpty())
+        return makeInvalidParameterError("fileName", QnRestResult::MissingParameter);
+
+    const QUrl url = params.value("url");
+    if (url.isEmpty())
+        return makeInvalidParameterError("url", QnRestResult::MissingParameter);
+    else if (!url.isValid())
+        return makeInvalidParameterError("url", QnRestResult::InvalidParameter);
+
+    bool ok;
+    const int chunkIndex = params.value("index").toInt(&ok);
+    if (!ok)
+        return makeInvalidParameterError("index", QnRestResult::MissingParameter);
+
+    const qint64 chunkSize = params.value("chunkSize").toLongLong(&ok);
+    if (!ok)
+        return makeInvalidParameterError("chunkSize", QnRestResult::MissingParameter);
+    if (chunkSize > kMaxChunkSize)
+        return makeInvalidParameterError("chunkSize", QnRestResult::InvalidParameter);
+
+    const auto fileInfo = downloader->fileInformation(fileName);
+    bool useDownloader = fileInfo.isValid()
+        && fileInfo.url == url
+        && fileInfo.chunkSize == chunkSize
+        && chunkIndex < fileInfo.downloadedChunks.size();
+
+    if (useDownloader && fileInfo.downloadedChunks[chunkIndex])
+    {
+        QByteArray data;
+        const auto errorCode = downloader->readFileChunk(fileName, chunkIndex, data);
+        if (errorCode == ErrorCode::noError)
+        {
+            result = data;
+            resultContentType = kOctetStreamContentType;
+            return nx_http::StatusCode::ok;
+        }
+    }
+
+    nx_http::HttpClient httpClient;
+    httpClient.setResponseReadTimeoutMs(kDownloadRequestTimeoutMs);
+    httpClient.setSendTimeoutMs(kDownloadRequestTimeoutMs);
+    httpClient.setMessageBodyReadTimeoutMs(kDownloadRequestTimeoutMs);
+
+    const qint64 pos = chunkIndex * chunkSize;
+    httpClient.addAdditionalHeader("Range",
+        lit("bytes=%1-%2").arg(pos).arg(pos + chunkSize - 1).toLatin1());
+
+    if (!httpClient.doGet(url) || !httpClient.response())
+        return nx_http::StatusCode::internalServerError;
+
+    const auto status = httpClient.response()->statusLine.statusCode;
+
+    if (status != nx_http::StatusCode::ok && status != nx_http::StatusCode::partialContent)
+        return status;
+
+    result.clear();
+    while (!httpClient.eof())
+        result.append(httpClient.fetchMessageBodyBuffer());
+
+    if (!httpClient.isValid())
+    {
+        result.clear();
+        return nx_http::StatusCode::internalServerError;
+    }
+
+    resultContentType = kOctetStreamContentType;
+
+    if (useDownloader)
+        downloader->writeFileChunk(fileName, chunkIndex, result);
+
     return nx_http::StatusCode::ok;
 }
 
@@ -323,6 +405,9 @@ int QnDistributedFileDownloaderRestHandler::executePost(
 
         case Command::downloadChunk:
             return helper.handleDownloadChunk();
+
+        case Command::downloadChunkFromInternet:
+            return helper.handleDownloadChunkFromInternet();
 
         case Command::uploadChunk:
             return helper.handleUploadChunk(body, bodyContentType);
