@@ -69,6 +69,7 @@ public:
 protected:
     int m_pingsReceived = 0;
     int m_pongsReceived = 0;
+    std::chrono::milliseconds m_pingTimeout;
 
 private:
     virtual void stopWhileInAioThread() override;
@@ -113,7 +114,6 @@ private:
     nx::Buffer m_controlBuffer;
     nx::Buffer m_readBuffer;
     std::unique_ptr<nx::network::aio::Timer> m_pingTimer;
-    std::chrono::milliseconds m_pingTimeout;
     nx::utils::ObjectDestructionFlag m_destructionFlag;
     SystemError::ErrorCode m_lastError;
 };

@@ -56,6 +56,7 @@ public:
     using WebSocket::WebSocket;
     int pingCount() { return m_pingsReceived; }
     int pongCount() { return m_pongsReceived; }
+    std::chrono::milliseconds pingTimeout() const { return m_pingTimeout; }
     TestStreamSocketDelegate* socket() { return dynamic_cast<TestStreamSocketDelegate*>(WebSocket::socket()); }
 };
 
@@ -986,5 +987,15 @@ TEST_F(WebSocket, UnexpectedClose_ReadReturnedZero)
     std::this_thread::sleep_for(std::chrono::milliseconds(200));
     ASSERT_TRUE(!serverWebSocket);
 }
+
+TEST_F(WebSocket_PingPong, calcPingTimeoutBySocketTimeout)
+{
+    std::this_thread::sleep_for(std::chrono::milliseconds(50));
+    ASSERT_EQ(clientWebSocket->pingTimeout(), kAliveTimeout / 4);
+    unsigned recvTimeout;
+    clientWebSocket->socket()->getRecvTimeout(&recvTimeout);
+    ASSERT_EQ(recvTimeout, kAliveTimeout.count());
+}
+
 }
 
