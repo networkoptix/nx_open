@@ -6,7 +6,7 @@
 #include <gtest/gtest.h>
 
 #include <nx/network/cloud/cloud_server_socket.h>
-#include <nx/network/http/httptypes.h>
+#include <nx/network/http/http_types.h>
 #include <nx/network/http/test_http_server.h>
 #include <nx/network/stun/async_client.h>
 #include <nx/utils/thread/sync_queue.h>

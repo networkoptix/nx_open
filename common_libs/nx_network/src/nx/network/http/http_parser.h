@@ -1,7 +1,7 @@
 #pragma once 
 
 #include "httpstreamreader.h"
-#include "httptypes.h"
+#include "http_types.h"
 #include "../buffer.h"
 #include "../connection_server/base_protocol_message_types.h"
 

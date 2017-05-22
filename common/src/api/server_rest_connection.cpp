@@ -22,7 +22,7 @@
 #include <nx/fusion/model_functions.h>
 #include <network/router.h>
 #include <nx/network/http/custom_headers.h>
-#include <nx/network/http/httptypes.h>
+#include <nx/network/http/http_types.h>
 #include <utils/common/delayed.h>
 #include <utils/common/synctime.h>
 #include <nx/utils/log/log.h>

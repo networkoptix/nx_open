@@ -5,7 +5,7 @@
 
 #include <nx/utils/log/log.h>
 #include <nx/utils/log/log_initializer.h>
-#include <nx/network/http/httptypes.h>
+#include <nx/network/http/http_types.h>
 #include "media_server/serverutil.h"
 #include <rest/server/rest_connection_processor.h>
 #include <network/tcp_listener.h>

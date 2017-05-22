@@ -20,7 +20,7 @@
 #include <utils/common/util.h>
 #include <utils/media/bitStream.h>
 
-#include <nx/network/http/httptypes.h>
+#include <nx/network/http/http_types.h>
 #include <nx/network/rtsp/rtsp_types.h>
 #include <nx/network/simple_http_client.h>
 #include <nx/utils/log/log.h>

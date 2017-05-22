@@ -8,7 +8,7 @@
 #include <nx/utils/log/assert.h>
 #include <nx/utils/thread/mutex.h>
 #include <nx/utils/thread/wait_condition.h>
-#include <nx/network/http/httptypes.h>
+#include <nx/network/http/http_types.h>
 #include <nx/fusion/model_functions.h>
 
 #include <rest/server/request_handler.h>

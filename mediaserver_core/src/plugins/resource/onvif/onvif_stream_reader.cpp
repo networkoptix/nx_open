@@ -12,7 +12,7 @@
 #include "nx/utils/log/log.h"
 #include <utils/common/sleep.h>
 #include <utils/common/synctime.h>
-#include <nx/network/http/httptypes.h>
+#include <nx/network/http/http_types.h>
 #include <utils/media/nalUnits.h>
 #include <utils/common/app_info.h>
 #include <network/tcp_connection_priv.h>

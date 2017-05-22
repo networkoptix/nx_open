@@ -8,7 +8,7 @@
 
 #include <nx/utils/log/log.h>
 #include <nx/utils/std/cpp14.h>
-#include <nx/network/http/httptypes.h>
+#include <nx/network/http/http_types.h>
 
 #include "core/resource/camera_resource.h"
 #include "core/resource_management/resource_pool.h"

@@ -7,7 +7,7 @@
 #include <nx/utils/thread/mutex.h>
 #include <nx/utils/byte_stream/abstract_byte_stream_filter.h>
 
-#include "httptypes.h"
+#include "http_types.h"
 #include "linesplitter.h"
 
 namespace nx_http {
