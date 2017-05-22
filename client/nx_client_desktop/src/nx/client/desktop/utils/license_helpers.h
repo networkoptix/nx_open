@@ -4,6 +4,8 @@
 
 #include <QtCore/QString>
 
+#include <licensing/license_fwd.h>
+
 namespace nx {
 namespace client {
 namespace desktop {
@@ -14,7 +16,6 @@ enum class DeactivationResult
 {
     Success,
     UnspecifiedError,
-    InvalidParameters,
     TransportProblem,
     ServerError,
     DeactivationError
@@ -22,7 +23,7 @@ enum class DeactivationResult
 using DeactivationHandler = std::function<void(DeactivationResult)>;
 
 void deactivateAsync(
-    const QString& hwid,
+    const QnLicenseList& licenses,
     const DeactivationHandler& completionHandler = DeactivationHandler());
 
 } // license namespace

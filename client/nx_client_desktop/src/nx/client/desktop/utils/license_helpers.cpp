@@ -10,15 +10,24 @@
 #include <utils/common/delayed.h>
 #include <utils/common/connective.h>
 
+#include <licensing/license.h>
+
 namespace {
 
 static const auto kDeactivateLicenseUrl =
     QUrl::fromUserInput(lit("http://nxlicensed.hdw.mx/nxlicensed/api/v1/deactivate"));
-static const auto kJsonTemplate = lit(
-    "{ \"licenses\": [ {\"key\": \"key1\", \"hwid\": \"%1\"} ] }");
+
+static const auto kJsonRootTemplate = lit(
+    "{ \"licenses\": [%1] }");
+
 static const QByteArray kJsonContentType(
     Qn::serializationFormatToHttpContentType(Qn::JsonFormat));
 
+QString toJson(const QnLicensePtr& license)
+{
+    return lit("{ \"key\": \"%1\", \"hwid\": \"%2\" }").arg(
+        QString::fromStdString(license->key().toStdString()), license->hardwareId());
+}
 
 class LicenseDeactivatorPrivate: public Connective<QObject>
 {
@@ -28,7 +37,7 @@ class LicenseDeactivatorPrivate: public Connective<QObject>
 
 public:
     LicenseDeactivatorPrivate(
-        const QString& hwid,
+        const QnLicenseList& licenses,
         const DeactivationHandler& handler);
 
 private:
@@ -40,17 +49,16 @@ private:
 };
 
 LicenseDeactivatorPrivate::LicenseDeactivatorPrivate(
-    const QString& hwid,
+    const QnLicenseList& licenses,
     const DeactivationHandler& handler)
     :
     base_type(),
     m_httpClient(nx_http::AsyncHttpClient::create()),
     m_handler(handler)
 {
-    if (hwid.isEmpty())
+    if (licenses.isEmpty())
     {
-        NX_EXPECT(false, "Hardware id can't be empty");
-        finalize(DeactivationResult::InvalidParameters);
+        finalize(DeactivationResult::Success);
         return;
     }
 
@@ -98,7 +106,12 @@ LicenseDeactivatorPrivate::LicenseDeactivatorPrivate(
     connect(m_httpClient.get(), &nx_http::AsyncHttpClient::done, this, threadSafeHandler,
         Qt::DirectConnection);
 
-    const auto body = kJsonTemplate.arg(hwid).toLatin1();
+    QStringList licenseData;
+    for (const auto& license: licenses)
+        licenseData.append(toJson(license));
+
+    const auto body = kJsonRootTemplate.arg(licenseData.join(L',')).toLatin1();
+    qDebug() << body;
     m_httpClient->doPost(kDeactivateLicenseUrl, kJsonContentType, body);
 }
 
@@ -108,7 +121,7 @@ void LicenseDeactivatorPrivate::finalize(DeactivationResult result)
         [this]() { deleteLater(); });
 
     if (thread() != QThread::currentThread())
-        NX_EXPECT(false, "Deactivation handler is tring to be called in wrong thread");
+        NX_EXPECT(false, "Deactivation handler is trying to be called in wrong thread");
     else if (m_handler)
         m_handler(result);
 }
@@ -124,11 +137,11 @@ namespace helpers {
 namespace license {
 
 void deactivateLicenseAsync(
-    const QString& hwid,
+    const QnLicenseList& licenses,
     const DeactivationHandler& completionHandler)
 {
-    //
-    new LicenseDeactivatorPrivate(hwid, completionHandler);
+    // Deactivator will delete himself when after operation complete
+    new LicenseDeactivatorPrivate(licenses, completionHandler);
 }
 
 } // license namespace
