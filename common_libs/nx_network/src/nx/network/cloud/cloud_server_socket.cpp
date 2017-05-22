@@ -100,10 +100,9 @@ CloudServerSocket::~CloudServerSocket()
     //    stopWhileInAioThread();
 }
 
-bool CloudServerSocket::bind(const SocketAddress& localAddress)
+bool CloudServerSocket::bind(const SocketAddress& /*localAddress*/)
 {
-    // Does not make any sense in cloud socket context
-    static_cast<void>(localAddress);
+    // Does not make any sense in cloud socket context.
     return true;
 }
 
@@ -425,7 +424,15 @@ void CloudServerSocket::startAcceptingConnections(
 void CloudServerSocket::initializeCustomAcceptors(
     const hpm::api::ListenResponse& response)
 {
-    auto acceptors = CustomAcceptorFactory::instance().create(response);
+    const auto cloudCredentials =
+        m_mediatorConnection->credentialsProvider()->getSystemCredentials();
+    NX_ASSERT(cloudCredentials);
+    if (!cloudCredentials)
+        return;
+
+    auto acceptors = CustomAcceptorFactory::instance().create(
+        *cloudCredentials,
+        response);
     for (auto& acceptor: acceptors)
     {
         acceptor->bindToAioThread(getAioThread());
@@ -608,7 +615,7 @@ void CloudServerSocket::stopWhileInAioThread()
 
 CustomAcceptorFactory::CustomAcceptorFactory():
     base_type(std::bind(&CustomAcceptorFactory::defaultFactoryFunc, this,
-        std::placeholders::_1))
+        std::placeholders::_1, std::placeholders::_2))
 {
 }
 
@@ -619,15 +626,20 @@ CustomAcceptorFactory& CustomAcceptorFactory::instance()
 }
 
 std::vector<std::unique_ptr<AbstractConnectionAcceptor>> 
-    CustomAcceptorFactory::defaultFactoryFunc(const hpm::api::ListenResponse& response)
+    CustomAcceptorFactory::defaultFactoryFunc(
+        const nx::hpm::api::SystemCredentials& credentials,
+        const hpm::api::ListenResponse& response)
 {
     std::vector<std::unique_ptr<AbstractConnectionAcceptor>> acceptors;
 
     if (response.trafficRelayUrl)
     {
+        QUrl trafficRelayUrlWithCredentials = QString::fromUtf8(*response.trafficRelayUrl);
+        trafficRelayUrlWithCredentials.setUserName(credentials.systemId);
+        trafficRelayUrlWithCredentials.setPassword(credentials.key);
         acceptors.push_back(
             std::make_unique<relay::ConnectionAcceptor>(
-                QUrl(*response.trafficRelayUrl)));
+                trafficRelayUrlWithCredentials));
     }
 
     return acceptors;

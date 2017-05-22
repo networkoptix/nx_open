@@ -1,0 +1,1 @@
+This test suite brings up all cloud modules necessary for Cloud Connect to work and performs some tests.

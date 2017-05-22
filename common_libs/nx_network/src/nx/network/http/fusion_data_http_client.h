@@ -104,9 +104,9 @@ public:
 
     void setRequestTimeout(std::chrono::milliseconds timeout)
     {
-        m_httpClient.setSendTimeoutMs(timeout.count());
-        m_httpClient.setResponseReadTimeoutMs(timeout.count());
-        m_httpClient.setMessageBodyReadTimeoutMs(timeout.count());
+        m_httpClient.setSendTimeout(timeout);
+        m_httpClient.setResponseReadTimeout(timeout);
+        m_httpClient.setMessageBodyReadTimeout(timeout);
     }
 
     std::unique_ptr<AbstractStreamSocket> takeSocket()

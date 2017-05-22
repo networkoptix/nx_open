@@ -34,7 +34,7 @@ class AbstractMessageDispatcher;
 
 /**
  * Used to install handlers on some events on HTTP connection.
- * @warning There is no way to remove installed event handler. 
+ * WARNING: There is no way to remove installed event handler. 
  *   Event handler implementation MUST ensure it does not crash.
  */
 class ConnectionEvents
