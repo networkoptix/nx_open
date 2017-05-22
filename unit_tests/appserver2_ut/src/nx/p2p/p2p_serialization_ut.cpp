@@ -31,7 +31,7 @@ TEST(P2pSerialization, WriterFlushBits)
     }
     catch (...)
     {
-        ASSERT_TRUE(0);
+        FAIL();
     }
 }
 
@@ -43,9 +43,9 @@ TEST(P2pSerialization, CompressedPeers)
 
     QByteArray serializedData = serializeCompressedPeers(peers, 0);
     bool success = false;
-    auto peers2 = deserializeCompressedPeers(serializedData, &success);
+    auto deserializedPeers = deserializeCompressedPeers(serializedData, &success);
     ASSERT_TRUE(success);
-    ASSERT_EQ(peers, peers2);
+    ASSERT_EQ(peers, deserializedPeers);
 }
 
 TEST(P2pSerialization, CompressedSize)
@@ -53,7 +53,7 @@ TEST(P2pSerialization, CompressedSize)
     QVector<quint32> values;
     for (int i = 0; i < 1000000 * 500; i += 1000000)
         values.push_back(i);
-    QVector<quint32> values2;
+    QVector<quint32> deserializedValues;
 
     try
     {
@@ -69,13 +69,13 @@ TEST(P2pSerialization, CompressedSize)
         // deserialize back
         BitStreamReader reader((const quint8*) serializedData.data(), serializedData.size());
         while (reader.bitsLeft() >= 8)
-            values2.push_back(deserializeCompressedSize(reader));
+            deserializedValues.push_back(deserializeCompressedSize(reader));
     }
     catch (...)
     {
-        ASSERT_TRUE(0);
+        FAIL();
     }
-    ASSERT_EQ(values, values2);
+    ASSERT_EQ(values, deserializedValues);
 }
 
 TEST(P2pSerialization, PeersMessage)
@@ -86,12 +86,12 @@ TEST(P2pSerialization, PeersMessage)
     for (int i = 0; i < 100; ++i)
         peers.push_back(PeerDistanceRecord(i, i * 1000));
 
-    QByteArray serializedData = serializePeersMessage(peers, 0);
+    QByteArray expectedData = serializePeersMessage(peers, 0);
     bool success = false;
-    auto deserializedPeers = deserializePeersMessage(serializedData, &success);
-    QByteArray serializedData2 = serializePeersMessage(deserializedPeers, 0);
+    auto deserializedPeers = deserializePeersMessage(expectedData, &success);
+    QByteArray actualData = serializePeersMessage(deserializedPeers, 0);
     ASSERT_TRUE(success);
-    ASSERT_EQ(serializedData.toHex(), serializedData2.toHex());
+    ASSERT_EQ(expectedData.toHex(), actualData.toHex());
 }
 
 TEST(P2pSerialization, SubscribeRequest)
@@ -102,12 +102,12 @@ TEST(P2pSerialization, SubscribeRequest)
     for (int i = 0; i < 100; ++i)
         peers.push_back(SubscribeRecord(i, i * 1000));
 
-    QByteArray serializedData = serializeSubscribeRequest(peers, 0);
+    QByteArray expectedData = serializeSubscribeRequest(peers, 0);
     bool success = false;
-    auto deserializedPeers = deserializeSubscribeRequest(serializedData, &success);
-    QByteArray serializedData2 = serializeSubscribeRequest(deserializedPeers, 0);
+    auto deserializedPeers = deserializeSubscribeRequest(expectedData, &success);
+    QByteArray actualData = serializeSubscribeRequest(deserializedPeers, 0);
     ASSERT_TRUE(success);
-    ASSERT_EQ(serializedData.toHex(), serializedData2.toHex());
+    ASSERT_EQ(expectedData.toHex(), actualData.toHex());
 }
 
 TEST(P2pSerialization, ResolvePeerNumberResponse)
@@ -121,12 +121,12 @@ TEST(P2pSerialization, ResolvePeerNumberResponse)
         peers.push_back(PeerNumberResponseRecord(i, id));
     }
 
-    QByteArray serializedData = serializeResolvePeerNumberResponse(peers, 0);
+    QByteArray expectedData = serializeResolvePeerNumberResponse(peers, 0);
     bool success = false;
-    auto deserializedPeers = deserializeResolvePeerNumberResponse(serializedData, &success);
-    QByteArray serializedData2 = serializeResolvePeerNumberResponse(deserializedPeers, 0);
+    auto deserializedPeers = deserializeResolvePeerNumberResponse(expectedData, &success);
+    QByteArray actualData = serializeResolvePeerNumberResponse(deserializedPeers, 0);
     ASSERT_TRUE(success);
-    ASSERT_EQ(serializedData.toHex(), serializedData2.toHex());
+    ASSERT_EQ(expectedData.toHex(), actualData.toHex());
 }
 
 TEST(P2pSerialization, TransactionList)
@@ -142,12 +142,12 @@ TEST(P2pSerialization, TransactionList)
         transactions.push_back(data);
     }
 
-    QByteArray serializedData = serializeTransactionList(transactions, 0);
+    QByteArray expectedData = serializeTransactionList(transactions, 0);
     bool success = false;
-    auto deserializedTransactions = deserializeTransactionList(serializedData, &success);
-    QByteArray serializedData2 = serializeTransactionList(deserializedTransactions, 0);
+    auto deserializedTransactions = deserializeTransactionList(expectedData, &success);
+    QByteArray actualData = serializeTransactionList(deserializedTransactions, 0);
     ASSERT_TRUE(success);
-    ASSERT_EQ(serializedData.toHex(), serializedData2.toHex());
+    ASSERT_EQ(expectedData.toHex(), actualData.toHex());
 }
 
 } // namespace test
