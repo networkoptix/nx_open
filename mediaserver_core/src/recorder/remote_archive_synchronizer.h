@@ -55,7 +55,8 @@ private:
         const QString& fileName,
         int64_t startTimeMs,
         const QnResourceAudioLayoutPtr& audioLayout,
-        bool needMotion);
+        bool needMotion,
+        int64_t* outRealDurationMs);
 
     QnServer::ChunksCatalog chunksCatalogByResolution(const QSize& resolution) const;
 

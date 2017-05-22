@@ -340,6 +340,7 @@ std::vector<RemoteArchiveEntry> SynchronizationTask::filterEntries(
             && !catalog->containTime(entry.startTimeMs + entry.durationMs / 2);
 
         qDebug() << "ENTRY NEED TO BE SYNCHRONIZED:" << needSyncEntry
+            << "(ENTRY ID)" << entry.id
             << "(CONTAIN TIME)" << catalog->containTime(entry.startTimeMs + entry.durationMs / 2)
             << "(LASTSYNC TIME)" << lastSyncTimeMs
             << "(ENTRY END TIME)" << entry.startTimeMs + entry.durationMs
@@ -427,7 +428,7 @@ bool SynchronizationTask::writeEntry(
         return false;
     }
 
-    const int64_t kEpsilonMs = 1010;
+    const int64_t kEpsilonMs = 2000;
     int64_t realDurationMs = std::round(helper.durationMs());
 
     int64_t diff = entry.durationMs - realDurationMs;
@@ -446,8 +447,12 @@ bool SynchronizationTask::writeEntry(
         catalogPrefix);
 
     // Ignore media if it is already in catalog
-    if (catalog->containTime(entry.startTimeMs + realDurationMs / 2))
+    if (catalog->containTime(entry.startTimeMs)
+        && catalog->containTime(entry.startTimeMs + realDurationMs / 2)
+        && catalog->containTime(entry.startTimeMs + realDurationMs))
+    {
         return true;
+    }
 
     auto normalStorage = qnNormalStorageMan->getOptimalStorageRoot();
     if (!normalStorage)
@@ -483,15 +488,23 @@ bool SynchronizationTask::writeEntry(
         fileNameWithExtension,
         entry.startTimeMs,
         audioLayout,
-        needMotion);
-
-    qDebug() << "File " << fileNameWithExtension << "has been written";
+        needMotion,
+        &realDurationMs);
 
     if (!succesfulWrite)
         return false; //< Should we call fileFinished?
 
+    qDebug() << "File " << fileNameWithExtension << "has been written";
+
     if (outRealDurationMs)
         *outRealDurationMs = realDurationMs;
+
+    diff = entry.durationMs - realDurationMs;
+    if (diff < 0)
+        diff = -diff;
+
+    if (realDurationMs == AV_NOPTS_VALUE || diff <= kEpsilonMs)
+        realDurationMs = entry.durationMs;
 
     return qnNormalStorageMan->fileFinished(
         realDurationMs,
@@ -506,7 +519,8 @@ bool SynchronizationTask::convertAndWriteBuffer(
     const QString& fileName,
     int64_t startTimeMs,
     const QnResourceAudioLayoutPtr& audioLayout,
-    bool needMotion)
+    bool needMotion,
+    int64_t* outRealDurationMs)
 {
     qDebug() << "Converting and writing file" << fileName;
     NX_LOGX(lm("Converting and writing file %1").arg(fileName), cl_logDEBUG1);
@@ -567,8 +581,13 @@ bool SynchronizationTask::convertAndWriteBuffer(
         if (mediaData->dataType == QnAbstractMediaData::EMPTY_DATA)
             break;
 
+
         recorder.processData(mediaData);
     }
+
+    qDebug() << "=======> Duration of the chunk!" << recorder.duration();
+    if (outRealDurationMs)
+        *outRealDurationMs = recorder.duration() / 1000;
 
     return true;
 }
