@@ -331,7 +331,7 @@ void CloudServerSocket::initTunnelPool(int queueLen)
 {
     auto tunnelPool = std::make_unique<IncomingTunnelPool>(getAioThread(), queueLen);
     m_tunnelPool = tunnelPool.get();
-    m_aggregateAcceptor.addSocket(std::move(tunnelPool));
+    m_aggregateAcceptor.add(std::move(tunnelPool));
 }
 
 void CloudServerSocket::startAcceptor(
@@ -437,7 +437,7 @@ void CloudServerSocket::initializeCustomAcceptors(
     {
         acceptor->bindToAioThread(getAioThread());
         m_customConnectionAcceptors.push_back(acceptor.get());
-        m_aggregateAcceptor.addSocket(std::move(acceptor));
+        m_aggregateAcceptor.add(std::move(acceptor));
     }
 }
 

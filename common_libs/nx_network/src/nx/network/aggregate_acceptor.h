@@ -28,8 +28,8 @@ public:
      * These methods can be called concurrently with AggregateAcceptor::accept.
      * NOTE: Blocks until completion.
      */
-    bool addSocket(std::unique_ptr<AbstractStreamSocketAcceptor> acceptor);
-    void removeSocket(size_t pos);
+    bool add(std::unique_ptr<AbstractStreamSocketAcceptor> acceptor);
+    void removeAt(size_t pos);
     void remove(AbstractStreamSocketAcceptor* acceptor);
     size_t count() const;
 

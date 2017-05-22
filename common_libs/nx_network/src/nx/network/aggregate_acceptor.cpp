@@ -86,7 +86,7 @@ void AggregateAcceptor::cancelIOSync()
     ioCancelledPromise.get_future().wait();
 }
 
-bool AggregateAcceptor::addSocket(std::unique_ptr<AbstractStreamSocketAcceptor> socket)
+bool AggregateAcceptor::add(std::unique_ptr<AbstractStreamSocketAcceptor> socket)
 {
     NX_LOGX(lm("Add socket(%1)").arg(socket), cl_logDEBUG2);
 
@@ -114,7 +114,7 @@ bool AggregateAcceptor::addSocket(std::unique_ptr<AbstractStreamSocketAcceptor> 
     return true;
 }
 
-void AggregateAcceptor::removeSocket(size_t pos)
+void AggregateAcceptor::removeAt(size_t pos)
 {
     NX_LOGX(lm("Remove socket(%1)").arg(pos), cl_logDEBUG2);
 
