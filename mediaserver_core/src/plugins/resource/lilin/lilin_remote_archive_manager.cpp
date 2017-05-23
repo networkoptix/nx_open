@@ -15,7 +15,7 @@ namespace plugins {
 
 namespace {
 
-static const std::chrono::milliseconds kHttpTimeout(4000);
+static const std::chrono::milliseconds kHttpTimeout(10000);
 static const std::chrono::seconds kDefaultChunkDuration(60);
 
 static const QString kListRequestTemplate("/sdlist?filelist=%1");

@@ -428,7 +428,7 @@ bool SynchronizationTask::writeEntry(
         return false;
     }
 
-    const int64_t kEpsilonMs = 2000;
+    const int64_t kEpsilonMs = MAX_FRAME_DURATION;
     int64_t realDurationMs = std::round(helper.durationMs());
 
     int64_t diff = entry.durationMs - realDurationMs;
