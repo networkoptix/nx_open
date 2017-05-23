@@ -62,6 +62,10 @@ angular.module('nxCommon')
                 var $canvas = element.find('canvas');
                 var canvas = $canvas.get(0);
 
+                scope.toggleActive = function(){
+                    scope.activeVolume = !scope.activeVolume;
+                };
+
 
                 var timelineConfig = TimelineConfig();
 

@@ -34,17 +34,153 @@
 
 
 .webclient{
-  height:100%;
-  width:100%;
-  margin: 0;
-  margin-top: -20px !important;
-}
+  &{
+    height:100%;
+    width:100%;
+    margin: 0;
+    margin-top: -20px !important;
+  }
 
-.webclient-window{
-  width:100%;
-  height:100%;
-  user-select:none;
-  cursor:default;
+  &-window{
+    width:100%;
+    height:100%;
+    user-select:none;
+    cursor:default;
+
+    .cameras-panel{
+      height: 100%;
+      width: 320px !important;
+      overflow-y: scroll;
+      overflow-x: hidden;
+    }
+
+    .tree{
+      font-size: 114%;
+      font-weight: 500;
+      padding: 0 8px;
+
+        .offline {
+          color:silver;
+        }
+
+        li>.collapse-group{
+          padding:10px;
+        }
+
+        /*li > ul{
+          margin-bottom: 8px;
+        }*/
+
+        & > li{
+          padding: 8px 0;
+          border-bottom: 1px solid $light6;
+        }
+    }
+  }
+
+  &-panel{
+    white-space: nowrap;
+    font-size: 120%;
+    min-height: 60px;
+    margin: 0px 20px;
+    padding: 10px 0px;
+
+    .webclient-button.active{
+      color: #3A911E;
+    }
+
+    &-border{
+      height: 30px;
+      position: relative;
+      vertical-align: top;
+      margin: 5px 10px;
+      border-left: 1px solid $dark8;
+      display: inline-block;
+    }
+
+    &-border-timeline{
+      height: 100px;
+      position: relative;
+      vertical-align: top;
+      border-left: 1px solid $light4;
+      display: inline-block;
+    }
+
+    .dropdown-menu{
+      background-color: #E1E7EA;
+      padding: 0 8px;
+
+      & > li > a{
+        line-height:24px;
+        text-align:left;
+        padding-left:15px;
+
+        &.active{
+          background-color: $brand_core !important;
+          color:$light1;
+        }
+        &:hover{
+          background-color: $light16;
+        }
+      }
+    }
+  }
+
+  &-button{
+    &{
+      padding:0 10px;
+      display: inline-block;
+      vertical-align: middle;
+      text-align: center;
+      cursor:pointer;
+    }
+
+    &:hover{
+      background-color: $light8;
+    }
+
+    &:active{
+      background-color: $light6;
+    }
+
+    &.disabled{
+      opacity:0.1;
+      cursor:default;
+    }
+
+    &.active:hover{
+      background-color: $light5 !important;
+    }
+
+    &.active:active{
+      background-color: $light6;
+    }
+
+    &.open>.dropdown-menu{
+      display: block;
+      min-width: auto;
+      border-radius: 0;
+      padding:0;
+    }
+
+    .glyphicon{
+      top:3px;
+      left:1px;
+      vertical-align: middle;
+      margin: 10px auto;
+    }
+  }
+
+  &-bottom-border{
+    margin: 0px 4px;
+  }
+
+  &-hint{
+    font-size:78%;
+    color:#698796;
+    display:inline-block;
+    padding-right:10px;
+  }
 }
 
 table.webclient-window>tbody>tr>td{
@@ -52,11 +188,18 @@ table.webclient-window>tbody>tr>td{
   height:100%;
   vertical-align: top;
   padding:0;
+
+  &.alert{
+    height:auto;  
+  }
 }
 
-table.webclient-window>tbody>tr>td.alert{
-  height:auto;
+.cameras-panel-toggle{
+  transition-timing-function: ease-in-out;
+  -webkit-transition-delay: 10s;
+  transition-delay: 10s;
 }
+
 .cameras-panel{
   overflow-y: auto;
   overflow-x: hidden;
@@ -65,12 +208,25 @@ table.webclient-window>tbody>tr>td.alert{
 
   background-color: $additional_light2;
 }
+
 .camera-status{
   display:inline-block;
   width:1em;
   text-align: center;
   font-size:180%;
   line-height: 1;
+
+  &.online-cam{
+    top: -8px;
+    left: -5px;  
+  }
+
+  &.offline-cam{
+    top: -8px;
+    left: -7px;
+    font-size: 200%;
+    font-weight: bolder;  
+  }
 }
 
 .camera-info{
@@ -79,21 +235,6 @@ table.webclient-window>tbody>tr>td.alert{
 .camera-preview .camera-status{
   position: absolute;
   z-index: 1;
-}
-.camera-status.online-cam{
-  top: -8px;
-  left: -5px;
-}
-
-.camera-status.offline-cam{
-  top: -8px;
-  left: -7px;
-  font-size: 200%;
-  font-weight: bolder;
-}
-
-camera-panel {
-  color: $dark1;
 }
 
 .view-wrapper{
@@ -111,19 +252,31 @@ camera-panel {
 
   padding-bottom:100px;
   background-color: $dark1;
-}
 
-.view-panel .stick-to-top{
-  position:absolute;
-  width:100%;
-  height: 48px;
-  top:0;
-  left: 0;
-  z-index: 1;
-}
+  &.no-archive{
+    padding-bottom: 40px !important;
+  }
 
-.view-panel.no-archive{
-  padding-bottom: 40px !important;
+  .stick-to-top{
+    position:absolute;
+    width:100%;
+    height: 48px;
+    top:0;
+    left: 0;
+    z-index: 1;  
+  }
+
+  .stick-to-bottom{
+    width:100%;
+    border-top: 1px solid transparent;
+  }
+
+  .float-size{
+    width:100%;
+    height:100%;
+
+    padding: 0px 20px;
+  }
 }
 
 .top-gradient{
@@ -146,14 +299,16 @@ camera-panel {
 }
 
 .video-status{
-  width: 24px;
-  font-size: 180%;
-  line-height: 12px;
-}
-.video-status.offline-video{
-  line-height: 16px;
-  font-size: 200% !important;
-  font-weight: bolder;
+  &{
+    width: 24px;
+    font-size: 180%;
+    line-height: 12px;
+  }
+  &.offline-video{
+    line-height: 16px;
+    font-size: 200% !important;
+    font-weight: bolder;  
+  }
 }
 
 .video-icon{
@@ -163,16 +318,46 @@ camera-panel {
 }
 
 .video-settings{
-  right: -25px;
-  min-width: 0px !important;
-  left:initial;
-  padding: 0px !important;
-  background-color: rgba($dark7,0.9) !important;
-  border-radius: 0px;
+  &{
+    right: -25px;
+    min-width: 0px !important;
+    left:initial;
+    padding: 0px !important;
+    background-color: rgba($dark7,0.9) !important;
+    border-radius: 0px;
 
-  color: $light16;
-  font-size: 12px;
-  line-height: 18px;
+    color: $light16;
+    font-size: 12px;
+    line-height: 18px;
+  }
+
+  &-options:hover{
+    background-color: $brand-core;
+    color: $light1;
+    font: bold 12px;
+  }
+
+  &-separation-line{
+    height: 1px;
+    background-color: $light16;
+    opacity: 0.2;  
+  }
+
+  &-36{
+    height: 36px;
+    line-height: 36px;
+
+    label{
+      margin-left: 8px;    
+    }
+  }
+
+  &-20{
+    height: 20px;
+    line-height: 13px !important;
+    font-size: 12px !important;
+    color: $light1 !important;
+  }
 }
 
 .no-fullscreen{
@@ -183,12 +368,6 @@ camera-panel {
   background-color: rgba($light16, 0.1);
 }
 
-.video-settings-options:hover{
-  background-color: $brand-core;
-  color: $light1;
-  font: bold 12px;
-}
-
 .camera-settings{
   display: inline-block;
   width: 36px;
@@ -197,47 +376,12 @@ camera-panel {
   vertical-align: middle;
 }
 
-.video-settings-separation-line{
-  height: 1px;
-  background-color: $light16;
-  opacity: 0.2;
-}
-
-.video-settings span{
-  color: $light1;
-}
-
-.video-settings-36{
-  height: 36px;
-  line-height: 36px;
-}
-.video-settings-36 label{
-  margin-left: 8px;
-}
-
-.video-settings-20{
-  height: 20px;
-  line-height: 13px !important;
-  font-weight: regular !important;
-  font-size: 12px !important;
-  color: $light1 !important;
-}
-
 .video-info{
   padding: 8px;
 }
 
 .video-title-back-button{
   margin-left: 6px;
-}
-
-.camera-settings-button{
-  width: 36px;
-  display: inline-block;
-  text-align: center;
-}
-.camera-settings-button .glyphicon{
-  margin-left: -2px;
 }
 
 .min-40{
@@ -251,18 +395,6 @@ camera-panel {
 .margin-right-8{
   margin-right: 8px;
 }
-
-.view-panel .stick-to-bottom{
-  width:100%;
-  border-top: 1px solid transparent;
-}
-.view-panel .float-size{
-  width:100%;
-  height:100%;
-
-  padding: 0px 20px;
-}
-
 
 /* Special hack for loading invisible flash objects */
 .invisible{
@@ -321,18 +453,6 @@ camera-panel {
   width:100% !important;
 }
 
-.webclient-panel{
-  white-space: nowrap;
-  font-size: 120%;
-  min-height: 60px;
-  margin: 0px 20px;
-  padding: 10px 0px;
-}
-
-.webclient-bottom-border{
-  margin: 0px 4px;
-}
-
 .cameras-search{
   padding:10px 0 10px 0;
   margin-top:3px;
@@ -340,90 +460,76 @@ camera-panel {
   border-bottom: 1px solid $light6;
   font-size: 13px;
   background-color: $additional_light2;
+
+  &>.input-group{
+    margin-top: -11px;
+    
+    .input-group-addon{
+      border: none !important;
+    }
+
+    &>input{
+      margin-bottom: -20px;
+      color: #698796;
+      border:none;
+      box-shadow:none;
+      font-size: 16px;
+
+      &::-webkit-input-placeholder {}
+      &:-moz-placeholder{}
+      &::-moz-placeholder{}
+      &:-ms-input-placeholder {}
+
+    }
+    &>*{
+      background: transparent;
+      color: #698796;   
+    }
+  }
+
+  &:hover{
+    backgroud-color: $light2;
+  }
+
+  &.active,&:active{
+    background-color: $light1;
+  }
 }
 
-.cameras-search>.input-group>input{
-  margin-bottom: -20px;
-}
 .raise-input-up{
   margin-bottom: -5px !important;
 }
 
-.cameras-search>.input-group{
-  margin-top: -11px;
-}
-
-.cameras-search>.input-group>*{
-  background: transparent;
-  border:none;
-  box-shadow:none;
-  color: #698796;
-  font-size: 16px;
-}
-
-
-.cameras-search>.input-group>input::-webkit-input-placeholder {
-  color: #698796;
-  font-size: 13px;
-}
-.cameras-search>.input-group>input:-moz-placeholder{
-  color: #698796;
-  font-size: 13px;
-}
-.cameras-search>.input-group>input::-moz-placeholder{
-  color: #698796;
-  font-size: 13px;
-}
-.cameras-search>.input-group>input:-ms-input-placeholder {
-  color: #698796;
-  font-size: 13px;
-}
-
 .clear-button{
-  width: 40px;
-  height: 43px;
+  &{
+    width: 40px;
+    height: 43px;
+  }
+  &-right{
+    background-color: $light4 !important;
+    position: relative;
+    height: 24px;
+    width: 1px;
+    top: 10px;
+  }
 }
 .icon{
   width: 44px;
   height: 43px;
 }
 
+.info-icon{
+  &.active{
+    color: $blue10 !important;  
+  }
+  
+  &:hover, &.active:hover{
+    background-color: $additional_light3 !important;  
+  }
 
-.clear-button-right{
-  background-color: $light4 !important;
-  position: relative;
-  height: 24px;
-  width: 1px;
-  top: 10px;
-}
-
-.info-icon.active{
-  color: $blue10 !important;
-}
-
-.info-icon:hover,
-.info-icon.active:hover{
-  background-color: $additional_light3 !important;
-}
-
-.info-icon:active,
-.info-icon.active:active{
-  background-color: $light5 !important;
-}
-
-.cameras-search>.input-group>input{
-  border:none;
-  box-shadow:none;
-  font-size: 16px;
-}
-
-.camers-search:hover{
-  backgroud-color: $light2;
-}
-
-.cameras-search.active,
-.cameras-search:active{
-  background-color: $light1;
+  &:active, &.active:active{
+    background-color: $light5 !important;
+  }
 }
 
 
@@ -449,11 +555,7 @@ div.text-right{
   background-color: $additional_light2;
 }
 
-.live-button .webclient-button{
-  margin: 40px auto;
-}
-
-live-circle{
+.live-circle{
   padding: 3px;
   margin: 2px 8px 2px 0;
   background-color: $light6;
@@ -466,93 +568,94 @@ live-circle{
   box-shadow: 0px 0px 2px #888;
 }
 
+div.text-right.no-volume{
+  width: 64px !important;
+}
+
 .live-button{
-  width: 63px;
+  width: 64px;
   height: 100%;
   text-align: center;
   line-height: 100px;
   border-left: 1px solid $light6 !important;
   border-right: 1px solid $light4 !important;
-}
 
-div.text-right.no-volume{
-  width: 64px !important;
-}
+  .webclient-button{
+    margin: 40px auto;
+  }
 
-.live-button.active{
-  background-color: $light6 !important;
-  border-left: 1px solid $light8 !important;
-  border-right: 1px solid $light7 !important; 
-}
+  .active{
+    background-color: $light6 !important;
+    border-left: 1px solid $light8 !important;
+    border-right: 1px solid $light7 !important; 
+  }
 
-.live-button:hover{
-  background-color: $light4 !important;
-  border-left: 1px solid $light6 !important;
-  border-right: 1px solid $light4 !important; 
-}
+  &:hover{
+    background-color: $light4 !important;
+    border-left: 1px solid $light6 !important;
+    border-right: 1px solid $light4 !important; 
+  }
 
-.live-button.active:hover{
-  background-color: $light4 !important;
-  border-left: 1px solid $light7 !important;
-  border-right: 1px solid $light6 !important; 
-}
+  &.active:hover{
+    background-color: $light4 !important;
+    border-left: 1px solid $light7 !important;
+    border-right: 1px solid $light6 !important; 
+  }
 
-.live-button:active,
-.live-button.active:active {
-  background-color: $light4 !important;
-  border-left: 1px solid $light8 !important;
-  border-right: 1px solid $light7 !important; 
-}
+  &:active,
+  &.active:active {
+    background-color: $light4 !important;
+    border-left: 1px solid $light8 !important;
+    border-right: 1px solid $light7 !important; 
+  }
 
-.live-button.active live-circle{
-  background-color: chartreuse !important;
+  &.active > .live-circle{
+    background-color: chartreuse !important;
+  }
+
 }
 
 .volume{
-  width: 40px;
-  height: 100%;
-}
-.volume .glyphicon-volume-up{
-  margin: 40px auto !important;
-}
+  width: 41px;
+  height: 100px;
 
-volume-control{
-  width: 212px;
-  height: 44px;
-  position: absolute;
-  right: 0;
-  top: -44px;
-  background-color: #333333;
-}
+  .glyphicon-volume-up{
+    margin: 40px auto !important;
+  }
 
-.volume-icons{
-  width: 44px;
-  height: 44px;
-}
-.volume-icons .glyphicon{
-  position: relative;
-  top: 14px;
-  left: 16px;
-}
+  &-control{
+    width: 212px;
+    height: 44px;
+    position: absolute;
+    right: 0;
+    top: -44px;
+    background-color: #333333;
+  }
+  &-icons{
+    width: 44px;
+    height: 44px;
 
-.volume-icons output{
-  position: relative;
-  top: 4px;
-  left: 6px;
-}
+    .glyphicon{
+      position: relative;
+      top: 14px;
+      left: 16px;
+    }
 
+    output{
+      position: relative;
+      top: 4px;
+      left: 6px;
+    }
+  }  
+}
 
 div.text-center{
-  margin: 0 64px 0 106px;
+  margin: 0 104px 0 106px;
   height:100%;
-}
 
-.webclient-button{
-  padding:0 10px;
-  display: inline-block;
-  vertical-align: middle;
-  text-align: center;
-  cursor:pointer;
+  &.no-volume{
+    margin-right:64px !important;
+  }
 }
 
 .dropdown > .webclient-button{
@@ -561,35 +664,6 @@ div.text-center{
 
 .dropdown.open > .webclient-button{
   background-color: rgba(0,0,0,0.1);
-}
-
-.webclient-button:hover{
-  background-color: $light8;
-}
-
-.webclient-button:active{
-  background-color: $light6;
-}
-
-.webclient-button.disabled{
-  opacity:0.1;
-  cursor:default;
-}
-
-.webclient-button.active:hover{
-  background-color: $light5 !important;
-  /*opacity:0.9;*/
-}
-
-.webclient-button.active:active{
-  background-color: $light6;
-}
-
-.webclient-button .glyphicon{
-  top:3px;
-  left:1px;
-  vertical-align: middle;
-  margin: 10px auto;
 }
 
 .glyphicon-backward,
@@ -624,96 +698,51 @@ div.text-center{
   display: block !important;
 }
 
-.weblcient-hint{
-  font-size:78%;
-  color:#698796;
-  display:inline-block;
-  padding-right:10px;
-}
+.server{
+  &-link{
+    height:40px;
+    line-height:20px !important;
+    padding: 10px;
 
-.webclient-panel .webclient-button.active{
-  color: #3A911E;
-}
+    &:hover{
+      background-color: $additional_light3 !important;
+      border-radius: 2px;  
+    }
 
-.webclient-button.open>.dropdown-menu{
-  display: block;
-  min-width: auto;
-  border-radius: 0;
-  padding:0;
-}
+    &:active{
+      background-color: $light5;
+      border-radius: 2px;  
+    }
 
-.webclient-window .cameras-panel{
-  height: 100%;
-  width: 320px !important;
-  overflow-y: scroll;
-  overflow-x: hidden;
-}
+    small{
+      font-size: 12px;
+      font-weight: 400;
+      color: $light16;
+      line-height: 18px;  
+    }
 
+    & > .pull-right{
+      margin-top: 2px;
+    }
 
-.webclient-window .tree{
-  font-size: 114%; /*16px*/
-  font-weight: 500;
-  padding: 0 8px;
-}
+    & > *{
+      vertical-align: middle;  
+    }
+  }
 
-.webclient-window .tree .offline {
-  color:silver;
-}
+  &-name{
+    margin-left: -17px;
+    font-size: 14px;
+    font-weight: 500;
+    color: $dark9;
+    line-height: 22px;
+  }
 
-.webclient-window .tree li>.collapse-group{
-  padding:10px;
-}
-
-.webclient-window .tree li > ul{
-  margin-bottom: 8px;
-}
-
-.webclient-window .tree > li{
-  padding: 8px 0;
-  border-bottom: 1px solid $light6;
-}
-
-.server-underline{
-  display: inline-block;
-  width:100%;
-  height: 40px;
-}
-.webclient-panel-border{
-  height: 30px;
-  position: relative;
-  vertical-align: top;
-  margin: 5px 10px;
-  border-left: 1px solid $dark8;
-  display: inline-block;
-}
-
-.webclient-panel-border-timeline{
-  height: 100px;
-  position: relative;
-  vertical-align: top;
-  border-left: 1px solid $light4;
-  display: inline-block;
-}
-
-
-.webclient-panel .dropdown-menu{
-  background-color: #E1E7EA;
-  padding: 0 8px;
-}
-
-.webclient-panel .dropdown-menu > li > a{
-  line-height:24px;
-  text-align:left;
-  padding-left:15px;
-}
-
-.webclient-panel .dropdown-menu > li > a.active{
-  background-color: $brand_core !important;
-  color:$light1;
-}
-
-.webclient-panel .dropdown-menu > li > a:hover{
-  background-color: $light16;
+  &-underline{
+    display: inline-block;
+    width:100%;
+    height: 40px;
+  }
 }
 
 .caption-row {
@@ -728,6 +757,7 @@ div.text-center{
   background-color: $light5;
   border-radius: 1px;
   font-size: 14px;
+  border: 1px solid $additional_light2;
 
 
   position:absolute;
@@ -741,25 +771,58 @@ div.text-center{
   border: 1px solid $light1;
 }
 
-.camera-node.Unauthorized {
-  color:#698796 !important;
-}
 
+.camera-node{
+  &{
+    height: 56px;
 
-.camera-node.Unauthorized small,
-.camera-node.Offline small{
-  color: #49626F;
-}
+    font-size: 14px;
+    font-weight: 500 !important;
+    color: $dark9 !important;
+    line-height: 34px;
+  }
 
-.camera-node.Unauthorized .camera-preview,
-.camera-node.Offline .camera-preview{
-  background-color: #212A2F;
-  border: 1px solid #171C1F;
-}
+  small{
+    font-size: 12px;
+    font-weight: 400;
+    color: $light16 !important;
+    line-height: 18px;
+  }
 
-.camera-node.Unauthorized .camera-preview img,
-.camera-node.Offline .camera-preview img{
-  display:none;
+  &.toggle-info{
+    line-height: 18px !important;
+  }
+
+  &.Unauthorized{
+    color:#698796 !important;
+
+    small{
+      color: #49626F;    
+    }
+
+    .camera-preview{
+      background-color: #212A2F;
+      border: 1px solid #171C1F;
+
+      img{
+        display:none;
+      }
+    }
+  }
+
+  &.Offline {
+    small{
+      color: #49626F;
+    }
+
+    .camera-preview{
+      background-color: #212A2F;
+      border: 1px solid #171C1F;
+      img{
+        display:none;
+      }
+    }
+  }
 }
 
 .camera-preview>.camera-preview-image {
@@ -821,51 +884,31 @@ div.text-center{
   display: inline-block;
 }
 
-.cameras-panel .nav > li > a{
-  color:$dark9;
-  font-weight: normal;
-}
-.cameras-panel .nav > li > a:hover,
-.cameras-panel .nav > li > a:focus {
-  text-decoration: none;
-  background-color: rgba(53,70,79,0.2);
-}
+.cameras-panel .nav > li{
+  & > a{
+    color:$dark9;
+    font-weight: normal;
 
-.cameras-panel .nav > li > a{
-  white-space: nowrap;
-  text-overflow: ellipsis;
-  overflow: hidden;
-  padding-right: 10px;
-  padding-left:95px;
-}
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    padding-right: 10px;
+    padding-left:95px;
+  }
 
-.cameras-panel .nav > li > a:hover{
-  background-color: $additional_light3;
-}
+  & > a:hover, & > a:focus{
+    text-decoration: none;
+    background-color: rgba($dark11,0.2);  
+  }
 
-.cameras-panel .nav > li.active > a{
-  text-decoration: none;
-  background-color: $light5;
-}
+  & > a:hover{
+    background-color: $additional_light3;
+  }
 
-.camera-node{
-  height: 56px;
-
-  font-size: 14px;
-  font-weight: 500 !important;
-  color: $dark9 !important;
-  line-height: 34px;
-}
-
-.camera-node small{
-  font-size: 12px;
-  font-weight: 400;
-  color: $light16 !important;
-  line-height: 18px;
-}
-
-.camera-node.toggle-info{
-  line-height: 18px !important;
+  &.active > a{
+    text-decoration: none;
+    background-color: $light5;
+  }
 }
 
 .not-supported.camera-view-message{
@@ -876,6 +919,15 @@ div.text-center{
   padding-top: 10px;
 }
 
+.camera-panel{
+  & {
+    color: $dark1;
+  }
+  &.visible-xs{
+    display: block !important;
+  }
+}
+
 .visible-mobile{
   display: none;
 }
@@ -884,10 +936,6 @@ div.text-center{
   width: 100% !important;
   min-width: 320px !important;
   display: block !important; 
-}
-
-camera-panel.visible-xs{
-  display: block !important;
 }
 
 .visible-xs.back-button{
@@ -901,7 +949,7 @@ camera-panel.visible-xs{
   .visible-xs.back-button{
     display: inline-block !important;
   }
-  camera-panel.visible-xs {
+  .camera-panel.visible-xs {
     display: block !important;
   }
   .view-panel{
@@ -926,59 +974,23 @@ camera-panel.visible-xs{
 }
 
 .mobile-alert{
-  background-color: black;
-  margin:0;
-  padding: 10px 20px;
-  font-weight: 300;
-  font-size:130%;
   color:#FFFFFF;
-}
+  
+  &{
+    background-color: black;
+    margin:0;
+    padding: 10px 20px;
+    font-weight: 300;
+    font-size:130%;
+  }
 
-
-.mobile-alert .btn{
-  border: 1px solid #263137;
-  border-radius: 5px;
-  margin:0;
-  color:#FFFFFF;
-}
-
-.mobile-alert .btn:hover{
- background-color: rgba(198,234,255,0.15);
-}
-.server-link{
-  height:40px;
-  line-height:20px !important;
-  padding: 10px;
-}
-.server-link:hover{
-  background-color: $additional_light3 !important;
-  border-radius: 2px;
-}
-.server-link:active{
-  background-color: $light5;
-  border-radius: 2px;
-}
-
-.server-link>*{
-  vertical-align: middle;
-}
-
-.server-link small{
-  font-size: 12px;
-  font-weight: 400;
-  color: $light16;
-  line-height: 18px;
-
-}
-
-.server-name{
-  margin-left: -17px;
-  font-size: 14px;
-  font-weight: 500;
-  color: $dark9;
-  line-height: 22px;
-}
-
-.server-link > .pull-right{
-  margin-top: 2px;
+  .btn{
+    border: 1px solid #263137;
+    border-radius: 5px;
+    margin:0;
+    color:#FFFFFF;
+  }
+  .btn:hover{
+    background-color: rgba(198,234,255,0.15);   
+  }
 }
