@@ -1,4 +1,6 @@
-#pragma once 
+#pragma once
+
+#include <boost/optional.hpp>
 
 #include "http_types.h"
 
@@ -47,6 +49,21 @@ private:
     BufferType m_currentLine;
     bool m_clearCurrentLineBuf;
     char m_prevLineEnding;
+};
+
+//-------------------------------------------------------------------------------------------------
+
+class NX_NETWORK_API BufferToLineSplitter
+{
+public:
+    BufferToLineSplitter(const nx::String& str);
+
+    boost::optional<ConstBufferRefType> nextLine();
+
+private:
+    const nx::String& m_sourceData;
+    LineSplitter m_lineSplitter;
+    std::size_t m_dataOffset = 0;
 };
 
 } // namespace nx_http

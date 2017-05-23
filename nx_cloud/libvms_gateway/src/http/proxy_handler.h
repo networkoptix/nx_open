@@ -31,8 +31,9 @@ public:
         nx_http::Response* const response,
         nx_http::RequestProcessedHandler completionHandler) override;
 
-    virtual void setResponse(nx_http::Response response) override;
-    virtual void sendResponse(nx_http::RequestResult requestResult) override;
+    virtual void sendResponse(
+        nx_http::RequestResult requestResult,
+        boost::optional<nx_http::Response> response) override;
 
 private:
     const conf::Settings& m_settings;
@@ -43,12 +44,12 @@ private:
     nx_http::RequestProcessedHandler m_requestCompletionHandler;
     std::unique_ptr<RequestProxyWorker> m_requestProxyWorker;
 
-    TargetWithOptions cutTargetFromRequest(
+    TargetHost cutTargetFromRequest(
         const nx_http::HttpServerConnection& connection,
         nx_http::Request* const request);
 
-    TargetWithOptions cutTargetFromUrl(nx_http::Request* const request);
-    TargetWithOptions cutTargetFromPath(nx_http::Request* const request);
+    TargetHost cutTargetFromUrl(nx_http::Request* const request);
+    TargetHost cutTargetFromPath(nx_http::Request* const request);
 
     void onConnected(const SocketAddress& targetAddress, SystemError::ErrorCode errorCode);
 };

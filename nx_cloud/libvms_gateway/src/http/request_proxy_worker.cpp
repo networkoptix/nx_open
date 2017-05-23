@@ -7,18 +7,8 @@ namespace nx {
 namespace cloud {
 namespace gateway {
 
-TargetWithOptions::TargetWithOptions(
-    nx_http::StatusCode::Value status_, SocketAddress target_)
-    :
-    status(status_),
-    target(std::move(target_))
-{
-}
-
-//-------------------------------------------------------------------------------------------------
-
 RequestProxyWorker::RequestProxyWorker(
-    const TargetWithOptions& /*targetPeer*/,
+    const TargetHost& targetPeer,
     nx_http::Request translatedRequest,
     AbstractResponseSender* responseSender,
     std::unique_ptr<AbstractStreamSocket> connectionToTheTargetPeer)
@@ -26,6 +16,8 @@ RequestProxyWorker::RequestProxyWorker(
     m_responseSender(responseSender)
 {
     using namespace std::placeholders;
+
+    m_targetPeer = targetPeer;
 
     m_targetHostPipeline = std::make_unique<nx_http::AsyncMessagePipeline>(
         this,
@@ -61,7 +53,9 @@ void RequestProxyWorker::closeConnection(
 
     NX_ASSERT(connection == m_targetHostPipeline.get());
 
-    m_responseSender->sendResponse(nx_http::StatusCode::serviceUnavailable);
+    m_responseSender->sendResponse(
+        nx_http::StatusCode::serviceUnavailable,
+        boost::none);
 }
 
 void RequestProxyWorker::stopWhileInAioThread()
@@ -79,38 +73,51 @@ void RequestProxyWorker::onMessageFromTargetHost(nx_http::Message message)
             .arg(m_targetHostPipeline->socket()->getForeignAddress()), cl_logDEBUG1);
 
         // TODO: #ak Imply better status code.
-        m_responseSender->sendResponse(nx_http::StatusCode::serviceUnavailable);
+        m_responseSender->sendResponse(
+            nx_http::StatusCode::serviceUnavailable,
+            boost::none);
         return;
     }
 
-    std::unique_ptr<nx_http::BufferSource> msgBody;
-    const auto contentTypeIter = message.response->headers.find("Content-Type");
-    if (contentTypeIter != message.response->headers.end())
-    {
-        nx_http::insertOrReplaceHeader(
-            &message.response->headers,
-            nx_http::HttpHeader("Content-Encoding", "identity"));
-        // No support for streaming body yet.
-        message.response->headers.erase("Transfer-Encoding");
-
-        msgBody = std::make_unique<nx_http::BufferSource>(
-            contentTypeIter->second,
-            std::move(message.response->messageBody));
-    }
+    auto msgBody = prepareMessageBody(message.response);
 
     const auto statusCode = message.response->statusLine.statusCode;
 
     NX_LOGX(lm("Received response from target host %1. status %2, Content-Type %3")
         .arg(m_targetHostPipeline->socket()->getForeignAddress().toString())
         .arg(nx_http::StatusCode::toString(statusCode))
-        .arg(contentTypeIter != message.response->headers.end() ? contentTypeIter->second : lit("none")),
+        .arg(msgBody ? msgBody->mimeType() : nx::String("none")),
         cl_logDEBUG2);
 
-    m_responseSender->setResponse(std::move(*message.response));
     m_responseSender->sendResponse(
         nx_http::RequestResult(
             static_cast<nx_http::StatusCode::Value>(statusCode),
-            std::move(msgBody)));
+            std::move(msgBody)),
+        std::move(*message.response));
+}
+
+std::unique_ptr<nx_http::AbstractMsgBodySource> RequestProxyWorker::prepareMessageBody(
+    nx_http::Response* response)
+{
+    const auto contentTypeIter = response->headers.find("Content-Type");
+    if (contentTypeIter == response->headers.end())
+        return nullptr;
+
+    auto converter = MessageBodyConverterFactory::instance().create(
+        m_targetPeer,
+        contentTypeIter->second);
+    if (converter)
+        response->messageBody = converter->convert(response->messageBody);
+
+    nx_http::insertOrReplaceHeader(
+        &response->headers,
+        nx_http::HttpHeader("Content-Encoding", "identity"));
+    // No support for streaming body yet.
+    response->headers.erase("Transfer-Encoding");
+
+    return std::make_unique<nx_http::BufferSource>(
+        contentTypeIter->second,
+        std::move(response->messageBody));
 }
 
 } // namespace gateway

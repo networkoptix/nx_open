@@ -70,23 +70,23 @@ void ProxyHandler::processRequest(
         std::bind(&ProxyHandler::onConnected, this, requestOptions.target, std::placeholders::_1));
 }
 
-void ProxyHandler::setResponse(nx_http::Response responseMessage)
+void ProxyHandler::sendResponse(
+    nx_http::RequestResult requestResult,
+    boost::optional<nx_http::Response> responseMessage)
 {
-    *response() = std::move(responseMessage);
-}
+    if (responseMessage)
+        *response() = std::move(*responseMessage);
 
-void ProxyHandler::sendResponse(nx_http::RequestResult requestResult)
-{
     decltype(m_requestCompletionHandler) handler;
     handler.swap(m_requestCompletionHandler);
     handler(std::move(requestResult));
 }
 
-TargetWithOptions ProxyHandler::cutTargetFromRequest(
+TargetHost ProxyHandler::cutTargetFromRequest(
     const nx_http::HttpServerConnection& connection,
     nx_http::Request* const request)
 {
-    TargetWithOptions requestOptions(nx_http::StatusCode::internalServerError);
+    TargetHost requestOptions(nx_http::StatusCode::internalServerError);
     if (!request->requestLine.url.host().isEmpty())
         requestOptions = cutTargetFromUrl(request);
     else
@@ -129,7 +129,7 @@ TargetWithOptions ProxyHandler::cutTargetFromRequest(
     return requestOptions;
 }
 
-TargetWithOptions ProxyHandler::cutTargetFromUrl(nx_http::Request* const request)
+TargetHost ProxyHandler::cutTargetFromUrl(nx_http::Request* const request)
 {
     if (!m_settings.http().allowTargetEndpointInUrl)
         return {nx_http::StatusCode::forbidden};
@@ -150,7 +150,7 @@ TargetWithOptions ProxyHandler::cutTargetFromUrl(nx_http::Request* const request
     return {nx_http::StatusCode::ok, std::move(targetEndpoint)};
 }
 
-TargetWithOptions ProxyHandler::cutTargetFromPath(nx_http::Request* const request)
+TargetHost ProxyHandler::cutTargetFromPath(nx_http::Request* const request)
 {
     // Parse path, expected format: /target[/some/longer/url].
     const auto path = request->requestLine.url.path();
@@ -159,7 +159,7 @@ TargetWithOptions ProxyHandler::cutTargetFromPath(nx_http::Request* const reques
         return {nx_http::StatusCode::badRequest};
 
     // Parse first path item, expected format: [protocol:]address[:port].
-    TargetWithOptions requestOptions(nx_http::StatusCode::ok);
+    TargetHost requestOptions(nx_http::StatusCode::ok);
     auto targetParts = pathItems[0].split(':', QString::SkipEmptyParts);
 
     // Is port specified?
@@ -236,7 +236,7 @@ void ProxyHandler::onConnected(
             m_targetPeerSocket->getLocalAddress(), isSsl(m_targetPeerSocket)), cl_logDEBUG2);
 
     m_requestProxyWorker = std::make_unique<RequestProxyWorker>(
-        TargetWithOptions(),
+        TargetHost(),
         std::move(m_request),
         this,
         std::move(m_targetPeerSocket));

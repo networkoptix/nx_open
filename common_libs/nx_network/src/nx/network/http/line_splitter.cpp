@@ -120,4 +120,25 @@ QnByteArrayConstRef LineSplitter::flush()
     return m_currentLine;
 }
 
+//-------------------------------------------------------------------------------------------------
+
+BufferToLineSplitter::BufferToLineSplitter(const nx::String& str):
+    m_sourceData(str)
+{
+}
+
+boost::optional<ConstBufferRefType> BufferToLineSplitter::nextLine()
+{
+    QnByteArrayConstRef line;
+    size_t bytesRead = 0;
+    if (m_lineSplitter.parseByLines(
+            nx_http::ConstBufferRefType(m_sourceData, m_dataOffset), &line, &bytesRead))
+    {
+        m_dataOffset += bytesRead;
+        return line;
+    }
+
+    return boost::none;
+}
+
 } // namespace nx_http
