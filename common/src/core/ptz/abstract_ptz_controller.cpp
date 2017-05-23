@@ -29,67 +29,67 @@ bool QnAbstractPtzController::getData(Qn::PtzDataFields query, QnPtzData* data) 
     data->fields = Qn::NoPtzFields;
     data->capabilities = getCapabilities();
 
-    if ((query & Qn::CapabilitiesPtzField))
+    if (query.testFlag(Qn::CapabilitiesPtzField))
     {
         data->capabilities = getCapabilities();
         data->fields |= Qn::CapabilitiesPtzField;
     }
 
-    if ((query & Qn::DevicePositionPtzField)
+    if (query.testFlag(Qn::DevicePositionPtzField)
         && getPosition(Qn::DevicePtzCoordinateSpace, &data->devicePosition))
     {
         data->fields |= Qn::DevicePositionPtzField;
     }
 
-    if ((query & Qn::LogicalPositionPtzField)
+    if (query.testFlag(Qn::LogicalPositionPtzField)
         && getPosition(Qn::LogicalPtzCoordinateSpace, &data->logicalPosition))
     {
         data->fields |= Qn::LogicalPositionPtzField;
     }
 
-    if ((query & Qn::DeviceLimitsPtzField)
-        && getLimits(Qn::DevicePtzCoordinateSpace, &data->deviceLimits))        \
+    if (query.testFlag(Qn::DeviceLimitsPtzField)
+        && getLimits(Qn::DevicePtzCoordinateSpace, &data->deviceLimits))
     {
         data->fields |= Qn::DeviceLimitsPtzField;
     }
 
-    if ((query & Qn::LogicalLimitsPtzField)
+    if (query.testFlag(Qn::LogicalLimitsPtzField)
         && getLimits(Qn::LogicalPtzCoordinateSpace, &data->logicalLimits))
     {
         data->fields |= Qn::LogicalLimitsPtzField;
     }
 
-    if ((query & Qn::FlipPtzField)
+    if (query.testFlag(Qn::FlipPtzField)
         && getFlip(&data->flip))
     {
         data->fields |= Qn::FlipPtzField;
     }
 
-    if ((query & Qn::PresetsPtzField)
+    if (query.testFlag(Qn::PresetsPtzField)
         && getPresets(&data->presets))
     {
         data->fields |= Qn::PresetsPtzField;
     }
 
-    if ((query & Qn::ToursPtzField)
+    if (query.testFlag(Qn::ToursPtzField)
         && getTours(&data->tours))
     {
         data->fields |= Qn::ToursPtzField;
     }
 
-    if ((query & Qn::ActiveObjectPtzField)
+    if (query.testFlag(Qn::ActiveObjectPtzField)
         && getActiveObject(&data->activeObject))
     {
         data->fields |= Qn::ActiveObjectPtzField;
     }
 
-    if ((query & Qn::HomeObjectPtzField)
+    if (query.testFlag(Qn::HomeObjectPtzField)
         && getHomeObject(&data->homeObject))
     {
         data->fields |= Qn::HomeObjectPtzField;
     }
 
-    if ((query & Qn::AuxilaryTraitsPtzField)
+    if (query.testFlag(Qn::AuxilaryTraitsPtzField)
         && getAuxilaryTraits(&data->auxilaryTraits))
     {
         data->fields |= Qn::AuxilaryTraitsPtzField;

@@ -74,7 +74,7 @@
                 </Directory>
 
                 <Directory Id="$(var.customization)ServerVoxDir" Name="vox"/>                                                
-                
+
                 <Component Id="ServerSigar">
                     <File Id="sigar.dll" Name="sigar.dll" Source="$(var.SourceDir)\sigar.dll" DiskId="6" />
                 </Component>
@@ -105,6 +105,9 @@
             <Component>
                 <File Id="udt.dll" Name="udt.dll" Source="$(var.SourceDir)/udt.dll" DiskId="4" />
             </Component>
+            <Component>
+                <File Id="nx_kit.dll" Name="nx_kit.dll" Source="$(var.SourceDir)/nx_kit.dll" DiskId="4" />
+            </Component>              
         </ComponentGroup>    
 
         <!-- Component groups -->
@@ -146,7 +149,7 @@
                 <File Id="ServerWebData" Name="external.dat" Source="$(var.SourceDir)/external.dat" DiskId="10" />
             </Component>
         </ComponentGroup>            
-        
+
         <ComponentGroup Id="ServerQTLibraries" Directory="${customization}MediaServerDir">
             <Component>
                 <File Id="Qt5Core.dll" Name="Qt5Core.dll" Source="$(var.QtDir)\Qt5Core.dll" DiskId="7"/>
@@ -175,7 +178,7 @@
             <Component>
                 <File Id="Qt5WebSockets.dll" Name="Qt5WebSockets.dll" Source="$(var.QtDir)\Qt5WebSockets.dll" DiskId="8"/>
             </Component>
-            
+
             <Component>
                 <File Id="icudt58.dll" Name="icudt58.dll" Source="$(var.QtDir)\icudt58.dll" DiskId="5" />                
             </Component>                 
@@ -186,7 +189,7 @@
                 <File Id="icuuc58.dll" Name="icuuc58.dll" Source="$(var.QtDir)\icuuc58.dll" DiskId="5" />                
             </Component>                 
         </ComponentGroup>
-        
+
         <ComponentGroup Id="ServerQuazip" Directory="${customization}MediaServerDir">
             <Component>
                 <File Id="quazip.dll" Name="quazip.dll" Source="$(var.SourceDir)\quazip.dll" DiskId="6" />                

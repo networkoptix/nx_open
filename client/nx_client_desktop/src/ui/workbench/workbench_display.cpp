@@ -276,14 +276,14 @@ QnWorkbenchDisplay::QnWorkbenchDisplay(QObject *parent):
             action::ToggleSyncAction, //< S
             action::JumpToEndAction,  //< X
             action::JumpToStartAction,//< Z
-            action::PlayPauseAction,  //< Space
 
             /* "Delete" button */
             action::DeleteVideowallMatrixAction,
             action::RemoveLayoutItemAction,
             action::RemoveLayoutItemFromSceneAction,
             action::RemoveFromServerAction,
-            action::StopSharingLayoutAction
+            action::StopSharingLayoutAction,
+            action::RemoveLayoutTourAction
         })
             action(actionId)->setEnabled(!isWebView);
     });
@@ -1494,14 +1494,17 @@ QRectF QnWorkbenchDisplay::fitInViewGeometry() const
     if (layoutBoundingRect.isNull())
         layoutBoundingRect = QRect(0, 0, 1, 1);
 
-    QRect backgroundBoundingRect = gridBackgroundItem() ? gridBackgroundItem()->sceneBoundingRect() : QRect();
+    QRect backgroundBoundingRect = gridBackgroundItem()
+        ? gridBackgroundItem()->sceneBoundingRect()
+        : QRect();
 
-    QRect sceneBoundingRect = (backgroundBoundingRect.isNull())
+    QRectF sceneBoundingRect = (backgroundBoundingRect.isNull())
         ? layoutBoundingRect
         : layoutBoundingRect.united(backgroundBoundingRect);
 
+    // Limit size for layout tour review layouts //TODO: #GDM move to layout data
     static const int kLayoutTourMinimalSize = 3; //< size in cells: 3*3
-    if (workbench()->currentLayout()->data().contains(Qn::LayoutTourUuidRole))
+    if (workbench()->currentLayout()->isLayoutTourReview())
     {
         if (sceneBoundingRect.width() < kLayoutTourMinimalSize)
             sceneBoundingRect.setWidth(kLayoutTourMinimalSize);
@@ -1510,26 +1513,22 @@ QRectF QnWorkbenchDisplay::fitInViewGeometry() const
     }
 
     /* Do not add additional spacing in following cases: */
-    bool noAdjust = qnRuntime->isVideoWallMode()                           /*< Videowall client. */
-        || !backgroundBoundingRect.isNull();                                /*< There is a layout background. */
+    const bool adjustSpace = !qnRuntime->isVideoWallMode()  //< Videowall client.
+        && backgroundBoundingRect.isNull()                  //< There is a layout background.
+        && !workbench()->currentLayout()->flags().testFlag(QnLayoutFlag::FillViewport);
 
-    if (noAdjust)
-        return workbench()->mapper()->mapFromGridF(QRectF(sceneBoundingRect));
+    static const qreal d = 0.015;
+    if (adjustSpace)
+        sceneBoundingRect = sceneBoundingRect.adjusted(-d, -d, d, d);
 
-    const qreal minAdjust = 0.015;
-    return workbench()->mapper()->mapFromGridF(QRectF(sceneBoundingRect).adjusted(-minAdjust, -minAdjust, minAdjust, minAdjust));
+    return workbench()->mapper()->mapFromGridF(sceneBoundingRect);
 }
 
 QRectF QnWorkbenchDisplay::viewportGeometry() const
 {
-    if (m_view == NULL)
-    {
-        return QRectF();
-    }
-    else
-    {
-        return m_viewportAnimator->accessor()->get(m_view).toRectF();
-    }
+    return m_view
+        ? m_viewportAnimator->accessor()->get(m_view).toRectF()
+        : QRectF();
 }
 
 QRectF QnWorkbenchDisplay::boundedViewportGeometry() const
@@ -1707,20 +1706,15 @@ void QnWorkbenchDisplay::synchronizeSceneBounds()
     if (m_instrumentManager->scene() == NULL)
         return; /* Do nothing if scene is being destroyed. */
 
-    QRectF sizeRect, moveRect;
+    auto zoomedItem = m_widgetByRole[Qn::ZoomedRole]
+        ? m_widgetByRole[Qn::ZoomedRole]->item()
+        : nullptr;
 
-    QnWorkbenchItem *zoomedItem = m_widgetByRole[Qn::ZoomedRole] ? m_widgetByRole[Qn::ZoomedRole]->item() : NULL;
-    if (zoomedItem != NULL)
-    {
-        sizeRect = moveRect = itemGeometry(zoomedItem);
-    }
-    else
-    {
-        moveRect = fitInViewGeometry();
-        sizeRect = fitInViewGeometry();
-    }
+    const QRectF sizeRect = zoomedItem
+        ? itemGeometry(zoomedItem)
+        : fitInViewGeometry();
 
-    m_boundingInstrument->setPositionBounds(m_view, moveRect);
+    m_boundingInstrument->setPositionBounds(m_view, sizeRect);
     m_boundingInstrument->setSizeBounds(m_view,
         qnGlobals->viewportLowerSizeBound(),
         Qt::KeepAspectRatioByExpanding,
@@ -2363,6 +2357,9 @@ void QnWorkbenchDisplay::at_notificationsHandler_businessActionAdded(const QnAbs
         return;
 
     if (workbench()->currentLayout()->isSearchLayout())
+        return;
+
+    if (workbench()->currentLayout()->isLayoutTourReview())
         return;
 
     /*

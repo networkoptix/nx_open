@@ -48,8 +48,8 @@ namespace {
     class QnAlarmLayoutResource: public QnLayoutResource {
         Q_DECLARE_TR_FUNCTIONS(QnAlarmLayoutResource)
     public:
-        QnAlarmLayoutResource():
-            QnLayoutResource()
+        QnAlarmLayoutResource(QnCommonModule* commonModule):
+            QnLayoutResource(commonModule)
         {
             NX_ASSERT(resourcePool()->getResources<QnAlarmLayoutResource>().isEmpty(), Q_FUNC_INFO, "The Alarm Layout must exist in a single instance");
 
@@ -202,7 +202,13 @@ void QnWorkbenchAlarmLayoutHandler::openCamerasInAlarmLayout( const QnVirtualCam
     }
 
     if (switchToLayout)
+    {
+        // Stop layout tour if it is running
+        if (action(action::ToggleLayoutTourModeAction)->isChecked())
+            menu()->trigger(action::ToggleLayoutTourModeAction);
+
         workbench()->setCurrentLayout(layout);
+    }
 
 
     if (!wasEmptyLayout || sortedCameras.empty())
@@ -224,10 +230,13 @@ QnWorkbenchLayout* QnWorkbenchAlarmLayoutHandler::findOrCreateAlarmLayout() {
 
     QnAlarmLayoutResourceList layouts = resourcePool()->getResources<QnAlarmLayoutResource>();
     NX_ASSERT(layouts.size() < 2, Q_FUNC_INFO, "There must be only one alarm layout, if any");
-    if (!layouts.empty()) {
+    if (!layouts.empty())
+    {
         alarmLayout = layouts.first();
-    } else {
-        alarmLayout = QnAlarmLayoutResourcePtr(new QnAlarmLayoutResource());
+    }
+    else
+    {
+        alarmLayout = QnAlarmLayoutResourcePtr(new QnAlarmLayoutResource(commonModule()));
         alarmLayout->setParentId(context()->user()->getId());
         resourcePool()->addResource(alarmLayout);
     }

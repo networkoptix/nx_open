@@ -3,6 +3,7 @@
 #include <cmath>
 
 #include <QtWidgets/QApplication>
+#include <QtWidgets/QGraphicsDropShadowEffect>
 
 #include <ui/animation/opacity_animator.h>
 #include <ui/common/geometry.h>
@@ -24,6 +25,9 @@ namespace {
 /* Duration of success and failure notifications staying up: */
 static constexpr int kNotificationDurationMs = 1200;
 
+/* Opacity for disabled button: */
+static constexpr qreal kDisabledTriggerOpacity = 0.5;
+
 /* A short delay in State::Waiting before busy indicator appears: */
 static constexpr int kBusyIndicatorDelayMs = 150;
 
@@ -39,10 +43,13 @@ static constexpr qreal kAnimationMinimumOpacity = 0.15;
 
 /* Tooltip adjustments: */
 static constexpr int kHoverEnterDelayMs = 0;
-static constexpr int kHoverLeaveDelayMs = 250;
+static constexpr int kHoverLeaveDelayMs = 50;
 static constexpr qreal kToolTipAnimationSpeedFactor = 2.0;
 static constexpr qreal kToolTipRoundingRadius = 2.0;
 static constexpr qreal kToolTipPadding = 8.0;
+static constexpr qreal kToolTipShadowBlurRadius = 5.0;
+static constexpr qreal kToolTipShadowOpacity = 0.36;
+static const QPointF kToolTipShadowOffset(0.0, 3.0);
 
 static Qt::Edge invertEdge(Qt::Edge edge)
 {
@@ -96,6 +103,13 @@ SoftwareTriggerButtonPrivate::SoftwareTriggerButtonPrivate(SoftwareTriggerButton
             q->update();
         });
 
+    connect(main, &SoftwareTriggerButton::enabledChanged, this,
+        [this]()
+        {
+            Q_Q(const SoftwareTriggerButton);
+            m_toolTip->setVisible(q->isEnabled());
+        });
+
     m_toolTipHoverProcessor->addTargetItem(main);
     m_toolTipHoverProcessor->addTargetItem(m_toolTip);
     m_toolTipHoverProcessor->setHoverEnterDelay(kHoverEnterDelayMs);
@@ -109,6 +123,14 @@ SoftwareTriggerButtonPrivate::SoftwareTriggerButtonPrivate(SoftwareTriggerButton
     m_toolTip->setOpacity(0.0);
     m_toolTip->setRoundingRadius(kToolTipRoundingRadius);
     m_toolTip->setFlag(QGraphicsItem::ItemIgnoresTransformations, false);
+
+    auto shadowEffect = new QGraphicsDropShadowEffect(m_toolTip);
+    auto shadowColor = QPalette().color(QPalette::Shadow);
+    shadowColor.setAlphaF(kToolTipShadowOpacity);
+    shadowEffect->setColor(shadowColor);
+    shadowEffect->setOffset(kToolTipShadowOffset);
+    shadowEffect->setBlurRadius(kToolTipShadowBlurRadius);
+    m_toolTip->setGraphicsEffect(shadowEffect);
 
     updateToolTipTailEdge();
 }
@@ -390,6 +412,9 @@ void SoftwareTriggerButtonPrivate::paint(QPainter* painter,
 
     QnScopedPainterOpacityRollback opacityRollback(painter);
 
+    if (!q->isEnabled())
+        painter->setOpacity(painter->opacity() * kDisabledTriggerOpacity);
+
     switch (effectiveState)
     {
         case SoftwareTriggerButton::State::Default:
@@ -490,6 +515,9 @@ void SoftwareTriggerButtonPrivate::ensureImages()
         };
 
     QIcon icon;
+    const auto normalPixmap = generateStatePixmap(QPalette::Window);
+    icon.addPixmap(normalPixmap, QIcon::Normal);
+    icon.addPixmap(normalPixmap, QIcon::Disabled);
     icon.addPixmap(generateStatePixmap(QPalette::Window), QIcon::Normal);
     icon.addPixmap(generateStatePixmap(QPalette::Midlight), QIcon::Active);
     icon.addPixmap(generateStatePixmap(QPalette::Dark), QnIcon::Pressed);

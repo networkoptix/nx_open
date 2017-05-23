@@ -48,12 +48,16 @@ QnWorkbenchLayout::QnWorkbenchLayout(const QnLayoutResourcePtr &resource, QObjec
 {
 
     // TODO: #Elric this does not belong here.
-    setData(Qn::LayoutSyncStateRole, QVariant::fromValue<QnStreamSynchronizationState>(QnStreamSynchronizationState(true, DATETIME_NOW, 1.0)));
+    setData(Qn::LayoutSyncStateRole, QVariant::fromValue<QnStreamSynchronizationState>(
+        QnStreamSynchronizationState(true, DATETIME_NOW, 1.0)));
 
     initCellParameters();
 
     if(resource.isNull())
         return;
+
+    if (resource->data().contains(Qn::LayoutFlagsRole))
+        setFlags(flags() | resource->data(Qn::LayoutFlagsRole).value<QnLayoutFlags>());
 
     m_icon = resource->data(Qn::LayoutIconRole).value<QIcon>();
     QnWorkbenchLayoutSynchronizer *synchronizer = new QnWorkbenchLayoutSynchronizer(this, resource, this);
@@ -578,6 +582,12 @@ const QSet<QnWorkbenchItem *> &QnWorkbenchLayout::items(const QString &resourceU
     return pos == m_itemsByUid.end() ? m_noItems : pos.value();
 }
 
+bool QnWorkbenchLayout::isFreeSlot(const QPointF &gridPos, const QSize &size) const
+{
+    QPoint gridCell = (gridPos - QnGeometry::toPoint(QSizeF(size)) / 2.0).toPoint();
+    return !m_itemMap.isOccupied(QRect(gridCell, size));
+}
+
 QRect QnWorkbenchLayout::closestFreeSlot(const QPointF& gridPos, const QSize& size,
     TypedMagnitudeCalculator<QPoint>* metric) const
 {
@@ -856,4 +866,9 @@ bool QnWorkbenchLayout::isSearchLayout() const {
     if (!data().contains(Qn::LayoutSearchStateRole))
         return false;
     return data(Qn::LayoutSearchStateRole).value<QnThumbnailsSearchState>().step > 0;
+}
+
+bool QnWorkbenchLayout::isLayoutTourReview() const
+{
+    return data().contains(Qn::LayoutTourUuidRole);
 }

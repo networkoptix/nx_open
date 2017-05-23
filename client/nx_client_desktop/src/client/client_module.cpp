@@ -204,6 +204,12 @@ QnClientModule::~QnClientModule()
 
     //restoring default message handler
     qInstallMessageHandler(defaultMsgHandler);
+
+    // First delete clientCore module and commonModule()
+    m_clientCoreModule.reset();
+
+    // Then delete static common.
+    m_staticCommon.reset();
 }
 
 void QnClientModule::initThread()

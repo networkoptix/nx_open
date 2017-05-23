@@ -7,7 +7,6 @@
 #include <QtWidgets/QLabel>
 #include <QtWidgets/QVBoxLayout>
 
-#include <ui/animation/rect_animator.h>
 #include <ui/common/palette.h>
 #include <ui/graphics/items/generic/viewport_bound_widget.h>
 #include <ui/graphics/items/generic/masked_proxy_widget.h>
@@ -30,25 +29,14 @@ void makeTransparentForMouse(QGraphicsItem* item)
 
 QnMaskedProxyWidget* makeMaskedProxy(
     QWidget* source,
-    QGraphicsItem* parentItem,
-    bool transparent)
+    QGraphicsItem* parentItem)
 {
     const auto result = new QnMaskedProxyWidget(parentItem);
     result->setWidget(source);
     result->setAcceptDrops(false);
     result->setCacheMode(QGraphicsItem::NoCache);
-
-    if (transparent)
-        makeTransparentForMouse(result);
-
+    makeTransparentForMouse(result);
     return result;
-}
-
-void setupLabel(QLabel* label)
-{
-    label->setAlignment(Qt::AlignCenter);
-    label->setWordWrap(true);
-    label->setFixedWidth(kFixedTextWidth);
 }
 
 QColor calculateFrameColor(const QPalette& palette)
@@ -68,8 +56,7 @@ LayoutTourDropPlaceholder::LayoutTourDropPlaceholder(
     Qt::WindowFlags windowFlags)
     :
     base_type(parent, windowFlags),
-    m_widget(new QnViewportBoundWidget(this)),
-    m_geometryAnimator(new RectAnimator(this))
+    m_widget(new QnViewportBoundWidget(this))
 {
     setAcceptedMouseButtons(0);
     setFrameShape(Qn::RoundedRectangularFrame);
@@ -80,15 +67,13 @@ LayoutTourDropPlaceholder::LayoutTourDropPlaceholder(
     setPaletteColor(this, QPalette::Window, Qt::transparent);
     setFrameBrush(calculateFrameColor(palette()));
 
-    const QString message = tr("Drag layout here to add it to the tour");
-    auto caption = new QLabel(message);
-    setupLabel(caption);
-    caption->setVisible(true);
+    auto caption = new QLabel(tr("Drag layout here to add it to the tour"));
+    caption->setAlignment(Qt::AlignCenter);
+    caption->setWordWrap(true);
+    caption->setFixedWidth(kFixedTextWidth);
 
     const auto container = new QWidget();
-    container->setObjectName(lit("centralContainer"));
     container->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
-    setPaletteColor(container, QPalette::Window, Qt::transparent);
 
     const auto layout = new QVBoxLayout(container);
     layout->setSpacing(0);
@@ -96,7 +81,7 @@ LayoutTourDropPlaceholder::LayoutTourDropPlaceholder(
 
     const auto horizontalLayout = new QGraphicsLinearLayout(Qt::Horizontal);
     horizontalLayout->addStretch(1);
-    horizontalLayout->addItem(makeMaskedProxy(container, m_widget, true));
+    horizontalLayout->addItem(makeMaskedProxy(container, m_widget));
     horizontalLayout->addStretch(1);
 
     const auto verticalLayout = new QGraphicsLinearLayout(Qt::Vertical, m_widget);
@@ -107,10 +92,6 @@ LayoutTourDropPlaceholder::LayoutTourDropPlaceholder(
     m_widget->setOpacity(kTextOpacity);
     makeTransparentForMouse(m_widget);
     addOverlayWidget(m_widget, detail::OverlayParams(Visible));
-
-    m_geometryAnimator->setTargetObject(this);
-    m_geometryAnimator->setAccessor(new PropertyAccessor("geometry"));
-    m_geometryAnimator->setTimeLimit(100);
 }
 
 const QRectF& LayoutTourDropPlaceholder::rect() const
@@ -125,20 +106,7 @@ void LayoutTourDropPlaceholder::setRect(const QRectF& rect)
 
     prepareGeometryChange();
     m_rect = rect;
-
-    m_geometryAnimator->pause();
-    m_geometryAnimator->setTargetValue(m_rect);
-    m_geometryAnimator->start();
-}
-
-AnimationTimer* LayoutTourDropPlaceholder::animationTimer() const
-{
-    return m_geometryAnimator->timer();
-}
-
-void LayoutTourDropPlaceholder::setAnimationTimer(AnimationTimer* timer)
-{
-    m_geometryAnimator->setTimer(timer);
+    setGeometry(rect);
 }
 
 void LayoutTourDropPlaceholder::changeEvent(QEvent* event)

@@ -94,11 +94,11 @@ bool updateItems(const QSqlDatabase& database, const ApiLayoutTourData& tour)
     const QString queryStr(R"sql(
         INSERT INTO vms_layout_tour_items (
             tourId,
-            layoutId,
+            resourceId,
             delayMs
         ) VALUES (
             :tourId,
-            :layoutId,
+            :resourceId,
             :delayMs
         )
     )sql");

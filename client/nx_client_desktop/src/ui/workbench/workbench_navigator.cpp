@@ -464,12 +464,19 @@ void QnWorkbenchNavigator::initialize()
 
     connect(context()->instance<QnWorkbenchServerTimeWatcher>(), &QnWorkbenchServerTimeWatcher::displayOffsetsChanged, this, &QnWorkbenchNavigator::updateLocalOffset);
 
-    connect(context()->instance<QnWorkbenchUserInactivityWatcher>(), SIGNAL(stateChanged(bool)), this, SLOT(setAutoPaused(bool)));
+    connect(context()->instance<QnWorkbenchUserInactivityWatcher>(),
+        &QnWorkbenchUserInactivityWatcher::stateChanged,
+        this,
+        &QnWorkbenchNavigator::updateAutoPaused);
+
+    connect(action(action::ToggleLayoutTourModeAction), &QAction::toggled, this,
+        &QnWorkbenchNavigator::updateAutoPaused);
 
     updateLines();
     updateCalendar();
     updateScrollBarFromSlider();
     updateTimeSliderWindowSizePolicy();
+    updateAutoPaused();
 }
 
 void QnWorkbenchNavigator::deinitialize()
@@ -1917,8 +1924,13 @@ void QnWorkbenchNavigator::updateTimeSliderWindowSizePolicy()
     m_timeSlider->setOption(QnTimeSlider::PreserveWindowSize, m_timeSlider->isThumbnailsVisible());
 }
 
-void QnWorkbenchNavigator::setAutoPaused(bool autoPaused)
+void QnWorkbenchNavigator::updateAutoPaused()
 {
+    const bool noActivity = context()->instance<QnWorkbenchUserInactivityWatcher>()->state();
+    const bool isTourRunning = action(action::ToggleLayoutTourModeAction)->isChecked();
+
+    const bool autoPaused = noActivity && !isTourRunning;
+
     if (autoPaused == m_autoPaused)
         return;
 

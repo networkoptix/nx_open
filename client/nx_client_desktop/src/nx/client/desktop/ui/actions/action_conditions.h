@@ -170,7 +170,7 @@ protected:
     template<class Item, class ItemSequence>
     bool checkInternal(const ItemSequence &sequence);
     bool checkOne(const QnResourcePtr &resource);
-    bool checkOne(QnResourceWidget *widget);
+    bool checkOne(QnResourceWidget* widget);
 
 private:
     QnResourceCriterion m_criterion;

@@ -290,8 +290,8 @@ void QnWorkbench::setItem(Qn::ItemRole role, QnWorkbenchItem *item)
     if (m_itemByRole[role] == item)
         return;
 
+    // Delayed clicks may lead to very interesting scenarios. Just ignore.
     bool validLayout = !item || item->layout() == m_currentLayout;
-    NX_ASSERT(validLayout, "Cannot set a role for an item from another layout.");
     if (!validLayout)
         return;
 

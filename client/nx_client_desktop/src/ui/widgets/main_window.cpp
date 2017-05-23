@@ -72,6 +72,7 @@
 
 #include <ui/workbench/workbench.h>
 #include <ui/workbench/workbench_controller.h>
+#include <ui/workbench/workbench_navigator.h>
 #include <ui/workbench/workbench_grid_mapper.h>
 #include <ui/workbench/workbench_layout.h>
 #include <ui/workbench/workbench_display.h>
@@ -618,7 +619,56 @@ void MainWindow::updateDecorationsState() {
     m_currentPageHolder->updateGeometry();
 }
 
-void MainWindow::updateDwmState() {
+bool MainWindow::handleKeyPress(int key)
+{
+    // Qt shortcuts handling works incorrect. If we have a shortcut set for an action, it will
+    // block key event passing in any case (even if we did not handle the event).
+    if (key == Qt::Key_Alt || key == Qt::Key_Control)
+        return false;
+
+    const bool isTourRunning = action(action::ToggleLayoutTourModeAction)->isChecked();
+
+    if (!isTourRunning)
+    {
+        if (key == Qt::Key_Space)
+        {
+            menu()->triggerIfPossible(action::PlayPauseAction,
+                navigator()->currentParameters(action::TimelineScope));
+            return true;
+        }
+
+        // Only running tours are handled further.
+        return false;
+    }
+
+    switch (key)
+    {
+        case Qt::Key_Backspace:
+        case Qt::Key_Left:
+        case Qt::Key_PageUp:
+        {
+            menu()->trigger(action::LayoutTourPrevStepAction);
+            break;
+        }
+        case Qt::Key_Enter:
+        case Qt::Key_Return:
+        case Qt::Key_Space:
+        case Qt::Key_Right:
+        case Qt::Key_PageDown:
+        {
+            menu()->trigger(action::LayoutTourNextStepAction);
+            break;
+        }
+        default:
+            // Stop layout tour if it is running.
+            menu()->trigger(action::ToggleLayoutTourModeAction);
+            break;
+    }
+    return true;
+}
+
+void MainWindow::updateDwmState()
+{
     if (isFullScreen())
     {
         /* Full screen mode. */
@@ -761,19 +811,7 @@ void MainWindow::paintEvent(QPaintEvent* event)
 void MainWindow::keyPressEvent(QKeyEvent* event)
 {
     base_type::keyPressEvent(event);
-
-    if (event->key() == Qt::Key_Alt || event->key() == Qt::Key_Control)
-        return;
-
-    if (action(action::ToggleLayoutTourModeAction)->isChecked())
-    {
-        if (event->key() == Qt::Key_Left)
-            menu()->trigger(action::LayoutTourPrevStepAction);
-        else if (event->key() == Qt::Key_Right)
-            menu()->trigger(action::LayoutTourNextStepAction);
-        else // Stop layout tour if it is running.
-            menu()->trigger(action::ToggleLayoutTourModeAction);
-    }
+    handleKeyPress(event->key());
 }
 
 void MainWindow::resizeEvent(QResizeEvent *event) {

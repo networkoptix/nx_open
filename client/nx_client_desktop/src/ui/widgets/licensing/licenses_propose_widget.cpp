@@ -7,7 +7,7 @@
 #include <core/resource/device_dependent_strings.h>
 
 #include <nx/client/desktop/ui/actions/action_manager.h>
-#include <ui/common/checkbox_utils.h>
+#include <nx/client/desktop/ui/common/checkbox_utils.h>
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_access_controller.h>
 
@@ -23,7 +23,7 @@ QnLicensesProposeWidget::QnLicensesProposeWidget(QWidget *parent):
 {
     ui->setupUi(this);
 
-    QnCheckbox::autoCleanTristate(ui->useLicenseCheckBox);
+    CheckboxUtils::autoClearTristate(ui->useLicenseCheckBox);
 
     connect(ui->useLicenseCheckBox, &QCheckBox::stateChanged, this,
         [this]
@@ -143,7 +143,7 @@ void QnLicensesProposeWidget::updateFromResources()
         {
             return camera->isLicenseUsed() == licenseUsed;
         });
-    QnCheckbox::setupTristateCheckbox(ui->useLicenseCheckBox, sameValue, licenseUsed);
+    CheckboxUtils::setupTristateCheckbox(ui->useLicenseCheckBox, sameValue, licenseUsed);
 }
 
 Qt::CheckState QnLicensesProposeWidget::state() const

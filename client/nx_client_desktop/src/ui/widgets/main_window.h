@@ -57,6 +57,13 @@ public:
     QWidget *viewport() const;
 
     void updateDecorationsState();
+
+    /**
+     * Handle key press.
+     * @returns true if key was handled.
+     */
+    bool handleKeyPress(int key);
+
 public slots:
     bool handleMessage(const QString &message);
 

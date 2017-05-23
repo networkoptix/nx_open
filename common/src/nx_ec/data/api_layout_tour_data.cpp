@@ -16,7 +16,7 @@ QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(
 
 bool ApiLayoutTourItemData::operator==(const ApiLayoutTourItemData& rhs) const
 {
-     return layoutId == rhs.layoutId
+     return resourceId == rhs.resourceId
          && delayMs == rhs.delayMs;
 }
 

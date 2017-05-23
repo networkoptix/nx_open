@@ -81,7 +81,7 @@ void QnMobileClientMetaTypes::registerQmlTypes() {
     qmlRegisterType<QnLiteClientController>("com.networkoptix.qml", 1, 0, "QnLiteClientController");
     qmlRegisterType<QnLiteClientLayoutHelper>("com.networkoptix.qml", 1, 0, "QnLiteClientLayoutHelper");
     qmlRegisterType<utils::DeveloperSettingsHelper>(
-        "Nx.Core", 1, 0, "DeveloperSettingsHelper");
+        "Nx.Settings", 1, 0, "DeveloperSettingsHelper");
 
     // Ptz related classes
     qmlRegisterUncreatableType<Ptz>("Nx.Core", 1, 0, "Ptz",

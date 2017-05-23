@@ -4,6 +4,7 @@
 
 #include <client/client_settings.h>
 
+#include <core/resource/layout_resource.h>
 #include <core/resource/layout_tour_item.h>
 
 #include <core/resource_management/resource_pool.h>
@@ -50,13 +51,13 @@ void LayoutTourExecutor::startTour(const ec2::ApiLayoutTourData& tour)
     if (!tour.isValid())
         return;
 
-    const auto items = QnLayoutTourItem::createList(tour.items, resourcePool());
-    if (items.empty())
+    NX_EXPECT(m_tour.items.empty());
+    resetTourItems(tour.items);
+    if (tour.items.empty())
         return;
 
     m_mode = Mode::MultipleLayouts;
     m_tour.id = tour.id;
-    m_tour.items = std::move(items);
     m_tour.currentIndex = -1;
     clearWorkbenchState();
 
@@ -88,7 +89,7 @@ void LayoutTourExecutor::updateTour(const ec2::ApiLayoutTourData& tour)
             startTimer();
     }
 
-    m_tour.items = QnLayoutTourItem::createList(tour.items, resourcePool());
+    resetTourItems(tour.items);
     if (m_tour.items.empty())
         stopCurrentTour();
     else if (m_tour.currentIndex >= tour.items.size())
@@ -150,7 +151,7 @@ void LayoutTourExecutor::stopCurrentTour()
             m_tour.currentIndex = 0;
             NX_EXPECT(!m_tour.id.isNull());
             m_tour.id = QnUuid();
-            m_tour.items.clear();
+            resetTourItems({});
 
             restoreWorkbenchState();
             menu()->trigger(action::FreespaceAction);
@@ -163,6 +164,39 @@ void LayoutTourExecutor::stopCurrentTour()
 
     setHintVisible(false);
     m_mode = Mode::Stopped;
+}
+
+void LayoutTourExecutor::resetTourItems(const ec2::ApiLayoutTourItemDataList& items)
+{
+    m_tour.items.clear();
+
+    for (const auto& item: items)
+    {
+        auto existing = resourcePool()->getResourceById(item.resourceId);
+        if (!existing)
+            continue;
+
+        auto existingLayout = existing.dynamicCast<QnLayoutResource>();
+
+        QnLayoutResourcePtr layout = existingLayout
+            ? existingLayout->clone()
+            : QnLayoutResource::createFromResource(existing);
+
+        NX_EXPECT(layout);
+        if (!layout)
+            continue;
+
+        layout->addFlags(Qn::local);
+        layout->setData(Qn::LayoutFlagsRole, qVariantFromValue(QnLayoutFlag::FixedViewport
+            | QnLayoutFlag::NoResize
+            | QnLayoutFlag::NoMove
+            | QnLayoutFlag::NoTimeline
+            | QnLayoutFlag::FillViewport
+        ));
+        layout->setData(Qn::LayoutPermissionsRole, static_cast<int>(Qn::ReadPermission));
+
+        m_tour.items.push_back(QnLayoutTourItem(layout, item.delayMs));
+    }
 }
 
 void LayoutTourExecutor::processTourStepInternal(bool forward, bool force)
@@ -229,7 +263,7 @@ void LayoutTourExecutor::processTourStepInternal(bool forward, bool force)
                     return;
             }
 
-            m_tour.currentIndex = nextIndex(m_tour.currentIndex, m_tour.items.size());
+            m_tour.currentIndex = nextIndex(m_tour.currentIndex, (int) m_tour.items.size());
             const auto& next = m_tour.items[m_tour.currentIndex];
 
             auto layout = next.layout;
@@ -251,11 +285,7 @@ void LayoutTourExecutor::processTourStepInternal(bool forward, bool force)
             break;
         }
         default:
-        {
-            NX_EXPECT(false);
-            stopCurrentTour();
             break;
-        }
     }
 }
 

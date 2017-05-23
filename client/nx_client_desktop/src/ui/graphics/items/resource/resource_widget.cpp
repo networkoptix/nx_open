@@ -60,7 +60,7 @@
 namespace {
 const qreal kButtonsSize = 24.0;
 
-static const MarginsF kHudMargins(4.0, 0.0, 4.0, 4.0);
+static const qreal kHudMargin = 4.0;
 
 /** Default timeout before the video is displayed as "loading", in milliseconds. */
 #ifdef QN_RESOURCE_WIDGET_FLASHY_LOADING_OVERLAY
@@ -219,8 +219,9 @@ QnResourceWidget::~QnResourceWidget()
 //TODO: #ynikitenkov #high emplace back "titleLayout->setContentsMargins(0, 0, 0, 1);" fix
 void QnResourceWidget::setupHud()
 {
-    addOverlayWidget(m_hudOverlay, detail::OverlayParams(UserVisible, true, true, InfoLayer));
-    m_hudOverlay->setContentsMargins(kHudMargins);
+    addOverlayWidget(m_hudOverlay, detail::OverlayParams(UserVisible, true, false, InfoLayer));
+    m_hudOverlay->setContentsMargins(0.0, 0.0, 0.0, 0.0);
+    m_hudOverlay->content()->setContentsMargins(kHudMargin, 0.0, kHudMargin, kHudMargin);
     setOverlayWidgetVisible(m_hudOverlay, true, /*animate=*/false);
     setOverlayWidgetVisible(m_hudOverlay->details(), false, /*animate=*/false);
     setOverlayWidgetVisible(m_hudOverlay->position(), false, /*animate=*/false);

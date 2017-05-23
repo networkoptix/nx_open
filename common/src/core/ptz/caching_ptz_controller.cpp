@@ -91,7 +91,7 @@ bool QnCachingPtzController::getLimits(Qn::PtzCoordinateSpace space, QnPtzLimits
         return false;
 
     const QnMutexLocker locker(&m_mutex);
-    switch(space)
+    switch (space)
     {
         case Qn::DevicePtzCoordinateSpace:
             if (!m_data.fields.testFlag(Qn::DeviceLimitsPtzField))

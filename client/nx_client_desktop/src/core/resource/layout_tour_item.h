@@ -14,9 +14,4 @@ struct QnLayoutTourItem
         layout(layout), delayMs(delayMs)
     {
     }
-
-    QnLayoutTourItem(const ec2::ApiLayoutTourItemData& data, QnResourcePool* resourcePool);
-
-    static QnLayoutTourItemList createList(const ec2::ApiLayoutTourItemDataList& items,
-        QnResourcePool* resourcePool);
 };

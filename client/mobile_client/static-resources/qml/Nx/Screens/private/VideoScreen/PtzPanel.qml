@@ -10,7 +10,7 @@ Column
 {
     id: control
 
-    property PtzController controller: PtzController
+    readonly property PtzController controller: PtzController
     {
         property bool supportsPresets: capabilities & Ptz.PresetsPtzCapability
     }
