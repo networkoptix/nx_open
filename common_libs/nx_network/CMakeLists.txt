@@ -1,5 +1,3 @@
-nx_rdep_add_package(openssl)
-
 set(library_type)
 if(WIN32)
     set(library_type LIBRARY_TYPE SHARED)
