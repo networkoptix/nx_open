@@ -1034,16 +1034,20 @@ void ActionHandler::at_dropResourcesAction_triggered()
         menu()->trigger(action::OpenVideoWallReviewAction, videoWall);
 }
 
-void ActionHandler::at_dropResourcesIntoNewLayoutAction_triggered() {
+void ActionHandler::at_dropResourcesIntoNewLayoutAction_triggered()
+{
     const auto parameters = menu()->currentParameters(sender());
 
-    QnLayoutResourceList layouts = parameters.resources().filtered<QnLayoutResource>();
-    QnVideoWallResourceList videowalls = parameters.resources().filtered<QnVideoWallResource>();
+    const auto layouts = parameters.resources().filtered<QnLayoutResource>();
+    if (!layouts.empty())
+        menu()->trigger(action::OpenAnyNumberOfLayoutsAction, layouts);
 
-    if (layouts.empty() && (videowalls.size() != parameters.resources().size())) /* There are some media in the drop, open new layout. */
-        menu()->trigger(action::OpenNewTabAction);
+    const auto openable =  parameters.resources().filtered(QnResourceAccessFilter::isOpenableInLayout);
+    if (openable.empty())
+        return;
 
-    menu()->trigger(action::DropResourcesAction, parameters);
+    menu()->trigger(action::OpenNewTabAction);
+    menu()->trigger(action::DropResourcesAction, openable);
 }
 
 void ActionHandler::at_delayedDropResourcesAction_triggered() {

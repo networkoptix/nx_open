@@ -48,12 +48,16 @@ QnWorkbenchLayout::QnWorkbenchLayout(const QnLayoutResourcePtr &resource, QObjec
 {
 
     // TODO: #Elric this does not belong here.
-    setData(Qn::LayoutSyncStateRole, QVariant::fromValue<QnStreamSynchronizationState>(QnStreamSynchronizationState(true, DATETIME_NOW, 1.0)));
+    setData(Qn::LayoutSyncStateRole, QVariant::fromValue<QnStreamSynchronizationState>(
+        QnStreamSynchronizationState(true, DATETIME_NOW, 1.0)));
 
     initCellParameters();
 
     if(resource.isNull())
         return;
+
+    if (resource->data().contains(Qn::LayoutFlagsRole))
+        setFlags(flags() | resource->data(Qn::LayoutFlagsRole).value<QnLayoutFlags>());
 
     m_icon = resource->data(Qn::LayoutIconRole).value<QIcon>();
     QnWorkbenchLayoutSynchronizer *synchronizer = new QnWorkbenchLayoutSynchronizer(this, resource, this);

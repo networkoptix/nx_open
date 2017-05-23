@@ -175,15 +175,27 @@ void LayoutTourExecutor::resetTourItems(const ec2::ApiLayoutTourItemDataList& it
 
     for (const auto& item: items)
     {
-        auto existing = resourcePool()->getResourceById<QnLayoutResource>(item.layoutId);
+        auto existing = resourcePool()->getResourceById(item.layoutId);
         if (!existing)
             continue;
 
-        auto layout = existing->clone();
+        auto existingLayout = existing.dynamicCast<QnLayoutResource>();
+
+        QnLayoutResourcePtr layout = existingLayout
+            ? existingLayout->clone()
+            : QnLayoutResource::createFromResource(existing);
+
+        NX_EXPECT(layout);
+        if (!layout)
+            continue;
+
         layout->addFlags(Qn::local);
         layout->setData(Qn::LayoutFlagsRole, qVariantFromValue(QnLayoutFlag::FixedViewport
             | QnLayoutFlag::NoResize
-            | QnLayoutFlag::NoMove));
+            | QnLayoutFlag::NoMove
+            | QnLayoutFlag::NoTimeline
+            | QnLayoutFlag::FillViewport
+        ));
         layout->setData(Qn::LayoutPermissionsRole, static_cast<int>(Qn::ReadPermission));
 
         m_tour.items.push_back(QnLayoutTourItem(layout, item.delayMs));

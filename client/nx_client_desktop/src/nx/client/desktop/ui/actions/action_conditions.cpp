@@ -1035,20 +1035,14 @@ ActionVisibility OpenInLayoutCondition::check(const Parameters& parameters, QnWo
 bool OpenInLayoutCondition::canOpen(const QnResourceList& resources,
     const QnLayoutResourcePtr& layout) const
 {
-    auto openableInLayout = [](const QnResourcePtr& resource)
-        {
-            return QnResourceAccessFilter::isShareableMedia(resource)
-                || resource->hasFlags(Qn::local_media);
-        };
-
     if (!layout)
-        return any_of(resources, openableInLayout);
+        return any_of(resources, QnResourceAccessFilter::isOpenableInLayout);
 
     bool isExportedLayout = layout->isFile();
 
     for (const auto& resource : resources)
     {
-        if (!openableInLayout(resource))
+        if (!QnResourceAccessFilter::isOpenableInLayout(resource))
             continue;
 
         /* Allow to duplicate items on the exported layout. */

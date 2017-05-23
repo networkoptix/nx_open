@@ -161,11 +161,18 @@ void LayoutPreviewPainter::paint(QPainter* painter, const QRect& paintRect)
 LayoutPreviewPainter::ThumbnailInfo LayoutPreviewPainter::thumbnailForItem(
     const QnLayoutItemData& item) const
 {
-    NX_EXPECT(m_layout && m_layout->resourcePool());
-    if (!m_layout || !m_layout->resourcePool())
+    NX_EXPECT(m_layout);
+    if (!m_layout)
         return ThumbnailInfo();
 
-    const auto resource = m_layout->resourcePool()->getResourceByDescriptor(item.resource);
+    auto resourcePool = m_layout->resourcePool();
+    if (!resourcePool)
+        resourcePool = m_thumbnailManager->resourcePool();
+    NX_EXPECT(resourcePool);
+    if (!resourcePool)
+        return ThumbnailInfo();
+
+    const auto resource = resourcePool->getResourceByDescriptor(item.resource);
     if (!resource)
         return ThumbnailInfo();
 

@@ -27,7 +27,6 @@ private:
     void initOverlay();
 
 private:
-    QnLayoutResourcePtr m_layout;
     QSharedPointer<LayoutPreviewPainter> m_previewPainter;
 };
 

@@ -626,7 +626,7 @@ void QnWorkbenchController::moveCursor(const QPoint &aAxis, const QPoint &bAxis)
     }
 
     Qn::ItemRole role = Qn::ZoomedRole;
-    if (tourIsRunning(context()))
+    if (workbench()->currentLayout()->flags().testFlag(QnLayoutFlag::NoResize))
         role = Qn::SingleSelectedRole;
     else if (!workbench()->item(role))
         role = Qn::RaisedRole;
@@ -1186,22 +1186,24 @@ void QnWorkbenchController::at_item_leftClicked(QGraphicsView *, QGraphicsItem *
     if (!widget)
         return;
 
-    QnWorkbenchItem *workbenchItem = widget->item();
+    const auto workbenchItem = widget->item();
 
-    if (!tourIsRunning(context()) && workbench()->item(Qn::RaisedRole) != workbenchItem)
+    const bool canRaise = !workbench()->currentLayout()->flags().testFlag(QnLayoutFlag::NoResize);
+    if (canRaise && workbench()->item(Qn::RaisedRole) != workbenchItem)
     {
         /* Don't raise if there's only one item in the layout. */
         QRectF occupiedGeometry = widget->geometry();
         occupiedGeometry = dilated(occupiedGeometry, occupiedGeometry.size() * raisedGeometryThreshold);
 
         if (occupiedGeometry.contains(display()->raisedGeometry(widget->geometry(), widget->rotation())))
-            workbenchItem = nullptr;
-
-        workbench()->setItem(Qn::RaisedRole, workbenchItem);
-        return;
+            workbench()->setItem(Qn::RaisedRole, nullptr);
+        else
+            workbench()->setItem(Qn::RaisedRole, workbenchItem);
     }
-
-    workbench()->setItem(Qn::RaisedRole, nullptr);
+    else
+    {
+        workbench()->setItem(Qn::RaisedRole, nullptr);
+    }
 }
 
 void QnWorkbenchController::at_item_rightClicked(
@@ -1261,9 +1263,15 @@ void QnWorkbenchController::at_item_doubleClicked(QnResourceWidget *widget)
     display()->scene()->clearSelection();
     widget->setSelected(true);
 
-    // Do nothing else in layout tour review mode
-    if (workbench()->currentLayout()->data().contains(Qn::LayoutTourUuidRole))
+    const bool isLayoutTourReviewMode = workbench()->currentLayout()->data()
+        .contains(Qn::LayoutTourUuidRole);
+
+    if (isLayoutTourReviewMode)
+    {
+        if (auto resource = widget->resource())
+            menu()->trigger(action::DropResourcesIntoNewLayoutAction, resource);
         return;
+    }
 
     QnWorkbenchItem *workbenchItem = widget->item();
     QnWorkbenchItem *zoomedItem = workbench()->item(Qn::ZoomedRole);

@@ -62,14 +62,16 @@ LayoutTourItemWidget::LayoutTourItemWidget(
     QGraphicsItem* parent)
     :
     base_type(context, item, parent),
-    m_layout(base_type::resource().dynamicCast<QnLayoutResource>()),
     m_previewPainter(new LayoutPreviewPainter(context->instance<QnCameraThumbnailManager>()))
 {
     setOption(QnResourceWidget::InfoOverlaysForbidden);
     setOption(QnResourceWidget::WindowRotationForbidden);
 
-    NX_EXPECT(m_layout, "LayoutTourItemWidget was created with a non-layout resource.");
-    m_previewPainter->setLayout(m_layout);
+    QnLayoutResourcePtr layout = resource().dynamicCast<QnLayoutResource>();
+    if (!layout)
+        layout = QnLayoutResource::createFromResource(resource());
+
+    m_previewPainter->setLayout(layout);
     m_previewPainter->setFrameColor(Qt::black);                 //TODO: #GDM #3.1 customize
     m_previewPainter->setBackgroundColor(QColor("#222B2F"));    //TODO: #GDM #3.1 customize
     m_previewPainter->setFontColor(palette().color(QPalette::WindowText)); //TODO: #GDM #3.1 customize
@@ -101,12 +103,12 @@ void LayoutTourItemWidget::initOverlay()
 
     auto updateIcon = [this, icon]
         {
-            const auto pixmap = qnResIconCache->icon(m_layout)
+            const auto pixmap = qnResIconCache->icon(resource())
                 .pixmap(1024, 1024, QIcon::Normal, QIcon::On);
             icon->setPixmap(pixmap);
         };
     updateIcon();
-    connect(m_layout, &QnResource::parentIdChanged, this, updateIcon);
+    connect(resource(), &QnResource::parentIdChanged, this, updateIcon);
 
     auto title = new GraphicsLabel();
     title->setAcceptedMouseButtons(0);
@@ -116,10 +118,10 @@ void LayoutTourItemWidget::initOverlay()
 
     auto updateTitle = [this, title]
         {
-            title->setText(m_layout->getName());
+            title->setText(resource()->getName());
         };
     updateTitle();
-    connect(m_layout, &QnResource::nameChanged, this, updateTitle);
+    connect(resource(), &QnResource::nameChanged, this, updateTitle);
 
     auto closeButton = new QnImageButtonWidget();
     const auto closeButtonIcon = qnSkin->icon(lit("buttons/clear.png"));
