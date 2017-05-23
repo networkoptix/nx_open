@@ -503,64 +503,85 @@ bool QnLicenseManagerWidget::canRemoveLicense(const QnLicensePtr &license) const
     return errCode != QnLicenseErrorCode::NoError && errCode != QnLicenseErrorCode::FutureLicense;
 }
 
-void QnLicenseManagerWidget::removeSelectedLicenses()
+void QnLicenseManagerWidget::removeLicense(const QnLicensePtr& license, ForceRemove force)
 {
-    /*
-    for (const QnLicensePtr& license : selectedLicenses())
-    {
-        if (!canRemoveLicense(license))
-            continue;
+    if (force == ForceRemove::Yes && !canRemoveLicense(license))
+        return;
 
-        auto removeLisencesHandler = [this, license](int reqID, ec2::ErrorCode errorCode)
+    const auto removeLisencesHandler =
+        [this, license](int reqID, ec2::ErrorCode errorCode)
         {
             at_licenseRemoved(reqID, errorCode, license);
         };
 
-        commonModule()->ec2Connection()->getLicenseManager(Qn::kSystemAccess)->removeLicense(license, this, removeLisencesHandler);
+    const auto manager = commonModule()->ec2Connection()->getLicenseManager(Qn::kSystemAccess);
+    manager->removeLicense(license, this, removeLisencesHandler);
+}
+
+// TODO: remove me
+QString getErrors(const nx::client::desktop::helpers::license::LicenseKeyErrorHash& errorsHash)
+{
+    QString result;
+    for (auto it = errorsHash.begin(); it != errorsHash.end(); ++it)
+    {
+        if (it.value() == nx::client::desktop::helpers::license::DeactivationError::NoError)
+            continue;
+
+        if (result.isEmpty())
+            result = lit("\n Some errors:");
+
+        result += lit("License <%1> has deactivation error %2")
+            .arg(QString::fromStdString(it.key().toStdString()), QString::number(static_cast<int>(it.value())));
     }
-    */
+    return result;
+}
+
+void QnLicenseManagerWidget::removeSelectedLicenses()
+{
+    const bool isRemoveMode = true;
+
+    auto licenses = selectedLicenses();
+
+    if (isRemoveMode)
+    {
+        for (const QnLicensePtr& license: licenses)
+            removeLicense(license, ForceRemove::No);
+    }
 
     using namespace nx::client::desktop::helpers::license;
     deactivateAsync(selectedLicenses(),
-        [](DeactivationResult result, const LicenseKeyErrorHash& errorsHash)
+        [this, licenses](DeactivationResult result, const LicenseKeyErrorHash& errorsHash)
         {
-            auto message = lit("+++++ license deactivation: ");
-            switch(result)
+            auto message = lit("============ Deactivation:");
+            const auto printMessageGuard = QnRaiiGuard::createDestructible(
+                [&message]() { qDebug() << message; });
+
+            if (result == DeactivationResult::Success)
             {
-                case DeactivationResult::Success:
-                    message += lit("success");
-                    break;
-                case DeactivationResult::UnspecifiedError:
-                    message += lit("unspecified error");
-                    break;
-                case DeactivationResult::TransportProblem:
-                    message += lit("transport problem");
-                    break;
-                case DeactivationResult::ServerError:
-                    message += lit("server error");
-                    break;
-                case DeactivationResult::DeactivationError:
-                    message += lit("deactivation problem");
-                    break;
+                message += lit("successful");
+                for (const QnLicensePtr& license: licenses)
+                    removeLicense(license, ForceRemove::Yes);
             }
-
-            bool firstError = true;
-            for (auto it = errorsHash.begin(); it != errorsHash.end(); ++it)
+            else
             {
-                if (it.value() == DeactivationError::NoError)
-                    continue;
+                /// Debug
+                switch(result)
+                {
+                    case DeactivationResult::DeactivationError:
+                        message += lit("deactivation problem");
+                        break;
+                    case DeactivationResult::ServerError:
+                        message += lit("server error");
+                        break;
+                    case DeactivationResult::UnspecifiedError: //Fallthrough
+                    default:
+                        message += lit("unspecified error");
+                        break;
+                }
 
-                if (firstError)
-                    message += lit("\n\nSome errors:");
-
-                firstError = false;
-                message += lit("License <%1> has deactivation error %2")
-                    .arg(it.key(), QString::number(static_cast<int>(it.value())));
+                message += getErrors(errorsHash);
             }
-
-            qDebug() << message;
         });
-
 }
 
 void QnLicenseManagerWidget::exportLicenses()

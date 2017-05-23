@@ -40,7 +40,7 @@ DeactivationError getDeactivationError(const QJsonObject& object)
 
     const auto code = object[kCodeTag].toString();
     if (code == lit("keyIsNotActivated"))
-        return DeactivationError::KeyIsNotActivated;
+        return DeactivationError::LicenseDeactivatedAlready;
 
     return DeactivationError::UnknownError;
 }
@@ -60,8 +60,8 @@ LicenseKeyErrorHash extractErrors(const QByteArray& messageBody)
         return LicenseKeyErrorHash();
 
     LicenseKeyErrorHash result;
-    for (const auto& licenseId: licenseErrors.keys())
-        result.insert(licenseId, getDeactivationError(licenseErrors[licenseId].toObject()));
+    for (const auto& key: licenseErrors.keys())
+        result.insert(key.toLatin1(), getDeactivationError(licenseErrors[key].toObject()));
 
     return result;
 }

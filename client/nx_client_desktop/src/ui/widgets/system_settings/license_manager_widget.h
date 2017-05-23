@@ -80,6 +80,15 @@ private:
 
     QnLicenseList selectedLicenses() const;
     bool canRemoveLicense(const QnLicensePtr &license) const;
+    bool canDeactivateLicense(const QnLicensePtr &license) const;
+
+    enum class ForceRemove
+    {
+        No,
+        Yes
+    };
+
+    void removeLicense(const QnLicensePtr& license, ForceRemove force);
     void removeSelectedLicenses();
 
     void exportLicenses();

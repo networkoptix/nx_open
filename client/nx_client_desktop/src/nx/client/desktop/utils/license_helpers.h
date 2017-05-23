@@ -17,7 +17,7 @@ enum class DeactivationResult
 {
     Success,
     UnspecifiedError,
-    TransportProblem,
+
     ServerError,
     DeactivationError
 };
@@ -27,10 +27,10 @@ enum class DeactivationError
     NoError,
     UnknownError,
 
-    KeyIsNotActivated
+    LicenseDeactivatedAlready
 };
 
-using LicenseKeyErrorHash = QHash<QString, DeactivationError>;
+using LicenseKeyErrorHash = QHash<QByteArray, DeactivationError>;
 using DeactivationHandler = std::function<void(DeactivationResult, const LicenseKeyErrorHash&)>;
 
 void deactivateAsync(
