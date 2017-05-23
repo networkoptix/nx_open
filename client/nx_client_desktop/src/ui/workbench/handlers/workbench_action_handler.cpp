@@ -62,7 +62,7 @@
 #include <nx/client/desktop/ui/messages/resources_messages.h>
 #include <nx/client/desktop/ui/messages/videowall_messages.h>
 
-#include <nx/network/http/httptypes.h>
+#include <nx/network/http/http_types.h>
 #include <nx/network/socket_global.h>
 #include <nx/network/cloud/address_resolver.h>
 

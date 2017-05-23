@@ -1,4 +1,4 @@
-#include "linesplitter.h"
+#include "line_splitter.h"
 
 #include <algorithm>
 

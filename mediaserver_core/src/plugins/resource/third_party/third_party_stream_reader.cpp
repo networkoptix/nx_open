@@ -7,8 +7,9 @@
 
 #include <QtCore/QTextStream>
 
-#include <nx/network/http/httptypes.h>
+#include <nx/network/http/http_types.h>
 #include <nx/streaming/av_codec_media_context.h>
+#include <nx/utils/app_info.h>
 #include <nx/utils/log/log.h>
 #include <plugins/resource/third_party/motion_data_picture.h>
 #include <plugins/resource/onvif/dataprovider/onvif_mjpeg.h>
@@ -273,7 +274,7 @@ CameraDiagnostics::Result ThirdPartyStreamReader::openStreamInternal(bool isCame
         if( mediaUrl.scheme().toLower() == lit("rtsp") )
         {
             QnMulticodecRtpReader* rtspStreamReader = new QnMulticodecRtpReader( m_resource );
-            rtspStreamReader->setUserAgent(QnAppInfo::productName());
+            rtspStreamReader->setUserAgent(nx::utils::AppInfo::productName());
             rtspStreamReader->setRequest( mediaUrlStr );
             rtspStreamReader->setRole(role);
             rtspStreamReader->setPrefferedAuthScheme(nx_http::header::AuthScheme::automatic);

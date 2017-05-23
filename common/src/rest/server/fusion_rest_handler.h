@@ -1,7 +1,7 @@
 #pragma once
 
 #include <nx/fusion/serialization/lexical_functions.h>
-#include <nx/network/http/httptypes.h>
+#include <nx/network/http/http_types.h>
 #include <nx/fusion/model_functions.h>
 #include <utils/common/util.h>
 

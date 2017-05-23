@@ -5,7 +5,7 @@
 
 #include <gtest/gtest.h>
 
-#include <nx/network/http/httpstreamreader.h>
+#include <nx/network/http/http_stream_reader.h>
 
 
 class TestResponseData

@@ -1,11 +1,11 @@
-#ifndef PLATFORM_PROCESS_CURRENT_PROCESS_H
-#define PLATFORM_PROCESS_CURRENT_PROCESS_H
+#pragma once
 
 #include <QString>
 
 namespace nx {
+namespace utils {
 
-class CurrentProcess
+class NX_UTILS_API CurrentProcess
 {
 public:
     /** linux, osx: changes real and effective user and group IDs to \arg userName
@@ -20,6 +20,5 @@ private:
     CurrentProcess(); // not constructable
 };
 
+} // namespace utils
 } // namespace nx
-
-#endif // PLATFORM_PROCESS_CURRENT_PROCESS_H

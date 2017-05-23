@@ -4,7 +4,7 @@
 
 #include <nx/network/aio/unified_pollset.h>
 #include <nx/network/flash_socket/types.h>
-#include <nx/network/http/httptypes.h>
+#include <nx/network/http/http_types.h>
 #include <nx/network/http/http_mod_manager.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/gzip/gzip_compressor.h>

@@ -11,7 +11,7 @@
 #include <core/ptz/abstract_ptz_controller.h>
 #include <core/ptz/ptz_data.h>
 #include <core/ptz/ptz_controller_pool.h>
-#include <nx/network/http/httptypes.h>
+#include <nx/network/http/http_types.h>
 #include <rest/server/rest_connection_processor.h>
 #include <core/resource_access/resource_access_manager.h>
 #include <core/resource/user_resource.h>

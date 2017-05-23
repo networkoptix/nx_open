@@ -1,4 +1,6 @@
+#include <map>
 #include <thread>
+#include <string>
 
 #include <gtest/gtest.h>
 
@@ -9,7 +11,9 @@
 #include <nx/utils/thread/sync_queue.h>
 
 #include <model/listening_peer_pool.h>
+#include <settings.h>
 
+#include "../settings_loader.h"
 #include "../stream_socket_stub.h"
 
 namespace nx {
@@ -30,10 +34,17 @@ public:
         m_peerName(nx::utils::generateRandomName(17).toStdString()),
         m_peerConnection(nullptr)
     {
-        m_pool = std::make_unique<model::ListeningPeerPool>();
+        addArg("-listeningPeer/disconnectedPeerTimeout", "1ms");
+        addArg("-listeningPeer/takeIdleConnectionTimeout", "1ms");
+        addArg("-listeningPeer/internalTimerPeriod", "1ms");
     }
 
 protected:
+    void addArg(const std::string& name, const std::string& value)
+    {
+        m_settingsLoader.addArg(name, value);
+    }
+
     void addConnection()
     {
         addConnection(m_peerName);
@@ -45,10 +56,22 @@ protected:
         connection->bindToAioThread(
             network::SocketGlobals::aioService().getRandomAioThread());
         m_peerConnection = connection.get();
-        m_pool->addConnection(peerName, std::move(connection));
+        pool().addConnection(peerName, std::move(connection));
     }
 
     void givenConnectionFromPeer()
+    {
+        addConnection(m_peerName);
+    }
+
+    void givenListeningPeerWhoseConnectionsHaveBeenTaken()
+    {
+        givenConnectionFromPeer();
+        whenRequestedConnection();
+        thenConnectionHasBeenProvided();
+    }
+
+    void whenPeerHasEstablshedNewConnection()
     {
         addConnection(m_peerName);
     }
@@ -62,7 +85,7 @@ protected:
     {
         using namespace std::placeholders;
 
-        m_pool->takeIdleConnection(
+        pool().takeIdleConnection(
             m_peerName,
             std::bind(&ListeningPeerPool::onTakeIdleConnectionCompletion, this, _1, _2));
     }
@@ -81,22 +104,28 @@ protected:
 
     void assertConnectionHasBeenAdded()
     {
-        ASSERT_GT(m_pool->getConnectionCountByPeerName(m_peerName), 0U);
+        ASSERT_GT(pool().getConnectionCountByPeerName(m_peerName), 0U);
     }
 
-    void assetPeerIsListening()
+    void assertPeerIsOnline()
     {
-        ASSERT_TRUE(m_pool->isPeerListening(m_peerName));
+        ASSERT_TRUE(pool().isPeerOnline(m_peerName));
     }
 
-    void assetPeerIsNotListening()
+    void assertPeerIsOffline()
     {
-        ASSERT_FALSE(m_pool->isPeerListening(m_peerName));
+        ASSERT_FALSE(pool().isPeerOnline(m_peerName));
+    }
+
+    void waitForPeerToBecomeOffline()
+    {
+        while (pool().isPeerOnline(m_peerName))
+            std::this_thread::sleep_for(std::chrono::milliseconds(1));
     }
 
     void thenConnectionIsRemovedFromPool()
     {
-        while (m_pool->getConnectionCountByPeerName(m_peerName) > 0U)
+        while (pool().getConnectionCountByPeerName(m_peerName) > 0U)
             std::this_thread::yield();
     }
 
@@ -114,6 +143,16 @@ protected:
         ASSERT_EQ(nullptr, result.connection);
     }
 
+    void thenGetConnectionRequestIs(api::ResultCode expectedResultCode)
+    {
+        const auto result = m_takeIdleConnectionResults.pop();
+        ASSERT_EQ(expectedResultCode, result.code);
+        if (expectedResultCode == api::ResultCode::ok)
+            ASSERT_NE(nullptr, result.connection);
+        else
+            ASSERT_EQ(nullptr, result.connection);
+    }
+
     void thenConnectRequestHasCompleted()
     {
         m_takeIdleConnectionResults.pop();
@@ -121,6 +160,15 @@ protected:
 
     const model::ListeningPeerPool& pool() const
     {
+        if (!m_pool)
+            const_cast<ListeningPeerPool*>(this)->initializePool();
+        return *m_pool;
+    }
+
+    model::ListeningPeerPool& pool()
+    {
+        if (!m_pool)
+            initializePool();
         return *m_pool;
     }
 
@@ -141,6 +189,7 @@ private:
     std::string m_peerName;
     relay::test::StreamSocketStub* m_peerConnection;
     nx::utils::SyncQueue<TakeIdleConnectionResult> m_takeIdleConnectionResults;
+    SettingsLoader m_settingsLoader;
 
     void onTakeIdleConnectionCompletion(
         api::ResultCode resultCode,
@@ -150,6 +199,13 @@ private:
         ASSERT_FALSE(m_poolHasBeenDestroyed.load());
         m_takeIdleConnectionResults.push({resultCode, std::move(connection)});
     }
+
+    void initializePool()
+    {
+        m_settingsLoader.load();
+        m_pool = std::make_unique<model::ListeningPeerPool>(
+            m_settingsLoader.settings());
+    }
 };
 
 //-------------------------------------------------------------------------------------------------
@@ -158,7 +214,7 @@ TEST_F(ListeningPeerPool, adding_peer_connection)
 {
     addConnection();
     assertConnectionHasBeenAdded();
-    assetPeerIsListening();
+    assertPeerIsOnline();
 }
 
 TEST_F(ListeningPeerPool, forgets_tcp_connection_when_it_is_closed)
@@ -166,7 +222,30 @@ TEST_F(ListeningPeerPool, forgets_tcp_connection_when_it_is_closed)
     givenConnectionFromPeer();
     whenConnectionIsClosed();
     thenConnectionIsRemovedFromPool();
-    assetPeerIsNotListening();
+}
+
+TEST_F(ListeningPeerPool, peer_with_idle_connections_is_online)
+{
+    givenConnectionFromPeer();
+    assertPeerIsOnline();
+}
+
+TEST_F(
+    ListeningPeerPool,
+    peer_without_idle_connections_is_online_before_expiration_timeout_passes)
+{
+    addArg("-listeningPeer/disconnectedPeerTimeout", "1m");
+
+    givenListeningPeerWhoseConnectionsHaveBeenTaken();
+    assertPeerIsOnline();
+}
+
+TEST_F(
+    ListeningPeerPool,
+    peer_without_idle_connections_becomes_offline_when_timeout_passes)
+{
+    givenListeningPeerWhoseConnectionsHaveBeenTaken();
+    waitForPeerToBecomeOffline();
 }
 
 TEST_F(ListeningPeerPool, get_idle_connection)
@@ -180,6 +259,28 @@ TEST_F(ListeningPeerPool, get_idle_connection_for_unknown_peer)
 {
     whenRequestedConnectionOfUnknownPeer();
     thenNoConnectionHasBeenProvided();
+}
+
+TEST_F(ListeningPeerPool, get_idle_connection_waits_for_connection_to_appear)
+{
+    addArg("-listeningPeer/disconnectedPeerTimeout", "1m");
+    addArg("-listeningPeer/takeIdleConnectionTimeout", "1m");
+
+    givenListeningPeerWhoseConnectionsHaveBeenTaken();
+    whenRequestedConnection();
+    whenPeerHasEstablshedNewConnection();
+    thenConnectionHasBeenProvided();
+}
+
+TEST_F(
+    ListeningPeerPool,
+    get_idle_connection_times_out_if_no_new_connection_established)
+{
+    addArg("-listeningPeer/disconnectedPeerTimeout", "1m");
+
+    givenListeningPeerWhoseConnectionsHaveBeenTaken();
+    whenRequestedConnection();
+    thenGetConnectionRequestIs(api::ResultCode::timedOut);
 }
 
 TEST_F(ListeningPeerPool, waits_get_idle_connection_completion_before_destruction)
@@ -204,12 +305,6 @@ TEST_F(
         thenConnectRequestHasCompleted();
     }
 }
-
-//TEST_F(
-//    ListeningPeerPool,
-//    get_idle_connection_waits_for_connection_to_appear_if_peer_is_listening)
-//{
-//}
 
 //-------------------------------------------------------------------------------------------------
 
@@ -271,20 +366,20 @@ TEST_F(ListeningPeerPoolFindPeerByParentDomainName, getConnectionCountByPeerName
     assertConnectionCountPerDomainIncludesAllPeers();
 }
 
-TEST_F(ListeningPeerPoolFindPeerByParentDomainName, isPeerListening)
+TEST_F(ListeningPeerPoolFindPeerByParentDomainName, peer_with_idle_connections_is_online)
 {
     givenMultipleConnectionsFromPeersOfTheSameDomain();
-    ASSERT_TRUE(pool().isPeerListening(domainName()));
+    ASSERT_TRUE(pool().isPeerOnline(domainName()));
 }
 
-TEST_F(ListeningPeerPoolFindPeerByParentDomainName, takeIdleConnection)
+TEST_F(ListeningPeerPoolFindPeerByParentDomainName, take_idle_connection)
 {
     givenMultipleConnectionsFromPeersOfTheSameDomain();
     whenRequestedConnection();
     thenConnectionHasBeenProvided();
 }
 
-TEST_F(ListeningPeerPoolFindPeerByParentDomainName, findListeningPeerByPrefix)
+TEST_F(ListeningPeerPoolFindPeerByParentDomainName, find_peer_by_prefix)
 {
     givenMultipleConnectionsFromPeersOfTheSameDomain();
     assertPeerIsFoundByDomainNamePrefix();

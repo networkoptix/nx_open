@@ -22,7 +22,7 @@
 #include <nx/network/aio/timer.h>
 #include <nx/network/http/asynchttpclient.h>
 #include <nx/network/http/auth_cache.h>
-#include <nx/network/http/httpstreamreader.h>
+#include <nx/network/http/http_stream_reader.h>
 #include <nx/network/http/http_message_stream_parser.h>
 #include <nx/network/http/multipart_content_parser.h>
 #include <nx/utils/thread/mutex.h>

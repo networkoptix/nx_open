@@ -11,7 +11,7 @@
 #include <nx/fusion/model_functions_fwd.h>
 #include <nx/fusion/fusion/fusion_fwd.h>
 
-#include "../httptypes.h"
+#include "../http_types.h"
 
 
 namespace nx_http {

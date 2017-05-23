@@ -3,7 +3,7 @@
 #include <network/tcp_connection_priv.h>
 
 #include <nx/utils/log/log.h>
-#include <nx/network/http/httptypes.h>
+#include <nx/network/http/http_types.h>
 #include <core/resource_access/resource_access_manager.h>
 #include <rest/server/rest_connection_processor.h>
 #include <common/common_module.h>

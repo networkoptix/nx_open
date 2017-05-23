@@ -35,7 +35,7 @@ public:
         const AddressEntry& desiredHostAddress,
         nx::utils::MoveOnlyFunc<void(VerificationResult)> completionHandler) = 0;
 
-    virtual SystemError::ErrorCode lastSysErrorCode() const = 0;
+    virtual SystemError::ErrorCode lastSystemErrorCode() const = 0;
 
     virtual std::unique_ptr<AbstractStreamSocket> takeSocket() = 0;
 };

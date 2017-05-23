@@ -3,19 +3,27 @@
 #include <nx/network/cloud/tunnel/relay/api/relay_api_client.h>
 
 namespace nx {
-namespace network {
 namespace cloud {
 namespace relay {
+namespace api {
 namespace test {
 
-class ClientToRelayConnection:
-    public nx::cloud::relay::api::Client
+enum class RequestProcessingBehavior
 {
-    using base_type = nx::cloud::relay::api::Client;
+    ignore,
+    fail,
+    produceLogicError,
+    succeed,
+};
+
+class ClientImpl:
+    public api::Client
+{
+    using base_type = api::Client;
 
 public:
-    ClientToRelayConnection();
-    virtual ~ClientToRelayConnection() override;
+    ClientImpl();
+    virtual ~ClientImpl() override;
 
     virtual void beginListening(
         const nx::String& peerName,
@@ -31,20 +39,21 @@ public:
 
     int scheduledRequestCount() const;
     void setOnBeforeDestruction(nx::utils::MoveOnlyFunc<void()> handler);
-    void setIgnoreRequests(bool val);
-    void setFailRequests(bool val);
+
+    void setBehavior(RequestProcessingBehavior behavior);
+    void setIgnoreRequests();
+    void setFailRequests();
 
 private:
     int m_scheduledRequestCount;
     nx::utils::MoveOnlyFunc<void()> m_onBeforeDestruction;
-    bool m_ignoreRequests;
-    bool m_failRequests;
+    RequestProcessingBehavior m_behavior = RequestProcessingBehavior::succeed;
 
     virtual void stopWhileInAioThread() override;
 };
 
 } // namespace test
+} // namespace api
 } // namespace relay
 } // namespace cloud
-} // namespace network
 } // namespace nx
