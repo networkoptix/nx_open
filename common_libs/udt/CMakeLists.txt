@@ -1,5 +1,5 @@
 set(library_type)
-if(WIN32)
+if(WINDOWS)
     set(library_type LIBRARY_TYPE SHARED)
 endif()
 
@@ -13,6 +13,6 @@ if(LINUX)
     target_link_libraries(udt PUBLIC pthread)
 endif()
 
-if(WIN32)
+if(WINDOWS)
     target_link_libraries(udt ws2_32)
 endif()

@@ -32,7 +32,7 @@ target_include_directories(common
         "${CMAKE_SOURCE_DIR}/common_libs/nx_streaming/src"
 )
 
-if(WIN32)
+if(WINDOWS)
     target_link_libraries(common PUBLIC Winmm)
 endif()
 

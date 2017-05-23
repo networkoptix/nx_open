@@ -3,7 +3,7 @@ nx_configure_file(
     ${CMAKE_CURRENT_BINARY_DIR})
 
 set(library_type)
-if(WIN32)
+if(WINDOWS)
     set(library_type LIBRARY_TYPE SHARED)
 endif()
 
@@ -19,7 +19,7 @@ target_compile_definitions(nx_utils
     PRIVATE NX_UTILS_API=${API_EXPORT_MACRO}
     INTERFACE NX_UTILS_API=${API_IMPORT_MACRO})
 
-if(WIN32)
+if(WINDOWS)
     target_link_libraries(nx_utils PRIVATE DbgHelp ws2_32)
 endif()
     
