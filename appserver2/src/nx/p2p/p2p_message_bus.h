@@ -14,6 +14,7 @@
 #include <common/static_common_module.h>
 #include <transaction/ubjson_transaction_serializer.h>
 #include <transaction/json_transaction_serializer.h>
+#include <transaction/transaction_descriptor.h>
 #include "routing_helpers.h"
 #include "connection_context.h"
 
