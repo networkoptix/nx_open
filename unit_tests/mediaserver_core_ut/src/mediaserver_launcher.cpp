@@ -34,7 +34,7 @@ int MediaServerLauncher::port() const
 
 void MediaServerLauncher::addSetting(const QString& name, const QVariant& value)
 {
-    m_customSettings.emplace_back(name, value.toString());
+    m_customSettings[name] = value.toString();
 }
 
 void MediaServerLauncher::prepareToStart()
@@ -42,11 +42,23 @@ void MediaServerLauncher::prepareToStart()
     m_configFilePath = *m_workDirResource.getDirName() + lit("/mserver.conf");
     m_configFile.open(m_configFilePath.toUtf8().constData());
 
-    m_configFile << "serverGuid = " << QnUuid::createUuid().toString().toStdString() << std::endl;
+    const QString kServerGuidParamName = lit("serverGuid");
+    const QString kSystemNameParamName = lit("systemName");
+
+    auto serverGuid = QnUuid::createUuid().toString().toStdString();
+    auto systemName = QnUuid::createUuid().toString().toStdString();
+
+    if (m_customSettings.find(kServerGuidParamName) != m_customSettings.end())
+        serverGuid = m_customSettings[kServerGuidParamName].toStdString();
+
+    if (m_customSettings.find(kSystemNameParamName) != m_customSettings.end())
+        systemName = m_customSettings[kSystemNameParamName].toStdString();
+
+    m_configFile << "serverGuid = " << serverGuid << std::endl;
     m_configFile << lit("removeDbOnStartup = %1").arg(m_firstStartup).toLocal8Bit().data() << std::endl;
     m_configFile << "dataDir = " << m_workDirResource.getDirName()->toStdString() << std::endl;
     m_configFile << "varDir = " << m_workDirResource.getDirName()->toStdString() << std::endl;
-    m_configFile << "systemName = " << QnUuid::createUuid().toString().toStdString() << std::endl;
+    m_configFile << "systemName = " << systemName << std::endl;
     m_configFile << "port = " << m_serverEndpoint.port << std::endl;
 
     for (const auto& customSetting: m_customSettings)
