@@ -341,8 +341,8 @@ class Server(object):
         path_to_patch = os.path.join(self.dir, MEDIASERVER_CLOUDHOST_PATH)
         data = self.host.read_file(path_to_patch)
         idx = data.find(MEDIASERVER_CLOUDHOST_TAG)
-        assert idx != -1, ('Cloud host tag %r is missing from mediaserver binary file %r'
-                           % (MEDIASERVER_CLOUDHOST_TAG, path_to_patch))
+        assert idx != -1, ('Cloud host tag %r is missing from mediaserver binary file %r (size: %d)'
+                           % (MEDIASERVER_CLOUDHOST_TAG, path_to_patch, len(data)))
         eidx = data.find('\0', idx)
         assert eidx != -1
         old_host = data[idx + len(MEDIASERVER_CLOUDHOST_TAG) + 1 : eidx]
