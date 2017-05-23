@@ -77,8 +77,6 @@ LayoutTourItemWidget::LayoutTourItemWidget(
     m_previewPainter->setBackgroundColor(QColor("#222B2F"));    //TODO: #GDM #3.1 customize
     m_previewPainter->setFontColor(palette().color(QPalette::WindowText)); //TODO: #GDM #3.1 customize
 
-    setAcceptDrops(true);
-
     initOverlay();
 }
 

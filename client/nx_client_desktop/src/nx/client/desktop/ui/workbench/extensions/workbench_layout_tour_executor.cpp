@@ -168,9 +168,6 @@ void LayoutTourExecutor::stopCurrentTour()
 
 void LayoutTourExecutor::resetTourItems(const ec2::ApiLayoutTourItemDataList& items)
 {
-    for (const auto& item: m_tour.items)
-        resourcePool()->removeResource(item.layout);
-
     m_tour.items.clear();
 
     for (const auto& item: items)
