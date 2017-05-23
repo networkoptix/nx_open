@@ -300,7 +300,7 @@ bool MultipleServerSocket::addSocket(
         return false;
 
     auto socketPtr = socket.get();
-    if (m_aggregateAcceptor.addSocket(
+    if (m_aggregateAcceptor.add(
             std::make_unique<StreamServerSocketToAcceptorWrapper>(std::move(socket))))
     {
         m_serverSockets.push_back(socketPtr);
@@ -311,7 +311,7 @@ bool MultipleServerSocket::addSocket(
 
 void MultipleServerSocket::removeSocket(size_t pos)
 {
-    m_aggregateAcceptor.removeSocket(pos);
+    m_aggregateAcceptor.removeAt(pos);
     m_serverSockets.erase(m_serverSockets.begin() + pos);
 }
 

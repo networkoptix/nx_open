@@ -48,9 +48,9 @@ void CloudMediaServerEndpointVerificator::verifyHost(
         std::bind(&CloudMediaServerEndpointVerificator::onHttpRequestDone, this));
 }
 
-SystemError::ErrorCode CloudMediaServerEndpointVerificator::lastSysErrorCode() const
+SystemError::ErrorCode CloudMediaServerEndpointVerificator::lastSystemErrorCode() const
 {
-    return m_prevSystemError;
+    return m_lastSystemErrorCode;
 }
 
 std::unique_ptr<AbstractStreamSocket> CloudMediaServerEndpointVerificator::takeSocket()
@@ -76,7 +76,7 @@ void CloudMediaServerEndpointVerificator::onHttpRequestDone()
             .arg(m_connectSessionId).arg(m_endpointToVerify.toString())
             .arg(SystemError::toString(m_httpClient->lastSysErrorCode())),
             cl_logDEBUG2);
-        m_prevSystemError = m_httpClient->lastSysErrorCode();
+        m_lastSystemErrorCode = m_httpClient->lastSysErrorCode();
         return nx::utils::swapAndCall(
             m_completionHandler,
             VerificationResult::ioError);

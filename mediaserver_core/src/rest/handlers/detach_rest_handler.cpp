@@ -1,7 +1,7 @@
 #include "detach_rest_handler.h"
 
 #include <cdb/connection.h>
-#include <nx/network/http/httptypes.h>
+#include <nx/network/http/http_types.h>
 #include <nx/utils/log/log.h>
 
 #include <api/global_settings.h>
@@ -12,7 +12,7 @@
 #include <core/resource/user_resource.h>
 #include <rest/server/rest_connection_processor.h>
 #include <rest/helpers/permissions_helper.h>
-#include <utils/common/sync_call.h>
+#include <nx/utils/sync_call.h>
 
 #include <media_server/serverutil.h>
 #include <cloud/cloud_connection_manager.h>

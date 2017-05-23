@@ -27,7 +27,7 @@
 #include <utils/common/request_param.h>
 #include <nx/fusion/model_functions.h>
 #include <nx/fusion/serialization/compressed_time_functions.h>
-#include <nx/network/http/httptypes.h>
+#include <nx/network/http/http_types.h>
 
 #include <api/app_server_connection.h>
 #include <event_log/events_serializer.h>

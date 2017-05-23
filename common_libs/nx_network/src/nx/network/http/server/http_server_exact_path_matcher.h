@@ -3,7 +3,7 @@
 #include <map>
 #include <vector>
 
-#include "../httptypes.h"
+#include "../http_types.h"
 
 namespace nx_http {
 

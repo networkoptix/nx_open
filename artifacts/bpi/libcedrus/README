@@ -1,0 +1,6 @@
+libcedrus provides low-level access to the video engine of Allwinner sunxi SoCs.
+
+Installation:
+
+   $ make
+   $ make install

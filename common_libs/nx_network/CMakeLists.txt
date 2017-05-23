@@ -1,7 +1,5 @@
-nx_rdep_add_package(openssl)
-
 set(library_type)
-if(WIN32)
+if(WINDOWS)
     set(library_type LIBRARY_TYPE SHARED)
 endif()
 
@@ -23,6 +21,6 @@ target_compile_definitions(nx_network
     PRIVATE NX_NETWORK_API=${API_EXPORT_MACRO}
     INTERFACE NX_NETWORK_API=${API_IMPORT_MACRO})
 
-if(WIN32)
+if(WINDOWS)
     target_link_libraries(nx_network PRIVATE Iphlpapi ws2_32)
 endif()

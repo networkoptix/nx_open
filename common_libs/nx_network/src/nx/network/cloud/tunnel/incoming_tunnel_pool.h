@@ -6,7 +6,7 @@
 
 #include <boost/optional.hpp>
 
-#include <nx/network/abstract_acceptor.h>
+#include <nx/network/abstract_stream_socket_acceptor.h>
 #include <nx/network/abstract_socket.h>
 #include <nx/network/aio/timer.h>
 
@@ -23,7 +23,7 @@ namespace cloud {
 class NX_NETWORK_API IncomingTunnelPool:
     public AbstractConnectionAcceptor
 {
-    using base_type = AbstractAcceptor;
+    using base_type = AbstractStreamSocketAcceptor;
 
 public:
     IncomingTunnelPool(aio::AbstractAioThread* aioThread, size_t acceptLimit);

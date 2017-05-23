@@ -235,15 +235,15 @@ void ConnectSessionManager::onOpenTunnelNotificationSent(
 {
     RelaySession relaySession;
 
-    {
-        QnMutexLocker lock(&m_mutex);
+    // TODO: #ak Make lock shorter. Handle cancellation problem: 
+    // element from m_relaySessions is removed and destructor does not wait for this session completion.
+    QnMutexLocker lock(&m_mutex);
 
-        if (m_terminated)
-            return;
+    if (m_terminated)
+        return;
 
-        relaySession = std::move(*relaySessionIter);
-        m_relaySessions.erase(relaySessionIter);
-    }
+    relaySession = std::move(*relaySessionIter);
+    m_relaySessions.erase(relaySessionIter);
 
     if (sysErrorCode != SystemError::noError)
     {
@@ -254,6 +254,7 @@ void ConnectSessionManager::onOpenTunnelNotificationSent(
         return;
     }
 
+    relaySession.listeningPeerConnection->cancelIOSync(network::aio::etNone);
     startRelaying(std::move(relaySession));
 }
 

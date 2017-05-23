@@ -1,5 +1,7 @@
 #pragma once
 
+#include <chrono>
+
 #include <QtCore/QSettings>
 #include <memory>
 
@@ -129,6 +131,8 @@ public:
     QSettings* runTimeSettings();
 
     static QString defaultROSettingsFilePath();
+    static std::chrono::milliseconds hlsTargetDuration();
+
     static QString defaultRunTimeSettingsFilePath();
 private:
     void initializeROSettingsFromConfFile( const QString& fileName );

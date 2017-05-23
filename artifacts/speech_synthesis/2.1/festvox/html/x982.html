@@ -1,0 +1,234 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>unit size and type</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REL="HOME"
+TITLE="Building Synthetic Voices"
+HREF="book1.html"><LINK
+REL="UP"
+TITLE="Limited domain synthesis"
+HREF="c941.html"><LINK
+REL="PREVIOUS"
+TITLE="autolabeling issues"
+HREF="x973.html"><LINK
+REL="NEXT"
+TITLE="using limited domain synthesizers"
+HREF="x997.html"></HEAD
+><BODY
+CLASS="SECT1"
+BGCOLOR="#FFFFFF"
+TEXT="#000000"
+LINK="#0000FF"
+VLINK="#840084"
+ALINK="#0000FF"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="3"
+ALIGN="center"
+>Building Synthetic Voices</TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="bottom"
+><A
+HREF="x973.html"
+ACCESSKEY="P"
+>&#60;&#60;&#60; Previous</A
+></TD
+><TD
+WIDTH="80%"
+ALIGN="center"
+VALIGN="bottom"
+>Limited domain synthesis</TD
+><TD
+WIDTH="10%"
+ALIGN="right"
+VALIGN="bottom"
+><A
+HREF="x997.html"
+ACCESSKEY="N"
+>Next &#62;&#62;&#62;</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="SECT1"
+><H1
+CLASS="SECT1"
+><A
+NAME="AEN982"
+>unit size and type</A
+></H1
+><P
+>The basic cluster unit selection code available in festival uses 
+segments as the size of unit. However the acoustic distance measure 
+used in cluster uses significant portions of the previous segment. Thus 
+the cluster unit selection effectively selects diphones from the 
+database. </P
+><P
+>The type of units the cluster selection code uses is based on the 
+segment name, by default. In the case of limited domain synthesis we 
+have found that constraining this further gives both better, and faster 
+synthesis. Thus we allow for the unit type to be defined by an 
+arbitrary feature. In the default limited domain set up 
+we use 
+<A
+NAME="AEN986"
+></A
+><BLOCKQUOTE
+CLASS="BLOCKQUOTE"
+><P
+CLASS="LITERALLAYOUT"
+>SEGMENT_WORD</P
+></BLOCKQUOTE
+>
+That is, the segment plus the word the segment comes from. Note 
+this doesn't mean we are doing <I
+CLASS="EMPHASIS"
+>word</I
+> concatenation in our 
+synthesizer. We are still selecting phone units but that the 
+these phone are differentiated depending on the word they come from 
+thus a /t/ from the word "unit" cannot be used to synthesis a /t/ in 
+"table". The primary reason for us doing this was to cut down 
+the search, though it notable improves synthesis quality to. As we 
+have constructed the database to have good coverage this is a practical 
+thing to do. </P
+><P
+>The feature function <CODE
+CLASS="VARNAME"
+>clunit_name</CODE
+> constructs the unit type for a 
+particular segment item. We have provided the above default (segment 
+name plus (downcased) word name), but it is easy to extend this. </P
+><P
+>In one domain we have worked in we wish to differentiate between words 
+in different prosody contexts. Particularly we wished to mark words us 
+"questionable" so we can ask users for confirmation. To do this we 
+marked the "questionable" words in the prompts with a question mark 
+prefix. We then recorded them with appropriate intonation and then 
+defined our <CODE
+CLASS="VARNAME"
+>clunit_name</CODE
+> function in include "C_" is the word was 
+prefixed by a question mark. For example the following two prompts 
+will be read in a different manner 
+<A
+NAME="AEN993"
+></A
+><BLOCKQUOTE
+CLASS="BLOCKQUOTE"
+><P
+CLASS="LITERALLAYOUT"
+>theater&nbsp;is&nbsp;Squirrel&nbsp;Hill&nbsp;Theater<br>
+theater&nbsp;is&nbsp;?Squirrel&nbsp;?Hill&nbsp;?Theater</P
+></BLOCKQUOTE
+>
+Likewise in unit selection the units in the word "Squirrel" will not be 
+used to synthesize the word "?Squirrel" and vice versa. Although crude, 
+this does give simple control over prosody variation though this technique 
+can require the vocabulary of the units to increase to where this 
+technique ceases to be practical. </P
+><P
+>It would be good if this technique had a back-off strategy where if no 
+unit can be found for a particular word it would allow other words to 
+contribute candidates. This is ultimately what general unit selection 
+is. We do consider this our goal in unit type but in the interest of 
+building quick and reliable limited domain synthesizers we do not yet do 
+this but consider it an area we will experiment with. One specific area 
+that only partially cross this line is in the synthesis of numbers. It 
+seem very reasonable to allow selection of units from simple numbers 
+(e.g. "seven" and "seventy") but we have not experimented on that yet. </P
+><P
+>One further important point should be highlights about this method 
+for defining unit types. Although including the word name in the unit 
+name does greatly encourage whole words to be selected it does not 
+mean that joins in the synthesize utterances only occur at word 
+boundaries. It is common that contiguous units are selection from 
+different occurrences of the same word. Mid-word (e.g. within 
+vowels, or at stops) joins at stable places are common. The optimal 
+coupling technique selects the best place within a word for the cross 
+over between two different parts of the database. </P
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="x973.html"
+ACCESSKEY="P"
+>&#60;&#60;&#60; Previous</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="book1.html"
+ACCESSKEY="H"
+>Home</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="x997.html"
+ACCESSKEY="N"
+>Next &#62;&#62;&#62;</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>autolabeling issues</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="c941.html"
+ACCESSKEY="U"
+>Up</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>using limited domain synthesizers</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

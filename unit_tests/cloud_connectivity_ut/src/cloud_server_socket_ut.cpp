@@ -547,11 +547,11 @@ TEST_F(CloudServerSocketStressTcpTest, MultiThread)
 
 //-------------------------------------------------------------------------------------------------
 
-class CloudServerSocketTest:
+class CloudServerSocket:
     public ::testing::Test
 {
 public:
-    CloudServerSocketTest()
+    CloudServerSocket()
     {
         stun::AbstractAsyncClient::Settings stunClientSettings;
         stunClientSettings.reconnectPolicy =
@@ -565,7 +565,7 @@ public:
         SocketGlobalsHolder::instance()->reinitialize();
     }
 
-    ~CloudServerSocketTest()
+    ~CloudServerSocket()
     {
         if (m_cloudServerSocket)
             destroyServerSocket();
@@ -596,7 +596,7 @@ protected:
 
     void givenInitializedServerSocket()
     {
-        m_cloudServerSocket = std::make_unique<CloudServerSocket>(
+        m_cloudServerSocket = std::make_unique<cloud::CloudServerSocket>(
             nx::network::SocketGlobals::mediatorConnector().systemConnection());
         ASSERT_EQ(
             hpm::api::ResultCode::ok,
@@ -618,16 +618,16 @@ protected:
         m_cloudServerSocket.reset();
     }
 
-    CloudServerSocket& cloudServerSocket()
+    cloud::CloudServerSocket& cloudServerSocket()
     {
         return *m_cloudServerSocket;
     }
 
 private:
-    std::unique_ptr<CloudServerSocket> m_cloudServerSocket;
+    std::unique_ptr<cloud::CloudServerSocket> m_cloudServerSocket;
 };
 
-TEST_F(CloudServerSocketTest, reconnect)
+TEST_F(CloudServerSocket, reconnect)
 {
     startMediatorAndRegister();
     hpm::api::SystemCredentials currentCredentials =
@@ -661,7 +661,7 @@ TEST_F(CloudServerSocketTest, reconnect)
     }
 }
 
-TEST_F(CloudServerSocketTest, serverChecksConnectionState)
+TEST_F(CloudServerSocket, serverChecksConnectionState)
 {
     const KeepAliveOptions kKeepAliveOptions(1, 1, 1);
     m_mediator.addArg(
@@ -696,7 +696,7 @@ TEST_F(CloudServerSocketTest, serverChecksConnectionState)
 // CloudServerSocketMultipleAcceptors
 
 class CloudServerSocketMultipleAcceptors:
-    public CloudServerSocketTest
+    public CloudServerSocket
 {
 public:
     CloudServerSocketMultipleAcceptors()
@@ -705,7 +705,8 @@ public:
 
         startMediatorAndRegister();
         m_factoryFuncBak = cloud::CustomAcceptorFactory::instance().setCustomFunc(
-            std::bind(&CloudServerSocketMultipleAcceptors::customAcceptorFactoryFunc, this, _1));
+            std::bind(&CloudServerSocketMultipleAcceptors::customAcceptorFactoryFunc, this,
+                _1, _2));
     }
 
     ~CloudServerSocketMultipleAcceptors()
@@ -769,15 +770,27 @@ protected:
         }
     }
 
+    void assertCloudCredentialsHaveBeenProvidedToCustomAcceptors()
+    {
+        ASSERT_TRUE(m_providedCloudCredentials);
+        ASSERT_EQ(
+            SocketGlobals::mediatorConnector().getSystemCredentials(),
+            *m_providedCloudCredentials);
+    }
+
 private:
     cloud::CustomAcceptorFactory::Function m_factoryFuncBak;
     utils::SyncQueue<network::test::AcceptorStub*> m_removedAcceptorsQueue;
     std::vector<network::test::AcceptorStub*> m_acceptorsCreated;
+    boost::optional<hpm::api::SystemCredentials> m_providedCloudCredentials;
 
     std::vector<std::unique_ptr<AbstractConnectionAcceptor>> customAcceptorFactoryFunc(
+        const hpm::api::SystemCredentials& credentials,
         const hpm::api::ListenResponse& /*response*/)
     {
         const int acceptorCount = 7;
+
+        m_providedCloudCredentials = credentials;
 
         std::vector<std::unique_ptr<AbstractConnectionAcceptor>> acceptors;
         for (int i = 0; i < acceptorCount; ++i)
@@ -816,6 +829,12 @@ TEST_F(CloudServerSocketMultipleAcceptors, all_acceptors_are_cancelled)
     givenAcceptingServerSocket();
     whenOneAcceptorReturnsSocket();
     thenEveryAcceptorIsCancelled();
+}
+
+TEST_F(CloudServerSocketMultipleAcceptors, provides_cloud_credentials_to_all_acceptors)
+{
+    givenInitializedServerSocket();
+    assertCloudCredentialsHaveBeenProvidedToCustomAcceptors();
 }
 
 } // namespace test

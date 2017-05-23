@@ -91,7 +91,7 @@ public:
         QSharedPointer<AbstractStreamSocket> socket,
         QnHttpConnectionListener* owner)
     :
-        QnTCPConnectionProcessor(socket, owner->commonModule())
+        QnTCPConnectionProcessor(socket, owner)
     {
     }
 

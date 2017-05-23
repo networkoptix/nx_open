@@ -9,7 +9,7 @@
 #include <QtCore/QString>
 #include <QtCore/QMetaType>
 
-#include <nx/network/http/httptypes.h>
+#include <nx/network/http/http_types.h>
 #include <nx/utils/uuid.h>
 
 #include <nx/utils/system_error.h>

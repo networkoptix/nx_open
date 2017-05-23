@@ -1,6 +1,7 @@
 #pragma once
 
-#include <nx/network/http/httptypes.h>
+#include <nx/network/buffer.h>
+#include <nx/network/http/http_types.h>
 #include "websocket_common_types.h"
 
 namespace nx {

@@ -44,19 +44,6 @@ void TestAuthenticationManager::setAuthenticationEnabled(bool value)
 
 //-------------------------------------------------------------------------------------------------
 
-TestHttpServer::TestHttpServer():
-    m_authenticationManager(&m_credentialsProvider)
-{
-    m_authenticationManager.setAuthenticationEnabled(false);
-
-    m_httpServer.reset(
-        new nx_http::HttpStreamSocketServer(
-            &m_authenticationManager,
-            &m_httpMessageDispatcher,
-            true,
-            nx::network::NatTraversalSupport::disabled));
-}
-
 TestHttpServer::~TestHttpServer()
 {
     m_httpServer->pleaseStopSync();

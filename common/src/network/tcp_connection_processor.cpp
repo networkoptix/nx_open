@@ -4,7 +4,7 @@
 
 #include <nx/network/aio/unified_pollset.h>
 #include <nx/network/flash_socket/types.h>
-#include <nx/network/http/httptypes.h>
+#include <nx/network/http/http_types.h>
 #include <nx/network/http/http_mod_manager.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/gzip/gzip_compressor.h>
@@ -31,14 +31,27 @@
 
 QnTCPConnectionProcessor::QnTCPConnectionProcessor(
     QSharedPointer<AbstractStreamSocket> socket,
-    QnCommonModule* commonModule)
+    QnTcpListener* owner)
 :
-    QnCommonModuleAware(commonModule),
+    QnCommonModuleAware(owner->commonModule()),
     d_ptr(new QnTCPConnectionProcessorPrivate)
 {
     Q_D(QnTCPConnectionProcessor);
     d->socket = socket;
-    d->chunkedMode = false;
+    d->owner = owner;
+}
+
+QnTCPConnectionProcessor::QnTCPConnectionProcessor(
+    QnTCPConnectionProcessorPrivate* dptr,
+    QSharedPointer<AbstractStreamSocket> socket,
+    QnTcpListener* owner)
+:
+    QnCommonModuleAware(owner->commonModule()),
+    d_ptr(dptr)
+{
+    Q_D(QnTCPConnectionProcessor);
+    d->socket = socket;
+    d->owner = owner;
 }
 
 QnTCPConnectionProcessor::QnTCPConnectionProcessor(
@@ -51,9 +64,7 @@ QnTCPConnectionProcessor::QnTCPConnectionProcessor(
 {
     Q_D(QnTCPConnectionProcessor);
     d->socket = socket;
-    d->chunkedMode = false;
 }
-
 
 QnTCPConnectionProcessor::~QnTCPConnectionProcessor()
 {
@@ -130,7 +141,8 @@ void QnTCPConnectionProcessor::parseRequest()
     }
     d->protocol = d->request.requestLine.version.protocol;
     d->requestBody = d->request.messageBody;
-    applyModToRequest();
+    if (d->owner)
+        d->owner->applyModToRequest(&d->request);
 }
 
 /*
@@ -459,7 +471,8 @@ bool QnTCPConnectionProcessor::readSingleRequest()
             d->protocol = d->request.requestLine.version.protocol;
             d->requestBody = d->httpStreamReader.fetchMessageBody();
 
-            applyModToRequest();
+            if (d->owner)
+                d->owner->applyModToRequest(&d->request);
 
             //TODO #ak logging
             //NX_LOG( QnLog::HTTP_LOG_INDEX, QString::fromLatin1("Received request from %1:\n%2-------------------\n\n\n").

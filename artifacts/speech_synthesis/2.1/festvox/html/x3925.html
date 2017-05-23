@@ -1,0 +1,1618 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>Functions</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REL="HOME"
+TITLE="Building Synthetic Voices"
+HREF="book1.html"><LINK
+REL="UP"
+TITLE="Festival's Scheme Programming Language"
+HREF="c3791.html"><LINK
+REL="PREVIOUS"
+TITLE="Data Types"
+HREF="x3843.html"><LINK
+REL="NEXT"
+TITLE="Debugging and Help"
+HREF="x4393.html"></HEAD
+><BODY
+CLASS="SECT1"
+BGCOLOR="#FFFFFF"
+TEXT="#000000"
+LINK="#0000FF"
+VLINK="#840084"
+ALINK="#0000FF"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="3"
+ALIGN="center"
+>Building Synthetic Voices</TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="bottom"
+><A
+HREF="x3843.html"
+ACCESSKEY="P"
+>&#60;&#60;&#60; Previous</A
+></TD
+><TD
+WIDTH="80%"
+ALIGN="center"
+VALIGN="bottom"
+>Festival's Scheme Programming Language</TD
+><TD
+WIDTH="10%"
+ALIGN="right"
+VALIGN="bottom"
+><A
+HREF="x4393.html"
+ACCESSKEY="N"
+>Next &#62;&#62;&#62;</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="SECT1"
+><H1
+CLASS="SECT1"
+><A
+NAME="AEN3925"
+>Functions</A
+></H1
+><P
+>This section lists the basic functions in Festival's Scheme. It doesn't 
+list them all (see the Festival manual for that) but does highlight the 
+key functions that you should normally use. </P
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="AEN3928"
+>Core functions</A
+></H2
+><P
+>These functions are the basic functions used in Scheme. These 
+include the structural functions for setting variables, 
+conditionals. loops, etc. </P
+><P
+></P
+><DIV
+CLASS="VARIABLELIST"
+><DL
+><DT
+><CODE
+CLASS="VARNAME"
+>(set! SYMBOL VALUE)</CODE
+></DT
+><DD
+><P
+>Sets <CODE
+CLASS="VARNAME"
+>SYMBOL</CODE
+> to <CODE
+CLASS="VARNAME"
+>VALUE</CODE
+>. 
+<CODE
+CLASS="VARNAME"
+>SYMBOL</CODE
+> is not evaluated, 
+while <CODE
+CLASS="VARNAME"
+>VALUE</CODE
+> is. Example 
+<A
+NAME="AEN3941"
+></A
+><BLOCKQUOTE
+CLASS="BLOCKQUOTE"
+><P
+CLASS="LITERALLAYOUT"
+>(set!&nbsp;a&nbsp;3)<br>
+(set!&nbsp;pi&nbsp;3.14)<br>
+(set!&nbsp;fruit&nbsp;'(apples&nbsp;pears&nbsp;bananas))<br>
+(set!&nbsp;fruit2&nbsp;fruit)</P
+></BLOCKQUOTE
+></P
+></DD
+><DT
+><CODE
+CLASS="VARNAME"
+>(define (FUNCNAME ARG0 ARG1 ...) . BODY)</CODE
+></DT
+><DD
+><P
+>define a function called <CODE
+CLASS="VARNAME"
+>FUNCNAME</CODE
+> with specified arguments and 
+body. 
+<A
+NAME="AEN3949"
+></A
+><BLOCKQUOTE
+CLASS="BLOCKQUOTE"
+><P
+CLASS="LITERALLAYOUT"
+>(define&nbsp;(myadd&nbsp;a&nbsp;b)&nbsp;(+&nbsp;a&nbsp;b))<br>
+(define&nbsp;(factorial&nbsp;a)<br>
+&nbsp;(cond<br>
+&nbsp;&nbsp;((&#60;&nbsp;a&nbsp;2)&nbsp;1)<br>
+&nbsp;&nbsp;(t&nbsp;(*&nbsp;a&nbsp;(factorial&nbsp;(-&nbsp;a&nbsp;1))))))</P
+></BLOCKQUOTE
+></P
+></DD
+><DT
+><CODE
+CLASS="VARNAME"
+>(if TEST TRUECASE [FALSECASE] )</CODE
+></DT
+><DD
+><P
+>If the value of <CODE
+CLASS="VARNAME"
+>TEST</CODE
+> is non-nil, evaluate <CODE
+CLASS="VARNAME"
+>TRUECASE</CODE
+> and return 
+value else if present evaluate <CODE
+CLASS="VARNAME"
+>FALSECASE</CODE
+> if present and return value, 
+else return <CODE
+CLASS="VARNAME"
+>nil</CODE
+>. 
+<A
+NAME="AEN3960"
+></A
+><BLOCKQUOTE
+CLASS="BLOCKQUOTE"
+><P
+CLASS="LITERALLAYOUT"
+>(if&nbsp;(string-equal&nbsp;v&nbsp;"apples")<br>
+&nbsp;&nbsp;&nbsp;(format&nbsp;t&nbsp;"It's&nbsp;an&nbsp;apple\n")<br>
+&nbsp;&nbsp;&nbsp;(format&nbsp;t&nbsp;"It's&nbsp;not&nbsp;an&nbsp;apple\n"))<br>
+(if&nbsp;(member&nbsp;v&nbsp;'(apples&nbsp;pears&nbsp;bananas))<br>
+&nbsp;&nbsp;&nbsp;(begin<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(format&nbsp;t&nbsp;"It's&nbsp;a&nbsp;fruit&nbsp;(%s)\n"&nbsp;v)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'fruit)<br>
+&nbsp;&nbsp;&nbsp;'notfruit)</P
+></BLOCKQUOTE
+></P
+></DD
+><DT
+><CODE
+CLASS="VARNAME"
+>(cond (TEST0 . BODY) (TEST1 . BODY) ...)</CODE
+></DT
+><DD
+><P
+>A multiple if statement. Evaluates each <CODE
+CLASS="VARNAME"
+>TEST</CODE
+> until a non-nil test 
+is found then evalues each of the expressions in that <CODE
+CLASS="VARNAME"
+>BODY</CODE
+> return 
+the value of the last one. 
+<A
+NAME="AEN3969"
+></A
+><BLOCKQUOTE
+CLASS="BLOCKQUOTE"
+><P
+CLASS="LITERALLAYOUT"
+>(cond<br>
+&nbsp;&nbsp;((string-equal&nbsp;v&nbsp;"apple")<br>
+&nbsp;&nbsp;&nbsp;'ringo)<br>
+&nbsp;&nbsp;((string-equal&nbsp;v&nbsp;"plum")<br>
+&nbsp;&nbsp;&nbsp;'ume)<br>
+&nbsp;&nbsp;((string-equal&nbsp;v&nbsp;"peach")<br>
+&nbsp;&nbsp;&nbsp;'momo)<br>
+&nbsp;&nbsp;(t<br>
+&nbsp;&nbsp;&nbsp;'kudamono)</P
+></BLOCKQUOTE
+></P
+></DD
+><DT
+><CODE
+CLASS="VARNAME"
+>(begin . BODY )</CODE
+></DT
+><DD
+><P
+>This evaluates each s-expression in <CODE
+CLASS="VARNAME"
+>BODY</CODE
+> and returns the value 
+of the last s-expression in the list. This is useful for case 
+where only one s-expression is expected but you need to call a number 
+of functions, notably the <CODE
+CLASS="VARNAME"
+>if</CODE
+> function. 
+<A
+NAME="AEN3978"
+></A
+><BLOCKQUOTE
+CLASS="BLOCKQUOTE"
+><P
+CLASS="LITERALLAYOUT"
+>(if&nbsp;(string-equal&nbsp;v&nbsp;"pear")<br>
+&nbsp;&nbsp;&nbsp;&nbsp;(begin<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(format&nbsp;t&nbsp;"assuming&nbsp;it's&nbsp;a&nbsp;asian&nbsp;pear\n")<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'nashi)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;'kudamono)</P
+></BLOCKQUOTE
+></P
+></DD
+><DT
+><CODE
+CLASS="VARNAME"
+>(or . DISJ)</CODE
+></DT
+><DD
+><P
+>evalutate each disjunct until one is non-nil and return that value. 
+<A
+NAME="AEN3985"
+></A
+><BLOCKQUOTE
+CLASS="BLOCKQUOTE"
+><P
+CLASS="LITERALLAYOUT"
+>(or&nbsp;(string-equal&nbsp;v&nbsp;"tortoise")<br>
+&nbsp;&nbsp;&nbsp;&nbsp;(string-equal&nbsp;v&nbsp;"turtle"))<br>
+(or&nbsp;(string-equal&nbsp;v&nbsp;"pear")<br>
+&nbsp;&nbsp;&nbsp;&nbsp;(string-equal&nbsp;v&nbsp;"apple")<br>
+&nbsp;&nbsp;&nbsp;&nbsp;(&#60;&nbsp;num_fruits&nbsp;6))</P
+></BLOCKQUOTE
+></P
+></DD
+><DT
+><CODE
+CLASS="VARNAME"
+>(and . CONJ)</CODE
+></DT
+><DD
+><P
+>evalutate each conjunct until one is nil and return that value or 
+return the value of the last conjunct. 
+<A
+NAME="AEN3992"
+></A
+><BLOCKQUOTE
+CLASS="BLOCKQUOTE"
+><P
+CLASS="LITERALLAYOUT"
+>(and&nbsp;(&#60;&nbsp;num_fruits&nbsp;10)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(&#62;&nbsp;num_fruits&nbsp;3))<br>
+(and&nbsp;(string-equal&nbsp;v&nbsp;"pear")<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(&#60;&nbsp;num_fruits&nbsp;6)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(or&nbsp;(string-equal&nbsp;day&nbsp;"Tuesday")<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(string-equal&nbsp;day&nbsp;"Wednesday")))</P
+></BLOCKQUOTE
+></P
+></DD
+></DL
+></DIV
+></DIV
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="AEN3994"
+>List functions</A
+></H2
+><P
+></P
+><DIV
+CLASS="VARIABLELIST"
+><DL
+><DT
+><CODE
+CLASS="VARNAME"
+>(car EXPR)</CODE
+></DT
+><DD
+><P
+>returns the "car" of <CODE
+CLASS="VARNAME"
+>EXPR</CODE
+>, for a list this is the first item, 
+for an atom or the empty list this is defined to be <CODE
+CLASS="VARNAME"
+>nil</CODE
+>. 
+<A
+NAME="AEN4004"
+></A
+><BLOCKQUOTE
+CLASS="BLOCKQUOTE"
+><P
+CLASS="LITERALLAYOUT"
+>(car&nbsp;'(a&nbsp;b))&nbsp;=&#62;&nbsp;a<br>
+(car&nbsp;'((a&nbsp;b)&nbsp;c&nbsp;d))&nbsp;=&#62;&nbsp;(a&nbsp;b)<br>
+(car&nbsp;'(a&nbsp;(b&nbsp;c)&nbsp;d))&nbsp;=&#62;&nbsp;a<br>
+(car&nbsp;nil)&nbsp;=&#62;&nbsp;nil<br>
+(car&nbsp;'a)&nbsp;=&#62;&nbsp;nil</P
+></BLOCKQUOTE
+></P
+></DD
+><DT
+><CODE
+CLASS="VARNAME"
+>(cdr EXPR)</CODE
+></DT
+><DD
+><P
+>returns the "cdr" of <CODE
+CLASS="VARNAME"
+>EXPR</CODE
+>, for a list this is the rest of the 
+list, for an atom or the empty list this is defined to be <CODE
+CLASS="VARNAME"
+>nil</CODE
+>. 
+<A
+NAME="AEN4013"
+></A
+><BLOCKQUOTE
+CLASS="BLOCKQUOTE"
+><P
+CLASS="LITERALLAYOUT"
+>(cdr&nbsp;'(a&nbsp;b))&nbsp;=&#62;&nbsp;(b)<br>
+(cdr&nbsp;'((a&nbsp;b)&nbsp;c&nbsp;d))&nbsp;=&#62;&nbsp;(c&nbsp;d)<br>
+(cdr&nbsp;'(a))&nbsp;=&#62;&nbsp;nil<br>
+(cdr&nbsp;'(a&nbsp;(b&nbsp;c)))&nbsp;=&#62;&nbsp;((b&nbsp;c))<br>
+(cdr&nbsp;nil)&nbsp;=&#62;&nbsp;nil<br>
+(cdr&nbsp;'a)&nbsp;=&#62;&nbsp;nil</P
+></BLOCKQUOTE
+></P
+></DD
+><DT
+><CODE
+CLASS="VARNAME"
+>(cons EXPR0 EXPR2)</CODE
+></DT
+><DD
+><P
+>build a new list whose "car" is <CODE
+CLASS="VARNAME"
+>EXPR0</CODE
+> and whose "cdr" is <CODE
+CLASS="VARNAME"
+>EXPR1</CODE
+>. 
+<A
+NAME="AEN4022"
+></A
+><BLOCKQUOTE
+CLASS="BLOCKQUOTE"
+><P
+CLASS="LITERALLAYOUT"
+>(cons&nbsp;'a&nbsp;'(b&nbsp;c))&nbsp;=&#62;&nbsp;(a&nbsp;b&nbsp;c)<br>
+(cons&nbsp;'a&nbsp;())&nbsp;=&#62;&nbsp;(a)<br>
+(cons&nbsp;'(a&nbsp;b)&nbsp;'(c&nbsp;d)&nbsp;=&#62;&nbsp;'((a&nbsp;b)&nbsp;c&nbsp;d))<br>
+(cons&nbsp;()&nbsp;'(a)&nbsp;=&#62;&nbsp;'(nil&nbsp;a))<br>
+(cons&nbsp;'a&nbsp;'b&nbsp;=&#62;&nbsp;(a&nbsp;.&nbsp;b))<br>
+(cons&nbsp;nil&nbsp;nil)&nbsp;=&#62;&nbsp;(nil)</P
+></BLOCKQUOTE
+></P
+></DD
+><DT
+><CODE
+CLASS="VARNAME"
+>(list . BODY)</CODE
+></DT
+><DD
+><P
+>Form a list from each of the arguments 
+<A
+NAME="AEN4029"
+></A
+><BLOCKQUOTE
+CLASS="BLOCKQUOTE"
+><P
+CLASS="LITERALLAYOUT"
+>(list&nbsp;'a&nbsp;'b&nbsp;'c)&nbsp;=&#62;&nbsp;(a&nbsp;b&nbsp;c)<br>
+(list&nbsp;'(a&nbsp;b)&nbsp;'c&nbsp;'d)&nbsp;=&#62;&nbsp;((a&nbsp;b)&nbsp;c&nbsp;d)<br>
+(list&nbsp;nil&nbsp;'(a&nbsp;b)&nbsp;'(a&nbsp;b))&nbsp;=&#62;&nbsp;(nil&nbsp;(a&nbsp;b)&nbsp;(a&nbsp;b))</P
+></BLOCKQUOTE
+></P
+></DD
+><DT
+><CODE
+CLASS="VARNAME"
+>(append . BODY)</CODE
+></DT
+><DD
+><P
+>Join each of the arguments (lists) into a single list 
+<A
+NAME="AEN4036"
+></A
+><BLOCKQUOTE
+CLASS="BLOCKQUOTE"
+><P
+CLASS="LITERALLAYOUT"
+>(append&nbsp;'(a&nbsp;b)&nbsp;'(c&nbsp;d))&nbsp;=&#62;&nbsp;(a&nbsp;b&nbsp;c&nbsp;d)<br>
+(append&nbsp;'(a&nbsp;b)&nbsp;'((c&nbsp;d))&nbsp;'(e&nbsp;f))&nbsp;=&#62;&nbsp;(a&nbsp;b&nbsp;(c&nbsp;d)&nbsp;e&nbsp;f)<br>
+(append&nbsp;nil&nbsp;nil)&nbsp;=&#62;&nbsp;nil<br>
+(append&nbsp;'(a&nbsp;b))&nbsp;=&#62;&nbsp;(a&nbsp;b))<br>
+(append&nbsp;'a&nbsp;'b)&nbsp;=&#62;&nbsp;error</P
+></BLOCKQUOTE
+></P
+></DD
+><DT
+><CODE
+CLASS="VARNAME"
+>(nth N LIST)</CODE
+></DT
+><DD
+><P
+>Return Nth member of list, the first item is the 0th member. 
+<A
+NAME="AEN4043"
+></A
+><BLOCKQUOTE
+CLASS="BLOCKQUOTE"
+><P
+CLASS="LITERALLAYOUT"
+>(nth&nbsp;0&nbsp;'(a&nbsp;b&nbsp;c))&nbsp;=&#62;&nbsp;a<br>
+(nth&nbsp;2&nbsp;'(a&nbsp;b&nbsp;c))&nbsp;=&#62;&nbsp;c<br>
+(nth&nbsp;3&nbsp;'(a&nbsp;b&nbsp;c))&nbsp;=&#62;&nbsp;nil</P
+></BLOCKQUOTE
+></P
+></DD
+><DT
+><CODE
+CLASS="VARNAME"
+>(nth_cdr N LIST)</CODE
+></DT
+><DD
+><P
+>Return Nth cdr list, the first cdr is the 0th member, which is 
+the list itself. 
+<A
+NAME="AEN4050"
+></A
+><BLOCKQUOTE
+CLASS="BLOCKQUOTE"
+><P
+CLASS="LITERALLAYOUT"
+>(nth&nbsp;0&nbsp;'(a&nbsp;b&nbsp;c))&nbsp;=&#62;&nbsp;(a&nbsp;b&nbsp;c)<br>
+(nth&nbsp;2&nbsp;'(a&nbsp;b&nbsp;c))&nbsp;=&#62;&nbsp;(c)<br>
+(nth&nbsp;1&nbsp;'(a&nbsp;b&nbsp;c))&nbsp;=&#62;&nbsp;(b&nbsp;c)<br>
+(nth&nbsp;3&nbsp;'(a&nbsp;b&nbsp;c))&nbsp;=&#62;&nbsp;nil</P
+></BLOCKQUOTE
+></P
+></DD
+><DT
+><CODE
+CLASS="VARNAME"
+>(last LIST)</CODE
+></DT
+><DD
+><P
+>The last cdr of a list, traditionally this function has always been called 
+<CODE
+CLASS="VARNAME"
+>last</CODE
+> rather <CODE
+CLASS="VARNAME"
+>last_cdr</CODE
+> 
+<A
+NAME="AEN4059"
+></A
+><BLOCKQUOTE
+CLASS="BLOCKQUOTE"
+><P
+CLASS="LITERALLAYOUT"
+>(last&nbsp;'(a&nbsp;b&nbsp;c))&nbsp;=&#62;&nbsp;(c)<br>
+(last&nbsp;'(a&nbsp;b&nbsp;(c&nbsp;d)))&nbsp;=&#62;&nbsp;((c&nbsp;d))</P
+></BLOCKQUOTE
+></P
+></DD
+><DT
+><CODE
+CLASS="VARNAME"
+>(reverse LIST)</CODE
+></DT
+><DD
+><P
+>Return the list in reverse order 
+<A
+NAME="AEN4066"
+></A
+><BLOCKQUOTE
+CLASS="BLOCKQUOTE"
+><P
+CLASS="LITERALLAYOUT"
+>(reverse&nbsp;'(a&nbsp;b&nbsp;c))&nbsp;=&#62;&nbsp;(c&nbsp;b&nbsp;a)<br>
+(reverse&nbsp;'(a))&nbsp;=&#62;&nbsp;(a)<br>
+(reverse&nbsp;'(a&nbsp;b&nbsp;(c&nbsp;d)))&nbsp;=&#62;&nbsp;((c&nbsp;d)&nbsp;b&nbsp;a)</P
+></BLOCKQUOTE
+></P
+></DD
+><DT
+><CODE
+CLASS="VARNAME"
+>(member ITEM LIST)</CODE
+></DT
+><DD
+><P
+>Returns the cdr in LIST whose car is ITEM or nil if it found 
+<A
+NAME="AEN4073"
+></A
+><BLOCKQUOTE
+CLASS="BLOCKQUOTE"
+><P
+CLASS="LITERALLAYOUT"
+>(member&nbsp;'b&nbsp;'(a&nbsp;b&nbsp;c))&nbsp;=&#62;&nbsp;(b&nbsp;c)<br>
+(member&nbsp;'c&nbsp;'(a&nbsp;b&nbsp;c))&nbsp;=&#62;&nbsp;(c)<br>
+(member&nbsp;'d&nbsp;'(a&nbsp;b&nbsp;c))&nbsp;=&#62;&nbsp;nil<br>
+(member&nbsp;'b&nbsp;'(a&nbsp;b&nbsp;c&nbsp;b))&nbsp;=&#62;&nbsp;(b&nbsp;c&nbsp;b)</P
+></BLOCKQUOTE
+>
+Note that <CODE
+CLASS="VARNAME"
+>member</CODE
+> uses <CODE
+CLASS="VARNAME"
+>eq</CODE
+> to test equality, hence this 
+does not work for strings. You should use <CODE
+CLASS="VARNAME"
+>member_string</CODE
+> 
+if the list contains strings. </P
+></DD
+><DT
+><CODE
+CLASS="VARNAME"
+>(assoc ITEM ALIST)</CODE
+></DT
+><DD
+><P
+>a-list are a standard list format for representing feature value 
+pairs. An a-list is basically a list of pairs of name and value, 
+although the name may be any lisp item it is usually an symbol. A 
+typlical a-list is 
+<A
+NAME="AEN4083"
+></A
+><BLOCKQUOTE
+CLASS="BLOCKQUOTE"
+><P
+CLASS="LITERALLAYOUT"
+>((name&nbsp;AH)<br>
+&nbsp;(duration&nbsp;0.095)<br>
+&nbsp;(vowel&nbsp;+)<br>
+&nbsp;(occurs&nbsp;("file01"&nbsp;"file04"&nbsp;"file07"&nbsp;"file24"))<br>
+)</P
+></BLOCKQUOTE
+>
+<CODE
+CLASS="VARNAME"
+>assoc</CODE
+> is a function that allows you to look up values 
+in an a-list 
+<A
+NAME="AEN4086"
+></A
+><BLOCKQUOTE
+CLASS="BLOCKQUOTE"
+><P
+CLASS="LITERALLAYOUT"
+>(assoc&nbsp;'name&nbsp;'((name&nbsp;AH)&nbsp;(duration&nbsp;0.95)))&nbsp;=&#62;&nbsp;(name&nbsp;AH)<br>
+(assoc&nbsp;'duration&nbsp;'((name&nbsp;AH)&nbsp;(duration&nbsp;0.95)))&nbsp;=&#62;&nbsp;(duration&nbsp;0.95)<br>
+(assoc&nbsp;'vowel&nbsp;'((name&nbsp;AH)&nbsp;(duration&nbsp;0.95)))&nbsp;=&#62;&nbsp;nil</P
+></BLOCKQUOTE
+>
+Note that <CODE
+CLASS="VARNAME"
+>assoc</CODE
+> uses <CODE
+CLASS="VARNAME"
+>eq</CODE
+> to test equality, hence this 
+does not work names that are strings. 
+You should use <CODE
+CLASS="VARNAME"
+>assoc_string</CODE
+> if the a-list uses strings for 
+names. </P
+></DD
+></DL
+></DIV
+></DIV
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="AEN4091"
+>Arithmetic functions</A
+></H2
+><P
+>+ - * / exp log sqrt &#60; &#62; &#60;= &#62;= = </P
+></DIV
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="AEN4094"
+>I/O functions</A
+></H2
+><P
+>File names in Festival use the Unix convention of using "/" as the 
+directory separator. However under other operating systems, such as 
+Windows, the "/" will be appropriately mapped into backslash as 
+required. For most cases you do not need to worry about this and if you 
+use forward slash all the time ti will work. </P
+><P
+></P
+><DIV
+CLASS="VARIABLELIST"
+><DL
+><DT
+><CODE
+CLASS="VARNAME"
+>(format FD FORMATSTRING . ARGS)</CODE
+></DT
+><DD
+><P
+>The <CODE
+CLASS="VARNAME"
+>format</CODE
+> function is a little unusually in
+Lisp. It basically follows the <CODE
+CLASS="VARNAME"
+>printf</CODE
+> command in C,
+or more closely follows the <CODE
+CLASS="VARNAME"
+>format</CODE
+> function in
+Emacs lisp. It is desgined to print out infomation that is not
+necessarily to be read in by Lisp (unlike <CODE
+CLASS="VARNAME"
+>pprint</CODE
+>,
+<CODE
+CLASS="VARNAME"
+>print</CODE
+> and
+<CODE
+CLASS="VARNAME"
+>printfp</CODE
+>). <CODE
+CLASS="VARNAME"
+>FD</CODE
+> is a file
+descriptor as created by <CODE
+CLASS="VARNAME"
+>fopen</CODE
+>, and the result is
+printed to that. Also two special values are allows
+there. <CODE
+CLASS="VARNAME"
+>t</CODE
+> causes the output to be sent to standard
+out (which is usually the terminal).  <CODE
+CLASS="VARNAME"
+>nil</CODE
+> causes
+the output to be written to a string and returned by the
+function. Also the variable <CODE
+CLASS="VARNAME"
+>stderr</CODE
+> is set to a file
+descriptor for standard error output.</P
+><P
+>The format string closely follows the format used in C's printf 
+functions. It is actually interpreted by those functions in its 
+implementation. <CODE
+CLASS="VARNAME"
+>format</CODE
+> supports the following directives 
+<P
+></P
+><DIV
+CLASS="VARIABLELIST"
+><DL
+><DT
+><I
+CLASS="EMPHASIS"
+>%d</I
+></DT
+><DD
+><P
+>Print as integer </P
+></DD
+><DT
+><I
+CLASS="EMPHASIS"
+>%d</I
+></DT
+><DD
+><P
+>Print as integer in hexadecimal </P
+></DD
+><DT
+><I
+CLASS="EMPHASIS"
+>%f</I
+></DT
+><DD
+><P
+>Print as float </P
+></DD
+><DT
+><I
+CLASS="EMPHASIS"
+>%s</I
+></DT
+><DD
+><P
+>Convert item to string </P
+></DD
+><DT
+><I
+CLASS="EMPHASIS"
+>%%</I
+></DT
+><DD
+><P
+>A percent character </P
+></DD
+><DT
+><I
+CLASS="EMPHASIS"
+>%g</I
+></DT
+><DD
+><P
+>Print as double </P
+></DD
+><DT
+><I
+CLASS="EMPHASIS"
+>%c</I
+></DT
+><DD
+><P
+>Print number as character </P
+></DD
+><DT
+><I
+CLASS="EMPHASIS"
+>%l</I
+></DT
+><DD
+><P
+>Print as Lisp object </P
+></DD
+></DL
+></DIV
+>
+In addition directive sizes are supported, including (zero or space) 
+padding, and widths. Explicitly specified sizes as arguments as in 
+<CODE
+CLASS="VARNAME"
+>%*s</CODE
+> are not supported, nor is <CODE
+CLASS="VARNAME"
+>%p</CODE
+> for pointers. </P
+><P
+>The <CODE
+CLASS="VARNAME"
+>%s</CODE
+> directive will try to convert the corresponding 
+lisp argument to a string before passing it to the low level print 
+function. Thus list will be printed to strings, and numbers also 
+coverted. This form will loose the distinction between lisp symbols 
+and lisp strings as the quote will not be present in the <CODE
+CLASS="VARNAME"
+>%s</CODE
+> 
+form. In general <CODE
+CLASS="VARNAME"
+>%s</CODE
+> should be used for getting nice human 
+output and not for machine readable output as it is a lossy print 
+form. </P
+><P
+>In contrast <CODE
+CLASS="VARNAME"
+>%l</CODE
+> is designed to reserve the Lisp forms 
+so they can be more easily read, quotes will appear and escapes 
+for embedded quote will be treated properly. 
+<A
+NAME="AEN4165"
+></A
+><BLOCKQUOTE
+CLASS="BLOCKQUOTE"
+><P
+CLASS="LITERALLAYOUT"
+>(format&nbsp;t&nbsp;"duration&nbsp;%0.3f\n"&nbsp;0.12345)&nbsp;=&#62;&nbsp;duration&nbsp;0.123<br>
+(format&nbsp;t&nbsp;"num&nbsp;%d\n"&nbsp;23)&nbsp;=&#62;&nbsp;num&nbsp;23<br>
+(format&nbsp;t&nbsp;"num&nbsp;%04d\n"&nbsp;23)&nbsp;=&#62;&nbsp;num&nbsp;0023</P
+></BLOCKQUOTE
+></P
+></DD
+><DT
+><I
+CLASS="EMPHASIS"
+>(pprintf SEXP [FD])</I
+></DT
+><DD
+><P
+>Pretty print give expression to standard out (or FD if specified). 
+Pretty printing is a technique that inserts newlines in the 
+printout and indentation to make the lisp expression easier to 
+read. &#13;</P
+></DD
+><DT
+><I
+CLASS="EMPHASIS"
+>(fopen FILENAME MODE)</I
+></DT
+><DD
+><P
+>This creates a file description, which can be used in the various I/O 
+functions. It closely follows C stdio <CODE
+CLASS="VARNAME"
+>fopen</CODE
+> function. The 
+mode may be 
+<P
+></P
+><DIV
+CLASS="VARIABLELIST"
+><DL
+><DT
+><I
+CLASS="EMPHASIS"
+>"r"</I
+></DT
+><DD
+><P
+>to open the file for reading </P
+></DD
+><DT
+><I
+CLASS="EMPHASIS"
+>"w"</I
+></DT
+><DD
+><P
+>to open the file for writing </P
+></DD
+><DT
+><I
+CLASS="EMPHASIS"
+>"a"</I
+></DT
+><DD
+><P
+>to open the file at the end for writing (so-called, append). </P
+></DD
+><DT
+><I
+CLASS="EMPHASIS"
+>"b"</I
+></DT
+><DD
+><P
+>File I/O in binary (for OS's that make the distinction), </P
+></DD
+></DL
+></DIV
+>
+Or any combination of these. </P
+></DD
+><DT
+><I
+CLASS="EMPHASIS"
+>(fclose FD)</I
+></DT
+><DD
+><P
+>Close a file descriptor as created by <CODE
+CLASS="VARNAME"
+>fopen</CODE
+>. </P
+></DD
+><DT
+><I
+CLASS="EMPHASIS"
+>(read)</I
+></DT
+><DD
+><P
+>Read next s-expression from standard in </P
+></DD
+><DT
+><I
+CLASS="EMPHASIS"
+>(readfp FD)</I
+></DT
+><DD
+><P
+>Read next s-expression from given file descriptor FD. On end of 
+file it returns an sexpression eq to the value returned by the 
+function <CODE
+CLASS="VARNAME"
+>(eof_val)</CODE
+>. A typical example use of these 
+functions is 
+<A
+NAME="AEN4216"
+></A
+><BLOCKQUOTE
+CLASS="BLOCKQUOTE"
+><P
+CLASS="LITERALLAYOUT"
+>(let&nbsp;((ifd&nbsp;(fopen&nbsp;infile&nbsp;"r"))<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(ofd&nbsp;(fopen&nbsp;outfile&nbsp;"w"))<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(word))<br>
+&nbsp;&nbsp;&nbsp;(while&nbsp;(not&nbsp;(equal?&nbsp;(set!&nbsp;word&nbsp;(readfp&nbsp;ifd))&nbsp;(eof-val)))<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(format&nbsp;ofd&nbsp;"%l\n"&nbsp;(lex.lookup&nbsp;word&nbsp;nil)))<br>
+&nbsp;&nbsp;&nbsp;(fclose&nbsp;ifd)<br>
+&nbsp;&nbsp;&nbsp;(fclose&nbsp;ofd)))</P
+></BLOCKQUOTE
+></P
+></DD
+><DT
+><I
+CLASS="EMPHASIS"
+>(load FILENAME [NOEVAL])</I
+></DT
+><DD
+><P
+>Load in the s-expressions in <CODE
+CLASS="VARNAME"
+>FILENAME</CODE
+>. If <CODE
+CLASS="VARNAME"
+>NOEVAL</CODE
+> is 
+unspecified the s-expressions are evaluated as they are read. If 
+<CODE
+CLASS="VARNAME"
+>NOEVAL</CODE
+> is specified and non-nil, <CODE
+CLASS="VARNAME"
+>load</CODE
+> will return all 
+s-expressions in the file un-evaluated in a single list. </P
+></DD
+></DL
+></DIV
+></DIV
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="AEN4227"
+>String functions</A
+></H2
+><P
+>As in many other languages, Scheme has a distinction between 
+<CODE
+CLASS="VARNAME"
+>strings</CODE
+> and <CODE
+CLASS="VARNAME"
+>symbols</CODE
+>. String evaluate to themselves and 
+cannot be assigned other values, symbols of the print name are 
+<CODE
+CLASS="VARNAME"
+>equal?</CODE
+> while strings of teh same name aren't necessarily. </P
+><P
+>In Festival's Scheme, strings are eight bit clean and designed to hold 
+strings of text and characters in what ever language is being 
+synthesized. Strings are always treats as string of 8 bit characters 
+even though some language may interpret these are 16-bit characters. 
+Symbols, in general, should not contain 8bit characters. 
+<P
+></P
+><DIV
+CLASS="VARIABLELIST"
+><DL
+><DT
+><CODE
+CLASS="VARNAME"
+>(string-equal STR1 STR2)</CODE
+></DT
+><DD
+><P
+>Finds the string of <CODE
+CLASS="VARNAME"
+>STR1</CODE
+> and <CODE
+CLASS="VARNAME"
+>STR2</CODE
+> and returns <CODE
+CLASS="VARNAME"
+>t</CODE
+> if 
+these are equal, and <CODE
+CLASS="VARNAME"
+>nil</CODE
+> otherwise. Symbol names and numbers are 
+mapped to string, though you should be aware that the mapping of a 
+number to a string may not always produce what you hope for. A number 
+<CODE
+CLASS="VARNAME"
+>0</CODE
+> may or may not be mapped to <CODE
+CLASS="VARNAME"
+>"0"</CODE
+> or maybe to <CODE
+CLASS="VARNAME"
+>"0.0"</CODE
+> 
+such that you should not dependent on the mapping. You can use 
+<CODE
+CLASS="VARNAME"
+>format</CODE
+> to map a number ot a string in an explicit manner. It is 
+however safe to pass symbol names to <CODE
+CLASS="VARNAME"
+>string-equal</CODE
+>. In most cases 
+<CODE
+CLASS="VARNAME"
+>string-equal</CODE
+> is the right function to use rather than 
+<CODE
+CLASS="VARNAME"
+>equal?</CODE
+> which is must stricter about its definition of equality. 
+<A
+NAME="AEN4251"
+></A
+><BLOCKQUOTE
+CLASS="BLOCKQUOTE"
+><P
+CLASS="LITERALLAYOUT"
+>(string-equal&nbsp;"hello"&nbsp;"hello")&nbsp;=&#62;&nbsp;t<br>
+(string-equal&nbsp;"hello"&nbsp;"Hello")&nbsp;=&#62;&nbsp;false<br>
+(string-equal&nbsp;"hello"&nbsp;'hello)&nbsp;=&#62;&nbsp;t</P
+></BLOCKQUOTE
+></P
+></DD
+><DT
+><CODE
+CLASS="VARNAME"
+>(string-append . ARGS)</CODE
+></DT
+><DD
+><P
+>For each argument coerce it to a string, and return the concatenation of 
+all arguments. 
+<A
+NAME="AEN4258"
+></A
+><BLOCKQUOTE
+CLASS="BLOCKQUOTE"
+><P
+CLASS="LITERALLAYOUT"
+>(string-append&nbsp;"abc"&nbsp;"def")&nbsp;=&#62;&nbsp;"abcdef"<br>
+(string-append&nbsp;"/usr/local/"&nbsp;"bin/"&nbsp;"festival")&nbsp;=&#62;&nbsp;"/usr/local/bin/festival"<br>
+(string-append&nbsp;"/usr/local/"&nbsp;t&nbsp;'hello)&nbsp;=&#62;&nbsp;"/usr/local/thello"<br>
+(string-append&nbsp;"abc")&nbsp;=&#62;&nbsp;"abc"<br>
+(string-append&nbsp;)&nbsp;=&#62;&nbsp;""</P
+></BLOCKQUOTE
+></P
+></DD
+><DT
+><CODE
+CLASS="VARNAME"
+>(member_string STR LIST)</CODE
+></DT
+><DD
+><P
+>returns <CODE
+CLASS="VARNAME"
+>nil</CODE
+> if no member of <CODE
+CLASS="VARNAME"
+>LIST</CODE
+> is <CODE
+CLASS="VARNAME"
+>string-equal</CODE
+> to 
+<CODE
+CLASS="VARNAME"
+>STR</CODE
+>, otherwise it returns <CODE
+CLASS="VARNAME"
+>t</CODE
+>. Again, this is often the 
+safe way to check membership of a list as this will work properly if 
+<CODE
+CLASS="VARNAME"
+>STR</CODE
+> or the members of <CODE
+CLASS="VARNAME"
+>LIST</CODE
+> are symbols or strings. 
+<A
+NAME="AEN4272"
+></A
+><BLOCKQUOTE
+CLASS="BLOCKQUOTE"
+><P
+CLASS="LITERALLAYOUT"
+>(member_string&nbsp;"a"&nbsp;'("b"&nbsp;"a"&nbsp;"c"))&nbsp;=&#62;&nbsp;t<br>
+(member_string&nbsp;"d"&nbsp;'("b"&nbsp;"a"&nbsp;"c"))&nbsp;=&#62;&nbsp;nil<br>
+(member_string&nbsp;"d"&nbsp;'(a&nbsp;b&nbsp;c&nbsp;d))&nbsp;=&#62;&nbsp;t<br>
+(member_string&nbsp;'a&nbsp;'("b"&nbsp;"a"&nbsp;"c"))&nbsp;=&#62;&nbsp;t</P
+></BLOCKQUOTE
+></P
+></DD
+><DT
+><CODE
+CLASS="VARNAME"
+>(string-before STR SUBSTR)</CODE
+></DT
+><DD
+><P
+>Returns the initial prefix of <CODE
+CLASS="VARNAME"
+>STR</CODE
+> up to the first occurrence 
+of <CODE
+CLASS="VARNAME"
+>SUBSTR</CODE
+> in <CODE
+CLASS="VARNAME"
+>STR</CODE
+>. If <CODE
+CLASS="VARNAME"
+>SUBSTR</CODE
+> doesn't 
+exist within <CODE
+CLASS="VARNAME"
+>STR</CODE
+> the empty string is returned. 
+<A
+NAME="AEN4284"
+></A
+><BLOCKQUOTE
+CLASS="BLOCKQUOTE"
+><P
+CLASS="LITERALLAYOUT"
+>(string-before&nbsp;"abcd"&nbsp;"c")&nbsp;=&#62;&nbsp;"ab"<br>
+(string-before&nbsp;"bin/make_labs"&nbsp;"/")&nbsp;=&#62;&nbsp;"bin"<br>
+(string-before&nbsp;"usr/local/bin/make_labs"&nbsp;"/")&nbsp;=&#62;&nbsp;"usr"<br>
+(string-before&nbsp;"make_labs"&nbsp;"/")&nbsp;=&#62;&nbsp;""</P
+></BLOCKQUOTE
+></P
+></DD
+><DT
+><CODE
+CLASS="VARNAME"
+>(string-after STR SUBSTR)</CODE
+></DT
+><DD
+><P
+>Returns the longest suffix of <CODE
+CLASS="VARNAME"
+>STR</CODE
+> after the first occurrence 
+of <CODE
+CLASS="VARNAME"
+>SUBSTR</CODE
+> in <CODE
+CLASS="VARNAME"
+>STR</CODE
+>. If <CODE
+CLASS="VARNAME"
+>SUBSTR</CODE
+> doesn't 
+exist within <CODE
+CLASS="VARNAME"
+>STR</CODE
+> the empty string is returned. 
+<A
+NAME="AEN4296"
+></A
+><BLOCKQUOTE
+CLASS="BLOCKQUOTE"
+><P
+CLASS="LITERALLAYOUT"
+>(string-after&nbsp;"abcd"&nbsp;"c")&nbsp;=&#62;&nbsp;"d"<br>
+(string-after&nbsp;"bin/make_labs"&nbsp;"/")&nbsp;=&#62;&nbsp;"make_labs"<br>
+(string-after&nbsp;"usr/bin/make_labs"&nbsp;"/")&nbsp;=&#62;&nbsp;"bin/make_labs"<br>
+(string-after&nbsp;"make_labs"&nbsp;"/")&nbsp;=&#62;&nbsp;""</P
+></BLOCKQUOTE
+></P
+></DD
+><DT
+><CODE
+CLASS="VARNAME"
+>(length STR)</CODE
+></DT
+><DD
+><P
+>Returns the lengh of given string (or list). Length does not coerce its 
+argument into a string, hence given a symbol as argument is an error. 
+<A
+NAME="AEN4303"
+></A
+><BLOCKQUOTE
+CLASS="BLOCKQUOTE"
+><P
+CLASS="LITERALLAYOUT"
+>(length&nbsp;"")&nbsp;=&#62;&nbsp;0<br>
+(length&nbsp;"abc")&nbsp;=&#62;&nbsp;3<br>
+(length&nbsp;'abc)&nbsp;-&#62;&nbsp;SIOD&nbsp;ERROR<br>
+(length&nbsp;'(a&nbsp;b&nbsp;c))&nbsp;-&#62;&nbsp;3</P
+></BLOCKQUOTE
+></P
+></DD
+><DT
+><CODE
+CLASS="VARNAME"
+>(symbolexplode SYMBOL)</CODE
+></DT
+><DD
+><P
+>returns a list of single character strings for each character in 
+<CODE
+CLASS="VARNAME"
+>SYMBOL}'</CODE
+> print name. This will also work on strings. 
+<A
+NAME="AEN4311"
+></A
+><BLOCKQUOTE
+CLASS="BLOCKQUOTE"
+><P
+CLASS="LITERALLAYOUT"
+>(symbolexplode&nbsp;'abc)&nbsp;=&#62;&nbsp;("a"&nbsp;"b"&nbsp;"c")<br>
+(symbolexplode&nbsp;'hello)&nbsp;=&#62;&nbsp;("h"&nbsp;"e"&nbsp;"l"&nbsp;"l"&nbsp;"o")</P
+></BLOCKQUOTE
+></P
+></DD
+><DT
+><CODE
+CLASS="VARNAME"
+>(intern STR)</CODE
+></DT
+><DD
+><P
+>Convert a string into a symbol with the same print name. </P
+></DD
+><DT
+><CODE
+CLASS="VARNAME"
+>(string-matches STR REGEX)</CODE
+></DT
+><DD
+><P
+>Returns <CODE
+CLASS="VARNAME"
+>t</CODE
+> if <CODE
+CLASS="VARNAME"
+>STR</CODE
+> matches <CODE
+CLASS="VARNAME"
+>REGEX</CODE
+> regular expression. 
+Regular expressions are described more fully below. 
+<A
+NAME="AEN4326"
+></A
+><BLOCKQUOTE
+CLASS="BLOCKQUOTE"
+><P
+CLASS="LITERALLAYOUT"
+>(string-matches&nbsp;"abc"&nbsp;"a.*")&nbsp;=&#62;&nbsp;t<br>
+(string-matches&nbsp;"hello"&nbsp;"[Hh]ello")&nbsp;=&#62;&nbsp;t</P
+></BLOCKQUOTE
+></P
+></DD
+></DL
+></DIV
+></P
+></DIV
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="AEN4328"
+>System functions</A
+></H2
+><P
+>In order to interact more easily with the underlying operating system, 
+Festival Scheme includes a number of basic function that allow Scheme 
+programs to make use of the operating system functions. 
+<P
+></P
+><DIV
+CLASS="VARIABLELIST"
+><DL
+><DT
+><CODE
+CLASS="VARNAME"
+>(system COMMAND)</CODE
+></DT
+><DD
+><P
+>Evaluates the command with the Unix shell (or equivalent). Its 
+not clear how this should (or does0 work on other operating systems 
+so it should be used sparingly if the code is to be portable. 
+<A
+NAME="AEN4337"
+></A
+><BLOCKQUOTE
+CLASS="BLOCKQUOTE"
+><P
+CLASS="LITERALLAYOUT"
+>(system&nbsp;"ls")&nbsp;=&#62;&nbsp;lists&nbsp;files&nbsp;in&nbsp;current&nbsp;directory.<br>
+(system&nbsp;(format&nbsp;nil&nbsp;"cat&nbsp;%s"&nbsp;filename))</P
+></BLOCKQUOTE
+></P
+></DD
+><DT
+><CODE
+CLASS="VARNAME"
+>(get_url URL OFILE)</CODE
+></DT
+><DD
+><P
+>Copies contents of <CODE
+CLASS="VARNAME"
+>URL</CODE
+> into <CODE
+CLASS="VARNAME"
+>OFILE</CODE
+>. It support 
+<TT
+CLASS="FILENAME"
+>file:</TT
+> and <TT
+CLASS="FILENAME"
+>http:</TT
+> prefixes, but current does not support the 
+<CODE
+CLASS="VARNAME"
+>ftp:</CODE
+> protocol. 
+<A
+NAME="AEN4349"
+></A
+><BLOCKQUOTE
+CLASS="BLOCKQUOTE"
+><P
+CLASS="LITERALLAYOUT"
+>(get_url&nbsp;"http://www.festvox.org/index.html"&nbsp;"festvox.html")</P
+></BLOCKQUOTE
+></P
+></DD
+><DT
+><CODE
+CLASS="VARNAME"
+>(setenv NAME VALUE)</CODE
+></DT
+><DD
+><P
+>Set environment variable <CODE
+CLASS="VARNAME"
+>NAME</CODE
+> to <CODE
+CLASS="VARNAME"
+>VALUE</CODE
+> which should 
+be strings 
+<A
+NAME="AEN4358"
+></A
+><BLOCKQUOTE
+CLASS="BLOCKQUOTE"
+><P
+CLASS="LITERALLAYOUT"
+>(setenv&nbsp;"DISPLAY"&nbsp;"nara.mt.cs.cmu.edu:0.0")</P
+></BLOCKQUOTE
+></P
+></DD
+><DT
+><CODE
+CLASS="VARNAME"
+>(getenv NAME)</CODE
+></DT
+><DD
+><P
+>Get value of environment variable <CODE
+CLASS="VARNAME"
+>NAME</CODE
+>. 
+<A
+NAME="AEN4366"
+></A
+><BLOCKQUOTE
+CLASS="BLOCKQUOTE"
+><P
+CLASS="LITERALLAYOUT"
+>(getenv&nbsp;"DISPLAY")</P
+></BLOCKQUOTE
+></P
+></DD
+><DT
+><CODE
+CLASS="VARNAME"
+>(getpid)</CODE
+></DT
+><DD
+><P
+>The process id, as a number. This is useful when creating 
+files that need to be unique for the festival instance. 
+<A
+NAME="AEN4373"
+></A
+><BLOCKQUOTE
+CLASS="BLOCKQUOTE"
+><P
+CLASS="LITERALLAYOUT"
+>(set!&nbsp;bbbfile&nbsp;(format&nbsp;nil&nbsp;"/tmp/stuff.%05d"&nbsp;(getpid)))</P
+></BLOCKQUOTE
+></P
+></DD
+><DT
+><CODE
+CLASS="VARNAME"
+>(cd DIRECTORY)</CODE
+></DT
+><DD
+><P
+>Change directory. 
+<A
+NAME="AEN4380"
+></A
+><BLOCKQUOTE
+CLASS="BLOCKQUOTE"
+><P
+CLASS="LITERALLAYOUT"
+>(cd&nbsp;"/tmp")</P
+></BLOCKQUOTE
+></P
+></DD
+><DT
+><CODE
+CLASS="VARNAME"
+>(pwd)</CODE
+></DT
+><DD
+><P
+>return a string which is a pathname to the current working directory. </P
+></DD
+></DL
+></DIV
+></P
+></DIV
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="AEN4387"
+>Utterance Functions</A
+></H2
+><P
+>%%%%% Utterance construction and access functions</P
+></DIV
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="AEN4390"
+>Synthesis Functions</A
+></H2
+><P
+>%%%%% Synthesis specific functions</P
+></DIV
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="x3843.html"
+ACCESSKEY="P"
+>&#60;&#60;&#60; Previous</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="book1.html"
+ACCESSKEY="H"
+>Home</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="x4393.html"
+ACCESSKEY="N"
+>Next &#62;&#62;&#62;</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>Data Types</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="c3791.html"
+ACCESSKEY="U"
+>Up</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>Debugging and Help</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

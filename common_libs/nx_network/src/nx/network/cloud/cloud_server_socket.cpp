@@ -100,10 +100,9 @@ CloudServerSocket::~CloudServerSocket()
     //    stopWhileInAioThread();
 }
 
-bool CloudServerSocket::bind(const SocketAddress& localAddress)
+bool CloudServerSocket::bind(const SocketAddress& /*localAddress*/)
 {
-    // Does not make any sense in cloud socket context
-    static_cast<void>(localAddress);
+    // Does not make any sense in cloud socket context.
     return true;
 }
 
@@ -332,7 +331,7 @@ void CloudServerSocket::initTunnelPool(int queueLen)
 {
     auto tunnelPool = std::make_unique<IncomingTunnelPool>(getAioThread(), queueLen);
     m_tunnelPool = tunnelPool.get();
-    m_aggregateAcceptor.addSocket(std::move(tunnelPool));
+    m_aggregateAcceptor.add(std::move(tunnelPool));
 }
 
 void CloudServerSocket::startAcceptor(
@@ -383,14 +382,14 @@ void CloudServerSocket::onListenRequestCompleted(
         return;
     }
 
-    NX_LOGX(lm("Listen request has failed: %1")
-        .arg(QnLexical::serialized(resultCode)), cl_logDEBUG1);
+    NX_LOGX(lm("Listen request has failed: %1").arg(resultCode), cl_logDEBUG1);
 
     if (!m_mediatorRegistrationRetryTimer.scheduleNextTry(
             std::bind(&CloudServerSocket::retryRegistration, this)))
     {
         // It is not supposed to happen in production, is it?
-        NX_LOGX(lm("Stopped mediator registration retries"), cl_logWARNING);
+        NX_LOGX(lm("Stopped mediator registration retries. Last result code %1")
+            .arg(resultCode), cl_logWARNING);
         m_state = State::readyToListen;
         reportResult(SystemError::invalidData); //< TODO: #ak Use better error code.
     }
@@ -425,12 +424,20 @@ void CloudServerSocket::startAcceptingConnections(
 void CloudServerSocket::initializeCustomAcceptors(
     const hpm::api::ListenResponse& response)
 {
-    auto acceptors = CustomAcceptorFactory::instance().create(response);
+    const auto cloudCredentials =
+        m_mediatorConnection->credentialsProvider()->getSystemCredentials();
+    NX_ASSERT(cloudCredentials);
+    if (!cloudCredentials)
+        return;
+
+    auto acceptors = CustomAcceptorFactory::instance().create(
+        *cloudCredentials,
+        response);
     for (auto& acceptor: acceptors)
     {
         acceptor->bindToAioThread(getAioThread());
         m_customConnectionAcceptors.push_back(acceptor.get());
-        m_aggregateAcceptor.addSocket(std::move(acceptor));
+        m_aggregateAcceptor.add(std::move(acceptor));
     }
 }
 
@@ -440,14 +447,14 @@ void CloudServerSocket::retryRegistration()
     issueRegistrationRequest();
 }
 
-void CloudServerSocket::reportResult(SystemError::ErrorCode sysErrorCode)
+void CloudServerSocket::reportResult(SystemError::ErrorCode systemErrorCode)
 {
     if (!m_savedAcceptHandler)
         return;
 
     decltype(m_savedAcceptHandler) acceptHandler;
     acceptHandler.swap(m_savedAcceptHandler);
-    acceptHandler(sysErrorCode, nullptr);
+    acceptHandler(systemErrorCode, nullptr);
 }
 
 void CloudServerSocket::acceptAsyncInternal(AcceptCompletionHandler handler)
@@ -608,7 +615,7 @@ void CloudServerSocket::stopWhileInAioThread()
 
 CustomAcceptorFactory::CustomAcceptorFactory():
     base_type(std::bind(&CustomAcceptorFactory::defaultFactoryFunc, this,
-        std::placeholders::_1))
+        std::placeholders::_1, std::placeholders::_2))
 {
 }
 
@@ -619,15 +626,20 @@ CustomAcceptorFactory& CustomAcceptorFactory::instance()
 }
 
 std::vector<std::unique_ptr<AbstractConnectionAcceptor>> 
-    CustomAcceptorFactory::defaultFactoryFunc(const hpm::api::ListenResponse& response)
+    CustomAcceptorFactory::defaultFactoryFunc(
+        const nx::hpm::api::SystemCredentials& credentials,
+        const hpm::api::ListenResponse& response)
 {
     std::vector<std::unique_ptr<AbstractConnectionAcceptor>> acceptors;
 
     if (response.trafficRelayUrl)
     {
+        QUrl trafficRelayUrlWithCredentials = QString::fromUtf8(*response.trafficRelayUrl);
+        trafficRelayUrlWithCredentials.setUserName(credentials.systemId);
+        trafficRelayUrlWithCredentials.setPassword(credentials.key);
         acceptors.push_back(
             std::make_unique<relay::ConnectionAcceptor>(
-                QUrl(*response.trafficRelayUrl)));
+                trafficRelayUrlWithCredentials));
     }
 
     return acceptors;

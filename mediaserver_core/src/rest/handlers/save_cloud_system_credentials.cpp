@@ -2,7 +2,7 @@
 
 #include <cdb/connection.h>
 
-#include <nx/network/http/httptypes.h>
+#include <nx/network/http/http_types.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/string.h>
 
@@ -10,7 +10,7 @@
 #include <api/model/cloud_credentials_data.h>
 #include <api/global_settings.h>
 #include <media_server/serverutil.h>
-#include <utils/common/sync_call.h>
+#include <nx/utils/sync_call.h>
 
 #include <nx_ec/data/api_cloud_system_data.h>
 #include <nx/fusion/model_functions.h>

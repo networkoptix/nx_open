@@ -7,8 +7,8 @@
 #include "tcp_connection_processor.h"
 
 #include "utils/common/byte_array.h"
-#include <nx/network/http/httptypes.h>
-#include <nx/network/http/httpstreamreader.h>
+#include <nx/network/http/http_types.h>
+#include <nx/network/http/http_stream_reader.h>
 #include <core/resource_access/user_access_data.h>
 
 
@@ -55,6 +55,7 @@ public:
         clientRequestOffset(0),
         prevSocketError(SystemError::noError),
         authenticatedOnce(false),
+        owner(nullptr),
         interleavedMessageDataPos(0),
         currentRequestSize(0)
     {
@@ -85,6 +86,7 @@ public:
     Qn::UserAccessData accessRights;
     SystemError::ErrorCode prevSocketError;
     bool authenticatedOnce;
+    QnTcpListener* owner;
 private:
     QByteArray interleavedMessageData;
     size_t interleavedMessageDataPos;

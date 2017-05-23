@@ -1,7 +1,7 @@
 #pragma once
 
 #include <nx/network/buffer.h>
-#include <nx/network/http/httptypes.h>
+#include <nx/network/http/http_types.h>
 #include <nx/network/socket_common.h>
 
 namespace nx {

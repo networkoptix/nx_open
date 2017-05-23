@@ -16,7 +16,7 @@
 #include "abstract_msg_body_source.h"
 #include "asynchttpclient.h"
 #include "auth_cache.h"
-#include "httpstreamreader.h"
+#include "http_stream_reader.h"
 
 namespace nx_http {
 
@@ -28,7 +28,7 @@ namespace nx_http {
  * This class methods are not thread-safe.
  * NOTE: This class is a replacement for nx_http::AsyncHttpClient.
  *   As soon as it becomes ready, nx_http::AsyncHttpClient will be declared as deprecated.
- * @warning It is strongly recommended to listen for someMessageBodyAvailable() event and
+ * WARNING: It is strongly recommended to listen for someMessageBodyAvailable() event and
  *   read current message body buffer with AsyncClient::fetchMessageBodyBuffer() call every time
  *   to avoid internal message body buffer to consume too much memory.
  */
@@ -115,7 +115,7 @@ public:
      *   can be read with AsyncClient::fetchMessageBodyBuffer() call.
      * Responsibility for preventing internal message body buffer 
      *   to grow beyond reasonable sizes lies on user of this class.
-     * @warning It is strongly recommended to call AsyncClient::fetchMessageBodyBuffer() 
+     * WARNING: It is strongly recommended to call AsyncClient::fetchMessageBodyBuffer() 
      *   every time on receiving this signal
     */
     void setOnSomeMessageBodyAvailable(nx::utils::MoveOnlyFunc<void()> handler);
@@ -211,19 +211,19 @@ public:
     void setDisablePrecalculatedAuthorization(bool val);
 
     /** Set socket connect/send timeout. */
-    void setSendTimeoutMs(unsigned int sendTimeoutMs);
+    void setSendTimeout(std::chrono::milliseconds sendTimeout);
     /**
      * @param responseReadTimeoutMs 0 means infinity.
      * By default, 3000 ms.
      * If timeout has been met, connection is closed, state set to failed and AsyncClient::done emitted.
      */
-    void setResponseReadTimeoutMs(unsigned int responseReadTimeoutMs);
+    void setResponseReadTimeout(std::chrono::milliseconds responseReadTimeout);
     /**
      * @param messageBodyReadTimeoutMs 0 means infinity.
      * By default there is no timeout.
      * If timeout has been met, connection is closed, state set to failed and AsyncClient::done emitted.
      */
-    void setMessageBodyReadTimeoutMs(unsigned int messageBodyReadTimeoutMs);
+    void setMessageBodyReadTimeout(std::chrono::milliseconds messageBodyReadTimeout);
 
     const std::unique_ptr<AbstractStreamSocket>& socket();
     /**
@@ -245,7 +245,7 @@ public:
     /**
      * Caller uses it to report that message body has ended (it may be tricky to detect message body end in some cases).
      * @note May be invoked within someMessageBodyAvailable handler only.
-     * @warning It is a hack. Use it only if you strongly know what you are doing.
+     * WARNING: It is a hack. Use it only if you strongly know what you are doing.
      */
     void forceEndOfMsgBody();
 
@@ -287,9 +287,9 @@ private:
     quint64 m_totalBytesReadPerRequest; //< total read bytes per request
     int m_totalRequestsSentViaCurrentConnection; //< total sent requests via single connection
     bool m_contentEncodingUsed;
-    unsigned int m_sendTimeoutMs;
-    unsigned int m_responseReadTimeoutMs;
-    unsigned int m_msgBodyReadTimeoutMs;
+    std::chrono::milliseconds m_sendTimeout;
+    std::chrono::milliseconds m_responseReadTimeout;
+    std::chrono::milliseconds m_msgBodyReadTimeout;
     AuthType m_authType;
     HttpHeaders m_additionalHeaders;
     int m_awaitedMessageNumber;

@@ -72,6 +72,7 @@
 
 #include <ui/workbench/workbench.h>
 #include <ui/workbench/workbench_controller.h>
+#include <ui/workbench/workbench_navigator.h>
 #include <ui/workbench/workbench_grid_mapper.h>
 #include <ui/workbench/workbench_layout.h>
 #include <ui/workbench/workbench_display.h>
@@ -339,13 +340,18 @@ MainWindow::MainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::WindowF
     m_globalLayout = new QVBoxLayout();
     m_globalLayout->setContentsMargins(0, 0, 0, 0);
     m_globalLayout->setSpacing(0);
+
     m_globalLayout->addWidget(m_titleBar);
     m_globalLayout->addLayout(m_viewLayout);
     m_globalLayout->setStretchFactor(m_viewLayout, 0x1000);
 
     setLayout(m_globalLayout);
 
-    m_currentPageHolder->addWidget(new QWidget());
+    if (qnRuntime->isDesktopMode())
+    {
+        m_currentPageHolder->addWidget(new QWidget());
+    }
+
     m_currentPageHolder->addWidget(m_view.data());
 
     if (qnRuntime->isDesktopMode())
@@ -366,13 +372,17 @@ MainWindow::MainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::WindowF
     if (nx::utils::AppInfo::isMacOsX())
         menu()->newMenu(action::MainScope);
 
-    /* VSync workaround must always be enabled to limit fps usage in following cases:
-     * * VSync is not supported by drivers
-     * * VSync is disabled in drivers
-     * * double buffering is disabled in drivers or in our program
-     */
-    QnVSyncWorkaround *vsyncWorkaround = new QnVSyncWorkaround(m_view->viewport(), this);
-    Q_UNUSED(vsyncWorkaround);
+    if (!qnRuntime->isActiveXMode())
+    {
+        /* VSync workaround must always be enabled to limit fps usage in following cases:
+         * * VSync is not supported by drivers
+         * * VSync is disabled in drivers
+         * * double buffering is disabled in drivers or in our program
+         * Workaround must be disabled in activeX mode.
+         */
+         QnVSyncWorkaround *vsyncWorkaround = new QnVSyncWorkaround(m_view->viewport(), this);
+         Q_UNUSED(vsyncWorkaround);
+    }
 
     updateWidgetsVisibility();
 }
@@ -407,46 +417,56 @@ void MainWindow::updateWidgetsVisibility()
 {
     const auto updateWelcomeScreenVisibility =
         [this](bool welcomeScreenIsVisible)
-    {
-        enum { kWorkaroundPage, kSceneIndex, kWelcomePageIndex };
+        {
+            // In activeX and videowall mode there is only scene widget on a holder
+            if (!qnRuntime->isDesktopMode())
+            {
+                NX_EXPECT(m_currentPageHolder->count() == 1);
+                m_titleBar->setVisible(false);
+                return;
+            }
 
-        // Due to flickering when switching between two opengl contexts
-        // we have to use intermediate non-opengl page switch.
-        m_currentPageHolder->setCurrentIndex(kWorkaroundPage);
+            enum { kWorkaroundPage, kSceneIndex, kWelcomePageIndex };
 
-        if (welcomeScreenIsVisible)
-            m_titleBar->setVisible(isTitleVisible());
-        m_currentPageHolder->repaint();
-        if (!welcomeScreenIsVisible)
-            m_titleBar->setVisible(isTitleVisible());
+            NX_EXPECT(m_currentPageHolder->count() == 3);
 
-        m_currentPageHolder->setCurrentIndex(welcomeScreenIsVisible
-            ? kWelcomePageIndex : kSceneIndex);
+            // Due to flickering when switching between two opengl contexts
+            // we have to use intermediate non-opengl page switch.
+            m_currentPageHolder->setCurrentIndex(kWorkaroundPage);
 
-        /* Fix scene activation state (Qt bug workaround) */
-        if (welcomeScreenIsVisible)
-            return;
+            if (welcomeScreenIsVisible)
+                m_titleBar->setVisible(isTitleVisible());
+            m_currentPageHolder->repaint();
+            if (!welcomeScreenIsVisible)
+                m_titleBar->setVisible(isTitleVisible());
 
-        if (!display() || !display()->scene())
-            return;
+            m_currentPageHolder->setCurrentIndex(welcomeScreenIsVisible
+                ? kWelcomePageIndex : kSceneIndex);
 
-        if (display()->scene()->isActive())
-            return;
+            /* Fix scene activation state (Qt bug workaround) */
+            if (welcomeScreenIsVisible)
+                return;
 
-        /*
-         * Fixes VMS-2413. The bug is following:
-         * QGraphicsScene contains activation counter.
-         * On WindowActivate counter is increased, on WindowsDeactivate (focus change, hide, etc) - decreased.
-         * There is scenario when WindowDeactivate is called twice (change focus to 'Reconnecting' dialog,
-         * then display Welcome Screen. In this case counter goes below zero, and the scene goes crazy.
-         * That's why I hate constructions like:
-         *   if (!--d->activationRefCount) { ... }
-         * --gdm
-         */
-        QEvent e(QEvent::WindowActivate);
-        QObject* sceneObject = display()->scene();
-        sceneObject->event(&e);
-    };
+            if (!display() || !display()->scene())
+                return;
+
+            if (display()->scene()->isActive())
+                return;
+
+            /*
+             * Fixes VMS-2413. The bug is following:
+             * QGraphicsScene contains activation counter.
+             * On WindowActivate counter is increased, on WindowsDeactivate (focus change, hide, etc) - decreased.
+             * There is scenario when WindowDeactivate is called twice (change focus to 'Reconnecting' dialog,
+             * then display Welcome Screen. In this case counter goes below zero, and the scene goes crazy.
+             * That's why I hate constructions like:
+             *   if (!--d->activationRefCount) { ... }
+             * --gdm
+             */
+            QEvent e(QEvent::WindowActivate);
+            QObject* sceneObject = display()->scene();
+            sceneObject->event(&e);
+        };
 
     // Always show title bar for welcome screen (it does not matter if it is fullscreen)
 
@@ -618,7 +638,56 @@ void MainWindow::updateDecorationsState() {
     m_currentPageHolder->updateGeometry();
 }
 
-void MainWindow::updateDwmState() {
+bool MainWindow::handleKeyPress(int key)
+{
+    // Qt shortcuts handling works incorrect. If we have a shortcut set for an action, it will
+    // block key event passing in any case (even if we did not handle the event).
+    if (key == Qt::Key_Alt || key == Qt::Key_Control)
+        return false;
+
+    const bool isTourRunning = action(action::ToggleLayoutTourModeAction)->isChecked();
+
+    if (!isTourRunning)
+    {
+        if (key == Qt::Key_Space)
+        {
+            menu()->triggerIfPossible(action::PlayPauseAction,
+                navigator()->currentParameters(action::TimelineScope));
+            return true;
+        }
+
+        // Only running tours are handled further.
+        return false;
+    }
+
+    switch (key)
+    {
+        case Qt::Key_Backspace:
+        case Qt::Key_Left:
+        case Qt::Key_PageUp:
+        {
+            menu()->trigger(action::LayoutTourPrevStepAction);
+            break;
+        }
+        case Qt::Key_Enter:
+        case Qt::Key_Return:
+        case Qt::Key_Space:
+        case Qt::Key_Right:
+        case Qt::Key_PageDown:
+        {
+            menu()->trigger(action::LayoutTourNextStepAction);
+            break;
+        }
+        default:
+            // Stop layout tour if it is running.
+            menu()->trigger(action::ToggleLayoutTourModeAction);
+            break;
+    }
+    return true;
+}
+
+void MainWindow::updateDwmState()
+{
     if (isFullScreen())
     {
         /* Full screen mode. */
@@ -761,19 +830,7 @@ void MainWindow::paintEvent(QPaintEvent* event)
 void MainWindow::keyPressEvent(QKeyEvent* event)
 {
     base_type::keyPressEvent(event);
-
-    if (event->key() == Qt::Key_Alt || event->key() == Qt::Key_Control)
-        return;
-
-    if (action(action::ToggleLayoutTourModeAction)->isChecked())
-    {
-        if (event->key() == Qt::Key_Left)
-            menu()->trigger(action::LayoutTourPrevStepAction);
-        else if (event->key() == Qt::Key_Right)
-            menu()->trigger(action::LayoutTourNextStepAction);
-        else // Stop layout tour if it is running.
-            menu()->trigger(action::ToggleLayoutTourModeAction);
-    }
+    handleKeyPress(event->key());
 }
 
 void MainWindow::resizeEvent(QResizeEvent *event) {

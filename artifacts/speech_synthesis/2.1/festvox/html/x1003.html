@@ -1,0 +1,829 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>Telling the time</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REL="HOME"
+TITLE="Building Synthetic Voices"
+HREF="book1.html"><LINK
+REL="UP"
+TITLE="Limited domain synthesis"
+HREF="c941.html"><LINK
+REL="PREVIOUS"
+TITLE="using limited domain synthesizers"
+HREF="x997.html"><LINK
+REL="NEXT"
+TITLE="Making it better"
+HREF="x1170.html"></HEAD
+><BODY
+CLASS="SECT1"
+BGCOLOR="#FFFFFF"
+TEXT="#000000"
+LINK="#0000FF"
+VLINK="#840084"
+ALINK="#0000FF"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="3"
+ALIGN="center"
+>Building Synthetic Voices</TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="bottom"
+><A
+HREF="x997.html"
+ACCESSKEY="P"
+>&#60;&#60;&#60; Previous</A
+></TD
+><TD
+WIDTH="80%"
+ALIGN="center"
+VALIGN="bottom"
+>Limited domain synthesis</TD
+><TD
+WIDTH="10%"
+ALIGN="right"
+VALIGN="bottom"
+><A
+HREF="x1170.html"
+ACCESSKEY="N"
+>Next &#62;&#62;&#62;</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="SECT1"
+><H1
+CLASS="SECT1"
+><A
+NAME="AEN1003"
+>Telling the time</A
+></H1
+><P
+>&#13;Festival includes a very simple little script that speaks the current 
+time (@file{festival/examples/saytime}). This section explains how to 
+replace the synthesizer used from this script with one that talks with 
+your own voice. This is an extreme example of a limited domain 
+synthesizer but it is a good example as it allows us to give 
+a walkthrough of the stages involved in building a limited domain 
+synthesizer. This example is also small enough that it can 
+be done in well under an hour. </P
+><P
+>Following through this example will give a reasonable understanding 
+of the relative importance of many important steps in the voice 
+building process. </P
+><P
+>The following tasks are required: 
+<P
+></P
+><UL
+><LI
+STYLE="list-style-type: disc"
+><P
+>Designing the prompts</P
+></LI
+><LI
+STYLE="list-style-type: disc"
+><P
+>Customized the synthesizer front end</P
+></LI
+><LI
+STYLE="list-style-type: disc"
+><P
+>Recording the prompts</P
+></LI
+><LI
+STYLE="list-style-type: disc"
+><P
+>Autolabeling the prompts</P
+></LI
+><LI
+STYLE="list-style-type: disc"
+><P
+>Building utterance structures for recorded utterances</P
+></LI
+><LI
+STYLE="list-style-type: disc"
+><P
+>Extracting pitchmark and building LPC coefficients</P
+></LI
+><LI
+STYLE="list-style-type: disc"
+><P
+>Building a clunit based synthesizer from the utterances</P
+></LI
+><LI
+STYLE="list-style-type: disc"
+><P
+>Testing and tuning</P
+></LI
+></UL
+></P
+><P
+>Before starting set the environment variables <TT
+CLASS="FILENAME"
+>FESTVOXDIR</TT
+> and 
+<TT
+CLASS="FILENAME"
+>ESTDIR</TT
+> to the directories which contain the festvox distribution 
+and the Edinburgh Speech Tools respectively. Under bash and other good 
+shells this may be done by commands like 
+<A
+NAME="AEN1030"
+></A
+><BLOCKQUOTE
+CLASS="BLOCKQUOTE"
+><P
+CLASS="LITERALLAYOUT"
+>export&nbsp;FESTVOXDIR=/home/awb/projects/festvox<br>
+export&nbsp;ESTDIR=/home/awb/projects/1.4.3/speech_tools</P
+></BLOCKQUOTE
+>
+In earlier releases we only offered a command line based method for 
+building voices and limited domain synthesizers. In order to make the 
+process easier and less prone to error we have introduced and graphical 
+front end to these scripts. This front end is called 
+<CODE
+CLASS="VARNAME"
+>pointyclicky</CODE
+> (as it offers a pointy-clicky interface). It is 
+particularly useful in the actual prompting and recording. Although 
+<CODE
+CLASS="VARNAME"
+>pointyclicky</CODE
+> is the recommend route in the section we go through the 
+process step by step to give a better understanding of what is required 
+and where problems may lie that require attention. </P
+><P
+>A simple script is provided setting up the basic directory structure 
+and copying in some default parameter files. The festvox distribution 
+includes all the setup for the time domain. When building 
+for your domain, you will need to provide the file <TT
+CLASS="FILENAME"
+>etc/DOMAIN.data</TT
+> 
+contains your prompts (as described below). 
+<A
+NAME="AEN1036"
+></A
+><BLOCKQUOTE
+CLASS="BLOCKQUOTE"
+><P
+CLASS="LITERALLAYOUT"
+>mkdir&nbsp;~/data/time<br>
+cd&nbsp;~/data/time<br>
+$FESTVOXDIR/src/ldom/setup_ldom&nbsp;cmu&nbsp;time&nbsp;awb</P
+></BLOCKQUOTE
+>
+As in the definition of diphone databases we require three identifiers 
+for the voice. These are (loosely) institution, domain and speaker. 
+Use <TT
+CLASS="FILENAME"
+>net</TT
+> if you feel there isn't an appropriate institution for 
+you, though we have also use the project name that the voice is being 
+build for here. The domain name seems well defined. For speaker name 
+we have also used style as opposed to speaker name. The primary reason 
+for these to so that people do not all build limited domain synthesizer 
+with the same thus making it not possible to load them into the same 
+instance of festival. </P
+><P
+>This setup script makes the directories and copies basic scheme 
+files into the <TT
+CLASS="FILENAME"
+>festvox/</TT
+> directory. You may need to 
+edit these files later. </P
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="AEN1041"
+>Designing the prompts</A
+></H2
+><P
+>In this <CODE
+CLASS="VARNAME"
+>saytime</CODE
+> example the basic format of the utterance is 
+<A
+NAME="AEN1045"
+></A
+><BLOCKQUOTE
+CLASS="BLOCKQUOTE"
+><P
+CLASS="LITERALLAYOUT"
+>The&nbsp;time&nbsp;is&nbsp;now,&nbsp;EXACTNESS&nbsp;MINUTE&nbsp;INFO,&nbsp;in&nbsp;the&nbsp;DAYPART.</P
+></BLOCKQUOTE
+>
+For example 
+<A
+NAME="AEN1047"
+></A
+><BLOCKQUOTE
+CLASS="BLOCKQUOTE"
+><P
+CLASS="LITERALLAYOUT"
+>The&nbsp;time&nbsp;is&nbsp;now,&nbsp;a&nbsp;little&nbsp;after&nbsp;five&nbsp;to&nbsp;ten,&nbsp;in&nbsp;the&nbsp;morning.</P
+></BLOCKQUOTE
+>
+In all there are 1152 (4x12x12x2) utterances (although there are 
+three possible day info parts (morning, afternoon and evening) they 
+only get 12 hours, 6 hours and 6 hours respectively). Although it 
+would technically be possible to record all of these we wish to reduce 
+the amount of recording to a minimum. Thus what we actually do is 
+ensure there is at least one example of each value in each slot. </P
+><P
+>Here is a list of 24 utterances that should cover the main 
+variations. 
+<A
+NAME="AEN1050"
+></A
+><BLOCKQUOTE
+CLASS="BLOCKQUOTE"
+><P
+CLASS="LITERALLAYOUT"
+>The&nbsp;time&nbsp;is&nbsp;now,&nbsp;exactly&nbsp;five&nbsp;past&nbsp;one,&nbsp;in&nbsp;the&nbsp;morning<br>
+The&nbsp;time&nbsp;is&nbsp;now,&nbsp;just&nbsp;after&nbsp;ten&nbsp;past&nbsp;two,&nbsp;in&nbsp;the&nbsp;morning<br>
+The&nbsp;time&nbsp;is&nbsp;now,&nbsp;a&nbsp;little&nbsp;after&nbsp;quarter&nbsp;past&nbsp;three,&nbsp;in&nbsp;the&nbsp;morning<br>
+The&nbsp;time&nbsp;is&nbsp;now,&nbsp;almost&nbsp;twenty&nbsp;past&nbsp;four,&nbsp;in&nbsp;the&nbsp;morning<br>
+The&nbsp;time&nbsp;is&nbsp;now,&nbsp;exactly&nbsp;twenty-five&nbsp;past&nbsp;five,&nbsp;in&nbsp;the&nbsp;morning<br>
+The&nbsp;time&nbsp;is&nbsp;now,&nbsp;just&nbsp;after&nbsp;half&nbsp;past&nbsp;six,&nbsp;in&nbsp;the&nbsp;morning<br>
+The&nbsp;time&nbsp;is&nbsp;now,&nbsp;a&nbsp;little&nbsp;after&nbsp;twenty-five&nbsp;to&nbsp;seven,&nbsp;in&nbsp;the&nbsp;morning<br>
+The&nbsp;time&nbsp;is&nbsp;now,&nbsp;almost&nbsp;twenty&nbsp;to&nbsp;eight,&nbsp;in&nbsp;the&nbsp;morning<br>
+The&nbsp;time&nbsp;is&nbsp;now,&nbsp;exactly&nbsp;quarter&nbsp;to&nbsp;nine,&nbsp;in&nbsp;the&nbsp;morning<br>
+The&nbsp;time&nbsp;is&nbsp;now,&nbsp;just&nbsp;after&nbsp;ten&nbsp;to&nbsp;ten,&nbsp;in&nbsp;the&nbsp;morning<br>
+The&nbsp;time&nbsp;is&nbsp;now,&nbsp;a&nbsp;little&nbsp;after&nbsp;five&nbsp;to&nbsp;eleven,&nbsp;in&nbsp;the&nbsp;morning<br>
+The&nbsp;time&nbsp;is&nbsp;now,&nbsp;almost&nbsp;twelve.<br>
+The&nbsp;time&nbsp;is&nbsp;now,&nbsp;just&nbsp;after&nbsp;five&nbsp;to&nbsp;one,&nbsp;in&nbsp;the&nbsp;afternoon<br>
+The&nbsp;time&nbsp;is&nbsp;now,&nbsp;a&nbsp;little&nbsp;after&nbsp;ten&nbsp;to&nbsp;two,&nbsp;in&nbsp;the&nbsp;afternoon<br>
+The&nbsp;time&nbsp;is&nbsp;now,&nbsp;exactly&nbsp;quarter&nbsp;to&nbsp;three,&nbsp;in&nbsp;the&nbsp;afternoon<br>
+The&nbsp;time&nbsp;is&nbsp;now,&nbsp;almost&nbsp;twenty&nbsp;to&nbsp;four,&nbsp;in&nbsp;the&nbsp;afternoon<br>
+The&nbsp;time&nbsp;is&nbsp;now,&nbsp;just&nbsp;after&nbsp;twenty-five&nbsp;to&nbsp;five,&nbsp;in&nbsp;the&nbsp;afternoon<br>
+The&nbsp;time&nbsp;is&nbsp;now,&nbsp;a&nbsp;little&nbsp;after&nbsp;half&nbsp;past&nbsp;six,&nbsp;in&nbsp;the&nbsp;evening<br>
+The&nbsp;time&nbsp;is&nbsp;now,&nbsp;exactly&nbsp;twenty-five&nbsp;past&nbsp;seven,&nbsp;in&nbsp;the&nbsp;evening<br>
+The&nbsp;time&nbsp;is&nbsp;now,&nbsp;almost&nbsp;twenty&nbsp;past&nbsp;eight,&nbsp;in&nbsp;the&nbsp;evening<br>
+The&nbsp;time&nbsp;is&nbsp;now,&nbsp;just&nbsp;after&nbsp;quarter&nbsp;past&nbsp;nine,&nbsp;in&nbsp;the&nbsp;evening<br>
+The&nbsp;time&nbsp;is&nbsp;now,&nbsp;almost&nbsp;ten&nbsp;past&nbsp;ten,&nbsp;in&nbsp;the&nbsp;evening<br>
+The&nbsp;time&nbsp;is&nbsp;now,&nbsp;exactly&nbsp;five&nbsp;past&nbsp;eleven,&nbsp;in&nbsp;the&nbsp;evening<br>
+The&nbsp;time&nbsp;is&nbsp;now,&nbsp;a&nbsp;little&nbsp;after&nbsp;quarter&nbsp;to&nbsp;midnight.</P
+></BLOCKQUOTE
+>
+These examples are first put in the prompt file with an utterance 
+number and the prompt in double quotes like this. 
+<A
+NAME="AEN1052"
+></A
+><BLOCKQUOTE
+CLASS="BLOCKQUOTE"
+><P
+CLASS="LITERALLAYOUT"
+>(time0001&nbsp;"The&nbsp;time&nbsp;is&nbsp;now&nbsp;...")<br>
+(time0002&nbsp;"The&nbsp;time&nbsp;is&nbsp;now&nbsp;...")<br>
+(time0003&nbsp;"The&nbsp;time&nbsp;is&nbsp;now&nbsp;...")<br>
+...</P
+></BLOCKQUOTE
+>
+These prompt should be put into <TT
+CLASS="FILENAME"
+>etc/DOMAIN.data</TT
+>. This file is 
+used by many of the following sub-processes. </P
+></DIV
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="AEN1055"
+>Recording the prompts</A
+></H2
+><P
+>&#13;The best way to record the prompts is to use a professional speaker in a 
+professional recording studio (anechoic chamber) using dual channel (one 
+for audio and the other for the electroglottograph signal) direct to 
+digital media using a high quality head mounted microphone. </P
+><P
+>However most of us don't have such equipment (or voice talent) so 
+readily available so whatever you do will probably have to be a 
+compromise. The head mounted mike requirement is the cheapest to meet 
+and it is pretty important so you should at least meet that requirement. 
+Anechoic chambers are expensive, and even professional recording studios 
+aren't easy to access (though most Universities will have some such 
+facilities). It is possible to do away with the EGG reading if 
+a little care is taken to ensure pitchmarks are properly extracted 
+from the waveform signal alone. </P
+><P
+>We have been successful in recording with a standard PC using a standard 
+soundblaster type 16bit audio card though results do vary from machine 
+to machine. Before attempting this you should record a few examples on 
+the PC to see how much noise is being picked up by the mike. For example 
+try the following 
+<A
+NAME="AEN1062"
+></A
+><BLOCKQUOTE
+CLASS="BLOCKQUOTE"
+><P
+CLASS="LITERALLAYOUT"
+>$ESTDIR/bin/na_record&nbsp;-f&nbsp;16000&nbsp;-time&nbsp;5&nbsp;-o&nbsp;test.wav&nbsp;-otype&nbsp;riff</P
+></BLOCKQUOTE
+>
+
+
+
+This will record 5 seconds from the microphone in the machine you run 
+the command on. You should also do this to test that the microphone 
+is plugged in (and switched on). Play back the recorded wave with 
+<TT
+CLASS="FILENAME"
+>na_play</TT
+> and perhaps play with the mixer levels until you get 
+the least background noise with the strongest spoken signal. Now 
+you should display the waveform to see (as well as hear) how much 
+noise is there. 
+<A
+NAME="AEN1071"
+></A
+><BLOCKQUOTE
+CLASS="BLOCKQUOTE"
+><P
+CLASS="LITERALLAYOUT"
+>$FESTVOXDIR/src/general/display_sg&nbsp;test.wav</P
+></BLOCKQUOTE
+>
+This will display the waveform and its spectrogram. Noise will show up 
+in the silence (and other) parts. </P
+><P
+>&#13;There a few ways to reduce noise. Ensure the microphone cable isn't 
+wrapped around other cables (especially power cables). Turning the 
+computer 90 degrees may help and repositioning things can help too. 
+Moving the sound board to some other slot in the machine can also help 
+as well as getting a different microphone (even the same make). </P
+><P
+>There is a large advantage in recording straight to disk as it allows 
+the recording to go directly into right files. Doing off-line recording 
+(onto DAT) is better in reducing noise but transferring it to disk and 
+segmenting it is a long and tedious process. </P
+><P
+>Once you have checked your recording environment you can proceed with 
+the build process. </P
+><P
+>First generate the prompts with the command 
+<A
+NAME="AEN1079"
+></A
+><BLOCKQUOTE
+CLASS="BLOCKQUOTE"
+><P
+CLASS="LITERALLAYOUT"
+>festival&nbsp;-b&nbsp;festvox/build_ldom.scm&nbsp;'(build_prompts&nbsp;"etc/time.data")'</P
+></BLOCKQUOTE
+>
+and prompt and record them with the command 
+<A
+NAME="AEN1081"
+></A
+><BLOCKQUOTE
+CLASS="BLOCKQUOTE"
+><P
+CLASS="LITERALLAYOUT"
+>bin/prompt_them&nbsp;etc/time.data</P
+></BLOCKQUOTE
+>
+You may or may not find listening to the prompts before speaking 
+useful. Simply displaying them may be adequate for you (if so 
+comment out the <TT
+CLASS="FILENAME"
+>na_play</TT
+> line in <TT
+CLASS="FILENAME"
+>bin/prompt_them}</TT
+>. </P
+></DIV
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="AEN1085"
+>Autolabeling the prompts</A
+></H2
+><P
+>The recorded prompt can be labeled by aligning them against 
+the synthesize prompts. This is done by the command 
+<A
+NAME="AEN1088"
+></A
+><BLOCKQUOTE
+CLASS="BLOCKQUOTE"
+><P
+CLASS="LITERALLAYOUT"
+>bin/make_labs&nbsp;prompt-wav/*.wav</P
+></BLOCKQUOTE
+>
+If the utterances are long (&#62; 10 seconds of speech) you may require lots 
+of swap space to do this stage (this could be fixed). </P
+><P
+>&#13;
+Once labeled you should check that they are labeled 
+reasonable. The labeler typically gets it pretty much correct, 
+or very wrong, so a quick check can often save time later. You 
+can check the database using the command 
+<A
+NAME="AEN1095"
+></A
+><BLOCKQUOTE
+CLASS="BLOCKQUOTE"
+><P
+CLASS="LITERALLAYOUT"
+>emulabel&nbsp;etc/emu_lab</P
+></BLOCKQUOTE
+>
+Once you are happy with the labeling you can construct the 
+whole utterance structure for the spoken utterances. This is done 
+by combining the basic structure from the synthesized prompts and 
+the actual times from the automatically labeled ones. This 
+can be done with the command 
+<A
+NAME="AEN1097"
+></A
+><BLOCKQUOTE
+CLASS="BLOCKQUOTE"
+><P
+CLASS="LITERALLAYOUT"
+>festival&nbsp;-b&nbsp;festvox/build_ldom.scm&nbsp;'(build_utts&nbsp;"etc/time.data")'</P
+></BLOCKQUOTE
+></P
+></DIV
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="AEN1099"
+>Extracting pitchmarks and building LPC coefficients</A
+></H2
+><P
+>&#13;Getting good pitchmarks is important to the quality of the synthesis,
+see <A
+HREF="x862.html"
+>the Section called <I
+>Extracting pitchmarks from waveforms</I
+> in the Chapter called <I
+>Basic Requirements</I
+></A
+> for more detailed discussion
+on extrating pitchmarks from waveforms. For the limited domain
+synthesizers the pitch extract is a little less crucial that for
+diphone collection.  Though spending a little time on this does help.</P
+><P
+>If you have recorded EGG signals the you can use <TT
+CLASS="FILENAME"
+>bin/make_pm</TT
+> 
+from the <TT
+CLASS="FILENAME"
+>.lar</TT
+> files. Note that you may need to add (or remove) 
+the option <TT
+CLASS="FILENAME"
+>-inv</TT
+> depending on the updownness of your EGG signal. 
+However so far only the CSTR larygnograph seems to produce inverted 
+signals so the default should be adequate. Also note the 
+parameters that specify the pitch period range, <TT
+CLASS="FILENAME"
+>-min</TT
+> and <TT
+CLASS="FILENAME"
+>max</TT
+> 
+the default setting are suitable for a male speaker, for a female you 
+should modify these to something like 
+<A
+NAME="AEN1111"
+></A
+><BLOCKQUOTE
+CLASS="BLOCKQUOTE"
+><P
+CLASS="LITERALLAYOUT"
+>-min&nbsp;0.0033&nbsp;-max&nbsp;0.0875&nbsp;-def&nbsp;0.005</P
+></BLOCKQUOTE
+>
+The changing from a range of (male) 200Hz-80Hz with a default of 
+100Hz, to a female range of 300Hz-120Hz and default of 200Hz. </P
+><P
+>&#13;If you don't have an EGG signal you must extract the pitch from the 
+waveform itself. This works though may require a little modification of 
+parameters, and it is computationally more expensive (and wont be as 
+exact as from an EGG signal). There are two methods, one 
+using Entropic's <TT
+CLASS="FILENAME"
+>epoch</TT
+> program which work pretty well 
+without tuning parameters. The second is to use the free Speech 
+Tools program <TT
+CLASS="FILENAME"
+>pitchmark</TT
+>. The first is very computationally 
+expensive, and as Entropic is no longer in existence, the program 
+is no longer available (though rumours circulate that it may 
+appear again for free). To use <TT
+CLASS="FILENAME"
+>epoch</TT
+> use the program 
+<A
+NAME="AEN1119"
+></A
+><BLOCKQUOTE
+CLASS="BLOCKQUOTE"
+><P
+CLASS="LITERALLAYOUT"
+>bin/make_pm_epoch&nbsp;wav/*.wav</P
+></BLOCKQUOTE
+>
+To use <TT
+CLASS="FILENAME"
+>pitchmark</TT
+> use the command 
+<A
+NAME="AEN1122"
+></A
+><BLOCKQUOTE
+CLASS="BLOCKQUOTE"
+><P
+CLASS="LITERALLAYOUT"
+>bin/make_pm_wave&nbsp;wav/*.wav</P
+></BLOCKQUOTE
+>
+As with the EGG extraction <TT
+CLASS="FILENAME"
+>pitchmark</TT
+> uses parameters to specify 
+the range of the pitch periods, you should modify the parameters to best 
+match your speakers range. The other filter parameters also 
+can make a different to the success. Rather than try to explain 
+what changing the figures mean (I admit I don't fully know), the 
+best solution is to explain what you need to obtain as a result. </P
+><P
+>Irrespective of how you extract the pitchmarks we have found that 
+a post-processing stage that moves the pitchmarks to the nearest 
+peak is worthwhile. You can achieve this by 
+<A
+NAME="AEN1126"
+></A
+><BLOCKQUOTE
+CLASS="BLOCKQUOTE"
+><P
+CLASS="LITERALLAYOUT"
+>bin/make_pm_fix&nbsp;pm/*.pm</P
+></BLOCKQUOTE
+></P
+><P
+>&#13;
+
+At this point you may find that your waveform file is upside down. 
+Normally this wouldn't matter but due to the basic signal processing 
+techniques we used to find the pitch periods upside down signals confuse 
+things. People tell me that it shouldn't happen but some recording 
+devices return an inverted signal. From the cases we've seen the same 
+device always returns the same form so if one of your recordings is 
+upside down all of them probably are (though there are some published 
+speech databases e.g. BU Radio data, where a random half are upside 
+down). </P
+><P
+>In general the higher peaks should be positive rather than negative. 
+If not you can invert the signals with the command 
+<A
+NAME="AEN1136"
+></A
+><BLOCKQUOTE
+CLASS="BLOCKQUOTE"
+><P
+CLASS="LITERALLAYOUT"
+>for&nbsp;i&nbsp;in&nbsp;wav/*.wav<br>
+do<br>
+&nbsp;&nbsp;&nbsp;ch_wave&nbsp;-scale&nbsp;-1.0&nbsp;$i&nbsp;-o&nbsp;$i<br>
+done</P
+></BLOCKQUOTE
+>
+If they are upside, invert them and re-run the pitch marking. (If 
+you do invert them it is not necessary to re-run the segment labeling.) </P
+><P
+>Power normalization can help too. This can be done globally by the 
+function 
+<A
+NAME="AEN1139"
+></A
+><BLOCKQUOTE
+CLASS="BLOCKQUOTE"
+><P
+CLASS="LITERALLAYOUT"
+>bin/simple_powernormalize&nbsp;wav/*.wav</P
+></BLOCKQUOTE
+>
+This should be sufficient for full sentence examples. In the diphone 
+collection we take greater care in power normalization but that vowel 
+based technique will be too confused by the longer more varied examples. </P
+><P
+>&#13;
+Once you have pitchmarks, next you need to generate the pitch 
+synchronous MELCEP parameterization of the speech used in building the 
+cluster synthesizer. 
+<A
+NAME="AEN1146"
+></A
+><BLOCKQUOTE
+CLASS="BLOCKQUOTE"
+><P
+CLASS="LITERALLAYOUT"
+>bin/make_mcep&nbsp;wav/*.wav</P
+></BLOCKQUOTE
+></P
+></DIV
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="AEN1148"
+>Building a clunit based synthesizer from the utterances</A
+></H2
+><P
+>Building a full clunit synthesizer is probably a little bit of over kill 
+but the technique basically works. See 
+<A
+HREF="c2641.html"
+>the Chapter called <I
+>Unit selection databases</I
+></A
+>
+for a more detailed discussion of unit selection technique. The basic 
+parameter file <TT
+CLASS="FILENAME"
+>festvox/time_build.scm</TT
+>, is reasonable as 
+a start. 
+<A
+NAME="AEN1153"
+></A
+><BLOCKQUOTE
+CLASS="BLOCKQUOTE"
+><P
+CLASS="LITERALLAYOUT"
+>festival&nbsp;-b&nbsp;festvox/build_ldom.scm&nbsp;'(build_clunits&nbsp;"etc/time.data")'</P
+></BLOCKQUOTE
+>
+If all goes well this should create a file 
+<TT
+CLASS="FILENAME"
+>festival/clunits/cmu_time_awb.catalogue</TT
+> and set of index trees in 
+<TT
+CLASS="FILENAME"
+>festival/trees/cmu_time_awb_time.tree</TT
+>. </P
+></DIV
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="AEN1157"
+>Testing and tuning</A
+></H2
+><P
+>To test the new voice start Festival as 
+<A
+NAME="AEN1160"
+></A
+><BLOCKQUOTE
+CLASS="BLOCKQUOTE"
+><P
+CLASS="LITERALLAYOUT"
+>festival&nbsp;festvox/cmu_time_awb_ldom.scm&nbsp;'(voice_cmu_time_awb_ldom)'</P
+></BLOCKQUOTE
+>
+The function <TT
+CLASS="FILENAME"
+>(saytime)</TT
+> can now be called and it should 
+say the current time, or <CODE
+CLASS="VARNAME"
+>(saythistime "11:23")</CODE
+>. </P
+><P
+>Note this synthesizer can <I
+CLASS="EMPHASIS"
+>only</I
+> say the phrases that it has phones 
+for which basically means it can only say the time in the format given 
+at the start of this chapter. Thus although you can 
+use <TT
+CLASS="FILENAME"
+>SayText</TT
+> it will only
+synthesis words that are in the domain.
+That's what limited domain synthesis 
+is. </P
+><P
+>A full directory structure of this example with the recordings and
+parameters files is available at <A
+HREF="http://festvox.org/examples/cmu_time_awb_ldom/"
+TARGET="_top"
+>http://festvox.org/examples/cmu_time_awb_ldom/</A
+>. And an on-line
+demo of this voice in that directory is available at
+<A
+HREF="http://festvox.org/ldom/index.html"
+TARGET="_top"
+>http://festvox.org/examples/cmu_time_awb_ldom/</A
+>.</P
+></DIV
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="x997.html"
+ACCESSKEY="P"
+>&#60;&#60;&#60; Previous</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="book1.html"
+ACCESSKEY="H"
+>Home</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="x1170.html"
+ACCESSKEY="N"
+>Next &#62;&#62;&#62;</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>using limited domain synthesizers</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="c941.html"
+ACCESSKEY="U"
+>Up</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>Making it better</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

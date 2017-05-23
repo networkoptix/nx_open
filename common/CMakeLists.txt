@@ -1,5 +1,3 @@
-nx_rdep_add_package(ffmpeg)
-
 nx_configure_file("${CMAKE_CURRENT_SOURCE_DIR}/qt.conf"
     ${CMAKE_CURRENT_BINARY_DIR}/resources/qt/etc/qt.conf)
 
@@ -25,7 +23,6 @@ nx_add_target(common LIBRARY
 )
 
 if(NOT ANDROID AND NOT IOS)
-    nx_rdep_add_package(quazip)
     target_link_libraries(common PUBLIC quazip)
 endif()
 
@@ -35,7 +32,7 @@ target_include_directories(common
         "${CMAKE_SOURCE_DIR}/common_libs/nx_streaming/src"
 )
 
-if(WIN32)
+if(WINDOWS)
     target_link_libraries(common PUBLIC Winmm)
 endif()
 

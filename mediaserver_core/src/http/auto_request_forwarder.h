@@ -2,7 +2,7 @@
 
 #include <core/resource/resource_fwd.h>
 #include <nx/network/http/auth_restriction_list.h>
-#include <nx/network/http/httptypes.h>
+#include <nx/network/http/http_types.h>
 #include <common/common_module_aware.h>
 
 

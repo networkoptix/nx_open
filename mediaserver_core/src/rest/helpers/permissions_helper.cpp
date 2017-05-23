@@ -11,7 +11,7 @@
 
 #include <rest/server/fusion_rest_handler.h>
 
-#include <nx/network/http/httptypes.h>
+#include <nx/network/http/http_types.h>
 #include <nx/utils/log/log.h>
 #include "core/resource_access/user_access_data.h"
 #include <media_server/media_server_module.h>

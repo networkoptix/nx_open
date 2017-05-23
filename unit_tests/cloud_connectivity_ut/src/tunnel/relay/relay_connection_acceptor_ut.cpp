@@ -17,11 +17,81 @@ namespace test {
 
 using namespace nx::cloud::relay;
 
-class CloudRelayReverseConnection:
+class RelayTest:
     public ::testing::Test
 {
+protected:
+    enum class ServerType
+    {
+        happy,
+        unhappy,
+    };
+
+    ServerType m_serverType = ServerType::happy;
+    utils::SyncQueue<std::unique_ptr<AbstractStreamSocket>> m_serverConnections;
+
+    virtual void SetUp() override
+    {
+        using namespace std::placeholders;
+
+        m_testHttpServer.registerRequestProcessorFunc(
+            api::kServerIncomingConnectionsPath,
+            std::bind(&RelayTest::processIncomingConnection, this,
+                _1, _2, _3, _4, _5));
+
+        ASSERT_TRUE(m_testHttpServer.bindAndListen());
+
+        m_relayServerUrl = QUrl(lm("http://%1/").arg(m_testHttpServer.serverAddress()));
+        m_relayServerUrl.setUserName("server1.system1");
+    }
+
+    QUrl relayServerUrl() const
+    {
+        return m_relayServerUrl;
+    }
+
+private:
+    TestHttpServer m_testHttpServer;
+    QUrl m_relayServerUrl;
+
+    void processIncomingConnection(
+        nx_http::HttpServerConnection* const connection,
+        nx::utils::stree::ResourceContainer /*authInfo*/,
+        nx_http::Request /*request*/,
+        nx_http::Response* const /*response*/,
+        nx_http::RequestProcessedHandler completionHandler)
+    {
+        using namespace std::placeholders;
+
+        if (m_serverType != ServerType::happy)
+        {
+            connection->closeConnection(SystemError::connectionReset);
+            return;
+        }
+
+        nx_http::RequestResult requestResult(
+            nx_http::StatusCode::switchingProtocols);
+        requestResult.connectionEvents.onResponseHasBeenSent =
+            std::bind(&RelayTest::saveConnection, this, _1);
+        completionHandler(std::move(requestResult));
+    }
+
+    void saveConnection(nx_http::HttpServerConnection* const connection)
+    {
+        auto socket = connection->takeSocket();
+        NX_ASSERT(socket->isInSelfAioThread());
+        socket->cancelIOSync(aio::etNone);
+        m_serverConnections.push(std::move(socket));
+    }
+};
+
+class RelayReverseConnection:
+    public RelayTest
+{
+    using base_type = RelayTest;
+
 public:
-    CloudRelayReverseConnection()
+    RelayReverseConnection()
     {
         m_clientEndpoint.address = HostAddress::localhost;
         m_clientEndpoint.port = nx::utils::random::number<int>(10000, 60000);
@@ -59,7 +129,7 @@ protected:
         using namespace std::placeholders;
 
         m_connection->waitForOriginatorToStartUsingConnection(
-            std::bind(&CloudRelayReverseConnection::onConnectionActivated, this, _1));
+            std::bind(&RelayReverseConnection::onConnectionActivated, this, _1));
     }
 
     void whenRelayActivatesConnection()
@@ -97,7 +167,7 @@ protected:
         using namespace std::placeholders;
 
         m_connection->connectToOriginator(
-            std::bind(&CloudRelayReverseConnection::onConnectionToOriginatorCompletion, this, _1));
+            std::bind(&RelayReverseConnection::onConnectionToOriginatorCompletion, this, _1));
     }
 
     void thenConnectionHasBeenEstablished()
@@ -130,64 +200,24 @@ protected:
     }
 
 private:
-    enum class ServerType
-    {
-        happy,
-        unhappy,
-    };
-
-    TestHttpServer m_testHttpServer;
-    ServerType m_serverType = ServerType::happy;
-    std::unique_ptr<detail::ReverseConnection> m_connection;
     utils::SyncQueue<SystemError::ErrorCode> m_connectResult;
     utils::SyncQueue<SystemError::ErrorCode> m_activateConnectionResult;
-    utils::SyncQueue<std::unique_ptr<AbstractStreamSocket>> m_serverConnections;
     std::unique_ptr<AbstractStreamSocket> m_serverConnection;
     SocketAddress m_clientEndpoint;
     nx::Buffer m_openTunnelNotificationBuffer;
     nx::cloud::relay::api::BeginListeningResponse m_expectedSettings;
+    std::unique_ptr<detail::ReverseConnection> m_connection;
 
     virtual void SetUp() override
     {
-        using namespace std::placeholders;
+        base_type::SetUp();
 
-        m_testHttpServer.registerRequestProcessorFunc(
-            api::kServerIncomingConnectionsPath,
-            std::bind(&CloudRelayReverseConnection::processIncomingConnection, this,
-                _1, _2, _3, _4, _5));
-
-        ASSERT_TRUE(m_testHttpServer.bindAndListen());
-
-        QUrl relayServerUrl(lm("http://%1/").arg(m_testHttpServer.serverAddress()));
-        relayServerUrl.setUserName("server1.system1");
-        m_connection = std::make_unique<detail::ReverseConnection>(relayServerUrl);
+        m_connection = std::make_unique<detail::ReverseConnection>(relayServerUrl());
     }
 
     virtual void TearDown() override
     {
         m_connection->pleaseStopSync();
-    }
-
-    void processIncomingConnection(
-        nx_http::HttpServerConnection* const connection,
-        nx::utils::stree::ResourceContainer /*authInfo*/,
-        nx_http::Request /*request*/,
-        nx_http::Response* const /*response*/,
-        nx_http::RequestProcessedHandler completionHandler)
-    {
-        using namespace std::placeholders;
-
-        if (m_serverType != ServerType::happy)
-        {
-            connection->closeConnection(SystemError::connectionReset);
-            return;
-        }
-
-        nx_http::RequestResult requestResult(
-            nx_http::StatusCode::switchingProtocols);
-        requestResult.connectionEvents.onResponseHasBeenSent =
-            std::bind(&CloudRelayReverseConnection::saveConnection, this, _1);
-        completionHandler(std::move(requestResult));
     }
 
     void onConnectionToOriginatorCompletion(SystemError::ErrorCode sysErrorCode)
@@ -199,28 +229,23 @@ private:
     {
         m_activateConnectionResult.push(sysErrorCode);
     }
-
-    void saveConnection(nx_http::HttpServerConnection* const connection)
-    {
-        m_serverConnections.push(connection->takeSocket());
-    }
 };
 
-TEST_F(CloudRelayReverseConnection, connects_to_the_relay_server)
+TEST_F(RelayReverseConnection, connects_to_the_relay_server)
 {
     givenHappyRelayServer();
     whenConnectingToTheRelayServer();
     thenConnectionHasBeenEstablished();
 }
 
-TEST_F(CloudRelayReverseConnection, reports_error_on_failure_to_connect)
+TEST_F(RelayReverseConnection, reports_error_on_failure_to_connect)
 {
     givenUnhappyRelayServer();
     whenConnectingToTheRelayServer();
     thenConnectionCouldNotBeenEstablished();
 }
 
-TEST_F(CloudRelayReverseConnection, connection_is_activated)
+TEST_F(RelayReverseConnection, connection_is_activated)
 {
     givenEstablishedConnection();
 
@@ -230,23 +255,76 @@ TEST_F(CloudRelayReverseConnection, connection_is_activated)
     thenConnectionProvidesStreamSocket();
 }
 
-TEST_F(CloudRelayReverseConnection, reports_error_on_subsequent_connection_to_relay_failure)
+TEST_F(RelayReverseConnection, reports_error_on_subsequent_connection_to_relay_failure)
 {
     givenEstablishedConnection();
     whenRelayClosesConnection();
     thenConnectionActivationErrorIsReported();
 }
 
-TEST_F(CloudRelayReverseConnection, provides_client_peer_name_on_success)
+TEST_F(RelayReverseConnection, provides_client_peer_name_on_success)
 {
     givenActivatedConnection();
     thenSocketForeignEndpointMatchesClientOne();
 }
 
-TEST_F(CloudRelayReverseConnection, provides_relay_settings_on_success)
+TEST_F(RelayReverseConnection, provides_relay_settings_on_success)
 {
     givenActivatedConnection();
     thenRelaySettingsAreAvailable();
+}
+
+//-------------------------------------------------------------------------------------------------
+
+class RelayConnectionAcceptor:
+    public RelayTest
+{
+    using base_type = RelayTest;
+
+public:
+    ~RelayConnectionAcceptor()
+    {
+        if (m_acceptor)
+            m_acceptor->pleaseStopSync();
+    }
+
+protected:
+    virtual void SetUp() override
+    {
+        base_type::SetUp();
+
+        m_acceptor =
+            std::make_unique<nx::network::cloud::relay::ConnectionAcceptor>(
+                relayServerUrl());
+    }
+
+    void whenStartedAccepting()
+    {
+        using namespace std::placeholders;
+
+        m_acceptor->acceptAsync(
+            std::bind(&RelayConnectionAcceptor::onAccepted, this, _1, _2));
+    }
+
+    void thenAcceptorIsRegisteredOnRelay()
+    {
+        m_serverConnections.pop();
+    }
+
+private:
+    std::unique_ptr<nx::network::cloud::relay::ConnectionAcceptor> m_acceptor;
+
+    void onAccepted(
+        SystemError::ErrorCode /*sysErrorCode*/,
+        std::unique_ptr<AbstractStreamSocket> /*streamSocket*/)
+    {
+    }
+};
+
+TEST_F(RelayConnectionAcceptor, registers_on_relay)
+{
+    whenStartedAccepting();
+    thenAcceptorIsRegisteredOnRelay();
 }
 
 } // namespace test

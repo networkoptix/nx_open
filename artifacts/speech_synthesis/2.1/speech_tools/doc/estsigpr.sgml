@@ -1,0 +1,366 @@
+
+<chapter>
+    <title>Signal Processing</title>
+    <para>
+
+    The &est signal processing library provides a set of standard
+    signal processing tools designed specifically for speech
+    analysis. The library includes:
+    
+    <itemizedlist>
+      <listitem><para>Windowing (creating frames from a continuous waveform)</para></listitem>
+      <listitem><para>Linear prediction and associated operations</para></listitem>
+      <listitem><para>Cepstral analysis, both via lpc and DFT.</para></listitem>
+      <listitem><para>Filterbank analysis</para></listitem>
+      <listitem><para>Frequency warping including mel-scaling</para></listitem>
+      <listitem><para>Pitch tracking</para></listitem>
+      <listitem><para>Energy and Power analysis</para></listitem>
+      <listitem><para>Spectrogram Generation</para></listitem>
+      <listitem><para>Fourier Transforms</para></listitem>
+      <listitem><para>Pitchmarking (of laryngograph signals)</para></listitem>
+    </itemizedlist>
+
+    </para>
+      <sect1>
+	<title>Overview</title>
+
+      <sect2><title>Design Issues</title>
+      <para>
+	The signal processing library is designed specifically for speech
+	applications and hence all functions are written with that end
+	goal in mind.  The design of the library has centered around
+	building a set of commonly used easy to configure analysis
+	routines.
+      </para>
+
+      <para>
+	<variablelist>
+	  <varlistentry><term>Speed</term><listitem>
+	  <para>We have tried to make the functions as fast as
+		possible. Signal processing can often be time critical, and
+		so it will always be the case that if the code for a
+		particular signal processing algroithm is written in a
+		single function loop it will run faster than by using
+		libraries.
+	    </para> <para>
+	    However, the signal processing routines in the EST library
+	    are in general very fast, and the fact that they use
+	    classes such as EST_Track and EST_FVector does not make
+	    them slower than they would be if float * etc was used.
+	  </para></listitem> </varlistentry>
+      <varlistentry><term>types</term><listitem>
+	  <para>The library makes heavy use of a small number of
+	    classes, specifically <link linkend="EST-Wave">
+	      EST_Wave</link> <link linkend="EST-Track">
+	      EST_Track</link> and <link linkend="EST-FVector">
+	      EST_FVector</link>. These classes are basically arrays
+	    and matrices, but take care of issues such as memory
+	    managment, error handling and file i/o. Using these
+	    classes in the library helps facilitate clean and simple
+	    algorithm writing and use. It is strongly recommended that
+	    you gain familiarity with these classes before using this
+	    part of the library.
+	  </para><para>
+	    At present, the issue of complex numbers in signal
+	    processing is somewhat fudged, in that a vector of complex
+	    numbers is represented by a vector of real parts and a
+	    vector of imaginary parts, rather than as a single vector
+	    of complex numbers. 
+	</listitem>
+      </varlistentry>
+    </variablelist>
+	</sect2>
+
+    <sect2><title>Common Processing model</title>
+      <para>
+	
+	In speech, a large number of algorithms follow the same basic
+	model, in which a waveform is analysed by an algorithm and a
+	Track, containing a series of time aligned vectors is
+	produced. Regardless of the type of signal processing, the
+	basic model is as follows:
+
+	<procedure>
+	  <step>
+	    <para> Start with a waveform and a series of analysis
+	      positions, which can be a fixed distance apart of
+	      specified by some other means.
+	    </para></step>
+	  <step><para> 
+	      For each analysis position, define a small portion of the
+	      waveform around that position, Multiply this by a
+	      windowing function to produce a vector of speech samples.
+	    </para></step>
+	  <step><para> Pass this to a frame based signal processing 
+	      routine which
+	      in outputs values in another vector.
+	    </para> </step>
+	  <step><para> Add this vector to a position in an EST_Track
+	      which correponds to the analysis time position.
+	    </para></step>
+	</procedure>
+
+	Given this model, the signal processing library breaks down into a
+	number of different types of function:
+
+	<variablelist>
+	  <varlistentry>
+	<term>Utterance based functions	</term>
+	<listitem><para>
+		Functions which operate on an entire waveform or
+		track. These break down into:
+
+		<variablelist>
+		  <varlistentry>
+		    <term>Analysis Functions
+		    </term>
+		    <listitem>
+		      <para>
+			which take a waveform and produce a track
+		      </para>
+		    </listitem>
+		  </varlistentry>
+		  <varlistentry>
+		    <term>Synthesis Functions
+		    </term>
+		    <listitem>
+		      <para>
+			which take a track and produce a waveform
+		      </para>
+		    </listitem>
+		  </varlistentry>
+		  <varlistentry><term>Filter Functions</term>
+		    <listitem>
+		      <para>
+			which take a waveform and produce a waveform
+		      </para>
+		    </listitem>
+		  </varlistentry>
+		  <varlistentry><term>Conversion Functions</term>
+		    <listitem><para>
+			which take a track and produce a track
+		      </para></listitem></varlistentry>
+		</variablelist>
+		<varlistentry>
+		  <term>Frames based functions</term>
+		  <listitem><para>
+		      Functions which operate on a single frame of speech or
+		      vector coefficients.</para></listitem></varlistentry>
+		<varlistentry>
+		  <term>Windowing functions</term>
+		  <listitem><para>
+		      which create a windowed frame of speech from a portion
+		      of a waveform.</para></listitem></varlistentry>
+	</variablelist>
+	</para>
+      <para>
+      Nearly all functions in the signal processing library belong to
+      one of the above listed types. Quite often functions are
+      presented on both the utterance and frame level. For example,
+      there is a function called <function>sig2lpc</function> which
+      takes a single frame of windowed speech and produces a set of
+      linear prediction coefficients. There is also a function called
+      <function><link linkend="sig2coef">sig2coef</link></function> which performs linear prediction
+      on a whole waveforn, returning the answer in a
+      Track. <function><link linkend="sig2coef">sig2coef</link></function> uses the common processing
+      model, and calls <function><link linkend="sig2lpc-1">sig2lpc</link></function> as the algorithm
+      in the loop.
+      </para><para>
+	Partly for historical reasons some functions,
+	e.g. <function><link linkend="pda">pda</link></function> are only available in the
+	utterance based form.
+      </para><para>
+	When writing signal processing code for this library, it is
+	often the case that all that needs to be written is the frame
+	based algorithm, as other algorithms can do the frame shifting
+	and windowing operations.
+	</para></sect2>
+    
+    <sect2><title>Track Allocation, Frames, Channels and
+	sub-tracks</title>
+      <para>
+	The signal processing library makes extensive use of the
+	advanced features of the track class, specifically the ability
+	to access single frames and channels.  
+	
+      </para><para>
+	Given a standard multi-channel track, it is possible to make 
+	a FVector point to any single frame or channel - this is done
+	by an internal pointer mechanism in EST_FVector. Furthermore,
+	a track can be made to point to a selected number of channels
+	or frames in a main track.
+      </para>
+      <para>
+	
+	For example, imagine we have a function that calculates the
+	covariance matrix for a multi-dimensional track of data.  But
+	the data we actually have contains energy, cepstra and delta
+	cepstra.  It is non-sensical to calculate convariance on
+	all of this, we just want the cepstra. To do this we use the
+	sub-track facility to set a temporary track to just the
+	cepstral coefficients and pass this into the covariance
+	function. The temporary track has smart pointers into the
+	original track and hence no data is copied.
+      </para><para>
+	Without this facility, either you would have to do a copy
+	(expensive) or else tell the covariance function which part of
+	the track to use (hacky).
+	
+	Extensive documentation describing this process is found in
+	<xref linkend="sigpr-example-frames">,
+	  <xref linkend="tr-example-sub-tracks"> and
+	    <xref linkend="tr-example-frames-and-channels">.
+	      </para>
+    </sect2>
+  </sect1>
+  
+
+<sect1><title>Functions</title>
+<toc depth=4></toc>
+<sect2><title>Functions for Generating Frames</title>
+<para>
+The following set of functions perform either a signal
+processing operation on a single frame of speech to produce a set of
+coefficients, or a transformation on an existing set of coefficients
+to produce a new set. In most cases, the first argument to the
+function is the input, and the second is the output. It is assumed
+that any input speech frame has already been windowed with an
+appropriate windowing function (eg. Hamming) - see 
+\Ref{Windowing mechanisms} on how to produce such a frame. See also
+<xref linkend="sigpr-track-func">.
+
+</para><para>
+It is also assumed that the output vector is of the correct size. No
+resizing is done in these functions as the incoming vectors may be
+subvectors of whole tracks etc. In many cases (eg. lpc analysis), an
+{\bf order} parameter is required. This is usually derived from the size
+of the input or output vectors, and hence is not passed explicitly.
+
+</para>
+&docpp-LinearPredictionfunctions-3;
+&docpp-Energyandpowerframefunctions-3;
+&docpp-FastFourierTransformfunctions-3;
+&docpp-Framebasedfilterbankandcepstralanalysis-3;
+
+<sect2><title id="sigpr-track-func">Functions for Generating Tracks</title>
+<para>
+
+	Functions which operate on a whole waveform and generate coefficients
+	for a track.
+</para>
+
+&docpp-Functionsforusewithframebasedprocessing-3;
+&docpp-DeltaandAccelerationcoefficients-3;
+&docpp-PitchF0DetectionAlgorithmfunctions-3;
+&docpp-PitchmarkingFunctions-3;
+&docpp-Spectrogramgeneration-3;
+
+
+</sect2>
+
+<sect2><title>Functions for Windowing Frames of Waveforms</title>
+&docpp-EST-Window-2;
+</sect2>
+<sect2><title>Filter funtions</title>
+<para>
+A filter modifies a waveform by changing its frequency
+characteristics.  The following types of filter are currently
+supported:
+
+<variablelist>
+<varlistentry><term>FIR filters</term><listitem><para>FIR filters are
+general purpose finite impulse response filters which are useful for
+band-pass, low-pass and high-pass
+filtering. </para></listitem></varlistentry>
+
+<varlistentry><term>Linear Prediction filters</term><listitem><para>
+are used to produce LP residuals from waveforms and vice
+versa</para></listitem></varlistentry>
+
+<varlistentry><term>Pre Emphasis filters</term><listitem><para> are
+simple filters for changing the spectral tilt of a
+signal</para></listitem></varlistentry>
+
+<varlistentry><term>Non linear
+filters</term><listitem><para>Miscellaneous
+filters</para></listitem></varlistentry>
+
+</variablelist>
+</para>
+
+&docpp-FIRfilters-3;
+&docpp-LinearPredictionfilters-3;
+&docpp-PrePostEmphasisfilters--3;
+&docpp-Miscellaneousfilters--3;
+</sect2>
+
+
+&docpp-FilterDesign-2;
+
+</sect1>
+
+&sigprexamplesection;
+
+<sect1><title>Programs</title>
+
+<para>The following are exectutable programs which are used for signal
+processing:
+</para>
+
+<simplesect><title><link
+linkend="sigfv-manual">sig2fv</link></title><para> is used to provide
+produce a variety of feature vectors given a
+waveform.</para></simplesect>
+
+<simplesect><title><link
+linkend="spectgen-manual">spectgen</link></title><para> is used to
+produce spectrograms from utterances.</para></simplesect>
+
+<simplesect><title><link linkend="sigfilter-manual">sigfilter</link></title><para> performs filtering
+operations on waveforms.</para></simplesect>
+
+<simplesect><title><link linkend="pda-manual">pda</link></title><para>
+performs pitch detection on waveforms. While sig2fv can perform pitch
+detection also, pda offers more control over the operation.
+</para></simplesect>
+
+<simplesect><title><link linkend="pitchmark-manual">pitchmark</link><para>produces a set of pitchmarks,
+specifying the instant of glottal close from laryngograph waveforms.
+</para></simplesect>
+
+
+<para>The following programs are also useful in signal processing:
+</para>
+
+<simplesect><title><link linkend="ch-wave-manual">ch_wave</link></title><para>performs basic operates on
+waveforms, such as adding headers, resampling, rescaling, multi to
+single channel conversion etc.
+</para></simplesect>
+
+<simplesect><title><link linkend="ch-track-manual">ch_track</link></title><para>performs basic operates on
+coefficient tracks, such as adding headers, resampling, rescaling,
+multi to single channel conversion etc. </para></simplesect>
+
+
+</sect1>
+
+
+
+
+
+<!--
+Local Variables:
+mode: sgml
+sgml-doctype: "speechtools.sgml"
+sgml-parent-document: ("speechtools.sgml" "chapter" "book")
+End:
+
+<sect1><title>Exectuable Programs</title>
+&sigfvmanualsection;
+&sigfiltermanualsection;
+&pdamanualsection;
+&pitchmarkmanualsection;
+</sect1>
+
+-->
+

@@ -1882,13 +1882,8 @@ bool MediaServerProcess::initTcpListener(
     CloudManagerGroup* const cloudManagerGroup,
     ec2::QnTransactionMessageBusBase* messageBus)
 {
-    m_httpModManager.reset( new nx_http::HttpModManager() );
     m_autoRequestForwarder.reset( new QnAutoRequestForwarder(commonModule() ));
     m_autoRequestForwarder->addPathToIgnore(lit("/ec2/*"));
-    m_httpModManager->addCustomRequestMod( std::bind(
-        &QnAutoRequestForwarder::processRequest,
-        m_autoRequestForwarder.get(),
-        std::placeholders::_1 ) );
 
     const int rtspPort = qnServerModule->roSettings()->value(nx_ms_conf::SERVER_PORT, nx_ms_conf::DEFAULT_SERVER_PORT).toInt();
 
@@ -1905,6 +1900,12 @@ bool MediaServerProcess::initTcpListener(
         rtspPort,
         maxConnections,
         acceptSslConnections );
+
+    m_universalTcpListener->httpModManager()->addCustomRequestMod(std::bind(
+        &QnAutoRequestForwarder::processRequest,
+        m_autoRequestForwarder.get(),
+        std::placeholders::_1));
+
 
 #ifdef ENABLE_ACTI
     QnActiResource::setEventPort(rtspPort);
@@ -2038,7 +2039,7 @@ Qn::ServerFlags MediaServerProcess::calcServerFlags()
 
 void MediaServerProcess::initPublicIpDiscovery()
 {
-    m_ipDiscovery.reset(new QnPublicIPDiscovery(
+    m_ipDiscovery.reset(new nx::network::PublicIPDiscovery(
         qnServerModule->roSettings()->value(nx_ms_conf::PUBLIC_IP_SERVERS).toString().split(";", QString::SkipEmptyParts)));
 
     if (qnServerModule->roSettings()->value("publicIPEnabled").isNull())
@@ -2058,8 +2059,8 @@ void MediaServerProcess::initPublicIpDiscovery()
     at_updatePublicAddress(m_ipDiscovery->publicIP());
 
     m_updatePiblicIpTimer.reset(new QTimer());
-    connect(m_updatePiblicIpTimer.get(), &QTimer::timeout, m_ipDiscovery.get(), &QnPublicIPDiscovery::update);
-    connect(m_ipDiscovery.get(), &QnPublicIPDiscovery::found, this, &MediaServerProcess::at_updatePublicAddress);
+    connect(m_updatePiblicIpTimer.get(), &QTimer::timeout, m_ipDiscovery.get(), &nx::network::PublicIPDiscovery::update);
+    connect(m_ipDiscovery.get(), &nx::network::PublicIPDiscovery::found, this, &MediaServerProcess::at_updatePublicAddress);
     m_updatePiblicIpTimer->start(kPublicIpUpdateTimeoutMs);
 }
 
@@ -2365,8 +2366,8 @@ void MediaServerProcess::run()
         qnServerModule->roSettings()->value(
             nx_ms_conf::SSL_CERTIFICATE_PATH,
             getDataDirectory() + lit( "/ssl/cert.pem")).toString(),
-        QnAppInfo::productName().toUtf8(), "US",
-        QnAppInfo::organizationName().toUtf8());
+        nx::utils::AppInfo::productName().toUtf8(), "US",
+        nx::utils::AppInfo::organizationName().toUtf8());
 
     commonModule()->createMessageProcessor<QnServerMessageProcessor>();
     std::unique_ptr<HostSystemPasswordSynchronizer> hostSystemPasswordSynchronizer( new HostSystemPasswordSynchronizer(commonModule()) );
@@ -3105,7 +3106,6 @@ void MediaServerProcess::run()
     nx::network::SocketGlobals::outgoingTunnelPool().clearOwnPeerId();
 
     m_autoRequestForwarder.reset();
-    m_httpModManager.reset();
 
     if (defaultMsgHandler)
         qInstallMessageHandler(defaultMsgHandler);

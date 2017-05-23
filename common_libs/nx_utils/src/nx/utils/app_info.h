@@ -15,6 +15,7 @@ public:
     static QString applicationArch();
     static QString armBox();
 
+    static QString productName();
     static QString productNameShort();
     static QString productNameLong();
     static QString organizationName();

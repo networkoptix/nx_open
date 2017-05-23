@@ -47,9 +47,6 @@ enum class Error
     timedOut,
 };
 
-SystemError::ErrorCode toSystemError(Error ecode);
-Error fromSystemError(SystemError::ErrorCode ecode);
-
 enum class SendMode
 {
     /** Wrap buffer passed to sendAsync() in a complete websocket message */

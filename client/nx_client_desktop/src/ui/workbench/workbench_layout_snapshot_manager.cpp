@@ -42,65 +42,42 @@ QnWorkbenchLayoutSnapshotManager::QnWorkbenchLayoutSnapshotManager(QObject *pare
 QnWorkbenchLayoutSnapshotManager::~QnWorkbenchLayoutSnapshotManager()
 {}
 
-Qn::ResourceSavingFlags QnWorkbenchLayoutSnapshotManager::flags(const QnLayoutResourcePtr &resource) const
+Qn::ResourceSavingFlags QnWorkbenchLayoutSnapshotManager::flags(
+    const QnLayoutResourcePtr& layout) const
 {
-    if (!resource)
-    {
-        qnNullWarning(resource);
-        return Qn::ResourceSavingFlags();
-    }
+    NX_EXPECT(layout);
 
-    QHash<QnLayoutResourcePtr, Qn::ResourceSavingFlags>::const_iterator pos = m_flagsByLayout.find(resource);
+    const auto pos = m_flagsByLayout.find(layout);
     if (pos == m_flagsByLayout.end())
-    {
-        if (resource->resourcePool())
-        {
-            /* We didn't get the notification from resource pool yet. */
-            return Qn::ResourceSavingFlags();
-        }
-        else
-        {
-            qnWarning("Layout '%1' is not managed by this layout snapshot manager.", resource ? resource->getName() : QLatin1String("null"));
-            return 0;
-        }
-    }
+        return Qn::ResourceSavingFlags();
 
     return *pos;
 }
 
-Qn::ResourceSavingFlags QnWorkbenchLayoutSnapshotManager::flags(QnWorkbenchLayout *layout) const
+Qn::ResourceSavingFlags QnWorkbenchLayoutSnapshotManager::flags(QnWorkbenchLayout* layout) const
 {
-    if (!layout)
-    {
-        qnNullWarning(layout);
-        return Qn::ResourceSavingFlags();
-    }
-
-    QnLayoutResourcePtr resource = layout->resource();
-    if (!resource)
+    NX_EXPECT(layout);
+    if (!layout || !layout->resource())
         return Qn::ResourceSavingFlags();
 
-    return flags(resource);
+    return flags(layout->resource());
 }
 
-void QnWorkbenchLayoutSnapshotManager::setFlags(const QnLayoutResourcePtr &resource, Qn::ResourceSavingFlags flags)
+void QnWorkbenchLayoutSnapshotManager::setFlags(const QnLayoutResourcePtr& layout,
+    Qn::ResourceSavingFlags flags)
 {
+    NX_EXPECT(layout && layout->resourcePool(),
+        "Could not set flags to resource which is not in pool");
+
     if (flags.testFlag(Qn::ResourceIsBeingSaved))
-        NX_ASSERT(accessController()->hasPermissions(resource, Qn::SavePermission), Q_FUNC_INFO, "Saving unsaveable resource");
+        NX_EXPECT(accessController()->hasPermissions(layout, Qn::SavePermission), "Saving unsaveable resource");
 
-    QHash<QnLayoutResourcePtr, Qn::ResourceSavingFlags>::iterator pos = m_flagsByLayout.find(resource);
-    if (pos == m_flagsByLayout.end())
-    {
-        pos = m_flagsByLayout.insert(resource, flags);
-    }
-    else if (*pos == flags)
-    {
+    if (m_flagsByLayout.value(layout) == flags)
         return;
-    }
 
-    *pos = flags;
+    m_flagsByLayout[layout] = flags;
 
-    emit flagsChanged(resource);
+    emit flagsChanged(layout);
 }
 
 bool QnWorkbenchLayoutSnapshotManager::isChanged(const QnLayoutResourcePtr &layout) const

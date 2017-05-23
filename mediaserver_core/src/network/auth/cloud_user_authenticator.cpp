@@ -14,7 +14,7 @@
 #include <nx_ec/dummy_handler.h>
 #include <nx_ec/data/api_conversion_functions.h>
 #include <utils/common/app_info.h>
-#include <utils/common/sync_call.h>
+#include <nx/utils/sync_call.h>
 
 #include <nx/network/http/auth_tools.h>
 #include <nx/utils/log/log.h>

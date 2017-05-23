@@ -824,6 +824,9 @@ bool QnDbManager::resyncTransactionLog()
     if (!fillTransactionLogInternal<nullptr_t, ApiLayoutTourData, ApiLayoutTourDataList>(ApiCommand::saveLayoutTour))
         return false;
 
+    if (!fillTransactionLogInternal<QnUuid, ApiDiscoveryData, ApiDiscoveryDataList>(ApiCommand::addDiscoveryInformation))
+        return false;
+
     return true;
 }
 

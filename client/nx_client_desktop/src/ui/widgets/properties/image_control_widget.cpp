@@ -3,7 +3,6 @@
 
 #include <core/resource/camera_resource.h>
 
-#include <ui/common/checkbox_utils.h>
 #include <ui/common/read_only.h>
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>

@@ -5,7 +5,7 @@
 #include <nx/network/connection_server/base_stream_protocol_connection.h>
 #include <nx/network/connection_server/stream_socket_server.h>
 #include <nx/network/http/abstract_msg_body_source.h>
-#include <nx/network/http/httptypes.h>
+#include <nx/network/http/http_types.h>
 #include <nx/network/http/http_parser.h>
 #include <nx/network/http/http_serializer.h>
 
@@ -34,7 +34,7 @@ class AbstractMessageDispatcher;
 
 /**
  * Used to install handlers on some events on HTTP connection.
- * @warning There is no way to remove installed event handler. 
+ * WARNING: There is no way to remove installed event handler. 
  *   Event handler implementation MUST ensure it does not crash.
  */
 class ConnectionEvents

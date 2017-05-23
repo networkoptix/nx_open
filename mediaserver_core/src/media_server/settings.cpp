@@ -12,6 +12,7 @@
 
 #include <utils/common/app_info.h>
 #include <media_server/media_server_app_info.h>
+#include <media_server/media_server_module.h>
 
 #ifndef _WIN32
 static QString templateConfigFileName = QString("/opt/%1/mediaserver/etc/mediaserver.conf.template").arg(QnAppInfo::linuxOrganizationName());
@@ -77,6 +78,18 @@ void MSSettings::initializeROSettings()
 QSettings* MSSettings::roSettings()
 {
     return m_roSettings.get();
+}
+
+std::chrono::milliseconds MSSettings::hlsTargetDuration()
+{
+    const auto value =
+        std::chrono::milliseconds(qnServerModule->roSettings()->value(
+            nx_ms_conf::HLS_TARGET_DURATION_MS,
+            nx_ms_conf::DEFAULT_TARGET_DURATION_MS).toUInt());
+
+    return value > std::chrono::milliseconds::zero()
+        ? value
+        : std::chrono::milliseconds(nx_ms_conf::DEFAULT_TARGET_DURATION_MS);
 }
 
 QString MSSettings::defaultRunTimeSettingsFilePath()

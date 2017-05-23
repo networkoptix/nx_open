@@ -22,8 +22,6 @@ class HttpApi:
     public ::testing::Test,
     public BasicComponentTest
 {
-public:
-
 protected:
     utils::SyncQueue<api::BeginListeningRequest> m_receivedBeginListeningRequests;
     utils::SyncQueue<api::CreateClientSessionRequest> m_receivedCreateClientSessionRequests;
@@ -40,7 +38,7 @@ protected:
         {
             m_relayClient = api::ClientFactory::create(
                 nx::network::url::Builder().setScheme("http").setHost("127.0.0.1")
-                .setPort(moduleInstance()->httpEndpoints()[0].port));
+                    .setPort(moduleInstance()->httpEndpoints()[0].port));
         }
         return *m_relayClient;
     }

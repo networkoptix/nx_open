@@ -18,8 +18,8 @@
 #include <nx/utils/thread/joinable.h>
 #include <nx/utils/thread/stoppable.h>
 #include <nx/network/socket.h>
-#include <nx/network/http/httptypes.h>
-#include <nx/network/http/httpstreamreader.h>
+#include <nx/network/http/http_types.h>
+#include <nx/network/http/http_stream_reader.h>
 
 #include "soap_wrapper.h"
 #include <onvif/soapDeviceBindingProxy.h>

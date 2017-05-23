@@ -17,7 +17,7 @@
 #include <nx/utils/thread/mutex.h>
 #include <nx/utils/thread/wait_condition.h>
 #include <nx/network/buffer.h>
-#include <nx/network/http/httptypes.h>
+#include <nx/network/http/http_types.h>
 
 #include "camera/camera_pool.h"
 #include "streaming_chunk_cache_key.h"

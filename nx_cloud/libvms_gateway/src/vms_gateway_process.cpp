@@ -12,6 +12,7 @@
 #include <nx/network/http/auth_restriction_list.h>
 #include <nx/network/http/auth_tools.h>
 #include <nx/network/http/server/http_message_dispatcher.h>
+#include <nx/network/public_ip_discovery.h>
 #include <nx/network/socket_global.h>
 #include <nx/network/ssl_socket.h>
 
@@ -21,10 +22,7 @@
 #include <nx/utils/std/cpp14.h>
 #include <nx/utils/scope_guard.h>
 #include <nx/utils/system_error.h>
-
-#include <platform/process/current_process.h>
-#include <utils/common/app_info.h>
-#include <utils/common/public_ip_discovery.h>
+#include <nx/utils/platform/current_process.h>
 
 #include "access_control/authentication_manager.h"
 #include "http/connect_handler.h"
@@ -32,10 +30,9 @@
 #include "libvms_gateway_app_info.h"
 #include "stree/cdb_ns.h"
 
-
 static int registerQtResources()
 {
-    Q_INIT_RESOURCE( libvms_gateway );
+    Q_INIT_RESOURCE(libvms_gateway);
     return 0;
 }
 
@@ -43,27 +40,11 @@ namespace nx {
 namespace cloud {
 namespace gateway {
 
-VmsGatewayProcess::VmsGatewayProcess( int argc, char **argv ):
-    m_argc( argc ),
-    m_argv( argv ),
-    m_terminated( false ),
-    m_timerID( -1 )
+VmsGatewayProcess::VmsGatewayProcess(int argc, char **argv):
+    base_type(argc, argv, "VmsGateway")
 {
-    //if call Q_INIT_RESOURCE directly, linker will search for nx::cdb::libcloud_db and fail...
+    //if call Q_INIT_RESOURCE directly, linker will search for nx::cloud::gateway::libvms_gateway and fail...
     registerQtResources();
-}
-
-void VmsGatewayProcess::pleaseStop()
-{
-    QnMutexLocker lk(&m_mutex);
-    m_terminated = true;
-    m_cond.wakeAll();
-}
-
-void VmsGatewayProcess::setOnStartedEventHandler(
-    nx::utils::MoveOnlyFunc<void(bool /*result*/)> handler)
-{
-    m_startedEventHandler = std::move(handler);
 }
 
 const std::vector<SocketAddress>& VmsGatewayProcess::httpEndpoints() const
@@ -76,41 +57,29 @@ void VmsGatewayProcess::enforceSslFor(const SocketAddress& targetAddress, bool e
     m_runTimeOptions.enforceSsl(targetAddress, enabled);
 }
 
-int VmsGatewayProcess::exec()
+std::unique_ptr<nx::utils::AbstractServiceSettings> VmsGatewayProcess::createSettings()
+{
+    return std::make_unique<conf::Settings>();
+}
+
+int VmsGatewayProcess::serviceMain(
+    const nx::utils::AbstractServiceSettings& abstractSettings)
 {
     using namespace std::placeholders;
 
-    bool processStartResult = false;
-    auto triggerOnStartedEventHandlerGuard = makeScopeGuard(
-        [this, &processStartResult]
-        {
-            if (m_startedEventHandler)
-                m_startedEventHandler(processStartResult);
-        });
+    const conf::Settings& settings = static_cast<const conf::Settings&>(abstractSettings);
 
     try
     {
-        //reading settings
-        conf::Settings settings;
-        //parsing command line arguments
-        settings.load(m_argc, (const char**) m_argv);
-        if (settings.isShowHelpRequested())
-        {
-            settings.printCmdLineArgsHelp();
-            return 0;
-        }
-
-        nx::utils::log::initialize(
-            settings.logging(), settings.general().dataDir,
-            QnLibVmsGatewayAppInfo::applicationDisplayName());
-
         //enabling nat traversal
         if (!settings.general().mediatorEndpoint.isEmpty())
+        {
             nx::network::SocketGlobals::mediatorConnector().mockupAddress(
                 SocketAddress(settings.general().mediatorEndpoint));
+        }
         nx::network::SocketGlobals::mediatorConnector().enable(true);
 
-        std::unique_ptr<QnPublicIPDiscovery> publicAddressFetcher;
+        std::unique_ptr<nx::network::PublicIPDiscovery> publicAddressFetcher;
         if (settings.cloudConnect().replaceHostAddressWithPublicAddress)
         {
             if (!settings.cloudConnect().publicIpAddress.isEmpty())
@@ -119,11 +88,11 @@ int VmsGatewayProcess::exec()
             }
             else
             {
-                publicAddressFetcher = std::make_unique<QnPublicIPDiscovery>(
+                publicAddressFetcher = std::make_unique<nx::network::PublicIPDiscovery>(
                     QStringList() << settings.cloudConnect().fetchPublicIpUrl);
 
                 QObject::connect(
-                    publicAddressFetcher.get(), &QnPublicIPDiscovery::found,
+                    publicAddressFetcher.get(), &nx::network::PublicIPDiscovery::found,
                     [this, &settings](const QHostAddress& publicAddress)
                     {
                         publicAddressFetched(settings, publicAddress.toString());
@@ -164,7 +133,7 @@ int VmsGatewayProcess::exec()
         {
             network::ssl::Engine::useOrCreateCertificate(
                 settings.http().sslCertPath, 
-                QnAppInfo::productName().toUtf8(),
+                nx::utils::AppInfo::productName().toUtf8(),
                 "US", nx::utils::AppInfo::organizationName().toUtf8());
         }
 
@@ -178,32 +147,22 @@ int VmsGatewayProcess::exec()
             return 3;
 
         // process privilege reduction
-        CurrentProcess::changeUser(settings.general().changeUser);
+        nx::utils::CurrentProcess::changeUser(settings.general().changeUser);
 
         if (!multiAddressHttpServer.listen())
             return 5;
         m_httpEndpoints = multiAddressHttpServer.endpoints();
 
-        if (m_terminated)
-            return 0;
-
         NX_LOG(lm("%1 has been started on %2")
             .arg(QnLibVmsGatewayAppInfo::applicationDisplayName())
             .container(m_httpEndpoints), cl_logALWAYS);
 
-        processStartResult = true;
-        triggerOnStartedEventHandlerGuard.fire();
-
-        {
-            QnMutexLocker lk(&m_mutex);
-            while (!m_terminated)
-                m_cond.wait(lk.mutex());
-        }
+        const auto result = runMainLoop();
 
         NX_LOG(lm("%1 has been stopped")
             .arg(QnLibVmsGatewayAppInfo::applicationDisplayName()), cl_logALWAYS);
 
-        return 0;
+        return result;
     }
     catch (const std::exception& e)
     {
@@ -269,6 +228,6 @@ void VmsGatewayProcess::publicAddressFetched(
     }
 }
 
-}   //namespace cloud
-}   //namespace gateway
-}   //namespace nx
+} // namespace cloud
+} // namespace gateway
+} // namespace nx

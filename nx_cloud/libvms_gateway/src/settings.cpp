@@ -12,7 +12,7 @@
 #include <QtCore/QString>
 
 #include <nx/fusion/serialization/lexical.h>
-#include <nx/network/http/httptypes.h>
+#include <nx/network/http/http_types.h>
 #include <nx/utils/app_info.h>
 #include <nx/utils/timer_manager.h>
 

@@ -37,6 +37,15 @@ const QLatin1String kMaxPreemptiveConnectionCount(
 constexpr int kDefaultMaxPreemptiveConnectionCount = 
     kDefaultRecommendedPreemptiveConnectionCount * 2;
 
+const QLatin1String kDisconnectedPeerTimeout("listeningPeer/disconnectedPeerTimeout");
+static std::chrono::milliseconds kDefaultDisconnectedPeerTimeout = std::chrono::seconds(15);
+
+const QLatin1String kTakeIdleConnectionTimeout("listeningPeer/takeIdleConnectionTimeout");
+static std::chrono::milliseconds kDefaultTakeIdleConnectionTimeout = std::chrono::seconds(5);
+
+const QLatin1String kInternalTimerPeriod("listeningPeer/internalTimerPeriod");
+static std::chrono::milliseconds kDefaultInternalTimerPeriod = std::chrono::seconds(1);
+
 //-------------------------------------------------------------------------------------------------
 // ConnectingPeer
 
@@ -46,6 +55,8 @@ constexpr std::chrono::seconds kDefaultConnectSessionIdleTimeout =
     std::chrono::minutes(10);
 
 } // namespace
+
+//-------------------------------------------------------------------------------------------------
 
 static const QString kModuleName = lit("traffic_relay");
 
@@ -57,7 +68,10 @@ Http::Http():
 
 ListeningPeer::ListeningPeer():
     recommendedPreemptiveConnectionCount(kDefaultRecommendedPreemptiveConnectionCount),
-    maxPreemptiveConnectionCount(kDefaultMaxPreemptiveConnectionCount)
+    maxPreemptiveConnectionCount(kDefaultMaxPreemptiveConnectionCount),
+    disconnectedPeerTimeout(kDefaultDisconnectedPeerTimeout),
+    takeIdleConnectionTimeout(kDefaultTakeIdleConnectionTimeout),
+    internalTimerPeriod(kDefaultInternalTimerPeriod)
 {
 }
 
@@ -150,7 +164,22 @@ void Settings::loadListeningPeer()
 
     m_listeningPeer.maxPreemptiveConnectionCount = settings().value(
         kMaxPreemptiveConnectionCount,
-        kDefaultMaxPreemptiveConnectionCount).toInt();
+        m_listeningPeer.recommendedPreemptiveConnectionCount*2).toInt();
+
+    m_listeningPeer.disconnectedPeerTimeout =
+        nx::utils::parseTimerDuration(
+            settings().value(kDisconnectedPeerTimeout).toString(),
+            kDefaultDisconnectedPeerTimeout);
+
+    m_listeningPeer.takeIdleConnectionTimeout =
+        nx::utils::parseTimerDuration(
+            settings().value(kTakeIdleConnectionTimeout).toString(),
+            kDefaultTakeIdleConnectionTimeout);
+
+    m_listeningPeer.internalTimerPeriod =
+        nx::utils::parseTimerDuration(
+            settings().value(kInternalTimerPeriod).toString(),
+            kDefaultInternalTimerPeriod);
 }
 
 void Settings::loadConnectingPeer()

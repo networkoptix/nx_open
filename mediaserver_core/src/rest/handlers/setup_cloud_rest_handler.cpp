@@ -2,7 +2,7 @@
 
 #include <api/global_settings.h>
 
-#include <nx/network/http/httptypes.h>
+#include <nx/network/http/http_types.h>
 #include "media_server/serverutil.h"
 #include "save_cloud_system_credentials.h"
 #include <core/resource_management/resource_pool.h>

@@ -56,6 +56,11 @@ QnResourceWidget* ResourceWidgetFactory::createWidget(QnWorkbenchContext* contex
         return nullptr;
     }
 
+    auto layout = item->layout();
+    const bool isLayoutTourReview = layout && layout->isLayoutTourReview();
+    if (isLayoutTourReview)
+        return new LayoutTourItemWidget(context, item);
+
     if (resource->hasFlags(Qn::server))
         return new QnServerResourceWidget(context, item);
 
@@ -67,18 +72,6 @@ QnResourceWidget* ResourceWidgetFactory::createWidget(QnWorkbenchContext* contex
 
     if (resource->hasFlags(Qn::web_page))
         return new QnWebResourceWidget(context, item);
-
-    // Make sure we are reviewing a layout tour
-    if (resource->hasFlags(Qn::layout))
-    {
-        auto layout = item->layout();
-        const bool isLayoutTourReview = layout
-            && !layout->data(Qn::LayoutTourUuidRole).value<QnUuid>().isNull();
-
-        NX_EXPECT(isLayoutTourReview);
-        if (isLayoutTourReview)
-            return new LayoutTourItemWidget(context, item);
-    }
 
     NX_EXPECT(false, lit("ResourceWidgetFactory: unsupported resource type %1")
         .arg(resource->flags()));
