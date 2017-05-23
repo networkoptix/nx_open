@@ -16,7 +16,7 @@
 #include <nx/network/socket_global.h>
 #include <nx/network/http/server/http_message_dispatcher.h>
 #include <nx/network/http/server/http_stream_socket_server.h>
-#include <platform/process/current_process.h>
+#include <nx/utils/platform/current_process.h>
 #include <utils/common/command_line_parser.h>
 #include <nx/utils/scope_guard.h>
 #include <nx/utils/system_error.h>
@@ -95,7 +95,7 @@ int MediatorProcess::serviceMain(const nx::utils::AbstractServiceSettings& abstr
         &multiAddressHttpServer);
 
     // process privilege reduction
-    CurrentProcess::changeUser(settings.general().systemUserToRunUnder);
+    nx::utils::CurrentProcess::changeUser(settings.general().systemUserToRunUnder);
 
     if (!stunServerComposite->listen())
         return 5;

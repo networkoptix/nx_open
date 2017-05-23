@@ -13,7 +13,7 @@
 #include <nx/utils/random.h>
 #include <nx/utils/std/cpp14.h>
 #include <utils/common/app_info.h>
-#include <utils/common/sync_call.h>
+#include <nx/utils/sync_call.h>
 
 #include "business_data_generator.h"
 #include "cloud_db_service.h"

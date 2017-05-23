@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+     xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+    <groupId>net.sourceforge</groupId>
+    <artifactId>quazip</artifactId>
+    <version>0.6.2-SNAPSHOT</version>
+    <packaging>pom</packaging>
+
+	<distributionManagement>
+		<repository>
+			<id>nexus-snapshots</id>
+			<url>http://hdw.mx/nexus/content/repositories/snapshots/</url>
+		</repository>
+	</distributionManagement>
+	<properties>
+		<platform>linux</platform>
+		<arch>x64</arch>
+		<compiler>gcc</compiler>
+	</properties>
+	<build>
+		<defaultGoal>deploy</defaultGoal>
+		<plugins>
+			<plugin>
+				<artifactId>maven-antrun-plugin</artifactId>
+				<version>1.7</version>
+				<executions>
+					<execution>
+						<id>generate-qt-project</id>
+						<phase>generate-resources</phase>
+						<goals>
+							<goal>run</goal>
+						</goals>
+						<configuration>
+							<failOnError>true</failOnError>
+							<target>							
+								<exec dir="${basedir}" executable="tar" failifexecutionfails="false">
+									<arg line="czf ${project.build.directory}/${arch}.tar.gz ./include ./bin ./lib --exclude=**/*.hidden"/>
+								</exec>
+							</target>
+						</configuration>
+					</execution>				
+				</executions>
+			</plugin>	
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>build-helper-maven-plugin</artifactId>
+				<version>1.3</version>
+				<executions>
+					<execution>
+						<id>attach</id>
+						<phase>package</phase>
+						<goals>
+							<goal>attach-artifact</goal>
+						</goals>
+						<configuration>
+							<artifacts>
+								<artifact>
+									<file>${project.build.directory}/${arch}.tar.gz</file>
+									<type>tar.gz</type>
+									<classifier>${platform}-${arch}-${compiler}</classifier>
+								</artifact>
+							</artifacts>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>			
+		</plugins>
+	</build>	
+</project>

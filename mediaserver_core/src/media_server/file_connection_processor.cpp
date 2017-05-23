@@ -7,7 +7,7 @@
 #include <quazip/quazip.h>
 #include <quazip/quazipfile.h>
 
-#include <nx/network/http/httptypes.h>
+#include <nx/network/http/http_types.h>
 #include <nx/utils/gzip/gzip_compressor.h>
 
 #include <media_server/serverutil.h>

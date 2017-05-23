@@ -1,0 +1,14 @@
+#!/bin/bash
+
+./configure --disable-everything \
+--enable-ffmpeg --enable-shared --disable-iconv \
+--enable-libvorbis --enable-libvpx \
+--extra-cflags="-I/usr/local/include/" --extra-ldflags="-L/usr/local/lib/ -static-libgcc" \
+--enable-encoder=h263 --enable-encoder=libvpx_vp8 --enable-encoder=libvpx_vp9 --enable-encoder=libvorbis --enable-encoder=aac --enable-encoder=mjpeg --enable-encoder=png  \
+--enable-decoder=h264 --enable-decoder=mpeg2video --enable-decoder=mjpeg --enable-decoder=mjpegb \
+--enable-muxer=h264 --enable-muxer=matroska --enable-muxer=mpjpeg --enable-muxer=mpegts --enable-muxer=flv --enable-muxer=rtp --enable-muxer=webm --enable-muxer=ogg \
+--enable-demuxer=h264 --enable-demuxer=avi --enable-demuxer=matroska --enable-demuxer=rtp --enable-demuxer=mjpeg \
+--enable-protocol=rtp \
+--enable-parser=h264 --enable-parser=mjpeg --enable-parser=vorbis --enable-parser=vp8 --enable-parser=vp9 \
+--enable-filter=copy --enable-filter=mp --enable-filter=null \
+--enable-bsf=h264_mp4toannexb --enable-bsf=mp3_header_decompress --enable-bsf=aac_adtstoasc 

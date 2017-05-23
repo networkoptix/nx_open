@@ -16,9 +16,6 @@
 #include "buffer_source.h"
 #include "custom_headers.h"
 
-static const int DEFAULT_SEND_TIMEOUT = 3000;
-static const int DEFAULT_RESPONSE_READ_TIMEOUT = 3000;
-
 using std::make_pair;
 
 namespace {
@@ -70,9 +67,9 @@ AsyncClient::AsyncClient():
     m_totalBytesReadPerRequest(0),
     m_totalRequestsSentViaCurrentConnection(0),
     m_contentEncodingUsed(true),
-    m_sendTimeoutMs(DEFAULT_SEND_TIMEOUT),
-    m_responseReadTimeoutMs(DEFAULT_RESPONSE_READ_TIMEOUT),
-    m_msgBodyReadTimeoutMs(0),
+    m_sendTimeout(Timeouts::kDefaultSendTimeout),
+    m_responseReadTimeout(Timeouts::kDefaultResponseReadTimeout),
+    m_msgBodyReadTimeout(0),
     m_authType(authBasicAndDigest),
     m_awaitedMessageNumber(0),
     m_lastSysErrorCode(SystemError::noError),
@@ -378,19 +375,21 @@ void AsyncClient::setDisablePrecalculatedAuthorization(bool val)
     m_precalculatedAuthorizationDisabled = val;
 }
 
-void AsyncClient::setSendTimeoutMs(unsigned int sendTimeoutMs)
+void AsyncClient::setSendTimeout(std::chrono::milliseconds sendTimeout)
 {
-    m_sendTimeoutMs = sendTimeoutMs;
+    m_sendTimeout = sendTimeout;
 }
 
-void AsyncClient::setResponseReadTimeoutMs(unsigned int _responseReadTimeoutMs)
+void AsyncClient::setResponseReadTimeout(
+    std::chrono::milliseconds _responseReadTimeout)
 {
-    m_responseReadTimeoutMs = _responseReadTimeoutMs;
+    m_responseReadTimeout = _responseReadTimeout;
 }
 
-void AsyncClient::setMessageBodyReadTimeoutMs(unsigned int messageBodyReadTimeoutMs)
+void AsyncClient::setMessageBodyReadTimeout(
+    std::chrono::milliseconds messageBodyReadTimeout)
 {
-    m_msgBodyReadTimeoutMs = messageBodyReadTimeoutMs;
+    m_msgBodyReadTimeout = messageBodyReadTimeout;
 }
 
 void AsyncClient::stopWhileInAioThread()
@@ -492,14 +491,14 @@ void AsyncClient::asyncSendDone(SystemError::ErrorCode errorCode, size_t bytesWr
 
     m_state = sReceivingResponse;
     m_responseBuffer.resize(0);
-    if (!m_socket->setRecvTimeout(m_responseReadTimeoutMs))
+    if (!m_socket->setRecvTimeout(m_responseReadTimeout))
     {
         if (reconnectIfAppropriate())
             return;
 
         const auto sysErrorCode = SystemError::getLastOSErrorCode();
         NX_LOGX(lm("Url %1. Error setting receive timeout to %2 ms. %3")
-            .arg(m_contentLocationUrl).arg(m_responseReadTimeoutMs)
+            .arg(m_contentLocationUrl).arg(m_responseReadTimeout)
             .arg(SystemError::toString(sysErrorCode)),
             cl_logDEBUG1);
         m_state = sFailed;
@@ -638,8 +637,8 @@ void AsyncClient::initiateTcpConnection()
     m_socket->bindToAioThread(getAioThread());
     m_connectionClosed = false;
     if (!m_socket->setNonBlockingMode(true) ||
-        !m_socket->setSendTimeout(m_sendTimeoutMs) ||
-        !m_socket->setRecvTimeout(m_responseReadTimeoutMs))
+        !m_socket->setSendTimeout(m_sendTimeout) ||
+        !m_socket->setRecvTimeout(m_responseReadTimeout))
     {
         m_socket->post(
             std::bind(
@@ -874,7 +873,7 @@ AsyncClient::Result AsyncClient::processResponseHeadersBytes(
     {
         //reading more data
         m_responseBuffer.resize(0);
-        if (!m_socket->setRecvTimeout(m_msgBodyReadTimeoutMs))
+        if (!m_socket->setRecvTimeout(m_msgBodyReadTimeout))
         {
             NX_LOGX(lm("Failed to read (1) response from %1. %2")
                 .arg(m_contentLocationUrl).arg(SystemError::getLastOSErrorText()),

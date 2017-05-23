@@ -10,7 +10,7 @@
 #include <nx/network/stun/message_parser.h>
 #include <nx/network/stun/message_serializer.h>
 #include <nx/utils/string.h>
-#include <utils/common/sync_call.h>
+#include <nx/utils/sync_call.h>
 
 #include <test_support/mediaserver_emulator.h>
 

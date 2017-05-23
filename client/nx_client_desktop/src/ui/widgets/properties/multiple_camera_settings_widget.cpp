@@ -13,8 +13,8 @@
 #include <core/resource/resource.h>
 #include <core/resource/camera_resource.h>
 
+#include <nx/client/desktop/ui/common/checkbox_utils.h>
 #include <ui/common/read_only.h>
-#include <ui/common/checkbox_utils.h>
 #include <ui/graphics/items/resource/resource_widget.h>
 #include <ui/help/help_topics.h>
 #include <ui/help/help_topic_accessor.h>
@@ -23,6 +23,8 @@
 #include <ui/widgets/properties/camera_schedule_widget.h>
 #include <ui/widgets/properties/camera_motion_mask_widget.h>
 #include <ui/workbench/workbench_context.h>
+
+using namespace nx::client::desktop::ui;
 
 QnMultipleCameraSettingsWidget::QnMultipleCameraSettingsWidget(QWidget *parent):
     QWidget(parent),
@@ -39,7 +41,7 @@ QnMultipleCameraSettingsWidget::QnMultipleCameraSettingsWidget(QWidget *parent):
     ui->licensingWidget->initializeContext(this);
     ui->cameraScheduleWidget->initializeContext(this);
 
-    QnCheckbox::autoCleanTristate(ui->enableAudioCheckBox);
+    CheckboxUtils::autoClearTristate(ui->enableAudioCheckBox);
 
     connect(ui->loginEdit, &QLineEdit::textChanged, this,
         &QnMultipleCameraSettingsWidget::at_dbDataChanged);
@@ -298,7 +300,7 @@ void QnMultipleCameraSettingsWidget::updateFromResources()
         ui->enableAudioCheckBox->setEnabled(audioSupported && !audioForced);
         setTabEnabledSafe(Qn::RecordingSettingsTab, !isDtsBased && recordingSupported);
         setTabEnabledSafe(Qn::ExpertCameraSettingsTab, !isDtsBased && hasVideo);
-        QnCheckbox::setupTristateCheckbox(ui->enableAudioCheckBox, sameAudioEnabled, audioEnabled);
+        CheckboxUtils::setupTristateCheckbox(ui->enableAudioCheckBox, sameAudioEnabled, audioEnabled);
 
         {
             QSet<QString> logins, passwords;

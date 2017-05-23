@@ -4,7 +4,7 @@
 #include <QtCore/QObject>
 
 #include <common/common_module_aware.h>
-#include <nx/network/http/httptypes.h>
+#include <nx/network/http/http_types.h>
 #include <nx/network/socket_common.h>
 #include <nx/utils/singleton.h>
 #include <nx/utils/thread/mutex.h>

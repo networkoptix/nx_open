@@ -15,7 +15,7 @@ static int s_cloudConnectTypeMask = (int)CloudConnectType::all;
 using namespace std::placeholders;
 
 ConnectorFactory::ConnectorFactory():
-    base_type(std::bind(&ConnectorFactory::defaultFunc, this, _1, _2, _3, _4))
+    base_type(std::bind(&ConnectorFactory::defaultFactoryFunction, this, _1, _2, _3, _4))
 {
 }
 
@@ -25,7 +25,7 @@ ConnectorFactory& ConnectorFactory::instance()
     return instance;
 }
 
-CloudConnectors ConnectorFactory::defaultFunc(
+CloudConnectors ConnectorFactory::defaultFactoryFunction(
     const AddressEntry& targetAddress,
     const nx::String& connectSessionId,
     const hpm::api::ConnectResponse& response,
@@ -60,7 +60,7 @@ CloudConnectors ConnectorFactory::defaultFunc(
     {
         TunnelConnectorContext context;
         context.connector = std::make_unique<relay::Connector>(
-            *response.trafficRelayUrl, targetAddress, connectSessionId);
+            QUrl(*response.trafficRelayUrl), targetAddress, connectSessionId);
         context.startDelay = response.params.trafficRelayingStartDelay;
         connectors.emplace_back(std::move(context));
     }
@@ -81,7 +81,7 @@ int ConnectorFactory::getEnabledCloudConnectMask()
 //-------------------------------------------------------------------------------------------------
 
 CrossNatConnectorFactory::CrossNatConnectorFactory():
-    base_type(std::bind(&CrossNatConnectorFactory::defaultFunc, this, _1))
+    base_type(std::bind(&CrossNatConnectorFactory::defaultFactoryFunction, this, _1))
 {
 }
 
@@ -91,7 +91,7 @@ CrossNatConnectorFactory& CrossNatConnectorFactory::instance()
     return instance;
 }
 
-std::unique_ptr<AbstractCrossNatConnector> CrossNatConnectorFactory::defaultFunc(
+std::unique_ptr<AbstractCrossNatConnector> CrossNatConnectorFactory::defaultFactoryFunction(
     const AddressEntry& address)
 {
     return std::make_unique<CrossNatConnector>(address);

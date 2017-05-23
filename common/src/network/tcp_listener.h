@@ -7,7 +7,7 @@
 
 #include "nx/utils/thread/long_runnable.h"
 
-#include <nx/network/http/httptypes.h>
+#include <nx/network/http/http_types.h>
 #include <nx/network/abstract_socket.h>
 #include <common/common_module_aware.h>
 

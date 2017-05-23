@@ -1,0 +1,221 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>Basic Requirements</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REL="HOME"
+TITLE="Building Synthetic Voices"
+HREF="book1.html"><LINK
+REL="UP"
+TITLE="Building Synthetic Voices"
+HREF="p710.html"><LINK
+REL="PREVIOUS"
+TITLE="Building Synthetic Voices"
+HREF="p710.html"><LINK
+REL="NEXT"
+TITLE="Voice in a new language"
+HREF="x740.html"></HEAD
+><BODY
+CLASS="CHAPTER"
+BGCOLOR="#FFFFFF"
+TEXT="#000000"
+LINK="#0000FF"
+VLINK="#840084"
+ALINK="#0000FF"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="3"
+ALIGN="center"
+>Building Synthetic Voices</TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="bottom"
+><A
+HREF="p710.html"
+ACCESSKEY="P"
+>&#60;&#60;&#60; Previous</A
+></TD
+><TD
+WIDTH="80%"
+ALIGN="center"
+VALIGN="bottom"
+></TD
+><TD
+WIDTH="10%"
+ALIGN="right"
+VALIGN="bottom"
+><A
+HREF="x740.html"
+ACCESSKEY="N"
+>Next &#62;&#62;&#62;</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="CHAPTER"
+><H1
+><A
+NAME="AEN714"
+></A
+>Basic Requirements</H1
+><P
+>&#13;This section identifies the basic requirements for building a voice 
+in a new language, and adding a new voice in a language already 
+supported by Festival. </P
+><DIV
+CLASS="SECT1"
+><H1
+CLASS="SECT1"
+><A
+NAME="AEN719"
+>Hardware/software requirements</A
+></H1
+><P
+>&#13;
+Because we are most familiar with a Unix environment the scripts, tools 
+etc. assume such a basic environment. This is not to say you couldn't 
+run these scripts on other platforms as many of these tools are 
+supported on platforms like WIN32, its just that in our normal work 
+environment, Unix is ubiquitous and we like working in it. Festival 
+also runs on Win32 platforms. </P
+><P
+>Much of the testing was done under Linux; wherever possible, 
+we are using freely available tools. We are happy to say that 
+no non-free tools are required to build voices, and we have 
+included citations and/or links to everything needed in this 
+document. </P
+><P
+>We assume Festival 1.4.3 and the Edinburgh Speech Tools 1.2.3.</P
+><P
+>Note that we make an extensive use of the Speech Tools programs, and you 
+will need the full distribution of them as well as Festival, rather than 
+the run-time (binary) only versions which are available for some Linux 
+platforms. If you find the task of compiling Festival and the speech 
+tools daunting, you will probably find the rest of the tasks specified 
+in this document more so. However, it is not necessary for you to have 
+any knowledge of C++ to make voices, though familiarity with text 
+processing techniques (e.g. awk, sed, perl) will make understanding the 
+examples given much easier. </P
+><P
+>We also assume a basic knowledge of Festival, and of speech processing 
+in general. We expect the reader to be familiar with basic terms such as 
+<I
+CLASS="EMPHASIS"
+>F0</I
+>, <I
+CLASS="EMPHASIS"
+>phoneme</I
+>, and <I
+CLASS="EMPHASIS"
+>cepstrum</I
+>, but not in any real 
+detail. References to general texts are given (when we know them to 
+exist). A basic knowledge of programming in Scheme (and/or Lisp) will 
+also make things easier. A basic capability in programming in general 
+will make defining rules, etc., much easier. </P
+><P
+>&#13;If you are going to record your own database, you will need recording 
+equipment: the higher quality, the better. A proper recording studio is 
+ideal, though may not be available for everyone. A cheap microphone 
+stuck on the back of standard PC is not ideal, though we know most of 
+you will end up doing that. A high quality sound board, close-talking, 
+high quality microphone and a nearly soundproof recording environment 
+will often be the compromise between these two extremes. </P
+><P
+>&#13;Many of the techniques described in here require a fair amount of 
+processing time to achieve, though machines are indeed getting faster 
+and this is becoming less of an issue. If you use the provided aligner 
+for labeling diphones you will need a processor of reasonable speed, 
+likewise for the various training techniques for intonation, duration 
+modeling and letter-to-sound rules. Nothing presented here takes weeks 
+though a number of processes may be over-night jobs, depending on the 
+speed of your machine, and size of your database. </P
+><P
+>Also we think that you will need a little patience. The process of 
+building a voice is not necessarily going to work first time. It may 
+even fail completely, so if you don't expect anything special, you wont 
+be disappointed. </P
+></DIV
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="p710.html"
+ACCESSKEY="P"
+>&#60;&#60;&#60; Previous</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="book1.html"
+ACCESSKEY="H"
+>Home</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="x740.html"
+ACCESSKEY="N"
+>Next &#62;&#62;&#62;</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>Building Synthetic Voices</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="p710.html"
+ACCESSKEY="U"
+>Up</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>Voice in a new language</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

@@ -1,0 +1,263 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>Diphones from general databases</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REL="HOME"
+TITLE="Building Synthetic Voices"
+HREF="book1.html"><LINK
+REL="UP"
+TITLE="Unit selection databases"
+HREF="c2641.html"><LINK
+REL="PREVIOUS"
+TITLE="Building a Unit Selection Cluster Voice"
+HREF="x3082.html"><LINK
+REL="NEXT"
+TITLE="Statistical Parametric Synthesis"
+HREF="c3170.html"></HEAD
+><BODY
+CLASS="SECT1"
+BGCOLOR="#FFFFFF"
+TEXT="#000000"
+LINK="#0000FF"
+VLINK="#840084"
+ALINK="#0000FF"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="3"
+ALIGN="center"
+>Building Synthetic Voices</TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="bottom"
+><A
+HREF="x3082.html"
+ACCESSKEY="P"
+>&#60;&#60;&#60; Previous</A
+></TD
+><TD
+WIDTH="80%"
+ALIGN="center"
+VALIGN="bottom"
+>Unit selection databases</TD
+><TD
+WIDTH="10%"
+ALIGN="right"
+VALIGN="bottom"
+><A
+HREF="c3170.html"
+ACCESSKEY="N"
+>Next &#62;&#62;&#62;</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="SECT1"
+><H1
+CLASS="SECT1"
+><A
+NAME="AEN3144"
+>Diphones from general databases</A
+></H1
+><P
+>&#13;
+As touched on above the choice of an inventory of units can be viewed as 
+a line from a small inventory phones, to diphones, triphones to 
+arbitrary units. Though the direction you come from influences the 
+selection of the units from the database. CHATR [<SPAN
+CLASS="CITATION"
+>campbell96</SPAN
+>] lies 
+firmly at the "arbitrary units" end of the spectrum. Although it can 
+exclude bad units from its inventory it is very much <SPAN
+CLASS="QUOTE"
+>"<I
+CLASS="EMPHASIS"
+>everything 
+minus some</I
+>"</SPAN
+> view of the world. Microsoft's Whistler [<SPAN
+CLASS="CITATION"
+>huang97</SPAN
+>] on 
+the other hand, starts off with a general database base but selects 
+typical units from it. Thus its inventory is substantially smaller than 
+the full general database the units are extracted from. At the other 
+end of the spectrum we have the fixed pre-specified inventory like 
+diphone synthesis as has bee described in the previous chapter. </P
+><P
+>In this section we'll give some examples of moving along the line 
+from the fixed pre-specified inventory to the words the more general 
+inventories but these techniques still have a strong component 
+of prespecification. </P
+><P
+>Firstly lets us assume you have a general database that is labeled with 
+utterances as described above. We can extract a standard diphone 
+database from this general database, however unless the database was 
+specifically designed, a general database is unlikely to have diphone 
+coverage. Even when phonetically rich databases are used such as Timit 
+there is likely to be very few vowel-vowel diphones as they are 
+comparatively rare. But as these diphone are rare we may be able to do 
+with out them and hence it is at least an interesting exercise to 
+extract an as complete as possible diphone index from a general 
+database. </P
+><P
+>The simplest method is to linearly search for all phone-phone pairs in 
+the phone set through all utterances simply taking the first example. 
+Some same code is given in <TT
+CLASS="FILENAME"
+>src/diphone/make_diphs_index.scm</TT
+>. 
+This basic idea is to load in all the utterances in a database, and 
+index each segment by is phone name and succeeding phone name. Then 
+various selection techniques can be use to select from the multiple 
+candidates of each diphone (or you can split the indexing further). 
+After selection a diphone index file can be saved. </P
+><P
+>The utterances to load are identified by a list of fileids. For 
+example if the list of fileids (without parenthesis) is in 
+the file <TT
+CLASS="FILENAME"
+>etc/fileids</TT
+>, the following will builds a diphone 
+index. 
+<A
+NAME="AEN3161"
+></A
+><BLOCKQUOTE
+CLASS="BLOCKQUOTE"
+><P
+CLASS="LITERALLAYOUT"
+>festival&nbsp;.../make_diphs_utts.scm<br>
+...<br>
+festival&#62;&nbsp;(set!&nbsp;fileids&nbsp;(load&nbsp;"etc/fileids"&nbsp;t))<br>
+...<br>
+festival&#62;&nbsp;(make_diphone_index&nbsp;fileids&nbsp;"dic/f2bdiph.est")</P
+></BLOCKQUOTE
+></P
+><P
+>Note that as this diphone index will contain a number of holes 
+you will need to either augment it with <SPAN
+CLASS="QUOTE"
+>"<I
+CLASS="EMPHASIS"
+>similar</I
+>"</SPAN
+> diphones 
+or process your diphone selections through <CODE
+CLASS="VARNAME"
+>UniSyn_module_hooks</CODE
+> 
+as described in the previous chapter. </P
+><P
+>As you complicate the selection, and the number of diphones you used 
+from the database you will need to complicate the names used to 
+identify the diphones themselves. The convention of using underscores 
+for syllable internal consonant clusters and dollars for syllable 
+initial consonants can be followed, but you will need to go further if 
+you wish to start introducing new feature such as phrase finality and 
+stress. Eventually going to a generalized naming scheme (type and number) 
+as used by the cluster selection technique described above, will prove 
+worth while. Also using CART trees, through hand written and fully 
+deterministic (one candidate at the leafs), will be a reasonable 
+algorithm to select between hand stipulated alternatives with 
+reasonable backoff strategies. </P
+><P
+>Another potential direction is to use the acoustic costs used in the 
+clustering methods described in the previous section. These can be used 
+to identify what the most typical unit in a cluster are (the mean 
+distances from all other units are given in the leafs). Pruning these 
+trees until the cluster only contain a single example should help to 
+improve synthesis, in that variation in the feature in the "diphone" 
+index will then be determined by the features specified in the cluster 
+train algorithm. Of course though as you limit the number of distinct 
+units types the more prosodic modification will be required by your 
+signal processing algorithm, which requires that you have good pitch 
+marks. </P
+><P
+>If you already have an existing database but don't wish to go to full 
+unit selection, such techniques are probably quite feasible and worth 
+further investigation. </P
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="x3082.html"
+ACCESSKEY="P"
+>&#60;&#60;&#60; Previous</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="book1.html"
+ACCESSKEY="H"
+>Home</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="c3170.html"
+ACCESSKEY="N"
+>Next &#62;&#62;&#62;</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>Building a Unit Selection Cluster Voice</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="c2641.html"
+ACCESSKEY="U"
+>Up</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>Statistical Parametric Synthesis</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

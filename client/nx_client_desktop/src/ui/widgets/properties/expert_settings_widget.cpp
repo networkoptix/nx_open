@@ -15,11 +15,13 @@
 
 #include <utils/common/scoped_value_rollback.h>
 
+#include <nx/client/desktop/ui/common/checkbox_utils.h>
 #include <ui/widgets/common/snapped_scrollbar.h>
 #include <ui/workaround/widgets_signals_workaround.h>
-#include <ui/common/checkbox_utils.h>
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
+
+using namespace nx::client::desktop::ui;
 
 QnCameraExpertSettingsWidget::QnCameraExpertSettingsWidget(QWidget* parent):
     QWidget(parent),
@@ -34,7 +36,7 @@ QnCameraExpertSettingsWidget::QnCameraExpertSettingsWidget(QWidget* parent):
     ui->scrollArea->setVerticalScrollBar(scrollBar->proxyScrollBar());
     scrollBar->setUseMaximumSpace(true);
 
-    QnCheckbox::autoCleanTristate(ui->checkBoxForceMotionDetection);
+    CheckboxUtils::autoClearTristate(ui->checkBoxForceMotionDetection);
 
     setWarningStyle(ui->settingsWarningLabel);
     setWarningStyle(ui->settingsDisabledWarningLabel);
@@ -268,7 +270,7 @@ void QnCameraExpertSettingsWidget::updateFromResources(const QnVirtualCameraReso
 
     bool gotForcedMotionStream = forcedMotionStreamIndex != -1;
 
-    QnCheckbox::setupTristateCheckbox(
+    CheckboxUtils::setupTristateCheckbox(
         ui->checkBoxForceMotionDetection,
         sameMdPolicies,
         gotForcedMotionStream);

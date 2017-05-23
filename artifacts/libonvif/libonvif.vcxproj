@@ -1,0 +1,257 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{AE0C0C31-0848-4D22-A080-F33D6BFE59A8}</ProjectGuid>
+    <RootNamespace>libonvif</RootNamespace>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <PlatformToolset>v140</PlatformToolset>
+    <CharacterSet>MultiByte</CharacterSet>
+    <WholeProgramOptimization>false</WholeProgramOptimization>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <PlatformToolset>v140</PlatformToolset>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <PlatformToolset>v140</PlatformToolset>
+    <CharacterSet>MultiByte</CharacterSet>
+    <WholeProgramOptimization>false</WholeProgramOptimization>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <PlatformToolset>v140</PlatformToolset>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup>
+    <_ProjectFileVersion>11.0.60610.1</_ProjectFileVersion>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <OutDir>$(SolutionDir)$(Configuration)\</OutDir>
+    <IntDir>$(Configuration)\</IntDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <OutDir>$(SolutionDir)$(Platform)\$(Configuration)\</OutDir>
+    <IntDir>$(Platform)\$(Configuration)\</IntDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <OutDir>$(SolutionDir)$(Configuration)\</OutDir>
+    <IntDir>$(Configuration)\</IntDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <OutDir>$(SolutionDir)$(Platform)\$(Configuration)\</OutDir>
+    <IntDir>$(Platform)\$(Configuration)\</IntDir>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <AdditionalOptions>/MP /bigobj %(AdditionalOptions)</AdditionalOptions>
+      <Optimization>Disabled</Optimization>
+      <AdditionalIncludeDirectories>..\..\build_environment\target\include\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>_DEBUG;DEBUG;WITH_OPENSSL;WIN32;SOAP_DEBUG;WITH_PURE_VIRTUAL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <MinimalRebuild>false</MinimalRebuild>
+      <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
+      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
+      <WarningLevel>Level3</WarningLevel>
+      <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
+      <DisableSpecificWarnings>4251;%(DisableSpecificWarnings)</DisableSpecificWarnings>
+    </ClCompile>
+    <Lib>
+      <OutputFile>..\..\build_environment\target\x86\lib\$(Configuration)\onvif.lib</OutputFile>
+    </Lib>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <Midl>
+      <TargetEnvironment>X64</TargetEnvironment>
+    </Midl>
+    <ClCompile>
+      <AdditionalOptions>/MP /bigobj %(AdditionalOptions)</AdditionalOptions>
+      <Optimization>Disabled</Optimization>
+      <AdditionalIncludeDirectories>..\..\build_environment\target\include\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>_DEBUG;DEBUG;WITH_OPENSSL;WIN32;SOAP_DEBUG;WITH_PURE_VIRTUAL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <MinimalRebuild>false</MinimalRebuild>
+      <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
+      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
+      <WarningLevel>Level3</WarningLevel>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <DisableSpecificWarnings>4251;%(DisableSpecificWarnings)</DisableSpecificWarnings>
+    </ClCompile>
+    <Lib>
+      <OutputFile>..\..\build_environment\target\x64\lib\$(Configuration)\onvif.lib</OutputFile>
+    </Lib>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <AdditionalOptions>/MP /bigobj %(AdditionalOptions)</AdditionalOptions>
+      <Optimization>MaxSpeed</Optimization>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <AdditionalIncludeDirectories>..\..\build_environment\target\include\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WITH_OPENSSL;WIN32;WITH_PURE_VIRTUAL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <MinimalRebuild>false</MinimalRebuild>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <WarningLevel>Level3</WarningLevel>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <DisableSpecificWarnings>4251;%(DisableSpecificWarnings)</DisableSpecificWarnings>
+    </ClCompile>
+    <Lib>
+      <OutputFile>..\..\build_environment\target\x86\lib\$(Configuration)\onvif.lib</OutputFile>
+    </Lib>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <Midl>
+      <TargetEnvironment>X64</TargetEnvironment>
+    </Midl>
+    <ClCompile>
+      <AdditionalOptions>/MP /bigobj %(AdditionalOptions)</AdditionalOptions>
+      <Optimization>MaxSpeed</Optimization>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <AdditionalIncludeDirectories>..\..\build_environment\target\include\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WITH_OPENSSL;WIN32;WITH_PURE_VIRTUAL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <MinimalRebuild>false</MinimalRebuild>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <WarningLevel>Level3</WarningLevel>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <DisableSpecificWarnings>4251;%(DisableSpecificWarnings)</DisableSpecificWarnings>
+    </ClCompile>
+    <Lib>
+      <OutputFile>..\..\build_environment\target\x64\lib\$(Configuration)\onvif.lib</OutputFile>
+    </Lib>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClCompile Include="src\dom.cpp" />
+    <ClCompile Include="src\mecevp.c">
+      <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">CompileAsCpp</CompileAs>
+      <CompileAs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">CompileAsCpp</CompileAs>
+      <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">CompileAsCpp</CompileAs>
+      <CompileAs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">CompileAsCpp</CompileAs>
+    </ClCompile>
+    <ClCompile Include="src\smdevp.c">
+      <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">CompileAsCpp</CompileAs>
+      <CompileAs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">CompileAsCpp</CompileAs>
+      <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">CompileAsCpp</CompileAs>
+      <CompileAs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">CompileAsCpp</CompileAs>
+    </ClCompile>
+    <ClCompile Include="src\soapC.cpp" />
+    <ClCompile Include="src\soapCreatePullPointBindingProxy.cpp" />
+    <ClCompile Include="src\soapCreatePullPointBindingService.cpp" />
+    <ClCompile Include="src\soapDeviceBindingProxy.cpp" />
+    <ClCompile Include="src\soapDeviceBindingService.cpp" />
+    <ClCompile Include="src\soapDeviceIOBindingProxy.cpp" />
+    <ClCompile Include="src\soapDeviceIOBindingService.cpp" />
+    <ClCompile Include="src\soapEventBindingProxy.cpp" />
+    <ClCompile Include="src\soapEventBindingService.cpp" />
+    <ClCompile Include="src\soapImagingBindingProxy.cpp" />
+    <ClCompile Include="src\soapImagingBindingService.cpp" />
+    <ClCompile Include="src\soapMediaBindingProxy.cpp" />
+    <ClCompile Include="src\soapMediaBindingService.cpp" />
+    <ClCompile Include="src\soapNotificationConsumerBindingProxy.cpp" />
+    <ClCompile Include="src\soapNotificationConsumerBindingService.cpp" />
+    <ClCompile Include="src\soapNotificationProducerBindingProxy.cpp" />
+    <ClCompile Include="src\soapNotificationProducerBindingService.cpp" />
+    <ClCompile Include="src\soapPausableSubscriptionManagerBindingProxy.cpp" />
+    <ClCompile Include="src\soapPausableSubscriptionManagerBindingService.cpp" />
+    <ClCompile Include="src\soapPTZBindingProxy.cpp" />
+    <ClCompile Include="src\soapPTZBindingService.cpp" />
+    <ClCompile Include="src\soapPullPointBindingProxy.cpp" />
+    <ClCompile Include="src\soapPullPointBindingService.cpp" />
+    <ClCompile Include="src\soapPullPointSubscriptionBindingProxy.cpp" />
+    <ClCompile Include="src\soapPullPointSubscriptionBindingService.cpp" />
+    <ClCompile Include="src\soapSubscriptionManagerBindingProxy.cpp" />
+    <ClCompile Include="src\soapSubscriptionManagerBindingService.cpp" />
+    <ClCompile Include="src\soapwsddProxy.cpp" />
+    <ClCompile Include="src\soapwsddService.cpp" />
+    <ClCompile Include="src\stdsoap2.cpp" />
+    <ClCompile Include="src\threads.c">
+      <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">CompileAsCpp</CompileAs>
+      <CompileAs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">CompileAsCpp</CompileAs>
+      <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">CompileAsCpp</CompileAs>
+      <CompileAs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">CompileAsCpp</CompileAs>
+    </ClCompile>
+    <ClCompile Include="src\wsaapi.cpp" />
+    <ClCompile Include="src\wsseapi.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="src\mecevp.h" />
+    <ClInclude Include="src\onvif.h" />
+    <ClInclude Include="src\smdevp.h" />
+    <ClInclude Include="src\soapCreatePullPointBindingProxy.h" />
+    <ClInclude Include="src\soapCreatePullPointBindingService.h" />
+    <ClInclude Include="src\soapDeviceBindingProxy.h" />
+    <ClInclude Include="src\soapDeviceBindingService.h" />
+    <ClInclude Include="src\soapDeviceIOBindingProxy.h" />
+    <ClInclude Include="src\soapDeviceIOBindingService.h" />
+    <ClInclude Include="src\soapEventBindingProxy.h" />
+    <ClInclude Include="src\soapEventBindingService.h" />
+    <ClInclude Include="src\soapH.h" />
+    <ClInclude Include="src\soapImagingBindingProxy.h" />
+    <ClInclude Include="src\soapImagingBindingService.h" />
+    <ClInclude Include="src\soapMediaBindingProxy.h" />
+    <ClInclude Include="src\soapMediaBindingService.h" />
+    <ClInclude Include="src\soapNotificationConsumerBindingProxy.h" />
+    <ClInclude Include="src\soapNotificationConsumerBindingService.h" />
+    <ClInclude Include="src\soapNotificationProducerBindingProxy.h" />
+    <ClInclude Include="src\soapNotificationProducerBindingService.h" />
+    <ClInclude Include="src\soapPausableSubscriptionManagerBindingProxy.h" />
+    <ClInclude Include="src\soapPausableSubscriptionManagerBindingService.h" />
+    <ClInclude Include="src\soapPTZBindingProxy.h" />
+    <ClInclude Include="src\soapPTZBindingService.h" />
+    <ClInclude Include="src\soapPullPointBindingProxy.h" />
+    <ClInclude Include="src\soapPullPointBindingService.h" />
+    <ClInclude Include="src\soapPullPointSubscriptionBindingProxy.h" />
+    <ClInclude Include="src\soapPullPointSubscriptionBindingService.h" />
+    <ClInclude Include="src\soapStub.h" />
+    <ClInclude Include="src\soapSubscriptionManagerBindingProxy.h" />
+    <ClInclude Include="src\soapSubscriptionManagerBindingService.h" />
+    <ClInclude Include="src\soapwsddProxy.h" />
+    <ClInclude Include="src\soapwsddService.h" />
+    <ClInclude Include="src\stdsoap2.h" />
+    <ClInclude Include="src\threads.h" />
+    <ClInclude Include="src\wsaapi.h" />
+    <ClInclude Include="src\wsseapi.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="ReadMe.txt" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

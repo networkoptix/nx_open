@@ -2,7 +2,7 @@
 
 #include <QString>
 
-#include "httptypes.h"
+#include "http_types.h"
 
 //Helper functions for calculating Http digest (rfc2617)
 namespace nx_http {

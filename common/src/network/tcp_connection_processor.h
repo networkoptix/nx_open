@@ -9,7 +9,7 @@
 #include "utils/common/byte_array.h"
 #include "api/model/audit/auth_session.h"
 
-#include <nx/network/http/httptypes.h>
+#include <nx/network/http/http_types.h>
 #include <nx/utils/thread/mutex.h>
 
 class QnTcpListener;

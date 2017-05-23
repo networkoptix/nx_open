@@ -113,9 +113,8 @@ void DirectEndpointConnector::launchVerificators(
         NX_LOGX(lm("cross-nat %1. Verifying host %2")
             .arg(m_connectSessionId).arg(endpoint), cl_logDEBUG2);
 
-        m_verificators.push_back(nullptr);
-        m_verificators.back() = 
-            EndpointVerificatorFactory::instance().create(m_connectSessionId);
+        m_verificators.push_back(
+            EndpointVerificatorFactory::instance().create(m_connectSessionId));
         m_verificators.back()->setTimeout(timeout);
         m_verificators.back()->verifyHost(
             endpoint,
@@ -144,7 +143,7 @@ void DirectEndpointConnector::onVerificationDone(
         case AbstractEndpointVerificator::VerificationResult::ioError:
             return reportErrorOnEndpointVerificationFailure(
                 nx::hpm::api::NatTraversalResultCode::tcpConnectFailed,
-                verificator->lastSysErrorCode());
+                verificator->lastSystemErrorCode());
             break;
 
         case AbstractEndpointVerificator::VerificationResult::notPassed:

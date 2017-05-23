@@ -5,16 +5,16 @@
 
 #include <boost/optional.hpp>
 
-#include "abstract_acceptor.h"
+#include "abstract_stream_socket_acceptor.h"
 #include "aio/timer.h"
 
 namespace nx {
 namespace network {
 
 class NX_NETWORK_API AggregateAcceptor:
-    public AbstractAcceptor
+    public AbstractStreamSocketAcceptor
 {
-    using base_type = AbstractAcceptor;
+    using base_type = AbstractStreamSocketAcceptor;
 
 public:
     AggregateAcceptor();
@@ -28,9 +28,9 @@ public:
      * These methods can be called concurrently with AggregateAcceptor::accept.
      * NOTE: Blocks until completion.
      */
-    bool addSocket(std::unique_ptr<AbstractAcceptor> acceptor);
-    void removeSocket(size_t pos);
-    void remove(AbstractAcceptor* acceptor);
+    bool add(std::unique_ptr<AbstractStreamSocketAcceptor> acceptor);
+    void removeAt(size_t pos);
+    void remove(AbstractStreamSocketAcceptor* acceptor);
     size_t count() const;
 
     void setAcceptTimeout(boost::optional<std::chrono::milliseconds> timeout);
@@ -38,10 +38,10 @@ public:
 private:
     struct AcceptorContext
     {
-        std::unique_ptr<AbstractAcceptor> acceptor;
+        std::unique_ptr<AbstractStreamSocketAcceptor> acceptor;
         bool isAccepting;
 
-        AcceptorContext(std::unique_ptr<AbstractAcceptor> acceptor);
+        AcceptorContext(std::unique_ptr<AbstractStreamSocketAcceptor> acceptor);
         AcceptorContext(AcceptorContext&&) = default;
         AcceptorContext& operator=(AcceptorContext&&) = default;
 

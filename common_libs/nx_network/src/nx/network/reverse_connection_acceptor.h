@@ -41,7 +41,7 @@ public:
  * Always keeps specified number of connections alive.
  * @param AcceptableReverseConnection MUST implement 
  *   AbstractAcceptableReverseConnection and aio::BasicPollable.
- * NOTE: This class follows behavior of AbstractAcceptor, though not implements it.
+ * NOTE: This class follows behavior of AbstractStreamSocketAcceptor, though not implements it.
  * NOTE: Does not implement accept timeout. If you need it, consider using aio::Timer.
  * NOTE: If AbstractAcceptableReverseConnection::waitForOriginatorToStartUsingConnection reports error, 
  *   that error is passed to the scheduled acceptAsync call.

@@ -1,6 +1,6 @@
 #pragma once 
 
-#include "httptypes.h"
+#include "http_types.h"
 #include "../buffer.h"
 
 namespace nx_http {

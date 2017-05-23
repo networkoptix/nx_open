@@ -24,6 +24,9 @@ struct ListeningPeer
 {
     int recommendedPreemptiveConnectionCount;
     int maxPreemptiveConnectionCount;
+    std::chrono::milliseconds disconnectedPeerTimeout;
+    std::chrono::milliseconds takeIdleConnectionTimeout;
+    std::chrono::milliseconds internalTimerPeriod;
 
     ListeningPeer();
 };

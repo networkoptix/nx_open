@@ -29,19 +29,17 @@ protected:
     void givenBaseUrlWithTrailingSlash()
     {
         initializeHttpServer("/test/");
-        m_baseUrl = QUrl(lm("http://%1/test/").arg(m_httpServer->serverAddress()));
     }
 
     void givenBaseUrlWithEmptyPath()
     {
         initializeHttpServer("/");
-        m_baseUrl = QUrl(lm("http://%1").arg(m_httpServer->serverAddress()));
+        m_baseUrl.setPath("");
     }
 
     void givenBaseUrlWithRootPath()
     {
         initializeHttpServer("/");
-        m_baseUrl = QUrl(lm("http://%1/").arg(m_httpServer->serverAddress()));
     }
 
     void whenInvokedSomeRequest()
@@ -69,11 +67,19 @@ protected:
         ASSERT_EQ(api::ResultCode::ok, m_lastResultCode);
     }
 
+    void enableAuthentication()
+    {
+        m_authenticator = QAuthenticator();
+        m_authenticator->setUser("username");
+        m_authenticator->setPassword("password");
+    }
+
 private:
     std::unique_ptr<TestHttpServer> m_httpServer;
     std::unique_ptr<ClientImpl> m_client;
     QUrl m_baseUrl;
     ResultCode m_lastResultCode = ResultCode::unknownError;
+    boost::optional<QAuthenticator> m_authenticator;
 
     void initializeHttpServer(QString baseUrlPath)
     {
@@ -96,8 +102,21 @@ private:
 
         ASSERT_TRUE(m_httpServer->bindAndListen());
         m_baseUrl = QUrl(lm("http://%1/%2").arg(m_httpServer->serverAddress()).arg(baseUrlPath));
+
+        if (m_authenticator)
+        {
+            m_httpServer->setAuthenticationEnabled(true);
+            m_httpServer->registerUserCredentials(
+                m_authenticator->user().toUtf8(),
+                m_authenticator->password().toUtf8());
+            m_baseUrl.setUserName(m_authenticator->user());
+            m_baseUrl.setPassword(m_authenticator->password());
+        }
     }
 };
+
+//-------------------------------------------------------------------------------------------------
+// Test cases.
 
 TEST_F(RelayApiClient, extends_path)
 {
@@ -122,6 +141,14 @@ TEST_F(RelayApiClient, base_url_has_empty_path)
 TEST_F(RelayApiClient, base_url_is_a_root_path)
 {
     givenBaseUrlWithRootPath();
+    whenInvokedSomeRequest();
+    thenClientUsedRightUrl();
+}
+
+TEST_F(RelayApiClient, uses_authentication)
+{
+    enableAuthentication();
+
     whenInvokedSomeRequest();
     thenClientUsedRightUrl();
 }

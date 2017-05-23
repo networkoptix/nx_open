@@ -26,7 +26,7 @@
 #include <nx/utils/log/log.h>
 #include "utils/common/synctime.h"
 #include "utils/math/math.h"
-#include <nx/network/http/httptypes.h>
+#include <nx/network/http/http_types.h>
 #include <nx/network/socket_global.h>
 #include <nx/utils/timer_manager.h>
 #include <nx/utils/system_error.h>

@@ -27,9 +27,10 @@ enum class QnLayoutFlag
     NoDrop              = 0x01,
     FixedViewport       = 0x02, //< Disallow to zoom and hand scroll
     NoMove              = 0x04,
-    NoResize            = 0x08,
+    NoResize            = 0x08, //< Disallow to resize (including raise) items
     NoTimeline          = 0x10,
     SpecialBackground   = 0x20,
+    FillViewport        = 0x40, //< Layout must fill viewport as much as possible
 };
 Q_DECLARE_FLAGS(QnLayoutFlags, QnLayoutFlag)
 Q_DECLARE_OPERATORS_FOR_FLAGS(QnLayoutFlags)
@@ -296,6 +297,13 @@ public:
     /**
      * \param gridPos                   Desired position, in grid coordinates.
      * \param size                      Desired slot size.
+     * \returns                         True if requested rect is not covered by pinned items.
+     */
+    bool isFreeSlot(const QPointF &gridPos, const QSize &size) const;
+
+    /**
+     * \param gridPos                   Desired position, in grid coordinates.
+     * \param size                      Desired slot size.
      * \param metric                    Metric of the gridspace to use for determining the closest slot.
      *                                  Positions of the top-left corner of the slot at hand will be passed to it.
      * \returns                         Geometry of the free slot of desired size whose upper-left corner
@@ -330,6 +338,9 @@ public:
      * @brief isSearchLayout            Check if this layout is preview search layout
      */
     bool isSearchLayout() const;
+
+    /** Check if this layout is a tour review. */
+    bool isLayoutTourReview() const;
 
 signals:
     void flagsChanged();
