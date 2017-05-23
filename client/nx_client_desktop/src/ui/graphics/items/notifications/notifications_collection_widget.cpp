@@ -620,12 +620,6 @@ void QnNotificationsCollectionWidget::showSystemHealthMessage(QnSystemHealth::Me
                 );
             break;
 
-        case QnSystemHealth::ConnectionLost:
-            item->addActionButton(
-                qnSkin->icon("events/connection.png"),
-                action::OpenLoginDialogAction);
-            break;
-
         case QnSystemHealth::NoPrimaryTimeServer:
             item->addActionButton(
                 qnSkin->icon("events/settings.png"),

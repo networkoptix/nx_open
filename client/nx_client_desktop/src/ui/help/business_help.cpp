@@ -78,8 +78,6 @@ int QnBusiness::healthHelpId(QnSystemHealth::MessageType type) {
         return Qn::EventsActions_NoLicenses_Help;
     case QnSystemHealth::SmtpIsNotSet:
         return Qn::EventsActions_EmailServerNotSet_Help;
-    case QnSystemHealth::ConnectionLost:
-        return Qn::EventsActions_EcConnectionLost_Help;
     case QnSystemHealth::EmailSendError:
         return Qn::EventsActions_SendMailError_Help;
     case QnSystemHealth::StoragesNotConfigured:
