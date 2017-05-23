@@ -1,0 +1,22 @@
+ <assembly>
+    <id>${classifier}</id>
+    <formats>
+        <format>tar.gz</format>
+    </formats>
+    <includeBaseDirectory>false</includeBaseDirectory>
+    <fileSets>
+        <fileSet>
+            <directory>${basedir}</directory>
+            <outputDirectory>../</outputDirectory>
+            <includes>
+                <include>x64/**</include>
+                <include>x86/**</include>
+                <include>include/**</include>
+                <include>*.pri</include>
+            </includes>
+            <excludes>
+                <exclude>**/.hidden</exclude>
+            </excludes>         
+        </fileSet>          
+    </fileSets>
+</assembly>

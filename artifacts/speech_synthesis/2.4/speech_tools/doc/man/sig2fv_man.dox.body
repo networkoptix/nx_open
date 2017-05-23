@@ -1,0 +1,75 @@
+/**
+
+@page sig2fv_manual sig2fv
+@brief *Generate signal processing coefficients from waveforms*
+@tableofcontents
+
+@section synopsis Synopsis
+
+@SYNOPSIS@
+
+`sig2fv` is used to create signal processing feature vector analysis on speech
+waveforms.
+The following types of analysis are provided:
+
+  - Linear prediction (LPC)
+  - Cepstrum coding from lpc coefficients
+  - Mel scale cepstrum coding via fbank
+  - Mel scale log filterbank analysis
+  - Line spectral frequencies
+  - Linear prediction reflection coefficients
+  - Root mean square energy
+  - Power
+  - fundamental frequency (pitch)
+  - calculation of delta and acceleration coefficients of all of the above
+
+The -coefs option is used to specify a list of the names of what sort
+of basic processing is required, and -delta and -acc are used for
+delta and acceleration coefficients respectively.
+
+
+@section options Options
+
+@OPTIONS@
+
+@section sig2fv-examples Examples
+
+Fixed frame basic linear prediction:
+
+To produce a set of linear prediction coefficients at every 10ms, using
+pre-emphasis and saving in EST format:
+
+    $ sig2fv kdt_010.wav -o kdt_010.lpc -coefs "lpc" -otype est -shift 0.01 -preemph 0.5
+
+**Pitch Synchronous linear prediction**:
+The following used the set of pitchmarks in kdt_010.pm as the centres
+of the analysis windows.
+
+    $ sig2fv kdt_010.wav -pm kdt_010.pm -o kdt_010.lpc -coefs "lpc" -otype est -shift 0.01 -preemph 0.5
+
+F0, Linear prediction and cepstral coefficients:
+
+    $ sig2fv kdt_010.wav -o kdt_010.lpc -coefs "f0 lpc cep" -otype est -shift 0.01
+
+Note that pitchtracking can also be done with the
+`pda` program. Both use the same underlying
+technique, but the pda program offers much finer control over the
+pitch track specific processing parameters.
+
+Energy, Linear Prediction and Cepstral coefficients, with a 10ms frame shift
+during analysis but a 5ms frame shift in the output file:
+
+    $ sig2fv kdt_010.wav -o kdt_010.lpc -coefs "f0 lpc cep" -otype est -S 0.005
+      -shift 0.01
+
+Delta  and acc coefficients can be calculated even if their base form is not 
+required. This produces normal energy coefficients and cepstral delta coefficients:
+
+    $ sig2fv ../kdt_010.wav -o kdt_010.lpc -coefs "energy" -delta "cep" -otype est
+
+Mel-scaled cepstra, Delta and acc coefficients, as is common in speech 
+recognition:
+
+    $ sig2fv ../kdt_010.wav -o kdt_010.lpc -coefs "melcep" -delta "melcep" -acc "melcep" -otype est -preemph 0.96
+
+*/

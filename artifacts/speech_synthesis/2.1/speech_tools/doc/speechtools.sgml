@@ -1,0 +1,110 @@
+<!doctype book PUBLIC "-//Davenport//DTD DocBook V3.0//EN" 
+        [ 
+	<!entity EDITION '1.2'>
+	<!entity VERSION '1.2.0'>
+	<!entity UPDATED '15th June 1999'>
+
+	<!entity % cstrDefs SYSTEM "cstr_defs.dtd">
+	%cstrDefs;
+
+	<!entity % includeOnlyDefs SYSTEM "INCLUDE_ONLY">
+	%includeOnlyDefs;
+
+	<!entity % sectionDefs SYSTEM "sections.dtd">
+	%sectionDefs;
+
+        <!entity % hidden 'IGNORE'>
+
+	<!entity % declareExamples SYSTEM "examples_gen/declare_entities.sgml">
+	<!entity includeExamples SYSTEM "examples_gen/include_entities.sgml">
+	%declareExamples;
+
+	<!entity % declareManuals SYSTEM "manuals_gen/declare_entities.sgml">
+	<!entity includeManuals SYSTEM "manuals_gen/include_entities.sgml">
+	%declareManuals;
+
+	<!entity % declareDocpp SYSTEM "doc++/declare_entities.sgml">
+	<!entity includeDocpp SYSTEM "doc++/include_entities.sgml">
+	%declareDocpp;
+
+        ]>
+
+<book>
+
+<bookinfo>
+	<title>Edinburgh Speech Tools Library</title>
+	<subtitle>
+		System Documentation
+		Edition &EDITION;, for &VERSION;
+		&UPDATED;
+	</subtitle>
+	<authorgroup>
+		<author>
+			<firstname>Paul</firstname> <surname>Taylor</surname>
+		</author>
+		<author>
+			<firstname>Richard</firstname> <surname>Caley</surname>
+		</author>
+		<author>
+			<firstname>Alan</firstname> <othername>W.</othername> <surname>Black</surname>
+		</author>
+		<author>
+			<firstname>Simon</firstname> <surname>King</surname>
+		</author>
+	</authorgroup>
+
+	<copyright>
+		<year>1994-1999</year>
+		<holder>Centre for Speech Technology,
+	University of Edinburgh</holder>
+	</copyright>
+</bookinfo>
+
+<toc depth=2></toc>
+
+<![ %include-estintro; [ &estintrodoc; ]]>
+
+<![ %include-estexec; [ &estexecdoc; ]]>
+     
+<![ %include-estbaseclassdoc; [ &estbaseclassdoc; ]]>
+
+<![ %include-estspeechclassdoc; [ &estspeechclassdoc; ]]>
+
+<![ %include-estlingdoc; [ &estlingdoc; ]]>
+
+<![ %include-estutildoc; [ &estutildoc; ]]>
+
+<![ %include-estsigprdoc; [ &estsigprdoc; ]]>
+
+<![ %include-estserver; [ &estserver; ]]>
+
+<![ %include-estgramdoc; [ &estgramdoc; ]]>
+
+<![ %include-estwagondoc; [ &estwagondoc; ]]>
+
+<![ %include-esttiltdoc; [ &esttiltdoc; ]]>
+
+<![ %include-estjavaappdoc; [ &estjavaappdoc; ]]>
+
+<![ %include-indexChapter; [ &indexChapter; ]]>
+
+
+
+
+</book>
+
+<!-- Keep this comment at the end of the file
+Local variables:
+mode: sgml
+sgml-omittag:nil
+sgml-shorttag:t
+sgml-minimize-attributes:nil
+sgml-always-quote-attributes:t
+sgml-indent-step:2
+sgml-indent-data:t
+sgml-parent-document:nil
+sgml-exposed-tags:nil
+sgml-local-catalogs:nil
+sgml-local-ecat-files:nil
+End:
+-->

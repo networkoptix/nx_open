@@ -1,0 +1,12 @@
+signal ch_wave
+type 0
+comment created using xlabel Mon Feb 22 07:45:44 1999
+separator ;
+nfields 1
+#
+    0.173428   -1 x; file sil1 ;
+    0.245849   -1 x; file w1 ;
+    0.560307   -1 x; file w2 ;
+    1.172071   -1 x; file w3 ;
+    1.680922   -1 x; file w4 ;
+    2.010820   -1 x; file sil2 ;

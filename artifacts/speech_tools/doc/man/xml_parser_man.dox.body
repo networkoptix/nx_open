@@ -1,0 +1,23 @@
+/**
+
+@page xml_parser_manual xml_parser
+@brief *An XML Parser*
+@tableofcontents
+
+@section synopsis Synopsis
+
+@SYNOPSIS@
+
+`xml_parser` is a simple program giving access to
+the *RXP* XML parser. It parses an input
+file and prints the results out in a simple indented format. It's
+main use is as a development tool, to check that files intended for
+input to an XML application, for instance *festival*, parse as
+you expect.
+
+
+@section options Options
+
+@OPTIONS@
+
+*/

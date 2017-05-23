@@ -1,0 +1,270 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>Out of vocabulary words</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REL="HOME"
+TITLE="Building Synthetic Voices"
+HREF="book1.html"><LINK
+REL="UP"
+TITLE="Lexicons"
+HREF="c1379.html"><LINK
+REL="PREVIOUS"
+TITLE="Lexicons and addenda"
+HREF="x1396.html"><LINK
+REL="NEXT"
+TITLE="Building letter-to-sound rules by hand"
+HREF="x1429.html"></HEAD
+><BODY
+CLASS="SECT1"
+BGCOLOR="#FFFFFF"
+TEXT="#000000"
+LINK="#0000FF"
+VLINK="#840084"
+ALINK="#0000FF"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="3"
+ALIGN="center"
+>Building Synthetic Voices</TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="bottom"
+><A
+HREF="x1396.html"
+ACCESSKEY="P"
+>&#60;&#60;&#60; Previous</A
+></TD
+><TD
+WIDTH="80%"
+ALIGN="center"
+VALIGN="bottom"
+>Lexicons</TD
+><TD
+WIDTH="10%"
+ALIGN="right"
+VALIGN="bottom"
+><A
+HREF="x1429.html"
+ACCESSKEY="N"
+>Next &#62;&#62;&#62;</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="SECT1"
+><H1
+CLASS="SECT1"
+><A
+NAME="AEN1405"
+>Out of vocabulary words</A
+></H1
+><P
+>Because its impossible to list all words in a natural language for 
+general text-to-speech you will need to provide something to pronounce 
+out of vocabulary words. In some languages this is easy but in other's 
+it is very hard. No matter what you do you <I
+CLASS="EMPHASIS"
+>must</I
+> provide 
+something even if it is simply replacing the unknown word with the word 
+<SPAN
+CLASS="QUOTE"
+>"<I
+CLASS="EMPHASIS"
+>unknown</I
+>"</SPAN
+> (or its local language equivalent). By default a lexicon 
+in Festival will throw an error if a requested word isn't found. To 
+change this you can set the <CODE
+CLASS="VARNAME"
+>lts_method</CODE
+>. Most usefully you can 
+reset this to the name of function, which takes a word and a part of 
+speech specification and returns a word pronunciation as described above. </P
+><P
+>For example is we are always going to return the 
+word <CODE
+CLASS="VARNAME"
+>unknown</CODE
+> but print a warning the the word is being 
+ignored a suitable function is 
+<A
+NAME="AEN1414"
+></A
+><BLOCKQUOTE
+CLASS="BLOCKQUOTE"
+><P
+CLASS="LITERALLAYOUT"
+>(define&nbsp;(mylex_lts_function&nbsp;word&nbsp;feats)<br>
+"Deal&nbsp;with&nbsp;out&nbsp;of&nbsp;vocabulary&nbsp;word."<br>
+&nbsp;&nbsp;(format&nbsp;t&nbsp;"unknown&nbsp;word:&nbsp;%s\n"&nbsp;word)<br>
+&nbsp;&nbsp;'("unknown"&nbsp;n&nbsp;(((uh&nbsp;n)&nbsp;1)&nbsp;((n&nbsp;ou&nbsp;n)&nbsp;1))))</P
+></BLOCKQUOTE
+>
+Note the pronunciation of <SPAN
+CLASS="QUOTE"
+>"<I
+CLASS="EMPHASIS"
+>unknown</I
+>"</SPAN
+> must be in the appropriate 
+phone set. Also the syllabic structure is required. You need to 
+specify this function for your lexicon as follows 
+<A
+NAME="AEN1418"
+></A
+><BLOCKQUOTE
+CLASS="BLOCKQUOTE"
+><P
+CLASS="LITERALLAYOUT"
+>(lex.set.lts.method&nbsp;'mylex_lts_function)</P
+></BLOCKQUOTE
+></P
+><P
+>At one level above merely identifying out of vocabulary words, they can 
+be spelled, this of course isn't ideal but it will allow the basic 
+information to be passed over to the listener. This can be done 
+with the out of vocabulary function, as follows. 
+<A
+NAME="AEN1421"
+></A
+><BLOCKQUOTE
+CLASS="BLOCKQUOTE"
+><P
+CLASS="LITERALLAYOUT"
+>(define&nbsp;(mylex_lts_function&nbsp;word&nbsp;feats)<br>
+"Deal&nbsp;with&nbsp;out&nbsp;of&nbsp;vocabulary&nbsp;words&nbsp;by&nbsp;spelling&nbsp;out&nbsp;the&nbsp;letters&nbsp;in&nbsp;the<br>
+word."<br>
+&nbsp;(if&nbsp;(equal?&nbsp;1&nbsp;(length&nbsp;word))<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(begin<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(format&nbsp;t&nbsp;"the&nbsp;character&nbsp;%s&nbsp;is&nbsp;missing&nbsp;from&nbsp;the&nbsp;lexicon\"&nbsp;word)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'("unknown"&nbsp;n&nbsp;(((uh&nbsp;n)&nbsp;1)&nbsp;((n&nbsp;ou&nbsp;n)&nbsp;1))))<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(cons<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;word<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'n<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(apply<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;append<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(mapcar<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(lambda&nbsp;(letter)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(car&nbsp;(cdr&nbsp;(cdr&nbsp;(lex.lookup&nbsp;letter&nbsp;'n)))))<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(symbolexplode&nbsp;word))))))</P
+></BLOCKQUOTE
+>
+A few point are worth noting in this function. This recursively calls 
+the lexical lookup function on the characters in a word. Each letter 
+should appear in the lexicon with its pronunciation (in isolation). 
+But a check is made to ensure we don't recurse for ever. The 
+<CODE
+CLASS="VARNAME"
+>symbolexplode</CODE
+> function assumes that that letters are single 
+bytes, which may not be true for some languages and that function would 
+need to be replaced for that language. Note that we append the 
+syllables of each of the letters in the word. For long words this might 
+be too naive as there could be internal prosodic structure in such a 
+spelling that this method would not allow for. In that case you would 
+want letters to be words thus the symbol explosion to happen at the 
+token to word level. Also the above function assumes that the part of 
+speech for letters is <CODE
+CLASS="VARNAME"
+>n</CODE
+>. This is only really important where 
+letters are homographs in languages so this can be used to distinguish 
+which pronunciation you require (cf. <SPAN
+CLASS="QUOTE"
+>"<I
+CLASS="EMPHASIS"
+>a</I
+>"</SPAN
+> in English or <SPAN
+CLASS="QUOTE"
+>"<I
+CLASS="EMPHASIS"
+>y</I
+>"</SPAN
+> in 
+French). </P
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="x1396.html"
+ACCESSKEY="P"
+>&#60;&#60;&#60; Previous</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="book1.html"
+ACCESSKEY="H"
+>Home</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="x1429.html"
+ACCESSKEY="N"
+>Next &#62;&#62;&#62;</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>Lexicons and addenda</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="c1379.html"
+ACCESSKEY="U"
+>Up</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>Building letter-to-sound rules by hand</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

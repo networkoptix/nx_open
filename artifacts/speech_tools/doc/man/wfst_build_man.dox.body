@@ -1,0 +1,40 @@
+/**
+
+@page wfst_build_manual wfst_build
+@brief *Build a weighted finite-state transducer*
+@tableofcontents
+
+@section synopsis Synopsis
+
+@SYNOPSIS@
+
+Builds and.or processes weighted finite state transducers (WFSTs) from
+various input formats.  This program accepts descriptions
+in the following formats and converts them to WFSTs
+
+  - regular expressions
+  - regular grammars
+  - Koskenniemi/Kay/Kaplan context restriction rules
+
+In addition various operations can be performed on two WFSTs
+
+  - compose: form new WFST feeding output of first WFSTs into
+    second WFSTs.
+  - union: form new WFST accepting the language both WFSTs
+  - intersect: form new WFST accepting only the language common
+    to both WFSTs
+  - concat: form new WFST accepting the language from the
+    concatenation of all strings in the first WFST to all strings in the
+    second.
+
+The newly formed WFSTs can be optionally determinized and minimzed.
+
+The option asis allows a single WFSTs to be loaded and determinized
+and/or minimized
+
+
+@section options Options
+
+@OPTIONS@
+
+*/

@@ -1,0 +1,473 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>Statistical Parametric Synthesis</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REL="HOME"
+TITLE="Building Synthetic Voices"
+HREF="book1.html"><LINK
+REL="UP"
+TITLE="Building Synthetic Voices"
+HREF="p710.html"><LINK
+REL="PREVIOUS"
+TITLE="Diphones from general databases"
+HREF="x3144.html"><LINK
+REL="NEXT"
+TITLE="Labeling Speech"
+HREF="c3245.html"></HEAD
+><BODY
+CLASS="CHAPTER"
+BGCOLOR="#FFFFFF"
+TEXT="#000000"
+LINK="#0000FF"
+VLINK="#840084"
+ALINK="#0000FF"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="3"
+ALIGN="center"
+>Building Synthetic Voices</TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="bottom"
+><A
+HREF="x3144.html"
+ACCESSKEY="P"
+>&#60;&#60;&#60; Previous</A
+></TD
+><TD
+WIDTH="80%"
+ALIGN="center"
+VALIGN="bottom"
+></TD
+><TD
+WIDTH="10%"
+ALIGN="right"
+VALIGN="bottom"
+><A
+HREF="c3245.html"
+ACCESSKEY="N"
+>Next &#62;&#62;&#62;</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="CHAPTER"
+><H1
+><A
+NAME="BSV-SPS-CH"
+></A
+>Statistical Parametric Synthesis</H1
+><DIV
+CLASS="SECT1"
+><H1
+CLASS="SECT1"
+><A
+NAME="AEN3172"
+>Building a CLUSTERGEN Statistical Parametric Synthesizer</A
+></H1
+><P
+>&#13;
+
+This method, inspired the work of Keiichi Tokuda and NITECH's HMM
+Speech Synthesis Toolkit, is a method for building statistical
+parametric synthesizers from databases of natural speech.  Although
+the result is still not as crisp as a well done unit selection voice,
+this method is much easier to get a nice clear synthetic voice that
+models the original speaker well.&#13;</P
+><P
+>&#13;Although this method is partially "tagged on" to the clunits method,
+it is actually quite independent.  The tasks are as follows.
+
+<P
+></P
+><UL
+><LI
+STYLE="list-style-type: disc"
+><P
+>Read and understand all the issues regarding the following
+steps</P
+></LI
+><LI
+STYLE="list-style-type: disc"
+><P
+>Set up the directory structure</P
+></LI
+><LI
+STYLE="list-style-type: disc"
+><P
+>Record or import the prompts and prompt list</P
+></LI
+><LI
+STYLE="list-style-type: disc"
+><P
+>Label the data with the HMM-state sized segments</P
+></LI
+><LI
+STYLE="list-style-type: disc"
+><P
+>Build utterance structures for recorded utterances</P
+></LI
+><LI
+STYLE="list-style-type: disc"
+><P
+>Extract F0 and mcep coefficients.</P
+></LI
+><LI
+STYLE="list-style-type: disc"
+><P
+>Build a CLUSTERGEN voice</P
+></LI
+><LI
+STYLE="list-style-type: disc"
+><P
+>Build an HMM-state duration model</P
+></LI
+><LI
+STYLE="list-style-type: disc"
+><P
+>Testing</P
+></LI
+></UL
+>
+
+We assume you have read the rest of this chapter (though, in reality,
+we know you probably haven't), thus the descriptions here are quite
+minimal.&#13;</P
+><P
+>&#13;First make an empty directory and in it run the
+<TT
+CLASS="FILENAME"
+>setup_cg</TT
+> setup command.
+<A
+NAME="AEN3201"
+></A
+><BLOCKQUOTE
+CLASS="BLOCKQUOTE"
+><P
+CLASS="LITERALLAYOUT"
+>&nbsp;&nbsp;&nbsp;&nbsp;mkdir&nbsp;cmu_us_awb_arctic<br>
+&nbsp;&nbsp;&nbsp;&nbsp;cd&nbsp;cmu_us_awb_arctic<br>
+&nbsp;&nbsp;&nbsp;&nbsp;$FESTVOXDIR/src/clustergen/setup_cg&nbsp;cmu&nbsp;us&nbsp;awb_arctic</P
+></BLOCKQUOTE
+>
+In you already have an existing voice running
+<TT
+CLASS="FILENAME"
+>setup_cg</TT
+> while only copy in the necessary files
+for clustergen, however I'd recommend starting from scratch as I don't
+know when you created your previous voice and I'm not sure of its
+exact state.&#13;</P
+><P
+>&#13;Now you need to get your waveform files and prompt file.  Put your
+waveform files in the <TT
+CLASS="FILENAME"
+>wav/</TT
+> and your prompt file
+in <TT
+CLASS="FILENAME"
+>etc/txt.done.data</TT
+>.  Note you should probably
+use <TT
+CLASS="FILENAME"
+>bin/get_wavs</TT
+> to copy the wavefiles so that
+they get power normalized and get changed to a reasonable format
+(16KHz, 16bit, RIFF format).&#13;</P
+><P
+>&#13;The next stage if to label the data.  If you aren't
+<I
+CLASS="EMPHASIS"
+>very</I
+> knowledgeable about labeling in clustergen, you
+should use the EHMM labeler.  EHMM constructs the labels in the right
+format for segments and HMM states. and matches them properly with
+what the synthesizer generates for the prompts.  Using other labels is
+likely to cause more problems.  Even if you already have other labels
+use EHMM first.
+<A
+NAME="AEN3210"
+></A
+><BLOCKQUOTE
+CLASS="BLOCKQUOTE"
+><P
+CLASS="LITERALLAYOUT"
+>&nbsp;&nbsp;&nbsp;&nbsp;./bin/do_build&nbsp;build_prompts<br>
+&nbsp;&nbsp;&nbsp;&nbsp;./bin/do_build&nbsp;label<br>
+&nbsp;&nbsp;&nbsp;&nbsp;./bin/do_build&nbsp;build_utts</P
+></BLOCKQUOTE
+>
+
+The EHMM labeler has been shown to be very reliable, and can nicely
+deal with silence insertion.  It isn't very fast though and will take
+several hours.  You can check the file
+<TT
+CLASS="FILENAME"
+>ehmm/mod/log100.txt</TT
+> to see the Baum-Welch
+iterations, there will probably be 20-30.  The ARCTIC a-set takes
+about 3-4 hours to label.&#13;</P
+><P
+>&#13;Parametric synthesis require a reversible parameterization, this set
+up here uses a form of mel cepstrum, the same version that is used by
+NITECH's basic HTS build.  Parameter build is in two parts building
+the F0 and building the mceps themselves.  Then these are combined
+into a single parameter file for each utterance in the database.
+
+<A
+NAME="AEN3214"
+></A
+><BLOCKQUOTE
+CLASS="BLOCKQUOTE"
+><P
+CLASS="LITERALLAYOUT"
+>&nbsp;&nbsp;&nbsp;&nbsp;./bin/do_clustergen&nbsp;f0<br>
+&nbsp;&nbsp;&nbsp;&nbsp;./bin/do_clustergen&nbsp;mcep<br>
+&nbsp;&nbsp;&nbsp;&nbsp;./bin/do_clustergen&nbsp;combine_coeffs</P
+></BLOCKQUOTE
+>
+
+The mcep part takes the longest.  Note that the F0 part now tries to
+estimate the range of the F0 on the speaker and modifies parameters
+for the F0 extraction program.  (The F0 params are saved in 
+<TT
+CLASS="FILENAME"
+>etc/f0.params</TT
+>.)&#13;</P
+><P
+>&#13;If you want to have a test set of utterances, you can separate out
+some of your prompt list.  The test set should be put in the file
+<TT
+CLASS="FILENAME"
+>etc/txt.done.data.test</TT
+> The follow commands will
+make a training and test set (every 10th prompt in the test set, the
+other 9 in the training set).
+
+<A
+NAME="AEN3219"
+></A
+><BLOCKQUOTE
+CLASS="BLOCKQUOTE"
+><P
+CLASS="LITERALLAYOUT"
+>&nbsp;&nbsp;&nbsp;&nbsp;./bin/traintest&nbsp;etc/txt.done.data<br>
+&nbsp;&nbsp;&nbsp;&nbsp;cat&nbsp;etc/txt.done.data.train&nbsp;&#62;etc/txt.done.data</P
+></BLOCKQUOTE
+></P
+><P
+>&#13;The next stage is to generate is to build the parametric model.  There
+parts are required for this.  This first is very quick and simply puts
+the state (and phone) names into their respective files.  It assumes a
+file <TT
+CLASS="FILENAME"
+>etc/statenames</TT
+> which is generate by EHMM.
+The second stage build the parametric models itself.  The last builds
+a duration model for the state names
+
+<A
+NAME="AEN3223"
+></A
+><BLOCKQUOTE
+CLASS="BLOCKQUOTE"
+><P
+CLASS="LITERALLAYOUT"
+>&nbsp;&nbsp;&nbsp;./bin/do_clustergen&nbsp;generate_statenames<br>
+&nbsp;&nbsp;&nbsp;./bin/do_clustergen&nbsp;cluster<br>
+&nbsp;&nbsp;&nbsp;./bin/do_clustergen&nbsp;dur</P
+></BLOCKQUOTE
+>&#13;</P
+><P
+>The resulting voice should now work
+<A
+NAME="AEN3226"
+></A
+><BLOCKQUOTE
+CLASS="BLOCKQUOTE"
+><P
+CLASS="LITERALLAYOUT"
+>&nbsp;&nbsp;&nbsp;festival&nbsp;festvox/cmu_us_awb_arctic_cg.scm<br>
+&nbsp;&nbsp;&nbsp;...<br>
+&nbsp;&nbsp;&nbsp;festival&#62;&nbsp;(voice_cmu_us_awb_arctic_cg)<br>
+&nbsp;&nbsp;&nbsp;...<br>
+&nbsp;&nbsp;&nbsp;festival&#62;&nbsp;(SayText&nbsp;"This&nbsp;is&nbsp;a&nbsp;little&nbsp;example.")</P
+></BLOCKQUOTE
+></P
+><P
+>The voice can be packaged for distribution by the command
+<A
+NAME="AEN3229"
+></A
+><BLOCKQUOTE
+CLASS="BLOCKQUOTE"
+><P
+CLASS="LITERALLAYOUT"
+>&nbsp;&nbsp;&nbsp;./bin/do_clusterget&nbsp;festvox_dist</P
+></BLOCKQUOTE
+>
+
+This will generation
+<TT
+CLASS="FILENAME"
+>festvox_cmu_us_awb_arctic_cg.tar.gz</TT
+> which will be
+quite small compared to a clunit voice made with the same databases.
+Because only the parameters are kept (in fact only means and standard
+deviations of clusters of of parameters) which do not include residual
+or excitation information the result is something orders of magnitude
+smaller that a full unit selection voices.&#13;</P
+><P
+>&#13;There two other options in the clustergen voice build.  These involve
+modeling trajectories rather than individual vectors.  They give
+objectively better results (though marginal subjectively better
+results for the voices we have tested).  Instead of the line
+
+<A
+NAME="AEN3233"
+></A
+><BLOCKQUOTE
+CLASS="BLOCKQUOTE"
+><P
+CLASS="LITERALLAYOUT"
+>&nbsp;&nbsp;&nbsp;./bin/do_clustergen&nbsp;cluster</P
+></BLOCKQUOTE
+>
+You can run
+<A
+NAME="AEN3235"
+></A
+><BLOCKQUOTE
+CLASS="BLOCKQUOTE"
+><P
+CLASS="LITERALLAYOUT"
+>&nbsp;&nbsp;&nbsp;./bin/do_clustergen&nbsp;trajectory</P
+></BLOCKQUOTE
+>
+or the slightly better
+<A
+NAME="AEN3237"
+></A
+><BLOCKQUOTE
+CLASS="BLOCKQUOTE"
+><P
+CLASS="LITERALLAYOUT"
+>&nbsp;&nbsp;&nbsp;./bin/do_clustergen&nbsp;trajectory_ola</P
+></BLOCKQUOTE
+>
+These two options may run after the simple version of the voice.&#13;</P
+><P
+>You can test your voice with held out data, if you did this in the above 
+step that created <TT
+CLASS="FILENAME"
+>etc/txt.done.data.test</TT
+>
+You can run
+<A
+NAME="AEN3241"
+></A
+><BLOCKQUOTE
+CLASS="BLOCKQUOTE"
+><P
+CLASS="LITERALLAYOUT"
+>&nbsp;&nbsp;&nbsp;$FESTVOXDIR/src/clustergen/cg_test&nbsp;resynth&nbsp;cgp</P
+></BLOCKQUOTE
+>
+
+This will create parameter files (and waveform files) in
+<TT
+CLASS="FILENAME"
+>test/cgp</TT
+>.  The output of the
+<TT
+CLASS="FILENAME"
+>cg_test</TT
+> is also four measures the mean difference
+for all features in the parameter vector, for F0 alone, for all but
+F0, and MCD (mel ceprstral distortion).</P
+></DIV
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="x3144.html"
+ACCESSKEY="P"
+>&#60;&#60;&#60; Previous</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="book1.html"
+ACCESSKEY="H"
+>Home</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="c3245.html"
+ACCESSKEY="N"
+>Next &#62;&#62;&#62;</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>Diphones from general databases</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="p710.html"
+ACCESSKEY="U"
+>Up</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>Labeling Speech</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>
