@@ -522,7 +522,7 @@ void QnLicenseManagerWidget::removeSelectedLicenses()
 
     using namespace nx::client::desktop::helpers::license;
     deactivateAsync(selectedLicenses(),
-        [](DeactivationResult result)
+        [](DeactivationResult result, const LicenseKeyErrorHash& errorsHash)
         {
             auto message = lit("+++++ license deactivation: ");
             switch(result)
@@ -543,6 +543,22 @@ void QnLicenseManagerWidget::removeSelectedLicenses()
                     message += lit("deactivation problem");
                     break;
             }
+
+            bool firstError = true;
+            for (auto it = errorsHash.begin(); it != errorsHash.end(); ++it)
+            {
+                if (it.value() == DeactivationError::NoError)
+                    continue;
+
+                if (firstError)
+                    message += lit("\n\nSome errors:");
+
+                firstError = false;
+                message += lit("License <%1> has deactivation error %2")
+                    .arg(it.key(), QString::number(static_cast<int>(it.value())));
+            }
+
+            qDebug() << message;
         });
 
 }

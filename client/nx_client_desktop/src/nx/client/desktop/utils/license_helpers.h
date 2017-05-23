@@ -2,6 +2,7 @@
 
 #include <functional>
 
+#include <QtCore/QHash>
 #include <QtCore/QString>
 
 #include <licensing/license_fwd.h>
@@ -20,7 +21,17 @@ enum class DeactivationResult
     ServerError,
     DeactivationError
 };
-using DeactivationHandler = std::function<void(DeactivationResult)>;
+
+enum class DeactivationError
+{
+    NoError,
+    UnknownError,
+
+    KeyIsNotActivated
+};
+
+using LicenseKeyErrorHash = QHash<QString, DeactivationError>;
+using DeactivationHandler = std::function<void(DeactivationResult, const LicenseKeyErrorHash&)>;
 
 void deactivateAsync(
     const QnLicenseList& licenses,
