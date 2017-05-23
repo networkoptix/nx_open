@@ -339,6 +339,9 @@ public:
      */
     bool isSearchLayout() const;
 
+    /** Check if this layout is a tour review. */
+    bool isLayoutTourReview() const;
+
 signals:
     void flagsChanged();
 

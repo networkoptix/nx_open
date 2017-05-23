@@ -1651,7 +1651,7 @@ ConditionWrapper isLayoutTourReviewMode()
     return new CustomBoolCondition(
         [](const Parameters& /*parameters*/, QnWorkbenchContext* context)
         {
-            return context->workbench()->currentLayout()->data().contains(Qn::LayoutTourUuidRole);
+            return context->workbench()->currentLayout()->isLayoutTourReview();
         });
 }
 

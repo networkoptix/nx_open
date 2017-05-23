@@ -57,8 +57,7 @@ QnResourceWidget* ResourceWidgetFactory::createWidget(QnWorkbenchContext* contex
     }
 
     auto layout = item->layout();
-    const bool isLayoutTourReview = layout
-        && !layout->data(Qn::LayoutTourUuidRole).value<QnUuid>().isNull();
+    const bool isLayoutTourReview = layout && layout->isLayoutTourReview();
     if (isLayoutTourReview)
         return new LayoutTourItemWidget(context, item);
 

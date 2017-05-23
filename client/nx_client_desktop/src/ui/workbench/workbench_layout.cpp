@@ -867,3 +867,8 @@ bool QnWorkbenchLayout::isSearchLayout() const {
         return false;
     return data(Qn::LayoutSearchStateRole).value<QnThumbnailsSearchState>().step > 0;
 }
+
+bool QnWorkbenchLayout::isLayoutTourReview() const
+{
+    return data().contains(Qn::LayoutTourUuidRole);
+}

@@ -175,7 +175,7 @@ void LayoutTourExecutor::resetTourItems(const ec2::ApiLayoutTourItemDataList& it
 
     for (const auto& item: items)
     {
-        auto existing = resourcePool()->getResourceById(item.layoutId);
+        auto existing = resourcePool()->getResourceById(item.resourceId);
         if (!existing)
             continue;
 

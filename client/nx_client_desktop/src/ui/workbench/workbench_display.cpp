@@ -1504,7 +1504,7 @@ QRectF QnWorkbenchDisplay::fitInViewGeometry() const
 
     // Limit size for layout tour review layouts //TODO: #GDM move to layout data
     static const int kLayoutTourMinimalSize = 3; //< size in cells: 3*3
-    if (workbench()->currentLayout()->data().contains(Qn::LayoutTourUuidRole))
+    if (workbench()->currentLayout()->isLayoutTourReview())
     {
         if (sceneBoundingRect.width() < kLayoutTourMinimalSize)
             sceneBoundingRect.setWidth(kLayoutTourMinimalSize);
@@ -2357,6 +2357,9 @@ void QnWorkbenchDisplay::at_notificationsHandler_businessActionAdded(const QnAbs
         return;
 
     if (workbench()->currentLayout()->isSearchLayout())
+        return;
+
+    if (workbench()->currentLayout()->isLayoutTourReview())
         return;
 
     /*

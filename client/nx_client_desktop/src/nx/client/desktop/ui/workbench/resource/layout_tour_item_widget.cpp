@@ -16,6 +16,7 @@
 #include <ui/graphics/items/generic/image_button_widget.h>
 #include <ui/graphics/items/generic/masked_proxy_widget.h>
 #include <ui/graphics/items/generic/viewport_bound_widget.h>
+#include <ui/graphics/items/resource/button_ids.h>
 #include <ui/graphics/items/standard/graphics_label.h>
 #include <ui/graphics/items/standard/graphics_pixmap.h>
 #include <nx/client/desktop/ui/graphics/painters/layout_preview_painter.h>
@@ -83,6 +84,16 @@ LayoutTourItemWidget::LayoutTourItemWidget(
 
 LayoutTourItemWidget::~LayoutTourItemWidget()
 {
+}
+
+Qn::ResourceStatusOverlay LayoutTourItemWidget::calculateStatusOverlay() const
+{
+    return Qn::EmptyOverlay;
+}
+
+int LayoutTourItemWidget::calculateButtonsVisibility() const
+{
+    return Qn::CloseButton;
 }
 
 void LayoutTourItemWidget::initOverlay()

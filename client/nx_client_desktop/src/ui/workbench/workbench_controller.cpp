@@ -1263,10 +1263,7 @@ void QnWorkbenchController::at_item_doubleClicked(QnResourceWidget *widget)
     display()->scene()->clearSelection();
     widget->setSelected(true);
 
-    const bool isLayoutTourReviewMode = workbench()->currentLayout()->data()
-        .contains(Qn::LayoutTourUuidRole);
-
-    if (isLayoutTourReviewMode)
+    if (workbench()->currentLayout()->isLayoutTourReview())
     {
         if (auto resource = widget->resource())
             menu()->trigger(action::DropResourcesIntoNewLayoutAction, resource);

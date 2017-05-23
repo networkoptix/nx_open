@@ -23,6 +23,10 @@ public:
         QGraphicsItem* parent = nullptr);
     virtual ~LayoutTourItemWidget() override;
 
+protected:
+    virtual Qn::ResourceStatusOverlay calculateStatusOverlay() const override;
+    virtual int calculateButtonsVisibility() const override;
+
 private:
     void initOverlay();
 

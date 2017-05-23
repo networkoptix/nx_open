@@ -317,7 +317,7 @@ void LayoutTourReviewController::addItemToReviewLayout(
         itemData.combinedGeometry = QRectF(bestPos, bestPos);
     }
     itemData.flags = Qn::PendingGeometryAdjustment;
-    itemData.resource.id = item.layoutId;
+    itemData.resource.id = item.resourceId;
     qnResourceRuntimeDataManager->setLayoutItemData(itemData.uuid,
         Qn::LayoutTourItemDelayMsRole, item.delayMs);
 
