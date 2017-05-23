@@ -219,7 +219,7 @@ QnResourceWidget::~QnResourceWidget()
 //TODO: #ynikitenkov #high emplace back "titleLayout->setContentsMargins(0, 0, 0, 1);" fix
 void QnResourceWidget::setupHud()
 {
-    addOverlayWidget(m_hudOverlay, detail::OverlayParams(UserVisible, true, true, InfoLayer));
+    addOverlayWidget(m_hudOverlay, detail::OverlayParams(UserVisible, true, false, InfoLayer));
     m_hudOverlay->setContentsMargins(0.0, 0.0, 0.0, 0.0);
     m_hudOverlay->content()->setContentsMargins(kHudMargin, 0.0, kHudMargin, kHudMargin);
     setOverlayWidgetVisible(m_hudOverlay, true, /*animate=*/false);
