@@ -29,6 +29,7 @@ list(APPEND CMAKE_MODULE_PATH
     ${PROJECT_SOURCE_DIR}/cmake)
 
 include(CMakeParseArguments)
+include(target_detection)
 include(utils)
 include(find_sources)
 include(qrc_utils)
@@ -38,7 +39,6 @@ include(mercurial)
 include(project_utils)
 
 find_python()
-detect_platform()
 nx_rdep_configure()
 
 include(android-ndk-workaround)
