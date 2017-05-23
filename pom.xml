@@ -519,7 +519,7 @@
 
                 <!-- <module>plugins/axiscamplugin</module> -->
                 <!-- <module>storage_plugins/ftpstorageplugin</module> -->
-                <module>storage_plugins/teststorageplugin</module>
+                <!-- <module>storage_plugins/teststorageplugin</module> -->
 
                 <!-- <module>mediaproxy</module> -->
             </modules>
@@ -806,7 +806,6 @@
                 <module>debsetup/client-deb</module>
                 <module>debsetup/mediaserver-deb</module>
 
-                <module>storage_plugins/teststorageplugin</module>
                 <!-- <module>storage_plugins/teststorageplugin/test</module> -->
             </modules>
             <properties>
