@@ -132,7 +132,7 @@ bool QnSignDialogDisplay::processData(const QnAbstractDataPacketPtr& data)
         }
         if (qnSyncTime->currentMSecsSinceEpoch() - m_lastDisplayTime2 > 100) // max display rate 10 fps
         {
-            QnCryptographicHash tmpctx = m_mdctx;
+            nx::utils::QnCryptographicHash tmpctx = m_mdctx;
             QByteArray calculatedSign = tmpctx.result();
             int progress = 100;
             if (reader)
