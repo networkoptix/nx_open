@@ -22,7 +22,7 @@ class QnTCPConnectionProcessor: public QnLongRunnable, public QnCommonModuleAwar
 public:
     static const int KEEP_ALIVE_TIMEOUT = 5  * 1000;
 
-    QnTCPConnectionProcessor(QSharedPointer<AbstractStreamSocket> socket, QnCommonModule* commonModule);
+    QnTCPConnectionProcessor(QSharedPointer<AbstractStreamSocket> socket, QnTcpListener* owner);
     virtual ~QnTCPConnectionProcessor();
 
     /**
@@ -67,8 +67,6 @@ public:
     int notFound(QByteArray& contentType);
     QnAuthSession authSession() const;
 protected:
-    virtual void applyModToRequest() {}
-protected:
     QString extractPath() const;
     static QString extractPath(const QString& fullUrl);
 
@@ -91,6 +89,11 @@ protected:
 
     QnTCPConnectionProcessor(
         QnTCPConnectionProcessorPrivate* d_ptr,
+        QSharedPointer<AbstractStreamSocket> socket,
+        QnTcpListener* owner);
+    // For inherited classes without TCP server socket only
+    QnTCPConnectionProcessor(
+        QnTCPConnectionProcessorPrivate* dptr,
         QSharedPointer<AbstractStreamSocket> socket,
         QnCommonModule* commonModule);
 

@@ -98,8 +98,10 @@ class QnFileConnectionProcessorPrivate : public QnTCPConnectionProcessorPrivate
 public:
 };
 
-QnFileConnectionProcessor::QnFileConnectionProcessor(QSharedPointer<AbstractStreamSocket> socket, QnTcpListener* owner) :
-    QnTCPConnectionProcessor(new QnTCPConnectionProcessorPrivate, socket, owner->commonModule())
+QnFileConnectionProcessor::QnFileConnectionProcessor(
+    QSharedPointer<AbstractStreamSocket> socket, QnTcpListener* owner)
+:
+    QnTCPConnectionProcessor(new QnTCPConnectionProcessorPrivate, socket, owner)
 {
 }
 

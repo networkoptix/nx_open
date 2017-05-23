@@ -15,7 +15,7 @@ public:
 QnDesktopCameraRegistrator::QnDesktopCameraRegistrator(
     QSharedPointer<AbstractStreamSocket> socket, QnTcpListener* owner)
 :
-    QnTCPConnectionProcessor(new QnDesktopCameraRegistratorPrivate, socket, owner->commonModule())
+    QnTCPConnectionProcessor(new QnDesktopCameraRegistratorPrivate, socket, owner)
 {
 }
 

@@ -28,26 +28,28 @@ QnUniversalRequestProcessor::~QnUniversalRequestProcessor()
 }
 
 QnUniversalRequestProcessor::QnUniversalRequestProcessor(
-        QSharedPointer<AbstractStreamSocket> socket,
-        QnUniversalTcpListener* owner, bool needAuth)
-    : QnTCPConnectionProcessor(new QnUniversalRequestProcessorPrivate, socket, owner->commonModule())
+    QSharedPointer<AbstractStreamSocket> socket,
+    QnUniversalTcpListener* owner, bool needAuth)
+: 
+    QnTCPConnectionProcessor(new QnUniversalRequestProcessorPrivate, socket, owner)
 {
     Q_D(QnUniversalRequestProcessor);
     d->processor = 0;
-    d->owner = owner;
     d->needAuth = needAuth;
 
     setObjectName( QLatin1String("QnUniversalRequestProcessor") );
 }
 
 QnUniversalRequestProcessor::QnUniversalRequestProcessor(
-        QnUniversalRequestProcessorPrivate* priv, QSharedPointer<AbstractStreamSocket> socket,
-        QnUniversalTcpListener* owner, bool needAuth)
-    : QnTCPConnectionProcessor(priv, socket, owner->commonModule())
+    QnUniversalRequestProcessorPrivate* priv, 
+    QSharedPointer<AbstractStreamSocket> socket,
+    QnUniversalTcpListener* owner, 
+    bool needAuth)
+: 
+    QnTCPConnectionProcessor(priv, socket, owner)
 {
     Q_D(QnUniversalRequestProcessor);
     d->processor = 0;
-    d->owner = owner;
     d->needAuth = needAuth;
 }
 
@@ -166,8 +168,8 @@ void QnUniversalRequestProcessor::run()
         {
             t.restart();
             parseRequest();
-
-            const auto redirect = d->owner->processorPool()->getRedirectRule(
+            auto owner = static_cast<QnUniversalTcpListener*> (d->owner);
+            const auto redirect = owner->processorPool()->getRedirectRule(
                 d->request.requestLine.url.path());
             if (redirect)
             {
@@ -177,7 +179,8 @@ void QnUniversalRequestProcessor::run()
             }
             else
             {
-                auto handler = d->owner->findHandler(d->protocol, d->request);
+                auto owner = static_cast<QnUniversalTcpListener*> (d->owner);
+                auto handler = owner->findHandler(d->protocol, d->request);
                 bool noAuth = false;
                 if (handler && !authenticate(&d->accessRights, &noAuth))
                     return;
@@ -212,8 +215,9 @@ bool QnUniversalRequestProcessor::processRequest(bool noAuth)
     Q_D(QnUniversalRequestProcessor);
 
     QnMutexLocker lock( &d->mutex );
-    if (auto handler = d->owner->findHandler(d->protocol, d->request))
-        d->processor = handler(d->socket, d->owner);
+    auto owner = static_cast<QnUniversalTcpListener*> (d->owner);
+    if (auto handler = owner->findHandler(d->protocol, d->request))
+        d->processor = handler(d->socket, owner);
     else
         return false;
 

@@ -1881,13 +1881,8 @@ bool MediaServerProcess::initTcpListener(
     CloudManagerGroup* const cloudManagerGroup,
     ec2::QnTransactionMessageBus* messageBus)
 {
-    m_httpModManager.reset( new nx_http::HttpModManager() );
     m_autoRequestForwarder.reset( new QnAutoRequestForwarder(commonModule() ));
     m_autoRequestForwarder->addPathToIgnore(lit("/ec2/*"));
-    m_httpModManager->addCustomRequestMod( std::bind(
-        &QnAutoRequestForwarder::processRequest,
-        m_autoRequestForwarder.get(),
-        std::placeholders::_1 ) );
 
     const int rtspPort = qnServerModule->roSettings()->value(nx_ms_conf::SERVER_PORT, nx_ms_conf::DEFAULT_SERVER_PORT).toInt();
 
@@ -1904,6 +1899,12 @@ bool MediaServerProcess::initTcpListener(
         rtspPort,
         maxConnections,
         acceptSslConnections );
+
+    m_universalTcpListener->httpModManager()->addCustomRequestMod(std::bind(
+        &QnAutoRequestForwarder::processRequest,
+        m_autoRequestForwarder.get(),
+        std::placeholders::_1));
+
 
 #ifdef ENABLE_ACTI
     QnActiResource::setEventPort(rtspPort);
@@ -3105,7 +3106,6 @@ void MediaServerProcess::run()
     nx::network::SocketGlobals::outgoingTunnelPool().clearOwnPeerId();
 
     m_autoRequestForwarder.reset();
-    m_httpModManager.reset();
 
     if (defaultMsgHandler)
         qInstallMessageHandler(defaultMsgHandler);
