@@ -31,6 +31,7 @@ list(APPEND CMAKE_MODULE_PATH
 include(CMakeParseArguments)
 include(target_detection)
 include(utils)
+include(find_python)
 include(find_sources)
 include(qrc_utils)
 include(precompiled_header)
