@@ -17,6 +17,7 @@
 #include <transaction/transaction_descriptor.h>
 #include "routing_helpers.h"
 #include "connection_context.h"
+#include "p2p_serialization.h"
 
 namespace ec2 {
 namespace detail {
@@ -154,7 +155,50 @@ private:
     template<class T>
     void sendUnicastTransaction(const QnTransaction<T>& tran, const QnPeerSet& dstPeers)
     {
-        //todo: implement me
+        QMap<P2pConnectionPtr, UnicastTransactionRecords> dstByConnection;
+
+        // split dstPeers by connection
+        for (const auto& peer : dstPeers)
+        {
+            qint32 distance = kMaxDistance;
+            auto dstPeer = routeToPeerVia(peer, &distance);
+            if (auto& connection = m_connections.value(dstPeer))
+                dstByConnection[connection].push_back(UnicastTransactionRecord(peer, distance + 1));
+        }
+        sendUnicastTransactionImpl(tran, dstByConnection);
+    }
+
+    template<class T>
+    void sendUnicastTransactionImpl(
+        const QnTransaction<T>& tran,
+        const QMap<P2pConnectionPtr,UnicastTransactionRecords>& dstByConnection)
+    {
+        for (auto itr = dstByConnection.begin(); itr != dstByConnection.end(); ++itr)
+        {
+            const auto& connection = itr.key();
+            switch (connection->remotePeer().dataFormat)
+            {
+            case Qn::JsonFormat:
+                if (itr->size() == 1 && itr.value()[0].dstPeer == connection->remotePeer().id)
+                {
+                    connection->sendMessage(
+                        m_jsonTranSerializer->serializedTransactionWithoutHeader(tran) + QByteArray("\r\n"));
+                }
+                else
+                {
+                    NX_ASSERT(0, "Unicast transaction routing error. Transaction skipped.");
+                }
+                break;
+            case Qn::UbjsonFormat:
+                connection->sendMessage(MessageType::pushUnicastTransaction,
+                    serializeUnicastHeader(itr.value()).append(
+                    m_ubjsonTranSerializer->serializedTransactionWithoutHeader(tran)));
+                break;
+            default:
+                qWarning() << "Client has requested data in an unsupported format" << connection->remotePeer().dataFormat;
+                break;
+            }
+        }
     }
 
     void printTran(
@@ -195,8 +239,10 @@ private:
     bool handleSubscribeForDataUpdates(const P2pConnectionPtr& connection, const QByteArray& data);
     bool handlePushTransactionData(const P2pConnectionPtr& connection, const QByteArray& data);
     bool handlePushTransactionList(const P2pConnectionPtr& connection, const QByteArray& tranList);
+    bool handleUnicastTransaction(const P2pConnectionPtr& connection, const QByteArray& tranList);
 
     friend struct GotTransactionFuction;
+    friend struct GotUnicastTransactionFuction;
     friend struct SendTransactionToTransportFuction;
 
     void gotTransaction(
@@ -205,6 +251,12 @@ private:
 
     template <class T>
     void gotTransaction(const QnTransaction<T>& tran,const P2pConnectionPtr& connection);
+
+    template <class T>
+    void gotUnicastTransaction(
+        const QnTransaction<T>& tran,
+        const P2pConnectionPtr& connection,
+        const UnicastTransactionRecords& records);
 
     void proxyFillerTransaction(const ec2::QnAbstractTransaction& tran);
     bool needSubscribeDelay();

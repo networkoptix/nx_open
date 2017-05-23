@@ -82,6 +82,20 @@ struct PeerNumberResponseRecord: public ec2::ApiPersistentIdData
 
 struct BidirectionRoutingInfo;
 
+struct UnicastTransactionRecord
+{
+    UnicastTransactionRecord() {}
+    UnicastTransactionRecord(const QnUuid& dstPeer, int ttl):
+        dstPeer(dstPeer),
+        ttl(ttl)
+    {
+    }
+    static const int recordSize = 16 + 1;
+    QnUuid dstPeer;
+    quint8 ttl = 0;
+};
+using UnicastTransactionRecords = std::vector<UnicastTransactionRecord>;
+
 static const qint32 kMaxDistance = std::numeric_limits<qint32>::max();
 static const qint32 kMaxOnlineDistance = 16384;
 static const char* kP2pProtoName = "nxp2p";

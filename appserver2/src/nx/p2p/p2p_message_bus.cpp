@@ -13,7 +13,6 @@
 #include <nx_ec/ec_proto_version.h>
 #include <utils/math/math.h>
 #include <http/p2p_connection_listener.h>
-#include <nx/p2p/p2p_serialization.h>
 
 namespace {
     int commitIntervalMs = 1000;
@@ -829,6 +828,9 @@ void MessageBus::at_gotMessage(
     case MessageType::pushTransactionList:
         result = handlePushTransactionList(connection, payload);
         break;
+    case MessageType::pushUnicastTransaction:
+        result = handleUnicastTransaction(connection, payload);
+        break;
     default:
         NX_ASSERT(0, lm("Unknown message type").arg((int)messageType));
         break;
@@ -1220,6 +1222,53 @@ void MessageBus::gotTransaction(
         m_handler->triggerNotification(tran, NotificationSource::Remote);
 }
 
+template <class T>
+void MessageBus::gotUnicastTransaction(
+    const QnTransaction<T> &tran,
+    const P2pConnectionPtr& connection,
+    const UnicastTransactionRecords& records)
+{
+    if (nx::utils::log::isToBeLogged(cl_logDEBUG1, QnLog::P2P_TRAN_LOG))
+        printTran(connection, tran, Connection::Direction::incoming);
+
+    UnicastTransactionRecords unprocessedRecords;
+    for (auto& record: records)
+    {
+        if (record.dstPeer == localPeer().id)
+        {
+            if (m_handler)
+                m_handler->triggerNotification(tran, NotificationSource::Remote);
+            continue;
+        }
+        if (record.ttl == 0)
+        {
+            NX_WARNING(this, lm("Drop unicast transaction because ttl is expired"));
+            continue;
+        }
+        unprocessedRecords.push_back(UnicastTransactionRecord(record.dstPeer, record.ttl - 1));
+    }
+
+    // split dstPeers by connection
+    QMap<P2pConnectionPtr, UnicastTransactionRecords> dstByConnection;
+    for (const auto& record: unprocessedRecords)
+    {
+        QVector<ApiPersistentIdData> via;
+        int distance = kMaxDistance;
+        QnUuid dstPeerId = routeToPeerVia(record.dstPeer, &distance);
+        if (distance > record.ttl || dstPeerId.isNull())
+        {
+            NX_WARNING(this, lm("Drop unicast transaction because no route within specified ttl found"));
+            continue;
+        }
+        if (auto& dstConnection = m_connections.value(dstPeerId))
+            dstByConnection[dstConnection].push_back(record);
+        else
+            NX_ASSERT(0, lm("Drop unicast transaction. Can't find connection to route"));
+    }
+
+    sendUnicastTransactionImpl(tran, dstByConnection);
+}
+
 void MessageBus::resotreAfterDbError()
 {
     // p2pMessageBus uses lazy transactions. It means it does 1 commit per time.
@@ -1242,6 +1291,20 @@ struct GotTransactionFuction
     }
 };
 
+struct GotUnicastTransactionFuction
+{
+    typedef void result_type;
+
+    template<class T>
+    void operator()(
+        MessageBus *bus,
+        const QnTransaction<T> &transaction,
+        const P2pConnectionPtr& connection,
+        const UnicastTransactionRecords& records) const
+    {
+        bus->gotUnicastTransaction(transaction, connection, records);
+    }
+};
 
 bool MessageBus::handlePushTransactionList(const P2pConnectionPtr& connection, const QByteArray& data)
 {
@@ -1259,6 +1322,25 @@ bool MessageBus::handlePushTransactionList(const P2pConnectionPtr& connection, c
         if (!handlePushTransactionData(connection, transaction))
             return false;
     }
+    return true;
+}
+
+bool MessageBus::handleUnicastTransaction(const P2pConnectionPtr& connection, const QByteArray& data)
+{
+    int headerSize = 0;
+    UnicastTransactionRecords records;
+    if (connection->remotePeer().dataFormat == Qn::UbjsonFormat)
+        records = deserializeUnicastHeader(data, &headerSize);
+    else
+        records.push_back(UnicastTransactionRecord(localPeer().id, 0));
+    using namespace std::placeholders;
+    return handleTransaction(
+        this,
+        connection->remotePeer().dataFormat,
+        data.mid(headerSize),
+        std::bind(GotUnicastTransactionFuction(), this, _1, connection, records),
+        [](Qn::SerializationFormat, const QByteArray&) { return false; });
+
     return true;
 }
 

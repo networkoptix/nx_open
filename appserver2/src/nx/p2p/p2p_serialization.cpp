@@ -310,5 +310,54 @@ const QVector<PeerNumberResponseRecord> deserializeResolvePeerNumberResponse(con
     return result;
 }
 
+QByteArray serializeUnicastHeader(const UnicastTransactionRecords& records)
+{
+    QByteArray result;
+    result.reserve(UnicastTransactionRecord::recordSize * records.size());
+    {
+        QBuffer buffer(&result);
+        buffer.open(QIODevice::WriteOnly);
+        QDataStream out(&buffer);
+        out << (quint32) records.size();
+        for (const auto& record: records)
+        {
+            out << record.ttl;
+            out.writeRawData(record.dstPeer.toRfc4122().data(), 16);
+        }
+    }
+    return result;
+}
+
+UnicastTransactionRecords deserializeUnicastHeader(const QByteArray& _response, int* bytesRead)
+{
+    QByteArray response(_response);
+    UnicastTransactionRecords result;
+
+    *bytesRead = 0;
+    if (response.size() < 4)
+        return result; //< error
+
+    QBuffer buffer(&response);
+    buffer.open(QIODevice::ReadOnly);
+    QDataStream in(&buffer);
+    QByteArray tmpBuffer;
+    tmpBuffer.resize(16);
+    PeerNumberType shortPeerNumber;
+    ApiPersistentIdData fullId;
+    quint32 size;
+    in >> size;
+    while (!in.atEnd() && size > 0)
+    {
+        UnicastTransactionRecord record;
+        in >> record.ttl;
+        in.readRawData(tmpBuffer.data(), tmpBuffer.size());
+        record.dstPeer = QnUuid::fromRfc4122(tmpBuffer);
+        result.push_back(std::move(record));
+        --size;
+    }
+    *bytesRead = buffer.pos();
+    return result;
+}
+
 } // namespace p2p
 } // namespace nx

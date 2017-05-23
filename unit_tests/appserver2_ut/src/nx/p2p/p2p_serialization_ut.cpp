@@ -150,6 +150,22 @@ TEST(P2pSerialization, TransactionList)
     ASSERT_EQ(expectedData.toHex(), actualData.toHex());
 }
 
+TEST(P2pSerialization, UnicastTransaction)
+{
+    using namespace nx::p2p;
+
+    UnicastTransactionRecords records;
+    for (int i = 0; i < 100; ++i)
+        records.push_back(UnicastTransactionRecord(QnUuid::createUuid(), i));
+
+    QByteArray expectedData = serializeUnicastHeader(records);
+    int size = 0;
+    auto deserializedRecords = deserializeUnicastHeader(expectedData, &size);
+    ASSERT_TRUE(size > 0);
+    QByteArray actualData = serializeUnicastHeader(deserializedRecords);
+    ASSERT_EQ(expectedData.toHex(), actualData.toHex());
+}
+
 } // namespace test
 } // namespace p2p
 } // namespace nx
