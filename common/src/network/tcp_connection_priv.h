@@ -76,9 +76,9 @@ public:
         clientRequestOffset(0),
         prevSocketError(SystemError::noError),
         authenticatedOnce(false),
+        owner(nullptr),
         interleavedMessageDataPos(0),
-        currentRequestSize(0),
-        owner(nullptr)
+        currentRequestSize(0)
     {
     }
 
