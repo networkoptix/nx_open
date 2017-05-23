@@ -27,6 +27,8 @@ RequestProxyWorker::RequestProxyWorker(
         std::bind(&RequestProxyWorker::onMessageFromTargetHost, this, _1));
     m_targetHostPipeline->startReadingConnection();
 
+    m_proxyHost = nx_http::getHeaderValue(translatedRequest.headers, "Host");
+
     nx_http::Message requestMsg(nx_http::MessageType::request);
     *requestMsg.request = std::move(translatedRequest);
     m_targetHostPipeline->sendMessage(std::move(requestMsg));
@@ -104,6 +106,7 @@ std::unique_ptr<nx_http::AbstractMsgBodySource> RequestProxyWorker::prepareMessa
         return nullptr;
 
     auto converter = MessageBodyConverterFactory::instance().create(
+        m_proxyHost,
         m_targetPeer,
         contentTypeIter->second);
     if (converter)

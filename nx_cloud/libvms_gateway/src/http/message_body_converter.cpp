@@ -10,9 +10,11 @@ namespace nx {
 namespace cloud {
 namespace gateway {
 
+using namespace std::placeholders;
+
 MessageBodyConverterFactory::MessageBodyConverterFactory():
     base_type(std::bind(&MessageBodyConverterFactory::defaultFactoryFunction, this,
-        std::placeholders::_1, std::placeholders::_2))
+        _1, _2, _3))
 {
 }
 
@@ -24,6 +26,7 @@ MessageBodyConverterFactory& MessageBodyConverterFactory::instance()
 
 std::unique_ptr<AbstractMessageBodyConverter> 
     MessageBodyConverterFactory::defaultFactoryFunction(
+        const nx::String& proxyHost,
         const TargetHost& targetHost,
         const nx::String& contentType)
 {
@@ -31,6 +34,7 @@ std::unique_ptr<AbstractMessageBodyConverter>
         contentType == nx_http::kAudioMpegUrlMimeType)
     {
         return std::make_unique<M3uPlaylistConverter>(
+            proxyHost,
             targetHost.target.address.toString().toUtf8());
     }
 

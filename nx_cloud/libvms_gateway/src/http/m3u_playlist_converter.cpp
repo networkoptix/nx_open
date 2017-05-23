@@ -7,7 +7,11 @@ namespace nx {
 namespace cloud {
 namespace gateway {
 
-M3uPlaylistConverter::M3uPlaylistConverter(const nx::String& targetHost):
+M3uPlaylistConverter::M3uPlaylistConverter(
+    const nx::String& proxyHost,
+    const nx::String& targetHost)
+    :
+    m_proxyHost(proxyHost),
     m_targetHost(targetHost)
 {
 }
@@ -28,6 +32,8 @@ nx_http::BufferType M3uPlaylistConverter::convert(
         QUrl url(entry.value);
         url.setPath(nx::network::url::normalizePath(
             lm("/%1/%2").arg(m_targetHost).arg(url.path())));
+        if (!url.host().isEmpty())
+            url.setHost(m_proxyHost);
         entry.value = url.toString().toUtf8();
     }
 

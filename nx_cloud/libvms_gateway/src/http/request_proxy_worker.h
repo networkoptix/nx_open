@@ -52,6 +52,7 @@ protected:
     virtual void stopWhileInAioThread() override;
 
 private:
+    nx::String m_proxyHost;
     TargetHost m_targetPeer;
     std::unique_ptr<nx_http::AsyncMessagePipeline> m_targetHostPipeline;
     AbstractResponseSender* m_responseSender;
