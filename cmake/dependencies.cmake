@@ -87,7 +87,7 @@ if(WINDOWS)
     nx_rdep_add_package(directx)
 endif()
 
-if(WINDOWS OR MACOSX OR (LINUX AND box MATCHES "none|tx1"))
+if(WINDOWS OR MACOSX OR (LINUX AND NOT ANDROID AND box MATCHES "none|tx1"))
     nx_rdep_add_package(any/qtsingleapplication)
     nx_rdep_add_package(any/help)
 endif()
