@@ -187,3 +187,13 @@ void QnScrollableItemsWidgetPrivate::setSpacing(qreal value)
 {
     m_contentLayout->setSpacing(value);
 }
+
+int QnScrollableItemsWidgetPrivate::lineHeight() const
+{
+    return m_scrollArea->lineHeight();
+}
+
+void QnScrollableItemsWidgetPrivate::setLineHeight(int value)
+{
+    m_scrollArea->setLineHeight(value);
+}
