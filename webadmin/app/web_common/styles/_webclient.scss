@@ -49,7 +49,7 @@
 
     .cameras-panel{
       height: 100%;
-      width: 320px !important;
+      width: 100%;
       overflow-y: scroll;
       overflow-x: hidden;
     }
@@ -66,10 +66,6 @@
         li>.collapse-group{
           padding:10px;
         }
-
-        /*li > ul{
-          margin-bottom: 8px;
-        }*/
 
         & > li{
           padding: 8px 0;
@@ -107,7 +103,7 @@
     }
 
     .dropdown-menu{
-      background-color: #E1E7EA;
+      background-color: $light4;
       padding: 0 8px;
 
       & > li > a{
@@ -177,7 +173,7 @@
 
   &-hint{
     font-size:78%;
-    color:#698796;
+    color:$light16;
     display:inline-block;
     padding-right:10px;
   }
@@ -195,9 +191,11 @@ table.webclient-window>tbody>tr>td{
 }
 
 .cameras-panel-toggle{
+  width: 320px;
+
   transition-timing-function: ease-in-out;
-  -webkit-transition-delay: 10s;
-  transition-delay: 10s;
+  -webkit-transition-duration: 1s;
+  transition-duration: 1s;
 }
 
 .cameras-panel{
@@ -209,32 +207,304 @@ table.webclient-window>tbody>tr>td{
   background-color: $additional_light2;
 }
 
-.camera-status{
-  display:inline-block;
-  width:1em;
+.camera-panel{
+  & {
+    color: $dark1;
+  }
+  &.visible-xs{
+    display: block !important;
+  }
+}
+
+/* Cameras panel */
+.cameras-search{
+  padding:10px 0 10px 0;
+  margin-top:3px;
+  height: 44px;
+  border-bottom: 1px solid $light6;
+  font-size: 13px;
+  background-color: $additional_light2;
+
+  &>.input-group{
+    margin-top: -11px;
+    
+    .input-group-addon{
+      border: none !important;
+    }
+
+    &>input{
+      margin-bottom: -20px;
+      color: $light16;
+      border:none;
+      box-shadow:none;
+      font-size: 16px;
+
+      &::-webkit-input-placeholder {}
+      &:-moz-placeholder{}
+      &::-moz-placeholder{}
+      &:-ms-input-placeholder {}
+
+    }
+    &>*{
+      background: transparent;
+      color:$light16;   
+    }
+  }
+
+  &:hover{
+    backgroud-color: $light2;
+  }
+
+  &.active,&:active{
+    background-color: $light1;
+  }
+}
+
+.server{
+  &-link{
+    height:40px;
+    line-height:20px !important;
+    padding: 10px;
+
+    &:hover{
+      background-color: $additional_light3 !important;
+      border-radius: 2px;  
+    }
+
+    &:active{
+      background-color: $light5;
+      border-radius: 2px;  
+    }
+
+    small{
+      font-size: 12px;
+      font-weight: 400;
+      color: $light16;
+      line-height: 18px;  
+    }
+
+    & > .pull-right{
+      margin-top: 2px;
+    }
+
+    & > *{
+      vertical-align: middle;  
+    }
+  }
+
+  &-name{
+    margin-left: -17px;
+    font-size: 14px;
+    font-weight: 500;
+    color: $dark9;
+    line-height: 22px;
+  }
+
+  &-underline{
+    display: inline-block;
+    width:100%;
+    height: 40px;
+  }
+}
+
+.camera{
+  &-status{
+    display:inline-block;
+    width:1em;
+    text-align: center;
+    font-size:180%;
+    line-height: 1;
+
+    &.online-cam{
+      top: -8px;
+      left: -5px;  
+    }
+
+    &.offline-cam{
+      top: -8px;
+      left: -7px;
+      font-size: 200%;
+      font-weight: bolder;  
+    }
+  }
+
+  &-info{
+    margin-left: -32px;
+  }
+
+  &-preview .camera-status{
+    position: absolute;
+    z-index: 1;
+  }
+
+  &-settings{
+    display: inline-block;
+    width: 36px;
+    text-align: center;
+    font-size: 150%;
+    vertical-align: middle;
+  }
+}
+
+.camera-preview{
+  width:68px !important;
+  height:38px !important;
+  margin-right: 10px;
+  background-color: $light5;
+  border-radius: 1px;
+  font-size: 14px;
+  border: 1px solid $additional_light2;
+
+
+  position:absolute;
+  margin-left:-86px;
+  margin-top: -2px;
+}
+
+.cameras-panel .nav > li.active > a .camera-preview{
+  height: 38px !important;
+  width: 68px !important;
+  border: 1px solid $light1;
+}
+
+.camera-node{
+  &{
+    height: 56px;
+
+    font-size: 14px;
+    font-weight: 500 !important;
+    color: $dark9 !important;
+    line-height: 34px;
+  }
+
+  small{
+    font-size: 12px;
+    font-weight: 400;
+    color: $light16 !important;
+    line-height: 18px;
+  }
+
+  &.toggle-info{
+    line-height: 18px !important;
+  }
+
+  &.Unauthorized,
+  &.Offline{
+    color:$light16 !important;
+
+    small{
+      color: $dark15;    
+    }
+
+    .camera-preview{
+      background-color: $dark7;
+      border: 1px solid $dark5;
+
+      img{
+        display:none;
+      }
+    }
+  }
+}
+
+.camera-preview>.camera-preview-image {
+  display:block;
+  position: relative;
+  top: 50%;
+  transform: translateY(-50%);
+  -ms-transform: translateY(-50%);
+  background-size: 100% 100%;
+
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.camera-preview>.camera-preview-image>img{
+  visibility:hidden;
+  max-width:68px !important;
+  max-height:38px !important;
+}
+
+.camera-view-informer{
   text-align: center;
-  font-size:180%;
-  line-height: 1;
 
-  &.online-cam{
-    top: -8px;
-    left: -5px;  
+  position: relative;
+  top: 50%;
+  transform: translateY(-50%);
+  -ms-transform: translateY(-50%);
+
+  font-weight: 400;
+  font-size:130%;
+  line-height:30px;
+  color:$dark17;
+}
+
+.camera-loading{
+  z-index:1000;
+}
+
+.camera-view-informer{ 
+  a{
+    color: $light12;
+    text-decoration: underline;
+
+    &:hover, &:active{
+      color: $light1;  
+    }
   }
 
-  &.offline-cam{
-    top: -8px;
-    left: -7px;
-    font-size: 200%;
-    font-weight: bolder;  
+  .camera-view-message-icon{
+    display: inline-block;
+    margin-bottom: 20px;
   }
 }
 
-.camera-info{
-  margin-left: -32px;
+.camera-view-message{
+  font-weight: 300;
+  color: $dark13;
+  font-size: 40px;
+  display: inline-block;
 }
-.camera-preview .camera-status{
-  position: absolute;
-  z-index: 1;
+
+.cameras-panel .nav > li{
+  & > a{
+    color:$dark9;
+    font-weight: normal;
+
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    padding-right: 10px;
+    padding-left:95px;
+  }
+
+  & > a:hover, & > a:focus{
+    text-decoration: none;
+    background-color: rgba($dark11,0.2);  
+  }
+
+  & > a:hover{
+    background-color: $additional_light3;
+  }
+
+  &.active > a{
+    text-decoration: none;
+    background-color: $light5;
+  }
+}
+
+.not-supported.camera-view-message{
+  line-height:40px;
+  text-align: center;
+  height:100%;
+
+  padding-top: 10px;
+}
+
+/* View */
+
+.view{
+  width: 100%;
 }
 
 .view-wrapper{
@@ -368,14 +638,6 @@ table.webclient-window>tbody>tr>td{
   background-color: rgba($light16, 0.1);
 }
 
-.camera-settings{
-  display: inline-block;
-  width: 36px;
-  text-align: center;
-  font-size: 150%;
-  vertical-align: middle;
-}
-
 .video-info{
   padding: 8px;
 }
@@ -453,49 +715,6 @@ table.webclient-window>tbody>tr>td{
   width:100% !important;
 }
 
-.cameras-search{
-  padding:10px 0 10px 0;
-  margin-top:3px;
-  height: 44px;
-  border-bottom: 1px solid $light6;
-  font-size: 13px;
-  background-color: $additional_light2;
-
-  &>.input-group{
-    margin-top: -11px;
-    
-    .input-group-addon{
-      border: none !important;
-    }
-
-    &>input{
-      margin-bottom: -20px;
-      color: #698796;
-      border:none;
-      box-shadow:none;
-      font-size: 16px;
-
-      &::-webkit-input-placeholder {}
-      &:-moz-placeholder{}
-      &::-moz-placeholder{}
-      &:-ms-input-placeholder {}
-
-    }
-    &>*{
-      background: transparent;
-      color: #698796;   
-    }
-  }
-
-  &:hover{
-    backgroud-color: $light2;
-  }
-
-  &.active,&:active{
-    background-color: $light1;
-  }
-}
-
 .raise-input-up{
   margin-bottom: -5px !important;
 }
@@ -513,6 +732,7 @@ table.webclient-window>tbody>tr>td{
     top: 10px;
   }
 }
+
 .icon{
   width: 44px;
   height: 43px;
@@ -532,13 +752,37 @@ table.webclient-window>tbody>tr>td{
   }
 }
 
+div{
+  &.text-left{
+    width:106px;
+    height:100%;
+    background-color: $additional_light2;
+    border-left: 1px solid $light6;
+    border-right: 1px solid $light6;
+  }
 
-div.text-left{
-  width:106px;
-  height:100%;
-  background-color: $additional_light2;
-  border-left: 1px solid $light6;
-  border-right: 1px solid $light6;
+  &.text-right{
+    &{
+      width:104px;
+      height:100%;
+      background-color: $additional_light2;
+    }
+
+    &.no-volume{
+      width: 64px !important;
+    }
+  }
+
+  &.text-center{
+    &{
+      margin: 0 104px 0 106px;
+      height:100%;
+    }
+
+    &.no-volume{
+      margin-right:64px;
+    }
+  }
 }
 
 .player-controls{
@@ -547,12 +791,6 @@ div.text-left{
 
 .zoom-level{
   margin-top: 6px;
-}
-
-div.text-right{
-  width:104px;
-  height:100%;
-  background-color: $additional_light2;
 }
 
 .live-circle{
@@ -566,10 +804,6 @@ div.text-right{
   -moz-box-shadow: 0px 0px 2px #888;
   -webkit-box-shadow: 0px 0px 2px #888;
   box-shadow: 0px 0px 2px #888;
-}
-
-div.text-right.no-volume{
-  width: 64px !important;
 }
 
 .live-button{
@@ -612,7 +846,6 @@ div.text-right.no-volume{
   &.active > .live-circle{
     background-color: chartreuse !important;
   }
-
 }
 
 .volume{
@@ -649,21 +882,12 @@ div.text-right.no-volume{
   }  
 }
 
-div.text-center{
-  margin: 0 104px 0 106px;
-  height:100%;
-
-  &.no-volume{
-    margin-right:64px !important;
-  }
-}
-
 .dropdown > .webclient-button{
   width:90px;
 }
 
 .dropdown.open > .webclient-button{
-  background-color: rgba(0,0,0,0.1);
+  background-color: rgba($dark1,0.1);
 }
 
 .glyphicon-backward,
@@ -698,244 +922,13 @@ div.text-center{
   display: block !important;
 }
 
-.server{
-  &-link{
-    height:40px;
-    line-height:20px !important;
-    padding: 10px;
-
-    &:hover{
-      background-color: $additional_light3 !important;
-      border-radius: 2px;  
-    }
-
-    &:active{
-      background-color: $light5;
-      border-radius: 2px;  
-    }
-
-    small{
-      font-size: 12px;
-      font-weight: 400;
-      color: $light16;
-      line-height: 18px;  
-    }
-
-    & > .pull-right{
-      margin-top: 2px;
-    }
-
-    & > *{
-      vertical-align: middle;  
-    }
-  }
-
-  &-name{
-    margin-left: -17px;
-    font-size: 14px;
-    font-weight: 500;
-    color: $dark9;
-    line-height: 22px;
-  }
-
-  &-underline{
-    display: inline-block;
-    width:100%;
-    height: 40px;
-  }
-}
-
 .caption-row {
   line-height: 40px;
   vertical-align: top;
 }
 
-.camera-preview{
-  width:68px !important;
-  height:38px !important;
-  margin-right: 10px;
-  background-color: $light5;
-  border-radius: 1px;
-  font-size: 14px;
-  border: 1px solid $additional_light2;
-
-
-  position:absolute;
-  margin-left:-86px;
-  margin-top: -2px;
-}
-
-.cameras-panel .nav > li.active > a .camera-preview{
-  height: 38px !important;
-  width: 68px !important;
-  border: 1px solid $light1;
-}
-
-
-.camera-node{
-  &{
-    height: 56px;
-
-    font-size: 14px;
-    font-weight: 500 !important;
-    color: $dark9 !important;
-    line-height: 34px;
-  }
-
-  small{
-    font-size: 12px;
-    font-weight: 400;
-    color: $light16 !important;
-    line-height: 18px;
-  }
-
-  &.toggle-info{
-    line-height: 18px !important;
-  }
-
-  &.Unauthorized{
-    color:#698796 !important;
-
-    small{
-      color: #49626F;    
-    }
-
-    .camera-preview{
-      background-color: #212A2F;
-      border: 1px solid #171C1F;
-
-      img{
-        display:none;
-      }
-    }
-  }
-
-  &.Offline {
-    small{
-      color: #49626F;
-    }
-
-    .camera-preview{
-      background-color: #212A2F;
-      border: 1px solid #171C1F;
-      img{
-        display:none;
-      }
-    }
-  }
-}
-
-.camera-preview>.camera-preview-image {
-  display:block;
-  position: relative;
-  top: 50%;
-  transform: translateY(-50%);
-  -ms-transform: translateY(-50%);
-  background-size: 100% 100%;
-
-  margin-left: auto;
-  margin-right: auto;
-}
-
-.camera-preview>.camera-preview-image>img{
-  visibility:hidden;
-  max-width:68px !important;
-  max-height:38px !important;
-}
-
-
-.camera-view-informer{
-  text-align: center;
-
-  position: relative;
-  top: 50%;
-  transform: translateY(-50%);
-  -ms-transform: translateY(-50%);
-
-  font-weight: 400;
-  font-size:130%;
-  line-height:30px;
-  color:#53707F;
-}
-
-.camera-loading{
-  z-index:1000;
-}
-
-.camera-view-informer a{
-  color: #91A7B2;
-  text-decoration: underline;
-}
-.camera-view-informer a:hover,
-.camera-view-informer a:active{
-  color: #ffffff;
-}
-
-.camera-view-informer .camera-view-message-icon{
-  display: inline-block;
-  margin-bottom: 20px;
-}
-
-
-.camera-view-message{
-  font-weight: 300;
-  color: #3F545F;
-  font-size: 40px;
-  display: inline-block;
-}
-
-.cameras-panel .nav > li{
-  & > a{
-    color:$dark9;
-    font-weight: normal;
-
-    white-space: nowrap;
-    text-overflow: ellipsis;
-    overflow: hidden;
-    padding-right: 10px;
-    padding-left:95px;
-  }
-
-  & > a:hover, & > a:focus{
-    text-decoration: none;
-    background-color: rgba($dark11,0.2);  
-  }
-
-  & > a:hover{
-    background-color: $additional_light3;
-  }
-
-  &.active > a{
-    text-decoration: none;
-    background-color: $light5;
-  }
-}
-
-.not-supported.camera-view-message{
-  line-height:40px;
-  text-align: center;
-  height:100%;
-
-  padding-top: 10px;
-}
-
-.camera-panel{
-  & {
-    color: $dark1;
-  }
-  &.visible-xs{
-    display: block !important;
-  }
-}
-
 .visible-mobile{
   display: none;
-}
-
-.visible-xs .cameras-panel{
-  width: 100% !important;
-  min-width: 320px !important;
-  display: block !important; 
 }
 
 .visible-xs.back-button{
@@ -949,8 +942,18 @@ div.text-center{
   .visible-xs.back-button{
     display: inline-block !important;
   }
-  .camera-panel.visible-xs {
-    display: block !important;
+
+  .cameras-panel-toggle{
+    z-index: 10;
+    position: absolute;
+    width: 100% !important;
+  }
+
+  .cameras-panel{
+    width: 100% !important;
+  }
+  .hide-panel{
+    width:0px !important;
   }
   .view-panel{
     padding-bottom: 160px;
@@ -974,7 +977,7 @@ div.text-center{
 }
 
 .mobile-alert{
-  color:#FFFFFF;
+  color:$light1;
   
   &{
     background-color: black;
@@ -985,10 +988,10 @@ div.text-center{
   }
 
   .btn{
-    border: 1px solid #263137;
+    border: 1px solid $dark8;
     border-radius: 5px;
     margin:0;
-    color:#FFFFFF;
+    color:$light1;
   }
   .btn:hover{
     background-color: rgba(198,234,255,0.15);   

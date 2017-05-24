@@ -24,10 +24,10 @@
                     <camera-panel cameras-provider="camerasProvider" active-camera="activeCamera"
                                   player="player" current-resolution="currentResolution" toggle-camera-panel="toggleCameraPanel"
                                   class="cameras-panel-toggle"
-                                  ng-class="{'visible-xs':toggleCameraPanel, 'hidden-xs': !toggleCameraPanel}"></camera-panel>
+                                  ng-class="{'hide-panel':!toggleCameraPanel}"></camera-panel>
                 </div>
             </td>
-            <td width="100%" ng-class="{'hidden-xs':toggleCameraPanel}">
+            <td width="100%">
                 <div class="view-wrapper" ng-class="{invisible:!activeCamera}">
                     <div class="view-panel" ng-class="{'no-archive': !canViewArchive}">
                         <div class="stick-to-top top-gradient">
