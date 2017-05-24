@@ -77,29 +77,26 @@ void WebSocket::reportErrorIfAny(
     size_t bytesRead,
     std::function<void(bool)> continueHandler)
 {
-    dispatch([this, ecode, bytesRead, continueHandler = std::move(continueHandler)]()
+    if (m_lastError == SystemError::noError)
+        m_lastError = ecode;
+
+    if (m_lastError != SystemError::noError || bytesRead == 0)
     {
-        if (m_lastError == SystemError::noError)
-            m_lastError = ecode;
+        NX_LOG(lit("[WebSocket] Reporting error %1, read queue empty: %2")
+            .arg(m_lastError)
+            .arg((bool)m_readQueue.empty()), cl_logDEBUG1);
 
-        if (m_lastError != SystemError::noError || bytesRead == 0)
+        if (!m_readQueue.empty())
         {
-            NX_LOG(lit("[WebSocket] Reporting error %1, read queue empty: %2")
-                .arg(m_lastError)
-                .arg((bool)m_readQueue.empty()), cl_logDEBUG1);
-
-            if (!m_readQueue.empty())
-            {
-                auto readData = m_readQueue.pop();
-                readData.handler(ecode, bytesRead);
-                NX_LOG(lit("[WebSocket] Reporting error, user handler completed"), cl_logDEBUG2);
-            }
-            continueHandler(true);
-            return;
+            auto readData = m_readQueue.pop();
+            readData.handler(ecode, bytesRead);
+            NX_LOG(lit("[WebSocket] Reporting error, user handler completed"), cl_logDEBUG2);
         }
+        continueHandler(true);
+        return;
+    }
 
-        continueHandler(false); //< No error
-    });
+    continueHandler(false); //< No error
 }
 
 void WebSocket::handleSocketRead(SystemError::ErrorCode ecode, size_t bytesRead)
