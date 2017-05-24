@@ -22,15 +22,15 @@ public:
 
     enum class Status
     {
-        //! There's no such file in the downloader.
+        /** There's no such file in the downloader. */
         notFound,
-        //! The file is downloading from an external URL and system servers.
+        /** The file is downloading from an external URL and system servers. */
         downloading,
-        //! Waiting for the file to be manually uploaded.
+        /** Waiting for the file to be manually uploaded. */
         uploading,
-        //! The file is downloaded.
+        /** The file is downloaded. */
         downloaded,
-        //! The file has been downloaded, but checksum validation has failed.
+        /** The file has been downloaded, but checksum validation has failed. */
         corrupted
     };
     Q_ENUM(Status)

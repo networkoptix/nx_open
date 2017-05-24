@@ -55,7 +55,7 @@ public:
 
     bool haveChunksToDownload();
 
-    /*! Peers from which the worker will choose to perform the operation.
+    /** Peers from which the worker will choose to perform the operation.
         All other peers from the peer manager will be ignored.
         This is used by updates manager to prevent the downloader from looking for files
         on peers which cannot contain an apropriate update file, e.g. ignore Linux servers
@@ -63,7 +63,7 @@ public:
     QList<QnUuid> peers() const;
     void setPeers(const QList<QnUuid>& peers);
 
-    /*! Preferred peers could be used to hint the worker where to find the file.
+    /** Preferred peers could be used to hint the worker where to find the file.
         This is used similarly to forced peers but does not limit the worker in selecting
         other peers.
      */
