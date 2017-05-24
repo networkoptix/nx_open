@@ -12,18 +12,18 @@ namespace test {
 
 namespace {
 
-const char* proxyHost = "proxy.nxvms.com";
+static const char* const kProxyHost = "proxy.nxvms.com";
 
-const char* serverHostName = "server_host_name";
+static const char* const kServerHostName = "server_host_name";
 
-const char* originalPlaylist =
+static const char* const kOriginalPlaylist =
     "#EXTM3U\r\n"
     "#EXTINF:123,BANDWIDTH=10000\r\n"
     "http://server.host/hls/camera.m3u?hi\r\n"
     "#EXTINF:321,BANDWIDTH=50000\r\n"
     "/hls/camera.m3u?lo\r\n";
 
-const char* expectedModifiedPlaylist =
+static const char* const kExpectedModifiedPlaylist =
     "#EXTM3U\r\n"
     "#EXTINF:123,BANDWIDTH=10000\r\n"
     "http://proxy.nxvms.com/server_host_name/hls/camera.m3u?hi\r\n"
@@ -39,19 +39,19 @@ public:
     M3uPlaylistConverter()
     {
         m_converter = std::make_unique<gateway::M3uPlaylistConverter>(
-            proxyHost,
-            serverHostName);
+            kProxyHost,
+            kServerHostName);
     }
 
 protected:
-    void whenConvertedPlaylist(const nx::String& originalPlaylist)
+    void whenConvertedPlaylist(const nx::String& kOriginalPlaylist)
     {
-        m_resultingPlaylist = m_converter->convert(originalPlaylist);
+        m_resultingPlaylist = m_converter->convert(kOriginalPlaylist);
     }
 
-    void thenResultingPlaylistEqualTo(const nx::String& expectedModifiedPlaylist)
+    void thenResultingPlaylistEqualTo(const nx::String& kExpectedModifiedPlaylist)
     {
-        ASSERT_EQ(expectedModifiedPlaylist, m_resultingPlaylist);
+        ASSERT_EQ(kExpectedModifiedPlaylist, m_resultingPlaylist);
     }
 
 private:
@@ -61,8 +61,8 @@ private:
 
 TEST_F(M3uPlaylistConverter, target_host_address_is_inserted)
 {
-    whenConvertedPlaylist(originalPlaylist);
-    thenResultingPlaylistEqualTo(expectedModifiedPlaylist);
+    whenConvertedPlaylist(kOriginalPlaylist);
+    thenResultingPlaylistEqualTo(kExpectedModifiedPlaylist);
 }
 
 } // namespace test

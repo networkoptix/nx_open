@@ -35,7 +35,8 @@ nx_http::BufferType M3uPlaylistConverter::convert(
         if (!url.host().isEmpty())
         {
             url.setHost(m_proxyEndpoint.address.toString());
-            url.setPort(m_proxyEndpoint.port);
+            if (m_proxyEndpoint.port != 0)
+                url.setPort(m_proxyEndpoint.port);
         }
         entry.value = url.toString().toUtf8();
     }
