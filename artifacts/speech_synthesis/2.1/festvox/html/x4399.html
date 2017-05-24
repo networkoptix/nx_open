@@ -1,0 +1,360 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>Regular Expressions</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REL="HOME"
+TITLE="Building Synthetic Voices"
+HREF="book1.html"><LINK
+REL="UP"
+TITLE="Festival's Scheme Programming Language"
+HREF="c3791.html"><LINK
+REL="PREVIOUS"
+TITLE="Adding new C++ functions to Scheme"
+HREF="x4396.html"><LINK
+REL="NEXT"
+TITLE="Some Examples"
+HREF="x4465.html"></HEAD
+><BODY
+CLASS="SECT1"
+BGCOLOR="#FFFFFF"
+TEXT="#000000"
+LINK="#0000FF"
+VLINK="#840084"
+ALINK="#0000FF"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="3"
+ALIGN="center"
+>Building Synthetic Voices</TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="bottom"
+><A
+HREF="x4396.html"
+ACCESSKEY="P"
+>&#60;&#60;&#60; Previous</A
+></TD
+><TD
+WIDTH="80%"
+ALIGN="center"
+VALIGN="bottom"
+>Festival's Scheme Programming Language</TD
+><TD
+WIDTH="10%"
+ALIGN="right"
+VALIGN="bottom"
+><A
+HREF="x4465.html"
+ACCESSKEY="N"
+>Next &#62;&#62;&#62;</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="SECT1"
+><H1
+CLASS="SECT1"
+><A
+NAME="AEN4399"
+>Regular Expressions</A
+></H1
+><P
+>Regular expressions are fundamentally useful in any text processing 
+language. This is also true in Festival's Scheme. The function 
+<CODE
+CLASS="VARNAME"
+>string-matches</CODE
+> and a number of other places (notably CART trees) 
+allow th eunse of regular expressions to matche strings. </P
+><P
+>We will not go into the formal aspects of regular expressions 
+but just give enough discussion to help you use them here. See 
+[<SPAN
+CLASS="CITATION"
+>regexbook</SPAN
+>] for probablay more information than you'll ever 
+need. </P
+><P
+>Each implementation of regex's may be slightly different hence here we 
+will lay out the full syntaxt and semantics of the our regex patterns. 
+This is not an arbitrary selection, when Festival was first developed we 
+use the GNU libg++ <CODE
+CLASS="VARNAME"
+>Regex</CODE
+> class but for portability to non-GNU 
+systems we had replace that with our own impelementation based on Henry 
+Spencer regex code (which is at the core of many regex libraries). </P
+><P
+>In general all character match themselves except for the following 
+which (can) have special interpretations 
+<A
+NAME="AEN4408"
+></A
+><BLOCKQUOTE
+CLASS="BLOCKQUOTE"
+><P
+CLASS="LITERALLAYOUT"
+>.&nbsp;*&nbsp;+&nbsp;?&nbsp;[&nbsp;]&nbsp;-&nbsp;(&nbsp;)&nbsp;|&nbsp;^&nbsp;$&nbsp;\</P
+></BLOCKQUOTE
+>
+If these are preceded by a backslash then they no longer will have 
+special interpretation. 
+<P
+></P
+><DIV
+CLASS="VARIABLELIST"
+><DL
+><DT
+><CODE
+CLASS="VARNAME"
+>.</CODE
+></DT
+><DD
+><P
+>Matches any character. 
+<A
+NAME="AEN4416"
+></A
+><BLOCKQUOTE
+CLASS="BLOCKQUOTE"
+><P
+CLASS="LITERALLAYOUT"
+>(string-matches&nbsp;"abc"&nbsp;"a.c")&nbsp;=&#62;&nbsp;t<br>
+(string-matches&nbsp;"acc"&nbsp;"a.c")&nbsp;=&#62;&nbsp;t</P
+></BLOCKQUOTE
+></P
+></DD
+><DT
+><CODE
+CLASS="VARNAME"
+>*</CODE
+></DT
+><DD
+><P
+>Matches zero or more occurrences of the preceding item in the regex 
+<A
+NAME="AEN4423"
+></A
+><BLOCKQUOTE
+CLASS="BLOCKQUOTE"
+><P
+CLASS="LITERALLAYOUT"
+>(string-matches&nbsp;"aaaac"&nbsp;"a*c")&nbsp;=&#62;&nbsp;t<br>
+(string-matches&nbsp;"c"&nbsp;"a*c")&nbsp;=&#62;&nbsp;t<br>
+(string-matches&nbsp;"anythingc"&nbsp;".*c")&nbsp;=&#62;&nbsp;t<br>
+(string-matches&nbsp;"canythingatallc"&nbsp;"c.*c")&nbsp;=&#62;&nbsp;t</P
+></BLOCKQUOTE
+></P
+></DD
+><DT
+><CODE
+CLASS="VARNAME"
+>+</CODE
+></DT
+><DD
+><P
+>Matches one or more occurrences of the preceding item in the regex 
+<A
+NAME="AEN4430"
+></A
+><BLOCKQUOTE
+CLASS="BLOCKQUOTE"
+><P
+CLASS="LITERALLAYOUT"
+>(string-matches&nbsp;"aaaac"&nbsp;"a+c")&nbsp;=&#62;&nbsp;t<br>
+(string-matches&nbsp;"c"&nbsp;"a*c")&nbsp;=&#62;&nbsp;nil<br>
+(string-matches&nbsp;"anythingc"&nbsp;".+c")&nbsp;=&#62;&nbsp;t<br>
+(string-matches&nbsp;"c"&nbsp;".+c")&nbsp;=&#62;&nbsp;nil<br>
+(string-matches&nbsp;"canythingatallc"&nbsp;"c.+c")&nbsp;=&#62;&nbsp;t<br>
+(string-matches&nbsp;"cc"&nbsp;"c.+c")&nbsp;=&#62;&nbsp;nil</P
+></BLOCKQUOTE
+></P
+></DD
+><DT
+><CODE
+CLASS="VARNAME"
+>?</CODE
+></DT
+><DD
+><P
+>Matches zero or one occurrences of the preceding item. This 
+is it makes the preceding item optional. 
+<A
+NAME="AEN4437"
+></A
+><BLOCKQUOTE
+CLASS="BLOCKQUOTE"
+><P
+CLASS="LITERALLAYOUT"
+>(string-matches&nbsp;"abc"&nbsp;"ab?c")&nbsp;=&#62;&nbsp;t<br>
+(string-matches&nbsp;"ac"&nbsp;"ab?c")&nbsp;=&#62;&nbsp;t</P
+></BLOCKQUOTE
+></P
+></DD
+><DT
+><CODE
+CLASS="VARNAME"
+>[ ]</CODE
+></DT
+><DD
+><P
+>can defined a set of characters. This can also be used to defined 
+a range. For example <CODE
+CLASS="VARNAME"
+>[aeiou]</CODE
+> is and lower case vowel, <CODE
+CLASS="VARNAME"
+>[a-z]</CODE
+> 
+is an lower case letter from a thru z. <CODE
+CLASS="VARNAME"
+>[a-zA-Z]</CODE
+> is any character 
+upper or lower case. </P
+><P
+>If the <CODE
+CLASS="VARNAME"
+>^</CODE
+> is specifed first it negates the class, thus 
+<CODE
+CLASS="VARNAME"
+>[^a-z]</CODE
+> matches anything but a lower case character. </P
+></DD
+><DT
+><CODE
+CLASS="VARNAME"
+>\( \)</CODE
+></DT
+><DD
+><P
+>Allow sections to be formed to allow other operators to affect them.
+For example the <CODE
+CLASS="VARNAME"
+>*</CODE
+> applies to the previous item
+thus to match zero more occurrences of somethign longer than a 
+single character
+<A
+NAME="AEN4456"
+></A
+><BLOCKQUOTE
+CLASS="BLOCKQUOTE"
+><P
+CLASS="LITERALLAYOUT"
+>(string-matches&nbsp;"helloworld"&nbsp;"hello\\(there\\)*world")&nbsp;=&#62;&nbsp;t<br>
+(string-matches&nbsp;"hellothereworld"&nbsp;"hello\\(there\\)*world")&nbsp;=&#62;&nbsp;t<br>
+(string-matches&nbsp;"hellotherethereworld"&nbsp;"hello\\(there\\)*world")&nbsp;=&#62;&nbsp;t</P
+></BLOCKQUOTE
+>
+Note that you need two backslashes, one to escape the other backslashes</P
+></DD
+><DT
+><CODE
+CLASS="VARNAME"
+>\|</CODE
+></DT
+><DD
+><P
+>Or operator.  Allows choice of two alternatives
+<A
+NAME="AEN4463"
+></A
+><BLOCKQUOTE
+CLASS="BLOCKQUOTE"
+><P
+CLASS="LITERALLAYOUT"
+>(string-matches&nbsp;"hellofishworld"&nbsp;"hello\\(fish\\|chips\\)world")&nbsp;=&#62;&nbsp;t<br>
+(string-matches&nbsp;"hellochipsworld"&nbsp;"hello\\(fish\\|chips\\)world")&nbsp;=&#62;&nbsp;t</P
+></BLOCKQUOTE
+>
+Note that you need two backslashes, one to escape the other backslashes</P
+></DD
+></DL
+></DIV
+>
+&#13;</P
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="x4396.html"
+ACCESSKEY="P"
+>&#60;&#60;&#60; Previous</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="book1.html"
+ACCESSKEY="H"
+>Home</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="x4465.html"
+ACCESSKEY="N"
+>Next &#62;&#62;&#62;</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>Adding new C++ functions to Scheme</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="c3791.html"
+ACCESSKEY="U"
+>Up</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>Some Examples</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

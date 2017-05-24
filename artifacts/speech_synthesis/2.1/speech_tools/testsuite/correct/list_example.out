@@ -1,0 +1,76 @@
+[ List Accessed by LItem
+  dove
+  quail
+  wood pigeon
+  hawk
+  eagle
+  sparrow
+  emu
+  rook
+]
+
+[ List Accessed by integer index
+  dove
+  quail
+  wood pigeon
+  hawk
+  eagle
+  sparrow
+  emu
+  rook
+]
+Last item: rook
+Last item: rook
+First item: dovE
+4th item: EaglE
+
+[ List After Substitutions and Replacements
+  Swallow
+  quail
+  SEagull
+  hawk
+  EaglE
+  sparrow
+  Emu
+  TurkEy
+]
+
+[ List After Removing Eagle
+  Swallow
+  quail
+  SEagull
+  hawk
+  sparrow
+  Emu
+  TurkEy
+]
+
+[ List After Reverse
+  TurkEy
+  Emu
+  sparrow
+  hawk
+  SEagull
+  quail
+  Swallow
+]
+
+[ Sorted
+  Emu
+  SEagull
+  Swallow
+  TurkEy
+  hawk
+  quail
+  sparrow
+]
+
+[ Sorted by second character
+  SEagull
+  hawk
+  Emu
+  sparrow
+  quail
+  TurkEy
+  Swallow
+]

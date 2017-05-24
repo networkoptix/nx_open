@@ -1,0 +1,13 @@
+0) Build ../speech_tools (make sure it is located int he given location)
+
+Cygwin part:
+1) ./configure
+2) make VCMakefile
+3) cp config/vc_config_make_rules-dist config/vc_config_make_rules
+4) make -C src/modules init_modules.cc
+
+MSVC Tools Command Prompt:
+1) nmake /nologo /FVCMakefile
+
+For release build:
+1) vc_config_make_rules: change /MDd to /MD

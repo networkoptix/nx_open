@@ -1,0 +1,176 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>Building lexicons for new languages</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REL="HOME"
+TITLE="Building Synthetic Voices"
+HREF="book1.html"><LINK
+REL="UP"
+TITLE="Lexicons"
+HREF="c1379.html"><LINK
+REL="PREVIOUS"
+TITLE="Post-lexical rules"
+HREF="x1615.html"><LINK
+REL="NEXT"
+TITLE="Building prosodic models"
+HREF="c1637.html"></HEAD
+><BODY
+CLASS="SECT1"
+BGCOLOR="#FFFFFF"
+TEXT="#000000"
+LINK="#0000FF"
+VLINK="#840084"
+ALINK="#0000FF"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="3"
+ALIGN="center"
+>Building Synthetic Voices</TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="bottom"
+><A
+HREF="x1615.html"
+ACCESSKEY="P"
+>&#60;&#60;&#60; Previous</A
+></TD
+><TD
+WIDTH="80%"
+ALIGN="center"
+VALIGN="bottom"
+>Lexicons</TD
+><TD
+WIDTH="10%"
+ALIGN="right"
+VALIGN="bottom"
+><A
+HREF="c1637.html"
+ACCESSKEY="N"
+>Next &#62;&#62;&#62;</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="SECT1"
+><H1
+CLASS="SECT1"
+><A
+NAME="AEN1630"
+>Building lexicons for new languages</A
+></H1
+><P
+>Traditionally building a new lexicon for a language was a significant
+piece of work taking several expert phonologists perhaps several years
+to construct a lexicon with reasonable coverage.  However we include a
+method here that can cut this time significantly using the basic
+technology provided with this documentation.</P
+><P
+>The basic idea is add the most common words to a lexicon, expclitly
+giving their pronunciation by hand, then automatically build letter to
+sound rules from the initial data.  Then finding the most common words
+submit them to the system and check their correctness.  If wrong they
+are corrected and added to the lexicon, if correct they are added to
+the lexicon as is.  Over multiple passes the lexicon and letter to
+sound rules will improve.  As each pass the letter to sound rules are
+re-generate with the new data making them more correct.</P
+><P
+>This tecynique has been proved succesful for a number of language
+cutting the amount to time and effort to perhaps checking thousands of
+words rather than tens of thousands of words.  It also is a structured
+method that requires only knowledge of the basic language to carry
+out.  Good lexicons can be generated in as little as a coupld of
+weeks, though to get greater than 95% correctness of words in a
+language could still take several months work.</P
+><P
+>As stated above you can never list all the words in a language, but
+having grateter than 95% coverage with letter to sound rule accuracy
+grater than 75% you will have a lexicon that is competitive with those
+that take many year build.  In fact because you can build a lexicon in
+a shorter time it more likely to be consistent and there better for
+synthesis.</P
+><P
+>&#13;&#13;</P
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="x1615.html"
+ACCESSKEY="P"
+>&#60;&#60;&#60; Previous</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="book1.html"
+ACCESSKEY="H"
+>Home</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="c1637.html"
+ACCESSKEY="N"
+>Next &#62;&#62;&#62;</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>Post-lexical rules</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="c1379.html"
+ACCESSKEY="U"
+>Up</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>Building prosodic models</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

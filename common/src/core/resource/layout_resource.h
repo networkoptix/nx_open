@@ -34,6 +34,9 @@ public:
 
     QnLayoutResourcePtr clone() const;
 
+    /** Create a new layout with a given resource on it. */
+    static QnLayoutResourcePtr createFromResource(const QnResourcePtr& resource);
+
     virtual QString toSearchString() const override;
 
     void setItems(const QnLayoutItemDataList &items);

@@ -808,7 +808,12 @@ void ActionHandler::at_openInCurrentLayoutAction_triggered()
     menu()->trigger(action::OpenInLayoutAction, parameters);
 }
 
-void ActionHandler::at_openInNewLayoutAction_triggered() {
+void ActionHandler::at_openInNewLayoutAction_triggered()
+{
+    // Stop layout tour if it is running
+    if (action(action::ToggleLayoutTourModeAction)->isChecked())
+        menu()->trigger(action::ToggleLayoutTourModeAction);
+
     menu()->trigger(action::OpenNewTabAction);
     menu()->trigger(action::OpenInCurrentLayoutAction, menu()->currentParameters(sender()));
 }
@@ -983,11 +988,8 @@ void ActionHandler::at_moveCameraAction_triggered() {
 
 void ActionHandler::at_dropResourcesAction_triggered()
 {
-    const bool isLayoutTourReviewMode = context()->workbench()->currentLayout()->data()
-        .contains(Qn::LayoutTourUuidRole);
-
     // Layout Tour Handler will process this action itself
-    if (isLayoutTourReviewMode)
+    if (context()->workbench()->currentLayout()->isLayoutTourReview())
         return;
 
     auto parameters = menu()->currentParameters(sender());
@@ -1029,16 +1031,20 @@ void ActionHandler::at_dropResourcesAction_triggered()
         menu()->trigger(action::OpenVideoWallReviewAction, videoWall);
 }
 
-void ActionHandler::at_dropResourcesIntoNewLayoutAction_triggered() {
+void ActionHandler::at_dropResourcesIntoNewLayoutAction_triggered()
+{
     const auto parameters = menu()->currentParameters(sender());
 
-    QnLayoutResourceList layouts = parameters.resources().filtered<QnLayoutResource>();
-    QnVideoWallResourceList videowalls = parameters.resources().filtered<QnVideoWallResource>();
+    const auto layouts = parameters.resources().filtered<QnLayoutResource>();
+    if (!layouts.empty())
+        menu()->trigger(action::OpenAnyNumberOfLayoutsAction, layouts);
 
-    if (layouts.empty() && (videowalls.size() != parameters.resources().size())) /* There are some media in the drop, open new layout. */
-        menu()->trigger(action::OpenNewTabAction);
+    const auto openable =  parameters.resources().filtered(QnResourceAccessFilter::isOpenableInLayout);
+    if (openable.empty())
+        return;
 
-    menu()->trigger(action::DropResourcesAction, parameters);
+    menu()->trigger(action::OpenNewTabAction);
+    menu()->trigger(action::DropResourcesAction, openable);
 }
 
 void ActionHandler::at_delayedDropResourcesAction_triggered() {
@@ -1266,7 +1272,7 @@ void ActionHandler::at_thumbnailsSearchAction_triggered()
     if (!resource)
         return;
 
-    QnResourceWidget *widget = parameters.widget();
+    auto widget = parameters.widget();
     if (!widget)
         return;
 
@@ -1771,7 +1777,7 @@ QnAdjustVideoDialog* ActionHandler::adjustVideoDialog() {
 
 void ActionHandler::at_adjustVideoAction_triggered()
 {
-    QnMediaResourceWidget *widget = menu()->currentParameters(sender()).widget<QnMediaResourceWidget>();
+    auto widget = menu()->currentParameters(sender()).widget<QnMediaResourceWidget>();
     if (!widget)
         return;
 
@@ -1782,7 +1788,7 @@ void ActionHandler::at_adjustVideoAction_triggered()
 void ActionHandler::at_createZoomWindowAction_triggered() {
     const auto params = menu()->currentParameters(sender());
 
-    QnMediaResourceWidget *widget = params.widget<QnMediaResourceWidget>();
+    auto widget = params.widget<QnMediaResourceWidget>();
     if (!widget)
         return;
 

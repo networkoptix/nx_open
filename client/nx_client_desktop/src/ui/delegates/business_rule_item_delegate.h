@@ -10,6 +10,7 @@
 
 typedef QVector<QnUuid> IDList;
 class QnBusinessTypesComparator;
+class QnBusinessStringsHelper;
 
 class QnSelectResourcesDialogButton: public QPushButton {
     Q_OBJECT
@@ -68,4 +69,5 @@ private slots:
 
 private:
     QScopedPointer<QnBusinessTypesComparator> m_lexComparator;
+    QScopedPointer<QnBusinessStringsHelper> m_businessStringsHelper;
 };

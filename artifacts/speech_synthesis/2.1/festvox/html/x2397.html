@@ -1,0 +1,226 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>Recording the diphones</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REL="HOME"
+TITLE="Building Synthetic Voices"
+HREF="book1.html"><LINK
+REL="UP"
+TITLE="Diphone databases"
+HREF="c2261.html"><LINK
+REL="PREVIOUS"
+TITLE="Defining a diphone list"
+HREF="x2304.html"><LINK
+REL="NEXT"
+TITLE="Labeling the diphones"
+HREF="x2413.html"></HEAD
+><BODY
+CLASS="SECT1"
+BGCOLOR="#FFFFFF"
+TEXT="#000000"
+LINK="#0000FF"
+VLINK="#840084"
+ALINK="#0000FF"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="3"
+ALIGN="center"
+>Building Synthetic Voices</TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="bottom"
+><A
+HREF="x2304.html"
+ACCESSKEY="P"
+>&#60;&#60;&#60; Previous</A
+></TD
+><TD
+WIDTH="80%"
+ALIGN="center"
+VALIGN="bottom"
+>Diphone databases</TD
+><TD
+WIDTH="10%"
+ALIGN="right"
+VALIGN="bottom"
+><A
+HREF="x2413.html"
+ACCESSKEY="N"
+>Next &#62;&#62;&#62;</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="SECT1"
+><H1
+CLASS="SECT1"
+><A
+NAME="AEN2397"
+>Recording the diphones</A
+></H1
+><P
+>&#13;The object of recording diphones is to get as uniform a set of 
+pronunciations as possible. Your speaker should be relaxed, not be 
+suffering for a cold, or cough, or a hangover. If something goes wrong 
+with the recording and some of the examples need to be re-recorded it is 
+important that the speaker has as similar a voice as with the original 
+recording, waiting for another cold to come along is not reasonable, 
+(though some may argue that the same hangover can easily be induced). 
+Also to try to keep the voice potentially repeatable it is wise to 
+record at the same time of day, morning is a good idea. The points 
+on speaker selection and recording in the previous section should also 
+be borne in mind. </P
+><P
+>The recording environment should be reconstructable, so that the 
+conditions can be set up again if needed. Everything should be as 
+well-defined as possible, as far as gain settings, microphone distances, 
+and so on. Anechoic chambers are best, but general recording studios 
+will do. We've even done recording in an open room, with care this 
+works (make sure there's little background noise from computers, air 
+conditioning, outside traffic etc). Of course open rooms aren't ideal 
+but they are better than open noisey rooms. </P
+><P
+>The distance between the speaker and the microphone is crucial. A head 
+mounted mike helps keep this constant; the Shure SM-2 headset, for 
+instance, works well with the mic positioned at 8mm from the lips or so. 
+This can be checked with a ruler. Considering the cost and availability 
+of headmounted microphones and rulers, you should really consider using 
+them. While even fixed microphones like the Shure SM-57 can be used 
+well by professional voice talent, we strongly recommend a good headset 
+mic. </P
+><P
+>Ultimately, you need to split the recordings into individual files, one 
+for each prompt. Ideally this can be done while recording on a 
+file-by-file basis, but as that may not be practical and some other 
+technique can be used, such as recording onto DAT and transferring the 
+data to disk (and downsampling) later. Files might contain 50-100 
+nonsense words each. In this case we hand label the words, taking into 
+account any duplicates caused be errors in the recording. The program 
+<TT
+CLASS="FILENAME"
+>ch_wave</TT
+> in the Edinburgh Speech Tools (EST) offers a function to 
+split a large file into individual files based on a label file. We can 
+use this to get our individual files. You may also add an identifiable 
+noise during recording and automatically detect that as a split point, 
+as is often done at the Oregon Graduate Instititute.. They typically 
+use two different noises that can easily be distinguished and use one 
+for <SPAN
+CLASS="QUOTE"
+>"<I
+CLASS="EMPHASIS"
+>OK</I
+>"</SPAN
+> and <SPAN
+CLASS="QUOTE"
+>"<I
+CLASS="EMPHASIS"
+>BAD</I
+>"</SPAN
+> this can make the splitting of the files 
+into the individual nonsense words easier. Note you will also need 
+to split the electroglottograph (EGG) signal exactly the same way, if 
+you are using one. </P
+><P
+>No matter how you split these, you should be aware that there will still 
+often be mistakes, and checking by listening will help. </P
+><P
+>We now almost always record directly to disk on a computer using a
+sound card; see <A
+HREF="x817.html"
+>the Section called <I
+>Recording under Unix</I
+> in the Chapter called <I
+>Basic Requirements</I
+></A
+> for recording
+setup details. There can be a reduction in the quality of the
+recording due to poor quality audio hardware in computers (and often
+too much noise), though at least the hardware issue is getting to be
+less of a problem these days. There are lots of advantages to
+recording directly to disk, as the stage of digitising, transfering
+and spliting the offline records is laborious and prone to error.</P
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="x2304.html"
+ACCESSKEY="P"
+>&#60;&#60;&#60; Previous</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="book1.html"
+ACCESSKEY="H"
+>Home</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="x2413.html"
+ACCESSKEY="N"
+>Next &#62;&#62;&#62;</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>Defining a diphone list</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="c2261.html"
+ACCESSKEY="U"
+>Up</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>Labeling the diphones</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

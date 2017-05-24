@@ -1,0 +1,25 @@
+/**
+
+@page fringe_client_manual fringe_client
+@brief *Send commands to a running fringe server*
+@tableofcontents
+
+@section synopsis Synopsis
+
+@SYNOPSIS@
+
+fringe_client is a simple program for sending commands to a fringe
+process which is running in server mode.
+
+@section options Options
+
+
+@section finding-fringe Finding Fringe.
+
+Each fringe which runs in server mode registers
+it's location in a file called `.estServices` in
+the users home directory. Multiple servers can be present if they are
+given different names, and the `-n` can be used to
+select which fringe a command is sent to.
+
+*/

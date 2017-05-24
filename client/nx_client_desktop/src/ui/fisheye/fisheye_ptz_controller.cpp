@@ -94,7 +94,7 @@ void QnFisheyePtzController::updateLimits()
     qreal maxX = m_mediaDewarpingParams.xCenter + m_mediaDewarpingParams.radius;
 #endif
 
-    if(m_mediaDewarpingParams.viewMode == QnMediaDewarpingParams::Horizontal)
+    if (m_mediaDewarpingParams.viewMode == QnMediaDewarpingParams::Horizontal)
     {
         m_unlimitedPan = false;
         m_limits.minPan = -90.0;
@@ -133,13 +133,13 @@ void QnFisheyePtzController::updateLimits()
 void QnFisheyePtzController::updateCapabilities()
 {
     Ptz::Capabilities capabilities = Ptz::NoPtzCapabilities;
-    if(m_mediaDewarpingParams.enabled)
+    if (m_mediaDewarpingParams.enabled)
     {
         capabilities = Ptz::ContinuousPtzCapabilities | Ptz::AbsolutePtzCapabilities
             | Ptz::LogicalPositioningPtzCapability | Ptz::VirtualPtzCapability;
     }
 
-    if(capabilities == m_capabilities)
+    if (capabilities == m_capabilities)
         return;
 
     m_capabilities = capabilities;
@@ -191,19 +191,19 @@ QVector3D QnFisheyePtzController::boundedPosition(const QVector3D& position)
     float hFov = result.z();
     float vFov = result.z() / m_aspectRatio;
 
-    if(!m_unlimitedPan)
+    if (!m_unlimitedPan)
     {
         result.setX(qBound<float>(
             m_limits.minPan + hFov / 2.0, result.x(), m_limits.maxPan - hFov / 2.0));
     }
 
-    if(!m_unlimitedPan || !qFuzzyEquals(m_limits.minTilt, -90)
+    if (!m_unlimitedPan || !qFuzzyEquals(m_limits.minTilt, -90)
         || m_itemDewarpingParams.panoFactor > 1)
     {
         result.setY(qMax(m_limits.minTilt + vFov / 2.0, result.y()));
     }
 
-    if(!m_unlimitedPan || !qFuzzyEquals(m_limits.maxTilt, 90)
+    if (!m_unlimitedPan || !qFuzzyEquals(m_limits.maxTilt, 90)
         || m_itemDewarpingParams.panoFactor > 1)
     {
         result.setY(qMin(m_limits.maxTilt - vFov  / 2.0, result.y()));
@@ -235,15 +235,15 @@ void QnFisheyePtzController::absoluteMoveInternal(const QVector3D& position)
 
 void QnFisheyePtzController::tick(int deltaMSecs)
 {
-    if(m_animationMode == SpeedAnimation)
+    if (m_animationMode == SpeedAnimation)
     {
         QVector3D speed = m_speed * m_unitSpeed;
         absoluteMoveInternal(boundedPosition(getPositionInternal() + speed * deltaMSecs / 1000.0));
     }
-    else if(m_animationMode == PositionAnimation)
+    else if (m_animationMode == PositionAnimation)
     {
         m_progress += m_relativeSpeed * deltaMSecs / 1000.0;
-        if(m_progress >= 1.0)
+        if (m_progress >= 1.0)
         {
             absoluteMoveInternal(m_endPosition);
             stopListening();
@@ -263,7 +263,7 @@ Ptz::Capabilities QnFisheyePtzController::getCapabilities() const
 
 bool QnFisheyePtzController::getLimits(Qn::PtzCoordinateSpace space, QnPtzLimits* limits) const
 {
-    if(space != Qn::LogicalPtzCoordinateSpace)
+    if (space != Qn::LogicalPtzCoordinateSpace)
         return false;
 
     *limits = m_limits;
@@ -282,7 +282,7 @@ bool QnFisheyePtzController::continuousMove(const QVector3D& speed)
     m_speed = speed;
     m_speed.setZ(-m_speed.z()); /* Positive speed means that fov should decrease. */
 
-    if(qFuzzyIsNull(speed))
+    if (qFuzzyIsNull(speed))
     {
         stopListening();
     }
@@ -300,13 +300,13 @@ bool QnFisheyePtzController::absoluteMove(
     const QVector3D& position,
     qreal speed)
 {
-    if(space != Qn::LogicalPtzCoordinateSpace)
+    if (space != Qn::LogicalPtzCoordinateSpace)
         return false;
 
     m_speed = QVector3D();
     stopListening();
 
-    if(!qFuzzyEquals(speed, 1.0) && speed > 1.0)
+    if (!qFuzzyEquals(speed, 1.0) && speed > 1.0)
     {
         absoluteMoveInternal(boundedPosition(position));
     }
@@ -317,14 +317,14 @@ bool QnFisheyePtzController::absoluteMove(
         m_endPosition = boundedPosition(position);
 
         /* Try to place start & end closer to each other */
-        if(m_unlimitedPan)
+        if (m_unlimitedPan)
         {
             m_startPosition.setX(qMod(m_startPosition.x(), 360.0));
             m_endPosition.setX(qMod(m_endPosition.x(), 360.0));
             
-            if(m_endPosition.x() - 180.0 > m_startPosition.x())
+            if (m_endPosition.x() - 180.0 > m_startPosition.x())
                 m_endPosition.setX(m_endPosition.x() - 360.0);
-            if(m_endPosition.x() + 180.0 < m_startPosition.x())
+            if (m_endPosition.x() + 180.0 < m_startPosition.x())
                 m_endPosition.setX(m_endPosition.x() + 360.0);
         }
 
@@ -344,7 +344,7 @@ bool QnFisheyePtzController::absoluteMove(
 
 bool QnFisheyePtzController::getPosition(Qn::PtzCoordinateSpace space, QVector3D* position) const
 {
-    if(space != Qn::LogicalPtzCoordinateSpace)
+    if (space != Qn::LogicalPtzCoordinateSpace)
         return false;
     
     *position = getPositionInternal();

@@ -163,7 +163,6 @@ bool ResourcePtzController::setPresetById(const QString& id)
         [id](const QnPtzPreset& preset) { return id == preset.id; }) != presets.end();
 
     return found && activatePreset(id, QnAbstractPtzController::MaxPtzSpeed);
-
 }
 
 bool ResourcePtzController::setAutoFocus()
