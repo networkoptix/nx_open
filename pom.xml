@@ -276,7 +276,7 @@
         <artifact.name.cloud_debug>${artifact.name.prefix}-cloud_debug-${artifact.name.suffix}</artifact.name.cloud_debug>
         <artifact.name.testcamera>${artifact.name.prefix}-testcamera-${artifact.name.suffix}</artifact.name.testcamera>
 
-        <nxcloud.version>1.0.141</nxcloud.version>
+        <nxcloud.version>1.0.142</nxcloud.version>
     </properties>
 
     <build>
@@ -526,7 +526,7 @@
 
                 <!-- <module>plugins/axiscamplugin</module> -->
                 <!-- <module>storage_plugins/ftpstorageplugin</module> -->
-                <module>storage_plugins/teststorageplugin</module>
+                <!-- <module>storage_plugins/teststorageplugin</module> -->
 
                 <!-- <module>mediaproxy</module> -->
             </modules>
@@ -818,7 +818,6 @@
                 <module>debsetup/client-deb</module>
                 <module>debsetup/mediaserver-deb</module>
 
-                <module>storage_plugins/teststorageplugin</module>
                 <!-- <module>storage_plugins/teststorageplugin/test</module> -->
             </modules>
             <properties>

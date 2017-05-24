@@ -85,7 +85,6 @@
   },
   "errorCodes": {
     "ok": "ok",
-    "cantChangePasswordPrefix": "Cannot save new password",
     "cantSendActivationPrefix": "Cannot send confirmation Email",
     "cantDisconnectSystemPrefix": "Cannot delete System",
     "cantUnshareWithMeSystemPrefix": "Cannot delete System",

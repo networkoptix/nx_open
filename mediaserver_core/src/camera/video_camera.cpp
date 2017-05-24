@@ -473,6 +473,8 @@ void QnVideoCamera::createReader(QnServer::ChunksCatalog catalog)
 
 void QnVideoCamera::startLiveCacheIfNeeded()
 {
+    using namespace std::chrono;
+
     QnMutexLocker lock(&m_getReaderMutex);
 
     if (!isSomeActivity())
@@ -485,9 +487,7 @@ void QnVideoCamera::startLiveCacheIfNeeded()
             ensureLiveCacheStarted(
                 MEDIA_Quality_Low,
                 m_secondaryReader,
-                qnServerModule->roSettings()->value(
-                    nx_ms_conf::HLS_TARGET_DURATION_MS,
-                    nx_ms_conf::DEFAULT_TARGET_DURATION_MS).toUInt() * USEC_PER_MSEC);
+                duration_cast<microseconds>(qnServerModule->settings()->hlsTargetDuration()).count());
     }
     else if (m_primaryReader && !m_liveCache[MEDIA_Quality_High])
     {
@@ -498,9 +498,7 @@ void QnVideoCamera::startLiveCacheIfNeeded()
             ensureLiveCacheStarted(
                 MEDIA_Quality_High,
                 m_primaryReader,
-                qnServerModule->roSettings()->value(
-                    nx_ms_conf::HLS_TARGET_DURATION_MS,
-                    nx_ms_conf::DEFAULT_TARGET_DURATION_MS).toUInt() * USEC_PER_MSEC);
+                duration_cast<microseconds>(qnServerModule->settings()->hlsTargetDuration()).count());
         }
     }
 }
