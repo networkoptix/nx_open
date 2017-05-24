@@ -218,6 +218,9 @@ TEST_F(OutgoingTunnelConnectionTest, timeout)
         nx::network::SocketGlobals::aioService().getRandomAioThread(),
         QnUuid::createUuid().toByteArray(),
         std::move(udtConnection));
+    auto tunnelConnectionGuard = makeScopeGuard(
+        [&tunnelConnection]() { tunnelConnection.pleaseStopSync(); });
+        
     tunnelConnection.start();
 
     m_serverSocket->pleaseStopSync();
@@ -253,8 +256,6 @@ TEST_F(OutgoingTunnelConnectionTest, timeout)
             }
         #endif
     }
-
-    tunnelConnection.pleaseStopSync();
 }
 
 TEST_F(OutgoingTunnelConnectionTest, cancellation)

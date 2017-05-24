@@ -221,7 +221,7 @@ SettingsProxyPtr createServerSettingsProxy(QnCommonModule* commonModule)
 
 bool needToResetSystem(bool isNewServerInstance, const SettingsProxy* settings)
 {
-    return isNewServerInstance ||
+    return isNewServerInstance || settings->localSystemId().isNull() ||
            (settings->isCloudInstanceChanged() && settings->isConnectedToCloud());
 }
 

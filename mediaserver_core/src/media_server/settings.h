@@ -130,10 +130,13 @@ public:
     QSettings* roSettings();
     QSettings* runTimeSettings();
 
+    std::chrono::milliseconds hlsTargetDuration() const;
+
     static QString defaultROSettingsFilePath();
     static std::chrono::milliseconds hlsTargetDuration();
 
     static QString defaultRunTimeSettingsFilePath();
+
 private:
     void initializeROSettingsFromConfFile( const QString& fileName );
     void initializeROSettings();

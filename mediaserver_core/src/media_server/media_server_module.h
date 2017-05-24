@@ -35,6 +35,8 @@ public:
 
     QSettings* roSettings() const;
     QSettings* runTimeSettings() const;
+    MSSettings* settings() const;
+
 private:
     QnCommonModule* m_commonModule;
     MSSettings* m_settings;

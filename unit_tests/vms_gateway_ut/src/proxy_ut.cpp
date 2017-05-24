@@ -1,4 +1,3 @@
-
 #include "test_setup.h"
 
 #include <QtCore/QUrlQuery>
@@ -6,7 +5,6 @@
 #include <nx/network/http/buffer_source.h>
 #include <nx/network/http/chunked_transfer_encoder.h>
 #include <nx/network/http/httpclient.h>
-
 
 namespace nx {
 namespace cloud {
@@ -20,8 +18,7 @@ static const QString checkuedTestPathAndQuery(lit("%1?%2&chunked").arg(testPath)
 static const nx_http::BufferType testMsgBody("bla-bla-bla");
 static const nx_http::BufferType testMsgContentType("text/plain");
 
-class VmsGatewayProxyTestHandler
-    :
+class VmsGatewayProxyTestHandler:
     public nx_http::AbstractHttpRequestHandler
 {
 public:
@@ -72,8 +69,7 @@ public:
     boost::optional<bool> m_securityExpectation;
 };
 
-class VmsGatewayProxyTest
-:
+class VmsGatewayProxyTest:
     public VmsGatewayFunctionalTest
 {
 public:
@@ -362,7 +358,7 @@ TEST_F(VmsGatewayProxyTest, ModRewrite)
         .arg(testPathAndQuery)));
 }
 
-}   // namespace test
-}   // namespace gateway
-}   // namespace cloud
-}   // namespace nx
+} // namespace test
+} // namespace gateway
+} // namespace cloud
+} // namespace nx

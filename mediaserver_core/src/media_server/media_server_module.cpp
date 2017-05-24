@@ -145,6 +145,11 @@ QSettings* QnMediaServerModule::roSettings() const
     return m_settings->roSettings();
 }
 
+MSSettings* QnMediaServerModule::settings() const
+{
+    return m_settings;
+}
+
 QSettings* QnMediaServerModule::runTimeSettings() const
 {
     return m_settings->runTimeSettings();
