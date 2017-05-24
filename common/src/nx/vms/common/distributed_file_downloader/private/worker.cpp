@@ -29,7 +29,7 @@ QString statusString(bool success)
     return success ? lit("OK") : lit("FAIL");
 }
 
-QList<QnUuid> takeClosestGuidPeers(QList<QnUuid>& peers, int count, const QnUuid& selfId)
+QList<QnUuid> takeClosestIdPeers(QList<QnUuid>& peers, int count, const QnUuid& selfId)
 {
     QList<QnUuid> result;
 
@@ -42,30 +42,19 @@ QList<QnUuid> takeClosestGuidPeers(QList<QnUuid>& peers, int count, const QnUuid
         return result;
     }
 
+    // Take count elements from the sorted circular list.
+
     const int currentIndex = std::distance(
         peers.begin(), std::lower_bound(peers.begin(), peers.end(), selfId));
 
-    const int firstIndex = currentIndex - (count + 1) / 2;
-    const int lastIndex = firstIndex + count - 1;
-
-    QVector<int> indexesToTake;
-    indexesToTake.reserve(count);
-
-    for (int i = firstIndex; i <= lastIndex; ++i)
+    int index = (currentIndex - (count + 1) / 2 + size) % size;
+    for (int i = 0; i < count; ++i)
     {
-        int index = i;
+        result.append(peers.takeAt(index));
 
-        if (index < 0)
-            index += size;
-        else if (index >= size)
-            index -= size;
-
-        indexesToTake.append(index);
+        if (index == peers.size())
+            index = 0;
     }
-    std::sort(indexesToTake.begin(), indexesToTake.end());
-
-    while (!indexesToTake.isEmpty())
-        result.append(peers.takeAt(indexesToTake.takeLast()));
 
     return result;
 }
@@ -797,12 +786,12 @@ QList<QnUuid> Worker::selectPeersForOperation(int count, QList<QnUuid> peers) co
         });
 
     /* The result should contain:
-       1) One of the closest-guid peers: thus every server will try to use its
+       1) One of the closest-id peers: thus every server will try to use its
           guid neighbours which should lead to more uniform peers load in flat networks.
        2) At least one random peer which wasn't selected in the main selection: this is to avoid
           overloading peers which started file downloading and obviously contain chunks
           while other do not yet.
-       3) The rest is the most scored peers having the closest guids.
+       3) The rest is the most scored peers having the closest IDs.
 
        (1) and (2) are additionalPeers, so additionalPeers = 2.
        If there're not enought high-score peers then the result should contain
@@ -838,7 +827,7 @@ QList<QnUuid> Worker::selectPeersForOperation(int count, QList<QnUuid> peers) co
 
     // Take (3) highest-score peers.
     std::sort(highestScorePeers.begin(), highestScorePeers.end());
-    result = takeClosestGuidPeers(highestScorePeers, highestScorePeersNeeded, selfId);
+    result = takeClosestIdPeers(highestScorePeers, highestScorePeersNeeded, selfId);
 
     if (result.size() == count)
         return result;
@@ -849,7 +838,7 @@ QList<QnUuid> Worker::selectPeersForOperation(int count, QList<QnUuid> peers) co
     std::sort(peers.begin(), peers.end());
 
     // Take (1) one closest-guid peer.
-    result += takeClosestGuidPeers(peers, 1, selfId);
+    result += takeClosestIdPeers(peers, 1, selfId);
     --additionalPeers;
 
     // Take (2) random peers.
@@ -956,7 +945,7 @@ bool Worker::needToFindBetterPeers() const
 
     auto closestPeers = m_peers;
     std::sort(closestPeers.begin(), closestPeers.end());
-    closestPeers = takeClosestGuidPeers(
+    closestPeers = takeClosestIdPeers(
         closestPeers, m_peersPerOperation, m_peerManager->selfId());
 
     for (const auto& peerId: closestPeers)

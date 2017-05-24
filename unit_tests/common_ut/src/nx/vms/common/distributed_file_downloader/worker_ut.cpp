@@ -203,7 +203,7 @@ TEST_F(DistributedFileDownloaderWorkerTest, preferredPeersSelection)
     }
 }
 
-TEST_F(DistributedFileDownloaderWorkerTest, closestGuidPeersSelection)
+TEST_F(DistributedFileDownloaderWorkerTest, closestIdPeersSelection)
 {
     for (int i = 0; i < 100; ++i)
         commonPeerManager->addPeer();
@@ -230,13 +230,13 @@ TEST_F(DistributedFileDownloaderWorkerTest, closestGuidPeersSelection)
         defaultPeer->worker->increasePeerRank(peer);
 
     const auto& selectedPeers = defaultPeer->worker->selectPeersForOperation();
-    int closestGuidPeersCount = 0;
+    int closestIdPeersCount = 0;
     for (const auto& peerId: selectedPeers)
     {
         if (distance(peerId) <= maxDistance)
-            ++closestGuidPeersCount;
+            ++closestIdPeersCount;
     }
-    ASSERT_GE(closestGuidPeersCount, selectedPeers.size() - 1);
+    ASSERT_GE(closestIdPeersCount, selectedPeers.size() - 1);
 }
 
 TEST_F(DistributedFileDownloaderWorkerTest, requestingFileInfo)
