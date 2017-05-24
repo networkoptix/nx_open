@@ -125,11 +125,11 @@
     }
 
     &:hover{
-      background-color: $light8;
+      background-color: $additional_light3;
     }
 
     &:active{
-      background-color: $light6;
+      background-color: $light5;
     }
 
     &.disabled{
@@ -137,12 +137,16 @@
       cursor:default;
     }
 
-    &.active:hover{
+    &.active{
       background-color: $light5 !important;
     }
 
+    &.active:hover{
+      background-color: $light4 !important;
+    }
+
     &.active:active{
-      background-color: $light6;
+      background-color: $light5 !important;
     }
 
     &.open>.dropdown-menu{
@@ -780,6 +784,19 @@ div{
   }
 }
 
+.side-shadow{
+  width:2px;
+  height: 100%;
+  background-color: $dark1;
+  opacity: 0.05;
+  position: absolute;
+
+  &.right{
+    right:0;
+  }
+}
+
+
 .player-controls{
   padding: 33px 25px 32px 25px !important;
 }
@@ -806,6 +823,7 @@ div{
   height: 100%;
   text-align: center;
   line-height: 100px;
+  background-color:$additional_light2;
   border-left: 1px solid $light6 !important;
   border-right: 1px solid $light4 !important;
 
@@ -814,15 +832,15 @@ div{
   }
 
   .active{
-    background-color: $light6 !important;
+    background-color: $light5 !important;
     border-left: 1px solid $light8 !important;
     border-right: 1px solid $light7 !important; 
   }
 
   &:hover{
-    background-color: $light4 !important;
+    background-color: $additional_light3 !important;
     border-left: 1px solid $light6 !important;
-    border-right: 1px solid $light4 !important; 
+    border-right: 1px solid $light5 !important; 
   }
 
   &.active:hover{
@@ -833,7 +851,7 @@ div{
 
   &:active,
   &.active:active {
-    background-color: $light4 !important;
+    background-color: $light5 !important;
     border-left: 1px solid $light8 !important;
     border-right: 1px solid $light7 !important; 
   }
