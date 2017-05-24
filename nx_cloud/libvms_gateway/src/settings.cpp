@@ -1,8 +1,3 @@
-/**********************************************************
-* May 17, 2016
-* akolesnikov
-***********************************************************/
-
 #include "settings.h"
 
 #include <thread>
@@ -253,7 +248,7 @@ void Settings::loadSettings()
         m_cloudConnect.preferedSslMode = SslMode::followIncomingConnection;
 }
 
-}   //namespace conf
-}   //namespace cloud
-}   //namespace gateway
-}   //namespace nx
+} // namespace conf
+} // namespace cloud
+} // namespace gateway
+} // namespace nx
