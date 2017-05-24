@@ -11,12 +11,12 @@ CREATE TABLE "vms_layout_tour_items" (
     );
 
 CREATE INDEX idx_layout_tour_items ON vms_layout_tour_items(tourId);
-    
+
 INSERT INTO vms_layout_tour_items
   SELECT
     tourId,
     layoutId,
     delayMs
   FROM vms_layout_tour_items_tmp;
-  
+
 DROP TABLE vms_layout_tour_items_tmp;

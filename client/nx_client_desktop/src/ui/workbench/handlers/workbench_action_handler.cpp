@@ -1039,7 +1039,7 @@ void ActionHandler::at_dropResourcesIntoNewLayoutAction_triggered()
     if (!layouts.empty())
         menu()->trigger(action::OpenAnyNumberOfLayoutsAction, layouts);
 
-    const auto openable =  parameters.resources().filtered(QnResourceAccessFilter::isOpenableInLayout);
+    const auto openable = parameters.resources().filtered(QnResourceAccessFilter::isOpenableInLayout);
     if (openable.empty())
         return;
 
