@@ -194,7 +194,7 @@ void ModuleConnector::Module::connectToGroup(Endpoints::iterator endpointsGroup)
         connectToEndpoint(endpoint, endpointsGroup);
     }
 
-    // Go to a next group if we could not stat any connects in current group.
+    // Go to a next group if we could not start any connects in current group.
     if (endpointsInProgress == 0)
         return connectToGroup(++endpointsGroup);
 }

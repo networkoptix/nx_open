@@ -21,7 +21,7 @@
 #include <network/module_information.h>
 
 #include <utils/common/app_info.h>
-#include "utils/common/cryptographic_hash.h"
+#include <nx/utils/cryptographic_hash.h>
 #include <api/global_settings.h>
 #include <nx/network/socket_global.h>
 #include <nx/network/nettools.h>
@@ -237,7 +237,7 @@ void DeprecatedMulticastFinder::at_moduleInformationChanged()
 
 RevealResponse *DeprecatedMulticastFinder::getCachedValue(const quint8* buffer, const quint8* bufferEnd)
 {
-    QnCryptographicHash m_mdctx(QnCryptographicHash::Md5);
+    nx::utils::QnCryptographicHash m_mdctx(nx::utils::QnCryptographicHash::Md5);
     m_mdctx.addData(reinterpret_cast<const char*>(buffer), bufferEnd - buffer);
     QByteArray result = m_mdctx.result();
     RevealResponse* response = m_cachedResponse[result];

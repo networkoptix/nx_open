@@ -12,6 +12,7 @@
 
 #include <utils/common/app_info.h>
 #include <media_server/media_server_app_info.h>
+#include <media_server/media_server_module.h>
 
 #ifndef _WIN32
 static QString templateConfigFileName = QString("/opt/%1/mediaserver/etc/mediaserver.conf.template").arg(QnAppInfo::linuxOrganizationName());

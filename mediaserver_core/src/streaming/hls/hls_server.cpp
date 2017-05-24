@@ -66,7 +66,7 @@ namespace nx_hls
 
     QnHttpLiveStreamingProcessor::QnHttpLiveStreamingProcessor( QSharedPointer<AbstractStreamSocket> socket, QnTcpListener* owner )
     :
-        QnTCPConnectionProcessor( socket, owner->commonModule() ),
+        QnTCPConnectionProcessor( socket, owner ),
         m_state( sReceiving ),
         m_switchToChunkedTransfer( false ),
         m_useChunkedTransfer( false ),

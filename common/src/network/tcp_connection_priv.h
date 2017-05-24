@@ -76,6 +76,7 @@ public:
         clientRequestOffset(0),
         prevSocketError(SystemError::noError),
         authenticatedOnce(false),
+        owner(nullptr),
         interleavedMessageDataPos(0),
         currentRequestSize(0)
     {
@@ -106,6 +107,7 @@ public:
     Qn::UserAccessData accessRights;
     SystemError::ErrorCode prevSocketError;
     bool authenticatedOnce;
+    QnTcpListener* owner;
 private:
     QByteArray interleavedMessageData;
     size_t interleavedMessageDataPos;

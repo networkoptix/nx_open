@@ -22,7 +22,6 @@ public:
     }
 
     QSharedPointer<AbstractStreamSocket> dstSocket;
-    QnUniversalTcpListener* owner;
     QUrl lastConnectedUrl;
     std::chrono::milliseconds connectTimeout;
     ec2::QnTransactionMessageBus* messageBus;

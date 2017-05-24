@@ -21,7 +21,7 @@
         <product.title>${company.name} Cloud DB Testing Utility</product.title>
 
         <qt.libs>core concurrent xml sql network gui</qt.libs>
-        <global.libs>-lcommon -lappserver2 -lnx_streaming -lnx_network -ludt -lnx_fusion -lnx_utils -lcloud_db -lcloud_db_client</global.libs>
+        <global.libs>-lcommon -lappserver2 -lnx_network -ludt -lnx_fusion -lnx_utils -lcloud_db -lcloud_db_client</global.libs>
         <windows.oslibs>-lws2_32 -lIphlpapi DbgHelp.lib -lwinmm</windows.oslibs>
         <mac.oslibs>-lbz2 -framework IOKit -framework CoreServices</mac.oslibs>
 

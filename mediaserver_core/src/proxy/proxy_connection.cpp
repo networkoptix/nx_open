@@ -50,10 +50,9 @@ QnProxyConnectionProcessor::QnProxyConnectionProcessor(
     QSharedPointer<AbstractStreamSocket> socket,
     QnHttpConnectionListener* owner)
 :
-    QnTCPConnectionProcessor(new QnProxyConnectionProcessorPrivate, std::move(socket), owner->commonModule())
+    QnTCPConnectionProcessor(new QnProxyConnectionProcessorPrivate, std::move(socket), owner)
 {
     Q_D(QnProxyConnectionProcessor);
-    d->owner = static_cast<QnUniversalTcpListener*>(owner);
     d->connectTimeout = qnGlobalSettings->proxyConnectTimeout();
     d->messageBus = messageBus;
 }
@@ -63,10 +62,9 @@ QnProxyConnectionProcessor::QnProxyConnectionProcessor(
     QSharedPointer<AbstractStreamSocket> socket,
     QnHttpConnectionListener* owner)
 :
-    QnTCPConnectionProcessor(priv, std::move(socket), owner->commonModule())
+    QnTCPConnectionProcessor(priv, std::move(socket), owner)
 {
     Q_D(QnProxyConnectionProcessor);
-    d->owner = static_cast<QnUniversalTcpListener*>(owner);
     d->connectTimeout = qnGlobalSettings->proxyConnectTimeout();
 }
 
@@ -136,10 +134,10 @@ static bool isLocalAddress(const QString& addr)
 QString QnProxyConnectionProcessor::connectToRemoteHost(const QnRoute& route, const QUrl& url)
 {
     Q_D(QnProxyConnectionProcessor);
-
+    auto owner = static_cast<QnUniversalTcpListener*>(d->owner);
     if (route.reverseConnect) {
         const auto& target = route.gatewayId.isNull() ? route.id : route.gatewayId;
-        d->dstSocket = d->owner->getProxySocket(
+        d->dstSocket = owner->getProxySocket(
             target.toString(),
             d->connectTimeout.count(),
             [&](int socketCount)

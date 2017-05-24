@@ -18,7 +18,7 @@
         <guid>${isd_native_plugin.guid}</guid>
 
         <qt.libs>core network concurrent</qt.libs>
-        <global.libs>-lcommon -lnx_utils -lnx_streaming</global.libs>
+        <global.libs>-lcommon -lnx_utils</global.libs>
         <windows.oslibs>Ws2_32.lib common.lib Iphlpapi.lib</windows.oslibs>
 
         <windows.defines>WIN32_LEAN_AND_MEAN</windows.defines>
@@ -55,14 +55,6 @@
                     <type>pom</type>
                     <scope>system</scope>
                     <systemPath>${root.dir}/common/pom.xml</systemPath>
-                </dependency>
-                <dependency>
-                    <groupId>${project.groupId}</groupId>
-                    <artifactId>nx_streaming</artifactId>
-                    <version>${project.version}</version>
-                    <type>pom</type>
-                    <scope>system</scope>
-                    <systemPath>${root.dir}/common_libs/nx_streaming/pom.xml</systemPath>
                 </dependency>
             </dependencies>
         </profile>
