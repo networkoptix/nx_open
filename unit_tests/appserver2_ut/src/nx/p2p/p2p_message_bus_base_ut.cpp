@@ -17,7 +17,11 @@ void P2pMessageBusTestBase::initResourceTypes(ec2::AbstractECConnection* ec2Conn
     qnResTypePool->replaceResourceTypeList(resourceTypeList);
 }
 
-void P2pMessageBusTestBase::createData(const Appserver2Ptr& server, int camerasCount, int propertiesPerCamera)
+void P2pMessageBusTestBase::createData(
+    const Appserver2Ptr& server,
+    int camerasCount,
+    int propertiesPerCamera,
+    int userCount)
 {
     const auto connection = server->moduleInstance()->ecConnection();
 
@@ -36,6 +40,18 @@ void P2pMessageBusTestBase::createData(const Appserver2Ptr& server, int camerasC
 
         auto serverManager = connection->getMediaServerManager(Qn::kSystemAccess);
         ASSERT_EQ(ec2::ErrorCode::ok, serverManager->saveSync(serverData));
+    }
+
+    std::vector<ec2::ApiUserData> users;
+
+    for (int i = 0; i < userCount; ++i)
+    {
+        ec2::ApiUserData userData;
+        userData.id = QnUuid::createUuid();
+        userData.name = lm("user_%1").arg(i);
+        userData.isEnabled = true;
+        userData.isCloud = false;
+        users.push_back(userData);
     }
 
     std::vector<ec2::ApiCameraData> cameras;
@@ -63,8 +79,12 @@ void P2pMessageBusTestBase::createData(const Appserver2Ptr& server, int camerasC
         for (int j = 0; j < propertiesPerCamera; ++j)
             cameraParams.push_back(ec2::ApiResourceParamWithRefData(cameraData.id, lit("property%1").arg(j), lit("value%1").arg(j)));
     }
+    auto userManager = connection->getUserManager(Qn::kSystemAccess);
     auto cameraManager = connection->getCameraManager(Qn::kSystemAccess);
     auto resourceManager = connection->getResourceManager(Qn::kSystemAccess);
+
+    for (const auto& user: users)
+        ASSERT_EQ(ec2::ErrorCode::ok, userManager->saveSync(user));
     ASSERT_EQ(ec2::ErrorCode::ok, cameraManager->saveUserAttributesSync(userAttrs));
     ASSERT_EQ(ec2::ErrorCode::ok, resourceManager->saveSync(cameraParams));
     ASSERT_EQ(ec2::ErrorCode::ok, cameraManager->addCamerasSync(cameras));

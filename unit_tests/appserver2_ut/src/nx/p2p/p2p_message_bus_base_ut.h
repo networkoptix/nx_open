@@ -35,7 +35,11 @@ protected:
     Appserver2Ptr createAppserver();
 
     void initResourceTypes(ec2::AbstractECConnection* ec2Connection);
-    void createData(const Appserver2Ptr& server, int camerasCount, int propertiesPerCamera);
+    void createData(
+        const Appserver2Ptr& server,
+        int camerasCount,
+        int propertiesPerCamera,
+        int userCount = 0);
 protected:
     QnStaticCommonModule staticCommon;
     std::vector<Appserver2Ptr> m_servers;
