@@ -18,7 +18,7 @@
 
     <properties>
         <qt.libs>core network concurrent xml xmlpatterns sql multimedia</qt.libs>
-        <global.libs>-lcommon -lnx_streaming -lnx_network -lnx_utils</global.libs>
+        <global.libs>-lcommon -lnx_network -lnx_utils</global.libs>
         <windows.oslibs>-lws2_32 -lIphlpapi DbgHelp.lib -lwinmm Wldap32.lib</windows.oslibs>
 
         <windows.defines>_VARIADIC_MAX=10</windows.defines>
@@ -43,15 +43,6 @@
             <type>pom</type>
             <scope>system</scope>
             <systemPath>${root.dir}/common/pom.xml</systemPath>
-        </dependency>
-
-        <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>nx_streaming</artifactId>
-            <version>${project.version}</version>
-            <type>pom</type>
-            <scope>system</scope>
-            <systemPath>${root.dir}/common_libs/nx_streaming/pom.xml</systemPath>
         </dependency>
 
         <dependency>

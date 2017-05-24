@@ -10,8 +10,7 @@ Ec2ConnectionProcessor::Ec2ConnectionProcessor(
     QSharedPointer<AbstractStreamSocket> socket,
     QnHttpConnectionListener* owner)
 :
-    QnTCPConnectionProcessor(socket, owner->commonModule()),
-    m_owner(owner)
+    QnTCPConnectionProcessor(socket, owner)
 {
     setObjectName(QLatin1String("Ec2ConnectionProcessor"));
 }
@@ -73,8 +72,9 @@ bool Ec2ConnectionProcessor::processRequest(bool noAuth)
     Q_D(QnTCPConnectionProcessor);
 
     QnMutexLocker lock(&m_mutex);
-    if (auto handler = m_owner->findHandler(d->protocol, d->request))
-        m_processor = handler(d->socket, m_owner);
+    auto owner = static_cast<QnHttpConnectionListener*> (d->owner);
+    if (auto handler = owner->findHandler(d->protocol, d->request))
+        m_processor = handler(d->socket, owner);
     else
         return false;
 

@@ -3,7 +3,7 @@ nx_configure_file(
     ${CMAKE_CURRENT_BINARY_DIR})
 
 set(library_type)
-if(WIN32)
+if(WINDOWS)
     set(library_type LIBRARY_TYPE SHARED)
 endif()
 

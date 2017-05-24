@@ -31,3 +31,7 @@ endif()
 if(ANDROID)
     target_link_libraries(mobile_client PUBLIC GLESv2 z log)
 endif()
+
+if(box STREQUAL "bpi")
+    target_link_libraries(mobile_client PRIVATE GLESv2)
+endif()

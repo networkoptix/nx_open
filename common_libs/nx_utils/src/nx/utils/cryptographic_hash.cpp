@@ -1,10 +1,12 @@
+#include <cstdio>
 #include "cryptographic_hash.h"
 
 #include <openssl/md4.h>
 #include <openssl/md5.h>
 #include <openssl/sha.h>
 
-#include <utils/common/warnings.h>
+namespace nx {
+namespace utils {
 
 // -------------------------------------------------------------------------- //
 // QnCryptographicHashPrivate
@@ -26,7 +28,7 @@ private:
     QByteArray result;
 };
 
-class QnMd4CryptographicHashPrivate: public QnCryptographicHashPrivate {
+class QnMd4CryptographicHashPrivate : public QnCryptographicHashPrivate {
 public:
     virtual void init() override { MD4_Init(&ctx); }
     virtual void update(const char *data, int length) override { MD4_Update(&ctx, data, length); }
@@ -38,7 +40,7 @@ private:
     MD4_CTX ctx;
 };
 
-class QnMd5CryptographicHashPrivate: public QnCryptographicHashPrivate {
+class QnMd5CryptographicHashPrivate : public QnCryptographicHashPrivate {
 public:
     virtual void init() override { MD5_Init(&ctx); }
     virtual void update(const char *data, int length) override { MD5_Update(&ctx, data, length); }
@@ -50,7 +52,7 @@ private:
     MD5_CTX ctx;
 };
 
-class QnSha1CryptographicHashPrivate: public QnCryptographicHashPrivate {
+class QnSha1CryptographicHashPrivate : public QnCryptographicHashPrivate {
 public:
     virtual void init() override { SHA1_Init(&ctx); }
     virtual void update(const char *data, int length) override { SHA1_Update(&ctx, data, length); }
@@ -67,7 +69,7 @@ private:
 // QnCryptographicHash
 // -------------------------------------------------------------------------- //
 QnCryptographicHash::QnCryptographicHash(Algorithm algorithm) {
-    switch(algorithm) {
+    switch (algorithm) {
     case Md4:
         d.reset(new QnMd4CryptographicHashPrivate());
         break;
@@ -78,7 +80,7 @@ QnCryptographicHash::QnCryptographicHash(Algorithm algorithm) {
         d.reset(new QnSha1CryptographicHashPrivate());
         break;
     default:
-        qnWarning("Invalid cryptographic hash algorithm '%1'.", static_cast<int>(algorithm));
+        std::printf("%s: Invalid cryptographic hash algorithm %d.\n", Q_FUNC_INFO, static_cast<int>(algorithm));
         d.reset(new QnMd5CryptographicHashPrivate());
         break;
     }
@@ -114,7 +116,7 @@ void QnCryptographicHash::reset() {
 }
 
 QByteArray QnCryptographicHash::result() const {
-    if(d->result.isEmpty()) {
+    if (d->result.isEmpty()) {
         d->result.resize(d->size());
         d->final(reinterpret_cast<unsigned char *>(d->result.data()));
     }
@@ -128,4 +130,5 @@ QByteArray QnCryptographicHash::hash(const QByteArray &data, Algorithm algorithm
     return hash.result();
 }
 
-
+}
+}

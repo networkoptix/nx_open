@@ -26,10 +26,10 @@ class TestConnectionProcessor: public QnTCPConnectionProcessor
 {
 public:
     TestConnectionProcessor(
-        QnCommonModule* commonModule,
-        QSharedPointer<AbstractStreamSocket> socket)
-        :
-        QnTCPConnectionProcessor(socket, commonModule)
+        QSharedPointer<AbstractStreamSocket> socket,
+        QnTcpListener* owner)
+    :
+        QnTCPConnectionProcessor(socket, owner)
     {
     }
     virtual ~TestConnectionProcessor() override
@@ -69,7 +69,7 @@ protected:
     virtual QnTCPConnectionProcessor* createRequestProcessor(
         QSharedPointer<AbstractStreamSocket> clientSocket) override
     {
-        return new TestConnectionProcessor(commonModule(), clientSocket);
+        return new TestConnectionProcessor(clientSocket, this);
     }
 };
 

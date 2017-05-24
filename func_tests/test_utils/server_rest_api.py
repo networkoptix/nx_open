@@ -69,8 +69,6 @@ class ServerRestApiProxy(object):
         return str(value)
 
     def _make_request(self, raise_exception, timeout_sec, fn, url, *args, **kw):
-        if timeout_sec is None:
-            timeout_sec = REST_API_TIMEOUT_SEC
         try:
             with warnings.catch_warnings():
                 warnings.simplefilter('ignore', InsecureRequestWarning)

@@ -310,6 +310,11 @@ public:
     {
         return !(*this == right);
     }
+
+    friend bool operator < (const MimeProtoVersion& lhs, const MimeProtoVersion& rhs)
+    {
+        return lhs.version < rhs.version;
+    }
 };
 
 static const MimeProtoVersion http_1_0 = { "HTTP", "1.0" };

@@ -114,7 +114,7 @@ protected:
                         server.first, otherServer.first);
 
                     #if defined(Q_OS_MAC)
-                        // Can join different UDT sockets to the same multicast group on OSX...
+                        // Can join different UDT sockets to the same multicast group on OSX.
                         NX_WARNING(this, error);
                     #else
                         FAIL() << error.toStdString();
