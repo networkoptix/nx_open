@@ -26,45 +26,46 @@ static const QByteArray kJsonContentType(
 QString toJson(const QnLicensePtr& license)
 {
     return lit("{ \"key\": \"%1\", \"hwid\": \"%2\" }").arg(
-        QString::fromStdString(license->key().toStdString()), license->hardwareId());
+        QString::fromLatin1(license->key().constData()), license->hardwareId());
 }
 
-using LicenseKeyErrorHash = nx::client::desktop::helpers::license::LicenseKeyErrorHash;
-using DeactivationError = nx::client::desktop::helpers::license::DeactivationError;
+namespace license = nx::client::desktop::helpers::license;
+using Error = license::Deactivator::ErrorCode;
+using LicenseErrorHash = license::Deactivator::LicenseErrorHash;
 
-DeactivationError getDeactivationError(const QJsonObject& object)
+license::Deactivator::ErrorCode getError(const QJsonObject& object)
 {
     static const auto kCodeTag = lit("code");
     if (object.isEmpty() || !object.contains(kCodeTag))
-        return DeactivationError::UnknownError;
+        return Error::UnknownError;
 
     const auto code = object[kCodeTag].toString();
     if (code == lit("keyIsNotActivated"))
-        return DeactivationError::LicenseDeactivatedAlready;
+        return Error::LicenseDeactivatedAlready;
 
     if (code == lit("limitExceeded"))
-        return DeactivationError::LimitExceeded;
+        return Error::LimitExceeded;
 
-    return DeactivationError::UnknownError;
+    return Error::UnknownError;
 }
 
-LicenseKeyErrorHash extractErrors(const QByteArray& messageBody)
+LicenseErrorHash extractErrors(const QByteArray& messageBody)
 {
     const auto document = QJsonDocument::fromJson(messageBody);
     if (document.isEmpty())
-        return LicenseKeyErrorHash();
+        return LicenseErrorHash();
 
     const auto object = document.object();
     if (object.isEmpty())
-        return LicenseKeyErrorHash();
+        return LicenseErrorHash();
 
     const auto licenseErrors = object[lit("errors")].toObject()[lit("licenseErrors")].toObject();
     if (licenseErrors.isEmpty())
-        return LicenseKeyErrorHash();
+        return LicenseErrorHash();
 
-    LicenseKeyErrorHash result;
+    LicenseErrorHash result;
     for (const auto& key: licenseErrors.keys())
-        result.insert(key.toLatin1(), getDeactivationError(licenseErrors[key].toObject()));
+        result.insert(key.toLatin1(), getError(licenseErrors[key].toObject()));
 
     return result;
 }
@@ -72,27 +73,27 @@ LicenseKeyErrorHash extractErrors(const QByteArray& messageBody)
 class LicenseDeactivatorPrivate: public Connective<QObject>
 {
     using base_type = Connective<QObject>;
-    using DeactivationHandler = nx::client::desktop::helpers::license::DeactivationHandler;
-    using DeactivationResult = nx::client::desktop::helpers::license::DeactivationResult;
+    using Handler = license::Deactivator::Handler;
+    using Result = license::Deactivator::Result;
 
 public:
     LicenseDeactivatorPrivate(
         const QnLicenseList& licenses,
-        const DeactivationHandler& handler);
+        const Handler& handler);
 
 private:
     void finalize(
-        DeactivationResult result,
-        const LicenseKeyErrorHash& errors = LicenseKeyErrorHash());
+        Result result,
+        const LicenseErrorHash& errors = LicenseErrorHash());
 
 private:
     const nx_http::AsyncHttpClientPtr m_httpClient;
-    const DeactivationHandler m_handler;
+    const Handler m_handler;
 };
 
 LicenseDeactivatorPrivate::LicenseDeactivatorPrivate(
     const QnLicenseList& licenses,
-    const DeactivationHandler& handler)
+    const Handler& handler)
     :
     base_type(),
     m_httpClient(nx_http::AsyncHttpClient::create()),
@@ -100,7 +101,7 @@ LicenseDeactivatorPrivate::LicenseDeactivatorPrivate(
 {
     if (licenses.isEmpty())
     {
-        finalize(DeactivationResult::Success);
+        finalize(Result::Success);
         return;
     }
 
@@ -110,33 +111,33 @@ LicenseDeactivatorPrivate::LicenseDeactivatorPrivate(
         {
             if (m_httpClient->failed())
             {
-                finalize(DeactivationResult::ServerError);
+                finalize(Result::ServerError);
                 return;
             }
 
             const auto response = m_httpClient->response();
             if (!response)
             {
-                finalize(DeactivationResult::UnspecifiedError);
+                finalize(Result::UnspecifiedError);
                 return;
             }
 
             switch(response->statusLine.statusCode)
             {
                 case nx_http::StatusCode::ok:
-                    finalize(DeactivationResult::Success);
+                    finalize(Result::Success);
                     break;
                 case nx_http::StatusCode::internalServerError:
-                    finalize(DeactivationResult::ServerError);
+                    finalize(Result::ServerError);
                     break;
                 case nx_http::StatusCode::badRequest:
                 {
-                    finalize(DeactivationResult::DeactivationError,
+                    finalize(Result::DeactivationError,
                         extractErrors(m_httpClient->fetchMessageBodyBuffer()));
                     break;
                 }
                 default:
-                    finalize(DeactivationResult::UnspecifiedError);
+                    finalize(Result::UnspecifiedError);
                     break;
             }
         };
@@ -160,8 +161,8 @@ LicenseDeactivatorPrivate::LicenseDeactivatorPrivate(
 }
 
 void LicenseDeactivatorPrivate::finalize(
-    DeactivationResult result,
-    const LicenseKeyErrorHash& errors)
+    Result result,
+    const LicenseErrorHash& errors)
 {
     const auto deleteLaterGuard = QnRaiiGuard::createDestructible(
         [this]() { deleteLater(); });
@@ -182,12 +183,49 @@ namespace desktop {
 namespace helpers {
 namespace license {
 
-void deactivateAsync(
+void Deactivator::deactivateAsync(
     const QnLicenseList& licenses,
-    const DeactivationHandler& completionHandler)
+    const Handler& completionHandler)
 {
     // Deactivator will delete himself when after operation complete
     new LicenseDeactivatorPrivate(licenses, completionHandler);
+}
+
+QString Deactivator::resultDescription(Result result)
+{
+    switch(result)
+    {
+        case Result::Success:
+            return tr("Success");
+        case Result::UnspecifiedError:
+            return tr("Unspecified error");
+        case Result::ServerError:
+            return tr("License server error");
+        case Result::DeactivationError:
+            return tr("Deactivation error");
+        default:
+            NX_EXPECT(false, "Unhandled switch value");
+            return QString();
+    }
+}
+
+QString Deactivator::errorDescription(ErrorCode error)
+{
+    switch(error)
+    {
+        case ErrorCode::NoError:
+            NX_EXPECT(false, "We don't exepect NoError code explanation");
+            return QString();
+        case ErrorCode::UnknownError:
+            return tr("Unknown error");
+        case ErrorCode::LicenseDeactivatedAlready:
+            return tr("License is inactive");
+        case ErrorCode::LimitExceeded:
+            return tr("Limit exceeded");
+        default:
+            NX_EXPECT(false, "We don;t excpect to be here");
+            return QString();
+    }
 }
 
 } // license namespace

@@ -88,8 +88,12 @@ private:
         Yes
     };
 
+    void takeAwaySelectedLicenses();
+
     void removeLicense(const QnLicensePtr& license, ForceRemove force);
-    void removeSelectedLicenses();
+    void deactivateLicenses(const QnLicenseList& licenses);
+    bool confirmDeactivation(const QStringList& extras) const;
+    QStringList deactivationExtrasText(const QnLicenseList& licenses);
 
     void exportLicenses();
 
@@ -114,5 +118,5 @@ private:
     QPushButton* m_exportLicensesButton {nullptr};
     QnLicenseList m_licenses;
     QnLicenseValidator* m_validator {nullptr};
-    bool m_isRemoveButton;
+    bool m_isRemoveTakeAwayOperation = true;
 };

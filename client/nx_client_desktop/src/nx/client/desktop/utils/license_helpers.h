@@ -4,6 +4,7 @@
 
 #include <QtCore/QHash>
 #include <QtCore/QString>
+#include <QtCore/QCoreApplication>
 
 #include <licensing/license_fwd.h>
 
@@ -13,30 +14,41 @@ namespace desktop {
 namespace helpers {
 namespace license {
 
-enum class DeactivationResult
+class Deactivator
 {
-    Success,
-    UnspecifiedError,
+    Q_DECLARE_TR_FUNCTIONS(Deactivator)
 
-    ServerError,
-    DeactivationError
+public:
+    enum class ErrorCode
+    {
+        NoError,
+        UnknownError,
+
+        LicenseDeactivatedAlready,
+        LimitExceeded
+    };
+
+    enum class Result
+    {
+        Success,
+        UnspecifiedError,
+
+        ServerError,
+        DeactivationError
+    };
+
+    using LicenseErrorHash = QHash<QByteArray, ErrorCode>;
+    using Handler = std::function<void(Result, const LicenseErrorHash&)>;
+
+    static void deactivateAsync(
+        const QnLicenseList& licenses,
+        const Handler& completionHandler = Handler());
+
+    static QString resultDescription(Result result);
+
+    static QString errorDescription(ErrorCode error);
+
 };
-
-enum class DeactivationError
-{
-    NoError,
-    UnknownError,
-
-    LicenseDeactivatedAlready,
-    LimitExceeded
-};
-
-using LicenseKeyErrorHash = QHash<QByteArray, DeactivationError>;
-using DeactivationHandler = std::function<void(DeactivationResult, const LicenseKeyErrorHash&)>;
-
-void deactivateAsync(
-    const QnLicenseList& licenses,
-    const DeactivationHandler& completionHandler = DeactivationHandler());
 
 } // license namespace
 } // helpers namespace
