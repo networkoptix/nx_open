@@ -42,6 +42,9 @@ DeactivationError getDeactivationError(const QJsonObject& object)
     if (code == lit("keyIsNotActivated"))
         return DeactivationError::LicenseDeactivatedAlready;
 
+    if (code == lit("limitExceeded"))
+        return DeactivationError::LimitExceeded;
+
     return DeactivationError::UnknownError;
 }
 

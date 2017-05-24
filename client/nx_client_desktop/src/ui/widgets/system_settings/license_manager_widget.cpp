@@ -102,7 +102,8 @@ QnLicenseManagerWidget::QnLicenseManagerWidget(QWidget *parent) :
     base_type(parent),
     ui(new Ui::LicenseManagerWidget),
     m_model(new QnLicenseListModel(this)),
-    m_validator(new QnLicenseValidator(this))
+    m_validator(new QnLicenseValidator(this)),
+    m_isRemoveButton(true)
 {
     ui->setupUi(this);
 
@@ -499,8 +500,20 @@ bool QnLicenseManagerWidget::canRemoveLicense(const QnLicensePtr &license) const
     if (!license)
         return false;
 
-    QnLicenseErrorCode errCode = m_validator->validate(license);
-    return errCode != QnLicenseErrorCode::NoError && errCode != QnLicenseErrorCode::FutureLicense;
+    const auto errorCode = m_validator->validate(license);
+    return errorCode != QnLicenseErrorCode::NoError
+        && errorCode != QnLicenseErrorCode::FutureLicense;
+}
+
+bool QnLicenseManagerWidget::canDeactivateLicense(const QnLicensePtr &license) const
+{
+    NX_EXPECT(license);
+    if (!license)
+        return false;
+
+    // TODO: add more checks according to specs
+    const auto errorCode = m_validator->validate(license);
+    return errorCode == QnLicenseErrorCode::NoError;
 }
 
 void QnLicenseManagerWidget::removeLicense(const QnLicensePtr& license, ForceRemove force)
@@ -538,11 +551,10 @@ QString getErrors(const nx::client::desktop::helpers::license::LicenseKeyErrorHa
 
 void QnLicenseManagerWidget::removeSelectedLicenses()
 {
-    const bool isRemoveMode = true;
-
     auto licenses = selectedLicenses();
 
-    if (isRemoveMode)
+    qDebug() << "+++++++++++ " << (m_isRemoveButton ? "removing " : "deactivating ") << "licenses";
+    if (m_isRemoveButton)
     {
         for (const QnLicensePtr& license: licenses)
             removeLicense(license, ForceRemove::No);
@@ -596,12 +608,14 @@ void QnLicenseManagerWidget::updateButtons()
     QnLicenseList selected = selectedLicenses();
     ui->detailsButton->setEnabled(selected.size() == 1 && !selected[0].isNull());
 
-    bool canRemoveAny = std::any_of(selected.cbegin(), selected.cend(), [this](const QnLicensePtr& license)
-    {
-        return canRemoveLicense(license);
-    });
+    const bool canRemoveAny = std::any_of(selected.cbegin(), selected.cend(),
+        [this](const QnLicensePtr& license) { return canRemoveLicense(license); });
+    const bool canDeactivateAny = std::any_of(selected.cbegin(), selected.cend(),
+        [this](const QnLicensePtr& license) { return canDeactivateLicense(license); });
 
-    ui->removeButton->setEnabled(true || canRemoveAny);
+    m_isRemoveButton = canRemoveAny || !canDeactivateAny;
+    ui->removeButton->setEnabled(canRemoveAny || canDeactivateAny);
+    ui->removeButton->setText(m_isRemoveButton ? tr("Remove") : tr("Deactivate"));
 }
 
 

@@ -114,4 +114,5 @@ private:
     QPushButton* m_exportLicensesButton {nullptr};
     QnLicenseList m_licenses;
     QnLicenseValidator* m_validator {nullptr};
+    bool m_isRemoveButton;
 };

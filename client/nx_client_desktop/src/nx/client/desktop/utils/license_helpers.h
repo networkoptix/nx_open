@@ -27,7 +27,8 @@ enum class DeactivationError
     NoError,
     UnknownError,
 
-    LicenseDeactivatedAlready
+    LicenseDeactivatedAlready,
+    LimitExceeded
 };
 
 using LicenseKeyErrorHash = QHash<QByteArray, DeactivationError>;
