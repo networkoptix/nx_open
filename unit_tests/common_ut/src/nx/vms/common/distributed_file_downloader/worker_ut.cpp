@@ -1,10 +1,9 @@
 #include <gtest/gtest.h>
 
 #include <nx/utils/log/log.h>
+#include <nx/utils/test_support/test_options.h>
 #include <nx/vms/common/distributed_file_downloader/private/storage.h>
 #include <nx/vms/common/distributed_file_downloader/private/worker.h>
-
-#include <test_setup.h>
 
 #include "utils.h"
 #include "test_peer_manager.h"
@@ -63,7 +62,9 @@ protected:
     virtual void SetUp() override
     {
         workingDirectory =
-            QDir(TestSetup::getTemporaryDirectoryPath()).absoluteFilePath("worker_ut");
+            (nx::utils::TestOptions::temporaryDirectoryPath().isEmpty()
+                ? QDir::homePath()
+                : nx::utils::TestOptions::temporaryDirectoryPath()) + "/worker_ut";
         workingDirectory.removeRecursively();
         NX_ASSERT(QDir().mkpath(workingDirectory.absolutePath()));
 

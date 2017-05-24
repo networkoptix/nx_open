@@ -20,6 +20,7 @@ public:
 
     virtual QnUuid selfId() const = 0;
 
+    /** @return Human readable peer name. This is mostly used in logs. */
     virtual QString peerString(const QnUuid& peerId) const;
     virtual QList<QnUuid> getAllPeers() const = 0;
     virtual int distanceTo(const QnUuid& peerId) const = 0;

@@ -3,9 +3,8 @@
 #include <QtCore/QDir>
 #include <QtCore/QFile>
 
+#include <nx/utils/test_support/test_options.h>
 #include <nx/vms/common/distributed_file_downloader/private/storage.h>
-
-#include <test_setup.h>
 
 #include "utils.h"
 
@@ -28,7 +27,9 @@ protected:
     virtual void SetUp() override
     {
         workingDirectory =
-            QDir(TestSetup::getTemporaryDirectoryPath()).absoluteFilePath("storage_ut");
+            (nx::utils::TestOptions::temporaryDirectoryPath().isEmpty()
+                ? QDir::homePath()
+                : nx::utils::TestOptions::temporaryDirectoryPath()) + "/storage_ut";
         workingDirectory.removeRecursively();
         NX_ASSERT(QDir().mkdir(workingDirectory.absolutePath()));
 

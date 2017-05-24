@@ -6,6 +6,7 @@
 
 #include <nx/utils/log/log.h>
 #include <nx/utils/raii_guard.h>
+#include <nx/utils/random.h>
 #include <nx/fusion/model_functions.h>
 
 #include "storage.h"
@@ -83,7 +84,7 @@ QList<QnUuid> takeRandomPeers(QList<QnUuid>& peers, int count)
     }
 
     for (int i = 0; i < count; ++i)
-        result.append(peers.takeAt(rand() % peers.size()));
+        result.append(peers.takeAt(nx::utils::random::number(0, peers.size() - 1)));
 
     return result;
 }
@@ -214,12 +215,6 @@ void Worker::nextStep()
     if (!fileInfo.isValid())
         return;
 
-    if (m_peerManager->peerString(m_peerManager->selfId()).contains(lit("Peer 1")))
-    {
-        int a = 1;
-        a = 2;
-    }
-
     switch (m_state)
     {
         case State::initial:
@@ -322,7 +317,7 @@ void Worker::requestFileInformationInternal()
             && !selectPeersForInternetDownload().isEmpty())
         {
             setState(State::foundAvailableChunks);
-            waitForNextStep(0);
+            nextStep();
             return;
         }
 
@@ -357,14 +352,15 @@ void Worker::requestFileInformationInternal()
                         {
 
                             setState(State::foundAvailableChunks);
-                            waitForNextStep(0);
+                            nextStep();
+                            return;
                         }
 
                         waitForNextStep();
                         return;
                     }
 
-                    waitForNextStep(0);
+                    nextStep();
                 });
 
             auto& peerInfo = m_peerInfoById[peerId];
@@ -479,7 +475,7 @@ void Worker::requestChecksums()
                         return;
                     }
 
-                    waitForNextStep(0);
+                    nextStep();
                 });
 
             auto& peerInfo = m_peerInfoById[peerId];
@@ -775,7 +771,7 @@ QList<QnUuid> Worker::selectPeersForOperation(int count, QList<QnUuid> peers) co
     struct ScoredPeer
     {
         QnUuid peerId;
-        int score;
+        int score = 0;
     };
 
     QList<ScoredPeer> scoredPeers;
@@ -870,11 +866,12 @@ int Worker::selectNextChunk() const
         return -1;
 
     const int chunksCount = fileInfo.downloadedChunks.size();
-    const int randomChunk = rand() % chunksCount;
+    const int randomChunk = utils::random::number(0, chunksCount - 1);
 
     int firstMetNotDownloadedChunk = -1;
 
-    auto findChunk = [this, &fileInfo, &firstMetNotDownloadedChunk](int start, int end)
+    auto findChunk =
+        [this, &fileInfo, &firstMetNotDownloadedChunk](int start, int end)
         {
             for (int i = start; i <= end; ++i)
             {
@@ -934,7 +931,7 @@ bool Worker::isFileReadyForInternetDownload() const
         && !fileInfo.md5.isEmpty()
         && fileInfo.chunkSize > 0
         && fileInfo.url.isValid()
-            && !m_availableChunks.isEmpty();
+        && !m_availableChunks.isEmpty();
 }
 
 QList<QnUuid> Worker::selectPeersForInternetDownload() const
@@ -1015,7 +1012,7 @@ qint64 Worker::defaultStepDelay()
     return kDefaultStepDelayMs;
 }
 
-AbstractPeerManager*Worker::peerManager() const
+AbstractPeerManager* Worker::peerManager() const
 {
     return m_peerManager;
 }

@@ -116,8 +116,8 @@ protected:
     AbstractPeerManager* peerManager() const;
 
 private:
-    Storage* m_storage;
-    AbstractPeerManager* m_peerManager;
+    Storage* m_storage = nullptr;
+    AbstractPeerManager* m_peerManager = nullptr;
     const QString m_fileName;
 
     QString m_logTag;
@@ -126,7 +126,7 @@ private:
     State m_state = State::initial;
 
     bool m_started = false;
-    QTimer* m_stepDelayTimer;
+    QTimer* m_stepDelayTimer = nullptr;
     QHash<rest::Handle, QnUuid> m_peerByRequestHandle;
 
     QBitArray m_availableChunks;

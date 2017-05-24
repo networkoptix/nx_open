@@ -1,7 +1,7 @@
 #include <gtest/gtest.h>
 
+#include <nx/utils/test_support/test_options.h>
 #include <nx/vms/common/distributed_file_downloader/private/storage.h>
-#include <test_setup.h>
 
 #include "test_peer_manager.h"
 #include "utils.h"
@@ -19,7 +19,10 @@ protected:
     {
         peerManager.reset(new TestPeerManager());
 
-        storageDir = TestSetup::getTemporaryDirectoryPath() + "/storage";
+        storageDir =
+            (nx::utils::TestOptions::temporaryDirectoryPath().isEmpty()
+                ? QDir::homePath()
+                : nx::utils::TestOptions::temporaryDirectoryPath()) + "/storage";
         storageDir.removeRecursively();
         NX_ASSERT(QDir().mkpath(storageDir.absolutePath()));
     }
@@ -37,36 +40,29 @@ TEST_F(DistributedFileDownloaderPeerManagerTest, invalidPeerRequest)
 {
     const auto& peer = QnUuid::createUuid();
 
-    bool called = false;
     const auto handle = peerManager->requestFileInfo(peer, "test",
         [&](bool, rest::Handle, const FileInformation&)
         {
-            // Should not be called.
-            called = true;
+            FAIL() << "Should not be called.";
         });
 
     peerManager->processNextRequest();
 
     ASSERT_EQ(handle, 0);
-    ASSERT_FALSE(called);
 }
 
 TEST_F(DistributedFileDownloaderPeerManagerTest, cancellingRequest)
 {
     const auto& peer = peerManager->addPeer();
 
-    bool called = false;
     const auto handle = peerManager->requestFileInfo(peer, "test",
         [&](bool, rest::Handle, const FileInformation&)
         {
-            // Should not be called.
-            called = true;
+            FAIL() << "Should not be called.";
         });
 
     peerManager->cancelRequest(peer, handle);
     peerManager->processNextRequest();
-
-    ASSERT_FALSE(called);
 }
 
 TEST_F(DistributedFileDownloaderPeerManagerTest, fileInfo)
