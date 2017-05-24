@@ -270,15 +270,14 @@ void Connection::onHttpClientDone()
     }
 
     auto socket = m_httpClient->takeSocket();
-    auto keepAliveTimeout = commonModule()->globalSettings()->connectionKeepAliveTimeout() * 1000;
-    socket->setRecvTimeout(std::chrono::milliseconds(keepAliveTimeout * 2).count());
-    socket->setSendTimeout(std::chrono::milliseconds(keepAliveTimeout * 2).count());
     socket->setNonBlockingMode(true);
-    socket->setNoDelay(true);
 
     using namespace nx::network;
     m_webSocket.reset(new websocket::WebSocket(std::move(socket)));
     m_httpClient.reset();
+    auto keepAliveTimeout = commonModule()->globalSettings()->connectionKeepAliveTimeout();
+    m_webSocket->setAliveTimeoutEx(keepAliveTimeout, 2);
+
     setState(State::Connected);
 }
 

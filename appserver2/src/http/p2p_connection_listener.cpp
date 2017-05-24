@@ -273,11 +273,10 @@ void P2pConnectionProcessor::run()
 
     std::unique_ptr<ShareSocketDelegate> socket(new ShareSocketDelegate(std::move(d->socket)));
     socket->setNonBlockingMode(true);
-    auto keepAliveTimeout = commonModule->globalSettings()->connectionKeepAliveTimeout() * 1000;
-    socket->setRecvTimeout(std::chrono::milliseconds(keepAliveTimeout * 2).count());
-    socket->setSendTimeout(std::chrono::milliseconds(keepAliveTimeout * 2).count());
-
+    auto keepAliveTimeout = commonModule->globalSettings()->connectionKeepAliveTimeout();
     WebSocketPtr webSocket(new websocket::WebSocket(std::move(socket)));
+    webSocket->setAliveTimeoutEx(keepAliveTimeout, 2);
+
     d->messageBus->gotConnectionFromRemotePeer(
         remotePeer,
         std::move(connectionLockGuard),
