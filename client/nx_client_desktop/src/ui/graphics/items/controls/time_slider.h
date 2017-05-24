@@ -327,7 +327,7 @@ private:
 
     class KineticHandlerBase;
     class KineticZoomHandler;
-    class KineticDragHandler;
+    class KineticScrollHandler;
 
 private:
     Marker markerFromPosition(const QPointF& pos, qreal maxDistance = 1.0) const;
@@ -501,7 +501,7 @@ private:
     qint64 m_dragWindowStart = 0;
 
     const QScopedPointer<KineticZoomHandler> m_kineticZoomHandler;
-    const QScopedPointer<KineticDragHandler> m_kineticDragHandler;
+    const QScopedPointer<KineticScrollHandler> m_kineticScrollHandler;
 };
 
 Q_DECLARE_OPERATORS_FOR_FLAGS(QnTimeSlider::Options);
