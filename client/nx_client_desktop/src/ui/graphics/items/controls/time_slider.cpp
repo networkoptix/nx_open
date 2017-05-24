@@ -144,7 +144,13 @@ namespace
     /** Gap between position marker and tooltip tail. */
     const qreal kToolTipMargin = 4.0;
 
-    const qreal kDegreesFor2x = 90.0;
+    const qreal kWheelDegreesFor2xScale = 90.0;
+
+    /** Window zooming maximum speed for kinetic processor. */
+    const qreal kWindowZoomMaxSpeed = kWheelDegreesFor2xScale * 8;
+
+    /** Window zooming friction for kinetic processor. */
+    const qreal kWindowZoomFriction = kWheelDegreesFor2xScale / 2.0;
 
     /** Window dragging maximum speed for kinetic processor. */
     const qreal kWindowDragMaxSpeed = 10000.0;
@@ -502,7 +508,7 @@ public:
 
     virtual void kineticMove(const QVariant& degrees) override
     {
-        qreal factor = std::pow(2.0, -degrees.toReal() / kDegreesFor2x);
+        qreal factor = std::pow(2.0, -degrees.toReal() / kWheelDegreesFor2xScale);
 
         if (!m_slider->scaleWindow(factor, m_slider->m_zoomAnchor))
             kineticProcessor()->reset();
@@ -511,8 +517,8 @@ public:
     virtual void updateKineticProcessor() override
     {
         kineticProcessor()->setFriction(m_hurried
-            ? kDegreesFor2x * 2.0
-            : kDegreesFor2x / 2.0);
+            ? kWindowZoomFriction * 4.0
+            : kWindowZoomFriction);
     }
 };
 
@@ -621,22 +627,28 @@ QnTimeSlider::QnTimeSlider(QGraphicsItem* parent, QGraphicsItem* tooltipParent):
     font.setBold(true);
     m_tooltipLine2->setFont(font);
 
+    /* Fine-tuned kinetic processor contants. */
+    static const int kZoomProcessorMaxShiftIntervalSeconds = 0.4;
+    static const int kDragProcessorMaxShiftIntervalSeconds = 0.05;
+    static const int kZoomProcessorSpeedCuttingThreshold = kWindowZoomMaxSpeed / 24.0;
+    static const int kDragProcessorSpeedCuttingThreshold = kWindowDragMaxSpeed / 10.0;
+
     /* Prepare kinetic zoom processor. */
     const auto kineticZoomProcessor = new KineticCuttingProcessor(QMetaType::QReal, this);
     kineticZoomProcessor->setHandler(m_kineticZoomHandler.data());
-    kineticZoomProcessor->setMaxShiftInterval(0.4);
+    kineticZoomProcessor->setMaxShiftInterval(kZoomProcessorMaxShiftIntervalSeconds);
     kineticZoomProcessor->setFlags(KineticProcessor::IgnoreDeltaTime);
-    kineticZoomProcessor->setMaxSpeedMagnitude(kDegreesFor2x * 8);
-    kineticZoomProcessor->setSpeedCuttingThreshold(kDegreesFor2x / 3);
+    kineticZoomProcessor->setMaxSpeedMagnitude(kWindowZoomMaxSpeed);
+    kineticZoomProcessor->setSpeedCuttingThreshold(kZoomProcessorSpeedCuttingThreshold);
     registerAnimation(kineticZoomProcessor);
     m_kineticZoomHandler->updateKineticProcessor();
 
     /* Prepare kinetic drag processor. */
     const auto kineticDragProcessor = new KineticCuttingProcessor(QMetaType::QReal, this);
     kineticDragProcessor->setHandler(m_kineticDragHandler.data());
-    kineticDragProcessor->setMaxShiftInterval(0.05);
+    kineticDragProcessor->setMaxShiftInterval(kDragProcessorMaxShiftIntervalSeconds);
     kineticDragProcessor->setMaxSpeedMagnitude(kWindowDragMaxSpeed);
-    kineticDragProcessor->setSpeedCuttingThreshold(kWindowDragMaxSpeed / 10.0);
+    kineticDragProcessor->setSpeedCuttingThreshold(kDragProcessorSpeedCuttingThreshold);
     registerAnimation(kineticDragProcessor);
     m_kineticDragHandler->updateKineticProcessor();
 
