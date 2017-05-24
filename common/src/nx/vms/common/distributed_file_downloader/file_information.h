@@ -15,8 +15,7 @@ struct FileInformation
     Q_GADGET
 
 public:
-    FileInformation();
-    FileInformation(const QString& fileName);
+    FileInformation(const QString& fileName = QString());
 
     bool isValid() const;
 

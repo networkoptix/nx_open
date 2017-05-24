@@ -7,10 +7,6 @@ namespace vms {
 namespace common {
 namespace distributed_file_downloader {
 
-FileInformation::FileInformation()
-{
-}
-
 FileInformation::FileInformation(const QString& fileName):
     name(fileName)
 {
