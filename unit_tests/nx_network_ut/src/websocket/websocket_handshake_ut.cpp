@@ -34,13 +34,6 @@ static void givenCorrectRequestLine(nx_http::Request* request)
     request->requestLine.version = nx_http::http_1_1;
 }
 
-static void givenCorrectResponseHeaders(nx_http::Response* response)
-{
-    givenCorrectHeaders(response);
-    auto& headers = response->headers;
-    headers.emplace("Sec-WebSocket-Accept", detail::makeAcceptKey(kSecKey));
-}
-
 TEST(WebsocketHandshake, validateRequest_requestLine)
 {
     nx_http::Request request;

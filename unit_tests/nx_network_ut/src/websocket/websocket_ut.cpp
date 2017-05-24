@@ -142,7 +142,7 @@ protected:
     void givenClientServerExchangeMessagesCallbacks()
     {
         clientSendCb =
-            [this](SystemError::ErrorCode ecode, size_t transferred)
+            [this](SystemError::ErrorCode ecode, size_t)
             {
                 ASSERT_EQ(ecode, SystemError::noError);
                 if (doneCount == kIterations)
@@ -151,7 +151,7 @@ protected:
             };
 
         clientReadCb =
-            [this](SystemError::ErrorCode ecode, size_t transferred)
+            [this](SystemError::ErrorCode ecode, size_t)
             {
                 ASSERT_EQ(ecode, SystemError::noError);
                 doneCount++;
@@ -167,7 +167,7 @@ protected:
             };
 
         serverSendCb =
-            [this](SystemError::ErrorCode ecode, size_t transferred)
+            [this](SystemError::ErrorCode ecode, size_t)
             {
                 ASSERT_EQ(ecode, SystemError::noError);
                 if (doneCount == kIterations)
@@ -176,7 +176,7 @@ protected:
             };
 
         serverReadCb =
-            [this](SystemError::ErrorCode ecode, size_t transferred)
+            [this](SystemError::ErrorCode, size_t)
             {
                 if (doneCount == kIterations)
                     return;
@@ -203,7 +203,7 @@ protected:
     void givenClientManyMessagesWithServerRespondingCallbacks()
     {
         clientSendCb =
-            [this](SystemError::ErrorCode ecode, size_t transferred)
+            [this](SystemError::ErrorCode ecode, size_t)
             {
             if (ecode == SystemError::connectionAbort)
             {
@@ -217,7 +217,7 @@ protected:
             };
 
         clientReadCb =
-            [this](SystemError::ErrorCode ecode, size_t transferred)
+            [this](SystemError::ErrorCode ecode, size_t)
             {
                 if (ecode == SystemError::connectionAbort)
                 {
@@ -238,7 +238,7 @@ protected:
             };
 
         serverSendCb =
-            [this](SystemError::ErrorCode ecode, size_t transferred)
+            [this](SystemError::ErrorCode ecode, size_t)
             {
                 if (ecode == SystemError::connectionAbort)
                 {
@@ -250,7 +250,7 @@ protected:
             };
 
         serverReadCb =
-            [this](SystemError::ErrorCode ecode, size_t transferred)
+            [this](SystemError::ErrorCode ecode, size_t)
             {
                 if (ecode == SystemError::connectionAbort)
                 {
@@ -375,11 +375,7 @@ TEST_F(WebSocket, MultipleMessagesFromClient_ServerResponds)
 }
 
 
-cf::future<cf::unit> websocketTestReader(
-    std::unique_ptr<TestWebSocket>& socket,
-    SendMode sendMode,
-    ReceiveMode receiveMode,
-    int iterations)
+cf::future<cf::unit> websocketTestReader(std::unique_ptr<TestWebSocket>& socket, int iterations)
 {
     struct State
     {
@@ -387,14 +383,14 @@ cf::future<cf::unit> websocketTestReader(
         int total;
         nx::Buffer buffer;
         std::unique_ptr<TestWebSocket>& webSocket;
-        State(std::unique_ptr<TestWebSocket>& socket, SendMode sendMode, ReceiveMode receiveMode, int total):
+        State(std::unique_ptr<TestWebSocket>& socket, int total):
             count (0),
             total(total),
             webSocket(socket)
         {}
         ~State(){}
     };
-    auto state = std::make_shared<State>(socket, sendMode, receiveMode, iterations);
+    auto state = std::make_shared<State>(socket, iterations);
     return cf::doWhile(
         *state->webSocket,
         [state]() mutable
@@ -422,8 +418,6 @@ cf::future<cf::unit> websocketTestReader(
 
 cf::future<cf::unit> websocketTestWriter(
     std::unique_ptr<TestWebSocket>& socket,
-    SendMode sendMode,
-    ReceiveMode receiveMode,
     const nx::Buffer& sendBuffer,
     int iterations)
 {
@@ -433,14 +427,14 @@ cf::future<cf::unit> websocketTestWriter(
         int total;
         nx::Buffer buffer;
         std::unique_ptr<TestWebSocket>& webSocket;
-        State(std::unique_ptr<TestWebSocket>& socket, SendMode sendMode, ReceiveMode receiveMode, const nx::Buffer& buffer, int total):
+        State(std::unique_ptr<TestWebSocket>& socket, const nx::Buffer& buffer, int total):
             count (0),
             total(total),
             buffer(buffer),
             webSocket(socket)
         {}
     };
-    auto state = std::make_shared<State>(socket, sendMode, receiveMode, sendBuffer, iterations);
+    auto state = std::make_shared<State>(socket, sendBuffer, iterations);
     return cf::doWhile(
         *state->webSocket,
         [state]() mutable
@@ -475,17 +469,8 @@ TEST_F(WebSocket, Wrappers)
     startFuture.wait();
     clientWebSocket->cancelIOSync(nx::network::aio::EventType::etNone);
     clientWebSocket->bindToAioThread(serverWebSocket->getAioThread());
-    auto readFuture = websocketTestReader(
-        serverWebSocket,
-        SendMode::singleMessage,
-        ReceiveMode::message,
-        10);
-    auto writeFuture = websocketTestWriter(
-        clientWebSocket,
-        SendMode::singleMessage,
-        ReceiveMode::message,
-        clientSendBuf,
-        10);
+    auto readFuture = websocketTestReader(serverWebSocket, 10);
+    auto writeFuture = websocketTestWriter(clientWebSocket, clientSendBuf, 10);
     cf::when_all(readFuture, writeFuture).wait();
 }
 
@@ -502,7 +487,7 @@ protected:
         givenTCPConnectionEstablished();
 
         clientSendCb =
-            [&](SystemError::ErrorCode ecode, size_t transferred)
+            [&](SystemError::ErrorCode ecode, size_t)
         {
             if (ecode != SystemError::noError)
             {
@@ -675,7 +660,7 @@ TEST_F(WebSocket, SendMultiFrame_ReceiveSingleMessage)
     const nx::Buffer kFrameBuffer("hello");
 
     clientSendCb =
-        [&](SystemError::ErrorCode ecode, size_t transferred)
+        [&](SystemError::ErrorCode ecode, size_t)
         {
             ASSERT_EQ(ecode, SystemError::noError);
             frameCount++;
@@ -730,7 +715,7 @@ TEST_F(WebSocket, SendMultiFrame_ReceiveFrame)
     const nx::Buffer kFrameBuffer("hello");
 
     clientSendCb =
-        [&](SystemError::ErrorCode ecode, size_t transferred)
+        [&](SystemError::ErrorCode ecode, size_t)
         {
             ASSERT_EQ(ecode, SystemError::noError);
             frameCount++;
@@ -786,7 +771,7 @@ TEST_F(WebSocket, SendMultiFrame_ReceiveStream)
     const int kReceiveAmount = kTotalMessageCount*kMessageFrameCount*clientSendBuf.size();
 
     clientSendCb =
-        [&](SystemError::ErrorCode ecode, size_t transferred)
+        [&](SystemError::ErrorCode ecode, size_t)
         {
             ASSERT_EQ(ecode, SystemError::noError);
             frameCount++;
@@ -837,7 +822,7 @@ TEST_F(WebSocket, SendMessage_ReceiveStream)
     const int kReceiveAmount = kTotalMessageCount*clientSendBuf.size();
 
     clientSendCb =
-        [&](SystemError::ErrorCode ecode, size_t transferred)
+        [&](SystemError::ErrorCode ecode, size_t)
         {
             ASSERT_EQ(ecode, SystemError::noError);
             sentMessageCount++;
@@ -910,7 +895,7 @@ TEST_F(WebSocket, UnexpectedClose_deleteFromCb_ParseError)
     const int kTotalMessageCount = 100;
 
     clientSendCb =
-        [&](SystemError::ErrorCode ecode, size_t transferred)
+        [&](SystemError::ErrorCode ecode, size_t)
         {
             if (ecode != SystemError::noError)
             {
@@ -959,7 +944,7 @@ TEST_F(WebSocket, UnexpectedClose_ReadReturnedZero)
     const int kTotalMessageCount = 100;
 
     clientSendCb =
-        [&](SystemError::ErrorCode ecode, size_t transferred)
+        [&](SystemError::ErrorCode ecode, size_t)
     {
         if (ecode != SystemError::noError)
         {
@@ -978,7 +963,7 @@ TEST_F(WebSocket, UnexpectedClose_ReadReturnedZero)
     };
 
     serverReadCb =
-        [&](SystemError::ErrorCode ecode, size_t bytesRead)
+        [&](SystemError::ErrorCode, size_t bytesRead)
     {
         if (bytesRead == 0)
         {

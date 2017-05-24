@@ -916,7 +916,7 @@ void when_inner_helper(Context context, Future&& f) {
 }
 
 template<size_t I, typename Context>
-void apply_helper(const Context& context) {}
+void apply_helper(const Context&) {}
 
 template<size_t I, typename Context, typename FirstFuture, typename... Futures>
 void apply_helper(const Context& context, FirstFuture&& f, Futures&&... fs) {
