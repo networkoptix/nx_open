@@ -487,7 +487,7 @@ void QnVideoCamera::startLiveCacheIfNeeded()
             ensureLiveCacheStarted(
                 MEDIA_Quality_Low,
                 m_secondaryReader,
-                duration_cast<microseconds>(qnServerModule->roSettings()->hlsTargetDuration()).count());
+                duration_cast<microseconds>(qnServerModule->settings()->hlsTargetDuration()).count());
     }
     else if (m_primaryReader && !m_liveCache[MEDIA_Quality_High])
     {
@@ -498,7 +498,7 @@ void QnVideoCamera::startLiveCacheIfNeeded()
             ensureLiveCacheStarted(
                 MEDIA_Quality_High,
                 m_primaryReader,
-                duration_cast<microseconds>(qnServerModule->roSettings()->hlsTargetDuration()).count());
+                duration_cast<microseconds>(qnServerModule->settings()->hlsTargetDuration()).count());
         }
     }
 }

@@ -79,10 +79,15 @@ QSettings* MSSettings::roSettings()
     return m_roSettings.get();
 }
 
-std::chrono::milliseconds MSSettings::hlsTargetDuration()
+QSettings* MSSettings::runTimeSettings()
+{
+    return m_rwSettings.get();
+}
+
+std::chrono::milliseconds MSSettings::hlsTargetDuration() const
 {
     const auto value =
-        std::chrono::milliseconds(roSettings()->value(
+        std::chrono::milliseconds(m_roSettings->value(
             nx_ms_conf::HLS_TARGET_DURATION_MS,
             nx_ms_conf::DEFAULT_TARGET_DURATION_MS).toUInt());
 
@@ -115,9 +120,3 @@ void MSSettings::initializeRunTimeSettings()
 #endif
     ));
 }
-
-QSettings* MSSettings::runTimeSettings()
-{
-    return m_rwSettings.get();
-}
-

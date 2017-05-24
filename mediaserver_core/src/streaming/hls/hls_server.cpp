@@ -977,7 +977,7 @@ namespace nx_hls
         std::unique_ptr<HLSSession> newHlsSession(
             new HLSSession(
                 sessionID,
-                duration_cast<milliseconds>(qnServerModule->roSettings()->hlsTargetDuration()).count(),
+                duration_cast<milliseconds>(qnServerModule->settings()->hlsTargetDuration()).count(),
                 !startTimestamp,   //if no start date specified, providing live stream
                 streamQuality,
                 videoCamera,
