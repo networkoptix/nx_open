@@ -62,12 +62,20 @@ void ConnectorExecutor::start(CompletionHandler handler)
         .arg(m_connectSessionId).arg(m_connectors.size()),
         cl_logDEBUG2);
 
+    auto connectorWithMinDelayIter = std::min_element(
+        m_connectors.begin(), m_connectors.end(),
+        [](const ConnectorContext& left, const ConnectorContext& right)
+        {
+            return left.startDelay < right.startDelay;
+        });
+    const auto delayOffset = connectorWithMinDelayIter->startDelay;
+
     for (auto it = m_connectors.begin(); it != m_connectors.end(); ++it)
     {
         if (it->startDelay > std::chrono::milliseconds::zero())
         {
             it->timer->start(
-                it->startDelay,
+                it->startDelay - delayOffset,
                 std::bind(&ConnectorExecutor::startConnector, this, it));
         }
         else
@@ -89,7 +97,7 @@ void ConnectorExecutor::reportNoSuitableConnectMethod()
         {
             nx::utils::swapAndCall(
                 m_handler,
-                nx::hpm::api::NatTraversalResultCode::noSuitableTraversalMethod,
+                nx::hpm::api::NatTraversalResultCode::noSuitableMethod,
                 SystemError::hostUnreach,
                 nullptr);
         });
