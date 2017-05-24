@@ -85,7 +85,6 @@ LIBS_TO_COPY=(
     libnx_fusion
     libnx_kit
     libnx_network
-    libnx_streaming
     libnx_utils
     libpostproc
     libudt

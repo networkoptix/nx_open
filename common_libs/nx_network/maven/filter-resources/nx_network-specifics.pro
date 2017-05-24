@@ -1,7 +1,6 @@
 INCLUDEPATH += ${root.dir}/common_libs/udt/src
 
-INCLUDEPATH -= $$ROOT_DIR/common/src \
-               $$ROOT_DIR/common_libs/nx_streaming/src
+INCLUDEPATH -= $$ROOT_DIR/common/src
 
 win* {
     DEFINES += NX_NETWORK_API=__declspec(dllexport)

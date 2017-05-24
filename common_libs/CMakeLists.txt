@@ -1,6 +1,5 @@
 add_subdirectory(nx_utils)
 add_subdirectory(nx_fusion)
-add_subdirectory(nx_streaming)
 add_subdirectory(nx_network)
 add_subdirectory(udt)
 

@@ -12,7 +12,6 @@ nx_add_target(libconnection_mediator LIBRARY
         qtservice qtsinglecoreapplication
     PUBLIC_LIBS
         cloud_db_client common
-        nx_streaming #< Dependency of common.
 )
 
 set_target_properties(libconnection_mediator PROPERTIES PREFIX "")
