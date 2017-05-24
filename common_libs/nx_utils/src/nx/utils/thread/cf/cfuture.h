@@ -904,7 +904,8 @@ namespace detail {
 template<size_t I, typename Context, typename Future>
 void when_inner_helper(Context context, Future&& f) {
   std::get<I>(context->result) = std::move(f);
-  std::get<I>(context->result).then([context](Future f) {
+  std::get<I>(context->result).then(
+      [context](typename std::remove_reference<Future>::type f) {
     std::lock_guard<std::mutex> lock(context->mutex);
     ++context->ready_futures;
     std::get<I>(context->result) = std::move(f);

@@ -24,15 +24,14 @@ WebSocket::WebSocket(
     m_lastError(SystemError::noError),
     m_pingTimeoutMultiplier(kDefaultPingTimeoutMultiplier)
 {
-    m_socket->bindToAioThread(getAioThread());
-    m_pingTimer->bindToAioThread(getAioThread());
+    aio::AbstractAsyncChannel::bindToAioThread(m_socket->getAioThread());
+    m_pingTimer->bindToAioThread(m_socket->getAioThread());
     m_readBuffer.reserve(4096);
     resetPingTimeoutBySocketTimeoutSync();
 }
 
 WebSocket::~WebSocket()
 {
-    pleaseStopSync();
 }
 
 void WebSocket::bindToAioThread(aio::AbstractAioThread* aioThread)
@@ -44,7 +43,6 @@ void WebSocket::bindToAioThread(aio::AbstractAioThread* aioThread)
     {
         AbstractAsyncChannel::bindToAioThread(aioThread);
         m_socket->bindToAioThread(aioThread);
-        m_pingTimer->cancelSync();
         m_pingTimer->bindToAioThread(aioThread);
         m_pingTimer->start(m_pingTimeout, [this]() { handlePingTimer(); });
         p.set_value();

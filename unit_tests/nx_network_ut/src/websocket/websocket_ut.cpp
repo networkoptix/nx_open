@@ -99,7 +99,6 @@ protected:
                         serverReceiveMode,
                         serverRole));
 
-                clientWebSocket->bindToAioThread(serverWebSocket->getAioThread());
                 startPromise.set_value();
             });
 
@@ -188,6 +187,19 @@ protected:
             };
     }
 
+    void whenSocketsBoundToOneThreadAndReadWriteScheduled()
+    {
+        whenSocketsBoundToOneThread();
+        clientWebSocket->sendAsync(clientSendBuf, clientSendCb);
+        serverWebSocket->readSomeAsync(&serverReadBuf, serverReadCb);
+    }
+
+    void whenSocketsBoundToOneThread()
+    {
+        clientWebSocket->cancelIOSync(nx::network::aio::EventType::etNone);
+        clientWebSocket->bindToAioThread(serverWebSocket->getAioThread());
+    }
+
     void givenClientManyMessagesWithServerRespondingCallbacks()
     {
         clientSendCb =
@@ -253,6 +265,10 @@ protected:
 
     virtual void TearDown() override
     {
+        if (clientWebSocket)
+            clientWebSocket->pleaseStopSync();
+        if (serverWebSocket)
+            serverWebSocket->pleaseStopSync();
     }
 
     void prepareTestData(nx::Buffer* payload, int size)
@@ -317,9 +333,7 @@ TEST_F(WebSocket, MultipleMessages_twoWay)
     givenTCPConnectionEstablished();
 
     startFuture.wait();
-
-    clientWebSocket->sendAsync(clientSendBuf, clientSendCb);
-    serverWebSocket->readSomeAsync(&serverReadBuf, serverReadCb);
+    whenSocketsBoundToOneThreadAndReadWriteScheduled();
 
     readyFuture.wait();
 }
@@ -334,6 +348,8 @@ TEST_F(WebSocket, MultipleMessages_ReceiveModeFrame_twoWay)
     givenTCPConnectionEstablished();
 
     startFuture.wait();
+    clientWebSocket->cancelIOSync(nx::network::aio::EventType::etNone);
+    clientWebSocket->bindToAioThread(serverWebSocket->getAioThread());
 
     clientWebSocket->sendAsync(clientSendBuf, clientSendCb);
     serverWebSocket->readSomeAsync(&serverReadBuf, serverReadCb);
@@ -352,9 +368,8 @@ TEST_F(WebSocket, MultipleMessagesFromClient_ServerResponds)
 
     startFuture.wait();
 
-    clientWebSocket->sendAsync(clientSendBuf, clientSendCb);
+    whenSocketsBoundToOneThreadAndReadWriteScheduled();
     clientWebSocket->readSomeAsync(&clientReadBuf, clientReadCb);
-    serverWebSocket->readSomeAsync(&serverReadBuf, serverReadCb);
 
     readyFuture.wait();
 }
@@ -458,6 +473,8 @@ TEST_F(WebSocket, Wrappers)
     givenServerModes(SendMode::singleMessage, ReceiveMode::message);
     givenTCPConnectionEstablished();
     startFuture.wait();
+    clientWebSocket->cancelIOSync(nx::network::aio::EventType::etNone);
+    clientWebSocket->bindToAioThread(serverWebSocket->getAioThread());
     auto readFuture = websocketTestReader(
         serverWebSocket,
         SendMode::singleMessage,
@@ -574,6 +591,8 @@ protected:
         };
 
         startFuture.wait();
+        clientWebSocket->cancelIOSync(nx::network::aio::EventType::etNone);
+        clientWebSocket->bindToAioThread(serverWebSocket->getAioThread());
         clientWebSocket->setAliveTimeout(kAliveTimeout);
     }
 
@@ -686,6 +705,7 @@ TEST_F(WebSocket, SendMultiFrame_ReceiveSingleMessage)
             serverWebSocket->readSomeAsync(&serverReadBuf, serverReadCb);
         };
     startFuture.wait();
+    whenSocketsBoundToOneThread();
 
     clientWebSocket->sendAsync(kFrameBuffer, clientSendCb);
     serverWebSocket->readSomeAsync(&serverReadBuf, serverReadCb);
@@ -741,6 +761,7 @@ TEST_F(WebSocket, SendMultiFrame_ReceiveFrame)
         };
     startFuture.wait();
 
+    whenSocketsBoundToOneThread();
     clientWebSocket->sendAsync(kFrameBuffer, clientSendCb);
     serverWebSocket->readSomeAsync(&serverReadBuf, serverReadCb);
 
@@ -797,9 +818,7 @@ TEST_F(WebSocket, SendMultiFrame_ReceiveStream)
             serverWebSocket->readSomeAsync(&serverReadBuf, serverReadCb);
         };
     startFuture.wait();
-
-    clientWebSocket->sendAsync(clientSendBuf, clientSendCb);
-    serverWebSocket->readSomeAsync(&serverReadBuf, serverReadCb);
+    whenSocketsBoundToOneThreadAndReadWriteScheduled();
 
     readyFuture.wait();
     ASSERT_TRUE(true);
@@ -844,10 +863,7 @@ TEST_F(WebSocket, SendMessage_ReceiveStream)
             serverWebSocket->readSomeAsync(&serverReadBuf, serverReadCb);
         };
     startFuture.wait();
-
-    clientWebSocket->sendAsync(clientSendBuf, clientSendCb);
-    serverWebSocket->readSomeAsync(&serverReadBuf, serverReadCb);
-
+    whenSocketsBoundToOneThreadAndReadWriteScheduled();
     readyFuture.wait();
     ASSERT_TRUE(true);
 }
@@ -924,9 +940,7 @@ TEST_F(WebSocket, UnexpectedClose_deleteFromCb_ParseError)
             serverWebSocket->readSomeAsync(&serverReadBuf, serverReadCb);
         };
     startFuture.wait();
-
-    clientWebSocket->sendAsync(clientSendBuf, clientSendCb);
-    serverWebSocket->readSomeAsync(&serverReadBuf, serverReadCb);
+    whenSocketsBoundToOneThreadAndReadWriteScheduled();
     std::this_thread::sleep_for(std::chrono::milliseconds(20));
 
     readyFuture.wait();
@@ -977,9 +991,7 @@ TEST_F(WebSocket, UnexpectedClose_ReadReturnedZero)
         serverWebSocket->readSomeAsync(&serverReadBuf, serverReadCb);
     };
     startFuture.wait();
-
-    clientWebSocket->sendAsync(clientSendBuf, clientSendCb);
-    serverWebSocket->readSomeAsync(&serverReadBuf, serverReadCb);
+    whenSocketsBoundToOneThreadAndReadWriteScheduled();
     std::this_thread::sleep_for(std::chrono::milliseconds(20));
     serverWebSocket->socket()->setZeroRead();
 
