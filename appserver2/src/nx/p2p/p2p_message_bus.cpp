@@ -129,6 +129,7 @@ void MessageBus::stop()
 void MessageBus::addOutgoingConnectionToPeer(const QnUuid& peer, const QUrl& _url)
 {
     QnMutexLocker lock(&m_mutex);
+    deleteRemoveUrlById(peer);
 
     QUrl url(_url);
     url.setPath(P2pConnectionProcessor::kUrlPath);
@@ -137,9 +138,8 @@ void MessageBus::addOutgoingConnectionToPeer(const QnUuid& peer, const QUrl& _ur
     m_remoteUrls.insert(m_remoteUrls.begin() + pos, RemoteConnection(peer, url));
 }
 
-void MessageBus::removeOutgoingConnectionFromPeer(const QnUuid& id)
+void MessageBus::deleteRemoveUrlById(const QnUuid& id)
 {
-    QnMutexLocker lock(&m_mutex);
     for (int i = 0; i < m_remoteUrls.size(); ++i)
     {
         if (m_remoteUrls[i].peerId == id)
@@ -148,6 +148,12 @@ void MessageBus::removeOutgoingConnectionFromPeer(const QnUuid& id)
             break;
         }
     }
+}
+
+void MessageBus::removeOutgoingConnectionFromPeer(const QnUuid& id)
+{
+    QnMutexLocker lock(&m_mutex);
+    deleteRemoveUrlById(id);
 
     m_outgoingConnections.remove(id);
     auto itr = m_connections.find(id);
