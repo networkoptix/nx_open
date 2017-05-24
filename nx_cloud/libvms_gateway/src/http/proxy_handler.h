@@ -43,6 +43,7 @@ private:
     nx_http::Request m_request;
     nx_http::RequestProcessedHandler m_requestCompletionHandler;
     std::unique_ptr<RequestProxyWorker> m_requestProxyWorker;
+    TargetHost m_targetHost;
 
     TargetHost cutTargetFromRequest(
         const nx_http::HttpServerConnection& connection,

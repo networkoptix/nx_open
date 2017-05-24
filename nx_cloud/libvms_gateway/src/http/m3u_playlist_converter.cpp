@@ -8,10 +8,10 @@ namespace cloud {
 namespace gateway {
 
 M3uPlaylistConverter::M3uPlaylistConverter(
-    const nx::String& proxyHost,
+    const SocketAddress& proxyEndpoint,
     const nx::String& targetHost)
     :
-    m_proxyHost(proxyHost),
+    m_proxyEndpoint(proxyEndpoint),
     m_targetHost(targetHost)
 {
 }
@@ -33,7 +33,10 @@ nx_http::BufferType M3uPlaylistConverter::convert(
         url.setPath(nx::network::url::normalizePath(
             lm("/%1/%2").arg(m_targetHost).arg(url.path())));
         if (!url.host().isEmpty())
-            url.setHost(m_proxyHost);
+        {
+            url.setHost(m_proxyEndpoint.address.toString());
+            url.setPort(m_proxyEndpoint.port);
+        }
         entry.value = url.toString().toUtf8();
     }
 

@@ -1,5 +1,7 @@
 #pragma once
 
+#include <nx/network/socket_common.h>
+
 #include "message_body_converter.h"
 
 namespace nx {
@@ -11,13 +13,13 @@ class M3uPlaylistConverter:
 {
 public:
     M3uPlaylistConverter(
-        const nx::String& proxyHost,
+        const SocketAddress& proxyEndpoint,
         const nx::String& targetHost);
 
     virtual nx_http::BufferType convert(nx_http::BufferType originalBody) override;
 
 private:
-    const nx::String m_proxyHost;
+    const SocketAddress m_proxyEndpoint;
     const nx::String m_targetHost;
 };
 

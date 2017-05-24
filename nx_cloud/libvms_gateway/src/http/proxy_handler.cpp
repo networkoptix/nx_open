@@ -30,24 +30,24 @@ void ProxyHandler::processRequest(
     nx_http::Response* const /*response*/,
     nx_http::RequestProcessedHandler completionHandler)
 {
-    auto requestOptions = cutTargetFromRequest(*connection, &request);
-    if (!nx_http::StatusCode::isSuccessCode(requestOptions.status))
+    m_targetHost = cutTargetFromRequest(*connection, &request);
+    if (!nx_http::StatusCode::isSuccessCode(m_targetHost.status))
     {
-        completionHandler(requestOptions.status);
+        completionHandler(m_targetHost.status);
         return;
     }
 
-    if (requestOptions.sslMode == conf::SslMode::followIncomingConnection
+    if (m_targetHost.sslMode == conf::SslMode::followIncomingConnection
         && m_settings.http().sslSupport
-        && m_runTimeOptions.isSslEnforced(requestOptions.target))
+        && m_runTimeOptions.isSslEnforced(m_targetHost.target))
     {
-        requestOptions.sslMode = conf::SslMode::enabled;
+        m_targetHost.sslMode = conf::SslMode::enabled;
     }
 
     // TODO: #ak avoid request loop by using Via header.
 
     m_targetPeerSocket = SocketFactory::createStreamSocket(
-        requestOptions.sslMode == conf::SslMode::enabled);
+        m_targetHost.sslMode == conf::SslMode::enabled);
 
     m_targetPeerSocket->bindToAioThread(connection->getAioThread());
     if (!m_targetPeerSocket->setNonBlockingMode(true) ||
@@ -66,8 +66,8 @@ void ProxyHandler::processRequest(
 
     // TODO: #ak updating request (e.g., Host header).
     m_targetPeerSocket->connectAsync(
-        requestOptions.target,
-        std::bind(&ProxyHandler::onConnected, this, requestOptions.target, std::placeholders::_1));
+        m_targetHost.target,
+        std::bind(&ProxyHandler::onConnected, this, m_targetHost.target, std::placeholders::_1));
 }
 
 void ProxyHandler::sendResponse(
@@ -86,39 +86,39 @@ TargetHost ProxyHandler::cutTargetFromRequest(
     const nx_http::HttpServerConnection& connection,
     nx_http::Request* const request)
 {
-    TargetHost requestOptions(nx_http::StatusCode::internalServerError);
+    TargetHost m_targetHost(nx_http::StatusCode::internalServerError);
     if (!request->requestLine.url.host().isEmpty())
-        requestOptions = cutTargetFromUrl(request);
+        m_targetHost = cutTargetFromUrl(request);
     else
-        requestOptions = cutTargetFromPath(request);
+        m_targetHost = cutTargetFromPath(request);
 
-    if (requestOptions.status != nx_http::StatusCode::ok)
+    if (m_targetHost.status != nx_http::StatusCode::ok)
     {
         NX_LOGX(lm("Failed to find address string in request path %1 received from %2")
             .arg(request->requestLine.url).arg(connection.socket()->getForeignAddress()),
             cl_logDEBUG1);
 
-        return requestOptions;
+        return m_targetHost;
     }
 
     if (!network::SocketGlobals::addressResolver()
-            .isCloudHostName(requestOptions.target.address.toString()))
+            .isCloudHostName(m_targetHost.target.address.toString()))
     {
         // No cloud address means direct IP.
         if (!m_settings.cloudConnect().allowIpTarget)
             return {nx_http::StatusCode::forbidden};
 
-        if (requestOptions.target.port == 0)
-            requestOptions.target.port = m_settings.http().proxyTargetPort;
+        if (m_targetHost.target.port == 0)
+            m_targetHost.target.port = m_settings.http().proxyTargetPort;
     }
 
-    if (requestOptions.sslMode == conf::SslMode::followIncomingConnection)
-        requestOptions.sslMode = m_settings.cloudConnect().preferedSslMode;
+    if (m_targetHost.sslMode == conf::SslMode::followIncomingConnection)
+        m_targetHost.sslMode = m_settings.cloudConnect().preferedSslMode;
 
-    if (requestOptions.sslMode == conf::SslMode::followIncomingConnection && connection.isSsl())
-        requestOptions.sslMode = conf::SslMode::enabled;
+    if (m_targetHost.sslMode == conf::SslMode::followIncomingConnection && connection.isSsl())
+        m_targetHost.sslMode = conf::SslMode::enabled;
 
-    if (requestOptions.sslMode == conf::SslMode::enabled && !m_settings.http().sslSupport)
+    if (m_targetHost.sslMode == conf::SslMode::enabled && !m_settings.http().sslSupport)
     {
         NX_LOGX(lm("SSL requestd but forbidden by settings %1")
             .arg(connection.socket()->getForeignAddress()), cl_logDEBUG1);
@@ -126,7 +126,7 @@ TargetHost ProxyHandler::cutTargetFromRequest(
         return {nx_http::StatusCode::forbidden};
     }
 
-    return requestOptions;
+    return m_targetHost;
 }
 
 TargetHost ProxyHandler::cutTargetFromUrl(nx_http::Request* const request)
@@ -159,18 +159,18 @@ TargetHost ProxyHandler::cutTargetFromPath(nx_http::Request* const request)
         return {nx_http::StatusCode::badRequest};
 
     // Parse first path item, expected format: [protocol:]address[:port].
-    TargetHost requestOptions(nx_http::StatusCode::ok);
+    TargetHost m_targetHost(nx_http::StatusCode::ok);
     auto targetParts = pathItems[0].split(':', QString::SkipEmptyParts);
 
     // Is port specified?
     if (targetParts.size() > 1)
     {
         bool isPortSpecified;
-        requestOptions.target.port = targetParts.back().toInt(&isPortSpecified);
+        m_targetHost.target.port = targetParts.back().toInt(&isPortSpecified);
         if (isPortSpecified)
             targetParts.pop_back();
         else
-            requestOptions.target.port = nx_http::DEFAULT_HTTP_PORT;
+            m_targetHost.target.port = nx_http::DEFAULT_HTTP_PORT;
     }
 
     // Is protocol specified?
@@ -180,16 +180,16 @@ TargetHost ProxyHandler::cutTargetFromPath(nx_http::Request* const request)
         targetParts.pop_front();
 
         if (protocol == lit("ssl") || protocol == lit("https"))
-            requestOptions.sslMode = conf::SslMode::enabled;
+            m_targetHost.sslMode = conf::SslMode::enabled;
         else if (protocol == lit("http"))
-            requestOptions.sslMode = conf::SslMode::disabled;
+            m_targetHost.sslMode = conf::SslMode::disabled;
     }
 
     if (targetParts.size() > 1)
         return {nx_http::StatusCode::badRequest};
 
     // Get address.
-    requestOptions.target.address = HostAddress(targetParts.front().toString());
+    m_targetHost.target.address = HostAddress(targetParts.front().toString());
     pathItems.pop_front();
 
     // Restore path without 1st item: /[some/longer/url].
@@ -205,7 +205,7 @@ TargetHost ProxyHandler::cutTargetFromPath(nx_http::Request* const request)
     }
 
     request->requestLine.url.setQuery(std::move(query));
-    return requestOptions;
+    return m_targetHost;
 }
 
 void ProxyHandler::onConnected(
@@ -236,7 +236,7 @@ void ProxyHandler::onConnected(
             m_targetPeerSocket->getLocalAddress(), isSsl(m_targetPeerSocket)), cl_logDEBUG2);
 
     m_requestProxyWorker = std::make_unique<RequestProxyWorker>(
-        TargetHost(),
+        m_targetHost,
         std::move(m_request),
         this,
         std::move(m_targetPeerSocket));

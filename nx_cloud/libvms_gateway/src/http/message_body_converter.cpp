@@ -36,7 +36,7 @@ std::unique_ptr<AbstractMessageBodyConverter>
     {
         return std::make_unique<M3uPlaylistConverter>(
             proxyHost,
-            targetHost.target.address.toString().toUtf8());
+            targetHost.target.toString().toUtf8());
     }
 
     return nullptr;
