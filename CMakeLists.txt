@@ -1,7 +1,6 @@
 cmake_minimum_required(VERSION 3.7.0 FATAL_ERROR)
 
 set(customization "default" CACHE STRING "Product customization")
-set(box "none" CACHE STRING "Target box")
 option(beta "Is this build is beta build" ON)
 set(buildNumber "0" CACHE STRING "Build number")
 
@@ -15,6 +14,15 @@ option(rdepSync
 
 set(CMAKE_BUILD_TYPE "Debug" CACHE STRING
     "One of [Debug Release RelWithDebInfo MinSizeRel].")
+
+set(target "" CACHE STRING "Target platform.")
+set(box "none")
+
+if(target STREQUAL "bpi")
+    set(CMAKE_TOOLCHAIN_FILE "${CMAKE_CURRENT_LIST_DIR}/cmake/toolchain/bpi.cmake")
+elseif(target STREQUAL "android")
+    set(CMAKE_TOOLCHAIN_FILE "${CMAKE_CURRENT_LIST_DIR}/cmake/toolchain/android-arm.cmake")
+endif()
 
 project(vms VERSION 3.1.0)
 
