@@ -49,9 +49,9 @@ QByteArray Playlist::toString() const
             playlistStr += "#EXT-X-DISCONTINUITY\r\n";
         // Generating string 2010-02-19T14:54:23.031+08:00, since QDateTime::setTimeSpec() 
         //   and QDateTime::toString(Qt::ISODate) do not provide expected result.
-        const int tzOffset = chunk.programDateTime.get().timeZone().offsetFromUtc(chunk.programDateTime.get());
         if (chunk.programDateTime)
         {
+            const int tzOffset = chunk.programDateTime.get().timeZone().offsetFromUtc(chunk.programDateTime.get());
             playlistStr += "#EXT-X-PROGRAM-DATE-TIME:";
             playlistStr += chunk.programDateTime.get().toString(Qt::ISODate) + "."; //< data/time.
             playlistStr += QString::number((chunk.programDateTime.get().toMSecsSinceEpoch() % 1000)); // Milliseconds.
