@@ -340,13 +340,18 @@ MainWindow::MainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::WindowF
     m_globalLayout = new QVBoxLayout();
     m_globalLayout->setContentsMargins(0, 0, 0, 0);
     m_globalLayout->setSpacing(0);
+
     m_globalLayout->addWidget(m_titleBar);
     m_globalLayout->addLayout(m_viewLayout);
     m_globalLayout->setStretchFactor(m_viewLayout, 0x1000);
 
     setLayout(m_globalLayout);
 
-    m_currentPageHolder->addWidget(new QWidget());
+    if (qnRuntime->isDesktopMode())
+    {
+        m_currentPageHolder->addWidget(new QWidget());
+    }
+
     m_currentPageHolder->addWidget(m_view.data());
 
     if (qnRuntime->isDesktopMode())
@@ -367,13 +372,17 @@ MainWindow::MainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::WindowF
     if (nx::utils::AppInfo::isMacOsX())
         menu()->newMenu(action::MainScope);
 
-    /* VSync workaround must always be enabled to limit fps usage in following cases:
-     * * VSync is not supported by drivers
-     * * VSync is disabled in drivers
-     * * double buffering is disabled in drivers or in our program
-     */
-    QnVSyncWorkaround *vsyncWorkaround = new QnVSyncWorkaround(m_view->viewport(), this);
-    Q_UNUSED(vsyncWorkaround);
+    if (!qnRuntime->isActiveXMode())
+    {
+        /* VSync workaround must always be enabled to limit fps usage in following cases:
+         * * VSync is not supported by drivers
+         * * VSync is disabled in drivers
+         * * double buffering is disabled in drivers or in our program
+         * Workaround must be disabled in activeX mode.
+         */
+         QnVSyncWorkaround *vsyncWorkaround = new QnVSyncWorkaround(m_view->viewport(), this);
+         Q_UNUSED(vsyncWorkaround);
+    }
 
     updateWidgetsVisibility();
 }
@@ -408,46 +417,56 @@ void MainWindow::updateWidgetsVisibility()
 {
     const auto updateWelcomeScreenVisibility =
         [this](bool welcomeScreenIsVisible)
-    {
-        enum { kWorkaroundPage, kSceneIndex, kWelcomePageIndex };
+        {
+            // In activeX and videowall mode there is only scene widget on a holder
+            if (!qnRuntime->isDesktopMode())
+            {
+                NX_EXPECT(m_currentPageHolder->count() == 1);
+                m_titleBar->setVisible(false);
+                return;
+            }
 
-        // Due to flickering when switching between two opengl contexts
-        // we have to use intermediate non-opengl page switch.
-        m_currentPageHolder->setCurrentIndex(kWorkaroundPage);
+            enum { kWorkaroundPage, kSceneIndex, kWelcomePageIndex };
 
-        if (welcomeScreenIsVisible)
-            m_titleBar->setVisible(isTitleVisible());
-        m_currentPageHolder->repaint();
-        if (!welcomeScreenIsVisible)
-            m_titleBar->setVisible(isTitleVisible());
+            NX_EXPECT(m_currentPageHolder->count() == 3);
 
-        m_currentPageHolder->setCurrentIndex(welcomeScreenIsVisible
-            ? kWelcomePageIndex : kSceneIndex);
+            // Due to flickering when switching between two opengl contexts
+            // we have to use intermediate non-opengl page switch.
+            m_currentPageHolder->setCurrentIndex(kWorkaroundPage);
 
-        /* Fix scene activation state (Qt bug workaround) */
-        if (welcomeScreenIsVisible)
-            return;
+            if (welcomeScreenIsVisible)
+                m_titleBar->setVisible(isTitleVisible());
+            m_currentPageHolder->repaint();
+            if (!welcomeScreenIsVisible)
+                m_titleBar->setVisible(isTitleVisible());
 
-        if (!display() || !display()->scene())
-            return;
+            m_currentPageHolder->setCurrentIndex(welcomeScreenIsVisible
+                ? kWelcomePageIndex : kSceneIndex);
 
-        if (display()->scene()->isActive())
-            return;
+            /* Fix scene activation state (Qt bug workaround) */
+            if (welcomeScreenIsVisible)
+                return;
 
-        /*
-         * Fixes VMS-2413. The bug is following:
-         * QGraphicsScene contains activation counter.
-         * On WindowActivate counter is increased, on WindowsDeactivate (focus change, hide, etc) - decreased.
-         * There is scenario when WindowDeactivate is called twice (change focus to 'Reconnecting' dialog,
-         * then display Welcome Screen. In this case counter goes below zero, and the scene goes crazy.
-         * That's why I hate constructions like:
-         *   if (!--d->activationRefCount) { ... }
-         * --gdm
-         */
-        QEvent e(QEvent::WindowActivate);
-        QObject* sceneObject = display()->scene();
-        sceneObject->event(&e);
-    };
+            if (!display() || !display()->scene())
+                return;
+
+            if (display()->scene()->isActive())
+                return;
+
+            /*
+             * Fixes VMS-2413. The bug is following:
+             * QGraphicsScene contains activation counter.
+             * On WindowActivate counter is increased, on WindowsDeactivate (focus change, hide, etc) - decreased.
+             * There is scenario when WindowDeactivate is called twice (change focus to 'Reconnecting' dialog,
+             * then display Welcome Screen. In this case counter goes below zero, and the scene goes crazy.
+             * That's why I hate constructions like:
+             *   if (!--d->activationRefCount) { ... }
+             * --gdm
+             */
+            QEvent e(QEvent::WindowActivate);
+            QObject* sceneObject = display()->scene();
+            sceneObject->event(&e);
+        };
 
     // Always show title bar for welcome screen (it does not matter if it is fullscreen)
 
