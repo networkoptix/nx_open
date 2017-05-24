@@ -145,7 +145,7 @@ TEST_F(DistributedFileDownloaderPeerManagerTest, usingStorage)
 
     FileInformation originalFileInfo("test");
     originalFileInfo.status = FileInformation::Status::downloaded;
-    NX_ASSERT(storage->addFile(originalFileInfo) == ErrorCode::noError);
+    NX_ASSERT(storage->addFile(originalFileInfo) == ResultCode::ok);
 
     originalFileInfo = storage->fileInformation(fileName);
     const auto originalChecksums = storage->getChunkChecksums(fileName);

@@ -9,11 +9,11 @@ namespace common {
 #ifdef THIS_BLOCK_IS_REQUIRED_TO_MAKE_FILE_BE_PROCESSED_BY_MOC_DO_NOT_DELETE
 Q_OBJECT
 #endif
-QN_DECLARE_METAOBJECT_HEADER(distributed_file_downloader, ErrorCode, )
+QN_DECLARE_METAOBJECT_HEADER(distributed_file_downloader, ResultCode, )
 
-enum class ErrorCode
+enum class ResultCode
 {
-    noError,
+    ok,
     ioError,
     fileDoesNotExist,
     fileAlreadyExists,
@@ -25,7 +25,7 @@ enum class ErrorCode
     noFreeSpace
 };
 
-QN_FUSION_DECLARE_FUNCTIONS(distributed_file_downloader::ErrorCode, (lexical))
+QN_FUSION_DECLARE_FUNCTIONS(distributed_file_downloader::ResultCode, (lexical))
 
 } // namespace distributed_file_downloader
 } // namespace common

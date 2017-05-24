@@ -258,7 +258,7 @@ TEST_F(DistributedFileDownloaderWorkerTest, requestingFileInfo)
 TEST_F(DistributedFileDownloaderWorkerTest, simpleDownload)
 {
     auto fileInfo = createTestFile();
-    NX_ASSERT(defaultPeer->storage->addFile(fileInfo) == ErrorCode::noError);
+    NX_ASSERT(defaultPeer->storage->addFile(fileInfo) == ResultCode::ok);
 
     fileInfo.downloadedChunks.fill(true);
 
@@ -287,7 +287,7 @@ TEST_F(DistributedFileDownloaderWorkerTest, corruptedFile)
     auto fileInfo = createTestFile();
     fileInfo.downloadedChunks.setBit(0); //< Making file corrupted.
 
-    NX_ASSERT(defaultPeer->storage->addFile(fileInfo) == ErrorCode::noError);
+    NX_ASSERT(defaultPeer->storage->addFile(fileInfo) == ResultCode::ok);
 
     fileInfo.downloadedChunks.fill(true);
 
@@ -327,7 +327,7 @@ TEST_F(DistributedFileDownloaderWorkerTest, simpleDownloadFromInternet)
 {
     auto fileInfo = createTestFile();
     fileInfo.url = "http://test.org/testFile";
-    NX_ASSERT(defaultPeer->storage->addFile(fileInfo) == ErrorCode::noError);
+    NX_ASSERT(defaultPeer->storage->addFile(fileInfo) == ResultCode::ok);
 
     commonPeerManager->setHasInternetConnection(defaultPeer->peerManager->selfId());
     commonPeerManager->addInternetFile(fileInfo.url, fileInfo.filePath);
@@ -354,7 +354,7 @@ TEST_F(DistributedFileDownloaderWorkerTest, downloadFromInternetViaNonSetPeer)
 {
     auto fileInfo = createTestFile();
     fileInfo.url = "http://test.org/testFile";
-    NX_ASSERT(defaultPeer->storage->addFile(fileInfo) == ErrorCode::noError);
+    NX_ASSERT(defaultPeer->storage->addFile(fileInfo) == ResultCode::ok);
 
     const auto proxyPeerId = commonPeerManager->addPeer("Proxy Peer");
 
@@ -388,7 +388,7 @@ TEST_F(DistributedFileDownloaderWorkerTest, multiDownloadFlatNetwork)
 
     QList<QnUuid> pendingPeers;
 
-    NX_ASSERT(defaultPeer->storage->addFile(fileInfo) == ErrorCode::noError);
+    NX_ASSERT(defaultPeer->storage->addFile(fileInfo) == ResultCode::ok);
     commonPeerManager->setHasInternetConnection(defaultPeer->id);
     commonPeerManager->setPeerGroups(defaultPeer->id, groups);
     commonPeerManager->setPeerStorage(defaultPeer->id, defaultPeer->storage);
@@ -457,7 +457,7 @@ TEST_F(DistributedFileDownloaderWorkerTest, multiDownloadNonFlatNetwork)
 
     QList<QnUuid> pendingPeers;
 
-    NX_ASSERT(defaultPeer->storage->addFile(fileInfo) == ErrorCode::noError);
+    NX_ASSERT(defaultPeer->storage->addFile(fileInfo) == ResultCode::ok);
     commonPeerManager->setHasInternetConnection(defaultPeer->id);
     commonPeerManager->setPeerGroups(defaultPeer->id, {groups[0]});
     commonPeerManager->setPeerStorage(defaultPeer->id, defaultPeer->storage);

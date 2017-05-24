@@ -225,7 +225,7 @@ rest::Handle TestPeerManager::downloadChunkFromInternet(
             if (storage && storageFileInfo.downloadedChunks[chunkIndex])
             {
                 QByteArray result;
-                if (storage->readFileChunk(fileName, chunkIndex, result) == ErrorCode::noError)
+                if (storage->readFileChunk(fileName, chunkIndex, result) == ResultCode::ok)
                 {
                     callback(true, handle, result);
                     return;

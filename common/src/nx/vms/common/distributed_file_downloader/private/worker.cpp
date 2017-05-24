@@ -379,7 +379,7 @@ void Worker::requestFileInformationInternal()
                 && fileInfo.size >= 0 && !fileInfo.md5.isEmpty() && fileInfo.chunkSize > 0)
             {
                 auto errorCode = m_storage->setChunkSize(fileInfo.name, fileInfo.chunkSize);
-                if (errorCode != ErrorCode::noError)
+                if (errorCode != ResultCode::ok)
                 {
                     NX_WARNING(m_logTag,
                         lm("During setting chunk size storage returned error: %1")
@@ -392,7 +392,7 @@ void Worker::requestFileInformationInternal()
                 errorCode = m_storage->updateFileInformation(
                     fileInfo.name, fileInfo.size, fileInfo.md5);
 
-                if (errorCode != ErrorCode::noError)
+                if (errorCode != ResultCode::ok)
                 {
                     NX_WARNING(m_logTag,
                         lm("During update storage returned error: %1")
@@ -494,7 +494,7 @@ void Worker::requestChecksums()
             const auto errorCode =
                 m_storage->setChunkChecksums(m_fileName, checksums);
 
-            if (errorCode != ErrorCode::noError)
+            if (errorCode != ResultCode::ok)
             {
                 NX_WARNING(m_logTag,
                     lm("Cannot set checksums: %1").arg(QnLexical::serialized(errorCode)));
@@ -605,7 +605,7 @@ void Worker::downloadNextChunk()
                 m_usingInternet = false;
 
             const auto errorCode = m_storage->writeFileChunk(m_fileName, chunkIndex, data);
-            if (errorCode != ErrorCode::noError)
+            if (errorCode != ResultCode::ok)
             {
                 NX_WARNING(m_logTag,
                     lm("Cannot write chunk. Storage error: %1")

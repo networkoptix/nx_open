@@ -131,12 +131,12 @@ FileInformation Downloader::fileInformation(
     return d->storage->fileInformation(fileName);
 }
 
-ErrorCode Downloader::addFile(const FileInformation& fileInformation)
+ResultCode Downloader::addFile(const FileInformation& fileInformation)
 {
     Q_D(Downloader);
 
     auto errorCode = d->storage->addFile(fileInformation);
-    if (errorCode != ErrorCode::noError)
+    if (errorCode != ResultCode::ok)
         return errorCode;
 
     executeInThread(thread(),
@@ -149,7 +149,7 @@ ErrorCode Downloader::addFile(const FileInformation& fileInformation)
     return errorCode;
 }
 
-ErrorCode Downloader::updateFileInformation(
+ResultCode Downloader::updateFileInformation(
     const QString& fileName,
     int size,
     const QByteArray& md5)
@@ -158,7 +158,7 @@ ErrorCode Downloader::updateFileInformation(
     return d->storage->updateFileInformation(fileName, size, md5);
 }
 
-ErrorCode Downloader::readFileChunk(
+ResultCode Downloader::readFileChunk(
     const QString& fileName,
     int chunkIndex,
     QByteArray& buffer)
@@ -167,7 +167,7 @@ ErrorCode Downloader::readFileChunk(
     return d->storage->readFileChunk(fileName, chunkIndex, buffer);
 }
 
-ErrorCode Downloader::writeFileChunk(
+ResultCode Downloader::writeFileChunk(
     const QString& fileName,
     int chunkIndex,
     const QByteArray& buffer)
@@ -176,7 +176,7 @@ ErrorCode Downloader::writeFileChunk(
     return d->storage->writeFileChunk(fileName, chunkIndex, buffer);
 }
 
-ErrorCode Downloader::deleteFile(
+ResultCode Downloader::deleteFile(
     const QString& fileName,
     bool deleteData)
 {

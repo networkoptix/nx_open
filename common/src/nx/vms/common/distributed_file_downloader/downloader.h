@@ -6,7 +6,7 @@
 
 #include <common/common_module_aware.h>
 
-#include "error_code.h"
+#include "result_code.h"
 #include "file_information.h"
 
 namespace nx {
@@ -36,24 +36,24 @@ public:
 
     FileInformation fileInformation(const QString& fileName) const;
 
-    ErrorCode addFile(const FileInformation& fileInformation);
+    ResultCode addFile(const FileInformation& fileInformation);
 
-    ErrorCode updateFileInformation(
+    ResultCode updateFileInformation(
         const QString& fileName,
         int size,
         const QByteArray& md5);
 
-    ErrorCode readFileChunk(
+    ResultCode readFileChunk(
         const QString& fileName,
         int chunkIndex,
         QByteArray& buffer);
 
-    ErrorCode writeFileChunk(
+    ResultCode writeFileChunk(
         const QString& fileName,
         int chunkIndex,
         const QByteArray& buffer);
 
-    ErrorCode deleteFile(const QString& fileName, bool deleteData = true);
+    ResultCode deleteFile(const QString& fileName, bool deleteData = true);
 
     QVector<QByteArray> getChunkChecksums(const QString& fileName);
 

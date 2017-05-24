@@ -5,7 +5,7 @@
 
 #include <nx/utils/thread/mutex.h>
 
-#include "../error_code.h"
+#include "../result_code.h"
 #include "../file_information.h"
 
 namespace nx {
@@ -40,17 +40,17 @@ public:
 
     FileInformation fileInformation(const QString& fileName) const;
 
-    ErrorCode addFile(const FileInformation& fileInfo);
-    ErrorCode updateFileInformation(const QString& fileName, qint64 size, const QByteArray& md5);
-    ErrorCode setChunkSize(const QString& fileName, qint64 chunkSize);
+    ResultCode addFile(const FileInformation& fileInfo);
+    ResultCode updateFileInformation(const QString& fileName, qint64 size, const QByteArray& md5);
+    ResultCode setChunkSize(const QString& fileName, qint64 chunkSize);
 
-    ErrorCode readFileChunk(const QString& fileName, int chunkIndex, QByteArray& buffer);
-    ErrorCode writeFileChunk(const QString& fileName, int chunkIndex, const QByteArray& buffer);
+    ResultCode readFileChunk(const QString& fileName, int chunkIndex, QByteArray& buffer);
+    ResultCode writeFileChunk(const QString& fileName, int chunkIndex, const QByteArray& buffer);
 
-    ErrorCode deleteFile(const QString& fileName, bool deleteData = true);
+    ResultCode deleteFile(const QString& fileName, bool deleteData = true);
 
     QVector<QByteArray> getChunkChecksums(const QString& fileName);
-    ErrorCode setChunkChecksums(
+    ResultCode setChunkChecksums(
         const QString& fileName, const QVector<QByteArray>& chunkChecksums);
 
     void findDownloads();
@@ -65,7 +65,7 @@ private:
     bool saveMetadata(const FileMetadata& fileInformation);
     FileMetadata loadMetadata(const QString& fileName);
     FileMetadata fileMetadata(const QString& fileName) const;
-    ErrorCode loadDownload(const QString& fileName);
+    ResultCode loadDownload(const QString& fileName);
     void checkDownloadCompleted(FileMetadata& fileInfo);
 
     static bool reserveSpace(const QString& fileName, const qint64 size);
