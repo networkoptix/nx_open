@@ -47,13 +47,6 @@
     user-select:none;
     cursor:default;
 
-    .cameras-panel{
-      height: 100%;
-      width: 100%;
-      overflow-y: scroll;
-      overflow-x: hidden;
-    }
-
     .tree{
       font-size: 114%;
       font-weight: 500;
@@ -199,6 +192,7 @@ table.webclient-window>tbody>tr>td{
 }
 
 .cameras-panel{
+  min-width: 320px;
   overflow-y: auto;
   overflow-x: hidden;
   height: 100%;
@@ -951,6 +945,7 @@ div{
 
   .cameras-panel{
     width: 100% !important;
+    min-width: 0px !important;
   }
   .hide-panel{
     width:0px !important;
