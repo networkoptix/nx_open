@@ -417,7 +417,7 @@ ActionVisibility ClearMotionSelectionCondition::check(const QnResourceWidgetList
         {
             hasDisplayedGrid = true;
 
-            if (auto mediaWidget = dynamic_cast<const QnMediaResourceWidget *>(widget))
+            if (auto mediaWidget = dynamic_cast<const QnMediaResourceWidget*>(widget))
                 foreach(const QRegion &region, mediaWidget->motionSelection())
                 if (!region.isEmpty())
                     return EnabledAction;
@@ -440,7 +440,7 @@ ActionVisibility ResourceCondition::check(const QnResourceList& resources, QnWor
 
 ActionVisibility ResourceCondition::check(const QnResourceWidgetList& widgets, QnWorkbenchContext* /*context*/)
 {
-    return checkInternal<QnResourceWidget *>(widgets) ? EnabledAction : InvisibleAction;
+    return checkInternal<QnResourceWidget*>(widgets) ? EnabledAction : InvisibleAction;
 }
 
 template<class Item, class ItemSequence>
@@ -988,7 +988,7 @@ ActionVisibility CreateZoomWindowCondition::check(const QnResourceWidgetList& wi
 
     // TODO: #Elric there probably exists a better way to check it all.
 
-    auto widget = dynamic_cast<QnMediaResourceWidget *>(widgets[0]);
+    auto widget = dynamic_cast<QnMediaResourceWidget*>(widgets[0]);
     if (!widget)
         return InvisibleAction;
 
@@ -1195,7 +1195,7 @@ ActionVisibility PtzCondition::check(const QnResourceWidgetList& widgets, QnWork
 {
     for (auto widget: widgets)
     {
-        auto mediaWidget = dynamic_cast<const QnMediaResourceWidget *>(widget);
+        auto mediaWidget = dynamic_cast<const QnMediaResourceWidget*>(widget);
         if (!mediaWidget)
             return InvisibleAction;
 

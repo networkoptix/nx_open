@@ -1039,7 +1039,7 @@ void QnWorkbenchController::at_rotationStarted(QGraphicsView *, QGraphicsWidget 
 void QnWorkbenchController::at_rotationFinished(QGraphicsView *, QGraphicsWidget *widget) {
     TRACE("ROTATION FINISHED");
 
-    QnResourceWidget *resourceWidget = dynamic_cast<QnResourceWidget *>(widget);
+    const auto resourceWidget = dynamic_cast<QnResourceWidget*>(widget);
     if(!resourceWidget)
         return; /* We may also get NULL if the widget being rotated gets deleted. */
 
@@ -1310,7 +1310,7 @@ void QnWorkbenchController::at_display_widgetChanged(Qn::ItemRole role) {
 
     QGraphicsItem *focusItem = display()->scene()->focusItem();
     bool canMoveFocus = !focusItem
-        || dynamic_cast<QnResourceWidget *>(focusItem)
+        || dynamic_cast<QnResourceWidget*>(focusItem)
         || dynamic_cast<QnGraphicsWebView*>(focusItem);
 
     if (newWidget && canMoveFocus)
@@ -1437,7 +1437,7 @@ void QnWorkbenchController::at_clearMotionSelectionAction_triggered()
 
     for (auto widget: widgets)
     {
-        if (auto mediaWidget = dynamic_cast<QnMediaResourceWidget *>(widget))
+        if (auto mediaWidget = dynamic_cast<QnMediaResourceWidget*>(widget))
             mediaWidget->clearMotionSelection();
     }
 }
