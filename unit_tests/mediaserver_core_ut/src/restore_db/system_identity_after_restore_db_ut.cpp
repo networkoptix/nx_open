@@ -10,6 +10,7 @@
 #include <common/common_module.h>
 #include <database/db_manager.h>
 #include <mediaserver_launcher.h>
+#include <api/global_settings.h>
 
 #define GTEST_HAS_TR1_TUPLE     0
 #define GTEST_USE_OWN_TR1_TUPLE 1
@@ -531,5 +532,5 @@ TEST_F(BaseRestoreDbTest, GenerateLocalSystemId_IfDefaultSystemNameIsSet)
     MediaServerLauncher launcher;
     launcher.addSetting(lit("systemName"), lit("__auto__SYSTEM_NAME"));
     ASSERT_TRUE(launcher.start());
-    ASSERT_TRUE(qnGlobalSettings->localSystemId() == QnUuid());
+    ASSERT_TRUE(launcher.commonModule()->globalSettings()->localSystemId() == QnUuid());
 }
