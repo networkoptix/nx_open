@@ -448,7 +448,7 @@ angular.module('nxCommon').controller('ViewCtrl',
             }
         };
 
-        setTimeout(function(){updateHeights();},100);
+        setTimeout(function(){updateHeights();},200);
         $window.resize(updateHeights);
         window.addEventListener("orientationchange",function(){setTimeout(function(){updateHeights();},200);});
 
