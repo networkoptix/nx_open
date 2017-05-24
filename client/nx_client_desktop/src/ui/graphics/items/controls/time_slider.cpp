@@ -628,10 +628,10 @@ QnTimeSlider::QnTimeSlider(QGraphicsItem* parent, QGraphicsItem* tooltipParent):
     m_tooltipLine2->setFont(font);
 
     /* Fine-tuned kinetic processor contants. */
-    static const int kZoomProcessorMaxShiftIntervalSeconds = 0.4;
-    static const int kDragProcessorMaxShiftIntervalSeconds = 0.05;
-    static const int kZoomProcessorSpeedCuttingThreshold = kWindowZoomMaxSpeed / 24.0;
-    static const int kDragProcessorSpeedCuttingThreshold = kWindowDragMaxSpeed / 10.0;
+    static const qreal kZoomProcessorMaxShiftIntervalSeconds = 0.4;
+    static const qreal kDragProcessorMaxShiftIntervalSeconds = 0.05;
+    static const qreal kZoomProcessorSpeedCuttingThreshold = kWindowZoomMaxSpeed / 24.0;
+    static const qreal kDragProcessorSpeedCuttingThreshold = kWindowDragMaxSpeed / 10.0;
 
     /* Prepare kinetic zoom processor. */
     const auto kineticZoomProcessor = new KineticCuttingProcessor(QMetaType::QReal, this);
