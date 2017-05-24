@@ -55,69 +55,92 @@ function(detect_package_versions)
     set(help_version "${customization}-${releaseVersion.short}" PARENT_SCOPE)
 endfunction()
 
+function(get_dependencies)
+    if (WINDOWS OR (LINUX AND NOT ANDROID))
+        set(haveServer TRUE)
+    endif()
+
+    if (WINDOWS OR MACOSX OR (LINUX AND NOT ANDROID AND box MATCHES "none|tx1"))
+        set(haveDesktopClient TRUE)
+    endif()
+
+    if (box STREQUAL "none")
+        set(haveMobileClient TRUE)
+    endif()
+
+    if(WINDOWS OR MACOSX OR (LINUX AND box MATCHES "none|bpi|tx1"))
+        set(haveTests TRUE)
+    endif()
+
+    nx_rdep_add_package(qt PATH_VARIABLE QT_DIR)
+    set(QT_DIR ${QT_DIR} PARENT_SCOPE)
+
+    nx_rdep_add_package(any/boost)
+    nx_rdep_add_package(any/qtservice)
+    nx_rdep_add_package(any/qtsinglecoreapplication)
+
+    nx_rdep_add_package(any/nx_kit)
+
+    nx_rdep_add_package(openssl)
+    nx_rdep_add_package(ffmpeg)
+
+    if(haveTests)
+        nx_rdep_add_package(gtest)
+        nx_rdep_add_package(gmock)
+    endif()
+
+    if(ANDROID OR WINDOWS)
+        nx_rdep_add_package(openal)
+    endif()
+
+    if(NOT ANDROID AND NOT IOS)
+        nx_rdep_add_package(quazip)
+    endif()
+
+    if(WINDOWS)
+        nx_rdep_add_package(directx)
+    endif()
+
+    if(haveDesktopClient)
+        nx_rdep_add_package(any/qtsingleapplication)
+        nx_rdep_add_package(any/help)
+    endif()
+
+    if(haveMobileClient)
+        nx_rdep_add_package(any/qtsingleguiapplication)
+    endif()
+
+    if(haveDesktopClient OR haveMobileClient)
+        nx_rdep_add_package(any/roboto-ttf)
+        nx_rdep_add_package(any/roboto-mono-ttf)
+    endif()
+
+    if(haveServer OR haveDesktopClient)
+        nx_rdep_add_package(festival)
+        if(NOT "${festival-vox_version}" STREQUAL "system")
+            nx_rdep_add_package(any/festival-vox)
+        endif()
+    endif()
+
+    if(ANDROID)
+        nx_rdep_add_package(libjpeg-turbo)
+    endif()
+
+    if(haveServer)
+        nx_rdep_add_package(any/nx_sdk-1.6.0)
+        nx_rdep_add_package(any/nx_storage_sdk-1.6.0)
+        nx_rdep_add_package(onvif)
+        nx_rdep_add_package(sigar)
+
+        nx_rdep_add_package(any/apidoctool PATH_VARIABLE APIDOCTOOL_PATH)
+        set(APIDOCTOOL_PATH ${APIDOCTOOL_PATH} PARENT_SCOPE)
+
+        nx_rdep_add_package(any/server-external-${branch} OPTIONAL PATH_VARIABLE server_external_path)
+        if(NOT server_external_path)
+            nx_rdep_add_package(any/server-external-${releaseVersion})
+        endif()
+    endif()
+endfunction()
+
 detect_package_versions()
-
-
-nx_rdep_add_package(qt PATH_VARIABLE QT_DIR)
-
-nx_rdep_add_package(any/boost)
-nx_rdep_add_package(any/qtservice)
-nx_rdep_add_package(any/qtsinglecoreapplication)
-
-nx_rdep_add_package(any/nx_kit)
-nx_rdep_add_package(any/apidoctool PATH_VARIABLE APIDOCTOOL_PATH)
-
-nx_rdep_add_package(openssl)
-nx_rdep_add_package(ffmpeg)
-
-if(WINDOWS OR MACOSX OR (LINUX AND box MATCHES "bpi|tx1"))
-    nx_rdep_add_package(gtest)
-    nx_rdep_add_package(gmock)
-endif()
-
-if(ANDROID OR WINDOWS)
-    nx_rdep_add_package(openal)
-endif()
-
-if(NOT ANDROID AND NOT IOS)
-    nx_rdep_add_package(quazip)
-endif()
-
-if(WINDOWS)
-    nx_rdep_add_package(directx)
-endif()
-
-if(WINDOWS OR MACOSX OR (LINUX AND NOT ANDROID AND box MATCHES "none|tx1"))
-    nx_rdep_add_package(any/qtsingleapplication)
-    nx_rdep_add_package(any/help)
-endif()
-
-if(WINDOWS OR MACOSX OR ANDROID OR IOS OR (LINUX AND box MATCHES "none|bpi"))
-    nx_rdep_add_package(any/qtsingleguiapplication)
-    nx_rdep_add_package(any/roboto-ttf)
-    nx_rdep_add_package(any/roboto-mono-ttf)
-endif()
-
-if(NOT (ANDROID OR IOS))
-    nx_rdep_add_package(festival)
-    if(NOT "${festival-vox_version}" STREQUAL "system")
-        nx_rdep_add_package(any/festival-vox)
-    endif()
-endif()
-
-if(ANDROID)
-    nx_rdep_add_package(libjpeg-turbo)
-endif()
-
-if(NOT (MACOSX OR ANDROID OR IOS))
-    nx_rdep_add_package(any/nx_sdk-1.6.0)
-    nx_rdep_add_package(any/nx_storage_sdk-1.6.0)
-    nx_rdep_add_package(onvif)
-    nx_rdep_add_package(sigar)
-
-    nx_rdep_add_package(any/server-external-${branch} OPTIONAL PATH_VARIABLE server_external_path)
-    if(NOT server_external_path)
-        nx_rdep_add_package(any/server-external-${releaseVersion})
-    endif()
-    unset(server_external_path)
-endif()
+get_dependencies()
