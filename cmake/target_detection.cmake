@@ -42,6 +42,7 @@ function(detect_target)
 
         set(detected_target ${detected_platform}-${detected_arch})
     else()
+        set(LINUX TRUE PARENT_SCOPE)
         set(detected_arch "arm")
         set(detected_platform "linux")
         set(detected_modification ${box})

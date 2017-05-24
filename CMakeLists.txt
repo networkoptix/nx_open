@@ -83,7 +83,13 @@ if(NOT WINDOWS)
         "${CMAKE_EXE_LINKER_FLAGS} -Wl,-rpath-link,${QT_DIR}/lib")
     set(CMAKE_SHARED_LINKER_FLAGS
         "${CMAKE_SHARED_LINKER_FLAGS} -Wl,-rpath-link,${QT_DIR}/lib")
+    set(CMAKE_EXE_LINKER_FLAGS
+        "${CMAKE_EXE_LINKER_FLAGS} -Wl,-rpath-link,${CMAKE_LIBRARY_OUTPUT_DIRECTORY}")
+    set(CMAKE_SHARED_LINKER_FLAGS
+        "${CMAKE_SHARED_LINKER_FLAGS} -Wl,-rpath-link,${CMAKE_LIBRARY_OUTPUT_DIRECTORY}")
 endif()
+
+link_directories("${CMAKE_LIBRARY_OUTPUT_DIRECTORY}")
 
 find_package(Qt5
     COMPONENTS
@@ -100,7 +106,6 @@ find_package(Qt5
 if(withDesktopClient OR withMobileClient)
     find_package(Qt5
         COMPONENTS
-            OpenGL
             Qml
             Quick)
 endif()
