@@ -810,7 +810,7 @@ void ActionHandler::at_openInCurrentLayoutAction_triggered()
 
 void ActionHandler::at_openInNewLayoutAction_triggered()
 {
-    // Stop layout tour if it is running
+    // Stop layout tour if it is running.
     if (action(action::ToggleLayoutTourModeAction)->isChecked())
         menu()->trigger(action::ToggleLayoutTourModeAction);
 
