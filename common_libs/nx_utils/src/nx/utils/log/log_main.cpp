@@ -30,7 +30,7 @@ public:
         return logger;
     }
 
-    std::shared_ptr<Logger> get(const QString& tag, bool allowMain)
+    std::shared_ptr<Logger> get(const QString& tag, bool allowMain) const
     {
         QnMutexLocker lock(&m_mutex);
         for (auto& it: m_loggersByTags)
@@ -42,8 +42,15 @@ public:
         return allowMain ? m_mainLogger : std::shared_ptr<Logger>();
     }
 
+    void remove(const std::set<QString>& filters)
+    {
+        QnMutexLocker lock(&m_mutex);
+        for (const auto f: filters)
+            m_loggersByTags.erase(f);
+    }
+
 private:
-    QnMutex m_mutex;
+    mutable QnMutex m_mutex;
     std::shared_ptr<Logger> m_mainLogger;
     std::map<QString, std::shared_ptr<Logger>> m_loggersByTags;
 };
@@ -69,6 +76,11 @@ std::shared_ptr<Logger> addLogger(const std::set<QString>& filters)
 std::shared_ptr<Logger> getLogger(const QString& tag, bool allowMain)
 {
     return loggerCollection()->get(tag, allowMain);
+}
+
+void removeLoggers(const std::set<QString>& filters)
+{
+    loggerCollection()->remove(filters);
 }
 
 } // namespace log
