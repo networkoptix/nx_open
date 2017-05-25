@@ -99,55 +99,53 @@ LicenseDeactivatorPrivate::LicenseDeactivatorPrivate(
     base_type(parent),
     m_httpClient(nx_http::AsyncHttpClient::create())
 {
-    const auto deleteLaterGuard = QnRaiiGuard::createDestructible(
-        [this]() { deleteLater(); });
-
-    const auto callHandler =
-        [handler](Result result, const LicenseErrorHash& errors = LicenseErrorHash())
+    const auto finalize =
+        [this, handler](Result result, const LicenseErrorHash& errors = LicenseErrorHash())
         {
+            deleteLater();
             if (handler)
                 handler(result, errors);
         };
 
     if (licenses.isEmpty())
     {
-        callHandler(Result::Success);
+        finalize(Result::Success);
         return;
     }
 
     const auto guard = QPointer<LicenseDeactivatorPrivate>(this);
     const auto postHandler =
-        [this, guard, deleteLaterGuard, callHandler]()
+        [this, guard, finalize]()
         {
             if (m_httpClient->failed())
             {
-                callHandler(Result::ConnectionError);
+                finalize(Result::ConnectionError);
                 return;
             }
 
             const auto response = m_httpClient->response();
             if (!response)
             {
-                callHandler(Result::UnspecifiedError);
+                finalize(Result::UnspecifiedError);
                 return;
             }
 
             switch(response->statusLine.statusCode)
             {
                 case nx_http::StatusCode::ok:
-                    callHandler(Result::Success);
+                    finalize(Result::Success);
                     break;
                 case nx_http::StatusCode::internalServerError:
-                    callHandler(Result::ServerError);
+                    finalize(Result::ServerError);
                     break;
                 case nx_http::StatusCode::badRequest:
                 {
-                    callHandler(Result::DeactivationError,
+                    finalize(Result::DeactivationError,
                         extractErrors(m_httpClient->fetchMessageBodyBuffer()));
                     break;
                 }
                 default:
-                    callHandler(Result::UnspecifiedError);
+                    finalize(Result::UnspecifiedError);
                     break;
             }
         };
