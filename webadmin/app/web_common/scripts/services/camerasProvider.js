@@ -287,17 +287,15 @@ angular.module('nxCommon')
 
         camerasProvider.prototype.requestResources = function() {
             var self = this;
-            var deferred = $q.defer();
-            systemAPI.getResourceTypes().then(function (result) {
+            return systemAPI.getResourceTypes().then(function (result) {
                 self.desktopCameraTypeId = _.find(result.data, function (type) {
                     return type.name === 'SERVER_DESKTOP_CAMERA';
                 });
                 self.desktopCameraTypeId = self.desktopCameraTypeId ? self.desktopCameraTypeId.id : null;
-                self.reloadTree().then(function(cams){
-                    deferred.resolve(cams);
-                });
+                return self.reloadTree();
+            }).then(function(cams){
+                return cams;
             });
-            return deferred.promise;
         };
 
         camerasProvider.prototype.startPoll = function(){
