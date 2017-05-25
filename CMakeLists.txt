@@ -18,10 +18,8 @@ set(CMAKE_BUILD_TYPE "Debug" CACHE STRING
 set(target "" CACHE STRING "Target platform.")
 set(box "none")
 
-if(target STREQUAL "bpi")
-    set(CMAKE_TOOLCHAIN_FILE "${CMAKE_CURRENT_LIST_DIR}/cmake/toolchain/bpi.cmake")
-elseif(target STREQUAL "android")
-    set(CMAKE_TOOLCHAIN_FILE "${CMAKE_CURRENT_LIST_DIR}/cmake/toolchain/android-arm.cmake")
+if(target)
+    set(CMAKE_TOOLCHAIN_FILE "${CMAKE_CURRENT_LIST_DIR}/cmake/toolchain/${target}.cmake")
 endif()
 
 project(vms VERSION 3.1.0)
