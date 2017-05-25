@@ -604,8 +604,12 @@ void QnLicenseManagerWidget::deactivateLicenses(const QnLicenseList& licenses)
 {
     using Result = Deactivator::Result;
 
+    window()->setEnabled(false);
+    const auto restoreEnabledGuard = QnRaiiGuard::createDestructible(
+        [this]() { window()->setEnabled(true); });
+
     const auto handler =
-        [this, licenses](Result result, const LicenseErrorHash& errorsHash)
+        [this, licenses, restoreEnabledGuard](Result result, const LicenseErrorHash& errorsHash)
         {
             const auto text = Deactivator::resultDescription(result, licenses.count());
             if (result == Result::Success)
@@ -621,7 +625,7 @@ void QnLicenseManagerWidget::deactivateLicenses(const QnLicenseList& licenses)
             }
         };
 
-    Deactivator::deactivateAsync(licenses, handler, this);
+    Deactivator::deactivateAsync(licenses, handler, parent());
 }
 
 void QnLicenseManagerWidget::takeAwaySelectedLicenses()
