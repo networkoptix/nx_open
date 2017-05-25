@@ -40,8 +40,10 @@ if(ANDROID OR IOS)
     set(enableAllVendors OFF)
 endif()
 
-if(ISD OR ISD_S2)
+if(box MATCHES "isd")
     set(enableAllVendors OFF)
+    remove_definitions(-DENABLE_SOFTWARE_MOTION_DETECTION)
+    add_definitions(-DEDGE_SERVER)
 endif()
 
 if(enableAllVendors)
