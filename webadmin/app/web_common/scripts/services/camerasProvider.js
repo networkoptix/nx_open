@@ -293,8 +293,6 @@ angular.module('nxCommon')
                 });
                 self.desktopCameraTypeId = self.desktopCameraTypeId ? self.desktopCameraTypeId.id : null;
                 return self.reloadTree();
-            }).then(function(cams){
-                return cams;
             });
         };
 
