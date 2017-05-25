@@ -12,7 +12,7 @@ from fnmatch import fnmatch
 def main():
     root = os.getcwd()
     pattern = "*.json"      
-    exclude = set(['cloud_portal', 'webadmin'])
+    exclude = set(['node_modules', 'bower_components'])
     for path, subdirs, files in os.walk(root, topdown=True):
         subdirs[:] = [d for d in subdirs if d not in exclude]
         for name in files:
