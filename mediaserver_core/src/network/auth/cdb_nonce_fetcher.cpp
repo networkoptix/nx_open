@@ -66,6 +66,10 @@ CdbNonceFetcher::~CdbNonceFetcher()
 
 QByteArray CdbNonceFetcher::generateNonce()
 {
+    auto cloudPreviouslyProvidedNonce = m_cloudUserInfoPool.newestMostCommonNonce();
+    if (cloudPreviouslyProvidedNonce)
+        return cloudPreviouslyProvidedNonce;
+
     if (!m_cloudConnectionManager->boundToCloud())
         return m_defaultGenerator->generateNonce();
 
