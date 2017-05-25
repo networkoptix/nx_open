@@ -32,8 +32,8 @@ class NX_NETWORK_API WebSocket :
             writeSize(writeSize)
         {}
 
-        WriteData(WriteData&& other) = default;
-        WriteData& operator=(WriteData&& other) = default;
+        WriteData(WriteData&& /*other*/) = default;
+        WriteData& operator=(WriteData&& /*other*/) = default;
 
         WriteData() {}
     };

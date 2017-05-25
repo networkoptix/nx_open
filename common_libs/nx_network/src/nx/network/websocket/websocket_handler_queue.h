@@ -22,8 +22,8 @@ public:
             buffer(std::move(buffer))
         {}
 
-        Held(Held&& other) = default;
-        Held& operator=(Held&& other) = default;
+        Held(Held&& /*other*/) = default;
+        Held& operator=(Held&& /*other*/) = default;
 
         Held() {}
     };
