@@ -83,22 +83,29 @@ public:
     virtual void dropConnections() override;
     virtual QVector<QnTransportConnectionInfo> connectionsInfo() const override;
 
+    void sendTransaction(const ec2::QnTransaction<ApiRuntimeData>& tran)
+    {
+        QnMutexLocker lock(&m_mutex);
+        ApiPersistentIdData peerId(tran.peerID, tran.params.peer.persistentId);
+        m_lastRuntimeInfo[peerId] = tran.params;
+        for (const auto& connection : m_connections)
+            sendTransactionImpl(connection, tran);
+    }
+
     template<class T>
-    void sendTransaction(const ec2::QnTransaction<T>& tran, const QnPeerSet& dstPeers = QnPeerSet())
+    void sendTransaction(const ec2::QnTransaction<T>& tran)
+    {
+        QnMutexLocker lock(&m_mutex);
+        for (const auto& connection: m_connections)
+            sendTransactionImpl(connection, tran);
+    }
+
+    template<class T>
+    void sendTransaction(const ec2::QnTransaction<T>& tran, const QnPeerSet& dstPeers)
     {
         NX_ASSERT(tran.command != ApiCommand::NotDefined);
         QnMutexLocker lock(&m_mutex);
-        if (m_connections.isEmpty())
-            return;
-
-        if (!dstPeers.isEmpty())
-        {
-            sendUnicastTransaction(tran, dstPeers);
-            return;
-        }
-
-        for (const auto& connection: m_connections)
-            sendTransactionImpl(connection, tran);
+        sendUnicastTransaction(tran, dstPeers);
     }
 
     bool isSubscribedTo(const ApiPersistentIdData& peer) const;
@@ -108,10 +115,13 @@ private:
     template<class T>
     void sendTransactionImpl(const P2pConnectionPtr& connection, const ec2::QnTransaction<T>& tran)
     {
+        NX_ASSERT(tran.command != ApiCommand::NotDefined);
+
         if (!connection->shouldTransactionBeSentToPeer(tran))
             return; //< This peer doesn't handle transactions of such type.
 
-        auto remoteAccess = ec2::getTransactionDescriptorByTransaction(tran)->
+        const auto& descriptor = ec2::getTransactionDescriptorByTransaction(tran);
+        auto remoteAccess = descriptor->
             checkRemotePeerAccessFunc(commonModule(), connection->userAccessData(), tran.params);
         if (remoteAccess == RemotePeerAccess::Forbidden)
         {
@@ -125,10 +135,18 @@ private:
 
         const ApiPersistentIdData peerId(tran.peerID, tran.persistentInfo.dbID);
         const auto context = this->context(connection);
-        if (connection->remotePeer().isServer() &&
-            (context->selectingDataInProgress || !context->updateSequence(tran)))
+        if (connection->remotePeer().isServer())
         {
-            return;
+            if (descriptor->isPersistent)
+            {
+                if (context->selectingDataInProgress || !context->updateSequence(tran))
+                    return;
+            }
+            else
+            {
+                if (!context->isRemotePeerSubscribedTo(tran.peerID))
+                    return;
+            }
         }
         NX_ASSERT(!(ApiPersistentIdData(connection->remotePeer()) == peerId)); //< loop
 
@@ -250,6 +268,9 @@ private:
     void gotTransaction(
         const QnTransaction<ApiUpdateSequenceData> &tran,
         const P2pConnectionPtr& connection);
+    void gotTransaction(
+        const QnTransaction<ApiRuntimeData> &tran,
+        const P2pConnectionPtr& connection);
 
     template <class T>
     void gotTransaction(const QnTransaction<T>& tran,const P2pConnectionPtr& connection);
@@ -274,6 +295,8 @@ private:
         const QList<QByteArray>& serializedTransactions);
     void startReading(P2pConnectionPtr connection);
     void sendInitialDataToClient(const P2pConnectionPtr& connection);
+    void sendRuntimeData(const P2pConnectionPtr& connection, const QList<ApiPersistentIdData>& peers);
+    void cleanupRuntimeInfo(const ec2::ApiPersistentIdData& peer);
 public:
     bool needStartConnection(
         const ApiPersistentIdData& peer,
@@ -300,6 +323,8 @@ public:
 
     void setDelayIntervals(const DelayIntervals& intervals);
     DelayIntervals delayIntervals() const;
+
+    QMap<ApiPersistentIdData, ApiRuntimeData> runtimeInfo() const;
 private:
     QMap<QnUuid, P2pConnectionPtr> m_connections; //< Actual connection list
     QMap<QnUuid, P2pConnectionPtr> m_outgoingConnections; //< Temporary list of outgoing connections
@@ -343,6 +368,7 @@ private:
     int m_connectionTries = 0;
     QElapsedTimer m_outConnectionsTimer;
     std::set<ApiPeerData> m_lastAlivePeers;
+    QMap<ApiPersistentIdData, ApiRuntimeData> m_lastRuntimeInfo;
     DelayIntervals m_intervals;
 };
 

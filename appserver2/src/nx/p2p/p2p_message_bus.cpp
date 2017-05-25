@@ -194,6 +194,8 @@ void MessageBus::gotConnectionFromRemotePeer(
 
 void MessageBus::sendInitialDataToClient(const P2pConnectionPtr& connection)
 {
+    sendRuntimeData(connection, m_lastRuntimeInfo.keys());
+
     QnTransaction<ApiFullInfoData> tran(commonModule()->moduleGUID());
     tran.command = ApiCommand::getFullInfo;
     if (!readApiFullInfoData(connection->userAccessData(), connection->remotePeer(), &tran.params))
@@ -1002,6 +1004,22 @@ struct SendTransactionToTransportFastFuction
     }
 };
 
+void MessageBus::sendRuntimeData(
+    const P2pConnectionPtr& connection,
+    const QList<ApiPersistentIdData>& peers)
+{
+    for (const auto& peer: peers)
+    {
+        auto runtimeInfoItr = m_lastRuntimeInfo.find(peer);
+        if (runtimeInfoItr != m_lastRuntimeInfo.end())
+        {
+            QnTransaction<ApiRuntimeData> tran(ApiCommand::runtimeInfoChanged, peer.id);
+            tran.params = runtimeInfoItr.value();
+            sendTransactionImpl(connection, tran);
+        }
+    }
+}
+
 bool MessageBus::handleSubscribeForDataUpdates(const P2pConnectionPtr& connection, const QByteArray& data)
 {
     bool success = false;
@@ -1034,10 +1052,14 @@ bool MessageBus::handleSubscribeForDataUpdates(const P2pConnectionPtr& connectio
     if (context(connection)->selectingDataInProgress)
     {
         context(connection)->remoteSubscription = newSubscription;
-        return true;
     }
-
-    return selectAndSendTransactions(connection, std::move(newSubscription));
+    else
+    {
+        if (!selectAndSendTransactions(connection, std::move(newSubscription)))
+            return false;
+    }
+    sendRuntimeData(connection, context(connection)->remoteSubscription.values.keys());
+    return true;
 }
 
 bool MessageBus::pushTransactionList(
@@ -1167,6 +1189,42 @@ void MessageBus::gotTransaction(
     }
 }
 
+void MessageBus::cleanupRuntimeInfo(const ec2::ApiPersistentIdData& peer)
+{
+    // If media server was restarted it could get new DB.
+    // At this case we would have two records in m_lastRuntimeInfo list.
+    // As soon as 'old' record will be removed resend runtime notification
+    // to make sure we emit later runtime version.
+    m_lastRuntimeInfo.remove(peer);
+    auto itr = m_lastRuntimeInfo.lowerBound(ApiPersistentIdData(peer.id, QnUuid()));
+    if (itr != m_lastRuntimeInfo.end() && itr.key().id == peer.id)
+    {
+        if (m_handler)
+        {
+            QnTransaction<ApiRuntimeData> tran(ApiCommand::runtimeInfoChanged, peer.id);
+            tran.params = itr.value();
+            m_handler->triggerNotification(tran, NotificationSource::Remote);
+        }
+    }
+}
+
+void MessageBus::gotTransaction(
+    const QnTransaction<ApiRuntimeData> &tran,
+    const P2pConnectionPtr& connection)
+{
+    if (localPeer().isServer() && !isSubscribedTo(connection->remotePeer()))
+        return; // Ignore deprecated transaction.
+
+    ApiPersistentIdData peerId(tran.peerID, tran.params.peer.persistentId);
+    m_lastRuntimeInfo[peerId] = tran.params;
+
+    if (m_handler)
+        m_handler->triggerNotification(tran, NotificationSource::Remote);
+
+    // Proxy transaction to subscribed peers
+    sendTransaction(tran);
+}
+
 template <class T>
 void MessageBus::gotTransaction(
     const QnTransaction<T> &tran,
@@ -1179,10 +1237,10 @@ void MessageBus::gotTransaction(
 
     //NX_ASSERT(connection->localPeerSubscribedTo(peerId)); //< loop
     NX_ASSERT(!context(connection)->isRemotePeerSubscribedTo(peerId)); //< loop
-
+    auto transactionDescriptor = getTransactionDescriptorByTransaction(tran);
     if (m_db)
     {
-        if (!tran.persistentInfo.isNull())
+        if (transactionDescriptor->isPersistent)
         {
 
             std::unique_ptr<ec2::detail::QnDbManager::QnLazyTransactionLocker> dbTran;
@@ -1512,13 +1570,14 @@ void MessageBus::emitPeerFoundLostSignals()
         emit peerFound(peer);
     }
 
-    for (const auto& peer : lostPeers)
+    for (const auto& peer: lostPeers)
     {
         NX_DEBUG(QnLog::P2P_TRAN_LOG,
             lit("Peer %1 has lost peer %2")
             .arg(qnStaticCommon->moduleDisplayName(localPeer().id))
             .arg(qnStaticCommon->moduleDisplayName(peer.id)));
         emit peerLost(peer);
+		cleanupRuntimeInfo(peer);
     }
 
     m_lastAlivePeers = newAlivePeers;
@@ -1534,6 +1593,12 @@ MessageBus::DelayIntervals MessageBus::delayIntervals() const
 {
     QnMutexLocker lock(&m_mutex);
     return m_intervals;
+}
+
+QMap<ApiPersistentIdData, ApiRuntimeData> MessageBus::runtimeInfo() const
+{
+    QnMutexLocker lock(&m_mutex);
+    return m_lastRuntimeInfo;
 }
 
 } // namespace p2p

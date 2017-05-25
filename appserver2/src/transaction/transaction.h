@@ -1301,8 +1301,8 @@ APPLY(9006, restoreDatabase, ApiDatabaseDumpData, \
                        AdminOnlyAccessOut(), /* Check remote peer rights for outgoing transaction */ \
                        LocalTransactionType()) /* local transaction type */ \
 APPLY(9009, updatePersistentSequence, ApiUpdateSequenceData, \
-                       false, \
-                       false, \
+                       true, /* persistent*/ \
+                       false,  /* system*/ \
                        InvalidGetHashHelper(), \
                        EmptyNotificationHelper(), \
                        AdminOnlyAccess(), /* save permission checker */ \

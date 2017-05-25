@@ -8,22 +8,36 @@ namespace ec2 {
 template<class T>
 void sendTransaction(
     QnTransactionMessageBusBase* bus,
-    const QnTransaction<T>& tran,
-    const QnPeerSet& dstPeers = QnPeerSet())
+    const QnTransaction<T>& tran)
 {
     if (auto p2pBus = dynamic_cast<nx::p2p::MessageBus*>(bus))
-        p2pBus->sendTransaction<T>(tran, dstPeers);
+        p2pBus->sendTransaction(tran);
     else if (auto msgBus = dynamic_cast<QnTransactionMessageBus*>(bus))
-        msgBus->sendTransaction<T>(tran, dstPeers);
+        msgBus->sendTransaction(tran);
 }
 
-template <class T>
+template<class T>
 void sendTransaction(
     QnTransactionMessageBusBase* bus,
     const QnTransaction<T>& tran,
-    const QnUuid& dstPeerId)
+    const QnPeerSet& dstPeers)
 {
-    dstPeerId.isNull() ? sendTransaction(bus, tran) : sendTransaction(bus, tran, QnPeerSet() << dstPeerId);
+    if (auto p2pBus = dynamic_cast<nx::p2p::MessageBus*>(bus))
+        p2pBus->sendTransaction(tran, dstPeers);
+    else if (auto msgBus = dynamic_cast<QnTransactionMessageBus*>(bus))
+        msgBus->sendTransaction(tran, dstPeers);
+}
+
+template<class T>
+void sendTransaction(
+    QnTransactionMessageBusBase* bus,
+    const QnTransaction<T>& tran,
+    const QnUuid& peer)
+{
+    if (auto p2pBus = dynamic_cast<nx::p2p::MessageBus*>(bus))
+        p2pBus->sendTransaction(tran, QnPeerSet() << peer);
+    else if (auto msgBus = dynamic_cast<QnTransactionMessageBus*>(bus))
+        msgBus->sendTransaction(tran, QnPeerSet() << peer);
 }
 
 } // namespace ec2

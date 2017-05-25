@@ -24,6 +24,7 @@ public:
     }
 
     bool isRemotePeerSubscribedTo(const ec2::ApiPersistentIdData& peer) const;
+    bool isRemotePeerSubscribedTo(const QnUuid& peer) const;
     bool isLocalPeerSubscribedTo(const ec2::ApiPersistentIdData& peer) const;
     bool updateSequence(const ec2::QnAbstractTransaction& tran);
 

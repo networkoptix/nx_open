@@ -14,7 +14,7 @@
 #include "p2p_serialization.h"
 
 // For debug purpose only
-#define CHECK_SEQUENCE
+//#define CHECK_SEQUENCE
 
 namespace nx {
 namespace p2p {

@@ -14,6 +14,7 @@
 #include <nx/p2p/p2p_connection.h>
 #include <config.h>
 #include <nx/p2p/p2p_serialization.h>
+#include <nx_ec/dummy_handler.h>
 
 namespace nx {
 namespace p2p {
@@ -36,6 +37,11 @@ protected:
     static bool checkDistance(const MessageBus* bus, const ApiPersistentIdData& peer)
     {
         return bus->distanceTo(peer) <= kMaxOnlineDistance;
+    }
+
+    static bool checkRuntimeInfo(const MessageBus* bus, const ApiPersistentIdData& peer)
+    {
+        return bus->runtimeInfo().size() == kInstanceCount;
     }
 
     void checkMessageBus(
@@ -155,6 +161,23 @@ protected:
             cl_logINFO);
     }
 
+    void addRuntimeData(const Appserver2Ptr& server)
+    {
+        auto commonModule = server->moduleInstance()->commonModule();
+        auto connection = server->moduleInstance()->ecConnection();
+        ApiRuntimeData runtimeData;
+        runtimeData.peer.id = commonModule->moduleGUID();
+        runtimeData.peer.instanceId = commonModule->runningInstanceGUID();
+        runtimeData.peer.persistentId = commonModule->dbId();
+        runtimeData.peer.peerType = Qn::PT_Server;
+
+        connection->getMiscManager(Qn::kSystemAccess)
+            ->saveRuntimeInfo(
+                runtimeData,
+                ec2::DummyHandler::instance(),
+                &ec2::DummyHandler::onRequestDone);
+    }
+
     void testMain(std::function<void(std::vector<Appserver2Ptr>&)> serverConnectFunc)
     {
         const_cast<bool&>(ec2::ini().isP2pMode) = true;
@@ -163,7 +186,10 @@ protected:
         QElapsedTimer t;
         t.restart();
         for (const auto& server: m_servers)
+        {
             createData(server, kCamerasCount, kPropertiesPerCamera);
+            addRuntimeData(server);
+        }
         NX_LOG(lit("Create test data time: %1 ms").arg(t.elapsed()), cl_logINFO);
 
         serverConnectFunc(m_servers);
@@ -176,6 +202,9 @@ protected:
 
         // check all peers is able to see each other
         checkMessageBus(&checkDistance, lm("has not online distance"));
+
+        // check all runtime data are received
+        checkMessageBus(&checkRuntimeInfo, lm("missing runtime info"));
 
         // wait for data sync
         int syncDoneCounter = 0;

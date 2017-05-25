@@ -2458,26 +2458,6 @@ void MediaServerProcess::run()
     commonModule()->setSystemIdentityTime(nx::ServerSetting::getSysIdTime(), commonModule()->moduleGUID());
     connect(commonModule(), &QnCommonModule::systemIdentityTimeChanged, this, &MediaServerProcess::at_systemIdentityTimeChanged, Qt::QueuedConnection);
 
-    ec2::ApiRuntimeData runtimeData;
-    runtimeData.peer.id = commonModule()->moduleGUID();
-    runtimeData.peer.instanceId = commonModule()->runningInstanceGUID();
-    runtimeData.peer.peerType = Qn::PT_Server;
-    runtimeData.box = QnAppInfo::armBox();
-    runtimeData.brand = QnAppInfo::productNameShort();
-    runtimeData.customization = compatibilityMode ? QString() : QnAppInfo::customizationName();
-    runtimeData.platform = QnAppInfo::applicationPlatform();
-
-#ifdef __arm__
-    if (QnAppInfo::isBpi() || QnAppInfo::isNx1())
-    {
-        runtimeData.nx1mac = Nx1::getMac();
-        runtimeData.nx1serial = Nx1::getSerial();
-    }
-#endif
-
-    runtimeData.hardwareIds = m_hardwareGuidList;
-    commonModule()->runtimeInfoManager()->updateLocalItem(runtimeData);    // initializing localInfo
-
     std::unique_ptr<ec2::AbstractECConnectionFactory> ec2ConnectionFactory(
         getConnectionFactory(
             Qn::PT_Server,
@@ -2530,6 +2510,28 @@ void MediaServerProcess::run()
         QnSleep::msleep(3000);
     }
     QnAppServerConnectionFactory::setEc2Connection(ec2Connection);
+
+    ec2::ApiRuntimeData runtimeData;
+    runtimeData.peer.id = commonModule()->moduleGUID();
+    runtimeData.peer.instanceId = commonModule()->runningInstanceGUID();
+    runtimeData.peer.persistentId = commonModule()->dbId();
+    runtimeData.peer.peerType = Qn::PT_Server;
+    runtimeData.box = QnAppInfo::armBox();
+    runtimeData.brand = QnAppInfo::productNameShort();
+    runtimeData.customization = compatibilityMode ? QString() : QnAppInfo::customizationName();
+    runtimeData.platform = QnAppInfo::applicationPlatform();
+
+#ifdef __arm__
+    if (QnAppInfo::isBpi() || QnAppInfo::isNx1())
+    {
+        runtimeData.nx1mac = Nx1::getMac();
+        runtimeData.nx1serial = Nx1::getSerial();
+    }
+#endif
+
+    runtimeData.hardwareIds = m_hardwareGuidList;
+    commonModule()->runtimeInfoManager()->updateLocalItem(runtimeData);    // initializing localInfo
+
     const auto& runtimeManager = commonModule()->runtimeInfoManager();
     connect(runtimeManager, &QnRuntimeInfoManager::runtimeInfoAdded, this, &MediaServerProcess::at_runtimeInfoChanged);
     connect(runtimeManager, &QnRuntimeInfoManager::runtimeInfoChanged, this, &MediaServerProcess::at_runtimeInfoChanged);

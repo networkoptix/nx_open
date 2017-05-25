@@ -9,6 +9,13 @@ bool ConnectionContext::isRemotePeerSubscribedTo(const ec2::ApiPersistentIdData&
     return remoteSubscription.values.contains(peer);
 }
 
+bool ConnectionContext::isRemotePeerSubscribedTo(const QnUuid& id) const
+{
+    ec2::ApiPersistentIdData peer(id, QnUuid());
+    auto itr = remoteSubscription.values.lowerBound(peer);
+    return itr != remoteSubscription.values.end() && itr.key().id == id;
+}
+
 bool ConnectionContext::isLocalPeerSubscribedTo(const ec2::ApiPersistentIdData& peer) const
 {
     auto itr = std::find(localSubscription.begin(), localSubscription.end(), peer);
