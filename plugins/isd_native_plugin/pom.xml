@@ -23,7 +23,7 @@
 
         <windows.defines>WIN32_LEAN_AND_MEAN</windows.defines>
 
-        <rdep.packages>openssl vmux cpro</rdep.packages>
+        <rdep.packages>openssl vmux</rdep.packages>
     </properties>
     <dependencies>
         <dependency>

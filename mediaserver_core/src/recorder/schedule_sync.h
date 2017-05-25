@@ -4,6 +4,7 @@
 #include <atomic>
 #include <vector>
 #include <map>
+#include <nx/utils/std/future.h>
 
 #ifndef Q_MOC_RUN
 #include <boost/optional.hpp>
@@ -157,7 +158,7 @@ private:
     SyncDataMap           m_syncData;
     mutable QnMutex       m_syncDataMutex;
     CopyError             m_lastError;
-    std::promise<void>    m_stopPromise;
+    nx::utils::promise<void>    m_stopPromise;
 };
 
 #endif
