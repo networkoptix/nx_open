@@ -39,6 +39,13 @@ function(detect_package_versions)
         set(_ffmpeg_version "3.1.1-bananapi")
     endif()
 
+    if(box STREQUAL "rpi")
+        set(_qt_version "5.6.1")
+        set(_quazip_version "0.7.2")
+        set(_openssl_version "1.0.0j")
+        set(_festival_version "2.1")
+    endif()
+
     if(box STREQUAL "isd")
         set(_qt_version "5.6.1")
         set(_openssl_version "1.0.0j")
