@@ -1,0 +1,384 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>Utterance structure</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REL="HOME"
+TITLE="Building Synthetic Voices"
+HREF="book1.html"><LINK
+REL="UP"
+TITLE="A Practical Speech Synthesis System"
+HREF="c180.html"><LINK
+REL="PREVIOUS"
+TITLE="A Practical Speech Synthesis System"
+HREF="c180.html"><LINK
+REL="NEXT"
+TITLE="Modules"
+HREF="x380.html"></HEAD
+><BODY
+CLASS="SECT1"
+BGCOLOR="#FFFFFF"
+TEXT="#000000"
+LINK="#0000FF"
+VLINK="#840084"
+ALINK="#0000FF"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="3"
+ALIGN="center"
+>Building Synthetic Voices</TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="bottom"
+><A
+HREF="c180.html"
+ACCESSKEY="P"
+>&#60;&#60;&#60; Previous</A
+></TD
+><TD
+WIDTH="80%"
+ALIGN="center"
+VALIGN="bottom"
+>A Practical Speech Synthesis System</TD
+><TD
+WIDTH="10%"
+ALIGN="right"
+VALIGN="bottom"
+><A
+HREF="x380.html"
+ACCESSKEY="N"
+>Next &#62;&#62;&#62;</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="SECT1"
+><H1
+CLASS="SECT1"
+><A
+NAME="AEN261"
+>Utterance structure</A
+></H1
+><P
+>&#13;
+
+The basic building block for Festival is the <I
+CLASS="EMPHASIS"
+>utterance</I
+>. The 
+structure consists of a set of <I
+CLASS="EMPHASIS"
+>relations</I
+> over a set of 
+<I
+CLASS="EMPHASIS"
+>items</I
+>. Each item represents a object such as a word, segment, 
+syllable, etc. while relations relate these items together. An item may 
+appear in multiple relations, such as a segment will be in a 
+<CODE
+CLASS="VARNAME"
+>Segment</CODE
+> relation and also in the <CODE
+CLASS="VARNAME"
+>SylStructure</CODE
+> relation. 
+Relations define an ordered structure over the items within them, in 
+general these may be arbitrary graphs but in practice so far we have 
+only used <I
+CLASS="EMPHASIS"
+>lists</I
+> and <I
+CLASS="EMPHASIS"
+>trees</I
+> Items may contain a number of 
+features. </P
+><P
+>There are no built-in relations in Festival and the names and use of 
+them is controlled by the particular modules used to do synthesis. 
+Language, voice and module specific relations can easy be created and 
+manipulated. However within our basic voices we have followed a number 
+of conventions that should be followed if you wish to use some of the 
+existing modules. </P
+><P
+>&#13;The relation names used will depend on the particular structure chosen 
+for your voice. So far most of our released voices have the same 
+basic structure though some of our research voices contain quite 
+a different set of relations. For our basic English voices the 
+relations used are as follows 
+<P
+></P
+><DIV
+CLASS="VARIABLELIST"
+><DL
+><DT
+><CODE
+CLASS="VARNAME"
+>Text</CODE
+></DT
+><DD
+><P
+>&#13;Contains a single item which contains a feature with the input character 
+string that is being synthesized </P
+></DD
+><DT
+><CODE
+CLASS="VARNAME"
+>Token</CODE
+></DT
+><DD
+><P
+>&#13;A list of trees where each root of each tree is the white space 
+separated tokenized object from the input character string. Punctuation 
+and whitespace has been stripped and placed on features on these token 
+items. The daughters of each of these roots are the list of words 
+that the token is associated with. In many cases this is a one 
+to one relationship, but in general it is one to zero or 
+more. For example tokens comprising of digits will typically 
+be associated with a number of words. </P
+></DD
+><DT
+><CODE
+CLASS="VARNAME"
+>Word </CODE
+></DT
+><DD
+><P
+>&#13;
+The words in the utterance. By <I
+CLASS="EMPHASIS"
+>word</I
+> we typically mean something 
+that can be given a pronunciation from a lexicon (or letter-to-sound 
+rules). However in most of our voices we distinguish pronunciation by 
+the words and a part of speech feature. Words with also be leaves of the 
+<CODE
+CLASS="VARNAME"
+>Token</CODE
+> relation, leaves of the <CODE
+CLASS="VARNAME"
+>Phrase</CODE
+> relation and roots of 
+the <CODE
+CLASS="VARNAME"
+>SylStructure</CODE
+> relation. </P
+></DD
+><DT
+><CODE
+CLASS="VARNAME"
+>Phrase</CODE
+></DT
+><DD
+><P
+>&#13;A simple list of trees representing the prosodic phrasing on the 
+utterance. In our voices we only have one level of prosodic phrase 
+below the utterance (though you can easily add a deeper hierarchy 
+if your models require it). The tree roots are labeled with 
+the phrase type and the leaves of these trees are in the 
+<CODE
+CLASS="VARNAME"
+>Word</CODE
+> relation. </P
+></DD
+><DT
+><CODE
+CLASS="VARNAME"
+>Syllable </CODE
+></DT
+><DD
+><P
+>&#13;A simple list of syllable items. These syllable items are intermediate 
+nodes in the <CODE
+CLASS="VARNAME"
+>SylStructure</CODE
+> relation allowing access to the words 
+these syllables are in and the segments that are in these syllables. 
+In this format no further onset/coda distinction is made explicit but can 
+be derived from this information. </P
+></DD
+><DT
+><CODE
+CLASS="VARNAME"
+>Segment </CODE
+></DT
+><DD
+><P
+>&#13;A simple list of segment (phone) items. These form the leaves of 
+the <CODE
+CLASS="VARNAME"
+>SylStructure</CODE
+> relation through which we can find where each 
+segment is placed within its syllable and word. By convention 
+silence phones do not appear in any syllable (or word) but will 
+exist in the segment relation. </P
+></DD
+><DT
+><CODE
+CLASS="VARNAME"
+>SylStructure</CODE
+></DT
+><DD
+><P
+>&#13;A list of tree structures over the items in the <CODE
+CLASS="VARNAME"
+>Word</CODE
+>, 
+<CODE
+CLASS="VARNAME"
+>Syllable</CODE
+> and <CODE
+CLASS="VARNAME"
+>Segment</CODE
+> items. </P
+></DD
+><DT
+><CODE
+CLASS="VARNAME"
+>IntEvent</CODE
+></DT
+><DD
+><P
+>&#13;A simple list of intonation events (accents and boundaries). 
+These are related to syllables through the <CODE
+CLASS="VARNAME"
+>Intonation</CODE
+> relation. </P
+></DD
+><DT
+><CODE
+CLASS="VARNAME"
+>Intonation</CODE
+></DT
+><DD
+><P
+>&#13;A list of trees whose roots are items in the <CODE
+CLASS="VARNAME"
+>Syllable</CODE
+> relation, 
+and daughters are in the <CODE
+CLASS="VARNAME"
+>IntEvent</CODE
+> relation. It is assumed that a 
+syllable may have a number of intonation events associated with it (at 
+least accents and boundaries), but an intonation event may only by 
+associated with one syllable. </P
+></DD
+><DT
+><CODE
+CLASS="VARNAME"
+>Wave</CODE
+></DT
+><DD
+><P
+>&#13;A relation consisting of a single item that has a feature with the 
+synthesized waveform. </P
+></DD
+><DT
+><CODE
+CLASS="VARNAME"
+>Target</CODE
+></DT
+><DD
+><P
+>&#13;A list of trees whose roots are segments and daughters are 
+F0 target points. This is only used by some intonation modules. </P
+></DD
+><DT
+><CODE
+CLASS="VARNAME"
+>Unit, SourceSegments, Frames, SourceCoef TargetCoef</CODE
+></DT
+><DD
+><P
+>A number of relations used the the <CODE
+CLASS="VARNAME"
+>UniSyn</CODE
+> module. </P
+></DD
+></DL
+></DIV
+></P
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="c180.html"
+ACCESSKEY="P"
+>&#60;&#60;&#60; Previous</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="book1.html"
+ACCESSKEY="H"
+>Home</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="x380.html"
+ACCESSKEY="N"
+>Next &#62;&#62;&#62;</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>A Practical Speech Synthesis System</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="c180.html"
+ACCESSKEY="U"
+>Up</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>Modules</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

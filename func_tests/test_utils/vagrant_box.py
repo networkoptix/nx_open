@@ -113,7 +113,7 @@ class Vagrant(object):
 
     def _cleanup_vms(self, vms_name):
         if not self._vbox_manage.does_vms_exist(vms_name): return
-        if self._vbox_manage.get_vms_state(vms_name) != 'poweroff':
+        if self._vbox_manage.get_vms_state(vms_name) not in ['poweroff', 'aborted']:
             self._vbox_manage.poweroff_vms(vms_name)
         self._vbox_manage.delete_vms(vms_name)
 

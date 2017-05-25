@@ -1,0 +1,589 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>Labeling with Full Acoustic Models</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REL="HOME"
+TITLE="Building Synthetic Voices"
+HREF="book1.html"><LINK
+REL="UP"
+TITLE="Labeling Speech"
+HREF="c3245.html"><LINK
+REL="PREVIOUS"
+TITLE="Labeling Speech"
+HREF="c3245.html"><LINK
+REL="NEXT"
+TITLE="Prosodic Labeling"
+HREF="x3361.html"></HEAD
+><BODY
+CLASS="SECT1"
+BGCOLOR="#FFFFFF"
+TEXT="#000000"
+LINK="#0000FF"
+VLINK="#840084"
+ALINK="#0000FF"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="3"
+ALIGN="center"
+>Building Synthetic Voices</TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="bottom"
+><A
+HREF="c3245.html"
+ACCESSKEY="P"
+>&#60;&#60;&#60; Previous</A
+></TD
+><TD
+WIDTH="80%"
+ALIGN="center"
+VALIGN="bottom"
+>Labeling Speech</TD
+><TD
+WIDTH="10%"
+ALIGN="right"
+VALIGN="bottom"
+><A
+HREF="x3361.html"
+ACCESSKEY="N"
+>Next &#62;&#62;&#62;</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="SECT1"
+><H1
+CLASS="SECT1"
+><A
+NAME="BSV-SPHINX-SECT"
+>Labeling with Full Acoustic Models</A
+></H1
+><P
+>A second method for labeling is also available.  Here we train full
+acoustic HMM models on the recorded data.  We build a database
+specific speech recognition engine and use that engine to label the
+data.  As this method can work from recorded prompts plus orthography
+(and a method to produce phone strings from that orthography), this
+works well when you have no synthesizer to bootstrap from.  However
+such training requires that the database has a suitable number of
+examples of triphones in it.  Here we have an advantage.  As the
+requirements for a speech synthesis data, that it is has a good
+distribution of phonemes, is the same as that require for acoustic
+modeling, a good speech synthesis databases should produce a good
+acoustic model for labeling.  Although there is no neatly defined
+definition of what "good" is, we can say that you probably need at
+least 400 utterances, and at least 15,000 segments.  400 sentences all
+starting with "The time is now, ..." probably wont do.</P
+><P
+>Other large database synthesis techniques use the same basic
+techniques to not just label the database but define the units to be
+selected.  [<SPAN
+CLASS="CITATION"
+>Donovan95</SPAN
+>] and others label there data with an
+acoustic model build (with Baum-Welch training) and use the defined
+HMM states (typically 3-5 per phoneme) as the units for selecting.
+[<SPAN
+CLASS="CITATION"
+>Tokuda9?</SPAN
+>] actually use the state models themselves to
+generate the units, but again use the same basic techniques for
+labeling.</P
+><P
+>For training we use Carnegie Mellon University's SphinxTrain and
+Sphinx speech recognition system.  There are other accessible training
+systems out there, HTK being the most famous, but SphinxTrain is the
+one we are most familiar with, and we have some control over its
+updates so can better ensure it remains appropriate for our synthesis
+labeling task.  As voice building is complex, acoustic model building
+is similarly so.  SphinxTrain has been reliably used to labeling
+hundreds of databases in many different languages but making it
+utterly robust against unseen data is very hard so although we have
+tried to minimize the chance of things going wrong (in non-obvious
+ways), we will not be surprised that when you try this processing on
+some new database there may be some problems.</P
+><P
+>SphinxTrain (and sphinx) have a number of restrictions which we need
+to keep in mind when labeling a set of prompts.  These a re code
+limitations, and may be fixed in future versions of
+SphinxTrain/Sphinx.  For the most part the are not actually serious
+restrictions, just minor prompts that the setup scripts need to work
+around.  The scripts cater for these limitations, and mostly will
+all go unseen by the user, unless of course something goes wrong.</P
+><P
+>Specifically, sphinx folds case on all phoneme names, so the scripts
+ensure that phone names are distinct irrespective of upper and lower
+case.  This is done by prepending "CAP" in front of upper case phone
+names.  Secondly there can only be up to 255 phones.  This is likely
+only to be problem when SphinxTrain phones are made more elaborate
+than simple phones, so mostly wont be a problem.  The third noted
+problem is limitation on the length and complexity of utterances.  The
+transcript files has a line length limit as does the lexicon.  For
+"nice" utterances this is never a problem but for some of our
+databases especially those with paragraph length utterances, the
+training and/or the labeling itself fails.</P
+><P
+>Sphinx2 is a real-time speech recognition system made available under
+a free software license.  It is available from <A
+HREF="http://cmusphinx.org"
+TARGET="_top"
+>http://cmusphinx.org</A
+>.  The source
+is available from
+<A
+HREF="http://sourceforge.net/projects/cmusphinx/"
+TARGET="_top"
+>http://sourceforge.net/projects/cmusphinx/</A
+>.  For these
+tests we used version <TT
+CLASS="FILENAME"
+>sphinx2-0.4.tar.gz</TT
+>.
+SphinxTrain is a set of programs and scripts that allow the building
+of acoustic models for Sphinx2 (and Sphinx3).  You can download
+SphinxTrain from <A
+HREF="http://www.speech.cs.cmu.edu/SphinxTrain/"
+TARGET="_top"
+>http://sourceforge.net/projects/cmusphinx/</A
+>.
+Note that Sphinx2 must be compiled and installed while SphinxTrain can
+run in place.  On many systems steps like these should give you
+working versions.  
+
+<A
+NAME="AEN3286"
+></A
+><BLOCKQUOTE
+CLASS="BLOCKQUOTE"
+><P
+CLASS="LITERALLAYOUT"
+>&nbsp;<br>
+&nbsp;&nbsp;&nbsp;tar&nbsp;zxvf&nbsp;sphinx2-0.4.tar.gz&nbsp;<br>
+&nbsp;&nbsp;&nbsp;mkdir&nbsp;sphinx2-runtime&nbsp;<br>
+&nbsp;&nbsp;&nbsp;export&nbsp;SPHINX2DIR=`pwd`/sphinx2-runtime<br>
+&nbsp;&nbsp;&nbsp;cd&nbsp;sphinx2&nbsp;./configure&nbsp;--prefix=$SPHINX2DIR&nbsp;<br>
+&nbsp;&nbsp;&nbsp;make&nbsp;<br>
+&nbsp;&nbsp;&nbsp;make&nbsp;install&nbsp;<br>
+&nbsp;&nbsp;&nbsp;cd&nbsp;..&nbsp;&nbsp;<br>
+&nbsp;&nbsp;&nbsp;tar&nbsp;zxvf&nbsp;SphinxTrain-0.9.1-beta.tar.gz&nbsp;<br>
+&nbsp;&nbsp;&nbsp;cd&nbsp;SphinxTrain&nbsp;<br>
+&nbsp;&nbsp;&nbsp;./configure&nbsp;<br>
+&nbsp;&nbsp;&nbsp;make&nbsp;<br>
+&nbsp;&nbsp;export&nbsp;SPHINXTRAINDIR=`pwd`/SphinxTrain&nbsp;</P
+></BLOCKQUOTE
+>&#13;</P
+><P
+>Now that we have sphinx2 and SphinxTrain installed we can prepare our
+FestVox voice for training.  Before starting the training process you
+must create utterance files for each of the prompts.  This can be done
+with the conventional festival script.
+
+<A
+NAME="AEN3289"
+></A
+><BLOCKQUOTE
+CLASS="BLOCKQUOTE"
+><P
+CLASS="LITERALLAYOUT"
+>&nbsp;&nbsp;festival&nbsp;-b&nbsp;festvox/build_clunits.scm&nbsp;'(build_prompts&nbsp;"etc/txt.done.data")'</P
+></BLOCKQUOTE
+>
+
+This generates label files in <TT
+CLASS="FILENAME"
+>prompt-lab/</TT
+> and waveform
+files in <TT
+CLASS="FILENAME"
+>prompt-wav/</TT
+> which technically are not
+needed for this labeling process.  Utterances are saved in
+<TT
+CLASS="FILENAME"
+>prompt-utt/</TT
+>.  At first it was thought that the prompt
+file <TT
+CLASS="FILENAME"
+>etc/txt.done.data</TT
+> would be sufficient but the 
+synthesis process is likely to resolve pronunciations in context,
+though post-lexical rules etc, that would make naive conversion
+of the words in the prompt list to phone lists wrong in general so
+the transcription for SphinxTrain is generated from the utterances
+themselves which ensures that they resulting labels can be trivially
+mapped back after labeling.  Thus the word names generate by
+in this process are somewhat arbitrary though often human readable.
+The word names are the word themselves plus a number (to ensure
+uniqueness in pronunciations).  Only "nice" words are printed as
+is, i.e. those containing only alphabetic characters, others
+are mapped to the word "w" with an appropriate number following.
+Thus hyphenated, quoted, etc words will not cause a problem for
+the SphinxTrain code.</P
+><P
+>After the prompt utterances are generated we can setup the SphinxTrain
+directory <TT
+CLASS="FILENAME"
+>st/</TT
+>.  All processing and output files
+are done within that directory until the file conversion of labels
+back into the voice's own phone set and put in
+<TT
+CLASS="FILENAME"
+>lab/</TT
+>.  Note this process takes a long time, at
+least several hours and possible several days if you have a
+particularly slow machine or particularly large database.  Also this
+may require around a half a gigabyte of space.</P
+><P
+>The script <TT
+CLASS="FILENAME"
+>./bin/sphinxtrain</TT
+> does the work of converting
+the FestVox database into a form suitable for SphinxTrain.  In all
+there are 6 steps: setup, building files, converting waveforms,
+the training itself, alignment and conversion of label files back into
+FestVox format.  The training stage itself consist of 11
+parts and by far takes the most time.</P
+><P
+>This script requires the environment variables
+<TT
+CLASS="FILENAME"
+>SPHINXTRAINDIR</TT
+> and
+<TT
+CLASS="FILENAME"
+>SPHINX2DIR</TT
+> to be set point to compiled versions
+of SphinxTrain and Sphinx2 respectively, as shown above.</P
+><P
+>The first step is to set up the sub-directory <TT
+CLASS="FILENAME"
+>st/</TT
+>
+where the training will take place.
+
+<A
+NAME="AEN3305"
+></A
+><BLOCKQUOTE
+CLASS="BLOCKQUOTE"
+><P
+CLASS="LITERALLAYOUT"
+>&nbsp;&nbsp;./bin/sphinxtrain&nbsp;setup</P
+></BLOCKQUOTE
+>
+
+The training database name will be taken from your 
+<TT
+CLASS="FILENAME"
+>etc/voice.defs</TT
+>, if you don't have one of those
+use 
+
+<A
+NAME="AEN3308"
+></A
+><BLOCKQUOTE
+CLASS="BLOCKQUOTE"
+><P
+CLASS="LITERALLAYOUT"
+>&nbsp;&nbsp;$FESTVOXDIR/src/general/guess_voice_defs</P
+></BLOCKQUOTE
+>&#13;</P
+><P
+>The next stage is to convert the database prompt list into a
+transcription file suitable for SphinxTrain,; construct a lexicon, and
+phone file etc.  All of the generate files will be put in
+<TT
+CLASS="FILENAME"
+>st/etc/</TT
+>.  Note because of various limitations in
+Sphinx2 and SphinxTrain, the lexicon (<TT
+CLASS="FILENAME"
+>.dic</TT
+>), and
+transcription (<TT
+CLASS="FILENAME"
+>.transcription</TT
+>) will not have what
+you might thing are sensible values.  The word names are take from the
+utts if they consist of only upper and lower case characters.  A
+number is added to make them unique. Also if another work exists with
+the same pronunciation but different word it may be assigned a differ
+name from what you expect.  The word names in the SphinxTrain files
+are only there to help debugging and are really referring to specific
+instances of words in the utterance (to ensure the pronunciations are
+preserved with respect to homograph disambiguation and post lexical
+rules. If people complain about these being confusing I
+will make all words simple "w" followed by a number.
+
+<A
+NAME="AEN3314"
+></A
+><BLOCKQUOTE
+CLASS="BLOCKQUOTE"
+><P
+CLASS="LITERALLAYOUT"
+>&nbsp;&nbsp;./bin/sphinxtrain&nbsp;files</P
+></BLOCKQUOTE
+>&#13;</P
+><P
+>The next stage is to generate the mfcc's for SphinxTrain unfortunately
+these must be in a different format from the mfcc's used in FestVox,
+also SphinxTrain only supports raw headered files, and NIST header
+files, so we copy the waveform files in <TT
+CLASS="FILENAME"
+>wav/</TT
+> into
+the <TT
+CLASS="FILENAME"
+>st/wav/</TT
+> directory converting them to NIST
+headers
+
+<A
+NAME="AEN3319"
+></A
+><BLOCKQUOTE
+CLASS="BLOCKQUOTE"
+><P
+CLASS="LITERALLAYOUT"
+>&nbsp;&nbsp;./bin/sphinxtrain&nbsp;feats</P
+></BLOCKQUOTE
+>&#13;</P
+><P
+>&#13;Now we can start the training itself.  This consists of eleven stages
+each which will be run automatically.
+
+<P
+></P
+><UL
+COMPACT="COMPACT"
+><LI
+STYLE="list-style-type: disc"
+><P
+>&#13;Module 0 checks the basic files for training.  There should be no errors
+at this stage&#13;</P
+></LI
+><LI
+STYLE="list-style-type: disc"
+><P
+>&#13;Module 1 builds the vector quantization parameters.&#13;</P
+></LI
+><LI
+STYLE="list-style-type: disc"
+><P
+>&#13;Module 2 builds context-independent phone models.  This runs Baum-Welch over
+the data building context-independent HMM phone models.  This runs
+for several passes until convergences (somewhere between 4 and 15 
+passes).  There may be some errors on some files (especially long,
+or badly transcribed ones), but a small number of errors here (with 
+the identified file being "ignored" should be ok.&#13;</P
+></LI
+><LI
+STYLE="list-style-type: disc"
+><P
+>&#13;Module 3 makes the untied model definition.&#13;</P
+></LI
+><LI
+STYLE="list-style-type: disc"
+><P
+>&#13;Module 4 builds context dependent models.&#13;</P
+></LI
+><LI
+STYLE="list-style-type: disc"
+><P
+>&#13;Module 5a builds trees for asking questions for tied-states.&#13;</P
+></LI
+><LI
+STYLE="list-style-type: disc"
+><P
+>&#13;Module 5b builds trees.  One for each state in each HMM.  This part
+takes the longest time.&#13;</P
+></LI
+><LI
+STYLE="list-style-type: disc"
+><P
+>&#13;Module 6 prunes trees.&#13;</P
+></LI
+><LI
+STYLE="list-style-type: disc"
+><P
+>&#13;Module 7 retrain context dependent models with tied states.&#13;</P
+></LI
+><LI
+STYLE="list-style-type: disc"
+><P
+>&#13;Module 8 deleted interpolation&#13;</P
+></LI
+><LI
+STYLE="list-style-type: disc"
+><P
+>&#13;Module 9 convert the generated models to Sphinx2 format&#13;</P
+></LI
+></UL
+>&#13;</P
+><P
+>All of the above stages should be run together with the command
+as 
+
+<A
+NAME="AEN3346"
+></A
+><BLOCKQUOTE
+CLASS="BLOCKQUOTE"
+><P
+CLASS="LITERALLAYOUT"
+>&nbsp;&nbsp;./bin/sphinxtrain&nbsp;train</P
+></BLOCKQUOTE
+>&#13;</P
+><P
+>Once trained we can use these models to align the labels against the
+recorded prompts.  
+
+<A
+NAME="AEN3349"
+></A
+><BLOCKQUOTE
+CLASS="BLOCKQUOTE"
+><P
+CLASS="LITERALLAYOUT"
+>&nbsp;&nbsp;./bin/sphinxtrain&nbsp;align</P
+></BLOCKQUOTE
+>
+
+Some utterances may fail to be labeled at this point, either because
+they are too long, or their orthography does not match the acoustics.
+There is not simple solution for this at present.  For some you wimple
+not get a label file, and you can either label the utterance by hand,
+exclude if from the data, or split it into a smaller file.  Other
+times Sphinx2 will crash and you'll need to remove the 
+utterances from the <TT
+CLASS="FILENAME"
+>st/etc/*.align</TT
+> and
+<TT
+CLASS="FILENAME"
+>st/etc/*.ctl</TT
+> and run the script
+<TT
+CLASS="FILENAME"
+>./bin/sphinx_lab</TT
+> by hand.&#13;</P
+><P
+>The final stage is to take the output from the alignment and convert
+the labels back into their FestVox format.  If everything worked
+to this stage, this final stage should be uneventful.
+
+<A
+NAME="AEN3355"
+></A
+><BLOCKQUOTE
+CLASS="BLOCKQUOTE"
+><P
+CLASS="LITERALLAYOUT"
+>&nbsp;&nbsp;./bin/sphinxtrain&nbsp;labs</P
+></BLOCKQUOTE
+></P
+><P
+>&#13;There should be a set of reasonable phone labels in
+<TT
+CLASS="FILENAME"
+>prompt-lab/</TT
+>.  These can the be
+merged into the original utterances with the command
+
+<A
+NAME="AEN3359"
+></A
+><BLOCKQUOTE
+CLASS="BLOCKQUOTE"
+><P
+CLASS="LITERALLAYOUT"
+>&nbsp;&nbsp;festival&nbsp;-b&nbsp;festvox/build_clunits.scm&nbsp;'(build_utts&nbsp;"etc/txt.done.data")'</P
+></BLOCKQUOTE
+>&#13;</P
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="c3245.html"
+ACCESSKEY="P"
+>&#60;&#60;&#60; Previous</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="book1.html"
+ACCESSKEY="H"
+>Home</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="x3361.html"
+ACCESSKEY="N"
+>Next &#62;&#62;&#62;</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>Labeling Speech</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="c3245.html"
+ACCESSKEY="U"
+>Up</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>Prosodic Labeling</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

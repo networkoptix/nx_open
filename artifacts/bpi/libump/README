@@ -1,0 +1,30 @@
+This repository contains the ARMs Universal Memory Provider userspace
+library. This library is a requirement for ARMs binary Mali driver.
+
+This software only depends on libc and a suitable kernel driver.
+
+Direct Installation:
+--------------------
+
+Run:
+
+> autoreconf -i
+> ./configure
+> make
+> make install
+
+to install libUMP into your system.
+
+Debian package:
+---------------
+
+For this you will need to have the build-essential, autoconf and libtool
+packages installed.
+
+By running:
+
+> dpkg-buildpackage -b
+
+you will create debian packages suited for your system in the upper
+level directory. The -b argument will build only binary packages and
+will skip trying to create a source package from the git tree.

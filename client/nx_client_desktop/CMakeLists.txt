@@ -50,7 +50,6 @@ if(LINUX)
     target_link_libraries(nx_client_desktop PRIVATE Qt5::X11Extras Xss Xfixes X11)
 endif()
 
-if(WIN32)
-    nx_rdep_add_package(directx)
+if(WINDOWS)
     target_link_libraries(nx_client_desktop PRIVATE d3d9 Winmm)
 endif()

@@ -23,7 +23,7 @@ extern "C"
 #include <core/resource_access/resource_access_manager.h>
 #include <core/resource/user_resource.h>
 #include <nx/streaming/archive_stream_reader.h>
-#include <nx/network/http/httptypes.h>
+#include <nx/network/http/http_types.h>
 #include <nx/utils/string.h>
 
 #include <network/tcp_connection_priv.h>
@@ -256,8 +256,8 @@ public:
 
 static const AVCodecID DEFAULT_VIDEO_CODEC = AV_CODEC_ID_H263P;
 
-QnRtspConnectionProcessor::QnRtspConnectionProcessor(QSharedPointer<AbstractStreamSocket> socket, QnTcpListener* _owner):
-    QnTCPConnectionProcessor(new QnRtspConnectionProcessorPrivate, socket, _owner->commonModule())
+QnRtspConnectionProcessor::QnRtspConnectionProcessor(QSharedPointer<AbstractStreamSocket> socket, QnTcpListener* owner):
+    QnTCPConnectionProcessor(new QnRtspConnectionProcessorPrivate, socket, owner)
 {
 }
 

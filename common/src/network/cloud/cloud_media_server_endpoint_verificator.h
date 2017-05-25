@@ -19,7 +19,7 @@ public:
         const nx::network::cloud::AddressEntry& targetHostAddress,
         nx::utils::MoveOnlyFunc<void(VerificationResult)> completionHandler) override;
 
-    virtual SystemError::ErrorCode lastSysErrorCode() const override;
+    virtual SystemError::ErrorCode lastSystemErrorCode() const override;
 
     virtual std::unique_ptr<AbstractStreamSocket> takeSocket() override;
 
@@ -28,7 +28,7 @@ protected:
 
 private:
     const nx::String m_connectSessionId;
-    SystemError::ErrorCode m_prevSystemError = SystemError::noError;
+    SystemError::ErrorCode m_lastSystemErrorCode = SystemError::noError;
     boost::optional<std::chrono::milliseconds> m_timeout;
     nx_http::AsyncHttpClientPtr m_httpClient;
     SocketAddress m_endpointToVerify;

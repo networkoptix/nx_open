@@ -1,0 +1,54 @@
+/**
+
+@page tilt_synthesis_manual tilt_synthesis
+@brief *Generate F0 contours from Tilt descriptions*
+@tableofcontents
+
+@section synopsis Synopsis
+
+@SYNOPSIS@
+
+`tilt_synthesis` generates a F0 contour, given a label file containing
+parameterised Tilt or RFC events.
+
+A detailed description of the Tilt intonation model can be found in the
+\ref tilt-overview section.
+
+@section options Options
+
+@OPTIONS@
+
+@section tilt_synthesis-input Input Intonation Files
+
+The input should be a label file containing the tilt parameters for the
+events in feature format. An example, in xlabel format, is shown below:
+
+    intonation_style tilt
+    #
+    0.29 26     phrase_start ; ev.f0 115.234 ; position 0.29 ; 
+    0.53 26     a ; int_event 1 ; ev.f0 118.171 ; position 0.53 ; tilt.amp 21.8602 ; 
+                  tilt.dur 0.26 ; tilt.tilt -0.163727 ; 
+    0.77 26     a ; int_event 1 ; ev.f0 112.694 ; position 0.77 ; tilt.amp 27.0315 ; 
+                  tilt.dur 0.32 ; tilt.tilt -0.446791 ; 
+    1.53 26     a ; int_event 1 ; ev.f0 100.83 ; position 1.53 ; tilt.amp 7.507 ; 
+                  tilt.dur 0.22 ; tilt.tilt -0.296317 ; 
+    1.79 26     phrase_end ; ev.f0 92.9785 ; position 1.79 ; 
+
+tilt_synthesis can also generate F0 contours from RFC parameters:
+
+    intonation_style rfc
+    #
+    0.29 26     phrase_start ; ev.f0 115.234 ; position 0.29 ; 
+    0.53 26     a ; ev.f0 118.171 ; rfc.rise_amp 8.19178 ; rfc.rise_dur 0.12 ; 
+                   rfc.fall_amp -13.6684 ; rfc.fall_dur 0.14 ; position 0.53 ;
+    0.77 26     a ; ev.f0 112.694 ; rfc.rise_amp 6.50673 ; rfc.rise_dur 0.1 ;
+                    rfc.fall_amp -20.5248 ; rfc.fall_dur 0.22 ; position 0.77 ; 
+    1.53 26     a ; ev.f0 100.83 ; rfc.rise_amp 1.55832 ; rfc.rise_dur 0.11 ; 
+                    rfc.fall_amp -6.09238 ; rfc.fall_dur 0.11 ; position 1.53 ; 
+    1.79 26     phrase_end ; ev.f0 92.9785 ; position 1.79 ; 
+
+The feature in the header, "intonation_style tilt" or
+"intonation_style rfc" is needed for the tilt_synthesis program to know which
+type of synthesis to perform.
+
+*/

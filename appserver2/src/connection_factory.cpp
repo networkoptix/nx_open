@@ -1231,7 +1231,7 @@ void Ec2DirectConnectionFactory::registerRestHandlers(QnRestProcessorPool* const
     *     exists, omitted fields will not be changed.
     * %param name Tour name.
     * %param items List of the layout tour items.
-    * %param item.layoutId Layout unique id.
+    * %param item.resourceId Resource unique id. Can be a layout or a camera or something else.
     * %param item.delayMs Delay between layouts switching in milliseconds.
     * %// AbstractLayoutTourManager::save
     */

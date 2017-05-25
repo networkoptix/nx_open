@@ -46,7 +46,7 @@ int main(int argc, const char* argv[])
     SocketGlobals::InitGuard socketGlobalsGuard;
 
     // common options
-    nx::utils::log::initializeGlobaly(args);
+    nx::utils::log::initializeGlobally(args);
     SocketGlobals::applyArguments(args);
 
     if (args.get("disable-udp"))

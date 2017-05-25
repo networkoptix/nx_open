@@ -7,7 +7,7 @@
 #include <quazip/quazip.h>
 #include <quazip/quazipfile.h>
 
-#include <nx/network/http/httptypes.h>
+#include <nx/network/http/http_types.h>
 #include <nx/utils/gzip/gzip_compressor.h>
 
 #include <media_server/serverutil.h>
@@ -98,8 +98,10 @@ class QnFileConnectionProcessorPrivate : public QnTCPConnectionProcessorPrivate
 public:
 };
 
-QnFileConnectionProcessor::QnFileConnectionProcessor(QSharedPointer<AbstractStreamSocket> socket, QnTcpListener* owner) :
-    QnTCPConnectionProcessor(new QnTCPConnectionProcessorPrivate, socket, owner->commonModule())
+QnFileConnectionProcessor::QnFileConnectionProcessor(
+    QSharedPointer<AbstractStreamSocket> socket, QnTcpListener* owner)
+:
+    QnTCPConnectionProcessor(new QnTCPConnectionProcessorPrivate, socket, owner)
 {
 }
 

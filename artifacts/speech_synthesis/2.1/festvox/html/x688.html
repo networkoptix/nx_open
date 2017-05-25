@@ -1,0 +1,239 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>Extracting features from utterances</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REL="HOME"
+TITLE="Building Synthetic Voices"
+HREF="book1.html"><LINK
+REL="UP"
+TITLE="A Practical Speech Synthesis System"
+HREF="c180.html"><LINK
+REL="PREVIOUS"
+TITLE="Utterance building"
+HREF="x591.html"><LINK
+REL="NEXT"
+TITLE="Building Synthetic Voices"
+HREF="p710.html"></HEAD
+><BODY
+CLASS="SECT1"
+BGCOLOR="#FFFFFF"
+TEXT="#000000"
+LINK="#0000FF"
+VLINK="#840084"
+ALINK="#0000FF"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="3"
+ALIGN="center"
+>Building Synthetic Voices</TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="bottom"
+><A
+HREF="x591.html"
+ACCESSKEY="P"
+>&#60;&#60;&#60; Previous</A
+></TD
+><TD
+WIDTH="80%"
+ALIGN="center"
+VALIGN="bottom"
+>A Practical Speech Synthesis System</TD
+><TD
+WIDTH="10%"
+ALIGN="right"
+VALIGN="bottom"
+><A
+HREF="p710.html"
+ACCESSKEY="N"
+>Next &#62;&#62;&#62;</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="SECT1"
+><H1
+CLASS="SECT1"
+><A
+NAME="AEN688"
+>Extracting features from utterances</A
+></H1
+><P
+>&#13;Many of the training techniques that are described in the 
+following chapters extract basic features (via pathnames) from 
+a set of utterances. This can most easily be done by the 
+<TT
+CLASS="FILENAME"
+>festival/examples/dumpfeats</TT
+> Festival script. It takes 
+a list of feature/pathnames, as a list or from a file and saves 
+the values for a given set of items in a single feature file (or 
+one for each utterance). Call <TT
+CLASS="FILENAME"
+>festival/examples/dumpfeats</TT
+> 
+with the argument <CODE
+CLASS="VARNAME"
+>-h</CODE
+> for more details. </P
+><P
+>For example suppose for all utterances we want the segment 
+duration, its name, the name of the segment preceding it 
+and the segment following it. 
+<A
+NAME="AEN697"
+></A
+><BLOCKQUOTE
+CLASS="BLOCKQUOTE"
+><P
+CLASS="LITERALLAYOUT"
+>dumpfeats&nbsp;-feats&nbsp;'(segment_duration&nbsp;name&nbsp;p.name&nbsp;n.name)'&nbsp;\<br>
+&nbsp;&nbsp;&nbsp;&nbsp;-relation&nbsp;Segment&nbsp;-output&nbsp;dur.feats&nbsp;festival/utts/*.utt</P
+></BLOCKQUOTE
+>
+If you wish to save the features in separate files one 
+for each utterance, if the output filename contains a <SPAN
+CLASS="QUOTE"
+>"<I
+CLASS="EMPHASIS"
+>%s</I
+>"</SPAN
+> 
+it will be filled in with the utterance fileid. Thus to dump 
+all features named in the file <TT
+CLASS="FILENAME"
+>duration.featnames</TT
+> we 
+would call 
+<A
+NAME="AEN702"
+></A
+><BLOCKQUOTE
+CLASS="BLOCKQUOTE"
+><P
+CLASS="LITERALLAYOUT"
+>dumpfeats&nbsp;-feats&nbsp;duration.featnames&nbsp;-relation&nbsp;Segment&nbsp;\<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;-output&nbsp;feats/%s.dur&nbsp;festival/utts/*.utt</P
+></BLOCKQUOTE
+>
+The file <TT
+CLASS="FILENAME"
+>duration.featnames</TT
+> should contain the features/pathnames 
+one per line (without the opening and closing parenthesis. </P
+><P
+>Other features and other specific code (e.g. selecting a 
+voice that uses an appropriate phone set), can be included in this 
+process by naming a scheme file with the <CODE
+CLASS="VARNAME"
+>-eval</CODE
+> option. </P
+><P
+>The dumped feature files consist of a line for each 
+item in the named relation containing the requested feature values 
+white space separated. For example 
+<A
+NAME="AEN708"
+></A
+><BLOCKQUOTE
+CLASS="BLOCKQUOTE"
+><P
+CLASS="LITERALLAYOUT"
+>0.399028&nbsp;pau&nbsp;0&nbsp;sh&nbsp;<br>
+0.08243&nbsp;sh&nbsp;pau&nbsp;iy&nbsp;<br>
+0.07458&nbsp;iy&nbsp;sh&nbsp;hh&nbsp;<br>
+0.048084&nbsp;hh&nbsp;iy&nbsp;ae&nbsp;<br>
+0.062803&nbsp;ae&nbsp;hh&nbsp;d&nbsp;<br>
+0.020608&nbsp;d&nbsp;ae&nbsp;y&nbsp;<br>
+0.082979&nbsp;y&nbsp;d&nbsp;ax&nbsp;<br>
+0.08208&nbsp;ax&nbsp;y&nbsp;r&nbsp;<br>
+0.036936&nbsp;r&nbsp;ax&nbsp;d&nbsp;<br>
+0.036935&nbsp;d&nbsp;r&nbsp;aa&nbsp;<br>
+0.081057&nbsp;aa&nbsp;d&nbsp;r&nbsp;<br>
+...</P
+></BLOCKQUOTE
+></P
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="x591.html"
+ACCESSKEY="P"
+>&#60;&#60;&#60; Previous</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="book1.html"
+ACCESSKEY="H"
+>Home</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="p710.html"
+ACCESSKEY="N"
+>Next &#62;&#62;&#62;</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>Utterance building</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="c180.html"
+ACCESSKEY="U"
+>Up</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>Building Synthetic Voices</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

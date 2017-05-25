@@ -78,19 +78,16 @@ boost::optional<QString> QnRestProcessorPool::getRedirectRule( const QString& pa
 
 class QnRestConnectionProcessorPrivate: public QnTCPConnectionProcessorPrivate
 {
-public:
-    QnHttpConnectionListener* owner = nullptr;
 };
 
 QnRestConnectionProcessor::QnRestConnectionProcessor(
     QSharedPointer<AbstractStreamSocket> socket,
-    QnHttpConnectionListener* _owner)
+    QnHttpConnectionListener* owner)
 :
-    QnTCPConnectionProcessor(new QnRestConnectionProcessorPrivate, socket, _owner->commonModule()),
+    QnTCPConnectionProcessor(new QnRestConnectionProcessorPrivate, socket, owner),
     m_noAuth(false)
 {
     Q_D(QnRestConnectionProcessor);
-    d->owner = _owner;
 }
 
 QnRestConnectionProcessor::~QnRestConnectionProcessor()
@@ -124,7 +121,8 @@ void QnRestConnectionProcessor::run()
     QList<QPair<QString, QString> > params = QUrlQuery(url.query()).queryItems(QUrl::FullyDecoded);
     int rez = CODE_OK;
     QByteArray contentType = "application/xml";
-    QnRestRequestHandlerPtr handler = d->owner->processorPool()->findHandler(url.path());
+    auto owner = static_cast<QnHttpConnectionListener*>(d->owner);
+    QnRestRequestHandlerPtr handler = owner->processorPool()->findHandler(url.path());
     if (handler)
     {
         if (!m_noAuth && d->accessRights != Qn::kSystemAccess)

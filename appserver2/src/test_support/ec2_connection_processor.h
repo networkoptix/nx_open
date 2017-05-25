@@ -24,5 +24,4 @@ protected:
 private:
     QnMutex m_mutex;
     QnTCPConnectionProcessor* m_processor = nullptr;
-    QnHttpConnectionListener* m_owner = nullptr;
 };

@@ -145,6 +145,9 @@ QnGraphicsScrollAreaPrivate::QnGraphicsScrollAreaPrivate(QnGraphicsScrollArea* p
     QFontMetrics fm(q->font());
     lineHeight = fm.height();
 
+    clipperWidget->setAcceptedMouseButtons(Qt::NoButton);
+    contentHolder->setAcceptedMouseButtons(Qt::NoButton);
+
     clipperWidget->setFlag(QGraphicsItem::ItemClipsChildrenToShape, true);
 
     const auto updateClipperGeometry =

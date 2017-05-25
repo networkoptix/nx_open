@@ -30,17 +30,15 @@ public:
     VMaxStreamFetcher* streamFetcher;
     int openedChannels;
     static QnMutex connectMutex;
-    QnTcpListener* owner;
 };
 QnMutex QnVMax480ConnectionProcessorPrivate::connectMutex;
 
-QnVMax480ConnectionProcessor::QnVMax480ConnectionProcessor(QSharedPointer<AbstractStreamSocket> socket, QnTcpListener* _owner):
-    QnTCPConnectionProcessor(new QnVMax480ConnectionProcessorPrivate, socket, _owner->commonModule())
+QnVMax480ConnectionProcessor::QnVMax480ConnectionProcessor(QSharedPointer<AbstractStreamSocket> socket, QnTcpListener* owner):
+    QnTCPConnectionProcessor(new QnVMax480ConnectionProcessorPrivate, socket, owner)
 {
     Q_D(QnVMax480ConnectionProcessor);
     d->streamFetcher = 0;
     d->openedChannels = 0;
-    d->owner = _owner;
 }
 
 QnVMax480ConnectionProcessor::~QnVMax480ConnectionProcessor()

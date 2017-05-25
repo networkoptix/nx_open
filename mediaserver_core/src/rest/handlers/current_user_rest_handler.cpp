@@ -6,7 +6,7 @@
 #include <nx_ec/managers/abstract_user_manager.h>
 #include "rest/server/rest_connection_processor.h"
 
-#include <nx/network/http/httptypes.h>
+#include <nx/network/http/http_types.h>
 #include <network/authenticate_helper.h>
 #include <common/common_module.h>
 

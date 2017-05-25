@@ -19,7 +19,8 @@
 #include <core/resource/user_resource.h>
 #include <core/resource_access/resource_access_manager.h>
 
-#include <network/authenticate_helper.h>
+#include <nx/network/http/http_content_type.h>
+#include <nx/network/hls/hls_types.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/string.h>
 #include <nx/utils/system_error.h>
@@ -33,11 +34,11 @@
 #include "hls_live_playlist_manager.h"
 #include "hls_playlist_manager_proxy.h"
 #include "hls_session_pool.h"
-#include "hls_types.h"
 #include "media_server/settings.h"
 #include "streaming/streaming_chunk_cache.h"
 #include "streaming/streaming_params.h"
-#include "network/tcp_connection_priv.h"
+#include <network/authenticate_helper.h>
+#include <network/tcp_connection_priv.h>
 #include <network/tcp_listener.h>
 #include <media_server/media_server_module.h>
 
@@ -59,16 +60,13 @@ namespace nx_hls
     static const int COMMON_KEY_FRAME_TO_NON_KEY_FRAME_RATIO = 5;
     static const int DEFAULT_PRIMARY_STREAM_BITRATE = 4*1024*1024;
 
-    const char *const kApplicationMpegUrlMimeType = "application/vnd.apple.mpegurl";
-    const char *const kAudioMpegUrlMimeType = "audio/mpegurl";
-
     //static const int DEFAULT_SECONDARY_STREAM_BITRATE = 512*1024;
 
     size_t QnHttpLiveStreamingProcessor::m_minPlaylistSizeToStartStreaming = nx_ms_conf::DEFAULT_HLS_PLAYLIST_PRE_FILL_CHUNKS;
 
     QnHttpLiveStreamingProcessor::QnHttpLiveStreamingProcessor( QSharedPointer<AbstractStreamSocket> socket, QnTcpListener* owner )
     :
-        QnTCPConnectionProcessor( socket, owner->commonModule() ),
+        QnTCPConnectionProcessor( socket, owner ),
         m_state( sReceiving ),
         m_switchToChunkedTransfer( false ),
         m_useChunkedTransfer( false ),
@@ -424,9 +422,9 @@ namespace nx_hls
     const char* QnHttpLiveStreamingProcessor::mimeTypeByExtension(const QString& extension) const
     {
         if (extension.toLower() == lit("m3u8"))
-            return kApplicationMpegUrlMimeType;
+            return nx_http::kApplicationMpegUrlMimeType;
 
-        return kAudioMpegUrlMimeType;
+        return nx_http::kAudioMpegUrlMimeType;
     }
 
     typedef std::multimap<QString, QString> RequestParamsType;
@@ -972,10 +970,12 @@ namespace nx_hls
             }
         }
 
+        using namespace std::chrono;
+
         std::unique_ptr<HLSSession> newHlsSession(
             new HLSSession(
                 sessionID,
-                qnServerModule->roSettings()->value( nx_ms_conf::HLS_TARGET_DURATION_MS, nx_ms_conf::DEFAULT_TARGET_DURATION_MS).toUInt(),
+                duration_cast<milliseconds>(qnServerModule->settings()->hlsTargetDuration()).count(),
                 !startTimestamp,   //if no start date specified, providing live stream
                 streamQuality,
                 videoCamera,

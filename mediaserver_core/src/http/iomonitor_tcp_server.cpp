@@ -28,7 +28,7 @@ public:
 };
 
 QnIOMonitorConnectionProcessor::QnIOMonitorConnectionProcessor(QSharedPointer<AbstractStreamSocket> socket, QnTcpListener* owner):
-    QnTCPConnectionProcessor(new QnIOMonitorConnectionProcessorPrivate, socket, owner->commonModule())
+    QnTCPConnectionProcessor(new QnIOMonitorConnectionProcessorPrivate, socket, owner)
 {
     QN_UNUSED(owner);
 }

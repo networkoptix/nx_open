@@ -1,0 +1,222 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>Lexicons</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REL="HOME"
+TITLE="Building Synthetic Voices"
+HREF="book1.html"><LINK
+REL="UP"
+TITLE="Building Synthetic Voices"
+HREF="p710.html"><LINK
+REL="PREVIOUS"
+TITLE="Mark-up modes"
+HREF="x1366.html"><LINK
+REL="NEXT"
+TITLE="Lexicons and addenda"
+HREF="x1396.html"></HEAD
+><BODY
+CLASS="CHAPTER"
+BGCOLOR="#FFFFFF"
+TEXT="#000000"
+LINK="#0000FF"
+VLINK="#840084"
+ALINK="#0000FF"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="3"
+ALIGN="center"
+>Building Synthetic Voices</TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="bottom"
+><A
+HREF="x1366.html"
+ACCESSKEY="P"
+>&#60;&#60;&#60; Previous</A
+></TD
+><TD
+WIDTH="80%"
+ALIGN="center"
+VALIGN="bottom"
+></TD
+><TD
+WIDTH="10%"
+ALIGN="right"
+VALIGN="bottom"
+><A
+HREF="x1396.html"
+ACCESSKEY="N"
+>Next &#62;&#62;&#62;</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="CHAPTER"
+><H1
+><A
+NAME="BSV-LEXICONS-CH"
+></A
+>Lexicons</H1
+><P
+>This chapter covers method for finding the pronunciation of 
+a word. This is either by a lexicon (a large list of words 
+and their pronunciations) or by some method of letter to 
+sound rules. </P
+><DIV
+CLASS="SECT1"
+><H1
+CLASS="SECT1"
+><A
+NAME="AEN1382"
+>Word pronunciations</A
+></H1
+><P
+>A pronunciation in Festival requires not just a list of 
+phones but also a syllabic structure. In some languages the 
+syllabic structure is very simple and well defined and 
+can be unambiguously derived from a phone string. In English 
+however this may not always be the case (compound nouns 
+being the difficult case). </P
+><P
+>The lexicon structure that is basically available in Festival takes both 
+a word and a part of speech (and arbitrary token) to find the given 
+pronunciation. For English this is probably the optimal form, although 
+there exist homographs in the language, the word itself and a fairly 
+broad part of speech tag will mostly identify the proper pronunciation. </P
+><P
+>An example entry is 
+<A
+NAME="AEN1387"
+></A
+><BLOCKQUOTE
+CLASS="BLOCKQUOTE"
+><P
+CLASS="LITERALLAYOUT"
+>("photography"<br>
+&nbsp;n<br>
+&nbsp;(((f&nbsp;@&nbsp;)&nbsp;0)&nbsp;((t&nbsp;o&nbsp;g)&nbsp;1)&nbsp;((r&nbsp;@&nbsp;f)&nbsp;0)&nbsp;((ii)&nbsp;0)))</P
+></BLOCKQUOTE
+>
+Not that in addition to explicit marking of syllables a stress 
+value is also given (0 or 1). In some languages lexical is 
+fully predictable, in others highly irregular. In some this 
+field may be more appropriately used for an other purpose, 
+e.g. tone type in Chinese. </P
+><P
+>There may be other languages which require a more complex (less 
+complex) format and the decision to use some other format rather 
+than this one is up to you. </P
+><P
+>&#13;Currently there is only residual support for morphological analysis in 
+Festival. A finite state transducer based analyzer for English based on 
+the work in [<SPAN
+CLASS="CITATION"
+>ritchie92</SPAN
+>] is included in 
+<TT
+CLASS="FILENAME"
+>festival/lib/engmorph.scm</TT
+> and 
+<TT
+CLASS="FILENAME"
+>festival/lib/engmorphsyn.scm</TT
+>. But this should be considered 
+experimental at best. Give the lack of such an analyzer our lexicons 
+need to list not only based forms of words but also all their 
+morphological variants. This is (more or less) acceptable in languages 
+such as English or French but which languages with richer morphology 
+such as German it may seem an unnecessary requirement. Agglutenative 
+languages such as Finnish and Turkish this appears to be even more a 
+restriction. This is probably true but this current restriction 
+not necessary hopeless. We have successfully build very good 
+letter-to-sound rules for German, a language with a rich morphology 
+which allows the system to properly predict pronunciations of 
+morphological variants of root words it has not seen before. 
+We have not yet done any experiments with Finnish or Turkish 
+but see this technique would work, (though of course developing 
+a properly morphological analyzer would be better). </P
+></DIV
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="x1366.html"
+ACCESSKEY="P"
+>&#60;&#60;&#60; Previous</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="book1.html"
+ACCESSKEY="H"
+>Home</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="x1396.html"
+ACCESSKEY="N"
+>Next &#62;&#62;&#62;</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>Mark-up modes</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="p710.html"
+ACCESSKEY="U"
+>Up</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>Lexicons and addenda</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

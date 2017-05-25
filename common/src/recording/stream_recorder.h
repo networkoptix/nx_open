@@ -14,7 +14,7 @@ extern "C"
     #include <libavformat/avformat.h>
 }
 
-#include <utils/common/cryptographic_hash.h>
+#include <nx/utils/cryptographic_hash.h>
 
 #include <core/ptz/item_dewarping_params.h>
 
@@ -180,7 +180,7 @@ private:
     bool m_needCalcSignature;
     QnAbstractMediaStreamDataProvider* m_mediaProvider;
 
-    QnCryptographicHash m_mdctx;
+    nx::utils::QnCryptographicHash m_mdctx;
 #ifdef SIGN_FRAME_ENABLED
     QImage m_logo;
 #endif

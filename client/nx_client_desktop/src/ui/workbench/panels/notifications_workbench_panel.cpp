@@ -14,6 +14,7 @@
 #include <ui/animation/opacity_animator.h>
 #include <ui/animation/variant_animator.h>
 #include <ui/graphics/instruments/hand_scroll_instrument.h>
+#include <ui/graphics/instruments/motion_selection_instrument.h>
 #include <ui/graphics/items/generic/edge_shadow_widget.h>
 #include <ui/graphics/items/generic/image_button_widget.h>
 #include <ui/graphics/items/generic/blinking_image_widget.h>
@@ -60,6 +61,7 @@ NotificationsWorkbenchPanel::NotificationsWorkbenchPanel(
 
     item->setZValue(ContentItemZOrder);
     item->setProperty(Qn::NoHandScrollOver, true);
+    item->setProperty(Qn::BlockMotionSelection, true);
     setHelpTopic(item, Qn::MainWindow_Notifications_Help);
     connect(item, &QGraphicsWidget::geometryChanged, this,
         &NotificationsWorkbenchPanel::updateControlsGeometry);

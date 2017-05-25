@@ -248,7 +248,7 @@ CurrentLayoutTourSettingsFactory::CurrentLayoutTourSettingsFactory(QObject* pare
 }
 
 
-QList<QAction*> CurrentLayoutTourSettingsFactory::newActions(const Parameters& parameters,
+QList<QAction*> CurrentLayoutTourSettingsFactory::newActions(const Parameters& /*parameters*/,
     QObject* parent)
 {
     const auto isManual = workbench()->currentLayout()->data(Qn::LayoutTourIsManualRole).toBool();

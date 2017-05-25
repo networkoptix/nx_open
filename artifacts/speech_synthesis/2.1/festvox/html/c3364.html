@@ -1,0 +1,207 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>Evaluation and Improvements</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REL="HOME"
+TITLE="Building Synthetic Voices"
+HREF="book1.html"><LINK
+REL="UP"
+TITLE="Building Synthetic Voices"
+HREF="p710.html"><LINK
+REL="PREVIOUS"
+TITLE="Prosodic Labeling"
+HREF="x3361.html"><LINK
+REL="NEXT"
+TITLE="Does it work at all?"
+HREF="x3374.html"></HEAD
+><BODY
+CLASS="CHAPTER"
+BGCOLOR="#FFFFFF"
+TEXT="#000000"
+LINK="#0000FF"
+VLINK="#840084"
+ALINK="#0000FF"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="3"
+ALIGN="center"
+>Building Synthetic Voices</TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="bottom"
+><A
+HREF="x3361.html"
+ACCESSKEY="P"
+>&#60;&#60;&#60; Previous</A
+></TD
+><TD
+WIDTH="80%"
+ALIGN="center"
+VALIGN="bottom"
+></TD
+><TD
+WIDTH="10%"
+ALIGN="right"
+VALIGN="bottom"
+><A
+HREF="x3374.html"
+ACCESSKEY="N"
+>Next &#62;&#62;&#62;</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="CHAPTER"
+><H1
+><A
+NAME="BSV-EVAL-CH"
+></A
+>Evaluation and Improvements</H1
+><P
+>This chapter discusses evaluation of speech synthesis voices and
+provides a detailed procedure to allow diagnostic testing of 
+new voices.</P
+><DIV
+CLASS="SECT1"
+><H1
+CLASS="SECT1"
+><A
+NAME="AEN3367"
+>Evaluation</A
+></H1
+><P
+>Now that you have built your voice, how can you tell if it works, and 
+how can you find out what you need to make it better. This chapter 
+deals with some issues of evaluating a voice in Festival. Some 
+of the points here also apply to testing and improving existing voices 
+too. </P
+><P
+>The evaluation of speech synthesis is notoriously hard. Evaluation in
+speech recognition was the major factor in making general speech
+recognition work. Rigourous tests on well defined data made the
+evaluation of different techniques possible. Though in spite of its
+success the strict evaluation criteria as used in speech recognition
+can cloud the ultimate goal. It is important always to remember that
+tests are there to evaluate a systems performance rather than become
+the task itself. Just as techniques can overtrain on data it is
+possible to over train on the test data and/or methodology too thus
+loosing the generality and purpose of the evaluation.</P
+><P
+>In speech recognition a simple (though naive) measure of phones or words 
+correct gives a reasonable indicator of how well a speech recognition 
+system works. In synthesis this a lot harder. A word can have multiple 
+pronunciations, so it is much harder to automatically test if a 
+synthesizer's phoneme accuracy, besides much of the quality is not just 
+in if it is correct but if it "sounds good".  This is effectly the crux
+of the matter. The only real synthesis evaluation technique is having 
+a human listen to the result. Humans individually are not very reliably 
+testers of systems, but humans in general are. However it is usually 
+not feasible to have testers listen to large amounts of synthetic speech 
+and return a general goodness score. More specific tests are required. </P
+><P
+>Although listening tests are the ultimate, because they are expensive in 
+resources (undergraduates are not willing to listing to bad synthesis 
+all day for free), and the design of listening tests is a non-trivial 
+task, there are a number of more general tests which can be run at less 
+expenses and can help greatly. </P
+><P
+>It is common that a new voice in Festival (or any other speech synthesis 
+systems), has limitations and it is wise to test what the limitations 
+are and decide if such limitations are acceptable or not. This depends 
+a lot on what you wish to use your voice for. For example if the voice 
+a Scottish English voice to be primarily used as the output of a Chinese 
+speech tranlation system, the vocabulary is constained by the 
+translation system itself so a large lexicon is probabaly not much of an 
+issue, but the vocabulary will include many anglosized (calenodianized 
+?) versions of Chinese names, which are not common in standard English 
+so letter-to-sound rules should be made more sensitive for that input. 
+If the system is to be used to read address lists, it should be able to 
+tokenize names and address appropriately, and if it is to be used in a 
+dialogue system the intonation model should be able to deal with 
+questions and continuations properly. Optimizing your voices for the 
+most common task, and minimizing the errors is what evaluation is for. </P
+></DIV
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="x3361.html"
+ACCESSKEY="P"
+>&#60;&#60;&#60; Previous</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="book1.html"
+ACCESSKEY="H"
+>Home</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="x3374.html"
+ACCESSKEY="N"
+>Next &#62;&#62;&#62;</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>Prosodic Labeling</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="p710.html"
+ACCESSKEY="U"
+>Up</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>Does it work at all?</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

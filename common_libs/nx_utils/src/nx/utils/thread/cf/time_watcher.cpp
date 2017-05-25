@@ -3,7 +3,7 @@
 namespace cf {
 time_watcher::time_watcher()
 : wakeup_time_(std::chrono::time_point<std::chrono::steady_clock>::max()) {
-  watcher_thread_ = nx::utils::thread([this] {
+  watcher_thread_ = std::thread([this] {
     while (!need_stop_) {
       std::unique_lock<std::mutex> lock(mutex_);
       cond_.wait_until(lock, wakeup_time_, [this] {

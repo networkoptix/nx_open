@@ -1,0 +1,628 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>English phone lists</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REL="HOME"
+TITLE="Building Synthetic Voices"
+HREF="book1.html"><LINK
+REL="PREVIOUS"
+TITLE="Tools Installation"
+HREF="c4569.html"><LINK
+REL="NEXT"
+TITLE="UK phoneset"
+HREF="x4816.html"></HEAD
+><BODY
+CLASS="CHAPTER"
+BGCOLOR="#FFFFFF"
+TEXT="#000000"
+LINK="#0000FF"
+VLINK="#840084"
+ALINK="#0000FF"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="3"
+ALIGN="center"
+>Building Synthetic Voices</TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="bottom"
+><A
+HREF="c4569.html"
+ACCESSKEY="P"
+>&#60;&#60;&#60; Previous</A
+></TD
+><TD
+WIDTH="80%"
+ALIGN="center"
+VALIGN="bottom"
+></TD
+><TD
+WIDTH="10%"
+ALIGN="right"
+VALIGN="bottom"
+><A
+HREF="x4816.html"
+ACCESSKEY="N"
+>Next &#62;&#62;&#62;</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="CHAPTER"
+><H1
+><A
+NAME="AEN4575"
+></A
+>English phone lists</H1
+><P
+>Relating phonemes to sounds is not obvious as people think. Even when 
+one is familar with phone sets its easy to make mistakes when reading 
+lists of phones alone. This is particularly true in reading diphone 
+nonsense words. The table provided here are intended for both the 
+experienced and inexperienced reader of phones, to help you decide 
+on the pronunciation. </P
+><P
+>These tables are not supposed to be a substitute for a good phonetics 
+course, they are intended to give people a basic idea of the 
+pronunciation of the phone sets used in the particaulr examples in this 
+document. Many simplifying assumptions have been made, and often aren't 
+even mentioned. To the phoneticians out there I apologise, as much as 
+the assumptions are wrong we are here listing atomic discrete phones 
+which we have found useful in building practical systems, even though 
+better sets probably exist. </P
+><DIV
+CLASS="SECT1"
+><H1
+CLASS="SECT1"
+><A
+NAME="BSV-USPHONESET-SECT"
+>US phoneset</A
+></H1
+><P
+>Inspite of everyone telling you that there is one and only one US 
+phoneset, when it comes to actually using one you quickly discover there 
+are actually many standard one used by lots of different pieces of 
+software, often the difference betwen them is trivial (e.g. case 
+folding) but computers being fundamentally dumb can't take 
+these trivial differences into account. Here we list the 
+<I
+CLASS="EMPHASIS"
+>radio</I
+> phoneset which is used by standard US voices in 
+festival. The definition is in <TT
+CLASS="FILENAME"
+>festival/lib/radio_phones.scm</TT
+>. 
+This list was based on those phones that appear in the Boston 
+University FM radio corpus with minor modifications. The 
+list here is exactly those phones which appear in the diphone 
+nonses words as used in the example explained in 
+<A
+HREF="c3610.html"
+>the Chapter called <I
+>US/UK English Diphone Synthesizer</I
+></A
+>.
+<P
+></P
+><DIV
+CLASS="VARIABLELIST"
+><DL
+><DT
+><I
+CLASS="EMPHASIS"
+>aa</I
+></DT
+><DD
+><P
+>fAther, wAshington </P
+></DD
+><DT
+><I
+CLASS="EMPHASIS"
+>ae</I
+></DT
+><DD
+><P
+>fAt, bAd </P
+></DD
+><DT
+><I
+CLASS="EMPHASIS"
+>ah </I
+></DT
+><DD
+><P
+>bUt, hUsh </P
+></DD
+><DT
+><I
+CLASS="EMPHASIS"
+>ao</I
+></DT
+><DD
+><P
+>lAWn, dOOr, mAll </P
+></DD
+><DT
+><I
+CLASS="EMPHASIS"
+>aw</I
+></DT
+><DD
+><P
+>hOW, sOUth, brOWser </P
+></DD
+><DT
+><I
+CLASS="EMPHASIS"
+>ax</I
+></DT
+><DD
+><P
+>About, cAnoe </P
+></DD
+><DT
+><I
+CLASS="EMPHASIS"
+>ay</I
+></DT
+><DD
+><P
+>hIde, bIble </P
+></DD
+><DT
+><I
+CLASS="EMPHASIS"
+>eh</I
+></DT
+><DD
+><P
+>gEt, fEAther </P
+></DD
+><DT
+><I
+CLASS="EMPHASIS"
+>el</I
+></DT
+><DD
+><P
+>tabLE, usabLE </P
+></DD
+><DT
+><I
+CLASS="EMPHASIS"
+>em</I
+></DT
+><DD
+><P
+>systEM, communisM </P
+></DD
+><DT
+><I
+CLASS="EMPHASIS"
+>en</I
+></DT
+><DD
+><P
+>beatEN </P
+></DD
+><DT
+><I
+CLASS="EMPHASIS"
+>er</I
+></DT
+><DD
+><P
+>fERtile, sEARch, makER </P
+></DD
+><DT
+><I
+CLASS="EMPHASIS"
+>ey</I
+></DT
+><DD
+><P
+>gAte, Ate </P
+></DD
+><DT
+><I
+CLASS="EMPHASIS"
+>ih</I
+></DT
+><DD
+><P
+>bIt, shIp </P
+></DD
+><DT
+><I
+CLASS="EMPHASIS"
+>iy</I
+></DT
+><DD
+><P
+>bEAt, shEEp </P
+></DD
+><DT
+><I
+CLASS="EMPHASIS"
+>ow</I
+></DT
+><DD
+><P
+>lOne, nOse </P
+></DD
+><DT
+><I
+CLASS="EMPHASIS"
+>oy</I
+></DT
+><DD
+><P
+>tOY, OYster </P
+></DD
+><DT
+><I
+CLASS="EMPHASIS"
+>uh</I
+></DT
+><DD
+><P
+>fUll, wOOd </P
+></DD
+><DT
+><I
+CLASS="EMPHASIS"
+>uw</I
+></DT
+><DD
+><P
+>fOOl, fOOd </P
+></DD
+><DT
+><I
+CLASS="EMPHASIS"
+>b</I
+></DT
+><DD
+><P
+>Book, aBrupt </P
+></DD
+><DT
+><I
+CLASS="EMPHASIS"
+>ch </I
+></DT
+><DD
+><P
+>CHart, larCH </P
+></DD
+><DT
+><I
+CLASS="EMPHASIS"
+>d</I
+></DT
+><DD
+><P
+>Done, baD </P
+></DD
+><DT
+><I
+CLASS="EMPHASIS"
+>dh</I
+></DT
+><DD
+><P
+>THat, faTHer </P
+></DD
+><DT
+><I
+CLASS="EMPHASIS"
+>f</I
+></DT
+><DD
+><P
+>Fat, lauGH </P
+></DD
+><DT
+><I
+CLASS="EMPHASIS"
+>g</I
+></DT
+><DD
+><P
+>Good, biGGer </P
+></DD
+><DT
+><I
+CLASS="EMPHASIS"
+>hh</I
+></DT
+><DD
+><P
+>Hello, loopHole </P
+></DD
+><DT
+><I
+CLASS="EMPHASIS"
+>jh</I
+></DT
+><DD
+><P
+>diGit, Jack </P
+></DD
+><DT
+><I
+CLASS="EMPHASIS"
+>k</I
+></DT
+><DD
+><P
+>Camera, jaCK, Kill </P
+></DD
+><DT
+><I
+CLASS="EMPHASIS"
+>l</I
+></DT
+><DD
+><P
+>Late, fuLL </P
+></DD
+><DT
+><I
+CLASS="EMPHASIS"
+>m</I
+></DT
+><DD
+><P
+>Man, gaMe </P
+></DD
+><DT
+><I
+CLASS="EMPHASIS"
+>n</I
+></DT
+><DD
+><P
+>maN, New </P
+></DD
+><DT
+><I
+CLASS="EMPHASIS"
+>ng</I
+></DT
+><DD
+><P
+>baNG, sittiNG </P
+></DD
+><DT
+><I
+CLASS="EMPHASIS"
+>p</I
+></DT
+><DD
+><P
+>Pat, camPer </P
+></DD
+><DT
+><I
+CLASS="EMPHASIS"
+>r</I
+></DT
+><DD
+><P
+>Reason, caR, </P
+></DD
+><DT
+><I
+CLASS="EMPHASIS"
+>s</I
+></DT
+><DD
+><P
+>Sit, maSS </P
+></DD
+><DT
+><I
+CLASS="EMPHASIS"
+>sh</I
+></DT
+><DD
+><P
+>SHip, claSH </P
+></DD
+><DT
+><I
+CLASS="EMPHASIS"
+>t</I
+></DT
+><DD
+><P
+>Tap, baT </P
+></DD
+><DT
+><I
+CLASS="EMPHASIS"
+>th</I
+></DT
+><DD
+><P
+>THeatre, baTH </P
+></DD
+><DT
+><I
+CLASS="EMPHASIS"
+>v</I
+></DT
+><DD
+><P
+>Various, haVe </P
+></DD
+><DT
+><I
+CLASS="EMPHASIS"
+>w</I
+></DT
+><DD
+><P
+>Water, cobWeb </P
+></DD
+><DT
+><I
+CLASS="EMPHASIS"
+>y</I
+></DT
+><DD
+><P
+>Yellow, Yacht </P
+></DD
+><DT
+><I
+CLASS="EMPHASIS"
+>z</I
+></DT
+><DD
+><P
+>Zero, quiZ, boyS </P
+></DD
+><DT
+><I
+CLASS="EMPHASIS"
+>zh</I
+></DT
+><DD
+><P
+>viSion, caSual </P
+></DD
+><DT
+><I
+CLASS="EMPHASIS"
+>pau</I
+></DT
+><DD
+><P
+>short silence </P
+></DD
+></DL
+></DIV
+>
+In addition to the phone sthemselves the nonsense word generated by 
+the diphone schema also have some other notations to denote different 
+type of phone. </P
+><P
+>The use of <I
+CLASS="EMPHASIS"
+>-</I
+> (hyphen) in the nonsense word itself is used to denot 
+an explicit syllable boundary. Thus <CODE
+CLASS="VARNAME"
+>pau t aa n - k aa pau</CODE
+> 
+is used to state that the word should be pronounced as <CODE
+CLASS="VARNAME"
+>tan ka</CODE
+> 
+rather than <CODE
+CLASS="VARNAME"
+>tank ah</CODE
+>. Where no explicit syllable boundary 
+is given the pronunciation should be pronounce naturally without 
+any boundary (which is probabaly too underspecified in some cases). </P
+><P
+>The use of <I
+CLASS="EMPHASIS"
+>_</I
+> (underscore) in phone names is used to denote 
+consonant clusters. That is <CODE
+CLASS="VARNAME"
+>t_-_r</CODE
+> is the /tr/ as found 
+in <CODE
+CLASS="VARNAME"
+>trip</CODE
+> not that in <CODE
+CLASS="VARNAME"
+>cat run</CODE
+>. </P
+></DIV
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="c4569.html"
+ACCESSKEY="P"
+>&#60;&#60;&#60; Previous</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="book1.html"
+ACCESSKEY="H"
+>Home</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="x4816.html"
+ACCESSKEY="N"
+>Next &#62;&#62;&#62;</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>Tools Installation</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+>&nbsp;</TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>UK phoneset</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

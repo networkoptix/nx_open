@@ -302,6 +302,7 @@ bool QnMServerBusinessRuleProcessor::executePlaySoundAction(const QnAbstractBusi
         auto url = lit("dbfile://notifications/") + params.url;
 
         QnAviResourcePtr resource(new QnAviResource(url));
+        resource->setCommonModule(commonModule());
         resource->setStatus(Qn::Online);
         QnAbstractStreamDataProviderPtr provider(
             resource->createDataProvider(Qn::ConnectionRole::CR_Default));

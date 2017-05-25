@@ -10,7 +10,7 @@
 
 #include <QtCore/QByteArray>
 
-#include <nx/network/http/httptypes.h>
+#include <nx/network/http/http_types.h>
 
 #include <common/common_globals.h>
 #include <core/resource/resource_fwd.h>

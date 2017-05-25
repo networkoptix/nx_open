@@ -55,6 +55,7 @@ protected:
     virtual void timerEvent(QTimerEvent* event) override;
 
 private:
+    void resetTourItems(const ec2::ApiLayoutTourItemDataList& items);
     void processTourStepInternal(bool forward, bool force);
 
     void clearWorkbenchState();

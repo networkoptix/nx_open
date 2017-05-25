@@ -1,5 +1,7 @@
 INCLUDEPATH += ${root.dir}/nx_cloud/cloud_db_client/src/include/
 
+INCLUDEPATH -= $$ROOT_DIR/common/src
+
 win* {
     DEFINES+=_VARIADIC_MAX=8
 }

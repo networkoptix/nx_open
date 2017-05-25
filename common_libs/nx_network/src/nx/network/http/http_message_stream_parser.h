@@ -2,8 +2,8 @@
 
 #include <nx/utils/byte_stream/abstract_byte_stream_filter.h>
 
-#include "httptypes.h"
-#include "httpstreamreader.h"
+#include "http_types.h"
+#include "http_stream_reader.h"
 
 namespace nx_http {
 

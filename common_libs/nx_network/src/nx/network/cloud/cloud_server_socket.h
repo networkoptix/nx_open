@@ -95,7 +95,7 @@ protected:
     void startAcceptingConnections(const hpm::api::ListenResponse& response);
     void initializeCustomAcceptors(const hpm::api::ListenResponse& response);
     void retryRegistration();
-    void reportResult(SystemError::ErrorCode sysErrorCode);
+    void reportResult(SystemError::ErrorCode systemErrorCode);
     AbstractStreamSocket* acceptNonBlocking();
     AbstractStreamSocket* acceptBlocking();
     void acceptAsyncInternal(AcceptCompletionHandler handler);

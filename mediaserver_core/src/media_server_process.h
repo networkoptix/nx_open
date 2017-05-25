@@ -19,7 +19,7 @@
 
 #include "nx/utils/thread/long_runnable.h"
 #include "nx_ec/impl/ec_api_impl.h"
-#include "utils/common/public_ip_discovery.h"
+#include <nx/network/public_ip_discovery.h>
 #include <nx/network/http/http_mod_manager.h>
 #include <nx/network/upnp/upnp_port_mapper.h>
 #include <media_server/serverutil.h>
@@ -175,13 +175,12 @@ private:
     qint64 m_firstRunningTime;
 
     std::unique_ptr<QnAutoRequestForwarder> m_autoRequestForwarder;
-    std::unique_ptr<nx_http::HttpModManager> m_httpModManager;
     QnUniversalTcpListener* m_universalTcpListener;
     QnMediaServerResourcePtr m_mediaServer;
     QSet<QnUuid> m_updateUserRequests;
     std::map<HostAddress, quint16> m_forwardedAddresses;
     QnMutex m_mutex;
-    std::unique_ptr<QnPublicIPDiscovery> m_ipDiscovery;
+    std::unique_ptr<nx::network::PublicIPDiscovery> m_ipDiscovery;
     std::unique_ptr<QTimer> m_updatePiblicIpTimer;
     quint64 m_dumpSystemResourceUsageTaskID;
     bool m_stopping;

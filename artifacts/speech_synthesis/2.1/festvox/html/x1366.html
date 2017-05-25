@@ -1,0 +1,207 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>Mark-up modes</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REL="HOME"
+TITLE="Building Synthetic Voices"
+HREF="book1.html"><LINK
+REL="UP"
+TITLE="Text analysis"
+HREF="c1189.html"><LINK
+REL="PREVIOUS"
+TITLE="TTS modes"
+HREF="x1361.html"><LINK
+REL="NEXT"
+TITLE="Lexicons"
+HREF="c1379.html"></HEAD
+><BODY
+CLASS="SECT1"
+BGCOLOR="#FFFFFF"
+TEXT="#000000"
+LINK="#0000FF"
+VLINK="#840084"
+ALINK="#0000FF"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="3"
+ALIGN="center"
+>Building Synthetic Voices</TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="bottom"
+><A
+HREF="x1361.html"
+ACCESSKEY="P"
+>&#60;&#60;&#60; Previous</A
+></TD
+><TD
+WIDTH="80%"
+ALIGN="center"
+VALIGN="bottom"
+>Text analysis</TD
+><TD
+WIDTH="10%"
+ALIGN="right"
+VALIGN="bottom"
+><A
+HREF="c1379.html"
+ACCESSKEY="N"
+>Next &#62;&#62;&#62;</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="SECT1"
+><H1
+CLASS="SECT1"
+><A
+NAME="BSV-MAKRUP-SECT"
+>Mark-up modes</A
+></H1
+><P
+>In some situtation it ispossible for the user of a text-to-speech
+system to provide more information for the synthesizer that just the
+text, or the type of text.  It is near impossible for TTS engines to
+get everything right all of the time, so in such situation it is
+useful to offer the developer a method to help guide the synthesizer
+in its syntehsis process.</P
+><P
+>Most speech synthesizer offer some speech method or embedded commands
+but these are specific to one interface or one API.  For
+example the Microsoft SAPI interface allows various commands
+to be embedded in a text string <SPAN
+CLASS="COMMENT"
+> some examples </SPAN
+>.</P
+><P
+>However there has been a move more recently to offer a general mark up
+method that is more general.  A number of people saw the potential use
+of XML as a general method for marking up text for speech synthesis.
+The earliest method we know was in a Masters thesis at Edinburgh in
+1995 [<SPAN
+CLASS="CITATION"
+>isard</SPAN
+>].  This was later published under the
+name SSML.  A number of other groups were alos looking at this and a
+large consortium formed to define this further under various names
+STML, and eventually Sable.</P
+><P
+>Around the same time, more serious definitions of such a mark-up were
+being developed.  The first to reach a well-define stage was JSML,
+(Java Speech Mark-up Language), which covered aspects of speech
+recognition and grammars as well as speech synthesis mark-up.  Unlike
+any of the other XML based markup languages, JSML, as it was embedded
+within Java, could define exceptions in a reasonable way.  One of the
+problems iwth a simpel XML markup is that it is one way.  You can
+request a voice or a language or some functionality, but there is no
+mechanism for feedback to know if such a feature is actually
+available.</P
+><P
+>XML markup for speech have been further advances with VoiceXML, which
+defines a mark-up language for basic dialog systems.  The speech
+synthesi part of the VoiceXML is closely follows the functionality of
+JSML and its predecessors. </P
+><P
+>A new standard for markup for speech synthesis is currently being
+defined by W3C under the name SSML, confusingly the same name as the
+earliest example, but not designed to be compatible with the original,
+but take into account the functionaly and desires of users of TTS.
+SSML markup is also defined as the method for speech synthesis markup
+in Microsoft's SALT tags.</P
+><A
+NAME="AEN1376"
+></A
+><BLOCKQUOTE
+CLASS="BLOCKQUOTE"
+><P
+CLASS="LITERALLAYOUT"
+>%%%%%%%%%%%%%%%%%%%%%%<br>
+Discussion&nbsp;to&nbsp;be&nbsp;added&nbsp;<br>
+%%%%%%%%%%%%%%%%%%%%%%</P
+></BLOCKQUOTE
+><P
+></P
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="x1361.html"
+ACCESSKEY="P"
+>&#60;&#60;&#60; Previous</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="book1.html"
+ACCESSKEY="H"
+>Home</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="c1379.html"
+ACCESSKEY="N"
+>Next &#62;&#62;&#62;</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>TTS modes</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="c1189.html"
+ACCESSKEY="U"
+>Up</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>Lexicons</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

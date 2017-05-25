@@ -22,7 +22,6 @@
 #include <core/resource_access/providers/shared_resource_access_provider.h>
 #include <core/resource_access/providers/shared_layout_item_access_provider.h>
 #include <core/resource_access/providers/videowall_item_access_provider.h>
-#include <core/resource_access/providers/layout_tour_access_provider.h>
 
 #include <core/resource_management/resource_pool.h>
 #include <core/resource_management/user_roles_manager.h>
@@ -134,7 +133,7 @@ QnCommonModule::QnCommonModule(bool clientMode, QObject *parent):
     m_mediaServerUserAttributesPool = new QnMediaServerUserAttributesPool(this);
     m_resourcePropertyDictionary = new QnResourcePropertyDictionary(this);
     m_resourceStatusDictionary = new QnResourceStatusDictionary(this);
-    instance<QnServerAdditionalAddressesDictionary>(); // todo: static common or common?
+    m_serverAdditionalAddressesDictionary = new QnServerAdditionalAddressesDictionary(this);
 
     m_resourcePool = new QnResourcePool(this);  /*< Depends on nothing. */
     m_layoutTourManager = new QnLayoutTourManager(this);  //< Depends on nothing.
@@ -157,7 +156,6 @@ QnCommonModule::QnCommonModule(bool clientMode, QObject *parent):
     m_resourceAccessProvider->addBaseProvider(new QnSharedResourceAccessProvider(this));
     m_resourceAccessProvider->addBaseProvider(new QnSharedLayoutItemAccessProvider(this));
     m_resourceAccessProvider->addBaseProvider(new QnVideoWallItemAccessProvider(this));
-    m_resourceAccessProvider->addBaseProvider(new QnLayoutTourAccessProvider(this));
 
     m_resourceAccessManager = new QnResourceAccessManager(this);    /*< Depends on access provider. */
 

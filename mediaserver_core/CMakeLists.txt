@@ -1,10 +1,5 @@
 find_package(Qt5 COMPONENTS WebSockets)
 
-nx_rdep_add_package(any/nx_sdk-1.6.0)
-nx_rdep_add_package(any/nx_storage_sdk-1.6.0)
-nx_rdep_add_package(onvif)
-nx_rdep_add_package(sigar)
-
 set(product.title "${mediaserver.name}")
 set(product.display.title "${mediaserver.display.name}")
 
@@ -41,8 +36,12 @@ nx_add_target(mediaserver_core LIBRARY
 
 if(LINUX)
     target_link_libraries(mediaserver_core PRIVATE ldap)
+
+    if(arch MATCHES "arm|aarch64")
+        target_link_libraries(mediaserver_core PRIVATE sasl2)
+    endif()
 endif()
 
-if(WIN32)
+if(WINDOWS)
     target_link_libraries(mediaserver_core PRIVATE Wldap32.dll Iphlpapi.dll Crypt32.lib)
 endif()

@@ -21,6 +21,12 @@ class Relaying:
     using base_type = BasicTestFixture;
 
 protected:
+    void startMoreConnectionsThatAreFoundOnRelay()
+    {
+        for (int i = 0; i < 101; ++i)
+            startExchangingFixedData();
+    }
+
     void assertServerIsListeningOnRelay()
     {
         using namespace nx::cloud::relay;
@@ -63,6 +69,9 @@ private:
     }
 };
 
+//-------------------------------------------------------------------------------------------------
+// Test cases.
+
 TEST_F(Relaying, server_socket_registers_itself_on_relay)
 {
     assertServerIsListeningOnRelay();
@@ -76,6 +85,12 @@ TEST_F(Relaying, connection_can_be_established)
 TEST_F(Relaying, exchanging_fixed_data)
 {
     startExchangingFixedData();
+    assertDataHasBeenExchangedCorrectly();
+}
+
+TEST_F(Relaying, DISABLED_multiple_connections)
+{
+    startMoreConnectionsThatAreFoundOnRelay();
     assertDataHasBeenExchangedCorrectly();
 }
 

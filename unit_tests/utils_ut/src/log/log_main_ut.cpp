@@ -9,7 +9,7 @@ namespace test {
 
 TEST(LogMain, DISABLED_Console)
 {
-    const auto mainLog = main();
+    const auto mainLog = mainLogger();
     mainLog->setDefaultLevel(levelFromString("INFO"));
     mainLog->setWriters();
     mainLog->setExceptionFilters({lit("nx::utils::log::test")});
