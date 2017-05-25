@@ -6,6 +6,8 @@
 #include <boost/optional.hpp>
 #include <nx/network/http/http_types.h>
 #include <nx/network/buffer.h>
+#include <nx/utils/thread/mutex.h>
+#include <common/common_module_aware.h>
 
 namespace detail {
 
@@ -21,7 +23,7 @@ using UserNonceToResponseMap = std::unordered_map<UserNonce, nx::Buffer>;
 
 namespace std {
 
-template<> 
+template<>
 struct Hash<detail::UserNonce>
 {
     size_t operator()(const detail::UserNonce& userNonce)
@@ -46,10 +48,14 @@ using TimestampToNonceUserCountMap = std::map<int64_t, NonceUserCount, std::grea
 
 class QnResourcePool;
 
-class CloudUserInfoPool
+class CloudUserInfoPool:
+    public QObject,
+    public QnCommonModuleAware
 {
+    Q_OBJECT
+
 public:
-    CloudUserInfoPool();
+    CloudUserInfoPool(QnCommonModule* commonModule);
     ~CloudUserInfoPool();
 
     bool authenticate(const nx::http::header::Authorization& authHeader) const;
@@ -59,9 +65,12 @@ private:
     void connectToResourcePool();
     void disconnectFromResourcePool();
     QnResourcePool* resourcePool();
+    void onNewResource(const QnResourcePtr& resource);
+    void onRemoveResource(const QnResourcePtr& resource);
 
 
 private:
     detail::UserNonceToResponseMap m_userNonceToResponse;
     detail::TimestampToNonceUserCountMap m_timestampToNonceUserCount;
+    QnMutex m_mutex;
 };
