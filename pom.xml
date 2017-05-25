@@ -666,6 +666,8 @@
                 <module>media_db_util</module>
                 <module>nx_cloud/libvms_gateway</module>
                 <module>nx_cloud/vms_gateway</module>
+                <module>nx_cloud/libtraffic_relay</module>
+                <module>nx_cloud/traffic_relay</module>
                 <module>client/minilauncher</module>
                 <module>traytool</module>
                 <!-- Vmaxproxy  module is disabled because we use already built version of vmax (vs2008 + qt4). We do so because vmaxproxy doesn't work if has been built on vs2012 -->
@@ -779,6 +781,7 @@
                 <module>macsetup/client-dmg</module>
                 <module>nx_cloud/libcloud_db</module>
                 <module>nx_cloud/libconnection_mediator</module>
+                <module>nx_cloud/libtraffic_relay</module>
                 <module>client/mobile_client</module>
             </modules>
         </profile>
@@ -799,9 +802,11 @@
             <modules>
                 <module>nx_cloud/cloud_db</module>
                 <module>nx_cloud/connection_mediator</module>
+                <module>nx_cloud/traffic_relay</module>
                 <module>nx_cloud/cloud_connect_test_util</module>
                 <module>nx_cloud/libcloud_db</module>
                 <module>nx_cloud/libconnection_mediator</module>
+                <module>nx_cloud/libtraffic_relay</module>
                 <module>media_db_util</module>
                 <module>testcamera</module>
                 <module>nx_cloud/libvms_gateway</module>
