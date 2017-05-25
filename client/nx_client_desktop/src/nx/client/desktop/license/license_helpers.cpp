@@ -247,7 +247,7 @@ QString Deactivator::errorDescription(ErrorCode error)
             return tr("Invalid license key");
     }
 
-    NX_EXPECT(false, "We don't excpect to be here");
+    NX_EXPECT(false, "We don't expect to be here");
     return QString();
 }
 
