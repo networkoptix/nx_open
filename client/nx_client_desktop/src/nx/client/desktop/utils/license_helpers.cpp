@@ -12,41 +12,48 @@
 
 #include <licensing/license.h>
 
+#include <nx/fusion/model_functions.h>
+
+namespace detail {
+
+struct LicenseData
+{
+    QString key;
+    QString hwid;
+};
+QN_FUSION_DECLARE_FUNCTIONS(LicenseData, (json))
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS (LicenseData, (json), (key)(hwid))
+
+using LicenseDataList = QList<LicenseData>;
+
+struct Licenses
+{
+    LicenseDataList licenses;
+};
+QN_FUSION_DECLARE_FUNCTIONS(Licenses, (json))
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS (Licenses, (json), (licenses))
+
+}
+
+QN_DEFINE_METAOBJECT_ENUM_LEXICAL_FUNCTIONS(nx::client::desktop::license::Deactivator, ErrorCode)
+
 namespace {
 
 static const auto kDeactivateLicenseUrl =
     QUrl::fromUserInput(lit("http://nxlicensed.hdw.mx/nxlicensed/api/v1/deactivate"));
 
-static const auto kJsonRootTemplate = lit(
-    "{ \"licenses\": [%1] }");
-
-static const QByteArray kJsonContentType(
-    Qn::serializationFormatToHttpContentType(Qn::JsonFormat));
-
-QString toJson(const QnLicensePtr& license)
-{
-    return lit("{ \"key\": \"%1\", \"hwid\": \"%2\" }").arg(
-        QString::fromLatin1(license->key().constData()), license->hardwareId());
-}
-
 using namespace nx::client::desktop::license;
 using ErrorCode = Deactivator::ErrorCode;
 using LicenseErrorHash = Deactivator::LicenseErrorHash;
 
-Deactivator::ErrorCode getError(const QJsonObject& object)
+ErrorCode getError(const QJsonObject& object)
 {
     static const auto kCodeTag = lit("code");
     if (object.isEmpty() || !object.contains(kCodeTag))
         return ErrorCode::UnknownError;
 
     const auto code = object[kCodeTag].toString();
-    if (code == lit("keyIsNotActivated"))
-        return ErrorCode::LicenseDeactivatedAlready;
-
-    if (code == lit("limitExceeded"))
-        return ErrorCode::LimitExceeded;
-
-    return ErrorCode::UnknownError;
+    return QnLexical::deserialized(code, ErrorCode::UnknownError);
 }
 
 LicenseErrorHash extractErrors(const QByteArray& messageBody)
@@ -164,12 +171,14 @@ LicenseDeactivatorPrivate::LicenseDeactivatorPrivate(
     connect(m_httpClient.get(), &nx_http::AsyncHttpClient::done, this, threadSafeHandler,
         Qt::DirectConnection);
 
-    QStringList licenseData;
+    detail::Licenses data;
     for (const auto& license: licenses)
-        licenseData.append(toJson(license));
+        data.licenses.append({::toString(license->key()), license->hardwareId()});
 
-    const auto body = kJsonRootTemplate.arg(licenseData.join(L',')).toLatin1();
-    m_httpClient->doPost(kDeactivateLicenseUrl, kJsonContentType, body);
+    static const QByteArray kJsonContentType(
+        Qn::serializationFormatToHttpContentType(Qn::JsonFormat));
+
+    m_httpClient->doPost(kDeactivateLicenseUrl, kJsonContentType, QJson::serialized(data));
 }
 
 }
@@ -218,10 +227,12 @@ QString Deactivator::errorDescription(ErrorCode error)
             return QString();
         case ErrorCode::UnknownError:
             return tr("Unknown error");
-        case ErrorCode::LicenseDeactivatedAlready:
+        case ErrorCode::keyIsNotActivated:
             return tr("License is inactive");
-        case ErrorCode::LimitExceeded:
+        case ErrorCode::limitExceeded:
             return tr("Limit exceeded");
+        case ErrorCode::keyIsInvalid:
+            return tr("Invalid license key");
     }
 
     NX_EXPECT(false, "We don't excpect to be here");
