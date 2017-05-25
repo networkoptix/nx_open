@@ -13,6 +13,9 @@
 #include <transaction/transaction_message_bus_base.h>
 #include "p2p_serialization.h"
 
+// For debug purpose only
+#define CHECK_SEQUENCE
+
 namespace nx {
 namespace p2p {
 
@@ -343,7 +346,18 @@ void Connection::sendMessage(const nx::Buffer& data)
     m_timer.post(
         [this, data]()
         {
+#ifdef CHECK_SEQUENCE
+            QByteArray dataWithSequence;
+            dataWithSequence.resize(8);
+            quint32* dataPtr = (quint32*) dataWithSequence.data();
+            dataPtr[0] = htonl(m_sendSequence++);
+            dataPtr[1] = htonl(data.size());
+            dataWithSequence.append(data);
+            m_dataToSend.push_back(dataWithSequence);
+#else
             m_dataToSend.push_back(data);
+#endif
+
             if (m_dataToSend.size() == 1)
             {
                 quint8 messageType = (quint8)m_dataToSend.front().at(0);
@@ -408,9 +422,22 @@ void Connection::onNewMessageRead(SystemError::ErrorCode errorCode, size_t bytes
 bool Connection::handleMessage(const nx::Buffer& message)
 {
     NX_ASSERT(!message.isEmpty());
-    MessageType messageType = (MessageType) message[0];
+    int offset = 0;
+#ifdef CHECK_SEQUENCE
+    offset = 8;
+    quint32* dataPtr = (quint32*) message.data();
+    quint32 sequence = ntohl(dataPtr[0]);
+    quint32 dataSize = ntohl(dataPtr[1]);
+
+    NX_CRITICAL(sequence == m_lastReceivedSequence);
+    m_lastReceivedSequence++;
+    NX_CRITICAL(dataSize == message.size() - offset);
+#endif
+
+    MessageType messageType = (MessageType)message[offset];
     NX_ASSERT(!m_remotePeer.persistentId.isNull());
-    emit gotMessage(weakPointer(), messageType, message.mid(1));
+    emit gotMessage(weakPointer(), messageType, message.mid(offset + 1));
+
     return true;
 }
 

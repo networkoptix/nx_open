@@ -138,6 +138,9 @@ private:
 
     network::aio::Timer m_timer;
     std::unique_ptr<QObject> m_opaqueObject;
+
+    int m_sendSequence = 0;
+    int m_lastReceivedSequence = 0;
 };
 
 QString toString(Connection::State value);
