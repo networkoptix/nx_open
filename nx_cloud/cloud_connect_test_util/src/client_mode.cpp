@@ -2,7 +2,7 @@
 
 #include <nx/network/cloud/cloud_stream_socket.h>
 #include <nx/network/cloud/tunnel/tcp/direct_endpoint_connector.h>
-#include <nx/network/http/httpclient.h>
+#include <nx/network/http/http_client.h>
 #include <nx/network/test_support/socket_test_helper.h>
 
 #include <nx/utils/string.h>

@@ -8,7 +8,7 @@
 #include <tuple>
 
 #include <nx/network/http/auth_tools.h>
-#include <nx/network/http/httpclient.h>
+#include <nx/network/http/http_client.h>
 #include <nx/network/socket.h>
 #include <nx/network/socket_global.h>
 #include <nx/utils/std/cpp14.h>

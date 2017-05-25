@@ -1,6 +1,6 @@
 #include "test_setup.h"
 
-#include <nx/network/http/httpclient.h>
+#include <nx/network/http/http_client.h>
 #include <nx/network/http/test_http_server.h>
 #include <nx/network/url/url_builder.h>
 

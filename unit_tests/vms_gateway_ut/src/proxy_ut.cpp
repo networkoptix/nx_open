@@ -4,7 +4,7 @@
 
 #include <nx/network/http/buffer_source.h>
 #include <nx/network/http/chunked_transfer_encoder.h>
-#include <nx/network/http/httpclient.h>
+#include <nx/network/http/http_client.h>
 
 namespace nx {
 namespace cloud {

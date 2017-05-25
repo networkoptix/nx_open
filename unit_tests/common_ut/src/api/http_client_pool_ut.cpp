@@ -16,7 +16,7 @@
 #include <nx/utils/std/cpp14.h>
 #include <nx/utils/byte_stream/custom_output_stream.h>
 #include <nx/network/http/asynchttpclient.h>
-#include <nx/network/http/httpclient.h>
+#include <nx/network/http/http_client.h>
 #include <nx/network/http/multipart_content_parser.h>
 #include <nx/network/http/server/http_stream_socket_server.h>
 #include <nx/network/http/test_http_server.h>

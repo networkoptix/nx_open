@@ -13,7 +13,7 @@
 
 #include <nx/utils/thread/mutex.h>
 #include <nx/utils/thread/wait_condition.h>
-#include <nx/network/http/httpclient.h>
+#include <nx/network/http/http_client.h>
 #include <nx/network/http/multipart_content_parser.h>
 
 #include <plugins/camera_plugin.h>

@@ -1,7 +1,7 @@
 #include <gtest/gtest.h>
 
 #include <nx/network/http/auth_tools.h>
-#include <nx/network/http/httpclient.h>
+#include <nx/network/http/http_client.h>
 #include <nx/network/http/server/http_server_connection.h>
 #include <nx/network/system_socket.h>
 #include <nx/utils/literal.h>
