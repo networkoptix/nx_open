@@ -176,11 +176,12 @@ QString QnStorageListModel::displayData(const QModelIndex& index, bool forcedTex
 
             return path;
         }
-		case StoragePoolColumn:
-	    	if (!storageData.isOnline)
-           		return tr("Inaccessible");
-	        if (!storageData.isWritable)
-            	return lit("Reserved");
+
+        case StoragePoolColumn:
+            if (!storageData.isOnline)
+                return tr("Inaccessible");
+            if (!storageData.isWritable)
+                return lit("Reserved");
             return storageData.isBackup ? tr("Backup") : tr("Main");
 
         case TypeColumn:
