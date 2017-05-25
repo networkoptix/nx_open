@@ -46,7 +46,7 @@ QString braced(const QString& source)
         /** No image is selected. */
         NoImage,
         /** Error is occurred. */
-        Error,
+        ErrorCode,
         /** Current layout image is being downloaded from the Server. */
         ImageDownloading,
         /** Current layout image is downloaded from the Server. */
@@ -94,7 +94,7 @@ public:
 
     /** Image is present and image file is available locally. */
     bool imageFileIsAvailable() const {
-        return state != NoImage && state != Error && state != ImageDownloading;
+        return state != NoImage && state != ErrorCode && state != ImageDownloading;
     }
 
     bool imageIsLoading() const {
@@ -192,7 +192,7 @@ bool QnLayoutSettingsDialog::eventFilter(QObject *target, QEvent *event) {
     {
         if (target == ui->imageLabel && !d->skipNextReleaseEvent)
         {
-            if (!ui->lockedCheckBox->isChecked() && (d->state == NoImage || d->state == Error) )
+            if (!ui->lockedCheckBox->isChecked() && (d->state == NoImage || d->state == ErrorCode) )
                 selectFile();
             else
                 viewFile();
@@ -338,7 +338,7 @@ void QnLayoutSettingsDialog::updateControls() {
     QImage image;
     if (!imagePresent) {
         ui->imageLabel->setPixmap(QPixmap());
-        ui->imageLabel->setText(d->state != Error
+        ui->imageLabel->setText(d->state != ErrorCode
                             ? braced(tr("No picture"))
                             : d->errorText);
     } else {
@@ -391,7 +391,7 @@ void QnLayoutSettingsDialog::accept() {
 
     /* if image not present or still not loaded then do nothing */
     case NoImage:
-    case Error:
+    case ErrorCode:
     case NewImageSelected:
     case ImageDownloaded:
         base_type::accept();
@@ -464,7 +464,7 @@ void QnLayoutSettingsDialog::at_imageLoaded(const QString &filename, bool ok) {
     d->state = ImageDownloaded;
 
     if (!ok) {
-        d->state = Error;
+        d->state = ErrorCode;
         d->errorText = braced(tr("Error while loading picture"));
     } else {
         d->state = ImageDownloaded;
@@ -477,7 +477,7 @@ void QnLayoutSettingsDialog::at_imageStored(const QString &filename, bool ok) {
     Q_D(QnLayoutSettingsDialog);
 
     if (!ok) {
-        d->state = Error;
+        d->state = ErrorCode;
         d->errorText = braced(tr("Error while uploading picture"));
         updateControls();
         return;
@@ -553,14 +553,14 @@ void QnLayoutSettingsDialog::selectFile() {
 
     QFileInfo fileInfo(fileName);
     if (fileInfo.size() == 0) {
-        d->state = Error;
+        d->state = ErrorCode;
         d->errorText = braced(tr("Picture cannot be read"));
         updateControls();
         return;
     }
 
     if (fileInfo.size() > ServerFileCache::maximumFileSize()) {
-        d->state = Error;
+        d->state = ErrorCode;
         //TODO: #GDM #3.1 move out strings and logic to separate class (string.h:bytesToString)
         //Important: maximumFileSize() is hardcoded in 1024-base
         d->errorText = braced(tr("Picture is too big. Maximum size is %1 MB")
@@ -588,7 +588,7 @@ void QnLayoutSettingsDialog::setPreview(const QImage &image) {
         return;
 
     if (image.isNull()) {
-        d->state = Error;
+        d->state = ErrorCode;
         d->errorText = braced(tr("Picture cannot be loaded"));
         updateControls();
         return;

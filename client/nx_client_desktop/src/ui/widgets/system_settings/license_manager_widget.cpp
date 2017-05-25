@@ -54,7 +54,7 @@
 
 namespace {
 
-using Deactivator = nx::client::desktop::helpers::license::Deactivator;
+using namespace nx::client::desktop::license;
 using LicenseErrorHash = Deactivator::LicenseErrorHash;
 
 QString getDeactivationMessages(const LicenseErrorHash& errors)
@@ -582,7 +582,7 @@ QStringList QnLicenseManagerWidget::deactivationExtrasText(const QnLicenseList& 
 
         const auto key = QString::fromStdString(license->key().constData());
         const auto channelsCountString =
-            tr("%n channel(s)", "%n is count of channels", license->cameraCount());
+            tr("%n channels", "", license->cameraCount());
         result.append(extraLineTemplate.arg(key, license->displayName(), channelsCountString));
     }
     return result;
@@ -591,7 +591,7 @@ QStringList QnLicenseManagerWidget::deactivationExtrasText(const QnLicenseList& 
 bool QnLicenseManagerWidget::confirmDeactivation(const QStringList& extras) const
 {
     QnMessageBox confirmationDialog(QnMessageBoxIcon::Question,
-        tr("Deactivate license(s)?", nullptr, extras.size()),
+        tr("Deactivate licenses?", "", extras.size()),
         extras.join(lit("\n")),
         QDialogButtonBox::Cancel);
     confirmationDialog.addButton(lit("Deactivate"),

@@ -11,7 +11,6 @@
 namespace nx {
 namespace client {
 namespace desktop {
-namespace helpers {
 namespace license {
 
 class Deactivator
@@ -52,8 +51,7 @@ public:
 
 };
 
-} // license namespace
-} // helpers namespace
-} // desktop namespace
-} // client namespace
-} // nx namespace
+} // namespace license
+} // namespace desktop
+} // namespace client
+} // namespace nx
