@@ -391,7 +391,7 @@ angular.module('nxCommon').controller('ViewCtrl',
 
         systemAPI.getCurrentUser().then(function(result) {
             $scope.canViewArchive = result.data.reply.isAdmin || (result.data.reply.permissions.indexOf(Config.globalViewArchivePermission)>=0);
-
+            $timeout(updateHeights());
             var userId = result.data.reply.id;
             $scope.camerasProvider.requestResources().then(function(res){
                 if(!$scope.storage.cameraId)
@@ -448,7 +448,6 @@ angular.module('nxCommon').controller('ViewCtrl',
             }
         };
 
-        setTimeout(function(){updateHeights();},200);
         $window.resize(updateHeights);
         window.addEventListener("orientationchange",function(){setTimeout(function(){updateHeights();},200);});
 
