@@ -180,7 +180,7 @@ QString QnStorageListModel::displayData(const QModelIndex& index, bool forcedTex
 	    	if (!storageData.isOnline)
            		return tr("Inaccessible");
 	        if (!storageData.isWritable)
-            	return lit("");
+            	return lit("Reserved");
             return storageData.isBackup ? tr("Backup") : tr("Main");
 
         case TypeColumn:
@@ -257,16 +257,37 @@ QVariant QnStorageListModel::data(const QModelIndex& index, int role) const
     {
         case Qt::DisplayRole:
             return displayData(index, false);
+
         case Qn::ItemMouseCursorRole:
             return mouseCursorData(index);
+
         case Qt::CheckStateRole:
             return checkstateData(index);
+
         case Qn::StorageInfoDataRole:
             return QVariant::fromValue<QnStorageModelInfo>(storage(index));
+
         case Qt::TextAlignmentRole:
             if (index.column() == TotalSpaceColumn)
                 return static_cast<int>(Qt::AlignRight | Qt::AlignVCenter);
             return QVariant();
+
+        case Qt::ToolTipRole:
+            if (index.column() == StoragePoolColumn)
+            {
+                const auto storageData = storage(index);
+                if (storageData.isOnline && !storageData.isWritable)
+                {
+                    const auto text = tr("Too small and system partitions are reserved and not"
+                        " used for writing if there is enough other storage space available.");
+
+                    /* HTML tooltips are word wrapped: */
+                    return lit("<span>%1</span").arg(text.toHtmlEscaped());
+                }
+
+                return QVariant();
+            }
+
         default:
             return QVariant();
     }
