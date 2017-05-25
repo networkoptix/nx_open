@@ -56,7 +56,7 @@ TEST_F(WebsocketMultibuffer, SingleBuffer_lockLast)
     ASSERT_EQ(buffer.readySize(), 1);
 
     auto popResult = buffer.popFront();
-    ASSERT_EQ(popResult.size(), kPerBufferWrites * strlen(kPattern));
+    ASSERT_EQ(popResult.size(), kPerBufferWrites * (int)strlen(kPattern));
 
     assertCorrectEmptyState();
 }
@@ -73,7 +73,7 @@ TEST_F(WebsocketMultibuffer, MultipleBuffer_lockLast)
     ASSERT_EQ(buffer.readySize(), 10);
 
     auto popResult = buffer.popFront();
-    ASSERT_EQ(popResult.size(), kPerBufferWrites * strlen(kPattern));
+    ASSERT_EQ(popResult.size(), kPerBufferWrites * (int)strlen(kPattern));
     ASSERT_EQ(buffer.readySize(), 9);
 }
 
