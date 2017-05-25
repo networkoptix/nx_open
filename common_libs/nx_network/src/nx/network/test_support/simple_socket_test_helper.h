@@ -679,37 +679,13 @@ void socketMultiConnect(
     const ClientSocketMaker& clientMaker,
     boost::optional<SocketAddress> endpointToConnectTo = boost::none)
 {
-    auto server = serverMaker();
-    auto serverGuard = makeScopeGuard([&server]() { server->pleaseStopSync(); });
-    ASSERT_TRUE(server->setNonBlockingMode(true));
-    ASSERT_TRUE(server->setReuseAddrFlag(true));
-    ASSERT_TRUE(server->bind(SocketAddress::anyPrivateAddress)) << lastError();
-    ASSERT_TRUE(server->listen((int)testClientCount())) << lastError();
-
-    nx::utils::TestSyncQueue< SystemError::ErrorCode > acceptResults;
-    nx::utils::TestSyncQueue< SystemError::ErrorCode > connectResults;
-
     QnMutex connectedSocketsMutex;
     bool terminated = false;
-
+    nx::utils::TestSyncQueue< SystemError::ErrorCode > acceptResults;
+    nx::utils::TestSyncQueue< SystemError::ErrorCode > connectResults;
     std::vector<std::unique_ptr<AbstractStreamSocket>> acceptedSockets;
     std::vector<std::unique_ptr<AbstractStreamSocket>> connectedSockets;
-    auto connectedSocketsGuard = makeScopeGuard(
-        [&connectedSockets, &connectedSocketsMutex, &terminated]()
-        {
-            {
-                QnMutexLocker lock(&connectedSocketsMutex);
-                terminated = true;
-            }
-
-            for (auto& socket: connectedSockets)
-                socket->pleaseStopSync();
-        });
-
-    auto serverAddress = server->getLocalAddress();
-    NX_LOG(lm("Server address: %1").arg(serverAddress.toString()), cl_logDEBUG1);
-    if (!endpointToConnectTo)
-        endpointToConnectTo = std::move(serverAddress);
+    decltype(serverMaker()) server;
 
     std::function<void(SystemError::ErrorCode, std::unique_ptr<AbstractStreamSocket>)> acceptor = 
         [&](SystemError::ErrorCode code, std::unique_ptr<AbstractStreamSocket> socket)
@@ -721,9 +697,6 @@ void socketMultiConnect(
             acceptedSockets.emplace_back(std::move(socket));
             server->acceptAsync(acceptor);
         };
-
-    server->acceptAsync(acceptor);
-    std::this_thread::sleep_for(std::chrono::milliseconds(50)); // for UDT only
 
     std::function<void(int)> connectNewClients =
         [&](int clientsToConnect)
@@ -747,6 +720,33 @@ void socketMultiConnect(
                         connectNewClients(clientsToConnect - 1);
                 });
         };
+
+    server = serverMaker();
+    auto serverGuard = makeScopeGuard([&server]() { server->pleaseStopSync(); });
+    ASSERT_TRUE(server->setNonBlockingMode(true));
+    ASSERT_TRUE(server->setReuseAddrFlag(true));
+    ASSERT_TRUE(server->bind(SocketAddress::anyPrivateAddress)) << lastError();
+    ASSERT_TRUE(server->listen((int)testClientCount())) << lastError();
+
+    auto connectedSocketsGuard = makeScopeGuard(
+        [&connectedSockets, &connectedSocketsMutex, &terminated]()
+        {
+            {
+                QnMutexLocker lock(&connectedSocketsMutex);
+                terminated = true;
+            }
+
+            for (auto& socket: connectedSockets)
+                socket->pleaseStopSync();
+        });
+
+    auto serverAddress = server->getLocalAddress();
+    NX_LOG(lm("Server address: %1").arg(serverAddress.toString()), cl_logDEBUG1);
+    if (!endpointToConnectTo)
+        endpointToConnectTo = std::move(serverAddress);
+
+    server->acceptAsync(acceptor);
+    std::this_thread::sleep_for(std::chrono::milliseconds(50)); // for UDT only
 
     const auto kClientCount = testClientCount();
     connectNewClients((int)kClientCount);

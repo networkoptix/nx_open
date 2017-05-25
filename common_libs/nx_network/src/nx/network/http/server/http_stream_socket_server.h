@@ -22,13 +22,13 @@ public:
         nx_http::server::AbstractAuthenticationManager* const authenticationManager,
         nx_http::AbstractMessageDispatcher* const httpMessageDispatcher,
         StreamServerArgs... streamServerArgs)
-	    :
-		base_type(std::move(streamServerArgs)...),
-		m_authenticationManager(authenticationManager),
-		m_httpMessageDispatcher(httpMessageDispatcher),
+        :
+        base_type(std::move(streamServerArgs)...),
+        m_authenticationManager(authenticationManager),
+        m_httpMessageDispatcher(httpMessageDispatcher),
         m_persistentConnectionEnabled(true)
-	{
-	}
+    {
+    }
 
     void setPersistentConnectionEnabled(bool value);
 

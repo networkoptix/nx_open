@@ -9,5 +9,4 @@ nx_add_target(applauncher EXECUTABLE
         qtsinglecoreapplication
         nx_kit
         common
-        nx_streaming #< Dependency of common.
 )

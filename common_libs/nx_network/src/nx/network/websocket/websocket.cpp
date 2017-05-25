@@ -1,5 +1,7 @@
 #include "websocket.h"
 
+#include <nx/utils/std/future.h>
+
 namespace nx {
 namespace network {
 namespace websocket {
@@ -36,7 +38,7 @@ WebSocket::~WebSocket()
 
 void WebSocket::bindToAioThread(aio::AbstractAioThread* aioThread)
 {
-    std::promise<void> p;
+    nx::utils::promise<void> p;
     auto f = p.get_future();
 
     dispatch([this, aioThread, p = std::move(p)]() mutable
@@ -243,7 +245,7 @@ void WebSocket::handlePingTimer()
 
 void WebSocket::resetPingTimeoutBySocketTimeoutSync()
 {
-    std::promise<void> p;
+    nx::utils::promise<void> p;
     auto f = p.get_future();
     resetPingTimeoutBySocketTimeout([p = std::move(p)]() mutable { p.set_value(); });
     f.wait();

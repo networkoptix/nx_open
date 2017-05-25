@@ -29,7 +29,6 @@ endif()
 target_include_directories(common
     PRIVATE
         ${Qt5Core_PRIVATE_INCLUDE_DIRS}
-        "${CMAKE_SOURCE_DIR}/common_libs/nx_streaming/src"
 )
 
 if(WINDOWS)

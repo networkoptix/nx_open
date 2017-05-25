@@ -20,7 +20,7 @@
         <guid>${connection_mediator_ut.guid}</guid>
 
         <qt.libs>core network xml concurrent sql multimedia</qt.libs>
-        <global.libs>-lcommon -lnx_streaming -lnx_network -ludt -lcloud_db_client -lconnection_mediator -lnx_fusion -lnx_utils -lappserver2 -lcloud_db</global.libs>
+        <global.libs>-lcommon -lnx_network -ludt -lcloud_db_client -lconnection_mediator -lnx_fusion -lnx_utils -lappserver2 -lcloud_db</global.libs>
         <windows.oslibs>Ws2_32.lib DbgHelp.lib Winmm.lib Iphlpapi.lib</windows.oslibs>
 
         <windows.defines>_VARIADIC_MAX=10</windows.defines>
