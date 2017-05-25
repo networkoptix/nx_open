@@ -51,10 +51,6 @@ void initialize(Manager* manager, Action* root)
         .flags(ResourceTarget | WidgetTarget | LayoutItemTarget | LayoutTarget | SingleTarget | MultiTarget)
         .mode(DesktopMode);
 
-    factory(DropResourcesIntoNewLayoutAction)
-        .flags(ResourceTarget | WidgetTarget | LayoutItemTarget | LayoutTarget | SingleTarget | MultiTarget)
-        .mode(DesktopMode);
-
     factory(DelayedOpenVideoWallItemAction)
         .flags(NoTarget);
 
@@ -761,7 +757,7 @@ void initialize(Manager* manager, Action* root)
             ConditionWrapper(new OpenInCurrentLayoutCondition())
             && !condition::isLayoutTourReviewMode());
 
-    factory(OpenInNewLayoutAction)
+    factory(OpenInNewTabAction)
         .mode(DesktopMode)
         .flags(Tree | Scene | SingleTarget | MultiTarget | ResourceTarget | LayoutItemTarget | WidgetTarget)
         .text(tr("Open in New Tab"))
@@ -783,39 +779,9 @@ void initialize(Manager* manager, Action* root)
             && ConditionWrapper(new LightModeCondition(Qn::LightModeNoNewWindow))
         );
 
-    factory(OpenSingleLayoutAction)
-        .flags(Tree | SingleTarget | ResourceTarget)
-        .text(tr("Open Layout in New Tab"))
-        .condition(hasFlags(Qn::layout));
-
-    factory(OpenMultipleLayoutsAction)
-        .flags(Tree | MultiTarget | ResourceTarget)
-        .text(tr("Open Layouts"))
-        .condition(hasFlags(Qn::layout));
-
-    factory(OpenSingleLayoutInNewWindowAction)
-        .flags(Tree | SingleTarget | ResourceTarget)
-        .text(tr("Open Layout in New Window"))
-        .condition(
-            condition::hasFlags(Qn::layout, ExactlyOne)
-            && ConditionWrapper(new LightModeCondition(Qn::LightModeNoNewWindow))
-        );
-
-    factory(OpenMultiLayoutInNewWindowAction)
-        .flags(Tree | MultiTarget | ResourceTarget)
-        .text(tr("Open Layouts in New Window"))
-        .condition(
-            condition::hasFlags(Qn::layout, All)
-            && ConditionWrapper(new LightModeCondition(Qn::LightModeNoNewWindow))
-        );
-
     factory(OpenCurrentLayoutInNewWindowAction)
         .flags(NoTarget)
         .condition(new LightModeCondition(Qn::LightModeNoNewWindow));
-
-    factory(OpenAnyNumberOfLayoutsAction)
-        .flags(SingleTarget | MultiTarget | ResourceTarget)
-        .condition(hasFlags(Qn::layout));
 
     factory(OpenVideoWallReviewAction)
         .flags(Tree | SingleTarget | ResourceTarget)
@@ -967,18 +933,21 @@ void initialize(Manager* manager, Action* root)
         .flags(Scene | SingleTarget | MultiTarget)
         .text(tr("Show Info"))
         .shortcut(lit("Alt+I"))
-        .condition(new DisplayInfoCondition(false));
+        .condition(ConditionWrapper(new DisplayInfoCondition(false))
+            && !condition::isLayoutTourReviewMode());
 
     factory(HideInfoAction)
         .flags(Scene | SingleTarget | MultiTarget)
         .text(tr("Hide Info"))
         .shortcut(lit("Alt+I"))
-        .condition(new DisplayInfoCondition(true));
+        .condition(ConditionWrapper(new DisplayInfoCondition(false))
+            && !condition::isLayoutTourReviewMode());
 
     factory(ToggleInfoAction)
         .flags(Scene | SingleTarget | MultiTarget | HotkeyOnly)
         .shortcut(lit("Alt+I"))
-        .condition(new DisplayInfoCondition());
+        .condition(ConditionWrapper(new DisplayInfoCondition(false))
+            && !condition::isLayoutTourReviewMode());
 
     factory()
         .flags(Scene | NoTarget)
@@ -1041,7 +1010,8 @@ void initialize(Manager* manager, Action* root)
         .conditionalText(tr("Show Motion"), new NoArchiveCondition())
         .shortcut(lit("Alt+G"))
         .condition(ConditionWrapper(new SmartSearchCondition(false))
-            && !condition::tourIsRunning());
+            && !condition::tourIsRunning()
+            && !condition::isLayoutTourReviewMode());
 
     // TODO: #ynikitenkov remove this action, use StartSmartSearchAction with .checked state!
     factory(StopSmartSearchAction)
@@ -1050,19 +1020,22 @@ void initialize(Manager* manager, Action* root)
         .conditionalText(tr("Hide Motion"), new NoArchiveCondition())
         .shortcut(lit("Alt+G"))
         .condition(ConditionWrapper(new SmartSearchCondition(true))
-            && !condition::tourIsRunning());
+            && !condition::tourIsRunning()
+            && !condition::isLayoutTourReviewMode());
 
     factory(ClearMotionSelectionAction)
         .flags(Scene | SingleTarget | MultiTarget)
         .text(tr("Clear Motion Selection"))
         .condition(ConditionWrapper(new ClearMotionSelectionCondition())
-            && !condition::tourIsRunning());
+            && !condition::tourIsRunning()
+            && !condition::isLayoutTourReviewMode());
 
     factory(ToggleSmartSearchAction)
         .flags(Scene | SingleTarget | MultiTarget | HotkeyOnly)
         .shortcut(lit("Alt+G"))
         .condition(ConditionWrapper(new SmartSearchCondition())
-            && !condition::tourIsRunning());
+            && !condition::tourIsRunning()
+            && !condition::isLayoutTourReviewMode());
 
     factory(CheckFileSignatureAction)
         .flags(Scene | SingleTarget)
@@ -1070,7 +1043,8 @@ void initialize(Manager* manager, Action* root)
         .shortcut(lit("Alt+C"))
         .autoRepeat(false)
         .condition(condition::hasFlags(Qn::exported_media, All)
-            && !condition::tourIsRunning());
+            && !condition::tourIsRunning()
+            && !condition::isLayoutTourReviewMode());
 
     factory(TakeScreenshotAction)
         .flags(Scene | SingleTarget | HotkeyOnly)
@@ -1083,7 +1057,8 @@ void initialize(Manager* manager, Action* root)
         .text(tr("Image Enhancement..."))
         .shortcut(lit("Alt+J"))
         .autoRepeat(false)
-        .condition(new AdjustVideoCondition());
+        .condition(ConditionWrapper(new AdjustVideoCondition())
+            && !condition::isLayoutTourReviewMode());
 
     factory(CreateZoomWindowAction)
         .flags(SingleTarget | WidgetTarget)
@@ -1132,6 +1107,7 @@ void initialize(Manager* manager, Action* root)
     factory(RemoveLayoutItemFromSceneAction)
         .flags(Scene | SingleTarget | MultiTarget | LayoutItemTarget | IntentionallyAmbiguous)
         .text(tr("Remove from Layout"))
+        .conditionalText(tr("Remove from Tour"), condition::isLayoutTourReviewMode())
         .shortcut(lit("Del"))
         .shortcut(Qt::Key_Backspace, Builder::Mac, true)
         .autoRepeat(false)
@@ -1241,7 +1217,8 @@ void initialize(Manager* manager, Action* root)
         .requiredGlobalPermission(Qn::GlobalViewLogsPermission)
         .condition(condition::hasFlags(Qn::live_cam, Any)
             && !condition::isPreviewSearchMode()
-            && !condition::tourIsRunning());
+            && !condition::tourIsRunning()
+            && !condition::isLayoutTourReviewMode());
 
     factory(CameraBusinessRulesAction)
         .mode(DesktopMode)
@@ -1255,7 +1232,8 @@ void initialize(Manager* manager, Action* root)
         .requiredGlobalPermission(Qn::GlobalAdminPermission)
         .condition(condition::hasFlags(Qn::live_cam, ExactlyOne)
             && !condition::isPreviewSearchMode()
-            && !condition::tourIsRunning());
+            && !condition::tourIsRunning()
+            && !condition::isLayoutTourReviewMode());
 
     factory(CameraSettingsAction)
         .mode(DesktopMode)
@@ -1269,14 +1247,16 @@ void initialize(Manager* manager, Action* root)
         .requiredGlobalPermission(Qn::GlobalEditCamerasPermission)
         .condition(condition::hasFlags(Qn::live_cam, Any)
             && !condition::isPreviewSearchMode()
-            && !condition::tourIsRunning());
+            && !condition::tourIsRunning()
+            && !condition::isLayoutTourReviewMode());
 
     factory(MediaFileSettingsAction)
         .mode(DesktopMode)
         .flags(Scene | Tree | SingleTarget | ResourceTarget | LayoutItemTarget)
         .text(tr("File Settings..."))
         .condition(condition::hasFlags(Qn::local_media, Any)
-            && !condition::tourIsRunning());
+            && !condition::tourIsRunning()
+            && !condition::isLayoutTourReviewMode());
 
     factory(LayoutSettingsAction)
         .mode(DesktopMode)
@@ -1289,22 +1269,19 @@ void initialize(Manager* manager, Action* root)
     factory(VideowallSettingsAction)
         .flags(Tree | SingleTarget | ResourceTarget)
         .text(tr("Video Wall Settings..."))
-        .condition(
-            condition::hasFlags(Qn::videowall, ExactlyOne)
+        .condition(condition::hasFlags(Qn::videowall, ExactlyOne)
             && ConditionWrapper(new AutoStartAllowedCondition())
-            && !condition::isSafeMode()
-        );
+            && !condition::isSafeMode());
 
     factory(ServerAddCameraManuallyAction)
         .flags(Scene | Tree | SingleTarget | ResourceTarget | LayoutItemTarget)
         .text(tr("Add Device..."))   //intentionally hardcode devices here
         .requiredGlobalPermission(Qn::GlobalAdminPermission)
-        .condition(
-            condition::hasFlags(Qn::remote_server, ExactlyOne)
+        .condition(condition::hasFlags(Qn::remote_server, ExactlyOne)
             && ConditionWrapper(new EdgeServerCondition(false))
             && !ConditionWrapper(new FakeServerCondition(true))
             && !condition::isSafeMode()
-        );
+            && !condition::isLayoutTourReviewMode());
 
     factory(CameraListByServerAction)
         .flags(Scene | Tree | SingleTarget | ResourceTarget | LayoutItemTarget)
@@ -1317,7 +1294,8 @@ void initialize(Manager* manager, Action* root)
         .condition(condition::hasFlags(Qn::remote_server, ExactlyOne)
             && ConditionWrapper(new EdgeServerCondition(false))
             && !ConditionWrapper(new FakeServerCondition(true))
-            && !condition::tourIsRunning());
+            && !condition::tourIsRunning()
+            && !condition::isLayoutTourReviewMode());
 
     factory(PingAction)
         .flags(NoTarget);
@@ -1328,7 +1306,8 @@ void initialize(Manager* manager, Action* root)
         .requiredGlobalPermission(Qn::GlobalAdminPermission)
         .condition(condition::hasFlags(Qn::remote_server, ExactlyOne)
             && !ConditionWrapper(new FakeServerCondition(true))
-            && !condition::tourIsRunning());
+            && !condition::tourIsRunning()
+            && !condition::isLayoutTourReviewMode());
 
     factory(ServerIssuesAction)
         .flags(Scene | Tree | SingleTarget | ResourceTarget | LayoutItemTarget)
@@ -1336,7 +1315,8 @@ void initialize(Manager* manager, Action* root)
         .requiredGlobalPermission(Qn::GlobalViewLogsPermission)
         .condition(condition::hasFlags(Qn::remote_server, ExactlyOne)
             && !ConditionWrapper(new FakeServerCondition(true))
-            && !condition::tourIsRunning());
+            && !condition::tourIsRunning()
+            && !condition::isLayoutTourReviewMode());
 
     factory(WebAdminAction)
         .flags(Scene | Tree | SingleTarget | MultiTarget | ResourceTarget | LayoutItemTarget)
@@ -1345,7 +1325,8 @@ void initialize(Manager* manager, Action* root)
         .condition(condition::hasFlags(Qn::remote_server, ExactlyOne)
             && !ConditionWrapper(new FakeServerCondition(true))
             && !ConditionWrapper(new CloudServerCondition(Any))
-            && !condition::tourIsRunning());
+            && !condition::tourIsRunning()
+            && !condition::isLayoutTourReviewMode());
 
     factory(ServerSettingsAction)
         .flags(Scene | Tree | SingleTarget | MultiTarget | ResourceTarget | LayoutItemTarget)
@@ -1353,7 +1334,8 @@ void initialize(Manager* manager, Action* root)
         .requiredGlobalPermission(Qn::GlobalAdminPermission)
         .condition(condition::hasFlags(Qn::remote_server, ExactlyOne)
             && !ConditionWrapper(new FakeServerCondition(true))
-            && !condition::tourIsRunning());
+            && !condition::tourIsRunning()
+            && !condition::isLayoutTourReviewMode());
 
     factory(ConnectToCurrentSystem)
         .flags(Tree | SingleTarget | MultiTarget | ResourceTarget)

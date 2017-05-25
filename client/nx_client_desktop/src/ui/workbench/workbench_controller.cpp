@@ -1226,7 +1226,7 @@ void QnWorkbenchController::at_item_doubleClicked(QnResourceWidget *widget)
     if (workbench()->currentLayout()->isLayoutTourReview())
     {
         if (auto resource = widget->resource())
-            menu()->trigger(action::DropResourcesIntoNewLayoutAction, resource);
+            menu()->trigger(action::OpenInNewTabAction, resource);
         return;
     }
 

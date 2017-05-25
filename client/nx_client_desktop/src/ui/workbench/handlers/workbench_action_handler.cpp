@@ -260,16 +260,9 @@ ActionHandler::ActionHandler(QObject *parent) :
     connect(action(action::PreviousLayoutAction), SIGNAL(triggered()), this, SLOT(at_previousLayoutAction_triggered()));
     connect(action(action::OpenInLayoutAction), SIGNAL(triggered()), this, SLOT(at_openInLayoutAction_triggered()));
     connect(action(action::OpenInCurrentLayoutAction), SIGNAL(triggered()), this, SLOT(at_openInCurrentLayoutAction_triggered()));
-    connect(action(action::OpenInNewLayoutAction), SIGNAL(triggered()), this, SLOT(at_openInNewLayoutAction_triggered()));
+    connect(action(action::OpenInNewTabAction), &QAction::triggered, this,
+        &ActionHandler::at_openInNewTabAction_triggered);
     connect(action(action::OpenInNewWindowAction), SIGNAL(triggered()), this, SLOT(at_openInNewWindowAction_triggered()));
-    connect(action(action::OpenSingleLayoutAction), SIGNAL(triggered()), this, SLOT(at_openLayoutsAction_triggered()));
-    connect(action(action::OpenMultipleLayoutsAction), SIGNAL(triggered()), this, SLOT(at_openLayoutsAction_triggered()));
-    connect(action(action::OpenAnyNumberOfLayoutsAction), SIGNAL(triggered()), this, SLOT(at_openLayoutsAction_triggered()));
-
-    connect(action(action::OpenSingleLayoutInNewWindowAction), &QAction::triggered, this,
-        &ActionHandler::at_openLayoutsInNewWindowAction_triggered);
-    connect(action(action::OpenMultiLayoutInNewWindowAction), &QAction::triggered, this,
-        &ActionHandler::at_openLayoutsInNewWindowAction_triggered);
 
     connect(action(action::OpenCurrentLayoutInNewWindowAction), SIGNAL(triggered()), this, SLOT(at_openCurrentLayoutInNewWindowAction_triggered()));
     connect(action(action::OpenNewWindowAction), SIGNAL(triggered()), this, SLOT(at_openNewWindowAction_triggered()));
@@ -289,7 +282,6 @@ ActionHandler::ActionHandler(QObject *parent) :
     connect(action(action::DropResourcesAction), SIGNAL(triggered()), this, SLOT(at_dropResourcesAction_triggered()));
     connect(action(action::DelayedDropResourcesAction), SIGNAL(triggered()), this, SLOT(at_delayedDropResourcesAction_triggered()));
     connect(action(action::InstantDropResourcesAction), SIGNAL(triggered()), this, SLOT(at_instantDropResourcesAction_triggered()));
-    connect(action(action::DropResourcesIntoNewLayoutAction), SIGNAL(triggered()), this, SLOT(at_dropResourcesIntoNewLayoutAction_triggered()));
     connect(action(action::MoveCameraAction), SIGNAL(triggered()), this, SLOT(at_moveCameraAction_triggered()));
     connect(action(action::AdjustVideoAction), SIGNAL(triggered()), this, SLOT(at_adjustVideoAction_triggered()));
     connect(action(action::ExitAction), &QAction::triggered, this, &ActionHandler::closeApplication);
@@ -340,7 +332,6 @@ ActionHandler::ActionHandler(QObject *parent) :
 
     connect(action(action::TogglePanicModeAction), SIGNAL(toggled(bool)), this, SLOT(at_togglePanicModeAction_toggled(bool)));
 
-    //connect(context()->instance<QnWorkbenchPanicWatcher>(),     SIGNAL(panicModeChanged()), this, SLOT(at_panicWatcher_panicModeChanged()));
     connect(context()->instance<QnWorkbenchScheduleWatcher>(), SIGNAL(scheduleEnabledChanged()), this, SLOT(at_scheduleWatcher_scheduleEnabledChanged()));
 
     /* Connect through lambda to handle forced parameter. */
@@ -349,7 +340,6 @@ ActionHandler::ActionHandler(QObject *parent) :
     connect(action(action::BeforeExitAction), &QAction::triggered, this, &ActionHandler::at_beforeExitAction_triggered);
 
     /* Run handlers that update state. */
-    //at_panicWatcher_panicModeChanged();
     at_scheduleWatcher_scheduleEnabledChanged();
 }
 
@@ -565,7 +555,7 @@ void ActionHandler::submitDelayedDrops() {
         QnLayoutResourceList layouts = resources.filtered<QnLayoutResource>();
         if (!layouts.isEmpty()) {
             workbench()->clear();
-            menu()->trigger(action::OpenAnyNumberOfLayoutsAction, layouts);
+            menu()->trigger(action::OpenInNewTabAction, layouts);
         }
         else {
             menu()->trigger(action::OpenInCurrentLayoutAction, resources);
@@ -592,7 +582,7 @@ void ActionHandler::submitInstantDrop() {
         QnLayoutResourceList layouts = resources.filtered<QnLayoutResource>();
         if (!layouts.isEmpty()) {
             workbench()->clear();
-            menu()->trigger(action::OpenAnyNumberOfLayoutsAction, layouts);
+            menu()->trigger(action::OpenInNewTabAction, layouts);
         }
         else {
             menu()->trigger(action::OpenInCurrentLayoutAction, resources);
@@ -808,14 +798,34 @@ void ActionHandler::at_openInCurrentLayoutAction_triggered()
     menu()->trigger(action::OpenInLayoutAction, parameters);
 }
 
-void ActionHandler::at_openInNewLayoutAction_triggered()
+void ActionHandler::at_openInNewTabAction_triggered()
 {
     // Stop layout tour if it is running.
     if (action(action::ToggleLayoutTourModeAction)->isChecked())
         menu()->trigger(action::ToggleLayoutTourModeAction);
 
+    const auto parameters = menu()->currentParameters(sender());
+
+    const auto layouts = parameters.resources().filtered<QnLayoutResource>();
+    for (const auto& layout: layouts)
+    {
+        auto wbLayout = QnWorkbenchLayout::instance(layout);
+        if (!wbLayout)
+        {
+            wbLayout = qnWorkbenchLayoutsFactory->create(layout, workbench());
+            workbench()->addLayout(wbLayout);
+        }
+        /* Explicit set that we do not control videowall through this layout */
+        wbLayout->setData(Qn::VideoWallItemGuidRole, qVariantFromValue(QnUuid()));
+        workbench()->setCurrentLayout(wbLayout);
+    }
+
+    const auto openable = parameters.resources().filtered(QnResourceAccessFilter::isOpenableInLayout);
+    if (openable.empty())
+        return;
+
     menu()->trigger(action::OpenNewTabAction);
-    menu()->trigger(action::OpenInCurrentLayoutAction, menu()->currentParameters(sender()));
+    menu()->trigger(action::DropResourcesAction, openable);
 }
 
 void ActionHandler::at_openInNewWindowAction_triggered()
@@ -834,38 +844,9 @@ void ActionHandler::at_openInNewWindowAction_triggered()
     openResourcesInNewWindow(filtered);
 }
 
-void ActionHandler::at_openLayoutsAction_triggered() {
-    foreach(const QnResourcePtr &resource, menu()->currentParameters(sender()).resources()) {
-        QnLayoutResourcePtr layoutResource = resource.dynamicCast<QnLayoutResource>();
-        if (!layoutResource)
-            continue;
-
-        QnWorkbenchLayout *layout = QnWorkbenchLayout::instance(layoutResource);
-        if (layout == NULL)
-        {
-            layout = qnWorkbenchLayoutsFactory->create(layoutResource, workbench());
-            workbench()->addLayout(layout);
-        }
-        /* Explicit set that we do not control videowall through this layout */
-        layout->setData(Qn::VideoWallItemGuidRole, qVariantFromValue(QnUuid()));
-
-        workbench()->setCurrentLayout(layout);
-    }
-}
-
-void ActionHandler::at_openLayoutsInNewWindowAction_triggered()
-{
-    // TODO: #GDM #Common this won't work for layouts that are not saved. (de)serialization of layouts is not implemented.
-    QnLayoutResourceList layouts = menu()->currentParameters(sender()).resources().filtered<QnLayoutResource>();
-    if (layouts.isEmpty())
-        return;
-    openResourcesInNewWindow(layouts);
-}
-
 void ActionHandler::at_openCurrentLayoutInNewWindowAction_triggered()
 {
-    menu()->trigger(action::OpenSingleLayoutInNewWindowAction,
-        workbench()->currentLayout()->resource());
+    menu()->trigger(action::OpenInNewWindowAction, workbench()->currentLayout()->resource());
 }
 
 void ActionHandler::at_openNewWindowAction_triggered()
@@ -1021,30 +1002,14 @@ void ActionHandler::at_dropResourcesAction_triggered()
     {
         parameters.setResources(resources);
         if (!menu()->triggerIfPossible(action::OpenInCurrentLayoutAction, parameters))
-            menu()->triggerIfPossible(action::OpenInNewLayoutAction, parameters);
+            menu()->triggerIfPossible(action::OpenInNewTabAction, parameters);
     }
 
     if (!layouts.empty())
-        menu()->trigger(action::OpenAnyNumberOfLayoutsAction, layouts);
+        menu()->trigger(action::OpenInNewTabAction, layouts);
 
     for (const auto& videoWall: videowalls)
         menu()->trigger(action::OpenVideoWallReviewAction, videoWall);
-}
-
-void ActionHandler::at_dropResourcesIntoNewLayoutAction_triggered()
-{
-    const auto parameters = menu()->currentParameters(sender());
-
-    const auto layouts = parameters.resources().filtered<QnLayoutResource>();
-    if (!layouts.empty())
-        menu()->trigger(action::OpenAnyNumberOfLayoutsAction, layouts);
-
-    const auto openable = parameters.resources().filtered(QnResourceAccessFilter::isOpenableInLayout);
-    if (openable.empty())
-        return;
-
-    menu()->trigger(action::OpenNewTabAction);
-    menu()->trigger(action::DropResourcesAction, openable);
 }
 
 void ActionHandler::at_delayedDropResourcesAction_triggered() {
@@ -1468,7 +1433,7 @@ void ActionHandler::at_thumbnailsSearchAction_triggered()
     layout->setLocalRange(period);
 
     resourcePool()->addResource(layout);
-    menu()->trigger(action::OpenSingleLayoutAction, layout);
+    menu()->trigger(action::OpenInNewTabAction, layout);
 }
 
 void ActionHandler::at_mediaFileSettingsAction_triggered() {
@@ -1909,16 +1874,6 @@ void ActionHandler::setCurrentLayoutBackground(const QString &filename) {
         }
     }
     layout->setBackgroundSize(QSize(w, h));
-}
-
-void ActionHandler::at_panicWatcher_panicModeChanged() {
-    action(action::TogglePanicModeAction)->setChecked(context()->instance<QnWorkbenchPanicWatcher>()->isPanicMode());
-
-    // TODO: #Elric totally evil copypasta and hacky workaround.
-    bool enabled =
-        context()->instance<QnWorkbenchScheduleWatcher>()->isScheduleEnabled() &&
-        accessController()->hasGlobalPermission(Qn::GlobalAdminPermission);
-    action(action::TogglePanicModeAction)->setEnabled(enabled);
 }
 
 void ActionHandler::at_scheduleWatcher_scheduleEnabledChanged() {

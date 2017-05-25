@@ -158,7 +158,7 @@ void LayoutTourReviewController::reviewLayoutTour(const ec2::ApiLayoutTourData& 
 
     if (auto layout = m_reviewLayouts.value(tour.id))
     {
-        menu()->trigger(action::OpenSingleLayoutAction, layout);
+        menu()->trigger(action::OpenInNewTabAction, layout);
         return;
     }
 
@@ -188,7 +188,7 @@ void LayoutTourReviewController::reviewLayoutTour(const ec2::ApiLayoutTourData& 
 
     m_reviewLayouts.insert(tour.id, layout);
 
-    menu()->trigger(action::OpenSingleLayoutAction, layout);
+    menu()->trigger(action::OpenInNewTabAction, layout);
     updateButtons(layout);
 }
 

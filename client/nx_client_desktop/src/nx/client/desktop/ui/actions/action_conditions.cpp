@@ -726,7 +726,7 @@ ActionVisibility AdjustVideoCondition::check(const QnResourceWidgetList& widgets
         return InvisibleAction;
 
     auto widget = widgets[0];
-    if ((widget->resource()->flags() & (Qn::server | Qn::videowall))
+    if ((widget->resource()->flags() & (Qn::server | Qn::videowall | Qn::layout))
         || (widget->resource()->flags().testFlag(Qn::web_page)))
         return InvisibleAction;
 
@@ -1036,11 +1036,18 @@ bool OpenInLayoutCondition::canOpen(const QnResourceList& resources,
     const QnLayoutResourcePtr& layout) const
 {
     if (!layout)
-        return any_of(resources, QnResourceAccessFilter::isOpenableInLayout);
+    {
+        return any_of(resources, QnResourceAccessFilter::isOpenableInLayout)
+            || any_of(resources,
+                [](const QnResourcePtr& resource)
+                {
+                    return resource->hasFlags(Qn::layout);
+                });
+    }
 
     bool isExportedLayout = layout->isFile();
 
-    for (const auto& resource : resources)
+    for (const auto& resource: resources)
     {
         if (!QnResourceAccessFilter::isOpenableInLayout(resource))
             continue;
