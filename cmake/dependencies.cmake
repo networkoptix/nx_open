@@ -81,7 +81,7 @@ function(get_dependencies)
         set(haveMobileClient TRUE)
     endif()
 
-    if(WINDOWS OR MACOSX OR (LINUX AND box MATCHES "none|bpi|tx1"))
+    if(WINDOWS OR MACOSX OR (LINUX AND NOT ANDROID AND box MATCHES "none|bpi|tx1"))
         set(haveTests TRUE)
     endif()
 
