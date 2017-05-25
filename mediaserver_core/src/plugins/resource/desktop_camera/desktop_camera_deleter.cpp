@@ -15,7 +15,7 @@
 
 namespace {
 
-const int deletePeriodMs = 60 * 1000;    //check once a minute
+const int kDeletePeriodMs = 60 * 1000;    //check once a minute
 
 } // namespace
 
@@ -29,7 +29,7 @@ QnDesktopCameraDeleter::QnDesktopCameraDeleter(QObject *parent):
             deleteQueuedResources();
             updateQueue();
         });
-    timer->start(deletePeriodMs);
+    timer->start(kDeletePeriodMs);
 }
 
 void QnDesktopCameraDeleter::deleteQueuedResources()
