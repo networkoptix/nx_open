@@ -54,11 +54,12 @@
 
 namespace {
 
-namespace license = nx::client::desktop::helpers::license;
-using LicenseErrorHash = license::Deactivator::LicenseErrorHash;
+using Deactivator = nx::client::desktop::helpers::license::Deactivator;
+using LicenseErrorHash = Deactivator::LicenseErrorHash;
+
 QString getDeactivationMessages(const LicenseErrorHash& errors)
 {
-    using ErrorCode = license::Deactivator::ErrorCode;
+    using ErrorCode = Deactivator::ErrorCode;
 
     QStringList result;
     for (auto it = errors.begin(); it != errors.end(); ++it)
@@ -69,7 +70,7 @@ QString getDeactivationMessages(const LicenseErrorHash& errors)
 
         const auto stringKey = QString::fromLatin1(it.key().begin());
         result.append(lit("%1: %2")
-            .arg(stringKey, license::Deactivator::errorDescription(errorCode)));
+            .arg(stringKey, Deactivator::errorDescription(errorCode)));
     }
     return result.join(lit("\n"));
 }
@@ -557,7 +558,7 @@ bool QnLicenseManagerWidget::canDeactivateLicense(const QnLicensePtr &license) c
 
 void QnLicenseManagerWidget::removeLicense(const QnLicensePtr& license, ForceRemove force)
 {
-    if (force == ForceRemove::Yes && !canRemoveLicense(license))
+    if (force == ForceRemove::No && !canRemoveLicense(license))
         return;
 
     const auto removeLisencesHandler =
@@ -601,41 +602,26 @@ bool QnLicenseManagerWidget::confirmDeactivation(const QStringList& extras) cons
 
 void QnLicenseManagerWidget::deactivateLicenses(const QnLicenseList& licenses)
 {
-    using Result = license::Deactivator::Result;
+    using Result = Deactivator::Result;
 
-    license::Deactivator::deactivateAsync(selectedLicenses(),
+    const auto handler =
         [this, licenses](Result result, const LicenseErrorHash& errorsHash)
         {
+            const auto text = Deactivator::resultDescription(result, licenses.count());
             if (result == Result::Success)
             {
                 for (const QnLicensePtr& license: licenses)
                     removeLicense(license, ForceRemove::Yes);
 
-                QnMessageBox::success(this,
-                    tr("License(s) deactivated", nullptr, licenses.count()));
+                QnMessageBox::success(this, text);
             }
             else
             {
-                QString error;
-                QString description;
-                switch(result)
-                {
-                    case Result::DeactivationError:
-                        error = tr("Can't deactivate license(s):", nullptr, licenses.count());
-                        description = getDeactivationMessages(errorsHash);
-                        break;
-                    case Result::ServerError:
-                        error = tr("Server error");
-                        break;
-                    case Result::UnspecifiedError: //Fallthrough
-                    default:
-                        error = tr("Unspecified error");
-                        break;
-                }
-
-                QnMessageBox::critical(this, error, description);
+                QnMessageBox::critical(this, text, getDeactivationMessages(errorsHash));
             }
-        });
+        };
+
+    Deactivator::deactivateAsync(licenses, handler, this);
 }
 
 void QnLicenseManagerWidget::takeAwaySelectedLicenses()

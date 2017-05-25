@@ -79,7 +79,8 @@ class LicenseDeactivatorPrivate: public Connective<QObject>
 public:
     LicenseDeactivatorPrivate(
         const QnLicenseList& licenses,
-        const Handler& handler);
+        const Handler& handler,
+        QObject* parent);
 
 private:
     void finalize(
@@ -93,9 +94,10 @@ private:
 
 LicenseDeactivatorPrivate::LicenseDeactivatorPrivate(
     const QnLicenseList& licenses,
-    const Handler& handler)
+    const Handler& handler,
+    QObject* parent)
     :
-    base_type(),
+    base_type(parent),
     m_httpClient(nx_http::AsyncHttpClient::create()),
     m_handler(handler)
 {
@@ -111,7 +113,7 @@ LicenseDeactivatorPrivate::LicenseDeactivatorPrivate(
         {
             if (m_httpClient->failed())
             {
-                finalize(Result::ServerError);
+                finalize(Result::ConnectionError);
                 return;
             }
 
@@ -185,24 +187,27 @@ namespace license {
 
 void Deactivator::deactivateAsync(
     const QnLicenseList& licenses,
-    const Handler& completionHandler)
+    const Handler& completionHandler,
+    QObject* parent)
 {
     // Deactivator will delete himself when after operation complete
-    new LicenseDeactivatorPrivate(licenses, completionHandler);
+    new LicenseDeactivatorPrivate(licenses, completionHandler, parent);
 }
 
-QString Deactivator::resultDescription(Result result)
+QString Deactivator::resultDescription(Result result, int licensesCount)
 {
     switch(result)
     {
         case Result::Success:
-            return tr("Success");
+            return tr("License(s) deactivated", nullptr, licensesCount);
         case Result::UnspecifiedError:
             return tr("Unspecified error");
+        case Result::ConnectionError:
+            return tr("Request failed. Check internet connection");
         case Result::ServerError:
             return tr("License server error");
         case Result::DeactivationError:
-            return tr("Deactivation error");
+            return tr("License(s) deactivation error", nullptr, licensesCount);
         default:
             NX_EXPECT(false, "Unhandled switch value");
             return QString();
@@ -214,7 +219,6 @@ QString Deactivator::errorDescription(ErrorCode error)
     switch(error)
     {
         case ErrorCode::NoError:
-            NX_EXPECT(false, "We don't exepect NoError code explanation");
             return QString();
         case ErrorCode::UnknownError:
             return tr("Unknown error");
@@ -223,7 +227,7 @@ QString Deactivator::errorDescription(ErrorCode error)
         case ErrorCode::LimitExceeded:
             return tr("Limit exceeded");
         default:
-            NX_EXPECT(false, "We don;t excpect to be here");
+            NX_EXPECT(false, "We don't excpect to be here");
             return QString();
     }
 }

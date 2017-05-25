@@ -32,6 +32,7 @@ public:
     {
         Success,
         UnspecifiedError,
+        ConnectionError,
 
         ServerError,
         DeactivationError
@@ -42,9 +43,10 @@ public:
 
     static void deactivateAsync(
         const QnLicenseList& licenses,
-        const Handler& completionHandler = Handler());
+        const Handler& completionHandler,
+        QObject* parent);
 
-    static QString resultDescription(Result result);
+    static QString resultDescription(Result result, int licensesCount);
 
     static QString errorDescription(ErrorCode error);
 
