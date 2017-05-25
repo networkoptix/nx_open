@@ -22,7 +22,7 @@ struct LicenseData
     QString hwid;
 };
 QN_FUSION_DECLARE_FUNCTIONS(LicenseData, (json))
-QN_FUSION_ADAPT_STRUCT_FUNCTIONS (LicenseData, (json), (key)(hwid))
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS(LicenseData, (json), (key)(hwid))
 
 using LicenseDataList = QList<LicenseData>;
 
@@ -31,7 +31,33 @@ struct Licenses
     LicenseDataList licenses;
 };
 QN_FUSION_DECLARE_FUNCTIONS(Licenses, (json))
-QN_FUSION_ADAPT_STRUCT_FUNCTIONS (Licenses, (json), (licenses))
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS(Licenses, (json), (licenses))
+
+struct LicenseStatus
+{
+    QString code;
+    QString text;
+};
+QN_FUSION_DECLARE_FUNCTIONS(LicenseStatus, (json))
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS(LicenseStatus, (json), (code)(text))
+
+using LicenseStatusHash = QHash<QString, LicenseStatus>;
+
+struct LicenseStatusData
+{
+    LicenseStatusHash licenseWarnings;
+    LicenseStatusHash licenseErrors;
+};
+QN_FUSION_DECLARE_FUNCTIONS(LicenseStatusData, (json))
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS(LicenseStatusData, (json), (licenseWarnings)(licenseErrors))
+
+struct ErrorReply
+{
+    QString error;
+    LicenseStatusData errors;
+};
+QN_FUSION_DECLARE_FUNCTIONS(ErrorReply, (json))
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS(ErrorReply, (json), (error)(errors))
 
 }
 
@@ -46,33 +72,19 @@ using namespace nx::client::desktop::license;
 using ErrorCode = Deactivator::ErrorCode;
 using LicenseErrorHash = Deactivator::LicenseErrorHash;
 
-ErrorCode getError(const QJsonObject& object)
+ErrorCode toErrorCode(const QString& text)
 {
-    static const auto kCodeTag = lit("code");
-    if (object.isEmpty() || !object.contains(kCodeTag))
-        return ErrorCode::UnknownError;
-
-    const auto code = object[kCodeTag].toString();
-    return QnLexical::deserialized(code, ErrorCode::UnknownError);
+    return QnLexical::deserialized(text, ErrorCode::UnknownError);
 }
 
 LicenseErrorHash extractErrors(const QByteArray& messageBody)
 {
-    const auto document = QJsonDocument::fromJson(messageBody);
-    if (document.isEmpty())
-        return LicenseErrorHash();
-
-    const auto object = document.object();
-    if (object.isEmpty())
-        return LicenseErrorHash();
-
-    const auto licenseErrors = object[lit("errors")].toObject()[lit("licenseErrors")].toObject();
-    if (licenseErrors.isEmpty())
-        return LicenseErrorHash();
+    const auto errorReply = QJson::deserialized(messageBody, detail::ErrorReply());
+    auto& errors = errorReply.errors.licenseErrors;
 
     LicenseErrorHash result;
-    for (const auto& key: licenseErrors.keys())
-        result.insert(key.toLatin1(), getError(licenseErrors[key].toObject()));
+    for (const auto& key: errors.keys())
+        result.insert(key.toLatin1(), toErrorCode(errors.value(key).code));
 
     return result;
 }

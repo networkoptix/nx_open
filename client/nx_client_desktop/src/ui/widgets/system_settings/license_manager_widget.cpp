@@ -50,7 +50,7 @@
 #include <utils/common/event_processors.h>
 #include <utils/common/delayed.h>
 
-#include <nx/client/desktop/utils/license_helpers.h>
+#include <nx/client/desktop/license/license_helpers.h>
 
 namespace {
 
