@@ -27,7 +27,7 @@ QnCrossdomainConnectionProcessor::QnCrossdomainConnectionProcessor(
     QnTCPConnectionProcessor(
         new QnCrossdomainConnectionProcessorPrivate,
         socket,
-        owner->commonModule())
+        owner)
 {
 }
 

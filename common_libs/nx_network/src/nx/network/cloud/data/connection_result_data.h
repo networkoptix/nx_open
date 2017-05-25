@@ -21,7 +21,7 @@ enum class NatTraversalResultCode
     endpointVerificationFailure,
     errorConnectingToRelay,
     notFoundOnRelay,
-    noSuitableTraversalMethod,
+    noSuitableMethod,
 };
 
 class NX_NETWORK_API ConnectionResultRequest:

@@ -4,7 +4,7 @@ set(_withMobileClient ON)
 set(_withClouds ON)
 
 if("${platform}" STREQUAL "linux")
-    if("${arch}" STREQUAL "arm")
+    if("${arch}" MATCHES "arm|aarch64")
         set(_withDesktopClient OFF)
         set(_withMobileClient OFF)
         set(_withClouds OFF)

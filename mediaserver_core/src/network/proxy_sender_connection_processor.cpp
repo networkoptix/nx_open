@@ -204,7 +204,8 @@ void QnProxySenderConnection::run()
         parseRequest();
         NX_VERBOSE(this, lm("Process request %1").arg(d->request.requestLine));
 
-        auto handler = d->owner->findHandler(d->protocol, d->request);
+        auto owner = static_cast<QnUniversalTcpListener*>(d->owner);
+        auto handler = owner->findHandler(d->protocol, d->request);
         bool noAuth = false;
         if (handler && authenticate(&d->accessRights, &noAuth))
             processRequest(noAuth);

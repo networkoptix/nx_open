@@ -13,7 +13,7 @@ add_definitions(
     -DNOLFS
 )
 
-if(WIN32)
+if(WINDOWS)
     add_definitions(
         -D_CRT_SECURE_NO_WARNINGS
     )
@@ -27,7 +27,7 @@ add_library(
         "ftp_library.cpp" 
 )
 
-if(WIN32)
+if(WINDOWS)
     target_link_libraries(
         ${TARGET}
         ws2_32

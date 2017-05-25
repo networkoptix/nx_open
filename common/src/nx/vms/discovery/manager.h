@@ -9,10 +9,10 @@ namespace vms {
 namespace discovery {
 
 /**
- * Discovers VMS modules notifies their module information and availability changes.
+ * Discovers VMS modules, notifies their module information and availability changes.
  *
- * - Searchs server for endpoints by multicasts, resource pool and interface methods.
- * - Tries to maintain connection to each module and access up to date module information.
+ * - Searches server for endpoints by multicasts, resource pool and interface methods.
+ * - Tries to maintain connection to each module and access up-to-date module information.
  * - Notifies about availability or module information changes.
  */
 class Manager: public QObject, public QnCommonModuleAware

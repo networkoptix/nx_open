@@ -175,7 +175,6 @@ private:
     qint64 m_firstRunningTime;
 
     std::unique_ptr<QnAutoRequestForwarder> m_autoRequestForwarder;
-    std::unique_ptr<nx_http::HttpModManager> m_httpModManager;
     QnUniversalTcpListener* m_universalTcpListener;
     QnMediaServerResourcePtr m_mediaServer;
     QSet<QnUuid> m_updateUserRequests;

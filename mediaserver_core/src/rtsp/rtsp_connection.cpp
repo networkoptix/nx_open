@@ -256,8 +256,8 @@ public:
 
 static const AVCodecID DEFAULT_VIDEO_CODEC = AV_CODEC_ID_H263P;
 
-QnRtspConnectionProcessor::QnRtspConnectionProcessor(QSharedPointer<AbstractStreamSocket> socket, QnTcpListener* _owner):
-    QnTCPConnectionProcessor(new QnRtspConnectionProcessorPrivate, socket, _owner->commonModule())
+QnRtspConnectionProcessor::QnRtspConnectionProcessor(QSharedPointer<AbstractStreamSocket> socket, QnTcpListener* owner):
+    QnTCPConnectionProcessor(new QnRtspConnectionProcessorPrivate, socket, owner)
 {
 }
 

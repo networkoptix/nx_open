@@ -116,8 +116,6 @@ QnUuid LocalSystemIndentityHelper::generateLocalSystemId() const
     if (m_settings->isSystemIdFromSystemName())
         return guidFromArbitraryData(m_systemNameString);
 
-    if (m_systemName->isDefault())
-        return QnUuid();
 
     return guidFromArbitraryData(m_systemNameString + m_settings->getMaxServerKey());
 }
@@ -223,7 +221,7 @@ SettingsProxyPtr createServerSettingsProxy(QnCommonModule* commonModule)
 
 bool needToResetSystem(bool isNewServerInstance, const SettingsProxy* settings)
 {
-    return isNewServerInstance ||
+    return isNewServerInstance || settings->localSystemId().isNull() ||
            (settings->isCloudInstanceChanged() && settings->isConnectedToCloud());
 }
 

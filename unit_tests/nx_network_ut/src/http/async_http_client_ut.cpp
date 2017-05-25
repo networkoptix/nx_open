@@ -72,9 +72,14 @@ public:
             lit("/httpsOnly"), []() { return std::make_unique<SslAssertHandler>(true); });
     }
 
-    TestHttpServer* testHttpServer()
+    TestHttpServer& testHttpServer()
     {
-        return m_testHttpServer.get();
+        return *m_testHttpServer;
+    }
+
+    const TestHttpServer& testHttpServer() const
+    {
+        return *m_testHttpServer;
     }
 
 protected:
@@ -342,16 +347,16 @@ private:
 
         for (const auto& ctx: m_requests)
         {
-            ASSERT_TRUE(testHttpServer()->registerStaticProcessor(
+            ASSERT_TRUE(testHttpServer().registerStaticProcessor(
                 ctx.url.path(),
                 ctx.message,
                 "application/text"));
         }
 
-        ASSERT_TRUE(testHttpServer()->bindAndListen());
+        ASSERT_TRUE(testHttpServer().bindAndListen());
 
         for (auto& ctx: m_requests)
-            ctx.url.setPort(testHttpServer()->serverAddress().port);
+            ctx.url.setPort(testHttpServer().serverAddress().port);
 
         QObject::connect(
             m_client.get(), &nx_http::AsyncHttpClient::done,
@@ -381,13 +386,13 @@ private:
 
 TEST_F(AsyncHttpClientTestMultiRequest, server_does_not_support_persistent_connections)
 {
-    testHttpServer()->setPersistentConnectionEnabled(false);
+    testHttpServer().setPersistentConnectionEnabled(false);
     doMultipleRequestsReusingHttpClient();
 }
 
 TEST_F(AsyncHttpClientTestMultiRequest, server_supports_persistent_connections)
 {
-    testHttpServer()->setPersistentConnectionEnabled(true);
+    testHttpServer().setPersistentConnectionEnabled(true);
     doMultipleRequestsReusingHttpClient();
 }
 
@@ -565,16 +570,16 @@ TEST_F(AsyncHttpClient, ConnectionBreakAfterReceivingSecondRequest)
 
     std::atomic<int> requestCounter(0);
     ASSERT_TRUE(
-        testHttpServer()->registerRequestProcessor<TestHandler>(
+        testHttpServer().registerRequestProcessor<TestHandler>(
             testPath,
             [&requestCounter]() mutable
             {
                 return std::make_unique<TestHandler>(requestCounter++);
             }));
-    ASSERT_TRUE(testHttpServer()->bindAndListen());
+    ASSERT_TRUE(testHttpServer().bindAndListen());
 
     QUrl testUrl(lit("http://%1%2")
-        .arg(testHttpServer()->serverAddress().toString())
+        .arg(testHttpServer().serverAddress().toString())
         .arg(QString::fromLatin1(testPath)));
 
     nx_http::HttpClient httpClient;
@@ -586,13 +591,13 @@ TEST_F(AsyncHttpClient, ConnectionBreakAfterReceivingSecondRequest)
 }
 
 //-------------------------------------------------------------------------------------------------
-// AsyncHttpClientCorrectUrlTransferring
+// AsyncHttpClientRequestValidation
 
-class AsyncHttpClientCorrectUrlTransferring:
+class AsyncHttpClientRequestValidation:
     public AsyncHttpClient
 {
 public:
-    AsyncHttpClientCorrectUrlTransferring()
+    AsyncHttpClientRequestValidation()
     {
         init();
     }
@@ -609,10 +614,23 @@ protected:
         const auto fragment = QUrl::toPercentEncoding("#frag%20ment");
 
         m_testUrl = QUrl(lit("http://%1%2?%3#%4")
-            .arg(testHttpServer()->serverAddress().toString())
+            .arg(testHttpServer().serverAddress().toString())
             .arg(testPath()).arg(QLatin1String(query)).arg(QLatin1String(fragment)));
 
         ASSERT_TRUE(m_httpClient.doGet(m_testUrl));
+    }
+
+    void whenSendingRequest()
+    {
+        ASSERT_TRUE(m_httpClient.doGet(commonTestUrl()));
+    }
+
+    void thenHostHeaderContainsServerEndpoint()
+    {
+        const auto request = m_receivedRequests.pop();
+        ASSERT_EQ(
+            testHttpServer().serverAddress().toString().toUtf8(),
+            nx_http::getHeaderValue(request.headers, "Host"));
     }
 
     void assertServerHasReceivedCorrectUrl()
@@ -625,6 +643,7 @@ protected:
     }
 
 private:
+    nx::utils::SyncQueue<nx_http::Request> m_receivedRequests;
     nx::utils::SyncQueue<QUrl> m_urlsFromReceivedRequests;
     nx_http::HttpClient m_httpClient;
     QUrl m_testUrl;
@@ -634,12 +653,17 @@ private:
         using namespace std::placeholders;
 
         ASSERT_TRUE(
-            testHttpServer()->registerRequestProcessorFunc(
+            testHttpServer().registerRequestProcessorFunc(
                 testPath(),
-                std::bind(&AsyncHttpClientCorrectUrlTransferring::onRequestReceived, this,
+                std::bind(&AsyncHttpClientRequestValidation::onRequestReceived, this,
                     _1, _2, _3, _4, _5)));
 
-        ASSERT_TRUE(testHttpServer()->bindAndListen());
+        ASSERT_TRUE(testHttpServer().bindAndListen());
+    }
+
+    QUrl commonTestUrl() const
+    {
+        return QUrl(lm("http://%1%2").arg(testHttpServer().serverAddress()).arg(testPath()));
     }
 
     void onRequestReceived(
@@ -650,16 +674,23 @@ private:
         nx_http::RequestProcessedHandler completionHandler)
     {
         m_urlsFromReceivedRequests.push(request.requestLine.url);
+        m_receivedRequests.push(std::move(request));
         completionHandler(nx_http::StatusCode::ok);
     }
 };
 
 TEST_F(
-    AsyncHttpClientCorrectUrlTransferring,
-    encoded_sequence_in_query_param_is_not_decoded)
+    AsyncHttpClientRequestValidation,
+    encoded_sequence_in_url_query_param_is_not_decoded)
 {
     whenIssuedRequestWithEncodedSequenceInQueryAndFragment();
     assertServerHasReceivedCorrectUrl();
+}
+
+TEST_F(AsyncHttpClientRequestValidation, host_header_contains_endpoint)
+{
+    whenSendingRequest();
+    thenHostHeaderContainsServerEndpoint();
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -824,32 +855,32 @@ public:
 protected:
     void initializeStaticContentServer()
     {
-        testHttpServer()->setPersistentConnectionEnabled(false);
+        testHttpServer().setPersistentConnectionEnabled(false);
         NX_GTEST_ASSERT_TRUE(
-            testHttpServer()->registerStaticProcessor(
+            testHttpServer().registerStaticProcessor(
                 testPath,
                 "qwade324dwfasd123sdf23sdfsdf",
                 "text/plain"));
-        NX_GTEST_ASSERT_TRUE(testHttpServer()->bindAndListen());
+        NX_GTEST_ASSERT_TRUE(testHttpServer().bindAndListen());
 
-        m_testUrl = lm("http://%1%2").arg(testHttpServer()->serverAddress()).arg(testPath);
+        m_testUrl = lm("http://%1%2").arg(testHttpServer().serverAddress()).arg(testPath);
     }
 
     void initializeDelayedConnectionClosureServer()
     {
         using namespace std::placeholders;
 
-        testHttpServer()->setPersistentConnectionEnabled(true);
+        testHttpServer().setPersistentConnectionEnabled(true);
 
         auto httpHandlerFunc =
             std::bind(&AsyncHttpClientReusingConnection::delayedConnectionClosureHttpHandlerFunc,
                 this, _1, _2, _3, _4, _5);
         NX_GTEST_ASSERT_TRUE(
-            testHttpServer()->registerRequestProcessorFunc(
+            testHttpServer().registerRequestProcessorFunc(
                 testPath, std::move(httpHandlerFunc)));
-        NX_GTEST_ASSERT_TRUE(testHttpServer()->bindAndListen());
+        NX_GTEST_ASSERT_TRUE(testHttpServer().bindAndListen());
 
-        m_testUrl = lm("http://%1%2").arg(testHttpServer()->serverAddress()).arg(testPath);
+        m_testUrl = lm("http://%1%2").arg(testHttpServer().serverAddress()).arg(testPath);
     }
 
     void scheduleRequestToValidUrlJustAfterFirstRequest()
