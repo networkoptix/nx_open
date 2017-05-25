@@ -2,7 +2,7 @@
 
 angular.module('nxCommon').controller('ViewCtrl',
     function ($scope, $rootScope, $location, $routeParams, cameraRecords,
-              camerasProvider, $sessionStorage, $localStorage, systemAPI) {
+              camerasProvider, $sessionStorage, $localStorage, $timeout, systemAPI) {
 
         var channels = {
             Auto: 'lo',

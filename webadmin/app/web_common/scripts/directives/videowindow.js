@@ -30,7 +30,8 @@ angular.module('nxCommon')
                 player:"=",
                 activeFormat:"=",
                 rotation: "=",
-                playing: "="
+                playing: "=",
+                preview: "="
             },
             templateUrl: Config.viewsDirCommon + 'components/videowindow.html',// ???
 
@@ -224,12 +225,8 @@ angular.module('nxCommon')
 
                             scope.vgApi.addEventListener("timeupdate", function (event) {
                                 var video = event.srcElement || event.originalTarget;
+                                scope.loading = false;
                                 scope.vgUpdateTime({$currentTime: video.currentTime, $duration: video.duration});
-                                if (scope.loading) {
-                                    $timeout(function () {
-                                        scope.loading = false;
-                                    });
-                                }
                             });
 
                             scope.vgApi.addEventListener("pause", function(event){
@@ -315,17 +312,13 @@ angular.module('nxCommon')
                         scope.vgApi = api;
                         if (scope.vgSrc) {
                             $timeout(function(){
-                                scope.loading = false;
+                                scope.loading = !!format;
                             });
                             scope.vgApi.load(getFormatSrc('hls'));
                             scope.vgApi.addEventListener("timeupdate", function (event) {
                                 var video = event.srcElement || event.originalTarget;
+                                scope.loading = false;
                                 scope.vgUpdateTime({$currentTime: video.currentTime, $duration: video.duration});
-                                if (scope.loading) {
-                                    $timeout(function () {
-                                        scope.loading = false;
-                                    });
-                                }
                             });
                         }
                         scope.vgPlayerReady({$API:api});

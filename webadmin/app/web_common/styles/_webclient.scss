@@ -645,6 +645,12 @@ table.webclient-window>tbody>tr>td{
   margin-left: 6px;
 }
 
+.video-preview{
+  height: 100%;
+  background-size: 100% 100%;
+  background-repeat: no-repeat;
+}
+
 .min-40{
   width:40px;
   display: inline-block;
