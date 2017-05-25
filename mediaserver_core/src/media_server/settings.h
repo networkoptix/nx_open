@@ -133,8 +133,6 @@ public:
     std::chrono::milliseconds hlsTargetDuration() const;
 
     static QString defaultROSettingsFilePath();
-    static std::chrono::milliseconds hlsTargetDuration();
-
     static QString defaultRunTimeSettingsFilePath();
 
 private:
