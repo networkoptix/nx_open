@@ -387,11 +387,9 @@ void initialize(Manager* manager, Action* root)
     } factory.endSubMenu();
 
     factory(SaveCurrentLayoutTourAction)
-        .flags(Scene | NoTarget | GlobalHotkey | IntentionallyAmbiguous)
+        .flags(NoTarget)
         .mode(DesktopMode)
-        .text(tr("Save Layout Tour"))
         .condition(condition::isLayoutTourReviewMode())
-        .shortcut(lit("Ctrl+S"))
         .autoRepeat(false);
 
     factory(SaveCurrentLayoutAction)
@@ -1484,7 +1482,6 @@ void initialize(Manager* manager, Action* root)
     factory(RemoveCurrentLayoutTourAction)
         .flags(NoTarget)
         .mode(DesktopMode)
-        .icon(qnSkin->icon("buttons/delete.png")) //< To be displayed on the button
         .condition(condition::isLayoutTourReviewMode())
         .autoRepeat(false);
 

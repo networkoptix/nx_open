@@ -266,6 +266,7 @@ QList<QAction*> CurrentLayoutTourSettingsFactory::newActions(const Parameters& /
             [this, manual]
             {
                 workbench()->currentLayout()->setData(Qn::LayoutTourIsManualRole, manual);
+                menu()->trigger(action::SaveCurrentLayoutTourAction);
             });
         actionGroup->addAction(action);
     }
