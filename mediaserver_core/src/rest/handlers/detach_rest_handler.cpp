@@ -1,7 +1,7 @@
 #include "detach_rest_handler.h"
 
 #include <cdb/connection.h>
-#include <nx/network/http/httptypes.h>
+#include <nx/network/http/http_types.h>
 #include <nx/utils/log/log.h>
 
 #include <api/global_settings.h>

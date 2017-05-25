@@ -7,7 +7,6 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "desktop_client-x64", "${roo
 	ProjectSection(ProjectDependencies) = postProject
 		${appserver2.guid} = ${appserver2.guid}
 		${common.guid} = ${common.guid}
-		${nx_streaming.guid} = ${nx_streaming.guid}
 		${nx_audio.guid} = ${nx_audio.guid}
 		${nx_client_desktop.guid} = ${nx_client_desktop.guid}
 	EndProjectSection
@@ -16,7 +15,6 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "nx_client_desktop-x64", "${
 	ProjectSection(ProjectDependencies) = postProject
 		${appserver2.guid} = ${appserver2.guid}
 		${common.guid} = ${common.guid}
-		${nx_streaming.guid} = ${nx_streaming.guid}
 		${nx_audio.guid} = ${nx_audio.guid}
 		${nx_client_core.guid} = ${nx_client_core.guid}
 		${nx_speech_synthesizer.guid} = ${nx_speech_synthesizer.guid}
@@ -44,8 +42,6 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "appserver2-x64", "${root.di
 		${nx_utils.guid} = ${nx_utils.guid}
 	EndProjectSection
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "nx_streaming-x64", "${root.dir}\common_libs\nx_streaming\src\nx_streaming-x64.vcxproj", "${nx_streaming.guid}"
-EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "udt-x64", "${root.dir}\common_libs\udt\src\udt-x64.vcxproj", "${udt.guid}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "nx_audio-x64", "${root.dir}\common_libs\nx_audio\src\nx_audio-x64.vcxproj", "${nx_audio.guid}"
@@ -63,7 +59,6 @@ EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "nx_media-x64", "${root.dir}\common_libs\nx_media\src\nx_media-x64.vcxproj", "${nx_media.guid}"
 	ProjectSection(ProjectDependencies) = postProject
 		${common.guid} = ${common.guid}
-		${nx_streaming.guid} = ${nx_streaming.guid}
 	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "nx_network-x64", "${root.dir}\common_libs\nx_network\src\nx_network-x64.vcxproj", "${nx_network.guid}"
@@ -129,10 +124,6 @@ Global
 		${appserver2.guid}.Debug|x64.Build.0 = Debug|x64
 		${appserver2.guid}.Release|x64.ActiveCfg = Release|x64
 		${appserver2.guid}.Release|x64.Build.0 = Release|x64
-		${nx_streaming.guid}.Debug|x64.ActiveCfg = Debug|x64
-		${nx_streaming.guid}.Debug|x64.Build.0 = Debug|x64
-		${nx_streaming.guid}.Release|x64.ActiveCfg = Release|x64
-		${nx_streaming.guid}.Release|x64.Build.0 = Release|x64
 		${nx_audio.guid}.Debug|x64.ActiveCfg = Debug|x64
 		${nx_audio.guid}.Debug|x64.Build.0 = Debug|x64
 		${nx_audio.guid}.Release|x64.ActiveCfg = Release|x64

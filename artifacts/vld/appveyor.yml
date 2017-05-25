@@ -1,0 +1,158 @@
+version: '{build}'
+
+branches:
+  # blacklist
+  except:
+    - gh-pages
+
+os: Visual Studio 2015
+
+environment:
+  GTEST_REPEAT: 1
+
+  matrix:
+  - VldStackWalkMethod: safe
+    Toolset: v90
+    Solution: vld_vs14_wo_mfc.sln
+    GTEST_FILTER: -*.Mfc*
+  - VldStackWalkMethod: safe
+    Toolset: v100
+    Solution: vld_vs14_wo_mfc.sln
+    GTEST_FILTER: -*.Mfc*
+  - VldStackWalkMethod: safe
+    Toolset: v110
+    Solution: vld_vs14_wo_mfc.sln
+    GTEST_FILTER: -*.Mfc*
+  - VldStackWalkMethod: safe
+    Toolset: v120_xp
+    Solution: vld_vs14.sln
+  - VldStackWalkMethod: safe
+    Toolset: v140_xp
+    Solution: vld_vs14.sln
+
+  - VldStackWalkMethod: fast
+    Toolset: v90
+    Solution: vld_vs14_wo_mfc.sln
+    GTEST_FILTER: -*.Mfc*
+  - VldStackWalkMethod: fast
+    Toolset: v100
+    Solution: vld_vs14_wo_mfc.sln
+    GTEST_FILTER: -*.Mfc*
+  - VldStackWalkMethod: fast
+    Toolset: v110
+    Solution: vld_vs14_wo_mfc.sln
+    GTEST_FILTER: -*.Mfc*
+  - VldStackWalkMethod: fast
+    Toolset: v120_xp
+    Solution: vld_vs14.sln
+  - VldStackWalkMethod: fast
+    Toolset: v140_xp
+    Solution: vld_vs14.sln
+
+platform:
+  - Win32
+  - x64
+
+configuration:
+  - Debug_VldRelease
+  - Debug_VldRelease_StaticCrt
+  - Release
+  - Release_StaticCrt
+
+matrix:
+  fast_finish: false
+
+nuget:
+  project_feed: true
+  disable_publish_on_pr: true
+
+notifications:
+- provider: Webhook
+  url: https://webhooks.gitter.im/e/f26eac97358590c8feca
+  on_build_success: true
+  on_build_failure: true
+  on_build_status_changed: true
+
+build_script:
+- ps: |
+    Write-Output "Configuration: $env:CONFIGURATION"
+    Write-Output "Platform: $env:PLATFORM"
+    if (($env:Toolset -eq "v100") -and ($env:PLATFORM -eq "x64"))
+    {
+        return
+    }
+    & .\change_toolset.ps1 $env:Toolset
+    msbuild /v:m /p:"Configuration=$env:CONFIGURATION" /p:Platform="$env:PLATFORM" "$env:Solution" /logger:"C:\Program Files\AppVeyor\BuildAgent\Appveyor.MSBuildLogger.dll"
+
+test_script:
+- ps: |
+    if (($env:Toolset -eq "v100") -and ($env:PLATFORM -eq "x64"))
+    {
+        return
+    }
+    cd src\
+
+    function Add-GTest-Result($testResult)
+    {
+        $testsuites = ([xml](get-content $testResult)).testsuites
+        $testsCount = 0
+        $anyFailures = $FALSE
+
+        foreach ($testsuite in $testsuites.testsuite) {
+            foreach ($testcase in $testsuite.testcase) {
+                $testsCount++
+                if ($testcase.failure) {
+                    $time = ([double]$testcase.time * 1000)
+                    Add-AppveyorTest $testcase.name -Outcome Failed -FileName $testsuite.name -Duration $time -ErrorMessage $testcase.failure.message
+                    Add-AppveyorMessage "$($testcase.name) failed" -Category Error
+                    $anyFailures = $TRUE
+                }
+                elseif ($testcase.skipped) {
+                    Add-AppveyorTest $testcase.name -Outcome Ignored -Filename $testsuite.name
+                }
+                else {
+                    $time = ([double]$testcase.time * 1000)
+                    Add-AppveyorTest $testcase.name -Outcome Passed -FileName $testsuite.name -Duration $time
+                }
+            }
+        }
+        return $testsCount, $anyFailures
+    }
+
+    function Run-Tests($platform, $configuration, $correctTestCount)
+    {
+        $testsCount = 0
+        $anyFailures = $FALSE
+        $tests_path = ".\bin\$platform\$configuration\"
+
+        # Run tests and upload results to AppVeyor one by one
+        Get-ChildItem "$tests_path\*.exe" | foreach {
+            $testfile = "$($_.FullName).xml"
+            & $_.FullName "--gtest_output=`"xml:$testfile`""
+            if (Test-Path $testfile)
+            {
+                $count, $testsResult = Add-GTest-Result $testfile
+                Write-Output "Found $testfile with $count tests"
+                $testsCount = $testsCount + $count
+                $anyFailures = $anyFailures -or $testsResult
+            }
+        }
+
+        if ($anyFailures -eq $TRUE){
+            Write-Output "Failing build as there are broken tests"
+            $host.SetShouldExit(1)
+        }
+
+        if ($testsCount -lt $correctTestCount){
+            Write-Output "Failing build as there the number of tests decreased from $correctTestCount"
+            $host.SetShouldExit(2)
+        }
+    }
+
+    $pos = $env:Toolset.IndexOf("_")
+    if ($pos -eq -1) { $pos = $env:Toolset.length }
+    $suffix = $env:Toolset.Substring(0, $pos )
+    $folders = @{"Debug_VldRelease" = "Debug(Release)-$suffix"; "Debug_VldRelease_StaticCrt" = "Debug(Release)_StaticCrt-$suffix";
+        "Release" = "Release-$suffix"; "Release_StaticCrt" = "Release_StaticCrt-$suffix"}
+    $correctTestCount =  if ($env:GTEST_FILTER -like '*Mfc*') { 49 } else { 53 }
+    Run-Tests "$env:PLATFORM" "$($folders[$env:CONFIGURATION])" $correctTestCount

@@ -1,8 +1,3 @@
-/**********************************************************
-* May 17, 2016
-* akolesnikov
-***********************************************************/
-
 #pragma once
 
 #include <chrono>
@@ -26,7 +21,7 @@ public:
     std::list<SocketAddress> endpointsToListen;
     QString dataDir;
     QString changeUser;
-    /** if empty, default address is used */
+    /** If empty, default address is used. */
     QString mediatorEndpoint;
 };
 
@@ -47,7 +42,7 @@ class Http
 {
 public:
     int proxyTargetPort;
-    /** Enables support of Http CONNECT method */
+    /** Enables support of Http CONNECT method. */
     bool connectSupport;
     bool allowTargetEndpointInUrl;
     bool sslSupport;
@@ -81,9 +76,9 @@ public:
     SslMode preferedSslMode = SslMode::followIncomingConnection;
 };
 
-/*!
-    \note Values specified via command-line have priority over conf file (or win32 registry) values
-*/
+/**
+ * NOTE: Values specified via command-line have priority over conf file (or win32 registry) values.
+ */
 class Settings:
     public nx::utils::BasicServiceSettings
 {
@@ -118,7 +113,7 @@ private:
     void loadConfiguration();
 };
 
-}   //namespace conf
-}   //namespace cloud
-}   //namespace gateway
-}   //namespace nx
+} // namespace conf
+} // namespace cloud
+} // namespace gateway
+} // namespace nx

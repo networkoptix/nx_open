@@ -70,6 +70,11 @@ bool QnByteArrayConstRef::startsWith(const_pointer str, size_type len) const
     return memcmp(data(), str, len) == 0;
 }
 
+bool QnByteArrayConstRef::startsWith(value_type ch) const
+{
+    return startsWith(&ch, 1);
+}
+
 uint QnByteArrayConstRef::toUInt() const
 {
     return toByteArrayWithRawData().toUInt();

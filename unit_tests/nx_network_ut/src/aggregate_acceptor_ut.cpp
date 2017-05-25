@@ -22,7 +22,7 @@ protected:
             auto acceptor = std::make_unique<AcceptorStub>();
             acceptor->setRemovedAcceptorsQueue(&m_removedAcceptorsQueue);
             m_acceptorStubs.push_back(acceptor.get());
-            m_aggregateAcceptor.addSocket(std::move(acceptor));
+            m_aggregateAcceptor.add(std::move(acceptor));
         }
     }
 
@@ -39,7 +39,7 @@ protected:
                 0, m_acceptorStubs.size()-1);
         m_acceptorToRemove = m_acceptorStubs[index];
 
-        m_aggregateAcceptor.removeSocket(index);
+        m_aggregateAcceptor.removeAt(index);
     }
 
     void thenAcceptorIsFreed()

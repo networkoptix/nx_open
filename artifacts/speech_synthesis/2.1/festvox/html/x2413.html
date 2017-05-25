@@ -1,0 +1,485 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>Labeling the diphones</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REL="HOME"
+TITLE="Building Synthetic Voices"
+HREF="book1.html"><LINK
+REL="UP"
+TITLE="Diphone databases"
+HREF="c2261.html"><LINK
+REL="PREVIOUS"
+TITLE="Recording the diphones"
+HREF="x2397.html"><LINK
+REL="NEXT"
+TITLE="Extracting the pitchmarks"
+HREF="x2522.html"></HEAD
+><BODY
+CLASS="SECT1"
+BGCOLOR="#FFFFFF"
+TEXT="#000000"
+LINK="#0000FF"
+VLINK="#840084"
+ALINK="#0000FF"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="3"
+ALIGN="center"
+>Building Synthetic Voices</TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="bottom"
+><A
+HREF="x2397.html"
+ACCESSKEY="P"
+>&#60;&#60;&#60; Previous</A
+></TD
+><TD
+WIDTH="80%"
+ALIGN="center"
+VALIGN="bottom"
+>Diphone databases</TD
+><TD
+WIDTH="10%"
+ALIGN="right"
+VALIGN="bottom"
+><A
+HREF="x2522.html"
+ACCESSKEY="N"
+>Next &#62;&#62;&#62;</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="SECT1"
+><H1
+CLASS="SECT1"
+><A
+NAME="AEN2413"
+>Labeling the diphones</A
+></H1
+><P
+>&#13;
+Labeling nonsense words is <I
+CLASS="EMPHASIS"
+>much</I
+> easier than labeling continuous 
+speech, whether it is by hand or automatically. With nonsense words, it 
+is completely defined which phones are there and they are (hopefully) 
+clearly articulated. </P
+><P
+>&#13;We have had significant experience in hand labeling diphones, and with 
+the right tools it can be done fairly quickly (e.g. 20 hours for 2500 
+nonsense words) even if it is a mind-numbing exercise which your voice 
+talent may offer you little sympathy for after you've made them babble 
+for hours in a box with electrodes on their throat (optional). But 
+labeling can't realistically be done for more than an hour or two at 
+any one time. As a minimum, the start of the preceding phone to the 
+first phone in the diphone, the changeover, and the end of the second 
+phone in the diphone should be labeled. Note we recommend phone 
+boundary labeling as that is much better defined than phone middle 
+marking. The diphone will, by default be extracted from the middle of 
+phone one to the middle of phone two. </P
+><P
+>&#13;
+Your data set conventions may include the labeling of closures within 
+stops explicitly. Thus you would expect the label <CODE
+CLASS="VARNAME"
+>tcl</CODE
+> at the end 
+of the silence part of a /t/ and a label <CODE
+CLASS="VARNAME"
+>t</CODE
+> after the burst. This 
+way the diphone boundary can automatically be placed within the silence 
+part of the stop. The label <CODE
+CLASS="VARNAME"
+>DB</CODE
+> can be used when explicit diphone 
+boundaries are desireable; this is useful within phones such as 
+diphthongs where the temporal middle need not be the most stable part. </P
+><P
+>&#13;Another place when specific diphone boundaries are recommended is in the 
+phone-to-silence diphones. The phones at the end of words are typically 
+longer than word internal phones, and tend to trail off in energy. Thus 
+the midpoint of a phone immediately before a silence typically has much 
+less energy than the midpoint of a word internal phone. Thus, when a 
+diphone is to be concatenated to a phone-silence diphone, there would be 
+a big jump in energy (as well as other related spectral characteristics). 
+Our solution to this is explicitly label a diphone boundary near the 
+beginning of the phone before the silence (about 20% in) where the 
+energy is much closer to what it will be in the diphone that will 
+precede it. </P
+><P
+>If you are using explicit closures, it is worth noting that stops at the 
+start of words don't seem to have a closure part; however it is a good 
+idea to actually label one anyway, if you are doing this by hand. Just 
+"steal" a suitable short piece of silence from the preceding part of the 
+waveform. </P
+><P
+>&#13;Because the words will often have very varying amounts of silence around 
+them, it is a good idea to label multiple silences around the word, so 
+that the silence immediately before the first phone is about 200-300 ms, 
+and labeling the silence before that as another phone; likewise with 
+the final silence. Also, as the final phone before the end silence may 
+trail off, we recommend that the end of the last phone come at the very 
+end of any signal thus appear to include silence within it. Then label 
+the real silence (200-300 ms) after it. The reason for this is if the 
+end silence happens to include some part of the spoken signal, and if 
+this is duplicated, as is the case when duration is elongated, an 
+audible buzz can be introduced. </P
+><P
+>&#13;
+Because labeling of diphone nonsense words is such a constrained task 
+we have included a program for automatically providing a labeling for 
+the spoken prompts. This requires that prompts be generated for the 
+diphone database. The aligner uses those prompts to do the aligning. 
+Though its not actually necessary that the prompts were used as prompts 
+they do need to be generated for this alignment process. This is not the 
+only means for alignment; you may also, for instance, use a speech 
+recognizer, such as CMU Sphinx, to segment (align) the data. </P
+><P
+>The idea behind the aligner is to take the prompt and the spoken form 
+and derive mel-scale cepstral parameterizations (and their deltas) of 
+the files. Then a DTW (dynamic time warping) algorithm is used to find 
+the best alignment between these two sets of features. Then the prompt 
+label file is used to index through the alignment to give a label file 
+for the spoken nonsense word. This is largely based on the techniques 
+described in [<SPAN
+CLASS="CITATION"
+>malfrere97</SPAN
+>], though this general technique has been 
+used for many years. </P
+><P
+>We have tested this aligner on a number of existing hand-labeled 
+databases to compare the quality of the alignments with respect to 
+the hand labeling. We have also tested aligning prompts generated 
+from a language different from that being recorded. To do this there 
+needs to be reasonable mapping between the language phonesets. </P
+><P
+>Here are results for automatically finding labels for 
+the ked (US English) by aligning them against prompts generated by 
+three different voices 
+<P
+></P
+><DIV
+CLASS="VARIABLELIST"
+><DL
+><DT
+><I
+CLASS="EMPHASIS"
+>ked itself</I
+></DT
+><DD
+><P
+>mean error 14.77ms stddev 17.08 </P
+></DD
+><DT
+><I
+CLASS="EMPHASIS"
+>mwm (US English)</I
+></DT
+><DD
+><P
+>mean error 27.23ms stddev 28.95 </P
+></DD
+><DT
+><I
+CLASS="EMPHASIS"
+>gsw (UK English)</I
+></DT
+><DD
+><P
+>mean error 25.25ms stddev 23.923 </P
+></DD
+></DL
+></DIV
+>
+Note that gsw actually gives better results than mwm, even though it is 
+a different dialect of English. We built three diphone index files from 
+each of the label sets generated from there alignment processes. 
+ked-to-ked was the best, and only marginally worse that the database 
+made from the manually produced labels. The database from mwm and gsw 
+produced labels were a little worse but not unacceptably so. 
+Considering a significant amount of careful corrections were made to the 
+manually produced labels, these automatically produced labels are still 
+significantly better than the first pass of hand labels. </P
+><P
+>A further experiment was made across languages; the ked diphones were 
+used as prompts to align a set of Korean diphones. Even though there 
+are a number of phones in Korean not present in English (various forms 
+of aspirated consonants), the results are quite usable. </P
+><P
+>Whether you use hand labeling or automatic alignment, it is always 
+worthwhile doing some hand-correction after the basic database is built. 
+Mistakes (sometimes systematic) always occur and listening to 
+substantial subset of the diphones (or them all if you resynthesize the 
+nonsense words) is definitely worth the time in finding bad diphones. 
+The diva is in the details. </P
+><P
+>&#13;
+The script <TT
+CLASS="FILENAME"
+>festvox/src/diphones/make_labs</TT
+> will process a set of 
+prompts and their spoken (recorded) form generating a set of label 
+files, to the best of its ability. The script expects the following to 
+already exist 
+<P
+></P
+><DIV
+CLASS="VARIABLELIST"
+><DL
+><DT
+><TT
+CLASS="FILENAME"
+>prompt-wav/</TT
+></DT
+><DD
+><P
+>The waveforms as synthesized by Festival </P
+></DD
+><DT
+><TT
+CLASS="FILENAME"
+>prompt-lab/</TT
+></DT
+><DD
+><P
+>The label files corresponding to the synthesized prompts in 
+<TT
+CLASS="FILENAME"
+>prompt-wav</TT
+>. </P
+></DD
+><DT
+><TT
+CLASS="FILENAME"
+>prompt-cep/</TT
+></DT
+><DD
+><P
+>The directory where the cepstral feature streams for each prompt 
+will be saved. </P
+></DD
+><DT
+><TT
+CLASS="FILENAME"
+>wav/</TT
+></DT
+><DD
+><P
+>The directory holding the nonsense words spoken by your voice talent. 
+The should have the same file id as the waveforms in <TT
+CLASS="FILENAME"
+>prompt-wav/</TT
+>. </P
+></DD
+><DT
+><TT
+CLASS="FILENAME"
+>cep/</TT
+></DT
+><DD
+><P
+>The directory where the cepstral feature streams for the recorded 
+material will be saved. </P
+></DD
+><DT
+><TT
+CLASS="FILENAME"
+>lab/</TT
+></DT
+><DD
+><P
+>The directory where the generated label files for the spoke 
+words in <TT
+CLASS="FILENAME"
+>wav/</TT
+> will be saved. </P
+></DD
+></DL
+></DIV
+>
+To run the script over the prompt waveforms 
+<A
+NAME="AEN2506"
+></A
+><BLOCKQUOTE
+CLASS="BLOCKQUOTE"
+><P
+CLASS="LITERALLAYOUT"
+>bin/make_labs&nbsp;prompt-wav/*.wav</P
+></BLOCKQUOTE
+>
+The script is written so it may be use used in parallel on multiple 
+machines if you want to distribute the process. On a Pentium Pro 
+200MHz, which you probably won't be able to find any more, a 2000 word 
+diphone databases can be labeled in about 30 minutes. Most of that 
+time is in generating the cepstrum coefficients. This is down to a 
+few minutes at most on a dual Pentium III 550. </P
+><P
+>&#13;Once the nonsense words have been labeled, you need to build a diphone 
+index. The index identifies which diphone comes from which files, and 
+from where. This can be automatically built from the label files 
+(mostly). The Festival script 
+<TT
+CLASS="FILENAME"
+>festvox/src/diphones/make_diph_index</TT
+> will take the diphone list 
+(as used above), find the occurrence of each diphone in the label files, 
+and build an index. The index consists of a simple header, followed by 
+a single line for each diphone: the diphone name, the fileid, start time, 
+mid-point (i.e. the phone boundary) and end time. The times are given 
+in <I
+CLASS="EMPHASIS"
+>seconds</I
+> (note that early versions of Festival, using a different 
+diphone synthesizer module, used milliseconds for this. If you have 
+such an old version of Festival, it's time to update it). </P
+><P
+>An example from the start of a diphone index file is 
+<A
+NAME="AEN2514"
+></A
+><BLOCKQUOTE
+CLASS="BLOCKQUOTE"
+><P
+CLASS="LITERALLAYOUT"
+>EST_File&nbsp;index<br>
+DataType&nbsp;ascii<br>
+NumEntries&nbsp;&nbsp;1610<br>
+IndexName&nbsp;ked2_diphone<br>
+EST_Header_End<br>
+y-aw&nbsp;kd1_002&nbsp;0.435&nbsp;0.500&nbsp;0.560<br>
+y-ao&nbsp;kd1_003&nbsp;0.400&nbsp;0.450&nbsp;0.510<br>
+y-uw&nbsp;kd1_004&nbsp;0.345&nbsp;0.400&nbsp;0.435<br>
+y-aa&nbsp;kd1_005&nbsp;0.255&nbsp;0.310&nbsp;0.365<br>
+y-ey&nbsp;kd1_006&nbsp;0.245&nbsp;0.310&nbsp;0.370<br>
+y-ay&nbsp;kd1_008&nbsp;0.250&nbsp;0.320&nbsp;0.380<br>
+y-oy&nbsp;kd1_009&nbsp;0.260&nbsp;0.310&nbsp;0.370<br>
+y-ow&nbsp;kd1_010&nbsp;0.245&nbsp;0.300&nbsp;0.345<br>
+y-uh&nbsp;kd1_011&nbsp;0.240&nbsp;0.300&nbsp;0.330<br>
+y-ih&nbsp;kd1_012&nbsp;0.240&nbsp;0.290&nbsp;0.320<br>
+y-eh&nbsp;kd1_013&nbsp;0.245&nbsp;0.310&nbsp;0.345<br>
+y-ah&nbsp;kd1_014&nbsp;0.305&nbsp;0.350&nbsp;0.395<br>
+...</P
+></BLOCKQUOTE
+>
+Note the number of entries field must be correct; if it is too small it 
+will (often confusingly) ignore the entries after that point. </P
+><P
+>This file can be created with a diphone list file and the lab 
+files in by the command 
+<A
+NAME="AEN2517"
+></A
+><BLOCKQUOTE
+CLASS="BLOCKQUOTE"
+><P
+CLASS="LITERALLAYOUT"
+>$FESTVOXDIR/src/diphones/make_diph_index&nbsp;etc/usdiph.list&nbsp;dic/kaldiph.est</P
+></BLOCKQUOTE
+>
+You should check that this has successfully found all the named 
+diphones. When an diphone is not found in a label file, an entry with 
+zeroes for the start, middle, and end is generated, which will produce a 
+warning when being used in Festival, but it is worth checking in 
+advance. </P
+><P
+>The <TT
+CLASS="FILENAME"
+>make_diph_index</TT
+> program will take the midpoint between phone 
+boundaries for the diphone boundary, unless otherwise specified with the 
+label <CODE
+CLASS="VARNAME"
+>DB</CODE
+>. It will also automatically remove underscores and 
+dollar symbols from the diphone names before searching for the diphone 
+in the label file, and it will only find the first occurrence of the 
+diphone. </P
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="x2397.html"
+ACCESSKEY="P"
+>&#60;&#60;&#60; Previous</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="book1.html"
+ACCESSKEY="H"
+>Home</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="x2522.html"
+ACCESSKEY="N"
+>Next &#62;&#62;&#62;</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>Recording the diphones</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="c2261.html"
+ACCESSKEY="U"
+>Up</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>Extracting the pitchmarks</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

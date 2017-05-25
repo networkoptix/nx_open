@@ -30,6 +30,7 @@ class QnMediaServerUserAttributesPool;
 class QnResourcePropertyDictionary;
 class QnResourceStatusDictionary;
 class QnResourceDiscoveryManager;
+class QnServerAdditionalAddressesDictionary;
 
 namespace ec2 { class AbstractECConnection; }
 namespace nx { namespace vms { namespace discovery { class Manager; } } }
@@ -129,6 +130,11 @@ public:
     QnResourceStatusDictionary* statusDictionary() const
     {
         return m_resourceStatusDictionary;
+    }
+
+    QnServerAdditionalAddressesDictionary* serverAdditionalAddressesDictionary() const
+    {
+        return m_serverAdditionalAddressesDictionary;
     }
 
     QnCameraUserAttributePool* cameraUserAttributesPool() const
@@ -281,6 +287,7 @@ private:
     QnMediaServerUserAttributesPool* m_mediaServerUserAttributesPool = nullptr;
     QnResourcePropertyDictionary* m_resourcePropertyDictionary = nullptr;
     QnResourceStatusDictionary* m_resourceStatusDictionary = nullptr;
+    QnServerAdditionalAddressesDictionary* m_serverAdditionalAddressesDictionary = nullptr;
     QnGlobalPermissionsManager* m_globalPermissionsManager = nullptr;
     QnUserRolesManager* m_userRolesManager = nullptr;
     QnResourceDiscoveryManager* m_resourceDiscoveryManager = nullptr;

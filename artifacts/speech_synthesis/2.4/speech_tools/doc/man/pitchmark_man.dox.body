@@ -1,0 +1,82 @@
+/**
+
+@page pitchmark_manual pitchmark
+@brief *Find instants of glottal closure in Laryngograph file*
+@tableofcontents
+
+@section synopsis Synopsis
+
+@SYNOPSIS@
+
+`pitchmark locates instants of glottal closure in a
+laryngograph waveform, and performs post-processing to produce even
+pitchmarks. EST does not currently provide any means of pitchmarking a
+speech waveform.
+
+Pitchmarking is performed by calling the
+pitchmark() function, which carries out the
+following operations: 
+
+  1. Double low pass filter the signal. This removes noise in the
+  signal. The parameter `lx_lf` specifies the low pass cutoff frequency,
+  and `lx_lo` specifies the order. Double filtering
+  (feeding the waveform through the filter, then reversing the waveform
+  and feeding it through again) is performed to reduce any phase shift
+  between the input and output of the filtering operation.
+
+  2. Double high pass filter the signal. This removes the
+  very low frequency swell that is often observed in laryngograph
+  waveforms.  The parameter `lx_hf` specifies the high pass cutoff frequency,
+  and `lx_ho` specifies the order.
+  Double filtering is performed to reduce any phase shift
+  between the input and output of the filtering operation.
+
+  3. Calculate the delta signal. The filtered waveform is
+  differentiated using the delta()
+  function.
+
+  4. Low pass filter the delta signal. Some noise may still
+  be present in the signal, and this is removed by further low pass
+  filtering. Experimentation has shown that simple mean smoothing is
+  often more effective than FIR smoothing at this point.  The parameter
+  `mo` is used to specify the size of the mean
+  smoothing window.  If FIR smoothing is chosen, the parameter
+  `df_lf` specifies the low pass cutoff frequency,
+  and `df_lo` specifies the order. Double filtering
+  is again used to avoid phase distortion.
+
+  5. Pick zero crossings. Now simple zero-crossing is used
+to find the pitchmarks themselves.
+
+
+`pitchmark` also performs post-processing on the pitchmarks. 
+This can be used to eliminate pitchmarks which occur too closely together, 
+or to provide estimated evenly spaced pitchmarks during unvoiced regions.
+The -fill option switches this facility on, and -min, -max, -def, -end 
+and -wave_end control its operation.
+
+
+@section options Options
+
+@OPTIONS@
+
+@section pitchmark-examples Examples
+
+**Basic Pitchmarking**:
+
+    $ pitchmark kdt_010.lar -o kdt_010.pm -otype est
+
+
+**Pitchmarking with unvoiced regions filled**:
+The following fills unvoiced regions with pitch
+periods that are about 0.01 seconds long. It also post-processes the
+set of pitchmarks and ensures that noe are above 0.02 seconds long and
+none below 0.003. A final unvoiced region extending to the end of the
+wave is specified by using the -wave_end option.
+
+    $ pitchmark kdt_010.lar -o kdt_010.pm -otype est -fill -min 0.003  \
+       -max 0.02 -def 0.01 -wave_end
+
+
+*/
+

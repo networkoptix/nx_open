@@ -1,0 +1,37 @@
+<!entity CstrOrg  '<OrgName>Center for Speech Technology
+                        Research, University of Edinburgh</OrgName>' >
+<!entity CstrAddr '
+         <street>80 South Bridge</street>
+         <City>Edinburgh</city>
+         <country>Scotland</country>
+         <postcode>EH1 1HN</postcode>' >
+
+
+
+<!entity title-left-image "est_small.jpg">
+<!entity title-right-image "cstr.gif">
+
+<!entity xml "<literal role=language>XML</literal>">
+<!entity cpp "<literal role=language>C++</literal>">
+<!entity java "<literal role=language>Java</literal>">
+<!entity scheme "<literal role=language>Scheme</literal>">
+<!entity est "<productname>speech tools</productname>">
+<!entity TheEST "<productname>The Edinburgh Speech Tools Library</productname>">
+<!entity theEST "<productname>the Edinburgh Speech Tools Library</productname>">
+<!entity festival "<command>festival</command>">
+<!entity Festival "<command>Festival</command>">
+<!entity fringe "<command>fringe</command>">
+<!entity Fringe "<command>Fringe</command>">
+
+<!entity samba '<ulink url="http://www.samba.org/"><productname>samba</productname></ulink>'>
+<!entity cygwin '<ulink url="http://sourceware.cygnus.com/cygwin/"><productname>Cygwin</productname></ulink>'>
+<!entity visualc '<ulink url="http://msdn.microsoft.com/visualc/"><productname>Visual C++</productname></ulink>'>
+<!entity gnumake '<ulink url="http://www.gnu.org/software/make/make.html"><productname>GNU make</productname></ulink>'>
+
+<!entity shellprompt '<prompt>unix$</prompt>' >
+<!entity dosprompt '<prompt>C&gt;</prompt>' >
+<!entity festprompt '<prompt>festival&gt;</prompt>' >
+
+<!attlist toc	depth	CDATA #IMPLIED>
+
+<!ENTITY % local.nav.class "|synopsys">

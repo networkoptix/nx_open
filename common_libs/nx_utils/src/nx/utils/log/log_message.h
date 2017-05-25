@@ -50,7 +50,7 @@ public:
         return m_str.arg(containerString(arguments ...));
     }
 
-    // QString number format compartability.
+    // QString number format compatibility.
     Message	arg(int value, int width = 0, int base = 10, const QChar& fill = kSpace) const;
     Message	arg(uint value, int width = 0, int base = 10, const QChar& fill = kSpace) const;
     Message	arg(long value, int width = 0, int base = 10, const QChar& fill = kSpace) const;

@@ -91,7 +91,7 @@ public:
         QSharedPointer<AbstractStreamSocket> socket,
         QnHttpConnectionListener* owner)
     :
-        QnTCPConnectionProcessor(socket, owner->commonModule())
+        QnTCPConnectionProcessor(socket, owner)
     {
     }
 
@@ -283,7 +283,6 @@ int Appserver2Process::exec()
     //Must call messageProcessor->init(ec2Connection)
     //commonModule->setEc2Connection(ec2Connection);
 
-    nx_http::HttpModManager httpModManager;
     QnSimpleHttpConnectionListener tcpListener(
         m_commonModule.get(),
         QHostAddress::Any,
@@ -312,12 +311,11 @@ int Appserver2Process::exec()
     tcpListener.start();
 
     m_commonModule->messageProcessor()->init(ec2Connection);
+    m_ecConnection = ec2Connection.get();
     //ec2Connection->startReceivingNotifications();
 
     processStartResult = true;
     triggerOnStartedEventHandlerGuard.fire();
-
-    m_ecConnection = ec2Connection.get();
 
     m_eventLoop.exec();
 

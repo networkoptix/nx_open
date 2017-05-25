@@ -1,0 +1,187 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>autolabeling issues</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REL="HOME"
+TITLE="Building Synthetic Voices"
+HREF="book1.html"><LINK
+REL="UP"
+TITLE="Limited domain synthesis"
+HREF="c941.html"><LINK
+REL="PREVIOUS"
+TITLE="customizing the synthesizer front end"
+HREF="x969.html"><LINK
+REL="NEXT"
+TITLE="unit size and type"
+HREF="x982.html"></HEAD
+><BODY
+CLASS="SECT1"
+BGCOLOR="#FFFFFF"
+TEXT="#000000"
+LINK="#0000FF"
+VLINK="#840084"
+ALINK="#0000FF"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="3"
+ALIGN="center"
+>Building Synthetic Voices</TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="bottom"
+><A
+HREF="x969.html"
+ACCESSKEY="P"
+>&#60;&#60;&#60; Previous</A
+></TD
+><TD
+WIDTH="80%"
+ALIGN="center"
+VALIGN="bottom"
+>Limited domain synthesis</TD
+><TD
+WIDTH="10%"
+ALIGN="right"
+VALIGN="bottom"
+><A
+HREF="x982.html"
+ACCESSKEY="N"
+>Next &#62;&#62;&#62;</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="SECT1"
+><H1
+CLASS="SECT1"
+><A
+NAME="AEN973"
+>autolabeling issues</A
+></H1
+><P
+>We currently use autolabel the recorded prompts using the alignment 
+technique based on [<SPAN
+CLASS="CITATION"
+>malfrere97</SPAN
+>] that we discussed above for diphone 
+labeling. Although this technique works its is not as robust for 
+general speech as it is for carefully articulated nonsense words. 
+Specifically this technique does not allow for alternative pronunciations 
+which are common. </P
+><P
+>Ideally we should use a more generally speech recognition systems. In 
+fact for labeling of unit selection database the bets results would be 
+to train a recognition using Baum-Welch on the database until 
+convergence. This would give the most consistent labeling. We have 
+started initial experiments with using the open source CMU Sphinx 
+recognition system are are likely to provide scripts to do this in later 
+releases. </P
+><P
+>In the mean time the greatest problem in predict phone list must be the 
+same (or very similar) to what was actually spoken. This can be 
+achieved by a knowledge speaker, and by customizing the front end of the 
+synthesizer so it produces more natural segments. </P
+><P
+>Two observations are worth mentioning here. First if the synthesizer 
+makes a mistake in pronunciation and the human speaker does not we 
+have found the things may work out anyway. For example we found 
+the word "hwy" appeared in the prompts, which the synthesizer 
+pronounced as "H W Y" while the speaker said "highway". The forced 
+alignment however cause the phones in the pronunciation of the letters 
+"H W Y" to be aligned with the phones in "highway" thus on selection 
+appropriate, though misnamed, phones were selected. However you should 
+<I
+CLASS="EMPHASIS"
+>depend</I
+> on such compound errors. </P
+><P
+>The second observation is that festival includes prediction of vowel 
+reduction. We are beginning to feel that such prediction is unnecessary 
+in limited domain synthesizer or in unit selection in general. This 
+vowel variation can itself be achieve but the clustering technique 
+themselves and hence allows a reasonable back-off selection strategy 
+than making firm type decisions. </P
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="x969.html"
+ACCESSKEY="P"
+>&#60;&#60;&#60; Previous</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="book1.html"
+ACCESSKEY="H"
+>Home</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="x982.html"
+ACCESSKEY="N"
+>Next &#62;&#62;&#62;</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>customizing the synthesizer front end</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="c941.html"
+ACCESSKEY="U"
+>Up</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>unit size and type</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

@@ -16,7 +16,7 @@ add_definitions(
     -DENABLE_THIRD_PARTY
     -DENABLE_MDNS)
 
-if(WIN32)
+if(WINDOWS)
     add_definitions(
         -DENABLE_VMAX
         -DENABLE_DESKTOP_CAMERA)
@@ -40,8 +40,10 @@ if(ANDROID OR IOS)
     set(enableAllVendors OFF)
 endif()
 
-if(ISD OR ISD_S2)
+if(box MATCHES "isd")
     set(enableAllVendors OFF)
+    remove_definitions(-DENABLE_SOFTWARE_MOTION_DETECTION)
+    add_definitions(-DEDGE_SERVER)
 endif()
 
 if(enableAllVendors)
@@ -60,7 +62,7 @@ if(enableAllVendors)
         -DENABLE_FLIR)
 endif()
 
-if(WIN32)
+if(WINDOWS)
     set(API_IMPORT_MACRO "__declspec(dllimport)")
     set(API_EXPORT_MACRO "__declspec(dllexport)")
 else()
@@ -69,7 +71,7 @@ else()
 endif()
 
 if(CMAKE_BUILD_TYPE STREQUAL "Debug")
-    if(NOT WIN32)
+    if(NOT WINDOWS)
         add_definitions(-D_DEBUG)
     endif()
     add_definitions(-DUSE_OWN_MUTEX)
@@ -78,7 +80,7 @@ if(CMAKE_BUILD_TYPE STREQUAL "Debug")
     endif()
 endif()
 
-if(WIN32)
+if(WINDOWS)
     add_definitions(
         -DNOMINMAX=
         -DUNICODE)
@@ -136,7 +138,8 @@ if(LINUX)
         set(CMAKE_INSTALL_RPATH "$ORIGIN/../lib")
     endif()
 
-    set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -Wl,--disable-new-dtags")
+    set(CMAKE_EXE_LINKER_FLAGS
+        "${CMAKE_EXE_LINKER_FLAGS} -Wl,--disable-new-dtags")
     set(CMAKE_SHARED_LINKER_FLAGS
         "${CMAKE_SHARED_LINKER_FLAGS} -rdynamic -Wl,--allow-shlib-undefined")
 endif()

@@ -1,7 +1,7 @@
 
 #include "audio_transmission_rest_handler.h"
 
-#include <nx/network/http/httptypes.h>
+#include <nx/network/http/http_types.h>
 #include <streaming/audio_streamer_pool.h>
 
 namespace

@@ -78,7 +78,10 @@ private:
 
     void saveConnection(nx_http::HttpServerConnection* const connection)
     {
-        m_serverConnections.push(connection->takeSocket());
+        auto socket = connection->takeSocket();
+        NX_ASSERT(socket->isInSelfAioThread());
+        socket->cancelIOSync(aio::etNone);
+        m_serverConnections.push(std::move(socket));
     }
 };
 

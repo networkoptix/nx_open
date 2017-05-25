@@ -7,14 +7,16 @@
 #include <nx/utils/std/cpp14.h>
 #include <nx/utils/thread/sync_queue.h>
 
+#include "api/relay_api_client_stub.h"
 #include "cloud_relay_basic_fixture.h"
-#include "client_to_relay_connection.h"
 
 namespace nx {
 namespace network {
 namespace cloud {
 namespace relay {
 namespace test {
+
+using RequestProcessingBehavior = nx::cloud::relay::api::test::RequestProcessingBehavior;
 
 //-------------------------------------------------------------------------------------------------
 // Test fixture.
@@ -50,7 +52,7 @@ public:
     RelayOutgoingTunnelConnection():
         m_clientToRelayConnectionCounter(0),
         m_destroyTunnelConnectionOnConnectFailure(false),
-        m_relayType(RelayType::happy),
+        m_relayType(RequestProcessingBehavior::succeed),
         m_connectTimeout(std::chrono::milliseconds::zero()),
         m_connectionsToCreateCount(1)
     {
@@ -74,17 +76,22 @@ protected:
 
     void givenHappyRelay()
     {
-        m_relayType = RelayType::happy;
+        m_relayType = RequestProcessingBehavior::succeed;
     }
 
     void givenUnhappyRelay()
     {
-        m_relayType = RelayType::unhappy;
+        m_relayType = RequestProcessingBehavior::fail;
     }
     
     void givenSilentRelay()
     {
-        m_relayType = RelayType::silent;
+        m_relayType = RequestProcessingBehavior::ignore;
+    }
+
+    void givenRelayProducingLogicError()
+    {
+        m_relayType = RequestProcessingBehavior::produceLogicError;
     }
 
     void givenIdleTunnel()
@@ -210,20 +217,13 @@ protected:
     }
 
 private:
-    enum class RelayType
-    {
-        happy,
-        unhappy,
-        silent,
-    };
-
     std::unique_ptr<relay::OutgoingTunnelConnection> m_tunnelConnection;
     nx::utils::SyncQueue<Result> m_connectResultQueue;
     std::atomic<int> m_clientToRelayConnectionCounter;
     bool m_isRelayHappy;
     nx::utils::promise<SystemError::ErrorCode> m_tunnelClosed;
     bool m_destroyTunnelConnectionOnConnectFailure;
-    RelayType m_relayType;
+    RequestProcessingBehavior m_relayType = RequestProcessingBehavior::succeed;
     std::chrono::milliseconds m_connectTimeout;
     int m_connectionsToCreateCount;
     boost::optional<std::chrono::milliseconds> m_tunnelInactivityTimeout;
@@ -232,19 +232,9 @@ private:
     nx::network::SocketAttributes m_resultingSocketAttributes;
 
     virtual void onClientToRelayConnectionInstanciated(
-        ClientToRelayConnection* relayClient) override
+        nx::cloud::relay::api::test::ClientImpl* relayClient) override
     {
-        switch (m_relayType)
-        {
-            case RelayType::unhappy:
-                relayClient->setFailRequests(true);
-                break;
-            case RelayType::silent:
-                relayClient->setIgnoreRequests(true);
-                break;
-            default:
-                break;
-        }
+        relayClient->setBehavior(m_relayType);
 
         ++m_clientToRelayConnectionCounter;
     }
@@ -411,6 +401,14 @@ TEST_F(RelayOutgoingTunnelConnection, applies_socket_attributes)
     givenHappyRelay();
     whenReceivedAndSavedConnection();
     thenSocketAttributesHaveBeenAppliedToTheResultingSocket();
+}
+
+TEST_F(RelayOutgoingTunnelConnection, does_not_return_connection_on_error)
+{
+    // In this case client reports error in still provides connection.
+    givenRelayProducingLogicError();
+    whenRequestingConnection();
+    thenErrorIsReported();
 }
 
 } // namespace test

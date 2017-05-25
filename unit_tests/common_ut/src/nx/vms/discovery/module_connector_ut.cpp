@@ -146,7 +146,7 @@ TEST_F(DiscoveryModuleConnector, EndpointPriority)
     expectConnect(id, networkEndpoint);  //< Network is a second choice.
 
     mediaservers.erase(networkEndpoint);
-    ASSERT_EQ(id, disconnectedQueue.pop()); //< Finaly no endpoint avaliable.
+    ASSERT_EQ(id, disconnectedQueue.pop()); //< Finally no endpoint avaliable.
 }
 
 TEST_F(DiscoveryModuleConnector, IgnoredEndpoints)
@@ -168,7 +168,7 @@ TEST_F(DiscoveryModuleConnector, IgnoredEndpoints)
     expectConnect(id, endpoint1); //< Another one is unblocked now.
 
     mediaservers.erase(endpoint1);
-    ASSERT_EQ(id, disconnectedQueue.pop()); //< Ony blocked endpoint is reachable.
+    ASSERT_EQ(id, disconnectedQueue.pop()); //< Only blocked endpoints is reachable.
 
     connector.setForbiddenEndpoints({}, id);
     expectConnect(id, endpoint3); //< The last one is unblocked now.

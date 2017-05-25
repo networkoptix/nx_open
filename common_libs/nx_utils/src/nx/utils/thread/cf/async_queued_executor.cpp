@@ -19,16 +19,16 @@ void async_queued_executor::stop() {
   {
     std::lock_guard<std::mutex> lock_(mutex_);
     need_stop_ = true;
+    cond_.notify_all();
   }
-  cond_.notify_all();
   if (thread_.joinable())
     thread_.join();
 }
 
 void async_queued_executor::start() {
-  thread_ = nx::utils::thread([this] {
-    while (true) {
-      std::unique_lock<std::mutex> lock(mutex_);
+  thread_ = std::thread([this] {
+    std::unique_lock<std::mutex> lock(mutex_);
+    while (!need_stop_) {
       cond_.wait(lock, [this] { return need_stop_ || !tasks_.empty(); });
       if (need_stop_)
         break;

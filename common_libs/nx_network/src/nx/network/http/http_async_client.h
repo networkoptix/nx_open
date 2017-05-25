@@ -16,7 +16,7 @@
 #include "abstract_msg_body_source.h"
 #include "asynchttpclient.h"
 #include "auth_cache.h"
-#include "httpstreamreader.h"
+#include "http_stream_reader.h"
 
 namespace nx_http {
 

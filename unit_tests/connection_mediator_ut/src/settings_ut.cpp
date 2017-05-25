@@ -132,7 +132,7 @@ TEST_F(Settings, traffic_relay_url)
 {
     const std::string relayUrl = "http://nxvms.com/relay";
 
-    addSetting("--trafficRelay/url="+relayUrl);
+    addSetting("--trafficRelay/url=" + relayUrl);
     loadSettings();
     ASSERT_EQ(relayUrl, settings().trafficRelay().url.toStdString());
 }

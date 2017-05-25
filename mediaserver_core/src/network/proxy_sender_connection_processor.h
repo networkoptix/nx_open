@@ -13,7 +13,7 @@ class QnProxySenderConnection: public QnUniversalRequestProcessor
 {
 public:
     QnProxySenderConnection(const SocketAddress& proxyServerUrl, const QnUuid& guid,
-                            QnUniversalTcpListener* owner);
+                            QnUniversalTcpListener* owner, bool needAuth);
 
     virtual ~QnProxySenderConnection();
 protected:
@@ -22,7 +22,7 @@ private:
     QByteArray readProxyResponse();
     void doDelay();
     int sendRequest(const QByteArray& data);
-    QByteArray makeProxyRequest(const QnUuid& serverUuid, const QUrl& url) const;
+    QByteArray makeProxyRequest(const QnUuid& serverUuid, const SocketAddress& address) const;
 private:
     Q_DECLARE_PRIVATE(QnProxySenderConnection);
 };

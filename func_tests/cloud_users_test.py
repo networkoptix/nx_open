@@ -24,6 +24,7 @@ def env(env_builder, server):
     server = server(setup=False)
     return env_builder(server=server)
 
+@pytest.mark.skip(reason="Disabled until release")
 def test_mediaserver_cloud_protocol_syncronization(env, cloud_host):
     env.server.setup_cloud_system(cloud_host)
     env.server.rest_api.ec2.saveUser.POST(

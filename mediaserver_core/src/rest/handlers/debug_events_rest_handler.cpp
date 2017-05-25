@@ -8,7 +8,7 @@
 #include <core/resource/camera_resource.h>
 #include <core/resource_management/resource_pool.h>
 
-#include <nx/network/http/httptypes.h>
+#include <nx/network/http/http_types.h>
 #include <utils/common/synctime.h>
 #include <rest/server/rest_connection_processor.h>
 

@@ -2,7 +2,7 @@
 
 #include <nx/fusion/model_functions_fwd.h>
 #include <nx/network/cloud/data/connection_result_data.h>
-#include <nx/network/http/httptypes.h>
+#include <nx/network/http/http_types.h>
 #include <nx/network/http/server/fusion_request_result.h>
 #include <nx/utils/system_error.h>
 

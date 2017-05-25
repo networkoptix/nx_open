@@ -6,6 +6,7 @@
 #include <QtCore/QCryptographicHash>
 #include <QtCore/QDateTime>
 
+#include <nx/network/url/url_parse_helper.h>
 #include <nx/network/socket_factory.h>
 #include <nx/network/socket_global.h>
 #include <nx/utils/log/log.h>
@@ -1081,7 +1082,11 @@ void AsyncHttpClient::composeRequest(const nx_http::StringType& httpMethod)
             m_request.headers.insert(std::make_pair("Connection", "keep-alive"));
 
         if (m_additionalHeaders.count("Host") == 0)
-            m_request.headers.insert(std::make_pair("Host", m_contentLocationUrl.host().toLatin1()));
+        {
+            m_request.headers.emplace(
+                "Host",
+                nx::network::url::getEndpoint(m_contentLocationUrl).toString().toUtf8());
+        }
     }
 
     m_request.headers.insert(m_additionalHeaders.cbegin(), m_additionalHeaders.cend());

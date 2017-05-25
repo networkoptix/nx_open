@@ -1,0 +1,213 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>Voice in an existing language</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REL="HOME"
+TITLE="Building Synthetic Voices"
+HREF="book1.html"><LINK
+REL="UP"
+TITLE="Basic Requirements"
+HREF="c714.html"><LINK
+REL="PREVIOUS"
+TITLE="Voice in a new language"
+HREF="x740.html"><LINK
+REL="NEXT"
+TITLE="Selecting a speaker"
+HREF="x781.html"></HEAD
+><BODY
+CLASS="SECT1"
+BGCOLOR="#FFFFFF"
+TEXT="#000000"
+LINK="#0000FF"
+VLINK="#840084"
+ALINK="#0000FF"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="3"
+ALIGN="center"
+>Building Synthetic Voices</TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="bottom"
+><A
+HREF="x740.html"
+ACCESSKEY="P"
+>&#60;&#60;&#60; Previous</A
+></TD
+><TD
+WIDTH="80%"
+ALIGN="center"
+VALIGN="bottom"
+>Basic Requirements</TD
+><TD
+WIDTH="10%"
+ALIGN="right"
+VALIGN="bottom"
+><A
+HREF="x781.html"
+ACCESSKEY="N"
+>Next &#62;&#62;&#62;</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="SECT1"
+><H1
+CLASS="SECT1"
+><A
+NAME="AEN759"
+>Voice in an existing language</A
+></H1
+><P
+>The most common case is when someone wants to make their own voice into 
+a synthesizer. Note that the issues in voice modeling of a particular 
+speaker are still open research problems. Much of the quality of a 
+particular voice comes mostly from the waveform generation method, but 
+other aspects of a speaker such as intonation and duration, and 
+pronunciation are all part of what makes that person's voice sound like 
+them. All of the general-purpose voices we have heard in Festival sound 
+like the speaker they were record from (at least as far as we know all 
+the speakers), but they also don't have all the qualities of that 
+person's voice, though they can be quite convincing for limited-domain 
+synthesizers. </P
+><P
+>As a practical recommendation to make a new speaker in an existing 
+supported language, you will need to consider 
+<P
+></P
+><UL
+><LI
+STYLE="list-style-type: disc"
+><P
+>Waveform synthesis</P
+></LI
+><LI
+STYLE="list-style-type: disc"
+><P
+>Speaker specific intonation</P
+></LI
+><LI
+STYLE="list-style-type: disc"
+><P
+>Speaker specific duration</P
+></LI
+></UL
+>
+<A
+HREF="c3610.html"
+>the Chapter called <I
+>US/UK English Diphone Synthesizer</I
+></A
+> deals with specifically building 
+a new US or UK English voice. This is a relatively easy place to start, 
+though of course we encourage reading this entire document. </P
+><P
+>Another possible solution to getting a new or particular voice is to do 
+voice conversion, as is done at the Oregon Graduate Institute (OGI) 
+[<SPAN
+CLASS="CITATION"
+>kain98</SPAN
+>] and elsewhere. OGI have already released new voices based 
+on this conversion and may release the conversion code itself, though 
+the license terms are not the same as those of Festival or this document. </P
+><P
+>&#13;
+Another aspect of a new voice in an existing language is a voice in a 
+new dialect. The requirements are similar to those of creating a voice 
+in a new language. The lexicon and intonation probably need to change 
+as well as the waveform generation method (a new diphone database). 
+Although much of the text analysis came probably be borrowed, be aware 
+that simple things like number pronunciation can often change between 
+dialects (cf. US and UK English). </P
+><P
+>&#13;We also do work on limited domain synthesis in the same framework. For 
+limited domain synthesis, a reasonably small corpus is collected, and 
+used to synthesize a much larger range of utterances in the same basic 
+style. We give an example of recording a talking clock, which, although 
+built from only 24 recordings, generates over a thousand unique 
+utterances; these capture a lot of the latent speaker characteristics 
+from the data. </P
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="x740.html"
+ACCESSKEY="P"
+>&#60;&#60;&#60; Previous</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="book1.html"
+ACCESSKEY="H"
+>Home</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="x781.html"
+ACCESSKEY="N"
+>Next &#62;&#62;&#62;</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>Voice in a new language</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="c714.html"
+ACCESSKEY="U"
+>Up</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>Selecting a speaker</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

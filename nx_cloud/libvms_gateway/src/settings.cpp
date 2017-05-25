@@ -1,8 +1,3 @@
-/**********************************************************
-* May 17, 2016
-* akolesnikov
-***********************************************************/
-
 #include "settings.h"
 
 #include <thread>
@@ -12,7 +7,7 @@
 #include <QtCore/QString>
 
 #include <nx/fusion/serialization/lexical.h>
-#include <nx/network/http/httptypes.h>
+#include <nx/network/http/http_types.h>
 #include <nx/utils/app_info.h>
 #include <nx/utils/timer_manager.h>
 
@@ -253,7 +248,7 @@ void Settings::loadSettings()
         m_cloudConnect.preferedSslMode = SslMode::followIncomingConnection;
 }
 
-}   //namespace conf
-}   //namespace cloud
-}   //namespace gateway
-}   //namespace nx
+} // namespace conf
+} // namespace cloud
+} // namespace gateway
+} // namespace nx

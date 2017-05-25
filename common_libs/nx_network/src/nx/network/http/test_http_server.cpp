@@ -64,7 +64,10 @@ bool TestHttpServer::bindAndListen(const SocketAddress& endpoint)
 
 SocketAddress TestHttpServer::serverAddress() const
 {
-    return m_httpServer->address();
+    auto socketAddress = m_httpServer->address();
+    if (socketAddress.address == HostAddress::anyHost)
+        socketAddress.address = HostAddress::localhost;
+    return socketAddress;
 }
 
 void TestHttpServer::setPersistentConnectionEnabled(bool value)

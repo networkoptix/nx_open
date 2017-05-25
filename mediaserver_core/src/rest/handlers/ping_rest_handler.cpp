@@ -4,7 +4,7 @@
 #include <api/model/ping_reply.h>
 #include <common/common_module.h>
 #include <media_server/serverutil.h>
-#include <nx/network/http/httptypes.h>
+#include <nx/network/http/http_types.h>
 
 #include <api/app_server_connection.h>
 #include <api/global_settings.h>

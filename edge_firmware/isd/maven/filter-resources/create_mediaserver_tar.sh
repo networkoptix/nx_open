@@ -57,8 +57,8 @@ copyLibsWithoutQt()
         libcommon.so
         libcloud_db_client.so
         libnx_fusion.so
+        libnx_kit.so
         libnx_network.so
-        libnx_streaming.so
         libnx_utils.so
         libnx_email.so
         libappserver2.so

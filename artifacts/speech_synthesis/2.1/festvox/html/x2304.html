@@ -1,0 +1,656 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>Defining a diphone list</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REL="HOME"
+TITLE="Building Synthetic Voices"
+HREF="book1.html"><LINK
+REL="UP"
+TITLE="Diphone databases"
+HREF="c2261.html"><LINK
+REL="PREVIOUS"
+TITLE="Diphone databases"
+HREF="c2261.html"><LINK
+REL="NEXT"
+TITLE="Recording the diphones"
+HREF="x2397.html"></HEAD
+><BODY
+CLASS="SECT1"
+BGCOLOR="#FFFFFF"
+TEXT="#000000"
+LINK="#0000FF"
+VLINK="#840084"
+ALINK="#0000FF"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="3"
+ALIGN="center"
+>Building Synthetic Voices</TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="bottom"
+><A
+HREF="c2261.html"
+ACCESSKEY="P"
+>&#60;&#60;&#60; Previous</A
+></TD
+><TD
+WIDTH="80%"
+ALIGN="center"
+VALIGN="bottom"
+>Diphone databases</TD
+><TD
+WIDTH="10%"
+ALIGN="right"
+VALIGN="bottom"
+><A
+HREF="x2397.html"
+ACCESSKEY="N"
+>Next &#62;&#62;&#62;</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="SECT1"
+><H1
+CLASS="SECT1"
+><A
+NAME="AEN2304"
+>Defining a diphone list</A
+></H1
+><P
+>&#13;Since diphones need to be cleanly articulated, various techniques have 
+been proposed to elicit them from subjects. One technique is to use 
+target words embedded carrier sentences to ensure that the diphones are 
+pronounced with acceptable duration and prosody (i.e. consistently). We 
+have typically used nonsense words that iterate through all possible 
+combinations; the advantage of this is that you don't need to search for 
+natural examples that have the desired diphone, the list can be more 
+easily checked and the presentation is less prone to pronunciation 
+errors than if real words were presented. The words look unnatural but 
+collecting all diphones in not a particularly natural thing to do. See 
+[<SPAN
+CLASS="CITATION"
+>isard86</SPAN
+>] or [<SPAN
+CLASS="CITATION"
+>stella83</SPAN
+>] for some more discussion on the use of 
+nonsense words for collecting diphones. </P
+><P
+>For best results, we believe the words should be pronounced with consistent 
+vocal effort, with as little prosodic variation as possible. In fact 
+pronouncing them in a monotone is ideal. Our nonsense words consist of 
+a simple carrier form with the diphones (where appropriate) being taken 
+from a middle syllable. Except where schwa and syllabic consonants are 
+involved that syllable should normally be a full stressed one. </P
+><P
+>Some example code is given in <TT
+CLASS="FILENAME"
+>src/diphone/darpaschema.scm</TT
+>. The 
+basic idea is to define classes of diphones, for example: vowel consonant, 
+consonant vowel, vowel vowel and consonant consonant. Then define 
+carrier contexts for these and list the cases. Here we use Festival's 
+Scheme interpreter to generate the list though any scripting language is 
+suitable. Our intention is that the diphone will come from a middle 
+syllable of the nonsense word so it is fully articulated and minimize 
+the articulatory effects at the start and end of the word. </P
+><P
+>For example to generate all vowel vowel diphone we define 
+a carrier 
+<A
+NAME="AEN2315"
+></A
+><BLOCKQUOTE
+CLASS="BLOCKQUOTE"
+><P
+CLASS="LITERALLAYOUT"
+>(set!&nbsp;vv-carrier&nbsp;'((pau&nbsp;t&nbsp;aa&nbsp;t)&nbsp;(t&nbsp;aa&nbsp;pau)))</P
+></BLOCKQUOTE
+>
+And we define a simple function that will enumerate all 
+vowel vowel transitions 
+<A
+NAME="AEN2317"
+></A
+><BLOCKQUOTE
+CLASS="BLOCKQUOTE"
+><P
+CLASS="LITERALLAYOUT"
+>(define&nbsp;(list-vvs)<br>
+&nbsp;&nbsp;(apply<br>
+&nbsp;&nbsp;&nbsp;append<br>
+&nbsp;&nbsp;&nbsp;(mapcar<br>
+&nbsp;&nbsp;&nbsp;&nbsp;(lambda&nbsp;(v1)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(mapcar&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(lambda&nbsp;(v2)&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(list<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(string-append&nbsp;v1&nbsp;"-"&nbsp;v2)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(append&nbsp;(car&nbsp;vv-carrier)&nbsp;(list&nbsp;v1&nbsp;v2)&nbsp;(car&nbsp;(cdr&nbsp;vv-carrier)))))<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;vowels))<br>
+&nbsp;&nbsp;&nbsp;&nbsp;vowels)))</P
+></BLOCKQUOTE
+>
+For those of you who aren't used to reading Lisp this simple 
+lists all possible combinations or in some potentially more 
+readable format (in an imaginary language) 
+<A
+NAME="AEN2319"
+></A
+><BLOCKQUOTE
+CLASS="BLOCKQUOTE"
+><P
+CLASS="LITERALLAYOUT"
+>for&nbsp;v1&nbsp;in&nbsp;vowels<br>
+&nbsp;&nbsp;&nbsp;for&nbsp;v2&nbsp;in&nbsp;vowels<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;print&nbsp;pau&nbsp;t&nbsp;aa&nbsp;t&nbsp;$v1&nbsp;$v2&nbsp;t&nbsp;aa&nbsp;pau</P
+></BLOCKQUOTE
+>
+The actual Lisp code returns a list of diphone names and phone string. 
+To be more efficient, the DARPAbet example produces consonant-vowel and 
+vowel-consonant diphones in the same nonsense word, which reduces the 
+number of words to be spoken quite significantly. Your voice talent 
+will appreciate this. </P
+><P
+>Although the idea seems simple to begin with, simply listing all 
+contexts and pairs, there are other constraints. Some consonants can 
+only appear in the onset of a syllable (before the vowel), and others 
+are restricted to the coda. </P
+><P
+>&#13;While one can collect all the diphones without considering where they 
+fall in a syllable, it often makes sense to collect diphones in 
+different syllabic contexts. Consonant clusters are the obvious next 
+set to consider; thus the example DARPAbet schema includes simple 
+consonant clusters with explicit syllable boundaries. We also include 
+syllabic consonants though these may be harder to pronounce in all 
+contexts. You can add other phenomena too, but this is at the cost of 
+not only making the list longer (and making it take longer to record), 
+but making it harder to produce. You must consider how easy it is for 
+your voice talent to pronounce them, and how consistent they can be 
+about it. For example, not all American speakers produce flaps (/dx/) 
+in all of the same contexts (and some may produce them even when you ask 
+them not to), and its quite difficult for some to pronounce them, which 
+can lead to production/transcription mismatches. </P
+><P
+>&#13;
+A second and related problem is language interference, which can cause 
+phoneme crossover. Because of the prevalence of English, especially in 
+electronic text, how many "foreign" phone should be considered for 
+addition? For example, should /w/ be include for German speakers, 
+(maybe), /t-i/ for Japanese (probably) or both /b/ and /v/ for Spanish 
+speakers ("B de burro / V de vaca"). This problem is made difficult by 
+the fact that the people you are recording will often be fluent or 
+nearly fluent in English, and hence already have reasonably ability in 
+phones that are not in their native language. If you are unfamiliar 
+with the phone set and constraints on a language, it pays off 
+considerably to either ask someone (like a linguist!) who knows the 
+language analytically (not just by intuition), to check the literature, 
+or to do some research. </P
+><P
+>To the degree that they are expected to appear, regardless of their 
+status in the target language per se, foreign phones should be 
+considered for the inventory. Remember that in most languages, nowadays, 
+making no attempt to accommodate foreign phones is considered ignorant 
+at least and possibly even arrogant. </P
+><P
+>Ultimately, when more complex forms are needed, extending the "diphone" 
+set becomes prohibitive and has diminishing returns. Obviously there 
+are phonetic differences between onset and coda positions, 
+co-articulatory effects which go over more then one phone, stress 
+differences, intonational accent differences, and phrase-positional 
+difference to name but a few. Explicitly enumerating all of these, or 
+even deciding the relative importance of each, is a difficult research 
+question, and arguably shouldn't be done in an abstract, linguistically 
+generated fashion from a strict interpretation of the language. 
+Identifying these potential differences and finding an inventory which 
+takes into account the actual distinctions a speaker makes is far more 
+productive and is the fundamental part of many new research directions 
+in concatenative speech synthesis. (See the discussion in the 
+introduction above). </P
+><P
+>&#13;However you choose to construct the diphone list, and whatever examples 
+you choose to include, the the tools and scripts included with this 
+document require that it be in a particular format. </P
+><P
+>Each line should contain a file id, a prompt, and a diphone name (or 
+list of names if more than one diphone is being extracted from that 
+file). The file id is used to in the filename for the waveform, label 
+file, and any other parameters files associated with the nonsense word. 
+We usually make this distinct for the particular speaker we are going to 
+record, e.g. their initials and possibly the language they are speaking. </P
+><P
+>The prompt is presented to the speaker at recording time, and here it 
+contains a string of the phones in the nonsense word from which the 
+diphones will be extracted. For example the following is taken from the 
+DARPAbet-generated list 
+<A
+NAME="AEN2337"
+></A
+><BLOCKQUOTE
+CLASS="BLOCKQUOTE"
+><P
+CLASS="LITERALLAYOUT"
+>(&nbsp;uk_0001&nbsp;"pau&nbsp;t&nbsp;aa&nbsp;b&nbsp;aa&nbsp;b&nbsp;aa&nbsp;pau"&nbsp;("b-aa"&nbsp;"aa-b")&nbsp;)<br>
+(&nbsp;uk_0002&nbsp;"pau&nbsp;t&nbsp;aa&nbsp;p&nbsp;aa&nbsp;p&nbsp;aa&nbsp;pau"&nbsp;("p-aa"&nbsp;"aa-p")&nbsp;)<br>
+(&nbsp;uk_0003&nbsp;"pau&nbsp;t&nbsp;aa&nbsp;d&nbsp;aa&nbsp;d&nbsp;aa&nbsp;pau"&nbsp;("d-aa"&nbsp;"aa-d")&nbsp;)<br>
+(&nbsp;uk_0004&nbsp;"pau&nbsp;t&nbsp;aa&nbsp;t&nbsp;aa&nbsp;t&nbsp;aa&nbsp;pau"&nbsp;("t-aa"&nbsp;"aa-t")&nbsp;)<br>
+(&nbsp;uk_0005&nbsp;"pau&nbsp;t&nbsp;aa&nbsp;g&nbsp;aa&nbsp;g&nbsp;aa&nbsp;pau"&nbsp;("g-aa"&nbsp;"aa-g")&nbsp;)<br>
+(&nbsp;uk_0006&nbsp;"pau&nbsp;t&nbsp;aa&nbsp;k&nbsp;aa&nbsp;k&nbsp;aa&nbsp;pau"&nbsp;("k-aa"&nbsp;"aa-k")&nbsp;)<br>
+...<br>
+(&nbsp;uk_0601&nbsp;"pau&nbsp;t&nbsp;aa&nbsp;t&nbsp;ey&nbsp;aa&nbsp;t&nbsp;aa&nbsp;pau"&nbsp;("ey-aa")&nbsp;)<br>
+(&nbsp;uk_0602&nbsp;"pau&nbsp;t&nbsp;aa&nbsp;t&nbsp;ey&nbsp;ae&nbsp;t&nbsp;aa&nbsp;pau"&nbsp;("ey-ae")&nbsp;)<br>
+(&nbsp;uk_0603&nbsp;"pau&nbsp;t&nbsp;aa&nbsp;t&nbsp;ey&nbsp;ah&nbsp;t&nbsp;aa&nbsp;pau"&nbsp;("ey-ah")&nbsp;)<br>
+(&nbsp;uk_0604&nbsp;"pau&nbsp;t&nbsp;aa&nbsp;t&nbsp;ey&nbsp;ao&nbsp;t&nbsp;aa&nbsp;pau"&nbsp;("ey-ao")&nbsp;)<br>
+...<br>
+(&nbsp;uk_0748&nbsp;"pau&nbsp;t&nbsp;aa&nbsp;p&nbsp;-&nbsp;r&nbsp;aa&nbsp;t&nbsp;aa&nbsp;pau"&nbsp;("p-r")&nbsp;)<br>
+(&nbsp;uk_0749&nbsp;"pau&nbsp;t&nbsp;aa&nbsp;p&nbsp;-&nbsp;w&nbsp;aa&nbsp;t&nbsp;aa&nbsp;pau"&nbsp;("p-w")&nbsp;)<br>
+(&nbsp;uk_0750&nbsp;"pau&nbsp;t&nbsp;aa&nbsp;p&nbsp;-&nbsp;y&nbsp;aa&nbsp;t&nbsp;aa&nbsp;pau"&nbsp;("p-y")&nbsp;)<br>
+(&nbsp;uk_0751&nbsp;"pau&nbsp;t&nbsp;aa&nbsp;p&nbsp;-&nbsp;m&nbsp;aa&nbsp;t&nbsp;aa&nbsp;pau"&nbsp;("p-m")&nbsp;)<br>
+...</P
+></BLOCKQUOTE
+>
+Note the explicit syllable boundary marking <CODE
+CLASS="VARNAME"
+>-</CODE
+> for the 
+consonant-consonant diphones is used to distinguish them from the 
+consonant cluster examples that appear later. </P
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="AEN2340"
+>Synthesizing prompts</A
+></H2
+><P
+>&#13;To help keep pronunciation consistent we suggest synthesizing prompts 
+and playing them to your voice talent at collection time. This helps 
+the speaker in two ways -- if they mimic the prompt they are more likely 
+to keep a fixed prosodic style; it also reduces the number of errors 
+where the speaker vocalizes the wrong diphone. Of course for new 
+languages where a set of diphones doesn't already exist, producing 
+prompts is not easy, however giving approximations with diphone sets 
+from other languages may work. The problem then is that in producing 
+prompts from a different phone set, the speaker is likely to mimic the 
+prompts hence the diphone set will probably seem to have a foreign 
+pronunciation, especially for vowels.
+Furthermore, mimicing the synthesizer too closely can remove some of the 
+speaker's natural voice quality, which is under their (possibly 
+subconscious) control to some degree. </P
+><P
+>Even when synthesizing prompts from an existing diphone set, you must be 
+aware that that diphone set may contain errors or that certain examples 
+will not be synthesized appropriately (e.g. consonant clusters). 
+Because of this, it is still worthwhile monitoring the speaker to ensure 
+they say things correctly. </P
+><P
+>The basic code for generating the prompts is in 
+<TT
+CLASS="FILENAME"
+>src/diphone/diphlist.scm</TT
+>, and a specific example for DARPA phone 
+set for American English in <TT
+CLASS="FILENAME"
+>src/diphone/us_schema.scm</TT
+>. The 
+prompts can be generated from the diphone list as described above (or at 
+the same time). The example code produces the prompts and phone labels 
+files which can be used by the aligning tool described below. </P
+><P
+>&#13;
+
+Before synthesizing, the function <CODE
+CLASS="VARNAME"
+>Diphone_Prompt_Setup</CODE
+> is called, 
+if it has been defined. You should define this to set up the 
+appropriate voices in Festival, as well as any other initialization you 
+might need -- for example, setting the fundamental frequency (F0) for 
+the prompts that are to be delivered in a monotone (disregarding 
+so-called microprosody, which is another matter). This value is set 
+through the variable <CODE
+CLASS="VARNAME"
+>FP_F0</CODE
+> and should be near the middle of the 
+range for the speaker, or at least somewhere comfortable to deliver. 
+For the DARPAbet diphone list for KAL, we have: 
+<A
+NAME="AEN2359"
+></A
+><BLOCKQUOTE
+CLASS="BLOCKQUOTE"
+><P
+CLASS="LITERALLAYOUT"
+>(define&nbsp;(Diphone_Prompt_Setup)<br>
+&nbsp;"(Diphone_Prompt_Setup)<br>
+Called&nbsp;before&nbsp;synthesizing&nbsp;the&nbsp;prompt&nbsp;waveforms.&nbsp;&nbsp;Uses&nbsp;the&nbsp;kal_dphone<br>
+voice&nbsp;for&nbsp;prompting&nbsp;and&nbsp;sets&nbsp;F0."<br>
+&nbsp;(voice_kal_diphone)&nbsp;&nbsp;;;&nbsp;US&nbsp;male&nbsp;voice<br>
+&nbsp;(set!&nbsp;FP_F0&nbsp;90)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;;;&nbsp;lower&nbsp;F0&nbsp;than&nbsp;ked<br>
+&nbsp;)</P
+></BLOCKQUOTE
+>
+
+If the function <CODE
+CLASS="VARNAME"
+>Diphone_Prompt_Word</CODE
+> is defined, it will be called 
+after the basic prompt-word utterance has been created, and before the 
+actual waveform synthesis. This may be used to map phones to other 
+phones, set durations or whatever you feel appropriate for your 
+speaker/diphone set. For the KAL set, we redefined the syllabic 
+consonants to their full consonant forms in the prompts, since the ked 
+diphone database doesn't actually include syllabics. Also, in the 
+example below, instead of using fixed (100ms) durations we make the 
+diphones use a constant scaling factor (here, 1.2) times the average 
+duration of the phones. 
+<A
+NAME="AEN2364"
+></A
+><BLOCKQUOTE
+CLASS="BLOCKQUOTE"
+><P
+CLASS="LITERALLAYOUT"
+>(define&nbsp;(Diphone_Prompt_Word&nbsp;utt)<br>
+&nbsp;&nbsp;"(Diphone_Prompt_Word&nbsp;utt)<br>
+Specify&nbsp;specific&nbsp;modifications&nbsp;of&nbsp;the&nbsp;utterance&nbsp;before&nbsp;synthesis<br>
+specific&nbsp;to&nbsp;this&nbsp;particular&nbsp;phone&nbsp;set."<br>
+&nbsp;&nbsp;;;&nbsp;No&nbsp;syllabics&nbsp;in&nbsp;kal&nbsp;so&nbsp;flip&nbsp;them&nbsp;to&nbsp;non-syllabic&nbsp;form<br>
+&nbsp;&nbsp;(mapcar<br>
+&nbsp;&nbsp;&nbsp;(lambda&nbsp;(s)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(let&nbsp;((n&nbsp;(item.name&nbsp;s)))<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(cond<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;((string-equal&nbsp;n&nbsp;"el")<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(item.set_name&nbsp;s&nbsp;"l"))<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;((string-equal&nbsp;n&nbsp;"em")<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(item.set_name&nbsp;s&nbsp;"m"))<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;((string-equal&nbsp;n&nbsp;"en")<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(item.set_name&nbsp;s&nbsp;"n")))))<br>
+&nbsp;&nbsp;&nbsp;(utt.relation.items&nbsp;utt&nbsp;'Segment))<br>
+&nbsp;&nbsp;(set!&nbsp;phoneme_durations&nbsp;kd_durs)<br>
+&nbsp;&nbsp;(Parameter.set&nbsp;'Duration_Stretch&nbsp;'1.2)<br>
+&nbsp;&nbsp;(Duration_Averages&nbsp;utt))</P
+></BLOCKQUOTE
+></P
+><P
+>&#13;By convention, the prompt waveforms are saved in 
+<TT
+CLASS="FILENAME"
+>prompt-wav/</TT
+>, and their labels in <TT
+CLASS="FILENAME"
+>prompt-lab/</TT
+>. 
+The prompts may be generated after the diphone list is given 
+using the following command: 
+<A
+NAME="AEN2371"
+></A
+><BLOCKQUOTE
+CLASS="BLOCKQUOTE"
+><P
+CLASS="LITERALLAYOUT"
+>festival&nbsp;festvox/us_schema.scm&nbsp;festvox/diphlist.scm<br>
+festival&#62;&nbsp;(diphone-gen-schema&nbsp;"us"&nbsp;"etc/usdiph.list")</P
+></BLOCKQUOTE
+></P
+><P
+>If you already have a diphone list schema generated in the file 
+<TT
+CLASS="FILENAME"
+>etc/usdiphlist</TT
+>, you can do the following 
+<A
+NAME="AEN2375"
+></A
+><BLOCKQUOTE
+CLASS="BLOCKQUOTE"
+><P
+CLASS="LITERALLAYOUT"
+>festival&nbsp;festvox/us_schema.scm&nbsp;festvox/diphlist.scm<br>
+festival&#62;&nbsp;(diphone-gen-waves&nbsp;"prompt-wav"&nbsp;"prompt-lab"&nbsp;"etc/usdiph.list")</P
+></BLOCKQUOTE
+></P
+><P
+>&#13;Another useful example of the setup functions is to generate prompts for 
+a language for which no synthesizer exists yet -- to "bootstrap" from 
+one language to another. A simple mapping can be given between the 
+target phoneset and an existing synthesizer's phone set. We don't know 
+if this will be sufficient to actually use as prompts, but we have found 
+that it is suitable to use these prompts for automatic alignment. </P
+><P
+>The example here is using the <CODE
+CLASS="VARNAME"
+>voice_kal_diphone</CODE
+> speaker, 
+a US English speaker, to produce prompts for japanese phone set, 
+this code is in <TT
+CLASS="FILENAME"
+>src/diphones/ja_schema.scm</TT
+> </P
+><P
+>The function <CODE
+CLASS="VARNAME"
+>Diphone_Prompt_Setup</CODE
+> calls the kal (US) voice, sets 
+a suitable F0 value, and sets the option <CODE
+CLASS="VARNAME"
+>diph_do_db_boundaries</CODE
+> to 
+<CODE
+CLASS="VARNAME"
+>nil</CODE
+>. This option allows the diphone boundaries to be dumped into 
+the prompt label files, but this doesn't work when cross-language 
+prompting is done, as the actual phones don't match the desired ones. 
+<A
+NAME="AEN2387"
+></A
+><BLOCKQUOTE
+CLASS="BLOCKQUOTE"
+><P
+CLASS="LITERALLAYOUT"
+>(define&nbsp;(Diphone_Prompt_Setup)<br>
+&nbsp;"(Diphone_Prompt_Setup)<br>
+Called&nbsp;before&nbsp;synthesizing&nbsp;the&nbsp;prompt&nbsp;waveforms.&nbsp;&nbsp;Cross&nbsp;language&nbsp;prompts<br>
+from&nbsp;US&nbsp;male&nbsp;(for&nbsp;gaijin&nbsp;male)."<br>
+&nbsp;(voice_kal_diphone)&nbsp;&nbsp;;;&nbsp;US&nbsp;male&nbsp;voice<br>
+&nbsp;(set!&nbsp;FP_F0&nbsp;90)<br>
+&nbsp;(set!&nbsp;diph_do_db_boundaries&nbsp;nil)&nbsp;;;&nbsp;cross-lang&nbsp;confuses&nbsp;this<br>
+&nbsp;)</P
+></BLOCKQUOTE
+>
+At synthesis time, each Japanese phone must be mapped to an equivalent 
+(one or more) US phone. This is done though a simple table. set in 
+<CODE
+CLASS="VARNAME"
+>nhg2radio_map</CODE
+> which gives the closest phone or phones for 
+the Japanese phone (those unlisted remain the same). </P
+><P
+>Our mapping table looks like this 
+<A
+NAME="AEN2391"
+></A
+><BLOCKQUOTE
+CLASS="BLOCKQUOTE"
+><P
+CLASS="LITERALLAYOUT"
+>(set!&nbsp;nhg2radio_map<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'((a&nbsp;aa)<br>
+	(i&nbsp;iy)<br>
+	(o&nbsp;ow)<br>
+	(u&nbsp;uw)<br>
+	(e&nbsp;eh)<br>
+	(ts&nbsp;t&nbsp;s)<br>
+	(N&nbsp;n)<br>
+	(h&nbsp;hh)<br>
+	(Qk&nbsp;k)<br>
+	(Qg&nbsp;g)<br>
+	(Qd&nbsp;d)<br>
+	(Qt&nbsp;t)<br>
+	(Qts&nbsp;t&nbsp;s)<br>
+	(Qch&nbsp;t&nbsp;ch)<br>
+	(Qj&nbsp;jh)<br>
+	(j&nbsp;jh)<br>
+	(Qs&nbsp;s)<br>
+	(Qsh&nbsp;sh)<br>
+	(Qz&nbsp;z)<br>
+	(Qp&nbsp;p)<br>
+	(Qb&nbsp;b)<br>
+	(Qky&nbsp;k&nbsp;y)<br>
+	(Qshy&nbsp;sh&nbsp;y)<br>
+	(Qchy&nbsp;ch&nbsp;y)<br>
+	(Qpy&nbsp;p&nbsp;y&nbsp;))<br>
+	(ky&nbsp;k&nbsp;y)<br>
+	(gy&nbsp;g&nbsp;y)<br>
+	(jy&nbsp;jh&nbsp;y)<br>
+	(chy&nbsp;ch&nbsp;y)<br>
+	(shy&nbsp;sh&nbsp;y)<br>
+	(hy&nbsp;hh&nbsp;y)<br>
+	(py&nbsp;p&nbsp;y)<br>
+	(by&nbsp;b&nbsp;y)<br>
+	(my&nbsp;m&nbsp;y)<br>
+	(ny&nbsp;n&nbsp;y)<br>
+	(ry&nbsp;r&nbsp;y)))</P
+></BLOCKQUOTE
+>
+Phones that are not explicitly mentioned map to themselves (e.g. most of 
+the consonants). </P
+><P
+>Finally we define <CODE
+CLASS="VARNAME"
+>Diphone_Prompt_Word</CODE
+> to actually do the mapping. 
+Where the mapping involves more than one US phone we add an extra 
+segment to the Segment (defined in the Festival manual) relation and 
+split the duration equally between them. The basic function looks like 
+<A
+NAME="AEN2395"
+></A
+><BLOCKQUOTE
+CLASS="BLOCKQUOTE"
+><P
+CLASS="LITERALLAYOUT"
+>(define&nbsp;(Diphone_Prompt_Word&nbsp;utt)<br>
+&nbsp;&nbsp;"(Diphone_Prompt_Word&nbsp;utt)<br>
+Specify&nbsp;specific&nbsp;modifications&nbsp;of&nbsp;the&nbsp;utterance&nbsp;before&nbsp;synthesis<br>
+specific&nbsp;to&nbsp;this&nbsp;particular&nbsp;phone&nbsp;set."<br>
+&nbsp;&nbsp;(mapcar<br>
+&nbsp;&nbsp;&nbsp;(lambda&nbsp;(s)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(let&nbsp;((n&nbsp;(item.name&nbsp;s))<br>
+	&nbsp;&nbsp;&nbsp;(newn&nbsp;(cdr&nbsp;(assoc_string&nbsp;(item.name&nbsp;s)&nbsp;nhg2radio_map))))<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(cond<br>
+	((cdr&nbsp;newn)&nbsp;&nbsp;;;&nbsp;its&nbsp;a&nbsp;dual&nbsp;one<br>
+	&nbsp;(let&nbsp;((newi&nbsp;(item.insert&nbsp;s&nbsp;(list&nbsp;(car&nbsp;(cdr&nbsp;newn)))&nbsp;'after)))<br>
+	&nbsp;&nbsp;&nbsp;(item.set_feat&nbsp;newi&nbsp;"end"&nbsp;(item.feat&nbsp;s&nbsp;"end"))<br>
+	&nbsp;&nbsp;&nbsp;(item.set_feat&nbsp;s&nbsp;"end"<br>
+			&nbsp;&nbsp;(/&nbsp;(+&nbsp;(item.feat&nbsp;s&nbsp;"segment_start")<br>
+				(item.feat&nbsp;s&nbsp;"end"))<br>
+			&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;2))<br>
+	&nbsp;&nbsp;&nbsp;(item.set_name&nbsp;s&nbsp;(car&nbsp;newn))))<br>
+	(newn<br>
+	&nbsp;(item.set_name&nbsp;s&nbsp;(car&nbsp;newn)))<br>
+	(t<br>
+	&nbsp;;;&nbsp;as&nbsp;is<br>
+	&nbsp;))))<br>
+&nbsp;&nbsp;&nbsp;(utt.relation.items&nbsp;utt&nbsp;'Segment))<br>
+&nbsp;&nbsp;utt)</P
+></BLOCKQUOTE
+>
+The label file produced from this will have the original desired 
+language phones, while the acoustic waveform will actually consist of 
+phones in the target language. Although this may seem like cheating, we 
+have found this to work for Korean and Japanese from English, and is 
+likely to work over many other language combination pairs. For 
+autolabeling as the nonse word phone names are pre-defined alignment 
+just needs to be the best matching path and as long as the phones are 
+distinctive from the ones around them this alignment method is likely to 
+work. </P
+></DIV
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="c2261.html"
+ACCESSKEY="P"
+>&#60;&#60;&#60; Previous</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="book1.html"
+ACCESSKEY="H"
+>Home</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="x2397.html"
+ACCESSKEY="N"
+>Next &#62;&#62;&#62;</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>Diphone databases</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="c2261.html"
+ACCESSKEY="U"
+>Up</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>Recording the diphones</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

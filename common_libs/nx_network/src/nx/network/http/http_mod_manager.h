@@ -6,12 +6,12 @@
 
 #include <nx/utils/singleton.h>
 
-#include "httptypes.h"
+#include "http_types.h"
 
 namespace nx_http {
 
 //!This class is to manage all modifications to HTTP request/response
-class NX_NETWORK_API HttpModManager: public QObject, public Singleton<HttpModManager>
+class NX_NETWORK_API HttpModManager: public QObject
 {
     Q_OBJECT
 

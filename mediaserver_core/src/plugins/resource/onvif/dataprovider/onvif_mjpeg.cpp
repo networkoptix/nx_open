@@ -6,7 +6,7 @@
 #include <core/resource/camera_resource.h>
 #include "core/resource/network_resource.h"
 #include "utils/common/synctime.h"
-#include <nx/network/http/httptypes.h>
+#include <nx/network/http/http_types.h>
 #include "utils/media/jpeg_utils.h"
 
 /*

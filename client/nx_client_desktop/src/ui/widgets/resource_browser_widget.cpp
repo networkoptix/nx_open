@@ -975,8 +975,7 @@ void QnResourceBrowserWidget::handleItemActivated(const QModelIndex& index, bool
     }
 
     // Double click shouldn't do anything in layout tour review mode.
-    const bool isLayoutTourReviewMode = workbench()->currentLayout()->data()
-        .contains(Qn::LayoutTourUuidRole);
+    const bool isLayoutTourReviewMode = workbench()->currentLayout()->isLayoutTourReview();
 
     // Really we should check all special layout modes here
     if (!isLayoutTourReviewMode)

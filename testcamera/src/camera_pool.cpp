@@ -133,7 +133,7 @@ void QnCameraPool::addCameras(bool cameraForEachFile, int count, QStringList pri
 QnTCPConnectionProcessor* QnCameraPool::createRequestProcessor(QSharedPointer<AbstractStreamSocket> clientSocket)
 {
     QMutexLocker lock(&m_mutex);
-    return new QnTestCameraProcessor(clientSocket, commonModule());
+    return new QnTestCameraProcessor(clientSocket, this);
 }
 
 QByteArray QnCameraPool::getDiscoveryResponse()

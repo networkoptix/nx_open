@@ -15,7 +15,7 @@
 #include <nx/utils/timer_manager.h>
 #include <nx/utils/uuid.h>
 #include <nx/utils/singleton.h>
-#include <nx/network/http/httptypes.h>
+#include <nx/network/http/http_types.h>
 #include <nx/utils/thread/mutex.h>
 #include <nx/network/http/auth_restriction_list.h>
 

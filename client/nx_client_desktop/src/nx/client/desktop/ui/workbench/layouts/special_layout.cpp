@@ -16,8 +16,6 @@ SpecialLayout::SpecialLayout(const QnLayoutResourcePtr& resource, QObject* paren
     m_panelWidget(new SpecialLayoutPanelWidget(resource, this))
 {
     setFlags(flags() | QnLayoutFlag::SpecialBackground);
-    if (resource->data().contains(Qn::LayoutFlagsRole))
-        setFlags(flags() | resource->data(Qn::LayoutFlagsRole).value<QnLayoutFlags>());
 }
 
 SpecialLayout::~SpecialLayout()

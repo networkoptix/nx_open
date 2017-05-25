@@ -8,7 +8,7 @@
 
 #include <network/cloud_url_validator.h>
 
-#include <nx/network/http/httptypes.h>
+#include <nx/network/http/http_types.h>
 
 #include <nx/client/desktop/ui/actions/action_manager.h>
 #include <ui/help/help_topic_accessor.h>

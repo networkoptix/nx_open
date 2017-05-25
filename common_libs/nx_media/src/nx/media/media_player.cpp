@@ -23,7 +23,7 @@
 #include <nx/streaming/archive_stream_reader.h>
 #include <nx/streaming/rtsp_client_archive_delegate.h>
 
-#include <nx/media/config.h>
+#include <nx/media/ini.h>
 
 #include "player_data_consumer.h"
 #include "frame_metadata.h"

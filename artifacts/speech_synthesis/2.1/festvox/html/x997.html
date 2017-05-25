@@ -1,0 +1,175 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>using limited domain synthesizers</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REL="HOME"
+TITLE="Building Synthetic Voices"
+HREF="book1.html"><LINK
+REL="UP"
+TITLE="Limited domain synthesis"
+HREF="c941.html"><LINK
+REL="PREVIOUS"
+TITLE="unit size and type"
+HREF="x982.html"><LINK
+REL="NEXT"
+TITLE="Telling the time"
+HREF="x1003.html"></HEAD
+><BODY
+CLASS="SECT1"
+BGCOLOR="#FFFFFF"
+TEXT="#000000"
+LINK="#0000FF"
+VLINK="#840084"
+ALINK="#0000FF"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="3"
+ALIGN="center"
+>Building Synthetic Voices</TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="bottom"
+><A
+HREF="x982.html"
+ACCESSKEY="P"
+>&#60;&#60;&#60; Previous</A
+></TD
+><TD
+WIDTH="80%"
+ALIGN="center"
+VALIGN="bottom"
+>Limited domain synthesis</TD
+><TD
+WIDTH="10%"
+ALIGN="right"
+VALIGN="bottom"
+><A
+HREF="x1003.html"
+ACCESSKEY="N"
+>Next &#62;&#62;&#62;</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="SECT1"
+><H1
+CLASS="SECT1"
+><A
+NAME="AEN997"
+>using limited domain synthesizers</A
+></H1
+><P
+>The goal of building such limited domain synthesizer is not just 
+to show off good synthesis. We followed this route as we see this 
+as a very practical method for building speech output systems. </P
+><P
+>For practical reasons, the default configures includes the possibility of 
+a back-up voice that will be called to do synthesis if the limited 
+domain synthesizer fails, which for this default setup means the phrase 
+includes a out of vocabulary word. It would perhaps be more useful if 
+the fall position just required synthesis of the out of vocabulary word 
+itself rather than the whole phrase, but that isn't as trivial as it 
+might be. The limit domain synthesis does not prosody modification of 
+the selections, except for pitch smooth at joins, thus slotting in a 
+diphone one word would sound very bad. At present each limited domain 
+synthesizer has an explicitly defined <CODE
+CLASS="VARNAME"
+>closest_voice</CODE
+>. This voice 
+is used when the limited domain synthesis fails and also when generating 
+the prompts, which can be looked upon as absolute minimal case when the 
+synthesizer has no data to synthesize from. </P
+><P
+>There are also issues in speed here, which we are still trying to 
+improve. This technique should in fact be fast but it is still slower 
+than our diphone synthesizer. One significant reason is the cost if 
+finding the optimal join put in selected units. Also this synthesizer 
+technique require more memory that diphones as the cepstrum parameters 
+for the whole database are required at run time, in addition to the full 
+waveforms. These issues we feel can and should be addressed as these 
+techniques are not fundamentally computationally expensive so we intend 
+to work on these aspect in later releases. </P
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="x982.html"
+ACCESSKEY="P"
+>&#60;&#60;&#60; Previous</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="book1.html"
+ACCESSKEY="H"
+>Home</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="x1003.html"
+ACCESSKEY="N"
+>Next &#62;&#62;&#62;</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>unit size and type</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="c941.html"
+ACCESSKEY="U"
+>Up</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>Telling the time</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

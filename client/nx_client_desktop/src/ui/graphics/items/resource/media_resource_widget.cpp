@@ -253,7 +253,12 @@ void clearSensitivityRegion(MotionGrid& grid, const QPoint& at)
     }
 };
 
-} // anonymous namespace
+bool tourIsRunning(QnWorkbenchContext* context)
+{
+    return context->action(action::ToggleLayoutTourModeAction)->isChecked();
+}
+
+} // namespace
 
 QnMediaResourceWidget::QnMediaResourceWidget(QnWorkbenchContext* context, QnWorkbenchItem* item, QGraphicsItem* parent):
     base_type(context, item, parent),
@@ -430,6 +435,10 @@ QnMediaResourceWidget::QnMediaResourceWidget(QnWorkbenchContext* context, QnWork
         &QnMediaResourceWidget::at_zoomRectChanged);
     connect(context->instance<QnWorkbenchRenderWatcher>(), &QnWorkbenchRenderWatcher::widgetChanged,
         this, &QnMediaResourceWidget::at_renderWatcher_widgetChanged);
+
+    // Update buttons for single layout tour start/stop
+    connect(action(action::ToggleLayoutTourModeAction), &QAction::toggled, this,
+        &QnMediaResourceWidget::updateButtonsVisibility);
 
     at_camDisplay_liveChanged();
     at_ptzButton_toggled(false);
@@ -738,7 +747,9 @@ void QnMediaResourceWidget::setupHud()
     m_triggersContainer = new QnScrollableItemsWidget(m_hudOverlay->right());
     m_triggersContainer->setAlignment(Qt::AlignRight | Qt::AlignBottom);
 
-    const auto triggersMargin = kTriggersMargin - m_hudOverlay->contentsMargins().right();
+    qreal right = 0.0;
+    m_hudOverlay->content()->getContentsMargins(nullptr, nullptr, &right, nullptr);
+    const auto triggersMargin = kTriggersMargin - right;
 
     m_triggersContainer->setSpacing(kTriggersSpacing);
     m_triggersContainer->setMaximumWidth(kTriggerButtonSize + triggersMargin);
@@ -770,7 +781,6 @@ void QnMediaResourceWidget::updateHud(bool animate)
 {
     base_type::updateHud(animate);
     setOverlayWidgetVisible(m_triggersContainer, isOverlayWidgetVisible(titleBar()), animate);
-
     updateCompositeOverlayMode();
 }
 
@@ -1130,7 +1140,9 @@ void QnMediaResourceWidget::setDisplay(const QnResourceDisplayPtr &display)
         m_renderer->setChannelCount(0);
     }
 
-    setOption(QnResourceWidget::WindowRotationForbidden, !hasVideo());
+    const bool canRotate = accessController()->hasPermissions(item()->layout()->resource(),
+        Qn::WritePermission);
+    setOption(QnResourceWidget::WindowRotationForbidden, !hasVideo() || !canRotate);
 
     emit displayChanged();
 }
@@ -1673,8 +1685,12 @@ int QnMediaResourceWidget::calculateButtonsVisibility() const
     if (!zoomRect().isNull())
         return result;
 
-    if (hasVideo && resource()->toResource()->hasFlags(Qn::motion))
+    if (hasVideo
+        && resource()->toResource()->hasFlags(Qn::motion)
+        && !tourIsRunning(context()))
+    {
         result |= Qn::MotionSearchButton;
+    }
 
     bool isExportedLayout = item()
         && item()->layout()
@@ -1709,7 +1725,9 @@ int QnMediaResourceWidget::calculateButtonsVisibility() const
     {
         if (item()
             && item()->layout()
-            && accessController()->hasPermissions(item()->layout()->resource(), Qn::WritePermission | Qn::AddRemoveItemsPermission)
+            && accessController()->hasPermissions(item()->layout()->resource(),
+                Qn::WritePermission | Qn::AddRemoveItemsPermission)
+            && !tourIsRunning(context())
             )
             result |= Qn::ZoomWindowButton;
     }
@@ -2173,6 +2191,8 @@ void QnMediaResourceWidget::updateCompositeOverlayMode()
 
     const bool animate = m_compositeOverlay->scene() != nullptr;
     setOverlayWidgetVisible(m_compositeOverlay, visible, animate);
+
+    m_triggersContainer->setEnabled(isLive);
 }
 
 qint64 QnMediaResourceWidget::getUtcCurrentTimeUsec() const

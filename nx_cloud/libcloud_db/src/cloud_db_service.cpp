@@ -20,7 +20,7 @@
 
 #include <api/global_settings.h>
 #include <common/common_module.h>
-#include <platform/process/current_process.h>
+#include <nx/utils/platform/current_process.h>
 #include <utils/common/app_info.h>
 #include <utils/db/db_structure_updater.h>
 
@@ -91,7 +91,7 @@ int CloudDbService::serviceMain(const utils::AbstractServiceSettings& abstractSe
     nx::utils::log::initialize(
         settings.vmsSynchronizationLogging(), settings.dataDir(),
         QnLibCloudDbAppInfo::applicationDisplayName(), QString(),
-        "sync_log", nx::utils::log::add({QnLog::EC2_TRAN_LOG}));
+        "sync_log", nx::utils::log::addLogger({QnLog::EC2_TRAN_LOG}));
 
     const auto& httpAddrToListenList = settings.endpointsToListen();
     m_settings = &settings;
@@ -238,7 +238,7 @@ int CloudDbService::serviceMain(const utils::AbstractServiceSettings& abstractSe
         return 3;
 
     // process privilege reduction
-    CurrentProcess::changeUser(settings.changeUser());
+    nx::utils::CurrentProcess::changeUser(settings.changeUser());
 
     if (!multiAddressHttpServer.listen(settings.http().tcpBacklogSize))
         return 5;

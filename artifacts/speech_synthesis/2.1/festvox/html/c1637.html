@@ -1,0 +1,694 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>Building prosodic models</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REL="HOME"
+TITLE="Building Synthetic Voices"
+HREF="book1.html"><LINK
+REL="UP"
+TITLE="Building Synthetic Voices"
+HREF="p710.html"><LINK
+REL="PREVIOUS"
+TITLE="Building lexicons for new languages"
+HREF="x1630.html"><LINK
+REL="NEXT"
+TITLE="Accent/Boundary Assignment"
+HREF="x1748.html"></HEAD
+><BODY
+CLASS="CHAPTER"
+BGCOLOR="#FFFFFF"
+TEXT="#000000"
+LINK="#0000FF"
+VLINK="#840084"
+ALINK="#0000FF"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="3"
+ALIGN="center"
+>Building Synthetic Voices</TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="bottom"
+><A
+HREF="x1630.html"
+ACCESSKEY="P"
+>&#60;&#60;&#60; Previous</A
+></TD
+><TD
+WIDTH="80%"
+ALIGN="center"
+VALIGN="bottom"
+></TD
+><TD
+WIDTH="10%"
+ALIGN="right"
+VALIGN="bottom"
+><A
+HREF="x1748.html"
+ACCESSKEY="N"
+>Next &#62;&#62;&#62;</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="CHAPTER"
+><H1
+><A
+NAME="AEN1637"
+></A
+>Building prosodic models</H1
+><DIV
+CLASS="SECT1"
+><H1
+CLASS="SECT1"
+><A
+NAME="AEN1639"
+>Phrasing</A
+></H1
+><P
+>&#13;Prosodic phrasing in speech synthesis makes the whole speech more 
+understandable. Due to the size of peoples lungs there is 
+a finite length of time people can talk before they can take 
+a breath, which defines an upper bound on prosodic phrases. However 
+we rarely make our phrases this maximum length and use phrasing 
+to mark groups within the speech. There is the apocryphal story 
+of the speech synthesis example with an unnaturally long 
+prosodic phrase played at a conference presentation. At the end 
+of the phrase the audience all took a large in-take of breathe. </P
+><P
+>For the most case very simple prosodic phrasing is sufficient. 
+A comparison of various prosodic phrasing techniques is 
+discussed in [<SPAN
+CLASS="CITATION"
+>taylor98a</SPAN
+>], though we will cover some 
+of them here also. </P
+><P
+>For English (and most likely many other language too) simple rules based 
+on punctuation is a very good predictor of prosodic phrase boundaries. 
+It is rare that punctuation exists where there is no boundary, but there 
+will be a substantial number of prosodic boundaries which are not 
+explicitly marked with punctuation. Thus a prosodic phrasing algorithm 
+solely based on punctuation will typically under predict but rarely make 
+a false insertion. However depending on the actual application you wish 
+to use the synthesizer for it may be the case that explicitly adding 
+punctuation at desired phrase breaks is possible and a prediction system 
+based solely on punctuation is adequate. </P
+><P
+>Festival basically supports two methods for predicting prosodic 
+phrases, though any other method can easily be used. Note that these do 
+not necessary entail pauses in the synthesized output. Pauses are 
+further predicted from prosodic phrase information. </P
+><P
+>The first basic method is by CART tree. A test is made on each 
+word to predict it is at the end of a prosodic phrase. The basic CART 
+tree returns <CODE
+CLASS="VARNAME"
+>B</CODE
+> or <CODE
+CLASS="VARNAME"
+>BB</CODE
+> (though may return what you consider 
+is appropriate form break labels as long as the rest of 
+your models support it). The two levels identify different 
+levels of break, <CODE
+CLASS="VARNAME"
+>BB</CODE
+> being a used to denote a bigger 
+break (and end of utterance). </P
+><P
+>&#13;The following tree is very simple and simply adds a break 
+after the last word of a token that has following punctuation. 
+Note the first condition is done by a lisp function as we wand to 
+ensure that only the last word in a token gets the break. (Earlier 
+erroneous versions of this would insert breaks after each word 
+in <SPAN
+CLASS="QUOTE"
+>"<I
+CLASS="EMPHASIS"
+>1984.</I
+>"</SPAN
+> 
+<A
+NAME="AEN1657"
+></A
+><BLOCKQUOTE
+CLASS="BLOCKQUOTE"
+><P
+CLASS="LITERALLAYOUT"
+>(set!&nbsp;simple_phrase_cart_tree<br>
+'<br>
+((lisp_token_end_punc&nbsp;in&nbsp;("?"&nbsp;"."&nbsp;":"))<br>
+&nbsp;&nbsp;((BB))<br>
+&nbsp;&nbsp;((lisp_token_end_punc&nbsp;in&nbsp;("'"&nbsp;"\""&nbsp;","&nbsp;";"))<br>
+&nbsp;&nbsp;&nbsp;((B))<br>
+&nbsp;&nbsp;&nbsp;((n.name&nbsp;is&nbsp;0)&nbsp;&nbsp;;;&nbsp;end&nbsp;of&nbsp;utterance<br>
+&nbsp;&nbsp;&nbsp;&nbsp;((BB))<br>
+&nbsp;&nbsp;&nbsp;&nbsp;((NB))))))</P
+></BLOCKQUOTE
+>
+This tree is defined <TT
+CLASS="FILENAME"
+>festival/lib/phrase.scm</TT
+> in the standard 
+distribution and is certainly a good first step in defining a phrasing 
+model for a new language. </P
+><P
+>To make a better phrasing model requires more information. As the basic 
+punctuation model underpredicts we need information that will find 
+reasonable boundaries within strings of words. In English, boundaries 
+are more likely between content words and function words, because most 
+function words are before the words they related to, in Japanese 
+function words are typically after their relate content words so breaks 
+are more likely between function words and content words. If you have 
+no data to train from, written rules, in a CART tree, can exploited this 
+fact and give a phrasing model that is better than a punctuation only. 
+Basically a rule could be if the current word is a content word and the 
+next is a function word (or the reverse if that appropriate for a 
+language) and we are more than 5 words from a punctuation symbol them 
+predict a break. We maybe also want to insure that we are also at least 
+five words from predicted break too. </P
+><P
+>Note the above basic rules aren't optimal but when you are building a 
+new voice in a new language and have no data to train from you will get 
+reasonably far with simple rules like that, such that phrasing 
+prediction will be less of a problem than the other problems you will 
+find in you voice. </P
+><P
+>&#13;
+
+To implement such a scheme we need three basic functions: one to 
+determine if the current word is a function of content word, one to 
+determine number of words since previous punctuation (or start of 
+utterance) and one to determine number of words to next punctuation (or 
+end of utterance. The first of these functions is already provided for 
+with a feature, through the feature function <CODE
+CLASS="VARNAME"
+>gpos</CODE
+>. This uses 
+the word list in the lisp variable <CODE
+CLASS="VARNAME"
+>guess_pos</CODE
+> to determine the 
+basic category of a word. Because in most languages the set of function 
+words is very nearly a closed class they can usually be explicitly 
+listed. The format of the <CODE
+CLASS="VARNAME"
+>guess_pos</CODE
+> variable is a list of 
+lists whose first element is the set name and the rest of the list if 
+the words that are part of that set. Any word not a member of 
+any of these sets is defined to be in the set <CODE
+CLASS="VARNAME"
+>content</CODE
+>. For 
+example the basic definition for this for English, 
+given in <TT
+CLASS="FILENAME"
+>festival/lib/pos.scm</TT
+> is 
+<A
+NAME="AEN1674"
+></A
+><BLOCKQUOTE
+CLASS="BLOCKQUOTE"
+><P
+CLASS="LITERALLAYOUT"
+>(set!&nbsp;english_guess_pos<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;'((in&nbsp;of&nbsp;for&nbsp;in&nbsp;on&nbsp;that&nbsp;with&nbsp;by&nbsp;at&nbsp;from&nbsp;as&nbsp;if&nbsp;that&nbsp;against&nbsp;about&nbsp;<br>
+	&nbsp;&nbsp;&nbsp;&nbsp;before&nbsp;because&nbsp;if&nbsp;under&nbsp;after&nbsp;over&nbsp;into&nbsp;while&nbsp;without<br>
+	&nbsp;&nbsp;&nbsp;&nbsp;through&nbsp;new&nbsp;between&nbsp;among&nbsp;until&nbsp;per&nbsp;up&nbsp;down)<br>
+	(to&nbsp;to)<br>
+	(det&nbsp;the&nbsp;a&nbsp;an&nbsp;no&nbsp;some&nbsp;this&nbsp;that&nbsp;each&nbsp;another&nbsp;those&nbsp;every&nbsp;all&nbsp;any&nbsp;<br>
+	&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;these&nbsp;both&nbsp;neither&nbsp;no&nbsp;many)<br>
+	(md&nbsp;will&nbsp;may&nbsp;would&nbsp;can&nbsp;could&nbsp;should&nbsp;must&nbsp;ought&nbsp;might)<br>
+	(cc&nbsp;and&nbsp;but&nbsp;or&nbsp;plus&nbsp;yet&nbsp;nor)<br>
+	(wp&nbsp;who&nbsp;what&nbsp;where&nbsp;how&nbsp;when)<br>
+	(pps&nbsp;her&nbsp;his&nbsp;their&nbsp;its&nbsp;our&nbsp;their&nbsp;its&nbsp;mine)<br>
+	(aux&nbsp;is&nbsp;am&nbsp;are&nbsp;was&nbsp;were&nbsp;has&nbsp;have&nbsp;had&nbsp;be)<br>
+	(punc&nbsp;"."&nbsp;","&nbsp;":"&nbsp;";"&nbsp;"\""&nbsp;"'"&nbsp;"("&nbsp;"?"&nbsp;")"&nbsp;"!")<br>
+	))</P
+></BLOCKQUOTE
+>
+The punctuation distance check can be written as a Lisp feature 
+function 
+<A
+NAME="AEN1676"
+></A
+><BLOCKQUOTE
+CLASS="BLOCKQUOTE"
+><P
+CLASS="LITERALLAYOUT"
+>(define&nbsp;(since_punctuation&nbsp;word)<br>
+&nbsp;"(since_punctuation&nbsp;word)<br>
+Number&nbsp;of&nbsp;words&nbsp;since&nbsp;last&nbsp;punctuation&nbsp;or&nbsp;beginning&nbsp;of&nbsp;utterance."<br>
+&nbsp;(cond<br>
+&nbsp;&nbsp;&nbsp;((null&nbsp;word)&nbsp;0)&nbsp;;;&nbsp;beginning&nbsp;or&nbsp;utterance<br>
+&nbsp;&nbsp;&nbsp;((string-equal&nbsp;"0"&nbsp;(item.feat&nbsp;word&nbsp;"p.lisp_token_end_punc"))&nbsp;0)<br>
+&nbsp;&nbsp;&nbsp;(t<br>
+&nbsp;&nbsp;&nbsp;&nbsp;(+&nbsp;1&nbsp;(since_punctuation&nbsp;(item.prev&nbsp;word))))))</P
+></BLOCKQUOTE
+>
+The function looking forward would be 
+<A
+NAME="AEN1678"
+></A
+><BLOCKQUOTE
+CLASS="BLOCKQUOTE"
+><P
+CLASS="LITERALLAYOUT"
+>(define&nbsp;(until_punctuation&nbsp;word)<br>
+&nbsp;"(until_punctuation&nbsp;word)<br>
+Number&nbsp;of&nbsp;words&nbsp;until&nbsp;next&nbsp;punctuation&nbsp;or&nbsp;end&nbsp;of&nbsp;utterance."<br>
+&nbsp;(cond<br>
+&nbsp;&nbsp;&nbsp;((null&nbsp;word)&nbsp;0)&nbsp;;;&nbsp;beginning&nbsp;or&nbsp;utterance<br>
+&nbsp;&nbsp;&nbsp;((string-equal&nbsp;"0"&nbsp;(token_end_punc&nbsp;word))&nbsp;0)<br>
+&nbsp;&nbsp;&nbsp;(t<br>
+&nbsp;&nbsp;&nbsp;&nbsp;(+&nbsp;1&nbsp;(since_punctuation&nbsp;(item.prev&nbsp;word))))))</P
+></BLOCKQUOTE
+>
+The whole tree using these features that will insert a break at 
+punctuation or between content and function words more than 
+5 words from a punctuation symbol is as follows 
+<A
+NAME="AEN1680"
+></A
+><BLOCKQUOTE
+CLASS="BLOCKQUOTE"
+><P
+CLASS="LITERALLAYOUT"
+>(set!&nbsp;simple_phrase_cart_tree_2<br>
+'<br>
+((lisp_token_end_punc&nbsp;in&nbsp;("?"&nbsp;"."&nbsp;":"))<br>
+&nbsp;&nbsp;((BB))<br>
+&nbsp;&nbsp;((lisp_token_end_punc&nbsp;in&nbsp;("'"&nbsp;"\""&nbsp;","&nbsp;";"))<br>
+&nbsp;&nbsp;&nbsp;((B))<br>
+&nbsp;&nbsp;&nbsp;((n.name&nbsp;is&nbsp;0)&nbsp;&nbsp;;;&nbsp;end&nbsp;of&nbsp;utterance<br>
+&nbsp;&nbsp;&nbsp;&nbsp;((BB))<br>
+&nbsp;&nbsp;&nbsp;&nbsp;((lisp_since_punctuation&nbsp;&#62;&nbsp;5)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;((lisp_until_punctuation&nbsp;&#62;&nbsp;5)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;((gpos&nbsp;is&nbsp;content)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;((n.gpos&nbsp;content)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;((NB))<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;((B)))&nbsp;&nbsp;&nbsp;;;&nbsp;not&nbsp;content&nbsp;so&nbsp;a&nbsp;function&nbsp;word<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;((NB)))&nbsp;&nbsp;&nbsp;;;&nbsp;this&nbsp;is&nbsp;a&nbsp;function&nbsp;word<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;((NB)))&nbsp;&nbsp;&nbsp;&nbsp;;;&nbsp;to&nbsp;close&nbsp;to&nbsp;punctuation<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;((NB)))&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;;;&nbsp;to&nbsp;soon&nbsp;after&nbsp;punctuation<br>
+&nbsp;&nbsp;&nbsp;&nbsp;((NB))))))</P
+></BLOCKQUOTE
+>
+To use this add the above to a file in your <TT
+CLASS="FILENAME"
+>festvox/</TT
+> 
+directory and ensure it is loaded by your standard voice file. 
+In your voice definition function. Add the following 
+<A
+NAME="AEN1683"
+></A
+><BLOCKQUOTE
+CLASS="BLOCKQUOTE"
+><P
+CLASS="LITERALLAYOUT"
+>&nbsp;&nbsp;&nbsp;(set!&nbsp;guess_pos&nbsp;english_guess_pos)&nbsp;;;&nbsp;or&nbsp;appropriate&nbsp;for&nbsp;your&nbsp;language<br>
+&nbsp;<br>
+&nbsp;&nbsp;&nbsp;(Parameter.set&nbsp;'Phrase_Method&nbsp;'cart_tree)<br>
+&nbsp;&nbsp;&nbsp;(set!&nbsp;phrase_cart_tree&nbsp;simple_phrase_cart_tree_2)</P
+></BLOCKQUOTE
+></P
+><P
+>A much better method for predicting phrase breaks is using a full 
+statistical model trained from data. The problem is that you need a lot 
+of data to train phrase break models. Elsewhere in this document we 
+suggest the use of a timit style database or around 460 sentences, 
+(around 14500 segments) for training models. However a database such as 
+this as very few internal utterance phrase breaks. An almost perfect 
+model word predict breaks at the end of each utterances and never 
+internally. Even the f2b database from the Boston University Radio New 
+Corpus [<SPAN
+CLASS="CITATION"
+>ostendorf95</SPAN
+>] which does have a number of utterance internal 
+breaks isn't really big enough. For English we used the MARSEC database 
+[<SPAN
+CLASS="CITATION"
+>roach93</SPAN
+>] which is much larger (around 37,000 words). Finding such 
+a database for your language will not be easy and you may need to fall 
+back on a purely hand written rule system. </P
+><P
+>&#13;Often syntax is suggested as a strong correlate of prosodic phrase. 
+Although there is evidence that it influences prosodic phrasing, there 
+are notable exceptions [<SPAN
+CLASS="CITATION"
+>bachenko90</SPAN
+>]. Also considering how 
+difficult it is to get a reliable parse tree it is probably not worth 
+the effort, training a reliable parser is non-trivial, (though we 
+provide a method for training stochastic context free grammars in the 
+speech tools, see manual for details). Of course if your text to be 
+synthesized is coming from a language system such as machine translation 
+or language generation then a syntax tree may be readily available. In 
+that case a simple rule mechanism taking into account syntactic phrasing 
+may be useful </P
+><P
+>When only moderate amounts of data are available for training a simple 
+CART tree may be able to tease out a reasonable model. See 
+[<SPAN
+CLASS="CITATION"
+>hirschberg94</SPAN
+>] for some discussion on this. Here is a short example 
+of building a CART tree for phrase prediction. Let us assume you have a 
+database of utterances as described previously. By convention we 
+build models in directories under <TT
+CLASS="FILENAME"
+>festival/</TT
+> in the main 
+database directory. Thus let us create <TT
+CLASS="FILENAME"
+>festival/phrbrk</TT
+>. </P
+><P
+>&#13;First we need to list the features that are likely to be suitable 
+predictors for phrase breaks. Add these to a file <TT
+CLASS="FILENAME"
+>phrbrk.feats</TT
+>, 
+what goes in here will depend on what you have, full part of speech 
+helps a lot but you may not have that for your language. The 
+<CODE
+CLASS="VARNAME"
+>gpos</CODE
+> described above is a good cheap alternative. Possible 
+features may be 
+<A
+NAME="AEN1701"
+></A
+><BLOCKQUOTE
+CLASS="BLOCKQUOTE"
+><P
+CLASS="LITERALLAYOUT"
+>word_break<br>
+lisp_token_end_punc<br>
+lisp_until_punctuation<br>
+lisp_since_punctuation<br>
+p.gpos<br>
+gpos<br>
+n.gpos</P
+></BLOCKQUOTE
+>
+Given this list you can extract features form your database of 
+utterances with the Festival script <TT
+CLASS="FILENAME"
+>dumpfeats</TT
+> 
+<A
+NAME="AEN1704"
+></A
+><BLOCKQUOTE
+CLASS="BLOCKQUOTE"
+><P
+CLASS="LITERALLAYOUT"
+>dumpfeats&nbsp;-eval&nbsp;../../festvox/phrbrk.scm&nbsp;-feats&nbsp;phrbrk.feats&nbsp;\<br>
+&nbsp;&nbsp;&nbsp;-relation&nbsp;Word&nbsp;-output&nbsp;phrbrk.data&nbsp;../utts/*.utts</P
+></BLOCKQUOTE
+>
+<TT
+CLASS="FILENAME"
+>festvox/phrbrk.scm</TT
+> should contain the definitions of 
+the function <CODE
+CLASS="VARNAME"
+>until_punctuation</CODE
+>, <CODE
+CLASS="VARNAME"
+>since_punctuation</CODE
+> 
+and any other Lisp feature functions you define. </P
+><P
+>Next we want to split this data into test and train data. 
+We provide a simple shell script called <TT
+CLASS="FILENAME"
+>traintest</TT
+> 
+which splits a given file 9:1, i.e every 10th line is put in 
+the test set. 
+<A
+NAME="AEN1711"
+></A
+><BLOCKQUOTE
+CLASS="BLOCKQUOTE"
+><P
+CLASS="LITERALLAYOUT"
+>traintest&nbsp;phrbrk.data</P
+></BLOCKQUOTE
+>
+As we intend to run <TT
+CLASS="FILENAME"
+>wagon</TT
+> the CART tree builder on this data we 
+also need create the feature description file for the data. The feature 
+description file consists of a bracketed list of feature name and type. 
+Type may be <CODE
+CLASS="VARNAME"
+>int</CODE
+> <CODE
+CLASS="VARNAME"
+>float</CODE
+> or categorical where a list of 
+possible values is given. The script <TT
+CLASS="FILENAME"
+>make_wagon_desc</TT
+> 
+(distributed with the speech tools) will make a reasonable approximation 
+for this file 
+<A
+NAME="AEN1717"
+></A
+><BLOCKQUOTE
+CLASS="BLOCKQUOTE"
+><P
+CLASS="LITERALLAYOUT"
+>make_wagon_desc&nbsp;phrbrk.data&nbsp;phrbrk.feats&nbsp;phrbrk.desc</P
+></BLOCKQUOTE
+>
+This script will treat all features as categorical. Thus any 
+<CODE
+CLASS="VARNAME"
+>float</CODE
+> or <CODE
+CLASS="VARNAME"
+>int</CODE
+> features will be treated categorically and 
+each value found in the data will be listed as a separate item. In our 
+example <CODE
+CLASS="VARNAME"
+>lisp_since_punctuation</CODE
+> and <CODE
+CLASS="VARNAME"
+>lisp_until_punctuation</CODE
+> 
+are actually float (well maybe even int) but they will be listed as 
+categorically in <TT
+CLASS="FILENAME"
+>phrbrk.desc</TT
+>, something like 
+<A
+NAME="AEN1724"
+></A
+><BLOCKQUOTE
+CLASS="BLOCKQUOTE"
+><P
+CLASS="LITERALLAYOUT"
+>...<br>
+(lisp_since_punctuation<br>
+0<br>
+1<br>
+2<br>
+4<br>
+3<br>
+5<br>
+6<br>
+7<br>
+8)<br>
+...</P
+></BLOCKQUOTE
+>
+You should change this entry (by hand) to be 
+<A
+NAME="AEN1726"
+></A
+><BLOCKQUOTE
+CLASS="BLOCKQUOTE"
+><P
+CLASS="LITERALLAYOUT"
+>...<br>
+(lisp_since_punctuation&nbsp;float&nbsp;)<br>
+...</P
+></BLOCKQUOTE
+>
+The script cannot work out the type of a feature automatically 
+so you must make this decision yourself. </P
+><P
+>Now that we have the data and description we can build 
+a CART tree. The basic command for <TT
+CLASS="FILENAME"
+>wagon</TT
+> will be 
+<A
+NAME="AEN1730"
+></A
+><BLOCKQUOTE
+CLASS="BLOCKQUOTE"
+><P
+CLASS="LITERALLAYOUT"
+>wagon&nbsp;-desc&nbsp;phrbrk.desc&nbsp;-data&nbsp;phrbrk.data.train&nbsp;-test&nbsp;phrbrk.data.test&nbsp;\<br>
+&nbsp;&nbsp;&nbsp;-output&nbsp;phrbrk.tree</P
+></BLOCKQUOTE
+>
+
+
+
+You will probably also want to set a <I
+CLASS="EMPHASIS"
+>stop</I
+> value. The default 
+stop value is 50, which means there must be at least 50 examples 
+in a group before it will consider looking for a question to 
+split it. Unless you have a <I
+CLASS="EMPHASIS"
+>lot</I
+> of data this is probably 
+too large and a value of 10 to 20 is probably more reasonable. </P
+><P
+>Other arguments to <TT
+CLASS="FILENAME"
+>wagon</TT
+> should also be considered. A stepwise 
+approach where all features are tested incrementally to find the best 
+set of features which give the best tree can give better results than 
+simply using all features. Though care should be taken with 
+this as the generated tree becomes optimized from the given 
+test set. Thus a further held our test set is required to 
+properly test the accuracy of the result. In the stepwise case 
+it is normal to split the train set again and call 
+wagon as follows 
+<A
+NAME="AEN1742"
+></A
+><BLOCKQUOTE
+CLASS="BLOCKQUOTE"
+><P
+CLASS="LITERALLAYOUT"
+>traintest&nbsp;phrbrk.data.train<br>
+wagon&nbsp;-desc&nbsp;phrbrk.desc&nbsp;-data&nbsp;phrbrk.data.train.train&nbsp;\<br>
+&nbsp;&nbsp;&nbsp;-test&nbsp;phrbrk.data.train.test&nbsp;\<br>
+&nbsp;&nbsp;&nbsp;-output&nbsp;phrbrk.tree&nbsp;-stepwise<br>
+wagon_test&nbsp;-data&nbsp;phrbrk.data.test&nbsp;-desc&nbsp;phrbrk.desc&nbsp;\<br>
+&nbsp;&nbsp;&nbsp;-tree&nbsp;phrbrk.tree</P
+></BLOCKQUOTE
+>
+Stepwise is particularly useful when features are highly correlated with 
+themselves and its not clear which is best general predictor. Note that 
+stepwise will take <I
+CLASS="EMPHASIS"
+>much</I
+> longer to run as it potentially must 
+build a large number of trees. </P
+><P
+>Other arguments to <TT
+CLASS="FILENAME"
+>wagon</TT
+> can be considered, refer to the 
+relevant chapter in speech tools manual for their details. </P
+><P
+>However it should be noted that without a good intonation and duration 
+model spending time on producing good phrasing is probably not worth it. 
+The quality of all these three prosodic components is closely related 
+such that if one is much better than there may not be 
+any real benefit. </P
+></DIV
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="x1630.html"
+ACCESSKEY="P"
+>&#60;&#60;&#60; Previous</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="book1.html"
+ACCESSKEY="H"
+>Home</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="x1748.html"
+ACCESSKEY="N"
+>Next &#62;&#62;&#62;</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>Building lexicons for new languages</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="p710.html"
+ACCESSKEY="U"
+>Up</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>Accent/Boundary Assignment</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

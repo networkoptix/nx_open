@@ -8,7 +8,7 @@
 #include <QtCore/QScopedPointer>
 #include <QtCore/QUrlQuery>
 
-#include <nx/network/http/httptypes.h>
+#include <nx/network/http/http_types.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/std/future.h>
 

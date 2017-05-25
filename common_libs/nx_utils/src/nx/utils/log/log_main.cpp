@@ -56,17 +56,17 @@ static LoggerCollection* loggerCollection()
 
 } // namespace
 
-std::shared_ptr<Logger> main()
+std::shared_ptr<Logger> mainLogger()
 {
     return loggerCollection()->main();
 }
 
-std::shared_ptr<Logger> add(const std::set<QString>& filters)
+std::shared_ptr<Logger> addLogger(const std::set<QString>& filters)
 {
     return loggerCollection()->add(filters);
 }
 
-std::shared_ptr<Logger> get(const QString& tag, bool allowMain)
+std::shared_ptr<Logger> getLogger(const QString& tag, bool allowMain)
 {
     return loggerCollection()->get(tag, allowMain);
 }

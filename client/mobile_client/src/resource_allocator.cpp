@@ -1,6 +1,6 @@
 #include "resource_allocator.h"
 
-#include "config.h"
+#include "ini.h"
 
 using nx::mobile_client::ini;
 

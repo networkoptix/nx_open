@@ -16,6 +16,7 @@
 #include <nx_ec/data/api_media_server_data.h>
 #include "nx/utils/thread/long_runnable.h"
 #include <common/common_module_aware.h>
+#include <nx/utils/std/future.h>
 
 class QnScheduleSync: public QnLongRunnable, public QnCommonModuleAware
 {
@@ -158,7 +159,7 @@ private:
     SyncDataMap           m_syncData;
     mutable QnMutex       m_syncDataMutex;
     CopyError             m_lastError;
-    std::promise<void>    m_stopPromise;
+    nx::utils::promise<void>    m_stopPromise;
 };
 
 #endif
