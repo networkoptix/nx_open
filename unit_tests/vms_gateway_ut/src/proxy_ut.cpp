@@ -69,8 +69,8 @@ public:
     boost::optional<bool> m_securityExpectation;
 };
 
-class VmsGatewayProxyTest:
-    public VmsGatewayFunctionalTest
+class Proxy:
+    public BasicComponentTest
 {
 public:
     void SetUp() override
@@ -129,7 +129,7 @@ private:
     boost::optional<bool> m_securityExpectation{boost::none};
 };
 
-TEST_F(VmsGatewayProxyTest, IpSpecified)
+TEST_F(Proxy, IpSpecified)
 {
     ASSERT_TRUE(startAndWaitUntilStarted(true, true, false));
 
@@ -159,7 +159,7 @@ TEST_F(VmsGatewayProxyTest, IpSpecified)
         nx_http::StatusCode::notFound);
 }
 
-TEST_F(VmsGatewayProxyTest, SslEnabled)
+TEST_F(Proxy, SslEnabled)
 {
     addArg("-http/sslSupport", "true");
     addArg("-cloudConnect/preferedSslMode", "followIncomingConnection");
@@ -202,7 +202,7 @@ TEST_F(VmsGatewayProxyTest, SslEnabled)
         .arg(testPathAndQuery)));
 }
 
-TEST_F(VmsGatewayProxyTest, SslEnforced)
+TEST_F(Proxy, SslEnforced)
 {
     addArg("-http/sslSupport", "true");
     addArg("-cloudConnect/preferedSslMode", "enabled");
@@ -227,7 +227,7 @@ TEST_F(VmsGatewayProxyTest, SslEnforced)
         .arg(testPathAndQuery)));
 }
 
-TEST_F(VmsGatewayProxyTest, SslRestricted)
+TEST_F(Proxy, SslRestricted)
 {
     addArg("-http/sslSupport", "true");
     addArg("-cloudConnect/preferedSslMode", "disabled");
@@ -270,7 +270,7 @@ TEST_F(VmsGatewayProxyTest, SslRestricted)
         .arg(testPathAndQuery)));
 }
 
-TEST_F(VmsGatewayProxyTest, SslForbidden)
+TEST_F(Proxy, SslForbidden)
 {
     addArg("-http/sslSupport", "false");
     addArg("-cloudConnect/preferedSslMode", "followIncomingConnection");
@@ -300,7 +300,7 @@ TEST_F(VmsGatewayProxyTest, SslForbidden)
         nx_http::StatusCode::forbidden);
 }
 
-TEST_F(VmsGatewayProxyTest, IpForbidden)
+TEST_F(Proxy, IpForbidden)
 {
     ASSERT_TRUE(startAndWaitUntilStarted(false, false, false));
 
@@ -313,7 +313,7 @@ TEST_F(VmsGatewayProxyTest, IpForbidden)
 }
 
 //testing proxying in case of request line like "GET http://192.168.0.1:2343/some/path HTTP/1.1"
-TEST_F(VmsGatewayProxyTest, proxyByRequestUrl)
+TEST_F(Proxy, proxyByRequestUrl)
 {
     addArg("-http/allowTargetEndpointInUrl", "true");
     addArg("-cloudConnect/replaceHostAddressWithPublicAddress", "false");
@@ -327,7 +327,7 @@ TEST_F(VmsGatewayProxyTest, proxyByRequestUrl)
     testProxyUrl(&httpClient, targetUrl, nx_http::StatusCode::ok);
 }
 
-TEST_F(VmsGatewayProxyTest, proxyingChunkedBody)
+TEST_F(Proxy, proxyingChunkedBody)
 {
     addArg("-http/allowTargetEndpointInUrl", "true");
     addArg("-cloudConnect/replaceHostAddressWithPublicAddress", "false");
@@ -341,7 +341,7 @@ TEST_F(VmsGatewayProxyTest, proxyingChunkedBody)
     testProxyUrl(&httpClient, targetUrl, nx_http::StatusCode::ok);
 }
 
-TEST_F(VmsGatewayProxyTest, ModRewrite)
+TEST_F(Proxy, ModRewrite)
 {
     addArg("-http/sslSupport", "true");
     addArg("-cloudConnect/sslAllowed", "true");

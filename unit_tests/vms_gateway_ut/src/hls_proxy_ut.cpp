@@ -24,7 +24,7 @@ const char* const kHlsChunkContentType = "video/mp2t";
 } // namespace
 
 class HlsProxy:
-    public VmsGatewayFunctionalTest
+    public BasicComponentTest
 {
 public:
     HlsProxy()

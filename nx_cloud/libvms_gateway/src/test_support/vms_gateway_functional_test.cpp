@@ -1,8 +1,3 @@
-/**********************************************************
-* Dec 21, 2015
-* akolesnikov
-***********************************************************/
-
 #include "vms_gateway_functional_test.h"
 
 #include <chrono>
@@ -25,14 +20,15 @@
 
 #include "vms_gateway_process.h"
 
-
 namespace nx {
 namespace cloud {
 namespace gateway {
 
 namespace {
+
 QString sTemporaryDirectoryPath;
-}
+
+} // namespace
 
 VmsGatewayFunctionalTest::VmsGatewayFunctionalTest():
     m_httpPort(0)
@@ -115,6 +111,6 @@ void VmsGatewayFunctionalTest::setTemporaryDirectoryPath(const QString& path)
     sTemporaryDirectoryPath = path;
 }
 
-}   // namespace gateway
-}   // namespace cloud
-}   // namespace nx
+} // namespace gateway
+} // namespace cloud
+} // namespace nx
