@@ -1,7 +1,5 @@
 #pragma once
 
+#include <nx/network/buffer.h>
 
-struct CloudUserInfo
-{
-    std::string nonce
-};
+

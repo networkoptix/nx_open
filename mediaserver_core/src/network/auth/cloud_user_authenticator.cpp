@@ -123,7 +123,7 @@ std::tuple<Qn::AuthResult, QnResourcePtr> CloudUserAuthenticator::authorize(
 
     bool isCloudNonce = m_cdbNonceFetcher.isValidCloudNonce(nonce);
 
-    if (m_cloudUserInfoPool.authorize(authorizationHeader))
+    if (m_cloudUserInfoPool.authenticate(authorizationHeader))
         return std::tuple<Qn::AuthResult, QnResourcePtr>(Qn::Auth_Ok, cloudUsers.first());
 
     // Server has provided to the client non-cloud nonce
