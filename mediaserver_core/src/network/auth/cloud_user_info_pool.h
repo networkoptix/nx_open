@@ -4,7 +4,6 @@
 #include <unordered_map>
 #include <map>
 #include <boost/optional.hpp>
-#include <common/common_module.h>
 #include <nx/network/http/http_types.h>
 #include <nx/network/buffer.h>
 
@@ -45,12 +44,22 @@ using TimestampToNonceUserCountMap = std::map<int64_t, NonceUserCount, std::grea
 
 }
 
+class QnResourcePool;
+
 class CloudUserInfoPool
 {
-
 public:
+    CloudUserInfoPool();
+    ~CloudUserInfoPool();
+
     bool authenticate(const nx::http::header::Authorization& authHeader) const;
     boost::optional<nx::Buffer> newestMostCommonNonce() const;
+
+private:
+    void connectToResourcePool();
+    void disconnectFromResourcePool();
+    QnResourcePool* resourcePool();
+
 
 private:
     detail::UserNonceToResponseMap m_userNonceToResponse;
