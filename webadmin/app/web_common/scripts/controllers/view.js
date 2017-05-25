@@ -391,7 +391,6 @@ angular.module('nxCommon').controller('ViewCtrl',
 
         systemAPI.getCurrentUser().then(function(result) {
             $scope.canViewArchive = result.data.reply.isAdmin || (result.data.reply.permissions.indexOf(Config.globalViewArchivePermission)>=0);
-            $timeout(updateHeights());
             var userId = result.data.reply.id;
             $scope.camerasProvider.requestResources().then(function(res){
                 if(!$scope.storage.cameraId)
@@ -432,7 +431,8 @@ angular.module('nxCommon').controller('ViewCtrl',
             var topAlertHeight = 0;
 
             var topAlert = $('td.alert');
-            if(topAlert.length){
+            //after the user is notified this should not be calculated again
+            if(topAlert.length && !$scope.session.mobileAppNotified){
                 topAlertHeight = topAlert.outerHeight() + 1; // -1 here is a hack.
             }
 
@@ -448,12 +448,14 @@ angular.module('nxCommon').controller('ViewCtrl',
             }
         };
 
+        //wait for the page to load then update
+        $timeout(updateHeights);
         $window.resize(updateHeights);
-        window.addEventListener("orientationchange",function(){setTimeout(function(){updateHeights();},200);});
+        window.addEventListener("orientationchange",$timeout(updateHeights,200));
 
         $scope.mobileAppAlertClose = function(){
             $scope.session.mobileAppNotified  = true;
-            setTimeout(updateHeights,50);
+            $timeout(updateHeights,50);
         };
 
         $('.video-icon.pull-left-5').dropdown();
