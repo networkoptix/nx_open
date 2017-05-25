@@ -16,16 +16,16 @@ static int strncasecmp(const char * str1, const char * str2, size_t n) { return 
 
 namespace nx_http {
 
-int strcasecmp( const StringType& one, const StringType& two )
+int strcasecmp(const StringType& one, const StringType& two)
 {
-    if( one.size() < two.size() )
+    if (one.size() < two.size())
         return -1;
-    if( one.size() > two.size() )
+    if (one.size() > two.size())
         return 1;
 #ifdef _WIN32
-    return _strnicmp( one.constData(), two.constData(), one.size() );
+    return _strnicmp(one.constData(), two.constData(), one.size());
 #else
-    return strncasecmp( one.constData(), two.constData(), one.size() );
+    return strncasecmp(one.constData(), two.constData(), one.size());
 #endif
 }
 
@@ -38,9 +38,9 @@ int defaultPortForScheme(const StringType& scheme)
     return -1;
 }
 
-StringType getHeaderValue( const HttpHeaders& headers, const StringType& headerName )
+StringType getHeaderValue(const HttpHeaders& headers, const StringType& headerName)
 {
-    HttpHeaders::const_iterator it = headers.find( headerName );
+    HttpHeaders::const_iterator it = headers.find(headerName);
     return it == headers.end() ? StringType() : it->second;
 }
 
@@ -56,30 +56,30 @@ bool readHeader(
     return true;
 }
 
-HttpHeaders::iterator insertOrReplaceHeader( HttpHeaders* const headers, const HttpHeader& newHeader )
+HttpHeaders::iterator insertOrReplaceHeader(HttpHeaders* const headers, const HttpHeader& newHeader)
 {
-    HttpHeaders::iterator existingHeaderIter = headers->lower_bound( newHeader.first );
-    if( (existingHeaderIter != headers->end()) &&
-        (strcasecmp( existingHeaderIter->first, newHeader.first ) == 0) )
+    HttpHeaders::iterator existingHeaderIter = headers->lower_bound(newHeader.first);
+    if ((existingHeaderIter != headers->end()) &&
+        (strcasecmp(existingHeaderIter->first, newHeader.first) == 0))
     {
         existingHeaderIter->second = newHeader.second;  //replacing header
         return existingHeaderIter;
     }
     else
     {
-        return headers->insert( existingHeaderIter, newHeader );
+        return headers->insert(existingHeaderIter, newHeader);
     }
 }
 
-HttpHeaders::iterator insertHeader( HttpHeaders* const headers, const HttpHeader& newHeader )
+HttpHeaders::iterator insertHeader(HttpHeaders* const headers, const HttpHeader& newHeader)
 {
-    HttpHeaders::iterator itr = headers->lower_bound( newHeader.first );
-    return headers->insert( itr, newHeader );
+    HttpHeaders::iterator itr = headers->lower_bound(newHeader.first);
+    return headers->insert(itr, newHeader);
 }
 
-void removeHeader( HttpHeaders* const headers, const StringType& headerName )
+void removeHeader(HttpHeaders* const headers, const StringType& headerName)
 {
-    HttpHeaders::iterator itr = headers->lower_bound( headerName );
+    HttpHeaders::iterator itr = headers->lower_bound(headerName);
     while (itr != headers->end() && itr->first == headerName)
         itr = headers->erase(itr);
 }
@@ -92,75 +92,75 @@ void removeHeader( HttpHeaders* const headers, const StringType& headerName )
 //split string str (starting at \a offset, checking \a count elements) into substrings using any element of \a separatorStr as separator
 template<class T, class Func>
 void split(
-    const T& str,
-    const typename T::value_type* separatorStr,
-    const Func& func,
-    typename T::size_type offset = 0,
-    typename T::size_type count = T::npos )
+const T& str,
+const typename T::value_type* separatorStr,
+const Func& func,
+typename T::size_type offset = 0,
+typename T::size_type count = T::npos )
 {
-    if( count == T::npos )
-        count = str.size();
-    typename T::size_type currentTokenStart = offset;
-    for( typename T::size_type i = offset; i < count; ++i )
-    {
-        if( strchr( separatorStr, str[i] ) == NULL )
-            continue;
-        if( i > currentTokenStart ) //skipping empty tokens
-            func( str, currentTokenStart, i-currentTokenStart );
-        currentTokenStart = i+1;
-    }
-    if( currentTokenStart < count )
-        func( str, currentTokenStart, count-currentTokenStart );
+if( count == T::npos )
+count = str.size();
+typename T::size_type currentTokenStart = offset;
+for( typename T::size_type i = offset; i < count; ++i )
+{
+if( strchr( separatorStr, str[i] ) == NULL )
+continue;
+if( i > currentTokenStart ) //skipping empty tokens
+func( str, currentTokenStart, i-currentTokenStart );
+currentTokenStart = i+1;
+}
+if( currentTokenStart < count )
+func( str, currentTokenStart, count-currentTokenStart );
 }
 
 template<class Handler, class Str>
 struct SplitHandlerStruct
 {
-    Handler* obj;
-    void (Handler::*func)( const Str&, size_t, size_t );
+Handler* obj;
+void (Handler::*func)( const Str&, size_t, size_t );
 
-    SplitHandlerStruct( Handler* _obj, void (Handler::*_func)( const Str&, size_t, size_t ) )
-    :
-        obj( _obj ),
-        func( _func )
-    {
-    }
+SplitHandlerStruct( Handler* _obj, void (Handler::*_func)( const Str&, size_t, size_t ) )
+:
+obj( _obj ),
+func( _func )
+{
+}
 
-    void operator()( const Str& str, size_t offset, size_t count )
-    {
-        obj->func( str, offset, count );
-    }
+void operator()( const Str& str, size_t offset, size_t count )
+{
+obj->func( str, offset, count );
+}
 };
 
 template<class Handler, class Str>
-    typename SplitHandlerStruct<Handler, Str> split_handler(
-        Handler* obj,
-        void (Handler::*func)( const Str&, size_t, size_t ) )
+typename SplitHandlerStruct<Handler, Str> split_handler(
+Handler* obj,
+void (Handler::*func)( const Str&, size_t, size_t ) )
 {
-    return typename SplitHandlerStruct<Handler, Str>( obj, func );
+return typename SplitHandlerStruct<Handler, Str>( obj, func );
 }
 */
 
 
-static size_t estimateSerializedDataSize( const HttpHeaders& headers )
+static size_t estimateSerializedDataSize(const HttpHeaders& headers)
 {
     size_t requiredSize = 0;
-    for( HttpHeaders::const_iterator
+    for (HttpHeaders::const_iterator
         it = headers.begin();
         it != headers.end();
-        ++it )
+        ++it)
     {
         requiredSize += it->first.size() + 1 + it->second.size() + 2;
     }
     return requiredSize;
 }
 
-void serializeHeaders( const HttpHeaders& headers, BufferType* const dstBuffer )
+void serializeHeaders(const HttpHeaders& headers, BufferType* const dstBuffer)
 {
-    for( HttpHeaders::const_iterator
+    for (HttpHeaders::const_iterator
         it = headers.begin();
         it != headers.end();
-        ++it )
+        ++it)
     {
         *dstBuffer += it->first;
         *dstBuffer += ": ";
@@ -172,11 +172,11 @@ void serializeHeaders( const HttpHeaders& headers, BufferType* const dstBuffer )
 bool parseHeader(
     StringType* const headerName,
     StringType* const headerValue,
-    const ConstBufferRefType& data )
+    const ConstBufferRefType& data)
 {
     ConstBufferRefType headerNameRef;
     ConstBufferRefType headerValueRef;
-    if( !parseHeader( &headerNameRef, &headerValueRef, data ) )
+    if (!parseHeader(&headerNameRef, &headerValueRef, data))
         return false;
     *headerName = headerNameRef;
     *headerValue = headerValueRef;
@@ -186,137 +186,138 @@ bool parseHeader(
 bool parseHeader(
     ConstBufferRefType* const headerName,
     ConstBufferRefType* const headerValue,
-    const ConstBufferRefType& data )
+    const ConstBufferRefType& data)
 {
     //skipping whitespace at start
-    const size_t headerNameStart = find_first_not_of( data, " " );
-    if( headerNameStart == BufferNpos )
+    const size_t headerNameStart = find_first_not_of(data, " ");
+    if (headerNameStart == BufferNpos)
         return false;
-    const size_t headerNameEnd = find_first_of( data, " :", headerNameStart );
-    if( headerNameEnd == BufferNpos )
+    const size_t headerNameEnd = find_first_of(data, " :", headerNameStart);
+    if (headerNameEnd == BufferNpos)
         return false;
 
     const size_t headerSepPos = data[headerNameEnd] == ':'
         ? headerNameEnd
-        : find_first_of( data, ":", headerNameEnd );
-    if( headerSepPos == BufferNpos )
+        : find_first_of(data, ":", headerNameEnd);
+    if (headerSepPos == BufferNpos)
         return false;
-    const size_t headerValueStart = find_first_not_of( data, ": ", headerSepPos );
-    if( headerValueStart == BufferNpos ) {
-        *headerName = data.mid( headerNameStart, headerNameEnd-headerNameStart );
+    const size_t headerValueStart = find_first_not_of(data, ": ", headerSepPos);
+    if (headerValueStart == BufferNpos)
+    {
+        *headerName = data.mid(headerNameStart, headerNameEnd - headerNameStart);
         return true;
     }
 
     //skipping separators after headerValue
-    const size_t headerValueEnd = find_last_not_of( data, " \n\r", headerValueStart );
-    if( headerValueEnd == BufferNpos )
+    const size_t headerValueEnd = find_last_not_of(data, " \n\r", headerValueStart);
+    if (headerValueEnd == BufferNpos)
         return false;
 
-    *headerName = data.mid( headerNameStart, headerNameEnd-headerNameStart );
-    *headerValue = data.mid( headerValueStart, headerValueEnd+1-headerValueStart );
+    *headerName = data.mid(headerNameStart, headerNameEnd - headerNameStart);
+    *headerValue = data.mid(headerValueStart, headerValueEnd + 1 - headerValueStart);
     return true;
 }
 
-HttpHeader parseHeader( const ConstBufferRefType& data )
+HttpHeader parseHeader(const ConstBufferRefType& data)
 {
     ConstBufferRefType headerNameRef;
     ConstBufferRefType headerValueRef;
-    parseHeader( &headerNameRef, &headerValueRef, data );
-    return HttpHeader( headerNameRef, headerValueRef );
+    parseHeader(&headerNameRef, &headerValueRef, data);
+    return HttpHeader(headerNameRef, headerValueRef);
 }
 
 namespace StatusCode
 {
-    StringType toString( int val )
+StringType toString(int val)
+{
+    return toString(Value(val));
+}
+
+StringType toString(Value val)
+{
+    switch (val)
     {
-        return toString(Value(val));
-    }
-
-    StringType toString( Value val )
-    {
-        switch( val )
-        {
-            case _continue:
-                return StringType("Continue");
-            case switchingProtocols:
-                return StringType("Switching Protocols");
-            case ok:
-                return StringType("OK");
-            case noContent:
-                return StringType("No Content");
-            case partialContent:
-                return StringType("Partial Content");
-            case multipleChoices:
-                return StringType("Multiple Choices");
-            case movedPermanently:
-                return StringType("Moved Permanently");
-            case found:
-                return StringType("Found");
-            case seeOther:
-                return StringType("See Other");
-            case notModified:
-                return StringType("Not Modified");
-            case badRequest:
-                return StringType("Bad Request");
-            case unauthorized:
-                return StringType("Unauthorized");
-            case forbidden:
-                return StringType("Forbidden");
-            case notFound:
-                return StringType("Not Found");
-            case notAllowed:
-                return StringType("Not Allowed");
-            case notAcceptable:
-                return StringType("Not Acceptable");
-            case proxyAuthenticationRequired:
-                return StringType("Proxy Authentication Required");
-            case rangeNotSatisfiable:
-                return StringType("Requested range not satisfiable");
-            case internalServerError:
-                return StringType("Internal Server Error");
-            case notImplemented:
-                return StringType("Not Implemented");
-            case serviceUnavailable:
-                return StringType("Service Unavailable");
-            default:
-                return StringType("Unknown_") + StringType::number(val);
-        }
-    }
-
-
-    bool isSuccessCode(Value statusCode)
-    {
-        return isSuccessCode(static_cast<int>(statusCode));
-    }
-
-    bool isSuccessCode(int statusCode)
-    {
-        return (statusCode >= ok && statusCode <= lastSuccessCode) ||
-                statusCode == switchingProtocols;
-    }
-
-    bool isMessageBodyAllowed(int statusCode)
-    {
-        switch (statusCode)
-        {
-            case noContent:
-            case notModified:
-                return false;
-
-            default:
-                // Message body is forbidden for informational status codes.
-                if (statusCode / 100 == 1)
-                    return false;
-                return true;
-        }
+        case _continue:
+            return StringType("Continue");
+        case switchingProtocols:
+            return StringType("Switching Protocols");
+        case ok:
+            return StringType("OK");
+        case noContent:
+            return StringType("No Content");
+        case partialContent:
+            return StringType("Partial Content");
+        case multipleChoices:
+            return StringType("Multiple Choices");
+        case movedPermanently:
+            return StringType("Moved Permanently");
+        case found:
+            return StringType("Found");
+        case seeOther:
+            return StringType("See Other");
+        case notModified:
+            return StringType("Not Modified");
+        case badRequest:
+            return StringType("Bad Request");
+        case unauthorized:
+            return StringType("Unauthorized");
+        case forbidden:
+            return StringType("Forbidden");
+        case notFound:
+            return StringType("Not Found");
+        case notAllowed:
+            return StringType("Not Allowed");
+        case notAcceptable:
+            return StringType("Not Acceptable");
+        case proxyAuthenticationRequired:
+            return StringType("Proxy Authentication Required");
+        case rangeNotSatisfiable:
+            return StringType("Requested range not satisfiable");
+        case internalServerError:
+            return StringType("Internal Server Error");
+        case notImplemented:
+            return StringType("Not Implemented");
+        case serviceUnavailable:
+            return StringType("Service Unavailable");
+        default:
+            return StringType("Unknown_") + StringType::number(val);
     }
 }
 
-const StringType Method::GET( "GET" );
-const StringType Method::HEAD( "HEAD" );
-const StringType Method::POST( "POST" );
-const StringType Method::PUT( "PUT" );
-const StringType Method::OPTIONS( "OPTIONS" );
+
+bool isSuccessCode(Value statusCode)
+{
+    return isSuccessCode(static_cast<int>(statusCode));
+}
+
+bool isSuccessCode(int statusCode)
+{
+    return (statusCode >= ok && statusCode <= lastSuccessCode) ||
+            statusCode == switchingProtocols;
+}
+
+bool isMessageBodyAllowed(int statusCode)
+{
+    switch (statusCode)
+    {
+        case noContent:
+        case notModified:
+            return false;
+
+        default:
+            // Message body is forbidden for informational status codes.
+            if (statusCode / 100 == 1)
+                return false;
+            return true;
+    }
+}
+}
+
+const StringType Method::GET("GET");
+const StringType Method::HEAD("HEAD");
+const StringType Method::POST("POST");
+const StringType Method::PUT("PUT");
+const StringType Method::OPTIONS("OPTIONS");
 
 //namespace Version
 //{
@@ -328,41 +329,41 @@ const StringType Method::OPTIONS( "OPTIONS" );
 ////////////////////////////////////////////////////////////
 //// class MimeProtoVersion
 ////////////////////////////////////////////////////////////
-static size_t estimateSerializedDataSize( const MimeProtoVersion& val )
+static size_t estimateSerializedDataSize(const MimeProtoVersion& val)
 {
     return val.protocol.size() + 1 + val.version.size();
 }
 
-bool MimeProtoVersion::parse( const ConstBufferRefType& data )
+bool MimeProtoVersion::parse(const ConstBufferRefType& data)
 {
     protocol.clear();
     version.clear();
 
-    const int sepPos = data.indexOf( '/' );
-    if( sepPos == -1 )
+    const int sepPos = data.indexOf('/');
+    if (sepPos == -1)
         return false;
-    protocol.append( data.constData(), sepPos );
-    version.append( data.constData()+sepPos+1, data.size()-(sepPos+1) );
+    protocol.append(data.constData(), sepPos);
+    version.append(data.constData() + sepPos + 1, data.size() - (sepPos + 1));
     return true;
 }
 
-void MimeProtoVersion::serialize( BufferType* const dstBuffer ) const
+void MimeProtoVersion::serialize(BufferType* const dstBuffer) const
 {
-    dstBuffer->append( protocol );
-    dstBuffer->append( "/" );
-    dstBuffer->append( version );
+    dstBuffer->append(protocol);
+    dstBuffer->append("/");
+    dstBuffer->append(version);
 }
 
 
 ////////////////////////////////////////////////////////////
 //// class RequestLine
 ////////////////////////////////////////////////////////////
-static size_t estimateSerializedDataSize( const RequestLine& rl )
+static size_t estimateSerializedDataSize(const RequestLine& rl)
 {
     return rl.method.size() + 1 + rl.url.toString().size() + 1 + estimateSerializedDataSize(rl.version) + 2;
 }
 
-bool RequestLine::parse( const ConstBufferRefType& data )
+bool RequestLine::parse(const ConstBufferRefType& data)
 {
     enum ParsingState
     {
@@ -377,25 +378,25 @@ bool RequestLine::parse( const ConstBufferRefType& data )
     const char* strEnd = str + data.size();
     const char* tokenStart = nullptr;
     bool waitingNextToken = true;
-    for( ; str <= strEnd; ++str )
+    for (; str <= strEnd; ++str)
     {
-        if( (*str == ' ') || (str == strEnd) )
+        if ((*str == ' ') || (str == strEnd))
         {
-            if( !waitingNextToken ) //waiting end of token
+            if (!waitingNextToken) //waiting end of token
             {
                 //found new token [tokenStart, str)
-                switch( parsingState )
+                switch (parsingState)
                 {
                     case psMethod:
-                        method.append( tokenStart, str-tokenStart );
+                        method.append(tokenStart, str - tokenStart);
                         parsingState = psUrl;
                         break;
                     case psUrl:
-                        url.setUrl( QLatin1String( tokenStart, str-tokenStart ) );
+                        url.setUrl(QLatin1String(tokenStart, str - tokenStart));
                         parsingState = psVersion;
                         break;
                     case psVersion:
-                        version.parse( data.mid( tokenStart-data.constData(), str-tokenStart ) );
+                        version.parse(data.mid(tokenStart - data.constData(), str - tokenStart));
                         parsingState = psDone;
                         break;
                     default:
@@ -407,7 +408,7 @@ bool RequestLine::parse( const ConstBufferRefType& data )
         }
         else
         {
-            if( waitingNextToken )
+            if (waitingNextToken)
             {
                 tokenStart = str;
                 waitingNextToken = false;   //waiting token end
@@ -418,21 +419,21 @@ bool RequestLine::parse( const ConstBufferRefType& data )
     return parsingState == psDone;
 }
 
-void RequestLine::serialize( BufferType* const dstBuffer ) const
+void RequestLine::serialize(BufferType* const dstBuffer) const
 {
     *dstBuffer += method;
     *dstBuffer += " ";
     QByteArray path = url.toString(QUrl::EncodeSpaces | QUrl::EncodeUnicode | QUrl::EncodeDelimiters).toLatin1();
     *dstBuffer += path.isEmpty() ? "/" : path;
     *dstBuffer += " ";
-    version.serialize( dstBuffer );
+    version.serialize(dstBuffer);
     *dstBuffer += "\r\n";
 }
 
 StringType RequestLine::toString() const
 {
     BufferType buf;
-    serialize( &buf );
+    serialize(&buf);
     return buf;
 }
 
@@ -440,54 +441,54 @@ StringType RequestLine::toString() const
 //// class StatusLine
 ////////////////////////////////////////////////////////////
 static const int MAX_DIGITS_IN_STATUS_CODE = 5;
-static size_t estimateSerializedDataSize( const StatusLine& sl )
+static size_t estimateSerializedDataSize(const StatusLine& sl)
 {
     return estimateSerializedDataSize(sl.version) + 1 + MAX_DIGITS_IN_STATUS_CODE + 1 + sl.reasonPhrase.size() + 2;
 }
 
 StatusLine::StatusLine()
-:
-    statusCode( StatusCode::undefined )
+    :
+    statusCode(StatusCode::undefined)
 {
 }
 
-bool StatusLine::parse( const ConstBufferRefType& data )
+bool StatusLine::parse(const ConstBufferRefType& data)
 {
     const size_t versionStart = 0;
-    const size_t versionEnd = find_first_of( data, " ", versionStart );
-    if( versionEnd == BufferNpos )
+    const size_t versionEnd = find_first_of(data, " ", versionStart);
+    if (versionEnd == BufferNpos)
         return false;
-    if( !version.parse(data.mid( versionStart, versionEnd-versionStart )) )
+    if (!version.parse(data.mid(versionStart, versionEnd - versionStart)))
         return false;
 
-    const size_t statusCodeStart = find_first_not_of( data, " ", versionEnd );
-    if( statusCodeStart == BufferNpos )
+    const size_t statusCodeStart = find_first_not_of(data, " ", versionEnd);
+    if (statusCodeStart == BufferNpos)
         return false;
-    const size_t statusCodeEnd = find_first_of( data, " ", statusCodeStart );
-    if( statusCodeEnd == BufferNpos )
+    const size_t statusCodeEnd = find_first_of(data, " ", statusCodeStart);
+    if (statusCodeEnd == BufferNpos)
         return false;
-    statusCode = ((BufferType)data.mid( statusCodeStart, statusCodeEnd-statusCodeStart )).toUInt();
+    statusCode = ((BufferType)data.mid(statusCodeStart, statusCodeEnd - statusCodeStart)).toUInt();
 
-    const size_t reasonPhraseStart = find_first_not_of( data, " ", statusCodeEnd );
-    if( reasonPhraseStart == BufferNpos )
+    const size_t reasonPhraseStart = find_first_not_of(data, " ", statusCodeEnd);
+    if (reasonPhraseStart == BufferNpos)
         return false;
-    const size_t reasonPhraseEnd = find_first_of( data, "\r\n", reasonPhraseStart );
+    const size_t reasonPhraseEnd = find_first_of(data, "\r\n", reasonPhraseStart);
     reasonPhrase = data.mid(
         reasonPhraseStart,
-        reasonPhraseEnd == BufferNpos ? BufferNpos : reasonPhraseEnd-reasonPhraseStart );
+        reasonPhraseEnd == BufferNpos ? BufferNpos : reasonPhraseEnd - reasonPhraseStart);
 
     return true;
 }
 
-void StatusLine::serialize( BufferType* const dstBuffer ) const
+void StatusLine::serialize(BufferType* const dstBuffer) const
 {
-    version.serialize( dstBuffer );
+    version.serialize(dstBuffer);
     *dstBuffer += " ";
     char buf[11];
 #ifdef _WIN32
-    _snprintf( buf, sizeof(buf), "%d", statusCode );
+    _snprintf(buf, sizeof(buf), "%d", statusCode);
 #else
-    snprintf( buf, sizeof(buf), "%d", statusCode );
+    snprintf(buf, sizeof(buf), "%d", statusCode);
 #endif
     *dstBuffer += buf;
     *dstBuffer += " ";
@@ -498,7 +499,7 @@ void StatusLine::serialize( BufferType* const dstBuffer ) const
 StringType StatusLine::toString() const
 {
     BufferType buf;
-    serialize( &buf );
+    serialize(&buf);
     return buf;
 }
 
@@ -521,39 +522,39 @@ bool parseRequestOrResponse(
     state = readingMessageLine;
 
     int lineNumber = 0;
-    for( size_t curPos = 0; curPos < data.size(); ++lineNumber )
+    for (size_t curPos = 0; curPos < data.size(); ++lineNumber)
     {
-        if( state == readingMessageBody )
+        if (state == readingMessageBody)
         {
-            message->messageBody = data.mid( curPos );
+            message->messageBody = data.mid(curPos);
             break;
         }
 
         //breaking into lines
-        const size_t lineSepPos = find_first_of( data, "\r\n", curPos, data.size()-curPos );
-        const ConstBufferRefType currentLine = data.mid( curPos, lineSepPos == BufferNpos ? lineSepPos : lineSepPos-curPos );
-        switch( state )
+        const size_t lineSepPos = find_first_of(data, "\r\n", curPos, data.size() - curPos);
+        const ConstBufferRefType currentLine = data.mid(curPos, lineSepPos == BufferNpos ? lineSepPos : lineSepPos - curPos);
+        switch (state)
         {
             case readingMessageLine:
-                if( !(message->*messageLine).parse( currentLine ) )
+                if (!(message->*messageLine).parse(currentLine))
                     return false;
                 state = readingHeaders;
                 break;
 
             case readingHeaders:
             {
-                if( !currentLine.isEmpty() )
+                if (!currentLine.isEmpty())
                 {
                     StringType headerName;
                     StringType headerValue;
-                    if( !parseHeader( &headerName, &headerValue, currentLine ) )
+                    if (!parseHeader(&headerName, &headerValue, currentLine))
                     {
-                        if(parseHeadersNonStrict)
+                        if (parseHeadersNonStrict)
                             break;
                         else
                             return false;
                     }
-                    message->headers.insert( std::make_pair( headerName, headerValue ) );
+                    message->headers.insert(std::make_pair(headerName, headerValue));
                     break;
                 }
                 else
@@ -566,56 +567,56 @@ bool parseRequestOrResponse(
                 break;
         }
 
-        if( lineSepPos == BufferNpos )
+        if (lineSepPos == BufferNpos)
             break;  //no more data to parse
         curPos = lineSepPos;
         ++curPos;   //skipping separator
-        if( curPos < data.size() && (data[curPos] == '\r' || data[curPos] == '\n') )
+        if (curPos < data.size() && (data[curPos] == '\r' || data[curPos] == '\n'))
             ++curPos;   //skipping complex separator (\r\n)
     }
 
     return true;
 }
 
-bool Request::parse( const ConstBufferRefType& data )
+bool Request::parse(const ConstBufferRefType& data)
 {
-    return parseRequestOrResponse( data, this, &Request::requestLine );
+    return parseRequestOrResponse(data, this, &Request::requestLine);
 }
 
-void Request::serialize( BufferType* const dstBuffer ) const
+void Request::serialize(BufferType* const dstBuffer) const
 {
     //estimating required buffer size
-    dstBuffer->reserve( dstBuffer->size() + estimateSerializedDataSize(requestLine) + estimateSerializedDataSize(headers) + 2 + messageBody.size() );
+    dstBuffer->reserve(dstBuffer->size() + estimateSerializedDataSize(requestLine) + estimateSerializedDataSize(headers) + 2 + messageBody.size());
 
     //serializing
-    requestLine.serialize( dstBuffer );
-    serializeHeaders( headers, dstBuffer );
-    dstBuffer->append( (const BufferType::value_type*)"\r\n" );
-    dstBuffer->append( messageBody );
+    requestLine.serialize(dstBuffer);
+    serializeHeaders(headers, dstBuffer);
+    dstBuffer->append((const BufferType::value_type*)"\r\n");
+    dstBuffer->append(messageBody);
 }
 
 BufferType Request::serialized() const
 {
     BufferType buf;
-    serialize( &buf );
+    serialize(&buf);
     return buf;
 }
 
 StringType Request::toString() const
 {
     BufferType buf;
-    serialize( &buf );
+    serialize(&buf);
     return buf;
 }
 
 BufferType Request::getCookieValue(const BufferType& name) const
 {
-    nx_http::HttpHeaders::const_iterator cookieIter = headers.find( "cookie" );
+    nx_http::HttpHeaders::const_iterator cookieIter = headers.find("cookie");
     if (cookieIter == headers.end())
         return BufferType();
 
     //TODO #ak optimize string operations here
-    for(const BufferType& value: cookieIter->second.split(';'))
+    for (const BufferType& value : cookieIter->second.split(';'))
     {
         QList<BufferType> params = value.split('=');
         if (params.size() > 1 && params[0].trimmed() == name)
@@ -629,34 +630,34 @@ BufferType Request::getCookieValue(const BufferType& name) const
 ////////////////////////////////////////////////////////////
 //// class Response
 ////////////////////////////////////////////////////////////
-bool Response::parse( const ConstBufferRefType& data )
+bool Response::parse(const ConstBufferRefType& data)
 {
-    return parseRequestOrResponse( data, this, &Response::statusLine );
+    return parseRequestOrResponse(data, this, &Response::statusLine);
 }
 
-void Response::serialize( BufferType* const dstBuffer ) const
+void Response::serialize(BufferType* const dstBuffer) const
 {
     //estimating required buffer size
-    dstBuffer->reserve( dstBuffer->size() + estimateSerializedDataSize(statusLine) + estimateSerializedDataSize(headers) + 2 + messageBody.size() );
+    dstBuffer->reserve(dstBuffer->size() + estimateSerializedDataSize(statusLine) + estimateSerializedDataSize(headers) + 2 + messageBody.size());
 
     //serializing
-    statusLine.serialize( dstBuffer );
-    serializeHeaders( headers, dstBuffer );
-    dstBuffer->append( (const BufferType::value_type*)"\r\n" );
-    dstBuffer->append( messageBody );
+    statusLine.serialize(dstBuffer);
+    serializeHeaders(headers, dstBuffer);
+    dstBuffer->append((const BufferType::value_type*)"\r\n");
+    dstBuffer->append(messageBody);
 }
 
-void Response::serializeMultipartResponse( BufferType* const dstBuffer, const ConstBufferRefType& boundary  ) const
+void Response::serializeMultipartResponse(BufferType* const dstBuffer, const ConstBufferRefType& boundary) const
 {
     //estimating required buffer size
-    dstBuffer->reserve( dstBuffer->size() + boundary.size() + 2 + estimateSerializedDataSize(headers) + 2 + messageBody.size() + 2);
+    dstBuffer->reserve(dstBuffer->size() + boundary.size() + 2 + estimateSerializedDataSize(headers) + 2 + messageBody.size() + 2);
 
     //serializing
     dstBuffer->append(boundary);
     dstBuffer->append("\r\n");
-    serializeHeaders( headers, dstBuffer );
-    dstBuffer->append( (const BufferType::value_type*)"\r\n" );
-    dstBuffer->append( messageBody );
+    serializeHeaders(headers, dstBuffer);
+    dstBuffer->append((const BufferType::value_type*)"\r\n");
+    dstBuffer->append(messageBody);
     dstBuffer->append("\r\n");
 }
 
@@ -664,41 +665,41 @@ void Response::serializeMultipartResponse( BufferType* const dstBuffer, const Co
 StringType Response::toString() const
 {
     BufferType buf;
-    serialize( &buf );
+    serialize(&buf);
     return buf;
 }
 
 StringType Response::toMultipartString(const ConstBufferRefType& boundary) const
 {
     BufferType buf;
-    serializeMultipartResponse( &buf, boundary );
+    serializeMultipartResponse(&buf, boundary);
     return buf;
 }
 
 
 namespace MessageType
 {
-    QLatin1String toString( Value val )
+QLatin1String toString(Value val)
+{
+    switch (val)
     {
-        switch( val )
+        case request:
         {
-            case request:
-            {
-                static QLatin1String requestStr("request");
-                return requestStr;
-            }
-            case response:
-            {
-                static QLatin1String responseStr("response");
-                return responseStr;
-            }
-            default:
-            {
-                static QLatin1String unknownStr("unknown");
-                return unknownStr;
-            }
+            static QLatin1String requestStr("request");
+            return requestStr;
+        }
+        case response:
+        {
+            static QLatin1String responseStr("response");
+            return responseStr;
+        }
+        default:
+        {
+            static QLatin1String unknownStr("unknown");
+            return unknownStr;
         }
     }
+}
 }
 
 
@@ -706,32 +707,32 @@ namespace MessageType
 ////////////////////////////////////////////////////////////
 //// class Message
 ////////////////////////////////////////////////////////////
-Message::Message( MessageType::Value _type )
-:
-    type( _type )
+Message::Message(MessageType::Value _type)
+    :
+    type(_type)
 {
-    if( type == MessageType::request )
+    if (type == MessageType::request)
         request = new Request();
-    else if( type == MessageType::response )
+    else if (type == MessageType::response)
         response = new Response();
 }
 
-Message::Message( const Message& right )
-:
-    type( right.type )
+Message::Message(const Message& right)
+    :
+    type(right.type)
 {
-    if( type == MessageType::request )
-        request = new Request( *right.request );
-    else if( type == MessageType::response )
-        response = new Response( *right.response );
+    if (type == MessageType::request)
+        request = new Request(*right.request);
+    else if (type == MessageType::response)
+        response = new Response(*right.response);
     else
         request = NULL;
 }
 
-Message::Message( Message&& right )
-:
-    type( right.type ),
-    request( right.request )
+Message::Message(Message&& right)
+    :
+    type(right.type),
+    request(right.request)
 {
     right.type = MessageType::none;
     right.request = nullptr;
@@ -742,14 +743,14 @@ Message::~Message()
     clear();
 }
 
-Message& Message::operator=( const Message& right )
+Message& Message::operator=(const Message& right)
 {
     clear();
     type = right.type;
-    if( type == MessageType::request )
-        request = new Request( *right.request );
-    else if( type == MessageType::response )
-        response = new Response( *right.response );
+    if (type == MessageType::request)
+        request = new Request(*right.request);
+    else if (type == MessageType::response)
+        response = new Response(*right.response);
     return *this;
 }
 
@@ -764,14 +765,14 @@ Message& Message::operator=(Message&& right)
     return *this;
 }
 
-void Message::serialize( BufferType* const dstBuffer ) const
+void Message::serialize(BufferType* const dstBuffer) const
 {
-    switch( type )
+    switch (type)
     {
         case MessageType::request:
-            return request->serialize( dstBuffer );
+            return request->serialize(dstBuffer);
         case MessageType::response:
-            return response->serialize( dstBuffer );
+            return response->serialize(dstBuffer);
         default:
             return /*false*/;
     }
@@ -779,9 +780,9 @@ void Message::serialize( BufferType* const dstBuffer ) const
 
 void Message::clear()
 {
-    if( type == MessageType::request )
+    if (type == MessageType::request)
         delete request;
-    else if( type == MessageType::response )
+    else if (type == MessageType::response)
         delete response;
     request = NULL;
     type = MessageType::none;
@@ -790,13 +791,13 @@ void Message::clear()
 StringType Message::toString() const
 {
     BufferType str;
-    switch( type )
+    switch (type)
     {
         case MessageType::request:
-            request->serialize( &str );
+            request->serialize(&str);
             break;
         case MessageType::response:
-            response->serialize( &str );
+            response->serialize(&str);
             break;
         default:
             break;
@@ -813,60 +814,60 @@ const StringType kUserAgent = "User-Agent";
 
 namespace AuthScheme
 {
-    const char* toString( Value val )
+const char* toString(Value val)
+{
+    switch (val)
     {
-        switch( val )
-        {
-            case basic:
-                return "Basic";
-            case digest:
-                return "Digest";
-            case automatic:
-                return "Automatic";
-            default:
-                return "None";
-        }
+        case basic:
+            return "Basic";
+        case digest:
+            return "Digest";
+        case automatic:
+            return "Automatic";
+        default:
+            return "None";
     }
+}
 
-    Value fromString( const char* str )
-    {
-        if( ::strcasecmp( str, "Basic" ) == 0 )
-            return basic;
-        if( ::strcasecmp( str, "Digest" ) == 0 )
-            return digest;
-        if( ::strcasecmp( str, "Automatic" ) == 0 )
-            return automatic;
-        return none;
-    }
+Value fromString(const char* str)
+{
+    if (::strcasecmp(str, "Basic") == 0)
+        return basic;
+    if (::strcasecmp(str, "Digest") == 0)
+        return digest;
+    if (::strcasecmp(str, "Automatic") == 0)
+        return automatic;
+    return none;
+}
 
-    Value fromString( const ConstBufferRefType& str )
-    {
-        if( str == "Basic" )
-            return basic;
-        if( str == "Digest" )
-            return digest;
-        if( str == "Automatic" )
-            return automatic;
-        return none;
-    }
+Value fromString(const ConstBufferRefType& str)
+{
+    if (str == "Basic")
+        return basic;
+    if (str == "Digest")
+        return digest;
+    if (str == "Automatic")
+        return automatic;
+    return none;
+}
 }
 
 ///////////////////////////////////////////////////////////////////
 //  Authorization
 ///////////////////////////////////////////////////////////////////
-bool BasicCredentials::parse( const BufferType& str )
+bool BasicCredentials::parse(const BufferType& str)
 {
-    const auto decodedBuf = BufferType::fromBase64( str );
-    const int sepIndex = decodedBuf.indexOf( ':' );
-    if( sepIndex == -1 )
+    const auto decodedBuf = BufferType::fromBase64(str);
+    const int sepIndex = decodedBuf.indexOf(':');
+    if (sepIndex == -1)
         return false;
-    userid = decodedBuf.mid( 0, sepIndex );
-    password = decodedBuf.mid( sepIndex+1 );
+    userid = decodedBuf.mid(0, sepIndex);
+    password = decodedBuf.mid(sepIndex + 1);
 
     return true;
 }
 
-void BasicCredentials::serialize( BufferType* const dstBuffer ) const
+void BasicCredentials::serialize(BufferType* const dstBuffer) const
 {
     BufferType serializedCredentials;
     serializedCredentials.append(userid);
@@ -875,16 +876,16 @@ void BasicCredentials::serialize( BufferType* const dstBuffer ) const
     *dstBuffer += serializedCredentials.toBase64();
 }
 
-bool DigestCredentials::parse( const BufferType& str, char separator )
+bool DigestCredentials::parse(const BufferType& str, char separator)
 {
     nx::utils::parseNameValuePairs(str, separator, &params);
-    auto usernameIter = params.find( "username" );
-    if( usernameIter != params.cend() )
+    auto usernameIter = params.find("username");
+    if (usernameIter != params.cend())
         userid = usernameIter.value();
     return true;
 }
 
-void DigestCredentials::serialize( BufferType* const dstBuffer ) const
+void DigestCredentials::serialize(BufferType* const dstBuffer) const
 {
     nx::utils::serializeNameValuePairs(params, dstBuffer);
 }
@@ -897,17 +898,17 @@ void DigestCredentials::serialize( BufferType* const dstBuffer ) const
 const StringType Authorization::NAME("Authorization");
 
 Authorization::Authorization()
-:
-    authScheme( AuthScheme::none )
+    :
+    authScheme(AuthScheme::none)
 {
     basic = NULL;
 }
 
-Authorization::Authorization( const AuthScheme::Value& authSchemeVal )
-:
-    authScheme( authSchemeVal )
+Authorization::Authorization(const AuthScheme::Value& authSchemeVal)
+    :
+    authScheme(authSchemeVal)
 {
-    switch( authScheme )
+    switch (authScheme)
     {
         case AuthScheme::basic:
             basic = new BasicCredentials();
@@ -923,18 +924,18 @@ Authorization::Authorization( const AuthScheme::Value& authSchemeVal )
     }
 }
 
-Authorization::Authorization( Authorization&& right )
-:
-    authScheme( right.authScheme ),
-    basic( right.basic )
+Authorization::Authorization(Authorization&& right)
+    :
+    authScheme(right.authScheme),
+    basic(right.basic)
 {
     right.authScheme = AuthScheme::none;
     right.basic = nullptr;
 }
 
 Authorization::Authorization(const Authorization& right)
-:
-    authScheme( right.authScheme )
+    :
+    authScheme(right.authScheme)
 {
     switch (authScheme)
     {
@@ -954,7 +955,7 @@ Authorization::~Authorization()
     clear();
 }
 
-Authorization& Authorization::operator=( Authorization&& right )
+Authorization& Authorization::operator=(Authorization&& right)
 {
     clear();
 
@@ -967,49 +968,49 @@ Authorization& Authorization::operator=( Authorization&& right )
     return *this;
 }
 
-bool Authorization::parse( const BufferType& str )
+bool Authorization::parse(const BufferType& str)
 {
     clear();
 
-    int authSchemeEndPos = str.indexOf( " " );
-    if( authSchemeEndPos == -1 )
+    int authSchemeEndPos = str.indexOf(" ");
+    if (authSchemeEndPos == -1)
         return false;
 
-    authScheme = AuthScheme::fromString( ConstBufferRefType( str, 0, authSchemeEndPos ) );
-    const ConstBufferRefType authParamsData( str, authSchemeEndPos + 1 );
-    switch( authScheme )
+    authScheme = AuthScheme::fromString(ConstBufferRefType(str, 0, authSchemeEndPos));
+    const ConstBufferRefType authParamsData(str, authSchemeEndPos + 1);
+    switch (authScheme)
     {
         case AuthScheme::basic:
             basic = new BasicCredentials();
-            return basic->parse( authParamsData.toByteArrayWithRawData() );
+            return basic->parse(authParamsData.toByteArrayWithRawData());
         case AuthScheme::digest:
             digest = new DigestCredentials();
-            return digest->parse( authParamsData.toByteArrayWithRawData() );
+            return digest->parse(authParamsData.toByteArrayWithRawData());
         default:
             return false;
     }
 }
 
-void Authorization::serialize( BufferType* const dstBuffer ) const
+void Authorization::serialize(BufferType* const dstBuffer) const
 {
-    dstBuffer->append( AuthScheme::toString( authScheme ) );
-    dstBuffer->append( " " );
-    if( authScheme == AuthScheme::basic )
-        basic->serialize( dstBuffer );
-    else if( authScheme == AuthScheme::digest )
-        digest->serialize( dstBuffer );
+    dstBuffer->append(AuthScheme::toString(authScheme));
+    dstBuffer->append(" ");
+    if (authScheme == AuthScheme::basic)
+        basic->serialize(dstBuffer);
+    else if (authScheme == AuthScheme::digest)
+        digest->serialize(dstBuffer);
 }
 
 BufferType Authorization::serialized() const
 {
     BufferType dest;
-    serialize( &dest );
+    serialize(&dest);
     return dest;
 }
 
 void Authorization::clear()
 {
-    switch( authScheme )
+    switch (authScheme)
     {
         case AuthScheme::basic:
             delete basic;
@@ -1029,7 +1030,7 @@ void Authorization::clear()
 
 StringType Authorization::userid() const
 {
-    switch( authScheme )
+    switch (authScheme)
     {
         case AuthScheme::basic:
             return basic->userid;
@@ -1040,9 +1041,9 @@ StringType Authorization::userid() const
     }
 }
 
-BasicAuthorization::BasicAuthorization( const StringType& userName, const StringType& userPassword )
-:
-    Authorization( AuthScheme::basic )
+BasicAuthorization::BasicAuthorization(const StringType& userName, const StringType& userPassword)
+    :
+    Authorization(AuthScheme::basic)
 {
     basic->userid = userName;
     basic->password = userPassword;
@@ -1050,29 +1051,29 @@ BasicAuthorization::BasicAuthorization( const StringType& userName, const String
 
 
 DigestAuthorization::DigestAuthorization()
-:
-    Authorization( AuthScheme::digest )
+    :
+    Authorization(AuthScheme::digest)
 {
 }
 
-DigestAuthorization::DigestAuthorization( DigestAuthorization&& right )
-:
-    Authorization( std::move(right) )
+DigestAuthorization::DigestAuthorization(DigestAuthorization&& right)
+    :
+    Authorization(std::move(right))
 {
 }
 
 DigestAuthorization::DigestAuthorization(const DigestAuthorization& right)
-:
+    :
     Authorization(right)
 {
 }
 
-void DigestAuthorization::addParam( const BufferType& name, const BufferType& value )
+void DigestAuthorization::addParam(const BufferType& name, const BufferType& value)
 {
-    if( name == "username" )
+    if (name == "username")
         digest->userid = value;
 
-    digest->params.insert( name, value );
+    digest->params.insert(name, value);
 }
 
 
@@ -1083,38 +1084,38 @@ void DigestAuthorization::addParam( const BufferType& name, const BufferType& va
 const StringType WWWAuthenticate::NAME("WWW-Authenticate");
 
 WWWAuthenticate::WWWAuthenticate(AuthScheme::Value authScheme)
-:
-    authScheme( authScheme )
+    :
+    authScheme(authScheme)
 {
 }
 
-bool WWWAuthenticate::parse( const BufferType& str )
+bool WWWAuthenticate::parse(const BufferType& str)
 {
-    int authSchemeEndPos = str.indexOf( " " );
-    if( authSchemeEndPos == -1 )
+    int authSchemeEndPos = str.indexOf(" ");
+    if (authSchemeEndPos == -1)
         return false;
 
-    authScheme = AuthScheme::fromString( ConstBufferRefType(str, 0, authSchemeEndPos) );
+    authScheme = AuthScheme::fromString(ConstBufferRefType(str, 0, authSchemeEndPos));
 
     nx::utils::parseNameValuePairs(
-        ConstBufferRefType( str, authSchemeEndPos + 1 ),
+        ConstBufferRefType(str, authSchemeEndPos + 1),
         ',',
-        &params );
+        &params);
 
     return true;
 }
 
-void WWWAuthenticate::serialize( BufferType* const dstBuffer ) const
+void WWWAuthenticate::serialize(BufferType* const dstBuffer) const
 {
-    dstBuffer->append( AuthScheme::toString( authScheme ) );
-    dstBuffer->append( " " );
+    dstBuffer->append(AuthScheme::toString(authScheme));
+    dstBuffer->append(" ");
     nx::utils::serializeNameValuePairs(params, dstBuffer);
 }
 
 BufferType WWWAuthenticate::serialized() const
 {
     BufferType dest;
-    serialize( &dest );
+    serialize(&dest);
     return dest;
 }
 
@@ -1126,47 +1127,47 @@ BufferType WWWAuthenticate::serialized() const
 //const nx_http::StringType IDENTITY_CODING( "identity" );
 //const nx_http::StringType ANY_CODING( "*" );
 
-AcceptEncodingHeader::AcceptEncodingHeader( const nx_http::StringType& strValue )
+AcceptEncodingHeader::AcceptEncodingHeader(const nx_http::StringType& strValue)
 {
-    parse( strValue );
+    parse(strValue);
 }
 
-void AcceptEncodingHeader::parse( const nx_http::StringType& str )
+void AcceptEncodingHeader::parse(const nx_http::StringType& str)
 {
     m_anyCodingQValue.reset();
 
     //TODO #ak this function is very slow. Introduce some parsing without allocations and copyings..
-    auto codingsStr = str.split( ',' );
-    for( const nx_http::StringType& contentCodingStr: codingsStr )
+    auto codingsStr = str.split(',');
+    for (const nx_http::StringType& contentCodingStr : codingsStr)
     {
-        auto tokens = contentCodingStr.split( ';' );
-        if( tokens.isEmpty() )
+        auto tokens = contentCodingStr.split(';');
+        if (tokens.isEmpty())
             continue;
         double qValue = 1.0;
-        if( tokens.size() > 1 )
+        if (tokens.size() > 1)
         {
             const nx_http::StringType& qValueStr = tokens[1].trimmed();
-            if( !qValueStr.startsWith("q=") )
+            if (!qValueStr.startsWith("q="))
                 continue;   //bad token, ignoring...
             qValue = qValueStr.mid(2).toDouble();
         }
         const nx_http::StringType& contentCoding = tokens.front().trimmed();
-        if( contentCoding == ANY_CODING )
+        if (contentCoding == ANY_CODING)
             m_anyCodingQValue = qValue;
         else
             m_codings[contentCoding] = qValue;
     }
 }
 
-bool AcceptEncodingHeader::encodingIsAllowed( const nx_http::StringType& encodingName, double* q ) const
+bool AcceptEncodingHeader::encodingIsAllowed(const nx_http::StringType& encodingName, double* q) const
 {
-    auto codingIter = m_codings.find( encodingName );
-    if( codingIter == m_codings.end() )
+    auto codingIter = m_codings.find(encodingName);
+    if (codingIter == m_codings.end())
     {
         //encoding is not explicitly specified
-        if( m_anyCodingQValue )
+        if (m_anyCodingQValue)
         {
-            if( q )
+            if (q)
                 *q = m_anyCodingQValue.get();
             return m_anyCodingQValue.get() > 0.0;
         }
@@ -1174,7 +1175,7 @@ bool AcceptEncodingHeader::encodingIsAllowed( const nx_http::StringType& encodin
         return encodingName == IDENTITY_CODING;
     }
 
-    if( q )
+    if (q)
         *q = codingIter->second;
     return codingIter->second > 0.0;
 }
@@ -1188,17 +1189,17 @@ Range::Range()
 {
 }
 
-bool Range::parse( const nx_http::StringType& strValue )
+bool Range::parse(const nx_http::StringType& strValue)
 {
     auto simpleRangeList = strValue.split(',');
-    rangeSpecList.reserve( simpleRangeList.size() );
-    for( const StringType& simpleRangeStr: simpleRangeList )
+    rangeSpecList.reserve(simpleRangeList.size());
+    for (const StringType& simpleRangeStr : simpleRangeList)
     {
-        if( simpleRangeStr.isEmpty() )
+        if (simpleRangeStr.isEmpty())
             return false;
         RangeSpec rangeSpec;
         const int sepPos = simpleRangeStr.indexOf('-');
-        if( sepPos == -1 )
+        if (sepPos == -1)
         {
             rangeSpec.start = simpleRangeStr.toULongLong();
             rangeSpec.end = rangeSpec.start;
@@ -1206,22 +1207,22 @@ bool Range::parse( const nx_http::StringType& strValue )
         else
         {
             rangeSpec.start = StringType::fromRawData(simpleRangeStr.constData(), sepPos).toULongLong();
-            if( sepPos < simpleRangeStr.size()-1 )  //range end is not empty
-                rangeSpec.end = StringType::fromRawData(simpleRangeStr.constData()+sepPos+1, simpleRangeStr.size()-sepPos-1).toULongLong();
+            if (sepPos < simpleRangeStr.size() - 1)  //range end is not empty
+                rangeSpec.end = StringType::fromRawData(simpleRangeStr.constData() + sepPos + 1, simpleRangeStr.size() - sepPos - 1).toULongLong();
         }
-        if( rangeSpec.end && rangeSpec.end < rangeSpec.start )
+        if (rangeSpec.end && rangeSpec.end < rangeSpec.start)
             return false;
-        rangeSpecList.push_back( std::move(rangeSpec) );
+        rangeSpecList.push_back(std::move(rangeSpec));
     }
 
     return true;
 }
 
-bool Range::validateByContentSize( size_t contentSize ) const
+bool Range::validateByContentSize(size_t contentSize) const
 {
-    for( const RangeSpec& rangeSpec: rangeSpecList )
+    for (const RangeSpec& rangeSpec : rangeSpecList)
     {
-        if( (rangeSpec.start >= contentSize) || (rangeSpec.end && rangeSpec.end.get() >= contentSize) )
+        if ((rangeSpec.start >= contentSize) || (rangeSpec.end && rangeSpec.end.get() >= contentSize))
             return false;
     }
 
@@ -1233,50 +1234,50 @@ bool Range::empty() const
     return rangeSpecList.empty();
 }
 
-bool Range::full( size_t contentSize ) const
+bool Range::full(size_t contentSize) const
 {
-    if( contentSize == 0 )
+    if (contentSize == 0)
         return true;
 
     //map<start, end>
     std::map<quint64, quint64> rangesSorted;
-    for( const RangeSpec& rangeSpec: rangeSpecList )
-        rangesSorted.emplace( rangeSpec.start, rangeSpec.end ? rangeSpec.end.get() : contentSize );
+    for (const RangeSpec& rangeSpec : rangeSpecList)
+        rangesSorted.emplace(rangeSpec.start, rangeSpec.end ? rangeSpec.end.get() : contentSize);
 
     quint64 curPos = 0;
-    for( const std::pair<quint64, quint64>& range: rangesSorted )
+    for (const std::pair<quint64, quint64>& range : rangesSorted)
     {
-        if( range.first > curPos )
+        if (range.first > curPos)
             return false;
-        if( range.second >= curPos )
-            curPos = range.second+1;
+        if (range.second >= curPos)
+            curPos = range.second + 1;
     }
 
     return curPos >= contentSize;
 }
 
-quint64 Range::totalRangeLength( size_t contentSize ) const
+quint64 Range::totalRangeLength(size_t contentSize) const
 {
-    if( contentSize == 0 || rangeSpecList.empty() )
+    if (contentSize == 0 || rangeSpecList.empty())
         return 0;
 
     //map<start, end>
     std::map<quint64, quint64> rangesSorted;
-    for( const RangeSpec& rangeSpec: rangeSpecList )
-        rangesSorted.emplace( rangeSpec.start, rangeSpec.end ? rangeSpec.end.get() : contentSize );
+    for (const RangeSpec& rangeSpec : rangeSpecList)
+        rangesSorted.emplace(rangeSpec.start, rangeSpec.end ? rangeSpec.end.get() : contentSize);
 
     quint64 curPos = 0;
     quint64 totalLength = 0;
-    for( const std::pair<quint64, quint64>& range: rangesSorted )
+    for (const std::pair<quint64, quint64>& range : rangesSorted)
     {
-        if( curPos < range.first )
+        if (curPos < range.first)
             curPos = range.first;
-        if( range.second < curPos )
+        if (range.second < curPos)
             continue;
-        const quint64 endPos = std::min<quint64>( contentSize-1, range.second );
+        const quint64 endPos = std::min<quint64>(contentSize - 1, range.second);
         totalLength += endPos - curPos + 1;
         curPos = endPos + 1;
-        if( curPos >= contentSize )
+        if (curPos >= contentSize)
             break;
     }
 
@@ -1288,18 +1289,18 @@ quint64 Range::totalRangeLength( size_t contentSize ) const
 //   Content-Range
 //////////////////////////////////////////////
 ContentRange::ContentRange()
-:
-    unitName( "bytes" )
+    :
+    unitName("bytes")
 {
 }
 
 quint64 ContentRange::rangeLength() const
 {
-    NX_ASSERT( !rangeSpec.end || (rangeSpec.end >= rangeSpec.start) );
+    NX_ASSERT(!rangeSpec.end || (rangeSpec.end >= rangeSpec.start));
 
-    if( rangeSpec.end )
+    if (rangeSpec.end)
         return rangeSpec.end.get() - rangeSpec.start + 1;   //both boundaries are inclusive
-    else if( instanceLength )
+    else if (instanceLength)
         return instanceLength.get() - rangeSpec.start;
     else
         return 1;   //since both boundaries are inclusive, 0-0 means 1 byte (the first one)
@@ -1307,20 +1308,20 @@ quint64 ContentRange::rangeLength() const
 
 StringType ContentRange::toString() const
 {
-    NX_ASSERT( !rangeSpec.end || (rangeSpec.end >= rangeSpec.start) );
+    NX_ASSERT(!rangeSpec.end || (rangeSpec.end >= rangeSpec.start));
 
     StringType str = unitName;
     str += " ";
-    str += StringType::number( rangeSpec.start ) + "-";
-    if( rangeSpec.end )
-        str += StringType::number( rangeSpec.end.get() );
-    else if( instanceLength )
-        str += StringType::number( instanceLength.get()-1 );
+    str += StringType::number(rangeSpec.start) + "-";
+    if (rangeSpec.end)
+        str += StringType::number(rangeSpec.end.get());
+    else if (instanceLength)
+        str += StringType::number(instanceLength.get() - 1);
     else
-        str += StringType::number( rangeSpec.start );
+        str += StringType::number(rangeSpec.start);
 
-    if( instanceLength )
-        str += "/" + StringType::number( instanceLength.get() );
+    if (instanceLength)
+        str += "/" + StringType::number(instanceLength.get());
     else
         str += "/*";
 
@@ -1332,61 +1333,61 @@ StringType ContentRange::toString() const
 //   Via
 //////////////////////////////////////////////
 
-bool Via::parse( const nx_http::StringType& strValue )
+bool Via::parse(const nx_http::StringType& strValue)
 {
-    if( strValue.isEmpty() )
+    if (strValue.isEmpty())
         return true;
 
     //introducing loop counter to guarantee method finiteness in case of bug in code
-    for( size_t curEntryEnd = nx_http::find_first_of(strValue, ","), curEntryStart = 0, i = 0;
+    for (size_t curEntryEnd = nx_http::find_first_of(strValue, ","), curEntryStart = 0, i = 0;
         curEntryStart != nx_http::BufferNpos && (i < 1000);
-        curEntryStart = (curEntryEnd == nx_http::BufferNpos ? curEntryEnd : curEntryEnd+1), curEntryEnd = nx_http::find_first_of(strValue, ",", curEntryEnd+1), ++i )
+        curEntryStart = (curEntryEnd == nx_http::BufferNpos ? curEntryEnd : curEntryEnd + 1), curEntryEnd = nx_http::find_first_of(strValue, ",", curEntryEnd + 1), ++i)
     {
         ProxyEntry entry;
 
         //skipping spaces at the start of entry
-        while( (curEntryStart < (curEntryEnd == nx_http::BufferNpos ? strValue.size() : curEntryEnd)) &&
-                (strValue.at(curEntryStart) == ' ') )
+        while ((curEntryStart < (curEntryEnd == nx_http::BufferNpos ? strValue.size() : curEntryEnd)) &&
+            (strValue.at(curEntryStart) == ' '))
         {
             ++curEntryStart;
         }
 
         //curEntryStart points first char after comma
-        size_t receivedProtoEnd = nx_http::find_first_of( strValue, " ", curEntryStart );
-        if( receivedProtoEnd == nx_http::BufferNpos )
+        size_t receivedProtoEnd = nx_http::find_first_of(strValue, " ", curEntryStart);
+        if (receivedProtoEnd == nx_http::BufferNpos)
             return false;
-        ConstBufferRefType protoNameVersion( strValue, curEntryStart, receivedProtoEnd-curEntryStart );
-        size_t nameVersionSep = nx_http::find_first_of( protoNameVersion, "/" );
-        if( nameVersionSep == nx_http::BufferNpos )
+        ConstBufferRefType protoNameVersion(strValue, curEntryStart, receivedProtoEnd - curEntryStart);
+        size_t nameVersionSep = nx_http::find_first_of(protoNameVersion, "/");
+        if (nameVersionSep == nx_http::BufferNpos)
         {
             //only version present
             entry.protoVersion = protoNameVersion;
         }
         else
         {
-            entry.protoName = protoNameVersion.mid( 0, nameVersionSep );
-            entry.protoVersion = protoNameVersion.mid( nameVersionSep+1 );
+            entry.protoName = protoNameVersion.mid(0, nameVersionSep);
+            entry.protoVersion = protoNameVersion.mid(nameVersionSep + 1);
         }
 
-        size_t receivedByStart = nx_http::find_first_not_of( strValue, " ", receivedProtoEnd+1 );
-        if( receivedByStart == nx_http::BufferNpos || receivedByStart > curEntryEnd )
+        size_t receivedByStart = nx_http::find_first_not_of(strValue, " ", receivedProtoEnd + 1);
+        if (receivedByStart == nx_http::BufferNpos || receivedByStart > curEntryEnd)
             return false;   //no receivedBy field
 
-        size_t receivedByEnd = nx_http::find_first_of( strValue, " ", receivedByStart );
-        if( receivedByEnd == nx_http::BufferNpos || (receivedByEnd > curEntryEnd) )
+        size_t receivedByEnd = nx_http::find_first_of(strValue, " ", receivedByStart);
+        if (receivedByEnd == nx_http::BufferNpos || (receivedByEnd > curEntryEnd))
         {
             receivedByEnd = curEntryEnd;
         }
         else
         {
             //comment present
-            size_t commentStart = nx_http::find_first_not_of( strValue, " ", receivedByEnd+1 );
-            if( commentStart != nx_http::BufferNpos && commentStart < curEntryEnd )
-                entry.comment = strValue.mid( commentStart, curEntryEnd == nx_http::BufferNpos ? -1 : (curEntryEnd-commentStart) ); //space are allowed in comment
+            size_t commentStart = nx_http::find_first_not_of(strValue, " ", receivedByEnd + 1);
+            if (commentStart != nx_http::BufferNpos && commentStart < curEntryEnd)
+                entry.comment = strValue.mid(commentStart, curEntryEnd == nx_http::BufferNpos ? -1 : (curEntryEnd - commentStart)); //space are allowed in comment
         }
-        entry.receivedBy = strValue.mid( receivedByStart, receivedByEnd-receivedByStart );
+        entry.receivedBy = strValue.mid(receivedByStart, receivedByEnd - receivedByStart);
 
-        entries.push_back( entry );
+        entries.push_back(entry);
     }
 
     return true;
@@ -1398,12 +1399,12 @@ StringType Via::toString() const
 
     //TODO #ak estimate required buffer size and allocate in advance
 
-    for( const ProxyEntry& entry: entries )
+    for (const ProxyEntry& entry : entries)
     {
-        if( !result.isEmpty() )
+        if (!result.isEmpty())
             result += ", ";
 
-        if( entry.protoName )
+        if (entry.protoName)
         {
             result += entry.protoName.get();
             result += "/";
@@ -1411,7 +1412,7 @@ StringType Via::toString() const
         result += entry.protoVersion;
         result += ' ';
         result += entry.receivedBy;
-        if( !entry.comment.isEmpty() )
+        if (!entry.comment.isEmpty())
         {
             result += ' ';
             result += entry.comment;
@@ -1426,7 +1427,7 @@ StringType Via::toString() const
 //////////////////////////////////////////////
 
 KeepAlive::KeepAlive()
-:
+    :
     timeout(0)
 {
 }
@@ -1434,7 +1435,7 @@ KeepAlive::KeepAlive()
 KeepAlive::KeepAlive(
     std::chrono::seconds _timeout,
     boost::optional<int> _max)
-:
+    :
     timeout(std::move(_timeout)),
     max(std::move(_max))
 {
@@ -1446,7 +1447,7 @@ bool KeepAlive::parse(const nx_http::StringType& strValue)
 
     const auto params = strValue.split(',');
     bool timeoutFound = false;
-    for (auto param: params)
+    for (auto param : params)
     {
         param = param.trimmed();
         const int sepPos = param.indexOf('=');
@@ -1460,7 +1461,7 @@ bool KeepAlive::parse(const nx_http::StringType& strValue)
             timeout = std::chrono::seconds(paramValue.toUInt());
             timeoutFound = true;
         }
-        else if(paramName == "max")
+        else if (paramName == "max")
         {
             max = paramValue.toUInt();
         }
@@ -1471,9 +1472,9 @@ bool KeepAlive::parse(const nx_http::StringType& strValue)
 
 StringType KeepAlive::toString() const
 {
-    StringType result = "timeout="+StringType::number((unsigned int)timeout.count());
+    StringType result = "timeout=" + StringType::number((unsigned int)timeout.count());
     if (max)
-        result += ", max="+StringType::number(*max);
+        result += ", max=" + StringType::number(*max);
     return result;
 }
 
@@ -1529,7 +1530,7 @@ Server::Server()
     products.push_back(Product{
         nx::utils::AppInfo::productNameShort().toUtf8(),
         nx::utils::SoftwareVersion(nx::utils::AppInfo::applicationVersion()),
-        nx::utils::AppInfo::organizationName().toUtf8()});
+        nx::utils::AppInfo::organizationName().toUtf8() });
 }
 
 bool Server::operator==(const Server& right) const
@@ -1558,7 +1559,7 @@ bool Server::parse(const nx_http::StringType& serverString)
 StringType Server::toString() const
 {
     StringType result;
-    for (const auto& product: products)
+    for (const auto& product : products)
     {
         result += toString(product);
         result += " ";
@@ -1641,11 +1642,11 @@ void Server::readProductComment(Server::Product* product, QnByteArrayConstRef* i
 
 } // namespace header
 
-//-------------------------------------------------------------------------------------------------
+  //-------------------------------------------------------------------------------------------------
 
 ChunkHeader::ChunkHeader()
-:
-    chunkSize( 0 )
+    :
+    chunkSize(0)
 {
 }
 
@@ -1655,7 +1656,7 @@ void ChunkHeader::clear()
     extensions.clear();
 }
 
-int ChunkHeader::parse( const ConstBufferRefType& buf )
+int ChunkHeader::parse(const ConstBufferRefType& buf)
 {
     const char* curPos = buf.constData();
     const char* dataEnd = curPos + buf.size();
@@ -1673,38 +1674,38 @@ int ChunkHeader::parse( const ConstBufferRefType& buf )
     const char* extSepPos = 0;
     const char* extValStart = 0;
 
-    for( ; curPos < dataEnd; ++curPos )
+    for (; curPos < dataEnd; ++curPos)
     {
         const char ch = *curPos;
-        switch( ch )
+        switch (ch)
         {
             case ';':
-                if( state == readingExtName )
+                if (state == readingExtName)
                 {
-                    if( curPos == extNameStart )
+                    if (curPos == extNameStart)
                         return -1;  //empty extension
-                    extensions.push_back( std::make_pair( BufferType(extNameStart, curPos-extNameStart), BufferType() ) );
+                    extensions.push_back(std::make_pair(BufferType(extNameStart, curPos - extNameStart), BufferType()));
                 }
-                else if( state == readingExtVal )
+                else if (state == readingExtVal)
                 {
-                    if( extSepPos == extNameStart )
+                    if (extSepPos == extNameStart)
                         return -1;  //empty extension
 
-                    if( *extValStart == '"' )
+                    if (*extValStart == '"')
                         ++extValStart;
                     int extValSize = curPos - extValStart;
-                    if( extValSize > 0 && *(extValStart + extValSize - 1) == '"' )
+                    if (extValSize > 0 && *(extValStart + extValSize - 1) == '"')
                         --extValSize;
 
-                    extensions.push_back( std::make_pair( BufferType( extNameStart, extSepPos - extNameStart ), BufferType( extValStart, extValSize ) ) );
+                    extensions.push_back(std::make_pair(BufferType(extNameStart, extSepPos - extNameStart), BufferType(extValStart, extValSize)));
                 }
 
                 state = readingExtName;
-                extNameStart = curPos+1;
+                extNameStart = curPos + 1;
                 continue;
 
             case '=':
-                if( state == readingExtName )
+                if (state == readingExtName)
                 {
                     state = readingExtVal;
                     extSepPos = curPos;
@@ -1718,32 +1719,32 @@ int ChunkHeader::parse( const ConstBufferRefType& buf )
                 break;
 
             case '\r':
-                if( state == readingExtName )
+                if (state == readingExtName)
                 {
-                    if( curPos == extNameStart )
+                    if (curPos == extNameStart)
                         return -1;  //empty extension
-                    extensions.push_back( std::make_pair( BufferType(extNameStart, curPos-extNameStart), BufferType() ) );
+                    extensions.push_back(std::make_pair(BufferType(extNameStart, curPos - extNameStart), BufferType()));
                 }
-                else if( state == readingExtVal )
+                else if (state == readingExtVal)
                 {
-                    if( extSepPos == extNameStart )
+                    if (extSepPos == extNameStart)
                         return -1;  //empty extension
 
-                    if( *extValStart == '"' )
+                    if (*extValStart == '"')
                         ++extValStart;
                     int extValSize = curPos - extValStart;
-                    if( extValSize > 0 && *(extValStart + extValSize - 1) == '"' )
+                    if (extValSize > 0 && *(extValStart + extValSize - 1) == '"')
                         --extValSize;
 
-                    extensions.push_back( std::make_pair( BufferType( extNameStart, extSepPos - extNameStart ), BufferType( extValStart, extValSize ) ) );
+                    extensions.push_back(std::make_pair(BufferType(extNameStart, extSepPos - extNameStart), BufferType(extValStart, extValSize)));
                 }
 
-                if( (dataEnd - curPos < 2) || *(curPos+1) != '\n' )
+                if ((dataEnd - curPos < 2) || *(curPos + 1) != '\n')
                     return -1;
                 return curPos + 2 - buf.constData();
 
             default:
-                if( state == readingChunkSize )
+                if (state == readingChunkSize)
                 {
                     if (ch >= '0' && ch <= '9')
                         chunkSize = (chunkSize << 4) | (ch - '0');
@@ -1761,7 +1762,7 @@ int ChunkHeader::parse( const ConstBufferRefType& buf )
     return -1;
 }
 
-int ChunkHeader::serialize( BufferType* const /*dstBuffer*/ ) const
+int ChunkHeader::serialize(BufferType* const /*dstBuffer*/) const
 {
     //TODO #ak
     return -1;
@@ -1774,7 +1775,7 @@ static const StringType defaultUserAgentString = lit("%1%2/%3 (%4) %5").arg(
     nx::utils::AppInfo::applicationVersion(),
     nx::utils::AppInfo::organizationName(),
     COMMON_USER_AGENT
-    ).toUtf8();
+).toUtf8();
 
 StringType userAgentString()
 {
@@ -1783,7 +1784,7 @@ StringType userAgentString()
 
 static const StringType defaultServerString = lit("%1/%2 (%3) %4").arg(
     nx::utils::AppInfo::productNameLong(), nx::utils::AppInfo::applicationVersion(), nx::utils::AppInfo::organizationName(), COMPATIBILITY_SERVER_STRING
-    ).toUtf8();
+).toUtf8();
 
 StringType serverString()
 {

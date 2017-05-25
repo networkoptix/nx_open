@@ -18,7 +18,7 @@
         <product.title>${company.name} nx_audio</product.title>
 
         <qt.libs>core</qt.libs>
-        <global.libs>-lcommon -lnx_streaming</global.libs>
+        <global.libs>-lcommon</global.libs>
         <ios.oslibs>-framework OpenAL</ios.oslibs>
         <rdep.windows.packages>openal</rdep.windows.packages>
         <rdep.android.packages>openal</rdep.android.packages>
@@ -32,18 +32,9 @@
             <type>pom</type>
             <scope>system</scope>
             <systemPath>${root.dir}/common/pom.xml</systemPath>
-        </dependency>    
-        
-        <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>nx_streaming</artifactId>
-            <version>${project.version}</version>
-            <type>pom</type>
-            <scope>system</scope>
-            <systemPath>${root.dir}/common_libs/nx_streaming/pom.xml</systemPath>
-        </dependency>           
-    </dependencies>      
-    
+        </dependency>
+    </dependencies>
+
     <profiles>
         <profile>
             <id>windows</id>

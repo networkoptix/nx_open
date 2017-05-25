@@ -224,6 +224,22 @@ std::unique_ptr<AbstractStreamSocket> HttpClient::takeSocket()
     return sock;
 }
 
+bool HttpClient::fetchResource(
+    const QUrl& url,
+    BufferType* msgBody,
+    StringType* contentType)
+{
+    nx_http::HttpClient client;
+    if (!client.doGet(url))
+        return false;
+
+    while (!client.eof())
+        *msgBody += client.fetchMessageBodyBuffer();
+    
+    *contentType = getHeaderValue(client.response()->headers, "Content-Type");
+    return true;
+}
+
 void HttpClient::instantiateHttpClient()
 {
     m_asyncHttpClient = nx_http::AsyncHttpClient::create();

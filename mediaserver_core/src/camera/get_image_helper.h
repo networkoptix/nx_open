@@ -9,6 +9,7 @@
 #include <camera/video_camera.h>
 
 class CLVideoDecoderOutput;
+typedef QSharedPointer<CLVideoDecoderOutput> CLVideoDecoderOutputPtr;
 class QnServerArchiveDelegate;
 
 class QnGetImageHelper

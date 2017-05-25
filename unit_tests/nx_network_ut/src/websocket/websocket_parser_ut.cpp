@@ -100,12 +100,12 @@ protected:
         EXPECT_CALL(ph, frameEnded()).Times(frameCount);
         EXPECT_CALL(ph, messageEnded()).Times(1);
 
-        int messageOffset = 0;
+        size_t messageOffset = 0;
         auto message = prepareMessage(payload, frameCount, type, masked, mask);
 
         for (int i = 0; ; ++i)
         {
-            int consumeLen = std::min((int)message.size() - messageOffset, readSize);
+            int consumeLen = std::min((int)(message.size() - messageOffset), readSize);
             p.consume(message.data() + i * readSize, consumeLen);
             messageOffset += consumeLen;
             if (messageOffset >= message.size())
@@ -141,7 +141,7 @@ TEST_F(WebsocketParserTest, SimpleTestMessage_SeveralParts)
     EXPECT_CALL(ph, messageEnded()).Times(1);
     EXPECT_CALL(ph, handleError(_)).Times(0);
 
-    for (int i = 0; i < sizeof(kShortTextMessageFinNoMask); ++i)
+    for (size_t i = 0; i < sizeof(kShortTextMessageFinNoMask); ++i)
         p.consume((char*)kShortTextMessageFinNoMask + i, 1);
 }
 

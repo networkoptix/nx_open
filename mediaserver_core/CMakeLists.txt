@@ -36,6 +36,10 @@ nx_add_target(mediaserver_core LIBRARY
 
 if(LINUX)
     target_link_libraries(mediaserver_core PRIVATE ldap)
+
+    if(arch MATCHES "arm|aarch64")
+        target_link_libraries(mediaserver_core PRIVATE sasl2)
+    endif()
 endif()
 
 if(WINDOWS)

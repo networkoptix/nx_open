@@ -40,8 +40,10 @@ if(ANDROID OR IOS)
     set(enableAllVendors OFF)
 endif()
 
-if(ISD OR ISD_S2)
+if(box MATCHES "isd")
     set(enableAllVendors OFF)
+    remove_definitions(-DENABLE_SOFTWARE_MOTION_DETECTION)
+    add_definitions(-DEDGE_SERVER)
 endif()
 
 if(enableAllVendors)
@@ -136,7 +138,8 @@ if(LINUX)
         set(CMAKE_INSTALL_RPATH "$ORIGIN/../lib")
     endif()
 
-    set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -Wl,--disable-new-dtags")
+    set(CMAKE_EXE_LINKER_FLAGS
+        "${CMAKE_EXE_LINKER_FLAGS} -Wl,--disable-new-dtags")
     set(CMAKE_SHARED_LINKER_FLAGS
         "${CMAKE_SHARED_LINKER_FLAGS} -rdynamic -Wl,--allow-shlib-undefined")
 endif()

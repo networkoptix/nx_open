@@ -1,4 +1,4 @@
-nx_add_target(nx_audio LIBRARY PUBLIC_LIBS nx_streaming)
+nx_add_target(nx_audio LIBRARY PUBLIC_LIBS common)
 
 if(MACOSX)
     find_library(OpenAL_LIBRARY OpenAL)

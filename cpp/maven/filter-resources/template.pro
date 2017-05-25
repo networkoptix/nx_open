@@ -117,7 +117,6 @@ INCLUDEPATH +=  ${project.build.sourceDirectory} \
                 $$ROOT_DIR/common_libs/nx_network/src \
                 $$ROOT_DIR/common_libs/nx_fusion/src \
                 $$ROOT_DIR/common_libs/nx_utils/src \
-                $$ROOT_DIR/common_libs/nx_streaming/src \
                 $$ROOT_DIR/common_libs/nx_media/src \
                 $$ROOT_DIR/common_libs/nx_audio/src \
                 ${packages.dir}/any/nx_kit/src \

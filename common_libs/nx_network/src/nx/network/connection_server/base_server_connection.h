@@ -258,10 +258,14 @@ private:
         {
             nx::utils::ObjectDestructionFlag::Watcher watcher(&m_connectionFreedFlag);
             BaseServerConnectionAccess::bytesReceived<CustomConnectionType>(this, m_readBuffer);
-            m_readBuffer.resize(0);
-            if (watcher.objectDestroyed() || !m_receiving)
+            if (watcher.objectDestroyed())
                 return; //< Connection has been removed by handler.
         }
+
+        m_readBuffer.resize(0);
+
+        if (!m_receiving)
+            return;
 
         if (bytesRead == 0)    //< Connection closed by remote peer.
             return handleSocketError(SystemError::connectionReset);

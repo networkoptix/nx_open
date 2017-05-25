@@ -96,6 +96,8 @@ public:
     /** @return Socket in blocking mode. */
     std::unique_ptr<AbstractStreamSocket> takeSocket();
 
+    static bool fetchResource(const QUrl& url, BufferType* msgBody, StringType* contentType);
+
 private:
     nx_http::AsyncHttpClientPtr m_asyncHttpClient;
     QnWaitCondition m_cond;

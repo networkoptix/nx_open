@@ -1,7 +1,6 @@
 cmake_minimum_required(VERSION 3.7.0 FATAL_ERROR)
 
 set(customization "default" CACHE STRING "Product customization")
-set(box "none" CACHE STRING "Target box")
 option(beta "Is this build is beta build" ON)
 set(buildNumber "0" CACHE STRING "Build number")
 
@@ -15,6 +14,13 @@ option(rdepSync
 
 set(CMAKE_BUILD_TYPE "Debug" CACHE STRING
     "One of [Debug Release RelWithDebInfo MinSizeRel].")
+
+set(target "" CACHE STRING "Target platform.")
+set(box "none")
+
+if(target)
+    set(CMAKE_TOOLCHAIN_FILE "${CMAKE_CURRENT_LIST_DIR}/cmake/toolchain/${target}.cmake")
+endif()
 
 project(vms VERSION 3.1.0)
 
@@ -83,7 +89,13 @@ if(NOT WINDOWS)
         "${CMAKE_EXE_LINKER_FLAGS} -Wl,-rpath-link,${QT_DIR}/lib")
     set(CMAKE_SHARED_LINKER_FLAGS
         "${CMAKE_SHARED_LINKER_FLAGS} -Wl,-rpath-link,${QT_DIR}/lib")
+    set(CMAKE_EXE_LINKER_FLAGS
+        "${CMAKE_EXE_LINKER_FLAGS} -Wl,-rpath-link,${CMAKE_LIBRARY_OUTPUT_DIRECTORY}")
+    set(CMAKE_SHARED_LINKER_FLAGS
+        "${CMAKE_SHARED_LINKER_FLAGS} -Wl,-rpath-link,${CMAKE_LIBRARY_OUTPUT_DIRECTORY}")
 endif()
+
+link_directories("${CMAKE_LIBRARY_OUTPUT_DIRECTORY}")
 
 find_package(Qt5
     COMPONENTS
@@ -100,7 +112,6 @@ find_package(Qt5
 if(withDesktopClient OR withMobileClient)
     find_package(Qt5
         COMPONENTS
-            OpenGL
             Qml
             Quick)
 endif()

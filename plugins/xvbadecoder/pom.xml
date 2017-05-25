@@ -11,13 +11,13 @@
     <modelVersion>4.0.0</modelVersion>
     <artifactId>xvbadecoder</artifactId>
     <packaging>pom</packaging>
-    <name>Nx Witness AMD XvBA decoder plugin</name>	
+    <name>Nx Witness AMD XvBA decoder plugin</name>
 
     <properties>
         <guid>${xvbadecoder.guid}</guid>
-        <product.title>${xvbadecoder.name}</product.title>	
+        <product.title>${xvbadecoder.name}</product.title>
 
-        <global.libs>-lcommon -lnx_streaming</global.libs>
+        <global.libs>-lcommon</global.libs>
         <windows.oslibs>-lws2_32 -lIphlpapi -lOle32 -lwinmm</windows.oslibs>
         <linux.oslibs>-lXvBAW</linux.oslibs>
     </properties>
@@ -26,11 +26,11 @@
             <groupId>${project.groupId}</groupId>
             <artifactId>build_variables</artifactId>
             <version>${project.version}</version>
-            <type>pom</type> 
+            <type>pom</type>
             <scope>system</scope>
-            <systemPath>${root.dir}/build_variables/pom.xml</systemPath>            
+            <systemPath>${root.dir}/build_variables/pom.xml</systemPath>
         </dependency>
-    </dependencies>  
+    </dependencies>
     <profiles>
         <profile>
             <id>linux</id>
@@ -52,15 +52,7 @@
                     <scope>system</scope>
                     <systemPath>${root.dir}/common/pom.xml</systemPath>
                 </dependency>
-                <dependency>
-                    <groupId>${project.groupId}</groupId>
-                    <artifactId>nx_streaming</artifactId>
-                    <version>${project.version}</version>
-                    <type>pom</type> 
-                    <scope>system</scope>
-                    <systemPath>${root.dir}/common_libs/nx_streaming/pom.xml</systemPath>
-                </dependency>           
             </dependencies>
-        </profile>	
-    </profiles>	
+        </profile>
+    </profiles>
 </project>

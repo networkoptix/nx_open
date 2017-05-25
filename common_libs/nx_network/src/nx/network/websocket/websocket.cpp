@@ -24,15 +24,14 @@ WebSocket::WebSocket(
     m_lastError(SystemError::noError),
     m_pingTimeoutMultiplier(kDefaultPingTimeoutMultiplier)
 {
-    m_socket->bindToAioThread(getAioThread());
-    m_pingTimer->bindToAioThread(getAioThread());
+    aio::AbstractAsyncChannel::bindToAioThread(m_socket->getAioThread());
+    m_pingTimer->bindToAioThread(m_socket->getAioThread());
     m_readBuffer.reserve(4096);
     resetPingTimeoutBySocketTimeoutSync();
 }
 
 WebSocket::~WebSocket()
 {
-    pleaseStopSync();
 }
 
 void WebSocket::bindToAioThread(aio::AbstractAioThread* aioThread)
@@ -44,7 +43,6 @@ void WebSocket::bindToAioThread(aio::AbstractAioThread* aioThread)
     {
         AbstractAsyncChannel::bindToAioThread(aioThread);
         m_socket->bindToAioThread(aioThread);
-        m_pingTimer->cancelSync();
         m_pingTimer->bindToAioThread(aioThread);
         m_pingTimer->start(m_pingTimeout, [this]() { handlePingTimer(); });
         p.set_value();
@@ -79,29 +77,26 @@ void WebSocket::reportErrorIfAny(
     size_t bytesRead,
     std::function<void(bool)> continueHandler)
 {
-    dispatch([this, ecode, bytesRead, continueHandler = std::move(continueHandler)]()
+    if (m_lastError == SystemError::noError)
+        m_lastError = ecode;
+
+    if (m_lastError != SystemError::noError || bytesRead == 0)
     {
-        if (m_lastError == SystemError::noError)
-            m_lastError = ecode;
+        NX_LOG(lit("[WebSocket] Reporting error %1, read queue empty: %2")
+            .arg(m_lastError)
+            .arg((bool)m_readQueue.empty()), cl_logDEBUG1);
 
-        if (m_lastError != SystemError::noError || bytesRead == 0)
+        if (!m_readQueue.empty())
         {
-            NX_LOG(lit("[WebSocket] Reporting error %1, read queue empty: %2")
-                .arg(m_lastError)
-                .arg((bool)m_readQueue.empty()), cl_logDEBUG1);
-
-            if (!m_readQueue.empty())
-            {
-                auto readData = m_readQueue.pop();
-                readData.handler(ecode, bytesRead);
-                NX_LOG(lit("[WebSocket] Reporting error, user handler completed"), cl_logDEBUG2);
-            }
-            continueHandler(true);
-            return;
+            auto readData = m_readQueue.pop();
+            readData.handler(ecode, bytesRead);
+            NX_LOG(lit("[WebSocket] Reporting error, user handler completed"), cl_logDEBUG2);
         }
+        continueHandler(true);
+        return;
+    }
 
-        continueHandler(false); //< No error
-    });
+    continueHandler(false); //< No error
 }
 
 void WebSocket::handleSocketRead(SystemError::ErrorCode ecode, size_t bytesRead)
