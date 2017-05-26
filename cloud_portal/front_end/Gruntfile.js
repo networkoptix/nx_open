@@ -50,6 +50,13 @@ module.exports = function (grunt) {
         },
         // Watches files for changes and runs tasks based on the changed files
         watch: {
+            web_common:{
+                files: ['<%= yeoman.web_common %>/**'],
+                tasks: ['copy:web_common'],
+                options: {
+                    livereload: true
+                }
+            },
             js: {
                 files: ['<%= yeoman.app %>/scripts/**','<%= yeoman.app %>/components/**', '<%= yeoman.web_common %>/**'],
                 tasks: ['newer:jshint:all'],
@@ -78,6 +85,7 @@ module.exports = function (grunt) {
                     '<%= yeoman.web_common %>/**',
                     '<%= yeoman.app %>/**.html',
                     '.tmp/styles/{,*/}*.css',
+                    '.tmp/web_common/**',
                     '<%= yeoman.app %>/images/{,*/}*.{png,jpg,jpeg,gif,webp,svg}'
                 ]
             }
@@ -657,7 +665,10 @@ module.exports = function (grunt) {
                 command: 'cd ../build_scripts; ./build.sh; cd ../../nx_cloud_deploy/cloud_portal; ./make.sh publish cloud-test'
             },
             merge:{
-                command: 'hg pull -u;  python ../../devtools/util/merge_dev.py -r prod_3.0.0; python ../../devtools/util/merge_dev.py -t prod_3.0.0; hg push;'
+                command: 'hg pull -u; python ../../../devtools/util/merge_dev.py -r default; python ../../../devtools/util/merge_dev.py -t default; hg push;'
+            },
+            pull:{
+                command: 'hg pull -u; python ../../../devtools/util/merge_dev.py -r default; hg push;'
             },
             version: {
                 command: 'hg parent > dist/version.txt'
@@ -852,4 +863,7 @@ module.exports = function (grunt) {
         'shell:merge'
     ]);
 
+    grunt.registerTask('pull', [
+        'shell:pull'
+    ]);
 };
