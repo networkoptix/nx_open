@@ -95,7 +95,7 @@ void LayoutTourReviewController::handleTourChanged(const ec2::ApiLayoutTourData&
     if (!reviewLayout)
         return;
 
-    reviewLayout->setData(Qn::CustomPanelTitleRole, tour.name);
+    reviewLayout->setName(tour.name);
     reviewLayout->setData(Qn::LayoutTourIsManualRole, tour.settings.manual);
     if (auto wbLayout = QnWorkbenchLayout::instance(reviewLayout))
         wbLayout->setData(Qn::LayoutTourIsManualRole, tour.settings.manual);
@@ -175,7 +175,6 @@ void LayoutTourReviewController::reviewLayoutTour(const ec2::ApiLayoutTourData& 
     layout->setData(Qn::LayoutFlagsRole, qVariantFromValue(QnLayoutFlag::FixedViewport
         | QnLayoutFlag::NoResize
         | QnLayoutFlag::NoTimeline));
-    layout->setData(Qn::CustomPanelTitleRole, tour.name);
     layout->setData(Qn::CustomPanelDescriptionRole, QString());
     layout->setData(Qn::LayoutPermissionsRole, static_cast<int>(Qn::ReadWriteSavePermission
         | Qn::AddRemoveItemsPermission));
@@ -207,29 +206,11 @@ void LayoutTourReviewController::connectToLayout(QnWorkbenchLayout* layout)
     if (!layout->resource())
        return;
 
-    *m_connections << connect(layout, &QnWorkbenchLayout::itemAdded, this,
-        [this, layout](QnWorkbenchItem* /*item*/)
-        {
-            updateOrder();
-            updateButtons(layout->resource());
-            updatePlaceholders();
-            menu()->trigger(action::SaveCurrentLayoutTourAction);
-        });
-    *m_connections << connect(layout, &QnWorkbenchLayout::itemMoved, this,
-        [this, layout](QnWorkbenchItem* /*item*/)
-        {
-            updateOrder();
-            updatePlaceholders();
-            menu()->trigger(action::SaveCurrentLayoutTourAction);
-        });
-    *m_connections << connect(layout, &QnWorkbenchLayout::itemRemoved, this,
-        [this, layout](QnWorkbenchItem* /*item*/)
-        {
-            updateOrder();
-            updateButtons(layout->resource());
-            updatePlaceholders();
-            menu()->trigger(action::SaveCurrentLayoutTourAction);
-        });
+    auto saveAction = action(action::SaveCurrentLayoutTourAction);
+
+    *m_connections << connect(layout, &QnWorkbenchLayout::itemAdded, saveAction, &QAction::trigger);
+    *m_connections << connect(layout, &QnWorkbenchLayout::itemMoved, saveAction, &QAction::trigger);
+    *m_connections << connect(layout, &QnWorkbenchLayout::itemRemoved, saveAction, &QAction::trigger);
 }
 
 void LayoutTourReviewController::updateOrder()
@@ -425,12 +406,15 @@ void LayoutTourReviewController::at_saveCurrentLayoutTourAction_triggered()
 
     const auto reviewLayout = m_reviewLayouts.value(id);
     NX_EXPECT(reviewLayout);
-//    snapshotManager()->store(reviewLayout);
 
     tour.items.clear();
     fillTourItems(&tour.items);
     tour.settings.manual = workbench()->currentLayout()->data(Qn::LayoutTourIsManualRole).toBool();
     layoutTourManager()->addOrUpdateTour(tour);
+
+    updateOrder();
+    updateButtons(reviewLayout);
+    updatePlaceholders();
 
     m_saveToursQueue.insert(tour.id);
     m_saveToursOperation->requestOperation();

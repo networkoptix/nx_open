@@ -489,7 +489,12 @@ void QnWorkbenchUi::updateViewportMargins(bool animate)
             return QRectF();
         };
 
-    const bool timelineCanBeVisible = m_timeline && any_of(display()->widgets(),
+    const auto layout = workbench()->currentLayout();
+    const bool allowedByLayout = (layout
+        ? !layout->flags().testFlag(QnLayoutFlag::NoTimeline)
+        : true);
+
+    const bool timelineCanBeVisible = m_timeline && allowedByLayout && any_of(display()->widgets(),
         [this](QnResourceWidget* widget)
         {
             return calculateTimelineVisible(widget);
