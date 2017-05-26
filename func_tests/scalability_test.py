@@ -22,7 +22,7 @@ log = logging.getLogger(__name__)
 
 MERGE_TIMEOUT = datetime.timedelta(hours=1)
 MERGE_DONE_CHECK_PERIOD_SEC = 2.
-SET_RESOURCE_STATUS_CMD = 202
+SET_RESOURCE_STATUS_CMD = '202'
 
 # Perhaps, it'd better to put it in the test configuration
 TOTAL_CAMERA_COUNT = 10000
@@ -73,7 +73,7 @@ def get_response(server, method, api_object, api_method):
 def compare_transaction_log(json_1, json_2):
     # We have to filter 'setResourceStatus' transactions due to VMS-5969
     def is_not_set_resource_status(transaction):
-        return transaction.command == SET_RESOURCE_STATUS_CMD
+        return transaction.command != SET_RESOURCE_STATUS_CMD
 
     def clean(json):
         return filter(is_not_set_resource_status, transaction_log.transactions_from_json(json))
