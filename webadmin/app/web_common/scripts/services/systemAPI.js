@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('nxCommon')
-    .factory('systemAPI', function ($http, $q, $localStorage) {
+    .factory('systemAPI', ['$http', '$q', '$localStorage', '$location', function ($http, $q, $localStorage, $location) {
 
         /*
         * System API is a unified service for making API requests to media servers
@@ -252,6 +252,13 @@ angular.module('nxCommon')
         };
         /* End of Working with archive*/
 
+        ServerConnection.prototype.setCameraPath = function(cameraId){
+            var systemLink = '';
+            if(this.systemId){
+                systemLink = '/systems/' + this.systemId;
+            }
+            $location.path(systemLink + '/view/' + cameraId, false);
+        };
 
         if(Config.webadminSystemApiCompatibility){
             // This is a hack to avoid changing all webadmin controllers at the same time - we initialize default connection
@@ -269,5 +276,6 @@ angular.module('nxCommon')
             var defaultConnection = connect(null, serverId);
             return defaultConnection;
         }
+
         return connect;
-    });
+    }]);

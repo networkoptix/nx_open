@@ -27,7 +27,7 @@ angular.module('nxCommon').controller('ViewCtrl',
 
         if(!$routeParams.cameraId &&  $scope.storage.cameraId){
             $scope.toggleCameraPanel = false;
-            $location.path('/view/' + $scope.storage.cameraId, false);
+            systemAPI.setCameraPath($scope.storage.cameraId);
         }
 
         $scope.positionProvider = null;
@@ -81,8 +81,9 @@ angular.module('nxCommon').controller('ViewCtrl',
                 return true;
             });
             $scope.hasMobileApp = !!found;
-            if(!$scope.storage.cameraId)
+            if(!$scope.storage.cameraId){
                 $scope.toggleCameraPanel = true;
+            }
 
         }
 
@@ -360,20 +361,27 @@ angular.module('nxCommon').controller('ViewCtrl',
         //timeFromUrl is used if we have a time from the url if not then set to false
         var timeFromUrl = null;
         $scope.$watch('activeCamera', function(){
-            $scope.storage.cameraId  = $scope.activeCamera.id || $scope.storage.cameraId;
-            $location.path('/view/' + $scope.activeCamera.id, false);
+            if(!$scope.activeCamera){
+                return;
+            }
+            $scope.storage.cameraId  = $scope.activeCamera.id;
+            systemAPI.setCameraPath($scope.activeCamera.id);
             timeFromUrl = timeFromUrl || null;
             $scope.updateCamera(timeFromUrl);
             timeFromUrl = null;
         });
 
         $scope.$watch('player', function(){
+            if(!$scope.player){
+                return;
+            }
             updateVideoSource($scope.positionProvider.liveMode?null:$scope.positionProvider.playedPosition);
         },true);
 
         $scope.$watch('volumeLevel', function(){
-            if($scope.playerAPI)
+            if($scope.playerAPI){
                 $scope.playerAPI.volume($scope.volumeLevel);
+            }
             $scope.storage.volumeLevel = $scope.volumeLevel;
         });
 
