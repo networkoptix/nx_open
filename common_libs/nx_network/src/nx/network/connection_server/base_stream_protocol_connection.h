@@ -70,7 +70,7 @@ public:
             auto bufferedSocket =
                 std::make_unique<nx::network::BufferedStreamSocket>(std::move(streamSocket));
             bufferedSocket->injectRecvData(m_dataToParse);
-            return bufferedSocket;
+            streamSocket = std::move(bufferedSocket);
         }
         return streamSocket;
     }
