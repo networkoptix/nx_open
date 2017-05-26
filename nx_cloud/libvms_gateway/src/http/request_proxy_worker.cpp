@@ -25,6 +25,10 @@ RequestProxyWorker::RequestProxyWorker(
 
     m_targetHostPipeline->setMessageHandler(
         std::bind(&RequestProxyWorker::onMessageFromTargetHost, this, _1));
+    m_targetHostPipeline->setOnSomeMessageBodyAvailable(
+        std::bind(&RequestProxyWorker::onSomeMessageBodyRead, this, _1));
+    m_targetHostPipeline->setOnMessageEnd(
+        std::bind(&RequestProxyWorker::onMessageEnd, this));
     m_targetHostPipeline->startReadingConnection();
 
     m_proxyHost = nx_http::getHeaderValue(translatedRequest.headers, "Host");
@@ -81,46 +85,91 @@ void RequestProxyWorker::onMessageFromTargetHost(nx_http::Message message)
         return;
     }
 
-    auto msgBody = prepareMessageBody(message.response);
-
     const auto statusCode = message.response->statusLine.statusCode;
+    const auto contentType = 
+        nx_http::getHeaderValue(message.response->headers, "Content-Type");
 
     NX_LOGX(lm("Received response from target host %1. status %2, Content-Type %3")
         .arg(m_targetHostPipeline->socket()->getForeignAddress().toString())
         .arg(nx_http::StatusCode::toString(statusCode))
-        .arg(msgBody ? msgBody->mimeType() : nx::String("none")),
+        .arg(contentType.isEmpty() ? nx::String("none") : contentType),
         cl_logDEBUG2);
+
+    // NOTE: Message body has not been read yet.
+    
+    updateMessageHeaders(message.response);
+
+    if (!messageBodyNeedsConvertion(*message.response))
+    {
+        // m_messageBodyTransferMode = MessageBodyTransferMode::streaming;
+        // TODO
+        //return;
+    }
+
+    m_messageBodyTransferMode = MessageBodyTransferMode::whole;
+    m_responseMessage = std::move(message);
+}
+
+void RequestProxyWorker::updateMessageHeaders(nx_http::Response* response)
+{
+    nx_http::insertOrReplaceHeader(
+        &response->headers,
+        nx_http::HttpHeader("Content-Encoding", "identity"));
+    response->headers.erase("Transfer-Encoding");
+}
+
+bool RequestProxyWorker::messageBodyNeedsConvertion(const nx_http::Response& response)
+{
+    const auto contentTypeIter = response.headers.find("Content-Type");
+    if (contentTypeIter == response.headers.end())
+        return false;
+
+    m_messageBodyConverter = MessageBodyConverterFactory::instance().create(
+        m_proxyHost,
+        m_targetPeer,
+        contentTypeIter->second);
+    return m_messageBodyConverter != nullptr;
+}
+
+void RequestProxyWorker::onSomeMessageBodyRead(nx::Buffer someMessageBody)
+{
+    m_messageBodyBuffer += someMessageBody;
+}
+
+void RequestProxyWorker::onMessageEnd()
+{
+    auto msgBody = prepareMessageBody();
+
+    const auto statusCode = m_responseMessage.response->statusLine.statusCode;
 
     m_responseSender->sendResponse(
         nx_http::RequestResult(
             static_cast<nx_http::StatusCode::Value>(statusCode),
             std::move(msgBody)),
-        std::move(*message.response));
+        std::move(*m_responseMessage.response));
 }
 
-std::unique_ptr<nx_http::AbstractMsgBodySource> RequestProxyWorker::prepareMessageBody(
-    nx_http::Response* response)
+std::unique_ptr<nx_http::AbstractMsgBodySource> RequestProxyWorker::prepareMessageBody()
 {
-    const auto contentTypeIter = response->headers.find("Content-Type");
-    if (contentTypeIter == response->headers.end())
-        return nullptr;
+    decltype(m_messageBodyBuffer) messageBodyBuffer;
+    m_messageBodyBuffer.swap(messageBodyBuffer);
 
-    auto converter = MessageBodyConverterFactory::instance().create(
-        m_proxyHost,
-        m_targetPeer,
-        contentTypeIter->second);
-    if (converter)
-        response->messageBody = converter->convert(response->messageBody);
+    const auto contentType = nx_http::getHeaderValue(
+        m_responseMessage.response->headers,
+        "Content-Type");
 
-    nx_http::insertOrReplaceHeader(
-        &response->headers,
-        nx_http::HttpHeader("Content-Encoding", "identity"));
-    // No support for streaming body yet.
-    response->headers.erase("Transfer-Encoding");
-
-    return std::make_unique<nx_http::BufferSource>(
-        contentTypeIter->second,
-        std::move(response->messageBody));
+    if (m_messageBodyConverter)
+    {
+        return std::make_unique<nx_http::BufferSource>(
+            contentType,
+            m_messageBodyConverter->convert(std::move(messageBodyBuffer)));
+    }
+    else
+    {
+        return std::make_unique<nx_http::BufferSource>(
+            contentType,
+            std::move(messageBodyBuffer));
+    }
 }
 
 } // namespace gateway
