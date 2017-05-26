@@ -113,6 +113,11 @@ void IncomingControlConnection::continueReadRequest()
 
                 case nx::network::server::ParserState::failed:
                     return handleError(SystemError::invalidData);
+
+                case nx::network::server::ParserState::readingBody:
+                    // Stun message cannot have body.
+                    NX_ASSERT(false);
+                    return handleError(SystemError::invalidData);
             };
         });
 }

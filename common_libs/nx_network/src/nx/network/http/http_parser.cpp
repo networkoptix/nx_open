@@ -23,13 +23,12 @@ nx::network::server::ParserState MessageParser::parse(
     if (!m_httpStreamReader.parseBytes(buf, nx_http::BufferNpos, bytesProcessed))
         return nx::network::server::ParserState::failed;
 
-    if (m_httpStreamReader.state() <= HttpStreamReader::readingMessageHeaders)
-        return nx::network::server::ParserState::readingMessage;
-
     switch (m_httpStreamReader.state())
     {
-        // TODO: #ak Currently, always reading full message before going futher.
-        //  Have to add support for infinite request message body to async server
+        case HttpStreamReader::waitingMessageStart:
+        case HttpStreamReader::readingMessageHeaders:
+            return nx::network::server::ParserState::readingMessage;
+
         case HttpStreamReader::pullingLineEndingBeforeMessageBody:
         case HttpStreamReader::readingMessageBody:
         {
