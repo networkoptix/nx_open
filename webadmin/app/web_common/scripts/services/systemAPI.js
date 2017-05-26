@@ -82,12 +82,12 @@ angular.module('nxCommon')
                 url += (url.indexOf('?')>0)?'&':'?';
                 url += $.param(data);
             }
-            return url;
+            return this.urlBase + url;
         };
         ServerConnection.prototype._get = function(url, data){
             url = this._setGetParams(url, data, this.systemId && this.authGet());
             var canceller = $q.defer();
-            var obj = this._wrapRequest($http.get(this.urlBase + url, { timeout: canceller.promise }));
+            var obj = this._wrapRequest($http.get(url, { timeout: canceller.promise }));
             obj.then(function(){
                 canceller = null;
             },function(){
@@ -102,7 +102,7 @@ angular.module('nxCommon')
         };
         ServerConnection.prototype._post = function(url, data){
             url = this._setGetParams(url, null, this.systemId && this.authPost());
-            return this._wrapRequest($http.post(this.urlBase + url, data));
+            return this._wrapRequest($http.post(url, data));
         };
         /* End of helpers */
 
@@ -203,13 +203,18 @@ angular.module('nxCommon')
 
         /* Formatting urls */
         ServerConnection.prototype.previewUrl = function(cameraPhysicalId, time, width, height){
-            return this.urlBase +
-                '/api/image' +
-                '?physicalId=' + cameraPhysicalId +
-                (width? '&width=' + width:'') +
-                (height? '&height=' + height:'') +
-                ('&time=' + (time || 'LATEST')); // mb LATEST?
+            var data = {
+                    physicalId:cameraPhysicalId,
+                    time:time  || 'LATEST'
+                };
 
+            if(width){
+                data.width = width;
+            }
+            if(height){
+                data.height = height;
+            }
+            return this._setGetParams('/api/image', data, this.systemId && this.authGet());
         };
         /* End of formatting urls */
 
