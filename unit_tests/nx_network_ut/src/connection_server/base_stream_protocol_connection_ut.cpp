@@ -29,6 +29,13 @@ public:
         base_type(&m_tcpSocket),
         m_asyncChannel(asyncChannel)
     {
+        m_asyncChannel->bindToAioThread(getAioThread());
+    }
+
+    virtual void bindToAioThread(aio::AbstractAioThread* aioThread) override
+    {
+        base_type::bindToAioThread(aioThread);
+        m_asyncChannel->bindToAioThread(aioThread);
     }
 
     virtual void readSomeAsync(
@@ -150,36 +157,26 @@ public:
 protected:
     void whenReadMessageWithIncompleteBody()
     {
-        m_input.write(
-            kHttpMessageWithIncompleteInfiniteBody.fullMessage.data(),
-            kHttpMessageWithIncompleteInfiniteBody.fullMessage.size());
+        m_messagesSent.push_back(kHttpMessageWithIncompleteInfiniteBody);
         m_expectedBody = kHttpMessageWithIncompleteInfiniteBody.messageBody;
+
+        sendMessages();
     }
 
     void whenReadMessageWithFiniteBody()
     {
-        const int step = 1;
-
-        for (int pos = 0;
-            pos < kHttpMessageWithFiniteBody.fullMessage.size();
-            pos += step)
-        {
-            const auto bytesToRead = 
-                std::min<int>(step, kHttpMessageWithFiniteBody.fullMessage.size() - pos);
-            m_input.write(
-                kHttpMessageWithFiniteBody.fullMessage.data() + pos,
-                bytesToRead);
-        }
-
+        m_messagesSent.push_back(kHttpMessageWithFiniteBody);
         m_expectedBody = kHttpMessageWithFiniteBody.messageBody;
+
+        sendMessagesInFragments();
     }
 
     void whenReadMessageWithoutBody()
     {
-        m_input.write(
-            kHttpMessageWithoutBody.fullMessage.data(),
-            kHttpMessageWithoutBody.fullMessage.size());
+        m_messagesSent.push_back(kHttpMessageWithoutBody);
         m_expectedBody = kHttpMessageWithoutBody.messageBody;
+
+        sendMessages();
     }
 
     void whenReadMultipleMessages()
@@ -189,13 +186,13 @@ protected:
         m_messagesSent.push_back(kHttpMessageWithFiniteBody);
         m_messagesSent.push_back(kHttpMessageWithoutBody);
 
-        for (const auto& message: m_messagesSent)
-            m_input.write(message.fullMessage.data(), message.fullMessage.size());
+        sendMessages();
     }
 
     void thenMessageIsReported()
     {
-        m_receivedMessageQueue.pop();
+        //m_receivedMessageQueue.pop();
+        thenEveryMessageIsReceived();
     }
     
     void thenMessageBodyIsReported()
@@ -221,6 +218,23 @@ protected:
         }
     }
 
+    virtual void saveMessage(nx_http::Message message)
+    {
+        auto messageToSave = std::make_unique<nx_http::Message>(std::move(message));
+        m_prevMessageReceived = messageToSave.get();
+        m_receivedMessageQueue.push(std::move(messageToSave));
+    }
+
+    TestHttpConnection& connection()
+    {
+        return *m_connection;
+    }
+
+    nx::Buffer expectedBody() const
+    {
+        return m_expectedBody;
+    }
+
 private:
     nx::utils::bstream::ReflectingPipeline m_input;
     aio::test::AsyncChannel m_asyncChannel;
@@ -239,11 +253,27 @@ private:
         ASSERT_EQ(m_connection.get(), connection);
     }
 
-    void saveMessage(nx_http::Message message)
+    void sendMessages()
     {
-        auto messageToSave = std::make_unique<nx_http::Message>(std::move(message));
-        m_prevMessageReceived = messageToSave.get();
-        m_receivedMessageQueue.push(std::move(messageToSave));
+        for (const auto& message: m_messagesSent)
+            m_input.write(message.fullMessage.data(), message.fullMessage.size());
+    }
+
+    void sendMessagesInFragments()
+    {
+        const int step = 1;
+
+        for (const auto& message: m_messagesSent)
+        {
+            for (int pos = 0;
+                pos < message.fullMessage.size();
+                pos += step)
+            {
+                const auto bytesToRead =
+                    std::min<int>(step, message.fullMessage.size() - pos);
+                m_input.write(message.fullMessage.data() + pos, bytesToRead);
+            }
+        }
     }
 
     void saveSomeBody(nx::Buffer bodyBuffer)
@@ -289,7 +319,73 @@ TEST_F(BaseStreamProtocolConnection, receiving_multiple_messages_over_same_conne
 }
 
 // TEST_F(BaseStreamProtocolConnection, message_parse_error)
-// TEST_F(BaseStreamProtocolConnection, taking_socket_after_message_availability)
+
+//-------------------------------------------------------------------------------------------------
+
+class BaseStreamProtocolConnectionTakeSocket:
+    public BaseStreamProtocolConnection
+{
+    using base_type = BaseStreamProtocolConnection;
+
+protected:
+    void whenTakenSocketInProcessMessageHandler()
+    {
+        while (!m_streamSocket)
+            std::this_thread::yield();
+    }
+
+    void thenMessageBodyCanBeReadFromSocket()
+    {
+        using namespace std::placeholders;
+
+        m_readBuffer.reserve(expectedBody().size());
+
+        m_streamSocket->readSomeAsync(
+            &m_readBuffer,
+            std::bind(&BaseStreamProtocolConnectionTakeSocket::onSomeBytesRead, this, _1, _2));
+
+        m_done.get_future().wait();
+    }
+
+    virtual void saveMessage(nx_http::Message message)
+    {
+        base_type::saveMessage(message);
+
+        m_streamSocket = connection().takeSocket();
+    }
+
+private:
+    std::unique_ptr<AbstractStreamSocket> m_streamSocket;
+    nx::Buffer m_readBuffer;
+    nx::utils::promise<void> m_done;
+
+    void onSomeBytesRead(
+        SystemError::ErrorCode sysErrorCode, std::size_t /*bytesRead*/)
+    {
+        using namespace std::placeholders;
+
+        ASSERT_EQ(SystemError::noError, sysErrorCode);
+
+        if (m_readBuffer == expectedBody())
+        {
+            m_done.set_value();
+            return;
+        }
+
+        ASSERT_TRUE(expectedBody().startsWith(m_readBuffer));
+
+        m_streamSocket->readSomeAsync(
+            &m_readBuffer,
+            std::bind(&BaseStreamProtocolConnectionTakeSocket::onSomeBytesRead, this, _1, _2));
+    }
+};
+
+TEST_F(BaseStreamProtocolConnectionTakeSocket, taking_socket_does_not_lose_data)
+{
+    whenReadMessageWithIncompleteBody();
+    whenTakenSocketInProcessMessageHandler();
+    thenMessageBodyCanBeReadFromSocket();
+}
 
 } // namespace test
 } // namespace server

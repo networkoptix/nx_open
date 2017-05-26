@@ -15,6 +15,8 @@ class NX_NETWORK_API MessageParser:
     public nx::network::server::AbstractMessageParser<Message>
 {
 public:
+    MessageParser();
+
     virtual void setMessage(Message* const msg) override;
     /**
      * Methods returns if:

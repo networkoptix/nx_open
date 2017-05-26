@@ -2,6 +2,11 @@
 
 namespace nx_http {
 
+MessageParser::MessageParser()
+{
+    m_httpStreamReader.setBreakAfterReadingHeaders(true);
+}
+
 void MessageParser::setMessage(Message* const msg)
 {
     m_msg = msg;

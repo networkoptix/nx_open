@@ -5,6 +5,9 @@
 
 #include <boost/optional.hpp>
 
+#include <nx/network/buffered_stream_socket.h>
+#include <nx/utils/qnbytearrayref.h>
+
 #include "base_protocol_message_types.h"
 #include "base_server_connection.h"
 
@@ -57,24 +60,40 @@ public:
 
     virtual ~BaseStreamProtocolConnection() = default;
 
+    virtual std::unique_ptr<AbstractStreamSocket> takeSocket() override
+    {
+        NX_ASSERT(this->isInSelfAioThread());
+
+        auto streamSocket = base_type::takeSocket();
+        if (!m_dataToParse.isEmpty())
+        {
+            auto bufferedSocket =
+                std::make_unique<nx::network::BufferedStreamSocket>(std::move(streamSocket));
+            bufferedSocket->injectRecvData(m_dataToParse);
+            return bufferedSocket;
+        }
+        return streamSocket;
+    }
+
     void bytesReceived(const nx::Buffer& buf)
     {
-        size_t pos = 0;
-        if (buf.isEmpty())
+        m_dataToParse = buf;
+
+        if (m_dataToParse.isEmpty())
         {
             // Reporting eof of file to the parser.
-            invokeMessageParser(buf, &pos);
-            return;
+            invokeMessageParser();
         }
-
-        for (; pos < (size_t)buf.size(); )
+        else
         {
-            if (!invokeMessageParser(buf, &pos))
+            while (!m_dataToParse.isEmpty())
             {
-                // TODO: #ak Ignore all following data and close connection?
-                return;
+                if (!invokeMessageParser())
+                    return; //< TODO: #ak Ignore all following data and close connection?
             }
         }
+
+        m_dataToParse.clear();
     }
 
     void readyToSendData()
@@ -117,8 +136,6 @@ public:
         // On completion readyToSendData will be called.
     }
 
-    // TODO #ak: Add message body streaming.
-
     /**
      * Initiates asynchoronous message send.
      */
@@ -139,9 +156,9 @@ public:
                 };
         }
 
-        auto newTask = std::make_shared<SendTask>(
+        auto newTask = std::make_unique<SendTask>(
             std::move(msg),
-            std::move(handler)); //< TODO: #ak Get rid of shared_ptr here when generic lambdas are available.
+            std::move(handler));
         addNewTaskToQueue(std::move(newTask));
     }
 
@@ -156,7 +173,7 @@ public:
         nx::Buffer data,
         std::function<void(SystemError::ErrorCode)> handler)
     {
-        auto newTask = std::make_shared<SendTask>(
+        auto newTask = std::make_unique<SendTask>(
             std::move(data),
             std::move(handler));
         addNewTaskToQueue(std::move(newTask));
@@ -169,27 +186,20 @@ public:
 
 protected:
     virtual void processMessage(MessageType) = 0;
-
-    virtual void processSomeMessageBody(nx::Buffer /*messageBodyBuffer*/)
-    {
-    }
+    virtual void processSomeMessageBody(nx::Buffer /*messageBodyBuffer*/) {}
 
 private:
     struct SendTask
     {
     public:
-        SendTask():
-            asyncSendIssued(false)
-        {
-        }
+        SendTask() = default;
 
         SendTask(
             MessageType _msg,
             std::function<void(SystemError::ErrorCode)> _handler)
             :
             msg(std::move(_msg)),
-            handler(std::move(_handler)),
-            asyncSendIssued(false)
+            handler(std::move(_handler))
         {
         }
 
@@ -198,26 +208,19 @@ private:
             std::function<void(SystemError::ErrorCode)> _handler)
             :
             buf(std::move(_buf)),
-            handler(std::move(_handler)),
-            asyncSendIssued(false)
+            handler(std::move(_handler))
         {
         }
 
-        SendTask(SendTask&& right):
-            msg(std::move(right.msg)),
-            buf(std::move(right.buf)),
-            handler(std::move(right.handler)),
-            asyncSendIssued(right.asyncSendIssued)
-        {
-        }
+        SendTask(SendTask&& right) = default;
 
         SendTask(const SendTask&) = delete;
         SendTask& operator=(const SendTask&) = delete;
 
         boost::optional<MessageType> msg;
         boost::optional<nx::Buffer> buf;
-        std::function<void( SystemError::ErrorCode )> handler;
-        bool asyncSendIssued;
+        std::function<void(SystemError::ErrorCode)> handler;
+        bool asyncSendIssued = false;
     };
 
     MessageType m_message;
@@ -229,21 +232,24 @@ private:
     std::deque<SendTask> m_sendQueue;
     nx::utils::ObjectDestructionFlag m_connectionFreedFlag;
     bool m_messageReported = false;
+    QnByteArrayConstRef m_dataToParse;
 
     /**
      * @param buf Source buffer.
      * @param pos Position inside source buffer. Moved by number of bytes read.
-     * @return false in case of a parse error. 
+     * @return false in case of parsing is stopped and cannot be resumed.
      *   This method should not be called anymore since parser can be in undefined state.
      */
-    bool invokeMessageParser(const nx::Buffer& buf, size_t* const pos)
+    bool invokeMessageParser()
     {
         size_t bytesProcessed = 0;
-        switch (m_parser.parse(*pos > 0 ? buf.mid((int)*pos) : buf, &bytesProcessed))
+        const auto parserState = m_parser.parse(m_dataToParse, &bytesProcessed);
+        m_dataToParse.pop_front(bytesProcessed);
+        switch (parserState)
         {
             case ParserState::init:
             case ParserState::readingMessage:
-                NX_ASSERT((*pos + bytesProcessed) == (size_t)buf.size());
+                NX_ASSERT(m_dataToParse.isEmpty());
                 break;
 
             case ParserState::readingBody:
@@ -271,7 +277,6 @@ private:
                 return false;
         }
 
-        *pos += bytesProcessed;
         return true;
     }
 
@@ -279,8 +284,6 @@ private:
     {
         if (m_messageReported)
             return true;
-
-        // NOTE: Interleaving is not supported yet.
 
         nx::utils::ObjectDestructionFlag::Watcher watcher(&m_connectionFreedFlag);
         // TODO: #ak m_message should not be used after moving.
@@ -322,10 +325,10 @@ private:
         readyToSendData();
     }
 
-    void addNewTaskToQueue(std::shared_ptr<SendTask> newTask)
+    void addNewTaskToQueue(std::unique_ptr<SendTask> newTask)
     {
         this->dispatch(
-            [this, newTask]()
+            [this, newTask = std::move(newTask)]()
             {
                 m_sendQueue.push_back(std::move(*newTask));
                 if (m_sendQueue.size() > 1)
