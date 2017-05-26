@@ -4,15 +4,18 @@
 
 TEST(CloudUserInfoPool, deserialize)
 {
-    const QString kSimpleString = lit("{\"timestamp\":1234567,\"cloudNonce\":\"abcdef0123456\"}");
+    const QString kSimpleString = 
+        lit("{\"timestamp\":1234567,\"cloudNonce\":\"abcdef0123456\", \"partialResponse\"=\"response\"}");
 
     int64_t ts;
-    nx::Buffer buf;
-    detail::deserialize(kSimpleString, &ts, &buf);
+    nx::Buffer nonce;
+    nx::Buffer response;
+    detail::deserialize(kSimpleString, &ts, &nonce, &response);
 
 
     ASSERT_EQ(ts, 1234567);
-    ASSERT_EQ(buf, "abcdef0123456");
+    ASSERT_EQ(nonce, "abcdef0123456");
+    ASSERT_EQ(response, "response");
 }
 
 namespace test  {
@@ -25,9 +28,13 @@ public:
         m_pool = pool;
     }
 
-    void setUserInfo(int64_t ts, const nx::Buffer& userName, const nx::Buffer& cloudNonce)
+    void setUserInfo(
+        int64_t ts,
+        const nx::Buffer& userName,
+        const nx::Buffer& cloudNonce, 
+        const nx::Buffer& partialResponse)
     {
-        m_pool->userInfoChanged(ts, userName, cloudNonce);
+        m_pool->userInfoChanged(ts, userName, cloudNonce, partialResponse);
     }
 
     void removeUserInfo(const nx::Buffer& userName)

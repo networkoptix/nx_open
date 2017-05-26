@@ -46,7 +46,11 @@ struct NonceUserCount
 
 using TimestampToNonceUserCountMap = std::map<int64_t, NonceUserCount, std::greater<int64_t>>;
 
-bool deserialize(const QString& serializedValue, int64_t* timestamp, nx::Buffer* cloudNonce);
+bool deserialize(
+    const QString& serializedValue,
+    int64_t* timestamp,
+    nx::Buffer* cloudNonce,
+    nx::Buffer* partialResponse);
 
 } // namespace detail
 
@@ -65,7 +69,8 @@ public:
     virtual void userInfoChanged(
         int64_t timestamp,
         const nx::Buffer& userName,
-        const nx::Buffer& cloudNonce) = 0;
+        const nx::Buffer& cloudNonce,
+        const nx::Buffer& partialResponse) = 0;
 
     virtual void userInfoRemoved(const nx::Buffer& userName) = 0;
     virtual ~AbstractCloudUserInfoPool() {}
@@ -106,7 +111,8 @@ private:
     virtual void userInfoChanged(
         int64_t timestamp,
         const nx::Buffer& userName,
-        const nx::Buffer& cloudNonce) override;
+        const nx::Buffer& cloudNonce,
+        const nx::Buffer& partialResponse) override;
 
     virtual void userInfoRemoved(const nx::Buffer& userName) override;
 

@@ -84,8 +84,9 @@ void CloudUserInfoPoolSupplier::reportInfoChanged(
 {
     int64_t timestamp;
     nx::Buffer cloudNonce;
+    nx::Buffer partialResponse;
 
-    if (!detail::deserialize(serializedValue, &timestamp, &cloudNonce))
+    if (!detail::deserialize(serializedValue, &timestamp, &cloudNonce, &partialResponse))
     {
         NX_LOG(lit("[CloudUserInfo] User %1. Deserialization failed")
             .arg(userName), cl_logDEBUG1);
@@ -95,7 +96,8 @@ void CloudUserInfoPoolSupplier::reportInfoChanged(
     m_pool->userInfoChanged(
         timestamp,
         userName.toUtf8().toLower(),
-        cloudNonce);
+        cloudNonce,
+        partialResponse);
 }
 
 void CloudUserInfoPoolSupplier::onRemoveResource(const QnResourcePtr& resource)
@@ -112,7 +114,7 @@ CloudUserInfoPool::CloudUserInfoPool(std::unique_ptr<AbstractCloudUserInfoPoolSu
 
 bool CloudUserInfoPool::authenticate(const nx_http::header::Authorization& authHeader) const
 {
-    return true;
+    return false;
 }
 
 boost::optional<nx::Buffer> CloudUserInfoPool::newestMostCommonNonce() const
@@ -123,7 +125,8 @@ boost::optional<nx::Buffer> CloudUserInfoPool::newestMostCommonNonce() const
 void CloudUserInfoPool::userInfoChanged(
     int64_t timestamp,
     const nx::Buffer& userName,
-    const nx::Buffer& cloudNonce)
+    const nx::Buffer& cloudNonce,
+    const nx::Buffer& partialResponse)
 {
 }
 
@@ -133,7 +136,11 @@ void CloudUserInfoPool::userInfoRemoved(const nx::Buffer& userName)
 
 namespace detail {
 
-bool deserialize(const QString& serializedValue, int64_t* timestamp, nx::Buffer* cloudNonce)
+bool deserialize(
+    const QString& serializedValue,
+    int64_t* timestamp,
+    nx::Buffer* cloudNonce,
+    nx::Buffer* partialResponse)
 {
     auto jsonObj = QJsonDocument::fromJson(serializedValue.toUtf8()).object();
     if (jsonObj.isEmpty())
@@ -144,6 +151,7 @@ bool deserialize(const QString& serializedValue, int64_t* timestamp, nx::Buffer*
 
     const QString kTimestampKey = lit("timestamp");
     const QString kCloudNonceKey = lit("cloudNonce");
+    const QString kPartialResponseKey = lit("partialResponse");
 
     auto timestampVal = jsonObj[kTimestampKey];
     if (timestampVal.isUndefined() || !timestampVal.isDouble())
@@ -160,6 +168,14 @@ bool deserialize(const QString& serializedValue, int64_t* timestamp, nx::Buffer*
         return false;
     }
     *cloudNonce = cloudNonceVal.toString().toUtf8();
+
+    auto partialResponseVal = jsonObj[kPartialResponseKey];
+    if (partialResponseVal.isUndefined() || !partialResponseVal.isString())
+    {
+        NX_LOG("[CloudUserInfo, deserialize] partial response is undefined or wrong type.", cl_logERROR);
+        return false;
+    }
+    *partialResponse = partialResponseVal.toString().toUtf8();
 
     return true;
 }
