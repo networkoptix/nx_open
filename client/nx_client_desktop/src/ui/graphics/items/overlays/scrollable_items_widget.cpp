@@ -89,6 +89,18 @@ QGraphicsWidget* QnScrollableItemsWidget::item(const QnUuid& id) const
     return d->item(id);
 }
 
+int QnScrollableItemsWidget::lineHeight() const
+{
+    Q_D(const QnScrollableItemsWidget);
+    return d->lineHeight();
+}
+
+void QnScrollableItemsWidget::setLineHeight(int value)
+{
+    Q_D(QnScrollableItemsWidget);
+    d->setLineHeight(value);
+}
+
 qreal QnScrollableItemsWidget::spacing() const
 {
     Q_D(const QnScrollableItemsWidget);

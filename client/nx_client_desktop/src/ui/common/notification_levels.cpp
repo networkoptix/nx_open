@@ -88,7 +88,6 @@ QnNotificationLevel::Value QnNotificationLevel::valueOf(QnSystemHealth::MessageT
             return QnNotificationLevel::Value::ImportantNotification;
 
         /* Red notifications */
-        case QnSystemHealth::ConnectionLost:
         case QnSystemHealth::EmailSendError:
         case QnSystemHealth::StoragesAreFull:
             return QnNotificationLevel::Value::CriticalNotification;

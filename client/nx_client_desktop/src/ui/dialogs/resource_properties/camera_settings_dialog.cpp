@@ -353,7 +353,7 @@ void QnCameraSettingsDialog::saveCameras(const QnVirtualCameraResourceList &came
 void QnCameraSettingsDialog::at_openButton_clicked()
 {
     QnVirtualCameraResourceList cameras = m_settingsWidget->cameras();
-    menu()->trigger(action::OpenInNewLayoutAction, cameras);
+    menu()->trigger(action::OpenInNewTabAction, cameras);
     m_settingsWidget->setCameras(cameras);
     retranslateUi();
 }

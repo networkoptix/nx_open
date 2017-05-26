@@ -315,7 +315,7 @@ void QnWorkbenchNavigator::setTimeScrollBar(QnTimeScrollBar *scrollBar)
 
     if (m_timeScrollBar)
     {
-        disconnect(m_timeScrollBar, NULL, this, NULL);
+        m_timeScrollBar->disconnect(this);
 
         if (isValid())
             deinitialize();
@@ -325,7 +325,15 @@ void QnWorkbenchNavigator::setTimeScrollBar(QnTimeScrollBar *scrollBar)
 
     if (m_timeScrollBar)
     {
-        connect(m_timeScrollBar, &QObject::destroyed, this, [this]() { setTimeScrollBar(NULL); });
+        connect(m_timeScrollBar, &QObject::destroyed, this,
+            [this]() { setTimeScrollBar(nullptr); });
+
+        connect(m_timeScrollBar, &QnTimeScrollBar::actionTriggered, this,
+            [this](int action)
+            {
+                if (action != AbstractGraphicsSlider::SliderMove)
+                    m_ignoreScrollBarDblClick = true;
+            });
 
         if (isValid())
             initialize();
@@ -1980,7 +1988,10 @@ bool QnWorkbenchNavigator::eventFilter(QObject *watched, QEvent *event)
     }
     else if (m_timeSlider && watched == m_timeScrollBar && event->type() == QEvent::GraphicsSceneMouseDoubleClick)
     {
-        m_timeSlider->setWindow(m_timeSlider->minimum(), m_timeSlider->maximum(), true);
+        if (!m_ignoreScrollBarDblClick)
+            m_timeSlider->setWindow(m_timeSlider->minimum(), m_timeSlider->maximum(), true);
+
+        m_ignoreScrollBarDblClick = false;
     }
 
     return base_type::eventFilter(watched, event);
