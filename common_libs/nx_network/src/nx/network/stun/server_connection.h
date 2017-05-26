@@ -49,8 +49,10 @@ public:
     virtual AbstractCommunicatingSocket* socket() override;
     virtual void close() override;
 
-    void processMessage(Message message);
     void setDestructHandler(std::function< void() > handler = nullptr);
+
+protected:
+    virtual void processMessage(Message message) override;
 
 private:
     void processBindingRequest(Message message);

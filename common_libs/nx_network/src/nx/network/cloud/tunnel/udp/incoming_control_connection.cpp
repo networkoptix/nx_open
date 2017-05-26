@@ -105,7 +105,7 @@ void IncomingControlConnection::continueReadRequest()
             switch(m_parser.parse(m_buffer, &processed))
             {
                 case nx::network::server::ParserState::init:
-                case nx::network::server::ParserState::inProgress:
+                case nx::network::server::ParserState::readingMessage:
                     return continueReadRequest();
 
                 case nx::network::server::ParserState::done:

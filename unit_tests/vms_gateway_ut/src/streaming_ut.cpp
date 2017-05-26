@@ -6,6 +6,8 @@
 
 #include <vms_gateway_process.h>
 
+#include "random_data_source.h"
+
 namespace nx {
 namespace cloud {
 namespace gateway {
@@ -14,42 +16,6 @@ namespace test {
 namespace {
 
 static const char* const kPath = "/Streaming";
-
-class RandomDataSource:
-    public nx_http::AbstractMsgBodySource
-{
-public:
-    RandomDataSource(nx_http::StringType contentType):
-        m_contentType(std::move(contentType))
-    {
-    }
-
-    virtual nx_http::StringType mimeType() const override
-    {
-        return m_contentType;
-    }
-
-    virtual boost::optional<uint64_t> contentLength() const override
-    {
-        return boost::none;
-    }
-
-    virtual void readAsync(
-        nx::utils::MoveOnlyFunc<
-            void(SystemError::ErrorCode, nx_http::BufferType)> completionHandler) override
-    {
-        post(
-            [completionHandler = std::move(completionHandler)]()
-            {
-                nx_http::BufferType randomData;
-                std::generate(randomData.data(), randomData.data() + randomData.size(), rand);
-                completionHandler(SystemError::noError, std::move(randomData));
-            });
-    }
-
-private:
-    const nx_http::StringType m_contentType;
-};
 
 } // namespace
 
@@ -76,6 +42,9 @@ private:
         m_httpClient.setSendTimeoutMs(0);
         m_httpClient.setResponseReadTimeoutMs(0);
         m_httpClient.setMessageBodyReadTimeoutMs(0);
+
+        addArg("--tcp/recvTimeout=1h");
+        addArg("--tcp/sendTimeout=1h");
 
         ASSERT_TRUE(startAndWaitUntilStarted());
         launchHttpServer();

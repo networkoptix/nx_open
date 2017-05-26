@@ -14,35 +14,31 @@ namespace server {
 enum class ParserState
 {
     init = 1,
-    inProgress,
+    readingMessage,
+    readingBody,
     done,
     failed,
 };
 
-namespace SerializerState
-{
+namespace SerializerState {
     using Type = int;
 
     static const int needMoreBufferSpace = 1;
     static const int done = 2;
 }; // namespace SerializerState
     
-class Message
-{
-public:
-    void clear();
-};
-
 /**
  * Demonstrates API of message parser.
  */
-class MessageParser
+template<typename Message>
+class AbstractMessageParser
 {
 public:
-    MessageParser();
+    virtual ~AbstractMessageParser() = default;
 
     /** Set message object to parse to. */
-    void setMessage(Message* const msg);
+    virtual void setMessage(Message* const msg) = 0;
+
     /**
      * Returns current parse state.
      * Methods returns if:
@@ -52,22 +48,36 @@ public:
      * NOTE: *buf MAY NOT contain whole message, but any part of it (it can be as little as 1 byte).
      * NOTE: Reads whole message even if parse error occured.
      */
-    ParserState parse(const nx::Buffer& /*buf*/, size_t* /*bytesProcessed*/);
+    virtual ParserState parse(const nx::Buffer& /*buf*/, size_t* /*bytesProcessed*/) = 0;
+
+    /**
+     * If parser supports streaming message body 
+     *   (AbstractMessageParser::parse implementation can return ParserState::readingBody),
+     *   then it should be returned here.
+     * If parser does not support it (never reports ParserState::readingBody) state, 
+     *   then it should leave dummy implementation.
+     */
+    virtual nx::Buffer fetchMessageBody() { return nx::Buffer(); };
 
     /** Resets parse state and prepares for parsing different data. */
-    void reset();
+    virtual void reset() = 0;
 };
 
 /**
  * Demonstrates API of message serializer.
  */
-class MessageSerializer
+template<typename Message>
+class AbstractMessageSerializer
 {
 public:
-    /** Set message to serialize. */
-    void setMessage(const Message* message);
+    virtual ~AbstractMessageSerializer() = default;
 
-    SerializerState::Type serialize(nx::Buffer* const buffer, size_t* bytesWritten);
+    /** Set message to serialize. */
+    virtual void setMessage(const Message* message) = 0;
+
+    virtual SerializerState::Type serialize(
+        nx::Buffer* const buffer,
+        size_t* bytesWritten) = 0;
 };
 
 } // namespace server
