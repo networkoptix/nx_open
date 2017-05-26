@@ -62,8 +62,6 @@ public:
 
     virtual std::unique_ptr<AbstractStreamSocket> takeSocket() override
     {
-        NX_ASSERT(this->isInSelfAioThread());
-
         auto streamSocket = base_type::takeSocket();
         if (!m_dataToParse.isEmpty())
         {
