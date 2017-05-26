@@ -31,7 +31,11 @@ CdbNonceFetcher::CdbNonceFetcher(
     m_defaultGenerator(defaultGenerator),
     m_randomEngine(m_rd()),
     m_nonceTrailerRandomGenerator('a', 'z'),
-    m_timerManager(nx::utils::TimerManager::instance())
+    m_timerManager(nx::utils::TimerManager::instance()),
+    m_cloudUserInfoPool(
+        std::unique_ptr<AbstractCloudUserInfoPoolSupplier>(
+            new CloudUserInfoPoolSupplier(
+                cloudConnectionManager->commonModule())))
 {
     m_monotonicClock.restart();
 
@@ -51,6 +55,11 @@ CdbNonceFetcher::CdbNonceFetcher(
     }
 }
 
+const CloudUserInfoPool& CdbNonceFetcher::cloudUserInfoPool() const
+{
+    return m_cloudUserInfoPool;
+}
+
 CdbNonceFetcher::~CdbNonceFetcher()
 {
     directDisconnectAll();
@@ -68,7 +77,7 @@ QByteArray CdbNonceFetcher::generateNonce()
 {
     auto cloudPreviouslyProvidedNonce = m_cloudUserInfoPool.newestMostCommonNonce();
     if (cloudPreviouslyProvidedNonce)
-        return cloudPreviouslyProvidedNonce;
+        return *cloudPreviouslyProvidedNonce;
 
     if (!m_cloudConnectionManager->boundToCloud())
         return m_defaultGenerator->generateNonce();

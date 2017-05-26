@@ -5,17 +5,13 @@
 #include "cloud_user_info_pool.h"
 
 
-namespace detail {
-
 static const QString kCloudAuthInfoKey = lit("CloudAuthInfo");
 
 // CloudUserInfoPoolSupplier
-CloudUserInfoPoolSupplier::CloudUserInfoPoolSupplier(
-    QnCommonModule* commonModule,
-    AbstractCloudUserInfoPoolSupplierHandler* handler)
+CloudUserInfoPoolSupplier::CloudUserInfoPoolSupplier(QnCommonModule* commonModule)
     :
     QnCommonModuleAware(commonModule),
-    m_handler(handler)
+    m_pool(nullptr)
 {
     for (const auto& userResource: resourcePool()->getResources<QnUserResource>())
     {
@@ -25,6 +21,11 @@ CloudUserInfoPoolSupplier::CloudUserInfoPoolSupplier(
         reportInfoChanged(userResource->getName(), value);
     }
     connectToResourcePool();
+}
+
+void CloudUserInfoPoolSupplier::setPool(AbstractCloudUserInfoPool* pool)
+{
+    m_pool = pool;
 }
 
 CloudUserInfoPoolSupplier::~CloudUserInfoPoolSupplier()
@@ -67,7 +68,7 @@ void CloudUserInfoPoolSupplier::onNewResource(const QnResourcePtr& resource)
             {
                 NX_LOG(lit("[CloudUserInfo] User %1. CloudAuthInfo removed.")
                     .arg(resource->getName()), cl_logDEBUG1);
-                m_handler->userInfoRemoved(resource->getName().toUtf8().toLower());
+                m_pool->userInfoRemoved(resource->getName().toUtf8().toLower());
                 return;
             }
 
@@ -82,14 +83,14 @@ void CloudUserInfoPoolSupplier::reportInfoChanged(
     int64_t timestamp;
     nx::Buffer cloudNonce;
 
-    if (!deserialize(serializedValue, &timestamp, &cloudNonce))
+    if (!detail::deserialize(serializedValue, &timestamp, &cloudNonce))
     {
         NX_LOG(lit("[CloudUserInfo] User %1. Deserialization failed")
             .arg(userName), cl_logDEBUG1);
         return;
     }
 
-    m_handler->userInfoChanged(
+    m_pool->userInfoChanged(
         timestamp,
         userName.toUtf8().toLower(),
         cloudNonce);
@@ -97,12 +98,16 @@ void CloudUserInfoPoolSupplier::reportInfoChanged(
 
 void CloudUserInfoPoolSupplier::onRemoveResource(const QnResourcePtr& resource)
 {
-    m_handler->userInfoRemoved(resource->getName().toUtf8().toLower());
+    m_pool->userInfoRemoved(resource->getName().toUtf8().toLower());
 }
 
-} // namespace detail
-
 // CloudUserInfoPool
+CloudUserInfoPool::CloudUserInfoPool(std::unique_ptr<AbstractCloudUserInfoPoolSupplier> supplier):
+    m_supplier(std::move(supplier))
+{
+    m_supplier->setPool(this);
+}
+
 bool CloudUserInfoPool::authenticate(const nx_http::header::Authorization& authHeader) const
 {
     return true;
@@ -113,3 +118,13 @@ boost::optional<nx::Buffer> CloudUserInfoPool::newestMostCommonNonce() const
     return nx::Buffer();
 }
 
+void CloudUserInfoPool::userInfoChanged(
+    int64_t timestamp,
+    const nx::Buffer& userName,
+    const nx::Buffer& cloudNonce)
+{
+}
+
+void CloudUserInfoPool::userInfoRemoved(const nx::Buffer& userName)
+{
+}

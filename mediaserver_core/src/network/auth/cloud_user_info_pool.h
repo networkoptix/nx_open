@@ -8,6 +8,7 @@
 #include <nx/network/buffer.h>
 #include <nx/utils/thread/mutex.h>
 #include <nx/utils/safe_direct_connection.h>
+#include <core/resource/resource_fwd.h>
 #include <common/common_module_aware.h>
 
 namespace detail {
@@ -47,7 +48,18 @@ using TimestampToNonceUserCountMap = std::map<int64_t, NonceUserCount, std::grea
 
 bool deserialize(const QString& serializedValue, int64_t* timestamp, nx::Buffer* cloudNonce);
 
-class AbstractCloudUserInfoPoolSupplierHandler
+} // namespace detail
+
+class AbstractCloudUserInfoPool;
+
+class AbstractCloudUserInfoPoolSupplier
+{
+public:
+    virtual void setPool(AbstractCloudUserInfoPool* pool) = 0;
+    virtual ~AbstractCloudUserInfoPoolSupplier() {}
+};
+
+class AbstractCloudUserInfoPool
 {
 public:
     virtual void userInfoChanged(
@@ -56,16 +68,19 @@ public:
         const nx::Buffer& cloudNonce) = 0;
 
     virtual void userInfoRemoved(const nx::Buffer& userName) = 0;
+    virtual ~AbstractCloudUserInfoPool() {}
 };
 
 class CloudUserInfoPoolSupplier:
-    Qn::EnableSafeDirectConnection,
-    public QnCommonModuleAware
+    public QObject,
+    public Qn::EnableSafeDirectConnection,
+    public QnCommonModuleAware,
+    public AbstractCloudUserInfoPoolSupplier
 {
+    Q_OBJECT
 public:
-    CloudUserInfoPoolSupplier(
-        QnCommonModule* commonModule,
-        AbstractCloudUserInfoPoolSupplierHandler* handler);
+    virtual void setPool(AbstractCloudUserInfoPool* pool) override;
+    CloudUserInfoPoolSupplier(QnCommonModule* commonModule);
     ~CloudUserInfoPoolSupplier();
 
 private:
@@ -75,18 +90,14 @@ private:
     void connectToResourcePool();
 
 private:
-    AbstractCloudUserInfoPoolSupplierHandler* m_handler;
+    AbstractCloudUserInfoPool* m_pool;
 };
 
-} // namespace detail
 
-class CloudUserInfoPool:
-    public detail::AbstractCloudUserInfoPoolSupplierHandler
+class CloudUserInfoPool : public AbstractCloudUserInfoPool
 {
-
 public:
-    CloudUserInfoPool(QnCommonModule* commonModule);
-    ~CloudUserInfoPool();
+    CloudUserInfoPool(std::unique_ptr<AbstractCloudUserInfoPoolSupplier> supplier);
 
     bool authenticate(const nx_http::header::Authorization& authHeader) const;
     boost::optional<nx::Buffer> newestMostCommonNonce() const;
@@ -101,6 +112,7 @@ private:
 
 
 private:
+    std::unique_ptr<AbstractCloudUserInfoPoolSupplier> m_supplier;
     detail::UserNonceToResponseMap m_userNonceToResponse;
     detail::TimestampToNonceUserCountMap m_timestampToNonceUserCount;
     QnMutex m_mutex;

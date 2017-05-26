@@ -56,6 +56,9 @@ public:
         nx_http::BufferType* const cloudNonce,
         nx_http::BufferType* const nonceTrailer);
 
+    const CloudUserInfoPool& cloudUserInfoPool() const;
+
+
 private:
     struct NonceCtx
     {

@@ -54,6 +54,7 @@ public:
 
     void clear();
 
+
 private:
     struct CloudAuthenticationData
     {
@@ -82,7 +83,6 @@ private:
     QElapsedTimer m_monotonicClock;
     /** set<pair<username, nonce>, auth_data> */
     std::set<std::pair<nx_http::StringType, nx_http::BufferType>> m_requestInProgress;
-    CloudUserInfoPool m_cloudUserInfoPool;
 
     void removeExpiredRecordsFromCache(QnMutexLockerBase* const lk);
     QnUserResourcePtr getMappedLocalUserForCloudCredentials(
