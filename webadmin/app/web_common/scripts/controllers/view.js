@@ -9,10 +9,16 @@ angular.module('nxCommon').controller('ViewCtrl',
             High: 'hi',
             Low: 'lo'
         };
+
+        if($routeParams.systemId){
+            systemAPI = systemAPI($routeParams.systemId);
+        }
+        $scope.systemAPI = systemAPI;
+
         $scope.debugMode = Config.allowDebugMode;
         $scope.session = $sessionStorage;
         $scope.storage = $localStorage;
-        $scope.camerasProvider = camerasProvider.getProvider();
+        $scope.camerasProvider = camerasProvider.getProvider(systemAPI);
         $scope.storage.serverStates = $scope.storage.serverStates || {};
         
         $scope.playerApi = false;
