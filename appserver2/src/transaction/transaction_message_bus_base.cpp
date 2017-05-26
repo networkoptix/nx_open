@@ -21,6 +21,7 @@ QnTransactionMessageBusBase::QnTransactionMessageBusBase(
     m_localPeerType(peerType),
     m_mutex(QnMutex::Recursive)
 {
+    qRegisterMetaType<Qn::PeerType>();
     moveToThread(m_thread);
 }
 
