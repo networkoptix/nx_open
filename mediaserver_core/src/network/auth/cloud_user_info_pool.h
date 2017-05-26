@@ -25,9 +25,9 @@ using UserNonceToResponseMap = std::unordered_map<UserNonce, nx::Buffer>;
 namespace std {
 
 template<>
-struct Hash<detail::UserNonce>
+struct hash<detail::UserNonce>
 {
-    size_t operator()(const detail::UserNonce& userNonce)
+    size_t operator()(const detail::UserNonce& userNonce) const
     {
         return qHash(userNonce.userName) ^ qHash(userNonce.cloudNonce);
     }
@@ -43,7 +43,9 @@ struct NonceUserCount
     size_t userCount;
 };
 
-using TimestampToNonceUserCountMap = std::map<int64_t, NonceUserCount, std::greater<>>;
+using TimestampToNonceUserCountMap = std::map<int64_t, NonceUserCount, std::greater<int64_t>>;
+
+bool deserialize(const QString& serializedValue, int64_t* timestamp, nx::Buffer* cloudNonce);
 
 class AbstractCloudUserInfoPoolSupplierHandler
 {
@@ -69,13 +71,14 @@ public:
 private:
     void onNewResource(const QnResourcePtr& resource);
     void onRemoveResource(const QnResourcePtr& resource);
-    void reportInfoChanged(const QByteArray& serializedValue);
+    void reportInfoChanged(const QString& userName, const QString& serializedValue);
+    void connectToResourcePool();
 
 private:
     AbstractCloudUserInfoPoolSupplierHandler* m_handler;
 };
 
-}
+} // namespace detail
 
 class CloudUserInfoPool:
     public detail::AbstractCloudUserInfoPoolSupplierHandler
@@ -85,7 +88,7 @@ public:
     CloudUserInfoPool(QnCommonModule* commonModule);
     ~CloudUserInfoPool();
 
-    bool authenticate(const nx::http::header::Authorization& authHeader) const;
+    bool authenticate(const nx_http::header::Authorization& authHeader) const;
     boost::optional<nx::Buffer> newestMostCommonNonce() const;
 
 private:
