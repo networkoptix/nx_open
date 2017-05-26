@@ -1,6 +1,6 @@
 set(CMAKE_SYSTEM_NAME Linux)
-set(CMAKE_SYSTEM_PROCESSOR armv7)
-set(box bpi)
+set(CMAKE_SYSTEM_PROCESSOR arm)
+set(box "bpi")
 
 set(_packages_dir "$ENV{environment}/packages/bpi")
 
