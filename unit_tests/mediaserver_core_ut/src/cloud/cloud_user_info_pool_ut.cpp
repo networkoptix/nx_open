@@ -5,12 +5,12 @@
 TEST(CloudUserInfoPool, deserialize)
 {
     const QString kSimpleString = 
-        lit("{\"timestamp\":1234567,\"cloudNonce\":\"abcdef0123456\", \"partialResponse\"=\"response\"}");
+        lit("{\"timestamp\":1234567,\"cloudNonce\":\"abcdef0123456\",\"partialResponse\"=\"response\"}");
 
     int64_t ts;
     nx::Buffer nonce;
     nx::Buffer response;
-    detail::deserialize(kSimpleString, &ts, &nonce, &response);
+    ASSERT_TRUE(detail::deserialize(kSimpleString, &ts, &nonce, &response));
 
 
     ASSERT_EQ(ts, 1234567);
@@ -59,14 +59,14 @@ protected:
 
 TEST_F(Pool, main)
 {
-    supplier->setUserInfo(1, "vasya", "nonce1");
-    supplier->setUserInfo(2, "vasya", "nonce2");
-    supplier->setUserInfo(2, "petya", "nonce2");
-    supplier->setUserInfo(3, "petya", "nonce3");
+    supplier->setUserInfo(1, "vasya", "nonce1", "responseVasya1");
+    supplier->setUserInfo(2, "vasya", "nonce2", "responseVasya2");
+    supplier->setUserInfo(2, "petya", "nonce2", "responsePetya1");
+    supplier->setUserInfo(3, "petya", "nonce3", "responsePetya2");
 
     auto nonce = userInfoPool.newestMostCommonNonce();
     ASSERT_TRUE(nonce);
-    ASSERT_EQ(nonce, "nonce2");
+    ASSERT_EQ(*nonce, nx::Buffer("nonce2"));
 }
 
 }
