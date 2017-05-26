@@ -5,7 +5,7 @@
 #include <QtCore/QCoreApplication>
 #include <QtCore/QTime>
 
-#include <nx/network/http/httpclient.h>
+#include <nx/network/http/http_client.h>
 #include <nx/utils/log/log.h>
 
 namespace {

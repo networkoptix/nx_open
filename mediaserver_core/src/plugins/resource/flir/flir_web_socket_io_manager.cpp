@@ -15,7 +15,7 @@
 #include <core/resource_management/resource_data_pool.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/log/to_string.h>
-#include <nx/network/http/httpclient.h>
+#include <nx/network/http/http_client.h>
 
 namespace {
 using ErrorSignalType = void(QWebSocket::*)(QAbstractSocket::SocketError);

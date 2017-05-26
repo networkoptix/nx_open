@@ -168,8 +168,7 @@ void QnResourcePool::removeResources(const QnResourceList& resources)
         disconnect(resource, nullptr, this, nullptr);
 
         resource->setRemovedFromPool(true);
-        if (resource->resourcePool() != this)
-            qnWarning("Given resource '%1' is not in the pool", resource->metaObject()->className());
+        NX_EXPECT(resource->resourcePool() == this);
 
 #ifdef DESKTOP_CAMERA_DEBUG
         if (resource.dynamicCast<QnNetworkResource>() &&
@@ -177,10 +176,6 @@ void QnResourcePool::removeResources(const QnResourceList& resources)
                 qDebug() << "desktop camera removed from resource pool" << resource->getName() << resource.dynamicCast<QnNetworkResource>()->getPhysicalId();
         }
 #endif
-
-        //const QString& uniqueId = resource->getUniqueId();
-        //if( m_resources.remove(uniqueId) != 0 )
-        //    removedResources.append(resource);
 
         //have to remove by id, since uniqueId can be MAC and, as a result, not unique among friend and foreign resources
         QnUuid resId = resource->getId();

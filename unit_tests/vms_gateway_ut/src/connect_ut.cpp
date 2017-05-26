@@ -12,7 +12,7 @@ namespace gateway {
 namespace test {
 
 class VmsGatewayConnectTest:
-    public VmsGatewayFunctionalTest
+    public BasicComponentTest
 {
 public:
     VmsGatewayConnectTest():

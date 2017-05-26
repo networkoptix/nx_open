@@ -96,12 +96,6 @@ enum IDType
     DropResourcesAction,
 
     /**
-     * Drops provided resources on the workbench, opening them in a new
-     * layout if necessary.
-     */
-    DropResourcesIntoNewLayoutAction,
-
-    /**
      * Drops provided serialized resources on the current layout after
      * connection to Server was established.
      *
@@ -437,9 +431,9 @@ enum IDType
     OpenInCurrentLayoutAction,
 
     /**
-     * Opens selected resources in a new layout.
+     * Opens selected resources in a new tab.
      */
-    OpenInNewLayoutAction,
+    OpenInNewTabAction,
 
     /**
      * Opens selected resources in the Alarm Layout.
@@ -452,21 +446,6 @@ enum IDType
     OpenInNewWindowAction,
 
     /**
-     * Opens a single layout.
-     */
-    OpenSingleLayoutAction,
-
-    /**
-     * Opens multiple layouts.
-     */
-    OpenMultipleLayoutsAction,
-
-    /**
-     * Opens given layouts.
-     */
-    OpenAnyNumberOfLayoutsAction,
-
-    /**
      * Opens given videowall in review mode.
      */
     OpenVideoWallReviewAction,
@@ -475,16 +454,6 @@ enum IDType
      * Menu containing all layouts belonging to the current user.
      */
     OpenCurrentUserLayoutMenu,
-
-    /**
-     * Opens selected layouts in a new window.
-     */
-    OpenSingleLayoutInNewWindowAction,
-
-    /**
-     * Opens selected layouts in a new window.
-     */
-    OpenMultiLayoutInNewWindowAction,
 
     /**
      * Opens current layout in a new window.

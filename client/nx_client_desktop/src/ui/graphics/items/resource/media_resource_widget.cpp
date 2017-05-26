@@ -744,8 +744,11 @@ void QnMediaResourceWidget::setTextOverlayParameters(const QnUuid& id, bool visi
 
 void QnMediaResourceWidget::setupHud()
 {
+    static const int kScrollLineHeight = 8;
+
     m_triggersContainer = new QnScrollableItemsWidget(m_hudOverlay->right());
     m_triggersContainer->setAlignment(Qt::AlignRight | Qt::AlignBottom);
+    m_triggersContainer->setLineHeight(kScrollLineHeight);
 
     qreal right = 0.0;
     m_hudOverlay->content()->getContentsMargins(nullptr, nullptr, &right, nullptr);
@@ -760,9 +763,11 @@ void QnMediaResourceWidget::setupHud()
 
     m_textOverlayWidget = new QnScrollableTextItemsWidget(m_compositeOverlay);
     m_textOverlayWidget->setAlignment(Qt::AlignRight | Qt::AlignBottom);
+    m_textOverlayWidget->setLineHeight(kScrollLineHeight);
 
     m_bookmarksContainer = new QnScrollableTextItemsWidget(m_compositeOverlay);
     m_bookmarksContainer->setAlignment(Qt::AlignRight | Qt::AlignBottom);
+    m_bookmarksContainer->setLineHeight(kScrollLineHeight);
     m_bookmarksContainer->hide();
 
     m_compositeOverlay->addWidget(m_textOverlayWidget);

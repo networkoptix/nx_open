@@ -11,7 +11,7 @@
 #include <nx/fusion/serialization/json.h>
 #include <nx/fusion/serialization/lexical.h>
 #include <nx/network/http/auth_tools.h>
-#include <nx/network/http/httpclient.h>
+#include <nx/network/http/http_client.h>
 #include <nx/network/socket_global.h>
 #include <nx/network/socket.h>
 #include <nx/utils/random.h>

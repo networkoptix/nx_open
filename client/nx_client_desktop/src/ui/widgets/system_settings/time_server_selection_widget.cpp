@@ -18,6 +18,7 @@
 #include <ui/help/help_topics.h>
 #include <ui/help/help_topic_accessor.h>
 
+#include <nx/utils/string.h>
 #include <utils/common/synctime.h>
 
 //#define QN_TIME_SERVER_SELECTION_DEBUG
@@ -38,10 +39,10 @@ static const int kZoneFontSizePixels = 14;
 static const int kZoneFontWeight = QFont::Normal;
 static const int kMinimumDateTimeWidth = 84;
 
-class QnSortServersByPriorityProxyModel: public QSortFilterProxyModel
+class QnSortServersByNameProxyModel: public QSortFilterProxyModel
 {
 public:
-    explicit QnSortServersByPriorityProxyModel(QObject* parent = nullptr):
+    explicit QnSortServersByNameProxyModel(QObject* parent = nullptr):
         QSortFilterProxyModel(parent)
     {
     }
@@ -49,7 +50,13 @@ public:
 protected:
     virtual bool lessThan(const QModelIndex& left, const QModelIndex& right) const
     {
-        return left.data(Qn::PriorityRole).toULongLong() < right.data(Qn::PriorityRole).toULongLong();
+        const auto leftStr = left.sibling(left.row(), QnTimeServerSelectionModel::NameColumn)
+            .data(Qt::DisplayRole).toString();
+
+        const auto rightStr = right.sibling(left.row(), QnTimeServerSelectionModel::NameColumn)
+            .data(Qt::DisplayRole).toString();
+
+        return nx::utils::naturalStringCompare(leftStr, rightStr, Qt::CaseInsensitive) < 0;
     }
 };
 
@@ -90,15 +97,6 @@ QnTimeServerSelectionWidget::QnTimeServerSelectionWidget(QWidget *parent /* = NU
     ui->setupUi(this);
     setHelpTopic(this, Qn::Administration_TimeSynchronization_Help);
 
-    ui->syncWithInternetCheckBox->setProperty(style::Properties::kCheckBoxAsButton, true);
-    ui->syncWithInternetCheckBox->setForegroundRole(QPalette::ButtonText);
-    connect(ui->syncWithInternetCheckBox, &QAbstractButton::toggled, this,
-        [this](bool checked)
-        {
-            ui->serversTable->setEnabled(!checked);
-        });
-    ui->serversTable->setEnabled(!ui->syncWithInternetCheckBox->isChecked());
-
     QFont font;
     font.setPixelSize(kTimeFontSizePixels);
     font.setWeight(kTimeFontWeight);
@@ -115,7 +113,7 @@ QnTimeServerSelectionWidget::QnTimeServerSelectionWidget(QWidget *parent /* = NU
     ui->zoneLabel->setFont(font);
     ui->zoneLabel->setForegroundRole(QPalette::Light);
 
-    QnSortServersByPriorityProxyModel* sortModel = new QnSortServersByPriorityProxyModel(this);
+    auto* sortModel = new QnSortServersByNameProxyModel(this);
     sortModel->setSourceModel(m_model);
 
     ui->serversTable->setModel(sortModel);
@@ -146,6 +144,31 @@ QnTimeServerSelectionWidget::QnTimeServerSelectionWidget(QWidget *parent /* = NU
     timer->setSingleShot(false);
     connect(timer, &QTimer::timeout, this, updateTime);
     timer->start();
+
+    const auto onSyncWithInternetCheckboxToggled =
+        [this](bool checked)
+        {
+            ui->serversTable->setColumnHidden(QnTimeServerSelectionModel::CheckboxColumn,
+                checked);
+
+            if (!checked && m_model->selectedServer().isNull())
+            {
+                auto model = ui->serversTable->model();
+                const auto topIndex = model->index(0, QnTimeServerSelectionModel::CheckboxColumn);
+                model->setData(topIndex, Qt::Checked, Qt::CheckStateRole);
+            }
+
+            updateDescription();
+            updateAlert();
+        };
+
+    connect(ui->syncWithInternetCheckBox, &QAbstractButton::toggled,
+        this, onSyncWithInternetCheckboxToggled);
+
+    connect(m_model, &QnTimeServerSelectionModel::hasInternetAccessChanged,
+        this, &QnTimeServerSelectionWidget::updateAlert);
+
+    onSyncWithInternetCheckboxToggled(ui->syncWithInternetCheckBox->isChecked());
 }
 
 QnTimeServerSelectionWidget::~QnTimeServerSelectionWidget()
@@ -166,6 +189,12 @@ void QnTimeServerSelectionWidget::applyChanges()
     if (!connection)
         return;
 
+    qnGlobalSettings->setSynchronizingTimeWithInternet(ui->syncWithInternetCheckBox->isChecked());
+    qnGlobalSettings->synchronizeNow();
+
+    if (ui->syncWithInternetCheckBox->isChecked())
+        return;
+
     PRINT_DEBUG("forcing selected server to " + m_model->selectedServer().toByteArray());
     auto timeManager = connection->getTimeManager(Qn::kSystemAccess);
     timeManager->forcePrimaryTimeServer(m_model->selectedServer(), this,
@@ -175,9 +204,6 @@ void QnTimeServerSelectionWidget::applyChanges()
             Q_UNUSED(errCode);  //suppress warning in the release code
             PRINT_DEBUG("forcing selected server finished with result " + ec2::toString(errCode).toUtf8());
         });
-
-    qnGlobalSettings->setSynchronizingTimeWithInternet(ui->syncWithInternetCheckBox->isChecked());
-    qnGlobalSettings->synchronizeNow();
 }
 
 bool QnTimeServerSelectionWidget::hasChanges() const
@@ -227,4 +253,18 @@ void QnTimeServerSelectionWidget::updateTime()
     ui->zoneLabel->setText(syncTime.timeZoneAbbreviation());
 
     ui->stackedWidget->setCurrentWidget(ui->timePage);
+}
+
+void QnTimeServerSelectionWidget::updateDescription()
+{
+    ui->descriptionLabel->setText(ui->syncWithInternetCheckBox->isChecked()
+        ? tr("System time is synchronized with the Internet and is independent from server local times.")
+        : tr("System time is synchronized with selected server local time and is independent from other servers."));
+}
+
+void QnTimeServerSelectionWidget::updateAlert()
+{
+    ui->alertBar->setText(ui->syncWithInternetCheckBox->isChecked() && !m_model->hasInternetAccess()
+        ? tr("No server has Internet access. Time is not being synchronized.")
+        : QString());
 }

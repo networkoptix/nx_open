@@ -7,7 +7,7 @@
 
 #include <gtest/gtest.h>
 
-#include <nx/network/http/httpclient.h>
+#include <nx/network/http/http_client.h>
 #include <nx/utils/log/log_message.h>
 #include <nx/utils/random.h>
 #include <nx/utils/system_utils.h>
