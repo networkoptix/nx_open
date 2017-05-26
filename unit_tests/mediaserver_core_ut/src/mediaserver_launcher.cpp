@@ -1,6 +1,6 @@
 #include "mediaserver_launcher.h"
 
-#include <nx/network/http/httpclient.h>
+#include <nx/network/http/http_client.h>
 #include <nx/utils/random.h>
 
 #include <media_server_process.h>

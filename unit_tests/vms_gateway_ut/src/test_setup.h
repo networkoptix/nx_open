@@ -9,7 +9,7 @@ namespace cloud {
 namespace gateway {
 namespace test {
 
-class VmsGatewayFunctionalTest:
+class BasicComponentTest:
     public nx::cloud::gateway::VmsGatewayFunctionalTest,
     public ::testing::Test
 {

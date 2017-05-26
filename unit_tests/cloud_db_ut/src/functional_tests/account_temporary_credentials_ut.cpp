@@ -14,7 +14,7 @@
 #include <nx/network/app_info.h>
 #include <nx/network/http/auth_tools.h>
 #include <nx/network/http/asynchttpclient.h>
-#include <nx/network/http/httpclient.h>
+#include <nx/network/http/http_client.h>
 #include <nx/network/http/server/fusion_request_result.h>
 #include <nx/utils/test_support/utils.h>
 #include <utils/common/app_info.h>

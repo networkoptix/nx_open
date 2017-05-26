@@ -6,7 +6,7 @@
 
 #include <common/common_globals.h>
 #include <nx/network/http/asynchttpclient.h>
-#include <nx/network/http/httpclient.h>
+#include <nx/network/http/http_client.h>
 #include <nx/utils/random.h>
 
 class RequestsGenerator

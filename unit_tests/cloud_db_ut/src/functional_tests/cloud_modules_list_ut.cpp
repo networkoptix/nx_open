@@ -4,7 +4,7 @@
 #include <list>
 
 #include <nx/network/cloud/cloud_module_url_fetcher.h>
-#include <nx/network/http/httpclient.h>
+#include <nx/network/http/http_client.h>
 #include <nx/utils/std/cpp14.h>
 #include <nx/utils/test_support/test_with_temporary_directory.h>
 #include <nx/utils/test_support/utils.h>

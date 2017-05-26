@@ -60,7 +60,7 @@ public:
 
     /**
      * Retrieve the currently accumulated message body, removing it from the internal buffer.
-     * Block while the internal message body buffer is empty. To read the whole message body,
+     * Blocks while the internal message body buffer is empty. To read the whole message body,
      * should be called in a loop while not eof().
      */
     BufferType fetchMessageBodyBuffer();

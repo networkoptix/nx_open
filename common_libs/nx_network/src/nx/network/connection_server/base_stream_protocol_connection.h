@@ -208,14 +208,13 @@ private:
         {
         }
 
+        SendTask(const SendTask&) = delete;
+        SendTask& operator=(const SendTask&) = delete;
+
         boost::optional<MessageType> msg;
         boost::optional<nx::Buffer> buf;
         std::function<void( SystemError::ErrorCode )> handler;
         bool asyncSendIssued;
-
-    private:
-        SendTask( const SendTask& );
-        SendTask& operator=( const SendTask& );
     };
 
     MessageType m_request;
@@ -227,14 +226,12 @@ private:
     std::deque<SendTask> m_sendQueue;
     nx::utils::ObjectDestructionFlag m_connectionFreedFlag;
 
-
     /**
      * @param buf Source buffer.
      * @param pos Position inside source buffer. Moved by number of bytes read.
      */
     bool invokeMessageParser(const nx::Buffer& buf, size_t* const pos)
     {
-        //parsing message
         size_t bytesProcessed = 0;
         switch (m_parser.parse(*pos > 0 ? buf.mid((int)*pos) : buf, &bytesProcessed))
         {
@@ -375,7 +372,7 @@ public:
     }
 
     /**
-     * handler will receive all incoming messages.
+     * @param handler Receives all incoming messages.
      * NOTE: It is required to call BaseStreamProtocolConnection::startReadingConnection
      *   to start receiving messages.
      */
