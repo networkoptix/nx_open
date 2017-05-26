@@ -29,6 +29,22 @@ class AbstractAuthenticationManager;
 
 } // namespace server
 
+namespace deprecated {
+
+using AsyncMessagePipeline =
+    nx::network::server::BaseStreamProtocolConnectionEmbeddable<
+        nx_http::Message,
+        nx_http::deprecated::MessageParser,
+        nx_http::MessageSerializer>;
+
+} // namespace deprecated
+
+using AsyncMessagePipeline =
+    nx::network::server::BaseStreamProtocolConnectionEmbeddable<
+        nx_http::Message,
+        nx_http::MessageParser,
+        nx_http::MessageSerializer>;
+
 class NX_NETWORK_API HttpServerConnection;
 class AbstractMessageDispatcher;
 
@@ -52,12 +68,6 @@ using ResponseIsReadyHandler =
 template<typename ConnectionType> using BaseConnection = 
     nx::network::server::BaseStreamProtocolConnection<
         ConnectionType,
-        nx_http::Message,
-        nx_http::deprecated::MessageParser,
-        nx_http::MessageSerializer>;
-
-using AsyncMessagePipeline =
-    nx::network::server::BaseStreamProtocolConnectionEmbeddable<
         nx_http::Message,
         nx_http::deprecated::MessageParser,
         nx_http::MessageSerializer>;

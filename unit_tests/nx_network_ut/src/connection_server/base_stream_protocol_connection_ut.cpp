@@ -112,11 +112,7 @@ static const HttpMessageWithoutBody kHttpMessageWithoutBody;
 
 //-------------------------------------------------------------------------------------------------
 
-using TestHttpConnection = 
-    nx::network::server::BaseStreamProtocolConnectionEmbeddable<
-        nx_http::Message,
-        nx_http::MessageParser,
-        nx_http::MessageSerializer>;
+using TestHttpConnection = nx_http::AsyncMessagePipeline;
 
 } // namespace
 
