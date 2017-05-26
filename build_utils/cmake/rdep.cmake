@@ -1,4 +1,4 @@
-set(RDEP_DIR "${PROJECT_SOURCE_DIR}/build_utils/python" CACHE PATH "Path to rdep scripts")
+set(RDEP_DIR "${CMAKE_SOURCE_DIR}/build_utils/python" CACHE PATH "Path to rdep scripts")
 mark_as_advanced(RDEP_DIR)
 set(PACKAGES_DIR "$ENV{environment}/packages" CACHE STRING "Path to local rdep repository")
 mark_as_advanced(PACKAGES_DIR)

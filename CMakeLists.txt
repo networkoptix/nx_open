@@ -18,8 +18,14 @@ set(CMAKE_BUILD_TYPE "Debug" CACHE STRING
 set(target "" CACHE STRING "Target platform.")
 set(box "none")
 
+# Early loading rdep to download a toolchain if needed.
+include(build_utils/cmake/find_python.cmake)
+include(build_utils/cmake/rdep.cmake)
+nx_rdep_configure()
+
 if(target)
     set(CMAKE_TOOLCHAIN_FILE "${CMAKE_CURRENT_LIST_DIR}/cmake/toolchain/${target}.cmake")
+    include(cmake/sync_toolchain.cmake)
 endif()
 
 project(vms VERSION 3.1.0)
@@ -37,16 +43,11 @@ list(APPEND CMAKE_MODULE_PATH
 include(CMakeParseArguments)
 include(target_detection)
 include(utils)
-include(find_python)
 include(find_sources)
 include(qrc_utils)
 include(precompiled_header)
-include(rdep)
 include(mercurial)
 include(project_utils)
-
-find_python()
-nx_rdep_configure()
 
 include(android-ndk-workaround)
 
