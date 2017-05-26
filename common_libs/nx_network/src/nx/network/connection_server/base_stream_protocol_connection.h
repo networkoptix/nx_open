@@ -223,7 +223,7 @@ private:
     MessageType m_message;
     ParserType m_parser;
     SerializerType m_serializer;
-    SerializerState::Type m_serializerState;
+    SerializerState m_serializerState;
     nx::Buffer m_writeBuffer;
     std::function<void(SystemError::ErrorCode)> m_sendCompletionHandler;
     std::deque<SendTask> m_sendQueue;

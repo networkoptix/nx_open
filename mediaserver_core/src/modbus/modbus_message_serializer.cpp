@@ -17,7 +17,7 @@ void ModbusMessageSerializer::setMessage(const ModbusMessage* message)
     m_message = message;
 }
 
-nx::network::server::SerializerState::Type ModbusMessageSerializer::serialize(nx::Buffer* const buffer, size_t* const bytesWritten)
+nx::network::server::SerializerState ModbusMessageSerializer::serialize(nx::Buffer* const buffer, size_t* const bytesWritten)
 {
     if (serializeHeader(buffer) == nx::network::server::SerializerState::needMoreBufferSpace)
         return nx::network::server::SerializerState::needMoreBufferSpace;
@@ -32,7 +32,7 @@ nx::Buffer ModbusMessageSerializer::serialized(const ModbusMessage& message)
     return message.encode();
 }
 
-nx::network::server::SerializerState::Type ModbusMessageSerializer::serializeHeader(nx::Buffer* const buffer)
+nx::network::server::SerializerState ModbusMessageSerializer::serializeHeader(nx::Buffer* const buffer)
 {
     auto bufferFreeSpace = buffer->capacity() - buffer->size();
     if (bufferFreeSpace < ModbusMessage::kHeaderSize)
@@ -44,7 +44,7 @@ nx::network::server::SerializerState::Type ModbusMessageSerializer::serializeHea
     return nx::network::server::SerializerState::done;
 }
 
-nx::network::server::SerializerState::Type ModbusMessageSerializer::serializeData(nx::Buffer* const buffer)
+nx::network::server::SerializerState ModbusMessageSerializer::serializeData(nx::Buffer* const buffer)
 {
     auto bufferFreeSpace = buffer->capacity() - buffer->size();
     if (bufferFreeSpace < m_message->data.size())

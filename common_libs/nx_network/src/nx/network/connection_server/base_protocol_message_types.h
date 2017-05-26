@@ -20,12 +20,11 @@ enum class ParserState
     failed,
 };
 
-namespace SerializerState {
-    using Type = int;
-
-    static const int needMoreBufferSpace = 1;
-    static const int done = 2;
-}; // namespace SerializerState
+enum class SerializerState
+{
+    needMoreBufferSpace = 1,
+    done = 2,
+};
     
 /**
  * Demonstrates API of message parser.
@@ -75,7 +74,7 @@ public:
     /** Set message to serialize. */
     virtual void setMessage(const Message* message) = 0;
 
-    virtual SerializerState::Type serialize(
+    virtual SerializerState serialize(
         nx::Buffer* const buffer,
         size_t* bytesWritten) = 0;
 };
