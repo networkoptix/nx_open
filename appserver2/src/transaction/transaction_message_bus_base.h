@@ -72,8 +72,8 @@ namespace ec2
         void setTimeSyncManager(TimeSynchronizationManager* timeSyncManager);
 
     signals:
-        void peerFound(ec2::ApiPeerData data);
-        void peerLost(ec2::ApiPeerData data);
+        void peerFound(QnUuid data, Qn::PeerType peerType);
+        void peerLost(QnUuid data, Qn::PeerType peerType);
         void remotePeerUnauthorized(QnUuid id);
     protected:
         bool readApiFullInfoData(

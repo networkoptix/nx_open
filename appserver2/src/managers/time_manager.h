@@ -332,7 +332,7 @@ private:
 
 private slots:
     void onNewConnectionEstablished(QnTransactionTransportBase* transport );
-    void onPeerLost(ApiPeerData peer);
+    void onPeerLost(QnUuid peer, Qn::PeerType peerType);
     void onDbManagerInitialized();
     void onTimeSynchronizationSettingsChanged();
 };

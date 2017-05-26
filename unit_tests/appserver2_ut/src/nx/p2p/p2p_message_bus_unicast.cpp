@@ -73,7 +73,7 @@ protected:
         QObject::connect(
             bus,
             &ec2::QnTransactionMessageBusBase::peerFound,
-            [this](const ApiPeerData& peer)
+            [this](QnUuid peer, Qn::PeerType)
         {
             auto result = m_alivePeers.insert(peer);
         }
@@ -103,7 +103,7 @@ protected:
     }
 
 private:
-    std::set<ApiPersistentIdData> m_alivePeers;
+    std::set<QnUuid> m_alivePeers;
     std::atomic<int> m_actionReceived{};
 };
 

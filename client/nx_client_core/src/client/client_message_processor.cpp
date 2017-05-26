@@ -180,9 +180,9 @@ void QnClientMessageProcessor::updateResource(const QnResourcePtr &resource, ec2
     }
 }
 
-void QnClientMessageProcessor::handleRemotePeerFound(const ec2::ApiPeerData& peer)
+void QnClientMessageProcessor::handleRemotePeerFound(QnUuid peer, Qn::PeerType peerType)
 {
-    base_type::handleRemotePeerFound(peer);
+    base_type::handleRemotePeerFound(peer, peerType);
 
     /*
      * Avoiding multiple connectionOpened() if client was on breakpoint or
@@ -197,7 +197,7 @@ void QnClientMessageProcessor::handleRemotePeerFound(const ec2::ApiPeerData& pee
         return;
     }
 
-    if (peer.id != commonModule()->remoteGUID())
+    if (peer != commonModule()->remoteGUID())
         return;
 
     trace(lit("peer found, state -> Connected"));
@@ -206,9 +206,9 @@ void QnClientMessageProcessor::handleRemotePeerFound(const ec2::ApiPeerData& pee
     emit connectionOpened();
 }
 
-void QnClientMessageProcessor::handleRemotePeerLost(const ec2::ApiPeerData& peer)
+void QnClientMessageProcessor::handleRemotePeerLost(QnUuid peer, Qn::PeerType peerType)
 {
-    base_type::handleRemotePeerLost(peer);
+    base_type::handleRemotePeerLost(peer, peerType);
 
     if (commonModule()->remoteGUID().isNull())
     {
@@ -216,7 +216,7 @@ void QnClientMessageProcessor::handleRemotePeerLost(const ec2::ApiPeerData& peer
         return;
     }
 
-    if (peer.id != commonModule()->remoteGUID())
+    if (peer != commonModule()->remoteGUID())
         return;
 
     /*

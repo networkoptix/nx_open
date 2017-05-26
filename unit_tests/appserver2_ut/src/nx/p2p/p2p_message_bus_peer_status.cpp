@@ -42,7 +42,7 @@ protected:
     {
         auto bus = dynamic_cast<MessageBus*>(m_servers[index]->moduleInstance()->ecConnection()->messageBus());
         ApiPersistentIdData lostPeer = bus->localPeer();
-        return m_alivePeers.find(lostPeer) == m_alivePeers.end();
+        return m_alivePeers.find(lostPeer.id) == m_alivePeers.end();
     }
     bool isPeerAlive(int index)
     {
@@ -76,7 +76,7 @@ protected:
         QObject::connect(
             bus,
             &ec2::QnTransactionMessageBusBase::peerFound,
-            [this](const ApiPeerData& peer)
+            [this](QnUuid peer, Qn::PeerType)
         {
             auto result = m_alivePeers.insert(peer);
             ASSERT_TRUE(result.second);
@@ -85,7 +85,7 @@ protected:
         QObject::connect(
             bus,
             &ec2::QnTransactionMessageBusBase::peerLost,
-            [this](const ApiPeerData& peer)
+            [this](QnUuid peer, Qn::PeerType)
         {
             int oldSize = m_alivePeers.size();
             m_alivePeers.erase(peer);
@@ -115,7 +115,7 @@ protected:
         waitForCondition(std::bind(&MessageBusOnlinePeers::isPeerLost, this, 3));
     }
 private:
-    std::set<ApiPersistentIdData> m_alivePeers;
+    std::set<QnUuid> m_alivePeers;
 };
 
 TEST_F(MessageBusOnlinePeers, rhomConnect)

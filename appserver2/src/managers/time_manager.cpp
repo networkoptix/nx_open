@@ -806,12 +806,12 @@ void TimeSynchronizationManager::onNewConnectionEstablished( QnTransactionTransp
     }
 }
 
-void TimeSynchronizationManager::onPeerLost(ApiPeerData peer)
+void TimeSynchronizationManager::onPeerLost(QnUuid peer, Qn::PeerType peerType)
 {
-    stopSynchronizingTimeWithPeer(peer.id);
+    stopSynchronizingTimeWithPeer(peer);
 
     QnMutexLocker lock( &m_mutex );
-    m_systemTimeByPeer.erase(peer.id);
+    m_systemTimeByPeer.erase(peer);
 }
 
 void TimeSynchronizationManager::startSynchronizingTimeWithPeer(

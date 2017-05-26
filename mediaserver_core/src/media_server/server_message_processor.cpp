@@ -134,29 +134,30 @@ void QnServerMessageProcessor::disconnectFromConnection(const ec2::AbstractECCon
     connection->getMiscNotificationManager()->disconnect(this);
 }
 
-void QnServerMessageProcessor::handleRemotePeerFound(const ec2::ApiPeerData &peer)
+void QnServerMessageProcessor::handleRemotePeerFound(QnUuid peer, Qn::PeerType peerType)
 {
-    base_type::handleRemotePeerFound(peer);
-    QnResourcePtr res = resourcePool()->getResourceById(peer.id);
+    base_type::handleRemotePeerFound(peer, peerType);
+    QnResourcePtr res = resourcePool()->getResourceById(peer);
     if (res)
         res->setStatus(Qn::Online);
     else
-        m_delayedOnlineStatus << peer.id;
+        m_delayedOnlineStatus << peer;
 }
 
-void QnServerMessageProcessor::handleRemotePeerLost(const ec2::ApiPeerData& peer)
+void QnServerMessageProcessor::handleRemotePeerLost(QnUuid peer, Qn::PeerType peerType)
 {
-    base_type::handleRemotePeerLost(peer);
-    QnResourcePtr res = resourcePool()->getResourceById(peer.id);
+    base_type::handleRemotePeerLost(peer, peerType);
+    QnResourcePtr res = resourcePool()->getResourceById(peer);
     if (res) {
         res->setStatus(Qn::Offline);
-        if (peer.peerType != Qn::PT_Server) {
+        if (peerType != Qn::PT_Server) 
+        {
             // This server hasn't own DB
             for(const QnResourcePtr& camera: resourcePool()->getAllCameras(res))
                 camera->setStatus(Qn::Offline);
         }
     }
-    m_delayedOnlineStatus.remove(peer.id);
+    m_delayedOnlineStatus.remove(peer);
 }
 
 void QnServerMessageProcessor::onResourceStatusChanged(

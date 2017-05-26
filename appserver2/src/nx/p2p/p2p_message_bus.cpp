@@ -1567,17 +1567,24 @@ void MessageBus::emitPeerFoundLostSignals()
             lit("Peer %1 has found peer %2")
             .arg(qnStaticCommon->moduleDisplayName(localPeer().id))
             .arg(qnStaticCommon->moduleDisplayName(peer.id)));
-        emit peerFound(peer);
+        emit peerFound(peer.id, peer.peerType);
     }
 
     for (const auto& peer: lostPeers)
     {
-        NX_DEBUG(QnLog::P2P_TRAN_LOG,
-            lit("Peer %1 has lost peer %2")
-            .arg(qnStaticCommon->moduleDisplayName(localPeer().id))
-            .arg(qnStaticCommon->moduleDisplayName(peer.id)));
-        emit peerLost(peer);
-		cleanupRuntimeInfo(peer);
+        cleanupRuntimeInfo(peer);
+        
+        ApiPeerData samePeer(ApiPersistentIdData(peer.id, QnUuid()), peer.peerType);
+        auto samePeerItr = newAlivePeers.lower_bound(samePeer);
+        bool hasSimilarPeer = samePeerItr != newAlivePeers.end() && samePeerItr->id == peer.id;
+        if (!hasSimilarPeer)
+        {
+            NX_DEBUG(QnLog::P2P_TRAN_LOG,
+                lit("Peer %1 has lost peer %2")
+                .arg(qnStaticCommon->moduleDisplayName(localPeer().id))
+                .arg(qnStaticCommon->moduleDisplayName(peer.id)));
+            emit peerLost(peer.id, peer.peerType);
+        }
     }
 
     m_lastAlivePeers = newAlivePeers;

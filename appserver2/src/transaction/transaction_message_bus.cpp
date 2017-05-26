@@ -299,7 +299,7 @@ bool QnTransactionMessageBus::gotAliveData(const ApiPeerAliveData &aliveData, Qn
         if (!isPeerExist)
         {
             NX_LOG(QnLog::EC2_TRAN_LOG, lit("emit peerFound. id=%1").arg(aliveData.peer.id.toString()), cl_logDEBUG1);
-            emit peerFound(aliveData.peer);
+            emit peerFound(aliveData.peer.id, aliveData.peer.peerType);
         }
     }
     else
@@ -1082,9 +1082,9 @@ void QnTransactionMessageBus::handlePeerAliveChanged(const ApiPeerData &peer, bo
     }
 
     if (isAlive)
-        emit peerFound(aliveData.peer);
+        emit peerFound(aliveData.peer.id, aliveData.peer.peerType);
     else
-        emit peerLost(aliveData.peer);
+        emit peerLost(aliveData.peer.id, aliveData.peer.peerType);
 }
 
 QnTransaction<ApiDiscoveredServerDataList> QnTransactionMessageBus::prepareModulesDataTransaction() const
