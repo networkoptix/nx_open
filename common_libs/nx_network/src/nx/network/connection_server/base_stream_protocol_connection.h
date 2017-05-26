@@ -185,6 +185,7 @@ public:
 protected:
     virtual void processMessage(MessageType) = 0;
     virtual void processSomeMessageBody(nx::Buffer /*messageBodyBuffer*/) {}
+    virtual void processMessageEnd() {}
 
 private:
     struct SendTask
@@ -265,6 +266,8 @@ private:
                     return false;
                 if (!reportMsgBodyIfHaveSome())
                     return false;
+                if (!reportMessageEnd())
+                    return false;
 
                 resetParserState();
                 break;
@@ -305,6 +308,13 @@ private:
             return false; //< Connection has been removed by handler.
 
         return true;
+    }
+
+    bool reportMessageEnd()
+    {
+        nx::utils::ObjectDestructionFlag::Watcher watcher(&m_connectionFreedFlag);
+        processMessageEnd();
+        return !watcher.objectDestroyed();
     }
 
     void resetParserState()
@@ -432,6 +442,12 @@ public:
         m_messageBodyHandler = std::forward<T>(handler);
     }
 
+    template<class T>
+    void setOnMessageEnd(T&& handler)
+    {
+        m_messageEndHandler = std::forward<T>(handler);
+    }
+
 protected:
     virtual void processMessage(MessageType msg) override
     {
@@ -445,9 +461,16 @@ protected:
             m_messageBodyHandler(std::move(messageBodyBuffer));
     }
 
+    virtual void processMessageEnd() override
+    {
+        if (m_messageEndHandler)
+            m_messageEndHandler();
+    }
+
 private:
     std::function<void(MessageType)> m_messageHandler;
     std::function<void(nx::Buffer)> m_messageBodyHandler;
+    std::function<void()> m_messageEndHandler;
 };
 
 } // namespace server
