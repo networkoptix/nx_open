@@ -120,7 +120,7 @@ void QnStatusOverlayController::onStatusOverlayChanged(bool /*animated*/)
     QnScopedTypedPropertyRollback<bool, QGraphicsWidget> visibilityRollback(
         m_widget.data(), &QGraphicsWidget::setVisible, &QGraphicsWidget::isVisible);
 
-    m_widget->setVisible(false); //< analog of "setUpdatesEnabled(false)
+    m_widget->setVisible(false); //< analog of "setUpdatesEnabled(false)"
 
     m_widget->setCaption(captionText(m_statusOverlay));
     m_widget->setDescription(descriptionText(m_statusOverlay));
