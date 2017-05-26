@@ -40,3 +40,7 @@ if(MACOSX)
     mark_as_advanced(CoreGraphics_LIBRARY)
     target_link_libraries(common PUBLIC ${CoreGraphics_LIBRARY})
 endif()
+
+if(targetDevice STREQUAL "isd")
+    target_link_libraries(common PRIVATE libcreateprocess)
+endif()
