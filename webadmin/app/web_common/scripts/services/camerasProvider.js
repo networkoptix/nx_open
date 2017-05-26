@@ -300,7 +300,7 @@ angular.module('nxCommon')
         camerasProvider.prototype.startPoll = function(){
             var self = this;
             this.poll = $poll(function(){
-                self.reloadTree();
+                return self.reloadTree();
             },reloadInterval);
         };
 
