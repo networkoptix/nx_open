@@ -158,16 +158,14 @@ protected:
 
     void whenReadMessageWithFiniteBody()
     {
-        const std::size_t step = 1;
+        const int step = 1;
 
-        for (std::size_t pos = 0;
+        for (int pos = 0;
             pos < kHttpMessageWithFiniteBody.fullMessage.size();
             pos += step)
         {
             const auto bytesToRead = 
-                std::min<std::size_t>(
-                    step,
-                    kHttpMessageWithFiniteBody.fullMessage.size() - pos);
+                std::min<int>(step, kHttpMessageWithFiniteBody.fullMessage.size() - pos);
             m_input.write(
                 kHttpMessageWithFiniteBody.fullMessage.data() + pos,
                 bytesToRead);
