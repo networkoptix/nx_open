@@ -1,68 +1,107 @@
 #include <common/common_module.h>
 #include "cloud_user_info_pool.h"
 
-CloudUserInfoPool::CloudUserInfoPool(QnCommonModule* commonModule):
-    QnCommonModuleAware(commonModule)
+
+namespace detail {
+
+static const QString kCloudAuthInfoKey = lit("CloudAuthInfo");
+
+// CloudUserInfoPoolSupplier
+CloudUserInfoPoolSupplier::CloudUserInfoPoolSupplier(
+    QnCommonModule* commonModule,
+    AbstractCloudUserInfoPoolSupplierHandler* handler)
+    :
+    QnCommonModuleAware(commonModule),
+    m_handler(handler)
 {
-    connectToResourcePool();
+    for (const auto& userResource: resourcePool()->getResources<QnUserResource>())
+    {
+        auto value = userResource->get(kCloudAuthInfoKey);
+        if (value.isEmpty())
+            continue;
+        reportInfoChanged(value);
+    }
 }
 
-CloudUserInfoPool::~CloudUserInfoPool()
+CloudUserInfoPoolSupplier::~CloudUserInfoPoolSupplier()
 {
-    disconnectFromResourcePool;
+    directDisconnectAll();
 }
 
-void CloudUserInfoPool::connectToResourcePool()
+void CloudUserInfoPoolSupplier::connectToResourcePool()
 {
     connect(
         resourcePool(),
         &QnResourcePool::resourceAdded,
         this,
-        &CloudUserInfoPool::onNewResource, Qt::QueuedConnection);
+        &CloudUserInfoPoolSupplier::onNewResource, Qt::QueuedConnection);
     connect(
         resourcePool(),
         &QnResourcePool::resourceRemoved,
         this,
-        &CloudUserInfoPool::onRemoveResource,
+        &CloudUserInfoPoolSupplier::onRemoveResource,
         Qt::QueuedConnection);
 }
 
-void CloudUserInfoPool::onNewResource(const QnResourcePtr& resource)
+void CloudUserInfoPoolSupplier::onNewResource(const QnResourcePtr& resource)
 {
-    connect(
+    Qn::directConnect(
         resource,
         &QnResource::propertyChanged,
         this,
         [this](const QnResourcePtr& resource, const QString& key)
         {
-            if (key != lit("CloudAuthInfo"))
+            if (key != lit(kCloudAuthInfoKey))
                 return;
 
             NX_LOG(lit("[CloudUserInfo] CloudAuthInfo changed for user %1. New value: %2")
-                .arg(resource->name())
-                .arg(resource->getProperty(key)));
+                .arg(resource->getName().toUtf8())
+                .arg(resource->getProperty(key)), cl_logDEBUG2);
 
-            QnMutexLocker lock(&m_mutex);
+            const auto propValue = resource->getProperty(key);
+            if (propValue.isEmpty())
+            {
+                NX_LOG(lit("[CloudUserInfo] User %1. CloudAuthInfo removed.")
+                    .arg(resource->getName().toUtf8()), cl_logDEBUG1);
+                m_handler->userInfoRemoved(resource->getName().toUtf8().toLower());
+                return;
+            }
+
+            reportInfoChanged(propValue);
         });
 }
 
-void CloudUserInfoPool::onRemoveResource(const QnResourcePtr& resource)
+void CloudUserInfoPoolSupplier::reportInfoChanged(const QByteArray& serializedValue)
+{
+    int64_t timestamp;
+    nx::Buffer cloudNonce;
+
+    if (!deserialize(serializedValue, &timestamp, cloudNonce))
+    {
+        NX_LOG(lit("[CloudUserInfo] User %1. Deserialization failed")
+            .arg(resource->getName().toUtf8()), cl_logDEBUG1);
+        return;
+    }
+
+    m_handler->userInfoChaged(
+        timestmap,
+        resource->getName().toUtf8().toLower(),
+        cloudNonce);
+}
+
+void CloudUserInfoPoolSupplier::onRemoveResource(const QnResourcePtr& resource)
+{
+    m_handler->userInfoRemoved(resource->getName().toUtf8().toLower());
+}
+
+} // namespace detail
+
+// CloudUserInfoPool
+bool CloudUserInfoPoolSupplier::authenticate(const nx::http::header::Authorization& authHeader) const
 {
 }
 
-void CloudUserInfoPool::disconnectFromResourcePool()
+boost::optional<nx::Buffer> CloudUserInfoPoolSupplier::newestMostCommonNonce() const
 {
 }
 
-bool CloudUserInfoPool::authenticate(const nx::http::header::Authorization& authHeader) const
-{
-}
-
-boost::optional<nx::Buffer> CloudUserInfoPool::newestMostCommonNonce() const
-{
-}
-
-QnResourcePool* CloudUserInfoPool::resourcePool()
-{
-    return qnCommonModule->resourcePool();
-}

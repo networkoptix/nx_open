@@ -7,6 +7,7 @@
 #include <nx/network/http/http_types.h>
 #include <nx/network/buffer.h>
 #include <nx/utils/thread/mutex.h>
+#include <nx/utils/safe_direct_connection.h>
 #include <common/common_module_aware.h>
 
 namespace detail {
@@ -44,15 +45,41 @@ struct NonceUserCount
 
 using TimestampToNonceUserCountMap = std::map<int64_t, NonceUserCount, std::greater<>>;
 
-}
+class AbstractCloudUserInfoPoolSupplierHandler
+{
+public:
+    virtual void userInfoChanged(
+        int64_t timestamp,
+        const nx::Buffer& userName,
+        const nx::Buffer& cloudNonce) = 0;
 
-class QnResourcePool;
+    virtual void userInfoRemoved(const nx::Buffer& userName) = 0;
+};
 
-class CloudUserInfoPool:
-    public QObject,
+class CloudUserInfoPoolSupplier:
+    Qn::EnableSafeDirectConnection,
     public QnCommonModuleAware
 {
-    Q_OBJECT
+public:
+    CloudUserInfoPoolSupplier(
+        QnCommonModule* commonModule,
+        AbstractCloudUserInfoPoolSupplierHandler* handler);
+    ~CloudUserInfoPoolSupplier();
+
+private:
+    void onNewResource(const QnResourcePtr& resource);
+    void onRemoveResource(const QnResourcePtr& resource);
+    void reportInfoChanged(const QByteArray& serializedValue);
+
+private:
+    AbstractCloudUserInfoPoolSupplierHandler* m_handler;
+};
+
+}
+
+class CloudUserInfoPool:
+    public detail::AbstractCloudUserInfoPoolSupplierHandler
+{
 
 public:
     CloudUserInfoPool(QnCommonModule* commonModule);
@@ -62,11 +89,12 @@ public:
     boost::optional<nx::Buffer> newestMostCommonNonce() const;
 
 private:
-    void connectToResourcePool();
-    void disconnectFromResourcePool();
-    QnResourcePool* resourcePool();
-    void onNewResource(const QnResourcePtr& resource);
-    void onRemoveResource(const QnResourcePtr& resource);
+    virtual void userInfoChanged(
+        int64_t timestamp,
+        const nx::Buffer& userName,
+        const nx::Buffer& cloudNonce) override;
+
+    virtual void userInfoRemoved(const nx::Buffer& userName) override;
 
 
 private:
@@ -74,3 +102,4 @@ private:
     detail::TimestampToNonceUserCountMap m_timestampToNonceUserCount;
     QnMutex m_mutex;
 };
+
