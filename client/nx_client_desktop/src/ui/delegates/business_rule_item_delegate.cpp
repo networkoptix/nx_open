@@ -112,23 +112,37 @@ QnBusinessRuleItemDelegate::~QnBusinessRuleItemDelegate()
 {
 }
 
-int QnBusinessRuleItemDelegate::optimalWidth(int column, const QFontMetrics& /*metrics*/)
+int QnBusinessRuleItemDelegate::optimalWidth(int column, const QFontMetrics& metrics)
 {
     const int kExtraSpace =
         style::Metrics::kStandardPadding //< dropdown text indent
-      + style::Metrics::kButtonHeight; //< dropdown arrow
+        + style::Metrics::kButtonHeight; //< dropdown arrow
 
     switch (column)
     {
         case QnBusiness::EventColumn:
         {
-            //TODO: #GDM #3.1 #refactor table
-            return kExtraSpace + 100;
+            QnBusinessStringsHelper helper(qnClientCoreModule->commonModule());
+            auto eventWidth = [&metrics, &helper](QnBusiness::EventType eventType)
+                {
+                    return metrics.width(helper.eventName(eventType));
+                };
+            int result = -1;
+            for (QnBusiness::EventType eventType: QnBusiness::allEvents())
+                result = qMax(result, eventWidth(eventType));
+            return kExtraSpace + result;
         }
         case QnBusiness::ActionColumn:
         {
-            //TODO: #GDM #3.1 #refactor table
-            return kExtraSpace + 100;
+            QnBusinessStringsHelper helper(qnClientCoreModule->commonModule());
+            auto actionWidth = [&metrics, &helper](QnBusiness::ActionType actionType)
+                {
+                    return metrics.width(helper.actionName(actionType));
+                };
+            int result = -1;
+            for (QnBusiness::ActionType actionType: QnBusiness::allActions())
+                result = qMax(result, actionWidth(actionType));
+            return kExtraSpace + result;
         }
         case QnBusiness::AggregationColumn:
         {
