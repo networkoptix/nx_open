@@ -666,6 +666,7 @@ var Helper = function () {
         expect(here.passwordInput.isPresent()).toBe(true);
         here.passwordInput.sendKeys(newPassword);
         here.submitButton.click();
+        browser.sleep(1000);
         // expect(h.alert.successMessageElem.isDisplayed()).toBe(true);
         expect(h.alert.successMessageElem.getText()).toContain(h.alert.alertMessages.restorePassSuccess);
     };
