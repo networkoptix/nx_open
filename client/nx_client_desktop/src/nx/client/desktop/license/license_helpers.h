@@ -22,16 +22,20 @@ class Deactivator
     Q_DECLARE_TR_FUNCTIONS(Deactivator)
 
 public:
-    // TODO: ask Ivan to change constant names and capitalize first latter.
     enum class ErrorCode
     {
         NoError,
         UnknownError,
 
         // Keys from license server
-        keyIsNotActivated,
-        limitExceeded,
-        keyIsInvalid
+        KeyIsInvalid,
+        KeyDoesntExist,
+        KeyIsDisabled,
+        KeyIsNotActivated,
+        KeyIsTrial,
+        DeactivationIsPending,
+        InvalidHardwareId,
+        LimitExceeded
     };
 
     enum class Result

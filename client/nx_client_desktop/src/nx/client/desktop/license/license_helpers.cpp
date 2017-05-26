@@ -21,8 +21,7 @@ struct LicenseData
     QString key;
     QString hwid;
 };
-QN_FUSION_DECLARE_FUNCTIONS(LicenseData, (json))
-QN_FUSION_ADAPT_STRUCT_FUNCTIONS(LicenseData, (json), (key)(hwid))
+#define LicenseData_Fields (key)(hwid)
 
 using LicenseDataList = QList<LicenseData>;
 
@@ -30,16 +29,14 @@ struct Licenses
 {
     LicenseDataList licenses;
 };
-QN_FUSION_DECLARE_FUNCTIONS(Licenses, (json))
-QN_FUSION_ADAPT_STRUCT_FUNCTIONS(Licenses, (json), (licenses))
+#define Licenses_Fields (licenses)
 
 struct LicenseStatus
 {
     QString code;
     QString text;
 };
-QN_FUSION_DECLARE_FUNCTIONS(LicenseStatus, (json))
-QN_FUSION_ADAPT_STRUCT_FUNCTIONS(LicenseStatus, (json), (code)(text))
+#define LicenseStatus_Fields (code)(text)
 
 using LicenseStatusHash = QHash<QString, LicenseStatus>;
 
@@ -48,16 +45,23 @@ struct LicenseStatusData
     LicenseStatusHash licenseWarnings;
     LicenseStatusHash licenseErrors;
 };
-QN_FUSION_DECLARE_FUNCTIONS(LicenseStatusData, (json))
-QN_FUSION_ADAPT_STRUCT_FUNCTIONS(LicenseStatusData, (json), (licenseWarnings)(licenseErrors))
+#define LicenseStatusData_Fields (licenseWarnings)(licenseErrors)
 
 struct ErrorReply
 {
     QString error;
     LicenseStatusData errors;
 };
-QN_FUSION_DECLARE_FUNCTIONS(ErrorReply, (json))
-QN_FUSION_ADAPT_STRUCT_FUNCTIONS(ErrorReply, (json), (error)(errors))
+#define ErrorReply_Fields (error)(errors)
+
+#define DEACTIVATION_TYPES \
+    (LicenseData) \
+    (Licenses) \
+    (LicenseStatus) \
+    (LicenseStatusData) \
+    (ErrorReply)
+
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(DEACTIVATION_TYPES, (json), _Fields)
 
 }
 
@@ -121,9 +125,10 @@ LicenseDeactivatorPrivate::LicenseDeactivatorPrivate(
     const auto finalize =
         [this, handler](Result result, const LicenseErrorHash& errors = LicenseErrorHash())
         {
-            deleteLater();
             if (handler)
                 handler(result, errors);
+
+            deleteLater();
         };
 
     if (licenses.isEmpty())
@@ -239,12 +244,23 @@ QString Deactivator::errorDescription(ErrorCode error)
             return QString();
         case ErrorCode::UnknownError:
             return tr("Unknown error");
-        case ErrorCode::keyIsNotActivated:
+
+        case ErrorCode::KeyDoesntExist:
+            return tr("License does not exist");
+        case ErrorCode::KeyIsDisabled:
+            return tr("License is disabled");
+        case ErrorCode::KeyIsNotActivated:
             return tr("License is inactive");
-        case ErrorCode::limitExceeded:
+        case ErrorCode::KeyIsInvalid:
+            return tr("Invalid license");
+        case ErrorCode::KeyIsTrial:
+            return tr("License is trial");
+        case ErrorCode::DeactivationIsPending:
+            return tr("License is in deactivation process");
+        case ErrorCode::InvalidHardwareId:
+            return tr("Invalid hardware id");
+        case ErrorCode::LimitExceeded:
             return tr("Limit exceeded");
-        case ErrorCode::keyIsInvalid:
-            return tr("Invalid license key");
     }
 
     NX_EXPECT(false, "We don't expect to be here");
