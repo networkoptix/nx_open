@@ -1,7 +1,7 @@
 'use strict';
 angular.module('nxCommon')
     .factory('camerasProvider', function (systemAPI, $localStorage, $q, $poll) {
-        var reloadInterval = Config.settingsConfig.reloadInterval;//30 seconds
+        var reloadInterval = Config.webclient.reloadInterval;//30 seconds
 
         function camerasProvider(){
             this.desktopCameraTypeId = null;

@@ -384,7 +384,7 @@ angular.module('nxCommon').controller('ViewCtrl',
             $scope.serverTime.timeZoneOffset = parseInt(result.data.reply.timeZoneOffset);
             $scope.serverTime.latency = timeCorrection;
 
-            if(Config.settingsConfig.useServerTime){
+            if(Config.webclient.useServerTime){
                 timeCorrection = $scope.serverTime.timeZoneOffset + clientDate.getTimezoneOffset() * 60000 - timeCorrection;
             }
         });

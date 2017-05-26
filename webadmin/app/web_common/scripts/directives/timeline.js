@@ -55,7 +55,7 @@ angular.module('nxCommon')
 
                 var debugEventsMode = Config.debug.chunksOnTimeline && Config.allowDebugMode;
 
-                scope.disableVolume = Config.settingsConfig.disableVolume;
+                scope.disableVolume = Config.webclient.disableVolume;
 
                 // !!! Read basic parameters, DOM elements and global objects for module
                 var viewport = element.find('.viewport');
@@ -77,7 +77,7 @@ angular.module('nxCommon')
                     timelineConfig.zoomAccuracyMs,
                     timelineConfig.lastMinuteDuration,
                     timelineConfig.minPixelsPerLevel,
-                    Config.settingsConfig.useServerTime,
+                    Config.webclient.useServerTime,
                     $q); //Init boundariesProvider
 
                 var animationState = {
