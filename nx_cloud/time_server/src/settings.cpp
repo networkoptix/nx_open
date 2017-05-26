@@ -45,8 +45,8 @@ void Settings::loadSettings()
 
 #ifdef Q_OS_LINUX
     QString defVarDirName = QString("/opt/%1/%2/var")
-        .arg(QnAppInfo::linuxOrganizationName()).arg(kModuleName);
-    QString varDirName = m_settings.value("varDir", defVarDirName).toString();
+        .arg(nx::utils::AppInfo::linuxOrganizationName()).arg(kModuleName);
+    QString varDirName = settings().value("varDir", defVarDirName).toString();
     m_dataDir = varDirName;
 #else
     const QStringList& dataDirList =
