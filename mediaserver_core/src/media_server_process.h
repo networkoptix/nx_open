@@ -68,7 +68,7 @@ public:
     QString enforceSocketType;
     QString enforcedMediatorEndpoint;
     QString ipVersion;
-
+    QString createFakeData;
 
     CmdLineArguments() :
         logLevel(
@@ -170,6 +170,11 @@ private:
     void serviceModeInit();
     QString hardwareIdAsGuid() const;
     void updateGuidIfNeeded();
+
+    // TODO: Makes sense to split into helper functions and move into appserver2 so it can be used
+    // in unit tests.
+    void makeFakeData(const QString& fakeDataString, const ec2::AbstractECConnectionPtr& connection);
+
 private:
     int m_argc;
     char** m_argv;

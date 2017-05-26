@@ -1068,6 +1068,8 @@ void MediaServerProcess::parseCommandLineParameters(int argc, char* argv[])
         lit("Enforces mediator address"), QString());
     commandLineParser.addParameter(&m_cmdLineArguments.ipVersion, "--ip-version", NULL,
         lit("Force ip version"), QString());
+    commandLineParser.addParameter(&m_cmdLineArguments.createFakeData, "--create-fake-data", NULL,
+        lit("Create fake data: users,cameras,propertiesPerCamera,camerasPerLayout,storageCount"), QString());
     commandLineParser.addParameter(&m_cmdLineArguments.cleanupDb, "--cleanup-db", NULL,
         lit("Deletes resources with NULL ids, "
             "cleans dangling cameras' and servers' user attributes, "
@@ -2222,6 +2224,113 @@ void MediaServerProcess::updateGuidIfNeeded()
         setObsoleteGuid(obsoleteGuid);
 }
 
+void MediaServerProcess::makeFakeData(
+    const QString& fakeDataString, const ec2::AbstractECConnectionPtr& connection)
+{
+    if (fakeDataString.isEmpty())
+        return;
+
+    const auto fakeData = fakeDataString.split(',');
+    int userCount = fakeData.value(0).toInt(0);
+    int camerasCount = fakeData.value(1).toInt(0);
+    int propertiesPerCamera = fakeData.value(2).toInt(0);
+    int camerasPerLayout = fakeData.value(3).toInt(0);
+    int storageCount = fakeData.value(4).toInt(0);
+
+    qWarning() << "Create fake data:"
+        << userCount << "users,"
+        << camerasCount << "cameras," << propertiesPerCamera << "properties per camera,"
+        << camerasPerLayout << "cameras per layout," << storageCount << "storages";
+
+    std::vector<ec2::ApiUserData> users;
+    for (int i = 0; i < userCount; ++i)
+    {
+        ec2::ApiUserData userData;
+        userData.id = QnUuid::createUuid();
+        userData.name = lm("user_%1").arg(i);
+        userData.isEnabled = true;
+        userData.isCloud = false;
+        users.push_back(userData);
+    }
+
+    std::vector<ec2::ApiCameraData> cameras;
+    std::vector<ec2::ApiCameraAttributesData> userAttrs;
+    ec2::ApiResourceParamWithRefDataList cameraParams;
+    const auto& moduleGuid = commonModule()->moduleGUID();
+    auto resTypePtr = qnResTypePool->getResourceTypeByName("Camera");
+    NX_ASSERT(!resTypePtr.isNull());
+    for (int i = 0; i < camerasCount; ++i)
+    {
+        ec2::ApiCameraData cameraData;
+        cameraData.typeId = resTypePtr->getId();
+        cameraData.parentId = moduleGuid;
+        cameraData.vendor = "Invalid camera";
+        cameraData.physicalId = QnUuid::createUuid().toString();
+        cameraData.id = ec2::ApiCameraData::physicalIdToId(cameraData.physicalId);
+        cameraData.name = lm("Camera %1").arg(cameraData.id);
+        cameras.push_back(std::move(cameraData));
+
+        ec2::ApiCameraAttributesData userAttr;
+        userAttr.cameraId = cameraData.id;
+        userAttrs.push_back(userAttr);
+
+        for (int j = 0; j < propertiesPerCamera; ++j)
+        {
+            cameraParams.push_back(ec2::ApiResourceParamWithRefData(
+                cameraData.id, lit("property%1").arg(j), lit("value%1").arg(j)));
+        }
+    }
+
+    std::vector<ec2::ApiLayoutData> layouts;
+    if (camerasPerLayout)
+    {
+        for (int minCameraOnLayout = 0; minCameraOnLayout < camerasCount;
+             minCameraOnLayout += camerasPerLayout)
+        {
+            ec2::ApiLayoutData layout;
+            layout.id = QnUuid::createUuid();
+            for (int cameraIndex = minCameraOnLayout;
+                 cameraIndex < minCameraOnLayout + camerasPerLayout && cameraIndex < camerasCount;
+                 ++cameraIndex)
+            {
+                ec2::ApiLayoutItemData item;
+                item.id = cameras[cameraIndex].id;
+                layout.items.push_back(item);
+            }
+
+            layouts.push_back(layout);
+        }
+    }
+
+    std::vector<ec2::ApiStorageData> storages;
+    for (int i = 0; i < storageCount; ++i)
+    {
+        ec2::ApiStorageData storage;
+        storage.id = QnUuid::createUuid();
+        storage.parentId = commonModule()->moduleGUID();
+        storage.name = lm("Fake Storage/%1").arg(storage.id);
+        storage.url = lm("/tmp/fakeStorage/%1").arg(storage.id);
+        storages.push_back(storage);
+    }
+
+    auto userManager = connection->getUserManager(Qn::kSystemAccess);
+    auto cameraManager = connection->getCameraManager(Qn::kSystemAccess);
+    auto resourceManager = connection->getResourceManager(Qn::kSystemAccess);
+    auto layoutManager = connection->getLayoutManager(Qn::kSystemAccess);
+    auto serverManager = connection->getMediaServerManager(Qn::kSystemAccess);
+
+    for (const auto& user: users)
+        NX_ASSERT(ec2::ErrorCode::ok == userManager->saveSync(user));
+
+    NX_ASSERT(ec2::ErrorCode::ok == cameraManager->saveUserAttributesSync(userAttrs));
+    NX_ASSERT(ec2::ErrorCode::ok == resourceManager->saveSync(cameraParams));
+    NX_ASSERT(ec2::ErrorCode::ok == cameraManager->addCamerasSync(cameras));
+    NX_ASSERT(ec2::ErrorCode::ok == serverManager->saveStoragesSync(storages));
+
+    for (const auto& layout: layouts)
+        NX_ASSERT(ec2::ErrorCode::ok == layoutManager->saveSync(layout));
+}
+
 void MediaServerProcess::serviceModeInit()
 {
     const auto settings = qnServerModule->roSettings();
@@ -2998,6 +3107,8 @@ void MediaServerProcess::run()
             commonModule()->moduleDiscoveryManager()->start();
     }
 #endif
+
+    makeFakeData( cmdLineArguments().createFakeData, ec2Connection);
     qnBackupStorageMan->scheduleSync()->start();
     emit started();
     exec();
@@ -3209,7 +3320,7 @@ protected:
         if (application->isRunning() &&
             m_main->serverSettings()->roSettings()->value(nx_ms_conf::ENABLE_MULTIPLE_INSTANCES).toInt() == 0)
         {
-            NX_LOG("Server already started", cl_logERROR);
+            qWarning() << "Server already started";
             qApp->quit();
             return;
         }

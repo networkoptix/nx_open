@@ -56,6 +56,15 @@ typedef std::shared_ptr<AbstractLayoutNotificationManager> AbstractLayoutNotific
                 std::make_shared<impl::CustomSimpleHandler<TargetType, HandlerType>>(target, handler)));
         }
 
+        ErrorCode saveSync(const ec2::ApiLayoutData& layout)
+        {
+            return impl::doSyncCall<impl::SimpleHandler>(
+                [=](const impl::SimpleHandlerPtr& handler)
+                {
+                    return this->save(layout, handler);
+                });
+        }
+
         /*!
         \param handler Functor with params: (ErrorCode)
         */
