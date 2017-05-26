@@ -43,18 +43,67 @@ private:
     aio::AbstractAsyncChannel* m_asyncChannel;
 };
 
-static const char kHttpRequestWithIncompleteInfiniteBody[] = R"http(
-HTTP/1.1 200 OK
-Server: Network Optix
-Content-Type: video/mp2t
-Connection: close
+struct HttpMessageTestData
+{
+    nx::Buffer fullMessage;
+    nx::Buffer messageBody;
+};
 
-Here goes mpeg2-ts video.
-)http";
+//-------------------------------------------------------------------------------------------------
 
-static const char kHttpRequestBody[] = "Here goes mpeg2-ts video.";
+struct HttpMessageWithIncompleteInfiniteBody: HttpMessageTestData
+{
+    HttpMessageWithIncompleteInfiniteBody()
+    {
+        fullMessage = 
+            "HTTP/1.1 200 OK\r\n"
+            "Server: Network Optix\r\n"
+            "Connection: close\r\n"
+            "Content-Type: video/mp2t\r\n"
+            "\r\n"
+            "Here goes mpeg2-ts video.";
+        messageBody = "Here goes mpeg2-ts video.";
+    }
+};
+static const HttpMessageWithIncompleteInfiniteBody kHttpMessageWithIncompleteInfiniteBody;
 
-static const std::size_t kHttpRequestLen = sizeof(kHttpRequestWithIncompleteInfiniteBody) - 1;
+//-------------------------------------------------------------------------------------------------
+
+struct HttpMessageWithFiniteBody: HttpMessageTestData
+{
+    HttpMessageWithFiniteBody()
+    {
+        fullMessage = 
+            "HTTP/1.1 200 OK\r\n"
+            "Server: Network Optix\r\n"
+            "Connection: close\r\n"
+            "Content-Type: video/mp2t\r\n"
+            "Content-Length: 25\r\n"
+            "\r\n"
+            "Here goes mpeg2-ts video.";
+
+        messageBody = "Here goes mpeg2-ts video.";
+    }
+};
+static const HttpMessageWithFiniteBody kHttpMessageWithFiniteBody;
+
+//-------------------------------------------------------------------------------------------------
+
+struct HttpMessageWithoutBody: HttpMessageTestData
+{
+    HttpMessageWithoutBody()
+    {
+        fullMessage = 
+            "HTTP/1.1 204 No Content\r\n"
+            "Server: Network Optix\r\n"
+            "Connection: close\r\n"
+            "Content-Type: video/mp2t\r\n"
+            "\r\n";
+    }
+};
+static const HttpMessageWithoutBody kHttpMessageWithoutBody;
+
+//-------------------------------------------------------------------------------------------------
 
 using TestHttpConnection = 
     nx::network::server::BaseStreamProtocolConnectionEmbeddable<
@@ -101,7 +150,49 @@ public:
 protected:
     void whenReadMessageWithIncompleteBody()
     {
-        m_input.write(kHttpRequestWithIncompleteInfiniteBody, kHttpRequestLen);
+        m_input.write(
+            kHttpMessageWithIncompleteInfiniteBody.fullMessage.data(),
+            kHttpMessageWithIncompleteInfiniteBody.fullMessage.size());
+        m_expectedBody = kHttpMessageWithIncompleteInfiniteBody.messageBody;
+    }
+
+    void whenReadMessageWithFiniteBody()
+    {
+        const std::size_t step = 1;
+
+        for (std::size_t pos = 0;
+            pos < kHttpMessageWithFiniteBody.fullMessage.size();
+            pos += step)
+        {
+            const auto bytesToRead = 
+                std::min<std::size_t>(
+                    step,
+                    kHttpMessageWithFiniteBody.fullMessage.size() - pos);
+            m_input.write(
+                kHttpMessageWithFiniteBody.fullMessage.data() + pos,
+                bytesToRead);
+        }
+
+        m_expectedBody = kHttpMessageWithFiniteBody.messageBody;
+    }
+
+    void whenReadMessageWithoutBody()
+    {
+        m_input.write(
+            kHttpMessageWithoutBody.fullMessage.data(),
+            kHttpMessageWithoutBody.fullMessage.size());
+        m_expectedBody = kHttpMessageWithoutBody.messageBody;
+    }
+
+    void whenReadMultipleMessages()
+    {
+        m_messagesSent.push_back(kHttpMessageWithoutBody);
+        m_messagesSent.push_back(kHttpMessageWithFiniteBody);
+        m_messagesSent.push_back(kHttpMessageWithFiniteBody);
+        m_messagesSent.push_back(kHttpMessageWithoutBody);
+
+        for (const auto& message: m_messagesSent)
+            m_input.write(message.fullMessage.data(), message.fullMessage.size());
     }
 
     void thenMessageIsReported()
@@ -109,17 +200,39 @@ protected:
         m_receivedMessageQueue.pop();
     }
     
-    void thenAvailableMessageBodyIsReported()
+    void thenMessageBodyIsReported()
     {
-        m_receivedMsgBody.waitForReceivedDataToMatch(kHttpRequestBody);
+        m_receivedMsgBody.waitForReceivedDataToMatch(m_expectedBody);
+    }
+
+    void thenEveryMessageIsReceived()
+    {
+        for (const auto& message: m_messagesSent)
+        {
+            auto messageReceived = m_receivedMessageQueue.pop();
+            for (;;)
+            {
+                {
+                    QnMutexLocker lock(&m_mutex);
+                    if (message.fullMessage == messageReceived->toString())
+                        break;
+                }
+
+                std::this_thread::yield();
+            }
+        }
     }
 
 private:
     nx::utils::bstream::ReflectingPipeline m_input;
     aio::test::AsyncChannel m_asyncChannel;
     std::unique_ptr<TestHttpConnection> m_connection;
-    nx::utils::SyncQueue<nx_http::Message> m_receivedMessageQueue;
+    nx::utils::SyncQueue<std::unique_ptr<nx_http::Message>> m_receivedMessageQueue;
     nx::utils::bstream::test::NotifyingOutput m_receivedMsgBody;
+    nx::Buffer m_expectedBody;
+    std::vector<HttpMessageTestData> m_messagesSent;
+    nx_http::Message* m_prevMessageReceived = nullptr;
+    QnMutex m_mutex;
 
     virtual void closeConnection(
         SystemError::ErrorCode /*closeReason*/,
@@ -130,11 +243,16 @@ private:
 
     void saveMessage(nx_http::Message message)
     {
-        m_receivedMessageQueue.push(std::move(message));
+        auto messageToSave = std::make_unique<nx_http::Message>(std::move(message));
+        m_prevMessageReceived = messageToSave.get();
+        m_receivedMessageQueue.push(std::move(messageToSave));
     }
 
     void saveSomeBody(nx::Buffer bodyBuffer)
     {
+        QnMutexLocker lock(&m_mutex);
+
+        m_prevMessageReceived->response->messageBody.append(bodyBuffer);
         m_receivedMsgBody.write(bodyBuffer.constData(), bodyBuffer.size());
     }
 };
@@ -151,14 +269,29 @@ TEST_F(BaseStreamProtocolConnection, message_is_reported_before_message_body)
 TEST_F(BaseStreamProtocolConnection, message_body_is_reported)
 {
     whenReadMessageWithIncompleteBody();
-    thenAvailableMessageBodyIsReported();
+    thenMessageBodyIsReported();
 }
 
-//TEST_F(BaseStreamProtocolConnection, message_body_is_reported_on_availability)
+TEST_F(BaseStreamProtocolConnection, full_message_body_is_reported)
+{
+    whenReadMessageWithFiniteBody();
+    thenMessageBodyIsReported();
+}
 
-//TEST_F(BaseStreamProtocolConnection, message_without_message_body)
+TEST_F(BaseStreamProtocolConnection, message_without_message_body)
+{
+    whenReadMessageWithoutBody();
+    thenMessageIsReported();
+}
 
-//TEST_F(BaseStreamProtocolConnection, receiving_multiple_messages_with_body_over_same_connection)
+TEST_F(BaseStreamProtocolConnection, receiving_multiple_messages_over_same_connection)
+{
+    whenReadMultipleMessages();
+    thenEveryMessageIsReceived();
+}
+
+// TEST_F(BaseStreamProtocolConnection, message_parse_error)
+// TEST_F(BaseStreamProtocolConnection, taking_socket_after_message_availability)
 
 } // namespace test
 } // namespace server
