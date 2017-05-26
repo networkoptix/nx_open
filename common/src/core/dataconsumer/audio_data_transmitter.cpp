@@ -1,5 +1,7 @@
 #include "audio_data_transmitter.h"
 
+#if defined(ENABLE_DATA_PROVIDERS)
+
 #include <set>
 
 #include <utils/common/sleep.h>
@@ -146,3 +148,5 @@ void QnAbstractAudioTransmitter::subscribe(
 
     start();
 }
+
+#endif // defined(ENABLE_DATA_PROVIDERS)
