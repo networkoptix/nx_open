@@ -1,3 +1,5 @@
+#include <QJsonDocument>
+#include <QJsonObject>
 #include <core/resource/user_resource.h>
 #include <core/resource_management/resource_pool.h>
 #include <common/common_module.h>
@@ -127,4 +129,39 @@ void CloudUserInfoPool::userInfoChanged(
 
 void CloudUserInfoPool::userInfoRemoved(const nx::Buffer& userName)
 {
+}
+
+namespace detail {
+
+bool deserialize(const QString& serializedValue, int64_t* timestamp, nx::Buffer* cloudNonce)
+{
+    auto jsonObj = QJsonDocument::fromJson(serializedValue.toUtf8()).object();
+    if (jsonObj.isEmpty())
+    {
+        NX_LOG("[CloudUserInfo, deserialize] Json object is empty.", cl_logERROR);
+        return false;
+    }
+
+    const QString kTimestampKey = lit("timestamp");
+    const QString kCloudNonceKey = lit("cloudNonce");
+
+    auto timestampVal = jsonObj[kTimestampKey];
+    if (timestampVal.isUndefined() || !timestampVal.isDouble())
+    {
+        NX_LOG("[CloudUserInfo, deserialize] timestamp is undefined or wrong type.", cl_logERROR);
+        return false;
+    }
+    *timestamp = (int64_t)timestampVal.toDouble();
+
+    auto cloudNonceVal = jsonObj[kCloudNonceKey];
+    if (cloudNonceVal.isUndefined() || !cloudNonceVal.isString())
+    {
+        NX_LOG("[CloudUserInfo, deserialize] cloud nonce is undefined or wrong type.", cl_logERROR);
+        return false;
+    }
+    *cloudNonce = cloudNonceVal.toString().toUtf8();
+
+    return true;
+}
+
 }
