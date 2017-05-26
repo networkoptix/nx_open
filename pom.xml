@@ -898,6 +898,7 @@
                 <additional.defines>DISABLE_ALL_VENDORS DISABLE_DESKTOP_CAMERA EDGE_SERVER debug_in_release</additional.defines>
                 <modification>isd_s2</modification>
                 <rdep.target>isd_s2</rdep.target>
+                <rdep.packages>cpro</rdep.packages>
                 <qt.spec/>
             </properties>
             <modules>

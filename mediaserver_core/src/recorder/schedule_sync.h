@@ -4,6 +4,7 @@
 #include <atomic>
 #include <vector>
 #include <map>
+#include <nx/utils/std/future.h>
 
 #ifndef Q_MOC_RUN
 #include <boost/optional.hpp>
