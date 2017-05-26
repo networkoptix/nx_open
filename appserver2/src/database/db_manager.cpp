@@ -485,10 +485,7 @@ bool QnDbManager::init(const QUrl& dbUrl)
         const auto& runtimeInfoManager = commonModule()->runtimeInfoManager();
         QnPeerRuntimeInfo localInfo = runtimeInfoManager->localInfo();
         if (localInfo.data.prematureLicenseExperationDate != licenseOverflowTime)
-        {
             localInfo.data.prematureLicenseExperationDate = licenseOverflowTime;
-            runtimeInfoManager->updateLocalItem(localInfo);
-        }
 
         query.addBindValue(DB_INSTANCE_KEY);
         if (!m_resyncFlags.testFlag(ResyncLog) && query.exec() && query.next())
@@ -508,6 +505,9 @@ bool QnDbManager::init(const QUrl& dbUrl)
                 return false;
             }
         }
+
+        localInfo.data.peer.persistentId = m_dbInstanceId;
+        runtimeInfoManager->updateLocalItem(localInfo);
 
         if (m_tranLog)
             if (!m_tranLog->init())
@@ -1573,7 +1573,7 @@ ErrorCode QnDbManager::insertAddParam(const ApiResourceParamWithRefData& param)
     m_kvPairQuery->bindValue(0, QnSql::serialized_field(param.resourceId));
     m_kvPairQuery->bindValue(1, QnSql::serialized_field(param.name));
     m_kvPairQuery->bindValue(2, QnSql::serialized_field(param.value));
-    if (!m_kvPairQuery->exec()) 
+    if (!m_kvPairQuery->exec())
     {
         qWarning() << Q_FUNC_INFO << m_kvPairQuery->lastError().text();
         return ErrorCode::dbError;
@@ -1831,7 +1831,7 @@ ErrorCode QnDbManager::insertOrReplaceCameraAttributes(const ApiCameraAttributes
         NX_LOG( lit("DB error in %1: %2").arg(Q_FUNC_INFO).arg(m_cameraUserAttrQuery->lastError().text()), cl_logERROR);
         return ErrorCode::dbError;
     }
-    
+
     *internalId = m_cameraUserAttrQuery->lastInsertId().toInt();
     return ErrorCode::ok;
 }
@@ -1949,12 +1949,12 @@ ErrorCode QnDbManager::updateCameraSchedule(const std::vector<ApiScheduleTaskDat
             ":dayOfWeek, :beforeThreshold, :afterThreshold, :streamQuality, :fps"
             ")");
     }
-    
+
     m_insCameraScheduleQuery->bindValue(":internalId", internalId);
-    for(const ApiScheduleTaskData& task: scheduleTasks) 
+    for(const ApiScheduleTaskData& task: scheduleTasks)
     {
         QnSql::bind(task, m_insCameraScheduleQuery.get());
-        if (!m_insCameraScheduleQuery->exec()) 
+        if (!m_insCameraScheduleQuery->exec())
         {
             qWarning() << Q_FUNC_INFO << m_insCameraScheduleQuery->lastError().text();
             return ErrorCode::dbError;
