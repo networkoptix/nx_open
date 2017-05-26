@@ -16,6 +16,7 @@
 class QnWorkbenchLayout;
 class QnWorkbenchItem;
 class QGraphicsWidget;
+class QnPendingOperation;
 
 namespace nx {
 namespace client {
@@ -75,6 +76,8 @@ private:
     QnDisconnectHelperPtr m_connections;
     QHash<QnUuid, QnLayoutResourcePtr> m_reviewLayouts;
     QHash<QPoint, QSharedPointer<LayoutTourDropPlaceholder> > m_dropPlaceholders;
+    QSet<QnUuid> m_saveToursQueue;
+    QnPendingOperation* m_saveToursOperation{nullptr};
 };
 
 } // namespace workbench

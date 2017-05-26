@@ -38,6 +38,9 @@ public:
     qreal spacing() const;
     void setSpacing(qreal value);
 
+    int lineHeight() const;
+    void setLineHeight(int value);
+
 private:
     void updateContentPosition();
 

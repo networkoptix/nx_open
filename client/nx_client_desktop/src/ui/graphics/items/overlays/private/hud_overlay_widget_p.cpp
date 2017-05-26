@@ -38,8 +38,8 @@ QnHudOverlayWidgetPrivate::QnHudOverlayWidgetPrivate(QnHudOverlayWidget* main):
     contentLayout->addItem(leftLayout);
     contentLayout->addItem(rightLayout);
 
-    content->setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::Expanding);
     content->setAcceptedMouseButtons(Qt::NoButton);
+    titleHolder->setAcceptedMouseButtons(Qt::NoButton);
 
     auto titleLayout = new QGraphicsLinearLayout(Qt::Vertical, titleHolder);
     titleLayout->addItem(title);

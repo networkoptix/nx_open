@@ -417,7 +417,7 @@ ActionVisibility ClearMotionSelectionCondition::check(const QnResourceWidgetList
         {
             hasDisplayedGrid = true;
 
-            if (auto mediaWidget = dynamic_cast<const QnMediaResourceWidget *>(widget))
+            if (auto mediaWidget = dynamic_cast<const QnMediaResourceWidget*>(widget))
                 foreach(const QRegion &region, mediaWidget->motionSelection())
                 if (!region.isEmpty())
                     return EnabledAction;
@@ -440,7 +440,7 @@ ActionVisibility ResourceCondition::check(const QnResourceList& resources, QnWor
 
 ActionVisibility ResourceCondition::check(const QnResourceWidgetList& widgets, QnWorkbenchContext* /*context*/)
 {
-    return checkInternal<QnResourceWidget *>(widgets) ? EnabledAction : InvisibleAction;
+    return checkInternal<QnResourceWidget*>(widgets) ? EnabledAction : InvisibleAction;
 }
 
 template<class Item, class ItemSequence>
@@ -726,7 +726,7 @@ ActionVisibility AdjustVideoCondition::check(const QnResourceWidgetList& widgets
         return InvisibleAction;
 
     auto widget = widgets[0];
-    if ((widget->resource()->flags() & (Qn::server | Qn::videowall))
+    if ((widget->resource()->flags() & (Qn::server | Qn::videowall | Qn::layout))
         || (widget->resource()->flags().testFlag(Qn::web_page)))
         return InvisibleAction;
 
@@ -988,7 +988,7 @@ ActionVisibility CreateZoomWindowCondition::check(const QnResourceWidgetList& wi
 
     // TODO: #Elric there probably exists a better way to check it all.
 
-    auto widget = dynamic_cast<QnMediaResourceWidget *>(widgets[0]);
+    auto widget = dynamic_cast<QnMediaResourceWidget*>(widgets[0]);
     if (!widget)
         return InvisibleAction;
 
@@ -1036,11 +1036,18 @@ bool OpenInLayoutCondition::canOpen(const QnResourceList& resources,
     const QnLayoutResourcePtr& layout) const
 {
     if (!layout)
-        return any_of(resources, QnResourceAccessFilter::isOpenableInLayout);
+    {
+        return any_of(resources, QnResourceAccessFilter::isOpenableInLayout)
+            || any_of(resources,
+                [](const QnResourcePtr& resource)
+                {
+                    return resource->hasFlags(Qn::layout);
+                });
+    }
 
     bool isExportedLayout = layout->isFile();
 
-    for (const auto& resource : resources)
+    for (const auto& resource: resources)
     {
         if (!QnResourceAccessFilter::isOpenableInLayout(resource))
             continue;
@@ -1195,7 +1202,7 @@ ActionVisibility PtzCondition::check(const QnResourceWidgetList& widgets, QnWork
 {
     for (auto widget: widgets)
     {
-        auto mediaWidget = dynamic_cast<const QnMediaResourceWidget *>(widget);
+        auto mediaWidget = dynamic_cast<const QnMediaResourceWidget*>(widget);
         if (!mediaWidget)
             return InvisibleAction;
 

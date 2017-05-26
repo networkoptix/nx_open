@@ -414,19 +414,13 @@ QSizeF QnIoModuleFormOverlayContentsPrivate::Layout::sizeHint(
     if (count() == 0)
         return QSizeF();
 
-    if (m_inputItems.empty() || m_outputItems.empty())
-    {
-        /* One-column layout: */
-        return withContentsMargins(this, QSizeF(kMinimumItemWidth, kItemHeight));
-    }
-    else
-    {
-        /* Two-column layout: */
-        int rowCount = qMax(m_inputItems.size(), m_outputItems.size());
-        return withContentsMargins(this, QSize(
-            kMinimumItemWidth * 2 + kHorizontalSpacing,
-            kItemHeight * rowCount + kVerticalSpacing * (rowCount - 1)));
-    }
+    const int rowCount = qMax(m_inputItems.size(), m_outputItems.size());
+    const int height = kItemHeight * rowCount + kVerticalSpacing * (rowCount - 1);
+    const int width = m_inputItems.empty() || m_outputItems.empty()
+        ? kMinimumItemWidth                           //< one-column layout
+        : kMinimumItemWidth * 2 + kHorizontalSpacing; //< two-column layout
+
+    return withContentsMargins(this, QSizeF(width, height));
 }
 
 /*

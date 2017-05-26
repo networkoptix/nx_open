@@ -330,7 +330,7 @@ void QnMainWindowTitleBarWidget::dragLeaveEvent(QDragLeaveEvent* event)
 void QnMainWindowTitleBarWidget::dropEvent(QDropEvent* event)
 {
     Q_D(QnMainWindowTitleBarWidget);
-    menu()->trigger(action::DropResourcesIntoNewLayoutAction, d->dropResources);
+    menu()->trigger(action::OpenInNewTabAction, d->dropResources);
     event->acceptProposedAction();
 }
 

@@ -387,7 +387,7 @@ void QnEventLogDialog::at_eventsGrid_clicked(const QModelIndex& idx)
             params.setArgument(Qn::ItemTimeRole, pos);
         }
 
-        context()->menu()->trigger(action::OpenInNewLayoutAction, params);
+        context()->menu()->trigger(action::OpenInNewTabAction, params);
 
         if (isMaximized())
             showNormal();
