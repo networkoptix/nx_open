@@ -12,6 +12,7 @@ DEFAULT_PRIVATE_NET = '10.10.1/24'
 MEDIASERVER_LISTEN_PORT = 7001
 BOX_PROVISION_MEDIASERVER = 'box-provision-mediaserver.sh'
 MEDIASERVER_DIST_FNAME = 'mediaserver.deb'  # expected in vagrant dir
+SSH_PORT_OFFSET=2220
 
 
 class ConfigCommand(object):
@@ -176,6 +177,10 @@ class BoxConfig(object):
     def rest_api_forwarded_port(self):
         return self.vm_port_base + self.idx
 
+    @property
+    def ssh_forwarded_port(self):
+        return self.vm_port_base + SSH_PORT_OFFSET + self.idx
+
     def expand(self, vbox_manage):
         network_vm_commands = [make_vm_config_internal_network_command(vbox_manage, ip_address)
                                for ip_address in self.ip_address_list]
@@ -184,6 +189,7 @@ class BoxConfig(object):
             vm_box_name=self.vm_box_name,
             rest_api_internal_port=MEDIASERVER_LISTEN_PORT,
             rest_api_forwarded_port=self.rest_api_forwarded_port,
+            ssh_forwarded_port=self.ssh_forwarded_port,
             vm_commands=map(self._expand_vm_command, network_vm_commands + self.vm_commands),
             vbox_commands=map(self._expand_vbox_command, self.vbox_commands),
             )
@@ -201,10 +207,11 @@ class BoxConfig(object):
 class ExpandedBoxConfig(object):
 
     def __init__(self, box_name, vm_box_name, rest_api_internal_port, rest_api_forwarded_port,
-                 vm_commands, vbox_commands):
+                 ssh_forwarded_port, vm_commands, vbox_commands):
         self.box_name = box_name
         self.vm_box_name = vm_box_name
         self.rest_api_internal_port = rest_api_internal_port
         self.rest_api_forwarded_port = rest_api_forwarded_port
+        self.ssh_forwarded_port = ssh_forwarded_port
         self.vm_commands = vm_commands
         self.vbox_commands = vbox_commands
