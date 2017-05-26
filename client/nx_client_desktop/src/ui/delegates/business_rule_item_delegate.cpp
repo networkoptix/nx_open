@@ -259,7 +259,6 @@ QWidget* QnBusinessRuleItemDelegate::createEditor(QWidget *parent, const QStyleO
         {
             QComboBox* comboBox = new QComboBox(parent);
             comboBox->setMaxVisibleItems(comboBoxMaxVisibleItems);
-            //TODO: #GDM #3.1 #refactor table
             for (QnBusiness::EventType eventType : m_lexComparator->lexSortedEvents())
                 comboBox->addItem(m_businessStringsHelper->eventName(eventType), eventType);
             return comboBox;
@@ -273,7 +272,6 @@ QWidget* QnBusinessRuleItemDelegate::createEditor(QWidget *parent, const QStyleO
             {
                 if (instantOnly && !QnBusiness::canBeInstant(actionType))
                     continue;
-                //TODO: #GDM #3.1 #refactor table
                 comboBox->addItem(m_businessStringsHelper->actionName(actionType), actionType);
             }
             return comboBox;
