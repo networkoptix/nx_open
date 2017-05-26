@@ -25,6 +25,8 @@ QnTwoWayAudioWidget::QnTwoWayAudioWidget(QGraphicsWidget *parent)
 
     setLayout(audioLayout);
     setAcceptedMouseButtons(0);
+
+    setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
 }
 
 QnTwoWayAudioWidget::~QnTwoWayAudioWidget() {}
