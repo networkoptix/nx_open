@@ -111,3 +111,12 @@ QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(Qn, BackupAction,
 (Qn::BackupAction_Cancel,  "stop")
 (Qn::BackupAction_ShowProgress, QString())
 )
+
+namespace Qn {
+
+QString toString(AuthResult value)
+{
+    return QnLexical::serialized(value);
+}
+
+} // namespace Qn

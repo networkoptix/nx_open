@@ -532,8 +532,11 @@ QN_DECLARE_METAOBJECT_HEADER(Qn,
         Auth_CloudConnectError   // can't connect to the Cloud to authenticate
     };
     QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(AuthResult)
+    QString toString(AuthResult value);
 
-    enum FailoverPriority {
+
+    enum FailoverPriority
+    {
         FP_Never,
         FP_Low,
         FP_Medium,
