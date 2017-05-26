@@ -2,6 +2,7 @@
 
 var Config = {
     viewsDir: 'static/views/', //'static/lang_' + lang + '/views/';
+    viewsDirCommon: 'web_common/views/',
     gatewayUrl: '/gateway',
     googleTagsCode: 'GTM-5MRNWP',
     apiBase: '/api',
@@ -192,5 +193,10 @@ var Config = {
                 ]
             }
         ]
+    },
+    webclient:{
+        useServerTime: true,
+        disableVolume: true,
+        reloadInterval: 5*1000
     }
 };
