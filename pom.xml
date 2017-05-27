@@ -140,6 +140,7 @@
         <newmobile/>
         <liteMode>false</liteMode>
         <iosTarget>iphoneos</iosTarget>
+        <paxton>false</paxton>
 
         <template>lib</template>
         <noQmlInQrc>false</noQmlInQrc>
@@ -637,9 +638,6 @@
                 <module>plugins/nxcontrol</module>
                 <module>plugins/acs/paxton-plugin</module>
             </modules>
-            <properties>
-                <paxton>true</paxton>
-            </properties>
         </profile>
         <profile>
             <id>windows-nomobile</id>
