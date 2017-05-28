@@ -117,6 +117,8 @@ void MessageBus::stop()
 {
     {
         QnMutexLocker lock(&m_mutex);
+        ec2::detail::QnDbManager::QnDbTransactionLocker dbTran(m_db->getTransaction());
+        dbTran.commit();
         m_remoteUrls.clear();
     }
 
@@ -341,9 +343,14 @@ void MessageBus::sendAlivePeersMessage(const P2pConnectionPtr& connection)
 {
     QVector<PeerDistanceRecord> records;
     records.reserve(m_peers->allPeerDistances.size());
+    const auto localPeer = ApiPersistentIdData(this->localPeer());
     for (auto itr = m_peers->allPeerDistances.cbegin(); itr != m_peers->allPeerDistances.cend(); ++itr)
     {
         qint32 minDistance = itr->minDistance();
+        // Don't broadcast foreign offline distances
+        if (minDistance < kMaxDistance && minDistance > kMaxOnlineDistance)
+            minDistance = itr->distanceVia(localPeer);
+
         if (minDistance == kMaxDistance)
             continue;
         const qint16 peerNumber = m_localShortPeerInfo.encode(itr.key());
@@ -918,10 +925,13 @@ bool MessageBus::handlePeersMessage(const P2pConnectionPtr& connection, const QB
         qint64 timeMs = qnSyncTime->currentMSecsSinceEpoch();
         for (const auto& peer: peers)
         {
+            int distance = peer.distance;
+            if (distance < kMaxOnlineDistance)
+                ++distance;
             m_peers->addRecord(
                 connection->remotePeer(),
                 shortPeers.decode(peer.peerNumber),
-                nx::p2p::RoutingRecord(peer.distance + 1, timeMs));
+                nx::p2p::RoutingRecord(distance, timeMs));
         }
         emitPeerFoundLostSignals();
         return true;
@@ -1159,6 +1169,20 @@ void MessageBus::proxyFillerTransaction(const ec2::QnAbstractTransaction& tran)
     }
 }
 
+void MessageBus::updateOfflineDistance(
+    const ApiPersistentIdData& to,
+    const ApiPersistentIdData& via,
+    int sequence)
+{
+    const qint32 offlineDistance = kMaxDistance - sequence;
+    const qint32 toDistance = m_peers->alivePeers[via].distanceTo(to);
+    if (offlineDistance < toDistance)
+    {
+        nx::p2p::RoutingRecord record(offlineDistance, qnSyncTime->currentUSecsSinceEpoch());
+        m_peers->addRecord(via, to, record);
+    }
+}
+
 void MessageBus::gotTransaction(
     const QnTransaction<ApiUpdateSequenceData> &tran,
     const P2pConnectionPtr& connection)
@@ -1169,6 +1193,8 @@ void MessageBus::gotTransaction(
 
     if (nx::utils::log::isToBeLogged(cl_logDEBUG1, QnLog::P2P_TRAN_LOG))
         printTran(connection, tran, Connection::Direction::incoming);
+
+    updateOfflineDistance(peerId, connection->remotePeer(), tran.persistentInfo.sequence);
 
     if (!m_db)
         return;
@@ -1242,7 +1268,7 @@ void MessageBus::gotTransaction(
     {
         if (transactionDescriptor->isPersistent)
         {
-
+            updateOfflineDistance(peerId, connection->remotePeer(), tran.persistentInfo.sequence);
             std::unique_ptr<ec2::detail::QnDbManager::QnLazyTransactionLocker> dbTran;
             dbTran.reset(new ec2::detail::QnDbManager::QnLazyTransactionLocker(m_db->getTransaction()));
 
@@ -1573,7 +1599,7 @@ void MessageBus::emitPeerFoundLostSignals()
     for (const auto& peer: lostPeers)
     {
         cleanupRuntimeInfo(peer);
-        
+
         ApiPeerData samePeer(ApiPersistentIdData(peer.id, QnUuid()), peer.peerType);
         auto samePeerItr = newAlivePeers.lower_bound(samePeer);
         bool hasSimilarPeer = samePeerItr != newAlivePeers.end() && samePeerItr->id == peer.id;

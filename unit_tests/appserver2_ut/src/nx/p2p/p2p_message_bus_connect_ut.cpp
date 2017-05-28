@@ -20,7 +20,7 @@ namespace nx {
 namespace p2p {
 namespace test {
 
-static const int kInstanceCount = 5;
+static const int kInstanceCount = 2;
 static const int kMaxSyncTimeoutMs = 1000 * 20 * 1000;
 static const int kPropertiesPerCamera = 5;
 static const int kCamerasCount = 20;
@@ -178,10 +178,13 @@ protected:
                 &ec2::DummyHandler::onRequestDone);
     }
 
-    void testMain(std::function<void(std::vector<Appserver2Ptr>&)> serverConnectFunc)
+    void testMain(std::function<void(std::vector<Appserver2Ptr>&)> serverConnectFunc, int keekDbAtServerIndex = -1)
     {
+        m_servers.clear();
+        m_instanceCounter = 0;
+
         const_cast<bool&>(ec2::ini().isP2pMode) = true;
-        startServers(kInstanceCount);
+        startServers(kInstanceCount, keekDbAtServerIndex);
 
         QElapsedTimer t;
         t.restart();
@@ -206,6 +209,10 @@ protected:
         // check all runtime data are received
         checkMessageBus(&checkRuntimeInfo, lm("missing runtime info"));
 
+        int expectedCamerasCount = kInstanceCount;
+        expectedCamerasCount *= kCamerasCount;
+        if (keekDbAtServerIndex >= 0)
+            expectedCamerasCount *= 2;
         // wait for data sync
         int syncDoneCounter = 0;
         do
@@ -215,7 +222,7 @@ protected:
             {
                 const auto& resPool = server->moduleInstance()->commonModule()->resourcePool();
                 const auto& cameraList = resPool->getAllCameras(QnResourcePtr());
-                if (cameraList.size() == kInstanceCount * kCamerasCount)
+                if (cameraList.size() == expectedCamerasCount)
                     ++syncDoneCounter;
                 else
                     break;
@@ -237,6 +244,12 @@ TEST_F(P2pMessageBusTest, SequenceConnect)
 TEST_F(P2pMessageBusTest, FullConnect)
 {
     testMain(fullConnect);
+}
+
+TEST_F(P2pMessageBusTest, RestartServer)
+{
+    testMain(fullConnect);
+    testMain(fullConnect, 0);
 }
 
 } // namespace test

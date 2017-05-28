@@ -213,7 +213,8 @@ int Appserver2Process::exec()
     registerQtResources();
 
     m_commonModule.reset(new QnCommonModule(false));
-    m_commonModule->setModuleGUID(QnUuid::createUuid());
+    m_commonModule->setModuleGUID(
+        m_moduleGuid.isNull() ? QnUuid::createUuid() : m_moduleGuid);
 
     QnResourceDiscoveryManager resourceDiscoveryManager(m_commonModule.get());
     // Starting receiving notifications.
@@ -339,6 +340,11 @@ QnCommonModule* Appserver2Process::commonModule() const
     return m_commonModule.get();
 }
 
+void Appserver2Process::setModuleGuid(const QnUuid& id)
+{
+    m_moduleGuid = id;
+}
+
 SocketAddress Appserver2Process::endpoint() const
 {
     QnMutexLocker lk(&m_mutex);
@@ -398,6 +404,11 @@ SocketAddress Appserver2ProcessPublic::endpoint() const
 QnCommonModule* Appserver2ProcessPublic::commonModule() const
 {
     return m_impl->commonModule();
+}
+
+void Appserver2ProcessPublic::setModuleGuid(const QnUuid& id)
+{
+    m_impl->setModuleGuid(id);
 }
 
 }   // namespace ec2

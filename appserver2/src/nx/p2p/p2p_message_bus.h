@@ -325,6 +325,11 @@ public:
     DelayIntervals delayIntervals() const;
 
     QMap<ApiPersistentIdData, ApiRuntimeData> runtimeInfo() const;
+
+    void MessageBus::updateOfflineDistance(
+        const ApiPersistentIdData& to,
+        const ApiPersistentIdData& via,
+        int sequence);
 private:
     QMap<QnUuid, P2pConnectionPtr> m_connections; //< Actual connection list
     QMap<QnUuid, P2pConnectionPtr> m_outgoingConnections; //< Temporary list of outgoing connections

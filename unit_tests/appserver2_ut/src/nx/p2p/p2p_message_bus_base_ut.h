@@ -31,8 +31,8 @@ protected:
     static void circleConnect(std::vector<Appserver2Ptr>& servers);
     static void fullConnect(std::vector<Appserver2Ptr>& servers);
 
-    void startServers(int count);
-    Appserver2Ptr createAppserver();
+    void startServers(int count, int keekDbAtServerIndex = -1);
+    Appserver2Ptr createAppserver(bool keepDbFile = false);
 
     void initResourceTypes(ec2::AbstractECConnection* ec2Connection);
     void createData(
@@ -43,6 +43,7 @@ protected:
 protected:
     QnStaticCommonModule staticCommon;
     std::vector<Appserver2Ptr> m_servers;
+    static int m_instanceCounter;
 };
 
 } // namespace test

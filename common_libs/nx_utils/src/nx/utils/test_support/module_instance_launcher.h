@@ -7,6 +7,7 @@
 
 #include "nx/utils/std/future.h"
 #include "nx/utils/std/thread.h"
+#include <nx/utils/uuid.h>
 
 namespace nx {
 namespace utils {
@@ -30,7 +31,7 @@ public:
             free(ptr);
     }
 
-    void start()
+    void start(const QnUuid& moduleGuid = QnUuid())
     {
         nx::utils::promise<void> moduleInstantiatedCreatedPromise;
         auto moduleInstantiatedCreatedFuture = moduleInstantiatedCreatedPromise.get_future();
@@ -38,10 +39,11 @@ public:
         m_moduleStartedPromise = std::make_unique<nx::utils::promise<bool>>();
 
         m_moduleProcessThread = nx::utils::thread(
-            [this, &moduleInstantiatedCreatedPromise]()->int
+            [this, &moduleInstantiatedCreatedPromise, moduleGuid]()->int
             {
                 m_moduleInstance = std::make_unique<ModuleProcessType>(
                     static_cast<int>(m_args.size()), m_args.data());
+                m_moduleInstance->setModuleGuid(moduleGuid);
                 m_moduleInstance->setOnStartedEventHandler(
                     [this](bool isStarted)
                     {

@@ -36,7 +36,12 @@ struct ApiPersistentIdData: ApiIdData
     /** Unique persistent Db ID of the peer. Empty for clients */
     QnUuid persistentId;
 
+    bool operator==(const ApiPersistentIdData& other) const
+    {
+        return id == other.id && persistentId == other.persistentId;
+    }
 };
+
 #define ApiPersistentIdData_Fields ApiIdData_Fields (persistentId)
 
 struct ApiPeerData: ApiPersistentIdData

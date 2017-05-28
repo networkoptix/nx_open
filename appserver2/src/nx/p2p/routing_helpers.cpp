@@ -30,6 +30,12 @@ qint32 RouteToPeerInfo::minDistance(QVector<ApiPersistentIdData>* outViaList) co
     return m_minDistance;
 }
 
+qint32 RouteToPeerInfo::distanceVia(const ApiPersistentIdData& peer) const
+{
+    auto itr = m_routeVia.find(peer);
+    return itr != m_routeVia.end() ? itr.value().distance : kMaxDistance;
+}
+
 // ---------------------- BidirectionRoutingInfo --------------
 
 BidirectionRoutingInfo::BidirectionRoutingInfo(

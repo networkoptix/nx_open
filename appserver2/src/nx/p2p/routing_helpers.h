@@ -34,6 +34,7 @@ struct RouteToPeerInfo
     RouteToPeerInfo() {}
 
     qint32 minDistance(QVector<ApiPersistentIdData>* outViaList = nullptr) const;
+    qint32 distanceVia(const ApiPersistentIdData& peer) const;
     const RoutingInfo& routeVia() const { return m_routeVia; }
 
     void remove(const ApiPersistentIdData& id)

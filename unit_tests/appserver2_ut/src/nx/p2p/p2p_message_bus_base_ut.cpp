@@ -4,10 +4,13 @@
 
 #include <nx/utils/test_support/test_options.h>
 #include <nx/utils/log/log.h>
+#include <api/common_message_processor.h>
 
 namespace nx {
 namespace p2p {
 namespace test {
+
+int P2pMessageBusTestBase::m_instanceCounter = 0;
 
 void P2pMessageBusTestBase::initResourceTypes(ec2::AbstractECConnection* ec2Connection)
 {
@@ -24,8 +27,25 @@ void P2pMessageBusTestBase::createData(
     int userCount)
 {
     const auto connection = server->moduleInstance()->ecConnection();
+    auto messageProcessor = server->moduleInstance()->commonModule()->messageProcessor();
 
     initResourceTypes(connection);
+
+    //read server list
+    ec2::ApiMediaServerDataList mediaServerList;
+    ASSERT_EQ(
+        ec2::ErrorCode::ok,
+        connection->getMediaServerManager(Qn::kSystemAccess)->getServersSync(&mediaServerList));
+    for (const auto &mediaServer : mediaServerList)
+        messageProcessor->updateResource(mediaServer, ec2::NotificationSource::Local);
+
+    //read camera list
+    ec2::ApiCameraDataList cameraList;
+    ASSERT_EQ(
+        ec2::ErrorCode::ok,
+        connection->getCameraManager(Qn::kSystemAccess)->getCamerasSync(&cameraList));
+    for (const auto &camera: cameraList)
+        messageProcessor->updateResource(camera, ec2::NotificationSource::Local);
 
     {
         ec2::ApiMediaServerData serverData;
@@ -90,36 +110,36 @@ void P2pMessageBusTestBase::createData(
     ASSERT_EQ(ec2::ErrorCode::ok, cameraManager->addCamerasSync(cameras));
 }
 
-Appserver2Ptr P2pMessageBusTestBase::createAppserver()
+Appserver2Ptr P2pMessageBusTestBase::createAppserver(bool keepDbFile)
 {
-    static int instanceCounter = 0;
-
     auto tmpDir = nx::utils::TestOptions::temporaryDirectoryPath();
     if (tmpDir.isEmpty())
         tmpDir = QDir::homePath();
-    tmpDir += lm("/ec2_server_sync_ut.data%1").arg(instanceCounter);
-    QDir(tmpDir).removeRecursively();
+    tmpDir += lm("/ec2_server_sync_ut.data%1").arg(m_instanceCounter);
+    if (!keepDbFile)
+        QDir(tmpDir).removeRecursively();
 
     Appserver2Ptr result(new Appserver2());
+    auto guid = guidFromArbitraryData(lm("guid_hash%1").arg(m_instanceCounter));
 
     const QString dbFileArg = lit("--dbFile=%1").arg(tmpDir);
     result->addArg(dbFileArg.toStdString().c_str());
 
-    const QString instanceArg = lit("--moduleInstance=%1").arg(instanceCounter);
+    const QString instanceArg = lit("--moduleInstance=%1").arg(m_instanceCounter);
     result->addArg(instanceArg.toStdString().c_str());
 
-    ++instanceCounter;
+    ++m_instanceCounter;
 
-    result->start();
+    result->start(guid);
     return result;
 }
 
-void P2pMessageBusTestBase::startServers(int count)
+void P2pMessageBusTestBase::startServers(int count, int keekDbAtServerIndex)
 {
     QElapsedTimer t;
     t.restart();
     for (int i = 0; i < count; ++i)
-        m_servers.push_back(createAppserver());
+        m_servers.push_back(createAppserver(i == keekDbAtServerIndex));
 
     for (const auto& server: m_servers)
     {

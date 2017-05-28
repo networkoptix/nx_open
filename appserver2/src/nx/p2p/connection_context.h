@@ -41,6 +41,7 @@ public:
 
     // to remote part
     QByteArray remotePeersMessage; //< last received peers message
+    QVector<PeerDistanceRecord> remotePeers;
     ec2::QnTranState remoteSubscription; //< remote -> local subscription
     bool remoteSelectingDataInProgress = false;
     bool isRemoteStarted = false; //< remote peer has open logical connection to us
