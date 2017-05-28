@@ -277,7 +277,6 @@ MainWindow::MainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::WindowF
     addAction(action(action::PreviousLayoutAction));
     addAction(action(action::SaveCurrentLayoutAction));
     addAction(action(action::SaveCurrentLayoutAsAction));
-    addAction(action(action::SaveCurrentLayoutTourAction));
     addAction(action(action::SaveCurrentVideoWallReviewAction));
     addAction(action(action::ExitAction));
     addAction(action(action::EscapeHotkeyAction));

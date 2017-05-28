@@ -78,9 +78,7 @@ QnWorkbenchNotificationsHandler::QnWorkbenchNotificationsHandler(QObject *parent
             checkAndAddSystemHealthMessage(QnSystemHealth::SystemIsReadOnly);
         });
 
-    QnCommonMessageProcessor *messageProcessor = qnCommonMessageProcessor;
-    connect(messageProcessor, &QnCommonMessageProcessor::connectionOpened, this,
-        &QnWorkbenchNotificationsHandler::at_eventManager_connectionOpened);
+    QnCommonMessageProcessor* messageProcessor = qnCommonMessageProcessor;
     connect(messageProcessor, &QnCommonMessageProcessor::connectionClosed, this,
         &QnWorkbenchNotificationsHandler::at_eventManager_connectionClosed);
     connect(messageProcessor, &QnCommonMessageProcessor::businessActionReceived, this,
@@ -230,7 +228,6 @@ bool QnWorkbenchNotificationsHandler::adminOnlyMessage(QnSystemHealth::MessageTy
     switch (message)
     {
         case QnSystemHealth::EmailIsEmpty:
-        case QnSystemHealth::ConnectionLost:
             return false;
 
         case QnSystemHealth::NoLicenses:
@@ -277,13 +274,13 @@ void QnWorkbenchNotificationsHandler::setSystemHealthEventVisibleInternal(QnSyst
 
     if (!connected)
     {
-        canShow = (message == QnSystemHealth::ConnectionLost);
+        canShow = false;
         if (visible)
         {
             /* In unit tests there can be users when we are disconnected. */
             QGuiApplication* guiApp = qobject_cast<QGuiApplication*>(qApp);
             if (guiApp)
-                NX_ASSERT(canShow, Q_FUNC_INFO, "No events but 'Connection lost' should be displayed if we are disconnected");
+                NX_ASSERT(false, Q_FUNC_INFO, "No events should be displayed if we are disconnected");
         }
     }
     else
@@ -317,7 +314,6 @@ void QnWorkbenchNotificationsHandler::checkAndAddSystemHealthMessage(QnSystemHea
 {
     switch (message)
     {
-        case QnSystemHealth::ConnectionLost:
         case QnSystemHealth::EmailSendError:
         case QnSystemHealth::StoragesAreFull:
         case QnSystemHealth::NoPrimaryTimeServer:
@@ -388,17 +384,9 @@ void QnWorkbenchNotificationsHandler::at_userEmailValidityChanged(const QnUserRe
     setSystemHealthEventVisible(message, user, visible);
 }
 
-
-void QnWorkbenchNotificationsHandler::at_eventManager_connectionOpened()
-{
-    setSystemHealthEventVisible(QnSystemHealth::ConnectionLost, false);
-}
-
 void QnWorkbenchNotificationsHandler::at_eventManager_connectionClosed()
 {
     clear();
-    if (!commonModule()->remoteGUID().isNull())
-        setSystemHealthEventVisible(QnSystemHealth::ConnectionLost, true);
 }
 
 void QnWorkbenchNotificationsHandler::at_eventManager_actionReceived(const QnAbstractBusinessActionPtr &businessAction)

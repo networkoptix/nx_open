@@ -7,7 +7,7 @@
 #include "mediaserver_launcher.h"
 #include <api/app_server_connection.h>
 #include <nx/network/http/auth_tools.h>
-#include <nx/network/http/httpclient.h>
+#include <nx/network/http/http_client.h>
 #include <nx/network/http/custom_headers.h>
 
 #include <nx/fusion/model_functions.h>

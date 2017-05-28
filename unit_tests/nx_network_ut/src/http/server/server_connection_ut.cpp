@@ -8,7 +8,7 @@
 
 #include <nx/network/aio/timer.h>
 #include <nx/network/http/buffer_source.h>
-#include <nx/network/http/httpclient.h>
+#include <nx/network/http/http_client.h>
 #include <nx/network/http/http_async_client.h>
 #include <nx/network/http/test_http_server.h>
 #include <nx/network/http/server/abstract_http_request_handler.h>

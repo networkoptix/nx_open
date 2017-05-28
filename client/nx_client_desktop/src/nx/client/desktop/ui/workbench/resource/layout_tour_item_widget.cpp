@@ -12,6 +12,7 @@
 
 #include <text/time_strings.h>
 
+#include <nx/client/desktop/ui/actions/action_manager.h>
 #include <ui/common/palette.h>
 #include <ui/graphics/items/generic/image_button_widget.h>
 #include <ui/graphics/items/generic/masked_proxy_widget.h>
@@ -179,6 +180,11 @@ void LayoutTourItemWidget::initOverlay()
         [this](int value)
         {
             item()->setData(Qn::LayoutTourItemDelayMsRole, value * 1000);
+        });
+    connect(delayEdit, &QSpinBox::editingFinished, this,
+        [this]
+        {
+            menu()->trigger(action::SaveCurrentLayoutTourAction);
         });
 
     auto delayWidget = new QnMaskedProxyWidget();

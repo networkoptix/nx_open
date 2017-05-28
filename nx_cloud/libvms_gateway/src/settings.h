@@ -109,8 +109,6 @@ private:
     Tcp m_tcp;
     Http m_http;
     CloudConnect m_cloudConnect;
-
-    void loadConfiguration();
 };
 
 } // namespace conf

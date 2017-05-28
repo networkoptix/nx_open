@@ -60,6 +60,10 @@ public:
     /** Item by unique id. Returns nullptr if an item with specified id is not found. */
     QGraphicsWidget* item(const QnUuid& id) const;
 
+    /** Scroll amount in pixels that is considered one line. */
+    int lineHeight() const;
+    void setLineHeight(int value);
+
 protected:
     virtual QSizeF sizeHint(Qt::SizeHint which,
         const QSizeF& constraint = QSizeF()) const override;

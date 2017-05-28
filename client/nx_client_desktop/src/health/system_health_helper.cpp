@@ -19,8 +19,6 @@ QString QnSystemHealthStringsHelper::messageTitle(QnSystemHealth::MessageType me
             return tr("Email server is not set");
         case QnSystemHealth::UsersEmailIsEmpty:
             return tr("Some users have not set their Email addresses");
-        case QnSystemHealth::ConnectionLost:
-            return tr("Connection to server lost");
         case QnSystemHealth::NoPrimaryTimeServer:
             return tr("Select server for others to synchronize time with");
         case QnSystemHealth::SystemIsReadOnly:

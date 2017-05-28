@@ -110,7 +110,6 @@ public:
      * * videowalls (videowall as a parent)
      * * videowall reviews (videowall as a parent)
      * * lite client control (server as a parent)
-     * * layout tours review (tour id as a parent id)
      */
     bool isServiceLayout() const;
 
