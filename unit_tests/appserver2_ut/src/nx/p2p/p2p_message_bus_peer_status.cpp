@@ -87,9 +87,9 @@ protected:
             &ec2::QnTransactionMessageBusBase::peerLost,
             [this](QnUuid peer, Qn::PeerType)
         {
-            int oldSize = m_alivePeers.size();
+            auto oldSize = m_alivePeers.size();
             m_alivePeers.erase(peer);
-            int newSize = m_alivePeers.size();
+            auto newSize = m_alivePeers.size();
             ASSERT_TRUE(oldSize > newSize);
         }
         );

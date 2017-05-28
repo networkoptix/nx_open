@@ -99,7 +99,7 @@ private:
 
     void onHttpClientDone();
 
-    void fillAuthInfo(nx_http::AsyncClient* httpClient, bool authByKey);
+    void fillAuthInfo(bool authByKey);
 
     void onMessageSent(SystemError::ErrorCode errorCode, size_t bytesSent);
     void onNewMessageRead(SystemError::ErrorCode errorCode, size_t bytesRead);

@@ -21,14 +21,14 @@ TEST(P2pRouting, distanceTo)
     ec2::ApiPersistentIdData to3 = to2;
     to3.persistentId = QnUuid::createUuid();
 
-    routing.addRecord(via1, to1, RoutingRecord(1, 0));
-    routing.addRecord(via1, to2, RoutingRecord(2, 0));
-    routing.addRecord(via1, to3, RoutingRecord(3, 0));
+    routing.addRecord(via1, to1, RoutingRecord(1));
+    routing.addRecord(via1, to2, RoutingRecord(2));
+    routing.addRecord(via1, to3, RoutingRecord(3));
 
     ec2::ApiPersistentIdData via2 = genId();
-    routing.addRecord(via2, to1, RoutingRecord(4, 0));
-    routing.addRecord(via2, to2, RoutingRecord(5, 0));
-    routing.addRecord(via2, to3, RoutingRecord(6, 0));
+    routing.addRecord(via2, to1, RoutingRecord(4));
+    routing.addRecord(via2, to2, RoutingRecord(5));
+    routing.addRecord(via2, to3, RoutingRecord(6));
 
     ASSERT_EQ(1, routing.distanceTo(to1));
     ASSERT_EQ(2, routing.distanceTo(to2));
@@ -62,14 +62,14 @@ TEST(P2pRouting, routeTo)
     ec2::ApiPersistentIdData to3 = to2;
     to3.persistentId = QnUuid::createUuid();
 
-    routing.addRecord(via1, to1, RoutingRecord(1, 0));
-    routing.addRecord(via1, to2, RoutingRecord(2, 0));
-    routing.addRecord(via1, to3, RoutingRecord(3, 0));
+    routing.addRecord(via1, to1, RoutingRecord(1));
+    routing.addRecord(via1, to2, RoutingRecord(2));
+    routing.addRecord(via1, to3, RoutingRecord(3));
 
     ec2::ApiPersistentIdData via2 = genId();
-    routing.addRecord(via2, to1, RoutingRecord(4, 0));
-    routing.addRecord(via2, to2, RoutingRecord(5, 0));
-    routing.addRecord(via2, to3, RoutingRecord(6, 0));
+    routing.addRecord(via2, to1, RoutingRecord(4));
+    routing.addRecord(via2, to2, RoutingRecord(5));
+    routing.addRecord(via2, to3, RoutingRecord(6));
 
     QVector<ApiPersistentIdData> viaList;
     qint32 distance = routing.distanceTo(to3.id, &viaList);

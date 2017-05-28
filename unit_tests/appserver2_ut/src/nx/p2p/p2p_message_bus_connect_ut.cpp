@@ -39,7 +39,7 @@ protected:
         return bus->distanceTo(peer) <= kMaxOnlineDistance;
     }
 
-    static bool checkRuntimeInfo(const MessageBus* bus, const ApiPersistentIdData& peer)
+    static bool checkRuntimeInfo(const MessageBus* bus, const ApiPersistentIdData& /*peer*/)
     {
         return bus->runtimeInfo().size() == kInstanceCount;
     }

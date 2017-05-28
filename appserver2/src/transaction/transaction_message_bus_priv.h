@@ -35,7 +35,7 @@ bool handleTransactionParams(
 //Overload for json transactions
 template<typename Function, typename Param>
 bool handleTransactionParams(
-    QnTransactionMessageBusBase* bus,
+    QnTransactionMessageBusBase* /*bus*/,
     const QByteArray &serializedTransaction,
     const QJsonObject& jsonData,
     const QnAbstractTransaction &abstractTransaction,

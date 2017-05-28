@@ -56,7 +56,7 @@ namespace ec2 {
     QnUpdatesManager<QueryProcessorType>::~QnUpdatesManager() {}
 
     template<class QueryProcessorType>
-    int QnUpdatesManager<QueryProcessorType>::sendUpdatePackageChunk(const QString &updateId, const QByteArray &data, qint64 offset, const QnPeerSet &peers, impl::SimpleHandlerPtr handler)
+    int QnUpdatesManager<QueryProcessorType>::sendUpdatePackageChunk(const QString &updateId, const QByteArray &data, qint64 offset, const QnPeerSet& /*peers*/, impl::SimpleHandlerPtr handler)
     {
         const int reqId = generateRequestID();
 
@@ -93,7 +93,7 @@ namespace ec2 {
     }
 
     template<class QueryProcessorType>
-    int QnUpdatesManager<QueryProcessorType>::installUpdate(const QString &updateId, const QnPeerSet &peers, impl::SimpleHandlerPtr handler)
+    int QnUpdatesManager<QueryProcessorType>::installUpdate(const QString &updateId, const QnPeerSet& /*peers*/, impl::SimpleHandlerPtr handler)
     {
         const int reqId = generateRequestID();
 

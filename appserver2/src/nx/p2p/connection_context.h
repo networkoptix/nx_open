@@ -46,8 +46,6 @@ public:
     bool remoteSelectingDataInProgress = false;
     bool isRemoteStarted = false; //< remote peer has open logical connection to us
     PeerNumberInfo shortPeerInfo;
-
-    QElapsedTimer sendStartTimer;
 };
 
 } // namespace p2p

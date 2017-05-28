@@ -55,8 +55,8 @@ void BidirectionRoutingInfo::clear()
 
 void BidirectionRoutingInfo::addLocalPeer()
 {
-    auto& peerData = alivePeers[m_localPeer].routeTo[m_localPeer] = RoutingRecord(0, 0);
-    allPeerDistances[m_localPeer].insert(m_localPeer, RoutingRecord(0, 0));
+    alivePeers[m_localPeer].routeTo[m_localPeer] = RoutingRecord(0);
+    allPeerDistances[m_localPeer].insert(m_localPeer, RoutingRecord(0));
 }
 
 void BidirectionRoutingInfo::removePeer(const ApiPersistentIdData& via)
@@ -116,7 +116,7 @@ void BidirectionRoutingInfo::updateLocalDistance(const ApiPersistentIdData& peer
     addRecord(
         m_localPeer,
         peer,
-        RoutingRecord(localOfflineDistance, qnSyncTime->currentMSecsSinceEpoch()));
+        RoutingRecord(localOfflineDistance));
 }
 
 } // namespace p2p

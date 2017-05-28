@@ -12,8 +12,6 @@
 
 namespace {
     static const int kByteArrayAlignFactor = sizeof(unsigned);
-    static const int kPeerRecordSize = 7; // 2 bytes number + 4 bytes distance + online flag
-    static const int kResolvePeerResponseRecordSize = 16 * 2 + 2; //< two guid + uncompressed PeerNumber per record
 }
 
 namespace nx {
@@ -88,7 +86,7 @@ QByteArray serializePeersMessage(
 {
     QByteArray result;
     result.resize(qPower2Ceil(
-        unsigned(records.size() * kPeerRecordSize + reservedSpaceAtFront),
+        unsigned(records.size() * PeerDistanceRecord::kMaxRecordSize + reservedSpaceAtFront),
         kByteArrayAlignFactor));
     BitStreamWriter writer;
     writer.setBuffer((quint8*) result.data(), result.size());
@@ -178,7 +176,8 @@ QVector<PeerNumberType> deserializeCompressedPeers(const QByteArray& data, bool*
 QByteArray serializeSubscribeRequest(const QVector<SubscribeRecord>& request, int reservedSpaceAtFront)
 {
     QByteArray result;
-    result.resize(qPower2Ceil(unsigned(request.size() * kPeerRecordSize + reservedSpaceAtFront), kByteArrayAlignFactor));
+    result.resize(qPower2Ceil(unsigned(request.size() * PeerDistanceRecord::kMaxRecordSize +
+        reservedSpaceAtFront), kByteArrayAlignFactor));
     BitStreamWriter writer;
     writer.setBuffer((quint8*) result.data(), result.size());
     writer.putBits(reservedSpaceAtFront * 8, 0);
@@ -262,7 +261,7 @@ QByteArray serializeResolvePeerNumberResponse(
     int reservedSpaceAtFront)
 {
     QByteArray result;
-    result.reserve(peers.size() * kResolvePeerResponseRecordSize + reservedSpaceAtFront);
+    result.reserve(peers.size() * PeerNumberResponseRecord::kRecordSize + reservedSpaceAtFront);
     {
         QBuffer buffer(&result);
         buffer.open(QIODevice::WriteOnly);
@@ -286,7 +285,7 @@ const QVector<PeerNumberResponseRecord> deserializeResolvePeerNumberResponse(con
     QVector<PeerNumberResponseRecord> result;
 
     *success = false;
-    if (response.size() % kResolvePeerResponseRecordSize != 0)
+    if (response.size() % PeerNumberResponseRecord::kRecordSize != 0)
         return result;
 
     QBuffer buffer(&response);
@@ -313,7 +312,7 @@ const QVector<PeerNumberResponseRecord> deserializeResolvePeerNumberResponse(con
 QByteArray serializeUnicastHeader(const UnicastTransactionRecords& records)
 {
     QByteArray result;
-    result.reserve(UnicastTransactionRecord::recordSize * records.size());
+    result.reserve(UnicastTransactionRecord::recordSize * (int) records.size());
     {
         QBuffer buffer(&result);
         buffer.open(QIODevice::WriteOnly);
@@ -342,7 +341,6 @@ UnicastTransactionRecords deserializeUnicastHeader(const QByteArray& _response, 
     QDataStream in(&buffer);
     QByteArray tmpBuffer;
     tmpBuffer.resize(16);
-    PeerNumberType shortPeerNumber;
     ApiPersistentIdData fullId;
     quint32 size;
     in >> size;

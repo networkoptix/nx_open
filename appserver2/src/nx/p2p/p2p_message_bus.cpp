@@ -279,7 +279,6 @@ void MessageBus::addOfflinePeersFromDb()
     const auto localPeer = this->localPeer();
 
     auto persistentState = m_db->transactionLog()->getTransactionsState().values;
-    const qint64 currentTimeMs = qnSyncTime->currentMSecsSinceEpoch();
     for (auto itr = persistentState.cbegin(); itr != persistentState.cend(); ++itr)
     {
         const auto& peer = itr.key();
@@ -288,7 +287,7 @@ void MessageBus::addOfflinePeersFromDb()
 
         const qint32 sequence = itr.value();
         const qint32 localOfflineDistance = kMaxDistance - sequence;
-        nx::p2p::RoutingRecord record(localOfflineDistance, currentTimeMs);
+        nx::p2p::RoutingRecord record(localOfflineDistance);
         m_peers->addRecord(localPeer, peer, record);
     }
 }
@@ -304,7 +303,7 @@ void MessageBus::printPeersMessage()
         qint32 minDistance = peer.minDistance();
         if (minDistance == kMaxDistance)
             continue;
-        qint16 peerNumber = m_localShortPeerInfo.encode(itr.key());
+        m_localShortPeerInfo.encode(itr.key());
 
         records << lit("\t\t\t\t\t To:  %1(dbId=%2). Distance: %3")
             .arg(qnStaticCommon->moduleDisplayName(itr.key().id))
@@ -507,8 +506,6 @@ bool MessageBus::hasStartingConnections() const
 
 void MessageBus::startStopConnections(const QMap<ApiPersistentIdData, P2pConnectionPtr>& currentSubscription)
 {
-    const RouteToPeerMap& allPeerDistances = m_peers->allPeerDistances;
-
     if (hasStartingConnections())
         return;
 
@@ -525,7 +522,6 @@ void MessageBus::startStopConnections(const QMap<ApiPersistentIdData, P2pConnect
         if (needStartConnection(peer, currentSubscription))
         {
             context->isLocalStarted = true;
-            context->sendStartTimer.restart();
             connection->sendMessage(MessageType::start, QByteArray());
             if (--maxStartsAtOnce == 0)
                 return; //< limit start requests at once
@@ -714,7 +710,7 @@ void MessageBus::startReading(P2pConnectionPtr connection)
 
 void MessageBus::at_stateChanged(
     QWeakPointer<Connection> weakRef,
-    Connection::State state)
+    Connection::State /*state*/)
 {
     P2pConnectionPtr connection = weakRef.toStrongRef();
     if (!connection)
@@ -922,7 +918,6 @@ bool MessageBus::handlePeersMessage(const P2pConnectionPtr& connection, const QB
     {
         m_peers->removePeer(connection->remotePeer());
         auto& shortPeers = context(connection)->shortPeerInfo;
-        qint64 timeMs = qnSyncTime->currentMSecsSinceEpoch();
         for (const auto& peer: peers)
         {
             int distance = peer.distance;
@@ -931,7 +926,7 @@ bool MessageBus::handlePeersMessage(const P2pConnectionPtr& connection, const QB
             m_peers->addRecord(
                 connection->remotePeer(),
                 shortPeers.decode(peer.peerNumber),
-                nx::p2p::RoutingRecord(distance, timeMs));
+                nx::p2p::RoutingRecord(distance));
         }
         emitPeerFoundLostSignals();
         return true;
@@ -1178,7 +1173,7 @@ void MessageBus::updateOfflineDistance(
     const qint32 toDistance = m_peers->alivePeers[via].distanceTo(to);
     if (offlineDistance < toDistance)
     {
-        nx::p2p::RoutingRecord record(offlineDistance, qnSyncTime->currentUSecsSinceEpoch());
+        nx::p2p::RoutingRecord record(offlineDistance);
         m_peers->addRecord(via, to, record);
     }
 }

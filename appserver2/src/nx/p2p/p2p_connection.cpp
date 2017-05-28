@@ -59,7 +59,7 @@ Connection::Connection(
 
     if (m_remotePeerUrl.userName().isEmpty())
     {
-        fillAuthInfo(m_httpClient.get(), m_credentialsSource == CredentialsSource::serverKey);
+        fillAuthInfo(m_credentialsSource == CredentialsSource::serverKey);
     }
     else
     {
@@ -130,7 +130,7 @@ QUrl Connection::remoteUrl() const
     return QUrl();
 }
 
-void Connection::fillAuthInfo(nx_http::AsyncClient* httpClient, bool authByKey)
+void Connection::fillAuthInfo(bool authByKey)
 {
     if (!commonModule()->videowallGuid().isNull())
     {
@@ -203,7 +203,7 @@ void Connection::onHttpClientDone()
         if (m_credentialsSource < CredentialsSource::none)
         {
             using namespace std::placeholders;
-            fillAuthInfo(m_httpClient.get(), m_credentialsSource == CredentialsSource::serverKey);
+            fillAuthInfo(m_credentialsSource == CredentialsSource::serverKey);
             m_httpClient->doPost(
                 m_remotePeerUrl,
                 std::bind(&Connection::onHttpClientDone, this));

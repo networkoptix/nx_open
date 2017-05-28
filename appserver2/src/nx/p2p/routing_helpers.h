@@ -10,11 +10,10 @@ using namespace ec2;
 
 struct RoutingRecord
 {
-    RoutingRecord() : distance(0), lastRecvTime(0) {}
-    RoutingRecord(int distance, qint64 lastRecvTime) : distance(distance), lastRecvTime(lastRecvTime) {}
+    RoutingRecord() : distance(0) {}
+    RoutingRecord(int distance) : distance(distance) {}
 
     qint32 distance;
-    qint64 lastRecvTime;
 };
 
 typedef QMap<ApiPersistentIdData, RoutingRecord> RoutingInfo;

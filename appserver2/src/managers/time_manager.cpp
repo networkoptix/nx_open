@@ -806,7 +806,7 @@ void TimeSynchronizationManager::onNewConnectionEstablished( QnTransactionTransp
     }
 }
 
-void TimeSynchronizationManager::onPeerLost(QnUuid peer, Qn::PeerType peerType)
+void TimeSynchronizationManager::onPeerLost(QnUuid peer, Qn::PeerType /*peerType*/)
 {
     stopSynchronizingTimeWithPeer(peer);
 

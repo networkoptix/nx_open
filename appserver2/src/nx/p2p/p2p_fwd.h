@@ -63,6 +63,7 @@ struct PeerDistanceRecord
         distance(distance)
     {
     }
+    static const int kMaxRecordSize = 7; // 2 bytes number + 4 bytes distance + online flag
 
     PeerNumberType peerNumber = 0;
     qint32 distance = 0;
@@ -70,6 +71,8 @@ struct PeerDistanceRecord
 
 struct PeerNumberResponseRecord: public ec2::ApiPersistentIdData
 {
+    static const int kRecordSize = 16 * 2 + 2; //< two guid + uncompressed PeerNumber per record
+
     PeerNumberResponseRecord() {}
     PeerNumberResponseRecord(PeerNumberType peerNumber, const ec2::ApiPersistentIdData& id):
         ec2::ApiPersistentIdData(id),
