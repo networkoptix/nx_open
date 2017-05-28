@@ -184,7 +184,7 @@ std::unique_ptr<nx_http::AbstractMsgBodySource> RequestProxyWorker::prepareStrea
         std::move(contentType),
         m_targetHostPipeline->takeSocket());
     m_targetHostPipeline.reset();
-    return bodySource;
+    return std::move(bodySource);
 }
 
 } // namespace gateway
