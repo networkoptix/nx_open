@@ -69,9 +69,7 @@ def get_auth(request, system_id):
     auth_get = digest(request.session['login'], request.session['password'], realm, nonce, 'GET')
     auth_post = digest(request.session['login'], request.session['password'], realm, nonce, 'POST')
     auth_play = digest(request.session['login'], request.session['password'], realm, nonce, 'PLAY')
-    response = api_success({'authGet': auth_get, 'authPost': auth_post, 'authPlay': auth_play})
-    response.set_cookie('auth', auth_get)
-    return response
+    return api_success({'authGet': auth_get, 'authPost': auth_post, 'authPlay': auth_play})
 
 
 @api_view(['POST'])
