@@ -1,7 +1,9 @@
 #include "request_proxy_worker.h"
 
+#include <nx/network/http/async_channel_msg_body_source.h>
 #include <nx/network/http/buffer_source.h>
 #include <nx/utils/log/log.h>
+#include <nx/utils/std/cpp14.h>
 
 namespace nx {
 namespace cloud {
@@ -95,27 +97,18 @@ void RequestProxyWorker::onMessageFromTargetHost(nx_http::Message message)
         .arg(contentType.isEmpty() ? nx::String("none") : contentType),
         cl_logDEBUG2);
 
-    // NOTE: Message body has not been read yet.
-    
-    updateMessageHeaders(message.response);
-
     if (!messageBodyNeedsConvertion(*message.response))
     {
-        // m_messageBodyTransferMode = MessageBodyTransferMode::streaming;
-        // TODO
-        //return;
+        auto msgBody = prepareStreamingMessageBody(contentType);
+        m_responseSender->sendResponse(
+            nx_http::RequestResult(
+                static_cast<nx_http::StatusCode::Value>(statusCode),
+                std::move(msgBody)),
+            std::move(*message.response));
+        return;
     }
 
-    m_messageBodyTransferMode = MessageBodyTransferMode::whole;
     m_responseMessage = std::move(message);
-}
-
-void RequestProxyWorker::updateMessageHeaders(nx_http::Response* response)
-{
-    nx_http::insertOrReplaceHeader(
-        &response->headers,
-        nx_http::HttpHeader("Content-Encoding", "identity"));
-    response->headers.erase("Transfer-Encoding");
 }
 
 bool RequestProxyWorker::messageBodyNeedsConvertion(const nx_http::Response& response)
@@ -138,7 +131,9 @@ void RequestProxyWorker::onSomeMessageBodyRead(nx::Buffer someMessageBody)
 
 void RequestProxyWorker::onMessageEnd()
 {
-    auto msgBody = prepareMessageBody();
+    updateMessageHeaders(m_responseMessage.response);
+    
+    auto msgBody = prepareFixedMessageBody();
 
     const auto statusCode = m_responseMessage.response->statusLine.statusCode;
 
@@ -149,8 +144,10 @@ void RequestProxyWorker::onMessageEnd()
         std::move(*m_responseMessage.response));
 }
 
-std::unique_ptr<nx_http::AbstractMsgBodySource> RequestProxyWorker::prepareMessageBody()
+std::unique_ptr<nx_http::AbstractMsgBodySource> RequestProxyWorker::prepareFixedMessageBody()
 {
+    updateMessageHeaders(m_responseMessage.response);
+
     decltype(m_messageBodyBuffer) messageBodyBuffer;
     m_messageBodyBuffer.swap(messageBodyBuffer);
 
@@ -170,6 +167,24 @@ std::unique_ptr<nx_http::AbstractMsgBodySource> RequestProxyWorker::prepareMessa
             contentType,
             std::move(messageBodyBuffer));
     }
+}
+
+void RequestProxyWorker::updateMessageHeaders(nx_http::Response* response)
+{
+    nx_http::insertOrReplaceHeader(
+        &response->headers,
+        nx_http::HttpHeader("Content-Encoding", "identity"));
+    response->headers.erase("Transfer-Encoding");
+}
+
+std::unique_ptr<nx_http::AbstractMsgBodySource> RequestProxyWorker::prepareStreamingMessageBody(
+    nx_http::StringType contentType)
+{
+    auto bodySource = nx_http::makeAsyncChannelMessageBodySource(
+        std::move(contentType),
+        m_targetHostPipeline->takeSocket());
+    m_targetHostPipeline.reset();
+    return bodySource;
 }
 
 } // namespace gateway

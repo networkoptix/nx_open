@@ -71,7 +71,7 @@ private:
     }
 };
 
-TEST_F(Streaming, DISABLED_stream_bytes_arrive_to_client_before_stream_end)
+TEST_F(Streaming, stream_bytes_arrive_to_client_before_stream_end)
 {
     startInfiniteStream();
     thenSomeStreamBytesAreReceivedByClient();

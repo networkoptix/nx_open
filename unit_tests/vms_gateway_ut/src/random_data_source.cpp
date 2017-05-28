@@ -28,6 +28,7 @@ void RandomDataSource::readAsync(
         [completionHandler = std::move(completionHandler)]()
         {
             nx_http::BufferType randomData;
+            randomData.resize(1024);
             std::generate(randomData.data(), randomData.data() + randomData.size(), rand);
             completionHandler(SystemError::noError, std::move(randomData));
         });
