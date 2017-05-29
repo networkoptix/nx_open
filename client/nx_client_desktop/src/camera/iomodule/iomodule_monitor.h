@@ -14,6 +14,7 @@ class QnIOModuleMonitor: public QObject, public QnConnectionContextAware
     Q_OBJECT
 public:
     QnIOModuleMonitor(const QnSecurityCamResourcePtr &camera);
+    virtual ~QnIOModuleMonitor();
     bool open();
 signals:
     void connectionClosed();
