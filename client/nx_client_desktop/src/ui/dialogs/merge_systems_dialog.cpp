@@ -104,11 +104,13 @@ void QnMergeSystemsDialog::done(int result)
         context()->instance<QnWorkbenchUserWatcher>()->setUserName(m_remoteOwnerCredentials.user());
         context()->instance<QnWorkbenchUserWatcher>()->setUserPassword(m_remoteOwnerCredentials.password());
 
-        //TODO: #GDM #FIXME #3.1 Restore functionality
-//         QUrl url = commonModule()->currentUrl();
-//         url.setUserName(m_remoteOwnerCredentials.user());
-//         url.setPassword(m_remoteOwnerCredentials.password());
-//         QnAppServerConnectionFactory::setUrl(url);
+        if (auto connection = QnAppServerConnectionFactory::ec2Connection())
+        {
+            QUrl url = connection->connectionInfo().ecUrl;
+            url.setUserName(m_remoteOwnerCredentials.user());
+            url.setPassword(m_remoteOwnerCredentials.password());
+            connection->updateConnectionUrl(url);
+        }
 
         menu()->trigger(action::ReconnectAction);
         context()->instance<QnWorkbenchUserWatcher>()->setReconnectOnPasswordChange(true);
