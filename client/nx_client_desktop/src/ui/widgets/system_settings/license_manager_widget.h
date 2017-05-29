@@ -6,9 +6,9 @@
 
 #include <nx_ec/ec_api_fwd.h>
 #include <licensing/license_fwd.h>
-
 #include <ui/widgets/common/abstract_preferences_widget.h>
 #include <utils/common/connective.h>
+#include <nx/client/desktop/license/license_helpers.h>
 
 class QModelIndex;
 class QNetworkAccessManager;
@@ -93,7 +93,18 @@ private:
     void removeLicense(const QnLicensePtr& license, ForceRemove force);
     void deactivateLicenses(const QnLicenseList& licenses);
     bool confirmDeactivation(const QStringList& extras) const;
-    QStringList deactivationExtrasText(const QnLicenseList& licenses);
+    QString getLicenseDescription(const QnLicensePtr& license) const;
+
+    using DeactivationErrors = nx::client::desktop::license::Deactivator::LicenseErrorHash;
+    void showDeactivationErrorsDialog(
+        const QnLicenseList& licenses,
+        const DeactivationErrors& errors);
+    QString getDeactivationErrorCaption(
+        int licensesCount,
+        int errorsCount) const;
+    QString getDeactivationErrorMessage(
+        const QnLicenseList& licenses,
+        const DeactivationErrors& errors) const;
 
     void exportLicenses();
 

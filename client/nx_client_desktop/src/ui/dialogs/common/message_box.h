@@ -147,6 +147,9 @@ public:
     Qt::TextFormat textFormat() const;
     void setTextFormat(Qt::TextFormat format);
 
+    Qt::TextFormat informativeTextFormat() const;
+    void setInformativeTextFormat(Qt::TextFormat format);
+
     QString informativeText() const;
 
     /** Informative text, that will be split by \n to several paragraphs */

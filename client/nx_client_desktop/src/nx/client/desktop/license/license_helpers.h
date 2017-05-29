@@ -24,18 +24,19 @@ class Deactivator
 public:
     enum class ErrorCode
     {
-        NoError,
-        UnknownError,
+        noError,
+        unknownError,
 
         // Keys from license server
-        KeyIsInvalid,
-        KeyDoesntExist,
-        KeyIsDisabled,
-        KeyIsNotActivated,
-        KeyIsTrial,
-        DeactivationIsPending,
-        InvalidHardwareId,
-        LimitExceeded
+        keyIsNotActivated,
+
+        keyIsInvalid,
+        keyDoesntExist,
+        keyIsDisabled,
+        keyIsTrial,
+        deactivationIsPending,
+        invalidHardwareId,
+        limitExceeded
     };
 
     enum class Result

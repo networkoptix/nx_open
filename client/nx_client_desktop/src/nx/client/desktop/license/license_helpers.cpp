@@ -78,7 +78,7 @@ using LicenseErrorHash = Deactivator::LicenseErrorHash;
 
 ErrorCode toErrorCode(const QString& text)
 {
-    return QnLexical::deserialized(text, ErrorCode::UnknownError);
+    return QnLexical::deserialized(text, ErrorCode::unknownError);
 }
 
 LicenseErrorHash extractErrors(const QByteArray& messageBody)
@@ -240,26 +240,26 @@ QString Deactivator::errorDescription(ErrorCode error)
 {
     switch (error)
     {
-        case ErrorCode::NoError:
+        case ErrorCode::noError:
             return QString();
-        case ErrorCode::UnknownError:
+        case ErrorCode::unknownError:
             return tr("Unknown error");
 
-        case ErrorCode::KeyDoesntExist:
+        case ErrorCode::keyDoesntExist:
             return tr("License does not exist");
-        case ErrorCode::KeyIsDisabled:
+        case ErrorCode::keyIsDisabled:
             return tr("License is disabled");
-        case ErrorCode::KeyIsNotActivated:
+        case ErrorCode::keyIsNotActivated:
             return tr("License is inactive");
-        case ErrorCode::KeyIsInvalid:
+        case ErrorCode::keyIsInvalid:
             return tr("Invalid license");
-        case ErrorCode::KeyIsTrial:
+        case ErrorCode::keyIsTrial:
             return tr("License is trial");
-        case ErrorCode::DeactivationIsPending:
+        case ErrorCode::deactivationIsPending:
             return tr("License is in deactivation process");
-        case ErrorCode::InvalidHardwareId:
+        case ErrorCode::invalidHardwareId:
             return tr("Invalid hardware id");
-        case ErrorCode::LimitExceeded:
+        case ErrorCode::limitExceeded:
             return tr("Limit exceeded");
     }
 
