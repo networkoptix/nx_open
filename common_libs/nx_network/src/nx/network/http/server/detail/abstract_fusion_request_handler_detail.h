@@ -28,7 +28,8 @@ inline bool loadFromUrlQuery(const QUrlQuery&, ...)
     return false;
 }
 
-inline bool serializeToHeaders(nx_http::HttpHeaders* /*where*/, ...)
+template<typename T>
+bool serializeToHeaders(nx_http::HttpHeaders* /*where*/, const T& /*what*/)
 {
     NX_ASSERT(false);
     return false;
