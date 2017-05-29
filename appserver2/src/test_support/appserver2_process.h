@@ -37,7 +37,6 @@ public:
     QnCommonModule* commonModule() const;
     ec2::AbstractECConnection* ecConnection();
     SocketAddress endpoint() const;
-    void setModuleGuid(const QnUuid& id);
 private:
     int m_argc;
     char** m_argv;
@@ -49,7 +48,6 @@ private:
     QnSimpleHttpConnectionListener* m_tcpListener;
     mutable QnMutex m_mutex;
     QEventLoop m_eventLoop;
-    QnUuid m_moduleGuid;
 };
 
 
@@ -70,7 +68,6 @@ public:
     ec2::AbstractECConnection* ecConnection();
     SocketAddress endpoint() const;
     QnCommonModule* commonModule() const;
-    void setModuleGuid(const QnUuid& id);
 private:
     Appserver2Process* m_impl;
 };

@@ -127,10 +127,12 @@ Appserver2Ptr P2pMessageBusTestBase::createAppserver(bool keepDbFile)
 
     const QString instanceArg = lit("--moduleInstance=%1").arg(m_instanceCounter);
     result->addArg(instanceArg.toStdString().c_str());
+    const QString guidArg = lit("--moduleGuid=%1").arg(guid.toString());
+    result->addArg(guidArg.toStdString().c_str());
 
     ++m_instanceCounter;
 
-    result->start(guid);
+    result->start();
     return result;
 }
 

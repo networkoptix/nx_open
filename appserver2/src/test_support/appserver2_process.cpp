@@ -77,6 +77,10 @@ public:
         return SocketAddress(m_settings.value("endpoint", "0.0.0.0:0").toString());
     }
 
+    QnUuid moduleGuid() const
+    {
+        return QnUuid(m_settings.value("moduleGuid").toString());
+    }
 private:
     QnSettings m_settings;
     bool m_showHelp;
@@ -212,9 +216,20 @@ int Appserver2Process::exec()
 
     registerQtResources();
 
+    conf::Settings settings;
+    //parsing command line arguments
+    settings.load(m_argc, m_argv);
+    if (settings.showHelp())
+    {
+        //settings.printCmdLineArgsHelp();
+        //TODO
+        return 0;
+    }
+
     m_commonModule.reset(new QnCommonModule(false));
+    const auto moduleGuid = settings.moduleGuid();
     m_commonModule->setModuleGUID(
-        m_moduleGuid.isNull() ? QnUuid::createUuid() : m_moduleGuid);
+        moduleGuid.isNull() ? QnUuid::createUuid() : moduleGuid);
 
     QnResourceDiscoveryManager resourceDiscoveryManager(m_commonModule.get());
     // Starting receiving notifications.
@@ -237,15 +252,6 @@ int Appserver2Process::exec()
     runtimeData.hardwareIds << QnUuid::createUuid().toString();
     m_commonModule->runtimeInfoManager()->updateLocalItem(runtimeData);    // initializing localInfo
 
-    conf::Settings settings;
-    //parsing command line arguments
-    settings.load(m_argc, m_argv);
-    if (settings.showHelp())
-    {
-        //settings.printCmdLineArgsHelp();
-        //TODO
-        return 0;
-    }
     qnStaticCommon->setModuleShortId(m_commonModule->moduleGUID(), settings.moduleInstance());
 
     //initializeLogging(settings);
@@ -340,11 +346,6 @@ QnCommonModule* Appserver2Process::commonModule() const
     return m_commonModule.get();
 }
 
-void Appserver2Process::setModuleGuid(const QnUuid& id)
-{
-    m_moduleGuid = id;
-}
-
 SocketAddress Appserver2Process::endpoint() const
 {
     QnMutexLocker lk(&m_mutex);
@@ -404,11 +405,6 @@ SocketAddress Appserver2ProcessPublic::endpoint() const
 QnCommonModule* Appserver2ProcessPublic::commonModule() const
 {
     return m_impl->commonModule();
-}
-
-void Appserver2ProcessPublic::setModuleGuid(const QnUuid& id)
-{
-    m_impl->setModuleGuid(id);
 }
 
 }   // namespace ec2

@@ -31,7 +31,7 @@ public:
             free(ptr);
     }
 
-    void start(const QnUuid& moduleGuid = QnUuid())
+    void start()
     {
         nx::utils::promise<void> moduleInstantiatedCreatedPromise;
         auto moduleInstantiatedCreatedFuture = moduleInstantiatedCreatedPromise.get_future();
@@ -39,11 +39,10 @@ public:
         m_moduleStartedPromise = std::make_unique<nx::utils::promise<bool>>();
 
         m_moduleProcessThread = nx::utils::thread(
-            [this, &moduleInstantiatedCreatedPromise, moduleGuid]()->int
+            [this, &moduleInstantiatedCreatedPromise]()->int
             {
                 m_moduleInstance = std::make_unique<ModuleProcessType>(
                     static_cast<int>(m_args.size()), m_args.data());
-                m_moduleInstance->setModuleGuid(moduleGuid);
                 m_moduleInstance->setOnStartedEventHandler(
                     [this](bool isStarted)
                     {
