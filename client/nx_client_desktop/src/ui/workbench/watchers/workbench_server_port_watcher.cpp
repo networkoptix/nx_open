@@ -11,6 +11,8 @@
 #include <core/resource/media_server_resource.h>
 #include <core/resource_management/resource_pool.h>
 
+using namespace nx::client::desktop::ui;
+
 QnWorkbenchServerPortWatcher::QnWorkbenchServerPortWatcher(QObject *parent)
     :
     base_type(parent),
@@ -48,10 +50,11 @@ QnWorkbenchServerPortWatcher::QnWorkbenchServerPortWatcher(QObject *parent)
                     if (url.isEmpty() || (url.port() == currentServer->getPort()))
                         return;
 
-                       //TODO: #GDM #FIXME #3.1 Restore functionality
-    //                 url.setPort(currentServer->getPort());
-    //                 QnAppServerConnectionFactory::setUrl(url);
-    //                 menu()->trigger(action::ReconnectAction);
+                    if (auto connection = QnAppServerConnectionFactory::ec2Connection())
+                    {
+                        connection->updateConnectionUrl(url);
+                        menu()->trigger(action::ReconnectAction);
+                    }
                 });
         });
 }

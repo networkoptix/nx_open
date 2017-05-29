@@ -36,6 +36,7 @@ private:
     void handleResourceDataChanged(int role);
 
     void updateButtons();
+    void updateTitle();
 
 private:
     QScopedPointer<Ui::SpecialLayoutPanelWidget> ui;

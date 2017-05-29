@@ -582,8 +582,9 @@ void QnWorkbenchConnectHandler::establishConnection(ec2::AbstractECConnectionPtr
 
     setPhysicalState(PhysicalState::waiting_peer);
     QUrl url = connectionInfo.effectiveUrl();
-    //TODO: #GDM #FIXME #3.1 Restore functionality
-    //QnAppServerConnectionFactory::setUrl(url);
+    if (connectionInfo.ecUrl != url)
+        connection->updateConnectionUrl(url);
+
     QnAppServerConnectionFactory::setEc2Connection(connection);
     qnClientMessageProcessor->init(connection);
 

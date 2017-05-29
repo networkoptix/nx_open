@@ -59,7 +59,7 @@ private:
     void processTourStepInternal(bool forward, bool force);
 
     void clearWorkbenchState();
-    void restoreWorkbenchState();
+    void restoreWorkbenchState(const QnUuid& tourId);
 
     void setHintVisible(bool visible);
 
