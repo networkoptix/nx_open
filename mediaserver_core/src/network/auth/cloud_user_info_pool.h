@@ -2,6 +2,7 @@
 
 #include <cstdint>
 #include <unordered_map>
+#include <unordered_set>
 #include <map>
 #include <boost/optional.hpp>
 #include <nx/network/http/http_types.h>
@@ -17,9 +18,22 @@ struct UserNonce
 {
     nx::Buffer userName;
     nx::Buffer cloudNonce;
+
+    UserNonce(const nx::Buffer& userName, const nx::Buffer& cloudNonce):
+        userName(userName),
+        cloudNonce(cloudNonce)
+    {}
 };
 
 using UserNonceToResponseMap = std::unordered_map<UserNonce, nx::Buffer>;
+
+inline bool operator == (const UserNonce& lhs, const UserNonce& rhs)
+{
+    return lhs.userName == rhs.userName && lhs.cloudNonce == rhs.cloudNonce;
+}
+
+using NameToNoncesMap = std::unordered_map<nx::Buffer, std::unordered_set<nx::Buffer>>;
+using NonceToTsMap = std::unordered_map<nx::Buffer, uint64_t>;
 
 }
 
@@ -42,13 +56,16 @@ struct NonceUserCount
 {
     nx::Buffer cloudNonce;
     size_t userCount;
+
+    NonceUserCount(const nx::Buffer& cloudNonce, size_t userCount);
+    NonceUserCount() = default;
 };
 
-using TimestampToNonceUserCountMap = std::map<int64_t, NonceUserCount, std::greater<int64_t>>;
+using TimestampToNonceUserCountMap = std::map<uint64_t, NonceUserCount>;
 
 bool deserialize(
     const QString& serializedValue,
-    int64_t* timestamp,
+    uint64_t* timestamp,
     nx::Buffer* cloudNonce,
     nx::Buffer* partialResponse);
 
@@ -67,7 +84,7 @@ class AbstractCloudUserInfoPool
 {
 public:
     virtual void userInfoChanged(
-        int64_t timestamp,
+        uint64_t timestamp,
         const nx::Buffer& userName,
         const nx::Buffer& cloudNonce,
         const nx::Buffer& partialResponse) = 0;
@@ -109,18 +126,31 @@ public:
 
 private:
     virtual void userInfoChanged(
-        int64_t timestamp,
+        uint64_t timestamp,
         const nx::Buffer& userName,
         const nx::Buffer& cloudNonce,
         const nx::Buffer& partialResponse) override;
 
     virtual void userInfoRemoved(const nx::Buffer& userName) override;
 
+    void decUserCountByNonce(const nx::Buffer& cloudNonce);
+    void updateNameToNonces(const nx::Buffer& userName, const nx::Buffer& cloudNonce);
+    void updateNonceToTs(const nx::Buffer& cloudNonce, uint64_t timestamp);
+    void updateUserNonceToResponse(
+        const nx::Buffer& userName,
+        const nx::Buffer& cloudNonce,
+        const nx::Buffer& partialResponse);
+    void updateTsToNonceCount(uint64_t timestamp, const nx::Buffer& cloudNonce);
+    void cleanupOldInfo(uint64_t timestamp);
+    void cleanupByNonce(const nx::Buffer& cloudNonce);
 
 private:
     std::unique_ptr<AbstractCloudUserInfoPoolSupplier> m_supplier;
     detail::UserNonceToResponseMap m_userNonceToResponse;
-    detail::TimestampToNonceUserCountMap m_timestampToNonceUserCount;
-    QnMutex m_mutex;
+    detail::TimestampToNonceUserCountMap m_tsToNonceUserCount;
+    detail::NameToNoncesMap m_nameToNonces;
+    detail::NonceToTsMap m_nonceToTs;
+    int m_userCount = 0;
+    mutable QnMutex m_mutex;
 };
 

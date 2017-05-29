@@ -82,7 +82,7 @@ void CloudUserInfoPoolSupplier::reportInfoChanged(
     const QString& userName,
     const QString& serializedValue)
 {
-    int64_t timestamp;
+    uint64_t timestamp;
     nx::Buffer cloudNonce;
     nx::Buffer partialResponse;
 
@@ -119,26 +119,130 @@ bool CloudUserInfoPool::authenticate(const nx_http::header::Authorization& authH
 
 boost::optional<nx::Buffer> CloudUserInfoPool::newestMostCommonNonce() const
 {
-    return nx::Buffer();
+    QnMutexLocker lock(&m_mutex);
+    return boost::none;
 }
 
 void CloudUserInfoPool::userInfoChanged(
-    int64_t timestamp,
+    uint64_t timestamp,
     const nx::Buffer& userName,
     const nx::Buffer& cloudNonce,
     const nx::Buffer& partialResponse)
 {
+    QnMutexLocker lock(&m_mutex);
+    updateNameToNonces(userName, cloudNonce);
+    updateNonceToTs(cloudNonce, timestamp);
+    updateUserNonceToResponse(userName, cloudNonce, partialResponse);
+    updateTsToNonceCount(timestamp, cloudNonce);
+}
+
+void CloudUserInfoPool::updateNameToNonces(const nx::Buffer& userName, const nx::Buffer& cloudNonce)
+{
+    auto nameResult = m_nameToNonces.emplace(userName, std::unordered_set<nx::Buffer>{cloudNonce});
+    if (!nameResult.second)
+    {
+        auto nonceResult = nameResult.first->second.emplace(cloudNonce);
+        NX_ASSERT(nonceResult.second);
+        return;
+    }
+    m_userCount++;
+}
+
+void CloudUserInfoPool::updateNonceToTs(const nx::Buffer& cloudNonce, uint64_t timestamp)
+{
+    auto nonceResult = m_nonceToTs.emplace(cloudNonce, timestamp);
+    if (!nonceResult.second)
+        NX_ASSERT(m_nonceToTs[cloudNonce] == timestamp);
+}
+
+void CloudUserInfoPool::updateUserNonceToResponse(
+    const nx::Buffer& userName,
+    const nx::Buffer& cloudNonce,
+    const nx::Buffer& partialResponse)
+{
+    auto result = m_userNonceToResponse.emplace(detail::UserNonce(userName, cloudNonce), partialResponse);
+    NX_ASSERT(result.second);
+}
+
+void CloudUserInfoPool::updateTsToNonceCount(uint64_t timestamp, const nx::Buffer& cloudNonce)
+{
+    auto result = m_tsToNonceUserCount.emplace(timestamp, detail::NonceUserCount(cloudNonce, 1));
+    if (!result.second)
+    {
+        result.first->second.userCount++;
+        NX_ASSERT(result.first->second.userCount <= m_userCount);
+        if (result.first->second.userCount == m_userCount)
+            cleanupOldInfo(result.first->first);
+    }
+}
+
+void CloudUserInfoPool::cleanupOldInfo(uint64_t timestamp)
+{
+    for (auto tsIt = m_tsToNonceUserCount.cbegin(); tsIt->first < timestamp;)
+    {
+        cleanupByNonce(tsIt->second.cloudNonce);
+        tsIt = m_tsToNonceUserCount.erase(tsIt);
+    }
+}
+
+void CloudUserInfoPool::cleanupByNonce(const nx::Buffer& cloudNonce)
+{
+    for (auto it = m_userNonceToResponse.cbegin(); it != m_userNonceToResponse.cend();)
+    {
+        if (it->first.cloudNonce == cloudNonce)
+            it = m_userNonceToResponse.erase(it);
+        else
+            ++it;
+    }
+
+    m_nonceToTs.erase(cloudNonce);
+
+    for (auto it = m_nameToNonces.begin(); it != m_nameToNonces.end(); ++it)
+        it->second.erase(cloudNonce);
 }
 
 void CloudUserInfoPool::userInfoRemoved(const nx::Buffer& userName)
 {
+    QnMutexLocker lock(&m_mutex);
+
+    auto erased = m_nameToNonces.erase(userName);
+    if (erased == 0)
+        return;
+
+    m_userCount--;
+    for (auto it = m_userNonceToResponse.cbegin(); it != m_userNonceToResponse.cend();)
+    {
+        if (it->first.userName == userName)
+        {
+            it = m_userNonceToResponse.erase(it);
+            decUserCountByNonce(it->first.cloudNonce);
+        }
+        else
+            ++it;
+    }
+}
+
+void CloudUserInfoPool::decUserCountByNonce(const nx::Buffer& cloudNonce)
+{
+    for (auto it = m_tsToNonceUserCount.begin(); it != m_tsToNonceUserCount.end();)
+    {
+        if (it->second.cloudNonce == cloudNonce)
+        {
+            if (--it->second.userCount == 0)
+            {
+                it = m_tsToNonceUserCount.erase(it);
+                continue;
+            }
+        }
+        ++it;
+    }
 }
 
 namespace detail {
 
 bool deserialize(
     const QString& serializedValue,
-    int64_t* timestamp,
+    uint64_t* timestamp,
     nx::Buffer* cloudNonce,
     nx::Buffer* partialResponse)
 {
@@ -159,7 +263,7 @@ bool deserialize(
         NX_LOG("[CloudUserInfo, deserialize] timestamp is undefined or wrong type.", cl_logERROR);
         return false;
     }
-    *timestamp = (int64_t)timestampVal.toDouble();
+    *timestamp = (uint64_t)timestampVal.toDouble();
 
     auto cloudNonceVal = jsonObj[kCloudNonceKey];
     if (cloudNonceVal.isUndefined() || !cloudNonceVal.isString())

@@ -2,22 +2,6 @@
 #include <network/auth/cloud_user_info_pool.h>
 
 
-TEST(CloudUserInfoPool, deserialize)
-{
-    const QString kSimpleString = 
-        lit("{\"timestamp\":1234567,\"cloudNonce\":\"abcdef0123456\",\"partialResponse\"=\"response\"}");
-
-    int64_t ts;
-    nx::Buffer nonce;
-    nx::Buffer response;
-    ASSERT_TRUE(detail::deserialize(kSimpleString, &ts, &nonce, &response));
-
-
-    ASSERT_EQ(ts, 1234567);
-    ASSERT_EQ(nonce, "abcdef0123456");
-    ASSERT_EQ(response, "response");
-}
-
 namespace test  {
 
 class TestPoolSupplier : public AbstractCloudUserInfoPoolSupplier
@@ -46,18 +30,35 @@ private:
     AbstractCloudUserInfoPool* m_pool;
 };
 
-class Pool : public ::testing::Test
+class CloudUserInfoPool: public ::testing::Test
 {
 protected:
-    Pool(): 
+    CloudUserInfoPool(): 
         supplier(new TestPoolSupplier),
         userInfoPool(std::unique_ptr<AbstractCloudUserInfoPoolSupplier>(supplier)) {}
 
     TestPoolSupplier* supplier;
-    CloudUserInfoPool userInfoPool;
+    ::CloudUserInfoPool userInfoPool;
 };
 
-TEST_F(Pool, main)
+TEST_F(CloudUserInfoPool, deserialize)
+{
+    const QString kSimpleString = 
+        lit("{\"timestamp\":1234567,\"cloudNonce\":\"abcdef0123456\",\"partialResponse\":\"response\"}");
+
+    int64_t ts;
+    nx::Buffer nonce;
+    nx::Buffer response;
+    ASSERT_TRUE(detail::deserialize(kSimpleString, &ts, &nonce, &response));
+
+
+    ASSERT_EQ(ts, 1234567);
+    ASSERT_EQ(nonce, "abcdef0123456");
+    ASSERT_EQ(response, "response");
+}
+
+
+TEST_F(CloudUserInfoPool, main)
 {
     supplier->setUserInfo(1, "vasya", "nonce1", "responseVasya1");
     supplier->setUserInfo(2, "vasya", "nonce2", "responseVasya2");
