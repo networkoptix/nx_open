@@ -910,8 +910,6 @@ enum IDType
     RemoveCurrentLayoutTourAction,
 
     CurrentLayoutTourSettingsAction,
-    LayoutTourPrevStepAction,   //< Prev layout in tour (or camera in single-layout tour)
-    LayoutTourNextStepAction,   //< Next layout in tour (or camera in single-layout tour)
 
     /* Timeline actions. */
 

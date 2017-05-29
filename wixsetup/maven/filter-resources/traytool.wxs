@@ -57,6 +57,15 @@
             </Component>
         </ComponentGroup>
 
+        <ComponentGroup Id="TrayToolOpenSSL" Directory="${customization}TrayToolDir">
+            <Component>
+                <File Id="TrayToolSsl_libeay32.dll" Name="libeay32.dll" Source="$(var.SourceDir)\libeay32.dll" DiskId="6"/>
+            </Component>
+            <Component>
+                <File Id="TrayToolSsl_ssleay32.dll" Name="ssleay32.dll" Source="$(var.SourceDir)\ssleay32.dll" DiskId="6"/>
+            </Component>
+        </ComponentGroup>
+
         <ComponentGroup Id="TraytoolPlatforms" Directory="TraytoolPlatforms">
             <Component>
                 <File Id="qwindows.dll" Name="qwindows.dll" Source="$(var.QtPluginsDir)\platforms\qwindows.dll" DiskId="9" />

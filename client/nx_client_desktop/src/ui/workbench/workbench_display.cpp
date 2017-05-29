@@ -1490,7 +1490,9 @@ QRectF QnWorkbenchDisplay::itemGeometry(QnWorkbenchItem *item, QRectF *enclosing
 
 QRectF QnWorkbenchDisplay::fitInViewGeometry() const
 {
-    QRect layoutBoundingRect = workbench()->currentLayout()->boundingRect();
+    auto layout = workbench()->currentLayout();
+
+    QRect layoutBoundingRect = layout->boundingRect();
     if (layoutBoundingRect.isNull())
         layoutBoundingRect = QRect(0, 0, 1, 1);
 
@@ -1502,15 +1504,9 @@ QRectF QnWorkbenchDisplay::fitInViewGeometry() const
         ? layoutBoundingRect
         : layoutBoundingRect.united(backgroundBoundingRect);
 
-    // Limit size for layout tour review layouts //TODO: #GDM move to layout data
-    static const int kLayoutTourMinimalSize = 3; //< size in cells: 3*3
-    if (workbench()->currentLayout()->isLayoutTourReview())
-    {
-        if (sceneBoundingRect.width() < kLayoutTourMinimalSize)
-            sceneBoundingRect.setWidth(kLayoutTourMinimalSize);
-        if (sceneBoundingRect.height() < kLayoutTourMinimalSize)
-            sceneBoundingRect.setHeight(kLayoutTourMinimalSize);
-    }
+    QRect minimalBoundingRect = layout->data(Qn::LayoutMinimalBoundingRectRole).value<QRect>();
+    if (!minimalBoundingRect.isEmpty())
+        sceneBoundingRect = sceneBoundingRect.united(minimalBoundingRect);
 
     /* Do not add additional spacing in following cases: */
     const bool adjustSpace = !qnRuntime->isVideoWallMode()  //< Videowall client.

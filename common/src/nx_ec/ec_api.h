@@ -700,7 +700,12 @@ namespace ec2
 
         virtual QnConnectionInfo connectionInfo() const = 0;
 
-        virtual QString authInfo() const = 0;
+        /**
+         * Changes url client currently uses to connect to server. Required to handle situations
+         * like user password change, server port change or systems merge.
+         */
+        virtual void updateConnectionUrl(const QUrl& url) = 0;
+
         //!Calling this method starts notifications delivery by emitting corresponding signals of corresponding manager
         /*!
             \note Calling entity MUST connect to all interesting signals prior to calling this method so that received data is consistent

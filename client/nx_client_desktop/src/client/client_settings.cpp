@@ -24,6 +24,8 @@
 #include <utils/common/app_info.h>
 #include <utils/common/warnings.h>
 
+#include <nx/utils/file_system.h>
+
 namespace
 {
 static const QString kXorKey = lit("ItIsAGoodDayToDie");
@@ -106,6 +108,8 @@ QnClientSettings::QnClientSettings(bool forceLocalSettings, QObject *parent):
 
     /* Load from settings. */
     load();
+
+    nx::utils::file_system::ensureDir(mediaFolder());
 
     setThreadSafe(true);
 

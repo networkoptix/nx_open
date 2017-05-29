@@ -64,6 +64,8 @@ private:
     /** Calculate items from the review layout. */
     bool fillTourItems(ec2::ApiLayoutTourItemDataList* items);
 
+    void handleItemDataChanged(const QnUuid& id, Qn::ItemDataRole role, const QVariant& data);
+
 // Actions handlers
 private:
     void at_reviewLayoutTourAction_triggered();

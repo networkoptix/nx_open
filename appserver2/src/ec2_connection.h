@@ -30,8 +30,7 @@ namespace ec2
 
         //!Implementation of ec2::AbstractECConnection::connectionInfo
         virtual QnConnectionInfo connectionInfo() const override;
-        //!Implementation of ec2::AbstractECConnection::authInfo
-        virtual QString authInfo() const override;
+        virtual void updateConnectionUrl(const QUrl& url) override;
 
         bool initialized() const;
 

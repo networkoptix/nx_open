@@ -120,6 +120,7 @@ void initialize(Manager* manager, Action* root)
         .flags(GlobalHotkey)
         .mode(DesktopMode)
         .shortcut(lit("F11"))
+        .condition(!condition::tourIsRunning())
         .autoRepeat(false);
 
     factory(WhatsThisAction)
@@ -139,6 +140,7 @@ void initialize(Manager* manager, Action* root)
         .requiredGlobalPermission(Qn::GlobalViewLogsPermission)
         .icon(qnSkin->icon("events/log.png"))
         .shortcut(lit("Ctrl+L"))
+        .condition(!condition::tourIsRunning())
         .text(tr("Event Log...")); //< To be displayed on button tooltip
 
     factory(OpenBusinessRulesAction)
@@ -214,6 +216,7 @@ void initialize(Manager* manager, Action* root)
         .mode(DesktopMode)
         .text(tr("Main Menu")) //< To be displayed on button tooltip
         .shortcut(lit("Alt+Space"), Builder::Mac, true)
+        .condition(!condition::tourIsRunning())
         .autoRepeat(false)
         .icon(qnSkin->icon("titlebar/main_menu.png"));
 
@@ -222,6 +225,7 @@ void initialize(Manager* manager, Action* root)
         .mode(DesktopMode)
         .text(tr("Connect to Server..."))
         .shortcut(lit("Ctrl+Shift+C"))
+        .condition(!condition::tourIsRunning())
         .autoRepeat(false);
 
     factory(DisconnectAction)
@@ -269,6 +273,7 @@ void initialize(Manager* manager, Action* root)
             .text(tr("Tab"))
             .pulledText(tr("New Tab"))
             .shortcut(lit("Ctrl+T"))
+            .condition(!condition::tourIsRunning())
             .autoRepeat(false) /* Technically, it should be auto-repeatable, but we don't want the user opening 100500 layouts and crashing the client =). */
             .icon(qnSkin->icon("titlebar/new_layout.png"));
 
@@ -360,7 +365,8 @@ void initialize(Manager* manager, Action* root)
             .requiredTargetPermissions(Qn::CurrentLayoutResourceRole, Qn::WritePermission | Qn::AddRemoveItemsPermission)
             .text(tr("File(s)..."))
             .shortcut(lit("Ctrl+O"))
-            .condition(!condition::isLayoutTourReviewMode())
+            .condition(!condition::isLayoutTourReviewMode()
+                && condition::tourIsRunning())
             .autoRepeat(false);
 
         factory(OpenFolderAction)
@@ -519,7 +525,8 @@ void initialize(Manager* manager, Action* root)
         .text(tr("System Administration..."))
         .shortcut(lit("Ctrl+Alt+A"))
         .requiredGlobalPermission(Qn::GlobalAdminPermission)
-        .condition(condition::treeNodeType({Qn::CurrentSystemNode, Qn::ServersNode}));
+        .condition(condition::treeNodeType({Qn::CurrentSystemNode, Qn::ServersNode})
+            && !condition::tourIsRunning());
 
     factory(SystemUpdateAction)
         .flags(NoTarget)
@@ -550,6 +557,7 @@ void initialize(Manager* manager, Action* root)
         .requiredGlobalPermission(Qn::GlobalViewBookmarksPermission)
         .text(tr("Bookmark Search..."))
         .shortcut(lit("Ctrl+B"))
+        .condition(!condition::tourIsRunning())
         .autoRepeat(false);
 
     factory(LoginToCloud)
@@ -586,6 +594,7 @@ void initialize(Manager* manager, Action* root)
         .text(tr("Event Rules..."))
         .icon(qnSkin->icon("events/settings.png"))
         .shortcut(lit("Ctrl+E"))
+        .condition(!condition::tourIsRunning())
         .autoRepeat(false);
 
     factory(CameraListAction)
@@ -598,6 +607,7 @@ void initialize(Manager* manager, Action* root)
             tr("Cameras List")
         ))
         .shortcut(lit("Ctrl+M"))
+        .condition(!condition::tourIsRunning())
         .autoRepeat(false);
 
     factory(MergeSystems)
@@ -620,6 +630,7 @@ void initialize(Manager* manager, Action* root)
         .shortcut(lit("F1"))
         .shortcutContext(Qt::ApplicationShortcut)
         .role(QAction::AboutRole)
+        .condition(!condition::tourIsRunning())
         .autoRepeat(false);
 
     factory()
@@ -940,13 +951,13 @@ void initialize(Manager* manager, Action* root)
         .flags(Scene | SingleTarget | MultiTarget)
         .text(tr("Hide Info"))
         .shortcut(lit("Alt+I"))
-        .condition(ConditionWrapper(new DisplayInfoCondition(false))
+        .condition(ConditionWrapper(new DisplayInfoCondition(true))
             && !condition::isLayoutTourReviewMode());
 
     factory(ToggleInfoAction)
         .flags(Scene | SingleTarget | MultiTarget | HotkeyOnly)
         .shortcut(lit("Alt+I"))
-        .condition(ConditionWrapper(new DisplayInfoCondition(false))
+        .condition(ConditionWrapper(new DisplayInfoCondition())
             && !condition::isLayoutTourReviewMode());
 
     factory()
@@ -986,13 +997,13 @@ void initialize(Manager* manager, Action* root)
 
     factory.beginSubMenu();
     {
-
         factory(PtzSavePresetAction)
             .mode(DesktopMode)
             .flags(Scene | SingleTarget)
             .text(tr("Save Current Position..."))
             .requiredTargetPermissions(Qn::WritePtzPermission | Qn::SavePermission)
-            .condition(new PtzCondition(Ptz::PresetsPtzCapability, true));
+            .condition(ConditionWrapper(new PtzCondition(Ptz::PresetsPtzCapability, true))
+                && condition::canSavePtzPosition());
 
         factory(PtzManageAction)
             .mode(DesktopMode)
@@ -1010,7 +1021,6 @@ void initialize(Manager* manager, Action* root)
         .conditionalText(tr("Show Motion"), new NoArchiveCondition())
         .shortcut(lit("Alt+G"))
         .condition(ConditionWrapper(new SmartSearchCondition(false))
-            && !condition::tourIsRunning()
             && !condition::isLayoutTourReviewMode());
 
     // TODO: #ynikitenkov remove this action, use StartSmartSearchAction with .checked state!
@@ -1020,7 +1030,6 @@ void initialize(Manager* manager, Action* root)
         .conditionalText(tr("Hide Motion"), new NoArchiveCondition())
         .shortcut(lit("Alt+G"))
         .condition(ConditionWrapper(new SmartSearchCondition(true))
-            && !condition::tourIsRunning()
             && !condition::isLayoutTourReviewMode());
 
     factory(ClearMotionSelectionAction)
@@ -1034,7 +1043,6 @@ void initialize(Manager* manager, Action* root)
         .flags(Scene | SingleTarget | MultiTarget | HotkeyOnly)
         .shortcut(lit("Alt+G"))
         .condition(ConditionWrapper(new SmartSearchCondition())
-            && !condition::tourIsRunning()
             && !condition::isLayoutTourReviewMode());
 
     factory(CheckFileSignatureAction)
@@ -1427,16 +1435,6 @@ void initialize(Manager* manager, Action* root)
             || (condition::treeNodeType(Qn::LayoutTourNode)
                 && ConditionWrapper(new ToggleTourCondition())));
 
-    factory(LayoutTourPrevStepAction)
-        .flags(GlobalHotkey)
-        .mode(DesktopMode)
-        .condition(condition::tourIsRunning());
-
-    factory(LayoutTourNextStepAction)
-        .flags(GlobalHotkey)
-        .mode(DesktopMode)
-        .condition(condition::tourIsRunning());
-
     factory(RemoveLayoutTourAction)
         .flags(Tree | NoTarget | IntentionallyAmbiguous)
         .mode(DesktopMode)
@@ -1501,6 +1499,7 @@ void initialize(Manager* manager, Action* root)
         .mode(DesktopMode)
         .text(tr("Close"))
         .shortcut(lit("Ctrl+W"))
+        .condition(!condition::tourIsRunning())
         .autoRepeat(false);
 
     factory(CloseAllButThisLayoutAction)
@@ -1600,8 +1599,8 @@ void initialize(Manager* manager, Action* root)
         .shortcut(lit("S"))
         .text(tr("Synchronize Streams"))
         .toggledText(tr("Disable Stream Synchronization"))
-        .condition(new ArchiveCondition());
-
+        .condition(ConditionWrapper(new ArchiveCondition())
+            && !condition::tourIsRunning());
 
     factory()
         .flags(Slider | TitleBar | Tree)

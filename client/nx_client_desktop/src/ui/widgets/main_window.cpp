@@ -308,8 +308,6 @@ MainWindow::MainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::WindowF
     addAction(action(action::AdjustVideoAction));
     addAction(action(action::TogglePanicModeAction));
     addAction(action(action::ToggleLayoutTourModeAction));
-    addAction(action(action::LayoutTourPrevStepAction));
-    addAction(action(action::LayoutTourNextStepAction));
     addAction(action(action::ReviewLayoutTourAction));
     addAction(action(action::DebugIncrementCounterAction));
     addAction(action(action::DebugDecrementCounterAction));
@@ -641,7 +639,7 @@ bool MainWindow::handleKeyPress(int key)
 {
     // Qt shortcuts handling works incorrect. If we have a shortcut set for an action, it will
     // block key event passing in any case (even if we did not handle the event).
-    if (key == Qt::Key_Alt || key == Qt::Key_Control)
+    if (key == Qt::Key_Alt || key == Qt::Key_Control || key == Qt::Key_Shift)
         return false;
 
     const bool isTourRunning = action(action::ToggleLayoutTourModeAction)->isChecked();
@@ -665,7 +663,7 @@ bool MainWindow::handleKeyPress(int key)
         case Qt::Key_Left:
         case Qt::Key_PageUp:
         {
-            menu()->trigger(action::LayoutTourPrevStepAction);
+            menu()->trigger(action::PreviousLayoutAction);
             break;
         }
         case Qt::Key_Enter:
@@ -674,7 +672,7 @@ bool MainWindow::handleKeyPress(int key)
         case Qt::Key_Right:
         case Qt::Key_PageDown:
         {
-            menu()->trigger(action::LayoutTourNextStepAction);
+            menu()->trigger(action::NextLayoutAction);
             break;
         }
         default:
