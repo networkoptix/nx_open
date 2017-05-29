@@ -89,7 +89,7 @@ bool HttpStreamReader::parseBytes(
                     {
                         if (!m_codedMessageBodyBuffer.isEmpty())
                         {
-                            if (!m_contentDecoder->processData(m_codedMessageBodyBuffer))  //result of processing is appended to m_msgBodyBuffer
+                            if (!m_contentDecoder->processData(m_codedMessageBodyBuffer))  //< Result of processing is appended to m_msgBodyBuffer.
                                 return false;
                             m_codedMessageBodyBuffer.clear();
                         }
@@ -100,11 +100,10 @@ bool HttpStreamReader::parseBytes(
                     msgBodyBytesRead = readMessageBody(
                         data.mid(currentDataPos, count - currentDataPos),
                         [this](const QnByteArrayConstRef& data)
-                    {
-                        QnMutexLocker lk(&m_mutex);
-                        m_msgBodyBuffer.append(data.constData(), data.size());
-                    }
-                    );
+                        {
+                            QnMutexLocker lk(&m_mutex);
+                            m_msgBodyBuffer.append(data.constData(), data.size());
+                        });
                 }
 
                 if (msgBodyBytesRead == (size_t)-1)
