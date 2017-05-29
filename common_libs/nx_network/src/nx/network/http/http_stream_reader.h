@@ -39,7 +39,7 @@ public:
     };
 
     HttpStreamReader();
-    virtual ~HttpStreamReader();
+    virtual ~HttpStreamReader() = default;
 
     /**
      * Parses count bytes from source buffer data as HTTP.
@@ -164,7 +164,7 @@ private:
     /**
      * Returns nullptr if encodingName is unknown.
      */
-    nx::utils::bstream::AbstractByteStreamFilter* createContentDecoder(
+    std::unique_ptr<nx::utils::bstream::AbstractByteStreamFilter> createContentDecoder(
         const nx_http::StringType& encodingName);
     void resetStateInternal();
 };

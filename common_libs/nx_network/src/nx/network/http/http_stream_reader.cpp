@@ -5,6 +5,7 @@
 #include <nx/utils/byte_stream/custom_output_stream.h>
 #include <nx/utils/gzip/gzip_uncompressor.h>
 #include <nx/utils/log/assert.h>
+#include <nx/utils/std/cpp14.h>
 
 namespace nx_http {
 
@@ -25,11 +26,10 @@ HttpStreamReader::HttpStreamReader():
 {
 }
 
-HttpStreamReader::~HttpStreamReader()
-{
-}
-
-bool HttpStreamReader::parseBytes(const BufferType& data, size_t count, size_t* bytesProcessed)
+bool HttpStreamReader::parseBytes(
+    const BufferType& data,
+    size_t count,
+    size_t* bytesProcessed)
 {
     return parseBytes(
         QnByteArrayConstRef(data, 0, count),
@@ -80,7 +80,10 @@ bool HttpStreamReader::parseBytes(
                 {
                     msgBodyBytesRead = readMessageBody(
                         data.mid(currentDataPos, count - currentDataPos),
-                        [this](const QnByteArrayConstRef& data) { m_codedMessageBodyBuffer.append(data.constData(), data.size()); });
+                        [this](const QnByteArrayConstRef& data)
+                        {
+                            m_codedMessageBodyBuffer.append(data.constData(), data.size());
+                        });
                     // Decoding content.
                     if ((msgBodyBytesRead != (size_t)-1) && (msgBodyBytesRead > 0))
                     {
@@ -344,12 +347,12 @@ bool HttpStreamReader::prepareToReadMessageBody()
     }
 
     m_contentDecoder.reset();
-    HttpHeaders::const_iterator contentEncodingIter = m_httpMessage.headers().find(nx_http::StringType("Content-Encoding"));
+    HttpHeaders::const_iterator contentEncodingIter = 
+        m_httpMessage.headers().find(nx_http::StringType("Content-Encoding"));
     if (contentEncodingIter != m_httpMessage.headers().end() &&
         contentEncodingIter->second != "identity")
     {
-        nx::utils::bstream::AbstractByteStreamFilter* contentDecoder =
-            createContentDecoder(contentEncodingIter->second);
+        auto contentDecoder = createContentDecoder(contentEncodingIter->second);
         if (contentDecoder == nullptr)
             return false;   //< Cannot decode message body.
                             // All operations with m_msgBodyBuffer MUST be done with m_mutex locked.
@@ -359,14 +362,14 @@ bool HttpStreamReader::prepareToReadMessageBody()
             m_msgBodyBuffer.append(data.constData(), data.size());
         };
         contentDecoder->setNextFilter(
-            std::make_shared<nx::utils::bstream::CustomOutputStream<decltype(safeAppendToBufferLambda)>>(
-                safeAppendToBufferLambda));
-        m_contentDecoder.reset(contentDecoder);
+            nx::utils::bstream::makeCustomOutputStream(std::move(safeAppendToBufferLambda)));
+        m_contentDecoder = std::move(contentDecoder);
     }
 
     // Analyzing message headers to find out if there should be message body
     //   and filling in m_contentLength.
-    HttpHeaders::const_iterator transferEncodingIter = m_httpMessage.headers().find(nx_http::StringType("Transfer-Encoding"));
+    HttpHeaders::const_iterator transferEncodingIter = 
+        m_httpMessage.headers().find(nx_http::StringType("Transfer-Encoding"));
     if (transferEncodingIter != m_httpMessage.headers().end())
     {
         // Parsing Transfer-Encoding.
@@ -381,7 +384,8 @@ bool HttpStreamReader::prepareToReadMessageBody()
 
     m_isChunkedTransfer = false;
 
-    HttpHeaders::const_iterator contentLengthIter = m_httpMessage.headers().find(nx_http::StringType("Content-Length"));
+    HttpHeaders::const_iterator contentLengthIter = 
+        m_httpMessage.headers().find(nx_http::StringType("Content-Length"));
     if (contentLengthIter != m_httpMessage.headers().end())
         m_contentLength = contentLengthIter->second.toULongLong();
     return true;
@@ -485,7 +489,9 @@ size_t HttpStreamReader::readChunkStream(
                     break;
                 }
 
-                const size_t bytesToCopy = std::min<>(m_currentChunkSize - m_currentChunkBytesRead, data.size() - currentOffset);
+                const size_t bytesToCopy = std::min<>(
+                    m_currentChunkSize - m_currentChunkBytesRead,
+                    data.size() - currentOffset);
                 func(data.mid(currentOffset, bytesToCopy));
                 m_messageBodyBytesRead += bytesToCopy;
                 m_currentChunkBytesRead += bytesToCopy;
@@ -555,11 +561,12 @@ unsigned int HttpStreamReader::hexCharToInt(BufferType::value_type ch)
     return 0;
 }
 
-nx::utils::bstream::AbstractByteStreamFilter* HttpStreamReader::createContentDecoder(
-    const nx_http::StringType& encodingName)
+std::unique_ptr<nx::utils::bstream::AbstractByteStreamFilter> 
+    HttpStreamReader::createContentDecoder(
+        const nx_http::StringType& encodingName)
 {
     if (encodingName == "gzip")
-        return new nx::utils::bstream::gzip::Uncompressor();
+        return std::make_unique<nx::utils::bstream::gzip::Uncompressor>();
     return nullptr;
 }
 
