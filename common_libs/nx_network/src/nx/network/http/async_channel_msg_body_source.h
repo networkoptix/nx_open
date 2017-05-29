@@ -1,6 +1,9 @@
 #pragma once
 
+#include <cstdint>
 #include <memory>
+
+#include <boost/optional.hpp>
 
 #include <nx/utils/std/cpp14.h>
 
@@ -47,6 +50,9 @@ public:
     {
         using namespace std::placeholders;
 
+        if (messageBodyTransferLimitHasBeenReached())
+            return reportEndOfMessageBody(std::move(completionHandler));
+        
         m_completionHandler.swap(completionHandler);
 
         m_readBuffer.reserve(16*1024);
@@ -55,17 +61,43 @@ public:
             std::bind(&AsyncChannelMessageBodySource::onSomeBytesRead, this, _1, _2));
     }
 
+    /**
+     * End of message body will be reported after sending messageBodyLimit bytes.
+     */
+    void setMessageBodyLimit(std::uint64_t messageBodyLimit)
+    {
+        m_messageBodyLimit = messageBodyLimit;
+    }
+
 private:
     StringType m_mimeType;
     std::unique_ptr<AsyncChannel> m_channel;
     nx_http::BufferType m_readBuffer;
     nx::utils::MoveOnlyFunc<
         void(SystemError::ErrorCode, BufferType)> m_completionHandler;
+    boost::optional<std::uint64_t> m_messageBodyLimit;
+    std::uint64_t m_totalBytesSent = 0;
 
     virtual void stopWhileInAioThread() override
     {
         base_type::stopWhileInAioThread();
         m_channel.reset();
+    }
+
+    bool messageBodyTransferLimitHasBeenReached() const
+    {
+        return m_messageBodyLimit && (m_totalBytesSent >= *m_messageBodyLimit);
+    }
+
+    void reportEndOfMessageBody(
+        nx::utils::MoveOnlyFunc<
+            void(SystemError::ErrorCode, BufferType)> completionHandler)
+    {
+        return post(
+            [completionHandler = std::move(completionHandler)]()
+            {
+                completionHandler(SystemError::noError, nx::Buffer());
+            });
     }
 
     void onSomeBytesRead(
@@ -74,6 +106,11 @@ private:
     {
         nx_http::BufferType readBuffer;
         m_readBuffer.swap(readBuffer);
+
+        if (m_messageBodyLimit && (m_totalBytesSent + readBuffer.size() > *m_messageBodyLimit))
+            readBuffer.remove(*m_messageBodyLimit - m_totalBytesSent, readBuffer.size());
+
+        m_totalBytesSent += readBuffer.size();
 
         nx::utils::swapAndCall(
             m_completionHandler,

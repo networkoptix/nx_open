@@ -12,21 +12,20 @@ namespace gateway {
 std::atomic<int> RequestProxyWorker::m_proxyingIdSequence(0);
 
 RequestProxyWorker::RequestProxyWorker(
-    const TargetHost& targetPeer,
+    const nx::String& targetHost,
     nx_http::Request translatedRequest,
     AbstractResponseSender* responseSender,
     std::unique_ptr<AbstractStreamSocket> connectionToTheTargetPeer)
     :
+    m_targetHost(targetHost),
     m_responseSender(responseSender),
     m_proxyingId(++m_proxyingIdSequence)
 {
     using namespace std::placeholders;
 
     NX_VERBOSE(this, lm("Proxy %1. Starting proxing to %2(%3) (path %4) from %5").arg(m_proxyingId)
-        .args(targetPeer.target, connectionToTheTargetPeer->getForeignAddress(),
+        .args(m_targetHost, connectionToTheTargetPeer->getForeignAddress(),
             translatedRequest.requestLine.url, connectionToTheTargetPeer->getLocalAddress()));
-
-    m_targetPeer = targetPeer;
 
     m_targetHostPipeline = std::make_unique<nx_http::AsyncMessagePipeline>(
         this,
@@ -111,13 +110,7 @@ void RequestProxyWorker::onMessageFromTargetHost(nx_http::Message message)
 
 void RequestProxyWorker::startMessageBodyStreaming(nx_http::Message message)
 {
-    const auto contentType =
-        nx_http::getHeaderValue(message.response->headers, "Content-Type");
-
-    NX_VERBOSE(this, lm("Proxy %1. Starting streaming message body of type %2")
-        .arg(m_proxyingId).arg(contentType));
-
-    auto msgBody = prepareStreamingMessageBody(contentType);
+    auto msgBody = prepareStreamingMessageBody(message);
     m_responseSender->sendResponse(
         nx_http::RequestResult(
             static_cast<nx_http::StatusCode::Value>(message.response->statusLine.statusCode),
@@ -125,12 +118,23 @@ void RequestProxyWorker::startMessageBodyStreaming(nx_http::Message message)
         std::move(*message.response));
 }
 
-std::unique_ptr<nx_http::AbstractMsgBodySource> RequestProxyWorker::prepareStreamingMessageBody(
-    nx_http::StringType contentType)
+std::unique_ptr<nx_http::AbstractMsgBodySource>
+    RequestProxyWorker::prepareStreamingMessageBody(const nx_http::Message& message)
 {
+    const auto contentType =
+        nx_http::getHeaderValue(message.response->headers, "Content-Type");
+
+    NX_VERBOSE(this, lm("Proxy %1. Preparing streaming message body of type %2")
+        .arg(m_proxyingId).arg(contentType));
+
     auto bodySource = nx_http::makeAsyncChannelMessageBodySource(
-        std::move(contentType),
+        contentType,
         m_targetHostPipeline->takeSocket());
+
+    const auto contentLengthIter = message.response->headers.find("Content-Length");
+    if (contentLengthIter != message.response->headers.end())
+        bodySource->setMessageBodyLimit(contentLengthIter->second.toULongLong());
+    
     m_targetHostPipeline.reset();
     return std::move(bodySource);
 }
@@ -143,7 +147,7 @@ bool RequestProxyWorker::messageBodyNeedsConvertion(const nx_http::Response& res
 
     m_messageBodyConverter = MessageBodyConverterFactory::instance().create(
         m_proxyHost,
-        m_targetPeer,
+        m_targetHost,
         contentTypeIter->second);
     if (m_messageBodyConverter)
     {
