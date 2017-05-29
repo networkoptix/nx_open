@@ -54,10 +54,9 @@ void RequestProxyWorker::closeConnection(
     SystemError::ErrorCode closeReason,
     nx_http::AsyncMessagePipeline* connection)
 {
-    NX_LOGX(lm("Connection to target peer %1 has been closed: %2")
+    NX_DEBUG(this, lm("Connection to target peer %1 has been closed: %2")
         .arg(connection->socket()->getForeignAddress().toString())
-        .arg(SystemError::toString(closeReason)),
-        cl_logDEBUG1);
+        .arg(SystemError::toString(closeReason)));
 
     NX_ASSERT(connection == m_targetHostPipeline.get());
 
@@ -77,8 +76,8 @@ void RequestProxyWorker::onMessageFromTargetHost(nx_http::Message message)
 {
     if (message.type != nx_http::MessageType::response)
     {
-        NX_LOGX(lm("Received unexpected request from target host %1. Closing connection...")
-            .arg(m_targetHostPipeline->socket()->getForeignAddress()), cl_logDEBUG1);
+        NX_DEBUG(this, lm("Received unexpected request from target host %1. Closing connection...")
+            .arg(m_targetHostPipeline->socket()->getForeignAddress()));
 
         // TODO: #ak Imply better status code.
         m_responseSender->sendResponse(
@@ -91,11 +90,10 @@ void RequestProxyWorker::onMessageFromTargetHost(nx_http::Message message)
     const auto contentType = 
         nx_http::getHeaderValue(message.response->headers, "Content-Type");
 
-    NX_LOGX(lm("Received response from target host %1. status %2, Content-Type %3")
+    NX_VERBOSE(this, lm("Received response from target host %1. status %2, Content-Type %3")
         .arg(m_targetHostPipeline->socket()->getForeignAddress().toString())
         .arg(nx_http::StatusCode::toString(statusCode))
-        .arg(contentType.isEmpty() ? nx::String("none") : contentType),
-        cl_logDEBUG2);
+        .arg(contentType.isEmpty() ? nx::String("none") : contentType));
 
     if (!messageBodyNeedsConvertion(*message.response))
     {
