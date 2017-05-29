@@ -46,7 +46,6 @@ function(detect_package_versions)
     endif()
 
     if(box STREQUAL "isd")
-        set(_qt_version "5.6.1")
         set(_openssl_version "1.0.0j")
         set(_quazip_version "0.7.2")
     endif()
