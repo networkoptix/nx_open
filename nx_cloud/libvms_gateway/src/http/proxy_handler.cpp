@@ -232,7 +232,7 @@ void ProxyHandler::onConnected(
             m_targetPeerSocket->getLocalAddress(), isSsl(m_targetPeerSocket)));
 
     m_targetPeerSocket->cancelIOSync(nx::network::aio::etNone);
-    m_requestProxyWorker = std::make_unique<RequestProxyWorker>(
+    m_requestProxyWorker = std::make_unique<ProxyWorker>(
         m_targetHost.target.toString().toUtf8(),
         std::move(m_request),
         this,

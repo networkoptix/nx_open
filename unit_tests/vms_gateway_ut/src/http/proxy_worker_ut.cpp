@@ -4,16 +4,16 @@
 #include <nx/network/system_socket.h>
 #include <nx/utils/std/future.h>
 
-#include <http/request_proxy_worker.h>
+#include <http/proxy_worker.h>
 
 namespace nx {
 namespace cloud {
 namespace gateway {
 namespace test {
 
-static const char* const kStaticResourcePath = "/RequestProxyWorker/static";
+static const char* const kStaticResourcePath = "/ProxyWorker/static";
 
-class RequestProxyWorker:
+class ProxyWorker:
     public ::testing::Test,
     public AbstractResponseSender
 {
@@ -29,7 +29,7 @@ protected:
     }
 
 private:
-    std::unique_ptr<gateway::RequestProxyWorker> m_requestProxyWorker;
+    std::unique_ptr<gateway::ProxyWorker> m_requestProxyWorker;
     TestHttpServer m_httpServer;
     nx::Buffer m_staticResource;
     nx::utils::promise<void> m_messageBodyEndReported;
@@ -71,7 +71,7 @@ private:
             << SystemError::getLastOSErrorText().toStdString();
         ASSERT_TRUE(tcpSocket->setNonBlockingMode(true));
 
-        m_requestProxyWorker = std::make_unique<gateway::RequestProxyWorker>(
+        m_requestProxyWorker = std::make_unique<gateway::ProxyWorker>(
             "not_used_in_streaming_mode",
             std::move(translatedRequest),
             this,
@@ -83,7 +83,7 @@ private:
         using namespace std::placeholders;
 
         m_messageBodySource->readAsync(
-            std::bind(&RequestProxyWorker::onSomeMessageBodyRead, this, _1, _2));
+            std::bind(&ProxyWorker::onSomeMessageBodyRead, this, _1, _2));
     }
 
     void onSomeMessageBodyRead(SystemError::ErrorCode systemErrorCode, nx::Buffer buffer)
@@ -101,7 +101,7 @@ private:
     }
 };
 
-TEST_F(RequestProxyWorker, streaming_message_body_end_is_reported)
+TEST_F(ProxyWorker, streaming_message_body_end_is_reported)
 {
     whenStreamingMessageBody();
     thenMessageBodyEndIsReported();

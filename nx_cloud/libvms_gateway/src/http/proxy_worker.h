@@ -30,14 +30,14 @@ public:
 /**
  * Proxies Http request and corresponding response.
  */
-class RequestProxyWorker:
+class ProxyWorker:
     public nx::network::aio::BasicPollable,
     public network::server::StreamConnectionHolder<nx_http::AsyncMessagePipeline>
 {
     using base_type = nx::network::aio::BasicPollable;
 
 public:
-    RequestProxyWorker(
+    ProxyWorker(
         const nx::String& targetHost,
         nx_http::Request translatedRequest,
         AbstractResponseSender* responseSender,
