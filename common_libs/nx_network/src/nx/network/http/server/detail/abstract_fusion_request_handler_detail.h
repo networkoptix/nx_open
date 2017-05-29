@@ -45,9 +45,13 @@ protected:
     void requestCompleted(FusionRequestResult result)
     {
         std::unique_ptr<nx_http::AbstractMsgBodySource> outputMsgBody;
-        outputMsgBody = std::make_unique<nx_http::BufferSource>(
-            Qn::serializationFormatToHttpContentType(Qn::JsonFormat),
-            QJson::serialized(result));
+
+        if (nx_http::StatusCode::isMessageBodyAllowed(result.httpStatusCode()))
+        {
+            outputMsgBody = std::make_unique<nx_http::BufferSource>(
+                Qn::serializationFormatToHttpContentType(Qn::JsonFormat),
+                QJson::serialized(result));
+        }
 
         requestCompleted(
             result.httpStatusCode(),
@@ -59,8 +63,7 @@ protected:
      */
     void requestCompleted(
         nx_http::StatusCode::Value statusCode,
-        std::unique_ptr<nx_http::AbstractMsgBodySource> outputMsgBody =
-        std::unique_ptr<nx_http::AbstractMsgBodySource>())
+        std::unique_ptr<nx_http::AbstractMsgBodySource> outputMsgBody = nullptr)
     {
         auto completionHandler = std::move(m_completionHandler);
         nx_http::RequestResult requestResult(
@@ -215,6 +218,8 @@ public:
 
         if (result.errorClass == FusionRequestErrorClass::noError)
         {
+            NX_ASSERT(nx_http::StatusCode::isMessageBodyAllowed(result.httpStatusCode()));
+
             // Serializing outputData.
             nx::Buffer serializedData;
             if (serializeToAnyFusionFormat(outputData, m_outputDataFormat, &serializedData))
@@ -231,7 +236,8 @@ public:
             }
         }
 
-        if (result.errorClass != FusionRequestErrorClass::noError)
+        if (result.errorClass != FusionRequestErrorClass::noError &&
+            nx_http::StatusCode::isMessageBodyAllowed(result.httpStatusCode()))
         {
             outputMsgBody = std::make_unique<nx_http::BufferSource>(
                 Qn::serializationFormatToHttpContentType(Qn::JsonFormat),
