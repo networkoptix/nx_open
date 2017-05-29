@@ -211,6 +211,8 @@ void LayoutTourReviewController::connectToLayout(QnWorkbenchLayout* layout)
     *m_connections << connect(layout, &QnWorkbenchLayout::itemAdded, saveAction, &QAction::trigger);
     *m_connections << connect(layout, &QnWorkbenchLayout::itemMoved, saveAction, &QAction::trigger);
     *m_connections << connect(layout, &QnWorkbenchLayout::itemRemoved, saveAction, &QAction::trigger);
+    *m_connections << connect(layout, &QnWorkbenchLayout::boundingRectChanged, this,
+        &LayoutTourReviewController::updatePlaceholders);
 }
 
 void LayoutTourReviewController::updateOrder()
@@ -239,7 +241,6 @@ void LayoutTourReviewController::updateButtons(const QnLayoutResourcePtr& layout
 void LayoutTourReviewController::updatePlaceholders()
 {
     static const QSize kPlaceholderSize(1, 1);
-    static const int kFillSize = 3;
 
     auto createPlaceholder = [this, mapper = workbench()->mapper()](const QPoint& cell)
         {
@@ -259,22 +260,45 @@ void LayoutTourReviewController::updatePlaceholders()
         return;
     }
 
-    const auto rect = layout->boundingRect();
-    if (rect.width() > kFillSize || rect.height() > kFillSize)
+    const int itemCount = layout->items().size();
+
+    QRect boundingRect = layout->boundingRect();
+
+    // Layout can have valid bounds after removing the last item, handling it here to improve UI
+    if (!boundingRect.isValid() || itemCount == 0)
+        boundingRect = QRect(0, 0, 1, 1);
+
+    static const int kMaxSize = 4;
+    if (boundingRect.width() > kMaxSize || boundingRect.height() > kMaxSize)
     {
         m_dropPlaceholders.clear();
         return;
     }
 
+    int minWidth = 2;
+    int minHeight = 2;
+
+    if (itemCount > 3)
+        minHeight = 3;
+    if (itemCount > 5)
+        minWidth = 3;
+    if (itemCount > 8)
+        minHeight = 4;
+
+    if (boundingRect.width() < minWidth)
+        boundingRect.setWidth(minWidth);
+    if (boundingRect.height() < minHeight)
+        boundingRect.setHeight(minHeight);
+
     for (const auto& p: m_dropPlaceholders.keys())
     {
-        if (!rect.contains(p))
+        if (!boundingRect.contains(p))
             m_dropPlaceholders.remove(p);
     }
 
-    for (int x = rect.left(); x < rect.left() + kFillSize; ++x)
+    for (int x = boundingRect.left(); x <= boundingRect.right(); ++x)
     {
-        for (int y = rect.top(); y < rect.top() + kFillSize; ++y)
+        for (int y = boundingRect.top(); y <= boundingRect.bottom(); ++y)
         {
             const QPoint cell(x, y);
             const bool isFree = layout->isFreeSlot(cell, kPlaceholderSize);
@@ -290,6 +314,9 @@ void LayoutTourReviewController::updatePlaceholders()
                 m_dropPlaceholders.insert(cell, createPlaceholder(cell));
         }
     }
+
+    layout->setData(Qn::LayoutMinimalBoundingRectRole, boundingRect);
+    display()->fitInView(display()->animationAllowed());
 }
 
 void LayoutTourReviewController::addItemToReviewLayout(
