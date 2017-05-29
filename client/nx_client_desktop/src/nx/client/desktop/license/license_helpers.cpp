@@ -216,26 +216,6 @@ void Deactivator::deactivateAsync(
     new LicenseDeactivatorPrivate(licenses, completionHandler, parent);
 }
 
-QString Deactivator::resultDescription(Result result, int licensesCount)
-{
-    switch (result)
-    {
-        case Result::Success:
-            return tr("Licenses deactivated", "", licensesCount);
-        case Result::UnspecifiedError:
-            return tr("Unspecified error");
-        case Result::ConnectionError:
-            return tr("Request failed. Check internet connection");
-        case Result::ServerError:
-            return tr("License server error");
-        case Result::DeactivationError:
-            return tr("Licenses deactivation error", "", licensesCount);
-    }
-
-    NX_EXPECT(false, "Unhandled switch value");
-    return QString();
-}
-
 QString Deactivator::errorDescription(ErrorCode error)
 {
     switch (error)

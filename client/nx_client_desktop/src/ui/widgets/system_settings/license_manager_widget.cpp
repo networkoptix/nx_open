@@ -57,6 +57,32 @@
 namespace {
 
 static const auto kHtmlDelimiter = lit("<br>");
+static const auto kEmptyLine = lit("%1%1").arg(kHtmlDelimiter);
+
+using DeactivationErrors =
+    nx::client::desktop::license::Deactivator::Deactivator::LicenseErrorHash;
+DeactivationErrors filterDeactivationErrors(const DeactivationErrors& errors)
+{
+    DeactivationErrors result;
+    for (auto it = errors.begin(); it != errors.end(); ++it)
+    {
+        using ErrorCode = nx::client::desktop::license::Deactivator::ErrorCode;
+
+        const auto code = it.value();
+        if (code == ErrorCode::noError || code == ErrorCode::keyIsNotActivated)
+            continue; //< Filter out non-actual-error codes
+
+        result.insert(it.key(), it.value());
+    }
+    return result;
+}
+
+QString toPlainText(const QString& htmlText)
+{
+    QTextDocument doc;
+    doc.setHtml(htmlText);
+    return doc.toPlainText();
+}
 
 QnLicensePtr findLicense(const QByteArray& key, const QnLicenseList& licenses)
 {
@@ -67,7 +93,6 @@ QnLicensePtr findLicense(const QByteArray& key, const QnLicenseList& licenses)
     }
     return QnLicensePtr();
 }
-
 
 class QnLicenseListSortProxyModel : public QSortFilterProxyModel
 {
@@ -585,7 +610,8 @@ bool QnLicenseManagerWidget::confirmDeactivation(const QStringList& extras) cons
         tr("Deactivate licenses?", "", extras.size()),
         QString(),
         QDialogButtonBox::Cancel);
-    confirmationDialog.setInformativeText(extras.join(lit("\n\n")), false);
+    confirmationDialog.setInformativeText(extras.join(kEmptyLine), false);
+    confirmationDialog.setInformativeTextFormat(Qt::RichText);
     confirmationDialog.addButton(lit("Deactivate"),
         QDialogButtonBox::AcceptRole, Qn::ButtonAccent::Warning);
 
@@ -612,7 +638,6 @@ QString QnLicenseManagerWidget::getDeactivationErrorMessage(
 {
     using Deactivator = nx::client::desktop::license::Deactivator;
 
-    static const auto kEmptyLine = lit("%1%1").arg(kHtmlDelimiter);
     static const auto kMessageDelimiter = lit("%1%1-%1%1").arg(kHtmlDelimiter);
     QStringList result;
     for (auto it = errors.begin(); it != errors.end(); ++it)
@@ -632,23 +657,7 @@ void QnLicenseManagerWidget::showDeactivationErrorsDialog(
     const QnLicenseList& licenses,
     const DeactivationErrors& errors)
 {
-    const auto filteredErrors =
-        [errors]() -> DeactivationErrors
-        {
-            DeactivationErrors result;
-            for (auto it = errors.begin(); it != errors.end(); ++it)
-            {
-                using ErrorCode = nx::client::desktop::license::Deactivator::ErrorCode;
-
-                const auto code = it.value();
-                if (code == ErrorCode::noError || code == ErrorCode::keyIsNotActivated)
-                    continue; //< Filter out non-actual-error codes
-
-                result.insert(it.key(), it.value());
-            }
-            return result;
-        }();
-
+    const auto filteredErrors = filterDeactivationErrors(errors);
     const int errorsCount = filteredErrors.size();
     const auto text = getDeactivationErrorCaption(licenses.size(), errorsCount);
     const auto extras = getDeactivationErrorMessage(licenses, filteredErrors);
@@ -663,12 +672,7 @@ void QnLicenseManagerWidget::showDeactivationErrorsDialog(
     button->setIcon(qnSkin->icon(lit("buttons/download.png"))); // TODO: change icon
     dialog.addButton(button, QDialogButtonBox::HelpRole);
     connect(button, &QAbstractButton::clicked, this,
-        [extras]()
-        {
-            QTextDocument doc;
-            doc.setHtml(extras);
-            qApp->clipboard()->setText(doc.toPlainText());
-        });
+        [text, extras]() { qApp->clipboard()->setText(lit("%1\n%2").arg(text, toPlainText(extras))); });
 
     dialog.setInformativeText(extras, false);
     dialog.setInformativeTextFormat(Qt::RichText);
@@ -722,7 +726,11 @@ void QnLicenseManagerWidget::deactivateLicenses(const QnLicenseList& licenses)
             for (const QnLicensePtr& license: licenses)
                 removeLicense(license, ForceRemove::Yes);
 
-            QnMessageBox::success(this, Deactivator::resultDescription(result, licenses.count()));
+            const auto text = licenses.count() == 1
+                ? tr("License deactivated")
+                : tr("%n licenses deactivated", "", licenses.count());
+
+            QnMessageBox::success(this, text);
         };
 
     Deactivator::deactivateAsync(licenses, handler, parent());

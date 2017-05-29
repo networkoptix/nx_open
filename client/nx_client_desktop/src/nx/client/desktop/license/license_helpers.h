@@ -57,8 +57,6 @@ public:
         const Handler& completionHandler,
         QObject* parent);
 
-    static QString resultDescription(Result result, int licensesCount);
-
     static QString errorDescription(ErrorCode error);
 };
 
