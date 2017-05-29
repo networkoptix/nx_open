@@ -203,7 +203,7 @@ void Manager::initializeMulticastFinders(bool clientMode)
 {
     m_multicastFinder = std::make_unique<UdpMulticastFinder>(m_moduleConnector->getAioThread());
     m_multicastFinder->listen(
-        [this](QnModuleInformationWithAddresses module, SocketAddress endpoint)
+        [this](QnModuleInformationWithAddresses module, SocketAddress /*endpoint*/)
         {
             std::set<SocketAddress> endpoints;
             for (const auto& address: module.remoteAddresses)

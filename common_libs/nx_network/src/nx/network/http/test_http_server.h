@@ -160,7 +160,8 @@ public:
 
     void setResponseBuffer(const QByteArray& buf);
 
-    void processMessage(nx_http::Message request);
+protected:
+    virtual void processMessage(nx_http::Message request) override;
 
 private:
     QByteArray m_responseBuffer;

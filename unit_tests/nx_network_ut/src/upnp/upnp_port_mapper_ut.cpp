@@ -3,8 +3,6 @@
 #include <nx/network/upnp/upnp_device_searcher.h>
 #include <nx/utils/test_support/sync_queue.h>
 
-#include <api/global_settings.h>
-
 #include "upnp_port_mapper_mocked.h"
 
 namespace nx_upnp {
@@ -128,7 +126,7 @@ TEST_F( UpnpPortMapper, CheckMappings )
 
 TEST_F( UpnpPortMapper, DISABLED_RealRouter )
 {
-    PortMapper portMapper( 10000 );
+    PortMapper portMapper( true, 10000 );
 
     EXPECT_TRUE( portMapper.enableMapping( 7001, PortMapper::Protocol::TCP,
                  [&]( SocketAddress ) {} ) );

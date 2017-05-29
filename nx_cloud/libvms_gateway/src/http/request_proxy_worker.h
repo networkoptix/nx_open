@@ -1,5 +1,6 @@
 #pragma once
 
+#include <atomic>
 #include <memory>
 
 #include <boost/optional.hpp>
@@ -27,7 +28,7 @@ public:
 };
 
 /**
- * Proxyies Http request and corresponding response.
+ * Proxies Http request and corresponding response.
  */
 class RequestProxyWorker:
     public nx::network::aio::BasicPollable,
@@ -55,11 +56,23 @@ private:
     nx::String m_proxyHost;
     TargetHost m_targetPeer;
     std::unique_ptr<nx_http::AsyncMessagePipeline> m_targetHostPipeline;
-    AbstractResponseSender* m_responseSender;
+    AbstractResponseSender* m_responseSender = nullptr;
+    std::unique_ptr<AbstractMessageBodyConverter> m_messageBodyConverter;
+    nx::Buffer m_messageBodyBuffer;
+    nx_http::Message m_responseMessage;
+    const int m_proxyingId;
+    static std::atomic<int> m_proxyingIdSequence;
 
     void onMessageFromTargetHost(nx_http::Message message);
-    std::unique_ptr<nx_http::AbstractMsgBodySource> prepareMessageBody(
-        nx_http::Response* response);
+    bool messageBodyNeedsConvertion(const nx_http::Response& response);
+    void startMessageBodyStreaming(nx_http::Message message);
+    std::unique_ptr<nx_http::AbstractMsgBodySource> prepareStreamingMessageBody(
+        nx_http::StringType contentType);
+
+    void onSomeMessageBodyRead(nx::Buffer someMessageBody);
+    void onMessageEnd();
+    std::unique_ptr<nx_http::AbstractMsgBodySource> prepareFixedMessageBody();
+    void updateMessageHeaders(nx_http::Response* response);
 };
 
 } // namespace gateway
