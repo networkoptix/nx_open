@@ -42,5 +42,5 @@ if(MACOSX)
 endif()
 
 if(targetDevice STREQUAL "isd")
-    target_link_libraries(common PRIVATE libcreateprocess)
+    target_compile_definitions(common PRIVATE ISD_JAGUAR)
 endif()

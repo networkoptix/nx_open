@@ -76,7 +76,6 @@ copyLibsWithoutQt()
     )
 
     [ -e "$LIBS_DIR/libvpx.so" ] && LIBS_TO_COPY+=( libvpx.so )
-    [ -e "$LIBS_DIR/libcreateprocess.so" ] && LIBS_TO_COPY+=( libcreateprocess.so )
 
     local LIB
     for LIB in "${LIBS_TO_COPY[@]}"; do

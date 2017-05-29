@@ -127,7 +127,6 @@ function(get_dependencies)
     endif()
 
     if(box STREQUAL "isd")
-        nx_rdep_add_package(libcreateprocess-0.1)
         nx_rdep_add_package(vmux-1.0.0)
     elseif(box STREQUAL "isd_s2")
         nx_rdep_add_package(vmux-1.0.0)
