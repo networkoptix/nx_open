@@ -2,33 +2,24 @@
 
 namespace nx_http {
 
-HttpMessageStreamParser::HttpMessageStreamParser()
-{
-}
-    
-HttpMessageStreamParser::~HttpMessageStreamParser()
-{
-}
-
-bool HttpMessageStreamParser::processData( const QnByteArrayConstRef& data )
+bool HttpMessageStreamParser::processData(const QnByteArrayConstRef& data)
 {
     size_t bytesProcessed = 0;
-    while( bytesProcessed < data.size() )
+    while (bytesProcessed < data.size())
     {
-        size_t localBytesProcessed = 0;
-        if( !m_httpStreamReader.parseBytes( data.mid(bytesProcessed), &localBytesProcessed ) ||
-            m_httpStreamReader.state() == HttpStreamReader::parseError )
+        std::size_t localBytesProcessed = 0;
+        if (!m_httpStreamReader.parseBytes(data.mid(bytesProcessed), &localBytesProcessed) ||
+            m_httpStreamReader.state() == HttpStreamReader::parseError)
         {
             m_httpStreamReader.resetState();
-            //reporting error
             return false;
         }
 
-        //TODO #ak limiting message size since message body is aggregated in parser
+        // TODO: #ak Limiting message size since message body is aggregated in the parser.
 
-        if( m_httpStreamReader.state() == HttpStreamReader::messageDone )
+        if (m_httpStreamReader.state() == HttpStreamReader::messageDone)
         {
-            if( !m_nextFilter->processData( m_httpStreamReader.fetchMessageBody() ) )
+            if (!m_nextFilter->processData(m_httpStreamReader.fetchMessageBody()))
                 return false;
             m_httpStreamReader.resetState();
         }
@@ -40,8 +31,8 @@ bool HttpMessageStreamParser::processData( const QnByteArrayConstRef& data )
 
 size_t HttpMessageStreamParser::flush()
 {
-    if( m_httpStreamReader.state() > HttpStreamReader::readingMessageHeaders )
-        m_nextFilter->processData( m_httpStreamReader.fetchMessageBody() );
+    if (m_httpStreamReader.state() > HttpStreamReader::readingMessageHeaders)
+        m_nextFilter->processData(m_httpStreamReader.fetchMessageBody());
     return 0;
 }
 
