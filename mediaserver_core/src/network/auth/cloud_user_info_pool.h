@@ -148,7 +148,7 @@ private:
     void cleanupOldInfo(uint64_t timestamp);
     void cleanupByNonce(const nx::Buffer& cloudNonce);
 
-private:
+protected:
     std::unique_ptr<AbstractCloudUserInfoPoolSupplier> m_supplier;
     detail::UserNonceToResponseMap m_userNonceToResponse;
     detail::TimestampToNonceUserCountMap m_tsToNonceUserCount;
