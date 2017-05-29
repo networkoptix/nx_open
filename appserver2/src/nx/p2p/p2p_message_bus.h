@@ -326,7 +326,7 @@ public:
 
     QMap<ApiPersistentIdData, ApiRuntimeData> runtimeInfo() const;
 
-    void MessageBus::updateOfflineDistance(
+    void updateOfflineDistance(
         const ApiPersistentIdData& to,
         const ApiPersistentIdData& via,
         int sequence);
