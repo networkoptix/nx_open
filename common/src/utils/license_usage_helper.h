@@ -31,7 +31,7 @@ class QnLicenseUsageHelper: public Connective<QObject>, public QnCommonModuleAwa
     Q_OBJECT
     using base_type = Connective<QObject>;
 public:
-    QnLicenseUsageHelper(QObject *parent);
+    QnLicenseUsageHelper(QnCommonModule* commonModule);
 
     bool isValid() const;
 
@@ -223,7 +223,7 @@ class QnVideoWallLicenseUsageHelper: public QnLicenseUsageHelper
     Q_OBJECT
     using base_type = QnLicenseUsageHelper;
 public:
-    QnVideoWallLicenseUsageHelper(QObject *parent = NULL);
+    QnVideoWallLicenseUsageHelper(QnCommonModule* commonModule);
 
     /** Propose to use some more or less licenses directly (e.g. to start control session). */
     void propose(int count);

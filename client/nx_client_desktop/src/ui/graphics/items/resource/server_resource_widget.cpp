@@ -780,8 +780,10 @@ int QnServerResourceWidget::calculateButtonsVisibility() const
     return result;
 }
 
-Qn::ResourceStatusOverlay QnServerResourceWidget::calculateStatusOverlay() const {
-    if (qnRuntime->isVideoWallMode() && !QnVideoWallLicenseUsageHelper().isValid())
+Qn::ResourceStatusOverlay QnServerResourceWidget::calculateStatusOverlay() const
+{
+    QnVideoWallLicenseUsageHelper helper(commonModule());
+    if (qnRuntime->isVideoWallMode() && !helper.isValid())
         return Qn::VideowallWithoutLicenseOverlay;
 
     auto status = m_resource->getStatus();
