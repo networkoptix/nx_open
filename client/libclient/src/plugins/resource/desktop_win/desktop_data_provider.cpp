@@ -175,7 +175,6 @@ void QnDesktopDataProvider::EncodedAudioInfo::stop()
     m_terminated = true;
     if (m_waveInOpened)
     {
-        waveInStop(hWaveIn);
         waveInReset(hWaveIn);
         waveInClose(hWaveIn);
         clearBuffers();
