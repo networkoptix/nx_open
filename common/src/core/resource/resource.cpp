@@ -608,7 +608,7 @@ void QnResource::doStatusChanged(Qn::ResourceStatus oldStatus, Qn::ResourceStatu
     }
 
     if ((oldStatus == Qn::Offline || oldStatus == Qn::NotDefined) && newStatus == Qn::Online && !hasFlags(Qn::foreigner))
-        init();
+        initAsync(false);
 
     // Null pointer if we are changing status in constructor. Signal is not needed in this case.
     if (auto sharedThis = toSharedPointer(this))
