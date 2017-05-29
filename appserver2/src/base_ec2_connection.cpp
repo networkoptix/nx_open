@@ -262,7 +262,7 @@ AbstractUpdatesManagerPtr BaseEc2Connection<QueryProcessorType>::getUpdatesManag
     const Qn::UserAccessData& userAccessData)
 {
     return std::make_shared<QnUpdatesManager<QueryProcessorType>>(
-        m_queryProcessor, userAccessData);
+        m_queryProcessor, userAccessData, messageBus());
 }
 
 template<class QueryProcessorType>

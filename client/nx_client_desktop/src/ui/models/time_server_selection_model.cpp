@@ -7,6 +7,7 @@
 #include <common/common_module.h>
 
 #include <core/resource_management/resource_pool.h>
+#include <core/resource_management/resource_changes_listener.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource/resource_display_info.h>
 
@@ -24,6 +25,7 @@
 #include <utils/common/synctime.h>
 #include <utils/tz/tz.h>
 
+#include <boost/algorithm/cxx11/any_of.hpp>
 #include <algorithm>
 
 namespace {
@@ -75,6 +77,7 @@ namespace {
 QnTimeServerSelectionModel::QnTimeServerSelectionModel(QObject* parent):
     base_type(parent),
     QnWorkbenchContextAware(parent),
+    m_hasInternetAccess(false),
     m_sameTimezone(false),
     m_sameTimezoneValid(false)
 {
@@ -199,6 +202,13 @@ QnTimeServerSelectionModel::QnTimeServerSelectionModel(QObject* parent):
             updateColumn(Columns::TimeColumn);
             updateColumn(Columns::OffsetColumn);
         });
+
+    auto serverChangesListener = new QnResourceChangesListener(this);
+    serverChangesListener->connectToResources<QnMediaServerResource>(
+        &QnMediaServerResource::serverFlagsChanged,
+        this, &QnTimeServerSelectionModel::updateHasInternetAccess);
+
+    updateHasInternetAccess();
 
     /* Requesting initial time. */
     resetData(qnSyncTime->currentMSecsSinceEpoch());
@@ -538,6 +548,11 @@ bool QnTimeServerSelectionModel::sameTimezone() const
     return m_sameTimezone;
 }
 
+bool QnTimeServerSelectionModel::hasInternetAccess() const
+{
+    return m_hasInternetAccess;
+}
+
 bool QnTimeServerSelectionModel::calculateSameTimezone() const
 {
     auto watcher = context()->instance<QnWorkbenchServerTimeWatcher>();
@@ -585,4 +600,15 @@ void QnTimeServerSelectionModel::resetData(qint64 currentSyncTime)
             continue;
         addItem(runtimeInfo);
     }
+}
+
+void QnTimeServerSelectionModel::updateHasInternetAccess()
+{
+    const auto servers = resourcePool()->getResources<QnMediaServerResource>();
+    m_hasInternetAccess = boost::algorithm::any_of(servers,
+        [](const QnMediaServerResourcePtr& server)
+        {
+            return server->getStatus() == Qn::Online
+                && server->getServerFlags().testFlag(Qn::SF_HasPublicIP);
+        });
 }

@@ -1,7 +1,7 @@
 #include <QtCore/QCoreApplication>
 
 #include <nx/fusion/serialization/lexical.h>
-#include <nx/network/http/httpclient.h>
+#include <nx/network/http/http_client.h>
 #include <nx/network/http/auth_tools.h>
 
 #define USE_GMOCK

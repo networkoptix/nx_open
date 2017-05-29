@@ -9,7 +9,7 @@
 #include <nx_ec/ec_api.h>
 #include <transaction/transaction_message_bus.h>
 #include <core/resource_management/resource_pool.h>
-#include "nx/network/http/httpclient.h"
+#include <nx/network/http/http_client.h>
 
 namespace {
 

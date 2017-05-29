@@ -8,7 +8,7 @@
 #include "flir_web_socket_io_manager.h"
 
 #include <core/resource/camera_resource.h>
-#include <nx/network/http/httpclient.h>
+#include <nx/network/http/http_client.h>
 
 namespace nx {
 namespace plugins {

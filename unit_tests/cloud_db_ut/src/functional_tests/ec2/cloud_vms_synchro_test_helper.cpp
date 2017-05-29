@@ -2,7 +2,7 @@
 
 #include <nx_ec/data/api_fwd.h>
 #include <nx_ec/ec_api.h>
-#include <nx/network/http/httpclient.h>
+#include <nx/network/http/http_client.h>
 #include <nx/fusion/model_functions.h>
 #include <nx/fusion/serialization/json.h>
 #include <nx/fusion/serialization/lexical.h>

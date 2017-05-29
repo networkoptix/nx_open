@@ -127,15 +127,13 @@ protected slots:
 
     void at_nextLayoutAction_triggered();
     void at_previousLayoutAction_triggered();
-    void at_openLayoutsAction_triggered();
 
     void at_openInLayoutAction_triggered();
 
     void at_openInCurrentLayoutAction_triggered();
-    void at_openInNewLayoutAction_triggered();
+    void at_openInNewTabAction_triggered();
     void at_openInNewWindowAction_triggered();
 
-    void at_openLayoutsInNewWindowAction_triggered();
     void at_openCurrentLayoutInNewWindowAction_triggered();
     void at_openNewWindowAction_triggered();
 
@@ -143,7 +141,6 @@ protected slots:
     void at_dropResourcesAction_triggered();
     void at_delayedDropResourcesAction_triggered();
     void at_instantDropResourcesAction_triggered();
-    void at_dropResourcesIntoNewLayoutAction_triggered();
     void at_openFileAction_triggered();
     void at_openFolderAction_triggered();
     void at_aboutAction_triggered();
@@ -181,7 +178,6 @@ protected slots:
     void at_setAsBackgroundAction_triggered();
     void setCurrentLayoutBackground(const QString &filename);
 
-    void at_panicWatcher_panicModeChanged();
     void at_scheduleWatcher_scheduleEnabledChanged();
     void at_togglePanicModeAction_toggled(bool checked);
 

@@ -38,7 +38,6 @@ protected:
         RetryPolicy retryPolicy;
         retryPolicy.maxRetryCount = 1;
 
-        m_connection->bindToAioThread(SocketGlobals::aioService().getRandomAioThread());
         m_connection->start(
             retryPolicy,
             std::bind(&IncomingReverseTunnelConnection::onConnectFinished, this, _1));

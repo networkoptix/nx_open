@@ -12,7 +12,9 @@ void MessageParser::setMessage(Message* const msg)
     m_msg = msg;
 }
 
-nx::network::server::ParserState MessageParser::parse(const nx::Buffer& buf, size_t* bytesProcessed)
+nx::network::server::ParserState MessageParser::parse(
+    const nx::Buffer& buf,
+    size_t* bytesProcessed)
 {
     if (buf.isEmpty())
     {
@@ -28,7 +30,7 @@ nx::network::server::ParserState MessageParser::parse(const nx::Buffer& buf, siz
 
     switch (m_httpStreamReader.state())
     {
-        //TODO #ak currently, always reading full message before going futher.
+        // TODO: #ak Currently, always reading full message before going futher.
         //  Have to add support for infinite request message body to async server
         //case HttpStreamReader::pullingLineEndingBeforeMessageBody:
         //case HttpStreamReader::readingMessageBody:

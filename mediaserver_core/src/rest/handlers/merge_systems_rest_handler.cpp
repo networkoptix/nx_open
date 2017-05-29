@@ -36,7 +36,7 @@
 #include <network/authenticate_helper.h>
 #include <api/resource_property_adaptor.h>
 #include <api/global_settings.h>
-#include <nx/network/http/httpclient.h>
+#include <nx/network/http/http_client.h>
 #include "system_settings_handler.h"
 #include <rest/server/json_rest_result.h>
 #include <api/model/system_settings_reply.h>

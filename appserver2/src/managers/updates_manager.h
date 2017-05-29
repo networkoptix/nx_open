@@ -31,17 +31,20 @@ namespace ec2 {
         public AbstractUpdatesManager
     {
     public:
-        QnUpdatesManager(QueryProcessorType * const queryProcessor, const Qn::UserAccessData &userAccessData);
+        QnUpdatesManager(
+            QueryProcessorType * const queryProcessor,
+            const Qn::UserAccessData &userAccessData,
+            QnTransactionMessageBusBase* messageBus);
         virtual ~QnUpdatesManager();
 
     protected:
         virtual int sendUpdatePackageChunk(const QString &updateId, const QByteArray &data, qint64 offset, const QnPeerSet &peers, impl::SimpleHandlerPtr handler) override;
         virtual int sendUpdateUploadResponce(const QString &updateId, const QnUuid &peerId, int chunks, impl::SimpleHandlerPtr handler) override;
-        virtual int installUpdate(const QString &updateId, const QnPeerSet &peers, impl::SimpleHandlerPtr handler) override;
 
     private:
         QueryProcessorType* const m_queryProcessor;
         Qn::UserAccessData m_userAccessData;
+        QnTransactionMessageBusBase* m_messageBus;
     };
 
 } // namespace ec2

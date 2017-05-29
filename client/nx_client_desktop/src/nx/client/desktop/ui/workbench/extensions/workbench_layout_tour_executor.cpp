@@ -310,7 +310,9 @@ void LayoutTourExecutor::setHintVisible(bool visible)
     if (visible)
     {
         m_hintLabel = QnGraphicsMessageBox::information(
-            tr("Press any key to stop the tour."));
+            tr("Use Left/Right arrows, Page Up/Page Down, Enter, Space and Backspace to control the tour.")
+            + L'\n'
+            + tr("Press any other key to stop the tour."));
     }
     else if (m_hintLabel)
     {

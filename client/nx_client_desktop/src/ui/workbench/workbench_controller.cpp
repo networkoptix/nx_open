@@ -123,7 +123,7 @@ QPoint invalidCursorPos()
     return invalidDragDelta();
 }
 
-QPoint modulo(const QPoint &pos, const QRect &rect)
+QPoint modulo(const QPoint& pos, const QRect& rect)
 {
     return QPoint(
         rect.left() + (pos.x() - rect.left() + rect.width()) % rect.width(),
@@ -150,16 +150,6 @@ int distance(int l, int h, int v)
     }
 }
 
-template<class T>
-struct IsInstanceOf
-{
-    template<class Y>
-    bool operator()(const Y *value) const
-    {
-        return dynamic_cast<const T *>(value) != NULL;
-    }
-};
-
 /** Opacity of video items when they are dragged / resized. */
 const qreal widgetManipulationOpacity = 0.3;
 
@@ -171,46 +161,6 @@ bool tourIsRunning(QnWorkbenchContext* context)
 }
 
 } // namespace
-
-
-/*!
-    Returns true if widget has checked option not set
-*/
-class ResourceWidgetHasNoOptionCondition
-:
-    public InstrumentItemCondition
-{
-public:
-    ResourceWidgetHasNoOptionCondition( QnResourceWidget::Option optionToCheck )
-    :
-        m_optionToCheck( optionToCheck )
-    {
-    }
-
-    //!Implementation of InstrumentItemCondition::oeprator()
-    virtual bool operator()(QGraphicsItem *item, Instrument* /*instrument*/) const
-    {
-        QnResourceWidget* resourceWidget = dynamic_cast<QnResourceWidget*>(item);
-        if( !resourceWidget )
-            return true;
-        return (resourceWidget->options() & m_optionToCheck) == 0;
-    }
-
-private:
-    QnResourceWidget::Option m_optionToCheck;
-};
-
-class ResourceWidgetNotRaisedCondition : public InstrumentItemCondition, public QnWorkbenchContextAware {
-public:
-    ResourceWidgetNotRaisedCondition(QnWorkbenchContext *context) :
-        QnWorkbenchContextAware(context)
-    {}
-
-    virtual bool operator()(QGraphicsItem *item, Instrument *instrument) const {
-        Q_UNUSED(instrument)
-        return item != display()->widget(Qn::RaisedRole);
-    }
-};
 
 QnWorkbenchController::QnWorkbenchController(QObject *parent):
     base_type(parent),
@@ -278,11 +228,21 @@ QnWorkbenchController::QnWorkbenchController(QObject *parent):
     m_resizingInstrument->setInnerEffectRadius(4);
     m_resizingInstrument->setOuterEffectRadius(8);
 
-    m_moveInstrument->addItemCondition(new ResourceWidgetNotRaisedCondition(context()));
-    m_resizingInstrument->addItemCondition(new ResourceWidgetNotRaisedCondition(context()));
+    auto notRaisedCondition =
+        [this](QGraphicsItem* item)
+        {
+            return item != display()->widget(Qn::RaisedRole);
+        };
 
-    m_rotationInstrument->addItemCondition(new InstrumentItemConditionAdaptor<IsInstanceOf<QnResourceWidget> >());
-    m_rotationInstrument->addItemCondition(new ResourceWidgetHasNoOptionCondition( QnResourceWidget::WindowRotationForbidden ));
+    m_moveInstrument->addItemCondition(new InstrumentItemConditionAdaptor(notRaisedCondition));
+    m_resizingInstrument->addItemCondition(new InstrumentItemConditionAdaptor(notRaisedCondition));
+
+    m_rotationInstrument->addItemCondition(new InstrumentItemConditionAdaptor(
+        [](QGraphicsItem* item)
+        {
+            const auto widget = dynamic_cast<QnResourceWidget*>(item);
+            return widget && !widget->options().testFlag(QnResourceWidget::WindowRotationForbidden);
+        }));
 
     /* Item instruments. */
     m_manager->installInstrument(new StopInstrument(Instrument::Item, mouseEventTypes, this));
@@ -1079,7 +1039,7 @@ void QnWorkbenchController::at_rotationStarted(QGraphicsView *, QGraphicsWidget 
 void QnWorkbenchController::at_rotationFinished(QGraphicsView *, QGraphicsWidget *widget) {
     TRACE("ROTATION FINISHED");
 
-    QnResourceWidget *resourceWidget = dynamic_cast<QnResourceWidget *>(widget);
+    const auto resourceWidget = dynamic_cast<QnResourceWidget*>(widget);
     if(!resourceWidget)
         return; /* We may also get NULL if the widget being rotated gets deleted. */
 
@@ -1266,7 +1226,7 @@ void QnWorkbenchController::at_item_doubleClicked(QnResourceWidget *widget)
     if (workbench()->currentLayout()->isLayoutTourReview())
     {
         if (auto resource = widget->resource())
-            menu()->trigger(action::DropResourcesIntoNewLayoutAction, resource);
+            menu()->trigger(action::OpenInNewTabAction, resource);
         return;
     }
 
@@ -1350,7 +1310,7 @@ void QnWorkbenchController::at_display_widgetChanged(Qn::ItemRole role) {
 
     QGraphicsItem *focusItem = display()->scene()->focusItem();
     bool canMoveFocus = !focusItem
-        || dynamic_cast<QnResourceWidget *>(focusItem)
+        || dynamic_cast<QnResourceWidget*>(focusItem)
         || dynamic_cast<QnGraphicsWebView*>(focusItem);
 
     if (newWidget && canMoveFocus)
@@ -1477,7 +1437,7 @@ void QnWorkbenchController::at_clearMotionSelectionAction_triggered()
 
     for (auto widget: widgets)
     {
-        if (auto mediaWidget = dynamic_cast<QnMediaResourceWidget *>(widget))
+        if (auto mediaWidget = dynamic_cast<QnMediaResourceWidget*>(widget))
             mediaWidget->clearMotionSelection();
     }
 }

@@ -17,6 +17,7 @@ QnViewportBoundWidget::QnViewportBoundWidget(QGraphicsItem* parent):
     QList<QGraphicsTransform*> transformations = this->transformations();
     transformations.push_back(m_scale);
     setTransformations(transformations);
+    setAcceptedMouseButtons(Qt::NoButton);
 
     itemChange(ItemSceneHasChanged, QVariant::fromValue(scene()));
 

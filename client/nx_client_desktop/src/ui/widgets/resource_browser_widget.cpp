@@ -970,7 +970,7 @@ void QnResourceBrowserWidget::handleItemActivated(const QModelIndex& index, bool
     // Layouts are always handled the same way, independently of other circumstances.
     if (resource->hasFlags(Qn::layout))
     {
-        menu()->trigger(action::OpenAnyNumberOfLayoutsAction, resource);
+        menu()->trigger(action::OpenInNewTabAction, resource);
         return;
     }
 

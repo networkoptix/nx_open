@@ -176,7 +176,7 @@
             </activation>
             <properties>
                 <qt.libs>core network xml sql</qt.libs>
-                <rdep.linux.arm.packages>openldap libcreateprocess</rdep.linux.arm.packages>
+                <rdep.linux.arm.packages>openldap</rdep.linux.arm.packages>
             </properties>
         </profile>
         <profile>

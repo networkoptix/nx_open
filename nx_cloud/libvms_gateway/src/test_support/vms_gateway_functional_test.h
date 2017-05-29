@@ -1,8 +1,3 @@
-/**********************************************************
-* May 19, 2016
-* akolesnikov
-***********************************************************/
-
 #pragma once
 
 #include <vector>
@@ -17,18 +12,16 @@
 
 #include "vms_gateway_process_public.h"
 
-
 namespace nx {
 namespace cloud {
 namespace gateway {
 
-class VmsGatewayFunctionalTest
-:
+class VmsGatewayFunctionalTest:
     public utils::test::ModuleLauncher<VmsGatewayProcessPublic>
 {
 public:
     VmsGatewayFunctionalTest();
-    ~VmsGatewayFunctionalTest();
+    virtual ~VmsGatewayFunctionalTest();
 
     virtual bool startAndWaitUntilStarted() override;
     bool startAndWaitUntilStarted(
@@ -37,7 +30,7 @@ public:
     SocketAddress endpoint() const;
     const std::unique_ptr<TestHttpServer>& testHttpServer() const;
 
-    /** Test will use \a path to store all of its files */
+    /** Test will use path to store all of its files. */
     static void setTemporaryDirectoryPath(const QString& path);
 
 private:
@@ -46,6 +39,6 @@ private:
     std::unique_ptr<TestHttpServer> m_testHttpServer;
 };
 
-}   // namespace gateway
-}   // namespace cloud
-}   // namespace nx
+} // namespace gateway
+} // namespace cloud
+} // namespace nx
