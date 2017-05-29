@@ -1,4 +1,4 @@
-#include "request_proxy_worker.h"
+#include "proxy_worker.h"
 
 #include <nx/network/http/async_channel_msg_body_source.h>
 #include <nx/network/http/buffer_source.h>
@@ -9,35 +9,34 @@ namespace nx {
 namespace cloud {
 namespace gateway {
 
-std::atomic<int> RequestProxyWorker::m_proxyingIdSequence(0);
+std::atomic<int> ProxyWorker::m_proxyingIdSequence(0);
 
-RequestProxyWorker::RequestProxyWorker(
-    const TargetHost& targetPeer,
+ProxyWorker::ProxyWorker(
+    const nx::String& targetHost,
     nx_http::Request translatedRequest,
     AbstractResponseSender* responseSender,
     std::unique_ptr<AbstractStreamSocket> connectionToTheTargetPeer)
     :
+    m_targetHost(targetHost),
     m_responseSender(responseSender),
     m_proxyingId(++m_proxyingIdSequence)
 {
     using namespace std::placeholders;
 
     NX_VERBOSE(this, lm("Proxy %1. Starting proxing to %2(%3) (path %4) from %5").arg(m_proxyingId)
-        .args(targetPeer.target, connectionToTheTargetPeer->getForeignAddress(),
+        .args(m_targetHost, connectionToTheTargetPeer->getForeignAddress(),
             translatedRequest.requestLine.url, connectionToTheTargetPeer->getLocalAddress()));
-
-    m_targetPeer = targetPeer;
 
     m_targetHostPipeline = std::make_unique<nx_http::AsyncMessagePipeline>(
         this,
         std::move(connectionToTheTargetPeer));
 
     m_targetHostPipeline->setMessageHandler(
-        std::bind(&RequestProxyWorker::onMessageFromTargetHost, this, _1));
+        std::bind(&ProxyWorker::onMessageFromTargetHost, this, _1));
     m_targetHostPipeline->setOnSomeMessageBodyAvailable(
-        std::bind(&RequestProxyWorker::onSomeMessageBodyRead, this, _1));
+        std::bind(&ProxyWorker::onSomeMessageBodyRead, this, _1));
     m_targetHostPipeline->setOnMessageEnd(
-        std::bind(&RequestProxyWorker::onMessageEnd, this));
+        std::bind(&ProxyWorker::onMessageEnd, this));
     m_targetHostPipeline->startReadingConnection();
 
     m_proxyHost = nx_http::getHeaderValue(translatedRequest.headers, "Host");
@@ -49,7 +48,7 @@ RequestProxyWorker::RequestProxyWorker(
     bindToAioThread(m_targetHostPipeline->getAioThread());
 }
 
-void RequestProxyWorker::bindToAioThread(
+void ProxyWorker::bindToAioThread(
     network::aio::AbstractAioThread* aioThread)
 {
     base_type::bindToAioThread(aioThread);
@@ -57,7 +56,7 @@ void RequestProxyWorker::bindToAioThread(
     m_targetHostPipeline->bindToAioThread(aioThread);
 }
 
-void RequestProxyWorker::closeConnection(
+void ProxyWorker::closeConnection(
     SystemError::ErrorCode closeReason,
     nx_http::AsyncMessagePipeline* connection)
 {
@@ -72,14 +71,14 @@ void RequestProxyWorker::closeConnection(
         boost::none);
 }
 
-void RequestProxyWorker::stopWhileInAioThread()
+void ProxyWorker::stopWhileInAioThread()
 {
     base_type::stopWhileInAioThread();
 
     m_targetHostPipeline.reset();
 }
 
-void RequestProxyWorker::onMessageFromTargetHost(nx_http::Message message)
+void ProxyWorker::onMessageFromTargetHost(nx_http::Message message)
 {
     if (message.type != nx_http::MessageType::response)
     {
@@ -109,15 +108,9 @@ void RequestProxyWorker::onMessageFromTargetHost(nx_http::Message message)
     m_responseMessage = std::move(message);
 }
 
-void RequestProxyWorker::startMessageBodyStreaming(nx_http::Message message)
+void ProxyWorker::startMessageBodyStreaming(nx_http::Message message)
 {
-    const auto contentType =
-        nx_http::getHeaderValue(message.response->headers, "Content-Type");
-
-    NX_VERBOSE(this, lm("Proxy %1. Starting streaming message body of type %2")
-        .arg(m_proxyingId).arg(contentType));
-
-    auto msgBody = prepareStreamingMessageBody(contentType);
+    auto msgBody = prepareStreamingMessageBody(message);
     m_responseSender->sendResponse(
         nx_http::RequestResult(
             static_cast<nx_http::StatusCode::Value>(message.response->statusLine.statusCode),
@@ -125,17 +118,28 @@ void RequestProxyWorker::startMessageBodyStreaming(nx_http::Message message)
         std::move(*message.response));
 }
 
-std::unique_ptr<nx_http::AbstractMsgBodySource> RequestProxyWorker::prepareStreamingMessageBody(
-    nx_http::StringType contentType)
+std::unique_ptr<nx_http::AbstractMsgBodySource>
+    ProxyWorker::prepareStreamingMessageBody(const nx_http::Message& message)
 {
+    const auto contentType =
+        nx_http::getHeaderValue(message.response->headers, "Content-Type");
+
+    NX_VERBOSE(this, lm("Proxy %1. Preparing streaming message body of type %2")
+        .arg(m_proxyingId).arg(contentType));
+
     auto bodySource = nx_http::makeAsyncChannelMessageBodySource(
-        std::move(contentType),
+        contentType,
         m_targetHostPipeline->takeSocket());
+
+    const auto contentLengthIter = message.response->headers.find("Content-Length");
+    if (contentLengthIter != message.response->headers.end())
+        bodySource->setMessageBodyLimit(contentLengthIter->second.toULongLong());
+    
     m_targetHostPipeline.reset();
     return std::move(bodySource);
 }
 
-bool RequestProxyWorker::messageBodyNeedsConvertion(const nx_http::Response& response)
+bool ProxyWorker::messageBodyNeedsConvertion(const nx_http::Response& response)
 {
     const auto contentTypeIter = response.headers.find("Content-Type");
     if (contentTypeIter == response.headers.end())
@@ -143,7 +147,7 @@ bool RequestProxyWorker::messageBodyNeedsConvertion(const nx_http::Response& res
 
     m_messageBodyConverter = MessageBodyConverterFactory::instance().create(
         m_proxyHost,
-        m_targetPeer,
+        m_targetHost,
         contentTypeIter->second);
     if (m_messageBodyConverter)
     {
@@ -152,12 +156,12 @@ bool RequestProxyWorker::messageBodyNeedsConvertion(const nx_http::Response& res
     return m_messageBodyConverter != nullptr;
 }
 
-void RequestProxyWorker::onSomeMessageBodyRead(nx::Buffer someMessageBody)
+void ProxyWorker::onSomeMessageBodyRead(nx::Buffer someMessageBody)
 {
     m_messageBodyBuffer += someMessageBody;
 }
 
-void RequestProxyWorker::onMessageEnd()
+void ProxyWorker::onMessageEnd()
 {
     updateMessageHeaders(m_responseMessage.response);
     
@@ -172,7 +176,7 @@ void RequestProxyWorker::onMessageEnd()
         std::move(*m_responseMessage.response));
 }
 
-std::unique_ptr<nx_http::AbstractMsgBodySource> RequestProxyWorker::prepareFixedMessageBody()
+std::unique_ptr<nx_http::AbstractMsgBodySource> ProxyWorker::prepareFixedMessageBody()
 {
     NX_VERBOSE(this, lm("Proxy %1. Preparing fixed message body").arg(m_proxyingId));
 
@@ -199,7 +203,7 @@ std::unique_ptr<nx_http::AbstractMsgBodySource> RequestProxyWorker::prepareFixed
     }
 }
 
-void RequestProxyWorker::updateMessageHeaders(nx_http::Response* response)
+void ProxyWorker::updateMessageHeaders(nx_http::Response* response)
 {
     nx_http::insertOrReplaceHeader(
         &response->headers,

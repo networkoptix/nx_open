@@ -30,15 +30,15 @@ public:
 /**
  * Proxies Http request and corresponding response.
  */
-class RequestProxyWorker:
+class ProxyWorker:
     public nx::network::aio::BasicPollable,
     public network::server::StreamConnectionHolder<nx_http::AsyncMessagePipeline>
 {
     using base_type = nx::network::aio::BasicPollable;
 
 public:
-    RequestProxyWorker(
-        const TargetHost& targetPeer,
+    ProxyWorker(
+        const nx::String& targetHost,
         nx_http::Request translatedRequest,
         AbstractResponseSender* responseSender,
         std::unique_ptr<AbstractStreamSocket> connectionToTheTargetPeer);
@@ -54,7 +54,7 @@ protected:
 
 private:
     nx::String m_proxyHost;
-    TargetHost m_targetPeer;
+    nx::String m_targetHost;
     std::unique_ptr<nx_http::AsyncMessagePipeline> m_targetHostPipeline;
     AbstractResponseSender* m_responseSender = nullptr;
     std::unique_ptr<AbstractMessageBodyConverter> m_messageBodyConverter;
@@ -67,7 +67,7 @@ private:
     bool messageBodyNeedsConvertion(const nx_http::Response& response);
     void startMessageBodyStreaming(nx_http::Message message);
     std::unique_ptr<nx_http::AbstractMsgBodySource> prepareStreamingMessageBody(
-        nx_http::StringType contentType);
+        const nx_http::Message& message);
 
     void onSomeMessageBodyRead(nx::Buffer someMessageBody);
     void onMessageEnd();
