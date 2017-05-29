@@ -997,13 +997,13 @@ void initialize(Manager* manager, Action* root)
 
     factory.beginSubMenu();
     {
-
         factory(PtzSavePresetAction)
             .mode(DesktopMode)
             .flags(Scene | SingleTarget)
             .text(tr("Save Current Position..."))
             .requiredTargetPermissions(Qn::WritePtzPermission | Qn::SavePermission)
-            .condition(new PtzCondition(Ptz::PresetsPtzCapability, true));
+            .condition(ConditionWrapper(new PtzCondition(Ptz::PresetsPtzCapability, true))
+                && condition::canSavePtzPosition());
 
         factory(PtzManageAction)
             .mode(DesktopMode)
