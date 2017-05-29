@@ -94,7 +94,7 @@ private:
         HWAVEIN hWaveIn;
         QQueue<WAVEHDR*> m_buffers;
         QnMutex m_mtx;
-        bool m_terminated;
+        std::atomic<bool> m_terminated;
         bool m_waveInOpened;
     };
 
