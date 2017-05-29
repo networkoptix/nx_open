@@ -57,7 +57,11 @@ struct NonceUserCount
     nx::Buffer cloudNonce;
     size_t userCount;
 
-    NonceUserCount(const nx::Buffer& cloudNonce, size_t userCount);
+    NonceUserCount(const nx::Buffer& cloudNonce, size_t userCount):
+        cloudNonce(cloudNonce),
+        userCount(userCount)
+    {}
+
     NonceUserCount() = default;
 };
 

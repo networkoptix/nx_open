@@ -13,7 +13,7 @@ public:
     }
 
     void setUserInfo(
-        int64_t ts,
+        uint64_t ts,
         const nx::Buffer& userName,
         const nx::Buffer& cloudNonce, 
         const nx::Buffer& partialResponse)
@@ -46,7 +46,7 @@ TEST_F(CloudUserInfoPool, deserialize)
     const QString kSimpleString = 
         lit("{\"timestamp\":1234567,\"cloudNonce\":\"abcdef0123456\",\"partialResponse\":\"response\"}");
 
-    int64_t ts;
+    uint64_t ts;
     nx::Buffer nonce;
     nx::Buffer response;
     ASSERT_TRUE(detail::deserialize(kSimpleString, &ts, &nonce, &response));

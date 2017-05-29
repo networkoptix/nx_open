@@ -120,7 +120,23 @@ bool CloudUserInfoPool::authenticate(const nx_http::header::Authorization& authH
 boost::optional<nx::Buffer> CloudUserInfoPool::newestMostCommonNonce() const
 {
     QnMutexLocker lock(&m_mutex);
-    return boost::none;
+    int maxUserCount = 0;
+    auto resultIt = m_tsToNonceUserCount.rbegin();
+    for (auto it = m_tsToNonceUserCount.rbegin(); it != m_tsToNonceUserCount.rend(); ++it)
+    {
+        if (it->second.userCount == m_userCount)
+            return it->second.cloudNonce;
+
+        if (it->second.userCount > maxUserCount)
+        {
+            maxUserCount = it->second.userCount;
+            resultIt = it;
+        }
+    }
+
+    return resultIt == m_tsToNonceUserCount.rend() ?
+        boost::none :
+        boost::optional<nx::Buffer>(resultIt->second.cloudNonce);
 }
 
 void CloudUserInfoPool::userInfoChanged(
