@@ -105,13 +105,18 @@ void IncomingControlConnection::continueReadRequest()
             switch(m_parser.parse(m_buffer, &processed))
             {
                 case nx::network::server::ParserState::init:
-                case nx::network::server::ParserState::inProgress:
+                case nx::network::server::ParserState::readingMessage:
                     return continueReadRequest();
 
                 case nx::network::server::ParserState::done:
                     return processRequest();
 
                 case nx::network::server::ParserState::failed:
+                    return handleError(SystemError::invalidData);
+
+                case nx::network::server::ParserState::readingBody:
+                    // Stun message cannot have body.
+                    NX_ASSERT(false);
                     return handleError(SystemError::invalidData);
             };
         });

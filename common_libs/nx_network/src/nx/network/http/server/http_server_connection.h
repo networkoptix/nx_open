@@ -29,6 +29,22 @@ class AbstractAuthenticationManager;
 
 } // namespace server
 
+namespace deprecated {
+
+using AsyncMessagePipeline =
+    nx::network::server::BaseStreamProtocolConnectionEmbeddable<
+        nx_http::Message,
+        nx_http::deprecated::MessageParser,
+        nx_http::MessageSerializer>;
+
+} // namespace deprecated
+
+using AsyncMessagePipeline =
+    nx::network::server::BaseStreamProtocolConnectionEmbeddable<
+        nx_http::Message,
+        nx_http::MessageParser,
+        nx_http::MessageSerializer>;
+
 class NX_NETWORK_API HttpServerConnection;
 class AbstractMessageDispatcher;
 
@@ -53,14 +69,10 @@ template<typename ConnectionType> using BaseConnection =
     nx::network::server::BaseStreamProtocolConnection<
         ConnectionType,
         nx_http::Message,
-        nx_http::MessageParser,
+        nx_http::deprecated::MessageParser,
         nx_http::MessageSerializer>;
 
-using AsyncMessagePipeline = 
-    nx::network::server::BaseStreamProtocolConnectionEmbeddable<
-        nx_http::Message,
-        nx_http::MessageParser,
-        nx_http::MessageSerializer>;
+//-------------------------------------------------------------------------------------------------
 
 class NX_NETWORK_API HttpServerConnection:
     public BaseConnection<HttpServerConnection>,
@@ -78,12 +90,11 @@ public:
     HttpServerConnection(const HttpServerConnection&) = delete;
     HttpServerConnection& operator=(const HttpServerConnection&) = delete;
 
-    void processMessage(nx_http::Message&& request);
-		
     /** Introduced for test purpose. */
     void setPersistentConnectionEnabled(bool value);
 
 protected:
+    virtual void processMessage(nx_http::Message request) override;
     virtual void stopWhileInAioThread() override;
 
 private:

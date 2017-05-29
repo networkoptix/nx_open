@@ -84,13 +84,13 @@ protected:
     {
         Qn::Permissions actual = resourceAccessManager()->permissions(m_currentUser, resource);
         ASSERT_EQ(desired, actual);
-        ASSERT_EQ(forbidden & actual, 0);
+        ASSERT_EQ(0U, forbidden & actual);
     }
 
     void checkForbiddenPermissions(const QnResourcePtr &resource, Qn::Permissions forbidden) const
     {
         Qn::Permissions actual = resourceAccessManager()->permissions(m_currentUser, resource);
-        ASSERT_EQ(forbidden & actual, 0);
+        ASSERT_EQ(0U, forbidden & actual);
     }
 
     // Declares the variables your tests want to use.

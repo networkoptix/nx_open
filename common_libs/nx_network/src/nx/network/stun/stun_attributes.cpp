@@ -44,7 +44,7 @@ int MappedAddress::getType() const
     return TYPE;
 }
 
-nx::network::server::SerializerState::Type MappedAddress::serialize(
+nx::network::server::SerializerState MappedAddress::serialize(
     MessageSerializerBuffer* buffer,
     std::size_t* bytesWritten) const
 {

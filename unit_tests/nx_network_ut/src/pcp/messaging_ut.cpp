@@ -2,7 +2,7 @@
 
 #include <nx/network/pcp/messaging.h>
 
-#include <utils/memory/data_stream_helpers.h>
+#include "data_stream_helpers.h"
 
 using namespace pcp;
 

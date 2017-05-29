@@ -18,7 +18,7 @@ void partialParse( MessageParser& parser, const Buffer& message, size_t partSize
     for ( ; parsedTotal < message.size() - partSize; parsedTotal += partSize )
     {
         const Buffer part( message.data() + parsedTotal, partSize );
-        ASSERT_EQ( parser.parse(part, &parsedNow), nx::network::server::ParserState::inProgress );
+        ASSERT_EQ( parser.parse(part, &parsedNow), nx::network::server::ParserState::readingMessage );
         ASSERT_EQ( parsedNow, partSize );
     }
 
