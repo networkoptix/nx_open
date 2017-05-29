@@ -13,6 +13,7 @@
 #include <nx/client/desktop/ui/graphics/items/resource/layout_tour_drop_placeholder.h>
 
 #include <ui/graphics/instruments/instrument_manager.h>
+#include <ui/graphics/items/resource/resource_widget.h>
 #include <ui/style/resource_icon_cache.h>
 #include <ui/workbench/workbench.h>
 #include <ui/workbench/workbench_display.h>
@@ -81,6 +82,9 @@ LayoutTourReviewController::LayoutTourReviewController(QObject* parent):
 
     connect(workbench(), &QnWorkbench::currentLayoutChanged, this,
         &LayoutTourReviewController::startListeningLayout);
+
+    connect(qnResourceRuntimeDataManager, &QnResourceRuntimeDataManager::layoutItemDataChanged,
+        this, &LayoutTourReviewController::handleItemDataChanged);
 }
 
 LayoutTourReviewController::~LayoutTourReviewController()
@@ -167,7 +171,7 @@ void LayoutTourReviewController::reviewLayoutTour(const ec2::ApiLayoutTourData& 
     static const float kCellAspectRatio{16.0f / 9.0f};
 
     const auto layout = QnLayoutResourcePtr(new QnLayoutResource());
-    layout->setId(QnUuid::createUuid()); //< Layout is never saved to server
+    layout->setId(QnUuid::createUuid()); //< Layout is never saved to server.
     layout->setParentId(tour.id);
     layout->setName(tour.name);
     layout->setData(Qn::IsSpecialLayoutRole, true);
@@ -233,7 +237,7 @@ void LayoutTourReviewController::updateButtons(const QnLayoutResourcePtr& layout
     if (!layout)
         return;
 
-    // Using he fact that dataChanged will be sent even if action list was not changed
+    // Using he fact that dataChanged will be sent even if action list was not changed.
     const QList<action::IDType> actions{action::StartCurrentLayoutTourAction};
     layout->setData(Qn::CustomPanelActionsRole, qVariantFromValue(actions));
 }
@@ -264,7 +268,7 @@ void LayoutTourReviewController::updatePlaceholders()
 
     QRect boundingRect = layout->boundingRect();
 
-    // Layout can have valid bounds after removing the last item, handling it here to improve UI
+    // Layout can have valid bounds after removing the last item, handling it here to improve UI.
     if (!boundingRect.isValid() || itemCount == 0)
         boundingRect = QRect(0, 0, 1, 1);
 
@@ -304,7 +308,7 @@ void LayoutTourReviewController::updatePlaceholders()
             const bool isFree = layout->isFreeSlot(cell, kPlaceholderSize);
             const bool placeholderExists = m_dropPlaceholders.contains(cell);
 
-            // If cell is empty and there is a placeholder (or vise versa), skip this step
+            // If cell is empty and there is a placeholder (or vise versa), skip this step.
             if (isFree == placeholderExists)
                 continue;
 
@@ -358,7 +362,6 @@ bool LayoutTourReviewController::fillTourItems(ec2::ApiLayoutTourItemDataList* i
     for (auto item: layoutItems)
     {
         const auto resource = resourcePool()->getResourceByUniqueId(item->resourceUid());
-        NX_EXPECT(resource);
         if (!resource)
             continue;
 
@@ -367,6 +370,35 @@ bool LayoutTourReviewController::fillTourItems(ec2::ApiLayoutTourItemDataList* i
     }
 
     return true;
+}
+
+void LayoutTourReviewController::handleItemDataChanged(const QnUuid& id, Qn::ItemDataRole role,
+    const QVariant& data)
+{
+    if (role != Qn::LayoutTourItemDelayMsRole)
+        return;
+
+    // We can get here while changing layout.
+    if (!isLayoutTourReviewMode())
+        return;
+
+    const auto item = workbench()->currentLayout()->item(id);
+    if (!item)
+        return;
+
+    QSet<QnUuid> selectedItems;
+    for (const auto widget: display()->widgets())
+    {
+        if (widget->isSelected())
+            selectedItems.insert(widget->item()->uuid());
+    }
+
+    if (!selectedItems.contains(id))
+        return;
+
+    selectedItems.remove(id);
+    for (const auto& itemId: selectedItems)
+        qnResourceRuntimeDataManager->setLayoutItemData(itemId, role, data);
 }
 
 void LayoutTourReviewController::at_reviewLayoutTourAction_triggered()
