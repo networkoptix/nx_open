@@ -24,6 +24,7 @@
 namespace {
 
 static const int kTimerPrecisionMs = 500;
+static const int kHintTimeoutMs = 10000;
 
 } // namespace
 
@@ -319,7 +320,8 @@ void LayoutTourExecutor::setHintVisible(bool visible)
         m_hintLabel = QnGraphicsMessageBox::information(
             tr("Use Left/Right arrows, Page Up/Page Down, Enter, Space and Backspace to control the tour.")
             + L'\n'
-            + tr("Press any other key to stop the tour."));
+            + tr("Press any other key to stop the tour."),
+            kHintTimeoutMs);
     }
     else if (m_hintLabel)
     {
