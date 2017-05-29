@@ -171,8 +171,8 @@ bool QnDesktopDataProvider::EncodedAudioInfo::addBuffer()
 
 void QnDesktopDataProvider::EncodedAudioInfo::stop()
 {
-    m_terminated = true;
     QnMutexLocker lock( &m_mtx );
+    m_terminated = true;
     if (m_waveInOpened)
     {
         waveInStop(hWaveIn);
@@ -184,6 +184,7 @@ void QnDesktopDataProvider::EncodedAudioInfo::stop()
 
 bool QnDesktopDataProvider::EncodedAudioInfo::start()
 {
+    QnMutexLocker lock(&m_mtx);
     if (m_terminated)
         return false;
     return waveInStart(hWaveIn) == S_OK;
