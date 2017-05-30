@@ -67,6 +67,7 @@ private:
     std::shared_ptr<nxcip::CameraMediaEncoder2> m_mediaEncoder2;
     QnResourceCustomAudioLayoutPtr m_audioLayout;
     unsigned int m_cameraCapabilities;
+    mutable QnMutex m_streamReaderMutex;
 
     QnAbstractMediaDataPtr readLiveStreamReader();
     void initializeAudioContext( const nxcip::AudioFormat& audioFormat );
