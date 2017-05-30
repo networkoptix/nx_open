@@ -31,6 +31,8 @@
 #include <ui/workbench/workbench_item.h>
 #include <ui/workbench/workbench_layout.h>
 
+#include <utils/common/event_processors.h>
+
 namespace nx {
 namespace client {
 namespace desktop {
@@ -171,7 +173,25 @@ void LayoutTourItemWidget::initOverlay()
     delayHintLabel->setAcceptedMouseButtons(0);
     delayHintLabel->setAlignment(Qt::AlignVCenter);
     delayHintLabel->setFont(font);
-    setPaletteColor(delayHintLabel, QPalette::WindowText, QColor("#53707f")); //TODO: #GDM #3.1 customize
+
+    auto updateHintColor = [this, delayHintLabel]
+    {
+
+        //QColor textColor = palette().color(QPalette::WindowText); //
+        QColor textColor = QColor("#53707f"); //TODO: #GDM #3.1 customize
+        switch (selectionState())
+        {
+            case SelectionState::selected:
+            case SelectionState::focusedAndSelected:
+                //textColor = palette().color(QPalette::Highlight);
+                textColor = QColor("#2fa2db");  //TODO: #GDM #3.1 customize
+        }
+        setPaletteColor(delayHintLabel, QPalette::WindowText, textColor);
+    };
+
+    connect(this, &QnResourceWidget::selectionStateChanged, this, updateHintColor);
+    installEventHandler(this, QEvent::PaletteChange, this, updateHintColor);
+    updateHintColor();
 
     auto delayEdit = new QSpinBox();
     delayEdit->setSuffix(L' ' + QnTimeStrings::suffix(QnTimeStrings::Suffix::Seconds));
