@@ -99,7 +99,6 @@
             <properties>
                 <qt.libs>core core-private network xml sql</qt.libs>
                 <rdep.linux.packages>quazip openldap</rdep.linux.packages>
-                <rdep.linux.arm.packages>libcreateprocess</rdep.linux.arm.packages>
             </properties>
         </profile>
 
