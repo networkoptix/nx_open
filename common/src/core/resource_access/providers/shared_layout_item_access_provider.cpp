@@ -47,7 +47,7 @@ bool QnSharedLayoutItemAccessProvider::calculateAccess(const QnResourceAccessSub
         auto resourceId = resource->getId();
         for (const auto& layout: sharedLayouts)
         {
-            NX_ASSERT(layout->isShared());
+            // Layout may be not shared yet in the process of sharing
             if (!layout->isShared())
                 continue;
 

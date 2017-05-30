@@ -140,6 +140,8 @@ void QnVideoWallItemAccessProvider::fillProviders(
                 break; /*< for item: getItems */
             }
         }
+
+        return;
     }
 
     NX_EXPECT(mode() == Mode::cached);
