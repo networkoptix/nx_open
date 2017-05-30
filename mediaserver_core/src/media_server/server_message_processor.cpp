@@ -159,7 +159,7 @@ void QnServerMessageProcessor::handleRemotePeerLost(const ec2::ApiPeerAliveData 
 void QnServerMessageProcessor::onResourceStatusChanged(
     const QnResourcePtr &resource,
     Qn::ResourceStatus status,
-    ec2::NotificationSource source)
+    ec2::NotificationSource /*source*/)
 {
     if (resource->getId() == commonModule()->moduleGUID() && status != Qn::Online)
     {

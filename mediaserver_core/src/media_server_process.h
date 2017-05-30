@@ -129,7 +129,7 @@ private slots:
     void at_archiveBackupFinished(qint64 backedUpToMs, QnBusiness::EventReason code);
     void at_timer();
     void at_connectionOpened();
-    void at_serverModuleConflict(nx::vms::discovery::Manager::ModuleData module);
+    void at_serverModuleConflict(nx::vms::discovery::ModuleEndpoint module);
 
     void at_appStarted();
     void at_runtimeInfoChanged(const QnPeerRuntimeInfo& runtimeInfo);

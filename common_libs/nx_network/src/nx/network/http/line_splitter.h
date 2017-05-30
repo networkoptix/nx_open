@@ -53,12 +53,12 @@ private:
 
 //-------------------------------------------------------------------------------------------------
 
-class NX_NETWORK_API BufferToLineSplitter
+class NX_NETWORK_API StringLineIterator
 {
 public:
-    BufferToLineSplitter(const nx::String& str);
+    StringLineIterator(const nx::String& str);
 
-    boost::optional<ConstBufferRefType> nextLine();
+    boost::optional<ConstBufferRefType> next();
 
 private:
     const nx::String& m_sourceData;

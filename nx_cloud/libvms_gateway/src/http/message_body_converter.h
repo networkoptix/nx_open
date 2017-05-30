@@ -40,7 +40,7 @@ struct TargetHost
 using MessageBodyConverterFactoryFunction = 
     std::unique_ptr<AbstractMessageBodyConverter>(
         const nx::String& proxyHost,
-        const TargetHost& targetHost,
+        const nx::String& targetHost,
         const nx::String& contentType);
 
 class MessageBodyConverterFactory:
@@ -56,7 +56,7 @@ public:
 private:
     std::unique_ptr<AbstractMessageBodyConverter> defaultFactoryFunction(
         const nx::String& proxyHost,
-        const TargetHost& targetHost,
+        const nx::String& targetHost,
         const nx::String& contentType);
 };
 

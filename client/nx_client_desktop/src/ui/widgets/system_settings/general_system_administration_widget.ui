@@ -51,11 +51,7 @@
        <number>16</number>
       </property>
       <item>
-       <widget class="QnEditableLabel" name="systemNameLabel" native="true">
-        <property name="focusPolicy">
-         <enum>Qt::TabFocus</enum>
-        </property>
-       </widget>
+       <widget class="QnEditableLabel" name="systemNameLabel" native="true"/>
       </item>
       <item>
        <widget class="QWidget" name="buttonWidget" native="true">
@@ -107,11 +103,7 @@
           <number>0</number>
          </property>
          <item>
-          <widget class="QnSystemSettingsWidget" name="systemSettingsWidget" native="true">
-           <property name="focusPolicy">
-            <enum>Qt::TabFocus</enum>
-           </property>
-          </widget>
+          <widget class="QnSystemSettingsWidget" name="systemSettingsWidget" native="true"/>
          </item>
         </layout>
        </widget>
@@ -138,11 +130,7 @@
           <number>0</number>
          </property>
          <item>
-          <widget class="QnDatabaseManagementWidget" name="backupWidget" native="true">
-           <property name="focusPolicy">
-            <enum>Qt::TabFocus</enum>
-           </property>
-          </widget>
+          <widget class="QnDatabaseManagementWidget" name="backupWidget" native="true"/>
          </item>
         </layout>
        </widget>

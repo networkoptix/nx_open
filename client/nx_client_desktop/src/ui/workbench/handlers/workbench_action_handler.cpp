@@ -256,8 +256,11 @@ ActionHandler::ActionHandler(QObject *parent) :
     connect(action(action::WebAdminAction), &QAction::triggered, this,
         &ActionHandler::at_webAdminAction_triggered);
 
-    connect(action(action::NextLayoutAction), SIGNAL(triggered()), this, SLOT(at_nextLayoutAction_triggered()));
-    connect(action(action::PreviousLayoutAction), SIGNAL(triggered()), this, SLOT(at_previousLayoutAction_triggered()));
+    connect(action(action::NextLayoutAction), &QAction::triggered, this,
+        &ActionHandler::at_nextLayoutAction_triggered);
+    connect(action(action::PreviousLayoutAction), &QAction::triggered, this,
+        &ActionHandler::at_previousLayoutAction_triggered);
+
     connect(action(action::OpenInLayoutAction), SIGNAL(triggered()), this, SLOT(at_openInLayoutAction_triggered()));
     connect(action(action::OpenInCurrentLayoutAction), SIGNAL(triggered()), this, SLOT(at_openInCurrentLayoutAction_triggered()));
     connect(action(action::OpenInNewTabAction), &QAction::triggered, this,
@@ -654,12 +657,22 @@ void ActionHandler::at_workbench_currentLayoutChanged() {
         qnRedAssController->setMode(Qn::AutoResolution);
 }
 
-void ActionHandler::at_nextLayoutAction_triggered() {
-    workbench()->setCurrentLayoutIndex((workbench()->currentLayoutIndex() + 1) % workbench()->layouts().size());
+void ActionHandler::at_nextLayoutAction_triggered()
+{
+    if (action(action::ToggleLayoutTourModeAction)->isChecked())
+        return;
+
+    const auto total = workbench()->layouts().size();
+    workbench()->setCurrentLayoutIndex((workbench()->currentLayoutIndex() + 1) % total);
 }
 
-void ActionHandler::at_previousLayoutAction_triggered() {
-    workbench()->setCurrentLayoutIndex((workbench()->currentLayoutIndex() - 1 + workbench()->layouts().size()) % workbench()->layouts().size());
+void ActionHandler::at_previousLayoutAction_triggered()
+{
+    if (action(action::ToggleLayoutTourModeAction)->isChecked())
+        return;
+
+    const auto total = workbench()->layouts().size();
+    workbench()->setCurrentLayoutIndex((workbench()->currentLayoutIndex() - 1 + total) % total);
 }
 
 void ActionHandler::at_openInLayoutAction_triggered()

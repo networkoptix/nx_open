@@ -772,7 +772,7 @@ protected:
 
     void assertCloudCredentialsHaveBeenProvidedToCustomAcceptors()
     {
-        ASSERT_TRUE(m_providedCloudCredentials);
+        ASSERT_TRUE(static_cast<bool>(m_providedCloudCredentials));
         ASSERT_EQ(
             SocketGlobals::mediatorConnector().getSystemCredentials(),
             *m_providedCloudCredentials);

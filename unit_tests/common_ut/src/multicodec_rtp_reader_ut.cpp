@@ -31,8 +31,6 @@
 #include <nx/network/http/http_client.h>
 #include <nx/network/test_support/buffer_socket.h>
 
-#include "file_socket.h"
-
 
 static const qint64 MAX_BYTES_TO_READ = 25*1024*1024;
 

@@ -42,9 +42,9 @@ namespace ec2
         return m_connectionInfo;
     }
 
-    QString Ec2DirectConnection::authInfo() const
+    void Ec2DirectConnection::updateConnectionUrl(const QUrl& /*url*/)
     {
-        return QString();
+        NX_EXPECT(false, "Should never get here");
     }
 
     bool Ec2DirectConnection::initialized() const
