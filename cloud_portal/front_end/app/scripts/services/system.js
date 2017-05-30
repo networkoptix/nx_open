@@ -25,7 +25,7 @@ angular.module('cloudApp')
         system.prototype.updateSystemAuth = function(force){
             var self = this;
             if(!force && self.auth){ //no need to update
-                return;
+                return $q.resolve(true);
             }
             return cloudApi.getSystemAuth(self.id).then(function(data){
                 self.auth = data.data.authGet;
