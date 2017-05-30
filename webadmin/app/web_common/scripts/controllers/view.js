@@ -1,6 +1,8 @@
 'use strict';
 
 angular.module('nxCommon').controller('ViewCtrl',
+            ['$scope', '$rootScope', '$location', '$routeParams', 'cameraRecords',
+              'camerasProvider', '$sessionStorage', '$localStorage', '$timeout', 'systemAPI',
     function ($scope, $rootScope, $location, $routeParams, cameraRecords,
               camerasProvider, $sessionStorage, $localStorage, $timeout, systemAPI) {
 
@@ -470,4 +472,4 @@ angular.module('nxCommon').controller('ViewCtrl',
 
         $('.video-icon.pull-left-5').dropdown();
 
-    });
+    }]);
