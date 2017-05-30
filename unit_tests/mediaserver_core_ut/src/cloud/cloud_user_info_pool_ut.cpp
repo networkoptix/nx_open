@@ -15,8 +15,7 @@ public:
     void setUserInfo(
         uint64_t ts,
         const nx::Buffer& userName,
-        const nx::Buffer& cloudNonce,
-        const nx::Buffer& partialResponse)
+        const nx::Buffer& cloudNonce)
     {
         m_pool->userInfoChanged(ts, userName, cloudNonce, partialResponse);
     }
@@ -61,6 +60,7 @@ protected:
     void givenVasyaNonce1AuthHeader()
     {
         authHeader.digest->userid = "vasya";
+        authHeader.digest->params["nonce"] = "nonce1";
     }
 
     void when3rdWithNonce3HasBeenAdded()

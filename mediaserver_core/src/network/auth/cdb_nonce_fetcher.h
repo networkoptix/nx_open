@@ -91,4 +91,5 @@ private:
 
     void cloudBindingStatusChangedUnsafe(const QnMutexLockerBase&, bool boundToCloud);
     void cloudBindingStatusChanged(bool boundToCloud);
+    nx::Buffer generateNonceTrailer();
 };
