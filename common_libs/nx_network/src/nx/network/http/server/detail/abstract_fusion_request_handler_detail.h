@@ -23,7 +23,8 @@ namespace detail {
  * This is a dummy implementation for types that
  * do not implement deserialization from url query.
  */
-inline bool loadFromUrlQuery(const QUrlQuery&, ...)
+template<typename T>
+bool loadFromUrlQuery(const QUrlQuery&, T*)
 {
     return false;
 }
@@ -167,7 +168,7 @@ private:
         if (nx_http::StatusCode::isMessageBodyAllowed(result.httpStatusCode()))
             return serializeOutputAsMessageBody(output, outputMsgBody);
         else
-            return serializeOutputToResponseHeaders(output);
+            return serializeToHeaders(&response()->headers, output);
     }
 
     bool serializeOutputAsMessageBody(
@@ -182,11 +183,6 @@ private:
             Qn::serializationFormatToHttpContentType(m_outputDataFormat),
             std::move(serializedData));
         return true;
-    }
-
-    bool serializeOutputToResponseHeaders(const Output& output)
-    {
-        return serializeToHeaders(&response()->headers, output);
     }
 };
 
