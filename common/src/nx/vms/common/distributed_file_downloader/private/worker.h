@@ -1,5 +1,7 @@
 #pragma once
 
+#include <boost/optional.hpp>
+
 #include <QtCore/QObject>
 #include <QtCore/QBitArray>
 
@@ -143,7 +145,7 @@ private:
     QHash<QnUuid, PeerInformation> m_peerInfoById;
     QList<QnUuid> m_peers;
 
-    int m_subsequentChunksToDownload = -1;
+    boost::optional<int> m_subsequentChunksToDownload;
     bool m_usingInternet = false;
 };
 

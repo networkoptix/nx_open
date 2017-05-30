@@ -289,7 +289,7 @@ void Worker::nextStep()
 
 void Worker::requestFileInformationInternal()
 {
-    m_subsequentChunksToDownload = -1;
+    m_subsequentChunksToDownload.reset();
 
     const QString subject = m_state == State::requestingAvailableChunks
         ? lit("available chunks")
@@ -429,7 +429,7 @@ void Worker::requestAvailableChunks()
 
 void Worker::requestChecksums()
 {
-    m_subsequentChunksToDownload = -1;
+    m_subsequentChunksToDownload.reset();
 
     setState(State::requestingChecksums);
 
@@ -583,7 +583,7 @@ void Worker::downloadNextChunk()
                 return;
             }
 
-            m_subsequentChunksToDownload = std::max(0, m_subsequentChunksToDownload - 1);
+            m_subsequentChunksToDownload = std::max(0, m_subsequentChunksToDownload.get() - 1);
             if (m_subsequentChunksToDownload == 0)
                 m_usingInternet = false;
 
@@ -600,7 +600,7 @@ void Worker::downloadNextChunk()
             }
         };
 
-    if (m_subsequentChunksToDownload <= 0)
+    if (m_subsequentChunksToDownload == boost::none || m_subsequentChunksToDownload == 0)
     {
         if (m_usingInternet && peerId != m_peerManager->selfId())
             m_subsequentChunksToDownload = 1;
