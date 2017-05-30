@@ -4,7 +4,7 @@
 
 
 angular.module('nxCommon')
-    .directive('cameraLinks', ['systemAPI', function () {
+    .directive('cameraLinks', [function () {
         return {
             restrict: 'E',
             scope: {
