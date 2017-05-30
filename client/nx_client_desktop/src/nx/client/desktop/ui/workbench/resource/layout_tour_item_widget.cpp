@@ -168,30 +168,36 @@ void LayoutTourItemWidget::initOverlay()
     updateOrder(Qn::LayoutTourItemOrderRole);
     connect(item(), &QnWorkbenchItem::dataChanged, this, updateOrder);
 
-    auto delayHintLabel = new GraphicsLabel(tr("Display for"));
+    auto delayHintLabel = new GraphicsLabel();
     delayHintLabel->setPerformanceHint(GraphicsLabel::PixmapCaching);
     delayHintLabel->setAcceptedMouseButtons(0);
     delayHintLabel->setAlignment(Qt::AlignVCenter);
     delayHintLabel->setFont(font);
 
-    auto updateHintColor = [this, delayHintLabel]
-    {
-
-        //QColor textColor = palette().color(QPalette::WindowText); //
-        QColor textColor = QColor("#53707f"); //TODO: #GDM #3.1 customize
-        switch (selectionState())
+    auto updateHint = [this, delayHintLabel]
         {
-            case SelectionState::selected:
-            case SelectionState::focusedAndSelected:
-                //textColor = palette().color(QPalette::Highlight);
-                textColor = QColor("#2fa2db");  //TODO: #GDM #3.1 customize
-        }
-        setPaletteColor(delayHintLabel, QPalette::WindowText, textColor);
-    };
 
-    connect(this, &QnResourceWidget::selectionStateChanged, this, updateHintColor);
-    installEventHandler(this, QEvent::PaletteChange, this, updateHintColor);
-    updateHintColor();
+            //QColor textColor = palette().color(QPalette::WindowText); //
+            QColor textColor = QColor("#53707f"); //TODO: #GDM #3.1 customize
+            QString text = tr("Display for");
+            switch (selectionState())
+            {
+                case SelectionState::selected:
+                case SelectionState::focusedAndSelected:
+                    //textColor = palette().color(QPalette::Highlight);
+                    textColor = QColor("#2fa2db");  //TODO: #GDM #3.1 customize
+                    text = tr("Display selected for");
+                    break;
+                default:
+                    break;
+            }
+            setPaletteColor(delayHintLabel, QPalette::WindowText, textColor);
+            delayHintLabel->setText(text);
+        };
+
+    connect(this, &QnResourceWidget::selectionStateChanged, this, updateHint);
+    installEventHandler(this, QEvent::PaletteChange, this, updateHint);
+    updateHint();
 
     auto delayEdit = new QSpinBox();
     delayEdit->setSuffix(L' ' + QnTimeStrings::suffix(QnTimeStrings::Suffix::Seconds));
