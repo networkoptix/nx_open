@@ -23,8 +23,7 @@ namespace detail {
  * This is a dummy implementation for types that
  * do not implement deserialization from url query.
  */
-template<typename T>
-bool loadFromUrlQuery(const QUrlQuery&, T*)
+inline bool loadFromUrlQuery(const QUrlQuery&, ...)
 {
     return false;
 }
