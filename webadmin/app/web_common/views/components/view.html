@@ -61,9 +61,7 @@
                                         <span class="visible-xs" ng-click="toggleCameraPanel=true"
                                               ng-class="{'back-button': !toggleCameraPanel}"><span class="glyphicon glyphicon-arrow-left"></span></span>
                                         <span class="caption-row video-name">
-                                            <span ng-if="activeCamera.status!='Recording' && activeCamera.scheduleEnabled" class="danger video-status offline-video">&#x25E6;</span>
-                                            <span ng-if="activeCamera.status=='Recording' " class="danger video-status">&#x25CF;</span>
-                                            <span ng-if="activeCamera.status!='Recording' && !activeCamera.scheduleEnabled" class="video-status">&nbsp;</span>
+                                            <camera-status camera="activeCamera" type="'video'"></camera-status>
                                             {{activeCamera.name + " (" + activeResolution + ")"}}
                                         </span>
                                 </div>
@@ -71,20 +69,10 @@
                         </div>
 
                         <div class="float-size">
-                            <div class="camera-view-informer" ng-if="!positionSelected && activeCamera.status == 'Offline' ">
-                                <div class="camera-view-offline camera-view-message-icon"></div><br/><div class="camera-view-message">OFFLINE</div>
-                            </div>
-                            <div class="camera-view-informer" ng-if="!positionSelected && activeCamera.status == 'Unauthorized'" >
-                                <div class="camera-view-unauthorized camera-view-message-icon"></div>
-                                <br/>
-                                <div class="camera-view-message">UNAUTHORIZED</div>
-                            </div>
-
-                            <div class="camera-view-informer" ng-if="iOSVideoTooLarge">
-                                Video cannot be played.<br>
-                                iOS does not support video larger than fullHD (2MP: 1920x1080).<br>
-                            </div>
-
+                            <camera-view-informer view-flags="{'status':activeCamera.status,
+                                                              'positionSelected': positionSelected,
+                                                              'iOSVideoTooLarge': iOSVideoTooLarge}">
+                            </camera-view-informer>
                             <videowindow ng-class="{invisible: iOSVideoTooLarge || !positionSelected &&
                                                         (activeCamera.status == 'Offline' || activeCamera.status == 'Unauthorized')}"
                                          vg-update-time="updateTime($currentTime, $duration)" preview="activeCamera.preview"

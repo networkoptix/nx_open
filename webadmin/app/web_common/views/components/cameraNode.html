@@ -1,9 +1,7 @@
 <a ng-click="selectCamera(camera);$event.stopPropagation()" class="camera-node hide-excess-text" ng-class="[camera.status,{'toggle-info':toggleInfo}]">
     <div class="pull-left camera-preview">
         <div>
-            <span ng-if="camera.status!='Recording' && camera.scheduleEnabled" class="camera-status offline-cam danger">&#x25E6;</span>
-            <span ng-if="camera.status=='Recording' " class="camera-status online-cam danger">&#x25CF;</span>
-            <span ng-if="camera.status!='Recording' && !camera.scheduleEnabled" class="camera-status camera-info">&nbsp;</span>
+            <camera-status camera="camera" type="'camera'"></camera-status>
         </div>
         <div class="camera-preview-image" ng-style="{'background-image':'url(' + camera.preview + ')'}">
             <img ng-if="camera.status != 'Offline' && camera.status != 'Unauthorized'"
