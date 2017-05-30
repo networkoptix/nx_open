@@ -9,8 +9,14 @@
 @import '_languages';
 
 @import 'common';
-.webclient{
-    margin-top: -10px !important;
+.webclient-page{
+    margin-bottom: 0;
+    .webclient{
+        margin-top: -10px !important;
+    }
+    footer{
+        display:none;
+    }
 }
 
 html {

@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('nxCommon')
-    .factory('systemAPI', ['$http', '$q', '$localStorage', '$location', function ($http, $q, $localStorage, $location) {
+    .factory('systemAPI', ['$http', '$q', '$location', function ($http, $q, $location) {
 
         /*
         * System API is a unified service for making API requests to media servers
@@ -13,8 +13,7 @@ angular.module('nxCommon')
         *
         * Service supports authentification methods for all these cases
         * 1. working locally we use cookie authentification on server
-        * 2. working through cloud we use cloudAPI method to set cookies for us
-        * TODO: move to cookie auth completely, do not use auth key?
+        * 2. working through cloud we use cloudAPI method to get auth keys
         *
         * Service also supports re-authentification?
         *
@@ -31,7 +30,7 @@ angular.module('nxCommon')
         * Each instance representing a single connection and is cached
         *
         * 
-        * TODO: Support websocket connection to server as well
+        * TODO (v 3.2): Support websocket connection to server as well
         * */
 
         
@@ -116,18 +115,18 @@ angular.module('nxCommon')
         };
 
         ServerConnection.prototype.setAuthKeys = function(authGet, authPost, authPlay){
-            $localStorage._authGet = authGet;
-            $localStorage._authPost = authPost;
-            $localStorage._authPlay = authPlay;
+            this._authGet = authGet;
+            this._authPost = authPost;
+            this._authPlay = authPlay;
         };
         ServerConnection.prototype.authGet = function(){
-            return $localStorage._authGet ;
+            return this._authGet ;
         };
         ServerConnection.prototype.authPost = function(){
-            return $localStorage._authPost ;
+            return this._authPost ;
         };
         ServerConnection.prototype.authPlay = function(){
-            return $localStorage._authPlay; // auth_rtsp
+            return this._authPlay; // auth_rtsp
         };
         /* End of Authentication  */
 
