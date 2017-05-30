@@ -1740,8 +1740,7 @@ int QnMediaResourceWidget::calculateButtonsVisibility() const
 
 Qn::ResourceStatusOverlay QnMediaResourceWidget::calculateStatusOverlay() const
 {
-    QnVideoWallLicenseUsageHelper helper(commonModule());
-    if (qnRuntime->isVideoWallMode() && !helper.isValid())
+    if (qnRuntime->isVideoWallMode() && !QnVideoWallLicenseUsageHelper().isValid())
         return Qn::VideowallWithoutLicenseOverlay;
 
     QnResourcePtr resource = m_display->resource();

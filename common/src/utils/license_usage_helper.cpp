@@ -116,8 +116,9 @@ QnLicenseUsageHelper::Cache::Cache()
 }
 
 
-QnLicenseUsageHelper::QnLicenseUsageHelper(QnCommonModule* commonModule):
-    QnCommonModuleAware(commonModule),
+QnLicenseUsageHelper::QnLicenseUsageHelper(QObject *parent):
+    base_type(parent),
+    QnCommonModuleAware(parent),
     m_dirty(true),
     m_validator(licensePool()->validator())
 {
@@ -585,8 +586,8 @@ QnVideoWallLicenseUsageWatcher::QnVideoWallLicenseUsageWatcher(QObject* parent):
 /************************************************************************/
 /* QnVideoWallLicenseUsageHelper                                        */
 /************************************************************************/
-QnVideoWallLicenseUsageHelper::QnVideoWallLicenseUsageHelper(QnCommonModule* commonModule):
-    base_type(commonModule),
+QnVideoWallLicenseUsageHelper::QnVideoWallLicenseUsageHelper(QObject *parent):
+    base_type(parent),
     m_proposed(0)
 {
     QnVideoWallLicenseUsageWatcher* usageWatcher = new QnVideoWallLicenseUsageWatcher(this);
