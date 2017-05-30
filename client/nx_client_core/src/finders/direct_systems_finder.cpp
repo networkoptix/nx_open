@@ -80,7 +80,7 @@ void QnDirectSystemsFinder::removeSystem(const SystemsHash::iterator& it)
     emit systemLost(system->id());
 }
 
-void QnDirectSystemsFinder::addServer(nx::vms::discovery::Manager::ModuleData module)
+void QnDirectSystemsFinder::addServer(nx::vms::discovery::ModuleEndpoint module)
 {
     const auto systemId = helpers::getTargetSystemId(module);
 
@@ -167,7 +167,7 @@ void QnDirectSystemsFinder::removeServer(QnUuid id)
 }
 
 void QnDirectSystemsFinder::updateServer(
-    const SystemsHash::iterator systemIt, nx::vms::discovery::Manager::ModuleData module)
+    const SystemsHash::iterator systemIt, nx::vms::discovery::ModuleEndpoint module)
 {
     const bool serverIsInKnownSystem = (systemIt != m_systems.end());
     NX_ASSERT(serverIsInKnownSystem, Q_FUNC_INFO, "Server is not known");
@@ -191,7 +191,7 @@ void QnDirectSystemsFinder::updateServer(
     updatePrimaryAddress(std::move(module));
 }
 
-void QnDirectSystemsFinder::updatePrimaryAddress(nx::vms::discovery::Manager::ModuleData module)
+void QnDirectSystemsFinder::updatePrimaryAddress(nx::vms::discovery::ModuleEndpoint module)
 {
     auto systemIt = getSystemItByServer(module.id);
     const bool serverIsInKnownSystem = (systemIt != m_systems.end());

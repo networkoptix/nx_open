@@ -77,9 +77,7 @@ void ProxyHandler::sendResponse(
     if (responseMessage)
         *response() = std::move(*responseMessage);
 
-    decltype(m_requestCompletionHandler) handler;
-    handler.swap(m_requestCompletionHandler);
-    handler(std::move(requestResult));
+    nx::utils::swapAndCall(m_requestCompletionHandler, std::move(requestResult));
 }
 
 TargetHost ProxyHandler::cutTargetFromRequest(
@@ -234,8 +232,8 @@ void ProxyHandler::onConnected(
             m_targetPeerSocket->getLocalAddress(), isSsl(m_targetPeerSocket)));
 
     m_targetPeerSocket->cancelIOSync(nx::network::aio::etNone);
-    m_requestProxyWorker = std::make_unique<RequestProxyWorker>(
-        m_targetHost,
+    m_requestProxyWorker = std::make_unique<ProxyWorker>(
+        m_targetHost.target.toString().toUtf8(),
         std::move(m_request),
         this,
         std::move(m_targetPeerSocket));

@@ -14,7 +14,7 @@ Manager::Manager(QnCommonModule* commonModule, bool clientMode, QnResourcePool* 
     QnCommonModuleAware(commonModule),
     m_resourcePool(resourcePool)
 {
-    qRegisterMetaType<nx::vms::discovery::Manager::ModuleData>();
+    qRegisterMetaType<nx::vms::discovery::ModuleEndpoint>();
     initializeConnector();
     initializeMulticastFinders(clientMode);
     monitorServerUrls();
@@ -42,13 +42,13 @@ void Manager::setMulticastInterval(std::chrono::milliseconds interval)
     m_multicastFinder->setSendInterval(interval);
 }
 
-Manager::ModuleData::ModuleData(QnModuleInformation old, SocketAddress endpoint):
+ModuleEndpoint::ModuleEndpoint(QnModuleInformation old, SocketAddress endpoint):
     QnModuleInformation(std::move(old)),
     endpoint(std::move(endpoint))
 {
 }
 
-bool Manager::ModuleData::operator==(const ModuleData& rhs) const
+bool ModuleEndpoint::operator==(const ModuleEndpoint& rhs) const
 {
     typedef const QnModuleInformation& BaseRef;
     return BaseRef(*this) == BaseRef(rhs) && endpoint == rhs.endpoint;
@@ -76,10 +76,10 @@ void Manager::stop()
         });
 }
 
-std::list<Manager::ModuleData> Manager::getAll() const
+std::list<ModuleEndpoint> Manager::getAll() const
 {
     QnMutexLocker lock(&m_mutex);
-    std::list<Manager::ModuleData> list;
+    std::list<ModuleEndpoint> list;
     for (const auto& m: m_modules)
         list.push_back(m.second);
 
@@ -96,7 +96,7 @@ boost::optional<SocketAddress> Manager::getEndpoint(const QnUuid& id) const
     return it->second.endpoint;
 }
 
-boost::optional<Manager::ModuleData> Manager::getModule(const QnUuid& id) const
+boost::optional<ModuleEndpoint> Manager::getModule(const QnUuid& id) const
 {
     QnMutexLocker lock(&m_mutex);
     const auto it = m_modules.find(id);
@@ -129,7 +129,7 @@ void Manager::initializeConnector()
             if (!commonModule())
                 return;
 
-            ModuleData module(std::move(information), std::move(endpoint));
+            ModuleEndpoint module(std::move(information), std::move(endpoint));
             if (commonModule()->moduleGUID() == module.id)
             {
                 const auto runtimeId = commonModule()->runningInstanceGUID();

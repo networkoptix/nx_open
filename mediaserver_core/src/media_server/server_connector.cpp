@@ -27,7 +27,7 @@ QnServerConnector::QnServerConnector(QnCommonModule* commonModule):
 {
 }
 
-static QString makeModuleUrl(const nx::vms::discovery::Manager::ModuleData& module)
+static QString makeModuleUrl(const nx::vms::discovery::ModuleEndpoint& module)
 {
     QUrl moduleUrl;
     moduleUrl.setScheme(module.sslAllowed ? lit("https") : lit("http"));
@@ -36,7 +36,7 @@ static QString makeModuleUrl(const nx::vms::discovery::Manager::ModuleData& modu
     return moduleUrl.toString();
 }
 
-void QnServerConnector::addConnection(const nx::vms::discovery::Manager::ModuleData& module)
+void QnServerConnector::addConnection(const nx::vms::discovery::ModuleEndpoint& module)
 {
     QString oldUrl;
     const auto newUrl = makeModuleUrl(module);
@@ -117,7 +117,7 @@ void QnServerConnector::restart()
     start();
 }
 
-void QnServerConnector::at_moduleFound(nx::vms::discovery::Manager::ModuleData module)
+void QnServerConnector::at_moduleFound(nx::vms::discovery::ModuleEndpoint module)
 {
     if (QnConnectionValidator::isCompatibleToCurrentSystem(module, commonModule()))
         return addConnection(module);
@@ -126,7 +126,7 @@ void QnServerConnector::at_moduleFound(nx::vms::discovery::Manager::ModuleData m
         .args(module.id, module.endpoint, module.systemName, module.version));
 }
 
-void QnServerConnector::at_moduleChanged(nx::vms::discovery::Manager::ModuleData module)
+void QnServerConnector::at_moduleChanged(nx::vms::discovery::ModuleEndpoint module)
 {
     if (QnConnectionValidator::isCompatibleToCurrentSystem(module, commonModule()))
         return addConnection(module);
