@@ -4,8 +4,7 @@
 
 #include <nx/utils/log/log.h>
 
-#include <utils/db/db_helper.h>
-
+#include "db_helper.h"
 #include "request_executor_factory.h"
 
 namespace nx {
@@ -152,8 +151,7 @@ void AsyncSqlQueryExecutor::dropExpiredConnectionsThreadFunc()
 {
     for (;;)
     {
-        std::unique_ptr<BaseRequestExecutor> dbConnection;
-        m_connectionsToDropQueue.pop(dbConnection);
+        std::unique_ptr<BaseRequestExecutor> dbConnection = m_connectionsToDropQueue.pop();
         if (!dbConnection)
             return; //null is used as a termination mark
 
