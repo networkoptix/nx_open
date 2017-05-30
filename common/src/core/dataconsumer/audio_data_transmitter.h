@@ -1,7 +1,5 @@
 #pragma once
 
-#ifdef ENABLE_DATA_PROVIDERS
-
 #include <QtCore/QElapsedTimer>
 
 #include <nx/streaming/abstract_data_consumer.h>
@@ -68,5 +66,3 @@ private:
     quint64 m_transmittedPacketDuration;
     QnAbstractStreamDataProvider* m_prevUsedProvider;
 };
-
-#endif // #ifdef ENABLE_DATA_PROVIDERS

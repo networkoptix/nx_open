@@ -50,9 +50,13 @@ function(_rdep_load_package_from_dir package_dir)
 endfunction()
 
 function(_rdep_try_package package)
-    cmake_parse_arguments(RDEP "" "PATH_VARIABLE;RESULT_VARIABLE" "" ${ARGN})
+    cmake_parse_arguments(RDEP "DEBUG_PACKAGE_FOUND" "PATH_VARIABLE;RESULT_VARIABLE" "" ${ARGN})
 
     set(package_dir "${PACKAGES_DIR}/${package}")
+
+    if(package MATCHES "-debug$")
+        set(debug_package TRUE)
+    endif()
 
     if(rdepSync)
         nx_rdep_sync_package(${package} RESULT_VARIABLE result)
@@ -69,7 +73,16 @@ function(_rdep_try_package package)
         _rdep_load_package_from_dir("${package_dir}")
 
         if(NOT EXISTS "${package_dir}/.nocopy")
-            nx_copy_package("${package_dir}")
+            if(CMAKE_MULTI_CONFIGURATION_MODE AND CMAKE_BUILD_TYPE STREQUAL "Release")
+                set(configurations "Release")
+            else()
+                set(configurations ${CMAKE_CONFIGURATION_TYPES})
+                if(RDEP_DEBUG_PACKAGE_FOUND AND NOT debug_package)
+                    list(REMOVE_ITEM configurations "Debug")
+                endif()
+            endif()
+
+            nx_copy_package("${package_dir}" CONFIGURATIONS ${configurations})
         endif()
 
         if(RDEP_PATH_VARIABLE)
@@ -96,12 +109,17 @@ function(nx_rdep_add_package package)
         _rdep_try_package("${package}-debug"
              PATH_VARIABLE package_dir
              RESULT_VARIABLE package_found)
+
+        if(package_found)
+            set(debug_package_found DEBUG_PACKAGE_FOUND)
+        endif()
     endif()
 
-    if(NOT package_found)
+    if(NOT package_found OR CMAKE_MULTI_CONFIGURATION_MODE)
         _rdep_try_package("${package}"
              PATH_VARIABLE package_dir
-             RESULT_VARIABLE package_found)
+             RESULT_VARIABLE package_found
+             ${debug_package_found})
     endif()
 
     if(NOT package_found)
