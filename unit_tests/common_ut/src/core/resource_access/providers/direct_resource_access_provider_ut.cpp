@@ -25,7 +25,7 @@ static const auto kNone = QnAbstractResourceAccessProvider::Source::none;
 
 }
 
-class QnResourceAccessProviderTest: public QnDirectAccessProviderTestFixture
+class QnDirectResourceAccessProviderTest: public QnDirectAccessProviderTestFixture
 {
     using base_type = QnDirectAccessProviderTestFixture;
 protected:
@@ -48,7 +48,7 @@ protected:
     }
 };
 
-TEST_F(QnResourceAccessProviderTest, checkInvalidAccess)
+TEST_F(QnDirectResourceAccessProviderTest, checkInvalidAccess)
 {
     auto camera = addCamera();
 
@@ -58,14 +58,14 @@ TEST_F(QnResourceAccessProviderTest, checkInvalidAccess)
     ASSERT_FALSE(accessProvider()->hasAccess(subject, camera));
 }
 
-TEST_F(QnResourceAccessProviderTest, checkAccessThroughChild)
+TEST_F(QnDirectResourceAccessProviderTest, checkAccessThroughChild)
 {
     auto camera = addCamera();
     auto user = addUser(Qn::GlobalAdminPermission);
     ASSERT_EQ(accessProvider()->accessibleVia(user, camera), kPermissions);
 }
 
-TEST_F(QnResourceAccessProviderTest, checkAccessThroughSecondChild)
+TEST_F(QnDirectResourceAccessProviderTest, checkAccessThroughSecondChild)
 {
     auto camera = addCamera();
     auto user = addUser(Qn::NoGlobalPermissions);
@@ -73,7 +73,7 @@ TEST_F(QnResourceAccessProviderTest, checkAccessThroughSecondChild)
     ASSERT_EQ(accessProvider()->accessibleVia(user, camera), kShared);
 }
 
-TEST_F(QnResourceAccessProviderTest, checkAccessThroughBothChildren)
+TEST_F(QnDirectResourceAccessProviderTest, checkAccessThroughBothChildren)
 {
     auto camera = addCamera();
     auto user = addUser(Qn::GlobalAdminPermission);
@@ -81,7 +81,7 @@ TEST_F(QnResourceAccessProviderTest, checkAccessThroughBothChildren)
     ASSERT_EQ(accessProvider()->accessibleVia(user, camera), kPermissions);
 }
 
-TEST_F(QnResourceAccessProviderTest, checkAccessProviders)
+TEST_F(QnDirectResourceAccessProviderTest, checkAccessProviders)
 {
     auto camera = addCamera();
 
@@ -116,7 +116,7 @@ TEST_F(QnResourceAccessProviderTest, checkAccessProviders)
     ASSERT_EQ(expectedProviders, providers);
 }
 
-TEST_F(QnResourceAccessProviderTest, checkAccessLevels)
+TEST_F(QnDirectResourceAccessProviderTest, checkAccessLevels)
 {
     auto camera = addCamera();
 

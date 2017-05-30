@@ -17,7 +17,7 @@ static const auto kSource = QnAbstractResourceAccessProvider::Source::shared;
 
 }
 
-class QnSharedResourceAccessProviderTest: public QnCachedBaseAccessProviderTestFixture
+class QnCachedSharedResourceAccessProviderTest: public QnCachedBaseAccessProviderTestFixture
 {
 protected:
     void awaitAccess(const QnResourceAccessSubject& subject, const QnResourcePtr& resource,
@@ -36,7 +36,7 @@ protected:
     }
 };
 
-TEST_F(QnSharedResourceAccessProviderTest, checkInvalidAccess)
+TEST_F(QnCachedSharedResourceAccessProviderTest, checkInvalidAccess)
 {
     auto camera = addCamera();
 
@@ -46,20 +46,20 @@ TEST_F(QnSharedResourceAccessProviderTest, checkInvalidAccess)
     ASSERT_FALSE(accessProvider()->hasAccess(subject, camera));
 }
 
-TEST_F(QnSharedResourceAccessProviderTest, checkAccessToInvalidResource)
+TEST_F(QnCachedSharedResourceAccessProviderTest, checkAccessToInvalidResource)
 {
     auto user = addUser(Qn::GlobalAdminPermission);
     ASSERT_FALSE(accessProvider()->hasAccess(user, QnResourcePtr()));
 }
 
-TEST_F(QnSharedResourceAccessProviderTest, checkDefaultCamera)
+TEST_F(QnCachedSharedResourceAccessProviderTest, checkDefaultCamera)
 {
     auto target = addCamera();
     auto user = addUser(Qn::GlobalAdminPermission);
     ASSERT_FALSE(accessProvider()->hasAccess(user, target));
 }
 
-TEST_F(QnSharedResourceAccessProviderTest, checkSource)
+TEST_F(QnCachedSharedResourceAccessProviderTest, checkSource)
 {
     auto target = addCamera();
     auto user = addUser(Qn::NoGlobalPermissions);
@@ -67,7 +67,7 @@ TEST_F(QnSharedResourceAccessProviderTest, checkSource)
     ASSERT_EQ(accessProvider()->accessibleVia(user, target), kSource);
 }
 
-TEST_F(QnSharedResourceAccessProviderTest, checkDirectAccessCamera)
+TEST_F(QnCachedSharedResourceAccessProviderTest, checkDirectAccessCamera)
 {
     auto target = addCamera();
     auto user = addUser(Qn::NoGlobalPermissions);
@@ -75,7 +75,7 @@ TEST_F(QnSharedResourceAccessProviderTest, checkDirectAccessCamera)
     ASSERT_TRUE(accessProvider()->hasAccess(user, target));
 }
 
-TEST_F(QnSharedResourceAccessProviderTest, checkDirectAccessUser)
+TEST_F(QnCachedSharedResourceAccessProviderTest, checkDirectAccessUser)
 {
     auto user = addUser(Qn::NoGlobalPermissions);
     sharedResourcesManager()->setSharedResources(user, QSet<QnUuid>() << user->getId());
@@ -84,7 +84,7 @@ TEST_F(QnSharedResourceAccessProviderTest, checkDirectAccessUser)
     ASSERT_FALSE(accessProvider()->hasAccess(user, user));
 }
 
-TEST_F(QnSharedResourceAccessProviderTest, checkDirectAccessLayout)
+TEST_F(QnCachedSharedResourceAccessProviderTest, checkDirectAccessLayout)
 {
     auto target = addLayout();
     auto user = addUser(Qn::NoGlobalPermissions);
@@ -92,7 +92,7 @@ TEST_F(QnSharedResourceAccessProviderTest, checkDirectAccessLayout)
     ASSERT_TRUE(accessProvider()->hasAccess(user, target));
 }
 
-TEST_F(QnSharedResourceAccessProviderTest, checkDirectAccessOwnedLayout)
+TEST_F(QnCachedSharedResourceAccessProviderTest, checkDirectAccessOwnedLayout)
 {
     auto target = addLayout();
     auto user = addUser(Qn::NoGlobalPermissions);
@@ -104,7 +104,7 @@ TEST_F(QnSharedResourceAccessProviderTest, checkDirectAccessOwnedLayout)
     ASSERT_FALSE(accessProvider()->hasAccess(user, target));
 }
 
-TEST_F(QnSharedResourceAccessProviderTest, checkLayoutMadeShared)
+TEST_F(QnCachedSharedResourceAccessProviderTest, checkLayoutMadeShared)
 {
     auto target = addLayout();
     auto user = addUser(Qn::NoGlobalPermissions);
@@ -118,7 +118,7 @@ TEST_F(QnSharedResourceAccessProviderTest, checkLayoutMadeShared)
     ASSERT_TRUE(accessProvider()->hasAccess(user, target));
 }
 
-TEST_F(QnSharedResourceAccessProviderTest, checkAccessAdded)
+TEST_F(QnCachedSharedResourceAccessProviderTest, checkAccessAdded)
 {
     auto target = addCamera();
     auto user = addUser(Qn::NoGlobalPermissions);
@@ -127,7 +127,7 @@ TEST_F(QnSharedResourceAccessProviderTest, checkAccessAdded)
     sharedResourcesManager()->setSharedResources(user, QSet<QnUuid>() << target->getId());
 }
 
-TEST_F(QnSharedResourceAccessProviderTest, checkAccessRemoved)
+TEST_F(QnCachedSharedResourceAccessProviderTest, checkAccessRemoved)
 {
     auto target = addCamera();
     auto user = addUser(Qn::NoGlobalPermissions);
@@ -136,7 +136,7 @@ TEST_F(QnSharedResourceAccessProviderTest, checkAccessRemoved)
     sharedResourcesManager()->setSharedResources(user, QSet<QnUuid>());
 }
 
-TEST_F(QnSharedResourceAccessProviderTest, checkRoleAccessGranted)
+TEST_F(QnCachedSharedResourceAccessProviderTest, checkRoleAccessGranted)
 {
     auto target = addCamera();
 
@@ -148,7 +148,7 @@ TEST_F(QnSharedResourceAccessProviderTest, checkRoleAccessGranted)
     sharedResourcesManager()->setSharedResources(role, QSet<QnUuid>() << target->getId());
 }
 
-TEST_F(QnSharedResourceAccessProviderTest, checkUserRoleChanged)
+TEST_F(QnCachedSharedResourceAccessProviderTest, checkUserRoleChanged)
 {
     auto target = addCamera();
 
@@ -160,7 +160,7 @@ TEST_F(QnSharedResourceAccessProviderTest, checkUserRoleChanged)
     user->setUserRoleId(role.id);
 }
 
-TEST_F(QnSharedResourceAccessProviderTest, checkRoleRemoved)
+TEST_F(QnCachedSharedResourceAccessProviderTest, checkRoleRemoved)
 {
     auto target = addCamera();
 
@@ -175,7 +175,7 @@ TEST_F(QnSharedResourceAccessProviderTest, checkRoleRemoved)
     ASSERT_FALSE(accessProvider()->hasAccess(user, target));
 }
 
-TEST_F(QnSharedResourceAccessProviderTest, accessProviders)
+TEST_F(QnCachedSharedResourceAccessProviderTest, accessProviders)
 {
     auto camera = addCamera();
     auto user = addUser(Qn::NoGlobalPermissions);
