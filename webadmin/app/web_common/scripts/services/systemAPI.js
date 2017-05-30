@@ -218,6 +218,22 @@ angular.module('nxCommon')
             }
             return this._setGetParams('/api/image', data, this.systemId && this.authGet());
         };
+        ServerConnection.prototype.hlsUrl = function(cameraId, position, resolution){
+            var data = {};
+            if(position){
+                data.pos = position;
+            }
+            return this._setGetParams('/hls/' + cameraId + '.m3u8?' + resolution, data, this.authGet());
+        };
+        ServerConnection.prototype.webmUrl = function(cameraId, position, resolution){
+            var data = {
+                resolution:resolution
+            };
+            if(position){
+                data.pos = position;
+            }
+            return this._setGetParams('/media/' + cameraId + '.webm?rt' , data, this.authGet());
+        };
         /* End of formatting urls */
 
         /* Working with archive*/
