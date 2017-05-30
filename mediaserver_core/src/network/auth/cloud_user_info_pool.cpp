@@ -66,15 +66,7 @@ void CloudUserInfoPoolSupplier::onNewResource(const QnResourcePtr& resource)
                 .arg(resource->getName())
                 .arg(resource->getProperty(key)), cl_logDEBUG2);
 
-            const auto propValue = resource->getProperty(key);
-            if (propValue.isEmpty())
-            {
-                NX_LOG(lit("[CloudUserInfo] User %1. Empty value. Ignoring.")
-                    .arg(resource->getName()), cl_logDEBUG1);
-                return;
-            }
-
-            reportInfoChanged(resource->getName(), propValue);
+            reportInfoChanged(resource->getName(), resource->getProperty(key));
         });
 }
 
