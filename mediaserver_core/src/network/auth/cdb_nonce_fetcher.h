@@ -58,6 +58,8 @@ public:
 
     const CloudUserInfoPool& cloudUserInfoPool() const;
 
+protected:
+    nx::Buffer generateNonceTrailer();
 
 private:
     struct NonceCtx
@@ -91,5 +93,4 @@ private:
 
     void cloudBindingStatusChangedUnsafe(const QnMutexLockerBase&, bool boundToCloud);
     void cloudBindingStatusChanged(bool boundToCloud);
-    nx::Buffer generateNonceTrailer();
 };

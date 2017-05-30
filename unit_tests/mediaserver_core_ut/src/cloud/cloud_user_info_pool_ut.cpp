@@ -1,23 +1,58 @@
 #include <gtest/gtest.h>
 #include <network/auth/cloud_user_info_pool.h>
+#include <network/auth/cdb_nonce_fetcher.h>
+#include <nx/network/http/auth_tools.h>
 
 
 namespace test  {
 
+const nx::Buffer kTestRealm = "test-realm";
+const nx::Buffer kTestAlgorithm = "MD5";
+const nx::Buffer kTestPassword = "password";
+const nx::Buffer kTestUri = "/uri";
+const nx::Buffer kTestMethod = "GET";
+
+class TestCdbNonceFetcher : public ::CdbNonceFetcher
+{
+public:
+    using CdbNonceFetcher::CdbNonceFetcher;
+    nx::Buffer generateNonceTrailer() { return ::CdbNonceFetcher::generateNonceTrailer(); }
+};
+
 class TestPoolSupplier : public AbstractCloudUserInfoPoolSupplier
 {
 public:
+    TestPoolSupplier() : nonceFetcher(nullptr, nullptr) {}
     virtual void setPool(AbstractCloudUserInfoPool* pool) override
     {
         m_pool = pool;
     }
 
-    void setUserInfo(
+    nx_http::header::DigestAuthorization setUserInfo(
         uint64_t ts,
         const nx::Buffer& userName,
         const nx::Buffer& cloudNonce)
     {
+        nx_http::header::WWWAuthenticate authServerHeader;
+        authServerHeader.params["nonce"] = cloudNonce + nonceFetcher.generateNonceTrailer();
+        authServerHeader.params["realm"] = kTestRealm;
+        authServerHeader.params["algorithm"] = kTestAlgorithm;
+
+        nx_http::header::DigestAuthorization authClientResponseHeader;
+        //ASSERT_TRUE(
+            nx_http::calcDigestResponse(
+                "GET",
+                userName,
+                kTestPassword,
+                boost::none,
+                kTestUri,
+                authServerHeader,
+                &authClientResponseHeader);
+
+        const auto partialResponse = authClientResponseHeader.digest->params["response"];
         m_pool->userInfoChanged(ts, userName, cloudNonce, partialResponse);
+
+        return authClientResponseHeader;
     }
 
     void removeUserInfo(const nx::Buffer& userName)
@@ -27,6 +62,7 @@ public:
 
 private:
     AbstractCloudUserInfoPool* m_pool;
+    TestCdbNonceFetcher nonceFetcher;
 };
 
 class TestCloudUserInfoPool : public ::CloudUserInfoPool
@@ -45,32 +81,25 @@ class CloudUserInfoPool: public ::testing::Test
 protected:
     CloudUserInfoPool():
         supplier(new TestPoolSupplier),
-        userInfoPool(std::unique_ptr<AbstractCloudUserInfoPoolSupplier>(supplier)),
-        authHeader(nx_http::header::AuthScheme::digest)
+        userInfoPool(std::unique_ptr<AbstractCloudUserInfoPoolSupplier>(supplier))
     {}
 
     void given2UsersInfos()
     {
-        supplier->setUserInfo(1, "vasya", "nonce1", "responseVasya1");
-        supplier->setUserInfo(2, "vasya", "nonce2", "responseVasya2");
-        supplier->setUserInfo(2, "petya", "nonce2", "responsePetya1");
-        supplier->setUserInfo(3, "petya", "nonce3", "responsePetya2");
-    }
-
-    void givenVasyaNonce1AuthHeader()
-    {
-        authHeader.digest->userid = "vasya";
-        authHeader.digest->params["nonce"] = "nonce1";
+        supplier->setUserInfo(1, "vasya", "nonce1");
+        supplier->setUserInfo(2, "vasya", "nonce2");
+        supplier->setUserInfo(2, "petya", "nonce2");
+        supplier->setUserInfo(3, "petya", "nonce3");
     }
 
     void when3rdWithNonce3HasBeenAdded()
     {
-        supplier->setUserInfo(3, "gena", "nonce3", "responseGena3");
+        supplier->setUserInfo(3, "gena", "nonce3");
     }
 
     void whenVasyaNonceUpdatedToTheNewest()
     {
-        supplier->setUserInfo(3, "vasya", "nonce3", "responseVasya3");
+        supplier->setUserInfo(3, "vasya", "nonce3");
     }
 
     void thenOnlyNewestNonceShouldStayInThePool()
@@ -85,7 +114,10 @@ protected:
 
     TestPoolSupplier* supplier;
     TestCloudUserInfoPool userInfoPool;
-    nx_http::header::Authorization authHeader;
+    nx_http::header::Authorization vasya1Auth;
+    nx_http::header::Authorization vasya2Auth;
+    nx_http::header::Authorization petya2Auth;
+    nx_http::header::Authorization petya3Auth;
 };
 
 TEST_F(CloudUserInfoPool, deserialize)
@@ -138,6 +170,7 @@ TEST_F(CloudUserInfoPool, commonNonce_EveryoneHaveNewestNonce)
 TEST_F(CloudUserInfoPool, auth)
 {
     given2UsersInfos();
+    ASSERT_TRUE(userInfoPool.authenticate(kTestMethod, vasya2Auth));
 }
 
 }
