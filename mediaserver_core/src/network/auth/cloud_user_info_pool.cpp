@@ -207,7 +207,9 @@ void CloudUserInfoPool::updateNonceToTs(const nx::Buffer& cloudNonce, uint64_t t
 {
     auto nonceResult = m_nonceToTs.emplace(cloudNonce, timestamp);
     if (!nonceResult.second)
+    {
         NX_ASSERT(m_nonceToTs[cloudNonce] == timestamp);
+    }
 }
 
 void CloudUserInfoPool::updateUserNonceToResponse(
