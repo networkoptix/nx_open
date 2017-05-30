@@ -7,8 +7,8 @@
 #include <nx/utils/log/assert.h>
 #include <common/common_module.h>
 
-QnResourceAccessProvider::QnResourceAccessProvider(QObject* parent):
-    base_type(parent),
+QnResourceAccessProvider::QnResourceAccessProvider(Mode mode, QObject* parent):
+    base_type(mode, parent),
     QnCommonModuleAware(parent)
 {
 }
@@ -61,7 +61,7 @@ QSet<QnAbstractResourceAccessProvider::Source> QnResourceAccessProvider::accessL
     const QnResourcePtr& resource) const
 {
     QSet<QnAbstractResourceAccessProvider::Source> result;
-    for (auto provider : m_providers)
+    for (auto provider: m_providers)
     {
         const auto level = provider->accessibleVia(subject, resource);
         if (level != Source::none)
@@ -75,8 +75,11 @@ void QnResourceAccessProvider::addBaseProvider(QnAbstractResourceAccessProvider*
     provider->setParent(this);
     m_providers.append(provider);
 
-    connect(provider, &QnAbstractResourceAccessProvider::accessChanged, this,
-        &QnResourceAccessProvider::handleBaseProviderAccessChanged);
+    if (mode() == Mode::cached)
+    {
+        connect(provider, &QnAbstractResourceAccessProvider::accessChanged, this,
+            &QnResourceAccessProvider::handleBaseProviderAccessChanged);
+    }
 }
 
 void QnResourceAccessProvider::insertBaseProvider(int index,
@@ -84,8 +87,12 @@ void QnResourceAccessProvider::insertBaseProvider(int index,
 {
     provider->setParent(this);
     m_providers.insert(index, provider);
-    connect(provider, &QnAbstractResourceAccessProvider::accessChanged, this,
-        &QnResourceAccessProvider::handleBaseProviderAccessChanged);
+
+    if (mode() == Mode::cached)
+    {
+        connect(provider, &QnAbstractResourceAccessProvider::accessChanged, this,
+            &QnResourceAccessProvider::handleBaseProviderAccessChanged);
+    }
 }
 
 void QnResourceAccessProvider::removeBaseProvider(QnAbstractResourceAccessProvider* provider)
@@ -108,18 +115,27 @@ QList<QnAbstractResourceAccessProvider*> QnResourceAccessProvider::providers() c
 
 void QnResourceAccessProvider::beginUpdateInternal()
 {
+    if (mode() == Mode::direct)
+        return;
+
     for (auto p: m_providers)
         p->beginUpdate();
 }
 
 void QnResourceAccessProvider::endUpdateInternal()
 {
+    if (mode() == Mode::direct)
+        return;
+
     for (auto p: m_providers)
         p->endUpdate();
 }
 
 void QnResourceAccessProvider::afterUpdate()
 {
+    if (mode() == Mode::direct)
+        return;
+
     for (const auto& subject: resourceAccessSubjectsCache()->allSubjects())
     {
         for (const QnResourcePtr& resource: commonModule()->resourcePool()->getResources())
@@ -134,6 +150,8 @@ void QnResourceAccessProvider::afterUpdate()
 void QnResourceAccessProvider::handleBaseProviderAccessChanged(
     const QnResourceAccessSubject& subject, const QnResourcePtr& resource, Source value)
 {
+    NX_EXPECT(mode() == Mode::cached);
+
     if (isUpdating())
         return;
 

@@ -10,7 +10,7 @@ class QnVideoWallItemAccessProvider: public QnBaseResourceAccessProvider
     using base_type = QnBaseResourceAccessProvider;
 
 public:
-    QnVideoWallItemAccessProvider(QObject* parent = nullptr);
+    QnVideoWallItemAccessProvider(Mode mode, QObject* parent = nullptr);
     virtual ~QnVideoWallItemAccessProvider();
 
 protected:

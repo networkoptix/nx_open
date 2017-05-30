@@ -1,4 +1,4 @@
-#include <core/resource_access/providers/base_access_provider_test_fixture.h>
+#include <core/resource_access/providers/direct_base_access_provider_test_fixture.h>
 #include <core/resource_access/providers/shared_layout_item_access_provider.h>
 
 #include <core/resource_access/shared_resources_manager.h>
@@ -13,12 +13,14 @@
 
 #include <nx_ec/data/api_user_role_data.h>
 
-class QnSharedLayoutItemAccessProviderTest: public QnBaseAccessProviderTestFixture
+class QnSharedLayoutItemAccessProviderTest: public QnDirectBaseAccessProviderTestFixture
 {
 protected:
     virtual QnAbstractResourceAccessProvider* createAccessProvider() const override
     {
-        return new QnSharedLayoutItemAccessProvider(commonModule());
+        return new QnSharedLayoutItemAccessProvider(
+            QnAbstractResourceAccessProvider::Mode::direct,
+            commonModule());
     }
 };
 

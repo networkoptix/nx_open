@@ -710,7 +710,8 @@ void QnPtzManageDialog::setResource(const QnResourcePtr &resource)
 
     m_resource = resource;
 
-    setWindowTitle(tr("Manage PTZ for %1...").arg(QnResourceDisplayInfo(m_resource).toString(qnSettings->extraInfoInTree())));
+    setWindowTitle(tr("Manage PTZ for %1...").arg(
+        QnResourceDisplayInfo(m_resource).toString(qnSettings->extraInfoInTree())));
 }
 
 bool QnPtzManageDialog::isModified() const

@@ -1,8 +1,8 @@
-#include "base_access_provider_test_fixture.h"
+#include "direct_base_access_provider_test_fixture.h"
 
 #include <core/resource_access/providers/resource_access_provider.h>
 
-void QnBaseAccessProviderTestFixture::SetUp()
+void QnDirectBaseAccessProviderTestFixture::SetUp()
 {
     base_type::SetUp();
     m_accessProvider = createAccessProvider();
@@ -12,15 +12,14 @@ void QnBaseAccessProviderTestFixture::SetUp()
         delete provider;
     }
     resourceAccessProvider()->addBaseProvider(m_accessProvider);
-    setupAwaitAccess();
 }
 
-void QnBaseAccessProviderTestFixture::TearDown()
+void QnDirectBaseAccessProviderTestFixture::TearDown()
 {
     base_type::TearDown();
 }
 
-QnAbstractResourceAccessProvider* QnBaseAccessProviderTestFixture::accessProvider() const
+QnAbstractResourceAccessProvider* QnDirectBaseAccessProviderTestFixture::accessProvider() const
 {
     return m_accessProvider;
 }

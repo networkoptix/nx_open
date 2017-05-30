@@ -1,4 +1,4 @@
-#include <core/resource_access/providers/base_access_provider_test_fixture.h>
+#include <core/resource_access/providers/direct_base_access_provider_test_fixture.h>
 #include <core/resource_access/providers/shared_resource_access_provider.h>
 
 #include <core/resource_access/shared_resources_manager.h>
@@ -17,7 +17,7 @@ static const auto kSource = QnAbstractResourceAccessProvider::Source::shared;
 
 }
 
-class QnSharedResourceAccessProviderTest: public QnBaseAccessProviderTestFixture
+class QnSharedResourceAccessProviderTest: public QnDirectBaseAccessProviderTestFixture
 {
 protected:
     void awaitAccess(const QnResourceAccessSubject& subject, const QnResourcePtr& resource,
@@ -31,7 +31,9 @@ protected:
 
     virtual QnAbstractResourceAccessProvider* createAccessProvider() const override
     {
-        return new QnSharedResourceAccessProvider(commonModule());
+        return new QnSharedResourceAccessProvider(
+            QnAbstractResourceAccessProvider::Mode::direct,
+            commonModule());
     }
 };
 

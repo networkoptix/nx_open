@@ -24,10 +24,15 @@ public:
         shared,         //< Accessible by direct sharing.
         layout,         //< Accessible by placing on shared layout.
         videowall,      //< Accessible by placing on videowall.
-        tour,           //< Accessible via layout tour
     };
 
-    QnAbstractResourceAccessProvider(QObject* parent = nullptr);
+    enum class Mode
+    {
+        cached,
+        direct
+    };
+
+    QnAbstractResourceAccessProvider(Mode mode, QObject* parent = nullptr);
     virtual ~QnAbstractResourceAccessProvider();
 
     virtual bool hasAccess(const QnResourceAccessSubject& subject,
@@ -47,9 +52,14 @@ public:
         const QnResourcePtr& resource,
         QnResourceList* providers = nullptr) const = 0;
 
+    Mode mode() const;
+
 signals:
     void accessChanged(const QnResourceAccessSubject& subject,
         const QnResourcePtr& resource, Source value);
+
+private:
+    const Mode m_mode;
 };
 
 inline uint qHash(QnAbstractResourceAccessProvider::Source value, uint seed)

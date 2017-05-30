@@ -9,11 +9,17 @@
 #include <nx/utils/log/log.h>
 #include <common/common_module.h>
 
-QnSharedResourceAccessProvider::QnSharedResourceAccessProvider(QObject* parent):
-    base_type(parent)
+QnSharedResourceAccessProvider::QnSharedResourceAccessProvider(
+    Mode mode,
+    QObject* parent)
+    :
+    base_type(mode, parent)
 {
-    connect(sharedResourcesManager(), &QnSharedResourcesManager::sharedResourcesChanged, this,
-        &QnSharedResourceAccessProvider::handleSharedResourcesChanged);
+    if (mode == Mode::cached)
+    {
+        connect(sharedResourcesManager(), &QnSharedResourcesManager::sharedResourcesChanged, this,
+            &QnSharedResourceAccessProvider::handleSharedResourcesChanged);
+    }
 }
 
 QnSharedResourceAccessProvider::~QnSharedResourceAccessProvider()
@@ -63,6 +69,8 @@ bool QnSharedResourceAccessProvider::calculateAccess(const QnResourceAccessSubje
 
 void QnSharedResourceAccessProvider::handleResourceAdded(const QnResourcePtr& resource)
 {
+    NX_EXPECT(mode() == Mode::cached);
+
     base_type::handleResourceAdded(resource);
 
     if (auto layout = resource.dynamicCast<QnLayoutResource>())
@@ -77,6 +85,8 @@ void QnSharedResourceAccessProvider::handleSharedResourcesChanged(
     const QSet<QnUuid>& oldValues,
     const QSet<QnUuid>& newValues)
 {
+    NX_EXPECT(mode() == Mode::cached);
+
     NX_ASSERT(subject.isValid());
     if (!subject.isValid())
         return;

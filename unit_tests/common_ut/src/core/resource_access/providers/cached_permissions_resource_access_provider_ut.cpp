@@ -1,4 +1,4 @@
-#include <core/resource_access/providers/base_access_provider_test_fixture.h>
+#include <core/resource_access/providers/cached_base_access_provider_test_fixture.h>
 #include <core/resource_access/providers/permissions_resource_access_provider.h>
 
 #include <core/resource_management/resource_pool.h>
@@ -20,7 +20,7 @@ static const auto kSource = QnAbstractResourceAccessProvider::Source::permission
 
 }
 
-class QnPermissionsResourceAccessProviderTest: public QnBaseAccessProviderTestFixture
+class QnPermissionsResourceAccessProviderTest: public QnCachedBaseAccessProviderTestFixture
 {
 protected:
     void awaitAccess(const QnResourceAccessSubject& subject, const QnResourcePtr& resource,
@@ -34,7 +34,9 @@ protected:
 
     virtual QnAbstractResourceAccessProvider* createAccessProvider() const override
     {
-        return new QnPermissionsResourceAccessProvider(commonModule());
+        return new QnPermissionsResourceAccessProvider(
+            QnAbstractResourceAccessProvider::Mode::cached,
+            commonModule());
     }
 };
 

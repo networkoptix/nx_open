@@ -17,7 +17,7 @@ class QnResourceAccessProvider:
     using base_type = QnAbstractResourceAccessProvider;
 
 public:
-    QnResourceAccessProvider(QObject* parent = nullptr);
+    QnResourceAccessProvider(Mode mode, QObject* parent = nullptr);
     virtual ~QnResourceAccessProvider();
 
     virtual bool hasAccess(const QnResourceAccessSubject& subject,

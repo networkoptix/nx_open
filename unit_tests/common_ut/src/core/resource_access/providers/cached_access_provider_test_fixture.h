@@ -12,7 +12,7 @@
 class QnCommonModule;
 class QnAbstractResourceAccessProvider;
 
-class QnAccessProviderTestFixture: public testing::Test,
+class QnCachedAccessProviderTestFixture: public testing::Test,
     protected QnResourcePoolTestHelper
 {
 protected:
