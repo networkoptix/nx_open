@@ -5,6 +5,12 @@
 #include <core/resource/media_server_resource.h>
 #include <nx/fusion/model_functions.h>
 
+namespace {
+
+static constexpr bool kFisheyeDewarpingFeatureEnabled = false;
+
+} // namespace
+
 class QnMediaResourceHelperPrivate : public QObject
 {
     QnMediaResourceHelper* q_ptr;
@@ -129,7 +135,9 @@ QPoint QnMediaResourceHelper::channelPosition(int channel) const
 QnMediaDewarpingParams QnMediaResourceHelper::fisheyeParams() const
 {
     Q_D(const QnMediaResourceHelper);
-    return d->camera ? d->camera->getDewarpingParams() : QnMediaDewarpingParams();
+    return (d->camera && kFisheyeDewarpingFeatureEnabled)
+        ? d->camera->getDewarpingParams()
+        : QnMediaDewarpingParams();
 }
 
 QnMediaResourceHelperPrivate::QnMediaResourceHelperPrivate(QnMediaResourceHelper* parent):
