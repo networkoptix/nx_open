@@ -13,6 +13,7 @@
 #include <nx/client/desktop/ui/graphics/items/resource/layout_tour_drop_placeholder.h>
 
 #include <ui/graphics/instruments/instrument_manager.h>
+#include <ui/graphics/items/resource/resource_widget.h>
 #include <ui/style/resource_icon_cache.h>
 #include <ui/workbench/workbench.h>
 #include <ui/workbench/workbench_display.h>
@@ -23,6 +24,7 @@
 #include <ui/workbench/workbench_utility.h>
 
 #include <utils/common/delayed.h>
+#include <utils/common/pending_operation.h>
 
 #include <nx/utils/log/log.h>
 #include <nx/utils/std/cpp14.h>
@@ -30,6 +32,9 @@
 namespace {
 
 static const int kDefaultDelayMs = 5000;
+
+// Save layout tour not more often than once in 5 seconds.
+static const int kSaveTourIntervalMs = 5000;
 
 } // namespace
 
@@ -43,6 +48,14 @@ LayoutTourReviewController::LayoutTourReviewController(QObject* parent):
     base_type(parent),
     QnWorkbenchContextAware(parent)
 {
+    auto saveQueuedTours = [this]
+        {
+            for (const auto& id: m_saveToursQueue)
+                menu()->trigger(action::SaveLayoutTourAction, {Qn::UuidRole, id});
+            m_saveToursQueue.clear();
+        };
+    m_saveToursOperation = new QnPendingOperation(saveQueuedTours, kSaveTourIntervalMs, this);
+
     connect(layoutTourManager(), &QnLayoutTourManager::tourChanged, this,
         &LayoutTourReviewController::handleTourChanged);
 
@@ -69,6 +82,9 @@ LayoutTourReviewController::LayoutTourReviewController(QObject* parent):
 
     connect(workbench(), &QnWorkbench::currentLayoutChanged, this,
         &LayoutTourReviewController::startListeningLayout);
+
+    connect(qnResourceRuntimeDataManager, &QnResourceRuntimeDataManager::layoutItemDataChanged,
+        this, &LayoutTourReviewController::handleItemDataChanged);
 }
 
 LayoutTourReviewController::~LayoutTourReviewController()
@@ -83,7 +99,7 @@ void LayoutTourReviewController::handleTourChanged(const ec2::ApiLayoutTourData&
     if (!reviewLayout)
         return;
 
-    reviewLayout->setData(Qn::CustomPanelTitleRole, tour.name);
+    reviewLayout->setName(tour.name);
     reviewLayout->setData(Qn::LayoutTourIsManualRole, tour.settings.manual);
     if (auto wbLayout = QnWorkbenchLayout::instance(reviewLayout))
         wbLayout->setData(Qn::LayoutTourIsManualRole, tour.settings.manual);
@@ -104,9 +120,20 @@ void LayoutTourReviewController::handleTourChanged(const ec2::ApiLayoutTourData&
 
 void LayoutTourReviewController::handleTourRemoved(const QnUuid& tourId)
 {
+    m_saveToursQueue.remove(tourId);
+
+    if (currentTourId() == tourId)
+        stopListeningLayout();
+
     // Handle only tours we are currently reviewing.
     if (auto reviewLayout = m_reviewLayouts.take(tourId))
-        resourcePool()->removeResource(reviewLayout);
+    {
+        if (auto wbLayout = QnWorkbenchLayout::instance(reviewLayout))
+        {
+            wbLayout->deleteLater();
+            workbench()->removeLayout(wbLayout);
+        }
+    }
 }
 
 void LayoutTourReviewController::startListeningLayout()
@@ -119,7 +146,6 @@ void LayoutTourReviewController::startListeningLayout()
     connectToLayout(workbench()->currentLayout());
     updateOrder();
     updateButtons(workbench()->currentLayout()->resource());
-
     updatePlaceholders();
 }
 
@@ -136,20 +162,16 @@ void LayoutTourReviewController::reviewLayoutTour(const ec2::ApiLayoutTourData& 
 
     if (auto layout = m_reviewLayouts.value(tour.id))
     {
-        menu()->trigger(action::OpenSingleLayoutAction, layout);
+        menu()->trigger(action::OpenInNewTabAction, layout);
         return;
     }
 
-    const QList<action::IDType> actions{
-        action::StartCurrentLayoutTourAction,
-        action::SaveCurrentLayoutTourAction,
-        action::RemoveCurrentLayoutTourAction
-    };
+    const QList<action::IDType> actions{action::StartCurrentLayoutTourAction};
 
     static const float kCellAspectRatio{16.0f / 9.0f};
 
     const auto layout = QnLayoutResourcePtr(new QnLayoutResource());
-    layout->setId(QnUuid::createUuid()); //< Layout is never saved to server
+    layout->setId(QnUuid::createUuid()); //< Layout is never saved to server.
     layout->setParentId(tour.id);
     layout->setName(tour.name);
     layout->setData(Qn::IsSpecialLayoutRole, true);
@@ -157,8 +179,6 @@ void LayoutTourReviewController::reviewLayoutTour(const ec2::ApiLayoutTourData& 
     layout->setData(Qn::LayoutFlagsRole, qVariantFromValue(QnLayoutFlag::FixedViewport
         | QnLayoutFlag::NoResize
         | QnLayoutFlag::NoTimeline));
-    layout->setData(Qn::CustomPanelActionsRole, qVariantFromValue(actions));
-    layout->setData(Qn::CustomPanelTitleRole, tour.name);
     layout->setData(Qn::CustomPanelDescriptionRole, QString());
     layout->setData(Qn::LayoutPermissionsRole, static_cast<int>(Qn::ReadWriteSavePermission
         | Qn::AddRemoveItemsPermission));
@@ -169,11 +189,10 @@ void LayoutTourReviewController::reviewLayoutTour(const ec2::ApiLayoutTourData& 
     for (auto item: tour.items)
         addItemToReviewLayout(layout, item);
 
-    resourcePool()->addResource(layout);
-
     m_reviewLayouts.insert(tour.id, layout);
 
-    menu()->trigger(action::OpenSingleLayoutAction, layout);
+    menu()->trigger(action::OpenInNewTabAction, layout);
+    updateButtons(layout);
 }
 
 QnUuid LayoutTourReviewController::currentTourId() const
@@ -191,26 +210,13 @@ void LayoutTourReviewController::connectToLayout(QnWorkbenchLayout* layout)
     if (!layout->resource())
        return;
 
-    *m_connections << connect(layout, &QnWorkbenchLayout::itemAdded, this,
-        [this, layout](QnWorkbenchItem* /*item*/)
-        {
-            updateOrder();
-            updateButtons(layout->resource());
-            updatePlaceholders();
-        });
-    *m_connections << connect(layout, &QnWorkbenchLayout::itemMoved, this,
-        [this, layout](QnWorkbenchItem* /*item*/)
-        {
-            updateOrder();
-            updatePlaceholders();
-        });
-    *m_connections << connect(layout, &QnWorkbenchLayout::itemRemoved, this,
-        [this, layout](QnWorkbenchItem* /*item*/)
-        {
-            updateOrder();
-            updateButtons(layout->resource());
-            updatePlaceholders();
-        });
+    auto saveAction = action(action::SaveCurrentLayoutTourAction);
+
+    *m_connections << connect(layout, &QnWorkbenchLayout::itemAdded, saveAction, &QAction::trigger);
+    *m_connections << connect(layout, &QnWorkbenchLayout::itemMoved, saveAction, &QAction::trigger);
+    *m_connections << connect(layout, &QnWorkbenchLayout::itemRemoved, saveAction, &QAction::trigger);
+    *m_connections << connect(layout, &QnWorkbenchLayout::boundingRectChanged, this,
+        &LayoutTourReviewController::updatePlaceholders);
 }
 
 void LayoutTourReviewController::updateOrder()
@@ -231,19 +237,14 @@ void LayoutTourReviewController::updateButtons(const QnLayoutResourcePtr& layout
     if (!layout)
         return;
 
-    // Using he fact that dataChanged will be sent even if action list was not changed
-    const QList<action::IDType> actions{
-        action::StartCurrentLayoutTourAction,
-        action::SaveCurrentLayoutTourAction,
-        action::RemoveCurrentLayoutTourAction
-    };
+    // Using he fact that dataChanged will be sent even if action list was not changed.
+    const QList<action::IDType> actions{action::StartCurrentLayoutTourAction};
     layout->setData(Qn::CustomPanelActionsRole, qVariantFromValue(actions));
 }
 
 void LayoutTourReviewController::updatePlaceholders()
 {
     static const QSize kPlaceholderSize(1, 1);
-    static const int kFillSize = 3;
 
     auto createPlaceholder = [this, mapper = workbench()->mapper()](const QPoint& cell)
         {
@@ -263,28 +264,51 @@ void LayoutTourReviewController::updatePlaceholders()
         return;
     }
 
-    const auto rect = layout->boundingRect();
-    if (rect.width() > kFillSize || rect.height() > kFillSize)
+    const int itemCount = layout->items().size();
+
+    QRect boundingRect = layout->boundingRect();
+
+    // Layout can have valid bounds after removing the last item, handling it here to improve UI.
+    if (!boundingRect.isValid() || itemCount == 0)
+        boundingRect = QRect(0, 0, 1, 1);
+
+    static const int kMaxSize = 4;
+    if (boundingRect.width() > kMaxSize || boundingRect.height() > kMaxSize)
     {
         m_dropPlaceholders.clear();
         return;
     }
 
+    int minWidth = 2;
+    int minHeight = 2;
+
+    if (itemCount > 3)
+        minHeight = 3;
+    if (itemCount > 5)
+        minWidth = 3;
+    if (itemCount > 8)
+        minHeight = 4;
+
+    if (boundingRect.width() < minWidth)
+        boundingRect.setWidth(minWidth);
+    if (boundingRect.height() < minHeight)
+        boundingRect.setHeight(minHeight);
+
     for (const auto& p: m_dropPlaceholders.keys())
     {
-        if (!rect.contains(p))
+        if (!boundingRect.contains(p))
             m_dropPlaceholders.remove(p);
     }
 
-    for (int x = rect.left(); x < rect.left() + kFillSize; ++x)
+    for (int x = boundingRect.left(); x <= boundingRect.right(); ++x)
     {
-        for (int y = rect.top(); y < rect.top() + kFillSize; ++y)
+        for (int y = boundingRect.top(); y <= boundingRect.bottom(); ++y)
         {
             const QPoint cell(x, y);
             const bool isFree = layout->isFreeSlot(cell, kPlaceholderSize);
             const bool placeholderExists = m_dropPlaceholders.contains(cell);
 
-            // If cell is empty and there is a placeholder (or vise versa), skip this step
+            // If cell is empty and there is a placeholder (or vise versa), skip this step.
             if (isFree == placeholderExists)
                 continue;
 
@@ -294,6 +318,9 @@ void LayoutTourReviewController::updatePlaceholders()
                 m_dropPlaceholders.insert(cell, createPlaceholder(cell));
         }
     }
+
+    layout->setData(Qn::LayoutMinimalBoundingRectRole, boundingRect);
+    display()->fitInView(display()->animationAllowed());
 }
 
 void LayoutTourReviewController::addItemToReviewLayout(
@@ -334,16 +361,44 @@ bool LayoutTourReviewController::fillTourItems(ec2::ApiLayoutTourItemDataList* i
     QnWorkbenchItem::sortByGeometry(&layoutItems);
     for (auto item: layoutItems)
     {
-        const auto layout = resourcePool()->getResourceByUniqueId(item->resourceUid());
-        NX_EXPECT(layout);
-        if (!layout)
+        const auto resource = resourcePool()->getResourceByUniqueId(item->resourceUid());
+        if (!resource)
             continue;
 
         const auto delayMs = item->data(Qn::LayoutTourItemDelayMsRole).toInt();
-        items->emplace_back(layout->getId(), delayMs);
+        items->emplace_back(resource->getId(), delayMs);
     }
 
     return true;
+}
+
+void LayoutTourReviewController::handleItemDataChanged(const QnUuid& id, Qn::ItemDataRole role,
+    const QVariant& data)
+{
+    if (role != Qn::LayoutTourItemDelayMsRole)
+        return;
+
+    // We can get here while changing layout.
+    if (!isLayoutTourReviewMode())
+        return;
+
+    const auto item = workbench()->currentLayout()->item(id);
+    if (!item)
+        return;
+
+    QSet<QnUuid> selectedItems;
+    for (const auto widget: display()->widgets())
+    {
+        if (widget->isSelected())
+            selectedItems.insert(widget->item()->uuid());
+    }
+
+    if (!selectedItems.contains(id))
+        return;
+
+    selectedItems.remove(id);
+    for (const auto& itemId: selectedItems)
+        qnResourceRuntimeDataManager->setLayoutItemData(itemId, role, data);
 }
 
 void LayoutTourReviewController::at_reviewLayoutTourAction_triggered()
@@ -387,6 +442,7 @@ void LayoutTourReviewController::at_dropResourcesAction_triggered()
         }
 
     }
+    menu()->trigger(action::SaveCurrentLayoutTourAction);
 }
 
 void LayoutTourReviewController::at_startCurrentLayoutTourAction_triggered()
@@ -409,13 +465,18 @@ void LayoutTourReviewController::at_saveCurrentLayoutTourAction_triggered()
 
     const auto reviewLayout = m_reviewLayouts.value(id);
     NX_EXPECT(reviewLayout);
-    snapshotManager()->store(reviewLayout);
 
     tour.items.clear();
     fillTourItems(&tour.items);
     tour.settings.manual = workbench()->currentLayout()->data(Qn::LayoutTourIsManualRole).toBool();
     layoutTourManager()->addOrUpdateTour(tour);
-    menu()->trigger(action::SaveLayoutTourAction, {Qn::UuidRole, id});
+
+    updateOrder();
+    updateButtons(reviewLayout);
+    updatePlaceholders();
+
+    m_saveToursQueue.insert(tour.id);
+    m_saveToursOperation->requestOperation();
 }
 
 void LayoutTourReviewController::at_removeCurrentLayoutTourAction_triggered()

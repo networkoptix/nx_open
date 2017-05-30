@@ -5,7 +5,7 @@
 #if defined(ENABLE_FLIR)
 
 #include <core/resource/resource_fwd.h>
-#include <nx/network/http/httpclient.h>
+#include <nx/network/http/http_client.h>
 #include <nx/network/system_socket.h>
 #include <utils/common/synctime.h>
 

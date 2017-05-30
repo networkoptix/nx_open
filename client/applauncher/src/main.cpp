@@ -328,7 +328,7 @@ int doInstallation(
 #include <fstream>
 #include <string.h>
 
-#include <nx/network/http/httpclient.h>
+#include <nx/network/http/http_client.h>
 
 //--rsync --dir=c:/temp/1 --url=enk.me/clients/2.1/default/windows/x64/
 //--rsync --dir=c:/tmp/1/ --url=downloads.hdwitness.com/clients/2.1/default/windows/x64/

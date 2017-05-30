@@ -2,6 +2,7 @@
 
 var Config = {
     viewsDir: 'static/views/', //'static/lang_' + lang + '/views/';
+    viewsDirCommon: 'web_common/views/',
     gatewayUrl: '/gateway',
     googleTagsCode: 'GTM-5MRNWP',
     apiBase: '/api',
@@ -192,5 +193,21 @@ var Config = {
                 ]
             }
         ]
-    }
+    },
+    webclient:{
+        useServerTime: true,
+        disableVolume: true,
+        reloadInterval: 5*1000
+    },
+    globalEditServersPermissions: 'GlobalAdminPermission',
+    globalViewArchivePermission: 'GlobalViewArchivePermission',
+    globalAccessAllMediaPermission: 'GlobalAccessAllMediaPermission',
+    allowDebugMode: false, // Allow debugging at all. Set to false in production
+    debug: {
+        video: true, // videowindow.js - disable loader, allow rightclick
+        videoFormat: false,//'flashls', // videowindow.js - force video player
+        chunksOnTimeline: false, // timeline.js - draw debug events
+        jshlsHideError: true, //components\jshls.js - Hide errors used in local env
+        jshlsDebug: false //components\jshls.js - Create hls player in debug mode
+    },
 };

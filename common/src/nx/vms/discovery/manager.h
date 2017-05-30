@@ -8,6 +8,14 @@ namespace nx {
 namespace vms {
 namespace discovery {
 
+struct ModuleEndpoint: QnModuleInformation
+{
+    SocketAddress endpoint;
+
+    ModuleEndpoint(QnModuleInformation old = {}, SocketAddress endpoint = {});
+    bool operator==(const ModuleEndpoint& rhs) const;
+};
+
 /**
  * Discovers VMS modules, notifies their module information and availability changes.
  *
@@ -30,16 +38,9 @@ public:
     void start();
     void stop();
 
-    struct ModuleData: QnModuleInformation
-    {
-        SocketAddress endpoint;
-        ModuleData(QnModuleInformation old = {}, SocketAddress endpoint = {});
-        bool operator==(const ModuleData& rhs) const;
-    };
-
-    std::list<ModuleData> getAll() const; //< All accessible modules.
+    std::list<ModuleEndpoint> getAll() const; //< All accessible modules.
     boost::optional<SocketAddress> getEndpoint(const QnUuid& id) const; //< Reachable endpoint.
-    boost::optional<ModuleData> getModule(const QnUuid& id) const;
+    boost::optional<ModuleEndpoint> getModule(const QnUuid& id) const;
 
     /**
      * Try to find module on the specified endpoint.
@@ -66,16 +67,16 @@ public:
 
 signals:
     /** New reachable module is found. */
-    void found(nx::vms::discovery::Manager::ModuleData module);
+    void found(nx::vms::discovery::ModuleEndpoint module);
 
     /** Module information or active endpoint of reachable module is changed. */
-    void changed(nx::vms::discovery::Manager::ModuleData module);
+    void changed(nx::vms::discovery::ModuleEndpoint module);
 
     /** Module connection is lost and could not be restored. */
     void lost(QnUuid information);
 
     /** Found the module with the same UUID as we are. */
-    void conflict(nx::vms::discovery::Manager::ModuleData module);
+    void conflict(nx::vms::discovery::ModuleEndpoint module);
 
 private:
     void initializeConnector();
@@ -87,7 +88,7 @@ private:
     std::atomic<bool> isRunning;
 
     mutable QnMutex m_mutex;
-    std::map<QnUuid, ModuleData> m_modules;
+    std::map<QnUuid, ModuleEndpoint> m_modules;
 
     std::unique_ptr<ModuleConnector> m_moduleConnector;
     std::unique_ptr<UdpMulticastFinder> m_multicastFinder;
@@ -98,4 +99,4 @@ private:
 } // namespace vms
 } // namespace nx
 
-Q_DECLARE_METATYPE(nx::vms::discovery::Manager::ModuleData);
+Q_DECLARE_METATYPE(nx::vms::discovery::ModuleEndpoint);

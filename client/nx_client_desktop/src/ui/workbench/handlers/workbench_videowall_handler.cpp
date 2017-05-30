@@ -750,7 +750,7 @@ void QnWorkbenchVideoWallHandler::openVideoWallItem(const QnVideoWallResourcePtr
 
     workbench()->clear();
     if (layout)
-        menu()->trigger(action::OpenSingleLayoutAction, layout);
+        menu()->trigger(action::OpenInNewTabAction, layout);
 }
 
 void QnWorkbenchVideoWallHandler::closeInstanceDelayed()
@@ -1844,7 +1844,7 @@ void QnWorkbenchVideoWallHandler::at_openVideoWallReviewAction_triggered()
 
     resourcePool()->addResource(layout);
 
-    menu()->trigger(action::OpenSingleLayoutAction, layout);
+    menu()->trigger(action::OpenInNewTabAction, layout);
 
     // new layout should not be marked as changed
     saveVideowallAndReviewLayout(videoWall, layout);

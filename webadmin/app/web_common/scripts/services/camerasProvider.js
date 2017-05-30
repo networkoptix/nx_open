@@ -1,9 +1,10 @@
 'use strict';
 angular.module('nxCommon')
-    .factory('camerasProvider', function (systemAPI, $localStorage, $q, $poll) {
-        var reloadInterval = Config.settingsConfig.reloadInterval;//30 seconds
+    .factory('camerasProvider', function ($localStorage, $q, $poll) {
+        var reloadInterval = Config.webclient.reloadInterval;//30 seconds
 
-        function camerasProvider(){
+        function camerasProvider(system){
+            this.systemAPI = system;
             this.desktopCameraTypeId = null;
 
             this.cameras = {};
@@ -82,7 +83,7 @@ angular.module('nxCommon')
             if(this.treeRequest){
                 this.treeRequest.abort('getCameras');
             }
-            this.treeRequest = systemAPI.getCameras();
+            this.treeRequest = self.systemAPI.getCameras();
             this.treeRequest.then(function (data) {
                 var cameras = data.data;
                 var findMediaStream = function(param){
@@ -100,7 +101,7 @@ angular.module('nxCommon')
 
                 function cameraSorter(camera) {
                     camera.url = self.extractDomain(camera.url);
-                    camera.preview = systemAPI.previewUrl(camera.physicalId, false, null, 256);
+                    camera.preview = self.systemAPI.previewUrl(camera.physicalId, false, null, 256);
                     camera.server = self.getServer(camera.parentId);
                     if(camera.server && camera.server.status === 'Offline'){
                         camera.status = 'Offline';
@@ -246,7 +247,7 @@ angular.module('nxCommon')
             if(this.treeRequest){
                 this.treeRequest.abort('reloadTree');
             }
-            this.treeRequest = systemAPI.getMediaServers();
+            this.treeRequest = self.systemAPI.getMediaServers();
             this.treeRequest.then(function (data) {
                 if(!self.mediaServers) {
                     self.mediaServers = _.sortBy(data.data,serverSorter);
@@ -287,7 +288,7 @@ angular.module('nxCommon')
 
         camerasProvider.prototype.requestResources = function() {
             var self = this;
-            return systemAPI.getResourceTypes().then(function (result) {
+            return self.systemAPI.getResourceTypes().then(function (result) {
                 self.desktopCameraTypeId = _.find(result.data, function (type) {
                     return type.name === 'SERVER_DESKTOP_CAMERA';
                 });
@@ -297,8 +298,9 @@ angular.module('nxCommon')
         };
 
         camerasProvider.prototype.startPoll = function(){
+            var self = this;
             this.poll = $poll(function(){
-                this.reloadTree();
+                return self.reloadTree();
             },reloadInterval);
         };
 
@@ -326,8 +328,8 @@ angular.module('nxCommon')
         };
 
         return {
-            getProvider: function(){
-                return new camerasProvider;
+            getProvider: function(system){
+                return new camerasProvider(system);
             }
         };
     });

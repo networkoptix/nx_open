@@ -17,7 +17,7 @@ public:
     explicit QnServerInterfaceWatcher(QObject* parent = nullptr);
 
 private slots:
-    void at_connectionChanged(nx::vms::discovery::Manager::ModuleData module);
+    void at_connectionChanged(nx::vms::discovery::ModuleEndpoint module);
     void at_connectionChangedById(QnUuid id);
     void at_resourcePool_statusChanged(const QnResourcePtr& resource);
     void at_resourcePool_resourceAdded(const QnResourcePtr& resource);

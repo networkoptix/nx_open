@@ -4,10 +4,11 @@
 
 
 angular.module('nxCommon')
-    .directive('cameraLinks', ['systemAPI', function (systemAPI) {
+    .directive('cameraLinks', ['systemAPI', function () {
         return {
             restrict: 'E',
             scope: {
+                system: "=",
                 activeCamera: "=",
                 position: "=",
                 liveMode: "=",
@@ -16,6 +17,7 @@ angular.module('nxCommon')
             },
             templateUrl: Config.viewsDirCommon + 'components/cameraLinks.html',
             link: function (scope, element/*, attrs*/) {
+                var systemAPI = scope.system;
                 scope.position = 0;
                 scope.duration = 5*60;
                 scope.resolution = '640p';

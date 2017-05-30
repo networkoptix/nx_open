@@ -9,6 +9,7 @@ angular.module('cloudApp', [
     'ui.bootstrap',
     'ngStorage',
     'base64',
+    'nxCommon',
     'ngToast'
 ]).config(['$httpProvider', function ($httpProvider) {
     $httpProvider.defaults.xsrfCookieName = 'csrftoken';
@@ -100,6 +101,14 @@ angular.module('cloudApp', [
             resolve: {
                 test: ['$route',function ($route) { $route.current.params.callShare = true; }]
             }
+        })
+        .when('/systems/:systemId/view', {
+            title: L.pageTitles.view,
+            templateUrl: Config.viewsDir + 'view.html'
+        })
+        .when('/systems/:systemId/view/:cameraId', {
+            title: L.pageTitles.view,
+            templateUrl: Config.viewsDir + 'view.html'
         })
         .when('/activate', {
             title: L.pageTitles.activate,

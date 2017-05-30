@@ -37,6 +37,9 @@ private:
 
 //-------------------------------------------------------------------------------------------------
 
+using ContentProviderFactoryFunction = 
+    nx::utils::MoveOnlyFunc<std::unique_ptr<nx_http::AbstractMsgBodySource>()>;
+
 class NX_NETWORK_API TestHttpServer
 {
 public:
@@ -116,6 +119,10 @@ public:
         const QString& filePath,
         const nx_http::StringType& mimeType);
 
+    bool registerContentProvider(
+        const QString& httpPath,
+        ContentProviderFactoryFunction contentProviderFactory);
+
     bool registerRedirectHandler(
         const QString& resourcePath,
         const QUrl& location);
@@ -153,7 +160,8 @@ public:
 
     void setResponseBuffer(const QByteArray& buf);
 
-    void processMessage(nx_http::Message request);
+protected:
+    virtual void processMessage(nx_http::Message request) override;
 
 private:
     QByteArray m_responseBuffer;

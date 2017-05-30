@@ -32,8 +32,22 @@
 #include <nx_ec/managers/abstract_user_manager.h>
 #include <nx/network/http/auth_tools.h>
 #include <nx/utils/string.h>
+#include <nx/utils/log/log.h>
+
+#include <nx/kit/ini_config.h>
 
 #include "cloud/cloud_manager_group.h"
+
+namespace {
+
+struct Ini: nx::kit::IniConfig
+{
+    Ini(): IniConfig("QnAuthHelper.ini") { reload(); }
+
+    NX_INI_INT(static_cast<int>(nx::utils::log::Level::none), logLevel, "");
+};
+
+} // namespace
 
 ////////////////////////////////////////////////////////////
 //// class QnAuthHelper
@@ -53,7 +67,6 @@ bool QnAuthHelper::UserDigestData::empty() const
 }
 
 
-
 static const qint64 LDAP_TIMEOUT = 1000000ll * 60 * 5;
 static const QString COOKIE_DIGEST_AUTH(lit("Authorization=Digest"));
 static const QString TEMP_AUTH_KEY_NAME = lit("authKey");
@@ -70,6 +83,12 @@ QnAuthHelper::QnAuthHelper(
     m_nonceProvider(&cloudManagerGroup->authenticationNonceFetcher),
     m_userDataProvider(&cloudManagerGroup->userAuthenticator)
 {
+    Ini ini;
+
+    const auto logger = nx::utils::log::addLogger({"QnAuthHelper"});
+    logger->setDefaultLevel(static_cast<nx::utils::log::Level>(ini.logLevel));
+    logger->setWriter(std::make_unique<nx::utils::log::StdOut>());
+
 #ifndef USE_USER_RESOURCE_PROVIDER
     connect(resourcePool(), SIGNAL(resourceAdded(const QnResourcePtr &)), this, SLOT(at_resourcePool_resourceAdded(const QnResourcePtr &)));
     connect(resourcePool(), SIGNAL(resourceChanged(const QnResourcePtr &)), this, SLOT(at_resourcePool_resourceAdded(const QnResourcePtr &)));
@@ -157,6 +176,7 @@ Qn::AuthResult QnAuthHelper::authenticate(
             {
                 if (usedAuthMethod)
                     *usedAuthMethod = nx_http::AuthMethod::urlQueryParam;
+                NX_DEBUG(this, lm("%1 with urlQueryParam (%2)").args(Qn::Auth_OK, request.requestLine));
                 return Qn::Auth_OK;
             }
         }
@@ -166,10 +186,13 @@ Qn::AuthResult QnAuthHelper::authenticate(
     {
         const QString& cookie = QLatin1String(nx_http::getHeaderValue(request.headers, "Cookie"));
         int customAuthInfoPos = cookie.indexOf(Qn::URL_QUERY_AUTH_KEY_NAME);
-        if (customAuthInfoPos >= 0) {
+        if (customAuthInfoPos >= 0)
+        {
             if (usedAuthMethod)
                 *usedAuthMethod = nx_http::AuthMethod::cookie;
-            return doCookieAuthorization("GET", cookie.toUtf8(), response, accessRights);
+            const auto result = doCookieAuthorization("GET", cookie.toUtf8(), response, accessRights);
+            NX_DEBUG(this, lm("%1 with cookie (%2)").args(result, request.requestLine));
+            return result;
         }
     }
 
@@ -194,6 +217,7 @@ Qn::AuthResult QnAuthHelper::authenticate(
                     QString desiredRealm = nx::network::AppInfo::realm();
                     if (userResource->isLdap()) {
                         auto errCode = QnLdapManager::instance()->realm(&desiredRealm);
+                        NX_DEBUG(this, lm("%1 with ldap (%2)").args(errCode, request.requestLine));
                         if (errCode != Qn::Auth_OK)
                             return errCode;
                     }
@@ -212,6 +236,7 @@ Qn::AuthResult QnAuthHelper::authenticate(
                                 userResource,
                                 isProxy,
                                 false); //requesting Basic authorization
+                            NX_DEBUG(this, lm("%1 requesting basic auth (%2)").args(authResult, request.requestLine));
                             return authResult;
                         }
                     }
@@ -227,6 +252,7 @@ Qn::AuthResult QnAuthHelper::authenticate(
                 response,
                 userResource,
                 isProxy);
+            NX_DEBUG(this, lm("%1 requesting digest auth (%2)").args(authResult, request.requestLine));
             return authResult;
         }
 
@@ -240,7 +266,10 @@ Qn::AuthResult QnAuthHelper::authenticate(
         if (userResource && userResource->isLdap()) {
             Qn::AuthResult authResult = QnLdapManager::instance()->realm(&desiredRealm);
             if (authResult != Qn::Auth_OK)
+            {
+                NX_DEBUG(this, lm("%1 with LDAP (%2)").args(authResult, request.requestLine));
                 return authResult;
+            }
         }
 
         UserDigestData userDigestData;
@@ -249,7 +278,10 @@ Qn::AuthResult QnAuthHelper::authenticate(
         if (userResource)
         {
             if (!userResource->isEnabled())
+            {
+                NX_DEBUG(this, lm("%1 user is disabled (%2)").args(Qn::Auth_WrongLogin, request.requestLine));
                 return Qn::Auth_WrongLogin;
+            }
 
             if (userResource->isLdap() &&
                 (userResource->getDigest().isEmpty() || userResource->getRealm() != desiredRealm))
@@ -257,7 +289,10 @@ Qn::AuthResult QnAuthHelper::authenticate(
                 //checking received credentials for validity
                 Qn::AuthResult authResult = checkDigestValidity(userResource, userDigestData.ha1Digest);
                 if (authResult != Qn::Auth_OK)
+                {
+                    NX_DEBUG(this, lm("%1 with LDAP (%2)").args(authResult, request.requestLine));
                     return authResult;
+                }
                 //changing stored user's password
                 applyClientCalculatedPasswordHashToResource(userResource, userDigestData);
                 userResource->prolongatePassword();
@@ -272,17 +307,21 @@ Qn::AuthResult QnAuthHelper::authenticate(
 
             authResult = doDigestAuth(
                 request.requestLine.method, authorizationHeader, response, isProxy, accessRights);
+            NX_DEBUG(this, lm("%1 with digest (%2)").args(authResult, request.requestLine));
         }
         else if (authorizationHeader.authScheme == nx_http::header::AuthScheme::basic)
         {
             if (usedAuthMethod)
                 *usedAuthMethod = nx_http::AuthMethod::httpBasic;
             authResult = doBasicAuth(request.requestLine.method, authorizationHeader, response, accessRights);
+            NX_DEBUG(this, lm("%1 with basic (%2)").args(authResult, request.requestLine));
         }
-        else {
+        else
+        {
             if (usedAuthMethod)
                 *usedAuthMethod = nx_http::AuthMethod::httpBasic;
             authResult = Qn::Auth_Forbidden;
+            NX_DEBUG(this, lm("%1 with basic (%2)").args(authResult, request.requestLine));
         }
 
         if (authResult == Qn::Auth_OK)
@@ -625,9 +664,6 @@ Qn::AuthResult QnAuthHelper::doCookieAuthorization(
         authorization.digest->parse(authData, ';');
         authResult = doDigestAuth(
             method, authorization, tmpHeaders, false, accessRights);
-    }
-    if (authResult != Qn::Auth_OK)
-    {
     }
     return authResult;
 }

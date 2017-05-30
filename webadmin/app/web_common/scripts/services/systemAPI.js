@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('nxCommon')
-    .factory('systemAPI', function ($http, $q, $localStorage) {
+    .factory('systemAPI', ['$http', '$q', '$localStorage', '$location', function ($http, $q, $localStorage, $location) {
 
         /*
         * System API is a unified service for making API requests to media servers
@@ -60,7 +60,7 @@ angular.module('nxCommon')
         ServerConnection.prototype._getUrlBase = function(){
             var urlBase = '';
             if(this.systemId){
-                urlBase += Config.gatewayUrl + '/' + this.serverId
+                urlBase += Config.gatewayUrl + '/' + this.systemId;
             }
             urlBase += '/web';
             if(this.serverId){
@@ -73,13 +73,21 @@ angular.module('nxCommon')
             // Raise a global event in both cases. Let outer code handle this global request
             return promise;
         };
-        ServerConnection.prototype._get = function(url, data){
-            var canceller = $q.defer();
+        ServerConnection.prototype._setGetParams = function(url, data, auth){
+            if(auth){
+                data = data || {}
+                data.auth = auth;
+            }
             if(data){
                 url += (url.indexOf('?')>0)?'&':'?';
                 url += $.param(data);
             }
-            var obj = this._wrapRequest($http.get(this.urlBase + url, { timeout: canceller.promise }));
+            return this.urlBase + url;
+        };
+        ServerConnection.prototype._get = function(url, data){
+            url = this._setGetParams(url, data, this.systemId && this.authGet());
+            var canceller = $q.defer();
+            var obj = this._wrapRequest($http.get(url, { timeout: canceller.promise }));
             obj.then(function(){
                 canceller = null;
             },function(){
@@ -93,7 +101,8 @@ angular.module('nxCommon')
             return obj;
         };
         ServerConnection.prototype._post = function(url, data){
-            return this._wrapRequest($http.post(this.urlBase + url, data));
+            url = this._setGetParams(url, null, this.systemId && this.authPost());
+            return this._wrapRequest($http.post(url, data));
         };
         /* End of helpers */
 
@@ -113,6 +122,9 @@ angular.module('nxCommon')
         };
         ServerConnection.prototype.authGet = function(){
             return $localStorage._authGet ;
+        };
+        ServerConnection.prototype.authPost = function(){
+            return $localStorage._authPost ;
         };
         ServerConnection.prototype.authPlay = function(){
             return $localStorage._authPlay; // auth_rtsp
@@ -191,13 +203,18 @@ angular.module('nxCommon')
 
         /* Formatting urls */
         ServerConnection.prototype.previewUrl = function(cameraPhysicalId, time, width, height){
-            return this.urlBase +
-                '/api/image' +
-                '?physicalId=' + cameraPhysicalId +
-                (width? '&width=' + width:'') +
-                (height? '&height=' + height:'') +
-                ('&time=' + (time || 'LATEST')); // mb LATEST?
+            var data = {
+                    physicalId:cameraPhysicalId,
+                    time:time  || 'LATEST'
+                };
 
+            if(width){
+                data.width = width;
+            }
+            if(height){
+                data.height = height;
+            }
+            return this._setGetParams('/api/image', data, this.systemId && this.authGet());
         };
         /* End of formatting urls */
 
@@ -235,6 +252,13 @@ angular.module('nxCommon')
         };
         /* End of Working with archive*/
 
+        ServerConnection.prototype.setCameraPath = function(cameraId){
+            var systemLink = '';
+            if(this.systemId){
+                systemLink = '/systems/' + this.systemId;
+            }
+            $location.path(systemLink + '/view/' + cameraId, false);
+        };
 
         if(Config.webadminSystemApiCompatibility){
             // This is a hack to avoid changing all webadmin controllers at the same time - we initialize default connection
@@ -250,8 +274,8 @@ angular.module('nxCommon')
                 }
             }
             var defaultConnection = connect(null, serverId);
-            console.log("init default connection");
             return defaultConnection;
         }
+
         return connect;
-    });
+    }]);

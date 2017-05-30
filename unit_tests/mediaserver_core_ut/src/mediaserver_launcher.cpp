@@ -1,6 +1,6 @@
 #include "mediaserver_launcher.h"
 
-#include <nx/network/http/httpclient.h>
+#include <nx/network/http/http_client.h>
 #include <nx/utils/random.h>
 
 #include <media_server_process.h>
@@ -108,7 +108,6 @@ bool MediaServerLauncher::start()
     m_mediaServerProcess->start();
 
     //waiting for server to come up
-    const auto startTime = std::chrono::steady_clock::now();
     constexpr const auto maxPeriodToWaitForMediaServerStart = std::chrono::seconds(150);
     auto result = future.wait_for(maxPeriodToWaitForMediaServerStart);
     if (result != std::future_status::ready)

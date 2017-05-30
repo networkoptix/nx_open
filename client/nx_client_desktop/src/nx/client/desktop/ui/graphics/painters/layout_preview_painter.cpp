@@ -107,7 +107,8 @@ void LayoutPreviewPainter::paint(QPainter* painter, const QRect& paintRect)
     if (bounding.isEmpty())
         return;
 
-    qreal space = m_layout->cellSpacing() * 0.5;
+    // Handle negative spacing for exported layouts.
+    qreal space = std::max(0.0, m_layout->cellSpacing() * 0.5);
 
     qreal cellAspectRatio = m_layout->hasCellAspectRatio()
         ? m_layout->cellAspectRatio()

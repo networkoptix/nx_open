@@ -221,7 +221,7 @@ bool DropInstrument::dropEvent(QGraphicsItem *, QGraphicsSceneDragDropEvent *eve
         }
         else
         {
-            delayedTriggerIfPossible(action::DropResourcesIntoNewLayoutAction, m_resources);
+            delayedTriggerIfPossible(action::OpenInNewTabAction, m_resources);
         }
 
     event->acceptProposedAction();

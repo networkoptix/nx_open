@@ -30,6 +30,8 @@ public:
 
 private:
     void updateTime();
+    void updateDescription();
+    void updateAlert();
 
     QnUuid selectedServer() const;
 

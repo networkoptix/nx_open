@@ -1,5 +1,7 @@
 #include "layout_tour_item_widget.h"
 
+#include <QtCore/QScopedValueRollback>
+
 #include <QtGui/QGuiApplication>
 
 #include <QtWidgets/QGraphicsLinearLayout>
@@ -8,10 +10,12 @@
 
 #include <camera/camera_thumbnail_manager.h>
 
+#include <core/resource_management/resource_runtime_data.h>
 #include <core/resource/layout_resource.h>
 
 #include <text/time_strings.h>
 
+#include <nx/client/desktop/ui/actions/action_manager.h>
 #include <ui/common/palette.h>
 #include <ui/graphics/items/generic/image_button_widget.h>
 #include <ui/graphics/items/generic/masked_proxy_widget.h>
@@ -175,10 +179,32 @@ void LayoutTourItemWidget::initOverlay()
     delayEdit->setMaximum(99);
     const auto delayMs = item()->data(Qn::LayoutTourItemDelayMsRole).toInt();
     delayEdit->setValue(delayMs / 1000);
+
     connect(delayEdit, QnSpinboxIntValueChanged, this,
         [this](int value)
         {
+            if (m_updating)
+                return;
+
+            QScopedValueRollback<bool> guard(m_updating, true);
             item()->setData(Qn::LayoutTourItemDelayMsRole, value * 1000);
+        });
+
+    connect(delayEdit, &QSpinBox::editingFinished, this,
+        [this]
+        {
+            menu()->trigger(action::SaveCurrentLayoutTourAction);
+        });
+
+    connect(qnResourceRuntimeDataManager, &QnResourceRuntimeDataManager::layoutItemDataChanged,
+        this,
+        [this, delayEdit](const QnUuid& id, Qn::ItemDataRole role, const QVariant& data)
+        {
+            if (m_updating || role != Qn::LayoutTourItemDelayMsRole || id != item()->uuid())
+                return;
+
+            QScopedValueRollback<bool> guard(m_updating, true);
+            delayEdit->setValue(data.toInt() / 1000);
         });
 
     auto delayWidget = new QnMaskedProxyWidget();

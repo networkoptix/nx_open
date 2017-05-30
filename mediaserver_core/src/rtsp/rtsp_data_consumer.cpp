@@ -663,7 +663,7 @@ bool QnRtspDataConsumer::processData(const QnAbstractDataPacketPtr& nonConstData
         bool isRtcp = false;
         if (codecEncoder->isRtpHeaderExists())
         {
-            RtpHeader* packet = (RtpHeader*) (m_sendBuffer.data() + 4);
+            RtpHeader* packet = (RtpHeader*) (m_sendBuffer.data() + 4 );
             isRtcp = packet->payloadType >= 72 && packet->payloadType <= 76;
             if (isRtcp && m_owner->getTracksCount() == 1)
             {

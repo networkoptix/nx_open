@@ -3,6 +3,7 @@
 
 #include <core/resource/camera_resource.h>
 #include <core/resource/device_dependent_strings.h>
+#include <utils/common/scoped_value_rollback.h>
 #include <ui/style/skin.h>
 
 namespace {
@@ -115,6 +116,13 @@ void QnStatusOverlayController::onStatusOverlayChanged(bool /*animated*/)
     NX_ASSERT(m_widget, "Status overlay widget can't be nullptr");
     if (!m_widget)
         return;
+
+    /* As graphics widgets don't have "setUpdatesEnabled",
+       temporarily make the widget invisible instead: */
+    QnScopedTypedPropertyRollback<bool, QGraphicsWidget> visibilityRollback(
+        m_widget.data(), &QGraphicsWidget::setVisible,
+        &QGraphicsWidget::isVisible,
+        false);
 
     m_widget->setCaption(captionText(m_statusOverlay));
     m_widget->setDescription(descriptionText(m_statusOverlay));

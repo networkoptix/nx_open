@@ -343,7 +343,7 @@ void QnNotificationsCollectionWidget::showBusinessAction(const QnAbstractBusines
             {
                 item->addActionButton(
                     icon,
-                    action::OpenInNewLayoutAction,
+                    action::OpenInNewTabAction,
                     action::Parameters(camera).withArgument(Qn::ItemTimeRole, timestampMs));
 
                 loadThumbnailForItem(item, camera, timestampMs);
@@ -354,7 +354,7 @@ void QnNotificationsCollectionWidget::showBusinessAction(const QnAbstractBusines
             {
                 item->addActionButton(
                     icon,
-                    action::OpenInNewLayoutAction,
+                    action::OpenInNewTabAction,
                     camera);
 
                 loadThumbnailForItem(item, camera);
@@ -417,7 +417,7 @@ void QnNotificationsCollectionWidget::showBusinessAction(const QnAbstractBusines
                 {
                     item->addActionButton(
                         icon,
-                        action::OpenInNewLayoutAction,
+                        action::OpenInNewTabAction,
                         action::Parameters(sourceCameras).withArgument(Qn::ItemTimeRole, timestampMs));
 
                     loadThumbnailForItem(item, sourceCameras.mid(0, kMaxThumbnailCount), timestampMs);
@@ -618,12 +618,6 @@ void QnNotificationsCollectionWidget::showSystemHealthMessage(QnSystemHealth::Me
                     .withArgument(Qn::FocusElementRole, lit("email"))
                     .withArgument(Qn::FocusTabRole, QnUserSettingsDialog::SettingsPage)
                 );
-            break;
-
-        case QnSystemHealth::ConnectionLost:
-            item->addActionButton(
-                qnSkin->icon("events/connection.png"),
-                action::OpenLoginDialogAction);
             break;
 
         case QnSystemHealth::NoPrimaryTimeServer:

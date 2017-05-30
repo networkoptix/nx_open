@@ -2,7 +2,7 @@
 #define MEDIASERVER_API_H
 
 #include <nx/network/socket_common.h>
-#include <nx/network/http/httpclient.h>
+#include <nx/network/http/http_client.h>
 
 #include "request_processor.h"
 

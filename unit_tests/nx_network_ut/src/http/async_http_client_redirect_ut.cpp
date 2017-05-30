@@ -1,6 +1,6 @@
 #include <gtest/gtest.h>
 
-#include <nx/network/http/httpclient.h>
+#include <nx/network/http/http_client.h>
 #include <nx/network/http/test_http_server.h>
 #include <nx/utils/string.h>
 

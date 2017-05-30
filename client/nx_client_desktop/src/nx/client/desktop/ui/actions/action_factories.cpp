@@ -96,7 +96,7 @@ QList<QAction*> OpenCurrentUserLayoutFactory::newActions(const Parameters& /*par
         connect(action, &QAction::triggered, this,
             [this, layout]()
             {
-                menu()->trigger(action::OpenSingleLayoutAction, layout);
+                menu()->trigger(action::OpenInNewTabAction, layout);
             });
         result.push_back(action);
     }
@@ -266,6 +266,7 @@ QList<QAction*> CurrentLayoutTourSettingsFactory::newActions(const Parameters& /
             [this, manual]
             {
                 workbench()->currentLayout()->setData(Qn::LayoutTourIsManualRole, manual);
+                menu()->trigger(action::SaveCurrentLayoutTourAction);
             });
         actionGroup->addAction(action);
     }
