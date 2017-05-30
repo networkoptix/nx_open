@@ -104,11 +104,13 @@ angular.module('cloudApp', [
         })
         .when('/systems/:systemId/view', {
             title: L.pageTitles.view,
-            templateUrl: Config.viewsDir + 'view.html'
+            templateUrl: Config.viewsDir + 'view.html',
+            controller: 'ViewPageCtrl'
         })
         .when('/systems/:systemId/view/:cameraId', {
             title: L.pageTitles.view,
-            templateUrl: Config.viewsDir + 'view.html'
+            templateUrl: Config.viewsDir + 'view.html',
+            controller: 'ViewPageCtrl'
         })
         .when('/activate', {
             title: L.pageTitles.activate,

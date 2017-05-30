@@ -435,12 +435,12 @@ angular.module('nxCommon').controller('ViewCtrl',
         // Now every browser behaves the same way
 
         var $window = $(window);
-        var $top = $('#top');
+        var $header = $('header');
         var updateHeights = function() {
             var $viewPanel = $('.view-panel');
             var $camerasPanel = $('.cameras-panel');
             var windowHeight = $window.height();
-            var topHeight = $top.outerHeight();
+            var headerHeight = $header.outerHeight();
 
             var topAlertHeight = 0;
 
@@ -450,7 +450,7 @@ angular.module('nxCommon').controller('ViewCtrl',
                 topAlertHeight = topAlert.outerHeight() + 1; // -1 here is a hack.
             }
 
-            var viewportHeight = (windowHeight - topHeight - topAlertHeight) + 'px';
+            var viewportHeight = (windowHeight - headerHeight - topAlertHeight) + 'px';
 
             $camerasPanel.css('height',viewportHeight );
             $viewPanel.css('height',viewportHeight );
