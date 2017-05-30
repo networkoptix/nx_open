@@ -126,9 +126,10 @@ void QnDesktopDataProvider::EncodedAudioInfo::clearBuffers()
 
 void QnDesktopDataProvider::EncodedAudioInfo::gotData()
 {
+    QnMutexLocker lock( &m_mtx );
     if (m_terminated)
         return;
-    QnMutexLocker lock( &m_mtx );
+
     if (m_buffers.isEmpty())
         return;
     WAVEHDR* data = m_buffers.front();
@@ -171,14 +172,16 @@ bool QnDesktopDataProvider::EncodedAudioInfo::addBuffer()
 
 void QnDesktopDataProvider::EncodedAudioInfo::stop()
 {
-    QnMutexLocker lock( &m_mtx );
-    m_terminated = true;
-    if (m_waveInOpened)
     {
-        waveInReset(hWaveIn);
-        waveInClose(hWaveIn);
-        clearBuffers();
+        QnMutexLocker lock( &m_mtx );
+        m_terminated = true;
+        if (!m_waveInOpened)
+            return;
     }
+
+    waveInReset(hWaveIn);
+    waveInClose(hWaveIn);
+    clearBuffers();
 }
 
 bool QnDesktopDataProvider::EncodedAudioInfo::start()
@@ -221,6 +224,10 @@ bool QnDesktopDataProvider::EncodedAudioInfo::setupFormat(QString& errMessage)
 
 bool QnDesktopDataProvider::EncodedAudioInfo::setupPostProcess()
 {
+    QnMutexLocker lock(&m_mtx);
+    if (m_terminated)
+        return false;
+
     int devId = nameToWaveIndex();
     WAVEFORMATEX wfx;
     //HRESULT hr;
