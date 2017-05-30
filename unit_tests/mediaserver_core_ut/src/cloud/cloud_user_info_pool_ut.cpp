@@ -46,7 +46,9 @@ class CloudUserInfoPool: public ::testing::Test
 protected:
     CloudUserInfoPool():
         supplier(new TestPoolSupplier),
-        userInfoPool(std::unique_ptr<AbstractCloudUserInfoPoolSupplier>(supplier)) {}
+        userInfoPool(std::unique_ptr<AbstractCloudUserInfoPoolSupplier>(supplier)),
+        authHeader(nx_http::header::AuthScheme::digest)
+    {}
 
     void given2UsersInfos()
     {
@@ -54,6 +56,11 @@ protected:
         supplier->setUserInfo(2, "vasya", "nonce2", "responseVasya2");
         supplier->setUserInfo(2, "petya", "nonce2", "responsePetya1");
         supplier->setUserInfo(3, "petya", "nonce3", "responsePetya2");
+    }
+
+    void givenVasyaNonce1AuthHeader()
+    {
+        authHeader.digest->userid = "vasya";
     }
 
     void when3rdWithNonce3HasBeenAdded()
@@ -78,6 +85,7 @@ protected:
 
     TestPoolSupplier* supplier;
     TestCloudUserInfoPool userInfoPool;
+    nx_http::header::Authorization authHeader;
 };
 
 TEST_F(CloudUserInfoPool, deserialize)
@@ -125,6 +133,11 @@ TEST_F(CloudUserInfoPool, commonNonce_EveryoneHaveNewestNonce)
     auto nonce = userInfoPool.newestMostCommonNonce();
     ASSERT_TRUE(nonce);
     ASSERT_EQ(*nonce, nx::Buffer("nonce3"));
+}
+
+TEST_F(CloudUserInfoPool, auth)
+{
+    given2UsersInfos();
 }
 
 }
