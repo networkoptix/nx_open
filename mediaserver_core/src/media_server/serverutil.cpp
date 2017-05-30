@@ -47,6 +47,7 @@
 
 #include "server_connector.h"
 #include "server/server_globals.h"
+#include <utils/crypt/symmetrical.h>
 
 namespace
 {
@@ -332,7 +333,7 @@ QByteArray nx::ServerSetting::decodeAuthKey(const QByteArray& authKey)
     QByteArray prefix("SK_");
     if (authKey.startsWith(prefix)) {
         QByteArray authKeyEncoded = QByteArray::fromHex(authKey.mid(prefix.length()));
-        QByteArray authKeyDecoded = QnAuthHelper::symmetricalEncode(authKeyEncoded);
+        QByteArray authKeyDecoded = nx::utils::encodeSimple(authKeyEncoded);
         return QnUuid::fromRfc4122(authKeyDecoded).toByteArray();
     }
     else {
@@ -360,7 +361,7 @@ void nx::ServerSetting::setAuthKey(const QByteArray& authKey)
 {
     QByteArray prefix("SK_");
     QByteArray authKeyBin = QnUuid(authKey).toRfc4122();
-    QByteArray authKeyEncoded = QnAuthHelper::symmetricalEncode(authKeyBin).toHex();
+    QByteArray authKeyEncoded = nx::utils::encodeSimple(authKeyBin).toHex();
     MSSettings::roSettings()->setValue(AUTH_KEY, prefix + authKeyEncoded); // encode and update in settings
 }
 

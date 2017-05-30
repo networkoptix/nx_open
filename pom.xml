@@ -140,6 +140,7 @@
         <newmobile/>
         <liteMode>false</liteMode>
         <iosTarget>iphoneos</iosTarget>
+        <paxton>false</paxton>
 
         <template>lib</template>
         <noQmlInQrc>false</noQmlInQrc>
@@ -164,7 +165,7 @@
         <openssl.version>1.0.2e</openssl.version>
         <openldap.version>2.4.42</openldap.version>
         <sasl2.version>2.1.26</sasl2.version>
-        <protobuf.version>3.0.0-SNAPSHOT</protobuf.version>
+        <protobuf.version>3.0.1-SNAPSHOT</protobuf.version>
         <onvif.version>2.1.2-io2</onvif.version>
         <sigar.version>1.7</sigar.version>
         <festival.version>2.4</festival.version>
@@ -176,7 +177,7 @@
         <vmux.version>1.0.0</vmux.version>
         <cpro.version>1.0.0</cpro.version>
         <server-external.version>${release.version}</server-external.version>
-        <help.version>${customization}-${release.version}</help.version>
+        <help.version>${customization}-${parsedVersion.majorVersion}.${parsedVersion.minorVersion}</help.version>
         <gcc.version>4.9.4</gcc.version>
 
         <qt.libs/>
@@ -271,7 +272,7 @@
         <artifact.name.cloud_debug>${artifact.name.prefix}-cloud_debug-${artifact.name.suffix}</artifact.name.cloud_debug>
         <artifact.name.testcamera>${artifact.name.prefix}-testcamera-${artifact.name.suffix}</artifact.name.testcamera>
 
-        <nxcloud.version>1.0.135</nxcloud.version>
+        <nxcloud.version>1.0.142</nxcloud.version>
     </properties>
 
     <build>
@@ -519,7 +520,7 @@
 
                 <!-- <module>plugins/axiscamplugin</module> -->
                 <!-- <module>storage_plugins/ftpstorageplugin</module> -->
-                <module>storage_plugins/teststorageplugin</module>
+                <!-- <module>storage_plugins/teststorageplugin</module> -->
 
                 <!-- <module>mediaproxy</module> -->
             </modules>
@@ -637,9 +638,6 @@
                 <module>plugins/nxcontrol</module>
                 <module>plugins/acs/paxton-plugin</module>
             </modules>
-            <properties>
-                <paxton>true</paxton>
-            </properties>
         </profile>
         <profile>
             <id>windows-nomobile</id>
@@ -806,7 +804,6 @@
                 <module>debsetup/client-deb</module>
                 <module>debsetup/mediaserver-deb</module>
 
-                <module>storage_plugins/teststorageplugin</module>
                 <!-- <module>storage_plugins/teststorageplugin/test</module> -->
             </modules>
             <properties>
@@ -889,6 +886,7 @@
                 <additional.defines>DISABLE_ALL_VENDORS DISABLE_DESKTOP_CAMERA EDGE_SERVER debug_in_release</additional.defines>
                 <modification>isd_s2</modification>
                 <rdep.target>isd_s2</rdep.target>
+                <rdep.packages>cpro</rdep.packages>
                 <qt.spec/>
             </properties>
             <modules>

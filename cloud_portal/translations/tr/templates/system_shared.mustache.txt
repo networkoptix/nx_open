@@ -1,0 +1,11 @@
+Sistem sizinle paylaşıldı
+
+{{#message.sharer_name}}
+{{message.sharer_name}} ({{message.sharer_email}}) paylaşılan sistem {{message.system_name}}.
+{{/message.sharer_name}}
+
+{{^message.sharer_name}}
+{{message.system_name}} sistemi sizinle paylaşıldı.
+{{/message.sharer_name}}
+
+Sistemi açın: {{config.portal_url}} / systems / {{message.system_id}}

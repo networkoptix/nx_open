@@ -39,6 +39,7 @@ public:
     void setPassword(const QString& password);
 
     void generateHash();
+    QString decodeLDAPPassword() const;
 
     bool checkLocalUserPassword(const QString &password);
 

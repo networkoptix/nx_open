@@ -127,8 +127,22 @@ copyBins()
     cp "$BINS_DIR/external.dat" "$INSTALL_DIR/$MODULE/bin/"
 
     mkdir -p "$INSTALL_DIR/$MODULE/bin/plugins/"
-    cp "$LIBS_DIR/libisd_native_plugin.so.DIMA" "$INSTALL_DIR/$MODULE/bin/plugins/libisd_native_plugin.so"
-    cp "$LIBS_DIR/libcpro_ipnc_plugin.so.1.0.0" "$INSTALL_DIR/$MODULE/bin/plugins/"
+    local ISD_PLUGIN="${isd_plugin}"
+    if [ -z $ISD_PLUGIN ]; then
+        ISD_PLUGIN="native"
+    fi
+
+    case "$ISD_PLUGIN" in
+        native)
+            cp "$BINS_DIR/plugins/libisd_native_plugin.so" "$INSTALL_DIR/$MODULE/bin/plugins/libisd_native_plugin.so"
+            ;;
+        cpro)
+            cp "$LIBS_DIR/libcpro_ipnc_plugin.so.1.0.0" "$INSTALL_DIR/$MODULE/bin/plugins/"
+            ;;
+        *)
+            echo "Error: unknown \${isd_plugin}: [$ISD_PLUGIN]"
+            exit 1
+    esac
 }
 
 # [in] INSTALL_DIR
@@ -154,7 +168,7 @@ buildArchives()
     pushd "$TAR_DIR" >/dev/null
     mkdir -p $(dirname "$INSTALL_SYMLINK_PATH")
     ln -s "/$INSTALL_PATH" "$INSTALL_SYMLINK_PATH"
-    tar czf "$RESOURCE_BUILD_DIR/$PACKAGE_NAME" "$INSTALL_PATH" *
+    tar czf "$RESOURCE_BUILD_DIR/$PACKAGE_NAME" *
     popd >/dev/null
 
     [ ! -z "$TARGET_DIR" ] && cp "$RESOURCE_BUILD_DIR/$PACKAGE_NAME" "$TARGET_DIR"

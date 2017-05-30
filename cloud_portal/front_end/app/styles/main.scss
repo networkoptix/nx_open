@@ -1,0 +1,749 @@
+
+@import '_theme_palette';
+@import 'custom/_custom_palette';
+@import '_theme_variables';
+@import '../bower_components/bootstrap-sass/assets/stylesheets/bootstrap';
+@import '_theme_override';
+
+@import '_big_brother';
+@import '_languages';
+
+html {
+  position: relative;
+  min-height: 100%;
+  overflow-y: scroll; /* CLOUD-373: this is hack: we fix vertical scroll to prevent the page from shaking when it appears or disappears*/
+}
+body {
+  /* Margin bottom by footer height */
+  margin-bottom: 80px;
+  min-width: 360px;
+}
+footer {
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+  /* Set the fixed height of the footer here */
+  height: 48px;
+  border-top: 1px solid $common-border-color;
+  padding-bottom: 2px;
+
+
+  .nav > li > span{
+    line-height:24px;
+    display:block;
+  }
+
+  .nav > li > a,
+  .nav > li > span{
+    font-size: $font-size-small;
+    padding: 10px;
+    color:  $light12;
+    &:hover{
+      color:$light16;
+    }
+
+    &.dropdown{
+      padding:6px;
+    }
+  }
+  .navbar-right > li > a, .navbar-right > li > span > a{
+    color:$light8;
+    &:hover{
+      color:$light12;
+    }
+  }
+}
+
+
+@mixin keyframe ($animation_name) {
+    @-webkit-keyframes #{$animation-name} {
+        @content;
+    }
+
+    @-moz-keyframes #{$animation-name} {
+        @content;
+    }
+
+    @-o-keyframes #{$animation-name} {
+        @content;
+    }
+
+    @keyframes #{$animation-name} {
+        @content;
+    }
+}
+
+@include keyframe(bubblingG) {
+    0% {
+        opacity:1;
+	}
+
+	77% {
+	    opacity:0;
+	}
+
+	100% {
+	    opacity:0;
+	}
+}
+
+.process-button {
+  display: inline-block;
+  position: relative;
+
+  .btn + .btn{
+    margin-left:0; /* Overwrite for modal-footer bootstrap style */
+  }
+
+  .processing {
+    visibility: hidden;
+  }
+
+  .loading{
+    width: 100%;
+    height: 100%;
+    position: absolute;
+
+	text-align: center;
+	vertical-align: middle;
+	overflow: hidden;
+
+	margin: auto;
+	padding-right: 0;
+	padding-left: 0;
+
+    span{
+        display: inline-block;
+        width: 8px;
+        height: 8px;
+        margin: auto 3px;
+        background: $brand_contrast;
+        border-radius: 8px;
+        animation: bubblingG 650ms infinite alternate;
+            -o-animation: bubblingG 650ms infinite alternate;
+            -ms-animation: bubblingG 650ms infinite alternate;
+            -webkit-animation: bubblingG 650ms infinite alternate;
+            -moz-animation: bubblingG 650ms infinite alternate;
+    }
+
+    &.btn-default span{
+        background: $light16;
+    }
+    .dot1{
+	    animation-delay: 0s;
+		-o-animation-delay: 0s;
+		-ms-animation-delay: 0s;
+		-webkit-animation-delay: 0s;
+		-moz-animation-delay: 0s;
+    }
+    .dot2{
+        animation-delay: 0.3s;
+		-o-animation-delay: 0.3s;
+		-ms-animation-delay: 0.3s;
+		-webkit-animation-delay: 0.3s;
+		-moz-animation-delay: 0.3s;
+    }
+    .dot3{
+        animation-delay: 0.6s;
+		-o-animation-delay: 0.6s;
+		-ms-animation-delay: 0.6s;
+		-webkit-animation-delay: 0.6s;
+		-moz-animation-delay: 0.6s;
+    }
+  }
+
+
+}
+
+.warning-label{
+    color: $brand-danger;
+}
+
+.loading .auth-visible,
+.loading .auth-hidden{
+    display: none !important;
+}
+
+.authorized .auth-hidden,
+.authorized .loading-visible{
+    display: none !important;
+}
+
+.anonymous .auth-visible,
+.anonymous .loading-visible{
+    display: none !important;
+}
+
+
+.panel.hoverable:hover{
+    box-shadow: 0px 2px 2px 0px transparentize(dark(15),0.8);
+}
+
+@media (min-width: $screen-sm-min) {
+  .hoverable .hover-visible {
+    visibility: hidden;
+  }
+
+  .hoverable:hover .hover-visible {
+    visibility: visible;
+  }
+}
+
+
+
+.process-loading{
+  border:none;
+  box-shadow:none;
+}
+
+.border-left{
+  border-left:1px solid $common-border-color;
+}
+
+.border-right{
+  border-right:1px solid $common-border-color;
+}
+.border-top{
+  border-top:1px solid $common-border-color;
+}
+.border-bottom{
+  border-bottom:1px solid $common-border-color;
+}
+.light-color{
+  color:    $gray-light;
+}
+.no-data-panel
+{
+  width:100%;
+  height:100%;
+  z-index:100;
+
+  min-height: 100px;
+
+  text-align: center;
+
+  background-color: $body-bg;
+  font-weight: lighter;
+  font-size: $font-size-h2;
+  display: table;
+
+    .no-data-panel-body{
+      display: table-cell;
+      vertical-align: middle;
+    }
+}
+
+.right-arrow{
+    display:inline-block;
+    width:40px;
+    height:40px;
+    position: relative;
+    background-image: url('/static/images/tutorial_arrow.png') !important;
+    background-repeat: no-repeat;
+    background-size: 40px 40px;
+    background-position: right 8px center;
+
+    @media only screen and (-webkit-min-device-pixel-ratio: 2), only screen and (min-device-pixel-ratio: 2) {
+        background-image: url('/static/images/tutorial_arrow@2x.png') !important;
+    }
+}
+
+.preloader{
+    display: none;
+}
+.process-loading{
+    position: relative;
+}
+.process-loading>*{
+    visibility:hidden;
+}
+
+
+.process-loading>.preloader {
+
+  display: block;
+  visibility: visible;
+  position:absolute;
+
+  width:100%;
+  height:100%;
+  min-height: 144px;
+  z-index:100;
+
+  padding-top:80px;
+
+  text-align: center;
+
+  background-color: $body-bg;
+}
+.process-loading>.preloader>img{
+    width:64px;
+    height:64px;
+}
+
+/* inline mode for portal: no header, dialogs behave like full-screen pages */
+.inline-portal header{
+    display: none;
+}
+
+.inline-portal>.container{
+    padding:0;
+}
+
+.inline-portal .modal{
+    overflow-y: hidden;
+}
+
+.inline-portal .modal-dialog{
+    width: 100%;
+    height: 100%;
+    padding: 0;
+    margin: 0;
+}
+
+.inline-portal .modal-content{
+    box-shadow: none;
+    border: none;
+    height:100%;
+    border-radius:0;
+}
+
+
+.inline-portal .modal-header .close{
+    display: none;
+}
+
+.ellipsis{
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+@mixin ellipsis{
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 100%;
+  line-height: initial;
+}
+.user-name{
+  @include ellipsis;
+}
+td{
+    &.user-name{
+      max-width: 200px;
+    }
+    &.user-email{
+      @include ellipsis;
+      max-width: 240px;
+    }
+    &.user-role{
+      @include ellipsis;
+      max-width: 120px;
+    }
+}
+.button-cell{
+    padding-right: 6px !important;
+    padding-left: 6px !important;
+    text-align: center;
+}
+.system-button {
+  user-select: none;
+  cursor: pointer;
+  overflow: hidden;
+
+  h2 {
+    @include ellipsis;
+
+    line-height: 24px;
+    margin-bottom: 2px;
+  }
+  .user-name{
+    font-size: $font-size-h6;
+    line-height:16px;
+    font-weight: bold;
+    display: block;
+    margin-bottom:12px;
+  }
+
+  .label {
+    display: inline-block;
+    vertical-align: bottom;
+
+    height: 20px;
+    margin-top: 12px;
+    line-height: 14px;
+    border-radius: $border-radius-small;
+
+    font-weight: normal;
+    font-size: $font-size-h6;
+  }
+}
+
+.btn-wrapper {
+  display: inline-block;
+  padding-top: 12px;
+  padding-left: 8px;
+}
+
+
+.buttons-panel {
+    padding-bottom: 15px;
+}
+@media (min-width: $screen-sm-min) {
+  .buttons-panel {
+    float: right;
+    padding-top: 15px;
+  }
+}
+
+
+.vertical-bar{
+  border-right: 1px solid $common-border-color;
+  height: 24px;
+  margin: 16px 0;
+}
+
+
+.hidden-collapsed{
+    display:block;
+}
+
+.hidden-expanded{
+    display:none;
+}
+
+@media (max-width: $grid-float-breakpoint-max) {
+  .navbar-collapse .vertical-bar{
+    display: none;
+  }
+
+  .hidden-collapsed{
+    display:none;
+  }
+
+  .hidden-expanded{
+    display:block;
+  }
+}
+
+/* add beta-symbol after product name everywhere */
+/*.product-name.add-version:after{
+  content: "\03B2";
+  font-style: italic;
+  opacity: 0.5;
+  font-size: 90%;
+}*/
+
+
+.inline-block{
+  display: inline-block;
+}
+
+
+.ng-toast {
+  margin-top: 34px;
+
+  .alert {
+    margin-bottom: 8px;
+
+    @media (max-width: $screen-sm-max) {
+      min-width: 100%;
+    }
+
+    @media (min-width: $screen-sm-min) {
+      min-width: 600px;
+    }
+
+
+    &.ng-animate {
+      transition: 0.5s linear all;
+
+      &.ng-enter {
+        opacity: 0;
+      }
+      &.ng-enter-active{
+        opacity: 1;
+      }
+
+      &.ng-leave {
+        opacity: 1;
+      }
+      &.ng-leave-active{
+        opacity: 0;
+      }
+    }
+  }
+}
+
+.alert-top{
+  position:fixed;
+  top: 34px;
+  left:50%;
+  transform: translateX(-50%);
+  z-index:1100;
+
+
+
+  @media (max-width: $screen-sm-max) {
+    min-width: 100%;
+  }
+
+  @media (min-width: $screen-sm-min) {
+    min-width: 600px;
+  }
+
+
+ &.ng-animate {
+    transition: 0.5s linear all;
+
+    &.ng-enter {
+      opacity: 0;
+    }
+    &.ng-enter-active{
+      opacity: 1;
+    }
+
+    &.ng-leave {
+      opacity: 1;
+    }
+    &.ng-leave-active{
+       opacity: 0;
+    }
+  }
+}
+
+@media (min-width: $screen-sm-min) {
+  // Automatically set modal's width for larger viewports
+  .modal-dialog .alert-top {
+    top: -74px;
+  }
+}
+
+.image-link,
+.image-link:hover{
+  @include ellipsis;
+  text-decoration: none !important;
+}
+
+.jumbotron .promo-block{
+  color: $jumbotron-color;
+}
+.promo-block {
+  padding: 32px 74px;
+  text-align: center;
+  color: $light15;
+
+  h2 {
+    font-weight: bold;
+  }
+
+  .promo-block {
+    padding-bottom: 0;
+  }
+
+}
+
+.error-page{
+    color:$dark10;
+    h1{
+        font-size:40px;
+    }
+    p{
+        font-size:24px;
+    }
+    a{
+        text-decoration: underline;
+    }
+}
+
+.cloud-icon img{
+  height: 60px;
+}
+
+.jumbotron .cloud-icon img{
+  height: 100px;
+}
+
+.welcome-caption{
+  font-size: 36px;
+  color: $brand_core !important;
+}
+
+h1.process-success{
+  text-align: center;
+  line-height: 1.5;
+}
+
+.search-block{
+    padding-top:10px;
+    padding-bottom:10px;
+    /*border-top:1px solid $common-border-color;
+    border-bottom:1px solid $common-border-color;*/
+    margin-bottom: 10px;
+}
+.inactive{
+    opacity:0.7;
+    cursor: pointer;
+}
+
+.download-link{
+    display:inline-block;
+    width:32px;
+    height:32px;
+    background-repeat: no-repeat;
+    background-size: 32px 32px;
+
+    background-image: url('/static/images/download.png') !important;
+
+    @media only screen and (-webkit-min-device-pixel-ratio: 2), only screen and (min-device-pixel-ratio: 2) {
+        background-image: url('/static/images/download@2x.png') !important;
+    }
+}
+.mobile-link {
+    display:inline-block;
+    width:140px;
+    height:40px;
+    position: relative;
+    background-repeat: no-repeat;
+    background-size: 140px 40px;
+
+    margin-right:10px;
+
+    &.iOS,&.ios{
+        background-image: url('/static/images/appstore.png') !important;
+
+        @media only screen and (-webkit-min-device-pixel-ratio: 2), only screen and (min-device-pixel-ratio: 2) {
+            background-image: url('/static/images/appstore@2x.png') !important;
+        }
+    }
+
+    &.Android,&.android{
+        background-image: url('/static/images/googleplay.png') !important;
+
+        @media only screen and (-webkit-min-device-pixel-ratio: 2), only screen and (min-device-pixel-ratio: 2) {
+            background-image: url('/static/images/googleplay@2x.png') !important;
+        }
+    }
+}
+
+.download-button{
+    margin-bottom:8px;
+    margin-top:0;
+    .installer-name{
+        display:block;
+        font-weight: normal;
+    }
+    .media-body{
+        width:auto;
+    }
+}
+h2.version-number{
+    font-weight: bold;
+    font-size: 32px;
+}
+
+.disabled{
+    color: $light10;
+}
+.input-overlay{
+    input{
+        padding-right:30px;
+        padding-left:30px;
+    }
+    .input-overlay-left{
+        position:absolute;
+        color:$light8;
+        left:17px;
+    }
+    .input-overlay-right{
+        position:absolute;
+        color:$light8;
+        right:17px;
+    }
+}
+
+
+@media (min-width: $screen-md-min) {
+    .flex-md{
+        display:flex;
+        align-items:stretch;
+    }
+
+    .border-left-md{
+      border-left:1px solid $common-border-color;
+    }
+}
+
+.conditions-note{
+    display:inline-block;
+    padding-left: 10px;
+    line-height:16px;
+    color:$dark16;
+}
+
+.help-topic{
+    margin-top:10px;
+}
+
+.dropdown-wide{
+    display:inline-block;
+    width:100%;
+}
+.dropdown .lang-sm{
+    margin-right: $padding-input-horizontal/2;
+}
+.two-columns{
+    -moz-column-count: 2;
+    /* Firefox */
+    -webkit-column-count: 2;
+    /* Safari and Chrome */
+    column-count: 2;
+}
+
+@mixin icon{
+  display: inline-block;
+  background-size: 112px 32px;
+  width: 16px;
+  height: 16px;
+  display: inline-block;
+  background-image: url('/static/images/portal_icons.png');
+  @media only screen and (-webkit-min-device-pixel-ratio: 2), only screen and (min-device-pixel-ratio: 2) {
+    background-image: url('/static/images/portal_icons@2x.png');
+  }
+}
+
+@mixin kill-glyphicon{
+    top:2px;
+  @include icon;
+  &:before{
+    content:none;
+  }
+}
+
+.glyphicon-share{
+    @include kill-glyphicon;
+    background-position: -16px 0;
+}
+.glyphicon-eye-open{
+    @include kill-glyphicon;
+    background-position: -80px 0;
+}
+.glyphicon-eye-close{
+    @include kill-glyphicon;
+    background-position: -80px -16px;
+}
+button .icon-caret{
+  float:right;
+}
+.icon-caret{
+  @include icon;
+  display: inline-block;
+  background-position: 2px 0px;
+
+  margin-left:$padding-input-horizontal/2;
+  margin-top: 2px;
+}
+.close-icon{
+  @include icon;
+  background-position: -32px 0;
+}
+

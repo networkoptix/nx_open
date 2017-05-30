@@ -25,6 +25,12 @@ update () {
   mkdir -p ./$DISTRIB
   tar xfv $DISTRIB.tar.gz -C ./$DISTRIB
   cp -Rf ./$DISTRIB/* /
+
+  CIFSUTILS=$(dpkg --get-selections | grep -v deinstall | grep cifs-utils | awk '{print $1}')
+  if [ -z "$CIFSUTILS" ]; then
+      dpkg -i cifs-utils/*.deb
+  fi
+
   if [[ "${box}" == "bpi" ]]; then
     #avoid grabbing libstdc++ from mediaserver lib folder
     export LD_LIBRARY_PATH=
@@ -45,8 +51,8 @@ update () {
     FONTCONFIG=$(dpkg -l | grep fontconfig | grep 2.11 | awk '{print $3}')
     if [ -z $FONTCONFIG ]; then dpkg -i /opt/deb/fontconfig/*.deb; fi
 
-    FONTCONFIG=$(dpkg -l | grep fonts-takao-mincho | awk '{print $3}')
-    if [ -z $FONTCONFIG ]; then dpkg -i /opt/deb/fonts-takao-mincho/*.deb; fi
+    FONTS=$(dpkg -l | grep fonts-takao-mincho | awk '{print $3}')
+    if [ -z $FONTS ]; then dpkg -i /opt/deb/fonts-takao-mincho/*.deb; fi
 
     touch /dev/cedar_dev
     chmod 777 /dev/disp

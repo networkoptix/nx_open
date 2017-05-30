@@ -68,8 +68,6 @@ public:
         const QString& path,
         unsigned int periodMillis);
 
-    static QByteArray symmetricalEncode(const QByteArray& data);
-
     enum class NonceProvider { automatic, local };
     QByteArray generateNonce(NonceProvider provider = NonceProvider::automatic) const;
 
@@ -169,10 +167,10 @@ private:
 
     void authenticationExpired( const QString& path, quint64 timerID );
     QnUserResourcePtr findUserByName( const QByteArray& nxUserName ) const;
-    void applyClientCalculatedPasswordHashToResource(
-        const QnUserResourcePtr& userResource,
-        const UserDigestData& userDigestData );
-    Qn::AuthResult doPasswordProlongation(QnUserResourcePtr userResource);
+    void updateUserHashes(const QnUserResourcePtr& userResource, const QString& password);
+
+    bool decodeBasicAuthData(const QByteArray& authData, QString* outUserName, QString* outPassword);
+    bool decodeLDAPPassword(const QByteArray& hash, QString* outPassword);
 
     /*!
         \return \a true if password expiration timestamp has been increased
