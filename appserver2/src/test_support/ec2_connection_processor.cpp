@@ -37,6 +37,10 @@ bool Ec2ConnectionProcessor::authenticate()
 {
     Q_D(QnTCPConnectionProcessor);
 
+    auto owner = static_cast<QnHttpConnectionListener*>(d->owner);
+    if (!owner->needAuth())
+        return true;
+
     const nx_http::StringType& authorization =
         nx_http::getHeaderValue(d->request.headers, "Authorization");
     if (authorization.isEmpty())

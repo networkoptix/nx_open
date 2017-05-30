@@ -81,6 +81,12 @@ public:
     {
         return QnUuid(m_settings.value("moduleGuid").toString());
     }
+
+    bool isAuthDisabled() const
+    {
+        return m_settings.contains("disableAuth");
+    }
+
 private:
     QnSettings m_settings;
     bool m_showHelp;
@@ -122,7 +128,6 @@ public:
     :
         QnHttpConnectionListener(commonModule, address, port, maxConnections, useSsl)
     {
-        addHandler<QnMuduleInformationConnectionProcessor>("HTTP", "api/moduleInformation");
     }
 
     ~QnSimpleHttpConnectionListener()
@@ -294,6 +299,9 @@ int Appserver2Process::exec()
         QnTcpListener::DEFAULT_MAX_CONNECTIONS,
         true);
 
+    if (settings.isAuthDisabled())
+        tcpListener.disableAuth();
+
     ec2ConnectionFactory->registerRestHandlers(tcpListener.processorPool());
 
     if (!tcpListener.bindToLocalAddress())
@@ -309,6 +317,7 @@ int Appserver2Process::exec()
         m_tcpListener = &tcpListener;
     }
 
+    tcpListener.addHandler<QnMuduleInformationConnectionProcessor>("HTTP", "api/moduleInformation");
     tcpListener.addHandler<QnRestConnectionProcessor>("HTTP", "ec2");
     ec2ConnectionFactory->registerTransactionListener(&tcpListener);
 
