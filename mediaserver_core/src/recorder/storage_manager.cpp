@@ -484,10 +484,10 @@ QnStorageManager::QnStorageManager(QnServer::StoragePool role):
     connect(qnResPool, &QnResourcePool::resourceAdded, this, &QnStorageManager::onNewResource, Qt::QueuedConnection);
     connect(qnResPool, &QnResourcePool::resourceRemoved, this, &QnStorageManager::onDelResource, Qt::QueuedConnection);
 
-	connect(this, &QnStorageManager::rebuildFinished, 
-        [this] (QnSystemHealth::MessageType message) 
+	connect(this, &QnStorageManager::rebuildFinished,
+        [this] (QnSystemHealth::MessageType message)
         {
-    		if (message == QnSystemHealth::ArchiveFastScanFinished || 
+    		if (message == QnSystemHealth::ArchiveFastScanFinished ||
                 message == QnSystemHealth::ArchiveRebuildFinished)
             {
                 for (const auto& storage: getUsedWritableStorages())
@@ -495,7 +495,7 @@ QnStorageManager::QnStorageManager(QnServer::StoragePool role):
                     if (!storage->hasFlags(Qn::storage_fastscan))
                     {
                         auto storageIndex = qnStorageDbPool->getStorageIndex(storage);
-                        m_spaceInfo.storageRebuilded(storageIndex, storage->getFreeSpace(), 
+                        m_spaceInfo.storageRebuilded(storageIndex, storage->getFreeSpace(),
                             calculateNxOccupiedSpace(storageIndex), storage->getSpaceLimit());
                     }
                 }
@@ -1440,7 +1440,7 @@ void QnStorageManager::removeEmptyDirs(const QnStorageResourcePtr &storage)
                 {
                     if (depthLimit == 0)
                     {
-                        NX_LOGX(lm("Directory depth is above the limit, corupted file system? %1")
+                        NX_LOGX(lm("Directory depth is above the limit, corrupted file system? %1")
                             .str(entry.absoluteFilePath()), cl_logERROR);
 
                         return false;
@@ -1542,7 +1542,7 @@ void QnStorageManager::clearSpace(bool forced)
     }
 
     qint64 toDeleteTotal = 0;
-    std::chrono::time_point<std::chrono::steady_clock> cleanupStartTime = std::chrono::steady_clock::now(); 
+    std::chrono::time_point<std::chrono::steady_clock> cleanupStartTime = std::chrono::steady_clock::now();
 
     if (QnLog::logs() && QnLog::logs()->get()->logLevel() >= cl_logDEBUG2)
     {
@@ -1552,8 +1552,8 @@ void QnStorageManager::clearSpace(bool forced)
 
         for (const auto& storage: storages)
         {
-            if (storage->getSpaceLimit() == 0 || 
-                (storage->getCapabilities() & QnAbstractStorageResource::cap::RemoveFile) 
+            if (storage->getSpaceLimit() == 0 ||
+                (storage->getCapabilities() & QnAbstractStorageResource::cap::RemoveFile)
                     != QnAbstractStorageResource::cap::RemoveFile)
             {
                 NX_LOG(lit("[Cleanup, measure]: storage: %1 spaceLimit: %2, RemoveFileCap: %3, skipping")
@@ -1593,7 +1593,7 @@ void QnStorageManager::clearSpace(bool forced)
         QString clearSpaceLogMessage;
         QTextStream clearSpaceLogStream(&clearSpaceLogMessage);
         auto cleanupEndTime = std::chrono::steady_clock::now();
-        qint64 elapsedMs = 
+        qint64 elapsedMs =
             std::chrono::duration_cast<std::chrono::milliseconds>
                 (cleanupEndTime - cleanupStartTime).count();
         qint64 elapsedSecs = qMax((elapsedMs / 1000), 1ll);
@@ -1601,10 +1601,10 @@ void QnStorageManager::clearSpace(bool forced)
         clearSpaceLogStream << "[Cleanup, measure]: Cleanup routine for "
                             << (m_role == QnServer::StoragePool::Normal ? "main " : "backup")
                             << " storage manager has finished" << endl;
-        clearSpaceLogStream << "[Cleanup, measure]: time elapsed: " << elapsedMs << " ms " 
+        clearSpaceLogStream << "[Cleanup, measure]: time elapsed: " << elapsedMs << " ms "
                             << "(" << elapsedSecs << " secs) "
                             << "(" << (elapsedSecs / (60 * 60)) << " hrs)" << endl;
-        clearSpaceLogStream << "[Cleanup, measure]: cleanup speed was " 
+        clearSpaceLogStream << "[Cleanup, measure]: cleanup speed was "
                             << (toDeleteTotal / (1024 * 1024 * elapsedSecs)) << " Mb/s"
                             << endl;
         NX_LOG(clearSpaceLogMessage, cl_logDEBUG2);
@@ -2173,7 +2173,7 @@ QnStorageResourcePtr QnStorageManager::getOptimalStorageRoot(
 
     for (const auto& storage: getUsedWritableStorages())
     {
-        if (pred(storage) && 
+        if (pred(storage) &&
             storage->getFreeSpace() > kMinStorageFreeSpace)
         {
             allowedIndexes.push_back(qnStorageDbPool->getStorageIndex(storage));
