@@ -32,6 +32,7 @@ private:
 
 private:
     QSharedPointer<LayoutPreviewPainter> m_previewPainter;
+    bool m_updating{false};
 };
 
 } // namespace workbench

@@ -382,7 +382,7 @@ int MessageParser::parseEndMessageIntegrity( MessageParserBuffer& buffer ) {
 nx::network::server::ParserState MessageParser::parse( const nx::Buffer& user_buffer , std::size_t* bytes_transferred )
 {
     if (user_buffer.isEmpty())  //end-of-file received
-        return nx::network::server::ParserState::inProgress;
+        return nx::network::server::ParserState::readingMessage;
 
     // Setting up the buffer environment variables
     MessageParserBuffer buffer(&m_tempBuffer,user_buffer);
@@ -440,7 +440,7 @@ nx::network::server::ParserState MessageParser::parse( const nx::Buffer& user_bu
                 break;  //continuing parsing
             case IN_PROGRESS:   
                 *bytes_transferred = buffer.position();
-                return nx::network::server::ParserState::inProgress;     
+                return nx::network::server::ParserState::readingMessage;
             case FAILED:
                 *bytes_transferred = buffer.position();
                 return nx::network::server::ParserState::failed;         

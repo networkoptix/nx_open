@@ -23,7 +23,12 @@ HttpServerConnection::HttpServerConnection(
 {
 }
 
-void HttpServerConnection::processMessage(nx_http::Message&& requestMessage)
+void HttpServerConnection::setPersistentConnectionEnabled(bool value)
+{
+    m_persistentConnectionEnabled = value;
+}
+
+void HttpServerConnection::processMessage(nx_http::Message requestMessage)
 {
     // TODO: #ak Incoming message body. Use AbstractMsgBodySource.
 
@@ -42,11 +47,6 @@ void HttpServerConnection::processMessage(nx_http::Message&& requestMessage)
     }
 
     authenticate(std::move(requestMessage));
-}
-
-void HttpServerConnection::setPersistentConnectionEnabled(bool value)
-{
-    m_persistentConnectionEnabled = value;
 }
 
 void HttpServerConnection::authenticate(nx_http::Message requestMessage)

@@ -1696,7 +1696,7 @@ void MediaServerProcess::at_connectionOpened()
     m_firstRunningTime = 0;
 }
 
-void MediaServerProcess::at_serverModuleConflict(nx::vms::discovery::Manager::ModuleData module)
+void MediaServerProcess::at_serverModuleConflict(nx::vms::discovery::ModuleEndpoint module)
 {
     const auto& resPool = commonModule()->resourcePool();
     qnBusinessRuleConnector->at_mediaServerConflict(
@@ -2508,6 +2508,7 @@ void MediaServerProcess::run()
             auto connectionResult = QnConnectionValidator::validateConnection(connectInfo, errorCode);
             if (connectionResult == Qn::SuccessConnectionResult)
             {
+                ec2Connection->getDiscoveryManager(Qn::kSystemAccess)->monitorServerDiscovery();
                 NX_LOG(QString::fromLatin1("Connected to local EC2"), cl_logWARNING);
                 break;
             }

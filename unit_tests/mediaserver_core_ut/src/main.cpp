@@ -51,7 +51,7 @@ int main(int argc, char** argv)
 #endif
     return nx::network::test::runTest(
         argc, argv,
-        [](const nx::utils::ArgumentParser& args)
+        [](const nx::utils::ArgumentParser& /*args*/)
         {
             return nx::utils::test::DeinitFunctions();
         },

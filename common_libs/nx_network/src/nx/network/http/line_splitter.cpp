@@ -122,12 +122,12 @@ QnByteArrayConstRef LineSplitter::flush()
 
 //-------------------------------------------------------------------------------------------------
 
-BufferToLineSplitter::BufferToLineSplitter(const nx::String& str):
+StringLineIterator::StringLineIterator(const nx::String& str):
     m_sourceData(str)
 {
 }
 
-boost::optional<ConstBufferRefType> BufferToLineSplitter::nextLine()
+boost::optional<ConstBufferRefType> StringLineIterator::next()
 {
     QnByteArrayConstRef line;
     size_t bytesRead = 0;
