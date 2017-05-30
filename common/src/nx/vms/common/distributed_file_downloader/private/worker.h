@@ -85,8 +85,14 @@ private:
     void requestFileInformationInternal();
     void requestFileInformation();
     void requestAvailableChunks();
+    void handleFileInformationReply(
+        bool success, rest::Handle handle, const FileInformation& fileInfo);
     void requestChecksums();
+    void handleChecksumsReply(
+        bool success, rest::Handle handle, const QVector<QByteArray>& checksums);
     void downloadNextChunk();
+    void handleDownloadChunkReply(
+        bool success, rest::Handle handle, int chunkIndex, const QByteArray& data);
 
     void cancelRequests();
 

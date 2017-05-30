@@ -15,6 +15,7 @@
 namespace {
 
 using namespace std::chrono;
+using nx::vms::common::distributed_file_downloader::Worker;
 
 constexpr int kDefaultPeersPerOperation = 5;
 constexpr int kSubsequentChunksToDownload = 5;
@@ -27,6 +28,24 @@ constexpr int kDefaultRank = 0;
 QString statusString(bool success)
 {
     return success ? lit("OK") : lit("FAIL");
+}
+
+QString requestSubjectString(Worker::State state)
+{
+    switch (state)
+    {
+        case Worker::State::requestingFileInformation:
+            return lit("file info");
+        case Worker::State::requestingAvailableChunks:
+            return lit("available chunks");
+        case Worker::State::requestingChecksums:
+            return lit("checksums");
+        case Worker::State::downloadingChunks:
+            return lit("chunk");
+        default:
+            break;
+    }
+    return QString();
 }
 
 // Take count elements from a sorted circular list of peers.
@@ -291,11 +310,7 @@ void Worker::requestFileInformationInternal()
 {
     m_subsequentChunksToDownload.reset();
 
-    const QString subject = m_state == State::requestingAvailableChunks
-        ? lit("available chunks")
-        : lit("file info");
-
-    NX_VERBOSE(m_logTag, lm("Trying to get %1.").arg(subject));
+    NX_VERBOSE(m_logTag, lm("Trying to get %1.").arg(requestSubjectString(m_state)));
 
     const auto peers = selectPeersForOperation();
     if (peers.isEmpty())
@@ -312,100 +327,18 @@ void Worker::requestFileInformationInternal()
         return;
     }
 
-    auto handleReply =
-        [this, subject](bool success, rest::Handle handle, const FileInformation& fileInfo)
-        {
-            const auto peerId = m_peerByRequestHandle.take(handle);
-            if (peerId.isNull())
-                return;
-
-            NX_VERBOSE(m_logTag,
-                lm("Got %3 reply from %1: %2")
-                    .arg(m_peerManager->peerString(peerId))
-                    .arg(statusString(success))
-                    .arg(subject));
-
-            auto exitGuard = QnRaiiGuard::createDestructible(
-                [this]()
-                {
-                    if (!m_peerByRequestHandle.isEmpty())
-                        return;
-
-                    if (m_state == State::requestingFileInformation
-                        || m_state == State::requestingAvailableChunks)
-                    {
-                        if (isFileReadyForInternetDownload()
-                            && !selectPeersForInternetDownload().isEmpty())
-                        {
-
-                            setState(State::foundAvailableChunks);
-                            nextStep();
-                            return;
-                        }
-
-                        waitForNextStep();
-                        return;
-                    }
-
-                    nextStep();
-                });
-
-            auto& peerInfo = m_peerInfoById[peerId];
-
-            if (!success || !fileInfo.isValid())
-            {
-                decreasePeerRank(peerId);
-                return;
-            }
-
-            if (m_state == State::requestingFileInformation
-                && fileInfo.size >= 0 && !fileInfo.md5.isEmpty() && fileInfo.chunkSize > 0)
-            {
-                auto resultCode = m_storage->setChunkSize(fileInfo.name, fileInfo.chunkSize);
-                if (resultCode != ResultCode::ok)
-                {
-                    NX_WARNING(m_logTag,
-                        lm("During setting chunk size storage returned error: %1")
-                            .arg(resultCode));
-
-                    fail();
-                    return;
-                }
-
-                resultCode = m_storage->updateFileInformation(
-                    fileInfo.name, fileInfo.size, fileInfo.md5);
-
-                if (resultCode != ResultCode::ok)
-                {
-                    NX_WARNING(m_logTag,
-                        lm("During update storage returned error: %1").arg(resultCode));
-                }
-                NX_INFO(m_logTag, "Updated file info.");
-
-                setState(State::foundFileInformation);
-            }
-
-            peerInfo.downloadedChunks = fileInfo.downloadedChunks;
-            if (m_availableChunks.count(true) < fileInfo.downloadedChunks.size()
-                && !addAvailableChunksInfo(fileInfo.downloadedChunks))
-            {
-                decreasePeerRank(peerId);
-                return;
-            }
-
-            increasePeerRank(peerId);
-            if (m_state == State::requestingAvailableChunks)
-                setState(State::foundAvailableChunks);
-        };
-
     for (const auto& peer: peers)
     {
         NX_VERBOSE(m_logTag,
             lm("Requesting %1 from server %2.")
-                .arg(subject)
+                .arg(requestSubjectString(m_state))
                 .arg(m_peerManager->peerString(peer)));
 
-        const auto handle = m_peerManager->requestFileInfo(peer, m_fileName, handleReply);
+        const auto handle = m_peerManager->requestFileInfo(peer, m_fileName,
+            [this](bool success, rest::Handle handle, const FileInformation& fileInfo)
+            {
+                handleFileInformationReply(success, handle, fileInfo);
+            });
         if (handle > 0)
             m_peerByRequestHandle[handle] = peer;
     }
@@ -426,6 +359,92 @@ void Worker::requestAvailableChunks()
     requestFileInformationInternal();
 }
 
+void Worker::handleFileInformationReply(
+    bool success, rest::Handle handle, const FileInformation& fileInfo)
+{
+    const auto peerId = m_peerByRequestHandle.take(handle);
+    if (peerId.isNull())
+        return;
+
+    NX_VERBOSE(m_logTag,
+        lm("Got %3 reply from %1: %2")
+            .arg(m_peerManager->peerString(peerId))
+            .arg(statusString(success))
+            .arg(requestSubjectString(m_state)));
+
+    auto exitGuard = QnRaiiGuard::createDestructible(
+        [this]()
+        {
+            if (!m_peerByRequestHandle.isEmpty())
+                return;
+
+            if (m_state == State::requestingFileInformation
+                || m_state == State::requestingAvailableChunks)
+            {
+                if (isFileReadyForInternetDownload()
+                    && !selectPeersForInternetDownload().isEmpty())
+                {
+
+                    setState(State::foundAvailableChunks);
+                    nextStep();
+                    return;
+                }
+
+                waitForNextStep();
+                return;
+            }
+
+            nextStep();
+        });
+
+    auto& peerInfo = m_peerInfoById[peerId];
+
+    if (!success || !fileInfo.isValid())
+    {
+        decreasePeerRank(peerId);
+        return;
+    }
+
+    if (m_state == State::requestingFileInformation
+        && fileInfo.size >= 0 && !fileInfo.md5.isEmpty() && fileInfo.chunkSize > 0)
+    {
+        auto resultCode = m_storage->setChunkSize(fileInfo.name, fileInfo.chunkSize);
+        if (resultCode != ResultCode::ok)
+        {
+            NX_WARNING(m_logTag,
+                lm("During setting chunk size storage returned error: %1")
+                    .arg(resultCode));
+
+            fail();
+            return;
+        }
+
+        resultCode = m_storage->updateFileInformation(
+            fileInfo.name, fileInfo.size, fileInfo.md5);
+
+        if (resultCode != ResultCode::ok)
+        {
+            NX_WARNING(m_logTag,
+                lm("During update storage returned error: %1").arg(resultCode));
+        }
+        NX_INFO(m_logTag, "Updated file info.");
+
+        setState(State::foundFileInformation);
+    }
+
+    peerInfo.downloadedChunks = fileInfo.downloadedChunks;
+    if (m_availableChunks.count(true) < fileInfo.downloadedChunks.size()
+        && !addAvailableChunksInfo(fileInfo.downloadedChunks))
+    {
+        decreasePeerRank(peerId);
+        return;
+    }
+
+    increasePeerRank(peerId);
+    if (m_state == State::requestingAvailableChunks)
+        setState(State::foundAvailableChunks);
+}
+
 void Worker::requestChecksums()
 {
     m_subsequentChunksToDownload.reset();
@@ -439,74 +458,81 @@ void Worker::requestChecksums()
         return;
     }
 
-    auto handleReply =
-        [this](bool success, rest::Handle handle, const QVector<QByteArray>& checksums)
-        {
-            const auto peerId = m_peerByRequestHandle.take(handle);
-            if (peerId.isNull())
-                return;
-
-            NX_VERBOSE(m_logTag,
-                lm("Got checksums from %1: %2")
-                    .arg(m_peerManager->peerString(peerId))
-                    .arg(statusString(success)));
-
-            auto exitGuard = QnRaiiGuard::createDestructible(
-                [this, &success]()
-                {
-                    if (success)
-                    {
-                        cancelRequests();
-                        waitForNextStep();
-                        return;
-                    }
-
-                    nextStep();
-                });
-
-            auto& peerInfo = m_peerInfoById[peerId];
-
-            if (!success || checksums.isEmpty() || checksums.size() != m_availableChunks.size())
-            {
-                success = false;
-                decreasePeerRank(peerId);
-                return;
-            }
-
-            const auto resultCode =
-                m_storage->setChunkChecksums(m_fileName, checksums);
-
-            if (resultCode != ResultCode::ok)
-            {
-                NX_WARNING(m_logTag, lm("Cannot set checksums: %1").arg(resultCode));
-                return;
-            }
-
-            NX_DEBUG(m_logTag, "Updated checksums.");
-
-            const auto& fileInfo = fileInformation();
-            if (fileInfo.status != FileInformation::Status::downloading
-                || fileInfo.downloadedChunks.count(true) == fileInfo.downloadedChunks.size())
-            {
-                fail();
-                return;
-            }
-
-            setState(State::downloadingChunks);
-        };
-
     for (const auto& peer: peers)
     {
         NX_VERBOSE(m_logTag,
-            lm("Requesting checksums from server %1.").arg(m_peerManager->peerString(peer)));
+            lm("Requesting %1 from server %2.")
+                .arg(requestSubjectString(State::requestingChecksums))
+                .arg(m_peerManager->peerString(peer)));
 
-        const auto handle = m_peerManager->requestChecksums(peer, m_fileName, handleReply);
+        const auto handle = m_peerManager->requestChecksums(peer, m_fileName,
+            [this](bool success, rest::Handle handle, const QVector<QByteArray>& checksums)
+            {
+                handleChecksumsReply(success, handle, checksums);
+            });
         if (handle > 0)
             m_peerByRequestHandle[handle] = peer;
     }
 
     if (m_peerByRequestHandle.isEmpty())
         waitForNextStep();
+}
+
+void Worker::handleChecksumsReply(
+    bool success, rest::Handle handle, const QVector<QByteArray>& checksums)
+{
+    const auto peerId = m_peerByRequestHandle.take(handle);
+    if (peerId.isNull())
+        return;
+
+    NX_VERBOSE(m_logTag,
+        lm("Got %1 from %2: %3")
+            .arg(requestSubjectString(State::requestingChecksums))
+            .arg(m_peerManager->peerString(peerId))
+            .arg(statusString(success)));
+
+    auto exitGuard = QnRaiiGuard::createDestructible(
+        [this, &success]()
+        {
+            if (success)
+            {
+                cancelRequests();
+                waitForNextStep();
+                return;
+            }
+
+            nextStep();
+        });
+
+    auto& peerInfo = m_peerInfoById[peerId];
+
+    if (!success || checksums.isEmpty() || checksums.size() != m_availableChunks.size())
+    {
+        success = false;
+        decreasePeerRank(peerId);
+        return;
+    }
+
+    const auto resultCode =
+        m_storage->setChunkChecksums(m_fileName, checksums);
+
+    if (resultCode != ResultCode::ok)
+    {
+        NX_WARNING(m_logTag, lm("Cannot set checksums: %1").arg(resultCode));
+        return;
+    }
+
+    NX_DEBUG(m_logTag, "Updated checksums.");
+
+    const auto& fileInfo = fileInformation();
+    if (fileInfo.status != FileInformation::Status::downloading
+        || fileInfo.downloadedChunks.count(true) == fileInfo.downloadedChunks.size())
+    {
+        fail();
+        return;
+    }
+
+    setState(State::downloadingChunks);
 }
 
 void Worker::downloadNextChunk()
@@ -557,44 +583,7 @@ void Worker::downloadNextChunk()
     auto handleReply =
         [this, chunkIndex](bool success, rest::Handle handle, const QByteArray& data)
         {
-            const auto peerId = m_peerByRequestHandle.take(handle);
-            if (peerId.isNull())
-                return;
-
-            NX_VERBOSE(m_logTag,
-                lm("Got chunk %2 from %1: %3")
-                    .arg(m_peerManager->peerString(peerId))
-                    .arg(chunkIndex)
-                    .arg(statusString(success)));
-
-            auto exitGuard = QnRaiiGuard::createDestructible(
-                [this, &success]()
-                {
-                    waitForNextStep(success ? 0 : -1);
-                });
-
-            auto& peerInfo = m_peerInfoById[peerId];
-
-            if (!success)
-            {
-                decreasePeerRank(peerId);
-                return;
-            }
-
-            m_subsequentChunksToDownload = std::max(0, m_subsequentChunksToDownload.get() - 1);
-            if (m_subsequentChunksToDownload == 0)
-                m_usingInternet = false;
-
-            const auto resultCode = m_storage->writeFileChunk(m_fileName, chunkIndex, data);
-            if (resultCode != ResultCode::ok)
-            {
-                NX_WARNING(m_logTag,
-                    lm("Cannot write chunk. Storage error: %1").arg(resultCode));
-
-                // TODO: Implement error handling
-                success = false;
-                return;
-            }
+            handleDownloadChunkReply(success, handle, chunkIndex, data);
         };
 
     if (m_subsequentChunksToDownload == boost::none || m_subsequentChunksToDownload == 0)
@@ -630,6 +619,47 @@ void Worker::downloadNextChunk()
                 .arg(chunkIndex).arg(m_peerManager->peerString(peerId)));
     }
     m_peerByRequestHandle[handle] = peerId;
+}
+
+void Worker::handleDownloadChunkReply(
+    bool success, rest::Handle handle, int chunkIndex, const QByteArray& data)
+{
+    const auto peerId = m_peerByRequestHandle.take(handle);
+    if (peerId.isNull())
+        return;
+
+    NX_VERBOSE(m_logTag,
+        lm("Got chunk %1 from %2: %3")
+            .arg(chunkIndex)
+            .arg(m_peerManager->peerString(peerId))
+            .arg(statusString(success)));
+
+    auto exitGuard = QnRaiiGuard::createDestructible(
+        [this, &success]()
+        {
+            waitForNextStep(success ? 0 : -1);
+        });
+
+    if (!success)
+    {
+        decreasePeerRank(peerId);
+        return;
+    }
+
+    m_subsequentChunksToDownload = std::max(0, m_subsequentChunksToDownload.get() - 1);
+    if (m_subsequentChunksToDownload == 0)
+        m_usingInternet = false;
+
+    const auto resultCode = m_storage->writeFileChunk(m_fileName, chunkIndex, data);
+    if (resultCode != ResultCode::ok)
+    {
+        NX_WARNING(m_logTag,
+            lm("Cannot write chunk. Storage error: %1").arg(resultCode));
+
+        // TODO: Implement error handling
+        success = false;
+        return;
+    }
 }
 
 void Worker::cancelRequests()
