@@ -25,6 +25,8 @@ enum class ResultCode
     noFreeSpace
 };
 
+QString toString(ResultCode code);
+
 QN_FUSION_DECLARE_FUNCTIONS(distributed_file_downloader::ResultCode, (lexical))
 
 } // namespace distributed_file_downloader

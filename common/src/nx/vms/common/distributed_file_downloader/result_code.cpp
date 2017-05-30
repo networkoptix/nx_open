@@ -9,6 +9,11 @@ namespace distributed_file_downloader {
 
 QN_DEFINE_METAOBJECT_ENUM_LEXICAL_FUNCTIONS(distributed_file_downloader, ResultCode)
 
+QString toString(ResultCode code)
+{
+    return QnLexical::serialized(code);
+}
+
 } // namespace distributed_file_downloader
 } // namespace common
 } // namespace vms
