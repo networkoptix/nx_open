@@ -844,7 +844,7 @@ void LayoutsHandler::at_newUserLayoutAction_triggered()
 
     snapshotManager()->save(layout);
 
-    menu()->trigger(action::OpenSingleLayoutAction, layout);
+    menu()->trigger(action::OpenInNewTabAction, layout);
 }
 
 void LayoutsHandler::at_saveLayoutAction_triggered()

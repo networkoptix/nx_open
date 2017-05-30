@@ -24,6 +24,7 @@
 namespace {
 
 static const int kTimerPrecisionMs = 500;
+static const int kHintTimeoutMs = 10000;
 
 } // namespace
 
@@ -64,9 +65,6 @@ void LayoutTourExecutor::startTour(const ec2::ApiLayoutTourData& tour)
     startTourInternal();
     if (!tour.settings.manual)
         startTimer();
-
-    //action(action::EffectiveMaximizeAction)->setChecked(false);
-    menu()->trigger(action::FreespaceAction);
 }
 
 void LayoutTourExecutor::updateTour(const ec2::ApiLayoutTourData& tour)
@@ -135,35 +133,36 @@ void LayoutTourExecutor::timerEvent(QTimerEvent* event)
 
 void LayoutTourExecutor::stopCurrentTour()
 {
-    switch (m_mode)
+    // We can recursively get here from restoreWorkbenchState() call
+    const auto mode = m_mode;
+    m_mode = Mode::Stopped;
+
+    switch (mode)
     {
         case Mode::SingleLayout:
         {
             stopTimer();
+            setHintVisible(false);
             workbench()->setItem(Qn::ZoomedRole, nullptr);
-
             break;
         }
 
         case Mode::MultipleLayouts:
         {
             stopTimer();
+            setHintVisible(false);
             m_tour.currentIndex = 0;
             NX_EXPECT(!m_tour.id.isNull());
+            QnUuid tourId = m_tour.id;
             m_tour.id = QnUuid();
             resetTourItems({});
-
-            restoreWorkbenchState();
-            menu()->trigger(action::FreespaceAction);
+            restoreWorkbenchState(tourId);
             break;
         }
 
         default:
             break;
     }
-
-    setHintVisible(false);
-    m_mode = Mode::Stopped;
 }
 
 void LayoutTourExecutor::resetTourItems(const ec2::ApiLayoutTourItemDataList& items)
@@ -296,12 +295,21 @@ void LayoutTourExecutor::clearWorkbenchState()
     workbench()->clear();
 }
 
-void LayoutTourExecutor::restoreWorkbenchState()
+void LayoutTourExecutor::restoreWorkbenchState(const QnUuid& tourId)
 {
     workbench()->clear();
+
+    if (m_lastState.layoutUuids.isEmpty() && !tourId.isNull())
+    {
+        m_lastState.layoutUuids.push_back(tourId);
+        m_lastState.currentLayoutId = tourId;
+    }
     workbench()->update(m_lastState);
 
-    if (workbench()->layouts().empty() || !workbench()->currentLayout()->resource())
+    const bool validState = !workbench()->layouts().empty()
+        && workbench()->currentLayout()->resource();
+    NX_EXPECT(validState);
+    if (!validState)
         menu()->trigger(action::OpenNewTabAction);
 }
 
@@ -310,7 +318,10 @@ void LayoutTourExecutor::setHintVisible(bool visible)
     if (visible)
     {
         m_hintLabel = QnGraphicsMessageBox::information(
-            tr("Press any key to stop the tour."));
+            tr("Use Left/Right arrows, Page Up/Page Down, Enter, Space and Backspace to control the tour.")
+            + L'\n'
+            + tr("Press any other key to stop the tour."),
+            kHintTimeoutMs);
     }
     else if (m_hintLabel)
     {

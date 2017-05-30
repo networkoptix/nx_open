@@ -42,23 +42,27 @@ int QnGetTimeZonesRestHandler::executeGet(
     QnJsonRestResult& result,
     const QnRestConnectionProcessor* /*owner*/)
 {
-    std::vector<TimeZoneInfo> outputData;
+    static const auto outputData =
+        []()
+        {
+            std::vector<TimeZoneInfo> data;
+            for (const auto& timeZoneId: nx::utils::getSupportedTimeZoneIds())
+            {
+                QTimeZone timeZone(timeZoneId.toLatin1());
+                TimeZoneInfo record;
+                record.id = timeZone.id();
+                record.displayName = timeZone.displayName(
+                    QDateTime::currentDateTime(), QTimeZone::DefaultName);
+                record.comment = timeZone.comment();
+                record.hasDaylightTime = timeZone.hasDaylightTime();
+                record.isDaylightTime = timeZone.isDaylightTime(QDateTime::currentDateTime());
+                record.offsetFromUtc = timeZone.offsetFromUtc(QDateTime::currentDateTime());
+                data.emplace_back(std::move(record));
+            }
 
-    for (const auto& timeZoneId: nx::utils::getSupportedTimeZoneIds())
-    {
-        QTimeZone timeZone(timeZoneId.toLatin1());
-        TimeZoneInfo record;
-        record.id = timeZone.id();
-        record.displayName = timeZone.displayName(
-            QDateTime::currentDateTime(), QTimeZone::DefaultName);
-        record.comment = timeZone.comment();
-        record.hasDaylightTime = timeZone.hasDaylightTime();
-        record.isDaylightTime = timeZone.isDaylightTime(QDateTime::currentDateTime());
-        record.offsetFromUtc = timeZone.offsetFromUtc(QDateTime::currentDateTime());
-        outputData.emplace_back(std::move(record));
-    }
+            return data;
+        }();
 
     result.setReply(outputData);
-
     return nx_http::StatusCode::ok;
 }

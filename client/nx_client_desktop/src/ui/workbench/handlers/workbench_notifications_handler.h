@@ -47,7 +47,6 @@ private slots:
     void at_context_userChanged();
     void at_userEmailValidityChanged(const QnUserResourcePtr &user, bool isValid);
 
-    void at_eventManager_connectionOpened();
     void at_eventManager_connectionClosed();
     void at_eventManager_actionReceived(const QnAbstractBusinessActionPtr& businessAction);
 

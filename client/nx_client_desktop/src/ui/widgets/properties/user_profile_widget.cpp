@@ -168,8 +168,9 @@ void QnUserProfileWidget::applyChanges()
             context()->instance<QnWorkbenchUserWatcher>()->setUserPassword(m_newPassword);
             QUrl url = commonModule()->currentUrl();
             url.setPassword(m_newPassword);
-            //TODO: #GDM #FIXME #3.1 Restore functionality
-            //QnAppServerConnectionFactory::setUrl(url);
+
+            if (auto connection = QnAppServerConnectionFactory::ec2Connection())
+                connection->updateConnectionUrl(url);
 
             using namespace nx::client::core::helpers;
 

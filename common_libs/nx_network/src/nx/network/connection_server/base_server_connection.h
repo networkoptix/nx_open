@@ -194,16 +194,18 @@ public:
      * Moves socket to the caller.
      * BaseServerConnection instance MUST be deleted just after this call.
      */
-    std::unique_ptr<AbstractStreamSocket> takeSocket()
+    virtual std::unique_ptr<AbstractStreamSocket> takeSocket()
     {
-        auto socket = std::move(m_streamSocket);
-        socket->cancelIOSync(nx::network::aio::etNone);
-        m_streamSocket = nullptr;
-        return socket;
+        m_streamSocket->cancelIOSync(nx::network::aio::etNone);
+        m_receiving = false;
+
+        decltype(m_streamSocket) socketToReturn;
+        socketToReturn.swap(m_streamSocket);
+        return socketToReturn;
     }
 
     /**
-     * @note Can be called inly from connection's AIO thread.
+     * @note Can be called only from connection's AIO thread.
      */
     void setInactivityTimeout(boost::optional<std::chrono::milliseconds> value)
     {

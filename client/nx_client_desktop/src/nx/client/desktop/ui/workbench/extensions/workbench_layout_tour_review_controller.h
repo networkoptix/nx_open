@@ -16,6 +16,7 @@
 class QnWorkbenchLayout;
 class QnWorkbenchItem;
 class QGraphicsWidget;
+class QnPendingOperation;
 
 namespace nx {
 namespace client {
@@ -63,6 +64,8 @@ private:
     /** Calculate items from the review layout. */
     bool fillTourItems(ec2::ApiLayoutTourItemDataList* items);
 
+    void handleItemDataChanged(const QnUuid& id, Qn::ItemDataRole role, const QVariant& data);
+
 // Actions handlers
 private:
     void at_reviewLayoutTourAction_triggered();
@@ -75,6 +78,8 @@ private:
     QnDisconnectHelperPtr m_connections;
     QHash<QnUuid, QnLayoutResourcePtr> m_reviewLayouts;
     QHash<QPoint, QSharedPointer<LayoutTourDropPlaceholder> > m_dropPlaceholders;
+    QSet<QnUuid> m_saveToursQueue;
+    QnPendingOperation* m_saveToursOperation{nullptr};
 };
 
 } // namespace workbench

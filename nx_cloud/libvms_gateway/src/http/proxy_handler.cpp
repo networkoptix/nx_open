@@ -55,8 +55,8 @@ void ProxyHandler::processRequest(
         !m_targetPeerSocket->setSendTimeout(m_settings.tcp().sendTimeout))
     {
         const auto osErrorCode = SystemError::getLastOSErrorCode();
-        NX_LOGX(lm("Failed to set socket options. %1")
-            .arg(SystemError::toString(osErrorCode)), cl_logINFO);
+        NX_INFO(this, lm("Failed to set socket options. %1")
+            .arg(SystemError::toString(osErrorCode)));
         completionHandler(nx_http::StatusCode::internalServerError);
         return;
     }
@@ -77,9 +77,7 @@ void ProxyHandler::sendResponse(
     if (responseMessage)
         *response() = std::move(*responseMessage);
 
-    decltype(m_requestCompletionHandler) handler;
-    handler.swap(m_requestCompletionHandler);
-    handler(std::move(requestResult));
+    nx::utils::swapAndCall(m_requestCompletionHandler, std::move(requestResult));
 }
 
 TargetHost ProxyHandler::cutTargetFromRequest(
@@ -94,9 +92,8 @@ TargetHost ProxyHandler::cutTargetFromRequest(
 
     if (m_targetHost.status != nx_http::StatusCode::ok)
     {
-        NX_LOGX(lm("Failed to find address string in request path %1 received from %2")
-            .arg(request->requestLine.url).arg(connection.socket()->getForeignAddress()),
-            cl_logDEBUG1);
+        NX_DEBUG(this, lm("Failed to find address string in request path %1 received from %2")
+            .arg(request->requestLine.url).arg(connection.socket()->getForeignAddress()));
 
         return m_targetHost;
     }
@@ -120,8 +117,8 @@ TargetHost ProxyHandler::cutTargetFromRequest(
 
     if (m_targetHost.sslMode == conf::SslMode::enabled && !m_settings.http().sslSupport)
     {
-        NX_LOGX(lm("SSL requestd but forbidden by settings %1")
-            .arg(connection.socket()->getForeignAddress()), cl_logDEBUG1);
+        NX_DEBUG(this, lm("SSL requestd but forbidden by settings %1")
+            .arg(connection.socket()->getForeignAddress()));
 
         return {nx_http::StatusCode::forbidden};
     }
@@ -220,9 +217,8 @@ void ProxyHandler::onConnected(
 
     if (errorCode != SystemError::noError)
     {
-        NX_LOGX(lm("Failed to establish connection to %1 (path %2) with SSL=%3")
-            .args(targetAddress, m_request.requestLine.url, isSsl(m_targetPeerSocket)),
-            cl_logDEBUG1);
+        NX_DEBUG(this, lm("Failed to establish connection to %1 (path %2) with SSL=%3")
+            .args(targetAddress, m_request.requestLine.url, isSsl(m_targetPeerSocket)));
 
         auto handler = std::move(m_requestCompletionHandler);
         return handler(
@@ -231,12 +227,13 @@ void ProxyHandler::onConnected(
                 : nx_http::StatusCode::serviceUnavailable);
     }
 
-    NX_LOGX(lm("Successfully established connection to %1(%2) (path %3) from %4 with SSL=%5")
+    NX_VERBOSE(this, lm("Successfully established connection to %1(%2) (path %3) from %4 with SSL=%5")
         .args(targetAddress, m_targetPeerSocket->getForeignAddress(), m_request.requestLine.url,
-            m_targetPeerSocket->getLocalAddress(), isSsl(m_targetPeerSocket)), cl_logDEBUG2);
+            m_targetPeerSocket->getLocalAddress(), isSsl(m_targetPeerSocket)));
 
-    m_requestProxyWorker = std::make_unique<RequestProxyWorker>(
-        m_targetHost,
+    m_targetPeerSocket->cancelIOSync(nx::network::aio::etNone);
+    m_requestProxyWorker = std::make_unique<ProxyWorker>(
+        m_targetHost.target.toString().toUtf8(),
         std::move(m_request),
         this,
         std::move(m_targetPeerSocket));

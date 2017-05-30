@@ -121,6 +121,35 @@ bool TestHttpServer::registerFileProvider(
         mimeType);
 }
 
+bool TestHttpServer::registerContentProvider(
+    const QString& httpPath,
+    ContentProviderFactoryFunction contentProviderFactory)
+{
+    auto contentProviderFactoryShared = 
+        std::make_shared<ContentProviderFactoryFunction>(std::move(contentProviderFactory));
+
+    return registerRequestProcessorFunc(
+        httpPath,
+        [contentProviderFactoryShared](
+            nx_http::HttpServerConnection* const /*connection*/,
+            nx::utils::stree::ResourceContainer /*authInfo*/,
+            nx_http::Request /*request*/,
+            nx_http::Response* const /*response*/,
+            nx_http::RequestProcessedHandler completionHandler)
+        {
+            auto msgBody = (*contentProviderFactoryShared)();
+            if (msgBody)
+            {
+                completionHandler(
+                    nx_http::RequestResult(nx_http::StatusCode::ok, std::move(msgBody)));
+            }
+            else
+            {
+                completionHandler(nx_http::StatusCode::internalServerError);
+            }
+        });
+}
+
 bool TestHttpServer::registerRedirectHandler(
     const QString& resourcePath,
     const QUrl& location)

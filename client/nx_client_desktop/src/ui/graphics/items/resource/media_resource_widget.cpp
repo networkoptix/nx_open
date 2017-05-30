@@ -428,7 +428,7 @@ QnMediaResourceWidget::QnMediaResourceWidget(QnWorkbenchContext* context, QnWork
             });
     }
 
-    connect(resource()->toResource(), &QnResource::resourceChanged, this,
+    connect(base_type::resource(), &QnResource::resourceChanged, this,
         &QnMediaResourceWidget::updateButtonsVisibility); //TODO: #GDM #Common get rid of resourceChanged
 
     connect(this, &QnResourceWidget::zoomRectChanged, this,
@@ -744,8 +744,11 @@ void QnMediaResourceWidget::setTextOverlayParameters(const QnUuid& id, bool visi
 
 void QnMediaResourceWidget::setupHud()
 {
+    static const int kScrollLineHeight = 8;
+
     m_triggersContainer = new QnScrollableItemsWidget(m_hudOverlay->right());
     m_triggersContainer->setAlignment(Qt::AlignRight | Qt::AlignBottom);
+    m_triggersContainer->setLineHeight(kScrollLineHeight);
 
     qreal right = 0.0;
     m_hudOverlay->content()->getContentsMargins(nullptr, nullptr, &right, nullptr);
@@ -760,9 +763,11 @@ void QnMediaResourceWidget::setupHud()
 
     m_textOverlayWidget = new QnScrollableTextItemsWidget(m_compositeOverlay);
     m_textOverlayWidget->setAlignment(Qt::AlignRight | Qt::AlignBottom);
+    m_textOverlayWidget->setLineHeight(kScrollLineHeight);
 
     m_bookmarksContainer = new QnScrollableTextItemsWidget(m_compositeOverlay);
     m_bookmarksContainer->setAlignment(Qt::AlignRight | Qt::AlignBottom);
+    m_bookmarksContainer->setLineHeight(kScrollLineHeight);
     m_bookmarksContainer->hide();
 
     m_compositeOverlay->addWidget(m_textOverlayWidget);
@@ -1241,7 +1246,7 @@ Qn::RenderStatus QnMediaResourceWidget::paintChannelBackground(QPainter *painter
     qreal opacity = effectiveOpacity();
     bool opaque = qFuzzyCompare(opacity, 1.0);
     // always use blending for images --gdm
-    if (!opaque || (resource()->toResource()->flags() & Qn::still_image))
+    if (!opaque || (base_type::resource()->flags() & Qn::still_image))
     {
         glEnable(GL_BLEND);
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -1664,16 +1669,16 @@ int QnMediaResourceWidget::calculateButtonsVisibility() const
     if (qnRuntime->isDevMode())
         result |= Qn::DbgScreenshotButton;
 
-    if (hasVideo && !resource()->toResource()->hasFlags(Qn::still_image))
+    if (hasVideo && !base_type::resource()->hasFlags(Qn::still_image))
         result |= Qn::ScreenshotButton;
 
     bool rgbImage = false;
-    QString url = resource()->toResource()->getUrl().toLower();
+    QString url = base_type::resource()->getUrl().toLower();
 
     // TODO: #rvasilenko totally evil. Button availability should be based on actual
     // colorspace value, better via some function in enhancement implementation,
     // and not on file extension checks!
-    if (resource()->toResource()->hasFlags(Qn::still_image)
+    if (base_type::resource()->hasFlags(Qn::still_image)
         && !url.endsWith(lit(".jpg"))
         && !url.endsWith(lit(".jpeg"))
         )
@@ -1685,9 +1690,7 @@ int QnMediaResourceWidget::calculateButtonsVisibility() const
     if (!zoomRect().isNull())
         return result;
 
-    if (hasVideo
-        && resource()->toResource()->hasFlags(Qn::motion)
-        && !tourIsRunning(context()))
+    if (hasVideo && base_type::resource()->hasFlags(Qn::motion))
     {
         result |= Qn::MotionSearchButton;
     }
@@ -1718,7 +1721,7 @@ int QnMediaResourceWidget::calculateButtonsVisibility() const
         result &= ~Qn::PtzButton;
     }
 
-    if (hasVideo && resource()->toResource()->hasFlags(Qn::io_module))
+    if (hasVideo && base_type::resource()->hasFlags(Qn::io_module))
         result |= Qn::IoModuleButton;
 
     if (hasVideo && !qnSettings->lightMode().testFlag(Qn::LightModeNoZoomWindows))

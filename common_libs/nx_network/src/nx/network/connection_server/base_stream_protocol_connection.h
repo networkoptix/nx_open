@@ -5,6 +5,9 @@
 
 #include <boost/optional.hpp>
 
+#include <nx/network/buffered_stream_socket.h>
+#include <nx/utils/qnbytearrayref.h>
+
 #include "base_protocol_message_types.h"
 #include "base_server_connection.h"
 
@@ -16,7 +19,7 @@ namespace server {
  * Connection of stream-orientied protocol of type request/respose.
  * It is not tied to underlying transport (tcp, udp, etc...).
  *
- * CustomConnectionType MUST provide following methods:
+ * CustomConnectionType MUST implement following methods:
  * <pre><code>
  *     // Called for every received message.
  *     void processMessage(Message request);
@@ -24,7 +27,7 @@ namespace server {
  *
  * NOTE: SerializerType::serialize is allowed to reallocate source buffer if needed, 
  *   but it is not recommended due to performance considerations!
- * NOTE: It is allowed to free instance within event handler
+ * NOTE: It is allowed to free instance within event handler.
  */
 template<
     class CustomConnectionType,
@@ -42,12 +45,6 @@ template<
     using base_type = BaseServerConnection<CustomConnectionType>;
 
 public:
-    /**
-     * Type of messages used by this connection class. 
-     * Request/response/indication is sub-class of message, so no difference at this level.
-     */
-    using message_type = MessageType;
-
     BaseStreamProtocolConnection(
         StreamConnectionHolder<CustomConnectionType>* connectionManager,
         std::unique_ptr<AbstractStreamSocket> streamSocket)
@@ -58,29 +55,43 @@ public:
         static const size_t DEFAULT_SEND_BUFFER_SIZE = 4 * 1024;
         m_writeBuffer.reserve(DEFAULT_SEND_BUFFER_SIZE);
 
-        m_parser.setMessage(&m_request);
+        m_parser.setMessage(&m_message);
     }
 
     virtual ~BaseStreamProtocolConnection() = default;
 
+    virtual std::unique_ptr<AbstractStreamSocket> takeSocket() override
+    {
+        auto streamSocket = base_type::takeSocket();
+        if (!m_dataToParse.isEmpty())
+        {
+            auto bufferedSocket =
+                std::make_unique<nx::network::BufferedStreamSocket>(std::move(streamSocket));
+            bufferedSocket->injectRecvData(m_dataToParse);
+            streamSocket = std::move(bufferedSocket);
+        }
+        return streamSocket;
+    }
+
     void bytesReceived(const nx::Buffer& buf)
     {
-        size_t pos = 0;
-        if (buf.isEmpty())
+        m_dataToParse = buf;
+
+        if (m_dataToParse.isEmpty())
         {
             // Reporting eof of file to the parser.
-            invokeMessageParser(buf, &pos);
-            return;
+            invokeMessageParser();
         }
-
-        for (; pos < (size_t)buf.size(); )
+        else
         {
-            if (!invokeMessageParser(buf, &pos))
+            while (!m_dataToParse.isEmpty())
             {
-                // TODO: #ak Ignore all following data and close connection?
-                return;
+                if (!invokeMessageParser())
+                    return; //< TODO: #ak Ignore all following data and close connection?
             }
         }
+
+        m_dataToParse.clear();
     }
 
     void readyToSendData()
@@ -123,9 +134,9 @@ public:
         // On completion readyToSendData will be called.
     }
 
-    // TODO #ak: Add message body streaming.
-
-    /** Initiates asynchoronous message send. */
+    /**
+     * Initiates asynchoronous message send.
+     */
     void sendMessage(
         MessageType msg,
         std::function<void(SystemError::ErrorCode)> handler)
@@ -143,9 +154,9 @@ public:
                 };
         }
 
-        auto newTask = std::make_shared<SendTask>(
+        auto newTask = std::make_unique<SendTask>(
             std::move(msg),
-            std::move(handler)); //< TODO: #ak Get rid of shared_ptr here when generic lambdas are available.
+            std::move(handler));
         addNewTaskToQueue(std::move(newTask));
     }
 
@@ -160,7 +171,7 @@ public:
         nx::Buffer data,
         std::function<void(SystemError::ErrorCode)> handler)
     {
-        auto newTask = std::make_shared<SendTask>(
+        auto newTask = std::make_unique<SendTask>(
             std::move(data),
             std::move(handler));
         addNewTaskToQueue(std::move(newTask));
@@ -171,22 +182,23 @@ public:
         m_sendCompletionHandler = std::move(handler);
     }
 
+protected:
+    virtual void processMessage(MessageType) = 0;
+    virtual void processSomeMessageBody(nx::Buffer /*messageBodyBuffer*/) {}
+    virtual void processMessageEnd() {}
+
 private:
     struct SendTask
     {
     public:
-        SendTask():
-            asyncSendIssued(false)
-        {
-        }
+        SendTask() = default;
 
         SendTask(
             MessageType _msg,
             std::function<void(SystemError::ErrorCode)> _handler)
             :
             msg(std::move(_msg)),
-            handler(std::move(_handler)),
-            asyncSendIssued(false)
+            handler(std::move(_handler))
         {
         }
 
@@ -195,74 +207,70 @@ private:
             std::function<void(SystemError::ErrorCode)> _handler)
             :
             buf(std::move(_buf)),
-            handler(std::move(_handler)),
-            asyncSendIssued(false)
+            handler(std::move(_handler))
         {
         }
 
-        SendTask(SendTask&& right):
-            msg(std::move(right.msg)),
-            buf(std::move(right.buf)),
-            handler(std::move(right.handler)),
-            asyncSendIssued(right.asyncSendIssued)
-        {
-        }
+        SendTask(SendTask&& /*right*/) = default;
+
+        SendTask(const SendTask&) = delete;
+        SendTask& operator=(const SendTask&) = delete;
 
         boost::optional<MessageType> msg;
         boost::optional<nx::Buffer> buf;
-        std::function<void( SystemError::ErrorCode )> handler;
-        bool asyncSendIssued;
-
-    private:
-        SendTask( const SendTask& );
-        SendTask& operator=( const SendTask& );
+        std::function<void(SystemError::ErrorCode)> handler;
+        bool asyncSendIssued = false;
     };
 
-    MessageType m_request;
+    MessageType m_message;
     ParserType m_parser;
     SerializerType m_serializer;
-    SerializerState::Type m_serializerState;
+    SerializerState m_serializerState;
     nx::Buffer m_writeBuffer;
     std::function<void(SystemError::ErrorCode)> m_sendCompletionHandler;
     std::deque<SendTask> m_sendQueue;
     nx::utils::ObjectDestructionFlag m_connectionFreedFlag;
-
+    bool m_messageReported = false;
+    QnByteArrayConstRef m_dataToParse;
 
     /**
      * @param buf Source buffer.
      * @param pos Position inside source buffer. Moved by number of bytes read.
+     * @return false in case of parsing is stopped and cannot be resumed.
+     *   This method should not be called anymore since parser can be in undefined state.
      */
-    bool invokeMessageParser(const nx::Buffer& buf, size_t* const pos)
+    bool invokeMessageParser()
     {
-        //parsing message
         size_t bytesProcessed = 0;
-        switch (m_parser.parse(*pos > 0 ? buf.mid((int)*pos) : buf, &bytesProcessed))
+        const auto parserState = m_parser.parse(m_dataToParse, &bytesProcessed);
+        m_dataToParse.pop_front(bytesProcessed);
+        switch (parserState)
         {
             case ParserState::init:
-            case ParserState::inProgress:
-                *pos += bytesProcessed;
-                NX_ASSERT(*pos == (size_t)buf.size());
-                return true;
+            case ParserState::readingMessage:
+                NX_ASSERT(m_dataToParse.isEmpty());
+                break;
+
+            case ParserState::readingBody:
+            {
+                if (!reportMessageIfNeeded())
+                    return false;
+                if (!reportMsgBodyIfHaveSome())
+                    return false;
+                break;
+            }
 
             case ParserState::done:
             {
-                // Processing request.
-                // NOTE: Interleaving is not supported yet.
+                if (!reportMessageIfNeeded())
+                    return false;
+                if (!reportMsgBodyIfHaveSome())
+                    return false;
+                if (!reportMessageEnd())
+                    return false;
 
-                {
-                    nx::utils::ObjectDestructionFlag::Watcher watcher(
-                        &m_connectionFreedFlag);
-                    static_cast<CustomConnectionType*>(this)->processMessage(
-                        std::move(m_request));
-                    if (watcher.objectDestroyed())
-                        return false; //< Connection has been removed by handler.
-                }
-
-                m_parser.reset();
-                m_request.clear();
-                m_parser.setMessage(&m_request);
-                *pos += bytesProcessed;
-                return true;
+                resetParserState();
+                break;
             }
 
             case ParserState::failed:
@@ -270,8 +278,51 @@ private:
                 return false;
         }
 
-        NX_ASSERT(false);
-        return false;
+        return true;
+    }
+
+    bool reportMessageIfNeeded()
+    {
+        if (m_messageReported)
+            return true;
+
+        nx::utils::ObjectDestructionFlag::Watcher watcher(&m_connectionFreedFlag);
+        // TODO: #ak m_message should not be used after moving.
+        processMessage(std::move(m_message));
+        if (watcher.objectDestroyed())
+            return false; //< Connection has been removed by handler.
+
+        m_messageReported = true;
+        return true;
+    }
+
+    bool reportMsgBodyIfHaveSome()
+    {
+        auto msgBodyBuffer = m_parser.fetchMessageBody();
+        if (msgBodyBuffer.isEmpty())
+            return true;
+
+        nx::utils::ObjectDestructionFlag::Watcher watcher(&m_connectionFreedFlag);
+        processSomeMessageBody(std::move(msgBodyBuffer));
+        if (watcher.objectDestroyed())
+            return false; //< Connection has been removed by handler.
+
+        return true;
+    }
+
+    bool reportMessageEnd()
+    {
+        nx::utils::ObjectDestructionFlag::Watcher watcher(&m_connectionFreedFlag);
+        processMessageEnd();
+        return !watcher.objectDestroyed();
+    }
+
+    void resetParserState()
+    {
+        m_parser.reset();
+        m_message.clear();
+        m_parser.setMessage(&m_message);
+        m_messageReported = false;
     }
 
     void sendMessageInternal(const MessageType& msg)
@@ -282,10 +333,10 @@ private:
         readyToSendData();
     }
 
-    void addNewTaskToQueue(std::shared_ptr<SendTask> newTask)
+    void addNewTaskToQueue(std::unique_ptr<SendTask> newTask)
     {
         this->dispatch(
-            [this, newTask]()
+            [this, newTask = std::move(newTask)]()
             {
                 m_sendQueue.push_back(std::move(*newTask));
                 if (m_sendQueue.size() > 1)
@@ -375,24 +426,51 @@ public:
     }
 
     /**
-     * handler will receive all incoming messages.
+     * @param handler Receives all incoming messages.
      * NOTE: It is required to call BaseStreamProtocolConnection::startReadingConnection
      *   to start receiving messages.
      */
     template<class T>
     void setMessageHandler(T&& handler)
     {
-        m_handler = std::forward<T>(handler);
+        m_messageHandler = std::forward<T>(handler);
     }
 
-    void processMessage(MessageType&& msg)
+    template<class T>
+    void setOnSomeMessageBodyAvailable(T&& handler)
     {
-        if (m_handler)
-            m_handler(std::move(msg));
+        m_messageBodyHandler = std::forward<T>(handler);
+    }
+
+    template<class T>
+    void setOnMessageEnd(T&& handler)
+    {
+        m_messageEndHandler = std::forward<T>(handler);
+    }
+
+protected:
+    virtual void processMessage(MessageType msg) override
+    {
+        if (m_messageHandler)
+            m_messageHandler(std::move(msg));
+    }
+
+    virtual void processSomeMessageBody(nx::Buffer messageBodyBuffer) override
+    {
+        if (m_messageBodyHandler)
+            m_messageBodyHandler(std::move(messageBodyBuffer));
+    }
+
+    virtual void processMessageEnd() override
+    {
+        if (m_messageEndHandler)
+            m_messageEndHandler();
     }
 
 private:
-    std::function<void(MessageType&&)> m_handler;
+    std::function<void(MessageType)> m_messageHandler;
+    std::function<void(nx::Buffer)> m_messageBodyHandler;
+    std::function<void()> m_messageEndHandler;
 };
 
 } // namespace server

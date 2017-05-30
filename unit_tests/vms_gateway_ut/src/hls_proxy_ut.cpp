@@ -1,7 +1,7 @@
 #include "test_setup.h"
 
 #include <nx/network/hls/hls_types.h>
-#include <nx/network/http/httpclient.h>
+#include <nx/network/http/http_client.h>
 #include <nx/network/http/http_content_type.h>
 #include <nx/network/http/test_http_server.h>
 #include <nx/network/m3u/m3u_playlist.h>
@@ -24,7 +24,7 @@ const char* const kHlsChunkContentType = "video/mp2t";
 } // namespace
 
 class HlsProxy:
-    public VmsGatewayFunctionalTest
+    public BasicComponentTest
 {
 public:
     HlsProxy()

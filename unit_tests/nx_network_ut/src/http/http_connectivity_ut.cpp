@@ -9,7 +9,7 @@
 #include <nx/network/buffered_stream_socket.h>
 #include <nx/network/http/buffer_source.h>
 #include <nx/network/http/empty_message_body_source.h>
-#include <nx/network/http/httpclient.h>
+#include <nx/network/http/http_client.h>
 #include <nx/network/http/test_http_server.h>
 #include <nx/utils/std/thread.h>
 

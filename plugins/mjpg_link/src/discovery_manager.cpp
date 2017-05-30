@@ -15,7 +15,7 @@
 #include <QtCore/QCryptographicHash>
 #include <QtCore/QUrl>
 
-#include <nx/network/http/httpclient.h>
+#include <nx/network/http/http_client.h>
 #include <nx/network/http/multipart_content_parser.h>
 
 #include "camera_manager.h"

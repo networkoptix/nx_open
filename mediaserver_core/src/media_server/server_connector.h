@@ -28,7 +28,7 @@ class QnServerConnector:
 public:
     explicit QnServerConnector(QnCommonModule* commonModule);
 
-    void addConnection(const nx::vms::discovery::Manager::ModuleData& module);
+    void addConnection(const nx::vms::discovery::ModuleEndpoint& module);
     void removeConnection(const QnUuid& id);
 
     void start();
@@ -36,8 +36,8 @@ public:
     void restart();
 
 private slots:
-    void at_moduleFound(nx::vms::discovery::Manager::ModuleData module);
-    void at_moduleChanged(nx::vms::discovery::Manager::ModuleData module);
+    void at_moduleFound(nx::vms::discovery::ModuleEndpoint module);
+    void at_moduleChanged(nx::vms::discovery::ModuleEndpoint module);
     void at_moduleLost(QnUuid id);
 
 private:

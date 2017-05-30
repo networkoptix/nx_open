@@ -71,7 +71,7 @@ private:
     void at_deleteButton_clicked();
     void at_connectionsComboBox_currentIndexChanged(const QModelIndex &index);
 
-    void at_moduleChanged(nx::vms::discovery::Manager::ModuleData data);
+    void at_moduleChanged(nx::vms::discovery::ModuleEndpoint data);
     void at_moduleLost(QnUuid id);
 
     QUrl currentUrl() const;

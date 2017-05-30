@@ -2,7 +2,7 @@
 
 #include <nx/network/http/server/abstract_http_request_handler.h>
 
-#include "request_proxy_worker.h"
+#include "proxy_worker.h"
 #include "settings.h"
 
 namespace nx {
@@ -42,7 +42,7 @@ private:
     std::unique_ptr<AbstractStreamSocket> m_targetPeerSocket;
     nx_http::Request m_request;
     nx_http::RequestProcessedHandler m_requestCompletionHandler;
-    std::unique_ptr<RequestProxyWorker> m_requestProxyWorker;
+    std::unique_ptr<ProxyWorker> m_requestProxyWorker;
     TargetHost m_targetHost;
 
     TargetHost cutTargetFromRequest(

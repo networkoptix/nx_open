@@ -294,6 +294,8 @@ private:
     bool m_pausedOverride;
     bool m_preciseNextSeek;
 
+    bool m_ignoreScrollBarDblClick = false;
+
     /** This flag says that video was paused automatically due to user inactivity.
      *  It's used to make it possible to unpause video only in the user inactivity state handler.
      */
