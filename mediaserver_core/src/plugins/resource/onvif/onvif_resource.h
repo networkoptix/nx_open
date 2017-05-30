@@ -16,6 +16,7 @@
 #include <nx/utils/thread/wait_condition.h>
 #include <QtXml/QXmlDefaultHandler>
 #include <QElapsedTimer>
+#include <QtCore/QTimeZone>
 
 #include <core/resource/security_cam_resource.h>
 #include <core/resource/camera_resource.h>
