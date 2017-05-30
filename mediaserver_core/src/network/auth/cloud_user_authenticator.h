@@ -54,7 +54,6 @@ public:
 
     void clear();
 
-
 private:
     struct CloudAuthenticationData
     {

@@ -39,17 +39,16 @@ CloudUserInfoPoolSupplier::~CloudUserInfoPoolSupplier()
 
 void CloudUserInfoPoolSupplier::connectToResourcePool()
 {
-    connect(
+    Qn::directConnect(
         resourcePool(),
         &QnResourcePool::resourceAdded,
         this,
-        &CloudUserInfoPoolSupplier::onNewResource, Qt::QueuedConnection);
-    connect(
+        &CloudUserInfoPoolSupplier::onNewResource);
+    Qn::directConnect(
         resourcePool(),
         &QnResourcePool::resourceRemoved,
         this,
-        &CloudUserInfoPoolSupplier::onRemoveResource,
-        Qt::QueuedConnection);
+        &CloudUserInfoPoolSupplier::onRemoveResource);
 }
 
 void CloudUserInfoPoolSupplier::onNewResource(const QnResourcePtr& resource)
