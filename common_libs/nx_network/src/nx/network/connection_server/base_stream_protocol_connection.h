@@ -211,7 +211,7 @@ private:
         {
         }
 
-        SendTask(SendTask&& right) = default;
+        SendTask(SendTask&& /*right*/) = default;
 
         SendTask(const SendTask&) = delete;
         SendTask& operator=(const SendTask&) = delete;

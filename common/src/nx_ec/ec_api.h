@@ -50,6 +50,7 @@ class QnRestProcessorPool;
 class QnHttpConnectionListener;
 class QnCommonModule;
 struct QnModuleInformation;
+namespace nx { namespace vms { namespace discovery { class Manager; } } }
 
 //!Contains API classes for the new Server
 /*!
@@ -500,39 +501,13 @@ namespace ec2
             return impl::doSyncCall<impl::GetDiscoveryDataHandler>(std::bind(fn, this, std::placeholders::_1), discoveryDataList);
         }
 
-        template<class TargetType, class HandlerType> int sendDiscoveredServer(
-            QnTransactionMessageBus* messageBus,
-            const ApiDiscoveredServerData &discoveredServer,
-            TargetType *target,
-            HandlerType handler)
-        {
-            return sendDiscoveredServer(messageBus, discoveredServer, std::static_pointer_cast<impl::SimpleHandler>(
-                std::make_shared<impl::CustomSimpleHandler<TargetType, HandlerType>>(target, handler)));
-        }
-
-        template<class TargetType, class HandlerType> int sendDiscoveredServersList(
-            QnTransactionMessageBus* messageBus,
-            const ApiDiscoveredServerDataList &discoveredServersList,
-            TargetType *target,
-            HandlerType handler)
-        {
-            return sendDiscoveredServersList(messageBus, discoveredServersList, std::static_pointer_cast<impl::SimpleHandler>(
-                 std::make_shared<impl::CustomSimpleHandler<TargetType, HandlerType>>(target, handler)));
-        }
+        virtual void monitorServerDiscovery() = 0;
 
     protected:
         virtual int discoverPeer(const QnUuid &id, const QUrl &url, impl::SimpleHandlerPtr handler) = 0;
         virtual int addDiscoveryInformation(const QnUuid &id, const QUrl &url, bool ignore, impl::SimpleHandlerPtr handler) = 0;
         virtual int removeDiscoveryInformation(const QnUuid &id, const QUrl &url, bool ignore, impl::SimpleHandlerPtr handler) = 0;
         virtual int getDiscoveryData(impl::GetDiscoveryDataHandlerPtr handler) = 0;
-        virtual int sendDiscoveredServer(
-            QnTransactionMessageBus* messageBus,
-            const ApiDiscoveredServerData &discoveredServer,
-            impl::SimpleHandlerPtr handler) = 0;
-        virtual int sendDiscoveredServersList(
-            QnTransactionMessageBus* messageBus,
-            const ApiDiscoveredServerDataList &discoveredServersList,
-            impl::SimpleHandlerPtr handler) = 0;
     };
     typedef std::shared_ptr<AbstractDiscoveryManager> AbstractDiscoveryManagerPtr;
 

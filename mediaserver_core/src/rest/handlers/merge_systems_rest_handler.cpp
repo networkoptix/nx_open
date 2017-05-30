@@ -349,7 +349,7 @@ int QnMergeSystemsRestHandler::execute(
             &ec2::DummyHandler::onRequestDone);
     }
 
-    nx::vms::discovery::Manager::ModuleData module(
+    nx::vms::discovery::ModuleEndpoint module(
         remoteModuleInformation, {url.host(), (uint16_t) remoteModuleInformation.port});
     owner->commonModule()->moduleDiscoveryManager()->checkEndpoint(module.endpoint, module.id);
 
