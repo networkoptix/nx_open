@@ -70,6 +70,9 @@
                     </Component>                    
                     <Component Id="ServerHttpPlugin">
                         <File Id="mjpg_link.dll" Name="mjpg_link.dll" Source="$(var.PluginsDir)\mjpg_link.dll" DiskId="10" />
+                    </Component> 
+                    <Component Id="ServerMulticastPlugin">
+                        <File Id="generic_multicast_plugin.dll" Name="generic_multicast_plugin.dll" Source="$(var.PluginsDir)\generic_multicast_plugin.dll" DiskId="10" />
                     </Component>                                              
                 </Directory>
 
@@ -224,6 +227,7 @@
             <ComponentGroupRef Id="ServerFFmpegLibraries"/>
             <ComponentRef Id="ServerRtspPlugin"/>
             <ComponentRef Id="ServerHttpPlugin"/>
+            <ComponentRef Id="ServerMulticastPlugin"/>
             <ComponentGroupRef Id="ServerQTLibraries" />
             <ComponentGroupRef Id="ServerQuazip" />
             <ComponentGroupRef Id="ServerOpenSSL"/>
