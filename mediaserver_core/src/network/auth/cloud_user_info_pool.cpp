@@ -4,7 +4,9 @@
 #include <core/resource_management/resource_pool.h>
 #include <common/common_module.h>
 #include <nx/utils/log/log.h>
+#include <nx/network/http/auth_tools.h>
 #include "cloud_user_info_pool.h"
+#include "cdb_nonce_fetcher.h"
 
 
 static const QString kCloudAuthInfoKey = lit("CloudAuthInfo");
@@ -61,16 +63,15 @@ void CloudUserInfoPoolSupplier::onNewResource(const QnResourcePtr& resource)
             if (key != kCloudAuthInfoKey)
                 return;
 
-            NX_LOG(lit("[CloudUserInfo] CloudAuthInfo changed for user %1. New value: %2")
+            NX_LOG(lit("[CloudUserInfo] Changed for user %1. New value: %2")
                 .arg(resource->getName())
                 .arg(resource->getProperty(key)), cl_logDEBUG2);
 
             const auto propValue = resource->getProperty(key);
             if (propValue.isEmpty())
             {
-                NX_LOG(lit("[CloudUserInfo] User %1. CloudAuthInfo removed.")
+                NX_LOG(lit("[CloudUserInfo] User %1. Empty value. Ignoring.")
                     .arg(resource->getName()), cl_logDEBUG1);
-                m_pool->userInfoRemoved(resource->getName().toUtf8().toLower());
                 return;
             }
 
@@ -102,6 +103,8 @@ void CloudUserInfoPoolSupplier::reportInfoChanged(
 
 void CloudUserInfoPoolSupplier::onRemoveResource(const QnResourcePtr& resource)
 {
+    NX_LOG(lit("[CloudUserInfo] User %1 removed. Clearing related data.")
+        .arg(resource->getName()), cl_logDEBUG1);
     m_pool->userInfoRemoved(resource->getName().toUtf8().toLower());
 }
 
@@ -112,9 +115,54 @@ CloudUserInfoPool::CloudUserInfoPool(std::unique_ptr<AbstractCloudUserInfoPoolSu
     m_supplier->setPool(this);
 }
 
-bool CloudUserInfoPool::authenticate(const nx_http::header::Authorization& authHeader) const
+bool CloudUserInfoPool::authenticate(
+    const nx_http::Method::ValueType& method,
+    const nx_http::header::Authorization& authHeader) const
 {
+    const QByteArray userName = authHeader.userid().toLower();
+    const auto nonce = authHeader.digest->params["nonce"];
+    nx::Buffer cloudNonce;
+    nx::Buffer nonceTrailer;
+
+    if (!CdbNonceFetcher::parseCloudNonce(nonce, &cloudNonce, &nonceTrailer))
+    {
+        NX_LOG(lit("[CloudUserInfo] parseCloudNonce() failed. User: %1, nonce: %2")
+            .arg(QString::fromUtf8(userName))
+            .arg(QString(nonce.toHex())), cl_logERROR);
+        return false;
+    }
+
+    const auto partialResponse = partialResponseByUserNonce(userName, cloudNonce);
+    if (!partialResponse)
+        return false;
+
+    const auto ha2 = nx_http::calcHa2(method, authHeader.digest->params["uri"]);
+    const auto calculatedResponse = nx_http::calcResponseFromIntermediate(
+        *partialResponse,
+        cloudNonce.size(),
+        nonceTrailer,
+        ha2);
+
+    if (authHeader.digest->params["response"] == calculatedResponse)
+        return true;
+
     return false;
+}
+
+boost::optional<nx::Buffer> CloudUserInfoPool::partialResponseByUserNonce(
+    const nx::Buffer& userName,
+    const nx::Buffer& cloudNonce) const
+{
+    QnMutexLocker lock(&m_mutex);
+    auto nameNonceIt = m_userNonceToResponse.find({userName, cloudNonce});
+    if (nameNonceIt == m_userNonceToResponse.cend())
+    {
+        NX_LOG(lit("[CloudUserInfo] Failed to find (user, cloudNonce) pair. User: %1, cloudNonce: %2")
+            .arg(QString::fromUtf8(userName))
+            .arg(QString(cloudNonce.toHex())), cl_logERROR);
+        return boost::none;
+    }
+    return nameNonceIt->second;
 }
 
 boost::optional<nx::Buffer> CloudUserInfoPool::newestMostCommonNonce() const

@@ -68,6 +68,12 @@ protected:
 
     void thenOnlyNewestNonceShouldStayInThePool()
     {
+        auto& vasyaNonceSet = userInfoPool.nameToNonces().find("vasya")->second;
+        ASSERT_EQ(vasyaNonceSet.find("nonce1"), vasyaNonceSet.cend());
+        ASSERT_EQ(vasyaNonceSet.find("nonce2"), vasyaNonceSet.cend());
+
+        auto& petyaNonceSet = userInfoPool.nameToNonces().find("petya")->second;
+        ASSERT_EQ(vasyaNonceSet.find("nonce2"), vasyaNonceSet.cend());
     }
 
     TestPoolSupplier* supplier;
@@ -114,17 +120,11 @@ TEST_F(CloudUserInfoPool, commonNonce_EveryoneHaveNewestNonce)
     given2UsersInfos();
     when3rdWithNonce3HasBeenAdded();
     whenVasyaNonceUpdatedToTheNewest();
+    thenOnlyNewestNonceShouldStayInThePool();
 
     auto nonce = userInfoPool.newestMostCommonNonce();
     ASSERT_TRUE(nonce);
     ASSERT_EQ(*nonce, nx::Buffer("nonce3"));
-
-    auto& vasyaNonceSet = userInfoPool.nameToNonces().find("vasya")->second;
-    ASSERT_EQ(vasyaNonceSet.find("nonce1"), vasyaNonceSet.cend());
-    ASSERT_EQ(vasyaNonceSet.find("nonce2"), vasyaNonceSet.cend());
-
-    auto& petyaNonceSet = userInfoPool.nameToNonces().find("petya")->second;
-    ASSERT_EQ(vasyaNonceSet.find("nonce2"), vasyaNonceSet.cend());
 }
 
 }

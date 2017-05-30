@@ -125,7 +125,9 @@ class CloudUserInfoPool : public AbstractCloudUserInfoPool
 public:
     CloudUserInfoPool(std::unique_ptr<AbstractCloudUserInfoPoolSupplier> supplier);
 
-    bool authenticate(const nx_http::header::Authorization& authHeader) const;
+    bool authenticate(
+        const nx_http::Method::ValueType& method,
+        const nx_http::header::Authorization& authHeader) const;
     boost::optional<nx::Buffer> newestMostCommonNonce() const;
 
 private:
@@ -147,6 +149,9 @@ private:
     void updateTsToNonceCount(uint64_t timestamp, const nx::Buffer& cloudNonce);
     void cleanupOldInfo(uint64_t timestamp);
     void cleanupByNonce(const nx::Buffer& cloudNonce);
+    boost::optional<nx::Buffer> partialResponseByUserNonce(
+        const nx::Buffer& userName,
+        const nx::Buffer& cloudNonce) const;
 
 protected:
     std::unique_ptr<AbstractCloudUserInfoPoolSupplier> m_supplier;
