@@ -29,30 +29,28 @@ QString statusString(bool success)
     return success ? lit("OK") : lit("FAIL");
 }
 
-QList<QnUuid> takeClosestIdPeers(QList<QnUuid>& peers, int count, const QnUuid& selfId)
+// Take count elements from a sorted circular list of peers.
+QList<QnUuid> takeClosestPeerIds(QList<QnUuid>& peerIds, int count, const QnUuid& referenceId)
 {
     QList<QnUuid> result;
 
-    const int size = peers.size();
+    const int size = peerIds.size();
 
     if (size <= count)
     {
-        result = peers;
-        peers.clear();
+        result.swap(peerIds);
         return result;
     }
 
-    // Take count elements from the sorted circular list.
-
     const int currentIndex = std::distance(
-        peers.begin(), std::lower_bound(peers.begin(), peers.end(), selfId));
+        peerIds.begin(), std::lower_bound(peerIds.begin(), peerIds.end(), referenceId));
 
     int index = (currentIndex - (count + 1) / 2 + size) % size;
     for (int i = 0; i < count; ++i)
     {
-        result.append(peers.takeAt(index));
+        result.append(peerIds.takeAt(index));
 
-        if (index == peers.size())
+        if (index == peerIds.size())
             index = 0;
     }
 
@@ -827,7 +825,7 @@ QList<QnUuid> Worker::selectPeersForOperation(int count, QList<QnUuid> peers) co
 
     // Take (3) highest-score peers.
     std::sort(highestScorePeers.begin(), highestScorePeers.end());
-    result = takeClosestIdPeers(highestScorePeers, highestScorePeersNeeded, selfId);
+    result = takeClosestPeerIds(highestScorePeers, highestScorePeersNeeded, selfId);
 
     if (result.size() == count)
         return result;
@@ -838,7 +836,7 @@ QList<QnUuid> Worker::selectPeersForOperation(int count, QList<QnUuid> peers) co
     std::sort(peers.begin(), peers.end());
 
     // Take (1) one closest-guid peer.
-    result += takeClosestIdPeers(peers, 1, selfId);
+    result += takeClosestPeerIds(peers, 1, selfId);
     --additionalPeers;
 
     // Take (2) random peers.
@@ -945,7 +943,7 @@ bool Worker::needToFindBetterPeers() const
 
     auto closestPeers = m_peers;
     std::sort(closestPeers.begin(), closestPeers.end());
-    closestPeers = takeClosestIdPeers(
+    closestPeers = takeClosestPeerIds(
         closestPeers, m_peersPerOperation, m_peerManager->selfId());
 
     for (const auto& peerId: closestPeers)
