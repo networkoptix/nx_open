@@ -195,6 +195,9 @@ angular.module('nxCommon')
             var params = id?{id:this._cleanId(id)}:null;
             return this._get('/ec2/getMediaServersEx',params);
         };
+        ServerConnection.prototype.getMediaServersAndCameras = function(){
+            return this._get('/api/aggregator?exec_cmd=ec2%2FgetMediaServersEx&exec_cmd=ec2%2FgetCamerasEx');
+        }
         ServerConnection.prototype.getResourceTypes = function(){
             return this._get('/ec2/getResourceTypes');
         };

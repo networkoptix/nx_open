@@ -48,6 +48,8 @@ angular.module('nxCommon')
                 scope.debugFormat = Config.allowDebugMode && Config.debug.videoFormat;
                 scope.jshlsHideError = Config.debug.jshlsHideError && Config.allowDebugMode;
                 scope.jshlsDebugMode = Config.debug.jshlsDebug && Config.allowDebugMode;
+                scope.videoFlags = {};
+                scope.videoFlags.loading = false;
                 
                 function getFormatSrc(mediaformat) {
                     var src = _.find(scope.vgSrc,function(src){return src.type == mimeTypes[mediaformat];});
@@ -62,15 +64,16 @@ angular.module('nxCommon')
 
                 function detectBestFormat(){
                     //1. Hide all informers
-                    scope.flashRequired = false;
-                    scope.flashOrWebmRequired = false;
-                    scope.noArmSupport = false;
-                    scope.noFormat = false;
-                    scope.errorLoading = false;
-                    scope.ieNoWebm = false;
-                    scope.loading = false;
-                    scope.ieWin10 = false;
-                    scope.ubuntuNX = false;
+                    scope.videoFlags.flashRequired = false;
+                    scope.videoFlags.flashOrWebmRequired = false;
+                    scope.videoFlags.noArmSupport = false;
+                    scope.videoFlags.noFormat = false;
+                    scope.videoFlags.errorLoading = false;
+                    scope.videoFlags.ieNoWebm = false;
+                    scope.videoFlags.loading = false;
+                    scope.videoFlags.ieWin10 = false;
+                    scope.videoFlags.ubuntuNX = false;
+                    //console.log(scope.videoFlags);
 
                     if(scope.debugMode && scope.activeFormat != "Auto"){
                         return scope.activeFormat;
@@ -113,7 +116,7 @@ angular.module('nxCommon')
                             return "webm";
                             // TODO: Try removing this line.
                         }else {
-                            scope.noArmSupport = true;
+                            scope.videoFlags.noArmSupport = true;
                             return false;
                         }
                     }
@@ -136,14 +139,14 @@ angular.module('nxCommon')
                             if(weHaveWebm){
                                 if(window.jscd.osVersion < 10){
                                     if(weHaveHls){
-                                        scope.flashOrWebmRequired = true;
+                                        scope.videoFlags.flashOrWebmRequired = true;
                                     }
                                     else{
-                                        scope.ieNoWebm = true;
+                                        scope.videoFlags.ieNoWebm = true;
                                     }
                                 }
                                 else{
-                                    scope.ieWin10 = true;
+                                    scope.videoFlags.ieWin10 = true;
                                 }
                             }
                             break;
@@ -154,7 +157,7 @@ angular.module('nxCommon')
                                 return "webm";
                             }
                             if(weHaveHls && window.jscd.os === 'Linux'){
-                                scope.ubuntuNX = true;
+                                scope.videoFlags.ubuntuNX = true;
                                 return false;
                             }
 
@@ -173,8 +176,8 @@ angular.module('nxCommon')
                             }
                     }
 
-                    scope.flashRequired = true;
-                    scope.noFormat = true;
+                    scope.videoFlags.flashRequired = true;
+                    scope.videoFlags.noFormat = true;
                     return false; // IE9 - No supported formats
                 }
 
@@ -209,7 +212,7 @@ angular.module('nxCommon')
 
                             if (scope.vgSrc) {
                                 $timeout(function () {
-                                    scope.loading = !!format;
+                                scope.videoFlags.loading = !!format;
                                 });
 
                                 if(format == 'webm' && window.jscd.os == "Android" ){ // TODO: this is hach for android bug. remove it later
@@ -217,7 +220,7 @@ angular.module('nxCommon')
                                         $timeout.cancel(autoshow);
                                     }
                                     autoshow = $timeout(function () {
-                                        scope.loading = false;
+                                    scope.videoFlags.loading = false;
                                         autoshow = null;
                                     },20000);
                                 }
@@ -226,7 +229,7 @@ angular.module('nxCommon')
 
                                 scope.vgApi.addEventListener("timeupdate", function (event) {
                                     var video = event.srcElement || event.originalTarget;
-                                    scope.loading = false;
+                                scope.videoFlags.loading = false;
                                     scope.vgUpdateTime({$currentTime: video.currentTime, $duration: video.duration});
                                 });
 
@@ -278,7 +281,7 @@ angular.module('nxCommon')
                                 scope.vgApi = api;
                                 if (scope.vgSrc) {
                                     $timeout(function () {
-                                        scope.loading = !!format;
+                                        scope.videoFlags.loading = !!format;
                                     });
                                     scope.vgApi.load(getFormatSrc('hls'));
 
@@ -287,8 +290,8 @@ angular.module('nxCommon')
                                 scope.vgPlayerReady({$API: api});
                             }, function (error) {
                                 $timeout(function () {
-                                    scope.errorLoading = true;
-                                    scope.loading = false;
+                                    scope.videoFlags.errorLoading = true;
+                                    scope.videoFlags.loading = false;
                                     scope.flashls = false;// Kill flashls with his error
                                     scope.native = false;
                                     scoep.jsHls = false;
@@ -296,7 +299,7 @@ angular.module('nxCommon')
                                 console.error(error);
                             }, function (position, duration) {
                                 if (position != 0) {
-                                    scope.loading = false;
+                                    scope.videoFlags.loading = false;
                                     scope.vgUpdateTime({$currentTime: position, $duration: duration});
                                 }
                             });
@@ -315,18 +318,18 @@ angular.module('nxCommon')
                             scope.vgApi = api;
                             if (scope.vgSrc) {
                                 $timeout(function(){
-                                    scope.loading = !!format;
+                                scope.videoFlags.loading = !!format;
                                 });
                                 scope.vgApi.load(getFormatSrc('hls'));
                                 scope.vgApi.addEventListener("timeupdate", function (event) {
                                     var video = event.srcElement || event.originalTarget;
-                                    scope.loading = false;
+                                scope.videoFlags.loading = false;
                                     scope.vgUpdateTime({$currentTime: video.currentTime, $duration: video.duration});
                                 });
                             }
                             scope.vgPlayerReady({$API:api});
                         },  function (api) {
-                                scope.errorLoading = true;
+                            scope.videoFlags.errorLoading = true;
                                 scope.jsHls = false;
                                 console.log(api);
                         });
@@ -338,8 +341,8 @@ angular.module('nxCommon')
 
                 var format = null;
                 function srcChanged(){
-                    scope.loading = false;
-                    scope.errorLoading = false;
+                    scope.videoFlags.loading = false;
+                    scope.videoFlags.errorLoading = false;
                     if(scope.vgSrc ) {
                         format = detectBestFormat();
                         if(!recyclePlayer(format)){ // Remove or recycle old player.
