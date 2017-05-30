@@ -666,6 +666,7 @@ void ThirdPartyStreamReader::initializeAudioContext( const nxcip::AudioFormat& a
 
 QnConstResourceVideoLayoutPtr ThirdPartyStreamReader::getVideoLayout() const
 {
+    QnMutexLocker lock(&m_streamReaderMutex);
     return m_builtinStreamReader ? m_builtinStreamReader->getVideoLayout() : QnConstResourceVideoLayoutPtr();
 }
 
