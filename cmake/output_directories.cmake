@@ -6,7 +6,8 @@ foreach(_type LIBRARY RUNTIME)
 
     if(CMAKE_MULTI_CONFIGURATION_MODE)
         foreach(_config ${CMAKE_CONFIGURATION_TYPES})
-            set(CMAKE_${_type}_OUTPUT_DIRECTORY_${_config}
+            string(TOUPPER ${_config} _CONFIG)
+            set(CMAKE_${_type}_OUTPUT_DIRECTORY_${_CONFIG}
                 "${CMAKE_${_type}_OUTPUT_DIRECTORY}/${_config}")
             file(MAKE_DIRECTORY "${CMAKE_${_type}_OUTPUT_DIRECTORY}/${_config}")
         endforeach()
@@ -15,3 +16,4 @@ endforeach()
 
 unset(_type)
 unset(_config)
+unset(_CONFIG)
