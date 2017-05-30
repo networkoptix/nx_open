@@ -16,6 +16,8 @@
 #include <network/authutil.h>
 #include <rest/server/json_rest_result.h>
 #include "utils/common/sleep.h"
+#include "common/common_module.h"
+#include <api/global_settings.h>
 
 class AuthReturnCodeTest:
     public ::testing::Test
@@ -56,6 +58,11 @@ public:
         ldapUserWithFilledDigest.isLdap = true;
         ldapUserWithFilledDigest.digest = "some digest";
         ASSERT_EQ(ec2::ErrorCode::ok, userManager->saveSync(ldapUserWithFilledDigest));
+
+        auto settings = mediaServerLauncher->commonModule()->globalSettings();
+        settings->setCloudSystemId(QnUuid::createUuid().toString());
+        settings->setCloudAuthKey(QnUuid::createUuid().toString());
+        settings->synchronizeNowSync();
     }
 
     void addLocalUser(QString userName, QString password)

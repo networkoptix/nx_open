@@ -13,6 +13,8 @@
 
 namespace {
 
+static const int kCameraCount = 100;
+
 using Appserver2 = nx::utils::test::ModuleLauncher<::ec2::Appserver2ProcessPublic>;
 using Appserver2Ptr = std::unique_ptr<Appserver2>;
 
@@ -51,7 +53,7 @@ static void createData(const Appserver2Ptr& server)
     httpClient.setUserName("admin");
     httpClient.setUserPassword("admin");
 
-    for (int i = 0; i < 10000; ++i)
+    for (int i = 0; i < kCameraCount; ++i)
     {
         ec2::ApiCameraData cameraData;
         auto resTypePtr = qnResTypePool->getResourceTypeByName("Camera");
@@ -85,7 +87,7 @@ TEST(SympleSyncTest, main)
 {
     QnStaticCommonModule staticCommon;
 
-    static const int kInstanceCount = 1;
+    static const int kInstanceCount = 2;
     static const int kMaxSyncTimeoutMs = 1000 * 5 * 1000;
 
     std::vector<Appserver2Ptr> servers;
@@ -128,7 +130,7 @@ TEST(SympleSyncTest, main)
         {
             const auto& resPool = server->moduleInstance()->commonModule()->resourcePool();
             const auto& cameraList = resPool->getAllCameras(QnResourcePtr());
-            if (cameraList.size() == 10000)
+            if (cameraList.size() == kCameraCount)
                 ++syncDoneCounter;
         }
         ASSERT_TRUE(timer.elapsed() < kMaxSyncTimeoutMs);

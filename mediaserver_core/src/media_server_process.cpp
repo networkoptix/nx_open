@@ -3196,6 +3196,7 @@ void MediaServerProcess::run()
     //disconnecting from EC2
     clearEc2ConnectionGuard.reset();
 
+    connectToCloudWatcher.reset();
     ec2Connection.reset();
     ec2ConnectionFactory.reset();
 

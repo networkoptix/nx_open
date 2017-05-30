@@ -1481,7 +1481,7 @@ bool SslSocket::enableClientEncryption()
 bool SslSocket::isEncryptionEnabled() const
 {
     Q_D(const SslSocket);
-    return d->ecnryptionEnabled || d->asyncSslHelper->isSsl();
+    return d->ecnryptionEnabled || (d->asyncSslHelper && d->asyncSslHelper->isSsl());
 }
 
 static void cancelIoFromAioThread(SslSocketPrivate* socket, aio::EventType eventType)

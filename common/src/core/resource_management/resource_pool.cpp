@@ -144,10 +144,14 @@ void QnResourcePool::addResources(const QnResourceList& resources, bool mainPool
     for (const auto& resource : addedResources)
     {
         TRACE("RESOURCE ADDED" << resource->metaObject()->className() << resource->getName());
+#if 0
         if (isOwnThread)
             emit resourceAdded(resource);
         else
             emit resourceAddedInternal(resource);
+#else
+        emit resourceAdded(resource);
+#endif
     }
 }
 
