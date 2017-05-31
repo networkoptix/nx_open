@@ -1,17 +1,17 @@
 #include "test_options.h"
 
-#include <QDebug>
+#include <QtCore/QDebug>
+#include <QtCore/QDir>
 
 #include <nx/utils/log/assert.h>
+#include <nx/utils/random.h>
 
 #ifdef _WIN32
-#include "../crash_dump/systemexcept_win.h"
+    #include "../crash_dump/systemexcept_win.h"
 #endif
 
 namespace nx {
 namespace utils {
-
-QString TestOptions::sTemporaryDirectoryPath;
 
 void TestOptions::setTimeoutMultiplier(size_t value)
 {
@@ -87,17 +87,25 @@ void TestOptions::applyArguments(const utils::ArgumentParser& arguments)
 
 void TestOptions::setTemporaryDirectoryPath(const QString& path)
 {
-    sTemporaryDirectoryPath = path;
+    QnMutexLocker lock(&s_mutex);
+    s_temporaryDirectoryPath = path;
+    qWarning() << ">>> TestOptions::setTemporaryDirectoryPath(" << path << ") <<<";
 }
 
 QString TestOptions::temporaryDirectoryPath()
 {
-    return sTemporaryDirectoryPath;
+    QnMutexLocker lock(&s_mutex);
+    QDir().mkpath(s_temporaryDirectoryPath);
+    return s_temporaryDirectoryPath;
 }
 
 std::atomic<size_t> TestOptions::s_timeoutMultiplier(1);
 std::atomic<bool> TestOptions::s_disableTimeAsserts(false);
 std::atomic<TestOptions::LoadMode> TestOptions::s_loadMode(TestOptions::LoadMode::normal);
+
+QnMutex TestOptions::s_mutex;
+QString TestOptions::s_temporaryDirectoryPath =
+    lm("%1/nx_unit_tests/%2").args(QDir::homePath(), nx::utils::random::number());
 
 } // namespace utils
 } // namespace nx

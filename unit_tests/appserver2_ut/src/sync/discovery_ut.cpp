@@ -12,7 +12,7 @@
 
 static const std::chrono::milliseconds kDiscoveryTimeouts(100);
 size_t kInitialServerCount = 3;
-size_t kAditionalServerCount = 2;
+size_t kAdditionalServerCount = 2;
 
 class DiscoveryTest: public testing::Test
 {
@@ -141,7 +141,7 @@ TEST_F(DiscoveryTest, main)
         addServer();
     checkVisibility();
 
-    for (size_t i = 0; i < kAditionalServerCount; ++i)
+    for (size_t i = 0; i < kAdditionalServerCount; ++i)
         addServer();
     checkVisibility();
 }

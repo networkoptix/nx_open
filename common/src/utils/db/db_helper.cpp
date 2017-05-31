@@ -1,13 +1,10 @@
 #include "db_helper.h"
 
 #include <QtCore/QCoreApplication>
-#include <QtCore/QFileInfo>
-
 #include <QtSql/QSqlQuery>
 #include <QtSql/QSqlRecord>
-#include <QFile>
 #include <QtSql/QSqlError>
-#include "qcoreapplication.h"
+
 #include <nx/utils/log/log.h>
 
 //TODO #AK QnDbTransaction is a bad name for this class since it actually lives beyond DB transaction
