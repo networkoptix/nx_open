@@ -48,6 +48,8 @@ public:
         nx::utils::MoveOnlyFunc<
             void(SystemError::ErrorCode, BufferType)> completionHandler) override
     {
+        const std::size_t kReadBufferSize = 16 * 1024;
+            
         using namespace std::placeholders;
 
         if (messageBodyTransferLimitHasBeenReached())
@@ -55,7 +57,7 @@ public:
         
         m_completionHandler.swap(completionHandler);
 
-        m_readBuffer.reserve(16*1024);
+        m_readBuffer.reserve(kReadBufferSize);
         m_channel->readSomeAsync(
             &m_readBuffer,
             std::bind(&AsyncChannelMessageBodySource::onSomeBytesRead, this, _1, _2));
