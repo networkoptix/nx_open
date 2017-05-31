@@ -1112,7 +1112,17 @@ void QnWorkbenchNavigator::updateCurrentWidget()
 
     if (m_currentWidget)
     {
-        m_timeSlider->setThumbnailsLoader(NULL, -1);
+        m_timeSlider->setThumbnailsLoader(nullptr, -1);
+
+        if (workbench()->currentLayout()->isSearchLayout())
+        {
+            /* Return current item position to fragment start: */
+            QnTimePeriod selection = m_currentWidget->item()->data(
+                Qn::ItemSliderSelectionRole).value<QnTimePeriod>();
+            m_preciseNextSeek = true;
+            at_timeSlider_valueChanged(selection.startTimeMs);
+        }
+
         if (m_streamSynchronizer->isRunning() && (m_currentWidgetFlags & WidgetSupportsPeriods))
         {
             for (auto widget: m_syncedWidgets)
@@ -1122,7 +1132,8 @@ void QnWorkbenchNavigator::updateCurrentWidget()
         {
             updateItemDataFromSlider(m_currentWidget);
         }
-        disconnect(m_currentWidget->resource(), NULL, this, NULL);
+
+        disconnect(m_currentWidget->resource(), nullptr, this, nullptr);
         connect(m_currentWidget->resource(), &QnResource::parentIdChanged, this, &QnWorkbenchNavigator::updateLocalOffset);
     }
     else
@@ -1136,8 +1147,8 @@ void QnWorkbenchNavigator::updateCurrentWidget()
         // clear current widget state to avoid incorrect behavior when closing the layout
         // see: Bug #1341: Selection on timeline aren't displayed after thumbnails searching
         // see: Bug #1344: If make a THMB search from a layout with a result of THMB search, Timeline are not marked properly
-        m_currentWidget = NULL;
-        m_currentMediaWidget = NULL;
+        m_currentWidget = nullptr;
+        m_currentMediaWidget = nullptr;
     }
     else
     {
