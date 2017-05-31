@@ -381,7 +381,7 @@
         </profile>
 
         <profile>
-            <id>isd</id>
+            <id>edge1</id>
             <activation>
                 <activeByDefault>false</activeByDefault>
                 <os>
@@ -389,24 +389,7 @@
                 </os>
                 <property>
                     <name>box</name>
-                    <value>isd</value>
-                </property>
-            </activation>
-            <properties>
-                <rdep.global.packages>qt any/boost gcc</rdep.global.packages>
-            </properties>
-        </profile>
-
-        <profile>
-            <id>isd_s2</id>
-            <activation>
-                <activeByDefault>false</activeByDefault>
-                <os>
-                    <family>unix</family>
-                </os>
-                <property>
-                    <name>box</name>
-                    <value>isd_s2</value>
+                    <value>edge1</value>
                 </property>
             </activation>
             <properties>

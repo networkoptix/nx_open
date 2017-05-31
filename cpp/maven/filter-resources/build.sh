@@ -12,7 +12,7 @@ if [ $PLATFORM == 'Linux' ] && [ "${arch}" != "arm"  ]; then
 	 echo '+++++++++++++ Invalid QT - does not support libglib. Compilation terminated +++++++++++++'
          exit 1
     fi
-fi    
+fi
 
 if [ "${box}" == "rpi" ] || [ "${box}" == "bpi" ]; then
      QTCHECK_ARM=`readelf -d ${qt.dir}/lib/libQt5Core.so | grep libglib-2.0.so.0`
@@ -42,9 +42,9 @@ case `uname -s` in
         NPROCESSORS=`sysctl hw.ncpu | awk '{print $2}'`
         ;;
 esac
-if [ '${box}' == 'isd' ] || [ '${box}' == 'isd_s2' ]; then
-    if [ '${project.artifactId}' == 'common' ] || [ '${project.artifactId}' == 'mediaserver_core' ]  || [ '${project.artifactId}' == 'appserver2' ] || [ '${project.artifactId}' == 'isd_native_plugin' ]; then
-    #if [ '${project.artifactId}' == 'common' ] || [ '${project.artifactId}' == 'appserver2' ] || [ '${project.artifactId}' == 'isd_native_plugin' ]; then
+if [ '${box}' == 'edge1' ]; then
+    if [ '${project.artifactId}' == 'common' ] || [ '${project.artifactId}' == 'mediaserver_core' ]  || [ '${project.artifactId}' == 'appserver2' ]; then
+    #if [ '${project.artifactId}' == 'common' ] || [ '${project.artifactId}' == 'appserver2' ]; then
         DEBUG=ext_debug
     fi
 fi
@@ -52,6 +52,6 @@ fi
 if [ '${box}' == 'ios' ]; then
     echo "Unlocking Keychain..."
     security unlock-keychain -p qweasd123 $HOME/Library/Keychains/login.keychain
-fi    
+fi
 
 make --no-p QUIET=yes -f Makefile.$CONFIG -j $[NPROCESSORS+1] $DEBUG || exit 1
