@@ -52,7 +52,9 @@ endfunction()
 
 function(nx_copy_package_for_configuration package_dir config)
     cmake_parse_arguments(COPY "SKIP_BIN;SKIP_LIB" "" "" ${ARGN})
-    string(TOUPPER ${config} CONFIG)
+    if(config)
+        string(TOUPPER ${config} CONFIG)
+    endif()
 
     if(NOT COPY_SKIP_BIN)
         if(IS_DIRECTORY "${package_dir}/bin")
