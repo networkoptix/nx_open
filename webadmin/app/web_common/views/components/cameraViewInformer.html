@@ -1,15 +1,9 @@
 <div class="camera-states" ng-if="showView || showVideo">
-    <div class="camera-view-informer" ng-if="alertType !='loading'">
+    <div class="camera-view-informer" ng-if="alertType">
         <div class="camera-view-message-icon" 
              ng-if="alertType == 'status'"
              ng-class="viewFlags[alertType] == 'Offline' ? 'camera-view-offline' : 'camera-view-unauthorized'"></div>
         <br ng-if="alertType == 'status'">
         <div class="camera-view-message" ng-bind-html="message"></div>
-    </div>
-
-    <!--BREAK BETWEEN MESSAGES-->
-    <img class="camera-view-informer video-preview"
-         ng-if="alertType == 'loading'"
-         ng-src="{{preview}}">
     </div>
 </div>

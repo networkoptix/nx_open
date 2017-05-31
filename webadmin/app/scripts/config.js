@@ -36,7 +36,7 @@ var Config = {
     dateSettingsFormat:'dd MMMM yyyy',
 
     visualLog: false,
-    allowDebugMode: true, // Allow debugging at all. Set to false in production
+    allowDebugMode: false, // Allow debugging at all. Set to false in production
     debug: {
         video: true, // videowindow.js - disable loader, allow rightclick
         videoFormat: false,//'flashls', // videowindow.js - force video player

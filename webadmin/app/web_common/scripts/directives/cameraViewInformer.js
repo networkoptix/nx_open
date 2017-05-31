@@ -6,8 +6,7 @@ angular.module('nxCommon')
 			restrict: 'E',
         	scope:{
         		viewFlags: "=",
-        		videoFlags: "=",
-        		preview: "="
+        		videoFlags: "="
         	},
         	templateUrl: Config.viewsDirCommon + 'components/cameraViewInformer.html',
         	link: function(scope){
@@ -75,10 +74,8 @@ angular.module('nxCommon')
                         return;
                     }
 
-                    //find message to display other than loading
-                    if(scope.alertType != "loading"){
-                        scope.message = scope.cameraStates[scope.alertType];
-                    }
+                    //load message to display
+                    scope.message = scope.cameraStates[scope.alertType];
         		}, true);
         	}
 		};
