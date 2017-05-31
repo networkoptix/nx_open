@@ -34,7 +34,7 @@
 #include "http_handlers/ping.h"
 #include "libcloud_db_app_info.h"
 #include "managers/account_manager.h"
-#include "managers/auth_provider.h"
+#include "managers/authentication_provider.h"
 #include "managers/cloud_module_url_provider.h"
 #include "managers/email_manager.h"
 #include "managers/event_manager.h"
