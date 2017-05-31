@@ -57,7 +57,7 @@
 #include <utils/math/color_transformations.h>
 #include <nx/utils/string.h>
 #include <nx/utils/math/fuzzy.h>
-
+#include <nx/client/desktop/ui/common/detail/base_input_control.h>
 
 using namespace style;
 
@@ -792,7 +792,13 @@ void QnNxStyle::drawPrimitive(
 
             if (option->state.testFlag(State_Enabled))
             {
-                if (auto lineEdit = qobject_cast<const QLineEdit*>(widget))
+                if (auto inputTextField =
+                    qobject_cast<const nx::client::desktop::ui::detail::BaseInputField*>(widget->parentWidget()))
+                {
+                    readOnly = inputTextField->isReadOnly();
+                    valid = inputTextField->lastValidationResult() != QValidator::Invalid;
+                }
+                else if (auto lineEdit = qobject_cast<const QLineEdit*>(widget))
                 {
                     readOnly = lineEdit->isReadOnly();
 

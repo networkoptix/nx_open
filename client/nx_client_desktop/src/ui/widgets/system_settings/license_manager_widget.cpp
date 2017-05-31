@@ -53,6 +53,7 @@
 #include <utils/common/delayed.h>
 
 #include <nx/client/desktop/license/license_helpers.h>
+#include <nx/client/desktop/ui/dialogs/license_deactivation_reason.h>
 
 namespace {
 
@@ -615,7 +616,15 @@ bool QnLicenseManagerWidget::confirmDeactivation(const QStringList& extras) cons
     confirmationDialog.addButton(lit("Deactivate"),
         QDialogButtonBox::AcceptRole, Qn::ButtonAccent::Warning);
 
-    return confirmationDialog.exec() != QDialogButtonBox::Cancel;
+    if (confirmationDialog.exec() == QDialogButtonBox::Cancel)
+        return false;
+
+    using namespace nx::client::desktop::ui;
+    dialogs::LicenseDeactivationReason dialog(QnUserResourcePtr(), parentWidget());
+    if (dialog.exec() == QDialogButtonBox::Cancel)
+        return false;
+
+    return true;
 }
 
 QString QnLicenseManagerWidget::getDeactivationErrorCaption(
@@ -733,7 +742,7 @@ void QnLicenseManagerWidget::deactivateLicenses(const QnLicenseList& licenses)
             QnMessageBox::success(this, text);
         };
 
-    Deactivator::deactivateAsync(licenses, handler, parent());
+    Deactivator::deactivateAsync(licenses, handler, parentWidget());
 }
 
 void QnLicenseManagerWidget::takeAwaySelectedLicenses()
@@ -754,7 +763,9 @@ void QnLicenseManagerWidget::takeAwaySelectedLicenses()
         }
 
         if (!extras.isEmpty() && confirmDeactivation(extras))
+        {
             deactivateLicenses(licenses);
+        }
     }
 }
 
