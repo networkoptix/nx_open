@@ -41,7 +41,7 @@ angular.module('cloudApp')
                     scope.activeSystem = _.find(scope.systems,function(system){
                         return $route.current.params.systemId == system.id;
                     });
-                    if(scope.systems.length == 1){ // Special case for a single system - it always active
+                    if(scope.singleSystem){ // Special case for a single system - it always active
                         scope.activeSystem = scope.systems[0];
                     }
                 }
@@ -51,6 +51,7 @@ angular.module('cloudApp')
                     cloudApi.systems().then(function(result){
                         scope.systems = cloudApi.sortSystems(result.data);
                         scope.singleSystem = scope.systems.length == 1;
+                        scope.systemCounter = scope.systems.length;
                         updateActiveSystem();
                     });
 
