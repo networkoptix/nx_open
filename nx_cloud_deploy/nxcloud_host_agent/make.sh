@@ -4,7 +4,7 @@
 . ../common.sh
 
 MODULE=nxcloud_host_agent
-nxcloud_host_agent_ARGS="--build-arg NXCLOUD_VERSION=${NXCLOUD_VERSION} --build-arg VERSION=${VERSION} --build-arg MODULES=\"${MODULES}\""
+BUILD_ARGS=(--build-arg NXCLOUD_VERSION=${NXCLOUD_VERSION} --build-arg VERSION=${VERSION} --build-arg MODULES="${MODULES[@]}")
 
 function stage()
 {

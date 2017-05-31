@@ -3,8 +3,6 @@
 . ./environment
 . ./common.sh
 
-MODULES="cloud_db cloud_portal cloud_portal_nginx connection_mediator vms_gateway nxcloud_host_agent"
-
 function run_targets()
 {
     local modules=$1
