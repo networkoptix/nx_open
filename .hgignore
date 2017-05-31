@@ -1,4 +1,5 @@
 syntax: glob
+
 ecs.db-shm
 ecs.db-wal
 *.swp
@@ -193,7 +194,13 @@ customization/*.html
 .sources_cache
 plugins/acs/paxton-plugin/packages/*
 plugins/acs/paxton-plugin/CustomProperties.cs
+nx_cloud_deploy/*/stage
+nx_cloud_deploy/nxcloud_host_agent/docker/docker
+nx_cloud_deploy/nxcloud_host_agent/docker/docker-compose
+nx_cloud_deploy/nxcloud_host_agent/docker/docker-machine
+
 syntax: regexp
 ^core$
 ^Makefile$
 ^app_process$
+
