@@ -21,6 +21,7 @@
 #include "core/resource_access/user_access_data.h"
 #include "core/resource_access/resource_access_manager.h"
 #include "core/resource/user_resource.h"
+#include <nx/fusion/serialization/sql.h>
 
 struct BeforeRestoreDbData;
 

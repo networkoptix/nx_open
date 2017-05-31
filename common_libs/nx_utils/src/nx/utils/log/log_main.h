@@ -32,7 +32,7 @@ bool isToBeLogged(Level level, const Tag& tag = {})
 
 namespace detail {
 
-class Helper
+class NX_UTILS_API Helper
 {
 public:
     Helper(Level level, const QString& tag);
@@ -52,7 +52,7 @@ Helper makeHelper(Level level, const Tag& tag)
     return Helper(level, toString(tag));
 }
 
-class Stream: public Helper
+class NX_UTILS_API Stream: public Helper
 {
 public:
     Stream(Level level, const QString& tag);
