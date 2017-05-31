@@ -38,10 +38,10 @@ GenericUserDataProvider::~GenericUserDataProvider()
 QnResourcePtr GenericUserDataProvider::findResByName(const QByteArray& nxUserName) const
 {
     QnMutexLocker lock(&m_mutex);
-
-    for (const QnUserResourcePtr& user : m_users)
+    const auto& lowerName = nxUserName.toLower();
+    for (const QnUserResourcePtr& user: m_users)
     {
-        if (user->getName().toUtf8().toLower() == nxUserName)
+        if (user->getName().toUtf8().toLower() == lowerName)
             return user;
     }
 

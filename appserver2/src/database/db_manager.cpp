@@ -1364,6 +1364,9 @@ bool QnDbManager::afterInstallUpdate(const QString& updateName)
     if (updateName.endsWith(lit("/51_http_business_action.sql")))
         return resyncIfNeeded(ResyncRules);
 
+    if (updateName.endsWith(lit("/53_reset_ldap_users.sql")))
+        return resyncIfNeeded(ResyncUsers);
+
     if (updateName.endsWith(lit("/54_migrate_permissions.sql")))
         return ec2::db::migrateV25UserPermissions(m_sdb) && resyncIfNeeded(ResyncUsers);
 
