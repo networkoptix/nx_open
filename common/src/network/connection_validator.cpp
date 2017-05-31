@@ -42,6 +42,15 @@ bool compatibleCustomization(const QString& c1, const QString& c2, bool isMobile
     return c1.left(c1.indexOf(kSeparator)) == c2.left(c2.indexOf(kSeparator));
 }
 
+bool compatibleCloudHost(const QString& cloudHost, bool isMobile)
+{
+    if (cloudHost.isEmpty())
+        return true;
+
+    return cloudHost == QnAppInfo::defaultCloudHost()
+        || (isMobile && QnAppInfo::compatibleCloudHosts().contains(cloudHost));
+}
+
 } // namespace
 
 QnSoftwareVersion QnConnectionValidator::minSupportedVersion()
@@ -109,7 +118,7 @@ Qn::ConnectionResult QnConnectionValidator::validateConnectionInternal(
     if (!compatibleCustomization(customization, localInfo.customization, isMobile))
         return Qn::IncompatibleInternalConnectionResult;
 
-    if (!cloudHost.isEmpty() && cloudHost != QnAppInfo::defaultCloudHost())
+    if (!compatibleCloudHost(cloudHost, isMobile))
         return Qn::IncompatibleCloudHostConnectionResult;
 
     if (version < minSupportedVersion())
