@@ -26,7 +26,10 @@ public:
     QString reason() const;
 
 private:
-    QWidget* createWidget();
+    QWidget* createWidget(QPushButton* nextButton);
+
+private:
+    QSet<QWidget*> m_invalidFields;
 };
 
 } // namespace dialogs

@@ -25,7 +25,7 @@ public:
         const BaseInputField::AccessorPtr& textAccessor,
         const BaseInputField::AccessorPtr& readOnlyAccessor,
         const BaseInputField::AccessorPtr& placeholderAccessor,
-        QWidget* parent);
+        BaseInputField* parent);
 
     virtual bool eventFilter(QObject* watched, QEvent* event);
 
@@ -33,19 +33,21 @@ public:
     void setHintText(const QString& text);
     Qn::ValidationResult validationResult() const;
     void validate();
-    void clearValidationResult();
 
     void setText(const QString& text);
     QString getText() const;
 
+    Qn::ValidationResult getLastResult() const;
+    void setLastValidationResult(Qn::ValidationResult result);
+    void clearValidationResult();
+
 public:
-    QWidget* parent;
+    BaseInputField* parent;
     QLabel* title;
     QnWordWrappedLabel* hint;
     QWidget* input;
     QPalette defaultPalette;
 
-    Qn::ValidationResult lastValidationResult;
     Qn::TextValidateFunction validator;
 
     const BaseInputField::AccessorPtr textAccessor;
@@ -53,8 +55,7 @@ public:
     const BaseInputField::AccessorPtr placeholderAccessor;
 
 private:
-    void setErrorMode(bool value);
-    bool m_errorMode = false;
+    Qn::ValidationResult m_lastResult;
 };
 
 BaseInputFieldPrivate::BaseInputFieldPrivate(
@@ -62,7 +63,7 @@ BaseInputFieldPrivate::BaseInputFieldPrivate(
     const BaseInputField::AccessorPtr& textAccessor,
     const BaseInputField::AccessorPtr& readOnlyAccessor,
     const BaseInputField::AccessorPtr& placeholderAccessor,
-    QWidget* parent):
+    BaseInputField* parent):
 
     QObject(parent),
     parent(parent),
@@ -70,16 +71,36 @@ BaseInputFieldPrivate::BaseInputFieldPrivate(
     hint(new QnWordWrappedLabel(parent)),
     input(inputInstance),
     defaultPalette(),
-    lastValidationResult(QValidator::Acceptable),
 
     textAccessor(textAccessor),
     readOnlyAccessor(readOnlyAccessor),
-    placeholderAccessor(placeholderAccessor)
+    placeholderAccessor(placeholderAccessor),
+
+    m_lastResult(QValidator::Acceptable)
 {
     input->installEventFilter(this);
     parent->setFocusProxy(input);
 }
 
+Qn::ValidationResult BaseInputFieldPrivate::getLastResult() const
+{
+    return m_lastResult;
+}
+
+void BaseInputFieldPrivate::setLastValidationResult(Qn::ValidationResult result)
+{
+    if (m_lastResult.state == result.state)
+        return;
+
+    m_lastResult = result;
+
+    emit parent->isValidChanged();
+}
+
+void BaseInputFieldPrivate::clearValidationResult()
+{
+    setLastValidationResult(Qn::ValidationResult(QValidator::Acceptable));
+}
 
 bool BaseInputFieldPrivate::eventFilter(QObject* watched, QEvent* event)
 {
@@ -99,7 +120,7 @@ bool BaseInputFieldPrivate::eventFilter(QObject* watched, QEvent* event)
             /* On focus gain make input look usual even if there is error. */
             setHintText(QString());
             input->setPalette(defaultPalette);
-            lastValidationResult.state = QValidator::Intermediate;
+            m_lastResult.state = QValidator::Intermediate;
             break;
         }
         case QEvent::FocusOut:
@@ -163,11 +184,11 @@ void BaseInputFieldPrivate::validate()
     input->ensurePolished();
 
     clearValidationResult();
-    lastValidationResult = validationResult();
-    setHintText(lastValidationResult.errorMessage);
+    m_lastResult = validationResult();
+    setHintText(m_lastResult.errorMessage);
 
     QPalette palette = defaultPalette;
-    if (lastValidationResult.state != QValidator::Acceptable)
+    if (m_lastResult.state != QValidator::Acceptable)
         setWarningStyle(&palette);
 
     if (!input->hasFocus())
@@ -176,10 +197,6 @@ void BaseInputFieldPrivate::validate()
     hint->setPalette(palette);
 }
 
-void BaseInputFieldPrivate::clearValidationResult()
-{
-    lastValidationResult = Qn::ValidationResult(QValidator::Acceptable);
-}
 
 void BaseInputFieldPrivate::setText(const QString& text)
 {
@@ -347,7 +364,7 @@ bool BaseInputField::isValid() const
 QValidator::State BaseInputField::lastValidationResult() const
 {
     Q_D(const BaseInputField);
-    return d->lastValidationResult.state;
+    return d->getLastResult().state;
 }
 
 void BaseInputField::setValidator(

@@ -42,29 +42,58 @@ LicenseDeactivationReason::LicenseDeactivationReason(
     setDefaultButton(nextButton);
     setEscapeButton(QDialogButtonBox::Cancel);
 
-    addCustomWidget(createWidget(), Layout::Main, 0, Qt::Alignment(), true);
+    addCustomWidget(createWidget(nextButton), Layout::Main, 0, Qt::Alignment(), true);
 }
 
 LicenseDeactivationReason::~LicenseDeactivationReason()
 {
 }
 
-QWidget* LicenseDeactivationReason::createWidget()
+QWidget* LicenseDeactivationReason::createWidget(QPushButton* nextButton)
 {
     auto widget = new QWidget();
+    widget->setFocusPolicy(Qt::TabFocus);
+
     auto layout = new QVBoxLayout(widget);
 
-    layout->addWidget(new QLabel(tr("Name")));
+    const auto addLabel = [layout](const QString& name) { layout->addWidget(new QLabel(name)); };
+
+    using namespace nx::client::desktop::ui::detail;
+    const auto addWidget =
+        [this, widget, layout, nextButton](BaseInputField* field, bool forceFocus = false)
+        {
+            const auto handleChanges =
+                [this, nextButton](BaseInputField* field)
+                {
+                    if (field->isValid())
+                        m_invalidFields.remove(field);
+                    else
+                        m_invalidFields.insert(field);
+
+                    nextButton->setEnabled(m_invalidFields.isEmpty());
+                };
+
+            handleChanges(field);
+            connect(field, &BaseInputField::isValidChanged, this,
+                [field, handleChanges]() { handleChanges(field); });
+
+            layout->addWidget(field);
+
+            if (forceFocus)
+                widget->setFocusProxy(field);
+        };
+
+    addLabel(tr("Name"));
     layout->addWidget(createField<QnInputField>(
         Qn::defaultNonEmptyValidator(tr("Name is necessary"))));
 
-    layout->addWidget(new QLabel(tr("Email")));
+    addLabel(tr("Email"));
     layout->addWidget(createField<QnInputField>(
         Qn::defaultEmailValidator(false)));
 
-    layout->addWidget(new QLabel(tr("Reason for deactivation")));
-    layout->addWidget(createField<nx::client::desktop::ui::TextEditField>(
-        Qn::defaultNonEmptyValidator(tr("Reason is necessary"))));
+    addLabel(tr("Reason for deactivation"));
+    addWidget(createField<nx::client::desktop::ui::TextEditField>(
+        Qn::defaultNonEmptyValidator(tr("Reason is necessary"))), false);
 
     return widget;
 }

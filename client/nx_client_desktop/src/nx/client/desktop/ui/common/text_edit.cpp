@@ -28,6 +28,7 @@ TextEditField::TextEditField(QWidget* parent):
     connect(textInput, &QTextEdit::textChanged, this, [this]()
     {
         handleInputTextChanged();
+        validate();
     });
 }
 

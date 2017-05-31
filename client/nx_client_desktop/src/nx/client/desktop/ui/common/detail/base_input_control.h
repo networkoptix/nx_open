@@ -19,6 +19,7 @@ class BaseInputField : public Connective<QWidget>
     Q_OBJECT
     using base_type = Connective<QWidget>;
 
+    Q_PROPERTY(bool isValid READ isValid NOTIFY isValidChanged)
     Q_PROPERTY(QString text READ text WRITE setText NOTIFY textChanged USER true)
     Q_PROPERTY(QString hint READ hint WRITE setHint)
     Q_PROPERTY(QString placeholderText READ placeholderText WRITE setPlaceholderText)
@@ -54,13 +55,14 @@ public: // Properties.
     bool isReadOnly() const;
     void setReadOnly(bool value);
 
+    bool isValid() const;
+
 public:
     bool validate();
 
     /* After a small delay calls validate if input is not being edited. */
     void updateDisplayStateDelayed();
 
-    bool isValid() const;
     QValidator::State lastValidationResult() const;
 
     void setValidator(
@@ -72,6 +74,7 @@ public:
 
 signals:
     void textChanged(const QString& text);
+    void isValidChanged();
 
 protected:
     void handleInputTextChanged();
