@@ -1,3 +1,4 @@
+MODULES=(cloud_db cloud_portal cloud_portal_nginx connection_mediator vms_gateway traffic_relay nxcloud_host_agent)
 
 case $(uname -s) in
     Linux)
@@ -35,8 +36,7 @@ function check_vms_dirs()
 function pack()
 {
     echo "Packing $MODULE:$VERSION to a container"
-    local DOCKER_ARGS_VAR=${MODULE}_ARGS
-    docker build -t $MODULE:$VERSION ${!DOCKER_ARGS_VAR} .
+    docker build -t $MODULE:$VERSION "${BUILD_ARGS[@]}" .
 }
 
 function pushns()

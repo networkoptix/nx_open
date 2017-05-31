@@ -21,6 +21,6 @@ RUN /app/env/bin/pip install --no-cache-dir nxcloud==${NXCLOUD_VERSION}
 
 ENV PATH /app/env/bin:/usr/local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
 ENV VERSION ${VERSION}
-ENV MODULES ${MODULES}
+ENV MODULES "${MODULES}"
 
 ENTRYPOINT ["/app/env/bin/nxcloud", "--mode=agent"]

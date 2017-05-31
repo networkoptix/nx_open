@@ -24,11 +24,14 @@
                         class="btn-wrapper" ng-if="!active.register"><a href="/register" class="btn btn-primary" >Create Account</a></span></li>
             </ul>
             <ul class="nav navbar-nav navbar-right auth-visible hidden-collapsed">
-                <li class="vertical-bar" ng-if="systems"></li>
-                <li uib-dropdown ng-if="systems">
-                    <a uib-dropdown-toggle ng-href="/systems/{{system.id}}">{{activeSystem?activeSystem.name:L.header.allSystems}} <span class="icon-caret"></span></a>
+                <li uib-dropdown ng-if="systems && singleSystem">
+                    <a ng-href="/systems/{{activeSystem.id}}">{{activeSystem.name}}</a>
+                </li>
+                <li class="vertical-bar" ng-if="systems && !singleSystem"></li>
+                <li uib-dropdown ng-if="systems && !singleSystem">
+                    <a uib-dropdown-toggle ng-href="/systems/{{system.id}}">{{activeSystem?activeSystem.name:systemCounter + ' ' + L.header.systems}} <span class="icon-caret"></span></a>
                     <ul uib-dropdown-menu>
-                        <li ng-repeat="system in systems"><a ng-href="/systems/{{system.id}}/{{active.view?'view':''}}">{{system.name}} - {{system.ownerFullName}}</a></li>
+                        <li ng-repeat="system in systems | limitTo: $root.C.maxSystemsForHeader"><a ng-href="/systems/{{system.id}}/{{active.view?'view':''}}">{{system.name}} - {{system.ownerFullName}}</a></li>
                         <li role="separator" class="nav-divider"></li>
                         <li ng-repeat="system in systems"><a ng-href="/systems">{{L.header.allSystems}}</a></li>
                     </ul>
