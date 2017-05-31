@@ -5,7 +5,7 @@
 
 MODULE=cloud_portal
 VERSION=${CLOUD_PORTAL_VERSION:-$VERSION}
-BUILD_ARGS="--build-arg CACHE_DATE=$(date +%s)"
+BUILD_ARGS=(--build-arg CACHE_DATE=$(date +%s))
 
 function build()
 {
