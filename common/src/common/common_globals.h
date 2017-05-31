@@ -762,7 +762,7 @@ QN_DECLARE_METAOBJECT_HEADER(Qn,
     template<class T>
     const T &_id(const T &value) { return value; }
 
-    const static QLatin1String wallpapersFolder("wallpapers");
+    const static QLatin1String kWallpapersFolder("wallpapers");
 
 } // namespace Qn
 

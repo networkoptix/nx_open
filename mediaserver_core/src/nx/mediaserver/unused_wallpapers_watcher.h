@@ -14,7 +14,6 @@ namespace mediaserver {
 /**
  * Monitor unused layout's wallpapers in the database and remove it.
  */
-
 class UnusedWallpapersWatcher: public QObject, public QnCommonModuleAware
 {
     Q_OBJECT;
@@ -26,8 +25,8 @@ public slots:
     void update();
 private:
     QTimer m_timer;
-    std::vector<ec2::ApiStoredFilePath> m_previousData;
+    QStringList m_previousData;
 };
 
-} // namespace mediaserver
+} // namespace mediaserverm_previousData
 } // namespace nx

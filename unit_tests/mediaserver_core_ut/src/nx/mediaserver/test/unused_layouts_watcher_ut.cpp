@@ -10,57 +10,44 @@ namespace nx {
 namespace mediaserver {
 namespace test {
 
-class UnusedLayoutsWatcherTest:
-    public QObject,
-    public ::testing::Test
+QStringList readFiles(const std::shared_ptr<ec2::AbstractECConnection>& ec2Connection)
 {
-private:
+    QStringList outputData;
+    auto fileManager = ec2Connection->getStoredFileManager(Qn::kSystemAccess);
+    fileManager->listDirectorySync(Qn::kWallpapersFolder, &outputData);
+    return outputData;
+}
+
+TEST(UnusedLayoutsWatcherTest, main)
+{
     std::unique_ptr<MediaServerLauncher> mediaServerLauncher;
-public:
+    mediaServerLauncher.reset(new MediaServerLauncher());
+    ASSERT_TRUE(mediaServerLauncher->start());
 
-    QStringList readFiles(const std::shared_ptr<ec2::AbstractECConnection>& ec2Connection)
-    {
-        QStringList outputData;
-        auto fileManager = ec2Connection->getStoredFileManager(Qn::kSystemAccess);
-        fileManager->listDirectorySync(Qn::wallpapersFolder, &outputData);
-        return outputData;
-    }
+    auto ec2Connection = mediaServerLauncher->commonModule()->ec2Connection();
 
-    void testMain()
-    {
-        mediaServerLauncher.reset(new MediaServerLauncher());
-        ASSERT_TRUE(mediaServerLauncher->start());
+    ec2::ApiLayoutData apiLayout;
+    apiLayout.id = QnUuid::createUuid();
+    apiLayout.backgroundImageFilename = lit("file1.jpg");
 
-        auto ec2Connection = mediaServerLauncher->commonModule()->ec2Connection();
+    auto layoutManager = ec2Connection->getLayoutManager(Qn::kSystemAccess);
+    ASSERT_EQ(ec2::ErrorCode::ok, layoutManager->saveSync(apiLayout));
 
-        ec2::ApiLayoutData apiLayout;
-        apiLayout.id = QnUuid::createUuid();
-        apiLayout.backgroundImageFilename = lit("file1.jpg");
+    auto fileManager = ec2Connection->getStoredFileManager(Qn::kSystemAccess);
+    fileManager->addStoredFileSync(lit("%1/file1.jpg").arg(Qn::kWallpapersFolder), QByteArray());
+    fileManager->addStoredFileSync(lit("%1/file2.jpg").arg(Qn::kWallpapersFolder), QByteArray());
 
-        auto layoutManager = ec2Connection->getLayoutManager(Qn::kSystemAccess);
-        ASSERT_EQ(ec2::ErrorCode::ok, layoutManager->saveSync(apiLayout));
+    ASSERT_EQ(2, readFiles(ec2Connection).size());
+    nx::mediaserver::UnusedWallpapersWatcher fileDeleter(mediaServerLauncher->commonModule());
 
-        auto fileManager = ec2Connection->getStoredFileManager(Qn::kSystemAccess);
-        fileManager->addStoredFileSync(lit("%1/file1.jpg").arg(Qn::wallpapersFolder), QByteArray());
-        fileManager->addStoredFileSync(lit("%1/file2.jpg").arg(Qn::wallpapersFolder), QByteArray());
+    fileDeleter.update();
+    ASSERT_EQ(2, readFiles(ec2Connection).size());
 
-        ASSERT_EQ(2, readFiles(ec2Connection).size());
-        nx::mediaserver::UnusedWallpapersWatcher fileDeleter(mediaServerLauncher->commonModule());
+    fileDeleter.update();
+    ASSERT_EQ(1, readFiles(ec2Connection).size());
 
-        fileDeleter.update();
-        ASSERT_EQ(2, readFiles(ec2Connection).size());
-
-        fileDeleter.update();
-        ASSERT_EQ(1, readFiles(ec2Connection).size());
-
-        fileDeleter.update();
-        ASSERT_EQ(1, readFiles(ec2Connection).size());
-    }
-};
-
-TEST_F(UnusedLayoutsWatcherTest, main)
-{
-    testMain();
+    fileDeleter.update();
+    ASSERT_EQ(1, readFiles(ec2Connection).size());
 }
 
 } // namespace test

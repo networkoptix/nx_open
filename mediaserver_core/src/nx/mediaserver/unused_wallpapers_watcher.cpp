@@ -27,40 +27,50 @@ void UnusedWallpapersWatcher::update()
     if (!connectionPtr)
         return;
     auto connection = dynamic_cast<ec2::Ec2DirectConnection*> (connectionPtr.get());
-    static const QString prefix = QString(Qn::wallpapersFolder) + L'/';
-    QString queryStr = R"(
-        select path from vms_storedFiles
-        where path like '%1%'
-        and not exists (select 1 from vms_layout where background_image_filename = substr(path, %2))
-        order by path
-    )";
-    queryStr = queryStr.arg(prefix).arg(prefix.length() + 1);
 
-    std::vector<ec2::ApiStoredFilePath> data;
-    auto errCode = connection->database()->execSqlQuery(queryStr, &data);
-    if (errCode != ec2::ErrorCode::ok)
+    auto fileManager = connection->getStoredFileManager(Qn::kSystemAccess);
+    QStringList fileList;
+    auto result = fileManager->listDirectorySync(Qn::kWallpapersFolder, &fileList);
+    if (result != ec2::ErrorCode::ok)
         return;
+    std::sort(fileList.begin(), fileList.end());
 
-    std::vector<ec2::ApiStoredFilePath> intersection;
+    auto layoutManager = connection->getLayoutManager(Qn::kSystemAccess);
+    ec2::ApiLayoutDataList layoutList;
+    result = layoutManager->getLayoutsSync(&layoutList);
+    if (result != ec2::ErrorCode::ok)
+        return;
+    QSet<QString> usingNames;
+    for (const auto& value : layoutList)
+        usingNames.insert(value.backgroundImageFilename);
+
+    fileList.erase(std::remove_if(fileList.begin(), fileList.end(),
+        [&usingNames](const QString& fileName)
+        {
+            return usingNames.contains(fileName);
+        }), fileList.end());
+
+    QStringList intersection;
     std::set_intersection(
-        data.begin(), data.end(),
+        fileList.begin(), fileList.end(),
         m_previousData.begin(), m_previousData.end(),
         std::inserter(intersection, intersection.begin()));
 
     auto manager = commonModule()->ec2Connection()->getStoredFileManager(Qn::kSystemAccess);
-    for (const auto& record : intersection)
+    // Remove unused files from database if no layout have been found for some period of time.
+    for (const auto& fileName: intersection)
     {
         NX_INFO(
             this,
             lm("Automatically remove Db file %1 because it is not used on layouts any more.")
-            .arg(record.path));
+            .arg(fileName));
         manager->deleteStoredFile(
-            record.path,
+            Qn::kWallpapersFolder + L'/' + fileName,
             ec2::DummyHandler::instance(),
             &ec2::DummyHandler::onRequestDone);
     }
 
-    m_previousData = data;
+    m_previousData = fileList;
 }
 
 } // namespace mediaserver
