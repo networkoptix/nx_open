@@ -24,11 +24,11 @@
                         class="btn-wrapper" ng-if="!active.register"><a href="/register" class="btn btn-primary" >Create Account</a></span></li>
             </ul>
             <ul class="nav navbar-nav navbar-right auth-visible hidden-collapsed">
-                <li uib-dropdown ng-if="systems && singleSystem">
+                <li uib-dropdown ng-if="singleSystem">
                     <a ng-href="/systems/{{activeSystem.id}}"><span class="glyphicon glyphicon-home"></span>  {{activeSystem.name}}</a>
                 </li>
-                <li class="vertical-bar" ng-if="systems && !singleSystem"></li>
-                <li uib-dropdown ng-if="systems && !singleSystem">
+                <li class="vertical-bar" ng-if="systemCounter && !singleSystem"></li>
+                <li uib-dropdown ng-if="systemCounter && !singleSystem">
                     <a uib-dropdown-toggle ng-href="/systems/{{system.id}}"><span ng-if="activeSystem" class="glyphicon glyphicon-home"></span> {{activeSystem?activeSystem.name:systemCounter + ' ' + L.header.systems}} <span class="icon-caret"></span></a>
                     <ul uib-dropdown-menu>
                         <li ng-repeat="system in systems | limitTo: $root.C.maxSystemsForHeader"><a ng-href="/systems/{{system.id}}/{{active.view?'view':''}}">{{system.name}} - {{system.ownerFullName}}</a></li>
