@@ -851,12 +851,15 @@ void QnWorkbenchNavigator::updateItemDataFromSlider(QnResourceWidget *widget) co
     if (!widget || !m_timeSlider)
         return;
 
-    QnWorkbenchItem *item = widget->item();
+    QnWorkbenchItem* item = widget->item();
 
     QnTimePeriod window(m_timeSlider->windowStart(), m_timeSlider->windowEnd() - m_timeSlider->windowStart());
     if (m_timeSlider->windowEnd() == m_timeSlider->maximum()) // TODO: #Elric check that widget supports live.
         window.durationMs = QnTimePeriod::infiniteDuration();
     item->setData(Qn::ItemSliderWindowRole, QVariant::fromValue<QnTimePeriod>(window));
+
+    if (workbench()->currentLayout()->isSearchLayout())
+        return;
 
     QnTimePeriod selection;
     if (m_timeSlider->isSelectionValid())
@@ -1251,6 +1254,9 @@ void QnWorkbenchNavigator::updateSliderOptions()
         return;
 
     m_timeSlider->setOption(QnTimeSlider::UseUTC, m_currentWidgetFlags & WidgetUsesUTC);
+
+    m_timeSlider->setOption(QnTimeSlider::ClearSelectionOnClick,
+        !workbench()->currentLayout()->isSearchLayout());
 
     bool selectionEditable = workbench()->currentLayout()->resource();
     m_timeSlider->setOption(QnTimeSlider::SelectionEditable, selectionEditable);
