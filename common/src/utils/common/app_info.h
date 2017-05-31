@@ -2,6 +2,7 @@
 
 #include <QtCore/QObject>
 #include <QtCore/QString>
+#include <QtCore/QStringList>
 
 class QnAppInfo: public QObject
 {
@@ -56,6 +57,7 @@ public:
     static Q_INVOKABLE QString defaultCloudPortalUrl();
     static Q_INVOKABLE QString defaultCloudModulesXmlUrl();
     static Q_INVOKABLE QString cloudName();
+    static Q_INVOKABLE QStringList compatibleCloudHosts();
 
     static Q_INVOKABLE int freeLicenseCount();
     static Q_INVOKABLE QString freeLicenseKey();

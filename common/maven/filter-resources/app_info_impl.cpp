@@ -177,6 +177,12 @@ QString QnAppInfo::cloudName()
     return QStringLiteral("${cloudName}");
 }
 
+QStringList QnAppInfo::compatibleCloudHosts()
+{
+    const auto hostsString = QString::fromLatin1("${compatibleCloudHosts}");
+    return hostsString.split(L';');
+}
+
 int QnAppInfo::freeLicenseCount()
 {
     return ${freeLicenseCount};
