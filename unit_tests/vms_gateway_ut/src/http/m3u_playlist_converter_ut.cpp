@@ -26,9 +26,9 @@ static const char* const kOriginalPlaylist =
 static const char* const kExpectedModifiedPlaylist =
     "#EXTM3U\r\n"
     "#EXTINF:123,BANDWIDTH=10000\r\n"
-    "http://proxy.nxvms.com/server_host_name/hls/camera.m3u?hi\r\n"
+    "http://proxy.nxvms.com/gateway/server_host_name/hls/camera.m3u?hi\r\n"
     "#EXTINF:321,BANDWIDTH=50000\r\n"
-    "/server_host_name/hls/camera.m3u?lo\r\n";
+    "/gateway/server_host_name/hls/camera.m3u?lo\r\n";
 
 } // namespace
 
