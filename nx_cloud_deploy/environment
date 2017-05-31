@@ -1,6 +1,6 @@
 BUILD_CONFIGURATION=release
 
-NX_VMS_DIR=..
+NX_VMS_DIR=$(readlink -f ..)
 NX_PORTAL_DIR=../cloud_portal
 
 if [ -n "$NX_VMS_DIR" -a -f "$NX_VMS_DIR/build_variables/target/version" ]
