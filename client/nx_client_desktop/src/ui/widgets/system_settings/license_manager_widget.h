@@ -91,17 +91,28 @@ private:
     void takeAwaySelectedLicenses();
 
     void removeLicense(const QnLicensePtr& license, ForceRemove force);
-    void deactivateLicenses(const QnLicenseList& licenses);
-    bool confirmDeactivation(const QStringList& extras) const;
+
+    using RequestInfo = nx::client::desktop::license::RequestInfo;
+    void deactivateLicenses(
+        const RequestInfo& info,
+        const QnLicenseList& licenses);
+
+    bool confirmDeactivation(
+        const QStringList& extras,
+        RequestInfo& info) const;
+
     QString getLicenseDescription(const QnLicensePtr& license) const;
 
     using DeactivationErrors = nx::client::desktop::license::Deactivator::LicenseErrorHash;
     void showDeactivationErrorsDialog(
+        const RequestInfo& info,
         const QnLicenseList& licenses,
         const DeactivationErrors& errors);
+
     QString getDeactivationErrorCaption(
         int licensesCount,
         int errorsCount) const;
+
     QString getDeactivationErrorMessage(
         const QnLicenseList& licenses,
         const DeactivationErrors& errors) const;

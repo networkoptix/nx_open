@@ -25,11 +25,13 @@ struct LicenseData
 
 using LicenseDataList = QList<LicenseData>;
 
-struct Licenses
+
+struct Request
 {
+    nx::client::desktop::license::RequestInfo deactivationInfo;
     LicenseDataList licenses;
 };
-#define Licenses_Fields (licenses)
+#define Request_Fields (licenses)
 
 struct LicenseStatus
 {
@@ -56,7 +58,7 @@ struct ErrorReply
 
 #define DEACTIVATION_TYPES \
     (LicenseData) \
-    (Licenses) \
+    (Request) \
     (LicenseStatus) \
     (LicenseStatusData) \
     (ErrorReply)
@@ -101,6 +103,7 @@ class LicenseDeactivatorPrivate: public Connective<QObject>
 
 public:
     LicenseDeactivatorPrivate(
+        const RequestInfo& info,
         const QnLicenseList& licenses,
         const Handler& handler,
         QObject* parent);
@@ -115,6 +118,7 @@ private:
 };
 
 LicenseDeactivatorPrivate::LicenseDeactivatorPrivate(
+    const RequestInfo& info,
     const QnLicenseList& licenses,
     const Handler& handler,
     QObject* parent)
@@ -188,14 +192,16 @@ LicenseDeactivatorPrivate::LicenseDeactivatorPrivate(
     connect(m_httpClient.get(), &nx_http::AsyncHttpClient::done, this, threadSafeHandler,
         Qt::DirectConnection);
 
-    detail::Licenses data;
+    detail::Request request;
+    request.deactivationInfo = info;
     for (const auto& license: licenses)
-        data.licenses.append({::toString(license->key()), license->hardwareId()});
+        request.licenses.append({::toString(license->key()), license->hardwareId()});
 
     static const QByteArray kJsonContentType(
         Qn::serializationFormatToHttpContentType(Qn::JsonFormat));
 
-    m_httpClient->doPost(kDeactivateLicenseUrl, kJsonContentType, QJson::serialized(data));
+    qDebug() << QJson::serialized(request);
+    m_httpClient->doPost(kDeactivateLicenseUrl, kJsonContentType, QJson::serialized(request));
 }
 
 }
@@ -207,13 +213,16 @@ namespace client {
 namespace desktop {
 namespace license {
 
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS(RequestInfo, (json), (name)(email)(reason))
+
 void Deactivator::deactivateAsync(
+    const RequestInfo& info,
     const QnLicenseList& licenses,
     const Handler& completionHandler,
     QObject* parent)
 {
     // Deactivator will delete himself when operation complete
-    new LicenseDeactivatorPrivate(licenses, completionHandler, parent);
+    new LicenseDeactivatorPrivate(info, licenses, completionHandler, parent);
 }
 
 QString Deactivator::errorDescription(ErrorCode error)

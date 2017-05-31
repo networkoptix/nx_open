@@ -792,8 +792,8 @@ void QnNxStyle::drawPrimitive(
 
             if (option->state.testFlag(State_Enabled))
             {
-                if (auto inputTextField =
-                    qobject_cast<const nx::client::desktop::ui::detail::BaseInputField*>(widget->parentWidget()))
+                using InputField = nx::client::desktop::ui::detail::BaseInputField;
+                if (auto inputTextField = qobject_cast<const InputField*>(widget->parentWidget()))
                 {
                     readOnly = inputTextField->isReadOnly();
                     valid = inputTextField->lastValidationResult() != QValidator::Invalid;
@@ -801,9 +801,6 @@ void QnNxStyle::drawPrimitive(
                 else if (auto lineEdit = qobject_cast<const QLineEdit*>(widget))
                 {
                     readOnly = lineEdit->isReadOnly();
-
-                    if (auto inputField = qobject_cast<const QnInputField*>(lineEdit->parent()))
-                        valid = inputField->lastValidationResult() != QValidator::Invalid;
                 }
                 else if (auto plainTextEdit = qobject_cast<const QPlainTextEdit*>(widget))
                 {

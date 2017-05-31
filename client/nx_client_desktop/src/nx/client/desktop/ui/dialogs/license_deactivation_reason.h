@@ -23,13 +23,16 @@ public:
 
     QString name() const;
     QString email() const;
-    QString reason() const;
+    QStringList reason() const;
 
 private:
     QWidget* createWidget(QPushButton* nextButton);
 
 private:
     QSet<QWidget*> m_invalidFields;
+    QString m_name;
+    QString m_email;
+    QStringList m_reason;
 };
 
 } // namespace dialogs

@@ -14,6 +14,13 @@ namespace client {
 namespace desktop {
 namespace license {
 
+struct RequestInfo
+{
+    QString name;
+    QString email;
+    QStringList reason;
+};
+
 class Deactivator
 {
     Q_GADGET
@@ -53,6 +60,7 @@ public:
     using Handler = std::function<void(Result, const LicenseErrorHash&)>;
 
     static void deactivateAsync(
+        const RequestInfo& info,
         const QnLicenseList& licenses,
         const Handler& completionHandler,
         QObject* parent);
