@@ -6,15 +6,21 @@
 import uuid
 import pytest
 import logging
+from test_utils.utils import SimpleNamespace
 import server_api_data_generators as generator
 
 log = logging.getLogger(__name__)
 
+
 @pytest.fixture
-def env(env_builder, server):
-    one = server()
-    two = server()
-    return env_builder(merge_servers=[one, two],  one=one, two=two)
+def env(server_factory):
+    one = server_factory('one')
+    two = server_factory('two')
+    one.merge([two])
+    return SimpleNamespace(
+        one=one,
+        two=two,
+        )
 
 def check_servers_online(env):
     for s in [env.one, env.two]:
