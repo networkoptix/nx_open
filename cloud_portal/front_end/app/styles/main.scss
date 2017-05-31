@@ -11,6 +11,9 @@
 @import 'common';
 .webclient-page{
     margin-bottom: 0;
+    .navbar{
+        box-shadow: none;
+    }
     .webclient{
         margin-top: -10px !important;
     }
