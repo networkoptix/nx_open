@@ -31,7 +31,7 @@ angular.module('cloudApp')
                     scope.active = {
                         register: isActive('/register'),
                         view:isActive('/view'),
-                        settings:isActive('/settings')
+                        settings:$route.current.params.systemId && !isActive('/view')
                     }
                 }
                 function updateActiveSystem(){
