@@ -142,6 +142,18 @@ namespace detail
             return doQueryNoLock(t1, t2);
         }
 
+        template <class OutputData>
+        ErrorCode execSqlQuery(const QString& queryStr, OutputData* outputData)
+        {
+            QnWriteLocker lock(&m_mutex);
+            QSqlQuery query(m_sdb);
+            query.setForwardOnly(true);
+            if (!prepareSQLQuery(&query, queryStr, Q_FUNC_INFO) || !query.exec())
+                return ErrorCode::dbError;
+            QnSql::fetch_many(query, outputData);
+            return ErrorCode::ok;
+        }
+
         //getCurrentTime
         ErrorCode doQuery(const nullptr_t& /*dummy*/, ApiTimeData& currentTime);
 
