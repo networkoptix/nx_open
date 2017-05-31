@@ -83,6 +83,45 @@ void removeLoggers(const std::set<QString>& filters)
     loggerCollection()->remove(filters);
 }
 
+namespace detail {
+
+Helper::Helper(Level level, const QString& tag):
+    m_level(level),
+    m_tag(tag)
+{
+    m_logger = getLogger(m_tag);
+    if (!m_logger->isToBeLogged(m_level, m_tag))
+        m_logger.reset();
+}
+
+void Helper::log(const QString& message)
+{
+    m_logger->logForced(m_level, m_tag, message);
+}
+
+Helper::operator bool() const
+{
+    return (bool) m_logger;
+}
+
+Stream::Stream(Level level, const QString& tag):
+    Helper(level, tag)
+{
+}
+
+Stream::~Stream()
+{
+    if (m_logger)
+        log(m_strings.join(' '));
+}
+
+Stream::operator bool() const
+{
+    return !(bool) m_logger;
+}
+
+} // namespace detail
+
 } // namespace log
 } // namespace utils
 } // namespace nx

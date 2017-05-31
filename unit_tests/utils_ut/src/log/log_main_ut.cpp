@@ -58,9 +58,9 @@ TEST_F(LogMainTest, ExplicitTag)
         "* WARNING SomeTag: Warning",
         "* INFO SomeTag: Info"});const int kSeven = 7;
 
-    NX_ALWAYS(testTag) << "Always" << kSeven;
-    NX_INFO(testTag) << "Info" << kSeven;
-    NX_VERBOSE(testTag) << "Verbose" << kSeven;
+    NX_ALWAYS(testTag) "Always" << kSeven;
+    NX_INFO(testTag) "Info" << kSeven;
+    NX_VERBOSE(testTag) "Verbose" << kSeven;
     expectMessages({
         "* ALWAYS SomeTag: Always 7",
         "* INFO SomeTag: Info 7"});
@@ -83,7 +83,7 @@ TEST_F(LogMainTest, This)
         "* DEBUG nx::utils::log::test::*LogMain*(0x*): Debug",
         "* VERBOSE nx::utils::log::test::*LogMain*(0x*): Verbose"});
 
-    /*
+#if 0
     const QSize kSize(2, 3);
     NX_ALWAYS() << "Always" << kSize;
     NX_INFO() << "Info" << kSize;
@@ -92,7 +92,7 @@ TEST_F(LogMainTest, This)
         "* ALWAYS nx::utils::log::test::*LogMain*(0x*): Always QSize(2, 3)",
         "* ERROR nx::utils::log::test::*LogMain*(0x*): Info QSize(2, 3)",
         "* VERBOSE nx::utils::log::test::*LogMain*(0x*): Verbose QSize(2, 3)"});
-    */
+#endif
 }
 
 } // namespace test
