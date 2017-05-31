@@ -41,7 +41,7 @@ public:
 
     virtual boost::optional<uint64_t> contentLength() const override
     {
-        return boost::none;
+        return m_messageBodyLimit;
     }
 
     virtual void readAsync(

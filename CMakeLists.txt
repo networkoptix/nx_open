@@ -15,11 +15,17 @@ option(rdepSync
 set(CMAKE_BUILD_TYPE "Debug" CACHE STRING
     "One of [Debug Release RelWithDebInfo MinSizeRel].")
 
-set(target "" CACHE STRING "Target platform.")
+set(targetDevice "" CACHE STRING "Target device. For the list see cmake/toolchains.")
 set(box "none")
 
-if(target)
-    set(CMAKE_TOOLCHAIN_FILE "${CMAKE_CURRENT_LIST_DIR}/cmake/toolchain/${target}.cmake")
+# Early loading rdep to download a toolchain if needed.
+include(build_utils/cmake/find_python.cmake)
+include(build_utils/cmake/rdep.cmake)
+nx_rdep_configure()
+
+if(targetDevice)
+    set(CMAKE_TOOLCHAIN_FILE "${CMAKE_CURRENT_LIST_DIR}/cmake/toolchain/${targetDevice}.cmake")
+    include(cmake/sync_toolchain.cmake)
 endif()
 
 project(vms VERSION 3.1.0)
@@ -37,16 +43,11 @@ list(APPEND CMAKE_MODULE_PATH
 include(CMakeParseArguments)
 include(target_detection)
 include(utils)
-include(find_python)
 include(find_sources)
 include(qrc_utils)
 include(precompiled_header)
-include(rdep)
 include(mercurial)
 include(project_utils)
-
-find_python()
-nx_rdep_configure()
 
 include(android-ndk-workaround)
 
@@ -61,16 +62,11 @@ include(properties)
 include(cloud_host)
 include(vms_parts)
 include(compiler_options)
+include(output_directories)
 
 if(NOT (WINDOWS OR ANDROID OR IOS))
     set(BUILD_SHARED_LIBS ON)
 endif()
-
-set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib")
-set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib")
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin")
-file(MAKE_DIRECTORY "${CMAKE_LIBRARY_OUTPUT_DIRECTORY}")
-file(MAKE_DIRECTORY "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}")
 
 include(dependencies)
 

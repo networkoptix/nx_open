@@ -19,7 +19,7 @@ class BasicHandler:
         typename nx::utils::tuple_first_element<void, std::tuple<Response...>>::type>
 {
     using Manager = controller::AbstractConnectSessionManager;
-    typedef void(Manager::*ManagerFunc)(const Request&, CompletionHandler);
+    using ManagerFunc = void(Manager::*)(const Request&, CompletionHandler);
 
 public:
     BasicHandler(

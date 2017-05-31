@@ -16,7 +16,8 @@
     <properties>
         <!-- Change it to point relatively to the root-->
         <root.dir>${basedir}/../..</root.dir>
-        <common.depends>libstdc++6 (>= 4.1.1), zlib1g (>= 1:1.1.4), debconf (>= 0.5) | debconf-2.0, python, upstart-job, psmisc, upstart (>= 0.6.5-8), libsm6, libice6, libaudio2, libogg0, libxfixes3, libxrender1, libfontconfig1, libgl1-mesa-glx</common.depends>
+        <!-- cifs-utils are installed BEFORE the package by the install package -->
+        <common.depends>libstdc++6 (>= 4.1.1), zlib1g (>= 1:1.1.4), debconf (>= 0.5) | debconf-2.0, python, upstart-job, psmisc, upstart (>= 0.6.5-8), libsm6, libice6, libaudio2, libogg0, libxfixes3, libxrender1, libfontconfig1, libgl1-mesa-glx, cifs-utils</common.depends>
         <arch.depends />
     </properties>
 

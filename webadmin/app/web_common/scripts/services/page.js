@@ -1,7 +1,7 @@
 'use strict';
 
 
-angular.module('cloudApp')
+angular.module('nxCommon')
     .factory('page', ['$rootScope', '$timeout', function ($rootScope, $timeout) {
         return {
             title:function(title, clean){

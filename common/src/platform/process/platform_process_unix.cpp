@@ -1,21 +1,30 @@
-#include "process_win.h"
+#include "platform_process_unix.h"
 
-#include <Windows.h>
+#ifndef QT_NO_PROCESS
 
-#include <utils/common/warnings.h>
+#include <sys/time.h>
+#include <sys/resource.h>
+#include <unistd.h>
+#include <errno.h>
 
 #include <QtCore/QProcess>
 #include <QtCore/QPointer>
 
-#define INVALID_PRIORITY_CLASS 0xDEADF00D
 
+#include <utils/common/warnings.h>
+
+namespace {
+    enum {
+        InvalidNiceValue = 0xDEADBEEF
+    };
+}
 
 // -------------------------------------------------------------------------- //
-// QnWindowsProcessPrivate
+// QnUnixProcessPrivate
 // -------------------------------------------------------------------------- //
-class QnWindowsProcessPrivate {
+class QnUnixProcessPrivate {
 public:
-    QnWindowsProcessPrivate(): initialized(false), current(false), valid(false), pid(-1), handle(INVALID_HANDLE_VALUE) {}
+    QnUnixProcessPrivate(): initialized(false), current(false), valid(false), pid(-1) {}
 
 private:
     void tryInitialize() {
@@ -24,8 +33,7 @@ private:
 
         if(!process) {
             if(current) {
-                handle = GetCurrentProcess();
-                pid = GetCurrentProcessId();
+                pid = getpid();
                 initialized = true;
                 valid = true;
             } else {
@@ -35,14 +43,12 @@ private:
 
             return;
         }
-        
+
         QProcess *process = this->process.data();
         if(process->state() == QProcess::NotRunning)
             return; /* Cannot initialize yet. */
 
-        if(PROCESS_INFORMATION *info = process->pid()) {
-            pid = info->dwProcessId;
-            handle = info->hProcess;
+        if((pid = process->pid())) {
             initialized = true;
             valid = true;
         } else {
@@ -51,39 +57,42 @@ private:
         }
     }
 
-    static DWORD qnToSystemPriority(QnPlatformProcess::Priority priority) {
+    static int qnToSystemPriority(QnPlatformProcess::Priority priority) {
         switch(priority) {
         case QnPlatformProcess::IdlePriority:
-            return IDLE_PRIORITY_CLASS;
+            return 19;
         case QnPlatformProcess::LowestPriority:
+            return 13;
         case QnPlatformProcess::LowPriority:
-            return BELOW_NORMAL_PRIORITY_CLASS;
+            return 6;
         case QnPlatformProcess::NormalPriority:
-            return NORMAL_PRIORITY_CLASS;
+            return 0;
         case QnPlatformProcess::HighPriority:
-            return ABOVE_NORMAL_PRIORITY_CLASS;
+            return -6;
         case QnPlatformProcess::HighestPriority:
-            return HIGH_PRIORITY_CLASS;
+            return -13;
         case QnPlatformProcess::TimeCriticalPriority:
-            return REALTIME_PRIORITY_CLASS;
+            return -20;
         default:
-            return INVALID_PRIORITY_CLASS;
+            return InvalidNiceValue;
         }
     }
 
-    static QnPlatformProcess::Priority systemToQnPrioriy(DWORD priority) {
+    static QnPlatformProcess::Priority systemToQnPrioriy(int priority) {
         switch(priority) {
-        case IDLE_PRIORITY_CLASS:
+        case 19: case 18: case 17: case 16:
             return QnPlatformProcess::IdlePriority;
-        case BELOW_NORMAL_PRIORITY_CLASS:
+        case 15: case 14: case 13: case 12: case 11: case 10:
+            return QnPlatformProcess::LowestPriority;
+        case 9: case 8: case 7: case 6: case 5: case 4: case 3:
             return QnPlatformProcess::LowPriority;
-        case NORMAL_PRIORITY_CLASS:
+        case 2: case 1: case 0: case -1: case -2: case -3:
             return QnPlatformProcess::NormalPriority;
-        case ABOVE_NORMAL_PRIORITY_CLASS:
+        case -4: case -5: case -6: case -7: case -8: case -9:
             return QnPlatformProcess::HighPriority;
-        case HIGH_PRIORITY_CLASS:
+        case -10: case -11: case -12: case -13: case -14: case -15: case -16:
             return QnPlatformProcess::HighestPriority;
-        case REALTIME_PRIORITY_CLASS:
+        case -17: case -18: case -19: case -20:
             return QnPlatformProcess::TimeCriticalPriority;
         default:
             return QnPlatformProcess::InvalidPriority;
@@ -91,25 +100,24 @@ private:
     }
 
 private:
-    friend class QnWindowsProcess;
+    friend class QnUnixProcess;
 
     bool initialized;
     bool current;
     bool valid;
     qint64 pid;
-    HANDLE handle;
-    QPointer<QProcess> process;
+    QPointer<QProcess>  process;
 };
 
 
 // -------------------------------------------------------------------------- //
-// QnWindowsProcess
+// QnUnixProcess
 // -------------------------------------------------------------------------- //
-QnWindowsProcess::QnWindowsProcess(QProcess *process, QObject *parent):
-    QnPlatformProcess(parent),
-    d_ptr(new QnWindowsProcessPrivate())
+QnUnixProcess::QnUnixProcess(QProcess *process, QObject *parent):
+    base_type(parent),
+    d_ptr(new QnUnixProcessPrivate())
 {
-    Q_D(QnWindowsProcess);
+    Q_D(QnUnixProcess);
     d->process = process;
     d->current = process == NULL;
 
@@ -119,43 +127,49 @@ QnWindowsProcess::QnWindowsProcess(QProcess *process, QObject *parent):
     d->tryInitialize();
 }
 
-QnWindowsProcess::~QnWindowsProcess() {
+QnUnixProcess::~QnUnixProcess() {
     return;
 }
 
-qint64 QnWindowsProcess::pid() const {
+qint64 QnUnixProcess::pid() const {
     return d_func()->pid;
 }
 
-QnPlatformProcess::Priority QnWindowsProcess::priority() const {
-    Q_D(const QnWindowsProcess);
+QnPlatformProcess::Priority QnUnixProcess::priority() const {
+    Q_D(const QnUnixProcess);
     if(!d->valid)
         return InvalidPriority;
 
-    DWORD systemPriority = GetPriorityClass(d->handle);
-    return d->systemToQnPrioriy(systemPriority);
+    errno = 0;
+    int systemPriority = getpriority(PRIO_PROCESS, d->pid);
+    if(errno != 0) {
+        return InvalidPriority;
+    } else {
+        return d->systemToQnPrioriy(systemPriority);
+    }
 }
 
-void QnWindowsProcess::setPriority(Priority priority) {
-    Q_D(QnWindowsProcess);
+void QnUnixProcess::setPriority(Priority priority) {
+    Q_D(QnUnixProcess);
     if(!d->valid) {
         qnWarning("Process is not valid, could not set priority.");
         return;
     }
 
-    DWORD systemPriority = d->qnToSystemPriority(priority);
-    if(systemPriority == INVALID_PRIORITY_CLASS) {
+    int systemPriority = d->qnToSystemPriority(priority);
+    if(systemPriority == (int)InvalidNiceValue) {
         qnWarning("Invalid process priority value '%1'.", static_cast<int>(priority));
         return;
     }
 
-    if(SetPriorityClass(d->handle, systemPriority) == 0) {
+    if(setpriority(PRIO_PROCESS, d->pid, systemPriority) != 0) {
         qnWarning("Could not set priority for process.");
         return;
     }
 }
 
-void QnWindowsProcess::at_process_stateChanged() {
+void QnUnixProcess::at_process_stateChanged() {
     d_func()->tryInitialize();
 }
 
+#endif // QT_NO_PROCESS

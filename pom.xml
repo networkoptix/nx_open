@@ -175,7 +175,6 @@
         <quazip.version>0.7.1</quazip.version>
         <openal.version>1.16</openal.version>
         <libjpeg-turbo.version>1.4.2</libjpeg-turbo.version>
-        <libcreateprocess.version>0.1</libcreateprocess.version>
         <vmux.version>1.0.0</vmux.version>
         <cpro.version>1.0.0</cpro.version>
         <server-external.version>default</server-external.version>
@@ -275,7 +274,7 @@
         <artifact.name.cloud_debug>${artifact.name.prefix}-cloud_debug-${artifact.name.suffix}</artifact.name.cloud_debug>
         <artifact.name.testcamera>${artifact.name.prefix}-testcamera-${artifact.name.suffix}</artifact.name.testcamera>
 
-        <nxcloud.version>1.0.142</nxcloud.version>
+        <nxcloud.version>1.0.146</nxcloud.version>
     </properties>
 
     <build>
@@ -866,7 +865,7 @@
                 <qt.spec/>
                 <openssl.version>1.0.0j</openssl.version>
                 <quazip.version>0.7.2</quazip.version>
-                <gcc.version>4.9.3</gcc.version>
+                <gcc.version>4.8.3</gcc.version>
                 <additional.defines>DISABLE_ALL_VENDORS DISABLE_SOFTWARE_MOTION_DETECTION DISABLE_DESKTOP_CAMERA EDGE_SERVER debug_in_release</additional.defines>
                 <modification>isd</modification>
                 <rdep.target>isd</rdep.target>
@@ -898,6 +897,7 @@
                 <additional.defines>DISABLE_ALL_VENDORS DISABLE_DESKTOP_CAMERA EDGE_SERVER debug_in_release</additional.defines>
                 <modification>isd_s2</modification>
                 <rdep.target>isd_s2</rdep.target>
+                <rdep.packages>cpro</rdep.packages>
                 <qt.spec/>
             </properties>
             <modules>

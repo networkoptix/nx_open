@@ -127,5 +127,8 @@
         "ieWin10": "Video cannot be played.<br>Please, use Microsoft Edge or Google Chrome browsers.",
         "ubuntuNX": "Video cannot be played.<br>This browser does not support video from ARM-based servers. Please, use Chromium browser instead.",
         "errorLoading": "Video cannot be played.<br>Error occurred."
+    },
+    "pageTitles": {
+        "default": "{{PRODUCT_NAME}} web interface"
     }
 }

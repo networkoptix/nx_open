@@ -1,6 +1,8 @@
 'use strict';
 
 angular.module('nxCommon').controller('ViewCtrl',
+            ['$scope', '$rootScope', '$location', '$routeParams', 'cameraRecords',
+              'camerasProvider', '$sessionStorage', '$localStorage', '$timeout', 'systemAPI',
     function ($scope, $rootScope, $location, $routeParams, cameraRecords,
               camerasProvider, $sessionStorage, $localStorage, $timeout, systemAPI) {
 
@@ -241,10 +243,6 @@ angular.module('nxCommon').controller('ViewCtrl',
             var cameraId = $scope.activeCamera.physicalId;
             var serverUrl = '';
 
-            var authParam = '&auth=' + systemAPI.authGet();
-
-            var positionMedia = !live ? '&pos=' + (playing) : '';
-
             var resolution = $scope.activeResolution;
             var resolutionHls = channels[resolution] || channels.Low;
 
@@ -256,8 +254,8 @@ angular.module('nxCommon').controller('ViewCtrl',
 
             $scope.currentResolution = $scope.player == "webm" ? resolution : resolutionHls;
             $scope.activeVideoSource = _.filter([
-                { src: ( serverUrl + '/hls/'   + cameraId + '.m3u8?'            + resolutionHls + positionMedia + authParam ), type: mimeTypes.hls, transport:'hls'},
-                { src: ( serverUrl + '/media/' + cameraId + '.webm?rt&resolution=' + resolution + positionMedia + authParam ), type: mimeTypes.webm, transport:'webm' }
+                { src: systemAPI.hlsUrl(cameraId, !live && playing, resolutionHls), type: mimeTypes.hls, transport:'hls'},
+                { src: systemAPI.webmUrl(cameraId, !live && playing, resolution), type: mimeTypes.webm, transport:'webm' }
             ],function(src){
                 return formatSupported(src.transport,false) && $scope.activeFormat === 'Auto' || $scope.debugMode && $scope.manualFormats.indexOf($scope.activeFormat) > -1;
             });
@@ -474,4 +472,4 @@ angular.module('nxCommon').controller('ViewCtrl',
 
         $('.video-icon.pull-left-5').dropdown();
 
-    });
+    }]);
