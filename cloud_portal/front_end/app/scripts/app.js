@@ -210,28 +210,4 @@ angular.module('cloudApp', [
             title: L.pageTitles.pageNotFound,
             templateUrl: Config.viewsDir + '404.html'
         });
-}]).run(['$route', '$rootScope', '$location', 'page', function ($route, $rootScope, $location, page) {
-
-    $rootScope.C = Config;
-    $rootScope.L = L;
-
-    var original = $location.path;
-    $location.path = function (path, reload) {
-        if (reload === false) {
-            var lastRoute = $route.current;
-            var un = $rootScope.$on('$locationChangeSuccess', function () {
-                $route.current = lastRoute;
-                un();
-            });
-        }
-        return original.apply($location, [path]);
-    };
-
-    $rootScope.$on('$routeChangeSuccess', function (event, current, previous) {
-        if(current.$$route){
-            page.title(current.$$route.title);
-        }else{
-            page.title(L.pageTitles.pageNotFound);
-        }
-    });
 }]);
