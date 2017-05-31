@@ -53,14 +53,12 @@ Release
 */x86/*
 */x64/*
 */arm/*
-*/arm-isd/*
-*/arm-isd_s2/*
+*/arm-edge1/*
 */arm-rpi/*
 */arm-bpi/*
 */arm-tx1/*
 */target/*
-*/target-isd/*
-*/target-isd_s2/*
+*/target-edge1/*
 */target-rpi/*
 */target-bpi/*
 */target-tx1/*

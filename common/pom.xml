@@ -84,7 +84,7 @@
         </profile>
 
         <profile>
-            <id>linux-arm-isd</id>
+            <id>linux-arm-edge1</id>
             <activation>
                 <activeByDefault>false</activeByDefault>
                 <os>
@@ -93,27 +93,7 @@
                 </os>
                 <property>
                     <name>box</name>
-                    <value>isd</value>
-                </property>
-            </activation>
-            <properties>
-                <qt.libs>core core-private network xml sql</qt.libs>
-                <rdep.linux.packages>quazip openldap</rdep.linux.packages>
-                <rdep.linux.arm.packages>libcreateprocess</rdep.linux.arm.packages>
-            </properties>
-        </profile>
-
-        <profile>
-            <id>linux-arm-isd-s2</id>
-            <activation>
-                <activeByDefault>false</activeByDefault>
-                <os>
-                    <family>unix</family>
-                    <name>linux</name>
-                </os>
-                <property>
-                    <name>box</name>
-                    <value>isd_s2</value>
+                    <value>edge1</value>
                 </property>
             </activation>
             <properties>

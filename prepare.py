@@ -22,8 +22,7 @@ gcc_version_for_target = {
     "bpi": "4.8.3",
     "rpi": "4.9.3",
     "tx1": "4.8.4",
-    "isd": "4.9.3",
-    "isd_s2": "4.9.3"
+    "edge1": "4.9.3"
 }
 
 def package_name(target, package, version):
