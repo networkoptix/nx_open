@@ -22,12 +22,12 @@ namespace ui {
 
 TextEditField::TextEditField(QWidget* parent):
     base_type(new QTextEdit(), accessor("plainText"),
-        accessor("readOnly"), accessor("placeholder"), parent)
+        accessor("readOnly"), accessor("placeholderText"), parent)
 {
     const auto textInput = qobject_cast<QTextEdit*>(input());
     connect(textInput, &QTextEdit::textChanged, this, [this]()
     {
-        handleInputTextChanged();
+        emit textChanged(text());
         validate();
     });
 }

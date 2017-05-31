@@ -84,16 +84,16 @@ QWidget* LicenseDeactivationReason::createWidget(QPushButton* nextButton)
         };
 
     addLabel(tr("Name"));
-    layout->addWidget(createField<QnInputField>(
-        Qn::defaultNonEmptyValidator(tr("Name is necessary"))));
+    addWidget(createField<QnInputField>(
+        Qn::defaultNonEmptyValidator(tr("Name is necessary"))), true);
 
     addLabel(tr("Email"));
-    layout->addWidget(createField<QnInputField>(
+    addWidget(createField<QnInputField>(
         Qn::defaultEmailValidator(false)));
 
     addLabel(tr("Reason for deactivation"));
     addWidget(createField<nx::client::desktop::ui::TextEditField>(
-        Qn::defaultNonEmptyValidator(tr("Reason is necessary"))), false);
+        Qn::defaultNonEmptyValidator(tr("Reason is necessary"))));
 
     return widget;
 }

@@ -36,9 +36,9 @@ public:
 
     virtual ~BaseInputField();
 
-    QWidget* input();
+    QWidget* input() const;
 
-public: // Properties.
+public:
     QString title() const;
     void setTitle(const QString& value);
 
@@ -58,6 +58,8 @@ public: // Properties.
     bool isValid() const;
 
 public:
+    virtual Qn::ValidationResult calculateValidationResult() const;
+
     bool validate();
 
     /* After a small delay calls validate if input is not being edited. */
@@ -75,9 +77,6 @@ public:
 signals:
     void textChanged(const QString& text);
     void isValidChanged();
-
-protected:
-    void handleInputTextChanged();
 
 private:
     Q_DISABLE_COPY(BaseInputField)
