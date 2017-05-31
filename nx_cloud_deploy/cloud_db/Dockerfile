@@ -1,0 +1,16 @@
+FROM 009544449203.dkr.ecr.us-east-1.amazonaws.com/cloud/base:1.5
+MAINTAINER Ivan Vigasin <ivigasin@gmail.com>
+
+ADD stage/qt /opt/networkoptix/qt
+ADD stage/cloud_db /opt/networkoptix/cloud_db
+
+ADD etc/authorization_rules.xml /opt/networkoptix/cloud_db/etc/authorization_rules.xml
+ADD etc/cloud_db.conf /opt/networkoptix/cloud_db/etc/cloud_db.conf
+ADD docker/entrypoint.sh /opt/networkoptix/cloud_db/bin
+
+EXPOSE 3346
+
+ENV QT_PLUGIN_PATH /opt/networkoptix/qt/bin
+ENV LD_LIBRARY_PATH /opt/networkoptix/qt/lib:/opt/networkoptix/cloud_db/lib
+
+CMD ["/opt/networkoptix/cloud_db/bin/entrypoint.sh"]

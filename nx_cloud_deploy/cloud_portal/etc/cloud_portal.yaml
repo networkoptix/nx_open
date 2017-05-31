@@ -1,0 +1,36 @@
+customization: '$CUSTOMIZATION'
+
+cloud_database:
+    host: '$DB_HOST'
+    port: '$DB_PORT'
+    username: '$DB_USER'
+    password: '$DB_PASSWORD'
+    database: '$DB_NAME'
+
+cloud_db:
+    url: 'http://$CLOUD_DB_HOST/cdb'
+
+cloud_portal:
+    url: 'http://$CLOUD_PORTAL_HOST'
+
+cloud_gateway:
+    url: 'http://$CLOUD_DB_HOST:3347'
+
+mail_from: '$MAIL_FROM'
+
+mail_prefix: '$MAIL_PREFIX'
+
+smtp:
+    host: '$SMTP_HOST'
+    user: '$SMTP_USER'
+    password: '$SMTP_PASSWORD'
+    port: $SMTP_PORT
+    tls: $SMTP_TLS
+
+admins:
+    -
+        - 'Evgeny'
+        - 'ebalashov@networkoptix.com'
+    -
+        - 'Ivan'
+        - 'ivigasin@networkoptix.com'
