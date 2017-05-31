@@ -271,8 +271,8 @@ void CloudUserInfoPool::userInfoRemoved(const nx::Buffer& userName)
     {
         if (it->first.userName == userName)
         {
-            it = m_userNonceToResponse.erase(it);
             decUserCountByNonce(it->first.cloudNonce);
+            it = m_userNonceToResponse.erase(it);
         }
         else
             ++it;
