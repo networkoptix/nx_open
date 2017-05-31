@@ -417,13 +417,18 @@ namespace ec2
                     return this->listDirectory(folderName, handler);
                 },
                 outData
-                );
+            );
         }
 
         ErrorCode addStoredFileSync(const QString& folderName, const QByteArray& data)
         {
-            int(AbstractStoredFileManager::*fn)(const QString&, const QByteArray&, impl::SimpleHandlerPtr) = &AbstractStoredFileManager::addStoredFile;
-            return impl::doSyncCall<impl::SimpleHandler>(std::bind(fn, this, folderName, data, std::placeholders::_1));
+            int(AbstractStoredFileManager::*fn)(
+                const QString&,
+                const QByteArray&,
+                impl::SimpleHandlerPtr) =
+                &AbstractStoredFileManager::addStoredFile;
+            return impl::doSyncCall<impl::SimpleHandler>(
+                std::bind(fn, this, folderName, data, std::placeholders::_1));
         }
 
     protected:
