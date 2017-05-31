@@ -64,16 +64,17 @@ angular.module('nxCommon')
 
                 function detectBestFormat(){
                     //1. Hide all informers
-                    scope.videoFlags.flashRequired = false;
-                    scope.videoFlags.flashOrWebmRequired = false;
-                    scope.videoFlags.noArmSupport = false;
-                    scope.videoFlags.noFormat = false;
-                    scope.videoFlags.errorLoading = false;
-                    scope.videoFlags.ieNoWebm = false;
-                    scope.videoFlags.loading = false;
-                    scope.videoFlags.ieWin10 = false;
-                    scope.videoFlags.ubuntuNX = false;
-                    //console.log(scope.videoFlags);
+                    scope.videoFlags = {
+                        'flashRequired': false,
+                        'flashOrWebmRequired': false,
+                        'noArmSupport': false,
+                        'noFormat': false,
+                        'errorLoading': false,
+                        'ieNoWebm': false,
+                        'loading': false,
+                        'ieWin10 ':false,                    
+                        'ubuntuNX': false
+                    };
 
                     if(scope.debugMode && scope.activeFormat != "Auto"){
                         return scope.activeFormat;

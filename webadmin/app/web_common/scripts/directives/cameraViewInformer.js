@@ -14,7 +14,8 @@ angular.module('nxCommon')
         		scope.cameraStates = L.cameraStates;
         		scope.showView = false;
         		scope.showFlags = false;
-
+                scope.message = "";
+                scope.alertType = null;
 
         		scope.$watch('viewFlags', function(){
         			if((scope.viewFlags.status == "Offline" || scope.viewFlags.status == 'Unauthorized') &&
@@ -25,13 +26,44 @@ angular.module('nxCommon')
         			else{
         				scope.showView = false;
         			}
+
+                    scope.alertType = _.find(Object.keys(scope.viewFlags), function(x){
+                        if(scope.viewFlags[x])
+                            return x;
+                    });
+
+                    if(!scope.alertType){
+                        return;
+                    }
+                    
+                    if( scope.alertType == 'status'){
+                        if(scope.viewFlags[scope.alertType] == "Offline"){
+                            scope.message = scope.cameraStates.offline;
+
+                        }
+                        else if(scope.viewFlags[scope.alertType] == "Unauthorized"){
+                            scope.message = scope.cameraStates.unauthorized;
+                        }
+                    }
+                    else{
+                        scope.message = scope.cameraStates[scope.alertType];
+                    }
         		}, true);
         		
+
+
         		scope.$watch('videoFlags', function(){
-        			scope.showVideo = _.find(scope.videoFlags, function(flag){
-											if(flag)
-												return true;
-										});
+                    scope.alertType = _.find(Object.keys(scope.videoFlags), function(x){
+                        if(scope.videoFlags[x])
+                            return x;
+                    });
+
+                    scope.showVideo = scope.alertType != null;
+
+                    if(scope.alertType != "loading")
+                        scope.message = scope.cameraStates[scope.alertType];
+
+                    console.log(scope.message);
         		}, true);
         	}
 		};
