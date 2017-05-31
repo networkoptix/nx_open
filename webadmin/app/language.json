@@ -116,18 +116,17 @@
         "reserved": "Reserved"
     },
     "cameraStates":{
-        "offline": "<div class='camera-view-offline camera-view-message-icon'></div><br/><div class='camera-view-message'>OFFLINE</div>",
-        "unauthorized": "<div class='camera-view-unauthorized camera-view-message-icon'></div><br><div class='camera-view-message'>UNAUTHORIZED</div>",
-        "iosVideoTooLarge": "Video cannot be played.<br>iOS does not support video larger than fullHD (2MP: 1920x1080).<br>",
-        "loading": "<div class='camera-view-preloader camera-view-message-icon'></div>",
-        "flashRequired": "Video cannot be played.<br>Please <a href='https://get.adobe.com/flashplayer/' target='_blank'>install Adobe Flash</a> for playing video from ARM-based servers.<br>",
-        "flashOrWebmRequired": "Video cannot be played.<br>Please <a href='https://get.adobe.com/flashplayer/' target='_blank'>install Adobe Flash</a> or<a href='https://tools.google.com/dlpage/webmmf/' target='_blank'>WebM codec</a> for playing video in Internet Explorer.<br>",
-        "noArmSupport": "Video cannot be played.<br>This browser or device does not support video playback from ARM-based servers.<br>",
-        "noFormat": "Video cannot be played.<br>This browser or device does not support video playback from  this camera.<br>",
-        "ieNoWebm": "Video cannot be played.<br>Please, install <a href='https://tools.google.com/dlpage/webmmf/' target='_blank'>WebM codec</a> for Internet Explorer.<br>",
-        "ieWin10": "Video cannot be played.<br>Please, use Microsoft Edge or Google Chrome browsers.<br>",
-        "ubuntuNX": "Video cannot be played.<br>This browser does not support video from ARM-based servers. Please, use Chromium browser instead.<br>",
-        "errorLoading": "Video cannot be played.<br>Error occurred.<br>"
+        "offline": "OFFLINE",
+        "unauthorized": "UNAUTHORIZED",
+        "iosVideoTooLarge": "Video cannot be played.<br>iOS does not support video larger than fullHD (2MP: 1920x1080).",
+        "flashRequired": "Video cannot be played.<br>Please <a href='https://get.adobe.com/flashplayer/' target='_blank'>install Adobe Flash</a> for playing video from ARM-based servers.",
+        "flashOrWebmRequired": "Video cannot be played.<br>Please <a href='https://get.adobe.com/flashplayer/' target='_blank'>install Adobe Flash</a> or<a href='https://tools.google.com/dlpage/webmmf/' target='_blank'>WebM codec</a> for playing video in Internet Explorer.",
+        "noArmSupport": "Video cannot be played.<br>This browser or device does not support video playback from ARM-based servers.",
+        "noFormat": "Video cannot be played.<br>This browser or device does not support video playback from  this camera.",
+        "ieNoWebm": "Video cannot be played.<br>Please, install <a href='https://tools.google.com/dlpage/webmmf/' target='_blank'>WebM codec</a> for Internet Explorer.",
+        "ieWin10": "Video cannot be played.<br>Please, use Microsoft Edge or Google Chrome browsers.",
+        "ubuntuNX": "Video cannot be played.<br>This browser does not support video from ARM-based servers. Please, use Chromium browser instead.",
+        "errorLoading": "Video cannot be played.<br>Error occurred."
     },
     "pageTitles": {
         "default": "{{PRODUCT_NAME}} web interface"

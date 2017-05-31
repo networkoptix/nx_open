@@ -1,39 +1,15 @@
-<div class="camera-states" ng-if="showView || showVideo ">
-    <div class="camera-view-informer" ng-if="!viewFlags.positionSelected && viewFlags.status == 'Offline'" ng-bind-html="cameraStates.offline">
-    </div>
-    <div class="camera-view-informer" ng-if="!viewFlags.positionSelected && viewFlags.status == 'Unauthorized'" ng-bind-html="cameraStates.unauthorized">
-    </div>
-
-    <div class="camera-view-informer" ng-if="viewFlags.iOSVideoTooLarge" ng-bind-html="cameraStates.iosVideoTooLarge">
+<div class="camera-states" ng-if="showView || showVideo">
+    <div class="camera-view-informer" ng-if="alertType !='loading'">
+        <div class="camera-view-message-icon" 
+             ng-if="alertType == 'status'"
+             ng-class="viewFlags[alertType] == 'Offline' ? 'camera-view-offline' : 'camera-view-unauthorized'"></div>
+        <br ng-if="alertType == 'status'">
+        <div class="camera-view-message" ng-bind-html="message"></div>
     </div>
 
     <!--BREAK BETWEEN MESSAGES-->
-
-    <div class="camera-view-informer camera-loading" ng-style="{'background-image':'url(' + preview + ')'}" ng-if="videoFlags.loading" ng-bind-html="cameraStates.loading">
-    </div>
-
-    <div class="camera-view-informer" ng-if="videoFlags.flashRequired" ng-bind-html="cameraStates.flashRequired">
-    </div>
-
-    <div class="camera-view-informer" ng-if="videoFlags.flashOrWebmRequired" ng-bind-html="cameraStates.flashOrWebmRequired">
-    </div>
-
-    <div class="camera-view-informer" ng-if="videoFlags.noArmSupport" ng-bind-html="cameraStates.noArmSupport">
-    </div>
-
-    <div class="camera-view-informer" ng-if="videoFlags.noFormat" ng-bind-html="cameraStates.noFormat">
-    </div>
-
-
-    <div class="camera-view-informer" ng-if="videoFlags.ieNoWebm" ng-bind-html="cameraStates.ieNoWebm">
-    </div>
-
-    <div class="camera-view-informer" ng-if="videoFlags.ieWin10" ng-bind-html="cameraStates.ieWin10">
-    </div>
-
-    <div class="camera-view-informer" ng-if="videoFlags.ubuntuNX" ng-bind-html="cameraStates.ubuntuNX">
-    </div>
-
-    <div class="camera-view-informer" ng-if="videoFlags.errorLoading" ng-bind-html="cameraStates.errorLoading">
+    <img class="camera-view-informer video-preview"
+         ng-if="alertType == 'loading'"
+         ng-src="{{preview}}">
     </div>
 </div>
