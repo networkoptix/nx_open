@@ -35,15 +35,22 @@ angular.module('cloudApp')
                     }
                 }
                 function updateActiveSystem(){
+                    if(!scope.systems){
+                        return;
+                    }
                     scope.activeSystem = _.find(scope.systems,function(system){
                         return $route.current.params.systemId == system.id;
                     });
+                    if(scope.systems.length == 1){ // Special case for a single system - it always active
+                        scope.activeSystem = scope.systems[0];
+                    }
                 }
                 updateActive();
                 account.get().then(function(account){
                     scope.account = account;
                     cloudApi.systems().then(function(result){
                         scope.systems = cloudApi.sortSystems(result.data);
+                        scope.singleSystem = scope.systems.length == 1;
                         updateActiveSystem();
                     });
 
