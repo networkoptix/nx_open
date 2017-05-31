@@ -184,15 +184,23 @@ QString QnBusinessStringsHelper::eventAtResource(const QnBusinessEventParameters
             : (params.resourceName.isEmpty() ? tr("Generic Event")
                 : tr("Generic Event at %1").arg(params.resourceName)));
     case SoftwareTriggerEvent:
-        return tr("Software Trigger at %1").arg(resourceName);
+        return tr("Software trigger %1 at %2")
+            .arg(getSoftwareTriggerName(params))
+            .arg(resourceName);
     default:
         break;
     }
     return tr("An unknown event has occurred");
 }
 
-QString QnBusinessStringsHelper::eventAtResources(const QnBusinessEventParameters &params) const
+QString QnBusinessStringsHelper::eventAtResources(const QnBusinessEventParameters& params) const
 {
+    if (params.eventType == QnBusiness::SoftwareTriggerEvent)
+    {
+        return lit("Software Trigger %1 has been activated multiple times")
+            .arg(getSoftwareTriggerName(params));
+    }
+
     return lit("Multiple %1 events have occured").arg(eventName(params.eventType));
 }
 
