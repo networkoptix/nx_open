@@ -80,7 +80,22 @@ function setLanguage(lang){
                         dataType: 'json',
                         success: function (response) {
                             L = response;// Fill global L variable
-                            angular.bootstrap(document, ['webadminApp']);
+
+                            $.ajax({
+                                url: 'web_common/commonLanguage.json',
+                                async: true,
+                                dataType: 'json',
+                                success: function (response) {
+                                    L.common = response;// Fill global L variable
+                                    angular.bootstrap(document, ['webadminApp']);
+                                },
+                                error:function(){
+                                    // Never should've happened
+                                    // Try loading anyways
+                                    angular.bootstrap(document, ['webadminApp']);
+                                    console.error("Can't get commonLanguage.json");
+                                }
+                            });
                         },
                         error:function(){
                             // Never should've happened

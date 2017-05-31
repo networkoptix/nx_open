@@ -8,6 +8,17 @@
 @import '_big_brother';
 @import '_languages';
 
+@import 'common';
+.webclient-page{
+    margin-bottom: 0;
+    .webclient{
+        margin-top: -10px !important;
+    }
+    footer{
+        display:none;
+    }
+}
+
 html {
   position: relative;
   min-height: 100%;

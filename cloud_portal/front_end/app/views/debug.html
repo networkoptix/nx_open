@@ -1,165 +1,167 @@
-<form class="form-horizontal" novalidate ng-model-options="{ updateOn: 'default' }">
-    <h1>Debug native links</h1>
+<div class="container" >
+    <form class="form-horizontal" novalidate ng-model-options="{ updateOn: 'default' }">
+        <h1>Debug native links</h1>
 
 
-    <div class="form-group">
-        <div class="col-sm-offset-2 col-sm-10">
-            <open-client-button system="{id:'dummy',isOnline:true}"></open-client-button>
+        <div class="form-group">
+            <div class="col-sm-offset-2 col-sm-10">
+                <open-client-button system="{id:'dummy',isOnline:true}"></open-client-button>
+            </div>
         </div>
-    </div>
 
-    <div class="form-group">
-        <div class="col-sm-offset-2 col-sm-4">
-            <label><input type="checkbox" ng-model="linkSettings.native"/> Native link</label>
+        <div class="form-group">
+            <div class="col-sm-offset-2 col-sm-4">
+                <label><input type="checkbox" ng-model="linkSettings.native"/> Native link</label>
+            </div>
         </div>
-    </div>
 
-    <div class="form-group">
-        <label class="col-sm-2 control-label">Auth key</label>
-        <div class="col-sm-4">
-            <input type="text" class="form-control" ng-model="linkSettings.auth"/>
+        <div class="form-group">
+            <label class="col-sm-2 control-label">Auth key</label>
+            <div class="col-sm-4">
+                <input type="text" class="form-control" ng-model="linkSettings.auth"/>
+            </div>
+            <div class="col-sm-4">
+                <button class="btn btn-sm btn-default" ng-click="getTempKey()">Get temporary key</button>
+            </div>
         </div>
-        <div class="col-sm-4">
-            <button class="btn btn-sm btn-default" ng-click="getTempKey()">Get temporary key</button>
+
+
+
+        <div class="form-group">
+            <label class="col-sm-2 control-label">From</label>
+            <div class="col-sm-4">
+                <input type="text" class="form-control" ng-model="linkSettings.from"/>
+            </div>
+            <div class="col-sm-4">
+                <p class="help-block">
+                    portal, mobile, client, webadmin
+                </p>
+            </div>
         </div>
-    </div>
 
-
-
-    <div class="form-group">
-        <label class="col-sm-2 control-label">From</label>
-        <div class="col-sm-4">
-            <input type="text" class="form-control" ng-model="linkSettings.from"/>
+        <div class="form-group">
+            <label class="col-sm-2 control-label">Context</label>
+            <div class="col-sm-4">
+                <input type="text" class="form-control" ng-model="linkSettings.context"/>
+            </div>
         </div>
-        <div class="col-sm-4">
-            <p class="help-block">
-                portal, mobile, client, webadmin
-            </p>
+
+        <div class="form-group">
+            <label class="col-sm-2 control-label">Command</label>
+            <div class="col-sm-4">
+                <input type="text" class="form-control" ng-model="linkSettings.command"/>
+            </div>
+            <div class="col-sm-4">
+                <p class="help-block">
+                    client, cloud, system
+                </p>
+            </div>
         </div>
-    </div>
 
-    <div class="form-group">
-        <label class="col-sm-2 control-label">Context</label>
-        <div class="col-sm-4">
-            <input type="text" class="form-control" ng-model="linkSettings.context"/>
+        <div class="form-group">
+            <label class="col-sm-2 control-label">SystemId</label>
+            <div class="col-sm-4">
+                <input type="text" class="form-control" ng-model="linkSettings.systemId"/>
+            </div>
         </div>
-    </div>
 
-    <div class="form-group">
-        <label class="col-sm-2 control-label">Command</label>
-        <div class="col-sm-4">
-            <input type="text" class="form-control" ng-model="linkSettings.command"/>
+        <div class="form-group">
+            <label class="col-sm-2 control-label">System action</label>
+            <div class="col-sm-4">
+                <input type="text" class="form-control" ng-model="linkSettings.action"/>
+            </div>
         </div>
-        <div class="col-sm-4">
-            <p class="help-block">
-                client, cloud, system
-            </p>
+
+
+
+        <div class="form-group" ng-class="{'has-error':actionParametersError}">
+            <label class="col-sm-2 control-label">Action parameters (json)</label>
+            <div class="col-sm-4">
+                <textarea class="form-control" rows="3" ng-model="actionParameters"></textarea>
+            </div>
         </div>
-    </div>
 
-    <div class="form-group">
-        <label class="col-sm-2 control-label">SystemId</label>
-        <div class="col-sm-4">
-            <input type="text" class="form-control" ng-model="linkSettings.systemId"/>
+
+        <div class="form-group">
+            <div class="col-sm-offset-2 col-sm-10">
+                <button class="btn btn-default" ng-click="openLink()"
+                        title="{{system.stateMessage}}">Call url</button>
+            </div>
         </div>
-    </div>
+        <div class="form-group">
+            <label class="col-sm-2 control-label">Formatted link:</label>
+            <div class="col-sm-10">
+                <b>{{generateLink()}}</b>
 
-    <div class="form-group">
-        <label class="col-sm-2 control-label">System action</label>
-        <div class="col-sm-4">
-            <input type="text" class="form-control" ng-model="linkSettings.action"/>
+                <pre>{{formatJSON(linkSettings)}}</pre>
+            </div>
         </div>
-    </div>
 
-
-
-    <div class="form-group" ng-class="{'has-error':actionParametersError}">
-        <label class="col-sm-2 control-label">Action parameters (json)</label>
-        <div class="col-sm-4">
-            <textarea class="form-control" rows="3" ng-model="actionParameters"></textarea>
+        <hr>
+        <h1>Debug processes and notifications</h1>
+        <div class="form-group">
+            <div class="col-sm-offset-2 col-sm-10">
+                <pre>{{formatJSON(debugProcess.process)}}</pre>
+            </div>
         </div>
-    </div>
-
-
-    <div class="form-group">
-        <div class="col-sm-offset-2 col-sm-10">
-            <button class="btn btn-default" ng-click="openLink()"
-                    title="{{system.stateMessage}}">Call url</button>
+        <div class="form-group">
+            <div class="col-sm-offset-2 col-sm-10">
+                <label><input type="checkbox" ng-model="debugProcess.success"/>Success</label>
+            </div>
         </div>
-    </div>
-    <div class="form-group">
-        <label class="col-sm-2 control-label">Formatted link:</label>
-        <div class="col-sm-10">
-            <b>{{generateLink()}}</b>
+        <div class="form-group">
+            <div class="col-sm-offset-2 col-sm-10">
+                <button class="btn btn-primary" ng-click="debugProcess.process.run()">Run process</button>
+                <button class="btn btn-primary" ng-click="notify()">Call notification</button>
+                <br>
+                <br>
 
-            <pre>{{formatJSON(linkSettings)}}</pre>
-        </div>
-    </div>
+                <process-button process="debugProcess.process"
+                                action-type="'danger'"
+                                button-text="'Danger'"></process-button>
 
-    <hr>
-    <h1>Debug processes and notifications</h1>
-    <div class="form-group">
-        <div class="col-sm-offset-2 col-sm-10">
-            <pre>{{formatJSON(debugProcess.process)}}</pre>
-        </div>
-    </div>
-    <div class="form-group">
-        <div class="col-sm-offset-2 col-sm-10">
-            <label><input type="checkbox" ng-model="debugProcess.success"/>Success</label>
-        </div>
-    </div>
-    <div class="form-group">
-        <div class="col-sm-offset-2 col-sm-10">
-            <button class="btn btn-primary" ng-click="debugProcess.process.run()">Run process</button>
-            <button class="btn btn-primary" ng-click="notify()">Call notification</button>
-            <br>
-            <br>
+                <process-button process="debugProcess.process"
+                                button-text="'Standard'"></process-button>
 
-            <process-button process="debugProcess.process"
-                            action-type="'danger'"
-                            button-text="'Danger'"></process-button>
-
-            <process-button process="debugProcess.process"
-                            button-text="'Standard'"></process-button>
-
-            <process-button process="debugProcess.process"
-                            action-type="'default'"
-                            button-text="'Default'"></process-button>
+                <process-button process="debugProcess.process"
+                                action-type="'default'"
+                                button-text="'Default'"></process-button>
 
 
+            </div>
         </div>
-    </div>
 
-    <hr>
-    <h1>Debug email notifications</h1>
-    <div class="form-group">
-        <label class="col-sm-2 control-label">Email</label>
-        <div class="col-sm-10">
-            <input type="email" class="form-control" ng-model="user_email">
+        <hr>
+        <h1>Debug email notifications</h1>
+        <div class="form-group">
+            <label class="col-sm-2 control-label">Email</label>
+            <div class="col-sm-10">
+                <input type="email" class="form-control" ng-model="user_email">
+            </div>
         </div>
-    </div>
 
-    <div class="form-group">
-        <label class="col-sm-2 control-label">Type</label>
-        <div class="col-sm-10">
-            <input type="text" class="form-control" ng-model="type">
+        <div class="form-group">
+            <label class="col-sm-2 control-label">Type</label>
+            <div class="col-sm-10">
+                <input type="text" class="form-control" ng-model="type">
+            </div>
         </div>
-    </div>
-    <div class="form-group">
-        <label class="col-sm-2 control-label">Message (json)</label>
-        <div class="col-sm-10">
-            <textarea class="form-control" rows="3" ng-model="message"></textarea>
+        <div class="form-group">
+            <label class="col-sm-2 control-label">Message (json)</label>
+            <div class="col-sm-10">
+                <textarea class="form-control" rows="3" ng-model="message"></textarea>
+            </div>
         </div>
-    </div>
-    <div class="form-group">
-        <div class="col-sm-offset-2 col-sm-10">
-            <button type="submit" class="btn btn-default" ng-click="testNotification()">Send Notification</button>
+        <div class="form-group">
+            <div class="col-sm-offset-2 col-sm-10">
+                <button type="submit" class="btn btn-default" ng-click="testNotification()">Send Notification</button>
+            </div>
         </div>
-    </div>
-    <div class="form-group" ng-if="result" ng-class="{'has-error':notificationError,'has-success':!notificationError}">
-        <label class="col-sm-2 control-label">Result:</label>
-        <div class="col-sm-12">
-            <pre ng-if="result" ng-bind-html="result"></pre>
+        <div class="form-group" ng-if="result" ng-class="{'has-error':notificationError,'has-success':!notificationError}">
+            <label class="col-sm-2 control-label">Result:</label>
+            <div class="col-sm-12">
+                <pre ng-if="result" ng-bind-html="result"></pre>
+            </div>
         </div>
-    </div>
-</form>
+    </form>
+</div>
