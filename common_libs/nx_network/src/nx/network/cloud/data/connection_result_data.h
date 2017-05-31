@@ -24,6 +24,11 @@ enum class NatTraversalResultCode
     noSuitableMethod,
 };
 
+/**
+ * This method is needed since socket API provides SystemError::ErrorCode as a result.
+ */
+NX_NETWORK_API SystemError::ErrorCode toSystemErrorCode(NatTraversalResultCode resultCode);
+
 class NX_NETWORK_API ConnectionResultRequest:
     public StunRequestData
 {
@@ -46,4 +51,4 @@ QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(nx::hpm::api::NatTraversalResultCode)
 } // namespace hpm
 } // namespace nx
 
-void NX_NETWORK_API serialize(const nx::hpm::api::NatTraversalResultCode&, QString*);
+NX_NETWORK_API void serialize(const nx::hpm::api::NatTraversalResultCode&, QString*);

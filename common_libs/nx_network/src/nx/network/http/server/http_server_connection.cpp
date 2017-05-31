@@ -198,6 +198,14 @@ void HttpServerConnection::processResponse(
         return;
     }
 
+    #if defined(_DEBUG)
+        if (responseMessageContext.msgBody)
+        {
+            NX_ASSERT(nx_http::StatusCode::isMessageBodyAllowed(
+                responseMessageContext.msg.response->statusLine.statusCode));
+        }
+    #endif
+
     strongThis->post(
         [this, strongThis = std::move(strongThis),
             processingContext = std::move(processingContext),

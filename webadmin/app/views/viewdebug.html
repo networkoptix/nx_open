@@ -44,7 +44,7 @@
                                         <li ng-repeat="camera in cameras[server.id]"
                                             ng-class="{active:activeCamera===camera}"
                                             ng-if="camera.visible"
-                                            ng-include="Config.viewsDir + (camera.isGroup?'components/camerasGroupNode.html':'components/cameraNode.html')" >
+                                            ng-include="Config.viewsDir + (camera.isGroup?'../web_common/views/components/camerasGroupNode.html':'../web_common/views/components/cameraNode.html')" >
                                         </li>
                                     </ul>
                                 </li>

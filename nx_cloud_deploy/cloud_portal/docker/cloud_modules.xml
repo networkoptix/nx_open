@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<modules>
+  <cdb>
+    <endpoint>$CLOUD_DB_HOST:3346</endpoint>
+    <!-- <endpoint>10.0.3.41:3346</endpoint> -->
+  </cdb>
+  <hpm>
+    <endpoint>$CONNECTION_MEDIATOR_HOST:3345</endpoint>
+    <!-- <endpoint>10.0.2.134:3345</endpoint> -->
+  </hpm>
+  <notification_module>
+    <endpoint>$CLOUD_PORTAL_HOST:80</endpoint>
+    <!-- <endpoint>10.0.2.134:3345</endpoint> -->
+  </notification_module>
+</modules>

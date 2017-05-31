@@ -20,6 +20,11 @@ std::vector<SocketAddress> RelayService::httpEndpoints() const
     return m_view->httpEndpoints();
 }
 
+const model::ListeningPeerPool& RelayService::listeningPeerPool() const
+{
+    return m_model->listeningPeerPool();
+}
+
 std::unique_ptr<utils::AbstractServiceSettings> RelayService::createSettings()
 {
     return std::make_unique<conf::Settings>();
@@ -30,7 +35,10 @@ int RelayService::serviceMain(const utils::AbstractServiceSettings& abstractSett
     const conf::Settings& settings = static_cast<const conf::Settings&>(abstractSettings);
 
     Model model(settings);
+    m_model = &model;
+
     Controller controller(settings, &model);
+
     View view(settings, model, &controller);
     m_view = &view;
 
