@@ -130,6 +130,31 @@ angular.module('cloudApp')
                 return $http.post(apiBase + '/account/authKey');
             },
             systems: getSystems,
+            getSystemOwnerName: function(system, currentUserEmail, forOrder) {
+                if(system.ownerAccountEmail == currentUserEmail ){
+                    if(forOrder){
+                        return '!!!!!!!'; // Force my systems to be first
+                    }
+                    return L.system.yourSystem;
+                }
+
+                if(system.ownerFullName && system.ownerFullName.trim() != ''){
+                    return system.ownerFullName;
+                }
+
+                return system.ownerAccountEmail;
+            },
+            sortSystems: function (systems, currentUserEmail){
+                var self = this;
+                // Alphabet sorting
+                var preSort =  _.sortBy(systems,function(system){
+                    return self.getSystemOwnerName(system, currentUserEmail, true);
+                });
+                // Sort by usage frequency is more important than Alphabet
+                return _.sortBy(preSort,function(system){
+                    return -system.usageFrequency;
+                });
+            },
 
             system: function(systemId){
                 function requestSystem(){

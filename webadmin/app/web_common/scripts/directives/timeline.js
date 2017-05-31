@@ -16,7 +16,7 @@ angular.module('nxCommon')
                 volumeLevel: '=',
                 serverTime: '='
             },
-            templateUrl: 'views/components/timeline.html',
+            templateUrl: Config.viewsDirCommon + 'components/timeline.html',
             link: function (scope, element/*, attrs*/) {
                 /**
                  * This is main timeline module.
@@ -55,12 +55,16 @@ angular.module('nxCommon')
 
                 var debugEventsMode = Config.debug.chunksOnTimeline && Config.allowDebugMode;
 
-                scope.disableVolume = Config.settingsConfig.disableVolume;
+                scope.disableVolume = Config.webclient.disableVolume;
 
                 // !!! Read basic parameters, DOM elements and global objects for module
                 var viewport = element.find('.viewport');
                 var $canvas = element.find('canvas');
                 var canvas = $canvas.get(0);
+
+                scope.toggleActive = function(){
+                    scope.activeVolume = !scope.activeVolume;
+                };
 
 
                 var timelineConfig = TimelineConfig();
@@ -73,7 +77,7 @@ angular.module('nxCommon')
                     timelineConfig.zoomAccuracyMs,
                     timelineConfig.lastMinuteDuration,
                     timelineConfig.minPixelsPerLevel,
-                    Config.settingsConfig.useServerTime,
+                    Config.webclient.useServerTime,
                     $q); //Init boundariesProvider
 
                 var animationState = {

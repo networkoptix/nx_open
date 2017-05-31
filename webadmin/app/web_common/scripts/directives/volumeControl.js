@@ -7,7 +7,7 @@ angular.module('nxCommon')
         	scope:{
         		volumeLevel: "="
         	},
-        	templateUrl: Config.viewsDir + 'components/volumeControl.html',
+        	templateUrl: Config.viewsDirCommon + 'components/volumeControl.html',
         	link: function(scope, element){
 		        var selector = '[data-rangeslider]';
 
