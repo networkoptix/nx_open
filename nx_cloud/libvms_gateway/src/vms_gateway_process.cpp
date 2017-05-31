@@ -26,6 +26,7 @@
 
 #include "access_control/authentication_manager.h"
 #include "http/connect_handler.h"
+#include "http/http_api_path.h"
 #include "http/proxy_handler.h"
 #include "libvms_gateway_app_info.h"
 #include "stree/cdb_ns.h"
@@ -196,7 +197,7 @@ void VmsGatewayProcess::registerApiHandlers(
             nx_http::StringType("CONNECT"));
     }
 
-    msgDispatcher->addModRewriteRule(lit("/gateway/"), lit("/"));
+    msgDispatcher->addModRewriteRule(lm("/%1/").arg(kApiPathPrefix), lit("/"));
 }
 
 void VmsGatewayProcess::publicAddressFetched(

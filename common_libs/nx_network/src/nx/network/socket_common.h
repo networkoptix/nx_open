@@ -150,6 +150,7 @@ public:
     QString toString() const;
     std::string toStdString() const;
     bool isNull() const;
+    bool isValid() const;
 
     static const SocketAddress anyAddress;
     static const SocketAddress anyPrivateAddress;

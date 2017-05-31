@@ -72,4 +72,9 @@ namespace ec2
             transactionLog->setTransactionLogTime(value);
     }
 
+    detail::QnDbManager* Ec2DirectConnection::database() const
+    {
+        return m_queryProcessor->getDb();
+    }
+
 }

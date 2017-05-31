@@ -4,7 +4,7 @@
 #include <network/module_information.h>
 
 namespace nx { namespace vms { namespace discovery { class Manager; } } }
-namespace nx { namespace vms { namespace discovery { class ModuleEndpoint; } } }
+namespace nx { namespace vms { namespace discovery { struct ModuleEndpoint; } } }
 
 namespace ec2 {
 

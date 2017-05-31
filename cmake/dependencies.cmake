@@ -143,8 +143,7 @@ function(get_dependencies)
     endif()
 
     if(haveDesktopClient OR haveMobileClient)
-        nx_rdep_add_package(any/roboto-ttf)
-        nx_rdep_add_package(any/roboto-mono-ttf)
+        nx_rdep_add_package(any/roboto-fonts)
     endif()
 
     if(haveServer OR haveDesktopClient)

@@ -1932,6 +1932,12 @@
         },
         {
             "keys": [
+                "iPIXA|INVDHDW32812IR"
+            ],
+            "clearInputsTimeoutSec": 3
+        },
+        {
+            "keys": [
                 "Bosch|IP5000*"
             ],
             "onvifPtzSpeedBroken": true

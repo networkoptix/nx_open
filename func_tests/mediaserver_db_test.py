@@ -18,15 +18,24 @@ import pytest
 import os
 import time
 import json
+from test_utils.utils import SimpleNamespace
 from test_utils.server import MEDIASERVER_MERGE_TIMEOUT_SEC
 import server_api_data_generators as generator
 
-BOX_1_DATABASE_FILE_V_2_4 = 'v2.4.1-box1.db'
-BOX_2_DATABASE_FILE_V_2_4 = 'v2.4.1-box2.db'
-BOX_1_CAMERA_GUID = '{ed93120e-0f50-3cdf-39c8-dd52a640688c}'
-BOX_2_CAMERA_GUID = '{a6b88c1b-92c3-0c27-b5a1-76a1246fd9ed}'
-BOX_1_SERVER_GUID = '{62a54ada-e7c7-0d09-c41a-4ab5c1251db8}'
-BOX_2_SERVER_GUID = '{88b807ab-0a0f-800e-e2c3-b640b31f3a1c}'
+
+SERVER_CONFIG = dict(
+    one=SimpleNamespace(
+        DATABASE_FILE_V_2_4='v2.4.1-box1.db',
+        CAMERA_GUID='{ed93120e-0f50-3cdf-39c8-dd52a640688c}',
+        SERVER_GUID='{62a54ada-e7c7-0d09-c41a-4ab5c1251db8}',
+        ),
+    two=SimpleNamespace(
+        DATABASE_FILE_V_2_4='v2.4.1-box2.db',
+        CAMERA_GUID='{a6b88c1b-92c3-0c27-b5a1-76a1246fd9ed}',
+        SERVER_GUID='{88b807ab-0a0f-800e-e2c3-b640b31f3a1c}',
+        ),
+    )
+
 MEDIASERVER_DATABASE_PATH = 'var/ecs.sqlite'
 
 
@@ -36,52 +45,40 @@ def db_version(request):
 
 
 @pytest.fixture
-def env(env_builder, server, run_options, db_version):
-    if db_version == '2.4':
-        built_env = env_2_4_version(env_builder, server, run_options)
-    else:
-        built_env = env_current_version(env_builder, server)
-    built_env.one.start_service()
-    built_env.two.start_service()
-    system_settings = dict(autoDiscoveryEnabled=False)
-    built_env.one.setup_local_system(systemSettings=system_settings)
-    built_env.two.setup_local_system(systemSettings=system_settings)
-    built_env.one.set_system_settings(statisticsAllowed=False)
-    built_env.two.set_system_settings(statisticsAllowed=False)
-    if db_version == '2.4':
-        check_camera(built_env.one, BOX_1_CAMERA_GUID)
-        check_camera(built_env.two, BOX_2_CAMERA_GUID)
-    return built_env
+def one(server_factory, run_options, db_version):
+    return server('one', server_factory, run_options.bin_dir, db_version)
 
+@pytest.fixture
+def two(server_factory, run_options, db_version):
+    return server('two', server_factory, run_options.bin_dir, db_version)
+
+
+def server(name, server_factory, bin_dir, db_version):
+    server_config = SERVER_CONFIG[name]
+    if db_version == '2.4':
+        config_file_params = dict(guidIsHWID='no', serverGuid=server_config.SERVER_GUID)
+        server = server_factory(name, start=False, config_file_params=config_file_params)
+        copy_database_file(server, bin_dir, server_config.DATABASE_FILE_V_2_4)
+    else:
+        server = server_factory(name, start=False)
+    server.start_service()
+    system_settings = dict(autoDiscoveryEnabled=False)
+    server.setup_local_system(systemSettings=system_settings)
+    server.set_system_settings(statisticsAllowed=False)
+    if db_version == '2.4':
+        check_camera(server, server_config.CAMERA_GUID)
+    return server
 
 def copy_database_file(server, bin_dir, backup_db_filename):
     backup_db_path = os.path.abspath(os.path.join(bin_dir, backup_db_filename))
     assert os.path.exists(backup_db_path), (
         "Binary artifact required for this test (database file) '%s' does not exist." % backup_db_path)
     server_db_path = os.path.join(server.dir, MEDIASERVER_DATABASE_PATH)
-    server.box.host.put_file(backup_db_path, server_db_path)
-
+    server.host.put_file(backup_db_path, server_db_path)
 
 def check_camera(server, camera_guid):
     cameras = [c for c in server.rest_api.ec2.getCameras.GET() if c['id'] == camera_guid]
     assert len(cameras) == 1, "'%r': one of cameras '%s' is absent" % (server, camera_guid)
-
-
-def env_current_version(env_builder, server):
-    one = server(start=False)
-    two = server(start=False)
-    return env_builder(one=one, two=two)
-
-
-def env_2_4_version(env_builder, server, run_options):
-    config_file_params_1 = dict(guidIsHWID='no', serverGuid=BOX_1_SERVER_GUID)
-    config_file_params_2 = dict(guidIsHWID='no', serverGuid=BOX_2_SERVER_GUID)
-    one = server(start=False, config_file_params=config_file_params_1)
-    two = server(start=False, config_file_params=config_file_params_2)
-    env = env_builder(one=one, two=two)
-    copy_database_file(env.one, run_options.bin_dir, BOX_1_DATABASE_FILE_V_2_4)
-    copy_database_file(env.two, run_options.bin_dir, BOX_2_DATABASE_FILE_V_2_4)
-    return env
 
 
 def assert_jsons_are_equal(json_one, json_two, json_name):
@@ -105,11 +102,11 @@ def store_json_data(filepath, json_data):
         json.dump(json_data, f, sort_keys=True, indent=4, separators=(',', ': '))
 
 
-def wait_until_servers_have_same_full_info(env):
+def wait_until_servers_have_same_full_info(one, two):
     start = time.time()
     while True:
-        full_info_one = env.one.rest_api.ec2.getFullInfo.GET()
-        full_info_two = env.two.rest_api.ec2.getFullInfo.GET()
+        full_info_one = one.rest_api.ec2.getFullInfo.GET()
+        full_info_two = two.rest_api.ec2.getFullInfo.GET()
         if full_info_one == full_info_two:
             return full_info_one
         if time.time() - start >= MEDIASERVER_MERGE_TIMEOUT_SEC:
@@ -130,32 +127,32 @@ def wait_for_camera_disappearance_after_backup(server, camera_guid):
         time.sleep(MEDIASERVER_MERGE_TIMEOUT_SEC / 10.)
 
 
-def test_backup_restore(env, camera):
-    env.two.merge_systems(env.one)
-    full_info_initial = wait_until_servers_have_same_full_info(env)
-    backup = env.one.rest_api.ec2.dumpDatabase.GET()
-    camera_guid = env.two.add_camera(camera)
-    full_info_with_new_camera = wait_until_servers_have_same_full_info(env)
+def test_backup_restore(one, two, camera):
+    two.merge_systems(one)
+    full_info_initial = wait_until_servers_have_same_full_info(one, two)
+    backup = one.rest_api.ec2.dumpDatabase.GET()
+    camera_guid = two.add_camera(camera)
+    full_info_with_new_camera = wait_until_servers_have_same_full_info(one, two)
     assert full_info_with_new_camera != full_info_initial, (
         "ec2/getFullInfo data before and after saveCamera are the same")
-    env.one.rest_api.ec2.restoreDatabase.POST(data=backup['data'])
-    wait_for_camera_disappearance_after_backup(env.one, camera_guid)
-    full_info_after_backup_restore = wait_until_servers_have_same_full_info(env)
+    one.rest_api.ec2.restoreDatabase.POST(data=backup['data'])
+    wait_for_camera_disappearance_after_backup(one, camera_guid)
+    full_info_after_backup_restore = wait_until_servers_have_same_full_info(one, two)
     assert full_info_after_backup_restore == full_info_initial
 
 
 # To detect VMS-5969
 @pytest.mark.skip(reason="VMS-5969")
 @pytest.mark.parametrize('db_version', ['current'])
-def test_server_guids_changed(env):
-    env.one.stop_service()
-    env.two.stop_service()
+def test_server_guids_changed(one, two):
+    one.stop_service()
+    two.stop_service()
     # To make server database and configuration file guids different
-    env.one.change_config(guidIsHWID='no', serverGuid=BOX_1_SERVER_GUID)
-    env.two.reset_config(guidIsHWID='no', serverGuid=BOX_2_SERVER_GUID)
-    env.one.start_service()
-    env.two.start_service()
-    env.one.setup_local_system()
-    env.two.setup_local_system()
-    env.two.merge_systems(env.one)
-    wait_until_servers_have_same_full_info(env)
+    one.change_config(guidIsHWID='no', serverGuid=SERVER_CONFIG['one'].SERVER_GUID)
+    two.reset_config(guidIsHWID='no', serverGuid=SERVER_CONFIG['two'].SERVER_GUID)
+    one.start_service()
+    two.start_service()
+    one.setup_local_system()
+    two.setup_local_system()
+    two.merge_systems(one)
+    wait_until_servers_have_same_full_info(one, two)
