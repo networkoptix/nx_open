@@ -235,5 +235,26 @@ TEST_F(CloudUserInfoPool, userRemoved)
     ASSERT_TRUE(userInfoPool.authenticate(kTestMethod, petya3Auth));
 }
 
+TEST_F(CloudUserInfoPool, userRemoved_3users)
+{
+    given2UsersInfos();
+    when3rdWithNonce3HasBeenAdded();
+    whenVasyaNonceUpdatedToTheNewest();
+
+    supplier->removeUserInfo("vasya");
+
+    auto nonce = userInfoPool.newestMostCommonNonce();
+    ASSERT_TRUE(nonce);
+    ASSERT_EQ(*nonce, nx::Buffer(generateTestNonce(3)));
+
+    ASSERT_FALSE(userInfoPool.authenticate(kTestMethod, vasya1Auth));
+    ASSERT_FALSE(userInfoPool.authenticate(kTestMethod, vasya2Auth));
+    ASSERT_FALSE(userInfoPool.authenticate(kTestMethod, vasya3Auth));
+    ASSERT_FALSE(userInfoPool.authenticate(kTestMethod, petya2Auth));
+
+    ASSERT_TRUE(userInfoPool.authenticate(kTestMethod, petya3Auth));
+    ASSERT_TRUE(userInfoPool.authenticate(kTestMethod, gena3Auth));
+}
+
 }
 
