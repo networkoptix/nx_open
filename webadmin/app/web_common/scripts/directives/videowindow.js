@@ -65,15 +65,15 @@ angular.module('nxCommon')
                 function detectBestFormat(){
                     //1. Hide all informers
                     scope.videoFlags = {
-                        'flashRequired': false,
-                        'flashOrWebmRequired': false,
-                        'noArmSupport': false,
-                        'noFormat': false,
-                        'errorLoading': false,
-                        'ieNoWebm': false,
-                        'loading': false,
-                        'ieWin10 ':false,                    
-                        'ubuntuNX': false
+                        flashRequired: false,
+                        flashOrWebmRequired: false,
+                        noArmSupport: false,
+                        noFormat: false,
+                        errorLoading: false,
+                        ieNoWebm: false,
+                        loading: false,
+                        ieWin10: false,                    
+                        ubuntuNX: false
                     };
 
                     if(scope.debugMode && scope.activeFormat != "Auto"){

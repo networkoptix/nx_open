@@ -15,9 +15,10 @@ angular.module('nxCommon')
         		scope.showView = false;
         		scope.showFlags = false;
                 scope.message = "";
-                scope.alertType = null;
 
         		scope.$watch('viewFlags', function(){
+                    scope.alertType = null;
+                    //if status is offline or unauthorized and no position is selected or ios video is too large show the cameraViewinformer directive
         			if((scope.viewFlags.status == "Offline" || scope.viewFlags.status == 'Unauthorized') &&
         			   !scope.viewFlags.positionSelected || scope.viewFlags.iosVideoTooLarge)
         			{
@@ -27,24 +28,30 @@ angular.module('nxCommon')
         				scope.showView = false;
         			}
 
-                    scope.alertType = _.find(Object.keys(scope.viewFlags), function(x){
-                        if(scope.viewFlags[x])
-                            return x;
-                    });
+
+                    //find message to display
+                    for(var key in scope.viewFlags){
+                        if(scope.viewFlags[key]){
+                            scope.alertType = key;
+                            break;
+                        }
+                    }
 
                     if(!scope.alertType){
                         return;
                     }
                     
+
+                    //If status turn on html and load specific status messages
                     if( scope.alertType == 'status'){
                         if(scope.viewFlags[scope.alertType] == "Offline"){
                             scope.message = scope.cameraStates.offline;
-
                         }
                         else if(scope.viewFlags[scope.alertType] == "Unauthorized"){
                             scope.message = scope.cameraStates.unauthorized;
                         }
                     }
+                    //Otherwise load remaining message
                     else{
                         scope.message = scope.cameraStates[scope.alertType];
                     }
@@ -53,17 +60,25 @@ angular.module('nxCommon')
 
 
         		scope.$watch('videoFlags', function(){
-                    scope.alertType = _.find(Object.keys(scope.videoFlags), function(x){
-                        if(scope.videoFlags[x])
-                            return x;
-                    });
+                    scope.alertType = null;
 
+                    //find message to display
+                    for(var key in scope.videoFlags){
+                        if(scope.videoFlags[key]){
+                            scope.alertType = key;
+                            break;
+                        }
+                    }
                     scope.showVideo = scope.alertType != null;
+                    
+                    if(!scope.alertType){
+                        return;
+                    }
 
-                    if(scope.alertType != "loading")
+                    //find message to display other than loading
+                    if(scope.alertType != "loading"){
                         scope.message = scope.cameraStates[scope.alertType];
-
-                    console.log(scope.message);
+                    }
         		}, true);
         	}
 		};
