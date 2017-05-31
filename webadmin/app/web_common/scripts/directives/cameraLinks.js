@@ -4,18 +4,20 @@
 
 
 angular.module('nxCommon')
-    .directive('cameraLinks', ['mediaserver', function (mediaserver) {
+    .directive('cameraLinks', [function () {
         return {
             restrict: 'E',
             scope: {
+                system: "=",
                 activeCamera: "=",
                 position: "=",
                 liveMode: "=",
                 player: "=",
                 currentResolution: "="
             },
-            templateUrl: Config.viewsDir + 'components/cameraLinks.html',
+            templateUrl: Config.viewsDirCommon + 'components/cameraLinks.html',
             link: function (scope, element/*, attrs*/) {
+                var systemAPI = scope.system;
                 scope.position = 0;
                 scope.duration = 5*60;
                 scope.resolution = '640p';
@@ -24,13 +26,13 @@ angular.module('nxCommon')
                 scope.streamName = function(stream){
                     switch(stream.encoderIndex){
                         case 0:
-                            return L.cameraLinks.highStream;
+                            return L.common.cameraLinks.highStream;
                         case 1:
-                            return L.cameraLinks.lowStream;
+                            return L.common.cameraLinks.lowStream;
                         case -1:
-                            return L.cameraLinks.transcoding;
+                            return L.common.cameraLinks.transcoding;
                     }
-                    return L.cameraLinks.unknown;
+                    return L.common.cameraLinks.unknown;
                 };
 
                 scope.formatLink = function(camera, stream,transport){
@@ -51,8 +53,8 @@ angular.module('nxCommon')
                         replace("{{physicalId}}", camera.physicalId).
                         replace("{{streamIndex}}", stream).
                         replace("{{streamLetter}}", stream?'lo':'hi').
-                        replace("{{auth}}", !scope.useAuth?'':'&auth=' + (transport=='rtsp'?mediaserver.authForRtsp():mediaserver.authForMedia())).
-                        replace("{{auth}}", !scope.useAuth?'':'&auth=' + (mediaserver.authForMedia())).
+                        replace("{{auth}}", !scope.useAuth?'':'&auth=' + (transport=='rtsp'?systemAPI.authPlay():systemAPI.authGet())).
+                        replace("{{auth}}", !scope.useAuth?'':'&auth=' + (systemAPI.authGet())).
                         replace("{{position}}", scope.liveMode || !scope.position?'':'&pos=' + scope.position).
                         replace("{{previewPosition}}", scope.liveMode || !scope.position?'&time=LATEST':'&time=' + scope.position).
                         replace("{{duration}}", scope.duration).

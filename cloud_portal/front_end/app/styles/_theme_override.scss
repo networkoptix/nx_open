@@ -6,6 +6,11 @@
 
 $font-size-a-bit-large:   ceil($font-size-base * 1.15); //~16px - we just need 16px sometimes :-)
 
+
+.container-fluid {
+    padding:0;
+}
+
 .panel{
   box-shadow: 0 1px 2px transparentize($dark15,0.9);
 }

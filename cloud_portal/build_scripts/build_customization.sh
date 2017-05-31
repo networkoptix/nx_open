@@ -6,6 +6,11 @@ cd $DIR
 
 TARGET_DIR="../cloud/static"
 CUSTOMIZATION=$1
+if [ -z "$CUSTOMIZATION" ]
+then
+    CUSTOMIZATION="default"
+fi
+
 dir=../customizations/$CUSTOMIZATION/
 
     echo "============================================================"

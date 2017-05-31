@@ -1,0 +1,8 @@
+{
+  "cameraLinks": {
+    "highStream": "High stream",
+    "lowStream": "Low stream",
+    "transcoding": "Transcoding",
+    "unknown": "Unknown"
+  }
+}
