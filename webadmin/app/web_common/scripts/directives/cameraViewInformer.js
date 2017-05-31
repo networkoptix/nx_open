@@ -23,13 +23,18 @@ angular.module('nxCommon')
                         }
                     }
                     
+                    //if status is online dont show any message
+                    if(scope.alertType == 'status' && scope.flags[scope.alertType] == "Online")
+                    {
+                        scope.alertType = null;
+                    }
                     //if non flag break
                     if(!scope.alertType){
                         return;
                     }
 
                     //offline and unauthorized are special cases. All others can be set without editing
-                    if(scope.alertType == 'status' && scope.flags[scope.alertType] != "Online"){
+                    if(scope.alertType == 'status'){
                         scope.message = scope.cameraStates[(scope.flags[scope.alertType]).toLowerCase()];
                     }
                     else{
