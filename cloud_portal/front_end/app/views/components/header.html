@@ -25,11 +25,11 @@
             </ul>
             <ul class="nav navbar-nav navbar-right auth-visible hidden-collapsed">
                 <li uib-dropdown ng-if="systems && singleSystem">
-                    <a ng-href="/systems/{{activeSystem.id}}">{{activeSystem.name}}</a>
+                    <a ng-href="/systems/{{activeSystem.id}}"><span class="glyphicon glyphicon-home"></span>  {{activeSystem.name}}</a>
                 </li>
                 <li class="vertical-bar" ng-if="systems && !singleSystem"></li>
                 <li uib-dropdown ng-if="systems && !singleSystem">
-                    <a uib-dropdown-toggle ng-href="/systems/{{system.id}}">{{activeSystem?activeSystem.name:systemCounter + ' ' + L.header.systems}} <span class="icon-caret"></span></a>
+                    <a uib-dropdown-toggle ng-href="/systems/{{system.id}}"><span ng-if="activeSystem" class="glyphicon glyphicon-home"></span> {{activeSystem?activeSystem.name:systemCounter + ' ' + L.header.systems}} <span class="icon-caret"></span></a>
                     <ul uib-dropdown-menu>
                         <li ng-repeat="system in systems | limitTo: $root.C.maxSystemsForHeader"><a ng-href="/systems/{{system.id}}/{{active.view?'view':''}}">{{system.name}} - {{system.ownerFullName}}</a></li>
                         <li role="separator" class="nav-divider"></li>
@@ -38,7 +38,7 @@
                 </li>
                 <li class="vertical-bar"></li>
                 <li uib-dropdown>
-                    <a uib-dropdown-toggle href="">{{account.email}} <span class="icon-caret"></span></a>
+                    <a uib-dropdown-toggle href=""><span class="glyphicon glyphicon-user"></span> {{account.email}} <span class="icon-caret"></span></a>
                     <ul uib-dropdown-menu>
                         <li><a href="/account/">Account Settings</a></li>
                         <li><a href="/account/password/">Change Password</a></li>
