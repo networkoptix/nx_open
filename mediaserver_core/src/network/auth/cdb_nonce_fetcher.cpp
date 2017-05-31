@@ -73,7 +73,7 @@ CdbNonceFetcher::~CdbNonceFetcher()
     timerID.reset();
 }
 
-nx::Buffer CdbNonceFetcher::generateNonceTrailer()
+nx::Buffer CdbNonceFetcher::generateNonceTrailer(std::function<short()> genFunc)
 {
     nx::Buffer nonceTrailer;
     nonceTrailer.resize(kNonceTrailerLength);
@@ -81,8 +81,14 @@ nx::Buffer CdbNonceFetcher::generateNonceTrailer()
     std::generate(
         nonceTrailer.data()+sizeof(kMagicBytes),
         nonceTrailer.data()+nonceTrailer.size(),
-        [&]{return m_nonceTrailerRandomGenerator(m_randomEngine);});
+        genFunc);
     return nonceTrailer;
+}
+
+nx::Buffer CdbNonceFetcher::generateNonceTrailer()
+{
+    return generateNonceTrailer(
+        [this]() { return m_nonceTrailerRandomGenerator(m_randomEngine); });
 }
 
 QByteArray CdbNonceFetcher::generateNonce()

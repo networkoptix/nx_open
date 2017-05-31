@@ -12,44 +12,49 @@ const nx::Buffer kTestPassword = "password";
 const nx::Buffer kTestUri = "/uri";
 const nx::Buffer kTestMethod = "GET";
 
+
 class TestCdbNonceFetcher : public ::CdbNonceFetcher
 {
 public:
-    using CdbNonceFetcher::CdbNonceFetcher;
-    nx::Buffer generateNonceTrailer() { return ::CdbNonceFetcher::generateNonceTrailer(); }
+    static nx::Buffer generateNonceTrailer()
+    {
+        return CdbNonceFetcher::generateNonceTrailer([]() { return 1; });
+    }
 };
 
 class TestPoolSupplier : public AbstractCloudUserInfoPoolSupplier
 {
 public:
-    TestPoolSupplier() : nonceFetcher(nullptr, nullptr) {}
+    TestPoolSupplier() {}
     virtual void setPool(AbstractCloudUserInfoPool* pool) override
     {
         m_pool = pool;
     }
 
-    nx_http::header::DigestAuthorization setUserInfo(
+    nx_http::header::Authorization setUserInfo(
         uint64_t ts,
         const nx::Buffer& userName,
         const nx::Buffer& cloudNonce)
     {
         nx_http::header::WWWAuthenticate authServerHeader;
-        authServerHeader.params["nonce"] = cloudNonce + nonceFetcher.generateNonceTrailer();
+        authServerHeader.authScheme = nx_http::header::AuthScheme::digest;
+        authServerHeader.params["nonce"] = cloudNonce + TestCdbNonceFetcher::generateNonceTrailer();
         authServerHeader.params["realm"] = kTestRealm;
         authServerHeader.params["algorithm"] = kTestAlgorithm;
 
         nx_http::header::DigestAuthorization authClientResponseHeader;
-        //ASSERT_TRUE(
-            nx_http::calcDigestResponse(
-                "GET",
-                userName,
-                kTestPassword,
-                boost::none,
-                kTestUri,
-                authServerHeader,
-                &authClientResponseHeader);
+        authClientResponseHeader.digest->userid = userName;
+        nx_http::calcDigestResponse(
+            "GET",
+            userName,
+            kTestPassword,
+            boost::none,
+            kTestUri,
+            authServerHeader,
+            &authClientResponseHeader);
 
-        const auto partialResponse = authClientResponseHeader.digest->params["response"];
+        const auto ha1 = nx_http::calcHa1(userName, kTestRealm, kTestPassword, kTestAlgorithm);
+        const auto partialResponse = nx_http::calcIntermediateResponse(ha1, cloudNonce);
         m_pool->userInfoChanged(ts, userName, cloudNonce, partialResponse);
 
         return authClientResponseHeader;
@@ -62,7 +67,6 @@ public:
 
 private:
     AbstractCloudUserInfoPool* m_pool;
-    TestCdbNonceFetcher nonceFetcher;
 };
 
 class TestCloudUserInfoPool : public ::CloudUserInfoPool
@@ -86,20 +90,20 @@ protected:
 
     void given2UsersInfos()
     {
-        supplier->setUserInfo(1, "vasya", "nonce1");
-        supplier->setUserInfo(2, "vasya", "nonce2");
-        supplier->setUserInfo(2, "petya", "nonce2");
-        supplier->setUserInfo(3, "petya", "nonce3");
+        vasya1Auth = supplier->setUserInfo(1, "vasya", generateTestNonce(1));
+        vasya2Auth = supplier->setUserInfo(2, "vasya", generateTestNonce(2));
+        petya2Auth = supplier->setUserInfo(2, "petya", generateTestNonce(2));
+        petya3Auth = supplier->setUserInfo(3, "petya", generateTestNonce(3));
     }
 
     void when3rdWithNonce3HasBeenAdded()
     {
-        supplier->setUserInfo(3, "gena", "nonce3");
+        gena3Auth = supplier->setUserInfo(3, "gena", generateTestNonce(3));
     }
 
     void whenVasyaNonceUpdatedToTheNewest()
     {
-        supplier->setUserInfo(3, "vasya", "nonce3");
+        vasya3Auth = supplier->setUserInfo(3, "vasya", generateTestNonce(3));
     }
 
     void thenOnlyNewestNonceShouldStayInThePool()
@@ -112,12 +116,21 @@ protected:
         ASSERT_EQ(vasyaNonceSet.find("nonce2"), vasyaNonceSet.cend());
     }
 
+    nx::Buffer generateTestNonce(char c)
+    {
+        nx::Buffer result;
+        result.fill(c, 95);
+        return result;
+    }
+
     TestPoolSupplier* supplier;
     TestCloudUserInfoPool userInfoPool;
     nx_http::header::Authorization vasya1Auth;
     nx_http::header::Authorization vasya2Auth;
     nx_http::header::Authorization petya2Auth;
     nx_http::header::Authorization petya3Auth;
+    nx_http::header::Authorization gena3Auth;
+    nx_http::header::Authorization vasya3Auth;
 };
 
 TEST_F(CloudUserInfoPool, deserialize)
@@ -142,7 +155,7 @@ TEST_F(CloudUserInfoPool, commonNonce_simple)
     given2UsersInfos();
     auto nonce = userInfoPool.newestMostCommonNonce();
     ASSERT_TRUE(nonce);
-    ASSERT_EQ(*nonce, nx::Buffer("nonce2"));
+    ASSERT_EQ(*nonce, nx::Buffer(generateTestNonce(2)));
 }
 
 TEST_F(CloudUserInfoPool, commonNonce_3rdAdded)
@@ -152,7 +165,7 @@ TEST_F(CloudUserInfoPool, commonNonce_3rdAdded)
 
     auto nonce = userInfoPool.newestMostCommonNonce();
     ASSERT_TRUE(nonce);
-    ASSERT_EQ(*nonce, nx::Buffer("nonce3"));
+    ASSERT_EQ(*nonce, nx::Buffer(generateTestNonce(3)));
 }
 
 TEST_F(CloudUserInfoPool, commonNonce_EveryoneHaveNewestNonce)
@@ -164,13 +177,46 @@ TEST_F(CloudUserInfoPool, commonNonce_EveryoneHaveNewestNonce)
 
     auto nonce = userInfoPool.newestMostCommonNonce();
     ASSERT_TRUE(nonce);
-    ASSERT_EQ(*nonce, nx::Buffer("nonce3"));
+    ASSERT_EQ(*nonce, nx::Buffer(generateTestNonce(3)));
 }
 
-TEST_F(CloudUserInfoPool, auth)
+TEST_F(CloudUserInfoPool, auth_2Users)
 {
     given2UsersInfos();
     ASSERT_TRUE(userInfoPool.authenticate(kTestMethod, vasya2Auth));
+    // old nonce user info should have already been deleted
+    ASSERT_FALSE(userInfoPool.authenticate(kTestMethod, vasya1Auth));
+
+    ASSERT_TRUE(userInfoPool.authenticate(kTestMethod, petya2Auth));
+    // But newer user info should be in the pool
+    ASSERT_TRUE(userInfoPool.authenticate(kTestMethod, petya3Auth));
+}
+
+TEST_F(CloudUserInfoPool, auth_3Users)
+{
+    given2UsersInfos();
+    when3rdWithNonce3HasBeenAdded();
+
+    ASSERT_TRUE(userInfoPool.authenticate(kTestMethod, vasya2Auth));
+    ASSERT_TRUE(userInfoPool.authenticate(kTestMethod, petya2Auth));
+    ASSERT_TRUE(userInfoPool.authenticate(kTestMethod, petya3Auth));
+    ASSERT_TRUE(userInfoPool.authenticate(kTestMethod, gena3Auth));
+}
+
+TEST_F(CloudUserInfoPool, auth_3Users_newNonceAll)
+{
+    given2UsersInfos();
+    when3rdWithNonce3HasBeenAdded();
+    whenVasyaNonceUpdatedToTheNewest();
+
+    // old nonces should have been removed
+    ASSERT_FALSE(userInfoPool.authenticate(kTestMethod, vasya1Auth));
+    ASSERT_FALSE(userInfoPool.authenticate(kTestMethod, vasya2Auth));
+    ASSERT_FALSE(userInfoPool.authenticate(kTestMethod, petya2Auth));
+
+    ASSERT_TRUE(userInfoPool.authenticate(kTestMethod, petya3Auth));
+    ASSERT_TRUE(userInfoPool.authenticate(kTestMethod, gena3Auth));
+    ASSERT_TRUE(userInfoPool.authenticate(kTestMethod, vasya3Auth));
 }
 
 }
