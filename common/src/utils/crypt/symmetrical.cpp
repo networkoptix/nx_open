@@ -62,6 +62,19 @@ QByteArray encodeSimple(const QByteArray& data)
     return result;
 }
 
+QByteArray encodeSimple(const QByteArray& data, const QByteArray& extraKey)
+{
+    QByteArray mask = detail::kMask;
+    for (int i = 0; i < qMin(mask.size(), extraKey.size()); ++i)
+        mask[i] = mask[i] ^ extraKey[i];
+
+    static const int maskSize = mask.size();
+    QByteArray result = data;
+    for (int i = 0; i < result.size(); ++i)
+        result.data()[i] ^= mask.data()[i % maskSize];
+    return result;
+}
+
 QByteArray encodeAES128CBC(const QByteArray& data, const detail::KeyType& key)
 {
     if (data.isEmpty())

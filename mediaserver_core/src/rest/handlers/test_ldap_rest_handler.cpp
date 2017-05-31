@@ -4,16 +4,21 @@
 #include "utils/common/ldap.h"
 #include "nx_ec/data/api_conversion_functions.h"
 #include "ldap/ldap_manager.h"
+#include <network/authenticate_helper.h>
 
-int QnTestLdapSettingsHandler::executePost(const QString &path, const QnRequestParams &params, const QByteArray &body, QnJsonRestResult &result, const QnRestConnectionProcessor*) {
+int QnTestLdapSettingsHandler::executePost(
+    const QString &path,
+    const QnRequestParams &params,
+    const QByteArray &body,
+    QnJsonRestResult &result,
+    const QnRestConnectionProcessor*)
+{
     QN_UNUSED(path, params);
 
     QnLdapSettings settings = QJson::deserialized(body, QnLdapSettings());
 
-    auto ldapManager = QnLdapManager::instance();
-
     QnLdapUsers ldapUsers;
-    Qn::LdapResult ldapResult = ldapManager->fetchUsers(ldapUsers, settings);
+    Qn::LdapResult ldapResult = qnAuthHelper->ldapManager()->fetchUsers(ldapUsers, settings);
     if (ldapResult != Qn::Ldap_NoError) {
         result.setError(QnRestResult::CantProcessRequest, QnLdapManager::errorMessage(ldapResult));
         return nx_http::StatusCode::ok;

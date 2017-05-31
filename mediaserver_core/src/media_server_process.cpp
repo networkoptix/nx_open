@@ -248,6 +248,7 @@
 #include <database/server_db.h>
 #include <server/server_globals.h>
 #include <media_server/master_server_status_watcher.h>
+#include "nx/mediaserver/unused_wallpapers_watcher.h"
 #include <media_server/connect_to_cloud_watcher.h>
 #include <rest/helpers/permissions_helper.h>
 #include "misc/migrate_oldwin_dir.h"
@@ -2998,6 +2999,7 @@ void MediaServerProcess::run()
     }
 #endif
     qnBackupStorageMan->scheduleSync()->start();
+    serverModule->unusedWallpapersWatcher()->start();
     emit started();
     exec();
 

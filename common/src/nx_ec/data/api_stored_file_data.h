@@ -18,6 +18,11 @@ namespace ec2
         ApiStoredFilePath() {}
         ApiStoredFilePath(const QString &path): path(path) {}
 
+        bool operator<(const ApiStoredFilePath& other) const
+        {
+            return path < other.path;
+        }
+
         QString path;
     };
 #define ApiStoredFilePath_Fields (path)
