@@ -1,5 +1,6 @@
 #pragma once
 
+#include <set>
 #include <QtCore/QString>
 #include <QtCore/QSet>
 
@@ -7,6 +8,7 @@
 #include <utils/common/system_information.h>
 #include <utils/common/id.h>
 #include <nx/fusion/model_functions_fwd.h>
+#include <nx/network/socket_common.h>
 
 struct QnModuleInformation
 {
@@ -47,6 +49,36 @@ struct QnModuleInformationWithAddresses : QnModuleInformation
     QnModuleInformationWithAddresses(const QnModuleInformation &other) :
         QnModuleInformation(other)
     {}
+
+    // TODO: Also make a tempate.
+    inline
+    std::set<SocketAddress> endpoints() const
+    {
+        std::set<SocketAddress> endpoints;
+        for (const auto& address: remoteAddresses)
+        {
+            SocketAddress endpoint(address);
+            if (endpoint.port == 0)
+                endpoint.port = (uint16_t) port;
+
+            endpoints.insert(std::move(endpoint));
+        }
+
+        return endpoints;
+    }
+
+    template<typename SocketAddressList>
+    void setEndpoints(const SocketAddressList& endpoints)
+    {
+        remoteAddresses.clear();
+        for (const auto& endpoint: endpoints)
+        {
+            if (endpoint.port == (uint16_t) port)
+                remoteAddresses.insert(endpoint.address.toString());
+            else
+                remoteAddresses.insert(endpoint.toString());
+        }
+    }
 };
 
 #define QnModuleInformation_Fields (type)(customization)(version)(systemInformation) \

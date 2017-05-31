@@ -74,6 +74,7 @@
 #include <rest/handlers/multiserver_thumbnail_rest_handler.h>
 #include <api/helpers/thumbnail_request_data.h>
 #include <utils/common/util.h>
+#include <nx/utils/concurrent.h>
 
 namespace {
     const QString tpProductLogoFilename(lit("productLogoFilename"));
@@ -204,6 +205,7 @@ QnMServerBusinessRuleProcessor::~QnMServerBusinessRuleProcessor()
 {
     quit();
     wait();
+    m_emailThreadPool.waitForDone();
 
     QnMutexLocker lk( &m_mutex );
     while( !m_aggregatedEmails.isEmpty() )
@@ -580,8 +582,11 @@ bool QnMServerBusinessRuleProcessor::sendMailInternal( const QnSendMailBusinessA
     NX_LOG( lit("Processing action SendMail. Sending mail to %1").
         arg(recipients.join(QLatin1String("; "))), cl_logDEBUG1 );
 
-    executeDelayed([this, action, recipients, aggregatedResCount]() {
-        QtConcurrent::run(std::bind(&QnMServerBusinessRuleProcessor::sendEmailAsync, this, action, recipients, aggregatedResCount));
+    executeDelayed([this, action, recipients, aggregatedResCount]()
+    {
+        nx::utils::concurrent::run(
+            &m_emailThreadPool,
+            std::bind(&QnMServerBusinessRuleProcessor::sendEmailAsync, this, action, recipients, aggregatedResCount));
     }, kEmailSendDelay, qnBusinessRuleConnector->thread());
 
     return true;

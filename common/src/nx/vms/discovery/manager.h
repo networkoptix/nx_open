@@ -4,6 +4,8 @@
 #include "module_connector.h"
 #include "udp_multicast_finder.h"
 
+class QnMediaServerResource;
+
 namespace nx {
 namespace vms {
 namespace discovery {
@@ -82,6 +84,7 @@ private:
     void initializeConnector();
     void initializeMulticastFinders(bool clientMode);
     void monitorServerUrls();
+    void updateEndpoints(const QnMediaServerResource* server);
 
 private:
     QnResourcePool* const m_resourcePool;

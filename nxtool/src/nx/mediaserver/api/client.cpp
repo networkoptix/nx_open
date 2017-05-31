@@ -117,6 +117,8 @@ static QString convertCapsToReadable(const QString &customization
                 return QStringLiteral("ISD Jaguar");
             else if (caps.contains("isd_s2"))
                 return QStringLiteral("ISD S2");
+            else if (caps.contains("edge1"))
+                return QStringLiteral("Edge 1");
             else
                 return QStringLiteral("%1 %2").arg(kLinuxTag).arg("unknown");
         }

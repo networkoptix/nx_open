@@ -14,8 +14,8 @@ supported_targets = [
     "rpi",
     "bpi",
     "tx1",
-    "isd",
     "isd_s2",
+    "edge1",
     "android",
     "android-arm",
     "android-x86",
@@ -33,7 +33,7 @@ additional_targets = {
     "android-x86": [ "android" ],
     "rpi": [ "linux-arm", "linux" ],
     "bpi": [ "linux-arm", "linux" ],
-    "isd": [ "linux-arm", "linux" ],
+    "edge1": [ "linux-arm", "linux" ],
     "isd_s2": [ "linux-arm", "linux" ],
     "tx1": [ "linux-arm", "linux" ]
 }
@@ -72,7 +72,7 @@ def get_platform_for_target(target):
         return "linux"
     elif target.startswith("macosx"):
         return "macosx"
-    elif target in [ "rpi", "bpi", "tx1", "isd", "isd_s2" ]:
+    elif target in [ "rpi", "bpi", "tx1", "isd_s2", "edge1" ]:
         return "linux"
     elif target.startswith("android"):
         return "android"

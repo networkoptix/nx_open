@@ -15,6 +15,7 @@
 
 namespace ec2
 {
+
     // TODO: #2.4 remove Ec2 prefix to avoid ec2::Ec2DirectConnection
     class Ec2DirectConnection
     :
@@ -38,7 +39,6 @@ namespace ec2
 
         virtual Timestamp getTransactionLogTime() const override;
         virtual void setTransactionLogTime(Timestamp value) override;
-
     private:
         const QnConnectionInfo m_connectionInfo;
         bool m_isInitialized;

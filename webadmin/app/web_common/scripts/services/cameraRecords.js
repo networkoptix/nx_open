@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('nxCommon')
-    .factory('cameraRecords', function ($q) {
+    .factory('cameraRecords', ['$q', function ($q) {
         var lastRecordProvider = null;
         var lastPositionProvider = null;
         return {
@@ -20,4 +20,4 @@ angular.module('nxCommon')
                 return lastPositionProvider;
             }
         };
-    });
+    }]);

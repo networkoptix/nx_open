@@ -21,6 +21,7 @@
 #include "core/resource_access/user_access_data.h"
 #include "core/resource_access/resource_access_manager.h"
 #include "core/resource/user_resource.h"
+#include <nx/fusion/serialization/sql.h>
 
 struct BeforeRestoreDbData;
 
@@ -140,6 +141,18 @@ namespace detail
         {
             QnWriteLocker lock(&m_mutex);
             return doQueryNoLock(t1, t2);
+        }
+
+        template <class OutputData>
+        ErrorCode execSqlQuery(const QString& queryStr, OutputData* outputData)
+        {
+            QnWriteLocker lock(&m_mutex);
+            QSqlQuery query(m_sdb);
+            query.setForwardOnly(true);
+            if (!prepareSQLQuery(&query, queryStr, Q_FUNC_INFO) || !query.exec())
+                return ErrorCode::dbError;
+            QnSql::fetch_many(query, outputData);
+            return ErrorCode::ok;
         }
 
         //getCurrentTime
