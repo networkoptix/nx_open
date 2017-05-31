@@ -211,5 +211,8 @@
   "regActions":{
     "passwordLabel":"Password",
     "createAccount": "Create Account"
+  },
+  "header":{
+    "allSystems":"All systems"
   }
 }
