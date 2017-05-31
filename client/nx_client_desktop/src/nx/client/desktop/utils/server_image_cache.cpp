@@ -13,7 +13,7 @@ namespace client {
 namespace desktop {
 
 ServerImageCache::ServerImageCache(QObject *parent) :
-    base_type(Qn::wallpapersFolder, parent)
+    base_type(Qn::kWallpapersFolder, parent)
 {
 }
 
