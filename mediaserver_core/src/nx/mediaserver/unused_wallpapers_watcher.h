@@ -22,7 +22,7 @@ class UnusedWallpapersWatcher: public QObject, public QnCommonModuleAware
 public:
     UnusedWallpapersWatcher(QnCommonModule* commonModule);
     void start();
-private slots:
+public slots:
     void update();
 private:
     QTimer m_timer;
