@@ -10,6 +10,6 @@ FOR /F %%G IN ('dir /b /AD') DO (
   cd %PACKDIR% 
   SET TESTRESULT=%ERRORLEVEL%
   echo pack errorlevel is %ERRORLEVEL%
-  rd /S /Q %%F
+  rd /S /Q %%G
   )
 cd %CURRENTDIR%
