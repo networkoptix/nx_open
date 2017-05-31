@@ -248,7 +248,15 @@ void Connection::onHttpClientDone()
         cancelConnecting(State::Error, lm("Remote peer Id is null"));
         return;
     }
-
+    else if (remotePeer.id != m_remotePeer.id)
+    {
+        cancelConnecting(
+            State::Error, 
+            lm("Remote peer id %1 is not match expected peer id %2")
+            .arg(remotePeer.id.toString())
+            .arg(m_remotePeer.id.toString()));
+        return;
+    }
     m_remotePeer = remotePeer;
 
     NX_ASSERT(!m_remotePeer.instanceId.isNull());
