@@ -1,5 +1,5 @@
 <ng-include ng-if="!register.success && !registerSuccess && session.fromClient" src="$root.C.viewsDir + 'static/register-intro.html'"></ng-include>
-<div class="auth-hidden">
+<div class="container" class="auth-hidden">
     <h1 class="process-success" ng-if="(register.success || registerSuccess) && !activated">
         Account registered. Confirmation message is sent to Email <br>{{account.email}}
     </h1>

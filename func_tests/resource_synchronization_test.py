@@ -9,7 +9,7 @@ import itertools
 from multiprocessing.dummy import Pool as ThreadPool
 from test_utils.server import MEDIASERVER_MERGE_TIMEOUT_SEC
 import server_api_data_generators as generator
-import transaction_log as tr
+import transaction_log
 
 log = logging.getLogger(__name__)
 
@@ -177,7 +177,8 @@ def check_transaction_log(env):
     while True:
         srv_transactions = {}
         for srv in servers:
-            transactions = tr.transactions_from_json(srv.rest_api.ec2.getTransactionLog.GET())
+            transactions = transaction_log.transactions_from_json(
+                srv.rest_api.ec2.getTransactionLog.GET())
             for t in transactions:
                 srv_transactions.setdefault(t, []).append(srv)
         unmatched_transactions = {t: l for t, l in srv_transactions.iteritems()

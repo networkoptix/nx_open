@@ -2,9 +2,8 @@
 
 #include <atomic>
 
-#include <QtCore/QString>
-
 #include <nx/utils/argument_parser.h>
+#include <nx/utils/thread/mutex.h>
 
 namespace nx {
 namespace utils {
@@ -34,7 +33,9 @@ private:
     static std::atomic<size_t> s_timeoutMultiplier;
     static std::atomic<bool> s_disableTimeAsserts;
     static std::atomic<LoadMode> s_loadMode;
-    static QString sTemporaryDirectoryPath;
+
+    static QnMutex s_mutex;
+    static QString s_temporaryDirectoryPath;
 };
 
 template<typename Count>

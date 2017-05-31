@@ -15,19 +15,19 @@ import server_api_data_generators as generator
 from test_utils.utils import SimpleNamespace
 from multiprocessing import Pool as ThreadPool
 from test_utils.server import Server
-import transaction_log as tr
+import transaction_log
 
 
 log = logging.getLogger(__name__)
 
 MERGE_TIMEOUT = datetime.timedelta(hours=1)
 MERGE_DONE_CHECK_PERIOD_SEC = 2.
-SET_RESOURCE_STATUS_CMD = 202
+SET_RESOURCE_STATUS_CMD = '202'
 
 # Perhaps, it'd better to put it in the test configuration
 TOTAL_CAMERA_COUNT = 10000
 TOTAL_STORAGE_COUNT = 500
-TOTAL_USER_COUNT = 1000
+TOTAL_USER_COUNT = 100
 RESOURCES_PER_CAMERA = 5
 
 REST_API_TIMEOUT_SEC = 60.
@@ -75,21 +75,21 @@ def compare_transaction_log(json_1, json_2):
     def is_not_set_resource_status(transaction):
         return transaction.command != SET_RESOURCE_STATUS_CMD
 
-    def get_filtered_transactions(json):
-        return filter(is_not_set_resource_status, tr.transactions_from_json(json))
+    def clean(json):
+        return filter(is_not_set_resource_status, transaction_log.transactions_from_json(json))
 
-    transactions_1 = get_filtered_transactions(json_1)
-    transactions_2 = get_filtered_transactions(json_2)
+    transactions_1 = clean(json_1)
+    transactions_2 = clean(json_2)
     return transactions_1 == transactions_2
 
 
 def compare_full_info(json_1, json_2):
     # We have to not check 'resStatusList' section due to VMS-5969
-    def get_stricted_full_info(json):
+    def clean(json):
         return {k: v for k, v in json.iteritems() if k != 'resStatusList'}
 
-    full_info_1 = get_stricted_full_info(json_1)
-    full_info_2 = get_stricted_full_info(json_2)
+    full_info_1 = clean(json_1)
+    full_info_2 = clean(json_2)
     return full_info_1 == full_info_2
 
 
@@ -108,7 +108,7 @@ def wait_merge_done(servers, method, api_object, api_method, start_time):
     while True:
         result_expected = get_response(servers[0], method, api_object, api_method)
 
-        if not result_expected:
+        if result_expected is None:
             if utils.datetime_utc_now() - start_time >= MERGE_TIMEOUT:
                 pytest.fail("%r can't get response for '%s' during %s" % (
                     servers[0], api_method,

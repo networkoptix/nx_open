@@ -596,14 +596,14 @@ function TimelineCanvasRender(canvas, timelineConfig, recordsProvider, scaleMana
     
         context.beginPath();
         context.strokeStyle = blurColor(timelineConfig.scrollBarMarksColor,1);
-        context.moveTo(centerOfScrollBar, self.canvas.height - marksHeightOffset);
-        context.lineTo(centerOfScrollBar, topOfScrollBar + marksHeightOffset);
+        context.moveTo(0.5 + centerOfScrollBar, self.canvas.height - marksHeightOffset);
+        context.lineTo(0.5 + centerOfScrollBar, topOfScrollBar + marksHeightOffset);
         context.stroke();
-        context.moveTo(centerOfScrollBar + marksSpacing, self.canvas.height - marksHeightOffset);
-        context.lineTo(centerOfScrollBar + marksSpacing, topOfScrollBar + marksHeightOffset);
+        context.moveTo(0.5 + centerOfScrollBar + marksSpacing, self.canvas.height - marksHeightOffset);
+        context.lineTo(0.5 + centerOfScrollBar + marksSpacing, topOfScrollBar + marksHeightOffset);
         context.stroke();
-        context.moveTo(centerOfScrollBar - marksSpacing, self.canvas.height - marksHeightOffset);
-        context.lineTo(centerOfScrollBar - marksSpacing, topOfScrollBar + marksHeightOffset);
+        context.moveTo(0.5 + centerOfScrollBar - marksSpacing, self.canvas.height - marksHeightOffset);
+        context.lineTo(0.5 + centerOfScrollBar - marksSpacing, topOfScrollBar + marksHeightOffset);
         context.stroke();
     }
 

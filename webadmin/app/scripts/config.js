@@ -3,6 +3,7 @@
 
 var Config = {
     viewsDir: 'views/', //'lang_' + lang + '/views/';
+    viewsDirCommon: 'web_common/views/',
     webadminSystemApiCompatibility: true,
     defaultLanguage: 'en_US',
     supportedLanguages:[
@@ -35,7 +36,7 @@ var Config = {
     dateSettingsFormat:'dd MMMM yyyy',
 
     visualLog: false,
-    allowDebugMode: false, // Allow debugging at all. Set to false in production
+    allowDebugMode: true, // Allow debugging at all. Set to false in production
     debug: {
         video: true, // videowindow.js - disable loader, allow rightclick
         videoFormat: false,//'flashls', // videowindow.js - force video player
@@ -116,7 +117,8 @@ var Config = {
         takeCameraOwnershipWithoutLock: {label: 'Take cameras ownership without lock', type: 'checkbox'},
         timeSynchronizationEnabled: {label: 'Time synchronization enabled', type: 'checkbox'},
         upnpPortMappingEnabled: {label: 'UPNP port mapping enabled', type: 'checkbox'},
-
+    },
+    webclient:{
         useServerTime: true,
         disableVolume: true,
         reloadInterval: 5*1000

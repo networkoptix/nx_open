@@ -9,18 +9,33 @@
         </div>
 
         <div class="navbar-collapse" uib-collapse="!isMenuExpanded">
-            <ul class="nav navbar-nav auth-visible">
+            <ul class="nav navbar-nav auth-visible" >
                 <li class="vertical-bar"></li>
-                <li class="auth-visible" ng-class="{active:isActive('/systems')}"><a href="/systems">Systems</a></li>
+
+                <li ng-if="activeSystem" ng-class="{active:active.view }"><a ng-href="/systems/{{activeSystem.id}}/view">View</a></li>
+                <li ng-if="activeSystem" ng-class="{active:active.settings}"><a ng-href="/systems/{{activeSystem.id}}">Settings</a></li>
+
                 <li role="separator" class="nav-divider"></li>
             </ul>
 
             <ul class="nav navbar-nav navbar-right auth-hidden">
                 <li><span class="btn-wrapper"><a href="/login" class="btn btn-default"
                                                  ng-click="login();$event.preventDefault();">Log In</a></span><span
-                        class="btn-wrapper" ng-if="!isActive('register')"><a href="/register" class="btn btn-primary" >Create Account</a></span></li>
+                        class="btn-wrapper" ng-if="!active.register"><a href="/register" class="btn btn-primary" >Create Account</a></span></li>
             </ul>
             <ul class="nav navbar-nav navbar-right auth-visible hidden-collapsed">
+                <li uib-dropdown ng-if="systems && singleSystem">
+                    <a ng-href="/systems/{{activeSystem.id}}">{{activeSystem.name}}</a>
+                </li>
+                <li class="vertical-bar" ng-if="systems && !singleSystem"></li>
+                <li uib-dropdown ng-if="systems && !singleSystem">
+                    <a uib-dropdown-toggle ng-href="/systems/{{system.id}}">{{activeSystem?activeSystem.name:systemCounter + ' ' + L.header.systems}} <span class="icon-caret"></span></a>
+                    <ul uib-dropdown-menu>
+                        <li ng-repeat="system in systems | limitTo: $root.C.maxSystemsForHeader"><a ng-href="/systems/{{system.id}}/{{active.view?'view':''}}">{{system.name}} - {{system.ownerFullName}}</a></li>
+                        <li role="separator" class="nav-divider"></li>
+                        <li ng-repeat="system in systems"><a ng-href="/systems">{{L.header.allSystems}}</a></li>
+                    </ul>
+                </li>
                 <li class="vertical-bar"></li>
                 <li uib-dropdown>
                     <a uib-dropdown-toggle href="">{{account.email}} <span class="icon-caret"></span></a>

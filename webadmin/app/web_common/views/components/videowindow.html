@@ -1,0 +1,12 @@
+<div class="videowindow">
+
+    <camera-view-informer video-flags="videoFlags" preview="preview"></camera-view-informer>
+    <div class="videoplayer" id="{{playerId}}" ng-if="flashls" ng-class="[videoFlags.loading ? 'invisible' : '', getRotation()]" ng-init="initFlash()">
+    </div>
+
+    <div class="videoplayer" ng-if="native" ng-class="[videoFlags.loading ? 'invisible' : '', getRotation()]">
+    </div>
+
+    <video class="videoplayer" ng-if="jsHls" ng-class="[videoFlags.loading ? 'invisible' : '', getRotation()]">
+    </video>
+</div>
