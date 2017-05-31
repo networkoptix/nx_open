@@ -3,6 +3,8 @@
 #include <nx/network/m3u/m3u_playlist.h>
 #include <nx/network/url/url_parse_helper.h>
 
+#include "http_api_path.h"
+
 namespace nx {
 namespace cloud {
 namespace gateway {
@@ -31,7 +33,7 @@ nx_http::BufferType M3uPlaylistConverter::convert(
             continue;
         QUrl url(entry.value);
         url.setPath(nx::network::url::normalizePath(
-            lm("/%1/%2").arg(m_targetHost).arg(url.path())));
+            lm("/%1/%2/%3").arg(kApiPathPrefix).arg(m_targetHost).arg(url.path())));
         if (!url.host().isEmpty())
         {
             url.setHost(m_proxyEndpoint.address.toString());
