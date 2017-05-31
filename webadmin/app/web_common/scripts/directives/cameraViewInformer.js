@@ -24,7 +24,7 @@ angular.module('nxCommon')
                     }
                     
                     //if status is online dont show any message
-                    if(scope.alertType == 'status' && scope.flags[scope.alertType] == "Online")
+                    if(scope.alertType == 'status' && (scope.flags[scope.alertType] == "Online" || scope.flags[scope.alertType] == "Recording")
                     {
                         scope.alertType = null;
                     }
