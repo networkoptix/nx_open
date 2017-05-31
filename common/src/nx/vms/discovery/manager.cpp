@@ -108,6 +108,7 @@ boost::optional<ModuleEndpoint> Manager::getModule(const QnUuid& id) const
 
 void Manager::checkEndpoint(SocketAddress endpoint, QnUuid expectedId)
 {
+    NX_EXPECT(endpoint.isValid(), lm("Invalid endpoint: %1").arg(endpoint));
     m_moduleConnector->dispatch(
         [this, endpoint = std::move(endpoint), expectedId = std::move(expectedId)]() mutable
         {
@@ -205,11 +206,7 @@ void Manager::initializeMulticastFinders(bool clientMode)
     m_multicastFinder->listen(
         [this](QnModuleInformationWithAddresses module, SocketAddress /*endpoint*/)
         {
-            std::set<SocketAddress> endpoints;
-            for (const auto& address: module.remoteAddresses)
-                endpoints.insert(address);
-
-            m_moduleConnector->newEndpoints(std::move(endpoints), module.id);
+            m_moduleConnector->newEndpoints(module.endpoints(), module.id);
         });
 
     if (!clientMode)
@@ -245,45 +242,9 @@ void Manager::monitorServerUrls()
         {
             if (const auto server = resource.dynamicCast<QnMediaServerResource>())
             {
-                const auto udateEndpoints =
-                    [this, server]()
-                    {
-                        if (server->getId() == commonModule()->moduleGUID())
-                        {
-                            return m_moduleConnector->post(
-                                [this, module = server->getModuleInformationWithAddresses()]()
-                                {
-                                    m_multicastFinder->multicastInformation(module);
-                                });
-                        }
-
-                        std::set<SocketAddress> allowedEndpoints;
-                        for (const auto& endpoint: server->getNetAddrList())
-                            allowedEndpoints.emplace(endpoint);
-
-                        int port = server->getPort();
-                        for (const auto& url: server->getAdditionalUrls())
-                            allowedEndpoints.emplace(url.host(), url.port(port));
-
-                        std::set<SocketAddress> forbiddenEndpoints;
-                        for (const auto& url: server->getIgnoredUrls())
-                            forbiddenEndpoints.emplace(url.host(), url.port(port));
-
-                        m_moduleConnector->post(
-                            [this, id = server->getId(), allowed = std::move(allowedEndpoints),
-                                forbidden = std::move(forbiddenEndpoints)]() mutable
-                            {
-                                NX_DEBUG(this, lm("Server %1 resource endpoints: add %2, forbid %3")
-                                    .arg(id).container(allowed).container(forbidden));
-
-                                m_moduleConnector->setForbiddenEndpoints(std::move(forbidden), id);
-                                if (allowed.size() != 0)
-                                    m_moduleConnector->newEndpoints(allowed, id);
-                            });
-                    };
-
-                udateEndpoints();
-                connect(server.data(), &QnMediaServerResource::auxUrlsChanged, udateEndpoints);
+                updateEndpoints(server.data());
+                connect(server.data(), &QnMediaServerResource::auxUrlsChanged,
+                    this, [this, server]() { updateEndpoints(server.data()); });
             }
         });
 
@@ -292,6 +253,46 @@ void Manager::monitorServerUrls()
         {
             if (const auto server = resource.dynamicCast<QnMediaServerResource>())
                 server->disconnect(this);
+        });
+}
+
+void Manager::updateEndpoints(const QnMediaServerResource* server)
+{
+    if (server->getId() == commonModule()->moduleGUID())
+    {
+        return m_moduleConnector->post(
+            [this, module = server->getModuleInformationWithAddresses()]()
+            {
+                m_multicastFinder->multicastInformation(module);
+            });
+    }
+
+    auto port = (uint16_t) server->getPort();
+    NX_ASSERT(port);
+    if (port == 0)
+        return;
+
+    std::set<SocketAddress> allowedEndpoints;
+    for (const auto& endpoint: server->getNetAddrList())
+        allowedEndpoints.emplace(endpoint.address, endpoint.port ? endpoint.port : port);
+
+    for (const auto& url: server->getAdditionalUrls())
+        allowedEndpoints.emplace(url.host(), (uint16_t) url.port(port));
+
+    std::set<SocketAddress> forbiddenEndpoints;
+    for (const auto& url: server->getIgnoredUrls())
+        forbiddenEndpoints.emplace(url.host(), (uint16_t) url.port(port));
+
+    m_moduleConnector->post(
+        [this, id = server->getId(), allowed = std::move(allowedEndpoints),
+            forbidden = std::move(forbiddenEndpoints)]() mutable
+        {
+            NX_DEBUG(this, lm("Server %1 resource endpoints: add %2, forbid %3")
+                .arg(id).container(allowed).container(forbidden));
+
+            m_moduleConnector->setForbiddenEndpoints(std::move(forbidden), id);
+            if (allowed.size() != 0)
+                m_moduleConnector->newEndpoints(allowed, id);
         });
 }
 
