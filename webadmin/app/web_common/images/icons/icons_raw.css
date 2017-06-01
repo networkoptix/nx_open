@@ -19,7 +19,7 @@ width: 194px;
 height: 194px;
 }
 
-.s188{
+.s186{
 width: 186px;
 height: 186px;
 }
@@ -205,19 +205,19 @@ background: url(icons_sprite@2x.png) -4px -292px;
 background: url(icons_sprite@2x.png) -52px -292px;
 }
 
-.settings{
+.settings.active{
 background: url(icons_sprite@2x.png) -100px -292px;	
 }
 
-.settings.blue{
+.settings.blue.active{
 background: url(icons_sprite@2x.png) -148px -292px;	
 }
 
-.cams-search{
+.cams-search.active{
 background: url(icons_sprite@2x.png) -196px -292px;	
 }
 
-.cams-search.blue{
+.cams-search.blue.active{
 background: url(icons_sprite@2x.png) -244px -292px;	
 }
 
