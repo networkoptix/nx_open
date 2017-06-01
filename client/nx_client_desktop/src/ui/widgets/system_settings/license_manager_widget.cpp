@@ -240,6 +240,9 @@ QnLicenseManagerWidget::QnLicenseManagerWidget(QWidget *parent) :
         updateLicensesIfNeeded);
     connect(commonModule()->licensePool(), &QnLicensePool::licensesChanged, this,
         updateLicensesIfNeeded);
+
+    connect(commonModule(), &QnCommonModule::remoteIdChanged, this,
+        [this]() { m_deactivationReason = RequestInfo(); });
 }
 
 QnLicenseManagerWidget::~QnLicenseManagerWidget()
@@ -605,9 +608,7 @@ QString QnLicenseManagerWidget::getLicenseDescription(const QnLicensePtr& licens
     return lit("%1%2%3, %4").arg(key, kHtmlDelimiter, license->displayName(), channelsCountString);
 }
 
-bool QnLicenseManagerWidget::confirmDeactivation(
-    const QStringList& extras,
-    RequestInfo& info) const
+bool QnLicenseManagerWidget::confirmDeactivation(const QStringList& extras)
 {
     QnMessageBox confirmationDialog(QnMessageBoxIcon::Question,
         tr("Deactivate licenses?", "", extras.size()),
@@ -622,11 +623,11 @@ bool QnLicenseManagerWidget::confirmDeactivation(
         return false;
 
     using namespace nx::client::desktop::ui;
-    dialogs::LicenseDeactivationReason dialog(QnUserResourcePtr(), parentWidget());
+    dialogs::LicenseDeactivationReason dialog(m_deactivationReason, parentWidget());
     if (dialog.exec() == QDialogButtonBox::Cancel)
         return false;
 
-    info = RequestInfo({dialog.name(), dialog.email(), dialog.reason()});
+    m_deactivationReason = dialog.info();
     return true;
 }
 
@@ -666,7 +667,6 @@ QString QnLicenseManagerWidget::getDeactivationErrorMessage(
 }
 
 void QnLicenseManagerWidget::showDeactivationErrorsDialog(
-    const RequestInfo& info,
     const QnLicenseList& licenses,
     const DeactivationErrors& errors)
 {
@@ -701,7 +701,7 @@ void QnLicenseManagerWidget::showDeactivationErrorsDialog(
             tr("Deactivate %n other", "", licenses.size() - errorsCount),
             QDialogButtonBox::YesRole, Qn::ButtonAccent::Warning);
         connect(deactivateButton, &QAbstractButton::clicked, this,
-            [this, licenses, errors, info]()
+            [this, licenses, errors]()
             {
                 QnLicenseList filtered;
                 std::copy_if(licenses.begin(), licenses.end(), std::back_inserter(filtered),
@@ -710,7 +710,7 @@ void QnLicenseManagerWidget::showDeactivationErrorsDialog(
                         return !errors.contains(license->key());
                     });
 
-                deactivateLicenses(info, filtered);
+                deactivateLicenses(filtered);
             });
         dialog.setDefaultButton(deactivateButton);
     }
@@ -718,9 +718,7 @@ void QnLicenseManagerWidget::showDeactivationErrorsDialog(
     dialog.exec();
 }
 
-void QnLicenseManagerWidget::deactivateLicenses(
-    const RequestInfo& info,
-    const QnLicenseList& licenses)
+void QnLicenseManagerWidget::deactivateLicenses(const QnLicenseList& licenses)
 {
     using Deactivator = nx::client::desktop::license::Deactivator;
     using Result = Deactivator::Result;
@@ -730,13 +728,13 @@ void QnLicenseManagerWidget::deactivateLicenses(
         [this]() { window()->setEnabled(true); });
 
     const auto handler =
-        [this, licenses, restoreEnabledGuard, info]
+        [this, licenses, restoreEnabledGuard]
             (Result result, const DeactivationErrors& errors)
         {
             switch(result)
             {
                 case Result::DeactivationError:
-                    showDeactivationErrorsDialog(info, licenses, errors);
+                    showDeactivationErrorsDialog(licenses, errors);
                     return;
 
                 case Result::UnspecifiedError:
@@ -770,7 +768,7 @@ void QnLicenseManagerWidget::deactivateLicenses(
             QnMessageBox::success(this, text);
         };
 
-    Deactivator::deactivateAsync(info, licenses, handler, parentWidget());
+    Deactivator::deactivateAsync(m_deactivationReason, licenses, handler, parentWidget());
 }
 
 void QnLicenseManagerWidget::takeAwaySelectedLicenses()
@@ -790,11 +788,8 @@ void QnLicenseManagerWidget::takeAwaySelectedLicenses()
                 extras.append(getLicenseDescription(license));
         }
 
-        RequestInfo info;
-        if (!extras.isEmpty() && confirmDeactivation(extras, info))
-        {
-            deactivateLicenses(info, licenses);
-        }
+        if (!extras.isEmpty() && confirmDeactivation(extras))
+            deactivateLicenses(licenses);
     }
 }
 

@@ -13,10 +13,11 @@
 namespace {
 
 template<typename FieldType>
-FieldType* createField(const Qn::TextValidateFunction& validator)
+FieldType* createField(const QString& text, const Qn::TextValidateFunction& validator)
 {
     auto result = new FieldType();
     result->setValidator(validator);
+    result->setText(text);
     return result;
 }
 
@@ -29,12 +30,13 @@ namespace ui {
 namespace dialogs {
 
 LicenseDeactivationReason::LicenseDeactivationReason(
-    const QnUserResourcePtr& currentUser,
+    const license::RequestInfo& info,
     QWidget* parent)
     :
     base_type(QnMessageBoxIcon::Information,
         tr("Please fill up information about yourself and reason for license deactivation"),
-        QString(), QDialogButtonBox::Cancel, QDialogButtonBox::NoButton, parent)
+        QString(), QDialogButtonBox::Cancel, QDialogButtonBox::NoButton, parent),
+    m_info(info)
 {
     const auto nextButton = addButton(tr("Next"),
         QDialogButtonBox::AcceptRole, Qn::ButtonAccent::Standard);
@@ -83,19 +85,20 @@ QWidget* LicenseDeactivationReason::createWidget(QPushButton* nextButton)
                 widget->setFocusProxy(field);
         };
 
-    const auto nameField = createField<QnInputField>(
+    const auto nameField = createField<QnInputField>(m_info.name,
         Qn::defaultNonEmptyValidator(tr("Name is necessary")));
-    const auto emailField = createField<QnInputField>(
+    const auto emailField = createField<QnInputField>(m_info.email,
         Qn::defaultEmailValidator(false));
     const auto reasonField = createField<nx::client::desktop::ui::TextEditField>(
+        m_info.reason.join(lit("n")),
         Qn::defaultNonEmptyValidator(tr("Reason is necessary")));
 
     connect(nextButton, &QPushButton::clicked, this,
         [this, nameField, emailField, reasonField]()
         {
-            m_name = nameField->text();
-            m_email = emailField->text();
-            m_reason = reasonField->text().split(lit("\n"));
+            m_info = nx::client::desktop::license::RequestInfo({
+                nameField->text(), emailField->text(),
+                reasonField->text().split(lit("\n"))});
         });
 
     addLabel(tr("Name"));
@@ -107,19 +110,9 @@ QWidget* LicenseDeactivationReason::createWidget(QPushButton* nextButton)
     return widget;
 }
 
-QString LicenseDeactivationReason::name() const
+license::RequestInfo LicenseDeactivationReason::info()
 {
-    return m_name;
-}
-
-QString LicenseDeactivationReason::email() const
-{
-    return m_email;
-}
-
-QStringList LicenseDeactivationReason::reason() const
-{
-    return m_reason;
+    return m_info;
 }
 
 } // namespace dialogs

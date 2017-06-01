@@ -2,6 +2,7 @@
 
 #include <core/resource/resource_fwd.h>
 #include <ui/dialogs/common/message_box.h>
+#include <nx/client/desktop/license/license_helpers.h>
 
 namespace nx {
 namespace client {
@@ -16,23 +17,19 @@ class LicenseDeactivationReason: public QnMessageBox
 
 public:
     LicenseDeactivationReason(
-        const QnUserResourcePtr& currentUser,
+        const license::RequestInfo& info,
         QWidget* parent = nullptr);
 
     virtual ~LicenseDeactivationReason();
 
-    QString name() const;
-    QString email() const;
-    QStringList reason() const;
+    license::RequestInfo info();
 
 private:
     QWidget* createWidget(QPushButton* nextButton);
 
 private:
+    license::RequestInfo m_info;
     QSet<QWidget*> m_invalidFields;
-    QString m_name;
-    QString m_email;
-    QStringList m_reason;
 };
 
 } // namespace dialogs

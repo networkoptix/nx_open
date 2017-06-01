@@ -57,7 +57,7 @@
 #include <utils/math/color_transformations.h>
 #include <nx/utils/string.h>
 #include <nx/utils/math/fuzzy.h>
-#include <nx/client/desktop/ui/common/detail/base_input_control.h>
+#include <nx/client/desktop/ui/common/detail/base_input_field.h>
 
 using namespace style;
 

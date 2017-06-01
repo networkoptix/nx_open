@@ -6,7 +6,7 @@
 #include <ui/utils/validators.h>
 #include <utils/common/connective.h>
 
-#include <nx/client/desktop/ui/common/detail/base_input_control.h>
+#include <nx/client/desktop/ui/common/detail/base_input_field.h>
 
 class QnPasswordStrengthIndicator;
 class QnInputFieldPrivate;
