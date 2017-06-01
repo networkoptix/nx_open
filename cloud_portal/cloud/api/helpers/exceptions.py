@@ -27,6 +27,7 @@ class ErrorCodes(Enum):
     not_authorized = 'notAuthorized'
     wrong_parameters = 'wrongParameters'
     wrong_code = 'wrongCode'
+    wrong_old_password = 'wrongOldPassword'
 
     # CLOUD DB specific errors
     forbidden = 'forbidden'
