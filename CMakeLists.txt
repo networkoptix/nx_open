@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.8.1 FATAL_ERROR)
+cmake_minimum_required(VERSION 3.8.0 FATAL_ERROR)
 
 set(customization "default" CACHE STRING "Product customization")
 option(beta "Is this build is beta build" ON)
@@ -124,8 +124,6 @@ endif()
 if(WINDOWS)
     # Prepare a file to be included into each Visual Studio project.
     nx_configure_file(${PROJECT_SOURCE_DIR}/msvc.user.props ${CMAKE_BINARY_DIR})
-    
-    add_definitions(-DWIN32_LEAN_AND_MEAN=1)
 endif()
 
 # Required for QN_DECLARE_METAOBJECT_HEADER

@@ -1,13 +1,13 @@
 #include "utils/common/util.h"
 
 #if !defined(Q_OS_WIN) && !defined(Q_OS_ANDROID)
-#   include <sys/statvfs.h>
-#   include <sys/time.h>
+    #include <sys/statvfs.h>
+    #include <sys/time.h>
 #endif
 
 #ifdef Q_OS_WIN32
-#   include <windows.h>
-#   include <mmsystem.h>
+    #include <windows.h>
+    #include <mmsystem.h>
 #endif
 
 #include <QtCore/QDateTime>

@@ -596,7 +596,7 @@
                 <windows>true</windows>
                 <unix>false</unix>
                 <script.extension>bat</script.extension>
-                <global.windows.defines>ENABLE_VMAX</global.windows.defines>
+                <global.windows.defines>ENABLE_VMAX _WINSOCKAPI_=</global.windows.defines>
                 <machine.type>X64</machine.type>
                 <qt.version>5.6.1-1</qt.version>
                 <artifact.name.platform>win64</artifact.name.platform>
