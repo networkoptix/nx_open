@@ -357,7 +357,7 @@ QnAbstractBusinessActionPtr QnBusinessRuleProcessor::processInstantAction(
         return QnBusinessActionFactory::instantiateAction(rule, bEvent, commonModule()->moduleGUID());
 
     QString eventKey = rule->getUniqueId();
-    if (bEvent->getResource())
+    if (bEvent->getResource() && bEvent->getEventType() != QnBusiness::SoftwareTriggerEvent)
         eventKey += bEvent->getResource()->getUniqueId();
 
     QnProcessorAggregationInfo& aggInfo = m_aggregateActions[eventKey];

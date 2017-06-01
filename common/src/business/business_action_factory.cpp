@@ -95,6 +95,6 @@ QnAbstractBusinessActionPtr QnBusinessActionFactory::createAction(const QnBusine
 QnAbstractBusinessActionPtr QnBusinessActionFactory::cloneAction(QnAbstractBusinessActionPtr action)
 {
     QnAbstractBusinessActionPtr result = createAction(action->actionType(), action->getRuntimeParams());
-    *result = *action;
+    result->assign(*action);
     return result;
 }

@@ -11,7 +11,7 @@
 namespace QJsonDetail {
 
 /**
- * Return true if the field must be serialized. Used as a default checker if no QnFusion::checker
+ * @return true if the field must be serialized. Used as a default checker if no QnFusion::checker
  * option is provided for the given class.
  */
 struct AlwaysTrueChecker
@@ -21,7 +21,7 @@ struct AlwaysTrueChecker
 };
 
 /**
- * Return true if value must be omitted in brief mode.
+ * @return true if value must be omitted in brief mode.
  */
 struct BriefChecker
 {

@@ -536,6 +536,11 @@ QVariant QnResourceWidget::itemChange(GraphicsItemChange change, const QVariant 
     return base_type::itemChange(change, value);
 }
 
+QnResourceWidget::SelectionState QnResourceWidget::selectionState() const
+{
+    return m_selectionState;
+}
+
 QSizeF QnResourceWidget::sizeHint(Qt::SizeHint which, const QSizeF &constraint) const
 {
     QSizeF result = base_type::sizeHint(which, constraint);
@@ -940,6 +945,7 @@ void QnResourceWidget::updateSelectedState()
         return;
 
     m_selectionState = selectionState;
+    emit selectionStateChanged(m_selectionState);
 }
 
 qreal QnResourceWidget::calculateFrameWidth() const

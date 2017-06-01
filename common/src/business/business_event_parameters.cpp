@@ -26,7 +26,9 @@ QnUuid QnBusinessEventParameters::getParamsHash() const {
                 paramKey += '_' + description.toUtf8();
             break;
 
-        //TODO: #vkutin #gdm Do we need to handle SoftwareTriggerEvent here?
+        case QnBusiness::SoftwareTriggerEvent:
+            return QnUuid::createUuid();
+            break;
 
         case QnBusiness::CameraInputEvent:
             paramKey += '_' + inputPortId.toUtf8();
