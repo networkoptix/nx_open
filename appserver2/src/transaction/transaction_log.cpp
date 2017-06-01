@@ -12,6 +12,7 @@
 #include "utils/common/synctime.h"
 #include "nx/fusion/model_functions.h"
 #include "nx_ec/data/api_discovery_data.h"
+#include <common/static_common_module.h>
 
 namespace ec2
 {
@@ -256,10 +257,17 @@ ErrorCode QnTransactionLog::updateSequenceNoLock(const QnUuid& peerID, const QnU
     if (m_state.values.value(key) >= sequence)
         return ErrorCode::ok;
 
-    if (sequence - m_state.values.value(key) > 10 &&
-        sequence - m_commitData.state.values.value(key) > 10)
+    static const int kMaxSequenceHole = 50;
+    int prevValue = std::max(m_commitData.state.values.value(key), m_state.values.value(key));
+    if (sequence - prevValue > kMaxSequenceHole)
     {
-        NX_CRITICAL(0);
+        NX_WARNING(
+            this,
+            lm("Peer %1 has got suspicious sequence gap %1 --> %2 from peer %3")
+            .arg(qnStaticCommon->moduleDisplayName(m_dbManager->commonModule()->moduleGUID()))
+            .arg(prevValue)
+            .arg(sequence)
+            .arg(qnStaticCommon->moduleDisplayName(peerID)));
     }
 
     if (!m_updateSequenceQuery)
