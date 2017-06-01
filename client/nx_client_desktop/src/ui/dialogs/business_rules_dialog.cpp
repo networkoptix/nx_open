@@ -264,7 +264,7 @@ QnBusinessRulesDialog::QnBusinessRulesDialog(QWidget *parent):
     connect(ui->deleteRuleButton, &QPushButton::clicked, this,
         &QnBusinessRulesDialog::at_deleteButton_clicked);
 
-    connect(m_rulesViewModel, &QnBusinessRulesActualModel::businessRuleDeleted, this,
+    connect(m_rulesViewModel, &QnBusinessRulesActualModel::eventRuleDeleted, this,
         &QnBusinessRulesDialog::at_message_ruleDeleted);
     connect(m_rulesViewModel, &QnBusinessRulesActualModel::beforeModelChanged, this,
         &QnBusinessRulesDialog::at_beforeModelChanged);

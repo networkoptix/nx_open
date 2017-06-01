@@ -7,8 +7,9 @@
 #include "core/resource/camera_resource.h"
 #include "api/common_message_processor.h"
 #include "business/business_strings_helper.h"
-#include "nx_ec/data/api_conversion_functions.h"
 #include "business/business_event_rule.h"
+#include "business/event_rule_manager.h"
+#include "nx_ec/data/api_conversion_functions.h"
 #include <api/global_settings.h>
 #include <common/common_module.h>
 #include "nx_ec/ec_api.h"
@@ -156,9 +157,9 @@ namespace ec2
             case ApiCommand::removeEventRule:
             {
                 eventType = Qn::AR_BEventRemove;
-                auto msgProc = m_connection->commonModule()->messageProcessor();
-                if (msgProc) {
-                    QnBusinessEventRulePtr bRule = msgProc->businessRules().value(params.id);
+                auto ruleManager = m_connection->commonModule()->eventRuleManager();
+                if (ruleManager) {
+                    QnBusinessEventRulePtr bRule = ruleManager->rule(params.id);
                     if (bRule)
                     {
                         QnBusinessStringsHelper helper(m_connection->commonModule());

@@ -239,8 +239,8 @@ private slots:
     void at_item_imageEnhancementChanged();
     void at_videoLayoutChanged();
 
-    void at_businessRuleChanged(const QnBusinessEventRulePtr& rule);
-    void at_businessRuleDeleted(const QnUuid& ruleId);
+    void at_eventRuleAddedOrUpdated(const QnBusinessEventRulePtr& rule);
+    void at_eventRuleRemoved(const QnUuid& ruleId);
 
 private:
     void setDisplay(const QnResourceDisplayPtr &display);
