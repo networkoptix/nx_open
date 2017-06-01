@@ -31,7 +31,7 @@ struct Request
     nx::client::desktop::license::RequestInfo deactivationInfo;
     LicenseDataList licenses;
 };
-#define Request_Fields (licenses)
+#define Request_Fields (licenses)(deactivationInfo)
 
 struct LicenseStatus
 {
@@ -200,7 +200,6 @@ LicenseDeactivatorPrivate::LicenseDeactivatorPrivate(
     static const QByteArray kJsonContentType(
         Qn::serializationFormatToHttpContentType(Qn::JsonFormat));
 
-    qDebug() << QJson::serialized(request);
     m_httpClient->doPost(kDeactivateLicenseUrl, kJsonContentType, QJson::serialized(request));
 }
 

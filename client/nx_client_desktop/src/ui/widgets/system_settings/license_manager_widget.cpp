@@ -733,10 +733,31 @@ void QnLicenseManagerWidget::deactivateLicenses(
         [this, licenses, restoreEnabledGuard, info]
             (Result result, const DeactivationErrors& errors)
         {
-            if (result != Result::Success)
+            switch(result)
             {
-                showDeactivationErrorsDialog(info, licenses, errors);
-                return;
+                case Result::DeactivationError:
+                    showDeactivationErrorsDialog(info, licenses, errors);
+                    return;
+
+                case Result::UnspecifiedError:
+                    QnMessageBox::critical(this,
+                        tr("Cannot deactivate licenses", "", licenses.count()));
+                    return;
+
+                case Result::ConnectionError:
+                    QnMessageBox::critical(this,
+                        tr("Cannot connect to the License Server"),
+                        tr("Please make sure your server has active Internet connection or check firewall settings."));
+                    return;
+
+                case Result::ServerError:
+                    QnMessageBox::critical(this,
+                        tr("License Server error"),
+                        tr("If the problem presists please contact Customer Support."));
+                    return;
+
+                default:
+                    break;
             }
 
             for (const QnLicensePtr& license: licenses)
