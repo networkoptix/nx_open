@@ -17,7 +17,7 @@ namespace desktop {
 namespace ui {
 namespace detail {
 
-class BaseInputFieldPrivate : public QObject
+class BaseInputFieldPrivate: public QObject
 {
 public:
     BaseInputFieldPrivate(
@@ -61,8 +61,8 @@ BaseInputFieldPrivate::BaseInputFieldPrivate(
     const BaseInputField::AccessorPtr& textAccessor,
     const BaseInputField::AccessorPtr& readOnlyAccessor,
     const BaseInputField::AccessorPtr& placeholderAccessor,
-    BaseInputField* parent):
-
+    BaseInputField* parent)
+    :
     QObject(parent),
     parent(parent),
     title(new QLabel(parent)),
@@ -106,17 +106,17 @@ bool BaseInputFieldPrivate::eventFilter(QObject* watched, QEvent* event)
     if (watched != input)
         return false;
 
-    switch(event->type())
+    switch (event->type())
     {
         case QEvent::Polish:
         {
-            // Ensure input is polished
+            // Ensure input is polished.
             executeDelayed([this](){ defaultPalette = input->palette(); }, 0);
             break;
         }
         case QEvent::FocusIn:
         {
-            /* On focus gain make input look usual even if there is error. */
+            // On focus gain make input look usual even if there is error.
             setHintText(QString());
             input->setPalette(defaultPalette);
             lastResult.state = QValidator::Intermediate;
@@ -124,7 +124,7 @@ bool BaseInputFieldPrivate::eventFilter(QObject* watched, QEvent* event)
         }
         case QEvent::FocusOut:
         {
-            /* On focus loss perform validate, unless it's a popup or programmable focus change. */
+            // On focus loss perform validate, unless it's a popup or programmable focus change.
             switch (static_cast<QFocusEvent*>(event)->reason())
             {
                 case Qt::ActiveWindowFocusReason:
@@ -385,7 +385,6 @@ Qn::ValidationResult BaseInputField::calculateValidationResult() const
         ? d->validator(d->getText())
         : Qn::ValidationResult(QValidator::Acceptable);
 }
-
 
 } // namespace detail
 } // namespace ui
