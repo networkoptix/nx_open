@@ -1,9 +1,9 @@
 set(CMAKE_SYSTEM_NAME Android)
 
-if(NOT $ENV{ANDROID_NDK} STREQUAL "")
-    set(CMAKE_ANDROID_NDK $ENV{ANDROID_NDK})
+if(NOT "$ENV{ANDROID_NDK}" STREQUAL "")
+    set(CMAKE_ANDROID_NDK "$ENV{ANDROID_NDK}")
 else()
-    set(CMAKE_ANDROID_NDK $ENV{environment}/packages/android/android-ndk)
+    set(CMAKE_ANDROID_NDK "${PACKAGES_DIR}/android/android-ndk")
 endif()
 
 set(CMAKE_SYSTEM_VERSION 16)

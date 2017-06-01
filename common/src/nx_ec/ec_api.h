@@ -409,6 +409,28 @@ namespace ec2
                 std::make_shared<impl::CustomListDirectoryHandler<TargetType, HandlerType>>(target, handler)) );
         }
 
+        ErrorCode listDirectorySync(const QString& folderName, QStringList* const outData)
+        {
+            return impl::doSyncCall<impl::ListDirectoryHandler>(
+                [=](const impl::ListDirectoryHandlerPtr &handler)
+                {
+                    return this->listDirectory(folderName, handler);
+                },
+                outData
+            );
+        }
+
+        ErrorCode addStoredFileSync(const QString& folderName, const QByteArray& data)
+        {
+            int(AbstractStoredFileManager::*fn)(
+                const QString&,
+                const QByteArray&,
+                impl::SimpleHandlerPtr) =
+                &AbstractStoredFileManager::addStoredFile;
+            return impl::doSyncCall<impl::SimpleHandler>(
+                std::bind(fn, this, folderName, data, std::placeholders::_1));
+        }
+
     protected:
         virtual int getStoredFile( const QString& filename, impl::GetStoredFileHandlerPtr handler ) = 0;
         virtual int addStoredFile( const QString& filename, const QByteArray& data, impl::SimpleHandlerPtr handler ) = 0;
@@ -449,15 +471,9 @@ namespace ec2
                 std::make_shared<impl::CustomSimpleHandler<TargetType, HandlerType>>(target, handler)));
         }
 
-        template<class TargetType, class HandlerType> int installUpdate(const QString &updateId, const QnPeerSet &peers, TargetType *target, HandlerType handler) {
-            return installUpdate(updateId, peers, std::static_pointer_cast<impl::SimpleHandler>(
-                std::make_shared<impl::CustomSimpleHandler<TargetType, HandlerType>>(target, handler)));
-        }
-
     protected:
         virtual int sendUpdatePackageChunk(const QString &updateId, const QByteArray &data, qint64 offset, const QnPeerSet &peers, impl::SimpleHandlerPtr handler) = 0;
         virtual int sendUpdateUploadResponce(const QString &updateId, const QnUuid &peerId, int chunks, impl::SimpleHandlerPtr handler) = 0;
-        virtual int installUpdate(const QString &updateId, const QnPeerSet &peers, impl::SimpleHandlerPtr handler) = 0;
     };
 
 

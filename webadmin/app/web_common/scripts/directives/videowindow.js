@@ -30,9 +30,10 @@ angular.module('nxCommon')
                 player:"=",
                 activeFormat:"=",
                 rotation: "=",
-                playing: "="
+                playing: "=",
+                preview: "="
             },
-            templateUrl: Config.viewsDir + 'components/videowindow.html',// ???
+            templateUrl: Config.viewsDirCommon + 'components/videowindow.html',// ???
 
             link: function (scope, element/*, attrs*/) {
                 var mimeTypes = {
@@ -47,6 +48,8 @@ angular.module('nxCommon')
                 scope.debugFormat = Config.allowDebugMode && Config.debug.videoFormat;
                 scope.jshlsHideError = Config.debug.jshlsHideError && Config.allowDebugMode;
                 scope.jshlsDebugMode = Config.debug.jshlsDebug && Config.allowDebugMode;
+                scope.videoFlags = {};
+                scope.loading = false;
                 
                 function getFormatSrc(mediaformat) {
                     var src = _.find(scope.vgSrc,function(src){return src.type == mimeTypes[mediaformat];});
@@ -61,15 +64,17 @@ angular.module('nxCommon')
 
                 function detectBestFormat(){
                     //1. Hide all informers
-                    scope.flashRequired = false;
-                    scope.flashOrWebmRequired = false;
-                    scope.noArmSupport = false;
-                    scope.noFormat = false;
-                    scope.errorLoading = false;
-                    scope.ieNoWebm = false;
+                    scope.videoFlags = {
+                        flashRequired: false,
+                        flashOrWebmRequired: false,
+                        noArmSupport: false,
+                        noFormat: false,
+                        errorLoading: false,
+                        ieNoWebm: false,
+                        ieWin10: false,                    
+                        ubuntuNX: false
+                    };
                     scope.loading = false;
-                    scope.ieWin10 = false;
-                    scope.ubuntuNX = false;
 
                     if(scope.debugMode && scope.activeFormat != "Auto"){
                         return scope.activeFormat;
@@ -112,7 +117,7 @@ angular.module('nxCommon')
                             return "webm";
                             // TODO: Try removing this line.
                         }else {
-                            scope.noArmSupport = true;
+                            scope.videoFlags.noArmSupport = true;
                             return false;
                         }
                     }
@@ -135,14 +140,14 @@ angular.module('nxCommon')
                             if(weHaveWebm){
                                 if(window.jscd.osVersion < 10){
                                     if(weHaveHls){
-                                        scope.flashOrWebmRequired = true;
+                                        scope.videoFlags.flashOrWebmRequired = true;
                                     }
                                     else{
-                                        scope.ieNoWebm = true;
+                                        scope.videoFlags.ieNoWebm = true;
                                     }
                                 }
                                 else{
-                                    scope.ieWin10 = true;
+                                    scope.videoFlags.ieWin10 = true;
                                 }
                             }
                             break;
@@ -153,7 +158,7 @@ angular.module('nxCommon')
                                 return "webm";
                             }
                             if(weHaveHls && window.jscd.os === 'Linux'){
-                                scope.ubuntuNX = true;
+                                scope.videoFlags.ubuntuNX = true;
                                 return false;
                             }
 
@@ -172,8 +177,8 @@ angular.module('nxCommon')
                             }
                     }
 
-                    scope.flashRequired = true;
-                    scope.noFormat = true;
+                    scope.videoFlags.flashRequired = true;
+                    scope.videoFlags.noFormat = true;
                     return false; // IE9 - No supported formats
                 }
 
@@ -202,52 +207,50 @@ angular.module('nxCommon')
                     scope.jsHls = false;
 
                     var autoshow = null;
-                    nativePlayer.init(element.find(".videoplayer"), function (api) {
-                        scope.vgApi = api;
+                    $timeout(function(){
+                        nativePlayer.init(element.find(".videoplayer"), function (api) {
+                            scope.vgApi = api;
 
-                        if (scope.vgSrc) {
-                            $timeout(function () {
+                            if (scope.vgSrc) {
+                                $timeout(function () {
                                 scope.loading = !!format;
-                            });
+                                });
 
-                            if(format == 'webm' && window.jscd.os == "Android" ){ // TODO: this is hach for android bug. remove it later
-                                if(autoshow){
-                                    $timeout.cancel(autoshow);
-                                }
-                                autoshow = $timeout(function () {
+                                if(format == 'webm' && window.jscd.os == "Android" ){ // TODO: this is hach for android bug. remove it later
+                                    if(autoshow){
+                                        $timeout.cancel(autoshow);
+                                    }
+                                    autoshow = $timeout(function () {
                                     scope.loading = false;
-                                    autoshow = null;
-                                },20000);
+                                        autoshow = null;
+                                    },20000);
+                                }
+
+                                scope.vgApi.load(getFormatSrc(nativeFormat), mimeTypes[nativeFormat]);
+
+                                scope.vgApi.addEventListener("timeupdate", function (event) {
+                                    var video = event.srcElement || event.originalTarget;
+                                scope.loading = false;
+                                    scope.vgUpdateTime({$currentTime: video.currentTime, $duration: video.duration});
+                                });
+
+                                scope.vgApi.addEventListener("pause", function(event){
+                                    scope.playing = false;
+                                });
+                                scope.vgApi.addEventListener("play", function(event){
+                                    scope.playing = true;
+                                });
+
+                                scope.vgApi.addEventListener("ended",function(event){
+                                    scope.vgUpdateTime({$currentTime: null, $duration: null});
+
+                                });
                             }
 
-                            scope.vgApi.load(getFormatSrc(nativeFormat), mimeTypes[nativeFormat]);
-
-                            scope.vgApi.addEventListener("timeupdate", function (event) {
-                                var video = event.srcElement || event.originalTarget;
-                                scope.vgUpdateTime({$currentTime: video.currentTime, $duration: video.duration});
-                                if (scope.loading) {
-                                    $timeout(function () {
-                                        scope.loading = false;
-                                    });
-                                }
-                            });
-
-                            scope.vgApi.addEventListener("pause", function(event){
-                                scope.playing = false;
-                            });
-                            scope.vgApi.addEventListener("play", function(event){
-                                scope.playing = true;
-                            });
-
-                            scope.vgApi.addEventListener("ended",function(event){
-                                scope.vgUpdateTime({$currentTime: null, $duration: null});
-
-                            });
-                        }
-
-                        scope.vgPlayerReady({$API: scope.vgApi});
-                    }, function (api) {
-                        console.error("some error");
+                            scope.vgPlayerReady({$API: scope.vgApi});
+                        }, function (api) {
+                            console.error("some error");
+                        });
                     });
                 }
 
@@ -262,9 +265,9 @@ angular.module('nxCommon')
                         playerId = "player0";
                     }
                     
-                    scope.flashSource = "components/flashlsChromeless.swf";
+                    scope.flashSource = "web_common/components/flashlsChromeless.swf";
                     if(scope.debugMode && scope.debugFormat){
-                        scope.flashSource = "components/flashlsChromeless_debug.swf";
+                        scope.flashSource = "web_common/components/flashlsChromeless_debug.swf";
                     }
 
                     var flashlsAPI = new FlashlsAPI(null);
@@ -288,7 +291,7 @@ angular.module('nxCommon')
                                 scope.vgPlayerReady({$API: api});
                             }, function (error) {
                                 $timeout(function () {
-                                    scope.errorLoading = true;
+                                    scope.videoFlags.errorLoading = true;
                                     scope.loading = false;
                                     scope.flashls = false;// Kill flashls with his error
                                     scope.native = false;
@@ -310,29 +313,27 @@ angular.module('nxCommon')
                     scope.native = false;
                     scope.jsHls = true;
 
-                    var hlsAPI = new JsHlsAPI();
-                    hlsAPI.init( element.find(".videoplayer"), scope.jshlsHideError, scope.jshlsDebugMode, function (api) {
-                        scope.vgApi = api;
-                        if (scope.vgSrc) {
-                            $timeout(function(){
+                    $timeout(function(){
+                        var hlsAPI = new JsHlsAPI();
+                        hlsAPI.init( element.find(".videoplayer"), scope.jshlsHideError, scope.jshlsDebugMode, function (api) {
+                            scope.vgApi = api;
+                            if (scope.vgSrc) {
+                                $timeout(function(){
+                                scope.loading = !!format;
+                                });
+                                scope.vgApi.load(getFormatSrc('hls'));
+                                scope.vgApi.addEventListener("timeupdate", function (event) {
+                                    var video = event.srcElement || event.originalTarget;
                                 scope.loading = false;
-                            });
-                            scope.vgApi.load(getFormatSrc('hls'));
-                            scope.vgApi.addEventListener("timeupdate", function (event) {
-                                var video = event.srcElement || event.originalTarget;
-                                scope.vgUpdateTime({$currentTime: video.currentTime, $duration: video.duration});
-                                if (scope.loading) {
-                                    $timeout(function () {
-                                        scope.loading = false;
-                                    });
-                                }
-                            });
-                        }
-                        scope.vgPlayerReady({$API:api});
-                    },  function (api) {
-                            scope.errorLoading = true;
-                            scope.jsHls = false;
-                            console.log(api);
+                                    scope.vgUpdateTime({$currentTime: video.currentTime, $duration: video.duration});
+                                });
+                            }
+                            scope.vgPlayerReady({$API:api});
+                        },  function (api) {
+                            scope.videoFlags.errorLoading = true;
+                                scope.jsHls = false;
+                                console.log(api);
+                        });
                     });
                 }
 
@@ -342,7 +343,7 @@ angular.module('nxCommon')
                 var format = null;
                 function srcChanged(){
                     scope.loading = false;
-                    scope.errorLoading = false;
+                    scope.videoFlags.errorLoading = false;
                     if(scope.vgSrc ) {
                         format = detectBestFormat();
                         if(!recyclePlayer(format)){ // Remove or recycle old player.
@@ -389,7 +390,7 @@ angular.module('nxCommon')
                 
                 scope.initFlash = function(){
                     var playerId = !scope.playerId ? 'player0': scope.playerId;
-                
+                    // TODO: Nick, remove html from js code
                     var tmp = '<object classid="clsid:d27cdb6e-ae6d-11cf-96b8-444553540000"codebase="" id="flashvideoembed_'+playerId+'"';
                     tmp += 'width="100%" height="100%">';
                     tmp += '\n\t<param name="movie"  value="'+scope.flashSource+'?inline=1" />';
@@ -407,6 +408,8 @@ angular.module('nxCommon')
                     
                     playerId = !scope.playerId ? '' : '#'+playerId;
                     $('videowindow'+playerId)[0].children[0].children[0].innerHTML = tmp;
+                    // TODO: Nick, that is strange. Why do you do it like this?
+                    // TODO: Also, try ng-bind-html instead of setting innerHTML
                 };
 
                 scope.getRotation = function(){

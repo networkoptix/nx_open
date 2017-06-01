@@ -54,7 +54,11 @@ public:
         ldapUserWithFilledDigest.name = "ldap user 2";
         ldapUserWithFilledDigest.isEnabled = true;
         ldapUserWithFilledDigest.isLdap = true;
-        ldapUserWithFilledDigest.digest = "some digest";
+
+        auto hashes = PasswordData::calculateHashes(ldapUserWithFilledDigest.name, "some password", true);
+        ldapUserWithFilledDigest.hash = hashes.passwordHash;
+        ldapUserWithFilledDigest.digest = hashes.passwordDigest;
+
         ASSERT_EQ(ec2::ErrorCode::ok, userManager->saveSync(ldapUserWithFilledDigest));
     }
 
@@ -142,6 +146,8 @@ private:
         httpClient.setUserName(login);
         httpClient.setUserPassword(password);
         httpClient.setAuthType(authType);
+        httpClient.addAdditionalHeader(Qn::CUSTOM_CHANGE_REALM_HEADER_NAME, QByteArray());
+
         const auto startTime = std::chrono::steady_clock::now();
         constexpr const auto maxPeriodToWaitForMediaServerStart = std::chrono::seconds(150);
         while (std::chrono::steady_clock::now() - startTime < maxPeriodToWaitForMediaServerStart)

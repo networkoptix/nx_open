@@ -32,9 +32,26 @@ void ModuleConnector::setDisconnectHandler(DisconnectedHandler handler)
     m_disconnectedHandler = std::move(handler);
 }
 
+static void validateEndpoints(std::set<SocketAddress>* endpoints)
+{
+    for (auto it = endpoints->begin(); it != endpoints->end(); )
+    {
+        NX_ASSERT(it->isValid(), lm("Invalid endpoint: %1").arg(*it));
+
+        if (it->isValid())
+            ++it;
+        else
+            it = endpoints->erase(it);
+    }
+}
+
 void ModuleConnector::newEndpoints(std::set<SocketAddress> endpoints, const QnUuid& id)
 {
+    validateEndpoints(&endpoints);
     NX_ASSERT(endpoints.size());
+    if (endpoints.empty())
+        return;
+
     dispatch(
         [this, endpoints = std::move(endpoints), id]() mutable
         {
@@ -44,6 +61,7 @@ void ModuleConnector::newEndpoints(std::set<SocketAddress> endpoints, const QnUu
 
 void ModuleConnector::setForbiddenEndpoints(std::set<SocketAddress> endpoints, const QnUuid& id)
 {
+    validateEndpoints(&endpoints);
     dispatch(
         [this, endpoints = std::move(endpoints), id]() mutable
         {
@@ -124,7 +142,7 @@ void ModuleConnector::Module::addEndpoints(std::set<SocketAddress> endpoints)
     }
     else
     {
-        // For known server sort endpoints by acessibility type and connect by order.
+        // For known server sort endpoints by accessibility type and connect by order.
         bool hasNewEndpoints = false;
         for (auto& endpoint: endpoints)
         {
@@ -271,7 +289,7 @@ boost::optional<QnModuleInformation> ModuleConnector::Module::getInformation(
     if (!QJson::deserialize<QnModuleInformation>(restResult.reply, &moduleInformation)
         || moduleInformation.id.isNull())
     {
-        NX_DEBUG(this, lm("Can not desserialize rsponse from %1")
+        NX_DEBUG(this, lm("Can not deserialize rsponse from %1")
             .args(moduleInformation.id));
         return boost::none;
     }

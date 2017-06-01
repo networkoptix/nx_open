@@ -1,0 +1,35 @@
+function(set_output_directories)
+    cmake_parse_arguments(DIR "" "RUNTIME;LIBRARY" "" ${ARGN})
+
+    if(DIR_RUNTIME)
+        set(DIR_RUNTIME "/${DIR_RUNTIME}")
+    endif()
+    if(DIR_LIBRARY)
+        set(DIR_LIBRARY "/${DIR_LIBRARY}")
+    endif()
+
+    if(CMAKE_MULTI_CONFIGURATION_MODE)
+        set(configs ${CMAKE_CONFIGURATION_TYPES})
+    else()
+        set(configs " ")
+    endif()
+
+    foreach(config ${configs})
+        if(config STREQUAL " ")
+            set(CONFIG "")
+            set(base "${CMAKE_BINARY_DIR}")
+        else()
+            string(TOUPPER ${config} CONFIG)
+            set(CONFIG "_${CONFIG}")
+            set(base "${CMAKE_BINARY_DIR}/${config}")
+        endif()
+
+        file(MAKE_DIRECTORY "${base}${DIR_RUNTIME}")
+        file(MAKE_DIRECTORY "${base}${DIR_LIBRARY}")
+
+        set(CMAKE_RUNTIME_OUTPUT_DIRECTORY${CONFIG} "${base}${DIR_RUNTIME}" PARENT_SCOPE)
+        set(CMAKE_LIBRARY_OUTPUT_DIRECTORY${CONFIG} "${base}${DIR_LIBRARY}" PARENT_SCOPE)
+    endforeach()
+endfunction()
+
+set_output_directories(RUNTIME "bin" LIBRARY "lib")

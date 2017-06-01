@@ -34,6 +34,7 @@
 #include <recorder/storage_manager.h>
 #include <common/static_common_module.h>
 #include <utils/common/app_info.h>
+#include <nx/mediaserver/unused_wallpapers_watcher.h>
 
 namespace {
 
@@ -90,6 +91,7 @@ QnMediaServerModule::QnMediaServerModule(
 
     store(new QnNewSystemServerFlagWatcher(commonModule()));
     store(new QnMasterServerStatusWatcher(commonModule()));
+    m_unusedWallpapersWatcher = store(new nx::mediaserver::UnusedWallpapersWatcher(commonModule()));
 
     store(new QnBusinessMessageBus(commonModule()));
 #ifdef ENABLE_VMAX
@@ -153,4 +155,9 @@ MSSettings* QnMediaServerModule::settings() const
 QSettings* QnMediaServerModule::runTimeSettings() const
 {
     return m_settings->runTimeSettings();
+}
+
+nx::mediaserver::UnusedWallpapersWatcher* QnMediaServerModule::unusedWallpapersWatcher() const
+{
+    return m_unusedWallpapersWatcher;
 }

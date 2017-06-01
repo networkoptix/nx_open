@@ -229,7 +229,7 @@
                                 <descriptor>${project.build.directory}/assembly-update-client.xml</descriptor>
                             </descriptors>
                             <outputDirectory>${project.build.directory}/pack</outputDirectory>
-                            
+
                             <appendAssemblyId>false</appendAssemblyId>
                             <finalName>${artifact.name.client_update}</finalName>
                         </configuration>
@@ -244,7 +244,7 @@
                             <descriptors>
                                 <descriptor>${project.build.directory}/assembly-testcamera.xml</descriptor>
                             </descriptors>
-                            <outputDirectory>${project.build.directory}/pack</outputDirectory>                           
+                            <outputDirectory>${project.build.directory}/pack</outputDirectory>
                             <appendAssemblyId>false</appendAssemblyId>
                             <finalName>${artifact.name.testcamera}</finalName>
                         </configuration>
@@ -362,6 +362,24 @@
             </activation>
             <properties>
                 <nxtool>true</nxtool>
+            </properties>
+        </profile>
+        <profile>
+            <id>paxton-installer</id>
+            <activation>
+                <os>
+                    <family>Windows</family>
+                </os>
+                <property>
+                    <name>arch</name>
+                    <value>x86</value>
+                </property>
+                <file>
+                    <missing>../customization/${customization}/paxton.skip</missing>
+                </file>
+            </activation>
+            <properties>
+                <paxton>true</paxton>
             </properties>
         </profile>
     </profiles>

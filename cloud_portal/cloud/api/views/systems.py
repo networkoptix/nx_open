@@ -51,9 +51,9 @@ def md5(data):
     return m.hexdigest()
 
 
-def digest(login, password, realm, nonce):
+def digest(login, password, realm, nonce, method):
     dig = md5(login + ':' + realm + ':' + password)
-    method = md5('GET:')
+    method = md5(method + ':')
     auth_digest = md5(dig + ':' + nonce + ':' + method)
     auth = base64.b64encode(login + ':' + nonce + ':' + auth_digest)
     return auth
@@ -66,8 +66,10 @@ def get_auth(request, system_id):
     data = cloud_api.System.get_nonce(request.session['login'], request.session['password'], system_id)
     nonce = data["nonce"]
     realm = settings.CLOUD_CONNECT['password_realm']
-    auth = digest(request.session['login'], request.session['password'], realm, nonce)
-    return api_success({'auth': auth})
+    auth_get = digest(request.session['login'], request.session['password'], realm, nonce, 'GET')
+    auth_post = digest(request.session['login'], request.session['password'], realm, nonce, 'POST')
+    auth_play = digest(request.session['login'], request.session['password'], realm, nonce, 'PLAY')
+    return api_success({'authGet': auth_get, 'authPost': auth_post, 'authPlay': auth_play})
 
 
 @api_view(['POST'])

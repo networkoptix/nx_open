@@ -125,10 +125,10 @@ function TimelineConfig(){
         scrollBarMarksHeightOffset : 3,
         scrollBarMarksSpacing : 4,
 
-        timeMarkerColor: [205,215,220, 0.9], // Timemarker color
-        timeMarkerTextColor: [12,21,23],
-        pointerMarkerColor: [43,56,63, 0.9], // Mouse pointer marker color
-        pointerMarkerTextColor: [255,255,255],
+        timeMarkerColor: [43,56,63, 0.9], // Timemarker color
+        timeMarkerTextColor: [255,255,255],
+        pointerMarkerColor: [205,215,220, 0.9], // Mouse pointer marker color
+        pointerMarkerTextColor: [43,56,63],
         timeMarkerLineWidth: 1,
         timeMarkerPointerLineWidth: 2,
         markerDateFont:{
@@ -175,4 +175,4 @@ function TimelineConfig(){
 
     return $.extend(timelineConfig, rulerPreset);
 
-}
+};

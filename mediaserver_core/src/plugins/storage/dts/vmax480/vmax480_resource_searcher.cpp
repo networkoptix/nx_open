@@ -6,6 +6,7 @@
 #include <nx/network/simple_http_client.h>
 #include <nx/network/http/http_types.h>
 #include <nx/network/simple_http_client.h>
+#include <nx/utils/log/log.h>
 
 #include <QtXml/QXmlDefaultHandler>
 #include <QtCore/QUrlQuery>
@@ -226,9 +227,17 @@ QMap<int, QByteArray> QnPlVmax480ResourceSearcher::getCamNames(const QByteArray&
 
 bool QnPlVmax480ResourceSearcher::vmaxAuthenticate(CLSimpleHTTPClient& client, const QAuthenticator& auth)
 {
+    NX_VERBOSE(
+        "QnPlVmax480ResourceSearcher::vmaxAuthenticate",
+        lm("Authenticating itself on VMAX %1:%2").arg(client.host()).arg(client.port()));
+
     QString body(QLatin1String("login_txt_id=%1&login_txt_pw=%2"));
     body = body.arg(auth.user()).arg(auth.password());
     CLHttpStatus status = client.doPOST(QLatin1String("cgi-bin/design/html_template/Login.cgi"), body);
+
+    NX_VERBOSE(
+        "QnPlVmax480ResourceSearcher::vmaxAuthenticate",
+        lm("Authentication request completed with result %1").arg(toString(status)));
 
     if (status != CL_HTTP_SUCCESS)
         return false;

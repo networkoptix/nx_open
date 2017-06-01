@@ -162,24 +162,6 @@
             </properties>
         </profile>
         <profile>
-            <id>linux-arm-isd</id>
-            <activation>
-                <activeByDefault>false</activeByDefault>
-                <os>
-                    <family>unix</family>
-                    <name>linux</name>
-                </os>
-                <property>
-                    <name>box</name>
-                    <value>isd</value>
-                </property>
-            </activation>
-            <properties>
-                <qt.libs>core network xml sql</qt.libs>
-                <rdep.linux.arm.packages>openldap libcreateprocess</rdep.linux.arm.packages>
-            </properties>
-        </profile>
-        <profile>
             <id>linux-arm-rpi</id>
             <activation>
                 <activeByDefault>false</activeByDefault>
