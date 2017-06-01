@@ -140,7 +140,7 @@ private:
         {
             if (descriptor->isPersistent)
             {
-                if (context->selectingDataInProgress || !context->updateSequence(tran))
+                if (context->sendDataInProgress || !context->updateSequence(tran))
                     return;
             }
             else
@@ -242,7 +242,8 @@ private:
     void printPeersMessage();
     void printSubscribeMessage(
         const QnUuid& remoteId,
-        const QVector<ApiPersistentIdData>& subscribedTo) const;
+        const QVector<ApiPersistentIdData>& subscribedTo,
+        const QVector<qint32>& sequences) const;
 
     void addOwnfInfoToPeerList();
     void addOfflinePeersFromDb();

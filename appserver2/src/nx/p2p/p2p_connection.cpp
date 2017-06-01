@@ -342,7 +342,7 @@ void Connection::sendMessage(const nx::Buffer& data)
         {
             NX_DEBUG(
                 this,
-                lit("Send message:\t %1 ---> %2. Type: %3. Size=%4")
+                lit("Send message: %1 ---> %2. Type: %3. Size=%4")
                 .arg(localPeerName)
                 .arg(remotePeerName)
                 .arg(toString(messageType))

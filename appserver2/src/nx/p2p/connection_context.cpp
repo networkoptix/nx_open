@@ -24,7 +24,7 @@ bool ConnectionContext::isLocalPeerSubscribedTo(const ec2::ApiPersistentIdData& 
 
 bool ConnectionContext::updateSequence(const ec2::QnAbstractTransaction& tran)
 {
-    NX_ASSERT(!selectingDataInProgress);
+    NX_ASSERT(!sendDataInProgress);
     const ec2::ApiPersistentIdData peerId(tran.peerID, tran.persistentInfo.dbID);
     auto itr = remoteSubscription.values.find(peerId);
     if (itr == remoteSubscription.values.end())

@@ -94,12 +94,13 @@ void MessageBus::printTran(
 
     NX_DEBUG(
         this,
-        lit("%1 tran:\t %2 %3 %4. Command: %5. Created by %6")
+        lit("%1 tran:\t %2 %3 %4. Command: %5. Seq=%6. Created by %7")
         .arg(msgName)
         .arg(localPeerName)
         .arg(directionName)
         .arg(remotePeerName)
         .arg(toString(tran.command))
+        .arg(tran.persistentInfo.sequence)
         .arg(qnStaticCommon->moduleDisplayName(tran.peerID)));
 }
 
@@ -320,15 +321,17 @@ void MessageBus::printPeersMessage()
 
 void MessageBus::printSubscribeMessage(
     const QnUuid& remoteId,
-    const QVector<ApiPersistentIdData>& subscribedTo) const
+    const QVector<ApiPersistentIdData>& subscribedTo,
+    const QVector<qint32>& sequences) const
 {
     QList<QString> records;
-
+    int index = 0;
     for (const auto& peer: subscribedTo)
     {
-        records << lit("\t\t\t\t\t To:  %1(dbId=%2)")
+        records << lit("\t\t\t\t\t To:  %1(dbId=%2) from: %3")
             .arg(qnStaticCommon->moduleDisplayName(peer.id))
-            .arg(peer.persistentId.toString());
+            .arg(peer.persistentId.toString())
+            .arg(sequences[index++]);
     }
 
     NX_DEBUG(
@@ -423,11 +426,13 @@ void MessageBus::resubscribePeers(
             QVector<PeerNumberType> shortValues;
             for (const auto& id: newValue)
                 shortValues.push_back(connectionContext->encode(id));
-            if (nx::utils::log::isToBeLogged(cl_logDEBUG1, this))
-                printSubscribeMessage(connection->remotePeer().id, connectionContext->localSubscription);
 
             NX_ASSERT(newValue.contains(connection->remotePeer()));
             auto sequences = m_db->transactionLog()->getTransactionsState(newValue);
+
+            if (nx::utils::log::isToBeLogged(cl_logDEBUG1, this))
+                printSubscribeMessage(connection->remotePeer().id, newValue, sequences);
+
             QVector<SubscribeRecord> request;
             request.reserve(shortValues.size());
             for (int i = 0; i < shortValues.size(); ++i)
@@ -436,7 +441,7 @@ void MessageBus::resubscribePeers(
             serializedData.data()[0] = (quint8) (MessageType::subscribeForDataUpdates);
             connection->sendMessage(serializedData);
 
-            connectionContext->remoteSelectingDataInProgress = true;
+            connectionContext->recvDataInProgress = true;
         }
     }
 }
@@ -561,7 +566,7 @@ void MessageBus::doSubscribe(const QMap<ApiPersistentIdData, P2pConnectionPtr>& 
     for (const auto& connection: m_connections)
     {
         const auto& data = context(connection);
-        if (data->remoteSelectingDataInProgress)
+        if (data->recvDataInProgress)
             return;
     }
 
@@ -774,7 +779,7 @@ void MessageBus::at_allDataSent(QWeakPointer<Connection> weakRef)
     QnMutexLocker lock(&m_mutex);
     if (m_connections.value(connection->remotePeer().id) != connection)
         return;
-    if (context(connection)->selectingDataInProgress)
+    if (context(connection)->sendDataInProgress)
         selectAndSendTransactions(connection, context(connection)->remoteSubscription);
 }
 
@@ -820,7 +825,7 @@ void MessageBus::at_gotMessage(
         result = true;
         break;
     case MessageType::stop:
-        connectionContext->selectingDataInProgress = false;
+        connectionContext->sendDataInProgress = false;
         connectionContext->isRemoteStarted = false;
         connectionContext->remoteSubscription.values.clear();
         break;
@@ -1061,7 +1066,7 @@ bool MessageBus::handleSubscribeForDataUpdates(const P2pConnectionPtr& connectio
         }
     }
     NX_ASSERT(!context(connection)->isRemotePeerSubscribedTo(connection->remotePeer()));
-    if (context(connection)->selectingDataInProgress)
+    if (context(connection)->sendDataInProgress)
     {
         context(connection)->remoteSubscription = newSubscription;
     }
@@ -1097,7 +1102,7 @@ bool MessageBus::selectAndSendTransactions(
         serializedTransactions,
         kMaxSelectDataSize,
         &isFinished);
-    context(connection)->selectingDataInProgress = !isFinished;
+    context(connection)->sendDataInProgress = !isFinished;
     if (errorCode != ErrorCode::ok)
     {
         NX_WARNING(
@@ -1400,7 +1405,7 @@ bool MessageBus::handlePushTransactionList(const P2pConnectionPtr& connection, c
 {
     if (data.isEmpty())
     {
-        context(connection)->remoteSelectingDataInProgress = false;
+        context(connection)->recvDataInProgress = false;
         return true; //< eof pushTranList reached
     }
     bool success = false;
