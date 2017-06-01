@@ -68,7 +68,6 @@ angular.module('nxCommon')
             return urlBase;
         };
         ServerConnection.prototype._wrapRequest = function(method, url, data, config, repeat){
-            console.log("wrapRequest", url);
             var self = this;
             // TODO: handle common situations here - like offline or logout
             // Raise a global event in both cases. Let outer code handle this global request
@@ -158,7 +157,7 @@ angular.module('nxCommon')
         };
         ServerConnection.prototype.deleteUser = function(userId){
             return this._post('/ec2/removeUser', {id:userId});
-        };
+        }
         ServerConnection.prototype.cleanUserObject = function(user){ // Remove unnesesary fields from the object
             var cleanedUser = {};
             if(user.id){
