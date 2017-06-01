@@ -2,19 +2,12 @@
 
 #include <string>
 
+#include "account_with_password.h"
 #include "data/account_data.h"
 #include "data/system_data.h"
 
 namespace nx {
 namespace cdb {
-
-class AccountWithPassword:
-    public api::AccountData
-{
-public:
-    std::string password;
-};
-
 namespace test {
 
 class BusinessDataGenerator
