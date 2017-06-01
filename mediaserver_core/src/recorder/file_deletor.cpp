@@ -41,7 +41,7 @@ void QnFileDeletor::run()
             processPostponedFiles();
             m_postponeTimer.restart();
         }
-        
+
         static const int DELTA = 5; // in range [-5..+5] seconds
         int thresholdSecs = nx::utils::random::numberDelta<int>(SPACE_CLEARANCE_INTERVAL, DELTA);
         if (qnBackupStorageMan && qnNormalStorageMan && m_storagesTimer.elapsed() > thresholdSecs * 1000)
@@ -120,7 +120,7 @@ void QnFileDeletor::processPostponedFiles()
         m_newPostponedFiles.clear();
     }
 
-    while (!newPostponedFiles.isEmpty()) 
+    while (!newPostponedFiles.isEmpty())
     {
         PostponedFileData fileData = newPostponedFiles.dequeue();
         if (m_postponedFiles.find(fileData) != m_postponedFiles.cend())
@@ -137,8 +137,19 @@ void QnFileDeletor::processPostponedFiles()
         return;
 
     PostponedFileDataSet newList;
+    auto kMaxProcessPostponedDuration = std::chrono::seconds(5);
+    auto start = std::chrono::steady_clock::now();
+
     for (PostponedFileDataSet::iterator itr = m_postponedFiles.begin(); itr != m_postponedFiles.end(); ++itr)
     {
+        if (std::chrono::steady_clock::now() - start > kMaxProcessPostponedDuration)
+        {
+            NX_LOG(lit("[Cleanup] process postponed files duration exceeded. Breaking."), cl_logDEBUG2);
+            for (; itr != m_postponedFiles.end(); ++itr)
+                newList.insert(*itr);
+            break;
+        }
+
         if (itr->storageId.isNull()) // File from the old-style deleteCatalog. Try once and discard.
             internalDeleteFile(itr->fileName);
         else
@@ -159,7 +170,14 @@ void QnFileDeletor::processPostponedFiles()
                         .arg(itr->fileName), cl_logDEBUG2);
             }
 
-            if (needToPostpone || !internalDeleteFile(itr->fileName))
+            auto deleteResult = internalDeleteFile(itr->fileName);
+            if (!deleteResult)
+            {
+                NX_LOG(lit("[Cleanup] internal delete failed for file %1 while processing postponed files.")
+                    .arg(itr->fileName), cl_logDEBUG2);
+            }
+
+            if (needToPostpone || !deleteResult)
                 newList.insert(*itr);
         }
     }

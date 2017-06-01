@@ -199,9 +199,8 @@ public:
     {
         while (!needToStop())
         {
-            NX_LOG(lit("[Aux] writing camera info files starting..."), cl_logDEBUG2);
+            std::this_thread::sleep_for(std::chrono::milliseconds(1000));
             m_owner->m_camInfoWriter.write();
-            NX_LOG(lit("[Aux] writing camera info files DONE"), cl_logDEBUG2);
 
             if (m_owner->m_removeEmtyDirTimer.isValid() &&
                 m_owner->m_removeEmtyDirTimer.elapsed() <= EMPTY_DIRS_CLEANUP_INTERVAL)
@@ -217,7 +216,7 @@ public:
                     continue;
                 m_owner->removeEmptyDirs(storage);
             }
-            NX_LOG(lit("[Aux] removing empty dirs DONE", cl_logDEBUG2);
+            NX_LOG(lit("[Aux] removing empty dirs DONE"), cl_logDEBUG2);
         }
     }
 
@@ -2139,12 +2138,12 @@ void QnStorageManager::changeStorageStatus(const QnStorageResourcePtr &fileStora
 
 void QnStorageManager::testOfflineStorages()
 {
+    if (m_auxThread && !m_auxThread->isRunning())
+        m_auxThread->start();
+
     QnMutexLocker lock( &m_testStorageThreadMutex );
     if (m_testStorageThread && !m_testStorageThread->isRunning())
         m_testStorageThread->start();
-
-    if (m_auxThread && !m_auxThread->isRunning())
-        m_auxThread->start();
 }
 
 void QnStorageManager::stopAsyncTasks()
