@@ -124,8 +124,6 @@ endif()
 if(WINDOWS)
     # Prepare a file to be included into each Visual Studio project.
     nx_configure_file(${PROJECT_SOURCE_DIR}/msvc.user.props ${CMAKE_BINARY_DIR})
-    
-    add_definitions(-DWIN32_LEAN_AND_MEAN=1)
 endif()
 
 # Required for QN_DECLARE_METAOBJECT_HEADER
