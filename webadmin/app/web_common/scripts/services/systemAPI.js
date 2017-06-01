@@ -67,10 +67,23 @@ angular.module('nxCommon')
             }
             return urlBase;
         };
-        ServerConnection.prototype._wrapRequest = function(promise){
+        ServerConnection.prototype._wrapRequest = function(method, url, data, config, repeat){
+            console.log("wrapRequest", url);
+            var self = this;
             // TODO: handle common situations here - like offline or logout
             // Raise a global event in both cases. Let outer code handle this global request
-            return promise;
+            var promise = $http({
+                method: method,
+                url: url,
+                data: data,
+                config: config
+            });
+            return promise.catch(function(error){
+                if(error.status == 503 && !repeat){ // Repeat the request once again for 503 error
+                    return self._wrapRequest(method, url, data, config, true);
+                }
+                return $q.reject(error);
+            });
         };
         ServerConnection.prototype._setGetParams = function(url, data, auth){
             if(auth){
@@ -86,7 +99,7 @@ angular.module('nxCommon')
         ServerConnection.prototype._get = function(url, data){
             url = this._setGetParams(url, data, this.systemId && this.authGet());
             var canceller = $q.defer();
-            var obj = this._wrapRequest($http.get(url, { timeout: canceller.promise }));
+            var obj = this._wrapRequest('GET', url, null, { timeout: canceller.promise });
             obj.then(function(){
                 canceller = null;
             },function(){
@@ -101,7 +114,7 @@ angular.module('nxCommon')
         };
         ServerConnection.prototype._post = function(url, data){
             url = this._setGetParams(url, null, this.systemId && this.authPost());
-            return this._wrapRequest($http.post(url, data));
+            return this._wrapRequest('POST', url, data);
         };
         /* End of helpers */
 
