@@ -332,7 +332,7 @@ bool SocketAddress::isNull() const
     return address == HostAddress() && port == 0;
 }
 
-bool SocketAddress::isValid() const
+bool SocketAddress::isComplete() const
 {
     // Port must be specified for any endpoint to connect unless it is a domain name.
     return port != 0 || (!address.ipV4() && !address.ipV6());

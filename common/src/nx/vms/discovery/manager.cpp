@@ -108,7 +108,7 @@ boost::optional<ModuleEndpoint> Manager::getModule(const QnUuid& id) const
 
 void Manager::checkEndpoint(SocketAddress endpoint, QnUuid expectedId)
 {
-    NX_EXPECT(endpoint.isValid(), lm("Invalid endpoint: %1").arg(endpoint));
+    NX_EXPECT(endpoint.isComplete(), lm("Invalid endpoint: %1").arg(endpoint));
     m_moduleConnector->dispatch(
         [this, endpoint = std::move(endpoint), expectedId = std::move(expectedId)]() mutable
         {

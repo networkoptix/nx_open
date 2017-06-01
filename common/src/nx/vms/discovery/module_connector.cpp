@@ -36,9 +36,9 @@ static void validateEndpoints(std::set<SocketAddress>* endpoints)
 {
     for (auto it = endpoints->begin(); it != endpoints->end(); )
     {
-        NX_ASSERT(it->isValid(), lm("Invalid endpoint: %1").arg(*it));
+        NX_ASSERT(it->isComplete(), lm("Invalid endpoint: %1").arg(*it));
 
-        if (it->isValid())
+        if (it->isComplete())
             ++it;
         else
             it = endpoints->erase(it);
