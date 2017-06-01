@@ -12,6 +12,7 @@
 
 namespace {
     static const int kByteArrayAlignFactor = sizeof(unsigned);
+    static const int kGuidSize = 16;
 }
 
 namespace nx {
@@ -272,8 +273,8 @@ QByteArray serializeResolvePeerNumberResponse(
         for (const auto& peer: peers)
         {
             out << peer.peerNumber;
-            out.writeRawData(peer.id.toRfc4122().data(), 16);
-            out.writeRawData(peer.persistentId.toRfc4122().data(), 16);
+            out.writeRawData(peer.id.toRfc4122().data(), kGuidSize);
+            out.writeRawData(peer.persistentId.toRfc4122().data(), kGuidSize);
         }
     }
     return result;
@@ -292,15 +293,17 @@ const QVector<PeerNumberResponseRecord> deserializeResolvePeerNumberResponse(con
     buffer.open(QIODevice::ReadOnly);
     QDataStream in(&buffer);
     QByteArray tmpBuffer;
-    tmpBuffer.resize(16);
+    tmpBuffer.resize(kGuidSize);
     PeerNumberType shortPeerNumber;
     ApiPersistentIdData fullId;
     while (!in.atEnd())
     {
         in >> shortPeerNumber;
-        in.readRawData(tmpBuffer.data(), tmpBuffer.size());
+        if (in.readRawData(tmpBuffer.data(), tmpBuffer.size()) != kGuidSize)
+            return result;
         fullId.id = QnUuid::fromRfc4122(tmpBuffer);
-        in.readRawData(tmpBuffer.data(), tmpBuffer.size());
+        if (in.readRawData(tmpBuffer.data(), tmpBuffer.size()) != kGuidSize)
+            return result;
         fullId.persistentId = QnUuid::fromRfc4122(tmpBuffer);
 
         result.push_back(PeerNumberResponseRecord(shortPeerNumber, fullId));
@@ -312,7 +315,7 @@ const QVector<PeerNumberResponseRecord> deserializeResolvePeerNumberResponse(con
 QByteArray serializeUnicastHeader(const UnicastTransactionRecords& records)
 {
     QByteArray result;
-    result.reserve(UnicastTransactionRecord::recordSize * (int) records.size());
+    result.reserve(UnicastTransactionRecord::kRecordSize * (int) records.size());
     {
         QBuffer buffer(&result);
         buffer.open(QIODevice::WriteOnly);
@@ -321,26 +324,26 @@ QByteArray serializeUnicastHeader(const UnicastTransactionRecords& records)
         for (const auto& record: records)
         {
             out << record.ttl;
-            out.writeRawData(record.dstPeer.toRfc4122().data(), 16);
+            out.writeRawData(record.dstPeer.toRfc4122().data(), kGuidSize);
         }
     }
     return result;
 }
 
-UnicastTransactionRecords deserializeUnicastHeader(const QByteArray& _response, int* bytesRead)
+UnicastTransactionRecords deserializeUnicastHeader(const QByteArray& response, int* bytesRead)
 {
-    QByteArray response(_response);
+    QByteArray responseCopy(response);
     UnicastTransactionRecords result;
 
-    *bytesRead = 0;
-    if (response.size() < 4)
+    *bytesRead = -1;
+    if (responseCopy.size() < 4)
         return result; //< error
 
-    QBuffer buffer(&response);
+    QBuffer buffer(&responseCopy);
     buffer.open(QIODevice::ReadOnly);
     QDataStream in(&buffer);
     QByteArray tmpBuffer;
-    tmpBuffer.resize(16);
+    tmpBuffer.resize(kGuidSize);
     ApiPersistentIdData fullId;
     quint32 size;
     in >> size;
@@ -348,7 +351,8 @@ UnicastTransactionRecords deserializeUnicastHeader(const QByteArray& _response, 
     {
         UnicastTransactionRecord record;
         in >> record.ttl;
-        in.readRawData(tmpBuffer.data(), tmpBuffer.size());
+        if (in.readRawData(tmpBuffer.data(), tmpBuffer.size()) != kGuidSize)
+            return result; //< Error
         record.dstPeer = QnUuid::fromRfc4122(tmpBuffer);
         result.push_back(std::move(record));
         --size;

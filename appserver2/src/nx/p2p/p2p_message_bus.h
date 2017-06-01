@@ -164,7 +164,8 @@ private:
                 m_ubjsonTranSerializer->serializedTransactionWithoutHeader(tran));
             break;
         default:
-            qWarning() << "Client has requested data in an unsupported format" << connection->remotePeer().dataFormat;
+            qWarning() << "Client has requested data in an unsupported format"
+                << connection->remotePeer().dataFormat;
             break;
         }
     }
@@ -213,7 +214,8 @@ private:
                     m_ubjsonTranSerializer->serializedTransactionWithoutHeader(tran)));
                 break;
             default:
-                qWarning() << "Client has requested data in an unsupported format" << connection->remotePeer().dataFormat;
+                qWarning() << "Client has requested data in an unsupported format"
+                    << connection->remotePeer().dataFormat;
                 break;
             }
         }

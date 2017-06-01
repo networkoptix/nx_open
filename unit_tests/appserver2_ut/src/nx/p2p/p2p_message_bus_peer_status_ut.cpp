@@ -77,21 +77,21 @@ protected:
             bus,
             &ec2::QnTransactionMessageBusBase::peerFound,
             [this](QnUuid peer, Qn::PeerType)
-        {
-            auto result = m_alivePeers.insert(peer);
-            ASSERT_TRUE(result.second);
-        }
+            {
+                auto result = m_alivePeers.insert(peer);
+                ASSERT_TRUE(result.second);
+            }
         );
         QObject::connect(
             bus,
             &ec2::QnTransactionMessageBusBase::peerLost,
             [this](QnUuid peer, Qn::PeerType)
-        {
-            auto oldSize = m_alivePeers.size();
-            m_alivePeers.erase(peer);
-            auto newSize = m_alivePeers.size();
-            ASSERT_TRUE(oldSize > newSize);
-        }
+            {
+                auto oldSize = m_alivePeers.size();
+                m_alivePeers.erase(peer);
+                auto newSize = m_alivePeers.size();
+                ASSERT_TRUE(oldSize > newSize);
+            }
         );
 
         serverConnectFunc(m_servers);

@@ -164,6 +164,9 @@ TEST(P2pSerialization, UnicastTransaction)
     ASSERT_TRUE(size > 0);
     QByteArray actualData = serializeUnicastHeader(deserializedRecords);
     ASSERT_EQ(expectedData.toHex(), actualData.toHex());
+
+    deserializeUnicastHeader(QByteArray("1"), &size);
+    ASSERT_EQ(-1, size); //< Deserialization error.
 }
 
 } // namespace test

@@ -966,7 +966,7 @@ struct SendTransactionToTransportFuction
     template<class T>
     void operator()(
         MessageBus* bus,
-        const QnTransaction<T> &transaction,
+        const QnTransaction<T>& transaction,
         const P2pConnectionPtr& connection) const
     {
         ApiPersistentIdData tranId(transaction.peerID, transaction.persistentInfo.dbID);
@@ -984,7 +984,8 @@ struct SendTransactionToTransportFuction
                     bus->ubjsonTranSerializer()->serializedTransactionWithoutHeader(transaction));
                 break;
             default:
-                qWarning() << "Client has requested data in an unsupported format" << connection->remotePeer().dataFormat;
+                qWarning() << "Client has requested data in an unsupported format"
+                    << connection->remotePeer().dataFormat;
                 break;
         }
     }
@@ -1251,7 +1252,7 @@ void MessageBus::gotTransaction(
 
 template <class T>
 void MessageBus::gotTransaction(
-    const QnTransaction<T> &tran,
+    const QnTransaction<T>& tran,
     const P2pConnectionPtr& connection)
 {
     if (nx::utils::log::isToBeLogged(cl_logDEBUG1, QnLog::P2P_TRAN_LOG))
@@ -1312,7 +1313,7 @@ void MessageBus::gotTransaction(
 
 template <class T>
 void MessageBus::gotUnicastTransaction(
-    const QnTransaction<T> &tran,
+    const QnTransaction<T>& tran,
     const P2pConnectionPtr& connection,
     const UnicastTransactionRecords& records)
 {
@@ -1336,7 +1337,7 @@ void MessageBus::gotUnicastTransaction(
         unprocessedRecords.push_back(UnicastTransactionRecord(record.dstPeer, record.ttl - 1));
     }
 
-    // split dstPeers by connection
+    // Split dstPeers by connection.
     QMap<P2pConnectionPtr, UnicastTransactionRecords> dstByConnection;
     for (const auto& record: unprocessedRecords)
     {
@@ -1372,7 +1373,7 @@ struct GotTransactionFuction
     template<class T>
     void operator()(
         MessageBus *bus,
-        const QnTransaction<T> &transaction,
+        const QnTransaction<T>& transaction,
         const P2pConnectionPtr& connection) const
     {
         bus->gotTransaction(transaction, connection);
@@ -1386,7 +1387,7 @@ struct GotUnicastTransactionFuction
     template<class T>
     void operator()(
         MessageBus *bus,
-        const QnTransaction<T> &transaction,
+        const QnTransaction<T>& transaction,
         const P2pConnectionPtr& connection,
         const UnicastTransactionRecords& records) const
     {

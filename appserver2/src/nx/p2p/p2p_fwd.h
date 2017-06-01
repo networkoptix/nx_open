@@ -93,7 +93,7 @@ struct UnicastTransactionRecord
         ttl(ttl)
     {
     }
-    static const int recordSize = 16 + 1;
+    static const int kRecordSize = 16 + 1;
     QnUuid dstPeer;
     quint8 ttl = 0;
 };
