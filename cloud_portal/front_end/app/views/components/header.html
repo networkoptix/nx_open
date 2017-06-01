@@ -24,8 +24,8 @@
                         class="btn-wrapper" ng-if="!active.register"><a href="/register" class="btn btn-primary" >Create Account</a></span></li>
             </ul>
             <ul class="nav navbar-nav navbar-right auth-visible hidden-collapsed">
-                <li uib-dropdown ng-if="singleSystem">
-                    <a ng-href="/systems/{{activeSystem.id}}"><span class="glyphicon glyphicon-home"></span>  {{activeSystem.name}}</a>
+                <li uib-dropdown ng-if="singleSystem" class="no-hover">
+                    <a href=""><span class="glyphicon glyphicon-home"></span>  {{activeSystem.name}}</a>
                 </li>
                 <li class="vertical-bar" ng-if="systemCounter && !singleSystem"></li>
                 <li uib-dropdown ng-if="systemCounter && !singleSystem">
