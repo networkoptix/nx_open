@@ -3,6 +3,11 @@
 . ../environment
 . ../common.sh
 
+if [ "${NXCLOUD_VERSION}" = latest ]
+then
+    NXCLOUD_VERSION=$(pip search --trusted-host=la.hdw.mx --index=http://la.hdw.mx:8006 nxcloud | awk 'BEGIN {n=1} { if (n == 1) print $NF; n++ }')
+fi
+
 MODULE=nxcloud_host_agent
 BUILD_ARGS=(--build-arg NXCLOUD_VERSION=${NXCLOUD_VERSION} --build-arg VERSION=${VERSION} --build-arg MODULES="${MODULES[@]}")
 

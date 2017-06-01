@@ -12,8 +12,8 @@
             <ul class="nav navbar-nav auth-visible" >
                 <li class="vertical-bar"></li>
 
-                <li ng-if="activeSystem" ng-class="{active:active.view }"><a ng-href="/systems/{{activeSystem.id}}/view">View</a></li>
                 <li ng-if="activeSystem" ng-class="{active:active.settings}"><a ng-href="/systems/{{activeSystem.id}}">Settings</a></li>
+                <li ng-if="activeSystem" ng-class="{active:active.view }"><a ng-href="/systems/{{activeSystem.id}}/view">View</a></li>
 
                 <li role="separator" class="nav-divider"></li>
             </ul>
@@ -24,8 +24,8 @@
                         class="btn-wrapper" ng-if="!active.register"><a href="/register" class="btn btn-primary" >Create Account</a></span></li>
             </ul>
             <ul class="nav navbar-nav navbar-right auth-visible hidden-collapsed">
-                <li uib-dropdown ng-if="singleSystem">
-                    <a ng-href="/systems/{{activeSystem.id}}"><span class="glyphicon glyphicon-home"></span>  {{activeSystem.name}}</a>
+                <li uib-dropdown ng-if="singleSystem" class="no-hover">
+                    <a href=""><span class="glyphicon glyphicon-home"></span>  {{activeSystem.name}}</a>
                 </li>
                 <li class="vertical-bar" ng-if="systemCounter && !singleSystem"></li>
                 <li uib-dropdown ng-if="systemCounter && !singleSystem">
@@ -33,7 +33,7 @@
                     <ul uib-dropdown-menu>
                         <li ng-repeat="system in systems | limitTo: $root.C.maxSystemsForHeader"><a ng-href="/systems/{{system.id}}/{{active.view?'view':''}}">{{system.name}} - {{system.ownerFullName}}</a></li>
                         <li role="separator" class="nav-divider"></li>
-                        <li ng-repeat="system in systems"><a ng-href="/systems">{{L.header.allSystems}}</a></li>
+                        <li><a ng-href="/systems">{{$root.L.header.allSystems}}</a></li>
                     </ul>
                 </li>
                 <li class="vertical-bar"></li>
