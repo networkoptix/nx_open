@@ -881,4 +881,4 @@ function TimelineCanvasRender(canvas, timelineConfig, recordsProvider, scaleMana
 
         return result;
     };
-}
+};

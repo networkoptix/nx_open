@@ -175,4 +175,4 @@ function TimelineConfig(){
 
     return $.extend(timelineConfig, rulerPreset);
 
-}
+};
