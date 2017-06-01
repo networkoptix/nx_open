@@ -1,14 +1,23 @@
 'use strict';
 
 angular.module('cloudApp')
-    .controller('ViewPageCtrl', ['$scope', 'account', 'system', '$routeParams',
-    function ($scope, account, system, $routeParams) {
+    .controller('ViewPageCtrl', ['$scope', 'account', 'system', '$routeParams', 'systemAPI', 'dialogs',
+    '$location', '$q',
+    function ($scope, account, system, $routeParams, systemAPI, dialogs, $location, $q) {
+        var currentSystem;
         account.requireLogin().then(function(account){
-            var currentSystem = system($routeParams.systemId, account.email);
+            currentSystem = system($routeParams.systemId, account.email);
             currentSystem.updateSystemAuth().then(function(){
                 $scope.systemReady = true;
-            }); // Make system login
+                $scope.system = currentSystem.mediaserver;
+            },function(error){
+                // cannot read the system
+                dialogs.notify(L.errorCodes.lostConnection.replace("{{systemName}}", currentSystem.name || L.errorCodes.thisSystem), 'warning');
+                $location.path("/systems");
+            });
         });
+
+
 
         $("body").addClass("webclient-page");
         $scope.$on('$destroy', function( event ) {

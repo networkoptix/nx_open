@@ -19,7 +19,19 @@ angular.module('cloudApp')
             this.accessRole = '';
             
             this.currentUserEmail = currentUserEmail;
-            this.mediaserver = systemAPI(systemId);
+            var self = this;
+            this.mediaserver = systemAPI(systemId, null, function(){
+                // Unauthorised request
+                // Some options here:
+                // * Access was revoked
+                // * System was disconnected from cloud
+                // * Password was changed
+                // * Nonce expired
+
+                // We try to update nonce and auth on the server again
+                // Other cases are not distinguishable
+                return self.updateSystemAuth(true);
+            });
             this.updateSystemState();
         }
         system.prototype.updateSystemAuth = function(force){
@@ -346,29 +358,6 @@ angular.module('cloudApp')
                     }
                 }
                 return self;
-            },function(error){
-                if(secondAttempt){
-                    // Something strange is happening here - pass it to controller
-                    return $q.reject(error);
-                }
-                if(error.status === 403 || error.status === 401) {
-                    // Some options here:
-                    // * Access was revoked
-                    // * System was disconnected from cloud
-                    // * Password was changed
-                    // * Nonce expired
-
-                    // We double-check nonce by trying to auth on the server again
-                    // Other cases are not distinguishable - so we just pass the error further
-
-                    return self.updateSystemAuth(true).then(function(){
-                        // Ok, just continue our data request
-                         return self.update(true);
-                    },function(){
-                        // We failed - let controller handle this situation
-                        return $q.reject(error);
-                    });
-                }
             });
         }
 
