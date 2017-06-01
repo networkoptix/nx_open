@@ -7,6 +7,14 @@
 
 namespace nx {
 namespace cdb {
+
+class AccountWithPassword:
+    public api::AccountData
+{
+public:
+    std::string password;
+};
+
 namespace test {
 
 class BusinessDataGenerator
@@ -14,7 +22,7 @@ class BusinessDataGenerator
 public:
     static std::string generateRandomEmailAddress();
 
-    static api::AccountData generateRandomAccount();
+    static AccountWithPassword generateRandomAccount();
 
     static data::SystemData generateRandomSystem(const api::AccountData& account);
 

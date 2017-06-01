@@ -189,7 +189,7 @@ int CloudDbService::serviceMain(const utils::AbstractServiceSettings& abstractSe
     AuthenticationProvider authProvider(
         settings,
         accountManager,
-        systemManager,
+        &systemManager,
         tempPasswordManager);
     m_authProvider = &authProvider;
 
