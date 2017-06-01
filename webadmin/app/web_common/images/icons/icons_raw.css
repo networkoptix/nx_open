@@ -1,0 +1,245 @@
+body { 
+background-color: #1C2327; 
+}
+
+div {
+border:1px solid #263137;
+margin: 10px;
+float: left;
+}
+
+span {
+width:100%;
+float: left;
+display:block;
+}
+
+.s194{
+width: 194px;
+height: 194px;
+}
+
+.s188{
+width: 186px;
+height: 186px;
+}
+.s100 {
+width:100px;
+height:100PX;
+}
+
+.s50 {
+width: 50px;
+height: 50px;
+}
+
+.s40 {
+width: 40px;
+height: 40px;
+}
+
+.s30 {
+width: 30px;
+height: 30px;
+}
+
+.s20 {
+width: 20px;
+height: 20px;
+}
+
+.s10 {
+width: 10px;
+height: 10px;
+}
+
+.play {
+background: url(icons_sprite@2x.png) -3px -5px;
+}
+
+.pause {
+background: url(icons_sprite@2x.png) -52px -5px;
+}
+
+.forward{
+background: url(icons_sprite@2x.png) -100px -5px;	
+}
+
+.backward{
+background: url(icons_sprite@2x.png) -148px -5px;	
+}
+
+.minus {
+background: url(icons_sprite@2x.png) -4px -53px;
+}
+
+.plus {
+background: url(icons_sprite@2x.png) -52px -53px;
+}
+
+.search{
+background: url(icons_sprite@2x.png) -100px -53px;	
+}
+
+.info-sign {
+background: url(icons_sprite@2x.png) -148px -53px;
+}
+
+.info-sign.active{
+background: url(icons_sprite@2x.png) -196px -53px;	
+}
+
+.calendar{
+background: url(icons_sprite@2x.png) -244px -53px;
+}
+
+.volume{
+background: url(icons_sprite@2x.png) -292px -53px;
+}
+
+.menu-up{
+background: url(icons_sprite@2x.png) -98px -98px;
+}
+
+.menu-down{
+background: url(icons_sprite@2x.png) -122px -98px;
+}
+
+.close{
+background: url(icons_sprite@2x.png) -146px -98px;
+}
+
+.small-camera-recorded{
+background: url(icons_sprite@2x.png) -170px -98px;
+}
+
+.small-camera-recorded-offline{
+background: url(icons_sprite@2x.png) -194px -98px;
+}
+
+.small-camera-not-recorded{
+background: url(icons_sprite@2x.png) -218px -98px;
+}
+
+.small-camera-offline{
+background: url(icons_sprite@2x.png) -242px -98px;
+}
+
+.menu-left{
+background: url(icons_sprite@2x.png) -98px -122px;
+}
+
+.menu-right{
+background: url(icons_sprite@2x.png) -122px -122px;
+}
+
+.close.active{
+background: url(icons_sprite@2x.png) -146px -122px;
+}
+
+.camera-recorded{
+background: url(icons_sprite@2x.png) -8px -153px;	
+}
+
+.camera-recorded-offline{
+background: url(icons_sprite@2x.png) -57px -153px;
+}
+
+.camera-not-recorded{
+background: url(icons_sprite@2x.png) -105px -153px;	
+}
+
+.fullscreen {
+background: url(icons_sprite@2x.png) -4px -196px;
+}
+
+.exit-fullscreen {
+background: url(icons_sprite@2x.png) -52px -196px;
+}
+
+.settings{
+background: url(icons_sprite@2x.png) -100px -196px;	
+}
+
+.settings.blue{
+background: url(icons_sprite@2x.png) -148px -196px;	
+}
+
+.cams-search{
+background: url(icons_sprite@2x.png) -196px -196px;	
+}
+
+.cams-search.blue{
+background: url(icons_sprite@2x.png) -244px -196px;	
+}
+
+.fullscreen.hover {
+background: url(icons_sprite@2x.png) -4px -244px;
+}
+
+.exit-fullscreen.hover {
+background: url(icons_sprite@2x.png) -52px -244px;
+}
+
+.settings.hover{
+background: url(icons_sprite@2x.png) -100px -244px;	
+}
+
+.settings.blue.hover{
+background: url(icons_sprite@2x.png) -148px -244px;	
+}
+
+.cams-search.hover{
+background: url(icons_sprite@2x.png) -196px -244px;	
+}
+
+.cams-search.blue.hover{
+background: url(icons_sprite@2x.png) -244px -244px;	
+}
+
+.fullscreen.active {
+background: url(icons_sprite@2x.png) -4px -292px;
+}
+
+.exit-fullscreen.active {
+background: url(icons_sprite@2x.png) -52px -292px;
+}
+
+.settings{
+background: url(icons_sprite@2x.png) -100px -292px;	
+}
+
+.settings.blue{
+background: url(icons_sprite@2x.png) -148px -292px;	
+}
+
+.cams-search{
+background: url(icons_sprite@2x.png) -196px -292px;	
+}
+
+.cams-search.blue{
+background: url(icons_sprite@2x.png) -244px -292px;	
+}
+
+.server{
+background: url(icons_sprite@2x.png) -3px -340px;		
+}
+
+.camera-unauthorized{
+background: url(icons_sprite@2x.png) 1px -382px;		
+}
+
+.camera-error{
+background: url(icons_sprite@2x.png) -47px -382px;		
+}
+
+.video-unauthorized{
+background: url(icons_sprite@2x.png) -2px -432px;
+}
+.video-offline{
+background: url(icons_sprite@2x.png) -194px -432px;
+}
+
+.video-error{
+background: url(icons_sprite@2x.png) 1px -624px;
+}
