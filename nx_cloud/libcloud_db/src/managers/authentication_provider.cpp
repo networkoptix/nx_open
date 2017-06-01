@@ -227,8 +227,8 @@ api::AuthInfo AuthenticationProvider::generateAuthRecord(
 {
     api::AuthInfo authInfo;
     authInfo.nonce = nonce;
-    authInfo.intermediateResponse = 
-        nx_http::calcIntermediateResponse(account.passwordHa1.c_str(), nonce.c_str());
+    authInfo.intermediateResponse = nx_http::calcIntermediateResponse(
+        account.passwordHa1.c_str(), nonce.c_str()).toStdString();
     //authInfo.expirationTime = ;
     return authInfo;
 }

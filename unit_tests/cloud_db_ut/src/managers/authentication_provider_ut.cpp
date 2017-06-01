@@ -60,7 +60,7 @@ protected:
     {
         auto authRecords = m_userAuthenticationDao->fetchUserAuthRecords(
             nullptr, m_system.id, m_account.email);
-        ASSERT_EQ(1, authRecords.size());
+        ASSERT_EQ(1U, authRecords.size());
         assertUserAuthenticationRecordIsValid(authRecords[0]);
     }
 
@@ -97,7 +97,7 @@ private:
     {
         auto dao = std::make_unique<dao::memory::UserAuthentication>();
         m_userAuthenticationDao = dao.get();
-        return dao;
+        return std::move(dao);
     }
 
     void prepareTestData()
