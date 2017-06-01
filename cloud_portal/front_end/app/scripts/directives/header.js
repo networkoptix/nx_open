@@ -27,7 +27,7 @@ angular.module('cloudApp')
                     }
                     return true;
                 };
-                scope.active = {}
+                scope.active = {};
                 function updateActive(){
                     scope.active.register = isActive('/register');
                     scope.active.view = isActive('/view');

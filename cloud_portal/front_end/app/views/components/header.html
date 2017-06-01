@@ -33,7 +33,7 @@
                     <ul uib-dropdown-menu>
                         <li ng-repeat="system in systems | limitTo: $root.C.maxSystemsForHeader"><a ng-href="/systems/{{system.id}}/{{active.view?'view':''}}">{{system.name}} - {{system.ownerFullName}}</a></li>
                         <li role="separator" class="nav-divider"></li>
-                        <li><a ng-href="/systems">{{L.header.allSystems}}</a></li>
+                        <li><a ng-href="/systems">{{$root.L.header.allSystems}}</a></li>
                     </ul>
                 </li>
                 <li class="vertical-bar"></li>
