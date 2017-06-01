@@ -44,6 +44,7 @@ class QnAbstractMediaStreamDataProvider;
 class TestStorageThread;
 class RebuildAsyncTask;
 class ScanMediaFilesTask;
+class AuxiliaryTask;
 class QnUuid;
 class QnScheduleSync;
 
@@ -262,8 +263,11 @@ private:
 
     friend class RebuildAsyncTask;
     friend class ScanMediaFilesTask;
+    friend class AuxiliaryTask;
 
     ScanMediaFilesTask* m_rebuildArchiveThread;
+    AuxiliaryTask* m_auxThread;
+
 
     bool m_initInProgress;
     QMap<QString, QSet<int>> m_oldStorageIndexes;

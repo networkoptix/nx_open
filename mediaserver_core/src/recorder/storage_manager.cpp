@@ -186,6 +186,45 @@ private:
 };
 
 
+class AuxiliaryTask: public QnLongRunnable
+{
+public:
+    AuxiliaryTask(QnStorageManager* owner): m_owner(owner) {}
+    virtual ~AuxiliaryTask() override
+    {
+        stop();
+    }
+
+    virtual void run() override
+    {
+        while (!needToStop())
+        {
+            NX_LOG(lit("[Aux] writing camera info files starting..."), cl_logDEBUG2);
+            m_owner->m_camInfoWriter.write();
+            NX_LOG(lit("[Aux] writing camera info files DONE"), cl_logDEBUG2);
+
+            if (m_owner->m_removeEmtyDirTimer.isValid() &&
+                m_owner->m_removeEmtyDirTimer.elapsed() <= EMPTY_DIRS_CLEANUP_INTERVAL)
+            {
+                continue;
+            }
+
+            NX_LOG(lit("[Aux] removing empty dirs starting..."), cl_logDEBUG2);
+            m_owner->m_removeEmtyDirTimer.restart();
+            for (const auto& storage: m_owner->getUsedWritableStorages())
+            {
+                if (storage->hasFlags(Qn::storage_fastscan))
+                    continue;
+                m_owner->removeEmptyDirs(storage);
+            }
+            NX_LOG(lit("[Aux] removing empty dirs DONE", cl_logDEBUG2);
+        }
+    }
+
+private:
+    QnStorageManager* m_owner;
+};
+
 class ScanMediaFilesTask: public QnLongRunnable
 {
 private:
@@ -457,6 +496,7 @@ QnStorageManager::QnStorageManager(QnServer::StoragePool role):
     m_isWritableStorageAvail(false),
     m_rebuildCancelled(false),
     m_rebuildArchiveThread(0),
+    m_auxThread(nullptr),
     m_firstStoragesTestDone(false),
     m_isRenameDisabled(MSSettings::roSettings()->value("disableRename").toInt()),
     m_camInfoWriterHandler(this),
@@ -510,6 +550,9 @@ QnStorageManager::QnStorageManager(QnServer::StoragePool role):
 
     m_rebuildArchiveThread = new ScanMediaFilesTask(this);
     m_rebuildArchiveThread->start();
+
+    m_auxThread = new AuxiliaryTask(this);
+
     m_clearMotionTimer.restart();
     m_clearBookmarksTimer.restart();
     m_removeEmtyDirTimer.invalidate();
@@ -1436,6 +1479,9 @@ void QnStorageManager::removeEmptyDirs(const QnStorageResourcePtr &storage)
         {
             for (const auto& entry: fl)
             {
+                if (QnResource::isStopping())
+                    return false;
+
                 if (entry.isDir())
                 {
                     if (depthLimit == 0)
@@ -1517,8 +1563,6 @@ void QnStorageManager::clearSpace(bool forced)
 
     if (m_firstStoragesTestDone)
         testOfflineStorages();
-
-    m_camInfoWriter.write();
 
     // 1. delete old data if cameras have max duration limit
     clearMaxDaysData();
@@ -1608,14 +1652,6 @@ void QnStorageManager::clearSpace(bool forced)
                             << (toDeleteTotal / (1024 * 1024 * elapsedSecs)) << " Mb/s"
                             << endl;
         NX_LOG(clearSpaceLogMessage, cl_logDEBUG2);
-    }
-
-    // 3. Remove empty dirs
-    if (!m_removeEmtyDirTimer.isValid() || m_removeEmtyDirTimer.elapsed() > EMPTY_DIRS_CLEANUP_INTERVAL)
-    {
-        m_removeEmtyDirTimer.restart();
-        for (const QnStorageResourcePtr &storage : storages)
-            removeEmptyDirs(storage);
     }
 
     // 4. DB cleanup
@@ -2106,6 +2142,9 @@ void QnStorageManager::testOfflineStorages()
     QnMutexLocker lock( &m_testStorageThreadMutex );
     if (m_testStorageThread && !m_testStorageThread->isRunning())
         m_testStorageThread->start();
+
+    if (m_auxThread && !m_auxThread->isRunning())
+        m_auxThread->start();
 }
 
 void QnStorageManager::stopAsyncTasks()
@@ -2124,6 +2163,12 @@ void QnStorageManager::stopAsyncTasks()
         m_rebuildArchiveThread->stop();
         delete m_rebuildArchiveThread;
         m_rebuildArchiveThread = 0;
+    }
+
+    if (m_auxThread) {
+        m_auxThread->stop();
+        delete m_auxThread;
+        m_auxThread = 0;
     }
 }
 
