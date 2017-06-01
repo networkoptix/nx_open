@@ -14,14 +14,8 @@ angular.module('nxCommon')
             this.storage = $localStorage;
             this.poll = null;
 
-            this.searchCams = null;
             this.bothRequest = null;
         }
-
-        //setters
-        camerasProvider.prototype.setSearchCams = function(searchCams){
-            this.searchCams = searchCams;
-        };
 
         //getters
         camerasProvider.prototype.getCamera = function(id){
@@ -263,7 +257,6 @@ angular.module('nxCommon')
             this.treeRequest.then(function(data){
                 setServers(data.data.reply['ec2/getMediaServersEx']);
                 self.getCameras(data.data.reply['ec2/getCamerasEx']);
-                self.searchCams();
                 deferred.resolve(self.cameras);
             }, function(error){
                 deferred.reject(error);

@@ -23,8 +23,6 @@ angular.module('nxCommon')
                     scope.mediaServers = scope.camerasProvider.getMediaServers();
                 };
 
-                scope.camerasProvider.setSearchCams(searchCams);
-
                 scope.$watch('camerasProvider.cameras',updateCameras);
                 scope.$watch('camerasProvider.mediaServers',updateMediaServers);
                 
