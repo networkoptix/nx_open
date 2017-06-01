@@ -922,7 +922,10 @@ bool MessageBus::handlePeersMessage(const P2pConnectionPtr& connection, const QB
         {
             int distance = peer.distance;
             if (distance < kMaxOnlineDistance)
+            {
                 ++distance;
+                NX_ASSERT(distance != kMaxOnlineDistance);
+            }
             m_peers->addRecord(
                 connection->remotePeer(),
                 shortPeers.decode(peer.peerNumber),

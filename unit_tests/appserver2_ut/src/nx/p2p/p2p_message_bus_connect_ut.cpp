@@ -249,7 +249,7 @@ TEST_F(P2pMessageBusTest, FullConnect)
 TEST_F(P2pMessageBusTest, RestartServer)
 {
     testMain(fullConnect);
-    testMain(fullConnect, 0);
+    testMain(fullConnect, /*keekDbAtServerIndex*/ 0);
 }
 
 } // namespace test
