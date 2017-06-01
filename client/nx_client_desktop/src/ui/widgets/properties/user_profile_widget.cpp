@@ -28,7 +28,6 @@
 
 #include <utils/common/url.h>
 
-#include <nx/vms/discovery/manager.h>
 #include <api/global_settings.h>
 
 QnUserProfileWidget::QnUserProfileWidget(QnUserSettingsModel* model, QWidget* parent /*= 0*/):
