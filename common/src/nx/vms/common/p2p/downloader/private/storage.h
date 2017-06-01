@@ -41,7 +41,7 @@ public:
 
     FileInformation fileInformation(const QString& fileName) const;
 
-    ResultCode addFile(const FileInformation& fileInfo);
+    ResultCode addFile(const FileInformation& fileInformation);
     ResultCode updateFileInformation(const QString& fileName, qint64 size, const QByteArray& md5);
     ResultCode setChunkSize(const QString& fileName, qint64 chunkSize);
 
@@ -63,6 +63,9 @@ public:
     static QVector<QByteArray> calculateChecksums(const QString& filePath, qint64 chunkSize);
 
 private:
+    ResultCode addDownloadedFile(const FileInformation& fileInformation);
+    ResultCode addNewFile(const FileInformation& fileInformation);
+
     bool saveMetadata(const FileMetadata& fileInformation);
     FileMetadata loadMetadata(const QString& fileName);
     FileMetadata fileMetadata(const QString& fileName) const;

@@ -53,43 +53,95 @@ FileInformation Storage::fileInformation(
     return m_fileInformationByName.value(fileName);
 }
 
-ResultCode Storage::addFile(const FileInformation& fileInfo)
+ResultCode Storage::addFile(const FileInformation& fileInformation)
 {
+    if (fileInformation.status == FileInformation::Status::downloaded)
+        return addDownloadedFile(fileInformation);
+    else
+        return addNewFile(fileInformation);
+}
+
+ResultCode Storage::addDownloadedFile(const FileInformation& fileInformation)
+{
+    NX_ASSERT(fileInformation.status == FileInformation::Status::downloaded);
+
     QnMutexLocker lock(&m_mutex);
 
-    if (m_fileInformationByName.contains(fileInfo.name))
+    if (m_fileInformationByName.contains(fileInformation.name))
         return ResultCode::fileAlreadyExists;
 
-    FileMetadata info = fileInfo;
-    const auto path = filePath(fileInfo.name);
+    FileMetadata info = fileInformation;
+    const auto path = filePath(fileInformation.name);
 
     if (info.chunkSize <= 0)
         info.chunkSize = kDefaultChunkSize;
 
-    if (fileInfo.status == FileInformation::Status::downloaded)
+    QFile file(path);
+
+    if (!file.exists())
+        return ResultCode::fileDoesNotExist;
+
+    const auto md5 = calculateMd5(path);
+    if (md5.isEmpty())
+        return ResultCode::ioError;
+
+    if (info.md5.isEmpty())
+        info.md5 = md5;
+    else if (info.md5 != md5)
+        return ResultCode::invalidChecksum;
+
+    const auto size = calculateFileSize(path);
+    if (size < 0)
+        return ResultCode::ioError;
+
+    if (info.size < 0)
+        info.size = size;
+    else if (info.size != size)
+        return ResultCode::invalidFileSize;
+
+    const int chunkCount = calculateChunkCount(info.size, info.chunkSize);
+    info.chunkChecksums = calculateChecksums(path, info.chunkSize);
+    if (info.chunkChecksums.size() != chunkCount)
+        return ResultCode::ioError;
+
+    info.downloadedChunks.fill(true, chunkCount);
+
+    if (!saveMetadata(info))
+        return ResultCode::ioError;
+
+    m_fileInformationByName.insert(fileInformation.name, info);
+
+    return ResultCode::ok;
+}
+
+ResultCode Storage::addNewFile(const FileInformation& fileInformation)
+{
+    NX_ASSERT(fileInformation.status != FileInformation::Status::downloaded);
+
+    QnMutexLocker lock(&m_mutex);
+
+    if (m_fileInformationByName.contains(fileInformation.name))
+        return ResultCode::fileAlreadyExists;
+
+    FileMetadata info = fileInformation;
+    const auto path = filePath(fileInformation.name);
+
+    if (info.chunkSize <= 0)
+        info.chunkSize = kDefaultChunkSize;
+
+    const auto fileDir = QFileInfo(path).absolutePath();
+    if (!QDir(fileDir).exists())
     {
-        QFile file(path);
-
-        if (!file.exists())
-            return ResultCode::fileDoesNotExist;
-
-        const auto md5 = calculateMd5(path);
-        if (md5.isEmpty())
+        if (!QDir().mkpath(fileDir))
             return ResultCode::ioError;
+    }
 
-        if (info.md5.isEmpty())
-            info.md5 = md5;
-        else if (info.md5 != md5)
-            return ResultCode::invalidChecksum;
-
-        const auto size = calculateFileSize(path);
-        if (size < 0)
-            return ResultCode::ioError;
-
+    if (!info.md5.isEmpty() && calculateMd5(path) == info.md5)
+    {
+        info.status = FileInformation::Status::downloaded;
+        info.size = calculateFileSize(path);
         if (info.size < 0)
-            info.size = size;
-        else if (info.size != size)
-            return ResultCode::invalidFileSize;
+            return ResultCode::ioError;
 
         const int chunkCount = calculateChunkCount(info.size, info.chunkSize);
         info.chunkChecksums = calculateChecksums(path, info.chunkSize);
@@ -100,59 +152,35 @@ ResultCode Storage::addFile(const FileInformation& fileInfo)
     }
     else
     {
-        const auto fileDir = QFileInfo(path).absolutePath();
-        if (!QDir(fileDir).exists())
-        {
-            if (!QDir().mkpath(fileDir))
-                return ResultCode::ioError;
-        }
+        if (info.status == FileInformation::Status::notFound)
+            info.status = FileInformation::Status::downloading;
 
-        if (!info.md5.isEmpty() && calculateMd5(path) == info.md5)
+        if (info.status == FileInformation::Status::uploading)
         {
-            info.status = FileInformation::Status::downloaded;
-            info.size = calculateFileSize(path);
             if (info.size < 0)
-                return ResultCode::ioError;
+                return ResultCode::invalidFileSize;
 
-            const int chunkCount = calculateChunkCount(info.size, info.chunkSize);
-            info.chunkChecksums = calculateChecksums(path, info.chunkSize);
-            if (info.chunkChecksums.size() != chunkCount)
-                return ResultCode::ioError;
-
-            info.downloadedChunks.fill(true, chunkCount);
+            if (info.md5.isEmpty())
+                return ResultCode::invalidChecksum;
         }
-        else
+
+        if (info.size >= 0)
         {
-            if (info.status == FileInformation::Status::notFound)
-                info.status = FileInformation::Status::downloading;
-
-            if (info.status == FileInformation::Status::uploading)
-            {
-                if (info.size < 0)
-                    return ResultCode::invalidFileSize;
-
-                if (info.md5.isEmpty())
-                    return ResultCode::invalidChecksum;
-            }
-
-            if (info.size >= 0)
-            {
-                const int chunkCount = calculateChunkCount(info.size, info.chunkSize);
-                info.downloadedChunks.resize(chunkCount);
-                info.chunkChecksums.resize(chunkCount);
-            }
-
-            if (!reserveSpace(path, info.size >= 0 ? info.size : 0))
-                return ResultCode::noFreeSpace;
-
-            checkDownloadCompleted(info);
+            const int chunkCount = calculateChunkCount(info.size, info.chunkSize);
+            info.downloadedChunks.resize(chunkCount);
+            info.chunkChecksums.resize(chunkCount);
         }
+
+        if (!reserveSpace(path, info.size >= 0 ? info.size : 0))
+            return ResultCode::noFreeSpace;
+
+        checkDownloadCompleted(info);
     }
 
     if (!saveMetadata(info))
         return ResultCode::ioError;
 
-    m_fileInformationByName.insert(fileInfo.name, info);
+    m_fileInformationByName.insert(fileInformation.name, info);
 
     return ResultCode::ok;
 }
