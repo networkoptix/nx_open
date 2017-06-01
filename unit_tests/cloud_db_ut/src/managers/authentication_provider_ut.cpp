@@ -2,6 +2,7 @@
 
 #include <nx/network/http/auth_tools.h>
 #include <nx/utils/std/cpp14.h>
+#include <nx/utils/time.h>
 
 #include <cdb/cloud_nonce.h>
 
@@ -61,10 +62,11 @@ protected:
         auto authRecords = m_userAuthenticationDao->fetchUserAuthRecords(
             nullptr, m_system.id, m_account.email);
         ASSERT_EQ(1U, authRecords.size());
-        assertUserAuthenticationRecordIsValid(authRecords[0]);
+        assertUserAuthenticationHashIsValid(authRecords[0]);
+        assertUserAuthenticationTimestampIsValid(authRecords[0]);
     }
 
-    void assertUserAuthenticationRecordIsValid(const api::AuthInfo& authInfo)
+    void assertUserAuthenticationHashIsValid(const api::AuthInfo& authInfo)
     {
         const auto ha2 = nx_http::calcHa2("GET", "/getsome/");
         const auto nonce = api::generateNonce(authInfo.nonce);
@@ -80,6 +82,17 @@ protected:
             ha2);
 
         ASSERT_EQ(expectedResponse, actualResponse);
+    }
+
+    void assertUserAuthenticationTimestampIsValid(const api::AuthInfo& authInfo)
+    {
+        ASSERT_GT(
+            authInfo.expirationTime,
+            nx::utils::floor<std::chrono::milliseconds>(nx::utils::utcTime()));
+        ASSERT_LE(
+            authInfo.expirationTime,
+            nx::utils::floor<std::chrono::milliseconds>(
+                nx::utils::utcTime() + m_settings.auth().offlineUserHashValidityPeriod));
     }
 
 private:
@@ -118,11 +131,7 @@ TEST_F(AuthenticationProvider, afterSharingSystem_adds_valid_auth_record)
     thenValidAuthRecordIsGenerated();
 }
 
-//TEST_F(AuthenticationProvider, afterSharingSystem_removes_expired_auth_record)
-
-//TEST_F(AuthenticationProvider, afterSharingSystem_adds_valid_auth_record)
-
-//TEST_F(AuthenticationProvider, afterSharingSystem_uses_system_wide_nonce)
+//TEST_F(AuthenticationProvider, afterSharingSystem_uses_system_wide_nonce_for_every_user)
 
 } // namespace test
 } // namespace cdb

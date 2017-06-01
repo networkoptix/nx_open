@@ -64,9 +64,6 @@ const std::chrono::seconds kDefaultNonceValidityPeriod = std::chrono::hours(4);
 const QLatin1String kIntermediateResponseValidityPeriod("auth/intermediateResponseValidityPeriod");
 const std::chrono::seconds kDefaultIntermediateResponseValidityPeriod = std::chrono::minutes(1);
 
-const QLatin1String kConnectionInactivityPeriod("auth/connectionInactivityPeriod");
-const std::chrono::milliseconds kDefaultConnectionInactivityPeriod(0); //< disabled
-
 //-------------------------------------------------------------------------------------------------
 // Event manager settings
 const QLatin1String kMediaServerConnectionIdlePeriod("eventManager/mediaServerConnectionIdlePeriod");
@@ -81,6 +78,9 @@ const QLatin1String kDefaultCloudModuleXmlTemplatePath(":/cloud_modules_template
 // Http
 const QLatin1String kTcpBacklogSize("http/tcpBacklogSize");
 const int kDefaultTcpBacklogSize = 1024;
+
+const QLatin1String kConnectionInactivityPeriod("http/connectionInactivityPeriod");
+const std::chrono::milliseconds kDefaultConnectionInactivityPeriod(0); //< disabled
 
 } // namespace
 
@@ -111,7 +111,8 @@ EventManager::EventManager():
 }
 
 Http::Http():
-    tcpBacklogSize(kDefaultTcpBacklogSize)
+    tcpBacklogSize(kDefaultTcpBacklogSize),
+    connectionInactivityPeriod(kDefaultConnectionInactivityPeriod)
 {
 }
 
@@ -286,10 +287,6 @@ void Settings::loadSettings()
         nx::utils::parseTimerDuration(
             settings().value(kIntermediateResponseValidityPeriod).toString(),
             kDefaultIntermediateResponseValidityPeriod));
-    m_auth.connectionInactivityPeriod = duration_cast<seconds>(
-        nx::utils::parseTimerDuration(
-            settings().value(kConnectionInactivityPeriod).toString(),
-            kDefaultConnectionInactivityPeriod));
 
     //event manager
     m_eventManager.mediaServerConnectionIdlePeriod = duration_cast<seconds>(
@@ -302,8 +299,14 @@ void Settings::loadSettings()
     m_moduleFinder.cloudModulesXmlTemplatePath = settings().value(
         kCloudModuleXmlTemplatePath, kDefaultCloudModuleXmlTemplatePath).toString();
 
+    //HTTP
     m_http.tcpBacklogSize = settings().value(
         kTcpBacklogSize, kDefaultTcpBacklogSize).toInt();
+
+    m_http.connectionInactivityPeriod = duration_cast<seconds>(
+        nx::utils::parseTimerDuration(
+            settings().value(kConnectionInactivityPeriod).toString(),
+            kDefaultConnectionInactivityPeriod));
 }
 
 } // namespace conf
