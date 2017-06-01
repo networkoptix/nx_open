@@ -296,10 +296,11 @@ def handle_exceptions(func):
 
         if isinstance(error, APIException):
             error_text = "{}({})".format(error.error_text, error.error_code)
-            if 'password' in error.error_data:
-                error.error_data['password'] = '*****'
-            if 'old_password' in error.error_data:
-                error.error_data['password'] = '***'
+            if error.error_data:
+                if 'password' in error.error_data:
+                    error.error_data['password'] = '*****'
+                if 'old_password' in error.error_data:
+                    error.error_data['password'] = '***'
             error_formatted = 'Status: {}\nMessage: {}\nError code: {}\nError data: {}'.\
                               format(error.status_code,
                                      error.error_text,
