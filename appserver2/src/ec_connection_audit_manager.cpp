@@ -1,18 +1,19 @@
 #include "ec_connection_audit_manager.h"
-#include "audit/audit_manager.h"
-#include "utils/common/synctime.h"
-#include "core/resource_management/resource_pool.h"
-#include "core/resource/user_resource.h"
-#include "core/resource/media_server_resource.h"
-#include "core/resource/camera_resource.h"
-#include "api/common_message_processor.h"
-#include "business/business_strings_helper.h"
-#include "business/business_event_rule.h"
-#include "business/event_rule_manager.h"
-#include "nx_ec/data/api_conversion_functions.h"
+
+#include <audit/audit_manager.h>
+#include <utils/common/synctime.h>
+#include <core/resource_management/resource_pool.h>
+#include <core/resource/user_resource.h>
+#include <core/resource/media_server_resource.h>
+#include <core/resource/camera_resource.h>
+#include <api/common_message_processor.h>
+#include <business/business_strings_helper.h>
+#include <business/business_event_rule.h>
+#include <business/event_rule_manager.h>
+#include <nx_ec/data/api_conversion_functions.h>
 #include <api/global_settings.h>
 #include <common/common_module.h>
-#include "nx_ec/ec_api.h"
+#include <nx_ec/ec_api.h>
 
 namespace ec2
 {
