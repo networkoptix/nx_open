@@ -682,7 +682,7 @@ void QnLicenseManagerWidget::showDeactivationErrorsDialog(
 
     const auto button = new QPushButton(lit("Copy to clipboard"), &dialog);
     button->setFlat(true);
-    button->setIcon(qnSkin->icon(lit("buttons/download.png"))); // TODO: change icon
+    button->setIcon(qnSkin->icon(lit("buttons/copy.png")));
     dialog.addButton(button, QDialogButtonBox::HelpRole);
     connect(button, &QAbstractButton::clicked, this,
         [text, extras]() { qApp->clipboard()->setText(lit("%1\n%2").arg(text, toPlainText(extras))); });
