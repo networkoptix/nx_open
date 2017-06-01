@@ -2,7 +2,7 @@
 
 var Config = {
     viewsDir: 'static/views/', //'static/lang_' + lang + '/views/';
-    viewsDirCommon: 'web_common/views/',
+    viewsDirCommon: 'static/web_common/views/',
     gatewayUrl: '/gateway',
     googleTagsCode: 'GTM-5MRNWP',
     apiBase: '/api',
