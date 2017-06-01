@@ -595,14 +595,12 @@ void QnCommonMessageProcessor::removeResourceIgnored(const QnUuid &)
 {
 }
 
-void QnCommonMessageProcessor::handleRemotePeerFound(QnUuid data, Qn::PeerType peerType)
+void QnCommonMessageProcessor::handleRemotePeerFound(QnUuid /*data*/, Qn::PeerType /*peerType*/)
 {
-    Q_UNUSED(data)
 }
 
-void QnCommonMessageProcessor::handleRemotePeerLost(QnUuid data, Qn::PeerType peerType)
+void QnCommonMessageProcessor::handleRemotePeerLost(QnUuid /*data*/, Qn::PeerType /*peerType*/)
 {
-    Q_UNUSED(data)
 }
 
 void QnCommonMessageProcessor::resetServerUserAttributesList( const ec2::ApiMediaServerUserAttributesDataList& serverUserAttributesList )

@@ -51,8 +51,6 @@ ConnectionProcessor::ConnectionProcessor(
     :
     QnTCPConnectionProcessor(socket, owner)
 {
-    Q_D(QnTCPConnectionProcessor);
-
     setObjectName(::toString(this));
 }
 
