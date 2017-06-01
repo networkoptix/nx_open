@@ -5,7 +5,8 @@
 namespace nx {
 namespace vms {
 namespace common {
-namespace distributed_file_downloader {
+namespace p2p {
+namespace downloader {
 
 AbstractPeerManager::AbstractPeerManager(QObject* parent):
     QObject(parent)
@@ -30,7 +31,8 @@ AbstractPeerManagerFactory::~AbstractPeerManagerFactory()
 {
 }
 
-} // namespace distributed_file_downloader
+} // namespace downloader
+} // namespace p2p
 } // namespace common
 } // namespace vms
 } // namespace nx

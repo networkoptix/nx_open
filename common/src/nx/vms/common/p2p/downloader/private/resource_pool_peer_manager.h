@@ -12,7 +12,8 @@ class QnAsyncHttpClientReply;
 namespace nx {
 namespace vms {
 namespace common {
-namespace distributed_file_downloader {
+namespace p2p {
+namespace downloader {
 
 class ResourcePoolPeerManager: public AbstractPeerManager, public QnCommonModuleAware
 {
@@ -69,7 +70,8 @@ public:
     virtual AbstractPeerManager* createPeerManager() override;
 };
 
-} // namespace distributed_file_downloader
+} // namespace downloader
+} // namespace p2p
 } // namespace common
 } // namespace vms
 } // namespace nx

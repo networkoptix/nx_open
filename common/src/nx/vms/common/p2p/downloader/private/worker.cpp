@@ -15,7 +15,7 @@
 namespace {
 
 using namespace std::chrono;
-using nx::vms::common::distributed_file_downloader::Worker;
+using nx::vms::common::p2p::downloader::Worker;
 
 constexpr int kDefaultPeersPerOperation = 5;
 constexpr int kSubsequentChunksToDownload = 5;
@@ -100,7 +100,8 @@ QList<QnUuid> takeRandomPeers(QList<QnUuid>& peers, int count)
 namespace nx {
 namespace vms {
 namespace common {
-namespace distributed_file_downloader {
+namespace p2p {
+namespace downloader {
 
 Worker::Worker(
     const QString& fileName,
@@ -1043,7 +1044,8 @@ void Worker::PeerInformation::decreaseRank(int value)
 
 QN_DEFINE_METAOBJECT_ENUM_LEXICAL_FUNCTIONS(Worker, State)
 
-} // namespace distributed_file_downloader
+} // namespace downloader
+} // namespace p2p
 } // namespace common
 } // namespace vms
 } // namespace nx

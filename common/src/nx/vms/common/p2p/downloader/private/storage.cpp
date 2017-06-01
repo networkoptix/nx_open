@@ -17,7 +17,8 @@ static const QString kMetadataSuffix = lit(".vmsdownload");
 namespace nx {
 namespace vms {
 namespace common {
-namespace distributed_file_downloader {
+namespace p2p {
+namespace downloader {
 
 QN_FUSION_DECLARE_FUNCTIONS(FileMetadata, (json))
 
@@ -118,7 +119,7 @@ ResultCode Storage::addFile(const FileInformation& fileInfo)
             if (info.chunkChecksums.size() != chunkCount)
                 return ResultCode::ioError;
 
-            info.downloadedChunks.fill(true, calculateChunkCount(info.size, info.chunkSize));
+            info.downloadedChunks.fill(true, chunkCount);
         }
         else
         {
@@ -610,7 +611,8 @@ qint64 Storage::calculateChunkSize(qint64 fileSize, int chunkIndex, qint64 chunk
 
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(FileMetadata, (json), FileInformation_Fields (chunkChecksums))
 
-} // namespace distributed_file_downloader
+} // namespace downloader
+} // namespace p2p
 } // namespace common
 } // namespace vms
 } // namespace nx

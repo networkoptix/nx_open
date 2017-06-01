@@ -2,8 +2,8 @@
 
 #include <nx/utils/log/log.h>
 #include <nx/utils/test_support/test_options.h>
-#include <nx/vms/common/distributed_file_downloader/private/storage.h>
-#include <nx/vms/common/distributed_file_downloader/private/worker.h>
+#include <nx/vms/common/p2p/downloader/private/storage.h>
+#include <nx/vms/common/p2p/downloader/private/worker.h>
 
 #include "utils.h"
 #include "test_peer_manager.h"
@@ -11,7 +11,8 @@
 namespace nx {
 namespace vms {
 namespace common {
-namespace distributed_file_downloader {
+namespace p2p {
+namespace downloader {
 namespace test {
 
 namespace {
@@ -527,7 +528,8 @@ TEST_F(DistributedFileDownloaderWorkerTest, multiDownloadNonFlatNetwork)
 }
 
 } // namespace test
-} // namespace distributed_file_downloader
+} // namespace downloader
+} // namespace p2p
 } // namespace common
 } // namespace vms
 } // namespace nx

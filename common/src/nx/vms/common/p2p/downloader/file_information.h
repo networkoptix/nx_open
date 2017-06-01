@@ -8,7 +8,8 @@
 namespace nx {
 namespace vms {
 namespace common {
-namespace distributed_file_downloader {
+namespace p2p {
+namespace downloader {
 
 struct FileInformation
 {
@@ -48,7 +49,8 @@ public:
 QN_FUSION_DECLARE_FUNCTIONS(FileInformation, (json))
 QN_FUSION_DECLARE_FUNCTIONS(FileInformation::Status, (lexical))
 
-} // namespace distributed_file_downloader
+} // namespace downloader
+} // namespace p2p
 } // namespace common
 } // namespace vms
 } // namespace nx

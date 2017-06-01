@@ -5,12 +5,13 @@
 #include <QtCore/QHash>
 #include <QtCore/QQueue>
 
-#include <nx/vms/common/distributed_file_downloader/private/abstract_peer_manager.h>
+#include <nx/vms/common/p2p/downloader/private/abstract_peer_manager.h>
 
 namespace nx {
 namespace vms {
 namespace common {
-namespace distributed_file_downloader {
+namespace p2p {
+namespace downloader {
 
 class Storage;
 class TestPeerManager;
@@ -45,11 +46,11 @@ struct RequestCounter
 class TestPeerManager: public AbstractPeerManager
 {
 public:
-    struct FileInformation: distributed_file_downloader::FileInformation
+    struct FileInformation: downloader::FileInformation
     {
-        using distributed_file_downloader::FileInformation::FileInformation;
+        using downloader::FileInformation::FileInformation;
         FileInformation() = default;
-        FileInformation(const distributed_file_downloader::FileInformation& fileInfo);
+        FileInformation(const downloader::FileInformation& fileInfo);
 
         QString filePath;
         QVector<QByteArray> checksums;
@@ -202,7 +203,8 @@ private:
     RequestCounter m_requestCounter;
 };
 
-} // namespace distributed_file_downloader
+} // namespace downloader
+} // namespace p2p
 } // namespace common
 } // namespace vms
 } // namespace nx

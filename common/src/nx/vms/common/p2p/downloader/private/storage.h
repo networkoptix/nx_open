@@ -11,7 +11,8 @@
 namespace nx {
 namespace vms {
 namespace common {
-namespace distributed_file_downloader {
+namespace p2p {
+namespace downloader {
 
 struct FileMetadata: FileInformation
 {
@@ -79,7 +80,8 @@ private:
     mutable QnMutex m_mutex;
 };
 
-} // namespace distributed_file_downloader
+} // namespace downloader
+} // namespace p2p
 } // namespace common
 } // namespace vms
 } // namespace nx

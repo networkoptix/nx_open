@@ -15,7 +15,8 @@ class QTimer;
 namespace nx {
 namespace vms {
 namespace common {
-namespace distributed_file_downloader {
+namespace p2p {
+namespace downloader {
 
 class Storage;
 class AbstractPeerManager;
@@ -158,7 +159,8 @@ private:
     bool m_usingInternet = false;
 };
 
-} // namespace distributed_file_downloader
+} // namespace downloader
+} // namespace p2p
 } // namespace common
 } // namespace vms
 } // namespace nx

@@ -3,13 +3,13 @@
 #include <nx/network/http/httptypes.h>
 #include <nx/network/http/httpclient.h>
 #include <nx/fusion/model_functions.h>
-#include <nx/vms/common/distributed_file_downloader/downloader.h>
+#include <nx/vms/common/p2p/downloader/downloader.h>
 #include <rest/server/json_rest_result.h>
 #include <media_server/media_server_module.h>
 
-using nx::vms::common::distributed_file_downloader::Downloader;
-using nx::vms::common::distributed_file_downloader::FileInformation;
-using nx::vms::common::distributed_file_downloader::ResultCode;
+using nx::vms::common::p2p::downloader::Downloader;
+using nx::vms::common::p2p::downloader::FileInformation;
+using nx::vms::common::p2p::downloader::ResultCode;
 
 namespace {
 

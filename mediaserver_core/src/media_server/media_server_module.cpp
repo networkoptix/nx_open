@@ -35,7 +35,7 @@
 #include <common/static_common_module.h>
 #include <utils/common/app_info.h>
 
-#include <nx/vms/common/distributed_file_downloader/downloader.h>
+#include <nx/vms/common/p2p/downloader/downloader.h>
 
 namespace {
 
@@ -135,7 +135,7 @@ QnMediaServerModule::QnMediaServerModule(
 
     store(new QnFileDeletor(commonModule()));
 
-    store(new nx::vms::common::distributed_file_downloader::Downloader(
+    store(new nx::vms::common::p2p::downloader::Downloader(
         downloadsDirectory(), commonModule()));
 
     // Translations must be installed from the main applicaition thread.

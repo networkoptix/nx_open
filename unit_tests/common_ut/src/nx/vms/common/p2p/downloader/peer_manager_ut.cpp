@@ -1,7 +1,7 @@
 #include <gtest/gtest.h>
 
 #include <nx/utils/test_support/test_options.h>
-#include <nx/vms/common/distributed_file_downloader/private/storage.h>
+#include <nx/vms/common/p2p/downloader/private/storage.h>
 
 #include "test_peer_manager.h"
 #include "utils.h"
@@ -9,7 +9,8 @@
 namespace nx {
 namespace vms {
 namespace common {
-namespace distributed_file_downloader {
+namespace p2p {
+namespace downloader {
 namespace test {
 
 class DistributedFileDownloaderPeerManagerTest: public ::testing::Test
@@ -254,7 +255,8 @@ TEST_F(DistributedFileDownloaderPeerManagerTest, calculateDistances)
 }
 
 } // namespace test
-} // namespace distributed_file_downloader
+} // namespace downloader
+} // namespace p2p
 } // namespace common
 } // namespace vms
 } // namespace nx

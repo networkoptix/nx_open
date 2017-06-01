@@ -3,12 +3,13 @@
 #include <QtCore/QTextStream>
 
 #include <nx/utils/log/assert.h>
-#include <nx/vms/common/distributed_file_downloader/private/storage.h>
+#include <nx/vms/common/p2p/downloader/private/storage.h>
 
 namespace nx {
 namespace vms {
 namespace common {
-namespace distributed_file_downloader {
+namespace p2p {
+namespace downloader {
 
 namespace {
 
@@ -207,7 +208,7 @@ rest::Handle TestPeerManager::downloadChunkFromInternet(
         [this, peerId, fileName, url, chunkIndex, chunkSize, callback](rest::Handle handle)
         {
             Storage* storage = nullptr;
-            distributed_file_downloader::FileInformation storageFileInfo;
+            downloader::FileInformation storageFileInfo;
 
             auto it = m_peers.find(peerId);
             if (it != m_peers.end() && it->storage)
@@ -472,10 +473,8 @@ void ProxyTestPeerManager::cancelRequest(const QnUuid& peerId, rest::Handle hand
     m_peerManager->cancelRequest(peerId, handle);
 }
 
-TestPeerManager::FileInformation::FileInformation(
-    const distributed_file_downloader::FileInformation& fileInfo)
-    :
-    distributed_file_downloader::FileInformation(fileInfo)
+TestPeerManager::FileInformation::FileInformation(const downloader::FileInformation& fileInfo):
+    downloader::FileInformation(fileInfo)
 {
 }
 
@@ -552,7 +551,8 @@ QString RequestCounter::requestTypeShortName(RequestCounter::RequestType request
     return QString();
 }
 
-} // namespace distributed_file_downloader
+} // namespace downloader
+} // namespace p2p
 } // namespace common
 } // namespace vms
 } // namespace nx

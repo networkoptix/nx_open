@@ -12,7 +12,8 @@
 namespace nx {
 namespace vms {
 namespace common {
-namespace distributed_file_downloader {
+namespace p2p {
+namespace downloader {
 
 class DownloaderPrivate: public QObject
 {
@@ -190,7 +191,8 @@ QVector<QByteArray> Downloader::getChunkChecksums(const QString& fileName)
     return d->storage->getChunkChecksums(fileName);
 }
 
-} // namespace distributed_file_downloader
+} // namespace downloader
+} // namespace p2p
 } // namespace common
 } // namespace vms
 } // namespace nx

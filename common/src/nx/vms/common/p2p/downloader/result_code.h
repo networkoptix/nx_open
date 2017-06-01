@@ -5,11 +5,12 @@
 namespace nx {
 namespace vms {
 namespace common {
+namespace p2p {
 
 #ifdef THIS_BLOCK_IS_REQUIRED_TO_MAKE_FILE_BE_PROCESSED_BY_MOC_DO_NOT_DELETE
 Q_OBJECT
 #endif
-QN_DECLARE_METAOBJECT_HEADER(distributed_file_downloader, ResultCode, )
+QN_DECLARE_METAOBJECT_HEADER(downloader, ResultCode, )
 
 enum class ResultCode
 {
@@ -27,9 +28,10 @@ enum class ResultCode
 
 QString toString(ResultCode code);
 
-QN_FUSION_DECLARE_FUNCTIONS(distributed_file_downloader::ResultCode, (lexical))
+QN_FUSION_DECLARE_FUNCTIONS(downloader::ResultCode, (lexical))
 
-} // namespace distributed_file_downloader
+} // namespace downloader
+} // namespace p2p
 } // namespace common
 } // namespace vms
 } // namespace nx
