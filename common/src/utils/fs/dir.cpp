@@ -14,6 +14,7 @@
 #include <errno.h>
 #include <net/if_arp.h>
 #include <sys/statvfs.h>
+#include <nx/utils/app_info.h>
 #endif
 
 
@@ -23,23 +24,44 @@ SystemError::ErrorCode readPartitions(
     std::list<PartitionInfo>* const partitionInfoList)
 {
 #if defined(Q_OS_LINUX) && !defined(Q_OS_ANDROID)
-    //map<device, <path, fs_name>>
+    std::string mountsFile("/proc/mounts");
+    bool scanfLongPattern = false;
+    if (nx::utils::AppInfo::isRaspberryPi())
+    {
+        // On Rapberry Pi 2+ "/proc/mounts" contains unexisting "/dev/root" on "/", while mount
+        // reports a valid mounted device.
+        if (system("mount > /root/mounts") == 0)
+        {
+            mountsFile = "/root/mounts";
+            scanfLongPattern = true;
+        }
+    }
+
     std::map<QString, std::pair<QString, QString>> deviceToPath;
-    std::unique_ptr<FILE, decltype(&fclose)> file(fopen("/proc/mounts", "r"), fclose);
+    std::unique_ptr<FILE, decltype(&fclose)> file(fopen(mountsFile.c_str(), "r"), fclose);
     if (!file)
         return SystemError::getLastOSErrorCode();
 
     char line[MAX_LINE_LENGTH];
     for (int i = 0; fgets(line, MAX_LINE_LENGTH, file.get()) != NULL; ++i)
     {
-        if (i == 0)
+        if (i == 0 && !scanfLongPattern)
             continue; /* Skip header. */
 
         char cDevName[MAX_LINE_LENGTH];
         char cPath[MAX_LINE_LENGTH];
         char cFSName[MAX_LINE_LENGTH];
-        if (sscanf(line, "%s %s %s ", cDevName, cPath, cFSName) != 3)
-            continue; /* Skip unrecognized lines. */
+        if (scanfLongPattern)
+        {
+            char cTmp[MAX_LINE_LENGTH];
+            if (sscanf(line, "%s %s %s %s %s ", cDevName, cTmp, cPath, cTmp, cFSName) != 5)
+                continue; /* Skip unrecognized lines. */
+        }
+        else
+        {
+            if (sscanf(line, "%s %s %s ", cDevName, cPath, cFSName) != 3)
+                continue; /* Skip unrecognized lines. */
+        }
 
         const QString& devName = QString::fromUtf8(cDevName);
         const QString& path = QString::fromUtf8(cPath);
