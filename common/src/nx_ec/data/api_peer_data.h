@@ -18,7 +18,8 @@ struct ApiPersistentIdData: ApiIdData
     :
         ApiIdData(id),
         persistentId(persistentId)
-    {}
+    {
+    }
 
     bool operator<(const ApiPersistentIdData& other) const
     {
@@ -56,7 +57,7 @@ struct ApiPeerData: ApiPersistentIdData
         const QnUuid& instanceId,
         Qn::PeerType peerType,
         Qn::SerializationFormat dataFormat = Qn::UbjsonFormat)
-    :
+        :
         ApiPersistentIdData(id, QnUuid()),
         instanceId(instanceId),
         peerType(peerType),
@@ -67,7 +68,7 @@ struct ApiPeerData: ApiPersistentIdData
         const ApiPersistentIdData& peer,
         Qn::PeerType peerType,
         Qn::SerializationFormat dataFormat = Qn::UbjsonFormat)
-    :
+        :
         ApiPersistentIdData(peer),
         peerType(peerType),
         dataFormat(dataFormat)

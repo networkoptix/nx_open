@@ -14,7 +14,7 @@
 #include "p2p_serialization.h"
 
 // For debug purpose only
-//#define CHECK_SEQUENCE
+#define CHECK_SEQUENCE
 
 namespace nx {
 namespace p2p {
@@ -173,12 +173,12 @@ void Connection::fillAuthInfo(bool authByKey)
 
 void Connection::cancelConnecting(State newState, const QString& reason)
 {
-    NX_LOG(QnLog::P2P_TRAN_LOG,
+    NX_VERBOSE(
+        this,
         lit("Connection to peer %1 canceled from state %2. Reason: %3")
         .arg(m_remotePeer.id.toString())
         .arg(toString(state()))
-        .arg(reason),
-        cl_logDEBUG2);
+        .arg(reason));
     setState(newState);
 }
 
@@ -193,8 +193,7 @@ void Connection::onHttpClientDone()
 
     const int statusCode = m_httpClient->response()->statusLine.statusCode;
 
-    NX_LOG(QnLog::P2P_TRAN_LOG, lit("%1. statusCode = %2")
-        .arg(Q_FUNC_INFO).arg(statusCode), cl_logDEBUG2);
+    NX_VERBOSE(this, lit("%1. statusCode = %2").arg(Q_FUNC_INFO).arg(statusCode));
 
     if (statusCode == nx_http::StatusCode::unauthorized)
     {
@@ -251,7 +250,7 @@ void Connection::onHttpClientDone()
     else if (remotePeer.id != m_remotePeer.id)
     {
         cancelConnecting(
-            State::Error, 
+            State::Error,
             lm("Remote peer id %1 is not match expected peer id %2")
             .arg(remotePeer.id.toString())
             .arg(m_remotePeer.id.toString()));
@@ -273,8 +272,8 @@ void Connection::onHttpClientDone()
     auto error = websocket::validateResponse(m_httpClient->request(), *m_httpClient->response());
     if (error != websocket::Error::noError)
     {
-        NX_LOG(QnLog::P2P_TRAN_LOG,
-            lm("Can't establish WEB socket connection. Validation failed. Error: %1").arg((int)error), cl_logERROR);
+        NX_ERROR(this,
+            lm("Can't establish WEB socket connection. Validation failed. Error: %1").arg((int)error));
         setState(State::Error);
         m_httpClient.reset();
         return;
@@ -332,7 +331,7 @@ void Connection::sendMessage(MessageType messageType, const nx::Buffer& data)
 
 void Connection::sendMessage(const nx::Buffer& data)
 {
-    if (nx::utils::log::isToBeLogged(cl_logDEBUG1, QnLog::P2P_TRAN_LOG))
+    if (nx::utils::log::isToBeLogged(cl_logDEBUG1, this))
     {
         auto localPeerName = qnStaticCommon->moduleDisplayName(commonModule()->moduleGUID());
         auto remotePeerName = qnStaticCommon->moduleDisplayName(remotePeer().id);
@@ -341,13 +340,13 @@ void Connection::sendMessage(const nx::Buffer& data)
         if (messageType != MessageType::pushTransactionData &&
             messageType != MessageType::pushTransactionList)
         {
-            NX_LOG(QnLog::P2P_TRAN_LOG,
+            NX_DEBUG(
+                this,
                 lit("Send message:\t %1 ---> %2. Type: %3. Size=%4")
                 .arg(localPeerName)
                 .arg(remotePeerName)
                 .arg(toString(messageType))
-                .arg(data.size()),
-                cl_logDEBUG1);
+                .arg(data.size()));
         }
     }
 

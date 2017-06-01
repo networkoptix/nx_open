@@ -4,7 +4,6 @@ const QString QnLog::MAIN_LOG_ID = QLatin1String();
 const QString QnLog::CUSTOM_LOG_BASE_ID = QLatin1String("CUSTOM");
 const QString QnLog::HTTP_LOG_INDEX = QLatin1String("HTTP");
 const QString QnLog::EC2_TRAN_LOG = QLatin1String("EC2_TRAN");
-const QString QnLog::P2P_TRAN_LOG = QLatin1String("P2P_TRAN");
 const QString QnLog::HWID_LOG = QLatin1String("HWID");
 const QString QnLog::PERMISSIONS_LOG = QLatin1String("PERMISSIONS");
 
@@ -30,7 +29,6 @@ std::shared_ptr<nx::utils::log::Logger> QnLogs::logger(int id)
         QnLog::CUSTOM_LOG_BASE_ID,
         QnLog::HTTP_LOG_INDEX,
         QnLog::EC2_TRAN_LOG,
-		QnLog::P2P_TRAN_LOG,
         QnLog::HWID_LOG,
         QnLog::PERMISSIONS_LOG,
     };

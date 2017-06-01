@@ -21,6 +21,9 @@
 #include <nx/network/socket_delegate.h>
 #include <nx/p2p/p2p_message_bus.h>
 
+namespace nx {
+namespace p2p {
+
 class ShareSocketDelegate: public nx::network::StreamSocketDelegate
 {
     using base_type = nx::network::StreamSocketDelegate;
@@ -38,42 +41,27 @@ private:
     QSharedPointer<AbstractStreamSocket> m_socket;
 };
 
-// -------------------------- P2pConnectionProcessor ---------------------
+// -------------------------- ConnectionProcessor ---------------------
 
-const QString P2pConnectionProcessor::kUrlPath(lit("/ec2/messageBus"));
+const QString ConnectionProcessor::kUrlPath(lit("/ec2/messageBus"));
 
-class P2pConnectionProcessorPrivate : public QnTCPConnectionProcessorPrivate
-{
-public:
-
-    P2pConnectionProcessorPrivate() :
-        QnTCPConnectionProcessorPrivate(),
-        messageBus(nullptr)
-    {
-    }
-
-    nx::p2p::MessageBus* messageBus;
-};
-
-P2pConnectionProcessor::P2pConnectionProcessor(
-    nx::p2p::MessageBus* messageBus,
+ConnectionProcessor::ConnectionProcessor(
     QSharedPointer<AbstractStreamSocket> socket,
     QnTcpListener* owner)
-:
-    QnTCPConnectionProcessor(new P2pConnectionProcessorPrivate, socket, owner->commonModule())
+    :
+    QnTCPConnectionProcessor(socket, owner)
 {
-    Q_D(P2pConnectionProcessor);
+    Q_D(QnTCPConnectionProcessor);
 
-    d->messageBus = messageBus;
     setObjectName(::toString(this));
 }
 
-P2pConnectionProcessor::~P2pConnectionProcessor()
+ConnectionProcessor::~ConnectionProcessor()
 {
     stop();
 }
 
-QByteArray P2pConnectionProcessor::responseBody(Qn::SerializationFormat dataFormat)
+QByteArray ConnectionProcessor::responseBody(Qn::SerializationFormat dataFormat)
 {
     ec2::ApiPeerDataEx localPeer;
     localPeer.id = commonModule()->moduleGUID();
@@ -95,37 +83,37 @@ QByteArray P2pConnectionProcessor::responseBody(Qn::SerializationFormat dataForm
         return QByteArray();
 }
 
-bool P2pConnectionProcessor::isDisabledPeer(const ec2::ApiPeerData& remotePeer) const
+bool ConnectionProcessor::isDisabledPeer(const ec2::ApiPeerData& remotePeer) const
 {
     return (!commonModule()->allowedPeers().isEmpty() &&
         !commonModule()->allowedPeers().contains(remotePeer.id) &&
         !remotePeer.isClient());
 }
 
-bool P2pConnectionProcessor::isPeerCompatible(const ec2::ApiPeerDataEx& remotePeer) const
+bool ConnectionProcessor::isPeerCompatible(const ec2::ApiPeerDataEx& remotePeer) const
 {
-    Q_D(const P2pConnectionProcessor);
-    const auto& commonModule = d->messageBus->commonModule();
+    Q_D(const QnTCPConnectionProcessor);
+    const auto& commonModule = d->owner->commonModule();
 
     if (remotePeer.peerType == Qn::PT_Server && commonModule->isReadOnly())
         return false;
     if (!remotePeer.systemId.isNull() &&
         remotePeer.systemId != commonModule->globalSettings()->localSystemId())
     {
-        NX_LOG(QnLog::P2P_TRAN_LOG,
+        NX_WARNING(
+            this,
             lm("Reject incoming P2P connection from peer %1 because of different systemId. "
                 "Local peer version: %2, remote peer version: %3")
             .arg(d->socket->getForeignAddress().address.toString())
             .arg(commonModule->globalSettings()->localSystemId())
-            .arg(remotePeer.systemId),
-            cl_logWARNING);
+            .arg(remotePeer.systemId));
         return false;
     }
     if (remotePeer.peerType != Qn::PT_MobileClient)
     {
         if (nx_ec::EC2_PROTO_VERSION != remotePeer.protoVersion)
         {
-            NX_LOG(QnLog::P2P_TRAN_LOG,
+            NX_LOG(this,
                 lm("Reject incoming P2P connection from peer %1 because of different EC2 proto version. "
                     "Local peer version: %2, remote peer version: %3")
                 .arg(d->socket->getForeignAddress().address.toString())
@@ -139,7 +127,7 @@ bool P2pConnectionProcessor::isPeerCompatible(const ec2::ApiPeerDataEx& remotePe
     {
         if (nx::network::AppInfo::defaultCloudHost() != remotePeer.cloudHost)
         {
-            NX_LOG(QnLog::P2P_TRAN_LOG,
+            NX_LOG(this,
                 lm("Reject incoming P2P connection from peer %1 because they have different built in cloud host setting. "
                     "Local peer host: %2, remote peer host: %3")
                 .arg(d->socket->getForeignAddress().address.toString())
@@ -152,9 +140,9 @@ bool P2pConnectionProcessor::isPeerCompatible(const ec2::ApiPeerDataEx& remotePe
     return true;
 }
 
-ec2::ApiPeerDataEx P2pConnectionProcessor::deserializeRemotePeerInfo()
+ec2::ApiPeerDataEx ConnectionProcessor::deserializeRemotePeerInfo()
 {
-    Q_D(const P2pConnectionProcessor);
+    Q_D(const QnTCPConnectionProcessor);
     ec2::ApiPeerDataEx remotePeer;
     QUrlQuery query(d->request.requestLine.url.query());
 
@@ -175,9 +163,9 @@ ec2::ApiPeerDataEx P2pConnectionProcessor::deserializeRemotePeerInfo()
     return remotePeer;
 }
 
-Qn::UserAccessData P2pConnectionProcessor::userAccessData(const ec2::ApiPeerDataEx& remotePeer) const
+Qn::UserAccessData ConnectionProcessor::userAccessData(const ec2::ApiPeerDataEx& remotePeer) const
 {
-    Q_D(const P2pConnectionProcessor);
+    Q_D(const QnTCPConnectionProcessor);
     // By default all peers have read permissions on all resources
     auto access = d->accessRights;
     if (remotePeer.peerType == Qn::PT_Server)
@@ -201,9 +189,9 @@ Qn::UserAccessData P2pConnectionProcessor::userAccessData(const ec2::ApiPeerData
     return access;
 }
 
-void P2pConnectionProcessor::run()
+void ConnectionProcessor::run()
 {
-    Q_D(P2pConnectionProcessor);
+    Q_D(QnTCPConnectionProcessor);
     initSystemThreadId();
 
     if (d->clientRequest.isEmpty() && !readRequest())
@@ -217,10 +205,18 @@ void P2pConnectionProcessor::run()
         return;
     }
 
-    const auto& commonModule = d->messageBus->commonModule();
+    const auto& commonModule = d->owner->commonModule();
+    auto messageBus = dynamic_cast<MessageBus*> (commonModule->ec2Connection()->messageBus());
+    if (!messageBus)
+    {
+        sendResponse(
+            nx_http::StatusCode::forbidden,
+            nx_http::StringType());
+        return;
+    }
     ec2::ConnectionLockGuard connectionLockGuard(
         commonModule->moduleGUID(),
-        d->messageBus->connectionGuardSharedState(),
+        messageBus->connectionGuardSharedState(),
         remotePeer.id,
         ec2::ConnectionLockGuard::Direction::Incoming);
 
@@ -277,9 +273,12 @@ void P2pConnectionProcessor::run()
     WebSocketPtr webSocket(new websocket::WebSocket(std::move(socket)));
     webSocket->setAliveTimeoutEx(keepAliveTimeout, 2);
 
-    d->messageBus->gotConnectionFromRemotePeer(
+    messageBus->gotConnectionFromRemotePeer(
         remotePeer,
         std::move(connectionLockGuard),
         std::move(webSocket),
         userAccessData(remotePeer));
 }
+
+} // namespace p2p
+} // namespace nx

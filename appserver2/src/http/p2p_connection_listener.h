@@ -6,25 +6,22 @@
 #include <nx_ec/data/api_peer_data.h>
 #include <core/resource_access/user_access_data.h>
 
-class P2pConnectionProcessorPrivate;
-
 namespace nx {
 namespace p2p {
-class MessageBus;
-}
-}
 
-class P2pConnectionProcessor : public QnTCPConnectionProcessor
+class MessageBus;
+class P2pConnectionProcessorPrivate;
+
+class ConnectionProcessor: public QnTCPConnectionProcessor
 {
 public:
     const static QString kUrlPath;
 
-    P2pConnectionProcessor(
-        nx::p2p::MessageBus* messageBus,
+    ConnectionProcessor(
         QSharedPointer<AbstractStreamSocket> socket,
         QnTcpListener* owner);
 
-    virtual ~P2pConnectionProcessor();
+    virtual ~ConnectionProcessor();
     virtual bool isTakeSockOwnership() const override { return true; }
 protected:
     virtual void run() override;
@@ -35,5 +32,7 @@ private:
     ec2::ApiPeerDataEx deserializeRemotePeerInfo();
     Qn::UserAccessData userAccessData(const ec2::ApiPeerDataEx& remotePeer) const;
 private:
-    Q_DECLARE_PRIVATE(P2pConnectionProcessor);
 };
+
+} // namespace p2p
+} // namespace nx

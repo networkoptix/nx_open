@@ -19,7 +19,6 @@ struct QnLog
     static NX_UTILS_API const QString CUSTOM_LOG_BASE_ID;
     static NX_UTILS_API const QString HTTP_LOG_INDEX;
     static NX_UTILS_API const QString EC2_TRAN_LOG;
-    static NX_UTILS_API const QString P2P_TRAN_LOG;
     static NX_UTILS_API const QString HWID_LOG;
     static NX_UTILS_API const QString PERMISSIONS_LOG;
 

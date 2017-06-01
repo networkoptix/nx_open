@@ -256,6 +256,12 @@ ErrorCode QnTransactionLog::updateSequenceNoLock(const QnUuid& peerID, const QnU
     if (m_state.values.value(key) >= sequence)
         return ErrorCode::ok;
 
+    if (sequence - m_state.values.value(key) > 10 &&
+        sequence - m_commitData.state.values.value(key) > 10)
+    {
+        NX_CRITICAL(0);
+    }
+
     if (!m_updateSequenceQuery)
     {
         m_updateSequenceQuery.reset(new QSqlQuery(m_dbManager->getDB()));

@@ -183,8 +183,8 @@ void Ec2DirectConnectionFactory::registerTransactionListener(
     }
     else if (auto bus = dynamic_cast<nx::p2p::MessageBus*> (m_bus.get()))
     {
-        httpConnectionListener->addHandler<P2pConnectionProcessor, nx::p2p::MessageBus>(
-            "HTTP", QnTcpListener::normalizedPath(P2pConnectionProcessor::kUrlPath), bus);
+        httpConnectionListener->addHandler<nx::p2p::ConnectionProcessor>(
+            "HTTP", QnTcpListener::normalizedPath(nx::p2p::ConnectionProcessor::kUrlPath));
     }
 
     m_sslEnabled = httpConnectionListener->isSslEnabled();

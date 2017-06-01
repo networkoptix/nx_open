@@ -303,7 +303,8 @@ static const int kPublicIpUpdateTimeoutMs = 60 * 2 * 1000;
 bool initResourceTypes(const ec2::AbstractECConnectionPtr& ec2Connection)
 {
     QList<QnResourceTypePtr> resourceTypeList;
-    const ec2::ErrorCode errorCode = ec2Connection->getResourceManager(Qn::kSystemAccess)->getResourceTypesSync(&resourceTypeList);
+    auto manager = ec2Connection->getResourceManager(Qn::kSystemAccess);
+    const ec2::ErrorCode errorCode = manager->getResourceTypesSync(&resourceTypeList);
     if (errorCode != ec2::ErrorCode::ok)
     {
         NX_LOG(QString::fromLatin1("Failed to load resource types. %1").arg(ec2::toString(errorCode)), cl_logERROR);
@@ -1040,6 +1041,7 @@ void MediaServerProcess::parseCommandLineParameters(int argc, char* argv[])
         "INFO"
 #endif
     );
+    commandLineParser.addParameter(&m_cmdLineArguments.exceptionFilters, "--exception-filters", NULL, "Log filters.");
     commandLineParser.addParameter(&m_cmdLineArguments.msgLogLevel, "--http-log-level", NULL,
         "Log value for http_log.log. Supported values same as above. Default is none (no logging)", "none");
     commandLineParser.addParameter(&m_cmdLineArguments.ec2TranLogLevel, "--ec2-tran-log-level", NULL,
@@ -2360,6 +2362,10 @@ void MediaServerProcess::serviceModeInit()
         };
 
     logSettings.level = makeLevel(cmdLineArguments().logLevel, "logLevel");
+
+    for (const auto& filter: cmdLineArguments().exceptionFilters.split(L';', QString::SkipEmptyParts))
+        logSettings.exceptionFilers.insert(filter);
+
     nx::utils::log::initialize(
         logSettings, dataLocation, qApp->applicationName(), binaryPath);
 

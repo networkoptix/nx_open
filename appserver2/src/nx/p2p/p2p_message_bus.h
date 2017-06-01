@@ -125,7 +125,8 @@ private:
             checkRemotePeerAccessFunc(commonModule(), connection->userAccessData(), tran.params);
         if (remoteAccess == RemotePeerAccess::Forbidden)
         {
-            NX_VERBOSE(QnLog::P2P_TRAN_LOG,
+            NX_VERBOSE(
+                this,
                 lm("Permission check failed while sending transaction %1 to peer %2")
                 .arg(tran.toString())
                 .arg(connection->remotePeer().id.toString()));
@@ -150,7 +151,7 @@ private:
         }
         NX_ASSERT(!(ApiPersistentIdData(connection->remotePeer()) == peerId)); //< loop
 
-        if (nx::utils::log::isToBeLogged(cl_logDEBUG1, QnLog::P2P_TRAN_LOG))
+        if (nx::utils::log::isToBeLogged(cl_logDEBUG1, this))
             printTran(connection, tran, Connection::Direction::outgoing);
 
         switch (connection->remotePeer().dataFormat)
