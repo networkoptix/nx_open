@@ -268,7 +268,6 @@ void Manager::updateEndpoints(const QnMediaServerResource* server)
     }
 
     auto port = (uint16_t) server->getPort();
-    NX_ASSERT(port);
     if (port == 0)
         return;
 

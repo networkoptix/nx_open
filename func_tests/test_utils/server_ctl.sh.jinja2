@@ -18,7 +18,7 @@ function start() {
     echo $PID > "$PID_PATH"
 }
 
-function wait_pid_is_dead() {
+function wait_until_process_is_dead() {
 	PID=$1
 	TIME_SEC=$2
 	for i in $(seq $TIME_SEC); do
@@ -39,10 +39,10 @@ function stop() {
 	if kill -0 $PID 2> /dev/null; then
 		echo "Sending SIGTERM to server PID $PID..."
 		kill -TERM $PID
-		if ! wait_pid_is_dead $PID 10; then
+		if ! wait_until_process_is_dead $PID 10; then
 			echo "Server still alive after 10 seconds, sending SIGKILL..."
 			kill -KILL $PID
-			if ! wait_pid_is_dead $PID 10; then
+			if ! wait_until_process_is_dead $PID 10; then
 				echo "Unable to kill server, bailing out."
 				return 1;
 			fi
