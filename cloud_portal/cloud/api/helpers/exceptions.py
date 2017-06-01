@@ -48,6 +48,19 @@ class ErrorCodes(Enum):
     deserialization_error = 'deserializationError'
     not_acceptable = 'notAcceptable'
 
+    def log_level(self):
+        if self in (ErrorCodes.ok,
+                    ErrorCodes.not_authorized,
+                    ErrorCodes.not_found,
+                    ErrorCodes.account_exists,
+                    ErrorCodes.wrong_old_password,
+                    ErrorCodes.account_not_activated):
+            return logging.INFO
+        if self in (ErrorCodes.forbidden,
+                    ErrorCodes.wrong_code):
+            return logging.WARNING
+        return logging.ERROR
+
 
 def api_success(data=None, status_code=status.HTTP_200_OK):
     if data is not None:
@@ -103,14 +116,7 @@ class APIException(Exception):
             }, status=self.status_code)
 
     def log_level(self):
-        if self.error_code in (ErrorCodes.not_authorized,
-                               ErrorCodes.not_found,
-                               ErrorCodes.account_exists,
-                               ErrorCodes.account_not_activated):
-            return logging.INFO
-        if self.error_code in (ErrorCodes.forbidden,):
-            return logging.WARNING
-        return logging.ERROR
+        return self.error_code.log_level()
 
 
 class APIInternalException(APIException):
