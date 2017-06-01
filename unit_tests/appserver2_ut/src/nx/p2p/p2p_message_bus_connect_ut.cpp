@@ -49,9 +49,9 @@ protected:
         const QString& errorMessage)
     {
         int syncDoneCounter = 0;
-        // wait for done
+        // Wait until done
         checkMessageBusInternal(checkFunction, errorMessage, true, syncDoneCounter);
-        // report error
+        // Report error
         if (syncDoneCounter != m_servers.size() * m_servers.size())
             checkMessageBusInternal(checkFunction, errorMessage, false, syncDoneCounter);
     }
@@ -80,11 +80,12 @@ protected:
                     if (!result)
                     {
                         if (!waitForSync)
-                            NX_LOG(lit("Peer %1 %2 to peer %3")
+                            NX_DEBUG(
+                                this,
+                                lit("Peer %1 %2 to peer %3")
                                 .arg(qnStaticCommon->moduleDisplayName(commonModule->moduleGUID()))
                                 .arg(errorMessage)
-                                .arg(qnStaticCommon->moduleDisplayName(commonModuleTo->moduleGUID())),
-                                cl_logDEBUG1);
+                                .arg(qnStaticCommon->moduleDisplayName(commonModuleTo->moduleGUID())));
                     }
                     else
                     {
@@ -106,7 +107,7 @@ protected:
         ec2::ApiTransactionDataList tranList;
         db->doQuery(ec2::ApiTranLogFilter(), tranList);
         qint64 totalDbData = 0;
-        for (const auto& tran : tranList)
+        for (const auto& tran: tranList)
             totalDbData += tran.dataSize;
 
         NX_LOG(lit("Total bytes sent: %1, dbSize: %2, ratio: %3")
@@ -116,7 +117,7 @@ protected:
 
         const auto& counters = Connection::sendCounters();
         qint64 webSocketBytes = 0;
-        for (int i = 0; i < (int)MessageType::counter; ++i)
+        for (int i = 0; i < (int) MessageType::counter; ++i)
             webSocketBytes += counters[i];
 
         NX_LOG(lit("Total bytes via P2P: %1, dbSize: %2, ratio: %3")
@@ -124,7 +125,7 @@ protected:
             .arg(totalDbData)
             .arg(webSocketBytes / (float)totalDbData), cl_logINFO);
 
-        for (int i = 0; i < (int)MessageType::counter; ++i)
+        for (int i = 0; i < (int) MessageType::counter; ++i)
         {
             NX_LOG(lit("P2P message: %1, bytes %2, dbSize: %3, ratio: %4")
                 .arg(toString(MessageType(i)))
@@ -136,7 +137,7 @@ protected:
         int totalConnections = 0;
         int startedConnections = 0;
         int connectionTries = 0;
-        for (const auto& server : m_servers)
+        for (const auto& server: m_servers)
         {
             ec2::Ec2DirectConnection* connection =
                 dynamic_cast<ec2::Ec2DirectConnection*> (server->moduleInstance()->ecConnection());
@@ -151,14 +152,15 @@ protected:
         }
 
         float k = (kInstanceCount - 1) * kInstanceCount;
-        NX_LOG(lit("Total connections: %1, ratio %2.  Opened %3, ratio %4.  Tries: %5, ratio %6")
+        NX_INFO(
+            this,
+            lit("Total connections: %1, ratio %2.  Opened %3, ratio %4.  Tries: %5, ratio %6")
             .arg(totalConnections)
             .arg(totalConnections / k)
             .arg(startedConnections)
             .arg(startedConnections / k)
             .arg(connectionTries)
-            .arg(connectionTries / k),
-            cl_logINFO);
+            .arg(connectionTries / k));
     }
 
     void addRuntimeData(const Appserver2Ptr& server)
@@ -200,13 +202,13 @@ protected:
         QElapsedTimer timer;
         timer.restart();
 
-        // check all peers have subscribed to each other
+        // Check all peers have subscribed to each other
         checkMessageBus(&checkSubscription, lm("is not subscribed"));
 
-        // check all peers is able to see each other
+        // Check all peers is able to see each other
         checkMessageBus(&checkDistance, lm("has not online distance"));
 
-        // check all runtime data are received
+        // Check all runtime data are received
         checkMessageBus(&checkRuntimeInfo, lm("missing runtime info"));
 
         int expectedCamerasCount = kInstanceCount;
