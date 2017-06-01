@@ -193,26 +193,27 @@ module.exports = function (grunt) {
             dist: {
                 options: {
                     middleware: function (connect, options) {
+                        var serveStatic = require('serve-static');
                         if (!Array.isArray(options.base)) {
-                            options.base = [options.base];
+                              options.base = [options.base];
                         }
 
+
+                        var proxyRequest = require('grunt-connect-proxy/lib/utils').proxyRequest;
                         // Setup the proxy
-                        var middlewares = [require('grunt-connect-proxy/lib/utils').proxyRequest];
+                        var middlewares = [
+                            function(req, res, options) {
+                                delete req.headers.host;
+                                proxyRequest(req, res, options);
+                            },
+                            //require('grunt-connect-proxy/lib/utils').proxyRequest,
+                            require('grunt-connect-rewrite/lib/utils').rewriteRequest
+                        ];
 
                         // Serve static files.
                         options.base.forEach(function (base) {
-                            middlewares.push(connect.static(base));
+                            middlewares.push(serveStatic(base));
                         });
-
-
-
-                        var rewriteRulesSnippet = require('grunt-connect-rewrite/lib/utils').rewriteRequest;
-                        middlewares.push(rewriteRulesSnippet);
-
-                        // Make directory browse-able.
-                        var directory = options.directory || options.base[options.base.length - 1];
-                        middlewares.push(connect.directory(directory));
 
                         return middlewares;
                     },
@@ -745,9 +746,10 @@ module.exports = function (grunt) {
         if (target === 'dist') {
             return grunt.task.run([
                 'build',
+                'configureRewriteRules',
                 'configureProxies:server',
-                //'connect:livereload',
-                'connect:dist:keepalive'
+                'connect:dist',
+                'watch'
             ]);
         }
 

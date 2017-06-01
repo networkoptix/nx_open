@@ -455,7 +455,7 @@ angular.module('nxCommon').controller('ViewCtrl',
 
             //One more IE hack.
             if(window.jscd.browser === 'Microsoft Internet Explorer') {
-                var videoWidth = $('header').width() - $('.cameras-panel').outerWidth(true) - 1;
+                var videoWidth = $header.width() - $camerasPanel.outerWidth(true) - 1;
                 $('videowindow').parent().css('width', videoWidth + 'px');
             }
         };

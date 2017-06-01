@@ -105,6 +105,10 @@ $font-size-a-bit-large:   ceil($font-size-base * 1.15); //~16px - we just need 1
 .nav > li > a:hover {
   background-color: $light2 !important;
 }
+.nav > li.no-hover>a:hover{
+  cursor:default;
+  background-color: transparent !important;
+}
 
 .nav-tabs > li > a{
   line-height: 16px;

@@ -1,6 +1,7 @@
 'use strict';
 angular.module('nxCommon')
-    .factory('camerasProvider', function ($localStorage, $q, $poll) {
+    .factory('camerasProvider', ['$localStorage', '$q', '$poll',
+    function ($localStorage, $q, $poll) {
         var reloadInterval = Config.webclient.reloadInterval;//30 seconds
 
         function camerasProvider(system){
@@ -316,4 +317,4 @@ angular.module('nxCommon')
                 return new camerasProvider(system);
             }
         };
-    });
+    }]);
