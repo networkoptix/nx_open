@@ -19,10 +19,10 @@ CloudUserInfoPoolSupplier::CloudUserInfoPoolSupplier(QnCommonModule* commonModul
 {
     for (const auto& userResource: resourcePool()->getResources<QnUserResource>())
     {
-        auto value = userResource->getProperty(kCloudAuthInfoKey);
-        if (value.isEmpty())
-            continue;
-        reportInfoChanged(userResource->getName(), value);
+        onNewResource(userResource);
+        reportInfoChanged(
+            userResource->getName(),
+            userResource->getProperty(kCloudAuthInfoKey));
     }
     connectToResourcePool();
 }
