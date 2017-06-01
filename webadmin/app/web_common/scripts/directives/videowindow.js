@@ -49,7 +49,7 @@ angular.module('nxCommon')
                 scope.jshlsHideError = Config.debug.jshlsHideError && Config.allowDebugMode;
                 scope.jshlsDebugMode = Config.debug.jshlsDebug && Config.allowDebugMode;
                 scope.videoFlags = {};
-                scope.videoFlags.loading = false;
+                scope.loading = false;
                 
                 function getFormatSrc(mediaformat) {
                     var src = _.find(scope.vgSrc,function(src){return src.type == mimeTypes[mediaformat];});
@@ -71,10 +71,10 @@ angular.module('nxCommon')
                         noFormat: false,
                         errorLoading: false,
                         ieNoWebm: false,
-                        loading: false,
                         ieWin10: false,                    
                         ubuntuNX: false
                     };
+                    scope.loading = false;
 
                     if(scope.debugMode && scope.activeFormat != "Auto"){
                         return scope.activeFormat;
@@ -213,7 +213,7 @@ angular.module('nxCommon')
 
                             if (scope.vgSrc) {
                                 $timeout(function () {
-                                scope.videoFlags.loading = !!format;
+                                scope.loading = !!format;
                                 });
 
                                 if(format == 'webm' && window.jscd.os == "Android" ){ // TODO: this is hach for android bug. remove it later
@@ -221,7 +221,7 @@ angular.module('nxCommon')
                                         $timeout.cancel(autoshow);
                                     }
                                     autoshow = $timeout(function () {
-                                    scope.videoFlags.loading = false;
+                                    scope.loading = false;
                                         autoshow = null;
                                     },20000);
                                 }
@@ -230,7 +230,7 @@ angular.module('nxCommon')
 
                                 scope.vgApi.addEventListener("timeupdate", function (event) {
                                     var video = event.srcElement || event.originalTarget;
-                                scope.videoFlags.loading = false;
+                                scope.loading = false;
                                     scope.vgUpdateTime({$currentTime: video.currentTime, $duration: video.duration});
                                 });
 
@@ -282,7 +282,7 @@ angular.module('nxCommon')
                                 scope.vgApi = api;
                                 if (scope.vgSrc) {
                                     $timeout(function () {
-                                        scope.videoFlags.loading = !!format;
+                                        scope.loading = !!format;
                                     });
                                     scope.vgApi.load(getFormatSrc('hls'));
 
@@ -292,7 +292,7 @@ angular.module('nxCommon')
                             }, function (error) {
                                 $timeout(function () {
                                     scope.videoFlags.errorLoading = true;
-                                    scope.videoFlags.loading = false;
+                                    scope.loading = false;
                                     scope.flashls = false;// Kill flashls with his error
                                     scope.native = false;
                                     scoep.jsHls = false;
@@ -300,7 +300,7 @@ angular.module('nxCommon')
                                 console.error(error);
                             }, function (position, duration) {
                                 if (position != 0) {
-                                    scope.videoFlags.loading = false;
+                                    scope.loading = false;
                                     scope.vgUpdateTime({$currentTime: position, $duration: duration});
                                 }
                             });
@@ -319,12 +319,12 @@ angular.module('nxCommon')
                             scope.vgApi = api;
                             if (scope.vgSrc) {
                                 $timeout(function(){
-                                scope.videoFlags.loading = !!format;
+                                scope.loading = !!format;
                                 });
                                 scope.vgApi.load(getFormatSrc('hls'));
                                 scope.vgApi.addEventListener("timeupdate", function (event) {
                                     var video = event.srcElement || event.originalTarget;
-                                scope.videoFlags.loading = false;
+                                scope.loading = false;
                                     scope.vgUpdateTime({$currentTime: video.currentTime, $duration: video.duration});
                                 });
                             }
@@ -342,7 +342,7 @@ angular.module('nxCommon')
 
                 var format = null;
                 function srcChanged(){
-                    scope.videoFlags.loading = false;
+                    scope.loading = false;
                     scope.videoFlags.errorLoading = false;
                     if(scope.vgSrc ) {
                         format = detectBestFormat();

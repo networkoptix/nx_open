@@ -169,5 +169,5 @@ var flashlsAPI = function(flashObject) {
 		return this.flashObject.getAutoLevelCapping();
 	}
 
-}
+};
 

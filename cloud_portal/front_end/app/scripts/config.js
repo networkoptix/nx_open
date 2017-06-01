@@ -19,7 +19,7 @@ var Config = {
     minSystemsToSearch: 9, //We need at least 9 system to enable search
     maxSystemsForHeader: 6, // Dropdown at the top is limited in terms of number of cameras to display
 
-    redirectAuthorised:'/systems/default', // Page for redirecting all authorised users
+    redirectAuthorised:'/systems', // Page for redirecting all authorised users
     redirectUnauthorised:'/', // Page for redirecting all unauthorised users by default
 
     systemStatuses: {

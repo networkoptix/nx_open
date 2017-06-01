@@ -1,5 +1,5 @@
 <div class="cameras-panel">
-    <div class="cameras-search" ng-class="{active:searchCams!=''}">
+    <div class="cameras-search" ng-class="{active:searchCams!=''}" ng-model-options="{ updateOn: 'default', debounce: 0 }">
         <label class="input-group input-group">
             <span class="input-group-addon icon" ><span class="glyphicon glyphicon-search"></span></span>
             <input type="search" class="form-control" placeholder="Search" ng-model="searchCams" ng-class="{'raise-input-up': searchCams}">
@@ -36,7 +36,7 @@
                 </div>
             </a>
             <ul class="nav "
-                collapse="server.collapsed"
+                collapse="server.collapsed" uib-collapse="server.collapsed"
                 ng-class="{edge: (server.flags.indexOf('SF_Edge')>=0) && !server.allowAutoRedundancy}" >
                 <li ng-repeat="camera in cameras[server.id]"
                     ng-class="{active:activeCamera===camera}"
