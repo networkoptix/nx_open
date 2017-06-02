@@ -10,6 +10,13 @@
 namespace nx {
 namespace db {
 
+QString toString(DBResult result)
+{
+    return QnLexical::serialized(result);
+}
+
+//-------------------------------------------------------------------------------------------------
+
 namespace {
 
 const QLatin1String kDbDriverName("db/driverName");
@@ -112,6 +119,28 @@ bool ConnectionOptions::operator==(const ConnectionOptions& rhs) const
         inactivityTimeout == rhs.inactivityTimeout &&
         maxPeriodQueryWaitsForAvailableConnection == rhs.maxPeriodQueryWaitsForAvailableConnection &&
         maxErrorsInARowBeforeClosingConnection == rhs.maxErrorsInARowBeforeClosingConnection;
+}
+
+//-------------------------------------------------------------------------------------------------
+
+Exception::Exception(DBResult dbResult):
+    base_type(QnLexical::serialized(dbResult).toStdString()),
+    m_dbResult(dbResult)
+{
+}
+
+Exception::Exception(
+    DBResult dbResult,
+    const std::string& errorDescription)
+    :
+    base_type(errorDescription),
+    m_dbResult(dbResult)
+{
+}
+
+DBResult Exception::dbResult() const
+{
+    return m_dbResult;
 }
 
 } // namespace db

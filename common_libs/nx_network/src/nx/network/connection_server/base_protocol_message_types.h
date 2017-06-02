@@ -36,7 +36,7 @@ public:
     virtual ~AbstractMessageParser() = default;
 
     /** Set message object to parse to. */
-    virtual void setMessage(Message* const msg) = 0;
+    virtual void setMessage(Message* const message) = 0;
 
     /**
      * Returns current parse state.

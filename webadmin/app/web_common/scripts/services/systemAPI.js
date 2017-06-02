@@ -85,6 +85,7 @@ angular.module('nxCommon')
                         return self.unauthorizedCallBack().then(function(){
                             return self._wrapRequest(method, url, data, config, true);
                         },function(){
+                            $rootScope.$broadcast("unauthirosed_" + self.systemId);
                             return $q.reject(error);
                         });
                     }

@@ -36,6 +36,8 @@ function(detect_package_versions)
 
     if(box STREQUAL "bananapi")
         set(_ffmpeg_version "3.1.1-bananapi")
+        set(_qt_version "5.6.1")
+        set(_openssl_version "1.0.0j")
     endif()
 
     if(box STREQUAL "rpi")
@@ -100,7 +102,7 @@ function(get_dependencies)
     nx_rdep_add_package(openssl)
     nx_rdep_add_package(ffmpeg)
 
-    if(box MATCHES "bpi")
+    if(box MATCHES "bpi|bananapi")
         nx_rdep_add_package(sysroot)
     endif()
 

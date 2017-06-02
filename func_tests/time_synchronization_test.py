@@ -119,12 +119,15 @@ def get_box_time(box):
 def discover_primary_server(env):
     time_response_one = env.one.rest_api.ec2.getCurrentTime.GET()
     time_response_two = env.two.rest_api.ec2.getCurrentTime.GET()
-    if time_response_one['isPrimaryTimeServer']:
+    one_is_primary = time_response_one['isPrimaryTimeServer']
+    two_is_primary = time_response_two['isPrimaryTimeServer']
+    assert not (one_is_primary and two_is_primary), 'Both servers are reported to be primary'
+    if one_is_primary:
         env.primary = env.one
         env.primary_box = env.one_box
         env.secondary = env.two
         env.secondary_box = env.two_box
-    if time_response_two['isPrimaryTimeServer']:
+    elif two_is_primary:
         env.primary = env.two
         env.primary_box = env.two_box
         env.secondary = env.one

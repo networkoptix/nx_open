@@ -85,6 +85,11 @@ QString toString(const std::chrono::microseconds& value)
     return QString(QLatin1String("%1usec")).arg(value.count());
 }
 
+QString toString(const std::type_info& value)
+{
+    return demangleTypeName(value.name());
+}
+
 QString demangleTypeName(const char* type)
 {
     auto typeName = boost::core::demangle(type);

@@ -83,6 +83,9 @@ public:
      */
     virtual QString getExternalUniqKey() const;
 
+    /** Virtual assignment operation. */
+    virtual void assign(const QnAbstractBusinessAction& other);
+
 protected:
     QnBusiness::ActionType m_actionType;
     QnBusiness::EventState m_toggleState;

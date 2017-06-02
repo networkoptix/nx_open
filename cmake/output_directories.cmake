@@ -9,7 +9,7 @@ function(set_output_directories)
     endif()
 
     if(CMAKE_MULTI_CONFIGURATION_MODE)
-        set(configs ${CMAKE_CONFIGURATION_TYPES})
+        set(configs ${CMAKE_ACTIVE_CONFIGURATIONS})
     else()
         set(configs " ")
     endif()

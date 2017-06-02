@@ -3,6 +3,7 @@
 #include <QtCore/QFileInfo>
 
 #include <core/resource/resource.h>
+#include <core/resource_access/user_access_data.h>
 
 #include "network/tcp_connection_priv.h"
 #include "core/resource_management/resource_pool.h"
@@ -79,7 +80,9 @@ int QnExternalBusinessEventRestHandler::executeGet(
     if (businessParams.eventType == QnBusiness::UndefinedEvent)
         businessParams.eventType = QnBusiness::UserDefinedEvent; // default value for type is 'CustomEvent'
 
-    if (!qnBusinessRuleConnector->createEventFromParams(businessParams, eventState, &errStr))
+    const auto& userId = owner->accessRights().userId;
+
+    if (!qnBusinessRuleConnector->createEventFromParams(businessParams, eventState, userId, &errStr))
         result.setError(QnRestResult::InvalidParameter, errStr);
 
     return CODE_OK;

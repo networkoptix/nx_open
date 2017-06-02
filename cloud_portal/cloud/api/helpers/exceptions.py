@@ -277,6 +277,14 @@ def handle_exceptions(func):
     :param func:
     :return:
     """
+    def clean_passwords(dictionary):
+        if isinstance(dictionary, dict):
+            if 'password' in dictionary:
+                dictionary['password'] = '*****'
+            if 'new_password' in dictionary:
+                dictionary['password'] = '****'
+            if 'old_password' in dictionary:
+                dictionary['password'] = '***'
 
     def log_error(request, error, log_level):
         page_url = 'unknown'
@@ -297,10 +305,7 @@ def handle_exceptions(func):
         if isinstance(error, APIException):
             error_text = "{}({})".format(error.error_text, error.error_code)
             if error.error_data:
-                if 'password' in error.error_data:
-                    error.error_data['password'] = '*****'
-                if 'old_password' in error.error_data:
-                    error.error_data['password'] = '***'
+                clean_passwords(error.error_data)
             error_formatted = 'Status: {}\nMessage: {}\nError code: {}\nError data: {}'.\
                               format(error.status_code,
                                      error.error_text,
@@ -311,6 +316,7 @@ def handle_exceptions(func):
             error_text = 'unknown'
             error_formatted = 'Unexpected error'
 
+        clean_passwords(request_data)
         error_formatted = '\n{}:{}\nPortal URL: {}\nUser: {}\nUser IP:{}\nRequest: {}\n{}\nCall Stack: \n{}'.\
             format(error.__class__.__name__,
                    error_text,

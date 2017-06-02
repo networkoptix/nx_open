@@ -293,7 +293,7 @@ void HttpServerConnection::addMessageBodyHeaders(
                         static_cast<qulonglong>(contentLength.get()))));
         }
     }
-    else
+    else if (nx_http::StatusCode::isMessageBodyAllowed(response->statusLine.statusCode))
     {
         nx_http::insertOrReplaceHeader(
             &response->headers,

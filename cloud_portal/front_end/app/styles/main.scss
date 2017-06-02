@@ -4,6 +4,7 @@
 @import '_theme_variables';
 @import '../bower_components/bootstrap-sass/assets/stylesheets/bootstrap';
 @import '_theme_override';
+@import '_header';
 
 @import '_big_brother';
 @import '_languages';
@@ -410,37 +411,6 @@ td{
 }
 
 
-.vertical-bar{
-  border-right: 1px solid $common-border-color;
-  height: 24px;
-  margin: 16px 0;
-}
-.vertical-bar.margin-right{
-    margin-right:16px;
-}
-
-.hidden-collapsed{
-    display:block;
-}
-
-.hidden-expanded{
-    display:none;
-}
-
-@media (max-width: $grid-float-breakpoint-max) {
-  .navbar-collapse .vertical-bar{
-    display: none;
-  }
-
-  .hidden-collapsed{
-    display:none;
-  }
-
-  .hidden-expanded{
-    display:block;
-  }
-}
-
 /* add beta-symbol after product name everywhere */
 /*.product-name.add-version:after{
   content: "\03B2";
@@ -744,9 +714,9 @@ h2.version-number{
 
 .glyphicon-user{
     @include kill-glyphicon;
-    width: 18px;
+    width: 20px;
     height: 18px;
-    background-position: -3px -34px;
+    background-position: -2px -34px;
 }
 
 .glyphicon-share{
@@ -767,10 +737,14 @@ button .icon-caret{
 .icon-caret{
   @include icon;
   display: inline-block;
-  background-position: 2px 0px;
+  width: 12px;
+  background-position: -2px 0px;
 
   margin-left:$padding-input-horizontal/2;
   margin-top: 2px;
+}
+.open .icon-caret{
+  background-position: -2px -14px ;
 }
 .close-icon{
   @include icon;

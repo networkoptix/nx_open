@@ -273,6 +273,10 @@ bool changeLocalSystemId(const ConfigureSystemData& data, ec2::QnTransactionMess
 
     if (data.localSystemId.isNull())
         commonModule->globalSettings()->resetCloudParams();
+
+    if (!data.systemName.isEmpty())
+        commonModule->globalSettings()->setSystemName(data.systemName);
+
     commonModule->globalSettings()->setLocalSystemId(data.localSystemId);
     commonModule->globalSettings()->synchronizeNowSync();
 

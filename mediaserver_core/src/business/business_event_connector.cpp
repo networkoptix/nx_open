@@ -117,12 +117,16 @@ void QnBusinessEventConnector::at_cameraInput(const QnResourcePtr &resource, con
     );
 }
 
-void QnBusinessEventConnector::at_softwareTrigger(const QnResourcePtr& resource, const QString& triggerId, qint64 timeStamp, QnBusiness::EventState toggleState)
+void QnBusinessEventConnector::at_softwareTrigger(const QnResourcePtr& resource,
+    const QString& triggerId, const QnUuid& userId, qint64 timeStamp,
+    QnBusiness::EventState toggleState)
 {
     if (!resource)
         return;
 
-    QnSoftwareTriggerEventPtr triggerEvent(new QnSoftwareTriggerEvent(resource->toSharedPointer(), triggerId, timeStamp, toggleState));
+    QnSoftwareTriggerEventPtr triggerEvent(new QnSoftwareTriggerEvent(resource->toSharedPointer(),
+        triggerId, userId, timeStamp, toggleState));
+
     qnBusinessRuleProcessor->processBusinessEvent(triggerEvent);
 }
 
@@ -163,7 +167,8 @@ void QnBusinessEventConnector::at_archiveBackupFinished(const QnResourcePtr &res
     qnBusinessRuleProcessor->processBusinessEvent(bEvent);
 }
 
-bool QnBusinessEventConnector::createEventFromParams(const QnBusinessEventParameters& params, QnBusiness::EventState eventState, QString* errMessage)
+bool QnBusinessEventConnector::createEventFromParams(const QnBusinessEventParameters& params,
+    QnBusiness::EventState eventState, const QnUuid& userId, QString* errMessage)
 {
     QnResourcePtr resource = resourcePool()->getResourceById(params.eventResourceId);
     bool isOnState = eventState == QnBusiness::ActiveState;
@@ -202,7 +207,7 @@ bool QnBusinessEventConnector::createEventFromParams(const QnBusinessEventParame
                     *errMessage = "'SoftwareTriggerEvent' requires 'resource' parameter";
                 return false;
             }
-            at_softwareTrigger(resource, params.inputPortId, params.eventTimestampUsec, eventState);
+            at_softwareTrigger(resource, params.inputPortId, userId, params.eventTimestampUsec, eventState);
             break;
         case QnBusiness::CameraDisconnectEvent:
             if (!resource) {

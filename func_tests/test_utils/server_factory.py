@@ -39,8 +39,8 @@ class ServerFactory(object):
             server = box.get_server(config)
         self._prepare_server(config, server)
         self._allocated_servers.append(server)
-        log.info('SERVER: %s at %s, rest_api=%s ecs_guid=%r local_system_id=%r',
-                 server.name, server.host, server.rest_api_url, server.ecs_guid, server.local_system_id)
+        log.info('SERVER %s: %s at %s, rest_api=%s ecs_guid=%r local_system_id=%r',
+                 server.title, server.name, server.host, server.rest_api_url, server.ecs_guid, server.local_system_id)
         return server
 
     def _prepare_server(self, config, server):

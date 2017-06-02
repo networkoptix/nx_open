@@ -313,6 +313,12 @@ protected:
             nx_http::getHeaderValue(m_httpResponse.headers, "Upgrade"));
     }
 
+    void assertNoMessageBodyHeadersPresent()
+    {
+        ASSERT_TRUE(m_httpResponse.headers.find("Content-Length") == m_httpResponse.headers.end());
+        ASSERT_TRUE(m_httpResponse.headers.find("Content-Type") == m_httpResponse.headers.end());
+    }
+
 private:
     nx_http::Response m_httpResponse;
 
@@ -336,6 +342,12 @@ TEST_F(HttpAsyncServerConnectionUpgrade, required_headers_are_added_to_response)
 {
     issueUpgradeRequest();
     assertThatResponseIsValid();
+}
+
+TEST_F(HttpAsyncServerConnectionUpgrade, response_with_1xx_status_does_not_contain_content_length)
+{
+    issueUpgradeRequest();
+    assertNoMessageBodyHeadersPresent();
 }
 
 } // namespace nx_http

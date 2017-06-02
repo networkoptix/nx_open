@@ -113,7 +113,7 @@ DBResult UpdateWithoutAnyDataExecutor::executeQuery(QSqlDatabase* const connecti
         return result;
     }
 
-    result = m_dbUpdateFunc(&queryContext);
+    result = invokeDbQueryFunc(m_dbUpdateFunc, &queryContext);
     if (result != DBResult::ok)
     {
         result = detailResultCode(connection, result);
@@ -156,7 +156,7 @@ DBResult UpdateWithoutAnyDataExecutorNoTran::executeQuery(QSqlDatabase* const co
 {
     auto completionHandler = std::move(m_completionHandler);
     QueryContext queryContext(connection, nullptr);
-    auto result = m_dbUpdateFunc(&queryContext);
+    auto result = invokeDbQueryFunc(m_dbUpdateFunc, &queryContext);
     result = detailResultCode(connection, result);
     completionHandler(&queryContext, result);
     return result;
@@ -183,7 +183,7 @@ DBResult SelectExecutor::executeQuery(QSqlDatabase* const connection)
 {
     auto completionHandler = std::move(m_completionHandler);
     QueryContext queryContext(connection, nullptr);
-    auto result = m_dbSelectFunc(&queryContext);
+    auto result = invokeDbQueryFunc(m_dbSelectFunc, &queryContext);
     result = detailResultCode(connection, result);
     completionHandler(&queryContext, result);
     return result;
