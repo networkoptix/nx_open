@@ -113,7 +113,7 @@ $max-header-item-width: 212px;
 
         &.dropdown{
             &>a>span{
-                &:first-child{
+                &.glyphicon{
                     margin-left: -2px;
                     margin-right: 14px;
                 }
