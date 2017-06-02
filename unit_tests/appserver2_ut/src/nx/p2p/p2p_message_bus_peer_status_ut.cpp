@@ -1,4 +1,4 @@
-#include "p2p_message_bus_base_ut.h"
+#include "p2p_message_bus_test_base.h"
 
 #include <QtCore/QElapsedTimer>
 
@@ -30,6 +30,7 @@ public:
             QObject::disconnect(bus, nullptr, nullptr, nullptr);
         }
     }
+
 protected:
     static const int kWaitTimeout = 1000 * 10;
 
@@ -101,6 +102,7 @@ protected:
     void rhombConnectMain()
     {
         startAllServers(circleConnect);
+        ASSERT_TRUE(m_servers.size() >= 3);
         m_servers[1]->moduleInstance()->ecConnection()->messageBus()->dropConnections();
         m_servers[2]->moduleInstance()->ecConnection()->messageBus()->dropConnections();
         waitForCondition(std::bind(&MessageBusOnlinePeers::isPeerLost, this, 2));
@@ -110,10 +112,12 @@ protected:
     void sequenceConnectMain()
     {
         startAllServers(sequenceConnect);
+        ASSERT_TRUE(m_servers.size() >= 2);
         m_servers[1]->moduleInstance()->ecConnection()->messageBus()->dropConnections();
         waitForCondition(std::bind(&MessageBusOnlinePeers::isPeerLost, this, 2));
         waitForCondition(std::bind(&MessageBusOnlinePeers::isPeerLost, this, 3));
     }
+
 private:
     std::set<QnUuid> m_alivePeers;
 };
