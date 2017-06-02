@@ -134,8 +134,12 @@ angular.module('nxCommon')
 
         /* Authentication */
         ServerConnection.prototype.getCurrentUser = function (forcereload){
+            var self = this;
             if(!this.cacheCurrentUser || forcereload){
-                this.cacheCurrentUser = this._get('/api/getCurrentUser');
+                this.cacheCurrentUser = this._get('/api/getCurrentUser').catch(function(error){
+                    self.cacheCurrentUser = null; // Clear cache in case of errors
+                    return $q.reject(error);
+                });
             }
             return this.cacheCurrentUser;
         };

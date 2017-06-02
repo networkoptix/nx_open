@@ -42,7 +42,7 @@ angular.module('cloudApp')
             return cloudApi.getSystemAuth(self.id).then(function(data){
                 self.auth = data.data.authGet;
                 return self.mediaserver.setAuthKeys(data.data.authGet, data.data.authPost, data.data.authPlay);
-            })
+            });
         };
         system.prototype.updateSystemState = function(){
             this.stateMessage = '';
