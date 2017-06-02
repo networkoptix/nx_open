@@ -1,6 +1,6 @@
 /**
  * @file
- * Helper functions for calculating Http Digest (rfc2617).
+ * Helper functions for calculating HTTP Digest (rfc2617).
  */
 
 #pragma once

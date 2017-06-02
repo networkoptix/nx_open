@@ -69,7 +69,7 @@ struct NX_NETWORK_API ci_less:
     }
 };
 
-/** Http header container.
+/** HTTP header container.
  * WARNING: This is multimap(!) to allow same header be present multiple times in a 
  * single http message. 
  * To insert or replace use nx_http::insertOrReplaceHeader
@@ -454,14 +454,14 @@ public:
     StringType toString() const;
 };
 
-/** Contains http header structures. */
+/** Contains HTTP header structures. */
 namespace header {
 
 /** Common header name constants. */
 extern NX_NETWORK_API const StringType kContentType;
 extern NX_NETWORK_API const StringType kUserAgent;
 
-/** Http authentication scheme enumeration. */
+/** HTTP authentication scheme enumeration. */
 namespace AuthScheme {
 
 enum Value
