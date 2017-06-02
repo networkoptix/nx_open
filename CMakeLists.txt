@@ -48,6 +48,7 @@ include(qrc_utils)
 include(precompiled_header)
 include(mercurial)
 include(project_utils)
+include(test_utils)
 
 include(android-ndk-workaround)
 

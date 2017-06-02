@@ -1,1 +1,1 @@
-nx_add_target(cloud_db_ut EXECUTABLE PUBLIC_LIBS libcloud_db GTest GMock)
+nx_add_test(cloud_db_ut PUBLIC_LIBS libcloud_db GTest GMock)
