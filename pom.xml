@@ -48,7 +48,6 @@
         <evidence_plugin.guid>{061d1513-9a37-4d14-90f5-11d42d2d7827}</evidence_plugin.guid>
         <genericrtspplugin.guid>{7fafaf1d-0d3d-42ea-aa11-4ffce0f170f9}</genericrtspplugin.guid>
         <image_library_plugin.guid>{62b24237-9c9d-4900-b32d-aa678317b4ba}</image_library_plugin.guid>
-        <isd_native_plugin.guid>{9d3f6a6f-ec63-4269-bf34-cc1060f80e90}</isd_native_plugin.guid>
         <it930x_plugin.guid>{2c75d1b9-a6f1-4aa6-9d7e-8c0e602bd8fd}</it930x_plugin.guid>
         <mjpg_link.guid>{c8a846fd-d881-45d8-9f6c-c3e02eaf5763}</mjpg_link.guid>
         <quicksyncdecoder.guid>{84ca6c5b-525e-438a-940c-50c14db49c66}</quicksyncdecoder.guid>
@@ -143,6 +142,7 @@
         <newmobile/>
         <liteMode>false</liteMode>
         <iosTarget>iphoneos</iosTarget>
+        <paxton>false</paxton>
 
         <template>lib</template>
         <noQmlInQrc>false</noQmlInQrc>
@@ -274,7 +274,7 @@
         <artifact.name.cloud_debug>${artifact.name.prefix}-cloud_debug-${artifact.name.suffix}</artifact.name.cloud_debug>
         <artifact.name.testcamera>${artifact.name.prefix}-testcamera-${artifact.name.suffix}</artifact.name.testcamera>
 
-        <nxcloud.version>1.0.150</nxcloud.version>
+        <nxcloud.version>latest</nxcloud.version>
     </properties>
 
     <build>
@@ -596,7 +596,7 @@
                 <windows>true</windows>
                 <unix>false</unix>
                 <script.extension>bat</script.extension>
-                <global.windows.defines>ENABLE_VMAX</global.windows.defines>
+                <global.windows.defines>ENABLE_VMAX _WINSOCKAPI_=</global.windows.defines>
                 <machine.type>X64</machine.type>
                 <qt.version>5.6.1-1</qt.version>
                 <artifact.name.platform>win64</artifact.name.platform>
@@ -641,9 +641,6 @@
                 <module>plugins/nxcontrol</module>
                 <module>plugins/acs/paxton-plugin</module>
             </modules>
-            <properties>
-                <paxton>true</paxton>
-            </properties>
         </profile>
         <profile>
             <id>windows-nomobile</id>
@@ -848,7 +845,7 @@
         </profile>
 
         <profile>
-            <id>linux-isd-jaguar</id>
+            <id>linux-edge1</id>
             <activation>
                 <activeByDefault>false</activeByDefault>
                 <os>
@@ -857,36 +854,7 @@
                 </os>
                 <property>
                     <name>box</name>
-                    <value>isd</value>
-                </property>
-            </activation>
-            <properties>
-                <toolchain.version>codesourcery-2014.05</toolchain.version>
-                <qt.spec/>
-                <openssl.version>1.0.0j</openssl.version>
-                <quazip.version>0.7.2</quazip.version>
-                <gcc.version>4.8.3</gcc.version>
-                <additional.defines>DISABLE_ALL_VENDORS DISABLE_SOFTWARE_MOTION_DETECTION DISABLE_DESKTOP_CAMERA EDGE_SERVER debug_in_release</additional.defines>
-                <modification>isd</modification>
-                <rdep.target>isd</rdep.target>
-            </properties>
-            <modules>
-                <module>plugins/isd_native_plugin</module>
-                <module>edge_firmware/isd</module>
-            </modules>
-        </profile>
-
-        <profile>
-            <id>linux-isd-s2</id>
-            <activation>
-                <activeByDefault>false</activeByDefault>
-                <os>
-                    <family>unix</family>
-                    <name>linux</name>
-                </os>
-                <property>
-                    <name>box</name>
-                    <value>isd_s2</value>
+                    <value>edge1</value>
                 </property>
             </activation>
             <properties>
@@ -895,13 +863,12 @@
                 <quazip.version>0.7.2</quazip.version>
                 <gcc.version>4.9.3</gcc.version>
                 <additional.defines>DISABLE_ALL_VENDORS DISABLE_DESKTOP_CAMERA EDGE_SERVER debug_in_release</additional.defines>
-                <modification>isd_s2</modification>
+                <modification>edge1</modification>
                 <rdep.target>isd_s2</rdep.target>
                 <rdep.packages>cpro</rdep.packages>
                 <qt.spec/>
             </properties>
             <modules>
-                <module>plugins/isd_native_plugin</module>
                 <module>edge_firmware/isd</module>
             </modules>
         </profile>

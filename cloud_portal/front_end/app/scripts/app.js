@@ -80,15 +80,6 @@ angular.module('cloudApp', [
             templateUrl: Config.viewsDir + 'systems.html',
             controller: 'SystemsCtrl'
         })
-        .when('/systems/default', {
-            // Special mode - user will be redirected to default system if default system can be determined (if user has one system)
-            title: L.pageTitles.systems,
-            templateUrl: Config.viewsDir + 'systems.html',
-            controller: 'SystemsCtrl',
-            resolve: {
-                test: ['$route',function ($route) { $route.current.params.defaultMode = true; }]
-            }
-        })
         .when('/systems/:systemId', {
             title: L.pageTitles.system,
             templateUrl: Config.viewsDir + 'system.html',

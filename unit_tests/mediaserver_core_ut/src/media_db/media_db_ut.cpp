@@ -16,7 +16,6 @@
 #include <utils/common/writer_pool.h>
 #include "plugins/storage/file_storage/file_storage_resource.h"
 #include <recorder/storage_manager.h>
-#include <plugins/storage/file_storage/file_storage_resource.h>
 #include <core/resource_management/status_dictionary.h>
 #include <common/common_module.h>
 #include <core/resource_management/resource_properties.h>

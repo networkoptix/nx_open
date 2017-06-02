@@ -1,18 +1,12 @@
 #include "ldap_manager.h"
 
-#include <api/global_settings.h>
-#include <common/common_module.h>
+#include "api/global_settings.h"
+#include <nx/utils/log/log.h>
 #include <iostream>
-#include <cstdio>
 #include <sstream>
 
 #include <QtCore/QCryptographicHash>
-
-#include <nx/utils/log/log.h>
-#include <nx/utils/string.h>
-
-#include <utils/crypt/symmetrical.h>
-
+#include <stdio.h>
 
 #ifdef Q_OS_WIN
 #include <Windows.h>
@@ -45,6 +39,8 @@
 #include <QCryptographicHash>
 
 #include "network/authutil.h"
+#include <common/common_module.h>
+#include <nx/utils/string.h>
 
 namespace {
     Qn::LdapResult translateErrorCode(LDAP_RESULT ldapCode)
@@ -202,20 +198,24 @@ namespace {
 QnLdapManager::QnLdapManager(QnCommonModule* commonModule):
     QnCommonModuleAware(commonModule)
 {
+    connect(commonModule->globalSettings(), &QnGlobalSettings::ldapSettingsChanged, this, &QnLdapManager::clearCache);
 }
 
-QnLdapManager::~QnLdapManager() {
+QnLdapManager::~QnLdapManager()
+{
 }
 
-class LdapSession {
+class LdapSession
+{
 public:
     LdapSession(const QnLdapSettings &settings);
     ~LdapSession();
 
     bool connect();
-    bool fetchUsers(QnLdapUsers &users);
+    bool fetchUsers(QnLdapUsers &users, const QString& additionFilter = QString());
+    QString getUserDn(const QString& login);
     bool testSettings();
-    Qn::AuthResult authenticateWithDigest(const QString &login, const QString &digest);
+    Qn::AuthResult authenticate(const QString &dn, const QString &password);
     QString getRealm();
 
     LDAP_RESULT lastErrorCode() const;
@@ -231,9 +231,9 @@ private:
     LDAP *m_ld;
 };
 
-LdapSession::LdapSession(const QnLdapSettings &settings)
-    : m_settings(settings),
-      m_ld(0)
+LdapSession::LdapSession(const QnLdapSettings &settings):
+    m_settings(settings),
+    m_ld(nullptr)
 {
 }
 
@@ -304,7 +304,17 @@ bool LdapSession::connect()
     return true;
 }
 
-bool LdapSession::fetchUsers(QnLdapUsers &users)
+QString LdapSession::getUserDn(const QString& login)
+{
+    QnLdapUsers users;
+    bool result = fetchUsers(users, lit("%1=%2").arg(m_dType->UidAttr()).arg(login));
+    if (!result || users.isEmpty())
+        return QString();
+
+    return users[0].dn;
+}
+
+bool LdapSession::fetchUsers(QnLdapUsers &users, const QString& customFilter)
 {
     LDAP_RESULT rc = ldap_simple_bind_s(m_ld, QSTOCW(m_settings.adminDn), QSTOCW(m_settings.adminPassword));
     if (rc != LDAP_SUCCESS)
@@ -315,7 +325,8 @@ bool LdapSession::fetchUsers(QnLdapUsers &users)
 
     LDAPMessage *result, *e;
 
-    QString filter = QnLdapFilter(m_dType->Filter()) & m_settings.searchFilter;
+    QString filter = QnLdapFilter(m_dType->Filter()) &
+        (customFilter.isEmpty() ? m_settings.searchFilter : customFilter);
     rc = ldap_search_ext_s(m_ld, QSTOCW(m_settings.searchBase), LDAP_SCOPE_SUBTREE, filter.isEmpty() ? 0 : QSTOCW(filter), NULL, 0, NULL, NULL, LDAP_NO_LIMIT, LDAP_NO_LIMIT, &result);
     if (rc != LDAP_SUCCESS)
     {
@@ -370,87 +381,17 @@ bool LdapSession::testSettings()
     return true;
 }
 
-Qn::AuthResult LdapSession::authenticateWithDigest(const QString &login, const QString &digest)
+Qn::AuthResult LdapSession::authenticate(const QString &dn, const QString &password)
 {
-    QUrl uri = m_settings.uri;
-
-    struct berval cred;
-    cred.bv_len = 0;
-    cred.bv_val = 0;
-
-    // The servresp will contain the digest-challange after the first call.
-    berval *servresp = NULL;
-    LDAP_RESULT res;
-
-    ldap_sasl_bind_s(m_ld, EMPTY_STR, DIGEST_MD5, &cred, NULL, NULL, &servresp);
-    ldap_get_option(m_ld, LDAP_OPT_ERROR_NUMBER, &res);
-    if (res != LDAP_SASL_BIND_IN_PROGRESS) {
-        m_lastErrorCode = res;
-        return Qn::Auth_LDAPConnectError;
-    }
-
-    QMap<QByteArray, QByteArray> responseDictionary;
-    QByteArray initialResponse(servresp->bv_val, servresp->bv_len);
-    for (QByteArray line : nx::utils::smartSplit(initialResponse, ',')) {
-        line = line.trimmed();
-        int eqIndex = line.indexOf('=');
-        if (eqIndex == -1)
-            continue;
-
-        responseDictionary[line.mid(0, eqIndex)] = nx::utils::unquoteStr(line.mid(eqIndex + 1));
-    }
-
-    if (!responseDictionary.contains("realm") || !responseDictionary.contains("nonce"))
-        return Qn::Auth_WrongDigest;
-
-    QByteArray realm = responseDictionary["realm"];
-    QByteArray nonce = responseDictionary["nonce"];
-
-    // TODO: Generate cnonce
-    QByteArray cnonce = "12345";
-    QByteArray nc = "00000001";
-    QByteArray qop = "auth";
-    QByteArray digestUri = QByteArray("ldap/") + m_settings.uri.host().toLatin1();
-
-    QMap<QByteArray, QByteArray> authDictionary;
-    authDictionary["username"] = login.toUtf8();
-    authDictionary["realm"] = realm;
-    authDictionary["nonce"] = nonce;
-    authDictionary["digest-uri"] = digestUri;
-    authDictionary["cnonce"] = cnonce;
-    authDictionary["nc"] = nc;
-    authDictionary["qop"] = qop;
-
-    QByteArray ha1 = md5(QByteArray::fromHex(digest.toLatin1()) + ":" + nonce + ":" + cnonce).toHex();
-    QByteArray ha2 = md5(QByteArray("AUTHENTICATE:") + digestUri).toHex();
-    authDictionary["response"] = md5(ha1 + ":" + nonce + ":" + nc + ":" + cnonce + ":" + qop + ":" + ha2).toHex();
-
-    QByteArray authRequest;
-    for (auto i = authDictionary.constBegin(); i != authDictionary.constEnd(); ++i) {
-        if (i != authDictionary.constBegin()) {
-            authRequest += ", ";
-        }
-
-        authRequest += i.key();
-        authRequest += "=";
-        if (i.key() != "nc" && i.key() != "qop")
-            authRequest += "\"" + i.value() + "\"";
-        else
-            authRequest += i.value();
-    }
-
-    cred.bv_val = const_cast<char*>(authRequest.data());
-    cred.bv_len = authRequest.size();
-
-    servresp = NULL;
-    ldap_sasl_bind_s(m_ld, EMPTY_STR, DIGEST_MD5, &cred, NULL, NULL, &servresp);
-    ldap_get_option(m_ld, LDAP_OPT_ERROR_NUMBER, &res);
-    if (res == LDAP_SUCCESS)
-        return Qn::Auth_OK;
-    else {
-        m_lastErrorCode = res;
+    int rc = ldap_simple_bind_s(m_ld, QSTOCW(dn), QSTOCW(password));
+    // TODO: vig, check error code to give more detailed error description
+    if (rc != LDAP_SUCCESS)
+    {
+        m_lastErrorCode = rc;
         return Qn::Auth_WrongPassword;
     }
+
+    return Qn::Auth_OK;
 }
 
 QString LdapSession::getRealm()
@@ -473,7 +414,7 @@ QString LdapSession::getRealm()
 
     QMap<QByteArray, QByteArray> responseDictionary;
     QByteArray initialResponse(servresp->bv_val, servresp->bv_len);
-    for (QByteArray line : nx::utils::smartSplit(initialResponse, ',')) {
+    for (QByteArray line: nx::utils::smartSplit(initialResponse, ',')) {
         line = line.trimmed();
         int eqIndex = line.indexOf('=');
         if (eqIndex == -1)
@@ -552,35 +493,53 @@ Qn::LdapResult QnLdapManager::fetchUsers(QnLdapUsers &users, const QnLdapSetting
     return Qn::Ldap_NoError;
 }
 
-Qn::LdapResult QnLdapManager::fetchUsers(QnLdapUsers &users) {
-    QnLdapSettings settings = qnGlobalSettings->ldapSettings();
+Qn::LdapResult QnLdapManager::fetchUsers(QnLdapUsers &users)
+{
+    QnLdapSettings settings = commonModule()->globalSettings()->ldapSettings();
     return fetchUsers(users, settings);
 }
 
-Qn::AuthResult QnLdapManager::authenticateWithDigest(const QString &login, const QString &digest) {
-    QnLdapSettings settings = qnGlobalSettings->ldapSettings();
+Qn::AuthResult QnLdapManager::authenticate(const QString &login, const QString &password)
+{
+    QnLdapSettings settings = commonModule()->globalSettings()->ldapSettings();
     LdapSession session(settings);
     if (!session.connect())
     {
-        NX_LOG( QString::fromLatin1("QnLdapManager::authenticateWithDigest: connect(): %1").arg(session.lastErrorString()), cl_logWARNING );
+        NX_LOG( QString::fromLatin1("QnLdapManager::authenticate: connect(): %1").arg(session.lastErrorString()), cl_logWARNING );
         return Qn::Auth_LDAPConnectError;
     }
 
-    auto authResult = session.authenticateWithDigest(login, digest);
+    QString dn;
+    {
+        QnMutexLocker lock(&m_cacheMutex);
+        dn = m_dnCache.value(login);
+    }
+    if (dn.isEmpty())
+    {
+        dn = session.getUserDn(login);
+        if (dn.isEmpty())
+            return Qn::Auth_WrongLogin;
+
+        QnMutexLocker lock(&m_cacheMutex);
+        m_dnCache[login] = dn;
+    }
+
+    auto authResult = session.authenticate(dn, password);
     if (authResult != Qn::Auth_OK)
-        NX_LOG( QString::fromLatin1("QnLdapManager::authenticateWithDigest: authenticateWithDigest(): %1").arg(session.lastErrorString()), cl_logWARNING );
+        NX_LOG( QString::fromLatin1("QnLdapManager::authenticate: authenticate(): %1").arg(session.lastErrorString()), cl_logWARNING );
 
     return authResult;
 }
 
 Qn::AuthResult  QnLdapManager::realm(QString* realm) const
 {
-    QnLdapSettings settings = qnGlobalSettings->ldapSettings();
+    QnLdapSettings settings = commonModule()->globalSettings()->ldapSettings();
     QString uriString = settings.uri.toString();
     *realm = QString();
 
-    QnMutexLocker _lock(&m_realmCacheMutex);
-    if (m_realmCache.find(uriString) == m_realmCache.end() ) {
+    QnMutexLocker _lock(&m_cacheMutex);
+    if (m_realmCache.find(uriString) == m_realmCache.end() )
+    {
         LdapSession session(settings);
         if (!session.connect())
         {
@@ -612,4 +571,11 @@ QString QnLdapManager::errorMessage(Qn::LdapResult ldapResult)
     default:
         return lit("Invalid ldap settings");
     }
+}
+
+void QnLdapManager::clearCache()
+{
+    QnMutexLocker lock(&m_cacheMutex);
+    m_realmCache.clear();
+    m_dnCache.clear();
 }

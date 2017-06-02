@@ -19,8 +19,6 @@
 
         <qt.libs>core</qt.libs>
         <global.libs>-lcommon</global.libs>
-
-        <windows.defines>WIN32_LEAN_AND_MEAN</windows.defines>
     </properties>
     <dependencies>
         <dependency>

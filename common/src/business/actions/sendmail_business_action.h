@@ -22,6 +22,9 @@ public:
 
     const QnBusinessAggregationInfo &aggregationInfo() const;
     void setAggregationInfo(const QnBusinessAggregationInfo &info);
+
+    virtual void assign(const QnAbstractBusinessAction& other) override;
+
 private:
     QnBusinessAggregationInfo m_aggregationInfo;
 };

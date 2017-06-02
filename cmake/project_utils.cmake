@@ -47,6 +47,12 @@ function(nx_add_target name type)
     if("${type}" STREQUAL "EXECUTABLE")
         add_executable(${name} ${sources})
         set_target_properties(${name} PROPERTIES SKIP_BUILD_RPATH OFF)
+
+        if(WINDOWS)
+            # Include "msvc.user.props" into each Visual Studio project.
+            set_target_properties(${name} PROPERTIES
+                VS_USER_PROPS ${CMAKE_BINARY_DIR}/msvc.user.props)
+        endif()
     elseif("${type}" STREQUAL "LIBRARY")
         add_library(${name} ${NX_LIBRARY_TYPE} ${sources})
     endif()

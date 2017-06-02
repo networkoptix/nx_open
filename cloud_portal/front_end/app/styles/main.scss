@@ -11,6 +11,9 @@
 @import 'common';
 .webclient-page{
     margin-bottom: 0;
+    .navbar{
+        box-shadow: none;
+    }
     .webclient{
         margin-top: -10px !important;
     }
@@ -712,7 +715,7 @@ h2.version-number{
 
 @mixin icon{
   display: inline-block;
-  background-size: 112px 32px;
+  background-size: 112px 56px;
   width: 16px;
   height: 16px;
   display: inline-block;
@@ -723,11 +726,25 @@ h2.version-number{
 }
 
 @mixin kill-glyphicon{
-    top:2px;
+  top:2px;
   @include icon;
   &:before{
     content:none;
   }
+}
+
+.glyphicon-home{
+    @include kill-glyphicon;
+    width: 20px;
+    height: 18px;
+    background-position: -26px -34px;
+}
+
+.glyphicon-user{
+    @include kill-glyphicon;
+    width: 18px;
+    height: 18px;
+    background-position: -3px -34px;
 }
 
 .glyphicon-share{

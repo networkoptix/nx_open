@@ -525,7 +525,7 @@ module.exports = function (grunt) {
             },
 
             pull: {
-                command: 'hg pull;hg up;python ../../devtools/util/merge_dev.py -r vms_3.1;'
+                command: 'hg pull;hg up;python ../../devtools/util/merge_dev.py -r default;'
             },
             merge_release: {
                 command: 'hg pull;hg up;python ../../devtools/util/merge_dev.py -r release_3.0;python ../../devtools/util/merge_dev.py -t release_3.0;hg push;'

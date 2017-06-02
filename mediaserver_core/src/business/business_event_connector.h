@@ -80,9 +80,12 @@ public slots:
 
     void at_archiveBackupFinished(const QnResourcePtr &resource, qint64 timeStamp, QnBusiness::EventReason reasonCode, const QString& reasonText);
 
-    void at_softwareTrigger(const QnResourcePtr& resource, const QString& triggerId, qint64 timeStamp, QnBusiness::EventState toggleState);
+    void at_softwareTrigger(const QnResourcePtr& resource, const QString& triggerId, const QnUuid& userId,
+        qint64 timeStamp, QnBusiness::EventState toggleState);
 
-    bool createEventFromParams(const QnBusinessEventParameters& params, QnBusiness::EventState eventState, QString* errMessage = 0);
+    bool createEventFromParams(const QnBusinessEventParameters& params, QnBusiness::EventState eventState,
+        const QnUuid& userId = QnUuid(), QString* errMessage = nullptr);
+
 private slots:
     void onNewResource(const QnResourcePtr &resource);
 };

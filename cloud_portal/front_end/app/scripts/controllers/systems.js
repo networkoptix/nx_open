@@ -34,7 +34,7 @@ angular.module('cloudApp')
             logoutForbidden: true
         }).then(function(result){
             // Special mode - user will be redirected to default system if default system can be determined (if user has one system)
-            if($routeParams.defaultMode && result.data.length == 1){
+            if(result.data.length == 1){
                 $scope.openSystem(result.data[0]);
                 return;
             }

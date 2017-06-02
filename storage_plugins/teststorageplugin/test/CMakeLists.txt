@@ -1,4 +1,4 @@
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
+set_output_directories(RUNTIME "bin")
 
 nx_add_target(
     teststorageplugin_ut 

@@ -8,16 +8,12 @@
 #include <nx/utils/uuid.h>
 #include <utils/threaded_image_loader.h>
 
-namespace {
-const QLatin1String folder("wallpapers");
-}
-
 namespace nx {
 namespace client {
 namespace desktop {
 
 ServerImageCache::ServerImageCache(QObject *parent) :
-    base_type(folder, parent)
+    base_type(Qn::kWallpapersFolder, parent)
 {
 }
 

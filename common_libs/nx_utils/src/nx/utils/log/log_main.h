@@ -1,15 +1,5 @@
 #pragma once
 
-/**@file
- * New logging system to replace log.h.
- *
- * Usage:
- * <pre><code>
- *     NX_<LEVEL>(TAG) << MESSAGE; //< Writes MESSAGE to log if LEVEL and TAG allow.
- *     NX_<LEVEL>(TAG, MESSAGE); //< The same as above, but shorter syntax;
- * </code></pre>
- */
-
 #include "log_logger.h"
 #include "to_string.h"
 
@@ -35,24 +25,39 @@ void NX_UTILS_API removeLoggers(const std::set<QString>& filters);
 template<typename Tag = QString>
 bool isToBeLogged(Level level, const Tag& tag = {})
 {
-    const auto tagString = ::toString(tag);
+    using ::toString;
+    const auto tagString = toString(tag);
     return getLogger(tagString)->isToBeLogged(level, tagString);
 }
 
-#define NX_UTILS_LOG_MESSAGE(LEVEL, TAG, MESSAGE) do \
-{ \
-    const auto tag = ::toString(TAG); \
-    const auto logger = nx::utils::log::getLogger(tag); \
-    if (logger->isToBeLogged(LEVEL, tag)) \
-        logger->log(LEVEL, tag, ::toString(MESSAGE)); \
-} while (0)
+namespace detail {
 
-template<typename Tag>
-class Stream
+class NX_UTILS_API Helper
 {
 public:
-    Stream(Level level, const Tag& tag): m_level(level), m_tag(tag) {}
-    ~Stream(){ NX_UTILS_LOG_MESSAGE(m_level, m_tag, m_strings.join(' ')); }
+    Helper(Level level, const QString& tag);
+    void log(const QString& message);
+    operator bool() const;
+
+protected:
+   const Level m_level;
+   const QString m_tag;
+   std::shared_ptr<Logger> m_logger;
+};
+
+template<typename Tag>
+Helper makeHelper(Level level, const Tag& tag)
+{
+    using ::toString;
+    return Helper(level, toString(tag));
+}
+
+class NX_UTILS_API Stream: public Helper
+{
+public:
+    Stream(Level level, const QString& tag);
+    ~Stream();
+    operator bool() const;
 
     template<typename Value>
     Stream& operator<<(const Value& value)
@@ -63,18 +68,40 @@ public:
     }
 
 private:
-    const Level m_level;
-    const Tag& m_tag;
     QStringList m_strings;
 };
 
+template<typename Tag>
+Stream makeStream(Level level, const Tag& tag)
+{
+    using ::toString;
+    return Stream(level, toString(tag));
+}
+
+} // namespace detail
+
+#define NX_UTILS_LOG_MESSAGE(LEVEL, TAG, MESSAGE) do \
+{ \
+    if (auto helper = nx::utils::log::detail::makeHelper(LEVEL, TAG)) \
+        helper.log(::toString(MESSAGE)); \
+} while (0)
+
 #define NX_UTILS_LOG_STREAM(LEVEL, TAG) \
-    if (!isToBeLogged(LEVEL, TAG)) {} else nx::utils::log::Stream<decltype(TAG)>(LEVEL, TAG)
+    if (auto stream = nx::utils::log::detail::makeStream(LEVEL, TAG)) {} else stream <<
 
 #define NX_UTILS_LOG(...) \
     NX_MSVC_EXPAND(NX_GET_4TH_ARG(__VA_ARGS__, \
         NX_UTILS_LOG_MESSAGE, NX_UTILS_LOG_STREAM, args_required)(__VA_ARGS__))
 
+/**
+ * Usage:
+ *     NX_<LEVEL>(TAG) MESSAGE; //< Writes MESSAGE to log if LEVEL and TAG allow.
+ *     NX_<LEVEL>(TAG, MESSAGE); //< The same as above, but shorter syntax;
+ *
+ * Examples:
+ *     NX_ERROR(this) "Unexpected value" << value;
+ *     NX_INFO(this, lm("Expected value %1").arg(value));
+ */
 #define NX_ALWAYS(...) NX_UTILS_LOG(nx::utils::log::Level::always, __VA_ARGS__)
 #define NX_ERROR(...) NX_UTILS_LOG(nx::utils::log::Level::error, __VA_ARGS__)
 #define NX_WARNING(...) NX_UTILS_LOG(nx::utils::log::Level::warning, __VA_ARGS__)

@@ -125,7 +125,7 @@ chmod 755 $BINSTAGE/*
 
 # Prepare DEBIAN dir
 mkdir -p $STAGE/DEBIAN
-chmod g-s $STAGE/DEBIAN
+chmod g-s,go+rx $STAGE/DEBIAN
 
 INSTALLED_SIZE=`du -s $STAGE | awk '{print $1;}'`
 

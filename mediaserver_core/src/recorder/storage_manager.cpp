@@ -1440,37 +1440,48 @@ QnRecordingStatsData QnStorageManager::mergeStatsFromCatalogs(qint64 bitrateAnal
 
 void QnStorageManager::removeEmptyDirs(const QnStorageResourcePtr &storage)
 {
-    std::function<bool (const QnAbstractStorageResource::FileInfoList &)> recursiveRemover =
-        [&](const QnAbstractStorageResource::FileInfoList &fl)
-    {
-        for (const auto& entry : fl)
+    const std::function<bool(const QnAbstractStorageResource::FileInfoList&, size_t)> removeEmptyDir =
+        [&](const QnAbstractStorageResource::FileInfoList& fl, size_t depthLimit)
         {
-            if (entry.isDir())
+            for (const auto& entry: fl)
             {
-                QnAbstractStorageResource::FileInfoList dirFileList =
-                    storage->getFileList(
-                        entry.absoluteFilePath()
-                    );
-                if (!dirFileList.isEmpty() && !recursiveRemover(dirFileList))
+                if (entry.isDir())
+                {
+                    if (depthLimit == 0)
+                    {
+                        NX_LOGX(lm("Directory depth is above the limit, corrupted file system? %1")
+                            .arg(entry.absoluteFilePath()), cl_logERROR);
+
+                        return false;
+                    }
+
+                    const auto dirFileList = storage->getFileList(entry.absoluteFilePath());
+                    if (!dirFileList.isEmpty() && !removeEmptyDir(dirFileList, depthLimit - 1))
+                        return false;
+
+                    // Ignore error here, trying to clean as much as we can.
+                    storage->removeDir(entry.absoluteFilePath());
+                }
+                else
+                {
+                    // We've met file. Solid reason to stop.
                     return false;
-                // ignore error here, trying to clean as much as we can
-                storage->removeDir(entry.absoluteFilePath());
+                }
             }
-            else // we've met file. solid reason to stop
-                return false;
-        }
-        return true;
-    };
+
+            return true;
+        };
 
     auto qualityFileList = storage->getFileList(storage->getUrl());
     for (const auto &qualityEntry : qualityFileList)
     {
-        if (qualityEntry.isDir()) // quality
+        if (qualityEntry.isDir()) //< Quality.
         {
             auto cameraFileList = storage->getFileList(qualityEntry.absoluteFilePath());
-            for (const auto &cameraEntry : cameraFileList)
-            {   // for every year folder
-                recursiveRemover(storage->getFileList(cameraEntry.absoluteFilePath()));
+            for (const auto &cameraEntry : cameraFileList) //< For every year folder.
+            {
+                static const size_t kDepthLimit = 10; //< Little more depth, than required.
+                removeEmptyDir(storage->getFileList(cameraEntry.absoluteFilePath()), kDepthLimit);
             }
         }
     }
