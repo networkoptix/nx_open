@@ -68,6 +68,7 @@ QnMediaServerModule::QnMediaServerModule(
 
     m_commonModule = store(new QnCommonModule(/*clientMode*/ false));
 #ifdef ENABLE_VMAX
+    // It depend on Vmax480Resources in the pool. Pool should be cleared before QnVMax480Server destructor.
     store(new QnVMax480Server(commonModule()));
 #endif
 
