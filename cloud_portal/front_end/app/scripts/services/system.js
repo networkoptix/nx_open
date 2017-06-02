@@ -39,8 +39,9 @@ angular.module('cloudApp')
             if(!force && self.auth){ //no need to update
                 return $q.resolve(true);
             }
+            self.auth = false;
             return cloudApi.getSystemAuth(self.id).then(function(data){
-                self.auth = data.data.authGet;
+                self.auth = true;
                 return self.mediaserver.setAuthKeys(data.data.authGet, data.data.authPost, data.data.authPlay);
             });
         };
