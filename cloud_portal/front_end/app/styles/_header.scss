@@ -8,6 +8,9 @@ $max-dropdown-width: 320px;
 $max-header-item-width: 212px;
 
 
+/* here we kill $grid-float-breakpoint-max to */
+$header-collapsing-width-1: 1px;
+
 .navbar{
 
     border-top:none;
@@ -26,7 +29,6 @@ $max-header-item-width: 212px;
             margin:(($header-height - $logo-height)/2) 0;
         }
     }
-
 
     .nav>li{
         margin:0;
@@ -125,61 +127,102 @@ $max-header-item-width: 212px;
                 }
             }
         }
+    }
 
-        &>.dropdown-menu {
-            background-clip: border-box;
-            min-width: 100%;
-            padding: $vertical-spacing/2 0;
-            border-radius: 0;
+    .dropdown-menu {
+        background-clip: border-box;
+        min-width: 100%;
+        padding: $vertical-spacing/2 0;
+        border-radius: 0;
 
-            margin-top: 1px;
-            border: 1px solid $navbar-default-bg;
+        margin-top: 1px;
+        border: 1px solid $navbar-default-bg;
 
-            &:before {
-                content: " ";
-                position: absolute;
-                z-index: -1;
-                top: 0px;
-                left: -2px;
-                right: -2px;
-                bottom: -2px;
-                border: 1px solid $navbar-default-border;
-                border-top: none;
+        &:before {
+            content: " ";
+            position: absolute;
+            z-index: -1;
+            top: 0px;
+            left: -2px;
+            right: -2px;
+            bottom: -2px;
+            border: 1px solid $navbar-default-border;
+            border-top: none;
 
-                @include box-shadow(0 2px 4px transparentize($dark15,0.8));
-            }
+            @include box-shadow(0 2px 4px transparentize($dark15,0.8));
+        }
 
-            & > li > a{
-                line-height: 32px;
-                padding: 0 $horizontal-spacing;
-                font-size: $font-size-base;
+        & > li > a{
+            line-height: 32px !important;
+            padding: 0 $horizontal-spacing !important;
+            font-size: $font-size-base;
 
-                text-overflow: ellipsis;
+            text-overflow: ellipsis;
+            overflow: hidden;
+            max-width: 100%;
+            @media (min-width: $grid-float-breakpoint) {
                 max-width: $max-dropdown-width;
-                overflow: hidden;
+            }
 
+            &:hover{
+                background-color: $light2 !important;
+                border-right: 1px solid $light2;
+                border-left: 1px solid $light2;
+                margin-right: -1px;
+                margin-left: -1px;
+            }
+
+            .system-owner{
+                color:$light10;
+            }
+        }
+        @media (max-width: $grid-float-breakpoint-max) {
+            & > li.active > a{
+                margin-left: -1px;
+                border-left: $active-border-width solid $brand_core;
+                padding-left: $horizontal-spacing - $active-border-width;
                 &:hover{
-                    border-right: 1px solid $light2;
-                    border-left: 1px solid $light2;
-                    margin-right: -1px;
-                    margin-left: -1px;
-                }
-
-
-                .system-owner{
-                    color:$light10;
+                    background-color: transparent !important;
                 }
             }
+        }
 
-            .nav-divider{
-                margin: $vertical-spacing/2 $horizontal-spacing;
-            }
+        .nav-divider{
+            margin: $vertical-spacing/2 $horizontal-spacing;
+        }
+    }
 
-            &.dropdown-right{
-                right:auto;
+
+
+    /* This is to prevent top menu from collapsing */
+    & > div > .navbar-nav > li {
+        float: left;
+    }
+    .navbar-header {
+        float: left;
+    }
+    .navbar-right {
+        float: right !important;
+        margin-right: 0;
+    }
+
+    @media (max-width: $grid-float-breakpoint-max) {
+        .open{
+            position:static; /* It was relative, but we remove it to allow dropdown to take the whole width of the screen*/
+            .dropdown-menu {
+                position: absolute;
+                border: 1px solid $navbar-default-bg;
+                background-color: $navbar-default-bg;
+                margin-top: 1px;
             }
         }
     }
+
+    .navbar-left {
+        float: left !important;
+    }
+    /* / End of This is to prevent top menu from collapsing*/
+
 
     .hidden-collapsed{
         display:block;
@@ -190,7 +233,7 @@ $max-header-item-width: 212px;
     }
 
     @media (max-width: $grid-float-breakpoint-max) {
-      .navbar-collapse .vertical-bar{
+      .vertical-bar{
         display: none;
       }
 
@@ -200,6 +243,14 @@ $max-header-item-width: 212px;
 
       .hidden-expanded{
         display:block;
+      }
+      .icon-caret,
+      .ellipsis{
+        display:none !important;
+      }
+
+      .glyphicon{
+        margin-right:0 !important;
       }
     }
 
