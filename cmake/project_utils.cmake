@@ -1,3 +1,14 @@
+# build_source_groups(<source root path> <list of source files with absolute paths> <name of root group>)
+function(build_source_groups _src_root_path _source_list _root_group_name)
+    foreach(_source IN ITEMS ${_source_list})
+        get_filename_component(_source_path "${_source}" PATH)
+        file(RELATIVE_PATH _source_path_rel "${_src_root_path}" "${_source_path}")
+        string(REPLACE "/" "\\" _group_path "${_source_path_rel}")
+        string(REPLACE .. ${_root_group_name} result_group_path "${_group_path}")
+        source_group("${result_group_path}" FILES "${_source}")
+    endforeach()
+endfunction()
+
 function(nx_add_target name type)
     set(options NO_MOC NO_PCH)
     set(oneValueArgs LIBRARY_TYPE)
@@ -43,6 +54,10 @@ function(nx_add_target name type)
     endif()
 
     set(sources ${sources} ${NX_ADDITIONAL_SOURCES} ${NX_OTHER_RESOURCES} ${NX_OTHER_SOURCES})
+
+    if(WINDOWS)
+        build_source_groups("${CMAKE_CURRENT_SOURCE_DIR}" "${sources}" "src")
+    endif()
 
     if("${type}" STREQUAL "EXECUTABLE")
         add_executable(${name} ${sources})
