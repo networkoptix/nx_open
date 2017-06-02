@@ -4,6 +4,7 @@
 
 #include <QtWidgets/QApplication>
 #include <QtWidgets/QGraphicsLinearLayout>
+#include <QtWidgets/QPushButton>
 
 #include <ui/animation/opacity_animator.h>
 #include <ui/common/palette.h>
@@ -37,6 +38,7 @@ const char* kActionIndexPropertyName = "_qn_actionIndex";
 
 static constexpr int kColorSignMargin = 4;
 static constexpr int kHorizontalMargin = 12;
+static constexpr int kExtraHorizontalMargin = 28;
 static constexpr int kVerticalMargin = 6;
 static constexpr int kNotificationIconWidth = 24;
 
@@ -109,8 +111,9 @@ void QnNotificationToolTipWidget::setEnclosingGeometry(const QRectF& enclosingGe
 // -------------------------------------------------------------------------- //
 QnNotificationWidget::QnNotificationWidget(QGraphicsItem* parent, Qt::WindowFlags flags) :
     base_type(parent, flags),
-    m_defaultActionIdx(-1),
-    m_layout(new QGraphicsLinearLayout(Qt::Horizontal)),
+    m_defaultActionIdx(-1),    
+    m_verticalLayout(new QGraphicsLinearLayout(Qt::Vertical)),
+    m_primaryLayout(new QGraphicsLinearLayout(Qt::Horizontal)),
     m_textLabel(new QnProxyLabel(this)),
     m_closeButton(new QnImageButtonWidget(this)),
     m_notificationLevel(QnNotificationLevel::Value::OtherNotification),
@@ -138,12 +141,14 @@ QnNotificationWidget::QnNotificationWidget(QGraphicsItem* parent, Qt::WindowFlag
 
     connect(m_textLabel, &QnProxyLabel::linkActivated, this, &QnNotificationWidget::linkActivated);
 
-    m_layout->setContentsMargins(kHorizontalMargin, kVerticalMargin,
-        closeButtonSize.width(), kVerticalMargin);
-    m_layout->addItem(m_textLabel);
-    m_layout->setStretchFactor(m_textLabel, 1.0);
+    m_primaryLayout->setContentsMargins(0, 0, closeButtonSize.width(), 0);
+    m_primaryLayout->addItem(m_textLabel);
+    m_primaryLayout->setStretchFactor(m_textLabel, 1.0);
 
-    setLayout(m_layout);
+    m_verticalLayout->setSpacing(8);
+    m_verticalLayout->setContentsMargins(kHorizontalMargin, kVerticalMargin, 0, kVerticalMargin);
+    m_verticalLayout->addItem(m_primaryLayout);
+    setLayout(m_verticalLayout);
 
     m_tooltipWidget->setFocusProxy(this);
     m_tooltipWidget->setOpacity(0.0);
@@ -252,8 +257,10 @@ void QnNotificationWidget::setGeometry(const QRectF& geometry)
 }
 
 void QnNotificationWidget::addActionButton(
-    const QIcon& icon, action::IDType actionId,
-    const action::Parameters& parameters, bool defaultAction)
+    const QIcon& icon,
+    ActionType actionId,
+    const ParametersType& parameters,
+    bool defaultAction)
 {
     QnImageButtonWidget* button = new QnImageButtonWidget(this);
     button->setAcceptHoverEvents(false);
@@ -271,7 +278,7 @@ void QnNotificationWidget::addActionButton(
     layout->addItem(button);
     layout->setAlignment(button, Qt::AlignHCenter);
     layout->addStretch();
-    m_layout->insertItem(0, layout);
+    m_primaryLayout->insertItem(0, layout);
 
     connect(button, &QnImageButtonWidget::clicked, this, [this, actionId, parameters]()
     {
@@ -279,6 +286,35 @@ void QnNotificationWidget::addActionButton(
         emit actionTriggered(actionId, parameters);
     });
     m_actions << ActionData(actionId, parameters); //still required for thumbnails click and base notification click
+}
+
+void QnNotificationWidget::addTextButton(
+    const QIcon& icon,
+    const QString& text,
+    ActionType actionId,
+    const ParametersType& parameters)
+{
+    auto button = new QPushButton();
+    if (!text.isEmpty())
+        button->setText(text);
+    if (!icon.isNull())
+        button->setIcon(icon);
+
+    connect(button, &QAbstractButton::clicked, this,
+        [this, actionId, parameters]()
+        {
+            emit buttonClicked(getFullAlias(QnLexical::serialized(actionId)));
+            emit actionTriggered(actionId, parameters);
+        });
+
+    auto proxy = new QGraphicsProxyWidget();
+    proxy->setWidget(button);
+
+    auto rowLayout = new QGraphicsLinearLayout(Qt::Horizontal);
+    rowLayout->setContentsMargins(kNotificationIconWidth, 0, kHorizontalMargin, 0);
+    rowLayout->addItem(proxy);
+    rowLayout->addStretch(1);
+    m_verticalLayout->addItem(rowLayout);
 }
 
 void QnNotificationWidget::triggerDefaultAction()
