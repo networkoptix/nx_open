@@ -28,8 +28,7 @@ class Settings;
 
 } // namespace
 
-class TemporaryAccountCredentialsEx
-:
+class TemporaryAccountCredentialsEx:
     public data::TemporaryAccountCredentials
 {
 public:
@@ -37,24 +36,36 @@ public:
     std::string accessRightsStr;
 
     TemporaryAccountCredentialsEx() {}
-    TemporaryAccountCredentialsEx(const TemporaryAccountCredentialsEx& right)
-    :
+    TemporaryAccountCredentialsEx(const TemporaryAccountCredentialsEx& right):
         data::TemporaryAccountCredentials(right),
         id(right.id),
         accessRightsStr(right.accessRightsStr)
     {
     }
-    TemporaryAccountCredentialsEx(data::TemporaryAccountCredentials&& right)
-    :
+    TemporaryAccountCredentialsEx(data::TemporaryAccountCredentials&& right):
         data::TemporaryAccountCredentials(std::move(right))
     {
     }
 };
 
-#define TemporaryAccountCredentialsEx_Fields TemporaryAccountCredentials_Fields (id)(accessRightsStr)
+#define TemporaryAccountCredentialsEx_Fields \
+    TemporaryAccountCredentials_Fields (id)(accessRightsStr)
 
-class TemporaryAccountPasswordManager
-:
+//-------------------------------------------------------------------------------------------------
+
+class AbstractTemporaryAccountPasswordManager
+{
+public:
+    virtual ~AbstractTemporaryAccountPasswordManager() = default;
+
+    virtual boost::optional<TemporaryAccountCredentialsEx> getCredentialsByLogin(
+        const std::string& login) const = 0;
+};
+
+//-------------------------------------------------------------------------------------------------
+
+class TemporaryAccountPasswordManager:
+    public AbstractTemporaryAccountPasswordManager,
     public AbstractAuthenticationDataProvider
 {
 public:
@@ -78,7 +89,7 @@ public:
     std::string generateRandomPassword() const;
     /**
      * Adds password and password digest.
-     * If \a data->login is empty, random login is generated
+     * If data->login is empty, random login is generated.
      */
     void addRandomCredentials(data::TemporaryAccountCredentials* const data);
 
@@ -92,8 +103,8 @@ public:
         nx::db::QueryContext* const queryContext,
         data::TemporaryAccountCredentials tempPasswordData);
 
-    boost::optional<TemporaryAccountCredentialsEx> getCredentialsByLogin(
-        const std::string& login) const;
+    virtual boost::optional<TemporaryAccountCredentialsEx> getCredentialsByLogin(
+        const std::string& login) const override;
 
 private:
     typedef boost::multi_index::multi_index_container<

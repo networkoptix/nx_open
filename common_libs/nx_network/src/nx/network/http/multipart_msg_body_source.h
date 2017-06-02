@@ -7,7 +7,7 @@
 namespace nx_http {
 
 /**
- * Used to generate and stream Http multipart message body.
+ * Used to generate and stream HTTP multipart message body.
  */
 class NX_NETWORK_API MultipartMessageBodySource:
     public AbstractMsgBodySource

@@ -674,10 +674,14 @@ nx::utils::Subscription<std::string>& SystemManager::systemMarkedAsDeletedSubscr
     return m_systemMarkedAsDeletedSubscription;
 }
 
-const nx::utils::Subscription<std::string>&
-    SystemManager::systemMarkedAsDeletedSubscription() const
+void SystemManager::addSystemSharingExtension(AbstractSystemSharingExtension* extension)
 {
-    return m_systemMarkedAsDeletedSubscription;
+    m_systemSharingExtensions.insert(extension);
+}
+
+void SystemManager::removeSystemSharingExtension(AbstractSystemSharingExtension* extension)
+{
+    m_systemSharingExtensions.erase(extension);
 }
 
 std::pair<std::string, std::string> SystemManager::extractSystemIdAndVmsUserId(
@@ -943,6 +947,18 @@ nx::db::DBResult SystemManager::shareSystem(
     dbResult = addNewSharing(queryContext, *inviteeAccount, sharing);
     if (dbResult != nx::db::DBResult::ok)
         return dbResult;
+
+    dbResult = invokeSystemSharingExtension(
+        &AbstractSystemSharingExtension::afterSharingSystem,
+        queryContext,
+        sharing,
+        isNewAccount ? SharingType::invite : SharingType::sharingWithExistingAccount);
+    if (dbResult != nx::db::DBResult::ok)
+    {
+        NX_LOGX(lm("Error invoking system sharing extension (%1, %2). %3")
+            .arg(sharing.systemId).arg(inviteeAccount->email).arg(dbResult), cl_logDEBUG1);
+        return dbResult;
+    }
 
     if (notificationCommand == NotificationCommand::sendNotification)
     {
@@ -1991,6 +2007,25 @@ void SystemManager::onEc2RemoveResourceParamDone(
     nx::db::QueryContext* /*queryContext*/,
     nx::db::DBResult /*dbResult*/)
 {
+}
+
+template<typename ExtensionFuncPtr, typename... Args>
+nx::db::DBResult SystemManager::invokeSystemSharingExtension(
+    ExtensionFuncPtr extensionFunc,
+    const Args&... args)
+{
+    for (auto& extension: m_systemSharingExtensions)
+    {
+        auto dbResult = (extension->*extensionFunc)(args...);
+        if (dbResult != nx::db::DBResult::ok)
+        {
+            NX_DEBUG(this, lm("Error invoking system sharing extension. %1")
+                .arg(nx::db::toString(dbResult)));
+            return dbResult;
+        }
+    }
+
+    return nx::db::DBResult::ok;
 }
 
 } // namespace cdb

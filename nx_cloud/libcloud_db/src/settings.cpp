@@ -64,8 +64,8 @@ const std::chrono::seconds kDefaultNonceValidityPeriod = std::chrono::hours(4);
 const QLatin1String kIntermediateResponseValidityPeriod("auth/intermediateResponseValidityPeriod");
 const std::chrono::seconds kDefaultIntermediateResponseValidityPeriod = std::chrono::minutes(1);
 
-const QLatin1String kConnectionInactivityPeriod("auth/connectionInactivityPeriod");
-const std::chrono::milliseconds kDefaultConnectionInactivityPeriod(0); //< disabled
+const QLatin1String kOfflineUserHashValidityPeriod("auth/offlineUserHashValidityPeriod");
+const std::chrono::minutes kDefaultOfflineUserHashValidityPeriod = 14 * std::chrono::hours(24);
 
 //-------------------------------------------------------------------------------------------------
 // Event manager settings
@@ -82,12 +82,22 @@ const QLatin1String kDefaultCloudModuleXmlTemplatePath(":/cloud_modules_template
 const QLatin1String kTcpBacklogSize("http/tcpBacklogSize");
 const int kDefaultTcpBacklogSize = 1024;
 
+const QLatin1String kConnectionInactivityPeriod("http/connectionInactivityPeriod");
+const std::chrono::milliseconds kDefaultConnectionInactivityPeriod(0); //< disabled
+
 } // namespace
 
 
 namespace nx {
 namespace cdb {
 namespace conf {
+
+Auth::Auth():
+    nonceValidityPeriod(kDefaultNonceValidityPeriod),
+    intermediateResponseValidityPeriod(kDefaultIntermediateResponseValidityPeriod),
+    offlineUserHashValidityPeriod(kDefaultOfflineUserHashValidityPeriod)
+{
+}
 
 Notification::Notification():
     enabled(kDefaultNotificationEnabled)
@@ -111,9 +121,12 @@ EventManager::EventManager():
 }
 
 Http::Http():
-    tcpBacklogSize(kDefaultTcpBacklogSize)
+    tcpBacklogSize(kDefaultTcpBacklogSize),
+    connectionInactivityPeriod(kDefaultConnectionInactivityPeriod)
 {
 }
+
+//-------------------------------------------------------------------------------------------------
 
 Settings::Settings():
     base_type(
@@ -286,10 +299,10 @@ void Settings::loadSettings()
         nx::utils::parseTimerDuration(
             settings().value(kIntermediateResponseValidityPeriod).toString(),
             kDefaultIntermediateResponseValidityPeriod));
-    m_auth.connectionInactivityPeriod = duration_cast<seconds>(
+    m_auth.offlineUserHashValidityPeriod = duration_cast<minutes>(
         nx::utils::parseTimerDuration(
-            settings().value(kConnectionInactivityPeriod).toString(),
-            kDefaultConnectionInactivityPeriod));
+            settings().value(kOfflineUserHashValidityPeriod).toString(),
+            kDefaultOfflineUserHashValidityPeriod));
 
     //event manager
     m_eventManager.mediaServerConnectionIdlePeriod = duration_cast<seconds>(
@@ -302,8 +315,14 @@ void Settings::loadSettings()
     m_moduleFinder.cloudModulesXmlTemplatePath = settings().value(
         kCloudModuleXmlTemplatePath, kDefaultCloudModuleXmlTemplatePath).toString();
 
+    //HTTP
     m_http.tcpBacklogSize = settings().value(
         kTcpBacklogSize, kDefaultTcpBacklogSize).toInt();
+
+    m_http.connectionInactivityPeriod = duration_cast<seconds>(
+        nx::utils::parseTimerDuration(
+            settings().value(kConnectionInactivityPeriod).toString(),
+            kDefaultConnectionInactivityPeriod));
 }
 
 } // namespace conf

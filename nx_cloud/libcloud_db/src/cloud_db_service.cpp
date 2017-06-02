@@ -34,7 +34,7 @@
 #include "http_handlers/ping.h"
 #include "libcloud_db_app_info.h"
 #include "managers/account_manager.h"
-#include "managers/auth_provider.h"
+#include "managers/authentication_provider.h"
 #include "managers/cloud_module_url_provider.h"
 #include "managers/email_manager.h"
 #include "managers/event_manager.h"
@@ -189,7 +189,7 @@ int CloudDbService::serviceMain(const utils::AbstractServiceSettings& abstractSe
     AuthenticationProvider authProvider(
         settings,
         accountManager,
-        systemManager,
+        &systemManager,
         tempPasswordManager);
     m_authProvider = &authProvider;
 
@@ -224,13 +224,13 @@ int CloudDbService::serviceMain(const utils::AbstractServiceSettings& abstractSe
         false,  //TODO #ak enable ssl when it works properly
         nx::network::NatTraversalSupport::disabled );
 
-    if (m_settings->auth().connectionInactivityPeriod.count())
+    if (m_settings->http().connectionInactivityPeriod > std::chrono::milliseconds::zero())
     {
         multiAddressHttpServer.forEachListener(
             [&](nx_http::HttpStreamSocketServer* server)
             {
                 server->setConnectionInactivityTimeout(
-                    m_settings->auth().connectionInactivityPeriod);
+                    m_settings->http().connectionInactivityPeriod);
             });
     }
 
