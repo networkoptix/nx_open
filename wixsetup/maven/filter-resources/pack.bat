@@ -6,12 +6,9 @@ cd %PACKDIR%
 FOR /F %%G IN ('dir /b /AD') DO (
   echo %%G
   cd %%G
-  start /B /HIGH cmd.exe /C ${environment.dir}\bin\7z.exe a ..\%%G.zip *
+  start /B /HIGH cmd.exe /C ${environment.dir}\bin\7z.exe a -sdel ..\%%G.zip *
   cd %PACKDIR%
   SET TESTRESULT=%ERRORLEVEL%
   echo pack errorlevel is %ERRORLEVEL%
-)
-FOR /F %%G IN ('dir /b /AD') DO (
-  rd /S /Q %%G
 )
 cd %CURRENTDIR%
