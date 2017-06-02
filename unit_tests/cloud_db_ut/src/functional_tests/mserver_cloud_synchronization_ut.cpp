@@ -53,7 +53,7 @@ TEST_F(FtEc2MserverCloudSynchronization, general)
     {
         // Cdb can change port after restart.
         appserver2()->moduleInstance()->ecConnection()->addRemotePeer(
-            ec2::kCloudPeerId,
+            ::ec2::kCloudPeerId,
             cdbEc2TransactionUrl());
         if (i > 0)
             verifyThatUsersMatchInCloudAndVms();
@@ -75,20 +75,20 @@ TEST_F(FtEc2MserverCloudSynchronization, reconnecting)
     for (int i = 0; i < 50; ++i)
     {
         // Cdb can change port after restart.
-        appserver2()->moduleInstance()->ecConnection()->addRemotePeer(ec2::kCloudPeerId, cdbEc2TransactionUrl());
+        appserver2()->moduleInstance()->ecConnection()->addRemotePeer(::ec2::kCloudPeerId, cdbEc2TransactionUrl());
 
         std::this_thread::sleep_for(
             std::chrono::milliseconds(
                 nx::utils::random::number(minDelay, maxDelay)));
 
-        appserver2()->moduleInstance()->ecConnection()->deleteRemotePeer(ec2::kCloudPeerId);
+        appserver2()->moduleInstance()->ecConnection()->deleteRemotePeer(::ec2::kCloudPeerId);
 
         std::this_thread::sleep_for(
             std::chrono::milliseconds(
                 nx::utils::random::number(minDelay, maxDelay)));
     }
 
-    appserver2()->moduleInstance()->ecConnection()->addRemotePeer(ec2::kCloudPeerId, cdbEc2TransactionUrl());
+    appserver2()->moduleInstance()->ecConnection()->addRemotePeer(::ec2::kCloudPeerId, cdbEc2TransactionUrl());
     waitForCloudAndVmsToSyncUsers();
 }
 
@@ -110,7 +110,7 @@ TEST_F(FtEc2MserverCloudSynchronization, adding_user_locally_while_offline)
         addCloudUserLocally(account2.email, &account2VmsData);
 
         ASSERT_TRUE(cdb()->startAndWaitUntilStarted());
-        appserver2()->moduleInstance()->ecConnection()->addRemotePeer(ec2::kCloudPeerId, cdbEc2TransactionUrl());
+        appserver2()->moduleInstance()->ecConnection()->addRemotePeer(::ec2::kCloudPeerId, cdbEc2TransactionUrl());
         verifyTransactionConnection();
         waitForUserToAppearInCloud(account2VmsData);
         // TODO: Check that cloud reported user's full name.
@@ -184,7 +184,7 @@ TEST_F(FtEc2MserverCloudSynchronization, merging_offline_changes)
     }
 
     // Establishing connection.
-    appserver2()->moduleInstance()->ecConnection()->addRemotePeer(ec2::kCloudPeerId, cdbEc2TransactionUrl());
+    appserver2()->moduleInstance()->ecConnection()->addRemotePeer(::ec2::kCloudPeerId, cdbEc2TransactionUrl());
     verifyTransactionConnection();
 
     // Waiting for data to be synchronized between cloud and vms.
@@ -218,7 +218,7 @@ TEST_F(FtEc2MserverCloudSynchronization, adding_user_in_cloud_and_removing_local
             appserver2()->moduleInstance()->ecConnection()
                 ->getUserManager(Qn::kSystemAccess)->removeSync(accountVmsData.id));
 
-        appserver2()->moduleInstance()->ecConnection()->addRemotePeer(ec2::kCloudPeerId, cdbEc2TransactionUrl());
+        appserver2()->moduleInstance()->ecConnection()->addRemotePeer(::ec2::kCloudPeerId, cdbEc2TransactionUrl());
 
         waitForCloudAndVmsToSyncUsers();
 
@@ -262,7 +262,7 @@ TEST_F(FtEc2MserverCloudSynchronization, sync_from_cloud)
         api::ResultCode::ok,
         cdb()->shareSystem(ownerAccount().email, ownerAccount().password, sharing));
 
-    appserver2()->moduleInstance()->ecConnection()->addRemotePeer(ec2::kCloudPeerId, cdbEc2TransactionUrl());
+    appserver2()->moduleInstance()->ecConnection()->addRemotePeer(::ec2::kCloudPeerId, cdbEc2TransactionUrl());
 
     waitForCloudAndVmsToSyncUsers();
 }
@@ -285,14 +285,14 @@ TEST_F(FtEc2MserverCloudSynchronization, rebinding_system_to_cloud)
             api::ResultCode::ok,
             cdb()->shareSystem(ownerAccount().email, ownerAccount().password, sharing));
 
-        appserver2()->moduleInstance()->ecConnection()->addRemotePeer(ec2::kCloudPeerId, cdbEc2TransactionUrl());
+        appserver2()->moduleInstance()->ecConnection()->addRemotePeer(::ec2::kCloudPeerId, cdbEc2TransactionUrl());
 
         waitForCloudAndVmsToSyncUsers();
 
         if (i == 0)
         {
             appserver2()->moduleInstance()->ecConnection()
-                ->deleteRemotePeer(ec2::kCloudPeerId);
+                ->deleteRemotePeer(::ec2::kCloudPeerId);
             ASSERT_EQ(api::ResultCode::ok, unbindSystem());
             ASSERT_TRUE(cdb()->restart());
             ASSERT_EQ(api::ResultCode::ok, registerAccountAndBindSystemToIt());
@@ -310,7 +310,7 @@ TEST_F(FtEc2MserverCloudSynchronization, new_transaction_timestamp)
 
     for (int i = 0; i < 2; ++i)
     {
-        appserver2()->moduleInstance()->ecConnection()->addRemotePeer(ec2::kCloudPeerId, cdbEc2TransactionUrl());
+        appserver2()->moduleInstance()->ecConnection()->addRemotePeer(::ec2::kCloudPeerId, cdbEc2TransactionUrl());
 
         waitForCloudAndVmsToSyncUsers();
 
@@ -328,7 +328,7 @@ TEST_F(FtEc2MserverCloudSynchronization, new_transaction_timestamp)
 
         if (i == 0)
         {
-            appserver2()->moduleInstance()->ecConnection()->deleteRemotePeer(ec2::kCloudPeerId);
+            appserver2()->moduleInstance()->ecConnection()->deleteRemotePeer(::ec2::kCloudPeerId);
 
             ASSERT_TRUE(cdb()->restart());
 
@@ -345,7 +345,7 @@ TEST_F(FtEc2MserverCloudSynchronization, new_transaction_timestamp)
 
 TEST_F(FtEc2MserverCloudSynchronization, rename_system)
 {
-    appserver2()->moduleInstance()->ecConnection()->addRemotePeer(ec2::kCloudPeerId, cdbEc2TransactionUrl());
+    appserver2()->moduleInstance()->ecConnection()->addRemotePeer(::ec2::kCloudPeerId, cdbEc2TransactionUrl());
 
     for (int i = 0; i < 4; ++i)
     {
@@ -355,10 +355,10 @@ TEST_F(FtEc2MserverCloudSynchronization, rename_system)
         if (needRestart)
         {
             appserver2()->moduleInstance()->ecConnection()
-                ->deleteRemotePeer(ec2::kCloudPeerId);
+                ->deleteRemotePeer(::ec2::kCloudPeerId);
             ASSERT_TRUE(cdb()->restart());
             appserver2()->moduleInstance()->ecConnection()
-                ->addRemotePeer(ec2::kCloudPeerId, cdbEc2TransactionUrl());
+                ->addRemotePeer(::ec2::kCloudPeerId, cdbEc2TransactionUrl());
         }
 
         const std::string newSystemName(nx::utils::generateRandomName(10).data());
@@ -420,7 +420,7 @@ TEST_F(Ec2MserverCloudSynchronization, adding_cloud_user_with_not_registered_ema
     ASSERT_TRUE(appserver2()->startAndWaitUntilStarted());
     ASSERT_EQ(api::ResultCode::ok, registerAccountAndBindSystemToIt());
 
-    appserver2()->moduleInstance()->ecConnection()->addRemotePeer(ec2::kCloudPeerId, cdbEc2TransactionUrl());
+    appserver2()->moduleInstance()->ecConnection()->addRemotePeer(::ec2::kCloudPeerId, cdbEc2TransactionUrl());
 
     // Waiting for cloud owner to be synchronized to vms db.
     waitForCloudAndVmsToSyncUsers();
@@ -473,14 +473,14 @@ TEST_F(Ec2MserverCloudSynchronization, migrate_transactions)
             preRegisteredCloudSystemId,
             preRegisteredCloudSystemAuthKey));
 
-    appserver2()->moduleInstance()->ecConnection()->addRemotePeer(ec2::kCloudPeerId, cdbEc2TransactionUrl());
+    appserver2()->moduleInstance()->ecConnection()->addRemotePeer(::ec2::kCloudPeerId, cdbEc2TransactionUrl());
 
     waitForCloudAndVmsToSyncUsers();
 }
 
 TEST_F(FtEc2MserverCloudSynchronization, transaction_timestamp)
 {
-    appserver2()->moduleInstance()->ecConnection()->addRemotePeer(ec2::kCloudPeerId, cdbEc2TransactionUrl());
+    appserver2()->moduleInstance()->ecConnection()->addRemotePeer(::ec2::kCloudPeerId, cdbEc2TransactionUrl());
     waitForCloudAndVmsToSyncUsers();
 
     using namespace std::chrono;
@@ -495,9 +495,9 @@ TEST_F(FtEc2MserverCloudSynchronization, transaction_timestamp)
         if (i == 1)
         {
             appserver2()->moduleInstance()->ecConnection()
-                ->deleteRemotePeer(ec2::kCloudPeerId);
+                ->deleteRemotePeer(::ec2::kCloudPeerId);
             ASSERT_TRUE(cdb()->restart());
-            appserver2()->moduleInstance()->ecConnection()->addRemotePeer(ec2::kCloudPeerId, cdbEc2TransactionUrl());
+            appserver2()->moduleInstance()->ecConnection()->addRemotePeer(::ec2::kCloudPeerId, cdbEc2TransactionUrl());
         }
 
         // Adding user locally with shifted timestamp.

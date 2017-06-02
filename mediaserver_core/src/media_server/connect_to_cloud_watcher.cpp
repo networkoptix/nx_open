@@ -56,7 +56,7 @@ void QnConnectToCloudWatcher::at_updateConnection()
     if (!needCloudConnect)
     {
         if (!m_cloudUrl.isEmpty())
-            m_messageBus->removeOutgoingConnectionFromPeer(ec2::kCloudPeerId);
+            m_messageBus->removeOutgoingConnectionFromPeer(::ec2::kCloudPeerId);
         return;
     }
 
@@ -96,5 +96,5 @@ void QnConnectToCloudWatcher::addCloudPeer(QUrl url)
     m_cloudUrl.setPath(nx::cdb::api::kEc2EventsPath);
     m_cloudUrl.setUserName(commonModule->globalSettings()->cloudSystemId());
     m_cloudUrl.setPassword(commonModule->globalSettings()->cloudAuthKey());
-    m_messageBus->addOutgoingConnectionToPeer(ec2::kCloudPeerId, m_cloudUrl);
+    m_messageBus->addOutgoingConnectionToPeer(::ec2::kCloudPeerId, m_cloudUrl);
 }

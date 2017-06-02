@@ -259,7 +259,7 @@ void Connection::onHttpClientDone()
     m_remotePeer = remotePeer;
 
     NX_ASSERT(!m_remotePeer.instanceId.isNull());
-    if (m_remotePeer.id == ec2::kCloudPeerId)
+    if (m_remotePeer.id == ::ec2::kCloudPeerId)
         m_remotePeer.peerType = Qn::PT_CloudServer;
 
     if (!m_connectionLockGuard->tryAcquireConnected())

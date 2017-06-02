@@ -207,12 +207,12 @@ QUrl Ec2MserverCloudSynchronization::cdbEc2TransactionUrl() const
 
 void Ec2MserverCloudSynchronization::establishConnectionBetweenVmsAndCloud()
 {
-    appserver2()->moduleInstance()->ecConnection()->addRemotePeer(ec2::kCloudPeerId, cdbEc2TransactionUrl());
+    appserver2()->moduleInstance()->ecConnection()->addRemotePeer(::ec2::kCloudPeerId, cdbEc2TransactionUrl());
 }
 
 void Ec2MserverCloudSynchronization::breakConnectionBetweenVmsAndCloud()
 {
-    appserver2()->moduleInstance()->ecConnection()->deleteRemotePeer(ec2::kCloudPeerId);
+    appserver2()->moduleInstance()->ecConnection()->deleteRemotePeer(::ec2::kCloudPeerId);
 }
 
 void Ec2MserverCloudSynchronization::verifyTransactionConnection()
