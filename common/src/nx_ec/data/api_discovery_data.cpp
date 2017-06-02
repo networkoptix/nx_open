@@ -1,5 +1,8 @@
 #include "api_discovery_data.h"
 
+#include <api/global_settings.h>
+#include <common/common_module.h>
+#include <network/connection_validator.h>
 #include <nx/fusion/model_functions.h>
 #include <nx/vms/discovery/manager.h>
 
@@ -13,23 +16,33 @@ QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(
 
 std::vector<ApiDiscoveredServerData> getServers(nx::vms::discovery::Manager* manager)
 {
+    const auto localSystemId = manager->commonModule()->globalSettings()->localSystemId();
+
     ApiDiscoveredServerDataList result;
     for (const auto& module: manager->getAll())
-    {
-        ApiDiscoveredServerData serverData(module);
-        if (module.endpoint.port == serverData.port)
-            serverData.remoteAddresses.insert(module.endpoint.address.toString());
-        else
-            serverData.remoteAddresses.insert(module.endpoint.toString());
-
-        // TODO: Should we check if it is compatible?
-        serverData.status = Qn::ResourceStatus::Online;
-        result.push_back(serverData);
-    }
+        result.push_back(makeServer(module, localSystemId));
 
     return result;
 }
 
+ApiDiscoveredServerData makeServer(
+    const nx::vms::discovery::ModuleEndpoint& module, const QnUuid& localSystemId)
+{
+    ApiDiscoveredServerData serverData(module);
+    serverData.setEndpoints(std::vector<SocketAddress>{module.endpoint});
+    if (QnConnectionValidator::validateConnection(module) != Qn::SuccessConnectionResult)
+    {
+        serverData.status = Qn::ResourceStatus::Incompatible;
+    }
+    else
+    {
+        serverData.status = (!localSystemId.isNull() && module.localSystemId == localSystemId)
+            ? Qn::ResourceStatus::Online
+            : Qn::ResourceStatus::Unauthorized;
+    }
+
+    return serverData;
+}
 } // namespace ec2
 
 void serialize_field(const ec2::ApiDiscoveredServerData &, QVariant *) { return; }

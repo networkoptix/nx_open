@@ -26,7 +26,7 @@ log = logging.getLogger(__name__)
 class HttpError(RuntimeError):
 
     def __init__(self, server_name, url, status_code, reason):
-         RuntimeError.__init__(self, '[%d] HTTP Error: %s for server %s url: %s' % (status_code, reason, server_name, url))
+         RuntimeError.__init__(self, '[%d] HTTP Error: %r for server %s url: %s' % (status_code, reason, server_name, url))
          self.status_code = status_code
          self.reason = reason
 
@@ -52,7 +52,7 @@ class ServerRestApiProxy(object):
         return ServerRestApiProxy(self._server_name, self._url + '/' + name, self._user, self._password, self._timeout_sec)
 
     def GET(self, raise_exception=True, timeout_sec=None, headers=None, **kw):
-        log.debug('%s: GET %s %s', self._server_name, self._url, kw)
+        self._log_request('GET', kw)
         params = {name: self._get_param_to_str(value) for name, value in kw.items()}
         return self._make_request(raise_exception, timeout_sec, requests.get, self._url, headers=headers, params=params)
 
@@ -60,8 +60,11 @@ class ServerRestApiProxy(object):
         if kw:
             assert not json, 'kw and json arguments are mutually exclusive - only one may be used at a time'
             json = kw
-        log.debug('%s: POST %s %s', self._server_name, self._url, json)
+        self._log_request('POST', json)
         return self._make_request(raise_exception, timeout_sec, requests.post, self._url, headers=headers, json=json)
+
+    def _log_request(self, method, data):
+        log.debug('%s: %s:%s %s %s %s', self._server_name, self._user, self._password, method, self._url, data)
 
     def _get_param_to_str(self, value):
         if type(value) is bool:

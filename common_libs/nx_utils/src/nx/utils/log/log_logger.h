@@ -17,6 +17,9 @@ public:
     /** Writes message to every writer if it is to be logged. */
     void log(Level level, const QString& tag, const QString& message);
 
+    /** Writes message to every writer unconditionally. */
+    void logForced(Level level, const QString& tag, const QString& message);
+
     /** Indicates whether this logger is going to log such a message. */
     bool isToBeLogged(Level level, const QString& tag = {});
 

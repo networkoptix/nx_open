@@ -54,13 +54,14 @@ NX_UTILS_API QString toString(const std::chrono::microseconds& value);
 // ------------------------------------------------------------------------------------------------
 // Pointers.
 
+NX_UTILS_API QString toString(const std::type_info& value);
 NX_UTILS_API QString demangleTypeName(const char* type);
 NX_UTILS_API QString pointerTypeName(const void* /*p*/);
 
 template<typename T>
 QString pointerTypeName(const T* /*p*/)
 {
-    return demangleTypeName(typeid(T).name());
+    return toString(typeid(T));
 }
 
 template<typename T>

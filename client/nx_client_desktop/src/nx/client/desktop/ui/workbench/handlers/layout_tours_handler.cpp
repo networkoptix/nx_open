@@ -141,11 +141,19 @@ LayoutToursHandler::LayoutToursHandler(QObject* parent):
             }
         });
 
-    connect(action(action::LayoutTourPrevStepAction), &QAction::triggered, m_tourExecutor,
-        &LayoutTourExecutor::prevTourStep);
+    connect(action(action::PreviousLayoutAction), &QAction::triggered, this,
+        [this]
+        {
+            if (action(action::ToggleLayoutTourModeAction)->isChecked())
+                m_tourExecutor->prevTourStep();
+        });
 
-    connect(action(action::LayoutTourNextStepAction), &QAction::triggered, m_tourExecutor,
-        &LayoutTourExecutor::nextTourStep);
+    connect(action(action::NextLayoutAction), &QAction::triggered, this,
+        [this]
+        {
+            if (action(action::ToggleLayoutTourModeAction)->isChecked())
+                m_tourExecutor->nextTourStep();
+        });
 
     connect(action(action::SaveLayoutTourAction), &QAction::triggered, this,
         [this]

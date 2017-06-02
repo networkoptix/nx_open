@@ -630,6 +630,9 @@ ConditionWrapper isLayoutTourReviewMode();
 /** Layout tour is running. */
 ConditionWrapper tourIsRunning();
 
+/** Check that fisheye cameras can save position only when dewarping is enabled. */
+ConditionWrapper canSavePtzPosition();
+
 } // namespace condition
 
 } // namespace action

@@ -248,6 +248,7 @@
 #include <database/server_db.h>
 #include <server/server_globals.h>
 #include <media_server/master_server_status_watcher.h>
+#include "nx/mediaserver/unused_wallpapers_watcher.h"
 #include <media_server/connect_to_cloud_watcher.h>
 #include <rest/helpers/permissions_helper.h>
 #include "misc/migrate_oldwin_dir.h"
@@ -299,6 +300,7 @@ const QString PENDING_SWITCH_TO_CLUSTER_MODE = lit("pendingSwitchToClusterMode")
 const QString MEDIATOR_ADDRESS_UPDATE = lit("mediatorAddressUpdate");
 
 static const int kPublicIpUpdateTimeoutMs = 60 * 2 * 1000;
+static QString kLogTag = toString(typeid(MediaServerProcess));
 
 bool initResourceTypes(const ec2::AbstractECConnectionPtr& ec2Connection)
 {
@@ -459,10 +461,7 @@ QnStorageResourcePtr createStorage(
     const QnUuid& serverId,
     const QString& path)
 {
-    NX_LOG(lit("%1 Attempting to create storage %2")
-            .arg(Q_FUNC_INFO)
-            .arg(path), cl_logDEBUG1);
-
+    NX_VERBOSE(kLogTag, lm("Attempting to create storage %1").arg(path));
     QnStorageResourcePtr storage(QnStoragePluginFactory::instance()->createStorage(commonModule,"ufile"));
     storage->setName("Initial");
     storage->setParentId(serverId);
@@ -472,7 +471,7 @@ QnStorageResourcePtr createStorage(
     const auto partitions = qnPlatform->monitor()->totalPartitionSpaceInfo();
     const auto it = std::find_if(partitions.begin(), partitions.end(),
         [&](const QnPlatformMonitor::PartitionSpace& part)
-    { return storagePath.startsWith(QnStorageResource::toNativeDirPath(part.path)); });
+        { return storagePath.startsWith(QnStorageResource::toNativeDirPath(part.path)); });
 
     const auto storageType = (it != partitions.end()) ? it->type : QnPlatformMonitor::NetworkPartition;
     storage->setStorageType(QnLexical::serialized(storageType));
@@ -484,34 +483,27 @@ QnStorageResourcePtr createStorage(
 
         if (totalSpace < fileStorage->getSpaceLimit())
         {
-            NX_LOG(lit("%1 Storage with this path %2 total space is unknown or totalSpace < spaceLimit. \n\t Total space: %3, Space limit: %4")
-                .arg(Q_FUNC_INFO)
-                .arg(path)
-                .arg(totalSpace)
-                .arg(storage->getSpaceLimit()), cl_logDEBUG1);
-            return QnStorageResourcePtr(); // if storage size isn't known or small do not add it by default
+            NX_DEBUG(kLogTag, lm(
+                "Storage with this path %1 total space is unknown or totalSpace < spaceLimit. "
+                "Total space: %2, Space limit: %3").args(path, totalSpace, storage->getSpaceLimit()));
+            return QnStorageResourcePtr();
         }
     }
     else
     {
-        NX_ASSERT(false);
-        NX_LOG(lit("%1 Failed to create to storage %2").arg(Q_FUNC_INFO).arg(path), cl_logWARNING);
+        NX_ASSERT(false, lm("Failed to create to storage: %1").arg(path));
         return QnStorageResourcePtr();
     }
 
     storage->setUsedForWriting(storage->initOrUpdate() == Qn::StorageInit_Ok && storage->isWritable());
-
-    NX_LOG(lit("%1 Storage %2 is operational: %3")
-            .arg(Q_FUNC_INFO)
-            .arg(path)
-            .arg(storage->isUsedForWriting()), cl_logDEBUG1);
+    NX_DEBUG(kLogTag, lm("Storage %1 is operational: %2").args(path, storage->isUsedForWriting()));
 
     QnResourceTypePtr resType = qnResTypePool->getResourceTypeByName("Storage");
     NX_ASSERT(resType);
     if (resType)
         storage->setTypeId(resType->getId());
-    storage->setParentId(serverGuid());
 
+    storage->setParentId(serverGuid());
     return storage;
 }
 
@@ -565,6 +557,8 @@ static QStringList listRecordFolders(bool includeNetwork = false)
         for (auto& path: folderPaths)
             path = closeDirPath(path) + serverGuid().toString();
     }
+
+    NX_VERBOSE(kLogTag, lm("Record folders: %1").container(folderPaths));
     return folderPaths;
 }
 
@@ -585,12 +579,9 @@ QnStorageResourceList getSmallStorages(const QnStorageResourceList& storages)
         if (totalSpace != QnStorageResource::kUnknownSize && totalSpace < storage->getSpaceLimit())
             result << storage; // if storage size isn't known do not delete it
 
-        NX_LOG(lit("%1 Candidate %2, isFileStorage = %3, totalSpace = %4, spaceLimit = %5")
-               .arg(Q_FUNC_INFO)
-               .arg(storage->getUrl())
-               .arg((bool)fileStorage)
-               .arg(totalSpace)
-               .arg(storage->getSpaceLimit()), cl_logDEBUG2);
+        NX_VERBOSE(kLogTag,
+            lm("Small storage %1, isFileStorage=%2, totalSpace=%3, spaceLimit=%4, toDelete").args(
+                storage->getUrl(), (bool)fileStorage, totalSpace, storage->getSpaceLimit()));
     }
     return result;
 }
@@ -607,21 +598,14 @@ QnStorageResourceList createStorages(
 
     availablePaths = listRecordFolders();
 
-    NX_LOG(lit("%1 Available paths count: %2")
-            .arg(Q_FUNC_INFO)
-            .arg(availablePaths.size()), cl_logDEBUG1);
-
+    NX_DEBUG(kLogTag, lm("Available paths count: %1").arg(availablePaths.size()));
     for(const QString& folderPath: availablePaths)
     {
-        NX_LOG(lit("%1 Available path: %2")
-                .arg(Q_FUNC_INFO)
-                .arg(folderPath), cl_logDEBUG1);
-
+        NX_DEBUG(kLogTag, lm("Available path: %1").arg(folderPath));
         if (!mServer->getStorageByUrl(folderPath).isNull())
         {
-            NX_LOG(lit("%1 Storage with this path %2 already exists. Won't be added.")
-                    .arg(Q_FUNC_INFO)
-                    .arg(folderPath), cl_logDEBUG1);
+            NX_DEBUG(kLogTag,
+                lm("Storage with this path %1 already exists. Won't be added.").arg(folderPath));
             continue;
         }
         // Create new storage because of new partition found that missing in the database
@@ -632,7 +616,7 @@ QnStorageResourceList createStorages(
         qint64 available = storage->getTotalSpace() - storage->getSpaceLimit();
         bigStorageThreshold = qMax(bigStorageThreshold, available);
         storages.append(storage);
-        NX_LOG(QString("Creating new storage: %1").arg(folderPath), cl_logINFO);
+        NX_DEBUG(kLogTag, lm("Creating new storage: %1").arg(folderPath));
     }
     bigStorageThreshold /= QnStorageManager::BIG_STORAGE_THRESHOLD_COEFF;
 
@@ -643,15 +627,17 @@ QnStorageResourceList createStorages(
             storage->setUsedForWriting(false);
     }
 
-    QString logMessage = lit("%1 Storage new candidates:\n").arg(Q_FUNC_INFO);
+    QString logMessage = lit("Storage new candidates:\n");
     for (const auto& storage : storages)
+    {
         logMessage.append(
             lit("\t\turl: %1, totalSpace: %2, spaceLimit: %3")
                 .arg(storage->getUrl())
                 .arg(storage->getTotalSpace())
                 .arg(storage->getSpaceLimit()));
-    NX_LOG(logMessage, cl_logDEBUG1);
+    }
 
+    NX_DEBUG(kLogTag, logMessage);
     return storages;
 }
 
@@ -704,13 +690,15 @@ QnStorageResourceList updateStorages(QnMediaServerResourcePtr mServer)
 
     QString logMesssage = lit("%1 Modified storages:\n").arg(Q_FUNC_INFO);
     for (const auto& storage : result.values())
+    {
         logMesssage.append(
             lit("\t\turl: %1, totalSpace: %2, spaceLimit: %3\n")
                 .arg(storage->getUrl())
                 .arg(storage->getTotalSpace())
                 .arg(storage->getSpaceLimit()));
-    NX_LOG(logMesssage, cl_logDEBUG1);
+    }
 
+    NX_DEBUG(kLogTag, logMesssage);
     return result.values();
 }
 
@@ -719,7 +707,13 @@ void MediaServerProcess::initStoragesAsync(QnCommonMessageProcessor* messageProc
     m_initStoragesAsyncPromise.reset(new nx::utils::promise<void>());
     QtConcurrent::run([messageProcessor, this]
     {
-        const auto setPromiseGuardFunc = makeScopeGuard([&]() { m_initStoragesAsyncPromise->set_value(); });
+        NX_VERBOSE(this, "Init storages begin");
+        const auto setPromiseGuardFunc = makeScopeGuard(
+            [&]()
+            {
+                NX_VERBOSE(this, "Init storages end");
+                m_initStoragesAsyncPromise->set_value();
+            });
 
         //read server's storages
         ec2::AbstractECConnectionPtr ec2Connection = messageProcessor->commonModule()->ec2Connection();
@@ -728,7 +722,7 @@ void MediaServerProcess::initStoragesAsync(QnCommonMessageProcessor* messageProc
 
         while ((rez = ec2Connection->getMediaServerManager(Qn::kSystemAccess)->getStoragesSync(QnUuid(), &storages)) != ec2::ErrorCode::ok)
         {
-            NX_LOG( lit("QnMain::run(): Can't get storage list. Reason: %1").arg(ec2::toString(rez)), cl_logDEBUG1 );
+            NX_DEBUG(this, lm("Can't get storage list. Reason: %1").arg(rez));
             QnSleep::msleep(APP_SERVER_REQUEST_ERROR_TIMEOUT_MS);
             if (m_needStop)
                 return;
@@ -736,10 +730,8 @@ void MediaServerProcess::initStoragesAsync(QnCommonMessageProcessor* messageProc
 
         for(const auto& storage: storages)
         {
-            NX_LOG(lit("%1 Existing storage: %2, spaceLimit = %3")
-                   .arg(Q_FUNC_INFO)
-                   .arg(storage.url)
-                   .arg(storage.spaceLimit), cl_logDEBUG2);
+            NX_DEBUG(this, lm("Existing storage: %1, spaceLimit = %2")
+                .args(storage.url, storage.spaceLimit));
             messageProcessor->updateResource(storage, ec2::NotificationSource::Local);
         }
 
@@ -760,12 +752,12 @@ void MediaServerProcess::initStoragesAsync(QnCommonMessageProcessor* messageProc
 
         storagesToRemove.append(unMountedStorages);
 
-        NX_LOG(lit("%1 Found %2 storages to remove").arg(Q_FUNC_INFO).arg(storagesToRemove.size()), cl_logDEBUG2);
+        NX_DEBUG(this, lm("Found %1 storages to remove").arg(storagesToRemove.size()));
         for (const auto& storage: storagesToRemove)
-            NX_LOG(lit("%1 Storage to remove: %2, id: %3")
-                   .arg(Q_FUNC_INFO)
-                   .arg(storage->getUrl())
-                   .arg(storage->getId().toString()), cl_logDEBUG2);
+        {
+            NX_DEBUG(this, lm("Storage to remove: %2, id: %3").args(
+                storage->getUrl(), storage->getId()));
+        }
 
         if (!storagesToRemove.isEmpty())
         {
@@ -886,7 +878,7 @@ void MediaServerProcess::saveStorages(
     ec2::ErrorCode rez;
     while((rez = ec2Connection->getMediaServerManager(Qn::kSystemAccess)->saveStoragesSync(apiStorages)) != ec2::ErrorCode::ok && !needToStop())
     {
-        qWarning() << "updateStorages(): Call to change server's storages failed. Reason: " << ec2::toString(rez);
+        NX_WARNING(this) "Call to change server's storages failed. Reason: " << rez;
         QnSleep::msleep(APP_SERVER_REQUEST_ERROR_TIMEOUT_MS);
     }
 }
@@ -1701,7 +1693,7 @@ void MediaServerProcess::at_connectionOpened()
     m_firstRunningTime = 0;
 }
 
-void MediaServerProcess::at_serverModuleConflict(nx::vms::discovery::Manager::ModuleData module)
+void MediaServerProcess::at_serverModuleConflict(nx::vms::discovery::ModuleEndpoint module)
 {
     const auto& resPool = commonModule()->resourcePool();
     qnBusinessRuleConnector->at_mediaServerConflict(
@@ -2624,6 +2616,7 @@ void MediaServerProcess::run()
             auto connectionResult = QnConnectionValidator::validateConnection(connectInfo, errorCode);
             if (connectionResult == Qn::SuccessConnectionResult)
             {
+                ec2Connection->getDiscoveryManager(Qn::kSystemAccess)->monitorServerDiscovery();
                 NX_LOG(QString::fromLatin1("Connected to local EC2"), cl_logWARNING);
                 break;
             }
@@ -3116,6 +3109,7 @@ void MediaServerProcess::run()
 
     makeFakeData( cmdLineArguments().createFakeData, ec2Connection);
     qnBackupStorageMan->scheduleSync()->start();
+    serverModule->unusedWallpapersWatcher()->start();
     emit started();
     exec();
 

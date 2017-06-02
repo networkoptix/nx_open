@@ -24,8 +24,8 @@ bool Entry::operator==(const Entry& right) const
 
 bool Playlist::parse(const nx::String& str)
 {
-    nx_http::BufferToLineSplitter lineSplitter(str);
-    while (auto line = lineSplitter.nextLine())
+    nx_http::StringLineIterator lineSplitter(str);
+    while (auto line = lineSplitter.next())
     {
         const auto trimmedLine = line->trimmed();
         if (trimmedLine.isEmpty())

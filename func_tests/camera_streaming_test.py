@@ -10,17 +10,10 @@ EXPECTED_TRANSPORT_LIST = set(['rtsp', 'hls', 'mjpeg', 'webm'])
 HISTORY_WAIT_TIMEOUT_SEC = 2*60
 
 
-@pytest.fixture
-def env(env_builder, server):
-    one = server()
-    two = server()
-    return env_builder(merge_servers=[one, two], one=one, two=two)
-
-
 def wait_for_and_check_camera_history(camera, server_list, expected_servers_order):
     t = time.time()
-    camera_history_responses = []
-    while len(camera_history_responses) < len(server_list):
+    while True:
+        camera_history_responses = []
         for server in server_list:
             response = server.rest_api.ec2.cameraHistory.GET(
                 cameraId=camera.id, startTime=0, endTime='now')
@@ -32,6 +25,8 @@ def wait_for_and_check_camera_history(camera, server_list, expected_servers_orde
                 continue
             if time.time() - t > HISTORY_WAIT_TIMEOUT_SEC:
                 pytest.fail('Timed out while waiting for proper camera history (%s seconds)' % HISTORY_WAIT_TIMEOUT_SEC)
+        if len(camera_history_responses) >= len(server_list):
+            break
         time.sleep(5)
     assert len(camera_history_responses) == len(server_list)
     for response in camera_history_responses[1:]:
@@ -61,23 +56,27 @@ def check_media_stream_transports(server):
 # https://networkoptix.atlassian.net/browse/TEST-178
 # https://networkoptix.atlassian.net/wiki/spaces/SD/pages/77234376/Camera+history+test
 @pytest.mark.testcam
-def test_camera_switching_should_be_represented_in_history(env, camera):
+def test_camera_switching_should_be_represented_in_history(artifact_file, server_factory, camera):
+    one = server_factory('one')
+    two = server_factory('two')
+    one.merge([two])
+
     camera.start_streaming()
-    camera.wait_until_discovered_by_server([env.one, env.two])
-    camera.switch_to_server(env.one)
-    env.one.start_recording_camera(camera)
-    wait_for_and_check_camera_history(camera, [env.one, env.two], [env.one])
-    camera.switch_to_server(env.two)
-    wait_for_and_check_camera_history(camera, [env.one, env.two], [env.one, env.two])
-    camera.switch_to_server(env.one)
-    wait_for_and_check_camera_history(camera, [env.one, env.two], [env.one, env.two, env.one])
-    env.one.stop_recording_camera(camera)
+    camera.wait_until_discovered_by_server([one, two])
+    camera.switch_to_server(one)
+    one.start_recording_camera(camera)
+    wait_for_and_check_camera_history(camera, [one, two], [one])
+    camera.switch_to_server(two)
+    wait_for_and_check_camera_history(camera, [one, two], [one, two])
+    camera.switch_to_server(one)
+    wait_for_and_check_camera_history(camera, [one, two], [one, two, one])
+    one.stop_recording_camera(camera)
 
     # https://networkoptix.atlassian.net/browse/VMS-4180
     stream_type = 'hls'
-    stream = env.one.get_media_stream(stream_type, camera)
+    stream = one.get_media_stream(stream_type, camera)
     metadata_list = stream.load_archive_stream_metadata(
-        '%s-stream-media-%s' % (env.artifact_path_prefix, stream_type), pos=0, duration=3000)
+        artifact_file('stream-media', stream_type), pos=0, duration=3000)
     assert metadata_list  # Must not be empty
 
-    check_media_stream_transports(env.one)
+    check_media_stream_transports(one)

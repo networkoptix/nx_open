@@ -566,14 +566,7 @@ QnModuleInformation QnMediaServerResource::getModuleInformation() const
 QnModuleInformationWithAddresses QnMediaServerResource::getModuleInformationWithAddresses() const
 {
     QnModuleInformationWithAddresses information = getModuleInformation();
-    for (const auto& endpoint: getAllAvailableAddresses())
-    {
-        if (endpoint.port == information.port)
-            information.remoteAddresses << endpoint.address.toString();
-        else
-            information.remoteAddresses << endpoint.toString();
-    }
-
+    information.setEndpoints(getAllAvailableAddresses());
     return information;
 }
 

@@ -7,7 +7,7 @@
 
 #include "targetver.h"
 
-#define WIN32_LEAN_AND_MEAN             // Exclude rarely-used stuff from Windows headers
+#define _WINSOCKAPI_
 #define _WINSOCK_DEPRECATED_NO_WARNINGS
 
 // Windows Header Files:

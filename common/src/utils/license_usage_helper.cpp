@@ -116,8 +116,9 @@ QnLicenseUsageHelper::Cache::Cache()
 }
 
 
-QnLicenseUsageHelper::QnLicenseUsageHelper(QnCommonModule* commonModule):
-    QnCommonModuleAware(commonModule),
+QnLicenseUsageHelper::QnLicenseUsageHelper(QObject *parent):
+    base_type(parent),
+    QnCommonModuleAware(parent),
     m_dirty(true),
     m_validator(licensePool()->validator())
 {
@@ -585,9 +586,19 @@ QnVideoWallLicenseUsageWatcher::QnVideoWallLicenseUsageWatcher(QObject* parent):
 /************************************************************************/
 /* QnVideoWallLicenseUsageHelper                                        */
 /************************************************************************/
+QnVideoWallLicenseUsageHelper::QnVideoWallLicenseUsageHelper(QObject *parent):
+    base_type(parent)
+{
+    init();
+}
+
 QnVideoWallLicenseUsageHelper::QnVideoWallLicenseUsageHelper(QnCommonModule* commonModule):
-    base_type(commonModule),
-    m_proposed(0)
+    base_type(commonModule)
+{
+    init();
+}
+
+void QnVideoWallLicenseUsageHelper::init()
 {
     QnVideoWallLicenseUsageWatcher* usageWatcher = new QnVideoWallLicenseUsageWatcher(this);
     connect(usageWatcher, &QnVideoWallLicenseUsageWatcher::licenseUsageChanged, this, &QnLicenseUsageHelper::invalidate);

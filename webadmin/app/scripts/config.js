@@ -3,6 +3,7 @@
 
 var Config = {
     viewsDir: 'views/', //'lang_' + lang + '/views/';
+    viewsDirCommon: 'web_common/views/',
     webadminSystemApiCompatibility: true,
     defaultLanguage: 'en_US',
     supportedLanguages:[
@@ -116,7 +117,8 @@ var Config = {
         takeCameraOwnershipWithoutLock: {label: 'Take cameras ownership without lock', type: 'checkbox'},
         timeSynchronizationEnabled: {label: 'Time synchronization enabled', type: 'checkbox'},
         upnpPortMappingEnabled: {label: 'UPNP port mapping enabled', type: 'checkbox'},
-
+    },
+    webclient:{
         useServerTime: true,
         disableVolume: true,
         reloadInterval: 5*1000

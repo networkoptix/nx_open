@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('nxCommon')
-    .factory('systemAPI', function ($http, $q) {
+    .factory('systemAPI', ['$http', '$q', '$location', function ($http, $q, $location) {
 
         /*
         * System API is a unified service for making API requests to media servers
@@ -13,8 +13,7 @@ angular.module('nxCommon')
         *
         * Service supports authentification methods for all these cases
         * 1. working locally we use cookie authentification on server
-        * 2. working through cloud we use cloudAPI method to set cookies for us
-        * TODO: move to cookie auth completely, do not use auth key?
+        * 2. working through cloud we use cloudAPI method to get auth keys
         *
         * Service also supports re-authentification?
         *
@@ -31,7 +30,7 @@ angular.module('nxCommon')
         * Each instance representing a single connection and is cached
         *
         * 
-        * TODO: Support websocket connection to server as well
+        * TODO (v 3.2): Support websocket connection to server as well
         * */
 
         
@@ -60,7 +59,7 @@ angular.module('nxCommon')
         ServerConnection.prototype._getUrlBase = function(){
             var urlBase = '';
             if(this.systemId){
-                urlBase += Config.gatewayUrl + '/' + this.serverId
+                urlBase += Config.gatewayUrl + '/' + this.systemId;
             }
             urlBase += '/web';
             if(this.serverId){
@@ -68,18 +67,38 @@ angular.module('nxCommon')
             }
             return urlBase;
         };
-        ServerConnection.prototype._wrapRequest = function(promise){
+        ServerConnection.prototype._wrapRequest = function(method, url, data, config, repeat){
+            var self = this;
             // TODO: handle common situations here - like offline or logout
             // Raise a global event in both cases. Let outer code handle this global request
-            return promise;
+            var promise = $http({
+                method: method,
+                url: url,
+                data: data,
+                config: config
+            });
+            return promise.catch(function(error){
+                if(error.status == 503 && !repeat){ // Repeat the request once again for 503 error
+                    return self._wrapRequest(method, url, data, config, true);
+                }
+                return $q.reject(error);
+            });
         };
-        ServerConnection.prototype._get = function(url, data){
-            var canceller = $q.defer();
+        ServerConnection.prototype._setGetParams = function(url, data, auth){
+            if(auth){
+                data = data || {}
+                data.auth = auth;
+            }
             if(data){
                 url += (url.indexOf('?')>0)?'&':'?';
                 url += $.param(data);
             }
-            var obj = this._wrapRequest($http.get(this.urlBase + url, { timeout: canceller.promise }));
+            return this.urlBase + url;
+        };
+        ServerConnection.prototype._get = function(url, data){
+            url = this._setGetParams(url, data, this.systemId && this.authGet());
+            var canceller = $q.defer();
+            var obj = this._wrapRequest('GET', url, null, { timeout: canceller.promise });
             obj.then(function(){
                 canceller = null;
             },function(){
@@ -93,15 +112,41 @@ angular.module('nxCommon')
             return obj;
         };
         ServerConnection.prototype._post = function(url, data){
-            return this._wrapRequest($http.post(this.urlBase + url, data));
+            url = this._setGetParams(url, null, this.systemId && this.authPost());
+            return this._wrapRequest('POST', url, data);
         };
         /* End of helpers */
 
 
-        ServerConnection.prototype.getCurrentUser = function(){
-            return this._get('/ec2/getCurrentUser');
+        /* Authentication */
+        ServerConnection.prototype.getCurrentUser = function (forcereload){
+            if(!this.cacheCurrentUser || forcereload){
+                this.cacheCurrentUser = this._get('/api/getCurrentUser');
+            }
+            return this.cacheCurrentUser;
         };
 
+        ServerConnection.prototype.setAuthKeys = function(authGet, authPost, authPlay){
+            this._authGet = authGet;
+            this._authPost = authPost;
+            this._authPlay = authPlay;
+        };
+        ServerConnection.prototype.authGet = function(){
+            return this._authGet ;
+        };
+        ServerConnection.prototype.authPost = function(){
+            return this._authPost ;
+        };
+        ServerConnection.prototype.authPlay = function(){
+            return this._authPlay; // auth_rtsp
+        };
+        /* End of Authentication  */
+
+        /* Server settings */
+        ServerConnection.prototype.getTime = function(){
+            return this._get('/api/gettime?local');
+        };
+        /* End of Server settings */
 
         /* Working with users*/
         ServerConnection.prototype.getAggregatedUsersData = function(){
@@ -112,7 +157,7 @@ angular.module('nxCommon')
         };
         ServerConnection.prototype.deleteUser = function(userId){
             return this._post('/ec2/removeUser', {id:userId});
-        };
+        }
         ServerConnection.prototype.cleanUserObject = function(user){ // Remove unnesesary fields from the object
             var cleanedUser = {};
             if(user.id){
@@ -162,6 +207,9 @@ angular.module('nxCommon')
             var params = id?{id:this._cleanId(id)}:null;
             return this._get('/ec2/getMediaServersEx',params);
         };
+        ServerConnection.prototype.getMediaServersAndCameras = function(){
+            return this._get('/api/aggregator?exec_cmd=ec2%2FgetMediaServersEx&exec_cmd=ec2%2FgetCamerasEx');
+        }
         ServerConnection.prototype.getResourceTypes = function(){
             return this._get('/ec2/getResourceTypes');
         };
@@ -169,13 +217,34 @@ angular.module('nxCommon')
 
         /* Formatting urls */
         ServerConnection.prototype.previewUrl = function(cameraPhysicalId, time, width, height){
-            return this.urlBase +
-                '/api/image' +
-                '?physicalId=' + cameraPhysicalId +
-                (width? '&width=' + width:'') +
-                (height? '&height=' + height:'') +
-                ('&time=' + (time || 'LATEST')); // mb LATEST?
+            var data = {
+                    physicalId:cameraPhysicalId,
+                    time:time  || 'LATEST'
+                };
 
+            if(width){
+                data.width = width;
+            }
+            if(height){
+                data.height = height;
+            }
+            return this._setGetParams('/api/image', data, this.systemId && this.authGet());
+        };
+        ServerConnection.prototype.hlsUrl = function(cameraId, position, resolution){
+            var data = {};
+            if(position){
+                data.pos = position;
+            }
+            return this._setGetParams('/hls/' + cameraId + '.m3u8?' + resolution, data, this.authGet());
+        };
+        ServerConnection.prototype.webmUrl = function(cameraId, position, resolution){
+            var data = {
+                resolution:resolution
+            };
+            if(position){
+                data.pos = position;
+            }
+            return this._setGetParams('/media/' + cameraId + '.webm?rt' , data, this.authGet());
         };
         /* End of formatting urls */
 
@@ -213,6 +282,13 @@ angular.module('nxCommon')
         };
         /* End of Working with archive*/
 
+        ServerConnection.prototype.setCameraPath = function(cameraId){
+            var systemLink = '';
+            if(this.systemId){
+                systemLink = '/systems/' + this.systemId;
+            }
+            $location.path(systemLink + '/view/' + cameraId, false);
+        };
 
         if(Config.webadminSystemApiCompatibility){
             // This is a hack to avoid changing all webadmin controllers at the same time - we initialize default connection
@@ -228,8 +304,8 @@ angular.module('nxCommon')
                 }
             }
             var defaultConnection = connect(null, serverId);
-            console.log("init default connection");
             return defaultConnection;
         }
+
         return connect;
-    });
+    }]);

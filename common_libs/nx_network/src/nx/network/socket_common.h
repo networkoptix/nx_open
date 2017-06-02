@@ -151,6 +151,9 @@ public:
     std::string toStdString() const;
     bool isNull() const;
 
+    /** @return true if all required properties are specified to be used for send/receive data. */
+    bool isComplete() const;
+
     static const SocketAddress anyAddress;
     static const SocketAddress anyPrivateAddress;
     static QString trimIpV6(const QString& ip);

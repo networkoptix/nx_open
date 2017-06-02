@@ -155,7 +155,7 @@
             </Component>
             <Component>
                 <File Id="nx_kit.dll" Name="nx_kit.dll" Source="$(var.SourceDir)/nx_kit.dll" DiskId="4" />
-            </Component>              
+            </Component>
         </ComponentGroup>
 
         <ComponentGroup Id="ClientOpenAL" Directory="$(var.clientDirId)">

@@ -14,10 +14,10 @@ class RunTimeOptions;
 
 class ConnectHandler:
     public nx_http::AbstractHttpRequestHandler,
-    public network::server::StreamConnectionHolder<nx_http::AsyncMessagePipeline>
+    public network::server::StreamConnectionHolder<nx_http::deprecated::AsyncMessagePipeline>
 {
     using base_type = 
-        network::server::StreamConnectionHolder<nx_http::AsyncMessagePipeline>;
+        network::server::StreamConnectionHolder<nx_http::deprecated::AsyncMessagePipeline>;
 
 public:
     ConnectHandler(
@@ -33,7 +33,7 @@ public:
 
     virtual void closeConnection(
         SystemError::ErrorCode closeReason,
-        nx_http::AsyncMessagePipeline* connection) override;
+        nx_http::deprecated::AsyncMessagePipeline* connection) override;
 
 private:
     typedef AbstractCommunicatingSocket Socket;

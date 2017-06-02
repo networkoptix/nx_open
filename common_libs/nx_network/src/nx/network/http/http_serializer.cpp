@@ -2,24 +2,19 @@
 
 namespace nx_http {
 
-MessageSerializer::MessageSerializer()
-{
-}
-
-//!Set message to serialize
-void MessageSerializer::setMessage( const Message* message )
+void MessageSerializer::setMessage(const Message* message)
 {
     m_message = message;
 }
         
-SerializerState::Type MessageSerializer::serialize( nx::Buffer* const buffer, size_t* const bytesWritten )
+nx::network::server::SerializerState MessageSerializer::serialize(
+    nx::Buffer* const buffer,
+    size_t* bytesWritten)
 {
-    //TODO #ak introduce cool implementation (small refactor to HttpMessage::serialize is required)
-
     const auto bufSizeBak = buffer->size();
-    m_message->serialize( buffer );
+    m_message->serialize(buffer);
     *bytesWritten = buffer->size() - bufSizeBak;
-    return SerializerState::done;
+    return nx::network::server::SerializerState::done;
 }
 
 } // namespace nx_http

@@ -32,9 +32,26 @@ void ModuleConnector::setDisconnectHandler(DisconnectedHandler handler)
     m_disconnectedHandler = std::move(handler);
 }
 
+static void validateEndpoints(std::set<SocketAddress>* endpoints)
+{
+    for (auto it = endpoints->begin(); it != endpoints->end(); )
+    {
+        NX_ASSERT(it->isComplete(), lm("Invalid endpoint: %1").arg(*it));
+
+        if (it->isComplete())
+            ++it;
+        else
+            it = endpoints->erase(it);
+    }
+}
+
 void ModuleConnector::newEndpoints(std::set<SocketAddress> endpoints, const QnUuid& id)
 {
+    validateEndpoints(&endpoints);
     NX_ASSERT(endpoints.size());
+    if (endpoints.empty())
+        return;
+
     dispatch(
         [this, endpoints = std::move(endpoints), id]() mutable
         {
@@ -44,6 +61,7 @@ void ModuleConnector::newEndpoints(std::set<SocketAddress> endpoints, const QnUu
 
 void ModuleConnector::setForbiddenEndpoints(std::set<SocketAddress> endpoints, const QnUuid& id)
 {
+    validateEndpoints(&endpoints);
     dispatch(
         [this, endpoints = std::move(endpoints), id]() mutable
         {

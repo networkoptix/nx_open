@@ -1,5 +1,5 @@
-#include "multicast_http_ut.h"
 #include "media_server_process.h"
+#include "multicast_http_ut.h"
 #include "platform/platform_abstraction.h"
 #include "nx/utils/thread/long_runnable.h"
 #include "media_server/media_server_module.h"
@@ -128,7 +128,7 @@ public:
         }, 3000);
     }
 
-    void callbackTimeout(const QUuid& requestId, QnMulticast::ErrCode errCode, const QnMulticast::Response& response)
+    void callbackTimeout(const QUuid& requestId, QnMulticast::ErrCode errCode, const QnMulticast::Response& /*response*/)
     {
         ASSERT_TRUE(m_runningRequestId == requestId);
         ASSERT_TRUE(errCode == QnMulticast::ErrCode::timeout);
@@ -191,7 +191,7 @@ public:
         request.auth.setUser(lit("admin"));
         request.auth.setPassword(oldPassword);
 
-        auto callback = [this](const QUuid& requestId, QnMulticast::ErrCode errCode, const QnMulticast::Response& response)
+        auto callback = [this](const QUuid& /*requestId*/, QnMulticast::ErrCode errCode, const QnMulticast::Response& response)
         {
             m_runningRequestId = QUuid();
             ASSERT_TRUE(errCode == QnMulticast::ErrCode::ok);
@@ -228,7 +228,7 @@ public:
         request1.url = QUrl(lit("/api/auditLog"));
         for (int i = 0; i < MT_REQUESTS; ++i)
         {
-            auto callback = [this](const QUuid& requestId, QnMulticast::ErrCode errCode, const QnMulticast::Response& response)
+            auto callback = [this](const QUuid& /*requestId*/, QnMulticast::ErrCode errCode, const QnMulticast::Response& response)
             {
                 ASSERT_TRUE(errCode == QnMulticast::ErrCode::ok);
                 ASSERT_TRUE(response.httpResult == 200); // HTTP OK

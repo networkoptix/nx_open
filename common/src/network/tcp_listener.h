@@ -69,6 +69,7 @@ public:
     static QString normalizedPath(const QString& path);
 
     virtual void applyModToRequest(nx_http::Request* /*request*/) {}
+
 signals:
     void portChanged();
 

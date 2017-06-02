@@ -1,8 +1,8 @@
 'use strict';
 
 angular.module('cloudApp')
-    .controller('ShareCtrl', ['$scope', 'cloudApi', 'process', 'dialogs', '$q', 'account', 'mediaserver',
-    function ($scope, cloudApi, process, dialogs, $q, account, mediaserver) {
+    .controller('ShareCtrl', ['$scope', 'cloudApi', 'process', 'dialogs', '$q', 'account',
+    function ($scope, cloudApi, process, dialogs, $q, account) {
 
         $scope.buttonText = L.sharing.shareConfirmButton;
 

@@ -91,6 +91,7 @@ public:
         Calls \a QnResource::init. If \a QnResource::init is already running in another thread, this method waits for it to complete
     */
     void blockingInit();
+    // TODO: comment
     void initAsync(bool optional);
     CameraDiagnostics::Result prevInitializationResult() const;
     //!Returns counter of resource initialization attempts (every attempt: successful or not)

@@ -32,7 +32,7 @@ namespace ec2
         virtual ~RemoteEC2Connection();
 
         virtual QnConnectionInfo connectionInfo() const override;
-        virtual QString authInfo() const override;
+        virtual void updateConnectionUrl(const QUrl& url) override;
 
         virtual void startReceivingNotifications() override;
         virtual void stopReceivingNotifications() override;
@@ -42,7 +42,7 @@ namespace ec2
 
     private:
         FixedUrlClientQueryProcessorPtr m_queryProcessor;
-        const QnConnectionInfo m_connectionInfo;
+        QnConnectionInfo m_connectionInfo;
         QnUuid m_remotePeerId;
     };
     typedef std::shared_ptr<RemoteEC2Connection> RemoteEC2ConnectionPtr;

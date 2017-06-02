@@ -27,7 +27,7 @@ class SessionsMigrationHelperPrivate: public QObject, public QnConnectionContext
 {
 public:
     void at_moduleFound(
-        nx::vms::discovery::Manager::ModuleData moduleData)
+        nx::vms::discovery::ModuleEndpoint moduleData)
     {
         using namespace nx::client::core::helpers;
         using nx::client::core::LocalConnectionData;

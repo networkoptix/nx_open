@@ -12,7 +12,7 @@ public:
     OldEcConnection(const QnConnectionInfo& connectionInfo);
 
     virtual QnConnectionInfo connectionInfo() const override;
-    virtual QString authInfo() const override;
+    virtual void updateConnectionUrl(const QUrl& url) override;
 
     virtual AbstractResourceManagerPtr getResourceManager(const Qn::UserAccessData &) override;
     virtual AbstractMediaServerManagerPtr getMediaServerManager(const Qn::UserAccessData &) override;

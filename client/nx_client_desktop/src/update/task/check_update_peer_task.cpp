@@ -414,7 +414,7 @@ void QnCheckForUpdatesPeerTask::at_buildReply_finished(QnAsyncHttpClientReply* r
         for (auto variant = variants.begin(); variant != variants.end(); ++variant)
         {
             // We suppose arch name does not contain '_' char.
-            // E.g. arm_isd_s2 will be split to "arm" and "isd_s2"
+            // E.g. arm_edge1_2 will be split to "arm" and "edge1_2".
             const auto arch = variant.key().section(L'_', 0, 0);
             const auto modification = variant.key().mid(arch.size() + 1);
 

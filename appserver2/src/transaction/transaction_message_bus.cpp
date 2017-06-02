@@ -941,7 +941,6 @@ bool QnTransactionMessageBus::sendInitialData(QnTransactionTransport* transport)
         transport->setWriteSync(true);
         sendRuntimeInfo(transport, processedPeers, QnTranState());
         transport->sendTransaction(tran, processedPeers);
-        transport->sendTransaction(prepareModulesDataTransaction(), processedPeers);
         transport->setReadSync(true);
 
         //sending local time information on known servers
@@ -1085,29 +1084,6 @@ void QnTransactionMessageBus::handlePeerAliveChanged(const ApiPeerData &peer, bo
         emit peerFound(aliveData.peer.id, aliveData.peer.peerType);
     else
         emit peerLost(aliveData.peer.id, aliveData.peer.peerType);
-}
-
-QnTransaction<ApiDiscoveredServerDataList> QnTransactionMessageBus::prepareModulesDataTransaction() const
-{
-    QnTransaction<ApiDiscoveredServerDataList> transaction(
-        ApiCommand::discoveredServersList,
-        commonModule()->moduleGUID());
-
-
-    const auto moduleManager = commonModule()->moduleDiscoveryManager();
-    for (const auto& serverData: getServers(moduleManager))
-    {
-        if (serverData.status == Qn::Online ||
-            serverData.status == Qn::Unauthorized ||
-            serverData.status == Qn::Incompatible)
-        {
-            transaction.params.push_back(std::move(serverData));
-        }
-    }
-
-    transaction.peerID = commonModule()->moduleGUID();
-    transaction.transactionType = TransactionType::Local;
-    return transaction;
 }
 
 static SocketAddress getUrlAddr(const QUrl& url) { return SocketAddress(url.host(), url.port()); }

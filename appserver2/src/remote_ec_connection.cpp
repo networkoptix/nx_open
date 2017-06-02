@@ -35,9 +35,9 @@ namespace ec2
         return m_connectionInfo;
     }
 
-    QString RemoteEC2Connection::authInfo() const
+    void RemoteEC2Connection::updateConnectionUrl(const QUrl& url)
     {
-        return m_connectionInfo.ecUrl.password();
+        m_connectionInfo.ecUrl = url;
     }
 
     void RemoteEC2Connection::startReceivingNotifications()

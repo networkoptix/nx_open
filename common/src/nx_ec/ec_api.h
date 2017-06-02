@@ -50,6 +50,7 @@ class QnRestProcessorPool;
 class QnHttpConnectionListener;
 class QnCommonModule;
 struct QnModuleInformation;
+namespace nx { namespace vms { namespace discovery { class Manager; } } }
 
 //!Contains API classes for the new Server
 /*!
@@ -413,6 +414,28 @@ namespace ec2
                 std::make_shared<impl::CustomListDirectoryHandler<TargetType, HandlerType>>(target, handler)) );
         }
 
+        ErrorCode listDirectorySync(const QString& folderName, QStringList* const outData)
+        {
+            return impl::doSyncCall<impl::ListDirectoryHandler>(
+                [=](const impl::ListDirectoryHandlerPtr &handler)
+                {
+                    return this->listDirectory(folderName, handler);
+                },
+                outData
+            );
+        }
+
+        ErrorCode addStoredFileSync(const QString& folderName, const QByteArray& data)
+        {
+            int(AbstractStoredFileManager::*fn)(
+                const QString&,
+                const QByteArray&,
+                impl::SimpleHandlerPtr) =
+                &AbstractStoredFileManager::addStoredFile;
+            return impl::doSyncCall<impl::SimpleHandler>(
+                std::bind(fn, this, folderName, data, std::placeholders::_1));
+        }
+
     protected:
         virtual int getStoredFile( const QString& filename, impl::GetStoredFileHandlerPtr handler ) = 0;
         virtual int addStoredFile( const QString& filename, const QByteArray& data, impl::SimpleHandlerPtr handler ) = 0;
@@ -499,39 +522,13 @@ namespace ec2
             return impl::doSyncCall<impl::GetDiscoveryDataHandler>(std::bind(fn, this, std::placeholders::_1), discoveryDataList);
         }
 
-        template<class TargetType, class HandlerType> int sendDiscoveredServer(
-            QnTransactionMessageBusBase* messageBus,
-            const ApiDiscoveredServerData &discoveredServer,
-            TargetType *target,
-            HandlerType handler)
-        {
-            return sendDiscoveredServer(messageBus, discoveredServer, std::static_pointer_cast<impl::SimpleHandler>(
-                std::make_shared<impl::CustomSimpleHandler<TargetType, HandlerType>>(target, handler)));
-        }
-
-        template<class TargetType, class HandlerType> int sendDiscoveredServersList(
-            QnTransactionMessageBusBase* messageBus,
-            const ApiDiscoveredServerDataList &discoveredServersList,
-            TargetType *target,
-            HandlerType handler)
-        {
-            return sendDiscoveredServersList(messageBus, discoveredServersList, std::static_pointer_cast<impl::SimpleHandler>(
-                 std::make_shared<impl::CustomSimpleHandler<TargetType, HandlerType>>(target, handler)));
-        }
+        virtual void monitorServerDiscovery() = 0;
 
     protected:
         virtual int discoverPeer(const QnUuid &id, const QUrl &url, impl::SimpleHandlerPtr handler) = 0;
         virtual int addDiscoveryInformation(const QnUuid &id, const QUrl &url, bool ignore, impl::SimpleHandlerPtr handler) = 0;
         virtual int removeDiscoveryInformation(const QnUuid &id, const QUrl &url, bool ignore, impl::SimpleHandlerPtr handler) = 0;
         virtual int getDiscoveryData(impl::GetDiscoveryDataHandlerPtr handler) = 0;
-        virtual int sendDiscoveredServer(
-            QnTransactionMessageBusBase* messageBus,
-            const ApiDiscoveredServerData &discoveredServer,
-            impl::SimpleHandlerPtr handler) = 0;
-        virtual int sendDiscoveredServersList(
-            QnTransactionMessageBusBase* messageBus,
-            const ApiDiscoveredServerDataList &discoveredServersList,
-            impl::SimpleHandlerPtr handler) = 0;
     };
     typedef std::shared_ptr<AbstractDiscoveryManager> AbstractDiscoveryManagerPtr;
 
@@ -699,7 +696,12 @@ namespace ec2
 
         virtual QnConnectionInfo connectionInfo() const = 0;
 
-        virtual QString authInfo() const = 0;
+        /**
+         * Changes url client currently uses to connect to server. Required to handle situations
+         * like user password change, server port change or systems merge.
+         */
+        virtual void updateConnectionUrl(const QUrl& url) = 0;
+
         //!Calling this method starts notifications delivery by emitting corresponding signals of corresponding manager
         /*!
             \note Calling entity MUST connect to all interesting signals prior to calling this method so that received data is consistent

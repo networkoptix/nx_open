@@ -27,7 +27,7 @@
 
         <windows.defines>EC2_LIB_API=__declspec(dllimport)</windows.defines>
 
-        <rdep.packages>any/server-external-${branch}|any/server-external any/apidoctool openssl ffmpeg onvif quazip sigar any/qtsinglecoreapplication any/qtservice</rdep.packages>
+        <rdep.packages>any/server-external-${branch}|any/server-external any/apidoctool openssl ffmpeg onvif quazip sigar any/qtsinglecoreapplication any/qtservice any/nx_kit</rdep.packages>
         <rdep.linux.arm.packages>openldap</rdep.linux.arm.packages>
     </properties>
 
@@ -159,24 +159,6 @@
             </activation>
             <properties>
                 <buildLib>sharedlib</buildLib>
-            </properties>
-        </profile>
-        <profile>
-            <id>linux-arm-isd</id>
-            <activation>
-                <activeByDefault>false</activeByDefault>
-                <os>
-                    <family>unix</family>
-                    <name>linux</name>
-                </os>
-                <property>
-                    <name>box</name>
-                    <value>isd</value>
-                </property>
-            </activation>
-            <properties>
-                <qt.libs>core network xml sql</qt.libs>
-                <rdep.linux.arm.packages>openldap</rdep.linux.arm.packages>
             </properties>
         </profile>
         <profile>

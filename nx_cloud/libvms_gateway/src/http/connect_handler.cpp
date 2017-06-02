@@ -66,7 +66,7 @@ void ConnectHandler::processRequest(
 
 void ConnectHandler::closeConnection(
     SystemError::ErrorCode /*closeReason*/,
-    nx_http::AsyncMessagePipeline* /*connection*/)
+    nx_http::deprecated::AsyncMessagePipeline* /*connection*/)
 {
     m_connectionSocket.reset();
     m_targetSocket.reset();

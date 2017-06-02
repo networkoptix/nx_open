@@ -30,6 +30,7 @@
     "restorePassword": "Reset password -",
     "restorePasswordSuccess": "Password saved -",
     "restorePasswordCode": "Reset password -",
+    "view": "View cameras - ",
     "contentPage": "",
     "debug": "Debug",
     "login": "Log in -",
@@ -211,5 +212,9 @@
   "regActions":{
     "passwordLabel":"Password",
     "createAccount": "Create Account"
+  },
+  "header":{
+    "allSystems":"All Systems",
+    "systems":"Systems"
   }
 }

@@ -9,7 +9,7 @@ struct PasswordData
     PasswordData();
     PasswordData(const QnRequestParams& params);
 
-    static PasswordData calculateHashes(const QString& username, const QString& password);
+    static PasswordData calculateHashes(const QString& username, const QString& password, bool isLdap);
 
     bool hasPassword() const;
 

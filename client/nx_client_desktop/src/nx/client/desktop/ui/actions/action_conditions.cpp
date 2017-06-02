@@ -46,6 +46,7 @@
 #include <ui/graphics/items/resource/media_resource_widget.h>
 #include <ui/workbench/watchers/workbench_schedule_watcher.h>
 #include <ui/workbench/workbench.h>
+#include <ui/workbench/workbench_item.h>
 #include <ui/workbench/workbench_display.h>
 #include <ui/workbench/workbench_layout.h>
 #include <ui/workbench/workbench_context.h>
@@ -1668,6 +1669,25 @@ ConditionWrapper tourIsRunning()
         [](const Parameters& /*parameters*/, QnWorkbenchContext* context)
         {
             return context->action(action::ToggleLayoutTourModeAction)->isChecked();
+        });
+}
+
+ConditionWrapper canSavePtzPosition()
+{
+    return new CustomBoolCondition(
+        [](const Parameters& parameters, QnWorkbenchContext* context)
+        {
+            auto widget = dynamic_cast<const QnMediaResourceWidget*>(parameters.widget());
+            NX_EXPECT(widget);
+            if (!widget)
+                return false;
+
+            // Allow to save position on fisheye cameras only if dewarping is enabled.
+            const bool isFisheyeCamera = widget->resource()->getDewarpingParams().enabled;
+            if (isFisheyeCamera)
+                return widget->item()->dewarpingParams().enabled;
+
+            return true;
         });
 }
 

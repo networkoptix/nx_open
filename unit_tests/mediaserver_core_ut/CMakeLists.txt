@@ -1,3 +1,3 @@
-nx_add_target(mediaserver_core_ut EXECUTABLE
+nx_add_test(mediaserver_core_ut
     PUBLIC_LIBS
         mediaserver_core libcloud_db festival GTest GMock)

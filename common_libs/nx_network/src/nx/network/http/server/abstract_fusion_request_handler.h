@@ -2,6 +2,8 @@
 
 #include "detail/abstract_fusion_request_handler_detail.h"
 
+#include "../http_types.h" 
+
 namespace nx_http {
 
 /**
@@ -70,8 +72,12 @@ private:
         this->m_completionHandler = std::move(completionHandler);
         this->m_requestMethod = request.requestLine.method;
 
-        if (!this->getDataFormat(request))
+        FusionRequestResult errorDescription;
+        if (!this->getDataFormat(request, nullptr, &errorDescription))
+        {
+            this->requestCompleted(std::move(errorDescription));
             return;
+        }
 
         processRequest(
             connection,

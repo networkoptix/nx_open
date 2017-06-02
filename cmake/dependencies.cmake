@@ -36,6 +36,8 @@ function(detect_package_versions)
 
     if(box STREQUAL "bananapi")
         set(_ffmpeg_version "3.1.1-bananapi")
+        set(_qt_version "5.6.1")
+        set(_openssl_version "1.0.0j")
     endif()
 
     if(box STREQUAL "rpi")
@@ -45,12 +47,7 @@ function(detect_package_versions)
         set(_festival_version "2.1")
     endif()
 
-    if(box STREQUAL "isd")
-        set(_openssl_version "1.0.0j")
-        set(_quazip_version "0.7.2")
-    endif()
-
-    if(box STREQUAL "isd_s2")
+    if(box STREQUAL "edge1")
         set(_qt_version "5.6.1")
         set(_openssl_version "1.0.1f")
         set(_quazip_version "0.7.2")
@@ -105,7 +102,7 @@ function(get_dependencies)
     nx_rdep_add_package(openssl)
     nx_rdep_add_package(ffmpeg)
 
-    if(box MATCHES "bpi")
+    if(box MATCHES "bpi|bananapi")
         nx_rdep_add_package(sysroot)
     endif()
 
@@ -126,10 +123,7 @@ function(get_dependencies)
         nx_rdep_add_package(directx)
     endif()
 
-    if(box STREQUAL "isd")
-        nx_rdep_add_package(vmux-1.0.0)
-    elseif(box STREQUAL "isd_s2")
-        nx_rdep_add_package(vmux-1.0.0)
+    if(box STREQUAL "edge1")
         nx_rdep_add_package(cpro-1.0.0)
     endif()
 
@@ -143,8 +137,7 @@ function(get_dependencies)
     endif()
 
     if(haveDesktopClient OR haveMobileClient)
-        nx_rdep_add_package(any/roboto-ttf)
-        nx_rdep_add_package(any/roboto-mono-ttf)
+        nx_rdep_add_package(any/roboto-fonts)
     endif()
 
     if(haveServer OR haveDesktopClient)

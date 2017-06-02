@@ -2,9 +2,8 @@
 
 #include <atomic>
 
-#include <QtCore/QString>
-
 #include <nx/utils/argument_parser.h>
+#include <nx/utils/thread/mutex.h>
 
 namespace nx {
 namespace utils {
@@ -18,6 +17,9 @@ public:
     static void disableTimeAsserts(bool areDisabled = true);
     static bool areTimeAssertsDisabled();
 
+    static void setTemporaryDirectoryPath(const QString& path);
+    static QString temporaryDirectoryPath();
+
     enum class LoadMode { light, normal, stress };
     static void setLoadMode(const QString& mode);
     static LoadMode getLoadMode();
@@ -27,14 +29,13 @@ public:
 
     static void applyArguments(const ArgumentParser& args);
 
-    static void setTemporaryDirectoryPath(const QString& path);
-    static QString temporaryDirectoryPath();
-
 private:
     static std::atomic<size_t> s_timeoutMultiplier;
     static std::atomic<bool> s_disableTimeAsserts;
     static std::atomic<LoadMode> s_loadMode;
-    static QString sTemporaryDirectoryPath;
+
+    static QnMutex s_mutex;
+    static QString s_temporaryDirectoryPath;
 };
 
 template<typename Count>
