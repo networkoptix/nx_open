@@ -25,6 +25,9 @@ $font-size-a-bit-large:   ceil($font-size-base * 1.15); //~16px - we just need 1
   font-size: $font-size-h3;
   margin-right:16px;
 }
+.container-fluid .navbar-brand{
+  margin-left:16px !important;
+}
 
 .navbar-brand>img{
   height:36px;
