@@ -597,7 +597,10 @@ namespace detail
             bool beginLazyTran();
             bool commitLazyTran();
         private:
+            void physicalCommitLazyData();
+        private:
             friend class QnLazyTransactionLocker;
+            friend class QnDbManager; //< Owner
 
             QnTransactionLog* m_tranLog;
             bool m_lazyTranInProgress;

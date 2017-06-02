@@ -195,6 +195,16 @@ bool QnDbManager::QnDbTransactionExt::commit()
     return rez;
 }
 
+void QnDbManager::QnDbTransactionExt::physicalCommitLazyData()
+{
+    if (m_lazyTranInProgress)
+    {
+        m_lazyTranInProgress = false;
+        m_database.commit();
+        m_tranLog->commit(); //< Just in case. It does nothing.
+    }
+}
+
 QnDbManager::QnLazyTransactionLocker::QnLazyTransactionLocker(QnDbTransactionExt* tran) :
     m_committed(false),
     m_tran(tran)
@@ -3999,7 +4009,8 @@ ErrorCode QnDbManager::doQuery(const nullptr_t& /*dummy*/, ApiDatabaseDumpData& 
 
 ErrorCode QnDbManager::doQuery(const ApiStoredFilePath& dumpFilePath, ApiDatabaseDumpToFileData& databaseDumpToFileData)
 {
-    QnDbTransactionLocker dbTran(getTransaction());
+    QnWriteLocker lock(&m_mutex);
+    m_tran->physicalCommitLazyData();
 
     //have to close/open DB to dump journals to .db file
     m_sdb.close();
