@@ -74,7 +74,7 @@ angular.module('nxCommon')
             var postData = method=='POST'? data : null;
             var requestUrl = this._setGetParams(url, getData, this.systemId && auth);
 
-            var canceller = $q.defer();
+            var canceler = $q.defer();
             var request = $http({
                 method: method,
                 url: requestUrl,
@@ -106,15 +106,14 @@ angular.module('nxCommon')
                 return $q.reject(error);// We cannot handle the problem at this level, pass it up
             });
 
-
             promise.then(function(){
-                canceller = null;
+                canceler = null;
             },function(){
-                canceller = null;
+                canceler = null;
             });
             promise.abort = function(reason){
-                if(canceller) {
-                    canceller.resolve('abort request: ' + reason);
+                if(canceler) {
+                    canceler.resolve('abort request: ' + reason);
                 }
             };
 
