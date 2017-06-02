@@ -743,6 +743,9 @@ button .icon-caret{
   margin-left:$padding-input-horizontal/2;
   margin-top: 2px;
 }
+.open .icon-caret{
+  background-position: -2px -14px ;
+}
 .close-icon{
   @include icon;
   background-position: -32px 0;
