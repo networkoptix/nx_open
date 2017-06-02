@@ -65,7 +65,7 @@ namespace ec2
         return AbstractLayoutManagerPtr();
     }
 
-    AbstractLayoutTourManagerPtr OldEcConnection::getLayoutTourManager(const Qn::UserAccessData& userAccessData)
+    AbstractLayoutTourManagerPtr OldEcConnection::getLayoutTourManager(const Qn::UserAccessData&)
     {
         return AbstractLayoutTourManagerPtr();
     }
@@ -201,11 +201,11 @@ namespace ec2
         return reqID;
     }
 
-    void OldEcConnection::addRemotePeer(const QUrl& /*url*/)
+    void OldEcConnection::addRemotePeer(const QnUuid& /*id*/, const QUrl& /*url*/)
     {
     }
 
-    void OldEcConnection::deleteRemotePeer(const QUrl& /*url*/)
+    void OldEcConnection::deleteRemotePeer(const QnUuid& /*id*/)
     {
     }
 

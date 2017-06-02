@@ -201,7 +201,7 @@ inline QTextStream& operator<<(QTextStream& stream, const QnScheduleTask& data)
 }
 
 
-typedef QList<QnScheduleTask> QnScheduleTaskList;
+typedef QVector<QnScheduleTask> QnScheduleTaskList;
 
 Q_DECLARE_TYPEINFO(QnScheduleTask, Q_MOVABLE_TYPE);
 Q_DECLARE_METATYPE(QnScheduleTask)

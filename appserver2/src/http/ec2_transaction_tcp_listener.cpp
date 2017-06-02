@@ -98,7 +98,7 @@ void QnTransactionTcpProcessor::run()
 
     ApiPeerData remotePeer(remoteGuid, remoteRuntimeGuid, peerType, dataFormat);
 
-    if (peerType == Qn::PT_Server && ec2::Settings::instance()->dbReadOnly())
+    if (peerType == Qn::PT_Server && commonModule()->isReadOnly())
     {
         sendResponse(nx_http::StatusCode::forbidden, nx_http::StringType());
         return;
@@ -341,4 +341,4 @@ void QnTransactionTcpProcessor::run()
 }
 
 
-}
+} // namespace ec2

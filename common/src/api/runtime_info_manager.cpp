@@ -28,9 +28,9 @@ void QnRuntimeInfoManager::setMessageProcessor(QnCommonMessageProcessor* message
             m_items->addOrUpdateItem(info);
         });
 
-        connect(messageProcessor, &QnCommonMessageProcessor::remotePeerLost, this, [this](const ec2::ApiPeerAliveData &data)
+        connect(messageProcessor, &QnCommonMessageProcessor::remotePeerLost, this, [this](QnUuid peer, Qn::PeerType peerType)
         {
-            m_items->removeItem(data.peer.id);
+            m_items->removeItem(peer);
         });
 
         connect(messageProcessor, &QnCommonMessageProcessor::connectionClosed, this, [this]

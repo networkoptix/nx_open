@@ -96,8 +96,8 @@ void TransactionLog::readTransactions(
 
     if (!to)
     {
-        ::ec2::QnTranStateKey maxTranStateKey;
-        maxTranStateKey.peerID = QnUuid::fromStringSafe(lit("{FFFFFFFF-FFFF-FFFF-FFFF-FFFFFFFFFFFF}"));
+        ::ec2::ApiPersistentIdData maxTranStateKey;
+        maxTranStateKey.id = QnUuid::fromStringSafe(lit("{FFFFFFFF-FFFF-FFFF-FFFF-FFFFFFFFFFFF}"));
         ::ec2::QnTranState maxTranState;
         maxTranState.values.insert(std::move(maxTranStateKey), std::numeric_limits<qint32>::max());
         to = std::move(maxTranState);
@@ -148,7 +148,7 @@ void TransactionLog::shiftLocalTransactionSequence(
 {
     QnMutexLocker lock(&m_mutex);
     return getTransactionLogContext(lock, systemId)->cache.shiftTransactionSequence(
-        ::ec2::QnTranStateKey(m_peerId, guidFromArbitraryData(systemId)),
+        ::ec2::ApiPersistentIdData(m_peerId, guidFromArbitraryData(systemId)),
         delta);
 }
 
@@ -215,7 +215,7 @@ nx::db::DBResult TransactionLog::fetchTransactionState(
         timestamp.sequence = selectTransactionStateQuery.value("timestamp_hi").toLongLong();
         timestamp.ticks = selectTransactionStateQuery.value("timestamp").toLongLong();
 
-        ::ec2::QnTranStateKey tranStateKey(
+        ::ec2::ApiPersistentIdData tranStateKey(
             QnUuid::fromStringSafe(peerGuid),
             QnUuid::fromStringSafe(dbGuid));
 
@@ -264,8 +264,8 @@ nx::db::DBResult TransactionLog::fetchTransactions(
         const auto dbResult = m_transactionDataObject->fetchTransactionsOfAPeerQuery(
             queryContext,
             systemId,
-            it.key().peerID.toSimpleString(),
-            it.key().dbID.toSimpleString(),
+            it.key().id.toSimpleString(),
+            it.key().persistentId.toSimpleString(),
             from.values.value(it.key()),
             to.values.value(it.key(), std::numeric_limits<qint32>::max()),
             &outputData->transactions);
@@ -331,7 +331,7 @@ int TransactionLog::generateNewTransactionSequence(
     const nx::String& systemId)
 {
     return getTransactionLogContext(lock, systemId)->cache.generateTransactionSequence(
-        ::ec2::QnTranStateKey(m_peerId, guidFromArbitraryData(systemId)));
+        ::ec2::ApiPersistentIdData(m_peerId, guidFromArbitraryData(systemId)));
 }
 
 ::ec2::Timestamp TransactionLog::generateNewTransactionTimestamp(

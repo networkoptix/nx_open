@@ -72,7 +72,6 @@ QnMediaServerModule::QnMediaServerModule(
     store(new QnVMax480Server(commonModule()));
 #endif
 
-    instance<QnLongRunnablePool>();
     instance<QnWriterPool>();
 #ifdef ENABLE_ONVIF
     store<PasswordHelper>(new PasswordHelper());

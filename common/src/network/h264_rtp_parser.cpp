@@ -313,7 +313,7 @@ bool CLH264RtpParser::isFirstSliceNal(
         bitReader.setBuffer(data+1, data + dataLen);
         macroNum = NALUnit::extractUEGolombCode(bitReader);
     }
-    catch(BitStreamException &e)
+    catch(BitStreamException&)
     {
         return false;
     }

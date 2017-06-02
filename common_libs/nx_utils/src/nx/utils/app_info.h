@@ -22,7 +22,15 @@ public:
     static QString linuxOrganizationName();
     static QString organizationNameForSettings();
 
-    static bool isArm() { return applicationArch() == lit("arm"); }
+    static bool isArm()
+    {
+        #if defined(__arm__)
+            return true;
+        #else
+            return false;
+        #endif
+    }
+
     static bool isBpi() { return armBox() == lit("bpi"); }
     static bool isRaspberryPi() { return armBox() == lit("rpi"); }
     static bool isNx1() { return armBox() == lit("nx1"); }
