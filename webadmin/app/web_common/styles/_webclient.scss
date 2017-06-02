@@ -304,26 +304,6 @@ table.webclient-window>tbody>tr>td{
 }
 
 .camera{
-  &-status{
-    display:inline-block;
-    width:1em;
-    text-align: center;
-    font-size:180%;
-    line-height: 1;
-
-    &.online-cam{
-      top: -8px;
-      left: -5px;  
-    }
-
-    &.offline-cam{
-      top: -8px;
-      left: -7px;
-      font-size: 200%;
-      font-weight: bolder;  
-    }
-  }
-
   &-info{
     margin-left: -32px;
   }
@@ -331,6 +311,9 @@ table.webclient-window>tbody>tr>td{
   &-preview .camera-status{
     position: absolute;
     z-index: 1;
+    top: 4px;
+    left: 4px;
+    width: 8px;
   }
 
   &-settings{
