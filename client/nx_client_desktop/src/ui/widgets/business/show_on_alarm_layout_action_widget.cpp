@@ -1,7 +1,7 @@
 #include "show_on_alarm_layout_action_widget.h"
 #include "ui_show_on_alarm_layout_action_widget.h"
 
-#include <business/business_action_parameters.h>
+#include <nx/vms/event/action_parameters.h>
 
 #include <core/resource/user_resource.h>
 #include <core/resource_management/resource_pool.h>
@@ -12,6 +12,8 @@
 #include <ui/style/resource_icon_cache.h>
 
 #include <utils/common/scoped_value_rollback.h>
+
+using namespace nx;
 
 QnShowOnAlarmLayoutActionWidget::QnShowOnAlarmLayoutActionWidget(QWidget *parent):
     base_type(parent),
@@ -36,23 +38,23 @@ void QnShowOnAlarmLayoutActionWidget::updateTabOrder(QWidget *before, QWidget *a
     setTabOrder(ui->useSourceCheckBox, after);
 }
 
-void QnShowOnAlarmLayoutActionWidget::at_model_dataChanged(QnBusiness::Fields fields)
+void QnShowOnAlarmLayoutActionWidget::at_model_dataChanged(Fields fields)
 {
     if (!model() || m_updating)
         return;
 
     QN_SCOPED_VALUE_ROLLBACK(&m_updating, true);
 
-    if (fields.testFlag(QnBusiness::ActionParamsField))
+    if (fields.testFlag(Field::actionParams))
     {
         ui->forceOpenCheckBox->setChecked(model()->actionParams().forced);
         ui->useSourceCheckBox->setChecked(model()->actionParams().useSource);
         updateUsersButtonText();
     }
 
-    if (fields.testFlag(QnBusiness::EventTypeField))
+    if (fields.testFlag(Field::eventType))
     {
-        bool canUseSource = (model()->eventType() >= QnBusiness::UserDefinedEvent || requiresCameraResource(model()->eventType()));
+        bool canUseSource = (model()->eventType() >= vms::event::UserDefinedEvent || requiresCameraResource(model()->eventType()));
         ui->useSourceCheckBox->setEnabled(canUseSource);
     }
 }
@@ -77,7 +79,7 @@ void QnShowOnAlarmLayoutActionWidget::selectUsers()
         for (const auto &id : dialog.selectedResources())
             userIds.push_back(id);
 
-        QnBusinessActionParameters params = model()->actionParams();
+        vms::event::ActionParameters params = model()->actionParams();
         params.additionalResources = userIds;
         model()->setActionParams(params);
     }
@@ -117,7 +119,7 @@ void QnShowOnAlarmLayoutActionWidget::paramsChanged()
 
     QN_SCOPED_VALUE_ROLLBACK(&m_updating, true);
 
-    QnBusinessActionParameters params = model()->actionParams();
+    vms::event::ActionParameters params = model()->actionParams();
     params.forced = ui->forceOpenCheckBox->isChecked();
     params.useSource = ui->useSourceCheckBox->isChecked();
     model()->setActionParams(params);

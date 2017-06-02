@@ -5,7 +5,7 @@
 #include <api/runtime_info_manager.h>
 #include <nx/streaming/archive_stream_reader.h>
 
-#include <business/actions/abstract_business_action.h>
+#include <nx/vms/event/actions/abstract_action.h>
 
 #include <camera/resource_display.h>
 #include <camera/cam_display.h>
@@ -42,6 +42,7 @@
 #include <utils/common/delayed.h>
 #include <nx/client/desktop/ui/workbench/layouts/layout_factory.h>
 
+using namespace nx;
 using namespace nx::client::desktop::ui;
 
 namespace {
@@ -95,9 +96,9 @@ QnWorkbenchAlarmLayoutHandler::QnWorkbenchAlarmLayoutHandler(QObject *parent):
         };
 
     connect(messageProcessor, &QnCommonMessageProcessor::businessActionReceived, this,
-        [this, allowedForUser](const QnAbstractBusinessActionPtr &businessAction)
+        [this, allowedForUser](const vms::event::AbstractActionPtr &businessAction)
         {
-            if (businessAction->actionType() != QnBusiness::ShowOnAlarmLayoutAction)
+            if (businessAction->actionType() != vms::event::ShowOnAlarmLayoutAction)
                 return;
 
             if (!context()->user())
@@ -118,7 +119,7 @@ QnWorkbenchAlarmLayoutHandler::QnWorkbenchAlarmLayoutHandler(QObject *parent):
             if (targetCameras.isEmpty())
                 return;
 
-            ActionKey key(businessAction->getBusinessRuleId(), businessAction->getRuntimeParams().eventTimestampUsec);
+            ActionKey key(businessAction->getRuleId(), businessAction->getRuntimeParams().eventTimestampUsec);
             if (m_processingActions.contains(key))
                 return; /* See m_processingActions comment. */
 

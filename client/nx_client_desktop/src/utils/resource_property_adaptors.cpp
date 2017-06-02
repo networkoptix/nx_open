@@ -1,6 +1,8 @@
 #include "resource_property_adaptors.h"
 
-#include <business/events/abstract_business_event.h>
+#include <nx/vms/event/events/abstract_event.h>
+
+using namespace nx;
 
 namespace {
     const QString namePtzHotkeys(lit("ptzHotkeys"));
@@ -12,12 +14,12 @@ namespace {
 
     /* Business events are packed to quint64 value, so we need to manually get key for each event.
      * Some events have their value more than 64, so we need to adjust them. */
-    qint64 eventTypeKey(QnBusiness::EventType eventType, bool *overflow) {
+    qint64 eventTypeKey(vms::event::EventType eventType, bool *overflow) {
         int offset = static_cast<int>(eventType);
         if (offset >= 64) {
             offset = 63;
             if (overflow) {
-                NX_ASSERT(!(*overflow), Q_FUNC_INFO, "Code should be improved to support more than one overflowed events.");                  
+                NX_ASSERT(!(*overflow), Q_FUNC_INFO, "Code should be improved to support more than one overflowed events.");
                 *overflow = true;
             }
         }
@@ -29,17 +31,17 @@ namespace {
 /* QnBusinessEventsFilterResourcePropertyAdaptor                        */
 /************************************************************************/
 
-QnBusinessEventsFilterResourcePropertyAdaptor::QnBusinessEventsFilterResourcePropertyAdaptor( QObject *parent /* = NULL*/ ) 
+QnBusinessEventsFilterResourcePropertyAdaptor::QnBusinessEventsFilterResourcePropertyAdaptor( QObject *parent /* = NULL*/ )
     : base_type(nameWatchedEventTypes, defaultWatchedEventsValue, parent)
 {}
 
-QList<QnBusiness::EventType> QnBusinessEventsFilterResourcePropertyAdaptor::watchedEvents() const
+QList<vms::event::EventType> QnBusinessEventsFilterResourcePropertyAdaptor::watchedEvents() const
 {
     qint64 packed = value();
-    QList<QnBusiness::EventType> result;
+    QList<vms::event::EventType> result;
     bool overflow = false;
 
-    for (const QnBusiness::EventType eventType: QnBusiness::allEvents()) {
+    for (const vms::event::EventType eventType: vms::event::allEvents()) {
         quint64 key = eventTypeKey(eventType, &overflow);
         if ((packed & key) == key)
             result << eventType;
@@ -47,12 +49,12 @@ QList<QnBusiness::EventType> QnBusinessEventsFilterResourcePropertyAdaptor::watc
     return result;
 }
 
-void QnBusinessEventsFilterResourcePropertyAdaptor::setWatchedEvents( const QList<QnBusiness::EventType> &events )
+void QnBusinessEventsFilterResourcePropertyAdaptor::setWatchedEvents( const QList<vms::event::EventType> &events )
 {
     quint64 value = defaultWatchedEventsValue;
 
     bool overflow = false;
-    for (const QnBusiness::EventType eventType: QnBusiness::allEvents()) {
+    for (const vms::event::EventType eventType: vms::event::allEvents()) {
         if (events.contains(eventType))
             continue;
 
@@ -62,7 +64,7 @@ void QnBusinessEventsFilterResourcePropertyAdaptor::setWatchedEvents( const QLis
     setValue(value);
 }
 
-bool QnBusinessEventsFilterResourcePropertyAdaptor::isAllowed( QnBusiness::EventType eventType ) const {
+bool QnBusinessEventsFilterResourcePropertyAdaptor::isAllowed( vms::event::EventType eventType ) const {
     return watchedEvents().contains(eventType);
 }
 

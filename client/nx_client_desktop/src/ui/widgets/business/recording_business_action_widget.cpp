@@ -1,7 +1,7 @@
 #include "recording_business_action_widget.h"
 #include "ui_recording_business_action_widget.h"
 
-#include <business/business_action_parameters.h>
+#include <nx/vms/event/action_parameters.h>
 
 #include <core/resource/camera_resource.h>
 #include <core/resource_management/resource_pool.h>
@@ -42,7 +42,7 @@ void QnRecordingBusinessActionWidget::updateTabOrder(QWidget *before, QWidget *a
     setTabOrder(ui->afterSpinBox,       after);
 }
 
-void QnRecordingBusinessActionWidget::at_model_dataChanged(QnBusiness::Fields fields) {
+void QnRecordingBusinessActionWidget::at_model_dataChanged(Fields fields) {
     if (!model())
         return;
 
@@ -50,11 +50,11 @@ void QnRecordingBusinessActionWidget::at_model_dataChanged(QnBusiness::Fields fi
 
     int maxFps = 0;
 
-    if (fields & QnBusiness::ActionResourcesField) {
+    if (fields.testFlag(Field::actionResources))
+    {
         auto cameras = resourcePool()->getResources<QnVirtualCameraResource>(model()->actionResources());
-        foreach (const QnVirtualCameraResourcePtr &camera, cameras) {
-            maxFps = maxFps == 0 ? camera->getMaxFps() : qMax(maxFps, camera->getMaxFps());
-        }
+        for (const auto& camera: cameras)
+            maxFps = (maxFps == 0 ? camera->getMaxFps() : qMax(maxFps, camera->getMaxFps()));
 
         ui->fpsSpinBox->setEnabled(maxFps > 0);
         ui->fpsSpinBox->setMaximum(maxFps);
@@ -63,10 +63,9 @@ void QnRecordingBusinessActionWidget::at_model_dataChanged(QnBusiness::Fields fi
         ui->fpsSpinBox->setMinimum(maxFps > 0 ? 1 : 0);
     }
 
-    if (fields & QnBusiness::ActionParamsField) {
-
-        QnBusinessActionParameters params = model()->actionParams();
-
+    if (fields.testFlag(Field::actionParams))
+    {
+        const auto params = model()->actionParams();
         int quality = ui->qualityComboBox->findData((int) params.streamQuality);
         if (quality >= 0)
             ui->qualityComboBox->setCurrentIndex(quality);
@@ -76,14 +75,15 @@ void QnRecordingBusinessActionWidget::at_model_dataChanged(QnBusiness::Fields fi
     }
 }
 
-void QnRecordingBusinessActionWidget::paramsChanged() {
+void QnRecordingBusinessActionWidget::paramsChanged()
+{
     if (!model() || m_updating)
         return;
 
-    QnBusinessActionParameters params;
-
+    nx::vms::event::ActionParameters params;
     params.fps = ui->fpsSpinBox->value();
     params.recordAfter = ui->afterSpinBox->value();
-    params.streamQuality = (Qn::StreamQuality)ui->qualityComboBox->itemData(ui->qualityComboBox->currentIndex()).toInt();
+    params.streamQuality = (Qn::StreamQuality)ui->qualityComboBox->itemData(
+        ui->qualityComboBox->currentIndex()).toInt();
     model()->setActionParams(params);
 }

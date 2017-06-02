@@ -13,7 +13,7 @@
 #include <client/client_message_processor.h>
 #include <client/client_show_once_settings.h>
 
-#include <business/business_strings_helper.h>
+#include <nx/vms/event/strings_helper.h>
 
 #include <core/resource/resource.h>
 #include <core/resource/user_resource.h>
@@ -33,6 +33,7 @@
 
 #include <watchers/cloud_status_watcher.h>
 
+using namespace nx;
 using namespace nx::client::desktop;
 using namespace nx::client::desktop::ui;
 
@@ -120,25 +121,25 @@ void QnWorkbenchNotificationsHandler::clear()
     emit cleared();
 }
 
-void QnWorkbenchNotificationsHandler::addNotification(const QnAbstractBusinessActionPtr &businessAction)
+void QnWorkbenchNotificationsHandler::addNotification(const vms::event::AbstractActionPtr &businessAction)
 {
-    QnBusinessEventParameters params = businessAction->getRuntimeParams();
-    QnBusiness::EventType eventType = params.eventType;
+    vms::event::EventParameters params = businessAction->getRuntimeParams();
+    vms::event::EventType eventType = params.eventType;
 
     const bool isAdmin = accessController()->hasGlobalPermission(Qn::GlobalAdminPermission);
 
     if (!isAdmin)
     {
-        if (eventType == QnBusiness::LicenseIssueEvent || eventType == QnBusiness::NetworkIssueEvent)
+        if (eventType == vms::event::LicenseIssueEvent || eventType == vms::event::NetworkIssueEvent)
             return;
 
-        if (businessAction->getParams().userGroup == QnBusiness::AdminOnly)
+        if (businessAction->getParams().userGroup == vms::event::AdminOnly)
             return;
     }
 
-    if (eventType >= QnBusiness::SystemHealthEvent && eventType <= QnBusiness::MaxSystemHealthEvent)
+    if (eventType >= vms::event::SystemHealthEvent && eventType <= vms::event::MaxSystemHealthEvent)
     {
-        int healthMessage = eventType - QnBusiness::SystemHealthEvent;
+        int healthMessage = eventType - vms::event::SystemHealthEvent;
         addSystemHealthEvent(QnSystemHealth::MessageType(healthMessage), businessAction);
         return;
     }
@@ -146,7 +147,7 @@ void QnWorkbenchNotificationsHandler::addNotification(const QnAbstractBusinessAc
     if (!context()->user())
         return;
 
-    if (businessAction->actionType() == QnBusiness::ShowOnAlarmLayoutAction)
+    if (businessAction->actionType() == vms::event::ShowOnAlarmLayoutAction)
     {
         //TODO: #GDM code duplication
         auto allowedForUser =
@@ -176,9 +177,9 @@ void QnWorkbenchNotificationsHandler::addNotification(const QnAbstractBusinessAc
     bool alwaysNotify = false;
     switch (businessAction->actionType())
     {
-        case QnBusiness::ShowOnAlarmLayoutAction:
-        case QnBusiness::PlaySoundAction:
-            //case QnBusiness::PlaySoundOnceAction: -- handled outside without notification
+        case vms::event::ShowOnAlarmLayoutAction:
+        case vms::event::PlaySoundAction:
+            //case vms::event::PlaySoundOnceAction: -- handled outside without notification
             alwaysNotify = true;
             break;
 
@@ -194,10 +195,10 @@ void QnWorkbenchNotificationsHandler::addNotification(const QnAbstractBusinessAc
 
 void QnWorkbenchNotificationsHandler::addSystemHealthEvent(QnSystemHealth::MessageType message)
 {
-    addSystemHealthEvent(message, QnAbstractBusinessActionPtr());
+    addSystemHealthEvent(message, vms::event::AbstractActionPtr());
 }
 
-void QnWorkbenchNotificationsHandler::addSystemHealthEvent(QnSystemHealth::MessageType message, const QnAbstractBusinessActionPtr &businessAction)
+void QnWorkbenchNotificationsHandler::addSystemHealthEvent(QnSystemHealth::MessageType message, const vms::event::AbstractActionPtr &businessAction)
 {
     if (message == QnSystemHealth::StoragesAreFull)
         return; //Bug #2308: Need to remove notification "Storages are full"
@@ -389,17 +390,17 @@ void QnWorkbenchNotificationsHandler::at_eventManager_connectionClosed()
     clear();
 }
 
-void QnWorkbenchNotificationsHandler::at_eventManager_actionReceived(const QnAbstractBusinessActionPtr &businessAction)
+void QnWorkbenchNotificationsHandler::at_eventManager_actionReceived(const vms::event::AbstractActionPtr &businessAction)
 {
     switch (businessAction->actionType())
     {
-        case QnBusiness::ShowPopupAction:
-        case QnBusiness::ShowOnAlarmLayoutAction:
+        case vms::event::ShowPopupAction:
+        case vms::event::ShowOnAlarmLayoutAction:
         {
             addNotification(businessAction);
             break;
         }
-        case QnBusiness::PlaySoundOnceAction:
+        case vms::event::PlaySoundOnceAction:
         {
             QString filename = businessAction->getParams().url;
             QString filePath = context()->instance<ServerNotificationCache>()->getFullPath(filename);
@@ -408,14 +409,14 @@ void QnWorkbenchNotificationsHandler::at_eventManager_actionReceived(const QnAbs
             AudioPlayer::playFileAsync(filePath);
             break;
         }
-        case QnBusiness::PlaySoundAction:
+        case vms::event::PlaySoundAction:
         {
             switch (businessAction->getToggleState())
             {
-                case QnBusiness::ActiveState:
+                case vms::event::ActiveState:
                     addNotification(businessAction);
                     break;
-                case QnBusiness::InactiveState:
+                case vms::event::InactiveState:
                     emit notificationRemoved(businessAction);
                     break;
                 default:
@@ -423,7 +424,7 @@ void QnWorkbenchNotificationsHandler::at_eventManager_actionReceived(const QnAbs
             }
             break;
         }
-        case QnBusiness::SayTextAction:
+        case vms::event::SayTextAction:
         {
             AudioPlayer::sayTextAsync(businessAction->getParams().sayText);
             break;

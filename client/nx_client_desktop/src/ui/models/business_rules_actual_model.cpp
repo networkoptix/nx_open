@@ -3,23 +3,25 @@
 #include <api/app_server_connection.h>
 #include <api/common_message_processor.h>
 
-#include <business/event_rule_manager.h>
+#include <nx/vms/event/rule_manager.h>
 #include <common/common_module.h>
 
 #include <ui/workbench/workbench_context.h>
+
+using namespace nx;
 
 QnBusinessRulesActualModel::QnBusinessRulesActualModel(QObject *parent):
     QnBusinessRulesViewModel(parent)
 {
     auto eventRuleManager = commonModule()->eventRuleManager();
 
-    connect(eventRuleManager, &QnEventRuleManager::ruleAddedOrUpdated,
+    connect(eventRuleManager, &vms::event::RuleManager::ruleAddedOrUpdated,
         this, &QnBusinessRulesActualModel::at_ruleAddedOrUpdated);
 
-    connect(eventRuleManager, &QnEventRuleManager::ruleRemoved,
+    connect(eventRuleManager, &vms::event::RuleManager::ruleRemoved,
         this, &QnBusinessRulesActualModel::at_ruleRemoved);
 
-    connect(eventRuleManager, &QnEventRuleManager::rulesReset,
+    connect(eventRuleManager, &vms::event::RuleManager::rulesReset,
         this, &QnBusinessRulesActualModel::at_rulesReset);
 
     reset();
@@ -40,7 +42,7 @@ void QnBusinessRulesActualModel::saveRule(const QModelIndex& index)
     if (!commonModule()->ec2Connection())
         return;
 
-    QnBusinessEventRulePtr rule = ruleModel->createRule();
+    vms::event::RulePtr rule = ruleModel->createRule();
 
     //TODO: #GDM SafeMode
     int handle = commonModule()->ec2Connection()->getBusinessEventManager(Qn::kSystemAccess)->save(
@@ -48,7 +50,7 @@ void QnBusinessRulesActualModel::saveRule(const QModelIndex& index)
     m_savingRules[handle] = ruleModel;
 }
 
-void QnBusinessRulesActualModel::at_resources_saved(int handle, ec2::ErrorCode errorCode, const QnBusinessEventRulePtr& rule)
+void QnBusinessRulesActualModel::at_resources_saved(int handle, ec2::ErrorCode errorCode, const vms::event::RulePtr& rule)
 {
     if (!m_savingRules.contains(handle))
         return;
@@ -61,7 +63,7 @@ void QnBusinessRulesActualModel::at_resources_saved(int handle, ec2::ErrorCode e
     emit afterModelChanged(RuleSaved, success);
 }
 
-void QnBusinessRulesActualModel::at_ruleAddedOrUpdated(const QnBusinessEventRulePtr& rule)
+void QnBusinessRulesActualModel::at_ruleAddedOrUpdated(const vms::event::RulePtr& rule)
 {
     addOrUpdateRule(rule);
     emit eventRuleChanged(rule->id());
@@ -73,7 +75,7 @@ void QnBusinessRulesActualModel::at_ruleRemoved(const QnUuid& id)
     emit eventRuleDeleted(id);
 }
 
-void QnBusinessRulesActualModel::at_rulesReset(const QnBusinessEventRuleList& rules)
+void QnBusinessRulesActualModel::at_rulesReset(const vms::event::RuleList& rules)
 {
     emit beforeModelChanged();
     clear();

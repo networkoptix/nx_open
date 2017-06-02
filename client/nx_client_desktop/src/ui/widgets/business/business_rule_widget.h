@@ -2,9 +2,9 @@
 
 #include <QtWidgets/QWidget>
 
-#include <business/business_fwd.h>
-#include <business/business_event_rule.h>
-#include <business/events/abstract_business_event.h>
+#include <nx/vms/event/event_fwd.h>
+#include <nx/vms/event/rule.h>
+#include <nx/vms/event/events/abstract_event.h>
 
 #include <ui/models/business_rules_view_model.h>
 
@@ -25,8 +25,8 @@ class QnAligner;
 class QnBusinessRuleWidget : public Connective<QnPanel>, public QnWorkbenchContextAware
 {
     Q_OBJECT
-
     typedef Connective<QnPanel> base_type;
+
 public:
     explicit QnBusinessRuleWidget(QWidget *parent = 0);
     virtual ~QnBusinessRuleWidget();
@@ -36,7 +36,6 @@ public:
 
 public slots:
     void at_scheduleButton_clicked();
-
 
 protected:
     /**
@@ -48,8 +47,13 @@ protected:
 
     virtual bool eventFilter(QObject *object, QEvent *event) override;
 
+private:
+    using Field = QnBusinessRuleViewModel::Field;
+    using Fields = QnBusinessRuleViewModel::Fields;
+    using Column = QnBusinessRuleViewModel::Column;
+
 private slots:
-    void at_model_dataChanged(QnBusiness::Fields fields);
+    void at_model_dataChanged(Fields fields);
 
     void at_eventTypeComboBox_currentIndexChanged(int index);
     void at_eventStatesComboBox_currentIndexChanged(int index);
@@ -72,8 +76,8 @@ private:
     QnAbstractBusinessParamsWidget *m_eventParameters;
     QnAbstractBusinessParamsWidget *m_actionParameters;
 
-    QMap<QnBusiness::EventType, QnAbstractBusinessParamsWidget*> m_eventWidgetsByType;
-    QMap<QnBusiness::ActionType, QnAbstractBusinessParamsWidget*> m_actionWidgetsByType;
+    QMap<nx::vms::event::EventType, QnAbstractBusinessParamsWidget*> m_eventWidgetsByType;
+    QMap<nx::vms::event::ActionType, QnAbstractBusinessParamsWidget*> m_actionWidgetsByType;
 
     QnResourceList m_dropResources;
 

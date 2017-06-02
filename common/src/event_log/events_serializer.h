@@ -1,12 +1,9 @@
-#ifndef __EVENTS_SERIALIZER_H__
-#define __EVENTS_SERIALIZER_H__
+#pragma once
 
-#include "business/actions/abstract_business_action.h"
+#include <nx/vms/event/actions/abstract_action.h>
 
 class QnEventSerializer
 {
 public:
-    static void deserialize(QnBusinessActionDataListPtr& events, const QByteArray& data);
+    static void deserialize(nx::vms::event::ActionDataListPtr& events, const QByteArray& data);
 };
-
-#endif // __EVENTS_SERIALIZER_H__

@@ -2,7 +2,7 @@
 #include "say_text_business_action_widget.h"
 #include "ui_say_text_business_action_widget.h"
 
-#include <business/business_action_parameters.h>
+#include <nx/vms/event/action_parameters.h>
 #include <ui/style/resource_icon_cache.h>
 
 #include <nx/audio/audiodevice.h>
@@ -48,14 +48,14 @@ void QnSayTextBusinessActionWidget::updateTabOrder(QWidget *before, QWidget *aft
     setTabOrder(ui->testButton,     after);
 }
 
-void QnSayTextBusinessActionWidget::at_model_dataChanged(QnBusiness::Fields fields) {
+void QnSayTextBusinessActionWidget::at_model_dataChanged(Fields fields) {
     if (!model() || m_updating)
         return;
 
     QN_SCOPED_VALUE_ROLLBACK(&m_updating, true);
 
     auto params = model()->actionParams();
-    if (fields & QnBusiness::ActionParamsField)
+    if (fields.testFlag(Field::actionParams))
     {
         ui->textEdit->setText(params.sayText);
         ui->playToClient->setChecked(params.playToClient);

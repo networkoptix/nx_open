@@ -10,9 +10,9 @@
 #include <api/app_server_connection.h>
 #include <api/server_rest_connection.h>
 
-#include <business/business_event_rule.h>
-#include <business/business_strings_helper.h>
-#include <business/event_rule_manager.h>
+#include <nx/vms/event/rule.h>
+#include <nx/vms/event/strings_helper.h>
+#include <nx/vms/event/rule_manager.h>
 
 #include <camera/resource_display.h>
 #include <camera/cam_display.h>
@@ -98,11 +98,12 @@
 #include <utils/license_usage_helper.h>
 #include <utils/math/color_transformations.h>
 #include <api/common_message_processor.h>
-#include <business/actions/abstract_business_action.h>
+#include <nx/vms/event/actions/abstract_action.h>
 #include <utils/media/sse_helper.h>
 #include <plugins/resource/avi/avi_resource.h>
 
-using namespace nx::client::desktop::ui;
+using namespace nx;
+using namespace client::desktop::ui;
 
 namespace {
 
@@ -320,9 +321,9 @@ QnMediaResourceWidget::QnMediaResourceWidget(QnWorkbenchContext* context, QnWork
         &QnMediaResourceWidget::updateCompositeOverlayMode);
 
     connect(qnCommonMessageProcessor, &QnCommonMessageProcessor::businessActionReceived, this,
-        [this](const QnAbstractBusinessActionPtr &businessAction)
+        [this](const vms::event::AbstractActionPtr &businessAction)
         {
-            if (businessAction->actionType() != QnBusiness::ExecutePtzPresetAction)
+            if (businessAction->actionType() != vms::event::ExecutePtzPresetAction)
                 return;
             const auto &actionParams = businessAction->getParams();
             if (actionParams.actionResourceId != m_resource->toResource()->getId())
@@ -459,13 +460,13 @@ QnMediaResourceWidget::QnMediaResourceWidget(QnWorkbenchContext* context, QnWork
 
     auto eventRuleManager = commonModule()->eventRuleManager();
 
-    connect(eventRuleManager, &QnEventRuleManager::rulesReset,
+    connect(eventRuleManager, &vms::event::RuleManager::rulesReset,
         this, &QnMediaResourceWidget::resetTriggers);
 
-    connect(eventRuleManager, &QnEventRuleManager::ruleAddedOrUpdated,
+    connect(eventRuleManager, &vms::event::RuleManager::ruleAddedOrUpdated,
         this, &QnMediaResourceWidget::at_eventRuleAddedOrUpdated);
 
-    connect(eventRuleManager, &QnEventRuleManager::ruleRemoved,
+    connect(eventRuleManager, &vms::event::RuleManager::ruleRemoved,
         this, &QnMediaResourceWidget::at_eventRuleRemoved);
 
     connect(this, &QnMediaResourceWidget::updateInfoTextLater, this,
@@ -2309,7 +2310,7 @@ const QnSpeedRange& QnMediaResourceWidget::availableSpeedRange()
 */
 
 QnMediaResourceWidget::SoftwareTrigger* QnMediaResourceWidget::createTriggerIfRelevant(
-    const QnBusinessEventRulePtr& rule)
+    const vms::event::RulePtr& rule)
 {
     NX_ASSERT(!m_softwareTriggers.contains(rule->id()));
 
@@ -2333,9 +2334,9 @@ QnMediaResourceWidget::SoftwareTrigger* QnMediaResourceWidget::createTriggerIfRe
     return &trigger;
 }
 
-bool QnMediaResourceWidget::isRelevantTriggerRule(const QnBusinessEventRulePtr& rule) const
+bool QnMediaResourceWidget::isRelevantTriggerRule(const vms::event::RulePtr& rule) const
 {
-    if (rule->isDisabled() || rule->eventType() != QnBusiness::SoftwareTriggerEvent)
+    if (rule->isDisabled() || rule->eventType() != vms::event::SoftwareTriggerEvent)
         return false;
 
     const auto users = rule->eventParams().metadata.instigators;
@@ -2354,7 +2355,7 @@ void QnMediaResourceWidget::configureTriggerButton(QnSoftwareTriggerButton* butt
 {
     NX_EXPECT(button);
 
-    const auto name = QnBusinessStringsHelper::getSoftwareTriggerName(info.name);
+    const auto name = vms::event::StringsHelper::getSoftwareTriggerName(info.name);
     button->setIcon(info.icon);
     button->setProlonged(info.prolonged);
     button->setToolTip(info.prolonged
@@ -2382,7 +2383,7 @@ void QnMediaResourceWidget::configureTriggerButton(QnSoftwareTriggerButton* butt
         connect(button, &QnSoftwareTriggerButton::pressed, this,
             [this, button, resultHandler, id = info.triggerId]()
             {
-                const auto requestId = invokeTrigger(id, resultHandler, QnBusiness::ActiveState);
+                const auto requestId = invokeTrigger(id, resultHandler, vms::event::ActiveState);
                 const bool success = requestId != rest::Handle();
                 button->setProperty(kTriggerRequestIdProperty, requestId);
                 button->setState(success
@@ -2397,7 +2398,7 @@ void QnMediaResourceWidget::configureTriggerButton(QnSoftwareTriggerButton* butt
                 if (button->state() == QnSoftwareTriggerButton::State::Failure)
                     return;
 
-                const auto requestId = invokeTrigger(id, resultHandler, QnBusiness::InactiveState);
+                const auto requestId = invokeTrigger(id, resultHandler, vms::event::InactiveState);
                 const bool success = requestId != rest::Handle();
                 button->setProperty(kTriggerRequestIdProperty, requestId);
                 button->setState(success
@@ -2448,7 +2449,7 @@ void QnMediaResourceWidget::at_eventRuleRemoved(const QnUuid& id)
     m_softwareTriggers.erase(iter);
 };
 
-void QnMediaResourceWidget::at_eventRuleAddedOrUpdated(const QnBusinessEventRulePtr& rule)
+void QnMediaResourceWidget::at_eventRuleAddedOrUpdated(const vms::event::RulePtr& rule)
 {
     const auto iter = m_softwareTriggers.find(rule->id());
     if (iter == m_softwareTriggers.end())
@@ -2469,7 +2470,7 @@ void QnMediaResourceWidget::at_eventRuleAddedOrUpdated(const QnBusinessEventRule
 rest::Handle QnMediaResourceWidget::invokeTrigger(
     const QString& id,
     std::function<void(bool, rest::Handle)> resultHandler,
-    QnBusiness::EventState toggleState)
+    vms::event::EventState toggleState)
 {
     if (!accessController()->hasGlobalPermission(Qn::GlobalUserInputPermission))
         return rest::Handle();

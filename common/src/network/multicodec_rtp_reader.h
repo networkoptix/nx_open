@@ -17,7 +17,7 @@
 
 #include <nx/streaming/rtsp_client.h>
 
-#include <business/business_fwd.h>
+#include <nx/vms/event/event_fwd.h>
 #include <nx/streaming/rtp_stream_parser.h>
 
 
@@ -86,7 +86,7 @@ public:
     QString getCurrentStreamUrl() const;
 
 signals:
-    void networkIssue(const QnResourcePtr&, qint64 timeStamp, QnBusiness::EventReason reasonCode, const QString& reasonParamsEncoded);
+    void networkIssue(const QnResourcePtr&, qint64 timeStamp, nx::vms::event::EventReason reasonCode, const QString& reasonParamsEncoded);
 
 private:
 

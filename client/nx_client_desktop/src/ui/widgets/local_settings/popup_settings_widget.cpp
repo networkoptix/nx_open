@@ -7,8 +7,8 @@
 #include <core/resource/user_resource.h>
 #include <core/resource_management/resource_properties.h>
 
-#include <business/events/abstract_business_event.h>
-#include <business/business_strings_helper.h>
+#include <nx/vms/event/events/abstract_event.h>
+#include <nx/vms/event/strings_helper.h>
 
 #include <health/system_health_helper.h>
 
@@ -20,6 +20,8 @@
 #include <utils/resource_property_adaptors.h>
 #include <utils/common/scoped_value_rollback.h>
 
+using namespace nx;
+
 QnPopupSettingsWidget::QnPopupSettingsWidget(QWidget* parent):
     base_type(parent),
     QnWorkbenchContextAware(parent),
@@ -28,7 +30,7 @@ QnPopupSettingsWidget::QnPopupSettingsWidget(QWidget* parent):
     m_systemHealthCheckBoxes(),
     m_adaptor(new QnBusinessEventsFilterResourcePropertyAdaptor(this)),
     m_updating(false),
-    m_helper(new QnBusinessStringsHelper(commonModule()))
+    m_helper(new vms::event::StringsHelper(commonModule()))
 {
     ui->setupUi(this);
 
@@ -37,7 +39,7 @@ QnPopupSettingsWidget::QnPopupSettingsWidget(QWidget* parent):
 
     setHelpTopic(this, Qn::SystemSettings_Notifications_Help);
 
-    for (QnBusiness::EventType eventType : QnBusiness::allEvents())
+    for (vms::event::EventType eventType : vms::event::allEvents())
     {
         QCheckBox* checkbox = new QCheckBox(this);
         checkbox->setText(m_helper->eventName(eventType));
@@ -115,11 +117,11 @@ void QnPopupSettingsWidget::loadDataToUi()
     if (context()->user())
         m_adaptor->setResource(context()->user());
 
-    QList<QnBusiness::EventType> watchedEvents = context()->user()
+    QList<vms::event::EventType> watchedEvents = context()->user()
         ? m_adaptor->watchedEvents()
-        : QnBusiness::allEvents();
+        : vms::event::allEvents();
 
-    for (QnBusiness::EventType eventType : m_businessRulesCheckBoxes.keys())
+    for (vms::event::EventType eventType : m_businessRulesCheckBoxes.keys())
     {
         bool checked = watchedEvents.contains(eventType);
         m_businessRulesCheckBoxes[eventType]->setChecked(checked);
@@ -152,13 +154,13 @@ bool QnPopupSettingsWidget::hasChanges() const
         || (context()->user() && m_adaptor->watchedEvents() != watchedEvents());
 }
 
-QList<QnBusiness::EventType> QnPopupSettingsWidget::watchedEvents() const
+QList<vms::event::EventType> QnPopupSettingsWidget::watchedEvents() const
 {
     if (ui->showAllCheckBox->isChecked())
-        return QnBusiness::allEvents();
+        return vms::event::allEvents();
 
-    QList<QnBusiness::EventType> result;
-    for (QnBusiness::EventType eventType : m_businessRulesCheckBoxes.keys())
+    QList<vms::event::EventType> result;
+    for (vms::event::EventType eventType : m_businessRulesCheckBoxes.keys())
         if (m_businessRulesCheckBoxes[eventType]->isChecked())
             result << eventType;
     return result;

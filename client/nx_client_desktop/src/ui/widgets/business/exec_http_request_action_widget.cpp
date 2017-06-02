@@ -1,7 +1,7 @@
 #include "exec_http_request_action_widget.h"
 #include "ui_exec_http_request_action_widget.h"
 
-#include <business/business_action_parameters.h>
+#include <nx/vms/event/action_parameters.h>
 #include <utils/common/scoped_value_rollback.h>
 
 namespace
@@ -47,7 +47,7 @@ void QnExecHttpRequestActionWidget::updateTabOrder(QWidget *before, QWidget *aft
     setTabOrder(ui->comboBoxContentType, after);
 }
 
-void QnExecHttpRequestActionWidget::at_model_dataChanged(QnBusiness::Fields fields)
+void QnExecHttpRequestActionWidget::at_model_dataChanged(Fields fields)
 {
     Q_UNUSED(fields);
     if (!model() || m_updating)
@@ -74,7 +74,7 @@ void QnExecHttpRequestActionWidget::paramsChanged()
 
     QN_SCOPED_VALUE_ROLLBACK(&m_updating, true);
 
-    QnBusinessActionParameters params = model()->actionParams();
+    auto params = model()->actionParams();
 
     QUrl url(ui->httpUrlLineEdit->text());
     url.setUserName(ui->loginLineEdit->text());

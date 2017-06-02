@@ -3,7 +3,7 @@
 #include <QtCore/QString>
 #include <QtCore/QByteArray>
 
-#include <business/business_fwd.h>
+#include <nx/vms/event/event_fwd.h>
 #include <core/resource/resource_fwd.h>
 #include <nx/utils/latin1_array.h>
 #include <nx/utils/latin1_array.h>

@@ -4,8 +4,8 @@
 #include <QtCore/QObject>
 
 #include <api/model/kvpair.h>
-#include <business/actions/abstract_business_action.h>
-#include <business/events/abstract_business_event.h>
+#include <nx/vms/event/actions/abstract_action.h>
+#include <nx/vms/event/events/abstract_event.h>
 #include <core/resource/resource_fwd.h>
 #include <health/system_health.h>
 #include <ui/workbench/workbench_state_manager.h>
@@ -26,7 +26,7 @@ public:
     virtual ~QnWorkbenchNotificationsHandler();
 
     void addSystemHealthEvent(QnSystemHealth::MessageType message);
-    void addSystemHealthEvent(QnSystemHealth::MessageType message, const QnAbstractBusinessActionPtr &businessAction);
+    void addSystemHealthEvent(QnSystemHealth::MessageType message, const nx::vms::event::AbstractActionPtr &businessAction);
 
     virtual bool tryClose(bool force) override;
     virtual void forcedUpdate() override;
@@ -35,8 +35,8 @@ signals:
     void systemHealthEventAdded( QnSystemHealth::MessageType message, const QVariant& params );
     void systemHealthEventRemoved( QnSystemHealth::MessageType message, const QVariant& params );
 
-    void notificationAdded(const QnAbstractBusinessActionPtr& businessAction);
-    void notificationRemoved(const QnAbstractBusinessActionPtr& businessAction);
+    void notificationAdded(const nx::vms::event::AbstractActionPtr& businessAction);
+    void notificationRemoved(const nx::vms::event::AbstractActionPtr& businessAction);
 
     void cleared();
 
@@ -48,13 +48,13 @@ private slots:
     void at_userEmailValidityChanged(const QnUserResourcePtr &user, bool isValid);
 
     void at_eventManager_connectionClosed();
-    void at_eventManager_actionReceived(const QnAbstractBusinessActionPtr& businessAction);
+    void at_eventManager_actionReceived(const nx::vms::event::AbstractActionPtr& businessAction);
 
     void at_settings_valueChanged(int id);
     void at_emailSettingsChanged();
 
 private:
-    void addNotification(const QnAbstractBusinessActionPtr& businessAction);
+    void addNotification(const nx::vms::event::AbstractActionPtr& businessAction);
 
     /**
      * Check that system health message can be displayed to admins only.

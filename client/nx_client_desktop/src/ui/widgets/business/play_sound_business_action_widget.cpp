@@ -4,7 +4,7 @@
 
 #include <QtCore/QFileInfo>
 
-#include <business/business_action_parameters.h>
+#include <nx/vms/event/action_parameters.h>
 #include <ui/style/resource_icon_cache.h>
 
 #include <nx/audio/audiodevice.h>
@@ -72,14 +72,15 @@ void QnPlaySoundBusinessActionWidget::updateCurrentIndex() {
     ui->pathComboBox->setCurrentIndex(soundModel->rowByFilename(m_filename));
 }
 
-void QnPlaySoundBusinessActionWidget::at_model_dataChanged(QnBusiness::Fields fields) {
+void QnPlaySoundBusinessActionWidget::at_model_dataChanged(Fields fields) {
     if (!model())
         return;
 
     QN_SCOPED_VALUE_ROLLBACK(&m_updating, true);
 
     auto params = model()->actionParams();
-    if (fields & QnBusiness::ActionParamsField) {
+    if (fields.testFlag(Field::actionParams))
+    {
         m_filename = params.url;
         QnNotificationSoundModel* soundModel = context()->instance<ServerNotificationCache>()->persistentGuiModel();
         ui->pathComboBox->setCurrentIndex(soundModel->rowByFilename(m_filename));

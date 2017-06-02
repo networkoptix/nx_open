@@ -13,33 +13,39 @@
 #include <ui/widgets/business/ptz_preset_business_action_widget.h>
 #include <ui/widgets/business/exec_http_request_action_widget.h>
 
-QnAbstractBusinessParamsWidget* QnBusinessActionWidgetFactory::createWidget(QnBusiness::ActionType actionType, QWidget *parent) {
-    switch (actionType) {
-    case QnBusiness::CameraOutputAction:
-        return new QnCameraOutputBusinessActionWidget(parent);
-    case QnBusiness::CameraRecordingAction:
-        return new QnRecordingBusinessActionWidget(parent);
-    case QnBusiness::SendMailAction:
-        return new QnSendmailBusinessActionWidget(parent);
-    case QnBusiness::ShowPopupAction:
-        return new QnPopupBusinessActionWidget(parent);
-    case QnBusiness::PlaySoundAction:
-    case QnBusiness::PlaySoundOnceAction:
-        return new QnPlaySoundBusinessActionWidget(parent);
-    case QnBusiness::SayTextAction:
-        return new QnSayTextBusinessActionWidget(parent);
-    case QnBusiness::BookmarkAction:
-        return new QnBookmarkBusinessActionWidget(parent);
-    case QnBusiness::ExecutePtzPresetAction:
-        return new QnExecPtzPresetBusinessActionWidget(parent);
-    case QnBusiness::ShowTextOverlayAction:
-        return new QnShowTextOverlayActionWidget(parent);
-    case QnBusiness::ShowOnAlarmLayoutAction:
-        return new QnShowOnAlarmLayoutActionWidget(parent);
-    case QnBusiness::ExecHttpRequestAction:
-        return new QnExecHttpRequestActionWidget(parent);
-    default:
-        break;
+using namespace nx;
+
+QnAbstractBusinessParamsWidget* QnBusinessActionWidgetFactory::createWidget(
+    vms::event::ActionType actionType,
+    QWidget* parent)
+{
+    switch (actionType)
+    {
+        case vms::event::CameraOutputAction:
+            return new QnCameraOutputBusinessActionWidget(parent);
+        case vms::event::CameraRecordingAction:
+            return new QnRecordingBusinessActionWidget(parent);
+        case vms::event::SendMailAction:
+            return new QnSendmailBusinessActionWidget(parent);
+        case vms::event::ShowPopupAction:
+            return new QnPopupBusinessActionWidget(parent);
+        case vms::event::PlaySoundAction:
+        case vms::event::PlaySoundOnceAction:
+            return new QnPlaySoundBusinessActionWidget(parent);
+        case vms::event::SayTextAction:
+            return new QnSayTextBusinessActionWidget(parent);
+        case vms::event::BookmarkAction:
+            return new QnBookmarkBusinessActionWidget(parent);
+        case vms::event::ExecutePtzPresetAction:
+            return new QnExecPtzPresetBusinessActionWidget(parent);
+        case vms::event::ShowTextOverlayAction:
+            return new QnShowTextOverlayActionWidget(parent);
+        case vms::event::ShowOnAlarmLayoutAction:
+            return new QnShowOnAlarmLayoutActionWidget(parent);
+        case vms::event::ExecHttpRequestAction:
+            return new QnExecHttpRequestActionWidget(parent);
+        default:
+            break;
     }
 
     return new QnEmptyBusinessActionWidget(parent);

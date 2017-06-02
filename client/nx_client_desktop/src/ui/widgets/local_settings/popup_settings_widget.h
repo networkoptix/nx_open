@@ -3,7 +3,7 @@
 #include <QtWidgets/QWidget>
 #include <QtWidgets/QCheckBox>
 
-#include <business/business_fwd.h>
+#include <nx/vms/event/event_fwd.h>
 #include <health/system_health.h>
 
 #include <ui/widgets/common/abstract_preferences_widget.h>
@@ -13,7 +13,8 @@ namespace Ui {
 class PopupSettingsWidget;
 }
 
-class QnBusinessStringsHelper;
+namespace nx { namespace vms { namespace event { class StringsHelper; }}}
+
 class QnBusinessEventsFilterResourcePropertyAdaptor;
 
 class QnPopupSettingsWidget: public QnAbstractPreferencesWidget, public QnWorkbenchContextAware
@@ -30,14 +31,14 @@ public:
     virtual bool hasChanges() const override;
 
 private:
-    QList<QnBusiness::EventType> watchedEvents() const;
+    QList<nx::vms::event::EventType> watchedEvents() const;
     quint64 watchedSystemHealth() const;
 
 private:
     QScopedPointer<Ui::PopupSettingsWidget> ui;
-    QMap<QnBusiness::EventType, QCheckBox*> m_businessRulesCheckBoxes;
+    QMap<nx::vms::event::EventType, QCheckBox*> m_businessRulesCheckBoxes;
     QMap<QnSystemHealth::MessageType, QCheckBox*> m_systemHealthCheckBoxes;
     QnBusinessEventsFilterResourcePropertyAdaptor* m_adaptor;
     bool m_updating;
-    std::unique_ptr<QnBusinessStringsHelper> m_helper;
+    std::unique_ptr<nx::vms::event::StringsHelper> m_helper;
 };

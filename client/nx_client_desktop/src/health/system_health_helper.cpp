@@ -1,6 +1,6 @@
 #include "system_health_helper.h"
 
-#include "business/actions/abstract_business_action.h"
+#include <nx/vms/event/actions/abstract_action.h>
 
 #include <nx/network/app_info.h>
 #include <nx/utils/string.h>

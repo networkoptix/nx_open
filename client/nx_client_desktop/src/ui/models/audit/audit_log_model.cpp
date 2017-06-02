@@ -6,7 +6,7 @@
 
 #include "api/common_message_processor.h"
 
-#include "business/business_strings_helper.h"
+#include <nx/vms/event/strings_helper.h>
 
 #include <client_core/client_core_module.h>
 
@@ -33,7 +33,9 @@
 #include <utils/common/qtimespan.h>
 #include <utils/math/math.h>
 
-typedef QnBusinessActionData* QnLightBusinessActionP;
+using namespace nx;
+
+typedef vms::event::ActionData* QnLightBusinessActionP;
 
 const QByteArray QnAuditLogModel::ChildCntParamName("childCnt");
 const QByteArray QnAuditLogModel::CheckedParamName("checked");

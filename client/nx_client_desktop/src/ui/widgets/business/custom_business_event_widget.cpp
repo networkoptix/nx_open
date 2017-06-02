@@ -11,11 +11,11 @@
 #include <utils/common/scoped_value_rollback.h>
 
 namespace {
-    const QString apiDocPath = lit("/static/api.xml");
-    const QString apiDocFragment = lit("group_Server_API_method_createEvent");
-}
+const QString kApiDocPath = lit("/static/api.xml");
+const QString kApiDocFragment = lit("group_Server_API_method_createEvent");
+} // namespace
 
-QnCustomBusinessEventWidget::QnCustomBusinessEventWidget(QWidget *parent) :
+QnCustomBusinessEventWidget::QnCustomBusinessEventWidget(QWidget* parent):
     base_type(parent),
     ui(new Ui::CustomBusinessEventWidget)
 {
@@ -35,40 +35,45 @@ QnCustomBusinessEventWidget::QnCustomBusinessEventWidget(QWidget *parent) :
 
     ui->hintLabel->setTextFormat(Qt::RichText);
     ui->hintLabel->setText(lit("%1<hr/>%2").arg(description, documentationHint));
-    connect(ui->hintLabel,  &QnWordWrappedLabel::linkActivated, this, [this] {
-        auto server = commonModule()->currentServer();
-        if (!server)
-            return;
+    connect(ui->hintLabel,  &QnWordWrappedLabel::linkActivated, this,
+        [this]
+        {
+            auto server = commonModule()->currentServer();
+            if (!server)
+                return;
 
-        QUrl targetUrl(server->getApiUrl());
-        targetUrl.setPath(apiDocPath);
-        targetUrl.setFragment(apiDocFragment);
-        QDesktopServices::openUrl(targetUrl);
-    });
+            QUrl targetUrl(server->getApiUrl());
+            targetUrl.setPath(kApiDocPath);
+            targetUrl.setFragment(kApiDocFragment);
+            QDesktopServices::openUrl(targetUrl);
+        });
 }
 
 QnCustomBusinessEventWidget::~QnCustomBusinessEventWidget()
 {
 }
 
-void QnCustomBusinessEventWidget::updateTabOrder(QWidget *before, QWidget *after) {
+void QnCustomBusinessEventWidget::updateTabOrder(QWidget* before, QWidget* after)
+{
     setTabOrder(before, ui->deviceNameEdit);
     setTabOrder(ui->deviceNameEdit, ui->captionEdit);
     setTabOrder(ui->captionEdit, ui->descriptionEdit);
     setTabOrder(ui->descriptionEdit, after);
 }
 
-void QnCustomBusinessEventWidget::at_model_dataChanged(QnBusiness::Fields fields) {
+void QnCustomBusinessEventWidget::at_model_dataChanged(Fields fields)
+{
     if (!model())
         return;
 
     QN_SCOPED_VALUE_ROLLBACK(&m_updating, true);
 
-    if (fields & QnBusiness::EventResourcesField) {
+    if (fields.testFlag(Field::eventResources))
+    {
         // TODO: #rvasilenko nothing to do so far. waiting for POS integration
     }
 
-    if (fields & QnBusiness::EventParamsField)
+    if (fields.testFlag(Field::eventParams))
     {
         QString resName = model()->eventParams().resourceName;
         if (ui->deviceNameEdit->text() != resName)
@@ -84,7 +89,8 @@ void QnCustomBusinessEventWidget::at_model_dataChanged(QnBusiness::Fields fields
     }
 }
 
-void QnCustomBusinessEventWidget::paramsChanged() {
+void QnCustomBusinessEventWidget::paramsChanged()
+{
     if (!model() || m_updating)
         return;
 

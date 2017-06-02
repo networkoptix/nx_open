@@ -16,7 +16,7 @@
 
 #include "serverutil.h"
 #include "transaction/transaction_message_bus.h"
-#include "business/business_message_bus.h"
+#include <nx/mediaserver/event/event_message_bus.h>
 #include "settings.h"
 #include "nx_ec/data/api_conversion_functions.h"
 #include "nx_ec/data/api_connection_data.h"
@@ -209,8 +209,8 @@ void QnServerMessageProcessor::registerProxySender(QnUniversalTcpListener* tcpLi
     m_universalTcpListener = tcpListener;
 }
 
-void QnServerMessageProcessor::execBusinessActionInternal(const QnAbstractBusinessActionPtr& action) {
-    qnBusinessMessageBus->at_actionReceived(action);
+void QnServerMessageProcessor::execBusinessActionInternal(const nx::vms::event::AbstractActionPtr& action) {
+    qnEventMessageBus->at_actionReceived(action);
 }
 
 void QnServerMessageProcessor::at_updateChunkReceived(const QString &updateId, const QByteArray &data, qint64 offset) {

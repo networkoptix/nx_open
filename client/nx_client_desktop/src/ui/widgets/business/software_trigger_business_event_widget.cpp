@@ -4,7 +4,7 @@
 #include <QtCore/QtMath>
 #include <QtCore/QScopedValueRollback>
 
-#include <business/business_strings_helper.h>
+#include <nx/vms/event/strings_helper.h>
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/user_resource.h>
 #include <ui/common/aligner.h>
@@ -25,7 +25,8 @@ QnSoftwareTriggerBusinessEventWidget::QnSoftwareTriggerBusinessEventWidget(QWidg
     ui->setupUi(this);
 
     ui->usersButton->setMaximumWidth(QWIDGETSIZE_MAX);
-    ui->triggerIdLineEdit->setPlaceholderText(QnBusinessStringsHelper::defaultSoftwareTriggerName());
+    ui->triggerIdLineEdit->setPlaceholderText(
+        nx::vms::event::StringsHelper::defaultSoftwareTriggerName());
 
     connect(ui->triggerIdLineEdit, &QLineEdit::textChanged, this,
         &QnSoftwareTriggerBusinessEventWidget::paramsChanged);
@@ -64,14 +65,14 @@ void QnSoftwareTriggerBusinessEventWidget::updateTabOrder(QWidget* before, QWidg
     setTabOrder(ui->iconComboBox, after);
 }
 
-void QnSoftwareTriggerBusinessEventWidget::at_model_dataChanged(QnBusiness::Fields fields)
+void QnSoftwareTriggerBusinessEventWidget::at_model_dataChanged(Fields fields)
 {
     if (!model() || m_updating)
         return;
 
     QScopedValueRollback<bool> updatingRollback(m_updating, true);
 
-    if (fields.testFlag(QnBusiness::EventParamsField))
+    if (fields.testFlag(Field::eventParams))
     {
         const auto params = model()->eventParams();
         ui->triggerIdLineEdit->setText(params.caption);

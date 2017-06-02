@@ -6,7 +6,7 @@
 #include <QtCore/QHash>
 #include <QtOpenGL/QGLWidget>
 
-#include <business/business_fwd.h>
+#include <nx/vms/event/event_fwd.h>
 
 #include <client/client_globals.h>
 
@@ -390,8 +390,8 @@ protected slots:
 
     void at_previewSearch_thumbnailLoaded(const QnThumbnail &thumbnail);
 
-    void at_notificationsHandler_businessActionAdded(const QnAbstractBusinessActionPtr &businessAction);
-    void showSplashOnResource(const QnResourcePtr &resource, const QnAbstractBusinessActionPtr &businessAction);
+    void at_notificationsHandler_businessActionAdded(const nx::vms::event::AbstractActionPtr &businessAction);
+    void showSplashOnResource(const QnResourcePtr &resource, const nx::vms::event::AbstractActionPtr &businessAction);
 
     bool canShowLayoutBackground() const;
 private:

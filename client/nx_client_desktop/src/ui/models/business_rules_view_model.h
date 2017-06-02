@@ -6,7 +6,7 @@
 #include <QtCore/QVariant>
 #include <QtCore/QList>
 
-#include <business/business_fwd.h>
+#include <nx/vms/event/event_fwd.h>
 
 #include <ui/models/business_rule_view_model.h>
 #include <ui/workbench/workbench_context_aware.h>
@@ -17,8 +17,13 @@
 class QnBusinessRulesViewModel : public Connective<QAbstractItemModel>, public QnWorkbenchContextAware
 {
     Q_OBJECT
-
     typedef Connective<QAbstractItemModel> base_type;
+
+public:
+    using Field = QnBusinessRuleViewModel::Field;
+    using Fields = QnBusinessRuleViewModel::Fields;
+    using Column = QnBusinessRuleViewModel::Column;
+
 public:
     explicit QnBusinessRulesViewModel(QObject *parent = 0);
     virtual ~QnBusinessRulesViewModel();
@@ -42,11 +47,11 @@ public:
     int createRule();
 
     /** Add existing rule to the model. */
-    void addOrUpdateRule(const QnBusinessEventRulePtr &rule);
+    void addOrUpdateRule(const nx::vms::event::RulePtr &rule);
 
     void deleteRule(const QnBusinessRuleViewModelPtr &ruleModel);
 
-    void forceColumnMinWidth(QnBusiness::Columns column, int width);
+    void forceColumnMinWidth(Column column, int width);
 
     QnBusinessRuleViewModelPtr rule(const QModelIndex &index) const;
 
@@ -55,8 +60,8 @@ public:
 private:
     bool isIndexValid(const QModelIndex &index) const;
 
-    QString columnTitle(QnBusiness::Columns column) const;
-    QSize columnSizeHint(QnBusiness::Columns column) const;
+    QString columnTitle(Column column) const;
+    QSize columnSizeHint(Column column) const;
 
     /**
      * @brief           Add new rule to the list.
@@ -65,12 +70,12 @@ private:
     int addRuleModelInternal(const QnBusinessRuleViewModelPtr &ruleModel);
 
 private slots:
-    void at_rule_dataChanged(const QnUuid &id, QnBusiness::Fields fields);
+    void at_rule_dataChanged(const QnUuid &id, QnBusinessRuleViewModel::Fields fields);
     void at_soundModel_listChanged();
     void at_soundModel_itemChanged(const QString &filename);
 
 private:
     QList<QnBusinessRuleViewModelPtr> m_rules;
-    QMap<QnBusiness::Columns, QnBusiness::Fields> m_fieldsByColumn;
-    QMap<QnBusiness::Columns, int> m_forcedWidthByColumn;
+    QMap<Column, Fields> m_fieldsByColumn;
+    QMap<Column, int> m_forcedWidthByColumn;
 };
