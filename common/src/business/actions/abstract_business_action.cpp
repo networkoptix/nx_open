@@ -282,5 +282,10 @@ QString QnAbstractBusinessAction::getExternalUniqKey() const
     return lit("action_") + QString::number(static_cast<int>(m_actionType)) + L'_';
 }
 
+void QnAbstractBusinessAction::assign(const QnAbstractBusinessAction& other)
+{
+    (*this) = other;
+}
+
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(
     (QnBusinessActionData), (ubjson)(json)(xml)(csv_record), _Fields)

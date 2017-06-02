@@ -31,6 +31,7 @@ class AccountData:
 public:
     AccountData() = default;
     AccountData(AccountRegistrationData registrationData);
+    AccountData(api::AccountData apiAccountData);
 
     virtual bool getAsVariant( int resID, QVariant* const value ) const override;
 };

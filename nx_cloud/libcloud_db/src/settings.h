@@ -26,7 +26,9 @@ public:
     QString rulesXmlPath;
     std::chrono::seconds nonceValidityPeriod;
     std::chrono::seconds intermediateResponseValidityPeriod;
-    std::chrono::milliseconds connectionInactivityPeriod;
+    std::chrono::minutes offlineUserHashValidityPeriod;
+
+    Auth();
 };
 
 class Notification
@@ -89,6 +91,7 @@ public:
      * Backlog value to pass to tcpServerSocket->listen call.
      */
     int tcpBacklogSize;
+    std::chrono::milliseconds connectionInactivityPeriod;
 
     Http();
 };

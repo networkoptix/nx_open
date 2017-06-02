@@ -5,6 +5,7 @@
 #include <chrono>
 #include <functional>
 #include <memory>
+#include <set>
 #include <stdexcept>
 #include <string>
 #include <vector>
@@ -35,6 +36,7 @@
 #include "data_view.h"
 #include "ec2/transaction_log.h"
 #include "managers_types.h"
+#include "system_sharing_manager.h"
 
 namespace nx {
 namespace cdb {
@@ -59,10 +61,11 @@ class InviteUserNotification;
 
 /**
  * Provides methods for manipulating system data on persisent storage.
- * Calls DBManager instance to perform DB manipulation. SQL requests are written in this class
- * @note All data can be cached
+ * Calls DBManager instance to perform DB manipulation.
+ * @note All data can be cached.
  */
 class SystemManager:
+    public AbstractSystemSharingManager,
     public AbstractAuthenticationDataProvider
 {
 public:
@@ -73,8 +76,8 @@ public:
     };
 
     /**
-     * Fills internal cache
-     * @throw std::runtime_error In case of failure to pre-fill data cache
+     * Fills internal cache.
+     * @throw std::runtime_error In case of failure to pre-fill data cache.
      */
     SystemManager(
         const conf::Settings& settings,
@@ -143,15 +146,20 @@ public:
      * - accountEmail has no rights for systemId
      * - accountEmail or systemId is unknown
      */
-    api::SystemAccessRole getAccountRightsForSystem(
+    virtual api::SystemAccessRole getAccountRightsForSystem(
         const std::string& accountEmail,
-        const std::string& systemId) const;
-    boost::optional<api::SystemSharingEx> getSystemSharingData(
+        const std::string& systemId) const override;
+    virtual boost::optional<api::SystemSharingEx> getSystemSharingData(
         const std::string& accountEmail,
-        const std::string& systemId) const;
+        const std::string& systemId) const override;
+
+    //---------------------------------------------------------------------------------------------
+    // Events.
 
     nx::utils::Subscription<std::string>& systemMarkedAsDeletedSubscription();
-    const nx::utils::Subscription<std::string>& systemMarkedAsDeletedSubscription() const;
+
+    virtual void addSystemSharingExtension(AbstractSystemSharingExtension* extension) override;
+    virtual void removeSystemSharingExtension(AbstractSystemSharingExtension* extension) override;
 
 private:
     static std::pair<std::string, std::string> extractSystemIdAndVmsUserId(
@@ -234,6 +242,7 @@ private:
     nx::utils::Subscription<std::string> m_systemMarkedAsDeletedSubscription;
     std::unique_ptr<dao::AbstractSystemDataObject> m_systemDao;
     dao::rdb::SystemSharingDataObject m_systemSharingDao;
+    std::set<AbstractSystemSharingExtension*> m_systemSharingExtensions;
 
     nx::db::DBResult insertSystemToDB(
         nx::db::QueryContext* const queryContext,
@@ -463,6 +472,11 @@ private:
     void onEc2RemoveResourceParamDone(
         nx::db::QueryContext* /*queryContext*/,
         nx::db::DBResult dbResult);
+
+    template<typename ExtensionFuncPtr, typename... Args>
+    nx::db::DBResult invokeSystemSharingExtension(
+        ExtensionFuncPtr extensionFunc,
+        const Args&... args);
 };
 
 } // namespace cdb

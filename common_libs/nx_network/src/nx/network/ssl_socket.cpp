@@ -1423,7 +1423,7 @@ bool SslSocket::connect(
     if (!d->nonBlockingMode)
     {
         if (!d->wrappedSocket->setNonBlockingMode(false))
-            return -1;
+            return false;
     }
 
     const auto result = d->wrappedSocket->connect(remoteAddress, timeoutMillis);
@@ -1431,7 +1431,7 @@ bool SslSocket::connect(
     if (!d->nonBlockingMode && result)
     {
         if (!d->wrappedSocket->setNonBlockingMode(true))
-            return -1;
+            return false;
     }
 
     return result;
