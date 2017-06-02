@@ -71,13 +71,16 @@ angular.module('nxCommon')
             var self = this;
             // TODO: handle common situations here - like offline or logout
             // Raise a global event in both cases. Let outer code handle this global request
-            var promise = $http({
+
+
+            var request = $http({
                 method: method,
                 url: url,
                 data: data,
                 config: config
             });
-            return promise.catch(function(error){
+
+            var promise = request.catch(function(error){
                 if(error.status == 401 || error.status == 403  || error.data && error.data.resultCode == "forbidden"){
                     if(!repeat && self.unauthorizedCallBack){ // first attempt
                         // Here we call a handler for unauthorised request. If handler promises success - we repeat the request once again.
@@ -98,6 +101,20 @@ angular.module('nxCommon')
 
                 return $q.reject(error);// We cannot handle the problem at this level, pass it up
             });
+            
+            var canceller = $q.defer();
+            promise.then(function(){
+                canceller = null;
+            },function(){
+                canceller = null;
+            });
+            promise.abort = function(reason){
+                if(canceller) {
+                    canceller.resolve('abort request: ' + reason);
+                }
+            };
+
+            return promise;
         };
         ServerConnection.prototype._setGetParams = function(url, data, auth){
             if(auth){
@@ -113,18 +130,7 @@ angular.module('nxCommon')
         ServerConnection.prototype._get = function(url, data){
             url = this._setGetParams(url, data, this.systemId && this.authGet());
             var canceller = $q.defer();
-            var obj = this._wrapRequest('GET', url, null, { timeout: canceller.promise });
-            obj.then(function(){
-                canceller = null;
-            },function(){
-                canceller = null;
-            });
-            obj.abort = function(reason){
-                if(canceller) {
-                    canceller.resolve('abort request: ' + reason);
-                }
-            };
-            return obj;
+            return this._wrapRequest('GET', url, null, { timeout: canceller.promise });
         };
         ServerConnection.prototype._post = function(url, data){
             url = this._setGetParams(url, null, this.systemId && this.authPost());
