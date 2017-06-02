@@ -17,10 +17,14 @@ angular.module('cloudApp')
             });
         });
 
-
+        var cancelSubscription = $scope.$on("unauthirosed_" + $routeParams.systemId,function(event,data){
+             dialogs.notify(L.errorCodes.lostConnection.replace("{{systemName}}", currentSystem.name || L.errorCodes.thisSystem), 'warning');
+             $location.path("/systems");
+        });
 
         $("body").addClass("webclient-page");
         $scope.$on('$destroy', function( event ) {
+            cancelSubscription();
             $("body").removeClass("webclient-page");
         });
     }]);

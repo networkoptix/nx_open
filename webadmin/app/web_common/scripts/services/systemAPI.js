@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('nxCommon')
-    .factory('systemAPI', ['$http', '$q', '$location', function ($http, $q, $location) {
+    .factory('systemAPI', ['$http', '$q', '$location', '$rootScope', function ($http, $q, $location, $rootScope) {
 
         /*
         * System API is a unified service for making API requests to media servers
@@ -78,20 +78,20 @@ angular.module('nxCommon')
                 config: config
             });
             return promise.catch(function(error){
-                if(repeat){ // Second attempt - do nothing about this error, just pass it up
-                    return $q.reject(error);
-                }
                 if(error.status == 401 || error.status == 403  || error.data && error.data.resultCode == "forbidden"){
-                    if(self.unauthorizedCallBack){
+                    if(!repeat && self.unauthorizedCallBack){ // first attempt
                         // Here we call a handler for unauthorised request. If handler promises success - we repeat the request once again.
+                        // Handler is supposed to try and update auth keys
                         return self.unauthorizedCallBack().then(function(){
                             return self._wrapRequest(method, url, data, config, true);
                         },function(){
                             return $q.reject(error);
                         });
                     }
+                    // Not authorised request - we lost connection to the system, broadcast this for active controller to handle the situation if needed
+                    $rootScope.$broadcast("unauthirosed_" + self.systemId);
                 }
-                if(error.status == 503){ // Repeat the request once again for 503 error
+                if(!repeat && error.status == 503){ // Repeat the request once again for 503 error
                     return self._wrapRequest(method, url, data, config, true);
                 }
 
