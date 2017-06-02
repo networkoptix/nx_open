@@ -4,6 +4,9 @@ $line-height: 24px;
 $vertical-spacing: (($header-height - $line-height) / 2);
 $horizontal-spacing: 16px;
 $active-border-width: 3px;
+$max-dropdown-width: 320px;
+$max-header-item-width: 212px;
+
 
 .navbar{
 
@@ -43,6 +46,14 @@ $active-border-width: 3px;
             margin:0;
             padding:$vertical-spacing $horizontal-spacing;
             line-height: $line-height;
+
+            &>span.ellipsis{
+                white-space: nowrap;
+                display:inline-block;
+                vertical-align:bottom;
+                line-height: $line-height;
+                max-width: $max-header-item-width;
+            }
 
             &:hover{
                 background-color: $light2 !important;
@@ -117,7 +128,7 @@ $active-border-width: 3px;
 
         &>.dropdown-menu {
             background-clip: border-box;
-            min-width:100%;
+            min-width: 100%;
             padding: $vertical-spacing/2 0;
             border-radius: 0;
 
@@ -138,11 +149,26 @@ $active-border-width: 3px;
                 @include box-shadow(0 2px 4px transparentize($dark15,0.8));
             }
 
-
             & > li > a{
                 line-height: 32px;
                 padding: 0 $horizontal-spacing;
                 font-size: $font-size-base;
+
+                text-overflow: ellipsis;
+                max-width: $max-dropdown-width;
+                overflow: hidden;
+
+                &:hover{
+                    border-right: 1px solid $light2;
+                    border-left: 1px solid $light2;
+                    margin-right: -1px;
+                    margin-left: -1px;
+                }
+
+
+                .system-owner{
+                    color:$light4;
+                }
             }
 
             .nav-divider{
@@ -176,4 +202,5 @@ $active-border-width: 3px;
         display:block;
       }
     }
+
 }

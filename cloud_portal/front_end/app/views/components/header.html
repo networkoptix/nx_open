@@ -23,22 +23,22 @@
             </ul>
             <ul class="nav navbar-nav navbar-right auth-visible hidden-collapsed">
                 <li ng-if="singleSystem" class="no-hover">
-                    <a href=""><span class="glyphicon glyphicon-home"></span>  {{activeSystem.name}}</a>
+                    <a href=""><span class="glyphicon glyphicon-home"></span><span class="ellipsis">{{activeSystem.name}}</span></a>
                 </li>
                 <li class="vertical-bar" ng-if="systemCounter && !singleSystem"></li>
                 <li uib-dropdown ng-if="systemCounter && !singleSystem">
                     <a uib-dropdown-toggle ng-href="/systems/{{system.id}}">
-                        <span ng-if="activeSystem" class="glyphicon glyphicon-home"></span>{{activeSystem?activeSystem.name:systemCounter + ' ' + L.header.systems}}<span class="icon-caret"></span>
+                        <span ng-if="activeSystem" class="glyphicon glyphicon-home"></span><span class="ellipsis">{{activeSystem?activeSystem.name:systemCounter + ' ' + L.header.systems}}</span><span class="icon-caret"></span>
                     </a>
                     <ul uib-dropdown-menu class="dropdown-right">
-                        <li ng-repeat="system in systems | limitTo: $root.C.maxSystemsForHeader" ng-class="{'hidden-expanded': system==activeSystem}"><a ng-href="/systems/{{system.id}}/{{active.view?'view':''}}">{{system.name}} &mdash; {{system.ownerFullName}}</a></li>
+                        <li ng-repeat="system in systems | limitTo: $root.C.maxSystemsForHeader" ng-class="{'hidden-expanded': system==activeSystem}"><a ng-href="/systems/{{system.id}}/{{active.view?'view':''}}">{{system.name}}<span class="system-owner"> &mdash; {{system.ownerFullName}}</span></a></li>
                         <li role="separator" class="nav-divider"></li>
                         <li><a ng-href="/systems">{{$root.L.header.allSystems}}</a></li>
                     </ul>
                 </li>
                 <li class="vertical-bar"></li>
                 <li uib-dropdown>
-                    <a uib-dropdown-toggle href=""><span class="glyphicon glyphicon-user"></span>{{account.email}}<span class="icon-caret"></span></a>
+                    <a uib-dropdown-toggle href=""><span class="glyphicon glyphicon-user"></span><span class="ellipsis">{{account.email}}</span><span class="icon-caret"></span></a>
                     <ul uib-dropdown-menu>
                         <li><a href="/account/">Account Settings</a></li>
                         <li><a href="/account/password/">Change Password</a></li>
