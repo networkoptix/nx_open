@@ -1,5 +1,5 @@
 <nav class="navbar navbar-default">
-    <div class="container">
+    <div class="container-fluid">
         <div class="navbar-header">
             <button type="button" class="navbar-toggle"
                     ng-click="isMenuExpanded = !isMenuExpanded">
@@ -10,7 +10,7 @@
 
         <div class="navbar-collapse" uib-collapse="!isMenuExpanded">
             <ul class="nav navbar-nav auth-visible" >
-                <li class="vertical-bar"></li>
+                <li class="vertical-bar margin-right"></li>
 
                 <li ng-if="activeSystem" ng-class="{active:active.settings}"><a ng-href="/systems/{{activeSystem.id}}">Settings</a></li>
                 <li ng-if="activeSystem" ng-class="{active:active.view }"><a ng-href="/systems/{{activeSystem.id}}/view">View</a></li>
@@ -45,7 +45,7 @@
                         <li><a href="" ng-click="logout()">Log Out</a></li>
                     </ul>
                 </li>
-                <li class="vertical-bar"></li>
+                <li class="vertical-bar margin-right"></li>
             </ul>
             <ul class="nav navbar-nav navbar-right hidden-expanded auth-visible ">
                 <li><a>{{account.email}}</a></li>

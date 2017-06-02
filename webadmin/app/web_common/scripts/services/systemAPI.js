@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('nxCommon')
-    .factory('systemAPI', ['$http', '$q', '$location', function ($http, $q, $location) {
+    .factory('systemAPI', ['$http', '$q', '$location', '$rootScope', function ($http, $q, $location, $rootScope) {
 
         /*
         * System API is a unified service for making API requests to media servers
@@ -9,7 +9,6 @@ angular.module('nxCommon')
         * There are several modes for this service:
         * 1. Upper level: working locally (no systemId) or through the cloud (with systemId)
         * 2. Lower level: workgin with default server (no serverID) or through the proxy (with serverId)
-        * TODO: get rid of working through cloud portal API
         *
         * Service supports authentification methods for all these cases
         * 1. working locally we use cookie authentification on server
@@ -34,21 +33,22 @@ angular.module('nxCommon')
         * */
 
         
-        function ServerConnection(systemId, serverId){
+        function ServerConnection(systemId, serverId, unauthorizedCallBack){
             // If we have systemId - this is a cloud connection
             // if we have serverId - we ought to use proxy
             
             this.systemId = systemId;
             this.serverId = serverId;
+            this.unauthorizedCallBack = unauthorizedCallBack;
             this.urlBase = this._getUrlBase();
         }
 
         // Connections cache
         var connections = {};
-        function connect (systemId, serverId){
+        function connect (systemId, serverId, unauthorizedCallBack){
             var key = systemId + '_' + serverId;
             if(!connections[key]){
-                connections[key] = new ServerConnection(systemId, serverId);
+                connections[key] = new ServerConnection(systemId, serverId, unauthorizedCallBack);
             }
             return connections[key];
         }
@@ -78,10 +78,24 @@ angular.module('nxCommon')
                 config: config
             });
             return promise.catch(function(error){
-                if(error.status == 503 && !repeat){ // Repeat the request once again for 503 error
+                if(error.status == 401 || error.status == 403  || error.data && error.data.resultCode == "forbidden"){
+                    if(!repeat && self.unauthorizedCallBack){ // first attempt
+                        // Here we call a handler for unauthorised request. If handler promises success - we repeat the request once again.
+                        // Handler is supposed to try and update auth keys
+                        return self.unauthorizedCallBack().then(function(){
+                            return self._wrapRequest(method, url, data, config, true);
+                        },function(){
+                            return $q.reject(error);
+                        });
+                    }
+                    // Not authorised request - we lost connection to the system, broadcast this for active controller to handle the situation if needed
+                    $rootScope.$broadcast("unauthirosed_" + self.systemId);
+                }
+                if(!repeat && error.status == 503){ // Repeat the request once again for 503 error
                     return self._wrapRequest(method, url, data, config, true);
                 }
-                return $q.reject(error);
+
+                return $q.reject(error);// We cannot handle the problem at this level, pass it up
             });
         };
         ServerConnection.prototype._setGetParams = function(url, data, auth){
@@ -120,8 +134,12 @@ angular.module('nxCommon')
 
         /* Authentication */
         ServerConnection.prototype.getCurrentUser = function (forcereload){
+            var self = this;
             if(!this.cacheCurrentUser || forcereload){
-                this.cacheCurrentUser = this._get('/api/getCurrentUser');
+                this.cacheCurrentUser = this._get('/api/getCurrentUser').catch(function(error){
+                    self.cacheCurrentUser = null; // Clear cache in case of errors
+                    return $q.reject(error);
+                });
             }
             return this.cacheCurrentUser;
         };
@@ -250,7 +268,6 @@ angular.module('nxCommon')
 
         /* Working with archive*/
         ServerConnection.prototype.getRecords = function(physicalId, startTime, endTime, detail, limit, label, periodsType){
-            //console.log('getRecords',physicalId,startTime,endTime,detail,periodsType);
             var d = new Date();
             if(typeof(startTime)==='undefined'){
                 startTime = d.getTime() - 30*24*60*60*1000;
@@ -303,7 +320,11 @@ angular.module('nxCommon')
                     }
                 }
             }
-            var defaultConnection = connect(null, serverId);
+            var defaultConnection = connect(null, serverId, function(){
+                // Unauthorised request here
+                window.location.reload(); // just reload the page and it supposed to handle the problem
+                return $q.reject(); // Do not repeat last request
+            });
             return defaultConnection;
         }
 
