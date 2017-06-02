@@ -3,6 +3,7 @@
 #include <network/authutil.h>
 #include <nx/utils/log/log.h>
 
+// This test might be useful to calculate auth query param for manual testing purpuses.
 TEST(AuthUtil, DISABLED_auth)
 {
     qDebug().noquote().nospace() << "----- ?auth=" << createHttpQueryAuthParam(
