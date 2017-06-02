@@ -3999,16 +3999,16 @@ ErrorCode QnDbManager::doQuery(const nullptr_t& /*dummy*/, ApiDatabaseDumpData& 
 
 ErrorCode QnDbManager::doQuery(const ApiStoredFilePath& dumpFilePath, ApiDatabaseDumpToFileData& databaseDumpToFileData)
 {
-    QnWriteLocker lock(&m_mutex);
+    QnDbTransactionLocker dbTran(getTransaction());
 
     //have to close/open DB to dump journals to .db file
     m_sdb.close();
     m_sdbStatic.close();
 
+    ErrorCode result = ErrorCode::ok;
+    QFile::remove(dumpFilePath.path);
     if( !QFile::copy( m_sdb.databaseName(), dumpFilePath.path ) )
-        return ErrorCode::ioError;
-
-    //TODO #ak add license db to backup
+        result = ErrorCode::ioError;
 
     QFileInfo dumpFileInfo( dumpFilePath.path );
     databaseDumpToFileData.size = dumpFileInfo.size();
@@ -4028,8 +4028,7 @@ ErrorCode QnDbManager::doQuery(const ApiStoredFilePath& dumpFilePath, ApiDatabas
     //tuning DB
     if( !tuneDBAfterOpen(&m_sdb) )
         return ErrorCode::dbError;
-
-    return ErrorCode::ok;
+    return result;
 }
 
 bool QnDbManager::tuneDBAfterOpen(QSqlDatabase* const sqlDb)
