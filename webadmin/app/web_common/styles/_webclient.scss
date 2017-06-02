@@ -386,22 +386,13 @@ table.webclient-window>tbody>tr>td{
   }
 }
 
-.camera-preview>.camera-preview-image {
-  display:block;
-  position: relative;
-  top: 50%;
-  transform: translateY(-50%);
-  -ms-transform: translateY(-50%);
-  background-size: 100% 100%;
-
-  margin-left: auto;
-  margin-right: auto;
-}
-
-.camera-preview>.camera-preview-image>img{
-  visibility:hidden;
+.camera-preview > img{
   max-width:68px !important;
-  max-height:38px !important;
+  max-height:34px !important;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
 }
 
 .camera-states{
