@@ -51,7 +51,7 @@
             <span ng-if="emptyArchive && !liveOnly" class="no-archive-message">Loading Archive</span>  
         </div>
     </div>
-    <div class="mobile-controls visible-xs">
+    <div class="mobile-controls visible-xs" ng-class="{'no-border': !emptyArchive || !liveOnly}">
         <div class="text-right pull-right" ng-class="{'no-volume':disableVolume}">
             <span class="live-button inline-block pull-left "
                 ng-class="{active:positionProvider.liveMode && canPlayLive,disabled:!canPlayLive}"
