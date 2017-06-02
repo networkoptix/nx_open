@@ -149,6 +149,10 @@ ng-include{
   border-top: 1px solid $light6;
 }
 
+.mobile-controls.no-border{
+  border-top: none;
+}
+
 .mobile-controls .pp-only .glyphicon{
   margin-top: 19px;
   margin-left: -2px;

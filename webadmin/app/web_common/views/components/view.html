@@ -59,9 +59,11 @@
                                 </div>
                                 <div class="hide-excess-text video-title-back-button">
                                         <span class="visible-xs" ng-click="toggleCameraPanel=true"
-                                              ng-class="{'back-button': !toggleCameraPanel}"><span class="glyphicon glyphicon-arrow-left"></span></span>
+                                              ng-class="{'back-button': !toggleCameraPanel}">
+                                            <span class="glyphicon glyphicon-arrow-left"></span>
+                                        </span>
+                                        <camera-status camera="activeCamera" type="'video'"></camera-status>
                                         <span class="caption-row video-name">
-                                            <camera-status camera="activeCamera" type="'video'"></camera-status>
                                             {{activeCamera.name + " (" + activeResolution + ")"}}
                                         </span>
                                 </div>
