@@ -118,12 +118,14 @@ protected:
 
     void assertUserAuthenticationTimestampIsValid(const api::AuthInfo& authInfo)
     {
+        using namespace std::chrono;
+
         ASSERT_GT(
-            authInfo.expirationTime,
-            nx::utils::floor<std::chrono::milliseconds>(nx::utils::utcTime()));
+            nx::utils::floor<milliseconds>(authInfo.expirationTime),
+            nx::utils::floor<milliseconds>(nx::utils::utcTime()));
         ASSERT_LE(
-            authInfo.expirationTime,
-            nx::utils::floor<std::chrono::milliseconds>(
+            nx::utils::floor<milliseconds>(authInfo.expirationTime),
+            nx::utils::floor<milliseconds>(
                 nx::utils::utcTime() + m_settings.auth().offlineUserHashValidityPeriod));
     }
 
