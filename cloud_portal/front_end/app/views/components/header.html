@@ -41,7 +41,7 @@
                     <li ng-if="activeSystem" class="hidden-expanded nav-divider" role="separator"></li>
 
                     <li ng-repeat="system in systems | limitTo: $root.C.maxSystemsForHeader"
-                        ng-class="{'hidden-expanded': system==activeSystem}">
+                        ng-if="system!=activeSystem">
                         <a ng-href="/systems/{{system.id}}/{{active.view?'view':''}}">{{system.name}}<span class="system-owner"> &mdash; {{system.ownerFullName}}</span></a>
                     </li>
                     <li role="separator" class="nav-divider"></li>
