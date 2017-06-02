@@ -38,6 +38,8 @@ void sendTransaction(
         p2pBus->sendTransaction(tran, QnPeerSet() << peer);
     else if (auto msgBus = dynamic_cast<QnTransactionMessageBus*>(bus))
         msgBus->sendTransaction(tran, QnPeerSet() << peer);
+    else
+        NX_CRITICAL(false, "Not implemented");
 }
 
 } // namespace ec2
