@@ -37,6 +37,9 @@
                     <span ng-class="{'hidden-expanded':!activeSystem}" class="glyphicon glyphicon-home"></span><span class="ellipsis">{{activeSystem?activeSystem.name:systemCounter + ' ' + L.header.systems}}</span><span class="icon-caret"></span>
                 </a>
                 <ul uib-dropdown-menu class="dropdown-menu-left">
+                    <li ng-if="activeSystem" class="hidden-expanded active"><a href="">{{activeSystem.name}}</a></li>
+                    <li ng-if="activeSystem" class="hidden-expanded nav-divider" role="separator"></li>
+
                     <li ng-repeat="system in systems | limitTo: $root.C.maxSystemsForHeader"
                         ng-class="{'hidden-expanded': system==activeSystem}">
                         <a ng-href="/systems/{{system.id}}/{{active.view?'view':''}}">{{system.name}}<span class="system-owner"> &mdash; {{system.ownerFullName}}</span></a>
@@ -49,6 +52,9 @@
             <li uib-dropdown>
                 <a uib-dropdown-toggle href=""><span class="glyphicon glyphicon-user"></span><span class="ellipsis">{{account.email}}</span><span class="icon-caret"></span></a>
                 <ul uib-dropdown-menu>
+                    <li class="hidden-expanded active"><a href="">{{account.email}}</a></li>
+                    <li class="hidden-expanded nav-divider" role="separator"></li>
+
                     <li><a href="/account/">Account Settings</a></li>
                     <li><a href="/account/password/">Change Password</a></li>
                     <li><a href="" ng-click="logout()">Log Out</a></li>
