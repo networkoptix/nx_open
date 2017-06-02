@@ -8,7 +8,7 @@ namespace nx { namespace vms { namespace discovery { struct ModuleEndpoint; } } 
 
 namespace ec2 {
 
-    struct ApiDiscoveryData : ApiIdData 
+    struct ApiDiscoveryData : ApiIdData
     {
         ApiDiscoveryData(): ignore(false) {}
 

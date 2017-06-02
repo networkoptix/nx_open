@@ -805,7 +805,7 @@ QIcon QnBusinessRuleViewModel::getIcon(const int column) const
                 case QnBusiness::SendMailAction:
                 {
                     if (!isValid(QnBusiness::TargetColumn))
-                        return qnSkin->icon("tree/user_invalid.png");
+                        return qnSkin->icon("tree/user_alert.png");
                     return qnResIconCache->icon(QnResourceIconCache::Users);
                 }
 

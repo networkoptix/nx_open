@@ -89,8 +89,6 @@ def pytest_addoption(parser):
     parser.addoption('--log-level', default=log_levels[0], type=str.upper,
                      choices=log_levels,
                      help='Change log level (%s). Default is %s' % (', '.join(log_levels), log_levels[0]))
-    parser.addoption('--scalability-yaml-config-file',
-                     help='Configuration file for the scalability test.')
     parser.addoption('--tests-config-file', type=TestsConfig.from_yaml_file, nargs='*',
                      help='Configuration file for tests, in yaml format.')
 

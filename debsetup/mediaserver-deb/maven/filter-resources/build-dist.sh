@@ -117,6 +117,7 @@ install -m 644 systemd/networkoptix-mediaserver.service $SYSTEMDSTAGE/$COMPANY_N
 
 # Prepare DEBIAN dir
 mkdir -p $STAGE/DEBIAN
+chmod go+rx $STAGE/DEBIAN
 
 INSTALLED_SIZE=`du -s $STAGE | awk '{print $1;}'`
 

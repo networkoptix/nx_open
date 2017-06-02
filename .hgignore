@@ -37,13 +37,18 @@ vms*.pro
 x86/*
 x64/*
 target/*
+target-edge1/*
+target-rpi/*
 target-bpi/*
+target-bananapi/*
+target-tx1/*
 packages.config
 .vs
 .vscode
 .git
 TAGS
 *.kdev4
+*/*.VC.db
 
 .DS_Store
 Debug
@@ -58,11 +63,13 @@ Release
 */arm-edge1/*
 */arm-rpi/*
 */arm-bpi/*
+*/arm-bananapi/*
 */arm-tx1/*
 */target/*
 */target-edge1/*
 */target-rpi/*
 */target-bpi/*
+*/target-bananapi/*
 */target-tx1/*
 
 android-build

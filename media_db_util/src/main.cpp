@@ -1,3 +1,5 @@
+#define _WINSOCKAPI_
+
 #include <memory>
 #include <QtCore>
 #include "recorder/storage_db.h"

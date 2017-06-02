@@ -45,7 +45,7 @@ QnIOModuleMonitor::~QnIOModuleMonitor()
 {
     if (m_httpClient)
     {
-        m_httpClient.get()->disconnect(this);
+        m_httpClient->disconnect(this);
         m_httpClient->pleaseStopSync();
         m_httpClient.reset();
     }
