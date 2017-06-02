@@ -122,14 +122,15 @@ nx::db::DBResult AuthenticationProvider::afterSharingSystem(
     const auto account = m_accountManager.findAccountByUserName(sharing.accountEmail);
     if (!account)
         throw nx::db::Exception(nx::db::DBResult::notFound);
+    if (account->statusCode != api::AccountStatus::activated)
+    {
+        NX_VERBOSE(this, lm("Ignoring not-activated account %1").arg(sharing.accountEmail));
+        return nx::db::DBResult::ok;
+    }
 
     auto authRecord = generateAuthRecord(sharing.systemId, *account, nonce);
 
-    auto userAuthRecords = m_authenticationDataObject->fetchUserAuthRecords(
-        queryContext, sharing.systemId, sharing.accountEmail);
-    removeExpiredRecords(&userAuthRecords);
-
-    userAuthRecords.push_back(std::move(authRecord));
+    std::vector<api::AuthInfo> userAuthRecords{std::move(authRecord)};
     m_authenticationDataObject->saveUserAuthRecords(
         queryContext, sharing.systemId, sharing.accountEmail, userAuthRecords);
 
