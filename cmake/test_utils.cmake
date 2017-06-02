@@ -13,4 +13,8 @@ function(nx_add_test target)
         COMMAND
             ${target} --tmp ${testTempDirectory}
     )
+
+    if(WINDOWS)
+        set_tests_properties(${target} PROPERTIES ENVIRONMENT "PATH=${QT_DIR}/bin\;$ENV{PATH}")
+    endif()
 endfunction()
