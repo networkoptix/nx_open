@@ -136,6 +136,11 @@ def discover_primary_server(env):
         assert False, 'There is no primary server in the system'
 
 
+def switch_primary_and_secondary(env):
+    env.primary, env.secondary = env.secondary, env.primary
+    env.primary_box, env.secondary_box = env.secondary_box, env.primary_box
+
+
 def wait_for_server_and_box_time_synced(server, box):
     '''Wait box(system) & mediaserver time synchronization'''
     start = time.time()
@@ -265,7 +270,7 @@ def test_initial(env):
 
 def test_change_primary_server(env):
     env.secondary.rest_api.ec2.forcePrimaryTimeServer.POST(id=env.secondary.ecs_guid)
-    env.primary, env.secondary = env.secondary, env.primary
+    switch_primary_and_secondary(env)
     set_box_time(env.primary, BASE_TIME + timedelta(hours=5))
     wait_for_server_and_box_time_synced(env.primary, env.primary_box)
     wait_for_servers_time_synced(env)
@@ -310,7 +315,8 @@ def test_primary_server_temporary_offline(env):
 #     assert len(servers) == 1 and servers[0]['id'] == env.secondary.ecs_guid
 #     time_response_secondary = env.secondary.rest_api.ec2.getCurrentTime.GET()
 #     assert time_response_secondary['isPrimaryTimeServer']
-#     env.primary, env.secondary = env.secondary, None
+#     env.primary, env.primary_box = env.secondary, env.secondary_box
+#     env.secondary = env.secondary_box = None
 #     set_box_time(env.primary, BASE_TIME - timedelta(hours=15))
 #     wait_for_server_and_box_time_synced(env.primary, env.primary_box)
 
