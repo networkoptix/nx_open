@@ -1,7 +1,7 @@
 <!--suppress ALL -->
 <nav class="navbar navbar-default">
     <div class="container-fluid">
-        <ul class="nav navbar-nav navbar-left auth-visible hidden-expanded">
+        <ul ng-if="activeSystem" class="nav navbar-nav navbar-left auth-visible hidden-expanded">
             <li uib-dropdown>
                 <a uib-dropdown-toggle href=""><span class="glyphicon glyphicon-user"></span></a>
                 <ul uib-dropdown-menu>
@@ -15,10 +15,10 @@
             <a class="navbar-brand product-name add-version" href="/"><img src="static/images/logo.png"></a>
         </div>
 
-        <ul class="nav navbar-nav auth-visible hidden-collapsed" >
+        <ul ng-if="activeSystem" class="nav navbar-nav auth-visible hidden-collapsed" >
             <li class="vertical-bar margin-right"></li>
-            <li ng-if="activeSystem" ng-class="{active:active.settings}"><a ng-href="/systems/{{activeSystem.id}}">Settings</a></li>
-            <li ng-if="activeSystem" ng-class="{active:active.view }"><a ng-href="/systems/{{activeSystem.id}}/view">View</a></li>
+            <li ng-class="{active:active.settings}"><a ng-href="/systems/{{activeSystem.id}}">Settings</a></li>
+            <li ng-class="{active:active.view }"><a ng-href="/systems/{{activeSystem.id}}/view">View</a></li>
         </ul>
 
         <ul class="nav navbar-nav navbar-right auth-hidden">
@@ -28,7 +28,7 @@
         </ul>
 
         <ul class="nav navbar-nav navbar-right auth-visible">
-            <li ng-if="singleSystem" class="no-hover">
+            <li ng-if="singleSystem" class="no-hover hidden-collapsed">
                 <a href=""><span class="glyphicon glyphicon-home"></span><span class="ellipsis">{{activeSystem.name}}</span></a>
             </li>
             <li class="vertical-bar" ng-if="systemCounter && !singleSystem"></li>
