@@ -15,18 +15,12 @@
 #include <utils/db/test_support/test_with_db_helper.h>
 #include <utils/db/types.h>
 
+#include "account_with_password.h"
 #include "cloud_db_service_public.h"
 #include "managers/email_manager.h"
 
 namespace nx {
 namespace cdb {
-
-class AccountWithPassword:
-    public api::AccountData
-{
-public:
-    std::string password;
-};
 
 class CdbLauncher:
     public utils::test::ModuleLauncher<CloudDbServicePublic>,

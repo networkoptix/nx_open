@@ -28,7 +28,7 @@ public:
 };
 
 /**
- * Proxies Http request and corresponding response.
+ * Proxies HTTP request and corresponding response.
  */
 class ProxyWorker:
     public nx::network::aio::BasicPollable,

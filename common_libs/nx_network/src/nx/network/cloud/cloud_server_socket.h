@@ -11,6 +11,7 @@
 
 #include "mediator_server_connections.h"
 #include "tunnel/incoming_tunnel_pool.h"
+#include "tunnel/tunnel_acceptor_factory.h"
 #include "tunnel/relay/relay_connection_acceptor.h"
 
 namespace nx {
@@ -35,8 +36,7 @@ public:
     CloudServerSocket(
         std::unique_ptr<hpm::api::MediatorServerTcpConnection> mediatorConnection,
         nx::network::RetryPolicy mediatorRegistrationRetryPolicy 
-            = nx::network::RetryPolicy(),
-        std::vector<AcceptorMaker> acceptorMakers = kDefaultAcceptorMakers);
+            = nx::network::RetryPolicy());
 
     ~CloudServerSocket();
 
@@ -110,7 +110,6 @@ protected:
 
     std::unique_ptr<hpm::api::MediatorServerTcpConnection> m_mediatorConnection;
     nx::network::RetryTimer m_mediatorRegistrationRetryTimer;
-    const std::vector<AcceptorMaker> m_acceptorMakers;
     int m_acceptQueueLen;
 
     std::atomic<State> m_state;
@@ -129,15 +128,15 @@ private:
 
 //-------------------------------------------------------------------------------------------------
 
-using CustomAcceptorFactoryFunc = 
+using CustomAcceptorFactoryFunction = 
     std::vector<std::unique_ptr<AbstractConnectionAcceptor>>(
         const nx::hpm::api::SystemCredentials&,
         const hpm::api::ListenResponse&);
 
 class NX_NETWORK_API CustomAcceptorFactory:
-    public nx::utils::BasicFactory<CustomAcceptorFactoryFunc>
+    public nx::utils::BasicFactory<CustomAcceptorFactoryFunction>
 {
-    using base_type = nx::utils::BasicFactory<CustomAcceptorFactoryFunc>;
+    using base_type = nx::utils::BasicFactory<CustomAcceptorFactoryFunction>;
 
 public:
     CustomAcceptorFactory();
@@ -145,7 +144,7 @@ public:
     static CustomAcceptorFactory& instance();
 
 private:
-    std::vector<std::unique_ptr<AbstractConnectionAcceptor>> defaultFactoryFunc(
+    std::vector<std::unique_ptr<AbstractConnectionAcceptor>> defaultFactoryFunction(
         const nx::hpm::api::SystemCredentials&,
         const hpm::api::ListenResponse&);
 };

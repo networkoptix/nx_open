@@ -131,7 +131,7 @@ public:
         completionHandler(
             nx_http::RequestResult(
                 nx_http::StatusCode::ok,
-                std::make_unique<nx_http::EmptyMessageBodySource>(nx::String(), boost::none),
+                nullptr,
                 std::move(events)));
     }
 

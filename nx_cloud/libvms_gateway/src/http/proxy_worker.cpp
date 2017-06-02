@@ -1,6 +1,6 @@
 #include "proxy_worker.h"
 
-#include <nx/network/http/async_channel_msg_body_source.h>
+#include <nx/network/http/async_channel_message_body_source.h>
 #include <nx/network/http/buffer_source.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/std/cpp14.h>
