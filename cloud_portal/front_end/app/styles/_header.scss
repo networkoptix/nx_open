@@ -34,6 +34,11 @@ $header-collapsing-width-1: 1px;
         }
     }
 
+
+    .margin-right{
+        margin-right:$horizontal-spacing !important;
+    }
+
     .nav>li{
         margin:0;
         padding:0;
@@ -44,9 +49,7 @@ $header-collapsing-width-1: 1px;
             border-right: 1px solid $common-border-color;
             margin: $vertical-spacing 0 !important;
             height: $line-height;
-            &.margin-right{
-                margin-right:$horizontal-spacing !important;
-            }
+
         }
         &>a{
             margin:0;
