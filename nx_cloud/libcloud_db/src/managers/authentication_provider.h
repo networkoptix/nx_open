@@ -41,7 +41,8 @@ public:
 
     virtual nx::db::DBResult afterSharingSystem(
         nx::db::QueryContext* const queryContext,
-        const api::SystemSharing& sharing) override;
+        const api::SystemSharing& sharing,
+        SharingType sharingType) override;
 
     /**
      * @return nonce to be used by mediaserver.

@@ -26,7 +26,9 @@ public:
     QString rulesXmlPath;
     std::chrono::seconds nonceValidityPeriod;
     std::chrono::seconds intermediateResponseValidityPeriod;
-    std::chrono::seconds offlineUserHashValidityPeriod;
+    std::chrono::minutes offlineUserHashValidityPeriod;
+
+    Auth();
 };
 
 class Notification

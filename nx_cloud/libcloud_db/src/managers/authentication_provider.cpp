@@ -62,7 +62,7 @@ void AuthenticationProvider::getCdbNonce(
 
     api::NonceData result;
     result.nonce = api::generateCloudNonceBase(systemId);
-    if (!accountEmail.empty())  //this is a request from portal. Generating real nonce
+    if (!accountEmail.empty())  //< This is a request from portal. Generating real nonce.
         result.nonce = api::generateNonce(result.nonce);
     result.validPeriod = m_settings.auth().nonceValidityPeriod;
 
@@ -108,8 +108,12 @@ void AuthenticationProvider::getAuthenticationResponse(
 
 nx::db::DBResult AuthenticationProvider::afterSharingSystem(
     nx::db::QueryContext* const queryContext,
-    const api::SystemSharing& sharing)
+    const api::SystemSharing& sharing,
+    SharingType sharingType)
 {
+    if (sharingType == SharingType::invite)
+        return nx::db::DBResult::ok;
+
     NX_DEBUG(this, lm("Updating authentication information of user %1 of system %2")
         .arg(sharing.accountEmail).arg(sharing.systemId));
 
@@ -229,7 +233,8 @@ api::AuthInfo AuthenticationProvider::generateAuthRecord(
     authInfo.nonce = nonce;
     authInfo.intermediateResponse = nx_http::calcIntermediateResponse(
         account.passwordHa1.c_str(), nonce.c_str()).toStdString();
-    //authInfo.expirationTime = ;
+    authInfo.expirationTime = 
+        nx::utils::utcTime() + m_settings.auth().offlineUserHashValidityPeriod;
     return authInfo;
 }
 

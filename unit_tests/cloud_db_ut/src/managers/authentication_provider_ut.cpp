@@ -47,23 +47,55 @@ public:
 protected:
     void whenSharingSystem()
     {
-        api::SystemSharing sharing;
-        sharing.systemId = m_system.id;
-        sharing.accountEmail = m_account.email;
-        sharing.accessRole = api::SystemAccessRole::owner;
+        shareSystem(m_ownerAccount.email, api::SystemAccessRole::owner);
+    }
 
-        ASSERT_EQ(
-            nx::db::DBResult::ok,
-            m_authenticationProvider->afterSharingSystem(nullptr, sharing));
+    void whenSharingSystemWithMultipleUsers()
+    {
+        constexpr std::size_t kAccountNumber = 2;
+
+        m_accounts.resize(kAccountNumber);
+        for (auto& account: m_accounts)
+        {
+            account = BusinessDataGenerator::generateRandomAccount();
+            m_accountManager.addAccount(account);
+            shareSystem(account.email, api::SystemAccessRole::liveViewer);
+        }
+    }
+
+    void whenSharingSystemWithNotExistingAccount()
+    {
+        shareSystem(
+            BusinessDataGenerator::generateRandomEmailAddress(),
+            api::SystemAccessRole::liveViewer);
     }
 
     void thenValidAuthRecordIsGenerated()
     {
         auto authRecords = m_userAuthenticationDao->fetchUserAuthRecords(
-            nullptr, m_system.id, m_account.email);
+            nullptr, m_system.id, m_ownerAccount.email);
         ASSERT_EQ(1U, authRecords.size());
         assertUserAuthenticationHashIsValid(authRecords[0]);
         assertUserAuthenticationTimestampIsValid(authRecords[0]);
+    }
+
+    void thenEachUserAuthRecordContainsSystemNonce()
+    {
+        boost::optional<std::string> nonce;
+        for (const auto& account: m_accounts)
+        {
+            const auto authRecords = m_userAuthenticationDao->fetchUserAuthRecords(
+                nullptr, m_system.id, account.email);
+            ASSERT_FALSE(authRecords.empty());
+
+            for (const auto& authRecord: authRecords)
+            {
+                if (nonce)
+                    ASSERT_EQ(*nonce, authRecord.nonce);
+                else
+                    nonce = authRecord.nonce;
+            }
+        }
     }
 
     void assertUserAuthenticationHashIsValid(const api::AuthInfo& authInfo)
@@ -71,7 +103,7 @@ protected:
         const auto ha2 = nx_http::calcHa2("GET", "/getsome/");
         const auto nonce = api::generateNonce(authInfo.nonce);
         const auto expectedResponse = nx_http::calcResponse(
-            m_account.passwordHa1.c_str(), nonce.c_str(), ha2);
+            m_ownerAccount.passwordHa1.c_str(), nonce.c_str(), ha2);
 
         const auto nonceTrailer = nonce.substr(authInfo.nonce.size());
 
@@ -103,7 +135,8 @@ private:
     std::unique_ptr<cdb::AuthenticationProvider> m_authenticationProvider;
     dao::UserAuthenticationDataObjectFactory::Function m_factoryBak;
     dao::memory::UserAuthentication* m_userAuthenticationDao = nullptr;
-    AccountWithPassword m_account;
+    AccountWithPassword m_ownerAccount;
+    std::vector<AccountWithPassword> m_accounts;
     data::SystemData m_system;
 
     std::unique_ptr<dao::AbstractUserAuthentication> createUserAuthenticationDao()
@@ -115,10 +148,23 @@ private:
 
     void prepareTestData()
     {
-        m_account = BusinessDataGenerator::generateRandomAccount();
-        m_system = BusinessDataGenerator::generateRandomSystem(m_account);
+        m_ownerAccount = BusinessDataGenerator::generateRandomAccount();
+        m_system = BusinessDataGenerator::generateRandomSystem(m_ownerAccount);
 
-        m_accountManager.addAccount(m_account);
+        m_accountManager.addAccount(m_ownerAccount);
+    }
+
+    void shareSystem(const std::string& email, api::SystemAccessRole accessRole)
+    {
+        api::SystemSharing sharing;
+        sharing.systemId = m_system.id;
+        sharing.accountEmail = email;
+        sharing.accessRole = accessRole;
+
+        ASSERT_EQ(
+            nx::db::DBResult::ok,
+            m_authenticationProvider->afterSharingSystem(
+                nullptr, sharing, SharingType::sharingWithExistingAccount));
     }
 };
 
@@ -131,7 +177,16 @@ TEST_F(AuthenticationProvider, afterSharingSystem_adds_valid_auth_record)
     thenValidAuthRecordIsGenerated();
 }
 
-//TEST_F(AuthenticationProvider, afterSharingSystem_uses_system_wide_nonce_for_every_user)
+TEST_F(AuthenticationProvider, afterSharingSystem_uses_system_wide_nonce_for_every_user)
+{
+    whenSharingSystemWithMultipleUsers();
+    thenEachUserAuthRecordContainsSystemNonce();
+}
+
+TEST_F(AuthenticationProvider, afterSharingSystem_throws_on_not_found_account)
+{
+    ASSERT_THROW(whenSharingSystemWithNotExistingAccount(), nx::db::Exception);
+}
 
 } // namespace test
 } // namespace cdb

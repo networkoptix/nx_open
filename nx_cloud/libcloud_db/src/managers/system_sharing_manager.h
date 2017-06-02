@@ -8,6 +8,12 @@
 namespace nx {
 namespace cdb {
 
+enum class SharingType
+{
+    sharingWithExistingAccount,
+    invite,
+};
+
 class AbstractSystemSharingExtension
 {
 public:
@@ -15,12 +21,10 @@ public:
 
     virtual nx::db::DBResult afterSharingSystem(
         nx::db::QueryContext* const queryContext,
-        const api::SystemSharing& sharing) = 0;
+        const api::SystemSharing& sharing,
+        SharingType sharingType) = 0;
 };
 
-/**
- * Draft.
- */
 class AbstractSystemSharingManager
 {
 public:

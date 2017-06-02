@@ -64,6 +64,9 @@ const std::chrono::seconds kDefaultNonceValidityPeriod = std::chrono::hours(4);
 const QLatin1String kIntermediateResponseValidityPeriod("auth/intermediateResponseValidityPeriod");
 const std::chrono::seconds kDefaultIntermediateResponseValidityPeriod = std::chrono::minutes(1);
 
+const QLatin1String kOfflineUserHashValidityPeriod("auth/offlineUserHashValidityPeriod");
+const std::chrono::minutes kDefaultOfflineUserHashValidityPeriod = 14 * std::chrono::hours(24);
+
 //-------------------------------------------------------------------------------------------------
 // Event manager settings
 const QLatin1String kMediaServerConnectionIdlePeriod("eventManager/mediaServerConnectionIdlePeriod");
@@ -88,6 +91,13 @@ const std::chrono::milliseconds kDefaultConnectionInactivityPeriod(0); //< disab
 namespace nx {
 namespace cdb {
 namespace conf {
+
+Auth::Auth():
+    nonceValidityPeriod(kDefaultNonceValidityPeriod),
+    intermediateResponseValidityPeriod(kDefaultIntermediateResponseValidityPeriod),
+    offlineUserHashValidityPeriod(kDefaultOfflineUserHashValidityPeriod)
+{
+}
 
 Notification::Notification():
     enabled(kDefaultNotificationEnabled)
@@ -115,6 +125,8 @@ Http::Http():
     connectionInactivityPeriod(kDefaultConnectionInactivityPeriod)
 {
 }
+
+//-------------------------------------------------------------------------------------------------
 
 Settings::Settings():
     base_type(
@@ -287,6 +299,10 @@ void Settings::loadSettings()
         nx::utils::parseTimerDuration(
             settings().value(kIntermediateResponseValidityPeriod).toString(),
             kDefaultIntermediateResponseValidityPeriod));
+    m_auth.offlineUserHashValidityPeriod = duration_cast<minutes>(
+        nx::utils::parseTimerDuration(
+            settings().value(kOfflineUserHashValidityPeriod).toString(),
+            kDefaultOfflineUserHashValidityPeriod));
 
     //event manager
     m_eventManager.mediaServerConnectionIdlePeriod = duration_cast<seconds>(

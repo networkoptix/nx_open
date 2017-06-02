@@ -948,6 +948,18 @@ nx::db::DBResult SystemManager::shareSystem(
     if (dbResult != nx::db::DBResult::ok)
         return dbResult;
 
+    dbResult = invokeSystemSharingExtension(
+        &AbstractSystemSharingExtension::afterSharingSystem,
+        queryContext,
+        sharing,
+        isNewAccount ? SharingType::invite : SharingType::sharingWithExistingAccount);
+    if (dbResult != nx::db::DBResult::ok)
+    {
+        NX_LOGX(lm("Error invoking system sharing extension (%1, %2). %3")
+            .arg(sharing.systemId).arg(inviteeAccount->email).arg(dbResult), cl_logDEBUG1);
+        return dbResult;
+    }
+
     if (notificationCommand == NotificationCommand::sendNotification)
     {
         dbResult = notifyUserAboutNewSystem(
@@ -987,17 +999,6 @@ nx::db::DBResult SystemManager::addNewSharing(
     {
         NX_LOGX(lm("Error updating sharing (%1, %2) in Db")
             .arg(sharing.systemId).arg(inviteeAccount.email), cl_logDEBUG1);
-        return dbResult;
-    }
-
-    dbResult = invokeSystemSharingExtension(
-        &AbstractSystemSharingExtension::afterSharingSystem,
-        queryContext,
-        sharing);
-    if (dbResult != nx::db::DBResult::ok)
-    {
-        NX_LOGX(lm("Error invoking system sharing extension (%1, %2). %3")
-            .arg(sharing.systemId).arg(inviteeAccount.email).arg(dbResult), cl_logDEBUG1);
         return dbResult;
     }
 
