@@ -14,14 +14,14 @@ float: left;
 display:block;
 }
 
-.s194{
-width: 194px;
-height: 194px;
+.s97{
+width: 97px;
+height: 97px;
 }
 
-.s186{
-width: 186px;
-height: 186px;
+.s93{
+width: 93px;
+height: 93px;
 }
 .s100 {
 width:100px;
@@ -43,6 +43,11 @@ width: 30px;
 height: 30px;
 }
 
+.s25{
+	width: 25px;
+	height: 25px;
+}
+
 .s20 {
 width: 20px;
 height: 20px;
@@ -54,192 +59,209 @@ height: 10px;
 }
 
 .play {
-background: url(icons_sprite@2x.png) -3px -5px;
+background: url(web_interface_sprite.png) -1px -2px;
 }
 
 .pause {
-background: url(icons_sprite@2x.png) -52px -5px;
-}
-
-.forward{
-background: url(icons_sprite@2x.png) -100px -5px;	
+background: url(web_interface_sprite.png) -26px -2px;
 }
 
 .backward{
-background: url(icons_sprite@2x.png) -148px -5px;	
+background: url(web_interface_sprite.png) -50px -2px;	
 }
 
-.minus {
-background: url(icons_sprite@2x.png) -4px -53px;
+.forward{
+background: url(web_interface_sprite.png) -74px -2px;	
 }
 
 .plus {
-background: url(icons_sprite@2x.png) -52px -53px;
+background: url(web_interface_sprite.png) -2px -26px;
+}
+
+.minus {
+background: url(web_interface_sprite.png) -26px -26px;
 }
 
 .search{
-background: url(icons_sprite@2x.png) -100px -53px;	
+background: url(web_interface_sprite.png) -50px -26px;	
 }
 
 .info-sign {
-background: url(icons_sprite@2x.png) -148px -53px;
+background: url(web_interface_sprite.png) -74px -26px;
 }
 
 .info-sign.active{
-background: url(icons_sprite@2x.png) -196px -53px;	
+background: url(web_interface_sprite.png) -98px -26px;	
 }
 
 .calendar{
-background: url(icons_sprite@2x.png) -244px -53px;
+background: url(web_interface_sprite.png) -122px -26px;
 }
 
 .volume{
-background: url(icons_sprite@2x.png) -292px -53px;
+background: url(web_interface_sprite.png) -146px -26px;
+}
+
+.left-button{
+background: url(web_interface_sprite.png) -2px -50px;
+}
+
+.right-button{
+background: url(web_interface_sprite.png) -26px -50px;
 }
 
 .menu-up{
-background: url(icons_sprite@2x.png) -98px -98px;
+background: url(web_interface_sprite.png) -49px -49px;
 }
 
 .menu-down{
-background: url(icons_sprite@2x.png) -122px -98px;
+background: url(web_interface_sprite.png) -61px -49px;
 }
 
 .close{
-background: url(icons_sprite@2x.png) -146px -98px;
+background: url(web_interface_sprite.png) -73px -49px;
 }
 
 .small-camera-recorded{
-background: url(icons_sprite@2x.png) -170px -98px;
+background: url(web_interface_sprite.png) -85px -49px;
 }
 
 .small-camera-recorded-offline{
-background: url(icons_sprite@2x.png) -194px -98px;
+background: url(web_interface_sprite.png) -97px -49px;
 }
 
 .small-camera-not-recorded{
-background: url(icons_sprite@2x.png) -218px -98px;
+background: url(web_interface_sprite.png) -109px -49px;
 }
 
 .small-camera-offline{
-background: url(icons_sprite@2x.png) -242px -98px;
+background: url(web_interface_sprite.png) -121px -49px;
 }
 
 .menu-left{
-background: url(icons_sprite@2x.png) -98px -122px;
+background: url(web_interface_sprite.png) -49px -61px;
 }
 
 .menu-right{
-background: url(icons_sprite@2x.png) -122px -122px;
+background: url(web_interface_sprite.png) -61px -61px;
 }
 
 .close.active{
-background: url(icons_sprite@2x.png) -146px -122px;
+background: url(web_interface_sprite.png) -73px -61px;
 }
 
 .camera-recorded{
-background: url(icons_sprite@2x.png) -8px -153px;	
+background: url(web_interface_sprite.png) -1px -74px;	
 }
 
 .camera-recorded-offline{
-background: url(icons_sprite@2x.png) -57px -153px;
+background: url(web_interface_sprite.png) -25px -74px;
 }
 
 .camera-not-recorded{
-background: url(icons_sprite@2x.png) -105px -153px;	
+background: url(web_interface_sprite.png) -50px -74px;	
 }
 
 .fullscreen {
-background: url(icons_sprite@2x.png) -4px -196px;
+background: url(web_interface_sprite.png) -2px -99px;
 }
 
 .exit-fullscreen {
-background: url(icons_sprite@2x.png) -52px -196px;
+background: url(web_interface_sprite.png) -26px -99px;
 }
 
 .settings{
-background: url(icons_sprite@2x.png) -100px -196px;	
+background: url(web_interface_sprite.png) -50px -99px;	
 }
 
 .settings.blue{
-background: url(icons_sprite@2x.png) -148px -196px;	
+background: url(web_interface_sprite.png) -74px -99px;	
 }
 
 .cams-search{
-background: url(icons_sprite@2x.png) -196px -196px;	
+background: url(web_interface_sprite.png) -98px -99px;	
 }
 
 .cams-search.blue{
-background: url(icons_sprite@2x.png) -244px -196px;	
+background: url(web_interface_sprite.png) -122px -99px;	
 }
 
 .fullscreen.hover {
-background: url(icons_sprite@2x.png) -4px -244px;
+background: url(web_interface_sprite.png) -2px -123px;
 }
 
 .exit-fullscreen.hover {
-background: url(icons_sprite@2x.png) -52px -244px;
+background: url(web_interface_sprite.png) -26px -123px;
 }
 
 .settings.hover{
-background: url(icons_sprite@2x.png) -100px -244px;	
+background: url(web_interface_sprite.png) -50px -123px;	
 }
 
 .settings.blue.hover{
-background: url(icons_sprite@2x.png) -148px -244px;	
+background: url(web_interface_sprite.png) -74px -123px;	
 }
 
 .cams-search.hover{
-background: url(icons_sprite@2x.png) -196px -244px;	
+background: url(web_interface_sprite.png) -98px -123px;	
 }
 
 .cams-search.blue.hover{
-background: url(icons_sprite@2x.png) -244px -244px;	
+background: url(web_interface_sprite.png) -122px -123px;	
 }
 
 .fullscreen.active {
-background: url(icons_sprite@2x.png) -4px -292px;
+background: url(web_interface_sprite.png) -2px -147px;
 }
 
 .exit-fullscreen.active {
-background: url(icons_sprite@2x.png) -52px -292px;
+background: url(web_interface_sprite.png) -26px -147px;
 }
 
 .settings.active{
-background: url(icons_sprite@2x.png) -100px -292px;	
+background: url(web_interface_sprite.png) -50px -147px;	
 }
 
 .settings.blue.active{
-background: url(icons_sprite@2x.png) -148px -292px;	
+background: url(web_interface_sprite.png) -74px -147px;	
 }
 
 .cams-search.active{
-background: url(icons_sprite@2x.png) -196px -292px;	
+background: url(web_interface_sprite.png) -98px -147px;	
 }
 
 .cams-search.blue.active{
-background: url(icons_sprite@2x.png) -244px -292px;	
+background: url(web_interface_sprite.png) -122px -147px;	
 }
 
 .server{
-background: url(icons_sprite@2x.png) -3px -340px;		
+background: url(web_interface_sprite.png) -1px -170px;		
 }
 
 .camera-unauthorized{
-background: url(icons_sprite@2x.png) 1px -382px;		
+background: url(web_interface_sprite.png) 1px -191px;		
 }
 
 .camera-error{
-background: url(icons_sprite@2x.png) -47px -382px;		
+background: url(web_interface_sprite.png) -24px -191px;		
 }
 
 .video-unauthorized{
-background: url(icons_sprite@2x.png) -2px -432px;
+background: url(web_interface_sprite.png) -1px -216px;
 }
 .video-offline{
-background: url(icons_sprite@2x.png) -194px -432px;
+background: url(web_interface_sprite.png) -97px -216px;
 }
 
 .video-error{
-background: url(icons_sprite@2x.png) 1px -624px;
+background: url(web_interface_sprite.png) 1px -312px;
+}
+
+@media 
+only screen and (-webkit-min-device-pixel-ratio: 1.5),
+only screen and (min--moz-device-pixel-ratio: 1.5),
+only screen and (min-resolution: 240dpi) {
+.play, .pause, .minus, .plus, .fullscreen, .exit-fullscreen, .info-sign, .menu-up, .menu-down, .menu-left, .menu-right, .camera-recorded, .camera-not-recorded, .collapse-up, .collapse-down, .small-camera-recorded, .small-camera-not-recorded, .small-camera-offline, .server, .server-current, .server-offline, .cap-unauthorized, .cap-offline, .camera-vew-unauthorized, .camera-vew-offline, .camera-vew-error {
+    background-image: url(web_interface_sprite@2x.png);
+	background-size: 300px 160px; 
 }
