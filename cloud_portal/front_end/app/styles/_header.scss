@@ -7,7 +7,11 @@ $active-border-width: 3px;
 $max-dropdown-width: 320px;
 $max-header-item-width: 212px;
 
+$collapse-first-width: 920px;
+$collapse-second-width: 700px;
 
+$collapse-first-width-max: $collapse-first-width - 1px;
+$collapse-second-width-max: $collapse-second-width - 1px;
 /* here we kill $grid-float-breakpoint-max to */
 $header-collapsing-width-1: 1px;
 
@@ -135,7 +139,7 @@ $header-collapsing-width-1: 1px;
         padding: $vertical-spacing/2 0;
         border-radius: 0;
 
-        margin-top: 1px;
+        margin-top: 1px !important;
         border: 1px solid $navbar-default-bg;
 
         &:before {
@@ -159,16 +163,13 @@ $header-collapsing-width-1: 1px;
 
             text-overflow: ellipsis;
             overflow: hidden;
-            max-width: 100%;
-            @media (min-width: $grid-float-breakpoint) {
-                max-width: $max-dropdown-width;
-            }
+            max-width: $max-dropdown-width;
 
             &:hover{
                 background-color: $light2 !important;
                 border-right: 1px solid $light2;
                 border-left: 1px solid $light2;
-                margin-right: -1px;
+                margin-right: 1px;
                 margin-left: -1px;
             }
 
@@ -176,14 +177,15 @@ $header-collapsing-width-1: 1px;
                 color:$light10;
             }
         }
-        @media (max-width: $grid-float-breakpoint-max) {
-            & > li.active > a{
-                margin-left: -1px;
-                border-left: $active-border-width solid $brand_core;
-                padding-left: $horizontal-spacing - $active-border-width;
-                &:hover{
-                    background-color: transparent !important;
-                }
+
+        & > li.active > a{
+            margin-left: -1px;
+            border-left: $active-border-width solid $brand_core;
+            padding-left: $horizontal-spacing - $active-border-width !important;
+            &:hover{
+                background-color: transparent !important;
+                margin-right: 0px;
+                border: none;
             }
         }
 
@@ -223,35 +225,75 @@ $header-collapsing-width-1: 1px;
     }
     /* / End of This is to prevent top menu from collapsing*/
 
-
-    .hidden-collapsed{
-        display:block;
-    }
-
-    .hidden-expanded{
-        display:none;
+    @media (min-width: $grid-float-breakpoint) {
+        .hidden-expanded{
+            display:none;
+        }
     }
 
     @media (max-width: $grid-float-breakpoint-max) {
-      .vertical-bar{
-        display: none;
-      }
+        .vertical-bar,
+        .hidden-collapsed,
+        .icon-caret,
+        .ellipsis{
+            display:none !important;
+        }
 
-      .hidden-collapsed{
-        display:none;
-      }
-
-      .hidden-expanded{
-        display:block;
-      }
-      .icon-caret,
-      .ellipsis{
-        display:none !important;
-      }
-
-      .glyphicon{
-        margin-right:0 !important;
-      }
+        .glyphicon{
+            margin-right:0 !important;
+        }
     }
 
+    @media (max-width: $collapse-first-width-max) {
+        .dropdown-menu-left{
+            right: 0;
+            left: auto;
+        }
+    }
+
+    .collapse-first{
+        @media (min-width: $collapse-first-width) {
+            .hidden-expanded{
+                display:none;
+            }
+        }
+        @media (max-width: $collapse-first-width-max) {
+            .hidden-expanded{
+                display:block;
+            }
+
+            .hidden-collapsed,
+            .icon-caret,
+            .ellipsis{
+                display:none !important;
+            }
+
+            .glyphicon{
+                margin-right:0 !important;
+            }
+
+        }
+    }
+    .collapse-second{
+        @media (min-width: $collapse-second-width) {
+            .hidden-expanded{
+                display:none;
+            }
+        }
+        @media (max-width: $collapse-second-width-max) {
+            .hidden-expanded{
+                display:block;
+            }
+
+            .hidden-collapsed,
+            .icon-caret,
+            .ellipsis{
+                display:none !important;
+            }
+
+            .glyphicon{
+                margin-right:0 !important;
+            }
+        }
+    }
 }
