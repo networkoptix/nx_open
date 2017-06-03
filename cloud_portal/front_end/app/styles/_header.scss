@@ -1,0 +1,302 @@
+$header-height: 56px;
+$logo-height: 32px;
+$line-height: 24px;
+$vertical-spacing: (($header-height - $line-height) / 2);
+$horizontal-spacing: 16px;
+$active-border-width: 3px;
+$max-dropdown-width: 320px;
+$max-header-item-width: 212px;
+
+$collapse-first-width: 920px;
+$collapse-second-width: 700px;
+
+$collapse-first-width-max: $collapse-first-width - 1px;
+$collapse-second-width-max: $collapse-second-width - 1px;
+/* here we kill $grid-float-breakpoint-max to */
+$header-collapsing-width-1: 1px;
+
+.navbar{
+
+    border-top:none;
+    border-left:none;
+    border-right:none;
+    border-radius:0;
+    box-shadow: 0 6px 10px $light3;
+
+    .navbar-brand{
+        font-size: $font-size-h3;
+        margin: 0 $horizontal-spacing !important;
+
+        &>img{
+            height:$logo-height;
+            display: inline-block;
+            margin:(($header-height - $logo-height)/2) 0;
+        }
+    }
+
+
+    .margin-right{
+        margin-right:$horizontal-spacing !important;
+    }
+
+    .nav>li{
+        margin:0;
+        padding:0;
+
+        font-size: $font-size-large;
+
+        &.vertical-bar{
+            border-right: 1px solid $common-border-color;
+            margin: $vertical-spacing 0 !important;
+            height: $line-height;
+
+        }
+        &>a{
+            margin:0;
+            padding:$vertical-spacing $horizontal-spacing;
+            line-height: $line-height;
+
+            &>span.ellipsis{
+                white-space: nowrap;
+                display:inline-block;
+                vertical-align:bottom;
+                line-height: $line-height;
+                max-width: $max-header-item-width;
+            }
+
+            &:hover{
+                background-color: $light2 !important;
+            }
+        }
+        &.no-hover>a:hover{
+            cursor:default;
+            background-color: transparent !important;
+        }
+
+        &.open{
+            border-bottom: 1px solid $navbar-default-bg;
+            margin-bottom: -1px;
+
+            &>a{
+                color: $navbar-default-link-color !important;
+
+                margin-left: -1px;
+                border-left: 1px solid $dropdown-border;
+
+                margin-right: -1px;
+                border-right: 1px solid $dropdown-border;
+
+                height: 58px;
+                margin-bottom: -2px;
+
+                @include box-shadow(0 2px 4px transparentize($dark15,0.8));
+                &:hover{
+                    background-color: transparent !important;
+                }
+
+                &:before {
+                    content:"";
+                    position:absolute;
+                    left: $horizontal-spacing;
+                    right: $horizontal-spacing;
+                    bottom: 1px;
+                    border-bottom: 1px solid $navbar-default-border;
+                }
+            }
+        }
+
+        &.active{
+            background-color: white !important;
+            &>a{
+                margin:0 $horizontal-spacing;
+                padding-left:0;
+                padding-right:0;
+
+                border-bottom: $active-border-width solid $brand_core;
+                padding-bottom: $vertical-spacing - $active-border-width;
+                &:hover{
+                    background-color: transparent !important;
+                }
+            }
+        }
+
+        &.dropdown{
+            &>a>span{
+                &.glyphicon{
+                    margin-left: -2px;
+                    margin-right: 14px;
+                }
+
+                &.icon-caret{
+                    margin-left: 14px;
+                    margin-right: -2px;
+                    margin-bottom: -2px;
+                }
+            }
+        }
+    }
+
+    .dropdown-menu {
+        background-clip: border-box;
+        min-width: 100%;
+        padding: $vertical-spacing/2 0;
+        border-radius: 0;
+
+        margin-top: 1px !important;
+        border: 1px solid $navbar-default-bg;
+
+        &:before {
+            content: " ";
+            position: absolute;
+            z-index: -1;
+            top: 0px;
+            left: -2px;
+            right: -2px;
+            bottom: -2px;
+            border: 1px solid $navbar-default-border;
+            border-top: none;
+
+            @include box-shadow(0 2px 4px transparentize($dark15,0.8));
+        }
+
+        & > li > a{
+            line-height: 32px !important;
+            padding: 0 $horizontal-spacing !important;
+            font-size: $font-size-base;
+
+            text-overflow: ellipsis;
+            overflow: hidden;
+            max-width: $max-dropdown-width;
+
+            &:hover{
+                background-color: $light2 !important;
+                border-right: 1px solid $light2;
+                border-left: 1px solid $light2;
+                margin-right: 1px;
+                margin-left: -1px;
+            }
+
+            .system-owner{
+                color:$light10;
+            }
+        }
+
+        & > li.active > a{
+            margin-left: -1px;
+            border-left: $active-border-width solid $brand_core;
+            padding-left: $horizontal-spacing - $active-border-width !important;
+            &:hover{
+                background-color: transparent !important;
+                margin-right: 0px;
+                border: none;
+            }
+        }
+
+        .nav-divider{
+            margin: $vertical-spacing/2 $horizontal-spacing;
+        }
+    }
+
+
+
+    /* This is to prevent top menu from collapsing */
+    & > div > .navbar-nav > li {
+        float: left;
+    }
+    .navbar-header {
+        float: left;
+    }
+    .navbar-right {
+        float: right !important;
+        margin-right: 0;
+    }
+
+    @media (max-width: $grid-float-breakpoint-max) {
+        .open{
+            position:static; /* It was relative, but we remove it to allow dropdown to take the whole width of the screen*/
+            .dropdown-menu {
+                position: absolute;
+                border: 1px solid $navbar-default-bg;
+                background-color: $navbar-default-bg;
+                margin-top: 1px;
+            }
+        }
+    }
+
+    .navbar-left {
+        float: left !important;
+    }
+    /* / End of This is to prevent top menu from collapsing*/
+
+    @media (min-width: $grid-float-breakpoint) {
+        .hidden-expanded{
+            display:none;
+        }
+    }
+
+    @media (max-width: $grid-float-breakpoint-max) {
+        .vertical-bar,
+        .hidden-collapsed,
+        .icon-caret,
+        .ellipsis{
+            display:none !important;
+        }
+
+        .glyphicon{
+            margin-right:0 !important;
+        }
+    }
+
+    @media (max-width: $collapse-first-width-max) {
+        .dropdown-menu-left{
+            right: 0;
+            left: auto;
+        }
+    }
+
+    .collapse-first{
+        @media (min-width: $collapse-first-width) {
+            .hidden-expanded{
+                display:none;
+            }
+        }
+        @media (max-width: $collapse-first-width-max) {
+            .hidden-expanded{
+                display:block;
+            }
+
+            .hidden-collapsed,
+            .icon-caret,
+            .ellipsis{
+                display:none !important;
+            }
+
+            .glyphicon{
+                margin-right:0 !important;
+            }
+
+        }
+    }
+    .collapse-second{
+        @media (min-width: $collapse-second-width) {
+            .hidden-expanded{
+                display:none;
+            }
+        }
+        @media (max-width: $collapse-second-width-max) {
+            .hidden-expanded{
+                display:block;
+            }
+
+            .hidden-collapsed,
+            .icon-caret,
+            .ellipsis{
+                display:none !important;
+            }
+
+            .glyphicon{
+                margin-right:0 !important;
+            }
+        }
+    }
+}

@@ -13,20 +13,18 @@ angular.module('nxCommon')
             templateUrl: Config.viewsDirCommon + 'components/cameraPanel.html',
             link: function (scope, element/*, attrs*/) {
                 scope.Config = Config;
-                scope.searchCams = "";
                 scope.storage = $localStorage;
 
                 var updateCameras = function(){
                     scope.cameras = scope.camerasProvider.cameras;
+                    searchCams();
                 };
                 var updateMediaServers = function(){
                     scope.mediaServers = scope.camerasProvider.getMediaServers();
                 };
 
-                scope.camerasProvider.setSearchCams(searchCams);
-
-                scope.$watch('camerasProvider.cameras',updateCameras);
-                scope.$watch('camerasProvider.mediaServers',updateMediaServers);
+                scope.$watch('camerasProvider.cameras',updateCameras, true);
+                scope.$watch('camerasProvider.mediaServers',updateMediaServers, true);
                 
 
                 scope.selectCamera = function (activeCamera) {

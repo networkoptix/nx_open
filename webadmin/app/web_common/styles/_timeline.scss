@@ -146,6 +146,11 @@ ng-include{
 .mobile-controls{
   height: 60px;
   background-color: $additional_light2;
+  border-top: 1px solid $light6;
+}
+
+.mobile-controls.no-border{
+  border-top: none;
 }
 
 .mobile-controls .pp-only .glyphicon{
