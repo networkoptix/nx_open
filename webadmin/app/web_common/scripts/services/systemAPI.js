@@ -33,10 +33,10 @@ angular.module('nxCommon')
         * */
 
         
-        function ServerConnection(systemId, serverId, unauthorizedCallBack){
+        function ServerConnection(userEmail, systemId, serverId, unauthorizedCallBack){
             // If we have systemId - this is a cloud connection
             // if we have serverId - we ought to use proxy
-            
+            this.userEmail = userEmail;
             this.systemId = systemId;
             this.serverId = serverId;
             this.unauthorizedCallBack = unauthorizedCallBack;
@@ -45,10 +45,10 @@ angular.module('nxCommon')
 
         // Connections cache
         var connections = {};
-        function connect (systemId, serverId, unauthorizedCallBack){
+        function connect (userEmail, systemId, serverId, unauthorizedCallBack){
             var key = systemId + '_' + serverId;
             if(!connections[key]){
-                connections[key] = new ServerConnection(systemId, serverId, unauthorizedCallBack);
+                connections[key] = new ServerConnection(userEmail, systemId, serverId, unauthorizedCallBack);
             }
             return connections[key];
         }
@@ -141,14 +141,44 @@ angular.module('nxCommon')
 
         /* Authentication */
         ServerConnection.prototype.getCurrentUser = function (forcereload){
+            if(forcereload){ // Clean cache to 
+                self.currentUser = null;
+                self.userRequest = null;
+            }
+            if(this.currentUser){ // We have user - return him right away
+                return $q.resolve(this.currentUser);
+            }
+            if(this.userRequest){ // Currently requesting user
+                return this.userRequest;
+            }
+            
             var self = this;
-            if(!this.cacheCurrentUser || forcereload){
-                this.cacheCurrentUser = this._get('/api/getCurrentUser').catch(function(error){
-                    self.cacheCurrentUser = null; // Clear cache in case of errors
-                    return $q.reject(error);
+            if(self.userEmail){ // Cloud portal mode - getCurrentUser is not working
+                this.userRequest = this._get('/ec2/getUsers').then(function(result){
+                    self.currentUser = _.find(result.data, function(user){
+                        return user.name.toLowerCase() == self.userEmail.toLowerCase();
+                    });
+                    return self.currentUser;
+                });
+            }else{ // Local system mode ???
+                this.userRequest = this._get('/api/getCurrentUser').then(function(result){
+                    self.currentUser = result.data.reply;
+                    return self.currentUser;
                 });
             }
-            return this.cacheCurrentUser;
+
+            this.userRequest.finally(function(){
+                self.userRequest = null; // Clear cache in case of errors
+            });
+            return this.userRequest;
+        };
+
+        ServerConnection.prototype.checkPermissions = function(flag){
+            // TODO: getCurrentUser will not work on portal for 3.0 systems, think of something
+            return this.getCurrentUser().then(function(user) {
+                return user.isAdmin ||
+                       user.permissions.indexOf(flag)>=0;
+            });
         };
 
         ServerConnection.prototype.setAuthKeys = function(authGet, authPost, authPlay){
@@ -327,7 +357,7 @@ angular.module('nxCommon')
                     }
                 }
             }
-            var defaultConnection = connect(null, serverId, function(){
+            var defaultConnection = connect(null, null, serverId, function(){
                 // Unauthorised request here
                 window.location.reload(); // just reload the page and it supposed to handle the problem
                 return $q.reject(); // Do not repeat last request
