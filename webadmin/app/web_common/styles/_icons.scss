@@ -180,167 +180,50 @@
   width: 40px !important;
   height: 40px !important;
 
-  .glyphicon-play{
-    @include kill-glyphicon;
-    background-position: -2px -4px;
-  }
-
-  .glyphicon-pause{
-    @include kill-glyphicon;
-    background-position: -52px -4px;
-  }
-
-  .glyphicon-backward{
-    @include kill-glyphicon;
-    background-position: -100px -4px;
-  }
-
-  .glyphicon-forward{
-    @include kill-glyphicon;
-    background-position: -148px -4px;
-  }
-
-  .glyphicon-plus{
-    @include kill-glyphicon;
-    background-position: -4px -52px;
-  }
-
-  .glyphicon-minus{
-    @include kill-glyphicon;
-    background-position: -52px -52px;
-  }
-
   .glyphicon-chevron-up{
     @include kill-glyphicon;
     width: 20px !important;
     height: 20px !important;
-    background-position: -98px -98px;
   }
 
   .glyphicon-chevron-down{
     @include kill-glyphicon;
     width: 20px !important;
     height: 20px !important;
-    background-position: -122px -98px;
-  }
-
-  .glyphicon-cog{
-    @include kill-glyphicon;
-    &{
-      background-position: -100px -198px;
-    }
-    &:hover{
-      background-position: -100px -246px;
-    }
-    &:active{
-      background-position: -100px -294px;
-    }
-  }
-
-  .glyphicon-fullscreen{
-    @include kill-glyphicon;
-    &{
-      background-position: -4px -198px;
-    }
-    &:hover{
-      background-position: -4px -246px;
-    }
-    &:active{
-      background-position: -4px -294px;
-    }
-  }
-
-  .glyphicon-th-list{
-    @include kill-glyphicon;
-    background-position: -2px -340px;
-  }
-
-  .glyphicon-search{
-    @include kill-glyphicon;
-    background-position: -100px -52px;
   }
 
   .glyphicon-remove{
     @include kill-glyphicon;
     width: 20px !important;
     height: 20px !important;
-    background-position: -146px -98px;
-  }
-
-  .glyphicon-info-sign{
-    @include kill-glyphicon;
-    &{
-      background-position: -148px -52px;
-    }
-    &.active{
-      background-position: -196px -52px;
-    }
   }
 
   .camera-preview-offline{
     @include icon;
     width: 50px !important;
     height: 50px !important;
-    background-position: -48px -382px;
-    position: relative;
-    left: 20px;
-    top: 5px;
   }
 
   .camera-preview-unauthorized{
     @include icon;
     width: 50px !important;
     height: 50px !important;
-    background-position: 1px -382px;
-    position: relative;
-    left: 20px;
-    top: 5px;
   }
 
   .camera-status{
     @include icon;
     width: 20px !important;
     height: 20px !important;
-    &.offline-recording{
-      background-position: -194px -98px;
-    }
-
-    &.online-recording{
-      background-position: -170px -98px; 
-    }
-
-    &.not-recording{
-      background-position: -218px -98px;
-    }
-
-    &.offline{
-      background-position: -242px -98px; 
-    }
-  }
-
-  .video-status{
-    @include icon;
-    &.online-recording{
-      background-position: -2px -148px;
-    }
-    &.offline-recording{
-      background-position: -50px -148px;
-    }
-    &.not-recording{
-      background-position: -100px -148px;
-    }
   }
 
   .camera-view-unauthorized{
     @include icon;
     width: 186px !important;
     height: 186px !important;
-    background-position: -2px -432px;
   }
   .camera-view-offline{
     @include icon;
     width: 186px !important;
     height: 186px !important;
-    background-position: -194px -432px;
   }
 }
