@@ -170,15 +170,13 @@ void QnFileDeletor::processPostponedFiles()
                         .arg(itr->fileName), cl_logDEBUG2);
             }
 
-            auto deleteResult = internalDeleteFile(itr->fileName);
-            if (!deleteResult)
+            if (needToPostpone || !internalDeleteFile(itr->fileName))
             {
-                NX_LOG(lit("[Cleanup] internal delete failed for file %1 while processing postponed files.")
-                    .arg(itr->fileName), cl_logDEBUG2);
-            }
-
-            if (needToPostpone || !deleteResult)
                 newList.insert(*itr);
+                NX_LOG(lit("[Cleanup] Postponing file %1. Reason: %2")
+                    .arg(itr->fileName)
+                    .arg(needToPostpone ? "Storage is offline or not in the resource pool" : "Delete failed"), cl_logDEBUG2);
+            }
         }
     }
     if (newList.empty())

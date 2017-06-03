@@ -58,19 +58,13 @@ void Composer::printProperties()
 }
 
 
-Writer::Writer(WriterHandler* writeHandler, std::chrono::milliseconds writeInterval):
-    m_handler(writeHandler),
-    m_writeInterval(writeInterval),
-    m_lastWriteTime(std::chrono::time_point<std::chrono::steady_clock>::min())
+Writer::Writer(WriterHandler* writeHandler):
+    m_handler(writeHandler)
 {}
 
 void Writer::write()
 {
-    auto now = std::chrono::steady_clock::now();
-    if (now - m_writeInterval < m_lastWriteTime)
-        return;
-
-    NX_LOG(lit("[Aux] writing camera info files starting..."), cl_logDEBUG2);
+    NX_LOG(lit("[CamInfo] writing camera info files starting..."), cl_logDEBUG2);
 
     for (auto& storageUrl: m_handler->storagesUrls())
         for (int i = 0; i < static_cast<int>(QnServer::ChunksCatalogCount); ++i)
@@ -83,10 +77,9 @@ void Writer::write()
                     m_composer.make(m_handler->composerHandler(cameraId)));
             }
 
-    NX_LOG(lit("[Aux] writing camera info files DONE"), cl_logDEBUG2);
-
-    m_lastWriteTime = std::chrono::steady_clock::now();
+    NX_LOG(lit("[CamInfo] writing camera info files DONE"), cl_logDEBUG2);
 }
+
 bool Writer::isWriteNeeded(const QString& infoFilePath, const QByteArray& infoFileData) const
 {
     bool isDataAndPathValid = !infoFilePath.isEmpty() && !infoFileData.isEmpty();
@@ -119,12 +112,6 @@ QString Writer::makeFullPath(
     auto basePath = closeDirPath(storageUrl) + DeviceFileCatalog::prefixByCatalog(catalog) + separator;
     return basePath + cameraId + separator + lit("info.txt");
 }
-
-void Writer::setWriteInterval(std::chrono::milliseconds interval)
-{
-    m_writeInterval = interval;
-}
-
 
 ServerWriterHandler::ServerWriterHandler(QnStorageManager* storageManager):
     m_storageManager(storageManager)
