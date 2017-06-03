@@ -14,6 +14,7 @@ angular.module('nxCommon')
             link: function (scope, element/*, attrs*/) {
                 scope.Config = Config;
                 scope.storage = $localStorage;
+                scope.searchCams = '';
 
                 var updateCameras = function(){
                     scope.cameras = scope.camerasProvider.cameras;
