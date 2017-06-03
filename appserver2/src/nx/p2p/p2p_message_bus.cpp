@@ -1,5 +1,6 @@
 #include "p2p_message_bus.h"
 
+#include <nx/utils/std/cmath.h>
 #include <common/common_module.h>
 #include <utils/media/bitStream.h>
 #include <utils/common/synctime.h>
