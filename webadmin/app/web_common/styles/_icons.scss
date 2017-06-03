@@ -1,5 +1,6 @@
 @mixin icon{
   display: inline-block;
+  background-size: 192px 408px;
   background-image: url(/web_common/images/icons/web_interface_sprite.png);
   @media only screen and (-webkit-min-device-pixel-ration: 2), only screen and (min-device-pixel-ratio: 2){
     background-image: url(/web_common/images/icons/web_interface_sprite@2x.png);
@@ -174,56 +175,4 @@
   width: 93px !important;
   height: 93px !important;
   background-position: -97px -216px;
-}
-
-@media only screen and (-webkit-min-device-pixel-ration: 2), only screen and (min-device-pixel-ratio: 2){
-  width: 40px !important;
-  height: 40px !important;
-
-  .glyphicon-chevron-up{
-    @include kill-glyphicon;
-    width: 20px !important;
-    height: 20px !important;
-  }
-
-  .glyphicon-chevron-down{
-    @include kill-glyphicon;
-    width: 20px !important;
-    height: 20px !important;
-  }
-
-  .glyphicon-remove{
-    @include kill-glyphicon;
-    width: 20px !important;
-    height: 20px !important;
-  }
-
-  .camera-preview-offline{
-    @include icon;
-    width: 50px !important;
-    height: 50px !important;
-  }
-
-  .camera-preview-unauthorized{
-    @include icon;
-    width: 50px !important;
-    height: 50px !important;
-  }
-
-  .camera-status{
-    @include icon;
-    width: 20px !important;
-    height: 20px !important;
-  }
-
-  .camera-view-unauthorized{
-    @include icon;
-    width: 186px !important;
-    height: 186px !important;
-  }
-  .camera-view-offline{
-    @include icon;
-    width: 186px !important;
-    height: 186px !important;
-  }
 }
