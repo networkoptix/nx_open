@@ -412,9 +412,9 @@ angular.module('nxCommon').controller('ViewCtrl',
                 $scope.camerasProvider.startPoll();
             });
         }
-        systemAPI.getCurrentUser().then(function(result) {
-            $scope.canViewArchive = result.data.reply.isAdmin || (result.data.reply.permissions.indexOf(Config.globalViewArchivePermission)>=0);
-            var userId = result.data.reply.id;
+
+        systemAPI.checkPermissions(Config.globalViewArchivePermission).then(function(result){
+            $scope.canViewArchive = result;
             requestResources();
         });
 

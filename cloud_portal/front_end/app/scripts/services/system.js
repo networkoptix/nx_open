@@ -20,8 +20,8 @@ angular.module('cloudApp')
             
             this.currentUserEmail = currentUserEmail;
             var self = this;
-            this.mediaserver = systemAPI(systemId, null, function(){
-                // Unauthorised request
+            this.mediaserver = systemAPI(currentUserEmail, systemId, null, function(){
+                // Unauthorised request handler
                 // Some options here:
                 // * Access was revoked
                 // * System was disconnected from cloud
