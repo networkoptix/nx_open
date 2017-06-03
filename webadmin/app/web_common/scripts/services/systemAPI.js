@@ -67,23 +67,30 @@ angular.module('nxCommon')
             }
             return urlBase;
         };
-        ServerConnection.prototype._wrapRequest = function(method, url, data, config, repeat){
+        ServerConnection.prototype._wrapRequest = function(method, url, data, repeat){
             var self = this;
-            // TODO: handle common situations here - like offline or logout
-            // Raise a global event in both cases. Let outer code handle this global request
-            var promise = $http({
+            var auth = method=='GET'? this.authGet() : this.authPost();
+            var getData = method=='GET'? data : null;
+            var postData = method=='POST'? data : null;
+            var requestUrl = this._setGetParams(url, getData, this.systemId && auth);
+
+            var canceler = $q.defer();
+            var request = $http({
                 method: method,
-                url: url,
-                data: data,
-                config: config
+                url: requestUrl,
+                data: postData,
+                config: {
+                    timeout: canceler.promise
+                }
             });
-            return promise.catch(function(error){
+
+            var promise = request.catch(function(error){
                 if(error.status == 401 || error.status == 403  || error.data && error.data.resultCode == "forbidden"){
                     if(!repeat && self.unauthorizedCallBack){ // first attempt
                         // Here we call a handler for unauthorised request. If handler promises success - we repeat the request once again.
                         // Handler is supposed to try and update auth keys
                         return self.unauthorizedCallBack().then(function(){
-                            return self._wrapRequest(method, url, data, config, true);
+                            return self._wrapRequest(method, url, data, true);
                         },function(){
                             $rootScope.$broadcast("unauthirosed_" + self.systemId);
                             return $q.reject(error);
@@ -93,11 +100,24 @@ angular.module('nxCommon')
                     $rootScope.$broadcast("unauthirosed_" + self.systemId);
                 }
                 if(!repeat && error.status == 503){ // Repeat the request once again for 503 error
-                    return self._wrapRequest(method, url, data, config, true);
+                    return self._wrapRequest(method, url, data, true);
                 }
 
                 return $q.reject(error);// We cannot handle the problem at this level, pass it up
             });
+
+            promise.then(function(){
+                canceler = null;
+            },function(){
+                canceler = null;
+            });
+            promise.abort = function(reason){
+                if(canceler) {
+                    canceler.resolve('abort request: ' + reason);
+                }
+            };
+
+            return promise;
         };
         ServerConnection.prototype._setGetParams = function(url, data, auth){
             if(auth){
@@ -111,23 +131,9 @@ angular.module('nxCommon')
             return this.urlBase + url;
         };
         ServerConnection.prototype._get = function(url, data){
-            url = this._setGetParams(url, data, this.systemId && this.authGet());
-            var canceller = $q.defer();
-            var obj = this._wrapRequest('GET', url, null, { timeout: canceller.promise });
-            obj.then(function(){
-                canceller = null;
-            },function(){
-                canceller = null;
-            });
-            obj.abort = function(reason){
-                if(canceller) {
-                    canceller.resolve('abort request: ' + reason);
-                }
-            };
-            return obj;
+            return this._wrapRequest('GET', url, data);
         };
         ServerConnection.prototype._post = function(url, data){
-            url = this._setGetParams(url, null, this.systemId && this.authPost());
             return this._wrapRequest('POST', url, data);
         };
         /* End of helpers */

@@ -21,18 +21,18 @@
             <li ng-class="{active:active.view }"><a ng-href="/systems/{{activeSystem.id}}/view">View</a></li>
         </ul>
 
-        <ul class="nav navbar-nav navbar-right auth-hidden">
+        <ul class="nav navbar-nav navbar-right auth-hidden margin-right">
             <li><span class="btn-wrapper"><a href="/login" class="btn btn-default"
                                              ng-click="login();$event.preventDefault();">Log In</a></span><span
                     class="btn-wrapper" ng-if="!active.register"><a href="/register" class="btn btn-primary" >Create Account</a></span></li>
         </ul>
 
-        <ul class="nav navbar-nav navbar-right auth-visible">
-            <li ng-if="singleSystem" class="no-hover hidden-collapsed">
+        <ul class="nav navbar-nav navbar-right auth-visible margin-right">
+            <li ng-if="singleSystem" class="no-hover collapse-second hidden-collapse">
                 <a href=""><span class="glyphicon glyphicon-home"></span><span class="ellipsis">{{activeSystem.name}}</span></a>
             </li>
             <li class="vertical-bar" ng-if="systemCounter && !singleSystem"></li>
-            <li uib-dropdown ng-if="systemCounter && !singleSystem">
+            <li uib-dropdown ng-if="systemCounter && !singleSystem" class="collapse-second">
                 <a uib-dropdown-toggle ng-href="/systems/{{system.id}}">
                     <span ng-class="{'hidden-expanded':!activeSystem}" class="glyphicon glyphicon-home"></span><span class="ellipsis">{{activeSystem?activeSystem.name:systemCounter + ' ' + L.header.systems}}</span><span class="icon-caret"></span>
                 </a>
@@ -49,7 +49,7 @@
                 </ul>
             </li>
             <li class="vertical-bar"></li>
-            <li uib-dropdown>
+            <li uib-dropdown class="collapse-first">
                 <a uib-dropdown-toggle href=""><span class="glyphicon glyphicon-user"></span><span class="ellipsis">{{account.email}}</span><span class="icon-caret"></span></a>
                 <ul uib-dropdown-menu>
                     <li class="hidden-expanded active"><a href="">{{account.email}}</a></li>
@@ -60,7 +60,7 @@
                     <li><a href="" ng-click="logout()">Log Out</a></li>
                 </ul>
             </li>
-            <li class="vertical-bar margin-right"></li>
+            <li class="vertical-bar"></li>
         </ul>
     </div>
 </nav>
