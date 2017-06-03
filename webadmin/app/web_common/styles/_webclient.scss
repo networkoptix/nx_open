@@ -605,8 +605,6 @@ table.webclient-window>tbody>tr>td{
 }
 
 .video-preview{
-  height: 100%;
-  max-width: 100%;
   background-color: $dark1;
 }
 
@@ -663,6 +661,15 @@ table.webclient-window>tbody>tr>td{
 .videowindow video{
   max-width:100%;
   max-height:100%;
+}
+
+.videowindow > img{
+  max-width: 100%;
+  max-height: 100%;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
 }
 
 .half-height {

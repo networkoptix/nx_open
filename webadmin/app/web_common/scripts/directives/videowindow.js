@@ -381,7 +381,17 @@ angular.module('nxCommon')
                     }
                 }
 
+                function previewModify(){
+                    var tmpPreview = scope.preview;
+                    var size = tmpPreview.indexOf('&height');
+                    if(size > -1){
+                        scope.preview = tmpPreview.substring(0,size);
+                    }
+                }
+
                 scope.$watch("vgSrc",srcChanged);
+
+                scope.$watch("preview", previewModify);
 
                 scope.$on('$destroy',recyclePlayer);
 
