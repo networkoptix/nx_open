@@ -76,7 +76,6 @@ angular.module('nxCommon')
         camerasProvider.prototype.getCameras = function(camerasList) {
             var self = this;
             var cameras = camerasList;
-            console.log(cameras);
 
             var findMediaStream = function(param){
                 return param.name === 'mediaStreams';
