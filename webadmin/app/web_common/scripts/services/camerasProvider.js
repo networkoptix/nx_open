@@ -76,6 +76,7 @@ angular.module('nxCommon')
         camerasProvider.prototype.getCameras = function(camerasList) {
             var self = this;
             var cameras = camerasList;
+            console.log(cameras);
 
             var findMediaStream = function(param){
                 return param.name === 'mediaStreams';
@@ -92,7 +93,7 @@ angular.module('nxCommon')
 
             function cameraSorter(camera) {
                 camera.url = self.extractDomain(camera.url);
-                camera.preview = self.systemAPI.previewUrl(camera.physicalId, false, null, 256);
+                camera.preview = self.systemAPI.previewUrl(camera.physicalId, false, null, null);
                 camera.server = self.getServer(camera.parentId);
                 if(camera.server && camera.server.status === 'Offline'){
                     camera.status = 'Offline';
