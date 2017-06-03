@@ -1,9 +1,9 @@
 @mixin icon{
   display: inline-block;
   background-size: 192px 408px;
-  background-image: url(/web_common/images/icons/web_interface_sprite.png);
+  background-image: url(../web_common/images/icons/web_interface_sprite.png);
   @media only screen and (-webkit-min-device-pixel-ration: 2), only screen and (min-device-pixel-ratio: 2){
-    background-image: url(/web_common/images/icons/web_interface_sprite@2x.png);
+    background-image: url(../web_common/images/icons/web_interface_sprite@2x.png);
   }
 }
 
