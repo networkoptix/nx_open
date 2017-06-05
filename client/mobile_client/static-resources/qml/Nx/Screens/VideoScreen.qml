@@ -8,6 +8,7 @@ import Nx.Settings 1.0
 import com.networkoptix.qml 1.0
 
 import "private/VideoScreen"
+import "private/VideoScreen/utils.js" as VideoScreenUtils
 
 PageBase
 {
@@ -62,19 +63,23 @@ PageBase
 
         readonly property bool applicationActive: Qt.application.state === Qt.ApplicationActive
 
-        property real uiOpacity: 1.0
+        property bool uiVisible: true
+        property real uiOpacity: uiVisible ? 1.0 : 0.0
         Behavior on uiOpacity
         {
             NumberAnimation { duration: 250; easing.type: Easing.OutCubic }
         }
 
-        property real navigationOpacity: 1.0
-        Behavior on navigationOpacity
+        property bool controlsVisible: true
+        property real controlsOpacity: controlsVisible ? 1.0 : 0.0
+        Behavior on controlsOpacity
         {
             NumberAnimation { duration: 250; easing.type: Easing.OutCubic }
         }
 
         property real cameraUiOpacity: 1.0
+
+        property int mode: VideoScreenUtils.VideoScreenMode.Navigation
 
         Timer
         {
@@ -90,8 +95,8 @@ PageBase
                 if (videoScreenController.serverOffline)
                 {
                     exitFullscreen()
-                    navigationOpacity = 0.0
-                    uiOpacity = 1.0
+                    controlsVisible = false
+                    uiVisible = true
                 }
                 else if (videoScreenController.cameraOffline)
                 {
@@ -100,7 +105,7 @@ PageBase
             }
             else
             {
-                d.navigationOpacity = 1.0
+                d.controlsVisible = true
             }
         }
 
@@ -293,6 +298,11 @@ PageBase
             anchors.bottom: parent.bottom
 
             controller.resourceId: videoScreenController.resourceHelper.resourceId
+
+            opacity: Math.min(d.uiOpacity, d.controlsOpacity)
+            visible: opacity > 0 && d.mode === VideoScreenUtils.VideoScreenMode.Ptz
+
+            onCloseButtonClicked: d.mode = VideoScreenUtils.VideoScreenMode.Navigation
         }
 
         Loader
@@ -302,8 +312,8 @@ PageBase
             anchors.bottom: parent.bottom
             width: parent.width
 
-            visible: opacity > 0 && !ptzPanel.visible
-            opacity: Math.min(d.uiOpacity, d.navigationOpacity)
+            visible: opacity > 0 && d.mode === VideoScreenUtils.VideoScreenMode.Navigation
+            opacity: Math.min(d.uiOpacity, d.controlsOpacity)
 
             sourceComponent:
                 videoScreenController.accessRightsHelper.canViewArchive
@@ -350,7 +360,7 @@ PageBase
                     ptzAvailable: ptzPanel.controller.available
                         && videoScreenController.accessRightsHelper.canManagePtz
                         && !videoScreenController.offline
-                    onPtzButtonClicked: ptzPanel.visible = true
+                    onPtzButtonClicked: d.mode = VideoScreenUtils.VideoScreenMode.Ptz
                 }
             }
 
@@ -423,7 +433,7 @@ PageBase
 
     function hideUi()
     {
-        d.uiOpacity = 0.0
+        d.uiVisible = false
         if (Utils.isMobile())
             enterFullscreen()
     }
@@ -431,12 +441,12 @@ PageBase
     function showUi()
     {
         exitFullscreen()
-        d.uiOpacity = 1.0
+        d.uiVisible = true
     }
 
     function toggleUi()
     {
-        if (navigationLoader.visible)
+        if (d.uiVisible)
             hideUi()
         else
             showUi()

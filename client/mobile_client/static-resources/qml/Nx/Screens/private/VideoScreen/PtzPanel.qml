@@ -15,7 +15,7 @@ Item
         property bool supportsPresets: capabilities & Ptz.PresetsPtzCapability
     }
 
-    visible: false
+    signal closeButtonClicked()
 
     implicitWidth: content.width
     implicitHeight: content.height
@@ -187,7 +187,7 @@ Item
                 flat: true
                 icon: lp("/images/close.png")
 
-                onClicked: control.visible = false
+                onClicked: control.closeButtonClicked()
             }
         }
     }
