@@ -46,7 +46,7 @@ SystemManager::SystemManager(
     const SystemHealthInfoProvider& systemHealthInfoProvider,
     nx::db::AsyncSqlQueryExecutor* const dbManager,
     AbstractEmailManager* const emailManager,
-    ec2::SyncronizationEngine* const ec2SyncronizationEngine) throw(std::runtime_error)
+    ec2::SyncronizationEngine* const ec2SyncronizationEngine) noexcept(false)
 :
     m_settings(settings),
     m_timerManager(timerManager),
