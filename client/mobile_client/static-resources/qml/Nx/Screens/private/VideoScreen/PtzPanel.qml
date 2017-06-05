@@ -15,7 +15,7 @@ Item
         property bool supportsPresets: capabilities & Ptz.PresetsPtzCapability
     }
 
-    property alias customRotationRad: joystick.customRotationRad
+    property alias customRotation: joystick.customRotation
 
     signal closeButtonClicked()
 

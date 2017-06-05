@@ -11,14 +11,15 @@ Rectangle
 
     property vector2d direction:
     {
-        var cosAngle = Math.cos(customRotationRad)
-        var sinAngle = Math.sin(customRotationRad)
+        var radians = customRotation * Math.PI / 180
+        var cosAngle = Math.cos(radians)
+        var sinAngle = Math.sin(radians)
         var x = d.movementVector.x * cosAngle - d.movementVector.y * sinAngle
         var y = d.movementVector.x * sinAngle + d.movementVector.y * cosAngle
         return Qt.vector2d(x, -y)
     }
     property int joystickType: JoystickUtils.Type.Any
-    property real customRotationRad: 0
+    property real customRotation: 0
 
     implicitWidth: 136
     implicitHeight: implicitWidth
