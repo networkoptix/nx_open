@@ -6,7 +6,7 @@ import Nx.Controls 1.0
 import "Ptz"
 import "Ptz/joystick_utils.js" as JoystickUtils
 
-Column
+Item
 {
     id: control
 
@@ -16,158 +16,179 @@ Column
     }
 
     visible: false
-    spacing: 8
 
-    Item
+    implicitWidth: content.width
+    implicitHeight: content.height
+
+    Image
     {
-        id: topPtzPanel
-
         width: parent.width
-        height: Math.max(zoomFocusRow.height, joystick.height)
-
-        Row
-        {
-            id: zoomFocusRow
-
-            spacing: 8
-            anchors.bottom: parent.bottom
-
-            FocusControl
-            {
-                id: focusControl
-
-                anchors.bottom: parent.bottom
-                visible: controller.capabilities & Ptz.ContinuousFocusCapability
-                supportsAutoFocus: controller.auxTraits & Ptz.ManualAutoFocusPtzTrait
-
-                onFocusInPressedChanged: moveFocus(focusInPressed, 1)
-                onFocusOutPressedChanged: moveFocus(focusOutPressed, -1)
-                onAutoFocusClicked: controller.setAutoFocus()
-
-                function moveFocus(shouldMove, speed)
-                {
-                    var focusSpeed = shouldMove? speed : 0
-                    controller.continuousFocus(focusSpeed)
-                }
-            }
-
-            ZoomControl
-            {
-                id: zoomControl
-
-                anchors.bottom: parent.bottom
-                visible: controller.capabilities & Ptz.ContinuousZoomCapability
-
-                onZoomInPressedChanged: zoomMove(zoomInPressed, 0.5)
-                onZoomOutPressedChanged: zoomMove(zoomOutPressed, -0.5)
-
-                function zoomMove(shouldMove, speed)
-                {
-                    var zoomVector = shouldMove
-                        ? Qt.vector3d(0, 0, speed)
-                        : Qt.vector3d(0, 0, 0)
-
-                    controller.continuousMove(zoomVector)
-                }
-            }
-        }
-
-        Joystick
-        {
-            id: joystick
-
-            joystickType:
-            {
-                if (!visible)
-                    return JoystickUtils.Type.Any
-
-                var caps = controller.capabilities
-                if (caps & Ptz.ContinuousPanTiltCapabilities)
-                {
-                    if (caps & Ptz.EightWayPtzTrait)
-                        return JoystickUtils.Type.EightWayPtz
-                    if (caps & Ptz.FourWayPtzTrait)
-                        return JoystickUtils.Type.FourWayPtz
-
-                    return JoystickUtils.Type.FreeWayPtz
-                }
-
-                if (caps & Ptz.ContinuousPanCapability)
-                    return JoystickUtils.Type.TwoWayHorizontal
-
-                if (caps & Ptz.ContinuousTiltCapability)
-                    return JoystickUtils.Type.TwoWayVertical
-
-                return JoystickUtils.Type.Any
-            }
-
-            anchors.bottom: parent.bottom
-            anchors.right: parent.right
-            visible: controller &&
-                (controller.capabilities & Ptz.ContinuousPanCapability
-                || controller.capabilities & Ptz.ContinuousTiltCapability)
-
-            onDirectionChanged:
-            {
-                controller.continuousMove(Qt.vector3d(direction.x, direction.y, 0))
-            }
-        }
+        height: sourceSize.height
+        anchors.bottom: parent.bottom
+        sourceSize.height: 56 * 2
+        source: lp("/images/timeline_gradient.png")
     }
 
-    Item
+    Column
     {
-        width: parent.width
-        height: 56
+        id: content
 
-        PresetsButton
+        x: 8
+        width: parent.width - 16
+
+        spacing: 8
+
+        Item
         {
-            id: presetsButton
+            id: topPtzPanel
 
-            anchors.left: parent.left
-            anchors.verticalCenter: parent.verticalCenter
+            width: parent.width
+            height: Math.max(zoomFocusRow.height, joystick.height)
 
-            resourceId: controller.resourceId
-            popupParent: videoScreen
-            onPresetChoosen: controller.setPresetById(id)
-
-            visible: controller.presetsCount && controller.supportsPresets
-        }
-
-        PresetsListItem
-        {
-            id: presetsItem
-
-            anchors.left: presetsButton.right
-            anchors.right: hidePtzButton.left
-            anchors.rightMargin: 4
-            anchors.verticalCenter: parent.verticalCenter
-
-            presetsCount: controller.presetsCount
-            currentPresetIndex: controller.activePresetIndex
-
-            visible: controller.presetsCount && controller.supportsPresets
-
-            onGoToPreset:
+            Row
             {
-                if (presetIndex != -1)
-                    controller.setPresetByIndex(presetIndex)
+                id: zoomFocusRow
+
+                spacing: 8
+                anchors.bottom: parent.bottom
+
+                FocusControl
+                {
+                    id: focusControl
+
+                    anchors.bottom: parent.bottom
+                    visible: controller.capabilities & Ptz.ContinuousFocusCapability
+                    supportsAutoFocus: controller.auxTraits & Ptz.ManualAutoFocusPtzTrait
+
+                    onFocusInPressedChanged: moveFocus(focusInPressed, 1)
+                    onFocusOutPressedChanged: moveFocus(focusOutPressed, -1)
+                    onAutoFocusClicked: controller.setAutoFocus()
+
+                    function moveFocus(shouldMove, speed)
+                    {
+                        var focusSpeed = shouldMove? speed : 0
+                        controller.continuousFocus(focusSpeed)
+                    }
+                }
+
+                ZoomControl
+                {
+                    id: zoomControl
+
+                    anchors.bottom: parent.bottom
+                    visible: controller.capabilities & Ptz.ContinuousZoomCapability
+
+                    onZoomInPressedChanged: zoomMove(zoomInPressed, 0.5)
+                    onZoomOutPressedChanged: zoomMove(zoomOutPressed, -0.5)
+
+                    function zoomMove(shouldMove, speed)
+                    {
+                        var zoomVector = shouldMove
+                            ? Qt.vector3d(0, 0, speed)
+                            : Qt.vector3d(0, 0, 0)
+
+                        controller.continuousMove(zoomVector)
+                    }
+                }
+            }
+
+            Joystick
+            {
+                id: joystick
+
+                joystickType:
+                {
+                    if (!visible)
+                        return JoystickUtils.Type.Any
+
+                    var caps = controller.capabilities
+                    if (caps & Ptz.ContinuousPanTiltCapabilities)
+                    {
+                        if (caps & Ptz.EightWayPtzTrait)
+                            return JoystickUtils.Type.EightWayPtz
+                        if (caps & Ptz.FourWayPtzTrait)
+                            return JoystickUtils.Type.FourWayPtz
+
+                        return JoystickUtils.Type.FreeWayPtz
+                    }
+
+                    if (caps & Ptz.ContinuousPanCapability)
+                        return JoystickUtils.Type.TwoWayHorizontal
+
+                    if (caps & Ptz.ContinuousTiltCapability)
+                        return JoystickUtils.Type.TwoWayVertical
+
+                    return JoystickUtils.Type.Any
+                }
+
+                anchors.bottom: parent.bottom
+                anchors.right: parent.right
+                visible: controller &&
+                    (controller.capabilities & Ptz.ContinuousPanCapability
+                    || controller.capabilities & Ptz.ContinuousTiltCapability)
+
+                onDirectionChanged:
+                {
+                    controller.continuousMove(Qt.vector3d(direction.x, direction.y, 0))
+                }
             }
         }
 
-        Button
+        Item
         {
-            id: hidePtzButton
+            width: parent.width
+            height: 56
 
-            width: 48
-            height: width
-            anchors.right: parent.right
-            anchors.rightMargin: 4
-            anchors.verticalCenter: parent.verticalCenter
+            PresetsButton
+            {
+                id: presetsButton
 
-            flat: true
-            icon: lp("/images/close.png")
+                anchors.left: parent.left
+                anchors.verticalCenter: parent.verticalCenter
 
-            onClicked: control.visible = false
+                resourceId: controller.resourceId
+                popupParent: videoScreen
+                onPresetChoosen: controller.setPresetById(id)
+
+                visible: controller.presetsCount && controller.supportsPresets
+            }
+
+            PresetsListItem
+            {
+                id: presetsItem
+
+                anchors.left: presetsButton.right
+                anchors.right: hidePtzButton.left
+                anchors.rightMargin: 4
+                anchors.verticalCenter: parent.verticalCenter
+
+                presetsCount: controller.presetsCount
+                currentPresetIndex: controller.activePresetIndex
+
+                visible: controller.presetsCount && controller.supportsPresets
+
+                onGoToPreset:
+                {
+                    if (presetIndex != -1)
+                        controller.setPresetByIndex(presetIndex)
+                }
+            }
+
+            Button
+            {
+                id: hidePtzButton
+
+                width: 48
+                height: width
+                anchors.right: parent.right
+                anchors.rightMargin: 4
+                anchors.verticalCenter: parent.verticalCenter
+
+                flat: true
+                icon: lp("/images/close.png")
+
+                onClicked: control.visible = false
+            }
         }
     }
 }

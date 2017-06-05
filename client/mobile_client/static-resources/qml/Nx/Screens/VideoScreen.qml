@@ -289,8 +289,7 @@ PageBase
         {
             id: ptzPanel
 
-            x: 8
-            width: parent.width - x * 2
+            width: parent.width
             anchors.bottom: parent.bottom
 
             controller.resourceId: videoScreenController.resourceHelper.resourceId
