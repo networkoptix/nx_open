@@ -11,7 +11,7 @@ Rectangle
 
     property vector2d direction:
     {
-        var radians = customRotation * Math.PI / 180
+        var radians = -customRotation * Math.PI / 180
         var cosAngle = Math.cos(radians)
         var sinAngle = Math.sin(radians)
         var x = d.movementVector.x * cosAngle - d.movementVector.y * sinAngle

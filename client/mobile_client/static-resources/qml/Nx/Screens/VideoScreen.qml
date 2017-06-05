@@ -298,7 +298,7 @@ PageBase
             anchors.bottom: parent.bottom
 
             controller.resourceId: videoScreenController.resourceHelper.resourceId
-            customRotation: -videoScreenController.resourceHelper.customRotation
+            customRotation: videoScreenController.resourceHelper.customRotation
 
             opacity: Math.min(d.uiOpacity, d.controlsOpacity)
             visible: opacity > 0 && d.mode === VideoScreenUtils.VideoScreenMode.Ptz
