@@ -20,7 +20,7 @@ namespace nx {
 namespace p2p {
 namespace test {
 
-static const int kInstanceCount = 5;
+static const int kInstanceCount = 2;
 static const int kMaxSyncTimeoutMs = 1000 * 20 * 1000;
 static const int kPropertiesPerCamera = 5;
 static const int kCamerasCount = 20;
