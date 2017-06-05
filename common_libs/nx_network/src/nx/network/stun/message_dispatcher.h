@@ -19,9 +19,10 @@ namespace stun {
 class NX_NETWORK_API MessageDispatcher
 {
 public:
-    typedef std::function<
-        void(std::shared_ptr< AbstractServerConnection >, stun::Message)
-    > MessageProcessor;
+    using MessageProcessor = std::function<
+        void(std::shared_ptr< AbstractServerConnection >, stun::Message)>;
+
+    MessageDispatcher() = default;
 
     MessageDispatcher(const MessageDispatcher&) = delete;
     MessageDispatcher& operator=(const MessageDispatcher&) = delete;
