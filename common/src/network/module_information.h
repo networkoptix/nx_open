@@ -8,6 +8,7 @@
 #include <nx/network/socket_common.h>
 #include <nx/utils/uuid.h>
 
+#include <common/common_globals.h>
 #include <utils/common/software_version.h>
 #include <utils/common/system_information.h>
 
