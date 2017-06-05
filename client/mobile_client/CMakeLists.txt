@@ -54,7 +54,7 @@ if(ANDROID)
 
     add_android_apk(mobile_client.apk TARGET mobile_client
         PACKAGE_SOURCE "${CMAKE_CURRENT_BINARY_DIR}/android"
-        QML_IMPORT_PATHS "${CMAKE_CURRENT_LIST_DIR}/static-resources/qml"
+        QML_ROOT_PATH "${CMAKE_CURRENT_LIST_DIR}/static-resources/qml"
         EXTRA_LIBS ${OPENSSL_LIBS} ${FFMPEG_LIBS} ${OPENAL_LIBS}
     )
 endif()

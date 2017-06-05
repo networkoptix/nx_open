@@ -16,7 +16,7 @@ endfunction()
 
 function(add_android_apk target)
     set(options)
-    set(oneValueArgs TARGET PACKAGE_SOURCE
+    set(oneValueArgs TARGET PACKAGE_SOURCE QML_ROOT_PATH
         KEYSTORE_FILE KEYSTORE_ALIAS KEYSTORE_PASSWORD KEYSTORE_KEY_PASSWORD)
     set(multiValueArgs QML_IMPORT_PATHS EXTRA_LIBS)
 
@@ -45,6 +45,7 @@ function(add_android_apk target)
         "    \"android-package-source-directory\": \"${APK_PACKAGE_SOURCE}\",\n"
         "    \"android-extra-libs\": \"${extra_libs}\",\n"
         "    \"qml-import-paths\": \"${APK_QML_IMPORT_PATHS}\",\n"
+        "    \"qml-root-path\": \"${APK_QML_ROOT_PATH}\",\n"
     )
 
     list(APPEND settings "    \"application-binary\": \"$<TARGET_FILE:${APK_TARGET}>\"\n")
