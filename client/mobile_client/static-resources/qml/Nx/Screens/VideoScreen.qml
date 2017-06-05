@@ -65,13 +65,13 @@ PageBase
         property real uiOpacity: 1.0
         Behavior on uiOpacity
         {
-            NumberAnimation { duration: 500; easing.type: Easing.OutCubic }
+            NumberAnimation { duration: 250; easing.type: Easing.OutCubic }
         }
 
         property real navigationOpacity: 1.0
         Behavior on navigationOpacity
         {
-            NumberAnimation { duration: 500; easing.type: Easing.OutCubic }
+            NumberAnimation { duration: 250; easing.type: Easing.OutCubic }
         }
 
         property real cameraUiOpacity: 1.0
