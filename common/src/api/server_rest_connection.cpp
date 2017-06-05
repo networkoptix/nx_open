@@ -163,7 +163,7 @@ Handle ServerConnection::detachSystemFromCloud(
         NX_ASSERT(admin);
         if (!admin)
             return Handle();
-        data = PasswordData::calculateHashes(admin->getName(), resetAdminPassword);
+        data = PasswordData::calculateHashes(admin->getName(), resetAdminPassword, false);
     }
 
     return executePost(

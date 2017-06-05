@@ -7,6 +7,7 @@
 #include <ui/animation/opacity_animator.h>
 #include <ui/animation/variant_animator.h>
 #include <ui/graphics/instruments/hand_scroll_instrument.h>
+#include <ui/graphics/instruments/motion_selection_instrument.h>
 #include <ui/graphics/items/controls/bookmarks_viewer.h>
 #include <ui/graphics/items/controls/navigation_item.h>
 #include <ui/graphics/items/controls/speed_slider.h>
@@ -83,11 +84,13 @@ TimelineWorkbenchPanel::TimelineWorkbenchPanel(
     m_yAnimator(new VariantAnimator(this))
 {
     m_resizerWidget->setProperty(Qn::NoHandScrollOver, true);
+    m_resizerWidget->setProperty(Qn::BlockMotionSelection, true);
     m_resizerWidget->setZValue(ResizerItemZOrder);
     connect(m_resizerWidget, &QGraphicsWidget::geometryChanged, this,
         &TimelineWorkbenchPanel::at_resizerWidget_geometryChanged);
 
     item->setProperty(Qn::NoHandScrollOver, true);
+    item->setProperty(Qn::BlockMotionSelection, true);
     item->setZValue(ContentItemZOrder);
     connect(item, &QGraphicsWidget::geometryChanged, this,
         &TimelineWorkbenchPanel::updateControlsGeometry);
@@ -110,6 +113,7 @@ TimelineWorkbenchPanel::TimelineWorkbenchPanel(
         });
 
     m_showWidget->setProperty(Qn::NoHandScrollOver, true);
+    m_showWidget->setProperty(Qn::BlockMotionSelection, true);
     m_showWidget->setFlag(QGraphicsItem::ItemHasNoContents, true);
     m_showWidget->setVisible(false);
     m_showWidget->setZValue(BackgroundItemZOrder);
@@ -187,10 +191,13 @@ TimelineWorkbenchPanel::TimelineWorkbenchPanel(
     }
 
     item->timeSlider()->toolTipItem()->setProperty(Qn::NoHandScrollOver, true);
+    item->timeSlider()->toolTipItem()->setProperty(Qn::BlockMotionSelection, true);
     item->timeSlider()->toolTipItem()->setZValue(NxUi::TooltipItemZOrder);
     item->speedSlider()->toolTipItem()->setProperty(Qn::NoHandScrollOver, true);
+    item->speedSlider()->toolTipItem()->setProperty(Qn::BlockMotionSelection, true);
     item->speedSlider()->toolTipItem()->setZValue(NxUi::TooltipItemZOrder);
     item->volumeSlider()->toolTipItem()->setProperty(Qn::NoHandScrollOver, true);
+    item->volumeSlider()->toolTipItem()->setProperty(Qn::BlockMotionSelection, true);
     item->volumeSlider()->toolTipItem()->setZValue(NxUi::TooltipItemZOrder);
 
     auto sliderZoomOutButton = new QnImageButtonWidget();

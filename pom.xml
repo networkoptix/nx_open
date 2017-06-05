@@ -49,7 +49,6 @@
         <evidence_plugin.guid>{061d1513-9a37-4d14-90f5-11d42d2d7827}</evidence_plugin.guid>
         <genericrtspplugin.guid>{7fafaf1d-0d3d-42ea-aa11-4ffce0f170f9}</genericrtspplugin.guid>
         <image_library_plugin.guid>{62b24237-9c9d-4900-b32d-aa678317b4ba}</image_library_plugin.guid>
-        <isd_native_plugin.guid>{9d3f6a6f-ec63-4269-bf34-cc1060f80e90}</isd_native_plugin.guid>
         <it930x_plugin.guid>{2c75d1b9-a6f1-4aa6-9d7e-8c0e602bd8fd}</it930x_plugin.guid>
         <mjpg_link.guid>{c8a846fd-d881-45d8-9f6c-c3e02eaf5763}</mjpg_link.guid>
         <quicksyncdecoder.guid>{84ca6c5b-525e-438a-940c-50c14db49c66}</quicksyncdecoder.guid>
@@ -140,6 +139,7 @@
         <newmobile/>
         <liteMode>false</liteMode>
         <iosTarget>iphoneos</iosTarget>
+        <paxton>false</paxton>
 
         <template>lib</template>
         <noQmlInQrc>false</noQmlInQrc>
@@ -164,7 +164,7 @@
         <openssl.version>1.0.2e</openssl.version>
         <openldap.version>2.4.42</openldap.version>
         <sasl2.version>2.1.26</sasl2.version>
-        <protobuf.version>3.0.0-SNAPSHOT</protobuf.version>
+        <protobuf.version>3.0.1-SNAPSHOT</protobuf.version>
         <onvif.version>2.1.2-io2</onvif.version>
         <sigar.version>1.7</sigar.version>
         <festival.version>2.4</festival.version>
@@ -174,8 +174,9 @@
         <libjpeg-turbo.version>1.4.2</libjpeg-turbo.version>
         <libcreateprocess.version>0.1</libcreateprocess.version>
         <vmux.version>1.0.0</vmux.version>
+        <cpro.version>1.0.0</cpro.version>
         <server-external.version>${release.version}</server-external.version>
-        <help.version>${customization}-${release.version}</help.version>
+        <help.version>${customization}-${parsedVersion.majorVersion}.${parsedVersion.minorVersion}</help.version>
         <gcc.version>4.9.4</gcc.version>
 
         <qt.libs/>
@@ -270,7 +271,7 @@
         <artifact.name.cloud_debug>${artifact.name.prefix}-cloud_debug-${artifact.name.suffix}</artifact.name.cloud_debug>
         <artifact.name.testcamera>${artifact.name.prefix}-testcamera-${artifact.name.suffix}</artifact.name.testcamera>
 
-        <nxcloud.version>1.0.135</nxcloud.version>
+        <nxcloud.version>1.0.142</nxcloud.version>
     </properties>
 
     <build>
@@ -518,7 +519,7 @@
 
                 <!-- <module>plugins/axiscamplugin</module> -->
                 <!-- <module>storage_plugins/ftpstorageplugin</module> -->
-                <module>storage_plugins/teststorageplugin</module> 
+                <!-- <module>storage_plugins/teststorageplugin</module> -->
 
                 <!-- <module>mediaproxy</module> -->
             </modules>
@@ -636,10 +637,7 @@
                 <module>plugins/nxcontrol</module>
                 <module>plugins/acs/paxton-plugin</module>
             </modules>
-            <properties>
-                <paxton>true</paxton>
-            </properties>
-        </profile>        
+        </profile>
         <profile>
             <id>windows-nomobile</id>
             <activation>
@@ -805,7 +803,6 @@
                 <module>debsetup/client-deb</module>
                 <module>debsetup/mediaserver-deb</module>
 
-                <module>storage_plugins/teststorageplugin</module>
                 <!-- <module>storage_plugins/teststorageplugin/test</module> -->
             </modules>
             <properties>
@@ -839,7 +836,7 @@
         </profile>
 
         <profile>
-            <id>linux-isd-jaguar</id>
+            <id>linux-edge1</id>
             <activation>
                 <activeByDefault>false</activeByDefault>
                 <os>
@@ -848,36 +845,7 @@
                 </os>
                 <property>
                     <name>box</name>
-                    <value>isd</value>
-                </property>
-            </activation>
-            <properties>
-                <toolchain.version>codesourcery-2014.05</toolchain.version>
-                <qt.spec/>
-                <openssl.version>1.0.0j</openssl.version>
-                <quazip.version>0.7.2</quazip.version>
-                <gcc.version>4.9.3</gcc.version>
-                <additional.defines>DISABLE_ALL_VENDORS DISABLE_SOFTWARE_MOTION_DETECTION DISABLE_DESKTOP_CAMERA EDGE_SERVER debug_in_release</additional.defines>
-                <modification>isd</modification>
-                <rdep.target>isd</rdep.target>
-            </properties>
-            <modules>
-                <module>plugins/isd_native_plugin</module>
-                <module>edge_firmware/isd</module>
-            </modules>
-        </profile>
-
-        <profile>
-            <id>linux-isd-s2</id>
-            <activation>
-                <activeByDefault>false</activeByDefault>
-                <os>
-                    <family>unix</family>
-                    <name>linux</name>
-                </os>
-                <property>
-                    <name>box</name>
-                    <value>isd_s2</value>
+                    <value>edge1</value>
                 </property>
             </activation>
             <properties>
@@ -886,12 +854,12 @@
                 <quazip.version>0.7.2</quazip.version>
                 <gcc.version>4.9.3</gcc.version>
                 <additional.defines>DISABLE_ALL_VENDORS DISABLE_DESKTOP_CAMERA EDGE_SERVER debug_in_release</additional.defines>
-                <modification>isd_s2</modification>
+                <modification>edge1</modification>
                 <rdep.target>isd_s2</rdep.target>
+                <rdep.packages>cpro</rdep.packages>
                 <qt.spec/>
             </properties>
             <modules>
-                <module>plugins/isd_native_plugin</module>
                 <module>edge_firmware/isd</module>
             </modules>
         </profile>

@@ -39,15 +39,16 @@ bool ProcessUtils::startProcessDetached(const QString &program, const QStringLis
     raw_env[envc] = 0;
 
     // Encode the working directory if it's non-empty, otherwise just pass 0.
-    const char *enc_wd = 0;
+    QByteArray encodedName;
     if (!workingDirectory.isEmpty())
-        enc_wd = QFile::encodeName(workingDirectory).constData();
+        encodedName = QFile::encodeName(workingDirectory);
 
     pid_t childPid = fork();
 
-    if (childPid == 0) {
-        if (enc_wd)
-            chdir(enc_wd);
+    if (childPid == 0)
+    {
+        if (!encodedName.isEmpty())
+            chdir(encodedName.constData());
 
         execve(enc_args[0], raw_argv.data(), raw_env.data());
         ::exit(-1);

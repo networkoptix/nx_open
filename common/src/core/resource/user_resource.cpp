@@ -6,6 +6,8 @@
 
 #include <utils/common/synctime.h>
 #include <core/resource_management/resource_properties.h>
+#include <utils/common/util.h>
+#include <utils/crypt/symmetrical.h>
 
 namespace {
     static const int LDAP_PASSWORD_PROLONGATION_PERIOD_SEC = 5 * 60;
@@ -113,13 +115,24 @@ void QnUserResource::setPassword(const QString& password)
     emit passwordChanged(::toSharedPointer(this));
 }
 
+QString QnUserResource::decodeLDAPPassword() const
+{
+    QList<QByteArray> parts = getHash().split('$');
+    if (parts.size() != 3 || parts[0] != "LDAP")
+        return QString();
+
+    QByteArray salt = QByteArray::fromHex(parts[1]);
+    QByteArray encodedPassword = QByteArray::fromHex(parts[2]);
+    return QString::fromUtf8(nx::utils::encodeSimple(encodedPassword, salt));
+}
+
 void QnUserResource::generateHash()
 {
     QString password = getPassword();
     if (password.isEmpty())
         return;
 
-    auto hashes = PasswordData::calculateHashes(getName(), password);
+    auto hashes = PasswordData::calculateHashes(getName(), password, isLdap());
 
     setRealm(hashes.realm);
     setHash(hashes.passwordHash);

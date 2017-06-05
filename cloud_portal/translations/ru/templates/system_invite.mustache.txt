@@ -1,0 +1,13 @@
+Добро пожаловать в {{PRODUCT_NAME}}
+
+{{#message.sharer_name}}
+{{message.sharer_name}} ({{message.sharer_email}}) пригласил вас присоединиться к {{PRODUCT_NAME}} и открыл вам доступ с системе {{message.system_name}}.
+{{/message.sharer_name}}
+
+{{^message.sharer_name}}
+Приглашаем вас присоединиться к {{PRODUCT_NAME}}.
+Вам открыт доступ к системе {{message.system_name}}.
+{{/message.sharer_name}}
+
+Регистрация и просмотр системы: {{config.portal_url}}/register/{{message.code}}
+

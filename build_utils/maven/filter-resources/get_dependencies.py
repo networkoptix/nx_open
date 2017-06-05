@@ -26,6 +26,7 @@ DEPENDENCY_VERSIONS = {
     "libjpeg-turbo": "${libjpeg-turbo.version}",
     "libcreateprocess": "${libcreateprocess.version}",
     "vmux": "${vmux.version}",
+    "cpro": "${cpro.version}",
     "server-external": "${server-external.version}",
     "help": "${help.version}"
 }
@@ -55,7 +56,7 @@ def get_packages(target):
         packages += """ ${rdep.windows.packages}"""
     elif target_platform == "linux":
         packages += """ ${rdep.linux.packages}"""
-        if target in [ "bpi", "rpi", "isd", "isd_s2", "tx1" ]:
+        if target in [ "bpi", "rpi", "isd_s2", "edge1", "tx1" ]:
             packages += """ ${rdep.linux.arm.packages}"""
     elif target_platform == "macosx":
         packages += """ ${rdep.mac.packages}"""

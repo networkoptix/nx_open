@@ -182,6 +182,7 @@ CameraDiagnostics::Result ThirdPartyStreamReader::openStreamInternal(bool isCame
             if( (m_cameraCapabilities & nxcip::BaseCameraManager::audioCapability) && m_thirdPartyRes->isAudioEnabled() )
                 config.flags |= nxcip::LiveStreamConfig::LIVE_STREAM_FLAG_AUDIO_ENABLED;
 
+            QnMutexLocker lock(&m_streamReaderMutex);
             m_liveStreamReader.reset(); // release an old one first
             nxcip::StreamReader * tmpReader = nullptr;
             int ret = mediaEncoder3->getConfiguredLiveStreamReader( &config, &tmpReader );
@@ -192,6 +193,7 @@ CameraDiagnostics::Result ThirdPartyStreamReader::openStreamInternal(bool isCame
         }
         else
         {
+            QnMutexLocker lock(&m_streamReaderMutex);
             m_liveStreamReader.reset();
             m_liveStreamReader.reset( mediaEncoder3->getLiveStreamReader(), refDeleter );
         }
@@ -226,6 +228,7 @@ CameraDiagnostics::Result ThirdPartyStreamReader::openStreamInternal(bool isCame
 
         if( m_mediaEncoder2 )
         {
+            QnMutexLocker lock(&m_streamReaderMutex);
             m_liveStreamReader.reset();
             m_liveStreamReader.reset( m_mediaEncoder2->getLiveStreamReader(), refDeleter );
         }
@@ -298,6 +301,8 @@ CameraDiagnostics::Result ThirdPartyStreamReader::openStreamInternal(bool isCame
 
 void ThirdPartyStreamReader::closeStream()
 {
+    QnMutexLocker lock(&m_streamReaderMutex);
+
     m_liveStreamReader.reset();
 
     if( m_builtinStreamReader.get() )
@@ -306,11 +311,13 @@ void ThirdPartyStreamReader::closeStream()
 
 bool ThirdPartyStreamReader::isStreamOpened() const
 {
+    QnMutexLocker lock(&m_streamReaderMutex);
     return m_liveStreamReader || (m_builtinStreamReader.get() && m_builtinStreamReader->isStreamOpened());
 }
 
 int ThirdPartyStreamReader::getLastResponseCode() const
 {
+    QnMutexLocker lock(&m_streamReaderMutex);
     return m_liveStreamReader
         ? nx_http::StatusCode::ok
         : (m_builtinStreamReader.get() ? m_builtinStreamReader->getLastResponseCode() : nx_http::StatusCode::ok);
@@ -336,6 +343,7 @@ QnMetaDataV1Ptr ThirdPartyStreamReader::getCameraMetadata()
 void ThirdPartyStreamReader::pleaseStop()
 {
     CLServerPushStreamReader::pleaseStop();
+    QnMutexLocker lock(&m_streamReaderMutex);
     if( m_liveStreamReader )
     {
         m_liveStreamReader->interrupt();
