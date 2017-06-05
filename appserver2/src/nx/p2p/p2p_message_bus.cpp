@@ -119,8 +119,11 @@ void MessageBus::stop()
 {
     {
         QnMutexLocker lock(&m_mutex);
-        ec2::detail::QnDbManager::QnDbTransactionLocker dbTran(m_db->getTransaction());
-        dbTran.commit();
+        if (m_db)
+        {
+            ec2::detail::QnDbManager::QnDbTransactionLocker dbTran(m_db->getTransaction());
+            dbTran.commit();
+        }
         m_remoteUrls.clear();
     }
 
