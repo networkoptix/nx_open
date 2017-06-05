@@ -1,0 +1,10 @@
+#!/bin/bash
+
+su qa -c 'Xvfb -screen 0 1280x1024x24' &
+sleep 1
+export DISPLAY=:0
+su qa -c ratpoison &
+su qa -c xterm &
+su qa -c 'x11vnc -safer -usepw -display :0' &
+
+wait
