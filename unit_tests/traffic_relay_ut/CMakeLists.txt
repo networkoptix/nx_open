@@ -1,1 +1,1 @@
-nx_add_target(traffic_relay_ut EXECUTABLE PUBLIC_LIBS libtraffic_relay GTest GMock)
+nx_add_test(traffic_relay_ut PUBLIC_LIBS libtraffic_relay GTest GMock)

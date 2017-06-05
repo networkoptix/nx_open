@@ -35,13 +35,13 @@ bool insertOrReplaceWebPage(
     return QnDbHelper::execSQLQuery(&query, Q_FUNC_INFO);
 }
 
-bool saveWebPage(const QSqlDatabase& database, const ApiWebPageData& webPage)
+bool saveWebPage(ec2::database::api::Context* resourceContext, const ApiWebPageData& webPage)
 {
     qint32 internalId;
-    if (!insertOrReplaceResource(database, webPage, &internalId))
+    if (!insertOrReplaceResource(resourceContext, webPage, &internalId))
         return false;
 
-    return insertOrReplaceWebPage(database, internalId);
+    return insertOrReplaceWebPage(resourceContext->database, internalId);
 }
 
 } // namespace api

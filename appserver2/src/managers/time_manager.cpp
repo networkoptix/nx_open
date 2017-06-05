@@ -20,7 +20,7 @@
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/media_server_resource.h>
 #include <nx/network/http/custom_headers.h>
-#include <transaction/transaction_message_bus.h>
+#include <transaction/message_bus_selector.h>
 
 #include <nx_ec/data/api_runtime_data.h>
 #include <nx_ec/data/api_misc_data.h>
@@ -295,7 +295,8 @@ static_assert( INTERNET_SYNC_TIME_PERIOD_SEC <= MAX_INTERNET_SYNC_TIME_PERIOD_SE
 TimeSynchronizationManager::TimeSynchronizationManager(
     Qn::PeerType peerType,
     nx::utils::TimerManager* const timerManager,
-    QnTransactionMessageBus* messageBus)
+    QnTransactionMessageBusBase* messageBus,
+    Settings* settings)
 :
     m_localSystemTimeDelta( std::numeric_limits<qint64>::min() ),
     m_broadcastSysTimeTaskID( 0 ),
@@ -308,7 +309,8 @@ TimeSynchronizationManager::TimeSynchronizationManager(
     m_timerManager(timerManager),
     m_internetTimeSynchronizationPeriod( INITIAL_INTERNET_SYNC_TIME_PERIOD_SEC ),
     m_timeSynchronized( false ),
-    m_internetSynchronizationFailureCount( 0 )
+    m_internetSynchronizationFailureCount( 0 ),
+    m_settings(settings)
 {
 }
 
@@ -387,9 +389,13 @@ void TimeSynchronizationManager::start(const std::shared_ptr<Ec2DirectConnection
     if (m_connection)
         onDbManagerInitialized();
 
-    connect(m_messageBus, &QnTransactionMessageBus::newDirectConnectionEstablished,
-                this, &TimeSynchronizationManager::onNewConnectionEstablished,
-                Qt::DirectConnection );
+    if (const auto& bus = dynamic_cast<QnTransactionMessageBus*>(m_messageBus))
+    {
+        // todo: p2p. add p2p implementation here
+        connect(bus, &QnTransactionMessageBus::newDirectConnectionEstablished,
+            this, &TimeSynchronizationManager::onNewConnectionEstablished,
+            Qt::DirectConnection);
+    }
     connect(m_messageBus, &QnTransactionMessageBus::peerLost,
                 this, &TimeSynchronizationManager::onPeerLost,
                 Qt::DirectConnection );
@@ -724,7 +730,7 @@ void TimeSynchronizationManager::remotePeerTimeSyncUpdate(
         NX_LOGX(lm("Received sync time update from peer %1, peer's sync time (%2). "
             "Accepting peer's synchronized time due to large drift (%3 ms, fault %4)").
             arg(remotePeerID.toString()).arg(QDateTime::fromMSecsSinceEpoch(remotePeerSyncTime).toString(Qt::ISODate)).
-            arg(timeDifference).arg(effectiveTimeErrorEstimation), cl_logINFO);
+            arg(timeDifference).arg(effectiveTimeErrorEstimation), cl_logDEBUG1);
     }
     else
     {
@@ -733,7 +739,7 @@ void TimeSynchronizationManager::remotePeerTimeSyncUpdate(
             arg(remotePeerID.toString()).arg(QDateTime::fromMSecsSinceEpoch(remotePeerSyncTime).toString(Qt::ISODate)).
             arg(remotePeerTimePriorityKey.toUInt64(), 0, 16).arg(commonModule->moduleGUID().toString()).
             arg(QDateTime::fromMSecsSinceEpoch(getSyncTimeNonSafe()).toString(Qt::ISODate)).
-            arg(m_usedTimeSyncInfo.timePriorityKey.toUInt64(), 0, 16), cl_logINFO );
+            arg(m_usedTimeSyncInfo.timePriorityKey.toUInt64(), 0, 16), cl_logDEBUG1);
     }
 
     //taking new synchronization data
@@ -800,12 +806,12 @@ void TimeSynchronizationManager::onNewConnectionEstablished( QnTransactionTransp
     }
 }
 
-void TimeSynchronizationManager::onPeerLost( ApiPeerAliveData data )
+void TimeSynchronizationManager::onPeerLost(QnUuid peer, Qn::PeerType /*peerType*/)
 {
-    stopSynchronizingTimeWithPeer( data.peer.id );
+    stopSynchronizingTimeWithPeer(peer);
 
     QnMutexLocker lock( &m_mutex );
-    m_systemTimeByPeer.erase( data.peer.id );
+    m_systemTimeByPeer.erase(peer);
 }
 
 void TimeSynchronizationManager::startSynchronizingTimeWithPeer(
@@ -1011,7 +1017,7 @@ void TimeSynchronizationManager::broadcastLocalSystemTime( quint64 taskID )
         tran.params.peerSysTime = QDateTime::currentMSecsSinceEpoch();  //currentMSecsSinceEpoch();
     }
     peerSystemTimeReceived( tran ); //remembering own system time
-    m_messageBus->sendTransaction( tran );
+    sendTransaction(m_messageBus, tran );
 }
 
 void TimeSynchronizationManager::checkIfManualTimeServerSelectionIsRequired( quint64 /*taskID*/ )
@@ -1071,7 +1077,7 @@ void TimeSynchronizationManager::syncTimeWithInternet( quint64 taskID )
     {
         NX_LOG(lit("TimeSynchronizationManager. Not synchronizing time with internet"), cl_logDEBUG2);
             m_internetTimeSynchronizationPeriod =
-            Settings::instance()->internetSyncTimePeriodSec(INTERNET_SYNC_TIME_PERIOD_SEC);
+            m_settings->internetSyncTimePeriodSec(INTERNET_SYNC_TIME_PERIOD_SEC);
         addInternetTimeSynchronizationTask();
         return;
     }
@@ -1116,7 +1122,7 @@ void TimeSynchronizationManager::onTimeFetchingDone( const qint64 millisFromEpoc
 
             m_internetSynchronizationFailureCount = 0;
 
-            m_internetTimeSynchronizationPeriod = Settings::instance()->internetSyncTimePeriodSec(INTERNET_SYNC_TIME_PERIOD_SEC);
+            m_internetTimeSynchronizationPeriod = m_settings->internetSyncTimePeriodSec(INTERNET_SYNC_TIME_PERIOD_SEC);
 
             const qint64 curLocalTime = currentMSecsSinceEpoch();
 
@@ -1152,7 +1158,7 @@ void TimeSynchronizationManager::onTimeFetchingDone( const qint64 millisFromEpoc
 
             m_internetTimeSynchronizationPeriod = std::min<>(
                 MIN_INTERNET_SYNC_TIME_PERIOD_SEC + m_internetTimeSynchronizationPeriod * INTERNET_SYNC_TIME_FAILURE_PERIOD_GROW_COEFF,
-                Settings::instance()->maxInternetTimeSyncRetryPeriodSec(MAX_INTERNET_SYNC_TIME_PERIOD_SEC));
+                m_settings->maxInternetTimeSyncRetryPeriodSec(MAX_INTERNET_SYNC_TIME_PERIOD_SEC));
 
             ++m_internetSynchronizationFailureCount;
             if( m_internetSynchronizationFailureCount > MAX_SEQUENT_INTERNET_SYNCHRONIZATION_FAILURES )

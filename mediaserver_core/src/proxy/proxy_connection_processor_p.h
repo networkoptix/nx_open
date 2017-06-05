@@ -24,6 +24,6 @@ public:
     QSharedPointer<AbstractStreamSocket> dstSocket;
     QUrl lastConnectedUrl;
     std::chrono::milliseconds connectTimeout;
-    ec2::QnTransactionMessageBus* messageBus;
+    ec2::QnTransactionMessageBusBase* messageBus;
 	std::chrono::steady_clock::time_point lastIoTimePoint;
 };

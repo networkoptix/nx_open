@@ -26,6 +26,7 @@ namespace ec2
     public:
         RemoteEC2Connection(
             const AbstractECConnectionFactory* connectionFactory,
+            const QnUuid& remotePeerId,
             const FixedUrlClientQueryProcessorPtr& queryProcessor,
             const QnConnectionInfo& connectionInfo );
         virtual ~RemoteEC2Connection();
@@ -42,7 +43,7 @@ namespace ec2
     private:
         FixedUrlClientQueryProcessorPtr m_queryProcessor;
         QnConnectionInfo m_connectionInfo;
-        QUrl m_peerUrl;
+        QnUuid m_remotePeerId;
     };
     typedef std::shared_ptr<RemoteEC2Connection> RemoteEC2ConnectionPtr;
 }

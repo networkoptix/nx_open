@@ -49,6 +49,14 @@ typedef void raw_type;       // Type used for raw data on this platform
 namespace nx {
 namespace network {
 
+#if defined(__arm__)
+    qint64 totalSocketBytesSent() { return 0; }
+#else
+    static std::atomic<qint64> m_totalSocketBytesSent;
+    qint64 totalSocketBytesSent() { return m_totalSocketBytesSent; }
+#endif
+
+
 //-------------------------------------------------------------------------------------------------
 // Socket implementation
 
@@ -656,6 +664,7 @@ int CommunicatingSocket<SocketInterfaceToImplement>::send(
         ),
         sendTimeout);
 #endif
+
     if (sended < 0)
     {
         const SystemError::ErrorCode errCode = SystemError::getLastOSErrorCode();
@@ -666,6 +675,9 @@ int CommunicatingSocket<SocketInterfaceToImplement>::send(
     {
         m_connected = false;
     }
+#if !defined(__arm__)
+    m_totalSocketBytesSent += sended;
+#endif
     return sended;
 }
 
