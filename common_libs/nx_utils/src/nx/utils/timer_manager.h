@@ -185,8 +185,6 @@ class NX_UTILS_API TimerManager:
     public StandaloneTimerManager,
     public Singleton<TimerManager>
 {
-protected:
-    virtual void run() override { StandaloneTimerManager::run(); }
 };
 
 /** Parses time period like 123ms (milliseconds).
