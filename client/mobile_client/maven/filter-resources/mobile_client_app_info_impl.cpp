@@ -13,6 +13,11 @@ QString QnMobileClientAppInfo::applicationDisplayName()
     return QStringLiteral("${product.display.title}");
 }
 
+QString QnMobileClientAppInfo::applicationVersion()
+{
+    return QStringLiteral("${parsedVersion.majorVersion}.${parsedVersion.minorVersion}");
+}
+
 bool QnMobileClientAppInfo::defaultLiteMode()
 {
     return ${liteMode};

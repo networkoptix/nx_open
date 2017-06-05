@@ -8,6 +8,8 @@ struct QnMobileClientAppInfo
     /** Real application name, visible to the user. */
     static QString applicationDisplayName();
 
+    static QString applicationVersion();
+
     /** Is lite mode enabled by default. */
     static bool defaultLiteMode();
 
