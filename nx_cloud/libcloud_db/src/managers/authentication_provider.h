@@ -16,9 +16,8 @@
 namespace nx {
 namespace cdb {
 
-namespace conf {
-class Settings;
-} // namespace conf
+namespace conf { class Settings; }
+namespace ec2 { class AbstractVmsP2pCommandBus; }
 
 class AbstractAccountManager;
 class AbstractTemporaryAccountPasswordManager;
@@ -36,7 +35,8 @@ public:
         const conf::Settings& settings,
         const AbstractAccountManager& accountManager,
         AbstractSystemSharingManager* systemSharingManager,
-        const AbstractTemporaryAccountPasswordManager& temporaryAccountCredentialsManager);
+        const AbstractTemporaryAccountPasswordManager& temporaryAccountCredentialsManager,
+        ec2::AbstractVmsP2pCommandBus* vmsP2pCommandBus);
     virtual ~AuthenticationProvider();
 
     virtual nx::db::DBResult afterSharingSystem(
@@ -73,6 +73,7 @@ private:
     AbstractSystemSharingManager* m_systemSharingManager;
     const AbstractTemporaryAccountPasswordManager& m_temporaryAccountCredentialsManager;
     std::unique_ptr<dao::AbstractUserAuthentication> m_authenticationDataObject;
+    ec2::AbstractVmsP2pCommandBus* m_vmsP2pCommandBus;
 
     boost::optional<AccountWithEffectivePassword> 
         getAccountByLogin(const std::string& login) const;
@@ -87,14 +88,15 @@ private:
     std::string fetchOrCreateNonce(
         nx::db::QueryContext* const queryContext,
         const std::string& systemId);
-    api::AuthInfo generateAuthRecord(
+    api::AuthInfoRecord generateAuthRecord(
         const std::string& systemId,
         const api::AccountData& account,
         const std::string& nonce);
-    void removeExpiredRecords(
-        std::vector<api::AuthInfo>* userAuthenticationRecords);
+    void removeExpiredRecords(api::AuthInfo* userAuthenticationRecords);
     void generateUpdateUserAuthInfoTransaction(
-        const std::vector<api::AuthInfo>& userAuthenticationRecords);
+        nx::db::QueryContext* const queryContext,
+        const api::SystemSharing& sharing,
+        const api::AuthInfo& userAuthenticationRecords);
 };
 
 } // namespace cdb

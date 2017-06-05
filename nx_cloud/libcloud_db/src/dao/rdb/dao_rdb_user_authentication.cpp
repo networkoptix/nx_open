@@ -21,20 +21,20 @@ void UserAuthentication::insertOrReplaceSystemNonce(
     // TODO
 }
 
-std::vector<api::AuthInfo> UserAuthentication::fetchUserAuthRecords(
+api::AuthInfo UserAuthentication::fetchUserAuthRecords(
     nx::db::QueryContext* const /*queryContext*/,
     const std::string& /*systemId*/,
     const std::string& /*userEmail*/)
 {
     // TODO
-    return std::vector<api::AuthInfo>();
+    return api::AuthInfo();
 }
 
 void UserAuthentication::saveUserAuthRecords(
     nx::db::QueryContext* const /*queryContext*/,
     const std::string& /*systemId*/,
     const std::string& /*accountEmail*/,
-    const std::vector<api::AuthInfo>& /*userAuthRecords*/)
+    const api::AuthInfo& /*userAuthRecords*/)
 {
     // TODO
 }

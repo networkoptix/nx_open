@@ -11,12 +11,16 @@
 #include <nx/utils/time.h>
 #include <nx/utils/uuid.h>
 
+#include <cloud_db_client/src/data/auth_data.h>
+
 #include "access_control/authentication_manager.h"
 #include "account_manager.h"
-#include "temporary_account_password_manager.h"
+#include "dao/user_authentication_data_object_factory.h"
 #include "settings.h"
 #include "stree/cdb_ns.h"
-#include "dao/user_authentication_data_object_factory.h"
+#include "temporary_account_password_manager.h"
+#include "../ec2/transaction_log.h"
+#include "../ec2/vms_p2p_command_bus.h"
 
 namespace nx {
 namespace cdb {
@@ -25,13 +29,15 @@ AuthenticationProvider::AuthenticationProvider(
     const conf::Settings& settings,
     const AbstractAccountManager& accountManager,
     AbstractSystemSharingManager* systemSharingManager,
-    const AbstractTemporaryAccountPasswordManager& temporaryAccountCredentialsManager)
+    const AbstractTemporaryAccountPasswordManager& temporaryAccountCredentialsManager,
+    ec2::AbstractVmsP2pCommandBus* vmsP2pCommandBus)
 :
     m_settings(settings),
     m_accountManager(accountManager),
     m_systemSharingManager(systemSharingManager),
     m_temporaryAccountCredentialsManager(temporaryAccountCredentialsManager),
-    m_authenticationDataObject(dao::UserAuthenticationDataObjectFactory::instance().create())
+    m_authenticationDataObject(dao::UserAuthenticationDataObjectFactory::instance().create()),
+    m_vmsP2pCommandBus(vmsP2pCommandBus)
 {
     m_systemSharingManager->addSystemSharingExtension(this);
 }
@@ -130,11 +136,13 @@ nx::db::DBResult AuthenticationProvider::afterSharingSystem(
 
     auto authRecord = generateAuthRecord(sharing.systemId, *account, nonce);
 
-    std::vector<api::AuthInfo> userAuthRecords{std::move(authRecord)};
+    api::AuthInfo userAuthRecords;
+    userAuthRecords.records.push_back(std::move(authRecord));
     m_authenticationDataObject->saveUserAuthRecords(
         queryContext, sharing.systemId, sharing.accountEmail, userAuthRecords);
 
-    generateUpdateUserAuthInfoTransaction(userAuthRecords);
+    generateUpdateUserAuthInfoTransaction(
+        queryContext, sharing, userAuthRecords);
 
     return nx::db::DBResult::ok;
 }
@@ -225,12 +233,12 @@ std::string AuthenticationProvider::fetchOrCreateNonce(
     return nonce;
 }
 
-api::AuthInfo AuthenticationProvider::generateAuthRecord(
+api::AuthInfoRecord AuthenticationProvider::generateAuthRecord(
     const std::string& /*systemId*/,
     const api::AccountData& account,
     const std::string& nonce)
 {
-    api::AuthInfo authInfo;
+    api::AuthInfoRecord authInfo;
     authInfo.nonce = nonce;
     authInfo.intermediateResponse = nx_http::calcIntermediateResponse(
         account.passwordHa1.c_str(), nonce.c_str()).toStdString();
@@ -240,15 +248,28 @@ api::AuthInfo AuthenticationProvider::generateAuthRecord(
 }
 
 void AuthenticationProvider::removeExpiredRecords(
-    std::vector<api::AuthInfo>* /*userAuthenticationRecords*/)
+    api::AuthInfo* /*userAuthenticationRecords*/)
 {
     // TODO
 }
 
 void AuthenticationProvider::generateUpdateUserAuthInfoTransaction(
-    const std::vector<api::AuthInfo>& /*userAuthenticationRecords*/)
+    nx::db::QueryContext* const queryContext,
+    const api::SystemSharing& sharing,
+    const api::AuthInfo& userAuthenticationRecords)
 {
-    // TODO
+    ::ec2::ApiResourceParamWithRefData userAuthenticationInfoAttribute;
+    userAuthenticationInfoAttribute.name = api::kVmsUserAuthInfoAttributeName;
+    userAuthenticationInfoAttribute.resourceId = 
+        QnUuid::fromStringSafe(sharing.vmsUserId.c_str());
+    userAuthenticationInfoAttribute.value = 
+        QString::fromUtf8(QJson::serialized(userAuthenticationRecords));
+    const auto dbResult = m_vmsP2pCommandBus->saveResourceAttribute(
+        queryContext,
+        sharing.systemId,
+        std::move(userAuthenticationInfoAttribute));
+    if (dbResult != nx::db::DBResult::ok)
+        throw nx::db::Exception(dbResult);
 }
 
 } // namespace cdb

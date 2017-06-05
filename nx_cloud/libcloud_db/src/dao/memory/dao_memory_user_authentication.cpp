@@ -23,14 +23,14 @@ void UserAuthentication::insertOrReplaceSystemNonce(
     m_systemIdToNonce.emplace(systemId, nonce);
 }
 
-std::vector<api::AuthInfo> UserAuthentication::fetchUserAuthRecords(
+api::AuthInfo UserAuthentication::fetchUserAuthRecords(
     nx::db::QueryContext* const /*queryContext*/,
     const std::string& systemId,
     const std::string& userEmail)
 {
     auto it = m_userAuthInfo.find(std::make_pair(systemId, userEmail));
     if (it == m_userAuthInfo.end())
-        return std::vector<api::AuthInfo>();
+        return api::AuthInfo();
 
     return it->second;
 }
@@ -39,7 +39,7 @@ void UserAuthentication::saveUserAuthRecords(
     nx::db::QueryContext* const /*queryContext*/,
     const std::string& systemId,
     const std::string& accountEmail,
-    const std::vector<api::AuthInfo>& userAuthRecords)
+    const api::AuthInfo& userAuthRecords)
 {
     m_userAuthInfo[std::make_pair(systemId, accountEmail)] = userAuthRecords;
 }

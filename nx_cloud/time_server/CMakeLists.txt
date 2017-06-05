@@ -1,0 +1,1 @@
+nx_add_target(time_server EXECUTABLE PUBLIC_LIBS nx_network nx_utils)

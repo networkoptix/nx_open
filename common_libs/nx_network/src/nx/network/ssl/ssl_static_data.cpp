@@ -48,7 +48,7 @@ public:
         for (size_t i = 0; i < count; ++i)
             m_mutexList.push_back(std::make_unique<QnMutex>());
 
-        CRYPTO_set_locking_callback(&OpenSslGlobalLockManager::lock);
+        CRYPTO_set_locking_callback(&OpenSslGlobalLockManager::manageLock);
     }
 
     ~OpenSslGlobalLockManager()
@@ -57,13 +57,13 @@ public:
         m_initialLockingCallback = nullptr;
     }
 
-    static void lock(int mode, int type, const char* file, int line)
+    static void manageLock(int mode, int type, const char* file, int line)
     {
-        openSslGlobalLockManagerInstance->lockImpl(mode, (size_t) type, file, line);
+        openSslGlobalLockManagerInstance->manageLockImpl(mode, (size_t) type, file, line);
     }
 
 private:
-    void lockImpl(int mode, size_t type, const char* file, int line)
+    void manageLockImpl(int mode, size_t type, const char* file, int line)
     {
         NX_CRITICAL(type < m_mutexList.size());
 

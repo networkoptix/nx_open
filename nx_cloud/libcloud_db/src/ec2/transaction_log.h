@@ -122,17 +122,18 @@ public:
             transaction.serialize(Qn::UbjsonFormat, nx_ec::EC2_PROTO_VERSION));
     }
 
-    template<int TransactionCommandValue, typename TransactionDataType>
+    template<typename TransactionDataType>
     nx::db::DBResult generateTransactionAndSaveToLog(
         nx::db::QueryContext* queryContext,
         const nx::String& systemId,
+        ::ec2::ApiCommand::Value commandCode,
         TransactionDataType transactionData)
     {
         return saveLocalTransaction(
             queryContext,
             systemId,
-            prepareLocalTransaction<TransactionCommandValue>(
-                queryContext, systemId, std::move(transactionData)));
+            prepareLocalTransaction(
+                queryContext, systemId, commandCode, std::move(transactionData)));
     }
 
     /**
@@ -188,10 +189,11 @@ public:
         return nx::db::DBResult::ok;
     }
 
-    template<int TransactionCommandValue, typename TransactionDataType>
+    template<typename TransactionDataType>
     ::ec2::QnTransaction<TransactionDataType> prepareLocalTransaction(
         nx::db::QueryContext* queryContext,
         const nx::String& systemId,
+        ::ec2::ApiCommand::Value commandCode,
         TransactionDataType transactionData)
     {
         int transactionSequence = 0;
@@ -202,7 +204,7 @@ public:
         // Generating transaction.
         ::ec2::QnTransaction<TransactionDataType> transaction(m_peerId);
         // Filling transaction header.
-        transaction.command = static_cast<::ec2::ApiCommand::Value>(TransactionCommandValue);
+        transaction.command = commandCode;
         transaction.peerID = m_peerId;
         transaction.transactionType = ::ec2::TransactionType::Cloud;
         transaction.persistentInfo.dbID = guidFromArbitraryData(systemId);

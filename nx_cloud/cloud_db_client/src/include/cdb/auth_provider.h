@@ -89,7 +89,7 @@ public:
         std::function<void(api::ResultCode, api::AuthResponse)> completionHandler) = 0;
 };
 
-class AuthInfo
+class AuthInfoRecord
 {
 public:
     std::string nonce;
@@ -98,6 +98,12 @@ public:
      */
     std::string intermediateResponse;
     std::chrono::system_clock::time_point expirationTime;
+};
+
+class AuthInfo
+{
+public:
+    std::vector<AuthInfoRecord> records;
 };
 
 } // namespace api
