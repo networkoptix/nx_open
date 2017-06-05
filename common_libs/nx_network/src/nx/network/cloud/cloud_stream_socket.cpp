@@ -489,7 +489,7 @@ void CloudStreamSocket::onCloudConnectDone(
     SystemError::ErrorCode errorCode,
     std::unique_ptr<AbstractStreamSocket> cloudConnection)
 {
-    NX_LOGX(lm("onCloudConnectDone. %1").arg(errorCode), cl_logDEBUG2);
+    NX_VERBOSE(this, lm("onCloudConnectDone. Result: %1").arg(SystemError::toString(errorCode)));
     
     if (errorCode == SystemError::noError)
     {
