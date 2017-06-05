@@ -3,21 +3,16 @@
 #include <atomic>
 #include <memory>
 
-#include <nx/utils/thread/stoppable.h>
+#include <nx/network/cloud/tunnel/tcp/tunnel_tcp_endpoint_verificator_factory.h>
 #include <nx/network/connection_server/multi_address_server.h>
 #include <nx/network/http/server/http_stream_socket_server.h>
-#include <nx/utils/thread/mutex.h>
-#include <nx/utils/thread/wait_condition.h>
+#include <nx/network/public_ip_discovery.h>
 #include <nx/utils/service.h>
 
 #include "settings.h"
 #include "run_time_options.h"
 
-class QnCommandLineParser;
-
-namespace nx_http {
-    class MessageDispatcher;
-} // namespace nx_http
+namespace nx_http { class MessageDispatcher; }
 
 namespace nx {
 namespace cloud {
@@ -31,7 +26,8 @@ class VmsGatewayProcess:
     using base_type = nx::utils::Service;
 
 public:
-    VmsGatewayProcess( int argc, char **argv );
+    VmsGatewayProcess(int argc, char **argv);
+    ~VmsGatewayProcess();
 
     const std::vector<SocketAddress>& httpEndpoints() const;
 
@@ -48,17 +44,20 @@ private:
     char** m_argv;
     int m_timerID;
     std::vector<SocketAddress> m_httpEndpoints;
-    QnMutex m_mutex;
-    QnWaitCondition m_cond;
+    nx::network::cloud::tcp::EndpointVerificatorFactory::Function m_endpointVerificatorFactoryBak;
+
+    void initializeCloudConnect(const conf::Settings& settings);
+
+    std::unique_ptr<nx::network::PublicIPDiscovery> initializePublicIpDiscovery(
+        const conf::Settings& settings);
+    void publicAddressFetched(
+        const conf::Settings& settings,
+        const QString& publicAddress);
 
     void registerApiHandlers(
         const conf::Settings& settings,
         const conf::RunTimeOptions& runTimeOptions,
         nx_http::MessageDispatcher* const msgDispatcher);
-
-    void publicAddressFetched(
-        const conf::Settings& settings,
-        const QString& publicAddress);
 };
 
 } // namespace cloud
