@@ -3,6 +3,7 @@
     <div>
         <div class="text-center" ng-class="{'no-volume':disableVolume}">
             <!--<div class="webclient-panel-border"></div>-->
+            <span ng-if="loading && !emptyArchive" class="no-archive-message"><img src="/images/icons/preloader.gif"></span>
             <div class="viewport"
                  ng-class="{invisible:liveOnly}"
                  ng-mouseup="mouseUp($event)"
