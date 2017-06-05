@@ -183,7 +183,6 @@ QnResource::QnResource(QnCommonModule* commonModule):
     m_lastInitTime(0),
     m_prevInitializationResult(CameraDiagnostics::ErrorCode::unknown),
     m_lastMediaIssue(CameraDiagnostics::NoErrorResult()),
-    m_removedFromPool(false),
     m_initInProgress(false),
     m_commonModule(commonModule)
 {
@@ -207,7 +206,6 @@ QnResource::QnResource(const QnResource& right)
     m_lastMediaIssue(right.m_lastMediaIssue),
     m_initializationAttemptCount(right.m_initializationAttemptCount),
     m_locallySavedProperties(right.m_locallySavedProperties),
-    m_removedFromPool(right.m_removedFromPool),
     m_initInProgress(right.m_initInProgress),
     m_commonModule(right.m_commonModule)
 {
@@ -609,9 +607,6 @@ void QnResource::doStatusChanged(Qn::ResourceStatus oldStatus, Qn::ResourceStatu
         }
     }
 
-    if ((oldStatus == Qn::Offline || oldStatus == Qn::NotDefined) && newStatus == Qn::Online && !hasFlags(Qn::foreigner))
-        initAsync(false /*optional*/);
-
     // Null pointer if we are changing status in constructor. Signal is not needed in this case.
     if (auto sharedThis = toSharedPointer(this))
     {
@@ -630,7 +625,7 @@ void QnResource::setStatus(Qn::ResourceStatus newStatus, Qn::StatusChangeReason 
     if (newStatus == Qn::NotDefined)
         return;
 
-    if (m_removedFromPool)
+    if (hasFlags(Qn::removed))
         return;
 
     QnUuid id = getId();
@@ -1216,12 +1211,6 @@ void QnResource::setPtzCapabilities(Ptz::Capabilities capabilities)
 void QnResource::setPtzCapability(Ptz::Capabilities capability, bool value)
 {
     setPtzCapabilities(value ? (getPtzCapabilities() | capability) : (getPtzCapabilities() & ~capability));
-}
-
-void QnResource::setRemovedFromPool(bool value)
-{
-    QnMutexLocker mutexLocker(&m_mutex);
-    m_removedFromPool = value;
 }
 
 void QnResource::setCommonModule(QnCommonModule* commonModule)

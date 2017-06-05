@@ -46,8 +46,8 @@ public:
     virtual AbstractStoredFileNotificationManagerPtr getStoredFileNotificationManager() override;
     virtual AbstractVideowallNotificationManagerPtr getVideowallNotificationManager() override;
 
-    virtual void addRemotePeer(const QUrl& url) override;
-    virtual void deleteRemotePeer(const QUrl& url) override;
+    virtual void addRemotePeer(const QnUuid& id, const QUrl& _url) override;
+    virtual void deleteRemotePeer(const QnUuid& id) override;
 
     virtual Timestamp getTransactionLogTime() const override;
     virtual void setTransactionLogTime(Timestamp value) override;
@@ -56,7 +56,7 @@ public:
     virtual void startReceivingNotifications() override;
     virtual void stopReceivingNotifications() override;
     virtual QnUuid routeToPeerVia(const QnUuid& dstPeer, int* distance) const override;
-    virtual QnTransactionMessageBus* messageBus() const override { return nullptr; }
+    virtual QnTransactionMessageBusBase* messageBus() const override { return nullptr; }
     virtual QnCommonModule* commonModule() const override { return nullptr; }
 protected:
     virtual int dumpDatabaseAsync(impl::DumpDatabaseHandlerPtr handler) override;

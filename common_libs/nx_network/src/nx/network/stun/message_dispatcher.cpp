@@ -1,26 +1,12 @@
-/**********************************************************
-* 3 sep 2014
-* a.kolesnikov
-***********************************************************/
-
 #include "message_dispatcher.h"
-
 
 namespace nx {
 namespace stun {
 
-MessageDispatcher::MessageDispatcher()
-{
-}
-
-MessageDispatcher::~MessageDispatcher()
-{
-}
-
 bool MessageDispatcher::registerRequestProcessor(
-        int method, MessageProcessor processor )
+    int method, MessageProcessor processor)
 {
-    return m_processors.emplace( method, std::move(processor) ).second;
+    return m_processors.emplace(method, std::move(processor)).second;
 }
 
 void MessageDispatcher::registerDefaultRequestProcessor(
@@ -30,11 +16,11 @@ void MessageDispatcher::registerDefaultRequestProcessor(
 }
 
 bool MessageDispatcher::dispatchRequest(
-        std::shared_ptr< AbstractServerConnection > connection,
-        stun::Message message ) const
+    std::shared_ptr< AbstractServerConnection > connection,
+    stun::Message message) const
 {
-    const auto it = m_processors.find( message.header.method );
-    const MessageProcessor& processor = 
+    const auto it = m_processors.find(message.header.method);
+    const MessageProcessor& processor =
         it == m_processors.end()
         ? m_defaultProcessor
         : it->second;

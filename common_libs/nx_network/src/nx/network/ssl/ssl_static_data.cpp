@@ -8,6 +8,7 @@
 #include <nx/utils/log/assert.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/std/cpp14.h>
+#include <nx/utils/unused.h>
 
 #if !defined(SSL_OP_NO_TLSv1_1)
     #define SSL_OP_NO_TLSv1_1 0
@@ -39,15 +40,15 @@ public:
     typedef void(*OpenSslLockingCallbackType)(
         int mode, int type, const char *file, int line);
 
-    std::unique_ptr<std::mutex[]> m_openSslGlobalLock;
-
     OpenSslGlobalLockManager():
         m_initialLockingCallback(CRYPTO_get_locking_callback())
     {
-        NX_ASSERT(!m_openSslGlobalLock);
-        // not safe here, new can throw exception
-        m_openSslGlobalLock.reset(new std::mutex[CRYPTO_num_locks()]);
-        CRYPTO_set_locking_callback(&OpenSslGlobalLockManager::openSSLGlobalLock);
+        const auto count = (size_t) CRYPTO_num_locks();
+        m_mutexList.reserve(count);
+        for (size_t i = 0; i < count; ++i)
+            m_mutexList.push_back(std::make_unique<QnMutex>());
+
+        CRYPTO_set_locking_callback(&OpenSslGlobalLockManager::manageLock);
     }
 
     ~OpenSslGlobalLockManager()
@@ -56,21 +57,33 @@ public:
         m_initialLockingCallback = nullptr;
     }
 
-    static void openSSLGlobalLock(int mode, int type, const char* file, int line)
+    static void manageLock(int mode, int type, const char* file, int line)
     {
-        Q_UNUSED(file);
-        Q_UNUSED(line);
-
-        auto& lock = openSslGlobalLockManagerInstance->m_openSslGlobalLock;
-        NX_ASSERT(lock);
-
-        if (mode & CRYPTO_LOCK)
-            lock.get()[type].lock();
-        else
-            lock.get()[type].unlock();
+        openSslGlobalLockManagerInstance->manageLockImpl(mode, (size_t) type, file, line);
     }
 
 private:
+    void manageLockImpl(int mode, size_t type, const char* file, int line)
+    {
+        NX_CRITICAL(type < m_mutexList.size());
+
+        auto& mutex = m_mutexList[type];
+        if (mode & CRYPTO_LOCK)
+        {
+            #if defined(USE_OWN_MUTEX)
+                mutex->lock(file, line);
+            #else
+                QN_UNUSED(file, line);
+                mutex->lock();
+            #endif
+        }
+        else
+        {
+            mutex->unlock();
+        }
+    }
+
+    std::vector<std::unique_ptr<QnMutex>> m_mutexList;
     OpenSslLockingCallbackType m_initialLockingCallback;
 };
 

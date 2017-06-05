@@ -77,6 +77,16 @@ public:
         return SocketAddress(m_settings.value("endpoint", "0.0.0.0:0").toString());
     }
 
+    QnUuid moduleGuid() const
+    {
+        return QnUuid(m_settings.value("moduleGuid").toString());
+    }
+
+    bool isAuthDisabled() const
+    {
+        return m_settings.contains("disableAuth");
+    }
+
 private:
     QnSettings m_settings;
     bool m_showHelp;
@@ -118,7 +128,6 @@ public:
     :
         QnHttpConnectionListener(commonModule, address, port, maxConnections, useSsl)
     {
-        addHandler<QnMuduleInformationConnectionProcessor>("HTTP", "api/moduleInformation");
     }
 
     ~QnSimpleHttpConnectionListener()
@@ -202,9 +211,6 @@ void Appserver2Process::setOnStartedEventHandler(
 
 int Appserver2Process::exec()
 {
-    nx::utils::TimerManager timerManager;
-    timerManager.start();
-
     bool processStartResult = false;
     auto triggerOnStartedEventHandlerGuard = makeScopeGuard(
         [this, &processStartResult]
@@ -215,8 +221,20 @@ int Appserver2Process::exec()
 
     registerQtResources();
 
+    conf::Settings settings;
+    //parsing command line arguments
+    settings.load(m_argc, m_argv);
+    if (settings.showHelp())
+    {
+        //settings.printCmdLineArgsHelp();
+        //TODO
+        return 0;
+    }
+
     m_commonModule.reset(new QnCommonModule(false));
-    m_commonModule->setModuleGUID(QnUuid::createUuid());
+    const auto moduleGuid = settings.moduleGuid();
+    m_commonModule->setModuleGUID(
+        moduleGuid.isNull() ? QnUuid::createUuid() : moduleGuid);
 
     QnResourceDiscoveryManager resourceDiscoveryManager(m_commonModule.get());
     // Starting receiving notifications.
@@ -239,20 +257,11 @@ int Appserver2Process::exec()
     runtimeData.hardwareIds << QnUuid::createUuid().toString();
     m_commonModule->runtimeInfoManager()->updateLocalItem(runtimeData);    // initializing localInfo
 
-    conf::Settings settings;
-    //parsing command line arguments
-    settings.load(m_argc, m_argv);
-    if (settings.showHelp())
-    {
-        //settings.printCmdLineArgsHelp();
-        //TODO
-        return 0;
-    }
-    m_commonModule->setInstanceCounter(settings.moduleInstance());
+    qnStaticCommon->setModuleShortId(m_commonModule->moduleGUID(), settings.moduleInstance());
 
     //initializeLogging(settings);
     std::unique_ptr<ec2::AbstractECConnectionFactory>
-        ec2ConnectionFactory(getConnectionFactory(Qn::PT_Server, &timerManager, m_commonModule.get()));
+        ec2ConnectionFactory(getConnectionFactory(Qn::PT_Server, nx::utils::TimerManager::instance(), m_commonModule.get()));
 
     std::map<QString, QVariant> confParams;
     ec2ConnectionFactory->setConfParams(std::move(confParams));
@@ -268,7 +277,7 @@ int Appserver2Process::exec()
         if (errorCode == ec2::ErrorCode::ok)
         {
             //connectInfo = ec2Connection->connectionInfo();
-            NX_LOG(lit("Connected to local EC2"), cl_logWARNING);
+            NX_LOG(lit("Connected to local EC2"), cl_logDEBUG1);
             break;
         }
 
@@ -290,6 +299,9 @@ int Appserver2Process::exec()
         QnTcpListener::DEFAULT_MAX_CONNECTIONS,
         true);
 
+    if (settings.isAuthDisabled())
+        tcpListener.disableAuth();
+
     ec2ConnectionFactory->registerRestHandlers(tcpListener.processorPool());
 
     if (!tcpListener.bindToLocalAddress())
@@ -305,6 +317,7 @@ int Appserver2Process::exec()
         m_tcpListener = &tcpListener;
     }
 
+    tcpListener.addHandler<QnMuduleInformationConnectionProcessor>("HTTP", "api/moduleInformation");
     tcpListener.addHandler<QnRestConnectionProcessor>("HTTP", "ec2");
     ec2ConnectionFactory->registerTransactionListener(&tcpListener);
 

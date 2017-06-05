@@ -120,7 +120,7 @@ namespace detail {
 template<typename T, typename F>
 ErrorCode saveTransactionImpl(const QnTransaction<T>& tran, ec2::QnTransactionLog *tlog, F f)
 {
-    QByteArray serializedTran = QnUbjsonTransactionSerializer::instance()->serializedTransaction(tran);
+    QByteArray serializedTran = tlog->serializer()->serializedTransaction(tran);
     return tlog->saveToDB(tran, f(tran.params), serializedTran);
 }
 

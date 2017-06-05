@@ -32,7 +32,14 @@ SystemError::ErrorCode readPartitions(
         // reports a valid mounted device.
         if (system("mount > /root/mounts") == 0)
         {
+            // Some devices have /tmp related problems, while root can always access /root.
             mountsFile = "/root/mounts";
+            scanfLongPattern = true;
+        }
+        else if (system("mount > /tmp/mounts") == 0)
+        {
+            // Temporary directory /tmp is a fallback for non-root users.
+            mountsFile = "/tmp/mounts";
             scanfLongPattern = true;
         }
     }

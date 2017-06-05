@@ -1,28 +1,17 @@
 #include "vms_gateway_process.h"
 
-#include <algorithm>
-#include <chrono>
-#include <iostream>
-#include <list>
-#include <thread>
-
-#include <QtCore/QDir>
-#include <QtSql/QSqlQuery>
-
 #include <nx/network/http/auth_restriction_list.h>
-#include <nx/network/http/auth_tools.h>
 #include <nx/network/http/server/http_message_dispatcher.h>
-#include <nx/network/public_ip_discovery.h>
 #include <nx/network/socket_global.h>
-#include <nx/network/ssl_socket.h>
+#include <nx/network/ssl/ssl_engine.h>
 
 #include <nx/utils/app_info.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/stree/stree_manager.h>
 #include <nx/utils/std/cpp14.h>
-#include <nx/utils/scope_guard.h>
-#include <nx/utils/system_error.h>
 #include <nx/utils/platform/current_process.h>
+
+#include <network/cloud/cloud_media_server_endpoint_verificator.h>
 
 #include "access_control/authentication_manager.h"
 #include "http/connect_handler.h"
@@ -46,6 +35,15 @@ VmsGatewayProcess::VmsGatewayProcess(int argc, char **argv):
 {
     //if call Q_INIT_RESOURCE directly, linker will search for nx::cloud::gateway::libvms_gateway and fail...
     registerQtResources();
+}
+
+VmsGatewayProcess::~VmsGatewayProcess()
+{
+    if (m_endpointVerificatorFactoryBak)
+    {
+        nx::network::cloud::tcp::EndpointVerificatorFactory::instance().setCustomFunc(
+            std::move(m_endpointVerificatorFactoryBak));
+    }
 }
 
 const std::vector<SocketAddress>& VmsGatewayProcess::httpEndpoints() const
@@ -72,36 +70,10 @@ int VmsGatewayProcess::serviceMain(
 
     try
     {
-        //enabling nat traversal
-        if (!settings.general().mediatorEndpoint.isEmpty())
-        {
-            nx::network::SocketGlobals::mediatorConnector().mockupAddress(
-                SocketAddress(settings.general().mediatorEndpoint));
-        }
-        nx::network::SocketGlobals::mediatorConnector().enable(true);
+        initializeCloudConnect(settings);
 
-        std::unique_ptr<nx::network::PublicIPDiscovery> publicAddressFetcher;
-        if (settings.cloudConnect().replaceHostAddressWithPublicAddress)
-        {
-            if (!settings.cloudConnect().publicIpAddress.isEmpty())
-            {
-                publicAddressFetched(settings, settings.cloudConnect().publicIpAddress);
-            }
-            else
-            {
-                publicAddressFetcher = std::make_unique<nx::network::PublicIPDiscovery>(
-                    QStringList() << settings.cloudConnect().fetchPublicIpUrl);
-
-                QObject::connect(
-                    publicAddressFetcher.get(), &nx::network::PublicIPDiscovery::found,
-                    [this, &settings](const QHostAddress& publicAddress)
-                    {
-                        publicAddressFetched(settings, publicAddress.toString());
-                    });
-
-                publicAddressFetcher->update();
-            }
-        }
+        std::unique_ptr<nx::network::PublicIPDiscovery> publicAddressFetcher =
+            initializePublicIpDiscovery(settings);
 
         const auto& httpAddrToListenList = settings.general().endpointsToListen;
         if (httpAddrToListenList.empty())
@@ -120,14 +92,13 @@ int VmsGatewayProcess::serviceMain(
 
         nx_http::MessageDispatcher httpMessageDispatcher;
 
-        //TODO #ak move following to stree xml
+        // TODO: #ak Move following to stree xml.
         nx_http::AuthMethodRestrictionList authRestrictionList;
 
         AuthenticationManager authenticationManager(
             authRestrictionList,
             streeManager);
 
-        //registering HTTP handlers
         registerApiHandlers(settings, m_runTimeOptions, &httpMessageDispatcher);
 
         if (settings.http().sslSupport)
@@ -147,7 +118,7 @@ int VmsGatewayProcess::serviceMain(
         if (!multiAddressHttpServer.bind(httpAddrToListenList))
             return 3;
 
-        // process privilege reduction
+        // Process privilege reduction.
         nx::utils::CurrentProcess::changeUser(settings.general().changeUser);
 
         if (!multiAddressHttpServer.listen())
@@ -172,32 +143,49 @@ int VmsGatewayProcess::serviceMain(
     }
 }
 
-void VmsGatewayProcess::registerApiHandlers(
-    const conf::Settings& settings,
-    const conf::RunTimeOptions& runTimeOptions,
-    nx_http::MessageDispatcher* const msgDispatcher)
+void VmsGatewayProcess::initializeCloudConnect(const conf::Settings& settings)
 {
-    msgDispatcher->registerRequestProcessor<ProxyHandler>(
-        nx_http::kAnyPath,
-        [&settings, &runTimeOptions]() -> std::unique_ptr<ProxyHandler>
-        {
-            return std::make_unique<ProxyHandler>(settings, runTimeOptions);
-        });
-
-    if (settings.http().connectSupport)
+    if (!settings.general().mediatorEndpoint.isEmpty())
     {
-        NX_CRITICAL(false, "Currently ConnectHandler has some issues:"
-            "please see implementation TODOs");
+        nx::network::SocketGlobals::mediatorConnector().mockupAddress(
+            SocketAddress(settings.general().mediatorEndpoint));
+    }
+    nx::network::SocketGlobals::mediatorConnector().enable(true);
 
-        msgDispatcher->registerRequestProcessor<ConnectHandler>(
-            nx_http::kAnyPath,
-            [&settings, &runTimeOptions]() -> std::unique_ptr<ConnectHandler> {
-                return std::make_unique<ConnectHandler>(settings, runTimeOptions);
-            },
-            nx_http::StringType("CONNECT"));
+    m_endpointVerificatorFactoryBak =
+        nx::network::cloud::tcp::EndpointVerificatorFactory::instance().setCustomFunc(
+            [](const nx::String& connectSessionId) 
+                -> std::unique_ptr<nx::network::cloud::tcp::AbstractEndpointVerificator>
+            {
+                return std::make_unique<CloudMediaServerEndpointVerificator>(
+                    connectSessionId);
+            });
+}
+
+std::unique_ptr<nx::network::PublicIPDiscovery> VmsGatewayProcess::initializePublicIpDiscovery(
+    const conf::Settings& settings)
+{
+    if (!settings.cloudConnect().replaceHostAddressWithPublicAddress)
+        return nullptr;
+
+    if (!settings.cloudConnect().publicIpAddress.isEmpty())
+    {
+        publicAddressFetched(settings, settings.cloudConnect().publicIpAddress);
+        return nullptr;
     }
 
-    msgDispatcher->addModRewriteRule(lm("/%1/").arg(kApiPathPrefix), lit("/"));
+    auto publicAddressFetcher = std::make_unique<nx::network::PublicIPDiscovery>(
+        QStringList() << settings.cloudConnect().fetchPublicIpUrl);
+
+    QObject::connect(
+        publicAddressFetcher.get(), &nx::network::PublicIPDiscovery::found,
+        [this, &settings](const QHostAddress& publicAddress)
+        {
+            publicAddressFetched(settings, publicAddress.toString());
+        });
+
+    publicAddressFetcher->update();
+    return publicAddressFetcher;
 }
 
 void VmsGatewayProcess::publicAddressFetched(
@@ -227,6 +215,34 @@ void VmsGatewayProcess::publicAddressFetched(
                 cl_logERROR);
         }
     }
+}
+
+void VmsGatewayProcess::registerApiHandlers(
+    const conf::Settings& settings,
+    const conf::RunTimeOptions& runTimeOptions,
+    nx_http::MessageDispatcher* const msgDispatcher)
+{
+    msgDispatcher->registerRequestProcessor<ProxyHandler>(
+        nx_http::kAnyPath,
+        [&settings, &runTimeOptions]() -> std::unique_ptr<ProxyHandler>
+        {
+            return std::make_unique<ProxyHandler>(settings, runTimeOptions);
+        });
+
+    if (settings.http().connectSupport)
+    {
+        NX_CRITICAL(false, "Currently ConnectHandler has some issues:"
+            "please see implementation TODOs");
+
+        msgDispatcher->registerRequestProcessor<ConnectHandler>(
+            nx_http::kAnyPath,
+            [&settings, &runTimeOptions]() -> std::unique_ptr<ConnectHandler> {
+                return std::make_unique<ConnectHandler>(settings, runTimeOptions);
+            },
+            nx_http::StringType("CONNECT"));
+    }
+
+    msgDispatcher->addModRewriteRule(lm("/%1/").arg(kApiPathPrefix), lit("/"));
 }
 
 } // namespace cloud

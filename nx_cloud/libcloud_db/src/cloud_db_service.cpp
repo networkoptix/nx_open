@@ -30,6 +30,7 @@
 #include "access_control/authentication_manager.h"
 #include "dao/rdb/db_instance_controller.h"
 #include "ec2/synchronization_engine.h"
+#include "ec2/vms_p2p_command_bus.h"
 #include "http_handlers/get_cloud_modules_xml.h"
 #include "http_handlers/ping.h"
 #include "libcloud_db_app_info.h"
@@ -146,6 +147,8 @@ int CloudDbService::serviceMain(const utils::AbstractServiceSettings& abstractSe
         settings.p2pDb(),
         &dbInstanceController.queryExecutor());
 
+    ec2::VmsP2pCommandBus vmsP2pCommandBus(&ec2SyncronizationEngine);
+
     SystemHealthInfoProvider systemHealthInfoProvider(
         &ec2SyncronizationEngine.connectionManager(),
         &dbInstanceController.queryExecutor());
@@ -190,7 +193,8 @@ int CloudDbService::serviceMain(const utils::AbstractServiceSettings& abstractSe
         settings,
         accountManager,
         &systemManager,
-        tempPasswordManager);
+        tempPasswordManager,
+        &vmsP2pCommandBus);
     m_authProvider = &authProvider;
 
     MaintenanceManager maintenanceManager(

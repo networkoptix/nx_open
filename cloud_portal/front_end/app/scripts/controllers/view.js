@@ -22,9 +22,9 @@ angular.module('cloudApp')
              $location.path("/systems");
         });
 
-        $("body").addClass("webclient-page");
+        $("html").addClass("webclient-page");
         $scope.$on('$destroy', function( event ) {
             cancelSubscription();
-            $("body").removeClass("webclient-page");
+            $("html").removeClass("webclient-page");
         });
     }]);

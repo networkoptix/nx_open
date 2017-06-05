@@ -54,7 +54,7 @@ namespace ec2
     {
     public:
         QnBusinessEventManager(
-            QnTransactionMessageBus* messageBus,
+            QnTransactionMessageBusBase* messageBus,
             QueryProcessorType* const queryProcessor,
             const Qn::UserAccessData &userAccessData);
 
@@ -68,7 +68,7 @@ namespace ec2
         virtual int resetBusinessRules( impl::SimpleHandlerPtr handler ) override;
 
     private:
-        QnTransactionMessageBus* m_messageBus;
+        QnTransactionMessageBusBase* m_messageBus;
         QueryProcessorType* const m_queryProcessor;
         Qn::UserAccessData m_userAccessData;
 

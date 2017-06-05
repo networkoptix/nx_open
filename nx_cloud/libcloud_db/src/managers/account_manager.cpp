@@ -34,7 +34,7 @@ AccountManager::AccountManager(
     const StreeManager& streeManager,
     TemporaryAccountPasswordManager* const tempPasswordManager,
     nx::db::AsyncSqlQueryExecutor* const dbManager,
-    AbstractEmailManager* const emailManager) throw(std::runtime_error)
+    AbstractEmailManager* const emailManager) noexcept(false)
 :
     m_settings(settings),
     m_streeManager(streeManager),

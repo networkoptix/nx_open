@@ -1,0 +1,1 @@
+nx_add_target(traffic_relay EXECUTABLE PUBLIC_LIBS libtraffic_relay)

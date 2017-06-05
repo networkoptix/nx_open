@@ -116,7 +116,7 @@ bool CrashReporter::scanAndReport(QSettings* settings)
     if (!globalSettings->isStatisticsAllowed()
         || globalSettings->isNewSystem())
     {
-        NX_LOGX(lit("Automatic report system is disabled"), cl_logINFO);
+        NX_LOGX(lit("Automatic report system is disabled"), cl_logDEBUG1);
         return false;
     }
 

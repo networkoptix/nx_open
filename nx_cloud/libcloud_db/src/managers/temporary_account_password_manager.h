@@ -71,7 +71,7 @@ class TemporaryAccountPasswordManager:
 public:
     TemporaryAccountPasswordManager(
         const conf::Settings& settings,
-        nx::db::AsyncSqlQueryExecutor* const dbManager) throw(std::runtime_error);
+        nx::db::AsyncSqlQueryExecutor* const dbManager) noexcept(false);
     virtual ~TemporaryAccountPasswordManager();
 
     virtual void authenticateByName(

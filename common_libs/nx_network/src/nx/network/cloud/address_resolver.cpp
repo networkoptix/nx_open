@@ -348,6 +348,11 @@ void AddressResolver::pleaseStop(nx::utils::MoveOnlyFunc<void()> handler)
         });
 }
 
+bool AddressResolver::isValidForConnect(const SocketAddress& endpoint) const
+{
+    return (endpoint.port != 0) || isCloudHostName(endpoint.address.toString());
+}
+
 AddressResolver::HostAddressInfo::HostAddressInfo(bool _isLikelyCloudAddress)
 :
     isLikelyCloudAddress(_isLikelyCloudAddress),

@@ -11,6 +11,12 @@ else()
     set(CMAKE_ACTIVE_CONFIGURATIONS)
 endif()
 
+macro(nx_expose_variables_to_parent_scope _variables_list)
+    foreach(_variable_name IN LISTS ${_variables_list})
+        set(${_variable_name} ${${_variable_name}} PARENT_SCOPE)
+    endforeach()
+endmacro()
+
 function(nx_copy)
     cmake_parse_arguments(COPY "IF_NEWER;IF_DIFFERENT;IF_MISSING" "DESTINATION" "" ${ARGN})
 

@@ -28,7 +28,7 @@ public:
         const std::string& systemId,
         const std::string& nonce) = 0;
 
-    virtual std::vector<api::AuthInfo> fetchUserAuthRecords(
+    virtual api::AuthInfo fetchUserAuthRecords(
         nx::db::QueryContext* const queryContext,
         const std::string& systemId,
         const std::string& userEmail) = 0;
@@ -37,7 +37,7 @@ public:
         nx::db::QueryContext* const queryContext,
         const std::string& systemId,
         const std::string& accountEmail,
-        const std::vector<api::AuthInfo>& userAuthRecords) = 0;
+        const api::AuthInfo& userAuthRecords) = 0;
 };
 
 } // namespace dao

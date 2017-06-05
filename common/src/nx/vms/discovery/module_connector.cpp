@@ -34,11 +34,12 @@ void ModuleConnector::setDisconnectHandler(DisconnectedHandler handler)
 
 static void validateEndpoints(std::set<SocketAddress>* endpoints)
 {
+    const auto& resolver = nx::network::SocketGlobals::addressResolver();
     for (auto it = endpoints->begin(); it != endpoints->end(); )
     {
-        NX_ASSERT(it->isValid(), lm("Invalid endpoint: %1").arg(*it));
+        NX_ASSERT(resolver.isValidForConnect(*it), lm("Invalid endpoint: %1").arg(*it));
 
-        if (it->isValid())
+        if (resolver.isValidForConnect(*it))
             ++it;
         else
             it = endpoints->erase(it);

@@ -70,25 +70,19 @@ bool QnUuid::isNull() const
     return m_uuid.isNull();
 }
 
-const QByteArray& QnUuid::toByteArray() const
+const QByteArray QnUuid::toByteArray() const
 {
-    if( !m_byteArrayRepresentation )
-        m_byteArrayRepresentation = m_uuid.toByteArray();
-    return m_byteArrayRepresentation.get();
+    return m_uuid.toByteArray();
 }
 
-const QByteArray& QnUuid::toRfc4122() const
+const QByteArray QnUuid::toRfc4122() const
 {
-    if( !m_rfc4122Representation )
-        m_rfc4122Representation = m_uuid.toRfc4122();
-    return m_rfc4122Representation.get();
+    return m_uuid.toRfc4122();
 }
 
-const QString& QnUuid::toString() const
+const QString QnUuid::toString() const
 {
-    if( !m_stringRepresentation )
-        m_stringRepresentation = m_uuid.toString();
-    return m_stringRepresentation.get();
+    return m_uuid.toString();
 }
 
 QString QnUuid::toSimpleString() const

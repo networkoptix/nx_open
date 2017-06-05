@@ -1,8 +1,7 @@
 #include "json_transaction_serializer.h"
 
-QByteArray ec2::QnJsonTransactionSerializer::serializedTransactionWithoutHeader(const QByteArray &serializedTran, const QnTransactionTransportHeader &header)
+QByteArray ec2::QnJsonTransactionSerializer::serializedTransactionWithoutHeader(const QByteArray &serializedTran)
 {
-    Q_UNUSED(header);    //header is really unused in json clients
     return serializedTran;
 }
 
