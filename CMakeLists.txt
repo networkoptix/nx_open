@@ -50,8 +50,6 @@ include(mercurial)
 include(project_utils)
 include(test_utils)
 
-include(android-ndk-workaround)
-
 include(ec_protocol)
 include(maven_compatibility)
 
@@ -90,6 +88,11 @@ if(NOT WINDOWS)
         "${CMAKE_EXE_LINKER_FLAGS} -Wl,-rpath-link,${CMAKE_LIBRARY_OUTPUT_DIRECTORY}")
     set(CMAKE_SHARED_LINKER_FLAGS
         "${CMAKE_SHARED_LINKER_FLAGS} -Wl,-rpath-link,${CMAKE_LIBRARY_OUTPUT_DIRECTORY}")
+endif()
+
+if(ANDROID)
+    include(android-ndk-workaround)
+    include(android-apk)
 endif()
 
 link_directories("${CMAKE_LIBRARY_OUTPUT_DIRECTORY}")

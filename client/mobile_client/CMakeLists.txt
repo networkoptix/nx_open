@@ -35,3 +35,26 @@ endif()
 if(box STREQUAL "bpi")
     target_link_libraries(mobile_client PRIVATE GLESv2)
 endif()
+
+if(ANDROID)
+    set(project.version.name "${releaseVersion}")
+    set(project.version.code "${buildNumber}")
+
+    file(COPY "maven/bin-resources/android" DESTINATION "${CMAKE_CURRENT_BINARY_DIR}")
+    file(COPY "${customization_dir}/icons/android/android"
+        DESTINATION "${CMAKE_CURRENT_BINARY_DIR}")
+    configure_file("maven/filter-resources/android/AndroidManifest.xml"
+        "${CMAKE_CURRENT_BINARY_DIR}/android/AndroidManifest.xml")
+    configure_file("./maven/filter-resources/android/res/values/strings.xml"
+        "${CMAKE_CURRENT_BINARY_DIR}/android/res/values/strings.xml")
+
+    get_target_property(OPENSSL_LIBS openssl INTERFACE_LINK_LIBRARIES)
+    get_target_property(FFMPEG_LIBS ffmpeg INTERFACE_LINK_LIBRARIES)
+    get_target_property(OPENAL_LIBS openal INTERFACE_LINK_LIBRARIES)
+
+    add_android_apk(mobile_client.apk TARGET mobile_client
+        PACKAGE_SOURCE "${CMAKE_CURRENT_BINARY_DIR}/android"
+        QML_IMPORT_PATHS "${CMAKE_CURRENT_LIST_DIR}/static-resources/qml"
+        EXTRA_LIBS ${OPENSSL_LIBS} ${FFMPEG_LIBS} ${OPENAL_LIBS}
+    )
+endif()
