@@ -8,6 +8,7 @@
 #include <algorithm>
 #include <cstring>
 #include <cstdlib>
+#include <functional>
 
 #include <plugins/plugin_tools.h>
 #include <utils/memory/cyclic_allocator.h>

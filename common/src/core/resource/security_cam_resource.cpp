@@ -59,7 +59,6 @@ QnSecurityCamResource::QnSecurityCamResource(QnCommonModule* commonModule):
     m_dpFactory(0),
     m_recActionCnt(0),
     m_statusFlags(Qn::CSF_NoFlags),
-    m_advancedWorking(false),
     m_manuallyAdded(false),
 	m_cachedLicenseType(Qn::LC_Count),
     m_cachedHasDualStreaming2(
@@ -859,14 +858,6 @@ bool QnSecurityCamResource::isAudioEnabled() const
         return true;
     QnCameraUserAttributePool::ScopedLock userAttributesLock( userAttributesPool(), getId() );
     return (*userAttributesLock)->audioEnabled;
-}
-
-bool QnSecurityCamResource::isAdvancedWorking() const {
-    return m_advancedWorking;
-}
-
-void QnSecurityCamResource::setAdvancedWorking(bool value) {
-    m_advancedWorking = value;
 }
 
 bool QnSecurityCamResource::isManuallyAdded() const {

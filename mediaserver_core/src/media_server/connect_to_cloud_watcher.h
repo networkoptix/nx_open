@@ -8,7 +8,7 @@
 #include <nx/network/cloud/cloud_module_url_fetcher.h>
 
 namespace ec2 {
-    class QnTransactionMessageBus;
+    class QnTransactionMessageBusBase;
 }
 
 /**
@@ -19,7 +19,7 @@ class QnConnectToCloudWatcher: public QObject
 {
     Q_OBJECT
 public:
-    QnConnectToCloudWatcher(ec2::QnTransactionMessageBus* messageBus);
+    QnConnectToCloudWatcher(ec2::QnTransactionMessageBusBase* messageBus);
     virtual ~QnConnectToCloudWatcher();
 private slots:
     void at_updateConnection();
@@ -29,5 +29,5 @@ private:
     QUrl m_cloudUrl;
     QTimer m_timer;
     std::unique_ptr<nx::network::cloud::CloudModuleUrlFetcher> m_cdbEndPointFetcher;
-    ec2::QnTransactionMessageBus* m_messageBus;
+    ec2::QnTransactionMessageBusBase* m_messageBus;
 };

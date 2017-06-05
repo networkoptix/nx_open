@@ -54,7 +54,9 @@ angular.module('nxCommon')
             return promise;
         }
         poll.cancel = function( promise ){
-            promise.abort();
+            if(promise){
+                promise.abort();
+            }
         };
 
 

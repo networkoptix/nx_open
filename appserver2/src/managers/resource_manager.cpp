@@ -85,16 +85,13 @@ namespace ec2
     }
 
     template<class T>
-    int QnResourceManager<T>::save(const ec2::ApiResourceParamWithRefDataList& kvPairs, impl::SaveKvPairsHandlerPtr handler )
+    int QnResourceManager<T>::save(const ec2::ApiResourceParamWithRefDataList& kvPairs, impl::SimpleHandlerPtr handler)
     {
         const int reqID = generateRequestID();
-        ApiResourceParamWithRefDataList outData;
-        outData = kvPairs;
-
         using namespace std::placeholders;
         m_queryProcessor->getAccess(m_userAccessData).processUpdateAsync(
             ApiCommand::setResourceParams, kvPairs,
-            std::bind( std::mem_fn( &impl::SaveKvPairsHandler::done ), handler, reqID, _1, outData) );
+            std::bind(std::mem_fn(&impl::SimpleHandler::done), handler, reqID, _1));
 
         return reqID;
     }

@@ -117,7 +117,8 @@
     "cantEditYourself": "Changing own permissions is not allowed",
     "cantEditAdmin": "This user has administrator permissions",
     "cantOpenClient": "{{VMS_NAME}} application is not detected. <a href=\"/download\">Download</a>",
-    "lostConnection": "Connection to {{systemName}} lost"
+    "lostConnection": "Connection to {{systemName}} lost",
+    "thisSystem": "the system"
   },
   "passwordRequirements": {
     "minLengthMessage": "Password must contain at least 8 characters",

@@ -1,12 +1,33 @@
 #pragma once
 
 #include <QtSql/QSqlDatabase>
+#include <QtSql/QSqlQuery>
 
 #include <nx_ec/data/api_fwd.h>
+
+#include <memory>
 
 namespace ec2 {
 namespace database {
 namespace api {
+
+    // todo: get rid of this struct. Make function insertOrReplaceResource member of some class.
+    struct Context
+    {
+        Context(const QSqlDatabase& db): database(db) {}
+        void reset()
+        {
+            getIdQuery.reset();
+            insQuery.reset();
+            updQuery.reset();
+        }
+
+        std::unique_ptr<QSqlQuery> getIdQuery;
+        std::unique_ptr<QSqlQuery> insQuery;
+        std::unique_ptr<QSqlQuery> updQuery;
+        const QSqlDatabase& database;
+
+    };
 
 /**
  * Get internal entry id from vms_resource table.
@@ -15,7 +36,7 @@ namespace api {
  * @returns 0 if resource is not found, valid internal id otherwise.
  */
 qint32 getResourceInternalId(
-    const QSqlDatabase& database,
+    Context* context,
     const QnUuid& guid);
 
 /**
@@ -26,7 +47,7 @@ qint32 getResourceInternalId(
  * @returns True if operation was successful, false otherwise.
  */
 bool insertOrReplaceResource(
-    const QSqlDatabase& database,
+    Context* context,
     const ApiResourceData& data,
     qint32* internalId);
 
@@ -36,7 +57,7 @@ bool insertOrReplaceResource(
 * @param in internalId Resource internal id.
 * @returns True if operation was successful, false otherwise.
 */
-bool deleteResourceInternal(const QSqlDatabase& database, int internalId);
+bool deleteResourceInternal(Context* context, int internalId);
 
 } // namespace api
 } // namespace database

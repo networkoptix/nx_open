@@ -14,14 +14,8 @@ angular.module('nxCommon')
             this.storage = $localStorage;
             this.poll = null;
 
-            this.searchCams = null;
             this.bothRequest = null;
         }
-
-        //setters
-        camerasProvider.prototype.setSearchCams = function(searchCams){
-            this.searchCams = searchCams;
-        };
 
         //getters
         camerasProvider.prototype.getCamera = function(id){
@@ -99,6 +93,7 @@ angular.module('nxCommon')
             function cameraSorter(camera) {
                 camera.url = self.extractDomain(camera.url);
                 camera.preview = self.systemAPI.previewUrl(camera.physicalId, false, null, 256);
+                camera.fullPreview = self.systemAPI.previewUrl(camera.physicalId, false, null, null);
                 camera.server = self.getServer(camera.parentId);
                 if(camera.server && camera.server.status === 'Offline'){
                     camera.status = 'Offline';
@@ -263,7 +258,6 @@ angular.module('nxCommon')
             this.treeRequest.then(function(data){
                 setServers(data.data.reply['ec2/getMediaServersEx']);
                 self.getCameras(data.data.reply['ec2/getCamerasEx']);
-                self.searchCams();
                 deferred.resolve(self.cameras);
             }, function(error){
                 deferred.reject(error);

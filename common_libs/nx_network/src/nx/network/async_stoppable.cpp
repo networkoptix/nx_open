@@ -16,7 +16,7 @@ void QnStoppableAsync::pleaseStopSync(bool checkForLocks)
 
     if (nx::network::SocketGlobals::isInitialized())
     {
-        NX_ASSERT(!nx::network::SocketGlobals::aioService().isInAnyAioThread());
+        NX_CRITICAL(!nx::network::SocketGlobals::aioService().isInAnyAioThread());
     }
 
     nx::utils::promise<void> promise;

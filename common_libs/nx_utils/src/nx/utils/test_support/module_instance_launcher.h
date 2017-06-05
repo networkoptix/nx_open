@@ -7,6 +7,7 @@
 
 #include "nx/utils/std/future.h"
 #include "nx/utils/std/thread.h"
+#include <nx/utils/uuid.h>
 
 namespace nx {
 namespace utils {

@@ -22,12 +22,14 @@ struct QnPeerRuntimeInfo
     QnUuid uuid;
     ec2::ApiRuntimeData data;
 
-    bool operator==(const QnPeerRuntimeInfo& other) const {
+    bool operator==(const QnPeerRuntimeInfo& other) const
+    {
         return uuid == other.uuid &&
             data == other.data;
     }
 
-    bool isNull() const {
+    bool isNull() const
+    {
         return uuid.isNull();
     }
 };
