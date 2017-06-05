@@ -297,7 +297,7 @@ bool QnRecordingManager::startOrStopRecording(
             float currentFps = recorderHiRes ? recorderHiRes->currentScheduleTask().getFps() : 0;
 
             // second stream should run if camera do not share fps or at least MIN_SECONDARY_FPS frames left for second stream
-            bool runSecondStream = (cameraRes->streamFpsSharingMethod() != Qn::BasicFpsSharing || cameraRes->getMaxFps() - currentFps >= MIN_SECONDARY_FPS) &&
+            bool runSecondStream = cameraRes->isEnoughFpsToRunSecondStream(currentFps) &&
                                     cameraRes->hasDualStreaming2() && providerLow;
             if (runSecondStream)
             {
