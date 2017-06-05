@@ -98,6 +98,9 @@ Item
             {
                 id: joystick
 
+                readonly property vector2d zeroVector: Qt.vector2d(0, 0)
+                property vector2d movementVector: Qt.vector2d(0, 0)
+
                 joystickType:
                 {
                     if (!visible)
@@ -129,9 +132,33 @@ Item
                     (controller.capabilities & Ptz.ContinuousPanCapability
                     || controller.capabilities & Ptz.ContinuousTiltCapability)
 
+                Timer
+                {
+                    id: directionFilterTimer
+
+                    property vector2d value: joystick.zeroVector
+
+                    interval: 450
+
+                    onTriggered:
+                    {
+                        if (value != joystick.movementVector)
+                            joystick.movementVector = value
+                    }
+                }
+
+                onMovementVectorChanged:
+                {
+                    controller.continuousMove(Qt.vector3d(movementVector.x, movementVector.y, 0))
+                }
+
                 onDirectionChanged:
                 {
-                    controller.continuousMove(Qt.vector3d(direction.x, direction.y, 0))
+                    if (direction == zeroVector)
+                        movementVector = directionFilterTimer.value
+
+                    directionFilterTimer.value = direction
+                    directionFilterTimer.restart()
                 }
             }
         }
