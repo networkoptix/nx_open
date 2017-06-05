@@ -62,6 +62,7 @@ include(cloud_host)
 include(vms_parts)
 include(compiler_options)
 include(output_directories)
+include(distribution_names)
 
 if(NOT (WINDOWS OR ANDROID OR IOS))
     set(BUILD_SHARED_LIBS ON)
