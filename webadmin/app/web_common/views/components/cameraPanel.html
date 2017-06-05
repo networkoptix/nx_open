@@ -26,11 +26,6 @@
                 </div>
                 <div class="hide-excess-text">
                     <span class="glyphicon glyphicon-th-list"></span>
-                    <span>
-                        <icon for="server.status=='Unauthorized'" on-true="server-unauthorized" title="Unauthorized"></icon>
-                        <icon for="server.status=='Offline'"      on-true="server-offline"      title="Offline"></icon>
-                        <icon for="server.status!='Unauthorized' && server.status!='Offline'" on-true="server-ok"></icon>
-                    </span>
                     <span class="server-name">&nbsp; {{server.name}}</span><small ng-if="toggleInfo">&nbsp;{{server.networkAddresses.substr(0,server.networkAddresses.indexOf(':'))}}</small>
                 </div>
             </a>

@@ -86,6 +86,7 @@
 
 .glyphicon-th-list{
   @include kill-glyphicon;
+  top: 4px !important;
   background-position: -1px -170px;
 }
 
