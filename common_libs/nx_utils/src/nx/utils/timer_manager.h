@@ -3,8 +3,7 @@
 * a.kolesnikov
 ***********************************************************/
 
-#ifndef StandaloneTimerManager_H
-#define StandaloneTimerManager_H
+#pragma once
 
 #include <chrono>
 #include <functional>
@@ -202,4 +201,3 @@ boost::optional<std::chrono::milliseconds> NX_UTILS_API parseOptionalTimerDurati
 }   //namespace utils
 }   //namespace nx
 
-#endif //StandaloneTimerManager_H
