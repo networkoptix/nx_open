@@ -98,7 +98,13 @@ public:
 
     Recorders findRecorders(const QnResourcePtr& res) const;
 
-    bool startForcedRecording(const QnSecurityCamResourcePtr& camRes, Qn::StreamQuality quality, int fps, int beforeThreshold, int afterThreshold, int maxDuration);
+    bool startForcedRecording(
+        const QnSecurityCamResourcePtr& camRes,
+        Qn::StreamQuality quality,
+        int fps,
+        int beforeThresholdSec,
+        int afterThresholdSec,
+        int maxDurationSec);
 
     bool stopForcedRecording(const QnSecurityCamResourcePtr& camRes, bool afterThresholdCheck = true);
 

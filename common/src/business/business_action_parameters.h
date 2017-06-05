@@ -26,7 +26,6 @@ struct QnBusinessActionParameters
     // Recording
     int fps;
     Qn::StreamQuality streamQuality;
-    int recordingDuration; //< Seconds.
     //! for bookmarks this represents epsilon, bookmark end time extended by
     int recordAfter; //< Seconds.
 
@@ -72,7 +71,7 @@ struct QnBusinessActionParameters
     bool isDefault() const;
 };
 
-#define QnBusinessActionParameters_Fields (actionResourceId)(url)(emailAddress)(userGroup)(fps)(streamQuality)(recordingDuration)(recordAfter)\
+#define QnBusinessActionParameters_Fields (actionResourceId)(url)(emailAddress)(userGroup)(fps)(streamQuality)(recordAfter)\
     (relayOutputId)(sayText)(tags)(text)(durationMs)(additionalResources)(forced)(presetId)(useSource)(recordBeforeMs)(playToClient)(contentType)
 
 /* Backward compatibility is not really important here as this class is not stored in the DB. */

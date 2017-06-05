@@ -975,10 +975,12 @@ bool QnDbManager::updateGuids()
     return true;
 }
 
-bool QnDbManager::updateBusinessActionParameters() {
+bool QnDbManager::updateBusinessActionParameters()
+{
     QHash<QString, QString> remapTable;
     remapTable["quality"] = "streamQuality";
-    remapTable["duration"] = "recordingDuration";
+    remapTable["duration"] = "durationMs";
+    remapTable["recordingDuration"] = "durationMs";
     remapTable["after"] = "recordAfter";
     remapTable["relayOutputID"] = "relayOutputId";
 
@@ -993,7 +995,8 @@ bool QnDbManager::updateBusinessActionParameters() {
             return false;
         }
 
-        while (query.next()) {
+        while (query.next())
+        {
             qint32 id = query.value(0).toInt();
             QByteArray data = query.value(1).toByteArray();
 
@@ -1004,9 +1007,23 @@ bool QnDbManager::updateBusinessActionParameters() {
                 continue;
 
             QJsonObject remappedValues;
-            for (const QString &key: values.keys()) {
-                QString remappedKey = remapTable.contains(key) ? remapTable[key] : key;
-                remappedValues[remappedKey] = values[key];
+            for (const QString &key: values.keys())
+            {
+                if (remapTable.contains(key))
+                {
+                    QString remappedKey = remapTable[key];
+                    remappedValues[remappedKey] = values[key];
+                    if (remappedKey == lit("durationMs"))
+                    {
+                        // seconds -> milliseconds
+                        int valueMs = remappedValues[remappedKey].toInt() * 1000;
+                        remappedValues[remappedKey] = QString::number(valueMs);
+                    }
+                }
+                else
+                {
+                    remappedValues[key] = values[key];
+                }
             }
 
             QByteArray remappedData;
@@ -1493,6 +1510,9 @@ bool QnDbManager::afterInstallUpdate(const QString& updateName)
         return ec2::database::migrations::reparentVideoWallLayouts(&m_resourceContext)
             && resyncIfNeeded({ResyncLayouts, ResyncVideoWalls});
     }
+    if (updateName.endsWith(lit("/92_rename_recording_param_name.sql")))
+        return updateBusinessActionParameters();
+
 
     NX_LOG(lit("SQL update %1 does not require post-actions.").arg(updateName), cl_logDEBUG1);
     return true;
