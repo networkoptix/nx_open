@@ -29,8 +29,11 @@
 #include <nx_ec/managers/abstract_camera_manager.h>
 #include <media_server/media_server_module.h>
 
+namespace {
 static const int NETSTATE_UPDATE_TIME = 1000 * 30;
 static const int RETRY_COUNT_FOR_FOREIGN_RESOURCES = 2;
+static const int kRetryCountToMakeCamOffline = 3;
+} // namespace
 
 QnMServerResourceDiscoveryManager::QnMServerResourceDiscoveryManager(QnCommonModule* commonModule):
     QnResourceDiscoveryManager(commonModule)
@@ -317,10 +320,11 @@ void QnMServerResourceDiscoveryManager::markOfflineIfNeeded(QSet<QString>& disco
             m_resourceDiscoveryCounter[uniqId]++;
 
 
-            if (m_resourceDiscoveryCounter[uniqId] >= 5)
+            if (m_resourceDiscoveryCounter[uniqId] >= kRetryCountToMakeCamOffline)
             {
                 QnVirtualCameraResource* camRes = dynamic_cast<QnVirtualCameraResource*>(netRes);
-                if (QnLiveStreamProvider::hasRunningLiveProvider(netRes)  || (camRes && !camRes->isScheduleDisabled())) {
+                if (QnLiveStreamProvider::hasRunningLiveProvider(netRes)  || (camRes && !camRes->isScheduleDisabled()))
+                {
                     if (res->getStatus() == Qn::Offline && !m_disconnectSended[uniqId]) {
                         QnVirtualCameraResourcePtr cam = res.dynamicCast<QnVirtualCameraResource>();
                         if (cam)

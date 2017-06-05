@@ -22,7 +22,7 @@ public:
         const std::string& systemId,
         const std::string& nonce) override;
 
-    virtual std::vector<api::AuthInfo> fetchUserAuthRecords(
+    virtual api::AuthInfo fetchUserAuthRecords(
         nx::db::QueryContext* const queryContext,
         const std::string& systemId,
         const std::string& userEmail) override;
@@ -31,12 +31,12 @@ public:
         nx::db::QueryContext* const queryContext,
         const std::string& systemId,
         const std::string& accountEmail,
-        const std::vector<api::AuthInfo>& userAuthRecords) override;
+        const api::AuthInfo& userAuthRecords) override;
 
 private:
     std::map<std::string, std::string> m_systemIdToNonce;
-    // map<pair<systemId, accountEmail>, auth info vector>
-    std::map<std::pair<std::string, std::string>, std::vector<api::AuthInfo>> m_userAuthInfo;
+    // map<pair<systemId, accountEmail>, auth info>
+    std::map<std::pair<std::string, std::string>, api::AuthInfo> m_userAuthInfo;
 };
 
 } // namespace rdb

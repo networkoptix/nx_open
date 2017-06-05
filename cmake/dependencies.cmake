@@ -25,6 +25,7 @@ function(detect_package_versions)
     endif()
 
     if(ANDROID)
+        set(_qt_version "5.6.2-2")
         set(_openssl_version "1.0.2g")
         set(_openal_version "1.17.2")
     endif()

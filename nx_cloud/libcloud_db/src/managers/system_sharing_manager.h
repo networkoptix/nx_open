@@ -19,6 +19,9 @@ class AbstractSystemSharingExtension
 public:
     virtual ~AbstractSystemSharingExtension() = default;
 
+    /**
+     * Called as the last step of adding NEW sharing (not updating existing one).
+     */
     virtual nx::db::DBResult afterSharingSystem(
         nx::db::QueryContext* const queryContext,
         const api::SystemSharing& sharing,

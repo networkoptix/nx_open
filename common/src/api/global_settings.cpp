@@ -86,10 +86,16 @@ QnGlobalSettings::QnGlobalSettings(QObject *parent):
         << initMiscAdaptors()
         ;
 
+    connect(this, &QnGlobalSettings::adminUserFound, this, &QnGlobalSettings::at_adminUserAdded, Qt::QueuedConnection);
     connect(commonModule()->resourcePool(), &QnResourcePool::resourceAdded, this,
-        &QnGlobalSettings::at_resourcePool_resourceAdded);
+        [this](const QnResourcePtr& resource)
+        {
+            if (resource->getId() == QnUserResource::kAdminGuid)
+                emit adminUserFound(resource);
+        }, Qt::DirectConnection);
+
     connect(commonModule()->resourcePool(), &QnResourcePool::resourceRemoved, this,
-        &QnGlobalSettings::at_resourcePool_resourceRemoved);
+        &QnGlobalSettings::at_resourcePool_resourceRemoved, Qt::DirectConnection);
     initialize();
 }
 
@@ -104,8 +110,9 @@ void QnGlobalSettings::initialize()
 {
     if (isInitialized())
         return;
-    for (const QnResourcePtr &resource : commonModule()->resourcePool()->getResources())
-        at_resourcePool_resourceAdded(resource);
+    const QnResourcePtr &resource = commonModule()->resourcePool()->getResourceById(QnUserResource::kAdminGuid);
+    if (resource)
+        at_adminUserAdded(resource);
 }
 
 bool QnGlobalSettings::isInitialized() const
@@ -457,7 +464,8 @@ void QnGlobalSettings::setAutoDiscoveryEnabled(bool enabled)
     m_autoDiscoveryEnabledAdaptor->setValue(enabled);
 }
 
-void QnGlobalSettings::at_resourcePool_resourceAdded(const QnResourcePtr &resource) {
+void QnGlobalSettings::at_adminUserAdded(const QnResourcePtr &resource)
+{
     if(m_admin)
         return;
 
@@ -479,7 +487,8 @@ void QnGlobalSettings::at_resourcePool_resourceAdded(const QnResourcePtr &resour
     emit initialized();
 }
 
-void QnGlobalSettings::at_resourcePool_resourceRemoved(const QnResourcePtr &resource) {
+void QnGlobalSettings::at_resourcePool_resourceRemoved(const QnResourcePtr &resource) 
+{
     if (!m_admin || resource != m_admin)
         return;
 

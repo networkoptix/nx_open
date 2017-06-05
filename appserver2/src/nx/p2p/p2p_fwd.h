@@ -1,0 +1,109 @@
+#pragma once
+
+#include <QtCore/QtGlobal>
+#include <QtCore/QMetaType>
+#include <QtCore/QString>
+#include <QtCore/QStringList>
+
+#include <nx/fusion/model_functions_fwd.h>
+#include <nx/fusion/serialization_format.h>
+
+#include <nx_ec/data/api_peer_data.h>
+#include <nx/fusion/fusion/fusion_fwd.h>
+
+namespace nx {
+
+#ifdef THIS_BLOCK_IS_REQUIRED_TO_MAKE_FILE_BE_PROCESSED_BY_MOC_DO_NOT_DELETE
+Q_OBJECT
+#endif
+QN_DECLARE_METAOBJECT_HEADER(p2p, MessageType, )
+
+enum class MessageType
+{
+    start,
+    stop,
+    resolvePeerNumberRequest,
+    resolvePeerNumberResponse,
+    alivePeers,
+    subscribeForDataUpdates,
+    pushTransactionData,
+    pushTransactionList, //< for UbJson format only
+    pushUnicastTransaction, //< for non persistent transactions only
+
+    counter
+};
+QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(MessageType)
+
+using PeerNumberType = quint16;
+const static PeerNumberType kUnknownPeerNumnber = 0xffff;
+
+struct PeerNumberInfo
+{
+    ec2::ApiPersistentIdData decode(PeerNumberType number) const;
+    PeerNumberType encode(const ec2::ApiPersistentIdData& peer, PeerNumberType shortNumber = kUnknownPeerNumnber);
+private:
+    QMap<ec2::ApiPersistentIdData, PeerNumberType> m_fullIdToShortId;
+    QMap<PeerNumberType, ec2::ApiPersistentIdData> m_shortIdToFullId;
+};
+
+struct SubscribeRecord
+{
+    SubscribeRecord() {}
+    SubscribeRecord(PeerNumberType peer, qint32 sequence): peer(peer), sequence(sequence) {}
+
+    PeerNumberType peer = 0;
+    qint32 sequence = 0;
+};
+
+struct PeerDistanceRecord
+{
+    PeerDistanceRecord() {}
+    PeerDistanceRecord(PeerNumberType peerNumber, qint32 distance):
+        peerNumber(peerNumber),
+        distance(distance)
+    {
+    }
+    static const int kMaxRecordSize = 7; // 2 bytes number + 4 bytes distance + online flag
+
+    PeerNumberType peerNumber = 0;
+    qint32 distance = 0;
+};
+
+struct PeerNumberResponseRecord: public ec2::ApiPersistentIdData
+{
+    static const int kRecordSize = 16 * 2 + 2; //< two guid + uncompressed PeerNumber per record
+
+    PeerNumberResponseRecord() {}
+    PeerNumberResponseRecord(PeerNumberType peerNumber, const ec2::ApiPersistentIdData& id):
+        ec2::ApiPersistentIdData(id),
+        peerNumber(peerNumber)
+    {
+    }
+
+    PeerNumberType peerNumber = 0;
+};
+
+struct BidirectionRoutingInfo;
+
+struct UnicastTransactionRecord
+{
+    UnicastTransactionRecord() {}
+    UnicastTransactionRecord(const QnUuid& dstPeer, int ttl):
+        dstPeer(dstPeer),
+        ttl(ttl)
+    {
+    }
+    static const int kRecordSize = 16 + 1;
+    QnUuid dstPeer;
+    quint8 ttl = 0;
+};
+using UnicastTransactionRecords = std::vector<UnicastTransactionRecord>;
+
+static const qint32 kMaxDistance = std::numeric_limits<qint32>::max();
+static const qint32 kMaxOnlineDistance = 16384;
+static const char* kP2pProtoName = "nxp2p";
+
+} // namespace p2p
+} // namespace nx
+
+QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES((nx::p2p::MessageType), (metatype)(lexical))

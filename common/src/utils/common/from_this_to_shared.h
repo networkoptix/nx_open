@@ -19,6 +19,11 @@ public:
         return m_weakPointer.toStrongRef();
     }
 
+    QWeakPointer<T> weakPointer() const
+    {
+        return m_weakPointer;
+    }
+
 private:
     /** Weak reference to this, to make conversion to shared pointer possible. */
     QWeakPointer<T> m_weakPointer;

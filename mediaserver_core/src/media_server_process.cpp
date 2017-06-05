@@ -213,7 +213,7 @@
 #include "platform/platform_abstraction.h"
 #include "core/ptz/server_ptz_controller_pool.h"
 #include "plugins/resource/acti/acti_resource.h"
-#include "transaction/transaction_message_bus.h"
+#include "transaction/transaction_message_bus_base.h"
 #include "common/common_module.h"
 #include "proxy/proxy_receiver_connection_processor.h"
 #include "proxy/proxy_connection.h"
@@ -267,6 +267,7 @@
 #ifdef __arm__
 #include "nx1/info.h"
 #endif
+#include <config.h>
 
 // This constant is used while checking for compatibility.
 // Do not change it until you know what you're doing.
@@ -304,7 +305,8 @@ static QString kLogTag = toString(typeid(MediaServerProcess));
 bool initResourceTypes(const ec2::AbstractECConnectionPtr& ec2Connection)
 {
     QList<QnResourceTypePtr> resourceTypeList;
-    const ec2::ErrorCode errorCode = ec2Connection->getResourceManager(Qn::kSystemAccess)->getResourceTypesSync(&resourceTypeList);
+    auto manager = ec2Connection->getResourceManager(Qn::kSystemAccess);
+    const ec2::ErrorCode errorCode = manager->getResourceTypesSync(&resourceTypeList);
     if (errorCode != ec2::ErrorCode::ok)
     {
         NX_LOG(QString::fromLatin1("Failed to load resource types. %1").arg(ec2::toString(errorCode)), cl_logERROR);
@@ -1005,14 +1007,14 @@ MediaServerProcess::MediaServerProcess(int argc, char* argv[], bool serviceMode)
 
     parseCommandLineParameters(argc, argv);
 
-    MSSettings settings(
+    m_settings.reset(new MSSettings(
         m_cmdLineArguments.configFilePath,
-        m_cmdLineArguments.rwConfigFilePath);
+        m_cmdLineArguments.rwConfigFilePath));
 
-    addCommandLineParametersFromConfig(&settings);
+    addCommandLineParametersFromConfig(m_settings.get());
 
     const bool isStatisticsDisabled =
-        settings.roSettings()->value(QnServer::kNoMonitorStatistics, false).toBool();
+        m_settings->roSettings()->value(QnServer::kNoMonitorStatistics, false).toBool();
 
     m_platform.reset(new QnPlatformAbstraction());
     m_platform->process(NULL)->setPriority(QnPlatformProcess::HighPriority);
@@ -1031,6 +1033,7 @@ void MediaServerProcess::parseCommandLineParameters(int argc, char* argv[])
         "INFO"
 #endif
     );
+    commandLineParser.addParameter(&m_cmdLineArguments.exceptionFilters, "--exception-filters", NULL, "Log filters.");
     commandLineParser.addParameter(&m_cmdLineArguments.msgLogLevel, "--http-log-level", NULL,
         "Log value for http_log.log. Supported values same as above. Default is none (no logging)", "none");
     commandLineParser.addParameter(&m_cmdLineArguments.ec2TranLogLevel, "--ec2-tran-log-level", NULL,
@@ -1059,6 +1062,8 @@ void MediaServerProcess::parseCommandLineParameters(int argc, char* argv[])
         lit("Enforces mediator address"), QString());
     commandLineParser.addParameter(&m_cmdLineArguments.ipVersion, "--ip-version", NULL,
         lit("Force ip version"), QString());
+    commandLineParser.addParameter(&m_cmdLineArguments.createFakeData, "--create-fake-data", NULL,
+        lit("Create fake data: users,cameras,propertiesPerCamera,camerasPerLayout,storageCount"), QString());
     commandLineParser.addParameter(&m_cmdLineArguments.cleanupDb, "--cleanup-db", NULL,
         lit("Deletes resources with NULL ids, "
             "cleans dangling cameras' and servers' user attributes, "
@@ -1762,7 +1767,7 @@ void MediaServerProcess::at_cameraIPConflict(const QHostAddress& host, const QSt
 void MediaServerProcess::registerRestHandlers(
     CloudManagerGroup* cloudManagerGroup,
     QnUniversalTcpListener* tcpListener,
-    ec2::QnTransactionMessageBus* messageBus)
+    ec2::QnTransactionMessageBusBase* messageBus)
 {
 	auto processorPool = tcpListener->processorPool();
     const auto welcomePage = lit("/static/index.html");
@@ -1871,7 +1876,7 @@ void MediaServerProcess::registerRestHandlers(
 
 bool MediaServerProcess::initTcpListener(
     CloudManagerGroup* const cloudManagerGroup,
-    ec2::QnTransactionMessageBus* messageBus)
+    ec2::QnTransactionMessageBusBase* messageBus)
 {
     m_autoRequestForwarder.reset( new QnAutoRequestForwarder(commonModule() ));
     m_autoRequestForwarder->addPathToIgnore(lit("/ec2/*"));
@@ -2213,6 +2218,113 @@ void MediaServerProcess::updateGuidIfNeeded()
         setObsoleteGuid(obsoleteGuid);
 }
 
+void MediaServerProcess::makeFakeData(
+    const QString& fakeDataString, const ec2::AbstractECConnectionPtr& connection)
+{
+    if (fakeDataString.isEmpty())
+        return;
+
+    const auto fakeData = fakeDataString.split(',');
+    int userCount = fakeData.value(0).toInt(0);
+    int camerasCount = fakeData.value(1).toInt(0);
+    int propertiesPerCamera = fakeData.value(2).toInt(0);
+    int camerasPerLayout = fakeData.value(3).toInt(0);
+    int storageCount = fakeData.value(4).toInt(0);
+
+    qWarning() << "Create fake data:"
+        << userCount << "users,"
+        << camerasCount << "cameras," << propertiesPerCamera << "properties per camera,"
+        << camerasPerLayout << "cameras per layout," << storageCount << "storages";
+
+    std::vector<ec2::ApiUserData> users;
+    for (int i = 0; i < userCount; ++i)
+    {
+        ec2::ApiUserData userData;
+        userData.id = QnUuid::createUuid();
+        userData.name = lm("user_%1").arg(i);
+        userData.isEnabled = true;
+        userData.isCloud = false;
+        users.push_back(userData);
+    }
+
+    std::vector<ec2::ApiCameraData> cameras;
+    std::vector<ec2::ApiCameraAttributesData> userAttrs;
+    ec2::ApiResourceParamWithRefDataList cameraParams;
+    const auto& moduleGuid = commonModule()->moduleGUID();
+    auto resTypePtr = qnResTypePool->getResourceTypeByName("Camera");
+    NX_ASSERT(!resTypePtr.isNull());
+    for (int i = 0; i < camerasCount; ++i)
+    {
+        ec2::ApiCameraData cameraData;
+        cameraData.typeId = resTypePtr->getId();
+        cameraData.parentId = moduleGuid;
+        cameraData.vendor = "Invalid camera";
+        cameraData.physicalId = QnUuid::createUuid().toString();
+        cameraData.id = ec2::ApiCameraData::physicalIdToId(cameraData.physicalId);
+        cameraData.name = lm("Camera %1").arg(cameraData.id);
+        cameras.push_back(std::move(cameraData));
+
+        ec2::ApiCameraAttributesData userAttr;
+        userAttr.cameraId = cameraData.id;
+        userAttrs.push_back(userAttr);
+
+        for (int j = 0; j < propertiesPerCamera; ++j)
+        {
+            cameraParams.push_back(ec2::ApiResourceParamWithRefData(
+                cameraData.id, lit("property%1").arg(j), lit("value%1").arg(j)));
+        }
+    }
+
+    std::vector<ec2::ApiLayoutData> layouts;
+    if (camerasPerLayout)
+    {
+        for (int minCameraOnLayout = 0; minCameraOnLayout < camerasCount;
+             minCameraOnLayout += camerasPerLayout)
+        {
+            ec2::ApiLayoutData layout;
+            layout.id = QnUuid::createUuid();
+            for (int cameraIndex = minCameraOnLayout;
+                 cameraIndex < minCameraOnLayout + camerasPerLayout && cameraIndex < camerasCount;
+                 ++cameraIndex)
+            {
+                ec2::ApiLayoutItemData item;
+                item.id = cameras[cameraIndex].id;
+                layout.items.push_back(item);
+            }
+
+            layouts.push_back(layout);
+        }
+    }
+
+    std::vector<ec2::ApiStorageData> storages;
+    for (int i = 0; i < storageCount; ++i)
+    {
+        ec2::ApiStorageData storage;
+        storage.id = QnUuid::createUuid();
+        storage.parentId = commonModule()->moduleGUID();
+        storage.name = lm("Fake Storage/%1").arg(storage.id);
+        storage.url = lm("/tmp/fakeStorage/%1").arg(storage.id);
+        storages.push_back(storage);
+    }
+
+    auto userManager = connection->getUserManager(Qn::kSystemAccess);
+    auto cameraManager = connection->getCameraManager(Qn::kSystemAccess);
+    auto resourceManager = connection->getResourceManager(Qn::kSystemAccess);
+    auto layoutManager = connection->getLayoutManager(Qn::kSystemAccess);
+    auto serverManager = connection->getMediaServerManager(Qn::kSystemAccess);
+
+    for (const auto& user: users)
+        NX_ASSERT(ec2::ErrorCode::ok == userManager->saveSync(user));
+
+    NX_ASSERT(ec2::ErrorCode::ok == cameraManager->saveUserAttributesSync(userAttrs));
+    NX_ASSERT(ec2::ErrorCode::ok == resourceManager->saveSync(cameraParams));
+    NX_ASSERT(ec2::ErrorCode::ok == cameraManager->addCamerasSync(cameras));
+    NX_ASSERT(ec2::ErrorCode::ok == serverManager->saveStoragesSync(storages));
+
+    for (const auto& layout: layouts)
+        NX_ASSERT(ec2::ErrorCode::ok == layoutManager->saveSync(layout));
+}
+
 void MediaServerProcess::serviceModeInit()
 {
     const auto settings = qnServerModule->roSettings();
@@ -2242,6 +2354,10 @@ void MediaServerProcess::serviceModeInit()
         };
 
     logSettings.level = makeLevel(cmdLineArguments().logLevel, "logLevel");
+
+    for (const auto& filter: cmdLineArguments().exceptionFilters.split(L';', QString::SkipEmptyParts))
+        logSettings.exceptionFilers.insert(filter);
+
     nx::utils::log::initialize(
         logSettings, dataLocation, qApp->applicationName(), binaryPath);
 
@@ -2278,7 +2394,6 @@ void MediaServerProcess::serviceModeInit()
 
 void MediaServerProcess::run()
 {
-
     std::shared_ptr<QnMediaServerModule> serverModule(new QnMediaServerModule(
         m_cmdLineArguments.enforcedMediatorEndpoint,
         m_cmdLineArguments.configFilePath,
@@ -2453,6 +2568,7 @@ void MediaServerProcess::run()
     ec2::ApiRuntimeData runtimeData;
     runtimeData.peer.id = commonModule()->moduleGUID();
     runtimeData.peer.instanceId = commonModule()->runningInstanceGUID();
+    runtimeData.peer.persistentId = commonModule()->dbId();
     runtimeData.peer.peerType = Qn::PT_Server;
     runtimeData.box = QnAppInfo::armBox();
     runtimeData.brand = QnAppInfo::productNameShort();
@@ -2523,6 +2639,7 @@ void MediaServerProcess::run()
         QnSleep::msleep(3000);
     }
     QnAppServerConnectionFactory::setEc2Connection(ec2Connection);
+
     const auto& runtimeManager = commonModule()->runtimeInfoManager();
     connect(runtimeManager, &QnRuntimeInfoManager::runtimeInfoAdded, this, &MediaServerProcess::at_runtimeInfoChanged);
     connect(runtimeManager, &QnRuntimeInfoManager::runtimeInfoChanged, this, &MediaServerProcess::at_runtimeInfoChanged);
@@ -2859,7 +2976,7 @@ void MediaServerProcess::run()
     if (!qnServerModule->roSettings()->value(QnServer::kNoInitStoragesOnStartup, false).toBool())
         initStoragesAsync(commonModule()->messageProcessor());
 
-    if (!QnPermissionsHelper::isSafeMode())
+    if (!QnPermissionsHelper::isSafeMode(commonModule()))
     {
         if (nx::mserver_aux::needToResetSystem(
                     nx::mserver_aux::isNewServerInstance(
@@ -2989,6 +3106,8 @@ void MediaServerProcess::run()
             commonModule()->moduleDiscoveryManager()->start();
     }
 #endif
+
+    makeFakeData( cmdLineArguments().createFakeData, ec2Connection);
     qnBackupStorageMan->scheduleSync()->start();
     serverModule->unusedWallpapersWatcher()->start();
     emit started();
@@ -3077,6 +3196,7 @@ void MediaServerProcess::run()
     //disconnecting from EC2
     clearEc2ConnectionGuard.reset();
 
+    connectToCloudWatcher.reset();
     ec2Connection.reset();
     ec2ConnectionFactory.reset();
 
@@ -3199,9 +3319,9 @@ protected:
             QCoreApplication::setApplicationVersion(QnAppInfo::applicationVersion());
 
         if (application->isRunning() &&
-            qnServerModule->roSettings()->value(nx_ms_conf::ENABLE_MULTIPLE_INSTANCES).toInt() == 0)
+            m_main->serverSettings()->roSettings()->value(nx_ms_conf::ENABLE_MULTIPLE_INSTANCES).toInt() == 0)
         {
-            NX_LOG("Server already started", cl_logERROR);
+            qWarning() << "Server already started";
             qApp->quit();
             return;
         }

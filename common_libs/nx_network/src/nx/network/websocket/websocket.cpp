@@ -165,7 +165,7 @@ void WebSocket::processReadData()
 
 void WebSocket::readWithoutAddingToQueue()
 {
-    post([this]() { readWithoutAddingToQueue(); });
+    post([this]() { readWithoutAddingToQueueSync(); });
 }
 
 void WebSocket::readWithoutAddingToQueueSync()

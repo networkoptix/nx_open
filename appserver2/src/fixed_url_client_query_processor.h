@@ -61,6 +61,12 @@ namespace ec2
             return m_ecURL;
         }
 
+        QnUuid getId() const
+        {
+            QnMutexLocker lk(&m_mutex);
+            return m_peerId;
+        }
+
         QString userName() const
         {
             QnMutexLocker lk( &m_mutex );
@@ -76,6 +82,7 @@ namespace ec2
     private:
         ClientQueryProcessor* m_clientProcessor;
         QUrl m_ecURL;
+        QnUuid m_peerId;
         mutable QnMutex m_mutex;
     };
 

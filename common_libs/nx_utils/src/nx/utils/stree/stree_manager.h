@@ -20,7 +20,7 @@ public:
     */
     StreeManager(
         const nx::utils::stree::ResourceNameSet& resourceNameSet,
-        const QString& xmlFilePath) throw(std::runtime_error);
+        const QString& xmlFilePath) noexcept(false);
 
     void search(
         const nx::utils::stree::AbstractResourceReader& input,
@@ -36,7 +36,7 @@ private:
     const nx::utils::stree::ResourceNameSet& m_attrNameSet;
     const QString m_xmlFilePath;
 
-    void loadStree() throw(std::runtime_error);
+    void loadStree() noexcept(false);
 };
 
 } // namespace stree

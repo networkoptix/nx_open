@@ -30,12 +30,19 @@ public:
         QnReadWriteLock& m_mutex;
     };
 
-    class QnDbTransactionLocker
+    class QnAbstractTransactionLocker
+    {
+    public:
+        virtual ~QnAbstractTransactionLocker() {}
+        virtual bool commit() = 0;
+    };
+
+    class QnDbTransactionLocker: public QnAbstractTransactionLocker
     {
     public:
         QnDbTransactionLocker(QnDbTransaction* tran);
-        ~QnDbTransactionLocker();
-        bool commit();
+        virtual ~QnDbTransactionLocker();
+        virtual bool commit() override;
 
     private:
         bool m_committed;
@@ -45,7 +52,7 @@ public:
     QnDbHelper();
     virtual ~QnDbHelper();
 
-    static bool tuneDBAfterOpen(QSqlDatabase* const sqlDb);
+    virtual bool tuneDBAfterOpen(QSqlDatabase* const sqlDb);
 
     virtual QnDbTransaction* getTransaction() = 0;
 

@@ -1,4 +1,4 @@
-nx_add_target(nx_network_ut EXECUTABLE
+nx_add_test(nx_network_ut
     PUBLIC_LIBS
         GTest GMock
         nx_network
