@@ -103,7 +103,7 @@ void ConnectSessionManager::createClientSession(
     if (peerName.empty())
     {
         NX_LOGX(lm("Session %1. Listening peer %2 was not found")
-            .arg(request.targetPeerName), cl_logDEBUG1);
+            .arg(request.desiredSessionId).arg(request.targetPeerName), cl_logDEBUG1);
         return completionHandler(
             api::ResultCode::notFound,
             std::move(response));
