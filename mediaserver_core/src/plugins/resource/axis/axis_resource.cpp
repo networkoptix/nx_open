@@ -570,6 +570,11 @@ CameraDiagnostics::Result QnPlAxisResource::initInternal()
 
     fetchAndSetAdvancedParameters();
 
+    // Copy information from build-in resource type to runtime params
+    // because mobile client doesn't load resource type information.
+    if (isIOModule())
+        setProperty(Qn::IO_CONFIG_PARAM_NAME, QString(lit("1")));
+
     saveParams();
 
     return CameraDiagnostics::NoErrorResult();

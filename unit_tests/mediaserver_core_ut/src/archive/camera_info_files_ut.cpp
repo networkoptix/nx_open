@@ -172,16 +172,6 @@ TEST(ComposerTest, CameraNOTFound)
     ASSERT_TRUE(composer.make(nullptr).isEmpty());
 }
 
-class DerivedTestWriter : public nx::caminfo::Writer
-{
-public:
-    using nx::caminfo::Writer::Writer;
-    void setWriteInterval(std::chrono::milliseconds interval)
-    {
-        nx::caminfo::Writer::setWriteInterval(interval);
-    }
-};
-
 class WriterTest : public ::testing::Test
 {
 protected:
@@ -206,7 +196,7 @@ protected:
     };
 
     WriterTestHandler testHandler;
-    DerivedTestWriter writer;
+    nx::caminfo::Writer writer;
     QStringList storagesUrls;
     QStringList camerasIds;
 
@@ -285,8 +275,6 @@ TEST_F(WriterTest, AllFilesWritten)
 
 TEST_F(WriterTest, DontWriteSameData)
 {
-    auto kWriteInterval = std::chrono::milliseconds(10);
-    writer.setWriteInterval(kWriteInterval);
     when(StoragesCount::Two, CamerasCount::Three);
 
     writer.write();
@@ -295,34 +283,9 @@ TEST_F(WriterTest, DontWriteSameData)
     resetWrittenData();
     thenWrittenFiles(0);
 
-    std::this_thread::sleep_for(kWriteInterval + std::chrono::milliseconds(5));
     writer.write();
     thenWrittenFiles(0);
 }
-
-TEST_F(WriterTest, IntervalTest)
-{
-    auto kWriteInterval = std::chrono::milliseconds(100);
-    writer.setWriteInterval(kWriteInterval);
-    when(StoragesCount::Two, CamerasCount::Three);
-
-    writer.write();
-
-    thenWrittenFiles(12);
-    resetWrittenData();
-    thenWrittenFiles(0);
-
-    addCameraProperty();
-    std::this_thread::sleep_for(kWriteInterval/2);
-    writer.write();
-    thenWrittenFiles(0);
-
-    std::this_thread::sleep_for(kWriteInterval/2 + std::chrono::milliseconds(5));
-    writer.write();
-    thenWrittenFiles(12);
-    thenAllFilesContainsPatternData(PatternData::WithAdditionalProp);
-}
-
 
 const QnUuid kModuleGuid = QnUuid::fromStringSafe(lit("{95a380a7-f7d7-4a4a-906f-b9c101a33ef1}"));
 const QnUuid kArchiveCamTypeGuid = QnUuid::fromStringSafe(lit("{1d250fa0-ce88-4358-9bc9-4f39d0ce3b12}"));
@@ -555,8 +518,8 @@ TEST_F(ReaderTest, ErrorsInData)
     for (const char* fileData: kInvalidFileDataList)
     {
         nx::caminfo::Reader(
-            &readerHandler, 
-            fileInfo, 
+            &readerHandler,
+            fileInfo,
             [fileData](const QString&)
             {
                 return QByteArray(fileData);
