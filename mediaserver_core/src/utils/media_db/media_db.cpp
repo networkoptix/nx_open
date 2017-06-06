@@ -22,17 +22,17 @@ QDataStream &operator << (QDataStream &stream, const StructToWrite &s)
 class RecordVisitor : public boost::static_visitor<>
 {
 public:
-    RecordVisitor(QDataStream* stream, Error *error) 
+    RecordVisitor(QDataStream* stream, Error *error)
         : m_stream(stream),
           m_error(error)
     {}
-   
+
     void operator() (const CameraOperation &camOp) const
     {
         *m_stream << camOp.part1;
         if (m_stream->status() == QDataStream::WriteFailed)
         {
-            qWarning() << "Media DB Camera operation write error: QDataStream::WriteFailed. errno: " 
+            qWarning() << "Media DB Camera operation write error: QDataStream::WriteFailed. errno: "
                        << strerror(errno);
             *m_error = Error::WriteError;
             return;
@@ -42,7 +42,7 @@ public:
                                                   bytesToWrite);
         if (bytesToWrite != bytesWritten)
         {
-            qWarning() << "Media DB Camera operation write error: QDataStream::WriteRawData wrong bytes written count. errno: " 
+            qWarning() << "Media DB Camera operation write error: QDataStream::WriteRawData wrong bytes written count. errno: "
                        << strerror(errno)
                        << ". Bytes to write = " << bytesToWrite
                        << "; Bytes written = " << bytesWritten;
@@ -51,12 +51,12 @@ public:
     }
 
     template<typename StructToWrite>
-    void operator() (const StructToWrite &s) const 
-    { 
-        *m_stream << s; 
+    void operator() (const StructToWrite &s) const
+    {
+        *m_stream << s;
         if (m_stream->status() == QDataStream::WriteFailed)
         {
-            qWarning() << "Media DB Media File operation write error: QDataStream::WriteFailed. errno: " 
+            qWarning() << "Media DB Media File operation write error: QDataStream::WriteFailed. errno: "
                        << strerror(errno);
             *m_error = Error::WriteError;
             return;
@@ -81,7 +81,7 @@ DbHelper::DbHelper(DbHelperHandler *const handler)
     start();
 }
 
-void DbHelper::run() 
+void DbHelper::run()
 {
     while (!m_needStop)
     {
@@ -94,7 +94,7 @@ void DbHelper::run()
                     .arg(m_needStop), cl_logDEBUG2);
             m_cond.wait(lk.mutex());
         }
-        
+
         if (m_needStop)
             return;
 
@@ -120,7 +120,7 @@ void DbHelper::run()
         {
             m_handler->handleRecordWrite(error);
             continue;
-        } 
+        }
         else
             m_handler->handleRecordWrite(error);
 
