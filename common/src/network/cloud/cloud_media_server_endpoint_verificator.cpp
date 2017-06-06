@@ -83,7 +83,7 @@ void CloudMediaServerEndpointVerificator::onHttpRequestDone()
     }
 
     if (!nx_http::StatusCode::isSuccessCode(
-        m_httpClient->response()->statusLine.statusCode))
+            m_httpClient->response()->statusLine.statusCode))
     {
         NX_LOGX(lm("cross-nat %1. Http request to %2 has failed: %3")
             .arg(m_connectSessionId).arg(m_endpointToVerify.toString())

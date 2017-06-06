@@ -52,6 +52,7 @@ Yunhong Gu, last updated 01/18/2011
 #include <ws2tcpip.h>
 #endif
 #include <windows.h>
+#include <winsock2.h>
 #endif
 #include <fstream>
 #include <map>
@@ -332,7 +333,7 @@ UDT_API int64_t recvfile(UDTSOCKET u, std::fstream& ofs, int64_t& offset, int64_
 UDT_API int64_t sendfile2(UDTSOCKET u, const char* path, int64_t* offset, int64_t size, int block = 364000);
 UDT_API int64_t recvfile2(UDTSOCKET u, const char* path, int64_t* offset, int64_t size, int block = 7280000);
 
-// select and selectEX are DEPRECATED; please use epoll. 
+// select and selectEX are DEPRECATED; please use epoll.
 UDT_API int select(int nfds, UDSET* readfds, UDSET* writefds, UDSET* exceptfds, const struct timeval* timeout);
 UDT_API int selectEx(const std::vector<UDTSOCKET>& fds, std::vector<UDTSOCKET>* readfds,
     std::vector<UDTSOCKET>* writefds, std::vector<UDTSOCKET>* exceptfds, int64_t msTimeOut);

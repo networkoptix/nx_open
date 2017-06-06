@@ -29,9 +29,26 @@ class StreeManager;
 namespace conf { class Settings; }
 
 /**
- * \note Methods of this class are re-enterable
+ * This interface introduced for testing purposes. 
+ * It is incomplete and quite raw.
+ */
+class AbstractAccountManager
+{
+public:
+    virtual ~AbstractAccountManager() = default;
+
+    /**
+     * Fetches account from cache.
+     */
+    virtual boost::optional<data::AccountData> findAccountByUserName(
+        const std::string& userName) const = 0;
+};
+
+/**
+ * NOTE: Methods of this class are re-enterable
  */
 class AccountManager:
+    public AbstractAccountManager,
     public AbstractAuthenticationDataProvider
 {
 public:
@@ -47,7 +64,7 @@ public:
         const StreeManager& streeManager,
         TemporaryAccountPasswordManager* const tempPasswordManager,
         nx::db::AsyncSqlQueryExecutor* const dbManager,
-        AbstractEmailManager* const emailManager) throw(std::runtime_error);
+        AbstractEmailManager* const emailManager) noexcept(false);
     virtual ~AccountManager();
 
     virtual void authenticateByName(
@@ -106,8 +123,8 @@ public:
     /**
      * Fetches account from cache.
      */
-    boost::optional<data::AccountData> findAccountByUserName(
-        const std::string& userName) const;
+    virtual boost::optional<data::AccountData> findAccountByUserName(
+        const std::string& userName) const override;
     
     nx::db::DBResult insertAccount(
         nx::db::QueryContext* const queryContext,

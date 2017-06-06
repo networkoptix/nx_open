@@ -1,5 +1,5 @@
 function(set_output_directories)
-    cmake_parse_arguments(DIR "" "RUNTIME;LIBRARY" "" ${ARGN})
+    cmake_parse_arguments(DIR "" "RUNTIME;LIBRARY;AFFECTED_VARIABLES_RESULT" "" ${ARGN})
 
     if(DIR_RUNTIME)
         set(DIR_RUNTIME "/${DIR_RUNTIME}")
@@ -9,12 +9,14 @@ function(set_output_directories)
     endif()
 
     if(CMAKE_MULTI_CONFIGURATION_MODE)
-        set(configs ${CMAKE_CONFIGURATION_TYPES})
+        set(configs ${CMAKE_ACTIVE_CONFIGURATIONS})
     else()
         set(configs " ")
     endif()
 
-    foreach(config ${configs})
+    set(affected_variables)
+
+    foreach(config IN LISTS configs)
         if(config STREQUAL " ")
             set(CONFIG "")
             set(base "${CMAKE_BINARY_DIR}")
@@ -28,8 +30,14 @@ function(set_output_directories)
         file(MAKE_DIRECTORY "${base}${DIR_LIBRARY}")
 
         set(CMAKE_RUNTIME_OUTPUT_DIRECTORY${CONFIG} "${base}${DIR_RUNTIME}" PARENT_SCOPE)
+        list(APPEND affected_variables "CMAKE_RUNTIME_OUTPUT_DIRECTORY${CONFIG}")
         set(CMAKE_LIBRARY_OUTPUT_DIRECTORY${CONFIG} "${base}${DIR_LIBRARY}" PARENT_SCOPE)
+        list(APPEND affected_variables "CMAKE_LIBRARY_OUTPUT_DIRECTORY${CONFIG}")
     endforeach()
+
+    if(DIR_AFFECTED_VARIABLES_RESULT)
+        set(${DIR_AFFECTED_VARIABLES_RESULT} ${affected_variables} PARENT_SCOPE)
+    endif()
 endfunction()
 
 set_output_directories(RUNTIME "bin" LIBRARY "lib")

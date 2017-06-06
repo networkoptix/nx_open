@@ -135,7 +135,7 @@ $table-cell-padding:          5px 16px 6px 16px;
 $link-color:                  $brand_d2;
 $link-hover-color:            $brand_core;
 
-$grid-float-breakpoint:       600px;
+$grid-float-breakpoint:       420px;
 $dialog-sm-float-breakpoint:     434px;
 
 $panel-body-padding:    16px;
@@ -146,3 +146,6 @@ $navbar-default-link-active-bg: $navbar-default-bg;
 $navbar-padding-horizontal:   0;
 $navbar-padding-vertical:     0;
 $navbar-default-link-active-color: $brand_core;
+
+$dropdown-link-active-bg:   transparent;
+$dropdown-link-active-color: $brand_core;

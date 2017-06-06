@@ -119,18 +119,26 @@ def get_box_time(box):
 def discover_primary_server(env):
     time_response_one = env.one.rest_api.ec2.getCurrentTime.GET()
     time_response_two = env.two.rest_api.ec2.getCurrentTime.GET()
-    if time_response_one['isPrimaryTimeServer']:
+    one_is_primary = time_response_one['isPrimaryTimeServer']
+    two_is_primary = time_response_two['isPrimaryTimeServer']
+    assert not (one_is_primary and two_is_primary), 'Both servers are reported to be primary'
+    if one_is_primary:
         env.primary = env.one
         env.primary_box = env.one_box
         env.secondary = env.two
         env.secondary_box = env.two_box
-    if time_response_two['isPrimaryTimeServer']:
+    elif two_is_primary:
         env.primary = env.two
         env.primary_box = env.two_box
         env.secondary = env.one
         env.secondary_box = env.one_box
     else:
         assert False, 'There is no primary server in the system'
+
+
+def switch_primary_and_secondary(env):
+    env.primary, env.secondary = env.secondary, env.primary
+    env.primary_box, env.secondary_box = env.secondary_box, env.primary_box
 
 
 def wait_for_server_and_box_time_synced(server, box):
@@ -262,7 +270,7 @@ def test_initial(env):
 
 def test_change_primary_server(env):
     env.secondary.rest_api.ec2.forcePrimaryTimeServer.POST(id=env.secondary.ecs_guid)
-    env.primary, env.secondary = env.secondary, env.primary
+    switch_primary_and_secondary(env)
     set_box_time(env.primary, BASE_TIME + timedelta(hours=5))
     wait_for_server_and_box_time_synced(env.primary, env.primary_box)
     wait_for_servers_time_synced(env)
@@ -307,7 +315,8 @@ def test_primary_server_temporary_offline(env):
 #     assert len(servers) == 1 and servers[0]['id'] == env.secondary.ecs_guid
 #     time_response_secondary = env.secondary.rest_api.ec2.getCurrentTime.GET()
 #     assert time_response_secondary['isPrimaryTimeServer']
-#     env.primary, env.secondary = env.secondary, None
+#     env.primary, env.primary_box = env.secondary, env.secondary_box
+#     env.secondary = env.secondary_box = None
 #     set_box_time(env.primary, BASE_TIME - timedelta(hours=15))
 #     wait_for_server_and_box_time_synced(env.primary, env.primary_box)
 

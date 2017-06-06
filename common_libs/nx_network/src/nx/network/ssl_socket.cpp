@@ -39,7 +39,7 @@
         NX_LOGX(MESSAGE, cl_logDEBUG1); \
 } while (0)
 
-static const std::size_t kSslAsyncRecvBufferSize(1024 * 100);
+static const std::size_t kSslAsyncRecvBufferSize(1024 * 64);
 
 namespace nx {
 namespace network {
@@ -1019,8 +1019,6 @@ SslSocket::SslSocket(
         }),
     d_ptr(priv)
 {
-    ssl::initOpenSSLGlobalLock();
-
     Q_D(SslSocket);
     d->wrappedSocket = std::move(wrappedSocket);
     d->isServerSide = isServerSide;
@@ -1423,7 +1421,7 @@ bool SslSocket::connect(
     if (!d->nonBlockingMode)
     {
         if (!d->wrappedSocket->setNonBlockingMode(false))
-            return -1;
+            return false;
     }
 
     const auto result = d->wrappedSocket->connect(remoteAddress, timeoutMillis);
@@ -1431,7 +1429,7 @@ bool SslSocket::connect(
     if (!d->nonBlockingMode && result)
     {
         if (!d->wrappedSocket->setNonBlockingMode(true))
-            return -1;
+            return false;
     }
 
     return result;
@@ -1481,7 +1479,7 @@ bool SslSocket::enableClientEncryption()
 bool SslSocket::isEncryptionEnabled() const
 {
     Q_D(const SslSocket);
-    return d->ecnryptionEnabled || d->asyncSslHelper->isSsl();
+    return d->ecnryptionEnabled || (d->asyncSslHelper && d->asyncSslHelper->isSsl());
 }
 
 static void cancelIoFromAioThread(SslSocketPrivate* socket, aio::EventType eventType)
@@ -1490,8 +1488,9 @@ static void cancelIoFromAioThread(SslSocketPrivate* socket, aio::EventType event
         socket->isSendInProgress = false;
     if (eventType == aio::etRead || eventType == aio::etNone)
         socket->isRecvInProgress = false;
-
-    socket->asyncSslHelper->clear();
+    
+    if (socket->asyncSslHelper)
+        socket->asyncSslHelper->clear();
 }
 
 void SslSocket::cancelIOAsync(aio::EventType eventType, utils::MoveOnlyFunc<void()> handler)
@@ -1698,30 +1697,40 @@ int MixedSslSocket::recv(void* buffer, unsigned int bufferLen, int flags)
 {
     Q_D(MixedSslSocket);
     auto helper = static_cast<MixedSslAsyncBioHelper*>(d->asyncSslHelper.get());
-    if (helper->is_initialized() && !helper->is_ssl())
+    if (helper)
     {
-        if (!updateInternalBlockingMode())
-            return -1;
-
-        return d->wrappedSocket->recv(buffer, bufferLen, flags);
+        if (helper->is_initialized() && !helper->is_ssl())
+        {
+            if (!updateInternalBlockingMode())
+                return -1;
+            d->asyncSslHelper.reset();
+        }
+        else
+        {
+            return SslSocket::recv(buffer, bufferLen, flags);
+        }
     }
-
-    return SslSocket::recv(buffer, bufferLen, flags);
+    return d->wrappedSocket->recv(buffer, bufferLen, flags);
 }
 
 int MixedSslSocket::send(const void* buffer, unsigned int bufferLen)
 {
     Q_D(MixedSslSocket);
     auto helper = static_cast<MixedSslAsyncBioHelper*>(d->asyncSslHelper.get());
-    if (helper->is_initialized() && !helper->is_ssl())
+    if (helper)
     {
-        if (!updateInternalBlockingMode())
-            return -1;
-
-        return d->wrappedSocket->send(buffer, bufferLen);
+        if (helper->is_initialized() && !helper->is_ssl())
+        {
+            if (!updateInternalBlockingMode())
+                return -1;
+            d->asyncSslHelper.reset(); //< not a SSL mode
+        }
+        else
+        {
+            return SslSocket::send(buffer, bufferLen);
+        }
     }
-
-    return SslSocket::send(buffer, bufferLen);
+    return d->wrappedSocket->send(buffer, bufferLen);
 }
 
 bool MixedSslSocket::setNonBlockingMode(bool val)
@@ -1731,7 +1740,7 @@ bool MixedSslSocket::setNonBlockingMode(bool val)
         return false;
 
     auto helper = static_cast<MixedSslAsyncBioHelper*>(d->asyncSslHelper.get());
-    if (helper->is_initialized() && !helper->is_ssl())
+    if (!helper || (helper->is_initialized() && !helper->is_ssl()))
         return updateInternalBlockingMode();
 
     return true;
@@ -1772,8 +1781,11 @@ void MixedSslSocket::readSomeAsync(
         return d->wrappedSocket->readSomeAsync(buffer, std::move(handler));
 
     auto helper = static_cast<MixedSslAsyncBioHelper*>(d->asyncSslHelper.get());
-    if (helper->is_initialized() && !helper->is_ssl())
-        return d->wrappedSocket->readSomeAsync(buffer,std::move(handler));
+    if (!helper || (helper->is_initialized() && !helper->is_ssl()))
+    {
+        d->asyncSslHelper.reset();
+        return d->wrappedSocket->readSomeAsync(buffer, std::move(handler));
+    }
 
     d->wrappedSocket->dispatch(
         [d, helper, buffer, handler = std::move(handler)]() mutable
@@ -1808,6 +1820,9 @@ void MixedSslSocket::sendAsync(
         return d->wrappedSocket->sendAsync(buffer, std::move(handler));
 
     auto helper = static_cast<MixedSslAsyncBioHelper*>(d->asyncSslHelper.get());
+    if (!helper)
+        return d->wrappedSocket->sendAsync(buffer, std::move(handler));
+
     if (!helper->is_initialized())
     {
         NX_ASSERT(false, "SSL server is not supposed to send before recv");
@@ -1816,7 +1831,10 @@ void MixedSslSocket::sendAsync(
     }
 
     if (!helper->is_ssl())
-        return d->wrappedSocket->sendAsync(buffer,std::move(handler));
+    {
+        d->asyncSslHelper.reset();
+        return d->wrappedSocket->sendAsync(buffer, std::move(handler));
+    }
 
     d->wrappedSocket->dispatch(
         [d, helper, &buffer, handler = std::move(handler)]() mutable
@@ -1862,7 +1880,6 @@ SslServerSocket::SslServerSocket(
     m_allowNonSecureConnect(allowNonSecureConnect),
     m_delegateSocket(std::move(delegateSocket))
 {
-    ssl::initOpenSSLGlobalLock();
 }
 
 bool SslServerSocket::listen(int queueLen)

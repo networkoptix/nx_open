@@ -30,11 +30,12 @@
 #include "access_control/authentication_manager.h"
 #include "dao/rdb/db_instance_controller.h"
 #include "ec2/synchronization_engine.h"
+#include "ec2/vms_p2p_command_bus.h"
 #include "http_handlers/get_cloud_modules_xml.h"
 #include "http_handlers/ping.h"
 #include "libcloud_db_app_info.h"
 #include "managers/account_manager.h"
-#include "managers/auth_provider.h"
+#include "managers/authentication_provider.h"
 #include "managers/cloud_module_url_provider.h"
 #include "managers/email_manager.h"
 #include "managers/event_manager.h"
@@ -146,6 +147,8 @@ int CloudDbService::serviceMain(const utils::AbstractServiceSettings& abstractSe
         settings.p2pDb(),
         &dbInstanceController.queryExecutor());
 
+    ec2::VmsP2pCommandBus vmsP2pCommandBus(&ec2SyncronizationEngine);
+
     SystemHealthInfoProvider systemHealthInfoProvider(
         &ec2SyncronizationEngine.connectionManager(),
         &dbInstanceController.queryExecutor());
@@ -189,8 +192,9 @@ int CloudDbService::serviceMain(const utils::AbstractServiceSettings& abstractSe
     AuthenticationProvider authProvider(
         settings,
         accountManager,
-        systemManager,
-        tempPasswordManager);
+        &systemManager,
+        tempPasswordManager,
+        &vmsP2pCommandBus);
     m_authProvider = &authProvider;
 
     MaintenanceManager maintenanceManager(
@@ -224,13 +228,13 @@ int CloudDbService::serviceMain(const utils::AbstractServiceSettings& abstractSe
         false,  //TODO #ak enable ssl when it works properly
         nx::network::NatTraversalSupport::disabled );
 
-    if (m_settings->auth().connectionInactivityPeriod.count())
+    if (m_settings->http().connectionInactivityPeriod > std::chrono::milliseconds::zero())
     {
         multiAddressHttpServer.forEachListener(
             [&](nx_http::HttpStreamSocketServer* server)
             {
                 server->setConnectionInactivityTimeout(
-                    m_settings->auth().connectionInactivityPeriod);
+                    m_settings->http().connectionInactivityPeriod);
             });
     }
 

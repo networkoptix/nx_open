@@ -34,6 +34,11 @@ AccountData::AccountData(AccountRegistrationData registrationData):
 {
 }
 
+AccountData::AccountData(api::AccountData apiAccountData):
+    api::AccountData(std::move(apiAccountData))
+{
+}
+
 bool AccountData::getAsVariant( int resID, QVariant* const value ) const
 {
     switch( resID )

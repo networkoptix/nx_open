@@ -1,5 +1,4 @@
-#ifndef __JSON_TRANSACTION_SERIALIZER_H_
-#define __JSON_TRANSACTION_SERIALIZER_H_
+#pragma once
 
 #include <QtCore/QCache>
 
@@ -16,13 +15,14 @@ namespace ec2
     /**
      * This class serialized a transaction into a byte array.
      */
-    class QnJsonTransactionSerializer: public Singleton<QnJsonTransactionSerializer>
+    class QnJsonTransactionSerializer
     {
     public:
         QnJsonTransactionSerializer() {}
 
         template<class T>
-        QByteArray serializedTransaction(const QnTransaction<T>& tran) {
+        QByteArray serializedTransaction(const QnTransaction<T>& tran)
+        {
             QnMutexLocker lock( &m_mutex );
             Q_UNUSED(lock);
 
@@ -49,7 +49,8 @@ namespace ec2
         }
 
         template<class T>
-        QByteArray serializedTransactionWithHeader(const QnTransaction<T> &tran, const QnTransactionTransportHeader &header) {
+        QByteArray serializedTransactionWithHeader(const QnTransaction<T> &tran, const QnTransactionTransportHeader &header)
+        {
             //TODO #ak use cache
             QJsonValue jsonTran;
             QJson::serialize(tran, &jsonTran);
@@ -67,12 +68,12 @@ namespace ec2
         QByteArray serializedTransactionWithHeader(const QByteArray &serializedTran, const QnTransactionTransportHeader &header);
 
         template<class T>
-        QByteArray serializedTransactionWithoutHeader(const QnTransaction<T> &tran, const QnTransactionTransportHeader &header) {
-            Q_UNUSED(header);    //header is really unused in json clients
+        QByteArray serializedTransactionWithoutHeader(const QnTransaction<T> &tran)
+        {
             return serializedTransaction(tran);
         }
 
-        QByteArray serializedTransactionWithoutHeader(const QByteArray &serializedTran, const QnTransactionTransportHeader &header);
+        QByteArray serializedTransactionWithoutHeader(const QByteArray &serializedTran);
 
         static bool deserializeTran(
             const quint8* chunkPayload,
@@ -86,4 +87,3 @@ namespace ec2
     };
 }
 
-#endif // __JSON_TRANSACTION_SERIALIZER_H_

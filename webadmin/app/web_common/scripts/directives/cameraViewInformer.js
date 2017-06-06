@@ -34,11 +34,13 @@ angular.module('nxCommon')
                     }
 
                     //offline and unauthorized are special cases. All others can be set without editing
-                    if(scope.alertType == 'status'){
-                        scope.message = scope.cameraStates[(scope.flags[scope.alertType]).toLowerCase()];
-                    }
-                    else{
-                        scope.message = scope.cameraStates[scope.alertType];
+                    if(scope.cameraStates){
+                        if(scope.alertType == 'status'){
+                            scope.message = scope.cameraStates[(scope.flags[scope.alertType]).toLowerCase()];
+                        }
+                        else{
+                            scope.message = scope.cameraStates[scope.alertType];
+                        }
                     }
                 }, true);
         	}

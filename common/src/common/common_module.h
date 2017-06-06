@@ -180,6 +180,9 @@ public:
     void setObsoleteServerGuid(const QnUuid& guid) { m_obsoleteUuid = guid; }
     QnUuid obsoleteServerGuid() const{ return m_obsoleteUuid; }
 
+    QnUuid dbId() const;
+    void setDbId(const QnUuid& uuid);
+
     /*
     * This timestamp is using for database backup/restore operation.
     * Server has got systemIdentity time after DB restore operation
@@ -243,8 +246,6 @@ public:
     void setVideowallGuid(const QnUuid &uuid);
 
     /** instanceCounter used for unit test purpose only */
-    void setInstanceCounter(int value);
-    int instanceCounter() const;
 signals:
     void readOnlyChanged(bool readOnly);
     void moduleInformationChanged();
@@ -268,6 +269,7 @@ private:
     QString m_defaultAdminPassword;
     QnUuid m_uuid;
     QnUuid m_runUuid;
+    QnUuid m_dbId;
     QnUuid m_obsoleteUuid;
     QnUuid m_remoteUuid;
     bool m_cloudMode;
@@ -301,5 +303,4 @@ private:
     QnEventRuleManager* m_eventRuleManager = nullptr;
 
     QnUuid m_videowallGuid;
-    int m_instanceCounter = 0;
 };

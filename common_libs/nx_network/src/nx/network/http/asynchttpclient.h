@@ -31,7 +31,7 @@ struct AuthInfo
 class AsyncHttpClientPtr;
 
 /**
- * Http client. All operations are done asynchronously.
+ * HTTP client. All operations are done asynchronously.
  *
  * To get new instance use AsyncHttpClient::create
  * This class methods are not thread-safe

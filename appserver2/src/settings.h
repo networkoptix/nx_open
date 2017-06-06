@@ -19,8 +19,6 @@
 namespace ec2 {
 
 class Settings
-:
-    public Singleton<Settings>
 {
 public:
     bool dbReadOnly() const;

@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.8.1 FATAL_ERROR)
+cmake_minimum_required(VERSION 3.8.0 FATAL_ERROR)
 
 set(customization "default" CACHE STRING "Product customization")
 option(beta "Is this build is beta build" ON)
@@ -48,8 +48,7 @@ include(qrc_utils)
 include(precompiled_header)
 include(mercurial)
 include(project_utils)
-
-include(android-ndk-workaround)
+include(test_utils)
 
 include(ec_protocol)
 include(maven_compatibility)
@@ -63,6 +62,7 @@ include(cloud_host)
 include(vms_parts)
 include(compiler_options)
 include(output_directories)
+include(distribution_names)
 
 if(NOT (WINDOWS OR ANDROID OR IOS))
     set(BUILD_SHARED_LIBS ON)
@@ -89,6 +89,11 @@ if(NOT WINDOWS)
         "${CMAKE_EXE_LINKER_FLAGS} -Wl,-rpath-link,${CMAKE_LIBRARY_OUTPUT_DIRECTORY}")
     set(CMAKE_SHARED_LINKER_FLAGS
         "${CMAKE_SHARED_LINKER_FLAGS} -Wl,-rpath-link,${CMAKE_LIBRARY_OUTPUT_DIRECTORY}")
+endif()
+
+if(ANDROID)
+    include(android-ndk-workaround)
+    include(android-apk)
 endif()
 
 link_directories("${CMAKE_LIBRARY_OUTPUT_DIRECTORY}")
@@ -124,8 +129,6 @@ endif()
 if(WINDOWS)
     # Prepare a file to be included into each Visual Studio project.
     nx_configure_file(${PROJECT_SOURCE_DIR}/msvc.user.props ${CMAKE_BINARY_DIR})
-    
-    add_definitions(-DWIN32_LEAN_AND_MEAN=1)
 endif()
 
 # Required for QN_DECLARE_METAOBJECT_HEADER

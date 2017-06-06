@@ -55,6 +55,9 @@
 namespace ec2 {
 
 class Ec2DirectConnection;
+class Settings;
+class QnTransactionMessageBusBase;
+
 /**
  * Sequence has less priority than TimeSynchronizationManager::peerIsServer and
  * TimeSynchronizationManager::peerTimeSynchronizedWithInternetServer flags
@@ -123,7 +126,8 @@ public:
     TimeSynchronizationManager(
         Qn::PeerType peerType,
         nx::utils::TimerManager* const timerManager,
-        QnTransactionMessageBus* messageBus);
+        QnTransactionMessageBusBase* messageBus,
+        Settings* settings);
     virtual ~TimeSynchronizationManager();
 
     /** Implemenattion of QnStoppable::pleaseStop. */
@@ -248,7 +252,7 @@ private:
     boost::optional<qint64> m_prevMonotonicClock;
     bool m_terminated;
     std::shared_ptr<Ec2DirectConnection> m_connection;
-    QnTransactionMessageBus* m_messageBus;
+    QnTransactionMessageBusBase* m_messageBus;
     /** TimeSyncInfo::syncTime stores local time on specified server. */
     std::map<QnUuid, TimeSyncInfo> m_systemTimeByPeer;
     const Qn::PeerType m_peerType;
@@ -258,6 +262,7 @@ private:
     bool m_timeSynchronized;
     int m_internetSynchronizationFailureCount;
     std::map<QnUuid, PeerContext> m_peersToSendTimeSyncTo;
+    Settings* m_settings;
 
     void selectLocalTimeAsSynchronized(
         QnMutexLockerBase* const lock,
@@ -327,7 +332,7 @@ private:
 
 private slots:
     void onNewConnectionEstablished(QnTransactionTransportBase* transport );
-    void onPeerLost( ApiPeerAliveData data );
+    void onPeerLost(QnUuid peer, Qn::PeerType peerType);
     void onDbManagerInitialized();
     void onTimeSynchronizationSettingsChanged();
 };

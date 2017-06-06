@@ -35,3 +35,31 @@ endif()
 if(box STREQUAL "bpi")
     target_link_libraries(mobile_client PRIVATE GLESv2)
 endif()
+
+if(ANDROID)
+    set(project.version.name "${releaseVersion}")
+    set(project.version.code "${buildNumber}")
+
+    file(COPY "maven/bin-resources/android" DESTINATION "${CMAKE_CURRENT_BINARY_DIR}")
+    file(COPY "${customization_dir}/icons/android/android"
+        DESTINATION "${CMAKE_CURRENT_BINARY_DIR}")
+    configure_file("maven/filter-resources/android/AndroidManifest.xml"
+        "${CMAKE_CURRENT_BINARY_DIR}/android/AndroidManifest.xml")
+    configure_file("./maven/filter-resources/android/res/values/strings.xml"
+        "${CMAKE_CURRENT_BINARY_DIR}/android/res/values/strings.xml")
+
+    get_target_property(OPENSSL_LIBS openssl INTERFACE_LINK_LIBRARIES)
+    get_target_property(FFMPEG_LIBS ffmpeg INTERFACE_LINK_LIBRARIES)
+    get_target_property(OPENAL_LIBS openal INTERFACE_LINK_LIBRARIES)
+
+    add_android_apk(mobile_client.apk TARGET mobile_client
+        APK_NAME "${client_distribution_name}.apk"
+        PACKAGE_SOURCE "${CMAKE_CURRENT_BINARY_DIR}/android"
+        QML_ROOT_PATH "${CMAKE_CURRENT_LIST_DIR}/static-resources/qml"
+        EXTRA_LIBS ${OPENSSL_LIBS} ${FFMPEG_LIBS} ${OPENAL_LIBS}
+        KEYSTORE_FILE "${customization_dir}/mobile_client/key.store"
+        KEYSTORE_ALIAS "hdwitness"
+        KEYSTORE_PASSWORD "hYCmvTDu"
+        KEYSTORE_KEY_PASSWORD "31O2zNNy"
+    )
+endif()

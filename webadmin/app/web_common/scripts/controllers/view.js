@@ -12,8 +12,8 @@ angular.module('nxCommon').controller('ViewCtrl',
             Low: 'lo'
         };
 
-        if($routeParams.systemId){
-            systemAPI = systemAPI($routeParams.systemId);
+        if($scope.system){ // Use system from outer scope (directive)
+            systemAPI = $scope.system;
         }
         $scope.systemAPI = systemAPI;
 
@@ -401,9 +401,7 @@ angular.module('nxCommon').controller('ViewCtrl',
             }
         });
 
-        systemAPI.getCurrentUser().then(function(result) {
-            $scope.canViewArchive = result.data.reply.isAdmin || (result.data.reply.permissions.indexOf(Config.globalViewArchivePermission)>=0);
-            var userId = result.data.reply.id;
+        function requestResources(){
             $scope.camerasProvider.requestResources().then(function(res){
                 if(!$scope.storage.cameraId)
                 {
@@ -413,6 +411,11 @@ angular.module('nxCommon').controller('ViewCtrl',
                 $scope.activeCamera = $scope.camerasProvider.getCamera($scope.storage.cameraId);
                 $scope.camerasProvider.startPoll();
             });
+        }
+
+        systemAPI.checkPermissions(Config.globalViewArchivePermission).then(function(result){
+            $scope.canViewArchive = result;
+            requestResources();
         });
 
         var killSubscription = $rootScope.$on('$routeChangeStart', function (event,next) {

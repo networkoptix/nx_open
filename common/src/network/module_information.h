@@ -4,11 +4,13 @@
 #include <QtCore/QString>
 #include <QtCore/QSet>
 
-#include <utils/common/software_version.h>
-#include <utils/common/system_information.h>
-#include <utils/common/id.h>
 #include <nx/fusion/model_functions_fwd.h>
 #include <nx/network/socket_common.h>
+#include <nx/utils/uuid.h>
+
+#include <common/common_globals.h>
+#include <utils/common/software_version.h>
+#include <utils/common/system_information.h>
 
 struct QnModuleInformation
 {
