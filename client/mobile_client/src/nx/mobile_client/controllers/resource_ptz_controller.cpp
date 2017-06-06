@@ -5,6 +5,7 @@
 #include <core/resource/camera_resource.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource_management/resource_pool.h>
+#include <nx/client/ptz/ptz_helpers.h>
 
 namespace {
 
@@ -104,11 +105,9 @@ Ptz::Traits ResourcePtzController::auxTraits() const
 
 int ResourcePtzController::presetsCount() const
 {
-    if (!getCapabilities().testFlag(Ptz::PresetsPtzCapability))
-        return 0;
-
-    QnPtzPresetList presets;
-    return getPresets(&presets) ? presets.size() : 0;
+    return getCapabilities().testFlag(Ptz::PresetsPtzCapability)
+        ? ptz::helpers::getSortedPresets(this).size()
+        : 0;
 }
 
 int ResourcePtzController::activePresetIndex() const
@@ -120,8 +119,8 @@ int ResourcePtzController::activePresetIndex() const
     if (!getActiveObject(&activeObject) || activeObject.type != Qn::PresetPtzObject)
         return -1;
 
-    QnPtzPresetList presets;
-    if (!getPresets(&presets))
+    const auto presets = ptz::helpers::getSortedPresets(this);
+    if (presets.isEmpty())
         return -1;
 
     for (int i = 0; i != presets.count(); ++i)
@@ -140,8 +139,8 @@ bool ResourcePtzController::setPresetByIndex(int index)
         return false;
     }
 
-    QnPtzPresetList presets;
-    return getPresets(&presets) && activatePreset(presets.at(index).id,
+    const auto presets = ptz::helpers::getSortedPresets(this);
+    return !presets.isEmpty() && activatePreset(presets.at(index).id,
         QnAbstractPtzController::MaxPtzSpeed);
 }
 
@@ -150,8 +149,8 @@ bool ResourcePtzController::setPresetById(const QString& id)
     if (!getCapabilities().testFlag(Ptz::PresetsPtzCapability))
         return false;
 
-    QnPtzPresetList presets;
-    if (!getPresets(&presets))
+    const auto presets = ptz::helpers::getSortedPresets(this);
+    if (presets.isEmpty())
         return false;
 
     const bool found = std::find_if(presets.begin(), presets.end(),
