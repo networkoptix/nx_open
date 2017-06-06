@@ -29,6 +29,11 @@ private:
     QnMulticodecRtpReader m_rtpStreamParser;
 
     virtual QnMetaDataV1Ptr getCameraMetadata() override;
+
+    QString serializeStreamParams(
+        const QnLiveStreamParams& params,
+        const QSize& resolution,
+        int profileIndex) const;
 };
 
 #endif // #ifdef ENABLE_ISD
