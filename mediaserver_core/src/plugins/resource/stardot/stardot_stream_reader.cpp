@@ -41,7 +41,7 @@ CameraDiagnostics::Result QnStardotStreamReader::openStreamInternal(bool isCamer
 
     if (isCameraControlRequired)
     {
-        QString request(lit("admin.cgi?image&h264_bitrate=%2&h264_framerate=%3"));
+        QString request(lit("admin.cgi?image&h264_bitrate=%1&h264_framerate=%2"));
         int bitrate = m_stardotRes->suggestBitrateKbps(params.quality, m_stardotRes->getResolution(), params.fps);
         request = request.arg(bitrate).arg(params.fps);
 
@@ -56,7 +56,9 @@ CameraDiagnostics::Result QnStardotStreamReader::openStreamInternal(bool isCamer
                 requestedUrl.setHost( m_stardotRes->getHostAddress() );
                 requestedUrl.setPort( m_stardotRes->httpPort() );
                 requestedUrl.setScheme( QLatin1String("http") );
-                requestedUrl.setPath( request );
+                int queryPos = request.indexOf(L'?');
+                requestedUrl.setPath(request.left(queryPos));
+                requestedUrl.setQuery(request.mid(queryPos+1));
                 return CameraDiagnostics::NotAuthorisedResult( requestedUrl.toString() );
             }
             return CameraDiagnostics::RequestFailedResult(QLatin1String("admin.cgi?image"), QLatin1String(nx_http::StatusCode::toString((nx_http::StatusCode::Value)status)));
