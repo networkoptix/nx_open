@@ -3,3 +3,98 @@
 @import "volumecontrols";
 @import "webclient";
 @import "icons";
+
+$placeholder_color: $light;
+$placeholder_color_transparent: transparentize($placeholder_color,1);
+
+.placeholder{
+    width:100%;
+    height:100%;
+
+    .placeholder-content{
+        text-align: center;
+
+        position: relative;
+        top: 50%;
+        transform: translateY(-50%);
+        -ms-transform: translateY(-50%);
+
+        font-weight: 400;
+        font-size:130%;
+        line-height:30px;
+        color:$dark17;
+
+        a{
+            color: $light12;
+            text-decoration: underline;
+    
+            &:hover, &:active{
+                    color: $light1;
+            }
+        }
+    
+        .placeholder-icon{
+            display: inline-block;
+            margin-bottom: 20px;
+        }
+    
+        .placeholder-title{
+          font-weight: 300;
+          color: $dark13;
+          font-size: 40px;
+          display: inline-block;
+        }
+        .placeholder-message{
+          font-weight: 300;
+          color: $dark13;
+          font-size: 40px;
+          display: inline-block;
+        }
+
+        .placeholder-preloader{
+            width:84px;
+            margin:auto;
+
+            .circleG{
+                background-color: $placeholder_color_transparent;
+                float:left;
+                height:16px;
+                width:16px;
+                border-radius:8px;
+                margin:0 6px;
+                -webkit-animation-name:bounce_circleG;
+                        animation-name:bounce_circleG;
+                -webkit-animation-duration:1.4s;
+                        animation-duration:1.4s;
+                -webkit-animation-iteration-count:infinite;
+                        animation-iteration-count:infinite;
+                -webkit-animation-direction:normal;
+                        animation-direction:normal;
+            }
+
+            .circleG_2{
+                -webkit-animation-delay:0.15s;
+                        animation-delay:0.15s;
+            }
+
+            .circleG_3{
+                -webkit-animation-delay:0.3s;
+                        animation-delay:0.3s;
+            }
+
+            @-webkit-keyframes bounce_circleG{
+                0%{}
+                40%{background-color: $placeholder_color;}
+                80%{background-color: $placeholder_color_transparent;}
+                100%{}
+            }
+
+            @keyframes bounce_circleG{
+                0%{}
+                40%{background-color: $placeholder_color;}
+                80%{background-color: $placeholder_color_transparent;}
+                100%{}
+            }
+        }
+    }
+}
