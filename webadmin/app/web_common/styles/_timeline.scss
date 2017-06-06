@@ -104,6 +104,9 @@ ng-include{
   text-transform: uppercase;
 
   div{
+      .shadows-off{
+        box-shadow: none !important;
+      }
       &.text-left{
         width:106px;
         height:100%;
