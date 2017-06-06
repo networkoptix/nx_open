@@ -25,6 +25,8 @@ class QnLdapManager:
     public QObject,
     public Singleton<QnLdapManager>
 {
+    Q_OBJECT
+
 public:
 
     QnLdapManager();
