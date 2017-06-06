@@ -105,7 +105,7 @@ QnMobileClientModule::QnMobileClientModule(
         availableCamerasWatcher, &QnAvailableCamerasWatcher::setUser);
 
     commonModule->store(new QnCloudConnectionProvider());
-    commonModule->instance<QnCloudStatusWatcher>();
+    m_cloudStatusWatcher = commonModule->store(new QnCloudStatusWatcher(commonModule, /*isMobile*/ true));
     QNetworkProxyFactory::setApplicationProxyFactory(new QnSimpleNetworkProxyFactory(commonModule));
 
     const auto getter = []() { return qnClientCoreSettings->knownServerUrls(); };
@@ -143,4 +143,9 @@ QnMobileClientModule::~QnMobileClientModule()
 {
     qApp->disconnect(this);
     QNetworkProxyFactory::setApplicationProxyFactory(nullptr);
+}
+
+QnCloudStatusWatcher* QnMobileClientModule::cloudStatusWatcher() const
+{
+    return m_cloudStatusWatcher;
 }

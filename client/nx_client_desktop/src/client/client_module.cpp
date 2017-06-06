@@ -339,7 +339,7 @@ void QnClientModule::initSingletons(const QnStartupParameters& startupParams)
 
     /* Just to feel safe */
     commonModule->store(new QnCloudConnectionProvider());
-    commonModule->instance<QnCloudStatusWatcher>();
+    m_cloudStatusWatcher = commonModule->store(new QnCloudStatusWatcher(commonModule, /*isMobile*/ false));
 
     //NOTE:: QNetworkProxyFactory::setApplicationProxyFactory takes ownership of object
     m_networkProxyFactory = new QnNetworkProxyFactory(commonModule);
@@ -577,4 +577,9 @@ void QnClientModule::initLocalResources(const QnStartupParameters& startupParams
     }
     resourceDiscoveryManager->setReady(true);
     commonModule->store(new QnSystemsWeightsManager());
+}
+
+QnCloudStatusWatcher* QnClientModule::cloudStatusWatcher() const
+{
+    return m_cloudStatusWatcher;
 }
