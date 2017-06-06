@@ -8,7 +8,8 @@ angular.module('nxCommon')
         	    iconClass: "=",
         	    title: "=",
         	    message: "=",
-        	    preloader: "="
+        	    preloader: "=",
+        	    condition: "="
         	},
         	templateUrl: Config.viewsDirCommon + 'components/placeholder.html'
 		};

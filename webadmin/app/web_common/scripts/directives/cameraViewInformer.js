@@ -6,15 +6,15 @@ angular.module('nxCommon')
 			restrict: 'E',
         	scope:{
         	    flags: "=",
-        	    loading: "="
+        	    preloader: "="
         	},
-        	templateUrl: Config.viewsDirCommon + 'components/cameraViewInformer.html',
+        	templateUrl: Config.viewsDirCommon + 'components/placeholder.html',
         	link: function(scope){
-        	    scope.title = null;
-        	    scope.message = null;
-        	    scope.iconClass = null;
-
                 scope.$watch('flags', function(){
+                    scope.title = null;
+                    scope.message = null;
+                    scope.iconClass = null;
+                    scope.condition = false;
                     scope.alertType = null;
 
                     //check for flag
@@ -34,6 +34,8 @@ angular.module('nxCommon')
                     if(!scope.alertType){
                         return;
                     }
+
+        	        scope.condition = true;
 
                     //offline and unauthorized are special cases. All others can be set without editing
                     if(scope.alertType == 'status'){
