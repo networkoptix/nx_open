@@ -218,6 +218,7 @@ void AddressResolver::resolveAsync(
     if (ipVersion == AF_INET)
     {
         const auto hostStr = hostName.toString().toStdString();
+        // TODO: #ak Use InetPton here on mswin2.
         const auto ipv4Address = inet_addr(hostStr.c_str());
         if (ipv4Address != INADDR_NONE)
         {
