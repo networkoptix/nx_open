@@ -11,6 +11,8 @@ GenericValueControl
     property bool focusInPressed: control.upButton.pressed
     property bool focusOutPressed: control.downButton.pressed
 
+    centralAreaText: "FOCUS"
+
     signal autoFocusClicked()
 
     upButton.icon: lp("/images/ptz/ptz_plus.png")
