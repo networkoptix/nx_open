@@ -8,10 +8,10 @@ namespace nx {
 
 SystemError::ErrorCode killProcessByPid(qint64 pid)
 {
-    auto processHandle = OpenProcess(PROCESS_TERMINATE, FALSE, pid);
+    auto processHandle = OpenProcess(PROCESS_TERMINATE, /*inheritHandle*/ FALSE, pid);
     if (!processHandle)
         return SystemError::getLastOSErrorCode();
-    const auto result = TerminateProcess(processHandle, 1)
+    const auto result = TerminateProcess(processHandle, /*exitCode*/ 1)
         ? SystemError::noError
         : SystemError::getLastOSErrorCode();
     CloseHandle(processHandle);
@@ -26,14 +26,14 @@ SystemError::ErrorCode startProcessDetached(
 {
     return QProcess::startDetached(executablePath, arguments, workingDirectory, pid)
         ? SystemError::noError
-        : SystemError::fileNotFound; //TODO #ak get proper error code.
+        : SystemError::fileNotFound; //TODO: #ak get proper error code.
 }
 
 bool checkProcessExists(qint64 pid)
 {
     bool exists = false;
 
-    auto handle = OpenProcess(PROCESS_QUERY_LIMITED_INFORMATION, FALSE, pid);
+    auto handle = OpenProcess(PROCESS_QUERY_LIMITED_INFORMATION, /*inheritHandle*/ FALSE, pid);
     if (handle)
     {
         DWORD exitCode = 9999;
