@@ -237,7 +237,7 @@ void QnLiveStreamProvider::setFps(float f)
         if (std::abs(m_newLiveParams.fps - f) < 0.1)
             return; // same fps?
 
-        m_newLiveParams.fps = qMax(1, qMin((int)f, getDefaultFps()));
+        m_newLiveParams.fps = qMax(1, qMin((int)f, m_cameraRes->getMaxFps()));
         f = m_newLiveParams.fps;
     }
 

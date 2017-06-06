@@ -1,3 +1,1 @@
-<placeholder ng-if="alertType"
-    icon-class="flags[alertType] == 'Offline' ? 'camera-view-offline' : 'camera-view-unauthorized'"
-    title="message"></placeholder>
+<placeholder ng-if="alertType || loading" icon-class="iconClass" title="title" message="message" preloader="loading"></placeholder>

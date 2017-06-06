@@ -8,6 +8,7 @@ angular.module('nxCommon')
             scope:{
                 'system': '='
             },
+            controller:'ViewCtrl',
             templateUrl: Config.viewsDirCommon + 'components/view.html'
         }
     });
