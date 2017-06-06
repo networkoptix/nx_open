@@ -11,8 +11,10 @@ class ConfigHelper:
         else:
             self.__file_name = path
         self.__config = ConfigParser.ConfigParser()
-        if os.path.isfile(self.__file_name):
+        try:
             self.__config.read(self.__file_name)
+        except:
+            pass
 
     def get_file_name(self):
         return self.__file_name

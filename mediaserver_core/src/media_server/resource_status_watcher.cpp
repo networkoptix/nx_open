@@ -6,6 +6,7 @@
 #include "api/app_server_connection.h"
 #include "core/resource/media_server_resource.h"
 #include <common/common_module.h>
+#include <core/resource/camera_resource.h>
 
 QnResourceStatusWatcher::QnResourceStatusWatcher(QnCommonModule* commonModule):
     QnCommonModuleAware(commonModule)
@@ -28,6 +29,18 @@ void QnResourceStatusWatcher::at_resource_statusChanged(const QnResourcePtr &res
 {
     if (reason == Qn::StatusChangeReason::Local)
         updateResourceStatusInternal(resource);
+
+    const QnSecurityCamResourcePtr& cameraRes = resource.dynamicCast<QnSecurityCamResource>();
+    if (cameraRes)
+    {
+        if (cameraRes->getStatus() >= Qn::Online &&
+            !cameraRes->hasFlags(Qn::foreigner) &&
+            !cameraRes->isInitialized())
+        {
+            cameraRes->initAsync(false /*optional*/);
+        }
+        return;
+    }
 }
 
 void QnResourceStatusWatcher::updateResourceStatusInternal(const QnResourcePtr& resource)

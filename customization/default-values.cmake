@@ -34,3 +34,4 @@ endif()
 set(vmax "false")
 
 set(customization.defines "")
+set(compatibleCustomizations)

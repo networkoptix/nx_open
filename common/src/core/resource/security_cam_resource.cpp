@@ -203,7 +203,7 @@ int QnSecurityCamResource::reservedSecondStreamFps() const
         NX_LOGX(
             lm("Wrong reserved second stream fps value for camera %1")
                 .arg(getName()),
-            cl_logWARNING);        
+            cl_logWARNING);
     }
 
     auto sharingMethod = streamFpsSharingMethod();
@@ -214,6 +214,11 @@ int QnSecurityCamResource::reservedSecondStreamFps() const
         return kSharePixelsDefaultReservedSecondStreamFps;
 
     return 0;
+}
+
+bool QnSecurityCamResource::isEnoughFpsToRunSecondStream(int currentFps) const
+{
+    return streamFpsSharingMethod() != Qn::BasicFpsSharing || getMaxFps() - currentFps >= kDefaultSecondStreamFpsLow;
 }
 
 #ifdef ENABLE_DATA_PROVIDERS
