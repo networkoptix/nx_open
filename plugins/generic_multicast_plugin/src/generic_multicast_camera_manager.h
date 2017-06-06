@@ -63,6 +63,7 @@ public:
     //!Implementation of nxcip::BaseCameraManager3::setParamValue
     virtual int setParamValue( const char* paramName, const char* value ) override;
 
+    bool isAudioEnabled() const;
 
     const nxcip::CameraInfo& info() const;
     nxpt::CommonRefManager* refManager();
@@ -73,4 +74,5 @@ private:
     nxcip::CameraInfo m_info;
     unsigned int m_capabilities;
     std::unique_ptr<GenericMulticastMediaEncoder> m_encoder;
+    bool m_audioEnabled;
 };

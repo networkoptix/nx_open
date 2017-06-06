@@ -236,8 +236,9 @@ CameraDiagnostics::Result ThirdPartyStreamReader::openStreamInternal(bool isCame
         if( m_thirdPartyRes->isAudioEnabled() )
         {
             nxcip::AudioFormat audioFormat;
+            Extras extras;
             if( m_mediaEncoder2->getAudioFormat( &audioFormat ) == nxcip::NX_NO_ERROR )
-                initializeAudioContext( audioFormat );
+                initializeAudioContext( audioFormat, extras );
         }
 
         char mediaUrlBuf[nxcip::MAX_TEXT_LEN];
@@ -410,7 +411,8 @@ QnAbstractMediaDataPtr ThirdPartyStreamReader::getNextData()
             else
             {
                 int errorCode = 0;
-                rez = readStreamReader( m_liveStreamReader.get(), &errorCode );
+                Extras extras;
+                rez = readStreamReader( m_liveStreamReader.get(), &errorCode, &extras);
                 if( rez )
                 {
                     if( m_cameraCapabilities & nxcip::BaseCameraManager::needIFrameDetectionCapability )
@@ -429,11 +431,11 @@ QnAbstractMediaDataPtr ThirdPartyStreamReader::getNextData()
                     }
                     else if( rez->dataType == QnAbstractMediaData::AUDIO )
                     {
-                        if( !m_audioContext )
+                        if( !m_audioContext || (extras.extradataBlob.size() > 0 && m_audioContext->getExtradataSize() == 0))
                         {
                             nxcip::AudioFormat audioFormat;
                             if( m_mediaEncoder2->getAudioFormat( &audioFormat ) == nxcip::NX_NO_ERROR )
-                                initializeAudioContext( audioFormat );
+                                initializeAudioContext( audioFormat, extras );
                         }
                         static_cast<QnCompressedAudioData*>(rez.get())->context = m_audioContext;
                     }
@@ -526,7 +528,10 @@ AVCodecID ThirdPartyStreamReader::toFFmpegCodecID( nxcip::CompressionType compre
     }
 }
 
-QnAbstractMediaDataPtr ThirdPartyStreamReader::readStreamReader( nxcip::StreamReader* streamReader, int* outErrorCode )
+QnAbstractMediaDataPtr ThirdPartyStreamReader::readStreamReader(
+    nxcip::StreamReader* streamReader,
+    int* outErrorCode,
+    Extras* outExtras)
 {
     nxcip::MediaDataPacket* packet = NULL;
     const int errorCode = streamReader->getNextData( &packet );
@@ -538,6 +543,18 @@ QnAbstractMediaDataPtr ThirdPartyStreamReader::readStreamReader( nxcip::StreamRe
     nxpt::ScopedRef<nxcip::MediaDataPacket> packetAp( packet, false );
 
     QnAbstractMediaDataPtr mediaPacket;
+
+    nxcip::MediaDataPacket2* mediaDataPacket2 = static_cast<nxcip::MediaDataPacket2*>(
+        packet->queryInterface(nxcip::IID_MediaDataPacket2));
+
+    if (mediaDataPacket2)
+    {
+        auto extradataSize = mediaDataPacket2->extradataSize();
+        outExtras->extradataBlob.resize(extradataSize);
+        memcpy(outExtras->extradataBlob.data(), mediaDataPacket2->extradata(), mediaDataPacket2->extradataSize());
+        mediaDataPacket2->releaseRef();
+    }
+
     switch( packet->type() )
     {
         case nxcip::dptVideo:
@@ -641,7 +658,7 @@ QnAbstractMediaDataPtr ThirdPartyStreamReader::readStreamReader( nxcip::StreamRe
     return mediaPacket;
 }
 
-void ThirdPartyStreamReader::initializeAudioContext( const nxcip::AudioFormat& audioFormat )
+void ThirdPartyStreamReader::initializeAudioContext( const nxcip::AudioFormat& audioFormat, const Extras& extras )
 {
     const AVCodecID ffmpegCodecId = toFFmpegCodecID(audioFormat.compressionType);
     const auto context = new QnAvCodecMediaContext(ffmpegCodecId);
@@ -686,7 +703,15 @@ void ThirdPartyStreamReader::initializeAudioContext( const nxcip::AudioFormat& a
     av->time_base.num = 1;
     av->time_base.den = audioFormat.sampleRate;
 
-    m_audioLayout->addAudioTrack( QnResourceAudioLayout::AudioTrack(m_audioContext, QString()) );
+    if (extras.extradataBlob.size() > 0 && context->getExtradataSize() == 0)
+    {
+        context->setExtradata(
+            (const uint8_t*) extras.extradataBlob.data(),
+            extras.extradataBlob.size());
+    }
+
+    m_audioLayout.reset(new QnResourceCustomAudioLayout());
+    m_audioLayout->addAudioTrack( QnResourceAudioLayout::AudioTrack(m_audioContext, QString()));
 }
 
 QnConstResourceVideoLayoutPtr ThirdPartyStreamReader::getVideoLayout() const

@@ -5,6 +5,7 @@
 
 #include "generic_multicast_camera_manager.h"
 #include "generic_multicast_media_encoder.h"
+#include "generic_multicast_stream_reader.h"
 
 namespace
 {
@@ -26,17 +27,18 @@ const char* multicastPluginParamsXML =
     </plugin>";
 }
 
-GenericMulticastCameraManager::GenericMulticastCameraManager( const nxcip::CameraInfo& info )
+GenericMulticastCameraManager::GenericMulticastCameraManager(const nxcip::CameraInfo& info)
 :
-    m_refManager( this ),
-    m_pluginRef( GenericMulticastPlugin::instance() ),
-    m_info( info ),
-    m_capabilities( 0 )
+    m_refManager(this),
+    m_pluginRef(GenericMulticastPlugin::instance()),
+    m_info(info),
+    m_capabilities(0)
 {    
     m_capabilities 
         |= nxcip::BaseCameraManager::audioCapability
         | nxcip::BaseCameraManager::shareIpCapability 
-        | nxcip::BaseCameraManager::primaryStreamSoftMotionCapability;
+        | nxcip::BaseCameraManager::primaryStreamSoftMotionCapability
+        | nxcip::BaseCameraManager::nativeMediaStreamCapability;
 }
 
 GenericMulticastCameraManager::~GenericMulticastCameraManager()
@@ -91,8 +93,8 @@ int GenericMulticastCameraManager::getEncoder( int encoderIndex, nxcip::CameraMe
     if( encoderIndex != 0 )
         return nxcip::NX_INVALID_ENCODER_NUMBER;
 
-    if( !m_encoder.get() )
-        m_encoder.reset( new GenericMulticastMediaEncoder(this) );
+    if(!m_encoder.get())
+        m_encoder.reset(new GenericMulticastMediaEncoder(this));
     m_encoder->addRef();
     *encoderPtr = m_encoder.get();
 
@@ -120,9 +122,9 @@ void GenericMulticastCameraManager::setCredentials( const char* /*username*/, co
 }
 
 //!Implementation of nxcip::BaseCameraManager::setAudioEnabled
-int GenericMulticastCameraManager::setAudioEnabled( int /*audioEnabled*/ )
+int GenericMulticastCameraManager::setAudioEnabled(int audioEnabled)
 {
-    //TODO/IMPL
+    m_audioEnabled = audioEnabled;
     return 0;
 }
 
@@ -207,4 +209,9 @@ const nxcip::CameraInfo& GenericMulticastCameraManager::info() const
 nxpt::CommonRefManager* GenericMulticastCameraManager::refManager()
 {
     return &m_refManager;
+}
+
+bool GenericMulticastCameraManager::isAudioEnabled() const
+{
+    return m_audioEnabled;
 }

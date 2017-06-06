@@ -21,6 +21,11 @@ class ThirdPartyStreamReader
 {
     typedef CLServerPushStreamReader base_type;
 
+    struct Extras
+    {
+        QByteArray extradataBlob;
+    };
+
 public:
     ThirdPartyStreamReader(
         QnResourcePtr res,
@@ -30,7 +35,10 @@ public:
     QnConstResourceAudioLayoutPtr getDPAudioLayout() const;
 
     static AVCodecID toFFmpegCodecID( nxcip::CompressionType compressionType );
-    static QnAbstractMediaDataPtr readStreamReader( nxcip::StreamReader* streamReader, int* errorCode = nullptr );
+    static QnAbstractMediaDataPtr readStreamReader(
+        nxcip::StreamReader* streamReader,
+        int* errorCode = nullptr,
+        Extras* outExtras = nullptr);
 
     virtual void updateSoftwareMotion() override;
     virtual QnConstResourceVideoLayoutPtr getVideoLayout() const override;
@@ -69,7 +77,7 @@ private:
     QnResourceCustomAudioLayoutPtr m_audioLayout;
     unsigned int m_cameraCapabilities;
 
-    void initializeAudioContext( const nxcip::AudioFormat& audioFormat );
+    void initializeAudioContext( const nxcip::AudioFormat& audioFormat, const Extras& extras );
 };
 
 #endif // ENABLE_THIRD_PARTY

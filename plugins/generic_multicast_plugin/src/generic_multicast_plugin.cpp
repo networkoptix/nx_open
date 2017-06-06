@@ -11,7 +11,7 @@ extern "C"
 #ifdef _WIN32
     __declspec(dllexport)
 #endif
-        nxpl::PluginInterface* createNXPluginInstance()
+    nxpl::PluginInterface* createNXPluginInstance()
     {
         return new GenericMulticastPlugin();
     }
