@@ -196,10 +196,21 @@ Item
 
                 visible: controller.presetsCount && controller.supportsPresets
 
-                onCurrentPresetIndexChanged:
+                Timer
                 {
-                    if (currentPresetIndex != -1)
-                        controller.setPresetByIndex(currentPresetIndex)
+                    id: skipIndexChangedNotificationTimer
+
+                    interval: 10000
+                }
+
+                onGoToPreset:
+                {
+                    presetsItem.currentPresetIndex = index
+                    if (index == -1)
+                        return
+
+                    controller.setPresetByIndex(index)
+                    skipIndexChangedNotificationTimer.restart()
                 }
 
                 Connections
@@ -207,7 +218,8 @@ Item
                     target: controller
                     onActivePresetIndexChanged:
                     {
-                        presetsItem.currentPresetIndex = controller.activePresetIndex
+                        if (!skipIndexChangedNotificationTimer.running)
+                            presetsItem.currentPresetIndex = controller.activePresetIndex
                     }
                 }
             }

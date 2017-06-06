@@ -9,6 +9,8 @@ Flickable
     property int presetsCount: 0
     property int currentPresetIndex: -1
 
+    signal goToPreset(int index)
+
     clip: true
     width: parent.width
     height: parent.height
@@ -23,7 +25,6 @@ Flickable
         id: presetButtonRow
 
         spacing: 0
-        padding: 0
 
         Repeater
         {
@@ -48,7 +49,7 @@ Flickable
                 font.pixelSize: 16
                 font.weight: Font.DemiBold
 
-                onClicked: control.currentPresetIndex = index
+                onClicked: control.goToPreset(index)
             }
         }
     }
