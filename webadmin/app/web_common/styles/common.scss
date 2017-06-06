@@ -7,9 +7,16 @@
 $placeholder_color: $light;
 $placeholder_color_transparent: transparentize($placeholder_color,1);
 
+placeholder{ /* Hack to have full-screen */
+    width:100%;
+    height:100%;
+}
 .placeholder{
     width:100%;
     height:100%;
+
+    z-index:1000;
+    background-color: transparentize($light, 0.4);
 
     .placeholder-content{
         text-align: center;

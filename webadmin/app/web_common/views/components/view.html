@@ -1,4 +1,5 @@
-<table ng-controller="ViewCtrl" style="width:100%" class="webclient-window">
+<placeholder ng-if="!ready" preloader="true" class="webclient-preloader"></placeholder>
+<table ng-if="ready" class="webclient-window">
     <tbody>
         <tr class="alerts-row" ng-if="hasMobileApp && !session.mobileAppNotified">
             <td colspan="2" class="alert">
