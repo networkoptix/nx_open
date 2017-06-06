@@ -25,6 +25,7 @@ Flickable
         id: presetButtonRow
 
         spacing: 0
+        padding: 0
 
         Repeater
         {
@@ -32,23 +33,22 @@ Flickable
 
             model: control.presetsCount
 
-            delegate: MouseArea
+            delegate: Button
             {
+                text: index + 1
+
+                leftPadding: 0
+                rightPadding: 0
                 width: 32
                 height: 56
 
-                Text
-                {
-                    anchors.centerIn: parent
+                color: "transparent"
+                textColor: index == currentPresetIndex
+                    ? ColorTheme.windowText
+                    : ColorTheme.transparent(ColorTheme.windowText, 0.2)
 
-                    color: index == currentPresetIndex
-                        ? ColorTheme.windowText
-                        : ColorTheme.transparent(ColorTheme.windowText, 0.2)
-
-                    font.pixelSize: 16
-                    font.weight: Font.DemiBold
-                    text: index + 1
-                }
+                font.pixelSize: 16
+                font.weight: Font.DemiBold
 
                 onClicked: { control.goToPreset(index) }
             }
