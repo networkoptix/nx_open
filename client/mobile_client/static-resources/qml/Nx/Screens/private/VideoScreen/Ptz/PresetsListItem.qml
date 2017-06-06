@@ -9,8 +9,6 @@ Flickable
     property int presetsCount: 0
     property int currentPresetIndex: -1
 
-    signal goToPreset(int presetIndex)
-
     clip: true
     width: parent.width
     height: parent.height
@@ -50,7 +48,7 @@ Flickable
                 font.pixelSize: 16
                 font.weight: Font.DemiBold
 
-                onClicked: { control.goToPreset(index) }
+                onClicked: control.currentPresetIndex = index
             }
         }
     }

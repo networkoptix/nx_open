@@ -196,10 +196,19 @@ Item
 
                 visible: controller.presetsCount && controller.supportsPresets
 
-                onGoToPreset:
+                onCurrentPresetIndexChanged:
                 {
-                    if (presetIndex != -1)
-                        controller.setPresetByIndex(presetIndex)
+                    if (currentPresetIndex != -1)
+                        controller.setPresetByIndex(currentPresetIndex)
+                }
+
+                Connections
+                {
+                    target: controller
+                    onActivePresetIndexChanged:
+                    {
+                        presetsItem.currentPresetIndex = controller.activePresetIndex
+                    }
                 }
             }
 
