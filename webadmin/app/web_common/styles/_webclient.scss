@@ -612,7 +612,15 @@ table.webclient-window>tbody>tr>td{
 
 .video-preview{
   background-color: $dark1;
+  max-width: 100%;
+  max-height: 100%;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  opacity:0.5;
 }
+
 
 .min-40{
   width:40px;
@@ -667,15 +675,6 @@ table.webclient-window>tbody>tr>td{
 .videowindow video{
   max-width:100%;
   max-height:100%;
-}
-
-.videowindow > img{
-  max-width: 100%;
-  max-height: 100%;
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
 }
 
 .half-height {

@@ -5,7 +5,8 @@ angular.module('nxCommon')
 		return{
 			restrict: 'E',
         	scope:{
-        	    flags: "="
+        	    flags: "=",
+        	    loading: "="
         	},
         	templateUrl: Config.viewsDirCommon + 'components/cameraViewInformer.html',
         	link: function(scope){
