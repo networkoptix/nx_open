@@ -407,7 +407,7 @@ table.webclient-window>tbody>tr>td{
 
 
   position:absolute;
-  margin-left:-86px;
+  margin-left: -72px;
   margin-top: -2px;
 }
 
@@ -472,7 +472,7 @@ table.webclient-window>tbody>tr>td{
     text-overflow: ellipsis;
     overflow: hidden;
     padding-right: 10px;
-    padding-left:95px;
+    padding-left: 78px;
   }
 
   & > a:hover, & > a:focus{
@@ -484,7 +484,8 @@ table.webclient-window>tbody>tr>td{
     background-color: $additional_light3;
   }
 
-  &.active > a{
+  &.active > a,
+  &.active > a:active{
     text-decoration: none;
     background-color: $light5;
   }
