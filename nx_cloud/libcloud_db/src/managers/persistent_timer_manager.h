@@ -23,26 +23,34 @@ using PersistentParamsMap = std::unordered_map<std::string, std::string>;
 class AbstractPersistentTimerEventReceiver
 {
 public:
-    virtual void persistentTimerFired(PersistentParamsMap& params) = 0;
+    virtual void persistentTimerFired(
+        nx::db::QueryContext* queryContext,
+        const QnUuid& taskId,
+        PersistentParamsMap& params) = 0;
 
     virtual ~AbstractPersistentTimerEventReceiver() {}
 };
 
 
-class PersistentTimerManager: public Singleton<PersistentTimerManager>
+class PersistentTimerManager
 {
 public:
+    PersistentTimerManager(nx::db::AbstractAsyncSqlQueryExecutor*);
+
     void registerEventReceiver(
-        const QnUuid& taskId,
+        const QnUuid& functorId,
         AbstractPersistentTimerEventReceiver* receiver);
 
+    void start();
+
     void subscribe(
+        const QnUuid& functorId,
         const QnUuid& taskId,
         std::chrono::milliseconds timeout,
         const PersistentParamsMap& params,
-        nx::db::QueryContext* queryContext = nullptr);
+        nx::db::QueryContext* queryContext);
 
-    void unsubscribe(const QnUuid& taskId, nx::db::QueryContext* = nullptr);
+    void unsubscribe(const QnUuid& taskId, nx::db::QueryContext* queryContext);
 
 private:
     std::unordered_map<QnUuid, AbstractPersistentTimerEventReceiver*> m_receiverMap;

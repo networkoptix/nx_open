@@ -26,7 +26,9 @@ public:
     typedef nx::utils::MoveOnlyFunc<nx::db::DBResult(nx::db::QueryContext*)>
         DbUpdateFunc;
 
-    DbStructureUpdater(AbstractAsyncSqlQueryExecutor* const queryExecutor);
+    DbStructureUpdater(
+        std::string dbManagerName,
+        AbstractAsyncSqlQueryExecutor* const queryExecutor);
 
     /**
      * Used to aggregate update scripts.

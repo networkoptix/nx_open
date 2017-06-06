@@ -24,12 +24,12 @@ protected:
 class ManagerUser: public nx::cdb::AbstractPersistentTimerEventReceiver
 {
 public:
-    static const QnUuid userTaskGuid;
+    static const QnUuid functorTypeId;
 
     ManagerUser(nx::cdb::PersistentTimerManager* manager, nx::utils::promise* readyPromise):
         m_manager(manager)
     {
-        manager->registerEventReceiver(userTaskGuid, this);
+        manager->registerEventReceiver(functorTypeId, this);
     }
 
     virtual void persistentTimerFired(const PersistentParamsMap& params) override
@@ -40,7 +40,7 @@ public:
         ++m_fired;
         if (m_shouldUnsubscribe)
         {
-            m_manager->unsubscribe(userTaskGuid);
+            m_manager->unsubscribe(functorTypeId);
             m_readyPromise->set_value();
         }
     }
@@ -51,7 +51,7 @@ public:
         params["key1"] = "value1";
         params["key2"] = "value2";
 
-        m_manager->subscribe(userTaskGuid, timeout, params);
+        m_manager->subscribe(functorTypeId, timeout, params);
     }
 
     void setShouldUnsubscribe() { m_shouldUnsubscribe = true; }
@@ -64,12 +64,26 @@ private:
     int m_fired = 0;
 };
 
-const QnUuid ManagerUser::userTaskGuid = QnUuid::fromStringSafe("{EC05F182-9380-48E3-9C76-AD6C10295136}");
+const QnUuid ManagerUser::functorTypeId = QnUuid::fromStringSafe("{EC05F182-9380-48E3-9C76-AD6C10295136}");
 
 TEST_F(PersistentTimerManager, subscribeUnsubscribe_simple)
 {
-    ManagerUser user(&manager, &readyPromise);
-    manager.subscribe(std::chrono::milliseconds(10));
+    // initialization
+    AbstractAsyncSqlQueryExecutor* executor = ;
+    PersistentTimerManager manager(executor);
+
+    ManagerUser user(executor, &manager, &readyPromise);
+
+    //
+    timerManager.start();
+
+    //
+    user.addTimer();
+    // executor.executeUpdate(
+    //     [](QueryContext* queryContext){queryContext, manager.subscribe(std::chrono::milliseconds(10));},
+    //     [](){}
+    // );
+
     std::this_thread::sleep_for(std::chrono::milliseconds(100));
 
     readyFuture.wait();
