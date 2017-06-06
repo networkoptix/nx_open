@@ -547,10 +547,12 @@ bool QnResourcePool::insertOrUpdateResource( const QnResourcePtr &resource, QHas
 {
     const QnUuid& id = resource->getId();
     auto itr = resourcePool->find(id);
-    if (itr == resourcePool->end()) {
+    if (itr == resourcePool->end())
+    {
         // new resource
         resourcePool->insert(id, resource);
-        m_cache.resourceAdded(resource);
+        if (resourcePool == &m_resources)
+            m_cache.resourceAdded(resource);
         return true;
     }
     else {
