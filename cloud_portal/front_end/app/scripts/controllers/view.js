@@ -7,16 +7,15 @@ angular.module('cloudApp')
         var currentSystem;
         account.requireLogin().then(function(account){
             $scope.currentSystem = system($routeParams.systemId, account.email);
-            $scope.currentSystem.getInfo().then(function(){
-                return $scope.currentSystem.updateSystemAuth().then(function(){
-                    $scope.systemReady = true;
-                    $scope.system = $scope.currentSystem.mediaserver;
-                    delayedUpdateSystemInfo();
-                },function(error){
-                    // cannot read the system
-                    dialogs.notify(L.errorCodes.lostConnection.replace("{{systemName}}", currentSystem.name || L.errorCodes.thisSystem), 'warning');
-                    $location.path("/systems");
-                });
+            var systemInfoRequest = $scope.currentSystem.getInfo();
+            var systemAuthRequest = $scope.currentSystem.updateSystemAuth();
+            $q.all([systemInfoRequest,systemAuthRequest]).then(function(){
+                $scope.systemReady = true;
+                $scope.system = $scope.currentSystem.mediaserver;
+                delayedUpdateSystemInfo();
+            },function(){
+                dialogs.notify(L.errorCodes.lostConnection.replace("{{systemName}}", currentSystem.name || L.errorCodes.thisSystem), 'warning');
+                $location.path("/systems");
             });
         });
 
