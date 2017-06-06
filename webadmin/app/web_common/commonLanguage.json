@@ -5,6 +5,7 @@
         "transcoding": "Transcoding",
         "unknown": "Unknown"
     },
+    "systemOffline":"System Offline",
     "cameraStates":{
         "offline": "OFFLINE",
         "unauthorized": "UNAUTHORIZED",

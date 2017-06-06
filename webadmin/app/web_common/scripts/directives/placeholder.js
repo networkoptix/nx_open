@@ -5,7 +5,7 @@ angular.module('nxCommon')
 		return{
 			restrict: 'E',
         	scope:{
-        	    iconClass:"=",
+        	    iconClass: "=",
         	    title: "=",
         	    message: "=",
         	    preloader: "="
