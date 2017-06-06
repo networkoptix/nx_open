@@ -44,7 +44,7 @@ Rectangle
         anchors.centerIn: parent
         visible: !control.showCentralArea
         opacity: 0.5
-        font: Qt.font({ pixelSize: 12, weight: Font.Bold})
+        font: Qt.font({pixelSize: 12, weight: Font.Bold})
         color: ColorTheme.contrast16
     }
 
