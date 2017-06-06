@@ -21,5 +21,5 @@
         "ubuntuNX": "Video cannot be played.<br>This browser does not support video from ARM-based servers. Please, use Chromium browser instead.",
         "errorLoading": "Video cannot be played.<br>Error occurred."
   },
-  "searchCaaamPlaceholder": "search"
+  "searchCamPlaceholder": "search"
 }

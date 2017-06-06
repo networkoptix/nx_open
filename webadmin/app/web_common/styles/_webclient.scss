@@ -234,6 +234,8 @@ table.webclient-window>tbody>tr>td{
     height: 100%;
     float: right;
     display: inline-block;
+    position: relative;
+    z-index: 1;
 
     .clear-button{
       float: left;
@@ -284,6 +286,15 @@ table.webclient-window>tbody>tr>td{
     outline: none !important;
     font-size: 16px;
     border-bottom: 1px solid $light6;
+    
+    &:hover{
+      background-color: $light2;
+    }
+
+    &.active,&:active,
+    &:focus{
+      background-color: $light1;
+    }
   }
 
   @mixin placeholder{
@@ -306,14 +317,6 @@ table.webclient-window>tbody>tr>td{
   }
   input:-moz-placeholder{
     @include placeholder;
-  }
-
-  &:hover{
-    background-color: $light2;
-  }
-
-  &.active,&:active{
-    background-color: $light1;
   }
 
   .glyphicon-remove{
