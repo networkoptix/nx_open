@@ -67,9 +67,12 @@ placeholder{ /* Hack to have full-screen */
     height:100%;
 
     z-index:1000;
-    background-color: transparentize($dark9, 0.1);
+    background-color: $dark9;
+    opacity: 0.6;
+
     &.has-preloader{
         background-color: transparent;
+        opacity: 1;
     }
 
     .placeholder-content{
@@ -83,7 +86,7 @@ placeholder{ /* Hack to have full-screen */
         font-size:130%;
         font-weight: 300;
         line-height:30px;
-        color: transparentize($light,0.4);
+        color: $light;
         &>*{
             width: 400px;
             text-align: center;
