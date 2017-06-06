@@ -113,7 +113,6 @@ void QnUserRolesManager::removeUserRole(const QnUuid& id)
     emit userRoleRemoved(role);
 }
 
-
 const QList<Qn::UserRole>& QnUserRolesManager::predefinedRoles()
 {
     static const QList<Qn::UserRole> predefinedRoleList({
