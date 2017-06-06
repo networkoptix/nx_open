@@ -5,6 +5,7 @@
 #include <unordered_map>
 #include <nx/utils/uuid.h>
 #include <nx/utils/singleton.h>
+#include <utils/db/async_sql_query_executor.h>
 
 namespace nx {
 namespace db {
@@ -17,25 +18,25 @@ class QueryContext;
 namespace nx {
 namespace cdb {
 
-class PersistentTimerManager;
+class PersistentSheduler;
 using PersistentParamsMap = std::unordered_map<std::string, std::string>;
 
 class AbstractPersistentTimerEventReceiver
 {
 public:
     virtual void persistentTimerFired(
-        nx::db::QueryContext* queryContext,
         const QnUuid& taskId,
-        PersistentParamsMap& params) = 0;
+        const PersistentParamsMap& params,
+        nx::db::QueryContext* context) = 0;
 
     virtual ~AbstractPersistentTimerEventReceiver() {}
 };
 
 
-class PersistentTimerManager
+class PersistentSheduler
 {
 public:
-    PersistentTimerManager(nx::db::AbstractAsyncSqlQueryExecutor*);
+    PersistentSheduler(nx::db::AbstractAsyncSqlQueryExecutor* sqlExecutor);
 
     void registerEventReceiver(
         const QnUuid& functorId,
@@ -53,8 +54,9 @@ public:
     void unsubscribe(const QnUuid& taskId, nx::db::QueryContext* queryContext);
 
 private:
-    std::unordered_map<QnUuid, AbstractPersistentTimerEventReceiver*> m_receiverMap;
-    std::unordered_map<QnUuid, PersistentParamsMap> m_paramsMap;
+    std::unordered_map<QnUuid, AbstractPersistentTimerEventReceiver*> m_functorToReceiver;
+    std::unordered_map<QnUuid, PersistentParamsMap> m_taskToParams;
+    nx::db::AbstractAsyncSqlQueryExecutor* m_sqlExecutor;
 };
 
 }

@@ -15,6 +15,9 @@ namespace db {
 class AbstractAsyncSqlQueryExecutor;
 class QueryContext;
 
+static const std::string kCdbStructureName = "cdb";
+static const std::string kPersistentShedulerStructureName = "sheduler";
+
 /**
  * Updates are executed in order they have been added to DbStructureUpdater istance.
  * @note Database is not created, it MUST already exist.

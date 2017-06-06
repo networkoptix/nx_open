@@ -16,7 +16,7 @@ InstanceController::InstanceController(const ConnectionOptions& dbConnectionOpti
     m_dbConnectionOptions(dbConnectionOptions),
     m_queryExecutor(std::make_unique<AsyncSqlQueryExecutor>(dbConnectionOptions)),
     m_statisticsCollector(kDefaultStatisticsAggregationPeriod),
-    m_dbStructureUpdater(m_queryExecutor.get())
+    m_dbStructureUpdater(kCdbStructureName, m_queryExecutor.get())
 {
     m_queryExecutor->setStatisticsCollector(&m_statisticsCollector);
 }
