@@ -105,3 +105,13 @@ placeholder{ /* Hack to have full-screen */
         }
     }
 }
+
+.webclient-placeholder{
+    position: absolute;
+    z-index: 1000;
+
+    .placeholder>.placeholder-content{
+        top:40%;
+    }
+}
+

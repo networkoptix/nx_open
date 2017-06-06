@@ -443,7 +443,7 @@ angular.module('nxCommon').controller('ViewCtrl',
         var updateHeights = function() {
             var $viewPanel = $('.view-panel');
             var $camerasPanel = $('.cameras-panel');
-            var $placeholder = $(".webclient-preloader .placeholder");
+            var $placeholder = $(".webclient-placeholder .placeholder");
             var windowHeight = $window.height();
             var headerHeight = $header.outerHeight();
 
