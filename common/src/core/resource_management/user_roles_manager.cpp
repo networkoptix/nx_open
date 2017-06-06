@@ -2,12 +2,16 @@
 
 #include <core/resource/user_resource.h>
 
-namespace {
+namespace Qn {
 
-uint qHash(Qn::UserRole role)
+uint qHash(UserRole role)
 {
     return uint(role);
 }
+
+} // namespace Qn
+
+namespace {
 
 QnUuid predefinedRoleUuid(Qn::UserRole role)
 {
