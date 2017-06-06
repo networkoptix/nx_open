@@ -282,9 +282,9 @@ def handle_exceptions(func):
             if 'password' in dictionary:
                 dictionary['password'] = '*****'
             if 'new_password' in dictionary:
-                dictionary['password'] = '****'
+                dictionary['new_password'] = '****'
             if 'old_password' in dictionary:
-                dictionary['password'] = '***'
+                dictionary['old_password'] = '***'
 
     def log_error(request, error, log_level):
         page_url = 'unknown'
