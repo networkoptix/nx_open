@@ -38,8 +38,11 @@ Flickable
 
                 leftPadding: 0
                 rightPadding: 0
+                topPadding: 0
+                bottomPadding: 0
+                padding: 0
                 width: 32
-                height: 56
+                height: 48
 
                 color: "transparent"
                 textColor: index == currentPresetIndex

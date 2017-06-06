@@ -35,16 +35,18 @@ Item
     {
         id: content
 
-        x: 8
-        width: parent.width - 16
+        x: 4
+        width: parent.width - 2 * x
 
-        spacing: 8
+        spacing: 12
+        bottomPadding: 4
 
         Item
         {
             id: topPtzPanel
 
-            width: parent.width
+            x: 4
+            width: parent.width - 2 * x
             height: Math.max(zoomFocusRow.height, joystick.height)
 
             Row
@@ -166,7 +168,7 @@ Item
         Item
         {
             width: parent.width
-            height: 56
+            height: 48
 
             PresetsButton
             {
@@ -174,6 +176,12 @@ Item
 
                 anchors.left: parent.left
                 anchors.verticalCenter: parent.verticalCenter
+                leftPadding: 0
+                rightPadding: 0
+                topPadding: 0
+                bottomPadding: 0
+                padding: 0
+                height: parent.height
 
                 resourceId: controller.resourceId
                 popupParent: videoScreen
@@ -186,6 +194,7 @@ Item
             {
                 id: presetsItem
 
+                height: parent.height
                 anchors.left: presetsButton.right
                 anchors.right: hidePtzButton.left
                 anchors.rightMargin: 4
@@ -228,11 +237,14 @@ Item
             {
                 id: hidePtzButton
 
-                width: 48
-                height: width
+                width: height
+                height: parent.height
                 anchors.right: parent.right
-                anchors.rightMargin: 4
                 anchors.verticalCenter: parent.verticalCenter
+                rightPadding: 0
+                leftPadding: 0
+                topPadding: 0
+                bottomPadding: 0
 
                 flat: true
                 icon: lp("/images/close.png")
