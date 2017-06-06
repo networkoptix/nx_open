@@ -79,7 +79,8 @@ void CrossNatConnector::connect(
             if (auto holder = SocketGlobals::tcpReversePool().getConnectionSource(hostName))
             {
                 s_mediatorResponseCounter.addResult(hpm::api::ResultCode::notImplemented);
-                NX_LOGX(lm("Using TCP reverse connections from pool"), cl_logDEBUG1);
+                NX_DEBUG(this, lm("Using TCP reverse connections from pool to connect to host %1")
+                    .arg(hostName));
 
                 return handler(
                     SystemError::noError,

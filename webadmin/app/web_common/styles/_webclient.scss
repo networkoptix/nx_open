@@ -1,6 +1,5 @@
 @import '../../styles/native-theme/theme_palette';
 
-
 ::-webkit-scrollbar {
   width: 8px;
 }
@@ -195,11 +194,11 @@ table.webclient-window>tbody>tr>td{
 }
 
 .cameras-panel{
-  min-width: 320px;
+  /*min-width: 320px;*/
   overflow-y: auto;
   overflow-x: hidden;
   height: 100%;
-  width:100%;
+  width:320px;
 
   background-color: $additional_light2;
 }
@@ -305,26 +304,6 @@ table.webclient-window>tbody>tr>td{
 }
 
 .camera{
-  &-status{
-    display:inline-block;
-    width:1em;
-    text-align: center;
-    font-size:180%;
-    line-height: 1;
-
-    &.online-cam{
-      top: -8px;
-      left: -5px;  
-    }
-
-    &.offline-cam{
-      top: -8px;
-      left: -7px;
-      font-size: 200%;
-      font-weight: bolder;  
-    }
-  }
-
   &-info{
     margin-left: -32px;
   }
@@ -332,6 +311,9 @@ table.webclient-window>tbody>tr>td{
   &-preview .camera-status{
     position: absolute;
     z-index: 1;
+    top: 4px;
+    left: 4px;
+    width: 8px;
   }
 
   &-settings{
@@ -404,22 +386,13 @@ table.webclient-window>tbody>tr>td{
   }
 }
 
-.camera-preview>.camera-preview-image {
-  display:block;
-  position: relative;
-  top: 50%;
-  transform: translateY(-50%);
-  -ms-transform: translateY(-50%);
-  background-size: 100% 100%;
-
-  margin-left: auto;
-  margin-right: auto;
-}
-
-.camera-preview>.camera-preview-image>img{
-  visibility:hidden;
+.camera-preview > img{
   max-width:68px !important;
-  max-height:38px !important;
+  max-height:34px !important;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
 }
 
 .camera-states{
@@ -566,19 +539,6 @@ table.webclient-window>tbody>tr>td{
   text-shadow: 0px 1px 3px rgba($dark1,1)
 }
 
-.video-status{
-  &{
-    width: 24px;
-    font-size: 180%;
-    line-height: 12px;
-  }
-  &.offline-video{
-    line-height: 16px;
-    font-size: 200% !important;
-    font-weight: bolder;  
-  }
-}
-
 .video-icon{
   width: 24px;
   margin: 6px;
@@ -645,8 +605,6 @@ table.webclient-window>tbody>tr>td{
 }
 
 .video-preview{
-  height: 100%;
-  max-width: 100%;
   background-color: $dark1;
 }
 
@@ -703,6 +661,15 @@ table.webclient-window>tbody>tr>td{
 .videowindow video{
   max-width:100%;
   max-height:100%;
+}
+
+.videowindow > img{
+  max-width: 100%;
+  max-height: 100%;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
 }
 
 .half-height {
@@ -763,6 +730,10 @@ div{
     background-color: $additional_light2;
     border-left: 1px solid $light6;
     border-right: 1px solid $light6;
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    box-shadow: 0 2px 0 2px rgba($dark1, 0.05);
   }
 
   &.text-right{
@@ -770,6 +741,10 @@ div{
       width:104px;
       height:100%;
       background-color: $additional_light2;
+      position: absolute;
+      bottom: 0;
+      right: 0;
+      box-shadow: 0 2px 0 2px rgba($dark1, 0.05);
     }
 
     &.no-volume{
@@ -789,21 +764,8 @@ div{
   }
 }
 
-.side-shadow{
-  width:2px;
-  height: 100%;
-  background-color: $dark1;
-  opacity: 0.05;
-  position: absolute;
-
-  &.right{
-    right:0;
-  }
-}
-
-
 .player-controls{
-  padding: 33px 25px 32px 25px !important;
+  padding: 33px 25px 32px 22px !important;
 }
 
 .zoom-level{
@@ -908,38 +870,6 @@ div{
   background-color: rgba($dark1,0.1);
 }
 
-.glyphicon-backward,
-.glyphicon-forward,
-.glyphicon-pause,
-.glyphicon-play,
-.live-button {
-  color:black;
-}
-
-.glyphicon-volume-off,
-.glyphicon-volume-up,
-.glyphicon-minus,
-.glyphicon-plus {
-  color:gray;
-}
-
-.glyphicon-pp{
-  width: 63px;
-  height: 100%;
-}
-
-.glyphicon-fwbw{
-  height: 40px;
-  width: 32px;
-  padding: 0 !important;
-}
-
-.glyphicon-pm{
-  height: 44px;
-  width: 40px;
-  display: block !important;
-}
-
 .caption-row {
   line-height: 40px;
   vertical-align: top;
@@ -981,7 +911,7 @@ div{
     margin: 0 !important;
   }
   .glyphicon-pm{
-    height: 60px;
+    height: 60px !important;
     display: inline-block !important;
   }
 
@@ -1013,4 +943,30 @@ div{
     color:$light1;
   }
 
+}
+
+.live-button {
+  color:black;
+}
+
+.glyphicon-volume-off,
+.glyphicon-volume-up{
+  color:gray;
+}
+
+.glyphicon-pp{
+  width: 63px;
+  height: 100%;
+}
+
+.glyphicon-fwbw{
+  height: 40px;
+  width: 32px;
+  padding: 0 !important;
+}
+
+.glyphicon-pm{
+  height: 44px;
+  width: 40px;
+  display: block;
 }

@@ -41,7 +41,7 @@ public:
     */
     StreeManager(
         const nx::utils::stree::ResourceNameSet& resourceNameSet,
-        const QString& xmlFilePath) throw(std::runtime_error);
+        const QString& xmlFilePath) noexcept(false);
 
     void search(
         StreeOperation,

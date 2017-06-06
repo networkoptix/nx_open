@@ -5,7 +5,7 @@
             <input type="search" class="form-control" placeholder="Search" ng-model="searchCams" ng-class="{'raise-input-up': searchCams}">
             <span ng-hide="!searchCams || searchCams==''" class="input-group-addon clear-button" ng-click="searchCams=''" ><span class="glyphicon glyphicon-remove"></span></span>
             <div class="clear-button-right" ng-hide="!searchCams || searchCams==''"></div>
-            <span class="input-group-addon info-icon" ng-class="{'active':toggleInfo}" ng-click="toggleInfo= !toggleInfo"><span class="glyphicon glyphicon-info-sign"></span></span>
+            <span class="input-group-addon info-icon" ng-click="toggleInfo= !toggleInfo"><span ng-class="{'active':toggleInfo}" class="glyphicon glyphicon-info-sign"></span></span>
         </label>
     </div>
     <camera-links ng-if="cameraLinksEnabled" system="systemAPI"

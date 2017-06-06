@@ -14,7 +14,7 @@ namespace cdb {
 
 StreeManager::StreeManager(
     const nx::utils::stree::ResourceNameSet& resourceNameSet,
-    const QString& xmlFilePath) throw(std::runtime_error)
+    const QString& xmlFilePath) noexcept(false)
 :
     nx::utils::stree::StreeManager(resourceNameSet, xmlFilePath)
 {
