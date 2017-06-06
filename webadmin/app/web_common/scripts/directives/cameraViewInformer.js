@@ -9,7 +9,7 @@ angular.module('nxCommon')
         	},
         	templateUrl: Config.viewsDirCommon + 'components/cameraViewInformer.html',
         	link: function(scope){
-        		scope.cameraStates = L.cameraStates;
+        		scope.cameraStates = L.common.cameraStates;
                 scope.message = "";
 
                 scope.$watch('flags', function(){

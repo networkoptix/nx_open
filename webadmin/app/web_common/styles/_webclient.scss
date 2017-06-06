@@ -1,4 +1,5 @@
 @import '../../styles/native-theme/theme_palette';
+@import 'icons';
 
 ::-webkit-scrollbar {
   width: 8px;
@@ -214,6 +215,7 @@ table.webclient-window>tbody>tr>td{
   font-size: 13px;
   background-color: $additional_light2;
   color: $light16;
+  position: relative;
 
   &>*{
     background: transparent;
@@ -230,7 +232,6 @@ table.webclient-window>tbody>tr>td{
 
   .icons-right{
     height: 100%;
-    width: 85px;
     float: right;
     display: inline-block;
 
@@ -275,7 +276,7 @@ table.webclient-window>tbody>tr>td{
   }
 
   input{
-    width: 320px;
+    width: 100%;
     padding: 0 85px 0 44px;
     position: absolute;
     border: none;
@@ -285,31 +286,26 @@ table.webclient-window>tbody>tr>td{
     border-bottom: 1px solid $light6;
   }
 
-  input::placeholder{
-    color: $light16;
-    font-size: 13px;
-    line-height: 44px;
-  }
-  input::-webkit-input-placeholder{
+  @mixin placeholder{
     color: $light16;
     font-size: 13px;
     line-height: 44px;
   }
 
+  input::placeholder{
+    @include placeholder;
+  }
+  input::-webkit-input-placeholder{
+    @include placeholder;
+  }
   input::-moz-placeholder{
-    color: $light16;
-    font-size: 13px;
-    line-height: 44px;
+    @include placeholder;
   }
   input:-ms-input-placeholder{
-    color: $light16;
-    font-size: 13px;
-    line-height: 44px;
+    @include placeholder;
   }
   input:-moz-placeholder{
-    color: $light16;
-    font-size: 13px;
-    line-height: 44px;
+    @include placeholder;
   }
 
   &:hover{
@@ -318,6 +314,20 @@ table.webclient-window>tbody>tr>td{
 
   &.active,&:active{
     background-color: $light1;
+  }
+
+  .glyphicon-remove{
+    @include kill-glyphicon;
+    height: 10px !important;
+    width: 10px !important;
+    background-position: -73px -49px;
+  }
+  .glyphicon-remove:hover,
+  .glyphicon-remove:active{
+    @include kill-glyphicon;
+    height: 10px !important;
+    width: 10px !important;
+    background-position: -73px -61px;
   }
 }
 

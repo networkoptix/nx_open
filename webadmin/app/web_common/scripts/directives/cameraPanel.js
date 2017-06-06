@@ -15,6 +15,7 @@ angular.module('nxCommon')
                 scope.Config = Config;
                 scope.storage = $localStorage;
                 scope.searchCams = '';
+                scope.inputPlaceholder = L.common.searchCamPlaceholder;
 
                 var updateCameras = function(){
                     scope.cameras = scope.camerasProvider.cameras;

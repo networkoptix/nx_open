@@ -4,5 +4,6 @@
     "lowStream": "Low stream",
     "transcoding": "Transcoding",
     "unknown": "Unknown"
-  }
+  },
+  "searchCamPlaceholder": "search"
 }

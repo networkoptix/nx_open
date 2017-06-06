@@ -95,20 +95,6 @@
   background-position: -50px -26px;
 }
 
-.glyphicon-remove{
-  @include kill-glyphicon;
-  height: 10px !important;
-  width: 10px !important;
-  background-position: -73px -49px;
-}
-.glyphicon-remove:hover,
-.glyphicon-remove:active{
-  @include kill-glyphicon;
-  height: 10px !important;
-  width: 10px !important;
-  background-position: -73px -61px;
-}
-
 .glyphicon-info-sign{
   @include kill-glyphicon;
   &{
