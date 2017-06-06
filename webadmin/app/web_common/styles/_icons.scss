@@ -2,7 +2,7 @@
   display: inline-block;
   background-size: 192px 408px;
   background-image: url(../web_common/images/icons/web_interface_sprite.png);
-  @media only screen and (-webkit-min-device-pixel-ration: 2), only screen and (min-device-pixel-ratio: 2){
+  @media only screen and (-webkit-min-device-pixel-ratio: 2), only screen and (min-device-pixel-ratio: 2){
     background-image: url(../web_common/images/icons/web_interface_sprite@2x.png);
   }
 }
@@ -182,12 +182,12 @@
   @include icon;
   width: 93px !important;
   height: 93px !important;
-  background-position: -97px -216px;
+  background-position: -99px -216px;
 }
 
 .server-offline{
   @include icon;
   width: 93px !important;
   height: 93px !important;
-  background-position: -97px -216px;
+  background-position: -99px -316px;
 }
