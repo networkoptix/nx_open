@@ -208,43 +208,90 @@ table.webclient-window>tbody>tr>td{
   }
 }
 
-/* Cameras panel */
+/* Cameras search */
 .cameras-search{
   height: 44px;
-  border-bottom: 1px solid $light6;
   font-size: 13px;
   background-color: $additional_light2;
+  color: $light16;
 
-  &>.input-group{
+  &>*{
+    background: transparent;
+    height: 44px;
+  }
+  .icon-left{
+    text-align: center;
+    line-height: 54px;
+    height: 100%;
+    width: 44px;
+    float: left;
+  }
 
-    .input-group-addon{
-      border: none !important;
+  .icons-right{
+    height: 100%;
+    width: 85px;
+    float: right;
+    display: inline-block;
+
+    .clear-button{
+      float: left;
+      width: 40px;
       height: 44px;
+      line-height: 44px;
     }
 
-    input{
-      margin-bottom: -20px;
-      color: $light16;
-      border:none;
-      box-shadow:none;
-      font-size: 16px;
-      /*caret-color: $light1;*/
+    .clear-divider{
+      background-color: $light4 !important;
+      height: 24px;
+      width: 1px;
 
-      &::placeholder{
-        color: $light16;
-        font-size: 13px;
-        line-height: 20px;
+      position: relative;
+      top: 10px;
+    }
+
+    .info-icon{
+      line-height: 54px;
+      float: right;
+      width: 44px;
+      height: 44px;
+      &.active{
+        color: $blue10 !important;  
+      }
+      
+      &:hover, &.active:hover{
+        background-color: $additional_light3 !important;  
+      }
+
+      &:active, &.active:active{
+        background-color: $light5 !important;
       }
     }
-
+    
     &>*{
-      background: transparent;
-      color:$light16;   
+      text-align: center;
+      display: inline-block;
     }
   }
 
+  input{
+    width: 320px;
+    padding: 0 85px 0 44px;
+    position: absolute;
+    border: none;
+    box-shadow: none;
+    outline: none !important;
+    font-size: 16px;
+    border-bottom: 1px solid $light6;
+  }
+
+  input::placeholder{
+    color: $light16;
+    font-size: 13px;
+    line-height: 20px;
+  }
+
   &:hover{
-    backgroud-color: $light2;
+    background-color: $light2;
   }
 
   &.active,&:active{
@@ -252,6 +299,8 @@ table.webclient-window>tbody>tr>td{
   }
 }
 
+
+/* Camera Panel*/
 .server{
   &-link{
     height:40px;
@@ -668,39 +717,6 @@ table.webclient-window>tbody>tr>td{
 .videowindow.fullscreen video{
   height:100% !important;
   width:100% !important;
-}
-
-.clear-button{
-  &{
-    width: 40px;
-    height: 43px;
-  }
-  &-right{
-    background-color: $light4 !important;
-    position: relative;
-    height: 24px;
-    width: 1px;
-    top: 10px;
-  }
-}
-
-.icon{
-  width: 44px;
-  height: 43px;
-}
-
-.info-icon{
-  &.active{
-    color: $blue10 !important;  
-  }
-  
-  &:hover, &.active:hover{
-    background-color: $additional_light3 !important;  
-  }
-
-  &:active, &.active:active{
-    background-color: $light5 !important;
-  }
 }
 
 div{
