@@ -1,5 +1,7 @@
 #include "ssl_static_data.h"
 
+#ifdef ENABLE_SSL
+
 #include <memory>
 #include <mutex>
 
@@ -203,3 +205,5 @@ String SslStaticData::s_allowedServerCiphers("HIGH:!RC4:!3DES");
 } // namespace ssl
 } // namespace network
 } // namespace nx
+
+#endif // ENABLE_SSL

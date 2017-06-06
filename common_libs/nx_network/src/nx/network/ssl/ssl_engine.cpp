@@ -1,5 +1,7 @@
 #include "ssl_engine.h"
 
+#ifdef ENABLE_SSL
+
 #include <QtCore/QDir>
 
 #include <nx/utils/log/log.h>
@@ -233,3 +235,5 @@ void Engine::setAllowedServerCiphers(const String& ciphers)
 } // namespace ssl
 } // namespace network
 } // namespace nx
+
+#endif // ENABLE_SSL
