@@ -16,7 +16,7 @@ placeholder{ /* Hack to have full-screen */
     height:100%;
 
     z-index:1000;
-    background-color: transparentize($light, 0.4);
+    background-color: transparentize($dark9, 0.1);
 
     .placeholder-content{
         text-align: center;
@@ -29,31 +29,33 @@ placeholder{ /* Hack to have full-screen */
         font-weight: 400;
         font-size:130%;
         line-height:30px;
-        color:$dark17;
+        color: transparentize($light,0.4);
 
         a{
             color: $light12;
             text-decoration: underline;
     
             &:hover, &:active{
-                    color: $light1;
+                color: $light1;
             }
         }
     
         .placeholder-icon{
-            display: inline-block;
-            margin-bottom: 20px;
+            display: block;
+            margin: auto;
+            margin-bottom: 24px;
         }
     
         .placeholder-title{
           font-weight: 300;
-          color: $dark13;
           font-size: 40px;
+          line-height:48px;
           display: inline-block;
+          text-transform: uppercase;
         }
+
         .placeholder-message{
           font-weight: 300;
-          color: $dark13;
           font-size: 40px;
           display: inline-block;
         }
