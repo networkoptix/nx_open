@@ -1,18 +1,14 @@
-#include "utils.h"
+#include "random_file.h"
 
 #include <QtCore/QFile>
 
+#include <nx/utils/random.h>
 #include <nx/utils/log/assert.h>
 
 namespace nx {
-namespace vms {
-namespace common {
-namespace p2p {
-namespace downloader {
-namespace test {
 namespace utils {
 
-void createTestFile(const QString& fileName, qint64 size)
+void createRandomFile(const QString& fileName, qint64 size)
 {
     QFile file(fileName);
 
@@ -22,10 +18,12 @@ void createTestFile(const QString& fileName, qint64 size)
         return;
     }
 
-    for (qint64 i = 0; i < size; ++i)
+    static constexpr qint64 kBlockSize = 1024;
+
+    for (qint64 bytesLeft = size; bytesLeft > 0; bytesLeft -= kBlockSize)
     {
-        const char c = static_cast<char>(rand());
-        if (file.write(&c, 1) != 1)
+        const auto& block = random::generate(std::min(bytesLeft, kBlockSize));
+        if (file.write(block.constData(), block.size()) != block.size())
         {
             NX_ASSERT(false, "Cannot write into test file.");
             return;
@@ -36,9 +34,4 @@ void createTestFile(const QString& fileName, qint64 size)
 }
 
 } // namespace utils
-} // namespace test
-} // namespace downloader
-} // namespace p2p
-} // namespace common
-} // namespace vms
 } // namespace nx

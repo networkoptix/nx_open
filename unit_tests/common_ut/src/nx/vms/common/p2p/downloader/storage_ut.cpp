@@ -4,9 +4,8 @@
 #include <QtCore/QFile>
 
 #include <nx/utils/test_support/test_options.h>
+#include <nx/utils/random_file.h>
 #include <nx/vms/common/p2p/downloader/private/storage.h>
-
-#include "utils.h"
 
 namespace nx {
 namespace vms {
@@ -48,7 +47,7 @@ protected:
 
     void createTestFile(const QString& fileName, qint64 size)
     {
-        utils::createTestFile(workingDirectory.absoluteFilePath(fileName), size);
+        utils::createRandomFile(workingDirectory.absoluteFilePath(fileName), size);
 
         testFileMd5 = Storage::calculateMd5(testFilePath);
         NX_ASSERT(!testFileMd5.isEmpty());

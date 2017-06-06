@@ -1,10 +1,10 @@
 #include <gtest/gtest.h>
 
 #include <nx/utils/test_support/test_options.h>
+#include <nx/utils/random_file.h>
 #include <nx/vms/common/p2p/downloader/private/storage.h>
 
 #include "test_peer_manager.h"
-#include "utils.h"
 
 namespace nx {
 namespace vms {
@@ -133,7 +133,7 @@ TEST_F(DistributedFileDownloaderPeerManagerTest, usingStorage)
     const QString fileName("test");
     const QString filePath(storageDir.absoluteFilePath(fileName));
 
-    utils::createTestFile(filePath, 1);
+    utils::createRandomFile(filePath, 1);
 
     auto storage = new Storage(storageDir);
 
@@ -198,7 +198,7 @@ TEST_F(DistributedFileDownloaderPeerManagerTest, internetFile)
     const QString filePath(storageDir.absoluteFilePath(fileName));
     const QString url("http://test.org/test");
 
-    utils::createTestFile(filePath, 1);
+    utils::createRandomFile(filePath, 1);
 
     peerManager->addInternetFile(url, filePath);
 

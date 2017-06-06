@@ -2,10 +2,10 @@
 
 #include <nx/utils/log/log.h>
 #include <nx/utils/test_support/test_options.h>
+#include <nx/utils/random_file.h>
 #include <nx/vms/common/p2p/downloader/private/storage.h>
 #include <nx/vms/common/p2p/downloader/private/worker.h>
 
-#include "utils.h"
 #include "test_peer_manager.h"
 
 namespace nx {
@@ -99,7 +99,7 @@ protected:
             }
         }
 
-        utils::createTestFile(fileInfo.absoluteFilePath(), size);
+        utils::createRandomFile(fileInfo.absoluteFilePath(), size);
 
         TestPeerManager::FileInformation testFileInfo(kTestFileName);
         testFileInfo.filePath = workingDirectory.absoluteFilePath(fileName);
