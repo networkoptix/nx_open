@@ -20,5 +20,5 @@
         "ieWin10": "Please, use Microsoft Edge or Google Chrome browsers.",
         "ubuntuNX": "This browser does not support video from ARM-based servers. Please, use Chromium browser instead."
   },
-  "searchCaaamPlaceholder": "search"
+  "searchCamPlaceholder": "search"
 }

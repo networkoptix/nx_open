@@ -1,5 +1,4 @@
 @import '../../styles/native-theme/theme_palette';
-@import 'icons';
 
 ::-webkit-scrollbar {
   width: 8px;
@@ -13,11 +12,6 @@
 ::-webkit-scrollbar-thumb
 {
   background: $light8;
-}
-
-::-webkit-scrollbar-track:hover
-{
-  background: $light9;
 }
 
 ::-webkit-scrollbar-thumb:hover
@@ -237,6 +231,8 @@ table.webclient-window>tbody>tr>td{
     height: 100%;
     float: right;
     display: inline-block;
+    position: relative;
+    z-index: 1;
 
     .clear-button{
       float: left;
@@ -287,6 +283,15 @@ table.webclient-window>tbody>tr>td{
     outline: none !important;
     font-size: 16px;
     border-bottom: 1px solid $light6;
+    
+    &:hover{
+      background-color: $light2;
+    }
+
+    &.active,&:active,
+    &:focus{
+      background-color: $light1;
+    }
   }
 
   @mixin placeholder{
@@ -309,28 +314,6 @@ table.webclient-window>tbody>tr>td{
   }
   input:-moz-placeholder{
     @include placeholder;
-  }
-
-  &:hover{
-    background-color: $light2;
-  }
-
-  &.active,&:active{
-    background-color: $light1;
-  }
-
-  .glyphicon-remove{
-    @include kill-glyphicon;
-    height: 10px !important;
-    width: 10px !important;
-    background-position: -73px -49px;
-  }
-  .glyphicon-remove:hover,
-  .glyphicon-remove:active{
-    @include kill-glyphicon;
-    height: 10px !important;
-    width: 10px !important;
-    background-position: -73px -61px;
   }
 }
 
@@ -407,7 +390,7 @@ table.webclient-window>tbody>tr>td{
 
 
   position:absolute;
-  margin-left:-86px;
+  margin-left: -72px;
   margin-top: -2px;
 }
 
@@ -472,7 +455,7 @@ table.webclient-window>tbody>tr>td{
     text-overflow: ellipsis;
     overflow: hidden;
     padding-right: 10px;
-    padding-left:95px;
+    padding-left: 78px;
   }
 
   & > a:hover, & > a:focus{
@@ -484,7 +467,8 @@ table.webclient-window>tbody>tr>td{
     background-color: $additional_light3;
   }
 
-  &.active > a{
+  &.active > a,
+  &.active > a:active{
     text-decoration: none;
     background-color: $light5;
   }

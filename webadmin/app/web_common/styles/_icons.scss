@@ -105,6 +105,18 @@
   }
 }
 
+.glyphicon-remove{
+  @include kill-glyphicon;
+  height: 10px !important;
+  width: 10px !important;
+  background-position: -73px -49px;
+  
+  &:hover,
+  &:active{
+    background-position: -73px -61px;
+  }
+}
+
 .camera-preview-offline{
   @include icon;
   width: 25px !important;
