@@ -33,6 +33,9 @@
 ::-ms-clear { display: none; }
 
 
+.visibility-hidden{
+    visibility:hidden;
+}
 .webclient{
   &{
     height:100%;
