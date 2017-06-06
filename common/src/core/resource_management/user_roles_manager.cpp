@@ -4,7 +4,7 @@
 
 namespace Qn {
 
-uint qHash(UserRole role)
+static uint qHash(UserRole role)
 {
     return uint(role);
 }
