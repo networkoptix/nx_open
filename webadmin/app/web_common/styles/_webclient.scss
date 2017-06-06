@@ -220,6 +220,7 @@ table.webclient-window>tbody>tr>td{
     height: 44px;
   }
   .icon-left{
+    position: absolute;
     text-align: center;
     line-height: 54px;
     height: 100%;
@@ -287,7 +288,28 @@ table.webclient-window>tbody>tr>td{
   input::placeholder{
     color: $light16;
     font-size: 13px;
-    line-height: 20px;
+    line-height: 44px;
+  }
+  input::-webkit-input-placeholder{
+    color: $light16;
+    font-size: 13px;
+    line-height: 44px;
+  }
+
+  input::-moz-placeholder{
+    color: $light16;
+    font-size: 13px;
+    line-height: 44px;
+  }
+  input:-ms-input-placeholder{
+    color: $light16;
+    font-size: 13px;
+    line-height: 44px;
+  }
+  input:-moz-placeholder{
+    color: $light16;
+    font-size: 13px;
+    line-height: 44px;
   }
 
   &:hover{
