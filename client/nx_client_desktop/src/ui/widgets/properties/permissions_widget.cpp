@@ -40,7 +40,7 @@ QnPermissionsWidget::QnPermissionsWidget(QnAbstractPermissionsModel* permissions
     addCheckBox(Qn::GlobalViewBookmarksPermission,       tr("View bookmarks"));
     addCheckBox(Qn::GlobalManageBookmarksPermission,     tr("Modify bookmarks"));
     addCheckBox(Qn::GlobalUserInputPermission,           tr("User Input"),
-        tr("PTZ, Device Output, 2-way Audio"));
+        tr("PTZ, Device Output, 2-Way Audio, Software Triggers."));
 
     ui->permissionsLayout->addStretch();
 
