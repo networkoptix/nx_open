@@ -79,7 +79,7 @@ public:
           m_data(dayOfWeek, startTime, endTime, recordType, beforeThreshold, afterThreshold, streamQuality, fps, doRecordAudio)
     {}
 
-    bool isEmpty() const {return m_data.m_startTime == 0 && m_data.m_endTime == 0; }
+    bool isEmpty() const { return m_data.m_startTime == 0 && m_data.m_endTime == 0; }
 
     const Data& getData() const { return m_data; }
     void setData(const Data& data) { m_data = data; }

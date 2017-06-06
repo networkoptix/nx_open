@@ -13,6 +13,7 @@ public:
     static QString defaultCloudPortalUrl();
     static QString defaultCloudModulesXmlUrl();
     static QString cloudName();
+    static QStringList compatibleCloudHosts();
 };
 
 } // namespace network

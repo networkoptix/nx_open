@@ -86,7 +86,6 @@ class QnRecordingManager:
     Q_OBJECT
 public:
     static const int RECORDING_CHUNK_LEN = 60; // seconds
-    static const int MIN_SECONDARY_FPS = 2;
 
     QnRecordingManager(
         QnCommonModule* commonModule,
@@ -99,7 +98,13 @@ public:
 
     Recorders findRecorders(const QnResourcePtr& res) const;
 
-    bool startForcedRecording(const QnSecurityCamResourcePtr& camRes, Qn::StreamQuality quality, int fps, int beforeThreshold, int afterThreshold, int maxDuration);
+    bool startForcedRecording(
+        const QnSecurityCamResourcePtr& camRes,
+        Qn::StreamQuality quality,
+        int fps,
+        int beforeThresholdSec,
+        int afterThresholdSec,
+        int maxDurationSec);
 
     bool stopForcedRecording(const QnSecurityCamResourcePtr& camRes, bool afterThresholdCheck = true);
 

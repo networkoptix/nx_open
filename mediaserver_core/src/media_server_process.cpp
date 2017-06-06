@@ -2641,8 +2641,12 @@ void MediaServerProcess::run()
     QnAppServerConnectionFactory::setEc2Connection(ec2Connection);
 
     const auto& runtimeManager = commonModule()->runtimeInfoManager();
-    connect(runtimeManager, &QnRuntimeInfoManager::runtimeInfoAdded, this, &MediaServerProcess::at_runtimeInfoChanged);
-    connect(runtimeManager, &QnRuntimeInfoManager::runtimeInfoChanged, this, &MediaServerProcess::at_runtimeInfoChanged);
+    connect(
+        runtimeManager, &QnRuntimeInfoManager::runtimeInfoAdded,
+        this, &MediaServerProcess::at_runtimeInfoChanged, Qt::QueuedConnection);
+    connect(
+        runtimeManager, &QnRuntimeInfoManager::runtimeInfoChanged,
+        this, &MediaServerProcess::at_runtimeInfoChanged, Qt::QueuedConnection);
 
     if (needToStop())
         return; //TODO #ak correctly deinitialize what has been initialised

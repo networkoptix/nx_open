@@ -59,7 +59,6 @@ namespace
 static const qint64 MSECS_PER_DAY = 1000ll * 3600ll * 24ll;
 static const qint64 MOTION_CLEANUP_INTERVAL = 1000ll * 3600;
 static const qint64 BOOKMARK_CLEANUP_INTERVAL = 1000ll * 60;
-static const qint64 EMPTY_DIRS_CLEANUP_INTERVAL = 1000ll * 3600;
 
 const qint64 kMinStorageFreeSpace = 150 * 1024 * 1024LL;
 
@@ -480,9 +479,12 @@ QnStorageManager::QnStorageManager(
 
     m_rebuildArchiveThread = new ScanMediaFilesTask(this);
     m_rebuildArchiveThread->start();
+
     m_clearMotionTimer.restart();
     m_clearBookmarksTimer.restart();
     m_removeEmtyDirTimer.invalidate();
+
+    startAuxTimerTasks();
 }
 
 int64_t QnStorageManager::calculateNxOccupiedSpace(int storageIndex) const
@@ -1445,6 +1447,9 @@ void QnStorageManager::removeEmptyDirs(const QnStorageResourcePtr &storage)
         {
             for (const auto& entry: fl)
             {
+                if (QnResource::isStopping())
+                    return false;
+
                 if (entry.isDir())
                 {
                     if (depthLimit == 0)
@@ -1526,8 +1531,6 @@ void QnStorageManager::clearSpace(bool forced)
 
     if (m_firstStoragesTestDone)
         testOfflineStorages();
-
-    m_camInfoWriter.write();
 
     // 1. delete old data if cameras have max duration limit
     clearMaxDaysData();
@@ -1617,14 +1620,6 @@ void QnStorageManager::clearSpace(bool forced)
                             << (toDeleteTotal / (1024 * 1024 * elapsedSecs)) << " Mb/s"
                             << endl;
         NX_LOG(clearSpaceLogMessage, cl_logDEBUG2);
-    }
-
-    // 3. Remove empty dirs
-    if (!m_removeEmtyDirTimer.isValid() || m_removeEmtyDirTimer.elapsed() > EMPTY_DIRS_CLEANUP_INTERVAL)
-    {
-        m_removeEmtyDirTimer.restart();
-        for (const QnStorageResourcePtr &storage : storages)
-            removeEmptyDirs(storage);
     }
 
     // 4. DB cleanup
@@ -2110,6 +2105,31 @@ void QnStorageManager::changeStorageStatus(const QnStorageResourcePtr &fileStora
         emit storageFailure(fileStorage, QnBusiness::StorageIoErrorReason);
 }
 
+void QnStorageManager::startAuxTimerTasks()
+{
+    static const std::chrono::minutes kWriteInfoFilesInterval(5);
+
+    m_auxTasksTimerManager.addNonStopTimer(
+        [this](nx::utils::TimerId) { m_camInfoWriter.write(); },
+        kWriteInfoFilesInterval,
+        kWriteInfoFilesInterval);
+
+    static const std::chrono::minutes kRemoveEmptyDirsInterval(60);
+
+    m_auxTasksTimerManager.addNonStopTimer(
+        [this](nx::utils::TimerId)
+        {
+            for (const auto& storage : getUsedWritableStorages())
+            {
+                if (storage->hasFlags(Qn::storage_fastscan))
+                    continue;
+                removeEmptyDirs(storage);
+            }
+        },
+        kRemoveEmptyDirsInterval,
+        kRemoveEmptyDirsInterval);
+}
+
 void QnStorageManager::testOfflineStorages()
 {
     QnMutexLocker lock( &m_testStorageThreadMutex );
@@ -2134,6 +2154,8 @@ void QnStorageManager::stopAsyncTasks()
         delete m_rebuildArchiveThread;
         m_rebuildArchiveThread = 0;
     }
+
+    m_auxTasksTimerManager.stop();
 }
 
 QnStorageResourcePtr QnStorageManager::getStorageByIndex(int index) const
