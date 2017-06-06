@@ -172,27 +172,27 @@
 
 .camera-view-unauthorized{
   @include icon;
-  width: 93px !important;
-  height: 93px !important;
-  background-position: -1px -216px;
+  width: 96px !important;
+  height: 96px !important;
+  background-position: 0px -216px;
 }
 .camera-view-offline{
   @include icon;
-  width: 93px !important;
-  height: 93px !important;
-  background-position: -99px -216px;
+  width: 96px !important;
+  height: 96px !important;
+  background-position: -96px -216px;
 }
 
 .server-offline{
   @include icon;
-  width: 93px !important;
-  height: 93px !important;
-  background-position: -99px -316px;
+  width: 96px !important;
+  height: 96px !important;
+  background-position: -96px -316px;
 }
 
 .camera-view-error{
   @include icon;
-  width: 93px !important;
-  height: 93px !important;
-  background-position: -1px -316px;
+  width: 96px !important;
+  height: 96px !important;
+  background-position: 0px -316px;
 }

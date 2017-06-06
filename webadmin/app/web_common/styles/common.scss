@@ -4,22 +4,74 @@
 @import "webclient";
 @import "icons";
 
-$placeholder_color: $light;
-$placeholder_color_transparent: transparentize($placeholder_color,1);
+$preloader_circle_color: $light;
+$preloader_circle_size: 16px;
+$preloader_circle_distance: 12px;
+
+
+@mixin preloader($circle_color, $circle_size, $circle_distance) {
+    &{
+        width:($preloader_circle_size + $preloader_circle_distance) *3;
+    }
+
+    .circleG{
+        background-color: transparentize($circle_color,1);
+        float:left;
+        height:$circle_size;
+        width:$circle_size;
+        border-radius:$circle_size/2;
+        margin:0 $circle_distance/2;
+        -webkit-animation-name:bounce_circleG;
+                animation-name:bounce_circleG;
+        -webkit-animation-duration:1.4s;
+                animation-duration:1.4s;
+        -webkit-animation-iteration-count:infinite;
+                animation-iteration-count:infinite;
+        -webkit-animation-direction:normal;
+                animation-direction:normal;
+    }
+
+    .circleG_2{
+        -webkit-animation-delay:0.15s;
+                animation-delay:0.15s;
+    }
+
+    .circleG_3{
+        -webkit-animation-delay:0.3s;
+                animation-delay:0.3s;
+    }
+
+    @-webkit-keyframes bounce_circleG{
+        0%{}
+        40%{background-color: $circle_color;}
+        80%{background-color: transparentize($circle_color,1);}
+        100%{}
+    }
+
+    @keyframes bounce_circleG{
+        0%{}
+        40%{background-color: $circle_color;}
+        80%{background-color: transparentize($circle_color,1);}
+        100%{}
+    }
+}
+
 
 placeholder{ /* Hack to have full-screen */
     width:100%;
     height:100%;
-    z-index: 1000;
 }
 .placeholder{
     width:100%;
     height:100%;
 
     z-index:1000;
-    background-color: transparentize($dark9, 0.1);
+    background-color: $dark9;
+    opacity: 0.6;
+
     &.has-preloader{
         background-color: transparent;
+        opacity: 1;
     }
 
     .placeholder-content{
@@ -31,11 +83,30 @@ placeholder{ /* Hack to have full-screen */
         -ms-transform: translateY(-50%);
 
         font-size:130%;
+        font-weight: 300;
         line-height:30px;
-        color: transparentize($light,0.4);
+        color: $light;
         &>*{
-            max-width: 400px;
+            width: 400px;
+            text-align: center;
+            margin: auto;
         }
+
+        .placeholder-icon{
+            margin-bottom: 24px;
+        }
+    
+        .placeholder-title{
+            font-size: 40px;
+            line-height:48px;
+            text-transform: uppercase;
+        }
+
+        .placeholder-message{
+            font-size: 18px;
+            line-height: 24px;
+        }
+
 
         a{
             color: $light12;
@@ -44,70 +115,9 @@ placeholder{ /* Hack to have full-screen */
                 color: $light1;
             }
         }
-    
-        .placeholder-icon{
-            display: block;
-            margin: auto;
-            margin-bottom: 24px;
-        }
-    
-        .placeholder-title{
-            font-size: 40px;
-            line-height:48px;
-            display: inline-block;
-            text-transform: uppercase;
-        }
-
-        .placeholder-message{
-            font-size: 18px;
-            line-height: 24px;
-            display: inline-block;
-        }
 
         .placeholder-preloader{
-            width:84px;
-            margin:auto;
-
-            .circleG{
-                background-color: $placeholder_color_transparent;
-                float:left;
-                height:16px;
-                width:16px;
-                border-radius:8px;
-                margin:0 6px;
-                -webkit-animation-name:bounce_circleG;
-                        animation-name:bounce_circleG;
-                -webkit-animation-duration:1.4s;
-                        animation-duration:1.4s;
-                -webkit-animation-iteration-count:infinite;
-                        animation-iteration-count:infinite;
-                -webkit-animation-direction:normal;
-                        animation-direction:normal;
-            }
-
-            .circleG_2{
-                -webkit-animation-delay:0.15s;
-                        animation-delay:0.15s;
-            }
-
-            .circleG_3{
-                -webkit-animation-delay:0.3s;
-                        animation-delay:0.3s;
-            }
-
-            @-webkit-keyframes bounce_circleG{
-                0%{}
-                40%{background-color: $placeholder_color;}
-                80%{background-color: $placeholder_color_transparent;}
-                100%{}
-            }
-
-            @keyframes bounce_circleG{
-                0%{}
-                40%{background-color: $placeholder_color;}
-                80%{background-color: $placeholder_color_transparent;}
-                100%{}
-            }
+            @include preloader($preloader_circle_color, $preloader_circle_size, $preloader_circle_distance);
         }
     }
 }

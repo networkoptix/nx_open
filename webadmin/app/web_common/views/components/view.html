@@ -1,4 +1,4 @@
-<placeholder ng-if="!ready" preloader="true" class="webclient-placeholder"></placeholder>
+<placeholder preloader="!ready" class="webclient-placeholder"></placeholder>
 <table ng-hide="!ready" class="webclient-window">
     <tbody>
         <tr class="alerts-row" ng-if="hasMobileApp && !session.mobileAppNotified">
@@ -73,8 +73,8 @@
 
                         <div class="float-size">
                             <camera-view-informer flags="{'status':activeCamera.status,
-                                                              'positionSelected': positionSelected,
-                                                              'iOSVideoTooLarge': iOSVideoTooLarge}">
+                                                          'positionSelected': positionSelected,
+                                                          'iOSVideoTooLarge': iOSVideoTooLarge}">
                             </camera-view-informer>
                             <videowindow ng-class="{invisible: iOSVideoTooLarge || !positionSelected &&
                                                         (activeCamera.status == 'Offline' || activeCamera.status == 'Unauthorized')}"

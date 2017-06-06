@@ -1,6 +1,9 @@
-<placeholder ng-if="!currentSystem.isOnline"
+<placeholder preloader="!systemReady"
+             class="webclient-placeholder"></placeholder>
+<placeholder condition="systemReady && !currentSystem.isOnline"
              title="$root.L.common.systemOffline"
              icon-class="'server-offline'"
              class="webclient-placeholder"></placeholder>
-<div ng-if="currentSystem.isOnline && systemReady" webclient system="system"
+<div ng-if="systemReady" ng-hide="!currentSystem.isOnline"
+     webclient system="system"
      class="container-fluid webclient"></div>
