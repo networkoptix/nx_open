@@ -1,5 +1,4 @@
 @import '../../styles/native-theme/theme_palette';
-@import 'icons';
 
 ::-webkit-scrollbar {
   width: 8px;
@@ -312,20 +311,6 @@ table.webclient-window>tbody>tr>td{
   }
   input:-moz-placeholder{
     @include placeholder;
-  }
-
-  .glyphicon-remove{
-    @include kill-glyphicon;
-    height: 10px !important;
-    width: 10px !important;
-    background-position: -73px -49px;
-  }
-  .glyphicon-remove:hover,
-  .glyphicon-remove:active{
-    @include kill-glyphicon;
-    height: 10px !important;
-    width: 10px !important;
-    background-position: -73px -61px;
   }
 }
 
