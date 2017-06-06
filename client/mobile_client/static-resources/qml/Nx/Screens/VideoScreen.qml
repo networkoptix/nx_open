@@ -162,11 +162,17 @@ PageBase
             text: qsTr("Change Quality")
             onClicked:
             {
+                var customQualities = [ 1080, 720, 480, 360 ]
+                var player = videoScreenController.mediaPlayer
+
                 var dialog = Workflow.openDialog(
                     "Screens/private/VideoScreen/QualityDialog.qml",
                     {
-                        "actualQuality": videoScreenController.mediaPlayer.currentResolution,
-                        "activeQuality": videoScreenController.mediaPlayer.videoQuality
+                        "actualQuality": player.currentResolution,
+                        "activeQuality": player.videoQuality,
+                        "customQualities": customQualities,
+                        "availableCustomQualities":
+                            player.availableVideoQualities(customQualities)
                     }
                 )
 

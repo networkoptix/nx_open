@@ -180,6 +180,13 @@ public:
      * @return Video quality of the video stream being played back. May differ from videoQuality().
      */
     Q_INVOKABLE VideoQuality actualVideoQuality() const;
+    /**
+     * @return Filtered list of available video qualities.
+     * For each given quality it checks the actual video quality and places it into result if
+     * 1) The requested quality is equal to the resulting quality
+     * 2) The resulting quality does not represent a standard stream and it is a unique value.
+     */
+    Q_INVOKABLE QList<int> availableVideoQualities(const QList<int>& videoQualities) const;
 
     QSize currentResolution() const;
 

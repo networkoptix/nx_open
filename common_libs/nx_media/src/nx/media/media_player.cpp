@@ -1030,6 +1030,49 @@ Player::VideoQuality Player::actualVideoQuality() const
     }
 }
 
+QList<int> Player::availableVideoQualities(const QList<int>& videoQualities) const
+{
+    Q_D(const Player);
+
+    d->log(lit("availableVideoQualities() BEGIN"));
+
+    QList<int> result;
+
+    if (!d->archiveReader)
+        return result;
+
+    const auto camera = d->resource.dynamicCast<QnVirtualCameraResource>();
+    if (!camera)
+        return result; //< Setting videoQuality for files is not supported.
+
+    auto qualities = videoQualities;
+
+    for (auto videoQuality: videoQualities)
+    {
+        const int quality = media_player_quality_chooser::chooseVideoQuality(
+            d->archiveReader->getTranscodingCodec(),
+            videoQuality,
+            d->liveMode,
+            d->positionMs,
+            camera).height();
+
+        if (quality == videoQuality)
+            result.append(videoQuality);
+
+        if (quality < CustomVideoQuality)
+            continue;
+
+        if (!qualities.contains(quality))
+        {
+            qualities.append(quality);
+            result.append(videoQuality);
+        }
+    }
+
+    d->log(lit("availableVideoQualities() END"));
+    return result;
+}
+
 QSize Player::currentResolution() const
 {
     Q_D(const Player);
