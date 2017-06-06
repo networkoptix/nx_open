@@ -33,7 +33,7 @@ ec2::ApiUserRoleDataList QnUserRolesManager::userRoles() const
     QnMutexLocker lk(&m_mutex);
     ec2::ApiUserRoleDataList result;
     result.reserve(m_roles.size());
-    for (const auto& role : m_roles)
+    for (const auto& role: m_roles)
         result.push_back(role);
     return result;
 }
@@ -46,7 +46,7 @@ void QnUserRolesManager::resetUserRoles(const ec2::ApiUserRoleDataList& userRole
         QnMutexLocker lk(&m_mutex);
 
         QSet<QnUuid> newRoles;
-        for (const auto& role : userRoles)
+        for (const auto& role: userRoles)
         {
             newRoles << role.id;
             if (m_roles[role.id] != role)
@@ -56,7 +56,7 @@ void QnUserRolesManager::resetUserRoles(const ec2::ApiUserRoleDataList& userRole
             }
         }
 
-        for (const QnUuid& id : m_roles.keys())
+        for (const QnUuid& id: m_roles.keys())
         {
             if (!newRoles.contains(id))
                 removed.push_back(m_roles.take(id));
@@ -68,7 +68,6 @@ void QnUserRolesManager::resetUserRoles(const ec2::ApiUserRoleDataList& userRole
     for (auto role: updated)
         emit userRoleAddedOrUpdated(role);
 }
-
 
 bool QnUserRolesManager::hasRole(const QnUuid& id) const
 {
@@ -255,7 +254,7 @@ ec2::ApiPredefinedRoleDataList QnUserRolesManager::getPredefinedRoles()
     static ec2::ApiPredefinedRoleDataList kPredefinedRoles;
     if (kPredefinedRoles.empty())
     {
-        for (auto role : predefinedRoles())
+        for (auto role: predefinedRoles())
         {
             kPredefinedRoles.emplace_back(
                 userRoleName(role),
