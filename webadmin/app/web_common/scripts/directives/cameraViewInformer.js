@@ -9,8 +9,9 @@ angular.module('nxCommon')
         	},
         	templateUrl: Config.viewsDirCommon + 'components/cameraViewInformer.html',
         	link: function(scope){
-        		scope.cameraStates = L.common.cameraStates;
-                scope.message = "";
+        	    scope.title = null;
+        	    scope.message = null;
+        	    scope.iconClass = null;
 
                 scope.$watch('flags', function(){
                     scope.alertType = null;
@@ -34,13 +35,15 @@ angular.module('nxCommon')
                     }
 
                     //offline and unauthorized are special cases. All others can be set without editing
-                    if(scope.cameraStates){
-                        if(scope.alertType == 'status'){
-                            scope.message = scope.cameraStates[(scope.flags[scope.alertType]).toLowerCase()];
-                        }
-                        else{
-                            scope.message = scope.cameraStates[scope.alertType];
-                        }
+                    if(scope.alertType == 'status'){
+                        scope.title = L.common.cameraStates[(scope.flags[scope.alertType]).toLowerCase()];
+                        scope.message = null;
+                        scope.iconClass = scope.flags[scope.alertType] == 'Offline' ? 'camera-view-offline' : 'camera-view-unauthorized';
+                    }
+                    else{
+                        scope.iconClass = 'camera-view-error';
+                        scope.title = L.common.cameraStates.error;
+                        scope.message = L.common.cameraStates[scope.alertType];
                     }
                 }, true);
         	}

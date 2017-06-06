@@ -191,3 +191,10 @@
   height: 93px !important;
   background-position: -99px -316px;
 }
+
+.camera-view-error{
+  @include icon;
+  width: 93px !important;
+  height: 93px !important;
+  background-position: -1px -316px;
+}
