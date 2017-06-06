@@ -2,6 +2,22 @@
 
 #include <core/resource/user_resource.h>
 
+namespace {
+
+uint qHash(Qn::UserRole role)
+{
+    return uint(role);
+}
+
+QnUuid predefinedRoleUuid(Qn::UserRole role)
+{
+    return int(role) < 0
+        ? QnUuid()
+        : QnUuid(lit("00000000-0000-0000-0000-1000%1").arg(int(role), 8, 16, QChar(L'0')));
+}
+
+} // namespace
+
 QnUserRolesManager::QnUserRolesManager(QObject* parent):
     base_type(parent),
     QnCommonModuleAware(parent)
@@ -108,6 +124,34 @@ const QList<Qn::UserRole>& QnUserRolesManager::predefinedRoles()
         Qn::UserRole::LiveViewer});
 
     return predefinedRoleList;
+}
+
+QnUuid QnUserRolesManager::predefinedRoleId(Qn::UserRole userRole)
+{
+    static const QHash<Qn::UserRole, QnUuid> predefinedRoleIds =
+        []()
+        {
+            QHash<Qn::UserRole, QnUuid> result;
+            for (Qn::UserRole role: QnUserRolesManager::predefinedRoles())
+                result[role] = predefinedRoleUuid(role);
+            return result;
+        }();
+
+    return predefinedRoleIds[userRole];
+}
+
+Qn::UserRole QnUserRolesManager::predefinedRole(const QnUuid& id)
+{
+    static const QHash<QnUuid, Qn::UserRole> predefinedRolesById =
+        []()
+        {
+            QHash<QnUuid, Qn::UserRole> result;
+            for (Qn::UserRole role: QnUserRolesManager::predefinedRoles())
+                result[QnUserRolesManager::predefinedRoleId(role)] = role;
+            return result;
+        }();
+
+    return predefinedRolesById[id];
 }
 
 QString QnUserRolesManager::userRoleName(Qn::UserRole userRole)

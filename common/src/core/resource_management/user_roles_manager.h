@@ -45,6 +45,9 @@ public:
     static QString userRoleName(Qn::UserRole userRole);
     QString userRoleName(const QnUserResourcePtr& user) const;
 
+    static QnUuid predefinedRoleId(Qn::UserRole userRole);
+    static Qn::UserRole predefinedRole(const QnUuid& id);
+
     static ec2::ApiPredefinedRoleDataList getPredefinedRoles();
 
 signals:
