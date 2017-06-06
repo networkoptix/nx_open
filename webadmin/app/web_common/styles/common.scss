@@ -18,6 +18,9 @@ placeholder{ /* Hack to have full-screen */
 
     z-index:1000;
     background-color: transparentize($dark9, 0.1);
+    &.has-preloader{
+        background-color: transparent;
+    }
 
     .placeholder-content{
         text-align: center;
