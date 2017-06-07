@@ -24,7 +24,7 @@ GenericMulticastPlugin::GenericMulticastPlugin()
     m_refManager( this )
 {
     genericMulticastPluginInstance = this;
-    m_discoveryManager.reset( new GenericMulticastDiscoveryManager() );
+    m_discoveryManager.reset(new GenericMulticastDiscoveryManager());
 }
 
 GenericMulticastPlugin::~GenericMulticastPlugin()
@@ -32,29 +32,25 @@ GenericMulticastPlugin::~GenericMulticastPlugin()
     genericMulticastPluginInstance = NULL;
 }
 
-//!Implementation of nxpl::PluginInterface::queryInterface
-/*!
-    Supports cast to nxcip::CameraDiscoveryManager interface
-*/
-void* GenericMulticastPlugin::queryInterface( const nxpl::NX_GUID& interfaceID )
+void* GenericMulticastPlugin::queryInterface(const nxpl::NX_GUID& interfaceID)
 {
-    if( memcmp( &interfaceID, &nxcip::IID_CameraDiscoveryManager, sizeof(nxcip::IID_CameraDiscoveryManager) ) == 0 )
+    if (memcmp(&interfaceID, &nxcip::IID_CameraDiscoveryManager, sizeof(nxcip::IID_CameraDiscoveryManager)) == 0)
     {
         m_discoveryManager->addRef();
         return m_discoveryManager.get();
     }
-    if( memcmp( &interfaceID, &nxpl::IID_PluginInterface, sizeof(nxpl::IID_PluginInterface) ) == 0 )
+    if (memcmp(&interfaceID, &nxpl::IID_PluginInterface, sizeof(nxpl::IID_PluginInterface)) == 0)
     {
         addRef();
         return static_cast<nxpl::PluginInterface*>(this);
     }
-    if( memcmp( &interfaceID, &nxpl::IID_Plugin, sizeof( nxpl::IID_Plugin) ) == 0 )
+    if (memcmp( &interfaceID, &nxpl::IID_Plugin, sizeof(nxpl::IID_Plugin) ) == 0)
     {
         addRef();
         return static_cast<nxpl::Plugin*>(this);
     }
 
-    return NULL;
+    return nullptr;
 }
 
 unsigned int GenericMulticastPlugin::addRef()
@@ -72,8 +68,9 @@ const char* GenericMulticastPlugin::name() const
     return "GENERIC_MULTICAST";
 }
 
-void GenericMulticastPlugin::setSettings( const nxpl::Setting* /*settings*/, int /*count*/ )
+void GenericMulticastPlugin::setSettings(const nxpl::Setting* /*settings*/, int /*count*/)
 {
+    // Do nothing.
 }
 
 nxpt::CommonRefManager* GenericMulticastPlugin::refManager()

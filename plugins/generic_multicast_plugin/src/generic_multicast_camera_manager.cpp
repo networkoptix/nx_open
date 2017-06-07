@@ -9,23 +9,25 @@
 
 namespace
 {
+
 const char* multicastPluginParamsXML =
-    "<?xml version=\"1.0\"?>                                           \
+    "<?xml version=\"1.0\"?>                                          \
     <plugin                                                           \
-            name=\"GenericMulticastPlugin\"                                \
+            name=\"GenericMulticastPlugin\"                           \
             version=\"1\"                                             \
             unique_id=\"5f41750e-d2f2-4056-928e-a01a833cceae\">       \
         <parameters>                                                  \
             <group name=\"Main\">                                     \
                 <param                                                \
-                    name=\"multicast_url\"                                 \
-                    description=\"Multicast URL\"                          \
+                    name=\"multicast_url\"                            \
+                    description=\"Multicast URL\"                     \
                     dataType=\"String\"                               \
                     readOnly=\"true\"/>                               \
             </group>                                                  \
         </parameters>                                                 \
     </plugin>";
-}
+
+} // namespace
 
 GenericMulticastCameraManager::GenericMulticastCameraManager(const nxcip::CameraInfo& info)
 :
@@ -45,29 +47,30 @@ GenericMulticastCameraManager::~GenericMulticastCameraManager()
 {
 }
 
-void* GenericMulticastCameraManager::queryInterface( const nxpl::NX_GUID& interfaceID )
+void* GenericMulticastCameraManager::queryInterface(const nxpl::NX_GUID& interfaceID)
 {
-    if( memcmp( &interfaceID, &nxpl::IID_PluginInterface, sizeof(nxpl::IID_PluginInterface) ) == 0 )
+    if (memcmp(&interfaceID, &nxpl::IID_PluginInterface, sizeof(nxpl::IID_PluginInterface) ) == 0)
     {
         addRef();
         return static_cast<nxpl::PluginInterface*>(this);
     }
-    if( memcmp( &interfaceID, &nxcip::IID_BaseCameraManager, sizeof(nxcip::IID_BaseCameraManager) ) == 0 )
+    if (memcmp(&interfaceID, &nxcip::IID_BaseCameraManager, sizeof(nxcip::IID_BaseCameraManager)) == 0)
     {
         addRef();
         return static_cast<nxcip::BaseCameraManager*>(this);
     }
-    if( memcmp( &interfaceID, &nxcip::IID_BaseCameraManager2, sizeof(nxcip::IID_BaseCameraManager2) ) == 0 )
+    if (memcmp(&interfaceID, &nxcip::IID_BaseCameraManager2, sizeof(nxcip::IID_BaseCameraManager2)) == 0)
     {
         addRef();
         return static_cast<nxcip::BaseCameraManager2*>(this);
     }
-    if( memcmp( &interfaceID, &nxcip::IID_BaseCameraManager3, sizeof(nxcip::IID_BaseCameraManager3) ) == 0 )
+    if (memcmp(&interfaceID, &nxcip::IID_BaseCameraManager3, sizeof(nxcip::IID_BaseCameraManager3)) == 0)
     {
         addRef();
         return static_cast<nxcip::BaseCameraManager3*>(this);
     }
-    return NULL;
+
+    return nullptr;
 }
 
 unsigned int GenericMulticastCameraManager::addRef()
@@ -80,55 +83,49 @@ unsigned int GenericMulticastCameraManager::releaseRef()
     return m_refManager.releaseRef();
 }
 
-//!Implementation of nxcip::BaseCameraManager::getEncoderCount
-int GenericMulticastCameraManager::getEncoderCount( int* encoderCount ) const
+int GenericMulticastCameraManager::getEncoderCount(int* encoderCount) const
 {
     *encoderCount = 1;
     return nxcip::NX_NO_ERROR;
 }
 
-//!Implementation of nxcip::BaseCameraManager::getEncoder
-int GenericMulticastCameraManager::getEncoder( int encoderIndex, nxcip::CameraMediaEncoder** encoderPtr )
+int GenericMulticastCameraManager::getEncoder(int encoderIndex, nxcip::CameraMediaEncoder** encoderPtr)
 {
-    if( encoderIndex != 0 )
+    if (encoderIndex != 0)
         return nxcip::NX_INVALID_ENCODER_NUMBER;
 
-    if(!m_encoder.get())
+    if (!m_encoder.get())
         m_encoder.reset(new GenericMulticastMediaEncoder(this));
+
     m_encoder->addRef();
     *encoderPtr = m_encoder.get();
 
     return nxcip::NX_NO_ERROR;
 }
 
-//!Implementation of nxcip::BaseCameraManager::getCameraInfo
-int GenericMulticastCameraManager::getCameraInfo( nxcip::CameraInfo* info ) const
+int GenericMulticastCameraManager::getCameraInfo(nxcip::CameraInfo* info) const
 {
-    memcpy( info, &m_info, sizeof(m_info) );
+    memcpy(info, &m_info, sizeof(m_info));
     return nxcip::NX_NO_ERROR;
 }
 
-//!Implementation of nxcip::BaseCameraManager::getCameraCapabilities
-int GenericMulticastCameraManager::getCameraCapabilities( unsigned int* capabilitiesMask ) const
+int GenericMulticastCameraManager::getCameraCapabilities(unsigned int* capabilitiesMask) const
 {
     *capabilitiesMask = m_capabilities;
     return nxcip::NX_NO_ERROR;
 }
 
-//!Implementation of nxcip::BaseCameraManager::setCredentials
-void GenericMulticastCameraManager::setCredentials( const char* /*username*/, const char* /*password*/ )
+void GenericMulticastCameraManager::setCredentials(const char* /*username*/, const char* /*password*/)
 {
-    //TODO/IMPL
+    // Do nothing.
 }
 
-//!Implementation of nxcip::BaseCameraManager::setAudioEnabled
 int GenericMulticastCameraManager::setAudioEnabled(int audioEnabled)
 {
     m_audioEnabled = audioEnabled;
     return 0;
 }
 
-//!Implementation of nxcip::BaseCameraManager::getPTZManager
 nxcip::CameraPtzManager *GenericMulticastCameraManager::getPtzManager() const
 {
     return NULL;
@@ -139,31 +136,27 @@ nxcip::CameraMotionDataProvider* GenericMulticastCameraManager::getCameraMotionD
     return NULL;
 }
 
-//!Implementation of nxcip::BaseCameraManager::getCameraRelayIOManager
 nxcip::CameraRelayIOManager* GenericMulticastCameraManager::getCameraRelayIOManager() const
 {
     return NULL;
 }
 
-//!Implementation of nxcip::BaseCameraManager::getLastErrorString
-void GenericMulticastCameraManager::getLastErrorString( char* errorString ) const
+void GenericMulticastCameraManager::getLastErrorString(char* errorString) const
 {
     errorString[0] = '\0';
-    //TODO/IMPL
 }
 
-
-int GenericMulticastCameraManager::createDtsArchiveReader( nxcip::DtsArchiveReader** /*dtsArchiveReader*/ ) const
+int GenericMulticastCameraManager::createDtsArchiveReader(nxcip::DtsArchiveReader** /*dtsArchiveReader*/) const
 {
     return nxcip::NX_NOT_IMPLEMENTED;
 }
 
-int GenericMulticastCameraManager::find( nxcip::ArchiveSearchOptions* /*searchOptions*/, nxcip::TimePeriods** /*timePeriods*/ ) const
+int GenericMulticastCameraManager::find(nxcip::ArchiveSearchOptions* /*searchOptions*/, nxcip::TimePeriods** /*timePeriods*/) const
 {
     return nxcip::NX_NOT_IMPLEMENTED;
 }
 
-int GenericMulticastCameraManager::setMotionMask( nxcip::Picture* /*motionMask*/ )
+int GenericMulticastCameraManager::setMotionMask(nxcip::Picture* /*motionMask*/)
 {
     return nxcip::NX_NOT_IMPLEMENTED;
 }
@@ -174,27 +167,28 @@ const char* GenericMulticastCameraManager::getParametersDescriptionXML() const
     return multicastPluginParamsXML;
 }
 
-int GenericMulticastCameraManager::getParamValue( const char* paramName, char* valueBuf, int* valueBufSize ) const
+int GenericMulticastCameraManager::getParamValue(const char* paramName, char* valueBuf, int* valueBufSize) const
 {
-    if( strcmp(paramName, "/main/multicast_url") == 0 )
+    if (strcmp(paramName, "/main/multicast_url") == 0)
     {
-        const int requiredBufSize = strlen( m_info.url )+1;
-        if( *valueBufSize < requiredBufSize )
+        const int requiredBufSize = strlen(m_info.url) + 1;
+        if (*valueBufSize < requiredBufSize)
         {
             *valueBufSize = requiredBufSize;
             return nxcip::NX_MORE_DATA;
         }
+
         *valueBufSize = requiredBufSize;
-        strcpy( valueBuf, m_info.url );
+        strcpy(valueBuf, m_info.url);
         return nxcip::NX_NO_ERROR;
     }
 
     return nxcip::NX_UNKNOWN_PARAMETER;
 }
 
-int GenericMulticastCameraManager::setParamValue( const char* paramName, const char* /*value*/ )
+int GenericMulticastCameraManager::setParamValue(const char* paramName, const char* /*value*/)
 {
-    if( strcmp(paramName, "/main/multicast_url") == 0 )
+    if (strcmp(paramName, "/main/multicast_url") == 0)
         return nxcip::NX_PARAM_READ_ONLY;
 
     return nxcip::NX_UNKNOWN_PARAMETER;

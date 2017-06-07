@@ -3,8 +3,7 @@
 #include <QtCore/QByteArray>
 
 #include <plugins/camera_plugin.h>
-
-#include <base_plugin_interface.h>
+#include <plugins/plugin_tools.h>
 #include <utils/memory/cyclic_allocator.h>
 
 extern "C" {

@@ -53,7 +53,6 @@ qint64 GenericMulticastIoDevice::readData(char* buf, qint64 maxlen)
 {
     if (!m_cutRtpHeaderOff)
     {
-        //qDebug() << "Reading data!!!!1";
         auto received = m_socket->recv(buf, maxlen);
         if (received < 0)
         {
@@ -61,7 +60,6 @@ qint64 GenericMulticastIoDevice::readData(char* buf, qint64 maxlen)
             return 0;
         }
 
-        //qDebug() << "====> RECEIVED" << received << "BYTES";
         return received;
     }
     else
