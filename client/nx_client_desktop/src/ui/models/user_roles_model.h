@@ -26,7 +26,8 @@ public:
         StandardRoleFlag = 0x00,    /*< Model will use standard roles. */
         UserRoleFlag     = 0x01,    /*< Model will use custom user roles (and listen to changes).*/
         CustomRoleFlag   = 0x02,    /*< Model will display 'Custom...' standard role. */
-        AllRoleFlags     = StandardRoleFlag | UserRoleFlag | CustomRoleFlag
+        AssignableFlag   = 0x04,    /*< Model will display only standard roles current user can assign to others. */
+        DefaultRoleFlags = StandardRoleFlag | AssignableFlag | UserRoleFlag | CustomRoleFlag
     };
     Q_DECLARE_FLAGS(DisplayRoleFlags, DisplayRoleFlag)
 
@@ -36,7 +37,7 @@ public:
         CheckColumn = 1 //< exists if isCheckable()
     };
 
-    explicit QnUserRolesModel(QObject* parent = nullptr, DisplayRoleFlags flags = AllRoleFlags);
+    explicit QnUserRolesModel(QObject* parent = nullptr, DisplayRoleFlags flags = DefaultRoleFlags);
     virtual ~QnUserRolesModel();
 
     /* Role-specific stuff: */

@@ -114,7 +114,7 @@ bool QnUserRolesModel::predefinedRoleIdsEnabled() const
 void QnUserRolesModel::setPredefinedRoleIdsEnabled(bool value)
 {
     Q_D(QnUserRolesModel);
-    if (d->m_checkable == value)
+    if (d->m_predefinedRoleIdsEnabled == value)
         return;
 
     d->m_predefinedRoleIdsEnabled = value;

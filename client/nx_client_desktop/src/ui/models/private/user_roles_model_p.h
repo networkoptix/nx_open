@@ -53,6 +53,7 @@ private:
     QList<Qn::UserRole> m_standardRoles;
     ec2::ApiUserRoleDataList m_userRoles;
     const bool m_customRoleEnabled;
+    const bool m_onlyAssignable;
 
     QString m_customRoleName;
     QString m_customRoleDescription;
