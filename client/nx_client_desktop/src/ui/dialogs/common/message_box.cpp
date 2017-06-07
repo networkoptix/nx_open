@@ -38,8 +38,10 @@ public:
     QnMessageBoxIcon icon;
     QPointer<QWidget> focusWidget;
     QnButtonDetections buttonDetection;
+    Qt::TextFormat informativeTextFormat = Qt::AutoText;
+
+public:
     QnMessageBoxPrivate(QnMessageBox* parent);
-    Qt::TextFormat informativeTextFormat = Qt::PlainText;
 
     void init();
     void detectDefaultButton();
