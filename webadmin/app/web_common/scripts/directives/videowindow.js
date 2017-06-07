@@ -19,7 +19,7 @@
  *
  */
 angular.module('nxCommon')
-    .directive('videowindow', ['$interval','$timeout','animateScope', function ($interval,$timeout,animateScope) {
+    .directive('videowindow', ['$interval','$timeout','animateScope', '$sce', function ($interval,$timeout,animateScope, $sce) {
         return {
             restrict: 'E',
             scope: {
@@ -188,7 +188,6 @@ angular.module('nxCommon')
                 var activePlayer = null;
                 function recyclePlayer(player){
                     if(activePlayer != player) {
-                        element.find(".videoplayer").html("");
                         scope.vgPlayerReady({$API: null});
                         activePlayer = player;
                         return false;
@@ -383,7 +382,11 @@ angular.module('nxCommon')
 
                 scope.$watch("vgSrc",srcChanged);
 
-                scope.$on('$destroy',recyclePlayer);
+                scope.$on('$destroy',function(){
+                    recyclePlayer();
+                    scope.vgApi.kill();
+                    window.stop();
+                });
 
                 if(scope.debugMode)
                     scope.$watch('activeFormat', srcChanged);
@@ -407,7 +410,7 @@ angular.module('nxCommon')
                     tmp += 'FlashVars="callback='+playerId+'">\n\t</embed>\n</object>';
                     
                     playerId = !scope.playerId ? '' : '#'+playerId;
-                    $('videowindow'+playerId)[0].children[0].children[0].innerHTML = tmp;
+                    scope.flashPlayer = $sce.trustAsHtml(tmp);
                     // TODO: Nick, that is strange. Why do you do it like this?
                     // TODO: Also, try ng-bind-html instead of setting innerHTML
                 };

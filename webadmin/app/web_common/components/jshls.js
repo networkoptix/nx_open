@@ -359,7 +359,7 @@ function JsHlsAPI(){
             if(this.hls) {
                 this.hls.destroy();
                 if(this.hls.bufferTimer) {
-                    clearInterval(hls.bufferTimer);
+                    window.clearInterval(this.hls.bufferTimer);
                     this.hls.bufferTimer = undefined;
                 }
                 this.hls = null;
@@ -468,6 +468,14 @@ function JsHlsAPI(){
         }
     };
 }
+
+JsHlsAPI.prototype.kill = function(){
+    window.clearInterval(this.hls.bufferTimer);
+    this.hls.bufferTimer = undefined;
+    this.hls.stopLoad();
+    this.hls.destroy();
+    this.hls = null;
+};
 
 JsHlsAPI.prototype.play = function(offset){
     this.video.play();
