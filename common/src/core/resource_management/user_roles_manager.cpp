@@ -150,10 +150,12 @@ Qn::UserRole QnUserRolesManager::predefinedRole(const QnUuid& id)
             QHash<QnUuid, Qn::UserRole> result;
             for (Qn::UserRole role: QnUserRolesManager::predefinedRoles())
                 result[QnUserRolesManager::predefinedRoleId(role)] = role;
+
+            result[QnUuid()] = Qn::UserRole::CustomPermissions;
             return result;
         }();
 
-    return predefinedRolesById[id];
+    return predefinedRolesById.value(id, Qn::UserRole::CustomUserRole);
 }
 
 QString QnUserRolesManager::userRoleName(Qn::UserRole userRole)
