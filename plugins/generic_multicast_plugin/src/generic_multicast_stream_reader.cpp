@@ -413,9 +413,14 @@ unsigned int GenericMulticastStreamReader::packetChannelNumber(const AVPacket& p
 
 unsigned int GenericMulticastStreamReader::packetFlags(const AVPacket& packet) const
 {
+    if (!isPacketStreamOk(packet))
+        return 0;
+
     unsigned int flags = 0;
     
-    if (packet.flags & AV_PKT_FLAG_KEY)
+    auto stream = m_formatContext->streams[packet.stream_index];
+
+    if (packet.flags & AV_PKT_FLAG_KEY && stream->codec->codec_type != AVMEDIA_TYPE_AUDIO)
         flags |= nxcip::MediaDataPacket::Flags::fKeyPacket;
 
     return flags;
