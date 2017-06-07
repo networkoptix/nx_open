@@ -104,7 +104,8 @@ CameraDiagnostics::Result QnPlIsdResource::initInternal()
     //reading resolution list
     CameraDiagnostics::Result result;
 
-    apiRequestUrl.setPath( lit("/api/param.cgi?req=VideoInput.1.h264.1.ResolutionList" ) );
+    apiRequestUrl.setPath( lit("/api/param.cgi"));
+    apiRequestUrl.setQuery(lit("req=VideoInput.1.h264.1.ResolutionList"));
     QByteArray reslst;
     result = doISDApiRequest( apiRequestUrl, &reslst );
     if( result.errorCode != CameraDiagnostics::ErrorCode::noError )
@@ -147,7 +148,7 @@ CameraDiagnostics::Result QnPlIsdResource::initInternal()
 
         float bestAspectRatio = getResolutionAspectRatio(m_resolution1);
 
-        for (int i = 0; i < resolutions.size(); ++i) 
+        for (int i = 0; i < resolutions.size(); ++i)
         {
             QSize tmp;
 
@@ -165,11 +166,11 @@ CameraDiagnostics::Result QnPlIsdResource::initInternal()
             }
 
             double square = resolutions[i].width() * resolutions[i].height();
-            
+
 
             double matchCoeff = qMax(requestSquare, square) / qMin(requestSquare, square);
 
-            if (matchCoeff <= bestMatchCoeff + 0.002) 
+            if (matchCoeff <= bestMatchCoeff + 0.002)
             {
                 bestIndex = i;
                 bestMatchCoeff = matchCoeff;
@@ -180,11 +181,12 @@ CameraDiagnostics::Result QnPlIsdResource::initInternal()
             m_resolution2 = resolutions[bestIndex];
 
     }
-    
+
 
     //reading fps list
 
-    apiRequestUrl.setPath( lit("/api/param.cgi?req=VideoInput.1.h264.1.FrameRateList") );
+    apiRequestUrl.setPath(lit("/api/param.cgi"));
+    apiRequestUrl.setQuery(lit("req=VideoInput.1.h264.1.FrameRateList"));
     QByteArray fpses;
     result = doISDApiRequest( apiRequestUrl, &fpses );
     if( result.errorCode != CameraDiagnostics::ErrorCode::noError )
@@ -212,7 +214,8 @@ CameraDiagnostics::Result QnPlIsdResource::initInternal()
 
     //reading firmware version
 
-    apiRequestUrl.setPath( lit("/api/param.cgi?req=General.FirmwareVersion") );
+    apiRequestUrl.setPath(lit("/api/param.cgi"));
+    apiRequestUrl.setQuery(lit("req=General.FirmwareVersion"));
     QByteArray cameraFirmwareVersion;
     result = doISDApiRequest( apiRequestUrl, &cameraFirmwareVersion );
     if( result.errorCode != CameraDiagnostics::ErrorCode::noError )
