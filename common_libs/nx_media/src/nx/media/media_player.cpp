@@ -618,31 +618,30 @@ void PlayerPrivate::applyVideoQuality()
     if (!camera)
         return; //< Setting videoQuality for files is not supported.
 
-    const QSize& quality = media_player_quality_chooser::chooseVideoQuality(
+    const auto& result = media_player_quality_chooser::chooseVideoQuality(
         archiveReader->getTranscodingCodec(),
         videoQuality,
         liveMode,
         positionMs,
         camera);
 
-    if (quality == media_player_quality_chooser::kQualityHigh)
+    switch (result.quality)
     {
-        archiveReader->setQuality(MEDIA_Quality_High, /*fastSwitch*/ true);
-    }
-    else if (quality == media_player_quality_chooser::kQualityLow)
-    {
-        archiveReader->setQuality(MEDIA_Quality_Low, /*fastSwitch*/ true);
-    }
-    else if (quality == media_player_quality_chooser::kQualityLowIframesOnly)
-    {
-        archiveReader->setQuality(MEDIA_Quality_LowIframesOnly, /*fastSwitch*/ true);
-    }
-    else
-    {
-        // Use "auto" width for correct aspect ratio, because quality.width() is in logical pixels.
-        NX_ASSERT(quality.isValid());
-        archiveReader->setQuality(MEDIA_Quality_CustomResolution, /*fastSwitch*/ true,
-            QSize(/*width*/ 0, quality.height()));
+        case Player::HighVideoQuality:
+            archiveReader->setQuality(MEDIA_Quality_High, /*fastSwitch*/ true);
+            break;
+        case Player::LowVideoQuality:
+            archiveReader->setQuality(MEDIA_Quality_Low, /*fastSwitch*/ true);
+            break;
+        case Player::LowIframesOnlyVideoQuality:
+            archiveReader->setQuality(MEDIA_Quality_LowIframesOnly, /*fastSwitch*/ true);
+            break;
+        default:
+            // Use "auto" width for correct aspect ratio,
+            // because quality.width() is in logical pixels.
+            NX_ASSERT(result.frameSize.isValid());
+            archiveReader->setQuality(MEDIA_Quality_CustomResolution, /*fastSwitch*/ true,
+                QSize(/*width*/ 0, result.frameSize.height()));
     }
     at_hurryUp(); //< skip waiting for current frame
 }
@@ -1045,31 +1044,39 @@ QList<int> Player::availableVideoQualities(const QList<int>& videoQualities) con
     if (!camera)
         return result; //< Setting videoQuality for files is not supported.
 
-    auto qualities = videoQualities;
+    auto getQuality =
+        [&camera,
+            codec = d->archiveReader->getTranscodingCodec(),
+            liveMode = d->liveMode,
+            positionMs = d->positionMs]
+            (int quality)
+        {
+            return media_player_quality_chooser::chooseVideoQuality(
+                codec, quality, liveMode, positionMs, camera);
+        };
+
+    const auto maximumHeight = getQuality(HighVideoQuality).frameSize.height();
+
+    bool customResolutionAvailable = false;
 
     for (auto videoQuality: videoQualities)
     {
-        const int quality = media_player_quality_chooser::chooseVideoQuality(
-            d->archiveReader->getTranscodingCodec(),
-            videoQuality,
-            d->liveMode,
-            d->positionMs,
-            camera).height();
+        const auto& resultQuality = getQuality(videoQuality);
 
-        if (quality == videoQuality)
-            result.append(videoQuality);
+        if (resultQuality.quality == CustomVideoQuality)
+            customResolutionAvailable = true;
 
-        if (quality < CustomVideoQuality)
+        if (resultQuality.frameSize.height() > maximumHeight)
             continue;
 
-        if (!qualities.contains(quality))
-        {
-            qualities.append(quality);
-            result.append(videoQuality);
-        }
+        result.append(videoQuality);
     }
 
     d->log(lit("availableVideoQualities() END"));
+
+    if (!customResolutionAvailable)
+        return QList<int>();
+
     return result;
 }
 

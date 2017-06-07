@@ -3,6 +3,7 @@
 #include <QtCore/QSize>
 
 #include <nx/streaming/media_data_packet.h>
+#include <nx/media/media_player.h>
 #include <core/resource/resource_fwd.h>
 #include <core/resource/resource_media_layout.h>
 
@@ -24,6 +25,12 @@ public:
     static const QSize kQualityHigh; //< Token-value; isValid() is false.
     static const QSize kQualityLowIframesOnly; //< Token-value; isValid() is false.
 
+    struct Result
+    {
+        Player::VideoQuality quality;
+        QSize frameSize;
+    };
+
     /**
      * @param videoQuality Video quality desired by the user. Same as Player::videoQuality: either
      *     one of enum Player::VideoQuality values, or approximate vertical resolution.
@@ -34,7 +41,7 @@ public:
      *     camera aspect ratio, thus, the returned custom size width should be treated as specified
      *     in logical pixels.
      */
-    static QSize chooseVideoQuality(
+    static Result chooseVideoQuality(
         AVCodecID transcodingCodec,
         int videoQuality,
         bool liveMode,

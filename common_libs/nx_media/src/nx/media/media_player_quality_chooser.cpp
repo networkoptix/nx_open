@@ -230,20 +230,13 @@ QSize media_player_quality_chooser::chooseHighStreamIfPossible(
     return kQualityLow;
 }
 
-QSize media_player_quality_chooser::chooseVideoQuality(
+media_player_quality_chooser::Result media_player_quality_chooser::chooseVideoQuality(
     AVCodecID transcodingCodec,
     int videoQuality,
     bool liveMode,
     qint64 positionMs,
     const QnVirtualCameraResourcePtr& camera)
 {
-    if (videoQuality == Player::LowIframesOnlyVideoQuality)
-    {
-        NX_LOG(lit("[media_player] Low stream I-frames only requested => Set low stream I-frames only"),
-            cl_logDEBUG1);
-        return kQualityLowIframesOnly;
-    }
-
     // Obtain Low and High stream codec and resolution.
     QSize highResolution;
     AVCodecID highCodec = AV_CODEC_ID_NONE;
@@ -251,7 +244,32 @@ QSize media_player_quality_chooser::chooseVideoQuality(
     AVCodecID lowCodec = AV_CODEC_ID_NONE;
     findCameraStreams(camera, &highResolution, &highCodec, &lowResolution, &lowCodec);
 
+    auto makeResult =
+        [&lowResolution, &highResolution](const QSize& quality)
+        {
+            switch (quality.height())
+            {
+                case Player::LowVideoQuality:
+                    return Result{Player::LowVideoQuality, lowResolution};
+                case Player::LowIframesOnlyVideoQuality:
+                    return Result{Player::LowIframesOnlyVideoQuality, lowResolution};
+                case Player::HighVideoQuality:
+                    return Result{Player::HighVideoQuality, highResolution};
+                default:
+                    return Result{Player::CustomVideoQuality, quality};
+            }
+        };
+
     QN_UNUSED(lowCodec);
+
+    if (videoQuality == Player::LowIframesOnlyVideoQuality)
+    {
+        NX_LOG(
+            lit("[media_player] Low stream I-frames only requested => "
+                "Set low stream I-frames only"),
+            cl_logDEBUG1);
+        return makeResult(kQualityLowIframesOnly);
+    }
 
     const bool highStreamRequested = videoQuality == Player::HighVideoQuality
         || (!highResolution.isEmpty() && videoQuality == highResolution.height());
@@ -263,8 +281,10 @@ QSize media_player_quality_chooser::chooseVideoQuality(
 
     if (highStreamRequested)
     {
-        return chooseHighStreamIfPossible(transcodingCodec, liveMode, positionMs, camera,
+        const QSize& quality = chooseHighStreamIfPossible(
+            transcodingCodec, liveMode, positionMs, camera,
             highCodec, highResolution, videoLayout);
+        return makeResult(quality);
     }
     else if (lowStreamRequested)
     {
@@ -277,7 +297,7 @@ QSize media_player_quality_chooser::chooseVideoQuality(
         const QSize& quality = applyTranscodingIfPossible(
             transcodingCodec, liveMode, positionMs, camera, resolution);
         if (quality.isValid())
-            return quality;
+            return makeResult(quality);
     }
     else
     {
@@ -285,7 +305,7 @@ QSize media_player_quality_chooser::chooseVideoQuality(
             .arg(videoQuality), cl_logDEBUG1);
     }
 
-    return kQualityLow;
+    return makeResult(kQualityLow);
 }
 
 } // namespace media
