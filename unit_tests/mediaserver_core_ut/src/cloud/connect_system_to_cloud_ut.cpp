@@ -6,7 +6,7 @@
 #include <core/resource/user_resource.h>
 #include <nx/utils/sync_call.h>
 
-#include "mediaserver_launcher.h"
+#include <test_support/mediaserver_launcher.h>
 #include "mediaserver_cloud_integration_test_setup.h"
 
 namespace {

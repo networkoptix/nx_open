@@ -35,7 +35,7 @@
 #include <gtest/gtest.h>
 
 #include <core/resource_management/resource_properties.h>
-#include "../utils.h"
+#include <test_support/utils.h>
 #include <media_server/media_server_module.h>
 
 extern nx::ut::cfg::Config config;

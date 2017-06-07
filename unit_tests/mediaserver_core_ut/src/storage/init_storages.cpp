@@ -6,7 +6,7 @@
 #include "core/resource/storage_resource.h"
 #include "media_server_process.h"
 #include "common/common_module.h"
-#include "mediaserver_launcher.h"
+#include <test_support/mediaserver_launcher.h>
 
 #define GTEST_HAS_TR1_TUPLE     0
 #define GTEST_USE_OWN_TR1_TUPLE 1

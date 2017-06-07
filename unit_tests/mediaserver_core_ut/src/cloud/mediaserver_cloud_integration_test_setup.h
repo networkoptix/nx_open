@@ -4,7 +4,7 @@
 #include <test_support/cdb_launcher.h>
 
 #include "mediaserver_client.h"
-#include "mediaserver_launcher.h"
+#include <test_support/mediaserver_launcher.h>
 
 
 class MediaServerCloudIntegrationTest

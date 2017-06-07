@@ -10,7 +10,7 @@
 #include <nx/utils/std/thread.h>
 
 #include "utils.h"
-#include "media_server_process.h"
+#include "../media_server_process.h"
 
 class MediaServerLauncher: public QObject
 {

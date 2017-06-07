@@ -16,7 +16,7 @@
 #include <media_server/serverutil.h>
 
 #include "mediaserver_cloud_integration_test_setup.h"
-#include "mediaserver_launcher.h"
+#include <test_support/mediaserver_launcher.h>
 
 using namespace nx::cdb;
 
