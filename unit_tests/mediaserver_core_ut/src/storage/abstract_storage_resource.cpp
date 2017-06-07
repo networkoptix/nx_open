@@ -38,8 +38,6 @@
 #include <test_support/utils.h>
 #include <media_server/media_server_module.h>
 
-extern nx::ut::cfg::Config config;
-
 namespace
 {
 
@@ -64,15 +62,15 @@ protected:
         ASSERT_TRUE(fileStorage && fileStorage->initOrUpdate() == Qn::StorageInit_Ok);
         qnNormalStorageMan->addStorage(fileStorage);
 
-        if (!config.ftpUrl.isEmpty())
+        if (!nx::ut::cfg::configInstance().ftpUrl.isEmpty())
         {
-            QnStorageResourcePtr ftpStorage = QnStorageResourcePtr(QnStoragePluginFactory::instance()->createStorage(commonModule(), config.ftpUrl, false));
+            QnStorageResourcePtr ftpStorage = QnStorageResourcePtr(QnStoragePluginFactory::instance()->createStorage(commonModule(), nx::ut::cfg::configInstance().ftpUrl, false));
             EXPECT_TRUE(ftpStorage && ftpStorage->initOrUpdate() == Qn::StorageInit_Ok) << "Ftp storage is unavailable. Check if server is online and url is correct." << std::endl;
         }
 
-        if (!config.smbUrl.isEmpty())
+        if (!nx::ut::cfg::configInstance().smbUrl.isEmpty())
         {
-            QnStorageResourcePtr smbStorage = QnStorageResourcePtr(QnStoragePluginFactory::instance()->createStorage(commonModule(), config.smbUrl));
+            QnStorageResourcePtr smbStorage = QnStorageResourcePtr(QnStoragePluginFactory::instance()->createStorage(commonModule(), nx::ut::cfg::configInstance().smbUrl));
             EXPECT_TRUE(smbStorage && smbStorage->initOrUpdate() == Qn::StorageInit_Ok);
             smbStorage->setUrl(smbStorageUrl);
             qnNormalStorageMan->addStorage(smbStorage);
@@ -81,8 +79,8 @@ protected:
 
     void prepare()
     {
-        this->ftpStorageUrl = config.ftpUrl;
-        this->smbStorageUrl = config.smbUrl;
+        this->ftpStorageUrl = nx::ut::cfg::configInstance().ftpUrl;
+        this->smbStorageUrl = nx::ut::cfg::configInstance().smbUrl;
 
         commonModule()->setModuleGUID(QnUuid("6F789D28-B675-49D9-AEC0-CEFFC99D674E"));
 

@@ -11,12 +11,23 @@
 #include <cassert>
 #include <stdio.h>
 
-extern nx::ut::cfg::Config config;
+static nx::ut::cfg::Config config;
 
 namespace nx
 {
 namespace ut
 {
+
+namespace cfg
+{
+
+nx::ut::cfg::Config& configInstance()
+{
+    return config;
+}
+
+} // namespace cfg
+
 namespace utils
 {
 

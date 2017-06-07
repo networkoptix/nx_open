@@ -21,6 +21,8 @@ struct Config
     QString smbUrl;
 };
 
+nx::ut::cfg::Config& configInstance();
+
 } // namespace cfg
 namespace utils
 {
