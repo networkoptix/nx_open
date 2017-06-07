@@ -65,6 +65,7 @@ PageBase
 
         property bool uiVisible: true
         property real uiOpacity: uiVisible ? 1.0 : 0.0
+
         Behavior on uiOpacity
         {
             NumberAnimation { duration: 250; easing.type: Easing.OutCubic }
@@ -111,7 +112,7 @@ PageBase
 
         onApplicationActiveChanged:
         {
-            if (!applicationActive)
+            if (!applicationActive && !ptzPanel.moveOnTapMode)
                 showUi()
         }
     }
@@ -224,7 +225,20 @@ PageBase
             mediaPlayer: videoScreenController.mediaPlayer
             resourceHelper: videoScreenController.resourceHelper
             videoCenterHeightOffsetFactor: 1 / 3
-            onClicked: toggleUi()
+            onClicked:
+            {
+                if (!ptzPanel.moveOnTapMode)
+                    toggleUi()
+            }
+
+            onClickedOnVideo:
+            {
+                if (!ptzPanel.moveOnTapMode)
+                    return
+
+                ptzPanel.moveOnTapMode = false
+                ptzPanel.moveViewport(viewport, aspect)
+            }
         }
     }
 
@@ -296,6 +310,18 @@ PageBase
             }
         }
 
+        Image
+        {
+            width: parent.width
+            height: sourceSize.height
+            anchors.bottom: parent.bottom
+            sourceSize.height: 56 * 2
+            source: lp("/images/timeline_gradient.png")
+
+            visible: ptzPanel.visible || moveOnTapItem.visible
+            opacity: ptzPanel.opacity + moveOnTapItem.opacity
+        }
+
         PtzPanel
         {
             id: ptzPanel
@@ -310,6 +336,49 @@ PageBase
             visible: opacity > 0 && d.mode === VideoScreenUtils.VideoScreenMode.Ptz
 
             onCloseButtonClicked: d.mode = VideoScreenUtils.VideoScreenMode.Navigation
+
+            onMoveOnTapModeChanged:
+            {
+                if (ptzPanel.moveOnTapMode)
+                    hideUi()
+                else
+                    showUi()
+            }
+        }
+
+        Item
+        {
+            id: moveOnTapItem
+
+            anchors.fill: parent
+
+            visible: opacity > 0
+            opacity: ptzPanel.moveOnTapMode ? 1 : 0
+
+            Button
+            {
+                anchors.left: parent.left
+                anchors.leftMargin: 4
+                anchors.bottom: parent.bottom
+                anchors.bottomMargin: 4
+
+                height: 48
+                flat: true
+                labelPadding: 16
+                leftPadding: 0
+                rightPadding: 0
+                topPadding: 0
+                bottomPadding: 0
+                padding: 0
+
+                text: qsTr("CANCEL")
+                onClicked: ptzPanel.moveOnTapMode = false
+            }
+
+            Behavior on opacity
+            {
+                NumberAnimation { duration: 250; easing.type: Easing.OutCubic }
+            }
         }
 
         Loader
@@ -381,7 +450,6 @@ PageBase
                 }
             }
         }
-
     }
 
     Rectangle

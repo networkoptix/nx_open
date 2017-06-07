@@ -15,6 +15,8 @@ ZoomableFlickable
     property real maxZoomFactor: 4
     property alias videoCenterHeightOffsetFactor: content.videoCenterHeightOffsetFactor
 
+    signal clickedOnVideo(int channelId, rect viewport, real aspect)
+
     minContentWidth: width
     minContentHeight: height
     maxContentWidth:
@@ -65,7 +67,12 @@ ZoomableFlickable
         }
 
         item: video
-        MultiVideoOutput { id: video }
+
+        MultiVideoOutput
+        {
+            id: video
+            onClickedOnVideo: zf.clickedOnVideo(channelId, viewport, aspect)
+        }
 
         onSourceSizeChanged: fitToBounds()
     }

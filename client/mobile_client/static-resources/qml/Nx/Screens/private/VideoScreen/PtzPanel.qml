@@ -13,23 +13,21 @@ Item
     property PtzController controller: PtzController
     {
         property bool supportsPresets: capabilities & Ptz.PresetsPtzCapability
+        property bool supportsMoveOnTap: capabilities & Ptz.AbsolutePtzCapabilities
     }
 
     property alias customRotation: joystick.customRotation
+    property alias moveOnTapMode: moveOnTapButton.checked
 
     signal closeButtonClicked()
 
+    function moveViewport(viewportRect, aspect)
+    {
+        controller.viewportMove(aspect, viewportRect, 1)
+    }
+
     implicitWidth: content.width
     implicitHeight: content.height
-
-    Image
-    {
-        width: parent.width
-        height: sourceSize.height
-        anchors.bottom: parent.bottom
-        sourceSize.height: 56 * 2
-        source: lp("/images/timeline_gradient.png")
-    }
 
     Column
     {
@@ -43,8 +41,6 @@ Item
 
         Item
         {
-            id: topPtzPanel
-
             x: 4
             width: parent.width - 2 * x
             height: Math.max(zoomFocusRow.height, joystick.height)
@@ -162,6 +158,30 @@ Item
                     directionFilterTimer.value = direction
                     directionFilterTimer.restart()
                 }
+            }
+
+            Button
+            {
+                id: moveOnTapButton
+
+                y: joystick.y - height - 8
+
+                opacity: 0.8
+                visible: controller.supportsMoveOnTap
+                width: 48
+                height: width
+                radius: width / 2
+                checkable: true
+                checked: false
+
+                anchors.right: parent.right
+                icon: lp("images/ptz/ptz.png")
+
+                padding: 0
+                rightPadding: 0
+                leftPadding: 0
+                topPadding: 0
+                bottomPadding: 0
             }
         }
 

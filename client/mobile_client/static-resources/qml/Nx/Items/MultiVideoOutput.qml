@@ -16,6 +16,8 @@ Item
 
     property size __sourceSize
 
+    signal clickedOnVideo(int channelId, rect viewport, real aspect)
+
     implicitWidth: __sourceSize.width * layoutSize.width
     implicitHeight: __sourceSize.height * layoutSize.height
 
@@ -27,6 +29,8 @@ Item
 
         VideoOutput
         {
+            id: videoOutput
+
             property point layoutPosition: resourceHelper.channelPosition(index)
 
             fillMode: VideoOutput.Stretch
@@ -42,6 +46,28 @@ Item
             }
 
             Component.onCompleted: setPlayer(mediaPlayer, index)
+
+            MouseArea
+            {
+                anchors.fill: parent
+                onClicked:
+                {
+                    var source = videoOutput.sourceRect
+                    var scale =  source.width / width
+                    var pos = Qt.vector2d(mouse.x, mouse.y).times(scale)
+                    if (pos.x < 0 || pos.y < 0 || pos.x > source.width || pos.y >source.height)
+                        return
+
+                    var aspect = videoOutput.sourceRect.width / videoOutput.sourceRect.height
+                    var center = Qt.vector2d(source.width / 2, source.height / 2)
+                    var topLeft = pos.minus(center)
+                    var newViewport = Qt.rect(
+                        topLeft.x / source.width,
+                        topLeft.y / source.height,
+                        1, 1)
+                    multiVideoOutput.clickedOnVideo(index, newViewport, aspect)
+                }
+            }
         }
     }
 
