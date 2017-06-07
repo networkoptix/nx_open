@@ -7,7 +7,13 @@ namespace nx {
 namespace cdb {
 namespace test {
 
-class ShedulerUser: public nx::cdb::AbstractPersistentTimerEventReceiver
+class DbHelperStub: public nx::cdb::AbstractSchedulerDbHelper
+{
+public:
+private:
+};
+
+class ShedulerUser: public nx::cdb::AbstractPersistentScheduleEventReceiver
 {
 public:
     static const QnUuid functorTypeId;
@@ -103,6 +109,7 @@ protected:
     }
 
     SqlExecutorStub executor;
+    DbHelperStub dbHelper;
     nx::cdb::PersistentSheduler scheduler;
     ShedulerUser user;
     nx::utils::future<void> readyFuture;
@@ -114,6 +121,11 @@ const QnUuid ShedulerUser::functorTypeId = QnUuid::fromStringSafe("{EC05F182-938
 
 TEST_F(PersistentScheduler, initialization)
 {
+}
+
+TEST_F(PersistentScheduler, registerEventReceiver)
+{
+
 }
 
 //TEST_F(PersistentSheduler, subscribeUnsubscribe_simple)
