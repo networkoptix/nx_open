@@ -1,5 +1,6 @@
 import QtQuick 2.6
 import Nx 1.0
+import Nx.Core 1.0
 import Nx.Media 1.0
 import Nx.Controls 1.0
 import Nx.Items 1.0
@@ -14,7 +15,7 @@ PageBase
 
     property alias resourceId: videoScreenController.resourceId
     property alias initialScreenshot: screenshot.source
-    property QnLiteClientLayoutHelper layoutHelper: null
+    property LiteClientLayoutHelper layoutHelper: null
     property QnCameraListModel camerasModel: null
 
     signal nextCameraRequested()

@@ -1,6 +1,7 @@
 import QtQuick 2.6
 import Nx 1.0
 import Nx.Controls 1.0
+import Nx.Core 1.0
 import Nx.Items 1.0
 import com.networkoptix.qml 1.0
 
@@ -157,7 +158,7 @@ Page
 
             currentResourceId: d.currentResourceId
             fourCamerasMode: (liteClientController.layoutHelper.displayMode
-               == QnLiteClientLayoutHelper.MultipleCameras)
+               === LiteClientLayoutHelper.MultipleCameras)
 
             onSingleCameraModeClicked:
             {
@@ -359,8 +360,9 @@ Page
         {
             name: "SingleCamera"
             when: liteClientController.serverOnline
-                && liteClientController.clientState == QnLiteClientController.Started
-                && liteClientController.layoutHelper.displayMode == QnLiteClientLayoutHelper.SingleCamera
+                && liteClientController.clientState === QnLiteClientController.Started
+                && liteClientController.layoutHelper.displayMode
+                    === LiteClientLayoutHelper.SingleCamera
 
             PropertyChanges
             {
@@ -383,8 +385,9 @@ Page
         {
             name: "MultipleCameras"
             when: liteClientController.serverOnline
-                && liteClientController.clientState == QnLiteClientController.Started
-                && liteClientController.layoutHelper.displayMode == QnLiteClientLayoutHelper.MultipleCameras
+                && liteClientController.clientState === QnLiteClientController.Started
+                && liteClientController.layoutHelper.displayMode
+                    === LiteClientLayoutHelper.MultipleCameras
 
             PropertyChanges
             {
