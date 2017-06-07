@@ -1874,7 +1874,11 @@ nx::db::DBResult SystemManager::processEc2SaveUser(
         NotificationCommand::sendNotification,
         &account);
     if (dbResult != nx::db::DBResult::ok)
+    {
+        NX_DEBUG(this, lm("Share system (%1) to %2 returned failed. %3")
+            .arg(systemId).arg(systemSharingData->accountEmail).arg(dbResult));
         return dbResult;
+    }
 
     // Generating "save full name" transaction.
     ::ec2::ApiResourceParamWithRefData fullNameData;
