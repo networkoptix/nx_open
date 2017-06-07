@@ -1,7 +1,5 @@
 #include "license_deactivation_reason.h"
 
-#include "ui_license_deactivation_reason_widget.h"
-
 #include <QtWidgets/QLabel>
 #include <QtWidgets/QVBoxLayout>
 #include <QtWidgets/QPushButton>
