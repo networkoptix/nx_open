@@ -131,7 +131,7 @@ public:
     std::map<AbstractSocket::SOCKET_HANDLE, int> writeEvents;
 
     virtual int epollWait(
-        int epollFd,
+        int /*epollFd*/,
         std::map<UDTSOCKET, int>* /*readReadyUdtSockets*/,
         std::map<UDTSOCKET, int>* /*writeReadyUdtSockets*/,
         int64_t /*timeoutMillis*/,
