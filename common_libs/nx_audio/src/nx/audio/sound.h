@@ -108,7 +108,7 @@ private:
     uint m_size;
     bool m_isValid;
     ALCdevice* m_device;
-    quint8* m_proxyBuffer;
+    quint8* m_proxyBuffer = nullptr;
     int m_proxyBufferLen;
     bool m_deinitialized;
     bool m_paused;
