@@ -1,5 +1,5 @@
 <placeholder preloader="!ready" class="webclient-placeholder"></placeholder>
-<table ng-hide="!ready" class="webclient-window">
+<table ng-class="{'visibility-hidden':!ready}" class="webclient-window">
     <tbody>
         <tr class="alerts-row" ng-if="hasMobileApp && !session.mobileAppNotified">
             <td colspan="2" class="alert">
