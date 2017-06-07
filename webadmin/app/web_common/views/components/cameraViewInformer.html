@@ -1,9 +1,0 @@
-<div class="camera-states" ng-if="alertType">
-    <div class="camera-view-informer">
-        <div class="camera-view-message-icon" 
-             ng-if="alertType == 'status'"
-             ng-class="flags[alertType] == 'Offline' ? 'camera-view-offline' : 'camera-view-unauthorized'"></div>
-        <br ng-if="alertType == 'status'">
-        <div class="camera-view-message" ng-bind-html="message"></div>
-    </div>
-</div>

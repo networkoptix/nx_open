@@ -101,7 +101,51 @@ ng-include{
   -webkit-touch-callout: none;
   user-select: none;
   background-color: $additional_light2;
+  text-transform: uppercase;
 
+  div{
+      .shadows-off{
+        box-shadow: none !important;
+      }
+      &.text-left{
+        width:106px;
+        height:100%;
+        background-color: $additional_light2;
+        border-left: 1px solid $light6;
+        border-right: 1px solid $light6;
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        box-shadow: 0 2px 0 2px rgba($dark1, 0.05);
+      }
+
+      &.text-right{
+        &{
+          width:104px;
+          height:100%;
+          background-color: $additional_light2;
+          position: absolute;
+          bottom: 0;
+          right: 0;
+          box-shadow: 0 2px 0 2px rgba($dark1, 0.05);
+        }
+
+        &.no-volume{
+          width: 64px !important;
+        }
+      }
+
+      &.text-center{
+        &{
+          margin: 0 104px 0 106px;
+          height:100%;
+        }
+
+        &.no-volume{
+          margin-right:64px;
+        }
+      }
+  }
 
 }
 
@@ -113,7 +157,6 @@ ng-include{
   line-height: 100px;
   font-size: 200%;
   color:$light10;
-
 }
 
 .no-timeline{
