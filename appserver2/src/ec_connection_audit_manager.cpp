@@ -130,8 +130,16 @@ namespace ec2
         const auto& resPool = m_connection->commonModule()->resourcePool();
         Qn::AuditRecordType eventType = Qn::AR_NotDefined;
         QString description;
+        QnUuid resourceId;
         switch(command)
         {
+            case ApiCommand::removeStorage:
+                if (QnResourcePtr res = resPool->getResourceById(params.id))
+                {
+                    eventType = Qn::AR_ServerUpdate;
+                    resourceId = res->getParentId();
+                }
+                break;
             case ApiCommand::removeResource:
             case ApiCommand::removeResources:
             case ApiCommand::removeCamera:
@@ -174,10 +182,13 @@ namespace ec2
             }
         }
 
-        if (eventType != Qn::AR_NotDefined) {
+        if (eventType != Qn::AR_NotDefined)
+        {
             auto auditRecord = qnAuditManager->prepareRecord(authInfo, eventType);
             if (!description.isEmpty())
                 auditRecord.addParam("description", description.toUtf8());
+            if (!resourceId.isNull())
+                auditRecord.resources.push_back(resourceId);
             qnAuditManager->addAuditRecord(auditRecord);
         }
     }
