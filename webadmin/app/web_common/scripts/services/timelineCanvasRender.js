@@ -455,7 +455,7 @@ function TimelineCanvasRender(canvas, timelineConfig, recordsProvider, scaleMana
                 }
             }
         }
-        return mouseX && mouseY > top && (mouseY < top + timelineConfig.chunkHeight * self.canvas.height);
+        return mouseX && 0 < mouseY && mouseY < self.canvas.height - timelineConfig.scrollBarHeight * self.canvas.height;
     }
     function drawEvent(context,chunk, levelIndex, debug, targetLevelIndex){
         var startCoordinate = self.scaleManager.dateToScreenCoordinate(chunk.start);
@@ -617,7 +617,6 @@ function TimelineCanvasRender(canvas, timelineConfig, recordsProvider, scaleMana
     }
 
     function drawPointerMarker(context, mouseX){
-
         if(window.jscd.mobile || !mouseX){
             return;
         }
