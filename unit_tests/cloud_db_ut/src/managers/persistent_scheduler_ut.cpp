@@ -1,8 +1,9 @@
 #include <gtest/gtest.h>
+#include <gmock/gmock.h>
 #include <nx/utils/std/future.h>
 #include <chrono>
-#include <managers/persistent_scheduler.h>
-#include <managers/persistent_scheduler_db_helper.h>
+#include <persistent_scheduler/persistent_scheduler.h>
+#include <persistent_scheduler/persistent_scheduler_db_helper.h>
 
 namespace nx {
 namespace cdb {
@@ -11,26 +12,21 @@ namespace test {
 class DbHelperStub: public nx::cdb::AbstractSchedulerDbHelper
 {
 public:
-private:
+    MOCK_CONST_METHOD0(getScheduleData, ScheduleDataVector());
+    MOCK_METHOD1(registerEventReceiver, nx::db::DBResult(const QnUuid& receiverId));
 };
 
-class TestScheduler: public nx::cdb::PersistentSheduler
-{
-public:
-    using nx::cdb::PersistentSheduler::PersistentSheduler;
-
-    const std::unordered_map<QnUuid, AbstractPersistentScheduleEventReceiver*>& functorToReceiver()
-    {
-        return m_functorToReceiver;
-    }
-};
-
-class ShedulerUser: public nx::cdb::AbstractPersistentScheduleEventReceiver
+class SchedulerUser: public nx::cdb::AbstractPersistentScheduleEventReceiver
 {
 public:
     static const QnUuid functorTypeId;
 
-    ShedulerUser(nx::cdb::PersistentSheduler* scheduler, nx::utils::promise<void>* readyPromise):
+    SchedulerUser(
+        nx::db::AbstractAsyncSqlQueryExecutor* executor,
+        nx::cdb::PersistentSheduler* scheduler,
+        nx::utils::promise<void>* readyPromise)
+        :
+        m_executor(executor),
         m_scheduler(scheduler),
         m_readyPromise(readyPromise)
     {
@@ -39,7 +35,7 @@ public:
 
     virtual void persistentTimerFired(
         const QnUuid& taskId,
-        const PersistentParamsMap& params,
+        const ScheduleParamsMap& params,
         nx::db::QueryContext* context) override
     {
         ASSERT_NE(params.find("key1"), params.cend());
@@ -55,9 +51,9 @@ public:
 
     void subscribe(std::chrono::milliseconds timeout)
     {
-        nx::cdb::PersistentParamsMap params;
-        params["key1"] = "value1";
-        params["key2"] = "value2";
+        //nx::cdb::PersistentParamsMap params;
+        //params["key1"] = "value1";
+        //params["key2"] = "value2";
 
 //        m_manager->subscribe(functorTypeId, timeout, params);
     }
@@ -66,6 +62,7 @@ public:
     int fired() const { return m_fired; }
 
 private:
+    nx::db::AbstractAsyncSqlQueryExecutor* m_executor;
     nx::cdb::PersistentSheduler* m_scheduler;
     nx::utils::promise<void>* m_readyPromise;
     std::atomic<bool> m_shouldUnsubscribe{false};
@@ -84,6 +81,7 @@ public:
         nx::utils::MoveOnlyFunc<nx::db::DBResult(nx::db::QueryContext*)> dbUpdateFunc,
         nx::utils::MoveOnlyFunc<void(nx::db::QueryContext*, nx::db::DBResult)> completionHandler) override
     {
+        completionHandler(nullptr, dbUpdateFunc(nullptr));
     }
 
     virtual void executeUpdateWithoutTran(
@@ -96,6 +94,7 @@ public:
         nx::utils::MoveOnlyFunc<nx::db::DBResult(nx::db::QueryContext*)> dbSelectFunc,
         nx::utils::MoveOnlyFunc<void(nx::db::QueryContext*, nx::db::DBResult)> completionHandler) override
     {
+        completionHandler(nullptr, dbSelectFunc(nullptr));
     }
 
     virtual nx::db::DBResult execSqlScriptSync(
@@ -110,31 +109,34 @@ public:
 class PersistentScheduler: public ::testing::Test
 {
 protected:
-    PersistentScheduler():
-        scheduler(&executor, &dbHelper),
-        user(&scheduler, &readyPromise)
-    {}
-
-    virtual void SetUp() override
+    PersistentScheduler()
     {
         readyFuture = readyPromise.get_future();
     }
 
+    void whenSchedulerAndUserInitialized()
+    {
+        scheduler = std::unique_ptr<nx::cdb::PersistentSheduler>(
+            new nx::cdb::PersistentSheduler(&executor, &dbHelper));
+
+        user = std::unique_ptr<SchedulerUser>(new SchedulerUser(&executor, scheduler.get(), &readyPromise));
+    }
+
     SqlExecutorStub executor;
     DbHelperStub dbHelper;
-    nx::cdb::PersistentSheduler scheduler;
-    ShedulerUser user;
+    std::unique_ptr<nx::cdb::PersistentSheduler> scheduler;
+    std::unique_ptr<SchedulerUser> user;
     nx::utils::future<void> readyFuture;
     nx::utils::promise<void> readyPromise;
 };
 
 
-const QnUuid ShedulerUser::functorTypeId = QnUuid::fromStringSafe("{EC05F182-9380-48E3-9C76-AD6C10295136}");
+const QnUuid SchedulerUser::functorTypeId = QnUuid::fromStringSafe("{EC05F182-9380-48E3-9C76-AD6C10295136}");
 
-TEST_F(PersistentScheduler, initialization_register)
+TEST_F(PersistentScheduler, initialization)
 {
-    ASSERT_TRUE(dbHelper.registerCalledWith(ShedulerUser::functorTypeId));
-    ASSERT_EQ(scheduler.functorToReceiver.size(), 1);
+    whenSchedulerAndUserInitialized();
+    EXPECT_CALL(dbHelper, getScheduleData()).Times(1);
 }
 
 
@@ -144,7 +146,7 @@ TEST_F(PersistentScheduler, initialization_register)
 //    AbstractAsyncSqlQueryExecutor* executor = ;
 //    PersistentSheduler manager(executor);
 
-//    ShedulerUser user(executor, &manager, &readyPromise);
+//    SchedulerUser user(executor, &manager, &readyPromise);
 
 //    //
 //    timerManager.start();

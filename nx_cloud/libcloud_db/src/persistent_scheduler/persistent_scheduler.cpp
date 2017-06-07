@@ -3,8 +3,12 @@
 namespace nx {
 namespace cdb {
 
-PersistentSheduler::PersistentSheduler(nx::db::AbstractAsyncSqlQueryExecutor* sqlExecutor):
-    m_sqlExecutor(sqlExecutor)
+PersistentSheduler::PersistentSheduler(
+    nx::db::AbstractAsyncSqlQueryExecutor* sqlExecutor,
+    AbstractSchedulerDbHelper* dbHelper)
+    :
+    m_sqlExecutor(sqlExecutor),
+    m_dbHelper(dbHelper)
 {}
 
 void PersistentSheduler::registerEventReceiver(const QnUuid& functorId,
