@@ -106,7 +106,7 @@ Ptz::Traits ResourcePtzController::auxTraits() const
 int ResourcePtzController::presetsCount() const
 {
     return getCapabilities().testFlag(Ptz::PresetsPtzCapability)
-        ? ptz::helpers::getSortedPresets(this).size()
+        ? core::ptz::helpers::getSortedPresets(this).size()
         : 0;
 }
 
@@ -119,7 +119,7 @@ int ResourcePtzController::activePresetIndex() const
     if (!getActiveObject(&activeObject) || activeObject.type != Qn::PresetPtzObject)
         return -1;
 
-    const auto presets = ptz::helpers::getSortedPresets(this);
+    const auto presets = core::ptz::helpers::getSortedPresets(this);
     if (presets.isEmpty())
         return -1;
 
@@ -139,7 +139,7 @@ bool ResourcePtzController::setPresetByIndex(int index)
         return false;
     }
 
-    const auto presets = ptz::helpers::getSortedPresets(this);
+    const auto presets = core::ptz::helpers::getSortedPresets(this);
     return !presets.isEmpty() && activatePreset(presets.at(index).id,
         QnAbstractPtzController::MaxPtzSpeed);
 }
@@ -149,7 +149,7 @@ bool ResourcePtzController::setPresetById(const QString& id)
     if (!getCapabilities().testFlag(Ptz::PresetsPtzCapability))
         return false;
 
-    const auto presets = ptz::helpers::getSortedPresets(this);
+    const auto presets = core::ptz::helpers::getSortedPresets(this);
     if (presets.isEmpty())
         return false;
 

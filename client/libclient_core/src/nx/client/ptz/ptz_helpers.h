@@ -4,6 +4,7 @@
 
 namespace nx {
 namespace client {
+namespace core {
 namespace ptz {
 namespace helpers {
 
@@ -14,5 +15,6 @@ QnPtzPresetList sortedPresets(QnPtzPresetList presets);
 
 } // namespace helpers
 } // namespace ptz
+} // namespace core
 } // namespace client
 } // namespace nx

@@ -107,7 +107,7 @@ void QnPtzTourSpotsModel::setSpots(const QnPtzTourSpotList &spots) {
 
 QnPtzPresetList QnPtzTourSpotsModel::sortedPresets() const
 {
-    return nx::client::ptz::helpers::sortedPresets(m_presets);
+    return nx::client::core::ptz::helpers::sortedPresets(m_presets);
 }
 
 const QnPtzPresetList& QnPtzTourSpotsModel::presets() const {
