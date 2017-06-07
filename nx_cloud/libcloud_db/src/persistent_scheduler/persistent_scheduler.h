@@ -53,8 +53,8 @@ public:
 
     void unsubscribe(const QnUuid& taskId, nx::db::QueryContext* queryContext);
 
-private:
-    std::unordered_map<QnUuid, AbstractPersistentTimerEventReceiver*> m_functorToReceiver;
+protected:
+    std::unordered_map<QnUuid, AbstractPersistentScheduleEventReceiver*> m_functorToReceiver;
     std::unordered_map<QnUuid, PersistentParamsMap> m_taskToParams;
     nx::db::AbstractAsyncSqlQueryExecutor* m_sqlExecutor;
 };

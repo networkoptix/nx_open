@@ -2,6 +2,7 @@
 #include <nx/utils/std/future.h>
 #include <chrono>
 #include <managers/persistent_scheduler.h>
+#include <managers/persistent_scheduler_db_helper.h>
 
 namespace nx {
 namespace cdb {
@@ -11,6 +12,17 @@ class DbHelperStub: public nx::cdb::AbstractSchedulerDbHelper
 {
 public:
 private:
+};
+
+class TestScheduler: public nx::cdb::PersistentSheduler
+{
+public:
+    using nx::cdb::PersistentSheduler::PersistentSheduler;
+
+    const std::unordered_map<QnUuid, AbstractPersistentScheduleEventReceiver*>& functorToReceiver()
+    {
+        return m_functorToReceiver;
+    }
 };
 
 class ShedulerUser: public nx::cdb::AbstractPersistentScheduleEventReceiver
@@ -119,14 +131,12 @@ protected:
 
 const QnUuid ShedulerUser::functorTypeId = QnUuid::fromStringSafe("{EC05F182-9380-48E3-9C76-AD6C10295136}");
 
-TEST_F(PersistentScheduler, initialization)
+TEST_F(PersistentScheduler, initialization_register)
 {
+    ASSERT_TRUE(dbHelper.registerCalledWith(ShedulerUser::functorTypeId));
+    ASSERT_EQ(scheduler.functorToReceiver.size(), 1);
 }
 
-TEST_F(PersistentScheduler, registerEventReceiver)
-{
-
-}
 
 //TEST_F(PersistentSheduler, subscribeUnsubscribe_simple)
 //{
