@@ -2987,6 +2987,7 @@ void MediaServerProcess::run()
     MSSettings::runTimeSettings()->setValue("lastRunningTime", 0);
 
     authHelper.reset();
+    remoteArchiveSynchronizer.reset();
     fileDeletor.reset();
     normalStorageManager.reset();
     backupStorageManager.reset();
