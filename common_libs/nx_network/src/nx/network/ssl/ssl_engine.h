@@ -1,5 +1,7 @@
 #pragma once
 
+#ifdef ENABLE_SSL
+
 #include <chrono>
 
 #include <openssl/ssl.h>
@@ -35,3 +37,5 @@ public:
 } // namespace ssl
 } // namespace network
 } // namespace nx
+
+#endif // ENABLE_SSL

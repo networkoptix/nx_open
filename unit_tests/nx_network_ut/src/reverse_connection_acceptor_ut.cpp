@@ -377,6 +377,19 @@ protected:
         ASSERT_EQ(sysErrorCode, std::get<0>(*m_lastAcceptedConnection));
     }
 
+    template<typename Func>
+    void executeInAcceptorsAioThread(Func func)
+    {
+        nx::utils::promise<void> done;
+        m_acceptor.post(
+            [&func, &done]()
+            {
+                func();
+                done.set_value();
+            });
+        done.get_future().wait();
+    }
+
 private:
     using AcceptResult = 
         std::tuple<SystemError::ErrorCode, std::unique_ptr<ReverseConnection>>;
@@ -384,8 +397,8 @@ private:
     const std::size_t m_preemptiveConnectionCount;
     nx::utils::SyncQueue<AcceptResult> m_acceptedConnections;
     boost::optional<AcceptResult> m_lastAcceptedConnection;
-    network::ReverseConnectionAcceptor<ReverseConnection> m_acceptor;
     ReverseConnectionPool m_reverseConnectionPool;
+    network::ReverseConnectionAcceptor<ReverseConnection> m_acceptor;
     nx::utils::SyncQueue<ReverseConnection*> m_connectedConnections;
     nx::utils::SyncQueue<ReverseConnection*> m_connectionsFailedToConnect;
     nx::utils::SyncQueue<ReverseConnection*> m_removedConnections;
@@ -524,6 +537,20 @@ TEST_F(ReverseConnectionAcceptor, cancel_io_in_other_thread)
 {
     givenStartedAcceptAsync();
     whenCancelledIo();
+    thenIoEventIsNotDelivered();
+}
+
+TEST_F(ReverseConnectionAcceptor, cancel_io_in_own_aio_thread_just_after_scheduling)
+{
+    givenReadyConnection();
+
+    executeInAcceptorsAioThread(
+        [this]()
+        {
+            whenInvokedAcceptAsync();
+            whenCancelledIo();
+        });
+
     thenIoEventIsNotDelivered();
 }
 
