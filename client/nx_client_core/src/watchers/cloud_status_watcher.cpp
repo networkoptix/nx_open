@@ -123,6 +123,7 @@ public:
     QnCloudSystemList recentCloudSystems;
     QnCloudSystem currentSystem;
     api::TemporaryCredentials temporaryCredentials;
+    bool isMobile = false;
 
 public:
     void updateConnection(bool initial = false);
@@ -144,11 +145,12 @@ private:
     bool m_cloudIsEnabled;
 };
 
-QnCloudStatusWatcher::QnCloudStatusWatcher(QObject* parent):
+QnCloudStatusWatcher::QnCloudStatusWatcher(QObject* parent, bool isMobile):
     base_type(parent),
     QnCommonModuleAware(parent),
     d_ptr(new QnCloudStatusWatcherPrivate(this))
 {
+    d_ptr->isMobile = isMobile;
     setStayConnected(!qnClientCoreSettings->cloudPassword().isEmpty());
 
     const auto correctOfflineState = [this]()
@@ -332,7 +334,7 @@ void QnCloudStatusWatcher::updateSystems()
     if (!d->cloudConnection)
         return;
 
-    const bool isMobile = runtimeInfoManager()->localInfo().data.peer.isMobileClient();
+    const bool isMobile = d->isMobile;
 
     QPointer<QnCloudStatusWatcher> guard(this);
     d->cloudConnection->systemManager()->getSystemsFiltered(api::Filter(),

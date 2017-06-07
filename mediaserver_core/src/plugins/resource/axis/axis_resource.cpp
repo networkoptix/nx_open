@@ -221,7 +221,8 @@ bool QnPlAxisResource::startIOMonitor(Qn::IOPortType portType, IOMonitor& ioMoni
     requestUrl.setHost( getHostAddress() );
     requestUrl.setPort( QUrl(getUrl()).port(DEFAULT_AXIS_API_PORT) );
     //preparing request
-    QString requestPath = lit("/axis-cgi/io/port.cgi?monitor=");
+    requestUrl.setPath(lit("/axis-cgi/io/port.cgi"));
+    QString requestQuery = lit("monitor=");
 
     QString portList;
     for (const auto& port: getIOPorts()) {
@@ -235,8 +236,8 @@ bool QnPlAxisResource::startIOMonitor(Qn::IOPortType portType, IOMonitor& ioMoni
     if (portList.isEmpty())
         return false; // no ports to listen
 
-    requestPath += portList;
-    requestUrl.setPath( requestPath );
+    requestQuery += portList;
+    requestUrl.setQuery(requestQuery);
 
     QnMutexLocker lk( &m_inputPortMutex );
     nx_http::AsyncHttpClientPtr httpClient = nx_http::AsyncHttpClient::create();
@@ -1375,7 +1376,8 @@ bool QnPlAxisResource::readCurrentIOStateAsync()
     requestUrl.setHost( getHostAddress() );
     requestUrl.setPort( QUrl(getUrl()).port(DEFAULT_AXIS_API_PORT) );
     //preparing request
-    QString requestPath = lit("/axis-cgi/io/port.cgi?checkactive=");
+    requestUrl.setPath(lit("/axis-cgi/io/port.cgi"));
+    QString requestQuery = lit("checkactive=");
 
     QString portList;
     for (const auto& port: getIOPorts()) {
@@ -1388,8 +1390,8 @@ bool QnPlAxisResource::readCurrentIOStateAsync()
     if (portList.isEmpty())
         return false; // no ports to listen
 
-    requestPath += portList;
-    requestUrl.setPath( requestPath );
+    requestQuery += portList;
+    requestUrl.setQuery(requestQuery);
 
     nx_http::AsyncHttpClientPtr httpClient = nx_http::AsyncHttpClient::create();
     connect(
