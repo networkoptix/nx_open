@@ -76,28 +76,28 @@ EpollWin32::~EpollWin32()
 
 void EpollWin32::add(const SYSSOCKET& s, const int* events)
 {
-    int& eventMask = m_sLocals[s];
+    int& eventMask = m_socketDescriptorToEventMask[s];
     eventMask |= *events;
 }
 
 void EpollWin32::remove(const SYSSOCKET& s)
 {
-    m_sLocals.erase(s);
+    m_socketDescriptorToEventMask.erase(s);
 }
 
 std::size_t EpollWin32::socketsPolledCount() const
 {
-    return m_sLocals.size();
+    return m_socketDescriptorToEventMask.size();
 }
 
 int EpollWin32::poll(
-    std::map<SYSSOCKET, int>* lrfds,
-    std::map<SYSSOCKET, int>* lwfds,
+    std::map<SYSSOCKET, int>* socketsAvailableForReading,
+    std::map<SYSSOCKET, int>* socketsAvailableForWriting,
     std::chrono::microseconds timeout)
 {
     using namespace std::chrono;
 
-    prepareForPolling(lrfds, lwfds);
+    prepareForPolling(socketsAvailableForReading, socketsAvailableForWriting);
 
     const bool isTimeoutSpecified = timeout != microseconds::max();
     timeval tv;
@@ -130,7 +130,7 @@ int EpollWin32::poll(
         return eventCount;
 
     bool receivedInterruptEvent = false;
-    prepareOutEvents(lrfds, lwfds, &receivedInterruptEvent);
+    prepareOutEvents(socketsAvailableForReading, socketsAvailableForWriting, &receivedInterruptEvent);
     if (receivedInterruptEvent)
         --eventCount;
 
@@ -149,26 +149,26 @@ void EpollWin32::interrupt()
 }
 
 void EpollWin32::prepareForPolling(
-    std::map<SYSSOCKET, int>* lrfds,
-    std::map<SYSSOCKET, int>* lwfds)
+    std::map<SYSSOCKET, int>* socketsAvailableForReading,
+    std::map<SYSSOCKET, int>* socketsAvailableForWriting)
 {
     m_readfds->fd_count = 0;
     m_writefds->fd_count = 0;
     m_exceptfds->fd_count = 0;
 
-    reallocFdSetIfNeeded(m_sLocals.size()+1, &m_readfdsCapacity, &m_readfds); //< +1 is for m_interruptionSocket
-    reallocFdSetIfNeeded(m_sLocals.size(), &m_writefdsCapacity, &m_writefds);
-    reallocFdSetIfNeeded(m_sLocals.size(), &m_exceptfdsCapacity, &m_exceptfds);
+    reallocFdSetIfNeeded(m_socketDescriptorToEventMask.size()+1, &m_readfdsCapacity, &m_readfds); //< +1 is for m_interruptionSocket
+    reallocFdSetIfNeeded(m_socketDescriptorToEventMask.size(), &m_writefdsCapacity, &m_writefds);
+    reallocFdSetIfNeeded(m_socketDescriptorToEventMask.size(), &m_exceptfdsCapacity, &m_exceptfds);
 
     m_readfds->fd_array[m_readfds->fd_count++] = m_interruptionSocket;
 
-    for (const std::pair<SYSSOCKET, int>& fdAndEventMask : m_sLocals)
+    for (const std::pair<SYSSOCKET, int>& fdAndEventMask: m_socketDescriptorToEventMask)
     {
-        if (lrfds && (fdAndEventMask.second & UDT_EPOLL_IN) > 0)
+        if (socketsAvailableForReading && (fdAndEventMask.second & UDT_EPOLL_IN) > 0)
         {
             m_readfds->fd_array[m_readfds->fd_count++] = fdAndEventMask.first;
         }
-        if (lwfds && (fdAndEventMask.second & UDT_EPOLL_OUT) > 0)
+        if (socketsAvailableForWriting && (fdAndEventMask.second & UDT_EPOLL_OUT) > 0)
         {
             m_writefds->fd_array[m_writefds->fd_count++] = fdAndEventMask.first;
         }
@@ -177,8 +177,8 @@ void EpollWin32::prepareForPolling(
 }
 
 void EpollWin32::prepareOutEvents(
-    std::map<SYSSOCKET, int>* lrfds,
-    std::map<SYSSOCKET, int>* lwfds,
+    std::map<SYSSOCKET, int>* socketsAvailableForReading,
+    std::map<SYSSOCKET, int>* socketsAvailableForWriting,
     bool* receivedInterruptEvent)
 {
     // Using win32-specific select features to get O(1) here.
@@ -191,11 +191,11 @@ void EpollWin32::prepareOutEvents(
             *receivedInterruptEvent = true;
             continue;
         }
-        (*lrfds)[m_readfds->fd_array[i]] = UDT_EPOLL_IN;
+        (*socketsAvailableForReading)[m_readfds->fd_array[i]] = UDT_EPOLL_IN;
     }
 
     for (size_t i = 0; i < m_writefds->fd_count; ++i)
-        (*lwfds)[m_writefds->fd_array[i]] = UDT_EPOLL_OUT;
+        (*socketsAvailableForWriting)[m_writefds->fd_array[i]] = UDT_EPOLL_OUT;
 
     for (size_t i = 0; i < m_exceptfds->fd_count; ++i)
     {
