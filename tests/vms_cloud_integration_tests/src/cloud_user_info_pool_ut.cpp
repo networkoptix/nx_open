@@ -112,7 +112,7 @@ protected:
         ASSERT_EQ(vasyaNonceSet.find("nonce1"), vasyaNonceSet.cend());
         ASSERT_EQ(vasyaNonceSet.find("nonce2"), vasyaNonceSet.cend());
 
-        auto& petyaNonceSet = userInfoPool.nameToNonces().find("petya")->second;
+        /*auto& petyaNonceSet =*/ userInfoPool.nameToNonces().find("petya")->second;
         ASSERT_EQ(vasyaNonceSet.find("nonce2"), vasyaNonceSet.cend());
     }
 
@@ -136,7 +136,7 @@ protected:
 TEST_F(CloudUserInfoPool, deserialize)
 {
     const QString kSimpleString =
-        lit("{\"timestamp\":1234567,\"cloudNonce\":\"abcdef0123456\",\"partialResponse\":\"response\"}");
+        lm("{\"timestamp\":1234567,\"cloudNonce\":\"abcdef0123456\",\"partialResponse\":\"response\"}");
 
     uint64_t ts;
     nx::Buffer nonce;
