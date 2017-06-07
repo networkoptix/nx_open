@@ -51,6 +51,7 @@ private:
         std::map<SYSSOCKET, int>* socketsAvailableForReading,
         std::map<SYSSOCKET, int>* socketsAvailableForWriting,
         bool* receivedInterruptEvent);
+    bool isPollingSocketForEvent(SYSSOCKET handle, int eventMask) const;
 
     void initializeInterruptSocket();
     void freeInterruptSocket();

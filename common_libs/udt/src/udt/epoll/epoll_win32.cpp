@@ -199,11 +199,25 @@ void EpollWin32::prepareOutEvents(
 
     for (size_t i = 0; i < m_exceptfds->fd_count; ++i)
     {
-        if (lrfds)
-            (*lrfds)[m_exceptfds->fd_array[i]] |= UDT_EPOLL_ERR;
-        if (lwfds)
-            (*lwfds)[m_exceptfds->fd_array[i]] |= UDT_EPOLL_ERR;
+        if (socketsAvailableForReading &&
+            isPollingSocketForEvent(m_exceptfds->fd_array[i], UDT_EPOLL_IN))
+        {
+            (*socketsAvailableForReading)[m_exceptfds->fd_array[i]] |= UDT_EPOLL_ERR;
+        }
+        if (socketsAvailableForWriting &&
+            isPollingSocketForEvent(m_exceptfds->fd_array[i], UDT_EPOLL_OUT))
+        {
+            (*socketsAvailableForWriting)[m_exceptfds->fd_array[i]] |= UDT_EPOLL_ERR;
+        }
     }
+}
+
+bool EpollWin32::isPollingSocketForEvent(SYSSOCKET handle, int eventMask) const
+{
+    auto it = m_socketDescriptorToEventMask.find(handle);
+    return it != m_socketDescriptorToEventMask.end()
+        ? (it->second & eventMask) > 0
+        : false;
 }
 
 void EpollWin32::initializeInterruptSocket()
