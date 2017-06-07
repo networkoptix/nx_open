@@ -1029,11 +1029,11 @@ Player::VideoQuality Player::actualVideoQuality() const
     }
 }
 
-QList<int> Player::availableVideoQualities(const QList<int>& videoQualities) const
+QList<int> Player::availableCustomVideoQualities(const QList<int>& videoQualities) const
 {
     Q_D(const Player);
 
-    d->log(lit("availableVideoQualities() BEGIN"));
+    d->log(lit("availableCustomVideoQualities() BEGIN"));
 
     QList<int> result;
 
@@ -1055,7 +1055,9 @@ QList<int> Player::availableVideoQualities(const QList<int>& videoQualities) con
                 codec, quality, liveMode, positionMs, camera);
         };
 
-    const auto maximumHeight = getQuality(HighVideoQuality).frameSize.height();
+    auto maximumHeight = getQuality(HighVideoQuality).frameSize.height();
+    if (maximumHeight <= 0)
+        maximumHeight = getQuality(LowVideoQuality).frameSize.height();
 
     bool customResolutionAvailable = false;
 
@@ -1072,7 +1074,7 @@ QList<int> Player::availableVideoQualities(const QList<int>& videoQualities) con
         result.append(videoQuality);
     }
 
-    d->log(lit("availableVideoQualities() END"));
+    d->log(lit("availableCustomVideoQualities() END"));
 
     if (!customResolutionAvailable)
         return QList<int>();

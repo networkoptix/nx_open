@@ -172,7 +172,7 @@ PageBase
                         "activeQuality": player.videoQuality,
                         "customQualities": customQualities,
                         "availableCustomQualities":
-                            player.availableVideoQualities(customQualities)
+                            player.availableCustomVideoQualities(customQualities)
                     }
                 )
 
