@@ -1,4 +1,4 @@
-#include "text_edit.h"
+#include "text_edit_field.h"
 
 #include <QtWidgets/QTextEdit>
 

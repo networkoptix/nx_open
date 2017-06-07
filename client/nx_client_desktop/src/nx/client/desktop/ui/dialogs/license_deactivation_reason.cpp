@@ -8,7 +8,7 @@
 
 #include <ui/widgets/common/input_field.h>
 
-#include <nx/client/desktop/ui/common/text_edit.h>
+#include <nx/client/desktop/ui/common/text_edit_field.h>
 
 namespace {
 
