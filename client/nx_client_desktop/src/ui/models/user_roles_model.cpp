@@ -149,10 +149,6 @@ QVariant QnUserRolesModel::data(const QModelIndex& index, int role) const
                 ? QVariant(d->m_checked.contains(index) ? Qt::Checked : Qt::Unchecked)
                 : QVariant();
 
-        case Qn::DisabledRole:
-            return !isCheckable() || d->m_checked.contains(
-                index.sibling(index.row(), CheckColumn));
-
         /* Role uuid (for custom roles): */
         case Qn::UuidRole:
             return QVariant::fromValue(roleModel.roleUuid);
@@ -186,11 +182,9 @@ bool QnUserRolesModel::setData(const QModelIndex& index, const QVariant& value, 
     else
         d->m_checked.remove(index);
 
-    static const QVector<int> changedRoles { Qt::CheckStateRole, Qn::DisabledRole };
     emit dataChanged(
         index.sibling(index.row(), 0),
-        index.sibling(index.row(), columnCount() - 1),
-        changedRoles);
+        index.sibling(index.row(), columnCount() - 1));
 
     return true;
 }
