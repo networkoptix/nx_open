@@ -61,6 +61,9 @@ QnUserRolesModelPrivate::QnUserRolesModelPrivate(
         &QnUserRolesModelPrivate::updateStandardRoles);
     updateStandardRoles();
 
+    connect(parent, &QAbstractItemModel::modelAboutToBeReset, this,
+        [this]() { m_checked.clear(); });
+
     if (flags.testFlag(QnUserRolesModel::UserRoleFlag))
     {
         m_userRoles = userRolesManager()->userRoles();
@@ -129,7 +132,7 @@ void QnUserRolesModelPrivate::updateStandardRoles()
     QList<Qn::UserRole> available;
     if (auto user = context()->user())
     {
-        for (auto role : allStandardRoles())
+        for (auto role: allStandardRoles())
         {
             if (resourceAccessManager()->canCreateUser(user, role))
                 available << role;

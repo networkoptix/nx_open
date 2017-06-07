@@ -15,7 +15,7 @@
 
 
 class QnUserRolesModelPrivate;
-class QnUserRolesModel : public ScopedModelOperations<Connective<QAbstractItemModel>>
+class QnUserRolesModel: public ScopedModelOperations<Connective<QAbstractItemModel>>
 {
     Q_OBJECT
     using base_type = ScopedModelOperations<Connective<QAbstractItemModel>>;
@@ -30,6 +30,12 @@ public:
     };
     Q_DECLARE_FLAGS(DisplayRoleFlags, DisplayRoleFlag)
 
+    enum Column
+    {
+        NameColumn = 0,
+        CheckColumn = 1 //< exists if isCheckable()
+    };
+
     explicit QnUserRolesModel(QObject* parent = nullptr, DisplayRoleFlags flags = AllRoleFlags);
     virtual ~QnUserRolesModel();
 
@@ -43,6 +49,9 @@ public:
     /* If we want to override "Custom" role name and tooltip: */
     void setCustomRoleStrings(const QString& name, const QString& description);
 
+    bool isCheckable() const;
+    void setCheckable(bool value);
+
     /* QAbstractItemModel implementation: */
 
     virtual QModelIndex index(int row, int column, const QModelIndex& parent = QModelIndex()) const override;
@@ -51,7 +60,10 @@ public:
     virtual int rowCount(const QModelIndex& parent = QModelIndex()) const override;
     virtual int columnCount(const QModelIndex& parent = QModelIndex()) const override;
 
+    virtual Qt::ItemFlags flags(const QModelIndex& index) const override;
+
     virtual QVariant data(const QModelIndex& index, int role = Qt::DisplayRole) const override;
+    virtual bool setData(const QModelIndex& index, const QVariant& value, int role) override;
 
 private:
     QScopedPointer<QnUserRolesModelPrivate> d_ptr;
