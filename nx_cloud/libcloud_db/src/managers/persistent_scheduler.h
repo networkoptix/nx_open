@@ -21,7 +21,7 @@ namespace cdb {
 class PersistentSheduler;
 using PersistentParamsMap = std::unordered_map<std::string, std::string>;
 
-class AbstractPersistentTimerEventReceiver
+class AbstractPersistentScheduleEventReceiver
 {
 public:
     virtual void persistentTimerFired(
@@ -29,7 +29,7 @@ public:
         const PersistentParamsMap& params,
         nx::db::QueryContext* context) = 0;
 
-    virtual ~AbstractPersistentTimerEventReceiver() {}
+    virtual ~AbstractPersistentScheduleEventReceiver() {}
 };
 
 
@@ -40,7 +40,7 @@ public:
 
     void registerEventReceiver(
         const QnUuid& functorId,
-        AbstractPersistentTimerEventReceiver* receiver);
+        AbstractPersistentScheduleEventReceiver* receiver);
 
     void start();
 

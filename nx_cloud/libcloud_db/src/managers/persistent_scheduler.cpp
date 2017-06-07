@@ -7,9 +7,8 @@ PersistentSheduler::PersistentSheduler(nx::db::AbstractAsyncSqlQueryExecutor* sq
     m_sqlExecutor(sqlExecutor)
 {}
 
-void PersistentSheduler::registerEventReceiver(
-    const QnUuid& functorId,
-    AbstractPersistentTimerEventReceiver* receiver)
+void PersistentSheduler::registerEventReceiver(const QnUuid& functorId,
+    AbstractPersistentScheduleEventReceiver *receiver)
 {
 
 }

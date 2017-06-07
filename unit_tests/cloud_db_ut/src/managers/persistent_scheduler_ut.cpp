@@ -99,7 +99,7 @@ class PersistentScheduler: public ::testing::Test
 {
 protected:
     PersistentScheduler():
-        scheduler(&executor),
+        scheduler(&executor, &dbHelper),
         user(&scheduler, &readyPromise)
     {}
 
