@@ -2,24 +2,21 @@
 #undef NULL
 #define NULL (0)
 
+#include "utils.h"
+
+#include <cassert>
+#include <stdio.h>
+
 #include <boost/lexical_cast.hpp>
 #include <boost/uuid/uuid_io.hpp>
 #include <boost/uuid/uuid.hpp>
 #include <boost/uuid/uuid_generators.hpp>
 
-#include "utils.h"
-#include <cassert>
-#include <stdio.h>
-
 static nx::ut::cfg::Config config;
 
-namespace nx
-{
-namespace ut
-{
-
-namespace cfg
-{
+namespace nx {
+namespace ut {
+namespace cfg {
 
 nx::ut::cfg::Config& configInstance()
 {
@@ -28,8 +25,7 @@ nx::ut::cfg::Config& configInstance()
 
 } // namespace cfg
 
-namespace utils
-{
+namespace utils {
 
 boost::optional<QString> createRandomDir()
 {
@@ -45,8 +41,11 @@ boost::optional<QString> createRandomDir()
     return fullPath;
 }
 
-WorkDirResource::WorkDirResource(const QString& path)
-    : m_workDir(path.isEmpty() ? createRandomDir() : path) {}
+WorkDirResource::WorkDirResource(const QString& path):
+    m_workDir(path.isEmpty() ? createRandomDir() : path)
+{
+}
+
 WorkDirResource::~WorkDirResource()
 {
     if (m_workDir)
@@ -74,5 +73,3 @@ bool validateAndOrCreatePath(const QString &path)
 } // namespace utils
 } // namespace ut
 } // namespace nx
-
-
