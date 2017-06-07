@@ -20,13 +20,15 @@
         <root.dir>${basedir}/../..</root.dir>
 
         <qt.libs>core network concurrent xml xmlpatterns sql multimedia</qt.libs>
-        <global.libs>-lmediaserver_core -lcloud_db -lcloud_db_client -lcommon -lnx_network -lnx_fusion -lnx_utils</global.libs>
+        <global.libs>-lmediaserver_core -lcloud_db -lcommon -lnx_network -lnx_fusion -lappserver2 -lnx_email -ludt -lcloud_db_client -lnx_speech_synthesizer -lnx_utils</global.libs>
         <windows.oslibs>-lws2_32 -lIphlpapi DbgHelp.lib -lwinmm Wldap32.lib</windows.oslibs>
+        <linux.oslibs>-ldl -lldap -ltermcap</linux.oslibs>
         <guid>${vms_cloud_integration_tests.guid}</guid>
 
         <windows.defines>_VARIADIC_MAX=10</windows.defines>
 
-        <rdep.packages>gtest gmock openssl ffmpeg quazip</rdep.packages>
+        <rdep.packages>gtest gmock openssl ffmpeg onvif quazip sigar festival</rdep.packages>
+        <rdep.linux.arm.packages>sasl2 openldap</rdep.linux.arm.packages>
     </properties>
 
     <dependencies>
