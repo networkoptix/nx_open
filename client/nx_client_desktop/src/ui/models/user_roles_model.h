@@ -52,6 +52,10 @@ public:
     bool isCheckable() const;
     void setCheckable(bool value);
 
+    /* Controls if UuidRole data contains predefined role pseudo uuids. */
+    bool predefinedRoleIdsEnabled() const;
+    void setPredefinedRoleIdsEnabled(bool value);
+
     /* QAbstractItemModel implementation: */
 
     virtual QModelIndex index(int row, int column, const QModelIndex& parent = QModelIndex()) const override;

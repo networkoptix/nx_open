@@ -58,5 +58,6 @@ private:
     QString m_customRoleDescription;
 
     bool m_checkable = false;
+    bool m_predefinedRoleIdsEnabled = false;
     QSet<QPersistentModelIndex> m_checked;
 };

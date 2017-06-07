@@ -105,6 +105,24 @@ void QnUserRolesModel::setCheckable(bool value)
     d->m_checkable = value;
 }
 
+bool QnUserRolesModel::predefinedRoleIdsEnabled() const
+{
+    Q_D(const QnUserRolesModel);
+    return d->m_predefinedRoleIdsEnabled;
+}
+
+void QnUserRolesModel::setPredefinedRoleIdsEnabled(bool value)
+{
+    Q_D(QnUserRolesModel);
+    if (d->m_checkable == value)
+        return;
+
+    d->m_predefinedRoleIdsEnabled = value;
+
+    if (const int count = rowCount())
+        emit dataChanged(index(0, 0), index(count - 1, columnCount() - 1));
+}
+
 Qt::ItemFlags QnUserRolesModel::flags(const QModelIndex& index) const
 {
     if (index.model() != this || !hasIndex(index.row(), index.column(), index.parent()))
@@ -151,7 +169,10 @@ QVariant QnUserRolesModel::data(const QModelIndex& index, int role) const
 
         /* Role uuid (for custom roles): */
         case Qn::UuidRole:
-            return QVariant::fromValue(roleModel.roleUuid);
+            return QVariant::fromValue(
+                roleModel.roleType != Qn::UserRole::CustomUserRole && d->m_predefinedRoleIdsEnabled
+                    ? QnUserRolesManager::predefinedRoleId(roleModel.roleType)
+                    : roleModel.roleUuid);
 
         /* Role permissions (for built-in roles): */
         case Qn::GlobalPermissionsRole:
