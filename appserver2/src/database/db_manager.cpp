@@ -1015,7 +1015,7 @@ bool QnDbManager::updateBusinessActionParameters()
                     remappedValues[remappedKey] = values[key];
                     if (remappedKey == lit("durationMs"))
                     {
-                        // seconds -> milliseconds
+                        // Convert seconds to milliseconds.
                         int valueMs = remappedValues[remappedKey].toInt() * 1000;
                         remappedValues[remappedKey] = QString::number(valueMs);
                     }

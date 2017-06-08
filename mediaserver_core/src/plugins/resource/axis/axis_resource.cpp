@@ -33,7 +33,8 @@ using namespace std;
 
 const QString QnPlAxisResource::MANUFACTURE(lit("Axis"));
 
-namespace{
+namespace {
+    const static std::chrono::milliseconds kReconnectTimeout(1000);
     const float MAX_AR_EPS = 0.04f;
     const quint64 MOTION_INFO_UPDATE_INTERVAL = 1000000ll * 60;
     const quint16 DEFAULT_AXIS_API_PORT = 80;
@@ -260,8 +261,11 @@ bool QnPlAxisResource::startIOMonitor(Qn::IOPortType portType, IOMonitor& ioMoni
 
 void QnPlAxisResource::stopInputPortMonitoringAsync()
 {
-    resetHttpClient(m_ioHttpMonitor[0].httpClient);
-    resetHttpClient(m_ioHttpMonitor[1].httpClient);
+    for (int i = 0; i < 2; ++i)
+    {
+        resetHttpClient(m_ioHttpMonitor[i].httpClient);
+        m_ioHttpMonitor[i].restartTimer.cancelSync();
+    }
     resetHttpClient(m_inputPortStateReader);
 
     auto timeMs = qnSyncTime->currentMSecsSinceEpoch();
@@ -1029,13 +1033,23 @@ void QnPlAxisResource::onMonitorConnectionClosed( nx_http::AsyncHttpClientPtr ht
     if (httpClient == m_ioHttpMonitor[0].httpClient) {
         lk.unlock();
         resetHttpClient(m_ioHttpMonitor[0].httpClient);
-        startIOMonitor(Qn::PT_Input, m_ioHttpMonitor[0]);
+        restartIOMonitorWithDelay(Qn::PT_Input, 0);
     }
     else if (httpClient == m_ioHttpMonitor[1].httpClient) {
         lk.unlock();
         resetHttpClient(m_ioHttpMonitor[1].httpClient);
-        startIOMonitor(Qn::PT_Output, m_ioHttpMonitor[1]);
+        restartIOMonitorWithDelay(Qn::PT_Output, 1);
     }
+}
+
+void QnPlAxisResource::restartIOMonitorWithDelay(Qn::IOPortType portType, int index)
+{
+    m_ioHttpMonitor[index].restartTimer.start(
+        kReconnectTimeout,
+        [this, portType, index]()
+    {
+        startIOMonitor(portType, m_ioHttpMonitor[index]);
+    });
 }
 
 bool QnPlAxisResource::readPortSettings( CLSimpleHTTPClient* const http, QnIOPortDataList& ioPortList)
