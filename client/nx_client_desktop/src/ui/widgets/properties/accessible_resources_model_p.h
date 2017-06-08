@@ -1,6 +1,6 @@
 #pragma once
 
-#include <QtCore/QSortFilterProxyModel>
+#include <nx/client/desktop/ui/common/column_remap_proxy_model.h>
 
 #include <client_core/connection_context_aware.h>
 
@@ -11,12 +11,13 @@
 *  and inserts a virtual column that displays an icon of a resource through
 *  which a user gains implicit access to the resource of corresponding row.
 */
-class QnAccessibleResourcesModel : public QSortFilterProxyModel, public QnConnectionContextAware
+class QnAccessibleResourcesModel:
+    public nx::client::desktop::ui::ColumnRemapProxyModel,
+    public QnConnectionContextAware
 {
-    //TODO: #vkutin Implement "QnRelayoutColumnsProxyModel" and use it as a base
-    using base_type = QSortFilterProxyModel;
-
     Q_OBJECT
+    using base_type = nx::client::desktop::ui::ColumnRemapProxyModel;
+
 public:
     enum Column
     {
@@ -31,15 +32,6 @@ public:
 
     QnResourceAccessSubject subject() const;
     void setSubject(const QnResourceAccessSubject& subject);
-
-
-    virtual int columnCount(const QModelIndex& parent = QModelIndex()) const override;
-    virtual QModelIndex index(int row, int column, const QModelIndex& parent = QModelIndex()) const override;
-    virtual QModelIndex sibling(int row, int column, const QModelIndex& idx) const override;
-    virtual QModelIndex parent(const QModelIndex& index) const override;
-
-    virtual QModelIndex mapToSource(const QModelIndex& proxyIndex) const override;
-    virtual QModelIndex mapFromSource(const QModelIndex& sourceIndex) const override;
 
     virtual QVariant data(const QModelIndex& index, int role) const override;
     virtual Qt::ItemFlags flags(const QModelIndex& index) const override;
