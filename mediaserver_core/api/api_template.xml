@@ -2654,9 +2654,9 @@ the respective JSON fields can be empty.</description>
                             <ol>
                                 <li>Request <code>/api/getNonce</code></li>
                                 <li>In response you"ll get a JSON object with <i>realm</i> and <i>nonce</i> (nonce is a session key for this user)</li>
-                                <li>Calculate authentification hash <i>auth_digest</i>, using realm and nonce (see algorithm below)</li>
+                                <li>Calculate authentication hash <i>auth_digest</i>, using realm and nonce (see algorithm below)</li>
                                 <li>Request <code>/api/cookieLogin</code>(POST) pass auth parameter there</li>
-                                <li>Server will check authentification and will set session cookies</li>
+                                <li>Server will check authentication and will set session cookies</li>
                             </ol>
                         </li>
                         <li>To log out:
@@ -2678,8 +2678,8 @@ the respective JSON fields can be empty.</description>
 
                         <ul>
                             <li>Call <i>/gettime</i> request to get <i>realm</i> and <i>nonce</i> from server (current server time MUST be used as a nonce value, nonce is valid for about 5 minutes)</li>
-                            <li>Calculate authentification hash <i>auth_digest</i>, using realm and nonce (see algorithm below)</li>
-                            <li>Set authentification hash to url-parameter: http://127.0.0.1:7001/ec2/method?...&amp;auth=<i>auth_digest</i>
+                            <li>Calculate authentication hash <i>auth_digest</i>, using realm and nonce (see algorithm below)</li>
+                            <li>Set authentication hash to url-parameter: http://127.0.0.1:7001/ec2/method?...&amp;auth=<i>auth_digest</i>
                             </li>
                         </ul>
                     </description>
@@ -2688,15 +2688,15 @@ the respective JSON fields can be empty.</description>
                     <result/>
                 </function>
                 <function>
-                    <name>Calculating authentification hash</name>
+                    <name>Calculating authentication hash</name>
                     <description>
-                        For url-based authentification and cookie-based authentification you need to calculate hash manually, using the following algorythm:
+                        For url-based authentication and cookie-based authentication you need to calculate hash manually, using the following algorithm:
                         <ul>
                             <li>Get <i>nonce</i> and <i>realm</i> from server</li>
                             <li>Translate user's <i>username</i> to lower case</li>
                             <li>Check required <i>method</i> ("GET" for http-requests, "PLAY" for rtsp)</li>
                             <li>
-                                <i>ha1 = MD5(usename:realm:password)</i>
+                                <i>ha1 = MD5(username:realm:password)</i>
                             </li>
                             <li>
                                 <i>simplified_ha2 = MD5(ha1:nonce:MD5(method:))</i>
@@ -2705,7 +2705,7 @@ the respective JSON fields can be empty.</description>
                                 <i>auth = base64(username:nonce:simplified_ha2)</i>
                             </li>
                             <li>
-                                <i>auth</i> is required authentification hash</li>
+                                <i>auth</i> is required authentication hash</li>
                         </ul>
                     </description>
                     <method/>
