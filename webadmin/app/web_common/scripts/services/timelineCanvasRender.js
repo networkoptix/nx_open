@@ -636,16 +636,17 @@ function TimelineCanvasRender(canvas, timelineConfig, recordsProvider, scaleMana
         var height = timelineConfig.markerHeight * self.canvas.height;
 
         // Line
+        var markerOffset = markerColor == timelineConfig.timeMarkerColor ? 0 : -0.5;
 
         context.lineWidth = markerColor == timelineConfig.timeMarkerColor ? timelineConfig.timeMarkerLineWidth: timelineConfig.timeMarkerPointerLineWidth;
         context.strokeStyle = blurColor(markerColor,1);
         context.fillStyle = blurColor(markerColor,1);
 
-        var top = (timelineConfig.topLabelHeight + timelineConfig.labelHeight) * self.canvas.height;
+        var top = (timelineConfig.topLabelHeight + timelineConfig.labelHeight) * self.canvas.height + 0.5;
 
         context.beginPath();
-        context.moveTo(0.5 + coordinate, top);
-        context.lineTo(0.5 + coordinate, Math.round(self.canvas.height - (timelineConfig.scrollBarHeight) * self.canvas.height)  - 2);
+        context.moveTo(0.5 + coordinate + markerOffset, top);
+        context.lineTo(0.5 + coordinate + markerOffset, Math.round(self.canvas.height - (timelineConfig.scrollBarHeight) * self.canvas.height)  - 2);
         context.stroke();
 
         var startCoord = coordinate - timelineConfig.markerWidth /2;
@@ -657,32 +658,32 @@ function TimelineCanvasRender(canvas, timelineConfig, recordsProvider, scaleMana
         }
 
         // Bubble
-        context.fillRect(startCoord, timelineConfig.markerPullDown, timelineConfig.markerWidth, height );
+        context.fillRect(startCoord + markerOffset, timelineConfig.markerPullDown, timelineConfig.markerWidth + markerOffset, height );
 
         // Triangle
         context.beginPath();
-        context.moveTo(0.5 + coordinate + timelineConfig.markerTriangleHeight * self.canvas.height, height);
-        context.lineTo(0.5 + coordinate, height + timelineConfig.markerTriangleHeight * self.canvas.height);
-        context.lineTo(0.5 + coordinate - timelineConfig.markerTriangleHeight * self.canvas.height, height);
+        context.moveTo(0.5 + coordinate + timelineConfig.markerTriangleHeight * self.canvas.height + markerOffset, height + 3);
+        context.lineTo(0.5 + coordinate + markerOffset, height + 3 + timelineConfig.markerTriangleHeight * self.canvas.height);
+        context.lineTo(0.5 + coordinate - timelineConfig.markerTriangleHeight * self.canvas.height + markerOffset, height + 3);
         context.closePath();
         context.fill();
 
         // Labels
         context.fillStyle = blurColor(textColor,1);
         context.font = formatFont(timelineConfig.markerDateFont);
-        coordinate = startCoord + timelineConfig.markerWidth /2; // Set actual center of the marker
+        coordinate = startCoord + markerOffset + timelineConfig.markerWidth /2; // Set actual center of the marker
 
         var dateString = dateFormat(date, timelineConfig.dateFormat);
         var dateWidth = context.measureText(dateString).width;
         var textStart = (height - timelineConfig.markerDateFont.size) / 2;
-        context.fillText(dateString,coordinate - dateWidth/2, textStart);
+        context.fillText(dateString,coordinate + markerOffset - dateWidth/2, textStart);
 
 
         context.font = formatFont(timelineConfig.markerTimeFont);
         dateString = dateFormat(date, timelineConfig.timeFormat);
         dateWidth = context.measureText(dateString).width;
         textStart = height/2 + textStart;
-        context.fillText(dateString,coordinate - dateWidth/2, textStart);
+        context.fillText(dateString,coordinate + markerOffset - dateWidth/2, textStart);
 
     }
 
