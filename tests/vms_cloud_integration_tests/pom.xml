@@ -19,10 +19,11 @@
     <properties>
         <root.dir>${basedir}/../..</root.dir>
 
-        <qt.libs>core network concurrent xml xmlpatterns sql multimedia</qt.libs>
+        <qt.libs>core network xml xmlpatterns sql concurrent multimedia websockets</qt.libs>
         <global.libs>-lmediaserver_core -lcloud_db -lcommon -lnx_network -lnx_fusion -lappserver2 -lnx_email -ludt -lcloud_db_client -lnx_speech_synthesizer -lnx_utils</global.libs>
-        <windows.oslibs>-lws2_32 -lIphlpapi DbgHelp.lib -lwinmm Wldap32.lib</windows.oslibs>
+        <windows.oslibs>Ws2_32.lib DbgHelp.lib -lIphlpapi -lwinmm Wldap32.lib Crypt32.lib</windows.oslibs>
         <linux.oslibs>-ldl -lldap -ltermcap</linux.oslibs>
+        <mac.oslibs>-lbz2 -framework IOKit -framework CoreServices</mac.oslibs>
         <guid>${vms_cloud_integration_tests.guid}</guid>
 
         <windows.defines>_VARIADIC_MAX=10</windows.defines>

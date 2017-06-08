@@ -8,3 +8,4 @@ INCLUDEPATH += ${root.dir}/mediaserver_core/src/
 linux {
     QMAKE_CXXFLAGS += -Werror
 }
+LIBS += $$FESTIVAL_LIB
