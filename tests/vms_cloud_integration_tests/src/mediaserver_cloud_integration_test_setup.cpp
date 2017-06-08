@@ -3,11 +3,11 @@
 #include <gtest/gtest.h>
 
 #include <nx/utils/string.h>
-
-#include <cdb/connection.h>
-#include <api/app_server_connection.h>
 #include <nx/utils/sync_call.h>
+#include <nx/utils/test_support/utils.h>
 
+#include <api/app_server_connection.h>
+#include <cdb/connection.h>
 #include <media_server/settings.h>
 
 using namespace nx::cdb;
@@ -30,6 +30,7 @@ bool MediaServerCloudIntegrationTest::startCloudDB()
 bool MediaServerCloudIntegrationTest::startMediaServer()
 {
     m_mediaServerLauncher.addSetting(nx_ms_conf::CDB_ENDPOINT, m_cdb.endpoint().toString());
+    m_mediaServerLauncher.addSetting(nx_ms_conf::DELAY_BEFORE_SETTING_MASTER_FLAG, "100ms");
 
     if (!m_mediaServerLauncher.start())
         return false;
@@ -56,8 +57,23 @@ bool MediaServerCloudIntegrationTest::registerRandomCloudAccount()
 
 bool MediaServerCloudIntegrationTest::registerCloudSystem()
 {
-    return m_cdb.bindRandomSystem(m_accountEmail, m_accountPassword, &m_cloudSystem) ==
-        api::ResultCode::ok;
+    if (m_cdb.bindRandomSystem(m_accountEmail, m_accountPassword, &m_cloudSystem) !=
+            api::ResultCode::ok)
+    {
+        return false;
+    }
+
+    if (m_cdb.getSystemSharing(
+            m_accountEmail,
+            m_accountPassword,
+            m_cloudSystem.id,
+            m_accountEmail,
+            &m_systemOwnerInfo) != nx::cdb::api::ResultCode::ok)
+    {
+        return false;
+    }
+
+    return true;
 }
 
 bool MediaServerCloudIntegrationTest::saveCloudCredentialsToMediaServer()
@@ -81,6 +97,11 @@ nx::cdb::CdbLauncher* MediaServerCloudIntegrationTest::cdb()
     return &m_cdb;
 }
 
+MediaServerLauncher& MediaServerCloudIntegrationTest::mediaServer()
+{
+    return m_mediaServerLauncher;
+}
+
 MediaServerClient MediaServerCloudIntegrationTest::prepareMediaServerClient()
 {
     MediaServerClient mediaServerClient(mediaServerEndpoint());
@@ -94,6 +115,14 @@ MediaServerClient MediaServerCloudIntegrationTest::prepareMediaServerClient()
         mediaServerClient.setUserName(m_defaultOwnerCredentials.first);
         mediaServerClient.setPassword(m_defaultOwnerCredentials.second);
     }
+    return mediaServerClient;
+}
+
+MediaServerClient MediaServerCloudIntegrationTest::prepareMediaServerClientFromCloudOwner()
+{
+    MediaServerClient mediaServerClient(mediaServerEndpoint());
+    mediaServerClient.setUserName(m_accountEmail.c_str());
+    mediaServerClient.setPassword(m_accountPassword.c_str());
     return mediaServerClient;
 }
 
