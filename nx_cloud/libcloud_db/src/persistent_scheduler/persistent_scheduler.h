@@ -5,6 +5,7 @@
 #include <unordered_map>
 #include <nx/utils/uuid.h>
 #include <nx/utils/singleton.h>
+#include <nx/utils/thread/mutex.h>
 #include <utils/db/async_sql_query_executor.h>
 #include "persistent_scheduler_db_helper.h"
 #include "persistent_scheduler_common.h"
@@ -47,21 +48,21 @@ public:
 
     void start();
 
-    QnUuid subscribe(
+    nx::db::DBResult subscribe(
+        nx::db::QueryContext* queryContext,
         const QnUuid& functorId,
+        QnUuid* outTaskId,
         std::chrono::milliseconds timeout,
-        const ScheduleParams& params,
-        nx::db::QueryContext* queryContext);
+        const ScheduleParams& params);
 
-    void unsubscribe(const QnUuid& taskId, nx::db::QueryContext* queryContext);
-
-private:
-    void startTimerTasks(const ScheduleData& scheduleData);
+    void unsubscribe(nx::db::QueryContext* queryContext, const QnUuid& taskId);
 
 private:
     nx::db::AbstractAsyncSqlQueryExecutor* m_sqlExecutor;
     AbstractSchedulerDbHelper* m_dbHelper;
     FunctorToReceiverMap m_functorToReceiver;
+    QnMutex m_mutex;
+    ScheduleData m_scheduleData;
 };
 
 }

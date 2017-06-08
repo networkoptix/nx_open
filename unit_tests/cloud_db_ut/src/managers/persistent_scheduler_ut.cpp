@@ -9,11 +9,13 @@ namespace nx {
 namespace cdb {
 namespace test {
 
+using namespace ::testing;
+
 class DbHelperStub: public nx::cdb::AbstractSchedulerDbHelper
 {
 public:
-    MOCK_CONST_METHOD1(getScheduleData, ScheduleData(nx::db::QueryContext*));
-    MOCK_METHOD1(registerEventReceiver, nx::db::DBResult(const QnUuid& receiverId));
+    MOCK_CONST_METHOD2(getScheduleData, nx::db::DBResult(nx::db::QueryContext*, nx::cdb::ScheduleData*));
+    MOCK_METHOD2(registerEventReceiver, nx::db::DBResult(nx::db::QueryContext*, const QnUuid&));
 };
 
 class SchedulerUser: public nx::cdb::AbstractPersistentScheduleEventReceiver
@@ -51,11 +53,25 @@ public:
 
     void subscribe(std::chrono::milliseconds timeout)
     {
-        //nx::cdb::PersistentParamsMap params;
-        //params["key1"] = "value1";
-        //params["key2"] = "value2";
+        nx::cdb::ScheduleParams params;
+        params["key1"] = "value1";
+        params["key1"] = "value1";
 
-//        m_manager->subscribe(functorTypeId, timeout, params);
+        m_executor->executeUpdate(
+            [this, params, timeout](nx::db::QueryContext* queryContext)
+            {
+                QnUuid taskId;
+                return m_scheduler->subscribe(
+                    queryContext,
+                    functorTypeId,
+                    &taskId,
+                    timeout,
+                    params);
+                NX_ASSERT(!taskId.isNull());
+            },
+            [](nx::db::QueryContext*, nx::db::DBResult result)
+            {
+            });
     }
 
     void setShouldUnsubscribe() { m_shouldUnsubscribe = true; }
@@ -114,6 +130,20 @@ protected:
         readyFuture = readyPromise.get_future();
     }
 
+    void expectingDbHelperFunctionsWillBeCalled()
+    {
+        EXPECT_CALL(dbHelper, getScheduleData(_, NotNull()))
+            .WillRepeatedly(
+                ::testing::DoAll(
+                    ::testing::SetArgPointee<1>(ScheduleData()),
+                    Return(nx::db::DBResult::ok)));
+
+        EXPECT_CALL(dbHelper, registerEventReceiver(nullptr, SchedulerUser::functorTypeId))
+            .Times(1)
+            .WillRepeatedly(::testing::Return(nx::db::DBResult::ok));
+
+    }
+
     void whenSchedulerAndUserInitialized()
     {
         scheduler = std::unique_ptr<nx::cdb::PersistentSheduler>(
@@ -135,10 +165,17 @@ const QnUuid SchedulerUser::functorTypeId = QnUuid::fromStringSafe("{EC05F182-93
 
 TEST_F(PersistentScheduler, initialization)
 {
+    expectingDbHelperFunctionsWillBeCalled();
     whenSchedulerAndUserInitialized();
-    EXPECT_CALL(dbHelper, getScheduleData(nullptr)).Times(::testing::AtLeast(1));
 }
 
+TEST_F(PersistentScheduler, subscribe)
+{
+    expectingDbHelperFunctionsWillBeCalled();
+    whenSchedulerAndUserInitialized();
+
+    user->subscribe(std::chrono::milliseconds(10));
+}
 
 //TEST_F(PersistentSheduler, subscribeUnsubscribe_simple)
 //{

@@ -19,30 +19,57 @@ PersistentSheduler::PersistentSheduler(
     m_sqlExecutor->executeSelect(
         [this, &scheduleData](nx::db::QueryContext* queryContext)
         {
-            std::cout << "dbfunc called" << std::endl;
-            scheduleData = m_dbHelper->getScheduleData(queryContext);
-            return nx::db::DBResult::ok;
+            return m_dbHelper->getScheduleData(queryContext, &scheduleData);
         },
         [readyPromise = std::move(readyPromise)](nx::db::QueryContext*, nx::db::DBResult result) mutable
         {
-            std::cout << "completion called" << std::endl;
             if (result != nx::db::DBResult::ok)
+            {
                 NX_LOG(lit("[Scheduler] Failed to load schedule data. Error code: %1")
                     .arg(nx::db::toString(result)), cl_logERROR);
+            }
             readyPromise.set_value();
         });
 
     readyFuture.wait();
-    startTimerTasks(scheduleData);
+    m_scheduleData = scheduleData;
 }
 
-void PersistentSheduler::registerEventReceiver(const QnUuid& functorId,
+void PersistentSheduler::registerEventReceiver(
+    const QnUuid& functorId,
     AbstractPersistentScheduleEventReceiver *receiver)
 {
+    m_sqlExecutor->executeUpdate(
+        [this, functorId](nx::db::QueryContext* queryContext)
+        {
+            return m_dbHelper->registerEventReceiver(queryContext, functorId);
+        },
+        [this, functorId, receiver](nx::db::QueryContext*, nx::db::DBResult result) mutable
+        {
+            if (result != nx::db::DBResult::ok)
+            {
+                NX_LOG(lit("[Scheduler] Failed to register functor id %1. Error code: %2")
+                    .arg(functorId.toString())
+                    .arg(nx::db::toString(result)), cl_logERROR);
+                return;
+            }
 
+            QnMutexLocker lock(&m_mutex);
+            m_functorToReceiver[functorId] = receiver;
+        });
 }
 
-void PersistentSheduler::startTimerTasks(const ScheduleData& scheduleData)
+nx::db::DBResult subscribe(
+    nx::db::QueryContext* queryContext,
+    const QnUuid& functorId,
+    QnUuid* outTaskId,
+    std::chrono::milliseconds timeout,
+    const ScheduleParams& params)
+{
+    return nx::db::DBResult::ioError;
+}
+
+void PersistentSheduler::start()
 {
 }
 
