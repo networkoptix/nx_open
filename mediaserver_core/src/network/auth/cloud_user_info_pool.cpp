@@ -30,7 +30,7 @@ CloudUserInfoPoolSupplier::CloudUserInfoPoolSupplier(QnCommonModule* commonModul
 
 void CloudUserInfoPoolSupplier::setPool(AbstractCloudUserInfoPool* pool)
 {
-    m_pool = pool;    
+    m_pool = pool;
 }
 
 CloudUserInfoPoolSupplier::~CloudUserInfoPoolSupplier()
