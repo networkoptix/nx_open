@@ -637,8 +637,8 @@ void PlayerPrivate::applyVideoQuality()
             archiveReader->setQuality(MEDIA_Quality_LowIframesOnly, /*fastSwitch*/ true);
             break;
         default:
-            // Use "auto" width for correct aspect ratio,
-            // because quality.width() is in logical pixels.
+            // Use "auto" width for correct aspect ratio, because quality.width() is in logical
+            // pixels.
             NX_ASSERT(result.frameSize.isValid());
             archiveReader->setQuality(MEDIA_Quality_CustomResolution, /*fastSwitch*/ true,
                 QSize(/*width*/ 0, result.frameSize.height()));

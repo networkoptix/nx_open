@@ -180,6 +180,7 @@ public:
      * @return Video quality of the video stream being played back. May differ from videoQuality().
      */
     Q_INVOKABLE VideoQuality actualVideoQuality() const;
+
     /**
      * @return Filtered list of available custom video qualities.
      * Custom video quality is treated as available if its vertical resolution does not exceed
