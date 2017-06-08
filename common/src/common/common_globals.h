@@ -768,7 +768,6 @@ QN_DECLARE_METAOBJECT_HEADER(Qn,
 } // namespace Qn
 
 Q_DECLARE_METATYPE(Qn::StatusChangeReason)
-Q_DECLARE_METATYPE(Qn::ResourceFlags)
 
 // TODO: #Elric #enum
 
