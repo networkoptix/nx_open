@@ -36,6 +36,7 @@ public:
     Q_INVOKABLE bool setAutoFocus();
     Q_INVOKABLE bool setPresetByIndex(int index);
     Q_INVOKABLE bool setPresetById(const QString& id);
+    Q_INVOKABLE int indexOfPreset(const QString& id) const;
 
 signals:
     void resourceIdChanged();

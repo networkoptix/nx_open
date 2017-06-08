@@ -205,7 +205,11 @@ Item
 
                 resourceId: controller.resourceId
                 popupParent: videoScreen
-                onPresetChoosen: controller.setPresetById(id)
+                onPresetChoosen:
+                {
+                    if (controller.setPresetById(id))
+                        presetsItem.currentPresetIndex = controller.indexOfPreset(id)
+                }
 
                 visible: controller.presetsCount && controller.supportsPresets
             }

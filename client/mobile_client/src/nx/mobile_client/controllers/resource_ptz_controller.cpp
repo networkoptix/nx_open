@@ -157,8 +157,17 @@ bool ResourcePtzController::setPresetById(const QString& id)
         [id](const QnPtzPreset& preset) { return id == preset.id; }) != presets.end();
 
     return found && activatePreset(id, QnAbstractPtzController::MaxPtzSpeed);
-
 }
+
+int ResourcePtzController::indexOfPreset(const QString& id) const
+{
+    const auto presets = core::ptz::helpers::getSortedPresets(this);
+    const auto it = std::find_if(presets.begin(), presets.end(),
+        [id](const QnPtzPreset& preset) { return id == preset.id; });
+
+    return it == presets.end() ? -1 : it - presets.begin();
+}
+
 
 bool ResourcePtzController::setAutoFocus()
 {
