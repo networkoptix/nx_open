@@ -67,10 +67,6 @@ struct NonceUserCount
 
 using TimestampToNonceUserCountMap = std::map<uint64_t, NonceUserCount>;
 
-bool deserialize(
-    const QString& serializedValue,
-    std::vector<std::tuple<uint64_t, nx::Buffer, nx::Buffer>>* cloudUserInfoDataVector);
-
 } // namespace detail
 
 class AbstractCloudUserInfoPool;
@@ -89,7 +85,7 @@ public:
         uint64_t timestamp,
         const nx::Buffer& userName,
         const nx::Buffer& cloudNonce,
-        const nx::Buffer& partialResponse) = 0;
+        const nx::Buffer& intermediateResponse) = 0;
 
     virtual void userInfoRemoved(const nx::Buffer& userName) = 0;
     virtual ~AbstractCloudUserInfoPool() {}
@@ -133,7 +129,7 @@ private:
         uint64_t timestamp,
         const nx::Buffer& userName,
         const nx::Buffer& cloudNonce,
-        const nx::Buffer& partialResponse) override;
+        const nx::Buffer& intermediateResponse) override;
 
     virtual void userInfoRemoved(const nx::Buffer& userName) override;
 
@@ -143,11 +139,11 @@ private:
     void updateUserNonceToResponse(
         const nx::Buffer& userName,
         const nx::Buffer& cloudNonce,
-        const nx::Buffer& partialResponse);
+        const nx::Buffer& intermediateResponse);
     void updateTsToNonceCount(uint64_t timestamp, const nx::Buffer& cloudNonce);
     void cleanupOldInfo(uint64_t timestamp);
     void cleanupByNonce(const nx::Buffer& cloudNonce);
-    boost::optional<nx::Buffer> partialResponseByUserNonce(
+    boost::optional<nx::Buffer> intermediateResponseByUserNonce(
         const nx::Buffer& userName,
         const nx::Buffer& cloudNonce) const;
 
