@@ -138,9 +138,9 @@ private slots:
     void at_actionDelivered(const QnAbstractBusinessActionPtr& action);
     void at_actionDeliveryFailed(const QnAbstractBusinessActionPtr& action);
 
-    void at_businessRuleChanged(const QnBusinessEventRulePtr& bRule);
-    void at_businessRuleDeleted(QnUuid id);
-    void at_businessRuleReset(const QnBusinessEventRuleList& rules);
+    void at_eventRuleChanged(const QnBusinessEventRulePtr& bRule);
+    void at_eventRuleRemoved(QnUuid id);
+    void at_eventRulesReset(const QnBusinessEventRuleList& rules);
 
     void toggleInputPortMonitoring(const QnResourcePtr& resource, bool toggle);
 
@@ -159,7 +159,7 @@ protected:
     void terminateRunningRule(const QnBusinessEventRulePtr& rule);
 
 private:
-    void at_businessRuleChanged_i(const QnBusinessEventRulePtr& bRule);
+    void at_eventRuleChanged_i(const QnBusinessEventRulePtr& bRule);
 
     QnAbstractBusinessActionPtr processToggleAction(const QnAbstractBusinessEventPtr& bEvent, const QnBusinessEventRulePtr& rule);
     QnAbstractBusinessActionPtr processInstantAction(const QnAbstractBusinessEventPtr& bEvent, const QnBusinessEventRulePtr& rule);
