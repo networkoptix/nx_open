@@ -88,16 +88,6 @@ QnMobileClientModule::QnMobileClientModule(
 
     auto userWatcher = common->store(new QnUserWatcher());
 
-    auto availableCamerasWatcher = common->store(new QnAvailableCamerasWatcher());
-    connect(userWatcher, &QnUserWatcher::userChanged,
-        availableCamerasWatcher, &QnAvailableCamerasWatcher::setUser);
-
-    common->store(new QnCloudConnectionProvider());
-    common->store(new QnCloudStatusWatcher());
-    QNetworkProxyFactory::setApplicationProxyFactory(new QnSimpleNetworkProxyFactory());
-
-    QnAppServerConnectionFactory::setDefaultFactory(QnMobileClientCameraFactory::instance());
-
     ec2::ApiRuntimeData runtimeData;
     runtimeData.peer.id = qnCommon->moduleGUID();
     runtimeData.peer.instanceId = qnCommon->runningInstanceGUID();
@@ -108,6 +98,16 @@ QnMobileClientModule::QnMobileClientModule(
     if (!startupParameters.videowallInstanceGuid.isNull())
         runtimeData.videoWallInstanceGuid = startupParameters.videowallInstanceGuid;
     QnRuntimeInfoManager::instance()->updateLocalItem(runtimeData);
+
+    auto availableCamerasWatcher = common->store(new QnAvailableCamerasWatcher());
+    connect(userWatcher, &QnUserWatcher::userChanged,
+        availableCamerasWatcher, &QnAvailableCamerasWatcher::setUser);
+
+    common->store(new QnCloudConnectionProvider());
+    common->store(new QnCloudStatusWatcher());
+    QNetworkProxyFactory::setApplicationProxyFactory(new QnSimpleNetworkProxyFactory());
+
+    QnAppServerConnectionFactory::setDefaultFactory(QnMobileClientCameraFactory::instance());
 
     auto moduleFinder = common->store(new QnModuleFinder(true));
     moduleFinder->multicastModuleFinder()->setCheckInterfacesTimeout(10 * 1000);
