@@ -8,6 +8,9 @@ $preloader_circle_color: $light;
 $preloader_circle_size: 16px;
 $preloader_circle_distance: 12px;
 
+$preloader_small_circle_size: 10px;
+$preloader_small_circle_distance: 8px;
+
 
 @mixin preloader($circle_color, $circle_size, $circle_distance) {
     &{
@@ -120,6 +123,10 @@ placeholder{ /* Hack to have full-screen */
             @include preloader($preloader_circle_color, $preloader_circle_size, $preloader_circle_distance);
         }
     }
+}
+
+.placeholder.preloader-small>.placeholder-content>.placeholder-preloader{
+    @include preloader($preloader_circle_color, $preloader_small_circle_size, $preloader_small_circle_distance);
 }
 
 .webclient-placeholder{

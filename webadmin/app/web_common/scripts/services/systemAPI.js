@@ -1,7 +1,8 @@
 'use strict';
 
 angular.module('nxCommon')
-    .factory('systemAPI', ['$http', '$q', '$location', '$rootScope', function ($http, $q, $location, $rootScope) {
+    .factory('systemAPI', ['$http', '$q', '$location', '$rootScope', '$log',
+    function ($http, $q, $location, $rootScope, $log) {
 
         /*
         * System API is a unified service for making API requests to media servers
@@ -89,7 +90,7 @@ angular.module('nxCommon')
                     if(!repeat && self.unauthorizedCallBack){ // first attempt
                         // Here we call a handler for unauthorised request. If handler promises success - we repeat the request once again.
                         // Handler is supposed to try and update auth keys
-                        return self.unauthorizedCallBack().then(function(){
+                        return self.unauthorizedCallBack(error).then(function(){
                             return self._wrapRequest(method, url, data, true);
                         },function(){
                             $rootScope.$broadcast("unauthirosed_" + self.systemId);
@@ -357,8 +358,10 @@ angular.module('nxCommon')
                     }
                 }
             }
-            var defaultConnection = connect(null, null, serverId, function(){
+            var defaultConnection = connect(null, null, serverId, function(error){
                 // Unauthorised request here
+
+                $log.error("reload on lost connection",error);
                 window.location.reload(); // just reload the page and it supposed to handle the problem
                 return $q.reject(); // Do not repeat last request
             });
