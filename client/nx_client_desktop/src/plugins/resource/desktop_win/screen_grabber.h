@@ -50,7 +50,7 @@ public:
     int height() const;
     qint64 currentTime() const;
     int refreshRate() const { return m_ddm.RefreshRate;}
-    void restartTimer() { m_timer.restart(); }
+    void restart();
     void setLogo(const QPixmap& logo);
     int screenWidth() const;
     int screenHeight() const;
