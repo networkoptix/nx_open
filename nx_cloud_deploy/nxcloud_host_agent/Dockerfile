@@ -10,6 +10,7 @@ COPY docker/pip.conf /root/.config/pip/pip.conf
 COPY docker/docker /usr/local/bin
 COPY docker/docker-machine /usr/local/bin
 COPY docker/docker-compose /usr/local/bin
+COPY docker/kubectl /usr/local/bin
 COPY docker/aws_config /root/.aws/config
 COPY docker/aws_credentials /root/.aws/credentials
 

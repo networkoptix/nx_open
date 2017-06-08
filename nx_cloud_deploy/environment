@@ -8,7 +8,7 @@ NX_PORTAL_DIR=$NX_VMS_DIR/cloud_portal
 if [ -n "$NX_VMS_DIR" -a -f "$NX_VMS_DIR/build_variables/target/version" ]
 then
     VERSION=$(cat $NX_VMS_DIR/build_variables/target/version 2> /dev/null)
-    QT_VERSION=$(xmlstarlet sel -t -v '/_:project/_:properties/_:qt.version' $NX_VMS_DIR/pom.xml)
+    QT_VERSION=$(xmlstarlet sel -t -v '/_:project/_:profiles/_:profile[_:id="linux-noarm"]/_:properties/_:qt.version' $NX_VMS_DIR/pom.xml)
     NXCLOUD_VERSION=$(xmlstarlet sel -t -v '/_:project/_:properties/_:nxcloud.version' $NX_VMS_DIR/pom.xml 2> /dev/null || true)
 else
     VERSION=3.0.0.0

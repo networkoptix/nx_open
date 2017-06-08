@@ -51,6 +51,9 @@ public:
     bool isInSelfAioThread() const;
 
     void cancelPostedCalls(nx::utils::MoveOnlyFunc<void()> completionHandler);
+    /**
+     * NOTE: Non blocking if called within object's aio thread.
+     */
     void cancelPostedCallsSync();
 
     template<typename Func>

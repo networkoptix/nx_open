@@ -2,6 +2,26 @@
 
 #include <core/resource/user_resource.h>
 
+namespace Qn {
+
+static uint qHash(UserRole role)
+{
+    return uint(role);
+}
+
+} // namespace Qn
+
+namespace {
+
+QnUuid predefinedRoleUuid(Qn::UserRole role)
+{
+    return int(role) < 0
+        ? QnUuid()
+        : QnUuid(lit("00000000-0000-0000-0000-1000%1").arg(int(role), 8, 16, QChar(L'0')));
+}
+
+} // namespace
+
 QnUserRolesManager::QnUserRolesManager(QObject* parent):
     base_type(parent),
     QnCommonModuleAware(parent)
@@ -17,7 +37,7 @@ ec2::ApiUserRoleDataList QnUserRolesManager::userRoles() const
     QnMutexLocker lk(&m_mutex);
     ec2::ApiUserRoleDataList result;
     result.reserve(m_roles.size());
-    for (const auto& role : m_roles)
+    for (const auto& role: m_roles)
         result.push_back(role);
     return result;
 }
@@ -30,7 +50,7 @@ void QnUserRolesManager::resetUserRoles(const ec2::ApiUserRoleDataList& userRole
         QnMutexLocker lk(&m_mutex);
 
         QSet<QnUuid> newRoles;
-        for (const auto& role : userRoles)
+        for (const auto& role: userRoles)
         {
             newRoles << role.id;
             if (m_roles[role.id] != role)
@@ -40,7 +60,7 @@ void QnUserRolesManager::resetUserRoles(const ec2::ApiUserRoleDataList& userRole
             }
         }
 
-        for (const QnUuid& id : m_roles.keys())
+        for (const QnUuid& id: m_roles.keys())
         {
             if (!newRoles.contains(id))
                 removed.push_back(m_roles.take(id));
@@ -52,7 +72,6 @@ void QnUserRolesManager::resetUserRoles(const ec2::ApiUserRoleDataList& userRole
     for (auto role: updated)
         emit userRoleAddedOrUpdated(role);
 }
-
 
 bool QnUserRolesManager::hasRole(const QnUuid& id) const
 {
@@ -97,7 +116,6 @@ void QnUserRolesManager::removeUserRole(const QnUuid& id)
     emit userRoleRemoved(role);
 }
 
-
 const QList<Qn::UserRole>& QnUserRolesManager::predefinedRoles()
 {
     static const QList<Qn::UserRole> predefinedRoleList({
@@ -108,6 +126,36 @@ const QList<Qn::UserRole>& QnUserRolesManager::predefinedRoles()
         Qn::UserRole::LiveViewer});
 
     return predefinedRoleList;
+}
+
+QnUuid QnUserRolesManager::predefinedRoleId(Qn::UserRole userRole)
+{
+    static const QHash<Qn::UserRole, QnUuid> predefinedRoleIds =
+        []()
+        {
+            QHash<Qn::UserRole, QnUuid> result;
+            for (Qn::UserRole role: QnUserRolesManager::predefinedRoles())
+                result[role] = predefinedRoleUuid(role);
+            return result;
+        }();
+
+    return predefinedRoleIds[userRole];
+}
+
+Qn::UserRole QnUserRolesManager::predefinedRole(const QnUuid& id)
+{
+    static const QHash<QnUuid, Qn::UserRole> predefinedRolesById =
+        []()
+        {
+            QHash<QnUuid, Qn::UserRole> result;
+            for (Qn::UserRole role: QnUserRolesManager::predefinedRoles())
+                result[QnUserRolesManager::predefinedRoleId(role)] = role;
+
+            result[QnUuid()] = Qn::UserRole::CustomPermissions;
+            return result;
+        }();
+
+    return predefinedRolesById.value(id, Qn::UserRole::CustomUserRole);
 }
 
 QString QnUserRolesManager::userRoleName(Qn::UserRole userRole)
@@ -212,7 +260,7 @@ ec2::ApiPredefinedRoleDataList QnUserRolesManager::getPredefinedRoles()
     static ec2::ApiPredefinedRoleDataList kPredefinedRoles;
     if (kPredefinedRoles.empty())
     {
-        for (auto role : predefinedRoles())
+        for (auto role: predefinedRoles())
         {
             kPredefinedRoles.emplace_back(
                 userRoleName(role),

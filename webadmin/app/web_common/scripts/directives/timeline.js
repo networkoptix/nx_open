@@ -132,6 +132,10 @@ angular.module('nxCommon')
 
                     timelineActions.updateState();
                     timelineRender.Draw( mouseXOverTimeline, mouseYOverTimeline, timelineActions.scrollingNow, timelineActions.catchScrollBar);
+
+                    if(scope.loading){
+                        scope.loading = false;
+                    }
                 }
 
 
@@ -449,6 +453,7 @@ angular.module('nxCommon')
                         scope.recordsProvider.ready.then(initTimeline);// reinit timeline here
                         scope.recordsProvider.archiveReadyPromise.then(function(hasArchive){
                             scope.emptyArchive = !hasArchive;
+                            scope.loading = hasArchive;
                         });
 
                         timelineRender.setRecordsProvider(scope.recordsProvider);

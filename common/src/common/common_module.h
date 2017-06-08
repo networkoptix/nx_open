@@ -31,6 +31,7 @@ class QnResourcePropertyDictionary;
 class QnResourceStatusDictionary;
 class QnResourceDiscoveryManager;
 class QnServerAdditionalAddressesDictionary;
+class QnEventRuleManager;
 
 namespace ec2 { class AbstractECConnection; }
 namespace nx { namespace vms { namespace discovery { class Manager; } } }
@@ -157,6 +158,11 @@ public:
     QnLayoutTourManager* layoutTourManager() const
     {
         return m_layoutTourManager;
+    }
+
+    QnEventRuleManager* eventRuleManager() const
+    {
+        return m_eventRuleManager;
     }
 
     QnLicensePool* licensePool() const;
@@ -294,6 +300,7 @@ private:
     QnUserRolesManager* m_userRolesManager = nullptr;
     QnResourceDiscoveryManager* m_resourceDiscoveryManager = nullptr;
     QnLayoutTourManager* m_layoutTourManager = nullptr;
+    QnEventRuleManager* m_eventRuleManager = nullptr;
 
     QnUuid m_videowallGuid;
 };

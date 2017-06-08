@@ -49,10 +49,10 @@ protected:
     {
         QnSoftwareVersion version(1, 2, 3, 123);
         const auto connection = module->ecConnection();
-        ASSERT_TRUE(connection != nullptr);
+        ASSERT_NE(nullptr, connection);
 
         const auto resourceManager = connection->getResourceManager(Qn::kSystemAccess);
-        ASSERT_TRUE(resourceManager != nullptr);
+        ASSERT_NE(nullptr, resourceManager);
 
         QList<QnResourceTypePtr> resourceTypeList;
         ASSERT_EQ(ec2::ErrorCode::ok, resourceManager->getResourceTypesSync(&resourceTypeList));

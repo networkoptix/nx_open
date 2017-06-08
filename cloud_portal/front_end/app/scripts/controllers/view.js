@@ -2,29 +2,41 @@
 
 angular.module('cloudApp')
     .controller('ViewPageCtrl', ['$scope', 'account', 'system', '$routeParams', 'systemAPI', 'dialogs',
-    '$location', '$q',
-    function ($scope, account, system, $routeParams, systemAPI, dialogs, $location, $q) {
+    '$location', '$q', '$poll',
+    function ($scope, account, system, $routeParams, systemAPI, dialogs, $location, $q, $poll) {
         var currentSystem;
         account.requireLogin().then(function(account){
-            currentSystem = system($routeParams.systemId, account.email);
-            currentSystem.updateSystemAuth().then(function(){
+            $scope.currentSystem = system($routeParams.systemId, account.email);
+            var systemInfoRequest = $scope.currentSystem.getInfo();
+            var systemAuthRequest = $scope.currentSystem.updateSystemAuth();
+            $q.all([systemInfoRequest,systemAuthRequest]).then(function(){
                 $scope.systemReady = true;
-                $scope.system = currentSystem.mediaserver;
-            },function(error){
-                // cannot read the system
+                $scope.system = $scope.currentSystem.mediaserver;
+                delayedUpdateSystemInfo();
+            },function(){
                 dialogs.notify(L.errorCodes.lostConnection.replace("{{systemName}}", currentSystem.name || L.errorCodes.thisSystem), 'warning');
                 $location.path("/systems");
             });
         });
+
+        function delayedUpdateSystemInfo(){
+            var pollingSystemUpdate = $poll(function(){
+                return $scope.currentSystem.update();
+            },Config.updateInterval);
+
+            $scope.$on('$destroy', function( event ) {
+                $poll.cancel(pollingSystemUpdate);
+            });
+        }
 
         var cancelSubscription = $scope.$on("unauthirosed_" + $routeParams.systemId,function(event,data){
              dialogs.notify(L.errorCodes.lostConnection.replace("{{systemName}}", currentSystem.name || L.errorCodes.thisSystem), 'warning');
              $location.path("/systems");
         });
 
-        $("body").addClass("webclient-page");
+        $("html").addClass("webclient-page");
         $scope.$on('$destroy', function( event ) {
             cancelSubscription();
-            $("body").removeClass("webclient-page");
+            $("html").removeClass("webclient-page");
         });
     }]);
