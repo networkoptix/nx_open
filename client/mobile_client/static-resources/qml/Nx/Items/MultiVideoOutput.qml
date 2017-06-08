@@ -16,7 +16,7 @@ Item
 
     property size __sourceSize
 
-    signal clickedOnVideo(int channelId, rect viewport, real aspect)
+    signal clickedOnVideo(int channelId, rect viewport, real aspect, point mousePos)
 
     implicitWidth: __sourceSize.width * layoutSize.width
     implicitHeight: __sourceSize.height * layoutSize.height
@@ -50,6 +50,7 @@ Item
             MouseArea
             {
                 anchors.fill: parent
+
                 onClicked:
                 {
                     var source = videoOutput.sourceRect
@@ -65,7 +66,9 @@ Item
                         topLeft.x / source.width,
                         topLeft.y / source.height,
                         1, 1)
-                    multiVideoOutput.clickedOnVideo(index, newViewport, aspect)
+
+                    var mousePos = mapToItem(multiVideoOutput, mouse.x, mouse.y)
+                    multiVideoOutput.clickedOnVideo(index, newViewport, aspect, mousePos)
                 }
             }
         }

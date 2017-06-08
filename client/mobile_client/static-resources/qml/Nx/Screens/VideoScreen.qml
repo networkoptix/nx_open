@@ -135,6 +135,7 @@ PageBase
         }
 
         opacity: d.uiOpacity
+        visible: opacity > 0
         titleOpacity: d.cameraUiOpacity
 
         controls:
@@ -238,7 +239,11 @@ PageBase
 
                 ptzPanel.moveOnTapMode = false
                 ptzPanel.moveViewport(viewport, aspect)
+                preloader.pos = mousePos
+                preloader.visible = true
             }
+
+            PtzViewportMovePreloader { id: preloader }
         }
     }
 
