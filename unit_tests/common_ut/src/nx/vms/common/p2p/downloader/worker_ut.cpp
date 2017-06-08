@@ -49,11 +49,17 @@ public:
         if (delay > 0)
         {
             static_cast<ProxyTestPeerManager*>(peerManager())->requestWait(
-                delay, [this] { Worker::waitForNextStep(0); });
+                delay, [this] { waitForNextStepBase(0); });
             return;
         }
 
         Worker::waitForNextStep(0);
+    }
+
+private:
+    void waitForNextStepBase(int delay)
+    {
+        Worker::waitForNextStep(delay);
     }
 };
 
@@ -134,11 +140,12 @@ protected:
     Peer* createPeer(
         const QString& peerName = QString(), const QnUuid& peerId = QnUuid::createUuid())
     {
-        auto peerManager = new ProxyTestPeerManager(commonPeerManager.data(), peerId, peerName);
-        auto storage = createStorage(peerId.toString());
-        auto worker = new TestWorker(kTestFileName, storage, peerManager);
-
-        return new Peer{peerId, peerManager, storage, worker};
+        auto peer = new Peer();
+        peer->id = peerId;
+        peer->peerManager = new ProxyTestPeerManager(commonPeerManager.data(), peerId, peerName);
+        peer->storage = createStorage(peerId.toString());
+        peer->worker = new TestWorker(kTestFileName, peer->storage, peer->peerManager);
+        return peer;
     }
 
     QnUuid addPeerWithFile(const TestPeerManager::FileInformation& fileInformation)
