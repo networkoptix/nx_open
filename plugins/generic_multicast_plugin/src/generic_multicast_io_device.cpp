@@ -129,10 +129,11 @@ qint64 GenericMulticastIoDevice::cutRtpHeaderOff(const char* inBuf, qint64 inBuf
 
     if (!hasExtension)
     {
+        payloadLength = inBufLength - rtpHeaderLength;
+
         if (outBufLength < payloadLength)
             return 0;
 
-        payloadLength = inBufLength - rtpHeaderLength;
         memcpy(outBuf, inBuf, payloadLength);
         return payloadLength;
     }
