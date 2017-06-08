@@ -18,6 +18,8 @@ if("${platform}" STREQUAL "linux")
             set(_withDesktopClient ON)
             set(_withTests ON)
         endif()
+    elseif("${arch}" STREQUAL "x86")
+        set(_withTests OFF)
     endif()
 endif()
 

@@ -172,10 +172,11 @@ bool QnPlSonyResource::startInputPortMonitoringAsync( std::function<void(bool)>&
     requestUrl.setHost( getHostAddress() );
     requestUrl.setPort( QUrl(getUrl()).port(DEFAULT_HTTP_PORT) );
 
-        //it is safe to proceed with no lock futher because stopInputMonitoring can be only called from current thread 
+        //it is safe to proceed with no lock futher because stopInputMonitoring can be only called from current thread
             //and forgetHttpClient cannot be called before doGet call
 
-    requestUrl.setPath( lit("/command/alarmdata.cgi?interval=%1").arg(INPUT_MONITOR_TIMEOUT_SEC) );
+    requestUrl.setPath(lit("/command/alarmdata.cgi"));
+    requestUrl.setQuery(lit("interval=%1").arg(INPUT_MONITOR_TIMEOUT_SEC));
     m_inputMonitorHttpClient = nx_http::AsyncHttpClient::create();
     connect(
         m_inputMonitorHttpClient.get(), &nx_http::AsyncHttpClient::responseReceived,
@@ -285,7 +286,7 @@ void QnPlSonyResource::onMonitorMessageBodyAvailable( AsyncHttpClientPtr httpCli
 void QnPlSonyResource::onMonitorConnectionClosed( AsyncHttpClientPtr httpClient )
 {
     QnMutexLocker lk(&m_inputPortMutex);
-    
+
     if (m_inputMonitorHttpClient != httpClient)
         return;
 
@@ -293,7 +294,7 @@ void QnPlSonyResource::onMonitorConnectionClosed( AsyncHttpClientPtr httpClient 
         return;
 
     auto response = httpClient->response();
-    if (static_cast<bool>(response) && 
+    if (static_cast<bool>(response) &&
         response->statusLine.statusCode != nx_http::StatusCode::ok)
     {
         return;

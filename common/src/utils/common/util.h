@@ -28,6 +28,8 @@ struct WinDriveInfo
     }
 };
 
+bool mediaIsInserted(const QString& driveString);
+
 using WinDriveInfoList = QList<WinDriveInfo>;
 
 WinDriveInfoList getWinDrivesInfo();

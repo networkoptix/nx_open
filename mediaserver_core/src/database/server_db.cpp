@@ -109,7 +109,7 @@ QnBusinessActionParameters convertOldActionParameters(const QByteArray& value)
                 result.streamQuality = static_cast<Qn::StreamQuality>(toInt(field));
                 break;
             case DurationParam:
-                result.recordingDuration = toInt(field);
+                result.durationMs = toInt(field) * 1000;
                 break;
             case RecordBeforeParam:
                 break;

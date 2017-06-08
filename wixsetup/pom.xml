@@ -62,6 +62,15 @@
             <scope>system</scope>
             <systemPath>${root.dir}/client/activex_client/pom.xml</systemPath>
         </dependency>
+
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>nxcontrol</artifactId>
+            <version>${project.version}</version>
+            <type>pom</type>
+            <scope>system</scope>
+            <systemPath>${root.dir}/plugins/nxinterface/pom.xml</systemPath>
+        </dependency>
     </dependencies>
 
     <build>

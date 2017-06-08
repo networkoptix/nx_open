@@ -59,24 +59,22 @@ function(add_android_apk target)
     if(CMAKE_BUILD_TYPE STREQUAL "Release")
         set(build_type --release)
         set(apk_suffix "release")
+
+        if(APK_KEYSTORE_FILE AND APK_KEYSTORE_ALIAS
+            AND APK_KEYSTORE_PASSWORD AND APK_KEYSTORE_KEY_PASSWORD)
+
+            set(sign_parameters
+                --sign "${APK_KEYSTORE_FILE}" "${APK_KEYSTORE_ALIAS}"
+                --storepass "${APK_KEYSTORE_PASSWORD}"
+                --keypass "${APK_KEYSTORE_KEY_PASSWORD}")
+            set(apk_suffix "${apk_suffix}-signed")
+        else()
+            set(sign_parameters)
+            set(apk_suffix "${apk_suffix}-unsigned")
+        endif()
     else()
         set(build_type)
         set(apk_suffix "debug")
-    endif()
-
-    if(APK_KEYSTORE_FILE AND APK_KEYSTORE_ALIAS
-        AND APK_KEYSTORE_PASSWORD AND APK_KEYSTORE_KEY_PASSWORD)
-
-        set(sign_parameters
-            --sign "${APK_KEYSTORE_FILE}" "${APK_KEYSTORE_ALIAS}"
-            --storepass "${APK_KEYSTORE_PASSWORD}"
-            --keypass "${APK_KEYSTORE_KEY_PASSWORD}")
-        set(apk_suffix "${apk_suffix}-signed")
-    else()
-        set(sign_parameters)
-        if(CMAKE_BUILD_TYPE STREQUAL "Release")
-            set(apk_suffix "${apk_suffix}-unsigned")
-        endif()
     endif()
 
     set(apk_dir "${CMAKE_CURRENT_BINARY_DIR}/${APK_TARGET}_apk")

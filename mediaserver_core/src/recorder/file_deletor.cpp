@@ -138,21 +138,46 @@ void QnFileDeletor::processPostponedFiles()
         return;
 
     PostponedFileDataSet newList;
+    auto kMaxProcessPostponedDuration = std::chrono::seconds(5);
+    auto start = std::chrono::steady_clock::now();
+
     for (PostponedFileDataSet::iterator itr = m_postponedFiles.begin(); itr != m_postponedFiles.end(); ++itr)
     {
+        if (std::chrono::steady_clock::now() - start > kMaxProcessPostponedDuration)
+        {
+            NX_LOG(lit("[Cleanup] process postponed files duration exceeded. Breaking."), cl_logDEBUG2);
+            for (; itr != m_postponedFiles.end(); ++itr)
+                newList.insert(*itr);
+            break;
+        }
+
         if (itr->storageId.isNull()) // File from the old-style deleteCatalog. Try once and discard.
             internalDeleteFile(itr->fileName);
         else
         {
             auto storage = resourcePool()->getResourceById(itr->storageId);
-            if (!storage) // Unknown storage. Try once and discard.
+            bool needToPostpone = !storage || storage->getStatus() == Qn::ResourceStatus::Offline;
+
+            if (!storage)
             {
-                internalDeleteFile(itr->fileName);
-                continue;
+                NX_LOG(lit("[Cleanup] storage with id %1 not found in pool. Postponing file %2")
+                        .arg(itr->storageId.toString())
+                        .arg(itr->fileName), cl_logDEBUG2);
+            }
+            else if (storage->getStatus() == Qn::ResourceStatus::Offline)
+            {
+                NX_LOG(lit("[Cleanup] storage %1 is offline. Postponing file %2")
+                        .arg(storage->getUrl())
+                        .arg(itr->fileName), cl_logDEBUG2);
             }
 
-            if (storage->getStatus() == Qn::ResourceStatus::Offline || !internalDeleteFile(itr->fileName))
+            if (needToPostpone || !internalDeleteFile(itr->fileName))
+            {
                 newList.insert(*itr);
+                NX_LOG(lit("[Cleanup] Postponing file %1. Reason: %2")
+                    .arg(itr->fileName)
+                    .arg(needToPostpone ? "Storage is offline or not in the resource pool" : "Delete failed"), cl_logDEBUG2);
+            }
         }
     }
     if (newList.empty())

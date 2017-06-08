@@ -1,5 +1,7 @@
 #pragma once
 
+#ifdef ENABLE_SSL
+
 #include <atomic>
 #include <memory>
 
@@ -45,3 +47,5 @@ private:
 } // namespace ssl
 } // namespace network
 } // namespace nx
+
+#endif // ENABLE_SSL

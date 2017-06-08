@@ -14,7 +14,6 @@
 #include "business/events/mserver_failure_business_event.h"
 #include "business/business_rule_processor.h"
 #include <common/common_module.h>
-#include <core/resource/camera_resource.h>
 
 static const long long USEC_PER_MSEC = 1000;
 static const int SEND_ERROR_TIMEOUT = 1000 * 60;
@@ -54,17 +53,6 @@ void MediaServerStatusWatcher::at_resource_removed( const QnResourcePtr& resourc
 
 void MediaServerStatusWatcher::at_resource_statusChanged( const QnResourcePtr& resource )
 {
-    const QnSecurityCamResourcePtr& cameraRes = resource.dynamicCast<QnSecurityCamResource>();
-    if (cameraRes)
-    {
-        if (cameraRes->getStatus() >= Qn::Online &&
-            !cameraRes->hasFlags(Qn::foreigner) &&
-            !cameraRes->isInitialized())
-        {
-            cameraRes->initAsync(false /*optional*/);
-        }
-        return;
-    }
 
     const QnMediaServerResourcePtr& mserverRes = resource.dynamicCast<QnMediaServerResource>();
     if( !mserverRes )

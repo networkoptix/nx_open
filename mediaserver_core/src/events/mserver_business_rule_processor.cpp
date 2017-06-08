@@ -460,17 +460,25 @@ bool QnMServerBusinessRuleProcessor::executeRecordingAction(const QnRecordingBus
     auto camera = resourcePool()->getResourceById<QnSecurityCamResource>(action->getParams().actionResourceId);
     //NX_ASSERT(camera);
     bool rez = false;
-    if (camera) {
+    if (camera)
+    {
+        auto toggleState = action->getToggleState();
         // todo: if camera is offline function return false. Need some tries on timer event
-        if (action->getToggleState() == QnBusiness::ActiveState)
+        if (toggleState == QnBusiness::ActiveState || //< Prolonged actions starts
+            action->getDurationSec() > 0) //< Instant action
+        {
             rez = qnRecordingManager->startForcedRecording(
                 camera,
-                action->getStreamQuality(), action->getFps(),
+                action->getStreamQuality(),
+                action->getFps(),
                 0, /* Record-before setup is forbidden */
-                action->getRecordAfter(),
-                action->getRecordDuration());
+                action->getRecordAfterSec(),
+                action->getDurationSec());
+        }
         else
+        {
             rez = qnRecordingManager->stopForcedRecording(camera);
+        }
     }
     return rez;
 }

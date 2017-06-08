@@ -97,6 +97,15 @@ public:
         m_clientEndpoint.port = nx::utils::random::number<int>(10000, 60000);
     }
 
+    ~RelayReverseConnection()
+    {
+        if (m_connection)
+            m_connection->pleaseStopSync();
+
+        if (m_serverConnection)
+            m_serverConnection->pleaseStopSync();
+    }
+
 protected:
     void givenHappyRelayServer()
     {

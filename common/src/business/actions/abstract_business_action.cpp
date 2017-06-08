@@ -108,6 +108,7 @@ bool supportsDuration(ActionType actionType)
         case BookmarkAction:
         case ShowTextOverlayAction:
         case CameraOutputAction:
+        case CameraRecordingAction:
             return true;
         default:
             return false;
@@ -138,6 +139,7 @@ bool isActionProlonged(ActionType actionType, const QnBusinessActionParameters &
         case BookmarkAction:
         case ShowTextOverlayAction:
         case CameraOutputAction:
+        case CameraRecordingAction:
             return parameters.durationMs <= 0;
 
         default:

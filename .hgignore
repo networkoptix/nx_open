@@ -203,6 +203,7 @@ nx_cloud_deploy/*/stage
 nx_cloud_deploy/nxcloud_host_agent/docker/docker
 nx_cloud_deploy/nxcloud_host_agent/docker/docker-compose
 nx_cloud_deploy/nxcloud_host_agent/docker/docker-machine
+nx_cloud_deploy/nxcloud_host_agent/docker/kubectl
 cmake_build/**
 
 syntax: regexp

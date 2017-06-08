@@ -409,6 +409,9 @@ angular.module('nxCommon').controller('ViewCtrl',
 
                 }
                 $scope.activeCamera = $scope.camerasProvider.getCamera($scope.storage.cameraId);
+
+                $scope.ready = true;
+                $timeout(updateHeights);
                 $scope.camerasProvider.startPoll();
             });
         }
@@ -440,6 +443,7 @@ angular.module('nxCommon').controller('ViewCtrl',
         var updateHeights = function() {
             var $viewPanel = $('.view-panel');
             var $camerasPanel = $('.cameras-panel');
+            var $placeholder = $(".webclient-placeholder .placeholder");
             var windowHeight = $window.height();
             var headerHeight = $header.outerHeight();
 
@@ -455,6 +459,7 @@ angular.module('nxCommon').controller('ViewCtrl',
 
             $camerasPanel.css('height',viewportHeight );
             $viewPanel.css('height',viewportHeight );
+            $placeholder.css('height',viewportHeight);
 
             //One more IE hack.
             if(window.jscd.browser === 'Microsoft Internet Explorer') {

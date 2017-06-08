@@ -50,6 +50,7 @@ set(mac.bundle.identifier "com.networkoptix.HDWitness2")
 set(mac.protocol_handler_bundle.identifier "com.networkoptix.protocol_handler")
 
 set(cloudName "Nx Cloud")
+set(compatibleCustomizations "default_cn" "default_zh_CN")
 
 set(liteDeviceName "Nx1")
 
