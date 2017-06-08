@@ -114,6 +114,8 @@ void ReverseConnection::onConnectDone(
 
     if (resultCode == api::ResultCode::ok)
     {
+        streamSocket->setRecvTimeout(std::chrono::milliseconds::zero());
+        streamSocket->setSendTimeout(std::chrono::milliseconds::zero());
         m_httpPipeline = std::make_unique<nx_http::AsyncMessagePipeline>(
             this, std::move(streamSocket));
         m_httpPipeline->setMessageHandler(

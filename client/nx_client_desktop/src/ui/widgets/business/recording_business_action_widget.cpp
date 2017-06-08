@@ -39,7 +39,7 @@ QnRecordingBusinessActionWidget::QnRecordingBusinessActionWidget(QWidget *parent
         ui->fixedDurationSuffixLabel->setEnabled(checked);
 
         // Prolonged type of event has changed. In case of instant
-        // action event state should be updated
+        // action event state should be updated.
         if (checked && (model()->eventType() == QnBusiness::UserDefinedEvent))
             model()->setEventState(QnBusiness::UndefinedState);
 

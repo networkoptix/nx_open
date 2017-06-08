@@ -90,7 +90,7 @@ QnContext::~QnContext() {}
 
 QnCloudStatusWatcher* QnContext::cloudStatusWatcher() const
 {
-    return commonModule()->instance<QnCloudStatusWatcher>();
+    return qnMobileClientModule->cloudStatusWatcher();
 }
 
 QnUserWatcher* QnContext::userWatcher() const

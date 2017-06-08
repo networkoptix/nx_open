@@ -17,26 +17,28 @@ enum QnBusinessRulesActualModelChange {
 class QnBusinessRulesActualModel: public QnBusinessRulesViewModel
 {
     Q_OBJECT
+    using base_type = QnBusinessRulesViewModel;
 
-    typedef QnBusinessRulesViewModel base_type;
 public:
-    QnBusinessRulesActualModel(QObject *parent = 0);
-
+    QnBusinessRulesActualModel(QObject* parent = nullptr);
     void reset();
+
 signals:
     void beforeModelChanged();
     void afterModelChanged(QnBusinessRulesActualModelChange change, bool ok);
 
-    void businessRuleChanged(const QnUuid &id);
-    void businessRuleDeleted(const QnUuid &id);
-public slots:
-    void saveRule(const QModelIndex &index);
-private slots:
-    void at_resources_saved( int handle, ec2::ErrorCode errorCode, const QnBusinessEventRulePtr &rule );
+    void eventRuleChanged(const QnUuid& id);
+    void eventRuleDeleted(const QnUuid& id);
 
-    void at_message_ruleChanged(const QnBusinessEventRulePtr &rule);
-    void at_message_ruleDeleted(const QnUuid &id);
-    void at_message_ruleReset(const QnBusinessEventRuleList &rules);
+public slots:
+    void saveRule(const QModelIndex& index);
+
+private slots:
+    void at_resources_saved(int handle, ec2::ErrorCode errorCode, const QnBusinessEventRulePtr& rule);
+
+    void at_ruleAddedOrUpdated(const QnBusinessEventRulePtr& rule);
+    void at_ruleRemoved(const QnUuid& id);
+    void at_rulesReset(const QnBusinessEventRuleList& rules);
 
 private:
     QMap<int, QnBusinessRuleViewModelPtr> m_savingRules;

@@ -298,6 +298,7 @@ protected:
                 response.set_value(*httpClient.response());
             });
         m_httpResponse = response.get_future().get();
+        httpClient.pleaseStopSync();
     }
 
     void assertThatResponseIsValid()

@@ -192,7 +192,9 @@ QBufferedFile::QBufferedFile(
     int maxBufferSize,
     const QnUuid& writerPoolId):
     m_fileEngine(fileImpl),
-    m_cycleBuffer(fileBlockSize+minBufferSize, SECTOR_SIZE),
+    m_cycleBuffer(
+        qPower2Ceil((unsigned) (fileBlockSize + minBufferSize), SECTOR_SIZE),
+        SECTOR_SIZE),
     m_queueWriter(0),
     m_cachedBuffer(CL_MEDIA_ALIGNMENT, SECTOR_SIZE),
     m_tmpBuffer(CL_MEDIA_ALIGNMENT, SECTOR_SIZE),
@@ -200,8 +202,8 @@ QBufferedFile::QBufferedFile(
     m_writerPoolId(writerPoolId)
 {
     m_systemDependentFlags = 0;
-    m_minBufferSize = minBufferSize;
-    m_maxBufferSize = maxBufferSize;
+    m_minBufferSize = qPower2Ceil((unsigned) minBufferSize, SECTOR_SIZE);
+    m_maxBufferSize = qPower2Ceil((unsigned) maxBufferSize, SECTOR_SIZE);
     m_isDirectIO = false;
     m_bufferPos = 0;
     m_actualFileSize = 0;

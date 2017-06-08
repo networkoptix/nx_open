@@ -21,3 +21,6 @@ endif()
 if(withMobileClient)
     add_subdirectory(mobile_client)
 endif()
+
+project(client)
+set_property(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY VS_STARTUP_PROJECT desktop_client)

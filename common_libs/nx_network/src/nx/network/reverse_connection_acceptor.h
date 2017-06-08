@@ -78,6 +78,8 @@ public:
     {
         base_type::bindToAioThread(aioThread);
 
+        m_acceptCallScheduler.bindToAioThread(aioThread);
+
         for (auto& connectionContext: m_connections)
             connectionContext.connection->bindToAioThread(aioThread);
         for (auto& connection: m_acceptedConnections)
@@ -115,7 +117,7 @@ public:
 
     void acceptAsync(AcceptCompletionHandler handler)
     {
-        post(
+        m_acceptCallScheduler.post(
             [this, handler = std::move(handler)]() mutable
             {
                 m_acceptHandler = std::move(handler);
@@ -171,6 +173,7 @@ public:
 protected:
     virtual void stopWhileInAioThread() override
     {
+        m_acceptCallScheduler.pleaseStopSync();
         m_connections.clear();
         m_acceptedConnections.clear();
     }
@@ -208,6 +211,7 @@ private:
     std::deque<std::unique_ptr<AcceptableReverseConnection>> m_acceptedConnections;
     std::size_t m_preemptiveConnectionCount = kDefaultPreemptiveConnectionCount;
     std::size_t m_maxReadyConnectionCount = kDefaultMaxReadyConnectionCount;
+    aio::BasicPollable m_acceptCallScheduler;
     mutable QnMutex m_mutex;
 
     void openConnections()
@@ -336,6 +340,7 @@ private:
     void cancelIoWhileInOwnAioThread()
     {
         m_acceptHandler = nullptr;
+        m_acceptCallScheduler.cancelPostedCallsSync();
     }
 };
 

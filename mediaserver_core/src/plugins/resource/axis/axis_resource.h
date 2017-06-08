@@ -15,6 +15,7 @@
 #include <api/model/api_ioport_data.h>
 #include <nx/network/http/multipart_content_parser.h>
 #include <core/resource/camera_advanced_param.h>
+#include <nx/network/aio/timer.h>
 
 class QnAxisPtzController;
 typedef std::shared_ptr<QnAbstractAudioTransmitter> QnAudioTransmitterPtr;
@@ -106,6 +107,7 @@ private:
     int toAxisMotionSensitivity(int sensitivity);
     void asyncUpdateIOSettings();
     bool readCurrentIOStateAsync();
+    void restartIOMonitorWithDelay(Qn::IOPortType portType, int index);
 private:
     QList<AxisResolution> m_resolutionList;
 
@@ -120,9 +122,16 @@ private:
     mutable QnMutex m_inputPortMutex;
     //!http client used to monitor input port(s) state
 
-    struct IOMonitor {
+    struct IOMonitor
+    {
+        ~IOMonitor()
+        {
+            restartTimer.pleaseStopSync(/*checkForLocks*/ false);
+        }
+
         nx_http::AsyncHttpClientPtr httpClient;
         std::shared_ptr<nx_http::MultipartContentParser> contentParser;
+        nx::network::aio::Timer restartTimer;
     };
 
     IOMonitor m_ioHttpMonitor[2];

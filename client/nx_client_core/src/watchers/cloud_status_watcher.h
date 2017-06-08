@@ -47,7 +47,7 @@ public:
     };
     Q_ENUM(Status)
 
-    explicit QnCloudStatusWatcher(QObject *parent = nullptr);
+    explicit QnCloudStatusWatcher(QObject *parent = nullptr, bool isMobile = true);
     ~QnCloudStatusWatcher();
 
     QnEncodedCredentials credentials() const;
