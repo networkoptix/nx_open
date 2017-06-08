@@ -1,6 +1,6 @@
 #pragma once
 
-#include <cdb/account_data.h>
+#include <nx/cloud/cdb/api/account_data.h>
 
 namespace nx {
 namespace cdb {

@@ -17,8 +17,8 @@
 
 #include "data/account_data.h"
 #include "data/types.h"
-#include "include/cdb/account_manager.h"
-#include "include/cdb/result_code.h"
+#include "include/nx/cloud/cdb/api/account_manager.h"
+#include "include/nx/cloud/cdb/api/result_code.h"
 
 namespace nx {
 namespace cdb {

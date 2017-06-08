@@ -1,6 +1,6 @@
 #include "ping.h"
 
-#include <cloud_db_client/src/cdb_request_path.h>
+#include <nx/cloud/cdb/client/cdb_request_path.h>
 
 namespace nx {
 namespace cdb {

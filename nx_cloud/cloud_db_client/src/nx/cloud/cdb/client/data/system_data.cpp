@@ -8,7 +8,7 @@
 #include <nx/fusion/model_functions.h>
 #include <nx/network/url/query_parse_helper.h>
 
-#include "field_name.h"
+#include "../field_name.h"
 
 namespace nx {
 namespace cdb {

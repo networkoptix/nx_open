@@ -9,7 +9,7 @@
 #include <nx/fusion/model_functions_fwd.h>
 #include <nx/utils/uuid.h>
 
-#include <cloud_db_client/src/data/account_data.h>
+#include <nx/cloud/cdb/client/data/account_data.h>
 #include <nx/utils/stree/resourcecontainer.h>
 
 namespace nx {

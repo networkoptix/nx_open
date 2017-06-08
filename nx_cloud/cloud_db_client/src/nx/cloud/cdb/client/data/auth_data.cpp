@@ -2,8 +2,8 @@
 
 #include <nx/fusion/model_functions.h>
 
-#include "field_name.h"
 #include "system_data.h"
+#include "../field_name.h"
 
 namespace nx {
 namespace cdb {

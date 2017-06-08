@@ -6,7 +6,7 @@
 #include <nx/utils/thread/mutex.h>
 #include <nx_ec/data/api_tran_state_data.h>
 
-#include <cdb/result_code.h>
+#include <nx/cloud/cdb/api/result_code.h>
 
 #include "transaction_log.h"
 

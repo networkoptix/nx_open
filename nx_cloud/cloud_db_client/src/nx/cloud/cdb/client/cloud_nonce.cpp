@@ -1,4 +1,4 @@
-#include "include/cdb/cloud_nonce.h"
+#include "include/nx/cloud/cdb/api/cloud_nonce.h"
 
 #ifdef _WIN32
 #include <WinSock2.h>

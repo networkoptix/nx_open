@@ -12,7 +12,7 @@
 #include <nx/utils/log/log.h>
 #include <nx/utils/std/cpp14.h>
 
-#include <cloud_db_client/src/cdb_request_path.h>
+#include <nx/cloud/cdb/client/cdb_request_path.h>
 
 #include "http_handlers/base_http_handler.h"
 #include "settings.h"

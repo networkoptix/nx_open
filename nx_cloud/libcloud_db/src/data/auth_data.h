@@ -8,7 +8,7 @@
 
 #include <nx/utils/stree/resourcecontainer.h>
 
-#include <cloud_db_client/src/data/auth_data.h>
+#include <nx/cloud/cdb/client/data/auth_data.h>
 
 
 namespace nx {

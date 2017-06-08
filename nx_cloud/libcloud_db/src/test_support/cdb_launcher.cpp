@@ -7,7 +7,7 @@
 #include <thread>
 #include <tuple>
 
-#include <cdb/account_manager.h>
+#include <nx/cloud/cdb/api/account_manager.h>
 #include <nx/fusion/serialization/lexical.h>
 #include <nx/network/http/auth_tools.h>
 #include <nx/utils/random.h>

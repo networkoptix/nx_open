@@ -16,7 +16,7 @@
 #include <utils/db/types.h>
 #include <nx/fusion/fusion/fusion_fwd.h>
 
-#include <cdb/result_code.h>
+#include <nx/cloud/cdb/api/result_code.h>
 
 
 namespace nx {

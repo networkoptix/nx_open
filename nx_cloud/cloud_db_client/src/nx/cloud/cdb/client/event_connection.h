@@ -13,7 +13,8 @@
 #include <nx/network/http/asynchttpclient.h>
 #include <nx/network/http/multipart_content_parser.h>
 #include <nx/network/retry_timer.h>
-#include <include/cdb/connection.h>
+
+#include <include/nx/cloud/cdb/api/connection.h>
 
 
 namespace nx {

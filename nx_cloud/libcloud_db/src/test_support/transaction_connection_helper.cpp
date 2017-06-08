@@ -7,7 +7,7 @@
 #include <nx/utils/std/cpp14.h>
 #include <nx/utils/random.h>
 
-#include <cdb/ec2_request_paths.h>
+#include <nx/cloud/cdb/api/ec2_request_paths.h>
 
 namespace nx {
 namespace cdb {

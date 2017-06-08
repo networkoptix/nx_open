@@ -6,7 +6,7 @@
 #ifndef NX_CLOUD_DB_CLIENT_CONNECTION_FACTORY_H
 #define NX_CLOUD_DB_CLIENT_CONNECTION_FACTORY_H
 
-#include "include/cdb/connection.h"
+#include "include/nx/cloud/cdb/api/connection.h"
 
 #include <nx/network/cloud/cloud_module_url_fetcher.h>
 

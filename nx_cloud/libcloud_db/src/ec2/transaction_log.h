@@ -11,7 +11,7 @@
 #include <nx/utils/std/cpp14.h>
 #include <nx/utils/thread/mutex.h>
 
-#include <cdb/result_code.h>
+#include <nx/cloud/cdb/api/result_code.h>
 #include <nx_ec/ec_proto_version.h>
 #include <utils/common/id.h>
 #include <utils/db/async_sql_query_executor.h>

@@ -7,7 +7,7 @@
 #include <nx/utils/test_support/utils.h>
 
 #include <api/app_server_connection.h>
-#include <cdb/connection.h>
+#include <nx/cloud/cdb/api/connection.h>
 #include <media_server/settings.h>
 
 using namespace nx::cdb;

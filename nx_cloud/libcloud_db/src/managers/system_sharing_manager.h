@@ -3,7 +3,7 @@
 #include <utils/db/query_context.h>
 #include <utils/db/types.h>
 
-#include <cdb/system_data.h>
+#include <nx/cloud/cdb/api/system_data.h>
 
 namespace nx {
 namespace cdb {

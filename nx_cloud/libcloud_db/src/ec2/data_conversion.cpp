@@ -1,6 +1,6 @@
 #include "data_conversion.h"
 
-#include <cdb/system_data.h>
+#include <nx/cloud/cdb/api/system_data.h>
 
 #include <nx_ec/data/api_user_data.h>
 #include <nx/fusion/serialization/lexical.h>

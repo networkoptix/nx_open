@@ -4,7 +4,7 @@
 
 #include <QtCore/QByteArray>
 
-#include <cdb/auth_provider.h>
+#include <nx/cloud/cdb/api/auth_provider.h>
 
 #include "access_control/auth_types.h"
 #include "dao/abstract_user_authentication_data_object.h"

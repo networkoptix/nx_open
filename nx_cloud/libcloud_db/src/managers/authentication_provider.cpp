@@ -4,14 +4,14 @@
 
 #include <openssl/md5.h>
 
-#include <cdb/cloud_nonce.h>
+#include <nx/cloud/cdb/api/cloud_nonce.h>
 #include <nx/network/http/auth_tools.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/random.h>
 #include <nx/utils/time.h>
 #include <nx/utils/uuid.h>
 
-#include <cloud_db_client/src/data/auth_data.h>
+#include <nx/cloud/cdb/client/data/auth_data.h>
 
 #include "access_control/authentication_manager.h"
 #include "account_manager.h"

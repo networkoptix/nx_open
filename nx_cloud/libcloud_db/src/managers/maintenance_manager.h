@@ -2,7 +2,7 @@
 
 #include <functional>
 
-#include <cloud_db_client/src/data/maintenance_data.h>
+#include <nx/cloud/cdb/client/data/maintenance_data.h>
 #include <nx_ec/data/api_fwd.h>
 #include <nx/network/aio/timer.h>
 #include <nx/utils/counter.h>

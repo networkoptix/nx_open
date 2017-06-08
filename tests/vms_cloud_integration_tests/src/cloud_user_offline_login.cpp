@@ -3,7 +3,7 @@
 
 #include <gtest/gtest.h>
 
-#include <cloud_db_client/src/data/auth_data.h>
+#include <nx/cloud/cdb/client/data/auth_data.h>
 
 #include "mediaserver_cloud_integration_test_setup.h"
 

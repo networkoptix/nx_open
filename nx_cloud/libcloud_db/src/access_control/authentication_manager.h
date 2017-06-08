@@ -11,7 +11,7 @@
 
 #include <nx/network/http/server/abstract_authentication_manager.h>
 
-#include <cdb/result_code.h>
+#include <nx/cloud/cdb/api/result_code.h>
 
 #include "auth_types.h"
 

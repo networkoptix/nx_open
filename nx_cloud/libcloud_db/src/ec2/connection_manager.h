@@ -9,9 +9,9 @@
 #include <boost/multi_index/identity.hpp>
 #include <boost/multi_index/member.hpp>
 
-#include <cdb/maintenance_manager.h>
-#include <cdb/result_code.h>
-#include <cdb/system_data.h>
+#include <nx/cloud/cdb/api/maintenance_manager.h>
+#include <nx/cloud/cdb/api/result_code.h>
+#include <nx/cloud/cdb/api/system_data.h>
 #include <nx/network/http/abstract_msg_body_source.h>
 #include <nx/network/http/server/abstract_http_request_handler.h>
 #include <nx/utils/move_only_func.h>

@@ -12,7 +12,7 @@
 
 #include "async_http_requests_executor.h"
 #include "data/account_data.h"
-#include "include/cdb/account_manager.h"
+#include "include/nx/cloud/cdb/api/account_manager.h"
 
 
 namespace nx {

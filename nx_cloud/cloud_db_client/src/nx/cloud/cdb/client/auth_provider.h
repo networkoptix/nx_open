@@ -7,7 +7,7 @@
 #define NX_CDB_CL_AUTH_PROVIDER_H
 
 #include "async_http_requests_executor.h"
-#include "include/cdb/auth_provider.h"
+#include "include/nx/cloud/cdb/api/auth_provider.h"
 
 
 namespace nx {

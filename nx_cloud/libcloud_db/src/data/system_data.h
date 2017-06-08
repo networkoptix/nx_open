@@ -11,7 +11,7 @@
 #include <nx/fusion/model_functions_fwd.h>
 #include <nx/utils/uuid.h>
 
-#include <cloud_db_client/src/data/system_data.h>
+#include <nx/cloud/cdb/client/data/system_data.h>
 
 namespace nx {
 namespace cdb {

@@ -1,6 +1,6 @@
 #pragma once
 
-#include <include/cdb/connection.h>
+#include <include/nx/cloud/cdb/api/connection.h>
 
 #include "account_manager.h"
 #include "auth_provider.h"

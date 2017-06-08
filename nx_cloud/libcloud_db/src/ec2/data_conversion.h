@@ -1,6 +1,6 @@
 #pragma once
 
-#include <cdb/system_data.h>
+#include <nx/cloud/cdb/api/system_data.h>
 #include <common/common_globals.h>
 
 

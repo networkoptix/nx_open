@@ -15,7 +15,7 @@
 #include <nx/utils/uuid.h>
 #include <nx/fusion/fusion/fusion_fwd.h>
 
-#include <cdb/account_data.h>
+#include <nx/cloud/cdb/api/account_data.h>
 
 
 namespace nx {

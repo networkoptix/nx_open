@@ -7,8 +7,8 @@
 #include <QtCore/QDateTime>
 #include <QtSql/QSqlQuery>
 
-#include <cloud_db_client/src/cdb_request_path.h>
-#include <cloud_db_client/src/data/types.h>
+#include <nx/cloud/cdb/client/cdb_request_path.h>
+#include <nx/cloud/cdb/client/data/types.h>
 #include <nx/email/mustache/mustache_helper.h>
 #include <nx/fusion/serialization/lexical.h>
 #include <nx/fusion/serialization/sql.h>
