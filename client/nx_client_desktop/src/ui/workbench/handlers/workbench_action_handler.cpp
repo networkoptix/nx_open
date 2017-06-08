@@ -2186,7 +2186,6 @@ void ActionHandler::at_nonceReceived(QnAsyncHttpClientReply *reply)
     if (!QJson::deserialize(reply->data(), &result) || !QJson::deserialize(result.reply, &auth))
     {
         QnMessageBox::critical(mainWindow(), tr("Failed to open server web page"));
-
         return;
     }
 
