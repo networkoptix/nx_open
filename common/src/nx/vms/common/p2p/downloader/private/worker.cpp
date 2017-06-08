@@ -25,12 +25,6 @@ constexpr int kMaxAutoRank = 5;
 constexpr int kMinAutoRank = 0;
 constexpr int kDefaultRank = 0;
 
-struct ScoredPeer
-{
-    QnUuid peerId;
-    int score = 0;
-};
-
 QString statusString(bool success)
 {
     return success ? lit("OK") : lit("FAIL");
@@ -788,6 +782,12 @@ QList<QnUuid> Worker::selectPeersForOperation(int count, QList<QnUuid> peers) co
         result = peers;
         return result;
     }
+
+    struct ScoredPeer
+    {
+        QnUuid peerId;
+        int score;
+    };
 
     QList<ScoredPeer> scoredPeers;
 
