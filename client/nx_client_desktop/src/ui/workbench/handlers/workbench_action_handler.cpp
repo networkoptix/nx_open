@@ -2154,7 +2154,7 @@ void ActionHandler::openInBrowser(const QnMediaServerResourcePtr& server,
 
     if (m_serverRequests.find(proxyUrl) == m_serverRequests.end())
     {
-        // No other requests to this proxy, so we have to get nonce by ourself.
+        // No other requests to this proxy, so we have to get nonce by ourselves.
         auto reply = new QnAsyncHttpClientReply(nx_http::AsyncHttpClient::create(), this);
         connect(
             reply, &QnAsyncHttpClientReply::finished,
