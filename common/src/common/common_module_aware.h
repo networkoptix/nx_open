@@ -19,6 +19,7 @@ class QnMediaServerUserAttributesPool;
 class QnResourceStatusDictionary;
 class QnGlobalSettings;
 class QnLayoutTourManager;
+class QnEventRuleManager;
 
 class QnCommonModuleAware
 {
@@ -52,6 +53,8 @@ public:
     QnResourceStatusDictionary* statusDictionary() const;
     QnGlobalSettings* globalSettings() const;
     QnLayoutTourManager* layoutTourManager() const;
+    QnEventRuleManager* eventRuleManager() const;
+
 private:
     void init(QObject *parent);
 

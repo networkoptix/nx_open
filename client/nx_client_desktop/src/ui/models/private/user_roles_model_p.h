@@ -1,9 +1,10 @@
 #pragma once
 
+#include <QtCore/QSet>
+#include <QtCore/QPersistentModelIndex>
+
 #include <ui/models/user_roles_model.h>
-
 #include <ui/workbench/workbench_context_aware.h>
-
 #include <utils/common/connective.h>
 
 class QnUserRolesModel;
@@ -52,7 +53,12 @@ private:
     QList<Qn::UserRole> m_standardRoles;
     ec2::ApiUserRoleDataList m_userRoles;
     const bool m_customRoleEnabled;
+    const bool m_onlyAssignable;
 
     QString m_customRoleName;
     QString m_customRoleDescription;
+
+    bool m_checkable = false;
+    bool m_predefinedRoleIdsEnabled = false;
+    QSet<QPersistentModelIndex> m_checked;
 };

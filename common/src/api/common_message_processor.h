@@ -45,14 +45,13 @@ public:
     virtual void updateResource(const ec2::ApiMediaServerData& server, ec2::NotificationSource source);
     virtual void updateResource(const ec2::ApiStorageData& storage, ec2::NotificationSource source);
 
-    QMap<QnUuid, QnBusinessEventRulePtr> businessRules() const;
-
     void resetServerUserAttributesList( const ec2::ApiMediaServerUserAttributesDataList& serverUserAttributesList );
     void resetCameraUserAttributesList( const ec2::ApiCameraAttributesDataList& cameraUserAttributesList );
     void resetPropertyList(const ec2::ApiResourceParamWithRefDataList& params);
     void resetStatusList(const ec2::ApiResourceStatusDataList& params);
     void resetAccessRights(const ec2::ApiAccessRightsDataList& accessRights);
     void resetUserRoles(const ec2::ApiUserRoleDataList& roles);
+
 signals:
     void connectionOpened();
     void connectionClosed();
@@ -64,9 +63,6 @@ signals:
     void fileUpdated(const QString &filename);
     void fileRemoved(const QString &filename);
 
-    void businessRuleChanged(const QnBusinessEventRulePtr &rule);
-    void businessRuleDeleted(const QnUuid &id);
-    void businessRuleReset(const QnBusinessEventRuleList &rules);
     void businessActionReceived(const QnAbstractBusinessActionPtr& action);
     void execBusinessAction(const QnAbstractBusinessActionPtr& action);
 
@@ -145,7 +141,6 @@ private:
     template <class Datatype> void updateResources(const std::vector<Datatype>& resList, QHash<QnUuid, QnResourcePtr>& remoteResources);
 protected:
     ec2::AbstractECConnectionPtr m_connection;
-    QMap<QnUuid, QnBusinessEventRulePtr> m_rules;
 };
 
 #define qnCommonMessageProcessor commonModule()->messageProcessor()
