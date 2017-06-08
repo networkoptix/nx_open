@@ -160,12 +160,37 @@ ec2::ErrorCode MediaServerClient::ec2GetSettings(ec2::ApiResourceParamDataList* 
         result);
 }
 
+void MediaServerClient::ec2GetResourceParams(
+    const QnUuid& resourceId,
+    std::function<void(ec2::ErrorCode, ec2::ApiResourceParamDataList)> completionHandler)
+{
+    performAsyncEc2Call(
+        lm("ec2/getResourceParams?id=%1")
+            .arg(resourceId.toSimpleString().toStdString()).toStdString(),
+        std::move(completionHandler));
+}
+
+ec2::ErrorCode MediaServerClient::ec2GetResourceParams(
+    const QnUuid& resourceId,
+    ec2::ApiResourceParamDataList* result)
+{
+    using Ec2GetResourceParamsAsyncFuncPointer =
+        void(MediaServerClient::*)(
+            const QnUuid&,
+            std::function<void(ec2::ErrorCode, ec2::ApiResourceParamDataList)>);
+
+    return syncCallWrapper(
+        static_cast<Ec2GetResourceParamsAsyncFuncPointer>(&MediaServerClient::ec2GetResourceParams),
+        resourceId,
+        result);
+}
+
 //-------------------------------------------------------------------------------------------------
 // Utilities
 
 template<typename Input, typename ... Output>
 void MediaServerClient::performGetRequest(
-    const QString& requestPath,
+    const std::string& requestPath,
     const Input& inputData,
     std::function<void(SystemError::ErrorCode, Output...)> completionHandler)
 {
@@ -196,7 +221,7 @@ void MediaServerClient::performGetRequest(
 
 template<typename ... Output>
 void MediaServerClient::performGetRequest(
-    const QString& requestPath,
+    const std::string& requestPath,
     std::function<void(SystemError::ErrorCode, Output...)> completionHandler)
 {
     // TODO: #ak think about a way to combine this method with the previous one
@@ -247,9 +272,23 @@ ResultCode MediaServerClient::syncCallWrapper(
     return resultCode;
 }
 
+template<typename ResultCode, typename Input, typename Output>
+ResultCode MediaServerClient::syncCallWrapper(
+    void(MediaServerClient::*asyncFunc)(const Input&, std::function<void(ResultCode, Output)>),
+    const Input& input,
+    Output* output)
+{
+    using namespace std::placeholders;
+
+    ResultCode resultCode;
+    std::tie(resultCode, *output) =
+        makeSyncCall<ResultCode, Output>(std::bind(asyncFunc, this, input, _1));
+    return resultCode;
+}
+
 template<typename Input>
 void MediaServerClient::performApiRequest(
-    const char* requestName,
+    const std::string& requestName,
     const Input& input,
     std::function<void(QnJsonRestResult)> completionHandler)
 {
@@ -268,7 +307,7 @@ void MediaServerClient::performApiRequest(
 
 template<typename Output>
 void MediaServerClient::performApiRequest(
-    const char* requestName,
+    const std::string& requestName,
     std::function<void(QnJsonRestResult, Output)> completionHandler)
 {
     performGetRequest<QnJsonRestResult>(
@@ -288,7 +327,7 @@ void MediaServerClient::performApiRequest(
 
 template<typename Input, typename ... Output>
 void MediaServerClient::performAsyncEc2Call(
-    const char* requestName,
+    const std::string& requestName,
     const Input& request,
     std::function<void(ec2::ErrorCode, Output...)> completionHandler)
 {
@@ -308,7 +347,7 @@ void MediaServerClient::performAsyncEc2Call(
 
 template<typename ... Output>
 void MediaServerClient::performAsyncEc2Call(
-    const char* requestName,
+    const std::string& requestName,
     std::function<void(ec2::ErrorCode, Output...)> completionHandler)
 {
     performGetRequest<Output...>(

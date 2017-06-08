@@ -25,6 +25,7 @@ namespace Qn {
 class QnLdapManager: public QObject, public QnCommonModuleAware
 {
     Q_OBJECT
+
 public:
 
     QnLdapManager(QnCommonModule* commonModule);

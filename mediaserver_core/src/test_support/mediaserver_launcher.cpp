@@ -1,10 +1,8 @@
 #include "mediaserver_launcher.h"
 
 #include <nx/network/http/http_client.h>
-#include <nx/utils/random.h>
-
-#include <media_server_process.h>
 #include <nx/network/socket_global.h>
+#include <nx/utils/random.h>
 
 MediaServerLauncher::MediaServerLauncher(const QString& tmpDir, DisabledFeatures disabledFeatures):
     m_workDirResource(tmpDir),

@@ -49,11 +49,20 @@ public:
 
     QString text() const;
 
+    using ActionType = nx::client::desktop::ui::action::IDType;
+    using ParametersType = nx::client::desktop::ui::action::Parameters;
+
     void addActionButton(
         const QIcon& icon,
-        nx::client::desktop::ui::action::IDType actionId = nx::client::desktop::ui::action::NoAction,
-        const nx::client::desktop::ui::action::Parameters& parameters = nx::client::desktop::ui::action::Parameters(),
+        ActionType actionId = nx::client::desktop::ui::action::NoAction,
+        const ParametersType& parameters = ParametersType(),
         bool defaultAction = false);
+
+    void addTextButton(
+        const QIcon& icon,
+        const QString& text,
+        ActionType actionId = nx::client::desktop::ui::action::NoAction,
+        const ParametersType& parameters = ParametersType());
 
     QnNotificationLevel::Value notificationLevel() const;
     void setNotificationLevel(QnNotificationLevel::Value notificationLevel);
@@ -121,7 +130,8 @@ private:
     int m_defaultActionIdx;
     QString m_soundPath;
 
-    QGraphicsLinearLayout* m_layout;
+    QGraphicsLinearLayout* m_verticalLayout;
+    QGraphicsLinearLayout* m_primaryLayout;
     QnProxyLabel* m_textLabel;
     QnImageButtonWidget* m_closeButton;
     QnNotificationLevel::Value m_notificationLevel;

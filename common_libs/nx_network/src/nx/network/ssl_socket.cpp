@@ -1019,8 +1019,6 @@ SslSocket::SslSocket(
         }),
     d_ptr(priv)
 {
-    ssl::initOpenSSLGlobalLock();
-
     Q_D(SslSocket);
     d->wrappedSocket = std::move(wrappedSocket);
     d->isServerSide = isServerSide;
@@ -1882,7 +1880,6 @@ SslServerSocket::SslServerSocket(
     m_allowNonSecureConnect(allowNonSecureConnect),
     m_delegateSocket(std::move(delegateSocket))
 {
-    ssl::initOpenSSLGlobalLock();
 }
 
 bool SslServerSocket::listen(int queueLen)

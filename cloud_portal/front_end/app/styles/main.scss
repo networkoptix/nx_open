@@ -10,18 +10,6 @@
 @import '_languages';
 
 @import 'common';
-.webclient-page{
-    margin-bottom: 0;
-    .navbar{
-        box-shadow: none;
-    }
-    .webclient{
-        margin-top: -10px !important;
-    }
-    footer{
-        display:none;
-    }
-}
 
 html {
   position: relative;
@@ -33,6 +21,23 @@ body {
   margin-bottom: 80px;
   min-width: 360px;
 }
+
+html.webclient-page{
+    overflow: hidden; /* WEB-564: this is another hack: we hide scroll for view page */
+
+    body{
+        margin-bottom: 0;
+    }
+    .navbar{
+        box-shadow: none;
+        margin-bottom: 0;
+    }
+    footer{
+        display:none;
+    }
+}
+
+
 footer {
   position: absolute;
   bottom: 0;

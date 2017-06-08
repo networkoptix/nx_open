@@ -3,13 +3,13 @@
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/media_server_resource.h>
 
-namespace {
-    static const int kUpdateMasterFlagTimeoutMs = 1000 * 30;
-}
-
-QnMasterServerStatusWatcher::QnMasterServerStatusWatcher(QObject* parent):
+QnMasterServerStatusWatcher::QnMasterServerStatusWatcher(
+    QObject* parent,
+    std::chrono::milliseconds delayBeforeSettingMasterFlag)
+    :
     QObject(parent),
-    QnCommonModuleAware(parent)
+    QnCommonModuleAware(parent),
+    m_delayBeforeSettingMasterFlag(delayBeforeSettingMasterFlag)
 {
     connect(resourcePool(), &QnResourcePool::resourceAdded, this,
         [this](const QnResourcePtr& resource)
@@ -27,7 +27,7 @@ QnMasterServerStatusWatcher::QnMasterServerStatusWatcher(QObject* parent):
     connect(runtimeInfoManager(), &QnRuntimeInfoManager::runtimeInfoRemoved, this, &QnMasterServerStatusWatcher::at_updateMasterFlag, Qt::QueuedConnection);
     connect(&m_timer, &QTimer::timeout, this, [this]() { setMasterFlag(true); } );
     m_timer.setSingleShot(true);
-    m_timer.setInterval(kUpdateMasterFlagTimeoutMs);
+    m_timer.setInterval(m_delayBeforeSettingMasterFlag.count());
 }
 
 bool QnMasterServerStatusWatcher::localPeerCanBeMaster() const

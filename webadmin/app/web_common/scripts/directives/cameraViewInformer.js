@@ -5,14 +5,16 @@ angular.module('nxCommon')
 		return{
 			restrict: 'E',
         	scope:{
-        	    flags: "="
+        	    flags: "=",
+        	    preloader: "="
         	},
-        	templateUrl: Config.viewsDirCommon + 'components/cameraViewInformer.html',
+        	templateUrl: Config.viewsDirCommon + 'components/placeholder.html',
         	link: function(scope){
-        		scope.cameraStates = L.cameraStates;
-                scope.message = "";
-
                 scope.$watch('flags', function(){
+                    scope.title = null;
+                    scope.message = null;
+                    scope.iconClass = null;
+                    scope.condition = false;
                     scope.alertType = null;
 
                     //check for flag
@@ -33,14 +35,18 @@ angular.module('nxCommon')
                         return;
                     }
 
+        	        scope.condition = true;
+
                     //offline and unauthorized are special cases. All others can be set without editing
-                    if(scope.cameraStates){
-                        if(scope.alertType == 'status'){
-                            scope.message = scope.cameraStates[(scope.flags[scope.alertType]).toLowerCase()];
-                        }
-                        else{
-                            scope.message = scope.cameraStates[scope.alertType];
-                        }
+                    if(scope.alertType == 'status'){
+                        scope.title = L.common.cameraStates[(scope.flags[scope.alertType]).toLowerCase()];
+                        scope.message = null;
+                        scope.iconClass = scope.flags[scope.alertType] == 'Offline' ? 'camera-view-offline' : 'camera-view-unauthorized';
+                    }
+                    else{
+                        scope.iconClass = 'camera-view-error';
+                        scope.title = L.common.cameraStates.error;
+                        scope.message = L.common.cameraStates[scope.alertType];
                     }
                 }, true);
         	}

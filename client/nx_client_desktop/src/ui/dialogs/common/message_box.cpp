@@ -38,6 +38,9 @@ public:
     QnMessageBoxIcon icon;
     QPointer<QWidget> focusWidget;
     QnButtonDetections buttonDetection;
+    Qt::TextFormat informativeTextFormat = Qt::AutoText;
+
+public:
     QnMessageBoxPrivate(QnMessageBox* parent);
 
     void init();
@@ -523,6 +526,23 @@ void QnMessageBox::setTextFormat(Qt::TextFormat format)
     ui->mainLabel->setTextFormat(format);
 }
 
+Qt::TextFormat QnMessageBox::informativeTextFormat() const
+{
+    Q_D(const QnMessageBox);
+    return d->informativeTextFormat;
+}
+
+void QnMessageBox::setInformativeTextFormat(Qt::TextFormat format)
+{
+    Q_D(QnMessageBox);
+
+    if (d->informativeTextFormat == format)
+        return;
+
+    for (auto& label: d->informativeLabels)
+        label->setTextFormat(format);
+}
+
 QString QnMessageBox::informativeText() const
 {
     Q_D(const QnMessageBox);
@@ -555,6 +575,9 @@ void QnMessageBox::setInformativeText(const QString &text, bool split)
         d->informativeLabels.append(label);
         ++index;
     }
+
+    for (auto& label: d->informativeLabels)
+        label->setTextFormat(d->informativeTextFormat);
 }
 
 void QnMessageBox::addCustomWidget(QWidget* widget, Layout layout, int stretch,

@@ -277,6 +277,7 @@ public:
     virtual QnAudioTransmitterPtr getAudioTransmitter();
 #endif
 
+    bool isEnoughFpsToRunSecondStream(int currentFps) const;
 public slots:
     virtual void inputPortListenerAttached();
     virtual void inputPortListenerDetached();

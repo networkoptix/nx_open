@@ -110,7 +110,7 @@ int CloudDbService::serviceMain(const utils::AbstractServiceSettings& abstractSe
         return 2;
     }
 
-    nx::utils::TimerManager timerManager;
+    nx::utils::StandaloneTimerManager timerManager;
     timerManager.start();
 
     std::unique_ptr<AbstractEmailManager> emailManager(

@@ -8,8 +8,10 @@
 #include <QtCore/QCryptographicHash>
 
 #include <api/global_settings.h>
-#include "api/runtime_info_manager.h"
+#include <api/runtime_info_manager.h>
 #include <api/common_message_processor.h>
+
+#include <business/event_rule_manager.h>
 
 #include <common/common_meta_types.h>
 
@@ -25,17 +27,17 @@
 
 #include <core/resource_management/resource_pool.h>
 #include <core/resource_management/user_roles_manager.h>
-#include "core/resource_management/resource_properties.h"
-#include "core/resource_management/status_dictionary.h"
-#include "core/resource_management/server_additional_addresses_dictionary.h"
+#include <core/resource_management/resource_properties.h>
+#include <core/resource_management/status_dictionary.h>
+#include <core/resource_management/server_additional_addresses_dictionary.h>
 #include <core/resource_management/resource_discovery_manager.h>
 #include <core/resource_management/layout_tour_manager.h>
 
 #include <core/resource/media_server_resource.h>
 #include <core/resource/user_resource.h>
 #include <core/resource/camera_history.h>
-#include "core/resource/camera_user_attribute_pool.h"
-#include "core/resource/media_server_user_attributes.h"
+#include <core/resource/camera_user_attribute_pool.h>
+#include <core/resource/media_server_user_attributes.h>
 
 #include <licensing/license.h>
 
@@ -47,17 +49,18 @@
 #include <api/session_manager.h>
 #include <network/router.h>
 
-namespace
-{
-    static const QString kAdminPasswordHash = lit("adminMd5Hash");
-    static const QString kAdminPasswordDigest = lit("adminMd5Digest");
-    static const QString kAdminPasswordCrypt512 = lit("adminCrypt512");
-    static const QString kAdminPasswordRealm = lit("adminRealm");
-    static const QString kLocalSystemId = lit("localSystemId");
-    static const QString kLocalSystemName = lit("localSystemName");
-    static const QString kServerName= lit("serverName");
-    static const QString kStorageInfo = lit("storageInfo");
-}
+namespace {
+
+static const QString kAdminPasswordHash = lit("adminMd5Hash");
+static const QString kAdminPasswordDigest = lit("adminMd5Digest");
+static const QString kAdminPasswordCrypt512 = lit("adminCrypt512");
+static const QString kAdminPasswordRealm = lit("adminRealm");
+static const QString kLocalSystemId = lit("localSystemId");
+static const QString kLocalSystemName = lit("localSystemName");
+static const QString kServerName = lit("serverName");
+static const QString kStorageInfo = lit("storageInfo");
+
+} // namespace
 
 void BeforeRestoreDbData::saveToSettings(QSettings* settings)
 {
@@ -136,7 +139,8 @@ QnCommonModule::QnCommonModule(bool clientMode, QObject *parent):
     m_serverAdditionalAddressesDictionary = new QnServerAdditionalAddressesDictionary(this);
 
     m_resourcePool = new QnResourcePool(this);  /*< Depends on nothing. */
-    m_layoutTourManager = new QnLayoutTourManager(this);  //< Depends on nothing.
+    m_layoutTourManager = new QnLayoutTourManager(this); //< Depends on nothing.
+    m_eventRuleManager = new QnEventRuleManager(this); //< Depends on nothing.
 
     m_moduleDiscoveryManager = new nx::vms::discovery::Manager(this, clientMode, m_resourcePool);
     // TODO: bind m_moduleDiscoveryManager to resPool server changes

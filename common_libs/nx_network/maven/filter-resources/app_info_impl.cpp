@@ -35,5 +35,11 @@ QString AppInfo::cloudName()
     return QStringLiteral("${cloudName}");
 }
 
+QStringList AppInfo::compatibleCloudHosts()
+{
+    const auto hostsString = QString::fromLatin1("${compatibleCloudHosts}");
+    return hostsString.split(L';');
+}
+
 } // namespace network
 } // namespace nx

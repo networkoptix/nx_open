@@ -81,7 +81,7 @@ public:
      */
     SystemManager(
         const conf::Settings& settings,
-        nx::utils::TimerManager* const timerManager,
+        nx::utils::StandaloneTimerManager* const timerManager,
         AccountManager* const accountManager,
         const SystemHealthInfoProvider& systemHealthInfoProvider,
         nx::db::AsyncSqlQueryExecutor* const dbManager,
@@ -227,7 +227,7 @@ private:
     constexpr static const int kSharingBySystemIdAndAccountEmailIndex = 4;
 
     const conf::Settings& m_settings;
-    nx::utils::TimerManager* const m_timerManager;
+    nx::utils::StandaloneTimerManager* const m_timerManager;
     AccountManager* const m_accountManager;
     const SystemHealthInfoProvider& m_systemHealthInfoProvider;
     nx::db::AsyncSqlQueryExecutor* const m_dbManager;

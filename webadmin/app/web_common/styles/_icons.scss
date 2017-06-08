@@ -2,7 +2,7 @@
   display: inline-block;
   background-size: 192px 408px;
   background-image: url(../web_common/images/icons/web_interface_sprite.png);
-  @media only screen and (-webkit-min-device-pixel-ration: 2), only screen and (min-device-pixel-ratio: 2){
+  @media only screen and (-webkit-min-device-pixel-ratio: 2), only screen and (min-device-pixel-ratio: 2){
     background-image: url(../web_common/images/icons/web_interface_sprite@2x.png);
   }
 }
@@ -86,19 +86,13 @@
 
 .glyphicon-th-list{
   @include kill-glyphicon;
+  top: 4px !important;
   background-position: -1px -170px;
 }
 
 .glyphicon-search{
   @include kill-glyphicon;
   background-position: -50px -26px;
-}
-
-.glyphicon-remove{
-  @include kill-glyphicon;
-  height: 10px !important;
-  width: 10px !important;
-  background-position: -73px -49px;
 }
 
 .glyphicon-info-sign{
@@ -108,6 +102,18 @@
   }
   &.active{
     background-position: -98px -26px;
+  }
+}
+
+.glyphicon-remove{
+  @include kill-glyphicon;
+  height: 10px !important;
+  width: 10px !important;
+  background-position: -73px -49px;
+  
+  &:hover,
+  &:active{
+    background-position: -73px -61px;
   }
 }
 
@@ -166,13 +172,27 @@
 
 .camera-view-unauthorized{
   @include icon;
-  width: 93px !important;
-  height: 93px !important;
-  background-position: -1px -216px;
+  width: 96px !important;
+  height: 96px !important;
+  background-position: 0px -216px;
 }
 .camera-view-offline{
   @include icon;
-  width: 93px !important;
-  height: 93px !important;
-  background-position: -97px -216px;
+  width: 96px !important;
+  height: 96px !important;
+  background-position: -96px -216px;
+}
+
+.server-offline{
+  @include icon;
+  width: 96px !important;
+  height: 96px !important;
+  background-position: -96px -316px;
+}
+
+.camera-view-error{
+  @include icon;
+  width: 96px !important;
+  height: 96px !important;
+  background-position: 0px -316px;
 }

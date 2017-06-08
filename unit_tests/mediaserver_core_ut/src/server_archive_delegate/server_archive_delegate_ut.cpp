@@ -36,7 +36,7 @@ extern "C" {
 #include <cmath>
 #include <stdio.h>
 
-#include "../utils.h"
+#include <test_support/utils.h>
 #include "media_server/media_server_module.h"
 
 const QString cameraFolder("camera");

@@ -19,7 +19,7 @@
     <properties>
         <guid>${vms_gateway_ut.guid}</guid>
         <qt.libs>core network xml concurrent sql multimedia</qt.libs>
-        <global.libs>-lnx_utils -lnx_network -ludt -lvms_gateway -lconnection_mediator -lcloud_db_client</global.libs>
+        <global.libs>-lvms_gateway -lcommon -lnx_fusion -lnx_utils -lnx_network -ludt -lconnection_mediator -lcloud_db_client</global.libs>
         <windows.oslibs>Ws2_32.lib DbgHelp.lib Winmm.lib Iphlpapi.lib</windows.oslibs>
 
         <windows.defines>_VARIADIC_MAX=10</windows.defines>

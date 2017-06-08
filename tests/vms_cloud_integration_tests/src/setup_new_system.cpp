@@ -1,6 +1,6 @@
 #include <gtest/gtest.h>
 
-#include "cloud/mediaserver_cloud_integration_test_setup.h"
+#include "mediaserver_cloud_integration_test_setup.h"
 
 class FtConfiguringNewSystem:
     public MediaServerCloudIntegrationTest,

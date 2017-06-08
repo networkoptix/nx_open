@@ -778,29 +778,7 @@ public:
         return ErrorCode::ok;
     }
 
-    ErrorCode readApiFullInfoDataForMobileClient(ApiFullInfoData* data, const QnUuid& userId)
-    {
-        const ErrorCode errorCode =
-            m_dbManager->readApiFullInfoDataForMobileClient(data, userId);
-        if (errorCode != ErrorCode::ok)
-            return errorCode;
-
-        filterData(data->servers);
-        filterData(data->serversUserAttributesList);
-        filterData(data->cameras);
-        filterData(data->cameraUserAttributesList);
-        filterData(data->users);
-        filterData(data->userRoles);
-        filterData(data->userRoles);
-        filterData(data->accessRights);
-        filterData(data->layouts);
-        filterData(data->cameraHistory);
-        filterData(data->discoveryData);
-        filterData(data->allProperties);
-        filterData(data->resStatusList);
-
-        return ErrorCode::ok;
-    }
+    ErrorCode readApiFullInfoDataForMobileClient(ApiFullInfoData* data, const QnUuid& userId);
 
     QnDbHelper::QnDbTransaction* getTransaction();
     ApiObjectType getObjectTypeNoLock(const QnUuid& objectId);

@@ -68,6 +68,13 @@ public:
         std::function<void(ec2::ErrorCode, ec2::ApiResourceParamDataList)> completionHandler);
     ec2::ErrorCode ec2GetSettings(ec2::ApiResourceParamDataList* result);
 
+    void ec2GetResourceParams(
+        const QnUuid& resourceId,
+        std::function<void(ec2::ErrorCode, ec2::ApiResourceParamDataList)> completionHandler);
+    ec2::ErrorCode ec2GetResourceParams(
+        const QnUuid& resourceId,
+        ec2::ApiResourceParamDataList* result);
+
 private:
     SocketAddress m_mediaServerEndpoint;
     QString m_userName;
@@ -75,13 +82,13 @@ private:
 
     template<typename Input, typename ... Output>
     void performGetRequest(
-        const QString& requestPath,
+        const std::string& requestPath,
         const Input& inputData,
         std::function<void(SystemError::ErrorCode, Output...)> completionHandler);
 
     template<typename ... Output>
     void performGetRequest(
-        const QString& requestPath,
+        const std::string& requestPath,
         std::function<void(SystemError::ErrorCode, Output...)> completionHandler);
 
     template<typename ResultCode, typename Output>
@@ -94,26 +101,32 @@ private:
         void(MediaServerClient::*asyncFunc)(const Input&, std::function<void(ResultCode)>),
         const Input& input);
 
+    template<typename ResultCode, typename Input, typename Output>
+    ResultCode syncCallWrapper(
+        void(MediaServerClient::*asyncFunc)(const Input&, std::function<void(ResultCode, Output)>),
+        const Input& input,
+        Output* output);
+
     template<typename Input>
     void performApiRequest(
-        const char* requestName,
+        const std::string& requestName,
         const Input& input,
         std::function<void(QnJsonRestResult)> completionHandler);
 
     template<typename Output>
     void performApiRequest(
-        const char* requestName,
+        const std::string& requestName,
         std::function<void(QnJsonRestResult, Output)> completionHandler);
 
     template<typename Input, typename ... Output>
     void performAsyncEc2Call(
-        const char* requestName,
+        const std::string& requestName,
         const Input& request,
         std::function<void(ec2::ErrorCode, Output...)> completionHandler);
 
     template<typename ... Output>
     void performAsyncEc2Call(
-        const char* requestName,
+        const std::string& requestName,
         std::function<void(ec2::ErrorCode, Output...)> completionHandler);
 
     ec2::ErrorCode systemErrorCodeToEc2Error(SystemError::ErrorCode systemErrorCode);

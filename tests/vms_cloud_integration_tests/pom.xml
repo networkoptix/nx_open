@@ -1,0 +1,53 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+
+    <parent>
+        <artifactId>build_tests</artifactId>
+        <groupId>com.networkoptix.hdwitness</groupId>
+        <version>3.1.0-SNAPSHOT</version>
+        <relativePath>../build_tests</relativePath>
+    </parent>
+
+    <groupId>com.networkoptix.hdwitness</groupId>
+    <version>3.1.0-SNAPSHOT</version>
+    <modelVersion>4.0.0</modelVersion>
+    <artifactId>vms_cloud_integration_tests</artifactId>
+    <packaging>pom</packaging>
+    <name>Vms Cloud Integration Tests</name>
+
+    <properties>
+        <root.dir>${basedir}/../..</root.dir>
+
+        <qt.libs>core network xml xmlpatterns sql concurrent multimedia websockets</qt.libs>
+        <global.libs>-lmediaserver_core -lcloud_db -lcommon -lnx_network -lnx_fusion -lappserver2 -lnx_email -ludt -lcloud_db_client -lnx_speech_synthesizer -lnx_utils</global.libs>
+        <windows.oslibs>Ws2_32.lib DbgHelp.lib -lIphlpapi -lwinmm Wldap32.lib Crypt32.lib</windows.oslibs>
+        <linux.oslibs>-ldl -lldap -ltermcap</linux.oslibs>
+        <mac.oslibs>-lbz2 -framework IOKit -framework CoreServices</mac.oslibs>
+        <guid>${vms_cloud_integration_tests.guid}</guid>
+
+        <windows.defines>_VARIADIC_MAX=10</windows.defines>
+
+        <rdep.packages>gtest gmock openssl ffmpeg onvif quazip sigar festival</rdep.packages>
+        <rdep.linux.arm.packages>sasl2 openldap</rdep.linux.arm.packages>
+    </properties>
+
+    <dependencies>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>libcloud_db</artifactId>
+            <version>${project.version}</version>
+            <type>pom</type>
+            <scope>system</scope>
+            <systemPath>${root.dir}/nx_cloud/libcloud_db/pom.xml</systemPath>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>mediaserver_core</artifactId>
+            <version>${project.version}</version>
+            <type>pom</type>
+            <scope>system</scope>
+            <systemPath>${root.dir}/mediaserver_core/pom.xml</systemPath>
+        </dependency>
+    </dependencies>
+</project>
