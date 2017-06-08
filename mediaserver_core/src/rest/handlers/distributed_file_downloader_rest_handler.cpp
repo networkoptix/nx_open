@@ -1,7 +1,7 @@
 #include "distributed_file_downloader_rest_handler.h"
 
-#include <nx/network/http/httptypes.h>
-#include <nx/network/http/httpclient.h>
+#include <nx/network/http/http_types.h>
+#include <nx/network/http/http_client.h>
 #include <nx/fusion/model_functions.h>
 #include <nx/vms/common/p2p/downloader/downloader.h>
 #include <rest/server/json_rest_result.h>
