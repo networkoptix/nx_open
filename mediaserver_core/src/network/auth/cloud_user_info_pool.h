@@ -55,9 +55,9 @@ namespace detail {
 struct NonceUserCount
 {
     nx::Buffer cloudNonce;
-    size_t userCount;
+    int userCount;
 
-    NonceUserCount(const nx::Buffer& cloudNonce, size_t userCount):
+    NonceUserCount(const nx::Buffer& cloudNonce, int userCount):
         cloudNonce(cloudNonce),
         userCount(userCount)
     {}
@@ -69,9 +69,7 @@ using TimestampToNonceUserCountMap = std::map<uint64_t, NonceUserCount>;
 
 bool deserialize(
     const QString& serializedValue,
-    uint64_t* timestamp,
-    nx::Buffer* cloudNonce,
-    nx::Buffer* partialResponse);
+    std::vector<std::tuple<uint64_t, nx::Buffer, nx::Buffer>>* cloudUserInfoDataVector);
 
 } // namespace detail
 
