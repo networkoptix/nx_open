@@ -29,7 +29,8 @@ GenericMulticastIoDevice::GenericMulticastIoDevice(const QUrl& url):
 
 GenericMulticastIoDevice::~GenericMulticastIoDevice()
 {
-
+    for (const auto iface : getAllIPv4Interfaces())
+        m_socket->leaveGroup(m_url.host(), iface.address.toString());
 }
 
 bool GenericMulticastIoDevice::open(QIODevice::OpenMode openMode)

@@ -1,57 +1,9 @@
 #include "generic_multicast_media_packet.h"
+#include "utils.h"
 
 #include <algorithm>
 
 #include <nx/utils/log/assert.h>
-
-namespace {
-
-nxcip::CompressionType fromFfmpegCodecIdToNx(AVCodecID codecId)
-{
-    switch (codecId)
-    {
-        case AV_CODEC_ID_NONE:
-            return nxcip::CompressionType::AV_CODEC_ID_NONE;
-        case AV_CODEC_ID_MPEG2VIDEO:
-            return nxcip::CompressionType::AV_CODEC_ID_MPEG2VIDEO;
-        case AV_CODEC_ID_H263:
-            return nxcip::CompressionType::AV_CODEC_ID_H263;
-        case AV_CODEC_ID_MJPEG:
-            return nxcip::CompressionType::AV_CODEC_ID_MJPEG;
-        case AV_CODEC_ID_MPEG4:
-            return nxcip::CompressionType::AV_CODEC_ID_MPEG4;
-        case AV_CODEC_ID_H264:
-            return nxcip::CompressionType::AV_CODEC_ID_H264;
-        case AV_CODEC_ID_THEORA:
-            return nxcip::CompressionType::AV_CODEC_ID_THEORA;
-        case AV_CODEC_ID_PNG:
-            return nxcip::CompressionType::AV_CODEC_ID_PNG;
-        case AV_CODEC_ID_GIF:
-            return nxcip::CompressionType::AV_CODEC_ID_GIF;
-
-        case AV_CODEC_ID_MP2:
-            return nxcip::CompressionType::AV_CODEC_ID_MP2;
-        case AV_CODEC_ID_MP3:
-            return nxcip::CompressionType::AV_CODEC_ID_MP3;
-        case AV_CODEC_ID_AAC:
-            return nxcip::CompressionType::AV_CODEC_ID_AAC;
-        case AV_CODEC_ID_AC3:
-            return nxcip::CompressionType::AV_CODEC_ID_AC3;
-        case AV_CODEC_ID_DTS:
-            return nxcip::CompressionType::AV_CODEC_ID_DTS;
-
-        case AV_CODEC_ID_PCM_S16LE:
-            return nxcip::CompressionType::AV_CODEC_ID_PCM_S16LE;
-        case AV_CODEC_ID_PCM_MULAW:
-            return nxcip::CompressionType::AV_CODEC_ID_PCM_MULAW;
-        case AV_CODEC_ID_VORBIS:
-            return nxcip::CompressionType::AV_CODEC_ID_VORBIS;
-        default:
-            return nxcip::CompressionType::AV_CODEC_ID_NONE;
-    }
-}
-
-} // namespace
 
 GenericMulticastMediaPacket::GenericMulticastMediaPacket(CyclicAllocator* allocator):
     m_refManager(this),
