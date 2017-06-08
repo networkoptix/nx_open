@@ -11,7 +11,7 @@
 #include <nx/utils/std/future.h>
 #include <nx/utils/test_support/module_instance_launcher.h>
 
-#include <cdb/connection.h>
+#include <nx/cloud/cdb/api/connection.h>
 #include <utils/db/test_support/test_with_db_helper.h>
 #include <utils/db/types.h>
 

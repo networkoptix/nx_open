@@ -5,7 +5,7 @@
 #include "test_disabled_ini_config.h"
 
 extern "C" {
-int test_ini_config_c();
+    #include "test_ini_config_c.h"
 } // extern "C"
 
 int main()
@@ -13,7 +13,7 @@ int main()
     int failedTestsCount = 0;
 
     failedTestsCount += nx::kit::test::runAllTests();
-        failedTestsCount += test_disabled_ini_config();
+    failedTestsCount += test_disabled_ini_config();
     failedTestsCount += test_ini_config_c();
 
     std::cerr << std::endl;

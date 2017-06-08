@@ -6,7 +6,7 @@
 #include <nx_ec/data/api_fwd.h>
 #include <nx_ec/ec_proto_version.h>
 
-#include <cdb/ec2_request_paths.h>
+#include <nx/cloud/cdb/api/ec2_request_paths.h>
 #include <nx/network/http/custom_headers.h>
 #include <nx/utils/scope_guard.h>
 

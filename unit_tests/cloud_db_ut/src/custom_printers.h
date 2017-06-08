@@ -6,7 +6,7 @@
 #include <QByteArray>
 #include <QString>
 
-#include <cdb/result_code.h>
+#include <nx/cloud/cdb/api/result_code.h>
 #include <nx_ec/impl/ec_api_impl.h>
 #include <utils/db/types.h>
 

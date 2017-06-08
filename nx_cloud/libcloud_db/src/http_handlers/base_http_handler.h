@@ -13,7 +13,7 @@
 #include <nx/network/http/server/abstract_http_request_handler.h>
 #include <nx/network/http/server/http_server_connection.h>
 
-#include <cloud_db_client/src/data/types.h>
+#include <nx/cloud/cdb/client/data/types.h>
 #include <nx/fusion/model_functions.h>
 
 #include "access_control/authorization_manager.h"

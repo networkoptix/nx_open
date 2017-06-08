@@ -8,7 +8,7 @@
 #include <nx/network/buffer.h>
 #include <nx/utils/thread/mutex.h>
 
-#include <cdb/connection.h>
+#include <nx/cloud/cdb/api/connection.h>
 
 namespace nx {
 namespace hpm {

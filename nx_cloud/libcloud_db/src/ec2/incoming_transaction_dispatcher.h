@@ -5,7 +5,7 @@
 #include <nx/utils/log/log.h>
 #include <utils/db/async_sql_query_executor.h>
 
-#include <cdb/result_code.h>
+#include <nx/cloud/cdb/api/result_code.h>
 #include <common/common_globals.h>
 #include <transaction/transaction_transport_header.h>
 #include <transaction/transaction.h>

@@ -13,7 +13,7 @@
 #include <boost/multi_index/identity.hpp>
 #include <boost/multi_index/member.hpp>
 
-#include <cdb/result_code.h>
+#include <nx/cloud/cdb/api/result_code.h>
 #include <nx/network/aio/timer.h>
 #include <nx/network/http/abstract_msg_body_source.h>
 #include <nx/utils/move_only_func.h>

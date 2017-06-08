@@ -4,7 +4,7 @@
 
 #include <nx/fusion/model_functions_fwd.h>
 
-#include <cdb/auth_provider.h>
+#include <nx/cloud/cdb/api/auth_provider.h>
 
 namespace nx {
 namespace cdb {

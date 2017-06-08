@@ -13,7 +13,7 @@
 #include <nx/utils/std/future.h>
 #include <nx/utils/thread/stoppable.h>
 
-#include <cdb/result_code.h>
+#include <nx/cloud/cdb/api/result_code.h>
 #include <nx/utils/stree/resourcecontainer.h>
 #include <utils/db/async_sql_query_executor.h>
 

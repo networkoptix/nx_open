@@ -10,7 +10,7 @@
 #include <nx/network/http/http_types.h>
 #include <nx/network/http/server/fusion_request_result.h>
 
-#include <cdb/result_code.h>
+#include <nx/cloud/cdb/api/result_code.h>
 
 
 namespace nx {

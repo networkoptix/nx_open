@@ -8,7 +8,7 @@
 
 #include <functional>
 
-#include <cdb/result_code.h>
+#include <nx/cloud/cdb/api/result_code.h>
 #include <nx/network/http/http_types.h>
 #include <nx/utils/move_only_func.h>
 #include <nx/utils/stree/resourcecontainer.h>

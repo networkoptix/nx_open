@@ -2,7 +2,7 @@
 
 #include <QString>
 
-#include <cloud_db_client/src/data/module_info.h>
+#include <nx/cloud/cdb/client/data/module_info.h>
 
 #include "access_control/authentication_manager.h"
 #include "access_control/auth_types.h"

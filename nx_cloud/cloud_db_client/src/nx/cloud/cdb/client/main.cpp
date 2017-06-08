@@ -3,7 +3,7 @@
 * akolesnikov
 ***********************************************************/
 
-#include "include/cdb/connection.h"
+#include "include/nx/cloud/cdb/api/connection.h"
 
 #include "connection_factory.h"
 

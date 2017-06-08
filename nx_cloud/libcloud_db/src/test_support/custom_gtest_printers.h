@@ -2,7 +2,7 @@
 
 #include <iostream>
 
-#include <cdb/result_code.h>
+#include <nx/cloud/cdb/api/result_code.h>
 
 namespace nx {
 namespace cdb {

@@ -7,7 +7,7 @@
 
 #include <utils/db/test_support/test_with_db_helper.h>
 
-#include <cdb/cloud_nonce.h>
+#include <nx/cloud/cdb/api/cloud_nonce.h>
 
 #include <libcloud_db/src/dao/user_authentication_data_object_factory.h>
 #include <libcloud_db/src/dao/memory/dao_memory_user_authentication.h>
@@ -15,7 +15,7 @@
 #include <libcloud_db/src/managers/authentication_provider.h>
 #include <libcloud_db/src/settings.h>
 #include <libcloud_db/src/test_support/business_data_generator.h>
-#include <cloud_db_client/src/data/auth_data.h>
+#include <nx/cloud/cdb/client/data/auth_data.h>
 
 #include "account_manager_stub.h"
 #include "system_sharing_manager_stub.h"

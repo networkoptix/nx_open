@@ -3,7 +3,7 @@
 #include <QtCore/QUrl>
 
 #include "async_http_requests_executor.h"
-#include "include/cdb/maintenance_manager.h"
+#include "include/nx/cloud/cdb/api/maintenance_manager.h"
 
 namespace nx {
 namespace cdb {

@@ -17,7 +17,7 @@
 #include <nx/utils/gzip/gzip_uncompressor.h>
 #include <nx/utils/system_error.h>
 
-#include <cdb/ec2_request_paths.h>
+#include <nx/cloud/cdb/api/ec2_request_paths.h>
 #include <nx_ec/ec_proto_version.h>
 #include <nx/utils/byte_stream/custom_output_stream.h>
 #include <utils/common/util.h>

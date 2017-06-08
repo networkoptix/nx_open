@@ -1,4 +1,4 @@
-#include "include/cdb/ec2_request_paths.h"
+#include "include/nx/cloud/cdb/api/ec2_request_paths.h"
 
 namespace nx {
 namespace cdb {

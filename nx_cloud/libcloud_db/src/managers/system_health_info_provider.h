@@ -2,7 +2,7 @@
 
 #include <string>
 
-#include <cdb/result_code.h>
+#include <nx/cloud/cdb/api/result_code.h>
 
 #include <nx/utils/counter.h>
 #include <nx/utils/subscription.h>

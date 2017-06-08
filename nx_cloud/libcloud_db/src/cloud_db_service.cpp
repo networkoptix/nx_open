@@ -24,8 +24,8 @@
 #include <utils/common/app_info.h>
 #include <utils/db/db_structure_updater.h>
 
-#include <cloud_db_client/src/cdb_request_path.h>
-#include <cdb/ec2_request_paths.h>
+#include <nx/cloud/cdb/client/cdb_request_path.h>
+#include <nx/cloud/cdb/api/ec2_request_paths.h>
 
 #include "access_control/authentication_manager.h"
 #include "dao/rdb/db_instance_controller.h"

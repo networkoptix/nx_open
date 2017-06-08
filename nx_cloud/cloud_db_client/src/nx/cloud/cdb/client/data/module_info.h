@@ -3,7 +3,7 @@
 #include <nx/fusion/model_functions_fwd.h>
 #include <nx/fusion/fusion/fusion_fwd.h>
 
-#include <cdb/module_info.h>
+#include <nx/cloud/cdb/api/module_info.h>
 
 namespace nx {
 namespace cdb {

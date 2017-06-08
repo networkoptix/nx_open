@@ -7,7 +7,7 @@
 #include <QtCore/QDir>
 #include <QtCore/QFile>
 
-#include <cdb/cloud_nonce.h>
+#include <nx/cloud/cdb/api/cloud_nonce.h>
 #include <data/account_data.h>
 #include <nx/fusion/model_functions.h>
 #include <nx/network/http/auth_tools.h>

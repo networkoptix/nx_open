@@ -192,7 +192,10 @@ template<typename Input, typename ... Output>
 void MediaServerClient::performGetRequest(
     const std::string& requestPath,
     const Input& inputData,
-    std::function<void(SystemError::ErrorCode, Output...)> completionHandler)
+    std::function<void(
+        SystemError::ErrorCode,
+        nx_http::StatusCode::Value statusCode,
+        Output...)> completionHandler)
 {
     using ActualOutputType =
         typename nx::utils::tuple_first_element<void, std::tuple<Output...>>::type;
@@ -212,17 +215,25 @@ void MediaServerClient::performGetRequest(
         [fusionClient = std::move(fusionClient),
             completionHandler = std::move(completionHandler)](
                 SystemError::ErrorCode errorCode,
-                const nx_http::Response* /*response*/,
+                const nx_http::Response* response,
                 Output... outData)
         {
-            return completionHandler(errorCode, std::move(outData)...);
+            return completionHandler(
+                errorCode,
+                response
+                    ? (nx_http::StatusCode::Value)response->statusLine.statusCode
+                    : nx_http::StatusCode::undefined,
+                std::move(outData)...);
         });
 }
 
 template<typename ... Output>
 void MediaServerClient::performGetRequest(
     const std::string& requestPath,
-    std::function<void(SystemError::ErrorCode, Output...)> completionHandler)
+    std::function<void(
+        SystemError::ErrorCode,
+        nx_http::StatusCode::Value statusCode,
+        Output...)> completionHandler)
 {
     // TODO: #ak think about a way to combine this method with the previous one
 
@@ -242,10 +253,15 @@ void MediaServerClient::performGetRequest(
         [fusionClient = std::move(fusionClient),
             completionHandler = std::move(completionHandler)](
                 SystemError::ErrorCode errorCode,
-                const nx_http::Response* /*response*/,
+                const nx_http::Response* response,
                 Output... outData)
         {
-            return completionHandler(errorCode, std::move(outData)...);
+            return completionHandler(
+                errorCode,
+                response
+                    ? (nx_http::StatusCode::Value)response->statusLine.statusCode
+                    : nx_http::StatusCode::undefined,
+                std::move(outData)...);
         });
 }
 
@@ -295,12 +311,13 @@ void MediaServerClient::performApiRequest(
     performGetRequest<Input, QnJsonRestResult>(
         requestName,
         input,
-        std::function<void(SystemError::ErrorCode, QnJsonRestResult)>(
-            [completionHandler = std::move(completionHandler)](
-                SystemError::ErrorCode sysErrorCode, QnJsonRestResult result)
+        std::function<void(SystemError::ErrorCode, nx_http::StatusCode::Value, QnJsonRestResult)>(
+            [this, completionHandler = std::move(completionHandler)](
+                SystemError::ErrorCode sysErrorCode,
+                nx_http::StatusCode::Value statusCode,
+                QnJsonRestResult result)
             {
-                if (sysErrorCode != SystemError::noError)
-                    result.error = QnRestResult::CantProcessRequest;
+                result.error = toApiErrorCode(sysErrorCode, statusCode);
                 completionHandler(std::move(result));
             }));
 }
@@ -312,17 +329,29 @@ void MediaServerClient::performApiRequest(
 {
     performGetRequest<QnJsonRestResult>(
         requestName,
-        std::function<void(SystemError::ErrorCode, QnJsonRestResult)>(
-            [completionHandler = std::move(completionHandler)](
-                SystemError::ErrorCode sysErrorCode, QnJsonRestResult result)
+        std::function<void(SystemError::ErrorCode, nx_http::StatusCode::Value, QnJsonRestResult)>(
+            [this, completionHandler = std::move(completionHandler)](
+                SystemError::ErrorCode sysErrorCode,
+                nx_http::StatusCode::Value statusCode,
+                QnJsonRestResult result)
             {
                 Output output;
-                if (sysErrorCode == SystemError::noError)
+                result.error = toApiErrorCode(sysErrorCode, statusCode);
+                if (result.error == QnRestResult::NoError)
                     output = result.deserialized<Output>();
-                else
-                    result.error = QnRestResult::CantProcessRequest;
                 completionHandler(std::move(result), std::move(output));
             }));
+}
+
+QnRestResult::Error MediaServerClient::toApiErrorCode(
+    SystemError::ErrorCode sysErrorCode,
+    nx_http::StatusCode::Value statusCode)
+{
+    if (sysErrorCode != SystemError::noError)
+        return QnRestResult::CantProcessRequest;
+    if (!nx_http::StatusCode::isSuccessCode(statusCode))
+        return QnRestResult::CantProcessRequest;
+    return QnRestResult::NoError;
 }
 
 template<typename Input, typename ... Output>
@@ -334,13 +363,14 @@ void MediaServerClient::performAsyncEc2Call(
     performGetRequest<Output...>(
         requestName,
         request,
-        std::function<void(SystemError::ErrorCode)>(
+        std::function<void(SystemError::ErrorCode, nx_http::StatusCode::Value)>(
             [this, completionHandler = std::move(completionHandler)](
                 SystemError::ErrorCode sysErrorCode,
+                nx_http::StatusCode::Value statusCode,
                 Output... output)
             {
                 completionHandler(
-                    systemErrorCodeToEc2Error(sysErrorCode),
+                    toEc2ErrorCode(sysErrorCode, statusCode),
                     std::move(output)...);
             }));
 }
@@ -352,20 +382,26 @@ void MediaServerClient::performAsyncEc2Call(
 {
     performGetRequest<Output...>(
         requestName,
-        std::function<void(SystemError::ErrorCode, Output...)>(
+        std::function<void(SystemError::ErrorCode, nx_http::StatusCode::Value, Output...)>(
             [this, completionHandler = std::move(completionHandler)](
-                SystemError::ErrorCode sysErrorCode, Output... result)
+                SystemError::ErrorCode sysErrorCode,
+                nx_http::StatusCode::Value statusCode,
+                Output... result)
             {
                 completionHandler(
-                    systemErrorCodeToEc2Error(sysErrorCode),
+                    toEc2ErrorCode(sysErrorCode, statusCode),
                     std::move(result)...);
             }));
 }
 
-ec2::ErrorCode MediaServerClient::systemErrorCodeToEc2Error(
-    SystemError::ErrorCode systemErrorCode)
+ec2::ErrorCode MediaServerClient::toEc2ErrorCode(
+    SystemError::ErrorCode systemErrorCode,
+    nx_http::StatusCode::Value statusCode)
 {
-    return systemErrorCode == SystemError::noError
-        ? ec2::ErrorCode::ok
-        : ec2::ErrorCode::ioError;
+    if (systemErrorCode != SystemError::noError)
+        return ec2::ErrorCode::ioError;
+    if (!nx_http::StatusCode::isSuccessCode(statusCode))
+        return ec2::ErrorCode::forbidden;
+
+    return ec2::ErrorCode::ok;
 }

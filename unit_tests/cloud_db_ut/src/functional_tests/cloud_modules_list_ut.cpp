@@ -10,7 +10,7 @@
 #include <nx/utils/test_support/utils.h>
 #include <nx/utils/uuid.h>
 
-#include <cloud_db_client/src/cdb_request_path.h>
+#include <nx/cloud/cdb/client/cdb_request_path.h>
 #include <managers/cloud_module_url_provider.h>
 
 #include "test_setup.h"
