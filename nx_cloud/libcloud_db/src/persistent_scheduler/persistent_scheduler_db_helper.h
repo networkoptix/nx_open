@@ -11,7 +11,7 @@ class AbstractSchedulerDbHelper
 {
 public:
     virtual nx::db::DBResult registerEventReceiver(const QnUuid& receiverId) = 0;
-    virtual ScheduleDataVector getScheduleData() const = 0;
+    virtual ScheduleData getScheduleData(nx::db::QueryContext* queryContext) const = 0;
 };
 
 }

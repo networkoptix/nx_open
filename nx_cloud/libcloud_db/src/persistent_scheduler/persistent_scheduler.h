@@ -7,6 +7,7 @@
 #include <nx/utils/singleton.h>
 #include <utils/db/async_sql_query_executor.h>
 #include "persistent_scheduler_db_helper.h"
+#include "persistent_scheduler_common.h"
 
 namespace nx {
 namespace db {
@@ -20,14 +21,13 @@ namespace nx {
 namespace cdb {
 
 class PersistentSheduler;
-using ScheduleParamsMap = std::unordered_map<std::string, std::string>;
 
 class AbstractPersistentScheduleEventReceiver
 {
 public:
     virtual void persistentTimerFired(
         const QnUuid& taskId,
-        const ScheduleParamsMap& params,
+        const ScheduleParams& params,
         nx::db::QueryContext* context) = 0;
 
     virtual ~AbstractPersistentScheduleEventReceiver() {}
@@ -50,10 +50,13 @@ public:
     QnUuid subscribe(
         const QnUuid& functorId,
         std::chrono::milliseconds timeout,
-        const ScheduleParamsMap& params,
+        const ScheduleParams& params,
         nx::db::QueryContext* queryContext);
 
     void unsubscribe(const QnUuid& taskId, nx::db::QueryContext* queryContext);
+
+private:
+    void startTimerTasks(const ScheduleData& scheduleData);
 
 private:
     nx::db::AbstractAsyncSqlQueryExecutor* m_sqlExecutor;

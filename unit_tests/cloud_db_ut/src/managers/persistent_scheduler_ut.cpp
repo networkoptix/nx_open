@@ -12,7 +12,7 @@ namespace test {
 class DbHelperStub: public nx::cdb::AbstractSchedulerDbHelper
 {
 public:
-    MOCK_CONST_METHOD0(getScheduleData, ScheduleDataVector());
+    MOCK_CONST_METHOD1(getScheduleData, ScheduleData(nx::db::QueryContext*));
     MOCK_METHOD1(registerEventReceiver, nx::db::DBResult(const QnUuid& receiverId));
 };
 
@@ -35,7 +35,7 @@ public:
 
     virtual void persistentTimerFired(
         const QnUuid& taskId,
-        const ScheduleParamsMap& params,
+        const ScheduleParams& params,
         nx::db::QueryContext* context) override
     {
         ASSERT_NE(params.find("key1"), params.cend());
@@ -136,7 +136,7 @@ const QnUuid SchedulerUser::functorTypeId = QnUuid::fromStringSafe("{EC05F182-93
 TEST_F(PersistentScheduler, initialization)
 {
     whenSchedulerAndUserInitialized();
-    EXPECT_CALL(dbHelper, getScheduleData()).Times(1);
+    EXPECT_CALL(dbHelper, getScheduleData(nullptr)).Times(::testing::AtLeast(1));
 }
 
 
