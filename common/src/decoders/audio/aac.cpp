@@ -2,7 +2,8 @@
 
 #ifdef ENABLE_DATA_PROVIDERS
 
-#include "utils/media/bitStream.h"
+#include <utils/media/bitStream.h>
+#include <utils/math/math.h>
 
 // convert AAC prifle to mpeg 4 object type.
 
@@ -65,7 +66,7 @@ bool AdtsHeader::decodeFromFrame(const uint8_t* const buffer, int bufferSize)
 
 bool AdtsHeader::encodeToFfmpegExtradata(QByteArray* extradata) const
 {
-    extradata->resize(kAscLength);
+    extradata->resize(qPower2Ceil((unsigned int)kAscLength, sizeof(int)));
     auto buffer = extradata->data();
     try
     {
@@ -85,6 +86,7 @@ bool AdtsHeader::encodeToFfmpegExtradata(QByteArray* extradata) const
         return false;
     }
 
+    extradata->resize(kAscLength);
     return true;
 }
 

@@ -67,7 +67,6 @@ private:
         Extras* outExtras);
 
     bool isPacketOk(const AVPacket& packet) const;
-    bool isH264Delimiter(const AVPacket& packet) const;
     bool isPacketStreamOk(const AVPacket& packet) const;
     bool isPacketDataTypeOk(const AVPacket& packet) const;
     bool isPacketTimestampOk(const AVPacket& packet) const;

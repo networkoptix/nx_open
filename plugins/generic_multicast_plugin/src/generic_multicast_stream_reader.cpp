@@ -245,7 +245,7 @@ bool GenericMulticastStreamReader::initLayout()
     int videoChannelNumber = -1;
     int audioChannelNumber = -1;
 
-    for (auto i = 0; i < m_formatContext->nb_streams; i++)
+    for (unsigned int i = 0; i < m_formatContext->nb_streams; i++)
     {
         AVStream *stream = m_formatContext->streams[i];
         AVCodecContext *codecContext = stream->codec;
@@ -268,7 +268,7 @@ bool GenericMulticastStreamReader::initLayout()
     }
 
     lastStreamId = -1;
-    for (auto i = 0; i < m_formatContext->nb_streams; i++)
+    for (unsigned int i = 0; i < m_formatContext->nb_streams; i++)
     {
         AVStream *stream = m_formatContext->streams[i];
         AVCodecContext *codecContext = stream->codec;
@@ -303,9 +303,6 @@ bool GenericMulticastStreamReader::isPacketOk(const AVPacket& packet) const
     if (packet.size <= 0)
         return false;
 
-    if (isH264Delimiter(packet))
-        return false;
-
     if (!isPacketDataTypeOk(packet))
         return false;
 
@@ -315,25 +312,12 @@ bool GenericMulticastStreamReader::isPacketOk(const AVPacket& packet) const
     return true;
 }
 
-bool GenericMulticastStreamReader::isH264Delimiter(const AVPacket& packet) const
-{
-    if (!isPacketStreamOk(packet))
-        return false;
-
-    auto stream = m_formatContext->streams[packet.stream_index];
-
-    return stream->codecpar->codec_id == AV_CODEC_ID_H264
-        && packet.size == 6
-        && packet.data[0] == 0x00
-        && packet.data[1] == 0x00
-        && packet.data[2] == 0x00
-        && packet.data[3] == 0x01
-        && packet.data[4] == nuDelimiter;
-}
-
 bool GenericMulticastStreamReader::isPacketStreamOk(const AVPacket& packet) const
 {
-    auto streamIndex = packet.stream_index;
+    if (packet.stream_index < 0)
+        return false;
+
+    unsigned int streamIndex = packet.stream_index;
 
     bool noCorrespondentChannel = m_streamIndexToChannelNumber.find(streamIndex)
         == m_streamIndexToChannelNumber.end();
@@ -488,9 +472,6 @@ bool GenericMulticastStreamReader::removeAdtsHeaderAndFillExtradata(
 {
     if (!isPacketStreamOk(packet))
         return false;
-
-    auto stream = m_formatContext->streams[packet.stream_index];
-    auto codecContext = stream->codec;
 
     AdtsHeader header;
     if (!header.decodeFromFrame(packet.data, packet.size))

@@ -9,7 +9,7 @@
 
 namespace {
 
-const std::size_t kBufferCapacity = 50 * 1024;
+const std::size_t kBufferCapacity = 32 * 1024;
 const std::chrono::milliseconds kReceiveTimeout(3000);
 const int kFixedRtpHeaderLength = 12;
 const char kRtpHeaderMask = 0b01000000;
@@ -77,7 +77,7 @@ qint64 GenericMulticastIoDevice::readData(char* buf, qint64 maxlen)
     }
 }
 
-qint64 GenericMulticastIoDevice::writeData(const char* buf, qint64 size)
+qint64 GenericMulticastIoDevice::writeData(const char* /*buf*/, qint64 /*size*/)
 {
     NX_ASSERT(false, lm("We should not write data to multicast IO device."));
     return 0;
@@ -111,6 +111,9 @@ qint64 GenericMulticastIoDevice::cutRtpHeaderOff(const char* inBuf, qint64 inBuf
     // If it's not rtp packet
     if (!(inBuf[0] & kRtpHeaderMask))
     {
+        if (outBufLength < inBufLength)
+            return 0;
+
         memcpy(outBuf, inBuf, inBufLength);
         return inBufLength;
     }
@@ -126,6 +129,9 @@ qint64 GenericMulticastIoDevice::cutRtpHeaderOff(const char* inBuf, qint64 inBuf
 
     if (!hasExtension)
     {
+        if (outBufLength < payloadLength)
+            return 0;
+
         payloadLength = inBufLength - rtpHeaderLength;
         memcpy(outBuf, inBuf, payloadLength);
         return payloadLength;
@@ -143,6 +149,10 @@ qint64 GenericMulticastIoDevice::cutRtpHeaderOff(const char* inBuf, qint64 inBuf
         return 0;
 
     inBuf += kExtensionLengthFieldLength;
+
+    if (outBufLength < payloadLength)
+        return 0;
+
     memcpy(outBuf, inBuf, payloadLength);
     return payloadLength;
 }

@@ -84,8 +84,6 @@ int GenericMulticastMediaEncoder::setBitrate(int /*bitrateKbps*/, int* /*selecte
 
 nxcip::StreamReader* GenericMulticastMediaEncoder::getLiveStreamReader()
 {
-    qDebug() << "getting live stream reader!";
-
     if (!m_streamReader)
     {
         auto url = QUrl(m_cameraManager->info().url);
@@ -93,10 +91,7 @@ nxcip::StreamReader* GenericMulticastMediaEncoder::getLiveStreamReader()
     }
 
     if (!m_streamReader->open())
-    {
-        qDebug() << "Unable to open stream!";
         return nullptr;
-    }
 
     m_streamReader->setAudioEnabled(m_cameraManager->isAudioEnabled());
     m_streamReader->addRef();
