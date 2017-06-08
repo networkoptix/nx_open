@@ -10,7 +10,7 @@
 #include "cdb_nonce_fetcher.h"
 
 
-static const QString kCloudAuthInfoKey = lit("cloudAuthInfo");
+static const QString kCloudAuthInfoKey = nx::cdb::api::kVmsUserAuthInfoAttributeName;
 
 // CloudUserInfoPoolSupplier
 CloudUserInfoPoolSupplier::CloudUserInfoPoolSupplier(QnCommonModule* commonModule)
