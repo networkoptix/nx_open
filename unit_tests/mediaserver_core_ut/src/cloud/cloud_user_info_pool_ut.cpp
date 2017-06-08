@@ -154,7 +154,7 @@ TEST_F(CloudUserInfoPool, commonNonce_simple)
 {
     given2UsersInfos();
     auto nonce = userInfoPool.newestMostCommonNonce();
-    ASSERT_TRUE(nonce);
+    ASSERT_TRUE((bool)nonce);
     ASSERT_EQ(*nonce, nx::Buffer(generateTestNonce(2)));
 }
 
@@ -164,7 +164,7 @@ TEST_F(CloudUserInfoPool, commonNonce_3rdAdded)
     when3rdWithNonce3HasBeenAdded();
 
     auto nonce = userInfoPool.newestMostCommonNonce();
-    ASSERT_TRUE(nonce);
+    ASSERT_TRUE((bool)nonce);
     ASSERT_EQ(*nonce, nx::Buffer(generateTestNonce(3)));
 }
 
@@ -176,7 +176,7 @@ TEST_F(CloudUserInfoPool, commonNonce_EveryoneHaveNewestNonce)
     thenOnlyNewestNonceShouldStayInThePool();
 
     auto nonce = userInfoPool.newestMostCommonNonce();
-    ASSERT_TRUE(nonce);
+    ASSERT_TRUE((bool)nonce);
     ASSERT_EQ(*nonce, nx::Buffer(generateTestNonce(3)));
 }
 
@@ -225,7 +225,7 @@ TEST_F(CloudUserInfoPool, userRemoved)
     supplier->removeUserInfo("vasya");
 
     auto nonce = userInfoPool.newestMostCommonNonce();
-    ASSERT_TRUE(nonce);
+    ASSERT_TRUE((bool)nonce);
     ASSERT_EQ(*nonce, nx::Buffer(generateTestNonce(3)));
 
     ASSERT_FALSE(userInfoPool.authenticate(kTestMethod, vasya1Auth));
@@ -244,7 +244,7 @@ TEST_F(CloudUserInfoPool, userRemoved_3users)
     supplier->removeUserInfo("vasya");
 
     auto nonce = userInfoPool.newestMostCommonNonce();
-    ASSERT_TRUE(nonce);
+    ASSERT_TRUE((bool)nonce);
     ASSERT_EQ(*nonce, nx::Buffer(generateTestNonce(3)));
 
     ASSERT_FALSE(userInfoPool.authenticate(kTestMethod, vasya1Auth));

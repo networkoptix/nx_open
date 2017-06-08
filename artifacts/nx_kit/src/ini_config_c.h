@@ -1,7 +1,7 @@
 /**@file
  * This is a C99 wrapper for C++ module "ini_config". Only one .ini instance is supported for now.
  *
- * NOTE: Compile with -DNX_KIT_API='__attribute__((visibility ("hidden")))'
+ * If compiled into a library, define -DNX_KIT_C_API as needed for import/export directives.
  *
  * In your C program, use .ini options as follows:
  * <pre><code>
@@ -45,13 +45,15 @@
  * </code></pre>
  */
 
-#include <stdbool.h>
+#if !defined(__cplusplus)
+    #include <stdbool.h>
+#endif // !defined(__cplusplus)
 
 #define NX_INI_FLAG(DEFAULT, PARAM, DESCR) bool PARAM
 #define NX_INI_INT(DEFAULT, PARAM, DESCR) int PARAM
 #define NX_INI_STRING(DEFAULT, PARAM, DESCR) const char* PARAM
 
-struct Ini NX_INI_STRUCT;
+struct Ini NX_INI_STRUCT; //< Ini struct definition.
 
 #undef NX_INI_FLAG
 #undef NX_INI_INT
@@ -59,27 +61,36 @@ struct Ini NX_INI_STRUCT;
 
 enum NxIniOutput { NX_INI_OUTPUT_NONE, NX_INI_OUTPUT_STDOUT, NX_INI_OUTPUT_STDERR };
 
+#if !defined(NX_KIT_C_API)
+    #define NX_KIT_C_API
+#endif
+
+#if defined(__cplusplus)
+    extern "C" {
+#endif
+
+NX_KIT_C_API extern struct Ini ini; //< Ini struct global variable declaration.
+
+NX_KIT_C_API bool nx_ini_isEnabled(void);
+NX_KIT_C_API void nx_ini_setOutput(enum NxIniOutput output);
+NX_KIT_C_API void nx_ini_reload(void);
+NX_KIT_C_API const char* nx_ini_iniFile(void);
+NX_KIT_C_API const char* nx_ini_iniFileDir(void);
+NX_KIT_C_API const char* nx_ini_iniFilePath(void);
+
+#if defined(__cplusplus)
+    } // extern "C"
+#endif
+
 //-------------------------------------------------------------------------------------------------
-#if !defined(__cplusplus) // Included in C project
-
-NX_KIT_API extern const struct Ini ini; //< Global variable declaration. Definition is in ini.cpp.
-
-NX_KIT_API bool nx_ini_isEnabled(void);
-NX_KIT_API void nx_ini_setOutput(enum NxIniOutput output);
-NX_KIT_API void nx_ini_reload(void);
-NX_KIT_API const char* nx_ini_iniFile(void);
-NX_KIT_API const char* nx_ini_iniFileDir(void);
-NX_KIT_API const char* nx_ini_iniFilePath(void);
-
-//-------------------------------------------------------------------------------------------------
-#else // !defined(__cplusplus) // Included from ini.cpp
+#if defined(__cplusplus) // Included from ini.cpp
 
 #include <nx/kit/ini_config.h>
 
 using nx::kit::IniConfig;
 
 extern "C" {
-    NX_KIT_API struct Ini ini; //< Global variable definition. Non-const to assign default values.
+    struct Ini ini; //< Ini struct global variable definition. Non-const to assign default values.
 } // extern "C"
 
 namespace {
@@ -105,7 +116,7 @@ struct CppIni: public IniConfig
         NX_INI_STRUCT //< Expands using the macros defined above.
     }
 
-    Ini* pIni = &ini;
+    Ini* const pIni = &ini;
 };
 
 static CppIni cppIni;
@@ -114,9 +125,9 @@ static CppIni cppIni;
 
 extern "C" {
 
-NX_KIT_API bool nx_ini_isEnabled() { return IniConfig::isEnabled(); }
+bool nx_ini_isEnabled() { return IniConfig::isEnabled(); }
 
-NX_KIT_API void nx_ini_setOutput(enum NxIniOutput output)
+void nx_ini_setOutput(enum NxIniOutput output)
 {
     switch (output)
     {
@@ -129,10 +140,10 @@ NX_KIT_API void nx_ini_setOutput(enum NxIniOutput output)
     }
 }
 
-NX_KIT_API void nx_ini_reload() { cppIni.reload(); }
-NX_KIT_API const char* nx_ini_iniFile() { return cppIni.iniFile(); }
-NX_KIT_API const char* nx_ini_iniFileDir() { return cppIni.iniFileDir(); }
-NX_KIT_API const char* nx_ini_iniFilePath() { return cppIni.iniFilePath(); }
+void nx_ini_reload() { cppIni.reload(); }
+const char* nx_ini_iniFile() { return cppIni.iniFile(); }
+const char* nx_ini_iniFileDir() { return cppIni.iniFileDir(); }
+const char* nx_ini_iniFilePath() { return cppIni.iniFilePath(); }
 
 } // extern "C"
 

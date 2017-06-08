@@ -27,10 +27,6 @@ QnISDStreamReader::~QnISDStreamReader()
     stop();
 }
 
-//static const int BYTES_PER_KB = 1024;
-
-#define USE_VBR
-
 QString QnISDStreamReader::serializeStreamParams(
     const QnLiveStreamParams& params,
     const QSize& resolution,
@@ -41,29 +37,15 @@ QString QnISDStreamReader::serializeStreamParams(
     QString result;
     QTextStream t(&result);
 
-#ifndef USE_VBR
-    //const QnSecurityCamResource* cameraRes = dynamic_cast<const QnSecurityCamResource*>(m_resource.data());
-    //NX_ASSERT( cameraRes );
-    //const bool isAmbarellaFirmware = cameraRes->getModel().indexOf(lit("4K")) != -1;
-    const bool isAmbarellaChipset = true;
-#endif
     static const int kMinBitrate = 256; //< kbps
     const int desiredBitrateKbps = std::max(kMinBitrate, res->suggestBitrateKbps(params.quality, resolution, params.fps));
 
     t << "VideoInput.1.h264." << profileIndex << ".Resolution=" << res->getSecondaryResolution().width()
       << "x" << res->getSecondaryResolution().height() << "\r\n";
     t << "VideoInput.1.h264." << profileIndex << ".FrameRate=" << params.fps << "\r\n";
-#ifndef USE_VBR
-    int constantBitrateToSetKbps = isAmbarellaChipset
-        ? desiredBitrateKbps * 30 / fps     //constant bitrate MUST be multiplied by 30/fps
-        : desiredBitrateKbps;
-    t << "VideoInput.1.h264." << profileIndex << ".BitrateControl=cbr\r\n";
-    t << "VideoInput.1.h264." << profileIndex << ".BitRate=" << constantBitrateToSetKbps << "\r\n";
-#else
     t << "VideoInput.1.h264." << profileIndex << ".BitrateControl=vbr\r\n";
     t << "VideoInput.1.h264." << profileIndex << ".BitrateVariableMin=" << desiredBitrateKbps / 5 << "\r\n";
     t << "VideoInput.1.h264." << profileIndex << ".BitrateVariableMax=" << desiredBitrateKbps / 5 * 6 << "\r\n";    //*1.2
-#endif
     t.flush();
     return result;
 }

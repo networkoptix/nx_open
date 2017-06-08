@@ -1,3 +1,5 @@
+#include "test_ini_config_c.h"
+
 /**@file
  * C99 test for ini_config_c.h.
  */

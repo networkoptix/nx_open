@@ -1,8 +1,7 @@
 #pragma once
 
 /**@file
- * Rudimentary header-only unit testing framework for C99. Each tests should be called manually.
- * Process exits
+ * Rudimentary header-only unit testing framework for C99. Each test should be called manually.
  */
 
 #include <stdio.h>
