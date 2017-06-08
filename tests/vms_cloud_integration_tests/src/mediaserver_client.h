@@ -84,12 +84,18 @@ private:
     void performGetRequest(
         const std::string& requestPath,
         const Input& inputData,
-        std::function<void(SystemError::ErrorCode, Output...)> completionHandler);
+        std::function<void(
+            SystemError::ErrorCode,
+            nx_http::StatusCode::Value statusCode,
+            Output...)> completionHandler);
 
     template<typename ... Output>
     void performGetRequest(
         const std::string& requestPath,
-        std::function<void(SystemError::ErrorCode, Output...)> completionHandler);
+        std::function<void(
+            SystemError::ErrorCode,
+            nx_http::StatusCode::Value statusCode,
+            Output...)> completionHandler);
 
     template<typename ResultCode, typename Output>
     ResultCode syncCallWrapper(
@@ -118,6 +124,10 @@ private:
         const std::string& requestName,
         std::function<void(QnJsonRestResult, Output)> completionHandler);
 
+    QnRestResult::Error toApiErrorCode(
+        SystemError::ErrorCode sysErrorCode,
+        nx_http::StatusCode::Value statusCode);
+
     template<typename Input, typename ... Output>
     void performAsyncEc2Call(
         const std::string& requestName,
@@ -129,5 +139,7 @@ private:
         const std::string& requestName,
         std::function<void(ec2::ErrorCode, Output...)> completionHandler);
 
-    ec2::ErrorCode systemErrorCodeToEc2Error(SystemError::ErrorCode systemErrorCode);
+    ec2::ErrorCode toEc2ErrorCode(
+        SystemError::ErrorCode systemErrorCode,
+        nx_http::StatusCode::Value statusCode);
 };
