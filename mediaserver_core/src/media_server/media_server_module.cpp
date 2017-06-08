@@ -37,6 +37,8 @@
 #include <nx/mediaserver/unused_wallpapers_watcher.h>
 #include <core/resource_management/resource_pool.h>
 
+#include <nx/vms/common/p2p/downloader/downloader.h>
+
 namespace {
 
 void installTranslations()
@@ -46,6 +48,19 @@ void installTranslations()
     QnTranslationManager translationManager;
     QnTranslation defaultTranslation = translationManager.loadTranslation(kDefaultPath);
     QnTranslationManager::installTranslation(defaultTranslation);
+}
+
+QDir downloadsDirectory()
+{
+    const QString varDir = qnServerModule->roSettings()->value("varDir").toString();
+    if (varDir.isEmpty())
+        return QDir();
+
+    const QDir dir(varDir + lit("/downloads"));
+    if (!dir.exists())
+        QDir().mkpath(dir.absolutePath());
+
+    return dir;
 }
 
 } // namespace
@@ -122,6 +137,9 @@ QnMediaServerModule::QnMediaServerModule(
         ));
 
     store(new QnFileDeletor(commonModule()));
+
+    store(new nx::vms::common::p2p::downloader::Downloader(
+        downloadsDirectory(), commonModule()));
 
     // Translations must be installed from the main applicaition thread.
     executeDelayed(&installTranslations, kDefaultDelay, qApp->thread());
