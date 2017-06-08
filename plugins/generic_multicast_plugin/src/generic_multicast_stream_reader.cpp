@@ -140,7 +140,7 @@ int GenericMulticastStreamReader::getNextData(nxcip::MediaDataPacket** outPacket
 
         stream = m_formatContext->streams[packet.stream_index];
         auto mediaPacket = std::make_unique<GenericMulticastMediaPacket>(&m_allocator);
-        mediaPacket->setCodecType(stream->codec->codec_id);
+        mediaPacket->setCodecType(stream->codecpar->codec_id);
         mediaPacket->setTimestamp(packetTimestamp(packet));
         mediaPacket->setChannelNumber(packetChannelNumber(packet));
         mediaPacket->setFlags(packetFlags(packet));
@@ -172,10 +172,10 @@ bool GenericMulticastStreamReader::initLayout()
 
     for (unsigned int i = 0; i < m_formatContext->nb_streams; i++)
     {
-        AVStream *stream = m_formatContext->streams[i];
-        AVCodecContext *codecContext = stream->codec;
+        AVStream* stream = m_formatContext->streams[i];
+        AVCodecParameters* params = stream->codecpar;
 
-        if (codecContext->codec_type >= AVMEDIA_TYPE_NB)
+        if (params->codec_type >= AVMEDIA_TYPE_NB)
             continue;
 
         if (stream->id && stream->id == lastStreamId)
@@ -183,7 +183,7 @@ bool GenericMulticastStreamReader::initLayout()
 
         lastStreamId = stream->id;
 
-        if (codecContext->codec_type == AVMEDIA_TYPE_VIDEO)
+        if (params->codec_type == AVMEDIA_TYPE_VIDEO)
         {
             if (m_firstVideoIndex == -1)
                 m_firstVideoIndex = i;
@@ -195,10 +195,10 @@ bool GenericMulticastStreamReader::initLayout()
     lastStreamId = -1;
     for (unsigned int i = 0; i < m_formatContext->nb_streams; i++)
     {
-        AVStream *stream = m_formatContext->streams[i];
-        AVCodecContext *codecContext = stream->codec;
+        AVStream* stream = m_formatContext->streams[i];
+        AVCodecParameters* params = stream->codecpar;
 
-        if (codecContext->codec_type >= AVMEDIA_TYPE_NB)
+        if (params->codec_type >= AVMEDIA_TYPE_NB)
             continue;
 
         if (stream->id && stream->id == lastStreamId)
@@ -206,17 +206,17 @@ bool GenericMulticastStreamReader::initLayout()
 
         lastStreamId = stream->id;
 
-        if (codecContext->codec_type == AVMEDIA_TYPE_AUDIO)
+        if (params->codec_type == AVMEDIA_TYPE_AUDIO)
         {
             ++audioChannelNumber;
             m_streamIndexToChannelNumber[i] = videoChannelNumber + audioChannelNumber + 1;
-            m_audioFormat.compressionType = fromFfmpegCodecIdToNx(codecContext->codec_id);
-            m_audioFormat.bitsPerCodedSample = codecContext->bits_per_coded_sample;
-            m_audioFormat.sampleRate = codecContext->sample_rate;
-            m_audioFormat.sampleFmt = fromFfmpegSampleFormatToNx(codecContext->sample_fmt);
-            m_audioFormat.bitrate = codecContext->bit_rate;
-            m_audioFormat.channelLayout = AV_CH_LAYOUT_STEREO;
-            m_audioFormat.channels = 2;
+            m_audioFormat.compressionType = fromFfmpegCodecIdToNx(params->codec_id);
+            m_audioFormat.bitsPerCodedSample = params->bits_per_coded_sample;
+            m_audioFormat.sampleRate = params->sample_rate;
+            m_audioFormat.sampleFmt = fromFfmpegSampleFormatToNx((AVSampleFormat)params->format);
+            m_audioFormat.bitrate = params->bit_rate;
+            m_audioFormat.channelLayout = params->channel_layout;
+            m_audioFormat.channels = params->channels;
         }
     }
 
@@ -329,7 +329,7 @@ unsigned int GenericMulticastStreamReader::packetFlags(const AVPacket& packet) c
     
     auto stream = m_formatContext->streams[packet.stream_index];
 
-    if (packet.flags & AV_PKT_FLAG_KEY && stream->codec->codec_type != AVMEDIA_TYPE_AUDIO)
+    if (packet.flags & AV_PKT_FLAG_KEY && stream->codecpar->codec_type != AVMEDIA_TYPE_AUDIO)
         flags |= nxcip::MediaDataPacket::Flags::fKeyPacket;
 
     return flags;
@@ -375,7 +375,7 @@ bool GenericMulticastStreamReader::preprocessPacket(
 
     auto stream = m_formatContext->streams[packet.stream_index];
 
-    if (stream->codec->codec_id == AV_CODEC_ID_AAC && hasAdtsHeader(packet))
+    if (stream->codecpar->codec_id == AV_CODEC_ID_AAC && hasAdtsHeader(packet))
         removeAdtsHeaderAndFillExtradata(packet, data, dataSize, outExtras);
 
     return true;
@@ -426,4 +426,3 @@ void GenericMulticastStreamReader::setAudioEnabled(bool audioEnabled)
 {
     m_audioEnabled = audioEnabled;
 }
-

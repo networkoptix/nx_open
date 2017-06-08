@@ -80,7 +80,7 @@ private:
 
 private:
     nxpt::CommonRefManager m_refManager;
-    std::atomic<bool> m_interrupted = false;
+    std::atomic<bool> m_interrupted = {false};
     QUrl m_url;
     std::unique_ptr<QIODevice> m_ioDevice;
     CyclicAllocator m_allocator;
