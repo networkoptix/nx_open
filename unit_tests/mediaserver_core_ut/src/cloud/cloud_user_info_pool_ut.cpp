@@ -136,17 +136,21 @@ protected:
 TEST_F(CloudUserInfoPool, deserialize)
 {
     const QString kSimpleString =
-        lm("{\"timestamp\":1234567,\"cloudNonce\":\"abcdef0123456\",\"partialResponse\":\"response\"}");
+        lm("[{\"timestamp\":111,\"cloudNonce\":\"nonce1\",\"partialResponse\":\"response1\"}, \
+             {\"timestamp\":222,\"cloudNonce\":\"nonce2\",\"partialResponse\":\"response2\"}]");
 
-    uint64_t ts;
-    nx::Buffer nonce;
-    nx::Buffer response;
-    ASSERT_TRUE(detail::deserialize(kSimpleString, &ts, &nonce, &response));
+    std::vector<std::tuple<uint64_t, nx::Buffer, nx::Buffer>> cloudUserInfoDataVector;
+    ASSERT_TRUE(detail::deserialize(kSimpleString, &cloudUserInfoDataVector));
 
+    ASSERT_EQ(cloudUserInfoDataVector.size(), 2);
 
-    ASSERT_EQ(ts, 1234567);
-    ASSERT_EQ(nonce, "abcdef0123456");
-    ASSERT_EQ(response, "response");
+    ASSERT_EQ(std::get<0>(cloudUserInfoDataVector[0]), 111);
+    ASSERT_EQ(std::get<1>(cloudUserInfoDataVector[0]), "nonce1");
+    ASSERT_EQ(std::get<2>(cloudUserInfoDataVector[0]), "response1");
+
+    ASSERT_EQ(std::get<0>(cloudUserInfoDataVector[1]), 222);
+    ASSERT_EQ(std::get<1>(cloudUserInfoDataVector[1]), "nonce2");
+    ASSERT_EQ(std::get<2>(cloudUserInfoDataVector[1]), "response2");
 }
 
 
