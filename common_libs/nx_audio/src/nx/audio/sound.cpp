@@ -40,6 +40,13 @@ Sound::Sound(ALCdevice *device, const QnAudioFormat& audioFormat):
         m_size = bitRate() / 32; // use 30+ ms buffers
         // Multiply by 2 to align OpenAL buffer
         int sampleSize = 2 * audioFormat.channelCount() * audioFormat.sampleSize() / 8;
+
+        if (sampleSize == 0)
+        {
+            m_isValid = false;
+            return;
+        }
+
         if (m_size % sampleSize)
             m_size += sampleSize - (m_size % sampleSize);
     }
@@ -67,7 +74,9 @@ Sound::~Sound()
     directDisconnectAll();
     if (!m_deinitialized)
         internalClear();
-    delete [] m_proxyBuffer;
+
+    if (m_proxyBuffer)
+        delete [] m_proxyBuffer;
 }
 
 bool Sound::setup()
