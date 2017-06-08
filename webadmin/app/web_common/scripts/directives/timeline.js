@@ -126,6 +126,10 @@ angular.module('nxCommon')
 
                 // !!! Render everything: updating function
                 function render(){
+
+                    if(!scope.scaleManager){
+                        return;
+                    }
                     if(scope.recordsProvider) {
                         scope.recordsProvider.updateLastMinute(timelineConfig.lastMinuteDuration, scope.scaleManager.levels.events.index);
                     }
@@ -469,7 +473,12 @@ angular.module('nxCommon')
                 animateScope.setDuration(timelineConfig.animationDuration);
                 animateScope.setScope(scope);
                 animateScope.start(render);
-                scope.$on('$destroy', function() { animateScope.stopScope(scope); });
+
+                //scope.scaleManager is set to null so that the garbage collecter cleans the object
+                scope.$on('$destroy', function() {
+                    animateScope.stopScope(scope);
+                    scope.scaleManager = null;
+                });
             }
         };
     }]);
