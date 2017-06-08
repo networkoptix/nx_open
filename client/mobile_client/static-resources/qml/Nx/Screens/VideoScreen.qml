@@ -243,7 +243,11 @@ PageBase
                 preloader.visible = true
             }
 
-            PtzViewportMovePreloader { id: preloader }
+            PtzViewportMovePreloader
+            {
+                id: preloader
+                visible: false
+            }
         }
     }
 
