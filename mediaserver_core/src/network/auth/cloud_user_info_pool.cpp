@@ -1,11 +1,11 @@
-#include <QJsonDocument>
-#include <QJsonObject>
-#include <QJsonArray>
 #include <core/resource/user_resource.h>
 #include <core/resource_management/resource_pool.h>
 #include <common/common_module.h>
 #include <nx/utils/log/log.h>
 #include <nx/network/http/auth_tools.h>
+#include <nx/cloud/cdb/client/data/auth_data.h>
+#include <nx/cloud/cdb/api/auth_provider.h>
+#include <nx/fusion/serialization/json.h>
 #include "cloud_user_info_pool.h"
 #include "cdb_nonce_fetcher.h"
 
@@ -30,7 +30,7 @@ CloudUserInfoPoolSupplier::CloudUserInfoPoolSupplier(QnCommonModule* commonModul
 
 void CloudUserInfoPoolSupplier::setPool(AbstractCloudUserInfoPool* pool)
 {
-    m_pool = pool;
+    m_pool = pool;    
 }
 
 CloudUserInfoPoolSupplier::~CloudUserInfoPoolSupplier()
@@ -75,21 +75,24 @@ void CloudUserInfoPoolSupplier::reportInfoChanged(
     const QString& userName,
     const QString& serializedValue)
 {
-    std::vector<std::tuple<uint64_t, nx::Buffer, nx::Buffer>> cloudUserInfoDataVector;
-    if (!detail::deserialize(serializedValue, &cloudUserInfoDataVector))
+    nx::cdb::api::AuthInfo authInfo;
+    bool deserializeResult = QJson::deserialize(serializedValue, &authInfo);
+    NX_ASSERT(deserializeResult);
+
+    if (!deserializeResult)
     {
         NX_LOG(lit("[CloudUserInfo] User %1. Deserialization failed")
             .arg(userName), cl_logDEBUG1);
         return;
     }
 
-    for (const auto& cloudUserInfoTuple : cloudUserInfoDataVector)
+    for (const auto& authInfoRecord : authInfo.records)
     {
         m_pool->userInfoChanged(
-            std::get<0>(cloudUserInfoTuple),
+            authInfoRecord.expirationTime.time_since_epoch().count(),
             userName.toUtf8().toLower(),
-            std::get<1>(cloudUserInfoTuple),
-            std::get<2>(cloudUserInfoTuple));
+            nx::Buffer::fromStdString(authInfoRecord.nonce),
+            nx::Buffer::fromStdString(authInfoRecord.intermediateResponse));
     }
 }
 
@@ -101,7 +104,7 @@ void CloudUserInfoPoolSupplier::onRemoveResource(const QnResourcePtr& resource)
 }
 
 // CloudUserInfoPool
-CloudUserInfoPool::CloudUserInfoPool(std::unique_ptr<AbstractCloudUserInfoPoolSupplier> supplier):
+CloudUserInfoPool::CloudUserInfoPool(std::unique_ptr<AbstractCloudUserInfoPoolSupplier> supplier) :
     m_supplier(std::move(supplier))
 {
     m_supplier->setPool(this);
@@ -124,13 +127,13 @@ bool CloudUserInfoPool::authenticate(
         return false;
     }
 
-    const auto partialResponse = partialResponseByUserNonce(userName, cloudNonce);
-    if (!partialResponse)
+    const auto intermediateResponse = intermediateResponseByUserNonce(userName, cloudNonce);
+    if (!intermediateResponse)
         return false;
 
     const auto ha2 = nx_http::calcHa2(method, authHeader.digest->params["uri"]);
     const auto calculatedResponse = nx_http::calcResponseFromIntermediate(
-        *partialResponse,
+        *intermediateResponse,
         cloudNonce.size(),
         nonceTrailer,
         ha2);
@@ -141,12 +144,12 @@ bool CloudUserInfoPool::authenticate(
     return false;
 }
 
-boost::optional<nx::Buffer> CloudUserInfoPool::partialResponseByUserNonce(
+boost::optional<nx::Buffer> CloudUserInfoPool::intermediateResponseByUserNonce(
     const nx::Buffer& userName,
     const nx::Buffer& cloudNonce) const
 {
     QnMutexLocker lock(&m_mutex);
-    auto nameNonceIt = m_userNonceToResponse.find({userName, cloudNonce});
+    auto nameNonceIt = m_userNonceToResponse.find({ userName, cloudNonce });
     if (nameNonceIt == m_userNonceToResponse.cend())
     {
         NX_LOG(lit("[CloudUserInfo] Failed to find (user, cloudNonce) pair. User: %1, cloudNonce: %2")
@@ -183,12 +186,12 @@ void CloudUserInfoPool::userInfoChanged(
     uint64_t timestamp,
     const nx::Buffer& userName,
     const nx::Buffer& cloudNonce,
-    const nx::Buffer& partialResponse)
+    const nx::Buffer& intermediateResponse)
 {
     QnMutexLocker lock(&m_mutex);
     updateNameToNonces(userName, cloudNonce);
     updateNonceToTs(cloudNonce, timestamp);
-    updateUserNonceToResponse(userName, cloudNonce, partialResponse);
+    updateUserNonceToResponse(userName, cloudNonce, intermediateResponse);
     updateTsToNonceCount(timestamp, cloudNonce);
 }
 
@@ -216,9 +219,9 @@ void CloudUserInfoPool::updateNonceToTs(const nx::Buffer& cloudNonce, uint64_t t
 void CloudUserInfoPool::updateUserNonceToResponse(
     const nx::Buffer& userName,
     const nx::Buffer& cloudNonce,
-    const nx::Buffer& partialResponse)
+    const nx::Buffer& intermediateResponse)
 {
-    auto result = m_userNonceToResponse.emplace(detail::UserNonce(userName, cloudNonce), partialResponse);
+    auto result = m_userNonceToResponse.emplace(detail::UserNonce(userName, cloudNonce), intermediateResponse);
     NX_ASSERT(result.second);
 }
 
@@ -294,59 +297,4 @@ void CloudUserInfoPool::decUserCountByNonce(const nx::Buffer& cloudNonce)
         }
         ++it;
     }
-}
-
-namespace detail {
-
-bool deserialize(
-    const QString& serializedValue,
-    std::vector<std::tuple<uint64_t, nx::Buffer, nx::Buffer>>* cloudUserInfoDataVector)
-{
-    auto cloudUserInfoJsonArray = QJsonDocument::fromJson(serializedValue.toUtf8()).array();
-    if (cloudUserInfoJsonArray.isEmpty())
-    {
-        NX_LOG("[CloudUserInfo, deserialize] Json array is empty.", cl_logERROR);
-        return false;
-    }
-
-    const QString kTimestampKey = lit("timestamp");
-    const QString kCloudNonceKey = lit("cloudNonce");
-    const QString kPartialResponseKey = lit("partialResponse");
-
-
-    for (int i = 0; i < cloudUserInfoJsonArray.size(); ++i)
-    {
-        auto jsonObj = cloudUserInfoJsonArray[i].toObject();
-        std::tuple<uint64_t, nx::Buffer, nx::Buffer> resultTuple;
-
-        auto timestampVal = jsonObj[kTimestampKey];
-        if (timestampVal.isUndefined() || !timestampVal.isDouble())
-        {
-            NX_LOG("[CloudUserInfo, deserialize] timestamp is undefined or wrong type.", cl_logERROR);
-            return false;
-        }
-        std::get<0>(resultTuple) = (uint64_t)timestampVal.toDouble();
-
-        auto cloudNonceVal = jsonObj[kCloudNonceKey];
-        if (cloudNonceVal.isUndefined() || !cloudNonceVal.isString())
-        {
-            NX_LOG("[CloudUserInfo, deserialize] cloud nonce is undefined or wrong type.", cl_logERROR);
-            return false;
-        }
-        std::get<1>(resultTuple) = cloudNonceVal.toString().toUtf8();
-
-        auto partialResponseVal = jsonObj[kPartialResponseKey];
-        if (partialResponseVal.isUndefined() || !partialResponseVal.isString())
-        {
-            NX_LOG("[CloudUserInfo, deserialize] partial response is undefined or wrong type.", cl_logERROR);
-            return false;
-        }
-        std::get<2>(resultTuple) = partialResponseVal.toString().toUtf8();
-
-        cloudUserInfoDataVector->push_back(resultTuple);
-    }
-
-    return true;
-}
-
 }

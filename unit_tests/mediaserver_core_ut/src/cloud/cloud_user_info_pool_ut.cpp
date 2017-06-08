@@ -54,8 +54,8 @@ public:
             &authClientResponseHeader);
 
         const auto ha1 = nx_http::calcHa1(userName, kTestRealm, kTestPassword, kTestAlgorithm);
-        const auto partialResponse = nx_http::calcIntermediateResponse(ha1, cloudNonce);
-        m_pool->userInfoChanged(ts, userName, cloudNonce, partialResponse);
+        const auto intermediateResponse = nx_http::calcIntermediateResponse(ha1, cloudNonce);
+        m_pool->userInfoChanged(ts, userName, cloudNonce, intermediateResponse);
 
         return authClientResponseHeader;
     }
@@ -132,27 +132,6 @@ protected:
     nx_http::header::Authorization gena3Auth;
     nx_http::header::Authorization vasya3Auth;
 };
-
-TEST_F(CloudUserInfoPool, deserialize)
-{
-    const QString kSimpleString =
-        lm("[{\"timestamp\":111,\"cloudNonce\":\"nonce1\",\"partialResponse\":\"response1\"}, \
-             {\"timestamp\":222,\"cloudNonce\":\"nonce2\",\"partialResponse\":\"response2\"}]");
-
-    std::vector<std::tuple<uint64_t, nx::Buffer, nx::Buffer>> cloudUserInfoDataVector;
-    ASSERT_TRUE(detail::deserialize(kSimpleString, &cloudUserInfoDataVector));
-
-    ASSERT_EQ(cloudUserInfoDataVector.size(), 2);
-
-    ASSERT_EQ(std::get<0>(cloudUserInfoDataVector[0]), 111);
-    ASSERT_EQ(std::get<1>(cloudUserInfoDataVector[0]), "nonce1");
-    ASSERT_EQ(std::get<2>(cloudUserInfoDataVector[0]), "response1");
-
-    ASSERT_EQ(std::get<0>(cloudUserInfoDataVector[1]), 222);
-    ASSERT_EQ(std::get<1>(cloudUserInfoDataVector[1]), "nonce2");
-    ASSERT_EQ(std::get<2>(cloudUserInfoDataVector[1]), "response2");
-}
-
 
 TEST_F(CloudUserInfoPool, commonNonce_simple)
 {
