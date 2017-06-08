@@ -70,7 +70,7 @@ function(nx_add_target name type)
              
             # Add user config file to the project dir.
             if((EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/${name}.vcxproj.user) 
-            AND (NOT EXISTS ${CMAKE_CURRENT_BINARY_DIR}/${name}.vcxproj.user))
+                AND (NOT EXISTS ${CMAKE_CURRENT_BINARY_DIR}/${name}.vcxproj.user))
 
                 nx_configure_file(${CMAKE_CURRENT_SOURCE_DIR}/${name}.vcxproj.user 
                     ${CMAKE_CURRENT_BINARY_DIR})
