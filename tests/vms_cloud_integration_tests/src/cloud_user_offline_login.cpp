@@ -42,7 +42,7 @@ protected:
     void whenMediaServerRestarted()
     {
         mediaServer().stop();
-        ASSERT_TRUE(mediaServer().start());
+        ASSERT_TRUE(startMediaServer());
     }
 
     void thenUserCanStillLogin()
