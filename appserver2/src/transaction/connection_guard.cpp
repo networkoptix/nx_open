@@ -34,7 +34,7 @@ ConnectionLockGuard::ConnectionLockGuard(ConnectionLockGuard&& rhs):
     m_peerGuid = std::move(rhs.m_peerGuid);
     rhs.m_peerGuid = QnUuid();
 
-    m_direction = m_direction;
+    m_direction = rhs.m_direction;
     m_state = rhs.m_state;
 }
 
@@ -48,7 +48,7 @@ ConnectionLockGuard& ConnectionLockGuard::operator=(ConnectionLockGuard&& rhs)
     m_peerGuid = std::move(rhs.m_peerGuid);
     rhs.m_peerGuid = QnUuid();
 
-    m_direction = m_direction;
+    m_direction = rhs.m_direction;
     m_state = rhs.m_state;
 
     return *this;

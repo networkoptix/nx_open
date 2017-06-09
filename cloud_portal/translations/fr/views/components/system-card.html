@@ -1,0 +1,28 @@
+
+<div class="panel panel-default" ng-if="system.isMine">
+    <div class="panel-body">
+        <h2>Votre système</h2>
+        <p></p>
+        <p>
+            <button class="btn btn-default" ng-click="rename()">Renommer système</button>
+        </p>
+        <button class="btn btn-default" ng-click="disconnect()">Déconnecter de             <span class="product-name">{{PRODUCT_NAME}}</span></button>
+    </div>
+</div>
+
+<div class="panel panel-default" ng-if="!system.isMine">
+    <div class="panel-body">
+        <h2>Propriétaire</h2>
+        <h3 class="user-name">{{system.info.ownerFullName}}</h3>
+        <a ng-href="mailto:{{system.info.ownerAccountEmail}}">{{system.info.ownerAccountEmail}}</a>
+        <hr>
+        <p>
+            Vos autorisations:             <b>{{$root.L.accessRoles[system.accessRole].label || system.accessRole}}</b>
+        </p>
+
+        <p ng-if="system.permissions.isAdmin">
+            <button class="btn btn-default" ng-click="rename()">Renommer système</button>
+        </p>
+        <button class="btn btn-default" ng-click="delete()">Déconnecter de mon compte</button>
+    </div>
+</div>

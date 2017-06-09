@@ -313,7 +313,10 @@ Qn::StorageInitResult QnFileStorageResource::initOrUpdateInternal()
     QString url = getUrl();
 
     if (url.isEmpty())
+    {
+        NX_LOG("[initOrUpdate] storage url is empty", cl_logDEBUG2);
         return Qn::StorageInit_WrongPath;
+    }
 
     if (url.contains("://"))
         result = mountTmpDrive(url);
@@ -323,7 +326,10 @@ Qn::StorageInitResult QnFileStorageResource::initOrUpdateInternal()
         if (storageDir.exists() || storageDir.mkpath(url))
             result = Qn::StorageInit_Ok;
         else
+        {
+            NX_LOG("[initOrUpdate] storage dir doesn't exist or mkdir failed", cl_logDEBUG2);
             result = Qn::StorageInit_WrongPath;
+        }
     }
 
     QString sysPath = sysDrivePath();
@@ -837,7 +843,7 @@ bool QnFileStorageResource::testWriteCapInternal() const
 
 Qn::StorageInitResult QnFileStorageResource::initOrUpdate()
 {
-    NX_LOG("QnFileStorageResource::initOrUpdate begin", cl_logDEBUG1);
+    NX_LOG(lit("[initOrUpdate] for storage %1 begin").arg(getUrl()), cl_logDEBUG2);
 
     Qn::StorageInitResult result;
     {
@@ -849,6 +855,9 @@ Qn::StorageInitResult QnFileStorageResource::initOrUpdate()
 
         if (!(oldValid == false && m_valid == true) && !isStorageDirMounted())
         {
+            NX_LOG(lit("[initOrUpdate] storage dir is not mounted. oldValid: %1 valid: %2")
+                    .arg(oldValid)
+                    .arg(m_valid), cl_logDEBUG2);
             m_valid = false;
             return Qn::StorageInit_WrongPath;
         }
@@ -860,12 +869,13 @@ Qn::StorageInitResult QnFileStorageResource::initOrUpdate()
     // remount attempt in initOrUpdate()
     if (!m_writeCapCached)
     {
+        NX_LOG("[initOrUpdate] write test file failed", cl_logDEBUG2);
         m_valid = false;
         return Qn::StorageInit_WrongPath;
     }
     QString localPath = getLocalPathSafe();
     m_cachedTotalSpace = getDiskTotalSpace(localPath.isEmpty() ? getPath() : localPath); // update cached value periodically
-    NX_LOG("QnFileStorageResource::initOrUpdate completed", cl_logDEBUG1);
+    NX_LOG("QnFileStorageResource::initOrUpdate completed", cl_logDEBUG2);
 
     return Qn::StorageInit_Ok;
 }
@@ -1018,12 +1028,16 @@ bool QnFileStorageResource::isStorageDirMounted() const
 {
     QString mountPoint;
 
+    NX_LOG(lit("[initOrUpdate, isStorageDirMounted] local path: %1, getPath(): %2")
+            .arg(m_localPath)
+            .arg(getPath()), cl_logDEBUG2);
+
     if (!m_localPath.isEmpty())
         return findPathInTabFile(m_localPath, lit("/proc/mounts"), &mountPoint, true);
     else if (findPathInTabFile(getPath(), lit("/etc/fstab"), &mountPoint, false))
         return findPathInTabFile(mountPoint, lit("/etc/mtab"), &mountPoint, true);
 
-    return false;
+    return findPathInTabFile(getPath(), lit("/etc/mtab"), &mountPoint, false);
 }
 #endif    // _WIN32
 

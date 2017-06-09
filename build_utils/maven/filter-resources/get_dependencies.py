@@ -26,6 +26,7 @@ DEPENDENCY_VERSIONS = {
     "libjpeg-turbo": "${libjpeg-turbo.version}",
     "libcreateprocess": "${libcreateprocess.version}",
     "vmux": "${vmux.version}",
+    "cpro": "${cpro.version}",
     "server-external": "${server-external.version}",
     "help": "${help.version}"
 }

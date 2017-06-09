@@ -96,7 +96,7 @@ def test_create_and_remove_user_with_resource(env):
         hash="", isAdmin=False, isEnabled=True, isLdap=False, realm="")
     env.server.rest_api.ec2.saveUser.POST(**user)
     expected_permissions = "GlobalViewArchivePermission|GlobalManageBookmarksPermission|0x80"
-    user_resource = generator.generate_resource_params_data(user)
+    user_resource = [generator.generate_resource_params_data(id=1, resource=user)]
     env.server.rest_api.ec2.setResourceParams.POST(json=user_resource)
     assert_server_has_resource(env, 'getUsers', id=user['id'], permissions=expected_permissions)
     assert_server_has_resource(env, 'getResourceParams', resourceId=user['id'], name=user_resource[0]['name'])
@@ -136,7 +136,7 @@ def test_remove_child_resources(env):
         ('saveCamera', 'getCameras', camera_2)]
     for post_method, get_method, data in tested_calls:
         env.server.rest_api.get_api_fn('POST', 'ec2', post_method)(**data)
-        resource_params = generator.generate_resource_params_data(data)
+        resource_params = [generator.generate_resource_params_data(id=1, resource=data)]
         env.server.rest_api.ec2.setResourceParams.POST(json=resource_params)
         assert_server_has_resource(env, get_method, id=data['id'])
         assert_server_has_resource(env, 'getResourceParams', resourceId=data['id'])

@@ -101,11 +101,12 @@ qint64 getDiskTotalSpace(const QString &root);
 
 quint64 getUsecTimer();
 
+// TODO: #Elric move to time.h
+// TODO: Rename to reflect that result is in seconds.
 /*
  * \returns                             Current time zone offset in seconds.
  */
-int currentTimeZone(); // TODO: #Elric move to time.h
-
+int currentTimeZone();
 
 static const qint64 UTC_TIME_DETECTION_THRESHOLD = 1000000ll * 3600*24*100;
 

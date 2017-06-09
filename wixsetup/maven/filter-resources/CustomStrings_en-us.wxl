@@ -105,6 +105,7 @@
     <String Id="InstallDirDlgFolderLabel"                           Overridable="yes">Install [ProductName] to:</String>
     <String Id="Product_ProductIsTooOld"                            Overridable="yes">Update to this version is not allowed. You should first upgrade to version 2.6</String>
 
+    <String Id="InstallerTitlePaxton"                               Overridable="yes">Paxton plugin</String>
     <String Id="InstallerTitleClientOnly"                           Overridable="yes">Client only</String>
     <String Id="InstallerTitleServerOnly"                           Overridable="yes">Server only</String>
     <String Id="InstallerTitleBundle"                               Overridable="yes">Client &amp; Server</String>

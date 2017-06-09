@@ -11,7 +11,6 @@
             <includes>
                 <include>audio/qtaudio_windows.dll</include>
                 <include>fonts/*.ttf</include>
-                <include>help/**</include>
                 <include>imageformats/qgif.dll</include>
                 <include>imageformats/qjpeg.dll</include>
                 <include>imageformats/qtiff.dll</include>
@@ -39,6 +38,13 @@
         <fileSet>
             <directory>${project.build.directory}/clientqml</directory>
             <outputDirectory>../qml</outputDirectory>
+            <includes>
+                <include>**</include>
+            </includes>
+        </fileSet> 
+        <fileSet>
+            <directory>${ClientHelpSourceDir}</directory>
+            <outputDirectory>../help</outputDirectory>
             <includes>
                 <include>**</include>
             </includes>

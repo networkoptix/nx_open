@@ -1,0 +1,28 @@
+
+<div class="panel panel-default" ng-if="system.isMine">
+    <div class="panel-body">
+        <h2>お使いのシステム</h2>
+        <p></p>
+        <p>
+            <button class="btn btn-default" ng-click="rename()">システム名を変更</button>
+        </p>
+        <button class="btn btn-default" ng-click="disconnect()"><span class="product-name">{{PRODUCT_NAME}}</span> から切断</button>
+    </div>
+</div>
+
+<div class="panel panel-default" ng-if="!system.isMine">
+    <div class="panel-body">
+        <h2>オーナー</h2>
+        <h3 class="user-name">{{system.info.ownerFullName}}</h3>
+        <a ng-href="mailto:{{system.info.ownerAccountEmail}}">{{system.info.ownerAccountEmail}}</a>
+        <hr>
+        <p>
+            アクセス許可: <b>{{$root.L.accessRoles[system.accessRole].label | system.accessRole}}</b>
+        </p>
+
+        <p ng-if="system.permissions.isAdmin">
+            <button class="btn btn-default" ng-click="rename()">システム名を変更</button>
+        </p>
+        <button class="btn btn-default" ng-click="delete()">自分のアカウントから切断</button>
+    </div>
+</div>

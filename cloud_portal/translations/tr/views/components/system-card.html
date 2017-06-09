@@ -1,0 +1,29 @@
+
+<div class="panel panel-default" ng-if="system.isMine">
+    <div class="panel-body">
+        <h2>Sistem</h2>
+        <p></p>
+        <p>
+            <button class="btn btn-default" ng-click="rename()">Sistemi yeniden adlandır</button>
+        </p>
+        <button class="btn btn-default" ng-click="disconnect()">Çıkış yap
+            <span class="product-name">{{PRODUCT_NAME}}</span></button>
+    </div>
+</div>
+
+<div class="panel panel-default" ng-if="!system.isMine">
+    <div class="panel-body">
+        <h2>Sahip</h2>
+        <h3 class="user-name">{{system.info.ownerFullName}}</h3>
+        <a ng-href="mailto:{{system.info.ownerAccountEmail}}">{{system.info.ownerAccountEmail}}</a>
+        <hr>
+        <p>
+            İzinleriniz: <b> {{$root.L.accessRoles[system.accessRole].label || System.accessRole}} </b>
+        </p>
+
+        <p ng-if="system.permissions.isAdmin">
+            <button class="btn btn-default" ng-click="rename()">Sistemi yeniden adlandır</button>
+        </p>
+        <button class="btn btn-default" ng-click="delete()">Hesabımdan çıkış yap</button>
+    </div>
+</div>

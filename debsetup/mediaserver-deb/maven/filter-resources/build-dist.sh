@@ -34,6 +34,7 @@ SYSTEMDSTAGE=$STAGE$SYSTEMDTARGET
 SERVER_BIN_PATH=${libdir}/bin/${build.configuration}
 SERVER_SHARE_PATH=${libdir}/share
 #SERVER_SQLDRIVERS_PATH=$SERVER_BIN_PATH/sqldrivers
+SERVER_DEB_PATH=${libdir}/deb
 SERVER_VOX_PATH=$SERVER_BIN_PATH/vox
 SERVER_LIB_PATH=${libdir}/lib/${build.configuration}
 SERVER_LIB_PLUGIN_PATH=$SERVER_BIN_PATH/plugins
@@ -129,6 +130,7 @@ install -m 644 debian/templates $STAGE/DEBIAN
 
 (cd $STAGEBASE; fakeroot dpkg-deb -b $FINALNAME)
 
-(cd $STAGEBASE; zip -y ./$UPDATE_NAME ./* -i *.*)
+cp -Rf $SERVER_DEB_PATH/* $STAGEBASE
+(cd $STAGEBASE; zip -r ./$UPDATE_NAME ./ -x ./$FINALNAME/**\* $FINALNAME/)
 mv $STAGEBASE/$UPDATE_NAME ${project.build.directory}
 echo "server.finalName=$FINALNAME" >> finalname-server.properties

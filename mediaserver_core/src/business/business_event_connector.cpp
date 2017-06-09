@@ -69,13 +69,18 @@ void QnBusinessEventConnector::at_storageFailure(const QnResourcePtr &mServerRes
     QString url;
     if (storageRes)
         url = storageRes->getUrl();
+    if (url.contains(lit("://")))
+        url = QUrl(url).toString(QUrl::RemoveUserInfo);
     QnStorageFailureBusinessEventPtr storageEvent(new QnStorageFailureBusinessEvent(mServerRes, timeStamp, reasonCode, url));
     qnBusinessRuleProcessor->processBusinessEvent(storageEvent);
 }
 
 void QnBusinessEventConnector::at_storageFailure(const QnResourcePtr &mServerRes, qint64 timeStamp, QnBusiness::EventReason reasonCode, const QString &storageUrl)
 {
-    QnStorageFailureBusinessEventPtr storageEvent(new QnStorageFailureBusinessEvent(mServerRes, timeStamp, reasonCode, storageUrl));
+    QString url = storageUrl;
+    if (url.contains(lit("://")))
+        url = QUrl(url).toString(QUrl::RemoveUserInfo);
+    QnStorageFailureBusinessEventPtr storageEvent(new QnStorageFailureBusinessEvent(mServerRes, timeStamp, reasonCode, url));
     qnBusinessRuleProcessor->processBusinessEvent(storageEvent);
 }
 

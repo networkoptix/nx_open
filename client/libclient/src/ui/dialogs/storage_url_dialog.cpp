@@ -150,7 +150,7 @@ QString QnStorageUrlDialog::makeUrl(const QString& path, const QString& login, c
         url.setUserName(login);
     if (!password.isEmpty())
         url.setPassword(password);
-    return url.toString();
+    return QString::fromUtf8(QUrl::toPercentEncoding(url.toString()));
 }
 
 void QnStorageUrlDialog::accept()

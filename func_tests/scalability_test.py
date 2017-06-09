@@ -52,7 +52,7 @@ def env(request, test_session, run_options):
         server_name = 'Server_%d' % idx
         rest_api_url = 'http://%s:%d/' % (endpoint['host'], endpoint['port'])
         server = Server('networkoptix', server_name, rest_api_url,
-                        host=endpoint['host'], internal_ip_port=endpoint['port'],
+                        internal_ip_port=endpoint['port'],
                         rest_api_timeout_sec=REST_API_TIMEOUT_SEC)
         server._is_started = True
         server.setup_local_system()
@@ -68,15 +68,16 @@ def get_response(server, method, api_object, api_method):
         return None
 
 
-def wait_merge_done(servers, method, api_object, api_method):
-    start_time = utils.datetime_utc_now()
+def wait_merge_done(servers, method, api_object, api_method, start_time):
+    api_call_start_time = utils.datetime_utc_now()
     while True:
         result_expected = get_response(servers[0], method, api_object, api_method)
 
         if not result_expected:
             if utils.datetime_utc_now() - start_time >= MERGE_TIMEOUT:
                 pytest.fail("%r can't get response for '%s' during %s" % (
-                    servers[0], api_method, MERGE_TIMEOUT))
+                    servers[0], api_method,
+                    MERGE_TIMEOUT  - (api_call_start_time - start_time)))
             continue
 
         def check(servers, result_expected):
@@ -88,11 +89,12 @@ def wait_merge_done(servers, method, api_object, api_method):
         first_unsynced_server = check(servers[1:], result_expected)
         if not first_unsynced_server:
             log.info('%s/%s merge duration: %s' % (api_object, api_method,
-                                                   utils.datetime_utc_now() - start_time))
+                                                   utils.datetime_utc_now() - api_call_start_time))
             return
         if utils.datetime_utc_now() - start_time >= MERGE_TIMEOUT:
             pytest.fail("'%s' was not synchronized during %s: '%r' and '%r'" % (
-                api_method, MERGE_TIMEOUT, servers[0], first_unsynced_server))
+                api_method, MERGE_TIMEOUT - (api_call_start_time - start_time),
+                servers[0], first_unsynced_server))
         time.sleep(MERGE_DONE_CHECK_PERIOD_SEC)
 
 
@@ -100,12 +102,12 @@ def measure_merge(servers):
     start_time = utils.datetime_utc_now()
     for i in range(1, len(servers)):
         servers[0].merge_systems(servers[i])
-    wait_merge_done(servers, 'GET', 'ec2', 'getUsers')
-    wait_merge_done(servers, 'GET', 'ec2', 'getStorages')
-    wait_merge_done(servers, 'GET', 'ec2', 'getLayouts')
-    wait_merge_done(servers, 'GET', 'ec2', 'getCamerasEx')
-    wait_merge_done(servers, 'GET', 'ec2', 'getFullInfo')
-    wait_merge_done(servers, 'GET', 'ec2', 'getTransactionLog')
+    wait_merge_done(servers, 'GET', 'ec2', 'getUsers', start_time)
+    wait_merge_done(servers, 'GET', 'ec2', 'getStorages', start_time)
+    wait_merge_done(servers, 'GET', 'ec2', 'getLayouts', start_time)
+    wait_merge_done(servers, 'GET', 'ec2', 'getCamerasEx', start_time)
+    wait_merge_done(servers, 'GET', 'ec2', 'getFullInfo', start_time)
+    wait_merge_done(servers, 'GET', 'ec2', 'getTransactionLog', start_time)
     log.info('Total merge duration: %s' % (utils.datetime_utc_now() - start_time))
 
 

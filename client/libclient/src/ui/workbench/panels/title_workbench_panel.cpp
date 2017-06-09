@@ -10,6 +10,7 @@
 #include <ui/animation/opacity_animator.h>
 #include <ui/animation/variant_animator.h>
 #include <ui/graphics/instruments/hand_scroll_instrument.h>
+#include <ui/graphics/instruments/motion_selection_instrument.h>
 #include <ui/graphics/items/generic/edge_shadow_widget.h>
 #include <ui/graphics/items/generic/image_button_widget.h>
 #include <ui/graphics/items/generic/masked_proxy_widget.h>
@@ -39,6 +40,7 @@ TitleWorkbenchPanel::TitleWorkbenchPanel(
     m_opacityProcessor(new HoverFocusProcessor(parentWidget))
 {
     item->setProperty(Qn::NoHandScrollOver, true);
+    item->setProperty(Qn::BlockMotionSelection, true);
     item->setWidget(new QnMainWindowTitleBarWidget(nullptr, context()));
     item->setPos(0.0, 0.0);
     item->setVisible(false);

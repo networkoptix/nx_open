@@ -7,6 +7,7 @@
 #include <plugins/storage/file_storage/file_storage_resource.h>
 
 #include <nx/utils/log/log.h>
+#include <nx/utils/random.h>
 #include "utils/common/util.h"
 
 const uint8_t kDbVersion = 1;
@@ -106,11 +107,18 @@ int QnStorageDb::getCameraIdHash(const QString &cameraUniqueId)
             cameraId = fillCameraOp(cameraOp, cameraUniqueId);
             auto existHashIdIt = m_uuidToHash.right.find(cameraId);
 
+            const int kMaxTries = 20;
+            int triesSoFar = 0;
             while (existHashIdIt != m_uuidToHash.right.end())
             {
-                std::uniform_int_distribution<uint16_t> dist(0, std::numeric_limits<uint16_t>::max());
-                cameraId = dist(m_gen);
+                if (triesSoFar == kMaxTries)
+                {
+                    NX_LOG(lit("[media_db] Unable to generate unique hash for camera id %1").arg(cameraUniqueId), cl_logWARNING);
+                    return -1;
+                }
+                cameraId = nx::utils::random::number<uint16_t>();
                 existHashIdIt = m_uuidToHash.right.find(cameraId);
+                triesSoFar++;
             }
 
             NX_ASSERT(existHashIdIt == m_uuidToHash.right.end());
@@ -118,6 +126,7 @@ int QnStorageDb::getCameraIdHash(const QString &cameraUniqueId)
                 NX_LOG(lit("%1 Bad camera hash").arg(Q_FUNC_INFO), cl_logWARNING);
 
             m_uuidToHash.insert(UuidToHash::value_type(cameraUniqueId, cameraId));
+            cameraOp.setCameraId(cameraId);
             m_dbHelper.writeRecord(cameraOp);
         }
         else
@@ -131,7 +140,13 @@ bool QnStorageDb::deleteRecords(const QString& cameraUniqueId,
                                 qint64 startTimeMs)
 {
     nx::media_db::MediaFileOperation mediaFileOp;
-    mediaFileOp.setCameraId(getCameraIdHash(cameraUniqueId));
+    int cameraId = getCameraIdHash(cameraUniqueId);
+    if (cameraId == -1)
+    {
+        NX_LOG(lit("[media_db, delete] camera id hash is not generated. Unable to delete"), cl_logWARNING); 
+        return false;
+    }
+    mediaFileOp.setCameraId(cameraId);
     mediaFileOp.setCatalog(catalog);
     mediaFileOp.setStartTime(startTimeMs);
     mediaFileOp.setRecordType(nx::media_db::RecordType::FileOperationDelete);
@@ -200,7 +215,13 @@ bool QnStorageDb::addRecord(const QString& cameraUniqueId,
     }
 
     nx::media_db::MediaFileOperation mediaFileOp;
-    mediaFileOp.setCameraId(getCameraIdHash(cameraUniqueId));
+    int cameraId = getCameraIdHash(cameraUniqueId);
+    if (cameraId == -1)
+    {
+        NX_LOG(lit("[media_db, add] camera id hash is not generated. Unable to add record"), cl_logWARNING); 
+        return false;
+    }
+    mediaFileOp.setCameraId(cameraId);
     mediaFileOp.setCatalog(catalog);
     mediaFileOp.setDuration(chunk.durationMs);
     mediaFileOp.setFileSize(chunk.getFileSize());
@@ -440,6 +461,11 @@ bool QnStorageDb::vacuumInternal()
                 nx::media_db::MediaFileOperation mediaFileOp;
                 auto cameraIdIt = m_uuidToHash.left.find(it->first);
                 NX_ASSERT(cameraIdIt != m_uuidToHash.left.end());
+                if (cameraIdIt == m_uuidToHash.left.end())
+                {
+                    NX_LOG(lit("[media_db] camera id %1 not found in UuidToHash map").arg(it->first), cl_logDEBUG1);
+                    continue;
+                }
 
                 mediaFileOp.setCameraId(cameraIdIt->second);
                 mediaFileOp.setCatalog(i == 0 ? QnServer::ChunksCatalog::LowQualityCatalog :

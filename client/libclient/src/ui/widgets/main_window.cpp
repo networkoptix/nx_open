@@ -306,10 +306,6 @@ QnMainWindow::QnMainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::Win
 
     menu()->setTargetProvider(m_ui.data());
 
-    const auto welcomeScreen = context->instance<QnWorkbenchWelcomeScreen>();
-    connect(welcomeScreen, &QnWorkbenchWelcomeScreen::visibleChanged,
-        this, &QnMainWindow::updateWidgetsVisibility);
-
     /* Layouts. */
 
     m_viewLayout = new QVBoxLayout();
@@ -328,7 +324,14 @@ QnMainWindow::QnMainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::Win
 
     m_currentPageHolder->addWidget(new QWidget());
     m_currentPageHolder->addWidget(m_view.data());
-    m_currentPageHolder->addWidget(welcomeScreen->widget());
+
+    if (qnRuntime->isDesktopMode())
+    {
+        const auto welcomeScreen = context->instance<QnWorkbenchWelcomeScreen>();
+        connect(welcomeScreen, &QnWorkbenchWelcomeScreen::visibleChanged,
+            this, &QnMainWindow::updateWidgetsVisibility);
+        m_currentPageHolder->addWidget(welcomeScreen->widget());
+    }
 
 /* Post-initialize. */
 
@@ -364,11 +367,17 @@ QWidget *QnMainWindow::viewport() const {
 
 bool QnMainWindow::isTitleVisible() const
 {
+    if (!qnRuntime->isDesktopMode())
+        return false;
+
     return m_titleVisible || isWelcomeScreenVisible();
 }
 
 bool QnMainWindow::isWelcomeScreenVisible() const
 {
+    if (!qnRuntime->isDesktopMode())
+        return false;
+
     const auto welcomeScreen = context()->instance<QnWorkbenchWelcomeScreen>();
     return (welcomeScreen && welcomeScreen->isVisible());
 }

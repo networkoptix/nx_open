@@ -63,13 +63,13 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="CustomProperties.cs" />
+    <Compile Include="NetworkOptixDriver.cs" />
     <Compile Include="NetworkOptixMiniDriver.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Util.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
-    <None Include="SampleKey.snk" />
     <None Include="Sign.snk" />
   </ItemGroup>
   <ItemGroup>

@@ -1,0 +1,13 @@
+Willkommen bei {{PRODUCT_NAME}}
+
+{{#message.sharer_name}}
+{{message.sharer_name}} ({{message.sharer_email}}) lädt Sie zu {{PRODUCT_NAME}} ein und teilt sein System {{message.system_name}} mit Ihnen.
+{{/message.sharer_name}}
+
+{{^message.sharer_name}}
+Sie wurden eingeladen sich bei {{PRODUCT_NAME}} anzuschließen.
+Das System {{message.system_name}} wurde mit Ihnen geteilt.
+{{/message.sharer_name}}
+
+Registrieren und System ansehen: {{config.portal_url}}/register/{{message.code}}
+

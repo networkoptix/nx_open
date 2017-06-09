@@ -21,7 +21,7 @@
 
 #include <plugins/resource/avi/avi_resource.h>
 #include <plugins/resource/avi/avi_archive_delegate.h>
-#include <nx/utils/flag_config.h>
+#include <nx/media/config.h>
 #include <nx/utils/log/log.h>
 
 #define OUTPUT_PREFIX "media_player: "
@@ -59,21 +59,6 @@ static const int kGotDataTimeoutMs = 1000 * 30;
 
 // Periodic tasks timer interval
 static const int kPeriodicTasksTimeoutMs = 1000;
-
-struct NxMediaFlagConfig: public nx::utils::FlagConfig
-{
-    using nx::utils::FlagConfig::FlagConfig;
-
-    NX_STRING_PARAM("", substitutePlayerUrl, "Use this Url for video, e.g. file:///c:/test.MP4");
-    NX_FLAG(0, outputFrameDelays, "Log if frame delay is negative.");
-    NX_FLAG(0, enableFps, "");
-    NX_INT_PARAM(-1, hwVideoX, "If not -1, override hardware video window X.");
-    NX_INT_PARAM(-1, hwVideoY, "If not -1, override hardware video window Y.");
-    NX_INT_PARAM(-1, hwVideoWidth, "If not -1, override hardware video window width.");
-    NX_INT_PARAM(-1, hwVideoHeight, "If not -1, override hardware video window height.");
-    NX_FLAG(0, forceIframesOnly, "For Low Quality selection, force I-frames-only mode.");
-};
-NxMediaFlagConfig conf("nx_media");
 
 static qint64 msecToUsec(qint64 posMs)
 {

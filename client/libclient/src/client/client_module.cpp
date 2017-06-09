@@ -170,8 +170,14 @@ QnClientModule::QnClientModule(const QnStartupParameters &startupParams
     initSkin(startupParams);
     initLocalResources(startupParams);
 
-    QWebSettings::globalSettings()->setAttribute(QWebSettings::PluginsEnabled, true);
-    QWebSettings::globalSettings()->enablePersistentStorage();
+    // WebKit initialization must occur only once per application run. Actual for ActiveX module.
+    static bool isWebKitInitialized = false;
+    if (!isWebKitInitialized)
+    {
+        QWebSettings::globalSettings()->setAttribute(QWebSettings::PluginsEnabled, true);
+        QWebSettings::globalSettings()->enablePersistentStorage();
+        isWebKitInitialized = true;
+    }
 }
 
 QnClientModule::~QnClientModule()
@@ -404,6 +410,10 @@ void QnClientModule::initLog(const QnStartupParameters& startupParams)
         // we hope self-updater will run only once per time and will not overflow log-file
         // qnClientInstanceManager is not initialized in self-update mode
         logFileNameSuffix = lit("self_update");
+    }
+    else if (qnRuntime->isActiveXMode())
+    {
+        logFileNameSuffix = lit("ax");
     }
     else if (qnClientInstanceManager && qnClientInstanceManager->isValid())
     {

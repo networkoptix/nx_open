@@ -7,6 +7,7 @@
 #include <nx/utils/unused.h>
 
 #if defined(Q_OS_LINUX)
+    #include <time.h>
     #include <sys/time.h>
     #include <QtCore/QFile>
     #include <QtCore/QProcess>
@@ -116,6 +117,21 @@ QStringList getSupportedTimeZoneIds()
 QString getCurrentTimeZoneId()
 {
     const QString id = QDateTime::currentDateTime().timeZone().id();
+
+    #if defined(Q_OS_LINUX)
+        if (id.isEmpty())
+        {
+            // Obtain time zone via POSIX functions (thread-safe).
+            constexpr int kMaxTimeZoneSize = 32;
+            struct timespec timespecTime;
+            struct tm tmTime;
+            time(&timespecTime.tv_sec);
+            localtime_r(&timespecTime.tv_sec, &tmTime);
+            char timeZone[kMaxTimeZoneSize];
+            strftime(timeZone, sizeof(timeZone), "%Z", &tmTime);
+            return QLatin1String(timeZone);
+        }
+    #endif
 
     // For certain values, return the equivalent known to be in the list of supported ids.
     if (id == "Etc/UTC" ||

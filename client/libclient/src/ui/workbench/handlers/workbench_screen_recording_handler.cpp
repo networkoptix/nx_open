@@ -6,6 +6,8 @@
 #include <QtOpenGL/QGLWidget>
 
 #include <client/client_settings.h>
+#include <client/client_runtime_settings.h>
+
 #include <ui/style/skin.h>
 #include <ui/dialogs/common/custom_file_dialog.h>
 #include <ui/dialogs/common/file_messages.h>
@@ -78,10 +80,13 @@ void QnWorkbenchScreenRecordingHandler::timerEvent(QTimerEvent* event)
         millisecondsLeft = kRecordingCountdownMs - m_countdown.elapsed();
 
     const int seconds = std::max((millisecondsLeft + 500) / 1000, 0);
-    const auto welcomeScreen = context()->instance<QnWorkbenchWelcomeScreen>();
-
     const auto message = recordingCountdownText(seconds);
-    welcomeScreen->setMessage(seconds > 0 ? message : QString());
+
+    if (qnRuntime->isDesktopMode())
+    {
+        const auto welcomeScreen = context()->instance<QnWorkbenchWelcomeScreen>();
+        welcomeScreen->setMessage(seconds > 0 ? message : QString());
+    }
 
     if (m_messageBox)
     {
@@ -155,8 +160,11 @@ void QnWorkbenchScreenRecordingHandler::stopRecordingCountdown()
     if (m_messageBox)
         m_messageBox->hideImmideately();
 
-    const auto welcomeScreen = context()->instance<QnWorkbenchWelcomeScreen>();
-    welcomeScreen->setMessage(QString());
+    if (qnRuntime->isDesktopMode())
+    {
+        const auto welcomeScreen = context()->instance<QnWorkbenchWelcomeScreen>();
+        welcomeScreen->setMessage(QString());
+    }
 }
 
 bool QnWorkbenchScreenRecordingHandler::isRecordingCountdown() const

@@ -6,7 +6,7 @@
     </parent>
 
     <groupId>com.networkoptix.hdwitness</groupId>
-    <version>3.0.0-SNAPSHOT</version>
+    <version>3.0.4-SNAPSHOT</version>
     <modelVersion>4.0.0</modelVersion>
     <artifactId>mobile_client</artifactId>
     <packaging>pom</packaging>
@@ -47,7 +47,7 @@
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>libclient_core</artifactId>
-            <version>${project.version}</version>
+            <version>3.0.0-SNAPSHOT</version>
             <type>pom</type>
             <scope>system</scope>
             <systemPath>${root.dir}/client/libclient_core/pom.xml</systemPath>
@@ -55,7 +55,7 @@
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>nx_audio</artifactId>
-            <version>${project.version}</version>
+            <version>3.0.0-SNAPSHOT</version>
             <type>pom</type>
             <scope>system</scope>
             <systemPath>${root.dir}/common_libs/nx_audio/pom.xml</systemPath>
@@ -63,7 +63,7 @@
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>nx_media</artifactId>
-            <version>${project.version}</version>
+            <version>3.0.0-SNAPSHOT</version>
             <type>pom</type>
             <scope>system</scope>
             <systemPath>${root.dir}/common_libs/nx_media/pom.xml</systemPath>
@@ -90,6 +90,7 @@
                                     <includes>
                                         <include>*.apk</include>
                                         <include>*.ipa</include>
+                                        <include>resources/**</include>
                                     </includes>
                                 </fileset>
                             </filesets>

@@ -237,10 +237,8 @@ void QnLiveStreamProvider::setFps(float f)
         if (std::abs(m_newLiveParams.fps - f) < 0.1)
             return; // same fps?
 
-
         m_newLiveParams.fps = qMax(1, qMin((int)f, getDefaultFps()));
         f = m_newLiveParams.fps;
-
     }
 
     if (getRole() != Qn::CR_SecondaryLiveVideo)
@@ -258,10 +256,10 @@ void QnLiveStreamProvider::setFps(float f)
 
 float QnLiveStreamProvider::getDefaultFps() const
 {
-    Qn::StreamFpsSharingMethod sharingMethod = m_cameraRes->streamFpsSharingMethod();
     float maxFps = m_cameraRes->getMaxFps();
     int reservedSecondStreamFps = m_cameraRes->reservedSecondStreamFps();
-    return qMax(1.0, sharingMethod ==  Qn::NoFpsSharing ? maxFps : maxFps - reservedSecondStreamFps);
+
+    return qMax(1.0, maxFps - reservedSecondStreamFps);
 }
 
 bool QnLiveStreamProvider::isMaxFps() const
@@ -362,38 +360,48 @@ void QnLiveStreamProvider::onGotAudioFrame(const QnCompressedAudioDataPtr& audio
     }
 }
 
-void QnLiveStreamProvider::onPrimaryFpsUpdated(int newFps)
+void QnLiveStreamProvider::onPrimaryFpsUpdated(int newPrimaryStreamFps)
 {
     NX_ASSERT(getRole() == Qn::CR_SecondaryLiveVideo);
     // now primary has newFps
     // this is secondary stream
     // need to adjust fps
 
-    int maxFps = m_cameraRes->getMaxFps();
-
     Qn::StreamFpsSharingMethod sharingMethod = m_cameraRes->streamFpsSharingMethod();
-    int newSecFps;
+    int maxPrimaryStreamFps = m_cameraRes->getMaxFps();
+    int newSecondaryStreamFps = 0;
 
     if (secondaryResolutionIsLarge())
-        newSecFps = MIN_SECOND_STREAM_FPS;
+    {
+        newSecondaryStreamFps = MIN_SECOND_STREAM_FPS;
+    }
     else if (sharingMethod == Qn::PixelsFpsSharing)
     {
-        newSecFps = qMin(m_cameraRes->desiredSecondStreamFps(), maxFps); //minimum between DESIRED_SECOND_STREAM_FPS and what is left;
-        if (maxFps - newFps < 2 )
-            newSecFps = qMax(m_cameraRes->desiredSecondStreamFps()/2,MIN_SECOND_STREAM_FPS);
+        //Old comment: minimum between DESIRED_SECOND_STREAM_FPS and what is left;
+        newSecondaryStreamFps = qMin(
+            m_cameraRes->desiredSecondStreamFps(),
+            maxPrimaryStreamFps);
 
+        if (maxPrimaryStreamFps - newPrimaryStreamFps < 2 )
+        {
+            newSecondaryStreamFps = qMax(
+                m_cameraRes->desiredSecondStreamFps() / 2,
+                MIN_SECOND_STREAM_FPS);
+        }
     }
     else if (sharingMethod == Qn::BasicFpsSharing)
-        newSecFps = qMin(m_cameraRes->desiredSecondStreamFps(), maxFps - newFps); //ss; minimum between 5 and what is left;
-    else// noSharing
-        newSecFps = qMin(m_cameraRes->desiredSecondStreamFps(), maxFps);
+    {
+        newSecondaryStreamFps = qMin(
+            m_cameraRes->desiredSecondStreamFps(),
+            maxPrimaryStreamFps - newPrimaryStreamFps);
+    }
+    else
+    {
+        // noSharing
+        newSecondaryStreamFps = qMin(m_cameraRes->desiredSecondStreamFps(), maxPrimaryStreamFps);
+    }
 
-
-
-
-    //NX_ASSERT(newSecFps>=0); // default fps is 10. Some camers has lower fps and NX_ASSERT is appear
-
-    setFps(qMax(1,newSecFps));
+    setFps(qMax(1.0, newSecondaryStreamFps));
 }
 
 QnLiveStreamParams QnLiveStreamProvider::getLiveParams()

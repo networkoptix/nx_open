@@ -1,0 +1,27 @@
+<div class="auth-visible" process-loading="gettingSystem">
+    <div ng-if="systemNoAccess" class="text-center">
+        <h1>未能访问系统</h1>
+        <p>此链接已断开，<br>
+            系统可能会断开连接从 {{PRODUCT_NAME}}，<br>
+            访问此系统可能被吊销，<br>
+            或您可以登录到一个不同的帐户</p>
+        <p>
+            <a href="/systems" class="btn btn-default">可用系统列表</a>
+        </p>
+    </div>
+
+    <ng-include ng-if="gettingSystem.success" src="$root.C.viewsDir + 'components/system-header.html'"></ng-include>
+    <div class="row"  ng-if="gettingSystem.success">
+        <div class="col-md-4 col-md-push-8">
+            <ng-include src="$root.C.viewsDir + 'components/system-card.html'"></ng-include>
+        </div>
+        <div class="col-md-8 col-md-pull-4">
+            <div class="no-data-panel light-color border-top border-bottom" ng-if="!system.permissions.editUsers" >
+                <span class="no-data-panel-body">
+                    您没有访问系统信息。
+                </span>
+            </div>
+            <ng-include src="$root.C.viewsDir + 'components/system-users.html'" ng-if="system.permissions.editUsers" ></ng-include>
+        </div>
+    </div>
+</div>

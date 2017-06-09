@@ -24,6 +24,7 @@ from .vagrant_box_config import MEDIASERVER_LISTEN_PORT, BoxConfigFactory, BoxCo
 from .cloud_host import CloudHost
 from .camera import make_schedule_task, Camera, SampleMediaFile
 from .media_stream import open_media_stream
+from .host import Host
 
 
 MEDIASERVER_DIR = '/opt/{company_name}/mediaserver'
@@ -155,7 +156,8 @@ class Server(object):
         self.title = name
         self.name = '%s-%s' % (name, str(uuid.uuid4())[-12:])
         self.box = box
-        self.host = host or box.host
+        assert host is None or isinstance(host, Host), repr(host)
+        self.host = host or box and box.host
         self.rest_api_url = rest_api_url
         self.dir = MEDIASERVER_DIR.format(company_name=self._company_name)
         self._config_path = os.path.join(self.dir, MEDIASERVER_CONFIG_PATH)

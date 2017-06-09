@@ -574,7 +574,7 @@ QnRecordingStatsReply QnStorageAnalyticsWidget::getForecastData(qint64 extraSize
             cameraForecast.expand &= cameraStats.archiveDurationSecs > 0 && cameraStats.recordedBytes > 0;
             cameraForecast.minDays = qMax(0, camRes->minDays());
             cameraForecast.maxDays = qMax(0, camRes->maxDays());
-            cameraForecast.byterate = cameraStats.recordedBytes / cameraStats.archiveDurationSecs;
+            cameraForecast.byterate = cameraStats.recordedBytes / qMax(1ll, cameraStats.archiveDurationSecs);
 
             if (cameraForecast.expand)
                 hasExpaned = true;

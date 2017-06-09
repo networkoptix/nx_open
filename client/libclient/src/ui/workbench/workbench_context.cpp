@@ -310,8 +310,11 @@ bool QnWorkbenchContext::handleStartupParameters(const QnStartupParameters& star
     * * we have opened exported exe-file
     * Otherwise we should try to connect or show welcome page.
     */
-    const auto welcomeScreen = instance<QnWorkbenchWelcomeScreen>();
-    welcomeScreen->setVisibleControls(true);
+    if (qnRuntime->isDesktopMode())
+    {
+        const auto welcomeScreen = instance<QnWorkbenchWelcomeScreen>();
+        welcomeScreen->setVisibleControls(true);
+    }
 
     if (!connectUsingCustomUri(startupParams.customUri)
         && startupParams.instantDrop.isEmpty()

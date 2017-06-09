@@ -1,0 +1,196 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-stylesheet type="text/xsl" href="api.xsl"?>
+<apidoc xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:noNamespaceSchemaLocation="api.xsd">
+    <groups>
+        <group>
+            <groupName>Account API</groupName>
+            <urlPrefix>/account</urlPrefix>
+            <groupDescription>Account management</groupDescription>
+            <functions>
+
+                <function>
+                    <name></name>
+                    <description>Get account information. Server determines account to return by provided credentials (email/password)</description>
+                    <method>GET</method>
+                    <result>
+                        <caption>Account data JSON</caption>
+                    </result>
+                </function>
+
+                <function>
+                    <name></name>
+                    <description>Change account information.</description>
+                    <method>POST</method>
+                    <result>
+                        <caption>Account data JSON</caption>
+                    </result>
+                </function>
+
+
+                <function>
+                    <name>login</name>
+                    <description></description>
+                    <method>POST</method>
+                    <params>
+                        <param>
+                            <name>email</name>
+                            <description>Unique address to be associated with account</description>
+                            <optional>false</optional>
+                        </param>
+                        <param>
+                            <name>password</name>
+                            <description>Hex representation of HA1 (see rfc2617) digest of user's password. Realm is VMS</description>
+                            <optional>true</optional>
+                        </param>
+                    </params>
+                    <result>
+                        <caption></caption>
+                    </result>
+                </function>
+                <function>
+                    <name>logout</name>
+                    <description></description>
+                    <method>GET</method>
+                    <params>
+                    </params>
+                    <result>
+                        <caption></caption>
+                    </result>
+                </function>
+
+                <function>
+                    <name>register</name>
+                    <description></description>
+                    <method>POST</method>
+                    <params>
+                        <param>
+                            <name>email</name>
+                            <description>Unique address to be associated with account</description>
+                            <optional>false</optional>
+                        </param>
+                        <param>
+                            <name>password</name>
+                            <description>Hex representation of HA1 (see rfc2617) digest of user's password. Realm is VMS</description>
+                            <optional>true</optional>
+                        </param>
+                        <param>
+                            <name>firstName</name>
+                            <description></description>
+                            <optional>true</optional>
+                        </param>
+                        <param>
+                            <name>secondName</name>
+                            <description></description>
+                            <optional>true</optional>
+                        </param>
+                    </params>
+                    <result>
+                        <caption></caption>
+                    </result>
+                </function>
+                <function>
+                    <name>activate</name>
+                    <description></description>
+                    <method>POST</method>
+                    <params>
+                        <param>
+                            <name>code</name>
+                            <description>Activation code provided by register method</description>
+                            <optional>false</optional>
+                        </param>
+                    </params>
+                    <result>
+                        <caption>Account data JSON</caption>
+                    </result>
+                </function>
+                <function>
+                    <name>restorePassword</name>
+                    <description></description>
+                    <method>POST</method>
+                    <params>
+                        <param>
+                            <name>email</name>
+                            <description>Account's email</description>
+                            <optional>false</optional>
+                        </param>
+                    </params>
+                    <result>
+                        <caption></caption>
+                    </result>
+                </function>
+                <function>
+                    <name>changePassword</name>
+                    <description>code or oldPassword are required</description>
+                    <method>POST</method>
+                    <params>
+                        <param>
+                            <name>email</name>
+                            <description>Account's email</description>
+                            <optional>false</optional>
+                        </param>
+                        <param>
+                            <name>new_password</name>
+                            <description>New password for account</description>
+                            <optional>false</optional>
+                        </param>
+                        <param>
+                            <name>code</name>
+                            <description>Confirmation code for changing password</description>
+                            <optional>true</optional>
+                        </param>
+                        <param>
+                            <name>old_passwprd</name>
+                            <description>Old password</description>
+                            <optional>true</optional>
+                        </param>
+                    </params>
+                    <result>
+                        <caption></caption>
+                    </result>
+                </function>
+
+
+
+            </functions>
+        </group>
+
+        <group>
+            <groupName>System API</groupName>
+            <urlPrefix>/system</urlPrefix>
+            <groupDescription>System data management</groupDescription>
+            <functions>
+                <function>
+                    <name>get</name>
+                    <description>Returns list of systems requesting entity has access to. Access is detected by credentials provided</description>
+                    <method>GET</method>
+                    <result>
+                        <caption>JSON. List of system data</caption>
+                    </result>
+                </function>
+            </functions>
+        </group>
+
+        <group>
+            <groupName>Error codes</groupName>
+            <constatnts>
+                <constant>
+                    <name>cloudInvalidResponse</name>
+                    <description>Cloud DB returns unexpected response (no json data or not enough data fields)</description>
+                </constant>
+                <constant>
+                    <name>portalError</name>
+                    <description>Unexpected error in cloud portal</description>
+                </constant>
+                <constant>
+                    <name>wrongCredentials</name>
+                    <description>Credentials wasn't accepted by cloud db. Username or password are incorrect</description>
+                </constant>
+                <constant>
+                    <name>wrongParameters</name>
+                    <description>Parameters validation failed. See error_data for details. error_data in that case is a dictionary 'field_name'=>['Error descriptions']</description>
+                </constant>
+            </constatnts>
+        </group>
+    </groups>
+</apidoc>

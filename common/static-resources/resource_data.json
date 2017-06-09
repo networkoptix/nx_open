@@ -336,6 +336,17 @@
         },
         {
             "keys": [
+                "Hikvision|*"
+            ],
+            "possibleDefaultCredentials": [
+                {
+                    "user": "admin",
+                    "password": "12345"
+                }
+            ]
+        },        
+        {
+            "keys": [
                 "Axis|*"
             ],
             "possibleDefaultCredentials": [
@@ -521,7 +532,8 @@
                 "VISTA|VK2-ENCODER",
                 "*|DW-CP04", "*|DW-CP16",
                 "ACTI|I96","ACTI|I98",
-                "UNIVIEW|IPC6242SR-X22"
+                "UNIVIEW|IPC6242SR-X22",
+                "Milesight*|MS-C2961-EB"
             ],
             "ptzTraits": "EightWayPtz"
         },
@@ -572,7 +584,8 @@
                 "H264|N51820L",
                 "TRUEN Co., Ltd.|TN-P4230CSLXIR",
                 "TRUEN Co. Ltd.|*",
-				"Vista|VK2-3MPEFEDre"
+				"Vista|VK2-3MPEFEDre",
+                "eneo|IEP-63M2812M0A"
             ],
             "ptzTraits": "FourWayPtz"
         },
@@ -585,7 +598,8 @@
                 "Cellinx|STH795",
                 "Honeywell Security Group|HISD-2201WE", "MESSOA|SPD970",
                 "H264|N51820L",
-                "onvif|v047-1"
+                "onvif|v047-1",
+                "iPIXA|*"
             ],
             "onvifPtzPresetsEnabled": true
         },
@@ -796,7 +810,9 @@
                 "Dahua|DH-SD6AL240-HNI",
                 "Dahua|RPZ-230F-HNI",
                 "Dahua|DH-SD6AL230F-HNI",
-                "General|RPZ-230F-HNI"
+                "General|RPZ-230F-HNI",
+                "Dahua|XVR",
+                "Private|XVR"
             ],
             "preferredAuthScheme": "Automatic"
         },
@@ -1894,6 +1910,13 @@
                 "Bosch|IP5000*"
             ],
             "onvifPtzSpeedBroken": true
+        },
+        {
+            "keys": [
+                "AVer|FX2000"
+            ],
+            "highStreamAvailableBitrates":["100000"],
+            "lowStreamAvailableBitrates":["100000"]
         }
     ]
 }
