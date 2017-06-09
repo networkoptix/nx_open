@@ -1029,11 +1029,11 @@ Player::VideoQuality Player::actualVideoQuality() const
     }
 }
 
-QList<int> Player::availableCustomVideoQualities(const QList<int>& videoQualities) const
+QList<int> Player::availableVideoQualities(const QList<int>& videoQualities) const
 {
     Q_D(const Player);
 
-    d->log(lit("availableCustomVideoQualities() BEGIN"));
+    d->log(lit("availableVideoQualities() BEGIN"));
 
     QList<int> result;
 
@@ -1055,29 +1055,45 @@ QList<int> Player::availableCustomVideoQualities(const QList<int>& videoQualitie
                 codec, quality, liveMode, positionMs, camera);
         };
 
-    auto maximumHeight = getQuality(HighVideoQuality).frameSize.height();
-    if (maximumHeight <= 0)
-        maximumHeight = getQuality(LowVideoQuality).frameSize.height();
+    const auto highQuality = getQuality(HighVideoQuality);
+    const auto maximumHeight = highQuality.frameSize.height() > 0
+        ? highQuality.frameSize.height()
+        : getQuality(LowVideoQuality).frameSize.height();
 
     bool customResolutionAvailable = false;
+    QList<int> customQualities;
 
     for (auto videoQuality: videoQualities)
     {
-        const auto& resultQuality = getQuality(videoQuality);
+        switch (videoQuality)
+        {
+            case LowVideoQuality:
+            case LowIframesOnlyVideoQuality:
+                result.append(videoQuality);
+                break;
 
-        if (resultQuality.quality == CustomVideoQuality)
-            customResolutionAvailable = true;
+            case HighVideoQuality:
+                if (highQuality.quality == HighVideoQuality)
+                    result.append(videoQuality);
+                break;
 
-        if (resultQuality.frameSize.height() > maximumHeight)
-            continue;
+            default:
+            {
+                const auto& resultQuality = getQuality(videoQuality);
 
-        result.append(videoQuality);
+                if (resultQuality.quality == CustomVideoQuality)
+                    customResolutionAvailable = true;
+
+                if (resultQuality.frameSize.height() <= maximumHeight)
+                    customQualities.append(videoQuality);
+            }
+        }
     }
 
-    d->log(lit("availableCustomVideoQualities() END"));
+    d->log(lit("availableVideoQualities() END"));
 
-    if (!customResolutionAvailable)
-        return QList<int>();
+    if (customResolutionAvailable)
+        return result + customQualities;
 
     return result;
 }

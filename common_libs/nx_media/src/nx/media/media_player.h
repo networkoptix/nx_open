@@ -182,11 +182,12 @@ public:
     Q_INVOKABLE VideoQuality actualVideoQuality() const;
 
     /**
-     * @return Filtered list of available custom video qualities.
-     * Custom video quality is treated as available if its vertical resolution does not exceed
-     * vertical resolution of high quality stream.
+     * @return Filtered list of available video qualities.
+     * Video quality is treated as available if its vertical resolution does not exceed
+     * vertical resolution of high quality stream (or low quality stream if HQ stream is
+     * unavailable).
      */
-    Q_INVOKABLE QList<int> availableCustomVideoQualities(const QList<int>& videoQualities) const;
+    Q_INVOKABLE QList<int> availableVideoQualities(const QList<int>& videoQualities) const;
 
     QSize currentResolution() const;
 

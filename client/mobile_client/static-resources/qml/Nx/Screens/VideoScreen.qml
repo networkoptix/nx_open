@@ -165,6 +165,10 @@ PageBase
             onClicked:
             {
                 var customQualities = [ 1080, 720, 480, 360 ]
+                var allVideoQualities =
+                    [ MediaPlayer.LowVideoQuality, MediaPlayer.HighVideoQuality ]
+                        .concat(customQualities)
+
                 var player = videoScreenController.mediaPlayer
 
                 var dialog = Workflow.openDialog(
@@ -173,8 +177,8 @@ PageBase
                         "actualQuality": player.currentResolution,
                         "activeQuality": player.videoQuality,
                         "customQualities": customQualities,
-                        "availableCustomQualities":
-                            player.availableCustomVideoQualities(customQualities)
+                        "availableVideoQualities":
+                            player.availableVideoQualities(allVideoQualities)
                     }
                 )
 

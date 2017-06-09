@@ -8,9 +8,7 @@ DialogListItem
 
     property int quality: 0
 
-    readonly property bool customQuality: quality >= MediaPlayer.CustomVideoQuality
-
-    enabled: !customQuality || qualityDialog.availableCustomQualities.indexOf(quality) !== -1
+    enabled: qualityDialog.availableVideoQualities.indexOf(quality) !== -1
     active: qualityDialog.activeQuality == quality
     text: quality + 'p'
 

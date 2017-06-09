@@ -12,7 +12,7 @@ DialogBase
     property int activeQuality: MediaPlayer.LowVideoQuality
     property size actualQuality
     property var customQualities: []
-    property var availableCustomQualities: []
+    property var availableVideoQualities: []
 
     deleteOnClose: true
 
