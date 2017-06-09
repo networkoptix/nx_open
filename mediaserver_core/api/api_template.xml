@@ -2369,6 +2369,27 @@ the respective JSON fields can be empty.</description>
                   </params>
                 </result>
               </function>
+              <function>
+                  <name>getNonce</name>
+                  <description>
+                      Return authentication parameters: "nonce" and "realm".
+                  </description>
+                  <method>GET</method>
+                  <params />
+                  <result>
+                      <caption>A JSON object with an error code, error message, and the list of JSON objects in "reply" field:</caption>
+                      <params>
+                          <param>
+                              <name>realm</name>
+                              <description>A string token used in authentication methods as "realm".</description>
+                          </param>
+                          <param>
+                              <name>nonce</name>
+                              <description>A session key for the current user. The current server time is used as a nonce value, and the nonce is valid for about 5 minutes.</description>
+                          </param>
+                      </params>
+                  </result>
+              </function>
             </functions>
         </group>
         <group>
