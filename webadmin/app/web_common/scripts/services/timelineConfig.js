@@ -145,6 +145,7 @@ function TimelineConfig(){
         markerHeight: 48/100,
         markerPullDown: 3,
         markerTriangleHeight: 3/100,
+        triangleHeightOffset: 3,
         markerLineHeightOffset: 4,
         dateFormat: 'd mmmm yyyy', // Timemarker format for date
         timeFormat: 'HH:MM:ss', // Timemarker format for time
