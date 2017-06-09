@@ -1,3 +1,5 @@
+#include <boost/optional.hpp>
+
 #include <gtest/gtest.h>
 
 #include <nx/utils/time.h>
@@ -85,7 +87,12 @@ protected:
     void thenNonceCanBeFetched()
     {
         whenFetchedSystemNonce();
-        ASSERT_EQ(m_expectedNonce, m_fetchedNonce);
+        ASSERT_EQ(m_expectedNonce, *m_fetchedNonce);
+    }
+
+    void thenNoNonceFound()
+    {
+        ASSERT_FALSE(static_cast<bool>(m_fetchedNonce));
     }
 
 private:
@@ -95,7 +102,7 @@ private:
     api::AuthInfo m_expectedAuthInfo;
     api::AuthInfo m_fetchedAuthInfo;
     std::string m_expectedNonce;
-    std::string m_fetchedNonce;
+    boost::optional<std::string> m_fetchedNonce;
 
     void prepareTestData()
     {
@@ -130,7 +137,8 @@ TEST_F(DaoRdbUserAuthentication, inserting_system_nonce)
 
 TEST_F(DaoRdbUserAuthentication, fetching_not_existing_nonce)
 {
-    ASSERT_THROW(whenFetchedSystemNonce(), nx::db::Exception);
+    whenFetchedSystemNonce();
+    thenNoNonceFound();
 }
 
 TEST_F(DaoRdbUserAuthentication, replacing_system_nonce)

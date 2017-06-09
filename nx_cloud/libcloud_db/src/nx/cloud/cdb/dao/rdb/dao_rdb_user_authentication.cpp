@@ -12,7 +12,7 @@ namespace cdb {
 namespace dao {
 namespace rdb {
 
-std::string UserAuthentication::fetchSystemNonce(
+boost::optional<std::string> UserAuthentication::fetchSystemNonce(
     nx::db::QueryContext* const queryContext,
     const std::string& systemId)
 {
@@ -38,10 +38,7 @@ std::string UserAuthentication::fetchSystemNonce(
     }
 
     if (!query.next())
-    {
-        NX_DEBUG(this, lm("There is no nonce of system %1").arg(systemId));
-        throw nx::db::Exception(nx::db::DBResult::notFound);
-    }
+        return boost::none;
 
     return query.value(0).toString().toStdString();
 }
