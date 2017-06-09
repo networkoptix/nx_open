@@ -281,6 +281,7 @@ public:
     static const StringType HEAD;
     static const StringType POST;
     static const StringType PUT;
+    static const StringType DELETE;
     static const StringType OPTIONS;
 };
 

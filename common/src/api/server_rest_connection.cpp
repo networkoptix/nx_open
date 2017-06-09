@@ -280,24 +280,71 @@ T parseMessageBody(const Qn::SerializationFormat& format, const nx_http::BufferT
 }
 
 template <typename ResultType>
-Handle ServerConnection::executeGet(const QString& path, const QnRequestParamList& params, REST_CALLBACK(ResultType) callback, QThread* targetThread)
+Handle ServerConnection::executeGet(
+    const QString& path,
+    const QnRequestParamList& params,
+    REST_CALLBACK(ResultType) callback,
+    QThread* targetThread)
 {
-    nx_http::ClientPool::Request request = prepareRequest(nx_http::Method::GET, prepareUrl(path, params));
-    auto handle = request.isValid() ? executeRequest(request, callback, targetThread) : Handle();
+    auto request = prepareRequest(nx_http::Method::GET, prepareUrl(path, params));
+    auto handle = request.isValid()
+        ? executeRequest(request, callback, targetThread)
+        : Handle();
+
     trace(handle, path);
     return handle;
 }
 
 template <typename ResultType>
-Handle ServerConnection::executePost(const QString& path,
-                                           const QnRequestParamList& params,
-                                           const nx_http::StringType& contentType,
-                                           const nx_http::StringType& messageBody,
-                                           REST_CALLBACK(ResultType) callback,
-                                           QThread* targetThread)
+Handle ServerConnection::executePost(
+    const QString& path,
+    const QnRequestParamList& params,
+    const nx_http::StringType& contentType,
+    const nx_http::StringType& messageBody,
+    REST_CALLBACK(ResultType) callback,
+    QThread* targetThread)
 {
-    nx_http::ClientPool::Request request = prepareRequest(nx_http::Method::POST, prepareUrl(path, params), contentType, messageBody);
-    auto handle = request.isValid() ? executeRequest(request, callback, targetThread) : Handle();
+    auto request = prepareRequest(
+        nx_http::Method::POST, prepareUrl(path, params), contentType, messageBody);
+    auto handle = request.isValid()
+        ? executeRequest(request, callback, targetThread)
+        : Handle();
+
+    trace(handle, path);
+    return handle;
+}
+
+template <typename ResultType>
+Handle ServerConnection::executePut(
+    const QString& path,
+    const QnRequestParamList& params,
+    const nx_http::StringType& contentType,
+    const nx_http::StringType& messageBody,
+    REST_CALLBACK(ResultType) callback,
+    QThread* targetThread)
+{
+    auto request = prepareRequest(
+        nx_http::Method::PUT, prepareUrl(path, params), contentType, messageBody);
+    auto handle = request.isValid()
+        ? executeRequest(request, callback, targetThread)
+        : Handle();
+
+    trace(handle, path);
+    return handle;
+}
+
+template <typename ResultType>
+Handle ServerConnection::executeDelete(
+    const QString& path,
+    const QnRequestParamList& params,
+    REST_CALLBACK(ResultType) callback,
+    QThread* targetThread)
+{
+    auto request = prepareRequest(nx_http::Method::DELETE, prepareUrl(path, params));
+    auto handle = request.isValid()
+        ? executeRequest(request, callback, targetThread)
+        : Handle();
+
     trace(handle, path);
     return handle;
 }

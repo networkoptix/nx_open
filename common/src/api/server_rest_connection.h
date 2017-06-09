@@ -130,6 +130,20 @@ namespace rest
             REST_CALLBACK(ResultType) callback,
             QThread* targetThread);
 
+        template <typename ResultType> Handle executePut(
+            const QString& path,
+            const QnRequestParamList& params,
+            const nx_http::StringType& contentType,
+            const nx_http::StringType& messageBody,
+            REST_CALLBACK(ResultType) callback,
+            QThread* targetThread);
+
+        template <typename ResultType> Handle executeDelete(
+            const QString& path,
+            const QnRequestParamList& params,
+            REST_CALLBACK(ResultType) callback,
+            QThread* targetThread);
+
         template <typename ResultType>
         Handle executeRequest(const nx_http::ClientPool::Request& request, REST_CALLBACK(ResultType) callback, QThread* targetThread);
         Handle executeRequest(const nx_http::ClientPool::Request& request, REST_CALLBACK(QByteArray) callback, QThread* targetThread);

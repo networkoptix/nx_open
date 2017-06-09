@@ -281,7 +281,30 @@ void AsyncHttpClient::doPut(
         static_cast<FuncToCallType>(&AsyncHttpClient::doPut),
         url,
         contentType,
-        std::move(messageBody));
+                std::move(messageBody));
+}
+
+void AsyncHttpClient::doDelete(const QUrl& url)
+{
+    NX_ASSERT(url.isValid());
+
+    resetDataBeforeNewRequest();
+    m_requestUrl = url;
+    m_contentLocationUrl = url;
+    m_contentLocationUrl.setPath(QLatin1String("*"));
+    composeRequest(nx_http::Method::DELETE);
+    initiateHttpMessageDelivery();
+}
+
+void AsyncHttpClient::doDelete(
+    const QUrl& url, nx::utils::MoveOnlyFunc<void (AsyncHttpClientPtr)> completionHandler)
+{
+    typedef void(AsyncHttpClient::*FuncToCallType)(const QUrl& /*url*/);
+
+    doHttpOperation<const QUrl&>(
+        std::move(completionHandler),
+        static_cast<FuncToCallType>(&AsyncHttpClient::doDelete),
+        url);
 }
 
 void AsyncHttpClient::doOptions(const QUrl& url)
