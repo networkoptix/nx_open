@@ -102,8 +102,8 @@ private:
         m_expectedAuthInfo.records.resize(1);
         m_expectedAuthInfo.records[0].expirationTime = 
             nx::utils::floor<std::chrono::milliseconds>(nx::utils::utcTime());
-        m_expectedAuthInfo.records[0].nonce = nx::utils::generateRandomName(7);
-        m_expectedAuthInfo.records[0].intermediateResponse = nx::utils::generateRandomName(14);
+        m_expectedAuthInfo.records[0].nonce = nx::utils::generateRandomName(7).toStdString();
+        m_expectedAuthInfo.records[0].intermediateResponse = nx::utils::generateRandomName(14).toStdString();
     }
 };
 
