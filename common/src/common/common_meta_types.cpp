@@ -139,6 +139,8 @@ void QnCommonMetaTypes::initialize() {
     qRegisterMetaType<QnResourceTypeList>();
     qRegisterMetaType<QnResourcePtr>();
     qRegisterMetaType<QnResourceList>();
+    qRegisterMetaType<Qn::ResourceFlags>();
+    QMetaType::registerConverter<Qn::ResourceFlags, int>();
     qRegisterMetaType<Qn::ResourceStatus>();
     qRegisterMetaType<Qn::BitratePerGopType>();
     qRegisterMetaType<QnBusiness::EventReason>();
@@ -203,7 +205,7 @@ void QnCommonMetaTypes::initialize() {
 
     qRegisterMetaType<TypeSpecificParamMap>();
     qRegisterMetaType<QnCameraAdvancedParamValue>();
-	qRegisterMetaType<QnCameraAdvancedParamValueList>();
+    qRegisterMetaType<QnCameraAdvancedParamValueList>();
 
     qRegisterMetaType<QVector<int> >(); /* This one is used by QAbstractItemModel. */
 
