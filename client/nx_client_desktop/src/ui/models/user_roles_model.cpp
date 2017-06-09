@@ -80,7 +80,7 @@ int QnUserRolesModel::columnCount(const QModelIndex& parent) const
     if (parent.isValid())
         return 0;
 
-    return 1;
+    return isCheckable() ? 2 : 1;
 }
 
 void QnUserRolesModel::setCustomRoleStrings(const QString& name, const QString& description)
@@ -89,11 +89,56 @@ void QnUserRolesModel::setCustomRoleStrings(const QString& name, const QString& 
     d->setCustomRoleStrings(name, description);
 }
 
+bool QnUserRolesModel::isCheckable() const
+{
+    Q_D(const QnUserRolesModel);
+    return d->m_checkable;
+}
+
+void QnUserRolesModel::setCheckable(bool value)
+{
+    Q_D(QnUserRolesModel);
+    if (d->m_checkable == value)
+        return;
+
+    ScopedReset reset(this);
+    d->m_checkable = value;
+}
+
+bool QnUserRolesModel::predefinedRoleIdsEnabled() const
+{
+    Q_D(const QnUserRolesModel);
+    return d->m_predefinedRoleIdsEnabled;
+}
+
+void QnUserRolesModel::setPredefinedRoleIdsEnabled(bool value)
+{
+    Q_D(QnUserRolesModel);
+    if (d->m_predefinedRoleIdsEnabled == value)
+        return;
+
+    d->m_predefinedRoleIdsEnabled = value;
+
+    if (const int count = rowCount())
+        emit dataChanged(index(0, 0), index(count - 1, columnCount() - 1));
+}
+
+Qt::ItemFlags QnUserRolesModel::flags(const QModelIndex& index) const
+{
+    if (index.model() != this || !hasIndex(index.row(), index.column(), index.parent()))
+        return Qt::NoItemFlags;
+
+    Qt::ItemFlags flags = Qt::ItemIsEnabled | Qt::ItemIsSelectable;
+    if (isCheckable() && index.column() == CheckColumn)
+        flags |= Qt::ItemIsUserCheckable;
+
+    return flags;
+}
+
 QVariant QnUserRolesModel::data(const QModelIndex& index, int role) const
 {
     if (index.model() != this || !hasIndex(index.row(), index.column(), index.parent()))
         return QVariant();
-
 
     Q_D(const QnUserRolesModel);
 
@@ -104,16 +149,30 @@ QVariant QnUserRolesModel::data(const QModelIndex& index, int role) const
         /* Role name: */
         case Qt::DisplayRole:
         case Qt::AccessibleTextRole:
-            return roleModel.name;
+            return index.column() == NameColumn
+                ? roleModel.name
+                : QString();
 
         /* Role description: */
         case Qt::ToolTipRole:
+        case Qt::StatusTipRole:
         case Qt::AccessibleDescriptionRole:
-            return roleModel.description;
+            return index.column() == NameColumn
+                ? roleModel.description
+                : QString();
+
+        /* Role check state: */
+        case Qt::CheckStateRole:
+            return index.column() == CheckColumn
+                ? QVariant(d->m_checked.contains(index) ? Qt::Checked : Qt::Unchecked)
+                : QVariant();
 
         /* Role uuid (for custom roles): */
         case Qn::UuidRole:
-            return QVariant::fromValue(roleModel.roleUuid);
+            return QVariant::fromValue(
+                roleModel.roleType != Qn::UserRole::CustomUserRole && d->m_predefinedRoleIdsEnabled
+                    ? QnUserRolesManager::predefinedRoleId(roleModel.roleType)
+                    : roleModel.roleUuid);
 
         /* Role permissions (for built-in roles): */
         case Qn::GlobalPermissionsRole:
@@ -126,4 +185,27 @@ QVariant QnUserRolesModel::data(const QModelIndex& index, int role) const
         default:
             return QVariant();
     }
+}
+
+bool QnUserRolesModel::setData(const QModelIndex& index, const QVariant& value, int role)
+{
+    if (index.model() != this || !hasIndex(index.row(), index.column(), index.parent()))
+        return false;
+
+    if (!isCheckable() || index.column() != CheckColumn || role != Qt::CheckStateRole)
+        return false;
+
+    const bool checked = value.toInt() == Qt::Checked;
+
+    Q_D(QnUserRolesModel);
+    if (checked)
+        d->m_checked.insert(index);
+    else
+        d->m_checked.remove(index);
+
+    emit dataChanged(
+        index.sibling(index.row(), 0),
+        index.sibling(index.row(), columnCount() - 1));
+
+    return true;
 }

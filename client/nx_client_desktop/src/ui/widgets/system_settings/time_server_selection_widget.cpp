@@ -160,6 +160,8 @@ QnTimeServerSelectionWidget::QnTimeServerSelectionWidget(QWidget *parent /* = NU
 
             updateDescription();
             updateAlert();
+
+            emit hasChangesChanged();
         };
 
     connect(ui->syncWithInternetCheckBox, &QAbstractButton::toggled,
@@ -208,8 +210,9 @@ void QnTimeServerSelectionWidget::applyChanges()
 
 bool QnTimeServerSelectionWidget::hasChanges() const
 {
-    PRINT_DEBUG("checking if the widget has changes " + m_model->selectedServer().toByteArray() + " vs...");
-    return m_model->selectedServer() != selectedServer();
+    return m_model->selectedServer() != selectedServer()
+        || (qnGlobalSettings->isSynchronizingTimeWithInternet()
+            != ui->syncWithInternetCheckBox->isChecked());
 }
 
 QnUuid QnTimeServerSelectionWidget::selectedServer() const

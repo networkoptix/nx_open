@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.7)
+cmake_minimum_required(VERSION 3.3.2)
 project(nx_kit_test)
 
 set(CMAKE_CXX_STANDARD 11)
@@ -21,14 +21,11 @@ add_library(test_disabled_ini_config
     tests/ini_config_test.cpp
     tests/test_disabled_ini_config.cpp
 )
-set(CMAKE_CXX_VISIBILITY_PRESET hidden)
-set(EXPORT_MACRO "__attribute__((visibility(\"default\")))")
 target_compile_definitions(test_disabled_ini_config
     PRIVATE NX_INI_CONFIG_DISABLED
-    PRIVATE TEST_DISABLED_INI_CONFIG_API=${EXPORT_MACRO}
-    INTERFACE TEST_DISABLED_INI_CONFIG_API=
-    PRIVATE NX_KIT_API=
-    INTERFACE NX_KIT_API=
+    PRIVATE TEST_DISABLED_INI_CONFIG_API=${NX_KIT_API_EXPORT_MACRO}
+    INTERFACE TEST_DISABLED_INI_CONFIG_API=${NX_KIT_API_IMPORT_MACRO}
+    PRIVATE NX_KIT_API= #< nx_kit sources are statically linked into lib test_disabled_ini_config.
 )
 
 # Executable for all tests.

@@ -859,8 +859,13 @@ void QnWorkbenchConnectHandler::at_messageProcessor_initialResourcesReceived()
     NX_ASSERT(m_physicalState == PhysicalState::waiting_resources);
     setState(LogicalState::connected, PhysicalState::connected);
 
-    /* Reload all dialogs and dependent data. */
-    context()->instance<QnWorkbenchStateManager>()->forcedUpdate();
+    /* Reload all dialogs and dependent data.
+     * It's done delayed because some things - for example qnGlobalSettings -
+     * are updated in QueuedConnection to initial notification or resource addition. */
+    const auto workbenchStateUpdate =
+        [this] { context()->instance<QnWorkbenchStateManager>()->forcedUpdate(); };
+
+    executeDelayedParented(workbenchStateUpdate, 0, this);
 
     /* In several seconds after connect show warnings. */
     executeDelayedParented([this] { showWarnMessagesOnce(); }, kMessagesDelayMs, this);

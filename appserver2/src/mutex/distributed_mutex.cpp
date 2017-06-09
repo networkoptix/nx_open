@@ -54,7 +54,10 @@ void QnDistributedMutex::sendTransaction(const LockRuntimeInfo& lockInfo, ApiCom
     tran.params.timestamp = lockInfo.timestamp;
     if (m_owner->m_userDataHandler)
         tran.params.userData = m_owner->m_userDataHandler->getUserData(lockInfo.name);
-    ec2::sendTransaction(m_owner->messageBus(), tran, dstPeer);
+    if (dstPeer.isNull())
+        ec2::sendTransaction(m_owner->messageBus(), tran); //< Broadcast
+    else
+        ec2::sendTransaction(m_owner->messageBus(), tran, dstPeer);
 }
 
 void QnDistributedMutex::at_newPeerFound(QnUuid peer, Qn::PeerType peerType)
