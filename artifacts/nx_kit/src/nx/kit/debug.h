@@ -3,7 +3,8 @@
 /**@file
  * Utilities for debugging and logging debug values.
  *
- * This unit can be compiled in the context of any C++ project.
+ * This unit can be compiled in the context of any C++ project. If Qt headers are included before
+ * this one, some Qt support is enabled via "#if defined(QT_CORE_LIB)".
  */
 
 #include <iostream>
@@ -191,6 +192,25 @@ NX_KIT_API std::string toString(char c);
 NX_KIT_API std::string toString(const char* s);
 NX_KIT_API std::string toString(char* s);
 NX_KIT_API std::string toString(const void* ptr);
+
+#if defined(QT_CORE_LIB)
+
+static inline std::string toString(const QByteArray& b)
+{
+    return toString(b.toStdString());
+}
+
+static inline std::string toString(const QString& s)
+{
+    return toString(s.toUtf8().constData());
+}
+
+static inline std::string toString(const QUrl& u)
+{
+    return toString(u.toEncoded().toStdString());
+}
+
+#endif // defined(QT_CORE_LIB)
 
 template<typename P>
 std::string toString(P* ptr)

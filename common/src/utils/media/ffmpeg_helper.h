@@ -68,7 +68,7 @@ public:
      * Deserialize MediaContext from binary format used in v2.5. Requires ffmpeg impl to fill
      * default values. QnMediaContextSerializableData fields are expected to be non-initialized.
      */
-    static bool deserializeMediaContextFromDepricatedFormat(
+    static bool deserializeMediaContextFromDeprecatedFormat(
         QnMediaContextSerializableData* context, const char* data, int dataLen);
 
     static AVIOContext* createFfmpegIOContext(QnStorageResourcePtr resource, const QString& url, QIODevice::OpenMode openMode, int ioBlockSize = 32768);
