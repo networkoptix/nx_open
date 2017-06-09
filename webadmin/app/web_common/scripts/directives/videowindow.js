@@ -409,7 +409,7 @@ angular.module('nxCommon')
                 scope.$on('$destroy',function(){
                     recyclePlayer();
                     scope.vgApi.kill();
-                    if(videoPlayers == 1){
+                    if(videoPlayers.length == 1){
                         videoPlayers.pop();
                     }
                     else{
