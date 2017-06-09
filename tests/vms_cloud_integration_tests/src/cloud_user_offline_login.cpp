@@ -83,3 +83,13 @@ TEST_F(CloudUserOfflineLogin, DISABLED_login_works_on_offline_server_after_resta
     whenMediaServerRestarted();
     thenUserCanStillLogin();
 }
+
+// TEST_F(CloudUserOfflineLogin, multiple_users_can_login)
+
+// TEST_F(CloudUserOfflineLogin, multiple_users_different_history_depth)
+
+// TEST_F(CloudUserOfflineLogin, cloud_user_added_while_system_is_offline_cannot_login_while_others_can)
+
+// TEST_F(CloudUserOfflineLogin, user_can_login_after_password_change)
+
+// TEST_F(CloudUserOfflineLogin, user_password_changed_while_system_was_offline)
