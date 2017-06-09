@@ -20,7 +20,7 @@ class ColumnRemapProxyModel: public QSortFilterProxyModel
 public:
     // Constructor. Size of sourceColumns determines the model column count.
     // Indices in sourceColumns refer to source columns, -1 inserts a new not mapped column.
-    ColumnRemapProxyModel(
+    explicit ColumnRemapProxyModel(
         const QVector<int>& sourceColumns,
         QObject* parent = nullptr);
 
