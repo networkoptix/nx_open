@@ -241,6 +241,16 @@ bool deserialize(const QByteArray& value, T* outTarget)
 }
 
 /**
+ * NOTE: This overload is required since otherwise QString will be converted to QJsonValue, 
+ * corresponding overload will be called and deserialize will fail.
+ */
+template<class T>
+bool deserialize(const QString& value, T* outTarget)
+{
+    return deserialize(value.toUtf8(), outTarget);
+}
+
+/**
  * Deserialize a value from a JSON utf-8-encoded string, allowing for omitted values.
  * @param value JSON string to deserialize.
  * @param outIncompleteJsonValue Returned when some values were omitted.
