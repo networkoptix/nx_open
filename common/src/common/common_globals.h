@@ -768,6 +768,7 @@ QN_DECLARE_METAOBJECT_HEADER(Qn,
 } // namespace Qn
 
 Q_DECLARE_METATYPE(Qn::StatusChangeReason)
+Q_DECLARE_METATYPE(Qn::ResourceFlags)
 
 // TODO: #Elric #enum
 
@@ -778,16 +779,16 @@ QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
 
 QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
     (Qn::PtzObjectType)(Qn::PtzCommand)(Qn::PtzCoordinateSpace)(Qn::MotionType)
-        (Qn::StreamQuality)(Qn::SecondStreamQuality)(Qn::StatisticsDeviceType)
-        (Qn::ServerFlag)(Qn::BackupType)(Qn::CameraBackupQuality)(Qn::StorageInitResult)
-        (Qn::PanicMode)(Qn::RecordingType)
-        (Qn::ConnectionRole)(Qn::ResourceStatus)(Qn::BitratePerGopType)
-        (Qn::PeerType)(Qn::RebuildState)(Qn::BackupState)
-        (Qn::BookmarkSortField)(Qt::SortOrder)
-        (Qn::RebuildAction)(Qn::BackupAction)
-        (Qn::TTHeaderFlag)(Qn::IOPortType)(Qn::IODefaultState)(Qn::AuditRecordType)(Qn::AuthResult)
-        (Qn::FailoverPriority)
-        ,
+    (Qn::StreamQuality)(Qn::SecondStreamQuality)(Qn::StatisticsDeviceType)
+    (Qn::ServerFlag)(Qn::BackupType)(Qn::CameraBackupQuality)(Qn::StorageInitResult)
+    (Qn::PanicMode)(Qn::RecordingType)
+    (Qn::ConnectionRole)(Qn::ResourceStatus)(Qn::BitratePerGopType)
+    (Qn::PeerType)(Qn::RebuildState)(Qn::BackupState)
+    (Qn::BookmarkSortField)(Qt::SortOrder)
+    (Qn::RebuildAction)(Qn::BackupAction)
+    (Qn::TTHeaderFlag)(Qn::IOPortType)(Qn::IODefaultState)(Qn::AuditRecordType)(Qn::AuthResult)
+    (Qn::FailoverPriority)
+    ,
     (metatype)(lexical)
 )
 

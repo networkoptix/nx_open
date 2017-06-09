@@ -66,6 +66,7 @@ enum Value
     noMediaStream,
     cameraInitializationInProgress,
     cameraPluginError,
+    liveVideoIsNotSupportedError,
     unknown
 };
 
@@ -185,6 +186,15 @@ class NoMediaStreamResult: public Result
 public:
     NoMediaStreamResult()
         : Result(ErrorCode::noMediaStream)
+    {
+    }
+};
+
+class LiveVideoIsNotSupportedResult: public Result
+{
+public:
+    LiveVideoIsNotSupportedResult():
+        Result(ErrorCode::liveVideoIsNotSupportedError)
     {
     }
 };

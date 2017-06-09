@@ -447,7 +447,13 @@ QString QnBusinessStringsHelper::eventReason(const QnBusinessEventParameters& pa
     case StorageFullReason:
     {
         QString storageUrl = reasonParamsEncoded;
-        result = tr("HDD/SSD disk %1 is full. Disk contains too much data that is not managed by VMS.").arg(storageUrl);
+        result = tr("HDD/SSD disk \"%1\" is full. Disk contains too much data that is not managed by VMS.").arg(storageUrl);
+        break;
+    }
+    case SystemStorageFullReason:
+    {
+        QString storageUrl = reasonParamsEncoded;
+        result = tr("System disk \"%1\" is almost full.").arg(storageUrl);
         break;
     }
     case BackupFailedNoBackupStorageError:

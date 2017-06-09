@@ -67,15 +67,16 @@ function(nx_add_target name type)
             # Include "msvc.user.props" into each Visual Studio project.
             set_target_properties(${name} PROPERTIES
                 VS_USER_PROPS ${CMAKE_BINARY_DIR}/msvc.user.props)
-             
+
             # Add user config file to the project dir.
-            if((EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/${name}.vcxproj.user) 
+            if((EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/${name}.vcxproj.user)
                 AND (NOT EXISTS ${CMAKE_CURRENT_BINARY_DIR}/${name}.vcxproj.user))
 
-                nx_configure_file(${CMAKE_CURRENT_SOURCE_DIR}/${name}.vcxproj.user 
+                nx_configure_file(${CMAKE_CURRENT_SOURCE_DIR}/${name}.vcxproj.user
                     ${CMAKE_CURRENT_BINARY_DIR})
-
             endif()
+            project(${name})
+            set_property(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY VS_STARTUP_PROJECT ${name})
         endif()
     elseif("${type}" STREQUAL "LIBRARY")
         add_library(${name} ${NX_LIBRARY_TYPE} ${sources})

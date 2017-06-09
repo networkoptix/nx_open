@@ -82,8 +82,7 @@ void QnBufferedScreenGrabber::run()
             toggleAero(false);
     }
 
-    m_grabber.restartTimer();
-    //m_timer.start();
+    m_grabber.restart();
     while (!needToStop())
     {
         if (!needToStop() && m_queue.size() == m_queue.maxSize())

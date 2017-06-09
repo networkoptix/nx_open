@@ -51,6 +51,7 @@ QN_DECLARE_METAOBJECT_HEADER(QnBusiness, EventReason EventState EventType Action
         StorageIoErrorReason,
         StorageTooSlowReason,
         StorageFullReason,
+        SystemStorageFullReason,
         LicenseRemoved,
 
         BackupFailedNoBackupStorageError,

@@ -60,7 +60,7 @@ void QnArchiveCamResource::setMotionMaskPhysical(int /*channel*/)
 
 CameraDiagnostics::Result QnArchiveCamResource::initInternal()
 {
-    return CameraDiagnostics::BadMediaStreamResult();
+    return CameraDiagnostics::LiveVideoIsNotSupportedResult();
 }
 
 QnAbstractStreamDataProvider* QnArchiveCamResource::createLiveDataProvider()
