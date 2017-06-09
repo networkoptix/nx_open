@@ -1,9 +1,9 @@
 #include "dao_rdb_user_authentication.h"
 
+#include <utils/db/query.h>
 #include <nx/fusion/model_functions.h>
 #include <nx/fusion/serialization/sql.h>
 #include <nx/utils/log/log.h>
-#include <utils/db/query.h>
 
 #include <nx/cloud/cdb/client/data/auth_data.h>
 
@@ -13,19 +13,62 @@ namespace dao {
 namespace rdb {
 
 std::string UserAuthentication::fetchSystemNonce(
-    nx::db::QueryContext* const /*queryContext*/,
-    const std::string& /*systemId*/)
+    nx::db::QueryContext* const queryContext,
+    const std::string& systemId)
 {
-    // TODO
-    return std::string();
+    QString sqlRequestStr = R"sql(
+        SELECT nonce
+        FROM system_auth_info
+        WHERE system_id=:systemId
+    )sql";
+
+    nx::db::SqlQuery query(*queryContext->connection());
+    query.setForwardOnly(true);
+    query.prepare(sqlRequestStr);
+    query.bindValue(":systemId", QnSql::serialized_field(systemId));
+    try
+    {
+        query.exec();
+    }
+    catch (const nx::db::Exception e)
+    {
+        NX_WARNING(this, lm("Error selecting system %1 nonce. %2")
+            .arg(systemId).arg(e.what()));
+        throw;
+    }
+
+    if (!query.next())
+    {
+        NX_DEBUG(this, lm("There is no nonce of system %1").arg(systemId));
+        throw nx::db::Exception(nx::db::DBResult::notFound);
+    }
+
+    return query.value(0).toString().toStdString();
 }
 
 void UserAuthentication::insertOrReplaceSystemNonce(
-    nx::db::QueryContext* const /*queryContext*/,
-    const std::string& /*systemId*/,
-    const std::string& /*nonce*/)
+    nx::db::QueryContext* const queryContext,
+    const std::string& systemId,
+    const std::string& nonce)
 {
-    // TODO
+    nx::db::SqlQuery query(*queryContext->connection());
+    query.prepare(R"sql(
+        REPLACE INTO system_auth_info(system_id, nonce)
+        VALUES(:systemId, :nonce)
+    )sql");
+    query.bindValue(":systemId", QnSql::serialized_field(systemId));
+    query.bindValue(":nonce", QnSql::serialized_field(nonce));
+
+    try
+    {
+        query.exec();
+    }
+    catch (const nx::db::Exception e)
+    {
+        NX_WARNING(this, lm("Error inserting system %1 nonce %2. %3")
+            .arg(systemId).arg(nonce).arg(e.what()));
+        throw;
+    }
 }
 
 api::AuthInfo UserAuthentication::fetchUserAuthRecords(
@@ -51,7 +94,7 @@ api::AuthInfo UserAuthentication::fetchUserAuthRecords(
     }
     catch (const nx::db::Exception e)
     {
-        NX_DEBUG(this, lm("Error selecting user %1 auth records for system %2. %3")
+        NX_WARNING(this, lm("Error selecting user %1 auth records for system %2. %3")
             .arg(accountId).arg(systemId).arg(e.what()));
         throw;
     }
@@ -86,7 +129,7 @@ void UserAuthentication::insertUserAuthRecords(
         }
         catch(const nx::db::Exception e)
         {
-            NX_DEBUG(this, lm("Error inserting user %1 auth records (%2) for system %3. %4")
+            NX_WARNING(this, lm("Error inserting user %1 auth records (%2) for system %3. %4")
                 .arg(accountId).arg(userAuthRecords.records.size())
                 .arg(systemId).arg(e.what()));
             throw;

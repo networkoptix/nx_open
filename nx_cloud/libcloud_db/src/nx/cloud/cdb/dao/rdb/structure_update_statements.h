@@ -811,6 +811,19 @@ CREATE TABLE system_user_auth_info(
 
 )sql";
 
+/**
+ * CLOUD-1161. Adding cloud system nonce.
+ */
+static const char kAddSystemNonce[] = R"sql(
+
+CREATE TABLE system_auth_info(
+    system_id                   VARCHAR(64) NOT NULL PRIMARY KEY,
+    nonce                       VARCHAR(256) NOT NULL,
+    FOREIGN KEY(system_id) REFERENCES system(id) ON DELETE CASCADE
+);
+
+)sql";
+
 } // namespace db
 } // namespace cdb
 } // namespace nx
