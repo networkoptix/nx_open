@@ -11,7 +11,7 @@
 #include <nx/utils/uuid.h>
 
 #include <nx/cloud/cdb/client/cdb_request_path.h>
-#include <managers/cloud_module_url_provider.h>
+#include <nx/cloud/cdb/managers/cloud_module_url_provider.h>
 
 #include "test_setup.h"
 

@@ -16,10 +16,14 @@ class SqlQuery
 public:
     SqlQuery(QSqlDatabase connection);
 
+    void setForwardOnly(bool val);
     void prepare(const QString& query);
     void bindValue(const QString& placeholder, const QVariant& value) noexcept;
     void bindValue(int pos, const QVariant& value) noexcept;
     void exec();
+
+    QSqlQuery& impl();
+    const QSqlQuery& impl() const;
 
 private:
     QSqlQuery m_sqlQuery;

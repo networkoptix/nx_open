@@ -16,7 +16,7 @@
 #include <nx/utils/test_support/utils.h>
 #include <nx/utils/thread/sync_queue.h>
 
-#include <dao/rdb/system_data_object.h>
+#include <nx/cloud/cdb/dao/rdb/system_data_object.h>
 
 #include "test_setup.h"
 

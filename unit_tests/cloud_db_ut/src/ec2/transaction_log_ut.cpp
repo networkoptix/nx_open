@@ -1,26 +1,26 @@
 #include <gtest/gtest.h>
 
 #include <nx/fusion/model_functions.h>
+#include <nx/utils/counter.h>
 #include <nx/utils/random.h>
 #include <nx/utils/std/cpp14.h>
 #include <nx/utils/test_support/utils.h>
 #include <nx/utils/time.h>
-
-#include <nx/utils/counter.h>
 #include <utils/db/async_sql_query_executor.h>
 #include <utils/db/request_execution_thread.h>
 #include <utils/db/test_support/test_with_db_helper.h>
 
-#include <ec2/dao/memory/transaction_data_object_in_memory.h>
-#include <ec2/data_conversion.h>
-#include <ec2/outgoing_transaction_dispatcher.h>
-#include <ec2/transaction_log.h>
 #include <nx_ec/ec_proto_version.h>
-#include <test_support/business_data_generator.h>
+
+#include <nx/cloud/cdb/data/account_data.h>
+#include <nx/cloud/cdb/data/system_data.h>
+#include <nx/cloud/cdb/ec2/dao/memory/transaction_data_object_in_memory.h>
+#include <nx/cloud/cdb/ec2/data_conversion.h>
+#include <nx/cloud/cdb/ec2/outgoing_transaction_dispatcher.h>
+#include <nx/cloud/cdb/ec2/transaction_log.h>
+#include <nx/cloud/cdb/test_support/business_data_generator.h>
 
 #include "base_persistent_data_test.h"
-#include "data/account_data.h"
-#include "data/system_data.h"
 #include "test_outgoing_transaction_dispatcher.h"
 
 namespace nx {

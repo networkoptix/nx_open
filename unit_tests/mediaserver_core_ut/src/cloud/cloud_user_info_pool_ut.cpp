@@ -96,6 +96,11 @@ protected:
         petya3Auth = supplier->setUserInfo(3, "petya", generateTestNonce(3));
     }
 
+    void whenSameUserIsReported()
+    {
+        vasya1Auth = supplier->setUserInfo(2, "petya", generateTestNonce(2));
+    }
+
     void when3rdWithNonce3HasBeenAdded()
     {
         gena3Auth = supplier->setUserInfo(3, "gena", generateTestNonce(3));
@@ -136,6 +141,16 @@ protected:
 TEST_F(CloudUserInfoPool, commonNonce_simple)
 {
     given2UsersInfos();
+    auto nonce = userInfoPool.newestMostCommonNonce();
+    ASSERT_TRUE((bool)nonce);
+    ASSERT_EQ(*nonce, nx::Buffer(generateTestNonce(2)));
+}
+
+TEST_F(CloudUserInfoPool, sameUserReportedTwice)
+{
+    given2UsersInfos();
+    whenSameUserIsReported();
+
     auto nonce = userInfoPool.newestMostCommonNonce();
     ASSERT_TRUE((bool)nonce);
     ASSERT_EQ(*nonce, nx::Buffer(generateTestNonce(2)));

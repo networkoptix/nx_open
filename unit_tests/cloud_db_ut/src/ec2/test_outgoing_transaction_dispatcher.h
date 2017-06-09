@@ -7,7 +7,7 @@
 
 #include <nx/utils/move_only_func.h>
 
-#include <ec2/outgoing_transaction_dispatcher.h>
+#include <nx/cloud/cdb/ec2/outgoing_transaction_dispatcher.h>
 
 namespace nx {
 namespace cdb {

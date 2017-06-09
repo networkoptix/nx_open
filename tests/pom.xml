@@ -19,7 +19,18 @@
         <qt.libs/>
     </properties>
 
-    <modules>
-        <module>vms_cloud_integration_tests</module>
-    </modules>
+    <profiles>
+        <profile>
+            <id>not-macosx</id>
+            <activation>
+                <os>
+                    <family>!mac</family>
+                </os>
+            </activation>
+            <modules>
+                <module>vms_cloud_integration_tests</module>
+            </modules>
+        </profile>
+    </profiles>
+
 </project>

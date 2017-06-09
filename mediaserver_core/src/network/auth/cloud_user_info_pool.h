@@ -134,7 +134,7 @@ private:
     virtual void userInfoRemoved(const nx::Buffer& userName) override;
 
     void decUserCountByNonce(const nx::Buffer& cloudNonce);
-    void updateNameToNonces(const nx::Buffer& userName, const nx::Buffer& cloudNonce);
+    bool updateNameToNonces(const nx::Buffer& userName, const nx::Buffer& cloudNonce);
     void updateNonceToTs(const nx::Buffer& cloudNonce, uint64_t timestamp);
     void updateUserNonceToResponse(
         const nx::Buffer& userName,
