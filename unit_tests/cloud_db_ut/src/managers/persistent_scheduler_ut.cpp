@@ -122,7 +122,7 @@ public:
         nx::utils::MoveOnlyFunc<nx::db::DBResult(nx::db::QueryContext*)> dbUpdateFunc,
         nx::utils::MoveOnlyFunc<void(nx::db::QueryContext*, nx::db::DBResult)> completionHandler) override
     {
-        completionHandler(nullptr, dbUpdateFunc(nullptr));
+        std::thread([&]() {completionHandler(nullptr, dbUpdateFunc(nullptr)); }).detach();
     }
 
     virtual void executeUpdateWithoutTran(
@@ -135,7 +135,7 @@ public:
         nx::utils::MoveOnlyFunc<nx::db::DBResult(nx::db::QueryContext*)> dbSelectFunc,
         nx::utils::MoveOnlyFunc<void(nx::db::QueryContext*, nx::db::DBResult)> completionHandler) override
     {
-        completionHandler(nullptr, dbSelectFunc(nullptr));
+        std::thread([&]() {completionHandler(nullptr, dbSelectFunc(nullptr)); }).detach();
     }
 
     virtual nx::db::DBResult execSqlScriptSync(
@@ -266,6 +266,22 @@ TEST_F(PersistentScheduler, running2Tasks)
     thenTaskIdsAreFilled();
     thenTimersFiredSeveralTimes();
 }
+
+TEST_F(PersistentScheduler, running2Tasks_subscribeFromHandler)
+{
+
+}
+
+TEST_F(PersistentScheduler, running2Tasks_unsubscribeFromHandler)
+{
+
+}
+
+TEST_F(PersistentScheduler, tasksLoadedFromDb)
+{
+
+}
+
 
 } // namespace test
 } // namespace cdb

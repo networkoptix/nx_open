@@ -30,14 +30,13 @@ PersistentSheduler::PersistentSheduler(
     m_sqlExecutor(sqlExecutor),
     m_dbHelper(dbHelper)
 {
-    ScheduleData scheduleData;
     nx::utils::promise<void> readyPromise;
     auto readyFuture = readyPromise.get_future();
 
     m_sqlExecutor->executeSelect(
-        [this, &scheduleData](nx::db::QueryContext* queryContext)
+        [this](nx::db::QueryContext* queryContext)
         {
-            return m_dbHelper->getScheduleData(queryContext, &scheduleData);
+            return m_dbHelper->getScheduleData(queryContext, &m_scheduleData);
         },
         [readyPromise = std::move(readyPromise)](nx::db::QueryContext*, nx::db::DBResult result) mutable
         {
@@ -50,7 +49,6 @@ PersistentSheduler::PersistentSheduler(
         });
 
     readyFuture.wait();
-    m_scheduleData = scheduleData;
 }
 
 void PersistentSheduler::registerEventReceiver(
