@@ -1047,9 +1047,9 @@ void QnPlAxisResource::restartIOMonitorWithDelay(Qn::IOPortType portType, int in
     m_ioHttpMonitor[index].restartTimer.start(
         kReconnectTimeout,
         [this, portType, index]()
-    {
-        startIOMonitor(portType, m_ioHttpMonitor[index]);
-    });
+        {
+            startIOMonitor(portType, m_ioHttpMonitor[index]);
+        });
 }
 
 bool QnPlAxisResource::readPortSettings( CLSimpleHTTPClient* const http, QnIOPortDataList& ioPortList)
