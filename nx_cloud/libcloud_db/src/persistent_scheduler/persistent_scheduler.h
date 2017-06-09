@@ -24,13 +24,14 @@ namespace cdb {
 
 class PersistentSheduler;
 
+using OnTimerUserFunc = nx::utils::MoveOnlyFunc<nx::db::DBResult(nx::db::QueryContext*)>;
+
 class AbstractPersistentScheduleEventReceiver
 {
 public:
-    virtual void persistentTimerFired(
+    virtual OnTimerUserFunc persistentTimerFired(
         const QnUuid& taskId,
-        const ScheduleParams& params,
-        nx::db::QueryContext* context) = 0;
+        const ScheduleParams& params) = 0;
 
     virtual ~AbstractPersistentScheduleEventReceiver() {}
 };
@@ -49,7 +50,11 @@ public:
 
     void start();
 
-    /** Should be called inside dbHandler of AbstractAsyncSqlExecutor::execute{Update,Select}*/
+    /**
+     * Functions below should be called inside dbHandler
+     * of AbstractAsyncSqlExecutor::execute{Update,Select} or
+     * from AbstractPersistentScheduleEventReceiver::persistentTimerFired()
+     */
     nx::db::DBResult subscribe(
         nx::db::QueryContext* queryContext,
         const QnUuid& functorId,
@@ -57,22 +62,19 @@ public:
         std::chrono::milliseconds timeout,
         const ScheduleParams& params);
 
-    /** Should be called inside dbHandler of AbstractAsyncSqlExecutor::execute{Update,Select}*/
-    nx::db::DBResult subscribe(
-        nx::db::QueryContext* queryContext,
-        const QnUuid& functorId,
-        QnUuid* outTaskId,
-        std::chrono::steady_clock::time_point timepoint,
-        const ScheduleParams& params);
-
-    /** Should be called inside dbHandler of AbstractAsyncSqlExecutor::execute{Update,Select}*/
-    void unsubscribe(nx::db::QueryContext* queryContext, const QnUuid& taskId);
+    nx::db::DBResult unsubscribe(nx::db::QueryContext* queryContext, const QnUuid& taskId);
 
 private:
     void addTimer(
         const QnUuid& functorId,
-        const QnUuid& outTaskId,
-        const ScheduleTask& task);
+        const QnUuid& taskId,
+        const ScheduleTaskInfo& taskInfo);
+
+    nx::db::DBResult subscribe(
+        nx::db::QueryContext* queryContext,
+        const QnUuid& functorId,
+        QnUuid* outTaskId,
+        const ScheduleTaskInfo& taskInfo);
 
 private:
     nx::db::AbstractAsyncSqlQueryExecutor* m_sqlExecutor;

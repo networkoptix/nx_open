@@ -16,14 +16,13 @@ class DbHelperStub: public nx::cdb::AbstractSchedulerDbHelper
 public:
     MOCK_CONST_METHOD2(getScheduleData, nx::db::DBResult(nx::db::QueryContext*, nx::cdb::ScheduleData*));
     MOCK_METHOD2(registerEventReceiver, nx::db::DBResult(nx::db::QueryContext*, const QnUuid&));
-    MOCK_METHOD5(
+    MOCK_METHOD4(
         subscribe,
         nx::db::DBResult(
             nx::db::QueryContext* queryContext,
             const QnUuid& functorId,
             QnUuid* outTaskId,
-            std::chrono::steady_clock::time_point timepoint,
-            const ScheduleParams& params));
+            const ScheduleTaskInfo& taskInfo));
 };
 
 class SchedulerUser: public nx::cdb::AbstractPersistentScheduleEventReceiver
@@ -43,29 +42,32 @@ public:
         m_scheduler->registerEventReceiver(functorTypeId, this);
     }
 
-    virtual void persistentTimerFired(
+    virtual OnTimerUserFunc persistentTimerFired(
         const QnUuid& taskId,
-        const ScheduleParams& params,
-        nx::db::QueryContext* context) override
+        const ScheduleParams& params) override
     {
-        ASSERT_NE(params.find("key1"), params.cend());
-        ASSERT_NE(params.find("key2"), params.cend());
+        NX_ASSERT(params.find("key1") != params.cend());
+        NX_ASSERT(params.find("key2") != params.cend());
 
-        QnMutexLocker lock(&m_mutex);
-        ++m_tasks[taskId];
+        {
+            QnMutexLocker lock(&m_mutex);
+            ++m_tasks[taskId];
+        }
 
         if (m_shouldUnsubscribe)
         {
 //            m_scheduler->unsubscribe(functorTypeId);
 //            m_readyPromise->set_value();
         }
+
+        return [](nx::db::QueryContext*) { return nx::db::DBResult::ok; };
     }
 
     void subscribe(std::chrono::milliseconds timeout)
     {
         nx::cdb::ScheduleParams params;
         params["key1"] = "value1";
-        params["key1"] = "value1";
+        params["key2"] = "value1";
 
         m_executor->executeUpdate(
             [this, params, timeout](nx::db::QueryContext* queryContext)
@@ -80,6 +82,8 @@ public:
 
                 if (dbResult != nx::db::DBResult::ok)
                     return dbResult;
+
+                NX_ASSERT(!taskId.isNull());
 
                 QnMutexLocker lock(&m_mutex);
                 m_tasks.emplace(taskId, 0);
@@ -173,11 +177,27 @@ protected:
                 nullptr,
                 SchedulerUser::functorTypeId,
                 _,
-                _,
-                _)).Times(AtLeast(1)).WillRepeatedly(
+                _)).Times(AtLeast(1)).WillOnce(
                     ::testing::DoAll(
                         ::testing::SetArgPointee<2>(QnUuid::createUuid()),
                         Return(nx::db::DBResult::ok)));
+    }
+
+    void expectingDbHelperSubscribeWillBeCalled2Times()
+    {
+        EXPECT_CALL(
+            dbHelper,
+            subscribe(
+                nullptr,
+                SchedulerUser::functorTypeId,
+                _,
+                _)).Times(AtLeast(1)).WillOnce(
+                    ::testing::DoAll(
+                        ::testing::SetArgPointee<2>(QnUuid::createUuid()),
+                        Return(nx::db::DBResult::ok))).WillOnce(
+                            ::testing::DoAll(
+                                ::testing::SetArgPointee<2>(QnUuid::createUuid()),
+                                Return(nx::db::DBResult::ok)));
     }
 
     void whenSchedulerAndUserInitialized()
@@ -234,41 +254,19 @@ TEST_F(PersistentScheduler, running2Tasks)
     const std::chrono::milliseconds kSleepTimeout{ 100 };
 
     expectingDbHelperInitFunctionsWillBeCalled();
-    expectingDbHelperSubscribeWillBeCalled();
+    expectingDbHelperSubscribeWillBeCalled2Times();
     whenSchedulerAndUserInitialized();
 
     user->subscribe(kFirstTaskTimeout);
     user->subscribe(kSecondTaskTimeout);
 
     std::this_thread::sleep_for(kSleepTimeout);
+
+    ASSERT_EQ(user->tasks().size(), 2);
     thenTaskIdsAreFilled();
     thenTimersFiredSeveralTimes();
 }
 
-//TEST_F(PersistentSheduler, subscribeUnsubscribe_simple)
-//{
-//    // initialization
-//    AbstractAsyncSqlQueryExecutor* executor = ;
-//    PersistentSheduler manager(executor);
-
-//    SchedulerUser user(executor, &manager, &readyPromise);
-
-//    //
-//    timerManager.start();
-
-//    //
-//    user.addTimer();
-//    // executor.executeUpdate(
-//    //     [](QueryContext* queryContext){queryContext, manager.subscribe(std::chrono::milliseconds(10));},
-//    //     [](){}
-//    // );
-
-//    std::this_thread::sleep_for(std::chrono::milliseconds(100));
-
-//    readyFuture.wait();
-//    ASSERT_GE(manager.fired(), 0);
-//}
-
-}
-}
-}
+} // namespace test
+} // namespace cdb
+} // namespace nx
