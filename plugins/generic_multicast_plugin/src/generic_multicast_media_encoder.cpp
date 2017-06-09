@@ -1,10 +1,12 @@
+#include "generic_multicast_media_encoder.h"
+#include "generic_multicast_camera_manager.h"
+#include "generic_multicast_stream_reader.h"
+
 #include <cstring>
 
 #include <QtCore/QUrl>
 
-#include "generic_multicast_media_encoder.h"
-#include "generic_multicast_camera_manager.h"
-#include "generic_multicast_stream_reader.h"
+#include <nx/utils/std/cpp14.h>
 
 GenericMulticastMediaEncoder::GenericMulticastMediaEncoder(
     GenericMulticastCameraManager* const cameraManager)
