@@ -7,15 +7,15 @@ Rectangle
     id: control
 
     property alias loops: animation.loops
-    property int loopPeriodMs: 300
+    property int loopPeriodMs: 400
     property point pos
 
     opacity: 0.8
     height: radius * 2
     width: radius * 2
-    radius: 32
-    border.width: 0.5
-    border.color: ColorTheme.contrast4
+    radius: 48
+    border.width: 2
+    border.color: ColorTheme.contrast1
     color: "transparent"
 
     x: pos.x - width / 2

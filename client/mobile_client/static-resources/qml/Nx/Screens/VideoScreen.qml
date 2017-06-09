@@ -9,6 +9,7 @@ import com.networkoptix.qml 1.0
 
 import "private/VideoScreen"
 import "private/VideoScreen/utils.js" as VideoScreenUtils
+import "private/VideoScreen/Ptz"
 
 PageBase
 {
@@ -225,7 +226,8 @@ PageBase
     Component
     {
         id: scalableVideoComponent
-        ScalableVideo 
+
+        ScalableVideo
         {
             mediaPlayer: videoScreenController.mediaPlayer
             resourceHelper: videoScreenController.resourceHelper
@@ -234,23 +236,6 @@ PageBase
             {
                 if (!ptzPanel.moveOnTapMode)
                     toggleUi()
-            }
-
-            onClickedOnVideo:
-            {
-                if (!ptzPanel.moveOnTapMode)
-                    return
-
-                ptzPanel.moveOnTapMode = false
-                ptzPanel.moveViewport(viewport, aspect)
-                preloader.pos = mousePos
-                preloader.visible = true
-            }
-
-            PtzViewportMovePreloader
-            {
-                id: preloader
-                visible: false
             }
         }
     }
@@ -331,8 +316,14 @@ PageBase
             sourceSize.height: 56 * 2
             source: lp("/images/timeline_gradient.png")
 
-            visible: ptzPanel.visible || moveOnTapItem.visible
-            opacity: ptzPanel.opacity + moveOnTapItem.opacity
+            visible: (d.mode == VideoScreenUtils.VideoScreenMode.Ptz && d.uiVisible)
+                || ptzPanel.moveOnTapMode
+            opacity: visible ? 1 : 0
+
+            Behavior on opacity
+            {
+                NumberAnimation { duration: 250; easing.type: Easing.OutCubic }
+            }
         }
 
         PtzPanel
@@ -353,45 +344,66 @@ PageBase
             onMoveOnTapModeChanged:
             {
                 if (ptzPanel.moveOnTapMode)
+                {
                     hideUi()
+                    moveOnTapOverlay.open()
+                }
                 else
+                {
                     showUi()
+                    moveOnTapOverlay.close()
+                }
+            }
+
+            Connections
+            {
+                target: moveOnTapOverlay
+                onClicked:
+                {
+                    if (videoScreenController.resourceHelper.fisheyeParams.enabled || !video.item)
+                        return
+
+                    var mapped = mapToItem(video.item, pos.x, pos.y)
+                    var data = video.item.getMoveViewportData(mapped)
+                    if (!data)
+                        return
+
+                    ptzPanel.moveViewport(data.viewport, data.aspect)
+                    preloader.pos = pos
+                    preloader.visible = true
+                    video.item.fitToBounds()
+
+                    /**
+                      * Workaround. Otverwise it moves content to wrong place.
+                      * TODO: investigate and get rid of this workaround
+                      */
+                    video.item.fitToBounds()
+                }
+
+                onVisibleChanged:
+                {
+                    if (moveOnTapOverlay.visible)
+                        return
+
+                    showUi()
+                    ptzPanel.moveOnTapMode = false
+                }
             }
         }
 
-        Item
+        PtzViewportMovePreloader
         {
-            id: moveOnTapItem
+            id: preloader
 
-            anchors.fill: parent
+            parent: videoScreen
+            visible: false
+        }
 
-            visible: opacity > 0
-            opacity: ptzPanel.moveOnTapMode ? 1 : 0
+        MoveOnTapOverlay
+        {
+            id: moveOnTapOverlay
 
-            Button
-            {
-                anchors.left: parent.left
-                anchors.leftMargin: 4
-                anchors.bottom: parent.bottom
-                anchors.bottomMargin: 4
-
-                height: 48
-                flat: true
-                labelPadding: 16
-                leftPadding: 0
-                rightPadding: 0
-                topPadding: 0
-                bottomPadding: 0
-                padding: 0
-
-                text: qsTr("CANCEL")
-                onClicked: ptzPanel.moveOnTapMode = false
-            }
-
-            Behavior on opacity
-            {
-                NumberAnimation { duration: 250; easing.type: Easing.OutCubic }
-            }
+            parent: videoScreen
         }
 
         Loader

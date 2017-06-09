@@ -15,7 +15,11 @@ ZoomableFlickable
     property real maxZoomFactor: 4
     property alias videoCenterHeightOffsetFactor: content.videoCenterHeightOffsetFactor
 
-    signal clickedOnVideo(int channelId, rect viewport, real aspect, point mousePos)
+    function getMoveViewportData(position)
+    {
+        var mapped = mapToItem(video, position.x, position.y)
+        return video.getMoveViewportData(mapped)
+    }
 
     minContentWidth: width
     minContentHeight: height
@@ -68,16 +72,7 @@ ZoomableFlickable
 
         item: video
 
-        MultiVideoOutput
-        {
-            id: video
-
-            onClickedOnVideo:
-            {
-                var localMousePos = mapToItem(zf, mousePos.x, mousePos.y)
-                zf.clickedOnVideo(channelId, viewport, aspect, localMousePos)
-            }
-        }
+        MultiVideoOutput { id: video }
 
         onSourceSizeChanged: fitToBounds()
     }

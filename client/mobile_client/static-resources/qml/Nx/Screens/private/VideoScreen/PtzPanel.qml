@@ -1,5 +1,6 @@
 import QtQuick 2.6
 
+import Nx 1.0
 import Nx.Core 1.0
 import Nx.Controls 1.0
 
@@ -166,7 +167,8 @@ Item
 
                 y: joystick.y - height - 8
 
-                opacity: 0.8
+                color: ColorTheme.transparent(ColorTheme.base9, 0.8)
+
                 visible: controller.supportsMoveOnTap
                 width: 48
                 height: width

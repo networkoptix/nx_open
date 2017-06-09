@@ -16,10 +16,25 @@ Item
 
     property size __sourceSize
 
-    signal clickedOnVideo(int channelId, rect viewport, real aspect, point mousePos)
-
     implicitWidth: __sourceSize.width * layoutSize.width
     implicitHeight: __sourceSize.height * layoutSize.height
+
+    function getMoveViewportData(position)
+    {
+        for (var i = 0; i != children.length; ++i)
+        {
+            var child = children[i]
+            if (typeof child.getMoveViewportData !== "function")
+                continue
+
+            var mapped = mapToItem(child, position.x, position.y)
+            if (mapped.x < 0 || mapped.y < 0 || mapped.x > child.width || mapped.y > child.height)
+                continue;
+
+            return child.getMoveViewportData(mapped)
+        }
+        return null
+    }
 
     Repeater
     {
@@ -39,6 +54,26 @@ Item
             x: layoutPosition.x * cellWidth
             y: layoutPosition.y * cellHeight
 
+            function getMoveViewportData(position)
+            {
+                var source = videoOutput.sourceRect
+                var scale =  source.width / width
+                var pos = Qt.vector2d(position.x, position.y).times(scale)
+                if (pos.x < 0 || pos.y < 0 || pos.x > source.width || pos.y >source.height)
+                    return
+
+                var center = Qt.vector2d(source.width / 2, source.height / 2)
+                var topLeft = pos.minus(center)
+                var newViewport = Qt.rect(
+                    topLeft.x / source.width,
+                    topLeft.y / source.height,
+                    1, 1)
+
+                var videoAspect = videoOutput.sourceRect.width / videoOutput.sourceRect.height
+                var result = {"channeId": index, "viewport": newViewport, "aspect": videoAspect}
+                return result
+            }
+
             onSourceRectChanged:
             {
                 if (index === 0 && __sourceSize.width === 0.0)
@@ -46,31 +81,6 @@ Item
             }
 
             Component.onCompleted: setPlayer(mediaPlayer, index)
-
-            MouseArea
-            {
-                anchors.fill: parent
-
-                onClicked:
-                {
-                    var source = videoOutput.sourceRect
-                    var scale =  source.width / width
-                    var pos = Qt.vector2d(mouse.x, mouse.y).times(scale)
-                    if (pos.x < 0 || pos.y < 0 || pos.x > source.width || pos.y >source.height)
-                        return
-
-                    var aspect = videoOutput.sourceRect.width / videoOutput.sourceRect.height
-                    var center = Qt.vector2d(source.width / 2, source.height / 2)
-                    var topLeft = pos.minus(center)
-                    var newViewport = Qt.rect(
-                        topLeft.x / source.width,
-                        topLeft.y / source.height,
-                        1, 1)
-
-                    var mousePos = mapToItem(multiVideoOutput, mouse.x, mouse.y)
-                    multiVideoOutput.clickedOnVideo(index, newViewport, aspect, mousePos)
-                }
-            }
         }
     }
 
