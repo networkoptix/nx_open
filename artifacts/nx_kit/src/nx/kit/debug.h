@@ -12,6 +12,13 @@
 #include <functional>
 #include <sstream>
 
+#if defined(QT_CORE_LIB)
+    // To be supported in NX_PRINT_VALUE.
+    #include <QtCore/QByteArray>
+    #include <QtCore/QString>
+    #include <QtCore/QUrl>
+#endif
+
 #if !defined(NX_KIT_API)
     #define NX_KIT_API
 #endif
