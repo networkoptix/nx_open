@@ -59,18 +59,51 @@ void PersistentSheduler::registerEventReceiver(
         });
 }
 
-nx::db::DBResult subscribe(
+nx::db::DBResult PersistentSheduler::subscribe(
     nx::db::QueryContext* queryContext,
     const QnUuid& functorId,
     QnUuid* outTaskId,
     std::chrono::milliseconds timeout,
     const ScheduleParams& params)
 {
-    return nx::db::DBResult::ioError;
+    return subscribe(queryContext, functorId, outTaskId, calcTimePoint(timeout), params);
+}
+
+nx::db::DBResult PersistentSheduler::subscribe(
+    nx::db::QueryContext* queryContext,
+    const QnUuid& functorId,
+    QnUuid* outTaskId,
+    std::chrono::steady_clock::time_point timepoint,
+    const ScheduleParams& params)
+{
+    auto dbResult = m_dbHelper->subscribe(queryContext, functorId, outTaskId, timepoint, params);
+    if (dbResult != nx::db::DBResult::ok)
+    {
+        NX_LOG(lit("[Scheduler] Failed to subscribe. Functor id: %1")
+            .arg(functorId.toString()), cl_logERROR);
+        return dbResult;
+    }
+
+    addTimer(functorId, *outTaskId, { params, timepoint });
+    return nx::db::DBResult::ok;
+}
+
+void PersistentSheduler::addTimer(
+    const QnUuid& functorId,
+    const QnUuid& outTaskId,
+    const ScheduleTask& task)
+{
 }
 
 void PersistentSheduler::start()
 {
+    for (const auto functorToTask : m_scheduleData.functorToTasks)
+    {
+        addTimer(
+            functorToTask.first,
+            functorToTask.second,
+            m_scheduleData.taskToParams[functorToTask.second]);
+    }
 }
 
 } // namespace cdb

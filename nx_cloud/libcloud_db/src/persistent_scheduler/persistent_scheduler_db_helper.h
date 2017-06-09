@@ -23,7 +23,7 @@ public:
         nx::db::QueryContext* queryContext,
         const QnUuid& functorId,
         QnUuid* outTaskId,
-        std::chrono::milliseconds timeout,
+        std::chrono::steady_clock::time_point timepoint,
         const ScheduleParams& params) = 0;
 
 };

@@ -6,6 +6,7 @@
 #include <nx/utils/uuid.h>
 #include <nx/utils/singleton.h>
 #include <nx/utils/thread/mutex.h>
+#include <nx/utils/timer_manager.h>
 #include <utils/db/async_sql_query_executor.h>
 #include "persistent_scheduler_db_helper.h"
 #include "persistent_scheduler_common.h"
@@ -48,6 +49,7 @@ public:
 
     void start();
 
+    /** Should be called inside dbHandler of AbstractAsyncSqlExecutor::execute{Update,Select}*/
     nx::db::DBResult subscribe(
         nx::db::QueryContext* queryContext,
         const QnUuid& functorId,
@@ -55,7 +57,22 @@ public:
         std::chrono::milliseconds timeout,
         const ScheduleParams& params);
 
+    /** Should be called inside dbHandler of AbstractAsyncSqlExecutor::execute{Update,Select}*/
+    nx::db::DBResult subscribe(
+        nx::db::QueryContext* queryContext,
+        const QnUuid& functorId,
+        QnUuid* outTaskId,
+        std::chrono::steady_clock::time_point timepoint,
+        const ScheduleParams& params);
+
+    /** Should be called inside dbHandler of AbstractAsyncSqlExecutor::execute{Update,Select}*/
     void unsubscribe(nx::db::QueryContext* queryContext, const QnUuid& taskId);
+
+private:
+    void addTimer(
+        const QnUuid& functorId,
+        const QnUuid& outTaskId,
+        const ScheduleTask& task);
 
 private:
     nx::db::AbstractAsyncSqlQueryExecutor* m_sqlExecutor;
@@ -63,6 +80,7 @@ private:
     FunctorToReceiverMap m_functorToReceiver;
     QnMutex m_mutex;
     ScheduleData m_scheduleData;
+    nx::utils::StandaloneTimerManager m_timerManager;
 };
 
 }
