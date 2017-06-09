@@ -10,6 +10,29 @@ QnRestRequestHandler::QnRestRequestHandler():
 
 }
 
+int QnRestRequestHandler::executeDelete(
+    const QString& path,
+    const QnRequestParamList& params,
+    QByteArray& result,
+    QByteArray& contentType,
+    const QnRestConnectionProcessor*)
+{
+    return nx_http::StatusCode::notImplemented;
+}
+
+int QnRestRequestHandler::executePut(
+    const QString& path,
+    const QnRequestParamList& params,
+    const QByteArray& body,
+    const QByteArray& srcBodyContentType,
+    QByteArray& result,
+    QByteArray& resultContentType,
+    const QnRestConnectionProcessor* processor)
+{
+    return executePost(
+        path, params, body, srcBodyContentType, result, resultContentType, processor);
+}
+
 QString QnRestRequestHandler::extractAction(const QString &path) const {
     QString localPath = path;
     while(localPath.endsWith(L'/'))

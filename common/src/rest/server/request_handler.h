@@ -1,5 +1,4 @@
-#ifndef __REQUEST_HANDLER_H__
-#define __REQUEST_HANDLER_H__
+#pragma once
 
 #include <QtCore/QObject>
 #include <QtCore/QPair>
@@ -21,7 +20,8 @@ class QnRestConnectionProcessor;
 // are named XyzRestHandler I suggest to rename this one to either
 // QnAbstractRestHandler or simply to QnRestHandler. And rename the header.
 
-enum class RestPermissions {
+enum class RestPermissions
+{
     anyUser,
     adminOnly
 };
@@ -32,25 +32,43 @@ enum class RestPermissions {
  *  
  * Single handler instance receives all requests, each request in different thread.
  */
-class QnRestRequestHandler: public QObject {
+class QnRestRequestHandler: public QObject
+{
     Q_OBJECT
+
 public:
     QnRestRequestHandler();
 
     //TODO: #rvasilenko #EC2 replace QnRequestParamList -> QnRequestParams
     //TODO: #rvasilenko replace parameters set with a single struct, 8 arguments is far too many
     //TODO: #rvasilenko looks like QnRestConnectionProcessor* is used only to get and modify its headers
-    /*!
-        \return http statusCode
-    */
+
+    /**
+     * @return HTTP status code.
+     */
     virtual int executeGet(const QString& path, const QnRequestParamList& params,
-                           QByteArray& result, QByteArray& contentType, const QnRestConnectionProcessor*) = 0;
-    /*!
-        \return http statusCode
-    */
-    virtual int executePost(const QString& path, const QnRequestParamList& params,
-                            const QByteArray& body, const QByteArray& srcBodyContentType, QByteArray& result,
-                            QByteArray& resultContentType, const QnRestConnectionProcessor*) = 0;
+        QByteArray& result, QByteArray& contentType, const QnRestConnectionProcessor*) = 0;
+
+    /**
+     * @return HTTP status code.
+     */
+    virtual int executeDelete(const QString& path, const QnRequestParamList& params,
+        QByteArray& result, QByteArray& contentType, const QnRestConnectionProcessor*);
+
+    /**
+     * @return HTTP status code.
+     */
+    virtual int executePost(
+        const QString& path, const QnRequestParamList& params,
+        const QByteArray& body, const QByteArray& srcBodyContentType, QByteArray& result,
+        QByteArray& resultContentType, const QnRestConnectionProcessor*) = 0;
+
+    /**
+     * @return HTTP status code.
+     */
+    virtual int executePut(const QString& path, const QnRequestParamList& params,
+        const QByteArray& body, const QByteArray& srcBodyContentType, QByteArray& result,
+        QByteArray& resultContentType, const QnRestConnectionProcessor*);
 
     virtual void afterExecute(const QString& /*path*/, const QnRequestParamList& /*params*/,
                               const QByteArray& /*body*/, const QnRestConnectionProcessor* /*owner*/) {}
@@ -91,5 +109,3 @@ protected:
 
     QnRestGUIRequestHandlerPrivate *d_ptr;
 };
-
-#endif // __REQUEST_HANDLER_H__
