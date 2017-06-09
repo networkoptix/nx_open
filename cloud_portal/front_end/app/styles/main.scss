@@ -723,7 +723,12 @@ h2.version-number{
     height: 18px;
     background-position: -2px -34px;
 }
-
+.glyphicon-menu-hamburger{
+    @include kill-glyphicon;
+    width: 20px;
+    height: 18px;
+    background-position: -50px -34px;
+}
 .glyphicon-share{
     @include kill-glyphicon;
     background-position: -16px 0;
