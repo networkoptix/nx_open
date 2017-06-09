@@ -62,9 +62,9 @@ static const qint64 BOOKMARK_CLEANUP_INTERVAL = 1000ll * 60;
 
 const qint64 kMinStorageFreeSpace = 150 * 1024 * 1024LL;
 #ifdef __arm__
-const qint64 kMinSystemStorageFreeSpace = 1000000000LL;
+const qint64 kMinSystemStorageFreeSpace = 1000 * 1000 * 1000LL;
 #else
-const qint64 kMinSystemStorageFreeSpace = 5000000000LL;
+const qint64 kMinSystemStorageFreeSpace = 5000 * 1000 * 1000LL;
 #endif
 
 static const QString SCAN_ARCHIVE_FROM(lit("SCAN_ARCHIVE_FROM"));
@@ -1549,8 +1549,6 @@ void QnStorageManager::clearSpace(bool forced)
 {
     QnMutexLocker lk(&m_clearSpaceMutex);
 
-    checkSystemStorageSpace();
-
     // if Backup on Schedule (or on demand) synchronization routine is
     // running at the moment, dont run clearSpace() if it's been triggered by
     // the timer.
@@ -2139,14 +2137,18 @@ void QnStorageManager::changeStorageStatus(const QnStorageResourcePtr &fileStora
 void QnStorageManager::startAuxTimerTasks()
 {
     static const std::chrono::minutes kWriteInfoFilesInterval(5);
-
     m_auxTasksTimerManager.addNonStopTimer(
         [this](nx::utils::TimerId) { m_camInfoWriter.write(); },
         kWriteInfoFilesInterval,
         kWriteInfoFilesInterval);
 
-    static const std::chrono::minutes kRemoveEmptyDirsInterval(60);
+    static const std::chrono::minutes kCheckSystemStorageSpace(1);
+    m_auxTasksTimerManager.addNonStopTimer(
+        [this](nx::utils::TimerId) { checkSystemStorageSpace(); },
+        kCheckSystemStorageSpace,
+        kCheckSystemStorageSpace);
 
+    static const std::chrono::minutes kRemoveEmptyDirsInterval(60);
     m_auxTasksTimerManager.addNonStopTimer(
         [this](nx::utils::TimerId)
         {
