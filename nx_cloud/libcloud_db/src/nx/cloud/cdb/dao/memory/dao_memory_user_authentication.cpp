@@ -35,7 +35,7 @@ api::AuthInfo UserAuthentication::fetchUserAuthRecords(
     return it->second;
 }
 
-void UserAuthentication::saveUserAuthRecords(
+void UserAuthentication::insertUserAuthRecords(
     nx::db::QueryContext* const /*queryContext*/,
     const std::string& systemId,
     const std::string& accountEmail,

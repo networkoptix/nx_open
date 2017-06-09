@@ -98,12 +98,24 @@ public:
      */
     std::string intermediateResponse;
     std::chrono::system_clock::time_point expirationTime;
+
+    bool operator==(const AuthInfoRecord& right) const
+    {
+        return nonce == right.nonce
+            && intermediateResponse == right.intermediateResponse
+            && expirationTime == right.expirationTime;
+    }
 };
 
 class AuthInfo
 {
 public:
     std::vector<AuthInfoRecord> records;
+
+    bool operator==(const AuthInfo& right) const
+    {
+        return records == right.records;
+    }
 };
 
 } // namespace api

@@ -138,8 +138,8 @@ nx::db::DBResult AuthenticationProvider::afterSharingSystem(
 
     api::AuthInfo userAuthRecords;
     userAuthRecords.records.push_back(std::move(authRecord));
-    m_authenticationDataObject->saveUserAuthRecords(
-        queryContext, sharing.systemId, sharing.accountEmail, userAuthRecords);
+    m_authenticationDataObject->insertUserAuthRecords(
+        queryContext, sharing.systemId, account->id, userAuthRecords);
 
     generateUpdateUserAuthInfoTransaction(
         queryContext, sharing, userAuthRecords);

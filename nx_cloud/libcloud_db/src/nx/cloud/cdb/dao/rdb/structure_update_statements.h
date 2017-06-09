@@ -794,6 +794,23 @@ CREATE TABLE system_health_history(
 
 )sql";
 
+/**
+ * CLOUD-1161. Adding cloud user offline login information.
+ */
+static const char kAddSystemUserAuthInfo[] = R"sql(
+
+CREATE TABLE system_user_auth_info(
+    system_id                   VARCHAR(64) NOT NULL,
+    account_id                  VARCHAR(64) NOT NULL,
+    nonce                       VARCHAR(256) NOT NULL,
+    intermediate_response       VARCHAR(256) NOT NULL,
+    expiration_time_utc         BIGINT,
+    FOREIGN KEY(system_id) REFERENCES system(id) ON DELETE CASCADE,
+    FOREIGN KEY(account_id) REFERENCES account(id) ON DELETE CASCADE
+);
+
+)sql";
+
 } // namespace db
 } // namespace cdb
 } // namespace nx

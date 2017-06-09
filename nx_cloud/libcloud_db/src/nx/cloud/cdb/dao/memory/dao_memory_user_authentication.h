@@ -27,7 +27,7 @@ public:
         const std::string& systemId,
         const std::string& userEmail) override;
 
-    virtual void saveUserAuthRecords(
+    virtual void insertUserAuthRecords(
         nx::db::QueryContext* const queryContext,
         const std::string& systemId,
         const std::string& accountEmail,

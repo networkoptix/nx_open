@@ -1,7 +1,9 @@
 #pragma once
 
-#include <nx/cloud/cdb/dao/rdb/db_instance_controller.h>
+#include <type_traits>
+
 #include <nx/cloud/cdb/dao/rdb/account_data_object.h>
+#include <nx/cloud/cdb/dao/rdb/db_instance_controller.h>
 #include <nx/cloud/cdb/dao/rdb/system_data_object.h>
 #include <nx/cloud/cdb/dao/rdb/system_sharing_data_object.h>
 
@@ -70,6 +72,60 @@ protected:
                 queryDonePromise.set_value(dbResult);
             });
         return queryDonePromise.get_future().get();
+    }
+
+    /**
+     * @param queryFunc throws nx::db::Exception.
+     */
+    template<typename QueryFunc, typename... OutputData>
+    void executeUpdateQuerySyncThrow(QueryFunc queryFunc)
+    {
+        nx::utils::promise<nx::db::DBResult> queryDonePromise;
+        m_persistentDbManager->queryExecutor().executeUpdate(
+            [&queryFunc](nx::db::QueryContext* queryContext)
+            {
+                queryFunc(queryContext);
+                return nx::db::DBResult::ok;
+            },
+            [&queryDonePromise](
+                nx::db::QueryContext*,
+                nx::db::DBResult dbResult,
+                OutputData... outputData)
+            {
+                queryDonePromise.set_value(dbResult);
+            });
+        const auto dbResult = queryDonePromise.get_future().get();
+        if (dbResult != nx::db::DBResult::ok)
+            throw nx::db::Exception(dbResult);
+    }
+
+    /**
+     * @param queryFunc throws nx::db::Exception.
+     */
+    template<typename QueryFunc>
+    typename std::result_of<QueryFunc(nx::db::QueryContext*)>::type 
+        executeSelectQuerySyncThrow(QueryFunc queryFunc)
+    {
+        typename std::result_of<QueryFunc(nx::db::QueryContext*)>::type result;
+
+        nx::utils::promise<nx::db::DBResult> queryDonePromise;
+        m_persistentDbManager->queryExecutor().executeSelect(
+            [&queryFunc, &result](nx::db::QueryContext* queryContext)
+            {
+                result = queryFunc(queryContext);
+                return nx::db::DBResult::ok;
+            },
+            [&queryDonePromise](
+                nx::db::QueryContext*,
+                nx::db::DBResult dbResult)
+            {
+                queryDonePromise.set_value(dbResult);
+            });
+        const auto dbResult = queryDonePromise.get_future().get();
+        if (dbResult != nx::db::DBResult::ok)
+            throw nx::db::Exception(dbResult);
+
+        return result;
     }
 
 private:
