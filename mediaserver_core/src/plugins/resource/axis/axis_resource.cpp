@@ -115,10 +115,13 @@ private:
     QnPlAxisResource* m_owner;
 };
 
-QnPlAxisResource::QnPlAxisResource() :
+QnPlAxisResource::QnPlAxisResource():
     m_lastMotionReadTime(0),
+    m_inputIoMonitor(Qn::PT_Input),
+    m_outputIoMonitor(Qn::PT_Output),
     m_audioTransmitter(new QnAxisAudioTransmitter(this))
 {
+
     setVendor(lit("Axis"));
     connect( this, &QnResource::propertyChanged, this, &QnPlAxisResource::at_propertyChanged, Qt::DirectConnection );
 }
@@ -126,12 +129,7 @@ QnPlAxisResource::QnPlAxisResource() :
 QnPlAxisResource::~QnPlAxisResource()
 {
     m_audioTransmitter.reset();
-    stopInputPortMonitoringAsync();
-
-    QnMutexLocker lock(&m_inputPortMutex);
-    while (!m_stoppingHttpClients.empty())
-        m_stopInputMonitoringWaitCondition.wait(lock.mutex());
-
+    stopInputPortMonitoringSync();
 }
 
 void QnPlAxisResource::checkIfOnlineAsync( std::function<void(bool)> completionHandler )
@@ -197,23 +195,27 @@ bool QnPlAxisResource::startInputPortMonitoringAsync( std::function<void(bool)>&
         QnMutexLocker lock(&m_mutex);
         m_ioStates.clear();
     }
-
-    bool rez = startIOMonitor(Qn::PT_Input, m_ioHttpMonitor[0]);
-    if (isIOModule())
-        startIOMonitor(Qn::PT_Output, m_ioHttpMonitor[1]);
-
-    QnMutexLocker lk( &m_inputPortMutex );
-    readCurrentIOStateAsync(); // read current state after starting I/O monitor to avoid time period if port updated before monitor was running
-    return rez;
+    m_timer.post([this]() { startInputPortMonitoring(); });
+    return true;
 }
 
-bool QnPlAxisResource::startIOMonitor(Qn::IOPortType portType, IOMonitor& ioMonitor)
+void QnPlAxisResource::startInputPortMonitoring()
+{
+    startIOMonitorInternal(m_inputIoMonitor);
+    if (isIOModule())
+        startIOMonitorInternal(m_outputIoMonitor);
+    readCurrentIOStateAsync();
+}
+
+bool QnPlAxisResource::startIOMonitorInternal(IOMonitor& ioMonitor)
 {
     if( hasFlags(Qn::foreigner) ||      //we do not own camera
         m_ioPorts.empty() )    //camera report no io
     {
         return false;
     }
+    if (ioMonitor.httpClient)
+        return true; //< already started
 
     //based on VAPIX Version 3 I/O Port API
 
@@ -226,9 +228,10 @@ bool QnPlAxisResource::startIOMonitor(Qn::IOPortType portType, IOMonitor& ioMoni
     QString requestQuery = lit("monitor=");
 
     QString portList;
-    for (const auto& port: getIOPorts()) {
-        //if (port.portType != Qn::PT_Disabled) {
-        if (port.portType == portType) {
+    for (const auto& port: getIOPorts())
+    {
+        if (port.portType == ioMonitor.portType)
+        {
             if (!portList.isEmpty())
                 portList += lit(",");
             portList += portIndexToReqParam(portIdToIndex(port.id));
@@ -240,8 +243,8 @@ bool QnPlAxisResource::startIOMonitor(Qn::IOPortType portType, IOMonitor& ioMoni
     requestQuery += portList;
     requestUrl.setQuery(requestQuery);
 
-    QnMutexLocker lk( &m_inputPortMutex );
     nx_http::AsyncHttpClientPtr httpClient = nx_http::AsyncHttpClient::create();
+    httpClient->bindToAioThread(m_timer.getAioThread());
     connect( httpClient.get(), &nx_http::AsyncHttpClient::responseReceived, this, &QnPlAxisResource::onMonitorResponseReceived, Qt::DirectConnection );
     connect( httpClient.get(), &nx_http::AsyncHttpClient::someMessageBodyAvailable, this, &QnPlAxisResource::onMonitorMessageBodyAvailable, Qt::DirectConnection );
     connect( httpClient.get(), &nx_http::AsyncHttpClient::done, this, &QnPlAxisResource::onMonitorConnectionClosed, Qt::DirectConnection );
@@ -261,47 +264,32 @@ bool QnPlAxisResource::startIOMonitor(Qn::IOPortType portType, IOMonitor& ioMoni
 
 void QnPlAxisResource::stopInputPortMonitoringAsync()
 {
-    for (int i = 0; i < 2; ++i)
-    {
-        resetHttpClient(m_ioHttpMonitor[i].httpClient);
-        m_ioHttpMonitor[i].restartTimer.cancelSync();
-    }
-    resetHttpClient(m_inputPortStateReader);
+    m_timer.post(
+        [this]()
+        {
+            stopInputPortMonitoringSync();
+        }
+    );
+}
+
+void QnPlAxisResource::stopInputPortMonitoringSync()
+{
+    m_inputIoMonitor.httpClient.reset();
+    m_outputIoMonitor.httpClient.reset();
+    m_inputPortStateReader.reset();
+    m_timer.cancelSync();
 
     auto timeMs = qnSyncTime->currentMSecsSinceEpoch();
-    for (const auto& state: ioStates())
+    for (const auto& state : ioStates())
     {
         if (state.isActive)
             updateIOState(state.id, false /*inactive*/, timeMs, true /*override*/);
     }
 }
 
-void QnPlAxisResource::resetHttpClient(nx_http::AsyncHttpClientPtr& value)
-{
-    QnMutexLocker lk( &m_inputPortMutex );
-
-    if( !value )
-        return;
-
-    nx_http::AsyncHttpClientPtr httpClient;
-    httpClient.swap(value);
-    m_stoppingHttpClients.insert(httpClient);
-
-    lk.unlock();
-
-    httpClient->pleaseStop([httpClient, this]()
-        {
-            QnMutexLocker lock(&m_inputPortMutex);
-            m_stoppingHttpClients.erase(httpClient);
-            m_stopInputMonitoringWaitCondition.wakeAll();
-        });
-
-}
-
 bool QnPlAxisResource::isInputPortMonitored() const
 {
-    QnMutexLocker lk( &m_inputPortMutex );
-    return m_ioHttpMonitor[0].httpClient.get() != nullptr;
+    return m_inputIoMonitor.httpClient != nullptr;
 }
 
 void QnPlAxisResource::clear()
@@ -947,13 +935,9 @@ bool QnPlAxisResource::initialize2WayAudio(CLSimpleHTTPClient * const http)
 void QnPlAxisResource::onMonitorResponseReceived( nx_http::AsyncHttpClientPtr httpClient )
 {
     NX_ASSERT( httpClient );
-    int index = -1;
-    QnMutexLocker lk( &m_inputPortMutex );
-    if (m_ioHttpMonitor[0].httpClient == httpClient)
-        index = 0;
-    else if (m_ioHttpMonitor[1].httpClient == httpClient)
-        index = 1;
-    else
+
+    IOMonitor* ioMonitor = ioMonitorByHttpClient(httpClient);
+    if (!ioMonitor)
         return;
 
     if (httpClient->response()->statusLine.statusCode != nx_http::StatusCode::ok)
@@ -964,7 +948,7 @@ void QnPlAxisResource::onMonitorResponseReceived( nx_http::AsyncHttpClientPtr ht
     }
 
     //analyzing response headers (if needed)
-    if (!m_ioHttpMonitor[index].contentParser->setContentType(httpClient->contentType()))
+    if (!ioMonitor->contentParser->setContentType(httpClient->contentType()))
     {
         static const char* multipartContentType = "multipart/x-mixed-replace";
 
@@ -988,9 +972,11 @@ void QnPlAxisResource::onCurrentIOStateResponseReceived( nx_http::AsyncHttpClien
         NX_LOG( lit("Axis camera %1. Failed to read current IO state. %2").
             arg(getUrl()).arg(QLatin1String(httpClient->response()->statusLine.reasonPhrase)), cl_logWARNING );
     }
-    else {
+    else
+    {
         QList<QByteArray> result = httpClient->fetchMessageBodyBuffer().split('\n');
-        for (const auto& line: result) {
+        for (const auto& line: result)
+        {
             QList<QByteArray> params = line.trimmed().split('=');
             if (params.size() == 2) {
                 int portIndex = portDisplayNameToIndex(QString::fromLatin1(params[0]));
@@ -1001,55 +987,51 @@ void QnPlAxisResource::onCurrentIOStateResponseReceived( nx_http::AsyncHttpClien
         }
     }
 
-    QnMutexLocker lk( &m_inputPortMutex );
-    if (m_inputPortStateReader == httpClient)
-        m_inputPortStateReader.reset();
+    m_inputPortStateReader.reset();
+}
+
+QnPlAxisResource::IOMonitor* QnPlAxisResource::ioMonitorByHttpClient(nx_http::AsyncHttpClientPtr httpClient)
+{
+    if (m_inputIoMonitor.httpClient == httpClient)
+        return &m_inputIoMonitor;
+    else if (m_outputIoMonitor.httpClient == httpClient)
+        return &m_outputIoMonitor;
+    else
+        return nullptr;
 }
 
 void QnPlAxisResource::onMonitorMessageBodyAvailable( nx_http::AsyncHttpClientPtr httpClient )
 {
     NX_ASSERT( httpClient );
 
-    int index = -1;
-    QnMutexLocker lk( &m_inputPortMutex );
-    if (m_ioHttpMonitor[0].httpClient == httpClient)
-        index = 0;
-    else if(m_ioHttpMonitor[1].httpClient == httpClient)
-        index = 1;
-    else
+    IOMonitor* ioMonitor = ioMonitorByHttpClient(httpClient);
+    if (!ioMonitor)
         return;
 
     const nx_http::BufferType& msgBodyBuf = httpClient->fetchMessageBodyBuffer();
-    auto parser = m_ioHttpMonitor[index].contentParser;
-    lk.unlock();
-    parser->processData(msgBodyBuf);
+    ioMonitor->contentParser->processData(msgBodyBuf);
 }
 
 void QnPlAxisResource::onMonitorConnectionClosed( nx_http::AsyncHttpClientPtr httpClient )
 {
     if (getParentId() != commonModule()->moduleGUID() || !isInitialized())
         return;
-    QnMutexLocker lk( &m_inputPortMutex );
-    if (httpClient == m_ioHttpMonitor[0].httpClient) {
-        lk.unlock();
-        resetHttpClient(m_ioHttpMonitor[0].httpClient);
-        restartIOMonitorWithDelay(Qn::PT_Input, 0);
-    }
-    else if (httpClient == m_ioHttpMonitor[1].httpClient) {
-        lk.unlock();
-        resetHttpClient(m_ioHttpMonitor[1].httpClient);
-        restartIOMonitorWithDelay(Qn::PT_Output, 1);
-    }
+    auto ioMonitor = ioMonitorByHttpClient(httpClient);
+    if (!ioMonitor)
+        return;
+    ioMonitor->httpClient.reset();
+    restartIOMonitorWithDelay();
 }
 
-void QnPlAxisResource::restartIOMonitorWithDelay(Qn::IOPortType portType, int index)
+void QnPlAxisResource::restartIOMonitorWithDelay()
 {
-    m_ioHttpMonitor[index].restartTimer.start(
+    m_timer.start(
         kReconnectTimeout,
-        [this, portType, index]()
+        [this]()
         {
-            startIOMonitor(portType, m_ioHttpMonitor[index]);
-        });
+            startInputPortMonitoring();
+        }
+    );
 }
 
 bool QnPlAxisResource::readPortSettings( CLSimpleHTTPClient* const http, QnIOPortDataList& ioPortList)
@@ -1161,8 +1143,6 @@ bool QnPlAxisResource::savePortSettings(const QnIOPortDataList& newPorts, const 
         }
     }
 
-    QUrl updateUrl;
-    updateUrl.setPath(lit("axis-cgi/param.cgi"));
     QUrlQuery urlQuery;
     static const int MAX_PATH_SIZE = 128;
     for (auto itr = changedParams.begin(); itr != changedParams.end();)
@@ -1382,6 +1362,8 @@ bool QnPlAxisResource::readCurrentIOStateAsync()
     {
         return false;
     }
+    if (m_inputPortStateReader)
+        return true; //< Already started
 
     //based on VAPIX Version 3 I/O Port API
 
@@ -1408,6 +1390,7 @@ bool QnPlAxisResource::readCurrentIOStateAsync()
     requestUrl.setQuery(requestQuery);
 
     nx_http::AsyncHttpClientPtr httpClient = nx_http::AsyncHttpClient::create();
+    httpClient->bindToAioThread(m_timer.getAioThread());
     connect(
         httpClient.get(), &nx_http::AsyncHttpClient::done,
         this, &QnPlAxisResource::onCurrentIOStateResponseReceived,
@@ -1422,7 +1405,7 @@ bool QnPlAxisResource::readCurrentIOStateAsync()
     return true;
 }
 
-void QnPlAxisResource::asyncUpdateIOSettings()
+void QnPlAxisResource::updateIOSettings()
 {
     const auto newValue = QJson::deserialized<QnIOPortDataList>(getProperty(Qn::IO_SETTINGS_PARAM_NAME).toUtf8());
     QnIOPortDataList prevValue;
@@ -1433,7 +1416,7 @@ void QnPlAxisResource::asyncUpdateIOSettings()
         prevValue = m_ioPorts;
     }
 
-    stopInputPortMonitoringAsync();
+    stopInputPortMonitoringSync();
     if (savePortSettings(newValue, prevValue))
     {
         {
@@ -1450,13 +1433,13 @@ void QnPlAxisResource::at_propertyChanged(const QnResourcePtr & res, const QStri
 {
     if (key == Qn::IO_SETTINGS_PARAM_NAME && res && !res->hasFlags(Qn::foreigner))
     {
-        QnUuid id = res->getId();
+        auto weakPtr = weakPointer();
         nx::utils::concurrent::run(
             QThreadPool::globalInstance(),
-            [id, this]()
+            [weakPtr]()
             {
-                if (auto res = resourcePool()->getResourceById<QnPlAxisResource>(id))
-                    res->asyncUpdateIOSettings();
+                if (auto res = weakPtr.toStrongRef().dynamicCast<QnPlAxisResource>())
+                    res->updateIOSettings();
             });
     }
 }
