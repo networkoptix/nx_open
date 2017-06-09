@@ -40,6 +40,10 @@ var nativePlayer = new (function () {
         currentVideo.volume = volumeLevel/100;
     }
 
+    this.kill = function(){
+        this.destroy();
+    };
+
     this.destroy = function(){
         if( currentVideo || node.has("video").length){
             try {
