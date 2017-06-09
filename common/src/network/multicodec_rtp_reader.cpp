@@ -70,7 +70,7 @@ QnMulticodecRtpReader::QnMulticodecRtpReader(
     m_gotData(false),
     m_rtpStarted(false),
     m_prefferedAuthScheme(nx_http::header::AuthScheme::digest),
-    m_rtpFrameTimeoutMs(QnGlobalSettings::instance()->rtpFrameTimeoutMs()) 
+    m_rtpFrameTimeoutMs(QnGlobalSettings::instance()->rtpFrameTimeoutMs())
 {
     auto globalSettings = QnGlobalSettings::instance();
     m_maxRtpRetryCount = globalSettings->maxRtpRetryCount();

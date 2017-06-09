@@ -666,7 +666,7 @@ CameraDiagnostics::Result QnRtspClient::open(const QString& url, qint64 startTim
     m_rtspAuthCtx.clear();
     if (m_defaultAuthScheme == nx_http::header::AuthScheme::basic)
         m_rtspAuthCtx.authenticateHeader = nx_http::header::WWWAuthenticate(m_defaultAuthScheme);
-    
+
     m_rtspAuthCtx.guessDigest = m_guessAuthDigest;
 
     {

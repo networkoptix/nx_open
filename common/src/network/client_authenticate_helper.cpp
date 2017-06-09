@@ -59,10 +59,10 @@ Qn::AuthResult QnClientAuthHelper::addAuthorizationToRequest(
                 nx_http::parseHeader(CLSimpleHTTPClient::basicAuth(auth)));
         }
     }
-    else if (!auth.user().isEmpty() && authenticationCtx->guessDigest) 
+    else if (!auth.user().isEmpty() && authenticationCtx->guessDigest)
     {
         // Trying to "guess" authentication header.
-        // It is used in the client/server conversations, 
+        // It is used in the client/server conversations,
         // since client can effectively predict nonce and realm.
         nx_http::insertOrReplaceHeader(
             &request->headers,
