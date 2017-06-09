@@ -63,6 +63,3 @@ if(ANDROID)
         KEYSTORE_KEY_PASSWORD "31O2zNNy"
     )
 endif()
-
-project(mobile_client)
-set_property(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY VS_STARTUP_PROJECT mobile_client)
