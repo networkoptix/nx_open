@@ -122,7 +122,11 @@ public:
         nx::utils::MoveOnlyFunc<nx::db::DBResult(nx::db::QueryContext*)> dbUpdateFunc,
         nx::utils::MoveOnlyFunc<void(nx::db::QueryContext*, nx::db::DBResult)> completionHandler) override
     {
-        std::thread([&]() {completionHandler(nullptr, dbUpdateFunc(nullptr)); }).detach();
+        std::thread(
+            [dbUpdateFunc = std::move(dbUpdateFunc), completionHandler= std::move(completionHandler)]()
+            {
+                completionHandler(nullptr, dbUpdateFunc(nullptr));
+            }).detach();
     }
 
     virtual void executeUpdateWithoutTran(
@@ -135,7 +139,11 @@ public:
         nx::utils::MoveOnlyFunc<nx::db::DBResult(nx::db::QueryContext*)> dbSelectFunc,
         nx::utils::MoveOnlyFunc<void(nx::db::QueryContext*, nx::db::DBResult)> completionHandler) override
     {
-        std::thread([&]() {completionHandler(nullptr, dbSelectFunc(nullptr)); }).detach();
+        std::thread(
+            [dbSelectFunc = std::move(dbSelectFunc), completionHandler= std::move(completionHandler)]()
+            {
+                completionHandler(nullptr, dbSelectFunc(nullptr));
+            }).detach();
     }
 
     virtual nx::db::DBResult execSqlScriptSync(
@@ -226,6 +234,7 @@ protected:
     std::unique_ptr<SchedulerUser> user;
     nx::utils::future<void> readyFuture;
     nx::utils::promise<void> readyPromise;
+    const std::chrono::milliseconds kSleepTimeout{ 100 };
 };
 
 
@@ -244,6 +253,7 @@ TEST_F(PersistentScheduler, subscribe)
     whenSchedulerAndUserInitialized();
 
     user->subscribe(std::chrono::milliseconds(10));
+    std::this_thread::sleep_for(kSleepTimeout);
     thenTaskIdsAreFilled();
 }
 
@@ -251,7 +261,6 @@ TEST_F(PersistentScheduler, running2Tasks)
 {
     const std::chrono::milliseconds kFirstTaskTimeout{ 10 };
     const std::chrono::milliseconds kSecondTaskTimeout{ 20 };
-    const std::chrono::milliseconds kSleepTimeout{ 100 };
 
     expectingDbHelperInitFunctionsWillBeCalled();
     expectingDbHelperSubscribeWillBeCalled2Times();
