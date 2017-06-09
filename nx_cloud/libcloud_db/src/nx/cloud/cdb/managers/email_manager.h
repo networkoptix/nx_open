@@ -19,7 +19,6 @@
 #include <nx/utils/counter.h>
 
 #include "notification.h"
-#include "settings.h"
 
 namespace nx {
 namespace cdb {
