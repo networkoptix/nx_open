@@ -221,6 +221,11 @@ angular.module('nxCommon')
                 if(targetAnimation){
                     targetAnimation.breakAnimation();
                 } 
+            },
+            stopHandler:function(handler){
+                if(animationHandler === handler){
+                    animationHandler = null;
+                }
             }
         };
     }]);
