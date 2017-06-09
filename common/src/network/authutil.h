@@ -1,27 +1,25 @@
-#ifndef NETWORK_AUTHUTIL_H_
-#define NETWORK_AUTHUTIL_H_
+#pragma once
 
 #include <QtCore/QMap>
 #include <QtCore/QByteArray>
 #include <QStringList>
 #include <nx/fusion/model_functions_fwd.h>
 
-QMap<QByteArray, QByteArray> parseAuthData(const QByteArray &authData, char delimiter);
+QMap<QByteArray, QByteArray> parseAuthData(const QByteArray& authData, char delimiter);
 
 class HttpAuthenticationClientContext;
 
-//!Calculates HA1 (see rfc 2617)
-/*!
-	\warning \a realm is not used currently
-*/
- QByteArray createUserPasswordDigest(
+/**
+ * Calculate HA1 (see rfc 2617).
+ */
+QByteArray createUserPasswordDigest(
     const QString& userName,
     const QString& password,
-    const QString& realm );
+    const QString& realm);
 
  QByteArray createHttpQueryAuthParam(
      const QString& userName,
-     const QByteArray &digest,
+     const QByteArray& digest,
      const QByteArray& method,
      QByteArray nonce);
 
@@ -40,5 +38,3 @@ struct NonceReply
 #define NonceReply_Fields (nonce)(realm)
 
 QN_FUSION_DECLARE_FUNCTIONS(NonceReply, (json))
-
-#endif

@@ -22,6 +22,7 @@ QnUuid QnBusinessEventParameters::getParamsHash() const {
             if (reasonCode == QnBusiness::StorageIoErrorReason
                 || reasonCode == QnBusiness::StorageTooSlowReason
                 || reasonCode == QnBusiness::StorageFullReason
+                || reasonCode == QnBusiness::SystemStorageFullReason
                 || reasonCode == QnBusiness::LicenseRemoved)
                 paramKey += '_' + description.toUtf8();
             break;

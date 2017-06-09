@@ -22,4 +22,25 @@
     <modules>
         <module>cloud_connect_integration_tests</module>
     </modules>
+
+    <profiles>
+        <profile>
+            <id>linux-arm-bpi</id>
+            <activation>
+                <activeByDefault>false</activeByDefault>
+                <os>
+                    <family>unix</family>
+                    <name>linux</name>
+                </os>
+                <property>
+                    <name>box</name>
+                    <value>bpi</value>
+                </property>
+            </activation>
+            <modules>
+                <module>../libtraffic_relay</module> <!-- Required by cloud_connect_integration_tests. -->
+            </modules>
+        </profile>
+    </profiles>
+
 </project>

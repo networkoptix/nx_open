@@ -12,6 +12,7 @@
 #include <QtCore/QList>
 #include <QtCore/QMap>
 #include <QtCore/QPair>
+#include <QtCore/QTimeZone>
 #include <QSharedPointer>
 #include <nx/utils/thread/wait_condition.h>
 #include <QtXml/QXmlDefaultHandler>

@@ -160,7 +160,7 @@ enum CodecCtxField { Field_RC_EQ, Field_EXTRADATA, Field_INTRA_MATRIX, Field_INT
  * Copied from v2.5 ffmpeg_helper.cpp.
  * @return nullptr on deserialization error.
  */
-static AVCodecContext* deserializeCodecContextFromDepricatedFormat(const char* data, int dataLen)
+static AVCodecContext* deserializeCodecContextFromDeprecatedFormat(const char* data, int dataLen)
 {
     static const char* const kError = "ERROR deserializing MediaContext 2.5:";
     AVCodec* codec = nullptr;
@@ -266,10 +266,10 @@ error:
 
 } // namespace
 
-bool QnFfmpegHelper::deserializeMediaContextFromDepricatedFormat(
+bool QnFfmpegHelper::deserializeMediaContextFromDeprecatedFormat(
     QnMediaContextSerializableData* context, const char* data, int dataLen)
 {
-    AVCodecContext* avCodecContext = deserializeCodecContextFromDepricatedFormat(data, dataLen);
+    AVCodecContext* avCodecContext = deserializeCodecContextFromDeprecatedFormat(data, dataLen);
     if (!avCodecContext)
         return false;
 
@@ -400,7 +400,7 @@ int QnFfmpegHelper::copyAvCodecContex(AVCodecContext* dst, const AVCodecContext*
     if (!result)
     {
         // To avoid double free since avcodec_copy_context does not copy these fields.
-        dst->stats_out = nullptr;   
+        dst->stats_out = nullptr;
         dst->coded_side_data = nullptr;
         dst->nb_coded_side_data = 0;
     }

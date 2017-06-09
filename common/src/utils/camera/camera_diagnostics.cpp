@@ -93,6 +93,12 @@ public:
                     << QnDeviceDependentStrings::getNameFromSet(resourcePool, detailsRebootRestore, device);
                 break;
             }
+            case liveVideoIsNotSupportedError:
+            {
+                errorMessageParts
+                    << tr("Camera was restored from archive. Delete the camera and add it again to view Live video.");
+                break;
+            }
             case connectionClosedUnexpectedly:
             {
                 errorMessageParts
