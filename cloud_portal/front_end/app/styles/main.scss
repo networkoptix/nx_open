@@ -617,6 +617,7 @@ h1.process-success{
 }
 
 .download-button{
+    max-width: 100%;
     margin-bottom:8px;
     margin-top:0;
     .installer-name{
@@ -625,6 +626,11 @@ h1.process-success{
     }
     .media-body{
         width:auto;
+    }
+    h2{
+        max-width: 320px;
+        overflow: hidden;
+        text-overflow: ellipsis;
     }
 }
 h2.version-number{
