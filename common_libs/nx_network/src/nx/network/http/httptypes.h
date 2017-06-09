@@ -456,8 +456,7 @@ namespace AuthScheme
     {
         none,
         basic,
-        digest,
-        automatic
+        digest
     };
 
     NX_NETWORK_API const char* toString( Value val );

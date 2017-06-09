@@ -302,6 +302,7 @@ public:
 
     /** @return "Server" http header value */
     QByteArray serverInfo() const;
+    void setGuessAuthDigest(bool guessAuthDigest);
 
 signals:
     void gotTextResponse(QByteArray text);
@@ -398,6 +399,7 @@ private:
     nx_http::header::AuthScheme::Value m_defaultAuthScheme;
     mutable QnMutex m_socketMutex;
     QByteArray m_serverInfo;
+    bool m_guessAuthDigest = true;
 
     /*!
         \param readSome if \a true, returns as soon as some data has been read. Otherwise, blocks till all \a bufSize bytes has been read

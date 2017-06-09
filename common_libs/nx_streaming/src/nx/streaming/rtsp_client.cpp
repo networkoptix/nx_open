@@ -412,8 +412,7 @@ qint64 QnRtspTimeHelper::getUsecTime(quint32 rtpTime, const QnRtspStatistic& sta
     }
 }
 
-
-static const size_t ADDITIONAL_READ_BUFFER_CAPACITY = 64*1024;
+static const size_t ADDITIONAL_READ_BUFFER_CAPACITY = 64 * 1024;
 
 
 static std::atomic<int> RTPSessionInstanceCounter(0);
@@ -667,6 +666,8 @@ CameraDiagnostics::Result QnRtspClient::open(const QString& url, qint64 startTim
     m_rtspAuthCtx.clear();
     if (m_defaultAuthScheme == nx_http::header::AuthScheme::basic)
         m_rtspAuthCtx.authenticateHeader = nx_http::header::WWWAuthenticate(m_defaultAuthScheme);
+    
+    m_rtspAuthCtx.guessDigest = m_guessAuthDigest;
 
     {
         QnMutexLocker lock(&m_socketMutex);
@@ -1989,5 +1990,10 @@ QnRtspClient::TrackMap QnRtspClient::getTrackInfo() const
 AbstractStreamSocket* QnRtspClient::tcpSock()
 {
     return m_tcpSock.get();
+}
+
+void QnRtspClient::setGuessAuthDigest(bool guessAuthDigest)
+{
+    m_guessAuthDigest = guessAuthDigest;
 }
 

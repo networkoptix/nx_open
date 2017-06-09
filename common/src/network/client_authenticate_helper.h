@@ -11,6 +11,7 @@ class HttpAuthenticationClientContext
 public:
     boost::optional<nx_http::header::WWWAuthenticate> authenticateHeader;
     int responseStatusCode;
+    bool guessDigest = true;  //< Should be set to false for cameras.
 
     HttpAuthenticationClientContext()
     :
@@ -24,6 +25,7 @@ public:
     {
         authenticateHeader.reset();
         responseStatusCode = nx_http::StatusCode::ok;
+        guessDigest = true;
     }
 };
 
