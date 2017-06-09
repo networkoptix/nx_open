@@ -470,11 +470,7 @@ function JsHlsAPI(){
 }
 
 JsHlsAPI.prototype.kill = function(){
-    window.clearInterval(this.hls.bufferTimer);
-    this.hls.bufferTimer = undefined;
-    this.hls.stopLoad();
     this.hls.destroy();
-    this.hls = null;
 };
 
 JsHlsAPI.prototype.play = function(offset){
@@ -490,6 +486,7 @@ JsHlsAPI.prototype.volume = function(volumeLevel){
 };
 
 JsHlsAPI.prototype.load = function(url){
+    this.hls.detachMedia();
     this.hls.loadSource(url);
     this.hls.autoLevelCapping = -1; //levelCapping;
     this.hls.attachMedia(this.video);
