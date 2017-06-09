@@ -2,7 +2,7 @@
 
 #include <gtest/gtest.h>
 
-#include <test_support/cdb_launcher.h>
+#include <nx/cloud/cdb/test_support/cdb_launcher.h>
 
 namespace nx {
 namespace cdb {

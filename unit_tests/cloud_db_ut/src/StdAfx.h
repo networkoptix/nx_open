@@ -4,6 +4,6 @@
 #include <nx/utils/deprecation.h>
 #include <nx/utils/test_support/custom_gtest_printers.h>
 
-#include <libcloud_db/src/test_support/custom_gtest_printers.h>
+#include <nx/cloud/cdb/test_support/custom_gtest_printers.h>
 
 #include "custom_printers.h"

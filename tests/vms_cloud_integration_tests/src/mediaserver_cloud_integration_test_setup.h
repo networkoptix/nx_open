@@ -1,6 +1,6 @@
 #pragma once
 
-#include <test_support/cdb_launcher.h>
+#include <nx/cloud/cdb/test_support/cdb_launcher.h>
 #include <test_support/mediaserver_launcher.h>
 
 #include "mediaserver_client.h"

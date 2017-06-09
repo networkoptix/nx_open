@@ -2,7 +2,7 @@
 
 #include <nx/utils/move_only_func.h>
 
-#include <libcloud_db/src/ec2/vms_p2p_command_bus.h>
+#include <nx/cloud/cdb/ec2/vms_p2p_command_bus.h>
 
 namespace nx {
 namespace cdb {

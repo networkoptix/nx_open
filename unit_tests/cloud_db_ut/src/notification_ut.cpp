@@ -1,6 +1,6 @@
 #include <gtest/gtest.h>
 
-#include <managers/notification.h>
+#include <nx/cloud/cdb/managers/notification.h>
 
 #include "functional_tests/email_manager_mocked.h"
 #include "functional_tests/test_setup.h"

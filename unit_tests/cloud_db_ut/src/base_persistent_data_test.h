@@ -1,12 +1,13 @@
 #pragma once
 
-#include <dao/rdb/db_instance_controller.h>
-#include <dao/rdb/account_data_object.h>
-#include <dao/rdb/system_data_object.h>
-#include <dao/rdb/system_sharing_data_object.h>
+#include <nx/cloud/cdb/dao/rdb/db_instance_controller.h>
+#include <nx/cloud/cdb/dao/rdb/account_data_object.h>
+#include <nx/cloud/cdb/dao/rdb/system_data_object.h>
+#include <nx/cloud/cdb/dao/rdb/system_sharing_data_object.h>
+
 #include <utils/db/test_support/test_with_db_helper.h>
 
-#include <libcloud_db/src/settings.h>
+#include <nx/cloud/cdb/settings.h>
 
 namespace nx {
 namespace cdb {
