@@ -362,6 +362,10 @@ table.webclient-window>tbody>tr>td{
     margin-left: -32px;
   }
 
+  &-name{
+    margin-left: 8px;
+  }
+
   &-preview .camera-status{
     position: absolute;
     z-index: 1;
@@ -380,8 +384,8 @@ table.webclient-window>tbody>tr>td{
 }
 
 .camera-preview{
-  width:68px !important;
-  height:38px !important;
+  width:70px !important;
+  height:40px !important;
   margin-right: 10px;
   background-color: $light5;
   border-radius: 1px;
@@ -395,8 +399,6 @@ table.webclient-window>tbody>tr>td{
 }
 
 .cameras-panel .nav > li.active > a .camera-preview{
-  height: 38px !important;
-  width: 68px !important;
   border: 1px solid $light1;
 }
 
@@ -426,12 +428,12 @@ table.webclient-window>tbody>tr>td{
     color:$light16 !important;
 
     small{
-      color: $dark15;    
+      color: $light10 !important;
     }
 
     .camera-preview{
-      background-color: $dark7;
-      border: 1px solid $dark5;
+      background-color: $light3 !important;
+      border: 1px solid $light5 !important;
 
       img{
         display:none;
@@ -441,8 +443,8 @@ table.webclient-window>tbody>tr>td{
 }
 
 .camera-preview > img{
-  max-width:66px !important;
-  max-height:34px !important;
+  max-width:68px !important;
+  max-height:38px !important;
   position: absolute;
   top: 50%;
   left: 50%;
@@ -458,17 +460,15 @@ table.webclient-window>tbody>tr>td{
     padding-left: 78px;
   }
 
-  & > a:hover, & > a:focus{
-    text-decoration: none;
-    background-color: rgba($dark11,0.2);  
-  }
-
   & > a:hover{
+    border-radius: 2px;
+    text-decoration: none;
     background-color: $additional_light3;
   }
 
   &.active > a,
   &.active > a:active{
+    border-radius: 2px;
     text-decoration: none;
     background-color: $light5;
   }
