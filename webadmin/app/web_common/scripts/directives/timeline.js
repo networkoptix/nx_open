@@ -472,6 +472,7 @@ angular.module('nxCommon')
 
                 //scope.scaleManager is set to null so that the garbage collecter cleans the object
                 scope.$on('$destroy', function() {
+                    $( window ).unbind('resize', updateTimelineWidth);
                     animateScope.stopScope(scope);
                     animateScope.stopHandler(render);
                     scope.scaleManager = null;
