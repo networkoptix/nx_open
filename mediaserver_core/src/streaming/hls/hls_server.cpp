@@ -278,7 +278,7 @@ namespace nx_hls
         QnSecurityCamResourcePtr camResource = resource.dynamicCast<QnSecurityCamResource>();
         if( !camResource )
         {
-            NX_LOG( lit("HLS. Requested resource %1 is not camera").
+            NX_LOG( lit("HLS. Requested resource %1 is not a camera").
                 arg(QString::fromRawData(shortFileName.constData(), shortFileName.size())), cl_logDEBUG1 );
             return nx_http::StatusCode::notFound;
         }
@@ -287,7 +287,7 @@ namespace nx_hls
         QnVideoCameraPtr camera = qnCameraPool->getVideoCamera( camResource );
         if( !camera )
         {
-            NX_LOG( lit("Error. HLS request to resource %1 which is not camera").arg(camResource->getUniqueId()), cl_logDEBUG2 );
+            NX_LOG( lit("Error. HLS request to resource %1 which is not a camera").arg(camResource->getUniqueId()), cl_logDEBUG2 );
             return nx_http::StatusCode::forbidden;
         }
 

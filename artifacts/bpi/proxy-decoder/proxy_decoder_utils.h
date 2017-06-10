@@ -74,7 +74,6 @@ void debugDrawCheckerboardYNative(uint8_t* yNative, int frameW, int frameH);
 
 /**
  * Print the line using a large font with 1 macroblock (32x32 px) as 1 pixel.
- * Currently only numbers and spaces are supported.
  */
 void debugPrintNative(uint8_t* yNative, int frameW, int frameH,
     int x0, int y0, const char* text);
