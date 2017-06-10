@@ -421,19 +421,6 @@ angular.module('nxCommon').controller('ViewCtrl',
             requestResources();
         });
 
-        var killSubscription = $rootScope.$on('$routeChangeStart', function (event,next) {
-            timeFromUrl = $location.search().time;
-            $scope.activeCamera = $scope.camerasProvider.getCamera(next.params.cameraId);
-        });
-
-        $scope.$on( '$destroy', function() {
-            $scope.camerasProvider.stopPoll();
-            killSubscription();
-        });
-
-
-
-
         // This hack was meant for IE and iPad to fix some issues with overflow:scroll and height:100%
         // But I kept it for all browsers to avoid future possible bugs in different browsers
         // Now every browser behaves the same way
@@ -479,5 +466,19 @@ angular.module('nxCommon').controller('ViewCtrl',
         };
 
         $('.video-icon.pull-left-5').dropdown();
+
+
+        var killSubscription = $rootScope.$on('$routeChangeStart', function (event,next) {
+            timeFromUrl = $location.search().time;
+            $scope.activeCamera = $scope.camerasProvider.getCamera(next.params.cameraId);
+        });
+
+        $('html').addClass('webclient-page');
+        $scope.$on('$destroy', function( event ) {
+            killSubscription();
+            $scope.camerasProvider.stopPoll();
+            $window.unbind('resize', updateHeights);
+            $('html').removeClass('webclient-page');
+        });
 
     }]);
