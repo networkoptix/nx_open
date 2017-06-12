@@ -17,6 +17,7 @@
 #include <utils/common/connective.h>
 
 #include <nx_ec/ec_api.h>
+#include <common/common_module_aware.h>
 
 class QnLexicalSerializer;
 class QnAbstractReplyProcessor;
@@ -103,12 +104,15 @@ private:
 
 
 
-class QnAbstractConnection: public Connective<QObject> {
+class QnAbstractConnection: public Connective<QObject>, public QnCommonModuleAware
+{
     Q_OBJECT
     typedef Connective<QObject> base_type;
 
 public:
-    QnAbstractConnection(QObject *parent = NULL, const QnResourcePtr& targetRes = QnResourcePtr());
+    QnAbstractConnection(
+        QnCommonModule* commonModule,
+        const QnResourcePtr& targetRes = QnResourcePtr());
     virtual ~QnAbstractConnection();
 
     QUrl url() const;

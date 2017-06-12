@@ -73,13 +73,11 @@ private:
 
 typedef QHash<QString, EndpointAdditionalInfo> EndpointInfoHash;
 
-class OnvifResourceInformationFetcher
+class OnvifResourceInformationFetcher: public QnCommonModuleAware
 {
     Q_DECLARE_TR_FUNCTIONS(OnvifResourceInformationFetcher)
 public:
-    OnvifResourceInformationFetcher();
-
-    static OnvifResourceInformationFetcher& instance();
+    OnvifResourceInformationFetcher(QnCommonModule* commonModule);
 
     void findResources(const EndpointInfoHash& endpointInfo, QnResourceList& result, DiscoveryMode discoveryMode) const;
     void findResources(const QString& endpoint, const EndpointAdditionalInfo& info, QnResourceList& result, DiscoveryMode discoveryMode) const;

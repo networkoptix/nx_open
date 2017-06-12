@@ -32,6 +32,8 @@
 #include <utils/developer_settings_helper.h>
 #include <settings/qml_settings_adaptor.h>
 #include <nx/mobile_client/helpers/inter_client_message.h>
+#include <nx/mobile_client/controllers/resource_ptz_controller.h>
+#include <nx/mobile_client/models/ptz_preset_model.h>
 
 using namespace nx::client::mobile;
 
@@ -68,9 +70,9 @@ void QnMobileClientMetaTypes::registerQmlTypes() {
     qmlRegisterType<QnCloudSystemInformationWatcher>("com.networkoptix.qml", 1, 0, "QnCloudSystemInformationWatcher");
     qmlRegisterType<QnUserWatcher>("com.networkoptix.qml", 1, 0, "QnUserWatcher");
     /* NxMediaPlayer should not be used.
-       It is here only to allow assignments of MediaPlyer to properties of this type. */
-    qmlRegisterType<nx::media::Player>("Nx.Media", 1, 0, "NxMediaPlayer");
+       It is here only to allow assignments of MediaPlayer to properties of this type. */
     qmlRegisterType<MediaPlayer>("Nx.Media", 1, 0, "MediaPlayer");
+    qmlRegisterUncreatableType<nx::media::Player>("Nx.Media", 1, 0, "NxMediaPlayer", lit("Cannot create an instance of abstract class."));
     qmlRegisterType<QnActiveCameraThumbnailLoader>("com.networkoptix.qml", 1, 0, "QnActiveCameraThumbnailLoader");
     qmlRegisterType<QnThumbnailCacheAccessor>("com.networkoptix.qml", 1, 0, "QnThumbnailCacheAccessor");
     qmlRegisterType<QnQuickItemMouseTracker>("com.networkoptix.qml", 1, 0, "ItemMouseTracker");
@@ -79,7 +81,13 @@ void QnMobileClientMetaTypes::registerQmlTypes() {
     qmlRegisterType<QnLiteClientController>("com.networkoptix.qml", 1, 0, "QnLiteClientController");
     qmlRegisterType<QnLiteClientLayoutHelper>("com.networkoptix.qml", 1, 0, "QnLiteClientLayoutHelper");
     qmlRegisterType<utils::DeveloperSettingsHelper>(
-        "com.networkoptix.qml", 1, 0, "DeveloperSettingsHelper");
+        "Nx.Settings", 1, 0, "DeveloperSettingsHelper");
+
+    // Ptz related classes
+    qmlRegisterUncreatableType<Ptz>("Nx.Core", 1, 0, "Ptz",
+        lit("Cannot create an instance of Ptz class"));
+    qmlRegisterType<nx::client::mobile::ResourcePtzController>("Nx.Core", 1, 0, "PtzController");
+    qmlRegisterType<nx::client::mobile::PtzPresetModel>("Nx.Core", 1, 0, "PtzPresetModel");
 
     qmlRegisterRevision<QQuickTextInput, 6>("Nx.Controls", 1, 0);
     qmlRegisterRevision<QQuickItem, 1>("Nx.Controls", 1, 0);

@@ -1,0 +1,70 @@
+/**
+
+@page ngram_test_manual ngram_test
+@brief *Test n-gram language model*
+@tableofcontents
+
+@section synopsis Synopsis
+
+@SYNOPSIS@
+
+ngram_test is for testing ngram models generated from
+\ref ngram_build_manual.
+
+**How do we test an ngram model?**:
+
+`ngram_test` will compute the entropy (or perplexity, see below)
+of some test data, given an ngram model. The entropy gives a measure
+of how likely the ngram model is to have generated the test
+data. Entropy is defined (for a sliding-window type ngram) as:
+
+\f[H = -\frac{1}{Q} \sum_{i=1}^{Q} log P(w_i | w_{i-1}, w_{i-2},... w_{i-N+1}) \f]
+
+where \f$Q\f$ is the number of words of test data and \f$N\f$ is the order
+of the ngram model. Perplexity is a more intuitive mease, defined as:
+
+\f[B = 2^H \f]
+
+The perplexity of an ngram model with vocabulary size V will be
+between 1 and V. Low perplexity indicates a more predictable language,
+and in speech recognition, a models with low perplexity on test data
+(i.e. data NOT used to estimate the model in the first place)
+typically give better accuracy recognition than models with higher 
+perplexity (this is not guaranteed, however).
+
+`ngram_test` works with non-sliding-window type models when the input
+format is `ngram_per_line`.
+
+
+**Input data format**:
+The data input format options are the same as \ref ngram_build_manual, as
+is the treatment of sentence start/end using special tags. 
+
+Note: To get meaningful entropy/perplexity figures, it is recommended that
+you use the same data input format in both
+\ref ngram_build_manual and \ref ngram_test_manual, and the treatment of
+sentence start/end should be the same.
+
+@see ngram_build_manual */
+
+@section options Options
+
+@OPTIONS@
+
+@section hints Hints
+
+@subsection perplex-infinity I got a perplexity of Infinity -- what went wrong?
+
+A perplexity of Infinity means that at least one of the ngrams in your
+test data had a probability of zero. Possible reasons for this include:
+
+
+  - The training data had no examples of this ngram, and
+you did not specify a floor for zero frequency ngrams in
+\ref ngram_build_manual.
+  - You used differing input formats for \ref ngram_build_manual 
+and \ref ngram_test_manual. 
+  - You used differing sentence start/end treatments in
+\ref ngram_build_manual  and \ref ngram_test_manual.
+
+*/

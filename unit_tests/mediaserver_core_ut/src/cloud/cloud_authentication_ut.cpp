@@ -1,15 +1,15 @@
 #include <gtest/gtest.h>
 
 #include <nx/network/http/auth_tools.h>
-#include <nx/network/http/httpclient.h>
+#include <nx/network/http/http_client.h>
 #include <nx/network/http/server/http_server_connection.h>
 #include <nx/network/system_socket.h>
 #include <nx/utils/literal.h>
 #include <nx/utils/random.h>
 
-#include <utils/common/guard.h>
-#include <utils/common/long_runnable.h>
-#include <utils/common/sync_call.h>
+#include <nx/utils/scope_guard.h>
+#include <nx/utils/thread/long_runnable.h>
+#include <nx/utils/sync_call.h>
 #include <utils/common/util.h>
 
 #include <media_server/media_server_module.h>
@@ -44,12 +44,12 @@ protected:
         auto tcpSocket = std::make_unique<nx::network::TCPSocket>(AF_INET);
         ASSERT_TRUE(tcpSocket->connect(mediaServerEndpoint(), 3000));
         ASSERT_TRUE(tcpSocket->setNonBlockingMode(true));
-        auto httpMsgPipeline = std::make_unique<nx_http::AsyncMessagePipeline>(
+        auto httpMsgPipeline = std::make_unique<nx_http::deprecated::AsyncMessagePipeline>(
             nullptr,
             std::move(tcpSocket));
         httpMsgPipeline->startReadingConnection();
 
-        auto httpMsgPipelineGuard = makeScopedGuard(
+        auto httpMsgPipelineGuard = makeScopeGuard(
             [&httpMsgPipeline]() { httpMsgPipeline->pleaseStopSync(); });
 
         nx::utils::promise<nx_http::Message> responseReceivedPromise;

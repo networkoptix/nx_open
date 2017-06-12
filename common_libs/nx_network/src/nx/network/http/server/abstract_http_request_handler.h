@@ -3,8 +3,10 @@
 #include <atomic>
 #include <memory>
 #include <mutex>
+#include <string>
+#include <vector>
 
-#include <plugins/videodecoder/stree/resourcecontainer.h>
+#include <nx/utils/stree/resourcecontainer.h>
 
 #include "http_server_connection.h"
 #include "../abstract_msg_body_source.h"
@@ -47,18 +49,28 @@ public:
     bool processRequest(
         nx_http::HttpServerConnection* const connection,
         nx_http::Message&& request,
-        stree::ResourceContainer&& authInfo,
+        nx::utils::stree::ResourceContainer&& authInfo,
         ResponseIsReadyHandler completionHandler);
+
+    void setRequestPathParams(std::vector<StringType> params);
+    /**
+     * Parameters parsed from URL path. 
+     * E.g., given http handler registered on path /account/%1/systems.
+     * When receiving request with path /account/cartman/systems.
+     * Then this method will return {cartman}.
+     * Works only when using RestMessageDispatcher.
+     */
+    const std::vector<StringType>& requestPathParams() const;
 
 protected:
     /**
      * Implement this method to handle request
      * @param response Implementation is allowed to modify response as it wishes
-     * @warning This object can be removed in completionHandler 
+     * WARNING: This object can be removed in completionHandler 
      */
     virtual void processRequest(
         nx_http::HttpServerConnection* const connection,
-        stree::ResourceContainer authInfo,
+        nx::utils::stree::ResourceContainer authInfo,
         nx_http::Request request,
         nx_http::Response* const response,
         nx_http::RequestProcessedHandler completionHandler) = 0;
@@ -68,6 +80,7 @@ protected:
 private:
     nx_http::Message m_responseMsg;
     ResponseIsReadyHandler m_completionHandler;
+    std::vector<StringType> m_requestPathParams;
 
     void requestDone(RequestResult requestResult);
 };

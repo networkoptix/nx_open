@@ -153,6 +153,9 @@
             <Component>
                 <File Id="udt.dll" Name="udt.dll" Source="$(var.SourceDir)/udt.dll" DiskId="4" />
             </Component>
+            <Component>
+                <File Id="nx_kit.dll" Name="nx_kit.dll" Source="$(var.SourceDir)/nx_kit.dll" DiskId="4" />
+            </Component>
         </ComponentGroup>
 
         <ComponentGroup Id="ClientOpenAL" Directory="$(var.clientDirId)">

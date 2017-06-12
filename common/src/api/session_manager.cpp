@@ -8,7 +8,7 @@
 #include <QtCore/QScopedPointer>
 #include <QtCore/QUrlQuery>
 
-#include <nx/network/http/httptypes.h>
+#include <nx/network/http/http_types.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/std/future.h>
 
@@ -18,16 +18,17 @@
 #include "common/common_module.h"
 #include "app_server_connection.h"
 #include <api/network_proxy_factory.h>
-#include <http/custom_headers.h>
+#include <nx/network/http/custom_headers.h>
 #include "http_client_pool.h"
+#include <nx_ec/ec_api.h>
 
 // -------------------------------------------------------------------------- //
 // QnSessionManager
 // -------------------------------------------------------------------------- //
 
-QnSessionManager::QnSessionManager(QObject *parent)
-:
-    QObject(parent)
+QnSessionManager::QnSessionManager(QObject* parent):
+    QObject(parent),
+    QnCommonModuleAware(parent)
 {
     qRegisterMetaType<AsyncRequestInfo>();
 
@@ -49,12 +50,6 @@ QnSessionManager::~QnSessionManager()
     auto httpPool = nx_http::ClientPool::instance();
     for (auto& httpClientAndRequestInfo : requestInProgress)
         httpPool->terminate(httpClientAndRequestInfo.first);
-}
-
-QnSessionManager *QnSessionManager::instance()
-{
-    NX_ASSERT(qnCommon->instance<QnSessionManager>(), Q_FUNC_INFO, "Make sure session manager exists");
-    return qnCommon->instance<QnSessionManager>();
 }
 
 void QnSessionManager::start()
@@ -247,7 +242,15 @@ int QnSessionManager::sendAsyncRequest(
         return -1;
     }
 
-    const auto appServerUrl = QnAppServerConnectionFactory::url();
+    const auto& connection = commonModule()->ec2Connection();
+    if (!connection)
+    {
+        NX_ASSERT(false, Q_FUNC_INFO,
+            lit("Not connected to ec2 database."));
+        return -1;
+    }
+
+    const QUrl appServerUrl = connection->connectionInfo().ecUrl;
     auto requestUrl = createApiUrl(url, objectName, params);
     requestUrl.setUserName(_url.userName().isEmpty() ? appServerUrl.userName() : _url.userName());
     requestUrl.setPassword(_url.password().isEmpty() ? appServerUrl.password() : _url.password());

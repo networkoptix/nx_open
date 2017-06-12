@@ -12,10 +12,16 @@
 
 #include <core/resource_management/resource_pool.h>
 #include <plugins/resource/acti/acti_resource.h>
-#include <nx/network/http/httptypes.h>
+#include <nx/network/http/http_types.h>
+#include <rest/server/rest_connection_processor.h>
 
 
-int QnActiEventRestHandler::executeGet(const QString &path, const QnRequestParamList &params, QByteArray &responseMessageBody, QByteArray &contentType, const QnRestConnectionProcessor*)
+int QnActiEventRestHandler::executeGet(
+    const QString &path,
+    const QnRequestParamList &params,
+    QByteArray &responseMessageBody,
+    QByteArray &contentType,
+    const QnRestConnectionProcessor* owner)
 {
     Q_UNUSED(responseMessageBody)
     Q_UNUSED(contentType)
@@ -23,10 +29,10 @@ int QnActiEventRestHandler::executeGet(const QString &path, const QnRequestParam
 
     QStringList pathParts = path.split('/');
     if( pathParts.size() < 4 )
-        return nx_http::StatusCode::badRequest; //missing resource id 
+        return nx_http::StatusCode::badRequest; //missing resource id
     QnUuid resourceID(pathParts[3]);
 
-    QnResourcePtr res = qnResPool->getResourceById(resourceID);
+    QnResourcePtr res = owner->resourcePool()->getResourceById(resourceID);
     if( !res )
         return nx_http::StatusCode::notFound;
 

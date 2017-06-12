@@ -1,6 +1,6 @@
 #include "base_ec2_connection.h"
 
-#include <utils/common/concurrent.h>
+#include <nx/utils/concurrent.h>
 
 #include "ec2_thread_pool.h"
 #include "fixed_url_client_query_processor.h"
@@ -10,13 +10,16 @@
 #include "managers/time_manager.h"
 #include "managers/time_manager_api.h"
 #include "nx_ec/data/api_data.h"
+#include "connection_factory.h"
 
 namespace ec2 {
 
 template<class QueryProcessorType>
 BaseEc2Connection<QueryProcessorType>::BaseEc2Connection(
+    const AbstractECConnectionFactory* connectionFactory,
     QueryProcessorType* queryProcessor)
     :
+    m_connectionFactory(connectionFactory),
     m_queryProcessor(queryProcessor),
     m_licenseNotificationManager(new QnLicenseNotificationManager),
     m_resourceNotificationManager(new QnResourceNotificationManager),
@@ -25,13 +28,14 @@ BaseEc2Connection<QueryProcessorType>::BaseEc2Connection(
     m_userNotificationManager(new QnUserNotificationManager),
     m_businessEventNotificationManager(new QnBusinessEventNotificationManager),
     m_layoutNotificationManager(new QnLayoutNotificationManager),
+    m_layoutTourNotificationManager(new QnLayoutTourNotificationManager),
     m_videowallNotificationManager(new QnVideowallNotificationManager),
     m_webPageNotificationManager(new QnWebPageNotificationManager),
     m_storedFileNotificationManager(new QnStoredFileNotificationManager),
     m_updatesNotificationManager(new QnUpdatesNotificationManager),
     m_miscNotificationManager(new QnMiscNotificationManager),
-    m_discoveryNotificationManager(new QnDiscoveryNotificationManager),
-    m_timeNotificationManager(new QnTimeNotificationManager<QueryProcessorType>)
+    m_discoveryNotificationManager(new QnDiscoveryNotificationManager(commonModule())),
+    m_timeNotificationManager(new QnTimeNotificationManager<QueryProcessorType>(connectionFactory->timeSyncManager()))
 {
     m_notificationManager.reset(
         new ECConnectionNotificationManager(
@@ -43,6 +47,7 @@ BaseEc2Connection<QueryProcessorType>::BaseEc2Connection(
             m_userNotificationManager.get(),
             m_businessEventNotificationManager.get(),
             m_layoutNotificationManager.get(),
+            m_layoutTourNotificationManager.get(),
             m_videowallNotificationManager.get(),
             m_webPageNotificationManager.get(),
             m_storedFileNotificationManager.get(),
@@ -61,20 +66,20 @@ BaseEc2Connection<QueryProcessorType>::~BaseEc2Connection()
 template<class QueryProcessorType>
 void BaseEc2Connection<QueryProcessorType>::startReceivingNotifications()
 {
-    connect(QnTransactionMessageBus::instance(), &QnTransactionMessageBus::peerFound,
+    connect(m_connectionFactory->messageBus(), &QnTransactionMessageBusBase::peerFound,
         this, &BaseEc2Connection<QueryProcessorType>::remotePeerFound, Qt::DirectConnection);
-    connect(QnTransactionMessageBus::instance(), &QnTransactionMessageBus::peerLost,
+    connect(m_connectionFactory->messageBus(), &QnTransactionMessageBus::peerLost,
         this, &BaseEc2Connection<QueryProcessorType>::remotePeerLost, Qt::DirectConnection);
-    connect(QnTransactionMessageBus::instance(), &QnTransactionMessageBus::remotePeerUnauthorized,
+    connect(m_connectionFactory->messageBus(), &QnTransactionMessageBus::remotePeerUnauthorized,
         this, &BaseEc2Connection<QueryProcessorType>::remotePeerUnauthorized, Qt::DirectConnection);
-    QnTransactionMessageBus::instance()->start();
+    m_connectionFactory->messageBus()->start();
 }
 
 template<class QueryProcessorType>
 void BaseEc2Connection<QueryProcessorType>::stopReceivingNotifications()
 {
-    QnTransactionMessageBus::instance()->disconnectAndJoin(this);
-    QnTransactionMessageBus::instance()->stop();
+    m_connectionFactory->messageBus()->disconnectAndJoin(this);
+    m_connectionFactory->messageBus()->stop();
 }
 
 template<class QueryProcessorType>
@@ -142,7 +147,7 @@ AbstractBusinessEventManagerPtr BaseEc2Connection<QueryProcessorType>::getBusine
     const Qn::UserAccessData& userAccessData)
 {
     return std::make_shared<QnBusinessEventManager<QueryProcessorType>>(
-        m_queryProcessor, userAccessData);
+        messageBus(), m_queryProcessor, userAccessData);
 }
 
 template<class QueryProcessorType>
@@ -174,10 +179,24 @@ AbstractLayoutManagerPtr BaseEc2Connection<QueryProcessorType>::getLayoutManager
 }
 
 template<class QueryProcessorType>
+AbstractLayoutTourManagerPtr BaseEc2Connection<QueryProcessorType>::getLayoutTourManager(
+    const Qn::UserAccessData& userAccessData)
+{
+    return std::make_shared<QnLayoutTourManager<QueryProcessorType>>(m_queryProcessor, userAccessData);
+}
+
+template<class QueryProcessorType>
 AbstractLayoutNotificationManagerPtr
     BaseEc2Connection<QueryProcessorType>::getLayoutNotificationManager()
 {
     return m_layoutNotificationManager;
+}
+
+template<class QueryProcessorType>
+AbstractLayoutTourNotificationManagerPtr
+    BaseEc2Connection<QueryProcessorType>::getLayoutTourNotificationManager()
+{
+    return m_layoutTourNotificationManager;
 }
 
 template<class QueryProcessorType>
@@ -193,6 +212,12 @@ AbstractVideowallNotificationManagerPtr
     BaseEc2Connection<QueryProcessorType>::getVideowallNotificationManager()
 {
     return m_videowallNotificationManager;
+}
+
+template<class QueryProcessorType>
+QnCommonModule* BaseEc2Connection<QueryProcessorType>::commonModule() const
+{
+    return m_connectionFactory->messageBus()->commonModule();
 }
 
 template<class QueryProcessorType>
@@ -237,7 +262,7 @@ AbstractUpdatesManagerPtr BaseEc2Connection<QueryProcessorType>::getUpdatesManag
     const Qn::UserAccessData& userAccessData)
 {
     return std::make_shared<QnUpdatesManager<QueryProcessorType>>(
-        m_queryProcessor, userAccessData);
+        m_queryProcessor, userAccessData, messageBus());
 }
 
 template<class QueryProcessorType>
@@ -273,7 +298,10 @@ template<class QueryProcessorType>
 AbstractTimeManagerPtr BaseEc2Connection<QueryProcessorType>::getTimeManager(
     const Qn::UserAccessData& userAccessData)
 {
-    return std::make_shared<QnTimeManager<QueryProcessorType>>(m_queryProcessor, userAccessData);
+    return std::make_shared<QnTimeManager<QueryProcessorType>>(
+        m_queryProcessor,
+        m_connectionFactory->timeSyncManager(),
+        userAccessData);
 }
 
 template<class QueryProcessorType>
@@ -281,6 +309,12 @@ AbstractTimeNotificationManagerPtr
     BaseEc2Connection<QueryProcessorType>::getTimeNotificationManager()
 {
     return m_timeNotificationManager;
+}
+
+template<class QueryProcessorType>
+ECConnectionNotificationManager* BaseEc2Connection<QueryProcessorType>::notificationManager()
+{
+    return m_notificationManager.get();
 }
 
 template<class QueryProcessorType>
@@ -337,54 +371,32 @@ int BaseEc2Connection<QueryProcessorType>::restoreDatabaseAsync(
 }
 
 template<class QueryProcessorType>
-void BaseEc2Connection<QueryProcessorType>::addRemotePeer(const QUrl& _url)
+void BaseEc2Connection<QueryProcessorType>::addRemotePeer(const QnUuid& id, const QUrl& _url)
 {
     QUrl url(_url);
-    url.setPath("/ec2/events");
     QUrlQuery q;
     url.setQuery(q);
-    QnTransactionMessageBus::instance()->addConnectionToPeer(url);
+    m_connectionFactory->messageBus()->addOutgoingConnectionToPeer(id, url);
 }
 
 template<class QueryProcessorType>
-void BaseEc2Connection<QueryProcessorType>::deleteRemotePeer(const QUrl& _url)
+void BaseEc2Connection<QueryProcessorType>::deleteRemotePeer(const QnUuid& id)
 {
-    QUrl url(_url);
-    url.setPath("/ec2/events");
-    QUrlQuery q;
-    url.setQuery(q);
-    QnTransactionMessageBus::instance()->removeConnectionFromPeer(url);
-}
-
-
-template<class QueryProcessorType>
-void BaseEc2Connection<QueryProcessorType>::sendRuntimeData(const ApiRuntimeData& data)
-{
-    QnTransaction<ApiRuntimeData> tran(ApiCommand::runtimeInfoChanged);
-    tran.params = data;
-    qnTransactionBus->sendTransaction(tran);
-}
-
-template<class QueryProcessorType>
-Timestamp BaseEc2Connection<QueryProcessorType>::getTransactionLogTime() const
-{
-    NX_ASSERT(transactionLog);
-    return transactionLog ? transactionLog->getTransactionLogTime() : Timestamp();
-}
-
-template<class QueryProcessorType>
-void BaseEc2Connection<QueryProcessorType>::setTransactionLogTime(Timestamp value)
-{
-    NX_ASSERT(transactionLog);
-    if (transactionLog)
-        transactionLog->setTransactionLogTime(value);
+    m_connectionFactory->messageBus()->removeOutgoingConnectionFromPeer (id);
 }
 
 template<class QueryProcessorType>
 QnUuid BaseEc2Connection<QueryProcessorType>::routeToPeerVia(
     const QnUuid& dstPeer, int* distance) const
 {
-    return qnTransactionBus ? qnTransactionBus->routeToPeerVia(dstPeer, distance) : QnUuid();
+    auto messageBus = m_connectionFactory->messageBus();
+    return messageBus ? messageBus->routeToPeerVia(dstPeer, distance) : QnUuid();
+}
+
+template<class QueryProcessorType>
+QnTransactionMessageBusBase* BaseEc2Connection<QueryProcessorType>::messageBus() const
+{
+    return m_connectionFactory->messageBus();
 }
 
 template class BaseEc2Connection<FixedUrlClientQueryProcessor>;

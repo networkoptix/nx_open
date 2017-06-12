@@ -82,7 +82,7 @@ private:
 
     void onConnectionAccepted(
         SystemError::ErrorCode /*sysErrorCode*/,
-        AbstractStreamSocket* streamSocket)
+        std::unique_ptr<AbstractStreamSocket> streamSocket)
     {
         using namespace std::placeholders;
 
@@ -90,9 +90,8 @@ private:
         ASSERT_TRUE(streamSocket->setNonBlockingMode(true));
         streamSocket->sendAsync(
             m_dataToSend,
-            std::bind(&UnifiedPollSet::onBytesSent, this, streamSocket, _1, _2));
-        m_acceptedConnections.push_back(
-            std::unique_ptr<AbstractStreamSocket>(streamSocket));
+            std::bind(&UnifiedPollSet::onBytesSent, this, streamSocket.get(), _1, _2));
+        m_acceptedConnections.push_back(std::move(streamSocket));
 
         m_udtServerSocket.acceptAsync(
             std::bind(&UnifiedPollSet::onConnectionAccepted, this, _1, _2));

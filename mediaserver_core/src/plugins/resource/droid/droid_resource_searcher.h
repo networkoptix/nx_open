@@ -10,11 +10,11 @@
 #include <nx/network/socket.h>
 
 
-class QnPlDroidResourceSearcher : public QnAbstractNetworkResourceSearcher
+class QnPlDroidResourceSearcher: public QnAbstractNetworkResourceSearcher
 {
 
 public:
-    QnPlDroidResourceSearcher();
+    QnPlDroidResourceSearcher(QnCommonModule* commonModule);
 
     QnResourceList findResources(void);
 

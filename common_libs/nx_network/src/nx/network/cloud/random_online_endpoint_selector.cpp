@@ -5,7 +5,7 @@
 
 #include "random_online_endpoint_selector.h"
 
-#include <utils/common/guard.h>
+#include <nx/utils/scope_guard.h>
 
 
 namespace {
@@ -76,7 +76,7 @@ void RandomOnlineEndpointSelector::done(
     SystemError::ErrorCode osErrorCode,
     SocketAddress endpoint)
 {
-    auto scopedGuard = makeScopedGuard([sock, this](){
+    auto scopedGuard = makeScopeGuard([sock, this](){
         QnMutexLocker lk(&m_mutex);
         m_sockets.erase(sock);
     });

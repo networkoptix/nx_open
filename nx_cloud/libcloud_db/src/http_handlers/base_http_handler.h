@@ -6,7 +6,7 @@
 #ifndef cloud_db_base_http_handler_h
 #define cloud_db_base_http_handler_h
 
-#include <http/custom_headers.h>
+#include <nx/network/http/custom_headers.h>
 #include <nx/utils/std/cpp14.h>
 #include <nx/network/http/buffer_source.h>
 #include <nx/network/http/server/abstract_fusion_request_handler.h>
@@ -53,9 +53,9 @@ protected:
     bool authorize(
         nx_http::HttpServerConnection* const connection,
         const nx_http::Request& request,
-        const stree::AbstractResourceReader& authenticationData,
-        const stree::AbstractResourceReader& dataToAuthorize,
-        stree::ResourceContainer* const authzInfo )
+        const nx::utils::stree::AbstractResourceReader& authenticationData,
+        const nx::utils::stree::AbstractResourceReader& dataToAuthorize,
+        nx::utils::stree::ResourceContainer* const authzInfo )
     {
         SocketResourceReader socketResources(*connection->socket());
         HttpRequestResourceReader httpRequestResources(request);
@@ -65,7 +65,7 @@ protected:
         //  needs to be deserialized depending on request type
         if (!m_authorizationManager.authorize(
                 authenticationData,
-                stree::MultiSourceResourceReader(
+                nx::utils::stree::MultiSourceResourceReader(
                     socketResources,
                     httpRequestResources,
                     dataToAuthorize),
@@ -127,7 +127,7 @@ public:
     virtual void processRequest(
         nx_http::HttpServerConnection* const connection,
         const nx_http::Request& request,
-        stree::ResourceContainer authInfo,
+        nx::utils::stree::ResourceContainer authInfo,
         Input inputData ) override
     {
         if( !this->authorize(
@@ -188,7 +188,7 @@ public:
     virtual void processRequest(
         nx_http::HttpServerConnection* const connection,
         const nx_http::Request& request,
-        stree::ResourceContainer authInfo,
+        nx::utils::stree::ResourceContainer authInfo,
         Input inputData ) override
     {
         //performing authorization
@@ -249,13 +249,13 @@ public:
     virtual void processRequest(
         nx_http::HttpServerConnection* const connection,
         const nx_http::Request& request,
-        stree::ResourceContainer authInfo ) override
+        nx::utils::stree::ResourceContainer authInfo ) override
     {
         if (!this->authorize(
                 connection,
                 request,
                 authInfo,
-                stree::ResourceContainer(),
+                nx::utils::stree::ResourceContainer(),
                 &authInfo))
             return;
 
@@ -307,13 +307,13 @@ public:
     virtual void processRequest(
         nx_http::HttpServerConnection* const connection,
         const nx_http::Request& request,
-        stree::ResourceContainer authInfo ) override
+        nx::utils::stree::ResourceContainer authInfo ) override
     {
         if (!this->authorize(
                 connection,
                 request,
                 authInfo,
-                stree::ResourceContainer(),
+                nx::utils::stree::ResourceContainer(),
                 &authInfo))
             return;
 
@@ -365,14 +365,14 @@ public:
     virtual void processRequest(
         nx_http::HttpServerConnection* const connection,
         const nx_http::Request& request,
-        stree::ResourceContainer authInfo,
+        nx::utils::stree::ResourceContainer authInfo,
         InputData inputData) override
     {
         if (!this->authorize(
                 connection,
                 request,
                 authInfo,
-                stree::ResourceContainer(),
+                nx::utils::stree::ResourceContainer(),
                 &authInfo))
             return;
 
@@ -434,13 +434,13 @@ public:
     virtual void processRequest(
         nx_http::HttpServerConnection* const connection,
         const nx_http::Request& request,
-        stree::ResourceContainer authInfo) override
+        nx::utils::stree::ResourceContainer authInfo) override
     {
         if (!this->authorize(
                 connection,
                 request,
                 authInfo,
-                stree::ResourceContainer(),
+                nx::utils::stree::ResourceContainer(),
                 &authInfo))
             return;
 

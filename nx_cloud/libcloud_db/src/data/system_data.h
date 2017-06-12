@@ -6,7 +6,7 @@
 #include <string>
 #include <vector>
 
-#include <plugins/videodecoder/stree/resourcecontainer.h>
+#include <nx/utils/stree/resourcecontainer.h>
 #include <nx/fusion/fusion/fusion_fwd.h>
 #include <nx/fusion/model_functions_fwd.h>
 #include <nx/utils/uuid.h>
@@ -30,7 +30,7 @@ namespace data {
  */
 class SystemRegistrationData:
     public api::SystemRegistrationData,
-    public stree::AbstractResourceReader
+    public nx::utils::stree::AbstractResourceReader
 {
 public:
     virtual bool getAsVariant(int resID, QVariant* const value) const override;
@@ -50,7 +50,7 @@ public:
 
 class SystemData:
     public api::SystemData,
-    public stree::AbstractResourceReader
+    public nx::utils::stree::AbstractResourceReader
 {
 public:
     /** Seconds since epoch (1970-01-01). */
@@ -73,7 +73,7 @@ public:
 
 class SystemSharing:
     public api::SystemSharing,
-    public stree::AbstractResourceReader
+    public nx::utils::stree::AbstractResourceReader
 {
 public:
     virtual bool getAsVariant(int resID, QVariant* const value) const override;
@@ -82,7 +82,7 @@ public:
 #define SystemSharing_FieldsEx SystemSharing_Fields (vmsUserId)
 
 class SystemSharingList:
-    public stree::AbstractResourceReader
+    public nx::utils::stree::AbstractResourceReader
 {
 public:
     std::vector<SystemSharing> sharing;
@@ -97,7 +97,7 @@ bool loadFromUrlQuery(const QUrlQuery& urlQuery, SystemSharingList* const system
  */
 class SystemId:
     public api::SystemId,
-    public stree::AbstractResourceReader
+    public nx::utils::stree::AbstractResourceReader
 {
 public:
     virtual bool getAsVariant(int resID, QVariant* const value) const override;
@@ -105,7 +105,7 @@ public:
 
 class SystemAttributesUpdate:
     public api::SystemAttributesUpdate,
-    public stree::AbstractResourceReader
+    public nx::utils::stree::AbstractResourceReader
 {
 public:
     virtual bool getAsVariant(int resID, QVariant* const value) const override;
@@ -113,7 +113,7 @@ public:
 
 class UserSessionDescriptor:
     public api::UserSessionDescriptor,
-    public stree::AbstractResourceReader
+    public nx::utils::stree::AbstractResourceReader
 {
     virtual bool getAsVariant(int resID, QVariant* const value) const override;
 };

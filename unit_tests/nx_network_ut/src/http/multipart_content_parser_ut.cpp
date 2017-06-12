@@ -10,7 +10,7 @@
 #include <nx/network/http/multipart_content_parser.h>
 #include <nx/utils/random.h>
 
-#include <utils/media/custom_output_stream.h>
+#include <nx/utils/byte_stream/custom_output_stream.h>
 
 TEST( HttpMultipartContentParser, genericTest )
 {
@@ -70,7 +70,7 @@ TEST( HttpMultipartContentParser, genericTest )
             };
 
             parser.setNextFilter(
-                std::make_shared<CustomOutputStream<decltype(decodedFramesProcessor)> >(
+                std::make_shared<nx::utils::bstream::CustomOutputStream<decltype(decodedFramesProcessor)> >(
                     decodedFramesProcessor) );
 
     #if 0   //TODO #ak fix
@@ -164,7 +164,7 @@ TEST( HttpMultipartContentParser, onlySizedData )
             };
 
             parser.setNextFilter(
-                std::make_shared<CustomOutputStream<decltype(decodedFramesProcessor)> >(
+                std::make_shared<nx::utils::bstream::CustomOutputStream<decltype(decodedFramesProcessor)> >(
                     decodedFramesProcessor) );
 
             for( int pos = 0; pos < testData.size(); pos += dataStep )
@@ -226,7 +226,7 @@ TEST( HttpMultipartContentParser, unSizedDataSimple )
         };
 
         parser.setNextFilter(
-            std::make_shared<CustomOutputStream<decltype(decodedFramesProcessor)> >(
+            std::make_shared<nx::utils::bstream::CustomOutputStream<decltype(decodedFramesProcessor)> >(
                 decodedFramesProcessor ) );
 
         for( int pos = 0; pos < testData.size(); pos += dataStep )
@@ -293,7 +293,7 @@ TEST( HttpMultipartContentParser, unSizedData )
             };
 
             parser.setNextFilter(
-                std::make_shared<CustomOutputStream<decltype(decodedFramesProcessor)> >(
+                std::make_shared<nx::utils::bstream::CustomOutputStream<decltype(decodedFramesProcessor)> >(
                     decodedFramesProcessor ) );
 
             for( size_t pos = 0; pos < (size_t)testData.size(); pos += dataStep )
@@ -327,7 +327,7 @@ TEST(HttpMultipartContentParser, epilogueOnly)
         };
 
         parser.setNextFilter(
-            std::make_shared<CustomOutputStream<decltype(decodedFramesProcessor)> >(
+            std::make_shared<nx::utils::bstream::CustomOutputStream<decltype(decodedFramesProcessor)> >(
                 decodedFramesProcessor));
 
         parser.processData(testData);

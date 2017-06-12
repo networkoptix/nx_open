@@ -1,6 +1,8 @@
 TEMPLATE = app
 CONFIG += console
 
+INCLUDEPATH -= $$ROOT_DIR/common/src
+
 unix:!mac {
     QMAKE_LFLAGS += "-Wl,-rpath-link,${libdir}/lib/$$CONFIGURATION/"
 }

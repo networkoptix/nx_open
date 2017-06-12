@@ -22,7 +22,7 @@ TEST(InitStoragesTest, main)
         nx_ms_conf::MIN_STORAGE_SPACE,
         (qint64)std::numeric_limits<int64_t>::max());
     ASSERT_TRUE(launcher.start());
-    auto storages = qnResPool->getResources<QnStorageResource>();
+    auto storages = launcher.commonModule()->resourcePool()->getResources<QnStorageResource>();
     ASSERT_TRUE(storages.isEmpty());
 }
 
@@ -34,9 +34,10 @@ TEST(SaveRestoreStoragesInfoFromConfig, main)
     qint64 spaceLimit1 = 50 * 1024 * 1024l;
     qint64 spaceLimit2 = 255 * 1024 * 1024l;
 
+    QnCommonModule commonModule(/*clientMode*/ false);
     nx::ut::utils::FileStorageTestHelper storageTestHelper;
-    auto storage1 = storageTestHelper.createStorage(path1, spaceLimit1);
-    auto storage2 = storageTestHelper.createStorage(path2, spaceLimit2);
+    auto storage1 = storageTestHelper.createStorage(&commonModule, path1, spaceLimit1);
+    auto storage2 = storageTestHelper.createStorage(&commonModule, path2, spaceLimit2);
 
     QnStorageResourceList storageList;
     BeforeRestoreDbData restoreData;
@@ -51,7 +52,9 @@ TEST(SaveRestoreStoragesInfoFromConfig, main)
     ASSERT_EQ(restoreData.getSpaceLimitForStorage(path2), spaceLimit2);
 }
 
-class UnmountedLocalStoragesFilterTest : public ::testing::Test
+class UnmountedLocalStoragesFilterTest:
+    public ::testing::Test,
+    public QnMediaServerModule
 {
 protected:
     UnmountedLocalStoragesFilterTest() :
@@ -85,7 +88,7 @@ protected:
             url += "/" + mediaFolderName;
 
         unmountedStorages = unmountedFilter.getUnmountedStorages(
-              QnStorageResourceList() << storageTestHelper.createStorage(url, spaceLimit),
+              QnStorageResourceList() << storageTestHelper.createStorage(commonModule(), url, spaceLimit),
               isPathFound == PathFound::yes ? QStringList() << url : QStringList());
     }
 

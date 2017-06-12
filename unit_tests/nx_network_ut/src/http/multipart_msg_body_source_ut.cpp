@@ -9,7 +9,7 @@
 
 #include <nx/network/http/multipart_msg_body_source.h>
 #include <nx/utils/std/cpp14.h>
-#include <utils/media/buffer_output_stream.h>
+#include <nx/utils/byte_stream/buffer_output_stream.h>
 
 
 namespace nx_http {

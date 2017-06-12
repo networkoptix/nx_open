@@ -5,7 +5,7 @@
 #include <common/common_module.h>
 
 #include <nx/fusion/model_functions.h>
-#include <nx/network/http/httptypes.h>
+#include <nx/network/http/http_types.h>
 
 #include <api/model/setup_local_system_data.h>
 #include <api/resource_property_adaptor.h>
@@ -39,12 +39,12 @@ int QnSetupLocalSystemRestHandler::execute(
     const QnRestConnectionProcessor* owner,
     QnJsonRestResult &result)
 {
-    if (QnPermissionsHelper::isSafeMode())
+    if (QnPermissionsHelper::isSafeMode(owner->commonModule()))
         return QnPermissionsHelper::safeModeError(result);
-    if (!QnPermissionsHelper::hasOwnerPermissions(owner->accessRights()))
+    if (!QnPermissionsHelper::hasOwnerPermissions(owner->resourcePool(), owner->accessRights()))
         return QnPermissionsHelper::notOwnerError(result);
 
-    if (!qnGlobalSettings->isNewSystem())
+    if (!owner->globalSettings()->isNewSystem())
     {
         result.setError(QnJsonRestResult::Forbidden, lit("This method is allowed at initial state only. Use 'api/detachFromSystem' method first."));
         return nx_http::StatusCode::ok;
@@ -68,33 +68,38 @@ int QnSetupLocalSystemRestHandler::execute(
         return nx_http::StatusCode::ok;
     }
 
-    const auto systemNameBak = qnGlobalSettings->systemName();
+    const auto systemNameBak = owner->globalSettings()->systemName();
 
-    qnGlobalSettings->resetCloudParams();
-    qnGlobalSettings->setSystemName(data.systemName);
-    qnGlobalSettings->setLocalSystemId(QnUuid::createUuid());
+    owner->globalSettings()->resetCloudParams();
+    owner->globalSettings()->setSystemName(data.systemName);
+    owner->globalSettings()->setLocalSystemId(QnUuid::createUuid());
 
-    if (!qnGlobalSettings->synchronizeNowSync())
+    if (!owner->globalSettings()->synchronizeNowSync())
     {
         //changing system name back
-        qnGlobalSettings->setSystemName(systemNameBak);
-        qnGlobalSettings->setLocalSystemId(QnUuid()); //< revert
+        owner->globalSettings()->setSystemName(systemNameBak);
+        owner->globalSettings()->setLocalSystemId(QnUuid()); //< revert
         result.setError(
             QnJsonRestResult::CantProcessRequest,
             lit("Internal server error."));
         return nx_http::StatusCode::ok;
     }
 
-    if (!updateUserCredentials(data, QnOptionalBool(true), qnResPool->getAdministrator(), &errStr))
+    if (!updateUserCredentials(
+        owner->commonModule()->ec2Connection(),
+        data,
+        QnOptionalBool(true),
+        owner->resourcePool()->getAdministrator(), &errStr))
     {
         //changing system name back
-        qnGlobalSettings->setSystemName(systemNameBak);
+        owner->globalSettings()->setSystemName(systemNameBak);
         result.setError(QnJsonRestResult::CantProcessRequest, errStr);
         return nx_http::StatusCode::ok;
     }
 
     QnSystemSettingsHandler settingsHandler;
     if (!settingsHandler.updateSettings(
+        owner->commonModule(),
         data.systemSettings,
         result,
         Qn::kSystemAccess,

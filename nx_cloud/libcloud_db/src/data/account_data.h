@@ -10,7 +10,7 @@
 #include <nx/utils/uuid.h>
 
 #include <cloud_db_client/src/data/account_data.h>
-#include <plugins/videodecoder/stree/resourcecontainer.h>
+#include <nx/utils/stree/resourcecontainer.h>
 
 namespace nx {
 namespace cdb {
@@ -18,7 +18,7 @@ namespace data {
 
 class AccountRegistrationData:
     public api::AccountRegistrationData,
-    public stree::AbstractResourceReader
+    public nx::utils::stree::AbstractResourceReader
 {
 public:
     virtual bool getAsVariant(int resID, QVariant* const value) const override;
@@ -26,18 +26,19 @@ public:
 
 class AccountData:
     public api::AccountData,
-    public stree::AbstractResourceReader
+    public nx::utils::stree::AbstractResourceReader
 {
 public:
     AccountData() = default;
     AccountData(AccountRegistrationData registrationData);
+    AccountData(api::AccountData apiAccountData);
 
     virtual bool getAsVariant( int resID, QVariant* const value ) const override;
 };
 
 class AccountConfirmationCode:
     public api::AccountConfirmationCode,
-    public stree::AbstractResourceReader
+    public nx::utils::stree::AbstractResourceReader
 {
 public:
     virtual bool getAsVariant( int resID, QVariant* const value ) const override;
@@ -45,7 +46,7 @@ public:
 
 class AccountUpdateData:
     public api::AccountUpdateData,
-    public stree::AbstractResourceReader
+    public nx::utils::stree::AbstractResourceReader
 {
 public:
     virtual bool getAsVariant(int resID, QVariant* const value) const override;
@@ -63,7 +64,7 @@ public:
 
 class AccountEmail:
     public api::AccountEmail,
-    public stree::AbstractResourceReader
+    public nx::utils::stree::AbstractResourceReader
 {
 public:
     virtual bool getAsVariant(int resID, QVariant* const value) const override;
@@ -71,8 +72,8 @@ public:
 
 class TemporaryCredentialsParams:
     public api::TemporaryCredentialsParams,
-    public stree::AbstractResourceReader,
-    public stree::AbstractResourceWriter
+    public nx::utils::stree::AbstractResourceReader,
+    public nx::utils::stree::AbstractResourceWriter
 {
 public:
     virtual bool getAsVariant(int resID, QVariant* const value) const override;
@@ -95,7 +96,7 @@ public:
     std::string toString() const;
     bool parse(const std::string& str);
 
-    bool authorize(const stree::AbstractResourceReader& requestAttributes) const;
+    bool authorize(const nx::utils::stree::AbstractResourceReader& requestAttributes) const;
 };
 
 class TemporaryAccountCredentials

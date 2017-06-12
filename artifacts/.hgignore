@@ -1,0 +1,9 @@
+subinclude:bpi/.hgignore
+
+syntax: glob
+.git
+.gitignore
+.idea
+*.d
+*.o
+*.so*

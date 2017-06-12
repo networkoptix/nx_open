@@ -13,10 +13,7 @@
 QnImageFilterHelper::QnImageFilterHelper():
     m_customAR(0.0),
     m_rotAngle(0),
-    m_timestampCorner(Qn::NoCorner),
-    m_codecID(AV_CODEC_ID_NONE),
-    m_onscreenDateOffset(0),
-    m_timeMs(0)
+    m_codecID(AV_CODEC_ID_NONE)
 {
 }
 
@@ -51,11 +48,9 @@ void QnImageFilterHelper::setContrastParams(const ImageCorrectionParams& params)
     m_contrastParams = params;
 }
 
-void QnImageFilterHelper::setTimeCorner(Qn::Corner corner, qint64 onscreenDateOffset, qint64 timeMsec)
+void QnImageFilterHelper::setTimeStampParams(const QnTimeStampParams& params)
 {
-    m_timestampCorner = corner;
-    m_onscreenDateOffset = onscreenDateOffset;
-    m_timeMs = timeMsec;
+    m_timestampParams = params;
 }
 
 void QnImageFilterHelper::setCodec( AVCodecID codecID )
@@ -77,7 +72,7 @@ bool QnImageFilterHelper::isEmpty() const
         return false;
     if (m_rotAngle)
         return false;
-    if (m_timestampCorner != Qn::NoCorner) 
+    if (m_timestampParams.enabled)
         return false;
 
     return true;
@@ -124,8 +119,8 @@ QList<QnAbstractImageFilterPtr> QnImageFilterHelper::createFilterChain(const QSi
     if (m_rotAngle)
         result << QnAbstractImageFilterPtr(new QnRotateImageFilter(m_rotAngle));
 
-    if (m_timestampCorner != Qn::NoCorner) 
-        result << QnAbstractImageFilterPtr(new QnTimeImageFilter(m_layout, m_timestampCorner, m_onscreenDateOffset, m_timeMs));
+    if (m_timestampParams.enabled)
+        result << QnAbstractImageFilterPtr(new QnTimeImageFilter(m_layout, m_timestampParams));
 
     //verifying that output resolution is supported by codec
 

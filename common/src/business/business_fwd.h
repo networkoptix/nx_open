@@ -51,6 +51,7 @@ QN_DECLARE_METAOBJECT_HEADER(QnBusiness, EventReason EventState EventType Action
         StorageIoErrorReason,
         StorageTooSlowReason,
         StorageFullReason,
+        SystemStorageFullReason,
         LicenseRemoved,
 
         BackupFailedNoBackupStorageError,
@@ -113,6 +114,9 @@ QN_DECLARE_METAOBJECT_HEADER(QnBusiness, EventReason EventState EventType Action
 
         /** Archive backup done. */
         BackupFinishedEvent = 11,
+
+        /** Software triggers. */
+        SoftwareTriggerEvent = 12,
 
         /** System health message. */
         SystemHealthEvent = 500,

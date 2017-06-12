@@ -7,7 +7,7 @@
 
 #include <nx/fusion/model_functions.h>
 #include <nx/network/http/auth_tools.h>
-#include <nx/network/http/httpclient.h>
+#include <nx/network/http/http_client.h>
 #include <nx/network/http/server/fusion_request_result.h>
 #include <cloud_db_client/src/data/account_data.h>
 #include <cloud_db_client/src/data/types.h>

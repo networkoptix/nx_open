@@ -1,8 +1,3 @@
-/**********************************************************
-* Dec 21, 2015
-* akolesnikov
-***********************************************************/
-
 #include "vms_gateway_functional_test.h"
 
 #include <chrono>
@@ -12,28 +7,28 @@
 #include <thread>
 #include <tuple>
 
-#include <common/common_globals.h>
 #include <nx/network/http/auth_tools.h>
-#include <nx/network/http/httpclient.h>
+#include <nx/network/http/http_client.h>
 #include <nx/network/socket.h>
 #include <nx/network/socket_global.h>
 #include <nx/utils/std/cpp14.h>
 #include <nx/utils/string.h>
-#include <utils/common/sync_call.h>
-#include <utils/crypt/linux_passwd_crypt.h>
+#include <nx/utils/sync_call.h>
+#include <nx/utils/crypt/linux_passwd_crypt.h>
 #include <nx/fusion/serialization/json.h>
 #include <nx/fusion/serialization/lexical.h>
 
 #include "vms_gateway_process.h"
-
 
 namespace nx {
 namespace cloud {
 namespace gateway {
 
 namespace {
+
 QString sTemporaryDirectoryPath;
-}
+
+} // namespace
 
 VmsGatewayFunctionalTest::VmsGatewayFunctionalTest():
     m_httpPort(0)
@@ -116,6 +111,6 @@ void VmsGatewayFunctionalTest::setTemporaryDirectoryPath(const QString& path)
     sTemporaryDirectoryPath = path;
 }
 
-}   // namespace gateway
-}   // namespace cloud
-}   // namespace nx
+} // namespace gateway
+} // namespace cloud
+} // namespace nx

@@ -21,6 +21,8 @@
 #include <utils/common/util.h>
 #include <nx/fusion/model_functions.h>
 #include <api/global_settings.h>
+#include <common/common_module.h>
+#include <media_server/media_server_module.h>
 
 namespace {
 
@@ -107,7 +109,7 @@ QnBusinessActionParameters convertOldActionParameters(const QByteArray& value)
                 result.streamQuality = static_cast<Qn::StreamQuality>(toInt(field));
                 break;
             case DurationParam:
-                result.recordingDuration = toInt(field);
+                result.durationMs = toInt(field) * 1000;
                 break;
             case RecordBeforeParam:
                 break;
@@ -284,7 +286,8 @@ int getBookmarksQueryLimit(const QnCameraBookmarkSearchFilter &filter)
 
 static const qint64 CLEANUP_INTERVAL = 1000000ll * 3600;
 
-QnServerDb::QnServerDb():
+QnServerDb::QnServerDb(QnCommonModule* commonModule):
+    QnCommonModuleAware(commonModule),
     m_lastCleanuptime(0),
     m_auditCleanuptime(0),
     m_runtimeActionsTotalRecords(0),
@@ -292,7 +295,7 @@ QnServerDb::QnServerDb():
 {
     const QString fileName =
         closeDirPath(
-            MSSettings::roSettings()->value("eventsDBFilePath", getDataDirectory()).toString())
+            qnServerModule->roSettings()->value("eventsDBFilePath", getDataDirectory()).toString())
         + QString(lit("mserver.sqlite"));
     addDatabase(fileName, "QnServerDb");
     if (m_sdb.open())
@@ -917,7 +920,7 @@ void QnServerDb::getAndSerializeActions(
         {
             QnUuid eventResId = QnUuid::fromRfc4122(actionsQuery.value(eventResIdx).toByteArray());
             QnNetworkResourcePtr camRes =
-                qnResPool->getResourceById<QnNetworkResource>(eventResId);
+                resourcePool()->getResourceById<QnNetworkResource>(eventResId);
             if (camRes)
             {
                 if (QnStorageManager::isArchiveTimeExists(

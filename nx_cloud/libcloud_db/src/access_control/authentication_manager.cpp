@@ -14,16 +14,17 @@
 
 #include <nx/fusion/serialization/json.h>
 #include <nx/fusion/serialization/lexical.h>
-#include <nx/network/auth_restriction_list.h>
+#include <nx/network/http/auth_restriction_list.h>
 #include <nx/network/http/auth_tools.h>
 #include <nx/network/http/buffer_source.h>
 #include <nx/network/http/server/fusion_request_result.h>
+#include <nx/network/http/server/http_server_connection.h>
 #include <nx/utils/time.h>
 
 #include <common/common_globals.h> //for Qn::SerializationFormat
-#include <http/custom_headers.h>
+#include <nx/network/http/custom_headers.h>
 #include <utils/common/app_info.h>
-#include <utils/common/guard.h>
+#include <nx/utils/scope_guard.h>
 
 #include "abstract_authentication_data_provider.h"
 #include "stree/cdb_ns.h"
@@ -41,7 +42,7 @@ using namespace nx_http;
 
 AuthenticationManager::AuthenticationManager(
     std::vector<AbstractAuthenticationDataProvider*> authDataProviders,
-    const QnAuthMethodRestrictionList& authRestrictionList,
+    const nx_http::AuthMethodRestrictionList& authRestrictionList,
     const StreeManager& stree)
 :
     m_authRestrictionList(authRestrictionList),
@@ -57,12 +58,12 @@ void AuthenticationManager::authenticate(
     nx_http::server::AuthenticationCompletionHandler completionHandler)
 {
     boost::optional<nx_http::header::WWWAuthenticate> wwwAuthenticate;
-    stree::ResourceContainer authProperties;
+    nx::utils::stree::ResourceContainer authProperties;
     nx_http::HttpHeaders responseHeaders;
     std::unique_ptr<nx_http::AbstractMsgBodySource> msgBody;
 
     api::ResultCode authResult = api::ResultCode::notAuthorized;
-    auto guard = makeScopedGuard(
+    auto guard = makeScopeGuard(
         [&authResult, &wwwAuthenticate, &authProperties,
         &responseHeaders, &msgBody, &completionHandler]()
         {
@@ -82,11 +83,12 @@ void AuthenticationManager::authenticate(
             }
 
             completionHandler(
-                authResult == api::ResultCode::ok,
-                std::move(authProperties),
-                std::move(wwwAuthenticate),
-                std::move(responseHeaders),
-                std::move(msgBody));
+                nx_http::server::AuthenticationResult(
+                    authResult == api::ResultCode::ok,
+                    std::move(authProperties),
+                    std::move(wwwAuthenticate),
+                    std::move(responseHeaders),
+                    std::move(msgBody)));
         });
 
     //TODO #ak use QnAuthHelper class to enable all that authentication types
@@ -115,13 +117,13 @@ void AuthenticationManager::authenticate(
     }
 
     //performing stree search
-    stree::ResourceContainer authTraversalResult;
-    stree::ResourceContainer inputRes;
+    nx::utils::stree::ResourceContainer authTraversalResult;
+    nx::utils::stree::ResourceContainer inputRes;
     if (authzHeader && !authzHeader->userid().isEmpty())
         inputRes.put(attr::userName, authzHeader->userid());
     SocketResourceReader socketResources(*connection.socket());
     HttpRequestResourceReader httpRequestResources(request);
-    const auto authSearchInputData = stree::MultiSourceResourceReader(
+    const auto authSearchInputData = nx::utils::stree::MultiSourceResourceReader(
         socketResources,
         httpRequestResources,
         inputRes,
@@ -194,7 +196,7 @@ void AuthenticationManager::authenticate(
 
 nx::String AuthenticationManager::realm()
 {
-    return QnAppInfo::realm().toUtf8();
+    return nx::network::AppInfo::realm().toUtf8();
 }
 
 bool AuthenticationManager::validateNonce(const nx_http::StringType& nonce)
@@ -207,8 +209,8 @@ bool AuthenticationManager::validateNonce(const nx_http::StringType& nonce)
 api::ResultCode AuthenticationManager::authenticateInDataManagers(
     const nx_http::StringType& username,
     std::function<bool(const nx::Buffer&)> validateHa1Func,
-    const stree::AbstractResourceReader& authSearchInputData,
-    stree::ResourceContainer* const authProperties)
+    const nx::utils::stree::AbstractResourceReader& authSearchInputData,
+    nx::utils::stree::ResourceContainer* const authProperties)
 {
     //TODO #ak AuthenticationManager has to become async some time...
 

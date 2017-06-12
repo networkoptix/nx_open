@@ -20,7 +20,9 @@
 namespace nx {
 namespace stun {
 
-class NX_NETWORK_API MessageParser {
+class NX_NETWORK_API MessageParser:
+    public nx::network::server::AbstractMessageParser<Message>
+{
 private:
     enum {
         // Header
@@ -59,8 +61,8 @@ public:
         m_header.transactionId.resize( Header::TRANSACTION_ID_SIZE );
     }
 
-    //!set message object to parse to
-    void setMessage( Message* const msg ) {
+    virtual void setMessage( Message* const msg ) override
+    {
         m_outputMessage = msg;
     }
     //!Returns current parse state
@@ -74,19 +76,19 @@ public:
         \note \a *buf MAY NOT contain whole message, but any part of it (it can be as little as 1 byte)
         \note Reads whole message even if parse error occurred
     */
-    nx_api::ParserState parse(
+    virtual nx::network::server::ParserState parse(
         const nx::Buffer& /*buf*/,
-        size_t* /*bytesProcessed*/ );
+        size_t* /*bytesProcessed*/ ) override;
 
     //!Returns current parse state
-    nx_api::ParserState state() const {
+    nx::network::server::ParserState state() const {
         return m_state == HEADER_INITIAL_AND_TYPE
-            ? nx_api::ParserState::init
-            : nx_api::ParserState::inProgress;
+            ? nx::network::server::ParserState::init
+            : nx::network::server::ParserState::readingMessage;
     }
 
     //!Resets parse state and prepares for parsing different data
-    void reset() {
+    virtual void reset() override {
         m_state = HEADER_INITIAL_AND_TYPE;
     }
 private:

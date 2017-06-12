@@ -1,15 +1,9 @@
-/**********************************************************
-* Sep 28, 2015
-* akolesnikov
-***********************************************************/
-
 #include "auth_data.h"
 
 #include <nx/fusion/model_functions.h>
-#include <utils/preprocessor/field_name.h>
 
+#include "field_name.h"
 #include "system_data.h"
-
 
 namespace nx {
 namespace cdb {
@@ -47,9 +41,14 @@ void serializeToUrlQuery(const AuthRequest& authRequest, QUrlQuery* const urlQue
         QString::fromStdString(authRequest.realm));
 }
 
-QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(
-    (NonceData)(AuthRequest)(AuthResponse), (json), _Fields, (optional, false))
+const char* const kVmsUserAuthInfoAttributeName = "cloudUserAuthenticationInfo";
 
-}   //api
-}   //cdb
-}   //nx
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(
+    (NonceData)(AuthRequest)(AuthResponse)(AuthInfoRecord)(AuthInfo),
+    (json),
+    _Fields,
+    (optional, false))
+
+} // namespace api
+} // namespace cdb
+} // namespace nx

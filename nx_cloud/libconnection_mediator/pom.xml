@@ -3,12 +3,12 @@
     <parent>
         <artifactId>nx_cloud</artifactId>
         <groupId>com.networkoptix.hdwitness</groupId>
-        <version>3.0.0-SNAPSHOT</version>
+        <version>3.1.0-SNAPSHOT</version>
         <relativePath>..</relativePath>
     </parent>
 
     <groupId>com.networkoptix.hdwitness</groupId>
-    <version>3.0.0-SNAPSHOT</version>
+    <version>3.1.0-SNAPSHOT</version>
     <modelVersion>4.0.0</modelVersion>
     <artifactId>libconnection_mediator</artifactId>
     <packaging>pom</packaging>
@@ -23,7 +23,7 @@
         <targetName>connection_mediator</targetName>
 
         <qt.libs>core network concurrent</qt.libs>
-        <global.libs>-lcommon -lnx_network -ludt -lcloud_db_client -lnx_streaming</global.libs>
+        <global.libs>-lcommon -lnx_network -ludt -lcloud_db_client -lnx_kit</global.libs>
         <windows.oslibs>-lws2_32 -lIphlpapi DbgHelp.lib -lwinmm</windows.oslibs>
         <mac.oslibs>-lbz2 -framework IOKit -framework CoreServices</mac.oslibs>
 
@@ -47,15 +47,6 @@
             <type>pom</type>
             <scope>system</scope>
             <systemPath>${root.dir}/common_libs/nx_network/pom.xml</systemPath>
-        </dependency>
-
-        <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>nx_streaming</artifactId>
-            <version>${project.version}</version>
-            <type>pom</type>
-            <scope>system</scope>
-            <systemPath>${root.dir}/common_libs/nx_streaming/pom.xml</systemPath>
         </dependency>
 
         <dependency>

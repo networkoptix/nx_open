@@ -1,12 +1,12 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd"> <parent>
         <artifactId>cpp</artifactId>
         <groupId>com.networkoptix.hdwitness</groupId>
-        <version>3.0.0-SNAPSHOT</version>
+        <version>3.1.0-SNAPSHOT</version>
         <relativePath>../../cpp</relativePath>
     </parent>
 
     <groupId>com.networkoptix.hdwitness</groupId>
-    <version>3.0.0-SNAPSHOT</version>
+    <version>3.1.0-SNAPSHOT</version>
     <modelVersion>4.0.0</modelVersion>
     <artifactId>mobile_client</artifactId>
     <packaging>pom</packaging>
@@ -21,7 +21,7 @@
 
         <qt.libs>core qml quick quick-private concurrent network sql multimedia qtmultimediaquicktools_private xml webchannel websockets</qt.libs>
         <!-- !!! DO NOT REMOVE DUPLICATES FROM global.libs UNLESS YOU KNOW WHAT YOU'RE DOING !!! -->
-        <global.libs>-lclient_core -lnx_media -lnx_audio -lnx_vms_utils -lnx_streaming -lnx_network -lappserver2 -lcloud_db_client -lcommon -lnx_streaming -lnx_network -lnx_fusion -lnx_utils -ludt</global.libs>
+        <global.libs>-lnx_client_core -lnx_media -lnx_audio -lnx_vms_utils -lnx_network -lappserver2 -lcloud_db_client -lcommon -lnx_network -lnx_fusion -lnx_utils -ludt -lnx_kit</global.libs>
         <windows.oslibs>DbgHelp.lib -lws2_32 -lIphlpapi -lwinmm -ld3d9</windows.oslibs>
         <linux.oslibs>-lz -lopenal -lX11 -lXfixes -lGL -lGLU</linux.oslibs>
         <android.oslibs>-lturbojpeg</android.oslibs>
@@ -37,8 +37,8 @@
 
         <project.version.code>${buildNumber}</project.version.code>
         <project.version.name>${release.version}</project.version.name>
-        <provisioning_profile>${static.customization.dir}/mobile_client/ios/provisioning_profiles/production.mobileprovision</provisioning_profile>
-        <mobile_client_entitlements>mobile_client-release.entitlements</mobile_client_entitlements>
+        <provisioning_profile>${static.customization.dir}/mobile_client/ios/provisioning_profiles/testing.mobileprovision</provisioning_profile>
+        <mobile_client_entitlements>mobile_client-beta.entitlements</mobile_client_entitlements>
         <provisioning_profile_id/>
     </properties>
 
@@ -46,11 +46,11 @@
     <dependencies>
         <dependency>
             <groupId>${project.groupId}</groupId>
-            <artifactId>libclient_core</artifactId>
+            <artifactId>nx_client_core</artifactId>
             <version>${project.version}</version>
             <type>pom</type>
             <scope>system</scope>
-            <systemPath>${root.dir}/client/libclient_core/pom.xml</systemPath>
+            <systemPath>${root.dir}/client/nx_client_core/pom.xml</systemPath>
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
@@ -90,6 +90,7 @@
                                     <includes>
                                         <include>*.apk</include>
                                         <include>*.ipa</include>
+                                        <include>resources/**</include>
                                     </includes>
                                 </fileset>
                             </filesets>
@@ -241,5 +242,18 @@
                 <linux.oslibs>-lz</linux.oslibs>
             </properties>
         </profile>
+         <profile>
+            <id>nobeta</id>
+            <activation>
+                <property>
+                    <name>beta</name>
+                    <value>false</value>
+                </property>
+            </activation>
+            <properties>
+                <provisioning_profile>${static.customization.dir}/mobile_client/ios/provisioning_profiles/production.mobileprovision</provisioning_profile>
+                <mobile_client_entitlements>mobile_client-release.entitlements</mobile_client_entitlements>
+            </properties>
+        </profile>        
     </profiles>
 </project>

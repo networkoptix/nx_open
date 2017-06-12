@@ -187,4 +187,6 @@ QN_FUSION_DECLARE_FUNCTIONS(QnPlatformMonitor::PartitionType, (metatype)(lexical
 QN_FUSION_DECLARE_FUNCTIONS(QnPlatformMonitor::PartitionTypes, (metatype)(lexical));
 Q_DECLARE_OPERATORS_FOR_FLAGS(QnPlatformMonitor::PartitionTypes);
 
+QString toString(const QnPlatformMonitor::PartitionSpace& value);
+
 #endif // QN_PLATFORM_MONITOR_H

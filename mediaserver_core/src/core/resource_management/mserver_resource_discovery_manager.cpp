@@ -27,15 +27,20 @@
 
 #include <nx_ec/data/api_conversion_functions.h>
 #include <nx_ec/managers/abstract_camera_manager.h>
+#include <media_server/media_server_module.h>
 
+namespace {
 static const int NETSTATE_UPDATE_TIME = 1000 * 30;
 static const int RETRY_COUNT_FOR_FOREIGN_RESOURCES = 2;
+static const int kRetryCountToMakeCamOffline = 3;
+} // namespace
 
-QnMServerResourceDiscoveryManager::QnMServerResourceDiscoveryManager()
+QnMServerResourceDiscoveryManager::QnMServerResourceDiscoveryManager(QnCommonModule* commonModule):
+    QnResourceDiscoveryManager(commonModule)
 {
     netStateTime.restart();
     connect(this, &QnMServerResourceDiscoveryManager::cameraDisconnected, qnBusinessRuleConnector, &QnBusinessEventConnector::at_cameraDisconnected);
-    m_serverOfflineTimeout = MSSettings::roSettings()->value("redundancyTimeout", m_serverOfflineTimeout/1000).toInt() * 1000;
+    m_serverOfflineTimeout = qnServerModule->roSettings()->value("redundancyTimeout", m_serverOfflineTimeout/1000).toInt() * 1000;
     m_serverOfflineTimeout = qMax(1000, m_serverOfflineTimeout);
     m_foreignResourcesRetryCount = 0;
 }
@@ -84,7 +89,7 @@ bool QnMServerResourceDiscoveryManager::processDiscoveredResources(QnResourceLis
                 ++itr;
                 continue;
             }
-            QnSecurityCamResourcePtr existRes = qnResPool->getResourceByUniqueId<QnSecurityCamResource>((*itr)->getUniqueId());
+            QnSecurityCamResourcePtr existRes = resourcePool()->getResourceByUniqueId<QnSecurityCamResource>((*itr)->getUniqueId());
             if (existRes && existRes->hasFlags(Qn::foreigner) && !existRes->hasFlags(Qn::desktop_camera))
             {
                 m_tmpForeignResources.insert(camRes->getUniqueId(), camRes);
@@ -100,7 +105,7 @@ bool QnMServerResourceDiscoveryManager::processDiscoveredResources(QnResourceLis
 
             // sort foreign resources to add more important cameras first: check if it is an own cameras, then check failOver priority order
             auto foreignResources = m_tmpForeignResources.values();
-            const QnUuid ownGuid = qnCommon->moduleGUID();
+            const QnUuid ownGuid = commonModule()->moduleGUID();
             std::sort(foreignResources.begin(), foreignResources.end(), [&ownGuid](const QnSecurityCamResourcePtr& leftCam, const QnSecurityCamResourcePtr& rightCam)
             {
                 bool leftOwnServer = leftCam->preferredServerId() == ownGuid;
@@ -204,7 +209,7 @@ bool QnMServerResourceDiscoveryManager::processDiscoveredResources(QnResourceLis
                     newNetRes->update(existCamRes);
                     newCamRes->setManuallyAdded( isDiscoveredManually );
 
-                    newNetRes->setParentId(qnCommon->moduleGUID());
+                    newNetRes->setParentId(commonModule()->moduleGUID());
                     newNetRes->setFlags(existCamRes->flags() & ~Qn::foreigner);
                     newNetRes->setId(existCamRes->getId());
                     newNetRes->addFlags(Qn::parent_change);
@@ -217,11 +222,11 @@ bool QnMServerResourceDiscoveryManager::processDiscoveredResources(QnResourceLis
                     ec2::ApiCameraData apiCamera;
                     fromResourceToApi(existCamRes, apiCamera);
 
-                    ec2::AbstractECConnectionPtr connect = QnAppServerConnectionFactory::getConnection2();
+                    ec2::AbstractECConnectionPtr connect = commonModule()->ec2Connection();
                     const ec2::ErrorCode errorCode = connect->getCameraManager(Qn::kSystemAccess)->addCameraSync(apiCamera);
                     if( errorCode != ec2::ErrorCode::ok )
                         NX_LOG( QString::fromLatin1("Discovery----: Can't add camera to ec2. %1").arg(ec2::toString(errorCode)), cl_logWARNING );
-                    propertyDictionary->saveParams( existCamRes->getId() );
+                    existCamRes->saveParams();
                 }
             }
         }
@@ -288,7 +293,7 @@ bool QnMServerResourceDiscoveryManager::processDiscoveredResources(QnResourceLis
 
 void QnMServerResourceDiscoveryManager::markOfflineIfNeeded(QSet<QString>& discoveredResources)
 {
-    const QnResourceList& resources = qnResPool->getResources();
+    const QnResourceList& resources = resourcePool()->getResources();
 
     for(const QnResourcePtr& res: resources)
     {
@@ -315,10 +320,11 @@ void QnMServerResourceDiscoveryManager::markOfflineIfNeeded(QSet<QString>& disco
             m_resourceDiscoveryCounter[uniqId]++;
 
 
-            if (m_resourceDiscoveryCounter[uniqId] >= 5)
+            if (m_resourceDiscoveryCounter[uniqId] >= kRetryCountToMakeCamOffline)
             {
                 QnVirtualCameraResource* camRes = dynamic_cast<QnVirtualCameraResource*>(netRes);
-                if (QnLiveStreamProvider::hasRunningLiveProvider(netRes)  || (camRes && !camRes->isScheduleDisabled())) {
+                if (QnLiveStreamProvider::hasRunningLiveProvider(netRes)  || (camRes && !camRes->isScheduleDisabled()))
+                {
                     if (res->getStatus() == Qn::Offline && !m_disconnectSended[uniqId]) {
                         QnVirtualCameraResourcePtr cam = res.dynamicCast<QnVirtualCameraResource>();
                         if (cam)

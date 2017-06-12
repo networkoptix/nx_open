@@ -29,7 +29,7 @@ struct QnThumbnailRequestData: public QnMultiserverRequestData
 
     QnThumbnailRequestData();
 
-    void loadFromParams(const QnRequestParamList& params);
+    void loadFromParams(QnResourcePool* resourcePool, const QnRequestParamList& params);
     QnRequestParamList toParams() const;
     bool isValid() const;
 

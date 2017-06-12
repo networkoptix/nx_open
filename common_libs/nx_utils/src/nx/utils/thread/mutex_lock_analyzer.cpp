@@ -6,7 +6,6 @@
 #if defined(USE_OWN_MUTEX)
 
 #if defined(_WIN32)
-#define WIN32_LEAN_AND_MEAN
 #include <Windows.h>
 #elif defined(__linux__)
 #include <signal.h>
@@ -140,7 +139,7 @@ bool LockGraphEdgeData::TwoMutexLockData::operator<( const TwoMutexLockData& rhs
 
 bool LockGraphEdgeData::TwoMutexLockData::operator==( const TwoMutexLockData& rhs ) const
 {
-    return 
+    return
         threadID == rhs.threadID &&
         firstLocked == rhs.firstLocked &&
         secondLocked == rhs.secondLocked;
@@ -191,7 +190,7 @@ bool LockGraphEdgeData::connectedTo( const LockGraphEdgeData& rhs ) const
 
     //note: lockPositions is sorted by threadID
 
-    //two edges are connected if there are elements with different thread id 
+    //two edges are connected if there are elements with different thread id
     return !is_equal_sorted_ranges_if(
         lockPositions.cbegin(), lockPositions.cend(),
         rhs.lockPositions.cbegin(), rhs.lockPositions.cend(),

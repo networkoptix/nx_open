@@ -7,12 +7,13 @@
 #include "core/resource/camera_resource.h"
 #include "core/resource_management/resource_pool.h"
 #include "common/common_module.h"
-#include <http/custom_headers.h>
+#include <nx/network/http/custom_headers.h>
 #include "network/tcp_connection_priv.h"
 #include "nx/fusion/serialization/json.h"
 #include <nx/fusion/model_functions.h>
 #include <nx/utils/thread/mutex.h>
 #include <nx/utils/thread/wait_condition.h>
+#include <network/tcp_listener.h>
 
 class QnIOMonitorConnectionProcessorPrivate: public QnTCPConnectionProcessorPrivate
 {
@@ -27,7 +28,7 @@ public:
 };
 
 QnIOMonitorConnectionProcessor::QnIOMonitorConnectionProcessor(QSharedPointer<AbstractStreamSocket> socket, QnTcpListener* owner):
-    QnTCPConnectionProcessor(new QnIOMonitorConnectionProcessorPrivate, socket)
+    QnTCPConnectionProcessor(new QnIOMonitorConnectionProcessorPrivate, socket, owner)
 {
     QN_UNUSED(owner);
 }
@@ -52,7 +53,7 @@ void QnIOMonitorConnectionProcessor::run()
     {
         parseRequest();
         QString uniqueId = QUrlQuery(getDecodedUrl().query()).queryItemValue(Qn::CAMERA_UNIQUE_ID_HEADER_NAME);
-        QnSecurityCamResourcePtr camera = qnResPool->getResourceByUniqueId<QnSecurityCamResource>(uniqueId);
+        QnSecurityCamResourcePtr camera = resourcePool()->getResourceByUniqueId<QnSecurityCamResource>(uniqueId);
         if (!camera) {
             sendResponse(CODE_NOT_FOUND, "multipart/x-mixed-replace; boundary=ioboundary");
             return;
@@ -61,7 +62,7 @@ void QnIOMonitorConnectionProcessor::run()
         Qn::directConnect(camera.data(), &QnSecurityCamResource::cameraInput, this, &QnIOMonitorConnectionProcessor::at_cameraIOStateChanged);
         Qn::directConnect(camera.data(), &QnSecurityCamResource::cameraOutput, this, &QnIOMonitorConnectionProcessor::at_cameraIOStateChanged);
 
-        if (camera->getParentId() != qnCommon->moduleGUID()) {
+        if (camera->getParentId() != commonModule()->moduleGUID()) {
             sendResponse(CODE_NOT_FOUND, "multipart/x-mixed-replace; boundary=ioboundary");
             return;
         }
@@ -83,7 +84,7 @@ void QnIOMonitorConnectionProcessor::run()
         while (!needToStop()
                && d->socket->isConnected()
                && camera->getStatus() >= Qn::Online
-               && camera->getParentId() == qnCommon->moduleGUID())
+               && camera->getParentId() == commonModule()->moduleGUID())
         {
             sendData();
             d->waitCond.wait(&d->waitMutex);

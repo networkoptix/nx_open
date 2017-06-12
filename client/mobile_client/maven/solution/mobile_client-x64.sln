@@ -1,4 +1,5 @@
-﻿Microsoft Visual Studio Solution File, Format Version 12.00
+
+Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 14
 VisualStudioVersion = 14.0.24720.0
 MinimumVisualStudioVersion = 10.0.40219.1
@@ -6,7 +7,6 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "mobile_client-x64", "${root
 	ProjectSection(ProjectDependencies) = postProject
 		${appserver2.guid} = ${appserver2.guid}
 		${common.guid} = ${common.guid}
-		${nx_streaming.guid} = ${nx_streaming.guid}
 		${nx_media.guid} = ${nx_media.guid}
 		${nx_audio.guid} = ${nx_audio.guid}
 		${nx_utils.guid} = ${nx_utils.guid}
@@ -14,11 +14,11 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "mobile_client-x64", "${root
 		${nx_network.guid} = ${nx_network.guid}
 		${nx_fusion.guid} = ${nx_fusion.guid}
 		${nx_vms_utils.guid} = ${nx_vms_utils.guid}
-		${libclient_core.guid} = ${libclient_core.guid}
+		${nx_client_core.guid} = ${nx_client_core.guid}
 		${cloud_db_client.guid} = ${cloud_db_client.guid}
 	EndProjectSection
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libclient_core-x64", "${root.dir}\client\libclient_core\src\libclient_core-x64.vcxproj", "${libclient_core.guid}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "nx_client_core-x64", "${root.dir}\client\nx_client_core\src\nx_client_core-x64.vcxproj", "${nx_client_core.guid}"
 	ProjectSection(ProjectDependencies) = postProject
 		${appserver2.guid} = ${appserver2.guid}
 		${common.guid} = ${common.guid}
@@ -37,8 +37,6 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "appserver2-x64", "${root.di
 		${nx_network.guid} = ${nx_network.guid}
 		${nx_utils.guid} = ${nx_utils.guid}
 	EndProjectSection
-EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "nx_streaming-x64", "${root.dir}\common_libs\nx_streaming\src\nx_streaming-x64.vcxproj", "${nx_streaming.guid}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "nx_media-x64", "${root.dir}\common_libs\nx_media\src\nx_media-x64.vcxproj", "${nx_media.guid}"
 EndProject
@@ -69,6 +67,11 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "nx_vms_utils-x64", "${root.
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "nx_utils-x64", "${root.dir}\common_libs\nx_utils\src\nx_utils-x64.vcxproj", "${nx_utils.guid}"
 	ProjectSection(ProjectDependencies) = postProject
+		${nx_kit.guid} = ${nx_kit.guid}
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "nx_kit-x64", "${root.dir}\nx_kit\src\nx_kit-x64.vcxproj", "${nx_kit.guid}"
+	ProjectSection(ProjectDependencies) = postProject
 	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "cloud_db_client-x64", "${root.dir}\nx_cloud\cloud_db_client\src\cloud_db_client-x64.vcxproj", "${cloud_db_client.guid}"
@@ -87,14 +90,10 @@ Global
 		${mobile_client.guid}.Debug|x64.Build.0 = Debug|x64
 		${mobile_client.guid}.Release|x64.ActiveCfg = Release|x64
 		${mobile_client.guid}.Release|x64.Build.0 = Release|x64
-		${libclient.guid}.Debug|x64.ActiveCfg = Debug|x64
-		${libclient.guid}.Debug|x64.Build.0 = Debug|x64
-		${libclient.guid}.Release|x64.ActiveCfg = Release|x64
-		${libclient.guid}.Release|x64.Build.0 = Release|x64
-		${libclient_core.guid}.Debug|x64.ActiveCfg = Debug|x64
-		${libclient_core.guid}.Debug|x64.Build.0 = Debug|x64
-		${libclient_core.guid}.Release|x64.ActiveCfg = Release|x64
-		${libclient_core.guid}.Release|x64.Build.0 = Release|x64
+		${nx_client_core.guid}.Debug|x64.ActiveCfg = Debug|x64
+		${nx_client_core.guid}.Debug|x64.Build.0 = Debug|x64
+		${nx_client_core.guid}.Release|x64.ActiveCfg = Release|x64
+		${nx_client_core.guid}.Release|x64.Build.0 = Release|x64
 		${common.guid}.Debug|x64.ActiveCfg = Debug|x64
 		${common.guid}.Debug|x64.Build.0 = Debug|x64
 		${common.guid}.Release|x64.ActiveCfg = Release|x64
@@ -103,10 +102,6 @@ Global
 		${appserver2.guid}.Debug|x64.Build.0 = Debug|x64
 		${appserver2.guid}.Release|x64.ActiveCfg = Release|x64
 		${appserver2.guid}.Release|x64.Build.0 = Release|x64
-		${nx_streaming.guid}.Debug|x64.ActiveCfg = Debug|x64
-		${nx_streaming.guid}.Debug|x64.Build.0 = Debug|x64
-		${nx_streaming.guid}.Release|x64.ActiveCfg = Release|x64
-		${nx_streaming.guid}.Release|x64.Build.0 = Release|x64
 		${nx_media.guid}.Debug|x64.ActiveCfg = Debug|x64
 		${nx_media.guid}.Debug|x64.Build.0 = Debug|x64
 		${nx_media.guid}.Release|x64.ActiveCfg = Release|x64

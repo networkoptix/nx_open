@@ -7,7 +7,7 @@
 
 #include <nx/utils/move_only_func.h>
 
-#include <utils/common/stoppable.h>
+#include <nx/network/async_stoppable.h>
 
 
 namespace nx {

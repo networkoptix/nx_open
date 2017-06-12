@@ -1,6 +1,7 @@
 #pragma once
 
 #include <chrono>
+#include <stdexcept>
 
 #include <QtCore/QString>
 #include <QtSql/QSqlDatabase>
@@ -28,6 +29,7 @@ enum class DBResult
     connectionError
 };
 
+QString toString(DBResult result);
 
 enum class RdbmsDriverType
 {
@@ -63,13 +65,30 @@ public:
 
     ConnectionOptions();
 
-    void loadFromSettings(QnSettings* const settings);
+    void loadFromSettings(const QnSettings& settings);
 
     bool operator==(const ConnectionOptions&) const;
 };
 
 QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(nx::db::DBResult)
 QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(nx::db::RdbmsDriverType)
+
+//-------------------------------------------------------------------------------------------------
+
+class Exception:
+    public std::runtime_error
+{
+    using base_type = std::runtime_error;
+
+public:
+    Exception(DBResult dbResult);
+    Exception(DBResult dbResult, const std::string& errorDescription);
+
+    DBResult dbResult() const;
+
+private:
+    DBResult m_dbResult;
+};
 
 } // namespace db
 } // namespace nx

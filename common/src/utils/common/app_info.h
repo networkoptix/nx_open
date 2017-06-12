@@ -2,6 +2,7 @@
 
 #include <QtCore/QObject>
 #include <QtCore/QString>
+#include <QtCore/QStringList>
 
 class QnAppInfo: public QObject
 {
@@ -15,7 +16,6 @@ public:
     static Q_INVOKABLE QString organizationName();
     static Q_INVOKABLE QString linuxOrganizationName();
     static Q_INVOKABLE QString organizationNameForSettings();
-    static Q_INVOKABLE QString realm();
 
     static Q_INVOKABLE QString applicationVersion();
     static Q_INVOKABLE QString applicationRevision();
@@ -32,10 +32,14 @@ public:
     static Q_INVOKABLE QString armBox();
     static Q_INVOKABLE bool    beta();
 
-    static Q_INVOKABLE QString productName();
     static Q_INVOKABLE QString productNameShort();
     static Q_INVOKABLE QString productNameLong();
     static Q_INVOKABLE QString customizationName();
+
+    static Q_INVOKABLE QString brand()
+    {
+        return productNameShort();
+    }
 
     static Q_INVOKABLE QString defaultLanguage();
 
@@ -51,11 +55,10 @@ public:
     static Q_INVOKABLE QString supportUrl();
     static Q_INVOKABLE QString supportPhone();
 
-    static Q_INVOKABLE QString updateGeneratorUrl();
-    static Q_INVOKABLE QString defaultCloudHost();
-    static Q_INVOKABLE QString defaultCloudPortalUrl();
-    static Q_INVOKABLE QString defaultCloudModulesXmlUrl();
+    /** Proxy for QML usage. */
     static Q_INVOKABLE QString cloudName();
+
+    static Q_INVOKABLE QString updateGeneratorUrl();
 
     static Q_INVOKABLE int freeLicenseCount();
     static Q_INVOKABLE QString freeLicenseKey();

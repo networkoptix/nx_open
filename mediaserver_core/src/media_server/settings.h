@@ -1,7 +1,9 @@
-#ifndef _MEDIASERVER_SETTINGS_H_
-#define _MEDIASERVER_SETTINGS_H_
+#pragma once
+
+#include <chrono>
 
 #include <QtCore/QSettings>
+#include <memory>
 
 //!Contains constants with names of configuration parameters
 namespace nx_ms_conf
@@ -114,21 +116,31 @@ namespace nx_ms_conf
     static const QLatin1String ENABLE_MULTIPLE_INSTANCES("enableMultipleInstances");
 }
 
-/*!
-    QSettings instance is initialized in \a initializeROSettingsFromConfFile or \a initializeRunTimeSettingsFromConfFile call or on first demand
-*/
-class MSSettings
+/**
+ * QSettings instance is initialized in \a initializeROSettingsFromConfFile or \a initializeRunTimeSettingsFromConfFile call or on first demand
+ */
+class MSSettings: public QObject
 {
+    Q_OBJECT;
 public:
+    MSSettings(
+        const QString& roSettingsPath = QString(),
+        const QString& rwSettingsPath = QString());
+
+    QSettings* roSettings();
+    QSettings* runTimeSettings();
+
+    std::chrono::milliseconds hlsTargetDuration() const;
+
     static QString defaultROSettingsFilePath();
-    static void initializeROSettingsFromConfFile( const QString& fileName );
-    static void initializeROSettings();
-    static QSettings* roSettings();
-
     static QString defaultRunTimeSettingsFilePath();
-    static void initializeRunTimeSettingsFromConfFile( const QString& fileName );
-    static void initializeRunTimeSettings();
-    static QSettings* runTimeSettings();
-};
 
-#endif
+private:
+    void initializeROSettingsFromConfFile( const QString& fileName );
+    void initializeROSettings();
+    void initializeRunTimeSettingsFromConfFile( const QString& fileName );
+    void initializeRunTimeSettings();
+private:
+    std::unique_ptr<QSettings> m_rwSettings;
+    std::unique_ptr<QSettings> m_roSettings;
+};

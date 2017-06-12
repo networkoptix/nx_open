@@ -26,7 +26,6 @@ struct QnAbstractTransactionV1
 {
     QnAbstractTransactionV1():
         command(ApiCommand::NotDefined),
-        peerID(qnCommon->moduleGUID()),
         isLocal(false)
     {
     }

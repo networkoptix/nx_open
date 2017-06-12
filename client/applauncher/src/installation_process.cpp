@@ -11,7 +11,7 @@
 #include <QtXml/QXmlInputSource>
 #include <QtXml/QXmlSimpleReader>
 
-#include <plugins/videodecoder/stree/streesaxhandler.h>
+#include <nx/utils/stree/streesaxhandler.h>
 #include <nx/utils/log/log.h>
 
 #include "mirror_list_xml_parse_handler.h"
@@ -239,7 +239,7 @@ void InstallationProcess::onHttpDone( nx_http::AsyncHttpClientPtr httpClient )
     //reading message body and parsing mirror list
     nx_http::BufferType msgBody = m_httpClient->fetchMessageBodyBuffer();
 
-    stree::SaxHandler xmlHandler( m_rns );
+    nx::utils::stree::SaxHandler xmlHandler( m_rns );
 
     QXmlSimpleReader reader;
     reader.setContentHandler( &xmlHandler );
@@ -259,7 +259,7 @@ void InstallationProcess::onHttpDone( nx_http::AsyncHttpClientPtr httpClient )
     }
     m_currentTree = xmlHandler.releaseTree();
 
-    stree::ResourceContainer inputData;
+    nx::utils::stree::ResourceContainer inputData;
     inputData.put( ProductParameters::product, m_productName );
     inputData.put( ProductParameters::customization, m_customization );
     inputData.put( ProductParameters::module, m_module );
@@ -289,7 +289,7 @@ void InstallationProcess::onHttpDone( nx_http::AsyncHttpClientPtr httpClient )
 #endif
 
 
-    stree::ResourceContainer result;
+    nx::utils::stree::ResourceContainer result;
     NX_LOG( QString::fromLatin1("Searching mirrors.xml with following input data: %1").arg(inputData.toString(m_rns)), cl_logDEBUG2 );
     m_currentTree->get( inputData, &result );
 

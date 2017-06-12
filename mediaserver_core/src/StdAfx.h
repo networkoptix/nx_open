@@ -27,7 +27,6 @@ extern "C" {
 /* Boost headers. */
 #include <boost/algorithm/cxx11/all_of.hpp>
 #include <boost/algorithm/cxx11/any_of.hpp>
-#include <boost/range/algorithm/count_if.hpp>
 
 #ifdef __cplusplus
 
@@ -61,6 +60,7 @@ extern "C" {
 #include <nx/utils/uuid.h>
 #include <nx/utils/thread/mutex.h>
 #include <nx/utils/thread/wait_condition.h>
-#include <nx/utils/deprecation.h>
-
 #endif
+
+#include <nx/utils/literal.h>
+#include <nx/utils/deprecation.h>

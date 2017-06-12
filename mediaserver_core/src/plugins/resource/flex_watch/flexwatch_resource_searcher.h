@@ -6,10 +6,10 @@
 #include <plugins/resource/onvif/onvif_resource_searcher.h>
 
 
-class QnFlexWatchResourceSearcher : public OnvifResourceSearcher
+class QnFlexWatchResourceSearcher: public OnvifResourceSearcher
 {
 public:
-    QnFlexWatchResourceSearcher();
+    QnFlexWatchResourceSearcher(QnCommonModule* commonModule);
     virtual ~QnFlexWatchResourceSearcher();
 
     // returns all available devices

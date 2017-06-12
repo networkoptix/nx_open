@@ -1,9 +1,5 @@
 #pragma once
 
-#ifndef BOOST_BIND_NO_PLACEHOLDERS
-#define BOOST_BIND_NO_PLACEHOLDERS
-#endif // BOOST_BIND_NO_PLACEHOLDERS
-#include <cassert>
 #include <limits>
 
 #include <QtCore/QtGlobal>
@@ -11,59 +7,26 @@
 #include <QtCore/QString>
 #include <QtCore/QStringList>
 
-#include <nx/utils/unused.h>
 #include <nx/fusion/model_functions_fwd.h>
-#include <nx/utils/datetime.h>
-#include <nx/utils/literal.h>
+#include <nx/fusion/serialization_format.h>
 
 #ifdef THIS_BLOCK_IS_REQUIRED_TO_MAKE_FILE_BE_PROCESSED_BY_MOC_DO_NOT_DELETE
 Q_OBJECT
 #endif
 QN_DECLARE_METAOBJECT_HEADER(Qn,
-    Border Corner ExtrapolationMode CameraCapability PtzObjectType PtzCommand PtzDataField PtzCoordinateSpace
-    PtzCapability StreamFpsSharingMethod MotionType TimePeriodType TimePeriodContent SystemComponent
+    ExtrapolationMode CameraCapability PtzObjectType PtzCommand PtzDataField PtzCoordinateSpace
+    StreamFpsSharingMethod MotionType TimePeriodContent SystemComponent
     ConnectionRole ResourceStatus BitratePerGopType
-    StreamQuality SecondStreamQuality PanicMode RebuildState BackupState RecordingType PropertyDataType SerializationFormat PeerType StatisticsDeviceType
+    StreamQuality SecondStreamQuality PanicMode RebuildState BackupState RecordingType PeerType StatisticsDeviceType
     ServerFlag BackupType StorageInitResult CameraBackupQuality CameraStatusFlag IOPortType IODefaultState AuditRecordType AuthResult
     RebuildAction BackupAction FailoverPriority
     Permission GlobalPermission UserRole ConnectionResult
     ,
-    Borders Corners ResourceFlags CameraCapabilities PtzDataFields PtzCapabilities PtzTraits
-    MotionTypes TimePeriodTypes
+    Borders Corners ResourceFlags CameraCapabilities PtzDataFields
+    MotionTypes
     ServerFlags CameraBackupQualities TimeFlags CameraStatusFlags IOPortTypes
     Permissions GlobalPermissions
     )
-
-
-    // TODO: #Elric #5.0 use Qt::Edge ?
-    /**
-     * Generic enumeration describing borders of a rectangle.
-     */
-    enum Border {
-        NoBorders = 0,
-        LeftBorder = 0x1,
-        RightBorder = 0x2,
-        TopBorder = 0x4,
-        BottomBorder = 0x8,
-        AllBorders = LeftBorder | RightBorder | TopBorder | BottomBorder
-    };
-    Q_DECLARE_FLAGS(Borders, Border)
-    Q_DECLARE_OPERATORS_FOR_FLAGS(Borders)
-
-
-    /**
-     * Generic enumeration describing corners of a rectangle.
-     */
-    enum Corner {
-        NoCorner = 0,
-        TopLeftCorner = 0x1,
-        TopRightCorner = 0x2,
-        BottomLeftCorner = 0x4,
-        BottomRightCorner = 0x8,
-        AllCorners = TopLeftCorner | TopRightCorner | BottomLeftCorner | BottomRightCorner
-    };
-    Q_DECLARE_FLAGS(Corners, Corner)
-    Q_DECLARE_OPERATORS_FOR_FLAGS(Corners)
 
     enum ExtrapolationMode {
         ConstantExtrapolation,
@@ -164,63 +127,10 @@ QN_DECLARE_METAOBJECT_HEADER(Qn,
         InvalidPtzObject = -1
     };
 
-    enum PtzCapability {
-        NoPtzCapabilities                   = 0x00000000,
-
-        ContinuousPanCapability             = 0x00000001,
-        ContinuousTiltCapability            = 0x00000002,
-        ContinuousZoomCapability            = 0x00000004,
-        ContinuousFocusCapability           = 0x00000008,
-
-        AbsolutePanCapability               = 0x00000010,
-        AbsoluteTiltCapability              = 0x00000020,
-        AbsoluteZoomCapability              = 0x00000040,
-
-        ViewportPtzCapability               = 0x00000080,
-
-        FlipPtzCapability                   = 0x00000100,
-        LimitsPtzCapability                 = 0x00000200,
-
-        DevicePositioningPtzCapability      = 0x00001000,
-        LogicalPositioningPtzCapability     = 0x00002000,
-
-        PresetsPtzCapability                = 0x00010000,
-        ToursPtzCapability                  = 0x00020000,
-        ActivityPtzCapability               = 0x00040000,
-        HomePtzCapability                   = 0x00080000,
-
-        AsynchronousPtzCapability           = 0x00100000,
-        SynchronizedPtzCapability           = 0x00200000,
-        VirtualPtzCapability                = 0x00400000,
-
-        AuxilaryPtzCapability               = 0x01000000,
-
-        /* Shortcuts */
-        ContinuousPanTiltCapabilities       = ContinuousPanCapability | ContinuousTiltCapability,
-        ContinuousPtzCapabilities           = ContinuousPanCapability | ContinuousTiltCapability | ContinuousZoomCapability,
-        AbsolutePtzCapabilities             = AbsolutePanCapability | AbsoluteTiltCapability | AbsoluteZoomCapability,
-    };
-    QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(PtzCapability)
-
-    Q_DECLARE_FLAGS(PtzCapabilities, PtzCapability)
-    Q_DECLARE_OPERATORS_FOR_FLAGS(PtzCapabilities)
-
-
     enum Projection {
         RectilinearProjection,
         EquirectangularProjection
     };
-
-
-    enum PtzTrait {
-        NoPtzTraits             = 0x00,
-        FourWayPtzTrait         = 0x01,
-        EightWayPtzTrait        = 0x02,
-        ManualAutoFocusPtzTrait = 0x04,
-    };
-    Q_DECLARE_FLAGS(PtzTraits, PtzTrait);
-    Q_DECLARE_OPERATORS_FOR_FLAGS(PtzTraits);
-
 
     enum StreamFpsSharingMethod {
         /** If second stream is running whatever fps it has, first stream can get maximumFps - secondstreamFps. */
@@ -316,6 +226,7 @@ QN_DECLARE_METAOBJECT_HEADER(Qn,
 
         /* Client-only flag. */
         exported                    = 0x20000000,   /**< Exported media file. */
+        removed                     = 0x40000000,   /**< resource removed from pool. */
 
 
         local_media = local | media | url,
@@ -336,7 +247,7 @@ QN_DECLARE_METAOBJECT_HEADER(Qn,
         local_image = url | local | media | still_image | streamprovider,    /**< Local still image file. */
 
         web_page = url | remote,   /**< Web-page resource */
-        fake_server = remote_server | fake,
+        fake_server = remote_server | fake
     };
     Q_DECLARE_FLAGS(ResourceFlags, ResourceFlag)
     Q_DECLARE_OPERATORS_FOR_FLAGS(ResourceFlags)
@@ -370,12 +281,11 @@ QN_DECLARE_METAOBJECT_HEADER(Qn,
     };
     QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(ResourceInfoLevel)
 
-	    enum class StatusChangeReason
+    enum class StatusChangeReason
     {
         Local,
         GotFromRemotePeer
     };
-
 
     enum BitratePerGopType {
         BPG_None,
@@ -465,16 +375,6 @@ QN_DECLARE_METAOBJECT_HEADER(Qn,
     };
     QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(IODefaultState)
 
-    enum TimePeriodType {
-        NullTimePeriod      = 0x1,  /**< No period. */
-        EmptyTimePeriod     = 0x2,  /**< Period of zero length. */
-        NormalTimePeriod    = 0x4,  /**< Normal period with non-zero length. */
-    };
-
-    Q_DECLARE_FLAGS(TimePeriodTypes, TimePeriodType)
-    Q_DECLARE_OPERATORS_FOR_FLAGS(TimePeriodTypes)
-
-
     enum TimePeriodContent {
         RecordingContent,
         MotionContent,
@@ -561,34 +461,6 @@ QN_DECLARE_METAOBJECT_HEADER(Qn,
     };
     QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(PeerType)
 
-    enum PropertyDataType {
-        PDT_None        = 0,
-        PDT_Value       = 1,
-        PDT_OnOff       = 2,
-        PDT_Boolen      = 3,
-        PDT_MinMaxStep  = 4,
-        PDT_Enumeration = 5,
-        PDT_Button      = 6
-    };
-    QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(PropertyDataType)
-
-
-    enum SerializationFormat {
-        JsonFormat          = 0,
-        UbjsonFormat        = 1,
-        BnsFormat           = 2,
-        CsvFormat           = 3,
-        XmlFormat           = 4,
-        CompressedPeriodsFormat = 5, // used for chunks data only
-        UrlQueryFormat      = 6,     //will be added in future for parsing url query (e.g., name1=val1&name2=val2)
-
-        UnsupportedFormat   = -1
-    };
-    QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(SerializationFormat)
-
-    const char* serializationFormatToHttpContentType(SerializationFormat format);
-    SerializationFormat serializationFormatFromHttpContentType(const QByteArray& httpContentType);
-
     enum TTHeaderFlag
     {
         TT_None          = 0x0,
@@ -661,8 +533,11 @@ QN_DECLARE_METAOBJECT_HEADER(Qn,
         Auth_CloudConnectError   // can't connect to the Cloud to authenticate
     };
     QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(AuthResult)
+    QString toString(AuthResult value);
 
-    enum FailoverPriority {
+
+    enum FailoverPriority
+    {
         FP_Never,
         FP_Low,
         FP_Medium,
@@ -888,34 +763,37 @@ QN_DECLARE_METAOBJECT_HEADER(Qn,
     template<class T>
     const T &_id(const T &value) { return value; }
 
+    const static QLatin1String kWallpapersFolder("wallpapers");
+
 } // namespace Qn
 
 Q_DECLARE_METATYPE(Qn::StatusChangeReason)
+Q_DECLARE_METATYPE(Qn::ResourceFlags)
 
 // TODO: #Elric #enum
 
 QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
-    (Qn::TimePeriodContent)(Qn::Corner)(Qn::UserRole)(Qn::ConnectionResult),
+    (Qn::TimePeriodContent)(Qn::UserRole)(Qn::ConnectionResult),
     (metatype)
 )
 
 QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
-    (Qn::PtzObjectType)(Qn::PtzCommand)(Qn::PtzTrait)(Qn::PtzTraits)(Qn::PtzCoordinateSpace)(Qn::MotionType)
-        (Qn::StreamQuality)(Qn::SecondStreamQuality)(Qn::StatisticsDeviceType)
-        (Qn::ServerFlag)(Qn::BackupType)(Qn::CameraBackupQuality)(Qn::StorageInitResult)
-        (Qn::PanicMode)(Qn::RecordingType)
-        (Qn::ConnectionRole)(Qn::ResourceStatus)(Qn::BitratePerGopType)
-        (Qn::SerializationFormat)(Qn::PropertyDataType)(Qn::PeerType)(Qn::RebuildState)(Qn::BackupState)
-        (Qn::BookmarkSortField)(Qt::SortOrder)
-        (Qn::RebuildAction)(Qn::BackupAction)
-        (Qn::TTHeaderFlag)(Qn::IOPortType)(Qn::IODefaultState)(Qn::AuditRecordType)(Qn::AuthResult)
-        (Qn::FailoverPriority)
-        ,
+    (Qn::PtzObjectType)(Qn::PtzCommand)(Qn::PtzCoordinateSpace)(Qn::MotionType)
+    (Qn::StreamQuality)(Qn::SecondStreamQuality)(Qn::StatisticsDeviceType)
+    (Qn::ServerFlag)(Qn::BackupType)(Qn::CameraBackupQuality)(Qn::StorageInitResult)
+    (Qn::PanicMode)(Qn::RecordingType)
+    (Qn::ConnectionRole)(Qn::ResourceStatus)(Qn::BitratePerGopType)
+    (Qn::PeerType)(Qn::RebuildState)(Qn::BackupState)
+    (Qn::BookmarkSortField)(Qt::SortOrder)
+    (Qn::RebuildAction)(Qn::BackupAction)
+    (Qn::TTHeaderFlag)(Qn::IOPortType)(Qn::IODefaultState)(Qn::AuditRecordType)(Qn::AuthResult)
+    (Qn::FailoverPriority)
+    ,
     (metatype)(lexical)
 )
 
 QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
-    (Qn::PtzCapabilities)(Qn::ServerFlags)(Qn::CameraBackupQualities)(Qn::TimeFlags)(Qn::CameraStatusFlags)
+    (Qn::ServerFlags)(Qn::CameraBackupQualities)(Qn::TimeFlags)(Qn::CameraStatusFlags)
     (Qn::Permission)(Qn::GlobalPermission)(Qn::Permissions)(Qn::GlobalPermissions)(Qn::IOPortTypes)
     ,
     (metatype)(numeric)(lexical)

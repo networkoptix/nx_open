@@ -1,12 +1,19 @@
-#ifndef QNACTIVECONNECTIONSRESTHANDLER_H
-#define QNACTIVECONNECTIONSRESTHANDLER_H
+#pragma once
 
 #include "rest/server/json_rest_handler.h"
 
-class QnActiveConnectionsRestHandler : public QnJsonRestHandler {
+namespace ec2
+{
+    class QnTransactionMessageBusBase;
+}
+
+class QnActiveConnectionsRestHandler: public QnJsonRestHandler
+{
     Q_OBJECT
 public:
-    virtual int executeGet(const QString &path, const QnRequestParams &params, QnJsonRestResult &result, const QnRestConnectionProcessor*) override;
-};
+    QnActiveConnectionsRestHandler(const ec2::QnTransactionMessageBusBase* messageBus);
 
-#endif // QNACTIVECONNECTIONSRESTHANDLER_H
+    virtual int executeGet(const QString &path, const QnRequestParams &params, QnJsonRestResult &result, const QnRestConnectionProcessor*) override;
+private:
+    const ec2::QnTransactionMessageBusBase* m_messageBus;
+};

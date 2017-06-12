@@ -2,6 +2,7 @@
 
 #include <nx/utils/test_support/run_test.h>
 #include <nx/network/socket_global.h>
+#include <nx/utils/std/thread.h>
 
 namespace nx {
 namespace network {
@@ -19,6 +20,8 @@ inline int runTest(
         argc, argv,
         [extraInit = std::move(extraInit), socketGlobalsFlags](const utils::ArgumentParser& args)
         {
+            nx::utils::DetachedThreads detachedThreadsGuard;
+
             auto sgGuard = std::make_unique<SocketGlobalsHolder>(socketGlobalsFlags);
             SocketGlobals::applyArguments(args);
             SocketGlobals::outgoingTunnelPool().assignOwnPeerId("ut", QnUuid::createUuid());

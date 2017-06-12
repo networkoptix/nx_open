@@ -5,13 +5,14 @@
 #include <map>
 #include <memory>
 
+#include <nx/network/aio/timer.h>
+#include <nx/network/async_stoppable.h>
+#include <nx/network/cloud/address_resolver.h>
+#include <nx/utils/counter.h>
 #include <nx/utils/thread/mutex.h>
 
-#include <utils/common/stoppable.h>
-#include <utils/common/subscription.h>
+#include <nx/utils/subscription.h>
 
-#include "nx/network/aio/timer.h"
-#include "nx/network/cloud/address_resolver.h"
 #include "outgoing_tunnel.h"
 
 namespace nx {
@@ -77,6 +78,7 @@ private:
     bool m_stopping;
     aio::Timer m_aioThreadBinder;
     OnTunnelClosedSubscription m_onTunnelClosedSubscription;
+    nx::utils::Counter m_counter;
 
     TunnelContext& getTunnel(const AddressEntry& targetHostAddress);
     void reportConnectionResult(

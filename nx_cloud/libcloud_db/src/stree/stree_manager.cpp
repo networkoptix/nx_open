@@ -13,23 +13,23 @@ namespace nx {
 namespace cdb {
 
 StreeManager::StreeManager(
-    const stree::ResourceNameSet& resourceNameSet,
-    const QString& xmlFilePath) throw(std::runtime_error)
+    const nx::utils::stree::ResourceNameSet& resourceNameSet,
+    const QString& xmlFilePath) noexcept(false)
 :
-    stree::StreeManager(resourceNameSet, xmlFilePath)
+    nx::utils::stree::StreeManager(resourceNameSet, xmlFilePath)
 {
 }
 
 void StreeManager::search(
     StreeOperation operation,
-    const stree::AbstractResourceReader& input,
-    stree::AbstractResourceWriter* const output) const
+    const nx::utils::stree::AbstractResourceReader& input,
+    nx::utils::stree::AbstractResourceWriter* const output) const
 {
-    stree::SingleResourceContainer operationRes(
+    nx::utils::stree::SingleResourceContainer operationRes(
         attr::operation, QnLexical::serialized(operation));
-    stree::MultiSourceResourceReader realInput(operationRes, input);
+    nx::utils::stree::MultiSourceResourceReader realInput(operationRes, input);
 
-    return stree::StreeManager::search(realInput, output);
+    return nx::utils::stree::StreeManager::search(realInput, output);
 }
 
 }   //cdb

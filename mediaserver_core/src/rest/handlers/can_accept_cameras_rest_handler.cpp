@@ -7,18 +7,24 @@
 #include <api/model/camera_list_reply.h>
 #include <common/common_module.h>
 #include <media_server/serverutil.h>
-#include <utils/common/concurrent.h>
-#include <nx/network/http/httptypes.h>
+#include <nx/utils/concurrent.h>
+#include <nx/network/http/http_types.h>
 #include "core/resource_management/resource_discovery_manager.h"
 #include "core/resource/camera_resource.h"
 #include "core/resource_management/resource_pool.h"
+#include <rest/server/rest_connection_processor.h>
 
 
 static QnResourceList CheckHostAddrAsync(const QnManualCameraInfo& input) {
     return input.checkHostAddr();
 }
 
-int QnCanAcceptCameraRestHandler::executePost(const QString &path, const QnRequestParams &params, const QByteArray &body, QnJsonRestResult &result, const QnRestConnectionProcessor*)
+int QnCanAcceptCameraRestHandler::executePost(
+    const QString &path,
+    const QnRequestParams &params,
+    const QByteArray &body,
+    QnJsonRestResult &result,
+    const QnRestConnectionProcessor* owner)
 {
     Q_UNUSED(path)
     Q_UNUSED(params)
@@ -30,7 +36,7 @@ int QnCanAcceptCameraRestHandler::executePost(const QString &path, const QnReque
     std::deque<QnSecurityCamResourcePtr> camerasToPing;
     QJson::deserialize(body, &inCameras);
 
-    const QSet<QString>& discoveredCameras = QnResourceDiscoveryManager::instance()->lastDiscoveredIds();
+    const QSet<QString>& discoveredCameras = owner->commonModule()->resourceDiscoveryManager()->lastDiscoveredIds();
 
     for(const QString& uniqueID: inCameras.uniqueIdList)
     {
@@ -41,13 +47,13 @@ int QnCanAcceptCameraRestHandler::executePost(const QString &path, const QnReque
         }
 
         // check for manual camera
-        QnSecurityCamResourcePtr camera = qnResPool->getResourceByUniqueId<QnSecurityCamResource>(uniqueID);
+        QnSecurityCamResourcePtr camera = owner->resourcePool()->getResourceByUniqueId<QnSecurityCamResource>(uniqueID);
         if( !camera )
             continue;
 
         if (camera->isManuallyAdded())
         {
-            QnResourceDiscoveryManager::instance()->fillManualCamInfo(manualCamList, camera);
+            owner->commonModule()->resourceDiscoveryManager()->fillManualCamInfo(manualCamList, camera);
             continue;
         }
 
@@ -60,7 +66,7 @@ int QnCanAcceptCameraRestHandler::executePost(const QString &path, const QnReque
     // add manual cameras
     QFuture<QnResourceList> manualDiscoveryResults = QtConcurrent::mapped(manualCamList, &CheckHostAddrAsync);
     //checking cameras with unicast
-    QnConcurrent::QnFuture<bool> camerasToPingResults( camerasToPing.size() );
+    nx::utils::concurrent::Future<bool> camerasToPingResults( camerasToPing.size() );
     for( size_t i = 0; i < camerasToPing.size(); ++i )
     {
         camerasToPing[i]->checkIfOnlineAsync(

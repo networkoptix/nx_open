@@ -25,19 +25,19 @@ public:
         nxcip::CameraPtzManager* cameraPtzManager );
     virtual ~QnThirdPartyPtzController();
 
-    virtual Qn::PtzCapabilities getCapabilities() override;
+    virtual Ptz::Capabilities getCapabilities() const override;
 
     virtual bool continuousMove(const QVector3D &speed) override;
     virtual bool absoluteMove(Qn::PtzCoordinateSpace space, const QVector3D &position, qreal speed) override;
-    
-    virtual bool getPosition(Qn::PtzCoordinateSpace space, QVector3D *position) override;
-    virtual bool getLimits(Qn::PtzCoordinateSpace space, QnPtzLimits *limits) override;
-    virtual bool getFlip(Qt::Orientations *flip) override;
+
+    virtual bool getPosition(Qn::PtzCoordinateSpace space, QVector3D *position) const override;
+    virtual bool getLimits(Qn::PtzCoordinateSpace space, QnPtzLimits *limits) const override;
+    virtual bool getFlip(Qt::Orientations *flip) const override;
 
 private:
     QnThirdPartyResourcePtr m_resource;
     nxcip::CameraPtzManager* m_cameraPtzManager;
-    Qn::PtzCapabilities m_capabilities;
+    Ptz::Capabilities m_capabilities;
     Qt::Orientations m_flip;
     QnPtzLimits m_limits;
     //QnLinearFunction m_35mmEquivToCameraZoom, m_cameraTo35mmEquivZoom;

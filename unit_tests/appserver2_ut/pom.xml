@@ -2,12 +2,12 @@
     <parent>
         <artifactId>build_ut</artifactId>
         <groupId>com.networkoptix.hdwitness</groupId>
-        <version>3.0.0-SNAPSHOT</version>
+        <version>3.1.0-SNAPSHOT</version>
         <relativePath>../build_ut</relativePath>
     </parent>
 
     <groupId>com.networkoptix.hdwitness</groupId>
-    <version>3.0.0-SNAPSHOT</version>
+    <version>3.1.0-SNAPSHOT</version>
     <modelVersion>4.0.0</modelVersion>
     <artifactId>appserver2_ut</artifactId>
     <packaging>pom</packaging>
@@ -20,7 +20,7 @@
         <guid>{a1071d46-9ff2-48d3-affd-2ab7e1d70255}</guid>
 
         <qt.libs>core gui network xml sql concurrent</qt.libs>
-        <global.libs>-lcommon -lnx_streaming -lnx_network -lappserver2 -lnx_fusion -lcloud_db_client -lnx_utils</global.libs>
+        <global.libs>-lcommon -lnx_network -lappserver2 -lnx_fusion -lcloud_db_client -lnx_utils -lnx_kit</global.libs>
         <windows.oslibs>Ws2_32.lib DbgHelp.lib -lIphlpapi -lwinmm</windows.oslibs>
         <mac.oslibs>-lbz2 -lz -framework IOKit -framework CoreServices</mac.oslibs>
 

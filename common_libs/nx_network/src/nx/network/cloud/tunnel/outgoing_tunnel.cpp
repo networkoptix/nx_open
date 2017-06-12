@@ -260,7 +260,7 @@ void OutgoingTunnel::startAsyncTunnelConnect(QnMutexLockerBase* const /*locker*/
     using namespace std::placeholders;
 
     m_state = State::connecting;
-    m_connector = ConnectorFactory::createCrossNatConnector(m_targetPeerAddress);
+    m_connector = CrossNatConnectorFactory::instance().create(m_targetPeerAddress);
     m_connector->bindToAioThread(getAioThread());
     m_connector->connect(
         kCloudConnectorTimeout,

@@ -64,8 +64,9 @@ static QFileInfoList readCrashes(const QString& prefix = QString())
 
 namespace ec2 {
 
-CrashReporter::CrashReporter()
-    : m_terminated(false)
+CrashReporter::CrashReporter(QnCommonModule* commonModule):
+    QnCommonModuleAware(commonModule),
+    m_terminated(false)
 {
 }
 
@@ -97,6 +98,8 @@ CrashReporter::~CrashReporter()
 
 bool CrashReporter::scanAndReport(QSettings* settings)
 {
+    const auto& globalSettings = commonModule()->globalSettings();
+
     // remove old crashes
     {
         auto allCrashes = readCrashes(lit("*"));
@@ -107,13 +110,13 @@ bool CrashReporter::scanAndReport(QSettings* settings)
             QFile::remove(crash.absoluteFilePath());
     }
 
-    if (!qnGlobalSettings->isInitialized())
+    if (!globalSettings->isInitialized())
         return false;
 
-    if (!qnGlobalSettings->isStatisticsAllowed()
-        || qnGlobalSettings->isNewSystem())
+    if (!globalSettings->isStatisticsAllowed()
+        || globalSettings->isNewSystem())
     {
-        NX_LOGX(lit("Automatic report system is disabled"), cl_logINFO);
+        NX_LOGX(lit("Automatic report system is disabled"), cl_logDEBUG1);
         return false;
     }
 
@@ -129,7 +132,7 @@ bool CrashReporter::scanAndReport(QSettings* settings)
         return false;
     }
 
-    const QString configApi = qnGlobalSettings->statisticsReportServerApi();
+    const QString configApi = globalSettings->statisticsReportServerApi();
     const QString serverApi = configApi.isEmpty() ? Ec2StaticticsReporter::DEFAULT_SERVER_API : configApi;
     const QUrl url = lit("%1/%2").arg(serverApi).arg(SERVER_API_COMMAND);
 
@@ -166,8 +169,8 @@ void CrashReporter::scanAndReportAsync(QSettings* settings)
     }
 
     NX_LOGX(lit("Start new async report"), cl_logINFO);
-    m_activeCollection = QnConcurrent::run(Ec2ThreadPool::instance(), [=](){
-        // \class QnConcurrent posts a job to \class Ec2ThreadPool rather than create new
+    m_activeCollection = nx::utils::concurrent::run(Ec2ThreadPool::instance(), [=](){
+        // \class nx::utils::concurrent posts a job to \class Ec2ThreadPool rather than create new
         // real thread, we need to reverve a thread to avoid possible deadlock
         QnScopedThreadRollback reservedThread( 1, Ec2ThreadPool::instance() );
         return scanAndReport(settings);
@@ -283,7 +286,7 @@ nx_http::HttpHeaders ReportData::makeHttpHeaders() const
     const auto extension = fileName.split(QChar('.')).last();
 
     QCryptographicHash uuidHash(QCryptographicHash::Sha1);
-    uuidHash.addData(qnCommon->moduleGUID().toByteArray());
+    uuidHash.addData(m_host.commonModule()->moduleGUID().toByteArray());
 
     nx_http::HttpHeaders headers;
     headers.insert(std::make_pair("Nx-Binary", binName.toUtf8()));

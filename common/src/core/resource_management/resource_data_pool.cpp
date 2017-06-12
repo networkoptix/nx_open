@@ -5,7 +5,7 @@
 #include <utils/common/warnings.h>
 #include <nx/fusion/serialization/json_functions.h>
 #include <core/resource/camera_resource.h>
-#include "utils/match/wildcard.h"
+#include "nx/utils/match/wildcard.h"
 
 struct QnResourceDataPoolChunk {
     QList<QString> keys;
@@ -36,6 +36,7 @@ QnResourceDataPool::QnResourceDataPool(QObject *parent):
     m_shortVendorByName.insert(lit("innovative security designs"), lit("isd"));
     m_shortVendorByName.insert(lit("norbain_"), lit("vista"));
     m_shortVendorByName.insert(lit("norbain"), lit("vista"));
+    m_shortVendorByName.insert(lit("flir systems"), lit("flir"));
 }
 
 QnResourceDataPool::~QnResourceDataPool() {

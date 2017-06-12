@@ -6,10 +6,11 @@
 #include <core/resource/network_resource.h>
 #include <core/resource_management/resource_searcher.h>
 
-class QnMdnsResourceSearcher : virtual public QnAbstractNetworkResourceSearcher
+class QnMdnsResourceSearcher: virtual public QnAbstractNetworkResourceSearcher
 {
+    using base_type = QnAbstractNetworkResourceSearcher;
 public:
-    QnMdnsResourceSearcher();
+    QnMdnsResourceSearcher(QnCommonModule* commonModule);
     ~QnMdnsResourceSearcher();
 
     bool isProxy() const;

@@ -6,8 +6,6 @@
 #include <thread>
 #include <condition_variable>
 
-#include <nx/utils/std/thread.h>
-
 #include "common.h"
 
 namespace cf {
@@ -28,9 +26,9 @@ class async_thread_pool_executor {
                     const detail::task_type& completion_cb);
 
   private:
-    nx::utils::thread thread_;
+    std::thread thread_;
     mutable std::mutex m_;
-    std::atomic<bool> need_stop_ = {false};
+    bool need_stop_ = {false};
     std::atomic<bool> has_task_ = {false};
     std::condition_variable start_cond_;
     detail::task_type task_;
@@ -50,7 +48,7 @@ private:
   tp_type tp_;
   mutable std::mutex mutex_;
   std::queue<detail::task_type> task_queue_;
-  nx::utils::thread manager_thread_;
+  std::thread manager_thread_;
   std::atomic<bool> need_stop_ = {false};
   std::atomic<size_t> available_count_;
   std::condition_variable cond_;

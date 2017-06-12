@@ -5,10 +5,9 @@
 #include <nx/utils/move_only_func.h>
 #include <nx/utils/thread/sync_queue_with_item_stay_timeout.h>
 
-#include <utils/common/joinable.h>
-#include <utils/common/long_runnable.h>
-#include <utils/common/stoppable.h>
-#include <utils/common/threadqueue.h>
+#include <nx/utils/thread/joinable.h>
+#include <nx/utils/thread/long_runnable.h>
+#include <nx/utils/thread/stoppable.h>
 
 #include "request_executor.h"
 

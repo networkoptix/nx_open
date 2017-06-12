@@ -1,13 +1,10 @@
 #include "db_helper.h"
 
 #include <QtCore/QCoreApplication>
-#include <QtCore/QFileInfo>
-
 #include <QtSql/QSqlQuery>
 #include <QtSql/QSqlRecord>
-#include <QFile>
 #include <QtSql/QSqlError>
-#include "qcoreapplication.h"
+
 #include <nx/utils/log/log.h>
 
 //TODO #AK QnDbTransaction is a bad name for this class since it actually lives beyond DB transaction
@@ -51,7 +48,15 @@ bool QnDbHelper::tuneDBAfterOpen(QSqlDatabase* const sqlDb)
         qWarning() << "Failed to enable FK support on sqlLite database!" << enableFKQuery.lastError().text();
         return false;
     }
-
+#if 0
+    QSqlQuery additionTuningQuery(*sqlDb);
+    additionTuningQuery.prepare(lit("PRAGMA synchronous=OFF"));
+    if (!additionTuningQuery.exec())
+    {
+        qWarning() << "Failed to turn off synchronous mode on sqlLite database!" << additionTuningQuery.lastError().text();
+        return false;
+    }
+#endif
     return true;
 }
 

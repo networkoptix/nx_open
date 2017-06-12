@@ -1,0 +1,620 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>Token to word rules</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REL="HOME"
+TITLE="Building Synthetic Voices"
+HREF="book1.html"><LINK
+REL="UP"
+TITLE="Text analysis"
+HREF="c1189.html"><LINK
+REL="PREVIOUS"
+TITLE="Text analysis"
+HREF="c1189.html"><LINK
+REL="NEXT"
+TITLE="Number pronunciation"
+HREF="x1339.html"></HEAD
+><BODY
+CLASS="SECT1"
+BGCOLOR="#FFFFFF"
+TEXT="#000000"
+LINK="#0000FF"
+VLINK="#840084"
+ALINK="#0000FF"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="3"
+ALIGN="center"
+>Building Synthetic Voices</TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="bottom"
+><A
+HREF="c1189.html"
+ACCESSKEY="P"
+>&#60;&#60;&#60; Previous</A
+></TD
+><TD
+WIDTH="80%"
+ALIGN="center"
+VALIGN="bottom"
+>Text analysis</TD
+><TD
+WIDTH="10%"
+ALIGN="right"
+VALIGN="bottom"
+><A
+HREF="x1339.html"
+ACCESSKEY="N"
+>Next &#62;&#62;&#62;</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="SECT1"
+><H1
+CLASS="SECT1"
+><A
+NAME="AEN1207"
+>Token to word rules</A
+></H1
+><P
+>The basic model in Festival is that each <I
+CLASS="EMPHASIS"
+>token</I
+> will be mapped a 
+list of <I
+CLASS="EMPHASIS"
+>words</I
+> by a call to a <CODE
+CLASS="VARNAME"
+>token_to_word</CODE
+> function. This 
+function will be called on each token and it should return a list of 
+words. It may check the tokens to context (within the current 
+utterance) too if necessary. The default action should (for most 
+languages) simply be returning the token itself as a list of own word 
+(itself). For example your basic function should look something like. 
+<A
+NAME="AEN1213"
+></A
+><BLOCKQUOTE
+CLASS="BLOCKQUOTE"
+><P
+CLASS="LITERALLAYOUT"
+>(define&nbsp;(MYLANG_token_to_words&nbsp;token&nbsp;name)<br>
+&nbsp;&nbsp;"(MYLANG_token_to_words&nbsp;TOKEN&nbsp;NAME)<br>
+Returns&nbsp;a&nbsp;list&nbsp;of&nbsp;words&nbsp;for&nbsp;the&nbsp;NAME&nbsp;from&nbsp;TOKEN.&nbsp;&nbsp;This&nbsp;primarily<br>
+allows&nbsp;the&nbsp;treatment&nbsp;of&nbsp;numbers,&nbsp;money&nbsp;etc."<br>
+&nbsp;&nbsp;(cond<br>
+&nbsp;&nbsp;&nbsp;(t<br>
+&nbsp;&nbsp;&nbsp;&nbsp;(list&nbsp;name))))</P
+></BLOCKQUOTE
+>
+This function should be set in your voice selection function 
+as the function for token analysis 
+<A
+NAME="AEN1215"
+></A
+><BLOCKQUOTE
+CLASS="BLOCKQUOTE"
+><P
+CLASS="LITERALLAYOUT"
+>&nbsp;&nbsp;(set!&nbsp;token_to_words&nbsp;MYLANG_token_to_words)</P
+></BLOCKQUOTE
+></P
+><P
+>This function should be added to to deal with 
+all tokens that are not in your lexicon, cannot be 
+treated by your letter-to-sound rules, or are ambiguous 
+in some way and require context to resolve. </P
+><P
+>For example suppose we wish to simply treat all tokens consisting of 
+strings of digits to be pronounced as a string of digits (rather 
+than numbers). We would add something like the following 
+<A
+NAME="AEN1219"
+></A
+><BLOCKQUOTE
+CLASS="BLOCKQUOTE"
+><P
+CLASS="LITERALLAYOUT"
+>(set!&nbsp;MYLANG_digit_names<br>
+&nbsp;&nbsp;&nbsp;'((0&nbsp;"zero")<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(1&nbsp;"one")<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(2&nbsp;"two")<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(3&nbsp;"three")<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(4&nbsp;"four")<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(5&nbsp;"five")<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(6&nbsp;"six")<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(7&nbsp;"seven")<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(8&nbsp;"eight")<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(9&nbsp;"nine")))<br>
+<br>
+(define&nbsp;(MYLANG_token_to_words&nbsp;token&nbsp;name)<br>
+&nbsp;&nbsp;"(MYLANG_token_to_words&nbsp;TOKEN&nbsp;NAME)<br>
+Returns&nbsp;a&nbsp;list&nbsp;of&nbsp;words&nbsp;for&nbsp;the&nbsp;NAME&nbsp;from&nbsp;TOKEN.&nbsp;&nbsp;This&nbsp;primarily<br>
+allows&nbsp;the&nbsp;treatment&nbsp;of&nbsp;numbers,&nbsp;money&nbsp;etc."<br>
+&nbsp;&nbsp;(cond<br>
+&nbsp;&nbsp;&nbsp;((string-matches&nbsp;name&nbsp;"[0-9]+")&nbsp;;;&nbsp;any&nbsp;string&nbsp;of&nbsp;digits<br>
+&nbsp;&nbsp;&nbsp;&nbsp;(mapcar<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(lambda&nbsp;(d)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(car&nbsp;(cdr&nbsp;(assoc_string&nbsp;d&nbsp;MTLANG_digit_names))))<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(symbolexplode&nbsp;name)))<br>
+&nbsp;&nbsp;&nbsp;(t<br>
+&nbsp;&nbsp;&nbsp;&nbsp;(list&nbsp;name))))</P
+></BLOCKQUOTE
+>
+But more elaborate rules are also necessary. Some tokens require context 
+to disambiguate and sometimes multiple tokens are really one object e.g 
+<SPAN
+CLASS="QUOTE"
+>"<I
+CLASS="EMPHASIS"
+>$12 billion</I
+>"</SPAN
+> must be rendered as <SPAN
+CLASS="QUOTE"
+>"<I
+CLASS="EMPHASIS"
+>twelve billion dollars</I
+>"</SPAN
+>, 
+where the money name crosses over the second word. Such multi-token rules 
+must be split into multiple conditions, one for each part of the 
+combined token. Thus we need to identify the <SPAN
+CLASS="QUOTE"
+>"<I
+CLASS="EMPHASIS"
+>$DIGITS</I
+>"</SPAN
+> is in a 
+context followed by <SPAN
+CLASS="QUOTE"
+>"<I
+CLASS="EMPHASIS"
+>?illion</I
+>"</SPAN
+>. The code below renders the full 
+phrase for the dollar amount. The second condition ensures nothing 
+is returned for the <SPAN
+CLASS="QUOTE"
+>"<I
+CLASS="EMPHASIS"
+>?illion</I
+>"</SPAN
+> word as it has already been dealt with 
+by the previous token. 
+<A
+NAME="AEN1231"
+></A
+><BLOCKQUOTE
+CLASS="BLOCKQUOTE"
+><P
+CLASS="LITERALLAYOUT"
+>&nbsp;&nbsp;&nbsp;((and&nbsp;(string-matches&nbsp;name&nbsp;"\\$[123456789]+")<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(string-matches&nbsp;(item.feat&nbsp;token&nbsp;"n.name")&nbsp;".*illion.?"))<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(append<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(digits_to_cardinal&nbsp;(string-after&nbsp;name&nbsp;"$"))&nbsp;;;&nbsp;amount<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(list&nbsp;(item.feat&nbsp;token&nbsp;"n.name"))&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;;;&nbsp;magnitude<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(list&nbsp;"dollars")))&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;;;&nbsp;currency&nbsp;name<br>
+&nbsp;&nbsp;&nbsp;((and&nbsp;(string-matches&nbsp;name&nbsp;".*illion.?")<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(string-matches&nbsp;(item.feat&nbsp;token&nbsp;"p.name")&nbsp;"\\$[123456789]+"))<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;;;&nbsp;dealt&nbsp;with&nbsp;in&nbsp;previous&nbsp;token<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;nil)</P
+></BLOCKQUOTE
+>
+Note this still is not enough as there may be other types of currency 
+pounds, yen, francs etc, some of which may be mass nouns and require no 
+plural (e.g. <SPAN
+CLASS="QUOTE"
+>"<I
+CLASS="EMPHASIS"
+>yen}</I
+>"</SPAN
+> and some of which make be count nouns require 
+plurals. Also this only deals with whole numbers of .*illions, 
+<SPAN
+CLASS="QUOTE"
+>"<I
+CLASS="EMPHASIS"
+>$1.25 million</I
+>"</SPAN
+> is common too. See the full example (for English) 
+in <TT
+CLASS="FILENAME"
+>festival/lib/token.scm</TT
+>. </P
+><P
+>A large list of rules are typically required. They should be looked 
+upon as breaking down the problem into smaller parts, potentially 
+recursive. For example hyphenated tokens can be split into two words. 
+It is probably wise to explicitly deal with all tokens than are not 
+purely alphabetic. Maybe having a catch-all that spells out all tokens 
+that are not explicitly dealt with (e.g. the numbers). For 
+example you could add the following as the penumtilmate condition 
+in your <CODE
+CLASS="VARNAME"
+>token_to_words</CODE
+> function 
+<A
+NAME="AEN1240"
+></A
+><BLOCKQUOTE
+CLASS="BLOCKQUOTE"
+><P
+CLASS="LITERALLAYOUT"
+>&nbsp;&nbsp;&nbsp;((not&nbsp;(string-matches&nbsp;name&nbsp;"[A-Za-z]"))<br>
+&nbsp;&nbsp;&nbsp;&nbsp;(symbolexplode&nbsp;name))</P
+></BLOCKQUOTE
+>
+Note this isn't necessary correct when certain letters may be homograpths. 
+For example the token <SPAN
+CLASS="QUOTE"
+>"<I
+CLASS="EMPHASIS"
+>a</I
+>"</SPAN
+> may be a determiner or a letter 
+of the alhpabet. When its a derterminer it may (often) be reduced) 
+while as a letter it probably ins't (i.e pronunciation in <SPAN
+CLASS="QUOTE"
+>"<I
+CLASS="EMPHASIS"
+>@</I
+>"</SPAN
+> 
+or <SPAN
+CLASS="QUOTE"
+>"<I
+CLASS="EMPHASIS"
+>ei}</I
+>"</SPAN
+>. Other languages also example this problem (e.g. Spanish 
+<SPAN
+CLASS="QUOTE"
+>"<I
+CLASS="EMPHASIS"
+>y</I
+>"</SPAN
+>. Therefore when we call symbol explode we don't want just the 
+the letter but to also specify that it is the letter pronunciation we 
+want and not the any other form. To ensure the lexicon system 
+gets the right pronunciation we there wish to specify the part 
+fo speech with the letter. Actually rather than just a string 
+of atomic words being returned by the <CODE
+CLASS="VARNAME"
+>token_to_words</CODE
+> function 
+the words may be descriptions including features. Thus for example 
+we dont just want to return 
+<A
+NAME="AEN1251"
+></A
+><BLOCKQUOTE
+CLASS="BLOCKQUOTE"
+><P
+CLASS="LITERALLAYOUT"
+>(a&nbsp;b&nbsp;c)</P
+></BLOCKQUOTE
+>
+We want to be more specific and return 
+<A
+NAME="AEN1253"
+></A
+><BLOCKQUOTE
+CLASS="BLOCKQUOTE"
+><P
+CLASS="LITERALLAYOUT"
+>(((name&nbsp;a)&nbsp;(pos&nbsp;nn))<br>
+&nbsp;((name&nbsp;b)&nbsp;(pos&nbsp;nn))<br>
+&nbsp;((name&nbsp;c)&nbsp;(pos&nbsp;nn)))</P
+></BLOCKQUOTE
+>
+This can be done by the code 
+<A
+NAME="AEN1255"
+></A
+><BLOCKQUOTE
+CLASS="BLOCKQUOTE"
+><P
+CLASS="LITERALLAYOUT"
+>&nbsp;&nbsp;&nbsp;((not&nbsp;(string-matches&nbsp;name&nbsp;"[A-Za-z]"))<br>
+&nbsp;&nbsp;&nbsp;&nbsp;(mapcar<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(lambda&nbsp;(l)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;((list&nbsp;'name&nbsp;l)&nbsp;(list&nbsp;'pos&nbsp;'nn)))<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(symbolexplode&nbsp;name)))</P
+></BLOCKQUOTE
+>
+The above assumes that all single characters symbols (letters, digits, 
+punctuation and other "funny" characters have an entry in your lexicon 
+with a part of speech field <CODE
+CLASS="VARNAME"
+>nn</CODE
+>, with a pronunctiation of the 
+character in isolation. </P
+><P
+>The list of tokens that you may wish to write/train rules for 
+is of couse language dependent and to a certain extent domain 
+dependent. For example there are many more numbers in email text 
+that in narative novels. The number of abbreviations is also much 
+higher in email and news stories than in more normal text. It may 
+be worth having a look at some typical data to find out the distribution 
+and find out what is worth working on. For a rough guide the folowing 
+is a list if the symbol types we currentl deal with in English, many 
+of which will require some treatment in other languages. 
+<P
+></P
+><DIV
+CLASS="VARIABLELIST"
+><DL
+><DT
+><I
+CLASS="EMPHASIS"
+>Money </I
+></DT
+><DD
+><P
+>Money amounts often have different treatment than simple numbers 
+and conventions about the sub-currency part (i.e. cents, pfennings etc). 
+Remember that you its not just numbers in the local currency you 
+have to deal with currency values from different countries are common 
+in lots of different texts (e.g dollars, yen, DMs and euro). </P
+></DD
+><DT
+><I
+CLASS="EMPHASIS"
+>Numbers</I
+></DT
+><DD
+><P
+>strings of digits will of course need mapping even if there is only one 
+mapping for a language (rare). Consider at least telphone numbers 
+verses amounts, most languages make a distinction here. In English 
+we need to distinguish further, see below for the more detailed 
+discussion. </P
+></DD
+><DT
+><I
+CLASS="EMPHASIS"
+>number/number</I
+></DT
+><DD
+><P
+>This can be used as a date, fraction, alternate, context will help, 
+though techniques of dropping back to saying the the string of characters 
+often preserve the ambiguity which can be better that forcing 
+a decision. </P
+></DD
+><DT
+><I
+CLASS="EMPHASIS"
+>acronyms</I
+></DT
+><DD
+><P
+>List of upper case letters (with or without vowels). The decision 
+to pronounce as a word or as letters is difficult in general but 
+good guesses go far. If its short (&#60; 4 chatacters) not in your 
+lexicon not surround by other words in upper case, its probably 
+an acronym, further analyss of vowels, consonant clusters 
+etc will help. </P
+></DD
+><DT
+><I
+CLASS="EMPHASIS"
+>number-number</I
+></DT
+><DD
+><P
+>Could be a range, of score (football), dates etc. </P
+></DD
+><DT
+><I
+CLASS="EMPHASIS"
+>word-word</I
+></DT
+><DD
+><P
+>Usually a simple split on each part is sufficient---but not as when used 
+as a dash. </P
+></DD
+><DT
+><I
+CLASS="EMPHASIS"
+>word/word</I
+></DT
+><DD
+><P
+>As an alternative, or a Unix pathname </P
+></DD
+><DT
+><I
+CLASS="EMPHASIS"
+>'s or TOKENs</I
+></DT
+><DD
+><P
+>An appended <SPAN
+CLASS="QUOTE"
+>"<I
+CLASS="EMPHASIS"
+>s</I
+>"</SPAN
+> to a non alphabetic token is probabaly 
+some form of pluralization, removing it and recursing on the analysis 
+is a reasonable thing to try. </P
+></DD
+><DT
+><I
+CLASS="EMPHASIS"
+>times and dates</I
+></DT
+><DD
+><P
+>These exist is variaous stnadardized forms many of which are easy 
+to recognize and break down. </P
+></DD
+><DT
+><I
+CLASS="EMPHASIS"
+>telephone numbers</I
+></DT
+><DD
+><P
+>This various from country to country (and by various conventions) 
+but there may be standard forms that can be recognized. </P
+></DD
+><DT
+><I
+CLASS="EMPHASIS"
+>romain numerals</I
+></DT
+><DD
+><P
+>Sometimes these are pronounced as numbers <SPAN
+CLASS="QUOTE"
+>"<I
+CLASS="EMPHASIS"
+>chapter II</I
+>"</SPAN
+>, or 
+as cardinals <SPAN
+CLASS="QUOTE"
+>"<I
+CLASS="EMPHASIS"
+>James II</I
+>"</SPAN
+>. </P
+></DD
+><DT
+><I
+CLASS="EMPHASIS"
+>ascii art</I
+></DT
+><DD
+><P
+>If you are dealing with on line text there are often extra characters 
+in a document that should be ignored, or at least not pronounced 
+literally, e.g. lines of hyphens used as separators. </P
+></DD
+><DT
+><I
+CLASS="EMPHASIS"
+>email addresses, URLs, file names</I
+></DT
+><DD
+><P
+>Depending on your context this may be worth spending time on. </P
+></DD
+><DT
+><I
+CLASS="EMPHASIS"
+>tokens containing any other non-alphanumeric character</I
+></DT
+><DD
+><P
+>Spliting the token around the non-alphanumeric and recursing 
+on each part before and after it may be reasonable. </P
+></DD
+></DL
+></DIV
+>
+Remember the first purpose of text analysis is ensure you 
+can deal with <I
+CLASS="EMPHASIS"
+>anything</I
+>, even if it is just saying 
+the word <SPAN
+CLASS="QUOTE"
+>"<I
+CLASS="EMPHASIS"
+>unknown</I
+>"</SPAN
+> (in the appropriate language). Also its 
+probabaly not worth spending time on rare token forms, though remember 
+it not easy to judge what are rare and what are not. </P
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="c1189.html"
+ACCESSKEY="P"
+>&#60;&#60;&#60; Previous</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="book1.html"
+ACCESSKEY="H"
+>Home</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="x1339.html"
+ACCESSKEY="N"
+>Next &#62;&#62;&#62;</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>Text analysis</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="c1189.html"
+ACCESSKEY="U"
+>Up</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>Number pronunciation</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

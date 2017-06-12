@@ -21,7 +21,7 @@ public:
 };
 
 /**
- * Keeps all user NXRC connections and moniors if they close.
+ * Keeps all user NXRC connections and monitors if they close.
  */
 class NX_NETWORK_API ReverseConnectionHolder:
     public ReverseConnectionSource,

@@ -54,36 +54,36 @@ TEST_F(BufferedStreamSocketTest, catchRecvEvent)
 {
     ASSERT_TRUE(accepted->setNonBlockingMode(true));
     accepted->catchRecvEvent(acceptedResults.pusher());
-    ASSERT_EQ(acceptedResults.pop(), SystemError::timedOut);
+    ASSERT_EQ(SystemError::timedOut, acceptedResults.pop());
 
     const auto clientCount = testClientCount();
     buffer.reserve(kTestMessage.size() * clientCount);
     accepted->catchRecvEvent(acceptedResults.pusher());
     for (size_t i = 0; i < clientCount; ++i)
-        ASSERT_EQ(client->send(kTestMessage.data(), kTestMessage.size()), kTestMessage.size());
+        ASSERT_EQ(kTestMessage.size(), client->send(kTestMessage.data(), kTestMessage.size()));
 
-    ASSERT_EQ(acceptedResults.pop(), SystemError::noError);
+    ASSERT_EQ(SystemError::noError, acceptedResults.pop());
     accepted->readAsyncAtLeast(
         &buffer, kTestMessage.size() * clientCount,
         [&](SystemError::ErrorCode code, size_t size)
         {
-            ASSERT_EQ(code, SystemError::noError);
-            ASSERT_EQ(size, kTestMessage.size() * clientCount);
-            ASSERT_EQ((size_t)buffer.size(), size);
+            ASSERT_EQ(SystemError::noError, code);
+            ASSERT_EQ(kTestMessage.size() * clientCount, size);
+            ASSERT_EQ(size, (size_t)buffer.size());
             ASSERT_TRUE(buffer.startsWith(kTestMessage));
             ASSERT_TRUE(buffer.endsWith(kTestMessage));
             acceptedResults.push(code);
         });
-    ASSERT_EQ(acceptedResults.pop(), SystemError::noError);
+    ASSERT_EQ(SystemError::noError, acceptedResults.pop());
 
     buffer = Buffer(kTestMessage.size() * clientCount, '\0');
     accepted->catchRecvEvent(acceptedResults.pusher());
     for (size_t i = 0; i < clientCount; ++i)
         ASSERT_EQ(client->send(kTestMessage.data(), kTestMessage.size()), kTestMessage.size());
 
-    ASSERT_EQ(acceptedResults.pop(), SystemError::noError);
+    ASSERT_EQ(SystemError::noError, acceptedResults.pop());
     ASSERT_TRUE(accepted->setNonBlockingMode(false));
-    ASSERT_EQ(accepted->recv(buffer.data(), buffer.size(), MSG_WAITALL), buffer.size());
+    ASSERT_EQ(buffer.size(), accepted->recv(buffer.data(), buffer.size(), MSG_WAITALL));
     ASSERT_TRUE(buffer.startsWith(kTestMessage));
     ASSERT_TRUE(buffer.endsWith(kTestMessage));
 

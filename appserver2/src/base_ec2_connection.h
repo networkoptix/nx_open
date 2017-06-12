@@ -1,10 +1,4 @@
-/**********************************************************
-* 21 jan 2014
-* a.kolesnikov
-***********************************************************/
-
-#ifndef BASE_EC2_CONNECTION_H
-#define BASE_EC2_CONNECTION_H
+#pragma once
 
 #include <memory>
 
@@ -19,6 +13,7 @@
 #include "managers/business_event_manager.h"
 #include "managers/camera_manager.h"
 #include "managers/layout_manager.h"
+#include <managers/layout_tour_manager.h>
 #include "managers/license_manager.h"
 #include "managers/stored_file_manager.h"
 #include "managers/media_server_manager.h"
@@ -35,6 +30,7 @@
 namespace ec2
 {
     class ECConnectionNotificationManager;
+    class Ec2DirectConnectionFactory;
 
     // TODO: #2.4 remove Ec2 suffix to avoid ec2::BaseEc2Connection
     template<class QueryProcessorType>
@@ -43,7 +39,9 @@ namespace ec2
         public AbstractECConnection
     {
     public:
-        BaseEc2Connection(QueryProcessorType* queryProcessor);
+        BaseEc2Connection(
+            const AbstractECConnectionFactory* connectionFactory,
+            QueryProcessorType* queryProcessor);
         virtual ~BaseEc2Connection();
 
         virtual AbstractResourceManagerPtr getResourceManager(const Qn::UserAccessData &userAccessData) override;
@@ -53,6 +51,7 @@ namespace ec2
         virtual AbstractBusinessEventManagerPtr getBusinessEventManager(const Qn::UserAccessData &userAccessData) override;
         virtual AbstractUserManagerPtr getUserManager(const Qn::UserAccessData &userAccessData) override;
         virtual AbstractLayoutManagerPtr getLayoutManager(const Qn::UserAccessData &userAccessData) override;
+        virtual AbstractLayoutTourManagerPtr getLayoutTourManager(const Qn::UserAccessData& userAccessData) override;
         virtual AbstractVideowallManagerPtr getVideowallManager(const Qn::UserAccessData &userAccessData) override;
         virtual AbstractWebPageManagerPtr getWebPageManager(const Qn::UserAccessData &userAccessData) override;
         virtual AbstractStoredFileManagerPtr getStoredFileManager(const Qn::UserAccessData &userAccessData) override;
@@ -69,12 +68,15 @@ namespace ec2
         virtual AbstractBusinessEventNotificationManagerPtr getBusinessEventNotificationManager() override;
         virtual AbstractUserNotificationManagerPtr getUserNotificationManager() override;
         virtual AbstractLayoutNotificationManagerPtr getLayoutNotificationManager() override;
+        virtual AbstractLayoutTourNotificationManagerPtr getLayoutTourNotificationManager() override;
         virtual AbstractWebPageNotificationManagerPtr getWebPageNotificationManager() override;
         virtual AbstractDiscoveryNotificationManagerPtr getDiscoveryNotificationManager() override;
         virtual AbstractMiscNotificationManagerPtr getMiscNotificationManager() override;
         virtual AbstractUpdatesNotificationManagerPtr getUpdatesNotificationManager() override;
         virtual AbstractStoredFileNotificationManagerPtr getStoredFileNotificationManager() override;
         virtual AbstractVideowallNotificationManagerPtr getVideowallNotificationManager() override;
+
+        virtual QnCommonModule* commonModule() const override;
 
         virtual void startReceivingNotifications() override;
         virtual void stopReceivingNotifications() override;
@@ -83,20 +85,18 @@ namespace ec2
         virtual int dumpDatabaseToFileAsync( const QString& dumpFilePath, impl::SimpleHandlerPtr) override;
         virtual int restoreDatabaseAsync( const ec2::ApiDatabaseDumpData& data, impl::SimpleHandlerPtr handler ) override;
 
-        virtual void addRemotePeer(const QUrl& url) override;
-        virtual void deleteRemotePeer(const QUrl& url) override;
-        virtual void sendRuntimeData(const ec2::ApiRuntimeData &data) override;
-
-        virtual Timestamp getTransactionLogTime() const override;
-        virtual void setTransactionLogTime(Timestamp value) override;
+        virtual void addRemotePeer(const QnUuid& id, const QUrl& url) override;
+        virtual void deleteRemotePeer(const QnUuid& id) override;
 
         QueryProcessorType* queryProcessor() const { return m_queryProcessor; }
-        virtual ECConnectionNotificationManager* notificationManager() override 
-        { return m_notificationManager.get(); }
+        virtual ECConnectionNotificationManager* notificationManager() override;
         ECConnectionAuditManager* auditManager() { return m_auditManager.get(); }
 
         virtual QnUuid routeToPeerVia(const QnUuid& dstPeer, int* distance) const override;
+
+        virtual QnTransactionMessageBusBase* messageBus() const override;
     protected:
+        const AbstractECConnectionFactory* m_connectionFactory;
         QueryProcessorType* m_queryProcessor;
         QnLicenseNotificationManagerPtr m_licenseNotificationManager;
         QnResourceNotificationManagerPtr m_resourceNotificationManager;
@@ -105,6 +105,7 @@ namespace ec2
         QnUserNotificationManagerPtr m_userNotificationManager;
         QnBusinessEventNotificationManagerPtr m_businessEventNotificationManager;
         QnLayoutNotificationManagerPtr m_layoutNotificationManager;
+        QnLayoutTourNotificationManagerPtr m_layoutTourNotificationManager;
         QnVideowallNotificationManagerPtr m_videowallNotificationManager;
         QnWebPageNotificationManagerPtr m_webPageNotificationManager;
         QnStoredFileNotificationManagerPtr m_storedFileNotificationManager;
@@ -116,5 +117,3 @@ namespace ec2
         std::unique_ptr<ECConnectionAuditManager> m_auditManager;
     };
 }
-
-#endif  //BASE_EC2_CONNECTION_H

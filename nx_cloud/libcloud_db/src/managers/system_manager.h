@@ -5,6 +5,7 @@
 #include <chrono>
 #include <functional>
 #include <memory>
+#include <set>
 #include <stdexcept>
 #include <string>
 #include <vector>
@@ -19,8 +20,8 @@
 #include <nx/utils/timer_manager.h>
 #include <nx_ec/data/api_data.h>
 #include <nx_ec/data/api_user_data.h>
-#include <utils/common/counter.h>
-#include <utils/common/subscription.h>
+#include <nx/utils/counter.h>
+#include <nx/utils/subscription.h>
 #include <utils/db/async_sql_query_executor.h>
 #include <utils/db/filter.h>
 
@@ -35,6 +36,7 @@
 #include "data_view.h"
 #include "ec2/transaction_log.h"
 #include "managers_types.h"
+#include "system_sharing_manager.h"
 
 namespace nx {
 namespace cdb {
@@ -59,10 +61,11 @@ class InviteUserNotification;
 
 /**
  * Provides methods for manipulating system data on persisent storage.
- * Calls DBManager instance to perform DB manipulation. SQL requests are written in this class
- * @note All data can be cached
+ * Calls DBManager instance to perform DB manipulation.
+ * @note All data can be cached.
  */
 class SystemManager:
+    public AbstractSystemSharingManager,
     public AbstractAuthenticationDataProvider
 {
 public:
@@ -73,8 +76,8 @@ public:
     };
 
     /**
-     * Fills internal cache
-     * @throw std::runtime_error In case of failure to pre-fill data cache
+     * Fills internal cache.
+     * @throw std::runtime_error In case of failure to pre-fill data cache.
      */
     SystemManager(
         const conf::Settings& settings,
@@ -83,14 +86,14 @@ public:
         const SystemHealthInfoProvider& systemHealthInfoProvider,
         nx::db::AsyncSqlQueryExecutor* const dbManager,
         AbstractEmailManager* const emailManager,
-        ec2::SyncronizationEngine* const ec2SyncronizationEngine) throw(std::runtime_error);
+        ec2::SyncronizationEngine* const ec2SyncronizationEngine) noexcept(false);
     virtual ~SystemManager();
 
     virtual void authenticateByName(
         const nx_http::StringType& username,
         std::function<bool(const nx::Buffer&)> validateHa1Func,
-        const stree::AbstractResourceReader& authSearchInputData,
-        stree::ResourceContainer* const authProperties,
+        const nx::utils::stree::AbstractResourceReader& authSearchInputData,
+        nx::utils::stree::ResourceContainer* const authProperties,
         nx::utils::MoveOnlyFunc<void(api::ResultCode)> completionHandler) override;
 
     /** Binds system to an account associated with authzInfo. */
@@ -143,15 +146,20 @@ public:
      * - accountEmail has no rights for systemId
      * - accountEmail or systemId is unknown
      */
-    api::SystemAccessRole getAccountRightsForSystem(
+    virtual api::SystemAccessRole getAccountRightsForSystem(
         const std::string& accountEmail,
-        const std::string& systemId) const;
-    boost::optional<api::SystemSharingEx> getSystemSharingData(
+        const std::string& systemId) const override;
+    virtual boost::optional<api::SystemSharingEx> getSystemSharingData(
         const std::string& accountEmail,
-        const std::string& systemId) const;
+        const std::string& systemId) const override;
+
+    //---------------------------------------------------------------------------------------------
+    // Events.
 
     nx::utils::Subscription<std::string>& systemMarkedAsDeletedSubscription();
-    const nx::utils::Subscription<std::string>& systemMarkedAsDeletedSubscription() const;
+
+    virtual void addSystemSharingExtension(AbstractSystemSharingExtension* extension) override;
+    virtual void removeSystemSharingExtension(AbstractSystemSharingExtension* extension) override;
 
 private:
     static std::pair<std::string, std::string> extractSystemIdAndVmsUserId(
@@ -228,12 +236,13 @@ private:
     SystemsDict m_systems;
     mutable QnMutex m_mutex;
     AccountSystemAccessRoleDict m_accountAccessRoleForSystem;
-    QnCounter m_startedAsyncCallsCounter;
+    nx::utils::Counter m_startedAsyncCallsCounter;
     uint64_t m_dropSystemsTimerId;
     std::atomic<bool> m_dropExpiredSystemsTaskStillRunning;
     nx::utils::Subscription<std::string> m_systemMarkedAsDeletedSubscription;
     std::unique_ptr<dao::AbstractSystemDataObject> m_systemDao;
     dao::rdb::SystemSharingDataObject m_systemSharingDao;
+    std::set<AbstractSystemSharingExtension*> m_systemSharingExtensions;
 
     nx::db::DBResult insertSystemToDB(
         nx::db::QueryContext* const queryContext,
@@ -249,7 +258,7 @@ private:
         const data::SystemRegistrationDataWithAccount& newSystem,
         nx::cdb::data::SystemSharing* const ownerSharing);
     void systemAdded(
-        QnCounter::ScopedIncrement asyncCallLocker,
+        nx::utils::Counter::ScopedIncrement asyncCallLocker,
         nx::db::QueryContext* /*queryContext*/,
         nx::db::DBResult dbResult,
         data::SystemRegistrationDataWithAccount systemRegistrationData,
@@ -260,7 +269,7 @@ private:
         nx::db::QueryContext* const queryContext,
         const std::string& systemId);
     void systemMarkedAsDeleted(
-        QnCounter::ScopedIncrement /*asyncCallLocker*/,
+        nx::utils::Counter::ScopedIncrement /*asyncCallLocker*/,
         nx::db::QueryContext* /*queryContext*/,
         nx::db::DBResult dbResult,
         std::string systemId,
@@ -271,7 +280,7 @@ private:
         nx::db::QueryContext* const queryContext,
         const data::SystemId& systemId);
     void systemDeleted(
-        QnCounter::ScopedIncrement asyncCallLocker,
+        nx::utils::Counter::ScopedIncrement asyncCallLocker,
         nx::db::QueryContext* /*queryContext*/,
         nx::db::DBResult dbResult,
         data::SystemId systemId,
@@ -379,7 +388,7 @@ private:
     void updateSystemAttributesInCache(
         data::SystemAttributesUpdate data);
     void systemNameUpdated(
-        QnCounter::ScopedIncrement asyncCallLocker,
+        nx::utils::Counter::ScopedIncrement asyncCallLocker,
         nx::db::QueryContext* /*queryContext*/,
         nx::db::DBResult dbResult,
         data::SystemAttributesUpdate data,
@@ -391,11 +400,10 @@ private:
         SystemDictionary& systemByIdIndex,
         typename SystemDictionary::iterator systemIter);
     void systemActivated(
-        QnCounter::ScopedIncrement asyncCallLocker,
+        nx::utils::Counter::ScopedIncrement asyncCallLocker,
         nx::db::QueryContext* /*queryContext*/,
         nx::db::DBResult dbResult,
-        std::string systemId,
-        std::function<void(api::ResultCode)> completionHandler);
+        std::string systemId);
 
     nx::db::DBResult saveUserSessionStart(
         nx::db::QueryContext* queryContext,
@@ -422,7 +430,7 @@ private:
 
     void dropExpiredSystems(uint64_t timerId);
     void expiredSystemsDeletedFromDb(
-        QnCounter::ScopedIncrement /*asyncCallLocker*/,
+        nx::utils::Counter::ScopedIncrement /*asyncCallLocker*/,
         nx::db::QueryContext* /*queryContext*/,
         nx::db::DBResult dbResult);
 
@@ -464,6 +472,11 @@ private:
     void onEc2RemoveResourceParamDone(
         nx::db::QueryContext* /*queryContext*/,
         nx::db::DBResult dbResult);
+
+    template<typename ExtensionFuncPtr, typename... Args>
+    nx::db::DBResult invokeSystemSharingExtension(
+        ExtensionFuncPtr extensionFunc,
+        const Args&... args);
 };
 
 } // namespace cdb

@@ -1,0 +1,71 @@
+  <chapter id='intonation-chapter'>
+    <title>Intonation</title>
+
+    <indexterm><primary>intonation</primary></indexterm>
+
+
+    <para>
+      This section gives an overview of the various programs within the
+      speech tools library that deal in intonation processing.  These
+      programs are still a little unstable though some have
+      been used for a number of years.
+    </para>
+
+
+
+    <sect1>
+      <title>Pitch tracking</title>
+
+      <indexterm><primary>intonation</primary><secondary>pitch tracking</secondary></indexterm>
+      <indexterm><primary>analysis</primary><secondary>pitch tracking</secondary></indexterm>
+      <indexterm><primary>pitch tracking</primary></indexterm>
+
+      <para>
+	The executable <filename>pda</filename> may be use for pitch tracking
+	speech files.  It is based on Paul Bagshaw's pitch tracker
+	@cite{bagshaw93}.
+      </para>
+
+    </sect1>
+
+    <sect1>
+      <title>Tilt</title>
+
+
+      <para>
+	The speech tools library provides code for the analysis and synthesis of
+	F0 contours using the Tilt intonation model.
+      </para>
+
+
+    </sect1>
+
+    <sect1>
+      <title>RFC</title>
+
+
+      <para>
+	to be written
+      </para>
+
+
+
+
+
+      <!--
+      Local Variables:
+      mode: sgml
+      sgml-doctype:"speechtools.sgml"
+      sgml-parent-document:("speechtools.sgml" "chapter" "book")
+      sgml-omittag:nil
+      sgml-shorttag:t
+      sgml-minimize-attributes:nil
+      sgml-always-quote-attributes:t
+      sgml-indent-step:2
+      sgml-indent-data:t
+      sgml-exposed-tags:nil
+      sgml-local-catalogs:nil
+      sgml-local-ecat-files:nil
+      End:
+      -->
+

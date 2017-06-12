@@ -1,11 +1,12 @@
 #include "resource_properties.h"
 #include "api/app_server_connection.h"
 #include "nx_ec/dummy_handler.h"
+#include <common/common_module.h>
 
 QnResourcePropertyDictionary::QnResourcePropertyDictionary(QObject *parent):
-        QObject(parent)
+    QObject(parent),
+    QnCommonModuleAware(parent)
 {
-
 }
 
 bool QnResourcePropertyDictionary::saveParams(const QnUuid& resourceId)
@@ -25,10 +26,9 @@ bool QnResourcePropertyDictionary::saveParams(const QnUuid& resourceId)
     if( params.empty() )
         return true;
 
-    ec2::ApiResourceParamWithRefDataList outData;
-    ec2::AbstractECConnectionPtr conn = QnAppServerConnectionFactory::getConnection2();
+    ec2::AbstractECConnectionPtr conn = commonModule()->ec2Connection();
     //TODO: #GDM SafeMode
-    ec2::ErrorCode rez = conn->getResourceManager(Qn::kSystemAccess)->saveSync(params, &outData);
+    ec2::ErrorCode rez = conn->getResourceManager(Qn::kSystemAccess)->saveSync(params);
 
     if (rez != ec2::ErrorCode::ok)
     {
@@ -55,7 +55,9 @@ int QnResourcePropertyDictionary::saveData(const ec2::ApiResourceParamWithRefDat
 {
     if (data.empty())
         return -1; // nothing to save
-    ec2::AbstractECConnectionPtr conn = QnAppServerConnectionFactory::getConnection2();
+    ec2::AbstractECConnectionPtr conn = commonModule()->ec2Connection();
+    if (!conn)
+        return -1; // not connected to ec2
     QnMutexLocker lock( &m_requestMutex );
     //TODO #ak m_requestInProgress is redundant here, data can be saved to
         //functor to use instead of \a QnResourcePropertyDictionary::onRequestDone

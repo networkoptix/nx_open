@@ -6,7 +6,7 @@
 #include "account_manager.h"
 
 #include "cdb_request_path.h"
-#include <utils/common/app_info.h>
+#include <nx/utils/app_info.h>
 
 
 namespace nx {
@@ -23,7 +23,7 @@ void AccountManager::registerNewAccount(
     std::function<void(api::ResultCode, api::AccountConfirmationCode)> completionHandler)
 {
     auto errorHandler = std::bind(completionHandler, std::placeholders::_1, api::AccountConfirmationCode());
-    accountData.customization = QnAppInfo::customizationName().toStdString();
+    accountData.customization = nx::utils::AppInfo::customizationName().toStdString();
     executeRequest(
         kAccountRegisterPath,
         std::move(accountData),

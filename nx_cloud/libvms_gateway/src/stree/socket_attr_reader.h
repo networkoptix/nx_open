@@ -5,7 +5,7 @@
 
 #pragma once
 
-#include <plugins/videodecoder/stree/resourcecontainer.h>
+#include <nx/utils/stree/resourcecontainer.h>
 #include <nx/network/socket.h>
 
 
@@ -15,7 +15,7 @@ namespace gateway {
 
 class SocketResourceReader
 :
-    public stree::AbstractResourceReader
+    public nx::utils::stree::AbstractResourceReader
 {
 public:
     SocketResourceReader(const AbstractCommunicatingSocket& sock);

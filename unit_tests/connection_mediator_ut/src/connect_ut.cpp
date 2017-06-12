@@ -13,10 +13,10 @@
 #include <nx/network/stun/stream_socket_server.h>
 #include <nx/network/stun/message_dispatcher.h>
 #include <nx/network/stun/extension/stun_extension_types.h>
-#include <nx/network/http/httpclient.h>
+#include <nx/network/http/http_client.h>
 #include <nx/network/http/test_http_server.h>
 #include <nx/network/socket_global.h>
-#include <utils/crypt/linux_passwd_crypt.h>
+#include <nx/utils/crypt/linux_passwd_crypt.h>
 #include <nx/utils/std/cpp14.h>
 
 #include <listening_peer_pool.h>
@@ -41,7 +41,7 @@ protected:
             &cloud,
             &stunMessageDispatcher,
             &listeningPeerPool);
-        server = std::make_unique<MultiAddressServer<stun::SocketServer>>(
+        server = std::make_unique<network::server::MultiAddressServer<stun::SocketServer>>(
             &stunMessageDispatcher,
             false,
             nx::network::NatTraversalSupport::disabled);
@@ -60,7 +60,7 @@ protected:
     conf::Settings settings;
     ListeningPeerPool listeningPeerPool;
     std::unique_ptr<PeerRegistrator> listeningPeerRegistrator;
-    std::unique_ptr<MultiAddressServer<stun::SocketServer>> server;
+    std::unique_ptr<network::server::MultiAddressServer<stun::SocketServer>> server;
 
     SocketAddress address() const
     {
@@ -84,7 +84,7 @@ TEST_F( ConnectTest, BindConnect )
     }
 
     stun::AsyncClient msClient;
-    auto msClientGuard = makeScopedGuard([&msClient]() { msClient.pleaseStopSync(); });
+    auto msClientGuard = makeScopeGuard([&msClient]() { msClient.pleaseStopSync(); });
 
     msClient.connect( address() );
     {

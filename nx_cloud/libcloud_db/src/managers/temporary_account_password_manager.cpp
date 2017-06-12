@@ -11,7 +11,7 @@
 #include <nx/utils/std/future.h>
 #include <nx/utils/string.h>
 #include <nx/utils/time.h>
-#include <utils/common/guard.h>
+#include <nx/utils/scope_guard.h>
 
 #include "stree/cdb_ns.h"
 
@@ -25,7 +25,7 @@ QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(
 
 TemporaryAccountPasswordManager::TemporaryAccountPasswordManager(
     const conf::Settings& settings,
-    nx::db::AsyncSqlQueryExecutor* const dbManager) throw(std::runtime_error)
+    nx::db::AsyncSqlQueryExecutor* const dbManager) noexcept(false)
 :
     m_settings(settings),
     m_dbManager(dbManager)
@@ -43,8 +43,8 @@ TemporaryAccountPasswordManager::~TemporaryAccountPasswordManager()
 void TemporaryAccountPasswordManager::authenticateByName(
     const nx_http::StringType& username,
     std::function<bool(const nx::Buffer&)> checkPasswordHash,
-    const stree::AbstractResourceReader& authSearchInputData,
-    stree::ResourceContainer* const authProperties,
+    const nx::utils::stree::AbstractResourceReader& authSearchInputData,
+    nx::utils::stree::ResourceContainer* const authProperties,
     nx::utils::MoveOnlyFunc<void(api::ResultCode)> completionHandler)
 {
     QnMutexLocker lk(&m_mutex);

@@ -14,7 +14,7 @@ class QnMServerBusinessRuleProcessor: public QnBusinessRuleProcessor
 {
     Q_OBJECT
 public:
-    QnMServerBusinessRuleProcessor();
+    QnMServerBusinessRuleProcessor(QnCommonModule* commonModule);
     virtual ~QnMServerBusinessRuleProcessor();
 
     virtual QnUuid getGuid() const override;
@@ -84,6 +84,7 @@ private:
     QMap<QnUuid, qint64> m_runningBookmarkActions;
     QScopedPointer<EmailManagerImpl> m_emailManager;
     QMap<SendEmailAggregationKey, SendEmailAggregationData> m_aggregatedEmails;
+    QThreadPool m_emailThreadPool;
 private:
     bool sendMail(const QnSendMailBusinessActionPtr& action );
     void sendAggregationEmail( const SendEmailAggregationKey& aggregationKey );
@@ -96,27 +97,27 @@ private:
      */
     void updateRecipientsList(const QnSendMailBusinessActionPtr& action) const;
 
-    static QByteArray getEventScreenshotEncoded(const QnUuid& id, qint64 timestampUsec, QSize dstSize);
+    QByteArray getEventScreenshotEncoded(const QnUuid& id, qint64 timestampUsec, QSize dstSize) const;
 
-    static QVariantMap eventDescriptionMap(
+    QVariantMap eventDescriptionMap(
         const QnAbstractBusinessActionPtr& action,
         const QnBusinessAggregationInfo &aggregationInfo,
-        QnEmailAttachmentList& attachments);
+        QnEmailAttachmentList& attachments) const;
 
-    static QVariantMap eventDetailsMap(
+    QVariantMap eventDetailsMap(
         const QnAbstractBusinessActionPtr& action,
         const QnInfoDetail& aggregationData,
         Qn::ResourceInfoLevel detailLevel,
-        bool addSubAggregationData = true );
+        bool addSubAggregationData = true ) const;
 
-    static QVariantList aggregatedEventDetailsMap(const QnAbstractBusinessActionPtr& action,
+    QVariantList aggregatedEventDetailsMap(const QnAbstractBusinessActionPtr& action,
         const QnBusinessAggregationInfo& aggregationInfo,
-        Qn::ResourceInfoLevel detailLevel);
+        Qn::ResourceInfoLevel detailLevel) const;
 
-    static QVariantList aggregatedEventDetailsMap(
+    QVariantList aggregatedEventDetailsMap(
         const QnAbstractBusinessActionPtr& action,
         const QList<QnInfoDetail>& aggregationDetailList,
-        Qn::ResourceInfoLevel detailLevel);
+        Qn::ResourceInfoLevel detailLevel) const;
 };
 
 #endif // __MSERVER_BUSINESS_RULE_PROCESSOR_H_

@@ -1,16 +1,29 @@
 #include "resource_pool_test_helper.h"
 
+#include <common/static_common_module.h>
+
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/layout_resource.h>
 #include <core/resource/user_resource.h>
 #include <core/resource/media_server_resource.h>
-#include <core/resource/storage_resource_stub.h>
-#include <core/resource/camera_resource_stub.h>
+#include <test_support/resource/storage_resource_stub.h>
+#include <test_support/resource/camera_resource_stub.h>
 #include <core/resource/webpage_resource.h>
 #include <core/resource/videowall_resource.h>
 
 QString QnResourcePoolTestHelper::kTestUserName = QStringLiteral("user");
 QString QnResourcePoolTestHelper::kTestUserName2 = QStringLiteral("user_2");
+
+QnResourcePoolTestHelper::QnResourcePoolTestHelper():
+    QnCommonModuleAware(nullptr, true),
+    m_staticCommon(new QnStaticCommonModule())
+{
+
+}
+
+QnResourcePoolTestHelper::~QnResourcePoolTestHelper()
+{
+}
 
 QnUserResourcePtr QnResourcePoolTestHelper::createUser(Qn::GlobalPermissions globalPermissions,
     const QString& name,
@@ -29,7 +42,7 @@ QnUserResourcePtr QnResourcePoolTestHelper::addUser(Qn::GlobalPermissions global
     QnUserType userType)
 {
     auto user = createUser(globalPermissions, name, userType);
-    qnResPool->addResource(user);
+    resourcePool()->addResource(user);
     return user;
 }
 
@@ -43,28 +56,28 @@ QnLayoutResourcePtr QnResourcePoolTestHelper::createLayout()
 QnLayoutResourcePtr QnResourcePoolTestHelper::addLayout()
 {
     auto layout = createLayout();
-    qnResPool->addResource(layout);
+    resourcePool()->addResource(layout);
     return layout;
 }
 
-QnVirtualCameraResourcePtr QnResourcePoolTestHelper::createCamera()
+QnVirtualCameraResourcePtr QnResourcePoolTestHelper::createCamera(Qn::LicenseType licenseType)
 {
-    QnVirtualCameraResourcePtr camera(new QnCameraResourceStub());
+    QnVirtualCameraResourcePtr camera(new nx::CameraResourceStub(licenseType));
     camera->setName(QStringLiteral("camera"));
     return camera;
 }
 
-QnVirtualCameraResourcePtr QnResourcePoolTestHelper::addCamera()
+QnVirtualCameraResourcePtr QnResourcePoolTestHelper::addCamera(Qn::LicenseType licenseType)
 {
-    auto camera = createCamera();
-    qnResPool->addResource(camera);
+    auto camera = createCamera(licenseType);
+    resourcePool()->addResource(camera);
     return camera;
 }
 
 QnWebPageResourcePtr QnResourcePoolTestHelper::addWebPage()
 {
     QnWebPageResourcePtr webPage(new QnWebPageResource(QStringLiteral("http://www.ru")));
-    qnResPool->addResource(webPage);
+    resourcePool()->addResource(webPage);
     return webPage;
 }
 
@@ -78,23 +91,23 @@ QnVideoWallResourcePtr QnResourcePoolTestHelper::createVideoWall()
 QnVideoWallResourcePtr QnResourcePoolTestHelper::addVideoWall()
 {
     auto videoWall = createVideoWall();
-    qnResPool->addResource(videoWall);
+    resourcePool()->addResource(videoWall);
     return videoWall;
 }
 
 QnMediaServerResourcePtr QnResourcePoolTestHelper::addServer()
 {
-    QnMediaServerResourcePtr server(new QnMediaServerResource());
+    QnMediaServerResourcePtr server(new QnMediaServerResource(commonModule()));
     server->setId(QnUuid::createUuid());
-    qnResPool->addResource(server);
+    resourcePool()->addResource(server);
     return server;
 }
 
 QnStorageResourcePtr QnResourcePoolTestHelper::addStorage(const QnMediaServerResourcePtr& server)
 {
-    QnStorageResourcePtr storage(new QnStorageResourceStub());
+    QnStorageResourcePtr storage(new nx::StorageResourceStub());
     storage->setParentId(server->getId());
-    qnResPool->addResource(storage);
+    resourcePool()->addResource(storage);
     return storage;
 }
 

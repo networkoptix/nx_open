@@ -10,17 +10,17 @@
 
 #include <QtCore/QBuffer>
 
-#include <plugins/videodecoder/stree/stree_manager.h>
+#include <nx/utils/stree/stree_manager.h>
 
 
 namespace nx {
 namespace utils {
 namespace stree {
 
-using ::stree::AbstractNode;
-using ::stree::ResourceContainer;
-using ::stree::ResourceNameSet;
-using ::stree::StreeManager;
+using ::nx::utils::stree::AbstractNode;
+using ::nx::utils::stree::ResourceContainer;
+using ::nx::utils::stree::ResourceNameSet;
+using ::nx::utils::stree::StreeManager;
 
 class StreeTest
 :
@@ -82,7 +82,7 @@ protected:
     std::string getOutAttr(const ResourceContainer& intputData)
     {
         ResourceContainer outputData;
-        streeRoot()->get(::stree::MultiSourceResourceReader(intputData, outputData), &outputData);
+        streeRoot()->get(::nx::utils::stree::MultiSourceResourceReader(intputData, outputData), &outputData);
         if (auto outVal = outputData.get<std::string>(StreeTest::outAttr))
             return *outVal;
         return std::string();

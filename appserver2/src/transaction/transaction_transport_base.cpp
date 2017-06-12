@@ -7,22 +7,23 @@
 #include <QtCore/QTimer>
 #include <QtCore/QUrlQuery>
 
-#include <cdb/ec2_request_paths.h>
-#include <nx_ec/ec_proto_version.h>
 #include <nx/network/http/base64_decoder_filter.h>
 #include <nx/network/socket_factory.h>
 #include <nx/utils/timer_manager.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/std/cpp14.h>
+#include <nx/utils/byte_stream/sized_data_decoder.h>
+#include <nx/utils/gzip/gzip_compressor.h>
+#include <nx/utils/gzip/gzip_uncompressor.h>
+#include <nx/utils/system_error.h>
 
-#include <utils/bsf/sized_data_decoder.h>
-#include <utils/gzip/gzip_compressor.h>
-#include <utils/gzip/gzip_uncompressor.h>
-#include <utils/media/custom_output_stream.h>
+#include <cdb/ec2_request_paths.h>
+#include <nx_ec/ec_proto_version.h>
+#include <nx/utils/byte_stream/custom_output_stream.h>
 #include <utils/common/util.h>
-#include <utils/common/systemerror.h>
-#include <http/custom_headers.h>
+#include <nx/network/http/custom_headers.h>
 #include <api/global_settings.h>
+#include <common/common_module.h>
 
 //#define USE_SINGLE_TWO_WAY_CONNECTION
 //!if not defined, ubjson is used
@@ -39,9 +40,8 @@ namespace {
     (all transactions that read with single read from socket)
 */
 static const int MAX_TRANS_TO_POST_AT_A_TIME = 16;
-static const QnUuid kCloudPeerId(lit("674BAFD7-4EEC-4BBA-84AA-A1BAEA7FC6DB"));
 
-}
+} // namespace
 
 namespace ec2
 {
@@ -86,12 +86,14 @@ const char* QnTransactionTransportBase::TUNNEL_MULTIPART_BOUNDARY = "ec2boundary
 const char* QnTransactionTransportBase::TUNNEL_CONTENT_TYPE = "multipart/mixed; boundary=ec2boundary";
 
 QnTransactionTransportBase::QnTransactionTransportBase(
+    const QnUuid& localSystemId,
     ConnectionGuardSharedState* const connectionGuardSharedState,
     const ApiPeerData& localPeer,
     PeerRole peerRole,
     std::chrono::milliseconds tcpKeepAliveTimeout,
     int keepAliveProbeCount)
 :
+    m_localSystemId(localSystemId),
     m_localPeer(localPeer),
     m_peerRole(peerRole),
     m_connectionGuardSharedState(connectionGuardSharedState),
@@ -128,6 +130,7 @@ QnTransactionTransportBase::QnTransactionTransportBase(
 }
 
 QnTransactionTransportBase::QnTransactionTransportBase(
+    const QnUuid& localSystemId,
     const QnUuid& connectionGuid,
     ConnectionLockGuard connectionLockGuard,
     const ApiPeerData& localPeer,
@@ -139,6 +142,7 @@ QnTransactionTransportBase::QnTransactionTransportBase(
     int keepAliveProbeCount)
 :
     QnTransactionTransportBase(
+        localSystemId,
         nullptr,
         localPeer,
         prAccepting,
@@ -189,13 +193,13 @@ QnTransactionTransportBase::QnTransactionTransportBase(
     std::weak_ptr<nx_http::HttpMessageStreamParser> incomingTransactionsRequestsParserWeak(
         incomingTransactionsRequestsParser );
 
-    auto extensionHeadersProcessor = makeFilterWithFunc( //this filter receives single HTTP message
+    auto extensionHeadersProcessor = nx::utils::bstream::makeFilterWithFunc( //this filter receives single HTTP message
         [this, incomingTransactionsRequestsParserWeak]() {
             if( auto incomingTransactionsRequestsParserStrong = incomingTransactionsRequestsParserWeak.lock() )
                 processChunkExtensions( incomingTransactionsRequestsParserStrong->currentMessage().headers() );
         } );
 
-    extensionHeadersProcessor->setNextFilter( makeCustomOutputStream(
+    extensionHeadersProcessor->setNextFilter( nx::utils::bstream::makeCustomOutputStream(
         std::bind(
             &QnTransactionTransportBase::receivedTransactionNonSafe,
             this,
@@ -207,12 +211,14 @@ QnTransactionTransportBase::QnTransactionTransportBase(
 }
 
 QnTransactionTransportBase::QnTransactionTransportBase(
+    const QnUuid& localSystemId,
     ConnectionGuardSharedState* const connectionGuardSharedState,
     const ApiPeerData& localPeer,
     std::chrono::milliseconds tcpKeepAliveTimeout,
     int keepAliveProbeCount)
 :
     QnTransactionTransportBase(
+        localSystemId,
         connectionGuardSharedState,
         localPeer,
         prOriginating,
@@ -239,12 +245,12 @@ QnTransactionTransportBase::QnTransactionTransportBase(
     //creating parser sequence: multipart_parser -> ext_headers_processor -> transaction handler
     m_multipartContentParser = std::make_shared<nx_http::MultipartContentParser>();
     std::weak_ptr<nx_http::MultipartContentParser> multipartContentParserWeak( m_multipartContentParser );
-    auto extensionHeadersProcessor = makeFilterWithFunc( //this filter receives single multipart message
+    auto extensionHeadersProcessor = nx::utils::bstream::makeFilterWithFunc( //this filter receives single multipart message
         [this, multipartContentParserWeak]() {
             if( auto multipartContentParser = multipartContentParserWeak.lock() )
                 processChunkExtensions( multipartContentParser->prevFrameHeaders() );
         } );
-    extensionHeadersProcessor->setNextFilter( makeCustomOutputStream(
+    extensionHeadersProcessor->setNextFilter( nx::utils::bstream::makeCustomOutputStream(
         std::bind(
             &QnTransactionTransportBase::receivedTransactionNonSafe,
             this,
@@ -535,10 +541,10 @@ void QnTransactionTransportBase::doOutgoingConnect(const QUrl& remotePeerUrl)
         m_httpClient->setUserPassword(remotePeerUrl.password());
     }
 
-    if (m_localPeer.isServer() && QnCommonModule::instance())
+    if (m_localPeer.isServer())
         m_httpClient->addAdditionalHeader(
             Qn::EC2_SYSTEM_ID_HEADER_NAME,
-            qnGlobalSettings->localSystemId().toByteArray());
+            m_localSystemId.toByteArray());
     if (m_base64EncodeOutgoingTransactions)    //requesting server to encode transactions
         m_httpClient->addAdditionalHeader(
             Qn::EC2_BASE64_ENCODING_REQUIRED_HEADER_NAME,
@@ -769,8 +775,8 @@ void QnTransactionTransportBase::receivedTransaction(
         //decodedTranData can contain multiple transactions
         if( !m_sizedDecoder )
         {
-            m_sizedDecoder = std::make_shared<nx_bsf::SizedDataDecodingFilter>();
-            m_sizedDecoder->setNextFilter( makeCustomOutputStream(
+            m_sizedDecoder = std::make_shared<nx::utils::bstream::SizedDataDecodingFilter>();
+            m_sizedDecoder->setNextFilter( nx::utils::bstream::makeCustomOutputStream(
                 std::bind(
                     &QnTransactionTransportBase::receivedTransactionNonSafe,
                     this,
@@ -1038,7 +1044,7 @@ void QnTransactionTransportBase::serializeAndSendNextDataBuffer()
             if( m_compressResponseMsgBody )
             {
                 //encoding outgoing message body
-                dataCtx.encodedSourceData = GZipCompressor::compressData( dataCtx.encodedSourceData );
+                dataCtx.encodedSourceData = nx::utils::bstream::gzip::Compressor::compressData( dataCtx.encodedSourceData );
             }
         }
         else    //m_peerRole == prOriginating
@@ -1228,14 +1234,14 @@ void QnTransactionTransportBase::at_responseReceived(const nx_http::AsyncHttpCli
         }
 
         const QString remotePeerCloudHost = ec2CloudHostItr == client->response()->headers.end()
-            ? QnAppInfo::defaultCloudHost()
+            ? nx::network::AppInfo::defaultCloudHost()
             : QString::fromUtf8(ec2CloudHostItr->second);
 
-        if (QnAppInfo::defaultCloudHost() != remotePeerCloudHost)
+        if (nx::network::AppInfo::defaultCloudHost() != remotePeerCloudHost)
         {
             NX_LOG(lm("Cannot connect to server %1 because they have different built in cloud host setting. "
                 "Local peer host: %2, remote peer host: %3").
-                arg(client->url()).arg(QnAppInfo::defaultCloudHost()).arg(remotePeerCloudHost),
+                arg(client->url()).arg(nx::network::AppInfo::defaultCloudHost()).arg(remotePeerCloudHost),
                 cl_logWARNING);
             cancelConnecting();
             return;
@@ -1272,6 +1278,7 @@ void QnTransactionTransportBase::at_responseReceived(const nx_http::AsyncHttpCli
     {
         NX_CRITICAL(m_connectionGuardSharedState);
         m_connectionLockGuard = std::make_unique<ConnectionLockGuard>(
+            m_localPeer.id,
             m_connectionGuardSharedState,
             m_remotePeer.id,
             ConnectionLockGuard::Direction::Outgoing);
@@ -1318,7 +1325,7 @@ void QnTransactionTransportBase::at_responseReceived(const nx_http::AsyncHttpCli
         if( contentEncodingIter->second == "gzip" )
         {
             //enabling decompression of received transactions
-            auto ungzip = std::make_shared<GZipUncompressor>();
+            auto ungzip = std::make_shared<nx::utils::bstream::gzip::Uncompressor>();
             ungzip->setNextFilter( std::move(m_incomingTransactionStreamParser) );
             m_incomingTransactionStreamParser = std::move(ungzip);
         }
@@ -1356,17 +1363,17 @@ void QnTransactionTransportBase::at_responseReceived(const nx_http::AsyncHttpCli
                 Qn::EC2_BASE64_ENCODING_REQUIRED_HEADER_NAME ) == "true" )
         {
             //inserting base64 decoder before the last filter
-            m_incomingTransactionStreamParser = nx_bsf::insert(
+            m_incomingTransactionStreamParser = nx::utils::bstream::insert(
                 m_incomingTransactionStreamParser,
-                nx_bsf::last( m_incomingTransactionStreamParser ),
+                nx::utils::bstream::last( m_incomingTransactionStreamParser ),
                 std::make_shared<Base64DecoderFilter>() );
 
             //base64-encoded data contains multiple transactions so
             //    inserting sized data decoder after base64 decoder
-            m_incomingTransactionStreamParser = nx_bsf::insert(
+            m_incomingTransactionStreamParser = nx::utils::bstream::insert(
                 m_incomingTransactionStreamParser,
-                nx_bsf::last( m_incomingTransactionStreamParser ),
-                std::make_shared<nx_bsf::SizedDataDecodingFilter>() );
+                nx::utils::bstream::last( m_incomingTransactionStreamParser ),
+                std::make_shared<nx::utils::bstream::SizedDataDecodingFilter>() );
         }
 
         auto keepAliveHeaderIter = m_httpClient->response()->headers.find(Qn::EC2_CONNECTION_TIMEOUT_HEADER_NAME);
@@ -1501,37 +1508,6 @@ void QnTransactionTransportBase::setRemoteIdentityTime(qint64 time)
 qint64 QnTransactionTransportBase::remoteIdentityTime() const
 {
     return m_remoteIdentityTime;
-}
-
-bool QnTransactionTransportBase::skipTransactionForMobileClient(ApiCommand::Value command) {
-    switch (command) {
-    case ApiCommand::getMediaServersEx:
-    case ApiCommand::saveCameras:
-    case ApiCommand::getCamerasEx:
-    case ApiCommand::getUsers:
-    case ApiCommand::saveLayouts:
-    case ApiCommand::getLayouts:
-    case ApiCommand::removeResource:
-    case ApiCommand::removeCamera:
-    case ApiCommand::removeMediaServer:
-    case ApiCommand::removeUser:
-    case ApiCommand::removeLayout:
-    case ApiCommand::saveCamera:
-    case ApiCommand::saveMediaServer:
-    case ApiCommand::saveUser:
-    case ApiCommand::saveLayout:
-    case ApiCommand::setResourceStatus:
-    case ApiCommand::setResourceParam:
-    case ApiCommand::setResourceParams:
-    case ApiCommand::saveCameraUserAttributes:
-    case ApiCommand::saveMediaServerUserAttributes:
-    case ApiCommand::getCameraHistoryItems:
-    case ApiCommand::addCameraHistoryItem:
-        return false;
-    default:
-        break;
-    }
-    return true;
 }
 
 void QnTransactionTransportBase::scheduleAsyncRead()

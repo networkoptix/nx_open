@@ -29,6 +29,7 @@
 #include <recorder/recording_manager.h>
 #include <utils/common/buffered_file.h>
 #include <utils/media/ffmpeg_helper.h>
+#include <media_server/media_server_module.h>
 
 namespace {
 static const int kMotionPrebufferSize = 8;
@@ -51,6 +52,7 @@ QnServerStreamRecorder::QnServerStreamRecorder(
     m_catalog(catalog),
     m_mediaProvider(mediaProvider),
     m_dualStreamingHelper(0),
+    m_forcedScheduleRecordDurationMs(0),
     m_usedPanicMode(false),
     m_usedSpecialRecordingMode(false),
     m_lastMotionState(false),
@@ -63,7 +65,7 @@ QnServerStreamRecorder::QnServerStreamRecorder(
     m_lastMotionTimeUsec = AV_NOPTS_VALUE;
     //m_needUpdateStreamParams = true;
     m_lastWarningTime = 0;
-    m_mediaServer = qSharedPointerDynamicCast<QnMediaServerResource> (qnResPool->getResourceById(getResource()->getParentId()));
+    m_mediaServer = qSharedPointerDynamicCast<QnMediaServerResource> (resourcePool()->getResourceById(getResource()->getParentId()));
 
     QnScheduleTask::Data scheduleData;
     scheduleData.m_startTime = 0;
@@ -466,7 +468,7 @@ int QnServerStreamRecorder::getFpsForValue(int fps)
     }
 }
 
-void QnServerStreamRecorder::startForcedRecording(Qn::StreamQuality quality, int fps, int beforeThreshold, int afterThreshold, int maxDuration)
+void QnServerStreamRecorder::startForcedRecording(Qn::StreamQuality quality, int fps, int beforeThreshold, int afterThreshold, int maxDurationSec)
 {
     Q_UNUSED(beforeThreshold)
 
@@ -476,15 +478,18 @@ void QnServerStreamRecorder::startForcedRecording(Qn::StreamQuality quality, int
     scheduleData.m_beforeThreshold = 0; // beforeThreshold not used now
     scheduleData.m_afterThreshold = afterThreshold;
     scheduleData.m_fps = getFpsForValue(fps);
-    if (maxDuration) {
+    if (maxDurationSec)
+    {
         QDateTime dt = qnSyncTime->currentDateTime();
         int currentWeekSeconds = (dt.date().dayOfWeek()-1)*3600*24 + dt.time().hour()*3600 + dt.time().minute()*60 +  dt.time().second();
-        scheduleData.m_endTime = currentWeekSeconds + maxDuration;
+        scheduleData.m_endTime = currentWeekSeconds + maxDurationSec;
     }
     scheduleData.m_recordType = Qn::RT_Always;
     scheduleData.m_streamQuality = quality;
 
     m_forcedSchedileRecord.setData(scheduleData);
+    m_forcedSchedileRecordTimer.restart();
+    m_forcedScheduleRecordDurationMs = maxDurationSec * 1000;
 
     updateScheduleInfo(qnSyncTime->currentMSecsSinceEpoch());
 }
@@ -537,7 +542,7 @@ void QnServerStreamRecorder::setSpecialRecordingMode(QnScheduleTask& task)
 
 bool QnServerStreamRecorder::isPanicMode() const
 {
-    const auto onlineServers = qnResPool->getAllServers(Qn::Online);
+    const auto onlineServers = resourcePool()->getAllServers(Qn::Online);
     return boost::algorithm::any_of(onlineServers
         , [](const QnMediaServerResourcePtr& server)
     {
@@ -565,7 +570,12 @@ void QnServerStreamRecorder::updateScheduleInfo(qint64 timeMs)
             setSpecialRecordingMode(m_forcedSchedileRecord);
             m_usedSpecialRecordingMode = true;
         }
-        return;
+        bool isExpired = m_forcedScheduleRecordDurationMs > 0
+             && m_forcedSchedileRecordTimer.hasExpired(m_forcedScheduleRecordDurationMs);
+        if (isExpired)
+            stopForcedRecording();
+        else
+            return;
     }
 
     m_usedSpecialRecordingMode = m_usedPanicMode = false;
@@ -641,7 +651,7 @@ void QnServerStreamRecorder::updateCamera(const QnSecurityCamResourcePtr& camera
 
 bool QnServerStreamRecorder::isRedundantSyncOn() const
 {
-    auto mediaServer = qnCommon->currentServer();
+    auto mediaServer = commonModule()->currentServer();
     NX_ASSERT(mediaServer);
 
     if (mediaServer->getBackupSchedule().backupType != Qn::Backup_RealTime)
@@ -675,7 +685,7 @@ void QnServerStreamRecorder::getStoragesAndFileNames(QnAbstractMediaStreamDataPr
 
         if (normalStorage || backupStorage)
             setTruncateInterval(
-                MSSettings::roSettings()->value(
+                qnServerModule->roSettings()->value(
                     nx_ms_conf::MEDIA_FILE_DURATION_SECONDS,
                     nx_ms_conf::DEFAULT_MEDIA_FILE_DURATION_SECONDS).toInt());
 

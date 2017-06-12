@@ -6,7 +6,7 @@
 #ifndef NX_CDB_ATTR_NS_H
 #define NX_CDB_ATTR_NS_H
 
-#include <plugins/videodecoder/stree/resourcenameset.h>
+#include <nx/utils/stree/resourcenameset.h>
 
 
 namespace nx {
@@ -65,7 +65,7 @@ enum Value
 //!Contains description of stree attributes used by cloud_db
 class CdbAttrNameSet
 :
-    public stree::ResourceNameSet
+    public nx::utils::stree::ResourceNameSet
 {
 public:
     CdbAttrNameSet();

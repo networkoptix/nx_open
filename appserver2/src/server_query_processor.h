@@ -5,20 +5,48 @@
 
 #include <utils/common/scoped_thread_rollback.h>
 #include <nx/fusion/model_functions.h>
-#include <utils/common/concurrent.h>
+#include <nx/utils/concurrent.h>
 
 #include "ec2_thread_pool.h"
 #include "database/db_manager.h"
 #include "transaction/transaction.h"
 #include "transaction/transaction_log.h"
-#include "transaction/transaction_message_bus.h"
 #include <transaction/binary_transaction_serializer.h>
 #include <api/app_server_connection.h>
 #include <ec_connection_notification_manager.h>
 #include "ec_connection_audit_manager.h"
 #include "utils/common/threadqueue.h"
+#include <transaction/message_bus_selector.h>
 
 namespace ec2 {
+
+typedef QnSafeQueue<std::function<void()>> PostProcessList;
+
+namespace detail {
+    class ServerQueryProcessor;
+} // detail
+
+struct ServerQueryProcessorAccess
+{
+    ServerQueryProcessorAccess(detail::QnDbManager* db, QnTransactionMessageBusBase* messageBus) :
+        m_db(db),
+        m_messageBus(messageBus)
+    {
+    }
+
+    detail::ServerQueryProcessor getAccess(const Qn::UserAccessData userAccessData);
+
+    detail::QnDbManager* getDb() const { return m_db; }
+    QnTransactionMessageBusBase* messageBus() { return m_messageBus; }
+    PostProcessList* postProcessList() { return &m_postProcessList; }
+    QnMutex* updateMutex() { return &m_updateMutex; }
+    QnCommonModule* commonModule() const { return m_messageBus->commonModule();  }
+private:
+    detail::QnDbManager* m_db;
+    QnTransactionMessageBusBase* m_messageBus;
+    PostProcessList m_postProcessList;
+    QnMutex m_updateMutex;
+};
 
 namespace detail {
 
@@ -42,7 +70,7 @@ struct ScopeHandlerGuard
 
     ~ScopeHandlerGuard()
     {
-        QnConcurrent::run(Ec2ThreadPool::instance(), std::bind(std::move(handler), *ecode));
+        nx::utils::concurrent::run(Ec2ThreadPool::instance(), std::bind(std::move(handler), *ecode));
     }
 };
 
@@ -55,15 +83,18 @@ ScopeHandlerGuard<Handler> createScopeHandlerGuard(ErrorCode& errorCode, Handler
 struct AuditData
 {
     ECConnectionAuditManager* auditManager;
+    ECConnectionNotificationManager* notificationManager;
     QnAuthSession authSession;
     Qn::UserAccessData userAccessData;
 
     AuditData(
         ECConnectionAuditManager* auditManager,
+        ECConnectionNotificationManager* notificationManager,
         const QnAuthSession& authSession,
         const Qn::UserAccessData& userAccessData)
         :
         auditManager(auditManager),
+        notificationManager(notificationManager),
         authSession(authSession),
         userAccessData(userAccessData)
     {}
@@ -84,30 +115,33 @@ void triggerNotification(
             auditData.authSession);
     }
 
-    QnAppServerConnectionFactory::getConnection2()
-        ->notificationManager()
-        ->triggerNotification(tran, NotificationSource::Local);
+    // Notification manager is null means startReceivingNotification isn't called yet
+    if (auditData.notificationManager)
+        auditData.notificationManager->triggerNotification(tran, NotificationSource::Local);
 }
 }
-
-class ServerQueryProcessor;
 
 struct PostProcessTransactionFunction
 {
     template<class T>
-    void operator()(const aux::AuditData& auditData, const QnTransaction<T>& tran) const;
+    void operator()(
+        QnTransactionMessageBusBase* messageBus,
+        const aux::AuditData& auditData,
+        const QnTransaction<T>& tran) const;
 };
 
 class ServerQueryProcessor
 {
 public:
 
-    typedef QnSafeQueue<std::function<void()>> PostProcessList;
-
     virtual ~ServerQueryProcessor() {}
 
-    ServerQueryProcessor(const Qn::UserAccessData &userAccessData):
-        m_userAccessData(userAccessData),
+    ServerQueryProcessor(
+        ServerQueryProcessorAccess* owner,
+        const Qn::UserAccessData &userAccessData)
+        :
+        m_owner(owner),
+        m_db(owner->getDb(), userAccessData),
         m_auditManager(nullptr)
     {
     }
@@ -287,12 +321,12 @@ public:
     {
         QN_UNUSED(cmdCode);
 
-        Qn::UserAccessData accessDataCopy(m_userAccessData);
-        QnConcurrent::run(Ec2ThreadPool::instance(),
-            [accessDataCopy, input, handler]()
+        QnDbManagerAccess accessDataCopy(m_db);
+        nx::utils::concurrent::run(Ec2ThreadPool::instance(),
+            [accessDataCopy, input, handler]() mutable
             {
                 OutputData output;
-                const ErrorCode errorCode = dbManager(accessDataCopy).doQuery(input, output);
+                const ErrorCode errorCode = accessDataCopy.doQuery(input, output);
                 handler(errorCode, output);
             });
     }
@@ -309,12 +343,12 @@ public:
     {
         QN_UNUSED(cmdCode);
 
-        Qn::UserAccessData accessDataCopy(m_userAccessData);
-        QnConcurrent::run(Ec2ThreadPool::instance(),
+        QnDbManagerAccess accessDataCopy(m_db);
+        nx::utils::concurrent::run(Ec2ThreadPool::instance(),
             [accessDataCopy, input1, input2, handler]()
             {
                 OutputData output;
-                const ErrorCode errorCode = dbManager(accessDataCopy).doQuery(
+                const ErrorCode errorCode = accessDataCopy.doQuery(
                     input1, input2, output);
                 handler(errorCode, output);
             });
@@ -323,12 +357,14 @@ public:
     void setAuditData(ECConnectionAuditManager* auditManager, const QnAuthSession& authSession);
 
 private:
-    static PostProcessList& getStaticPostProcessList();
-    static QnMutex& getStaticUpdateMutex();
-
     aux::AuditData createAuditDataCopy()
     {
-        return aux::AuditData(m_auditManager, m_authSession, m_userAccessData);
+        const auto& ec2Connection = m_owner->commonModule()->ec2Connection();
+        return aux::AuditData(
+            m_auditManager,
+            ec2Connection ? ec2Connection->notificationManager() : nullptr,
+            m_authSession,
+            m_db.userAccessData());
     }
 
     /**
@@ -344,18 +380,17 @@ private:
         ErrorCode errorCode = ErrorCode::ok;
         auto scopeGuard = aux::createScopeHandlerGuard(errorCode, completionHandler);
 
-        PostProcessList& transactionsPostProcessList = getStaticPostProcessList();
-        QnMutex& updateDataMutex = getStaticUpdateMutex();
+        PostProcessList* transactionsPostProcessList = m_owner->postProcessList();
         // Starting transaction.
         {
-            QnMutexLocker lock(&updateDataMutex);
+            QnMutexLocker lock(m_owner->updateMutex());
             std::unique_ptr<detail::QnDbManager::QnDbTransactionLocker> dbTran;
             PostProcessList localPostProcessList;
 
             if (ApiCommand::isPersistent(tran.command))
             {
                 dbTran.reset(new detail::QnDbManager::QnDbTransactionLocker(
-                    dbManager(m_userAccessData).getTransaction()));
+                    m_db.getTransaction()));
                 errorCode = syncFunction(tran, &localPostProcessList);
                 if (errorCode != ErrorCode::ok)
                     return;
@@ -367,22 +402,23 @@ private:
             }
             else
             {
-                if (!getTransactionDescriptorByTransaction(tran)->checkSavePermissionFunc(m_userAccessData, tran.params))
+                if (!getTransactionDescriptorByTransaction(tran)->checkSavePermissionFunc(m_owner->commonModule(), m_db.userAccessData(), tran.params))
                 {
                     errorCode = ErrorCode::forbidden;
                     return;
                 }
-                localPostProcessList.push(std::bind(PostProcessTransactionFunction(), createAuditDataCopy(), tran));
+                localPostProcessList.push(std::bind(
+                    PostProcessTransactionFunction(), m_owner->messageBus(), createAuditDataCopy(), tran));
             }
 
             std::function<void()> postProcessAction;
             while (localPostProcessList.pop(postProcessAction, 0))
-                transactionsPostProcessList.push(postProcessAction);
+                transactionsPostProcessList->push(postProcessAction);
         }
 
         // Sending transactions.
         std::function<void()> postProcessAction;
-        while (transactionsPostProcessList.pop(postProcessAction, 0))
+        while (transactionsPostProcessList->pop(postProcessAction, 0))
             postProcessAction();
 
         // Handler is invoked asynchronously.
@@ -432,7 +468,7 @@ private:
         PostProcessList* const transactionsPostProcessList)
     {
         ErrorCode errorCode = ErrorCode::ok;
-        auto connection = QnAppServerConnectionFactory::getConnection2();
+        auto connection = m_owner->commonModule()->ec2Connection();
 
         #define RUN_AND_CHECK_ERROR(EXPR, MESSAGE) do \
         { \
@@ -485,7 +521,7 @@ private:
                     processMultiUpdateSync(
                         ApiCommand::removeResource,
                         tran.transactionType,
-                        dbManager(m_userAccessData)
+                        m_db
                             .getNestedObjectsNoLock(ApiObjectInfo(resourceType, tran.params.id))
                             .toIdList(),
                         transactionsPostProcessList),
@@ -527,12 +563,35 @@ private:
                     processMultiUpdateSync(
                         ApiCommand::removeLayout,
                         tran.transactionType,
-                        dbManager(m_userAccessData)
+                        m_db
                             .getNestedObjectsNoLock(ApiObjectInfo(resourceType, tran.params.id))
                             .toIdList(),
                         transactionsPostProcessList),
                     lit("Remove user child resources failed"));
 
+                // Removing owned layout tours
+                const auto tourIds = m_db.getLayoutToursNoLock(tran.params.id);
+                RUN_AND_CHECK_ERROR(
+                    processMultiUpdateSync(
+                        ApiCommand::removeLayoutTour,
+                        tran.transactionType,
+                        tourIds,
+                        transactionsPostProcessList),
+                    lit("Remove user child layout tours failed"));
+
+                // Removing autogenerated layouts, belonging to layout tours
+                for (const auto& tourId: tourIds)
+                {
+                    RUN_AND_CHECK_ERROR(
+                        processMultiUpdateSync(
+                            ApiCommand::removeLayout,
+                            tran.transactionType,
+                            m_db
+                            .getNestedObjectsNoLock(ApiObjectInfo(ApiObject_User, tourId.id))
+                            .toIdList(),
+                            transactionsPostProcessList),
+                        lit("Remove autogenerated tour's layouts failed"));
+                }
                 break;
             }
 
@@ -542,7 +601,7 @@ private:
                     processMultiUpdateSync(
                         ApiCommand::removeLayout,
                         tran.transactionType,
-                        dbManager(m_userAccessData)
+                        m_db
                             .getNestedObjectsNoLock(ApiObjectInfo(resourceType, tran.params.id))
                             .toIdList(),
                         transactionsPostProcessList),
@@ -577,7 +636,7 @@ private:
         ErrorCode errorCode = processMultiUpdateSync(
             ApiCommand::removeEventRule,
             tran.transactionType,
-            dbManager(m_userAccessData).getObjectsNoLock(ApiObject_BusinessRule).toIdList(),
+            m_db.getObjectsNoLock(ApiObject_BusinessRule).toIdList(),
             transactionsPostProcessList);
         if(errorCode != ErrorCode::ok)
             return errorCode;
@@ -597,21 +656,21 @@ private:
     {
         NX_ASSERT(ApiCommand::isPersistent(tran.command));
 
-        tran.transactionType = getTransactionDescriptorByTransaction(tran)->getTransactionTypeFunc(tran.params);
+        tran.transactionType = getTransactionDescriptorByTransaction(tran)->getTransactionTypeFunc(m_db.db()->commonModule(), tran.params, m_db.db());
         if (tran.transactionType == TransactionType::Unknown)
             return ErrorCode::forbidden;
 
-        transactionLog->fillPersistentInfo(tran);
-        QByteArray serializedTran = QnUbjsonTransactionSerializer::instance()->serializedTransaction(tran);
+        m_db.db()->transactionLog()->fillPersistentInfo(tran);
+        QByteArray serializedTran = m_owner->messageBus()->ubjsonTranSerializer()->serializedTransaction(tran);
 
         ErrorCode errorCode =
-            dbManager(m_userAccessData).executeTransactionNoLock(tran, serializedTran);
+            m_db.executeTransactionNoLock(tran, serializedTran);
         NX_ASSERT(errorCode != ErrorCode::containsBecauseSequence
             && errorCode != ErrorCode::containsBecauseTimestamp);
         if (errorCode != ErrorCode::ok)
             return errorCode;
 
-        transactionsPostProcessList->push(std::bind(PostProcessTransactionFunction(), createAuditDataCopy(), tran));
+        transactionsPostProcessList->push(std::bind(PostProcessTransactionFunction(), m_owner->messageBus(), createAuditDataCopy(), tran));
 
         return errorCode;
     }
@@ -635,7 +694,7 @@ private:
             case ApiCommand::removeResource:
             {
                 QnTransaction<ApiIdData> updatedTran = tran;
-                switch(dbManager(m_userAccessData).getObjectTypeNoLock(tran.params.id))
+                switch(m_db.getObjectTypeNoLock(tran.params.id))
                 {
                     case ApiObject_Server:
                         updatedTran.command = ApiCommand::removeMediaServer;
@@ -712,7 +771,8 @@ private:
 
 
 private:
-    Qn::UserAccessData m_userAccessData;
+    ServerQueryProcessorAccess* m_owner;
+    QnDbManagerAccess m_db;
     ECConnectionAuditManager* m_auditManager;
     QnAuthSession m_authSession;
 
@@ -721,27 +781,22 @@ private:
         ApiCommand::Value command,
         DataType data)
     {
-        QnTransaction<DataType> transaction(command, std::move(data));
-        transaction.historyAttributes.author = m_userAccessData.userId;
+        QnTransaction<DataType> transaction(command, m_owner->commonModule()->moduleGUID(), std::move(data));
+        transaction.historyAttributes.author = m_db.userAccessData().userId;
         return transaction;
     }
 };
 
 template<class T>
-void PostProcessTransactionFunction::operator()(const aux::AuditData& auditData, const QnTransaction<T>& tran) const
+void PostProcessTransactionFunction::operator()(
+    QnTransactionMessageBusBase* messageBus,
+    const aux::AuditData& auditData,
+    const QnTransaction<T>& tran) const
 {
-    qnTransactionBus->sendTransaction(tran);
+    sendTransaction(messageBus, tran);
     aux::triggerNotification(auditData, tran);
 }
 
 } // namespace detail
-
-struct ServerQueryProcessorAccess
-{
-    detail::ServerQueryProcessor getAccess(const Qn::UserAccessData userAccessData)
-    {
-        return detail::ServerQueryProcessor(userAccessData);
-    }
-};
 
 } // namespace ec2

@@ -315,35 +315,44 @@ void fromResourceListToApi(const QnCameraUserAttributesList& src, ApiCameraAttri
 //// ApiCameraDataEx
 ////////////////////////////////////////////////////////////
 
-void fromApiToResource(const ApiCameraDataEx& src, QnVirtualCameraResourcePtr& dst)
+void fromApiToResource(
+    const ApiCameraDataEx& src,
+    QnVirtualCameraResourcePtr& dst,
+    QnCameraUserAttributePool* attributesPool)
 {
     fromApiToResource(static_cast<const ApiCameraData&>(src), dst);
     //TODO #ak using QnCameraUserAttributePool here is not good
-    QnCameraUserAttributePool::ScopedLock userAttributesLock(QnCameraUserAttributePool::instance(), dst->getId());
+    QnCameraUserAttributePool::ScopedLock userAttributesLock(attributesPool, dst->getId());
     fromApiToResource(static_cast<const ApiCameraAttributesData&>(src), *userAttributesLock);
 
     for (const ApiResourceParamData& srcParam: src.addParams)
         dst->setProperty(srcParam.name, srcParam.value, QnResource::NO_MARK_DIRTY);
 }
 
-void fromResourceToApi(const QnVirtualCameraResourcePtr& src, ApiCameraDataEx& dst)
+void fromResourceToApi(
+    const QnVirtualCameraResourcePtr& src,
+    ApiCameraDataEx& dst,
+    QnCameraUserAttributePool* attributesPool)
 {
     fromResourceToApi(src, static_cast<ApiCameraData&>(dst));
     //TODO #ak using QnCameraUserAttributePool here is not good
-    QnCameraUserAttributePool::ScopedLock userAttributesLock(QnCameraUserAttributePool::instance(), src->getId());
+    QnCameraUserAttributePool::ScopedLock userAttributesLock(attributesPool, src->getId());
     fromResourceToApi(*userAttributesLock, static_cast<ApiCameraAttributesData&>(dst));
 
     for (const ec2::ApiResourceParamData& srcParam: src->getRuntimeProperties())
         dst.addParams.push_back(srcParam);
 }
 
-void fromResourceListToApi(const QnVirtualCameraResourceList& src, ApiCameraDataExList& dst)
+void fromResourceListToApi(
+    const QnVirtualCameraResourceList& src,
+    ApiCameraDataExList& dst,
+    QnCameraUserAttributePool* attributesPool)
 {
     dst.reserve(dst.size() + src.size());
     for (const QnVirtualCameraResourcePtr& srcCamera: src)
     {
         dst.push_back(ApiCameraDataEx());
-        fromResourceToApi(srcCamera, dst.back());
+        fromResourceToApi(srcCamera, dst.back(), attributesPool);
     }
 }
 
@@ -528,7 +537,7 @@ void fromApiToResourceList(const ApiLicenseDataList& src, QnLicenseList& dst)
 
 void deserializeNetAddrList(const QString& source, QList<SocketAddress>& target)
 {
-    for (const auto& addr : source.split(L';'))
+    for (const auto& addr : source.split(L';', QString::SkipEmptyParts))
         target.push_back(addr);
 }
 
@@ -596,25 +605,25 @@ void fromApiToResource(const ApiMediaServerData& src, QnMediaServerResourcePtr& 
 }
 
 template<class List>
-void fromApiToResourceList(const ApiMediaServerDataList& src, List& dst, const overload_tag&)
+void fromApiToResourceList(const ApiMediaServerDataList& src, List& dst, const overload_tag&, QnCommonModule* commonModule)
 {
     dst.reserve(dst.size() + (int)src.size());
     for (const ApiMediaServerData& srcServer: src)
     {
-        QnMediaServerResourcePtr dstServer(new QnMediaServerResource());
+        QnMediaServerResourcePtr dstServer(new QnMediaServerResource(commonModule));
         fromApiToResource(srcServer, dstServer);
         dst.push_back(std::move(dstServer));
     }
 }
 
-void fromApiToResourceList(const ApiMediaServerDataList& src, QnResourceList& dst)
+void fromApiToResourceList(const ApiMediaServerDataList& src, QnResourceList& dst, QnCommonModule* commonModule)
 {
-    fromApiToResourceList(src, dst, overload_tag());
+    fromApiToResourceList(src, dst, overload_tag(), commonModule);
 }
 
-void fromApiToResourceList(const ApiMediaServerDataList& src, QnMediaServerResourceList& dst)
+void fromApiToResourceList(const ApiMediaServerDataList& src, QnMediaServerResourceList& dst, QnCommonModule* commonModule)
 {
-    fromApiToResourceList(src, dst, overload_tag());
+    fromApiToResourceList(src, dst, overload_tag(), commonModule);
 }
 
 
@@ -732,9 +741,11 @@ static QnUserType userResourceType(bool isLdap, bool isCloud)
                      QnUserType::Local;
 }
 
-QnUserResourcePtr fromApiToResource(const ApiUserData& src)
+QnUserResourcePtr fromApiToResource(const ApiUserData& src, QnCommonModule* commonModule)
 {
     QnUserResourcePtr dst(new QnUserResource(userResourceType(src.isLdap, src.isCloud)));
+    if (commonModule)
+        dst->setCommonModule(commonModule);
     fromApiToResource(src, dst);
     return dst;
 }

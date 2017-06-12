@@ -1,5 +1,7 @@
 #include "lite_client_controller.h"
 
+#include <common/common_module.h>
+
 #include <core/resource_management/resource_pool.h>
 #include <core/resource_management/resource_properties.h>
 #include <core/resource_management/resources_changes_manager.h>
@@ -20,7 +22,7 @@ namespace {
 
 } // namespace
 
-class QnLiteClientControllerPrivate: public QObject
+class QnLiteClientControllerPrivate: public QObject, public QnConnectionContextAware
 {
     Q_DECLARE_PUBLIC(QnLiteClientController)
     QnLiteClientController* q_ptr;
@@ -79,22 +81,22 @@ void QnLiteClientController::setServerId(const QString& serverId)
     if (d->serverId == id)
         return;
 
-    d->server = qnResPool->getResourceById<QnMediaServerResource>(id);
+    d->server = resourcePool()->getResourceById<QnMediaServerResource>(id);
     emit serverIdChanged();
 
     if (d->server)
     {
         d->serverId = d->server->getId();
 
-        connect(qnRuntimeInfoManager, &QnRuntimeInfoManager::runtimeInfoAdded,
+        connect(runtimeInfoManager(), &QnRuntimeInfoManager::runtimeInfoAdded,
             d, &QnLiteClientControllerPrivate::at_runtimeInfoAdded);
-        connect(qnRuntimeInfoManager, &QnRuntimeInfoManager::runtimeInfoRemoved,
+        connect(runtimeInfoManager(), &QnRuntimeInfoManager::runtimeInfoRemoved,
             d, &QnLiteClientControllerPrivate::at_runtimeInfoRemoved);
 
         connect(d->server, &QnMediaServerResource::statusChanged,
             d, &QnLiteClientControllerPrivate::updateServerStatus);
 
-        const auto items = qnRuntimeInfoManager->items()->getItems();
+        const auto items = runtimeInfoManager()->items()->getItems();
         const auto it = std::find_if(items.begin(), items.end(),
             [d](const QnPeerRuntimeInfo& info)
             {
@@ -107,7 +109,7 @@ void QnLiteClientController::setServerId(const QString& serverId)
     }
     else
     {
-        disconnect(qnRuntimeInfoManager, nullptr, this, nullptr);
+        disconnect(runtimeInfoManager(), nullptr, this, nullptr);
         d->setClientState(State::Stopped);
     }
 
@@ -181,7 +183,7 @@ void QnLiteClientController::stopLiteClient()
     message.operation = QnVideoWallControlMessage::Exit;
     message.videowallGuid = d->serverId;
 
-    const auto connection = QnAppServerConnectionFactory::getConnection2();
+    const auto connection = commonModule()->ec2Connection();
     const auto videowallManager = connection->getVideowallManager(Qn::kSystemAccess);
     videowallManager->sendControlMessage(message, this, []{});
 }

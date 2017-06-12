@@ -13,15 +13,13 @@
 #include <boost/preprocessor/cat.hpp>
 #endif
 
-#ifndef QN_NO_QT
-#   include <QtCore/QString>
-#   include <QtCore/QByteArray>
-#   include <QtCore/QUrl>
-#   include <nx/utils/uuid.h>
-#endif
+#include <QtCore/QString>
+#include <QtCore/QByteArray>
+#include <QtCore/QUrl>
 
 #include <nx/utils/collection.h>
 #include <nx/utils/latin1_array.h>
+#include <nx/utils/uuid.h>
 
 #include "collection_fwd.h"
 #include "ubjson.h"
@@ -320,5 +318,9 @@ bool deserialize(QnUbjsonReader<Input> *stream, std::array<T, N> *target) {
     return true;
 }
 
+QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
+(QSize)(QSizeF)(QRect)(QRectF)(QPoint)(QPointF)(QVector2D)(QVector3D)(QVector4D),
+(ubjson)
+)
 
 #endif // QN_UBJSON_FUNCTIONS_H

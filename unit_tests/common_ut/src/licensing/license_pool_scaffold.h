@@ -1,21 +1,24 @@
-#ifndef QN_LICENSE_POOL_SCAFFOLD
-#define QN_LICENSE_POOL_SCAFFOLD
+#pragma once
 
-#include <licensing/license.h>
+#include <common/common_globals.h>
+
+class QnLicensePool;
 
 /** RAII class for managing license pool. */
-class QnLicensePoolScaffold {
+class QnLicensePoolScaffold
+{
 public:
-    QnLicensePoolScaffold(bool isArm = false);
+    QnLicensePoolScaffold(QnLicensePool* licensePool);
     ~QnLicensePoolScaffold();
 
     void addLicense(Qn::LicenseType licenseType);
     void addLicenses(Qn::LicenseType licenseType, int count);
 
     void addFutureLicenses(int count);
-private:
-    /** Are we emulating the arm server. */
-    bool m_arm;
-};
 
-#endif  // QN_LICENSE_POOL_SCAFFOLD
+    void setArmMode(bool isArm = true);
+private:
+    QnLicensePool* const m_licensePool {nullptr};
+    /** Are we emulating the arm server. */
+    bool m_arm {false};
+};

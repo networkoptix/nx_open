@@ -25,8 +25,9 @@ int QnQtFileStorageResource::getCapabilities() const
     return m_capabilities;
 }
 
-QnQtFileStorageResource::QnQtFileStorageResource() 
-    : m_capabilities(0)
+QnQtFileStorageResource::QnQtFileStorageResource(QnCommonModule* commonModule):
+    base_type(commonModule),
+    m_capabilities(0)
 {
     m_capabilities |= cap::ListFile;
     m_capabilities |= cap::ReadFile;
@@ -88,7 +89,7 @@ qint64 QnQtFileStorageResource::getFileSize(const QString& url) const
 	return 0; // not implemented
 }
 
-Qn::StorageInitResult QnQtFileStorageResource::initOrUpdate() 
+Qn::StorageInitResult QnQtFileStorageResource::initOrUpdate()
 {
     QString tmpDir = closeDirPath(getUrl()) + QLatin1String("tmp")
         + QString::number(nx::utils::random::number<uint>());
@@ -104,7 +105,7 @@ Qn::StorageInitResult QnQtFileStorageResource::initOrUpdate()
             dir.rmdir(tmpDir);
             return Qn::StorageInit_Ok;
         }
-        else 
+        else
             return Qn::StorageInit_WrongPath;
     }
 
@@ -117,9 +118,9 @@ QString QnQtFileStorageResource::removeProtocolPrefix(const QString& url) const
     return prefix == -1 ? url : url.mid(prefix + 3);
 }
 
-QnStorageResource* QnQtFileStorageResource::instance(const QString&)
+QnStorageResource* QnQtFileStorageResource::instance(QnCommonModule* commonModule, const QString&)
 {
-    return new QnQtFileStorageResource();
+    return new QnQtFileStorageResource(commonModule);
 }
 
 #endif //ENABLE_DATA_PROVIDERS

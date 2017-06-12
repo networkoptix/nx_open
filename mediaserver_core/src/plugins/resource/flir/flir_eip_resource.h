@@ -1,5 +1,6 @@
-#ifndef FLIR_EIP_RESOURCE_H
-#define FLIR_EIP_RESOURCE_H
+#pragma once
+
+#ifdef ENABLE_FLIR
 
 #include <core/resource/security_cam_resource.h>
 #include <core/resource/camera_resource.h>
@@ -24,6 +25,12 @@ public:
 
     QnFlirEIPResource();
     ~QnFlirEIPResource();
+
+    struct PortTimerEntry
+    {
+        QString portId;
+        bool state;
+    };
 
     enum class ParamsRequestMode{
         GetMode, SetMode
@@ -81,6 +88,7 @@ private:
     std::shared_ptr<EIPAsyncClient> m_eipAsyncClient;
     std::shared_ptr<EIPAsyncClient> m_outputEipAsyncClient;
     std::shared_ptr<EIPAsyncClient> m_alarmsEipAsyncClient;
+    std::map<quint64, PortTimerEntry> m_autoResetTimers;
 
 private:
     MessageRouterRequest buildEIPGetRequest(const QnCameraAdvancedParameter& param) const;
@@ -134,4 +142,4 @@ private slots:
     void routeAlarmMonitoringFlow();
 };
 
-#endif // FLIR_EIP_RESOURCE_H
+#endif // ENABLE_FLIR

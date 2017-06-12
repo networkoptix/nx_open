@@ -1,5 +1,8 @@
-#include <atomic>
 #include "server_rest_connection.h"
+
+#include <atomic>
+
+#include <QtCore/QElapsedTimer>
 
 #include <api/model/password_data.h>
 #include <api/model/cloud_credentials_data.h>
@@ -18,10 +21,12 @@
 
 #include <nx/fusion/model_functions.h>
 #include <network/router.h>
-#include <http/custom_headers.h>
-#include <nx/network/http/httptypes.h>
+#include <nx/network/http/custom_headers.h>
+#include <nx/network/http/http_types.h>
 #include <utils/common/delayed.h>
+#include <utils/common/synctime.h>
 #include <nx/utils/log/log.h>
+#include <common/common_module.h>
 
 namespace {
     static const size_t ResponseReadTimeoutMs = 15 * 1000;
@@ -42,7 +47,12 @@ namespace {
 namespace rest
 {
 
-ServerConnection::ServerConnection(const QnUuid& serverId):
+ServerConnection::ServerConnection(
+    QnCommonModule* commonModule,
+    const QnUuid& serverId)
+    :
+    QObject(),
+    QnCommonModuleAware(commonModule),
     m_serverId(serverId)
 {
     auto httpPool = nx_http::ClientPool::instance();
@@ -72,16 +82,29 @@ rest::Handle ServerConnection::cameraThumbnailAsync( const QnThumbnailRequestDat
 rest::Handle ServerConnection::twoWayAudioCommand(const QnUuid& cameraId, bool start, GetCallback callback, QThread* targetThread /*= 0*/)
 {
     QnRequestParamList params;
-    params.insert(lit("clientId"),      qnCommon->moduleGUID().toString());
+    params.insert(lit("clientId"),      commonModule()->moduleGUID().toString());
     params.insert(lit("resourceId"),    cameraId.toString());
     params.insert(lit("action"),        start ? lit("start") : lit("stop"));
     return executeGet(lit("/api/transmitAudio"), params, callback, targetThread);
 }
 
+rest::Handle ServerConnection::softwareTriggerCommand(const QnUuid& cameraId, const QString& triggerId,
+    QnBusiness::EventState toggleState, GetCallback callback, QThread* targetThread)
+{
+    QnRequestParamList params;
+    params.insert(lit("timestamp"), lit("%1").arg(qnSyncTime->currentMSecsSinceEpoch()));
+    params.insert(lit("event_type"), QnLexical::serialized(QnBusiness::SoftwareTriggerEvent));
+    params.insert(lit("inputPortId"), triggerId);
+    params.insert(lit("eventResourceId"), cameraId.toString());
+    if (toggleState != QnBusiness::UndefinedState)
+        params.insert(lit("state"), QnLexical::serialized(toggleState));
+    return executeGet(lit("/api/createEvent"), params, callback, targetThread);
+}
+
 QnMediaServerResourcePtr ServerConnection::getServerWithInternetAccess() const
 {
     QnMediaServerResourcePtr server =
-        qnResPool->getResourceById<QnMediaServerResource>(qnCommon->remoteGUID());
+        commonModule()->resourcePool()->getResourceById<QnMediaServerResource>(commonModule()->remoteGUID());
     if (!server)
         return QnMediaServerResourcePtr(); //< something wrong. No current server available
 
@@ -89,7 +112,7 @@ QnMediaServerResourcePtr ServerConnection::getServerWithInternetAccess() const
         return server;
 
     // Current server doesn't have internet access. Try to find another one
-    for (const auto server: qnResPool->getAllServers(Qn::Online))
+    for (const auto server: commonModule()->resourcePool()->getAllServers(Qn::Online))
     {
         if (server->getServerFlags().testFlag(Qn::SF_HasPublicIP))
             return server;
@@ -159,11 +182,11 @@ Handle ServerConnection::detachSystemFromCloud(
     PasswordData data;
     if (!resetAdminPassword.isEmpty())
     {
-        auto admin = qnResPool->getAdministrator();
+        auto admin = commonModule()->resourcePool()->getAdministrator();
         NX_ASSERT(admin);
         if (!admin)
             return Handle();
-        data = PasswordData::calculateHashes(admin->getName(), resetAdminPassword);
+        data = PasswordData::calculateHashes(admin->getName(), resetAdminPassword, false);
     }
 
     return executePost(
@@ -233,8 +256,8 @@ QUrl ServerConnection::prepareUrl(const QString& path, const QnRequestParamList&
     result.setPath(path);
     QUrlQuery q;
     for (const auto& param: params)
-        q.addQueryItem(param.first, param.second);
-    result.setQuery(q.toString());
+        q.addQueryItem(param.first, QString::fromUtf8(QUrl::toPercentEncoding(param.second)));
+    result.setQuery(q);
     return result;
 }
 
@@ -398,8 +421,11 @@ nx_http::ClientPool::Request ServerConnection::prepareRequest(
     const nx_http::StringType& contentType,
     const nx_http::StringType& messageBody)
 {
-    const auto server =  qnResPool->getResourceById<QnMediaServerResource>(m_serverId);
+    const auto server =  commonModule()->resourcePool()->getResourceById<QnMediaServerResource>(m_serverId);
     if (!server)
+        return nx_http::ClientPool::Request();
+    const auto connection = commonModule()->ec2Connection();
+    if (!connection)
         return nx_http::ClientPool::Request();
 
     nx_http::ClientPool::Request request;
@@ -410,31 +436,32 @@ nx_http::ClientPool::Request ServerConnection::prepareRequest(
     request.contentType = contentType;
     request.messageBody = messageBody;
 
-    QString user = QnAppServerConnectionFactory::url().userName();
-    QString password = QnAppServerConnectionFactory::url().password();
+    QString user = connection->connectionInfo().ecUrl.userName();
+    QString password = connection->connectionInfo().ecUrl.password();
     if (user.isEmpty() || password.isEmpty())
     {
         // if auth is not known, use server auth key
         user = server->getId().toString();
         password = server->getAuthKey();
     }
-    auto videoWallGuid = QnAppServerConnectionFactory::videowallGuid();
+    auto videoWallGuid = commonModule()->videowallGuid();
     if (!videoWallGuid.isNull())
         request.headers.emplace(Qn::VIDEOWALL_GUID_HEADER_NAME, videoWallGuid.toByteArray());
     request.headers.emplace(Qn::SERVER_GUID_HEADER_NAME, server->getId().toByteArray());
     request.headers.emplace(
-        Qn::EC2_RUNTIME_GUID_HEADER_NAME, qnCommon->runningInstanceGUID().toByteArray());
+        Qn::EC2_RUNTIME_GUID_HEADER_NAME, commonModule()->runningInstanceGUID().toByteArray());
     request.headers.emplace(Qn::CUSTOM_USERNAME_HEADER_NAME, user.toLower().toUtf8());
 
-    QnRoute route = QnRouter::instance()->routeTo(server->getId());
+    const auto& router = commonModule()->router();
+    QnRoute route = router->routeTo(server->getId());
     if (route.reverseConnect)
     {
         // no route exists. proxy via nearest server
-        auto nearestServer = qnCommon->currentServer();
+        auto nearestServer = commonModule()->currentServer();
         if (!nearestServer)
             return nx_http::ClientPool::Request();
         QUrl nearestUrl(server->getApiUrl());
-        if (nearestServer->getId() == qnCommon->moduleGUID())
+        if (nearestServer->getId() == commonModule()->moduleGUID())
             request.url.setHost(lit("127.0.0.1"));
         else
             request.url.setHost(nearestUrl.host());

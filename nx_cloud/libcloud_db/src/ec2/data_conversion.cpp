@@ -74,7 +74,7 @@ void convert(const api::SystemSharing& from, ::ec2::ApiUserData* const to)
             QString::fromStdString(from.customPermissions));
     to->userRoleId = QnUuid::fromStringSafe(from.userRoleId);
     to->isEnabled = from.isEnabled;
-    to->realm = QnAppInfo::realm();
+    to->realm = nx::network::AppInfo::realm();
     to->hash = "password_is_in_cloud";
     to->digest = "password_is_in_cloud";
     accessRoleToPermissions(from.accessRole, &to->permissions, &to->isAdmin);

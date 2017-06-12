@@ -8,8 +8,6 @@
 #include <nx/fusion/model_functions.h>
 #include <nx/utils/log/log.h>
 
-#include <utils/db/db_helper.h>
-
 #include "async_sql_query_executor.h"
 
 namespace nx {

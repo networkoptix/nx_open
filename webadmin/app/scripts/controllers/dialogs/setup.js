@@ -381,7 +381,7 @@ angular.module('webadminApp')
 
              Serverside related changes:
 
-             result.setError(QnRestResult::CantProcessRequest, QnAppInfo::cloudName() + " is not accessible yet. Please try again later.");
+             result.setError(QnRestResult::CantProcessRequest, nx::network::AppInfo::cloudName() + " is not accessible yet. Please try again later.");
              +        return nx_http::StatusCode::ok;
 
              */

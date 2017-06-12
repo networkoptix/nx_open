@@ -1,8 +1,3 @@
-/**********************************************************
-* May 17, 2016
-* akolesnikov
-***********************************************************/
-
 #include "settings.h"
 
 #include <thread>
@@ -12,10 +7,9 @@
 #include <QtCore/QString>
 
 #include <nx/fusion/serialization/lexical.h>
-#include <nx/network/http/httptypes.h>
+#include <nx/network/http/http_types.h>
+#include <nx/utils/app_info.h>
 #include <nx/utils/timer_manager.h>
-
-#include <utils/common/app_info.h>
 
 #include "libvms_gateway_app_info.h"
 
@@ -97,8 +91,7 @@ namespace cloud {
 namespace gateway {
 namespace conf {
 
-Http::Http()
-:
+Http::Http():
     proxyTargetPort(0),
     connectSupport(false),
     allowTargetEndpointInUrl(false),
@@ -106,30 +99,27 @@ Http::Http()
 {
 }
 
-Settings::Settings()
-:
-    m_settings(
-        QnAppInfo::organizationNameForSettings(),
+Settings::Settings():
+    base_type(
+        nx::utils::AppInfo::organizationNameForSettings(),
         QnLibVmsGatewayAppInfo::applicationName(),
-        kModuleName),
-    m_showHelp(false)
+        kModuleName)
 {
-    fillSupportedCmdParameters();
 }
 
-bool Settings::showHelp() const
+QString Settings::dataDir() const
 {
-    return m_showHelp;
+    return m_general.dataDir;
+}
+
+nx::utils::log::Settings Settings::logging() const
+{
+    return m_logging;
 }
 
 const General& Settings::general() const
 {
     return m_general;
-}
-
-const nx::utils::log::Settings& Settings::logging() const
-{
-    return m_logging;
 }
 
 const Auth& Settings::auth() const
@@ -152,31 +142,12 @@ const CloudConnect& Settings::cloudConnect() const
     return m_cloudConnect;
 }
 
-void Settings::load( int argc, const char **argv )
-{
-    m_commandLineParser.parse(argc, argv, stderr);
-    m_settings.parseArgs(argc, argv);
-
-    loadConfiguration();
-}
-
-void Settings::printCmdLineArgsHelp()
-{
-    //TODO #ak
-}
-
-void Settings::fillSupportedCmdParameters()
-{
-    m_commandLineParser.addParameter(
-        &m_showHelp, "--help", NULL, "Show help message", false );
-}
-
-void Settings::loadConfiguration()
+void Settings::loadSettings()
 {
     using namespace std::chrono;
 
     //general
-    const QStringList& httpAddrToListenStrList = m_settings.value(
+    const QStringList& httpAddrToListenStrList = settings().value(
         kGeneralEndpointsToListen,
         kDefaultGeneralEndpointsToListen).toString().split(',');
     std::transform(
@@ -185,7 +156,7 @@ void Settings::loadConfiguration()
         std::back_inserter(m_general.endpointsToListen),
         [](const QString& str) { return SocketAddress(str); });
 
-    const QString& dataDirFromSettings = m_settings.value(kGeneralDataDir).toString();
+    const QString& dataDirFromSettings = settings().value(kGeneralDataDir).toString();
     if (!dataDirFromSettings.isEmpty())
     {
         m_general.dataDir = dataDirFromSettings;
@@ -194,8 +165,8 @@ void Settings::loadConfiguration()
     {
 #ifdef Q_OS_LINUX
         QString defVarDirName = QString("/opt/%1/%2/var")
-            .arg(QnAppInfo::linuxOrganizationName()).arg(kModuleName);
-        QString varDirName = m_settings.value("varDir", defVarDirName).toString();
+            .arg(nx::utils::AppInfo::linuxOrganizationName()).arg(kModuleName);
+        QString varDirName = settings().value("varDir", defVarDirName).toString();
         m_general.dataDir = varDirName;
 #else
         //TODO #ak get rid of QStandardPaths::standardLocations call here since it requies QApplication instance
@@ -204,71 +175,71 @@ void Settings::loadConfiguration()
 #endif
     }
 
-    m_general.changeUser = m_settings.value(kGeneralChangeUser).toString();
-    m_general.mediatorEndpoint = m_settings.value(kGeneralMediatorEndpoint).toString();
+    m_general.changeUser = settings().value(kGeneralChangeUser).toString();
+    m_general.mediatorEndpoint = settings().value(kGeneralMediatorEndpoint).toString();
 
     //log
-    m_logging.load(m_settings);
+    m_logging.load(settings());
 
     //auth
-    m_auth.rulesXmlPath = m_settings.value(kAuthXmlPath, kDefaultAuthXmlPath).toString();
+    m_auth.rulesXmlPath = settings().value(kAuthXmlPath, kDefaultAuthXmlPath).toString();
 
     //tcp
     m_tcp.recvTimeout = 
         nx::utils::parseTimerDuration(
-            m_settings.value(kTcpRecvTimeout).toString(),
+            settings().value(kTcpRecvTimeout).toString(),
             kDefaultTcpRecvTimeout);
     m_tcp.sendTimeout =
         nx::utils::parseTimerDuration(
-            m_settings.value(kTcpSendTimeout).toString(),
+            settings().value(kTcpSendTimeout).toString(),
             kDefaultTcpSendTimeout);
 
     //http
     m_http.proxyTargetPort = 
-        m_settings.value(kHttpProxyTargetPort, kDefaultHttpProxyTargetPort).toInt();
+        settings().value(kHttpProxyTargetPort, kDefaultHttpProxyTargetPort).toInt();
     m_http.connectSupport =
-        m_settings.value(
+        settings().value(
             kHttpConnectSupport,
             kDefaultHttpConnectSupport) == "true";
     m_http.allowTargetEndpointInUrl =
-        m_settings.value(
+        settings().value(
             kHttpAllowTargetEndpointInUrl,
             kDefaultHttpAllowTargetEndpointInUrl).toString() == "true";
     m_http.sslSupport =
-        m_settings.value(
+        settings().value(
             kHttpSslSupport,
             kDefaultHttpSslSupport).toString() == "true";
     m_http.sslCertPath =
-        m_settings.value(
+        settings().value(
             kHttpSslCertPath,
             kDefaultHttpSslCertPath).toString();
 
     //CloudConnect
     m_cloudConnect.replaceHostAddressWithPublicAddress =
-        m_settings.value(
+        settings().value(
             kReplaceHostAddressWithPublicAddress,
             kDefaultReplaceHostAddressWithPublicAddress).toString() == "true";
     m_cloudConnect.allowIpTarget =
-        m_settings.value(
+        settings().value(
             kAllowIpTarget,
             kDefaultAllowIpTarget).toString() == "true";
     m_cloudConnect.fetchPublicIpUrl = 
-        m_settings.value(
+        settings().value(
             kFetchPublicIpUrl,
             kDefaultFetchPublicIpUrl).toString();
     m_cloudConnect.publicIpAddress =
-        m_settings.value(
+        settings().value(
             kPublicIpAddress,
             kDefaultPublicIpAddress).toString();
     m_cloudConnect.tcpReverse.port =
-        (uint16_t)m_settings.value(tcp_reverse::kPort, tcp_reverse::kDefaultPort).toInt();
+        (uint16_t)settings().value(tcp_reverse::kPort, tcp_reverse::kDefaultPort).toInt();
     m_cloudConnect.tcpReverse.poolSize =
-        (size_t)m_settings.value(tcp_reverse::kPoolSize, (int)tcp_reverse::kDefaultPoolSize).toInt();
+        (size_t)settings().value(tcp_reverse::kPoolSize, (int)tcp_reverse::kDefaultPoolSize).toInt();
     m_cloudConnect.tcpReverse.keepAlive =
-        KeepAliveOptions::fromString(m_settings.value(
+        KeepAliveOptions::fromString(settings().value(
             tcp_reverse::kKeepAlive, tcp_reverse::kDefaultKeepAlive).toString());
 
-    auto preferedSslMode = m_settings.value(kPreferedSslMode, kDefaultPreferedSslMode).toString();
+    auto preferedSslMode = settings().value(kPreferedSslMode, kDefaultPreferedSslMode).toString();
     if (preferedSslMode == "enabled" || preferedSslMode == "true")
         m_cloudConnect.preferedSslMode = SslMode::enabled;
     else if (preferedSslMode == "disabled" || preferedSslMode == "false")
@@ -277,7 +248,7 @@ void Settings::loadConfiguration()
         m_cloudConnect.preferedSslMode = SslMode::followIncomingConnection;
 }
 
-}   //namespace conf
-}   //namespace cloud
-}   //namespace gateway
-}   //namespace nx
+} // namespace conf
+} // namespace cloud
+} // namespace gateway
+} // namespace nx

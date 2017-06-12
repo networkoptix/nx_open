@@ -12,6 +12,7 @@
 
 #include <nx/network/socket_common.h>
 #include <nx/network/socket_global.h>
+#include <common/common_module.h>
 
 namespace {
 
@@ -70,16 +71,16 @@ const QString kFormatTemplate = lit("%1 (%2)");
 
 };
 
-
-
-QnResourceDisplayInfo::QnResourceDisplayInfo(const QnResourcePtr& resource) :
+QnResourceDisplayInfo::QnResourceDisplayInfo(const QnResourcePtr& resource)
+:
     m_resource(resource),
     m_detailLevel(Qn::RI_Invalid),
     m_name(),
     m_host(),
     m_port(0),
     m_extraInfo()
-{}
+{
+}
 
 QString QnResourceDisplayInfo::name() const
 {
@@ -176,7 +177,10 @@ void QnResourceDisplayInfo::ensureConstructed(Qn::ResourceInfoLevel detailLevel)
     if (flags.testFlag(Qn::user))
     {
         if (const QnUserResourcePtr& user = m_resource.dynamicCast<QnUserResource>())
-            m_extraInfo = qnUserRolesManager->userRoleName(user);
+        {
+            if (auto common = user->commonModule())
+                m_extraInfo = common->userRolesManager()->userRoleName(user);
+        }
     }
     else
     {

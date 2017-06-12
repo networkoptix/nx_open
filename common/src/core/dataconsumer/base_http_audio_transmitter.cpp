@@ -2,6 +2,8 @@
 
 #include "base_http_audio_transmitter.h"
 
+#include <nx/utils/std/future.h>
+
 #include <core/resource/security_cam_resource.h>
 #include <core/resource/media_server_resource.h>
 

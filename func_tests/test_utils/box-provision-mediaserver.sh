@@ -17,7 +17,8 @@ apt-get -y install \
         syslinux \
         syslinux-common \
         nas \
-        floppyd
+        floppyd \
+        cifs-utils
 
 echo "Install mediaserver..."
 dpkg -i --force-depends /vagrant/mediaserver.deb

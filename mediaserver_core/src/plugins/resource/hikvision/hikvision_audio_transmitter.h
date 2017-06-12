@@ -3,7 +3,7 @@
 #include <core/dataconsumer/base_http_audio_transmitter.h>
 #include <core/resource/security_cam_resource.h>
 #include <nx/network/http/asynchttpclient.h>
-#include <nx/network/http/httpclient.h>
+#include <nx/network/http/http_client.h>
 
 class HikvisionAudioTransmitter: public BaseHttpAudioTransmitter
 {

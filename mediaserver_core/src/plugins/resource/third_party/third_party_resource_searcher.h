@@ -13,10 +13,11 @@
 #include <QtCore/QList>
 #include <QtCore/QVector>
 
+#include <nx/network/upnp/upnp_search_handler.h>
+
 #include "third_party_resource.h"
 #include "../mdns/mdns_resource_searcher.h"
 #include "plugins/resource/upnp/upnp_resource_searcher.h"
-#include <nx/network/upnp/upnp_device_searcher.h>
 #include "plugins/camera_plugin.h"
 #include "plugins/camera_plugin_qt_wrapper.h"
 
@@ -33,7 +34,7 @@ public:
     /*!
         Adds ref to \a plugin
     */
-    ThirdPartyResourceSearcher();
+    ThirdPartyResourceSearcher(QnCommonModule* commonModule);
     /*!
         Releases ref to \a plugin
     */

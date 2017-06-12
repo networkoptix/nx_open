@@ -12,7 +12,6 @@
 #include <nx/fusion/serialization/sql_functions.h>
 #include <nx/fusion/serialization/ubjson_functions.h>
 #include <nx/fusion/serialization/xml_functions.h>
-#include <nx/fusion/serialization/compressed_time_functions.h>
 #include <nx/utils/math/fuzzy.h>
 
 namespace QnHashAutomation {

@@ -18,7 +18,8 @@ class TunnelConnector:
 public:
     ~TunnelConnector();
     
-    void setConnectorFactoryFunc(ConnectorFactory::FactoryFunc newFactoryFunc);
+    void setConnectorFactoryFunc(
+        CrossNatConnectorFactory::Function newFactoryFunc);
     const hpm::MediatorFunctionalTest& mediator() const;
     hpm::MediatorFunctionalTest& mediator();
 
@@ -54,7 +55,7 @@ protected:
         ConnectResult* const connectResult);
 
 private:
-    boost::optional<ConnectorFactory::FactoryFunc> m_oldFactoryFunc;
+    boost::optional<CrossNatConnectorFactory::Function> m_oldFactoryFunc;
     nx::hpm::MediatorFunctionalTest m_mediator;
 };
 

@@ -1,10 +1,9 @@
 #include <gtest/gtest.h>
 
 #include <nx/network/http/test_http_server.h>
+#include <nx/network/public_ip_discovery.h>
 #include <nx/utils/random.h>
 #include <nx/utils/test_support/utils.h>
-
-#include <utils/common/public_ip_discovery.h>
 
 namespace nx {
 namespace network {
@@ -12,11 +11,11 @@ namespace test {
 
 static const QString kPublicIpAddress(lit("127.0.0.1"));
 
-class QnPublicIPDiscovery:
+class PublicIPDiscovery:
     public ::testing::Test
 {
 public:
-    QnPublicIPDiscovery():
+    PublicIPDiscovery():
         m_testHttpServer(std::make_unique<TestHttpServer>())
     {
         init();
@@ -41,7 +40,7 @@ protected:
     void registerEventHandler(int eventHandlerOptions = 0)
     {
         QObject::connect(
-            m_publicAddressFinder.get(), &::QnPublicIPDiscovery::found,
+            m_publicAddressFinder.get(), &::nx::network::PublicIPDiscovery::found,
             [this, eventHandlerOptions](const QHostAddress& address)
             {
                 m_eventHandlerHasBeenInvoked.set_value();
@@ -79,7 +78,7 @@ protected:
 
 private:
     std::unique_ptr<TestHttpServer> m_testHttpServer;
-    std::unique_ptr<::QnPublicIPDiscovery> m_publicAddressFinder;
+    std::unique_ptr<::nx::network::PublicIPDiscovery> m_publicAddressFinder;
     nx::utils::promise<void> m_finderHasFinished;
     nx::utils::promise<void> m_eventHandlerHasBeenInvoked;
     boost::optional<QString> m_foundIpAddress;
@@ -90,19 +89,19 @@ private:
         ASSERT_TRUE(m_testHttpServer->bindAndListen())
             << SystemError::getLastOSErrorText().toStdString();
 
-        m_publicAddressFinder = std::make_unique<::QnPublicIPDiscovery>(
+        m_publicAddressFinder = std::make_unique<::nx::network::PublicIPDiscovery>(
             QStringList() << serverUrl());
     }
 };
 
-TEST_F(QnPublicIPDiscovery, finds_ip_address)
+TEST_F(PublicIPDiscovery, finds_ip_address)
 {
     registerEventHandler();
     invokeFinder();
     assertIfIpAddressHasNotBeenFound();
 }
 
-TEST_F(QnPublicIPDiscovery, cancellation)
+TEST_F(PublicIPDiscovery, cancellation)
 {
     registerEventHandler(withDelay);
     invokeFinder();

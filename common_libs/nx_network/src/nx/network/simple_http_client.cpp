@@ -1,14 +1,14 @@
 #include "simple_http_client.h"
 
+#include <sstream>
+
 #include <QtCore/QCryptographicHash>
 #include <QtCore/QUrl>
 
-#include <sstream>
+#include <nx/utils/log/log.h>
+#include <nx/utils/string.h>
 
-#include "http/httptypes.h"
-#include "utils/common/util.h"
-#include "network/authutil.h"
-
+#include "http/http_types.h"
 
 //static const int MAX_LINE_LENGTH = 1024*16;
 
@@ -113,10 +113,19 @@ CLHttpStatus CLSimpleHTTPClient::doPOST(const QByteArray& requestStr, const QStr
     {
         if (!m_connected)
         {
-            if (m_host.isEmpty() || !m_sock->connect(m_host, m_port))
+            if (m_host.isEmpty())
+                return CL_TRANSPORT_ERROR;
+
+            NX_VERBOSE(this, lm("Connecting to %1:%2").arg(m_host).arg(m_port));
+            if (!m_sock->connect(m_host, m_port))
             {
+                const auto systemErrorCode = SystemError::getLastOSErrorCode();
+                NX_VERBOSE(this, lm("Failed to connect. %1")
+                    .arg(SystemError::toString(systemErrorCode)));
                 return CL_TRANSPORT_ERROR;
             }
+
+            NX_VERBOSE(this, lm("Connect succeeded"));
         }
 
         QByteArray request;
@@ -482,7 +491,7 @@ void CLSimpleHTTPClient::getAuthInfo()
     QList<QByteArray> authParams = wwwAuth.split(',');
     for (int i = 0; i < authParams.size(); ++i)
     {
-        QList<QByteArray> param = smartSplit(authParams[i], '=');
+        QList<QByteArray> param = nx::utils::smartSplit(authParams[i], '=');
         if (param.size() > 1)
         {
             param[0] = param[0].trimmed();

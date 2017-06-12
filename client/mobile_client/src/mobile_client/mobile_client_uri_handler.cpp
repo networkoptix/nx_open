@@ -1,7 +1,7 @@
 #include "mobile_client_uri_handler.h"
 
+#include <nx/network/app_info.h>
 #include <nx/vms/utils/system_uri.h>
-#include <utils/common/app_info.h>
 #include <watchers/cloud_status_watcher.h>
 
 #include "mobile_client_ui_controller.h"
@@ -59,7 +59,7 @@ void QnMobileClientUriHandler::handleUrl(const QUrl& url)
     }
 
     if (uri.protocol() != SystemUri::Protocol::Native
-        && uri.domain() != QnAppInfo::defaultCloudHost())
+        && uri.domain() != nx::network::AppInfo::defaultCloudHost())
     {
         if (uri.scope() == SystemUri::Scope::Generic)
         {

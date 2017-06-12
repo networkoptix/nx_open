@@ -15,12 +15,13 @@ static const int PROXY_CONNECTIONS_TO_REQUEST = 3;
 // -------------------------------- QnUniversalListener ---------------------------------
 
 QnHttpConnectionListener::QnHttpConnectionListener(
+    QnCommonModule* commonModule,
     const QHostAddress& address,
     int port,
     int maxConnections,
     bool useSsl )
 :
-    QnTcpListener( address, port, maxConnections, useSsl ),
+    QnTcpListener(commonModule, address, port, maxConnections, useSsl),
     m_needAuth( true )
 {
 }
@@ -32,7 +33,7 @@ QnHttpConnectionListener::~QnHttpConnectionListener()
 
 bool QnHttpConnectionListener::isProxy(const nx_http::Request& request)
 {
-    return (m_proxyInfo.proxyHandler && m_proxyInfo.proxyCond(request));
+    return (m_proxyInfo.proxyHandler && m_proxyInfo.proxyCond(commonModule(), request));
 }
 
 bool QnHttpConnectionListener::needAuth() const

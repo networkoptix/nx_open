@@ -23,6 +23,7 @@
 
 #include <nx/network/ssl_socket.h>
 #include <nx/utils/log/log.h>
+#include <nx/utils/std/cpp14.h>
 #include <utils/email/email.h>
 
 
@@ -225,8 +226,8 @@ SmtpOperationResult SmtpClient::connectToHost()
             if (responseCode != SmtpReplyCode::ServiceReady)
                 return {SmtpError::ServerError, responseCode};
 
-            m_socket = std::make_unique<nx::network::SslSocket>(
-                m_socket.release(), /*isServerSide*/ false);
+            m_socket = std::make_unique<nx::network::deprecated::SslSocket>(
+                std::move(m_socket), /*isServerSide*/ false);
 
             // Send ELHO one more time
             sendMessage(lit("EHLO ") + name);

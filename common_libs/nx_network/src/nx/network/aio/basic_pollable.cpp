@@ -25,8 +25,12 @@ BasicPollable::BasicPollable(
     m_pollable(-1, std::make_unique<CommonSocketImpl>()),
     m_aioService(aioService)
 {
-    if (aioThread)
-        m_aioService->bindSocketToAioThread(&m_pollable, aioThread);
+    if (!aioThread)
+        aioThread = m_aioService->getCurrentAioThread();
+    if (!aioThread)
+        aioThread = m_aioService->getRandomAioThread();
+
+    m_aioService->bindSocketToAioThread(&m_pollable, aioThread);
 }
 
 BasicPollable::~BasicPollable()
@@ -86,6 +90,22 @@ void BasicPollable::dispatch(nx::utils::MoveOnlyFunc<void()> func)
 bool BasicPollable::isInSelfAioThread() const
 {
     return getAioThread() == m_aioService->getCurrentAioThread();
+}
+
+void BasicPollable::cancelPostedCalls(nx::utils::MoveOnlyFunc<void()> completionHandler)
+{
+    post(
+        [this, completionHandler = std::move(completionHandler)]()
+        {
+            m_aioService->cancelPostedCalls(&m_pollable, true);
+            completionHandler();
+        });
+}
+
+void BasicPollable::cancelPostedCallsSync()
+{
+    executeInAioThreadSync(
+        [this]() { m_aioService->cancelPostedCalls(&m_pollable, true); });
 }
 
 void BasicPollable::stopWhileInAioThread()

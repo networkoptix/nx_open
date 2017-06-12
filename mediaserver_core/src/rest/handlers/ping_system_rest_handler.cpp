@@ -4,13 +4,15 @@
 #include <licensing/license.h>
 #include <licensing/remote_licenses.h>
 
-#include "network/module_finder.h"
+#include "nx/vms/discovery/manager.h"
 #include "network/module_information.h"
 #include "network/tcp_connection_priv.h"
 #include <network/connection_validator.h>
 #include "utils/common/app_info.h"
 #include <nx/network/simple_http_client.h>
-#include <http/custom_headers.h>
+#include <nx/network/http/custom_headers.h>
+#include <rest/server/rest_connection_processor.h>
+#include <licensing/license_validator.h>
 
 //#define START_LICENSES_DEBUG
 
@@ -23,7 +25,7 @@ int QnPingSystemRestHandler::executeGet(
         const QString &path,
         const QnRequestParams &params,
         QnJsonRestResult &result,
-        const QnRestConnectionProcessor* /*owner*/)
+        const QnRestConnectionProcessor* owner)
 {
     Q_UNUSED(path)
 
@@ -91,8 +93,8 @@ int QnPingSystemRestHandler::executeGet(
     }
 
     /* Check if there is a valid starter license in the local system. */
-    QnLicenseListHelper helper(qnLicensePool->getLicenses());
-    if (helper.totalLicenseByType(Qn::LC_Start) > 0)
+    QnLicenseListHelper helper(owner->licensePool()->getLicenses());
+    if (helper.totalLicenseByType(Qn::LC_Start, owner->licensePool()->validator()) > 0)
     {
 
         /* Check if there is a valid starter license in the remote system. */
@@ -100,7 +102,7 @@ int QnPingSystemRestHandler::executeGet(
 
         /* Warn that some of the licenses will be deactivated. */
         QnLicenseListHelper remoteHelper(remoteLicensesList);
-        if (remoteHelper.totalLicenseByType(Qn::LC_Start, true) > 0)
+        if (remoteHelper.totalLicenseByType(Qn::LC_Start, nullptr) > 0)
             result.setError(QnJsonRestResult::CantProcessRequest, lit("STARTER_LICENSE_ERROR"));
     }
 

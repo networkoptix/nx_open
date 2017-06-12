@@ -15,6 +15,7 @@
 #include <network/system_helpers.h>
 
 #include "ec2_connection.h"
+#include <licensing/license_validator.h>
 
 static const std::chrono::hours kDefaultSendCycleTime(30 * 24); //< About a month.
 static const std::chrono::hours kSendAfterUpdateTime(3);
@@ -38,8 +39,8 @@ namespace ec2
     const QString Ec2StaticticsReporter::AUTH_PASSWORD = lit(
                 "f087996adb40eaed989b73e2d5a37c951f559956c44f6f8cdfb6f127ca4136cd");
 
-    Ec2StaticticsReporter::Ec2StaticticsReporter(const AbstractMediaServerManagerPtr& msManager):
-        m_msManager(msManager),
+    Ec2StaticticsReporter::Ec2StaticticsReporter(ec2::AbstractECConnection* ec2Connection):
+        m_ec2Connection(ec2Connection),
         m_firstTime(true),
         m_timerCycle(kInitialTimerCycle),
         m_timerDisabled(false),
@@ -56,60 +57,77 @@ namespace ec2
 
     ErrorCode Ec2StaticticsReporter::collectReportData(std::nullptr_t, ApiSystemStatistics* const outData)
     {
-        if(!detail::QnDbManager::instance() || !detail::QnDbManager::instance()->isInitialized())
+        if(!m_ec2Connection)
             return ErrorCode::ioError;
 
-        ErrorCode res;
-        // TODO: Get rid of these macros.
-        #define dbManager_queryOrReturn(ApiType, name) \
-            ApiType name; \
-            if ((res = dbManager(Qn::kSystemAccess).doQuery(nullptr, name)) != ErrorCode::ok) \
-                return res;
-        #define dbManager_queryOrReturn_uuid(ApiType, name) \
-            ApiType name; \
-            if ((res = dbManager(Qn::kSystemAccess).doQuery(QnUuid(), name)) != ErrorCode::ok) \
-                return res;
+        ErrorCode errCode;
 
-        dbManager_queryOrReturn_uuid(ApiMediaServerDataExList, mediaservers);
-        for (auto& ms : mediaservers) outData->mediaservers.push_back(std::move(ms));
+        ApiMediaServerDataExList mediaServers;
+        errCode = m_ec2Connection->getMediaServerManager(Qn::kSystemAccess)->getServersExSync(&mediaServers);
+        if (errCode != ErrorCode::ok)
+            return errCode;
 
-        dbManager_queryOrReturn_uuid(ApiCameraDataExList, cameras);
-        for (ApiCameraDataEx& cam : cameras)
+        for (auto& ms : mediaServers) outData->mediaservers.push_back(std::move(ms));
+
+
+        ApiCameraDataExList cameras;
+        errCode = m_ec2Connection->getCameraManager(Qn::kSystemAccess)->getCamerasExSync(&cameras);
+        if (errCode != ErrorCode::ok)
+            return errCode;
+
+        for (ApiCameraDataEx& cam: cameras)
             if (cam.typeId != QnResourceTypePool::kDesktopCameraTypeUuid)
                 outData->cameras.push_back(std::move(cam));
 
-        if ((res = dbManager(Qn::kSystemAccess).doQuery(QnUuid(), outData->clients)) != ErrorCode::ok)
-            return res;
+        QnLicenseList licenses;
+        errCode = m_ec2Connection->getLicenseManager(Qn::kSystemAccess)->getLicensesSync(&licenses);
+        if (errCode != ErrorCode::ok)
+            return errCode;
 
-        dbManager_queryOrReturn(ApiLicenseDataList, licenses);
-        for (auto& license : licenses)
+        for (const auto& license: licenses)
         {
-            QnLicense qnLicense(license.licenseBlock);
-            ApiLicenseStatistics statLicense(std::move(license));
-            statLicense.validation = qnLicense.validationInfo();
+            ApiLicenseData apiLicense;
+            fromResourceToApi(license, apiLicense);
+            ApiLicenseStatistics statLicense(std::move(apiLicense));
+            QnLicenseValidator validator(m_ec2Connection->commonModule());
+            statLicense.validation = validator.validationInfo(license);
             outData->licenses.push_back(std::move(statLicense));
         }
 
-        dbManager_queryOrReturn_uuid(ApiBusinessRuleDataList, bRules);
-        for (auto& br : bRules) outData->businessRules.push_back(std::move(br));
+        QnBusinessEventRuleList bRules;
+        errCode = m_ec2Connection->getBusinessEventManager(Qn::kSystemAccess)->getBusinessRulesSync(&bRules);
+        if (errCode != ErrorCode::ok)
+            return errCode;
 
-        if ((res = dbManager(Qn::kSystemAccess).doQuery(QnUuid(), outData->layouts)) != ErrorCode::ok)
-            return res;
+        for (auto& br: bRules)
+        {
+            ApiBusinessRuleData apiData;
+            fromResourceToApi(br, apiData);
+            outData->businessRules.push_back(std::move(apiData));
+        }
 
-        dbManager_queryOrReturn_uuid(ApiUserDataList, users);
+        errCode = m_ec2Connection->getLayoutManager(Qn::kSystemAccess)->getLayoutsSync(&outData->layouts);
+        if (errCode != ErrorCode::ok)
+            return errCode;
+
+        ApiUserDataList users;
+        errCode = m_ec2Connection->getUserManager(Qn::kSystemAccess)->getUsersSync(&users);
+        if (errCode != ErrorCode::ok)
+            return errCode;
+
         for (auto& u : users) outData->users.push_back(std::move(u));
 
         #undef dbManager_queryOrReturn
         #undef dbManager_queryOrReturn_uuid
 
-        outData->systemId = helpers::currentSystemLocalId();
+        outData->systemId = helpers::currentSystemLocalId(m_ec2Connection->commonModule());
         return ErrorCode::ok;
     }
 
     ErrorCode Ec2StaticticsReporter::triggerStatisticsReport(std::nullptr_t, ApiStatisticsServerInfo* const outData)
     {
         removeTimer();
-        outData->systemId = helpers::currentSystemLocalId();
+        outData->systemId = helpers::currentSystemLocalId(m_ec2Connection->commonModule());
         outData->status = lit("initiated");
         return initiateReport(&outData->url);
     }
@@ -150,17 +168,18 @@ namespace ec2
 
     void Ec2StaticticsReporter::timerEvent()
     {
-        if (!qnGlobalSettings->isInitialized())
+        const auto& settings = m_ec2Connection->commonModule()->globalSettings();
+        if (!settings->isInitialized())
         {
             /* Try again. */
             setupTimer();
             return;
         }
 
-        if (!qnGlobalSettings->isStatisticsAllowed()
-            || qnGlobalSettings->isNewSystem())
+        if (!settings->isStatisticsAllowed()
+            || settings->isNewSystem())
         {
-            NX_LOGX(lm("Automatic report system is disabled"), cl_logINFO);
+            NX_LOGX(lm("Automatic report system is disabled"), cl_logDEBUG1);
 
             // Better luck next time (if report system will be enabled by another mediaserver)
             setupTimer();
@@ -187,10 +206,11 @@ namespace ec2
 
     QDateTime Ec2StaticticsReporter::plannedReportTime(const QDateTime& now)
     {
+        const auto& settings = m_ec2Connection->commonModule()->globalSettings();
         if (m_firstTime)
         {
             m_firstTime = false;
-            const auto reportedVersion = qnGlobalSettings->statisticsReportLastVersion();
+            const auto reportedVersion = settings->statisticsReportLastVersion();
             const auto currentVersion = nx::utils::AppInfo::applicationFullVersion();
 
             QCollator collator;
@@ -198,7 +218,7 @@ namespace ec2
             if (collator.compare(currentVersion, reportedVersion) > 0)
             {
                 const uint timeCycle = convertToSeconds(nx::utils::parseTimerDuration(
-                    qnGlobalSettings->statisticsReportTimeCycle(), kSendAfterUpdateTime));
+                    settings->statisticsReportTimeCycle(), kSendAfterUpdateTime));
 
                 m_plannedReportTime = now.addSecs(nx::utils::random::number(
                       timeCycle * kMinDelayRatio / 100,
@@ -213,13 +233,13 @@ namespace ec2
         }
 
         const uint timeCycle = convertToSeconds(nx::utils::parseTimerDuration(
-            qnGlobalSettings->statisticsReportTimeCycle(), kDefaultSendCycleTime));
+            settings->statisticsReportTimeCycle(), kDefaultSendCycleTime));
 
         const uint minDelay = timeCycle * kMinDelayRatio / 100;
         const uint maxDelay = timeCycle * kMaxdelayRation / 100;
         if (!m_plannedReportTime || *m_plannedReportTime > now.addSecs(maxDelay))
         {
-            const QDateTime lastTime = qnGlobalSettings->statisticsReportLastTime();
+            const QDateTime lastTime = settings->statisticsReportLastTime();
             m_plannedReportTime = (lastTime.isValid() ? lastTime : now).addSecs(
                 nx::utils::random::number<uint>(minDelay, maxDelay));
 
@@ -233,8 +253,9 @@ namespace ec2
 
     ErrorCode Ec2StaticticsReporter::initiateReport(QString* reportApi)
     {
+        const auto& settings = m_ec2Connection->commonModule()->globalSettings();
         ApiSystemStatistics data;
-        data.reportInfo.number = qnGlobalSettings->statisticsReportLastNumber();
+        data.reportInfo.number = settings->statisticsReportLastNumber();
         auto res = collectReportData(nullptr, &data);
         if (res != ErrorCode::ok)
         {
@@ -250,7 +271,7 @@ namespace ec2
         m_httpClient->setUserName(AUTH_USER);
         m_httpClient->setUserPassword(AUTH_PASSWORD);
 
-        const QString configApi = qnGlobalSettings->statisticsReportServerApi();
+        const QString configApi = settings->statisticsReportServerApi();
         const QString serverApi = configApi.isEmpty() ? DEFAULT_SERVER_API : configApi;
         const QUrl url = lit("%1/%2").arg(serverApi).arg(kServerReportApi);
         const auto contentType = Qn::serializationFormatToHttpContentType(Qn::JsonFormat);
@@ -267,20 +288,22 @@ namespace ec2
 
     void Ec2StaticticsReporter::finishReport(nx_http::AsyncHttpClientPtr httpClient)
     {
+        const auto& settings = m_ec2Connection->commonModule()->globalSettings();
+
         if (httpClient->hasRequestSuccesed())
         {
             m_timerCycle = kInitialTimerCycle;
             NX_LOGX(lm("Statistics report successfully sent to %1")
-                .str(httpClient->url()), cl_logINFO);
+                .arg(httpClient->url()), cl_logINFO);
 
             const auto now = qnSyncTime->currentDateTime().toUTC();
             m_plannedReportTime = boost::none;
 
-            const int lastNumber = qnGlobalSettings->statisticsReportLastNumber();
-            qnGlobalSettings->setStatisticsReportLastNumber(lastNumber + 1);
-            qnGlobalSettings->setStatisticsReportLastTime(now);
-            qnGlobalSettings->setStatisticsReportLastVersion(nx::utils::AppInfo::applicationFullVersion());
-            qnGlobalSettings->synchronizeNow();
+            const int lastNumber = settings->statisticsReportLastNumber();
+            settings->setStatisticsReportLastNumber(lastNumber + 1);
+            settings->setStatisticsReportLastTime(now);
+            settings->setStatisticsReportLastVersion(nx::utils::AppInfo::applicationFullVersion());
+            settings->synchronizeNow();
         }
         else
         {
@@ -288,7 +311,7 @@ namespace ec2
                 m_timerCycle = kMaxTimerCycle;
 
             NX_LOGX(lm("doPost to %1 has failed, update timer cycle to %2")
-                .str(httpClient->url()).arg(m_timerCycle), cl_logWARNING);
+                .arg(httpClient->url()).arg(m_timerCycle), cl_logWARNING);
         }
 
         setupTimer();

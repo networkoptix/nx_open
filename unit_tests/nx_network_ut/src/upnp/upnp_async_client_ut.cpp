@@ -1,7 +1,5 @@
 #include <nx/network/upnp/upnp_async_client.h>
 
-#include <common/common_globals.h>
-
 #include <gtest/gtest.h>
 
 #include <nx/utils/std/future.h>

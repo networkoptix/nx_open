@@ -76,7 +76,7 @@ public:
 
 private:
     QnBusinessEventRule(int internalId, int aggregationPeriod, const QByteArray& actionParams, bool isSystem,
-        QnBusiness::ActionType bActionType, QnBusiness::EventType bEventType, const QnResourcePtr& actionRes= QnResourcePtr());
+        QnBusiness::ActionType bActionType, QnBusiness::EventType bEventType, const QnUuid& actionResId = QnUuid());
 
     QnUuid m_id;
 

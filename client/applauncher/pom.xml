@@ -2,12 +2,12 @@
     <parent>
         <artifactId>cpp</artifactId>
         <groupId>com.networkoptix.hdwitness</groupId>
-        <version>3.0.0-SNAPSHOT</version>
+        <version>3.1.0-SNAPSHOT</version>
         <relativePath>../../cpp</relativePath>
     </parent>
 
     <groupId>com.networkoptix.hdwitness</groupId>
-    <version>3.0.0-SNAPSHOT</version>
+    <version>3.1.0-SNAPSHOT</version>
     <modelVersion>4.0.0</modelVersion>
     <artifactId>applauncher</artifactId>
     <packaging>pom</packaging>
@@ -20,13 +20,13 @@
         <template>app</template>
 
         <qt.libs>core gui network xml widgets</qt.libs>
-        <global.libs>-lcommon -lnx_utils -lnx_network -lnx_streaming -ludt</global.libs>
+        <global.libs>-lcommon -lnx_utils -lnx_network -ludt</global.libs>
         <windows.oslibs>DbgHelp.lib Ws2_32.lib Iphlpapi.lib Winmm.lib</windows.oslibs>
         <mac.oslibs>-framework IOKit -framework CoreServices</mac.oslibs>
 
         <rdep.packages>openssl quazip any/qtsinglecoreapplication</rdep.packages>
-    </properties>       
-    
+    </properties>
+
     <dependencies>
         <dependency>
             <groupId>${project.groupId}</groupId>
@@ -36,6 +36,7 @@
             <scope>system</scope>
             <systemPath>${root.dir}/common/pom.xml</systemPath>
         </dependency>
+
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>nx_network</artifactId>
@@ -45,6 +46,5 @@
             <systemPath>${root.dir}/common_libs/nx_network/pom.xml</systemPath>
         </dependency>
     </dependencies>
-
 
 </project>

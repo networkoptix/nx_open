@@ -11,7 +11,7 @@
 #include <string>
 
 #include <plugins/resource/onvif/onvif_notification_consumer.h>
-#include <utils/common/long_runnable.h>
+#include <nx/utils/thread/long_runnable.h>
 
 #include <nx/utils/singleton.h>
 

@@ -15,7 +15,7 @@
 #include <core/resource/resource_fwd.h>
 #include <nx/streaming/abstract_media_stream_data_provider.h>
 #include <core/resource/resource_media_layout.h>
-#include <utils/common/safe_direct_connection.h>
+#include <nx/utils/safe_direct_connection.h>
 
 static const int  META_DATA_DURATION_MS = 300;
 static const int MIN_SECOND_STREAM_FPS = 2;

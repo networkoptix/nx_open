@@ -1,10 +1,3 @@
-/**********************************************************
-* 27 aug 2013
-* a.kolesnikov
-***********************************************************/
-
-#include "cloud_db_process_public.h"
-
 #ifdef _WIN32
     #include <windows.h>
 #else
@@ -14,7 +7,9 @@
 
 #include <nx/utils/crash_dump/systemexcept.h>
 
-static nx::cdb::CloudDBProcessPublic* serviceInstance = NULL;
+#include "cloud_db_service_public.h"
+
+static nx::cdb::CloudDbServicePublic* serviceInstance = NULL;
 
 void stopServer( int /*signal*/ )
 {
@@ -42,7 +37,7 @@ int libCloudDBMain(int argc, char* argv[])
     signal(SIGTERM, stopServer);
 #endif
 
-    nx::cdb::CloudDBProcessPublic service(argc, argv);
+    nx::cdb::CloudDbServicePublic service(argc, argv);
     serviceInstance = &service;
     const int result = service.exec();
 

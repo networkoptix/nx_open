@@ -1,0 +1,191 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>Post-lexical rules</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REL="HOME"
+TITLE="Building Synthetic Voices"
+HREF="book1.html"><LINK
+REL="UP"
+TITLE="Lexicons"
+HREF="c1379.html"><LINK
+REL="PREVIOUS"
+TITLE="Building letter-to-sound rules automatically"
+HREF="x1469.html"><LINK
+REL="NEXT"
+TITLE="Building lexicons for new languages"
+HREF="x1630.html"></HEAD
+><BODY
+CLASS="SECT1"
+BGCOLOR="#FFFFFF"
+TEXT="#000000"
+LINK="#0000FF"
+VLINK="#840084"
+ALINK="#0000FF"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="3"
+ALIGN="center"
+>Building Synthetic Voices</TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="bottom"
+><A
+HREF="x1469.html"
+ACCESSKEY="P"
+>&#60;&#60;&#60; Previous</A
+></TD
+><TD
+WIDTH="80%"
+ALIGN="center"
+VALIGN="bottom"
+>Lexicons</TD
+><TD
+WIDTH="10%"
+ALIGN="right"
+VALIGN="bottom"
+><A
+HREF="x1630.html"
+ACCESSKEY="N"
+>Next &#62;&#62;&#62;</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="SECT1"
+><H1
+CLASS="SECT1"
+><A
+NAME="BSV-POSTLEXICAL-SECT"
+>Post-lexical rules</A
+></H1
+><P
+>&#13;In fluent speech word boundaries are often degraded in a way that causes 
+co-articulation across boundaries. A lexical entry should normally 
+provide pronunciations as if the word is being spoken in isolation. It 
+is only once the word has been inserted into the the context in which 
+it is going to spoken can co-articulary effects be applied. </P
+><P
+>Post lexical rules are a general set of rules which can modify the 
+segment relation (or any other part of the utterance for that matter), 
+after the basic pronunciations have been found. In Festival 
+post-lexical rules are defined as functions which will be applied 
+to the utterance after intonational accents have been assigned. </P
+><P
+>&#13;For example in British English word final /r/ is only produced when the 
+following word starts with a vowel. Thus all other word final /r/s need 
+to be deleted. A Scheme function that implements this is as follows 
+<A
+NAME="AEN1624"
+></A
+><BLOCKQUOTE
+CLASS="BLOCKQUOTE"
+><P
+CLASS="LITERALLAYOUT"
+>(define&nbsp;(plr_rp_final_r&nbsp;utt)<br>
+&nbsp;&nbsp;(mapcar<br>
+&nbsp;&nbsp;&nbsp;(lambda&nbsp;(s)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;(if&nbsp;(and&nbsp;(string-equal&nbsp;"r"&nbsp;(item.name&nbsp;s))&nbsp;&nbsp;;;&nbsp;this&nbsp;is&nbsp;an&nbsp;r<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;;;&nbsp;it&nbsp;is&nbsp;syllable&nbsp;final<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(string-equal&nbsp;"1"&nbsp;(item.feat&nbsp;s&nbsp;"syl_final"))<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;;;&nbsp;the&nbsp;syllable&nbsp;is&nbsp;word&nbsp;final<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(not&nbsp;(string-equal&nbsp;"0"&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(item.feat&nbsp;s&nbsp;"R:SylStructure.parent.syl_break")))<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;;;&nbsp;The&nbsp;next&nbsp;segment&nbsp;is&nbsp;not&nbsp;a&nbsp;vowel<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(string-equal&nbsp;"-"&nbsp;(item.feat&nbsp;s&nbsp;"n.ph_vc")))<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(item.delete&nbsp;s)))<br>
+&nbsp;&nbsp;&nbsp;(utt.relation.items&nbsp;utt&nbsp;'Segment)))</P
+></BLOCKQUOTE
+>
+
+In English we also use post-lexical rules for phenomena 
+such as vowel reduction and schwa deletion in the possessive <SPAN
+CLASS="QUOTE"
+>"<I
+CLASS="EMPHASIS"
+>'s</I
+>"</SPAN
+>. </P
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="x1469.html"
+ACCESSKEY="P"
+>&#60;&#60;&#60; Previous</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="book1.html"
+ACCESSKEY="H"
+>Home</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="x1630.html"
+ACCESSKEY="N"
+>Next &#62;&#62;&#62;</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>Building letter-to-sound rules automatically</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="c1379.html"
+ACCESSKEY="U"
+>Up</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>Building lexicons for new languages</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

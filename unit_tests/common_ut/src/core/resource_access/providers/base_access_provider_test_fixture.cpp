@@ -6,12 +6,12 @@ void QnBaseAccessProviderTestFixture::SetUp()
 {
     base_type::SetUp();
     m_accessProvider = createAccessProvider();
-    for (auto provider : qnResourceAccessProvider->providers())
+    for (auto provider: resourceAccessProvider()->providers())
     {
-        qnResourceAccessProvider->removeBaseProvider(provider);
+        resourceAccessProvider()->removeBaseProvider(provider);
         delete provider;
     }
-    qnResourceAccessProvider->addBaseProvider(m_accessProvider);
+    resourceAccessProvider()->addBaseProvider(m_accessProvider);
     setupAwaitAccess();
 }
 

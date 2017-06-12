@@ -1,25 +1,25 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-	<modelVersion>4.0.0</modelVersion>
-	<parent>
-		<artifactId>plugins</artifactId>
-		<groupId>com.networkoptix.hdwitness</groupId>
-		<version>3.0.0-SNAPSHOT</version>
-		<relativePath>..</relativePath>
-	</parent>
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <artifactId>plugins</artifactId>
+        <groupId>com.networkoptix.hdwitness</groupId>
+        <version>3.1.0-SNAPSHOT</version>
+        <relativePath>..</relativePath>
+    </parent>
 
-	<groupId>com.networkoptix.hdwitness</groupId>
-	<version>3.0.0-SNAPSHOT</version>
+    <groupId>com.networkoptix.hdwitness</groupId>
+    <version>3.1.0-SNAPSHOT</version>
     <artifactId>it930x_plugin</artifactId>
-	<packaging>pom</packaging>
+    <packaging>pom</packaging>
     <name>Nx Witness ITE it930x DVB-T Receiver Plugin</name>
 
-	<properties>
-		<product.title>${project.name}</product.title>	
+    <properties>
+        <product.title>${project.name}</product.title>
 
-		<qt.libs>core</qt.libs>
-		<global.libs>-lcommon -lnx_streaming</global.libs>
+        <qt.libs>core</qt.libs>
+        <global.libs>-lcommon</global.libs>
     </properties>
-    
+
     <dependencies>
         <dependency>
             <groupId>${project.groupId}</groupId>
@@ -28,38 +28,29 @@
             <type>pom</type>
             <scope>system</scope>
             <systemPath>${root.dir}/common/pom.xml</systemPath>
-        </dependency>    
-        
-        <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>nx_streaming</artifactId>
-            <version>${project.version}</version>
-            <type>pom</type>
-            <scope>system</scope>
-            <systemPath>${root.dir}/common_libs/nx_streaming/pom.xml</systemPath>
-        </dependency>           
+        </dependency>
     </dependencies>
-    
-	<profiles>
-		<profile>
-			<id>linux</id>
-			<activation>
-				<os>
-					<family>unix</family>
-					<name>linux</name>
-				</os>
-			</activation>
-			<properties>
-				<buildLib>sharedlib</buildLib>
-			</properties>
+
+    <profiles>
+        <profile>
+            <id>linux</id>
+            <activation>
+                <os>
+                    <family>unix</family>
+                    <name>linux</name>
+                </os>
+            </activation>
+            <properties>
+                <buildLib>sharedlib</buildLib>
+            </properties>
             <dependencies>
                 <dependency>
                     <groupId>${project.groupId}</groupId>
                     <artifactId>build_variables</artifactId>
                     <version>${project.version}</version>
-                    <type>pom</type> 
+                    <type>pom</type>
                     <scope>system</scope>
-                    <systemPath>${root.dir}/build_variables/pom.xml</systemPath>            
+                    <systemPath>${root.dir}/build_variables/pom.xml</systemPath>
                 </dependency>
                 <dependency>
                     <groupId>${project.groupId}</groupId>
@@ -68,8 +59,8 @@
                     <type>pom</type>
                     <scope>system</scope>
                     <systemPath>${root.dir}/common/pom.xml</systemPath>
-                </dependency>        
-            </dependencies>             
-		</profile>	
-	</profiles>	
+                </dependency>
+            </dependencies>
+        </profile>
+    </profiles>
 </project>

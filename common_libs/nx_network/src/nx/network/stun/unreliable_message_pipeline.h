@@ -9,11 +9,11 @@
 #include <functional>
 #include <memory>
 
+#include <nx/network/async_stoppable.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/object_destruction_flag.h>
 #include <nx/utils/std/cpp14.h>
-#include <utils/common/stoppable.h>
-#include <utils/common/systemerror.h>
+#include <nx/utils/system_error.h>
 
 #include "nx/network/aio/basic_pollable.h"
 #include "nx/network/connection_server/base_protocol_message_types.h"
@@ -172,7 +172,7 @@ public:
         messageSerializer.setMessage(&message);
         size_t bytesWritten = 0;
         if (messageSerializer.serialize(&serializedMessage, &bytesWritten) != 
-            nx_api::SerializerState::done)
+            nx::network::server::SerializerState::done)
         {
             NX_ASSERT(false);
         }
@@ -195,7 +195,7 @@ private:
         size_t bytesParsed = 0;
         MessageType msg;
         m_messageParser.setMessage(&msg);
-        if (m_messageParser.parse(datagram, &bytesParsed) == nx_api::ParserState::done)
+        if (m_messageParser.parse(datagram, &bytesParsed) == nx::network::server::ParserState::done)
         {
             m_customPipeline->messageReceived(
                 std::move(sourceAddress),
@@ -204,7 +204,7 @@ private:
         else
         {
             NX_LOGX(lm("Failed to parse UDP datagram of size %1 received from %2 on %3")
-                .arg((unsigned int)datagram.size()).str(sourceAddress).str(address()),
+                .arg((unsigned int)datagram.size()).arg(sourceAddress).arg(address()),
                 cl_logDEBUG1);
         }
     }

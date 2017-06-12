@@ -6,8 +6,8 @@
 #ifndef NX_CDB_STREE_HTTP_REQUEST_ATTR_READER_H
 #define NX_CDB_STREE_HTTP_REQUEST_ATTR_READER_H
 
-#include <plugins/videodecoder/stree/resourcecontainer.h>
-#include <nx/network/http/httptypes.h>
+#include <nx/utils/stree/resourcecontainer.h>
+#include <nx/network/http/http_types.h>
 
 
 namespace nx {
@@ -15,7 +15,7 @@ namespace cdb {
 
 class HttpRequestResourceReader
 :
-    public stree::AbstractResourceReader
+    public nx::utils::stree::AbstractResourceReader
 {
 public:
     HttpRequestResourceReader(const nx_http::Request& request);

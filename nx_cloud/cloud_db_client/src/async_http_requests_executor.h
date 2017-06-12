@@ -12,8 +12,8 @@
 #include <nx/utils/thread/mutex.h>
 #include <nx/utils/std/cpp14.h>
 
-#include <http/custom_headers.h>
-#include <utils/common/stoppable.h>
+#include <nx/network/http/custom_headers.h>
+#include <nx/utils/thread/stoppable.h>
 
 #include "data/account_data.h"
 #include "data/types.h"
@@ -115,7 +115,7 @@ public:
 private:
     mutable QnMutex m_mutex;
     nx_http::AuthInfo m_auth;
-    std::deque<std::unique_ptr<QnStoppableAsync>> m_runningRequests;
+    std::deque<std::unique_ptr<network::aio::BasicPollable>> m_runningRequests;
     std::unique_ptr<
         network::cloud::CloudModuleUrlFetcher::ScopedOperation
     > m_cdbEndPointFetcher;
@@ -178,7 +178,7 @@ private:
 
         client->setRequestTimeout(m_requestTimeout);
 
-        m_runningRequests.push_back(std::unique_ptr<QnStoppableAsync>());
+        m_runningRequests.push_back(std::unique_ptr<network::aio::BasicPollable>());
         auto thisClient = client.get();
         client->execute(
             [completionHandler, this, thisClient](
@@ -186,20 +186,10 @@ private:
                 const nx_http::Response* response,
                 OutputData ... data)
             {
-                {
-                    QnMutexLocker lk(&m_mutex);
-                    auto requestIter =
-                        std::find_if(
-                            m_runningRequests.begin(),
-                            m_runningRequests.end(),
-                            [thisClient](const std::unique_ptr<QnStoppableAsync>& client)
-                            {
-                                return client.get() == thisClient;
-                            });
-                    if (requestIter == m_runningRequests.end())
-                        return; //< Request has been cancelled...
-                    m_runningRequests.erase(requestIter);
-                }
+                auto client = getClientByPointer(thisClient);
+                if (!client)
+                    return; //< Request has been cancelled...
+
                 if ((errCode != SystemError::noError && errCode != SystemError::invalidData)
                     || !response)
                 {
@@ -208,24 +198,48 @@ private:
                         OutputData()...);
                 }
 
-                api::ResultCode resultCode = api::ResultCode::ok;
-                const auto resultCodeStrIter =
-                    response->headers.find(Qn::API_RESULT_CODE_HEADER_NAME);
-                if (resultCodeStrIter != response->headers.end())
-                {
-                    resultCode = QnLexical::deserialized<api::ResultCode>(
-                        resultCodeStrIter->second,
-                        api::ResultCode::unknownError);
-                }
-                else
-                {
-                    resultCode = api::httpStatusCodeToResultCode(
-                        static_cast<nx_http::StatusCode::Value>(
-                            response->statusLine.statusCode));
-                }
+                const api::ResultCode resultCode = getResultCode(response);
                 completionHandler(resultCode, std::move(data)...);
             });
         m_runningRequests.back() = std::move(client);
+    }
+
+    std::unique_ptr<network::aio::BasicPollable> getClientByPointer(
+        network::aio::BasicPollable* httpClientPtr)
+    {
+        QnMutexLocker lk(&m_mutex);
+        auto requestIter =
+            std::find_if(
+                m_runningRequests.begin(),
+                m_runningRequests.end(),
+                [httpClientPtr](
+                    const std::unique_ptr<network::aio::BasicPollable>& client)
+                {
+                    return client.get() == httpClientPtr;
+                });
+        if (requestIter == m_runningRequests.end())
+            return nullptr;
+        auto client = std::move(*requestIter);
+        m_runningRequests.erase(requestIter);
+        return client;
+    }
+
+    api::ResultCode getResultCode(const nx_http::Response* response)
+    {
+        const auto resultCodeStrIter =
+            response->headers.find(Qn::API_RESULT_CODE_HEADER_NAME);
+        if (resultCodeStrIter != response->headers.end())
+        {
+            return QnLexical::deserialized<api::ResultCode>(
+                resultCodeStrIter->second,
+                api::ResultCode::unknownError);
+        }
+        else
+        {
+            return api::httpStatusCodeToResultCode(
+                static_cast<nx_http::StatusCode::Value>(
+                    response->statusLine.statusCode));
+        }
     }
 };
 

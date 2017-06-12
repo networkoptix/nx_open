@@ -30,20 +30,23 @@ bool QnStoragePluginFactory::existsFactoryForProtocol(const QString &protocol)
     return m_factoryByProtocol.find(protocol) == m_factoryByProtocol.end() ? false : true;
 }
 
-QnStorageResource *QnStoragePluginFactory::createStorage(const QString &url, bool useDefaultForUnknownPrefix)
+QnStorageResource *QnStoragePluginFactory::createStorage(
+    QnCommonModule* commonModule,
+    const QString &url,
+    bool useDefaultForUnknownPrefix)
 {
     int index = url.indexOf(lit("://"));
-    if (index == -1) 
-        return m_defaultFactory ? m_defaultFactory(url) : NULL;
-    
+    if (index == -1)
+        return m_defaultFactory ? m_defaultFactory(commonModule, url) : NULL;
+
     QString protocol = url.left(index);
     if (m_factoryByProtocol.contains(protocol)) {
-        QnStorageResource *ret = m_factoryByProtocol.value(protocol)(url);
+        QnStorageResource *ret = m_factoryByProtocol.value(protocol)(commonModule, url);
         ret->setStorageType(protocol);
         return ret;
     } else {
         if (useDefaultForUnknownPrefix)
-            return m_defaultFactory ? m_defaultFactory(url) : NULL;
+            return m_defaultFactory ? m_defaultFactory(commonModule, url) : NULL;
         else
             return NULL;
     }

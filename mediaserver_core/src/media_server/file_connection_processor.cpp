@@ -7,12 +7,11 @@
 #include <quazip/quazip.h>
 #include <quazip/quazipfile.h>
 
+#include <nx/network/http/http_types.h>
+#include <nx/utils/gzip/gzip_compressor.h>
+
 #include <media_server/serverutil.h>
-
 #include <network/tcp_connection_priv.h>
-#include <nx/network/http/httptypes.h>
-
-#include <utils/gzip/gzip_compressor.h>
 #include <utils/common/util.h>
 #include <network/tcp_listener.h>
 #include <common/common_module.h>
@@ -99,8 +98,10 @@ class QnFileConnectionProcessorPrivate : public QnTCPConnectionProcessorPrivate
 public:
 };
 
-QnFileConnectionProcessor::QnFileConnectionProcessor(QSharedPointer<AbstractStreamSocket> socket, QnTcpListener* /*_owner*/) :
-    QnTCPConnectionProcessor(new QnTCPConnectionProcessorPrivate, socket)
+QnFileConnectionProcessor::QnFileConnectionProcessor(
+    QSharedPointer<AbstractStreamSocket> socket, QnTcpListener* owner)
+:
+    QnTCPConnectionProcessor(new QnTCPConnectionProcessorPrivate, socket, owner)
 {
 }
 
@@ -137,7 +138,7 @@ bool QnFileConnectionProcessor::loadFile(
         return false;
 
     *outData = file->readAll();
-    *outLastModified = qnCommon->startupTime(); //staticFileLastModified(file);
+    *outLastModified = commonModule()->startupTime(); //staticFileLastModified(file);
     if (outData->size() < cachedFiles.maxCost())
         cachedFiles.insert(path, new CacheEntry(*outData, *outLastModified), outData->size());
     return true;
@@ -150,7 +151,7 @@ QByteArray QnFileConnectionProcessor::compressMessageBody(const QByteArray& cont
     if (nx_http::getHeaderValue(d->request.headers, "Accept-Encoding").toLower().contains("gzip") && !d->response.messageBody.isEmpty())
     {
         if (!contentType.contains("image")) {
-            d->response.messageBody = GZipCompressor::compressData(d->response.messageBody);
+            d->response.messageBody = nx::utils::bstream::gzip::Compressor::compressData(d->response.messageBody);
             return "gzip";
         }
     }
@@ -186,7 +187,7 @@ void QnFileConnectionProcessor::run()
         return;
     }
 
-    nx_http::HttpHeader modifiedHeader("Last-Modified", dateTimeToHTTPFormat(lastModified));
+    nx_http::HttpHeader modifiedHeader("Last-Modified", nx_http::formatDateTime(lastModified));
     d->response.headers.insert(modifiedHeader);
     QString modifiedSinceStr = nx_http::getHeaderValue(d->request.headers, "If-Modified-Since");
     if (!modifiedSinceStr.isEmpty())

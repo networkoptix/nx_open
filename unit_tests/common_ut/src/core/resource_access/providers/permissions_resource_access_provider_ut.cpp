@@ -7,10 +7,12 @@
 #include <core/resource/layout_resource.h>
 #include <core/resource/user_resource.h>
 #include <core/resource/media_server_resource.h>
-#include <core/resource/storage_resource_stub.h>
-#include <core/resource/camera_resource_stub.h>
+#include <test_support/resource/storage_resource_stub.h>
+#include <test_support/resource/camera_resource_stub.h>
 #include <core/resource/webpage_resource.h>
 #include <core/resource/videowall_resource.h>
+
+#include <common/common_module.h>
 
 namespace {
 
@@ -32,7 +34,7 @@ protected:
 
     virtual QnAbstractResourceAccessProvider* createAccessProvider() const override
     {
-        return new QnPermissionsResourceAccessProvider();
+        return new QnPermissionsResourceAccessProvider(commonModule());
     }
 };
 
@@ -217,7 +219,7 @@ TEST_F(QnPermissionsResourceAccessProviderTest, checkUserRoleChangeAccess)
 
     auto user = addUser(Qn::NoGlobalPermissions);
     auto role = createRole(Qn::GlobalAccessAllMediaPermission);
-    qnUserRolesManager->addOrUpdateUserRole(role);
+    userRolesManager()->addOrUpdateUserRole(role);
 
     user->setUserRoleId(role.id);
     ASSERT_TRUE(accessProvider()->hasAccess(user, target));
@@ -237,7 +239,7 @@ TEST_F(QnPermissionsResourceAccessProviderTest, checkUserEnabledChange)
 TEST_F(QnPermissionsResourceAccessProviderTest, nonPoolResourceAccess)
 {
     auto user = addUser(Qn::GlobalAdminPermission);
-    QnVirtualCameraResourcePtr camera(new QnCameraResourceStub());
+    QnVirtualCameraResourcePtr camera(new nx::CameraResourceStub());
     ASSERT_FALSE(accessProvider()->hasAccess(user, camera));
 }
 
@@ -246,7 +248,7 @@ TEST_F(QnPermissionsResourceAccessProviderTest, awaitNewCameraAccess)
     auto user = addUser(Qn::GlobalAdminPermission);
     auto camera = createCamera();
     awaitAccess(user, camera);
-    qnResPool->addResource(camera);
+    resourcePool()->addResource(camera);
 }
 
 TEST_F(QnPermissionsResourceAccessProviderTest, awaitRemovedCameraAccess)
@@ -254,7 +256,7 @@ TEST_F(QnPermissionsResourceAccessProviderTest, awaitRemovedCameraAccess)
     auto user = addUser(Qn::GlobalAdminPermission);
     auto camera = addCamera();
     awaitAccess(user, camera, false);
-    qnResPool->removeResource(camera);
+    resourcePool()->removeResource(camera);
 }
 
 TEST_F(QnPermissionsResourceAccessProviderTest, awaitNewUserAccess)
@@ -262,7 +264,7 @@ TEST_F(QnPermissionsResourceAccessProviderTest, awaitNewUserAccess)
     auto camera = addCamera();
     auto user = createUser(Qn::GlobalAdminPermission);
     awaitAccess(user, camera);
-    qnResPool->addResource(user);
+    resourcePool()->addResource(user);
 }
 
 TEST_F(QnPermissionsResourceAccessProviderTest, awaitRemovedUserAccess)
@@ -270,7 +272,7 @@ TEST_F(QnPermissionsResourceAccessProviderTest, awaitRemovedUserAccess)
     auto camera = addCamera();
     auto user = addUser(Qn::GlobalAdminPermission);
     awaitAccess(user, camera, false);
-    qnResPool->removeResource(user);
+    resourcePool()->removeResource(user);
 }
 
 TEST_F(QnPermissionsResourceAccessProviderTest, awaitPermissionsChangedAccess)
@@ -291,7 +293,7 @@ TEST_F(QnPermissionsResourceAccessProviderTest, suppressDuplicatedSignals)
     user->setRawPermissions(Qn::GlobalAccessAllMediaPermission);
 
     /* Here we should receive the 'false' value. */
-    qnResPool->removeResource(user);
+    resourcePool()->removeResource(user);
 }
 
 TEST_F(QnPermissionsResourceAccessProviderTest, checkRoleCameraAccess)
@@ -299,7 +301,7 @@ TEST_F(QnPermissionsResourceAccessProviderTest, checkRoleCameraAccess)
     auto target = addCamera();
 
     auto role = createRole(Qn::GlobalAccessAllMediaPermission);
-    qnUserRolesManager->addOrUpdateUserRole(role);
+    userRolesManager()->addOrUpdateUserRole(role);
     ASSERT_TRUE(accessProvider()->hasAccess(role, target));
 }
 
@@ -308,11 +310,11 @@ TEST_F(QnPermissionsResourceAccessProviderTest, checkRolePermissionsChange)
     auto target = addCamera();
 
     auto role = createRole(Qn::NoGlobalPermissions);
-    qnUserRolesManager->addOrUpdateUserRole(role);
+    userRolesManager()->addOrUpdateUserRole(role);
     ASSERT_FALSE(accessProvider()->hasAccess(role, target));
 
     role.permissions = Qn::GlobalAccessAllMediaPermission;
-    qnUserRolesManager->addOrUpdateUserRole(role);
+    userRolesManager()->addOrUpdateUserRole(role);
     ASSERT_TRUE(accessProvider()->hasAccess(role, target));
 }
 
@@ -322,7 +324,7 @@ TEST_F(QnPermissionsResourceAccessProviderTest, awaitAddedRoleAccess)
 
     auto role = createRole(Qn::GlobalAccessAllMediaPermission);
     awaitAccess(role, target, true);
-    qnUserRolesManager->addOrUpdateUserRole(role);
+    userRolesManager()->addOrUpdateUserRole(role);
 }
 
 TEST_F(QnPermissionsResourceAccessProviderTest, awaitRemovedRoleAccess)
@@ -330,46 +332,46 @@ TEST_F(QnPermissionsResourceAccessProviderTest, awaitRemovedRoleAccess)
     auto target = addCamera();
 
     auto role = createRole(Qn::GlobalAccessAllMediaPermission);
-    qnUserRolesManager->addOrUpdateUserRole(role);
+    userRolesManager()->addOrUpdateUserRole(role);
     awaitAccess(role, target, false);
 
-    qnUserRolesManager->removeUserRole(role.id);
+    userRolesManager()->removeUserRole(role.id);
 }
 
 TEST_F(QnPermissionsResourceAccessProviderTest, suppressDuplicatedRoleSignals)
 {
     auto target = addCamera();
     auto role = createRole(Qn::GlobalAccessAllMediaPermission);
-    qnUserRolesManager->addOrUpdateUserRole(role);
+    userRolesManager()->addOrUpdateUserRole(role);
 
     awaitAccess(role, target, false);
 
     /* Here we should NOT receive the signal */
     role.permissions = Qn::GlobalAccessAllMediaPermission | Qn::GlobalExportPermission;
-    qnUserRolesManager->addOrUpdateUserRole(role);
+    userRolesManager()->addOrUpdateUserRole(role);
 
     /* Here we should receive the 'false' value. */
-    qnUserRolesManager->removeUserRole(role.id);
+    userRolesManager()->removeUserRole(role.id);
 }
 
 TEST_F(QnPermissionsResourceAccessProviderTest, awaitRoleAccessToAddedCamera)
 {
     auto role = createRole(Qn::GlobalAccessAllMediaPermission);
-    qnUserRolesManager->addOrUpdateUserRole(role);
+    userRolesManager()->addOrUpdateUserRole(role);
 
     auto target = createCamera();
     awaitAccess(role, target, true);
-    qnResPool->addResource(target);
+    resourcePool()->addResource(target);
 }
 
 TEST_F(QnPermissionsResourceAccessProviderTest, awaitRoleAccessToRemovedCamera)
 {
     auto role = createRole(Qn::GlobalAccessAllMediaPermission);
-    qnUserRolesManager->addOrUpdateUserRole(role);
+    userRolesManager()->addOrUpdateUserRole(role);
 
     auto target = addCamera();
     awaitAccess(role, target, false);
-    qnResPool->removeResource(target);
+    resourcePool()->removeResource(target);
 }
 
 TEST_F(QnPermissionsResourceAccessProviderTest, awaitUserAccessChangeOnRolePermissionsChange)
@@ -377,7 +379,7 @@ TEST_F(QnPermissionsResourceAccessProviderTest, awaitUserAccessChangeOnRolePermi
     auto target = addCamera();
 
     auto role = createRole(Qn::NoGlobalPermissions);
-    qnUserRolesManager->addOrUpdateUserRole(role);
+    userRolesManager()->addOrUpdateUserRole(role);
 
     auto user = addUser(Qn::GlobalAdminPermission);
     user->setUserRoleId(role.id);
@@ -385,7 +387,7 @@ TEST_F(QnPermissionsResourceAccessProviderTest, awaitUserAccessChangeOnRolePermi
 
     awaitAccess(user, target, true);
     role.permissions = Qn::GlobalAccessAllMediaPermission;
-    qnUserRolesManager->addOrUpdateUserRole(role);
+    userRolesManager()->addOrUpdateUserRole(role);
     ASSERT_TRUE(accessProvider()->hasAccess(user, target));
 }
 
@@ -394,7 +396,7 @@ TEST_F(QnPermissionsResourceAccessProviderTest, checkAccessToOwnLayout)
     auto target = createLayout();
     auto user = addUser(Qn::NoGlobalPermissions);
     target->setParentId(user->getId());
-    qnResPool->addResource(target);
+    resourcePool()->addResource(target);
     ASSERT_TRUE(accessProvider()->hasAccess(user, target));
 }
 
@@ -405,7 +407,7 @@ TEST_F(QnPermissionsResourceAccessProviderTest, checkParentIdChange)
     auto user = addUser(Qn::NoGlobalPermissions);
     auto target = createLayout();
     target->setParentId(user->getId());
-    qnResPool->addResource(target);
+    resourcePool()->addResource(target);
     target->setParentId(QnUuid());
     ASSERT_FALSE(accessProvider()->hasAccess(user, target));
 }

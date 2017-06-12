@@ -6,7 +6,7 @@
 #include "merge_ldap_users_rest_handler.h"
 
 #include <common/common_module.h>
-#include <nx/network/http/httptypes.h>
+#include <nx/network/http/http_types.h>
 
 #include <core/resource/user_resource.h>
 #include <ldap/ldap_manager.h>
@@ -17,25 +17,26 @@
 
 #include <nx/utils/uuid.h>
 #include "rest/server/rest_connection_processor.h"
+#include <network/authenticate_helper.h>
 
-namespace {
-    ec2::AbstractECConnectionPtr ec2Connection() { return QnAppServerConnectionFactory::getConnection2(); }
-}
-
-int QnMergeLdapUsersRestHandler::executePost(const QString &path, const QnRequestParams &params, const QByteArray &body, QnJsonRestResult &result, const QnRestConnectionProcessor* owner)
+int QnMergeLdapUsersRestHandler::executePost(
+    const QString &path,
+    const QnRequestParams &params,
+    const QByteArray &body,
+    QnJsonRestResult &result,
+    const QnRestConnectionProcessor* owner)
 {
     QN_UNUSED(path, params, body);
 
-    QnLdapManager *ldapManager = QnLdapManager::instance();
     QnLdapUsers ldapUsers;
-    Qn::LdapResult ldapResult = ldapManager->fetchUsers(ldapUsers);
+    Qn::LdapResult ldapResult = qnAuthHelper->ldapManager()->fetchUsers(ldapUsers);
     if (ldapResult != Qn::Ldap_NoError)
 	{
         result.setError(QnRestResult::CantProcessRequest, QnLdapManager::errorMessage(ldapResult));
         return nx_http::StatusCode::ok;
     }
 
-    ec2::AbstractUserManagerPtr userManager = ec2Connection()->getUserManager(owner->accessRights());
+    ec2::AbstractUserManagerPtr userManager = owner->commonModule()->ec2Connection()->getUserManager(owner->accessRights());
 
     ec2::ApiUserDataList dbUsers;
     userManager->getUsersSync(&dbUsers);

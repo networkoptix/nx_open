@@ -1,7 +1,7 @@
 #pragma once
 
 #include <nx/utils/move_only_func.h>
-#include <utils/common/stoppable.h>
+#include <nx/utils/thread/stoppable.h>
 
 namespace nx {
 namespace hpm {

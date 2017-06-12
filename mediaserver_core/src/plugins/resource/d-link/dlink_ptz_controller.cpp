@@ -3,7 +3,7 @@
 #include "dlink_ptz_controller.h"
 #include "nx/utils/math/fuzzy.h"
 #include "plugins/resource/onvif/onvif_resource.h"
-#include "utils/common/long_runnable.h"
+#include "nx/utils/thread/long_runnable.h"
 
 //static const int CACHE_UPDATE_TIMEOUT = 60 * 1000;
 
@@ -47,20 +47,20 @@ QnDlinkPtzController::~QnDlinkPtzController()
 
 }
 
-Qn::PtzCapabilities QnDlinkPtzController::getCapabilities()
+Ptz::Capabilities QnDlinkPtzController::getCapabilities() const
 {
-    return Qn::ContinuousZoomCapability | Qn::ContinuousPanCapability | Qn::ContinuousTiltCapability;
+    return Ptz::ContinuousZoomCapability | Ptz::ContinuousPanCapability | Ptz::ContinuousTiltCapability;
 }
 
-static QString zoomDirection(qreal speed) 
+static QString zoomDirection(qreal speed)
 {
-    if(speed > 0) 
+    if(speed > 0)
         return lit("tele");
     else
         return lit("wide");
 }
 
-static QString moveDirection(qreal x, qreal y) 
+static QString moveDirection(qreal x, qreal y)
 {
     if(qAbs(x) > qAbs(y))
         return x > 0 ? lit("right") : lit("left");
@@ -75,12 +75,12 @@ bool QnDlinkPtzController::continuousMove(const QVector3D &speed)
         request = QString(lit("/cgi-bin/camctrl/camctrl.cgi?channel=%1&zoom=%2")).arg(m_resource->getChannel()).arg(zoomDirection(speed.z()));
     else if (!qFuzzyIsNull(speed.x()) || !qFuzzyIsNull(speed.y()))
         request = QString(lit("/cgi-bin/camctrl/camctrl.cgi?channel=%1&move=%2")).arg(m_resource->getChannel()).arg(moveDirection(speed.x(), speed.y()));
-    
+
     m_repeatCommand->stop();
     bool rez = true;
     if (!request.isEmpty())
         rez = doQuery(request);
-    
+
     if (rez) {
         QnMutexLocker lock( &m_mutex );
         m_lastRequest = request;
@@ -91,7 +91,7 @@ bool QnDlinkPtzController::continuousMove(const QVector3D &speed)
     return rez;
 }
 
-bool QnDlinkPtzController::doQuery(const QString &request, QByteArray* body) const 
+bool QnDlinkPtzController::doQuery(const QString &request, QByteArray* body) const
 {
     if (request.isEmpty())
         return false;

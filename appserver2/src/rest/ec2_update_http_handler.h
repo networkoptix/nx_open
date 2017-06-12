@@ -8,7 +8,7 @@
 #include <nx/utils/log/assert.h>
 #include <nx/utils/thread/mutex.h>
 #include <nx/utils/thread/wait_condition.h>
-#include <nx/network/http/httptypes.h>
+#include <nx/network/http/http_types.h>
 #include <nx/fusion/model_functions.h>
 
 #include <rest/server/request_handler.h>
@@ -27,12 +27,12 @@ namespace update_http_handler_detail {
 // TODO: Move to ApiIdData. Then consider moving this and fillId() methods out of Api*Data.
 
 template<typename RequestData>
-void fixRequestDataIfNeeded(RequestData* const /*requestData*/)
+inline void fixRequestDataIfNeeded(RequestData* const /*requestData*/)
 {
 }
 
 template<>
-void fixRequestDataIfNeeded<ApiUserData>(ApiUserData* const userData)
+inline void fixRequestDataIfNeeded<ApiUserData>(ApiUserData* const userData)
 {
     if (userData->isCloud)
     {

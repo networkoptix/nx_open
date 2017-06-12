@@ -2,17 +2,19 @@
 
 #include "server_rest_connection_fwd.h"
 
-#include <nx/network/http/httptypes.h>
-#include "utils/common/systemerror.h"
+#include <nx/network/http/http_types.h>
+#include <nx/utils/system_error.h>
 #include "utils/common/request_param.h"
 #include "nx_ec/data/api_fwd.h"
 #include <api/helpers/request_helpers_fwd.h>
 #include <nx/network/http/asynchttpclient.h>
 
 #include <rest/server/json_rest_result.h>
-#include <utils/common/safe_direct_connection.h>
+#include <nx/utils/safe_direct_connection.h>
 #include <api/http_client_pool.h>
+#include <business/business_fwd.h>
 #include <core/resource/resource_fwd.h>
+#include <common/common_module_aware.h>
 
 /*
 * New class for HTTP requests to mediaServer. It should be used instead of deprecated class QnMediaServerConnection.
@@ -25,11 +27,12 @@ namespace rest
 {
     class ServerConnection:
         public QObject,
+        public QnCommonModuleAware,
         public Qn::EnableSafeDirectConnection
     {
         Q_OBJECT
     public:
-        ServerConnection(const QnUuid& serverId);
+        ServerConnection(QnCommonModule* commonModule, const QnUuid& serverId);
         virtual ~ServerConnection();
 
 
@@ -63,6 +66,9 @@ namespace rest
             QThread* targetThread = 0);
 
         Handle twoWayAudioCommand(const QnUuid& cameraId, bool start, GetCallback callback, QThread* targetThread = 0);
+
+        Handle softwareTriggerCommand(const QnUuid& cameraId, const QString& triggerId,
+            QnBusiness::EventState toggleState, GetCallback callback, QThread* targetThread = nullptr);
 
         Handle getStatisticsSettingsAsync(Result<QByteArray>::type callback
             , QThread *targetThread = nullptr);

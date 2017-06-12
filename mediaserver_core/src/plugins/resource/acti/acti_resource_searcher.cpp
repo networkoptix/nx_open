@@ -11,7 +11,7 @@
 #include <core/resource/resource_data.h>
 #include <core/resource_management/resource_data_pool.h>
 #include <common/common_module.h>
-
+#include <common/static_common_module.h>
 
 extern QString getValueFromString(const QString& line);
 
@@ -39,7 +39,10 @@ const int kCacheExpirationInterval = 60 * 1000;
 
 const QString QnActiResourceSearcher::kSystemInfoProductionIdParamName("production id");
 
-QnActiResourceSearcher::QnActiResourceSearcher()
+QnActiResourceSearcher::QnActiResourceSearcher(QnCommonModule* commonModule):
+    QnAbstractResourceSearcher(commonModule),
+    QnAbstractNetworkResourceSearcher(commonModule),
+    QnUpnpResourceSearcherAsync(commonModule)
 {
     QnMdnsListener::instance()->registerConsumer((std::uintptr_t) this);
     m_resTypeId = qnResTypePool->getResourceTypeId(manufacture(), QLatin1String("ACTI_COMMON"));
@@ -264,7 +267,7 @@ QList<QnResourcePtr> QnActiResourceSearcher::checkHostAddr(const QUrl& url, cons
         return result;
     }
 
-    auto resourceData = qnCommon->dataPool()->data(manufacture(), devInfo.info.modelName);
+    auto resourceData = qnStaticCommon->dataPool()->data(manufacture(), devInfo.info.modelName);
     if (resourceData.value<bool>(Qn::FORCE_ONVIF_PARAM_NAME))
         return result;
 
@@ -355,7 +358,7 @@ void QnActiResourceSearcher::processPacket(
     if(isNx)
         devInfoCopy.friendlyName = NX_VENDOR;
 
-    auto existingRes = qnResPool->getNetResourceByPhysicalId(
+    auto existingRes = resourcePool()->getNetResourceByPhysicalId(
         stringToActiPhysicalID(devInfo.serialNumber));
 
     QAuthenticator cameraAuth;
@@ -388,7 +391,7 @@ void QnActiResourceSearcher::processPacket(
 
         // Possible auth = auth from resources with the same host address + default one.
         QSet<QAuthenticator> possibleAuth;
-        auto sameHostResources = qnResPool->getAllNetResourceByHostAddress(host)
+        auto sameHostResources = resourcePool()->getAllNetResourceByHostAddress(host)
             .filtered<QnActiResource>();
 
         if (!sameHostResources.isEmpty())
@@ -441,7 +444,7 @@ void QnActiResourceSearcher::createResource(
         return;
 
     const bool isNx = isNxDevice(devInfo);
-    QnResourceData resourceData = qnCommon->dataPool()->data(manufacture(), devInfo.modelName);
+    QnResourceData resourceData = qnStaticCommon->dataPool()->data(manufacture(), devInfo.modelName);
     if (resourceData.value<bool>(Qn::FORCE_ONVIF_PARAM_NAME))
         return;
 
@@ -450,7 +453,7 @@ void QnActiResourceSearcher::createResource(
 
     if(isNx)
     {
-        resourceData = qnCommon->dataPool()->data(NX_VENDOR, devInfo.modelName);
+        resourceData = qnStaticCommon->dataPool()->data(NX_VENDOR, devInfo.modelName);
         auto name = resourceData.value<QString>(NX_DEVICE_NAME_PARAMETER_NAME);
         auto model = resourceData.value<QString>(NX_DEVICE_MODEL_PARAMETER_NAME);
 
@@ -511,17 +514,17 @@ QnNetworkResourcePtr QnActiResourceSearcher::findExistingResource(
     const QString& serialNumber,
     const QString& macAddress)
 {
-    auto existingRes = qnResPool->getNetResourceByPhysicalId(stringToActiPhysicalID(serialNumber));
+    auto existingRes = resourcePool()->getNetResourceByPhysicalId(stringToActiPhysicalID(serialNumber));
 
     if (!existingRes)
-        existingRes = qnResPool->getNetResourceByPhysicalId(stringToActiPhysicalID(macAddress));
+        existingRes = resourcePool()->getNetResourceByPhysicalId(stringToActiPhysicalID(macAddress));
 
     if (!existingRes && !QnMacAddress(macAddress).isNull())
-        existingRes = qnResPool->getResourceByMacAddress(macAddress);
+        existingRes = resourcePool()->getResourceByMacAddress(macAddress);
 
     if (!existingRes && !serialNumber.isEmpty())
     {
-        auto sameHostResources = qnResPool->getAllNetResourceByHostAddress(hostAddress)
+        auto sameHostResources = resourcePool()->getAllNetResourceByHostAddress(hostAddress)
             .filtered<QnActiResource>();
 
         for (const auto& camera: sameHostResources)

@@ -4,6 +4,7 @@
 #include <atomic>
 #include <vector>
 #include <map>
+#include <nx/utils/std/future.h>
 
 #ifndef Q_MOC_RUN
 #include <boost/optional.hpp>
@@ -14,9 +15,11 @@
 #include <recorder/storage_manager.h>
 #include <core/resource/server_backup_schedule.h>
 #include <nx_ec/data/api_media_server_data.h>
-#include "utils/common/long_runnable.h"
+#include "nx/utils/thread/long_runnable.h"
+#include <common/common_module_aware.h>
+#include <nx/utils/std/future.h>
 
-class QnScheduleSync: public QnLongRunnable
+class QnScheduleSync: public QnLongRunnable, public QnCommonModuleAware
 {
     Q_OBJECT
 private:
@@ -59,7 +62,7 @@ public:
     };
 
 public:
-    QnScheduleSync();
+    QnScheduleSync(QnCommonModule* commonModule);
     ~QnScheduleSync();
 signals:
     void backupFinished(
@@ -143,8 +146,8 @@ private:
     std::atomic<bool>       m_backupSyncOn;
     std::atomic<bool>       m_syncing;
     std::atomic<bool>       m_forced;
-    
-    // Interrupted by user OR current backup session is over 
+
+    // Interrupted by user OR current backup session is over
     std::atomic<bool>       m_interrupted;
     bool                    m_failReported;
     ec2::backup::DayOfWeek  m_curDow;
@@ -157,7 +160,7 @@ private:
     SyncDataMap           m_syncData;
     mutable QnMutex       m_syncDataMutex;
     CopyError             m_lastError;
-    std::promise<void>    m_stopPromise;
+    nx::utils::promise<void>    m_stopPromise;
 };
 
 #endif

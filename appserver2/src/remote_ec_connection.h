@@ -25,20 +25,27 @@ namespace ec2
 
     public:
         RemoteEC2Connection(
+            const AbstractECConnectionFactory* connectionFactory,
+            const QnUuid& remotePeerId,
             const FixedUrlClientQueryProcessorPtr& queryProcessor,
             const QnConnectionInfo& connectionInfo );
         virtual ~RemoteEC2Connection();
 
         virtual QnConnectionInfo connectionInfo() const override;
-        virtual QString authInfo() const override;
+        virtual void updateConnectionUrl(const QUrl& url) override;
 
         virtual void startReceivingNotifications() override;
         virtual void stopReceivingNotifications() override;
+
+        virtual Timestamp getTransactionLogTime() const override;
+        virtual void setTransactionLogTime(Timestamp value) override;
+
     private:
         FixedUrlClientQueryProcessorPtr m_queryProcessor;
-        const QnConnectionInfo m_connectionInfo;
-        QUrl m_peerUrl;
+        QnConnectionInfo m_connectionInfo;
+        QnUuid m_remotePeerId;
     };
+    typedef std::shared_ptr<RemoteEC2Connection> RemoteEC2ConnectionPtr;
 }
 
 #endif  //REMOTE_EC_CONNECTION_H

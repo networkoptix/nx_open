@@ -7,9 +7,9 @@
 #include "plugins/storage/third_party/third_party_storage.h"
 #include <nx/utils/thread/mutex.h>
 
-class QnThirdPartyStorageResource
-    : public QnStorageResource
+class QnThirdPartyStorageResource: public QnStorageResource
 {
+    using base_type = QnStorageResource;
 public: //typedefs
     typedef std::shared_ptr<
         nx_spl::Storage
@@ -28,12 +28,14 @@ public: //typedefs
 
 public: // static funcs
     static QnStorageResource* instance(
+        QnCommonModule* commonModule,
         const QString               &url,
         const StorageFactoryPtrType &sf
     );
 
 public: //ctors, dtor
     QnThirdPartyStorageResource(
+        QnCommonModule* commonModule,
         const StorageFactoryPtrType &sf,
         const QString               &storageUrl
     );
@@ -44,11 +46,11 @@ public: //ctors, dtor
 
 public: // inherited interface overrides
     virtual QIODevice *open(
-        const QString       &fileName, 
+        const QString       &fileName,
         QIODevice::OpenMode  openMode
     ) override;
 
-    virtual int     getCapabilities() const override;    
+    virtual int     getCapabilities() const override;
     virtual qint64  getFreeSpace() override;
     virtual qint64  getTotalSpace()const override;
     virtual Qn::StorageInitResult initOrUpdate() override;
@@ -59,8 +61,8 @@ public: // inherited interface overrides
     virtual bool    isDirExists(const QString& url) override;
     virtual qint64  getFileSize(const QString& url) const override;
 
-    virtual 
-    QnAbstractStorageResource::FileInfoList 
+    virtual
+    QnAbstractStorageResource::FileInfoList
     getFileList(const QString& dirName) override;
 
 private:

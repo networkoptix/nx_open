@@ -23,7 +23,7 @@
 #include <sys/statvfs.h>
 
 #include <nx/utils/log/log.h>
-#include <utils/common/concurrent.h>
+#include <nx/utils/concurrent.h>
 #include <utils/fs/dir.h>
 
 static const int BYTES_PER_MB = 1024*1024;
@@ -603,10 +603,7 @@ QList<QnPlatformMonitor::PartitionSpace> QnLinuxMonitor::totalPartitionSpaceInfo
     QThreadPool pool;
     PartitionInfoAsyncFetcher infoFetcher;
 
-    NX_LOG(lit("%1 Preparing to get partitions info. Timeout is %2 ms.")
-           .arg(Q_FUNC_INFO)
-           .arg(kExpiryTimeout), cl_logDEBUG2);
-
+    NX_VERBOSE(this, lm("Preparing to get partitions info. Timeout is %1 ms.").arg(kExpiryTimeout));
     pool.setMaxThreadCount(1);
     infoFetcher.setAutoDelete(false);
 
@@ -616,13 +613,12 @@ QList<QnPlatformMonitor::PartitionSpace> QnLinuxMonitor::totalPartitionSpaceInfo
 
     if (result.isEmpty())
     {
-        NX_LOG(lit("%1 Get partitions info result is empty. This might result in serious storage related problems.")
-               .arg(Q_FUNC_INFO)
-               .arg(kExpiryTimeout), cl_logWARNING);
+        NX_WARNING(this, lm("Get partitions info result is empty. "
+            "This might result in serious storage related problems."));
     }
     else
     {
-        NX_LOG(lit("%1 Get partitions info succeeded.").arg(Q_FUNC_INFO), cl_logDEBUG2);
+        NX_DEBUG(this, lm("Get partitions info: %1").container(result));
     }
 
     return result;

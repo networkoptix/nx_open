@@ -9,9 +9,9 @@
 #include <functional>
 
 #include <cdb/result_code.h>
-#include <nx/network/http/httptypes.h>
+#include <nx/network/http/http_types.h>
 #include <nx/utils/move_only_func.h>
-#include <plugins/videodecoder/stree/resourcecontainer.h>
+#include <nx/utils/stree/resourcecontainer.h>
 
 
 namespace nx {
@@ -30,8 +30,8 @@ public:
     virtual void authenticateByName(
         const nx_http::StringType& username,
         std::function<bool(const nx::Buffer&)> validateHa1Func,
-        const stree::AbstractResourceReader& authSearchInputData,
-        stree::ResourceContainer* const authProperties,
+        const nx::utils::stree::AbstractResourceReader& authSearchInputData,
+        nx::utils::stree::ResourceContainer* const authProperties,
         nx::utils::MoveOnlyFunc<void(api::ResultCode /*authResult*/)> completionHandler) = 0;
 };
 

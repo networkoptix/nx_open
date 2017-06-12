@@ -6,106 +6,16 @@
 
 $font-size-a-bit-large:   ceil($font-size-base * 1.15); //~16px - we just need 16px sometimes :-)
 
+
+.container-fluid {
+    padding:0;
+}
+
 .panel{
   box-shadow: 0 1px 2px transparentize($dark15,0.9);
 }
 .panel-heading {
   border-bottom: none;
-}
-
-.navbar{
-  box-shadow: 0 6px 10px $light3;
-}
-.navbar-brand{
-  font-size: $font-size-h3;
-  margin-right:16px;
-}
-
-.navbar-brand>img{
-  height:36px;
-  margin:10px 0;
-  display: inline-block;
-}
-
-.navbar-toggle {
-  width: 40px;
-  height:40px;
-  font-size: $font-size-h3;
-}
-
-
-// Default navbar
-.navbar-default {
-  .navbar-nav > .active > a {
-    &,
-    &:hover,
-    &:focus {
-      border-bottom: 3px solid $brand_core;
-      padding-bottom: 13px;
-
-      padding-right:1px;
-      padding-left:1px;
-      margin-right:15px;
-      margin-left:15px;
-
-      cursor: default;
-      background-color: $navbar-default-bg !important;
-    }
-  }
-}
-.nav > li > a{
-  padding: 16px;
-  line-height: 24px;
-  font-size: $font-size-large;
-}
-
-@media (max-width: $grid-float-breakpoint-max) {
-  .navbar-collapse{
-    .nav > li > a {
-      padding: 6px 8px;
-    }
-    .nav > li > .btn-wrapper {
-      padding: 4px 8px;
-      width: 50%;
-      a {
-        width: 100%;
-      }
-    }
-    .navbar-nav {
-      margin: 0px;
-    }
-    
-    padding-top:10px;
-    padding-bottom:10px;
-  }
-}
-
-.nav .dropdown-menu > li > a{
-  padding: 6px 16px;
-  font-size: $font-size-base;
-}
-
-.dropdown-menu {
-  padding: 8px 0;
-  border-radius: 0;
-  @include box-shadow(0 2px 4px transparentize($dark15,0.8));
-}
-
-.navbar-nav > li > .dropdown-menu {
-  min-width:100%;
-  border-top:none;
-}
-
-
-.nav > li > a:hover {
-  background-color: $light2 !important;
-}
-
-.nav-tabs > li > a{
-  line-height: 16px;
-}
-.nav-tabs > li > a:hover {
-  background-color: #fff !important;
 }
 
 
@@ -154,7 +64,9 @@ h1>.label{
       margin-right:8px;
     }
   }
-
+  .modal-title{
+    margin-right: 24px;
+  }
   .modal-header .close{
     position: absolute;
     right: 0;
@@ -349,21 +261,6 @@ label {
 }
 
 
-.navbar{
-  border-top:none;
-  border-left:none;
-  border-right:none;
-  border-radius:0;
-}
-
-.navbar-default .navbar-nav>li.open>a{
-  border: 1px solid $dropdown-border;
-  color: $navbar-default-link-color !important;
-  border-bottom: none;
-  padding:15px;
-  @include box-shadow(0 2px 4px transparentize($dark15,0.7));
-}
-
 
 @mixin kill-glyphicon{
   background-size: 112px 32px;
@@ -413,3 +310,12 @@ select {
         margin-top: 8px;
     }
 }
+
+
+.nav-tabs > li > a{
+  line-height: 16px;
+}
+.nav-tabs > li > a:hover {
+  background-color: #fff !important;
+}
+

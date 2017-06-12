@@ -3,22 +3,22 @@
 #include "network/universal_request_processor_p.h"
 #include "network/tcp_connection_priv.h"
 #include "network/universal_tcp_listener.h"
-#include <http/custom_headers.h>
+#include <nx/network/http/custom_headers.h>
 
 class QnProxyReceiverConnectionPrivate: public QnTCPConnectionProcessorPrivate
 {
 public:
-    QnUniversalTcpListener* owner;
     bool takeSocketOwnership;
 };
 
-QnProxyReceiverConnection::QnProxyReceiverConnection(QSharedPointer<AbstractStreamSocket> socket,
-                                                     QnHttpConnectionListener* owner):
-    QnTCPConnectionProcessor(new QnProxyReceiverConnectionPrivate, socket)
+QnProxyReceiverConnection::QnProxyReceiverConnection(
+    QSharedPointer<AbstractStreamSocket> socket,
+    QnHttpConnectionListener* owner)
+:
+    QnTCPConnectionProcessor(new QnProxyReceiverConnectionPrivate, socket, owner)
 {
     Q_D(QnProxyReceiverConnection);
 
-    d->owner = static_cast<QnUniversalTcpListener*>(owner);
     d->takeSocketOwnership = false;
     setObjectName( lit("QnProxyReceiverConnection") );
 }
@@ -46,7 +46,9 @@ void QnProxyReceiverConnection::run()
     sendResponse(nx_http::StatusCode::ok, QByteArray());
 
     auto guid = nx_http::getHeaderValue(d->request.headers, Qn::PROXY_SENDER_HEADER_NAME);
-    if (d->owner->registerProxyReceiverConnection(guid, d->socket)) {
+    auto owner = static_cast<QnUniversalTcpListener*>(d->owner);
+    if (owner->registerProxyReceiverConnection(guid, d->socket)) 
+    {
         d->takeSocketOwnership = true; // remove ownership from socket
         d->socket.clear();
     }

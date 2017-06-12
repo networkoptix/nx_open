@@ -10,11 +10,11 @@
 #include <api/app_server_connection.h>
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/user_resource.h>
-#include <http/custom_headers.h>
+#include <nx/network/http/custom_headers.h>
 #include <nx_ec/dummy_handler.h>
 #include <nx_ec/data/api_conversion_functions.h>
 #include <utils/common/app_info.h>
-#include <utils/common/sync_call.h>
+#include <nx/utils/sync_call.h>
 
 #include <nx/network/http/auth_tools.h>
 #include <nx/utils/log/log.h>
@@ -22,6 +22,7 @@
 #include "cdb_nonce_fetcher.h"
 #include "cloud/cloud_connection_manager.h"
 #include <api/global_settings.h>
+#include <common/common_module.h>
 
 static const std::chrono::minutes UNSUCCESSFUL_AUTHORIZATION_RESULT_CACHE_PERIOD(1);
 
@@ -85,9 +86,11 @@ std::tuple<Qn::AuthResult, QnResourcePtr> CloudUserAuthenticator::authorize(
     const nx_http::header::Authorization& authorizationHeader,
     nx_http::HttpHeaders* const responseHeaders)
 {
+    const auto& commonModule = m_cloudConnectionManager->commonModule();
+
     const QByteArray userName = authorizationHeader.userid().toLower();
 
-    auto cloudUsers = qnResPool->getResources<QnUserResource>().filtered(
+    auto cloudUsers = commonModule->resourcePool()->getResources<QnUserResource>().filtered(
         [userName](const QnUserResourcePtr& user)
         {
             return user->isCloud() &&
@@ -119,6 +122,9 @@ std::tuple<Qn::AuthResult, QnResourcePtr> CloudUserAuthenticator::authorize(
     const auto nonce = authorizationHeader.digest->params["nonce"];
 
     bool isCloudNonce = m_cdbNonceFetcher.isValidCloudNonce(nonce);
+
+    if (m_cdbNonceFetcher.cloudUserInfoPool().authenticate(method, authorizationHeader))
+        return std::tuple<Qn::AuthResult, QnResourcePtr>(Qn::Auth_OK, cloudUsers.first());
 
     // Server has provided to the client non-cloud nonce
     // for cloud user due to no cloud connection so far.
@@ -260,8 +266,9 @@ QnUserResourcePtr CloudUserAuthenticator::getMappedLocalUserForCloudCredentials(
     const nx_http::StringType& userName) const
 {
     const auto userNameQString = QString::fromUtf8(userName);
+    const auto& commonModule = m_cloudConnectionManager->commonModule();
     //if there is user with same name in system, resolving to that user
-    const auto res = qnResPool->getResource(
+    const auto res = commonModule->resourcePool()->getResource(
         [&userNameQString](const QnResourcePtr& res) {
             return (res.dynamicCast<QnUserResource>() != nullptr) &&
                    (res->getName() == userNameQString);
@@ -284,7 +291,7 @@ void CloudUserAuthenticator::fetchAuthorizationFromCloud(
 
     nx::cdb::api::AuthRequest authRequest;
     authRequest.nonce = std::string(cloudNonce.constData(), cloudNonce.size());
-    authRequest.realm = QnAppInfo::realm().toStdString();
+    authRequest.realm = nx::network::AppInfo::realm().toStdString();
     authRequest.username = std::string(userid.data(), userid.size());
 
     //marking that request is in progress

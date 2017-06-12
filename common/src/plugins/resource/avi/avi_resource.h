@@ -5,6 +5,7 @@
 #include <nx/streaming/config.h>
 #include <nx/streaming/media_data_packet.h>
 #include <utils/common/aspect_ratio.h>
+#include "avi_archive_metadata.h"
 
 class QnArchiveStreamReader;
 class QnAviArchiveDelegate;
@@ -12,6 +13,7 @@ class QnAviArchiveDelegate;
 class QnAviResource : public QnAbstractArchiveResource
 {
     Q_OBJECT
+        using base_type = QnAbstractArchiveResource;
 public:
     QnAviResource(const QString& file);
     ~QnAviResource();
@@ -42,11 +44,17 @@ public:
      */
     QnAspectRatio imageAspectRatio() const;
 
+    void setAviMetadata(const QnAviArchiveMetadata& value);
+
+    virtual QnMediaDewarpingParams getDewarpingParams() const override;
+    virtual qreal customAspectRatio() const override;
+
 private:
     QnStorageResourcePtr m_storage;
     QnMetaDataLightVector m_motionBuffer[CL_MAX_CHANNELS];
     qint64 m_timeZoneOffset;
     QnAspectRatio m_imageAspectRatio;
+    boost::optional<QnAviArchiveMetadata> m_aviMetadata;
 };
 
 #endif // QN_AVI_RESOURCE_H

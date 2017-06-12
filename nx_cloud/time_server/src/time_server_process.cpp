@@ -4,8 +4,8 @@
 #include <nx/network/time/time_protocol_client.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/log/log_initializer.h>
-#include <utils/common/guard.h>
-#include <utils/common/systemerror.h>
+#include <nx/utils/scope_guard.h>
+#include <nx/utils/system_error.h>
 
 #include "settings.h"
 #include "time_protocol_server.h"
@@ -15,13 +15,12 @@ namespace nx {
 namespace time_server {
 
 namespace {
-static const SocketAddress timeProtocolServerEndpoint =
+static const SocketAddress kTimeProtocolServerEndpoint =
     SocketAddress(HostAddress::anyHost, network::kTimeProtocolDefaultPort);
 } // namespace
 
 TimeServerProcess::TimeServerProcess(int argc, char **argv):
-    m_argc(argc),
-    m_argv(argv)
+    base_type(argc, argv, "TimeServer")
 {
 }
 
@@ -30,54 +29,25 @@ TimeServerProcess::~TimeServerProcess()
     // TODO: waiting for exec() to return
 }
 
-void TimeServerProcess::pleaseStop()
+std::unique_ptr<nx::utils::AbstractServiceSettings> TimeServerProcess::createSettings()
 {
-    m_processTerminationEvent.set_value();
+    return std::make_unique<conf::Settings>();
 }
 
-void TimeServerProcess::setOnStartedEventHandler(
-    nx::utils::MoveOnlyFunc<void(bool /*isStarted*/)> handler)
+int TimeServerProcess::serviceMain(
+    const nx::utils::AbstractServiceSettings& /*abstractSettings*/)
 {
-    m_startedEventHandler = std::move(handler);
-}
-
-int TimeServerProcess::exec()
-{
-    bool processStartResult = false;
-    auto triggerOnStartedEventHandlerGuard = makeScopedGuard(
-        [this, &processStartResult]
-        {
-            if (m_startedEventHandler)
-                m_startedEventHandler(processStartResult);
-        });
-
     try
     {
-        // Initializing.
-        conf::Settings settings;
-        settings.load(m_argc, m_argv);
-        if (settings.isShowHelpRequested())
-        {
-            settings.printCmdLineArgsHelp();
-            return 0;
-        }
-
-        utils::log::initialize(
-            settings.logging(),
-            settings.dataDir(),
-            TimeServerAppInfo::applicationDisplayName(),
-            "log_file",
-            QnLog::MAIN_LOG_ID);
-
         TimeProtocolServer timeProtocolServer(
             false,
             network::NatTraversalSupport::disabled);
 
-        if (!timeProtocolServer.bind(timeProtocolServerEndpoint))
+        if (!timeProtocolServer.bind(kTimeProtocolServerEndpoint))
         {
             const auto sysErrorCode = SystemError::getLastOSErrorCode();
             NX_LOGX(lm("Failed to bind to local endpoint %1. %2")
-                .str(timeProtocolServerEndpoint)
+                .arg(kTimeProtocolServerEndpoint)
                 .arg(SystemError::toString(sysErrorCode)),
                 cl_logERROR);
             return 1;
@@ -89,22 +59,17 @@ int TimeServerProcess::exec()
         {
             const auto sysErrorCode = SystemError::getLastOSErrorCode();
             NX_LOGX(lm("Failed to listen to local endpoint %1. %2")
-                .str(timeProtocolServer.address())
+                .arg(timeProtocolServer.address())
                 .arg(SystemError::toString(sysErrorCode)),
                 cl_logERROR);
             return 2;
         }
 
         NX_LOGX(lm("Serving time protocol (rfc868) on %1")
-            .str(timeProtocolServer.address()), 
+            .arg(timeProtocolServer.address()), 
             cl_logALWAYS);
 
-        // Initialization succeeded.
-
-        processStartResult = true;
-        triggerOnStartedEventHandlerGuard.fire();
-
-        m_processTerminationEvent.get_future().wait();
+        return runMainLoop();
     }
     catch (const std::exception& e)
     {

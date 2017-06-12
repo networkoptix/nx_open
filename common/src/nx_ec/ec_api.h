@@ -34,10 +34,12 @@
 #include <nx_ec/data/api_media_server_data.h>
 #include <nx_ec/data/api_access_rights_data.h>
 #include <nx_ec/data/api_user_role_data.h>
+#include <nx_ec/data/api_misc_data.h>
 #include "nx_ec/managers/abstract_server_manager.h"
 #include "nx_ec/managers/abstract_camera_manager.h"
 #include "nx_ec/managers/abstract_user_manager.h"
 #include "nx_ec/managers/abstract_layout_manager.h"
+#include <nx_ec/managers/abstract_layout_tour_manager.h>
 #include "nx_ec/managers/abstract_webpage_manager.h"
 #include "nx_ec/managers/abstract_videowall_manager.h"
 
@@ -46,7 +48,9 @@
 
 class QnRestProcessorPool;
 class QnHttpConnectionListener;
+class QnCommonModule;
 struct QnModuleInformation;
+namespace nx { namespace vms { namespace discovery { class Manager; } } }
 
 //!Contains API classes for the new Server
 /*!
@@ -55,7 +59,11 @@ struct QnModuleInformation;
 */
 namespace ec2
 {
-class ECConnectionNotificationManager;
+    class ECConnectionNotificationManager;
+    class QnTransactionMessageBusBase;
+    class P2pMessageBus;
+    class QnDistributedMutexManager;
+    class TimeSynchronizationManager;
 
     struct QnPeerTimeInfo {
 
@@ -126,11 +134,13 @@ class ECConnectionNotificationManager;
             \param handler Functor with params: (ErrorCode, const ApiResourceParamWithRefDataList&)
         */
         template<class TargetType, class HandlerType>
-        int getKvPairs( const QnUuid& resourceId, TargetType* target, HandlerType handler ) {
+        int getKvPairs( const QnUuid& resourceId, TargetType* target, HandlerType handler )
+        {
             return getKvPairs( resourceId, std::static_pointer_cast<impl::GetKvPairsHandler>(std::make_shared<impl::CustomGetKvPairsHandler<TargetType, HandlerType>>(target, handler)) );
         }
 
-        ErrorCode getKvPairsSync(const QnUuid& resourceId, ApiResourceParamWithRefDataList* const outData) {
+        ErrorCode getKvPairsSync(const QnUuid& resourceId, ApiResourceParamWithRefDataList* const outData)
+        {
             return impl::doSyncCall<impl::GetKvPairsHandler>(
                 [=](const impl::GetKvPairsHandlerPtr &handler) {
                     return this->getKvPairs(resourceId, handler);
@@ -147,7 +157,8 @@ class ECConnectionNotificationManager;
             return getStatusList( resourceId, std::static_pointer_cast<impl::GetStatusListHandler>(std::make_shared<impl::CustomGetStatusListHandler<TargetType, HandlerType>>(target, handler)) );
         }
 
-        ErrorCode getStatusListSync(const QnUuid& resourceId, ApiResourceStatusDataList* const outData) {
+        ErrorCode getStatusListSync(const QnUuid& resourceId, ApiResourceStatusDataList* const outData)
+        {
             return impl::doSyncCall<impl::GetStatusListHandler>(
                 [=](const impl::GetStatusListHandlerPtr &handler) {
                     return this->getStatusList(resourceId, handler);
@@ -160,16 +171,18 @@ class ECConnectionNotificationManager;
             \param handler Functor with params: (ErrorCode, const ApiResourceParamWithRefDataList&)
         */
         template<class TargetType, class HandlerType>
-        int save(const ec2::ApiResourceParamWithRefDataList& kvPairs, TargetType* target, HandlerType handler ) {
-            return save(kvPairs, std::static_pointer_cast<impl::SaveKvPairsHandler>(std::make_shared<impl::CustomSaveKvPairsHandler<TargetType, HandlerType>>(target, handler)) );
+        int save(const ec2::ApiResourceParamWithRefDataList& kvPairs, TargetType* target, HandlerType handler )
+        {
+            return save(kvPairs, std::static_pointer_cast<impl::SimpleHandler>(std::make_shared<impl::CustomSimpleHandler<TargetType, HandlerType>>(target, handler)) );
         }
 
-        ErrorCode saveSync(const ec2::ApiResourceParamWithRefDataList& kvPairs, ApiResourceParamWithRefDataList* const outData) {
-            return impl::doSyncCall<impl::SaveKvPairsHandler>(
-                [=](const impl::SaveKvPairsHandlerPtr &handler) {
+        ErrorCode saveSync(const ec2::ApiResourceParamWithRefDataList& kvPairs)
+        {
+            return impl::doSyncCall<impl::SimpleHandler>(
+                [=](const impl::SimpleHandlerPtr &handler)
+                {
                     return this->save(kvPairs, handler);
-                },
-                outData
+                }
             );
         }
 
@@ -178,8 +191,7 @@ class ECConnectionNotificationManager;
             ApiResourceParamWithRefDataList kvPairs;
             for (const auto& p: properties)
                 kvPairs.push_back(ApiResourceParamWithRefData(resourceId, p.name, p.value));
-            ApiResourceParamWithRefDataList dummy;
-            return saveSync(kvPairs, &dummy);
+            return saveSync(kvPairs);
         }
 
         //!Convenient method to remove resource of any type
@@ -201,7 +213,7 @@ class ECConnectionNotificationManager;
         virtual int setResourceStatus( const QnUuid& resourceId, Qn::ResourceStatus status, impl::SetResourceStatusHandlerPtr handler ) = 0;
         virtual int getKvPairs( const QnUuid &resourceId, impl::GetKvPairsHandlerPtr handler ) = 0;
         virtual int getStatusList( const QnUuid &resourceId, impl::GetStatusListHandlerPtr handler ) = 0;
-        virtual int save(const ec2::ApiResourceParamWithRefDataList& kvPairs, impl::SaveKvPairsHandlerPtr handler ) = 0;
+        virtual int save(const ec2::ApiResourceParamWithRefDataList& kvPairs, impl::SimpleHandlerPtr handler ) = 0;
         virtual int remove( const QnUuid& resource, impl::SimpleHandlerPtr handler ) = 0;
         virtual int remove( const QVector<QnUuid>& resourceList, impl::SimpleHandlerPtr handler ) = 0;
     };
@@ -402,6 +414,28 @@ class ECConnectionNotificationManager;
                 std::make_shared<impl::CustomListDirectoryHandler<TargetType, HandlerType>>(target, handler)) );
         }
 
+        ErrorCode listDirectorySync(const QString& folderName, QStringList* const outData)
+        {
+            return impl::doSyncCall<impl::ListDirectoryHandler>(
+                [=](const impl::ListDirectoryHandlerPtr &handler)
+                {
+                    return this->listDirectory(folderName, handler);
+                },
+                outData
+            );
+        }
+
+        ErrorCode addStoredFileSync(const QString& folderName, const QByteArray& data)
+        {
+            int(AbstractStoredFileManager::*fn)(
+                const QString&,
+                const QByteArray&,
+                impl::SimpleHandlerPtr) =
+                &AbstractStoredFileManager::addStoredFile;
+            return impl::doSyncCall<impl::SimpleHandler>(
+                std::bind(fn, this, folderName, data, std::placeholders::_1));
+        }
+
     protected:
         virtual int getStoredFile( const QString& filename, impl::GetStoredFileHandlerPtr handler ) = 0;
         virtual int addStoredFile( const QString& filename, const QByteArray& data, impl::SimpleHandlerPtr handler ) = 0;
@@ -442,15 +476,9 @@ class ECConnectionNotificationManager;
                 std::make_shared<impl::CustomSimpleHandler<TargetType, HandlerType>>(target, handler)));
         }
 
-        template<class TargetType, class HandlerType> int installUpdate(const QString &updateId, const QnPeerSet &peers, TargetType *target, HandlerType handler) {
-            return installUpdate(updateId, peers, std::static_pointer_cast<impl::SimpleHandler>(
-                std::make_shared<impl::CustomSimpleHandler<TargetType, HandlerType>>(target, handler)));
-        }
-
     protected:
         virtual int sendUpdatePackageChunk(const QString &updateId, const QByteArray &data, qint64 offset, const QnPeerSet &peers, impl::SimpleHandlerPtr handler) = 0;
         virtual int sendUpdateUploadResponce(const QString &updateId, const QnUuid &peerId, int chunks, impl::SimpleHandlerPtr handler) = 0;
-        virtual int installUpdate(const QString &updateId, const QnPeerSet &peers, impl::SimpleHandlerPtr handler) = 0;
     };
 
 
@@ -469,8 +497,8 @@ class ECConnectionNotificationManager;
 
     class AbstractDiscoveryManager {
     public:
-        template<class TargetType, class HandlerType> int discoverPeer(const QUrl &url, TargetType *target, HandlerType handler) {
-            return discoverPeer(url, std::static_pointer_cast<impl::SimpleHandler>(
+        template<class TargetType, class HandlerType> int discoverPeer(const QnUuid &id, const QUrl &url, TargetType *target, HandlerType handler) {
+            return discoverPeer(id, url, std::static_pointer_cast<impl::SimpleHandler>(
                 std::make_shared<impl::CustomSimpleHandler<TargetType, HandlerType>>(target, handler)));
         }
 
@@ -494,23 +522,13 @@ class ECConnectionNotificationManager;
             return impl::doSyncCall<impl::GetDiscoveryDataHandler>(std::bind(fn, this, std::placeholders::_1), discoveryDataList);
         }
 
-        template<class TargetType, class HandlerType> int sendDiscoveredServer(const ApiDiscoveredServerData &discoveredServer, TargetType *target, HandlerType handler) {
-            return sendDiscoveredServer(discoveredServer, std::static_pointer_cast<impl::SimpleHandler>(
-                std::make_shared<impl::CustomSimpleHandler<TargetType, HandlerType>>(target, handler)));
-        }
-
-        template<class TargetType, class HandlerType> int sendDiscoveredServersList(const ApiDiscoveredServerDataList &discoveredServersList, TargetType *target, HandlerType handler) {
-            return sendDiscoveredServersList(discoveredServersList, std::static_pointer_cast<impl::SimpleHandler>(
-                 std::make_shared<impl::CustomSimpleHandler<TargetType, HandlerType>>(target, handler)));
-        }
+        virtual void monitorServerDiscovery() = 0;
 
     protected:
-        virtual int discoverPeer(const QUrl &url, impl::SimpleHandlerPtr handler) = 0;
+        virtual int discoverPeer(const QnUuid &id, const QUrl &url, impl::SimpleHandlerPtr handler) = 0;
         virtual int addDiscoveryInformation(const QnUuid &id, const QUrl &url, bool ignore, impl::SimpleHandlerPtr handler) = 0;
         virtual int removeDiscoveryInformation(const QnUuid &id, const QUrl &url, bool ignore, impl::SimpleHandlerPtr handler) = 0;
         virtual int getDiscoveryData(impl::GetDiscoveryDataHandlerPtr handler) = 0;
-        virtual int sendDiscoveredServer(const ApiDiscoveredServerData &discoveredServer, impl::SimpleHandlerPtr handler) = 0;
-        virtual int sendDiscoveredServersList(const ApiDiscoveredServerDataList &discoveredServersList, impl::SimpleHandlerPtr handler) = 0;
     };
     typedef std::shared_ptr<AbstractDiscoveryManager> AbstractDiscoveryManagerPtr;
 
@@ -584,6 +602,7 @@ class ECConnectionNotificationManager;
     public:
     signals:
         void systemIdChangeRequested(const QnUuid& systemId, qint64 sysIdTime, Timestamp tranLogTime);
+        void miscDataChanged(const QString& name, const QString& value);
     };
 
     typedef std::shared_ptr<AbstractMiscNotificationManager> AbstractMiscNotificationManagerPtr;
@@ -619,20 +638,56 @@ class ECConnectionNotificationManager;
             return impl::doSyncCall<impl::SimpleHandler>(std::bind(fn, this, value, time, std::placeholders::_1));
         }
 
+        ErrorCode saveMiscParamSync(const ec2::ApiMiscData& param)
+        {
+            int(AbstractMiscManager::*fn)(const ec2::ApiMiscData&, impl::SimpleHandlerPtr) = &AbstractMiscManager::saveMiscParam;
+            return impl::doSyncCall<impl::SimpleHandler>(std::bind(fn, this, param, std::placeholders::_1));
+        }
+
+        template<class TargetType, class HandlerType> int saveMiscParam(const ApiMiscData& data, TargetType* target, HandlerType handler)
+        {
+            return saveMiscParam(data, std::static_pointer_cast<impl::SimpleHandler>(
+                std::make_shared<impl::CustomSimpleHandler<TargetType, HandlerType>>(target, handler)));
+        }
+
+        template<class TargetType, class HandlerType>
+        int saveRuntimeInfo(const ApiRuntimeData& data, TargetType* target,
+            HandlerType handler)
+        {
+            return saveRuntimeInfo(data, std::static_pointer_cast<impl::SimpleHandler>(
+                std::make_shared<impl::CustomSimpleHandler<TargetType, HandlerType>>(
+                    target, handler)));
+        }
+
+        template<class TargetType, class HandlerType>
+        int getMisParam(const QByteArray& paramName, TargetType* target, HandlerType handler)
+        {
+            return getMiscParam(paramName, std::static_pointer_cast<impl::GetMiscParamHandler>(std::make_shared<impl::CustomGetMiscParamHandler<TargetType, HandlerType>>(target, handler)));
+        }
+
+        ErrorCode getMiscParamSync(const QByteArray& paramName, ApiMiscData* const outData)
+        {
+            return impl::doSyncCall<impl::GetMiscParamHandler>(
+                [=](const impl::GetMiscParamHandlerPtr &handler) {
+                    return this->getMiscParam(paramName, handler);
+                },
+                outData);
+        }
 
     protected:
         virtual int changeSystemId(const QnUuid& systemId, qint64 sysIdTime, Timestamp tranLogTime, impl::SimpleHandlerPtr handler) = 0;
         virtual int markLicenseOverflow(bool value, qint64 time, impl::SimpleHandlerPtr handler) = 0;
         virtual int cleanupDatabase(bool cleanupDbObjects, bool cleanupTransactionLog, impl::SimpleHandlerPtr handler) = 0;
+        virtual int saveMiscParam(const ec2::ApiMiscData& param, impl::SimpleHandlerPtr handler) = 0;
+        virtual int saveRuntimeInfo(const ec2::ApiRuntimeData& data, impl::SimpleHandlerPtr handler) = 0;
+        virtual int getMiscParam(const QByteArray& paramName, impl::GetMiscParamHandlerPtr handler) = 0;
     };
     typedef std::shared_ptr<AbstractMiscManager> AbstractMiscManagerPtr;
 
     /*!
         \note All methods are asynchronous if other not specified
     */
-    class AbstractECConnection
-    :
-        public QObject
+    class AbstractECConnection: public QObject
     {
         Q_OBJECT
 
@@ -641,7 +696,12 @@ class ECConnectionNotificationManager;
 
         virtual QnConnectionInfo connectionInfo() const = 0;
 
-        virtual QString authInfo() const = 0;
+        /**
+         * Changes url client currently uses to connect to server. Required to handle situations
+         * like user password change, server port change or systems merge.
+         */
+        virtual void updateConnectionUrl(const QUrl& url) = 0;
+
         //!Calling this method starts notifications delivery by emitting corresponding signals of corresponding manager
         /*!
             \note Calling entity MUST connect to all interesting signals prior to calling this method so that received data is consistent
@@ -649,9 +709,8 @@ class ECConnectionNotificationManager;
         virtual void startReceivingNotifications() = 0;
         virtual void stopReceivingNotifications() = 0;
 
-        virtual void addRemotePeer(const QUrl& url) = 0;
-        virtual void deleteRemotePeer(const QUrl& url) = 0;
-        virtual void sendRuntimeData(const ec2::ApiRuntimeData &data) = 0;
+        virtual void addRemotePeer(const QnUuid& id, const QUrl& _url) = 0;
+        virtual void deleteRemotePeer(const QnUuid& id) = 0;
 
         virtual Timestamp getTransactionLogTime() const = 0;
         virtual void setTransactionLogTime(Timestamp value) = 0;
@@ -663,6 +722,7 @@ class ECConnectionNotificationManager;
         virtual AbstractBusinessEventManagerPtr getBusinessEventManager(const Qn::UserAccessData &userAccessData) = 0;
         virtual AbstractUserManagerPtr getUserManager(const Qn::UserAccessData &userAccessData) = 0;
         virtual AbstractLayoutManagerPtr getLayoutManager(const Qn::UserAccessData &userAccessData) = 0;
+        virtual AbstractLayoutTourManagerPtr getLayoutTourManager(const Qn::UserAccessData& userAccessData) = 0;
         virtual AbstractVideowallManagerPtr getVideowallManager(const Qn::UserAccessData &userAccessData) = 0;
         virtual AbstractStoredFileManagerPtr getStoredFileManager(const Qn::UserAccessData &userAccessData) = 0;
         virtual AbstractUpdatesManagerPtr getUpdatesManager(const Qn::UserAccessData &userAccessData) = 0;
@@ -679,6 +739,7 @@ class ECConnectionNotificationManager;
         virtual AbstractBusinessEventNotificationManagerPtr getBusinessEventNotificationManager() = 0;
         virtual AbstractUserNotificationManagerPtr getUserNotificationManager() = 0;
         virtual AbstractLayoutNotificationManagerPtr getLayoutNotificationManager() = 0;
+        virtual AbstractLayoutTourNotificationManagerPtr getLayoutTourNotificationManager() = 0;
         virtual AbstractWebPageNotificationManagerPtr getWebPageNotificationManager() = 0;
         virtual AbstractDiscoveryNotificationManagerPtr getDiscoveryNotificationManager() = 0;
         virtual AbstractMiscNotificationManagerPtr getMiscNotificationManager() = 0;
@@ -686,7 +747,11 @@ class ECConnectionNotificationManager;
         virtual AbstractStoredFileNotificationManagerPtr getStoredFileNotificationManager() = 0;
         virtual AbstractVideowallNotificationManagerPtr getVideowallNotificationManager() = 0;
 
+        virtual QnCommonModule* commonModule() const = 0;
+
         virtual QnUuid routeToPeerVia(const QnUuid& dstPeer, int* distance) const = 0;
+        virtual QnTransactionMessageBusBase* messageBus() const = 0;
+
         virtual ECConnectionNotificationManager* notificationManager()
         {
             NX_ASSERT(0);
@@ -741,8 +806,8 @@ class ECConnectionNotificationManager;
 
         void reverseConnectionRequested(const ec2::ApiReverseConnectionData& reverseConnetionData);
 
-        void remotePeerFound(const ec2::ApiPeerAliveData& data);
-        void remotePeerLost(const ec2::ApiPeerAliveData& data);
+        void remotePeerFound(QnUuid data, Qn::PeerType peerType);
+        void remotePeerLost(QnUuid data, Qn::PeerType peerType);
         void remotePeerUnauthorized(const QnUuid& id);
 
         void settingsChanged(ec2::ApiResourceParamDataList settings);
@@ -758,9 +823,7 @@ class ECConnectionNotificationManager;
     /*!
         \note All methods are asynchronous if other not specified
     */
-    class AbstractECConnectionFactory
-    :
-        public QObject
+    class AbstractECConnectionFactory: public QObject
     {
         Q_OBJECT
 
@@ -792,7 +855,9 @@ class ECConnectionNotificationManager;
         virtual void registerRestHandlers( QnRestProcessorPool* const restProcessorPool ) = 0;
         virtual void registerTransactionListener(QnHttpConnectionListener* httpConnectionListener) = 0;
         virtual void setConfParams( std::map<QString, QVariant> confParams ) = 0;
-
+        virtual QnTransactionMessageBusBase* messageBus() const = 0;
+        virtual QnDistributedMutexManager* distributedMutex() const = 0;
+        virtual TimeSynchronizationManager* timeSyncManager() const = 0;
     protected:
         virtual int testConnectionAsync( const QUrl& addr, impl::TestConnectionHandlerPtr handler ) = 0;
         virtual int connectAsync( const QUrl& addr, const ApiClientInfoData& clientInfo,

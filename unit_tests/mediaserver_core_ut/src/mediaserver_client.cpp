@@ -3,7 +3,7 @@
 #include <nx/network/http/fusion_data_http_client.h>
 #include <nx/utils/type_utils.h>
 
-#include <utils/common/sync_call.h>
+#include <nx/utils/sync_call.h>
 
 MediaServerClient::MediaServerClient(const SocketAddress& mediaServerEndpoint):
     m_mediaServerEndpoint(mediaServerEndpoint)

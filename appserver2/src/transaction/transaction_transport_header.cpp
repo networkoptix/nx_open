@@ -19,11 +19,6 @@ namespace ec2
         }
     }
 
-    void QnTransactionTransportHeader::fillSequence()
-    {
-        fillSequence(qnCommon->moduleGUID(), qnCommon->runningInstanceGUID());
-    }
-
     QString toString(const QnTransactionTransportHeader& header)
     {
         return lit("ttSeq=%1 sender=%2:%3").arg(header.sequence).arg(header.sender.toString()).arg(header.senderRuntimeID.toString());

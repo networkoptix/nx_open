@@ -1,9 +1,8 @@
 #include "http_server_base_authentication_manager.h"
 
+#include <nx/network/app_info.h>
+#include <nx/utils/scope_guard.h>
 #include <nx/utils/string.h>
-
-#include <utils/common/app_info.h>
-#include <utils/common/guard.h>
 
 #include "../auth_tools.h"
 
@@ -70,11 +69,12 @@ void BaseAuthenticationManager::reportAuthenticationFailure(
     AuthenticationCompletionHandler completionHandler)
 {
     completionHandler(
-        false,
-        stree::ResourceContainer(),
-        generateWwwAuthenticateHeader(),
-        nx_http::HttpHeaders(),
-        nullptr);
+        nx_http::server::AuthenticationResult(
+            false,
+            nx::utils::stree::ResourceContainer(),
+            generateWwwAuthenticateHeader(),
+            nx_http::HttpHeaders(),
+            nullptr));
 }
 
 header::WWWAuthenticate BaseAuthenticationManager::generateWwwAuthenticateHeader()
@@ -112,12 +112,7 @@ void BaseAuthenticationManager::passwordLookupDone(
 void BaseAuthenticationManager::reportSuccess(
     AuthenticationCompletionHandler completionHandler)
 {
-    completionHandler(
-        true,
-        stree::ResourceContainer(),
-        header::WWWAuthenticate(),
-        nx_http::HttpHeaders(),
-        nullptr);
+    completionHandler(nx_http::server::SuccessfulAuthenticationResult());
 }
 
 nx::String BaseAuthenticationManager::generateNonce()
@@ -128,7 +123,7 @@ nx::String BaseAuthenticationManager::generateNonce()
 
 nx::String BaseAuthenticationManager::realm()
 {
-    return QnAppInfo::realm().toUtf8();
+    return nx::network::AppInfo::realm().toUtf8();
 }
 
 bool BaseAuthenticationManager::validateNonce(const nx::String& /*nonce*/)

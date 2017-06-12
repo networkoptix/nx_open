@@ -8,14 +8,17 @@
 #include <core/resource/network_resource.h>
 #include <core/resource_management/mserver_resource_discovery_manager.h>
 #include <core/resource_management/resource_pool.h>
+#include <common/common_module.h>
 
 namespace {
     const int keepAliveInterval = 5 * 1000;
 }
 
-QnDesktopCameraResourceSearcher::QnDesktopCameraResourceSearcher():
-    base_type()
-{ }
+QnDesktopCameraResourceSearcher::QnDesktopCameraResourceSearcher(QnCommonModule* commonModule):
+    QnAbstractResourceSearcher(commonModule),
+    base_type(commonModule)
+{
+}
 
 QnDesktopCameraResourceSearcher::~QnDesktopCameraResourceSearcher()
 {
@@ -60,10 +63,13 @@ void QnDesktopCameraResourceSearcher::registerCamera(const QSharedPointer<Abstra
     QnResourceList resources;
     auto desktopCamera = cameraFromConnection(info);
     resources << desktopCamera;
-    QnMServerResourceDiscoveryManager::instance()->addResourcesImmediatly(resources);
+
+    auto discoveryManager = commonModule()->resourceDiscoveryManager();
+
+    discoveryManager->addResourcesImmediatly(resources);
     // discovery manager could delay init a bit but this call for Desktop Camera does nothing anyway (empty function)
     // So, do init immediately as well
-    if (auto addedCamera = qnResPool->getResourceById(desktopCamera->getId()))
+    if (auto addedCamera = resourcePool()->getResourceById(desktopCamera->getId()))
         addedCamera->init();
     log("register desktop camera", info);
 }

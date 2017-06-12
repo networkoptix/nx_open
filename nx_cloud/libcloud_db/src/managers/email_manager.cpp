@@ -86,7 +86,7 @@ void EMailManager::sendAsync(
 }
 
 void EMailManager::onSendNotificationRequestDone(
-    QnCounter::ScopedIncrement /*asyncCallLocker*/,
+    nx::utils::Counter::ScopedIncrement /*asyncCallLocker*/,
     nx_http::AsyncHttpClientPtr client,
     std::uint64_t notificationIndex,
     std::function<void(bool)> completionHandler)

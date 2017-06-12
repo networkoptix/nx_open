@@ -15,7 +15,7 @@ template<class F>
 class MoveOnlyFunc:
     private std::function<F>
 {
-    using BaseType = std::function<F>;
+    using base_type = std::function<F>;
 
     template<class Func>
     class MoveOnlyFuncWrapper
@@ -101,12 +101,22 @@ public:
         return std::function<F>::operator()(std::forward<Args>(args)...);
     }
 
+    bool operator==(std::nullptr_t) const
+    {
+        return static_cast<const base_type&>(*this) == nullptr;
+    }
+
+    bool operator!=(std::nullptr_t) const
+    {
+        return !(*this == nullptr);
+    }
+
     //using std::function<F>::operator();
     using std::function<F>::operator bool;
 
     void swap(MoveOnlyFunc& other)
     {
-        BaseType::swap(static_cast<BaseType&>(other));
+        base_type::swap(static_cast<base_type&>(other));
     }
 };
 
@@ -125,6 +135,14 @@ void moveAndCallOptional(Function& function, Args&& ... args)
         return;
 
     moveAndCall(function, std::forward<Args>(args) ...);
+}
+
+template<typename Function, typename ... Args>
+void swapAndCall(Function& function, Args&& ... args)
+{
+    Function functionLocal;
+    function.swap(functionLocal);
+    functionLocal(std::forward<Args>(args) ...);
 }
 
 } // namespace utils

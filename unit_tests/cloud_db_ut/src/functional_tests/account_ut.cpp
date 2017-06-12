@@ -12,13 +12,13 @@
 #include <nx/fusion/model_functions.h>
 #include <nx/network/http/auth_tools.h>
 #include <nx/network/http/asynchttpclient.h>
-#include <nx/network/http/httpclient.h>
+#include <nx/network/http/http_client.h>
 #include <nx/network/http/server/fusion_request_result.h>
 #include <nx/utils/test_support/utils.h>
 #include <nx/utils/time.h>
 #include <utils/common/app_info.h>
 
-#include <utils/common/sync_call.h>
+#include <nx/utils/sync_call.h>
 
 #include "email_manager_mocked.h"
 #include "test_setup.h"
@@ -886,16 +886,28 @@ protected:
 
     void assertRegistrationTimestampIsCorrect()
     {
+        using namespace std::chrono;
+
         const auto account = getFreshAccountCopy();
-        ASSERT_GE(account.registrationTime, m_registrationTimeRange.first);
-        ASSERT_LE(account.registrationTime, m_registrationTimeRange.second);
+        ASSERT_GE(
+            nx::utils::floor<milliseconds>(account.registrationTime),
+            nx::utils::floor<milliseconds>(m_registrationTimeRange.first));
+        ASSERT_LE(
+            nx::utils::floor<milliseconds>(account.registrationTime),
+            nx::utils::floor<milliseconds>(m_registrationTimeRange.second));
     }
     
     void assertActivationTimestampIsCorrect()
     {
+        using namespace std::chrono;
+
         const auto account = getFreshAccountCopy();
-        ASSERT_GE(account.activationTime, m_activationTimeRange.first);
-        ASSERT_LE(account.activationTime, m_activationTimeRange.second);
+        ASSERT_GE(
+            nx::utils::floor<milliseconds>(account.activationTime),
+            nx::utils::floor<milliseconds>(m_activationTimeRange.first));
+        ASSERT_LE(
+            nx::utils::floor<milliseconds>(account.activationTime),
+            nx::utils::floor<milliseconds>(m_activationTimeRange.second));
     }
 
     void whenRestartedCloudDb()

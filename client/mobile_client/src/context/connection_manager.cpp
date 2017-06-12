@@ -4,6 +4,14 @@
 #include <QtGui/QGuiApplication>
 #include <QtCore/QMetaEnum>
 
+#include <client_core/connection_context_aware.h>
+#include <client_core/client_core_module.h>
+#include <client_core/client_core_settings.h>
+
+#include <mobile_client/mobile_client_message_processor.h>
+#include <mobile_client/mobile_client_settings.h>
+#include <mobile_client/mobile_client_module.h>
+
 #include <core/resource_management/resource_pool.h>
 #include <api/abstract_connection.h>
 #include <api/app_server_connection.h>
@@ -15,9 +23,9 @@
 #include <utils/common/app_info.h>
 #include <common/common_module.h>
 #include <network/connection_validator.h>
-#include <client_core/client_core_settings.h>
-#include <mobile_client/mobile_client_message_processor.h>
-#include <mobile_client/mobile_client_settings.h>
+
+#include <nx_ec/dummy_handler.h>
+
 #include <watchers/user_watcher.h>
 #include <nx/network/socket_global.h>
 #include <network/system_helpers.h>
@@ -45,7 +53,7 @@ namespace {
 
 } // namespace
 
-class QnConnectionManagerPrivate : public Connective<QObject>
+class QnConnectionManagerPrivate : public Connective<QObject>, public QnConnectionContextAware
 {
     QnConnectionManager* q_ptr;
     Q_DECLARE_PUBLIC(QnConnectionManager)
@@ -87,13 +95,16 @@ QnConnectionManager::QnConnectionManager(QObject* parent):
 {
     Q_D(QnConnectionManager);
 
-    connect(qnGlobalSettings, &QnGlobalSettings::systemNameChanged, this,
-        [d]()
+    QPointer<QnGlobalSettings> settings(qnGlobalSettings);
+    connect(settings.data(), &QnGlobalSettings::systemNameChanged, this,
+        [d, settings]()
         {
+
+
             /* 2.6 servers use another property name for systemName, so in 3.0 it's always empty.
                However we fill system name in doConnect().
                This value won't change, but it's not so critical. */
-            const auto systemName = qnGlobalSettings->systemName();
+            const auto systemName = settings->systemName();
             if (!systemName.isEmpty())
                 d->setSystemName(systemName);
         });
@@ -236,11 +247,11 @@ void QnConnectionManager::disconnectFromServer()
     d->doDisconnect();
 
     d->setUrl(QUrl());
-    qnCommon->instance<QnUserWatcher>()->setUserName(QString());
+    commonModule()->instance<QnUserWatcher>()->setUserName(QString());
 
     // TODO: #dklychkov Move it to a better place
-    QnResourceList remoteResources = qnResPool->getResourcesWithFlag(Qn::remote);
-    qnResPool->removeResources(remoteResources);
+    QnResourceList remoteResources = resourcePool()->getResourcesWithFlag(Qn::remote);
+    resourcePool()->removeResources(remoteResources);
 }
 
 QnConnectionManagerPrivate::QnConnectionManagerPrivate(QnConnectionManager* parent):
@@ -306,13 +317,13 @@ bool QnConnectionManagerPrivate::doConnect()
         return false;
     }
 
-    qnCommon->updateRunningInstanceGuid();
+    commonModule()->updateRunningInstanceGuid();
 
     auto connectUrl = url;
     connectUrl.setScheme(lit("http"));
 
     auto result = new QnEc2ConnectionRequestResult(this);
-    connectionHandle = QnAppServerConnectionFactory::ec2ConnectionFactory()->connect(
+    connectionHandle = qnClientCoreModule->connectionFactory()->connect(
         connectUrl,
         ec2::ApiClientInfoData(),
         result,
@@ -369,19 +380,22 @@ bool QnConnectionManagerPrivate::doConnect()
 
             const auto ec2Connection = result->connection();
 
-            QnAppServerConnectionFactory::setUrl(connectUrl);
             QnAppServerConnectionFactory::setEc2Connection(ec2Connection);
-            QnAppServerConnectionFactory::setConnectionInfo(connectionInfo);
 
-            QnMobileClientMessageProcessor::instance()->init(ec2Connection);
+            qnMobileClientMessageProcessor->init(ec2Connection);
 
-            QnSessionManager::instance()->start();
+            commonModule()->sessionManager()->start();
 
-            connect(QnRuntimeInfoManager::instance(), &QnRuntimeInfoManager::runtimeInfoChanged,
+            connect(runtimeInfoManager(), &QnRuntimeInfoManager::runtimeInfoChanged,
                 this, [this, ec2Connection](const QnPeerRuntimeInfo& info)
                 {
-                    if (info.uuid == qnCommon->moduleGUID())
-                        ec2Connection->sendRuntimeData(info.data);
+                    if (info.uuid == commonModule()->moduleGUID())
+                    {
+                        ec2Connection->getMiscManager(Qn::kSystemAccess)->saveRuntimeInfo(
+                            info.data,
+                            ec2::DummyHandler::instance(),
+                            &ec2::DummyHandler::onRequestDone);
+                    }
                 });
 
             connect(
@@ -390,7 +404,7 @@ bool QnConnectionManagerPrivate::doConnect()
                 QnSyncTime::instance(),
                 static_cast<void(QnSyncTime::*)(qint64)>(&QnSyncTime::updateTime));
 
-            qnCommon->instance<QnUserWatcher>()->setUserName(
+            commonModule()->instance<QnUserWatcher>()->setUserName(
                 connectionInfo.effectiveUserName.isEmpty()
                     ? url.userName()
                     : connectionInfo.effectiveUserName);
@@ -430,13 +444,11 @@ void QnConnectionManagerPrivate::doDisconnect()
 
     qnGlobalSettings->synchronizeNow();
 
-    disconnect(QnRuntimeInfoManager::instance(), nullptr, this, nullptr);
+    disconnect(runtimeInfoManager(), nullptr, this, nullptr);
 
-    QnMobileClientMessageProcessor::instance()->init(nullptr);
-    QnAppServerConnectionFactory::setUrl(QUrl());
+    qnMobileClientMessageProcessor->init(nullptr);
     QnAppServerConnectionFactory::setEc2Connection(nullptr);
-    QnAppServerConnectionFactory::setConnectionInfo(QnConnectionInfo());
-    QnSessionManager::instance()->stop();
+    commonModule()->sessionManager()->stop();
 
     setSystemName(QString());
     connectionVersion = QnSoftwareVersion();

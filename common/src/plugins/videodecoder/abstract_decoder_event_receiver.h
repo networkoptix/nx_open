@@ -7,7 +7,7 @@
 
 #ifdef ENABLE_DATA_PROVIDERS
 
-#include "stree/resourcecontainer.h"
+#include <nx/utils/stree/resourcecontainer.h>
 
 
 class QnAbstractVideoDecoder;
@@ -32,7 +32,7 @@ public:
     */
     virtual DecoderBehaviour streamParamsChanged(
         QnAbstractVideoDecoder* decoder,
-        const stree::AbstractResourceReader& newStreamParams ) = 0;
+        const nx::utils::stree::AbstractResourceReader& newStreamParams ) = 0;
 };
 
 #endif // ENABLE_DATA_PROVIDERS

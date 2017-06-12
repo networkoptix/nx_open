@@ -137,7 +137,7 @@ private:
         {
             NX_LOGX(QnLog::EC2_TRAN_LOG,
                 lm("Failed to deserialize transaction %1 received from %2")
-                .arg(::ec2::ApiCommand::toString(transaction.command)).str(transportHeader),
+                .arg(::ec2::ApiCommand::toString(transaction.command)).arg(transportHeader),
                 cl_logWARNING);
             m_aioTimer.post(
                 [completionHandler = std::move(completionHandler)]
@@ -160,7 +160,7 @@ private:
     {
         NX_LOGX(QnLog::EC2_TRAN_LOG,
             lm("Failed to deserialize transaction %1 received from %2")
-            .arg(::ec2::ApiCommand::toString(transactionType)).str(transportHeader),
+            .arg(::ec2::ApiCommand::toString(transactionType)).arg(transportHeader),
             cl_logWARNING);
         m_aioTimer.post(
             [completionHandler = std::move(completionHandler)]
@@ -312,7 +312,7 @@ private:
                 lm("Ec2 transaction log skipped transaction %1 received from (%2, %3)")
                 .arg(::ec2::ApiCommand::toString(transactionCommand))
                 .arg(transactionContext.transportHeader.systemId)
-                .str(transactionContext.transportHeader.endpoint),
+                .arg(transactionContext.transportHeader.endpoint),
                 cl_logDEBUG1);
             return dbResultCode;
         }
@@ -322,7 +322,7 @@ private:
                 lm("Error saving transaction %1 received from (%2, %3) to the log. %4")
                 .arg(::ec2::ApiCommand::toString(transactionCommand))
                 .arg(transactionContext.transportHeader.systemId)
-                .str(transactionContext.transportHeader.endpoint)
+                .arg(transactionContext.transportHeader.endpoint)
                 .arg(queryContext->connection()->lastError().text()),
                 cl_logWARNING);
             return dbResultCode;
@@ -338,7 +338,7 @@ private:
             NX_LOGX(QnLog::EC2_TRAN_LOG, 
                 lm("Error processing transaction %1 received from %2. %3")
                 .arg(::ec2::ApiCommand::toString(transactionCommand))
-                .str(transactionContext.transportHeader)
+                .arg(transactionContext.transportHeader)
                 .arg(queryContext->connection()->lastError().text()),
                 cl_logWARNING);
         }

@@ -42,20 +42,12 @@ angular.module('cloudApp')
 
         function delayedUpdateSystemInfo(){
             var pollingSystemUpdate = $poll(function(){
-                return $scope.system.update().catch(function(error){
-                    if(error.status === 403 || error.status === 401 || error.data.resultCode == "forbidden"){
-                        // Either we lost access to the system
-                        // Or it was disconnected from the cloud
-                        // Send user to /systems/ and show him the message
-                        dialogs.notify(L.errorCodes.lostConnection.replace("{{systemName}}", $scope.system.info.name), 'warning');
-                        $location.path("/systems/");
-                    }
-                });
+                return $scope.system.update();
             },Config.updateInterval);
 
             $scope.$on('$destroy', function( event ) {
                 $poll.cancel(pollingSystemUpdate);
-            } );
+            });
         }
 
         //Retrieve users list
@@ -151,6 +143,15 @@ angular.module('cloudApp')
             if(option.permissions){
                 option.permissions = normalizePermissionString(option.permissions);
             }
+        });
+
+        var cancelSubscription = $scope.$on("unauthirosed_" + $routeParams.systemId,function(event,data){
+             dialogs.notify(L.errorCodes.lostConnection.replace("{{systemName}}", $scope.system.name || L.errorCodes.thisSystem), 'warning');
+             $location.path("/systems");
+        });
+
+        $scope.$on('$destroy', function( event ) {
+            cancelSubscription();
         });
 
 

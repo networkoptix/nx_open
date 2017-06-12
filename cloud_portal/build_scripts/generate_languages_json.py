@@ -43,6 +43,23 @@ def merge(source, destination):
     return destination
 
 
+def merge_json(target_filename, source_filename, key=None):
+    if not os.path.exists(source_filename) or not os.path.exists(target_filename):
+        return
+    with codecs.open(target_filename, 'r', 'utf-8') as file_descriptor:
+        target_content = json.load(file_descriptor)
+    with codecs.open(source_filename, 'r', 'utf-8') as file_descriptor:
+        source_content = json.load(file_descriptor)
+
+    if key is None:
+        merge(source_content, target_content)
+    else:
+        content = {}
+        content[key] = source_content
+        merge(content, target_content)
+    save_content(target_filename, json.dumps(target_content, ensure_ascii=False))
+
+
 def generate_languages_files(languages, template_filename):
     languages_json = []
     # Localize this language
@@ -64,6 +81,7 @@ def generate_languages_files(languages, template_filename):
             })
             merge(data, all_strings)
         save_content("static/lang_" + lang + "/language.json", json.dumps(all_strings, ensure_ascii=False))
+        merge_json("static/lang_" + lang + "/language.json",  "static/lang_" + lang + "/web_common/commonLanguage.json", 'common')
     save_content('static/languages.json', json.dumps(languages_json, ensure_ascii=False))
 
 
@@ -74,4 +92,5 @@ config = yaml.safe_load(open('../cloud_portal.yaml'))
 if 'languages' not in config:
     raise 'No languages section in cloud_portal.yaml'
 
+merge_json('static/language.json', 'static/web_common/commonLanguage.json', 'common')
 generate_languages_files(config['languages'], 'static/language.json')

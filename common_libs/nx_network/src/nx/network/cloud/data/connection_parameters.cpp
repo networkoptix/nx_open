@@ -13,7 +13,10 @@ ConnectionParameters::ConnectionParameters():
     rendezvousConnectTimeout(kRendezvousConnectTimeoutDefault),
     udpTunnelKeepAliveInterval(kUdpTunnelKeepAliveIntervalDefault),
     udpTunnelKeepAliveRetries(kUdpTunnelKeepAliveRetriesDefault),
-    tunnelInactivityTimeout(kDefaultTunnelInactivityTimeout)
+    tunnelInactivityTimeout(kDefaultTunnelInactivityTimeout),
+    udpHolePunchingStartDelay(kUdpHolePunchingStartDelayDefault),
+    trafficRelayingStartDelay(kTrafficRelayingStartDelayDefault),
+    directTcpConnectStartDelay(kDirectTcpConnectStartDelayDefault)
 {
 }
 
@@ -24,7 +27,10 @@ bool ConnectionParameters::operator==(const ConnectionParameters& rhs) const
         && udpTunnelKeepAliveRetries == rhs.udpTunnelKeepAliveRetries
         && tunnelInactivityTimeout == rhs.tunnelInactivityTimeout
         && tcpReverseRetryPolicy == rhs.tcpReverseRetryPolicy
-        && tcpReverseHttpTimeouts == rhs.tcpReverseHttpTimeouts;
+        && tcpReverseHttpTimeouts == rhs.tcpReverseHttpTimeouts
+        && udpHolePunchingStartDelay == rhs.udpHolePunchingStartDelay
+        && trafficRelayingStartDelay == rhs.trafficRelayingStartDelay
+        && directTcpConnectStartDelay == rhs.directTcpConnectStartDelay;
 }
 
 void ConnectionParameters::serializeAttributes(nx::stun::Message* const message)
@@ -64,6 +70,18 @@ void ConnectionParameters::serializeAttributes(nx::stun::Message* const message)
     message->addAttribute(
         stun::extension::attrs::tcpReverseHttpMsgBodyTimeout,
         tcpReverseHttpTimeouts.messageBodyReadTimeout);
+
+    // Start delays.
+
+    message->addAttribute(
+        stun::extension::attrs::udpHolePunchingStartDelay,
+        udpHolePunchingStartDelay);
+    message->addAttribute(
+        stun::extension::attrs::trafficRelayingStartDelay,
+        trafficRelayingStartDelay);
+    message->addAttribute(
+        stun::extension::attrs::directTcpConnectStartDelay,
+        directTcpConnectStartDelay);
 }
 
 bool ConnectionParameters::parseAttributes(const nx::stun::Message& message)
@@ -118,6 +136,21 @@ bool ConnectionParameters::parseAttributes(const nx::stun::Message& message)
         message, stun::extension::attrs::tcpReverseHttpMsgBodyTimeout,
         &tcpReverseHttpTimeouts.messageBodyReadTimeout,
         (std::chrono::milliseconds)nx_http::AsyncHttpClient::Timeouts::kDefaultMessageBodyReadTimeout);
+
+    // Start delays.
+
+    readAttributeValue(
+        message, stun::extension::attrs::udpHolePunchingStartDelay,
+        &udpHolePunchingStartDelay,
+        std::chrono::milliseconds::zero());
+    readAttributeValue(
+        message, stun::extension::attrs::trafficRelayingStartDelay,
+        &trafficRelayingStartDelay,
+        std::chrono::milliseconds::zero());
+    readAttributeValue(
+        message, stun::extension::attrs::directTcpConnectStartDelay,
+        &directTcpConnectStartDelay,
+        std::chrono::milliseconds::zero());
 
     return true;
 }

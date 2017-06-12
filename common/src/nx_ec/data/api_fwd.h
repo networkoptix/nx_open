@@ -19,7 +19,6 @@ namespace ec2 {
     struct ApiServerFootageData;
     struct ApiCameraHistoryItemData;
     struct ApiCameraHistoryData;
-    struct ApiClientInfoData;
     struct ApiEmailData;
     struct ApiEmailSettingsData;
     struct ApiFullInfoData;
@@ -27,8 +26,10 @@ namespace ec2 {
     struct ApiUpdateSequenceData;
     struct ApiIdData;
     struct ApiLayoutItemData;
-    struct ApiLayoutItemWithRefData;
     struct ApiLayoutData;
+    struct ApiLayoutTourItemData;
+    struct ApiLayoutTourData;
+    struct ApiLayoutTourSettings;
     struct ApiLicenseData;
     struct ApiDetailedLicenseData;
     struct ApiLockData;
@@ -43,7 +44,7 @@ namespace ec2 {
     struct ApiResourceTypeData;
     struct ApiScheduleTaskData;
     struct ApiScheduleTaskWithRefData;
-    struct QnTranStateKey;
+    struct ApiPersistentIdData;
     struct QnTranState;
     struct QnTranStateResponse;
     struct ApiSyncRequestData;
@@ -83,10 +84,12 @@ namespace ec2 {
 
     struct ApiTimeData;
     struct ApiMiscData;
+    typedef std::vector<ApiMiscData> ApiMiscDataList;
     struct ApiPeerSystemTimeData;
     typedef std::vector<ApiPeerSystemTimeData> ApiPeerSystemTimeDataList;
 
     struct ApiPeerData;
+    struct ApiPeerDataEx;
     struct ApiRuntimeData;
 
     struct ApiDatabaseDumpData;
@@ -100,8 +103,9 @@ namespace ec2 {
     typedef std::vector<ApiCameraData> ApiCameraDataList;
     typedef std::vector<ApiCameraAttributesData> ApiCameraAttributesDataList;
     typedef std::vector<ApiCameraDataEx> ApiCameraDataExList;
-    typedef std::vector<ApiClientInfoData> ApiClientInfoDataList;
     typedef std::vector<ApiLayoutData> ApiLayoutDataList;
+    using ApiLayoutTourDataList = std::vector<ApiLayoutTourData>;
+    using ApiLayoutTourItemDataList = std::vector<ApiLayoutTourItemData>;
     typedef std::vector<ApiLicenseData> ApiLicenseDataList;
     typedef std::vector<ApiDetailedLicenseData> ApiDetailedLicenseDataList;
     typedef std::vector<ApiMediaServerData> ApiMediaServerDataList;
@@ -149,7 +153,6 @@ namespace ec2 {
     (ApiCameraHistoryData)\
     (ApiCameraAttributesData)\
     (ApiCameraDataEx)\
-    (ApiClientInfoData)\
     (ApiEmailData)\
     (ApiEmailSettingsData)\
     (ApiFullInfoData)\
@@ -157,8 +160,10 @@ namespace ec2 {
     (ApiSyncMarkerRecord)\
     (ApiUpdateSequenceData)\
     (ApiLayoutItemData)\
-    (ApiLayoutItemWithRefData)\
     (ApiLayoutData)\
+    (ApiLayoutTourItemData)\
+    (ApiLayoutTourData)\
+    (ApiLayoutTourSettings)\
     (ApiLicenseData)\
     (ApiDetailedLicenseData)\
     (ApiLockData)\
@@ -175,7 +180,7 @@ namespace ec2 {
     (ApiResourceTypeData)\
     (ApiScheduleTaskData)\
     (ApiScheduleTaskWithRefData)\
-    (QnTranStateKey)\
+    (ApiPersistentIdData)\
     (QnTranState)\
     (ApiSyncRequestData)\
     (QnTranStateResponse)\
@@ -210,6 +215,7 @@ namespace ec2 {
     (ApiTimeData)\
     (ApiMiscData)\
     (ApiPeerData)\
+    (ApiPeerDataEx)\
     (ApiRuntimeData)\
     (ApiDatabaseDumpData)\
     (ApiDatabaseDumpToFileData)\
@@ -218,12 +224,10 @@ namespace ec2 {
     (ApiWebPageData)\
     (ApiDiscoveredServerData)\
 
-#ifndef QN_NO_BASE
     QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
         QN_EC2_API_DATA_TYPES,
         (ubjson)(xml)(json)(sql_record)(csv_record)
     );
-#endif
 
 } // namespace ec2
 

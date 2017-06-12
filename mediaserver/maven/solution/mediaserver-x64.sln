@@ -1,4 +1,4 @@
-﻿
+
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 14
 VisualStudioVersion = 14.0.24720.0
@@ -8,7 +8,6 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "mediaserver-x64", "src\medi
 		${appserver2.guid} = ${appserver2.guid}
 		${mediaserver_core.guid} = ${mediaserver_core.guid}
 		${nx_email.guid} = ${nx_email.guid}
-		${nx_streaming.guid} = ${nx_streaming.guid}
 		${common.guid} = ${common.guid}
 	EndProjectSection
 EndProject
@@ -16,7 +15,6 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "mediaserver_core-x64", "..\
 	ProjectSection(ProjectDependencies) = postProject
 		${appserver2.guid} = ${appserver2.guid}
 		${nx_email.guid} = ${nx_email.guid}
-		${nx_streaming.guid} = ${nx_streaming.guid}
 		${common.guid} = ${common.guid}
 		${nx_utils.guid} = ${nx_utils.guid}
 		${nx_network.guid} = ${nx_network.guid}
@@ -39,8 +37,6 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "appserver2-x64", "..\appser
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "nx_email-x64", "..\common_libs\nx_email\src\nx_email-x64.vcxproj", "${nx_email.guid}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "nx_streaming-x64", "..\common_libs\nx_streaming\src\nx_streaming-x64.vcxproj", "${nx_streaming.guid}"
-EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "udt-x64", "..\common_libs\udt\src\udt-x64.vcxproj", "${udt.guid}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "nx_network-x64", "..\common_libs\nx_network\src\nx_network-x64.vcxproj", "${nx_network.guid}"
@@ -56,6 +52,11 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "nx_fusion-x64", "${basedir}
 	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "nx_utils-x64", "..\common_libs\nx_utils\src\nx_utils-x64.vcxproj", "${nx_utils.guid}"
+	ProjectSection(ProjectDependencies) = postProject
+		${nx_kit.guid} = ${nx_kit.guid}
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "nx_kit-x64", "..\nx_kit\src\nx_kit-x64.vcxproj", "${nx_kit.guid}"
 	ProjectSection(ProjectDependencies) = postProject
 	EndProjectSection
 EndProject
@@ -97,10 +98,6 @@ Global
 		${nx_email.guid}.Debug|x64.Build.0 = Debug|x64
 		${nx_email.guid}.Release|x64.ActiveCfg = Release|x64
 		${nx_email.guid}.Release|x64.Build.0 = Release|x64
-		${nx_streaming.guid}.Debug|x64.ActiveCfg = Debug|x64
-		${nx_streaming.guid}.Debug|x64.Build.0 = Debug|x64
-		${nx_streaming.guid}.Release|x64.ActiveCfg = Release|x64
-		${nx_streaming.guid}.Release|x64.Build.0 = Release|x64
 		${nx_network.guid}.Debug|x64.ActiveCfg = Debug|x64
 		${nx_network.guid}.Debug|x64.Build.0 = Debug|x64
 		${nx_network.guid}.Release|x64.ActiveCfg = Release|x64

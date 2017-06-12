@@ -1,25 +1,29 @@
-#ifndef __SIGN_FRAME_HELPER__
-#define __SIGN_FRAME_HELPER__
+#pragma once
 
 #include <QtCore/QByteArray>
 #include <QtCore/QCoreApplication>
 #include <QtGui/QPainter>
 
-#include <utils/common/cryptographic_hash.h>
+#include <common/common_module_aware.h>
+
+#include <licensing/license_fwd.h>
+
+#include <nx/utils/cryptographic_hash.h>
 
 #include <nx/streaming/video_data_packet.h>
 
 static const char EXPORT_SIGN_MAGIC[] = "RhjrjLbkMxTujHI!";
-static const QnCryptographicHash::Algorithm EXPORT_SIGN_METHOD = QnCryptographicHash::Md5;
+static const nx::utils::QnCryptographicHash::Algorithm EXPORT_SIGN_METHOD = nx::utils::QnCryptographicHash::Md5;
 
 class SPSUnit;
 class PPSUnit;
 
-class QnSignHelper
+class QnSignHelper: public QObject, public QnCommonModuleAware
 {
-    Q_DECLARE_TR_FUNCTIONS(QnSignHelper)
+    Q_OBJECT
+    using base_type = QObject;
 public:
-    QnSignHelper();
+    QnSignHelper(QnCommonModule* commonModule, QObject* parent = nullptr);
     ~QnSignHelper();
     void setLogo(QPixmap logo);
     QnCompressedVideoDataPtr createSignatureFrame(AVCodecContext* srcCodec, QnCompressedVideoDataPtr iFrame);
@@ -40,12 +44,12 @@ public:
 
     //TODO: #Elric remove magic const from the function
     QFontMetrics updateFontSize(QPainter& painter, const QSize& paintSize);
-    static void updateDigest(AVCodecContext* srcCodec, QnCryptographicHash &ctx, const quint8* data, int size);
-    static void updateDigest(const QnConstMediaContextPtr& context, QnCryptographicHash &ctx, const quint8* data, int size);
+    static void updateDigest(AVCodecContext* srcCodec, nx::utils::QnCryptographicHash &ctx, const quint8* data, int size);
+    static void updateDigest(const QnConstMediaContextPtr& context, nx::utils::QnCryptographicHash &ctx, const quint8* data, int size);
     void setSignOpacity(float opacity, QColor color);
 
     /** Return initial signature as filler */
-    static QByteArray getSignPattern();
+    static QByteArray getSignPattern(QnLicensePool* licensePool);
     static int getMaxSignSize();
     static char getSignPatternDelim();
 
@@ -62,8 +66,8 @@ private:
     int correctNalPrefix(const QByteArray& srcCodecExtraData, quint8* videoBuf, int out_size, int videoBufSize);
     int runX264Process(AVFrame* frame, QString optionStr, quint8* rezBuffer);
     int removeH264SeiMessage(quint8* buffer, int size);
-    static void doUpdateDigestNoCodec(QnCryptographicHash &ctx, const quint8* data, int size);
-    static void doUpdateDigest(AVCodecID codecId, const quint8* extradata, int extradataSize, QnCryptographicHash &ctx, const quint8* data, int size);
+    static void doUpdateDigestNoCodec(nx::utils::QnCryptographicHash &ctx, const quint8* data, int size);
+    static void doUpdateDigest(AVCodecID codecId, const quint8* extradata, int extradataSize, nx::utils::QnCryptographicHash &ctx, const quint8* data, int size);
 
 private:
     QPixmap m_logo;
@@ -81,6 +85,6 @@ private:
     QString m_hwIdStr;
     QString m_licensedToStr;
     AVPacket* m_outPacket;
-};
 
-#endif // __SIGN_FRAME_HELPER__
+    QnLicenseValidator* m_licenseValidator = nullptr;
+};

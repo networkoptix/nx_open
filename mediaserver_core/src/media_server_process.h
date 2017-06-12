@@ -17,9 +17,9 @@
 #include "platform/monitoring/global_monitor.h"
 #include <platform/platform_abstraction.h>
 
-#include "utils/common/long_runnable.h"
+#include "nx/utils/thread/long_runnable.h"
 #include "nx_ec/impl/ec_api_impl.h"
-#include "utils/common/public_ip_discovery.h"
+#include <nx/network/public_ip_discovery.h>
 #include <nx/network/http/http_mod_manager.h>
 #include <nx/network/upnp/upnp_port_mapper.h>
 #include <media_server/serverutil.h>
@@ -27,12 +27,13 @@
 
 #include "health/system_health.h"
 #include "platform/platform_abstraction.h"
+#include <nx/utils/log/log.h>
+#include <nx/vms/discovery/manager.h>
 
 class QnAppserverResourceProcessor;
 class QNetworkReply;
 class QnServerMessageProcessor;
 struct QnModuleInformation;
-class QnModuleFinder;
 struct QnPeerRuntimeInfo;
 class QnLdapManager;
 struct BeforeRestoreDbData;
@@ -48,6 +49,7 @@ class CmdLineArguments
 {
 public:
     QString logLevel;
+    QString exceptionFilters;
     //!Log level of http requests log
     QString msgLogLevel;
     QString ec2TranLogLevel;
@@ -67,7 +69,7 @@ public:
     QString enforceSocketType;
     QString enforcedMediatorEndpoint;
     QString ipVersion;
-
+    QString createFakeData;
 
     CmdLineArguments() :
         logLevel(
@@ -89,7 +91,7 @@ class MediaServerProcess: public QnLongRunnable
     Q_OBJECT
 
 public:
-    MediaServerProcess(int argc, char* argv[]);
+    MediaServerProcess(int argc, char* argv[], bool serviceMode = false);
     ~MediaServerProcess();
 
     void stopObjects();
@@ -103,14 +105,24 @@ public:
 
     const CmdLineArguments cmdLineArguments() const;
     void setObsoleteGuid(const QnUuid& obsoleteGuid) { m_obsoleteGuid = obsoleteGuid; }
-    void setNeedInitHardwareId(bool value);
+    QnCommonModule* commonModule() const
+    {
+        if (const auto& module = m_serverModule.lock())
+            return module->commonModule();
+        else
+            return nullptr;
+    }
+    MSSettings* serverSettings() const { return m_settings.get(); }
+
 signals:
     void started();
 public slots:
     void stopAsync();
     void stopSync();
 private slots:
-    void loadResourcesFromECS(QnCommonMessageProcessor* messageProcessor);
+    void loadResourcesFromECS(
+        ec2::AbstractECConnectionPtr ec2Connection,
+        QnCommonMessageProcessor* messageProcessor);
     void at_portMappingChanged(QString address);
     void at_serverSaved(int, ec2::ErrorCode err);
     void at_cameraIPConflict(const QHostAddress& host, const QStringList& macAddrList);
@@ -120,7 +132,7 @@ private slots:
     void at_archiveBackupFinished(qint64 backedUpToMs, QnBusiness::EventReason code);
     void at_timer();
     void at_connectionOpened();
-    void at_serverModuleConflict(const QnModuleInformation &moduleInformation, const SocketAddress &address);
+    void at_serverModuleConflict(nx::vms::discovery::ModuleEndpoint module);
 
     void at_appStarted();
     void at_runtimeInfoChanged(const QnPeerRuntimeInfo& runtimeInfo);
@@ -135,8 +147,13 @@ private:
     void moveHandlingCameras();
     void updateAddressesList();
     void initStoragesAsync(QnCommonMessageProcessor* messageProcessor);
-    void registerRestHandlers(CloudManagerGroup* const cloudManagerGroup);
-    bool initTcpListener(CloudManagerGroup* const cloudManagerGroup);
+    void registerRestHandlers(
+        CloudManagerGroup* const cloudManagerGroup,
+        QnUniversalTcpListener* tcpListener,
+        ec2::QnTransactionMessageBusBase* messageBus);
+    bool initTcpListener(
+        CloudManagerGroup* const cloudManagerGroup,
+        ec2::QnTransactionMessageBusBase* messageBus);
     std::unique_ptr<nx_upnp::PortMapper> initializeUpnpPortMapper();
     Qn::ServerFlags calcServerFlags();
     void initPublicIpDiscovery();
@@ -148,27 +165,30 @@ private:
     void performActionsOnExit();
     void parseCommandLineParameters(int argc, char* argv[]);
     void updateAllowedInterfaces();
-    void addCommandLineParametersFromConfig();
+    void addCommandLineParametersFromConfig(MSSettings* settings);
     void saveServerInfo(const QnMediaServerResourcePtr& server);
 
-    bool initHardwareId();
+    void serviceModeInit();
     QString hardwareIdAsGuid() const;
     void updateGuidIfNeeded();
+
+    // TODO: Makes sense to split into helper functions and move into appserver2 so it can be used
+    // in unit tests.
+    void makeFakeData(const QString& fakeDataString, const ec2::AbstractECConnectionPtr& connection);
+
 private:
     int m_argc;
     char** m_argv;
     bool m_startMessageSent;
     qint64 m_firstRunningTime;
 
-    QnModuleFinder* m_moduleFinder;
     std::unique_ptr<QnAutoRequestForwarder> m_autoRequestForwarder;
-    std::unique_ptr<nx_http::HttpModManager> m_httpModManager;
     QnUniversalTcpListener* m_universalTcpListener;
     QnMediaServerResourcePtr m_mediaServer;
     QSet<QnUuid> m_updateUserRequests;
     std::map<HostAddress, quint16> m_forwardedAddresses;
     QnMutex m_mutex;
-    std::unique_ptr<QnPublicIPDiscovery> m_ipDiscovery;
+    std::unique_ptr<nx::network::PublicIPDiscovery> m_ipDiscovery;
     std::unique_ptr<QTimer> m_updatePiblicIpTimer;
     quint64 m_dumpSystemResourceUsageTaskID;
     bool m_stopping;
@@ -180,7 +200,9 @@ private:
     CmdLineArguments m_cmdLineArguments;
     QnUuid m_obsoleteGuid;
     std::unique_ptr<nx::utils::promise<void>> m_initStoragesAsyncPromise;
-    bool m_needInitHardwareId = false;
+    std::weak_ptr<QnMediaServerModule> m_serverModule;
+    bool m_serviceMode;
+    std::unique_ptr<MSSettings> m_settings;
 };
 
 #endif // MEDIA_SERVER_PROCESS_H

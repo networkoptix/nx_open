@@ -6,7 +6,7 @@
 #include <nx/utils/random.h>
 #include <nx/utils/std/cpp14.h>
 
-#include <utils/common/guard.h>
+#include <nx/utils/scope_guard.h>
 
 namespace nx {
 namespace network {

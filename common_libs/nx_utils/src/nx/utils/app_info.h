@@ -15,8 +15,24 @@ public:
     static QString applicationArch();
     static QString armBox();
 
-    static bool isArm() { return applicationArch() == lit("arm"); }
+    static QString productName();
+    static QString productNameShort();
+    static QString productNameLong();
+    static QString organizationName();
+    static QString linuxOrganizationName();
+    static QString organizationNameForSettings();
+
+    static bool isArm()
+    {
+        #if defined(__arm__)
+            return true;
+        #else
+            return false;
+        #endif
+    }
+
     static bool isBpi() { return armBox() == lit("bpi"); }
+    static bool isRaspberryPi() { return armBox() == lit("rpi"); }
     static bool isNx1() { return armBox() == lit("nx1"); }
     static bool isAndroid() { return applicationPlatform() == lit("android"); }
     static bool isIos() { return applicationPlatform() == lit("ios"); }

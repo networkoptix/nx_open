@@ -11,12 +11,16 @@
 
 namespace ec2
 {
+    class TimeSynchronizationManager;
+
     template<typename QueryProcessorType>
     class QnTimeNotificationManager : public AbstractTimeNotificationManager
     {
     public:
-        QnTimeNotificationManager();
+        QnTimeNotificationManager(TimeSynchronizationManager* timeSyncManager);
         ~QnTimeNotificationManager();
+    private:
+        TimeSynchronizationManager* m_timeSyncManager;
     };
 
     template<class QueryProcessorType>
@@ -25,7 +29,10 @@ namespace ec2
         public AbstractTimeManager
     {
     public:
-        QnTimeManager(QueryProcessorType* queryProcessor, const Qn::UserAccessData &userAccessData );
+        QnTimeManager(
+            QueryProcessorType* queryProcessor,
+            TimeSynchronizationManager* timeSyncManager,
+            const Qn::UserAccessData &userAccessData );
         virtual ~QnTimeManager();
 
         //!Implementation of AbstractTimeManager::getPeerTimeInfoList
@@ -39,6 +46,7 @@ namespace ec2
 
     private:
         QueryProcessorType* m_queryProcessor;
+        TimeSynchronizationManager* m_timeSyncManager;
         Qn::UserAccessData m_userAccessData;
     };
 }

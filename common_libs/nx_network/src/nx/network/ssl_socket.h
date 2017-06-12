@@ -18,6 +18,7 @@ typedef struct bio_st BIO;
 
 namespace nx {
 namespace network {
+namespace deprecated {
 
 class SslSocketPrivate;
 class MixedSslSocketPrivate;
@@ -39,8 +40,9 @@ class NX_NETWORK_API SslSocket:
 
 public:
     SslSocket(
-        AbstractStreamSocket* wrappedSocket,
-        bool isServerSide, bool encriptionEnforced = false);
+        std::unique_ptr<AbstractStreamSocket> wrappedSocket,
+        bool isServerSide,
+        bool encriptionEnforced = false);
     virtual ~SslSocket();
 
     virtual bool reopen() override;
@@ -81,8 +83,10 @@ protected:
     SslSocketPrivate *d_ptr;
 
     SslSocket(
-        SslSocketPrivate* priv,AbstractStreamSocket* wrappedSocket,
-        bool isServerSide, bool encriptionEnforced);
+        SslSocketPrivate* priv,
+        std::unique_ptr<AbstractStreamSocket> wrappedSocket,
+        bool isServerSide,
+        bool encriptionEnforced);
 
     int recvInternal(void* buffer, unsigned int bufferLen, int flags);
     int sendInternal(const void* buffer, unsigned int bufferLen);
@@ -125,10 +129,11 @@ private:
  *      or to system socket directly.
  *  @note Can only be used on server side for accepting connections
 */
-class NX_NETWORK_API MixedSslSocket: public SslSocket
+class NX_NETWORK_API MixedSslSocket:
+    public SslSocket
 {
 public:
-    MixedSslSocket(AbstractStreamSocket* wrappedSocket);
+    MixedSslSocket(std::unique_ptr<AbstractStreamSocket> wrappedSocket);
 
     virtual int recv(void* buffer, unsigned int bufferLen, int flags) override;
     virtual int send(const void* buffer, unsigned int bufferLen) override;
@@ -163,7 +168,7 @@ class NX_NETWORK_API SslServerSocket:
 
 public:
     SslServerSocket(
-        AbstractStreamServerSocket* delegateSocket,
+        std::unique_ptr<AbstractStreamServerSocket> delegateSocket,
         bool allowNonSecureConnect);
 
     virtual bool listen(int queueLen) override;
@@ -171,10 +176,7 @@ public:
     virtual void pleaseStop(nx::utils::MoveOnlyFunc<void()> handler) override;
     virtual void pleaseStopSync(bool assertIfCalledUnderLock = true) override;
 
-    virtual void acceptAsync(
-        nx::utils::MoveOnlyFunc<void(
-            SystemError::ErrorCode,
-            AbstractStreamSocket*)> handler) override;
+    virtual void acceptAsync(AcceptCompletionHandler handler) override;
 
     virtual void cancelIOAsync(nx::utils::MoveOnlyFunc<void()> handler) override;
     virtual void cancelIOSync() override;
@@ -182,15 +184,14 @@ public:
 private:
     const bool m_allowNonSecureConnect;
     std::unique_ptr<AbstractStreamServerSocket> m_delegateSocket;
-    nx::utils::MoveOnlyFunc<void(
-        SystemError::ErrorCode,
-        AbstractStreamSocket*)> m_acceptHandler;
+    AcceptCompletionHandler m_acceptHandler;
 
     void connectionAccepted(
-            SystemError::ErrorCode errorCode,
-            AbstractStreamSocket* newSocket);
+        SystemError::ErrorCode errorCode,
+        std::unique_ptr<AbstractStreamSocket> newSocket);
 };
 
+} // namespace deprecated
 } // namespace network
 } // namespace nx
 

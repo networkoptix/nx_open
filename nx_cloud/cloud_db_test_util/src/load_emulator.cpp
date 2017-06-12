@@ -1,7 +1,7 @@
 #include "load_emulator.h"
 
+#include <nx/network/url/url_builder.h>
 #include <nx/network/url/url_parse_helper.h>
-#include <nx/utils/url_builder.h>
 #include <nx/utils/string.h>
 
 namespace nx {
@@ -77,7 +77,7 @@ void LoadEmulator::openConnections()
         const auto& system = m_systems.systems[systemIndex];
 
         m_connectionHelper.establishTransactionConnection(
-            utils::UrlBuilder().setScheme(cdbUrl.scheme())
+            network::url::Builder().setScheme(cdbUrl.scheme())
                 .setHost(cdbEndpoint.address.toString())
                 .setPort(cdbEndpoint.port),
             system.id,

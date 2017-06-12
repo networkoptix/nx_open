@@ -7,8 +7,8 @@
 #include "mediaserver_launcher.h"
 #include <api/app_server_connection.h>
 #include <nx/network/http/auth_tools.h>
-#include <nx/network/http/httpclient.h>
-#include <http/custom_headers.h>
+#include <nx/network/http/http_client.h>
+#include <nx/network/http/custom_headers.h>
 
 #include <nx/fusion/model_functions.h>
 #include <network/authenticate_helper.h>
@@ -16,8 +16,11 @@
 #include <network/authutil.h>
 #include <rest/server/json_rest_result.h>
 #include "utils/common/sleep.h"
+#include "common/common_module.h"
+#include <api/global_settings.h>
 
-class AuthReturnCodeTest : public ::testing::Test
+class AuthReturnCodeTest:
+    public ::testing::Test
 {
 public:
     static void SetUpTestCase()
@@ -33,7 +36,7 @@ public:
 
     virtual void SetUp() override
     {
-        auto ec2Connection = QnAppServerConnectionFactory::getConnection2();
+        auto ec2Connection = mediaServerLauncher->commonModule()->ec2Connection();
         ec2::AbstractUserManagerPtr userManager = ec2Connection->getUserManager(Qn::kSystemAccess);
 
         userData.id = QnUuid::createUuid();
@@ -53,18 +56,27 @@ public:
         ldapUserWithFilledDigest.name = "ldap user 2";
         ldapUserWithFilledDigest.isEnabled = true;
         ldapUserWithFilledDigest.isLdap = true;
-        ldapUserWithFilledDigest.digest = "some digest";
+
+        auto hashes = PasswordData::calculateHashes(ldapUserWithFilledDigest.name, "some password", true);
+        ldapUserWithFilledDigest.hash = hashes.passwordHash;
+        ldapUserWithFilledDigest.digest = hashes.passwordDigest;
+
         ASSERT_EQ(ec2::ErrorCode::ok, userManager->saveSync(ldapUserWithFilledDigest));
+
+        auto settings = mediaServerLauncher->commonModule()->globalSettings();
+        settings->setCloudSystemId(QnUuid::createUuid().toString());
+        settings->setCloudAuthKey(QnUuid::createUuid().toString());
+        settings->synchronizeNowSync();
     }
 
     void addLocalUser(QString userName, QString password)
     {
-        auto ec2Connection = QnAppServerConnectionFactory::getConnection2();
+        auto ec2Connection = mediaServerLauncher->commonModule()->ec2Connection();
         ec2::AbstractUserManagerPtr userManager = ec2Connection->getUserManager(Qn::kSystemAccess);
 
         userData.id = QnUuid::createUuid();
         userData.name = userName;
-        userData.digest = nx_http::calcHa1(userName, QnAppInfo::realm(), password);
+        userData.digest = nx_http::calcHa1(userName, nx::network::AppInfo::realm(), password);
         userData.isEnabled = true;
         userData.isCloud = false;
         ASSERT_EQ(ec2::ErrorCode::ok, userManager->saveSync(userData));
@@ -103,7 +115,7 @@ public:
         cookieLogin.auth = createHttpQueryAuthParam(
             login,
             password,
-            QnAppInfo::realm().toUtf8(),
+            nx::network::AppInfo::realm().toUtf8(),
             nx_http::Method::GET,
             QnAuthHelper::instance()->generateNonce());
 
@@ -141,6 +153,8 @@ private:
         httpClient.setUserName(login);
         httpClient.setUserPassword(password);
         httpClient.setAuthType(authType);
+        httpClient.addAdditionalHeader(Qn::CUSTOM_CHANGE_REALM_HEADER_NAME, QByteArray());
+
         const auto startTime = std::chrono::steady_clock::now();
         constexpr const auto maxPeriodToWaitForMediaServerStart = std::chrono::seconds(150);
         while (std::chrono::steady_clock::now() - startTime < maxPeriodToWaitForMediaServerStart)

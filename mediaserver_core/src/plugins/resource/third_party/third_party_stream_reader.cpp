@@ -7,8 +7,9 @@
 
 #include <QtCore/QTextStream>
 
-#include <nx/network/http/httptypes.h>
+#include <nx/network/http/http_types.h>
 #include <nx/streaming/av_codec_media_context.h>
+#include <nx/utils/app_info.h>
 #include <nx/utils/log/log.h>
 #include <plugins/resource/third_party/motion_data_picture.h>
 #include <plugins/resource/onvif/dataprovider/onvif_mjpeg.h>
@@ -182,6 +183,7 @@ CameraDiagnostics::Result ThirdPartyStreamReader::openStreamInternal(bool isCame
             if( (m_cameraCapabilities & nxcip::BaseCameraManager::audioCapability) && m_thirdPartyRes->isAudioEnabled() )
                 config.flags |= nxcip::LiveStreamConfig::LIVE_STREAM_FLAG_AUDIO_ENABLED;
 
+            QnMutexLocker lock(&m_streamReaderMutex);
             m_liveStreamReader.reset(); // release an old one first
             nxcip::StreamReader * tmpReader = nullptr;
             int ret = mediaEncoder3->getConfiguredLiveStreamReader( &config, &tmpReader );
@@ -192,6 +194,7 @@ CameraDiagnostics::Result ThirdPartyStreamReader::openStreamInternal(bool isCame
         }
         else
         {
+            QnMutexLocker lock(&m_streamReaderMutex);
             m_liveStreamReader.reset();
             m_liveStreamReader.reset( mediaEncoder3->getLiveStreamReader(), refDeleter );
         }
@@ -226,6 +229,7 @@ CameraDiagnostics::Result ThirdPartyStreamReader::openStreamInternal(bool isCame
 
         if( m_mediaEncoder2 )
         {
+            QnMutexLocker lock(&m_streamReaderMutex);
             m_liveStreamReader.reset();
             m_liveStreamReader.reset( m_mediaEncoder2->getLiveStreamReader(), refDeleter );
         }
@@ -236,8 +240,9 @@ CameraDiagnostics::Result ThirdPartyStreamReader::openStreamInternal(bool isCame
         if( m_thirdPartyRes->isAudioEnabled() )
         {
             nxcip::AudioFormat audioFormat;
+            Extras extras;
             if( m_mediaEncoder2->getAudioFormat( &audioFormat ) == nxcip::NX_NO_ERROR )
-                initializeAudioContext( audioFormat );
+                initializeAudioContext( audioFormat, extras );
         }
 
         char mediaUrlBuf[nxcip::MAX_TEXT_LEN];
@@ -273,7 +278,7 @@ CameraDiagnostics::Result ThirdPartyStreamReader::openStreamInternal(bool isCame
         if( mediaUrl.scheme().toLower() == lit("rtsp") )
         {
             QnMulticodecRtpReader* rtspStreamReader = new QnMulticodecRtpReader( m_resource );
-            rtspStreamReader->setUserAgent(QnAppInfo::productName());
+            rtspStreamReader->setUserAgent(nx::utils::AppInfo::productName());
             rtspStreamReader->setRequest( mediaUrlStr );
             rtspStreamReader->setRole(role);
             rtspStreamReader->setPrefferedAuthScheme(nx_http::header::AuthScheme::automatic);
@@ -298,6 +303,8 @@ CameraDiagnostics::Result ThirdPartyStreamReader::openStreamInternal(bool isCame
 
 void ThirdPartyStreamReader::closeStream()
 {
+    QnMutexLocker lock(&m_streamReaderMutex);
+
     m_liveStreamReader.reset();
 
     if( m_builtinStreamReader.get() )
@@ -306,11 +313,13 @@ void ThirdPartyStreamReader::closeStream()
 
 bool ThirdPartyStreamReader::isStreamOpened() const
 {
+    QnMutexLocker lock(&m_streamReaderMutex);
     return m_liveStreamReader || (m_builtinStreamReader.get() && m_builtinStreamReader->isStreamOpened());
 }
 
 int ThirdPartyStreamReader::getLastResponseCode() const
 {
+    QnMutexLocker lock(&m_streamReaderMutex);
     return m_liveStreamReader
         ? nx_http::StatusCode::ok
         : (m_builtinStreamReader.get() ? m_builtinStreamReader->getLastResponseCode() : nx_http::StatusCode::ok);
@@ -336,6 +345,7 @@ QnMetaDataV1Ptr ThirdPartyStreamReader::getCameraMetadata()
 void ThirdPartyStreamReader::pleaseStop()
 {
     CLServerPushStreamReader::pleaseStop();
+    QnMutexLocker lock(&m_streamReaderMutex);
     if( m_liveStreamReader )
     {
         m_liveStreamReader->interrupt();
@@ -410,7 +420,8 @@ QnAbstractMediaDataPtr ThirdPartyStreamReader::getNextData()
             else
             {
                 int errorCode = 0;
-                rez = readStreamReader( m_liveStreamReader.get(), &errorCode );
+                Extras extras;
+                rez = readStreamReader( m_liveStreamReader.get(), &errorCode, &extras);
                 if( rez )
                 {
                     if( m_cameraCapabilities & nxcip::BaseCameraManager::needIFrameDetectionCapability )
@@ -429,11 +440,11 @@ QnAbstractMediaDataPtr ThirdPartyStreamReader::getNextData()
                     }
                     else if( rez->dataType == QnAbstractMediaData::AUDIO )
                     {
-                        if( !m_audioContext )
+                        if( !m_audioContext || (extras.extradataBlob.size() > 0 && m_audioContext->getExtradataSize() == 0))
                         {
                             nxcip::AudioFormat audioFormat;
                             if( m_mediaEncoder2->getAudioFormat( &audioFormat ) == nxcip::NX_NO_ERROR )
-                                initializeAudioContext( audioFormat );
+                                initializeAudioContext( audioFormat, extras );
                         }
                         static_cast<QnCompressedAudioData*>(rez.get())->context = m_audioContext;
                     }
@@ -526,7 +537,10 @@ AVCodecID ThirdPartyStreamReader::toFFmpegCodecID( nxcip::CompressionType compre
     }
 }
 
-QnAbstractMediaDataPtr ThirdPartyStreamReader::readStreamReader( nxcip::StreamReader* streamReader, int* outErrorCode )
+QnAbstractMediaDataPtr ThirdPartyStreamReader::readStreamReader(
+    nxcip::StreamReader* streamReader,
+    int* outErrorCode,
+    Extras* outExtras)
 {
     nxcip::MediaDataPacket* packet = NULL;
     const int errorCode = streamReader->getNextData( &packet );
@@ -538,6 +552,18 @@ QnAbstractMediaDataPtr ThirdPartyStreamReader::readStreamReader( nxcip::StreamRe
     nxpt::ScopedRef<nxcip::MediaDataPacket> packetAp( packet, false );
 
     QnAbstractMediaDataPtr mediaPacket;
+
+    nxcip::MediaDataPacket2* mediaDataPacket2 = static_cast<nxcip::MediaDataPacket2*>(
+        packet->queryInterface(nxcip::IID_MediaDataPacket2));
+
+    if (mediaDataPacket2)
+    {
+        auto extradataSize = mediaDataPacket2->extradataSize();
+        outExtras->extradataBlob.resize(extradataSize);
+        memcpy(outExtras->extradataBlob.data(), mediaDataPacket2->extradata(), mediaDataPacket2->extradataSize());
+        mediaDataPacket2->releaseRef();
+    }
+
     switch( packet->type() )
     {
         case nxcip::dptVideo:
@@ -641,7 +667,7 @@ QnAbstractMediaDataPtr ThirdPartyStreamReader::readStreamReader( nxcip::StreamRe
     return mediaPacket;
 }
 
-void ThirdPartyStreamReader::initializeAudioContext( const nxcip::AudioFormat& audioFormat )
+void ThirdPartyStreamReader::initializeAudioContext( const nxcip::AudioFormat& audioFormat, const Extras& extras )
 {
     const AVCodecID ffmpegCodecId = toFFmpegCodecID(audioFormat.compressionType);
     const auto context = new QnAvCodecMediaContext(ffmpegCodecId);
@@ -686,7 +712,15 @@ void ThirdPartyStreamReader::initializeAudioContext( const nxcip::AudioFormat& a
     av->time_base.num = 1;
     av->time_base.den = audioFormat.sampleRate;
 
-    m_audioLayout->addAudioTrack( QnResourceAudioLayout::AudioTrack(m_audioContext, QString()) );
+    if (extras.extradataBlob.size() > 0 && context->getExtradataSize() == 0)
+    {
+        context->setExtradata(
+            (const uint8_t*) extras.extradataBlob.data(),
+            extras.extradataBlob.size());
+    }
+
+    m_audioLayout.reset(new QnResourceCustomAudioLayout());
+    m_audioLayout->addAudioTrack( QnResourceAudioLayout::AudioTrack(m_audioContext, QString()));
 }
 
 QnConstResourceVideoLayoutPtr ThirdPartyStreamReader::getVideoLayout() const

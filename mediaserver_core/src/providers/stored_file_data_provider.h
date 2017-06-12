@@ -3,6 +3,7 @@
 #include <plugins/storage/memory/ext_iodevice_storage.h>
 #include <plugins/resource/avi/avi_archive_delegate.h>
 #include <QtCore/QBuffer>
+#include <nx_ec/ec_api_fwd.h>
 
 
 class QnStoredFileDataProvider : public QnAbstractStreamDataProvider
@@ -16,7 +17,10 @@ class QnStoredFileDataProvider : public QnAbstractStreamDataProvider
 
 Q_OBJECT
 public:
-    explicit QnStoredFileDataProvider(const QString& filePath, int cyclesCount = 0);
+    explicit QnStoredFileDataProvider(
+        ec2::AbstractECConnectionPtr connection,
+        const QString& filePath,
+        int cyclesCount = 0);
     ~QnStoredFileDataProvider();
 
     virtual void run() override;

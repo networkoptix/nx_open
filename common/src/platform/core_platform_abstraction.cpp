@@ -8,22 +8,22 @@
 #include <utils/common/warnings.h>
 
 #if defined(Q_OS_WIN)
-#   include "process/process_win.h"
+#   include "process/platform_process_win.h"
 #   include "notification/notifier_win.h"
 #   define QnProcessImpl QnWindowsProcess
 #   define QnNotifierImpl QnWindowsNotifier
 #elif defined(Q_OS_LINUX)
-#   include "process/process_unix.h"
+#   include "process/platform_process_unix.h"
 #   include "notification/generic_notifier.h"
 #   define QnProcessImpl QnUnixProcess
 #   define QnNotifierImpl QnGenericNotifier
 #elif defined(Q_OS_MACX)
-#   include "process/process_unix.h"
+#   include "process/platform_process_unix.h"
 #   include "notification/generic_notifier.h"
 #   define QnProcessImpl QnUnixProcess
 #   define QnNotifierImpl QnGenericNotifier
 #else
-#   include "process/process_unix.h"
+#   include "process/platform_process_unix.h"
 #   include "notification/generic_notifier.h"
 #   define QnProcessImpl QnUnixProcess
 #   define QnNotifierImpl QnGenericNotifier

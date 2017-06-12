@@ -18,7 +18,7 @@ StaticData::StaticData(const nx_http::StringType& mimeType, QByteArray response)
 
 void StaticData::processRequest(
     nx_http::HttpServerConnection* const /*connection*/,
-    stree::ResourceContainer /*authInfo*/,
+    nx::utils::stree::ResourceContainer /*authInfo*/,
     nx_http::Request /*request*/,
     nx_http::Response* const /*response*/,
     nx_http::RequestProcessedHandler completionHandler)

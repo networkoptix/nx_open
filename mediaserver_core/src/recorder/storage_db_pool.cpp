@@ -5,15 +5,14 @@
 #include "plugins/storage/file_storage/file_storage_resource.h"
 #include <nx/utils/log/log.h>
 
-QnStorageDbPool::QnStorageDbPool(): 
-    DependedSingleTone<QnStorageDbPool>() 
+QnStorageDbPool::QnStorageDbPool(QnCommonModule* commonModule):
+    QnCommonModuleAware(commonModule)
 {
-
 }
 
-QString QnStorageDbPool::getLocalGuid()
+QString QnStorageDbPool::getLocalGuid(QnCommonModule* commonModule)
 {
-    QString simplifiedGUID = qnCommon->moduleGUID().toString();
+    QString simplifiedGUID = commonModule->moduleGUID().toString();
     simplifiedGUID = simplifiedGUID.replace("{", "");
     simplifiedGUID = simplifiedGUID.replace("}", "");
     return simplifiedGUID;
@@ -24,7 +23,7 @@ QnStorageDbPtr QnStorageDbPool::getSDB(const QnStorageResourcePtr &storage)
     QnMutexLocker lock( &m_sdbMutex );
 
     QnStorageDbPtr sdb = m_chunksDB[storage->getUrl()];
-    if (!sdb) 
+    if (!sdb)
     {
         if (!(storage->getCapabilities() & QnAbstractStorageResource::cap::WriteFile))
         {
@@ -33,7 +32,7 @@ QnStorageDbPtr QnStorageDbPool::getSDB(const QnStorageResourcePtr &storage)
                     .arg(storage->getUrl()), cl_logWARNING);
             return sdb;
         }
-        QString simplifiedGUID = getLocalGuid();
+        QString simplifiedGUID = getLocalGuid(commonModule());
         QString dbPath = storage->getUrl();
         QString fileName = closeDirPath(dbPath) + QString::fromLatin1("%1_media.nxdb").arg(simplifiedGUID);
 
@@ -64,9 +63,9 @@ int QnStorageDbPool::getStorageIndex(const QnStorageResourcePtr& storage)
     }
     else {
         int index = -1;
-        for (const QSet<int>& indexes: m_storageIndexes.values()) 
+        for (const QSet<int>& indexes: m_storageIndexes.values())
         {
-            for (const int& value: indexes) 
+            for (const int& value: indexes)
                 index = qMax(index, value);
         }
         index++;
@@ -84,7 +83,7 @@ void QnStorageDbPool::removeSDB(const QnStorageResourcePtr &storage)
 void QnStorageDbPool::flush()
 {
     QnMutexLocker lock( &m_sdbMutex );
-    for(const QnStorageDbPtr& sdb: m_chunksDB.values()) 
+    for(const QnStorageDbPtr& sdb: m_chunksDB.values())
     {
         if (sdb)
             sdb->flushRecords();

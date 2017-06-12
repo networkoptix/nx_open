@@ -37,7 +37,8 @@ private:
 #define THROW_BITSTREAM_ERR throw BitStreamException()
 #define THROW_BITSTREAM_ERR2(x) throw BitStreamException(x)
 
-class BitStream {
+class BitStream
+{
 public:
     inline quint8* getBuffer() const {return (quint8*) m_initBuffer;}
     inline unsigned getBitsLeft() const {return m_totalBits;}
@@ -47,7 +48,8 @@ protected:
         if (buffer >= end)
             THROW_BITSTREAM_ERR;
         m_totalBits = (unsigned)(end - buffer) * 8;
-        if (m_maskInitialized == 0) {
+        if (m_maskInitialized == 0)
+        {
             for (unsigned i= 0; i < INT_BIT; i++)
                 m_masks[i] = (1 << i) - 1;
             m_masks[INT_BIT] = UINT_MAX;
@@ -62,7 +64,8 @@ protected:
     static unsigned m_masks[INT_BIT + 1];
 };
 
-class BitStreamReader: public BitStream {
+class BitStreamReader: public BitStream
+{
 private:
     inline unsigned getCurVal(unsigned* buff)
     {
@@ -133,7 +136,8 @@ public:
         }
         return (prevVal + (curVal >> bitLeft)) & m_masks[num];
     }
-    inline unsigned getBit() {
+    inline unsigned getBit()
+    {
         if (m_totalBits < 1)
             THROW_BITSTREAM_ERR;
         if (m_bitLeft > 0)
@@ -146,7 +150,8 @@ public:
         m_totalBits--;
         return (m_curVal >> m_bitLeft) & 1;
     }
-    inline void skipBits(unsigned num) {
+    inline void skipBits(unsigned num)
+    {
         if (m_totalBits < num)
             THROW_BITSTREAM_ERR;
         NX_ASSERT(num <= INT_BIT);
@@ -159,7 +164,24 @@ public:
         }
         m_totalBits -= num;
     }
-    inline void skipBit() {
+    inline void skipBytes(unsigned num)
+    {
+        if (m_totalBits < num * 8)
+            THROW_BITSTREAM_ERR;
+        while (m_bitLeft > 0 && num > 0)
+        {
+            skipBits(8);
+            --num;
+        }
+        unsigned worldsToSkip = num >> 2;
+        m_buffer += worldsToSkip;
+        m_totalBits -= worldsToSkip * 32;
+        num &= 3;
+        skipBits(num * 8);
+    }
+
+    inline void skipBit()
+    {
         if (m_totalBits < 1)
             THROW_BITSTREAM_ERR;
         if (m_bitLeft > 0)
@@ -172,20 +194,24 @@ public:
         m_totalBits--;
     }
     inline unsigned getBitsCount() const  {return (unsigned)(m_buffer - m_initBuffer) * INT_BIT + INT_BIT - m_bitLeft;}
+    inline int bitsLeft() const { return m_totalBits; }
 private:
     unsigned m_curVal;
     unsigned m_bitLeft;
 };
 
 
-class BitStreamWriter: public BitStream {
+class BitStreamWriter: public BitStream
+{
 public:
-    inline void setBuffer(quint8* buffer, quint8* end) {
+    inline void setBuffer(quint8* buffer, quint8* end)
+    {
         BitStream::setBuffer(buffer, end);
         m_curVal = 0;
         m_bitWrited = 0;
     }
-    inline void setBuffer(quint8* buffer, int size) {
+    inline void setBuffer(quint8* buffer, int size)
+    {
         BitStream::setBuffer(buffer, buffer + size);
         m_curVal = 0;
         m_bitWrited = 0;
@@ -198,7 +224,8 @@ public:
         reader.setBuffer((quint8*)m_buffer, (quint8*) (m_buffer + 1));
         putBits(cnt, reader.getBits(cnt));
     }
-    inline void putBits(unsigned num, unsigned value) {
+    inline void putBits(unsigned num, unsigned value)
+    {
         if (m_totalBits < num)
             THROW_BITSTREAM_ERR;
         value &= m_masks[num];
@@ -216,16 +243,48 @@ public:
         }
         m_totalBits -= num;
     }
-    inline void putBit(unsigned value) {
+
+    void putBytes(quint8* data, unsigned size)
+    {
+        if (m_totalBits < size)
+            THROW_BITSTREAM_ERR;
+        while (m_bitWrited > 0 && size > 0)
+        {
+            putBits(8, *data++);
+            --size;
+        }
+
+        int copySize = size & ~3; //< flor to 4
+        if (copySize > 0)
+        {
+            memcpy(m_buffer, data, copySize);
+            m_buffer += copySize / 4;
+            data += copySize;
+            size -= copySize;
+            m_totalBits -= copySize * 8;
+
+        }
+
+        while (size > 0)
+        {
+            putBits(8, *data++);
+            --size;
+        }
+    }
+
+    inline void putBit(unsigned value)
+    {
         if (m_totalBits < 1)
             THROW_BITSTREAM_ERR;
         value &= m_masks[1];
-        if (m_bitWrited + 1 < INT_BIT) {
+        if (m_bitWrited + 1 < INT_BIT)
+        {
             m_bitWrited ++;
             m_curVal <<= 1;
             m_curVal += value;
         }
-        else {
+        else
+        {
             m_curVal <<= (INT_BIT - m_bitWrited);
             m_bitWrited = m_bitWrited + 1 - INT_BIT;
             m_curVal += value >> m_bitWrited;
@@ -234,15 +293,28 @@ public:
         }
         m_totalBits --;
     }
-    inline void flushBits() {
+    inline void flushBits(bool finishLastByte = false)
+    {
+        if (finishLastByte)
+        {
+            int bitsLeft = 8 - (m_bitWrited % 8);
+            if (bitsLeft < 8)
+                putBits(bitsLeft, 0);
+        }
+
         m_curVal <<= INT_BIT - m_bitWrited;
         unsigned prevVal = ntohl(*m_buffer);
         prevVal &= m_masks[INT_BIT - m_bitWrited];
         prevVal |= m_curVal;
         *m_buffer = htonl(prevVal);
     }
-    inline unsigned getBitsCount() {
+    inline unsigned getBitsCount()
+    {
         return (unsigned) (m_buffer - m_initBuffer) * INT_BIT + m_bitWrited;
+    }
+    inline int getBytesCount()
+    {
+        return (getBitsCount() + 7) / 8;
     }
 private:
     unsigned m_curVal;

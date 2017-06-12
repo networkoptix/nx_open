@@ -3,6 +3,8 @@
 
 #include <QtCore/QSharedPointer>
 
+#include <plugins/resource/avi/avi_archive_metadata.h>
+
 #include "nx/streaming/audio_data_packet.h"
 #include "nx/streaming/video_data_packet.h"
 
@@ -25,25 +27,10 @@ class QnAviAudioLayout;
 
 class QnAviArchiveDelegate: public QnAbstractArchiveDelegate
 {
-    Q_OBJECT;
+    Q_OBJECT
 
+    friend class QnAviAudioLayout;
 public:
-    enum Tag {
-        StartTimeTag,
-        EndTimeTag,
-        LayoutInfoTag,
-        SoftwareTag,
-        SignatureTag,
-        DewarpingTag,
-        CustomTag /**< Tag for all other future values encoded in JSON object. */
-    };
-
-    /*
-    * Some containers supports only predefined tag names. So, I've introduce this function
-    */
-    static const char* getTagName(Tag tag, const QString& formatName);
-    const char* getTagValue(Tag tag);
-
     QnAviArchiveDelegate();
     virtual ~QnAviArchiveDelegate();
 
@@ -72,43 +59,47 @@ public:
 
     const char* getTagValue( const char* tagName );
 
+    QnAviArchiveMetadata metadata() const;
+
 protected:
     qint64 packetTimestamp(const AVPacket& packet);
     void packetTimestamp(QnCompressedVideoData* video, const AVPacket& packet);
     void initLayoutStreams();
     AVFormatContext* getFormatContext();
+
 private:
-    bool deserializeLayout(QnCustomResourceVideoLayout* layout, const QString& layoutStr);
     QnConstMediaContextPtr getCodecContext(AVStream* stream);
     bool reopen();
+
 protected:
-    AVFormatContext* m_formatContext;
+    AVFormatContext* m_formatContext = nullptr;
     QnResourcePtr m_resource;
-    qint64 m_playlistOffsetUsec; // File additional offset inside playlist for DVD/BluRay
-    int m_selectedAudioChannel;
-    bool m_initialized;
+    qint64 m_playlistOffsetUs = 0; // Additional file offset inside playlist for DVD/BluRay.
+    int m_selectedAudioChannel = 0;
+    bool m_initialized = false;
     QnStorageResourcePtr m_storage;
+
 private:
-    int m_audioStreamIndex;
-    int m_firstVideoIndex;
-    bool m_streamsFound;
+    int m_audioStreamIndex = -1;
+    int m_firstVideoIndex = 0;
+    bool m_streamsFound = false;
     QnCustomResourceVideoLayoutPtr m_videoLayout;
     QnResourceAudioLayoutPtr m_audioLayout;
     QVector<int> m_indexToChannel;
     QList<QnConstMediaContextPtr> m_contexts;
+    QnAviArchiveMetadata m_metadata;
 
-    qint64 m_startTimeUsec; //microseconds
-    bool m_useAbsolutePos;
-    qint64 m_duration;
+    qint64 m_startTimeUs = 0;
+    bool m_useAbsolutePos = true;
+    qint64 m_durationUs = AV_NOPTS_VALUE;
 
-    friend class QnAviAudioLayout;
-    AVIOContext* m_ioContext;
-    bool m_eofReached;
+    AVIOContext* m_ioContext = nullptr;
+    bool m_eofReached = false;
     QnMutex m_openMutex;
     QVector<qint64> m_lastPacketTimes;
-    bool m_fastStreamFind;
-    bool m_hasVideo;
-    qint64 m_lastSeekTime;
+    bool m_fastStreamFind = false;
+    bool m_hasVideo = true;
+    qint64 m_lastSeekTime = AV_NOPTS_VALUE;
 };
 
 typedef QSharedPointer<QnAviArchiveDelegate> QnAviArchiveDelegatePtr;

@@ -32,7 +32,7 @@ public:
      * Used to aggregate update scripts.
      * if not set, initial version is considered to be zero.
      * Subsequent call to addUpdate* method will add script with initial version.
-     * @warning DB of version less than initial will fail to be upgraded!
+     * WARNING: DB of version less than initial will fail to be upgraded!
      */
     void setInitialVersion(unsigned int version);
     void addUpdateScript(QByteArray updateScript);

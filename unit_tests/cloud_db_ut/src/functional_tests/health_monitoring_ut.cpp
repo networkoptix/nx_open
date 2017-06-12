@@ -1,7 +1,7 @@
 #include <chrono>
 #include <thread>
 
-#include <utils/common/sync_call.h>
+#include <nx/utils/sync_call.h>
 
 #include "health_monitoring_fixture.h"
 

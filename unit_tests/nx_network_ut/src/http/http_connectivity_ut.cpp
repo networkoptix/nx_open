@@ -9,7 +9,7 @@
 #include <nx/network/buffered_stream_socket.h>
 #include <nx/network/http/buffer_source.h>
 #include <nx/network/http/empty_message_body_source.h>
-#include <nx/network/http/httpclient.h>
+#include <nx/network/http/http_client.h>
 #include <nx/network/http/test_http_server.h>
 #include <nx/utils/std/thread.h>
 
@@ -109,7 +109,7 @@ public:
 
     virtual void processRequest(
         nx_http::HttpServerConnection* const /*connection*/,
-        stree::ResourceContainer /*authInfo*/,
+        nx::utils::stree::ResourceContainer /*authInfo*/,
         nx_http::Request /*request*/,
         nx_http::Response* const /*response*/,
         nx_http::RequestProcessedHandler completionHandler) override
@@ -131,7 +131,7 @@ public:
         completionHandler(
             nx_http::RequestResult(
                 nx_http::StatusCode::ok,
-                std::make_unique<nx_http::EmptyMessageBodySource>(nx::String(), boost::none),
+                nullptr,
                 std::move(events)));
     }
 

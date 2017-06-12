@@ -160,8 +160,8 @@ void OnvifResourceSearcherWsdd::ProbeContext::initializeSoap()
 }
 
 
-OnvifResourceSearcherWsdd::OnvifResourceSearcherWsdd():
-    m_onvifFetcher(OnvifResourceInformationFetcher::instance()),
+OnvifResourceSearcherWsdd::OnvifResourceSearcherWsdd(OnvifResourceInformationFetcher* informationFetcher):
+    m_onvifFetcher(informationFetcher),
     m_shouldStop(false),
     m_isFirstSearch(true)
     /*,
@@ -187,7 +187,7 @@ OnvifResourceSearcherWsdd::~OnvifResourceSearcherWsdd()
 void OnvifResourceSearcherWsdd::pleaseStop()
 {
     m_shouldStop = true;
-    m_onvifFetcher.pleaseStop();
+    m_onvifFetcher->pleaseStop();
 }
 
 /*void OnvifResourceSearcherWsdd::updateInterfacesListenSockets() const
@@ -221,7 +221,7 @@ void OnvifResourceSearcherWsdd::pleaseStop()
     {
         QString key = iface.address.toString();
 
-        if (m_recvSocketList.contains(key)) 
+        if (m_recvSocketList.contains(key))
             continue;
 
         QUdpSocketPtr socket(new QUdpSocket());
@@ -266,13 +266,13 @@ void OnvifResourceSearcherWsdd::findHelloEndpoints(EndpointInfoHash& result) con
         soapWsddProxy.soap->master = socket.socketDescriptor();
 
         //Receiving all ProbeMatches
-        for (int i = 0; i < CHECK_HELLO_RETRY_COUNT; ++i) 
+        for (int i = 0; i < CHECK_HELLO_RETRY_COUNT; ++i)
         {
             __wsdd__Hello wsddHello;
             wsddHello.wsdd__Hello = NULL;
 
             int soapRes = soapWsddProxy.recv_Hello(wsddHello);
-            if (soapRes != SOAP_OK) 
+            if (soapRes != SOAP_OK)
             {
                 if (soapRes == SOAP_EOF || SOAP_NO_METHOD)
                 {
@@ -281,7 +281,7 @@ void OnvifResourceSearcherWsdd::findHelloEndpoints(EndpointInfoHash& result) con
                     soap_end(soapWsddProxy.soap);
                     break;
                 }
-                else 
+                else
                 {
                     //SOAP_NO_METHOD - The dispatcher did not find a matching operation for the request
                     //So, this is not error, silently ignore
@@ -382,7 +382,7 @@ void OnvifResourceSearcherWsdd::findResources(QnResourceList& result, DiscoveryM
     if (m_shouldStop)
         return;
 
-    m_onvifFetcher.findResources(endpoints, result, discoveryMode);
+    m_onvifFetcher->findResources(endpoints, result, discoveryMode);
 }
 
 QStringList OnvifResourceSearcherWsdd::getAddrPrefixes(const QString& host) const
@@ -552,7 +552,7 @@ void OnvifResourceSearcherWsdd::fillWsddStructs(wsdd__ProbeType& probe, wsa__End
     endpoint.__anyAttribute = NULL;
 }
 
-template <class T> 
+template <class T>
 void OnvifResourceSearcherWsdd::addEndpointToHash(EndpointInfoHash& hash, const T* source,
     const SOAP_ENV__Header* header, const QStringList& addrPrefixes, const QString& host) const
 {
@@ -575,7 +575,7 @@ void OnvifResourceSearcherWsdd::addEndpointToHash(EndpointInfoHash& hash, const 
     QString uniqId = !mac.isEmpty() ? mac : endpointId;
 
     hash.insert(
-        appropriateAddr, 
+        appropriateAddr,
         EndpointAdditionalInfo(
             name,
             manufacturer,
@@ -709,7 +709,7 @@ void OnvifResourceSearcherWsdd::findEndpointsImpl( EndpointInfoHash& result, con
     int soapRes = soapWsddProxy.send_Probe(targetAddr.toLatin1().data(), NULL, &wsddProbe);
     soapRes = soapWsddProxy.send_Probe(targetAddr.toLatin1().data(), NULL, &wsddProbe);
 
-    if (soapRes != SOAP_OK) 
+    if (soapRes != SOAP_OK)
     {
         qWarning() << "OnvifResourceSearcherWsdd::findEndpoints: (Send) SOAP failed. GSoap error code: "
             << soapRes << SoapErrorHelper::fetchDescription(soapWsddProxy.soap_fault())
@@ -723,7 +723,7 @@ void OnvifResourceSearcherWsdd::findEndpointsImpl( EndpointInfoHash& result, con
     soap_end(soapWsddProxy.soap);
 
     //Receiving all ProbeMatches. Timeout = 500 ms, as written in ONVIF spec
-    while (true) 
+    while (true)
     {
         if (m_shouldStop)
             return;
@@ -732,13 +732,13 @@ void OnvifResourceSearcherWsdd::findEndpointsImpl( EndpointInfoHash& result, con
         wsddProbeMatches.wsdd__ProbeMatches = NULL;
 
         soapRes = soapWsddProxy.recv_ProbeMatches(wsddProbeMatches);
-        if (soapRes != SOAP_OK) 
+        if (soapRes != SOAP_OK)
         {
-            if (soapRes == SOAP_EOF) 
+            if (soapRes == SOAP_EOF)
             {
                 //qDebug() << "OnvifResourceSearcherWsdd::findEndpoints: All devices found. Interface: " << iface.address.toString();
-            } 
-            else 
+            }
+            else
             {
                 qWarning() << "OnvifResourceSearcherWsdd::findEndpoints: SOAP failed. GSoap error code: "
                     << soapRes << SoapErrorHelper::fetchDescription(soapWsddProxy.soap_fault())
@@ -802,7 +802,7 @@ bool OnvifResourceSearcherWsdd::sendProbe( const QnInterfaceAndAddr& iface )
 
     QString targetAddr = QString::fromLatin1(WSDD_GSOAP_MULTICAST_ADDRESS);
     int soapRes = ctx->soapWsddProxy.send_Probe(targetAddr.toLatin1().data(), NULL, &ctx->wsddProbe);
-    if( soapRes != SOAP_OK ) 
+    if( soapRes != SOAP_OK )
     {
         qWarning() << "OnvifResourceSearcherWsdd::findEndpoints: (Send) SOAP failed. GSoap error code: "
             << soapRes << SoapErrorHelper::fetchDescription(ctx->soapWsddProxy.soap_fault())
@@ -846,13 +846,13 @@ bool OnvifResourceSearcherWsdd::readProbeMatches( const QnInterfaceAndAddr& ifac
         memset( &wsddProbeMatches, 0, sizeof(wsddProbeMatches) );
 
         int soapRes = ctx.soapWsddProxy.recv_ProbeMatches(wsddProbeMatches);
-        if (soapRes != SOAP_OK) 
+        if (soapRes != SOAP_OK)
         {
-            if (soapRes == SOAP_EOF) 
+            if (soapRes == SOAP_EOF)
             {
                 //qDebug() << "OnvifResourceSearcherWsdd::findEndpoints: All devices found. Interface: " << iface.address.toString();
-            } 
-            else 
+            }
+            else
             {
                 qWarning() << "OnvifResourceSearcherWsdd::findEndpoints: SOAP failed. GSoap error code: "
                     << soapRes << SoapErrorHelper::fetchDescription(ctx.soapWsddProxy.soap_fault())
@@ -875,9 +875,10 @@ bool OnvifResourceSearcherWsdd::readProbeMatches( const QnInterfaceAndAddr& ifac
                 getAddrPrefixes(iface.address.toString()),
                 iface.address.toString());
 
-            if (cl_log.logLevel() >= cl_logDEBUG1)
+            if (nx::utils::log::isToBeLogged(nx::utils::log::Level::debug))
             {
-                printProbeMatches(wsddProbeMatches.wsdd__ProbeMatches->ProbeMatch, ctx.soapWsddProxy.soap->header);
+                printProbeMatches(wsddProbeMatches.wsdd__ProbeMatches->ProbeMatch,
+                    ctx.soapWsddProxy.soap->header);
             }
         }
 

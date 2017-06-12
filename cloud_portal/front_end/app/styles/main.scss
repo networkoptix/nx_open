@@ -4,9 +4,12 @@
 @import '_theme_variables';
 @import '../bower_components/bootstrap-sass/assets/stylesheets/bootstrap';
 @import '_theme_override';
+@import '_header';
 
 @import '_big_brother';
 @import '_languages';
+
+@import 'common';
 
 html {
   position: relative;
@@ -18,6 +21,23 @@ body {
   margin-bottom: 80px;
   min-width: 360px;
 }
+
+html.webclient-page{
+    overflow: hidden; /* WEB-564: this is another hack: we hide scroll for view page */
+
+    body{
+        margin-bottom: 0;
+    }
+    .navbar{
+        box-shadow: none;
+        margin-bottom: 0;
+    }
+    footer{
+        display:none;
+    }
+}
+
+
 footer {
   position: absolute;
   bottom: 0;
@@ -396,35 +416,6 @@ td{
 }
 
 
-.vertical-bar{
-  border-right: 1px solid $common-border-color;
-  height: 24px;
-  margin: 16px 0;
-}
-
-
-.hidden-collapsed{
-    display:block;
-}
-
-.hidden-expanded{
-    display:none;
-}
-
-@media (max-width: $grid-float-breakpoint-max) {
-  .navbar-collapse .vertical-bar{
-    display: none;
-  }
-
-  .hidden-collapsed{
-    display:none;
-  }
-
-  .hidden-expanded{
-    display:block;
-  }
-}
-
 /* add beta-symbol after product name everywhere */
 /*.product-name.add-version:after{
   content: "\03B2";
@@ -626,6 +617,7 @@ h1.process-success{
 }
 
 .download-button{
+    max-width: 100%;
     margin-bottom:8px;
     margin-top:0;
     .installer-name{
@@ -634,6 +626,11 @@ h1.process-success{
     }
     .media-body{
         width:auto;
+    }
+    h2{
+        max-width: 320px;
+        overflow: hidden;
+        text-overflow: ellipsis;
     }
 }
 h2.version-number{
@@ -701,7 +698,7 @@ h2.version-number{
 
 @mixin icon{
   display: inline-block;
-  background-size: 112px 32px;
+  background-size: 112px 56px;
   width: 16px;
   height: 16px;
   display: inline-block;
@@ -712,13 +709,32 @@ h2.version-number{
 }
 
 @mixin kill-glyphicon{
-    top:2px;
+  top:2px;
   @include icon;
   &:before{
     content:none;
   }
 }
 
+.glyphicon-home{
+    @include kill-glyphicon;
+    width: 20px;
+    height: 18px;
+    background-position: -26px -34px;
+}
+
+.glyphicon-user{
+    @include kill-glyphicon;
+    width: 20px;
+    height: 18px;
+    background-position: -2px -34px;
+}
+.glyphicon-menu-hamburger{
+    @include kill-glyphicon;
+    width: 20px;
+    height: 18px;
+    background-position: -50px -34px;
+}
 .glyphicon-share{
     @include kill-glyphicon;
     background-position: -16px 0;
@@ -737,10 +753,14 @@ button .icon-caret{
 .icon-caret{
   @include icon;
   display: inline-block;
-  background-position: 2px 0px;
+  width: 12px;
+  background-position: -2px 0px;
 
   margin-left:$padding-input-horizontal/2;
   margin-top: 2px;
+}
+.open .icon-caret{
+  background-position: -2px -14px ;
 }
 .close-icon{
   @include icon;

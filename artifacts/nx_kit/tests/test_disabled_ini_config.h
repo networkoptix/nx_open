@@ -1,0 +1,1 @@
+TEST_DISABLED_INI_CONFIG_API int test_disabled_ini_config();

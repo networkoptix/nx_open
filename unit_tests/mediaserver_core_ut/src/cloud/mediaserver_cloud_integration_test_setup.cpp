@@ -6,7 +6,7 @@
 
 #include <cdb/connection.h>
 #include <api/app_server_connection.h>
-#include <utils/common/sync_call.h>
+#include <nx/utils/sync_call.h>
 
 #include <media_server/settings.h>
 
@@ -35,7 +35,8 @@ bool MediaServerCloudIntegrationTest::startMediaServer()
         return false;
 
     // TODO: #ak Remove it from here when mediaserver does it from QnMain::run, not from application's main thread.
-    QnCommonMessageProcessor::instance()->init(QnAppServerConnectionFactory::getConnection2());
+    m_mediaServerLauncher.commonModule()->messageProcessor()->init(
+        m_mediaServerLauncher.commonModule()->ec2Connection());
 
     m_mserverClient = std::make_unique<MediaServerClient>(
         m_mediaServerLauncher.endpoint());

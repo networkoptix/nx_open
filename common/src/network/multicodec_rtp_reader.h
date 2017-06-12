@@ -3,15 +3,17 @@
 
 #ifdef ENABLE_DATA_PROVIDERS
 
+#include <QtCore/QElapsedTimer>
+
 #include <vector>
 
-#include <core/dataprovider/abstract_media_stream_provider.h> 
-#include <core/resource/resource_consumer.h> 
-#include <core/resource/resource_media_layout.h> 
-#include <nx/streaming/media_data_packet.h> 
-#include <utils/camera/camera_diagnostics.h> 
-#include <utils/common/stoppable.h> 
-#include <utils/common/safe_direct_connection.h>
+#include <core/dataprovider/abstract_media_stream_provider.h>
+#include <core/resource/resource_consumer.h>
+#include <core/resource/resource_media_layout.h>
+#include <nx/streaming/media_data_packet.h>
+#include <utils/camera/camera_diagnostics.h>
+#include <nx/utils/thread/stoppable.h>
+#include <nx/utils/safe_direct_connection.h>
 
 #include <nx/streaming/rtsp_client.h>
 
@@ -136,9 +138,8 @@ private:
     QString m_currentStreamUrl;
     QString m_rtpTransport;
 
-    int m_maxRtpRetryCount;
-
-    int m_rtpFrameTimeoutMs;
+    int m_maxRtpRetryCount{0};
+    int m_rtpFrameTimeoutMs{0};
 };
 
 #endif // ENABLE_DATA_PROVIDERS

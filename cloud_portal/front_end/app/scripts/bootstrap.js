@@ -23,7 +23,21 @@ $.ajax({
             dataType: 'json',
             success: function (response) {
                 L = response;// Fill global L variable
-                angular.bootstrap(document, ['cloudApp']);
+                $.ajax({
+                    url: 'web_common/commonLanguage.json',
+                    async: true,
+                    dataType: 'json',
+                    success: function (response) {
+                        L.common = response;// Fill global L variable
+                        angular.bootstrap(document, ['cloudApp']);
+                    },
+                    error:function(){
+                        // Never should've happened
+                        // Try loading anyways
+                        angular.bootstrap(document, ['cloudApp']);
+                        console.error("Can't get commonLanguage.json");
+                    }
+                });
             },
             error:function(){
                 window.location.href = '503.html'; // Can't retrieve any language - service is unavailable, go to 503

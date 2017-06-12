@@ -23,7 +23,7 @@ public:
     virtual void processRequest(
         nx_http::HttpServerConnection* const connection,
         const nx_http::Request& request,
-        stree::ResourceContainer authInfo) override;
+        nx::utils::stree::ResourceContainer authInfo) override;
 
 private:
     const PeerRegistrator& m_registrator;

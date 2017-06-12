@@ -1,0 +1,227 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>Making it better</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REL="HOME"
+TITLE="Building Synthetic Voices"
+HREF="book1.html"><LINK
+REL="UP"
+TITLE="Limited domain synthesis"
+HREF="c941.html"><LINK
+REL="PREVIOUS"
+TITLE="Telling the time"
+HREF="x1003.html"><LINK
+REL="NEXT"
+TITLE="Text analysis"
+HREF="c1189.html"></HEAD
+><BODY
+CLASS="SECT1"
+BGCOLOR="#FFFFFF"
+TEXT="#000000"
+LINK="#0000FF"
+VLINK="#840084"
+ALINK="#0000FF"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="3"
+ALIGN="center"
+>Building Synthetic Voices</TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="bottom"
+><A
+HREF="x1003.html"
+ACCESSKEY="P"
+>&#60;&#60;&#60; Previous</A
+></TD
+><TD
+WIDTH="80%"
+ALIGN="center"
+VALIGN="bottom"
+>Limited domain synthesis</TD
+><TD
+WIDTH="10%"
+ALIGN="right"
+VALIGN="bottom"
+><A
+HREF="c1189.html"
+ACCESSKEY="N"
+>Next &#62;&#62;&#62;</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="SECT1"
+><H1
+CLASS="SECT1"
+><A
+NAME="AEN1170"
+>Making it better</A
+></H1
+><P
+>The above walkthough is to give you a basic idea of the stages involved in 
+building a limited domain synthesizer. The quality of a limited domain 
+synthesizer will most likely be excellent in parts and very bad in 
+others which is typical of techniques like this. Each stage is, of 
+course, more complex than this and there are a number of things that can 
+be done to improve it. </P
+><P
+>For limited domain synthesize it should be possible to correct 
+the errors such that it is excellent always. To do so though requires 
+being able to diagnose where the problems are. The most 
+likely problems are listed here 
+<P
+></P
+><UL
+><LI
+STYLE="list-style-type: disc"
+><P
+>Mis-labeling
+Due to lipsmacks, and other reasons the labeling may not be correct. 
+The result may the wrong, extra or missing segments in the synthesized 
+utterance. Using <TT
+CLASS="FILENAME"
+>emulabel</TT
+> you can check and hand correct the 
+labels. </P
+></LI
+><LI
+STYLE="list-style-type: disc"
+><P
+>Mis-spoken data
+The speaker may have made a mistake in the content. This can often 
+happen even when the speaker is careful. Mistakes can be actual 
+content (it is easy to read a list of number wrongly), but also 
+hesitations and false starts can make the recording bad. Also note 
+that inconsistent prosodic variation can also affect the synthesis 
+quality. Re-recording can be considered for bad examples, 
+or you can delete them from the <TT
+CLASS="FILENAME"
+>etc/LDOM.data</TT
+> list, assuming 
+there is enough variation in the rest of the examples to ensure 
+proper coverage of the domain. </P
+></LI
+><LI
+STYLE="list-style-type: disc"
+><P
+>Bad pitchmarking
+Automatic pitchmarking is not really automatic. It is very worthwhile 
+checking to see if it is correct and re-running the pitchmarking with 
+better parameters until it is better. (We need better documentation 
+here on how to know what "correct" is.) </P
+></LI
+><LI
+STYLE="list-style-type: disc"
+><P
+>Looking at the data
+There is never a substitute for actually looking at the data. Use 
+<TT
+CLASS="FILENAME"
+>emulabel</TT
+> to actually look at the recorded utterances and see what 
+the labeling is. Ensure these match and files haven't got out of 
+order. Look at a random selection not just the first example. </P
+></LI
+><LI
+STYLE="list-style-type: disc"
+><P
+>Improving the unit clustering The clustering techniques and the
+features used here are pretty generic and by no means optimal. Even
+for the simple example given here it is not very good. See <A
+HREF="c2641.html"
+>the Chapter called <I
+>Unit selection databases</I
+></A
+> on unit selection for more discussion on
+this. Adding new features for use in cluster may help a lot.</P
+></LI
+></UL
+>
+The line between limited domain synthesis and unit selection is fuzzy. 
+The more complex and varied the phrases you synthesize are, the more 
+difficult it is to produce reliable synthesis. </P
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="x1003.html"
+ACCESSKEY="P"
+>&#60;&#60;&#60; Previous</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="book1.html"
+ACCESSKEY="H"
+>Home</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="c1189.html"
+ACCESSKEY="N"
+>Next &#62;&#62;&#62;</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>Telling the time</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="c941.html"
+ACCESSKEY="U"
+>Up</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>Text analysis</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

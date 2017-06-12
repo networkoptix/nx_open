@@ -20,6 +20,8 @@
 
 #include <nx_ec/ec_api.h>
 #include <utils/common/request_param.h>
+#include <common/common_module_aware.h>
+#include <nx/utils/singleton.h>
 
 class EmailManagerImpl;
 
@@ -38,13 +40,13 @@ public:
         else
             return true;
     }
-    
+
     void init(const QnAbstractBusinessEventPtr& event, const QnBusinessEventRulePtr& rule) {
         m_event = event;
         m_rule = rule;
         m_initialized = true;
     }
-    
+
     /** Restores the initial state. */
     void reset(){
         m_timer.restart();
@@ -91,16 +93,19 @@ private:
 /*
 * This class route business event and generate business action
 */
-class QnBusinessRuleProcessor: public QThread
+class QnBusinessRuleProcessor:
+    public QThread,
+    public Singleton<QnBusinessRuleProcessor>,
+    public QnCommonModuleAware
 {
     Q_OBJECT
 public:
-    QnBusinessRuleProcessor();
+    QnBusinessRuleProcessor(QnCommonModule* commonModule);
     virtual ~QnBusinessRuleProcessor();
 
     void addBusinessRule(const QnBusinessEventRulePtr& value);
-    
-    
+
+
     /*
     * Return module GUID. if destination action intended for current module, no route through message bus is required
     */
@@ -121,9 +126,6 @@ public slots:
     */
     void executeAction(const QnAbstractBusinessActionPtr& action);
 
-    static QnBusinessRuleProcessor* instance();
-    static void init(QnBusinessRuleProcessor* instance);
-    static void fini();
 protected:
     virtual void prepareAdditionActionParams(const QnAbstractBusinessActionPtr& action) = 0;
 protected slots:
@@ -136,9 +138,9 @@ private slots:
     void at_actionDelivered(const QnAbstractBusinessActionPtr& action);
     void at_actionDeliveryFailed(const QnAbstractBusinessActionPtr& action);
 
-    void at_businessRuleChanged(const QnBusinessEventRulePtr& bRule);
-    void at_businessRuleDeleted(QnUuid id);
-    void at_businessRuleReset(const QnBusinessEventRuleList& rules);
+    void at_eventRuleChanged(const QnBusinessEventRulePtr& bRule);
+    void at_eventRuleRemoved(QnUuid id);
+    void at_eventRulesReset(const QnBusinessEventRuleList& rules);
 
     void toggleInputPortMonitoring(const QnResourcePtr& resource, bool toggle);
 
@@ -148,7 +150,6 @@ private slots:
 protected:
     bool containResource(const QnResourceList& resList, const QnUuid& resId) const;
     QnAbstractBusinessActionList matchActions(const QnAbstractBusinessEventPtr& bEvent);
-    //QnBusinessMessageBus& getMessageBus() { return m_messageBus; }
 
     /*
     * Some actions can be executed on server only. In this case, function returns server where action must be executed
@@ -158,7 +159,7 @@ protected:
     void terminateRunningRule(const QnBusinessEventRulePtr& rule);
 
 private:
-    void at_businessRuleChanged_i(const QnBusinessEventRulePtr& bRule);
+    void at_eventRuleChanged_i(const QnBusinessEventRulePtr& bRule);
 
     QnAbstractBusinessActionPtr processToggleAction(const QnAbstractBusinessEventPtr& bEvent, const QnBusinessEventRulePtr& rule);
     QnAbstractBusinessActionPtr processInstantAction(const QnAbstractBusinessEventPtr& bEvent, const QnBusinessEventRulePtr& rule);
@@ -170,13 +171,12 @@ protected:
     mutable QnMutex m_mutex;
 private:
     QList<QnBusinessEventRulePtr> m_rules;
-    //QnBusinessMessageBus m_messageBus;
     static QnBusinessRuleProcessor* m_instance;
 
     struct RunningRuleInfo
     {
         RunningRuleInfo() {}
-        QMap<QnUuid, QnAbstractBusinessEventPtr> resources; 
+        QMap<QnUuid, QnAbstractBusinessEventPtr> resources;
         QSet<QnUuid> isActionRunning; // actions that has been started by resource. Continues action starts only onces for all event resources.
     };
     typedef QMap<QString, RunningRuleInfo> RunningRuleMap;
@@ -188,7 +188,7 @@ private:
 
 
     /**
-     * @brief match resources between event and rule. 
+     * @brief match resources between event and rule.
      * @return false if business rule isn't match to a source event
      */
     bool checkEventCondition(const QnAbstractBusinessEventPtr& bEvent, const QnBusinessEventRulePtr& rule);

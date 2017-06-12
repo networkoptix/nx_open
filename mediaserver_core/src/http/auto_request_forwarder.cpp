@@ -12,7 +12,7 @@
 #include <core/resource/camera_history.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/media_server_resource.h>
-#include <http/custom_headers.h>
+#include <nx/network/http/custom_headers.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/string.h>
 #include <utils/fs/file.h>
@@ -21,17 +21,22 @@
 
 #include "streaming/streaming_params.h"
 #include <network/universal_request_processor.h>
-
+#include <common/common_module.h>
 
 static const qint64 USEC_PER_MS = 1000;
+
+QnAutoRequestForwarder::QnAutoRequestForwarder(QnCommonModule* commonModule):
+    QnCommonModuleAware(commonModule)
+{
+}
 
 void QnAutoRequestForwarder::processRequest( nx_http::Request* const request )
 {
     const auto allowedMethods = m_restrictionList.getAllowedAuthMethods(*request);
-    //TODO #ak AuthMethod::videowall is used here to imply existing class
-        //QnAuthMethodRestrictionList with no change, since release 2.5 is coming.
+    //TODO #ak nx_http::AuthMethod::videowall is used here to imply existing class
+        //nx_http::AuthMethodRestrictionList with no change, since release 2.5 is coming.
         //Proper types will be introduced in 2.6
-    if (!(allowedMethods & AuthMethod::videowall))
+    if (!(allowedMethods & nx_http::AuthMethod::videowall))
         return; //not processing url
 
     const QUrlQuery urlQuery( request->requestLine.url.query() );
@@ -52,7 +57,7 @@ void QnAutoRequestForwarder::processRequest( nx_http::Request* const request )
 
     if (QnUniversalRequestProcessor::isCloudRequest(*request))
     {
-        auto servers = qnResPool->getResources<QnMediaServerResource>().filtered(
+        auto servers = resourcePool()->getResources<QnMediaServerResource>().filtered(
             [](const QnMediaServerResourcePtr server)
             {
                 return server->getServerFlags().testFlag(Qn::SF_HasPublicIP) &&
@@ -94,7 +99,7 @@ void QnAutoRequestForwarder::processRequest( nx_http::Request* const request )
                 if( virtualCameraRes )
                 {
                     QnMediaServerResourcePtr mediaServer =
-                        qnCameraHistoryPool->getMediaServerOnTimeSync( virtualCameraRes, timestampMs );
+                        commonModule()->cameraHistoryPool()->getMediaServerOnTimeSync( virtualCameraRes, timestampMs );
                     if( mediaServer )
                         serverRes = mediaServer;
                 }
@@ -116,7 +121,7 @@ bool QnAutoRequestForwarder::addProxyToRequest(
 {
     if (!serverRes)
         return false;
-    if (serverRes->getId() == qnCommon->moduleGUID())
+    if (serverRes->getId() == commonModule()->moduleGUID())
         return false; //target server is this one
     request->headers.emplace(
         Qn::SERVER_GUID_HEADER_NAME,
@@ -126,7 +131,7 @@ bool QnAutoRequestForwarder::addProxyToRequest(
 
 void QnAutoRequestForwarder::addPathToIgnore(const QString& pathWildcardMask)
 {
-    m_restrictionList.deny(pathWildcardMask, AuthMethod::videowall);
+    m_restrictionList.deny(pathWildcardMask, nx_http::AuthMethod::videowall);
 }
 
 bool QnAutoRequestForwarder::findCameraGuid(
@@ -150,7 +155,7 @@ bool QnAutoRequestForwarder::findCameraGuid(
     if( cameraGuid.isNull() )
         return false;
 
-    *res = qnResPool->getResourceById( cameraGuid );
+    *res = resourcePool()->getResourceById( cameraGuid );
     return *res;
 }
 
@@ -178,7 +183,7 @@ bool QnAutoRequestForwarder::findCameraUniqueIDInPath(
 
     //resUniqueID could be physical id or mac address
     //trying luck with physical id
-    *res = qnResPool->getResourceByUniqueId(resUniqueID);
+    *res = resourcePool()->getResourceByUniqueId(resUniqueID);
     if( *res )
     {
         NX_LOG(lit("auto_forward. Found resource %1 by unique id %2 from path").
@@ -186,7 +191,7 @@ bool QnAutoRequestForwarder::findCameraUniqueIDInPath(
         return true;
     }
     //searching by mac
-    //*res = qnResPool->getResourceByMacAddress(resUniqueID);
+    //*res = resourcePool()->getResourceByMacAddress(resUniqueID);
     return *res != nullptr;
 }
 
@@ -197,7 +202,7 @@ bool QnAutoRequestForwarder::findCameraUniqueIDInQuery(
     const auto uniqueID = urlQuery.queryItemValue( Qn::CAMERA_UNIQUE_ID_HEADER_NAME );
     if( uniqueID.isEmpty() )
         return false;
-    *res = qnResPool->getResourceByUniqueId( uniqueID );
+    *res = resourcePool()->getResourceByUniqueId( uniqueID );
     return *res;
 }
 

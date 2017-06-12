@@ -18,13 +18,18 @@
 #   define QnMonitorImpl QnSigarMonitor
 #endif
 
-QnPlatformAbstraction::QnPlatformAbstraction(int statsUpdatePeriodMs, QObject *parent):
+QnPlatformAbstraction::QnPlatformAbstraction(QObject *parent):
     base_type(parent)
 {
     if(!qApp)
         qnWarning("QApplication instance must be created before a QnPlatformAbstraction.");
 
-    m_monitor = new QnGlobalMonitor(new QnMonitorImpl(this), this, statsUpdatePeriodMs);
+    m_monitor = new QnGlobalMonitor(new QnMonitorImpl(this), this);
+}
+
+void QnPlatformAbstraction::setUpdatePeriodMs(int value)
+{
+    m_monitor->setUpdatePeriodMs(value);
 }
 
 QnPlatformAbstraction::~QnPlatformAbstraction()

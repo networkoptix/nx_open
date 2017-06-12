@@ -1,8 +1,10 @@
 #include <gtest/gtest.h>
 
 #include <common/common_module.h>
+#include <common/static_common_module.h>
 
 #include <client/client_runtime_settings.h>
+#include <client_core/client_core_module.h>
 
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/layout_resource.h>
@@ -30,19 +32,24 @@ protected:
     // virtual void SetUp() will be called before each test is run.
     virtual void SetUp()
     {
-        m_module.reset(new QnCommonModule());
+        m_staticCommon.reset(new QnStaticCommonModule());
+        m_module.reset(new QnClientCoreModule());
         m_runtime.reset(new QnClientRuntimeSettings());
-        m_accessController.reset(new QnWorkbenchAccessController());
+        m_accessController.reset(new QnWorkbenchAccessController(m_module.data()));
     }
 
     // virtual void TearDown() will be called after each test is run.
     virtual void TearDown()
     {
         m_currentUser.clear();
+        m_accessController.clear();
         m_runtime.clear();
         m_module.clear();
-        m_accessController.clear();
+        m_staticCommon.reset();
     }
+
+    QnCommonModule* commonModule() const { return m_module->commonModule(); }
+    QnResourcePool* resourcePool() const { return commonModule()->resourcePool(); }
 
     QnUserResourcePtr addUser(const QString &name, Qn::GlobalPermissions globalPermissions, QnUserType userType = QnUserType::Local)
     {
@@ -51,7 +58,7 @@ protected:
         user->setName(name);
         user->setRawPermissions(globalPermissions);
         user->addFlags(Qn::remote);
-        qnResPool->addResource(user);
+        resourcePool()->addResource(user);
 
         return user;
     }
@@ -73,7 +80,7 @@ protected:
 
     void logout()
     {
-        qnResPool->removeResources(qnResPool->getResourcesWithFlag(Qn::remote));
+        resourcePool()->removeResources(resourcePool()->getResourcesWithFlag(Qn::remote));
         m_currentUser.clear();
         m_accessController->setUser(m_currentUser);
     }
@@ -110,7 +117,8 @@ protected:
     }
 
     // Declares the variables your tests want to use.
-    QSharedPointer<QnCommonModule> m_module;
+    QScopedPointer<QnStaticCommonModule> m_staticCommon;
+    QSharedPointer<QnClientCoreModule> m_module;
     QSharedPointer<QnWorkbenchAccessController> m_accessController;
     QSharedPointer<QnClientRuntimeSettings> m_runtime;
     QnUserResourcePtr m_currentUser;
@@ -125,7 +133,7 @@ TEST_F(QnWorkbenchAccessControllerTest, checkExportedLayouts)
 {
     auto layout = createLayout(Qn::exported_layout);
     layout->setUrl("path/to/file");
-    qnResPool->addResource(layout);
+    resourcePool()->addResource(layout);
 
     ASSERT_TRUE(layout->isFile());
 
@@ -142,7 +150,7 @@ TEST_F(QnWorkbenchAccessControllerTest, checkExportedLayouts)
     checkPermissions(layout, desired, forbidden);
 
     /* ...even in safe mode. */
-    qnCommon->setReadOnly(true);
+    commonModule()->setReadOnly(true);
     checkPermissions(layout, desired, forbidden);
 }
 
@@ -151,7 +159,7 @@ TEST_F(QnWorkbenchAccessControllerTest, checkExportedLayoutsLocked)
 {
     auto layout = createLayout(Qn::exported_layout, true);
     layout->setUrl("path/to/file");
-    qnResPool->addResource(layout);
+    resourcePool()->addResource(layout);
 
     ASSERT_TRUE(layout->isFile());
 
@@ -166,7 +174,7 @@ TEST_F(QnWorkbenchAccessControllerTest, checkExportedLayoutsLocked)
     checkPermissions(layout, desired, forbidden);
 
     /* ...even in safe mode. */
-    qnCommon->setReadOnly(true);
+    commonModule()->setReadOnly(true);
     checkPermissions(layout, desired, forbidden);
 }
 
@@ -178,7 +186,7 @@ TEST_F(QnWorkbenchAccessControllerTest, checkExportedLayoutsLocked)
 TEST_F(QnWorkbenchAccessControllerTest, checkLocalLayoutsUnlogged)
 {
     auto layout = createLayout(Qn::local);
-    qnResPool->addResource(layout);
+    resourcePool()->addResource(layout);
 
     /* Local layouts can be edited when we are not logged id. */
     Qn::Permissions desired = Qn::FullLayoutPermissions;
@@ -199,7 +207,7 @@ TEST_F(QnWorkbenchAccessControllerTest, checkLocalLayoutsLoggedIn)
     loginAs(Qn::GlobalLiveViewerPermissionSet);
 
     auto layout = createLayout(Qn::local);
-    qnResPool->addResource(layout);
+    resourcePool()->addResource(layout);
 
     Qn::Permissions desired = Qn::FullLayoutPermissions;
     Qn::Permissions forbidden = Qn::RemovePermission;
@@ -218,7 +226,7 @@ TEST_F(QnWorkbenchAccessControllerTest, checkLockedLocalLayoutsLoggedIn)
     loginAs(Qn::GlobalLiveViewerPermissionSet);
 
     auto layout = createLayout(Qn::local, true);
-    qnResPool->addResource(layout);
+    resourcePool()->addResource(layout);
 
     Qn::Permissions desired = Qn::FullLayoutPermissions;
     /* Layout still can be saved. */
@@ -240,11 +248,10 @@ TEST_F(QnWorkbenchAccessControllerTest, checkLockedLocalLayoutsLoggedIn)
 TEST_F(QnWorkbenchAccessControllerTest, checkLocalLayoutsLoggedInSafeMode)
 {
     loginAs(Qn::GlobalLiveViewerPermissionSet);
-    qnCommon->setReadOnly(true);
+    commonModule()->setReadOnly(true);
 
     auto layout = createLayout(Qn::local);
-    qnResPool->addResource(layout);
-    Qn::Permissions actual = m_accessController->permissions(layout);
+    resourcePool()->addResource(layout);
 
     Qn::Permissions desired = Qn::FullLayoutPermissions;
     Qn::Permissions forbidden = Qn::RemovePermission | Qn::SavePermission | Qn::WriteNamePermission | Qn::EditLayoutSettingsPermission;
@@ -261,10 +268,10 @@ TEST_F(QnWorkbenchAccessControllerTest, checkLocalLayoutsLoggedInSafeMode)
 TEST_F(QnWorkbenchAccessControllerTest, checkLockedLocalLayoutsLoggedInSafeMode)
 {
     loginAs(Qn::GlobalLiveViewerPermissionSet);
-    qnCommon->setReadOnly(true);
+    commonModule()->setReadOnly(true);
 
     auto layout = createLayout(Qn::local, true);
-    qnResPool->addResource(layout);
+    resourcePool()->addResource(layout);
 
     Qn::Permissions desired = Qn::FullLayoutPermissions;
     Qn::Permissions forbidden = Qn::RemovePermission | Qn::AddRemoveItemsPermission | Qn::WriteNamePermission | Qn::SavePermission | Qn::EditLayoutSettingsPermission;

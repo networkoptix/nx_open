@@ -9,20 +9,21 @@
 #include <core/resource/resource_data.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource_management/resource_data_pool.h>
+#include <common/static_common_module.h>
 
 QnWorkaroundPtzController::QnWorkaroundPtzController(const QnPtzControllerPtr &baseController):
     base_type(baseController),
     m_overrideContinuousMove(false),
     m_flip(0),
-    m_traits(Qn::NoPtzTraits),
+    m_traits(Ptz::NoPtzTraits),
     m_overrideCapabilities(false),
-    m_capabilities(Qn::NoPtzCapabilities)
+    m_capabilities(Ptz::NoPtzCapabilities)
 {
     QnVirtualCameraResourcePtr camera = resource().dynamicCast<QnVirtualCameraResource>();
     if(!camera)
         return;
 
-    QnResourceData resourceData = qnCommon->dataPool()->data(camera);
+    QnResourceData resourceData = qnStaticCommon->dataPool()->data(camera);
 
     resourceData.value(lit("ptzTraits"), &m_traits);
 
@@ -31,13 +32,14 @@ QnWorkaroundPtzController::QnWorkaroundPtzController(const QnPtzControllerPtr &b
     if(resourceData.value<bool>(lit("tiltFlipped"), false))
         m_flip |= Qt::Vertical;
 
-    m_overrideContinuousMove = m_flip != 0 || (m_traits & (Qn::FourWayPtzTrait | Qn::EightWayPtzTrait));
+    m_overrideContinuousMove = m_flip != 0 || (m_traits & (Ptz::FourWayPtzTrait | Ptz::EightWayPtzTrait));
 
     if(resourceData.value(Qn::PTZ_CAPABILITIES_PARAM_NAME, &m_capabilities))
         m_overrideCapabilities = true;
 }
 
-Qn::PtzCapabilities QnWorkaroundPtzController::getCapabilities() {
+Ptz::Capabilities QnWorkaroundPtzController::getCapabilities() const
+{
     return m_overrideCapabilities ? m_capabilities : base_type::getCapabilities();
 }
 
@@ -51,8 +53,8 @@ bool QnWorkaroundPtzController::continuousMove(const QVector3D &speed) {
     if(m_flip & Qt::Vertical)
         localSpeed.setY(localSpeed.y() * -1);
 
-    if(m_traits & (Qn::EightWayPtzTrait | Qn::FourWayPtzTrait)) {
-        float rounding = (m_traits & Qn::EightWayPtzTrait) ? M_PI / 4.0 : M_PI / 2.0; /* 45 or 90 degrees. */
+    if(m_traits & (Ptz::EightWayPtzTrait | Ptz::FourWayPtzTrait)) {
+        float rounding = (m_traits & Ptz::EightWayPtzTrait) ? M_PI / 4.0 : M_PI / 2.0; /* 45 or 90 degrees. */
 
         QVector2D cartesianSpeed(localSpeed);
         QnPolarPoint<float> polarSpeed = cartesianToPolar(cartesianSpeed);
@@ -70,7 +72,7 @@ bool QnWorkaroundPtzController::continuousMove(const QVector3D &speed) {
     return base_type::continuousMove(localSpeed);
 }
 
-bool QnWorkaroundPtzController::extends(Qn::PtzCapabilities) {
+bool QnWorkaroundPtzController::extends(Ptz::Capabilities) {
     return true; // TODO: #Elric if no workaround is needed for a camera, we don't really have to extend.
 }
 

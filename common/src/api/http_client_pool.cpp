@@ -15,14 +15,11 @@ namespace {
 
 namespace nx_http {
 
-static ClientPool* staticInstance;
-
 ClientPool::ClientPool(QObject *parent):
     QObject(parent),
     m_maxPoolSize(kDefaultPoolSize),
     m_requestId(0)
 {
-    staticInstance = this;
 }
 
 ClientPool::~ClientPool()
@@ -34,18 +31,11 @@ ClientPool::~ClientPool()
     }
     for (auto itr = dataCopy.begin(); itr != dataCopy.end(); ++itr)
         itr->second->client->pleaseStopSync();
-    staticInstance = nullptr;
 }
 
 void ClientPool::setPoolSize(int value)
 {
     m_maxPoolSize = value;
-}
-
-ClientPool* ClientPool::instance()
-{
-    NX_ASSERT(staticInstance, Q_FUNC_INFO, "Make sure http client pool exists");
-    return staticInstance;
 }
 
 int ClientPool::doGet(const QUrl& url, nx_http::HttpHeaders headers)
@@ -192,7 +182,7 @@ ClientPool::HttpConnection* ClientPool::getUnusedConnection(const QUrl& url)
         result = new HttpConnection();
         result->client = createHttpConnection();
 
-        m_connectionPool.emplace(requestAddress, std::move(HttpConnectionPtr(result)));
+        m_connectionPool.emplace(requestAddress, HttpConnectionPtr(result));
     }
 
     return result;

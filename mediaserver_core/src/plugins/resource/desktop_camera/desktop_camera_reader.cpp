@@ -8,7 +8,7 @@
 #include "network/tcp_connection_priv.h"
 #include "desktop_camera_resource_searcher.h"
 #include "desktop_camera_resource.h"
-#include <http/custom_headers.h>
+#include <nx/network/http/custom_headers.h>
 
 static const int KEEP_ALIVE_INTERVAL = 30 * 1000;
 

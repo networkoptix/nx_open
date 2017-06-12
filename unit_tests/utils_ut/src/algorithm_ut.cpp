@@ -10,7 +10,7 @@ namespace nx {
 namespace utils {
 namespace test {
 
-class MoveIf:
+class AlgorithmMoveIf:
     public ::testing::Test
 {
 protected:
@@ -67,7 +67,7 @@ private:
     }
 };
 
-TEST_F(MoveIf, actually_splits_array)
+TEST_F(AlgorithmMoveIf, actually_splits_array)
 {
     const std::vector<int> initialArray = { 1, 2, 8, 5, 3, 7, 4, 9 };
     const int splitValue = 5;
@@ -77,7 +77,7 @@ TEST_F(MoveIf, actually_splits_array)
     performFixedDataTest(initialArray, splitValue, initialArrayAfterTest, resultingArrayAfterTest);
 }
 
-TEST_F(MoveIf, whole_initial_data_is_moved)
+TEST_F(AlgorithmMoveIf, whole_initial_data_is_moved)
 {
     const std::vector<int> initialArray = { 1, 2, 8, 5, 3, 7, 4, 9 };
     const int splitValue = 0;
@@ -87,14 +87,116 @@ TEST_F(MoveIf, whole_initial_data_is_moved)
     performFixedDataTest(initialArray, splitValue, initialArrayAfterTest, resultingArrayAfterTest);
 }
 
-TEST_F(MoveIf, whole_initial_data_is_left_in_place)
+TEST_F(AlgorithmMoveIf, whole_initial_data_is_left_in_place)
 {
     const std::vector<int> initialArray = { 1, 2, 8, 5, 3, 7, 4, 9 };
     const int splitValue = 10;
     const std::vector<int> initialArrayAfterTest = { 1, 2, 8, 5, 3, 7, 4, 9 };
     const std::vector<int> resultingArrayAfterTest = {};
 
-    performFixedDataTest(initialArray, splitValue, initialArrayAfterTest, resultingArrayAfterTest);
+    performFixedDataTest(
+        initialArray,
+        splitValue,
+        initialArrayAfterTest,
+        resultingArrayAfterTest);
+}
+
+//-------------------------------------------------------------------------------------------------
+// reverseWords
+
+TEST(Algorithm_reverseWords, common)
+{
+    ASSERT_EQ("com.google.inbox", reverseWords<std::string>("inbox.google.com", "."));
+    ASSERT_EQ(".com", reverseWords<std::string>("com.", "."));
+    ASSERT_EQ("com.", reverseWords<std::string>(".com", "."));
+}
+
+TEST(Algorithm_reverseWords, empty_string)
+{
+    ASSERT_EQ("", reverseWords<std::string>("", "."));
+}
+
+TEST(Algorithm_reverseWords, no_separators)
+{
+    ASSERT_EQ("com", reverseWords<std::string>("com", "."));
+}
+
+TEST(Algorithm_reverseWords, only_separators)
+{
+    ASSERT_EQ("...", reverseWords<std::string>("...", "."));
+    ASSERT_EQ(".", reverseWords<std::string>(".", "."));
+}
+
+//-------------------------------------------------------------------------------------------------
+// countElementsWithPrefix
+
+TEST(Algorithm_countElementsWithPrefix, all)
+{
+    std::map<std::string, int> m;
+    m.emplace("a", 0);
+    m.emplace("aaabbbccc", 0);
+    m.emplace("aaabbbddd", 0);
+    m.emplace("aaabbbeee", 0);
+    m.emplace("aaafff", 0);
+
+    ASSERT_EQ(4U, countElementsWithPrefix(m, "aaa"));
+    ASSERT_EQ(5U, countElementsWithPrefix(m, "a"));
+    ASSERT_EQ(3U, countElementsWithPrefix(m, "aaab"));
+    ASSERT_EQ(1U, countElementsWithPrefix(m, "aaaf"));
+    ASSERT_EQ(1U, countElementsWithPrefix(m, "aaabbbddd"));
+    ASSERT_EQ(1U, countElementsWithPrefix(m, "aaabbbdd"));
+    ASSERT_EQ(0U, countElementsWithPrefix(m, "aaabbbddd111"));
+    ASSERT_EQ(1U, countElementsWithPrefix(m, "aaabbbe"));
+    ASSERT_EQ(1U, countElementsWithPrefix(m, "aaabbbc"));
+}
+
+//-------------------------------------------------------------------------------------------------
+// findFirstElementWithPrefix
+
+TEST(Algorithm_findFirstElementWithPrefix, all)
+{
+    std::map<std::string, int> m;
+    m.emplace("a", 1);
+    m.emplace("aaabbbccc", 2);
+    m.emplace("aaabbbddd", 3);
+    m.emplace("aaabbbeee", 4);
+    m.emplace("aaafff", 5);
+
+    ASSERT_EQ(m.end(), findFirstElementWithPrefix(m, "c"));
+    ASSERT_EQ(m.end(), findFirstElementWithPrefix(m, "aaafff1"));
+    ASSERT_EQ(1, findFirstElementWithPrefix(m, "a")->second);
+    ASSERT_EQ(2, findFirstElementWithPrefix(m, "aa")->second);
+    ASSERT_EQ(4, findFirstElementWithPrefix(m, "aaabbbe")->second);
+    ASSERT_EQ(5, findFirstElementWithPrefix(m, "aaaff")->second);
+}
+
+//-------------------------------------------------------------------------------------------------
+// equalRangeByPrefix
+
+TEST(Algorithm_equalRangeByPrefix, all)
+{
+    std::map<std::string, int> m;
+    m.emplace("a", 1);
+    m.emplace("aaabbbccc", 2);
+    m.emplace("aaabbbddd", 3);
+    m.emplace("aaabbbeee", 4);
+    m.emplace("aaafff", 5);
+
+    auto range = equalRangeByPrefix(m, "a");
+    ASSERT_EQ(m.begin(), range.first);
+    ASSERT_EQ(m.end(), range.second);
+
+    range = equalRangeByPrefix(m, "aaab");
+    ASSERT_EQ(2, range.first->second);
+    ASSERT_EQ(5, range.second->second);
+
+    range = equalRangeByPrefix(m, "aaaf");
+    ASSERT_EQ(5, range.first->second);
+    ASSERT_EQ(m.end(), range.second);
+
+    range = equalRangeByPrefix(m, "c");
+    ASSERT_EQ(m.end(), range.first);
+    ASSERT_EQ(m.end(), range.second);
 }
 
 } // namespace test

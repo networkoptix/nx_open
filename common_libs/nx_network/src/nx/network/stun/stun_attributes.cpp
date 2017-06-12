@@ -44,36 +44,36 @@ int MappedAddress::getType() const
     return TYPE;
 }
 
-nx_api::SerializerState::Type MappedAddress::serialize(
+nx::network::server::SerializerState MappedAddress::serialize(
     MessageSerializerBuffer* buffer,
     std::size_t* bytesWritten) const
 {
     const auto initialPosition = buffer->position();
 
     if (buffer->WriteByte(0) == nullptr)
-        return nx_api::SerializerState::needMoreBufferSpace;
+        return nx::network::server::SerializerState::needMoreBufferSpace;
 
     const uint8_t addressFamily = m_endpoint.address.ipV4() ? kAddressTypeIpV4 : kAddressTypeIpV6;
     if (buffer->WriteByte(addressFamily) == nullptr)
-        return nx_api::SerializerState::needMoreBufferSpace;
+        return nx::network::server::SerializerState::needMoreBufferSpace;
 
     if (buffer->WriteUint16(m_endpoint.port) == nullptr)
-        return nx_api::SerializerState::needMoreBufferSpace;
+        return nx::network::server::SerializerState::needMoreBufferSpace;
 
     if (const auto ipv4Address = m_endpoint.address.ipV4())
     {
         if (buffer->WriteBytes(reinterpret_cast<const char*>(&ipv4Address->s_addr), 4) == nullptr)
-            return nx_api::SerializerState::needMoreBufferSpace;
+            return nx::network::server::SerializerState::needMoreBufferSpace;
     }
     else if (const auto ipv6Address = m_endpoint.address.ipV6())
     {
         if (buffer->WriteBytes(reinterpret_cast<const char*>(&ipv6Address->s6_addr), 16) == nullptr)
-            return nx_api::SerializerState::needMoreBufferSpace;
+            return nx::network::server::SerializerState::needMoreBufferSpace;
     }
 
     *bytesWritten = buffer->position() - initialPosition;
 
-    return nx_api::SerializerState::done;
+    return nx::network::server::SerializerState::done;
 }
 
 bool MappedAddress::deserialize(MessageParserBuffer* buffer)

@@ -12,10 +12,11 @@ class QnDesktopCameraRegistratorPrivate: public QnTCPConnectionProcessorPrivate
 public:
 };
 
-QnDesktopCameraRegistrator::QnDesktopCameraRegistrator(QSharedPointer<AbstractStreamSocket> socket, QnTcpListener* _owner):
-    QnTCPConnectionProcessor(new QnDesktopCameraRegistratorPrivate, socket)
+QnDesktopCameraRegistrator::QnDesktopCameraRegistrator(
+    QSharedPointer<AbstractStreamSocket> socket, QnTcpListener* owner)
+:
+    QnTCPConnectionProcessor(new QnDesktopCameraRegistratorPrivate, socket, owner)
 {
-    Q_UNUSED(_owner)
 }
 
 void QnDesktopCameraRegistrator::run()
@@ -30,7 +31,7 @@ void QnDesktopCameraRegistrator::run()
 
 	if (auto s = QnDesktopCameraResourceSearcher::instance())
         s->registerCamera(d->socket, userName, userId);
-    
+
 	d->socket.clear();
 }
 

@@ -21,8 +21,8 @@
 
 #include <transaction/connection_guard_shared_state.h>
 
-#include <utils/common/counter.h>
-#include <utils/common/subscription.h>
+#include <nx/utils/counter.h>
+#include <nx/utils/subscription.h>
 
 #include "access_control/auth_types.h"
 #include "serialization/transaction_serializer.h"
@@ -71,7 +71,7 @@ public:
      */
     void createTransactionConnection(
         nx_http::HttpServerConnection* const connection,
-        stree::ResourceContainer authInfo,
+        nx::utils::stree::ResourceContainer authInfo,
         nx_http::Request request,
         nx_http::Response* const response,
         nx_http::RequestProcessedHandler completionHandler);
@@ -80,7 +80,7 @@ public:
      */
     void pushTransaction(
         nx_http::HttpServerConnection* const connection,
-        stree::ResourceContainer authInfo,
+        nx::utils::stree::ResourceContainer authInfo,
         nx_http::Request request,
         nx_http::Response* const response,
         nx_http::RequestProcessedHandler completionHandler);
@@ -161,7 +161,7 @@ private:
     const ::ec2::ApiPeerData m_localPeerData;
     ConnectionDict m_connections;
     mutable QnMutex m_mutex;
-    QnCounter m_startedAsyncCallsCounter;
+    nx::utils::Counter m_startedAsyncCallsCounter;
     nx::utils::SubscriptionId m_onNewTransactionSubscriptionId;
     SystemStatusChangedSubscription m_systemStatusChangedSubscription;
 

@@ -5,7 +5,7 @@
 #ifndef NAMED_PIPE_SERVER_H
 #define NAMED_PIPE_SERVER_H
 
-#include <utils/common/systemerror.h>
+#include <nx/utils/system_error.h>
 
 #include "named_pipe_socket.h"
 

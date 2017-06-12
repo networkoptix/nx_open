@@ -14,9 +14,9 @@
 #include <api/global_settings.h>
 #include <core/resource/param.h>
 #include <core/resource/user_resource.h>
-#include <utils/common/guard.h>
+#include <nx/utils/scope_guard.h>
 #include <utils/common/id.h>
-#include <utils/common/sync_call.h>
+#include <nx/utils/sync_call.h>
 
 #include "access_control/authentication_manager.h"
 #include "access_control/authorization_manager.h"
@@ -46,7 +46,7 @@ SystemManager::SystemManager(
     const SystemHealthInfoProvider& systemHealthInfoProvider,
     nx::db::AsyncSqlQueryExecutor* const dbManager,
     AbstractEmailManager* const emailManager,
-    ec2::SyncronizationEngine* const ec2SyncronizationEngine) throw(std::runtime_error)
+    ec2::SyncronizationEngine* const ec2SyncronizationEngine) noexcept(false)
 :
     m_settings(settings),
     m_timerManager(timerManager),
@@ -116,12 +116,12 @@ SystemManager::~SystemManager()
 void SystemManager::authenticateByName(
     const nx_http::StringType& username,
     std::function<bool(const nx::Buffer&)> validateHa1Func,
-    const stree::AbstractResourceReader& /*authSearchInputData*/,
-    stree::ResourceContainer* const authProperties,
+    const nx::utils::stree::AbstractResourceReader& /*authSearchInputData*/,
+    nx::utils::stree::ResourceContainer* const authProperties,
     nx::utils::MoveOnlyFunc<void(api::ResultCode)> completionHandler)
 {
     api::ResultCode result = api::ResultCode::notAuthorized;
-    auto scopedGuard = makeScopedGuard(
+    auto scopedGuard = makeScopeGuard(
         [&completionHandler, &result]() { completionHandler(result); });
 
     QnMutexLocker lock(&m_mutex);
@@ -236,8 +236,8 @@ namespace {
  * Returns true, if record contains every single resource present in filter.
  */
 static bool applyFilter(
-    const stree::AbstractResourceReader& record,
-    const stree::AbstractIteratableContainer& filter)
+    const nx::utils::stree::AbstractResourceReader& record,
+    const nx::utils::stree::AbstractIteratableContainer& filter)
 {
     // TODO: #ak this method should be moved to stree and have linear complexity, not n*log(n)!
     for (auto it = filter.begin(); !it->atEnd(); it->next())
@@ -262,7 +262,7 @@ void SystemManager::getSystems(
         attr::systemStatus,
         static_cast<int>(api::SystemStatus::ssActivated));
 
-    stree::MultiSourceResourceReader wholeFilterMap(filter, authzInfo);
+    nx::utils::stree::MultiSourceResourceReader wholeFilterMap(filter, authzInfo);
 
     const auto accountEmail = wholeFilterMap.get<std::string>(cdb::attr::authAccountEmail);
 
@@ -674,10 +674,14 @@ nx::utils::Subscription<std::string>& SystemManager::systemMarkedAsDeletedSubscr
     return m_systemMarkedAsDeletedSubscription;
 }
 
-const nx::utils::Subscription<std::string>&
-    SystemManager::systemMarkedAsDeletedSubscription() const
+void SystemManager::addSystemSharingExtension(AbstractSystemSharingExtension* extension)
 {
-    return m_systemMarkedAsDeletedSubscription;
+    m_systemSharingExtensions.insert(extension);
+}
+
+void SystemManager::removeSystemSharingExtension(AbstractSystemSharingExtension* extension)
+{
+    m_systemSharingExtensions.erase(extension);
 }
 
 std::pair<std::string, std::string> SystemManager::extractSystemIdAndVmsUserId(
@@ -791,7 +795,7 @@ nx::db::DBResult SystemManager::insertOwnerSharingToDb(
 }
 
 void SystemManager::systemAdded(
-    QnCounter::ScopedIncrement /*asyncCallLocker*/,
+    nx::utils::Counter::ScopedIncrement /*asyncCallLocker*/,
     nx::db::QueryContext* /*queryContext*/,
     nx::db::DBResult dbResult,
     data::SystemRegistrationDataWithAccount /*systemRegistrationData*/,
@@ -828,7 +832,7 @@ nx::db::DBResult SystemManager::markSystemAsDeleted(
 }
 
 void SystemManager::systemMarkedAsDeleted(
-    QnCounter::ScopedIncrement /*asyncCallLocker*/,
+    nx::utils::Counter::ScopedIncrement /*asyncCallLocker*/,
     nx::db::QueryContext* /*queryContext*/,
     nx::db::DBResult dbResult,
     std::string systemId,
@@ -884,7 +888,7 @@ nx::db::DBResult SystemManager::deleteSystemFromDB(
 }
 
 void SystemManager::systemDeleted(
-    QnCounter::ScopedIncrement /*asyncCallLocker*/,
+    nx::utils::Counter::ScopedIncrement /*asyncCallLocker*/,
     nx::db::QueryContext* /*queryContext*/,
     nx::db::DBResult dbResult,
     data::SystemId systemId,
@@ -943,6 +947,18 @@ nx::db::DBResult SystemManager::shareSystem(
     dbResult = addNewSharing(queryContext, *inviteeAccount, sharing);
     if (dbResult != nx::db::DBResult::ok)
         return dbResult;
+
+    dbResult = invokeSystemSharingExtension(
+        &AbstractSystemSharingExtension::afterSharingSystem,
+        queryContext,
+        sharing,
+        isNewAccount ? SharingType::invite : SharingType::sharingWithExistingAccount);
+    if (dbResult != nx::db::DBResult::ok)
+    {
+        NX_LOGX(lm("Error invoking system sharing extension (%1, %2). %3")
+            .arg(sharing.systemId).arg(inviteeAccount->email).arg(dbResult), cl_logDEBUG1);
+        return dbResult;
+    }
 
     if (notificationCommand == NotificationCommand::sendNotification)
     {
@@ -1295,11 +1311,11 @@ nx::db::DBResult SystemManager::generateSaveUserTransaction(
     ec2::convert(sharing, &userData);
     userData.isCloud = true;
     userData.fullName = QString::fromStdString(account.fullName);
-    return m_ec2SyncronizationEngine->transactionLog().generateTransactionAndSaveToLog<
-        ::ec2::ApiCommand::saveUser>(
-            queryContext,
-            sharing.systemId.c_str(),
-            std::move(userData));
+    return m_ec2SyncronizationEngine->transactionLog().generateTransactionAndSaveToLog(
+        queryContext,
+        sharing.systemId.c_str(),
+        ::ec2::ApiCommand::saveUser,
+        std::move(userData));
 }
 
 nx::db::DBResult SystemManager::generateUpdateFullNameTransaction(
@@ -1312,11 +1328,11 @@ nx::db::DBResult SystemManager::generateUpdateFullNameTransaction(
     fullNameData.resourceId = QnUuid(sharing.vmsUserId.c_str());
     fullNameData.name = Qn::USER_FULL_NAME;
     fullNameData.value = QString::fromStdString(newFullName);
-    return m_ec2SyncronizationEngine->transactionLog().generateTransactionAndSaveToLog<
-        ::ec2::ApiCommand::setResourceParam>(
-            queryContext,
-            sharing.systemId.c_str(),
-            std::move(fullNameData));
+    return m_ec2SyncronizationEngine->transactionLog().generateTransactionAndSaveToLog(
+        queryContext,
+        sharing.systemId.c_str(),
+        ::ec2::ApiCommand::setResourceParam,
+        std::move(fullNameData));
 }
 
 nx::db::DBResult SystemManager::generateRemoveUserTransaction(
@@ -1325,11 +1341,11 @@ nx::db::DBResult SystemManager::generateRemoveUserTransaction(
 {
     ::ec2::ApiIdData userId;
     ec2::convert(sharing, &userId);
-    return m_ec2SyncronizationEngine->transactionLog().generateTransactionAndSaveToLog<
-        ::ec2::ApiCommand::removeUser>(
-            queryContext,
-            sharing.systemId.c_str(),
-            std::move(userId));
+    return m_ec2SyncronizationEngine->transactionLog().generateTransactionAndSaveToLog(
+        queryContext,
+        sharing.systemId.c_str(),
+        ::ec2::ApiCommand::removeUser,
+        std::move(userId));
 }
 
 nx::db::DBResult SystemManager::generateRemoveUserFullNameTransaction(
@@ -1339,11 +1355,11 @@ nx::db::DBResult SystemManager::generateRemoveUserFullNameTransaction(
     ::ec2::ApiResourceParamWithRefData fullNameParam;
     fullNameParam.resourceId = QnUuid(sharing.vmsUserId.c_str());
     fullNameParam.name = Qn::USER_FULL_NAME;
-    return m_ec2SyncronizationEngine->transactionLog().generateTransactionAndSaveToLog<
-        ::ec2::ApiCommand::removeResourceParam>(
-            queryContext,
-            sharing.systemId.c_str(),
-            std::move(fullNameParam));
+    return m_ec2SyncronizationEngine->transactionLog().generateTransactionAndSaveToLog(
+        queryContext,
+        sharing.systemId.c_str(),
+        ::ec2::ApiCommand::removeResourceParam,
+        std::move(fullNameParam));
 }
 
 nx::db::DBResult SystemManager::placeUpdateUserTransactionToEachSystem(
@@ -1452,11 +1468,11 @@ nx::db::DBResult SystemManager::renameSystem(
     systemNameData.name = nx::settings_names::kNameSystemName;
     systemNameData.value = QString::fromStdString(data.name.get());
 
-    return m_ec2SyncronizationEngine->transactionLog().generateTransactionAndSaveToLog<
-        ::ec2::ApiCommand::setResourceParam>(
-            queryContext,
-            data.systemId.c_str(),
-            std::move(systemNameData));
+    return m_ec2SyncronizationEngine->transactionLog().generateTransactionAndSaveToLog(
+        queryContext,
+        data.systemId.c_str(),
+        ::ec2::ApiCommand::setResourceParam,
+        std::move(systemNameData));
 }
 
 void SystemManager::updateSystemAttributesInCache(
@@ -1482,7 +1498,7 @@ void SystemManager::updateSystemAttributesInCache(
 }
 
 void SystemManager::systemNameUpdated(
-    QnCounter::ScopedIncrement /*asyncCallLocker*/,
+    nx::utils::Counter::ScopedIncrement /*asyncCallLocker*/,
     nx::db::QueryContext* /*queryContext*/,
     nx::db::DBResult dbResult,
     data::SystemAttributesUpdate data,
@@ -1525,16 +1541,14 @@ void SystemManager::activateSystemIfNeeded(
         std::bind(&dao::AbstractSystemDataObject::activateSystem, m_systemDao.get(), _1, _2),
         systemIter->id,
         std::bind(&SystemManager::systemActivated, this,
-            m_startedAsyncCallsCounter.getScopedIncrement(),
-            _1, _2, _3, [](api::ResultCode) {}));
+            m_startedAsyncCallsCounter.getScopedIncrement(), _1, _2, _3));
 }
 
 void SystemManager::systemActivated(
-    QnCounter::ScopedIncrement /*asyncCallLocker*/,
+    nx::utils::Counter::ScopedIncrement /*asyncCallLocker*/,
     nx::db::QueryContext* /*queryContext*/,
     nx::db::DBResult dbResult,
-    std::string systemId,
-    std::function<void(api::ResultCode)> completionHandler)
+    std::string systemId)
 {
     {
         QnMutexLocker lk(&m_mutex);
@@ -1560,8 +1574,6 @@ void SystemManager::systemActivated(
                 });
         }
     }
-
-    completionHandler(dbResultToApiResult(dbResult));
 }
 
 nx::db::DBResult SystemManager::saveUserSessionStart(
@@ -1791,7 +1803,7 @@ void SystemManager::dropExpiredSystems(uint64_t /*timerId*/)
 }
 
 void SystemManager::expiredSystemsDeletedFromDb(
-    QnCounter::ScopedIncrement /*asyncCallLocker*/,
+    nx::utils::Counter::ScopedIncrement /*asyncCallLocker*/,
     nx::db::QueryContext* /*queryContext*/,
     nx::db::DBResult dbResult)
 {
@@ -1869,11 +1881,11 @@ nx::db::DBResult SystemManager::processEc2SaveUser(
     fullNameData.resourceId = vmsUser.id;
     fullNameData.name = Qn::USER_FULL_NAME;
     fullNameData.value = QString::fromStdString(account.fullName);
-    return m_ec2SyncronizationEngine->transactionLog().generateTransactionAndSaveToLog<
-        ::ec2::ApiCommand::setResourceParam>(
-            queryContext,
-            systemId,
-            std::move(fullNameData));
+    return m_ec2SyncronizationEngine->transactionLog().generateTransactionAndSaveToLog(
+        queryContext,
+        systemId,
+        ::ec2::ApiCommand::setResourceParam,
+        std::move(fullNameData));
 }
 
 void SystemManager::onEc2SaveUserDone(
@@ -1898,7 +1910,7 @@ nx::db::DBResult SystemManager::processEc2RemoveUser(
     NX_LOGX(
         QnLog::EC2_TRAN_LOG,
         lm("Processing vms transaction removeUser. systemId %1, vms user id %2")
-            .arg(systemId).str(data.id),
+            .arg(systemId).arg(data.id),
         cl_logDEBUG2);
 
     systemSharingData->systemId = systemId.toStdString();
@@ -1914,7 +1926,7 @@ nx::db::DBResult SystemManager::processEc2RemoveUser(
         NX_LOGX(
             QnLog::EC2_TRAN_LOG,
             lm("Failed to remove sharing by vms user id. system %1, vms user id %2. %3")
-                .arg(systemId).str(data.id)
+                .arg(systemId).arg(data.id)
                 .arg(queryContext->connection()->lastError().text()),
             cl_logDEBUG1);
         return dbResult;
@@ -1995,6 +2007,25 @@ void SystemManager::onEc2RemoveResourceParamDone(
     nx::db::QueryContext* /*queryContext*/,
     nx::db::DBResult /*dbResult*/)
 {
+}
+
+template<typename ExtensionFuncPtr, typename... Args>
+nx::db::DBResult SystemManager::invokeSystemSharingExtension(
+    ExtensionFuncPtr extensionFunc,
+    const Args&... args)
+{
+    for (auto& extension: m_systemSharingExtensions)
+    {
+        auto dbResult = (extension->*extensionFunc)(args...);
+        if (dbResult != nx::db::DBResult::ok)
+        {
+            NX_DEBUG(this, lm("Error invoking system sharing extension. %1")
+                .arg(nx::db::toString(dbResult)));
+            return dbResult;
+        }
+    }
+
+    return nx::db::DBResult::ok;
 }
 
 } // namespace cdb

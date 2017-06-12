@@ -15,6 +15,7 @@
 #include "recorder/storage_manager.h"
 #include "api/model/storage_status_reply.h"
 #include "media_server/settings.h"
+#include <rest/server/rest_connection_processor.h>
 
 
 namespace aux {
@@ -32,7 +33,7 @@ QnStorageStatusReply createReply(const QnStorageResourcePtr& storage)
         reply.storage.reservedSpace = QnStorageResource::kThirdPartyStorageLimit;
 
 #if defined (Q_OS_WIN)
-    if (!reply.storage.isExternal) 
+    if (!reply.storage.isExternal)
     {
         /* Do not allow to create several local storages on one hard drive. */
         reply.storage.isWritable = false;
@@ -43,14 +44,14 @@ QnStorageStatusReply createReply(const QnStorageResourcePtr& storage)
     return reply;
 }
 
-QnStorageResourcePtr getOrCreateStorage(const QString& storageUrl)
+QnStorageResourcePtr getOrCreateStorage(QnCommonModule* commonModule, const QString& storageUrl)
 {
     QnStorageResourcePtr storage = qnNormalStorageMan->getStorageByUrlExact(storageUrl);
     if (!storage)
         storage = qnBackupStorageMan->getStorageByUrlExact(storageUrl);
 
     if (!storage)
-        storage = QnStorageResourcePtr(QnStoragePluginFactory::instance()->createStorage(storageUrl, false));
+        storage = QnStorageResourcePtr(QnStoragePluginFactory::instance()->createStorage(commonModule, storageUrl, false));
 
     if (storage)
         storage->setUrl(storageUrl);
@@ -59,14 +60,18 @@ QnStorageResourcePtr getOrCreateStorage(const QString& storageUrl)
 }
 }
 
-int QnStorageStatusRestHandler::executeGet(const QString &, const QnRequestParams &params, QnJsonRestResult &result, const QnRestConnectionProcessor*)
+int QnStorageStatusRestHandler::executeGet(
+    const QString &,
+    const QnRequestParams &params,
+    QnJsonRestResult &result,
+    const QnRestConnectionProcessor* owner)
 {
     QString storageUrl;
 
     if(!requireParameter(params, lit("path"), result, &storageUrl))
         return nx_http::StatusCode::invalidParameter;
 
-    auto storage = aux::getOrCreateStorage(storageUrl);
+    auto storage = aux::getOrCreateStorage(owner->commonModule(), storageUrl);
     if (!storage)
         return nx_http::StatusCode::invalidParameter;
 

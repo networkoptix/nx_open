@@ -9,7 +9,7 @@
 #include <memory>
 #include <stdexcept>
 
-#include <plugins/videodecoder/stree/stree_manager.h>
+#include <nx/utils/stree/stree_manager.h>
 #include <nx/fusion/model_functions_fwd.h>
 #include <nx/utils/singleton.h>
 
@@ -32,7 +32,7 @@ QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(StreeOperation)
 class StreeManager
 :
     public Singleton<StreeManager>,
-    public stree::StreeManager
+    public nx::utils::stree::StreeManager
 {
 public:
     /*!
@@ -40,13 +40,13 @@ public:
         \throw \a std::runtime_error in case of parse error
     */
     StreeManager(
-        const stree::ResourceNameSet& resourceNameSet,
-        const QString& xmlFilePath) throw(std::runtime_error);
+        const nx::utils::stree::ResourceNameSet& resourceNameSet,
+        const QString& xmlFilePath) noexcept(false);
 
     void search(
         StreeOperation,
-        const stree::AbstractResourceReader& input,
-        stree::AbstractResourceWriter* const output) const;
+        const nx::utils::stree::AbstractResourceReader& input,
+        nx::utils::stree::AbstractResourceWriter* const output) const;
 };
 
 }   //cdb

@@ -6,12 +6,13 @@
 
 #include <core/resource/camera_resource.h>
 #include <core/resource/user_resource.h>
+#include <common/common_module.h>
 
 
 QnPermissionsResourceAccessProvider::QnPermissionsResourceAccessProvider(QObject* parent):
     base_type(parent)
 {
-    connect(qnGlobalPermissionsManager, &QnGlobalPermissionsManager::globalPermissionsChanged,
+    connect(globalPermissionsManager(), &QnGlobalPermissionsManager::globalPermissionsChanged,
         this, &QnPermissionsResourceAccessProvider::updateAccessBySubject);
 }
 
@@ -26,7 +27,7 @@ bool QnPermissionsResourceAccessProvider::hasAccessToDesktopCamera(
      * if the user has the ability to push his screen. */
     return subject.user()
         && subject.user()->getName() == resource->getName()
-        && qnGlobalPermissionsManager->hasGlobalPermission(subject,
+        && globalPermissionsManager()->hasGlobalPermission(subject,
             Qn::GlobalControlVideoWallPermission);
 }
 
@@ -56,7 +57,7 @@ bool QnPermissionsResourceAccessProvider::calculateAccess(const QnResourceAccess
     else if (isLayout(resource) && subject.user() && resource->getParentId() == subject.id())
         requiredPermission = Qn::NoGlobalPermissions;
 
-    return qnGlobalPermissionsManager->hasGlobalPermission(subject, requiredPermission);
+    return globalPermissionsManager()->hasGlobalPermission(subject, requiredPermission);
 }
 
 void QnPermissionsResourceAccessProvider::handleResourceAdded(const QnResourcePtr& resource)

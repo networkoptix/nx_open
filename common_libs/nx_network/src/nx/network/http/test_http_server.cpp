@@ -28,8 +28,12 @@ void TestAuthenticationManager::authenticate(
     }
     else
     {
-        completionHandler(
-            true, stree::ResourceContainer(), boost::none, nx_http::HttpHeaders(), nullptr);
+        completionHandler(nx_http::server::AuthenticationResult(
+            true,
+            nx::utils::stree::ResourceContainer(),
+            boost::none,
+            nx_http::HttpHeaders(),
+            nullptr));
     }
 }
 
@@ -40,40 +44,30 @@ void TestAuthenticationManager::setAuthenticationEnabled(bool value)
 
 //-------------------------------------------------------------------------------------------------
 
-TestHttpServer::TestHttpServer():
-    m_authenticationManager(&m_credentialsProvider)
-{
-    m_authenticationManager.setAuthenticationEnabled(false);
-
-    m_httpServer.reset(
-        new nx_http::HttpStreamSocketServer(
-            &m_authenticationManager,
-            &m_httpMessageDispatcher,
-            true,
-            nx::network::NatTraversalSupport::disabled));
-}
-
 TestHttpServer::~TestHttpServer()
 {
     m_httpServer->pleaseStopSync();
     NX_LOGX("Stopped", cl_logINFO);
 }
 
-bool TestHttpServer::bindAndListen()
+bool TestHttpServer::bindAndListen(const SocketAddress& endpoint)
 {
-    if (!m_httpServer->bind(SocketAddress(HostAddress::localhost, 0)))
+    if (!m_httpServer->bind(endpoint))
         return false;
 
     if (!m_httpServer->listen())
         return false;
 
-    NX_LOGX(lm("Started on %1").str(m_httpServer->address()), cl_logINFO);
+    NX_LOGX(lm("Started on %1").arg(m_httpServer->address()), cl_logINFO);
     return true;
 }
 
 SocketAddress TestHttpServer::serverAddress() const
 {
-    return m_httpServer->address();
+    auto socketAddress = m_httpServer->address();
+    if (socketAddress.address == HostAddress::anyHost)
+        socketAddress.address = HostAddress::localhost;
+    return socketAddress;
 }
 
 void TestHttpServer::setPersistentConnectionEnabled(bool value)
@@ -127,6 +121,35 @@ bool TestHttpServer::registerFileProvider(
         mimeType);
 }
 
+bool TestHttpServer::registerContentProvider(
+    const QString& httpPath,
+    ContentProviderFactoryFunction contentProviderFactory)
+{
+    auto contentProviderFactoryShared = 
+        std::make_shared<ContentProviderFactoryFunction>(std::move(contentProviderFactory));
+
+    return registerRequestProcessorFunc(
+        httpPath,
+        [contentProviderFactoryShared](
+            nx_http::HttpServerConnection* const /*connection*/,
+            nx::utils::stree::ResourceContainer /*authInfo*/,
+            nx_http::Request /*request*/,
+            nx_http::Response* const /*response*/,
+            nx_http::RequestProcessedHandler completionHandler)
+        {
+            auto msgBody = (*contentProviderFactoryShared)();
+            if (msgBody)
+            {
+                completionHandler(
+                    nx_http::RequestResult(nx_http::StatusCode::ok, std::move(msgBody)));
+            }
+            else
+            {
+                completionHandler(nx_http::StatusCode::internalServerError);
+            }
+        });
+}
+
 bool TestHttpServer::registerRedirectHandler(
     const QString& resourcePath,
     const QUrl& location)
@@ -143,7 +166,7 @@ bool TestHttpServer::registerRedirectHandler(
 // class RandomlyFailingHttpConnection
 
 RandomlyFailingHttpConnection::RandomlyFailingHttpConnection(
-    StreamConnectionHolder<RandomlyFailingHttpConnection>* socketServer,
+    nx::network::server::StreamConnectionHolder<RandomlyFailingHttpConnection>* socketServer,
     std::unique_ptr<AbstractStreamSocket> sock)
     :
     BaseType(socketServer, std::move(sock)),
@@ -196,7 +219,7 @@ RandomlyFailingHttpServer::RandomlyFailingHttpServer(
     bool sslRequired,
     nx::network::NatTraversalSupport natTraversalSupport)
     :
-    BaseType(sslRequired, natTraversalSupport)
+    base_type(sslRequired, natTraversalSupport)
 {
 }
 

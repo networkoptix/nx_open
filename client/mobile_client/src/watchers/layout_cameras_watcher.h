@@ -1,5 +1,7 @@
 #pragma once
 
+#include <client_core/connection_context_aware.h>
+
 #include <utils/common/connective.h>
 #include <utils/common/counter_hash.h>
 #include <nx/utils/uuid.h>
@@ -9,7 +11,7 @@ namespace nx {
 namespace client {
 namespace mobile {
 
-class LayoutCamerasWatcher: public Connective<QObject>
+class LayoutCamerasWatcher: public Connective<QObject>, public QnConnectionContextAware
 {
     Q_OBJECT
 

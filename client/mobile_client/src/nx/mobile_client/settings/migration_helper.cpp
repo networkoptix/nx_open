@@ -2,11 +2,11 @@
 
 #include <functional>
 
+#include <common/common_module.h>
+
 #include <nx/network/url/url_parse_helper.h>
 
-#include <network/module_finder.h>
-#include <network/direct_module_finder.h>
-#include <network/direct_module_finder_helper.h>
+#include <nx/vms/discovery/manager.h>
 #include <network/system_helpers.h>
 #include <client_core/client_core_settings.h>
 #include <mobile_client/mobile_client_settings.h>
@@ -23,16 +23,16 @@ static QnUuid savedSessionId(const QVariant& sessionVariant)
     return QnLoginSession::fromVariant(sessionVariant.toMap()).id;
 }
 
-class SessionsMigrationHelperPrivate: public QObject
+class SessionsMigrationHelperPrivate: public QObject, public QnConnectionContextAware
 {
 public:
-    void at_moduleFinder_moduleAddressFound(
-        const QnModuleInformation &moduleInformation, const SocketAddress &address)
+    void at_moduleFound(
+        nx::vms::discovery::ModuleEndpoint moduleData)
     {
         using namespace nx::client::core::helpers;
         using nx::client::core::LocalConnectionData;
 
-        const auto systemId = helpers::getLocalSystemId(moduleInformation);
+        const auto systemId = helpers::getLocalSystemId(moduleData);
         auto recentConnections = qnClientCoreSettings->recentLocalConnections();
         auto authenticationData = qnClientCoreSettings->systemAuthenticationData();
         auto savedSessions = qnSettings->savedSessions();
@@ -56,7 +56,7 @@ public:
             // There could be multiple sessions with the same URL and even same credentials.
 
             auto migratedIt = findConnection(
-                [this, &moduleInformation, &address](
+                [this, &moduleData](
                     const QnUuid& localId, const LocalConnectionData& data)
                 {
                     if (!migratedSessionIds.contains(localId))
@@ -64,7 +64,7 @@ public:
 
                     for (const auto& url: data.urls)
                     {
-                        if (address == nx::network::url::getEndpoint(url))
+                        if (moduleData.endpoint == nx::network::url::getEndpoint(url))
                             return true;
                     }
 
@@ -97,9 +97,6 @@ public:
                     storeCredentials(systemId, credentials);
             }
 
-            for (const auto& url: connectionData.urls)
-                qnModuleFinder->directModuleFinderHelper()->removeForcedUrl(this, url);
-
             recentConnectionsChanged = true;
         }
 
@@ -117,24 +114,20 @@ SessionsMigrationHelper::SessionsMigrationHelper(QObject* parent):
 {
     Q_D(SessionsMigrationHelper);
 
-    NX_ASSERT(qnModuleFinder);
-
+    const auto moduleManager = commonModule()->moduleDiscoveryManager();
+    NX_ASSERT(moduleManager);
     for (const auto& sessionVariant: qnSettings->savedSessions())
     {
         const auto& session = QnLoginSession::fromVariant(sessionVariant.toMap());
         d->migratedSessionIds.insert(session.id);
-        qnModuleFinder->directModuleFinderHelper()->addForcedUrl(d, session.url);
-        qnModuleFinder->directModuleFinder()->checkUrl(session.url);
+        moduleManager->checkEndpoint(session.url);
     }
 
-    for (const auto& moduleInformation: qnModuleFinder->foundModules())
-    {
-        for (const auto& address: qnModuleFinder->moduleAddresses(moduleInformation.id))
-            d->at_moduleFinder_moduleAddressFound(moduleInformation, address);
-    }
+    for (const auto& module: moduleManager->getAll())
+        d->at_moduleFound(module);
 
-    connect(qnModuleFinder, &QnModuleFinder::moduleAddressFound,
-        d, &SessionsMigrationHelperPrivate::at_moduleFinder_moduleAddressFound);
+    connect(moduleManager, &nx::vms::discovery::Manager::found,
+        d, &SessionsMigrationHelperPrivate::at_moduleFound);
 }
 
 SessionsMigrationHelper::~SessionsMigrationHelper()

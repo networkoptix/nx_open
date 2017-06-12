@@ -1,11 +1,12 @@
 #include "common_globals.h"
 
+#include <core/ptz/ptz_constants.h>
+
 #include <nx/fusion/model_functions.h>
 
 QN_DEFINE_METAOBJECT_ENUM_LEXICAL_FUNCTIONS(Qn, PtzCommand)
 QN_DEFINE_METAOBJECT_ENUM_LEXICAL_FUNCTIONS(Qn, PtzCoordinateSpace)
 QN_DEFINE_METAOBJECT_ENUM_LEXICAL_FUNCTIONS(Qn, PtzObjectType)
-QN_DEFINE_METAOBJECT_ENUM_LEXICAL_FUNCTIONS(Qn, PtzCapabilities)
 QN_DEFINE_METAOBJECT_ENUM_LEXICAL_FUNCTIONS(Qn, MotionType)
 QN_DEFINE_METAOBJECT_ENUM_LEXICAL_FUNCTIONS(Qn, SecondStreamQuality)
 QN_DEFINE_METAOBJECT_ENUM_LEXICAL_FUNCTIONS(Qn, StatisticsDeviceType)
@@ -46,12 +47,6 @@ QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(Qn, FailoverPriority,
 (Qn::FP_High,       "High")
 )
 
-QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(Qn, PtzTraits,
-    (Qn::FourWayPtzTrait,          "FourWayPtz")
-    (Qn::EightWayPtzTrait,         "EightWayPtz")
-    (Qn::ManualAutoFocusPtzTrait,  "ManualAutoFocus")
-)
-
 QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(Qn, BackupType,
     (Qn::Backup_Manual,            "BackupManual")
     (Qn::Backup_RealTime,          "BackupRealTime")
@@ -81,16 +76,7 @@ QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(Qn, CameraBackupQuality,
     (Qn::CameraBackup_Default,           "CameraBackupDefault")
 )
 
-
-// TODO: #Elric #2.3 code duplication ^v
-QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(Qn, PtzTrait,
-    (Qn::FourWayPtzTrait,          "FourWayPtz")
-    (Qn::EightWayPtzTrait,         "EightWayPtz")
-    (Qn::ManualAutoFocusPtzTrait,  "ManualAutoFocus")
-)
-
 QN_DEFINE_METAOBJECT_ENUM_LEXICAL_FUNCTIONS(Qn, RecordingType)
-QN_DEFINE_METAOBJECT_ENUM_LEXICAL_FUNCTIONS(Qn, PropertyDataType)
 
 QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(Qn, StreamQuality,
     (Qn::QualityLowest,     "lowest")
@@ -99,15 +85,6 @@ QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(Qn, StreamQuality,
     (Qn::QualityHigh,       "high")
     (Qn::QualityHighest,    "highest")
     (Qn::QualityPreSet,     "preset")
-)
-
-QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(Qn, SerializationFormat,
-    (Qn::JsonFormat,        "json")
-    (Qn::UbjsonFormat,      "ubjson")
-    (Qn::BnsFormat,         "bns")
-    (Qn::CsvFormat,         "csv")
-    (Qn::XmlFormat,         "xml")
-    (Qn::CompressedPeriodsFormat, "periods")
 )
 
 QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(Qn, BookmarkSortField,
@@ -134,3 +111,12 @@ QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(Qn, BackupAction,
 (Qn::BackupAction_Cancel,  "stop")
 (Qn::BackupAction_ShowProgress, QString())
 )
+
+namespace Qn {
+
+QString toString(AuthResult value)
+{
+    return QnLexical::serialized(value);
+}
+
+} // namespace Qn

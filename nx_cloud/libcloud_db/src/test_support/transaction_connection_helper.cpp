@@ -267,7 +267,7 @@ void TransactionConnectionHelper::onTransactionConnectionStateChanged(
                     QnMutexLocker lk(&m_mutex);
                     m_connectedConnections.insert(connectionId);
                 });
-            m_onConnectionBecomesActiveSubscription.notify(newState);
+            m_onConnectionBecomesActiveSubscription.notify(connectionId, newState);
             break;
 
         case ec2::QnTransactionTransportBase::Error:
@@ -275,7 +275,7 @@ void TransactionConnectionHelper::onTransactionConnectionStateChanged(
             ++m_totalConnectionsFailed;
             if (m_removeConnectionAfterClosure)
                 removeConnection(connection);
-            m_onConnectionFailureSubscription.notify(newState);
+            m_onConnectionFailureSubscription.notify(connectionId, newState);
             break;
 
         default:

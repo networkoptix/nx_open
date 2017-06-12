@@ -1,8 +1,10 @@
 #include "outgoing_tunnel_pool.h"
 
+#include <nx/network/socket_global.h>
+#include <nx/utils/thread/barrier_handler.h>
 #include <nx/utils/log/log.h>
-#include <nx/utils/std/cpp14.h>
 #include <nx/utils/random.h>
+#include <nx/utils/std/cpp14.h>
 
 namespace nx {
 namespace network {
@@ -18,6 +20,8 @@ OutgoingTunnelPool::OutgoingTunnelPool():
 
 OutgoingTunnelPool::~OutgoingTunnelPool()
 {
+    m_counter.wait();
+
     NX_ASSERT(m_terminated);
     NX_ASSERT(m_pool.empty());
 }
@@ -94,7 +98,7 @@ String OutgoingTunnelPool::ownPeerId() const
 
 void OutgoingTunnelPool::assignOwnPeerId(const String& name, const QnUuid& uuid)
 {
-    const auto id = lm("%1_%2_%3").strs(name, uuid.toSimpleString(), nx::utils::random::number());
+    const auto id = lm("%1_%2_%3").args(name, uuid.toSimpleString(), nx::utils::random::number());
 
     QnMutexLocker lock(&m_mutex);
     NX_ASSERT(s_isOwnPeerIdChangeAllowed || !m_isOwnPeerIdAssigned,
@@ -137,6 +141,7 @@ OutgoingTunnelPool::TunnelContext&
         cl_logDEBUG1);
 
     auto tunnel = std::make_unique<OutgoingTunnel>(targetHostAddress);
+    tunnel->bindToAioThread(SocketGlobals::aioService().getRandomAioThread());
     tunnel->setOnClosedHandler(
         std::bind(&OutgoingTunnelPool::onTunnelClosed, this, tunnel.get()));
 
@@ -163,6 +168,8 @@ void OutgoingTunnelPool::reportConnectionResult(
 
 void OutgoingTunnelPool::onTunnelClosed(OutgoingTunnel* tunnelPtr)
 {
+    const auto callLocker = m_counter.getScopedIncrement();
+
     std::list<OutgoingTunnel::NewConnectionHandler> userHandlers;
     std::unique_ptr<OutgoingTunnel> tunnel;
     QString remoteHostName;

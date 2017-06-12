@@ -36,10 +36,10 @@ QnHikvisionOnvifResource::~QnHikvisionOnvifResource()
 CameraDiagnostics::Result QnHikvisionOnvifResource::initInternal()
 {
     auto result = QnPlOnvifResource::initInternal();
-    if (result != CameraDiagnostics::NoErrorResult())
+    if (result.errorCode != CameraDiagnostics::ErrorCode::noError)
         return result;
 
-    initialize2WayAudio();    
+    initialize2WayAudio();
     saveParams();
 
     return CameraDiagnostics::NoErrorResult();

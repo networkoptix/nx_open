@@ -15,6 +15,7 @@
 
 namespace ec2
 {
+
     // TODO: #2.4 remove Ec2 prefix to avoid ec2::Ec2DirectConnection
     class Ec2DirectConnection
     :
@@ -22,6 +23,7 @@ namespace ec2
     {
     public:
         Ec2DirectConnection(
+            const Ec2DirectConnectionFactory* connectionFactory,
             ServerQueryProcessorAccess* queryProcessor,
             const QnConnectionInfo& connectionInfo,
             const QUrl& dbUrl);
@@ -29,15 +31,15 @@ namespace ec2
 
         //!Implementation of ec2::AbstractECConnection::connectionInfo
         virtual QnConnectionInfo connectionInfo() const override;
-        //!Implementation of ec2::AbstractECConnection::authInfo
-        virtual QString authInfo() const override;
+        virtual void updateConnectionUrl(const QUrl& url) override;
 
         bool initialized() const;
 
         Ec2StaticticsReporter* getStaticticsReporter();
 
+        virtual Timestamp getTransactionLogTime() const override;
+        virtual void setTransactionLogTime(Timestamp value) override;
     private:
-        std::unique_ptr<QnTransactionLog> m_transactionLog;
         const QnConnectionInfo m_connectionInfo;
         bool m_isInitialized;
         std::unique_ptr<Ec2StaticticsReporter> m_staticticsReporter;

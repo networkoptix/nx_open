@@ -16,8 +16,8 @@
 #include <core/resource/resource_fwd.h>
 #include <nx/utils/thread/mutex.h>
 #include <nx/utils/thread/wait_condition.h>
-#include <utils/common/safe_direct_connection.h>
-#include <utils/common/subscription.h>
+#include <nx/utils/safe_direct_connection.h>
+#include <nx/utils/subscription.h>
 
 #include "abstract_user_data_provider.h"
 

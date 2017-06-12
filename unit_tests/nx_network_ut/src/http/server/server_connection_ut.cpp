@@ -1,34 +1,31 @@
-/**********************************************************
-* Aug 25, 2015
-* a.kolesnikov
-***********************************************************/
-
 #include <chrono>
 #include <future>
 #include <thread>
 
 #include <gtest/gtest.h>
 
-#include <QString>
+#include <QtCore/QString>
 
 #include <nx/network/aio/timer.h>
 #include <nx/network/http/buffer_source.h>
-#include <nx/network/http/httpclient.h>
+#include <nx/network/http/http_client.h>
+#include <nx/network/http/http_async_client.h>
 #include <nx/network/http/test_http_server.h>
 #include <nx/network/http/server/abstract_http_request_handler.h>
 #include <nx/network/system_socket.h>
+#include <nx/network/url/url_builder.h>
 #include <nx/utils/std/cpp14.h>
 
 namespace nx_http {
 
-class HttpAsyncServerConnectionTest
-:
+namespace {
+
+class HttpAsyncServerConnectionTest:
     public ::testing::Test
 {
 public:
-    HttpAsyncServerConnectionTest()
-    :
-        m_testHttpServer( std::make_unique<TestHttpServer>() )
+    HttpAsyncServerConnectionTest():
+        m_testHttpServer(std::make_unique<TestHttpServer>())
     {
     }
 
@@ -36,26 +33,18 @@ protected:
     std::unique_ptr<TestHttpServer> m_testHttpServer;
 };
 
-
-//!Delays response for several seconds
-class TestHandler
-:
+class DelayingRequestHandler:
     public nx_http::AbstractHttpRequestHandler
 {
 public:
     static const QString PATH;
 
-    virtual ~TestHandler()
-    {
-    }
-
-    //!Implementation of \a nx_http::AbstractHttpRequestHandler::processRequest
     virtual void processRequest(
         nx_http::HttpServerConnection* const /*connection*/,
-        stree::ResourceContainer /*authInfo*/,
+        nx::utils::stree::ResourceContainer /*authInfo*/,
         nx_http::Request /*request*/,
         nx_http::Response* const /*response*/,
-        nx_http::RequestProcessedHandler completionHandler )
+        nx_http::RequestProcessedHandler completionHandler)
     {
         m_timer.start(
             std::chrono::seconds(5),
@@ -69,59 +58,50 @@ private:
     nx::network::aio::Timer m_timer;
 };
 
-const QString TestHandler::PATH = "/tst";
+const QString DelayingRequestHandler::PATH = "/tst";
 
+} // namespace
 
-TEST_F( HttpAsyncServerConnectionTest, connectionRemovedBeforeRequestHasBeenProcessed )
+TEST_F(HttpAsyncServerConnectionTest, connectionRemovedBeforeRequestHasBeenProcessed)
 {
-    m_testHttpServer->registerRequestProcessor<TestHandler>(
-        TestHandler::PATH,
-        [&]()->std::unique_ptr<TestHandler> {
-            return std::make_unique<TestHandler>();
-        } );
+    m_testHttpServer->registerRequestProcessor<DelayingRequestHandler>(
+        DelayingRequestHandler::PATH,
+        [&]()->std::unique_ptr<DelayingRequestHandler> {
+            return std::make_unique<DelayingRequestHandler>();
+        });
 
-    ASSERT_TRUE( m_testHttpServer->bindAndListen() );
+    ASSERT_TRUE(m_testHttpServer->bindAndListen());
 
     //fetching mjpeg with async http client
-    const QUrl url( QString( "http://127.0.0.1:%1%2" ).
-        arg( m_testHttpServer->serverAddress().port ).arg( TestHandler::PATH ) );
+    const QUrl url(QString("http://127.0.0.1:%1%2").
+        arg(m_testHttpServer->serverAddress().port).arg(DelayingRequestHandler::PATH));
 
     auto client = nx_http::AsyncHttpClient::create();
-    client->doGet( url );
-    std::this_thread::sleep_for( std::chrono::seconds( 1 ) );
+    client->doGet(url);
+    std::this_thread::sleep_for(std::chrono::seconds(1));
     client.reset();
 
-    std::this_thread::sleep_for( std::chrono::seconds( 10 ) );
+    std::this_thread::sleep_for(std::chrono::seconds(10));
 }
 
+namespace {
 
-//!Delays response for several seconds
-class PipeliningTestHandler
-:
+class PipeliningTestHandler:
     public nx_http::AbstractHttpRequestHandler
 {
 public:
     static const nx::String PATH;
 
-    PipeliningTestHandler()
-    {
-    }
-
-    virtual ~PipeliningTestHandler()
-    {
-    }
-
-    //!Implementation of \a nx_http::AbstractHttpRequestHandler::processRequest
     virtual void processRequest(
         nx_http::HttpServerConnection* const /*connection*/,
-        stree::ResourceContainer /*authInfo*/,
+        nx::utils::stree::ResourceContainer /*authInfo*/,
         nx_http::Request request,
         nx_http::Response* const response,
-        nx_http::RequestProcessedHandler completionHandler )
+        nx_http::RequestProcessedHandler completionHandler)
     {
         response->headers.emplace(
             "Seq",
-            nx_http::getHeaderValue( request.headers, "Seq" ) );
+            nx_http::getHeaderValue(request.headers, "Seq"));
         completionHandler(
             nx_http::RequestResult(
                 nx_http::StatusCode::ok,
@@ -131,18 +111,20 @@ public:
 
 const nx::String PipeliningTestHandler::PATH = "/tst";
 
+} // namespace
 
-TEST_F(HttpAsyncServerConnectionTest, requestPipeliningTest )
+TEST_F(HttpAsyncServerConnectionTest, requestPipeliningTest)
 {
     static const int REQUESTS_TO_SEND = 100;
 
     m_testHttpServer->registerRequestProcessor<PipeliningTestHandler>(
         PipeliningTestHandler::PATH,
-        [&]()->std::unique_ptr<PipeliningTestHandler> {
+        [&]()->std::unique_ptr<PipeliningTestHandler>
+        {
             return std::make_unique<PipeliningTestHandler>();
-        } );
+        });
 
-    ASSERT_TRUE( m_testHttpServer->bindAndListen() );
+    ASSERT_TRUE(m_testHttpServer->bindAndListen());
 
     //opening connection and sending multiple requests
     nx_http::Request request;
@@ -151,19 +133,19 @@ TEST_F(HttpAsyncServerConnectionTest, requestPipeliningTest )
     request.requestLine.url = PipeliningTestHandler::PATH;
 
     auto sock = SocketFactory::createStreamSocket();
-    ASSERT_TRUE( sock->connect( SocketAddress(
+    ASSERT_TRUE(sock->connect(SocketAddress(
         HostAddress::localhost,
-        m_testHttpServer->serverAddress().port ) ) );
+        m_testHttpServer->serverAddress().port)));
 
     int msgCounter = 0;
-    for( ; msgCounter < REQUESTS_TO_SEND; ++msgCounter )
+    for (; msgCounter < REQUESTS_TO_SEND; ++msgCounter)
     {
         nx_http::insertOrReplaceHeader(
             &request.headers,
-            nx_http::HttpHeader( "Seq", nx::String::number( msgCounter ) ) );
+            nx_http::HttpHeader("Seq", nx::String::number(msgCounter)));
         //sending request
         auto serializedMessage = request.serialized();
-        ASSERT_EQ( sock->send( serializedMessage ), serializedMessage.size() );
+        ASSERT_EQ(sock->send(serializedMessage), serializedMessage.size());
     }
 
     //reading responses out of socket
@@ -179,29 +161,29 @@ TEST_F(HttpAsyncServerConnectionTest, requestPipeliningTest )
         {
             auto bytesRead = sock->recv(
                 readBuf.data() + dataSize,
-                readBuf.size() - dataSize );
-            ASSERT_FALSE( bytesRead == 0 || bytesRead == -1 );
+                readBuf.size() - dataSize);
+            ASSERT_FALSE(bytesRead == 0 || bytesRead == -1);
             dataSize += bytesRead;
         }
 
         size_t bytesParsed = 0;
         ASSERT_TRUE(
             httpMsgReader.parseBytes(
-                QnByteArrayConstRef( readBuf, 0, dataSize ),
-                &bytesParsed ) );
-        readBuf.remove( 0, bytesParsed );
+                QnByteArrayConstRef(readBuf, 0, dataSize),
+                &bytesParsed));
+        readBuf.remove(0, bytesParsed);
         dataSize -= bytesParsed;
-        if( httpMsgReader.state() == nx_http::HttpStreamReader::messageDone )
+        if (httpMsgReader.state() == nx_http::HttpStreamReader::messageDone)
         {
-            ASSERT_TRUE( httpMsgReader.message().response != nullptr );
-            auto seqIter = httpMsgReader.message().response->headers.find( "Seq" );
-            ASSERT_TRUE( seqIter != httpMsgReader.message().response->headers.end() );
-            ASSERT_EQ( seqIter->second.toInt(), REQUESTS_TO_SEND-msgCounter );
+            ASSERT_TRUE(httpMsgReader.message().response != nullptr);
+            auto seqIter = httpMsgReader.message().response->headers.find("Seq");
+            ASSERT_TRUE(seqIter != httpMsgReader.message().response->headers.end());
+            ASSERT_EQ(seqIter->second.toInt(), REQUESTS_TO_SEND - msgCounter);
             --msgCounter;
         }
     }
 
-    ASSERT_EQ( 0, msgCounter);
+    ASSERT_EQ(0, msgCounter);
 }
 
 TEST_F(HttpAsyncServerConnectionTest, multipleRequestsTest)
@@ -270,6 +252,103 @@ TEST_F(HttpAsyncServerConnectionTest, inactivityTimeout)
     const auto start = std::chrono::steady_clock::now();
     ASSERT_EQ(0, socket->recv(buffer.data(), buffer.size(), 0));
     ASSERT_LT(std::chrono::steady_clock::now() - start, kTimeout * 2);
+}
+
+//-------------------------------------------------------------------------------------------------
+// Connection upgrade tests.
+
+namespace {
+
+class HttpAsyncServerConnectionUpgrade:
+    public HttpAsyncServerConnectionTest
+{
+protected:
+    static const QString kTestPath;
+    static const nx_http::StringType kProtocolToUpgradeTo;
+
+    virtual void SetUp() override
+    {
+        using namespace std::placeholders;
+
+        m_testHttpServer->registerRequestProcessorFunc(
+            kTestPath,
+            std::bind(&HttpAsyncServerConnectionUpgrade::processRequest, this,
+                _1, _2, _3, _4, _5));
+
+        ASSERT_TRUE(m_testHttpServer->bindAndListen());
+    }
+
+    virtual void TearDown() override
+    {
+    }
+
+    void issueUpgradeRequest()
+    {
+        nx::utils::promise<nx_http::Response> response;
+
+        nx_http::AsyncClient httpClient;
+        httpClient.doUpgrade(
+            nx::network::url::Builder().setScheme("http")
+                .setHost("127.0.0.1")
+                .setPort(m_testHttpServer->serverAddress().port)
+                .setPath(kTestPath),
+            kProtocolToUpgradeTo,
+            [&response, &httpClient]()
+            {
+                response.set_value(*httpClient.response());
+            });
+        m_httpResponse = response.get_future().get();
+        httpClient.pleaseStopSync();
+    }
+
+    void assertThatResponseIsValid()
+    {
+        ASSERT_EQ(
+            nx_http::StatusCode::switchingProtocols,
+            m_httpResponse.statusLine.statusCode);
+        ASSERT_EQ(
+            "Upgrade",
+            nx_http::getHeaderValue(m_httpResponse.headers, "Connection"));
+        ASSERT_EQ(
+            kProtocolToUpgradeTo,
+            nx_http::getHeaderValue(m_httpResponse.headers, "Upgrade"));
+    }
+
+    void assertNoMessageBodyHeadersPresent()
+    {
+        ASSERT_TRUE(m_httpResponse.headers.find("Content-Length") == m_httpResponse.headers.end());
+        ASSERT_TRUE(m_httpResponse.headers.find("Content-Type") == m_httpResponse.headers.end());
+    }
+
+private:
+    nx_http::Response m_httpResponse;
+
+    void processRequest(
+        nx_http::HttpServerConnection* const /*connection*/,
+        nx::utils::stree::ResourceContainer /*authInfo*/,
+        nx_http::Request /*request*/,
+        nx_http::Response* const /*response*/,
+        nx_http::RequestProcessedHandler completionHandler)
+    {
+        completionHandler(nx_http::StatusCode::switchingProtocols);
+    }
+};
+
+const QString HttpAsyncServerConnectionUpgrade::kTestPath("/HttpAsyncServerConnectionUpgrade");
+const nx_http::StringType HttpAsyncServerConnectionUpgrade::kProtocolToUpgradeTo("TEST/1.0");
+
+} // namespace
+
+TEST_F(HttpAsyncServerConnectionUpgrade, required_headers_are_added_to_response)
+{
+    issueUpgradeRequest();
+    assertThatResponseIsValid();
+}
+
+TEST_F(HttpAsyncServerConnectionUpgrade, response_with_1xx_status_does_not_contain_content_length)
+{
+    issueUpgradeRequest();
+    assertNoMessageBodyHeadersPresent();
 }
 
 } // namespace nx_http

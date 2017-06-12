@@ -18,7 +18,7 @@
 #include <nx/network/http/abstract_msg_body_source.h>
 #include <nx/utils/move_only_func.h>
 #include <nx/utils/thread/mutex.h>
-#include <utils/common/counter.h>
+#include <nx/utils/counter.h>
 
 #include "access_control/auth_types.h"
 #include "data/account_data.h"
@@ -101,7 +101,7 @@ private:
     constexpr static const int kServerContextBySystemIdIndex = 1;
 
     const conf::Settings& m_settings;
-    QnCounter m_startedAsyncCallsCounter;
+    nx::utils::Counter m_startedAsyncCallsCounter;
     MediaServerConnectionContainer m_activeMediaServerConnections;
     mutable QnMutex m_mutex;
 

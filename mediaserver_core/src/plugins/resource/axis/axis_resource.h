@@ -15,11 +15,12 @@
 #include <api/model/api_ioport_data.h>
 #include <nx/network/http/multipart_content_parser.h>
 #include <core/resource/camera_advanced_param.h>
+#include <nx/network/aio/timer.h>
 
 class QnAxisPtzController;
 typedef std::shared_ptr<QnAbstractAudioTransmitter> QnAudioTransmitterPtr;
 
-class QnPlAxisResource : public QnPhysicalCameraResource
+class QnPlAxisResource: public QnPhysicalCameraResource
 {
     Q_OBJECT
 
@@ -104,8 +105,11 @@ private:
     int addMotionWindow();
     bool updateMotionWindow(int wndNum, int sensitivity, const QRect& rect);
     int toAxisMotionSensitivity(int sensitivity);
-    void asyncUpdateIOSettings();
+    void updateIOSettings();
     bool readCurrentIOStateAsync();
+    void restartIOMonitorWithDelay();
+    void startInputPortMonitoring();
+    void stopInputPortMonitoringSync();
 private:
     QList<AxisResolution> m_resolutionList;
 
@@ -117,15 +121,20 @@ private:
     //std::map<QString, unsigned int> m_outputPortNameToIndex;
     QnIOPortDataList m_ioPorts;
     QnIOStateDataList m_ioStates;
-    mutable QnMutex m_inputPortMutex;
     //!http client used to monitor input port(s) state
 
-    struct IOMonitor {
+    struct IOMonitor
+    {
+        IOMonitor(Qn::IOPortType portType): portType(portType) {}
+
+        Qn::IOPortType portType;
         nx_http::AsyncHttpClientPtr httpClient;
         std::shared_ptr<nx_http::MultipartContentParser> contentParser;
     };
 
-    IOMonitor m_ioHttpMonitor[2];
+    IOMonitor m_inputIoMonitor;
+    IOMonitor m_outputIoMonitor;
+    nx::network::aio::Timer m_timer;
     nx_http::AsyncHttpClientPtr m_inputPortStateReader;
     QVector<QString> m_ioPortIdList;
 
@@ -135,7 +144,6 @@ private:
     AxisResolution m_resolutions[SECONDARY_ENCODER_INDEX+1];
     QnAudioTransmitterPtr m_audioTransmitter;
 
-    std::set<nx_http::AsyncHttpClientPtr> m_stoppingHttpClients;
     QnWaitCondition m_stopInputMonitoringWaitCondition;
 
     QnCameraAdvancedParams m_advancedParameters;
@@ -166,8 +174,8 @@ private:
     QnIOPortDataList mergeIOSettings(const QnIOPortDataList& cameraIO, const QnIOPortDataList& savedIO);
     bool ioPortErrorOccured();
     void updateIOState(const QString& portId, bool isActive, qint64 timestamp, bool overrideIfExist);
-    bool startIOMonitor(Qn::IOPortType portType, IOMonitor& result);
-    void resetHttpClient(nx_http::AsyncHttpClientPtr& value);
+    bool startIOMonitorInternal(IOMonitor& ioMonitor);
+    IOMonitor* ioMonitorByHttpClient(nx_http::AsyncHttpClientPtr httpClient);
 
     /*!
         Convert port number to ID

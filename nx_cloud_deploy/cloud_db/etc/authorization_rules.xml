@@ -1,0 +1,244 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<sequence>
+    <set resName="secureSource" resValue="false"/>
+
+    <condition resName="socket.intf.ip">
+        <set value="127.0.0.1" resName="secureSource" resValue="true"/>
+        <set value="172.17.0.6" resName="secureSource" resValue="true"/>
+    </condition>
+    <condition resName="socket.remoteIP">
+        <set value="95.31.136.2" resName="secureSource" resValue="true"/>
+    </condition>
+
+    <condition resName="operation">
+
+        <sequence value="authentication">
+            <!-- TODO cloud modules authentication rules should be added here -->
+            <!-- TODO this section should be suitable for authentication by ip address and for password check -->
+            <set resName="authenticated" resValue="false"/>
+        
+            <condition resName="user.name">
+                <set value="connection_mediator" resName="user.password" resValue="123456"/>
+                <!-- <sequence value="connection_mediator">
+                    <set resName="user.realm" resValue="dwspectrum"/>
+                    <set resName="user.ha1" resValue="111111111111111"/>
+                </sequence> -->
+            </condition>
+            
+            <condition resName="request.path">
+                <set value="/cdb/account/reset_password" resName="authenticated" resValue="true"/>
+                <condition value="/cdb/maintenance/get_vms_connections" resName="secureSource">
+                    <set value="true" resName="authenticated" resValue="true"/>
+                </condition>
+                <condition value="/cdb/maintenance/get_transaction_log" resName="secureSource">
+                    <set value="true" resName="authenticated" resValue="true"/>
+                </condition>
+            </condition>
+        </sequence>
+
+        <sequence value="authorization">
+            <set resName="authorized" resValue="true"/>
+
+            <condition resName="account.status">
+                <sequence value="1">
+                    <!-- account not activated -->
+                    <set resName="authorized" resValue="false"/>
+                    <set resName="resultCode" resValue="accountNotActivated"/>
+                    <condition resName="request.path">
+                        <set value="/cdb/account/activate" resName="authorized" resValue="true"/>
+                        <!-- <set value="/cdb/account/get" resName="authorized" resValue="true"/> -->
+                    </condition>
+                </sequence>
+                <sequence value="3">
+                    <!-- account blocked -->
+                    <set resName="authorized" resValue="false"/>
+                    <set resName="resultCode" resValue="accountBlocked"/>
+                </sequence>
+            </condition>
+
+            <condition resName="authorized">
+                <!-- following section forbids authorization on some conditions -->
+                <condition value="true" resName="request.path">
+                    <sequence value="/cdb/account/register">
+                        <!--
+                        This request must be allowed for cloud portal only
+                        <set resName="authorized" resValue="false"/>
+                        -->
+                    </sequence>
+                    <sequence value="/cdb/account/activate">
+                        <!--
+                        This request must be allowed for cloud portal only
+                        <set resName="authorized" resValue="false"/>
+                        -->
+                    </sequence>
+                    <condition value="/cdb/system/get" resName="systemID" matchType="presence">
+                        <condition value="true" resName="auth.accountRightsOnSystem">
+                            <set value="none" resName="authorized" resValue="false"/>
+                        </condition>
+                    </condition>
+                    <condition value="/cdb/system/get_cloud_users" resName="systemID" matchType="presence">
+                        <sequence value="true">
+                            <!-- user list is allowed for account -->
+                            <set resName="authorized" resValue="false"/>
+                            <condition resName="auth.accountRightsOnSystem">
+                                <set value="owner" resName="authorized" resValue="true"/>
+                                <set value="cloudAdmin" resName="authorized" resValue="true"/>
+                                <set value="localAdmin" resName="authorized" resValue="true"/>
+                                <!-- TODO should maintenance be able to view all sharings? or, maybe, just other maintenance? -->
+                                <set value="maintenance" resName="authorized" resValue="true"/>
+                            </condition>
+                        </sequence>
+                        <condition value="false" resName="auth.systemID" matchType="presence">
+                            <set value="true" resName="authorized" resValue="true"/>
+                        </condition>
+                    </condition>
+                    <condition value="/cdb/system/get_access_role_list" resName="systemID" matchType="presence">
+                        <sequence value="false">
+                            <set resName="authorized" resValue="false"/>
+                            <set resName="resultCode" resValue="badRequest"/>
+                        </sequence>
+                        <sequence value="true">
+                            <set resName="authorized" resValue="false"/>
+                            <condition resName="auth.accountRightsOnSystem">
+                                <set value="owner" resName="authorized" resValue="true"/>
+                                <set value="cloudAdmin" resName="authorized" resValue="true"/>
+                                <set value="localAdmin" resName="authorized" resValue="true"/>
+                                <!-- TODO should maintenance be able to view all sharings? or, maybe, just other maintenance? -->
+                                <set value="maintenance" resName="authorized" resValue="true"/>
+                            </condition>
+                        </sequence>
+                    </condition>
+                    <sequence value="/cdb/system/share">
+                        <set resName="authorized" resValue="false"/>
+                        <condition resName="auth.accountRightsOnSystem">
+                            <set value="owner" resName="authorized" resValue="true"/>
+                            <sequence value="cloudAdmin">
+                                <set resName="authorized" resValue="true"/>
+                                <condition resName="systemAccessRole">
+                                    <!-- only system owner and integrator can share system to another integrator -->
+                                    <set value="maintenance" resName="authorized" resValue="false"/>
+                                </condition>
+                            </sequence>
+                            <sequence value="localAdmin">
+                                <set resName="authorized" resValue="true"/>
+                                <condition resName="systemAccessRole">
+                                    <!-- only system owner and integrator can share system to another integrator -->
+                                    <set value="maintenance" resName="authorized" resValue="false"/>
+                                </condition>
+                            </sequence>
+                            <condition value="maintenance" resName="systemAccessRole">
+                                <!-- integrator can share system being monitored to other integrator account -->
+                                <set value="maintenance" resName="authorized" resValue="true"/>
+                            </condition>
+                        </condition>
+                        <condition resName="data.accountRightsOnSystem">
+                            <!-- maintenance sharing can be self-removed or removed by another maintenance -->
+                            <sequence value="maintenance">
+                                <set resName="authorized" resValue="false"/>
+                                <condition resName="auth.accountRightsOnSystem">
+                                    <condition value="maintenance" resName="systemAccessRole">
+                                        <set value="none" resName="authorized" resValue="true"/>
+                                    </condition>
+                                </condition>
+                            </sequence>
+                        </condition>
+                        <condition resName="auth.selfAccountAccessRequested">
+                            <sequence value="true">
+                                <condition resName="systemAccessRole">
+                                    <sequence value="none">  <!-- sharing removal... -->
+                                        <!-- any account can remove non-owner sharing to itself -->
+                                        <set resName="authorized" resValue="true"/>
+                                        <condition resName="auth.accountRightsOnSystem">
+                                            <!-- cannot remove owner sharing -->
+                                            <set value="owner" resName="authorized" resValue="false"/>
+                                        </condition>
+                                    </sequence>
+                                </condition>
+                            </sequence>
+                        </condition>
+                        <condition resName="data.accountRightsOnSystem">
+                            <!-- owner sharing cannot be modified by anyone -->
+                            <set value="owner" resName="authorized" resValue="false"/>
+                        </condition>
+                        <condition resName="systemAccessRole">
+                            <!-- "owner" role cannot be assigned to anyone -->
+                            <set value="owner" resName="authorized" resValue="false"/>
+                        </condition>
+                    </sequence>
+                    <sequence value="/cdb/system/bind">
+                        <!-- check system is already bound -->
+                        <set resName="authorized" resValue="false"/>
+                        <condition resName="auth.accountEmail" matchType="presence">
+                            <set value="true" resName="authorized" resValue="true"/>
+                        </condition>
+                    </sequence>
+                    <sequence value="/cdb/system/unbind">
+                        <set resName="authorized" resValue="false"/>
+                        <condition resName="auth.accountRightsOnSystem">
+                            <set value="owner" resName="authorized" resValue="true"/>
+                        </condition>
+                        <condition resName="auth.selfSystemAccessRequested">
+                            <set value="owner" resName="authorized" resValue="true"/>
+                        </condition>
+                    </sequence>
+                    <sequence value="/cdb/auth/get_authentication">
+                        <set resName="authorized" resValue="false"/>
+                        <condition resName="auth.systemID" matchType="presence">
+                            <set value="true" resName="authorized" resValue="true"/>
+                        </condition>
+                    </sequence>
+                    <sequence value="/cdb/auth/get_nonce">
+                        <set resName="authorized" resValue="false"/>
+                        <condition resName="auth.systemID" matchType="presence">
+                            <set value="true" resName="authorized" resValue="true"/>
+                            <condition value="false" resName="auth.accountEmail" matchType="presence">
+                                <condition value="true" resName="systemID" matchType="presence">
+                                    <set value="true" resName="authorized" resValue="true"/>
+                                </condition>
+                            </condition>
+                        </condition>
+                    </sequence>
+                    <!-- only systems can receive events at the moment -->
+                    <condition value="/cdb/event/subscribe" resName="auth.systemID" matchType="presence">
+                        <set value="false" resName="authorized" resValue="false"/>
+                    </condition>
+                    <!-- only system can update self system name -->
+                    <sequence value="/cdb/system/update_system_name">
+                        <set resName="authorized" resValue="false"/>
+                        <condition value="/cdb/system/update_system_name" resName="auth.selfSystemAccessRequested">
+                            <set value="true" resName="authorized" resValue="true"/>
+                        </condition>
+                    </sequence>
+                    <condition value="/cdb/account/create_temporary_credentials" resName="auth.accountEmail" matchType="presence">
+                        <set value="false" resName="authorized" resValue="false"/>
+                    </condition>
+                    <sequence value="/cdb/maintenance/get_vms_connections">
+                        <set resName="authorized" resValue="false"/>
+                        <condition resName="secureSource">
+                            <set value="true" resName="authorized" resValue="true"/>
+                        </condition>
+                    </sequence>
+                    <sequence value="/cdb/maintenance/get_transaction_log">
+                        <set resName="authorized" resValue="false"/>
+                        <condition resName="secureSource">
+                            <set value="true" resName="authorized" resValue="true"/>
+                        </condition>
+                    </sequence>
+                </condition>
+            </condition>
+        </sequence>     <!-- authorization -->
+
+        <condition value="getTemporaryCredentialsParameters" resName="credentials.type">
+            <sequence value="short">
+                <set resName="credentials.expirationPeriod" resValue="60m"/>
+                <set resName="credentials.prolongationPeriod" resValue="10m"/>
+            </sequence>
+
+            <sequence value="long">
+                <set resName="credentials.expirationPeriod" resValue="30d"/>
+            </sequence>
+        </condition>
+
+    </condition>        <!-- operation -->
+</sequence>

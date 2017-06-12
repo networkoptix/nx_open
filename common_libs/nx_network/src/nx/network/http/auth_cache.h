@@ -11,7 +11,7 @@
 
 #include <nx/utils/singleton.h>
 
-#include "httptypes.h"
+#include "http_types.h"
 
 namespace nx_http {
 

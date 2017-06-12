@@ -2,6 +2,7 @@
 
 #include <string>
 
+#include "account_with_password.h"
 #include "data/account_data.h"
 #include "data/system_data.h"
 
@@ -14,7 +15,7 @@ class BusinessDataGenerator
 public:
     static std::string generateRandomEmailAddress();
 
-    static api::AccountData generateRandomAccount();
+    static AccountWithPassword generateRandomAccount();
 
     static data::SystemData generateRandomSystem(const api::AccountData& account);
 

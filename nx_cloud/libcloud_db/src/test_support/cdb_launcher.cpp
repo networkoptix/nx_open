@@ -13,10 +13,10 @@
 #include <nx/utils/random.h>
 #include <nx/utils/std/cpp14.h>
 #include <utils/common/app_info.h>
-#include <utils/common/sync_call.h>
+#include <nx/utils/sync_call.h>
 
 #include "business_data_generator.h"
-#include "cloud_db_process.h"
+#include "cloud_db_service.h"
 #include "managers/email_manager.h"
 
 namespace nx {
@@ -92,7 +92,7 @@ CdbLauncher::~CdbLauncher()
 
 bool CdbLauncher::waitUntilStarted()
 {
-    if (!utils::test::ModuleLauncher<CloudDBProcessPublic>::waitUntilStarted())
+    if (!utils::test::ModuleLauncher<CloudDbServicePublic>::waitUntilStarted())
         return false;
 
     const auto& httpEndpoints = moduleInstance()->impl()->httpEndpoints();
@@ -953,7 +953,7 @@ AccountWithPassword CdbLauncher::addActivatedAccount2()
     if (result != api::ResultCode::ok)
     {
         throw std::runtime_error(lm("Failed to add account. %1")
-            .str(api::toString(result)).toStdString());
+            .arg(api::toString(result)).toStdString());
     }
     return account;
 }
@@ -973,7 +973,7 @@ api::SystemData CdbLauncher::addRandomSystemToAccount(
     if (result != api::ResultCode::ok)
     {
         throw std::runtime_error(lm("Failed to bind system to account. %1")
-            .str(api::toString(result)).toStdString());
+            .arg(api::toString(result)).toStdString());
     }
     return system1;
 }
@@ -989,7 +989,7 @@ void CdbLauncher::shareSystemEx(
     if (result != api::ResultCode::ok)
     {
         throw std::runtime_error(lm("Failed to share system. %1")
-            .str(api::toString(result)).toStdString());
+            .arg(api::toString(result)).toStdString());
     }
 }
 
@@ -1004,7 +1004,7 @@ void CdbLauncher::shareSystemEx(
     if (result != api::ResultCode::ok)
     {
         throw std::runtime_error(lm("Failed to share system. %1")
-            .str(api::toString(result)).toStdString());
+            .arg(api::toString(result)).toStdString());
     }
 }
 
@@ -1035,7 +1035,7 @@ void CdbLauncher::setUserEnabledFlag(
     if (result != api::ResultCode::ok)
     {
         throw std::runtime_error(lm("Failed to get system sharing. %1")
-            .str(api::toString(result)).toStdString());
+            .arg(api::toString(result)).toStdString());
     }
 
     userData.isEnabled = isEnabled;
@@ -1044,7 +1044,7 @@ void CdbLauncher::setUserEnabledFlag(
     if (result != api::ResultCode::ok)
     {
         throw std::runtime_error(lm("Failed to share system. %1")
-            .str(api::toString(result)).toStdString());
+            .arg(api::toString(result)).toStdString());
     }
 }
 

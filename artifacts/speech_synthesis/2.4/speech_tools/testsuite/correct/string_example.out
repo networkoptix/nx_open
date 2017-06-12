@@ -1,0 +1,13 @@
+hello world
+stdio version hello world
+
+Yes, it contains a match for \(wow\|yey\|lo\)[^a-z]
+match was 'lo '
+ word was 'lo'
+
+processing 'http://www.cstr.ed.ac.uk/speech_tools'
+   gives 'protocol=http host=www.cstr.ed.ac.uk path=/speech_tools dummy=\6'
+
+start with "what if I don't like 'hello world'?"
+    quoted "'what if I don''t like ''hello world''?'"
+   unquoted "what if I don't like 'hello world'?"

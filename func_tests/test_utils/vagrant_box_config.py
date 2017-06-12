@@ -12,6 +12,7 @@ DEFAULT_PRIVATE_NET = '10.10.1/24'
 MEDIASERVER_LISTEN_PORT = 7001
 BOX_PROVISION_MEDIASERVER = 'box-provision-mediaserver.sh'
 MEDIASERVER_DIST_FNAME = 'mediaserver.deb'  # expected in vagrant dir
+SSH_PORT_OFFSET=2220
 
 
 class ConfigCommand(object):
@@ -68,11 +69,11 @@ def make_vbox_host_time_disabled_command():
 
 class BoxConfigFactory(object):
 
-    def __init__(self, company_name):
-        self._company_name = company_name
+    def __init__(self, customization_company_name):
+        self._customization_company_name = customization_company_name
 
     # ip_address may end with .0 (like 1.2.3.0); this will be treated as network address, and dhcp will be used for it
-    def __call__(self, name=None, install_server=True, provision_scripts=None,
+    def __call__(self, name=None, install_server=True, provision_scripts=None, must_be_recreated=False,
                  ip_address_list=None, required_file_list=None, sync_time=True):
         vm_commands = []
         vbox_commands = []
@@ -83,13 +84,18 @@ class BoxConfigFactory(object):
             vbox_commands += [make_vbox_host_time_disabled_command()]
         if install_server:
             vm_commands += [make_vm_provision_command(
-                BOX_PROVISION_MEDIASERVER, env=dict(COMPANY_NAME=quote(self._company_name)))]
+                BOX_PROVISION_MEDIASERVER, env=dict(COMPANY_NAME=quote(self._customization_company_name)))]
             required_file_list += ['{bin_dir}/' + MEDIASERVER_DIST_FNAME,
                                    '{test_dir}/test_utils/' + BOX_PROVISION_MEDIASERVER]
         for script in provision_scripts or []:
             vm_commands += [make_vm_provision_command(script)]
             required_file_list.append('{test_dir}/' + script)
-        return BoxConfig(name, ip_address_list, required_file_list, vm_commands, vbox_commands)
+        if install_server:
+            server_customization_company_name = self._customization_company_name
+        else:
+            server_customization_company_name = None
+        return BoxConfig(name, ip_address_list, required_file_list, server_customization_company_name,
+                         vm_commands, vbox_commands, must_be_recreated)
 
 
 class BoxConfig(object):
@@ -100,6 +106,7 @@ class BoxConfig(object):
             name=d['name'],
             ip_address_list=map(IPNetwork, d['ip_address_list']),
             required_file_list=d['required_file_list'],
+            server_customization_company_name=d['server_customization_company_name'],
             vm_commands=[ConfigCommand.from_dict(command) for command in d['vm_commands']],
             vbox_commands=[ConfigCommand.from_dict(command) for command in d['vbox_commands']],
             idx=d['idx'],
@@ -107,18 +114,20 @@ class BoxConfig(object):
             vm_port_base=d['vm_port_base'],
             )
 
-    def __init__(self, name, ip_address_list, required_file_list, vm_commands, vbox_commands,
+    def __init__(self, name, ip_address_list, required_file_list, server_customization_company_name,
+                 vm_commands, vbox_commands, must_be_recreated=False,
                  idx=None, vm_name_prefix=None, vm_port_base=None):
         assert is_list_inst(ip_address_list, IPNetwork), repr(ip_address_list)
         self.name = name
         self.ip_address_list = ip_address_list
         self.required_file_list = required_file_list
+        self.server_customization_company_name = server_customization_company_name  # None if server was not installed
         self.vm_commands = vm_commands
         self.vbox_commands = vbox_commands
         self.idx = idx
         self.vm_name_prefix = vm_name_prefix
         self.vm_port_base = vm_port_base
-        self.must_be_recreated = False  # this test requires fresh box
+        self.must_be_recreated = must_be_recreated  # this test requires fresh box
         self.is_allocated = False
 
     def __str__(self):
@@ -132,6 +141,7 @@ class BoxConfig(object):
             name=self.name,
             ip_address_list=map(str, self.ip_address_list),
             required_file_list=self.required_file_list,
+            server_customization_company_name=self.server_customization_company_name,
             vm_commands=[command.to_dict() for command in self.vm_commands],
             vbox_commands=[command.to_dict() for command in self.vbox_commands],
             idx=self.idx,
@@ -144,6 +154,7 @@ class BoxConfig(object):
             name=self.name,
             ip_address_list=self.ip_address_list,
             required_file_list=self.required_file_list,
+            server_customization_company_name=self.server_customization_company_name,
             vm_commands=self.vm_commands,
             vbox_commands=self.vbox_commands,
             idx=idx,
@@ -154,6 +165,7 @@ class BoxConfig(object):
     def matches(self, other):
         return (self.name == other.name
                 and self.ip_address_list == other.ip_address_list
+                and self.server_customization_company_name == other.server_customization_company_name
                 and sorted(self.required_file_list) == sorted(other.required_file_list)
                 and self.vm_commands == other.vm_commands
                 and self.vbox_commands == other.vbox_commands)
@@ -176,6 +188,10 @@ class BoxConfig(object):
     def rest_api_forwarded_port(self):
         return self.vm_port_base + self.idx
 
+    @property
+    def ssh_forwarded_port(self):
+        return self.vm_port_base + SSH_PORT_OFFSET + self.idx
+
     def expand(self, vbox_manage):
         network_vm_commands = [make_vm_config_internal_network_command(vbox_manage, ip_address)
                                for ip_address in self.ip_address_list]
@@ -184,6 +200,7 @@ class BoxConfig(object):
             vm_box_name=self.vm_box_name,
             rest_api_internal_port=MEDIASERVER_LISTEN_PORT,
             rest_api_forwarded_port=self.rest_api_forwarded_port,
+            ssh_forwarded_port=self.ssh_forwarded_port,
             vm_commands=map(self._expand_vm_command, network_vm_commands + self.vm_commands),
             vbox_commands=map(self._expand_vbox_command, self.vbox_commands),
             )
@@ -201,10 +218,11 @@ class BoxConfig(object):
 class ExpandedBoxConfig(object):
 
     def __init__(self, box_name, vm_box_name, rest_api_internal_port, rest_api_forwarded_port,
-                 vm_commands, vbox_commands):
+                 ssh_forwarded_port, vm_commands, vbox_commands):
         self.box_name = box_name
         self.vm_box_name = vm_box_name
         self.rest_api_internal_port = rest_api_internal_port
         self.rest_api_forwarded_port = rest_api_forwarded_port
+        self.ssh_forwarded_port = ssh_forwarded_port
         self.vm_commands = vm_commands
         self.vbox_commands = vbox_commands

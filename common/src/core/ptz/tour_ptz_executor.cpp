@@ -15,6 +15,7 @@
 #include "core/resource_management/resource_data_pool.h"
 #include "common/common_module.h"
 #include "core/resource/security_cam_resource.h"
+#include <common/static_common_module.h>
 
 #define QN_TOUR_PTZ_EXECUTOR_DEBUG
 #ifdef QN_TOUR_PTZ_EXECUTOR_DEBUG
@@ -44,7 +45,7 @@ typedef QList<QnPtzTourSpotData> QnPtzTourSpotDataList;
 
 struct QnPtzTourData {
     QnPtzTour tour;
-    
+
     Qn::PtzCoordinateSpace space;
     QnPtzTourSpotDataList spots;
 
@@ -55,7 +56,8 @@ struct QnPtzTourData {
 // -------------------------------------------------------------------------- //
 // QnTourPtzExecutorPrivate
 // -------------------------------------------------------------------------- //
-class QnTourPtzExecutorPrivate: public ConnectiveBase {
+class QnTourPtzExecutorPrivate: public ConnectiveBase
+{
 public:
     enum State {
         Stopped,
@@ -67,7 +69,7 @@ public:
     QnTourPtzExecutorPrivate();
     virtual ~QnTourPtzExecutorPrivate();
 
-    void init(const QnPtzControllerPtr &controller);
+    void init(const QnPtzControllerPtr &controller, QThreadPool* threadPool);
     void updateDefaults();
 
     void stopTour();
@@ -97,18 +99,18 @@ public:
     Qn::PtzCoordinateSpace defaultSpace;
     Qn::PtzDataField defaultDataField;
     Qn::PtzCommand defaultCommand;
-    
+
     QBasicTimer moveTimer;
     QBasicTimer waitTimer;
 
     QnPtzTourData data;
     int index;
     State state;
-    
+
     bool usingDefaultMoveTimer;
     bool needPositionUpdate;
     bool waitingForNewPosition;
-    
+
     QElapsedTimer spotTimer;
     QVector3D startPosition;
     QVector3D lastPosition;
@@ -118,7 +120,7 @@ public:
     bool canReadPosition;
 };
 
-QnTourPtzExecutorPrivate::QnTourPtzExecutorPrivate(): 
+QnTourPtzExecutorPrivate::QnTourPtzExecutorPrivate():
     q(nullptr),
     usingThreadController(false),
     usingBlockingController(false),
@@ -135,41 +137,42 @@ QnTourPtzExecutorPrivate::QnTourPtzExecutorPrivate():
 QnTourPtzExecutorPrivate::~QnTourPtzExecutorPrivate() {
     if(usingThreadController) {
         /* Base controller is owned both through a shared pointer and through
-         * a QObject hierarchy. To prevent double deletion, we have to release 
+         * a QObject hierarchy. To prevent double deletion, we have to release
          * QObject ownership. */
-        baseController->setParent(NULL); 
+        baseController->setParent(NULL);
     }
 }
 
-void QnTourPtzExecutorPrivate::init(const QnPtzControllerPtr &controller) {
-    baseController = controller; 
-    if(baseController->hasCapabilities(Qn::AsynchronousPtzCapability)) {
+void QnTourPtzExecutorPrivate::init(const QnPtzControllerPtr &controller, QThreadPool* threadPool)
+{
+    baseController = controller;
+    if(baseController->hasCapabilities(Ptz::AsynchronousPtzCapability)) {
         /* Just use it as is. */
-    } else if(baseController->hasCapabilities(Qn::VirtualPtzCapability)) {
+    } else if(baseController->hasCapabilities(Ptz::VirtualPtzCapability)) {
         usingBlockingController = true;
     } else {
-        baseController.reset(new QnThreadedPtzController(baseController));
+        baseController.reset(new QnThreadedPtzController(baseController, threadPool));
         usingThreadController = true;
 
         /* This call makes sure that thread controller lives in the same thread
          * as tour executor. Both need an event loop to function properly,
          * and tour executor can be moved between threads after construction. */
-        baseController->setParent(q); 
+        baseController->setParent(q);
     }
 
     connect(baseController, &QnAbstractPtzController::finished, q, &QnTourPtzExecutor::at_controller_finished);
-    QnResourceData resourceData = qnCommon->dataPool()->data(baseController->resource().dynamicCast<QnSecurityCamResource>());
+    QnResourceData resourceData = qnStaticCommon->dataPool()->data(baseController->resource().dynamicCast<QnSecurityCamResource>());
     tourGetPosWorkaround = resourceData.value<bool>(lit("tourGetPosWorkaround"), false);
 }
 
-void QnTourPtzExecutorPrivate::updateDefaults() 
+void QnTourPtzExecutorPrivate::updateDefaults()
 {
-    defaultSpace = baseController->hasCapabilities(Qn::LogicalPositioningPtzCapability) ? Qn::LogicalPtzCoordinateSpace : Qn::DevicePtzCoordinateSpace;
+    defaultSpace = baseController->hasCapabilities(Ptz::LogicalPositioningPtzCapability) ? Qn::LogicalPtzCoordinateSpace : Qn::DevicePtzCoordinateSpace;
     defaultDataField = defaultSpace == Qn::LogicalPtzCoordinateSpace ? Qn::LogicalPositionPtzField : Qn::DevicePositionPtzField;
     defaultCommand = defaultSpace == Qn::LogicalPtzCoordinateSpace ? Qn::GetLogicalPositionPtzCommand : Qn::GetDevicePositionPtzCommand;
 
-    canReadPosition = baseController->hasCapabilities(Qn::DevicePositioningPtzCapability) ||
-                      baseController->hasCapabilities(Qn::LogicalPositioningPtzCapability);
+    canReadPosition = baseController->hasCapabilities(Ptz::DevicePositioningPtzCapability) ||
+                      baseController->hasCapabilities(Ptz::LogicalPositioningPtzCapability);
 }
 
 void QnTourPtzExecutorPrivate::stopTour() {
@@ -190,10 +193,10 @@ void QnTourPtzExecutorPrivate::startTour(const QnPtzTour &tour) {
     data.tour.optimize();
     data.space = defaultSpace;
     qnResizeList(data.spots, data.size());
-    
-    /* Capabilities of the underlying controller may have changed, 
+
+    /* Capabilities of the underlying controller may have changed,
      * and we don't listen to changes, so defaults must be updated. */
-    updateDefaults(); 
+    updateDefaults();
 
     startMoving();
 }
@@ -204,7 +207,7 @@ void QnTourPtzExecutorPrivate::startMoving() {
         state = Entering;
         lastPosition = qQNaN<QVector3D>();
         lastPositionRequestTime = 0;
-        
+
         startPosition = qQNaN<QVector3D>();
     } else if(state == Waiting) {
         index = (index + 1) % data.size();
@@ -263,7 +266,7 @@ void QnTourPtzExecutorPrivate::processMoving(bool status, const QVector3D &posit
         if(state == Moving) {
             QnPtzTourSpotData &spotData = currentSpotData();
             spotData.moveTime = lastPositionRequestTime;
-            if (tourGetPosWorkaround && !qFuzzyEquals(spotData.position, lastPosition)) 
+            if (tourGetPosWorkaround && !qFuzzyEquals(spotData.position, lastPosition))
                 spotData.moveTime += pingTimeout; // workaround for VIVOTEK SD8363E camera. It stops after getPosition call. So, increase getPosition timeout if we detect that camera changes position.
             spotData.position = lastPosition;
         }
@@ -313,7 +316,7 @@ void QnTourPtzExecutorPrivate::activateCurrentSpot() {
     baseController->activatePreset(spot.presetId, spot.speed);
 }
 
-void QnTourPtzExecutorPrivate::requestPosition() 
+void QnTourPtzExecutorPrivate::requestPosition()
 {
     if (!canReadPosition)
         return;
@@ -342,7 +345,7 @@ bool QnTourPtzExecutorPrivate::handleTimer(int timerId) {
     }
 }
 
-void QnTourPtzExecutorPrivate::handleFinished(Qn::PtzCommand command, const QVariant &data) 
+void QnTourPtzExecutorPrivate::handleFinished(Qn::PtzCommand command, const QVariant &data)
 {
     if (!canReadPosition && command == Qn::ActivatePresetPtzCommand) {
         moveTimer.stop();
@@ -356,11 +359,11 @@ void QnTourPtzExecutorPrivate::handleFinished(Qn::PtzCommand command, const QVar
 // -------------------------------------------------------------------------- //
 // QnTourPtzExecutor
 // -------------------------------------------------------------------------- //
-QnTourPtzExecutor::QnTourPtzExecutor(const QnPtzControllerPtr &controller):
+QnTourPtzExecutor::QnTourPtzExecutor(const QnPtzControllerPtr &controller, QThreadPool* threadPool):
     d(new QnTourPtzExecutorPrivate())
 {
     d->q = this;
-    d->init(controller);
+    d->init(controller, threadPool);
 
     connect(this, &QnTourPtzExecutor::startTourRequested,       this,   &QnTourPtzExecutor::at_startTourRequested,  Qt::QueuedConnection);
     connect(this, &QnTourPtzExecutor::stopTourRequested,        this,   &QnTourPtzExecutor::at_stopTourRequested,   Qt::QueuedConnection);
@@ -369,7 +372,7 @@ QnTourPtzExecutor::QnTourPtzExecutor(const QnPtzControllerPtr &controller):
 
 QnTourPtzExecutor::~QnTourPtzExecutor() {
     /* If this object is run in a separate thread, then it must be deleted with deleteLater(). */
-    NX_ASSERT(QThread::currentThread() == thread()); 
+    NX_ASSERT(QThread::currentThread() == thread());
 }
 
 void QnTourPtzExecutor::startTour(const QnPtzTour &tour) {

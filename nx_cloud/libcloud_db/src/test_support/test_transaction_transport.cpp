@@ -16,6 +16,7 @@ TransactionTransport::TransactionTransport(
     int connectionId)
 :
     ec2::QnTransactionTransportBase(
+        QnUuid(), //< localSystemId. Not used here
         connectionGuardSharedState,
         std::move(localPeer),
         kTcpKeepAliveTimeout,

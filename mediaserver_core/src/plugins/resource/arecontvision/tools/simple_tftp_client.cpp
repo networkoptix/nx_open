@@ -7,7 +7,7 @@
 #include <nx/network/socket.h>
 #include <nx/utils/log/log.h>
 #include <utils/common/byte_array.h>
-#include <utils/common/systemerror.h>
+#include <nx/utils/system_error.h>
 #include <nx/streaming/abstract_stream_data_provider.h>
 
 using namespace std;

@@ -28,15 +28,15 @@ static const int PRIMARY_ENCODER_INDEX = 0;
 static const int SECONDARY_ENCODER_INDEX = 1;
 
 
-class QnSecurityCamResource : public QnNetworkResource, public QnMediaResource {
+class QnSecurityCamResource : public QnNetworkResource, public QnMediaResource
+{
     typedef QnNetworkResource base_type;
     Q_OBJECT
-
 public:
     static QnUuid makeCameraIdFromUniqueId(const QString& uniqueId);
 
 public:
-    QnSecurityCamResource();
+    QnSecurityCamResource(QnCommonModule* commonModule = nullptr);
     virtual ~QnSecurityCamResource();
 
     QnMediaServerResourcePtr getParentServer() const;
@@ -64,7 +64,8 @@ public:
 
     virtual int reservedSecondStreamFps() const;
 
-    virtual void setIframeDistance(int frames, int timems) = 0; // sets the distance between I frames
+    /** sets the distance between I frames */
+    virtual void setIframeDistance(int /*frames*/, int /*timems*/) {}
 
     void setDataProviderFactory(QnDataProviderFactory* dpFactory);
 
@@ -276,6 +277,7 @@ public:
     virtual QnAudioTransmitterPtr getAudioTransmitter();
 #endif
 
+    bool isEnoughFpsToRunSecondStream(int currentFps) const;
 public slots:
     virtual void inputPortListenerAttached();
     virtual void inputPortListenerDetached();
@@ -353,7 +355,6 @@ private:
     QString m_groupName;
     QString m_groupId;
     Qn::CameraStatusFlags m_statusFlags;
-    bool m_advancedWorking;
     bool m_manuallyAdded;
     QString m_model;
     QString m_vendor;

@@ -14,7 +14,7 @@
 #include <nx/network/cloud/data/connection_ack_data.h>
 #include <nx/network/cloud/data/connection_result_data.h>
 #include <nx/network/cloud/data/result_code.h>
-#include <utils/common/stoppable.h>
+#include <nx/utils/thread/stoppable.h>
 
 #include "listening_peer_pool.h"
 #include "statistics/connection_statistics_info.h"
@@ -35,7 +35,7 @@ class Settings;
 class UDPHolePunchingConnectionInitiationFsm:
     public network::aio::BasicPollable
 {
-    using Parent = network::aio::BasicPollable;
+    using base_type = network::aio::BasicPollable;
 
 public:
     /** 
@@ -73,7 +73,7 @@ private:
         waitingServerPeerUDPAddress,
         /** reported server's UDP address to the client, waiting for result */
         waitingConnectionResult,
-        fini
+        fini,
     };
 
     State m_state;

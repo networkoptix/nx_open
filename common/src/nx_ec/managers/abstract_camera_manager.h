@@ -2,6 +2,7 @@
 
 #include <nx_ec/ec_api_fwd.h>
 #include <nx_ec/data/api_camera_data.h>
+#include <nx_ec/data/api_camera_data_ex.h>
 #include <nx_ec/data/api_camera_history_data.h>
 #include <nx_ec/data/api_camera_attributes_data.h>
 #include <nx_ec/impl/ec_api_impl.h>
@@ -51,6 +52,13 @@ typedef std::shared_ptr<AbstractCameraNotificationManager> AbstractCameraNotific
             }, cameraList);
         }
 
+        ErrorCode getCamerasExSync(ec2::ApiCameraDataExList* const cameraList)
+        {
+            return impl::doSyncCall<impl::GetCamerasExHandler>([this](impl::GetCamerasExHandlerPtr handler)
+            {
+                this->getCamerasEx(handler);
+            }, cameraList);
+        }
 
         /*!
         \param handler Functor with params: (ErrorCode)
@@ -172,6 +180,7 @@ typedef std::shared_ptr<AbstractCameraNotificationManager> AbstractCameraNotific
 
     protected:
         virtual int getCameras(impl::GetCamerasHandlerPtr handler) = 0;
+        virtual int getCamerasEx(impl::GetCamerasExHandlerPtr handler) = 0;
         virtual int addCamera(const ec2::ApiCameraData& camera, impl::SimpleHandlerPtr handler) = 0;
         virtual int save(const ec2::ApiCameraDataList& cameras, impl::SimpleHandlerPtr handler) = 0;
         virtual int remove(const QnUuid& id, impl::SimpleHandlerPtr handler) = 0;

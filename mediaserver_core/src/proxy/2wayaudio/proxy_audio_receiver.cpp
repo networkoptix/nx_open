@@ -133,9 +133,11 @@ private:
 typedef QSharedPointer<QnProxyDesktopDataProvider> QnProxyDesktopDataProviderPtr;
 
 
-QnAudioProxyReceiver::QnAudioProxyReceiver(QSharedPointer<AbstractStreamSocket> socket,
-                                                     QnHttpConnectionListener* owner):
-    QnTCPConnectionProcessor(new QnAudioProxyReceiverPrivate, socket)
+QnAudioProxyReceiver::QnAudioProxyReceiver(
+    QSharedPointer<AbstractStreamSocket> socket,
+    QnHttpConnectionListener* owner)
+:
+    QnTCPConnectionProcessor(new QnAudioProxyReceiverPrivate, socket, owner)
 {
     Q_D(QnAudioProxyReceiver);
     setObjectName( lit("QnAudioProxyReceiver") );

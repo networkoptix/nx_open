@@ -14,7 +14,7 @@
 #include <QtCore/QUrlQuery>
 
 #include <api/app_server_connection.h>
-#include <utils/common/concurrent.h>
+#include <nx/utils/concurrent.h>
 #include <nx/fusion/model_functions.h>
 #include <utils/common/scoped_thread_rollback.h>
 #include <nx/network/http/asynchttpclient.h>
@@ -25,8 +25,9 @@
 #include "transaction/json_transaction_serializer.h"
 #include "transaction/transaction.h"
 #include "nx/fusion/serialization/ubjson.h"
-#include "http/custom_headers.h"
+#include <nx/network/http/custom_headers.h>
 #include "api/model/audit/auth_session.h"
+#include <common/common_module.h>
 
 namespace {
     Qn::SerializationFormat serializationFormatFromUrl(const QUrl &url, Qn::SerializationFormat defaultFormat = Qn::UbjsonFormat)
@@ -37,16 +38,6 @@ namespace {
             format = QnLexical::deserialized(formatString, defaultFormat);
         return format;
     }
-
-    void addCustomHeaders(const nx_http::AsyncHttpClientPtr& httpClient)
-    {
-        //TODO #ak videowall looks strange here
-        if (!QnAppServerConnectionFactory::videowallGuid().isNull())
-            httpClient->addAdditionalHeader(Qn::VIDEOWALL_GUID_HEADER_NAME, QnAppServerConnectionFactory::videowallGuid().toString().toUtf8());
-        httpClient->addAdditionalHeader(Qn::EC2_RUNTIME_GUID_HEADER_NAME, qnCommon->runningInstanceGUID().toByteArray());
-        httpClient->addAdditionalHeader(Qn::CUSTOM_CHANGE_REALM_HEADER_NAME, QByteArray()); //< allow to update realm if migration
-    }
-
 } // anonymous namespace
 
 namespace ec2
@@ -54,13 +45,16 @@ namespace ec2
     static const size_t RESPONSE_WAIT_TIMEOUT_MS = 30*1000;
     static const size_t TCP_CONNECT_TIMEOUT_MS = 10*1000;
 
-    class ClientQueryProcessor
-    :
-        public QObject
+    class ClientQueryProcessor: public QObject, public QnCommonModuleAware
     {
         Q_OBJECT
-
     public:
+
+        ClientQueryProcessor(QnCommonModule* commonModule):
+            QnCommonModuleAware(commonModule)
+        {
+        }
+
         virtual ~ClientQueryProcessor()
         {
             pleaseStopSync();
@@ -256,6 +250,14 @@ namespace ec2
                 default:
                     return handler( ErrorCode::serverError );
             }
+        }
+    private:
+        void addCustomHeaders(const nx_http::AsyncHttpClientPtr& httpClient)
+        {
+            if (!commonModule()->videowallGuid().isNull())
+                httpClient->addAdditionalHeader(Qn::VIDEOWALL_GUID_HEADER_NAME, commonModule()->videowallGuid().toString().toUtf8());
+            httpClient->addAdditionalHeader(Qn::EC2_RUNTIME_GUID_HEADER_NAME, commonModule()->runningInstanceGUID().toByteArray());
+            httpClient->addAdditionalHeader(Qn::CUSTOM_CHANGE_REALM_HEADER_NAME, QByteArray()); //< allow to update realm if migration
         }
     };
 }

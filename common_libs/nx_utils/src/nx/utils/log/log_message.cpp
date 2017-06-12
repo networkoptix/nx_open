@@ -1,80 +1,71 @@
 #include "log_message.h"
 
-constexpr wchar_t QnLogMessage::kSpace;
+namespace nx {
+namespace utils {
+namespace log {
 
-QnLogMessage::QnLogMessage()
-{
-}
+const QChar Message::kSpace = QLatin1Char(' ');
 
-QnLogMessage::QnLogMessage(const char* text)
-:
-    m_str(QString::fromLatin1(text))
-{
-}
-
-QnLogMessage::QnLogMessage(const QString& text)
-:
+Message::Message(const QString& text):
     m_str(text)
 {
 }
 
-QnLogMessage::QnLogMessage(const QByteArray& text)
-:
+Message::Message(const char* text):
     m_str(QString::fromLatin1(text))
 {
 }
 
-QnLogMessage QnLogMessage::arg(const QByteArray& a, int fieldWidth, wchar_t fillChar) const
+Message::Message(const QByteArray& text):
+    m_str(QString::fromUtf8(text))
 {
-    return m_str.arg(QString::fromLatin1(a), fieldWidth, fillChar);
 }
 
-QnLogMessage QnLogMessage::arg(const std::string& a, int fieldWidth, wchar_t fillChar) const
+Message	Message::arg(int value, int width, int base, const QChar& fill) const
 {
-    return m_str.arg(QString::fromStdString(a), fieldWidth, fillChar);
+    return m_str.arg(value, width, base, fill);
 }
 
-QnLogMessage QnLogMessage::arg(const char* str, int fieldWidth, wchar_t fillChar) const
+Message	Message::arg(uint value, int width, int base, const QChar& fill) const
 {
-    return m_str.arg(QString::fromUtf8(str), fieldWidth, fillChar);
+    return m_str.arg(value, width, base, fill);
 }
 
-QnLogMessage QnLogMessage::arg(const wchar_t* str, int fieldWidth, wchar_t fillChar) const
+Message	Message::arg(long value, int width, int base, const QChar& fill) const
 {
-    return m_str.arg(QString::fromWCharArray(str), fieldWidth, fillChar);
+    return m_str.arg(value, width, base, fill);
 }
 
-QnLogMessage QnLogMessage::arg(const QnUuid& a, int fieldWidth, wchar_t fillChar) const
+Message	Message::arg(ulong value, int width, int base, const QChar& fill) const
 {
-    return m_str.arg(a.toString(), fieldWidth, fillChar);
+    return m_str.arg(value, width, base, fill);
 }
 
-QnLogMessage QnLogMessage::arg(const QUrl& a, int fieldWidth, wchar_t fillChar) const
+Message	Message::arg(qlonglong value, int width, int base, const QChar& fill) const
 {
-    return m_str.arg(toString(a), fieldWidth, fillChar);
+    return m_str.arg(value, width, base, fill);
 }
 
-QnLogMessage QnLogMessage::arg(std::chrono::seconds a, int fieldWidth, wchar_t fillChar) const
+Message	Message::arg(qulonglong value, int width, int base, const QChar& fill) const
 {
-    return m_str.arg(QString::fromLatin1("%1s").arg(a.count()), fieldWidth, fillChar);
+    return m_str.arg(value, width, base, fill);
 }
 
-QnLogMessage QnLogMessage::arg(std::chrono::milliseconds a, int fieldWidth, wchar_t fillChar) const
+Message	Message::arg(short value, int width, int base, const QChar& fill) const
 {
-    return m_str.arg(QString::fromLatin1("%1ms").arg(a.count()), fieldWidth, fillChar);
+    return m_str.arg(value, width, base, fill);
 }
 
-QnLogMessage QnLogMessage::arg(std::chrono::microseconds a, int fieldWidth, wchar_t fillChar) const
+Message	Message::arg(ushort value, int width, int base, const QChar& fill) const
 {
-    return m_str.arg(QString::fromLatin1("%1usec").arg(a.count()), fieldWidth, fillChar);
+    return m_str.arg(value, width, base, fill);
 }
 
-QnLogMessage::operator QString() const
+Message	Message::arg(double value, int width, char format, int precision, const QChar& fill) const
 {
-    return m_str;
+    return m_str.arg(value, width, format, precision, fill);
 }
 
-std::string QnLogMessage::toStdString() const
-{
-    return m_str.toStdString();
-}
+} // namespace log
+} // namespace utils
+} // namespace nx

@@ -6,9 +6,8 @@
 
 #include <nx/fusion/serialization/lexical.h>
 #include <nx/utils/log/log.h>
+#include <nx/utils/scope_guard.h>
 #include <nx/utils/std/cpp14.h>
-
-#include <utils/common/guard.h>
 
 namespace nx {
 namespace db {
@@ -69,7 +68,7 @@ void DbRequestExecutionThread::queryExecutionThreadMain()
 {
     constexpr const std::chrono::milliseconds kTaskWaitTimeout = std::chrono::seconds(1);
 
-    auto invokeOnClosedHandlerGuard = makeScopedGuard(
+    auto invokeOnClosedHandlerGuard = makeScopeGuard(
         [onClosedHandler = std::move(m_onClosedHandler)]()
         {
             if (onClosedHandler)
@@ -124,18 +123,24 @@ void DbRequestExecutionThread::processTask(std::unique_ptr<AbstractExecutor> tas
 
         default:
         {
-            NX_LOGX(lit("DB query failed with error %1. Db text %2")
-                .arg(QnLexical::serialized(result)).arg(m_dbConnectionHolder.dbConnection()->lastError().text()),
-                cl_logWARNING);
             ++m_numberOfFailedRequestsInARow;
-            if (!isDbErrorRecoverable(result))
+            if (isDbErrorRecoverable(result))
+            {
+                NX_LOGX(lit("DB query failed with result code %1. Db text %2")
+                    .arg(QnLexical::serialized(result))
+                    .arg(m_dbConnectionHolder.dbConnection()->lastError().text()),
+                    cl_logDEBUG1);
+            }
+            else
             {
                 NX_LOGX(lit("Dropping DB connection due to unrecoverable error %1. Db text %2")
-                    .arg(QnLexical::serialized(result)).arg(m_dbConnectionHolder.dbConnection()->lastError().text()),
+                    .arg(QnLexical::serialized(result))
+                    .arg(m_dbConnectionHolder.dbConnection()->lastError().text()),
                     cl_logWARNING);
                 closeConnection();
                 break;
             }
+
             if (m_numberOfFailedRequestsInARow >= 
                 connectionOptions().maxErrorsInARowBeforeClosingConnection)
             {

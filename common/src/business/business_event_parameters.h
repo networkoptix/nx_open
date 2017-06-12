@@ -15,29 +15,16 @@ struct QnEventMetaData
      */
     std::vector<QnUuid> cameraRefs;
 
-    QnEventMetaData() {}
+    //! Users that can generate this event. Empty == any user
+    std::vector<QnUuid> instigators;
 
-    QnEventMetaData(const QnEventMetaData& right): cameraRefs(right.cameraRefs) {}
-
-    QnEventMetaData(QnEventMetaData&& right): cameraRefs(std::move(right.cameraRefs)) {}
-
-    QnEventMetaData& operator=(const QnEventMetaData& right)
-    {
-        if (&right == this)
-            return *this;
-        cameraRefs = right.cameraRefs;
-        return *this;
-    }
-
-    QnEventMetaData& operator=(QnEventMetaData&& right)
-    {
-        if (&right == this)
-            return *this;
-        cameraRefs = std::move(right.cameraRefs);
-        return *this;
-    }
+    QnEventMetaData() = default;
+    QnEventMetaData(const QnEventMetaData&) = default;
+    QnEventMetaData(QnEventMetaData&&) = default;
+    QnEventMetaData& operator= (const QnEventMetaData&) = default;
+    QnEventMetaData& operator= (QnEventMetaData&&) = default;
 };
-#define QnEventMetaData_Fields (cameraRefs)
+#define QnEventMetaData_Fields (cameraRefs)(instigators)
 QN_FUSION_DECLARE_FUNCTIONS(QnEventMetaData, (ubjson)(json)(eq)(xml)(csv_record));
 
 struct QnBusinessEventParameters

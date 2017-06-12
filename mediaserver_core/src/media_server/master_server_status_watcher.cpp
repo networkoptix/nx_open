@@ -7,22 +7,24 @@ namespace {
     static const int kUpdateMasterFlagTimeoutMs = 1000 * 30;
 }
 
-QnMasterServerStatusWatcher::QnMasterServerStatusWatcher()
+QnMasterServerStatusWatcher::QnMasterServerStatusWatcher(QObject* parent):
+    QObject(parent),
+    QnCommonModuleAware(parent)
 {
-    connect(qnResPool, &QnResourcePool::resourceAdded, this,
+    connect(resourcePool(), &QnResourcePool::resourceAdded, this,
         [this](const QnResourcePtr& resource)
         {
             auto server = resource.dynamicCast<QnMediaServerResource>();
-            if (server && resource->getId() == qnCommon->moduleGUID())
+            if (server && resource->getId() == commonModule()->moduleGUID())
             {
                 connect(server.data(), &QnMediaServerResource::serverFlagsChanged, this, &QnMasterServerStatusWatcher::at_updateMasterFlag);
                 at_updateMasterFlag();
             }
         });
 
-    connect(QnRuntimeInfoManager::instance(), &QnRuntimeInfoManager::runtimeInfoAdded, this, &QnMasterServerStatusWatcher::at_updateMasterFlag, Qt::QueuedConnection);
-    connect(QnRuntimeInfoManager::instance(), &QnRuntimeInfoManager::runtimeInfoChanged, this, &QnMasterServerStatusWatcher::at_updateMasterFlag, Qt::QueuedConnection);
-    connect(QnRuntimeInfoManager::instance(), &QnRuntimeInfoManager::runtimeInfoRemoved, this, &QnMasterServerStatusWatcher::at_updateMasterFlag, Qt::QueuedConnection);
+    connect(runtimeInfoManager(), &QnRuntimeInfoManager::runtimeInfoAdded, this, &QnMasterServerStatusWatcher::at_updateMasterFlag, Qt::QueuedConnection);
+    connect(runtimeInfoManager(), &QnRuntimeInfoManager::runtimeInfoChanged, this, &QnMasterServerStatusWatcher::at_updateMasterFlag, Qt::QueuedConnection);
+    connect(runtimeInfoManager(), &QnRuntimeInfoManager::runtimeInfoRemoved, this, &QnMasterServerStatusWatcher::at_updateMasterFlag, Qt::QueuedConnection);
     connect(&m_timer, &QTimer::timeout, this, [this]() { setMasterFlag(true); } );
     m_timer.setSingleShot(true);
     m_timer.setInterval(kUpdateMasterFlagTimeoutMs);
@@ -30,21 +32,21 @@ QnMasterServerStatusWatcher::QnMasterServerStatusWatcher()
 
 bool QnMasterServerStatusWatcher::localPeerCanBeMaster() const
 {
-    auto mServer = qnResPool->getResourceById<QnMediaServerResource>(qnCommon->moduleGUID());
+    auto mServer = resourcePool()->getResourceById<QnMediaServerResource>(commonModule()->moduleGUID());
     return mServer && mServer->getServerFlags().testFlag(Qn::SF_HasPublicIP);
 }
 
 void QnMasterServerStatusWatcher::at_updateMasterFlag()
 {
-    auto items = QnRuntimeInfoManager::instance()->items()->getItems();
+    auto items = runtimeInfoManager()->items()->getItems();
     bool hasBetterMaster = std::any_of(items.begin(), items.end(),
         [this](const QnPeerRuntimeInfo& item)
     {
-        return item.data.peer.id < qnCommon->moduleGUID() &&
+        return item.data.peer.id < commonModule()->moduleGUID() &&
                item.data.flags.testFlag(ec2::RF_MasterCloudSync);
     });
 
-    QnPeerRuntimeInfo localInfo = QnRuntimeInfoManager::instance()->localInfo();
+    QnPeerRuntimeInfo localInfo = runtimeInfoManager()->localInfo();
     bool isLocalMaster = localInfo.data.flags.testFlag(ec2::RF_MasterCloudSync);
     bool canBeMaster = localPeerCanBeMaster() && !hasBetterMaster;
     if (!canBeMaster && isLocalMaster)
@@ -61,10 +63,10 @@ void QnMasterServerStatusWatcher::at_updateMasterFlag()
 
 void QnMasterServerStatusWatcher::setMasterFlag(bool value)
 {
-    QnPeerRuntimeInfo localInfo = QnRuntimeInfoManager::instance()->localInfo();
+    QnPeerRuntimeInfo localInfo = runtimeInfoManager()->localInfo();
     if (value)
         localInfo.data.flags |= ec2::RF_MasterCloudSync;
     else
         localInfo.data.flags &= ~ec2::RF_MasterCloudSync;
-    QnRuntimeInfoManager::instance()->updateLocalItem(localInfo);
+    runtimeInfoManager()->updateLocalItem(localInfo);
 }

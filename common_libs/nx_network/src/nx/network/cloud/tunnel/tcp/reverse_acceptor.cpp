@@ -129,7 +129,7 @@ ReverseAcceptor::NxRcHandler::NxRcHandler(ReverseAcceptor* acceptor):
 
 void ReverseAcceptor::NxRcHandler::processRequest(
     nx_http::HttpServerConnection* const connection,
-    stree::ResourceContainer,
+    nx::utils::stree::ResourceContainer,
     nx_http::Request request,
     nx_http::Response* const response,
     nx_http::RequestProcessedHandler handler)
@@ -161,10 +161,7 @@ void ReverseAcceptor::NxRcHandler::processRequest(
         });
 
     m_acceptor->fillNxRcHeaders(&response->headers);
-    handler(
-        nx_http::RequestResult(
-            nx_http::StatusCode::upgrade,
-            std::make_unique<nx_http::EmptyMessageBodySource>(nx::String(), boost::none)));
+    handler(nx_http::StatusCode::switchingProtocols);
 }
 
 } // namespace tcp

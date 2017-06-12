@@ -3,7 +3,10 @@
 #include <QtCore/QCoreApplication>
 
 #include "plugins/storage/file_storage/qtfile_storage_resource.h"
+
 #include "common/common_module.h"
+#include <common/static_common_module.h>
+
 #include "utils/common/synctime.h"
 #include "core/resource_management/status_dictionary.h"
 #include "core/resource/resource_fwd.h"
@@ -13,6 +16,8 @@
 #include "core/resource/storage_plugin_factory.h"
 
 #include "camera_pool.h"
+
+#include <utils/media/ffmpeg_initializer.h>
 
 extern "C"
 {
@@ -29,13 +34,6 @@ QString doUnquote(const QString& fileName)
     if (rez.endsWith("\"") || rez.endsWith("'"))
         rez = rez.left(rez.length()-1);
     return rez;
-}
-
-void ffmpegInit()
-{
-    av_register_all();
-
-    QnStoragePluginFactory::instance()->registerStoragePlugin("file", QnQtFileStorageResource::instance, true);
 }
 
 QStringList checkFileNames(const QString& fileNames)
@@ -55,7 +53,7 @@ void showUsage(char* exeName)
     qDebug() << "usage:";
     qDebug() << "testCamera [options] <cameraSet1> <cameraSet2> ... <cameraSetN>";
     qDebug() << "where <cameraSetN> is camera(s) param with ';' delimiter";
-    qDebug() << "count=N"; 
+    qDebug() << "count=N";
     qDebug() << "files=\"<fileName>[,<fileName>...]\" - for primary stream";
     qDebug() << "secondary-files=\"<fileName>[,<fileName>...]\" - for low quality stream";
     qDebug() << "[offline=0..100] (optional, default value 0 - no offline)";
@@ -76,17 +74,9 @@ int main(int argc, char *argv[])
     QCoreApplication::setApplicationVersion(QnAppInfo::applicationVersion());
 
 
-    ffmpegInit();
 
     // Each user may have it's own traytool running.
     QCoreApplication app(argc, argv);
-
-    QnCommonModule common;
-    QnSyncTime syncTime;
-
-    new QnLongRunnablePool();
-
-    //QDir::setCurrent(QFileInfo(QFile::decodeName(argv[0])).absolutePath());
 
     qDebug() << qApp->applicationName() << "version" << qApp->applicationVersion();
 
@@ -95,6 +85,15 @@ int main(int argc, char *argv[])
         showUsage(argv[0]);
         return 1;
     }
+
+    QnStaticCommonModule staticCommon(Qn::PT_NotDefined, QString(), QString());
+    QnCommonModule common(true);
+
+    common.instance<QnFfmpegInitializer>();
+    common.instance<QnLongRunnablePool>();
+    QnStoragePluginFactory::instance()->registerStoragePlugin("file",
+        QnQtFileStorageResource::instance, true);
+
 
     bool cameraForEachFile = false;
     QStringList localInterfacesToListen;
@@ -118,11 +117,8 @@ int main(int argc, char *argv[])
         }
     }
 
-    QnCameraPool::initGlobalInstance( new QnCameraPool( localInterfacesToListen ) );
+    QnCameraPool::initGlobalInstance(new QnCameraPool(localInterfacesToListen, &common));
     QnCameraPool::instance()->start();
-    QnResourceStatusDictionary statusDictionary;
-    QnResourcePropertyDictionary dictionary;
-    std::unique_ptr<QnCameraUserAttributePool> cameraUserAttributePool( new QnCameraUserAttributePool() );
     for (int i = 1; i < argc; ++i)
     {
         QString param = argv[i];

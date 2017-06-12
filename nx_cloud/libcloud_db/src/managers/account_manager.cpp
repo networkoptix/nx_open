@@ -16,7 +16,7 @@
 #include <nx/utils/log/log.h>
 #include <nx/utils/time.h>
 #include <utils/common/app_info.h>
-#include <utils/common/guard.h>
+#include <nx/utils/scope_guard.h>
 
 #include "access_control/authentication_manager.h"
 #include "email_manager.h"
@@ -34,7 +34,7 @@ AccountManager::AccountManager(
     const StreeManager& streeManager,
     TemporaryAccountPasswordManager* const tempPasswordManager,
     nx::db::AsyncSqlQueryExecutor* const dbManager,
-    AbstractEmailManager* const emailManager) throw(std::runtime_error)
+    AbstractEmailManager* const emailManager) noexcept(false)
 :
     m_settings(settings),
     m_streeManager(streeManager),
@@ -56,8 +56,8 @@ AccountManager::~AccountManager()
 void AccountManager::authenticateByName(
     const nx_http::StringType& username,
     std::function<bool(const nx::Buffer&)> validateHa1Func,
-    const stree::AbstractResourceReader& authSearchInputData,
-    stree::ResourceContainer* const authProperties,
+    const nx::utils::stree::AbstractResourceReader& authSearchInputData,
+    nx::utils::stree::ResourceContainer* const authProperties,
     nx::utils::MoveOnlyFunc<void(api::ResultCode)> completionHandler)
 {
     {
@@ -338,7 +338,7 @@ void AccountManager::createTemporaryCredentials(
         params.timeouts = api::TemporaryCredentialsTimeouts();
         m_streeManager.search(
             StreeOperation::getTemporaryCredentialsParameters,
-            stree::SingleResourceContainer(
+            nx::utils::stree::SingleResourceContainer(
                 attr::credentialsType, QString::fromStdString(params.type)),
             &params);
         if (params.timeouts.expirationPeriod == std::chrono::seconds::zero())
@@ -691,7 +691,7 @@ db::DBResult AccountManager::issueAccountActivationCode(
 }
 
 void AccountManager::accountReactivated(
-    QnCounter::ScopedIncrement /*asyncCallLocker*/,
+    nx::utils::Counter::ScopedIncrement /*asyncCallLocker*/,
     bool requestSourceSecured,
     nx::db::QueryContext* /*queryContext*/,
     nx::db::DBResult resultCode,
@@ -754,7 +754,7 @@ nx::db::DBResult AccountManager::verifyAccount(
 }
 
 void AccountManager::sendActivateAccountResponse(
-    QnCounter::ScopedIncrement /*asyncCallLocker*/,
+    nx::utils::Counter::ScopedIncrement /*asyncCallLocker*/,
     nx::db::QueryContext* /*queryContext*/,
     nx::db::DBResult resultCode,
     data::AccountConfirmationCode /*verificationCode*/,
@@ -947,7 +947,7 @@ nx::db::DBResult AccountManager::resetPassword(
 }
 
 void AccountManager::temporaryCredentialsSaved(
-    QnCounter::ScopedIncrement /*asyncCallLocker*/,
+    nx::utils::Counter::ScopedIncrement /*asyncCallLocker*/,
     api::ResultCode resultCode,
     const std::string& accountEmail,
     api::TemporaryCredentials temporaryCredentials,

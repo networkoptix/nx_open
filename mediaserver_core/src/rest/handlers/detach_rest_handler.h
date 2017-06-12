@@ -24,7 +24,7 @@ public:
 private:
     int execute(
         DetachFromCloudData passwordData,
-        const Qn::UserAccessData& accessRights,
+        const QnRestConnectionProcessor* owner,
         QnJsonRestResult& result);
 
 private:

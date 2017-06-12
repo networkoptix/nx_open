@@ -1,6 +1,6 @@
 #pragma once
 
-#include <utils/common/counter.h>
+#include <nx/utils/counter.h>
 
 #include "abstract_authentication_manager.h"
 #include "http_server_password_lookup_result.h"
@@ -37,7 +37,7 @@ public:
 
 private:
     AbstractAuthenticationDataProvider* m_authenticationDataProvider;
-    QnCounter m_startedAsyncCallsCounter;
+    nx::utils::Counter m_startedAsyncCallsCounter;
 
     void reportAuthenticationFailure(AuthenticationCompletionHandler completionHandler);
     header::WWWAuthenticate generateWwwAuthenticateHeader();

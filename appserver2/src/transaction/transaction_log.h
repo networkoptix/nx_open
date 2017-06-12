@@ -12,9 +12,11 @@ namespace ec2
     static const char ADD_HASH_DATA[] = "$$_HASH_$$";
 
     namespace detail { class QnDbManager; }
+    enum class TransactionLockType;
 
+    class QnUbjsonTransactionSerializer;
 
-    class QnTransactionLog: public Singleton<QnTransactionLog>
+    class QnTransactionLog
     {
     public:
 
@@ -24,12 +26,15 @@ namespace ec2
             Reason_Timestamp
         };
 
-        QnTransactionLog(detail::QnDbManager* db);
+        QnTransactionLog(detail::QnDbManager* db, QnUbjsonTransactionSerializer* tranSerializer);
         virtual ~QnTransactionLog();
 
+        QnUbjsonTransactionSerializer* serializer() const { return m_tranSerializer; }
+
         /**
-         * Return transactions from the log
-         * @param state return transactions with sequence bigger then state
+         * Return all transactions from the log
+         * @param state return transactions with sequence bigger then state,
+         * for other peers all transactions are returned.
          * @param output result
          * @param onlyCloudData if false returns all transactions otherwise filter
          *        result and keep only cloud related transactions.
@@ -38,7 +43,21 @@ namespace ec2
             const QnTranState& state,
             bool onlyCloudData,
             QList<QByteArray>& result);
+
+        /**
+         * This function is similar to previous one but returns transactions included in state parameter only
+         */
+        ErrorCode getExactTransactionsAfter(
+            QnTranState* inOutState,
+            bool onlyCloudData,
+            QList<QByteArray>& result,
+            int maxDataSize,
+            bool* outIsFinished);
+
         QnTranState getTransactionsState();
+
+        // filter should contains sorted data
+        QVector<qint32> getTransactionsState(const QVector<ApiPersistentIdData>& filter);
 
         bool contains(const QnTranState& state) const;
 
@@ -69,11 +88,12 @@ namespace ec2
         bool init();
         bool clear();
 
-        int getLatestSequence(const QnTranStateKey& key) const;
+        int getLatestSequence(const ApiPersistentIdData& key) const;
         static QnUuid makeHash(const QByteArray& data1, const QByteArray& data2 = QByteArray());
         static QnUuid makeHash(const QByteArray &extraData, const ApiDiscoveryData &data);
 
         ErrorCode updateSequence(const ApiUpdateSequenceData& data);
+        ErrorCode updateSequence(const QnAbstractTransaction& tran, TransactionLockType lockType);
         void fillPersistentInfo(QnAbstractTransaction& tran);
 
         void beginTran();
@@ -86,8 +106,10 @@ namespace ec2
             const QnAbstractTransaction &tranID,
             const QnUuid &hash,
             const QByteArray &data);
+        void resetPreparedStatements();
     private:
         friend class detail::QnDbManager;
+        ErrorCode updateSequenceNoLock(const QnUuid& peerID, const QnUuid& dbID, int sequence);
 
         template <class T>
         ContainsReason contains(const QnTransaction<T>& tran) { return contains(tran, transactionHash(tran.command, tran.params)); }
@@ -95,13 +117,12 @@ namespace ec2
 
         int currentSequenceNoLock() const;
 
-        ErrorCode updateSequenceNoLock(const QnUuid& peerID, const QnUuid& dbID, int sequence);
     private:
         struct UpdateHistoryData
         {
             UpdateHistoryData(): timestamp(Timestamp::fromInteger(0)) {}
-            UpdateHistoryData(const QnTranStateKey& updatedBy, const Timestamp& timestamp): updatedBy(updatedBy), timestamp(timestamp) {}
-            QnTranStateKey updatedBy;
+            UpdateHistoryData(const ApiPersistentIdData& updatedBy, const Timestamp& timestamp): updatedBy(updatedBy), timestamp(timestamp) {}
+            ApiPersistentIdData updatedBy;
             Timestamp timestamp;
         };
         struct CommitData
@@ -122,9 +143,11 @@ namespace ec2
         quint64 m_baseTime;
         Timestamp m_lastTimestamp;
         CommitData m_commitData;
+        QnUbjsonTransactionSerializer* m_tranSerializer;
+        std::unique_ptr<QSqlQuery> m_insTranQuery;
+        std::unique_ptr<QSqlQuery> m_updateSequenceQuery;
     };
 };
 
-#define transactionLog QnTransactionLog::instance()
 
 #endif // __TRANSACTION_LOG_H_

@@ -12,7 +12,7 @@
 
 #include <nx/utils/thread/mutex.h>
 #include <nx/utils/thread/wait_condition.h>
-#include <utils/common/long_runnable.h>
+#include <nx/utils/thread/long_runnable.h>
 #include <core/dataprovider/abstract_ondemand_data_provider.h>
 
 #include "data_source_cache.h"

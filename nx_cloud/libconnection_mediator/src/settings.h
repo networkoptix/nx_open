@@ -6,13 +6,14 @@
 
 #include <boost/optional.hpp>
 
-#include <QtCore/QUrl> 
+#include <QtCore/QUrl>
 
 #include <nx/network/cloud/cloud_connect_options.h>
 #include <nx/network/cloud/data/connection_parameters.h>
 #include <nx/network/socket_common.h>
 #include <nx/utils/log/log_initializer.h>
 #include <nx/utils/log/log_settings.h>
+#include <nx/utils/basic_service_settings.h>
 #include <nx/utils/settings.h>
 
 #include <utils/common/command_line_parser.h>
@@ -30,7 +31,7 @@ struct General
     api::CloudConnectOptions cloudConnectOptions = api::emptyCloudConnectOptions;
 };
 
-struct CloudDB
+struct CloudDb
 {
     bool runWithCloud;
     boost::optional<QUrl> url;
@@ -38,7 +39,7 @@ struct CloudDB
     QString password;
     std::chrono::seconds updateInterval;
 
-    CloudDB():
+    CloudDb():
         runWithCloud(true)
     {
     }
@@ -68,6 +69,11 @@ struct Statistics
     }
 };
 
+struct TrafficRelay
+{
+    QString url;
+};
+
 /**
  * Extends api::ConnectionParameters with mediator-only parameters.
  */
@@ -83,48 +89,45 @@ struct ConnectionParameters:
 /**
  * @note Values specified via command-line have priority over conf file (or win32 registry) values.
  */
-class Settings
+class Settings:
+    public nx::utils::BasicServiceSettings
 {
+    using base_type = nx::utils::BasicServiceSettings;
+
 public:
     Settings();
 
-    bool showHelp() const;
+    virtual QString dataDir() const override;
+    virtual nx::utils::log::Settings logging() const override;
 
     const General& general() const;
-    const nx::utils::log::Settings& logging() const;
-    const CloudDB& cloudDB() const;
+    const CloudDb& cloudDB() const;
     const Stun& stun() const;
     const Http& http() const;
     const ConnectionParameters& connectionParameters() const;
     const nx::db::ConnectionOptions& dbConnectionOptions() const;
     const Statistics& statistics() const;
-
-    /**
-     * Loads settings from both command line and conf file (or win32 registry).
-     */
-    void load(int argc, const char **argv);
-    void printCmdLineArgsHelp();
+    const TrafficRelay& trafficRelay() const;
 
 private:
-    QnCommandLineParser m_commandLineParser;
-    QnSettings m_settings;
-    bool m_showHelp;
-
     General m_general;
     nx::utils::log::Settings m_logging;
-    CloudDB m_cloudDB;
+    CloudDb m_cloudDB;
     Stun m_stun;
     Http m_http;
     ConnectionParameters m_connectionParameters;
     nx::db::ConnectionOptions m_dbConnectionOptions;
     Statistics m_statistics;
+    TrafficRelay m_trafficRelay;
 
-    void fillSupportedCmdParameters();
+    virtual void loadSettings() override;
+
     void initializeWithDefaultValues();
-    void loadConfiguration();
     void readEndpointList(
         const QString& str,
         std::list<SocketAddress>* const addrToListenList);
+    void loadConnectionParameters();
+    void loadTrafficRelay();
 };
 
 } // namespace conf

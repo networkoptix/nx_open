@@ -11,10 +11,11 @@
 #include "server/http_server_plain_text_credentials_provider.h"
 #include "server/http_stream_socket_server.h"
 #include "server/handler/http_server_handler_custom.h"
+#include "server/rest/http_server_rest_message_dispatcher.h"
 
 //-------------------------------------------------------------------------------------------------
 
-class TestAuthenticationManager:
+class NX_NETWORK_API TestAuthenticationManager:
     public nx_http::server::BaseAuthenticationManager
 {
     typedef nx_http::server::BaseAuthenticationManager BaseType;
@@ -36,13 +37,42 @@ private:
 
 //-------------------------------------------------------------------------------------------------
 
+using ContentProviderFactoryFunction = 
+    nx::utils::MoveOnlyFunc<std::unique_ptr<nx_http::AbstractMsgBodySource>()>;
+
 class NX_NETWORK_API TestHttpServer
 {
 public:
-    TestHttpServer();
+    using ProcessHttpRequestFunc = nx::utils::MoveOnlyFunc<void(
+        nx_http::HttpServerConnection* const /*connection*/,
+        nx::utils::stree::ResourceContainer /*authInfo*/,
+        nx_http::Request /*request*/,
+        nx_http::Response* const /*response*/,
+        nx_http::RequestProcessedHandler /*completionHandler*/)>;
+
+    TestHttpServer():
+        TestHttpServer(
+            true,
+            nx::network::NatTraversalSupport::disabled)
+    {
+    }
+
+    template<typename... Args>
+    TestHttpServer(Args... args):
+        m_authenticationManager(&m_credentialsProvider)
+    {
+        m_authenticationManager.setAuthenticationEnabled(false);
+
+        m_httpServer.reset(
+            new nx_http::HttpStreamSocketServer(
+                &m_authenticationManager,
+                &m_httpMessageDispatcher,
+                std::move(args)...));
+    }
+
     ~TestHttpServer();
 
-    bool bindAndListen();
+    bool bindAndListen(const SocketAddress& endpoint = SocketAddress::anyPrivateAddress);
     SocketAddress serverAddress() const;
 
     template<typename RequestHandlerType>
@@ -89,6 +119,10 @@ public:
         const QString& filePath,
         const nx_http::StringType& mimeType);
 
+    bool registerContentProvider(
+        const QString& httpPath,
+        ContentProviderFactoryFunction contentProviderFactory);
+
     bool registerRedirectHandler(
         const QString& resourcePath,
         const QUrl& location);
@@ -103,7 +137,7 @@ public:
     nx_http::HttpStreamSocketServer& server() { return *m_httpServer; }
 
 private:
-    nx_http::MessageDispatcher m_httpMessageDispatcher;
+    nx_http::server::rest::MessageDispatcher m_httpMessageDispatcher;
     nx_http::server::PlainTextCredentialsProvider m_credentialsProvider;
     TestAuthenticationManager m_authenticationManager;
     std::unique_ptr<nx_http::HttpStreamSocketServer> m_httpServer;
@@ -120,13 +154,14 @@ public:
     using BaseType = nx_http::BaseConnection<RandomlyFailingHttpConnection>;
 
     RandomlyFailingHttpConnection(
-        StreamConnectionHolder<RandomlyFailingHttpConnection>* socketServer,
+        nx::network::server::StreamConnectionHolder<RandomlyFailingHttpConnection>* socketServer,
         std::unique_ptr<AbstractStreamSocket> sock);
     virtual ~RandomlyFailingHttpConnection();
 
     void setResponseBuffer(const QByteArray& buf);
 
-    void processMessage(nx_http::Message request);
+protected:
+    virtual void processMessage(nx_http::Message request) override;
 
 private:
     QByteArray m_responseBuffer;
@@ -136,9 +171,11 @@ private:
 };
 
 class NX_NETWORK_API RandomlyFailingHttpServer:
-    public StreamSocketServer<RandomlyFailingHttpServer, RandomlyFailingHttpConnection>
+    public nx::network::server::StreamSocketServer<
+        RandomlyFailingHttpServer, RandomlyFailingHttpConnection>
 {
-    using BaseType = StreamSocketServer<RandomlyFailingHttpServer, RandomlyFailingHttpConnection>;
+    using base_type = nx::network::server::StreamSocketServer<
+        RandomlyFailingHttpServer, RandomlyFailingHttpConnection>;
 
 public:
     RandomlyFailingHttpServer(

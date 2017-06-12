@@ -11,7 +11,7 @@ class TimeProtocolConnection:
 {
 public:
     TimeProtocolConnection(
-        StreamConnectionHolder<TimeProtocolConnection>* socketServer,
+        network::server::StreamConnectionHolder<TimeProtocolConnection>* socketServer,
         std::unique_ptr<AbstractStreamSocket> _socket);
     ~TimeProtocolConnection();
 
@@ -21,7 +21,7 @@ protected:
     virtual void stopWhileInAioThread() override;
 
 private:
-    StreamConnectionHolder<TimeProtocolConnection>* m_socketServer;
+    network::server::StreamConnectionHolder<TimeProtocolConnection>* m_socketServer;
     std::unique_ptr<AbstractStreamSocket> m_socket;
     nx::Buffer m_outputBuffer;
 

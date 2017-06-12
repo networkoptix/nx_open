@@ -9,24 +9,26 @@ static const int kRecvBufferCapacity = 1024 * 4;
 namespace nx {
 namespace network {
 
-BufferedStreamSocket::BufferedStreamSocket(std::unique_ptr<AbstractStreamSocket> socket)
-    : m_socket(std::move(socket))
+BufferedStreamSocket::BufferedStreamSocket(std::unique_ptr<AbstractStreamSocket> socket):
+    StreamSocketDelegate(socket.get()),
+    m_socket(std::move(socket))
 {
-    setDelegate(m_socket.get());
 }
 
 void BufferedStreamSocket::catchRecvEvent(
-    std::function<void(SystemError::ErrorCode)> handler)
+    nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode)> handler)
 {
+    m_catchRecvEventHandler = std::move(handler);
+
     if (!m_internalRecvBuffer.isEmpty())
-        return m_socket->dispatch(std::bind(std::move(handler), SystemError::noError));
+        return triggerCatchRecvEvent(SystemError::noError);
 
     if (m_internalRecvBuffer.capacity() < kRecvBufferCapacity)
         m_internalRecvBuffer.reserve(kRecvBufferCapacity);
 
     m_socket->readSomeAsync(
         &m_internalRecvBuffer,
-        [this, handler = std::move(handler)](SystemError::ErrorCode code, size_t size) mutable
+        [this](SystemError::ErrorCode code, size_t size) mutable
         {
             NX_LOGX(lm("catchRecvEvent read size=%1: %2")
                 .arg(code == SystemError::noError ? size : 0)
@@ -37,7 +39,7 @@ void BufferedStreamSocket::catchRecvEvent(
                 code = SystemError::connectionReset;
 
             // Make socket ready for blocking mode:
-            m_socket->post(std::bind(std::move(handler), code));
+            triggerCatchRecvEvent(code);
         });
 }
 
@@ -66,43 +68,6 @@ void BufferedStreamSocket::injectRecvData(Buffer buffer, Inject injectType)
     NX_ASSERT(false, lm("Unexpected enum value: %1").arg((int)injectType));
 }
 
-bool BufferedStreamSocket::bind(const SocketAddress& localAddress)
-{
-    return m_socket->bind(localAddress);
-}
-
-SocketAddress BufferedStreamSocket::getLocalAddress() const
-{
-    return m_socket->getLocalAddress();
-}
-
-bool BufferedStreamSocket::close()
-{
-    return m_socket->close();
-}
-
-bool BufferedStreamSocket::isClosed() const
-{
-    return m_socket->isClosed();
-}
-
-bool BufferedStreamSocket::shutdown()
-{
-    return m_socket->shutdown();
-}
-
-bool BufferedStreamSocket::reopen()
-{
-    return m_socket->reopen();
-}
-
-bool BufferedStreamSocket::connect(
-    const SocketAddress& remoteAddress,
-    unsigned int timeoutMillis)
-{
-    return m_socket->connect(remoteAddress, timeoutMillis);
-}
-
 int BufferedStreamSocket::recv(void* buffer, unsigned int bufferLen, int flags)
 {
     if (m_internalRecvBuffer.isEmpty())
@@ -123,40 +88,6 @@ int BufferedStreamSocket::recv(void* buffer, unsigned int bufferLen, int flags)
     int recv = m_socket->recv((char*)buffer + internalSize, bufferLen - internalSize, flags);
     NX_LOGX(lm("recv internalSize=%1 + realRecv=%2").arg(internalSize).arg(recv), cl_logDEBUG2);
     return (recv < 0) ? (int)internalSize : internalSize + recv;
-}
-
-int BufferedStreamSocket::send(const void* buffer, unsigned int bufferLen)
-{
-    return m_socket->send(buffer, bufferLen);
-}
-
-SocketAddress BufferedStreamSocket::getForeignAddress() const
-{
-    return m_socket->getForeignAddress();
-}
-
-bool BufferedStreamSocket::isConnected() const
-{
-    return m_socket->isConnected();
-}
-
-void BufferedStreamSocket::cancelIOAsync(
-    aio::EventType eventType,
-    nx::utils::MoveOnlyFunc<void()> handler)
-{
-    return m_socket->cancelIOAsync(eventType, std::move(handler));
-}
-
-void BufferedStreamSocket::cancelIOSync(aio::EventType eventType)
-{
-    return m_socket->cancelIOSync(eventType);
-}
-
-void BufferedStreamSocket::connectAsync(
-    const SocketAddress& address,
-    nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode)> handler)
-{
-    m_socket->connectAsync(address, std::move(handler));
 }
 
 void BufferedStreamSocket::readSomeAsync(
@@ -184,11 +115,13 @@ void BufferedStreamSocket::readSomeAsync(
         });
 }
 
-void BufferedStreamSocket::sendAsync(
-    const nx::Buffer& buf,
-    std::function<void(SystemError::ErrorCode, size_t)> handler)
+void BufferedStreamSocket::triggerCatchRecvEvent(SystemError::ErrorCode resultCode)
 {
-    m_socket->sendAsync(buf, std::move(handler));
+    post(
+        [this, resultCode]()
+        {
+            nx::utils::swapAndCall(m_catchRecvEventHandler, resultCode);
+        });
 }
 
 } // namespace network

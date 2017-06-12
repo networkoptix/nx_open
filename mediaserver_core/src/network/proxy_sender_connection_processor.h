@@ -2,7 +2,7 @@
 #define BACK_TCP_CONNECTION_H__
 
 #include <QUrl>
-#include "utils/common/long_runnable.h"
+#include "nx/utils/thread/long_runnable.h"
 #include <nx/network/socket.h>
 #include "network/universal_request_processor.h"
 
@@ -22,6 +22,7 @@ private:
     QByteArray readProxyResponse();
     void doDelay();
     int sendRequest(const QByteArray& data);
+    QByteArray makeProxyRequest(const QnUuid& serverUuid, const SocketAddress& address) const;
 private:
     Q_DECLARE_PRIVATE(QnProxySenderConnection);
 };

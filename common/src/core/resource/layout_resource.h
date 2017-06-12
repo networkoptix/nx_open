@@ -9,7 +9,7 @@
 #include <core/resource/layout_item_data.h>
 
 #include <utils/common/threadsafe_item_storage.h>
-
+#include <common/common_globals.h>
 
 /**
  * QnLayoutResource class describes the set of resources together with their view options.
@@ -27,12 +27,15 @@ class QnLayoutResource: public QnResource,
     typedef QnResource base_type;
 
 public:
-    QnLayoutResource();
+    QnLayoutResource(QnCommonModule* commonModule = nullptr);
 
     virtual QString getUniqueId() const override;
     virtual Qn::ResourceStatus getStatus() const override;
 
     QnLayoutResourcePtr clone() const;
+
+    /** Create a new layout with a given resource on it. */
+    static QnLayoutResourcePtr createFromResource(const QnResourcePtr& resource);
 
     virtual QString toSearchString() const override;
 
@@ -69,6 +72,8 @@ public:
 
     void setData(int role, const QVariant &value);
 
+    QVariant data(int role) const; // TODO: #ynikitenkov Possibly move to QnResourceRuntimeDataManager
+
     QHash<int, QVariant> data() const;
 
     void requestStore() { emit storeRequested(::toSharedPointer(this)); } // TODO: #Elric hack
@@ -100,6 +105,14 @@ public:
     /** Check if layout is shared. */
     bool isShared() const;
 
+    /**
+     * Auto-generated service layout. Such layouts are used for:
+     * * videowalls (videowall as a parent)
+     * * videowall reviews (videowall as a parent)
+     * * lite client control (server as a parent)
+     */
+    bool isServiceLayout() const;
+
     /** Get all resources ids placed on the layout. */
     QSet<QnUuid> layoutResourceIds() const;
 
@@ -107,7 +120,7 @@ public:
     QSet<QnResourcePtr> layoutResources() const;
 
     /** Get all resources placed on the layout. WARNING: method is SLOW! */
-    static QSet<QnResourcePtr> layoutResources(const QnLayoutItemDataMap& items);
+    static QSet<QnResourcePtr> layoutResources(QnResourcePool* resourcePool, const QnLayoutItemDataMap& items);
 
 signals:
     void itemAdded(const QnLayoutResourcePtr &resource, const QnLayoutItemData &item);
@@ -122,6 +135,8 @@ signals:
     void backgroundImageChanged(const QnLayoutResourcePtr &resource);
     void backgroundOpacityChanged(const QnLayoutResourcePtr &resource);
     void lockedChanged(const QnLayoutResourcePtr &resource);
+
+    void dataChanged(int role);
 
 protected:
     virtual Qn::Notifier storedItemAdded(const QnLayoutItemData& item) override;

@@ -37,6 +37,7 @@
 #include "cached_output_stream.h"
 #include "common/common_module.h"
 #include "audit/audit_manager.h"
+#include <media_server/media_server_module.h>
 
 static const int CONNECTION_TIMEOUT = 1000 * 5;
 static const int MAX_QUEUE_SIZE = 30;
@@ -96,8 +97,8 @@ public:
         camera->copyLastGop(
             /*primaryLiveStream*/ true,
             /*skipTime*/ 0,
-            tmpQueue, 
-            /*cseq*/ 0, 
+            tmpQueue,
+            /*cseq*/ 0,
             /*iFramesOnly*/ false);
 
         auto randomAccess = tmpQueue.lock();
@@ -378,9 +379,8 @@ static const QLatin1String CONTINUOUS_TIMESTAMPS_PARAM_NAME( "ct" );
 static const int MS_PER_SEC = 1000;
 
 QnProgressiveDownloadingConsumer::QnProgressiveDownloadingConsumer(QSharedPointer<AbstractStreamSocket> socket, QnTcpListener* _owner):
-    QnTCPConnectionProcessor(new QnProgressiveDownloadingConsumerPrivate, socket)
+    QnTCPConnectionProcessor(new QnProgressiveDownloadingConsumerPrivate, socket, _owner)
 {
-    Q_UNUSED(_owner)
     Q_D(QnProgressiveDownloadingConsumer);
     d->socketTimeout = CONNECTION_TIMEOUT;
     d->streamingFormat = "webm";
@@ -393,7 +393,7 @@ QnProgressiveDownloadingConsumer::QnProgressiveDownloadingConsumer(QSharedPointe
         arg(d->foreignAddress).arg(d->foreignPort).
         arg(QnProgressiveDownloadingConsumer_count.fetchAndAddOrdered(1)+1), cl_logDEBUG1 );
 
-    const int sessionLiveTimeoutSec = MSSettings::roSettings()->value(
+    const int sessionLiveTimeoutSec = qnServerModule->roSettings()->value(
         nx_ms_conf::PROGRESSIVE_DOWNLOADING_SESSION_LIVE_TIME,
         nx_ms_conf::DEFAULT_PROGRESSIVE_DOWNLOADING_SESSION_LIVE_TIME ).toUInt();
     if( sessionLiveTimeoutSec > 0 )
@@ -473,7 +473,7 @@ void QnProgressiveDownloadingConsumer::run()
     Q_D(QnProgressiveDownloadingConsumer);
     initSystemThreadId();
 
-    if (qnCommon->isTranscodeDisabled())
+    if (commonModule()->isTranscodeDisabled())
     {
         d->response.messageBody = QByteArray("Video transcoding is disabled in the server settings. Feature unavailable.");
         sendResponse(CODE_NOT_IMPLEMETED, "text/plain");
@@ -544,13 +544,13 @@ void QnProgressiveDownloadingConsumer::run()
         QnResourcePtr resource;
         const QnUuid uuid = QnUuid::fromStringSafe(resId);
         if (!uuid.isNull())
-            resource = qnResPool->getResourceById(uuid);
+            resource = resourcePool()->getResourceById(uuid);
         if (!resource)
-            resource = qnResPool->getResourceByUniqueId(resId);
+            resource = resourcePool()->getResourceByUniqueId(resId);
         if (!resource)
-            resource = qnResPool->getResourceByMacAddress(resId);
+            resource = resourcePool()->getResourceByMacAddress(resId);
         if (!resource)
-            resource = qnResPool->getResourceByUrl(resId);
+            resource = resourcePool()->getResourceByUrl(resId);
         if (!resource)
         {
             d->response.messageBody = QByteArray("Resource with id ") + QByteArray(resId.toLatin1()) + QByteArray(" not found ");
@@ -558,7 +558,7 @@ void QnProgressiveDownloadingConsumer::run()
             return;
         }
 
-        if (!qnResourceAccessManager->hasPermission(d->accessRights, resource, Qn::ReadPermission))
+        if (!resourceAccessManager()->hasPermission(d->accessRights, resource, Qn::ReadPermission))
         {
             sendUnauthorizedResponse(nx_http::StatusCode::forbidden, STATIC_FORBIDDEN_HTML);
             return;
@@ -640,7 +640,7 @@ void QnProgressiveDownloadingConsumer::run()
         const bool standFrameDuration = decodedUrlQuery.hasQueryItem(STAND_FRAME_DURATION_PARAM_NAME);
 
         const bool rtOptimization = decodedUrlQuery.hasQueryItem(RT_OPTIMIZATION_PARAM_NAME);
-        if (rtOptimization && MSSettings::roSettings()->value(StreamingParams::FFMPEG_REALTIME_OPTIMIZATION, true).toBool())
+        if (rtOptimization && qnServerModule->roSettings()->value(StreamingParams::FFMPEG_REALTIME_OPTIMIZATION, true).toBool())
             d->transcoder.setUseRealTimeOptimization(true);
 
 
@@ -650,14 +650,14 @@ void QnProgressiveDownloadingConsumer::run()
         auto camera = qnCameraPool->getVideoCamera(resource);
 
         bool isLive = position.isEmpty() || position == "now";
-		
-        if (!isLive && 
-            !qnResourceAccessManager->hasGlobalPermission(d->accessRights, Qn::GlobalViewArchivePermission))
+
+        if (!isLive &&
+            !commonModule()->resourceAccessManager()->hasGlobalPermission(d->accessRights, Qn::GlobalViewArchivePermission))
         {
             sendUnauthorizedResponse(nx_http::StatusCode::forbidden, STATIC_FORBIDDEN_HTML);
             return;
         }
-		
+
 
         QnProgressiveDownloadingDataConsumer dataConsumer(
             this,
@@ -687,7 +687,8 @@ void QnProgressiveDownloadingConsumer::run()
             QnLiveStreamProviderPtr liveReader = camera->getLiveReader(qualityToUse);
             dataProvider = liveReader;
             if (liveReader) {
-                dataConsumer.copyLastGopFromCamera(camera);
+                if (camera->isSomeActivity())
+                    dataConsumer.copyLastGopFromCamera(camera); //< Don't copy deprecated gop if camera is not running now
                 liveReader->startIfNotRunning();
                 camera->inUse(this);
             }

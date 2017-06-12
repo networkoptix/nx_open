@@ -11,13 +11,16 @@
 #include "core/resource/resource_data.h"
 #include "core/resource_management/resource_data_pool.h"
 #include "common/common_module.h"
+#include <common/static_common_module.h>
 
 static const int CL_BROAD_CAST_RETRY = 1;
 static const int STARDOT_DISCOVERY_PORT = 7364;
 
 extern QString getValueFromString(const QString& line);
 
-QnStardotResourceSearcher::QnStardotResourceSearcher()
+QnStardotResourceSearcher::QnStardotResourceSearcher(QnCommonModule* commonModule):
+    QnAbstractResourceSearcher(commonModule),
+    QnAbstractNetworkResourceSearcher(commonModule)
 {
 }
 
@@ -103,7 +106,7 @@ QnResourceList QnStardotResourceSearcher::findResources()
                 if (typeId.isNull())
                     continue;
 
-                QnResourceData resourceData = qnCommon->dataPool()->data(manufacture(), QLatin1String(model));
+                QnResourceData resourceData = qnStaticCommon->dataPool()->data(manufacture(), QLatin1String(model));
                 if (resourceData.value<bool>(Qn::FORCE_ONVIF_PARAM_NAME))
                     continue; // model forced by ONVIF
 
@@ -113,7 +116,7 @@ QnResourceList QnStardotResourceSearcher::findResources()
                 resource->setMAC(QnMacAddress(mac));
                 resource->setModel(QLatin1String(model));
                 resource->setName(QLatin1String(model));
-                
+
                 int delimPos = model.indexOf('/');
                 if (delimPos >= 0)
                 {
@@ -122,7 +125,7 @@ QnResourceList QnStardotResourceSearcher::findResources()
                         shortModel = shortModel .mid(6);
                     resource->setName(QString(lit("Stardot-%1")).arg(QLatin1String(shortModel)));
                 }
-                
+
                 resource->setFirmware(QLatin1String(firmware));
 
 
@@ -215,7 +218,7 @@ QList<QnResourcePtr> QnStardotResourceSearcher::checkHostAddr(const QUrl& url, c
     {
         QString modelFull = QString(QLatin1String(downloadFile(status, QLatin1String("get?model=fullname"), host, port, timeout, auth)));
 
-        if (modelFull.length())        
+        if (modelFull.length())
             model = modelFull;
     }
 
@@ -236,7 +239,7 @@ QList<QnResourcePtr> QnStardotResourceSearcher::checkHostAddr(const QUrl& url, c
     if (mac.isEmpty())
         return QList<QnResourcePtr>();
 
-    QnResourceData resourceData = qnCommon->dataPool()->data(manufacture(), model);
+    QnResourceData resourceData = qnStaticCommon->dataPool()->data(manufacture(), model);
     if (resourceData.value<bool>(Qn::FORCE_ONVIF_PARAM_NAME))
         return QList<QnResourcePtr>(); // model forced by ONVIF
 

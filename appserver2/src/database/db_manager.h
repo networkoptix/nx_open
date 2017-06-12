@@ -1,9 +1,10 @@
-#ifndef __DB_MANAGER_H_
-#define __DB_MANAGER_H_
+#pragma once
 
 #include <memory>
 
 #include <QtSql/QSqlError>
+
+#include <common/common_module_aware.h>
 
 #include "nx_ec/ec_api.h"
 #include "transaction/transaction.h"
@@ -20,10 +21,15 @@
 #include "core/resource_access/user_access_data.h"
 #include "core/resource_access/resource_access_manager.h"
 #include "core/resource/user_resource.h"
+#include <database/api/db_resource_api.h>
+#include <nx/fusion/serialization/sql.h>
 
+struct BeforeRestoreDbData;
 
 namespace ec2
 {
+
+class TimeSynchronizationManager;
 
 namespace aux {
 bool applyRestoreDbData(const BeforeRestoreDbData& restoreData, const QnUserResourcePtr& admin);
@@ -66,22 +72,29 @@ public:
 
 class QnDbManagerAccess;
 
+enum class TransactionLockType
+{
+    Regular, //< do commit as soon as commit() function called
+    Lazy //< delay commit unless regular commit() called
+};
+
 namespace detail
 {
+
     class QnDbManager
     :
         public QObject,
         public QnDbHelper,
-        public Singleton<QnDbManager>
+        public QnCommonModuleAware
     {
         Q_OBJECT
 
         friend class ::ec2::QnDbManagerAccess;
-        friend ec2::TransactionType::Value getRemoveUserTransactionTypeFromDb(const QnUuid& id);
-        friend ec2::TransactionType::Value getStatusTransactionTypeFromDb(const QnUuid& id);
+        friend ec2::TransactionType::Value getRemoveUserTransactionTypeFromDb(const QnUuid& id, detail::QnDbManager* db);
+        friend ec2::TransactionType::Value getStatusTransactionTypeFromDb(const QnUuid& id, detail::QnDbManager* db);
 
     public:
-        QnDbManager();
+        QnDbManager(QnCommonModule* commonModule);
         virtual ~QnDbManager();
 
         bool init(const QUrl& dbUrl);
@@ -92,7 +105,7 @@ namespace detail
         {
             NX_ASSERT(!tran.persistentInfo.isNull(), Q_FUNC_INFO, "You must register transaction command in persistent command list!");
             if (!tran.isLocal()) {
-                QnTransactionLog::ContainsReason isContains = transactionLog->contains(tran);
+                QnTransactionLog::ContainsReason isContains = m_tranLog->contains(tran);
                 if (isContains == QnTransactionLog::Reason_Timestamp)
                     return ErrorCode::containsBecauseTimestamp;
                 else if (isContains == QnTransactionLog::Reason_Sequence)
@@ -103,7 +116,7 @@ namespace detail
                 return result;
             if (tran.isLocal())
                 return ErrorCode::ok;
-            return transactionLog->saveTransaction( tran, serializedTran);
+            return m_tranLog->saveTransaction( tran, serializedTran);
         }
 
         ErrorCode executeTransactionNoLock(const QnTransaction<ApiDatabaseDumpData>& tran, const QByteArray& /*serializedTran*/)
@@ -138,6 +151,18 @@ namespace detail
             return doQueryNoLock(t1, t2);
         }
 
+        template <class OutputData>
+        ErrorCode execSqlQuery(const QString& queryStr, OutputData* outputData)
+        {
+            QnWriteLocker lock(&m_mutex);
+            QSqlQuery query(m_sdb);
+            query.setForwardOnly(true);
+            if (!prepareSQLQuery(&query, queryStr, Q_FUNC_INFO) || !query.exec())
+                return ErrorCode::dbError;
+            QnSql::fetch_many(query, outputData);
+            return ErrorCode::ok;
+        }
+
         //getCurrentTime
         ErrorCode doQuery(const nullptr_t& /*dummy*/, ApiTimeData& currentTime);
 
@@ -165,7 +190,10 @@ namespace detail
 
         //!Reads settings (properties of user 'admin')
 
-        virtual QnDbTransaction* getTransaction() override;
+        void setTransactionLog(QnTransactionLog* tranLog);
+        void setTimeSyncManager(TimeSynchronizationManager* timeSyncManager);
+        QnTransactionLog* transactionLog() const;
+        virtual bool tuneDBAfterOpen(QSqlDatabase* const sqlDb) override;
 
     signals:
         //!Emitted after \a QnDbManager::init was successfully executed
@@ -280,15 +308,11 @@ namespace detail
         //getTransactionLog
         ErrorCode doQueryNoLock(const ApiTranLogFilter&, ApiTransactionDataList& tranList);
 
-        //getClientInfoList
-        ErrorCode doQueryNoLock(const QnUuid& clientId, ApiClientInfoDataList& data);
-
         // Stub - acts as if nothing is found in the database. Needed for merge algorithm.
-        ErrorCode doQueryNoLock(const QnUuid& /*id*/, ApiUpdateUploadResponceDataList& data)
-        {
-            data.clear();
-            return ErrorCode::ok;
-        }
+        ErrorCode doQueryNoLock(const QnUuid& /*id*/, ApiUpdateUploadResponceDataList& data);
+
+        // getLayoutTours
+        ErrorCode doQueryNoLock(const nullptr_t& /*dummy*/, ApiLayoutTourDataList& data);
 
         // ------------ transactions --------------------------------------
 
@@ -306,6 +330,7 @@ namespace detail
         ErrorCode executeTransactionInternal(const QnTransaction<ApiStorageData>& tran);
         ErrorCode executeTransactionInternal(const QnTransaction<ApiMediaServerUserAttributesData>& tran);
         ErrorCode executeTransactionInternal(const QnTransaction<ApiLayoutData>& tran);
+        ErrorCode executeTransactionInternal(const QnTransaction<ApiLayoutTourData>& tran);
         ErrorCode executeTransactionInternal(const QnTransaction<ApiLayoutDataList>& tran);
         ErrorCode executeTransactionInternal(const QnTransaction<ApiResourceStatusData>& tran);
         ErrorCode executeTransactionInternal(const QnTransaction<ApiResourceParamWithRefData>& tran);
@@ -517,6 +542,9 @@ namespace detail
         ErrorCode removeLayout(const QnUuid& id);
         ErrorCode saveLayout(const ApiLayoutData& params);
 
+        ErrorCode removeLayoutTour(const QnUuid& id);
+        ErrorCode saveLayoutTour(const ApiLayoutTourData& params);
+
         ErrorCode deleteUserProfileTable(const qint32 id);
         ErrorCode removeUser( const QnUuid& guid );
         ErrorCode insertOrReplaceUser(const ApiUserData& data, qint32 internalId);
@@ -560,17 +588,51 @@ namespace detail
         qint32 getBusinessRuleInternalId( const QnUuid& guid );
 
         bool isReadOnly() const { return m_dbReadOnly; }
-
-    private:
+    public:
         class QnDbTransactionExt: public QnDbTransaction
         {
         public:
-            QnDbTransactionExt(QSqlDatabase& database, QnReadWriteLock& mutex): QnDbTransaction(database, mutex) {}
+            QnDbTransactionExt(
+                QSqlDatabase& database,
+                QnTransactionLog* tranLog,
+                QnReadWriteLock& mutex)
+                :
+                QnDbTransaction(database, mutex),
+                m_tranLog(tranLog),
+                m_lazyTranInProgress(false)
+            {
+            }
 
             virtual bool beginTran() override;
             virtual void rollback() override;
             virtual bool commit() override;
+
+            bool beginLazyTran();
+            bool commitLazyTran();
+        private:
+            void physicalCommitLazyData();
+        private:
+            friend class QnLazyTransactionLocker;
+            friend class QnDbManager; //< Owner
+
+            QnTransactionLog* m_tranLog;
+            bool m_lazyTranInProgress;
         };
+
+        class QnLazyTransactionLocker: public QnAbstractTransactionLocker
+        {
+        public:
+            QnLazyTransactionLocker(QnDbTransactionExt* tran);
+            virtual ~QnLazyTransactionLocker();
+            virtual bool commit() override;
+
+        private:
+            bool m_committed;
+            QnDbTransactionExt* m_tran;
+        };
+
+        virtual QnDbTransactionExt* getTransaction() override;
+    private:
 
         enum GuidConversionMethod {CM_Default, CM_Binary, CM_MakeHash, CM_String, CM_INT};
 
@@ -588,7 +650,7 @@ namespace detail
             ResyncRules             =  0x100,
             ResyncUsers             =  0x200,
             ResyncStorages          =  0x400,
-            ResyncClientInfo        =  0x800,
+            ResyncClientInfo        =  0x800, //< removed since 3.1
             ResyncVideoWalls        = 0x1000,
             ResyncWebPages          = 0x2000,
         };
@@ -632,6 +694,9 @@ namespace detail
 
         /** Raise flags if db is not just created. Always returns true. */
         bool resyncIfNeeded(ResyncFlags flags);
+
+        QString getDatabaseName(const QString& baseName);
+        void resetPreparedStatements();
     private:
         QnUuid m_storageTypeId;
         QnUuid m_serverTypeId;
@@ -647,7 +712,7 @@ namespace detail
         * So, only atomic SQL updates are allowed. m_mutexStatic is used for createDB only. Common mutex/transaction is sharing for both DB
         */
         QSqlDatabase m_sdbStatic;
-        QnDbTransactionExt m_tran;
+        std::unique_ptr<QnDbTransactionExt> m_tran;
         QnDbTransaction m_tranStatic;
         mutable QnReadWriteLock m_mutexStatic;
 
@@ -655,13 +720,26 @@ namespace detail
         bool m_isBackupRestore;
         bool m_dbReadOnly;
         ResyncFlags m_resyncFlags;
+        QnTransactionLog* m_tranLog;
+        TimeSynchronizationManager* m_timeSyncManager;
+
+        std::unique_ptr<QSqlQuery> m_insCameraQuery;
+        std::unique_ptr<QSqlQuery> m_cameraUserAttrQuery;
+        std::unique_ptr<QSqlQuery> m_insCameraScheduleQuery;
+        std::unique_ptr<QSqlQuery> m_kvPairQuery;
+        ec2::database::api::Context m_resourceContext;
     };
+
 } // namespace detail
 
 class QnDbManagerAccess
 {
 public:
-    QnDbManagerAccess(const Qn::UserAccessData &userAccessData);
+    QnDbManagerAccess(detail::QnDbManager* dbManager, const Qn::UserAccessData &userAccessData);
+
+    Qn::UserAccessData userAccessData() const { return m_userAccessData; }
+    detail::QnDbManager* db() const { return m_dbManager; }
+
     ApiObjectType getObjectType(const QnUuid& objectId);
 
     ErrorCode doQuery(nullptr_t /*dummy*/, ApiFullInfoData& data)
@@ -672,7 +750,7 @@ public:
     ErrorCode readApiFullInfoDataComplete(ApiFullInfoData* data)
     {
         const ErrorCode errorCode =
-            detail::QnDbManager::instance()->readApiFullInfoDataComplete(data);
+            m_dbManager->readApiFullInfoDataComplete(data);
         if (errorCode != ErrorCode::ok)
             return errorCode;
 
@@ -686,6 +764,7 @@ public:
         filterData(data->userRoles);
         filterData(data->accessRights);
         filterData(data->layouts);
+        filterData(data->layoutTours);
         filterData(data->videowalls);
         filterData(data->rules);
         filterData(data->cameraHistory);
@@ -699,44 +778,24 @@ public:
         return ErrorCode::ok;
     }
 
-    ErrorCode readApiFullInfoDataForMobileClient(ApiFullInfoData* data, const QnUuid& userId)
-    {
-        const ErrorCode errorCode =
-            detail::QnDbManager::instance()->readApiFullInfoDataForMobileClient(data, userId);
-        if (errorCode != ErrorCode::ok)
-            return errorCode;
-
-        filterData(data->servers);
-        filterData(data->serversUserAttributesList);
-        filterData(data->cameras);
-        filterData(data->cameraUserAttributesList);
-        filterData(data->users);
-        filterData(data->userRoles);
-        filterData(data->userRoles);
-        filterData(data->accessRights);
-        filterData(data->layouts);
-        filterData(data->cameraHistory);
-        filterData(data->discoveryData);
-        filterData(data->allProperties);
-        filterData(data->resStatusList);
-
-        return ErrorCode::ok;
-    }
+    ErrorCode readApiFullInfoDataForMobileClient(ApiFullInfoData* data, const QnUuid& userId);
 
     QnDbHelper::QnDbTransaction* getTransaction();
     ApiObjectType getObjectTypeNoLock(const QnUuid& objectId);
     ApiObjectInfoList getNestedObjectsNoLock(const ApiObjectInfo& parentObject);
     ApiObjectInfoList getObjectsNoLock(const ApiObjectType& objectType);
+    ApiIdDataList getLayoutToursNoLock(const QnUuid& parentId);
+
     void getResourceParamsNoLock(const QnUuid& resourceId, ApiResourceParamWithRefDataList& resourceParams);
 
     template <typename T1, typename T2>
     ErrorCode doQuery(const T1 &t1, T2 &t2)
     {
-        ErrorCode errorCode = detail::QnDbManager::instance()->doQuery(t1, t2);
+        ErrorCode errorCode = m_dbManager->doQuery(t1, t2);
         if (errorCode != ErrorCode::ok)
             return errorCode;
 
-        if (!getTransactionDescriptorByParam<T2>()->checkReadPermissionFunc(m_userAccessData, t2))
+        if (!getTransactionDescriptorByParam<T2>()->checkReadPermissionFunc(m_dbManager->commonModule(), m_userAccessData, t2))
         {
             errorCode = ErrorCode::forbidden;
             t2 = T2();
@@ -747,11 +806,11 @@ public:
     template<typename T1, template<typename, typename> class Cont, typename T2, typename A>
     ErrorCode doQuery(const T1 &inParam, Cont<T2,A>& outParam)
     {
-        ErrorCode errorCode = detail::QnDbManager::instance()->doQuery(inParam, outParam);
+        ErrorCode errorCode = m_dbManager->doQuery(inParam, outParam);
         if (errorCode != ErrorCode::ok)
             return errorCode;
 
-        getTransactionDescriptorByParam<Cont<T2,A>>()->filterByReadPermissionFunc(m_userAccessData, outParam);
+        getTransactionDescriptorByParam<Cont<T2,A>>()->filterByReadPermissionFunc(m_dbManager->commonModule(), m_userAccessData, outParam);
         return errorCode;
     }
 
@@ -762,9 +821,9 @@ public:
     {
         if (!isTranAllowed(tran))
             return ErrorCode::forbidden;
-        if (!getTransactionDescriptorByTransaction(tran)->checkSavePermissionFunc(m_userAccessData, tran.params))
+        if (!getTransactionDescriptorByTransaction(tran)->checkSavePermissionFunc(m_dbManager->commonModule(), m_userAccessData, tran.params))
             return ErrorCode::forbidden;
-        return detail::QnDbManager::instance()->executeTransactionNoLock(tran, std::forward<SerializedTransaction>(serializedTran));
+        return m_dbManager->executeTransactionNoLock(tran, std::forward<SerializedTransaction>(serializedTran));
     }
 
     template <template<typename, typename> class Cont, typename Param, typename A, typename SerializedTransaction>
@@ -773,11 +832,11 @@ public:
         if (!isTranAllowed(tran))
             return ErrorCode::forbidden;
         auto outParamContainer = tran.params;
-        getTransactionDescriptorByTransaction(tran)->filterBySavePermissionFunc(m_userAccessData, outParamContainer);
+        getTransactionDescriptorByTransaction(tran)->filterBySavePermissionFunc(m_dbManager->commonModule(), m_userAccessData, outParamContainer);
         if (outParamContainer.size() != tran.params.size())
             return ErrorCode::forbidden;
 
-        return detail::QnDbManager::instance()->executeTransactionNoLock(tran, std::forward<SerializedTransaction>(serializedTran));
+        return m_dbManager->executeTransactionNoLock(tran, std::forward<SerializedTransaction>(serializedTran));
     }
 
     template <class Param, class SerializedTransaction>
@@ -785,9 +844,9 @@ public:
     {
         if (!isTranAllowed(tran))
             return ErrorCode::forbidden;
-        if (!getTransactionDescriptorByTransaction(tran)->checkSavePermissionFunc(m_userAccessData, tran.params))
+        if (!getTransactionDescriptorByTransaction(tran)->checkSavePermissionFunc(m_dbManager->commonModule(), m_userAccessData, tran.params))
             return ErrorCode::forbidden;
-        return detail::QnDbManager::instance()->executeTransaction(tran, std::forward<SerializedTransaction>(serializedTran));
+        return m_dbManager->executeTransaction(tran, std::forward<SerializedTransaction>(serializedTran));
     }
 
     template <template<typename, typename> class Cont, typename Param, typename A, typename SerializedTransaction>
@@ -796,25 +855,23 @@ public:
         if (!isTranAllowed(tran))
             return ErrorCode::forbidden;
         Cont<Param,A> paramCopy = tran.params;
-        getTransactionDescriptorByTransaction(tran)->filterBySavePermissionFunc(m_userAccessData, paramCopy);
+        getTransactionDescriptorByTransaction(tran)->filterBySavePermissionFunc(m_dbManager->commonModule(), m_userAccessData, paramCopy);
         if (paramCopy.size() != tran.params.size())
             return ErrorCode::forbidden;
 
-        return detail::QnDbManager::instance()->executeTransaction(tran, std::forward<SerializedTransaction>(serializedTran));
+        return m_dbManager->executeTransaction(tran, std::forward<SerializedTransaction>(serializedTran));
     }
-
 private:
     template<typename T>
     void filterData(T& target)
     {
-        getTransactionDescriptorByParam<T>()->filterByReadPermissionFunc(m_userAccessData, target);
+        getTransactionDescriptorByParam<T>()->filterByReadPermissionFunc(m_dbManager->commonModule(), m_userAccessData, target);
     }
 
+    detail::QnDbManager* m_dbManager;
     Qn::UserAccessData m_userAccessData;
 };
 
 } // namespace ec2
 
-#define dbManager(userAccessData) QnDbManagerAccess(userAccessData)
-
-#endif // __DB_MANAGER_H_
+#define dbManager(db, userAccessData) QnDbManagerAccess(db, userAccessData)

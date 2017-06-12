@@ -3,9 +3,11 @@
 #include <core/resource/resource_display_info.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource_management/resource_pool.h>
+#include <common/common_module.h>
 
-utils::QnCameraNamesWatcher::QnCameraNamesWatcher(QObject* parent):
-    base_type(parent),
+utils::QnCameraNamesWatcher::QnCameraNamesWatcher(QnCommonModule* commonModule):
+    base_type(nullptr),
+    QnCommonModuleAware(commonModule),
     m_names()
 {
 }
@@ -20,11 +22,13 @@ QString utils::QnCameraNamesWatcher::getCameraName(const QnUuid& cameraId)
     if (it != m_names.end())
         return *it;
 
-    const auto cameraResource = qnResPool->getResourceById<QnVirtualCameraResource>(cameraId);
+    const auto& resPool = commonModule()->resourcePool();
+
+    const auto cameraResource = resPool->getResourceById<QnVirtualCameraResource>(cameraId);
     if (!cameraResource)
         return lit("<%1>").arg(tr("Removed camera"));
 
-    connect(qnResPool, &QnResourcePool::resourceRemoved, this,
+    connect(resPool, &QnResourcePool::resourceRemoved, this,
         [this](const QnResourcePtr& resource)
         {
             const auto cameraResource = resource.dynamicCast<QnVirtualCameraResource>();

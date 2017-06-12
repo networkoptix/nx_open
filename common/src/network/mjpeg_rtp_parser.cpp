@@ -404,7 +404,7 @@ bool QnMjpegRtpParser::processData(quint8* rtpBufferBase, int bufferOffset, int 
     // 1. jpeg main header
 
     int typeSpecific = *curPtr++;
-    QN_UNUSED(typeSpecific);
+    Q_UNUSED(typeSpecific);
     int fragmentOffset = (curPtr[0] << 16) + (curPtr[1] << 8) + curPtr[2];
     curPtr += 3;
     int jpegType = *curPtr++;
@@ -456,7 +456,7 @@ bool QnMjpegRtpParser::processData(quint8* rtpBufferBase, int bufferOffset, int 
             if (bytesLeft < 4)
                 return false;
             quint8 MBZ = *curPtr++;
-            QN_UNUSED(MBZ);
+            Q_UNUSED(MBZ);
             quint8 Precision = *curPtr++;
             quint16 length = (curPtr[0] << 8) + curPtr[1];
             curPtr += 2;

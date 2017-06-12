@@ -1,4 +1,3 @@
-
 #include "include/cdb/cloud_nonce.h"
 
 #ifdef _WIN32
@@ -14,7 +13,6 @@
 #include <nx/utils/log/assert.h>
 #include <nx/utils/random.h>
 #include <nx/utils/time.h>
-
 
 namespace nx {
 namespace cdb {
@@ -69,7 +67,7 @@ std::string generateCloudNonceBase(const std::string& systemId)
             nx::utils::timeSinceEpoch()).count();
     const uint32_t timestampInNetworkByteOrder = htonl(timestamp);
 
-    //TODO #ak replace with proper vectors function when available
+    // TODO: #ak Replace with proper vector function when available.
     char randomBytes[kRandomBytesCount+1];
     for (int i = 0; i < kRandomBytesCount; ++i)
         randomBytes[i] = nx::utils::random::number<int>('a', 'z');
@@ -78,8 +76,6 @@ std::string generateCloudNonceBase(const std::string& systemId)
     QByteArray md5Hash;
     md5Hash.resize(MD5_DIGEST_LENGTH);
     calcNonceHash(systemId, timestamp, md5Hash.data());
-
-    //TODO #ak timestamp byte order
 
     const auto timestampInNetworkByteOrderBuf = 
         QByteArray::fromRawData(
@@ -104,9 +100,7 @@ bool parseCloudNonceBase(
         QByteArray::fromBase64(QByteArray::fromRawData(
             nonceBase.data() + kRandomBytesCount,
             nonceBase.size() - kRandomBytesCount));
-    //TODO #ak timestamp byte order
     memcpy(timestamp, timestampAndHash.constData(), sizeof(*timestamp));
-    //converting timestamp to local byte order
     *timestamp = ntohl(*timestamp);
     NX_ASSERT(timestampAndHash.size() - sizeof(*timestamp) == MD5_DIGEST_LENGTH);
     nonceHash->resize(MD5_DIGEST_LENGTH);
@@ -131,8 +125,8 @@ bool isValidCloudNonceBase(
 
 std::string generateNonce(const std::string& cloudNonce)
 {
-    //if request is authenticated with account permissions, returning full nonce
-    //  TODO #ak some refactor in mediaserver and here is required to remove this condition at all
+    // If request is authenticated with account permissions, returning full nonce.
+    // TODO: #ak Some refactor in mediaserver and here is required to remove this condition at all.
     //nonce = ;
     std::string nonce;
     nonce.resize(cloudNonce.size() + kNonceTrailerLength);
@@ -142,13 +136,13 @@ std::string generateNonce(const std::string& cloudNonce)
     memcpy(&nonce[noncePos], kMagicBytes, sizeof(kMagicBytes));
     noncePos += sizeof(kMagicBytes);
 
-    //adding trailing random bytes
+    // Adding trailing random bytes.
     for (; noncePos < nonce.size(); ++noncePos)
         nonce[noncePos] = nx::utils::random::number<int>('a', 'z');
 
     return nonce;
 }
 
-}   // namespace api
-}   // namespace cdb
-}   // namespace nx
+} // namespace api
+} // namespace cdb
+} // namespace nx

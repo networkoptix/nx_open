@@ -17,10 +17,16 @@
 QnUuid serverGuid();
 void setUseAlternativeGuid(bool value);
 
+class QnCommonModule;
+
+namespace ec2 {
+    class QnTransactionMessageBusBase;
+    class AbstractECConnection;
+}
+
 QString getDataDirectory();
 void syncStoragesToSettings(const QnMediaServerResourcePtr &server);
-bool backupDatabase();
-
+bool backupDatabase(std::shared_ptr<ec2::AbstractECConnection> connection);
 
 namespace nx
 {
@@ -65,7 +71,12 @@ namespace nx
 
 void resetTransactionTransportConnections();
 
-bool updateUserCredentials(PasswordData data, QnOptionalBool isEnabled, const QnUserResourcePtr& userRes, QString* errString = nullptr);
+bool updateUserCredentials(
+    std::shared_ptr<ec2::AbstractECConnection> connection,
+    PasswordData data,
+    QnOptionalBool isEnabled,
+    const QnUserResourcePtr& userRes,
+    QString* errString = nullptr);
 bool validatePasswordData(const PasswordData& passwordData, QString* errStr);
 
 
@@ -114,7 +125,9 @@ struct ConfigureSystemData : public PasswordData
 * @param sysIdTime - database recovery time (last back time)
 * @param tranLogTime - move transaction time to position at least tranLogTime
 */
-bool changeLocalSystemId(const ConfigureSystemData& data);
+bool changeLocalSystemId(
+    const ConfigureSystemData& data,
+    ec2::QnTransactionMessageBusBase* messageBus);
 
 /**
  * Auto detect HTTP content type based on message body
@@ -124,7 +137,7 @@ QByteArray autoDetectHttpContentType(const QByteArray& msgBody);
 /**
  * @return false if failed to save some data.
  */
-bool resetSystemToStateNew();
+bool resetSystemToStateNew(QnCommonModule* commonModule);
 
 
 #define ConfigureSystemData_Fields PasswordData_Fields (localSystemId)(wholeSystem)(sysIdTime)(tranLogTime)(port)(foreignServer)(foreignUsers)(foreignSettings)(additionParams)(rewriteLocalSettings)

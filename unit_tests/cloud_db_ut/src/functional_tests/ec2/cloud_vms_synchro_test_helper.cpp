@@ -2,16 +2,19 @@
 
 #include <nx_ec/data/api_fwd.h>
 #include <nx_ec/ec_api.h>
-#include <nx/network/http/httpclient.h>
+#include <nx/network/http/http_client.h>
 #include <nx/fusion/model_functions.h>
 #include <nx/fusion/serialization/json.h>
 #include <nx/fusion/serialization/lexical.h>
 #include <nx/utils/thread/sync_queue.h>
+#include <nx/utils/test_support/test_options.h>
+
 #include <transaction/transaction.h>
 
 #include <api/global_settings.h>
 #include <cloud_db_client/src/cdb_request_path.h>
 #include <utils/common/app_info.h>
+#include <transaction/abstract_transaction_transport.h>
 
 namespace nx {
 namespace cdb {
@@ -21,9 +24,9 @@ constexpr static const auto kMaxTimeToWaitForChangesToBePropagatedToCloud = std:
 Ec2MserverCloudSynchronization::Ec2MserverCloudSynchronization()
 {
     const auto tmpDir =
-        (CdbLauncher::temporaryDirectoryPath().isEmpty()
+        (nx::utils::TestOptions::temporaryDirectoryPath().isEmpty()
             ? QDir::homePath()
-            : CdbLauncher::temporaryDirectoryPath()) + "/ec2_cloud_sync_ut.data";
+            : nx::utils::TestOptions::temporaryDirectoryPath()) + "/ec2_cloud_sync_ut.data";
     QDir(tmpDir).removeRecursively();
 
     const QString dbFileArg = lit("--dbFile=%1").arg(tmpDir);
@@ -127,9 +130,8 @@ api::ResultCode Ec2MserverCloudSynchronization::unbindSystem()
         adminUserId,
         "cloudAuthKey",
         QString()));
-    ::ec2::ApiResourceParamWithRefDataList outParams;
     if (m_appserver2.moduleInstance()->ecConnection()->getResourceManager(Qn::kSystemAccess)
-            ->saveSync(params, &outParams) != ::ec2::ErrorCode::ok)
+            ->saveSync(params) != ::ec2::ErrorCode::ok)
     {
         return api::ResultCode::unknownError;
     }
@@ -176,9 +178,8 @@ api::ResultCode Ec2MserverCloudSynchronization::saveCloudSystemCredentials(
         adminUserId,
         "cloudAuthKey",
         QString::fromStdString(m_system.authKey)));
-    ::ec2::ApiResourceParamWithRefDataList outParams;
     if (m_appserver2.moduleInstance()->ecConnection()->getResourceManager(Qn::kSystemAccess)
-            ->saveSync(params, &outParams) != ::ec2::ErrorCode::ok)
+            ->saveSync(params) != ::ec2::ErrorCode::ok)
     {
         return api::ResultCode::unknownError;
     }
@@ -206,12 +207,12 @@ QUrl Ec2MserverCloudSynchronization::cdbEc2TransactionUrl() const
 
 void Ec2MserverCloudSynchronization::establishConnectionBetweenVmsAndCloud()
 {
-    appserver2()->moduleInstance()->ecConnection()->addRemotePeer(cdbEc2TransactionUrl());
+    appserver2()->moduleInstance()->ecConnection()->addRemotePeer(::ec2::kCloudPeerId, cdbEc2TransactionUrl());
 }
 
 void Ec2MserverCloudSynchronization::breakConnectionBetweenVmsAndCloud()
 {
-    appserver2()->moduleInstance()->ecConnection()->deleteRemotePeer(cdbEc2TransactionUrl());
+    appserver2()->moduleInstance()->ecConnection()->deleteRemotePeer(::ec2::kCloudPeerId);
 }
 
 void Ec2MserverCloudSynchronization::verifyTransactionConnection()
@@ -323,7 +324,7 @@ void Ec2MserverCloudSynchronization::addCloudUserLocally(
     accountVmsData->email = QString::fromStdString(accountEmail);
     accountVmsData->name = QString::fromStdString(accountEmail);
     accountVmsData->userRoleId = QnUuid::createUuid();
-    accountVmsData->realm = QnAppInfo::realm();
+    accountVmsData->realm = nx::network::AppInfo::realm();
     accountVmsData->hash = "password_is_in_cloud";
     accountVmsData->digest = "password_is_in_cloud";
     // TODO: randomize access rights
@@ -707,7 +708,7 @@ api::ResultCode Ec2MserverCloudSynchronization::fetchCloudTransactionLog(
     ::ec2::ApiTransactionDataList* const transactionList)
 {
     const QUrl url(lm("http://%1%2?systemId=%3")
-        .str(cdb()->endpoint()).arg(kMaintenanceGetTransactionLog)
+        .arg(cdb()->endpoint()).arg(kMaintenanceGetTransactionLog)
         .arg(registeredSystemData().id));
     return fetchTransactionLog(url, transactionList);
 }
@@ -716,7 +717,7 @@ api::ResultCode Ec2MserverCloudSynchronization::fetchCloudTransactionLogFromMedi
     ::ec2::ApiTransactionDataList* const transactionList)
 {
     QUrl url(lm("http://%1/%2?cloud_only=true")
-        .str(appserver2()->moduleInstance()->endpoint()).arg("ec2/getTransactionLog"));
+        .arg(appserver2()->moduleInstance()->endpoint()).arg("ec2/getTransactionLog"));
     url.setUserName("admin");
     url.setPassword("admin");
     return fetchTransactionLog(url, transactionList);

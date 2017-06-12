@@ -7,7 +7,7 @@
 #include <gmock/gmock.h>
 
 #include <nx/utils/string.h>
-#include <utils/common/sync_call.h>
+#include <nx/utils/sync_call.h>
 
 #include <test_support/mediaserver_emulator.h>
 

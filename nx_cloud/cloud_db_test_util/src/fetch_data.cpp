@@ -4,7 +4,7 @@
 
 #include <cdb/cdb_client.h>
 
-#include <utils/common/sync_call.h>
+#include <nx/utils/sync_call.h>
 
 namespace nx {
 namespace cdb {

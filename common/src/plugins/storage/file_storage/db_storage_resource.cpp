@@ -1,8 +1,12 @@
 #include "db_storage_resource.h"
 #include <api/app_server_connection.h>
+#include <core/resource_management/resource_pool.h>
+#include <common/common_module.h>
+#include <core/resource_access/user_access_data.h>
+#include <nx_ec//ec_api.h>
 
-QnDbStorageResource::QnDbStorageResource() :
-    QnStorageResource(),
+QnDbStorageResource::QnDbStorageResource(QnCommonModule* commonModule):
+    base_type(commonModule),
     m_state(QnDbStorageResourceState::Waiting),
     m_capabilities(cap::ReadFile)
 {
@@ -13,16 +17,19 @@ QnDbStorageResource::~QnDbStorageResource()
 
 }
 
-QnStorageResource* QnDbStorageResource::instance(const QString& )
+QnStorageResource* QnDbStorageResource::instance(QnCommonModule* commonModule, const QString& )
 {
-    return new QnDbStorageResource();
+    return new QnDbStorageResource(commonModule);
 }
 
-QIODevice *QnDbStorageResource::open(const QString &fileName, QIODevice::OpenMode openMode)
+QIODevice* QnDbStorageResource::open(const QString &fileName, QIODevice::OpenMode openMode)
 {
     m_filePath = removeProtocolPrefix(fileName);
 
-    auto connection = QnAppServerConnectionFactory::getConnection2();
+    auto resCommonModule = commonModule();
+    NX_ASSERT(resCommonModule, "Common module should be set");
+
+    auto connection = resCommonModule->ec2Connection();
 
     if (!connection)
         return nullptr;

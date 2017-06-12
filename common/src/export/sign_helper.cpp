@@ -5,7 +5,10 @@
 
 #include "nx/streaming/video_data_packet.h"
 #include <nx/streaming/config.h>
-#include "licensing/license.h"
+
+#include <licensing/license.h>
+#include <licensing/license_validator.h>
+
 #include "utils/media/nalUnits.h"
 #include "utils/common/util.h"
 #include "utils/common/scoped_painter_rollback.h"
@@ -23,6 +26,7 @@ extern "C" {
 #endif
 };
 
+using namespace nx::utils;
 
 static const int text_x_offs = 16;
 static const int text_y_offs = 16;
@@ -58,23 +62,27 @@ float getAvgColor(const AVFrame* frame, int plane, const QRect& rect)
     return sum / (rect.width() * rect.height());
 }
 
-QnSignHelper::QnSignHelper():
+QnSignHelper::QnSignHelper(QnCommonModule* commonModule, QObject* parent):
+    base_type(parent),
+    QnCommonModuleAware(commonModule),
     m_cachedMetric(QFont()),
-    m_outPacket(av_packet_alloc())
+    m_outPacket(av_packet_alloc()),
+    m_licenseValidator(new QnLicenseValidator(this))
 {
     m_opacity = 1.0;
     m_signBackground = Qt::white;
 
     m_versionStr = qApp->applicationName().append(QLatin1String(" v")).append(QCoreApplication::applicationVersion());
-    m_hwIdStr = qnLicensePool->currentHardwareId();
+    m_hwIdStr = licensePool()->currentHardwareId();
     if (m_hwIdStr.isEmpty())
         m_hwIdStr = tr("Unknown");
 
-    QList<QnLicensePtr> list = qnLicensePool->getLicenses();
+    QList<QnLicensePtr> list = licensePool()->getLicenses();
     m_licensedToStr = tr("Trial License");
     for (const QnLicensePtr& license: list)
     {
-        if (license->type() != Qn::LC_Trial && license->isValid()) {
+        if (license->type() != Qn::LC_Trial && m_licenseValidator->isValid(license))
+        {
             m_licensedToStr = license->name();
             break;
         }
@@ -747,7 +755,7 @@ int QnSignHelper::getMaxSignSize()
     return 512;
 }
 
-QByteArray QnSignHelper::getSignPattern()
+QByteArray QnSignHelper::getSignPattern(QnLicensePool* licensePool)
 {
     QByteArray result;
     result.append(INITIAL_SIGNATURE_MAGIC);
@@ -755,12 +763,12 @@ QByteArray QnSignHelper::getSignPattern()
 
     result.append(qApp->applicationName().toUtf8()).append(" v").append(QCoreApplication::applicationVersion().toUtf8()).append(SIGN_TEXT_DELIMITER);
 
-    QString hid = qnLicensePool->currentHardwareId();
+    QString hid = licensePool->currentHardwareId();
     if (hid.isEmpty())
         hid = tr("Unknown");
     result.append(hid.toUtf8()).append(SIGN_TEXT_DELIMITER);
 
-    QList<QnLicensePtr> list = qnLicensePool->getLicenses();
+    QList<QnLicensePtr> list = licensePool->getLicenses();
     QString licenseName(tr("FREE License"));
     for (const QnLicensePtr& license: list)
     {

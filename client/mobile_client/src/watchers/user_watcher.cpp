@@ -14,9 +14,13 @@
 
 namespace {
 
-QnUserResourcePtr findUser(const QString& userName)
+QnUserResourcePtr findUser(const QString& userName, QnCommonModule* commonModule)
 {
-    const auto users = qnResPool->getResources<QnUserResource>();
+    NX_ASSERT(commonModule);
+    if (!commonModule)
+        return QnUserResourcePtr();
+
+    const auto users = commonModule->resourcePool()->getResources<QnUserResource>();
 
     /* TODO: Remove this hack which makes QnAvailableCamerasWatcher working.
        Now it always needs a user resource, but when we connect from Lite Client we use
@@ -25,8 +29,8 @@ QnUserResourcePtr findUser(const QString& userName)
        This is enough to make the cameras watcher working but not semantically correct.
    */
     const auto serverId = QnUuid::fromStringSafe(userName);
-    if (!serverId.isNull() && qnCommon->remoteGUID() == serverId)
-        return qnResPool->getAdministrator();
+    if (!serverId.isNull() && commonModule->remoteGUID() == serverId)
+        return commonModule->resourcePool()->getAdministrator();
 
     for (const auto& user: users)
     {
@@ -42,15 +46,15 @@ QnUserResourcePtr findUser(const QString& userName)
 QnUserWatcher::QnUserWatcher(QObject* parent) :
     base_type(parent)
 {
-    connect(QnClientMessageProcessor::instance(),
+    connect(qnClientMessageProcessor,
         &QnClientMessageProcessor::initialResourcesReceived, this,
         [this]
         {
-            setCurrentUser(findUser(m_userName));
+            setCurrentUser(findUser(m_userName, commonModule()));
         }
     );
 
-    connect(qnResPool, &QnResourcePool::resourceRemoved,
+    connect(resourcePool(), &QnResourcePool::resourceRemoved,
         this, [this](const QnResourcePtr& resource)
         {
             const auto user = resource.dynamicCast<QnUserResource>();

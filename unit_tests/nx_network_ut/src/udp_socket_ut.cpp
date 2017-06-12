@@ -8,7 +8,7 @@
 #include <nx/utils/std/thread.h>
 #include <nx/utils/string.h>
 
-#include <utils/common/guard.h>
+#include <nx/utils/scope_guard.h>
 
 namespace nx {
 namespace network {
@@ -39,7 +39,7 @@ void udpSocketTransferTest(int ipVersion, const HostAddress& targetHost)
     static const Buffer kTestMessage = QnUuid::createUuid().toSimpleString().toUtf8();
 
     UDPSocket sender(ipVersion);
-    const auto senderCleanupGuard = makeScopedGuard([&sender]() { sender.pleaseStopSync(); });
+    const auto senderCleanupGuard = makeScopeGuard([&sender]() { sender.pleaseStopSync(); });
 
     ASSERT_TRUE(sender.bind(SocketAddress::anyPrivateAddress));
     ASSERT_TRUE(sender.setSendTimeout(1000));
@@ -49,7 +49,7 @@ void udpSocketTransferTest(int ipVersion, const HostAddress& targetHost)
     ASSERT_FALSE(senderHost.isIpAddress());
 
     UDPSocket receiver(ipVersion);
-    const auto receiverCleanupGuard = makeScopedGuard([&receiver]() { receiver.pleaseStopSync(); });
+    const auto receiverCleanupGuard = makeScopeGuard([&receiver]() { receiver.pleaseStopSync(); });
     ASSERT_TRUE(receiver.bind(SocketAddress::anyPrivateAddress));
     ASSERT_TRUE(receiver.setRecvTimeout(1000));
 
@@ -109,7 +109,7 @@ TEST(UdpSocket, DISABLED_multipleSocketsOnTheSamePort)
     constexpr int socketCount = 2;
 
     std::vector<SocketContext> sockets;
-    const auto socketsCleanupGuard = makeScopedGuard(
+    const auto socketsCleanupGuard = makeScopeGuard(
         [&sockets]()
         {
             for (auto& ctx : sockets)
@@ -165,7 +165,7 @@ TEST(UdpSocket, DISABLED_Performance)
     UDPSocket server(AF_INET);
     server.bind(SocketAddress::anyPrivateAddress);
     const auto address = server.getLocalAddress();
-    NX_LOG(lm("%1").str(address), cl_logINFO);
+    NX_LOG(lm("%1").arg(address), cl_logINFO);
     nx::utils::thread serverThread(
         [&]()
         {
@@ -189,11 +189,11 @@ TEST(UdpSocket, DISABLED_Performance)
                 std::chrono::steady_clock::now() - startTime);
 
             NX_LOG(lm("Resieve ended (%1): %2")
-                .strs(recv, SystemError::getLastOSErrorText()), cl_logINFO);
+                .args(recv, SystemError::getLastOSErrorText()), cl_logINFO);
 
             const auto bytesPerS = double(transferSize) * 1000 / durationMs.count();
             NX_LOG(lm("Resieved size=%1b, count=%2, average=%3, duration=%4, speed=%5bps")
-                .strs(nx::utils::bytesToString(transferSize), transferCount,
+                .args(nx::utils::bytesToString(transferSize), transferCount,
                     nx::utils::bytesToString(transferSize / transferCount),
                     durationMs, nx::utils::bytesToString((uint64_t) bytesPerS)), cl_logINFO);
         });

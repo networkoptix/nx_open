@@ -1,5 +1,6 @@
-
 #include "transaction_transport.h"
+
+#include <common/common_module.h>
 
 #include <api/app_server_connection.h>
 #include <api/global_settings.h>
@@ -7,11 +8,12 @@
 #include <core/resource_management/resource_pool.h>
 
 #include "database/db_manager.h"
-
+#include <nx/network/http/custom_headers.h>
 
 namespace ec2 {
 
 QnTransactionTransport::QnTransactionTransport(
+    QnTransactionMessageBusBase* bus,
     const QnUuid& connectionGuid,
     ConnectionLockGuard connectionLockGuard,
     const ApiPeerData& localPeer,
@@ -23,6 +25,7 @@ QnTransactionTransport::QnTransactionTransport(
     const Qn::UserAccessData &userAccessData)
 :
     QnTransactionTransportBase(
+        bus->commonModule()->globalSettings()->localSystemId(),
         connectionGuid,
         std::move(connectionLockGuard),
         localPeer,
@@ -30,22 +33,26 @@ QnTransactionTransport::QnTransactionTransport(
         connectionType,
         request,
         contentEncoding,
-        QnGlobalSettings::instance()->connectionKeepAliveTimeout(),
-        QnGlobalSettings::instance()->keepAliveProbeCount()),
+        bus->commonModule()->globalSettings()->connectionKeepAliveTimeout(),
+        bus->commonModule()->globalSettings()->keepAliveProbeCount()),
+    m_bus(bus),
     m_userAccessData(userAccessData)
 {
     setOutgoingConnection(std::move(socket));
 }
 
 QnTransactionTransport::QnTransactionTransport(
+    QnTransactionMessageBusBase* bus,
     ConnectionGuardSharedState* const connectionGuardSharedState,
     const ApiPeerData& localPeer)
 :
     QnTransactionTransportBase(
+        bus->commonModule()->globalSettings()->localSystemId(),
         connectionGuardSharedState,
         localPeer,
-        QnGlobalSettings::instance()->connectionKeepAliveTimeout(),
-        QnGlobalSettings::instance()->keepAliveProbeCount()),
+        bus->commonModule()->globalSettings()->connectionKeepAliveTimeout(),
+        bus->commonModule()->globalSettings()->keepAliveProbeCount()),
+    m_bus(bus),
     m_userAccessData(Qn::kSystemAccess)
 {
 }
@@ -71,16 +78,17 @@ void QnTransactionTransport::close()
 
 void QnTransactionTransport::fillAuthInfo(const nx_http::AsyncHttpClientPtr& httpClient, bool authByKey)
 {
-    if (!QnAppServerConnectionFactory::videowallGuid().isNull())
+    if (!m_bus->commonModule()->videowallGuid().isNull())
     {
         httpClient->addAdditionalHeader(
-            "X-NetworkOptix-VideoWall",
-            QnAppServerConnectionFactory::videowallGuid().toString().toUtf8());
+            Qn::VIDEOWALL_GUID_HEADER_NAME,
+            m_bus->commonModule()->videowallGuid().toString().toUtf8());
         return;
     }
 
-    QnMediaServerResourcePtr ownServer = 
-        qnResPool->getResourceById<QnMediaServerResource>(localPeer().id);
+    const auto& resPool = m_bus->commonModule()->resourcePool();
+    QnMediaServerResourcePtr ownServer =
+        resPool->getResourceById<QnMediaServerResource>(localPeer().id);
     if (ownServer && authByKey)
     {
         httpClient->setUserName(ownServer->getId().toString().toLower());
@@ -88,12 +96,14 @@ void QnTransactionTransport::fillAuthInfo(const nx_http::AsyncHttpClientPtr& htt
     }
     else
     {
-        QUrl url = QnAppServerConnectionFactory::url();
+        QUrl url;
+        if (const auto& connection = m_bus->commonModule()->ec2Connection())
+            url = connection->connectionInfo().ecUrl;
         httpClient->setUserName(url.userName().toLower());
-        if (detail::QnDbManager::instance() && detail::QnDbManager::instance()->isInitialized())
+        if (ApiPeerData::isServer(localPeer().peerType))
         {
             // try auth by admin user if allowed
-            QnUserResourcePtr adminUser = qnResPool->getAdministrator();
+            QnUserResourcePtr adminUser = resPool->getAdministrator();
             if (adminUser)
             {
                 httpClient->setUserPassword(adminUser->getDigest());
@@ -128,18 +138,18 @@ bool QnTransactionTransport::sendSerializedTransaction(
 
     QnTransactionTransportHeader header(_header);
     NX_ASSERT(header.processedPeers.contains(localPeer().id));
-    header.fillSequence();
+    header.fillSequence(m_bus->commonModule()->moduleGUID(), m_bus->commonModule()->runningInstanceGUID());
     switch (remotePeer().dataFormat)
     {
         case Qn::JsonFormat:
-            addData(QnJsonTransactionSerializer::instance()->serializedTransactionWithoutHeader(serializedTran, header) + QByteArray("\r\n"));
+            addData(m_bus->jsonTranSerializer()->serializedTransactionWithoutHeader(serializedTran) + QByteArray("\r\n"));
             break;
             //case Qn::BnsFormat:
             //    addData(QnBinaryTransactionSerializer::instance()->serializedTransactionWithHeader(serializedTran, header));
             break;
         case Qn::UbjsonFormat: {
 
-            if (QnLog::instance(QnLog::EC2_TRAN_LOG)->logLevel() >= cl_logDEBUG1)
+            if (nx::utils::log::isToBeLogged(nx::utils::log::Level::debug, QnLog::EC2_TRAN_LOG))
             {
                 QnAbstractTransaction abtractTran;
                 QnUbjsonReader<QByteArray> stream(&serializedTran);
@@ -147,12 +157,12 @@ bool QnTransactionTransport::sendSerializedTransaction(
                 NX_LOG(QnLog::EC2_TRAN_LOG, lit("send direct transaction %1 to peer %2").arg(abtractTran.toString()).arg(remotePeer().id.toString()), cl_logDEBUG1);
             }
 
-            addData(QnUbjsonTransactionSerializer::instance()->serializedTransactionWithHeader(serializedTran, header));
+            addData(m_bus->ubjsonTranSerializer()->serializedTransactionWithHeader(serializedTran, header));
             break;
         }
         default:
             qWarning() << "Client has requested data in the unsupported format" << remotePeer().dataFormat;
-            addData(QnUbjsonTransactionSerializer::instance()->serializedTransactionWithHeader(serializedTran, header));
+            addData(m_bus->ubjsonTranSerializer()->serializedTransactionWithHeader(serializedTran, header));
             break;
     }
 

@@ -253,97 +253,103 @@ bool MultipartContentParser::readUnsizedBinaryData(
 {
     //TODO #ak move this function (splitting byte stream by a pattern) to a separate file
 
-    switch( m_chunkParseState )
+    for (;;)
     {
-        case waitingEndOfLine:
+        switch( m_chunkParseState )
         {
-            const auto slashRPos = data.indexOf('\r');
-            if( slashRPos == -1 )
+            case waitingEndOfLine:
             {
-                m_currentFrame += data;
-                *offset = data.size();
-                return true;
-            }
-            //saving data up to found \r
-            m_currentFrame += data.mid( 0, slashRPos );
-            *offset = slashRPos;
-            m_chunkParseState = checkingForBoundaryAfterEndOfLine;
-            data.pop_front( slashRPos );
-            m_supposedBoundary += '\r';
-            data.pop_front();
-            *offset += 1;
-            //*offset points to \r
-        }
-
-        case checkingForBoundaryAfterEndOfLine:
-        {
-            if( !m_supposedBoundary.isEmpty() )
-            {
-                //if we are here, then m_supposedBoundary does not contain full boundary yet
-
-                //saving supposed boundary in local buffer
-                const size_t bytesNeeded = m_startBoundaryForUnsizedBinaryParsing.size() - m_supposedBoundary.size();
-                const int slashRPos = data.indexOf( '\r' );
-                if( (slashRPos != -1) &&
-                    (static_cast<size_t>(slashRPos) < bytesNeeded) &&
-                    !((m_supposedBoundary + data.mid(0, slashRPos)).startsWith(m_startBoundaryForUnsizedBinaryParsingWOTrailingCRLF)) )
+                const auto slashRPos = data.indexOf('\r');
+                if( slashRPos == -1 )
                 {
-                    //boundary not found, resetting boundary check
-                    m_currentFrame += m_supposedBoundary;
-                    m_supposedBoundary.clear();
-                    m_chunkParseState = waitingEndOfLine;
+                    m_currentFrame += data;
+                    *offset = data.size();
+                    return true;
+                }
+                //saving data up to found \r
+                m_currentFrame += data.mid( 0, slashRPos );
+                *offset = slashRPos;
+                m_chunkParseState = checkingForBoundaryAfterEndOfLine;
+                data.pop_front( slashRPos );
+                m_supposedBoundary += '\r';
+                data.pop_front();
+                *offset += 1;
+                //*offset points to \r
+                continue;
+            }
+
+            case checkingForBoundaryAfterEndOfLine:
+            {
+                if( !m_supposedBoundary.isEmpty() )
+                {
+                    //if we are here, then m_supposedBoundary does not contain full boundary yet
+
+                    //saving supposed boundary in local buffer
+                    const size_t bytesNeeded = m_startBoundaryForUnsizedBinaryParsing.size() - m_supposedBoundary.size();
+                    const int slashRPos = data.indexOf( '\r' );
+                    if( (slashRPos != -1) &&
+                        (static_cast<size_t>(slashRPos) < bytesNeeded) &&
+                        !((m_supposedBoundary + data.mid(0, slashRPos)).startsWith(m_startBoundaryForUnsizedBinaryParsingWOTrailingCRLF)) )
+                    {
+                        //boundary not found, resetting boundary check
+                        m_currentFrame += m_supposedBoundary;
+                        m_supposedBoundary.clear();
+                        m_chunkParseState = waitingEndOfLine;
+                        return true;
+                    }
+
+                    const size_t bytesToCopy = (data.size() > bytesNeeded)
+                        ? bytesNeeded
+                        : data.size();
+                    m_supposedBoundary += data.mid( 0, bytesToCopy );
+                    *offset += bytesToCopy;
+                    data.pop_front( bytesToCopy );
+                }
+
+                QnByteArrayConstRef supposedBoundary;
+                if( m_supposedBoundary.size() == m_startBoundaryForUnsizedBinaryParsing.size() )  //supposed boundary is in m_supposedBoundary buffer
+                {
+                    supposedBoundary = QnByteArrayConstRef(m_supposedBoundary);
+                }
+                else if( m_supposedBoundary.isEmpty() && (data.size() >= (size_t)m_startBoundaryForUnsizedBinaryParsing.size()) )   //supposed boundary is in the source data
+                {
+                    supposedBoundary = data.mid( 0, m_startBoundaryForUnsizedBinaryParsing.size() );
+                    *offset += m_startBoundaryForUnsizedBinaryParsing.size();
+                    data.pop_front( m_startBoundaryForUnsizedBinaryParsing.size() );
+                }
+                else
+                {
+                    //waiting for more data
+                    m_supposedBoundary += data;
+                    *offset += data.size();
                     return true;
                 }
 
-                const size_t bytesToCopy = (data.size() > bytesNeeded)
-                    ? bytesNeeded
-                    : data.size();
-                m_supposedBoundary += data.mid( 0, bytesToCopy );
-                *offset += bytesToCopy;
-                data.pop_front( bytesToCopy );
-            }
+                //checking if boundary has been met
+                if( (supposedBoundary == m_startBoundaryForUnsizedBinaryParsing) ||
+                    (supposedBoundary == m_endBoundaryForUnsizedBinaryParsing) )
+                {
+                    //found frame delimiter
+                    if( !m_nextFilter->processData( m_currentFrame ) )
+                        return false;
+                    m_currentFrame.clear();
 
-            QnByteArrayConstRef supposedBoundary;
-            if( m_supposedBoundary.size() == m_startBoundaryForUnsizedBinaryParsing.size() )  //supposed boundary is in m_supposedBoundary buffer
-            {
-                supposedBoundary = QnByteArrayConstRef(m_supposedBoundary);
-            }
-            else if( m_supposedBoundary.isEmpty() && (data.size() >= (size_t)m_startBoundaryForUnsizedBinaryParsing.size()) )   //supposed boundary is in the source data
-            {
-                supposedBoundary = data.mid( 0, m_startBoundaryForUnsizedBinaryParsing.size() );
-                *offset += m_startBoundaryForUnsizedBinaryParsing.size();
-                data.pop_front( m_startBoundaryForUnsizedBinaryParsing.size() );
-            }
-            else
-            {
-                //waiting for more data
-                m_supposedBoundary += data;
-                *offset += data.size();
-                return true;
-            }
+                    m_state = supposedBoundary == m_endBoundaryForUnsizedBinaryParsing ? eofReached : readingHeaders;
+                    m_currentFrameHeaders.clear();
+                }
+                else
+                {
+                    //not a boundary, just frame data...
+                    m_currentFrame += supposedBoundary;
+                }
 
-            //checking if boundary has been met
-            if( (supposedBoundary == m_startBoundaryForUnsizedBinaryParsing) ||
-                (supposedBoundary == m_endBoundaryForUnsizedBinaryParsing) )
-            {
-                //found frame delimiter
-                if( !m_nextFilter->processData( m_currentFrame ) )
-                    return false;
-                m_currentFrame.clear();
-
-                m_state = supposedBoundary == m_endBoundaryForUnsizedBinaryParsing ? eofReached : readingHeaders;
-                m_currentFrameHeaders.clear();
+                m_supposedBoundary.clear();
+                m_chunkParseState = waitingEndOfLine;
+                break;
             }
-            else
-            {
-                //not a boundary, just frame data...
-                m_currentFrame += supposedBoundary;
-            }
-
-            m_supposedBoundary.clear();
-            m_chunkParseState = waitingEndOfLine;
-            break;
         }
+
+        break;
     }
 
     return true;

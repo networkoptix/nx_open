@@ -4,10 +4,13 @@
 
 #include <api/global_settings.h>
 #include <common/common_module.h>
-#include <transaction/transaction_message_bus.h>
+#include <transaction/transaction_message_bus_base.h>
+#include <transaction/transaction_transport_base.h>
 #include <cdb/ec2_request_paths.h>
 
 #include "settings.h"
+#include "media_server_module.h"
+#include <api/runtime_info_manager.h>
 
 namespace {
     static const int kUpdateIfFailIntervalMs = 1000 * 60;
@@ -15,19 +18,20 @@ namespace {
 
 using namespace nx::network::cloud;
 
-QnConnectToCloudWatcher::QnConnectToCloudWatcher():
+QnConnectToCloudWatcher::QnConnectToCloudWatcher(ec2::QnTransactionMessageBusBase* messageBus):
     m_cdbEndPointFetcher(
-        new CloudDbUrlFetcher(std::make_unique<RandomEndpointSelector>()))
+        new CloudDbUrlFetcher(std::make_unique<RandomEndpointSelector>())),
+    m_messageBus(messageBus)
 {
     m_timer.setSingleShot(true);
     m_timer.setInterval(kUpdateIfFailIntervalMs);
 
+    const auto& commonModule = messageBus->commonModule();
     connect(&m_timer, &QTimer::timeout, this, &QnConnectToCloudWatcher::at_updateConnection);
-
-    connect(qnGlobalSettings, &QnGlobalSettings::cloudSettingsChanged, this, &QnConnectToCloudWatcher::at_updateConnection);
-    connect(QnRuntimeInfoManager::instance(), &QnRuntimeInfoManager::runtimeInfoAdded, this, &QnConnectToCloudWatcher::at_updateConnection);
-    connect(QnRuntimeInfoManager::instance(), &QnRuntimeInfoManager::runtimeInfoChanged, this, &QnConnectToCloudWatcher::at_updateConnection);
-    connect(QnRuntimeInfoManager::instance(), &QnRuntimeInfoManager::runtimeInfoRemoved, this, &QnConnectToCloudWatcher::at_updateConnection);
+    connect(commonModule->globalSettings(), &QnGlobalSettings::cloudSettingsChanged, this, &QnConnectToCloudWatcher::at_updateConnection);
+    connect(commonModule->runtimeInfoManager(), &QnRuntimeInfoManager::runtimeInfoAdded, this, &QnConnectToCloudWatcher::at_updateConnection);
+    connect(commonModule->runtimeInfoManager(), &QnRuntimeInfoManager::runtimeInfoChanged, this, &QnConnectToCloudWatcher::at_updateConnection);
+    connect(commonModule->runtimeInfoManager(), &QnRuntimeInfoManager::runtimeInfoRemoved, this, &QnConnectToCloudWatcher::at_updateConnection);
 }
 
 QnConnectToCloudWatcher::~QnConnectToCloudWatcher()
@@ -43,21 +47,21 @@ void QnConnectToCloudWatcher::restartTimer()
 void QnConnectToCloudWatcher::at_updateConnection()
 {
     m_timer.stop();
-
-    QnPeerRuntimeInfo localInfo = QnRuntimeInfoManager::instance()->localInfo();
+    const auto& commonModule = m_messageBus->commonModule();
+    QnPeerRuntimeInfo localInfo = commonModule->runtimeInfoManager()->localInfo();
     bool needCloudConnect =
         localInfo.data.flags.testFlag(ec2::RF_MasterCloudSync) &&
-        !qnGlobalSettings->cloudSystemId().isEmpty() &&
-		!qnGlobalSettings->cloudAuthKey().isEmpty();
+        !commonModule->globalSettings()->cloudSystemId().isEmpty() &&
+		!commonModule->globalSettings()->cloudAuthKey().isEmpty();
     if (!needCloudConnect)
     {
         if (!m_cloudUrl.isEmpty())
-            qnTransactionBus->removeConnectionFromPeer(m_cloudUrl);
+            m_messageBus->removeOutgoingConnectionFromPeer(::ec2::kCloudPeerId);
         return;
     }
 
-    const auto cdbEndpoint = 
-        MSSettings::roSettings()->value(nx_ms_conf::CDB_ENDPOINT, "").toString();
+    const auto cdbEndpoint =
+        qnServerModule->roSettings()->value(nx_ms_conf::CDB_ENDPOINT, "").toString();
     if (!cdbEndpoint.isEmpty())
     {
         addCloudPeer((QString)lm("http://%1").arg(cdbEndpoint));
@@ -71,7 +75,7 @@ void QnConnectToCloudWatcher::at_updateConnection()
                 if (statusCode != nx_http::StatusCode::ok)
                 {
                     NX_LOGX(lm("Error fetching cloud_db endpoint. HTTP result: %1")
-                        .str(statusCode), cl_logWARNING);
+                        .arg(statusCode), cl_logWARNING);
                     // try once more later
                     metaObject()->invokeMethod(this, "restartTimer", Qt::QueuedConnection);
                     return;
@@ -84,12 +88,13 @@ void QnConnectToCloudWatcher::at_updateConnection()
 
 void QnConnectToCloudWatcher::addCloudPeer(QUrl url)
 {
+    const auto& commonModule = m_messageBus->commonModule();
     NX_LOGX(lm("Creating transaction connection to cloud_db at %1")
-        .str(url), cl_logDEBUG1);
+        .arg(url), cl_logDEBUG1);
 
     m_cloudUrl = url;
     m_cloudUrl.setPath(nx::cdb::api::kEc2EventsPath);
-    m_cloudUrl.setUserName(qnGlobalSettings->cloudSystemId());
-    m_cloudUrl.setPassword(qnGlobalSettings->cloudAuthKey());
-    qnTransactionBus->addConnectionToPeer(m_cloudUrl);
+    m_cloudUrl.setUserName(commonModule->globalSettings()->cloudSystemId());
+    m_cloudUrl.setPassword(commonModule->globalSettings()->cloudAuthKey());
+    m_messageBus->addOutgoingConnectionToPeer(::ec2::kCloudPeerId, m_cloudUrl);
 }

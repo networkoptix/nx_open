@@ -5,7 +5,7 @@
 #include <nx/utils/thread/mutex.h>
 
 #include <transaction/transaction_transport_base.h>
-#include <utils/common/subscription.h>
+#include <nx/utils/subscription.h>
 
 #include "test_transaction_transport.h"
 
@@ -20,9 +20,9 @@ enum class KeepAlivePolicy
 };
 
 using OnConnectionBecomesActiveSubscription =
-    utils::Subscription<::ec2::QnTransactionTransportBase::State>;
+    utils::Subscription<int /*connectionId*/, ::ec2::QnTransactionTransportBase::State>;
 using OnConnectionFailureSubscription =
-    utils::Subscription<::ec2::QnTransactionTransportBase::State>;
+    utils::Subscription<int /*connectionId*/, ::ec2::QnTransactionTransportBase::State>;
 
 /**
  * Helps to establish transaction connection to appserver2 peer and monitor its state.

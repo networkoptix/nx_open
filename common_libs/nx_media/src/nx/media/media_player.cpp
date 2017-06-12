@@ -6,29 +6,31 @@
 #include <QtCore/QTimer>
 #include <QtCore/QMutex>
 
+#include <nx/kit/debug.h>
+
+#include <common/common_module.h>
+#include <nx/utils/log/log.h>
+#include <utils/common/long_runable_cleanup.h>
+
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/camera_history.h>
 #include <core/resource/media_server_resource.h>
 
+#include <plugins/resource/avi/avi_resource.h>
+#include <plugins/resource/avi/avi_archive_delegate.h>
+
 #include <nx/streaming/archive_stream_reader.h>
 #include <nx/streaming/rtsp_client_archive_delegate.h>
+
+#include <nx/media/ini.h>
 
 #include "player_data_consumer.h"
 #include "frame_metadata.h"
 #include "video_decoder_registry.h"
 #include "audio_output.h"
 
-#include <plugins/resource/avi/avi_resource.h>
-#include <plugins/resource/avi/avi_archive_delegate.h>
-#include <nx/utils/flag_config.h>
-#include <nx/utils/log/log.h>
-
-#define OUTPUT_PREFIX "media_player: "
-#include <nx/utils/debug_utils.h>
-
 #include "media_player_quality_chooser.h"
-#include <utils/common/long_runable_cleanup.h>
 
 namespace nx {
 namespace media {
@@ -36,44 +38,29 @@ namespace media {
 namespace {
 
 // Max allowed frame duration. If the distance is higher, then the discontinuity is detected.
-static const qint64 kMaxFrameDurationMs = 1000 * 5;
+static constexpr qint64 kMaxFrameDurationMs = 1000 * 5;
 
-static const qint64 kLivePosition = -1;
+static constexpr qint64 kLivePosition = -1;
 
 // Resync playback timer if a video frame is too late.
-static const int kMaxDelayForResyncMs = 500;
+static constexpr int kMaxDelayForResyncMs = 500;
 
 // Max allowed amount of underflow/overflow issues in Live mode before extending live buffer.
-static const int kMaxCounterForWrongLiveBuffer = 2;
+static constexpr int kMaxCounterForWrongLiveBuffer = 2;
 
 // Calculate next time to render later. It used for AV sync in case of audio buffer has hole in the middle.
 // At this case current audio playback position may be significant less than video frame PTS.
 // Audio and video timings will became similar as soon as audio buffer passes a hole.
-static const int kTryLaterIntervalMs = 16;
+static constexpr int kTryLaterIntervalMs = 16;
 
 // Default value for max openGL texture size
-static const int kDefaultMaxTextureSize = 2048;
+static constexpr int kDefaultMaxTextureSize = 2048;
 
 // Player will go to the invalid state if no data is received within this timeout.
-static const int kGotDataTimeoutMs = 1000 * 30;
+static constexpr int kGotDataTimeoutMs = 1000 * 30;
 
 // Periodic tasks timer interval
-static const int kPeriodicTasksTimeoutMs = 1000;
-
-struct NxMediaFlagConfig: public nx::utils::FlagConfig
-{
-    using nx::utils::FlagConfig::FlagConfig;
-
-    NX_STRING_PARAM("", substitutePlayerUrl, "Use this Url for video, e.g. file:///c:/test.MP4");
-    NX_FLAG(0, outputFrameDelays, "Log if frame delay is negative.");
-    NX_FLAG(0, enableFps, "");
-    NX_INT_PARAM(-1, hwVideoX, "If not -1, override hardware video window X.");
-    NX_INT_PARAM(-1, hwVideoY, "If not -1, override hardware video window Y.");
-    NX_INT_PARAM(-1, hwVideoWidth, "If not -1, override hardware video window width.");
-    NX_INT_PARAM(-1, hwVideoHeight, "If not -1, override hardware video window height.");
-    NX_FLAG(0, forceIframesOnly, "For Low Quality selection, force I-frames-only mode.");
-};
-NxMediaFlagConfig conf("nx_media");
+static constexpr int kPeriodicTasksTimeoutMs = 1000;
 
 static qint64 msecToUsec(qint64 posMs)
 {
@@ -90,7 +77,7 @@ static qint64 usecToMsec(qint64 posUsec)
 class PlayerPrivate: public QObject
 {
     Q_DECLARE_PUBLIC(Player)
-    Player *q_ptr;
+    Player* q_ptr;
 
 public:
     // Holds QT property value.
@@ -468,7 +455,7 @@ QVideoFramePtr PlayerPrivate::scaleFrame(const QVideoFramePtr& videoFrame)
 
 void PlayerPrivate::presentNextFrame()
 {
-    NX_SHOW_FPS("presentNextFrame");
+    NX_FPS(PresentNextFrame);
 
     if (!videoFrameToRender)
         return;
@@ -578,11 +565,11 @@ qint64 PlayerPrivate::getDelayForNextFrameWithoutAudioMs(const QVideoFramePtr& f
         liveMode && lastVideoPtsMs.is_initialized() && mediaQueueLenMs == 0 && frameDelayMs < 0;
     bool liveBufferOverflow = liveMode && mediaQueueLenMs > liveBufferMs;
 
-    if (conf.outputFrameDelays)
+    if (ini().outputFrameDelays)
     {
         if (frameDelayMs < 0)
         {
-            PRINT << "ptsMs: " << ptsMs << ", ptsDeltaMs: " << ptsDeltaMs
+            NX_PRINT << "ptsMs: " << ptsMs << ", ptsDeltaMs: " << ptsDeltaMs
                 << ", frameDelayMs: " << frameDelayMs;
         }
     }
@@ -701,14 +688,14 @@ bool PlayerPrivate::initDataProvider()
                 r = guardedThis->videoGeometry;
             }
 
-            if (conf.hwVideoX != -1)
-                r.setX(conf.hwVideoX);
-            if (conf.hwVideoY != -1)
-                r.setY(conf.hwVideoY);
-            if (conf.hwVideoWidth != -1)
-                r.setWidth(conf.hwVideoWidth);
-            if (conf.hwVideoHeight != -1)
-                r.setHeight(conf.hwVideoHeight);
+            if (ini().hwVideoX != -1)
+                r.setX(ini().hwVideoX);
+            if (ini().hwVideoY != -1)
+                r.setY(ini().hwVideoY);
+            if (ini().hwVideoWidth != -1)
+                r.setWidth(ini().hwVideoWidth);
+            if (ini().hwVideoHeight != -1)
+                r.setHeight(ini().hwVideoHeight);
 
             return r;
         });
@@ -755,7 +742,7 @@ Player::Player(QObject *parent):
 {
     Q_D(const Player);
     d->log(lit("Player()"));
-    conf.reload();
+    ini().reload();
 }
 
 Player::~Player()
@@ -901,7 +888,7 @@ void Player::setSource(const QUrl& url)
 {
     Q_D(Player);
 
-    const QUrl& newUrl = *conf.substitutePlayerUrl ? QUrl(conf.substitutePlayerUrl) : url;
+    const QUrl& newUrl = *ini().substitutePlayerUrl ? QUrl(ini().substitutePlayerUrl) : url;
 
     if (newUrl == d->url)
     {
@@ -925,7 +912,7 @@ void Player::setSource(const QUrl& url)
     }
     else
     {
-        d->resource = qnResPool->getResourceById(QnUuid(path));
+        d->resource = commonModule()->resourcePool()->getResourceById(QnUuid(path));
     }
 
     if (d->resource && currentState == State::Playing)
@@ -1001,9 +988,9 @@ void Player::setVideoQuality(int videoQuality)
 {
     Q_D(Player);
 
-    if (conf.forceIframesOnly && videoQuality == LowVideoQuality)
+    if (ini().forceIframesOnly && videoQuality == LowVideoQuality)
     {
-        d->log(lit("setVideoQuality(%1): config forceIframesOnlyis true => use value %2")
+        d->log(lit("setVideoQuality(%1): .ini forceIframesOnly is set => use value %2")
             .arg(videoQuality).arg(LowIframesOnlyVideoQuality));
         videoQuality = LowIframesOnlyVideoQuality;
     }

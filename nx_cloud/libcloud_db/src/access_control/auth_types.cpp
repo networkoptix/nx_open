@@ -14,7 +14,7 @@ AuthorizationInfo::AuthorizationInfo()
 {
 }
 
-AuthorizationInfo::AuthorizationInfo( stree::ResourceContainer&& rc )
+AuthorizationInfo::AuthorizationInfo( nx::utils::stree::ResourceContainer&& rc )
 :
     m_rc( std::move(rc) )
 {
@@ -29,7 +29,7 @@ bool AuthorizationInfo::getAsVariant( int resID, QVariant* const value ) const
     return false;
 }
 
-std::unique_ptr<stree::AbstractConstIterator> AuthorizationInfo::begin() const
+std::unique_ptr<nx::utils::stree::AbstractConstIterator> AuthorizationInfo::begin() const
 {
     return m_rc.begin();
 }

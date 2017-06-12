@@ -5,28 +5,13 @@
 namespace ec2
 {
 
-static QnDistributedMutexManager* m_staticInstance = 0;
-
-QnDistributedMutexManager* QnDistributedMutexManager::instance()
+QnDistributedMutexManager::QnDistributedMutexManager(QnTransactionMessageBus* messageBus):
+    m_messageBus(messageBus)
 {
-    return m_staticInstance;
-}
-
-void QnDistributedMutexManager::initStaticInstance(QnDistributedMutexManager* value)
-{
-    if (m_staticInstance)
-        delete m_staticInstance;
-    m_staticInstance = value;
-}
-
-QnDistributedMutexManager::QnDistributedMutexManager():
-    m_timestamp(1),
-    m_userDataHandler(0)
-{
-    connect(qnTransactionBus, &QnTransactionMessageBus::gotLockRequest,    this, &QnDistributedMutexManager::at_gotLockRequest);
-    connect(qnTransactionBus, &QnTransactionMessageBus::gotLockResponse,   this, &QnDistributedMutexManager::at_gotLockResponse);
-    connect(qnTransactionBus, &QnTransactionMessageBus::peerFound,         this, &QnDistributedMutexManager::peerFound);
-    connect(qnTransactionBus, &QnTransactionMessageBus::peerLost,          this, &QnDistributedMutexManager::peerLost);
+    connect(m_messageBus, &QnTransactionMessageBus::gotLockRequest,    this, &QnDistributedMutexManager::at_gotLockRequest);
+    connect(m_messageBus, &QnTransactionMessageBus::gotLockResponse,   this, &QnDistributedMutexManager::at_gotLockResponse);
+    connect(m_messageBus, &QnTransactionMessageBusBase::peerFound,         this, &QnDistributedMutexManager::peerFound);
+    connect(m_messageBus, &QnTransactionMessageBus::peerLost,          this, &QnDistributedMutexManager::peerLost);
 
     //connect(qnTransactionBus, &QnTransactionMessageBus::gotUnlockRequest,  this, &QnDistributedMutexManager::at_gotUnlockRequest, Qt::DirectConnection);
 }
@@ -50,8 +35,6 @@ QnDistributedMutex* QnDistributedMutexManager::createMutex(const QString& name)
 
 void QnDistributedMutexManager::releaseMutex(const QString& name)
 {
-    if (!m_staticInstance)
-        return; // todo: connection already closed and object deleted, but posted ~QnDistributedMutex have access to deleted object. Refactor is required
     QnMutexLocker lock( &m_mutex );
     m_mutexList.remove(name);
 }
@@ -66,13 +49,15 @@ void QnDistributedMutexManager::at_gotLockRequest(ApiLockData lockData)
     if (netMutex)
         netMutex->at_gotLockRequest(lockData);
     else {
-        QnTransaction<ApiLockData> tran(ApiCommand::lockResponse);
+        QnTransaction<ApiLockData> tran(
+            ApiCommand::lockResponse,
+            m_messageBus->commonModule()->moduleGUID());
         tran.params.name = lockData.name;
         tran.params.timestamp = lockData.timestamp;
-        tran.params.peer = qnCommon->moduleGUID();
+        tran.params.peer = m_messageBus->commonModule()->moduleGUID();
         if (m_userDataHandler)
             tran.params.userData = m_userDataHandler->getUserData(lockData.name);
-        qnTransactionBus->sendTransaction(tran, lockData.peer);
+        m_messageBus->sendTransaction(tran, lockData.peer);
     }
 }
 
@@ -100,6 +85,11 @@ void QnDistributedMutexManager::at_gotUnlockRequest(ApiLockData lockData)
 qint64 QnDistributedMutexManager::newTimestamp()
 {
     return ++m_timestamp;
+}
+
+QnTransactionMessageBus* QnDistributedMutexManager::messageBus() const
+{
+    return m_messageBus;
 }
 
 }

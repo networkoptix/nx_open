@@ -24,7 +24,7 @@
 class QnUpnpResourceSearcher : virtual public QnAbstractNetworkResourceSearcher
 {
 public:
-    QnUpnpResourceSearcher();
+    QnUpnpResourceSearcher(QnCommonModule* commonModule);
     ~QnUpnpResourceSearcher();
 
     void setSendRequests(bool value);
@@ -80,6 +80,8 @@ class QnUpnpResourceSearcherAsync
     public nx_upnp::SearchHandler
 {
 public:
+    QnUpnpResourceSearcherAsync(QnCommonModule* commonModule);
+
     //!Implementation of QnAbstractNetworkResourceSearcher::findResources
     virtual QnResourceList findResources() override;
     //!Implementation of UPNPSearchHandler::processPacket
