@@ -189,7 +189,7 @@ table.webclient-window>tbody>tr>td{
 
 .cameras-panel{
   /*min-width: 320px;*/
-  overflow-y: auto;
+  overflow-y: scroll;
   overflow-x: hidden;
   height: 100%;
   width:320px;
@@ -686,105 +686,6 @@ table.webclient-window>tbody>tr>td{
 .videowindow.fullscreen video{
   height:100% !important;
   width:100% !important;
-}
-
-
-.player-controls{
-  padding: 33px 25px 32px 22px !important;
-}
-
-.zoom-level{
-  margin-top: 6px;
-}
-
-.live-circle{
-  padding: 3px;
-  margin: 2px 8px 2px 0;
-  background-color: $light6;
-  display: inline-block;
-  -moz-border-radius: 100px;
-  -webkit-border-radius: 100px;
-  border-radius: 100px;
-  -moz-box-shadow: 0px 0px 2px #888;
-  -webkit-box-shadow: 0px 0px 2px #888;
-  box-shadow: 0px 0px 2px #888;
-}
-
-.live-button{
-  width: 64px;
-  height: 100%;
-  text-align: center;
-  line-height: 100px;
-  background-color:$additional_light2;
-  border-left: 1px solid $light6 !important;
-  border-right: 1px solid $light4 !important;
-
-  .webclient-button{
-    margin: 40px auto;
-  }
-
-  .active{
-    background-color: $light5 !important;
-    border-left: 1px solid $light8 !important;
-    border-right: 1px solid $light7 !important; 
-  }
-
-  &:hover{
-    background-color: $additional_light3 !important;
-    border-left: 1px solid $light6 !important;
-    border-right: 1px solid $light5 !important; 
-  }
-
-  &.active:hover{
-    background-color: $light4 !important;
-    border-left: 1px solid $light7 !important;
-    border-right: 1px solid $light6 !important; 
-  }
-
-  &:active,
-  &.active:active {
-    background-color: $light5 !important;
-    border-left: 1px solid $light8 !important;
-    border-right: 1px solid $light7 !important; 
-  }
-
-  &.active > .live-circle{
-    background-color: chartreuse !important;
-  }
-}
-
-.volume{
-  width: 41px;
-  height: 100px;
-
-  .glyphicon-volume-up{
-    margin: 40px auto !important;
-  }
-
-  &-control{
-    width: 212px;
-    height: 44px;
-    position: absolute;
-    right: 0;
-    top: -44px;
-    background-color: #333333;
-  }
-  &-icons{
-    width: 44px;
-    height: 44px;
-
-    .glyphicon{
-      position: relative;
-      top: 14px;
-      left: 16px;
-    }
-
-    output{
-      position: relative;
-      top: 4px;
-      left: 6px;
-    }
-  }  
 }
 
 .dropdown > .webclient-button{
