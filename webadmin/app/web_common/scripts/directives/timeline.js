@@ -110,6 +110,7 @@ angular.module('nxCommon')
                 }
                 function updateTimelineWidth(){
                     scope.viewportWidth = element.find('.viewport').width();
+                    console.log("Videport: %s", scope.viewportWidth);
                     canvas.width  = scope.viewportWidth;
                     scope.scaleManager.setViewportWidth(scope.viewportWidth);
                     $timeout(function(){
@@ -462,7 +463,7 @@ angular.module('nxCommon')
 
                 // !!! Finally run required functions to initialize timeline
                 updateTimelineHeight();
-                updateTimelineWidth(); // Adjust width
+                $timeout(updateTimelineWidth); // Adjust width
                 initTimeline(); // Setup boundaries and scale
 
                 // !!! Start drawing
