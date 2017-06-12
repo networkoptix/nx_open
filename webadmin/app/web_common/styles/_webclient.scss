@@ -189,7 +189,7 @@ table.webclient-window>tbody>tr>td{
 
 .cameras-panel{
   /*min-width: 320px;*/
-  overflow-y: auto;
+  overflow-y: scroll;
   overflow-x: hidden;
   height: 100%;
   width:320px;
