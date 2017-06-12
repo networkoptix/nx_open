@@ -81,7 +81,7 @@ QnMulticodecRtpReader::QnMulticodecRtpReader(
     else
         m_RtpSession.setTCPTimeout(1000 * 10);
 
-    m_RtpSession.setGuessAuthDigest(false);
+    m_RtpSession.setShouldGuessAuthDigest(false);
 
     QnMediaResourcePtr mr = qSharedPointerDynamicCast<QnMediaResource>(res);
     m_numberOfVideoChannels = 1;

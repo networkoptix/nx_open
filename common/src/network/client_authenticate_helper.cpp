@@ -15,16 +15,18 @@ Qn::AuthResult QnClientAuthHelper::authenticate(
     const nx_http::BufferType& authHeaderBuf = nx_http::getHeaderValue(
         response.headers,
         response.statusLine.statusCode == nx_http::StatusCode::proxyAuthenticationRequired
-        ? "Proxy-Authenticate"
-        : "WWW-Authenticate");
+            ? "Proxy-Authenticate"
+            : "WWW-Authenticate");
+
     if (!authHeaderBuf.isEmpty())
     {
-        nx_http::header::WWWAuthenticate authenticateHeader;
-        if (!authenticateHeader.parse(authHeaderBuf))
+        nx_http::header::WWWAuthenticate authenticationHeader;
+        if (!authenticationHeader.parse(authHeaderBuf))
             return Qn::Auth_WrongDigest;
-        authenticationCtx->authenticateHeader = std::move(authenticateHeader);
+        authenticationCtx->setAuthenticationHeader(authenticationHeader);
     }
-    authenticationCtx->responseStatusCode = response.statusLine.statusCode;
+    authenticationCtx->setResponseStatusCode(
+        static_cast<nx_http::StatusCode::Value>(response.statusLine.statusCode));
 
     return addAuthorizationToRequest(
         auth,
@@ -37,21 +39,23 @@ Qn::AuthResult QnClientAuthHelper::addAuthorizationToRequest(
     nx_http::Request* const request,
     const HttpAuthenticationClientContext* const authenticationCtx)
 {
-    if (authenticationCtx->authenticateHeader)
+    auto authHeaderWrapped = authenticationCtx->authenticationHeader();
+    if (authHeaderWrapped)
     {
-        if (authenticationCtx->authenticateHeader.get().authScheme == nx_http::header::AuthScheme::digest)
+        auto authHeader = authHeaderWrapped.get();
+        if (authHeader.authScheme == nx_http::header::AuthScheme::digest)
         {
             nx_http::insertOrReplaceHeader(
                 &request->headers,
                 nx_http::parseHeader(CLSimpleHTTPClient::digestAccess(
                     auth,
-                    QLatin1String(authenticationCtx->authenticateHeader.get().params.value("realm")),
-                    QLatin1String(authenticationCtx->authenticateHeader.get().params.value("nonce")),
+                    QLatin1String(authHeader.params.value("realm")),
+                    QLatin1String(authHeader.params.value("nonce")),
                     QLatin1String(request->requestLine.method),
                     request->requestLine.url.toString(),
-                    authenticationCtx->responseStatusCode == nx_http::StatusCode::proxyAuthenticationRequired).toLatin1()));
+                    authenticationCtx->responseStatusCode() == nx_http::StatusCode::proxyAuthenticationRequired).toLatin1()));
         }
-        else if (authenticationCtx->authenticateHeader.get().authScheme == nx_http::header::AuthScheme::basic &&
+        else if (authHeader.authScheme == nx_http::header::AuthScheme::basic &&
             !auth.user().isEmpty())
         {
             nx_http::insertOrReplaceHeader(
@@ -59,7 +63,7 @@ Qn::AuthResult QnClientAuthHelper::addAuthorizationToRequest(
                 nx_http::parseHeader(CLSimpleHTTPClient::basicAuth(auth)));
         }
     }
-    else if (!auth.user().isEmpty() && authenticationCtx->guessDigest)
+    else if (!auth.user().isEmpty() && authenticationCtx->shouldGuessDigest())
     {
         // Trying to "guess" authentication header.
         // It is used in the client/server conversations,
@@ -76,4 +80,48 @@ Qn::AuthResult QnClientAuthHelper::addAuthorizationToRequest(
     }
 
     return Qn::Auth_OK;
+}
+
+HttpAuthenticationClientContext::HttpAuthenticationClientContext(bool shouldGuessDigest):
+    m_shouldGuessDigest(shouldGuessDigest)
+{
+}
+
+bool HttpAuthenticationClientContext::shouldGuessDigest() const
+{
+    return m_shouldGuessDigest;
+}
+
+HttpAuthenticationClientContext::AuthHeaderType
+HttpAuthenticationClientContext::authenticationHeader() const
+{
+    return m_authenticationHeader;
+}
+
+void HttpAuthenticationClientContext::setAuthenticationHeader(
+    const HttpAuthenticationClientContext::AuthHeaderType& header)
+{
+    m_authenticationHeader = header;
+}
+
+nx_http::StatusCode::Value HttpAuthenticationClientContext::responseStatusCode() const
+{
+    return m_responseStatusCode;
+}
+
+void HttpAuthenticationClientContext::setResponseStatusCode(
+    nx_http::StatusCode::Value responseStatusCode)
+{
+    m_responseStatusCode = responseStatusCode;
+}
+
+bool HttpAuthenticationClientContext::isValid() const
+{
+    return static_cast<bool>(m_authenticationHeader);
+}
+
+void HttpAuthenticationClientContext::clear()
+{
+    m_authenticationHeader.reset();
+    m_responseStatusCode = nx_http::StatusCode::ok;
 }

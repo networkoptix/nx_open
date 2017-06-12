@@ -438,6 +438,7 @@ QnRtspClient::QnRtspClient( std::unique_ptr<AbstractStreamSocket> tcpSock )
     m_additionalReadBuffer( nullptr ),
     m_additionalReadBufferPos( 0 ),
     m_additionalReadBufferSize( 0 ),
+    m_rtspAuthCtx(/*shouldGuessDigest*/ true),
     m_userAgent(nx_http::userAgentString()),
     m_defaultAuthScheme(nx_http::header::AuthScheme::basic)
 {
@@ -663,11 +664,12 @@ CameraDiagnostics::Result QnRtspClient::open(const QString& url, qint64 startTim
     m_contentBase = m_url.toString();
     m_responseBufferLen = 0;
     m_rtpToTrack.clear();
-    m_rtspAuthCtx.clear();
+    m_rtspAuthCtx = HttpAuthenticationClientContext(m_shouldGuessAuthDigest);
     if (m_defaultAuthScheme == nx_http::header::AuthScheme::basic)
-        m_rtspAuthCtx.authenticateHeader = nx_http::header::WWWAuthenticate(m_defaultAuthScheme);
-
-    m_rtspAuthCtx.guessDigest = m_guessAuthDigest;
+    {
+        m_rtspAuthCtx.setAuthenticationHeader(
+            nx_http::header::WWWAuthenticate(m_defaultAuthScheme));
+    }
 
     {
         QnMutexLocker lock(&m_socketMutex);
@@ -691,7 +693,8 @@ CameraDiagnostics::Result QnRtspClient::open(const QString& url, qint64 startTim
     m_tcpSock->setRecvTimeout(m_tcpTimeout);
     m_tcpSock->setSendTimeout(m_tcpTimeout);
 
-    if (m_numOfPredefinedChannels) {
+    if (m_numOfPredefinedChannels)
+    {
         usePredefinedTracks();
         return CameraDiagnostics::NoErrorResult();
     }
@@ -1931,7 +1934,7 @@ int QnRtspClient::readSocketWithBuffering( quint8* buf, size_t bufSize, bool rea
 bool QnRtspClient::sendRequestAndReceiveResponse( nx_http::Request&& request, QByteArray& responseBuf )
 {
     int prevStatusCode = nx_http::StatusCode::ok;
-    if (m_rtspAuthCtx.authenticateHeader)
+    if (m_rtspAuthCtx.authenticationHeader())
         addAuth( &request );
     addAdditionAttrs( &request );
 
@@ -1992,8 +1995,8 @@ AbstractStreamSocket* QnRtspClient::tcpSock()
     return m_tcpSock.get();
 }
 
-void QnRtspClient::setGuessAuthDigest(bool guessAuthDigest)
+void QnRtspClient::setShouldGuessAuthDigest(bool shouldGuessAuthDigest)
 {
-    m_guessAuthDigest = guessAuthDigest;
+    m_shouldGuessAuthDigest = shouldGuessAuthDigest;
 }
 

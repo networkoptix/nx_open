@@ -1,32 +1,32 @@
-#ifndef __QN_CLIENT_AUTH_HELPER__
-#define __QN_CLIENT_AUTH_HELPER__
+#pragma once
 
 #include <QtNetwork/QAuthenticator>
 
-#include "common/common_globals.h"
+#include <common/common_globals.h>
 #include <nx/network/http/httptypes.h>
 
 class HttpAuthenticationClientContext
 {
+    using AuthHeaderType = boost::optional<nx_http::header::WWWAuthenticate>;
+
 public:
-    boost::optional<nx_http::header::WWWAuthenticate> authenticateHeader;
-    int responseStatusCode;
-    bool guessDigest = true;  //< Should be set to false for cameras.
+    explicit HttpAuthenticationClientContext(bool shouldGuessDigest);
 
-    HttpAuthenticationClientContext()
-    :
-        responseStatusCode( nx_http::StatusCode::ok )
-    {
-    }
+    bool shouldGuessDigest() const;  //< Should be set to false for cameras.
 
-    bool isValid() const { return static_cast<bool>(authenticateHeader); }
+    AuthHeaderType authenticationHeader() const;
+    void setAuthenticationHeader(const AuthHeaderType& header);
 
-    void clear()
-    {
-        authenticateHeader.reset();
-        responseStatusCode = nx_http::StatusCode::ok;
-        guessDigest = true;
-    }
+    nx_http::StatusCode::Value responseStatusCode() const;
+    void setResponseStatusCode(nx_http::StatusCode::Value responseStatusCode);
+
+    bool isValid() const;
+    void clear();
+
+private:
+    bool m_shouldGuessDigest;
+    boost::optional<nx_http::header::WWWAuthenticate> m_authenticationHeader = boost::none;
+    nx_http::StatusCode::Value m_responseStatusCode = nx_http::StatusCode::Value::ok;
 };
 
 class QnClientAuthHelper
@@ -54,4 +54,3 @@ public:
         const HttpAuthenticationClientContext* const authenticationCtx);
 };
 
-#endif // __QN_CLIENT_AUTH_HELPER__
