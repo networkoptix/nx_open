@@ -110,7 +110,6 @@ angular.module('nxCommon')
                 }
                 function updateTimelineWidth(){
                     scope.viewportWidth = element.find('.viewport').width();
-                    console.log("Videport: %s", scope.viewportWidth);
                     canvas.width  = scope.viewportWidth;
                     scope.scaleManager.setViewportWidth(scope.viewportWidth);
                     $timeout(function(){
