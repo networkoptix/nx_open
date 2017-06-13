@@ -442,7 +442,7 @@ bool Connection::handleMessage(const nx::Buffer& message)
 #endif
 
     MessageType messageType = (MessageType)message[offset];
-    NX_ASSERT(!m_remotePeer.persistentId.isNull());
+    //NX_ASSERT(!m_remotePeer.persistentId.isNull());
     emit gotMessage(weakPointer(), messageType, message.mid(offset + 1));
 
     return true;

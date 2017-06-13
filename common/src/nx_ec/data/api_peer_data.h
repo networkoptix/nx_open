@@ -98,7 +98,10 @@ struct ApiPeerData: ApiPersistentIdData
 
     static bool isClient(Qn::PeerType peerType)
     {
-            return peerType != Qn::PT_Server && peerType != Qn::PT_CloudServer && peerType != Qn::PT_OldServer;
+            return peerType != Qn::PT_Unknown && 
+                peerType != Qn::PT_Server && 
+                peerType != Qn::PT_CloudServer && 
+                peerType != Qn::PT_OldServer;
     }
 
     bool isClient() const

@@ -14,6 +14,7 @@
 #include <nx_ec/ec_proto_version.h>
 #include <utils/math/math.h>
 #include <http/p2p_connection_listener.h>
+#include <api/runtime_info_manager.h>
 
 namespace {
     int commitIntervalMs = 1000;
@@ -110,7 +111,7 @@ void MessageBus::start()
     m_localShortPeerInfo.encode(localPeer(), 0);
     m_peers.reset(new BidirectionRoutingInfo(localPeer()));
     addOfflinePeersFromDb();
-
+    m_lastRuntimeInfo[localPeer()] = commonModule()->runtimeInfoManager()->localInfo().data;
     base_type::start();
 }
 
@@ -195,6 +196,7 @@ void MessageBus::gotConnectionFromRemotePeer(
     {
         // Clients use simplified logic. They are started and subscribed to all updates immediately.
         context(connection)->isLocalStarted = true;
+        m_peers->addRecord(remotePeer, remotePeer, nx::p2p::RoutingRecord(1));
         sendInitialDataToClient(connection);
     }
 }
@@ -346,6 +348,15 @@ void MessageBus::printSubscribeMessage(
         .arg(records.join("\n")));
 }
 
+bool MessageBus::isLocalConnection(const ApiPersistentIdData& peer) const
+{
+    auto connection = m_connections.value(peer.id);
+    if (!connection)
+        return false;
+    auto peerType = connection->remotePeer().peerType;
+    return ec2::ApiPeerData::isClient(peerType) && peerType != Qn::PT_VideowallClient;
+}
+
 void MessageBus::sendAlivePeersMessage(const P2pConnectionPtr& connection)
 {
     QVector<PeerDistanceRecord> records;
@@ -353,6 +364,9 @@ void MessageBus::sendAlivePeersMessage(const P2pConnectionPtr& connection)
     const auto localPeer = ApiPersistentIdData(this->localPeer());
     for (auto itr = m_peers->allPeerDistances.cbegin(); itr != m_peers->allPeerDistances.cend(); ++itr)
     {
+        if (isLocalConnection(itr.key()))
+            continue; //< don't show this connection to other servers
+
         qint32 minDistance = itr->minDistance();
         // Don't broadcast foreign offline distances
         if (minDistance < kMaxDistance && minDistance > kMaxOnlineDistance)
@@ -507,9 +521,12 @@ bool MessageBus::hasStartingConnections() const
 {
     for (const auto& connection: m_connections)
     {
-        auto data = context(connection);
-        if (data->isLocalStarted && data->remotePeersMessage.isEmpty())
-            return true;
+        if (connection->remotePeer().isServer())
+        {
+            auto data = context(connection);
+            if (data->isLocalStarted && data->remotePeersMessage.isEmpty())
+                return true;
+        }
     }
     return false;
 }
@@ -1099,23 +1116,25 @@ bool MessageBus::selectAndSendTransactions(
 {
 
     QList<QByteArray> serializedTransactions;
-    bool isFinished = false;
-    const ErrorCode errorCode = m_db->transactionLog()->getExactTransactionsAfter(
-        &newSubscription,
-        connection->remotePeer().peerType == Qn::PeerType::PT_CloudServer,
-        serializedTransactions,
-        kMaxSelectDataSize,
-        &isFinished);
-    context(connection)->sendDataInProgress = !isFinished;
-    if (errorCode != ErrorCode::ok)
+    bool isFinished = true;
+    if (m_db)
     {
-        NX_WARNING(
-            this,
-            lit("P2P message bus failure. Can't select transaction list from database"));
-        return false;
+        const ErrorCode errorCode = m_db->transactionLog()->getExactTransactionsAfter(
+            &newSubscription,
+            connection->remotePeer().peerType == Qn::PeerType::PT_CloudServer,
+            serializedTransactions,
+            kMaxSelectDataSize,
+            &isFinished);
+        if (errorCode != ErrorCode::ok)
+        {
+            NX_WARNING(
+                this,
+                lit("P2P message bus failure. Can't select transaction list from database"));
+            return false;
+        }
     }
+    context(connection)->sendDataInProgress = !isFinished;
     context(connection)->remoteSubscription = newSubscription;
-
 
     if (nx::utils::log::isToBeLogged(cl_logDEBUG1, this))
     {
@@ -1256,7 +1275,7 @@ void MessageBus::gotTransaction(
 
     if (m_handler)
         m_handler->triggerNotification(tran, NotificationSource::Remote);
-
+    emitPeerFoundLostSignals();
     // Proxy transaction to subscribed peers
     sendTransaction(tran);
 }
@@ -1577,7 +1596,11 @@ void MessageBus::emitPeerFoundLostSignals()
         if (peer == ApiPersistentIdData(localPeer()))
             continue;
         if (itr->minDistance() < kMaxOnlineDistance)
-            newAlivePeers.insert(ApiPeerData(peer, Qn::PT_Server)); // TODO: Add detecting peer type for remote clients
+        {
+            const auto peerData = m_lastRuntimeInfo.value(peer);
+            if (!peerData.peer.isNull())
+                newAlivePeers.insert(peerData.peer);
+        }
     }
 
     std::vector<ApiPeerData> newPeers;
