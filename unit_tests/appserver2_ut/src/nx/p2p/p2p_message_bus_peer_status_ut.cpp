@@ -122,7 +122,7 @@ private:
     std::set<QnUuid> m_alivePeers;
 };
 
-TEST_F(MessageBusOnlinePeers, rhomConnect)
+TEST_F(MessageBusOnlinePeers, rhombConnect)
 {
     rhombConnectMain();
 }

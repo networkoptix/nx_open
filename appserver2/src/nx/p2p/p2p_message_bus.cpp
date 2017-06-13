@@ -359,27 +359,37 @@ bool MessageBus::isLocalConnection(const ApiPersistentIdData& peer) const
 
 void MessageBus::sendAlivePeersMessage(const P2pConnectionPtr& connection)
 {
-    QVector<PeerDistanceRecord> records;
-    records.reserve(m_peers->allPeerDistances.size());
-    const auto localPeer = ApiPersistentIdData(this->localPeer());
-    for (auto itr = m_peers->allPeerDistances.cbegin(); itr != m_peers->allPeerDistances.cend(); ++itr)
+    auto serializeMessage = [this](const P2pConnectionPtr& connection)
     {
-        if (isLocalConnection(itr.key()))
-            continue; //< don't show this connection to other servers
+        QVector<PeerDistanceRecord> records;
+        records.reserve(m_peers->allPeerDistances.size());
+        const auto localPeer = ApiPersistentIdData(this->localPeer());
+        for (auto itr = m_peers->allPeerDistances.cbegin(); itr != m_peers->allPeerDistances.cend(); ++itr)
+        {
+            if (isLocalConnection(itr.key()))
+                continue; //< don't show this connection to other servers
 
-        qint32 minDistance = itr->minDistance();
-        // Don't broadcast foreign offline distances
-        if (minDistance < kMaxDistance && minDistance > kMaxOnlineDistance)
-            minDistance = itr->distanceVia(localPeer);
+            // Don't send longer route than this peer already has.
+            // Otherwise it could generate route loop.
+            qint32 minDistance = itr->minDistance();
 
-        if (minDistance == kMaxDistance)
-            continue;
-        const qint16 peerNumber = m_localShortPeerInfo.encode(itr.key());
-        records.push_back(PeerDistanceRecord(peerNumber, minDistance));
-    }
-    NX_ASSERT(!records.isEmpty());
-    QByteArray data = serializePeersMessage(records, 1);
-    data.data()[0] = (quint8) MessageType::alivePeers;
+            if (itr->distanceVia(connection->remotePeer()) == minDistance)
+                continue;
+
+            // Don't broadcast foreign offline distances
+            if (minDistance < kMaxDistance && minDistance > kMaxOnlineDistance)
+                minDistance = itr->distanceVia(localPeer);
+
+            if (minDistance == kMaxDistance)
+                continue;
+            const qint16 peerNumber = m_localShortPeerInfo.encode(itr.key());
+            records.push_back(PeerDistanceRecord(peerNumber, minDistance));
+        }
+        NX_ASSERT(!records.isEmpty());
+        QByteArray data = serializePeersMessage(records, 1);
+        data.data()[0] = (quint8)MessageType::alivePeers;
+        return data;
+    };
 
     auto sendAlivePeersMessage = [this](const P2pConnectionPtr& connection, const QByteArray& data)
     {
@@ -400,7 +410,7 @@ void MessageBus::sendAlivePeersMessage(const P2pConnectionPtr& connection)
 
     if (connection)
     {
-        sendAlivePeersMessage(connection, data);
+        sendAlivePeersMessage(connection, serializeMessage(connection));
         return;
     }
 
@@ -410,7 +420,7 @@ void MessageBus::sendAlivePeersMessage(const P2pConnectionPtr& connection)
             continue;
         if (!context(connection)->isRemoteStarted)
             continue;
-        sendAlivePeersMessage(connection, data);
+        sendAlivePeersMessage(connection, serializeMessage(connection));
     }
 }
 
