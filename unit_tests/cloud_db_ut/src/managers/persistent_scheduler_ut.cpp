@@ -200,6 +200,12 @@ protected:
         readyFuture = readyPromise.get_future();
     }
 
+    virtual void TearDown() override
+    {
+        if (scheduler)
+            scheduler->stop();
+    }
+
     void expectingDbHelperInitFunctionsWillBeCalled()
     {
         EXPECT_CALL(dbHelper, getScheduleData(_, NotNull()))
@@ -260,6 +266,7 @@ protected:
             new nx::cdb::PersistentSheduler(&executor, &dbHelper));
 
         user = std::unique_ptr<SchedulerUser>(new SchedulerUser(&executor, scheduler.get(), &readyPromise));
+        scheduler->start();
     }
 
     void thenTaskIdsAreFilled()
@@ -299,6 +306,7 @@ TEST_F(PersistentScheduler, subscribe)
     whenSchedulerAndUserInitialized();
 
     user->subscribe(std::chrono::milliseconds(10));
+    std::this_thread::sleep_for(kSleepTimeout);
     thenTaskIdsAreFilled();
 }
 

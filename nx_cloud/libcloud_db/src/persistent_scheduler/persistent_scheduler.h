@@ -43,12 +43,14 @@ public:
     PersistentSheduler(
         nx::db::AbstractAsyncSqlQueryExecutor* sqlExecutor,
         AbstractSchedulerDbHelper* dbHelper);
+    ~PersistentSheduler();
 
     void registerEventReceiver(
         const QnUuid& functorId,
         AbstractPersistentScheduleEventReceiver* receiver);
 
     void start();
+    void stop();
 
     /**
      * Functions below should be called inside dbHandler
@@ -84,7 +86,8 @@ private:
     FunctorToReceiverMap m_functorToReceiver;
     QnMutex m_mutex;
     ScheduleData m_scheduleData;
-    nx::utils::StandaloneTimerManager m_timerManager;
+    std::unique_ptr<nx::utils::StandaloneTimerManager> m_timerManager;
+    QnMutex m_timerManagerMutex;
     std::unordered_map<QnUuid, nx::utils::TimerId> m_taskToTimer;
 };
 

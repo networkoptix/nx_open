@@ -51,6 +51,11 @@ PersistentSheduler::PersistentSheduler(
     readyFuture.wait();
 }
 
+PersistentSheduler::~PersistentSheduler()
+{
+    stop();
+}
+
 void PersistentSheduler::registerEventReceiver(
     const QnUuid& functorId,
     AbstractPersistentScheduleEventReceiver *receiver)
@@ -135,7 +140,9 @@ void PersistentSheduler::removeTimer(const QnUuid& taskId)
         }
         timerId = taskToTimerIt->second;
     }
-    m_timerManager.deleteTimer(timerId);
+    QnMutexLocker lock(&m_timerManagerMutex);
+    NX_ASSERT(m_timerManager);
+    m_timerManager->deleteTimer(timerId);
 }
 
 void PersistentSheduler::addTimer(
@@ -143,7 +150,9 @@ void PersistentSheduler::addTimer(
     const QnUuid& taskId,
     const ScheduleTaskInfo& taskInfo)
 {
-    auto timerId = m_timerManager.addNonStopTimer(
+    QnMutexLocker lock(&m_timerManagerMutex);
+    NX_ASSERT(m_timerManager);
+    auto timerId = m_timerManager->addNonStopTimer(
         [this, functorId, taskId, params = taskInfo.params](nx::utils::TimerId)
         {
             AbstractPersistentScheduleEventReceiver* receiver;
@@ -176,7 +185,7 @@ void PersistentSheduler::addTimer(
         timeoutFromTimepoint(taskInfo.fireTimePoint),
         taskInfo.period);
 
-    QnMutexLocker lock(&m_mutex);
+    QnMutexLocker lock2(&m_mutex);
     auto taskToTimerIt = m_taskToTimer.find(taskId);
     NX_ASSERT(taskToTimerIt == m_taskToTimer.cend());
     if (taskToTimerIt != m_taskToTimer.cend())
@@ -190,6 +199,8 @@ void PersistentSheduler::addTimer(
 
 void PersistentSheduler::start()
 {
+    QnMutexLocker lock(&m_timerManagerMutex);
+    m_timerManager.reset(new nx::utils::StandaloneTimerManager);
     for (const auto functorToTask : m_scheduleData.functorToTasks)
     {
         addTimer(
@@ -197,6 +208,15 @@ void PersistentSheduler::start()
             functorToTask.second,
             m_scheduleData.taskToParams[functorToTask.second]);
     }
+}
+
+void PersistentSheduler::stop()
+{
+    QnMutexLocker lock(&m_timerManagerMutex);
+    if (!m_timerManager)
+        return;
+    m_timerManager->stop();
+    m_timerManager.reset();
 }
 
 } // namespace cdb
