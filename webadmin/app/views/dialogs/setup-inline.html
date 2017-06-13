@@ -243,11 +243,17 @@
                 Password must contain different types of characters and have at least 8 symbols
             </div>
         </div>
-        <div class="form-group has-error"
-             ng-if="!forms.localForm.passwordInput.$valid && !forms.localForm.passwordInput.$error.required">
-            <div class="help-block">
-                Password must contain different types of characters and have at least 8 symbols
-            </div>
+        <div class="form-group has-error" ng-if="!forms.localForm.passwordInput.password.$valid">
+            <div class="help-block" ng-if="forms.localForm.passwordInput.password.$error.weak &&
+                  !forms.localForm.passwordInput.password.$error.common &&
+                  !forms.localForm.passwordInput.password.$error.pattern &&
+                  !forms.localForm.passwordInput.password.$error.minlength">{{L.passwordRequirements.weakMessage}}</div>
+            <div class="help-block" ng-if="forms.localForm.passwordInput.password.$error.common &&
+                  !forms.localForm.passwordInput.password.$error.pattern &&
+                  !forms.localForm.passwordInput.password.$error.minlength">{{L.passwordRequirements.commonMessage}}</div>
+            <div class="help-block" ng-if="forms.localForm.passwordInput.password.$error.minlength &&
+                  !forms.localForm.passwordInput.password.$error.pattern">{{L.passwordRequirements.minLengthMessage}}</div>
+            <div class="help-block" ng-if="forms.localForm.passwordInput.password.$error.pattern">{{L.passwordRequirements.requiredMessage}}</div>
         </div>
 
         <div class="form-group has-error"

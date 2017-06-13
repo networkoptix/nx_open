@@ -45,6 +45,21 @@ void SqlQuery::exec()
     }
 }
 
+bool SqlQuery::next()
+{
+    return m_sqlQuery.next();
+}
+
+QVariant SqlQuery::value(int index) const
+{
+    return m_sqlQuery.value(index);
+}
+
+QVariant SqlQuery::value(const QString& name) const
+{
+    return m_sqlQuery.value(name);
+}
+
 QSqlQuery& SqlQuery::impl()
 {
     return m_sqlQuery;

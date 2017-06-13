@@ -7,12 +7,14 @@ namespace cdb {
 namespace dao {
 namespace memory {
 
-std::string UserAuthentication::fetchSystemNonce(
+boost::optional<std::string> UserAuthentication::fetchSystemNonce(
     nx::db::QueryContext* const /*queryContext*/,
     const std::string& systemId)
 {
     auto it = m_systemIdToNonce.find(systemId);
-    return it != m_systemIdToNonce.end() ? it->second : std::string();
+    if (it == m_systemIdToNonce.end())
+        return boost::none;
+    return it->second;
 }
 
 void UserAuthentication::insertOrReplaceSystemNonce(

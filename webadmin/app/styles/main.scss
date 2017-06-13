@@ -46,11 +46,14 @@ $radio-panels-selected-border: $gray-light;
   font-family: "Roboto";
 }
 
-/* Space out content a bit */
+/* Space out content a bit  */
 body {
   padding-bottom: 20px;
   height:100%;
-  overflow:hidden;
+}
+
+html.webclient-page{
+    overflow: hidden;
 }
 
 @media only screen and (device-width: 768px) {

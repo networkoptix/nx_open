@@ -56,6 +56,7 @@ DbInstanceController::DbInstanceController(const nx::db::ConnectionOptions& dbCo
     dbStructureUpdater().addUpdateScript(db::kAddSystemRegistrationTimestamp);
     dbStructureUpdater().addUpdateScript(db::kAddSystemHealthStateHistory);
     dbStructureUpdater().addUpdateScript(db::kAddSystemUserAuthInfo);
+    dbStructureUpdater().addUpdateScript(db::kAddSystemNonce);
 }
 
 } // namespace rdb

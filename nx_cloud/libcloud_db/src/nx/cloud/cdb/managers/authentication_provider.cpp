@@ -224,13 +224,13 @@ std::string AuthenticationProvider::fetchOrCreateNonce(
 {
     auto nonce = m_authenticationDataObject->fetchSystemNonce(
         queryContext, systemId);
-    if (nonce.empty())
+    if (!nonce)
     {
         nonce = api::generateCloudNonceBase(systemId);
         m_authenticationDataObject->insertOrReplaceSystemNonce(
-            queryContext, systemId, nonce);
+            queryContext, systemId, *nonce);
     }
-    return nonce;
+    return *nonce;
 }
 
 api::AuthInfoRecord AuthenticationProvider::generateAuthRecord(

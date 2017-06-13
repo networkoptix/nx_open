@@ -90,7 +90,7 @@ protected:
     void thenValidAuthRecordIsGenerated()
     {
         auto authInfo = m_userAuthenticationDao->fetchUserAuthRecords(
-            nullptr, m_system.id, m_ownerAccount.email);
+            nullptr, m_system.id, m_ownerAccount.id);
         ASSERT_EQ(1U, authInfo.records.size());
         assertUserAuthenticationHashIsValid(authInfo.records[0]);
         assertUserAuthenticationTimestampIsValid(authInfo.records[0]);
@@ -102,7 +102,7 @@ protected:
         for (const auto& account: m_accounts)
         {
             const auto authInfo = m_userAuthenticationDao->fetchUserAuthRecords(
-                nullptr, m_system.id, account.email);
+                nullptr, m_system.id, account.id);
             ASSERT_FALSE(authInfo.records.empty());
 
             for (const auto& authRecord: authInfo.records)

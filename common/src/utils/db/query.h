@@ -22,6 +22,10 @@ public:
     void bindValue(int pos, const QVariant& value) noexcept;
     void exec();
 
+    bool next();
+    QVariant value(int index) const;
+    QVariant value(const QString& name) const;
+
     QSqlQuery& impl();
     const QSqlQuery& impl() const;
 

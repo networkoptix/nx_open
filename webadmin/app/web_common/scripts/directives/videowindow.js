@@ -19,7 +19,7 @@
  *
  */
 angular.module('nxCommon')
-    .directive('videowindow', ['$interval','$timeout','animateScope', '$sce', function ($interval,$timeout,animateScope, $sce) {
+    .directive('videowindow', ['$interval','$timeout','animateScope', '$sce', '$log', function ($interval,$timeout,animateScope, $sce, $log) {
         return {
             restrict: 'E',
             scope: {
@@ -409,12 +409,12 @@ angular.module('nxCommon')
                 scope.$on('$destroy',function(){
                     recyclePlayer();
                     scope.vgApi.kill();
-                    if(videoPlayers == 1){
+                    if(videoPlayers.length == 1){
                         videoPlayers.pop();
                     }
                     else{
-                        console.error('Problem with deallocating video players');
-                        console.error(videoPlayers);
+                        $log.error('Problem with deallocating video players');
+                        $log.error(videoPlayers);
                     }
                 });
 

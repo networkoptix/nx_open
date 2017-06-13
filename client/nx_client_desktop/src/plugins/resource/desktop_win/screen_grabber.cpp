@@ -664,3 +664,9 @@ void QnScreenGrabber::pleaseStop()
     m_needStop = true;
     m_waitCond.wakeAll();
 }
+
+void QnScreenGrabber::restart()
+{
+    m_timer.restart();
+    m_needStop = false;
+}

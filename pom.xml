@@ -47,6 +47,7 @@
         <axiscamplugin.guid>{c27722d6-d3ae-41dc-9467-52d93f5b119a}</axiscamplugin.guid>
         <evidence_plugin.guid>{061d1513-9a37-4d14-90f5-11d42d2d7827}</evidence_plugin.guid>
         <genericrtspplugin.guid>{7fafaf1d-0d3d-42ea-aa11-4ffce0f170f9}</genericrtspplugin.guid>
+        <generic_multicast_plugin.guid>{e03f4c6d-2831-44e7-b636-e37f904d7388}</generic_multicast_plugin.guid>
         <image_library_plugin.guid>{62b24237-9c9d-4900-b32d-aa678317b4ba}</image_library_plugin.guid>
         <it930x_plugin.guid>{2c75d1b9-a6f1-4aa6-9d7e-8c0e602bd8fd}</it930x_plugin.guid>
         <mjpg_link.guid>{c8a846fd-d881-45d8-9f6c-c3e02eaf5763}</mjpg_link.guid>
@@ -113,6 +114,7 @@
         <axiscamplugin.name>${company.name} AXIS camera integration plugin</axiscamplugin.name>
         <evidence_plugin.name>${company.name} Evidence integration plugin</evidence_plugin.name>
         <genericrtspplugin.name>${company.name} generic RTSP plugin</genericrtspplugin.name>
+        <generic_multicast_plugin.name>${company.name} generic multicast plugin</generic_multicast_plugin.name>
         <client.mediafolder.name>${product.name} Media</client.mediafolder.name>
         <vmaxproxy.name>${company.name} VMax Proxy</vmaxproxy.name>
         <wixsetup.name>${company.name} ${display.product.name} Setup v.${release.version}</wixsetup.name>
@@ -519,6 +521,7 @@
                 <module>mediaserver_core</module>
 
                 <module>plugins/genericrtspplugin</module>
+                <module>plugins/generic_multicast_plugin</module>
                 <module>plugins/image_library_plugin</module>
                 <module>plugins/mjpg_link</module>
 

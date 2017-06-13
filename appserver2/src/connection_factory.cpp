@@ -989,11 +989,11 @@ void Ec2DirectConnectionFactory::registerRestHandlers(QnRestProcessorPool* const
      * %param[opt] digest HA1 digest hash from user password, as per RFC 2069. When modifying an
      *     existing user, supply empty string. When creating a new user, calculate the value
      *     based on UTF-8 password as follows:
-     *     <code>digest = md5(name + ":" + realm + ":" + password).toHex();</code>
+     *     <code>digest = md5_hex(user_name + ":" + realm + ":" + password);</code>
      * %param[opt] hash User's password hash. When modifying an existing user, supply empty string.
      *     When creating a new user, calculate the value based on UTF-8 password as follows:
-     *     <code>salt = rand().toHex();
-     *     hash = "md5$" + salt + "$" + md5(salt + password).toHex();</code>
+     *     <code>salt = rand_hex();
+     *     hash = "md5$" + salt + "$" + md5_hex(salt + password);</code>
      * %param[opt] cryptSha512Hash Cryptography key hash. Supply empty string
      *     when creating, keep the value when modifying.
      * %param[opt] realm HTTP authorization realm as defined in RFC 2617, can be obtained via
