@@ -197,11 +197,11 @@ QString QnBusinessStringsHelper::eventAtResources(const QnBusinessEventParameter
 {
     if (params.eventType == QnBusiness::SoftwareTriggerEvent)
     {
-        return lit("Software Trigger %1 has been activated multiple times")
+        return tr("Software Trigger %1 has been activated multiple times")
             .arg(getSoftwareTriggerName(params));
     }
 
-    return lit("Multiple %1 events have occured").arg(eventName(params.eventType));
+    return tr("Multiple %1 events have occured").arg(eventName(params.eventType));
 }
 
 QString QnBusinessStringsHelper::getResoureNameFromParams(const QnBusinessEventParameters& params,

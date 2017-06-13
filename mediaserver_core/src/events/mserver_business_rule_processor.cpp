@@ -688,25 +688,25 @@ void QnMServerBusinessRuleProcessor::sendEmailAsync(
 
 bool QnMServerBusinessRuleProcessor::sendMail(const QnSendMailBusinessActionPtr& action )
 {
-    //QnMutexLocker lk( &m_mutex );  m_mutex is already locked down the stack
+    // QnMutexLocker lk(&m_mutex); <- m_mutex is already locked down the stack.
 
-    //currently, aggregating only cameraDisconnected and networkIssue events
+    // Currently, aggregating only cameraDisconnected and networkIssue events.
     if( action->getRuntimeParams().eventType != QnBusiness::CameraDisconnectEvent &&
         action->getRuntimeParams().eventType != QnBusiness::NetworkIssueEvent )
     {
         return sendMailInternal(action, 1);
     }
 
-    /* Aggregating by recipients and event type. */
+    // Aggregating by recipients and event type.
 
     SendEmailAggregationKey aggregationKey(action->getRuntimeParams().eventType,
-        action->getParams().emailAddress); // all recipients are already computed and packed here
+        action->getParams().emailAddress); //< all recipients are already computed and packed here.
 
     SendEmailAggregationData& aggregatedData = m_aggregatedEmails[aggregationKey];
 
     QnBusinessAggregationInfo aggregationInfo = aggregatedData.action
-        ? aggregatedData.action->aggregationInfo()  //adding event source (camera) to the existing aggregation info
-        : QnBusinessAggregationInfo();              //creating new aggregation info
+        ? aggregatedData.action->aggregationInfo() //< adding event source (camera) to the existing aggregation info.
+        : QnBusinessAggregationInfo();             //< creating new aggregation info.
 
     if( !aggregatedData.action )
     {
