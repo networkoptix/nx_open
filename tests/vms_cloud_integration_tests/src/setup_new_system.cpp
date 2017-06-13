@@ -59,7 +59,7 @@ protected:
             client.detachFromCloud(DetachFromCloudData()).error);
     }
 
-    void assertIfSystemDoesNotAcceptDefaultCredentials()
+    void assertSystemAcceptsDefaultCredentials()
     {
         MediaServerClient client(mediaServerEndpoint());
         client.setUserName("admin");
@@ -106,6 +106,6 @@ TEST_F(FtConfiguringNewSystem, reconfiguring_cloud_system)
 {
     configureCloudSystem();
     detachSystemFromCloud();
-    assertIfSystemDoesNotAcceptDefaultCredentials();
+    assertSystemAcceptsDefaultCredentials();
     configureCloudSystem();
 }
