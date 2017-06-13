@@ -18,13 +18,6 @@ CloudUserInfoPoolSupplier::CloudUserInfoPoolSupplier(QnCommonModule* commonModul
     QnCommonModuleAware(commonModule),
     m_pool(nullptr)
 {
-    for (const auto& userResource: resourcePool()->getResources<QnUserResource>())
-    {
-        onNewResource(userResource);
-        reportInfoChanged(
-            userResource->getName(),
-            userResource->getProperty(kCloudAuthInfoKey));
-    }
     connectToResourcePool();
 }
 
@@ -54,6 +47,14 @@ void CloudUserInfoPoolSupplier::connectToResourcePool()
 
 void CloudUserInfoPoolSupplier::onNewResource(const QnResourcePtr& resource)
 {
+    auto userResource = resource.dynamicCast<QnUserResource>();
+    if (!userResource)
+        return;
+
+    auto cloudAuthInfoProp = userResource->getProperty(kCloudAuthInfoKey);
+    if (!cloudAuthInfoProp.isEmpty())
+        reportInfoChanged(resource->getName(), cloudAuthInfoProp);
+
     Qn::directConnect(
         resource.data(),
         &QnResource::propertyChanged,
