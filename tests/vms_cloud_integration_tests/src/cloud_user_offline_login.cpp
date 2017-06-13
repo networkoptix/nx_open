@@ -76,7 +76,7 @@ private:
     }
 };
 
-TEST_F(CloudUserOfflineLogin, login_works_on_offline_server_after_restart)
+TEST_F(CloudUserOfflineLogin, DISABLED_login_works_on_offline_server_after_restart)
 {
     givenCloudSystem();
     whenSystemWentOffline();

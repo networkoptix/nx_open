@@ -25,6 +25,8 @@
 #include "abstract_nonce_provider.h"
 #include "cloud_user_info_pool.h"
 
+//#define ENABLE_CLOUD_USER_OFFLINE_LOGIN
+
 class CloudConnectionManager;
 
 /**
