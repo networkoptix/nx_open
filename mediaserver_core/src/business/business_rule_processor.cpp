@@ -233,6 +233,15 @@ bool QnBusinessRuleProcessor::executeActionInternal(const QnAbstractBusinessActi
         }
     }
 
+
+    if (action->getParams().needConfirmation)
+    {
+        const auto targetActionType = action->actionType();
+        action->setActionType(QnBusiness::ShowPopupAction);
+        action->getParams().targetActionType = targetActionType;
+        return broadcastBusinessAction(action);
+    }
+
     switch (action->actionType()) {
     case QnBusiness::DiagnosticsAction:
         return true;

@@ -183,6 +183,11 @@ QnAbstractBusinessAction::QnAbstractBusinessAction(const QnBusiness::ActionType 
 QnAbstractBusinessAction::~QnAbstractBusinessAction()
 {}
 
+void QnAbstractBusinessAction::setActionType(QnBusiness::ActionType actionType)
+{
+    m_actionType = actionType;
+}
+
 QnBusiness::ActionType QnAbstractBusinessAction::actionType() const
 {
     return m_actionType;

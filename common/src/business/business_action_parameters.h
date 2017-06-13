@@ -16,6 +16,9 @@ struct QnBusinessActionParameters
       */
     bool needConfirmation = true;
 
+    QnBusiness::ActionType targetActionType = QnBusiness::UndefinedAction;
+
+
     /** Additional parameter for event log convenience. Does not filled when the action really occurs. */
     QnUuid actionResourceId;
 

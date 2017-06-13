@@ -257,7 +257,8 @@ bool QnMServerBusinessRuleProcessor::executeActionInternal(const QnAbstractBusin
             result = sendMail(action.dynamicCast<QnSendMailBusinessAction>());
             break;
         case QnBusiness::BookmarkAction:
-            result = executeBookmarkAction(action);
+            if (!action->getParams().needConfirmation)
+                result = executeBookmarkAction(action);
             break;
         case QnBusiness::CameraOutputAction:
             result = triggerCameraOutput(action.dynamicCast<QnCameraOutputBusinessAction>());
