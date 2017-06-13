@@ -1,15 +1,16 @@
-#include <QJsonDocument>
-#include <QJsonObject>
 #include <core/resource/user_resource.h>
 #include <core/resource_management/resource_pool.h>
 #include <common/common_module.h>
 #include <nx/utils/log/log.h>
 #include <nx/network/http/auth_tools.h>
+#include <nx/cloud/cdb/client/data/auth_data.h>
+#include <nx/cloud/cdb/api/auth_provider.h>
+#include <nx/fusion/serialization/json.h>
 #include "cloud_user_info_pool.h"
 #include "cdb_nonce_fetcher.h"
 
 
-static const QString kCloudAuthInfoKey = lit("CloudAuthInfo");
+static const QString kCloudAuthInfoKey = nx::cdb::api::kVmsUserAuthInfoAttributeName;
 
 // CloudUserInfoPoolSupplier
 CloudUserInfoPoolSupplier::CloudUserInfoPoolSupplier(QnCommonModule* commonModule)
@@ -17,13 +18,6 @@ CloudUserInfoPoolSupplier::CloudUserInfoPoolSupplier(QnCommonModule* commonModul
     QnCommonModuleAware(commonModule),
     m_pool(nullptr)
 {
-    for (const auto& userResource: resourcePool()->getResources<QnUserResource>())
-    {
-        onNewResource(userResource);
-        reportInfoChanged(
-            userResource->getName(),
-            userResource->getProperty(kCloudAuthInfoKey));
-    }
     connectToResourcePool();
 }
 
@@ -53,6 +47,14 @@ void CloudUserInfoPoolSupplier::connectToResourcePool()
 
 void CloudUserInfoPoolSupplier::onNewResource(const QnResourcePtr& resource)
 {
+    auto userResource = resource.dynamicCast<QnUserResource>();
+    if (!userResource)
+        return;
+
+    auto cloudAuthInfoProp = userResource->getProperty(kCloudAuthInfoKey);
+    if (!cloudAuthInfoProp.isEmpty())
+        reportInfoChanged(resource->getName(), cloudAuthInfoProp);
+
     Qn::directConnect(
         resource.data(),
         &QnResource::propertyChanged,
@@ -74,22 +76,31 @@ void CloudUserInfoPoolSupplier::reportInfoChanged(
     const QString& userName,
     const QString& serializedValue)
 {
-    uint64_t timestamp;
-    nx::Buffer cloudNonce;
-    nx::Buffer partialResponse;
+    if (serializedValue.isEmpty())
+    {
+        NX_DEBUG(this, lit("User %1. Received empty cloud auth info").arg(userName));
+        return;
+    }
 
-    if (!detail::deserialize(serializedValue, &timestamp, &cloudNonce, &partialResponse))
+    nx::cdb::api::AuthInfo authInfo;
+    bool deserializeResult = QJson::deserialize(serializedValue, &authInfo);
+    NX_ASSERT(deserializeResult);
+
+    if (!deserializeResult)
     {
         NX_LOG(lit("[CloudUserInfo] User %1. Deserialization failed")
             .arg(userName), cl_logDEBUG1);
         return;
     }
 
-    m_pool->userInfoChanged(
-        timestamp,
-        userName.toUtf8().toLower(),
-        cloudNonce,
-        partialResponse);
+    for (const auto& authInfoRecord : authInfo.records)
+    {
+        m_pool->userInfoChanged(
+            authInfoRecord.expirationTime.time_since_epoch().count(),
+            userName.toUtf8().toLower(),
+            nx::Buffer::fromStdString(authInfoRecord.nonce),
+            nx::Buffer::fromStdString(authInfoRecord.intermediateResponse));
+    }
 }
 
 void CloudUserInfoPoolSupplier::onRemoveResource(const QnResourcePtr& resource)
@@ -100,7 +111,7 @@ void CloudUserInfoPoolSupplier::onRemoveResource(const QnResourcePtr& resource)
 }
 
 // CloudUserInfoPool
-CloudUserInfoPool::CloudUserInfoPool(std::unique_ptr<AbstractCloudUserInfoPoolSupplier> supplier):
+CloudUserInfoPool::CloudUserInfoPool(std::unique_ptr<AbstractCloudUserInfoPoolSupplier> supplier) :
     m_supplier(std::move(supplier))
 {
     m_supplier->setPool(this);
@@ -123,13 +134,13 @@ bool CloudUserInfoPool::authenticate(
         return false;
     }
 
-    const auto partialResponse = partialResponseByUserNonce(userName, cloudNonce);
-    if (!partialResponse)
+    const auto intermediateResponse = intermediateResponseByUserNonce(userName, cloudNonce);
+    if (!intermediateResponse)
         return false;
 
     const auto ha2 = nx_http::calcHa2(method, authHeader.digest->params["uri"]);
     const auto calculatedResponse = nx_http::calcResponseFromIntermediate(
-        *partialResponse,
+        *intermediateResponse,
         cloudNonce.size(),
         nonceTrailer,
         ha2);
@@ -140,12 +151,12 @@ bool CloudUserInfoPool::authenticate(
     return false;
 }
 
-boost::optional<nx::Buffer> CloudUserInfoPool::partialResponseByUserNonce(
+boost::optional<nx::Buffer> CloudUserInfoPool::intermediateResponseByUserNonce(
     const nx::Buffer& userName,
     const nx::Buffer& cloudNonce) const
 {
     QnMutexLocker lock(&m_mutex);
-    auto nameNonceIt = m_userNonceToResponse.find({userName, cloudNonce});
+    auto nameNonceIt = m_userNonceToResponse.find({ userName, cloudNonce });
     if (nameNonceIt == m_userNonceToResponse.cend())
     {
         NX_LOG(lit("[CloudUserInfo] Failed to find (user, cloudNonce) pair. User: %1, cloudNonce: %2")
@@ -182,25 +193,32 @@ void CloudUserInfoPool::userInfoChanged(
     uint64_t timestamp,
     const nx::Buffer& userName,
     const nx::Buffer& cloudNonce,
-    const nx::Buffer& partialResponse)
+    const nx::Buffer& intermediateResponse)
 {
     QnMutexLocker lock(&m_mutex);
-    updateNameToNonces(userName, cloudNonce);
+    if (updateNameToNonces(userName, cloudNonce)) //< Already has info for this user in pool
+    {
+        NX_ASSERT(m_nonceToTs[cloudNonce] == timestamp);
+        NX_ASSERT(m_userNonceToResponse[detail::UserNonce(userName, cloudNonce)] == intermediateResponse);
+        return;
+    }
     updateNonceToTs(cloudNonce, timestamp);
-    updateUserNonceToResponse(userName, cloudNonce, partialResponse);
+    updateUserNonceToResponse(userName, cloudNonce, intermediateResponse);
     updateTsToNonceCount(timestamp, cloudNonce);
 }
 
-void CloudUserInfoPool::updateNameToNonces(const nx::Buffer& userName, const nx::Buffer& cloudNonce)
+bool CloudUserInfoPool::updateNameToNonces(const nx::Buffer& userName, const nx::Buffer& cloudNonce)
 {
     auto nameResult = m_nameToNonces.emplace(userName, std::unordered_set<nx::Buffer>{cloudNonce});
     if (!nameResult.second)
     {
         auto nonceResult = nameResult.first->second.emplace(cloudNonce);
-        NX_ASSERT(nonceResult.second);
-        return;
+        if (!nonceResult.second)
+            return true;
+        return false;
     }
     m_userCount++;
+    return false;
 }
 
 void CloudUserInfoPool::updateNonceToTs(const nx::Buffer& cloudNonce, uint64_t timestamp)
@@ -215,10 +233,9 @@ void CloudUserInfoPool::updateNonceToTs(const nx::Buffer& cloudNonce, uint64_t t
 void CloudUserInfoPool::updateUserNonceToResponse(
     const nx::Buffer& userName,
     const nx::Buffer& cloudNonce,
-    const nx::Buffer& partialResponse)
+    const nx::Buffer& intermediateResponse)
 {
-    auto result = m_userNonceToResponse.emplace(detail::UserNonce(userName, cloudNonce), partialResponse);
-    NX_ASSERT(result.second);
+    auto result = m_userNonceToResponse.emplace(detail::UserNonce(userName, cloudNonce), intermediateResponse);
 }
 
 void CloudUserInfoPool::updateTsToNonceCount(uint64_t timestamp, const nx::Buffer& cloudNonce)
@@ -293,52 +310,4 @@ void CloudUserInfoPool::decUserCountByNonce(const nx::Buffer& cloudNonce)
         }
         ++it;
     }
-}
-
-namespace detail {
-
-bool deserialize(
-    const QString& serializedValue,
-    uint64_t* timestamp,
-    nx::Buffer* cloudNonce,
-    nx::Buffer* partialResponse)
-{
-    auto jsonObj = QJsonDocument::fromJson(serializedValue.toUtf8()).object();
-    if (jsonObj.isEmpty())
-    {
-        NX_LOG("[CloudUserInfo, deserialize] Json object is empty.", cl_logERROR);
-        return false;
-    }
-
-    const QString kTimestampKey = lit("timestamp");
-    const QString kCloudNonceKey = lit("cloudNonce");
-    const QString kPartialResponseKey = lit("partialResponse");
-
-    auto timestampVal = jsonObj[kTimestampKey];
-    if (timestampVal.isUndefined() || !timestampVal.isDouble())
-    {
-        NX_LOG("[CloudUserInfo, deserialize] timestamp is undefined or wrong type.", cl_logERROR);
-        return false;
-    }
-    *timestamp = (uint64_t)timestampVal.toDouble();
-
-    auto cloudNonceVal = jsonObj[kCloudNonceKey];
-    if (cloudNonceVal.isUndefined() || !cloudNonceVal.isString())
-    {
-        NX_LOG("[CloudUserInfo, deserialize] cloud nonce is undefined or wrong type.", cl_logERROR);
-        return false;
-    }
-    *cloudNonce = cloudNonceVal.toString().toUtf8();
-
-    auto partialResponseVal = jsonObj[kPartialResponseKey];
-    if (partialResponseVal.isUndefined() || !partialResponseVal.isString())
-    {
-        NX_LOG("[CloudUserInfo, deserialize] partial response is undefined or wrong type.", cl_logERROR);
-        return false;
-    }
-    *partialResponse = partialResponseVal.toString().toUtf8();
-
-    return true;
-}
-
 }

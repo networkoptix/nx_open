@@ -5,7 +5,7 @@
 #include <nx/utils/random.h>
 #include <nx/utils/uuid.h>
 
-#include <ec2/transaction_log_cache.h>
+#include <nx/cloud/cdb/ec2/transaction_log_cache.h>
 
 namespace nx {
 namespace cdb {

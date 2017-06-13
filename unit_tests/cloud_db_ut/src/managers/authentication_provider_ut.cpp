@@ -7,15 +7,15 @@
 
 #include <utils/db/test_support/test_with_db_helper.h>
 
-#include <cdb/cloud_nonce.h>
+#include <nx/cloud/cdb/api/cloud_nonce.h>
 
-#include <libcloud_db/src/dao/user_authentication_data_object_factory.h>
-#include <libcloud_db/src/dao/memory/dao_memory_user_authentication.h>
-#include <libcloud_db/src/ec2/synchronization_engine.h>
-#include <libcloud_db/src/managers/authentication_provider.h>
-#include <libcloud_db/src/settings.h>
-#include <libcloud_db/src/test_support/business_data_generator.h>
-#include <cloud_db_client/src/data/auth_data.h>
+#include <nx/cloud/cdb/dao/user_authentication_data_object_factory.h>
+#include <nx/cloud/cdb/dao/memory/dao_memory_user_authentication.h>
+#include <nx/cloud/cdb/ec2/synchronization_engine.h>
+#include <nx/cloud/cdb/managers/authentication_provider.h>
+#include <nx/cloud/cdb/settings.h>
+#include <nx/cloud/cdb/test_support/business_data_generator.h>
+#include <nx/cloud/cdb/client/data/auth_data.h>
 
 #include "account_manager_stub.h"
 #include "system_sharing_manager_stub.h"
@@ -90,7 +90,7 @@ protected:
     void thenValidAuthRecordIsGenerated()
     {
         auto authInfo = m_userAuthenticationDao->fetchUserAuthRecords(
-            nullptr, m_system.id, m_ownerAccount.email);
+            nullptr, m_system.id, m_ownerAccount.id);
         ASSERT_EQ(1U, authInfo.records.size());
         assertUserAuthenticationHashIsValid(authInfo.records[0]);
         assertUserAuthenticationTimestampIsValid(authInfo.records[0]);
@@ -102,7 +102,7 @@ protected:
         for (const auto& account: m_accounts)
         {
             const auto authInfo = m_userAuthenticationDao->fetchUserAuthRecords(
-                nullptr, m_system.id, account.email);
+                nullptr, m_system.id, account.id);
             ASSERT_FALSE(authInfo.records.empty());
 
             for (const auto& authRecord: authInfo.records)

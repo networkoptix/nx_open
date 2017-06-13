@@ -596,10 +596,11 @@ void UnifiedPollSet::moveIterToTheNextEvent(ConstIteratorImpl* const iter) const
 
 void UnifiedPollSet::removePhantomSockets(std::map<UDTSOCKET, int>* const udtFdSet)
 {
+    // TODO: #ak Make O(N) here instead of current O(N*log(N)).
     for (auto it = udtFdSet->begin(); it != udtFdSet->end();)
     {
         if (m_udtSockets.find(it->first) == m_udtSockets.end())
-            it = udtFdSet->erase(it);   //UDT sometimes reports phantom FD
+            it = udtFdSet->erase(it);   // UDT sometimes reports phantom FD.
         else
             ++it;
     }

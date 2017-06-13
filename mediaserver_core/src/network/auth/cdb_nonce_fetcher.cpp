@@ -9,7 +9,7 @@
 
 #include <nx/utils/log/log.h>
 
-#include <cdb/cloud_nonce.h>
+#include <nx/cloud/cdb/api/cloud_nonce.h>
 #include <nx/utils/sync_call.h>
 
 #include "cloud/cloud_connection_manager.h"
@@ -93,9 +93,11 @@ nx::Buffer CdbNonceFetcher::generateNonceTrailer()
 
 QByteArray CdbNonceFetcher::generateNonce()
 {
+#ifdef ENABLE_CLOUD_USER_OFFLINE_LOGIN
     auto cloudPreviouslyProvidedNonce = m_cloudUserInfoPool.newestMostCommonNonce();
     if (cloudPreviouslyProvidedNonce)
         return *cloudPreviouslyProvidedNonce + generateNonceTrailer();
+#endif
 
     if (!m_cloudConnectionManager->boundToCloud())
         return m_defaultGenerator->generateNonce();

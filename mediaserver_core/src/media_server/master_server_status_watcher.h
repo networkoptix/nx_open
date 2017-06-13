@@ -16,7 +16,9 @@ class QnMasterServerStatusWatcher: public QObject, public QnCommonModuleAware
 {
     Q_OBJECT
 public:
-    QnMasterServerStatusWatcher(QObject* parent);
+    QnMasterServerStatusWatcher(
+        QObject* parent,
+        std::chrono::milliseconds delayBeforeSettingMasterFlag);
     virtual ~QnMasterServerStatusWatcher() {}
 private slots:
     void at_updateMasterFlag();
@@ -25,4 +27,5 @@ private:
     bool localPeerCanBeMaster() const;
 private:
     QTimer m_timer;
+    std::chrono::milliseconds m_delayBeforeSettingMasterFlag;
 };

@@ -1,7 +1,7 @@
 //
 // This file is generated. Go to pom.xml.
 //
-#include <libcloud_db_app_info.h>
+#include "nx/cloud/cdb/libcloud_db_app_info.h"
 
 QString QnLibCloudDbAppInfo::applicationName()
 {

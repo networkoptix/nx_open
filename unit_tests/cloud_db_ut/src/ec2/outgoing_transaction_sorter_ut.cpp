@@ -6,7 +6,7 @@
 #include <nx/utils/std/cpp14.h>
 #include <nx/utils/std/thread.h>
 
-#include <ec2/outgoing_transaction_sorter.h>
+#include <nx/cloud/cdb/ec2/outgoing_transaction_sorter.h>
 
 #include "test_outgoing_transaction_dispatcher.h"
 
