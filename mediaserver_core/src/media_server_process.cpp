@@ -256,6 +256,7 @@
 #include "media_server_process_aux.h"
 #include <common/static_common_module.h>
 #include <recorder/storage_db_pool.h>
+#include <transaction/message_bus_selector.h>
 
 #if !defined(EDGE_SERVER)
 #include <nx_speech_synthesizer/text_to_wav.h>
@@ -3247,13 +3248,15 @@ void MediaServerProcess::at_runtimeInfoChanged(const QnPeerRuntimeInfo& runtimeI
         return;
     if (runtimeInfo.uuid != commonModule()->moduleGUID())
         return;
-
-    QnAppServerConnectionFactory::ec2Connection()
-        ->getMiscManager(Qn::kSystemAccess)
-        ->saveRuntimeInfo(
-            runtimeInfo.data,
-            ec2::DummyHandler::instance(),
-            &ec2::DummyHandler::onRequestDone);
+    auto connection = commonModule()->ec2Connection();
+    if (connection)
+    {
+        ec2::QnTransaction<ec2::ApiRuntimeData> tran(
+            ec2::ApiCommand::runtimeInfoChanged,
+            commonModule()->moduleGUID());
+        tran.params = runtimeInfo.data;
+        sendTransaction(commonModule()->ec2Connection()->messageBus(), tran);
+    }
 }
 
 void MediaServerProcess::at_emptyDigestDetected(const QnUserResourcePtr& user, const QString& login, const QString& password)

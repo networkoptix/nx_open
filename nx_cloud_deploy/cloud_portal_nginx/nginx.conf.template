@@ -56,7 +56,7 @@ http {
             index static/index.html;
 
             if (${DOLLAR}http_x_forwarded_proto != "https") {
-                return 301 https://$host$request_uri;
+                return 301 https://${DOLLAR}host${DOLLAR}request_uri;
             }
 
             # checks for static file, if not found proxy to app

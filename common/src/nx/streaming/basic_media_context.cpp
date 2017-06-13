@@ -3,7 +3,7 @@
 #include <nx/streaming/media_context_serializable_data.h>
 #include <nx/utils/log/log.h>
 
-#include <utils/media/ffmpeg_helper.h> //< for deserializeMediaContextFromDepricatedFormat()
+#include <utils/media/ffmpeg_helper.h> //< for deserializeMediaContextFromDeprecatedFormat()
 
 /**
  * ATTENTION: m_data is created with all fields non-initialized.
@@ -62,7 +62,7 @@ static bool deserializeMediaContext(
     }
     else //< Deprecated format from v2.5.
     {
-        if (!QnFfmpegHelper::deserializeMediaContextFromDepricatedFormat(
+        if (!QnFfmpegHelper::deserializeMediaContextFromDeprecatedFormat(
             context, data.data(), data.size()))
         {
             // Serialization errors are already logged.

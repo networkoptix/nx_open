@@ -9,7 +9,3 @@ add_subdirectory(mjpg_link)
 if(LINUX AND box STREQUAL "none")
     add_subdirectory(it930x_plugin)
 endif()
-
-if(box MATCHES "isd")
-    add_subdirectory(isd_native_plugin)
-endif()

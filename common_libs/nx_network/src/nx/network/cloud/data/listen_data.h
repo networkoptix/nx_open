@@ -21,7 +21,7 @@ public:
 
     // TODO: #mux Remove systemId and serverId as redandant.
     // Every server message is signed up with system id, server id and message integrity based on
-    // authentification key by MediatorServerConnection.
+    // authentication key by MediatorServerConnection.
     nx::String systemId;
     nx::String serverId;
     CloudConnectVersion cloudConnectVersion;

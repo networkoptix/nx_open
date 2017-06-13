@@ -34,9 +34,7 @@ angular.module('cloudApp')
              $location.path("/systems");
         });
 
-        $("html").addClass("webclient-page");
         $scope.$on('$destroy', function( event ) {
             cancelSubscription();
-            $("html").removeClass("webclient-page");
         });
     }]);

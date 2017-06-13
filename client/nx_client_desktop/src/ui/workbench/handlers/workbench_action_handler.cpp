@@ -2154,7 +2154,7 @@ void ActionHandler::openInBrowser(const QnMediaServerResourcePtr& server,
 
     if (m_serverRequests.find(proxyUrl) == m_serverRequests.end())
     {
-        // No other requests to this proxy, so we have to get nonce by ourself.
+        // No other requests to this proxy, so we have to get nonce by ourselves.
         auto reply = new QnAsyncHttpClientReply(nx_http::AsyncHttpClient::create(), this);
         connect(
             reply, &QnAsyncHttpClientReply::finished,
@@ -2186,7 +2186,6 @@ void ActionHandler::at_nonceReceived(QnAsyncHttpClientReply *reply)
     if (!QJson::deserialize(reply->data(), &result) || !QJson::deserialize(result.reply, &auth))
     {
         QnMessageBox::critical(mainWindow(), tr("Failed to open server web page"));
-
         return;
     }
 
