@@ -3,6 +3,7 @@
 #include <QtCore/QUrlQuery>
 
 #include <common/common_module.h>
+#include <api/helpers/camera_id_helper.h>
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/camera_history.h>
 #include <core/resource/camera_resource.h>
@@ -63,9 +64,9 @@ void QnAutoRequestForwarder::processRequest(nx_http::Request* const request)
         {
             if (addProxyToRequest(request, servers.front()))
             {
-                NX_LOG(lit("auto_forward. Forwarding request %1 to server %2")
+                NX_VERBOSE(this) lit("Forwarding request %1 to server %2")
                     .arg(request->requestLine.url.path())
-                    .arg(servers.front()->getId().toString()), cl_logDEBUG2);
+                    .arg(servers.front()->getId().toString());
             }
         }
         return;
@@ -74,11 +75,10 @@ void QnAutoRequestForwarder::processRequest(nx_http::Request* const request)
     const bool liveStreamRequested = urlQuery.hasQueryItem(StreamingParams::LIVE_PARAM_NAME);
 
     QnResourcePtr cameraRes;
-    if (findCameraGuid(*request, urlQuery, &cameraRes)
-        || findCameraUniqueID(*request, urlQuery, &cameraRes))
+    if (findCamera(*request, urlQuery, &cameraRes))
     {
         // Detect the owner of res and add SERVER_GUID_HEADER_NAME.
-        NX_ASSERT(cameraRes);
+        NX_CRITICAL(cameraRes);
 
         // Check for the time requested to select the desired server.
         qint64 timestampMs = -1;
@@ -105,13 +105,13 @@ void QnAutoRequestForwarder::processRequest(nx_http::Request* const request)
         }
         if (addProxyToRequest(request, serverRes))
         {
-            NX_LOG(lit(
-                "auto_forward. Forwarding request %1 (resource %2, timestamp %3) to server %4")
+            NX_VERBOSE(this) lit(
+                "Forwarding request %1 (resource %2, timestamp %3) to server %4")
                 .arg(request->requestLine.url.path()).arg(cameraRes->getId().toString())
                 .arg(timestampMs == -1
                     ? QString::fromLatin1("live")
                     : QDateTime::fromMSecsSinceEpoch(timestampMs).toString(Qt::ISODate))
-                .arg(serverRes->getId().toString()), cl_logDEBUG2);
+                .arg(serverRes->getId().toString());
         }
     }
 }
@@ -135,73 +135,132 @@ void QnAutoRequestForwarder::addPathToIgnore(const QString& pathWildcardMask)
     m_restrictionList.deny(pathWildcardMask, nx_http::AuthMethod::videowall);
 }
 
-bool QnAutoRequestForwarder::findCameraGuid(
+bool QnAutoRequestForwarder::findCamera(
     const nx_http::Request& request,
     const QUrlQuery& urlQuery,
-    QnResourcePtr* const res)
+    QnResourcePtr* const resource)
 {
-    QnUuid cameraGuid;
+    return false;
 
-    nx_http::HttpHeaders::const_iterator xCameraGuidIter =
-        request.headers.find(Qn::CAMERA_GUID_HEADER_NAME);
-    if (xCameraGuidIter != request.headers.end())
-        cameraGuid = QnUuid::fromStringSafe(xCameraGuidIter->second);
-
-    if (cameraGuid.isNull())
-        cameraGuid = QnUuid::fromStringSafe(request.getCookieValue(Qn::CAMERA_GUID_HEADER_NAME));
-
-    if (cameraGuid.isNull())
-        cameraGuid = QnUuid::fromStringSafe(urlQuery.queryItemValue(Qn::CAMERA_GUID_HEADER_NAME));
-
-    if (cameraGuid.isNull())
-        return false;
-
-    *res = resourcePool()->getResourceById(cameraGuid);
-    return *res;
-}
-
-bool QnAutoRequestForwarder::findCameraUniqueID(
-    const nx_http::Request& request,
-    const QUrlQuery& urlQuery,
-    QnResourcePtr* const res)
-{
-    return findCameraUniqueIDInPath(request, res)
-        || findCameraUniqueIDInQuery(urlQuery, res);
-}
-
-bool QnAutoRequestForwarder::findCameraUniqueIDInPath(
-    const nx_http::Request& request,
-    QnResourcePtr* const res)
-{
-    // Path containing camera unique_id looks like: /[something/]unique_id[.extension]
-
-    const QString& requestedResourcePath = QnFile::fileName(request.requestLine.url.path());
-    const int nameFormatSepPos = requestedResourcePath.lastIndexOf(QLatin1Char('.'));
-    const QString& resUniqueID = requestedResourcePath.mid(0, nameFormatSepPos);
-
-    if (resUniqueID.isEmpty())
-        return false;
-
-    // TODO: #mshevchenko: Use camera_id_helper.
-    *res = resourcePool()->getResourceByUniqueId(resUniqueID);
-    if (*res)
-    {
-        NX_LOG(lit("auto_forward. Found resource %1 by unique id %2 from path").
-            arg((*res)->getId().toString()).arg(resUniqueID), cl_logDEBUG2);
+    if (findCameraAsCameraGuidHeader(request, urlQuery, resource))
         return true;
-    }
-    return *res != nullptr;
+
+    if (findCameraInUrlPath(request, urlQuery, resource))
+        return true;
+
+    if (findCameraInUrlQuery(request, urlQuery, resource))
+        return true;
+
+    return false;
 }
 
-bool QnAutoRequestForwarder::findCameraUniqueIDInQuery(
+bool QnAutoRequestForwarder::findCameraAsCameraGuidHeader(
+    const nx_http::Request& request,
     const QUrlQuery& urlQuery,
-    QnResourcePtr* const res)
+    QnResourcePtr* const resource)
 {
-    const auto uniqueID = urlQuery.queryItemValue(Qn::CAMERA_UNIQUE_ID_HEADER_NAME);
-    if (uniqueID.isEmpty())
+    QnUuid cameraUuid;
+
+    // TODO: Never succeeds: presence of this header has already triggered an early exit.
+    auto it = request.headers.find(Qn::CAMERA_GUID_HEADER_NAME);
+    if (it != request.headers.end())
+        cameraUuid = QnUuid::fromStringSafe(it->second);
+
+    if (cameraUuid.isNull())
+        cameraUuid = QnUuid::fromStringSafe(request.getCookieValue(Qn::CAMERA_GUID_HEADER_NAME));
+
+    if (cameraUuid.isNull())
+    {
+        // TODO: Never succeeds: presence of this query item has already triggered an early exit.
+        cameraUuid = QnUuid::fromStringSafe(urlQuery.queryItemValue(Qn::CAMERA_GUID_HEADER_NAME));
+    }
+
+    if (cameraUuid.isNull())
         return false;
-    *res = resourcePool()->getResourceByUniqueId(uniqueID);
-    return *res;
+
+    *resource = resourcePool()->getResourceById(cameraUuid);
+    return *resource != nullptr;
+}
+
+namespace {
+
+/** @return Part of str after prefix, or empty string if there is no such prefix in str. */
+static QString stringAfterPrefix(const QString& str, const QString& prefix)
+{
+    if (str.startsWith(prefix))
+        return str.mid(prefix.size());
+    else
+        return QString();
+}
+
+} // namespace
+
+bool QnAutoRequestForwarder::findCameraInUrlPath(
+    const nx_http::Request& request,
+    const QUrlQuery& /*urlQuery*/,
+    QnResourcePtr* const resource)
+{
+    // Check urls like: rtsp://<server>/<flexibleId>[.<ext>]
+    // Check urls like: http://<server>/hls/<flexibleId>[.<ext>]
+    // Check urls like: http://<server>/media/<flexibleId>[.<ext>]
+
+    const QString& path = request.requestLine.url.path();
+
+    QString trailing;
+    if (request.requestLine.url.scheme() == "rtsp")
+    {
+        // Get the trailing after the last '/'.
+        const int lastSlashPos = path.lastIndexOf('/');
+        if (lastSlashPos >= 0)
+            trailing = path.mid(lastSlashPos + 1);
+        else
+            trailing = path;
+    }
+    else
+    {
+        trailing = stringAfterPrefix(path, "/hls/");
+        if (trailing.isEmpty())
+            trailing = stringAfterPrefix(path, "/media/");
+        if (trailing.isEmpty() || trailing.indexOf('/') != -1)
+            return false;
+    }
+
+    const int periodPos = trailing.lastIndexOf('.');
+    const QString& potentialId = trailing.mid(0, periodPos);
+
+    if (potentialId.isEmpty())
+        return false;
+
+    *resource = nx::camera_id_helper::findCameraByFlexibleId(resourcePool(), potentialId);
+    if (*resource)
+    {
+        NX_VERBOSE(this) lit("Found resource %1 by id %2 from url path")
+            .arg((*resource)->getId().toString()).arg(potentialId);
+    }
+    return *resource != nullptr;
+}
+
+bool QnAutoRequestForwarder::findCameraInUrlQuery(
+    const nx_http::Request& request,
+    const QUrlQuery& urlQuery,
+    QnResourcePtr* const resource)
+{
+    const QString& path = request.requestLine.url.path();
+    // NOTE: Only these methods need forwarding and have non-deprecated physicalId parameter.
+    if (!path.startsWith("/api/image") && !path.startsWith("/api/iomonitor"))
+        return false;
+
+    const auto physicalId = urlQuery.queryItemValue(Qn::PHYSICAL_ID_URL_QUERY_ITEM);
+    if (physicalId.isEmpty())
+        return false;
+
+    *resource = resourcePool()->getNetResourceByPhysicalId(physicalId);
+    if (*resource)
+    {
+        NX_VERBOSE(this) lit("Found resource %1 by physicalId %2 from url path")
+            .arg((*resource)->getId().toString()).arg(physicalId);
+    }
+    return *resource != nullptr;
 }
 
 qint64 QnAutoRequestForwarder::fetchTimestamp(

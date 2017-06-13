@@ -21,23 +21,25 @@ public:
 private:
     nx_http::AuthMethodRestrictionList m_restrictionList;
 
-    bool findCameraGuid(
+    bool findCamera(
         const nx_http::Request& request,
         const QUrlQuery& urlQuery,
-        QnResourcePtr* const res);
+        QnResourcePtr* const resource);
 
-    bool findCameraUniqueID(
+    bool findCameraAsCameraGuidHeader(
         const nx_http::Request& request,
         const QUrlQuery& urlQuery,
-        QnResourcePtr* const res);
+        QnResourcePtr* const resource);
 
-    bool findCameraUniqueIDInPath(
+    bool findCameraInUrlPath(
         const nx_http::Request& request,
-        QnResourcePtr* const res);
-
-    bool findCameraUniqueIDInQuery(
         const QUrlQuery& urlQuery,
-        QnResourcePtr* const res);
+        QnResourcePtr* const resource);
+
+    bool findCameraInUrlQuery(
+        const nx_http::Request& request,
+        const QUrlQuery& urlQuery,
+        QnResourcePtr* const resource);
 
     /** @return UTC time (milliseconds). */
     qint64 fetchTimestamp(const nx_http::Request& request, const QUrlQuery& urlQuery);
