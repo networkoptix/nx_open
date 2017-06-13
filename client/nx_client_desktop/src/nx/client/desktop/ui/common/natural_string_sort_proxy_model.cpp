@@ -1,5 +1,3 @@
-#pragma once
-
 #include "natural_string_sort_proxy_model.h"
 
 #include <nx/utils/string.h>
@@ -20,7 +18,7 @@ NaturalStringSortProxyModel::NaturalStringSortProxyModel(QObject* parent):
                 right.data(Qt::DisplayRole).toString(),
                 sortCaseSensitivity()) < 0;
         });
-};
+}
 
 } // namespace ui
 } // namespace desktop
