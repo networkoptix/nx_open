@@ -65,13 +65,23 @@ public:
             ++m_tasks[taskId].fired;
         }
 
-        if (m_shouldUnsubscribe)
-        {
-//            m_scheduler->unsubscribe(functorTypeId);
-//            m_readyPromise->set_value();
-        }
+        return
+            [this](nx::db::QueryContext*)
+            {
+                if (m_shouldSubscribe)
+                {
+                    subscribe(std::chrono::milliseconds(10));
+                    m_shouldSubscribe = false;
+                }
 
-        return [](nx::db::QueryContext*) { return nx::db::DBResult::ok; };
+                if (m_shouldUnsubscribe)
+                {
+                    unsubscribe(m_unsubscribeId, std::move(m_unsubscribeCallback));
+                    m_shouldUnsubscribe = false;
+                }
+
+                return nx::db::DBResult::ok;
+            };
     }
 
     void unsubscribe(
@@ -131,7 +141,16 @@ public:
             });
     }
 
-    void setShouldUnsubscribe() { m_shouldUnsubscribe = true; }
+    void setShouldUnsubscribe(
+        const QnUuid& taskId,
+        nx::utils::MoveOnlyFunc<void(const nx::cdb::test::SchedulerUser::Task&)> unsubscribeCb)
+    {
+        m_unsubscribeId = taskId;
+        m_unsubscribeCallback = std::move(unsubscribeCb);
+        m_shouldUnsubscribe = true;
+    }
+
+    void setShouldSubscribe() { m_shouldSubscribe = true; }
     TaskMap tasks()
     {
         QnMutexLocker lock(&m_mutex);
@@ -143,6 +162,9 @@ private:
     nx::cdb::PersistentSheduler* m_scheduler;
     nx::utils::promise<void>* m_readyPromise;
     std::atomic<bool> m_shouldUnsubscribe{false};
+    std::atomic<bool> m_shouldSubscribe{false};
+    nx::utils::MoveOnlyFunc<void(const Task& task)> m_unsubscribeCallback;
+    QnUuid m_unsubscribeId;
     TaskMap m_tasks;
     QnMutex m_mutex;
 };
@@ -220,7 +242,7 @@ protected:
             .WillRepeatedly(::testing::Return(nx::db::DBResult::ok));
     }
 
-    void expectingDbHelperSubscribeWillBeCalled()
+    void expectingDbHelperSubscribeWillBeCalledOnce()
     {
         EXPECT_CALL(
             dbHelper,
@@ -243,7 +265,7 @@ protected:
                 _)).Times(AtLeast(1)).WillOnce(Return(nx::db::DBResult::ok));
     }
 
-    void expectingDbHelperSubscribeWillBeCalled2Times()
+    void expectingDbHelperSubscribeWillBeCalledTwice()
     {
         EXPECT_CALL(
             dbHelper,
@@ -269,14 +291,47 @@ protected:
         scheduler->start();
     }
 
+    QnUuid whenSubscribedOnce()
+    {
+        QnUuid taskId;
+        nx::utils::promise<void> subPromise;
+        auto subFuture = subPromise.get_future();
+
+        user->subscribe(
+            std::chrono::milliseconds(10),
+            [&taskId, subPromise = std::move(subPromise)](const QnUuid& subscribedId) mutable
+        {
+            taskId = subscribedId;
+            subPromise.set_value();
+        });
+        subFuture.wait();
+
+        return taskId;
+    }
+
+    void whenShouldSubscribeFromHandler()
+    {
+        user->setShouldSubscribe();
+    }
+
+    void whenShouldUnsubscribeFromHandler(
+        const QnUuid& taskId,
+        nx::utils::MoveOnlyFunc<void(const nx::cdb::test::SchedulerUser::Task&)> unsubscribeCb)
+    {
+        user->setShouldUnsubscribe(taskId, std::move(unsubscribeCb));
+    }
+
     void thenTaskIdsAreFilled()
     {
         for (const auto& task : user->tasks())
             ASSERT_FALSE(task.first.isNull());
     }
 
-    void thenTimersFiredSeveralTimes()
+    void thenTimersFiredSeveralTimes(int taskCount = -1)
     {
+        if (taskCount != -1)
+            ASSERT_EQ(user->tasks().size(), taskCount);
+
         for (const auto& task : user->tasks())
             ASSERT_GT(task.second.fired, 0);
     }
@@ -302,7 +357,7 @@ TEST_F(PersistentScheduler, initialization)
 TEST_F(PersistentScheduler, subscribe)
 {
     expectingDbHelperInitFunctionsWillBeCalled();
-    expectingDbHelperSubscribeWillBeCalled();
+    expectingDbHelperSubscribeWillBeCalledOnce();
     whenSchedulerAndUserInitialized();
 
     user->subscribe(std::chrono::milliseconds(10));
@@ -313,20 +368,12 @@ TEST_F(PersistentScheduler, subscribe)
 TEST_F(PersistentScheduler, unsubscribe)
 {
     expectingDbHelperInitFunctionsWillBeCalled();
-    expectingDbHelperSubscribeWillBeCalled();
+    expectingDbHelperSubscribeWillBeCalledOnce();
     expectingDbHelperUnsubscribeWillBeCalled();
 
     whenSchedulerAndUserInitialized();
-    QnUuid taskId;
-    nx::utils::promise<void> subscribePromise;
 
-    user->subscribe(
-        std::chrono::milliseconds(10),
-        [&taskId](const QnUuid& subscribedId) mutable
-    {
-        taskId = subscribedId;
-    });
-    std::this_thread::sleep_for(kSleepTimeout / 3);
+    QnUuid taskId = whenSubscribedOnce();
 
     int firedAlready;
     user->unsubscribe(
@@ -348,7 +395,7 @@ TEST_F(PersistentScheduler, running2Tasks)
     const std::chrono::milliseconds kSecondTaskTimeout{ 20 };
 
     expectingDbHelperInitFunctionsWillBeCalled();
-    expectingDbHelperSubscribeWillBeCalled2Times();
+    expectingDbHelperSubscribeWillBeCalledTwice();
     whenSchedulerAndUserInitialized();
 
     user->subscribe(kFirstTaskTimeout);
@@ -361,14 +408,43 @@ TEST_F(PersistentScheduler, running2Tasks)
     thenTimersFiredSeveralTimes();
 }
 
-TEST_F(PersistentScheduler, running2Tasks_subscribeFromHandler)
+TEST_F(PersistentScheduler, subscribeFromHandler)
 {
+    expectingDbHelperInitFunctionsWillBeCalled();
+    expectingDbHelperSubscribeWillBeCalledTwice();
+    whenSchedulerAndUserInitialized();
 
+    user->subscribe(std::chrono::milliseconds(10));
+    whenShouldSubscribeFromHandler();
+
+    std::this_thread::sleep_for(kSleepTimeout);
+    thenTaskIdsAreFilled();
+    thenTimersFiredSeveralTimes(2);
 }
 
-TEST_F(PersistentScheduler, running2Tasks_unsubscribeFromHandler)
+TEST_F(PersistentScheduler, unsubscribeFromHandler)
 {
+    expectingDbHelperInitFunctionsWillBeCalled();
+    expectingDbHelperSubscribeWillBeCalledOnce();
+    expectingDbHelperUnsubscribeWillBeCalled();
 
+    whenSchedulerAndUserInitialized();
+
+    QnUuid taskId = whenSubscribedOnce();
+
+    ASSERT_FALSE(taskId.isNull());
+    int firedAlready;
+    whenShouldUnsubscribeFromHandler(
+        taskId,
+        [&firedAlready](const nx::cdb::test::SchedulerUser::Task& task)
+        {
+            firedAlready = task.fired;
+        });
+
+    std::this_thread::sleep_for(kSleepTimeout);
+
+    ASSERT_EQ(firedAlready, user->tasks()[taskId].fired);
+    ASSERT_FALSE(user->tasks()[taskId].subscribed);
 }
 
 TEST_F(PersistentScheduler, tasksLoadedFromDb)
