@@ -419,7 +419,9 @@ static std::atomic<int> RTPSessionInstanceCounter(0);
 
 // ================================================== QnRtspClient ==========================================
 
-QnRtspClient::QnRtspClient( std::unique_ptr<AbstractStreamSocket> tcpSock )
+QnRtspClient::QnRtspClient(
+    bool shoulGuessAuthDigest,
+    std::unique_ptr<AbstractStreamSocket> tcpSock)
 :
     m_csec(2),
     //m_rtpIo(*this),
@@ -438,7 +440,7 @@ QnRtspClient::QnRtspClient( std::unique_ptr<AbstractStreamSocket> tcpSock )
     m_additionalReadBuffer( nullptr ),
     m_additionalReadBufferPos( 0 ),
     m_additionalReadBufferSize( 0 ),
-    m_rtspAuthCtx(/*shouldGuessDigest*/ true),
+    m_rtspAuthCtx(shoulGuessAuthDigest),
     m_userAgent(nx_http::userAgentString()),
     m_defaultAuthScheme(nx_http::header::AuthScheme::basic)
 {
@@ -664,7 +666,7 @@ CameraDiagnostics::Result QnRtspClient::open(const QString& url, qint64 startTim
     m_contentBase = m_url.toString();
     m_responseBufferLen = 0;
     m_rtpToTrack.clear();
-    m_rtspAuthCtx = HttpAuthenticationClientContext(m_shouldGuessAuthDigest);
+    m_rtspAuthCtx.clear();
     if (m_defaultAuthScheme == nx_http::header::AuthScheme::basic)
     {
         m_rtspAuthCtx.setAuthenticationHeader(
@@ -1994,9 +1996,3 @@ AbstractStreamSocket* QnRtspClient::tcpSock()
 {
     return m_tcpSock.get();
 }
-
-void QnRtspClient::setShouldGuessAuthDigest(bool shouldGuessAuthDigest)
-{
-    m_shouldGuessAuthDigest = shouldGuessAuthDigest;
-}
-

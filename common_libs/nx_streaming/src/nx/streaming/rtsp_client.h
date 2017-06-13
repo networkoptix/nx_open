@@ -190,7 +190,10 @@ public:
     //typedef QMap<int, QSharedPointer<SDPTrackInfo> > TrackMap;
     typedef QVector<QSharedPointer<SDPTrackInfo> > TrackMap;
 
-    QnRtspClient( std::unique_ptr<AbstractStreamSocket> tcpSock = std::unique_ptr<AbstractStreamSocket>() );
+    QnRtspClient(
+        bool shouldGuessAuthDigest,
+        std::unique_ptr<AbstractStreamSocket> tcpSock = std::unique_ptr<AbstractStreamSocket>());
+
     ~QnRtspClient();
 
     // returns \a CameraDiagnostics::ErrorCode::noError if stream was opened, error code - otherwise
@@ -302,7 +305,6 @@ public:
 
     /** @return "Server" http header value */
     QByteArray serverInfo() const;
-    void setShouldGuessAuthDigest(bool shouldGuessAuthDigest);
 
 signals:
     void gotTextResponse(QByteArray text);
@@ -399,7 +401,6 @@ private:
     nx_http::header::AuthScheme::Value m_defaultAuthScheme;
     mutable QnMutex m_socketMutex;
     QByteArray m_serverInfo;
-    bool m_shouldGuessAuthDigest = true;
 
     /*!
         \param readSome if \a true, returns as soon as some data has been read. Otherwise, blocks till all \a bufSize bytes has been read

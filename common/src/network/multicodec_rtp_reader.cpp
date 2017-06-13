@@ -62,7 +62,7 @@ QnMulticodecRtpReader::QnMulticodecRtpReader(
     std::unique_ptr<AbstractStreamSocket> tcpSock )
 :
     QnResourceConsumer(res),
-    m_RtpSession(std::move(tcpSock)),
+    m_RtpSession(/*shouldGuessAuthDigest*/ false, std::move(tcpSock)),
     m_timeHelper(res->getUniqueId()),
     m_pleaseStop(false),
     m_gotSomeFrame(false),
@@ -80,8 +80,6 @@ QnMulticodecRtpReader::QnMulticodecRtpReader(
         m_RtpSession.setTCPTimeout(netRes->getNetworkTimeout());
     else
         m_RtpSession.setTCPTimeout(1000 * 10);
-
-    m_RtpSession.setShouldGuessAuthDigest(false);
 
     QnMediaResourcePtr mr = qSharedPointerDynamicCast<QnMediaResource>(res);
     m_numberOfVideoChannels = 1;
