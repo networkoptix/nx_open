@@ -541,7 +541,8 @@
             "keys": [
                 "ACTI|V32",
                 "ACTi Corporation|V32",
-                "AXIS|Q6000-E"
+                "AXIS|Q6000-E",
+                "AXIS|*Q6000-E"
             ],
             "forceONVIF": true
         },
