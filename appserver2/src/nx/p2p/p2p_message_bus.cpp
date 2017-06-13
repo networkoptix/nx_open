@@ -15,6 +15,7 @@
 #include <utils/math/math.h>
 #include <http/p2p_connection_listener.h>
 #include <api/runtime_info_manager.h>
+#include <managers/time_manager.h>
 
 namespace {
     int commitIntervalMs = 1000;
@@ -205,14 +206,24 @@ void MessageBus::sendInitialDataToClient(const P2pConnectionPtr& connection)
 {
     sendRuntimeData(connection, m_lastRuntimeInfo.keys());
 
-    QnTransaction<ApiFullInfoData> tran(commonModule()->moduleGUID());
-    tran.command = ApiCommand::getFullInfo;
-    if (!readApiFullInfoData(connection->userAccessData(), connection->remotePeer(), &tran.params))
     {
-        connection->setState(Connection::State::Error);
-        return;
+        QnTransaction<ApiFullInfoData> tran(commonModule()->moduleGUID());
+        tran.command = ApiCommand::getFullInfo;
+        if (!readApiFullInfoData(connection->userAccessData(), connection->remotePeer(), &tran.params))
+        {
+            connection->setState(Connection::State::Error);
+            return;
+        }
+        sendTransactionImpl(connection, tran);
     }
-    sendTransactionImpl(connection, tran);
+
+    {
+        QnTransaction<ApiPeerSystemTimeDataList> tran;
+        tran.params = m_timeSyncManager->getKnownPeersSystemTime();
+        tran.command = ApiCommand::getKnownPeersSystemTime;
+        tran.peerID = commonModule()->moduleGUID();
+        sendTransactionImpl(connection, tran);
+    }
 }
 
 void MessageBus::connectSignals(const P2pConnectionPtr& connection)
@@ -1303,6 +1314,29 @@ void MessageBus::gotTransaction(
     //NX_ASSERT(connection->localPeerSubscribedTo(peerId)); //< loop
     NX_ASSERT(!context(connection)->isRemotePeerSubscribedTo(peerId)); //< loop
     auto transactionDescriptor = getTransactionDescriptorByTransaction(tran);
+
+    // process special cases
+    switch (tran.command)
+    {
+        case ApiCommand::forcePrimaryTimeServer:
+            m_timeSyncManager->onGotPrimariTimeServerTran(tran);
+            if (localPeer().isServer())
+                sendTransaction(tran); //< Proxy
+            return;
+        case ApiCommand::broadcastPeerSystemTime:
+            m_timeSyncManager->peerSystemTimeReceived(tran);
+            if (localPeer().isServer())
+                sendTransaction(tran); //< Proxy
+            return;
+        case ApiCommand::getKnownPeersSystemTime:
+            m_timeSyncManager->knownPeersSystemTimeReceived(tran);
+            if (localPeer().isServer())
+                sendTransaction(tran); //< Proxy
+            return;
+        default:
+            break; //< Not a special case
+    }
+
     if (m_db)
     {
         if (transactionDescriptor->isPersistent)
