@@ -6,7 +6,7 @@
 #include <nx/fusion/serialization/sql_functions.h>
 #include <nx/utils/test_support/utils.h>
 
-#include <test_support/business_data_generator.h>
+#include <nx/cloud/cdb/test_support/business_data_generator.h>
 
 namespace nx {
 namespace cdb {

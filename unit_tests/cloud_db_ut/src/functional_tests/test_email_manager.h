@@ -2,7 +2,7 @@
 
 #include <nx/utils/move_only_func.h>
 
-#include <libcloud_db/src/managers/email_manager.h>
+#include <nx/cloud/cdb/managers/email_manager.h>
 
 namespace nx {
 namespace cdb {

@@ -1,7 +1,7 @@
 #pragma once
 
-#include <managers/account_manager.h>
-#include <test_support/business_data_generator.h>
+#include <nx/cloud/cdb/managers/account_manager.h>
+#include <nx/cloud/cdb/test_support/business_data_generator.h>
 
 namespace nx {
 namespace cdb {

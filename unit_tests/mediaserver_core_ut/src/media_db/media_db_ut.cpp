@@ -27,7 +27,7 @@
 #   include <platform/platform_abstraction.h>
 #endif
 
-#include "../utils.h"
+#include <test_support/utils.h>
 #include <media_server/settings.h>
 #include <media_server/media_server_module.h>
 

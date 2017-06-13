@@ -94,7 +94,9 @@ QnMediaServerModule::QnMediaServerModule(
     nx::network::SocketGlobals::mediatorConnector().enable(true);
 
     store(new QnNewSystemServerFlagWatcher(commonModule()));
-    store(new QnMasterServerStatusWatcher(commonModule()));
+    store(new QnMasterServerStatusWatcher(
+        commonModule(),
+        m_settings->delayBeforeSettingMasterFlag()));
     m_unusedWallpapersWatcher = store(new nx::mediaserver::UnusedWallpapersWatcher(commonModule()));
 
     store(new QnBusinessMessageBus(commonModule()));

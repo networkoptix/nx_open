@@ -8,8 +8,6 @@
 #include <QtCore/QDir>
 #include <QtCore/QFile>
 
-#include <cdb/cloud_nonce.h>
-#include <data/account_data.h>
 #include <nx/fusion/model_functions.h>
 #include <nx/network/app_info.h>
 #include <nx/network/http/auth_tools.h>
@@ -17,9 +15,10 @@
 #include <nx/network/http/http_client.h>
 #include <nx/network/http/server/fusion_request_result.h>
 #include <nx/utils/test_support/utils.h>
-#include <utils/common/app_info.h>
-
 #include <nx/utils/sync_call.h>
+
+#include <nx/cloud/cdb/api/cloud_nonce.h>
+#include <nx/cloud/cdb/data/account_data.h>
 
 #include "email_manager_mocked.h"
 #include "test_setup.h"

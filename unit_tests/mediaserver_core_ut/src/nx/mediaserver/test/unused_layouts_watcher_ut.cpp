@@ -2,7 +2,7 @@
 #include <memory>
 
 #include <gtest/gtest.h>
-#include "mediaserver_launcher.h"
+#include <test_support/mediaserver_launcher.h>
 #include <nx/mediaserver/unused_wallpapers_watcher.h>
 #include "nx_ec/ec_api.h"
 

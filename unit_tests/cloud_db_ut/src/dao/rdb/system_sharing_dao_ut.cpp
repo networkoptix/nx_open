@@ -1,6 +1,6 @@
 #include <gtest/gtest.h>
 
-#include <dao/rdb/system_sharing_data_object.h>
+#include <nx/cloud/cdb/dao/rdb/system_sharing_data_object.h>
 
 #include "base_persistent_data_test.h"
 
