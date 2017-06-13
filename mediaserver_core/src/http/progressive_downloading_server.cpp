@@ -687,7 +687,8 @@ void QnProgressiveDownloadingConsumer::run()
             QnLiveStreamProviderPtr liveReader = camera->getLiveReader(qualityToUse);
             dataProvider = liveReader;
             if (liveReader) {
-                dataConsumer.copyLastGopFromCamera(camera);
+                if (camera->isSomeActivity())
+                    dataConsumer.copyLastGopFromCamera(camera); //< Don't copy deprecated gop if camera is not running now
                 liveReader->startIfNotRunning();
                 camera->inUse(this);
             }

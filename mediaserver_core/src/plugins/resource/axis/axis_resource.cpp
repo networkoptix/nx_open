@@ -130,7 +130,7 @@ QnPlAxisResource::~QnPlAxisResource()
 {
     m_audioTransmitter.reset();
     stopInputPortMonitoringSync();
-    m_timer.pleaseStopSync();
+    m_timer.pleaseStopSync(/*checkForLocks*/ false);
 }
 
 void QnPlAxisResource::checkIfOnlineAsync( std::function<void(bool)> completionHandler )

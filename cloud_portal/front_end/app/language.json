@@ -110,7 +110,7 @@
     "alreadyExists": "This account already exists",
     "unknownError": "Unexpected error occured",
     "accountAlreadyActivated": "This account is already activated",
-    "EmailNotFound": "Account does not exist",
+    "emailNotFound": "Account does not exist",
     "EmailAlreadyExists": "This Email is already registered",
     "oldPasswordMistmatch": "Current password is incorrect",
     "passwordMismatch": "Wrong password",
