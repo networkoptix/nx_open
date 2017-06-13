@@ -215,8 +215,11 @@ bool Param<const char*>::reload(const std::string* value, std::ostream* output)
         free(const_cast<char*>(*pValue));
         *pValue = defaultValue;
     }
-    if (value) //< Exists in .ini file, and can be empty.
-        *pValue = strdup(value->c_str());
+    if (value) //< Exists in .ini file, and can be empty: copy all chars to *pValue.
+    {
+        *pValue = (char*) malloc(value->size() + 1);
+        memcpy(const_cast<char*>(*pValue), value->c_str(), value->size() + 1);
+    }
     const std::string newValue{*pValue ? *pValue : ""};
     printValueLine(output, "\"" + newValue + "\"", " = ", /*error*/ "",
         newValue == (defaultValue ? defaultValue : ""));
