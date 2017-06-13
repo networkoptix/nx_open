@@ -122,7 +122,8 @@ protected:
     }
 };
 
-TEST_F(FtConnectSystemToCloudOnlyCloudOwner, removing_cloud_system_id_resets_system_to_new_state)
+// TODO: #ak CLOUD-734
+TEST_F(FtConnectSystemToCloudOnlyCloudOwner, DISABLED_removing_cloud_system_id_resets_system_to_new_state)
 {
     givenServerConnectedToTheCloud();
 
@@ -147,7 +148,8 @@ protected:
     }
 };
 
-TEST_F(FtConnectSystemToCloudWithLocalOwner, removing_cloud_system_id_cleans_up_cloud_data)
+// TODO: #ak CLOUD-734
+TEST_F(FtConnectSystemToCloudWithLocalOwner, DISABLED_removing_cloud_system_id_cleans_up_cloud_data)
 {
     givenServerConnectedToTheCloud();
 
