@@ -203,7 +203,7 @@ void Connection::onHttpClientDone()
         {
             using namespace std::placeholders;
             fillAuthInfo(m_credentialsSource == CredentialsSource::serverKey);
-            m_httpClient->doPost(
+            m_httpClient->doGet(
                 m_remotePeerUrl,
                 std::bind(&Connection::onHttpClientDone, this));
         }
