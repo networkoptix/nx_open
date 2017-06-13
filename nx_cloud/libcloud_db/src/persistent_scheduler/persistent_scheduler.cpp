@@ -105,12 +105,45 @@ nx::db::DBResult PersistentSheduler::subscribe(
     return nx::db::DBResult::ok;
 }
 
+nx::db::DBResult PersistentSheduler::unsubscribe(
+    nx::db::QueryContext* queryContext,
+    const QnUuid& taskId)
+{
+    auto dbResult = m_dbHelper->unsubscribe(queryContext, taskId);
+    if (dbResult != nx::db::DBResult::ok)
+    {
+        NX_LOG(lit("[Scheduler] Failed to unsubscribe. Task id: %1")
+            .arg(taskId.toString()), cl_logERROR);
+        return dbResult;
+    }
+
+    removeTimer(taskId);
+    return nx::db::DBResult::ok;
+}
+
+void PersistentSheduler::removeTimer(const QnUuid& taskId)
+{
+    nx::utils::TimerId timerId;
+    {
+        QnMutexLocker lock(&m_mutex);
+        auto taskToTimerIt = m_taskToTimer.find(taskId);
+        NX_ASSERT(taskToTimerIt != m_taskToTimer.cend());
+        if (taskToTimerIt == m_taskToTimer.cend())
+        {
+            NX_LOG(lit("[Scheduler] timer id not found in TaskToTimer map"), cl_logERROR);
+            return;
+        }
+        timerId = taskToTimerIt->second;
+    }
+    m_timerManager.deleteTimer(timerId);
+}
+
 void PersistentSheduler::addTimer(
     const QnUuid& functorId,
     const QnUuid& taskId,
     const ScheduleTaskInfo& taskInfo)
 {
-    m_timerManager.addNonStopTimer(
+    auto timerId = m_timerManager.addNonStopTimer(
         [this, functorId, taskId, params = taskInfo.params](nx::utils::TimerId)
         {
             AbstractPersistentScheduleEventReceiver* receiver;
@@ -142,6 +175,17 @@ void PersistentSheduler::addTimer(
         },
         timeoutFromTimepoint(taskInfo.fireTimePoint),
         taskInfo.period);
+
+    QnMutexLocker lock(&m_mutex);
+    auto taskToTimerIt = m_taskToTimer.find(taskId);
+    NX_ASSERT(taskToTimerIt == m_taskToTimer.cend());
+    if (taskToTimerIt != m_taskToTimer.cend())
+    {
+        NX_LOG(lit("[Scheduler] timer id %1 is already present in TaskToTimer map")
+               .arg(timerId), cl_logERROR);
+        return;
+    }
+    m_taskToTimer[taskId] = timerId;
 }
 
 void PersistentSheduler::start()

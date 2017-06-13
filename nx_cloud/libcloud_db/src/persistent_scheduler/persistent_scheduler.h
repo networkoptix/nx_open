@@ -70,6 +70,8 @@ private:
         const QnUuid& taskId,
         const ScheduleTaskInfo& taskInfo);
 
+    void removeTimer(const QnUuid& taskId);
+
     nx::db::DBResult subscribe(
         nx::db::QueryContext* queryContext,
         const QnUuid& functorId,
@@ -83,6 +85,7 @@ private:
     QnMutex m_mutex;
     ScheduleData m_scheduleData;
     nx::utils::StandaloneTimerManager m_timerManager;
+    std::unordered_map<QnUuid, nx::utils::TimerId> m_taskToTimer;
 };
 
 }

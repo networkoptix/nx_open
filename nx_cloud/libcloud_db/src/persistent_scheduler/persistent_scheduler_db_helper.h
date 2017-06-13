@@ -25,6 +25,10 @@ public:
         QnUuid* outTaskId,
         const ScheduleTaskInfo& taskInfo) = 0;
 
+    virtual nx::db::DBResult unsubscribe(
+        nx::db::QueryContext* queryContext,
+        const QnUuid& taskId) = 0;
+
 };
 
 }

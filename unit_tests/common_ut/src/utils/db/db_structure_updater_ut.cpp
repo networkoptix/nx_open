@@ -105,7 +105,7 @@ public:
         m_testAsyncSqlQueryExecutor->setCustomExecSqlScriptFunc(
             std::bind(&DbStructureUpdater::execSqlScript, this, _1, _2));
 
-        m_dbUpdater = std::make_unique<db::DbStructureUpdater>(m_testAsyncSqlQueryExecutor.get());
+        m_dbUpdater = std::make_unique<db::DbStructureUpdater>(kCdbStructureName, m_testAsyncSqlQueryExecutor.get());
     }
 
 protected:
@@ -186,7 +186,7 @@ private:
         BaseType::initializeDatabase();
 
         // Creating initial structure.
-        nx::db::DbStructureUpdater updater(asyncSqlQueryExecutor().get());
+        nx::db::DbStructureUpdater updater(kCdbStructureName, asyncSqlQueryExecutor().get());
         ASSERT_TRUE(updater.updateStructSync());
     }
 
