@@ -79,7 +79,7 @@ struct QnBusinessActionParameters
     bool isDefault() const;
 };
 
-#define QnBusinessActionParameters_Fields (needConfirmation)(actionResourceId)(url)\
+#define QnBusinessActionParameters_Fields (targetActionType)(needConfirmation)(actionResourceId)(url)\
     (emailAddress)(userGroup)(fps)(streamQuality)(recordAfter)\
     (relayOutputId)(sayText)(tags)(text)(durationMs)(additionalResources)\
     (forced)(presetId)(useSource)(recordBeforeMs)(playToClient)(contentType)
