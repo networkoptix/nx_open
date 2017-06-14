@@ -85,6 +85,17 @@ ec2::ApiUserRoleData QnUserRolesManager::userRole(const QnUuid& id) const
     return m_roles.value(id);
 }
 
+QnUuid QnUserRolesManager::unifiedUserRoleId(const QnUserResourcePtr& user)
+{
+    if (!user)
+        return QnUuid();
+
+    const auto userRole = user->userRole();
+    return userRole == Qn::UserRole::CustomUserRole
+        ? user->userRoleId()
+        : predefinedRoleId(userRole);
+}
+
 void QnUserRolesManager::addOrUpdateUserRole(const ec2::ApiUserRoleData& role)
 {
     NX_ASSERT(!role.isNull());

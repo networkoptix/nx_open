@@ -40,6 +40,9 @@ public:
     // Returns information structure for custom user role with specified uuid.
     ec2::ApiUserRoleData userRole(const QnUuid& id) const;
 
+    // Returns custom or predefined role id for specified user.
+    static QnUuid unifiedUserRoleId(const QnUserResourcePtr& user);
+
     // Returns list of predefined user roles.
     static const QList<Qn::UserRole>& predefinedRoles();
 
