@@ -73,7 +73,7 @@ void QnThumbnailRequestData::loadFromParams(QnResourcePool* resourcePool,
     if (params.contains(kTimeParam))
     {
         QString timeValue = params.value(kTimeParam);
-        if (timeValue == kLatestTimeValue)
+        if (timeValue.toLower() == kLatestTimeValue)
             msecSinceEpoch = kLatestThumbnail;
         else
             msecSinceEpoch = nx::utils::parseDateTimeMsec(timeValue);
