@@ -41,9 +41,6 @@ protected:
 public:
     virtual ~QnAbstractBusinessAction();
 
-    /**
-      * Fills out action type with actionType and changes target type to previous current one
-      */
     void setActionType(QnBusiness::ActionType actionType);
     QnBusiness::ActionType actionType() const;
 

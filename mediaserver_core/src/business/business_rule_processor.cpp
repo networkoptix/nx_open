@@ -180,9 +180,12 @@ bool QnBusinessRuleProcessor::handleBookmarkAction(const QnAbstractBusinessActio
         if (!m_runningBookmarkActions.contains(runningKey))
             return false;
 
-        action->getRuntimeParams().eventTimestampUsec
-            = m_runningBookmarkActions.take(runningKey);
+        action->getRuntimeParams().eventTimestampUsec =
+            m_runningBookmarkActions.take(runningKey);
     }
+
+    action->getParams().targetActionType = action->actionType();
+    action->setActionType(QnBusiness::ShowPopupAction);
 
     broadcastBusinessAction(action);
     return true;
