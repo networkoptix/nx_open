@@ -45,7 +45,7 @@ public:
         AbstractSchedulerDbHelper* dbHelper);
     ~PersistentSheduler();
 
-    void registerEventReceiver(
+    nx::db::DBResult registerEventReceiver(
         const QnUuid& functorId,
         AbstractPersistentScheduleEventReceiver* receiver);
 

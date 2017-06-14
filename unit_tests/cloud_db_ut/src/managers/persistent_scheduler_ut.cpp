@@ -50,7 +50,7 @@ public:
         m_scheduler(scheduler),
         m_readyPromise(readyPromise)
     {
-        m_scheduler->registerEventReceiver(functorTypeId, this);
+        m_registerResult = m_scheduler->registerEventReceiver(functorTypeId, this);
     }
 
     virtual OnTimerUserFunc persistentTimerFired(
@@ -157,6 +157,8 @@ public:
         return m_tasks;
     }
 
+    nx::db::DBResult registerResult() const { return m_registerResult; }
+
 private:
     nx::db::AbstractAsyncSqlQueryExecutor* m_executor;
     nx::cdb::PersistentSheduler* m_scheduler;
@@ -167,6 +169,7 @@ private:
     QnUuid m_unsubscribeId;
     TaskMap m_tasks;
     QnMutex m_mutex;
+    nx::db::DBResult m_registerResult = nx::db::DBResult::ok;
 };
 
 class SqlExecutorStub: public nx::db::AbstractAsyncSqlQueryExecutor
@@ -174,7 +177,7 @@ class SqlExecutorStub: public nx::db::AbstractAsyncSqlQueryExecutor
 public:
     virtual const nx::db::ConnectionOptions& connectionOptions() const override
     {
-        return nx::db::ConnectionOptions();
+        return m_connectionOptions;
     }
 
     virtual void executeUpdate(
@@ -211,6 +214,8 @@ public:
     {
         return nx::db::DBResult::ok;
     }
+
+    nx::db::ConnectionOptions m_connectionOptions;
 };
 
 
@@ -228,7 +233,34 @@ protected:
             scheduler->stop();
     }
 
-    void expectingDbHelperInitFunctionsWillBeCalled()
+    void expectingGetScheduledDataFromDbWithSomeDataWillBeCalled()
+    {
+        nx::cdb::TaskToParams taskParams;
+        nx::cdb::ScheduleTaskInfo taskInfo;
+        const auto kDbTaskPeriod = std::chrono::milliseconds(10);
+
+        taskInfo.params["key1"] = "dbValue1";
+        taskInfo.params["key2"] = "dbValue2";
+        taskInfo.fireTimePoint = std::chrono::steady_clock::now() + kDbTaskPeriod;
+        taskInfo.period = kDbTaskPeriod;
+
+        auto taskId = QnUuid::createUuid();
+        taskParams.emplace(taskId, taskInfo);
+
+        FunctorToTasks functorToTasks;
+        functorToTasks.emplace(SchedulerUser::functorTypeId, taskId);
+
+        ScheduleData dbData = { functorToTasks, taskParams };
+
+        EXPECT_CALL(dbHelper, getScheduleData(_, NotNull()))
+            .Times(AtLeast(1))
+            .WillRepeatedly(
+                ::testing::DoAll(
+                    ::testing::SetArgPointee<1>(dbData),
+                    Return(nx::db::DBResult::ok)));
+    }
+
+    void expectingGetScheduledDataFromDbWithNoDataWillBeCalled()
     {
         EXPECT_CALL(dbHelper, getScheduleData(_, NotNull()))
             .Times(AtLeast(1))
@@ -236,13 +268,38 @@ protected:
                 ::testing::DoAll(
                     ::testing::SetArgPointee<1>(ScheduleData()),
                     Return(nx::db::DBResult::ok)));
+    }
+
+    enum class RegisterReceiverDbReturns
+    {
+        error,
+        ok
+    };
+
+    void expectingRegisterEventReceiverWillBeCalled(RegisterReceiverDbReturns result)
+    {
+        nx::db::DBResult registerReceiverResult = result == RegisterReceiverDbReturns::ok
+            ? nx::db::DBResult::ok
+            : nx::db::DBResult::ioError;
 
         EXPECT_CALL(dbHelper, registerEventReceiver(nullptr, SchedulerUser::functorTypeId))
             .Times(AtLeast(1))
-            .WillRepeatedly(::testing::Return(nx::db::DBResult::ok));
+            .WillRepeatedly(::testing::Return(registerReceiverResult));
     }
 
-    void expectingDbHelperSubscribeWillBeCalledOnce()
+    void expectingDbHelperInitFunctionsWillBeCalled(RegisterReceiverDbReturns result = RegisterReceiverDbReturns::ok)
+    {
+        expectingGetScheduledDataFromDbWithNoDataWillBeCalled();
+        expectingRegisterEventReceiverWillBeCalled(result);
+    }
+
+    void expectingDbHelperInitFunctionsWithSomeDataWillBeCalled()
+    {
+        expectingGetScheduledDataFromDbWithSomeDataWillBeCalled();
+        expectingRegisterEventReceiverWillBeCalled(RegisterReceiverDbReturns::ok);
+    }
+
+    void expectingDbHelperSubscribeWillBeCalledOnce(nx::db::DBResult result = nx::db::DBResult::ok)
     {
         EXPECT_CALL(
             dbHelper,
@@ -253,16 +310,16 @@ protected:
                 _)).Times(AtLeast(1)).WillOnce(
                     ::testing::DoAll(
                         ::testing::SetArgPointee<2>(QnUuid::createUuid()),
-                        Return(nx::db::DBResult::ok)));
+                        Return(result)));
     }
 
-    void expectingDbHelperUnsubscribeWillBeCalled()
+    void expectingDbHelperUnsubscribeWillBeCalled(nx::db::DBResult result = nx::db::DBResult::ok)
     {
         EXPECT_CALL(
             dbHelper,
             unsubscribe(
                 nullptr,
-                _)).Times(AtLeast(1)).WillOnce(Return(nx::db::DBResult::ok));
+                _)).Times(AtLeast(1)).WillOnce(Return(result));
     }
 
     void expectingDbHelperSubscribeWillBeCalledTwice()
@@ -321,8 +378,20 @@ protected:
         user->setShouldUnsubscribe(taskId, std::move(unsubscribeCb));
     }
 
-    void thenTaskIdsAreFilled()
+    enum TasksIdState
     {
+        filled,
+        notFilled
+    };
+
+    void thenTaskIdsAre(TasksIdState idState)
+    {
+        if (idState == notFilled)
+        {
+            ASSERT_TRUE(user->tasks().empty());
+            return;
+        }
+
         for (const auto& task : user->tasks())
             ASSERT_FALSE(task.first.isNull());
     }
@@ -354,6 +423,14 @@ TEST_F(PersistentScheduler, initialization)
     whenSchedulerAndUserInitialized();
 }
 
+TEST_F(PersistentScheduler, initialization_registerReceiverDbError)
+{
+    expectingDbHelperInitFunctionsWillBeCalled(RegisterReceiverDbReturns::error);
+    whenSchedulerAndUserInitialized();
+
+    ASSERT_NE(user->registerResult(), nx::db::DBResult::ok);
+}
+
 TEST_F(PersistentScheduler, subscribe)
 {
     expectingDbHelperInitFunctionsWillBeCalled();
@@ -362,7 +439,18 @@ TEST_F(PersistentScheduler, subscribe)
 
     user->subscribe(std::chrono::milliseconds(10));
     std::this_thread::sleep_for(kSleepTimeout);
-    thenTaskIdsAreFilled();
+    thenTaskIdsAre(filled);
+}
+
+TEST_F(PersistentScheduler, subscribe_dbError)
+{
+    expectingDbHelperInitFunctionsWillBeCalled();
+    expectingDbHelperSubscribeWillBeCalledOnce(nx::db::DBResult::ioError);
+    whenSchedulerAndUserInitialized();
+
+    user->subscribe(std::chrono::milliseconds(10));
+    std::this_thread::sleep_for(kSleepTimeout);
+    thenTaskIdsAre(notFilled);
 }
 
 TEST_F(PersistentScheduler, unsubscribe)
@@ -389,6 +477,30 @@ TEST_F(PersistentScheduler, unsubscribe)
     ASSERT_FALSE(user->tasks()[taskId].subscribed);
 }
 
+TEST_F(PersistentScheduler, unsubscribe_dbError)
+{
+    expectingDbHelperInitFunctionsWillBeCalled();
+    expectingDbHelperSubscribeWillBeCalledOnce();
+    expectingDbHelperUnsubscribeWillBeCalled(nx::db::DBResult::ioError);
+
+    whenSchedulerAndUserInitialized();
+
+    QnUuid taskId = whenSubscribedOnce();
+
+    int firedAlready = -1;
+    user->unsubscribe(
+        taskId,
+        [&firedAlready](const nx::cdb::test::SchedulerUser::Task& task)
+        {
+            firedAlready = task.fired;
+        });
+
+    std::this_thread::sleep_for(kSleepTimeout);
+
+    ASSERT_EQ(firedAlready, -1);
+    ASSERT_TRUE(user->tasks()[taskId].subscribed);
+}
+
 TEST_F(PersistentScheduler, running2Tasks)
 {
     const std::chrono::milliseconds kFirstTaskTimeout{ 10 };
@@ -404,7 +516,7 @@ TEST_F(PersistentScheduler, running2Tasks)
     std::this_thread::sleep_for(kSleepTimeout);
 
     ASSERT_EQ(user->tasks().size(), 2);
-    thenTaskIdsAreFilled();
+    thenTaskIdsAre(filled);
     thenTimersFiredSeveralTimes();
 }
 
@@ -418,7 +530,7 @@ TEST_F(PersistentScheduler, subscribeFromHandler)
     whenShouldSubscribeFromHandler();
 
     std::this_thread::sleep_for(kSleepTimeout);
-    thenTaskIdsAreFilled();
+    thenTaskIdsAre(filled);
     thenTimersFiredSeveralTimes(2);
 }
 
@@ -449,12 +561,11 @@ TEST_F(PersistentScheduler, unsubscribeFromHandler)
 
 TEST_F(PersistentScheduler, tasksLoadedFromDb)
 {
+    expectingDbHelperInitFunctionsWithSomeDataWillBeCalled();
+    whenSchedulerAndUserInitialized();
 
-}
-
-TEST_F(PersistentScheduler, unsuccessful_DB_operations)
-{
-
+    std::this_thread::sleep_for(kSleepTimeout);
+    thenTimersFiredSeveralTimes(1);
 }
 
 TEST_F(PersistentScheduler, real_DB_operations)

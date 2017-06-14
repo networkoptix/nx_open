@@ -1,5 +1,6 @@
 #include <nx/utils/std/future.h>
 #include <nx/utils/log/log.h>
+#include <nx/utils/scope_guard.h>
 #include "persistent_scheduler.h"
 
 namespace nx {
@@ -30,25 +31,25 @@ PersistentSheduler::PersistentSheduler(
     m_sqlExecutor(sqlExecutor),
     m_dbHelper(dbHelper)
 {
-    nx::utils::promise<void> readyPromise;
-    auto readyFuture = readyPromise.get_future();
+    nx::utils::promise<void> p;
+    auto f = p.get_future();
 
     m_sqlExecutor->executeSelect(
         [this](nx::db::QueryContext* queryContext)
         {
             return m_dbHelper->getScheduleData(queryContext, &m_scheduleData);
         },
-        [readyPromise = std::move(readyPromise)](nx::db::QueryContext*, nx::db::DBResult result) mutable
+        [p = std::move(p)](nx::db::QueryContext*, nx::db::DBResult result) mutable
         {
             if (result != nx::db::DBResult::ok)
             {
                 NX_LOG(lit("[Scheduler] Failed to load schedule data. Error code: %1")
                     .arg(nx::db::toString(result)), cl_logERROR);
             }
-            readyPromise.set_value();
+            p.set_value();
         });
 
-    readyFuture.wait();
+    f.wait();
 }
 
 PersistentSheduler::~PersistentSheduler()
@@ -56,17 +57,22 @@ PersistentSheduler::~PersistentSheduler()
     stop();
 }
 
-void PersistentSheduler::registerEventReceiver(
+nx::db::DBResult PersistentSheduler::registerEventReceiver(
     const QnUuid& functorId,
     AbstractPersistentScheduleEventReceiver *receiver)
 {
+    nx::utils::promise<nx::db::DBResult> p;
+    auto f = p.get_future();
+
     m_sqlExecutor->executeUpdate(
         [this, functorId](nx::db::QueryContext* queryContext)
         {
             return m_dbHelper->registerEventReceiver(queryContext, functorId);
         },
-        [this, functorId, receiver](nx::db::QueryContext*, nx::db::DBResult result) mutable
+        [this, functorId, receiver, p = std::move(p)](nx::db::QueryContext*, nx::db::DBResult result) mutable
         {
+            auto promiseGuard = makeScopeGuard([p = std::move(p), result]() mutable { p.set_value(result); });
+
             if (result != nx::db::DBResult::ok)
             {
                 NX_LOG(lit("[Scheduler] Failed to register functor id %1. Error code: %2")
@@ -78,6 +84,8 @@ void PersistentSheduler::registerEventReceiver(
             QnMutexLocker lock(&m_mutex);
             m_functorToReceiver[functorId] = receiver;
         });
+
+    return f.get();
 }
 
 nx::db::DBResult PersistentSheduler::subscribe(
@@ -142,6 +150,11 @@ void PersistentSheduler::removeTimer(const QnUuid& taskId)
     }
     QnMutexLocker lock(&m_timerManagerMutex);
     NX_ASSERT(m_timerManager);
+    if (!m_timerManager)
+    {
+        NX_LOG(lit("[Scheduler, timer] timer manager is NULL"), cl_logWARNING);
+        return;
+    }
     m_timerManager->deleteTimer(timerId);
 }
 
@@ -152,6 +165,12 @@ void PersistentSheduler::addTimer(
 {
     QnMutexLocker lock(&m_timerManagerMutex);
     NX_ASSERT(m_timerManager);
+    if (!m_timerManager)
+    {
+        NX_LOG(lit("[Scheduler, timer] timer manager is NULL"), cl_logWARNING);
+        return;
+    }
+
     auto timerId = m_timerManager->addNonStopTimer(
         [this, functorId, taskId, params = taskInfo.params](nx::utils::TimerId)
         {
@@ -199,8 +218,11 @@ void PersistentSheduler::addTimer(
 
 void PersistentSheduler::start()
 {
-    QnMutexLocker lock(&m_timerManagerMutex);
-    m_timerManager.reset(new nx::utils::StandaloneTimerManager);
+    {
+        QnMutexLocker lock(&m_timerManagerMutex);
+        m_timerManager.reset(new nx::utils::StandaloneTimerManager);
+    }
+
     for (const auto functorToTask : m_scheduleData.functorToTasks)
     {
         addTimer(
