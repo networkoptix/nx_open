@@ -29,14 +29,35 @@ class CloudUserOfflineLogin:
     public ::testing::Test
 {
 protected:
-    void givenCloudSystem()
+    void whenCloudUserPasswordHasBeenChanged()
     {
-        waitUserCloudAuthInfoToBeSynchronized();
+        changeCloudOwnerAccountPassword();
+    }
+    
+    void whenCloudDataHasBeenSynchronizedToTheServer()
+    {
+        waitForCloudDataSynchronizedToTheMediaServer();
+    }
+
+    void whenAddedMultipleCloudUsers()
+    {
+        constexpr int kAdditionalCloudUserCount = 2;
+        for (int i = 0; i < kAdditionalCloudUserCount; ++i)
+        {
+            m_additionalCloudUsers.push_back(cdb()->addActivatedAccount2());
+            cdb()->shareSystemEx(
+                ownerAccount(),
+                cloudSystem(),
+                m_additionalCloudUsers.back().email,
+                nx::cdb::api::SystemAccessRole::viewer);
+        }
     }
 
     void whenSystemWentOffline()
     {
         cdb()->stop();
+
+        whenMediaServerRestarted();
     }
 
     void whenMediaServerRestarted()
@@ -52,10 +73,25 @@ protected:
         ASSERT_EQ(ec2::ErrorCode::ok, mediaServerClient.ec2GetSettings(&vmsSettings));
     }
 
+    void thenAllUsersCanStillLogin()
+    {
+        auto mediaServerClient = prepareMediaServerClientFromCloudOwner();
+        for (const auto& account: m_additionalCloudUsers)
+        {
+            mediaServerClient.setUserName(QString::fromStdString(account.email));
+            mediaServerClient.setPassword(QString::fromStdString(account.password));
+            ec2::ApiUserDataList users;
+            ASSERT_EQ(ec2::ErrorCode::ok, mediaServerClient.ec2GetUsers(&users));
+        }
+    }
+
 private:
+    std::vector<nx::cdb::AccountWithPassword> m_additionalCloudUsers;
+
     virtual void SetUp() override
     {
         connectSystemToCloud();
+        waitUserCloudAuthInfoToBeSynchronized();
     }
 
     void waitUserCloudAuthInfoToBeSynchronized()
@@ -78,18 +114,30 @@ private:
 
 TEST_F(CloudUserOfflineLogin, login_works_on_offline_server_after_restart)
 {
-    givenCloudSystem();
     whenSystemWentOffline();
-    whenMediaServerRestarted();
     thenUserCanStillLogin();
 }
 
-// TEST_F(CloudUserOfflineLogin, multiple_users_can_login)
+TEST_F(CloudUserOfflineLogin, multiple_users_can_login)
+{
+    whenAddedMultipleCloudUsers();
+    whenCloudDataHasBeenSynchronizedToTheServer();
+    whenSystemWentOffline();
+
+    thenAllUsersCanStillLogin();
+}
 
 // TEST_F(CloudUserOfflineLogin, multiple_users_different_history_depth)
 
 // TEST_F(CloudUserOfflineLogin, cloud_user_added_while_system_is_offline_cannot_login_while_others_can)
 
-// TEST_F(CloudUserOfflineLogin, user_can_login_after_password_change)
+TEST_F(CloudUserOfflineLogin, DISABLED_user_can_login_after_password_change)
+{
+    whenCloudUserPasswordHasBeenChanged();
+    whenCloudDataHasBeenSynchronizedToTheServer();
+    whenSystemWentOffline();
+
+    thenUserCanStillLogin();
+}
 
 // TEST_F(CloudUserOfflineLogin, user_password_changed_while_system_was_offline)
