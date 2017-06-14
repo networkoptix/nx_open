@@ -57,35 +57,12 @@ PersistentSheduler::~PersistentSheduler()
     stop();
 }
 
-nx::db::DBResult PersistentSheduler::registerEventReceiver(
+void PersistentSheduler::registerEventReceiver(
     const QnUuid& functorId,
     AbstractPersistentScheduleEventReceiver *receiver)
 {
-    nx::utils::promise<nx::db::DBResult> p;
-    auto f = p.get_future();
-
-    m_sqlExecutor->executeUpdate(
-        [this, functorId](nx::db::QueryContext* queryContext)
-        {
-            return m_dbHelper->registerEventReceiver(queryContext, functorId);
-        },
-        [this, functorId, receiver, p = std::move(p)](nx::db::QueryContext*, nx::db::DBResult result) mutable
-        {
-            auto promiseGuard = makeScopeGuard([p = std::move(p), result]() mutable { p.set_value(result); });
-
-            if (result != nx::db::DBResult::ok)
-            {
-                NX_LOG(lit("[Scheduler] Failed to register functor id %1. Error code: %2")
-                    .arg(functorId.toString())
-                    .arg(nx::db::toString(result)), cl_logERROR);
-                return;
-            }
-
-            QnMutexLocker lock(&m_mutex);
-            m_functorToReceiver[functorId] = receiver;
-        });
-
-    return f.get();
+    QnMutexLocker lock(&m_mutex);
+    m_functorToReceiver[functorId] = receiver;
 }
 
 nx::db::DBResult PersistentSheduler::subscribe(
@@ -163,46 +140,22 @@ void PersistentSheduler::addTimer(
     const QnUuid& taskId,
     const ScheduleTaskInfo& taskInfo)
 {
-    QnMutexLocker lock(&m_timerManagerMutex);
-    NX_ASSERT(m_timerManager);
-    if (!m_timerManager)
+    nx::utils::TimerId timerId;
     {
-        NX_LOG(lit("[Scheduler, timer] timer manager is NULL"), cl_logWARNING);
-        return;
-    }
-
-    auto timerId = m_timerManager->addNonStopTimer(
-        [this, functorId, taskId, params = taskInfo.params](nx::utils::TimerId)
+        QnMutexLocker lock(&m_timerManagerMutex);
+        NX_ASSERT(m_timerManager);
+        if (!m_timerManager)
         {
-            AbstractPersistentScheduleEventReceiver* receiver;
-            {
-                QnMutexLocker lock(&m_mutex);
-                auto it = m_functorToReceiver.find(functorId);
-                NX_ASSERT(it != m_functorToReceiver.cend());
-                if (it == m_functorToReceiver.cend())
-                {
-                    NX_LOG(lit("[Scheduler] No receiver for functor id %1")
-                        .arg(functorId.toString()), cl_logERROR);
-                }
-                receiver = it->second;
-            }
+            NX_LOG(lit("[Scheduler, timer] timer manager is NULL"), cl_logWARNING);
+            return;
+        }
 
-            m_sqlExecutor->executeUpdate(
-                [this, receiver, &params, &functorId, &taskId](nx::db::QueryContext* queryContext)
-                {
-                    return receiver->persistentTimerFired(taskId, params)(queryContext);
-                },
-                [this](nx::db::QueryContext*, nx::db::DBResult result)
-                {
-                    if (result != nx::db::DBResult::ok)
-                    {
-                        NX_LOG(lit("[Scheduler] Use on timer callback returned error %1")
-                            .arg(toString(result)), cl_logERROR);
-                    }
-                });
-        },
-        timeoutFromTimepoint(taskInfo.fireTimePoint),
-        taskInfo.period);
+        timerId = m_timerManager->addNonStopTimer(
+            [this, functorId, taskId, params = taskInfo.params](nx::utils::TimerId)
+            { timerFunction(functorId, taskId, params); },
+            timeoutFromTimepoint(taskInfo.fireTimePoint),
+            taskInfo.period);
+    }
 
     QnMutexLocker lock2(&m_mutex);
     auto taskToTimerIt = m_taskToTimer.find(taskId);
@@ -216,6 +169,39 @@ void PersistentSheduler::addTimer(
     m_taskToTimer[taskId] = timerId;
 }
 
+void PersistentSheduler::timerFunction(
+    const QnUuid& functorId,
+    const QnUuid& taskId,
+    const nx::cdb::ScheduleParams& params)
+{
+    AbstractPersistentScheduleEventReceiver* receiver;
+    {
+        QnMutexLocker lock(&m_mutex);
+        auto it = m_functorToReceiver.find(functorId);
+        NX_ASSERT(it != m_functorToReceiver.cend());
+        if (it == m_functorToReceiver.cend())
+        {
+            NX_LOG(lit("[Scheduler] No receiver for functor id %1")
+                   .arg(functorId.toString()), cl_logERROR);
+        }
+        receiver = it->second;
+    }
+
+    m_sqlExecutor->executeUpdate(
+        [this, receiver, &params, &functorId, &taskId](nx::db::QueryContext* queryContext)
+    {
+        return receiver->persistentTimerFired(taskId, params)(queryContext);
+    },
+        [this](nx::db::QueryContext*, nx::db::DBResult result)
+    {
+        if (result != nx::db::DBResult::ok)
+        {
+            NX_LOG(lit("[Scheduler] Use on timer callback returned error %1")
+                   .arg(toString(result)), cl_logERROR);
+        }
+    });
+}
+
 void PersistentSheduler::start()
 {
     {
@@ -225,10 +211,13 @@ void PersistentSheduler::start()
 
     for (const auto functorToTask : m_scheduleData.functorToTasks)
     {
-        addTimer(
-            functorToTask.first,
-            functorToTask.second,
-            m_scheduleData.taskToParams[functorToTask.second]);
+        for (const auto taskId : functorToTask.second)
+        {
+            addTimer(
+                functorToTask.first,
+                taskId,
+                m_scheduleData.taskToParams[taskId]);
+        }
     }
 }
 

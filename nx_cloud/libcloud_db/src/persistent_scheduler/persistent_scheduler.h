@@ -45,7 +45,7 @@ public:
         AbstractSchedulerDbHelper* dbHelper);
     ~PersistentSheduler();
 
-    nx::db::DBResult registerEventReceiver(
+    void registerEventReceiver(
         const QnUuid& functorId,
         AbstractPersistentScheduleEventReceiver* receiver);
 
@@ -79,6 +79,11 @@ private:
         const QnUuid& functorId,
         QnUuid* outTaskId,
         const ScheduleTaskInfo& taskInfo);
+
+    void timerFunction(
+        const QnUuid& functorId,
+        const QnUuid& taskId,
+        const nx::cdb::ScheduleParams& params);
 
 private:
     nx::db::AbstractAsyncSqlQueryExecutor* m_sqlExecutor;

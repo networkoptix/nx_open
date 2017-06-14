@@ -2,7 +2,7 @@
 
 #include <unordered_map>
 #include <string>
-#include <vector>
+#include <set>
 #include <chrono>
 #include <nx/utils/uuid.h>
 
@@ -18,7 +18,7 @@ struct ScheduleTaskInfo
 };
 
 using TaskToParams = std::unordered_map<QnUuid, ScheduleTaskInfo>;
-using FunctorToTasks = std::unordered_map<QnUuid, QnUuid>;
+using FunctorToTasks = std::unordered_map<QnUuid, std::set<QnUuid>>;
 
 struct ScheduleData
 {
