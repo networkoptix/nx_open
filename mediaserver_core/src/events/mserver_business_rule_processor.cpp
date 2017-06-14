@@ -66,6 +66,7 @@
 #include <nx/streaming/abstract_archive_stream_reader.h>
 
 #include <utils/common/app_info.h>
+#include <utils/camera/bookmark_helpers.h>
 #include <nx/utils/system_error.h>
 #include <utils/common/synctime.h>
 #include <utils/math/math.h>
@@ -257,9 +258,17 @@ bool QnMServerBusinessRuleProcessor::executeActionInternal(const QnAbstractBusin
             result = sendMail(action.dynamicCast<QnSendMailBusinessAction>());
             break;
         case QnBusiness::BookmarkAction:
-            if (!action->getParams().needConfirmation)
-                result = executeBookmarkAction(action);
+        {
+            const bool needConfirmation = action->getParams().needConfirmation;
+            result = executeBookmarkAction(action, needConfirmation);
+            if (!needConfirmation || !result)
+                break;
+
+            action->setActionType(QnBusiness::ShowPopupAction);
+            action->getParams().targetActionType = QnBusiness::BookmarkAction;
+            result = broadcastBusinessAction(action);
             break;
+        }
         case QnBusiness::CameraOutputAction:
             result = triggerCameraOutput(action.dynamicCast<QnCameraOutputBusinessAction>());
             break;
@@ -484,7 +493,9 @@ bool QnMServerBusinessRuleProcessor::executeRecordingAction(const QnRecordingBus
     return rez;
 }
 
-bool QnMServerBusinessRuleProcessor::executeBookmarkAction(const QnAbstractBusinessActionPtr &action)
+bool QnMServerBusinessRuleProcessor::executeBookmarkAction(
+    const QnAbstractBusinessActionPtr &action,
+    bool createBookmark)
 {
     NX_ASSERT(action);
     auto camera = resourcePool()->getResourceById<QnSecurityCamResource>(action->getParams().actionResourceId);
@@ -492,13 +503,10 @@ bool QnMServerBusinessRuleProcessor::executeBookmarkAction(const QnAbstractBusin
         return false;
 
     int fixedDurationMs = action->getParams().durationMs;
-    int recordBeforeMs = action->getParams().recordBeforeMs;
-    int recordAfterMs = action->getParams().recordAfter;
 
     const auto key = action->getExternalUniqKey();
     auto runningKey = guidFromArbitraryData(key);
     qint64 startTimeMs = action->getRuntimeParams().eventTimestampUsec / 1000;
-    qint64 endTimeMs = startTimeMs;
 
     if (fixedDurationMs <= 0)
     {
@@ -514,20 +522,16 @@ bool QnMServerBusinessRuleProcessor::executeBookmarkAction(const QnAbstractBusin
         startTimeMs = m_runningBookmarkActions.take(runningKey);
     }
 
-    QnCameraBookmark bookmark;
-    bookmark.guid = QnUuid::createUuid();
-    bookmark.startTimeMs = startTimeMs - recordBeforeMs;
-    bookmark.durationMs = fixedDurationMs > 0 ? fixedDurationMs : endTimeMs - startTimeMs;
-    bookmark.durationMs += recordBeforeMs + recordAfterMs;
-    bookmark.cameraId = camera->getId();
-    QnBusinessStringsHelper helper(commonModule());
-    bookmark.name = helper.eventAtResource(action->getRuntimeParams(), Qn::RI_WithUrl);
-    bookmark.description = helper.eventDetails(action->getRuntimeParams()).join(L'\n');
-    bookmark.tags = action->getParams().tags.split(L',', QString::SkipEmptyParts).toSet();
+    if (!createBookmark)
+    {
+        action->getRuntimeParams().eventTimestampUsec = startTimeMs * 1000;
+        qDebug() << action->getRuntimeParams().eventTimestampUsec;
+        return true;
+    }
 
-    return qnServerDb->addBookmark(bookmark);
+    return qnServerDb->addBookmark(
+        helpers::bookmarkFromAction(action, camera, commonModule()));
 }
-
 
 QnUuid QnMServerBusinessRuleProcessor::getGuid() const {
     return serverGuid();

@@ -3,6 +3,9 @@
 
 #include <utils/math/math.h>
 #include <core/resource/camera_bookmark.h>
+#include <core/resource/security_cam_resource.h>
+#include <business/business_strings_helper.h>
+#include <business/actions/abstract_business_action.h>
 
 namespace
 {
@@ -12,6 +15,32 @@ namespace
     {
         return (std::abs(first - second) >= minDiff);
     }
+}
+
+QnCameraBookmark helpers::bookmarkFromAction(
+    const QnAbstractBusinessActionPtr& action,
+    const QnSecurityCamResourcePtr& camera,
+    QnCommonModule* commonModule)
+{
+    const auto actionParams = action->getParams();
+    const qint64 recordBeforeMs = actionParams.recordBeforeMs;
+    const qint64 recordAfterMs = actionParams.recordAfter;
+    const qint64 fixedDurationMs = actionParams.durationMs;
+    const qint64 startTimeMs = action->getRuntimeParams().eventTimestampUsec / 1000;
+    const qint64 endTimeMs = startTimeMs;
+
+    QnCameraBookmark bookmark;
+    bookmark.guid = QnUuid::createUuid();
+    bookmark.startTimeMs = startTimeMs - recordBeforeMs;
+    bookmark.durationMs = fixedDurationMs > 0 ? fixedDurationMs : endTimeMs - startTimeMs;
+    bookmark.durationMs += recordBeforeMs + recordAfterMs;
+    bookmark.cameraId = camera->getId();
+
+    QnBusinessStringsHelper helper(commonModule);
+    bookmark.name = helper.eventAtResource(action->getRuntimeParams(), Qn::RI_WithUrl);
+    bookmark.description = helper.eventDetails(action->getRuntimeParams()).join(L'\n');
+    bookmark.tags = action->getParams().tags.split(L',', QString::SkipEmptyParts).toSet();
+    return bookmark;
 }
 
 QnCameraBookmarkList helpers::bookmarksAtPosition(const QnCameraBookmarkList &bookmarks

@@ -64,7 +64,7 @@ public:
     QnBusinessActionParameters& getParams();
 
     void setRuntimeParams(const QnBusinessEventParameters& params);
-    const QnBusinessEventParameters& getRuntimeParams() const;
+    QnBusinessEventParameters& getRuntimeParams();
 
     void setBusinessRuleId(const QnUuid& value);
     QnUuid getBusinessRuleId() const;
