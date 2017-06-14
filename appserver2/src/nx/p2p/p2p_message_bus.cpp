@@ -1239,7 +1239,7 @@ void MessageBus::gotTransaction(
 {
     ApiPersistentIdData peerId(tran.peerID, tran.persistentInfo.dbID);
     //NX_ASSERT(connection->localPeerSubscribedTo(peerId)); //< loop
-    NX_ASSERT(!context(connection)->isRemotePeerSubscribedTo(peerId)); //< loop
+    //NX_ASSERT(!context(connection)->isRemotePeerSubscribedTo(peerId)); //< loop
 
     if (nx::utils::log::isToBeLogged(cl_logDEBUG1, this))
         printTran(connection, tran, Connection::Direction::incoming);
@@ -1292,6 +1292,10 @@ void MessageBus::gotTransaction(
         return; // Ignore deprecated transaction.
 
     ApiPersistentIdData peerId(tran.peerID, tran.params.peer.persistentId);
+
+    if (m_lastRuntimeInfo[peerId] == tran.params)
+        return; //< Already processed. Ignore same transaction.
+
     m_lastRuntimeInfo[peerId] = tran.params;
 
     if (m_handler)
@@ -1312,10 +1316,12 @@ void MessageBus::gotTransaction(
     ApiPersistentIdData peerId(tran.peerID, tran.persistentInfo.dbID);
 
     //NX_ASSERT(connection->localPeerSubscribedTo(peerId)); //< loop
-    NX_ASSERT(!context(connection)->isRemotePeerSubscribedTo(peerId)); //< loop
+    //NX_ASSERT(!context(connection)->isRemotePeerSubscribedTo(peerId)); //< loop
     auto transactionDescriptor = getTransactionDescriptorByTransaction(tran);
 
+#if 0
     // process special cases
+	// TODO: potential tranasction loop for non-persistent transactions should be handled somehow
     switch (tran.command)
     {
         case ApiCommand::forcePrimaryTimeServer:
@@ -1336,6 +1342,7 @@ void MessageBus::gotTransaction(
         default:
             break; //< Not a special case
     }
+#endif
 
     if (m_db)
     {
