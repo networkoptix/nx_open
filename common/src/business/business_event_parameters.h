@@ -79,10 +79,15 @@ struct QnBusinessEventParameters
      */
     QnEventMetaData metadata;
 
+    /**
+     * Identifier of bookmark. Used to prevent double bookmark creation on creation confirmation.
+     */
+    QnUuid bookmarkId;
+
     /** Hash for events aggregation. */
     QnUuid getParamsHash() const;
 };
 #define QnBusinessEventParameters_Fields \
     (eventType)(eventTimestampUsec)(eventResourceId)(resourceName)(sourceServerId) \
-    (reasonCode)(inputPortId)(caption)(description)(metadata)
+    (reasonCode)(inputPortId)(caption)(description)(metadata)(bookmarkId)
 QN_FUSION_DECLARE_FUNCTIONS(QnBusinessEventParameters, (ubjson)(json)(eq)(xml)(csv_record));

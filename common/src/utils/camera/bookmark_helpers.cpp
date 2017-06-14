@@ -39,11 +39,16 @@ QnCameraBookmark helpers::bookmarkFromAction(
     const qint64 recordBeforeMs = actionParams.recordBeforeMs;
     const qint64 recordAfterMs = actionParams.recordAfter;
     const qint64 fixedDurationMs = actionParams.durationMs;
-    const qint64 startTimeMs = action->getRuntimeParams().eventTimestampUsec / 1000;
+
+    const auto runtimeParams = action->getRuntimeParams();
+    const qint64 startTimeMs = runtimeParams.eventTimestampUsec / 1000;
     const qint64 endTimeMs = startTimeMs;
 
     QnCameraBookmark bookmark;
-    bookmark.guid = QnUuid::createUuid();
+    bookmark.guid = runtimeParams.bookmarkId.isNull()
+        ? QnUuid::createUuid()
+        : runtimeParams.bookmarkId;
+
     bookmark.startTimeMs = startTimeMs - recordBeforeMs;
     bookmark.durationMs = fixedDurationMs > 0 ? fixedDurationMs : endTimeMs - startTimeMs;
     bookmark.durationMs += recordBeforeMs + recordAfterMs;

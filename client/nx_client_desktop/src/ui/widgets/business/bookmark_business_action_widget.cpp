@@ -30,11 +30,8 @@ QnBookmarkBusinessActionWidget::QnBookmarkBusinessActionWidget(QWidget *parent) 
     connect(ui->recordBeforeSpinBox, QnSpinboxIntValueChanged,  this, &QnBookmarkBusinessActionWidget::paramsChanged);
     connect(ui->recordAfterSpinBox, QnSpinboxIntValueChanged,  this, &QnBookmarkBusinessActionWidget::paramsChanged);
 
-    connect(ui->needConfirmationCheckBox, &QCheckBox::toggled, this,
-        [this]()
-        {
-            ui->confirmationByLabel->setVisible(ui->needConfirmationCheckBox->isChecked());
-        });
+    connect(ui->needConfirmationCheckBox, &QCheckBox::toggled,
+        this, &QnBookmarkBusinessActionWidget::updateUserSelectionControls);
 
     connect(ui->fixedDurationCheckBox,  &QCheckBox::toggled, this, [this](bool checked)
     {
@@ -58,6 +55,12 @@ void QnBookmarkBusinessActionWidget::updateTabOrder(QWidget *before, QWidget *af
     setTabOrder(ui->recordAfterSpinBox, ui->tagsLineEdit);
     setTabOrder(ui->tagsLineEdit, ui->needConfirmationCheckBox);
     setTabOrder(ui->needConfirmationCheckBox, after);
+}
+
+void QnBookmarkBusinessActionWidget::updateUserSelectionControls()
+{
+    const bool visible = ui->needConfirmationCheckBox->isChecked();
+    ui->confirmationByLabel->setVisible(visible);
 }
 
 void QnBookmarkBusinessActionWidget::at_model_dataChanged(QnBusiness::Fields fields)
@@ -90,7 +93,8 @@ void QnBookmarkBusinessActionWidget::at_model_dataChanged(QnBusiness::Fields fie
     }
 
     ui->recordAfterWidget->setEnabled(!ui->fixedDurationCheckBox->isChecked());
-    ui->confirmationByLabel->setVisible(ui->needConfirmationCheckBox->isChecked());
+
+    updateUserSelectionControls();
 }
 
 void QnBookmarkBusinessActionWidget::paramsChanged() {
