@@ -43,7 +43,7 @@ def env(server_factory, camera_factory, counter):
     # Create cameras
     for server in [one, two, three]:
         add_cameras_to_server(server, camera_factory, counter, 2)
-    wait_servers_online([one, two, three])
+    wait_until_servers_are_online([one, two, three])
     return SimpleNamespace(
         one=one,
         two=two,
@@ -51,7 +51,7 @@ def env(server_factory, camera_factory, counter):
         )
 
 
-def wait_servers_online(servers):
+def wait_until_servers_are_online(servers):
     start = time.time()
     server_guids = sorted([s.ecs_guid for s in servers])
     for srv in servers:
@@ -156,9 +156,7 @@ def discovery(request):
 @pytest.mark.testcam
 def test_failover_and_auto_discovery(server_factory, camera_factory, counter, discovery):
     one = server_factory('one')
-    two = server_factory('two', start=False)
-    two.start_service()
-    two.setup_local_system(systemSettings=dict(autoDiscoveryEnabled=discovery))
+    two = server_factory('two', setup_settings=dict(autoDiscoveryEnabled=discovery))
     two.rest_api.ec2.saveMediaServerUserAttributes.POST(
         serverId=two.ecs_guid,
         maxCameras=2,
@@ -167,7 +165,7 @@ def test_failover_and_auto_discovery(server_factory, camera_factory, counter, di
     cameras_one = get_server_camera_ids(one)
     assert cameras_one
     one.merge([two])
-    wait_servers_online([one, two])
+    wait_until_servers_are_online([one, two])
     one.stop_service()
     wait_for_expected_online_cameras_on_server(two, cameras_one)
     one.start_service()
