@@ -5,7 +5,7 @@
 namespace nx {
 namespace utils {
 
-void createRandomFile(const QString& fileName, qint64 size);
+void NX_UTILS_API createRandomFile(const QString& fileName, qint64 size);
 
 } // namespace utils
 } // namespace nx
