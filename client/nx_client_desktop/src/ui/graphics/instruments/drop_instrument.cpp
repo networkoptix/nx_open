@@ -12,6 +12,7 @@
 #include <common/common_globals.h>
 
 #include <core/resource_management/resource_pool.h>
+#include <core/resource_management/layout_tour_manager.h>
 #include <core/resource/media_resource.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource/layout_resource.h>
@@ -179,41 +180,49 @@ bool DropInstrument::dragLeaveEvent(QGraphicsItem *, QGraphicsSceneDragDropEvent
     return true;
 }
 
-bool DropInstrument::dropEvent(QGraphicsItem *, QGraphicsSceneDragDropEvent *event)
+bool DropInstrument::dropEvent(QGraphicsItem* /*item*/, QGraphicsSceneDragDropEvent* event)
 {
-    QnWorkbenchContext *context = m_context.data();
-    if (context == NULL)
+    auto context = m_context.data();
+    if (!context)
         return true;
 
     const QMimeData *mimeData = event->mimeData();
     if (mimeData->hasFormat(Qn::NoSceneDrop))
         return false;
 
-    const auto videoWallItems = resourcePool()->getVideoWallItemsByUuid(m_ids);
+    event->acceptProposedAction();
+
+    const auto layoutTours = layoutTourManager()->tours(m_ids);
+    if (!layoutTours.empty())
+    {
+        for (const auto& tour : layoutTours)
+            delayedTriggerIfPossible(action::ReviewLayoutTourAction, {Qn::UuidRole, tour.id});
+
+        // If tour was opened, ignore other items.
+        return true;
+    }
 
     // Try to drop videowall items first.
+    const auto videoWallItems = resourcePool()->getVideoWallItemsByUuid(m_ids);
     if (delayedTriggerIfPossible(action::StartVideoWallControlAction, videoWallItems))
     {
         // Ignore resources.
+        return true;
+    }
+
+    const auto resources = resourcePool()->getResources(m_ids);
+    if (!m_intoNewLayout)
+    {
+        delayedTriggerIfPossible(
+            action::DropResourcesAction,
+            action::Parameters(resources).withArgument(Qn::ItemPositionRole,
+                context->workbench()->mapper()->mapToGridF(event->scenePos())));
     }
     else
     {
-        const auto resources = resourcePool()->getResources(m_ids);
-        if (!m_intoNewLayout)
-        {
-            delayedTriggerIfPossible(
-                action::DropResourcesAction,
-                action::Parameters(resources).withArgument(Qn::ItemPositionRole,
-                    context->workbench()->mapper()->mapToGridF(event->scenePos()))
-            );
-        }
-        else
-        {
-            delayedTriggerIfPossible(action::OpenInNewTabAction, resources);
-        }
+        delayedTriggerIfPossible(action::OpenInNewTabAction, resources);
     }
 
-    event->acceptProposedAction();
     return true;
 }
 
