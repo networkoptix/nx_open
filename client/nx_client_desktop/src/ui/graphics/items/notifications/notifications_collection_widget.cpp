@@ -247,21 +247,34 @@ void QnNotificationsCollectionWidget::handleShowPopupAction(
     if (params.targetActionType != QnBusiness::BookmarkAction)
         return;
 
-    qDebug() << businessAction->getRuntimeParams().eventTimestampUsec;
-
-    using namespace nx::client::desktop::ui;
-    const auto camera = resourcePool()->getResourceById<QnSecurityCamResource>(
-        businessAction->getParams().actionResourceId);
-    if (!camera)
+    QnCameraBookmarkList bookmarks;
+    for (const auto& resourceId: businessAction->getResources())
     {
-        NX_EXPECT(false, "Invalid camera resource");
-        return;
+        using namespace nx::client::desktop::ui;
+        const auto camera = resourcePool()->getResourceById<QnSecurityCamResource>(resourceId);
+        if (!camera)
+        {
+            NX_EXPECT(false, "Invalid camera resource");
+            continue;
+        }
+
+        const auto bookmark = helpers::bookmarkFromAction(businessAction, camera, commonModule());
+        if (!bookmark.isValid())
+        {
+            NX_EXPECT(false, "Invalid bookmark");
+            continue;
+        }
+
+        bookmarks.append(bookmark);
     }
 
+    if (bookmarks.isEmpty())
+        return;
+
     widget->addTextButton(QIcon(), tr("Bookmark it"),
-        [bookmark = helpers::bookmarkFromAction(businessAction, camera, commonModule())]()
+        [bookmarks]()
         {
-            if (bookmark.isValid())
+            for (const auto bookmark: bookmarks)
                 qnCameraBookmarksManager->addCameraBookmark(bookmark);
         });
 }
