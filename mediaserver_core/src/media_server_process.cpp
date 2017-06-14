@@ -1604,13 +1604,13 @@ void MediaServerProcess::saveServerInfo(const QnMediaServerResourcePtr& server)
     #endif
 }
 
-void MediaServerProcess::at_updatePublicAddress(const QHostAddress& publicIP)
+void MediaServerProcess::at_updatePublicAddress(const QHostAddress& publicIp)
 {
     if (isStopping())
         return;
 
     QnPeerRuntimeInfo localInfo = commonModule()->runtimeInfoManager()->localInfo();
-    localInfo.data.publicIP = publicIP.toString();
+    localInfo.data.publicIP = publicIp.toString();
     commonModule()->runtimeInfoManager()->updateLocalItem(localInfo);
 
     const auto& resPool = commonModule()->resourcePool();
@@ -1618,7 +1618,7 @@ void MediaServerProcess::at_updatePublicAddress(const QHostAddress& publicIP)
     if (server)
     {
         Qn::ServerFlags serverFlags = server->getServerFlags();
-        if (publicIP.isNull())
+        if (publicIp.isNull())
             serverFlags &= ~Qn::SF_HasPublicIP;
         else
             serverFlags |= Qn::SF_HasPublicIP;
@@ -1632,7 +1632,7 @@ void MediaServerProcess::at_updatePublicAddress(const QHostAddress& publicIP)
             ec2Connection->getMediaServerManager(Qn::kSystemAccess)->save(apiServer, this, [] {});
         }
 
-        if (server->setProperty(Qn::PUBLIC_IP, publicIP.toString(), QnResource::NO_ALLOW_EMPTY))
+        if (server->setProperty(Qn::PUBLIC_IP, publicIp.toString(), QnResource::NO_ALLOW_EMPTY))
             server->saveParams();
 
         updateAddressesList(); //< update interface list to add/remove publicIP
@@ -1786,6 +1786,7 @@ void MediaServerProcess::registerRestHandlers(
 
     // TODO: When supported by apidoctool, the comment to these constants should be parsed.
     const auto kAdmin = Qn::GlobalAdminPermission;
+    const auto kViewLogs = Qn::GlobalViewLogsPermission;
 
     reg("api/storageStatus", new QnStorageStatusRestHandler());
     reg("api/storageSpace", new QnStorageSpaceRestHandler());
@@ -1813,8 +1814,8 @@ void MediaServerProcess::registerRestHandlers(
     reg("api/pingSystem", new QnPingSystemRestHandler());
     reg("api/rebuildArchive", new QnRebuildArchiveRestHandler());
     reg("api/backupControl", new QnBackupControlRestHandler());
-    reg("api/events", new QnBusinessEventLogRestHandler(), Qn::GlobalViewLogsPermission); //< deprecated
-    reg("api/getEvents", new QnBusinessLog2RestHandler(), Qn::GlobalViewLogsPermission); //< new version
+    reg("api/events", new QnBusinessEventLogRestHandler(), kViewLogs); //< deprecated
+    reg("api/getEvents", new QnBusinessLog2RestHandler(), kViewLogs); //< new version
     reg("api/showLog", new QnLogRestHandler());
     reg("api/getSystemId", new QnGetSystemIdRestHandler());
     reg("api/doCameraDiagnosticsStep", new QnCameraDiagnosticsRestHandler());
@@ -1867,7 +1868,7 @@ void MediaServerProcess::registerRestHandlers(
 
     reg("api/startLiteClient", new QnStartLiteClientRestHandler());
 
-    #ifdef _DEBUG
+    #if defined(_DEBUG)
         reg("api/debugEvent", new QnDebugEventsRestHandler());
     #endif
 
@@ -1875,20 +1876,31 @@ void MediaServerProcess::registerRestHandlers(
 
 }
 
+template<class TcpConnectionProcessor>
+void MediaServerProcess::regTcp(const QByteArray& protocol, const QString& path)
+{
+    m_universalTcpListener->addHandler<TcpConnectionProcessor>(protocol, path);
+
+    if (TcpConnectionProcessor::isForwardingRequired())
+        m_autoRequestForwarder->addProtocolAndPath(protocol, path);
+}
+
 bool MediaServerProcess::initTcpListener(
     CloudManagerGroup* const cloudManagerGroup,
     ec2::QnTransactionMessageBusBase* messageBus)
 {
-    m_autoRequestForwarder.reset( new QnAutoRequestForwarder(commonModule() ));
+    m_autoRequestForwarder.reset( new QnAutoRequestForwarder(commonModule()));
     m_autoRequestForwarder->addPathToIgnore(lit("/ec2/*"));
 
-    const int rtspPort = qnServerModule->roSettings()->value(nx_ms_conf::SERVER_PORT, nx_ms_conf::DEFAULT_SERVER_PORT).toInt();
+    const int rtspPort = qnServerModule->roSettings()->value(
+        nx_ms_conf::SERVER_PORT, nx_ms_conf::DEFAULT_SERVER_PORT).toInt();
 
     // Accept SSL connections in all cases as it is always in use by cloud modules and old clients,
     // config value only affects server preference listed in moduleInformation.
     bool acceptSslConnections = true;
-    int maxConnections = qnServerModule->roSettings()->value("maxConnections", QnTcpListener::DEFAULT_MAX_CONNECTIONS).toInt();
-    NX_LOG(QString("Using maxConnections = %1.").arg(maxConnections), cl_logINFO);
+    int maxConnections = qnServerModule->roSettings()->value(
+        "maxConnections", QnTcpListener::DEFAULT_MAX_CONNECTIONS).toInt();
+    NX_INFO(this) lit("Using maxConnections = %1.").arg(maxConnections);
 
     m_universalTcpListener = new QnUniversalTcpListener(
         commonModule(),
@@ -1896,31 +1908,38 @@ bool MediaServerProcess::initTcpListener(
         QHostAddress::Any,
         rtspPort,
         maxConnections,
-        acceptSslConnections );
+        acceptSslConnections);
 
     m_universalTcpListener->httpModManager()->addCustomRequestMod(std::bind(
         &QnAutoRequestForwarder::processRequest,
         m_autoRequestForwarder.get(),
         std::placeholders::_1));
 
-
-#ifdef ENABLE_ACTI
-    QnActiResource::setEventPort(rtspPort);
-    m_universalTcpListener->processorPool()->registerHandler("api/camera_event", new QnActiEventRestHandler());  //used to receive event from acti camera. TODO: remove this from api
-#endif
+    #if defined(ENABLE_ACTI)
+        QnActiResource::setEventPort(rtspPort);
+        // Used to receive event from an acti camera.
+        // TODO: Remove this from api.
+        m_universalTcpListener->processorPool()->registerHandler(
+            "api/camera_event", new QnActiEventRestHandler());
+    #endif
 
     registerRestHandlers(cloudManagerGroup, m_universalTcpListener, messageBus);
 
-    if( !m_universalTcpListener->bindToLocalAddress() )
+    if (!m_universalTcpListener->bindToLocalAddress())
         return false;
     m_universalTcpListener->setDefaultPage("/static/index.html");
 
-    // Server return code 403 (forbidden) instead of 401 if user isn't authorized for requests starting with 'web' path
+    // Server returns code 403 (forbidden) instead of 401 if the user isn't authorized for requests
+    // starting with "web" path.
     m_universalTcpListener->setPathIgnorePrefix("web/");
     QnAuthHelper::instance()->restrictionList()->deny(lit("/web/*"), nx_http::AuthMethod::http);
 
-    nx_http::AuthMethod::Values methods = (nx_http::AuthMethod::Values)(nx_http::AuthMethod::cookie | nx_http::AuthMethod::urlQueryParam | nx_http::AuthMethod::tempUrlQueryParam);
-    QnUniversalRequestProcessor::setUnauthorizedPageBody(QnFileConnectionProcessor::readStaticFile("static/login.html"), methods);
+    nx_http::AuthMethod::Values methods = (nx_http::AuthMethod::Values) (
+        nx_http::AuthMethod::cookie |
+        nx_http::AuthMethod::urlQueryParam |
+        nx_http::AuthMethod::tempUrlQueryParam);
+    QnUniversalRequestProcessor::setUnauthorizedPageBody(
+        QnFileConnectionProcessor::readStaticFile("static/login.html"), methods);
     m_universalTcpListener->addHandler<QnRtspConnectionProcessor>("RTSP", "*");
     m_universalTcpListener->addHandler<QnRestConnectionProcessor>("HTTP", "api");
     m_universalTcpListener->addHandler<QnRestConnectionProcessor>("HTTP", "ec2");
@@ -1941,12 +1960,12 @@ bool MediaServerProcess::initTcpListener(
     m_universalTcpListener->addHandler<QnProxyReceiverConnection>("HTTP", "proxy-reverse");
     m_universalTcpListener->addHandler<QnAudioProxyReceiver>("HTTP", "proxy-2wayaudio");
 
-    if( !qnServerModule->roSettings()->value("authenticationEnabled", "true").toBool() )
+    if( !qnServerModule->roSettings()->value("authenticationEnabled", "true").toBool())
         m_universalTcpListener->disableAuth();
 
-#ifdef ENABLE_DESKTOP_CAMERA
-    m_universalTcpListener->addHandler<QnDesktopCameraRegistrator>("HTTP", "desktop_camera");
-#endif   //ENABLE_DESKTOP_CAMERA
+    #if defined(ENABLE_DESKTOP_CAMERA)
+        m_universalTcpListener->addHandler<QnDesktopCameraRegistrator>("HTTP", "desktop_camera");
+    #endif
 
     return true;
 }
