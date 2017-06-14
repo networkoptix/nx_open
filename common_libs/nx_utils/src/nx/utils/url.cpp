@@ -4,13 +4,12 @@ namespace nx {
 namespace utils {
 namespace url {
 
-bool equal(const QUrl& lhs, const QUrl& rhs, ComparisonFlags flags)
+NX_UTILS_API bool equal(const QUrl& lhs, const QUrl& rhs, ComparisonFlags flags)
 {
     if (flags.testFlag(ComparisonFlag::All))
         return lhs == rhs;
 
-    return
-        (!flags.testFlag(ComparisonFlag::Host) || lhs.host() == rhs.host())
+    return (!flags.testFlag(ComparisonFlag::Host) || lhs.host() == rhs.host())
         && (!flags.testFlag(ComparisonFlag::Port) || lhs.port() == rhs.port())
         && (!flags.testFlag(ComparisonFlag::Scheme) || lhs.scheme() == rhs.scheme())
         && (!flags.testFlag(ComparisonFlag::UserName) || lhs.userName() == rhs.userName())

@@ -24,9 +24,9 @@ enum class UrlPart
 using ComparisonFlag = UrlPart;
 Q_DECLARE_FLAGS(ComparisonFlags, ComparisonFlag)
 
-bool equal(const QUrl& lhs, const QUrl& rhs, ComparisonFlags flags = ComparisonFlag::All);
+NX_UTILS_API bool equal(const QUrl& lhs, const QUrl& rhs, ComparisonFlags flags = ComparisonFlag::All);
 
-bool addressesEqual(const QUrl& lhs, const QUrl& rhs)
+inline bool addressesEqual(const QUrl& lhs, const QUrl& rhs)
 {
     return equal(lhs, rhs, ComparisonFlag::Address);
 }
