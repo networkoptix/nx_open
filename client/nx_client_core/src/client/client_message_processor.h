@@ -41,4 +41,4 @@ private:
 };
 
 #define qnClientMessageProcessor \
-    static_cast<QnClientMessageProcessor*>(commonModule()->messageProcessor())
+    static_cast<QnClientMessageProcessor*>(this->commonModule()->messageProcessor())
