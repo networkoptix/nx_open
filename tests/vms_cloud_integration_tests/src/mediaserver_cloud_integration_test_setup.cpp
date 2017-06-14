@@ -161,13 +161,13 @@ void MediaServerCloudIntegrationTest::connectSystemToCloud()
 
 void MediaServerCloudIntegrationTest::changeCloudOwnerAccountPassword()
 {
-    const auto newPassword = nx::utils::generateRandomName(7);
+    const auto newPassword = nx::utils::generateRandomName(7).toStdString();
 
     api::AccountUpdateData update;
     update.passwordHa1 = nx_http::calcHa1(
         m_ownerAccount.email.c_str(),
         nx::network::AppInfo::realm().toStdString().c_str(),
-        newPassword.constData()).constData();
+        newPassword.c_str()).constData();
     ASSERT_EQ(
         nx::cdb::api::ResultCode::ok,
         cdb()->updateAccount(m_ownerAccount.email, m_ownerAccount.password, update));
