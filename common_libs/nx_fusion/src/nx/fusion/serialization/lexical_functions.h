@@ -3,6 +3,7 @@
 
 #include <nx/utils/uuid.h>
 #include <QtCore/QUrl>
+#include <QtCore/QBitArray>
 #include <QtGui/QColor>
 
 #include "lexical.h"
@@ -134,6 +135,8 @@ bool deserialize(const QString &value, T *target, typename std::enable_if<QnLexi
     return QnLexicalDetail::deserialize_numeric_enum(value, target);
 }
 
+bool serialize(const QBitArray& value, QString* target);
+bool deserialize(const QString& value, QBitArray* target);
 
 QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES((bool)(QnUuid)(QUrl)(QColor), (lexical))
 

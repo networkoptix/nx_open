@@ -148,6 +148,24 @@ TEST_F(QnFusionTestFixture, flagsNumeric)
     ASSERT_EQ(nx::Flag1|nx::Flag2, flags);
 }
 
+TEST_F(QnFusionTestFixture, bitArray)
+{
+    QBitArray value(17);
+    value.setBit(1);
+    value.setBit(5);
+    value.setBit(6);
+    value.setBit(9);
+    value.setBit(11);
+    value.setBit(16);
+
+    const auto data = QJson::serialized(value);
+    ASSERT_EQ(data, str("YgoBAQ==")); //< Base64 is expected.
+
+    QBitArray target;
+    ASSERT_TRUE(QJson::deserialize(data, &target));
+    ASSERT_EQ(value, target);
+}
+
 TEST_F(QnFusionTestFixture, deserializeStruct)
 {
     const IntMockData data(113, 115, 117);

@@ -32,6 +32,7 @@
 #include <ui/workbench/workbench_context.h>
 
 #include <utils/common/event_processors.h>
+#include <utils/common/scoped_painter_rollback.h>
 
 #include <nx/utils/string.h>
 #include <nx/utils/app_info.h>
@@ -127,7 +128,7 @@ QnAccessibleResourcesWidget::QnAccessibleResourcesWidget(
 
     auto indirectAccessDelegate = new QnCustomizableItemDelegate(this);
     indirectAccessDelegate->setCustomSizeHint(
-        [](const QStyleOptionViewItem& option, const QModelIndex& index)
+        [](const QStyleOptionViewItem& option, const QModelIndex& /*index*/)
         {
             return qnSkin->maximumSize(option.icon);
         });
@@ -150,14 +151,19 @@ QnAccessibleResourcesWidget::QnAccessibleResourcesWidget(
     }
 
     indirectAccessDelegate->setCustomPaint(
-        [](QPainter* painter, const QStyleOptionViewItem& option, const QModelIndex& index)
+        [](QPainter* painter, const QStyleOptionViewItem& option, const QModelIndex& /*index*/)
         {
             option.widget->style()->drawPrimitive(QStyle::PE_PanelItemViewItem,
                 &option, painter, option.widget);
+
+            QnScopedPainterOpacityRollback opacityRollback(painter);
+
+            const bool selected = option.state.testFlag(QStyle::State_Selected);
+            if (selected)
+                painter->setOpacity(painter->opacity() * style::Hints::kDisabledItemOpacity);
+
             option.icon.paint(painter, option.rect, Qt::AlignCenter,
-                option.state.testFlag(QStyle::State_Selected)
-                    ? QIcon::Normal
-                    : QIcon::Disabled);
+                selected ? QIcon::Normal : QIcon::Disabled);
         });
 
     ui->resourcesTreeView->setItemDelegateForColumn(
