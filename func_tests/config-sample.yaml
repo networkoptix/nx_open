@@ -19,5 +19,7 @@ tests:
   scalability_test:
     # lowercased config values defined when used test_config fixture (see 'config' fixture in scalability_test.py)
     server_count: 2
-    total_camera_count: 10
-    total_user_count: 2
+    cameras_per_server: 5
+    users_per_server: 1
+    storages_per_server: 1
+    
