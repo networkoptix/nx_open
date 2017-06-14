@@ -14,9 +14,4 @@ QnSystemHealthBusinessAction::QnSystemHealthBusinessAction(QnSystemHealth::Messa
     runtimeParams.eventTimestampUsec = qnSyncTime->currentUSecsSinceEpoch();
     runtimeParams.eventResourceId = eventResourceId;
     setRuntimeParams(runtimeParams);
-
-    QnBusinessActionParameters actionParams;
-    actionParams.userGroup = QnBusiness::AdminOnly;
-    setParams(actionParams);
-
 }

@@ -34,6 +34,21 @@ public:
         return result;
     }
 
+    // Splits subject id list into valid users and valid role ids (including predefined).
+    template<class IDList>
+    void usersAndRoles(const IDList& ids, QnUserResourceList& users, QList<QnUuid>& roles)
+    {
+        users = resourcePool()->getResources<QnUserResource>(ids);
+
+        QnMutexLocker lk(&m_mutex);
+        roles.clear();
+        for (const auto& id: ids)
+        {
+            if (isValidRoleId(id))
+                roles << id;
+        }
+    }
+
     // Checks if there is a custom user role with specified uuid.
     bool hasRole(const QnUuid& id) const;
 
@@ -62,6 +77,9 @@ public:
     // For Qn::CustomUserRole and Qn::CustomPermissions returns null uuid.
     static QnUuid predefinedRoleId(Qn::UserRole userRole);
 
+    // Returns list of ids of predefined admin roles.
+    static const QList<QnUuid>& adminRoleIds();
+
     // Returns predefined user role for corresponding pseudo-uuid.
     // For null uuid returns Qn::CustomPermissions.
     // For any other uuid returns Qn::CustomUserRole without checking
@@ -87,7 +105,9 @@ signals:
     void userRoleRemoved(const ec2::ApiUserRoleData& userRole);
 
 private:
-    mutable QnMutex m_mutex;
+    bool isValidRoleId(const QnUuid& id) const; //< This function is not thread-safe.
 
+private:
+    mutable QnMutex m_mutex;
     QHash<QnUuid, ec2::ApiUserRoleData> m_roles;
 };

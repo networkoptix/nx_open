@@ -1,8 +1,8 @@
 #pragma once
 
-#include <QtWidgets/QWidget>
+#include <QtCore/QScopedPointer>
 
-#include <ui/widgets/business/abstract_business_params_widget.h>
+#include <ui/widgets/business/subject_target_action_widget.h>
 #include <ui/workbench/workbench_context_aware.h>
 
 namespace Ui {
@@ -10,11 +10,11 @@ class PlaySoundBusinessActionWidget;
 } // namespace Ui
 
 class QnPlaySoundBusinessActionWidget:
-    public QnAbstractBusinessParamsWidget,
+    public QnSubjectTargetActionWidget,
     public QnWorkbenchContextAware
 {
     Q_OBJECT
-    using base_type = QnAbstractBusinessParamsWidget;
+    using base_type = QnSubjectTargetActionWidget;
 
 public:
     explicit QnPlaySoundBusinessActionWidget(QWidget* parent = nullptr);

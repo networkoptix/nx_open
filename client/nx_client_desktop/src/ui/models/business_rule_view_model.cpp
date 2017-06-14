@@ -111,6 +111,15 @@ QSet<QnUuid> filterEventResources(const QSet<QnUuid>& ids, EventType eventType)
     return QSet<QnUuid>();
 }
 
+template<class IDList>
+QSet<QnUuid> filterSubjectIds(const IDList& ids)
+{
+    QnUserResourceList users;
+    QList<QnUuid> roles;
+    qnClientCoreModule->commonModule()->userRolesManager()->usersAndRoles(ids, users, roles);
+    return toIds(users).unite(roles.toSet());
+}
+
 QSet<QnUuid> filterActionResources(const QSet<QnUuid>& ids, ActionType actionType)
 {
     auto resourcePool = qnClientCoreModule->commonModule()->resourcePool();
@@ -119,14 +128,7 @@ QSet<QnUuid> filterActionResources(const QSet<QnUuid>& ids, ActionType actionTyp
         return toIds(resourcePool->getResources<QnVirtualCameraResource>(ids));
 
     if (requiresUserResource(actionType))
-    {
-        auto users = resourcePool->getResources<QnUserResource>(ids);
-        auto roles = qnClientCoreModule->commonModule()->userRolesManager()->userRoles(ids);
-        auto result = toIds(users);
-        for (auto role: roles)
-            result << role.id;
-        return result;
-    }
+        return filterSubjectIds(ids);
 
     return QSet<QnUuid>();
 }
@@ -231,17 +233,9 @@ QVariant QnBusinessRuleViewModel::data(const int column, const int role) const
                 case QnBusiness::ActionColumn:
                     return m_actionType;
                 case QnBusiness::TargetColumn:
-                {
-                    switch (m_actionType)
-                    {
-                        case QnBusiness::SendMailAction:
-                            return m_actionParams.emailAddress;
-                        case QnBusiness::ShowPopupAction:
-                            return (int) m_actionParams.userGroup;
-                        default:
-                            break;
-                    }
-                }
+                    if (m_actionType == QnBusiness::SendMailAction)
+                        return m_actionParams.emailAddress;
+                    break;
                 case QnBusiness::AggregationColumn:
                     return m_aggregationPeriodSec;
                 default:
@@ -264,11 +258,13 @@ QVariant QnBusinessRuleViewModel::data(const int column, const int role) const
         case Qn::EventTypeRole:
             return qVariantFromValue(m_eventType);
         case Qn::EventResourcesRole:
-            return QVariant::fromValue<QSet<QnUuid>>(filterEventResources(m_eventResources, m_eventType));
+            return qVariantFromValue(filterEventResources(m_eventResources, m_eventType));
         case Qn::ActionTypeRole:
             return qVariantFromValue(m_actionType);
         case Qn::ActionResourcesRole:
-            return QVariant::fromValue<QSet<QnUuid>>(filterActionResources(m_actionResources, m_actionType));
+            return m_actionType != QnBusiness::ShowPopupAction
+                ? qVariantFromValue(filterActionResources(m_actionResources, m_actionType))
+                : qVariantFromValue(QnBusiness::filterSubjectIds(m_actionParams.additionalResources));
 
         case Qn::HelpTopicIdRole:
             return getHelpTopic(column);
@@ -306,10 +302,9 @@ bool QnBusinessRuleViewModel::setData(const int column, const QVariant &value, i
                 case QnBusiness::ShowPopupAction:
                 {
                     QnBusinessActionParameters params = m_actionParams;
-
-                    // TODO: #GDM #Business you're implicitly relying on what enum values are, which is very bad.
-                    // This code will fail silently if someone changes the header. Please write it properly.
-                    params.userGroup = (QnBusiness::UserGroup) value.toInt();
+                    const auto subjects = value.value<QSet<QnUuid>>();
+                    params.additionalResources = decltype(params.additionalResources)(
+                        subjects.cbegin(), subjects.cend());
                     setActionParams(params);
                     break;
                 }
@@ -811,9 +806,12 @@ QIcon QnBusinessRuleViewModel::getIcon(const int column) const
 
                 case QnBusiness::ShowPopupAction:
                 {
-                    if (m_actionParams.userGroup == QnBusiness::AdminOnly)
-                        return qnResIconCache->icon(QnResourceIconCache::User);
-                    return qnResIconCache->icon(QnResourceIconCache::Users);
+                    QnUserResourceList users;
+                    QList<QnUuid> roles;
+                    userRolesManager()->usersAndRoles(m_actionParams.additionalResources, users, roles);
+                    return (users.empty() && roles.empty()) || users.size() > 1 || !roles.empty()
+                        ? qnResIconCache->icon(QnResourceIconCache::Users)
+                        : qnResIconCache->icon(QnResourceIconCache::User);
                 }
 
                 case QnBusiness::ShowTextOverlayAction:
@@ -1042,10 +1040,10 @@ QString QnBusinessRuleViewModel::getTargetText(const bool detailed) const
         }
         case QnBusiness::ShowPopupAction:
         {
-            if (m_actionParams.userGroup == QnBusiness::AdminOnly)
-                return tr("Administrators Only");
-            else
-                return tr("Users");
+            QnUserResourceList users;
+            QList<QnUuid> roles;
+            userRolesManager()->usersAndRoles(m_actionParams.additionalResources, users, roles);
+            return m_helper->actionSubjects(users, roles);
         }
         case QnBusiness::BookmarkAction:
         case QnBusiness::CameraRecordingAction:

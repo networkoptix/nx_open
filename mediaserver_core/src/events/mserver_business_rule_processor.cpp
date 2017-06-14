@@ -1026,9 +1026,9 @@ void QnMServerBusinessRuleProcessor::updateRecipientsList(
     QStringList additional = action->getParams().emailAddress.split(kOldEmailDelimiter,
         QString::SkipEmptyParts);
 
-    const auto ids = action->getResources();
-    const auto userRoles = userRolesManager()->userRoles(ids);
-    const auto users = resourcePool()->getResources<QnUserResource>(ids);
+    QList<QnUuid> userRoles;
+    QnUserResourceList users;
+    userRolesManager()->usersAndRoles(action->getResources(), users, userRoles);
 
     QStringList recipients;
     auto addRecipient = [&recipients](const QString& email)
@@ -1042,7 +1042,6 @@ void QnMServerBusinessRuleProcessor::updateRecipientsList(
                 recipients.append(address.value());
         };
 
-
     for (const auto& email: additional)
         addRecipient(email);
 
@@ -1054,7 +1053,8 @@ void QnMServerBusinessRuleProcessor::updateRecipientsList(
 
     for (const auto& userRole: userRoles)
     {
-        for (const auto& subject: resourceAccessSubjectsCache()->usersInRole(userRole.id))
+        //TODO: #FIXME!!! #vkutin Handle predefined roles as well!
+        for (const auto& subject: resourceAccessSubjectsCache()->usersInRole(userRole))
         {
             const auto& user = subject.user();
             NX_ASSERT(user);

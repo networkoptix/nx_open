@@ -153,6 +153,15 @@ QnUuid QnUserRolesManager::predefinedRoleId(Qn::UserRole userRole)
     return predefinedRoleIds[userRole];
 }
 
+const QList<QnUuid>& QnUserRolesManager::adminRoleIds()
+{
+    static const QList<QnUuid> kAdminRoleIds {
+        predefinedRoleId(Qn::UserRole::Owner),
+        predefinedRoleId(Qn::UserRole::Administrator) };
+
+    return kAdminRoleIds;
+}
+
 Qn::UserRole QnUserRolesManager::predefinedRole(const QnUuid& id)
 {
     static const QHash<QnUuid, Qn::UserRole> predefinedRolesById =
@@ -282,3 +291,18 @@ ec2::ApiPredefinedRoleDataList QnUserRolesManager::getPredefinedRoles()
     return kPredefinedRoles;
 }
 
+// This function is not thread-safe and should be called under external mutex lock.
+bool QnUserRolesManager::isValidRoleId(const QnUuid& id) const
+{
+    switch (predefinedRole(id))
+    {
+        case Qn::UserRole::CustomUserRole:
+            return m_roles.contains(id); //< Existing custom role.
+
+        case Qn::UserRole::CustomPermissions:
+            return false; //< Null uuid.
+
+        default:
+            return true; //< Predefined role.
+    }
+}
