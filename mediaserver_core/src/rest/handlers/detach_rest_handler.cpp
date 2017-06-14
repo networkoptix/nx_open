@@ -138,7 +138,7 @@ int QnDetachFromCloudRestHandler::execute(
         // So, it is allowed to perform detach while offline.
     }
 
-    if (!m_cloudConnectionManager->detachSystemFromCloud())
+    if (!m_cloudConnectionManager->resetCloudData())
     {
         NX_LOGX(lm("Cannot detach from cloud. Failed to reset cloud attributes. cloudSystemId %1")
             .arg(owner->globalSettings()->cloudSystemId()), cl_logDEBUG1);
