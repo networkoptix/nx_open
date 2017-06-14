@@ -525,9 +525,11 @@ bool QnMServerBusinessRuleProcessor::executeBookmarkAction(
         startTimeMs = m_runningBookmarkActions.take(runningKey);
     }
 
+    auto& runtimeParams = action->getRuntimeParams();
+    runtimeParams.bookmarkId = QnUuid::createUuid();
     if (!createBookmark)
     {
-        action->getRuntimeParams().eventTimestampUsec = startTimeMs * 1000;
+        runtimeParams.eventTimestampUsec = startTimeMs * 1000;
         qDebug() << action->getRuntimeParams().eventTimestampUsec;
         return true;
     }
