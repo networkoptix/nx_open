@@ -3,8 +3,8 @@
 
 #include <gtest/gtest.h>
 #include <server/server_globals.h>
-#include "utils.h"
-#include "mediaserver_launcher.h"
+#include <test_support/utils.h>
+#include <test_support/mediaserver_launcher.h>
 #include <api/app_server_connection.h>
 #include <nx/network/http/auth_tools.h>
 #include <nx/network/http/http_client.h>
