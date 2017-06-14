@@ -29,11 +29,13 @@
 #include <ui/workbench/workbench.h>
 #include <ui/workbench/workbench_grid_mapper.h>
 #include <ui/workbench/workbench_context.h>
-#include <ui/workbench/workbench_resource.h>
 #include <ui/workaround/mac_utils.h>
+
+#include <nx/client/desktop/utils/mime_data.h>
 
 #include "destruction_guard_item.h"
 
+using namespace nx::client::desktop;
 using namespace nx::client::desktop::ui;
 
 class DropSurfaceItem: public QGraphicsObject {
@@ -121,55 +123,34 @@ bool DropInstrument::sceneEventFilter(QGraphicsItem *watched, QEvent *event) {
     return this->sceneEvent(watched, event);
 }
 
-bool DropInstrument::dragEnterEvent(QGraphicsItem *, QGraphicsSceneDragDropEvent *event) {
-    m_resources.clear();
-    m_videoWallItems.clear();
+bool DropInstrument::dragEnterEvent(QGraphicsItem *, QGraphicsSceneDragDropEvent *event)
+{
+    m_ids.clear();
 
-    const QMimeData *mimeData = event->mimeData();
-    if (mimeData->hasFormat(Qn::NoSceneDrop)) {
+    const auto mimeData = event->mimeData();
+    if (mimeData->hasFormat(Qn::NoSceneDrop))
+    {
         event->ignore();
         return false;
     }
 
 #ifdef Q_OS_MAC
-    if (mimeData->hasUrls()) {
-        foreach(const QUrl &url, mimeData->urls()) {
+    if (mimeData->hasUrls())
+    {
+        foreach(const QUrl &url, mimeData->urls())
+        {
             if (url.isLocalFile() && QFile::exists(url.toLocalFile()))
                 mac_saveFileBookmark(url.path());
         }
     }
 #endif
 
-    QnResourceList resources = QnWorkbenchResource::deserializeResources(mimeData);
-    QnResourceList media;   // = resources.filtered<QnMediaResource>();
-    QnResourceList layouts; // = resources.filtered<QnLayoutResource>();
-    QnResourceList servers; // = resources.filtered<QnMediaServerResource>();
-    QnResourceList videowalls;
-    QnResourceList webPages;
+    // Scene drop is working only for resources that are already in the pool.
+    MimeData data(mimeData);
+    m_ids = data.getIds();
 
-    foreach( QnResourcePtr res, resources )
+    if (m_ids.empty())
     {
-        if( dynamic_cast<QnMediaResource*>(res.data()) )
-            media.push_back( res );
-        if( res.dynamicCast<QnLayoutResource>() )
-            layouts.push_back( res );
-        if( res.dynamicCast<QnMediaServerResource>() )
-            servers.push_back( res );
-        if( res.dynamicCast<QnVideoWallResource>() )
-            videowalls.push_back( res );
-        if( res.dynamicCast<QnWebPageResource>() )
-            webPages.push_back( res );
-    }
-
-    m_resources = media;
-    m_resources << layouts;
-    m_resources << servers;
-    m_resources << videowalls;
-    m_resources << webPages;
-
-    m_videoWallItems = resourcePool()->getVideoWallItemsByUuid(QnVideoWallItem::deserializeUuids(mimeData));
-
-    if (m_resources.empty() && m_videoWallItems.empty()) {
         event->ignore();
         return false;
     }
@@ -178,8 +159,10 @@ bool DropInstrument::dragEnterEvent(QGraphicsItem *, QGraphicsSceneDragDropEvent
     return true;
 }
 
-bool DropInstrument::dragMoveEvent(QGraphicsItem *, QGraphicsSceneDragDropEvent *event) {
-    if(m_resources.empty() && m_videoWallItems.empty()) {
+bool DropInstrument::dragMoveEvent(QGraphicsItem *, QGraphicsSceneDragDropEvent *event)
+{
+    if (m_ids.empty())
+    {
         event->ignore();
         return false;
     }
@@ -188,8 +171,9 @@ bool DropInstrument::dragMoveEvent(QGraphicsItem *, QGraphicsSceneDragDropEvent 
     return true;
 }
 
-bool DropInstrument::dragLeaveEvent(QGraphicsItem *, QGraphicsSceneDragDropEvent *) {
-    if(m_resources.empty() && m_videoWallItems.empty())
+bool DropInstrument::dragLeaveEvent(QGraphicsItem *, QGraphicsSceneDragDropEvent *)
+{
+    if (m_ids.empty())
         return false;
 
     return true;
@@ -205,24 +189,29 @@ bool DropInstrument::dropEvent(QGraphicsItem *, QGraphicsSceneDragDropEvent *eve
     if (mimeData->hasFormat(Qn::NoSceneDrop))
         return false;
 
-    // try to drop videowall items first
-    if (delayedTriggerIfPossible(action::StartVideoWallControlAction, m_videoWallItems))
-    {
+    const auto videoWallItems = resourcePool()->getVideoWallItemsByUuid(m_ids);
 
+    // Try to drop videowall items first.
+    if (delayedTriggerIfPossible(action::StartVideoWallControlAction, videoWallItems))
+    {
+        // Ignore resources.
     }
     else
+    {
+        const auto resources = resourcePool()->getResources(m_ids);
         if (!m_intoNewLayout)
         {
             delayedTriggerIfPossible(
                 action::DropResourcesAction,
-                action::Parameters(m_resources).withArgument(Qn::ItemPositionRole,
+                action::Parameters(resources).withArgument(Qn::ItemPositionRole,
                     context->workbench()->mapper()->mapToGridF(event->scenePos()))
             );
         }
         else
         {
-            delayedTriggerIfPossible(action::OpenInNewTabAction, m_resources);
+            delayedTriggerIfPossible(action::OpenInNewTabAction, resources);
         }
+    }
 
     event->acceptProposedAction();
     return true;
