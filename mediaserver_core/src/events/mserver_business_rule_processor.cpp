@@ -260,9 +260,12 @@ bool QnMServerBusinessRuleProcessor::executeActionInternal(const QnAbstractBusin
         case QnBusiness::BookmarkAction:
         {
             const bool needConfirmation = action->getParams().needConfirmation;
-            result = executeBookmarkAction(action, needConfirmation);
+            result = executeBookmarkAction(action, !needConfirmation);
             if (!needConfirmation || !result)
                 break;
+
+            if (action->isProlonged() && action->getToggleState() == QnBusiness::ActiveState)
+                break; //< It is prolonged action. We have to wait for its end.
 
             action->setActionType(QnBusiness::ShowPopupAction);
             action->getParams().targetActionType = QnBusiness::BookmarkAction;
