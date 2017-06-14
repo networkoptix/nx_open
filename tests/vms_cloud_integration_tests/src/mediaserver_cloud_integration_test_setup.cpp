@@ -38,11 +38,6 @@ bool MediaServerCloudIntegrationTest::startMediaServer()
     // TODO: #ak Remove it from here when mediaserver does it from QnMain::run, not from application's main thread.
     m_mediaServerLauncher.commonModule()->messageProcessor()->init(
         m_mediaServerLauncher.commonModule()->ec2Connection());
-
-    m_mserverClient = std::make_unique<MediaServerClient>(
-        m_mediaServerLauncher.endpoint());
-    m_mserverClient->setUserName(lit("admin"));
-    m_mserverClient->setPassword(lit("admin"));
     return true;
 }
 
@@ -78,12 +73,14 @@ bool MediaServerCloudIntegrationTest::registerCloudSystem()
 
 bool MediaServerCloudIntegrationTest::saveCloudCredentialsToMediaServer()
 {
+    auto mserverClient = prepareMediaServerClient();
+
     CloudCredentialsData cloudData;
     cloudData.cloudSystemID = QString::fromStdString(m_cloudSystem.id);
     cloudData.cloudAuthKey = QString::fromStdString(m_cloudSystem.authKey);
     cloudData.cloudAccountName = QString::fromStdString(m_accountEmail);
     return
-        m_mserverClient->saveCloudSystemCredentials(std::move(cloudData)).error ==
+        mserverClient.saveCloudSystemCredentials(std::move(cloudData)).error ==
         QnJsonRestResult::NoError;
 }
 
@@ -157,6 +154,12 @@ void MediaServerCloudIntegrationTest::connectSystemToCloud()
         m_ownerCredentials.first = m_accountEmail.c_str();
         m_ownerCredentials.second = m_accountPassword.c_str();
     }
+}
+
+void MediaServerCloudIntegrationTest::switchToDefaultCredentials()
+{
+    m_ownerCredentials.first.clear();
+    m_ownerCredentials.second.clear();
 }
 
 void MediaServerCloudIntegrationTest::init()

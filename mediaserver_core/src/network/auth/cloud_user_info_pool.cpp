@@ -76,6 +76,12 @@ void CloudUserInfoPoolSupplier::reportInfoChanged(
     const QString& userName,
     const QString& serializedValue)
 {
+    if (serializedValue.isEmpty())
+    {
+        NX_DEBUG(this, lit("User %1. Received empty cloud auth info").arg(userName));
+        return;
+    }
+
     nx::cdb::api::AuthInfo authInfo;
     bool deserializeResult = QJson::deserialize(serializedValue, &authInfo);
     NX_ASSERT(deserializeResult);

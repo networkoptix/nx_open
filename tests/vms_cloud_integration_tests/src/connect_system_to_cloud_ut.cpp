@@ -39,6 +39,8 @@ protected:
                     std::move(params),
                     std::placeholders::_1));
         ASSERT_EQ(ec2::ErrorCode::ok, resultCode);
+
+        switchToDefaultCredentials();
     }
 
     void thenSystemStateShouldBecomeNew()
@@ -63,15 +65,15 @@ protected:
         for (;;)
         {
             ec2::ApiUserDataList users;
-            ec2::ErrorCode resultCode = mediaServerClient.ec2GetUsers(&users);
-            ASSERT_EQ(ec2::ErrorCode::ok, resultCode);
+            if (mediaServerClient.ec2GetUsers(&users) == ec2::ErrorCode::ok)
+            {
+                bool foundCloudUser = false;
+                for (const auto& user: users)
+                    foundCloudUser |= user.isCloud;
 
-            bool foundCloudUser = false;
-            for (const auto& user: users)
-                foundCloudUser |= user.isCloud;
-
-            if (!foundCloudUser)
-                break;
+                if (!foundCloudUser)
+                    break;
+            }
             std::this_thread::sleep_for(kRetryRequestDelay);
         }
     }
@@ -122,7 +124,8 @@ protected:
     }
 };
 
-TEST_F(FtConnectSystemToCloudOnlyCloudOwner, removing_cloud_system_id_resets_system_to_new_state)
+// TODO: #ak CLOUD-734
+TEST_F(FtConnectSystemToCloudOnlyCloudOwner, DISABLED_removing_cloud_system_id_resets_system_to_new_state)
 {
     givenServerConnectedToTheCloud();
 
@@ -147,7 +150,8 @@ protected:
     }
 };
 
-TEST_F(FtConnectSystemToCloudWithLocalOwner, removing_cloud_system_id_cleans_up_cloud_data)
+// TODO: #ak CLOUD-734
+TEST_F(FtConnectSystemToCloudWithLocalOwner, DISABLED_removing_cloud_system_id_cleans_up_cloud_data)
 {
     givenServerConnectedToTheCloud();
 
@@ -182,6 +186,11 @@ protected:
         QnJsonRestResult resultCode = mediaServerClient.detachFromCloud(std::move(params));
         ASSERT_EQ(QnJsonRestResult::NoError, resultCode.error);
     }
+
+    void whenUsingDefaultCredentials()
+    {
+        switchToDefaultCredentials();
+    }
 };
 
 TEST_F(FtDisconnectSystemFromCloud, disconnect_by_mserver_api_call_local_admin_present)
@@ -199,6 +208,7 @@ TEST_F(FtDisconnectSystemFromCloud, disconnect_by_mserver_api_call_cloud_owner_o
     givenServerConnectedToTheCloudWithCloudOwnerOnly();
 
     whenInvokedDetachFromCloudRestMethod();
+    whenUsingDefaultCredentials();
 
     thenCloudUsersShouldBeRemoved();
     thenCloudAttributesShouldBeRemoved();

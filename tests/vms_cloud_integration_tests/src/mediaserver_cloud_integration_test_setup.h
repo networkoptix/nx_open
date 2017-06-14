@@ -32,10 +32,11 @@ public:
     std::string cloudOwnerVmsUserId() const { return m_systemOwnerInfo.vmsUserId; };
     nx::cdb::api::SystemData cloudSystem() const { return m_cloudSystem; }
 
+    void switchToDefaultCredentials();
+
 private:
     nx::cdb::CdbLauncher m_cdb;
     MediaServerLauncher m_mediaServerLauncher;
-    std::unique_ptr<MediaServerClient> m_mserverClient;
     const std::pair<QString, QString> m_defaultOwnerCredentials;
     std::pair<QString, QString> m_ownerCredentials;
     nx::cdb::api::SystemData m_cloudSystem;

@@ -12,6 +12,7 @@
 #include <core/resource/user_resource.h>
 #include <rest/server/rest_connection_processor.h>
 #include <rest/helpers/permissions_helper.h>
+#include <network/system_helpers.h>
 #include <nx/utils/sync_call.h>
 
 #include <media_server/serverutil.h>
@@ -80,20 +81,39 @@ int QnDetachFromCloudRestHandler::execute(
         return nx_http::StatusCode::ok;
     }
 
-    // first of all, enable admin user and changing its password
-    //      so that there is always a way to connect to the system
-    if (!updateUserCredentials(
-        owner->commonModule()->ec2Connection(),
-        data,
-        QnOptionalBool(true),
-        owner->resourcePool()->getAdministrator(), &errStr))
+    auto adminUser = owner->resourcePool()->getAdministrator();
+    const bool shouldResetSystemToNewState = !adminUser->isEnabled() && !data.hasPassword();
+
+    if (shouldResetSystemToNewState)
     {
-        NX_LOGX(lm("Cannot detach from cloud. Failed to re-enable local admin. cloudSystemId %1")
-            .arg(owner->globalSettings()->cloudSystemId()), cl_logDEBUG1);
-        result.setError(QnJsonRestResult::CantProcessRequest, errStr);
-        result.setReply(DetachFromCloudReply(
-            DetachFromCloudReply::ResultCode::cannotUpdateUserCredentials));
-        return nx_http::StatusCode::ok;
+        if (!resetSystemToStateNew(owner->commonModule()))
+        {
+            NX_LOGX(lm("Cannot detach from cloud. Failed to reset system to state new. cloudSystemId %1")
+                .arg(owner->globalSettings()->cloudSystemId()), cl_logDEBUG1);
+            result.setError(QnJsonRestResult::CantProcessRequest, errStr);
+            result.setReply(DetachFromCloudReply(
+                DetachFromCloudReply::ResultCode::cannotUpdateUserCredentials));
+            return nx_http::StatusCode::ok;
+        }
+    }
+    else
+    {
+        // first of all, enable admin user and changing its password
+        //      so that there is always a way to connect to the system
+        if (!updateUserCredentials(
+                owner->commonModule()->ec2Connection(),
+                data,
+                QnOptionalBool(true),
+                adminUser,
+                &errStr))
+        {
+            NX_LOGX(lm("Cannot detach from cloud. Failed to re-enable local admin. cloudSystemId %1")
+                .arg(owner->globalSettings()->cloudSystemId()), cl_logDEBUG1);
+            result.setError(QnJsonRestResult::CantProcessRequest, errStr);
+            result.setReply(DetachFromCloudReply(
+                DetachFromCloudReply::ResultCode::cannotUpdateUserCredentials));
+            return nx_http::StatusCode::ok;
+        }
     }
 
     // Second, updating data in cloud.
