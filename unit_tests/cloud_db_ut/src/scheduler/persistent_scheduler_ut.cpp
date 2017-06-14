@@ -164,8 +164,8 @@ protected:
 
     void whenSchedulerAndUserInitialized()
     {
-        scheduler = std::unique_ptr<nx::cdb::PersistentSheduler>(
-            new nx::cdb::PersistentSheduler(&executor, &dbHelper));
+        scheduler = std::unique_ptr<nx::cdb::PersistentScheduler>(
+            new nx::cdb::PersistentScheduler(&executor, &dbHelper));
 
         user = std::unique_ptr<SchedulerUser>(new SchedulerUser(&executor, scheduler.get(), functorId));
         scheduler->start();
@@ -230,7 +230,7 @@ protected:
 
     SqlExecutorStub executor;
     DbHelperStub dbHelper;
-    std::unique_ptr<nx::cdb::PersistentSheduler> scheduler;
+    std::unique_ptr<nx::cdb::PersistentScheduler> scheduler;
     std::unique_ptr<SchedulerUser> user;
     const std::chrono::milliseconds kSleepTimeout{ 100 };
 };

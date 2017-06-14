@@ -24,7 +24,7 @@ static std::chrono::milliseconds timeoutFromTimepoint(std::chrono::steady_clock:
 
 }
 
-PersistentSheduler::PersistentSheduler(
+PersistentScheduler::PersistentScheduler(
     nx::db::AbstractAsyncSqlQueryExecutor* sqlExecutor,
     AbstractSchedulerDbHelper* dbHelper)
     :
@@ -52,12 +52,12 @@ PersistentSheduler::PersistentSheduler(
     f.wait();
 }
 
-PersistentSheduler::~PersistentSheduler()
+PersistentScheduler::~PersistentScheduler()
 {
     stop();
 }
 
-void PersistentSheduler::registerEventReceiver(
+void PersistentScheduler::registerEventReceiver(
     const QnUuid& functorId,
     AbstractPersistentScheduleEventReceiver *receiver)
 {
@@ -65,7 +65,7 @@ void PersistentSheduler::registerEventReceiver(
     m_functorToReceiver[functorId] = receiver;
 }
 
-nx::db::DBResult PersistentSheduler::subscribe(
+nx::db::DBResult PersistentScheduler::subscribe(
     nx::db::QueryContext* queryContext,
     const QnUuid& functorId,
     QnUuid* outTaskId,
@@ -77,7 +77,7 @@ nx::db::DBResult PersistentSheduler::subscribe(
         { params, timePointFromTimeout(period), period });
 }
 
-nx::db::DBResult PersistentSheduler::subscribe(
+nx::db::DBResult PersistentScheduler::subscribe(
     nx::db::QueryContext* queryContext,
     const QnUuid& functorId,
     QnUuid* outTaskId,
@@ -95,7 +95,7 @@ nx::db::DBResult PersistentSheduler::subscribe(
     return nx::db::DBResult::ok;
 }
 
-nx::db::DBResult PersistentSheduler::unsubscribe(
+nx::db::DBResult PersistentScheduler::unsubscribe(
     nx::db::QueryContext* queryContext,
     const QnUuid& taskId)
 {
@@ -111,7 +111,7 @@ nx::db::DBResult PersistentSheduler::unsubscribe(
     return nx::db::DBResult::ok;
 }
 
-void PersistentSheduler::removeTimer(const QnUuid& taskId)
+void PersistentScheduler::removeTimer(const QnUuid& taskId)
 {
     nx::utils::TimerId timerId;
     {
@@ -135,7 +135,7 @@ void PersistentSheduler::removeTimer(const QnUuid& taskId)
     m_timerManager->deleteTimer(timerId);
 }
 
-void PersistentSheduler::addTimer(
+void PersistentScheduler::addTimer(
     const QnUuid& functorId,
     const QnUuid& taskId,
     const ScheduleTaskInfo& taskInfo)
@@ -169,7 +169,7 @@ void PersistentSheduler::addTimer(
     m_taskToTimer[taskId] = timerId;
 }
 
-void PersistentSheduler::timerFunction(
+void PersistentScheduler::timerFunction(
     const QnUuid& functorId,
     const QnUuid& taskId,
     const nx::cdb::ScheduleParams& params)
@@ -202,7 +202,7 @@ void PersistentSheduler::timerFunction(
     });
 }
 
-void PersistentSheduler::start()
+void PersistentScheduler::start()
 {
     {
         QnMutexLocker lock(&m_timerManagerMutex);
@@ -221,7 +221,7 @@ void PersistentSheduler::start()
     }
 }
 
-void PersistentSheduler::stop()
+void PersistentScheduler::stop()
 {
     QnMutexLocker lock(&m_timerManagerMutex);
     if (!m_timerManager)

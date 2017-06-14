@@ -12,17 +12,9 @@
 #include "persistent_scheduler_common.h"
 
 namespace nx {
-namespace db {
-
-class QueryContext;
-
-}
-}
-
-namespace nx {
 namespace cdb {
 
-class PersistentSheduler;
+class PersistentScheduler;
 
 using OnTimerUserFunc = nx::utils::MoveOnlyFunc<nx::db::DBResult(nx::db::QueryContext*)>;
 
@@ -36,14 +28,14 @@ public:
     virtual ~AbstractPersistentScheduleEventReceiver() {}
 };
 
-class PersistentSheduler
+class PersistentScheduler
 {
     using FunctorToReceiverMap = std::unordered_map<QnUuid, AbstractPersistentScheduleEventReceiver*>;
 public:
-    PersistentSheduler(
+    PersistentScheduler(
         nx::db::AbstractAsyncSqlQueryExecutor* sqlExecutor,
         AbstractSchedulerDbHelper* dbHelper);
-    ~PersistentSheduler();
+    ~PersistentScheduler();
 
     void registerEventReceiver(
         const QnUuid& functorId,

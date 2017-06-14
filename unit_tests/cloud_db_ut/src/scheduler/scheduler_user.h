@@ -22,7 +22,7 @@ public:
 
     SchedulerUser(
         nx::db::AbstractAsyncSqlQueryExecutor* executor,
-        nx::cdb::PersistentSheduler* scheduler,
+        nx::cdb::PersistentScheduler* scheduler,
         const QnUuid& functorId)
         :
         m_executor(executor),
@@ -138,7 +138,7 @@ public:
 
 private:
     nx::db::AbstractAsyncSqlQueryExecutor* m_executor;
-    nx::cdb::PersistentSheduler* m_scheduler;
+    nx::cdb::PersistentScheduler* m_scheduler;
     std::atomic<bool> m_shouldUnsubscribe{ false };
     std::atomic<bool> m_shouldSubscribe{ false };
     nx::utils::MoveOnlyFunc<void(const Task& task)> m_unsubscribeCallback;

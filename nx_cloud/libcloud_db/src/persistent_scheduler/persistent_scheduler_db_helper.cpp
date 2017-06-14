@@ -12,9 +12,9 @@ CREATE TABLE schedule_data(
     functor_type_id     VARCHAR(64) NOT NULL,
     task_id             VARCHAR(64) NOT NULL,
     fire_point          BIGINT,
-    period              BIGINT
+    period              BIGINT,
     param_key           VARCHAR(255) NOT NULL,
-    param_value         VARCHAR(255) NOT NULL,
+    param_value         VARCHAR(255) NOT NULL
 );
 )sql";
 
@@ -74,12 +74,12 @@ nx::db::DBResult SchedulerDbHelper::subscribe(
         VALUES(:functorId, :taskId, :firePoint, :period, :paramKey, :paramValue)
     )sql");
 
-    auto taskId = QnUuid::createUuid();
+    *outTaskId = QnUuid::createUuid();
 
     for (const auto& param : taskInfo.params)
     {
         subscribeQuery.bindValue(":functorId", functorId.toRfc4122());
-        subscribeQuery.bindValue(":taskId", taskId.toRfc4122());
+        subscribeQuery.bindValue(":taskId", outTaskId->toRfc4122());
         subscribeQuery.bindValue(
             ":firePoint",
             std::chrono::duration_cast<std::chrono::milliseconds>(
