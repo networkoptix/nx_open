@@ -49,6 +49,9 @@ public:
     SoftwareTriggerButton::State state() const;
     void setState(SoftwareTriggerButton::State state);
 
+    bool isLive() const;
+    void setLive(bool value);
+
     void paint(QPainter* painter, const QStyleOptionGraphicsItem* option,
         QWidget* widget);
 
@@ -68,13 +71,17 @@ private:
     QPixmap generatePixmap(const QColor& background, const QColor& frame, const QPixmap& icon);
     void ensureImages();
 
+    void updateToolTipText();
+
     QRect buttonRect() const;
 
 private:
     QString m_iconName;
     QSize m_buttonSize;
     Qt::Edge m_toolTipEdge = Qt::LeftEdge;
+    QString m_toolTipText;
     bool m_prolonged = false;
+    bool m_live = true;
 
     QnStyledTooltipWidget* const m_toolTip;
     HoverFocusProcessor* const m_toolTipHoverProcessor;
@@ -89,6 +96,8 @@ private:
     QPixmap m_failurePixmap;
     QPixmap m_failureFramePixmap;
     QPixmap m_activityFramePixmap;
+    QPixmap m_goToLivePixmap;
+    QPixmap m_goToLivePixmapPressed;
 };
 
 } // namespace graphics
