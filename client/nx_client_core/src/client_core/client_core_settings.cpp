@@ -7,7 +7,7 @@
 
 #include <nx/utils/raii_guard.h>
 #include <nx/utils/string.h>
-
+#include <nx/utils/url.h>
 
 namespace {
 
@@ -24,6 +24,8 @@ QnClientCoreSettings::QnClientCoreSettings(QObject* parent) :
     m_settings->beginGroup(kCoreSettingsGroup);
     init();
     updateFromSettings(m_settings);
+
+    migrateKnownServerConnections();
 }
 
 QnClientCoreSettings::~QnClientCoreSettings()
@@ -72,6 +74,12 @@ void QnClientCoreSettings::writeValueToSettings(
             processedValue = nx::utils::xorEncrypt(value.toString(), kEncodeXorKey);
             break;
         }
+        case KnownServerConnections:
+        {
+            auto list = value.value<QList<KnownServerConnection>>();
+            processedValue = QString::fromUtf8(QJson::serialized(list));
+            break;
+        }
         case KnownServerUrls:
         {
             auto list = value.value<QList<QUrl>>();
@@ -112,9 +120,14 @@ QVariant QnClientCoreSettings::readValueFromSettings(
         case CloudPassword:
             return nx::utils::xorDecrypt(baseValue.toString(), kEncodeXorKey);
 
+        case KnownServerConnections:
+            return qVariantFromValue(
+                QJson::deserialized<QList<KnownServerConnection>>(baseValue.toByteArray()));
+
         case KnownServerUrls:
             return qVariantFromValue(
                 QJson::deserialized<QList<QUrl>>(baseValue.toByteArray()));
+
         default:
             break;
     }
@@ -126,4 +139,37 @@ void QnClientCoreSettings::save()
 {
     submitToSettings(m_settings);
     m_settings->sync();
+}
+
+void QnClientCoreSettings::migrateKnownServerConnections()
+{
+    const auto knownUrls = knownServerUrls();
+    if (knownUrls.isEmpty())
+        return;
+
+    const auto recentConnections = recentLocalConnections();
+
+    auto knownConnections = knownServerConnections();
+    const auto oldKnownConnectionsCount = knownConnections.size();
+
+    for (const auto& knownUrl: knownUrls)
+    {
+        const auto it = std::find_if(recentConnections.begin(), recentConnections.end(),
+            [&knownUrl](const nx::client::core::LocalConnectionData& connection)
+            {
+                return std::any_of(connection.urls.begin(), connection.urls.end(),
+                    [&knownUrl](const QUrl& url)
+                    {
+                        return nx::utils::url::addressesEqual(url, knownUrl);
+                    });
+            });
+
+        if (it != recentConnections.end())
+            knownConnections.append(KnownServerConnection{it.key(), knownUrl});
+    }
+
+    if (knownConnections.size() != oldKnownConnectionsCount)
+        setKnownServerConnections(knownConnections);
+
+    setKnownServerUrls(QList<QUrl>());
 }

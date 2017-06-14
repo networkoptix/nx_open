@@ -179,6 +179,7 @@
 #include <rest/handlers/audio_transmission_rest_handler.h>
 #include <rest/handlers/start_lite_client_rest_handler.h>
 #include <rest/handlers/runtime_info_rest_handler.h>
+#include <rest/handlers/distributed_file_downloader_rest_handler.h>
 #ifdef _DEBUG
 #include <rest/handlers/debug_events_rest_handler.h>
 #endif
@@ -1826,6 +1827,8 @@ void MediaServerProcess::registerRestHandlers(
     reg("api/iflist", new QnIfListRestHandler());
     reg("api/aggregator", new QnJsonAggregatorRestHandler());
     reg("api/ifconfig", new QnIfConfigRestHandler(), kAdmin);
+
+    reg("api/downloader/", new QnDistributedFileDownloaderRestHandler());
 
     reg("api/settime", new QnSetTimeRestHandler(), kAdmin); //< deprecated
     reg("api/setTime", new QnSetTimeRestHandler(), kAdmin); //< new version
