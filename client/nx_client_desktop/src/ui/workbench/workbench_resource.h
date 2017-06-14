@@ -6,11 +6,13 @@
 
 class QMimeData;
 
-class QnWorkbenchResource {
+class QnWorkbenchResource
+{
 public:
     static QStringList resourceMimeTypes();
 
-    static void serializeResources(const QnResourceList &resources, const QStringList &mimeTypes, QMimeData *mimeData);
+    static void serializeResources(const QnResourceList& resources, const QStringList& mimeTypes,
+        QMimeData* mimeData);
 
-    static QnResourceList deserializeResources(const QMimeData *mimeData);
+    static QnResourceList deserializeResources(const QMimeData* mimeData);
 };
