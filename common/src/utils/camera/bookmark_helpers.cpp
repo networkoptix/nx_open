@@ -22,7 +22,20 @@ QnCameraBookmark helpers::bookmarkFromAction(
     const QnSecurityCamResourcePtr& camera,
     QnCommonModule* commonModule)
 {
+    if (!camera)
+    {
+        NX_EXPECT(false, "Camera is invalid");
+        return QnCameraBookmark();
+    }
+
     const auto actionParams = action->getParams();
+    if (action->actionType() != QnBusiness::BookmarkAction
+        && actionParams.targetActionType != QnBusiness::BookmarkAction)
+    {
+        NX_EXPECT(false, "Invalid action");
+        return QnCameraBookmark();
+    }
+
     const qint64 recordBeforeMs = actionParams.recordBeforeMs;
     const qint64 recordAfterMs = actionParams.recordAfter;
     const qint64 fixedDurationMs = actionParams.durationMs;
