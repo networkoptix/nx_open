@@ -7,36 +7,19 @@
     <x>0</x>
     <y>0</y>
     <width>474</width>
-    <height>116</height>
+    <height>196</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string/>
   </property>
   <layout class="QGridLayout" name="gridLayout">
-   <item row="0" column="0">
-    <widget class="QCheckBox" name="fixedDurationCheckBox">
-     <property name="text">
-      <string>Fixed duration:</string>
-     </property>
-    </widget>
-   </item>
-   <item row="3" column="1">
-    <widget class="QLineEdit" name="tagsLineEdit"/>
-   </item>
-   <item row="3" column="0">
-    <widget class="QLabel" name="tagsLabel">
-     <property name="text">
-      <string>Tags:</string>
-     </property>
-    </widget>
-   </item>
-   <item row="0" column="1">
-    <widget class="QWidget" name="durationWidget" native="true">
+   <item row="2" column="1">
+    <widget class="QWidget" name="recordAfterWidget" native="true">
      <property name="enabled">
-      <bool>false</bool>
+      <bool>true</bool>
      </property>
-     <layout class="QHBoxLayout" name="horizontalLayout" stretch="0,1">
+     <layout class="QHBoxLayout" name="horizontalLayout_5" stretch="0,1">
       <property name="leftMargin">
        <number>0</number>
       </property>
@@ -50,20 +33,23 @@
        <number>0</number>
       </property>
       <item>
-       <widget class="QSpinBox" name="durationSpinBox">
+       <widget class="QSpinBox" name="recordAfterSpinBox">
         <property name="suffix">
          <string/>
         </property>
         <property name="minimum">
-         <number>5</number>
+         <number>0</number>
         </property>
         <property name="maximum">
          <number>30</number>
         </property>
+        <property name="value">
+         <number>0</number>
+        </property>
        </widget>
       </item>
       <item>
-       <widget class="QLabel" name="durationSuffixLabel">
+       <widget class="QLabel" name="recordAfterSuffixLabel">
         <property name="text">
          <string>seconds</string>
         </property>
@@ -116,12 +102,12 @@
      </layout>
     </widget>
    </item>
-   <item row="2" column="1">
-    <widget class="QWidget" name="recordAfterWidget" native="true">
+   <item row="0" column="1">
+    <widget class="QWidget" name="durationWidget" native="true">
      <property name="enabled">
-      <bool>true</bool>
+      <bool>false</bool>
      </property>
-     <layout class="QHBoxLayout" name="horizontalLayout_5" stretch="0,1">
+     <layout class="QHBoxLayout" name="horizontalLayout" stretch="0,1">
       <property name="leftMargin">
        <number>0</number>
       </property>
@@ -135,23 +121,20 @@
        <number>0</number>
       </property>
       <item>
-       <widget class="QSpinBox" name="recordAfterSpinBox">
+       <widget class="QSpinBox" name="durationSpinBox">
         <property name="suffix">
          <string/>
         </property>
         <property name="minimum">
-         <number>0</number>
+         <number>5</number>
         </property>
         <property name="maximum">
          <number>30</number>
         </property>
-        <property name="value">
-         <number>0</number>
-        </property>
        </widget>
       </item>
       <item>
-       <widget class="QLabel" name="recordAfterSuffixLabel">
+       <widget class="QLabel" name="durationSuffixLabel">
         <property name="text">
          <string>seconds</string>
         </property>
@@ -160,6 +143,30 @@
      </layout>
     </widget>
    </item>
+   <item row="2" column="0">
+    <widget class="QLabel" name="recordAfterLabel">
+     <property name="text">
+      <string>Post-recording:</string>
+     </property>
+    </widget>
+   </item>
+   <item row="3" column="0">
+    <widget class="QLabel" name="tagsLabel">
+     <property name="text">
+      <string>Tags:</string>
+     </property>
+    </widget>
+   </item>
+   <item row="0" column="0">
+    <widget class="QCheckBox" name="fixedDurationCheckBox">
+     <property name="text">
+      <string>Fixed duration:</string>
+     </property>
+    </widget>
+   </item>
+   <item row="3" column="1">
+    <widget class="QLineEdit" name="tagsLineEdit"/>
+   </item>
    <item row="1" column="0">
     <widget class="QLabel" name="recordBeforeLabel">
      <property name="text">
@@ -167,10 +174,20 @@
      </property>
     </widget>
    </item>
-   <item row="2" column="0">
-    <widget class="QLabel" name="recordAfterLabel">
+   <item row="4" column="1">
+    <widget class="QCheckBox" name="needConfirmationCheckBox">
      <property name="text">
-      <string>Post-recording:</string>
+      <string>Ask confirmation before creating bookmark</string>
+     </property>
+    </widget>
+   </item>
+   <item row="5" column="0">
+    <widget class="QLabel" name="confirmationByLabel">
+     <property name="text">
+      <string>By:</string>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
      </property>
     </widget>
    </item>

@@ -14,7 +14,7 @@ struct QnBusinessActionParameters
     /**
       * Shows if action should be confirmed by user. Currently used for bookmarks confirmation
       */
-    bool needConfirmation = true;
+    bool needConfirmation = false;
 
     QnBusiness::ActionType targetActionType = QnBusiness::UndefinedAction;
 
