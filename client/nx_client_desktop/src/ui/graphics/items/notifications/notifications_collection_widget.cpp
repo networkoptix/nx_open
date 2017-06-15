@@ -271,7 +271,7 @@ void QnNotificationsCollectionWidget::handleShowPopupAction(
     if (bookmarks.isEmpty())
         return;
 
-    widget->addTextButton(QIcon(), tr("Bookmark it"),
+    widget->addTextButton(qnSkin->icon("buttons/bookmark.png"), tr("Bookmark it"),
         [bookmarks]()
         {
             for (const auto bookmark: bookmarks)

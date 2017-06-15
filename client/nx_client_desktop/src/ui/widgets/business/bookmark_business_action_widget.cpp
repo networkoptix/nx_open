@@ -60,7 +60,8 @@ void QnBookmarkBusinessActionWidget::updateTabOrder(QWidget *before, QWidget *af
 void QnBookmarkBusinessActionWidget::updateUserSelectionControls()
 {
     const bool visible = ui->needConfirmationCheckBox->isChecked();
-    ui->confirmationByLabel->setVisible(visible);
+    // TODO: implement user selection
+    ui->confirmationByLabel->setVisible(false);
 }
 
 void QnBookmarkBusinessActionWidget::at_model_dataChanged(QnBusiness::Fields fields)
