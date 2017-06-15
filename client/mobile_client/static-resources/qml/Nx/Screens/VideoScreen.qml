@@ -377,6 +377,12 @@ PageBase
         model: camerasModel
     }
 
+    onActivePageChanged:
+    {
+        if (activePage)
+            videoScreenController.start()
+    }
+
     Component.onDestruction: exitFullscreen()
 
     function hideUi()
