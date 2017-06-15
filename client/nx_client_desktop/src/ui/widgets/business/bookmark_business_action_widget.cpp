@@ -42,6 +42,7 @@ QnBookmarkBusinessActionWidget::QnBookmarkBusinessActionWidget(QWidget *parent) 
 
         ui->recordAfterWidget->setEnabled(!checked);
     });
+    setSubjectsButton(ui->selectUsersButton);
 }
 
 QnBookmarkBusinessActionWidget::~QnBookmarkBusinessActionWidget()
@@ -54,14 +55,15 @@ void QnBookmarkBusinessActionWidget::updateTabOrder(QWidget *before, QWidget *af
     setTabOrder(ui->recordBeforeSpinBox, ui->recordAfterSpinBox);
     setTabOrder(ui->recordAfterSpinBox, ui->tagsLineEdit);
     setTabOrder(ui->tagsLineEdit, ui->needConfirmationCheckBox);
-    setTabOrder(ui->needConfirmationCheckBox, after);
+    setTabOrder(ui->needConfirmationCheckBox, ui->selectUsersButton);
+    setTabOrder(ui->selectUsersButton, after);
 }
 
 void QnBookmarkBusinessActionWidget::updateUserSelectionControls()
 {
     const bool visible = ui->needConfirmationCheckBox->isChecked();
-    // TODO: implement user selection
-    ui->confirmationByLabel->setVisible(false);
+    ui->confirmationByLabel->setVisible(visible);
+    ui->selectUsersButton->setVisible(visible);
 }
 
 void QnBookmarkBusinessActionWidget::at_model_dataChanged(QnBusiness::Fields fields)
@@ -69,6 +71,7 @@ void QnBookmarkBusinessActionWidget::at_model_dataChanged(QnBusiness::Fields fie
     if (!model() || m_updating)
         return;
 
+    base_type::at_model_dataChanged(fields);
     QN_SCOPED_VALUE_ROLLBACK(&m_updating, true);
 
     if (fields.testFlag(QnBusiness::EventTypeField))
