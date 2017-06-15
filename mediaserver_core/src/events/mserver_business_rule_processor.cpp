@@ -1012,10 +1012,6 @@ void QnMServerBusinessRuleProcessor::updateRecipientsList(
     QStringList additional = action->getParams().emailAddress.split(kOldEmailDelimiter,
         QString::SkipEmptyParts);
 
-    QList<QnUuid> userRoles;
-    QnUserResourceList users;
-    userRolesManager()->usersAndRoles(action->getResources(), users, userRoles);
-
     QStringList recipients;
     auto addRecipient = [&recipients](const QString& email)
         {
@@ -1031,22 +1027,30 @@ void QnMServerBusinessRuleProcessor::updateRecipientsList(
     for (const auto& email: additional)
         addRecipient(email);
 
-    for (const auto& user: users)
-    {
-        if (user->isEnabled())
-            addRecipient(user->getEmail());
-    }
+    const auto subjects = action->getResources().toList().toSet();
 
-    for (const auto& userRole: userRoles)
+    //TODO: #vkutin Optimize?
+    for (const auto& user: resourcePool()->getResources<QnUserResource>())
     {
-        //TODO: #FIXME!!! #vkutin Handle predefined roles as well!
-        for (const auto& subject: resourceAccessSubjectsCache()->usersInRole(userRole))
+        if (!user->isEnabled())
+            continue;
+
+        if (subjects.contains(user->getId()))
         {
-            const auto& user = subject.user();
-            NX_ASSERT(user);
-            if (user && user->isEnabled())
-                addRecipient(user->getEmail());
+            addRecipient(user->getEmail());
+            continue;
         }
+
+        const auto role = user->userRole();
+        if (role == Qn::UserRole::CustomPermissions)
+            continue;
+
+        const auto roleId = role == Qn::UserRole::CustomUserRole
+            ? user->userRoleId()
+            : QnUserRolesManager::predefinedRoleId(role);
+
+        if (subjects.contains(roleId))
+            addRecipient(user->getEmail());
     }
 
     recipients.removeDuplicates();
