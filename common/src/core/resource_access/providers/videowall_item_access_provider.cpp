@@ -11,6 +11,8 @@
 #include <core/resource/videowall_resource.h>
 #include <common/common_module.h>
 
+using namespace nx::core::access;
+
 QnVideoWallItemAccessProvider::QnVideoWallItemAccessProvider(
     Mode mode,
     QObject* parent)
@@ -37,7 +39,7 @@ QnVideoWallItemAccessProvider::~QnVideoWallItemAccessProvider()
 {
 }
 
-QnAbstractResourceAccessProvider::Source QnVideoWallItemAccessProvider::baseSource() const
+Source QnVideoWallItemAccessProvider::baseSource() const
 {
     return Source::videowall;
 }

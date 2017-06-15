@@ -14,7 +14,7 @@ QnAbstractResourceAccessProvider::~QnAbstractResourceAccessProvider()
 {
 }
 
-QnAbstractResourceAccessProvider::Mode QnAbstractResourceAccessProvider::mode() const
+nx::core::access::Mode QnAbstractResourceAccessProvider::mode() const
 {
     return m_mode;
 }

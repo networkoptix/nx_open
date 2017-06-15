@@ -49,6 +49,8 @@
 #include <api/session_manager.h>
 #include <network/router.h>
 
+using namespace nx;
+
 namespace {
 
 static const QString kAdminPasswordHash = lit("adminMd5Hash");
@@ -122,7 +124,10 @@ qint64 BeforeRestoreDbData::getSpaceLimitForStorage(const QString& url) const
 
 // ------------------- QnCommonModule --------------------
 
-QnCommonModule::QnCommonModule(bool clientMode, QObject *parent):
+QnCommonModule::QnCommonModule(bool clientMode,
+    core::access::Mode resourceAccessMode,
+    QObject* parent)
+    :
     QObject(parent),
     m_messageProcessor(nullptr)
 {
@@ -150,30 +155,26 @@ QnCommonModule::QnCommonModule(bool clientMode, QObject *parent):
     m_resourceAccessSubjectCache = new QnResourceAccessSubjectsCache(this); /*< Depends on respool and roles. */
     m_sharedResourceManager = new QnSharedResourcesManager(this);   /*< Depends on respool and roles. */
 
-    const auto accessProviderMode = clientMode
-        ? QnAbstractResourceAccessProvider::Mode::cached
-        : QnAbstractResourceAccessProvider::Mode::direct;
-
     // Depends on respool, roles and shared resources.
-    m_resourceAccessProvider = new QnResourceAccessProvider(accessProviderMode, this);
+    m_resourceAccessProvider = new QnResourceAccessProvider(resourceAccessMode, this);
 
     // Depends on respool.
-    m_globalPermissionsManager = new QnGlobalPermissionsManager(this);
+    m_globalPermissionsManager = new QnGlobalPermissionsManager(resourceAccessMode, this);
     m_runtimeInfoManager = new QnRuntimeInfoManager(this);
 
 
     // Some of base providers depend on QnGlobalPermissionsManager and QnSharedResourcesManager.
     m_resourceAccessProvider->addBaseProvider(
-        new QnPermissionsResourceAccessProvider(accessProviderMode, this));
+        new QnPermissionsResourceAccessProvider(resourceAccessMode, this));
     m_resourceAccessProvider->addBaseProvider(
-        new QnSharedResourceAccessProvider(accessProviderMode, this));
+        new QnSharedResourceAccessProvider(resourceAccessMode, this));
     m_resourceAccessProvider->addBaseProvider(
-        new QnSharedLayoutItemAccessProvider(accessProviderMode, this));
+        new QnSharedLayoutItemAccessProvider(resourceAccessMode, this));
     m_resourceAccessProvider->addBaseProvider(
-        new QnVideoWallItemAccessProvider(accessProviderMode, this));
+        new QnVideoWallItemAccessProvider(resourceAccessMode, this));
 
     // Depends on access provider.
-    m_resourceAccessManager = new QnResourceAccessManager(this);
+    m_resourceAccessManager = new QnResourceAccessManager(resourceAccessMode, this);
 
 
     m_globalSettings = new QnGlobalSettings(this);

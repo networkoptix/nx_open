@@ -13,13 +13,14 @@
 
 #include <nx_ec/data/api_user_role_data.h>
 
+using namespace nx::core::access;
+
 class QnCachedSharedLayoutItemAccessProviderTest: public QnCachedBaseAccessProviderTestFixture
 {
 protected:
     virtual QnAbstractResourceAccessProvider* createAccessProvider() const override
     {
-        return new QnSharedLayoutItemAccessProvider(QnAbstractResourceAccessProvider::Mode::cached,
-            commonModule());
+        return new QnSharedLayoutItemAccessProvider(Mode::cached, commonModule());
     }
 };
 
@@ -75,8 +76,7 @@ TEST_F(QnCachedSharedLayoutItemAccessProviderTest, checkSource)
 
     sharedResourcesManager()->setSharedResources(user, QSet<QnUuid>() << layout->getId());
 
-    ASSERT_EQ(accessProvider()->accessibleVia(user, target),
-        QnAbstractResourceAccessProvider::Source::layout);
+    ASSERT_EQ(accessProvider()->accessibleVia(user, target), Source::layout);
 }
 
 TEST_F(QnCachedSharedLayoutItemAccessProviderTest, checkSharedServer)

@@ -9,6 +9,8 @@
 #include <nx/utils/log/log.h>
 #include <common/common_module.h>
 
+using namespace nx::core::access;
+
 QnSharedResourceAccessProvider::QnSharedResourceAccessProvider(
     Mode mode,
     QObject* parent)
@@ -26,7 +28,7 @@ QnSharedResourceAccessProvider::~QnSharedResourceAccessProvider()
 {
 }
 
-QnAbstractResourceAccessProvider::Source QnSharedResourceAccessProvider::baseSource() const
+Source QnSharedResourceAccessProvider::baseSource() const
 {
     return Source::shared;
 }

@@ -8,6 +8,7 @@
 #include <core/resource/user_resource.h>
 #include <common/common_module.h>
 
+using namespace nx::core::access;
 
 QnPermissionsResourceAccessProvider::QnPermissionsResourceAccessProvider(
     Mode mode,
@@ -37,7 +38,7 @@ bool QnPermissionsResourceAccessProvider::hasAccessToDesktopCamera(
             Qn::GlobalControlVideoWallPermission);
 }
 
-QnAbstractResourceAccessProvider::Source QnPermissionsResourceAccessProvider::baseSource() const
+Source QnPermissionsResourceAccessProvider::baseSource() const
 {
     return Source::permissions;
 }

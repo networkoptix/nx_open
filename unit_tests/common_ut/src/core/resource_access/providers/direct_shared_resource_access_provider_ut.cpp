@@ -11,9 +11,11 @@
 
 #include <nx_ec/data/api_user_role_data.h>
 
+using namespace nx::core::access;
+
 namespace {
 
-static const auto kSource = QnAbstractResourceAccessProvider::Source::shared;
+static const auto kSource = Source::shared;
 
 }
 
@@ -22,9 +24,7 @@ class QnDirectSharedResourceAccessProviderTest: public QnDirectBaseAccessProvide
 protected:
     virtual QnAbstractResourceAccessProvider* createAccessProvider() const override
     {
-        return new QnSharedResourceAccessProvider(
-            QnAbstractResourceAccessProvider::Mode::direct,
-            commonModule());
+        return new QnSharedResourceAccessProvider(Mode::direct, commonModule());
     }
 };
 

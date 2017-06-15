@@ -14,9 +14,11 @@
 
 #include <common/common_module.h>
 
+using namespace nx::core::access;
+
 namespace {
 
-static const auto kSource = QnAbstractResourceAccessProvider::Source::permissions;
+static const auto kSource = Source::permissions;
 
 }
 
@@ -25,9 +27,7 @@ class QnDirectPermissionsResourceAccessProviderTest: public QnDirectBaseAccessPr
 protected:
     virtual QnAbstractResourceAccessProvider* createAccessProvider() const override
     {
-        return new QnPermissionsResourceAccessProvider(
-            QnAbstractResourceAccessProvider::Mode::direct,
-            commonModule());
+        return new QnPermissionsResourceAccessProvider(Mode::direct, commonModule());
     }
 };
 

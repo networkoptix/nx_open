@@ -11,7 +11,7 @@
 
 void QnDirectAccessProviderTestFixture::SetUp()
 {
-    m_module.reset(new QnCommonModule(false));
+    m_module.reset(new QnCommonModule(false, nx::core::access::Mode::direct));
     initializeContext(m_module.data());
 }
 

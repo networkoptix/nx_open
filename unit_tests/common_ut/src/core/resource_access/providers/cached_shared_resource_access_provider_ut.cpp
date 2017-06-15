@@ -11,9 +11,11 @@
 
 #include <nx_ec/data/api_user_role_data.h>
 
+using namespace nx::core::access;
+
 namespace {
 
-static const auto kSource = QnAbstractResourceAccessProvider::Source::shared;
+static const auto kSource = Source::shared;
 
 }
 
@@ -26,13 +28,12 @@ protected:
         if (value)
             awaitAccessValue(subject, resource, kSource);
         else
-            awaitAccessValue(subject, resource, QnAbstractResourceAccessProvider::Source::none);
+            awaitAccessValue(subject, resource, Source::none);
     }
 
     virtual QnAbstractResourceAccessProvider* createAccessProvider() const override
     {
-        return new QnSharedResourceAccessProvider(QnAbstractResourceAccessProvider::Mode::cached,
-            commonModule());
+        return new QnSharedResourceAccessProvider(Mode::cached, commonModule());
     }
 };
 

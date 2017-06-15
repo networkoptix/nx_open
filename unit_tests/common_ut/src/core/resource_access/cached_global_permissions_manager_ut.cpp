@@ -1,7 +1,10 @@
 #include <gtest/gtest.h>
 
+#include "custom_printers.h"
+
 #include <common/common_module.h>
 
+#include <nx/core/access/access_types.h>
 #include <core/resource_management/resource_pool.h>
 #include <core/resource_management/resource_pool_test_helper.h>
 #include <core/resource_management/user_roles_manager.h>
@@ -12,21 +15,14 @@
 #include <core/resource/user_resource.h>
 #include <test_support/resource/camera_resource_stub.h>
 
-#include <nx/fusion/model_functions.h>
-
-void PrintTo(const Qn::GlobalPermissions& val, ::std::ostream* os)
-{
-    *os << QnLexical::serialized(val).toStdString();
-}
-
-class QnGlobalPermissionsManagerTest: public testing::Test, protected QnResourcePoolTestHelper
+class QnCachedGlobalPermissionsManagerTest: public testing::Test, protected QnResourcePoolTestHelper
 {
 protected:
 
     // virtual void SetUp() will be called before each test is run.
     virtual void SetUp()
     {
-        m_module.reset(new QnCommonModule(true));
+        m_module.reset(new QnCommonModule(false, nx::core::access::Mode::cached));
         initializeContext(m_module.data());
 
         QObject::connect(globalPermissionsManager(),
@@ -89,11 +85,7 @@ protected:
     std::deque<AwaitedAccess> m_awaitedAccessQueue;
 };
 
-/************************************************************************/
-/* Checking layouts as admin                                            */
-/************************************************************************/
-
-TEST_F(QnGlobalPermissionsManagerTest, checkRoleRemoved)
+TEST_F(QnCachedGlobalPermissionsManagerTest, checkRoleRemoved)
 {
     auto role = createRole(Qn::GlobalAccessAllMediaPermission);
     userRolesManager()->addOrUpdateUserRole(role);
@@ -109,7 +101,7 @@ TEST_F(QnGlobalPermissionsManagerTest, checkRoleRemoved)
     ASSERT_FALSE(hasGlobalPermission(user, Qn::GlobalAccessAllMediaPermission));
 }
 
-TEST_F(QnGlobalPermissionsManagerTest, checkRoleRemovedSignalRole)
+TEST_F(QnCachedGlobalPermissionsManagerTest, checkRoleRemovedSignalRole)
 {
     auto role = createRole(Qn::GlobalAccessAllMediaPermission);
     userRolesManager()->addOrUpdateUserRole(role);
@@ -119,7 +111,7 @@ TEST_F(QnGlobalPermissionsManagerTest, checkRoleRemovedSignalRole)
     userRolesManager()->removeUserRole(role.id);
 }
 
-TEST_F(QnGlobalPermissionsManagerTest, checkRoleRemovedSignalUser)
+TEST_F(QnCachedGlobalPermissionsManagerTest, checkRoleRemovedSignalUser)
 {
     auto role = createRole(Qn::GlobalAccessAllMediaPermission);
     userRolesManager()->addOrUpdateUserRole(role);

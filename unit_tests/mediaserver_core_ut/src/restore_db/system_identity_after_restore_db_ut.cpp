@@ -165,7 +165,8 @@ public:
 
         settingsProxy.reset(new detail::TestSettingsProxy);
 
-        commonModule = std::unique_ptr<QnCommonModule>(new QnCommonModule(/*isClient*/false));
+        commonModule = std::unique_ptr<QnCommonModule>(new QnCommonModule(/*isClient*/false,
+            nx::core::access::Mode::direct));
 
         admin = QnUserResourcePtr(new QnUserResource(QnUserType::Local));
         mediaServer = QnMediaServerResourcePtr(new QnMediaServerResource(commonModule.get()));

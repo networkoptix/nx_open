@@ -15,13 +15,14 @@
 
 #include <nx_ec/data/api_user_role_data.h>
 
+using namespace nx::core::access;
+
 class QnCachedVideoWallItemAccessProviderTest: public QnCachedBaseAccessProviderTestFixture
 {
 protected:
     virtual QnAbstractResourceAccessProvider* createAccessProvider() const override
     {
-        return new QnVideoWallItemAccessProvider(QnAbstractResourceAccessProvider::Mode::cached,
-            commonModule());
+        return new QnVideoWallItemAccessProvider(Mode::cached, commonModule());
     }
 
     QnLayoutResourcePtr addLayoutForVideoWall(const QnVideoWallResourcePtr& videoWall)
@@ -39,8 +40,7 @@ TEST_F(QnCachedVideoWallItemAccessProviderTest, checkSource)
     auto target = addLayoutForVideoWall(videoWall);
     auto user = addUser(Qn::GlobalAdminPermission);
 
-    ASSERT_EQ(accessProvider()->accessibleVia(user, target),
-        QnAbstractResourceAccessProvider::Source::videowall);
+    ASSERT_EQ(accessProvider()->accessibleVia(user, target), Source::videowall);
 }
 
 TEST_F(QnCachedVideoWallItemAccessProviderTest, checkInvalidAccess)
@@ -129,7 +129,7 @@ TEST_F(QnCachedVideoWallItemAccessProviderTest, checkCameraOnLayoutAddedOnVideoW
     item.resource.uniqueId = target->getUniqueId();
     layout->addItem(item);
 
-    awaitAccessValue(user, target, QnAbstractResourceAccessProvider::Source::videowall);
+    awaitAccessValue(user, target, Source::videowall);
     resourcePool()->addResource(layout);
 
     ASSERT_TRUE(accessProvider()->hasAccess(user, target));
@@ -150,7 +150,7 @@ TEST_F(QnCachedVideoWallItemAccessProviderTest, checkCameraDroppedOnVideoWall)
     layout->addItem(item);
     resourcePool()->addResource(layout);
 
-    awaitAccessValue(user, target, QnAbstractResourceAccessProvider::Source::videowall);
+    awaitAccessValue(user, target, Source::videowall);
     layout->setParentId(videoWall->getId());
 
     ASSERT_TRUE(accessProvider()->hasAccess(user, target));

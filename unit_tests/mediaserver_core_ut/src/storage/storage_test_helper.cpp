@@ -12,7 +12,8 @@ namespace ut {
 namespace utils {
 
 FileStorageTestHelper::FileStorageTestHelper() :
-    m_commonModule(new QnCommonModule(/*isClient*/false)),
+    m_commonModule(new QnCommonModule(/*isClient*/false,
+        nx::core::access::Mode::direct)),
     m_platformAbstraction(new QnPlatformAbstraction())
 {
     m_commonModule->setModuleGUID(QnUuid::createUuid());

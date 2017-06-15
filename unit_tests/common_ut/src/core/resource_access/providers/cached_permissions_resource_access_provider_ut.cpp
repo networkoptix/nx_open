@@ -14,9 +14,11 @@
 
 #include <common/common_module.h>
 
+using namespace nx::core::access;
+
 namespace {
 
-static const auto kSource = QnAbstractResourceAccessProvider::Source::permissions;
+static const auto kSource = Source::permissions;
 
 }
 
@@ -29,13 +31,13 @@ protected:
         if (value)
             awaitAccessValue(subject, resource, kSource);
         else
-            awaitAccessValue(subject, resource, QnAbstractResourceAccessProvider::Source::none);
+            awaitAccessValue(subject, resource, Source::none);
     }
 
     virtual QnAbstractResourceAccessProvider* createAccessProvider() const override
     {
         return new QnPermissionsResourceAccessProvider(
-            QnAbstractResourceAccessProvider::Mode::cached,
+            Mode::cached,
             commonModule());
     }
 };

@@ -2,6 +2,7 @@
 
 #include <QtCore/QObject>
 
+#include <nx/core/access/access_types.h>
 #include <core/resource_access/resource_access_subject.h>
 
 #include <utils/common/connective.h>
@@ -16,21 +17,8 @@ class QnAbstractResourceAccessProvider:
     using base_type = Connective<QObject>;
 
 public:
-    /** Types of base providers, sorted by priority. */
-    enum class Source
-    {
-        none,
-        permissions,    //< Accessible by permissions.
-        shared,         //< Accessible by direct sharing.
-        layout,         //< Accessible by placing on shared layout.
-        videowall,      //< Accessible by placing on videowall.
-    };
-
-    enum class Mode
-    {
-        cached,
-        direct
-    };
+    using Mode = nx::core::access::Mode;
+    using Source = nx::core::access::Source;
 
     QnAbstractResourceAccessProvider(Mode mode, QObject* parent = nullptr);
     virtual ~QnAbstractResourceAccessProvider();
@@ -62,7 +50,7 @@ private:
     const Mode m_mode;
 };
 
-inline uint qHash(QnAbstractResourceAccessProvider::Source value, uint seed)
+inline uint qHash(nx::core::access::Source value, uint seed)
 {
     return qHash(static_cast<int>(value), seed);
 }

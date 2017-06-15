@@ -10,6 +10,8 @@
 #include <core/resource/user_resource.h>
 #include <common/common_module.h>
 
+using namespace nx::core::access;
+
 QnSharedLayoutItemAccessProvider::QnSharedLayoutItemAccessProvider(
     Mode mode,
     QObject* parent)
@@ -28,7 +30,7 @@ QnSharedLayoutItemAccessProvider::~QnSharedLayoutItemAccessProvider()
 
 }
 
-QnAbstractResourceAccessProvider::Source QnSharedLayoutItemAccessProvider::baseSource() const
+Source QnSharedLayoutItemAccessProvider::baseSource() const
 {
     return Source::layout;
 }

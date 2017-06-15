@@ -17,11 +17,13 @@
 #include <core/resource/webpage_resource.h>
 #include <core/resource/videowall_resource.h>
 
+using namespace nx::core::access;
+
 namespace {
 
-static const auto kPermissions = QnAbstractResourceAccessProvider::Source::permissions;
-static const auto kShared = QnAbstractResourceAccessProvider::Source::shared;
-static const auto kNone = QnAbstractResourceAccessProvider::Source::none;
+static const auto kPermissions = Source::permissions;
+static const auto kShared = Source::shared;
+static const auto kNone = Source::none;
 
 }
 
@@ -133,18 +135,18 @@ TEST_F(QnCachedResourceAccessProviderTest, checkSequentialAccessAdding)
 
     auto user = addUser(Qn::NoGlobalPermissions);
 
-    awaitAccessValue(user, camera, QnAbstractResourceAccessProvider::Source::videowall);
+    awaitAccessValue(user, camera, Source::videowall);
     user->setRawPermissions(Qn::GlobalControlVideoWallPermission);
 
-    awaitAccessValue(user, camera, QnAbstractResourceAccessProvider::Source::layout);
+    awaitAccessValue(user, camera, Source::layout);
     auto sharedIds = QSet<QnUuid>() << sharedLayout->getId();
     sharedResourcesManager()->setSharedResources(user, sharedIds);
 
     sharedIds << camera->getId();
-    awaitAccessValue(user, camera, QnAbstractResourceAccessProvider::Source::shared);
+    awaitAccessValue(user, camera, Source::shared);
     sharedResourcesManager()->setSharedResources(user, sharedIds);
 
-    awaitAccessValue(user, camera, QnAbstractResourceAccessProvider::Source::permissions);
+    awaitAccessValue(user, camera, Source::permissions);
     user->setRawPermissions(Qn::GlobalAccessAllMediaPermission);
 }
 
@@ -162,21 +164,21 @@ TEST_F(QnCachedResourceAccessProviderTest, checkSequentialAccessRemoving)
     videoWallLayout->addItem(layoutItem);
 
     auto user = createUser(Qn::GlobalAccessAllMediaPermission);
-    awaitAccessValue(user, camera, QnAbstractResourceAccessProvider::Source::permissions);
+    awaitAccessValue(user, camera, Source::permissions);
     resourcePool()->addResource(user);   //permissions
 
     auto sharedIds = QSet<QnUuid>() << sharedLayout->getId() << camera->getId();
     sharedResourcesManager()->setSharedResources(user, sharedIds);
-    awaitAccessValue(user, camera, QnAbstractResourceAccessProvider::Source::shared);
+    awaitAccessValue(user, camera, Source::shared);
     user->setRawPermissions(Qn::GlobalControlVideoWallPermission); // shared
 
-    awaitAccessValue(user, camera, QnAbstractResourceAccessProvider::Source::layout);
+    awaitAccessValue(user, camera, Source::layout);
     sharedResourcesManager()->setSharedResources(user, QSet<QnUuid>() << sharedLayout->getId());
 
-    awaitAccessValue(user, camera, QnAbstractResourceAccessProvider::Source::videowall);
+    awaitAccessValue(user, camera, Source::videowall);
     sharedResourcesManager()->setSharedResources(user, QSet<QnUuid>());
 
-    awaitAccessValue(user, camera, QnAbstractResourceAccessProvider::Source::none);
+    awaitAccessValue(user, camera, Source::none);
     resourcePool()->removeResource(videoWall);
 }
 
@@ -229,23 +231,23 @@ TEST_F(QnCachedResourceAccessProviderTest, checkAccessLevels)
     auto videoWallLayout = addLayoutForVideoWall(videoWall);
     videoWallLayout->addItem(layoutItem);
 
-    QSet<QnAbstractResourceAccessProvider::Source> expectedLevels;
-    expectedLevels << QnAbstractResourceAccessProvider::Source::videowall;
+    QSet<Source> expectedLevels;
+    expectedLevels << Source::videowall;
     auto user = addUser(Qn::GlobalControlVideoWallPermission);
 
     ASSERT_EQ(expectedLevels, accessProvider()->accessLevels(user, camera));
 
     auto sharedIds = QSet<QnUuid>() << sharedLayout->getId();
     sharedResourcesManager()->setSharedResources(user, sharedIds);
-    expectedLevels << QnAbstractResourceAccessProvider::Source::layout;
+    expectedLevels << Source::layout;
     ASSERT_EQ(expectedLevels, accessProvider()->accessLevels(user, camera));
 
     sharedIds << camera->getId();
     sharedResourcesManager()->setSharedResources(user, sharedIds);
-    expectedLevels << QnAbstractResourceAccessProvider::Source::shared;
+    expectedLevels << Source::shared;
     ASSERT_EQ(expectedLevels, accessProvider()->accessLevels(user, camera));
 
     user->setRawPermissions(Qn::GlobalAdminPermission);
-    expectedLevels << QnAbstractResourceAccessProvider::Source::permissions;
+    expectedLevels << Source::permissions;
     ASSERT_EQ(expectedLevels, accessProvider()->accessLevels(user, camera));
 }

@@ -15,14 +15,14 @@
 
 #include <nx_ec/data/api_user_role_data.h>
 
+using namespace nx::core::access;
+
 class QnDirectVideoWallItemAccessProviderTest: public QnDirectBaseAccessProviderTestFixture
 {
 protected:
     virtual QnAbstractResourceAccessProvider* createAccessProvider() const override
     {
-        return new QnVideoWallItemAccessProvider(
-            QnAbstractResourceAccessProvider::Mode::direct,
-            commonModule());
+        return new QnVideoWallItemAccessProvider(Mode::direct, commonModule());
     }
 
     QnLayoutResourcePtr addLayoutForVideoWall(const QnVideoWallResourcePtr& videoWall)

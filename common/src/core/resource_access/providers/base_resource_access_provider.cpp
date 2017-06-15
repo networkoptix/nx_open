@@ -10,6 +10,8 @@
 #include <core/resource/user_resource.h>
 #include <common/common_module.h>
 
+using namespace nx::core::access;
+
 QnBaseResourceAccessProvider::QnBaseResourceAccessProvider(Mode mode, QObject* parent):
     base_type(mode, parent),
     QnCommonModuleAware(parent),
@@ -56,7 +58,7 @@ bool QnBaseResourceAccessProvider::hasAccess(const QnResourceAccessSubject& subj
     return m_accessibleResources[subject.id()].contains(resource->getId());
 }
 
-QnAbstractResourceAccessProvider::Source QnBaseResourceAccessProvider::accessibleVia(
+Source QnBaseResourceAccessProvider::accessibleVia(
     const QnResourceAccessSubject& subject,
     const QnResourcePtr& resource,
     QnResourceList* providers) const

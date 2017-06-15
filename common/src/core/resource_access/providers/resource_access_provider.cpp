@@ -7,6 +7,8 @@
 #include <nx/utils/log/assert.h>
 #include <common/common_module.h>
 
+using namespace nx::core::access;
+
 QnResourceAccessProvider::QnResourceAccessProvider(Mode mode, QObject* parent):
     base_type(mode, parent),
     QnCommonModuleAware(parent)
@@ -27,7 +29,7 @@ bool QnResourceAccessProvider::hasAccess(const QnResourceAccessSubject& subject,
         });
 }
 
-QnAbstractResourceAccessProvider::Source QnResourceAccessProvider::accessibleVia(
+Source QnResourceAccessProvider::accessibleVia(
     const QnResourceAccessSubject& subject,
     const QnResourcePtr& resource,
     QnResourceList* providers) const
@@ -35,7 +37,7 @@ QnAbstractResourceAccessProvider::Source QnResourceAccessProvider::accessibleVia
     if (providers)
         providers->clear();
 
-    QnAbstractResourceAccessProvider::Source accessSource = Source::none;
+    Source accessSource = Source::none;
     for (auto provider: m_providers)
     {
         const auto result = provider->accessibleVia(subject, resource, providers);
@@ -56,11 +58,11 @@ QnAbstractResourceAccessProvider::Source QnResourceAccessProvider::accessibleVia
     return accessSource;
 }
 
-QSet<QnAbstractResourceAccessProvider::Source> QnResourceAccessProvider::accessLevels(
+QSet<Source> QnResourceAccessProvider::accessLevels(
     const QnResourceAccessSubject& subject,
     const QnResourcePtr& resource) const
 {
-    QSet<QnAbstractResourceAccessProvider::Source> result;
+    QSet<Source> result;
     for (auto provider: m_providers)
     {
         const auto level = provider->accessibleVia(subject, resource);
@@ -141,7 +143,7 @@ void QnResourceAccessProvider::afterUpdate()
         for (const QnResourcePtr& resource: commonModule()->resourcePool()->getResources())
         {
             auto value = accessibleVia(subject, resource);
-            if (value != QnAbstractResourceAccessProvider::Source::none)
+            if (value != Source::none)
                 emit accessChanged(subject, resource, value);
         }
     }

@@ -9,9 +9,11 @@
 
 #include <core/resource_access/providers/abstract_resource_access_provider.h>
 
+using namespace nx::core::access;
+
 void QnCachedAccessProviderTestFixture::SetUp()
 {
-    m_module.reset(new QnCommonModule(true));
+    m_module.reset(new QnCommonModule(false, nx::core::access::Mode::cached));
     initializeContext(m_module.data());
 }
 
@@ -23,16 +25,16 @@ void QnCachedAccessProviderTestFixture::TearDown()
 }
 
 void QnCachedAccessProviderTestFixture::awaitAccessValue(const QnResourceAccessSubject& subject,
-    const QnResourcePtr& resource, QnAbstractResourceAccessProvider::Source value)
+    const QnResourcePtr& resource, Source value)
 {
     m_awaitedAccessQueue.emplace_back(subject, resource, value);
 }
 
 void QnCachedAccessProviderTestFixture::at_accessChanged(const QnResourceAccessSubject& subject,
-    const QnResourcePtr& resource, QnAbstractResourceAccessProvider::Source value)
+    const QnResourcePtr& resource, Source value)
 {
     ASSERT_EQ(value, accessProvider()->accessibleVia(subject, resource));
-    ASSERT_EQ(value != QnAbstractResourceAccessProvider::Source::none,
+    ASSERT_EQ(value != Source::none,
         accessProvider()->hasAccess(subject, resource));
 
     if (m_awaitedAccessQueue.empty())
@@ -50,8 +52,9 @@ void QnCachedAccessProviderTestFixture::setupAwaitAccess()
 {
     QObject::connect(accessProvider(),
         &QnAbstractResourceAccessProvider::accessChanged,
-        [this](const QnResourceAccessSubject& subject, const QnResourcePtr& resource,
-            QnAbstractResourceAccessProvider::Source value)
+        [this](const QnResourceAccessSubject& subject,
+            const QnResourcePtr& resource,
+            Source value)
         {
             at_accessChanged(subject, resource, value);
         });
