@@ -76,6 +76,7 @@ public:
             Task task;
             {
                 QnMutexLocker lock(&m_mutex);
+                NX_ASSERT(m_tasks.find(taskId) != m_tasks.cend());
                 m_tasks[taskId].subscribed = false;
                 task = m_tasks[taskId];
             }

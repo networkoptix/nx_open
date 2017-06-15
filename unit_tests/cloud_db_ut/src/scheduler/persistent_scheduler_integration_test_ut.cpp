@@ -82,17 +82,67 @@ protected:
 
     void andWhenFirstUsersUnsubscribes()
     {
-        //user2->unsubscribe()
+        nx::utils::promise<int> u1t1p;
+        nx::utils::promise<int> u1t2p;
+
+        auto u1t1f = u1t1p.get_future();
+        auto u1t2f = u1t2p.get_future();
+
+        ASSERT_FALSE(user1Task1Id.isNull());
+        ASSERT_FALSE(user1Task2Id.isNull());
+
+        user1->unsubscribe(
+            user1Task1Id,
+            [u1t1p = std::move(u1t1p)](const SchedulerUser::Task& task) mutable
+            {
+                u1t1p.set_value(task.fired);
+            });
+
+        user1->unsubscribe(
+            user1Task2Id,
+            [u1t2p = std::move(u1t2p)](const SchedulerUser::Task& task) mutable
+            {
+                u1t2p.set_value(task.fired);
+            });
+
+        user1Task1FiredWhileUnsubscribe = u1t1f.get();
+        user1Task2FiredWhileUnsubscribe = u1t2f.get();
     }
 
     void whenTwoUsersScheduleTwoTasksEach()
     {
         whenTwoUsersInitializedAndRegistredToScheduler();
+        nx::utils::promise<QnUuid> u1t1p;
+        nx::utils::promise<QnUuid> u1t2p;
+        nx::utils::promise<QnUuid> u2t1p;
+        nx::utils::promise<QnUuid> u2t2p;
 
-        user1->subscribe(kFirstUserFirstTaskTimeout);
-        user1->subscribe(kFirstUserSecondTaskTimeout);
-        user2->subscribe(kSecondUserFirstTaskTimeout);
-        user2->subscribe(kSecondUserSecondTaskTimeout);
+        auto u1t1f = u1t1p.get_future();
+        auto u1t2f = u1t2p.get_future();
+        auto u2t1f = u2t1p.get_future();
+        auto u2t2f = u2t2p.get_future();
+
+        user1->subscribe(
+            kFirstUserFirstTaskTimeout,
+            [u1t1p = std::move(u1t1p)](const QnUuid& id) mutable { u1t1p.set_value(id); });
+
+        user1->subscribe(
+            kFirstUserSecondTaskTimeout,
+            [u1t2p = std::move(u1t2p)](const QnUuid& id) mutable { u1t2p.set_value(id); });
+
+        user2->subscribe(
+            kSecondUserFirstTaskTimeout,
+            [u2t1p = std::move(u2t1p)](const QnUuid& id) mutable { u2t1p.set_value(id); });
+
+        user2->subscribe(
+            kSecondUserSecondTaskTimeout,
+            [u2t2p = std::move(u2t2p)](const QnUuid& id) mutable { u2t2p.set_value(id); });
+
+
+        user1Task1Id = u1t1f.get();
+        user1Task2Id = u1t2f.get();
+        user2Task1Id = u2t1f.get();
+        user2Task2Id = u2t2f.get();
     }
 
     void andWhenSchedulerWorksForSomeTime()
@@ -139,17 +189,22 @@ protected:
 
     void thenFirstUserShouldNotReceiveTimerEventsAnyLonger()
     {
+        auto user1Tasks = user1->tasks();
+        ASSERT_EQ(user1Tasks.size(), 2);
 
+        ASSERT_EQ(user1Tasks[user1Task1Id].fired, user1Task1FiredWhileUnsubscribe);
+        ASSERT_EQ(user1Tasks[user1Task2Id].fired, user1Task2FiredWhileUnsubscribe);
     }
 
     void thenTasksShouldFireMultipleTimesForTheSecondUser()
     {
-
+        assertTasksFiredForUser(user2);
     }
 
     void andNoTasksShouldFireForTheFirstUser()
     {
-
+        auto user1Tasks = user1->tasks();
+        ASSERT_EQ(user1Tasks.size(), 0);
     }
 
     QString dbPath;
@@ -159,6 +214,14 @@ protected:
     std::unique_ptr<PersistentScheduler> scheduler;
     std::unique_ptr<SchedulerUser> user1;
     std::unique_ptr<SchedulerUser> user2;
+
+    QnUuid user1Task1Id;
+    QnUuid user1Task2Id;
+    QnUuid user2Task1Id;
+    QnUuid user2Task2Id;
+
+    int user1Task1FiredWhileUnsubscribe = 0;
+    int user1Task2FiredWhileUnsubscribe = 0;
 };
 
 TEST_F(SchedulerIntegrationTest, TwoUsersScheduleTasks)
@@ -205,8 +268,10 @@ TEST_F(SchedulerIntegrationTest, TwoUsersTasks_OneUnsubscribed_AfterRestart_TwoU
 {
     whenTwoUsersScheduleTwoTasksEach();
     andWhenSchedulerWorksForSomeTime();
+    thenTasksShouldFireMultipleTimesForBothUsers();
 
     andWhenFirstUsersUnsubscribes();
+    andWhenSchedulerWorksForSomeTime();
     andWhenSchedulerWorksForSomeTime();
     thenFirstUserShouldNotReceiveTimerEventsAnyLonger();
 

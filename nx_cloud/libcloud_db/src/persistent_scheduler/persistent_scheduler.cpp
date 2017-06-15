@@ -188,18 +188,18 @@ void PersistentScheduler::timerFunction(
     }
 
     m_sqlExecutor->executeUpdate(
-        [this, receiver, &params, &functorId, &taskId](nx::db::QueryContext* queryContext)
-    {
-        return receiver->persistentTimerFired(taskId, params)(queryContext);
-    },
-        [this](nx::db::QueryContext*, nx::db::DBResult result)
-    {
-        if (result != nx::db::DBResult::ok)
+        [this, receiver, params, &functorId, &taskId](nx::db::QueryContext* queryContext)
         {
-            NX_LOG(lit("[Scheduler] Use on timer callback returned error %1")
-                   .arg(toString(result)), cl_logERROR);
-        }
-    });
+            return receiver->persistentTimerFired(taskId, params)(queryContext);
+        },
+        [this](nx::db::QueryContext*, nx::db::DBResult result)
+        {
+            if (result != nx::db::DBResult::ok)
+            {
+                NX_LOG(lit("[Scheduler] Use on timer callback returned error %1")
+                       .arg(toString(result)), cl_logERROR);
+            }
+        });
 }
 
 void PersistentScheduler::start()
