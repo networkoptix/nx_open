@@ -11,6 +11,14 @@ struct QnBusinessActionParameters
 {
     QnBusinessActionParameters();
 
+    /**
+      * Shows if action should be confirmed by user. Currently used for bookmarks confirmation
+      */
+    bool needConfirmation = false;
+
+    QnBusiness::ActionType targetActionType = QnBusiness::UndefinedAction;
+
+
     /** Additional parameter for event log convenience. Does not filled when the action really occurs. */
     QnUuid actionResourceId;
 
@@ -19,6 +27,9 @@ struct QnBusinessActionParameters
 
     // Email
     QString emailAddress;
+
+    // Popups and System Health
+    QnBusiness::UserGroup userGroup;
 
     // Recording
     int fps;
@@ -68,8 +79,10 @@ struct QnBusinessActionParameters
     bool isDefault() const;
 };
 
-#define QnBusinessActionParameters_Fields (actionResourceId)(url)(emailAddress)(fps)(streamQuality)(recordAfter)\
-    (relayOutputId)(sayText)(tags)(text)(durationMs)(additionalResources)(forced)(presetId)(useSource)(recordBeforeMs)(playToClient)(contentType)
+#define QnBusinessActionParameters_Fields (targetActionType)(needConfirmation)(actionResourceId)(url)\
+    (emailAddress)(userGroup)(fps)(streamQuality)(recordAfter)\
+    (relayOutputId)(sayText)(tags)(text)(durationMs)(additionalResources)\
+    (forced)(presetId)(useSource)(recordBeforeMs)(playToClient)(contentType)
 
 /* Backward compatibility is not really important here as this class is not stored in the DB. */
 QN_FUSION_DECLARE_FUNCTIONS(QnBusinessActionParameters, (ubjson)(json)(eq)(xml)(csv_record));

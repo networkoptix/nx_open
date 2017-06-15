@@ -54,10 +54,13 @@
 #include <utils/common/scoped_painter_rollback.h>
 #include <utils/common/util.h> /* For random. */
 #include <utils/math/color_transformations.h>
+#include <utils/camera/bookmark_helpers.h>
 #include <nx/client/desktop/utils/server_notification_cache.h>
 #include <utils/multi_image_provider.h>
 
 #include <nx/fusion/model_functions.h>
+#include <camera/camera_bookmarks_manager.h>
+#include <core/resource/security_cam_resource.h>
 
 using namespace nx::client::desktop;
 using namespace nx::client::desktop::ui;
@@ -137,7 +140,6 @@ QnNotificationsCollectionWidget::QnNotificationsCollectionWidget(QGraphicsItem* 
     connect(handler,    &QnWorkbenchNotificationsHandler::systemHealthEventRemoved, this,   &QnNotificationsCollectionWidget::hideSystemHealthMessage);
     connect(handler,    &QnWorkbenchNotificationsHandler::cleared,                  this,   &QnNotificationsCollectionWidget::hideAll);
 
-    using namespace nx::client::desktop;
     connect(this->context()->instance<ServerNotificationCache>(),
         &ServerNotificationCache::fileDownloaded,
         this,
@@ -233,6 +235,48 @@ void QnNotificationsCollectionWidget::loadThumbnailForItem(
     item->setImageProvider(new QnMultiImageProvider(std::move(providers), Qt::Vertical, kMultiThumbnailSpacing, item));
 }
 
+void QnNotificationsCollectionWidget::handleShowPopupAction(
+    const QnAbstractBusinessActionPtr& businessAction,
+    QnNotificationWidget* widget)
+{
+    const auto params = businessAction->getParams();
+    if (params.targetActionType == QnBusiness::UndefinedAction)
+        return;
+
+    if (params.targetActionType != QnBusiness::BookmarkAction)
+        return;
+
+    QnCameraBookmarkList bookmarks;
+    for (const auto& resourceId: businessAction->getResources())
+    {
+        const auto camera = resourcePool()->getResourceById<QnSecurityCamResource>(resourceId);
+        if (!camera)
+        {
+            NX_EXPECT(false, "Invalid camera resource");
+            continue;
+        }
+
+        const auto bookmark = helpers::bookmarkFromAction(businessAction, camera, commonModule());
+        if (!bookmark.isValid())
+        {
+            NX_EXPECT(false, "Invalid bookmark");
+            continue;
+        }
+
+        bookmarks.append(bookmark);
+    }
+
+    if (bookmarks.isEmpty())
+        return;
+
+    widget->addTextButton(qnSkin->icon("buttons/bookmark.png"), tr("Bookmark it"),
+        [bookmarks]()
+        {
+            for (const auto bookmark: bookmarks)
+                qnCameraBookmarksManager->addCameraBookmark(bookmark);
+        });
+}
+
 void QnNotificationsCollectionWidget::showBusinessAction(const QnAbstractBusinessActionPtr& businessAction)
 {
     if (m_list->itemCount() >= kMaxNotificationItems)
@@ -316,13 +360,21 @@ void QnNotificationsCollectionWidget::showBusinessAction(const QnAbstractBusines
     item->setProperty(kItemTimeStampPropertyName,  timestampMs);
     setHelpTopic(item, QnBusiness::eventHelpId(eventType));
 
-    if (businessAction->actionType() == QnBusiness::PlaySoundAction)
+    switch (businessAction->actionType())
     {
-        QString soundUrl = businessAction->getParams().url;
-        m_itemsByLoadingSound.insert(soundUrl, item);
-        context()->instance<ServerNotificationCache>()->downloadFile(soundUrl);
-    }
-
+        case QnBusiness::PlaySoundAction:
+        {
+            QString soundUrl = businessAction->getParams().url;
+            m_itemsByLoadingSound.insert(soundUrl, item);
+            context()->instance<ServerNotificationCache>()->downloadFile(soundUrl);
+            break;
+        }
+        case QnBusiness::ShowPopupAction:
+            handleShowPopupAction(businessAction, item);
+            break;
+        default:
+            break;
+    };
     QIcon icon = iconForAction(businessAction);
 
     if (businessAction->actionType() == QnBusiness::ShowOnAlarmLayoutAction)
@@ -429,6 +481,7 @@ void QnNotificationsCollectionWidget::showBusinessAction(const QnAbstractBusines
                 break;
         }
     }
+
 
     m_itemsByBusinessRuleId.insert(ruleId, item);
 
