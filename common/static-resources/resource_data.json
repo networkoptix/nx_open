@@ -1871,20 +1871,18 @@
                     },
                     "y": {
                         "extrapolationMode": "ConstantExtrapolation",
-                        "_TODO": "Actual tilt range is [0, -180].",
                         "device":  [1,   -1],
-                        "logical": [0,   -90]
+                        "logical": [90,   -30]
                     },
                     "z": {
                         "extrapolationMode": "ConstantExtrapolation",
                         "device":  [0, 0.10, 0.20 , 0.30 , 0.40 , 0.50 , 0.60 , 0.70, 0.80, 0.90, 1],
                         "logical": [1, 1.35, 1.82 , 2.46 , 3.31 , 4.47 , 6.034 , 8.14, 10.99, 14.9 , 20],
-                        "logicalMultiplier": 58.0,
+                        "logicalMultiplier": 32.0,
                         "space": "35MmEquiv"
                     }
                 }
-            },
-            "onvifPtzDigitsAfterDecimalPoint": 3
+            }
         }
     ]
 }
