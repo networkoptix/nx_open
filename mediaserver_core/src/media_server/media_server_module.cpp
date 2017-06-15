@@ -35,6 +35,8 @@
 #include <common/static_common_module.h>
 #include <utils/common/app_info.h>
 #include <nx/mediaserver/unused_wallpapers_watcher.h>
+
+#include <nx/core/access/access_types.h>
 #include <core/resource_management/resource_pool.h>
 
 #include <nx/vms/common/p2p/downloader/downloader.h>
@@ -118,7 +120,7 @@ QnMediaServerModule::QnMediaServerModule(
 
     store(new QnServerPtzControllerPool(commonModule()));
 
-    store(new QnStorageDbPool(commonModule()));
+    store(new QnStorageDbPool(commonModule()->moduleGUID()));
 
     m_streamingChunkCache = store(new StreamingChunkCache(commonModule()));
 

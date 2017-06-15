@@ -2,6 +2,7 @@
 
 #include "platform/platform_abstraction.h"
 #include "nx/utils/thread/long_runnable.h"
+#include <nx/core/access/access_types.h>
 #include "core/resource_management/resource_pool.h"
 #include <plugins/storage/file_storage/file_storage_resource.h>
 #include <common/common_module.h>
