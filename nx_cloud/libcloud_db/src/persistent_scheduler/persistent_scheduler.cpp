@@ -8,18 +8,19 @@ namespace cdb {
 
 namespace {
 
-static std::chrono::steady_clock::time_point timePointFromTimeout(std::chrono::milliseconds timeout)
+static std::chrono::milliseconds calcDelay(const ScheduleTaskInfo& taskInfo)
 {
-    return std::chrono::steady_clock::now() + timeout;
-}
+    using namespace std::chrono;
 
-static std::chrono::milliseconds timeoutFromTimepoint(std::chrono::steady_clock::time_point timepoint)
-{
-    auto now = std::chrono::steady_clock::now();
-    return now >= timepoint
-        ? std::chrono::milliseconds(1)
-        : std::chrono::duration_cast<std::chrono::milliseconds>(
-                timepoint - std::chrono::steady_clock::now());
+    auto nowTimePoint = steady_clock::now();
+    qint64 durationFromSchedulePointToNowMs = duration_cast<milliseconds>(nowTimePoint - taskInfo.schedulePoint).count();
+    qint64 periodMs = taskInfo.period.count();
+    qint64 durationFromSchedulePointToNextFirePointMs = (durationFromSchedulePointToNowMs / periodMs + 1) * periodMs;
+
+    return std::chrono::milliseconds(
+        durationFromSchedulePointToNextFirePointMs
+            + duration_cast<milliseconds>(taskInfo.schedulePoint.time_since_epoch()).count()
+            - duration_cast<milliseconds>(nowTimePoint.time_since_epoch()).count());
 }
 
 }
@@ -74,7 +75,7 @@ nx::db::DBResult PersistentScheduler::subscribe(
 {
     return subscribe(
         queryContext, functorId, outTaskId,
-        { params, timePointFromTimeout(period), period });
+        { params, period, std::chrono::steady_clock::now() });
 }
 
 nx::db::DBResult PersistentScheduler::subscribe(
@@ -153,8 +154,8 @@ void PersistentScheduler::addTimer(
         timerId = m_timerManager->addNonStopTimer(
             [this, functorId, taskId, params = taskInfo.params](nx::utils::TimerId)
             { timerFunction(functorId, taskId, params); },
-            timeoutFromTimepoint(taskInfo.fireTimePoint),
-            taskInfo.period);
+            taskInfo.period,
+            calcDelay(taskInfo));
     }
 
     QnMutexLocker lock2(&m_mutex);

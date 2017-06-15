@@ -11,7 +11,7 @@ R"sql(
 CREATE TABLE schedule_data(
     functor_type_id     VARCHAR(64) NOT NULL,
     task_id             VARCHAR(64) NOT NULL,
-    fire_point          BIGINT,
+    schedule_point      BIGINT,
     period              BIGINT,
     param_key           VARCHAR(255) NOT NULL,
     param_value         VARCHAR(255) NOT NULL
@@ -47,15 +47,15 @@ nx::db::DBResult SchedulerDbHelper::getScheduleData(
     {
         QnUuid functorId = QnUuid::fromRfc4122(scheduleDataQuery.value(0).toByteArray());
         QnUuid taskId = QnUuid::fromRfc4122(scheduleDataQuery.value(1).toByteArray());
-        qint64 firePointMs = scheduleDataQuery.value(2).toLongLong();
+        qint64 schedulePointMs = scheduleDataQuery.value(2).toLongLong();
         qint64 periodMs = scheduleDataQuery.value(3).toLongLong();
         QString paramKey = scheduleDataQuery.value(4).toString();
         QString paramValue = scheduleDataQuery.value(5).toString();
 
         scheduleData->functorToTasks[functorId].emplace(taskId);
         scheduleData->taskToParams[taskId].params.emplace(paramKey.toStdString(), paramValue.toStdString());
-        scheduleData->taskToParams[taskId].fireTimePoint =
-            std::chrono::steady_clock::time_point() + std::chrono::milliseconds(firePointMs);
+        scheduleData->taskToParams[taskId].schedulePoint =
+                std::chrono::steady_clock::time_point() + std::chrono::milliseconds(schedulePointMs);
         scheduleData->taskToParams[taskId].period = std::chrono::milliseconds(periodMs);
     }
 
@@ -70,8 +70,8 @@ nx::db::DBResult SchedulerDbHelper::subscribe(
 {
     QSqlQuery subscribeQuery(*queryContext->connection());
     subscribeQuery.prepare(R"sql(
-        INSERT INTO schedule_data(functor_type_id, task_id, fire_point, period, param_key, param_value)
-        VALUES(:functorId, :taskId, :firePoint, :period, :paramKey, :paramValue)
+        INSERT INTO schedule_data(functor_type_id, task_id, schedule_point, period, param_key, param_value)
+        VALUES(:functorId, :taskId, :schedulePoint, :period, :paramKey, :paramValue)
     )sql");
 
     *outTaskId = QnUuid::createUuid();
@@ -81,9 +81,10 @@ nx::db::DBResult SchedulerDbHelper::subscribe(
         subscribeQuery.bindValue(":functorId", functorId.toRfc4122());
         subscribeQuery.bindValue(":taskId", outTaskId->toRfc4122());
         subscribeQuery.bindValue(
-            ":firePoint",
+            ":schedulePoint",
             (qint64)std::chrono::duration_cast<std::chrono::milliseconds>(
-                taskInfo.fireTimePoint.time_since_epoch()).count());
+                taskInfo.schedulePoint.time_since_epoch()).count());
+
         subscribeQuery.bindValue(":period", (qint64)taskInfo.period.count());
         subscribeQuery.bindValue(":paramKey", QString::fromStdString(param.first));
         subscribeQuery.bindValue(":paramValue", QString::fromStdString(param.second));

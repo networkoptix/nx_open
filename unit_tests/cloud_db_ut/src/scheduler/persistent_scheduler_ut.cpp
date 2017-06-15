@@ -93,7 +93,7 @@ protected:
 
         taskInfo.params["key1"] = "dbValue1";
         taskInfo.params["key2"] = "dbValue2";
-        taskInfo.fireTimePoint = std::chrono::steady_clock::now() + kDbTaskPeriod;
+        taskInfo.schedulePoint = std::chrono::steady_clock::now();
         taskInfo.period = kDbTaskPeriod;
 
         auto taskId = QnUuid::createUuid();

@@ -13,8 +13,8 @@ using ScheduleParams = std::unordered_map<std::string, std::string>;
 struct ScheduleTaskInfo
 {
     ScheduleParams params;
-    std::chrono::steady_clock::time_point fireTimePoint;
     std::chrono::milliseconds period;
+    std::chrono::steady_clock::time_point schedulePoint;
 };
 
 using TaskToParams = std::unordered_map<QnUuid, ScheduleTaskInfo>;
