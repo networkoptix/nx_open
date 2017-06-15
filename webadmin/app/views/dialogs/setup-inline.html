@@ -34,7 +34,7 @@
         <p>Please configure the server first.<br>
             Choose an option.</p>
         <div class="spacer" ng-if="!settings.liteClient"><br><br><br></div>
-        <button class="btn btn-primary" ng-click="next()">Setup New System</button>
+        <button class="btn btn-primary" autofocus ng-click="next()">Setup New System</button>
 
         <div class="horisontal-line-text">
             <span class="line"></span>
@@ -488,11 +488,11 @@
     <button class="btn btn-primary pull-right"
             ng-if="activeStep.next"
             ng-disabled="lockNextButton"
-            enter-button auto-focus
+            auto-focus
             ng-click="next()">Next <span class="glyphicon glyphicon-arrow-right"></span></button>
     <button class="btn btn-primary pull-right"
             ng-if="activeStep.finish"
             ng-disabled="lockNextButton"
-            enter-button auto-focus
+            auto-focus
             ng-click="finish()">Finish</button>
 </div>

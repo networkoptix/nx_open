@@ -1,5 +1,4 @@
-#ifndef PLAY_SOUND_BUSINESS_ACTION_WIDGET_H
-#define PLAY_SOUND_BUSINESS_ACTION_WIDGET_H
+#pragma once
 
 #include <QtWidgets/QWidget>
 
@@ -7,19 +6,21 @@
 #include <ui/workbench/workbench_context_aware.h>
 
 namespace Ui {
-    class PlaySoundBusinessActionWidget;
-}
+class PlaySoundBusinessActionWidget;
+} // namespace Ui
 
-class QnPlaySoundBusinessActionWidget : public QnAbstractBusinessParamsWidget, public QnWorkbenchContextAware
+class QnPlaySoundBusinessActionWidget:
+    public QnAbstractBusinessParamsWidget,
+    public QnWorkbenchContextAware
 {
     Q_OBJECT
-    typedef QnAbstractBusinessParamsWidget base_type;
+    using base_type = QnAbstractBusinessParamsWidget;
 
 public:
-    explicit QnPlaySoundBusinessActionWidget(QWidget *parent = 0);
-    ~QnPlaySoundBusinessActionWidget();
+    explicit QnPlaySoundBusinessActionWidget(QWidget* parent = nullptr);
+    virtual ~QnPlaySoundBusinessActionWidget() override;
 
-    virtual void updateTabOrder(QWidget *before, QWidget *after) override;
+    virtual void updateTabOrder(QWidget* before, QWidget* after) override;
 
 protected slots:
     virtual void at_model_dataChanged(QnBusiness::Fields fields) override;
@@ -31,13 +32,10 @@ private slots:
 
     void at_testButton_clicked();
     void at_manageButton_clicked();
-    void at_soundModel_itemChanged(const QString &filename);
+    void at_soundModel_itemChanged(const QString& filename);
     void at_volumeSlider_valueChanged(int value);
 
 private:
     QScopedPointer<Ui::PlaySoundBusinessActionWidget> ui;
-
     QString m_filename;
 };
-
-#endif // PLAY_SOUND_BUSINESS_ACTION_WIDGET_H

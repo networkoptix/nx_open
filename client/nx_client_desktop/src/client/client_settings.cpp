@@ -26,6 +26,8 @@
 
 #include <nx/utils/file_system.h>
 
+#include <client_core/client_core_settings.h>
+
 namespace
 {
 static const QString kXorKey = lit("ItIsAGoodDayToDie");
@@ -108,6 +110,8 @@ QnClientSettings::QnClientSettings(bool forceLocalSettings, QObject *parent):
 
     /* Load from settings. */
     load();
+
+    migrateKnownServerConnections();
 
     nx::utils::file_system::ensureDir(mediaFolder());
 
@@ -311,6 +315,18 @@ QnPropertyStorage::UpdateStatus QnClientSettings::updateValue(int id, const QVar
         writeValueToSettings(m_settings, id, this->value(id));
 
     return status;
+}
+
+void QnClientSettings::migrateKnownServerConnections()
+{
+    const auto knownUrls = knownServerUrls();
+    if (knownUrls.isEmpty())
+        return;
+
+    qnClientCoreSettings->setKnownServerUrls(knownUrls);
+    qnClientCoreSettings->migrateKnownServerConnections();
+
+    setKnownServerUrls(QList<QUrl>());
 }
 
 void QnClientSettings::load()

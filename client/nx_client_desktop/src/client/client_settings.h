@@ -230,6 +230,8 @@ private:
         QN_DECLARE_RW_PROPERTY(int,                         timelapseSpeed,         setTimelapseSpeed,          TIMELAPSE_SPEED,            10)
     QN_END_PROPERTY_STORAGE()
 
+    void migrateKnownServerConnections();
+
 private:
     QSettings *m_settings;
     bool m_loading;

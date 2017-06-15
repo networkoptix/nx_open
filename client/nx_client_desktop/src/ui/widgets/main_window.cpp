@@ -92,7 +92,6 @@
 #include <client/client_settings.h>
 #include <client/client_runtime_settings.h>
 #include <client/client_message_processor.h>
-#include <watchers/server_address_watcher.h>
 
 #include <utils/common/scoped_value_rollback.h>
 #include <utils/screen_manager.h>
@@ -252,14 +251,6 @@ MainWindow::MainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::WindowF
     context->instance<QnWorkbenchLayoutAspectRatioWatcher>();
     context->instance<QnWorkbenchPtzDialogWatcher>();
 
-    const auto getter = []() { return qnSettings->knownServerUrls(); };
-    const auto setter =
-        [](const QnServerAddressWatcher::UrlsList& values)
-        {
-            qnSettings->setKnownServerUrls(values);
-            qnSettings->save();
-        };
-    context->instance<QnServerAddressWatcher>()->setAccessors(getter, setter);
     context->instance<QnWorkbenchResourcesChangesWatcher>();
     context->instance<QnWorkbenchServerSafemodeWatcher>();
     context->instance<QnWorkbenchBookmarkTagsWatcher>();

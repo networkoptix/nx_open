@@ -2316,6 +2316,7 @@ bool QnTimeSlider::eventFilter(QObject* target, QEvent* event)
         {
         case QEvent::GraphicsSceneMousePress:
             m_dragDelta = toolTipItem()->tailPos() - static_cast<QGraphicsSceneMouseEvent*>(event)->pos();
+            m_dragMarker = DragMarker;
             dragProcessor()->mousePressEvent(toolTipItem(), static_cast<QGraphicsSceneMouseEvent*>(event), true);
             return true;
 
@@ -3220,6 +3221,8 @@ void QnTimeSlider::mousePressEvent(QGraphicsSceneMouseEvent* event)
             if (canSelect && m_dragMarker == NoMarker && !extendSelectionRequested)
                 m_dragMarker = CreateSelectionMarker;
             immediateDrag = (m_dragMarker == NoMarker) && !extendSelectionRequested;
+            if (m_dragMarker == NoMarker)
+                m_dragMarker = DragMarker; //TODO: #vkutin #3.2 Simplify all this logic!
             break;
 
         case Qt::RightButton:
