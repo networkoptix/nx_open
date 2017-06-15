@@ -8,12 +8,14 @@
 /** Abstract base class for access providers containing common code.
  *  Thread-safety is achieved by using only signal-slot system with auto-connections.
  */
-class QnBaseResourceAccessProvider: public QnAbstractResourceAccessProvider, public QnCommonModuleAware
+class QnBaseResourceAccessProvider:
+    public QnAbstractResourceAccessProvider,
+    public QnCommonModuleAware
 {
     using base_type = QnAbstractResourceAccessProvider;
 
 public:
-    QnBaseResourceAccessProvider(QObject* parent = nullptr);
+    QnBaseResourceAccessProvider(Mode mode, QObject* parent = nullptr);
     virtual ~QnBaseResourceAccessProvider();
 
     virtual bool hasAccess(const QnResourceAccessSubject& subject,

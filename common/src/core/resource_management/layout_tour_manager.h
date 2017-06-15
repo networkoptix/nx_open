@@ -17,6 +17,7 @@ public:
     void resetTours(const ec2::ApiLayoutTourDataList& tours = ec2::ApiLayoutTourDataList());
 
     ec2::ApiLayoutTourData tour(const QnUuid& id) const;
+    ec2::ApiLayoutTourDataList tours(const QList<QnUuid>& ids) const;
 
     void addOrUpdateTour(const ec2::ApiLayoutTourData& tour);
     void removeTour(const QnUuid& tourId);

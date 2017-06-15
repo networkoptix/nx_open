@@ -59,6 +59,10 @@ private:
     void showSystemHealthMessage(QnSystemHealth::MessageType message, const QVariant& params);
     void hideSystemHealthMessage(QnSystemHealth::MessageType message, const QVariant& params);
     void showBusinessAction(const QnAbstractBusinessActionPtr& businessAction);
+    void handleShowPopupAction(
+        const QnAbstractBusinessActionPtr& businessAction,
+        QnNotificationWidget* widget);
+
     void hideBusinessAction(const QnAbstractBusinessActionPtr& businessAction);
     void hideAll();
     void updateBlinker();

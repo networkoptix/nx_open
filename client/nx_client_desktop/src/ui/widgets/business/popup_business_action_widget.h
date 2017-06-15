@@ -1,34 +1,30 @@
-#ifndef POPUP_BUSINESS_ACTION_WIDGET_H
-#define POPUP_BUSINESS_ACTION_WIDGET_H
+#pragma once
 
-#include <QtWidgets/QWidget>
+#include <QtCore/QScopedPointer>
 
-#include <ui/widgets/business/abstract_business_params_widget.h>
+#include <ui/widgets/business/subject_target_action_widget.h>
 #include <ui/workbench/workbench_context_aware.h>
 
 namespace Ui {
-    class PopupBusinessActionWidget;
-}
+class PopupBusinessActionWidget;
+} // namespace Ui
 
-class QnPopupBusinessActionWidget : public QnAbstractBusinessParamsWidget, public QnWorkbenchContextAware
+class QnPopupBusinessActionWidget:
+    public QnSubjectTargetActionWidget,
+    public QnWorkbenchContextAware
 {
     Q_OBJECT
-    typedef QnAbstractBusinessParamsWidget base_type;
+    using base_type = QnSubjectTargetActionWidget;
 
 public:
-    explicit QnPopupBusinessActionWidget(QWidget *parent = 0);
-    ~QnPopupBusinessActionWidget();
+    explicit QnPopupBusinessActionWidget(QWidget* parent = nullptr);
+    virtual ~QnPopupBusinessActionWidget() override;
 
-    virtual void updateTabOrder(QWidget *before, QWidget *after) override;
+    virtual void updateTabOrder(QWidget* before, QWidget* after) override;
 
-protected slots:
-    virtual void at_model_dataChanged(QnBusiness::Fields fields) override;
 private slots:
-    void paramsChanged();
     void at_settingsButton_clicked();
 
 private:
     QScopedPointer<Ui::PopupBusinessActionWidget> ui;
 };
-
-#endif // POPUP_BUSINESS_ACTION_WIDGET_H

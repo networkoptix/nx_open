@@ -31,6 +31,7 @@ nx_add_target(nx_client_desktop LIBRARY
         ${mac_sources}
     ADDITIONAL_RESOURCES
         "${customization_dir}/nx_client_desktop/resources"
+        "${customization_dir}/icons/all/logo.png"
         "${CMAKE_CURRENT_BINARY_DIR}/globals.json"
     OTHER_SOURCES
         ${QML_FILES}

@@ -2,6 +2,7 @@
 
 #include <nx/utils/log/log.h>
 
+#include <nx/core/access/access_types.h>
 #include <common/common_module.h>
 #include <common/common_globals.h>
 #include <common/static_common_module.h>
@@ -412,7 +413,7 @@ private:
 
 private:
     QnStaticCommonModule m_staticCommon;
-    std::unique_ptr<QnCommonModule> m_module{new QnCommonModule(true)};
+    std::unique_ptr<QnCommonModule> m_module{new QnCommonModule(false, nx::core::access::Mode::direct)};
 
     QnSharedResourcePointer<MockServer> m_server{new MockServer(m_module.get())};
 
@@ -444,7 +445,7 @@ protected:
     {
         m_staticCommon.reset(new QnStaticCommonModule());
         // Init singletons.
-        m_common.reset(new QnCommonModule(true));
+        m_common.reset(new QnCommonModule(false, nx::core::access::Mode::direct));
         m_common->setModuleGUID(QnUuid::createUuid());
         m_common->store(new QnFfmpegInitializer());
 

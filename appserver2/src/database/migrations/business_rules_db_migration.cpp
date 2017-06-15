@@ -5,6 +5,8 @@
 #include <QtSql/QSqlDatabase>
 #include <QtSql/QSqlQuery>
 
+#include <core/resource_management/user_roles_manager.h>
+
 #include <business/business_fwd.h>
 
 #include <utils/db/db_helper.h>
@@ -117,9 +119,23 @@ struct CameraOutputParametersV30
 };
 #define CameraOutputParametersV30_Fields (relayOutputId)(durationMs)
 
+struct ShowPopupParametersV30
+{
+    QnBusiness::UserGroup userGroup;
+};
+#define ShowPopupParametersV30_Fields (userGroup)
+
+struct ShowPopupParametersV31Alpha
+{
+    std::vector<QnUuid> additionalResources;
+};
+#define ShowPopupParametersV31Alpha_Fields (additionalResources)
+
 #define MIGRATION_ACTION_PARAM_TYPES \
     (CameraOutputParametersV23)\
     (CameraOutputParametersV30)\
+    (ShowPopupParametersV30)\
+    (ShowPopupParametersV31Alpha)\
 
 QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(MIGRATION_ACTION_PARAM_TYPES, (json))
 
@@ -208,6 +224,49 @@ bool migrateBusinessRulesToV30(const QSqlDatabase& database)
         {
             if (!doRemap(database, data.id, QnBusiness::CameraOutputAction, "action_type"))
                 return false;
+        }
+
+        if (!doRemap(database, data.id, QJson::serialized(newParams), "action_params"))
+            return false;
+    }
+
+    return true;
+}
+
+bool migrateBusinessRulesToV31Alpha(const QSqlDatabase& database)
+{
+    QSqlQuery query(database);
+    query.setForwardOnly(true);
+    QString sqlText = R"(
+        SELECT id, action_type, action_params
+        FROM vms_businessrule
+        WHERE action_type = ?
+    )";
+    if (!QnDbHelper::prepareSQLQuery(&query, sqlText, Q_FUNC_INFO))
+        return false;
+
+    /* Updating duration field. */
+    query.addBindValue(QnBusiness::ShowPopupAction);
+    if (!QnDbHelper::execSQLQuery(&query, Q_FUNC_INFO))
+        return false;
+
+    QVector<BusinessRuleRemapData> oldData;
+    while (query.next())
+    {
+        BusinessRuleRemapData data;
+        data.id = query.value("id").toInt();
+        data.actionParams = query.value("action_params").toByteArray();
+        oldData << data;
+    }
+
+    for (const BusinessRuleRemapData& data: oldData)
+    {
+        auto oldParams = QJson::deserialized<ShowPopupParametersV30>(data.actionParams);
+        ShowPopupParametersV31Alpha newParams;
+        if (oldParams.userGroup == QnBusiness::AdminOnly)
+        {
+            newParams.additionalResources =
+                QnUserRolesManager::adminRoleIds().toVector().toStdVector();
         }
 
         if (!doRemap(database, data.id, QJson::serialized(newParams), "action_params"))

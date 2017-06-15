@@ -1,6 +1,14 @@
 #include "user_roles_manager.h"
 
+#include <set>
+#include <vector>
+
+#include <QtCore/QVector>
+#include <QtCore/QList>
+#include <QtCore/QSet>
+
 #include <core/resource/user_resource.h>
+#include <core/resource_management/resource_pool.h>
 
 namespace Qn {
 
@@ -31,6 +39,32 @@ QnUserRolesManager::QnUserRolesManager(QObject* parent):
 QnUserRolesManager::~QnUserRolesManager()
 {
 }
+
+template<class IDList>
+void QnUserRolesManager::usersAndRoles(const IDList& ids, QnUserResourceList& users, QList<QnUuid>& roles)
+{
+    users = resourcePool()->getResources<QnUserResource>(ids);
+
+    QnMutexLocker lk(&m_mutex);
+    roles.clear();
+    for (const auto& id: ids)
+    {
+        if (isValidRoleId(id))
+            roles << id;
+    }
+}
+
+// Instantiations for std::vector, std::set, QVector, QList and QSet:
+template void QnUserRolesManager::usersAndRoles(
+    const std::vector<QnUuid>& ids, QnUserResourceList& users, QList<QnUuid>& roles);
+template void QnUserRolesManager::usersAndRoles(
+    const std::set<QnUuid>& ids, QnUserResourceList& users, QList<QnUuid>& roles);
+template void QnUserRolesManager::usersAndRoles(
+    const QVector<QnUuid>& ids, QnUserResourceList& users, QList<QnUuid>& roles);
+template void QnUserRolesManager::usersAndRoles(
+    const QList<QnUuid>& ids, QnUserResourceList& users, QList<QnUuid>& roles);
+template void QnUserRolesManager::usersAndRoles(
+    const QSet<QnUuid>& ids, QnUserResourceList& users, QList<QnUuid>& roles);
 
 ec2::ApiUserRoleDataList QnUserRolesManager::userRoles() const
 {
@@ -83,6 +117,17 @@ ec2::ApiUserRoleData QnUserRolesManager::userRole(const QnUuid& id) const
 {
     QnMutexLocker lk(&m_mutex);
     return m_roles.value(id);
+}
+
+QnUuid QnUserRolesManager::unifiedUserRoleId(const QnUserResourcePtr& user)
+{
+    if (!user)
+        return QnUuid();
+
+    const auto userRole = user->userRole();
+    return userRole == Qn::UserRole::CustomUserRole
+        ? user->userRoleId()
+        : predefinedRoleId(userRole);
 }
 
 void QnUserRolesManager::addOrUpdateUserRole(const ec2::ApiUserRoleData& role)
@@ -140,6 +185,15 @@ QnUuid QnUserRolesManager::predefinedRoleId(Qn::UserRole userRole)
         }();
 
     return predefinedRoleIds[userRole];
+}
+
+const QList<QnUuid>& QnUserRolesManager::adminRoleIds()
+{
+    static const QList<QnUuid> kAdminRoleIds {
+        predefinedRoleId(Qn::UserRole::Owner),
+        predefinedRoleId(Qn::UserRole::Administrator) };
+
+    return kAdminRoleIds;
 }
 
 Qn::UserRole QnUserRolesManager::predefinedRole(const QnUuid& id)
@@ -271,3 +325,18 @@ ec2::ApiPredefinedRoleDataList QnUserRolesManager::getPredefinedRoles()
     return kPredefinedRoles;
 }
 
+// This function is not thread-safe and should be called under external mutex lock.
+bool QnUserRolesManager::isValidRoleId(const QnUuid& id) const
+{
+    switch (predefinedRole(id))
+    {
+        case Qn::UserRole::CustomUserRole:
+            return m_roles.contains(id); //< Existing custom role.
+
+        case Qn::UserRole::CustomPermissions:
+            return false; //< Null uuid.
+
+        default:
+            return true; //< Predefined role.
+    }
+}

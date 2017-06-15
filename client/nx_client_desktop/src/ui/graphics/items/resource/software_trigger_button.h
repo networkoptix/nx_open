@@ -50,6 +50,9 @@ public:
     virtual void paint(QPainter* painter, const QStyleOptionGraphicsItem* option,
         QWidget* widget) override;
 
+    bool isLive() const;
+    void setLive(bool value);
+
 protected:
     using base_type::setIcon;
 

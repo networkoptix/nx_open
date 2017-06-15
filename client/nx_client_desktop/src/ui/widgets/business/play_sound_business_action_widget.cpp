@@ -51,15 +51,23 @@ QnPlaySoundBusinessActionWidget::QnPlaySoundBusinessActionWidget(QWidget* parent
     connect(ui->volumeSlider, &QSlider::valueChanged,
         this, &QnPlaySoundBusinessActionWidget::at_volumeSlider_valueChanged);
 
-    connect(ui->playToClient, &QCheckBox::stateChanged,
-        this, &QnPlaySoundBusinessActionWidget::paramsChanged);
-
     connect(nx::audio::AudioDevice::instance(), &nx::audio::AudioDevice::volumeChanged, this,
         [this]
         {
             QScopedValueRollback<bool> updatingRollback(m_updating, true);
             ui->volumeSlider->setValue(qRound(nx::audio::AudioDevice::instance()->volume() * 100));
         });
+
+    connect(ui->playToClient, &QCheckBox::toggled, this,
+        [this](bool checked)
+        {
+            ui->selectUsersButton->setVisible(checked);
+            paramsChanged();
+        });
+
+    ui->playToClient->setFixedHeight(ui->selectUsersButton->minimumSizeHint().height());
+    ui->selectUsersButton->setVisible(ui->playToClient->isChecked());
+    setSubjectsButton(ui->selectUsersButton);
 
     setHelpTopic(this, Qn::EventsActions_PlaySound_Help);
 }
@@ -70,11 +78,13 @@ QnPlaySoundBusinessActionWidget::~QnPlaySoundBusinessActionWidget()
 
 void QnPlaySoundBusinessActionWidget::updateTabOrder(QWidget* before, QWidget* after)
 {
-    setTabOrder(before,                 ui->pathComboBox);
-    setTabOrder(ui->pathComboBox,       ui->manageButton);
-    setTabOrder(ui->manageButton,       ui->volumeSlider);
-    setTabOrder(ui->volumeSlider,       ui->testButton);
-    setTabOrder(ui->testButton, after);
+    setTabOrder(before,                ui->playToClient);
+    setTabOrder(ui->playToClient,      ui->selectUsersButton);
+    setTabOrder(ui->selectUsersButton, ui->pathComboBox);
+    setTabOrder(ui->pathComboBox,      ui->manageButton);
+    setTabOrder(ui->manageButton,      ui->volumeSlider);
+    setTabOrder(ui->volumeSlider,      ui->testButton);
+    setTabOrder(ui->testButton,         after);
 }
 
 void QnPlaySoundBusinessActionWidget::updateCurrentIndex()
@@ -90,6 +100,8 @@ void QnPlaySoundBusinessActionWidget::at_model_dataChanged(QnBusiness::Fields fi
 {
     if (!model())
         return;
+
+    base_type::at_model_dataChanged(fields);
 
     QScopedValueRollback<bool> updatingRollback(m_updating, true);
 
