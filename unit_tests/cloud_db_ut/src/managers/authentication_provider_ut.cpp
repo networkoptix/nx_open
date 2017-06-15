@@ -106,11 +106,11 @@ protected:
 
     void whenChangingAccountPassword()
     {
-        m_ownerAccount.password = nx::utils::generateRandomName(7);
+        m_ownerAccount.password = nx::utils::generateRandomName(7).toStdString();
         m_ownerAccount.passwordHa1 = nx_http::calcHa1(
             m_ownerAccount.email.c_str(),
             nx::network::AppInfo::realm().toStdString().c_str(),
-            m_ownerAccount.password.c_str());
+            m_ownerAccount.password.c_str()).toStdString();
 
         ASSERT_NO_THROW(
             m_authenticationProvider->afterUpdatingAccountPassword(

@@ -200,45 +200,45 @@ TYPED_TEST_CASE_P(DaoUserAuthentication);
 
 TYPED_TEST_P(DaoUserAuthentication, saved_user_auth_records_can_be_read_later)
 {
-    whenAddedAuthRecord();
-    thenAuthRecordCanBeRead();
+    this->whenAddedAuthRecord();
+    this->thenAuthRecordCanBeRead();
 }
 
 TYPED_TEST_P(DaoUserAuthentication, fetching_empty_auth_record_list)
 {
-    whenFetchedAuthRecords();
-    thenRecordListIsEmpty();
+    this->whenFetchedAuthRecords();
+    this->thenRecordListIsEmpty();
 }
 
 TYPED_TEST_P(DaoUserAuthentication, inserting_system_nonce)
 {
-    whenInsertedSystemNonce();
-    thenNonceCanBeFetched();
+    this->whenInsertedSystemNonce();
+    this->thenNonceCanBeFetched();
 }
 
 TYPED_TEST_P(DaoUserAuthentication, fetching_not_existing_nonce)
 {
-    whenFetchedSystemNonce();
-    thenNoNonceFound();
+    this->whenFetchedSystemNonce();
+    this->thenNoNonceFound();
 }
 
 TYPED_TEST_P(DaoUserAuthentication, replacing_system_nonce)
 {
-    whenReplacedExistingNonce();
-    thenNonceCanBeFetched();
+    this->whenReplacedExistingNonce();
+    this->thenNonceCanBeFetched();
 }
 
 TYPED_TEST_P(DaoUserAuthentication, fetching_every_system_of_an_account)
 {
-    givenAccountWithMultipleSystems();
-    thenEverySystemInformationCanBeSelected();
+    this->givenAccountWithMultipleSystems();
+    this->thenEverySystemInformationCanBeSelected();
 }
 
 TYPED_TEST_P(DaoUserAuthentication, deleting_every_auth_record_of_an_account)
 {
-    givenAccountWithMultipleSystems();
-    whenDeleteAllRecords();
-    thenAllRecordsHaveBeenDeleted();
+    this->givenAccountWithMultipleSystems();
+    this->whenDeleteAllRecords();
+    this->thenAllRecordsHaveBeenDeleted();
 }
 
 REGISTER_TYPED_TEST_CASE_P(DaoUserAuthentication,
