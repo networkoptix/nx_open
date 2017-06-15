@@ -5,11 +5,11 @@
 #include <fstream>
 #include <functional>
 #include <signal.h>
-#ifdef __linux__
-#include <signal.h>
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <unistd.h>
+#if defined(__linux__)
+    #include <signal.h>
+    #include <sys/types.h>
+    #include <sys/stat.h>
+    #include <unistd.h>
 #endif
 
 #include <qtsinglecoreapplication.h>
@@ -258,17 +258,16 @@
 #include <transaction/message_bus_selector.h>
 
 #if !defined(EDGE_SERVER)
-#include <nx_speech_synthesizer/text_to_wav.h>
-#include <nx/utils/file_system.h>
+    #include <nx_speech_synthesizer/text_to_wav.h>
+    #include <nx/utils/file_system.h>
 #endif
 
 #include <streaming/audio_streamer_pool.h>
 #include <proxy/2wayaudio/proxy_audio_receiver.h>
 
-#ifdef __arm__
-#include "nx1/info.h"
+#if defined(__arm__)
+    #include "nx1/info.h"
 #endif
-#include <config.h>
 
 // This constant is used while checking for compatibility.
 // Do not change it until you know what you're doing.
@@ -1778,7 +1777,9 @@ void MediaServerProcess::registerRestHandlers(
     processorPool->registerRedirectRule(lit("/static/"), welcomePage);
 
     auto reg =
-        [processorPool](const QString& path, QnRestRequestHandler* handler,
+        [this, processorPool](
+            const QString& path,
+            QnRestRequestHandler* handler,
             Qn::GlobalPermission permissions = Qn::NoGlobalPermissions)
         {
             processorPool->registerHandler(path, handler, permissions);
@@ -1873,7 +1874,6 @@ void MediaServerProcess::registerRestHandlers(
     #endif
 
     reg("ec2/runtimeInfo", new QnRuntimeInfoRestHandler());
-
 }
 
 template<class TcpConnectionProcessor>
@@ -1940,31 +1940,31 @@ bool MediaServerProcess::initTcpListener(
         nx_http::AuthMethod::tempUrlQueryParam);
     QnUniversalRequestProcessor::setUnauthorizedPageBody(
         QnFileConnectionProcessor::readStaticFile("static/login.html"), methods);
-    m_universalTcpListener->addHandler<QnRtspConnectionProcessor>("RTSP", "*");
-    m_universalTcpListener->addHandler<QnRestConnectionProcessor>("HTTP", "api");
-    m_universalTcpListener->addHandler<QnRestConnectionProcessor>("HTTP", "ec2");
-    m_universalTcpListener->addHandler<QnFileConnectionProcessor>("HTTP", "static");
-    m_universalTcpListener->addHandler<QnCrossdomainConnectionProcessor>("HTTP", "crossdomain.xml");
-    m_universalTcpListener->addHandler<QnProgressiveDownloadingConsumer>("HTTP", "media");
-    m_universalTcpListener->addHandler<QnIOMonitorConnectionProcessor>("HTTP", "api/iomonitor");
+    regTcp<QnRtspConnectionProcessor>("RTSP", "*");
+    regTcp<QnRestConnectionProcessor>("HTTP", "api");
+    regTcp<QnRestConnectionProcessor>("HTTP", "ec2");
+    regTcp<QnFileConnectionProcessor>("HTTP", "static");
+    regTcp<QnCrossdomainConnectionProcessor>("HTTP", "crossdomain.xml");
+    regTcp<QnProgressiveDownloadingConsumer>("HTTP", "media");
+    regTcp<QnIOMonitorConnectionProcessor>("HTTP", "api/iomonitor");
 
     nx_hls::QnHttpLiveStreamingProcessor::setMinPlayListSizeToStartStreaming(
         qnServerModule->roSettings()->value(
         nx_ms_conf::HLS_PLAYLIST_PRE_FILL_CHUNKS,
         nx_ms_conf::DEFAULT_HLS_PLAYLIST_PRE_FILL_CHUNKS).toInt());
-    m_universalTcpListener->addHandler<nx_hls::QnHttpLiveStreamingProcessor>("HTTP", "hls");
-    //m_universalTcpListener->addHandler<QnDefaultTcpConnectionProcessor>("HTTP", "*");
+    regTcp<nx_hls::QnHttpLiveStreamingProcessor>("HTTP", "hls");
+    //regTcp<QnDefaultTcpConnectionProcessor>("HTTP", "*");
 
-    m_universalTcpListener->addHandler<QnProxyConnectionProcessor>("*", "proxy", messageBus);
-    //m_universalTcpListener->addHandler<QnProxyReceiverConnection>("PROXY", "*");
-    m_universalTcpListener->addHandler<QnProxyReceiverConnection>("HTTP", "proxy-reverse");
-    m_universalTcpListener->addHandler<QnAudioProxyReceiver>("HTTP", "proxy-2wayaudio");
+    regTcp<QnProxyConnectionProcessor>("*", "proxy", messageBus);
+    //regTcp<QnProxyReceiverConnection>("PROXY", "*");
+    regTcp<QnProxyReceiverConnection>("HTTP", "proxy-reverse");
+    regTcp<QnAudioProxyReceiver>("HTTP", "proxy-2wayaudio");
 
     if( !qnServerModule->roSettings()->value("authenticationEnabled", "true").toBool())
         m_universalTcpListener->disableAuth();
 
     #if defined(ENABLE_DESKTOP_CAMERA)
-        m_universalTcpListener->addHandler<QnDesktopCameraRegistrator>("HTTP", "desktop_camera");
+        regTcp<QnDesktopCameraRegistrator>("HTTP", "desktop_camera");
     #endif
 
     return true;
@@ -2423,6 +2423,7 @@ void MediaServerProcess::run()
 
     if (m_serviceMode)
         serviceModeInit();
+
     updateAllowedInterfaces();
 
     if (!m_cmdLineArguments.enforceSocketType.isEmpty())
