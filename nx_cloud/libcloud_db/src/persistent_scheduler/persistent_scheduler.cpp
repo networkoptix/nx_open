@@ -178,11 +178,11 @@ void PersistentScheduler::timerFunction(
     {
         QnMutexLocker lock(&m_mutex);
         auto it = m_functorToReceiver.find(functorId);
-        NX_ASSERT(it != m_functorToReceiver.cend());
         if (it == m_functorToReceiver.cend())
         {
             NX_LOG(lit("[Scheduler] No receiver for functor id %1")
-                   .arg(functorId.toString()), cl_logERROR);
+                   .arg(functorId.toString()), cl_logDEBUG1);
+            return;
         }
         receiver = it->second;
     }

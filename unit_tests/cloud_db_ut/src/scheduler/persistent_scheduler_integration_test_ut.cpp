@@ -40,8 +40,12 @@ protected:
 
     void initDb()
     {
-        const auto dbPath = QDir(utils::TestOptions::temporaryDirectoryPath()).filePath("test_db.sqlite");
-        QFile::remove(dbPath);
+        if (dbPath.isEmpty())
+        {
+            dbPath = QDir(utils::TestOptions::temporaryDirectoryPath()).filePath("test_db.sqlite");
+            QFile::remove(dbPath);
+        }
+
         dbOptions.driverType = db::RdbmsDriverType::sqlite;
         dbOptions.dbName = dbPath;
 
@@ -52,7 +56,7 @@ protected:
         ASSERT_TRUE(dbHelper->initDb());
     }
 
-    void whenTwoUsersScheduleTwoTasksEach()
+    void whenTwoUsersInitializedAndRegistredToScheduler()
     {
         user1 = std::unique_ptr<SchedulerUser>(
             new SchedulerUser(
@@ -65,6 +69,11 @@ protected:
                 executor.get(),
                 scheduler.get(),
                 scheduleUser2FunctorId));
+    }
+
+    void whenTwoUsersScheduleTwoTasksEach()
+    {
+        whenTwoUsersInitializedAndRegistredToScheduler();
 
         user1->subscribe(kFirstUserFirstTaskTimeout);
         user1->subscribe(kFirstUserSecondTaskTimeout);
@@ -72,7 +81,46 @@ protected:
         user2->subscribe(kSecondUserSecondTaskTimeout);
     }
 
+    void andWhenSchedulerWorksForSomeTime(int timeoutMs)
+    {
+        std::this_thread::sleep_for(std::chrono::milliseconds(timeoutMs));
+    }
 
+    void andWhenSystemRestarts()
+    {
+        scheduler->stop();
+        user1.reset();
+        user2.reset();
+        scheduler.reset();
+        dbHelper.reset();
+        executor.reset();
+
+        SetUp();
+    }
+
+    void assertTasksFiredForUser(std::unique_ptr<SchedulerUser>& user)
+    {
+        auto userTasks = user->tasks();
+        ASSERT_EQ(userTasks.size(), 2);
+        for (const auto& task: userTasks)
+        {
+            ASSERT_GT(task.second.fired, 0);
+            ASSERT_TRUE(task.second.subscribed);
+        }
+    }
+
+    void thenTasksShouldFireMultipleTimesForBothUsers()
+    {
+        assertTasksFiredForUser(user1);
+        assertTasksFiredForUser(user2);
+    }
+
+    void thenSchedulerShouldBeIdleWithoutCrashes()
+    {
+        andWhenSchedulerWorksForSomeTime(1000);
+    }
+
+    QString dbPath;
     db::ConnectionOptions dbOptions;
     std::unique_ptr<db::AsyncSqlQueryExecutor> executor;
     std::unique_ptr<SchedulerDbHelper> dbHelper;
@@ -84,19 +132,19 @@ protected:
 TEST_F(SchedulerIntegrationTest, TwoUsersScheduleTasks)
 {
     whenTwoUsersScheduleTwoTasksEach();
-    std::this_thread::sleep_for(std::chrono::seconds(5));
-    //thenTasksShouldFireMultipleTimes();
+    andWhenSchedulerWorksForSomeTime(1000);
+    thenTasksShouldFireMultipleTimesForBothUsers();
 }
 
-//TEST_F(SchedulerIntegrationTest, TwoUsersTasks_AfterRestart_NoUsersRegistered)
-//{
-//    whenTwoUsersScheduleTwoTasksEach();
-//    andSystemRestarts();
-//    andNoUsersRegistred();
-//
-//    thenSchedulerShouldBeIdleWithoutCrashes();
-//}
-//
+TEST_F(SchedulerIntegrationTest, TwoUsersTasks_AfterRestart_NoUsersRegistered)
+{
+    whenTwoUsersScheduleTwoTasksEach();
+    andWhenSchedulerWorksForSomeTime(500);
+    andWhenSystemRestarts();
+
+    thenSchedulerShouldBeIdleWithoutCrashes();
+}
+
 //TEST_F(SchedulerIntegrationTest, TwoUsersTasks_AfterRestart_TwoUsersRegistered)
 //{
 //    whenTwoUsersScheduleTwoTasksEach();
