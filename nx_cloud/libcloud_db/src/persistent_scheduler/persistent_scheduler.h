@@ -44,11 +44,6 @@ public:
     void start();
     void stop();
 
-    /**
-     * Functions below should be called inside dbHandler
-     * of AbstractAsyncSqlExecutor::execute{Update,Select} or
-     * from AbstractPersistentScheduleEventReceiver::persistentTimerFired()
-     */
     nx::db::DBResult subscribe(
         nx::db::QueryContext* queryContext,
         const QnUuid& functorId,
