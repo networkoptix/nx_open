@@ -8,6 +8,7 @@
 #include <QtCore/QPair>
 #include <QtCore/QString>
 #include <QtCore/QMetaType>
+#include <QtCore/QUrlQuery>
 
 #include <nx/network/http/http_types.h>
 #include <nx/utils/uuid.h>
@@ -93,15 +94,17 @@ typedef QnListMap<QByteArray, QByteArray> QnReplyHeaderList;
 
 typedef QHash<QString, QString> QnRequestParams;
 
+/** NOTE: If identical param names exist in url, the first one is taken. */
+QnRequestParams requestParamsFromUrl(const QUrl& url);
 
 struct QnHTTPRawResponse
 {
     QnHTTPRawResponse();
     QnHTTPRawResponse(
-        SystemError::ErrorCode _sysErrorCode,
+        SystemError::ErrorCode sysErrorCode,
         const nx_http::StatusLine& statusLine,
-        const QByteArray& _contentType,
-        const QByteArray& _msgBody);
+        const QByteArray& contentType,
+        const QByteArray& msgBody);
 
     SystemError::ErrorCode sysErrorCode;
     QNetworkReply::NetworkError status;

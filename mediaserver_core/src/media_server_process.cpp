@@ -12,6 +12,8 @@
     #include <unistd.h>
 #endif
 
+#include <boost/optional.hpp>
+
 #include <qtsinglecoreapplication.h>
 #include <qtservice.h>
 
@@ -1783,6 +1785,10 @@ void MediaServerProcess::registerRestHandlers(
             Qn::GlobalPermission permissions = Qn::NoGlobalPermissions)
         {
             processorPool->registerHandler(path, handler, permissions);
+
+            const auto& cameraIdUrlParams = handler->cameraIdUrlParamsForRequestForwarding();
+            if (!cameraIdUrlParams.isEmpty())
+                m_autoRequestForwarder->addCameraIdUrlParams(path, cameraIdUrlParams);
         };
 
     // TODO: When supported by apidoctool, the comment to these constants should be parsed.
@@ -1876,13 +1882,15 @@ void MediaServerProcess::registerRestHandlers(
     reg("ec2/runtimeInfo", new QnRuntimeInfoRestHandler());
 }
 
-template<class TcpConnectionProcessor>
-void MediaServerProcess::regTcp(const QByteArray& protocol, const QString& path)
+template<class TcpConnectionProcessor, typename... ExtraParam>
+void MediaServerProcess::regTcp(
+    const QByteArray& protocol, const QString& path, ExtraParam... extraParam)
 {
-    m_universalTcpListener->addHandler<TcpConnectionProcessor>(protocol, path);
+    m_universalTcpListener->addHandler<TcpConnectionProcessor>(
+        protocol, path, extraParam...);
 
     if (TcpConnectionProcessor::isForwardingRequired())
-        m_autoRequestForwarder->addProtocolAndPath(protocol, path);
+        m_autoRequestForwarder->addAllowedProtocolAndPathPart(protocol, path);
 }
 
 bool MediaServerProcess::initTcpListener(

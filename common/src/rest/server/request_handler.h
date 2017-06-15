@@ -5,8 +5,6 @@
 #include <QtCore/QByteArray>
 #include <QtCore/QSharedPointer>
 
-#include <nx/utils/string.h>
-
 #include <common/common_globals.h>
 #include <utils/common/request_param.h>
 
@@ -69,6 +67,9 @@ public:
     friend class QnRestProcessorPool;
 
     Qn::GlobalPermission permissions() const { return m_permissions; }
+
+    /** Override if automatic request forwarding is required based on camera id in url params. */
+    virtual QStringList cameraIdUrlParamsForRequestForwarding() const { return {}; }
 
 protected:
     void setPath(const QString& path) { m_path = path; }

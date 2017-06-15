@@ -10,7 +10,9 @@
 #include <core/resource/media_server_resource.h>
 #include <nx/network/http/custom_headers.h>
 #include <nx/utils/log/log.h>
+#include <nx/utils/log/to_string.h>
 #include <nx/utils/string.h>
+#include <nx/utils/match/wildcard.h>
 #include <utils/fs/file.h>
 #include <nx/network/rtsp/rtsp_types.h>
 #include <nx/streaming/rtsp_client.h>
@@ -19,36 +21,41 @@
 #include <network/universal_request_processor.h>
 #include <common/common_module.h>
 
-static const qint64 USEC_PER_MS = 1000;
+#include <ini.h>
+
+static const qint64 kUsPerMs = 1000;
 
 QnAutoRequestForwarder::QnAutoRequestForwarder(QnCommonModule* commonModule):
     QnCommonModuleAware(commonModule)
 {
+    if (ini().verboseAutoRequestForwarder)
+    {
+        const auto logger = nx::utils::log::addLogger({toString(this)});
+        logger->setDefaultLevel(nx::utils::log::Level::verbose);
+        NX_VERBOSE(this) lm("Verbose logging started: .ini verboseAutoRequestForwarder=true");
+    }
 }
 
 void QnAutoRequestForwarder::processRequest(nx_http::Request* const request)
 {
-    const auto allowedMethods = m_restrictionList.getAllowedAuthMethods(*request);
+    NX_VERBOSE(this) lm("Request URL: [%1]").arg(request->requestLine.url);
 
-    // TODO: #akolesnikov: nx_http::AuthMethod::videowall is used here to imply the existing class
-    // nx_http::AuthMethodRestrictionList with no change, since release 2.5 is coming.
-    // Proper types should be introduced.
-    if (!(allowedMethods & nx_http::AuthMethod::videowall))
-        return; //< Not processing the url.
+    if (isPathIgnored(request))
+        return;
 
     const QUrlQuery urlQuery(request->requestLine.url.query());
-
     if (urlQuery.hasQueryItem(Qn::SERVER_GUID_HEADER_NAME)
         || request->headers.find(Qn::SERVER_GUID_HEADER_NAME) != request->headers.end())
     {
-        // SERVER_GUID_HEADER_NAME already present.
+        NX_VERBOSE(this) lm("Skipped: Header or param [%1] found")
+            .arg(Qn::SERVER_GUID_HEADER_NAME);
         return;
     }
-
     if (urlQuery.hasQueryItem(Qn::CAMERA_GUID_HEADER_NAME)
         || request->headers.find(Qn::CAMERA_GUID_HEADER_NAME) != request->headers.end())
     {
-        // CAMERA_GUID_HEADER_NAME already present.
+        NX_VERBOSE(this) lm("Skipped: Header or param [%1] found")
+            .arg(Qn::CAMERA_GUID_HEADER_NAME);
         return;
     }
 
@@ -64,203 +71,261 @@ void QnAutoRequestForwarder::processRequest(nx_http::Request* const request)
         {
             if (addProxyToRequest(request, servers.front()))
             {
-                NX_VERBOSE(this) lit("Forwarding request %1 to server %2")
-                    .arg(request->requestLine.url.path())
+                NX_VERBOSE(this) lm("Cloud request. Forwarding to server %2")
                     .arg(servers.front()->getId().toString());
             }
+        }
+        else
+        {
+            NX_VERBOSE(this) lm("Cloud request. Skipped: No servers found")
+                .arg(servers.front()->getId().toString());
         }
         return;
     }
 
     const bool liveStreamRequested = urlQuery.hasQueryItem(StreamingParams::LIVE_PARAM_NAME);
 
-    QnResourcePtr cameraRes;
-    if (findCamera(*request, urlQuery, &cameraRes))
+    QnResourcePtr camera;
+    if (!findCamera(*request, urlQuery, &camera))
+        return;
+    NX_CRITICAL(camera);
+
+    // Check for the time requested to select the desired server.
+    qint64 timestampMs = -1;
+    QnMediaServerResourcePtr server =
+        camera->getParentResource().dynamicCast<QnMediaServerResource>();
+    if (!liveStreamRequested)
     {
-        // Detect the owner of res and add SERVER_GUID_HEADER_NAME.
-        NX_CRITICAL(cameraRes);
-
-        // Check for the time requested to select the desired server.
-        qint64 timestampMs = -1;
-
-        QnMediaServerResourcePtr serverRes =
-            cameraRes->getParentResource().dynamicCast<QnMediaServerResource>();
-        if (!liveStreamRequested)
+        timestampMs = fetchTimestamp(*request, urlQuery);
+        if (timestampMs != -1)
         {
-            timestampMs = fetchTimestamp(*request, urlQuery);
-            if (timestampMs != -1)
+            // Search the server for the timestamp.
+            QnVirtualCameraResourcePtr virtualCamera =
+                camera.dynamicCast<QnVirtualCameraResource>();
+            if (virtualCamera)
             {
-                // Search the server for the timestamp.
-                QnVirtualCameraResourcePtr virtualCameraRes =
-                    cameraRes.dynamicCast<QnVirtualCameraResource>();
-                if (virtualCameraRes)
-                {
-                    QnMediaServerResourcePtr mediaServer =
-                        commonModule()->cameraHistoryPool()->getMediaServerOnTimeSync(
-                            virtualCameraRes, timestampMs);
-                    if (mediaServer)
-                        serverRes = mediaServer;
-                }
+                QnMediaServerResourcePtr mediaServer =
+                    commonModule()->cameraHistoryPool()->getMediaServerOnTimeSync(
+                        virtualCamera, timestampMs);
+                if (mediaServer)
+                    server = mediaServer;
             }
         }
-        if (addProxyToRequest(request, serverRes))
-        {
-            NX_VERBOSE(this) lit(
-                "Forwarding request %1 (resource %2, timestamp %3) to server %4")
-                .arg(request->requestLine.url.path()).arg(cameraRes->getId().toString())
-                .arg(timestampMs == -1
-                    ? QString::fromLatin1("live")
-                    : QDateTime::fromMSecsSinceEpoch(timestampMs).toString(Qt::ISODate))
-                .arg(serverRes->getId().toString());
-        }
+    }
+    if (addProxyToRequest(request, server))
+    {
+        NX_VERBOSE(this) lm("Forwarding to server %4 (camera %2, timestamp %3)")
+            .arg(camera->getId().toString())
+            .arg(timestampMs == -1
+                ? QString::fromLatin1("live")
+                : QDateTime::fromMSecsSinceEpoch(timestampMs).toString(Qt::ISODate))
+            .arg(server->getId().toString());
     }
 }
 
 bool QnAutoRequestForwarder::addProxyToRequest(
     nx_http::Request* const request,
-    const QnMediaServerResourcePtr& serverRes)
+    const QnMediaServerResourcePtr& server)
 {
-    if (!serverRes)
+    if (!server)
+    {
+        NX_VERBOSE(this) lm("Skipped: Server not found");
         return false;
-    if (serverRes->getId() == commonModule()->moduleGUID())
-        return false; //< Target server is this one.
-    request->headers.emplace(
-        Qn::SERVER_GUID_HEADER_NAME,
-        serverRes->getId().toByteArray());
+    }
+
+    if (server->getId() == commonModule()->moduleGUID())
+    {
+        NX_VERBOSE(this) lm("Skipped: Target server is the current one");
+        return false;
+    }
+
+    request->headers.emplace(Qn::SERVER_GUID_HEADER_NAME, server->getId().toByteArray());
     return true;
 }
 
 void QnAutoRequestForwarder::addPathToIgnore(const QString& pathWildcardMask)
 {
-    m_restrictionList.deny(pathWildcardMask, nx_http::AuthMethod::videowall);
+    m_ignoredPathWildcardMarks.append(pathWildcardMask);
+    NX_VERBOSE(this) lm("Added path wildcard mask to ignore: [%1]").arg(pathWildcardMask);
+}
+
+bool QnAutoRequestForwarder::isPathIgnored(const nx_http::Request* request)
+{
+    for (const auto& mask: m_ignoredPathWildcardMarks)
+    {
+        QString path = request->requestLine.url.path();
+
+        // Leave no more than one slash at the beginning.
+        while (path.startsWith(lit("//")))
+            path = path.mid(1);
+
+        // Remove trailing slashes.
+        while (path.endsWith(L'/'))
+            path.chop(1);
+
+        if (wildcardMatch("*" + mask, path))
+        {
+            NX_VERBOSE(this) lm("Skipped: Path [%1] matches wildcard mask [%2]").args(path, mask);
+            return true;
+        }
+    }
+    return false;
+}
+
+void QnAutoRequestForwarder::addAllowedProtocolAndPathPart(
+    const QByteArray& protocol, const QString& pathPart)
+{
+    NX_ASSERT(!protocol.isEmpty());
+    NX_ASSERT(!pathPart.isEmpty());
+    NX_ASSERT(!pathPart.contains('/'));
+
+    const auto& scheme = protocol.toLower();
+
+    m_allowedPathPartByScheme.insertMulti(scheme, pathPart);
+    NX_VERBOSE(this) lm("Added allowed path part [%1] for protocol [%2]").args(pathPart, protocol);
+}
+
+void QnAutoRequestForwarder::addCameraIdUrlParams(
+    const QString& path, const QStringList& cameraIdUrlParams)
+{
+    NX_ASSERT(!path.isEmpty());
+    NX_ASSERT(!cameraIdUrlParams.isEmpty());
+    NX_ASSERT(!m_cameraIdUrlParamsByPath.contains(path));
+
+    m_cameraIdUrlParamsByPath.insert(path, cameraIdUrlParams);
+    NX_VERBOSE(this) lm("Added camera id url params [%1] for path [%2]")
+        .args(cameraIdUrlParams, path);
 }
 
 bool QnAutoRequestForwarder::findCamera(
     const nx_http::Request& request,
     const QUrlQuery& urlQuery,
-    QnResourcePtr* const resource)
+    QnResourcePtr* const outCamera)
 {
-    return false;
+    QnUuid cameraId = findCameraIdAsCameraGuidHeader(request, urlQuery);
+    if (!cameraId.isNull())
+    {
+        *outCamera = resourcePool()->getResourceById(cameraId);
+        return *outCamera != nullptr;
+    }
 
-    if (findCameraAsCameraGuidHeader(request, urlQuery, resource))
+    if (findCameraInUrlPath(request, urlQuery, outCamera))
         return true;
 
-    if (findCameraInUrlPath(request, urlQuery, resource))
+    if (findCameraInUrlQuery(request, urlQuery, outCamera))
         return true;
 
-    if (findCameraInUrlQuery(request, urlQuery, resource))
-        return true;
-
+    NX_VERBOSE(this) lm("Skipped: Camera not found");
     return false;
 }
 
-bool QnAutoRequestForwarder::findCameraAsCameraGuidHeader(
+QnUuid QnAutoRequestForwarder::findCameraIdAsCameraGuidHeader(
     const nx_http::Request& request,
-    const QUrlQuery& urlQuery,
-    QnResourcePtr* const resource)
+    const QUrlQuery& urlQuery)
 {
-    QnUuid cameraUuid;
+    QnUuid cameraId;
 
     // TODO: Never succeeds: presence of this header has already triggered an early exit.
     auto it = request.headers.find(Qn::CAMERA_GUID_HEADER_NAME);
     if (it != request.headers.end())
-        cameraUuid = QnUuid::fromStringSafe(it->second);
-
-    if (cameraUuid.isNull())
-        cameraUuid = QnUuid::fromStringSafe(request.getCookieValue(Qn::CAMERA_GUID_HEADER_NAME));
-
-    if (cameraUuid.isNull())
     {
-        // TODO: Never succeeds: presence of this query item has already triggered an early exit.
-        cameraUuid = QnUuid::fromStringSafe(urlQuery.queryItemValue(Qn::CAMERA_GUID_HEADER_NAME));
+        cameraId = QnUuid::fromStringSafe(it->second);
+        NX_VERBOSE(this) lm("Found camera id %1 in header [%2]")
+            .args(cameraId, Qn::CAMERA_GUID_HEADER_NAME);
+        return cameraId;
     }
 
-    if (cameraUuid.isNull())
-        return false;
+    cameraId = QnUuid::fromStringSafe(request.getCookieValue(Qn::CAMERA_GUID_HEADER_NAME));
+    if (!cameraId.isNull())
+    {
+        NX_VERBOSE(this) lm("Found camera id %1 in cookie [%2]")
+            .args(cameraId, Qn::CAMERA_GUID_HEADER_NAME);
+        return cameraId;
+    }
 
-    *resource = resourcePool()->getResourceById(cameraUuid);
-    return *resource != nullptr;
+    // TODO: Never succeeds: presence of this query item has already triggered an early exit.
+    cameraId = QnUuid::fromStringSafe(urlQuery.queryItemValue(Qn::CAMERA_GUID_HEADER_NAME));
+    if (!cameraId.isNull())
+    {
+        NX_VERBOSE(this) lm("Found camera id %1 in url param [%2]")
+            .args(cameraId, Qn::CAMERA_GUID_HEADER_NAME);
+        return cameraId;
+    }
+
+    return cameraId;
 }
-
-namespace {
-
-/** @return Part of str after prefix, or empty string if there is no such prefix in str. */
-static QString stringAfterPrefix(const QString& str, const QString& prefix)
-{
-    if (str.startsWith(prefix))
-        return str.mid(prefix.size());
-    else
-        return QString();
-}
-
-} // namespace
 
 bool QnAutoRequestForwarder::findCameraInUrlPath(
     const nx_http::Request& request,
     const QUrlQuery& /*urlQuery*/,
-    QnResourcePtr* const resource)
+    QnResourcePtr* const outCamera)
 {
-    // Check urls like: rtsp://<server>/<flexibleId>[.<ext>]
-    // Check urls like: http://<server>/hls/<flexibleId>[.<ext>]
-    // Check urls like: http://<server>/media/<flexibleId>[.<ext>]
+    const QString path = request.requestLine.url.path();
+    const int lastSlashPos = path.lastIndexOf('/');
 
-    const QString& path = request.requestLine.url.path();
-
-    QString trailing;
-    if (request.requestLine.url.scheme() == "rtsp")
+    bool found = false;
+    for (const auto& pathPart: m_allowedPathPartByScheme.values(request.requestLine.url.scheme()))
     {
-        // Get the trailing after the last '/'.
-        const int lastSlashPos = path.lastIndexOf('/');
-        if (lastSlashPos >= 0)
-            trailing = path.mid(lastSlashPos + 1);
-        else
-            trailing = path;
-    }
-    else
-    {
-        trailing = stringAfterPrefix(path, "/hls/");
-        if (trailing.isEmpty())
-            trailing = stringAfterPrefix(path, "/media/");
-        if (trailing.isEmpty() || trailing.indexOf('/') != -1)
-            return false;
-    }
+        if (pathPart != lit("*"))
+        {
+            if (lastSlashPos == -1) //< No slash in path, and pathPart is not "*".
+                continue;
 
-    const int periodPos = trailing.lastIndexOf('.');
-    const QString& potentialId = trailing.mid(0, periodPos);
+            // Check that pathPart precedes the last slash.
+            if (path.mid(lastSlashPos - pathPart.size(), pathPart.size()) != pathPart)
+                continue;
+        }
 
-    if (potentialId.isEmpty())
+        found = true;
+        break;
+    }
+    if (!found)
         return false;
 
-    *resource = nx::camera_id_helper::findCameraByFlexibleId(resourcePool(), potentialId);
-    if (*resource)
-    {
-        NX_VERBOSE(this) lit("Found resource %1 by id %2 from url path")
-            .arg((*resource)->getId().toString()).arg(potentialId);
-    }
-    return *resource != nullptr;
+    // Get the trailing after the last '/' (if any), which has the format: <cameraId>[.<ext>]
+    const QString trailing = path.mid(lastSlashPos + 1); //< Also works for lastSlashPos == -1.
+
+    // Get the trailing part before .<ext> (if any).
+    const int lastPeriodPos = trailing.lastIndexOf('.');
+    const QString cameraId = trailing.left(lastPeriodPos);
+    if (cameraId.isEmpty())
+        return false;
+
+    NX_VERBOSE(this) lm("Found camera id %1 in url path").arg(cameraId);
+    *outCamera = nx::camera_id_helper::findCameraByFlexibleId(resourcePool(), cameraId);
+    return *outCamera != nullptr;
 }
 
 bool QnAutoRequestForwarder::findCameraInUrlQuery(
     const nx_http::Request& request,
     const QUrlQuery& urlQuery,
-    QnResourcePtr* const resource)
+    QnResourcePtr* const outCamera)
 {
-    const QString& path = request.requestLine.url.path();
-    // NOTE: Only these methods need forwarding and have non-deprecated physicalId parameter.
-    if (!path.startsWith("/api/image") && !path.startsWith("/api/iomonitor"))
-        return false;
+    const QString path = request.requestLine.url.path();
 
-    const auto physicalId = urlQuery.queryItemValue(Qn::PHYSICAL_ID_URL_QUERY_ITEM);
-    if (physicalId.isEmpty())
-        return false;
-
-    *resource = resourcePool()->getNetResourceByPhysicalId(physicalId);
-    if (*resource)
+    // Path may contain an arbitrary prefix before the checked part.
+    QStringList paramNames;
+    for (const QString& expectedPath: m_cameraIdUrlParamsByPath.keys())
     {
-        NX_VERBOSE(this) lit("Found resource %1 by physicalId %2 from url path")
-            .arg((*resource)->getId().toString()).arg(physicalId);
+        if (path.endsWith(expectedPath))
+        {
+            paramNames = m_cameraIdUrlParamsByPath.value(expectedPath);
+            NX_ASSERT(!paramNames.isEmpty());
+            break;
+        }
     }
-    return *resource != nullptr;
+    if (paramNames.isEmpty()) //< Path trailing not found.
+        return false;
+
+    NX_VERBOSE(this) lm("Lookingh for camera id in url params [%2]").args(paramNames);
+
+    const QnRequestParams params = requestParamsFromUrl(request.requestLine.url);
+    QString notFoundCameraId;
+    *outCamera = nx::camera_id_helper::findCameraByFlexibleIds(
+        resourcePool(), &notFoundCameraId, params, paramNames);
+    if (!*outCamera && !notFoundCameraId.isNull())
+        NX_VERBOSE(this) lm("Camera not found by flexible id [%1]").args(notFoundCameraId);
+    return *outCamera != nullptr;
 }
 
 qint64 QnAutoRequestForwarder::fetchTimestamp(
@@ -273,7 +338,7 @@ qint64 QnAutoRequestForwarder::fetchTimestamp(
         if (timeStr.toLower().trimmed() == "latest")
             return -1;
         else
-            return nx::utils::parseDateTime(timeStr.toLatin1()) / USEC_PER_MS;
+            return nx::utils::parseDateTime(timeStr.toLatin1()) / kUsPerMs;
     }
 
     if (urlQuery.hasQueryItem(StreamingParams::START_POS_PARAM_NAME))
@@ -283,13 +348,13 @@ qint64 QnAutoRequestForwarder::fetchTimestamp(
         const auto ts = nx::utils::parseDateTime(posStr);
         if (ts == DATETIME_NOW)
             return -1;
-        return ts / USEC_PER_MS;
+        return ts / kUsPerMs;
     }
 
     if (urlQuery.hasQueryItem(StreamingParams::START_TIMESTAMP_PARAM_NAME))
     {
         const auto tsStr = urlQuery.queryItemValue(StreamingParams::START_TIMESTAMP_PARAM_NAME);
-        return tsStr.toLongLong() / USEC_PER_MS;
+        return tsStr.toLongLong() / kUsPerMs;
     }
 
     if (request.requestLine.version == nx_rtsp::rtsp_1_0)
@@ -301,7 +366,7 @@ qint64 QnAutoRequestForwarder::fetchTimestamp(
             qint64 startTimestamp = 0;
             qint64 endTimestamp = 0;
             if (nx_rtsp::parseRangeHeader(rangeIter->second, &startTimestamp, &endTimestamp))
-                return startTimestamp / USEC_PER_MS;
+                return startTimestamp / kUsPerMs;
         }
     }
 

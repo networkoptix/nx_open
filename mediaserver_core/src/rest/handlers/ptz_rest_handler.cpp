@@ -25,6 +25,7 @@ namespace {
 
 static const QString kCameraIdParam = lit("cameraId");
 static const QString kDeprecatedResourceIdParam = lit("resourceId");
+static const QStringList kCameraIdParams{kCameraIdParam, kDeprecatedResourceIdParam};
 
 static const int OLD_SEQUENCE_THRESHOLD = 1000 * 60 * 5;
 
@@ -146,6 +147,11 @@ int QnPtzRestHandler::execCommandAsync(const QString& sequence, AsyncFunc functi
     return CODE_OK;
 }
 
+QStringList QnPtzRestHandler::cameraIdUrlParamsForRequestForwarding() const
+{
+    return kCameraIdParams;
+}
+
 int QnPtzRestHandler::executePost(
     const QString& path,
     const QnRequestParams& params,
@@ -171,10 +177,7 @@ int QnPtzRestHandler::executePost(
 
     QString notFoundCameraId = QString::null;
     QnSecurityCamResourcePtr camera = nx::camera_id_helper::findCameraByFlexibleIds(
-        processor->owner()->resourcePool(),
-        &notFoundCameraId,
-        params,
-        {kCameraIdParam, kDeprecatedResourceIdParam});
+        processor->owner()->resourcePool(), &notFoundCameraId, params, kCameraIdParams);
     if (!camera)
     {
         QString errStr;

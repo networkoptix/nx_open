@@ -17,9 +17,15 @@ namespace {
 
 static const QString kCameraIdParam = lit("cameraId");
 static const QString kDeprecatedResIdParam = lit("res_id");
+static const QStringList kCameraIdParams{kCameraIdParam, kDeprecatedResIdParam};
 static const QString kTypeParam = lit("type");
 
 } // namespace
+
+QStringList QnCameraDiagnosticsRestHandler::cameraIdUrlParamsForRequestForwarding() const
+{
+    return kCameraIdParams;
+}
 
 int QnCameraDiagnosticsRestHandler::executeGet(
     const QString& path,
@@ -40,10 +46,7 @@ int QnCameraDiagnosticsRestHandler::executeGet(
 
     QString notFoundCameraId = QString::null;
     QnSecurityCamResourcePtr camera = nx::camera_id_helper::findCameraByFlexibleIds(
-        owner->commonModule()->resourcePool(),
-        &notFoundCameraId,
-        params,
-        {kCameraIdParam, kDeprecatedResIdParam});
+        owner->commonModule()->resourcePool(), &notFoundCameraId, params, kCameraIdParams);
     if (!camera)
     {
         if (!notFoundCameraId.isNull())

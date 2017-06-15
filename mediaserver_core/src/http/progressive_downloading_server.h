@@ -16,6 +16,8 @@ class QnProgressiveDownloadingConsumer
     public nx::utils::TimerEventHandler
 {
 public:
+    static bool isForwardingRequired() { return true; } //< See the base class method.
+
     QnProgressiveDownloadingConsumer(QSharedPointer<AbstractStreamSocket> socket, QnTcpListener* owner);
     virtual ~QnProgressiveDownloadingConsumer();
 

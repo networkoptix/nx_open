@@ -14,6 +14,7 @@
 #include <nx/utils/thread/mutex.h>
 #include <nx/utils/thread/wait_condition.h>
 #include <network/tcp_listener.h>
+#include <api/helpers/camera_id_helper.h>
 
 class QnIOMonitorConnectionProcessorPrivate: public QnTCPConnectionProcessorPrivate
 {
@@ -40,6 +41,8 @@ QnIOMonitorConnectionProcessor::~QnIOMonitorConnectionProcessor()
     stop();
 }
 
+static const QString kCameraIdParam = "cameraId";
+
 void QnIOMonitorConnectionProcessor::run()
 {
     Q_D(QnIOMonitorConnectionProcessor);
@@ -52,8 +55,9 @@ void QnIOMonitorConnectionProcessor::run()
     if (ready)
     {
         parseRequest();
-        QString uniqueId = QUrlQuery(getDecodedUrl().query()).queryItemValue(Qn::PHYSICAL_ID_URL_QUERY_ITEM);
-        QnSecurityCamResourcePtr camera = resourcePool()->getResourceByUniqueId<QnSecurityCamResource>(uniqueId);
+        const QString cameraId = QUrlQuery(getDecodedUrl().query()).queryItemValue(kCameraIdParam);
+        QnSecurityCamResourcePtr camera = nx::camera_id_helper::findCameraByFlexibleId(
+            resourcePool(), cameraId);
         if (!camera) {
             sendResponse(CODE_NOT_FOUND, "multipart/x-mixed-replace; boundary=ioboundary");
             return;
@@ -203,3 +207,4 @@ void QnIOMonitorConnectionProcessor::pleaseStop()
     QnLongRunnable::pleaseStop();
     d->waitCond.wakeAll();
 }
+

@@ -158,8 +158,8 @@ private:
         QnUniversalTcpListener* tcpListener,
         ec2::QnTransactionMessageBusBase* messageBus);
 
-    template<class TcpConnectionProcessor>
-    void regTcp(const QByteArray& protocol, const QString& path);
+    template<class TcpConnectionProcessor, typename... ExtraParam>
+    void regTcp(const QByteArray& protocol, const QString& path, ExtraParam... extraParam);
 
     bool initTcpListener(
         CloudManagerGroup* const cloudManagerGroup,
