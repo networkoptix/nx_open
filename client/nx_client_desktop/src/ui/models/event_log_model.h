@@ -1,5 +1,7 @@
 #pragma once
 
+#include <vector>
+
 #include <QtCore/QAbstractItemModel>
 
 #include <utils/common/id.h>
@@ -69,7 +71,8 @@ private:
     static int helpTopicIdData(Column column, const QnBusinessActionData& action);
 
     QString motionUrl(Column column, const QnBusinessActionData& action) const;
-    static QString getUserNameById(const QnUuid& id);
+    QString getSubjectNameById(const QnUuid& id) const;
+    QString getSubjectsText(const std::vector<QnUuid>& ids) const;
     static QString getResourceNameString(const QnUuid& id);
 
     bool hasVideoLink(const QnBusinessActionData& action) const;
