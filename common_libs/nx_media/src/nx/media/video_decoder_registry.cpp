@@ -53,7 +53,7 @@ VideoDecoderPtr VideoDecoderRegistry::createCompatibleDecoder(
 }
 
 bool VideoDecoderRegistry::hasCompatibleDecoder(
-    const AVCodecID codec, const QSize& resolution, bool ignoreCount)
+    const AVCodecID codec, const QSize& resolution, UsageCountPolicy countCheckPolicy)
 {
     auto codecString =
         [codec, &resolution]()
@@ -61,12 +61,12 @@ bool VideoDecoderRegistry::hasCompatibleDecoder(
             return lit("%1 [%2x%3]").arg(codec).arg(resolution.width()).arg(resolution.height());
         };
 
-    NX_LOGX(lm("Checking for decoder compatible to codec %1.").arg(codecString()), cl_logDEBUG2);
+    NX_LOGX(lm("Checking for decoder compatible with codec %1.").arg(codecString()), cl_logDEBUG2);
 
     QMutexLocker lock(&mutex);
     for (const auto& plugin: m_plugins)
     {
-        if (!ignoreCount && plugin.useCount >= plugin.maxUseCount)
+        if (countCheckPolicy == UsageCountPolicy::Check && plugin.useCount >= plugin.maxUseCount)
         {
             NX_LOGX(lm("Count exceeded for plugin %1").arg(plugin.name), cl_logDEBUG2);
             continue;
@@ -75,7 +75,7 @@ bool VideoDecoderRegistry::hasCompatibleDecoder(
         if (!plugin.isCompatible(codec, resolution))
         {
             NX_LOGX(
-                lm("Plugin %1 is not compatible to codec %2").arg(plugin.name).arg(codecString()),
+                lm("Plugin %1 is not compatible with codec %2").arg(plugin.name).arg(codecString()),
                 cl_logDEBUG2);
             continue;
         }

@@ -148,8 +148,10 @@ static QSize applyTranscodingIfPossible(
     const QSize& desiredResolution,
     media_player_quality_chooser::RequestReason requestReason)
 {
-    const bool ignoreCount =
-        requestReason == media_player_quality_chooser::RequestReason::Information;
+    const auto countCheckPolicy =
+        requestReason == media_player_quality_chooser::RequestReason::Information
+            ? VideoDecoderRegistry::UsageCountPolicy::Ignore
+            : VideoDecoderRegistry::UsageCountPolicy::Check;
 
     if (!isTranscodingSupported(liveMode, positionMs, camera))
     {
@@ -161,7 +163,7 @@ static QSize applyTranscodingIfPossible(
     QSize resolution = limitResolution(desiredResolution, kMaxTranscodingResolution);
 
     if (!VideoDecoderRegistry::instance()->hasCompatibleDecoder(
-        transcodingCodec, resolution, ignoreCount))
+        transcodingCodec, resolution, countCheckPolicy))
     {
         NX_LOG(lit("[media_player] Transcoding to %1 x %2 not supported => Set low stream")
             .arg(resolution.width()).arg(resolution.height()), cl_logDEBUG1);
@@ -190,7 +192,10 @@ QSize media_player_quality_chooser::chooseHighStreamIfPossible(
     const QnConstResourceVideoLayoutPtr& videoLayout,
     RequestReason requestReason)
 {
-    const bool ignoreCount = requestReason == RequestReason::Information;
+    const auto countCheckPolicy =
+        requestReason == media_player_quality_chooser::RequestReason::Information
+            ? VideoDecoderRegistry::UsageCountPolicy::Ignore
+            : VideoDecoderRegistry::UsageCountPolicy::Check;
 
     if (highCodec != AV_CODEC_ID_NONE && !highResolution.isEmpty()) //< High stream exists.
     {
@@ -212,7 +217,7 @@ QSize media_player_quality_chooser::chooseHighStreamIfPossible(
                 return quality;
         }
         else if (VideoDecoderRegistry::instance()->hasCompatibleDecoder(
-            highCodec, highResolution, ignoreCount))
+            highCodec, highResolution, countCheckPolicy))
         {
             NX_LOG(lit("[media_player] High stream requested => Set high stream"),
                 cl_logDEBUG1);

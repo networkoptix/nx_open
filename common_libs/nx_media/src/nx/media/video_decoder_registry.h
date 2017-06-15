@@ -24,6 +24,12 @@ class VideoDecoderRegistry
 public:
     static VideoDecoderRegistry* instance();
 
+    enum class UsageCountPolicy
+    {
+        Check, /**< Take decoder usage count into account. */
+        Ignore /**< Ignore decoder usage count. */
+    };
+
     /**
      * @return Optimal video decoder (in case of any) compatible with such frame. Return null
      * pointer if no compatible decoder is found.
@@ -36,7 +42,7 @@ public:
     bool hasCompatibleDecoder(
         const AVCodecID codec,
         const QSize& resolution,
-        bool ignoreCount = false);
+        UsageCountPolicy countCheckPolicy = UsageCountPolicy::Check);
 
     /**
      * @return Some sort of a maximum for all resolutions returned for the codec by

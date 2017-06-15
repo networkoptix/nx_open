@@ -33,8 +33,8 @@ public:
 
     enum class RequestReason
     {
-        Playback, //< Choose quality to start playback.
-        Information, //< Check quality availability without an intention to start playback.
+        Playback, /**< Choose quality to start playback. */
+        Information, /**< Check quality availability without an intention to start playback. */
     };
 
     /**
