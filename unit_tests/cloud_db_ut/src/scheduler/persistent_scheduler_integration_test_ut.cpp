@@ -117,10 +117,7 @@ protected:
         auto userTasks = user->tasks();
         ASSERT_EQ(userTasks.size(), 2);
         for (const auto& task: userTasks)
-        {
             ASSERT_GT(task.second.fired, 0);
-            ASSERT_TRUE(task.second.subscribed);
-        }
     }
 
     void thenTasksShouldFireMultipleTimesForBothUsers()
@@ -188,22 +185,22 @@ TEST_F(SchedulerIntegrationTest, TwoUsersTasks_AfterRestart_OneUserRegistered)
     thenTasksShouldFireMultipleTimesForTheFirstUser();
 }
 
-TEST_F(SchedulerIntegrationTest, TwoUsersTasks_OneUnsubscribed_AfterRestart_TwoUsersRegistered)
-{
-    whenTwoUsersScheduleTwoTasksEach();
-    andWhenSchedulerWorksForSomeTime();
+//TEST_F(SchedulerIntegrationTest, TwoUsersTasks_OneUnsubscribed_AfterRestart_TwoUsersRegistered)
+//{
+//    whenTwoUsersScheduleTwoTasksEach();
+//    andWhenSchedulerWorksForSomeTime();
 
-    andWhenFirstUsersUnsubscribes();
-    thenFirstUserShouldNotReceiveTimerEventsAnyLonger();
+//    andWhenFirstUsersUnsubscribes();
+//    thenFirstUserShouldNotReceiveTimerEventsAnyLonger();
 
-    andSystemRestarts();
-    andBothUsersRegistred();
+//    andSystemRestarts();
+//    andBothUsersRegistred();
 
-    thenTasksShouldFireMultipleTimesForTheSecondUser();
-    andNoTasksShouldFireForTheFirstUser();
-}
+//    thenTasksShouldFireMultipleTimesForTheSecondUser();
+//    andNoTasksShouldFireForTheFirstUser();
+//}
 
-//TEST_F(SchedulerIntegrationTest, OneUserSchedulesLongTask_AfterRestartAndPause_)
+//TEST_F(SchedulerIntegrationTest, OneUserSchedulesLongTask_AfterRestartAndPause)
 //{
 //    whenTwoUsersScheduleTwoTasksEach();
 //    thenTasksShouldFireMultipleTimes();

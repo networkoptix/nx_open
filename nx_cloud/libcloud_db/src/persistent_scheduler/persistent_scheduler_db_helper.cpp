@@ -47,10 +47,10 @@ nx::db::DBResult SchedulerDbHelper::getScheduleData(
     {
         QnUuid functorId = QnUuid::fromRfc4122(scheduleDataQuery.value(0).toByteArray());
         QnUuid taskId = QnUuid::fromRfc4122(scheduleDataQuery.value(1).toByteArray());
-        QString paramKey = scheduleDataQuery.value(2).toString();
-        QString paramValue = scheduleDataQuery.value(3).toString();
-        qint64 firePointMs = scheduleDataQuery.value(4).toLongLong();
-        qint64 periodMs = scheduleDataQuery.value(5).toLongLong();
+        qint64 firePointMs = scheduleDataQuery.value(2).toLongLong();
+        qint64 periodMs = scheduleDataQuery.value(3).toLongLong();
+        QString paramKey = scheduleDataQuery.value(4).toString();
+        QString paramValue = scheduleDataQuery.value(5).toString();
 
         scheduleData->functorToTasks[functorId].emplace(taskId);
         scheduleData->taskToParams[taskId].params.emplace(paramKey.toStdString(), paramValue.toStdString());
@@ -82,9 +82,9 @@ nx::db::DBResult SchedulerDbHelper::subscribe(
         subscribeQuery.bindValue(":taskId", outTaskId->toRfc4122());
         subscribeQuery.bindValue(
             ":firePoint",
-            std::chrono::duration_cast<std::chrono::milliseconds>(
+            (qint64)std::chrono::duration_cast<std::chrono::milliseconds>(
                 taskInfo.fireTimePoint.time_since_epoch()).count());
-        subscribeQuery.bindValue(":period", taskInfo.period.count());
+        subscribeQuery.bindValue(":period", (qint64)taskInfo.period.count());
         subscribeQuery.bindValue(":paramKey", QString::fromStdString(param.first));
         subscribeQuery.bindValue(":paramValue", QString::fromStdString(param.second));
 
