@@ -192,4 +192,10 @@ PageBase
     {
         layoutHelper.singleCameraId = camerasModel.previousResourceId(resourceId)
     }
+
+    onActivePageChanged:
+    {
+        if (activePage)
+            videoScreenController.start()
+    }
 }
