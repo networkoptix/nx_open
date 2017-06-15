@@ -6,6 +6,7 @@
 #include <gtest/gtest.h>
 #include <gmock/gmock.h>
 
+#include <nx/utils/scope_guard.h>
 #include <nx/utils/string.h>
 #include <nx/utils/sync_call.h>
 
@@ -27,6 +28,7 @@ TEST_F(MediatorFunctionalTest, resolve_generic)
     ASSERT_TRUE(startAndWaitUntilStarted());
 
     const auto client = clientConnection();
+    auto clientGuard = makeScopeGuard([&client]() { client->pleaseStopSync(); });
 
     const auto system1 = addRandomSystem();
     auto system1Servers = addRandomServers(system1, 2);
@@ -73,8 +75,6 @@ TEST_F(MediatorFunctionalTest, resolve_generic)
             system1Servers[i]->endpoint().toString(),
             resolveResponse.endpoints.front().toString());
     }
-
-    client->pleaseStopSync();
 }
 
 TEST_F(MediatorFunctionalTest, resolve_same_server_name)
@@ -84,6 +84,7 @@ TEST_F(MediatorFunctionalTest, resolve_same_server_name)
     ASSERT_TRUE(startAndWaitUntilStarted());
 
     const auto client = clientConnection();
+    auto clientGuard = makeScopeGuard([&client]() { client->pleaseStopSync(); });
 
     const auto system1 = addRandomSystem();
     auto server1 = addServer(system1, QnUuid::createUuid().toSimpleString().toUtf8());
@@ -104,8 +105,6 @@ TEST_F(MediatorFunctionalTest, resolve_same_server_name)
     ASSERT_EQ(
         server2->endpoint().toString(),
         resolveResponse.endpoints.front().toString());
-
-    client->pleaseStopSync();
 }
 
 TEST_F(MediatorFunctionalTest, resolve_unkownDomain)
@@ -115,6 +114,7 @@ TEST_F(MediatorFunctionalTest, resolve_unkownDomain)
     ASSERT_TRUE(startAndWaitUntilStarted());
 
     const auto client = clientConnection();
+    auto clientGuard = makeScopeGuard([&client]() { client->pleaseStopSync(); });
 
     //resolving unknown system
     api::ResolveDomainResponse resolveResponse;
@@ -127,8 +127,6 @@ TEST_F(MediatorFunctionalTest, resolve_unkownDomain)
             std::placeholders::_1));
 
     ASSERT_EQ(api::ResultCode::notFound, resultCode);
-
-    client->pleaseStopSync();
 }
 
 TEST_F(MediatorFunctionalTest, resolve_unkownHost)
@@ -138,6 +136,8 @@ TEST_F(MediatorFunctionalTest, resolve_unkownHost)
     ASSERT_TRUE(startAndWaitUntilStarted());
 
     const auto client = clientConnection();
+    auto clientGuard = makeScopeGuard([&client]() { client->pleaseStopSync(); });
+
     const auto system1 = addRandomSystem();
 
     //resolving unknown system
@@ -151,8 +151,6 @@ TEST_F(MediatorFunctionalTest, resolve_unkownHost)
             std::placeholders::_1));
 
     ASSERT_EQ(api::ResultCode::notFound, resultCode);
-
-    client->pleaseStopSync();
 }
 
 TEST_F(MediatorFunctionalTest, resolve_by_system_name)
@@ -162,6 +160,8 @@ TEST_F(MediatorFunctionalTest, resolve_by_system_name)
     ASSERT_TRUE(startAndWaitUntilStarted());
 
     const auto client = clientConnection();
+    auto clientGuard = makeScopeGuard([&client]() { client->pleaseStopSync(); });
+
     const auto system1 = addRandomSystem();
 
     //emulating local mediaserver
@@ -198,8 +198,6 @@ TEST_F(MediatorFunctionalTest, resolve_by_system_name)
     ASSERT_EQ(
         mserverEmulator.endpoint().toString(),
         resolveResponse.endpoints.front().toString());
-
-    client->pleaseStopSync();
 }
 
 } // namespace test

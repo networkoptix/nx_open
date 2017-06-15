@@ -13,6 +13,9 @@
 #include <nx_ec/ec2_lib.h>
 #include <nx/utils/log/assert.h>
 #include <nx/utils/timer_manager.h>
+#include <nx/client/core/watchers/known_server_connections.h>
+
+using namespace nx::client::core;
 
 QnClientCoreModule::QnClientCoreModule(QObject* parent):
     base_type(parent)
@@ -30,6 +33,8 @@ QnClientCoreModule::QnClientCoreModule(QObject* parent):
 
     commonModule()->instance<QnResourcesChangesManager>();
     commonModule()->instance<QnClientPtzControllerPool>();
+
+    commonModule()->store(new watchers::KnownServerConnections(commonModule()));
 }
 
 QnClientCoreModule::~QnClientCoreModule()

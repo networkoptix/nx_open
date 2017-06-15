@@ -17,6 +17,13 @@ namespace dao {
 class AbstractUserAuthentication
 {
 public:
+    struct SystemInfo
+    {
+        std::string systemId;
+        std::string nonce;
+        std::string vmsUserId;
+    };
+
     virtual ~AbstractUserAuthentication() = default;
 
     virtual boost::optional<std::string> fetchSystemNonce(
@@ -31,13 +38,21 @@ public:
     virtual api::AuthInfo fetchUserAuthRecords(
         nx::db::QueryContext* const queryContext,
         const std::string& systemId,
-        const std::string& userEmail) = 0;
+        const std::string& accountId) = 0;
 
     virtual void insertUserAuthRecords(
         nx::db::QueryContext* const queryContext,
         const std::string& systemId,
-        const std::string& accountEmail,
+        const std::string& accountId,
         const api::AuthInfo& userAuthRecords) = 0;
+
+    virtual std::vector<SystemInfo> fetchAccountSystems(
+        nx::db::QueryContext* const queryContext,
+        const std::string& accountId) = 0;
+
+    virtual void deleteAccountAuthRecords(
+        nx::db::QueryContext* const queryContext,
+        const std::string& accountId) = 0;
 };
 
 } // namespace dao

@@ -93,11 +93,9 @@ nx::Buffer CdbNonceFetcher::generateNonceTrailer()
 
 QByteArray CdbNonceFetcher::generateNonce()
 {
-#ifdef ENABLE_CLOUD_USER_OFFLINE_LOGIN
     auto cloudPreviouslyProvidedNonce = m_cloudUserInfoPool.newestMostCommonNonce();
     if (cloudPreviouslyProvidedNonce)
         return *cloudPreviouslyProvidedNonce + generateNonceTrailer();
-#endif
 
     if (!m_cloudConnectionManager->boundToCloud())
         return m_defaultGenerator->generateNonce();

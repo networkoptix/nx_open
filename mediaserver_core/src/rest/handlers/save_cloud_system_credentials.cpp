@@ -245,7 +245,7 @@ bool QnSaveCloudSystemCredentialsHandler::fetchNecessaryDataFromCloud(
 }
 
 bool QnSaveCloudSystemCredentialsHandler::initializeCloudRelatedManagers(
-    const CloudCredentialsData& data,
+    const CloudCredentialsData& /*data*/,
     QnJsonRestResult* result)
 {
     using namespace nx::cdb;

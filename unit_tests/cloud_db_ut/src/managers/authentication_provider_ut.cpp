@@ -57,27 +57,44 @@ public:
     }
 
 protected:
+    void givenAccountWithMultipleSystems()
+    {
+        constexpr int kSystemCount = 7;
+
+        m_systems.clear();
+        for (int i = 0; i < kSystemCount; ++i)
+        {
+            m_systems.push_back(BusinessDataGenerator::generateRandomSystem(m_ownerAccount));
+            shareSystem(
+                m_systems.back().id,
+                m_ownerAccount.email,
+                api::SystemAccessRole::owner);
+        }
+    }
+
     void whenSharingSystem()
     {
-        shareSystem(m_ownerAccount.email, api::SystemAccessRole::owner);
+        shareSystem(
+            m_systems[0].id,
+            m_ownerAccount.email,
+            api::SystemAccessRole::owner);
     }
 
     void whenSharingSystemWithMultipleUsers()
     {
-        constexpr std::size_t kAccountNumber = 2;
-
-        m_accounts.resize(kAccountNumber);
-        for (auto& account: m_accounts)
+        for (auto& account: m_additionalAccounts)
         {
-            account = BusinessDataGenerator::generateRandomAccount();
-            m_accountManager.addAccount(account);
-            shareSystem(account.email, api::SystemAccessRole::liveViewer);
+            shareSystem(
+                m_systems[0].id,
+                account.email,
+                api::SystemAccessRole::liveViewer);
         }
     }
 
     void whenSharingSystemWithNotExistingAccount()
     {
         shareSystem(
+            m_systems[0].id,
             BusinessDataGenerator::generateRandomEmailAddress(),
             api::SystemAccessRole::liveViewer);
     }
@@ -87,22 +104,31 @@ protected:
         // TODO
     }
 
+    void whenChangingAccountPassword()
+    {
+        m_ownerAccount.password = nx::utils::generateRandomName(7).toStdString();
+        m_ownerAccount.passwordHa1 = nx_http::calcHa1(
+            m_ownerAccount.email.c_str(),
+            nx::network::AppInfo::realm().toStdString().c_str(),
+            m_ownerAccount.password.c_str()).toStdString();
+
+        ASSERT_NO_THROW(
+            m_authenticationProvider->afterUpdatingAccountPassword(
+                nullptr, m_ownerAccount));
+    }
+
     void thenValidAuthRecordIsGenerated()
     {
-        auto authInfo = m_userAuthenticationDao->fetchUserAuthRecords(
-            nullptr, m_system.id, m_ownerAccount.id);
-        ASSERT_EQ(1U, authInfo.records.size());
-        assertUserAuthenticationHashIsValid(authInfo.records[0]);
-        assertUserAuthenticationTimestampIsValid(authInfo.records[0]);
+        assertUserAuthRecordsAreValidForSystem(m_systems[0].id);
     }
 
     void thenEachUserAuthRecordContainsSystemNonce()
     {
         boost::optional<std::string> nonce;
-        for (const auto& account: m_accounts)
+        for (const auto& account: m_additionalAccounts)
         {
             const auto authInfo = m_userAuthenticationDao->fetchUserAuthRecords(
-                nullptr, m_system.id, account.id);
+                nullptr, m_systems[0].id, account.id);
             ASSERT_FALSE(authInfo.records.empty());
 
             for (const auto& authRecord: authInfo.records)
@@ -118,7 +144,7 @@ protected:
     void thenUpdateUserTransactionHasBeenGenerated()
     {
         auto it = m_updateUserAuthInfoTransactions.find(
-            std::make_pair(m_system.id, guidFromArbitraryData(m_ownerAccount.email)));
+            std::make_pair(m_systems[0].id, guidFromArbitraryData(m_ownerAccount.email)));
         ASSERT_TRUE(it != m_updateUserAuthInfoTransactions.end());
         ASSERT_EQ(1U, it->second.records.size());
         assertUserAuthenticationHashIsValid(it->second.records[0]);
@@ -127,6 +153,98 @@ protected:
     void thenUpdateUserTransactionHasNotBeenGenerated()
     {
         ASSERT_TRUE(m_updateUserAuthInfoTransactions.empty());
+    }
+
+    void thenHashForEverySystemHasBeenGenerated()
+    {
+        for (const auto& system: m_systems)
+            assertUserAuthRecordsAreValidForSystem(system.id);
+    }
+
+private:
+    conf::Settings m_settings;
+    AccountManagerStub m_accountManager;
+    SystemSharingManagerStub m_systemSharingManager;
+    TemporaryAccountPasswordManagerStub m_temporaryAccountPasswordManager;
+    std::unique_ptr<cdb::AuthenticationProvider> m_authenticationProvider;
+    dao::UserAuthenticationDataObjectFactory::Function m_factoryBak;
+    dao::memory::UserAuthentication* m_userAuthenticationDao = nullptr;
+    AccountWithPassword m_ownerAccount;
+    std::vector<AccountWithPassword> m_additionalAccounts;
+    std::vector<data::SystemData> m_systems;
+    VmsP2pCommandBusStub m_vmsP2pCommandBusStub;
+    // map<pair<system id, user email>, >
+    std::map<
+        std::pair<std::string, QnUuid>,
+        api::AuthInfo> m_updateUserAuthInfoTransactions;
+
+    std::unique_ptr<dao::AbstractUserAuthentication> createUserAuthenticationDao()
+    {
+        auto dao = std::make_unique<dao::memory::UserAuthentication>();
+        m_userAuthenticationDao = dao.get();
+        return std::move(dao);
+    }
+
+    void prepareTestData()
+    {
+        m_ownerAccount = BusinessDataGenerator::generateRandomAccount();
+        m_systems.push_back(BusinessDataGenerator::generateRandomSystem(m_ownerAccount));
+
+        m_accountManager.addAccount(m_ownerAccount);
+
+        initializeAdditionalAccounts();
+    }
+
+    void initializeAdditionalAccounts()
+    {
+        constexpr std::size_t kAccountNumber = 2;
+
+        m_additionalAccounts.resize(kAccountNumber);
+        for (auto& account : m_additionalAccounts)
+        {
+            account = BusinessDataGenerator::generateRandomAccount();
+            m_accountManager.addAccount(account);
+        }
+    }
+
+    void shareSystem(
+        const std::string& systemId,
+        const std::string& email,
+        api::SystemAccessRole accessRole)
+    {
+        api::SystemSharing sharing;
+        sharing.systemId = systemId;
+        sharing.accountEmail = email;
+        sharing.accessRole = accessRole;
+        sharing.vmsUserId = guidFromArbitraryData(email).toSimpleByteArray().toStdString();
+
+        ASSERT_EQ(
+            nx::db::DBResult::ok,
+            m_authenticationProvider->afterSharingSystem(
+                nullptr, sharing, SharingType::sharingWithExistingAccount));
+    }
+
+    nx::db::DBResult onSaveResourceAttribute(
+        const std::string& systemId,
+        const ::ec2::ApiResourceParamWithRefData& data)
+    {
+        if (data.name == api::kVmsUserAuthInfoAttributeName)
+        {
+            m_updateUserAuthInfoTransactions.emplace(
+                std::make_pair(systemId, data.resourceId),
+                QJson::deserialized<api::AuthInfo>(data.value.toUtf8()));
+        }
+
+        return nx::db::DBResult::ok;
+    }
+
+    void assertUserAuthRecordsAreValidForSystem(const std::string& systemId)
+    {
+        auto authInfo = m_userAuthenticationDao->fetchUserAuthRecords(
+            nullptr, systemId, m_ownerAccount.id);
+        ASSERT_EQ(1U, authInfo.records.size());
+        assertUserAuthenticationHashIsValid(authInfo.records[0]);
+        assertUserAuthenticationTimestampIsValid(authInfo.records[0]);
     }
 
     void assertUserAuthenticationHashIsValid(const api::AuthInfoRecord& authInfo)
@@ -158,66 +276,6 @@ protected:
             nx::utils::floor<milliseconds>(authInfo.expirationTime),
             nx::utils::floor<milliseconds>(
                 nx::utils::utcTime() + m_settings.auth().offlineUserHashValidityPeriod));
-    }
-
-private:
-    conf::Settings m_settings;
-    AccountManagerStub m_accountManager;
-    SystemSharingManagerStub m_systemSharingManager;
-    TemporaryAccountPasswordManagerStub m_temporaryAccountPasswordManager;
-    std::unique_ptr<cdb::AuthenticationProvider> m_authenticationProvider;
-    dao::UserAuthenticationDataObjectFactory::Function m_factoryBak;
-    dao::memory::UserAuthentication* m_userAuthenticationDao = nullptr;
-    AccountWithPassword m_ownerAccount;
-    std::vector<AccountWithPassword> m_accounts;
-    data::SystemData m_system;
-    VmsP2pCommandBusStub m_vmsP2pCommandBusStub;
-    // map<pair<system id, user email>, >
-    std::map<
-        std::pair<std::string, QnUuid>,
-        api::AuthInfo> m_updateUserAuthInfoTransactions;
-
-    std::unique_ptr<dao::AbstractUserAuthentication> createUserAuthenticationDao()
-    {
-        auto dao = std::make_unique<dao::memory::UserAuthentication>();
-        m_userAuthenticationDao = dao.get();
-        return std::move(dao);
-    }
-
-    void prepareTestData()
-    {
-        m_ownerAccount = BusinessDataGenerator::generateRandomAccount();
-        m_system = BusinessDataGenerator::generateRandomSystem(m_ownerAccount);
-
-        m_accountManager.addAccount(m_ownerAccount);
-    }
-
-    void shareSystem(const std::string& email, api::SystemAccessRole accessRole)
-    {
-        api::SystemSharing sharing;
-        sharing.systemId = m_system.id;
-        sharing.accountEmail = email;
-        sharing.accessRole = accessRole;
-        sharing.vmsUserId = guidFromArbitraryData(email).toSimpleByteArray().toStdString();
-
-        ASSERT_EQ(
-            nx::db::DBResult::ok,
-            m_authenticationProvider->afterSharingSystem(
-                nullptr, sharing, SharingType::sharingWithExistingAccount));
-    }
-
-    nx::db::DBResult onSaveResourceAttribute(
-        const std::string& systemId,
-        const ::ec2::ApiResourceParamWithRefData& data)
-    {
-        if (data.name == api::kVmsUserAuthInfoAttributeName)
-        {
-            m_updateUserAuthInfoTransactions.emplace(
-                std::make_pair(systemId, data.resourceId),
-                QJson::deserialized<api::AuthInfo>(data.value.toUtf8()));
-        }
-
-        return nx::db::DBResult::ok;
     }
 };
 
@@ -254,6 +312,15 @@ TEST_F(
     whenSystemSharingRanIntoDbError();
     thenUpdateUserTransactionHasNotBeenGenerated();
 }
+
+TEST_F(AuthenticationProvider, each_system_auth_hash_is_updated_on_account_password_change)
+{
+    givenAccountWithMultipleSystems();
+    whenChangingAccountPassword();
+    thenHashForEverySystemHasBeenGenerated();
+}
+
+// TEST_F(AuthenticationProvider, )
 
 } // namespace test
 } // namespace cdb

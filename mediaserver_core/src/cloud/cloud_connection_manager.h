@@ -46,7 +46,6 @@ public:
     void setProxyVia(const SocketAddress& proxyEndpoint);
 
     bool detachSystemFromCloud();
-    bool resetCloudData();
 
 signals:
     void cloudBindingStatusChanged(bool boundToCloud);

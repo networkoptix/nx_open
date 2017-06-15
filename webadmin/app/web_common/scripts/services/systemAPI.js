@@ -360,9 +360,7 @@ angular.module('nxCommon')
             }
             var defaultConnection = connect(null, null, serverId, function(error){
                 // Unauthorised request here
-
-                $log.error("reload on lost connection",error);
-                window.location.reload(); // just reload the page and it supposed to handle the problem
+                // We are in webadmin mode - do nothing, let webadmin handle it
                 return $q.reject(); // Do not repeat last request
             });
             return defaultConnection;

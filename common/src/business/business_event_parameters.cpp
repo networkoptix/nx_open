@@ -28,8 +28,7 @@ QnUuid QnBusinessEventParameters::getParamsHash() const {
             break;
 
         case QnBusiness::SoftwareTriggerEvent:
-            return QnUuid::createUuid();
-            break;
+            return QnUuid::createUuid(); //< Warning: early return.
 
         case QnBusiness::CameraInputEvent:
             paramKey += '_' + inputPortId.toUtf8();

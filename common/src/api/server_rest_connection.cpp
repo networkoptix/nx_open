@@ -248,6 +248,127 @@ Handle ServerConnection::checkCloudHost(
         targetThread);
 }
 
+Handle ServerConnection::downloaderAddDownload(
+    const QString& fileName,
+    int size,
+    const QByteArray& md5,
+    const QUrl& url,
+    GetCallback callback,
+    QThread* targetThread)
+{
+    return executeGet(
+        lit("/api/downloader/addDownload"),
+        QnRequestParamList{
+            {lit("fileName"), fileName},
+            {lit("size"), QString::number(size)},
+            {lit("md5"), QString::fromUtf8(md5)},
+            {lit("url"), url.toString()}},
+        callback,
+        targetThread);
+}
+
+Handle ServerConnection::downloaderRemoveDownload(
+    const QString& fileName,
+    bool deleteData,
+    GetCallback callback,
+    QThread* targetThread)
+{
+    return executeGet(
+        lit("/api/downloader/removeDownload"),
+        QnRequestParamList{
+            {lit("fileName"), fileName},
+            {lit("deleteData"), QnLexical::serialized(deleteData)}},
+        callback,
+        targetThread);
+}
+
+Handle ServerConnection::downloaderChunkChecksums(
+    const QString& fileName,
+    GetCallback callback,
+    QThread* targetThread)
+{
+    return executeGet(
+        lit("/api/downloader/chunkChecksums"),
+        QnRequestParamList{{lit("fileName"), fileName}},
+        callback,
+        targetThread);
+}
+
+Handle ServerConnection::downloaderDownloadChunk(
+    const QString& fileName,
+    int index,
+    Result<QByteArray>::type callback,
+    QThread* targetThread)
+{
+    return executeGet(
+        lit("/api/downloader/downloadChunk"),
+        QnRequestParamList{
+            {lit("fileName"), fileName},
+            {lit("index"), QString::number(index)}},
+        callback,
+        targetThread);
+}
+
+Handle ServerConnection::downloaderDownloadChunkFromInternet(
+    const QString& fileName,
+    const QUrl& url,
+    int chunkIndex,
+    int chunkSize,
+    Result<QByteArray>::type callback,
+    QThread* targetThread)
+{
+    return executeGet(
+        lit("/api/downloader/downloadChunkFromInternet"),
+        QnRequestParamList{
+            {lit("fileName"), fileName},
+            {lit("url"), url.toString()},
+            {lit("chunkIndex"), QString::number(chunkIndex)},
+            {lit("chunkSize"), QString::number(chunkSize)}},
+        callback,
+        targetThread);
+}
+
+Handle ServerConnection::downloaderUploadChunk(
+    const QString& fileName,
+    int index,
+    const QByteArray& data,
+    GetCallback callback,
+    QThread* targetThread)
+{
+    return executePost(
+        lit("/api/downloader/uploadChunk"),
+        QnRequestParamList{
+            {lit("fileName"), fileName},
+            {lit("index"), QString::number(index)}},
+        "application/octet-stream",
+        data,
+        callback,
+        targetThread);
+}
+
+Handle ServerConnection::downloaderStatus(
+    GetCallback callback,
+    QThread* targetThread)
+{
+    return executeGet(
+        lit("/api/downloader/status"),
+        QnRequestParamList(),
+        callback,
+        targetThread);
+}
+
+Handle ServerConnection::downloaderFileStatus(
+    const QString& fileName,
+    GetCallback callback,
+    QThread* targetThread)
+{
+    return executeGet(
+        lit("/api/downloader/status"),
+        QnRequestParamList{{lit("fileName"), fileName}},
+        callback,
+        targetThread);
+}
+
 // --------------------------- private implementation -------------------------------------
 
 QUrl ServerConnection::prepareUrl(const QString& path, const QnRequestParamList& params) const
