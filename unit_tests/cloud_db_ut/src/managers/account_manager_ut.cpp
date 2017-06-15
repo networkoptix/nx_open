@@ -128,7 +128,7 @@ private:
         accountRegistrationData.email = accountEmail;
         accountRegistrationData.customization = "default";
         accountRegistrationData.fullName = "H Z";
-        accountRegistrationData.passwordHa1 = nx::utils::generateRandomName(22);
+        accountRegistrationData.passwordHa1 = nx::utils::generateRandomName(22).toStdString();
 
         api::ResultCode resultCode = api::ResultCode::ok;
         std::tie(resultCode, *accountConfirmationCode) =
