@@ -279,8 +279,7 @@ CameraDiagnostics::Result ThirdPartyStreamReader::openStreamInternal(bool isCame
             rtspStreamReader->setUserAgent(QnAppInfo::productName());
             rtspStreamReader->setRequest( mediaUrlStr );
             rtspStreamReader->setRole(role);
-            rtspStreamReader->setPrefferedAuthScheme(nx_http::header::AuthScheme::automatic);
-			m_thirdPartyRes->updateSourceUrl(rtspStreamReader->getCurrentStreamUrl(), getRole());
+            m_thirdPartyRes->updateSourceUrl(rtspStreamReader->getCurrentStreamUrl(), getRole());
             QnMutexLocker lock(&m_streamReaderMutex);
             m_builtinStreamReader.reset( rtspStreamReader );
         }
