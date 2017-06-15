@@ -100,7 +100,7 @@ LayoutToursHandler::LayoutToursHandler(QObject* parent):
                 messageBox.setStandardButtons(QDialogButtonBox::Cancel);
                 messageBox.addCustomButton(QnMessageBoxCustomButton::Delete,
                     QDialogButtonBox::AcceptRole, Qn::ButtonAccent::Warning);
-                if (messageBox.exec() == QDialogButtonBox::Cancel);
+                if (messageBox.exec() == QDialogButtonBox::Cancel)
                     return;
             }
 
