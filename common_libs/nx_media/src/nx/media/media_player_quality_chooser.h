@@ -31,6 +31,12 @@ public:
         QSize frameSize;
     };
 
+    enum class RequestReason
+    {
+        Playback, //< Choose quality to start playback.
+        Information, //< Check quality availability without an intention to start playback.
+    };
+
     /**
      * @param videoQuality Video quality desired by the user. Same as Player::videoQuality: either
      *     one of enum Player::VideoQuality values, or approximate vertical resolution.
@@ -46,7 +52,8 @@ public:
         int videoQuality,
         bool liveMode,
         qint64 positionMs,
-        const QnVirtualCameraResourcePtr& camera);
+        const QnVirtualCameraResourcePtr& camera,
+        RequestReason requestReason);
 
 private:
     media_player_quality_chooser() = delete;
@@ -58,7 +65,8 @@ private:
         const QnVirtualCameraResourcePtr& camera,
         AVCodecID highCodec,
         const QSize& highResolution,
-        const QnConstResourceVideoLayoutPtr& videoLayout);
+        const QnConstResourceVideoLayoutPtr& videoLayout,
+        RequestReason requestReason);
 };
 
 } // namespace media

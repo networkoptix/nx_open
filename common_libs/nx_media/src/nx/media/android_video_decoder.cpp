@@ -503,6 +503,11 @@ QSize AndroidVideoDecoder::maxResolution(const AVCodecID codec)
     return AndroidVideoDecoderPrivate::maxResolutions[codec]; //< Return empty QSize if not found.
 }
 
+QString AndroidVideoDecoder::name()
+{
+    return lit("android_native");
+}
+
 int AndroidVideoDecoder::decode(const QnConstCompressedVideoDataPtr& frame, QVideoFramePtr* result)
 {
     QElapsedTimer tm;

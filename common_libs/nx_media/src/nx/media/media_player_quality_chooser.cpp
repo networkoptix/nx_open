@@ -145,8 +145,12 @@ static QSize applyTranscodingIfPossible(
     bool liveMode,
     qint64 positionMs,
     const QnVirtualCameraResourcePtr& camera,
-    const QSize& desiredResolution)
+    const QSize& desiredResolution,
+    media_player_quality_chooser::RequestReason requestReason)
 {
+    const bool ignoreCount =
+        requestReason == media_player_quality_chooser::RequestReason::Information;
+
     if (!isTranscodingSupported(liveMode, positionMs, camera))
     {
         NX_LOG(lit("[media_player] Transcoding not supported for the camera => Set low stream"),
@@ -157,7 +161,7 @@ static QSize applyTranscodingIfPossible(
     QSize resolution = limitResolution(desiredResolution, kMaxTranscodingResolution);
 
     if (!VideoDecoderRegistry::instance()->hasCompatibleDecoder(
-        transcodingCodec, resolution))
+        transcodingCodec, resolution, ignoreCount))
     {
         NX_LOG(lit("[media_player] Transcoding to %1 x %2 not supported => Set low stream")
             .arg(resolution.width()).arg(resolution.height()), cl_logDEBUG1);
@@ -183,8 +187,11 @@ QSize media_player_quality_chooser::chooseHighStreamIfPossible(
     const QnVirtualCameraResourcePtr& camera,
     AVCodecID highCodec,
     const QSize& highResolution,
-    const QnConstResourceVideoLayoutPtr& videoLayout)
+    const QnConstResourceVideoLayoutPtr& videoLayout,
+    RequestReason requestReason)
 {
+    const bool ignoreCount = requestReason == RequestReason::Information;
+
     if (highCodec != AV_CODEC_ID_NONE && !highResolution.isEmpty()) //< High stream exists.
     {
         if (videoLayout->channelCount() > 1) //< Panoramic camera.
@@ -200,12 +207,12 @@ QSize media_player_quality_chooser::chooseHighStreamIfPossible(
                 cl_logDEBUG1);
 
             const QSize& quality = applyTranscodingIfPossible(
-                transcodingCodec, liveMode, positionMs, camera, resolution);
+                transcodingCodec, liveMode, positionMs, camera, resolution, requestReason);
             if (quality.isValid())
                 return quality;
         }
         else if (VideoDecoderRegistry::instance()->hasCompatibleDecoder(
-            highCodec, highResolution))
+            highCodec, highResolution, ignoreCount))
         {
             NX_LOG(lit("[media_player] High stream requested => Set high stream"),
                 cl_logDEBUG1);
@@ -216,7 +223,7 @@ QSize media_player_quality_chooser::chooseHighStreamIfPossible(
             NX_LOG(lit("[media_player] High stream requested but compatible decoder missing:"),
                 cl_logDEBUG1);
             const QSize& quality = applyTranscodingIfPossible(
-                transcodingCodec, liveMode, positionMs, camera, highResolution);
+                transcodingCodec, liveMode, positionMs, camera, highResolution, requestReason);
             if (quality.isValid())
                 return quality;
         }
@@ -235,7 +242,8 @@ media_player_quality_chooser::Result media_player_quality_chooser::chooseVideoQu
     int videoQuality,
     bool liveMode,
     qint64 positionMs,
-    const QnVirtualCameraResourcePtr& camera)
+    const QnVirtualCameraResourcePtr& camera,
+    RequestReason requestReason)
 {
     // Obtain Low and High stream codec and resolution.
     QSize highResolution;
@@ -283,7 +291,8 @@ media_player_quality_chooser::Result media_player_quality_chooser::chooseVideoQu
     {
         const QSize& quality = chooseHighStreamIfPossible(
             transcodingCodec, liveMode, positionMs, camera,
-            highCodec, highResolution, videoLayout);
+            highCodec, highResolution, videoLayout,
+            requestReason);
         return makeResult(quality);
     }
     else if (lowStreamRequested)
@@ -295,7 +304,7 @@ media_player_quality_chooser::Result media_player_quality_chooser::chooseVideoQu
         const QSize& resolution = transcodingResolution(
             lowResolution, highResolution, videoQuality, transcodingCodec);
         const QSize& quality = applyTranscodingIfPossible(
-            transcodingCodec, liveMode, positionMs, camera, resolution);
+            transcodingCodec, liveMode, positionMs, camera, resolution, requestReason);
         if (quality.isValid())
             return makeResult(quality);
     }

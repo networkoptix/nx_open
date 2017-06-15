@@ -273,6 +273,11 @@ QSize FfmpegVideoDecoder::maxResolution(const AVCodecID codec)
     return s_maxResolution;
 }
 
+QString FfmpegVideoDecoder::name()
+{
+    return lit("ffmpeg");
+}
+
 int FfmpegVideoDecoder::decode(
     const QnConstCompressedVideoDataPtr& compressedVideoData, QVideoFramePtr* outDecodedFrame)
 {

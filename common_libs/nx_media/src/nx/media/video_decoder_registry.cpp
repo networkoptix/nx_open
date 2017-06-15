@@ -2,6 +2,8 @@
 
 #include <QtCore/QMutexLocker>
 
+#include <nx/utils/log/log.h>
+
 #include "abstract_video_decoder.h"
 
 namespace nx {
@@ -50,13 +52,36 @@ VideoDecoderPtr VideoDecoderRegistry::createCompatibleDecoder(
     return VideoDecoderPtr(nullptr, nullptr); //< no compatible decoder found
 }
 
-bool VideoDecoderRegistry::hasCompatibleDecoder(const AVCodecID codec, const QSize& resolution)
+bool VideoDecoderRegistry::hasCompatibleDecoder(
+    const AVCodecID codec, const QSize& resolution, bool ignoreCount)
 {
+    auto codecString =
+        [codec, &resolution]()
+        {
+            return lit("%1 [%2x%3]").arg(codec).arg(resolution.width()).arg(resolution.height());
+        };
+
+    NX_LOGX(lm("Checking for decoder compatible to codec %1.").arg(codecString()), cl_logDEBUG2);
+
     QMutexLocker lock(&mutex);
     for (const auto& plugin: m_plugins)
     {
-        if (plugin.isCompatible(codec, resolution) && plugin.useCount < plugin.maxUseCount)
-            return true;
+        if (!ignoreCount && plugin.useCount >= plugin.maxUseCount)
+        {
+            NX_LOGX(lm("Count exceeded for plugin %1").arg(plugin.name), cl_logDEBUG2);
+            continue;
+        }
+
+        if (!plugin.isCompatible(codec, resolution))
+        {
+            NX_LOGX(
+                lm("Plugin %1 is not compatible to codec %2").arg(plugin.name).arg(codecString()),
+                cl_logDEBUG2);
+            continue;
+        }
+
+        NX_LOGX(lm("Selected plugin: %1").arg(plugin.name), cl_logDEBUG2);
+        return true;
     }
     return false;
 }

@@ -33,7 +33,10 @@ public:
     /**
      * @return True if compatible video decoder found.
      */
-    bool hasCompatibleDecoder(const AVCodecID codec, const QSize& resolution);
+    bool hasCompatibleDecoder(
+        const AVCodecID codec,
+        const QSize& resolution,
+        bool ignoreCount = false);
 
     /**
      * @return Some sort of a maximum for all resolutions returned for the codec by
@@ -80,6 +83,7 @@ private:
         ResourceAllocatorPtr allocator;
         int useCount;
         int maxUseCount;
+        QString name;
     };
 
     template<class Decoder>
@@ -96,6 +100,7 @@ private:
             maxResolution = &Decoder::maxResolution;
             this->allocator = std::move(allocator);
             this->maxUseCount = maxUseCount;
+            name = Decoder::name();
         }
     };
 

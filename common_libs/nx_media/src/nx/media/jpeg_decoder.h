@@ -24,6 +24,8 @@ public:
 
     static QSize maxResolution(const AVCodecID codec);
 
+    static QString name();
+
     virtual int decode(
         const QnConstCompressedVideoDataPtr& frame, QVideoFramePtr* result = nullptr) override;
 

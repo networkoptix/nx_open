@@ -623,7 +623,8 @@ void PlayerPrivate::applyVideoQuality()
         videoQuality,
         liveMode,
         positionMs,
-        camera);
+        camera,
+        media_player_quality_chooser::RequestReason::Playback);
 
     switch (result.quality)
     {
@@ -1052,7 +1053,8 @@ QList<int> Player::availableVideoQualities(const QList<int>& videoQualities) con
             (int quality)
         {
             return media_player_quality_chooser::chooseVideoQuality(
-                codec, quality, liveMode, positionMs, camera);
+                codec, quality, liveMode, positionMs, camera,
+                media_player_quality_chooser::RequestReason::Information);
         };
 
     const auto highQuality = getQuality(HighVideoQuality);
