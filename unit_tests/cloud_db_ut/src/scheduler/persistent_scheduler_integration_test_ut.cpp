@@ -116,6 +116,7 @@ protected:
     {
         auto userTasks = user->tasks();
         ASSERT_EQ(userTasks.size(), 2);
+
         for (const auto& task: userTasks)
             ASSERT_GT(task.second.fired, 0);
     }
@@ -134,6 +135,21 @@ protected:
     void thenSchedulerShouldBeIdleWithoutCrashes()
     {
         andWhenSchedulerWorksForSomeTime();
+    }
+
+    void thenFirstUserShouldNotReceiveTimerEventsAnyLonger()
+    {
+
+    }
+
+    void thenTasksShouldFireMultipleTimesForTheSecondUser()
+    {
+
+    }
+
+    void andNoTasksShouldFireForTheFirstUser()
+    {
+
     }
 
     QString dbPath;
@@ -185,20 +201,22 @@ TEST_F(SchedulerIntegrationTest, TwoUsersTasks_AfterRestart_OneUserRegistered)
     thenTasksShouldFireMultipleTimesForTheFirstUser();
 }
 
-//TEST_F(SchedulerIntegrationTest, TwoUsersTasks_OneUnsubscribed_AfterRestart_TwoUsersRegistered)
-//{
-//    whenTwoUsersScheduleTwoTasksEach();
-//    andWhenSchedulerWorksForSomeTime();
+TEST_F(SchedulerIntegrationTest, TwoUsersTasks_OneUnsubscribed_AfterRestart_TwoUsersRegistered)
+{
+    whenTwoUsersScheduleTwoTasksEach();
+    andWhenSchedulerWorksForSomeTime();
 
-//    andWhenFirstUsersUnsubscribes();
-//    thenFirstUserShouldNotReceiveTimerEventsAnyLonger();
+    andWhenFirstUsersUnsubscribes();
+    andWhenSchedulerWorksForSomeTime();
+    thenFirstUserShouldNotReceiveTimerEventsAnyLonger();
 
-//    andSystemRestarts();
-//    andBothUsersRegistred();
+    andWhenSystemRestarts();
+    whenTwoUsersInitializedAndRegistredToScheduler();
+    andWhenSchedulerWorksForSomeTime();
 
-//    thenTasksShouldFireMultipleTimesForTheSecondUser();
-//    andNoTasksShouldFireForTheFirstUser();
-//}
+    thenTasksShouldFireMultipleTimesForTheSecondUser();
+    andNoTasksShouldFireForTheFirstUser();
+}
 
 //TEST_F(SchedulerIntegrationTest, OneUserSchedulesLongTask_AfterRestartAndPause)
 //{
