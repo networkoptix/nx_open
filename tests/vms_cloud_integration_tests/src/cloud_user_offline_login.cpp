@@ -131,7 +131,7 @@ TEST_F(CloudUserOfflineLogin, multiple_users_can_login)
 
 // TEST_F(CloudUserOfflineLogin, cloud_user_added_while_system_is_offline_cannot_login_while_others_can)
 
-TEST_F(CloudUserOfflineLogin, DISABLED_user_can_login_after_password_change)
+TEST_F(CloudUserOfflineLogin, user_can_login_after_password_change)
 {
     whenCloudUserPasswordHasBeenChanged();
     whenCloudDataHasBeenSynchronizedToTheServer();
@@ -140,4 +140,4 @@ TEST_F(CloudUserOfflineLogin, DISABLED_user_can_login_after_password_change)
     thenUserCanStillLogin();
 }
 
-// TEST_F(CloudUserOfflineLogin, user_password_changed_while_system_was_offline)
+// TEST_F(CloudUserOfflineLogin, invited_user_can_login_after_completing_registration_in_cloud)
