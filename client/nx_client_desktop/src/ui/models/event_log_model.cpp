@@ -290,13 +290,39 @@ QnResourcePtr QnEventLogModel::getResource(Column column, const QnBusinessAction
     return QnResourcePtr();
 }
 
-QString QnEventLogModel::getUserNameById(const QnUuid& id)
+QString QnEventLogModel::getSubjectsText(const std::vector<QnUuid>& ids) const
 {
-    static const auto kRemovedUserName = L'<' + tr("User removed") + L'>';
+    if (ids.empty())
+        return tr("All users");
 
-    auto resourcePool = qnClientCoreModule->commonModule()->resourcePool();
-    const auto userResource = resourcePool->getResourceById(id).dynamicCast<QnUserResource>();
-    return (userResource.isNull() ? kRemovedUserName : userResource->getName());
+    QnUserResourceList users;
+    QList<QnUuid> roles;
+    userRolesManager()->usersAndRoles(ids, users, roles);
+
+    const int numDeleted = int(ids.size()) - (users.size() + roles.size());
+    if (roles.empty() && users.empty() && numDeleted > 0)
+        return tr("%n Removed subjects", "", numDeleted);
+
+    QString text = m_helper->actionSubjects(users, roles, numDeleted > 0);
+
+    if (numDeleted > 0)
+        text += lit(", ") + tr("%n Removed subjects", "", numDeleted);
+
+    return text;
+}
+
+QString QnEventLogModel::getSubjectNameById(const QnUuid& id) const
+{
+    static const auto kRemovedUserName = L'<' + tr("Subject removed") + L'>';
+
+    QnUserResourceList users;
+    QList<QnUuid> roles;
+    userRolesManager()->usersAndRoles(
+        QVector<QnUuid>{id}, users, roles);
+
+    return users.empty() && roles.empty()
+        ? kRemovedUserName
+        : m_helper->actionSubjects(users, roles, false);
 }
 
 QVariant QnEventLogModel::iconData(Column column, const QnBusinessActionData& action)
@@ -386,22 +412,16 @@ QString QnEventLogModel::textData(Column column, const QnBusinessActionData& act
             else if (actionType == QnBusiness::ShowPopupAction
                   || actionType == QnBusiness::ShowOnAlarmLayoutAction)
             {
-                const auto& usersAndRoles = action.actionParams.additionalResources;
-                if (usersAndRoles.empty())
-                    return tr("All users");
-
-                //TODO: #vkutin #3.1 Support roles adequately.
-                if (usersAndRoles.size() == 1)
-                    return getUserNameById(usersAndRoles.front());
-
-                return tr("%n users and roles", "", usersAndRoles.size());
+                return getSubjectsText(action.actionParams.additionalResources);
             }
             else if (actionType == QnBusiness::ExecHttpRequestAction)
             {
                 return QUrl(action.actionParams.url).toString(QUrl::RemoveUserInfo);
             }
             else
+            {
                 return getResourceNameString(action.actionParams.actionResourceId);
+            }
         }
         case DescriptionColumn:
         {
@@ -472,7 +492,7 @@ QString QnEventLogModel::tooltip(Column column, const QnBusinessActionData& acti
         else
         {
             for (const auto& userId: users)
-                userNames.append(getUserNameById(userId));
+                userNames.append(getSubjectNameById(userId));
         }
 
         if (userNames.size() > kMaxResourcesCount)

@@ -29,6 +29,7 @@
 #include <nx/client/desktop/ui/actions/action_manager.h>
 #include <ui/common/geometry.h>
 #include <ui/common/notification_levels.h>
+#include <ui/graphics/items/generic/graphics_message_box.h>
 
 //TODO: #gdm think about moving out pages enums
 #include <ui/dialogs/resource_properties/user_settings_dialog.h>
@@ -274,6 +275,12 @@ void QnNotificationsCollectionWidget::handleShowPopupAction(
         {
             for (const auto bookmark: bookmarks)
                 qnCameraBookmarksManager->addCameraBookmark(bookmark);
+
+            static constexpr int kHintTimeoutMs = 5000;
+            const auto message = bookmarks.count() == 1
+                ? tr("Bookmark created")
+                : tr("%n bookmarks created", "", bookmarks.count());
+            QnGraphicsMessageBox::information(message, kHintTimeoutMs);
         });
 }
 

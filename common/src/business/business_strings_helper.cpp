@@ -641,7 +641,8 @@ QString QnBusinessStringsHelper::getSoftwareTriggerName(const QnBusinessEventPar
     return getSoftwareTriggerName(params.caption);
 }
 
-QString QnBusinessStringsHelper::actionSubjects(const QnBusinessEventRulePtr& rule) const
+QString QnBusinessStringsHelper::actionSubjects(const QnBusinessEventRulePtr& rule,
+    bool noSingleName) const
 {
     QnUserResourceList users;
     QList<QnUuid> roles;
@@ -651,25 +652,29 @@ QString QnBusinessStringsHelper::actionSubjects(const QnBusinessEventRulePtr& ru
     else
         userRolesManager()->usersAndRoles(rule->actionParams().additionalResources, users, roles);
 
-    return actionSubjects(users, roles);
+    return actionSubjects(users, roles, noSingleName);
 }
 
 QString QnBusinessStringsHelper::actionSubjects(
     const QnUserResourceList& users,
-    const QList<QnUuid>& roles) const
+    const QList<QnUuid>& roles,
+    bool noSingleName) const
 {
     if (users.empty() && roles.empty())
         return tr("All Users");
 
-    if (users.size() == 1 && roles.empty())
-        return users.front()->getName();
-
-    if (users.empty() && roles.size() == 1)
+    if (!noSingleName)
     {
-        return lit("%1 %2 %3")
-            .arg(tr("Role"))
-            .arg(L'\x2013') //< En-dash.
-            .arg(userRolesManager()->userRole(roles.front()).name);
+        if (users.size() == 1 && roles.empty())
+            return users.front()->getName();
+
+        if (users.empty() && roles.size() == 1)
+        {
+            return lit("%1 %2 %3")
+                .arg(tr("Role"))
+                .arg(L'\x2013') //< En-dash.
+                .arg(userRolesManager()->userRole(roles.front()).name);
+        }
     }
 
     if (roles.empty())

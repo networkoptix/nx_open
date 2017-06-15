@@ -29,6 +29,10 @@
 #include <nx/client/desktop/utils/server_notification_cache.h>
 #include <utils/math/color_transformations.h>
 
+#include <nx/client/desktop/ui/event_rules/subject_selection_dialog.h>
+
+using namespace nx::client::desktop::ui;
+
 namespace {
 enum { comboBoxMaxVisibleItems = 100 };
 }
@@ -77,13 +81,24 @@ void QnSelectResourcesDialogButton::setSelectionTarget(QnResourceSelectionDialog
 
 void QnSelectResourcesDialogButton::at_clicked()
 {
-    QnResourceSelectionDialog dialog(m_target, this);
-    dialog.setSelectedResources(m_resources);
-    dialog.setDelegate(m_dialogDelegate);
-    int result = dialog.exec();
-    if (result != QDialog::Accepted)
-        return;
-    m_resources = dialog.selectedResources();
+    if (m_target == QnResourceSelectionDialog::Filter::users)
+    {
+        SubjectSelectionDialog dialog(this);
+        dialog.setCheckedSubjects(m_resources);
+        //TODO: #vkutin #3.1 Use dialog delegate for validation.
+        if (dialog.exec() != QDialog::Accepted)
+            return;
+        m_resources = dialog.checkedSubjects();
+    }
+    else
+    {
+        QnResourceSelectionDialog dialog(m_target, this);
+        dialog.setSelectedResources(m_resources);
+        dialog.setDelegate(m_dialogDelegate);
+        if (dialog.exec() != QDialog::Accepted)
+            return;
+        m_resources = dialog.selectedResources();
+    }
     emit commit();
 }
 
