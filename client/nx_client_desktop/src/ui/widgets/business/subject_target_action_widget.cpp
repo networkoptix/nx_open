@@ -12,6 +12,10 @@
 #include <ui/style/resource_icon_cache.h>
 #include <ui/style/skin.h>
 
+#include <nx/client/desktop/ui/event_rules/subject_selection_dialog.h>
+
+using namespace nx::client::desktop::ui;
+
 QnSubjectTargetActionWidget::QnSubjectTargetActionWidget(QWidget* parent):
     base_type(parent),
     m_helper(new QnBusinessStringsHelper(commonModule()))
@@ -38,12 +42,12 @@ void QnSubjectTargetActionWidget::selectSubjects()
     if (!model() || m_updating)
         return;
 
-    QnResourceSelectionDialog dialog(QnResourceSelectionDialog::Filter::users, this);
+    SubjectSelectionDialog dialog(this);
     QSet<QnUuid> selected;
     for (auto id: model()->actionParams().additionalResources)
         selected << id;
 
-    dialog.setSelectedResources(selected);
+    dialog.setCheckedSubjects(selected);
     if (dialog.exec() != QDialog::Accepted)
         return;
 
@@ -51,7 +55,7 @@ void QnSubjectTargetActionWidget::selectSubjects()
         QScopedValueRollback<bool> updatingRollback(m_updating, true);
 
         std::vector<QnUuid> userIds;
-        for (const auto &id: dialog.selectedResources())
+        for (const auto &id: dialog.checkedSubjects())
             userIds.push_back(id);
 
         QnBusinessActionParameters params = model()->actionParams();
