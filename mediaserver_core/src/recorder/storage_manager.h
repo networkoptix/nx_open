@@ -131,6 +131,7 @@ public:
     bool hasRebuildingStorages() const;
 
     void clearSpace(bool forced=false);
+    void checkSystemStorageSpace();
     void removeEmptyDirs(const QnStorageResourcePtr &storage);
 
     bool clearOldestSpace(const QnStorageResourcePtr &storage, bool useMinArchiveDays);
@@ -288,6 +289,7 @@ private:
     nx::caminfo::Writer m_camInfoWriter;
 
     nx::utils::StandaloneTimerManager m_auxTasksTimerManager;
+    bool m_lowSysStorageSpaceWarnShown;
 };
 
 #define qnNormalStorageMan QnStorageManager::normalInstance()

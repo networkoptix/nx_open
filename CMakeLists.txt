@@ -152,6 +152,7 @@ endif()
 
 if(withTests)
     add_subdirectory(unit_tests)
+    add_subdirectory(tests)
 endif()
 
 include(fix_qt_vars)

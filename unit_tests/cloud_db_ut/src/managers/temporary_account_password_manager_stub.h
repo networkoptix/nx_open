@@ -1,6 +1,6 @@
 #pragma once
 
-#include <managers/temporary_account_password_manager.h>
+#include <nx/cloud/cdb/managers/temporary_account_password_manager.h>
 
 namespace nx {
 namespace cdb {

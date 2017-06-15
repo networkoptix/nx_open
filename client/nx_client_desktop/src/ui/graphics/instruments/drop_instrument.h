@@ -48,8 +48,7 @@ private:
         const nx::client::desktop::ui::action::Parameters& parameters);
 
 private:
-    QnResourceList m_resources;
-    QnVideoWallItemIndexList m_videoWallItems;
+    QList<QnUuid> m_ids;
 
     QPointer<QnWorkbenchContext> m_context;
     QScopedPointer<SceneEventFilterItem> m_filterItem;

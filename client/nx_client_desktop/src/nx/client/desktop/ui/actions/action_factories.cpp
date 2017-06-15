@@ -258,8 +258,8 @@ QList<QAction*> CurrentLayoutTourSettingsFactory::newActions(const Parameters& /
     {
         auto action = new QAction(parent);
         action->setText(manual
-            ? tr("Switch Layouts by Hotkeys")
-            : tr("Switch Layouts By Timer"));
+            ? tr("Switch with Hotkeys")
+            : tr("Switch by Timer"));
         action->setCheckable(true);
         action->setChecked(manual == isManual);
         connect(action, &QAction::triggered, this,

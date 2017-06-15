@@ -1,10 +1,9 @@
 #include <QtCore>
-#include "utils.h"
 
 #include <nx/network/test_support/run_test.h>
 #include <nx/utils/test_support/test_with_temporary_directory.h>
 
-nx::ut::cfg::Config config;
+#include <test_support/utils.h>
 
 static void fillConfig(const QStringList& arguments)
 {
@@ -23,14 +22,14 @@ static void fillConfig(const QStringList& arguments)
     }
 
     if (parser.isSet("tmp") && nx::ut::utils::validateAndOrCreatePath(parser.value("tmp")))
-        config.tmpDir = parser.value("tmp");
+        nx::ut::cfg::configInstance().tmpDir = parser.value("tmp");
     else
-        config.tmpDir = QDir(QDir::tempPath()).absoluteFilePath("nx_ut");
+        nx::ut::cfg::configInstance().tmpDir = QDir(QDir::tempPath()).absoluteFilePath("nx_ut");
 
     if (parser.isSet("ftp-storage-url"))
-        config.ftpUrl = parser.value("ftp-storage-url");
+        nx::ut::cfg::configInstance().ftpUrl = parser.value("ftp-storage-url");
     if (parser.isSet("smb-storage-url"))
-        config.smbUrl = parser.value("smb-storage-url");
+        nx::ut::cfg::configInstance().smbUrl = parser.value("smb-storage-url");
 }
 
 static void fillConfig(QCoreApplication& app)

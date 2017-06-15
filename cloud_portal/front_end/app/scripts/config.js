@@ -141,23 +141,23 @@ var Config = {
                     },
                     {
                         platform: 'win64',
-                        appType: 'bundle',
+                        appType: 'server',
                     },
                     {
                         platform: 'win64',
-                        appType: 'server',
-                    },
-                    {
-                        platform: 'win86',
                         appType: 'bundle',
-                    },
-                    {
-                        platform: 'win86',
-                        appType: 'server',
                     },
                     {
                         platform: 'win86',
                         appType: 'client',
+                    },
+                    {
+                        platform: 'win86',
+                        appType: 'server',
+                    },
+                    {
+                        platform: 'win86',
+                        appType: 'bundle',
                     }
                 ]
             },
@@ -175,11 +175,11 @@ var Config = {
                     },
                     {
                         platform: 'linux86',
-                        appType: 'server',
+                        appType: 'client',
                     },
                     {
                         platform: 'linux86',
-                        appType: 'client',
+                        appType: 'server',
                     }
                 ]
             },

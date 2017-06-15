@@ -9,7 +9,7 @@ angular.module('nxCommon')
         	    title: "=",
         	    message: "=",
         	    preloader: "=",
-        	    condition: "="
+        	    condition: "=ngIf"
         	},
         	templateUrl: Config.viewsDirCommon + 'components/placeholder.html'
 		};

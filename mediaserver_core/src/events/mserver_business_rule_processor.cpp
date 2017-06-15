@@ -674,25 +674,25 @@ void QnMServerBusinessRuleProcessor::sendEmailAsync(
 
 bool QnMServerBusinessRuleProcessor::sendMail(const QnSendMailBusinessActionPtr& action )
 {
-    //QnMutexLocker lk( &m_mutex );  m_mutex is already locked down the stack
+    // QnMutexLocker lk(&m_mutex); <- m_mutex is already locked down the stack.
 
-    //currently, aggregating only cameraDisconnected and networkIssue events
+    // Currently, aggregating only cameraDisconnected and networkIssue events.
     if( action->getRuntimeParams().eventType != QnBusiness::CameraDisconnectEvent &&
         action->getRuntimeParams().eventType != QnBusiness::NetworkIssueEvent )
     {
         return sendMailInternal(action, 1);
     }
 
-    /* Aggregating by recipients and event type. */
+    // Aggregating by recipients and event type.
 
     SendEmailAggregationKey aggregationKey(action->getRuntimeParams().eventType,
-        action->getParams().emailAddress); // all recipients are already computed and packed here
+        action->getParams().emailAddress); //< all recipients are already computed and packed here.
 
     SendEmailAggregationData& aggregatedData = m_aggregatedEmails[aggregationKey];
 
     QnBusinessAggregationInfo aggregationInfo = aggregatedData.action
-        ? aggregatedData.action->aggregationInfo()  //adding event source (camera) to the existing aggregation info
-        : QnBusinessAggregationInfo();              //creating new aggregation info
+        ? aggregatedData.action->aggregationInfo() //< adding event source (camera) to the existing aggregation info.
+        : QnBusinessAggregationInfo();             //< creating new aggregation info.
 
     if( !aggregatedData.action )
     {
@@ -1012,9 +1012,9 @@ void QnMServerBusinessRuleProcessor::updateRecipientsList(
     QStringList additional = action->getParams().emailAddress.split(kOldEmailDelimiter,
         QString::SkipEmptyParts);
 
-    const auto ids = action->getResources();
-    const auto userRoles = userRolesManager()->userRoles(ids);
-    const auto users = resourcePool()->getResources<QnUserResource>(ids);
+    QList<QnUuid> userRoles;
+    QnUserResourceList users;
+    userRolesManager()->usersAndRoles(action->getResources(), users, userRoles);
 
     QStringList recipients;
     auto addRecipient = [&recipients](const QString& email)
@@ -1028,7 +1028,6 @@ void QnMServerBusinessRuleProcessor::updateRecipientsList(
                 recipients.append(address.value());
         };
 
-
     for (const auto& email: additional)
         addRecipient(email);
 
@@ -1040,7 +1039,8 @@ void QnMServerBusinessRuleProcessor::updateRecipientsList(
 
     for (const auto& userRole: userRoles)
     {
-        for (const auto& subject: resourceAccessSubjectsCache()->usersInRole(userRole.id))
+        //TODO: #FIXME!!! #vkutin Handle predefined roles as well!
+        for (const auto& subject: resourceAccessSubjectsCache()->usersInRole(userRole))
         {
             const auto& user = subject.user();
             NX_ASSERT(user);

@@ -1,10 +1,12 @@
 #include "authutil.h"
+
 #include <QCryptographicHash>
 
 #include <nx/fusion/model_functions.h>
 #include <nx/utils/string.h>
 
-QMap<QByteArray, QByteArray> parseAuthData(const QByteArray &authData, char delimiter) {
+QMap<QByteArray, QByteArray> parseAuthData(const QByteArray& authData, char delimiter)
+{
     QMap<QByteArray, QByteArray> result;
 
     const QList<QByteArray>& authParams = nx::utils::smartSplit(authData, delimiter);
@@ -28,11 +30,39 @@ QMap<QByteArray, QByteArray> parseAuthData(const QByteArray &authData, char deli
 QByteArray createUserPasswordDigest(
     const QString& userName,
     const QString& password,
-    const QString& realm )
+    const QString& realm)
 {
     QCryptographicHash md5(QCryptographicHash::Md5);
-    md5.addData(QString(lit("%1:%2:%3")).arg(userName.toLower(), realm, password).toLatin1());
+    md5.addData(userName.toLower().toUtf8());
+    md5.addData(":");
+    md5.addData(realm.toUtf8());
+    md5.addData(":");
+    md5.addData(password.toUtf8());
     return md5.result().toHex();
+}
+
+QByteArray createHttpQueryAuthParam(
+    const QString& userName,
+    const QByteArray& digest,
+    const QByteArray& method,
+    QByteArray nonce)
+{
+    // Calculating HA2.
+    QCryptographicHash md5(QCryptographicHash::Md5);
+    md5.addData(method);
+    md5.addData(":");
+    const QByteArray& partialHa2 = md5.result().toHex();
+
+    // Calculating authentication digest.
+    md5.reset();
+    md5.addData(digest);
+    md5.addData(":");
+    md5.addData(nonce);
+    md5.addData(":");
+    md5.addData(partialHa2);
+    const QByteArray& simplifiedHa2 = md5.result().toHex();
+
+    return (userName.toUtf8().toLower() + ":" + nonce + ":" + simplifiedHa2).toBase64();
 }
 
 QByteArray createHttpQueryAuthParam(
@@ -42,31 +72,8 @@ QByteArray createHttpQueryAuthParam(
     const QByteArray& method,
     QByteArray nonce)
 {
-    return createHttpQueryAuthParam(userName, createUserPasswordDigest(userName, password, realm), method, nonce);
-}
-
-QByteArray createHttpQueryAuthParam(
-    const QString& userName,
-    const QByteArray& digest,
-    const QByteArray& method,
-    QByteArray nonce)
-{
-    //calculating "HA2"
-    QCryptographicHash md5Hash( QCryptographicHash::Md5 );
-    md5Hash.addData( method );
-    md5Hash.addData( ":" );
-    const QByteArray nedoHa2 = md5Hash.result().toHex();
-
-    //calculating auth digest
-    md5Hash.reset();
-    md5Hash.addData( digest );
-    md5Hash.addData( ":" );
-    md5Hash.addData( nonce );
-    md5Hash.addData( ":" );
-    md5Hash.addData( nedoHa2 );
-    const QByteArray& authDigest = md5Hash.result().toHex();
-
-    return (userName.toUtf8().toLower() + ":" + nonce + ":" + authDigest).toBase64();
+    const auto& digest = createUserPasswordDigest(userName, password, realm);
+    return createHttpQueryAuthParam(userName, digest, method, nonce);
 }
 
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES((NonceReply), (json), _Fields)

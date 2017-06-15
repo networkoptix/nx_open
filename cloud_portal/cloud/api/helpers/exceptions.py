@@ -175,7 +175,7 @@ class APILogicException(APIException):
 def validate_mediaserver_response(func):
     def validate_error(response_data):
         if 'resultCode' not in response_data or 'errorText' not in response_data:
-            raise APIInternalException('No valid error message from cloud_db', ErrorCodes.cloud_invalid_response)
+            raise APIInternalException('No valid error message from gateway', ErrorCodes.cloud_invalid_response)
 
     def validator(*args, **kwargs):
         response = func(*args, **kwargs)
@@ -202,7 +202,7 @@ def validate_mediaserver_response(func):
         if response.status_code in errors:
             if response_data:
                 validate_error(response_data)
-                raise errors[response.status_code](response_data['errorText'], error_code=response_data['resultCode'])
+                raise errors[response.status_code](response_data['errorText'], error_code=response_data['resultCode'], error_data=response_data)
             else:
                 raise errors[response.status_code](response.text, error_code=ErrorCodes.unknown_error)
 

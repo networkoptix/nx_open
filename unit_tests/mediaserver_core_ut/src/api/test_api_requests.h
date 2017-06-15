@@ -10,7 +10,7 @@
 #include <nx/network/http/http_client.h>
 #include <nx/fusion/model_functions.h>
 
-#include "mediaserver_launcher.h"
+#include <test_support/mediaserver_launcher.h>
 
 namespace nx {
 namespace test {

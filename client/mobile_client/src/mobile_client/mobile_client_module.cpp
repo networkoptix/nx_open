@@ -26,7 +26,6 @@
 #include <watchers/user_watcher.h>
 #include <watchers/available_cameras_watcher.h>
 #include <watchers/cloud_status_watcher.h>
-#include <watchers/server_address_watcher.h>
 #include <finders/systems_finder.h>
 #include <client/system_weights_manager.h>
 #include <utils/media/ffmpeg_initializer.h>
@@ -107,15 +106,6 @@ QnMobileClientModule::QnMobileClientModule(
     commonModule->store(new QnCloudConnectionProvider());
     m_cloudStatusWatcher = commonModule->store(new QnCloudStatusWatcher(commonModule, /*isMobile*/ true));
     QNetworkProxyFactory::setApplicationProxyFactory(new QnSimpleNetworkProxyFactory(commonModule));
-
-    const auto getter = []() { return qnClientCoreSettings->knownServerUrls(); };
-    const auto setter =
-        [](const QnServerAddressWatcher::UrlsList& values)
-        {
-            qnClientCoreSettings->setKnownServerUrls(values);
-            qnClientCoreSettings->save();
-        };
-    commonModule->store(new QnServerAddressWatcher(getter, setter, commonModule));
 
     commonModule->instance<QnSystemsFinder>();
     commonModule->store(new QnSystemsWeightsManager());

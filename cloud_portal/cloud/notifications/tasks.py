@@ -6,6 +6,7 @@ from .engines import email_engine
 
 
 from smtplib import SMTPException
+from ssl import SSLError
 from celery.exceptions import Ignore
 
 from django.conf import settings
@@ -33,7 +34,7 @@ def send_email(user_email, type, message, customization, attempt=1):
     try:
         email_engine.send(user_email, type, message, customization)
     except Exception as error:
-        if isinstance(error, SMTPException) and attempt < settings.MAX_RETRIES:
+        if (isinstance(error, SMTPException) or isinstance(error, SSLError)) and attempt < settings.MAX_RETRIES:
             send_email.delay(user_email, type, message, customization, attempt+1)
 
         log_error(error, user_email, type, message, customization, attempt)

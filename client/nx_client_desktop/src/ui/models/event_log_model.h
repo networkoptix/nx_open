@@ -71,7 +71,6 @@ private:
     QString motionUrl(Column column, const QnBusinessActionData& action) const;
     static QString getUserNameById(const QnUuid& id);
     static QString getResourceNameString(const QnUuid& id);
-    static QString getUserGroupString(QnBusiness::UserGroup value);
 
     bool hasVideoLink(const QnBusinessActionData& action) const;
     bool hasAccessToCamera(const QnUuid& cameraId) const;

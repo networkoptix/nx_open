@@ -61,6 +61,11 @@ static const qint64 MOTION_CLEANUP_INTERVAL = 1000ll * 3600;
 static const qint64 BOOKMARK_CLEANUP_INTERVAL = 1000ll * 60;
 
 const qint64 kMinStorageFreeSpace = 150 * 1024 * 1024LL;
+#ifdef __arm__
+const qint64 kMinSystemStorageFreeSpace = 1000 * 1000 * 1000LL;
+#else
+const qint64 kMinSystemStorageFreeSpace = 5000 * 1000 * 1000LL;
+#endif
 
 static const QString SCAN_ARCHIVE_FROM(lit("SCAN_ARCHIVE_FROM"));
 
@@ -430,7 +435,8 @@ QnStorageManager::QnStorageManager(
     m_firstStoragesTestDone(false),
     m_isRenameDisabled(qnServerModule->roSettings()->value("disableRename").toInt()),
     m_camInfoWriterHandler(this, commonModule->resourcePool()),
-    m_camInfoWriter(&m_camInfoWriterHandler)
+    m_camInfoWriter(&m_camInfoWriterHandler),
+    m_lowSysStorageSpaceWarnShown(false)
 {
     NX_ASSERT(m_role == QnServer::StoragePool::Normal || m_role == QnServer::StoragePool::Backup);
     m_storageWarnTimer.restart();
@@ -618,7 +624,8 @@ bool QnStorageManager::getSqlDbPath(
     QString storageUrl = storage->getUrl();
     QString dbRefFilePath;
 
-    dbRefFilePath = closeDirPath(storageUrl) + dbRefFileName.arg(QnStorageDbPool::getLocalGuid(commonModule()));
+    dbRefFilePath = closeDirPath(storageUrl) + dbRefFileName.arg(QnStorageDbPool::getLocalGuid(
+        commonModule()->moduleGUID()));
     QByteArray dbRefGuidStr;
 
     //checking for file db_ref.guid existence
@@ -653,7 +660,7 @@ void QnStorageManager::migrateSqliteDatabase(const QnStorageResourcePtr & storag
     if (!getSqlDbPath(storage, dbPath))
         return;
 
-    QString simplifiedGUID = QnStorageDbPool::getLocalGuid(commonModule());
+    QString simplifiedGUID = QnStorageDbPool::getLocalGuid(commonModule()->moduleGUID());
     QString oldFileName = closeDirPath(dbPath) + QString::fromLatin1("media.sqlite");
     QString fileName =
         closeDirPath(dbPath) +
@@ -1517,9 +1524,32 @@ void QnStorageManager::updateCameraHistory() const
     return;
 }
 
+void QnStorageManager::checkSystemStorageSpace()
+{
+    QnStorageManager::StorageMap storageRoots = getAllStorages();
+    qint64 bigStorageThreshold = 0;
+    for (const auto& storage: getAllStorages())
+    {
+        if (storage->getStatus() == Qn::Online && storage->isSystem())
+        {
+            if (!m_lowSysStorageSpaceWarnShown
+                && storage->getFreeSpace() < kMinSystemStorageFreeSpace)
+            {
+                m_lowSysStorageSpaceWarnShown = true;
+                emit storageFailure(storage, QnBusiness::SystemStorageFullReason);
+            }
+            else if (storage->getFreeSpace() > kMinSystemStorageFreeSpace * 2)
+            {
+                m_lowSysStorageSpaceWarnShown = false;
+            }
+        }
+    }
+}
+
 void QnStorageManager::clearSpace(bool forced)
 {
     QnMutexLocker lk(&m_clearSpaceMutex);
+
     // if Backup on Schedule (or on demand) synchronization routine is
     // running at the moment, dont run clearSpace() if it's been triggered by
     // the timer.
@@ -2108,14 +2138,18 @@ void QnStorageManager::changeStorageStatus(const QnStorageResourcePtr &fileStora
 void QnStorageManager::startAuxTimerTasks()
 {
     static const std::chrono::minutes kWriteInfoFilesInterval(5);
-
     m_auxTasksTimerManager.addNonStopTimer(
         [this](nx::utils::TimerId) { m_camInfoWriter.write(); },
         kWriteInfoFilesInterval,
         kWriteInfoFilesInterval);
 
-    static const std::chrono::minutes kRemoveEmptyDirsInterval(60);
+    static const std::chrono::minutes kCheckSystemStorageSpace(1);
+    m_auxTasksTimerManager.addNonStopTimer(
+        [this](nx::utils::TimerId) { checkSystemStorageSpace(); },
+        kCheckSystemStorageSpace,
+        kCheckSystemStorageSpace);
 
+    static const std::chrono::minutes kRemoveEmptyDirsInterval(60);
     m_auxTasksTimerManager.addNonStopTimer(
         [this](nx::utils::TimerId)
         {

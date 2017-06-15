@@ -38,8 +38,8 @@ bool QnWorkbenchLayoutsChangeValidator::confirmChangeVideoWallLayout(
             // Possibly we already have no access (if item is removed)
             switch (accessSource)
             {
-                case QnAbstractResourceAccessProvider::Source::videowall:
-                case QnAbstractResourceAccessProvider::Source::none:
+                case nx::core::access::Source::videowall:
+                case nx::core::access::Source::none:
                     break;
                 default:
                     return false;

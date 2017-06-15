@@ -455,7 +455,7 @@ function TimelineCanvasRender(canvas, timelineConfig, recordsProvider, scaleMana
                 }
             }
         }
-        return mouseX && mouseY > top && (mouseY < top + timelineConfig.chunkHeight * self.canvas.height);
+        return mouseX && 0 < mouseY && mouseY < self.canvas.height - timelineConfig.scrollBarHeight * self.canvas.height;
     }
     function drawEvent(context,chunk, levelIndex, debug, targetLevelIndex){
         var startCoordinate = self.scaleManager.dateToScreenCoordinate(chunk.start);
@@ -617,7 +617,6 @@ function TimelineCanvasRender(canvas, timelineConfig, recordsProvider, scaleMana
     }
 
     function drawPointerMarker(context, mouseX){
-
         if(window.jscd.mobile || !mouseX){
             return;
         }
@@ -642,7 +641,7 @@ function TimelineCanvasRender(canvas, timelineConfig, recordsProvider, scaleMana
         context.strokeStyle = blurColor(markerColor,1);
         context.fillStyle = blurColor(markerColor,1);
 
-        var top = (timelineConfig.topLabelHeight + timelineConfig.labelHeight) * self.canvas.height;
+        var top = (timelineConfig.topLabelHeight + timelineConfig.labelHeight) * self.canvas.height + 0.5;
 
         context.beginPath();
         context.moveTo(0.5 + coordinate, top);
@@ -662,9 +661,9 @@ function TimelineCanvasRender(canvas, timelineConfig, recordsProvider, scaleMana
 
         // Triangle
         context.beginPath();
-        context.moveTo(0.5 + coordinate + timelineConfig.markerTriangleHeight * self.canvas.height, height);
-        context.lineTo(0.5 + coordinate, height + timelineConfig.markerTriangleHeight * self.canvas.height);
-        context.lineTo(0.5 + coordinate - timelineConfig.markerTriangleHeight * self.canvas.height, height);
+        context.moveTo(0.5 + coordinate + timelineConfig.markerTriangleHeight * self.canvas.height, height + timelineConfig.triangleHeightOffset);
+        context.lineTo(0.5 + coordinate, height + timelineConfig.triangleHeightOffset + timelineConfig.markerTriangleHeight * self.canvas.height);
+        context.lineTo(0.5 + coordinate - timelineConfig.markerTriangleHeight * self.canvas.height, height + timelineConfig.triangleHeightOffset);
         context.closePath();
         context.fill();
 

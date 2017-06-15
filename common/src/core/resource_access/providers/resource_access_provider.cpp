@@ -7,8 +7,10 @@
 #include <nx/utils/log/assert.h>
 #include <common/common_module.h>
 
-QnResourceAccessProvider::QnResourceAccessProvider(QObject* parent):
-    base_type(parent),
+using namespace nx::core::access;
+
+QnResourceAccessProvider::QnResourceAccessProvider(Mode mode, QObject* parent):
+    base_type(mode, parent),
     QnCommonModuleAware(parent)
 {
 }
@@ -27,7 +29,7 @@ bool QnResourceAccessProvider::hasAccess(const QnResourceAccessSubject& subject,
         });
 }
 
-QnAbstractResourceAccessProvider::Source QnResourceAccessProvider::accessibleVia(
+Source QnResourceAccessProvider::accessibleVia(
     const QnResourceAccessSubject& subject,
     const QnResourcePtr& resource,
     QnResourceList* providers) const
@@ -35,7 +37,7 @@ QnAbstractResourceAccessProvider::Source QnResourceAccessProvider::accessibleVia
     if (providers)
         providers->clear();
 
-    QnAbstractResourceAccessProvider::Source accessSource = Source::none;
+    Source accessSource = Source::none;
     for (auto provider: m_providers)
     {
         const auto result = provider->accessibleVia(subject, resource, providers);
@@ -56,12 +58,12 @@ QnAbstractResourceAccessProvider::Source QnResourceAccessProvider::accessibleVia
     return accessSource;
 }
 
-QSet<QnAbstractResourceAccessProvider::Source> QnResourceAccessProvider::accessLevels(
+QSet<Source> QnResourceAccessProvider::accessLevels(
     const QnResourceAccessSubject& subject,
     const QnResourcePtr& resource) const
 {
-    QSet<QnAbstractResourceAccessProvider::Source> result;
-    for (auto provider : m_providers)
+    QSet<Source> result;
+    for (auto provider: m_providers)
     {
         const auto level = provider->accessibleVia(subject, resource);
         if (level != Source::none)
@@ -75,8 +77,11 @@ void QnResourceAccessProvider::addBaseProvider(QnAbstractResourceAccessProvider*
     provider->setParent(this);
     m_providers.append(provider);
 
-    connect(provider, &QnAbstractResourceAccessProvider::accessChanged, this,
-        &QnResourceAccessProvider::handleBaseProviderAccessChanged);
+    if (mode() == Mode::cached)
+    {
+        connect(provider, &QnAbstractResourceAccessProvider::accessChanged, this,
+            &QnResourceAccessProvider::handleBaseProviderAccessChanged);
+    }
 }
 
 void QnResourceAccessProvider::insertBaseProvider(int index,
@@ -84,8 +89,12 @@ void QnResourceAccessProvider::insertBaseProvider(int index,
 {
     provider->setParent(this);
     m_providers.insert(index, provider);
-    connect(provider, &QnAbstractResourceAccessProvider::accessChanged, this,
-        &QnResourceAccessProvider::handleBaseProviderAccessChanged);
+
+    if (mode() == Mode::cached)
+    {
+        connect(provider, &QnAbstractResourceAccessProvider::accessChanged, this,
+            &QnResourceAccessProvider::handleBaseProviderAccessChanged);
+    }
 }
 
 void QnResourceAccessProvider::removeBaseProvider(QnAbstractResourceAccessProvider* provider)
@@ -108,24 +117,33 @@ QList<QnAbstractResourceAccessProvider*> QnResourceAccessProvider::providers() c
 
 void QnResourceAccessProvider::beginUpdateInternal()
 {
+    if (mode() == Mode::direct)
+        return;
+
     for (auto p: m_providers)
         p->beginUpdate();
 }
 
 void QnResourceAccessProvider::endUpdateInternal()
 {
+    if (mode() == Mode::direct)
+        return;
+
     for (auto p: m_providers)
         p->endUpdate();
 }
 
 void QnResourceAccessProvider::afterUpdate()
 {
+    if (mode() == Mode::direct)
+        return;
+
     for (const auto& subject: resourceAccessSubjectsCache()->allSubjects())
     {
         for (const QnResourcePtr& resource: commonModule()->resourcePool()->getResources())
         {
             auto value = accessibleVia(subject, resource);
-            if (value != QnAbstractResourceAccessProvider::Source::none)
+            if (value != Source::none)
                 emit accessChanged(subject, resource, value);
         }
     }
@@ -134,6 +152,8 @@ void QnResourceAccessProvider::afterUpdate()
 void QnResourceAccessProvider::handleBaseProviderAccessChanged(
     const QnResourceAccessSubject& subject, const QnResourcePtr& resource, Source value)
 {
+    NX_EXPECT(mode() == Mode::cached);
+
     if (isUpdating())
         return;
 

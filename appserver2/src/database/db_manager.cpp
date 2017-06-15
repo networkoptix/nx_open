@@ -1015,7 +1015,7 @@ bool QnDbManager::updateBusinessActionParameters()
                     remappedValues[remappedKey] = values[key];
                     if (remappedKey == lit("durationMs"))
                     {
-                        // seconds -> milliseconds
+                        // Convert seconds to milliseconds.
                         int valueMs = remappedValues[remappedKey].toInt() * 1000;
                         remappedValues[remappedKey] = QString::number(valueMs);
                     }
@@ -1513,6 +1513,8 @@ bool QnDbManager::afterInstallUpdate(const QString& updateName)
     if (updateName.endsWith(lit("/92_rename_recording_param_name.sql")))
         return updateBusinessActionParameters();
 
+    if (updateName.endsWith(lit("/93_migrate_show_popup_action.sql")))
+        return ec2::db::migrateBusinessRulesToV31Alpha(m_sdb) && resyncIfNeeded(ResyncRules);
 
     NX_LOG(lit("SQL update %1 does not require post-actions.").arg(updateName), cl_logDEBUG1);
     return true;

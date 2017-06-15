@@ -570,8 +570,8 @@ void QnServerStreamRecorder::updateScheduleInfo(qint64 timeMs)
             setSpecialRecordingMode(m_forcedSchedileRecord);
             m_usedSpecialRecordingMode = true;
         }
-        bool isExpired = m_forcedScheduleRecordDurationMs > 0 &&
-            m_forcedSchedileRecordTimer.hasExpired(m_forcedScheduleRecordDurationMs);
+        bool isExpired = m_forcedScheduleRecordDurationMs > 0
+             && m_forcedSchedileRecordTimer.hasExpired(m_forcedScheduleRecordDurationMs);
         if (isExpired)
             stopForcedRecording();
         else

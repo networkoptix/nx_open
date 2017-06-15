@@ -221,6 +221,10 @@ AbstractStreamSocket* MultipleServerSocket::accept()
         m_lastError = result.first;
         SystemError::setLastErrorCode(result.first);
     }
+    else
+    {
+        result.second->setNonBlockingMode(false);
+    }
 
     return result.second.release();
 }

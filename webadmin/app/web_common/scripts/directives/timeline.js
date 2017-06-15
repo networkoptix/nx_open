@@ -462,14 +462,21 @@ angular.module('nxCommon')
 
                 // !!! Finally run required functions to initialize timeline
                 updateTimelineHeight();
-                updateTimelineWidth(); // Adjust width
+                $timeout(updateTimelineWidth); // Adjust width
                 initTimeline(); // Setup boundaries and scale
 
                 // !!! Start drawing
                 animateScope.setDuration(timelineConfig.animationDuration);
                 animateScope.setScope(scope);
                 animateScope.start(render);
-                scope.$on('$destroy', function() { animateScope.stopScope(scope); });
+
+                //scope.scaleManager is set to null so that the garbage collecter cleans the object
+                scope.$on('$destroy', function() {
+                    $( window ).unbind('resize', updateTimelineWidth);
+                    animateScope.stopScope(scope);
+                    animateScope.stopHandler(render);
+                    scope.scaleManager = null;
+                });
             }
         };
     }]);

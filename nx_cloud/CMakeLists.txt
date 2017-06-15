@@ -15,3 +15,7 @@ if(withClouds)
     add_subdirectory(time_server)
     add_subdirectory(cloud_connect_test_util)
 endif()
+
+if(withTests)
+    add_subdirectory(tests)
+endif()

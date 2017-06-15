@@ -17,7 +17,7 @@
 #include <nx/utils/gzip/gzip_uncompressor.h>
 #include <nx/utils/system_error.h>
 
-#include <cdb/ec2_request_paths.h>
+#include <nx/cloud/cdb/api/ec2_request_paths.h>
 #include <nx_ec/ec_proto_version.h>
 #include <nx/utils/byte_stream/custom_output_stream.h>
 #include <utils/common/util.h>
@@ -240,7 +240,7 @@ QnTransactionTransportBase::QnTransactionTransportBase(
     m_readBuffer.reserve( DEFAULT_READ_BUFFER_SIZE );
     m_lastReceiveTimer.invalidate();
 
-    NX_LOG(QnLog::EC2_TRAN_LOG, lit("QnTransactionTransportBase for object = %1").arg((size_t) this,  0, 16), cl_logDEBUG1);
+    NX_LOGX(QnLog::EC2_TRAN_LOG, lit("QnTransactionTransportBase for object = %1").arg((size_t) this,  0, 16), cl_logDEBUG2);
 
     //creating parser sequence: multipart_parser -> ext_headers_processor -> transaction handler
     m_multipartContentParser = std::make_shared<nx_http::MultipartContentParser>();
@@ -262,7 +262,7 @@ QnTransactionTransportBase::QnTransactionTransportBase(
 
 QnTransactionTransportBase::~QnTransactionTransportBase()
 {
-    NX_LOG(QnLog::EC2_TRAN_LOG, lit("~QnTransactionTransportBase for object = %1").arg((size_t) this,  0, 16), cl_logDEBUG1);
+    NX_LOGX(QnLog::EC2_TRAN_LOG, lit("~QnTransactionTransportBase for object = %1").arg((size_t) this,  0, 16), cl_logDEBUG2);
 
     stopWhileInAioThread();
 
