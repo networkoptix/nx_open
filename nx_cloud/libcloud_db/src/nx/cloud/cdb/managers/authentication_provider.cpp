@@ -134,17 +134,33 @@ nx::db::DBResult AuthenticationProvider::afterSharingSystem(
         return nx::db::DBResult::ok;
     }
 
-    auto authRecord = generateAuthRecord(sharing.systemId, *account, nonce);
-
-    api::AuthInfo userAuthRecords;
-    userAuthRecords.records.push_back(std::move(authRecord));
-    m_authenticationDataObject->insertUserAuthRecords(
-        queryContext, sharing.systemId, account->id, userAuthRecords);
-
-    generateUpdateUserAuthInfoTransaction(
-        queryContext, sharing, userAuthRecords);
-
+    addUserAuthRecord(
+        queryContext,
+        sharing.systemId,
+        sharing.vmsUserId,
+        *account,
+        nonce);
     return nx::db::DBResult::ok;
+}
+
+void AuthenticationProvider::afterUpdatingAccountPassword(
+    nx::db::QueryContext* const queryContext,
+    const api::AccountData& account)
+{
+    m_authenticationDataObject->deleteAccountAuthRecords(
+        queryContext, account.id);
+
+    const auto systems = m_authenticationDataObject->fetchAccountSystems(
+        queryContext, account.id);
+    for (const auto& system: systems)
+    {
+        addUserAuthRecord(
+            queryContext,
+            system.systemId,
+            system.vmsUserId,
+            account,
+            system.nonce);
+    }
 }
 
 boost::optional<AuthenticationProvider::AccountWithEffectivePassword>
@@ -233,8 +249,25 @@ std::string AuthenticationProvider::fetchOrCreateNonce(
     return *nonce;
 }
 
+void AuthenticationProvider::addUserAuthRecord(
+    nx::db::QueryContext* const queryContext,
+    const std::string& systemId,
+    const std::string& vmsUserId,
+    const api::AccountData& account,
+    const std::string& nonce)
+{
+    auto authRecord = generateAuthRecord(account, nonce);
+
+    api::AuthInfo userAuthRecords;
+    userAuthRecords.records.push_back(std::move(authRecord));
+    m_authenticationDataObject->insertUserAuthRecords(
+        queryContext, systemId, account.id, userAuthRecords);
+
+    generateUpdateUserAuthInfoTransaction(
+        queryContext, systemId, vmsUserId, userAuthRecords);
+}
+
 api::AuthInfoRecord AuthenticationProvider::generateAuthRecord(
-    const std::string& /*systemId*/,
     const api::AccountData& account,
     const std::string& nonce)
 {
@@ -255,18 +288,19 @@ void AuthenticationProvider::removeExpiredRecords(
 
 void AuthenticationProvider::generateUpdateUserAuthInfoTransaction(
     nx::db::QueryContext* const queryContext,
-    const api::SystemSharing& sharing,
+    const std::string& systemId,
+    const std::string& vmsUserId,
     const api::AuthInfo& userAuthenticationRecords)
 {
     ::ec2::ApiResourceParamWithRefData userAuthenticationInfoAttribute;
     userAuthenticationInfoAttribute.name = api::kVmsUserAuthInfoAttributeName;
     userAuthenticationInfoAttribute.resourceId = 
-        QnUuid::fromStringSafe(sharing.vmsUserId.c_str());
+        QnUuid::fromStringSafe(vmsUserId.c_str());
     userAuthenticationInfoAttribute.value = 
         QString::fromUtf8(QJson::serialized(userAuthenticationRecords));
     const auto dbResult = m_vmsP2pCommandBus->saveResourceAttribute(
         queryContext,
-        sharing.systemId,
+        systemId,
         std::move(userAuthenticationInfoAttribute));
     if (dbResult != nx::db::DBResult::ok)
         throw nx::db::Exception(dbResult);

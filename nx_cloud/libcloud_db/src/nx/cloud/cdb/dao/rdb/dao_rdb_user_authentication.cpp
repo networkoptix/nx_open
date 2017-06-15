@@ -134,6 +134,66 @@ void UserAuthentication::insertUserAuthRecords(
     }
 }
 
+std::vector<AbstractUserAuthentication::SystemInfo> UserAuthentication::fetchAccountSystems(
+    nx::db::QueryContext* const queryContext,
+    const std::string& accountId)
+{
+    nx::db::SqlQuery query(*queryContext->connection());
+    query.setForwardOnly(true);
+    query.prepare(R"sql(
+        SELECT sta.system_id AS systemId, sta.vms_user_id AS vmsUserId, sai.nonce AS nonce
+        FROM system_to_account sta, system_auth_info sai
+        WHERE sta.account_id = :accountId AND sta.system_id = sai.system_id
+    )sql");
+    query.bindValue(":accountId", QnSql::serialized_field(accountId));
+
+    try
+    {
+        query.exec();
+    }
+    catch (const nx::db::Exception e)
+    {
+        NX_WARNING(this, lm("Error selecting every system auth info for account %1. %2")
+            .arg(accountId).arg(e.what()));
+        throw;
+    }
+
+    std::vector<SystemInfo> result;
+    while (query.next())
+    {
+        SystemInfo systemInfo;
+        systemInfo.systemId = query.value("systemId").toString().toStdString();
+        systemInfo.vmsUserId = query.value("vmsUserId").toString().toStdString();
+        systemInfo.nonce = query.value("nonce").toString().toStdString();
+        result.push_back(std::move(systemInfo));
+    }
+
+    return result;
+}
+
+void UserAuthentication::deleteAccountAuthRecords(
+    nx::db::QueryContext* const queryContext,
+    const std::string& accountId)
+{
+    nx::db::SqlQuery query(*queryContext->connection());
+    query.prepare(R"sql(
+        DELETE FROM system_user_auth_info
+        WHERE account_id = :accountId
+    )sql");
+    query.bindValue(":accountId", QnSql::serialized_field(accountId));
+
+    try
+    {
+        query.exec();
+    }
+    catch (const nx::db::Exception e)
+    {
+        NX_WARNING(this, lm("Error deleting account %1 authentication records. %2")
+            .arg(accountId).arg(e.what()));
+        throw;
+    }
+}
+
 } // namespace rdb
 } // namespace dao
 

@@ -29,6 +29,30 @@ public:
     }
 
 protected:
+    void givenAccountWithMultipleSystems()
+    {
+        using namespace std::placeholders;
+
+        for (int i = 0; i < 7; ++i)
+        {
+            const auto system = insertRandomSystem(m_ownerAccount);
+            auto authInfo = generateAuthInfo();
+
+            AbstractUserAuthentication::SystemInfo systemInfo;
+            systemInfo.systemId = system.id;
+            systemInfo.nonce = authInfo.records[0].nonce;
+            //systemInfo.vmsUserId = ;
+            m_expectedSystemInfo.emplace(system.id, systemInfo);
+
+            executeUpdateQuerySyncThrow(
+                std::bind(&dao::rdb::UserAuthentication::insertUserAuthRecords,
+                    m_dao, _1, system.id, m_ownerAccount.id, authInfo));
+            executeUpdateQuerySyncThrow(
+                std::bind(&dao::rdb::UserAuthentication::insertOrReplaceSystemNonce,
+                    m_dao, _1, system.id, authInfo.records[0].nonce));
+        }
+    }
+
     void whenAddedAuthRecord()
     {
         using namespace std::placeholders;
@@ -73,6 +97,15 @@ protected:
                 m_dao, _1, m_system.id));
     }
 
+    void whenDeleteAllRecords()
+    {
+        using namespace std::placeholders;
+
+        executeUpdateQuerySyncThrow(
+            std::bind(&dao::rdb::UserAuthentication::deleteAccountAuthRecords,
+                m_dao, _1, m_ownerAccount.id));
+    }
+
     void thenAuthRecordCanBeRead()
     {
         whenFetchedAuthRecords();
@@ -95,6 +128,41 @@ protected:
         ASSERT_FALSE(static_cast<bool>(m_fetchedNonce));
     }
 
+    void thenEverySystemInformationCanBeSelected()
+    {
+        using namespace std::placeholders;
+
+        auto systems = executeSelectQuerySyncThrow(
+            std::bind(&dao::rdb::UserAuthentication::fetchAccountSystems,
+                m_dao, _1, m_ownerAccount.id));
+
+        // Validating.
+        ASSERT_EQ(m_expectedSystemInfo.size(), systems.size());
+        for (const auto& system: systems)
+        {
+            auto it = m_expectedSystemInfo.find(system.systemId);
+            ASSERT_NE(m_expectedSystemInfo.end(), it);
+            ASSERT_EQ(it->second.nonce, system.nonce);
+            //ASSERT_EQ(it->second.vmsUserId, system.vmsUserId);
+        }
+    }
+
+    void thenAllRecordsHaveBeenDeleted()
+    {
+        using namespace std::placeholders;
+
+        auto systems = executeSelectQuerySyncThrow(
+            std::bind(&dao::rdb::UserAuthentication::fetchAccountSystems,
+                m_dao, _1, m_ownerAccount.id));
+        for (const auto& system: systems)
+        {
+            auto fetchedAuthInfo = executeSelectQuerySyncThrow(
+                std::bind(&dao::rdb::UserAuthentication::fetchUserAuthRecords,
+                    m_dao, _1, system.systemId, m_ownerAccount.id));
+            ASSERT_TRUE(fetchedAuthInfo.records.empty());
+        }
+    }
+
 private:
     rdb::UserAuthentication m_dao;
     api::AccountData m_ownerAccount;
@@ -103,14 +171,23 @@ private:
     api::AuthInfo m_fetchedAuthInfo;
     std::string m_expectedNonce;
     boost::optional<std::string> m_fetchedNonce;
+    std::map<std::string, AbstractUserAuthentication::SystemInfo> m_expectedSystemInfo;
 
     void prepareTestData()
     {
-        m_expectedAuthInfo.records.resize(1);
-        m_expectedAuthInfo.records[0].expirationTime = 
+        m_expectedAuthInfo = generateAuthInfo();
+    }
+
+    api::AuthInfo generateAuthInfo()
+    {
+        api::AuthInfo authInfo;
+        authInfo.records.resize(1);
+        authInfo.records[0].expirationTime =
             nx::utils::floor<std::chrono::milliseconds>(nx::utils::utcTime());
-        m_expectedAuthInfo.records[0].nonce = nx::utils::generateRandomName(7).toStdString();
-        m_expectedAuthInfo.records[0].intermediateResponse = nx::utils::generateRandomName(14).toStdString();
+        authInfo.records[0].nonce = nx::utils::generateRandomName(7).toStdString();
+        authInfo.records[0].intermediateResponse = 
+            nx::utils::generateRandomName(14).toStdString();
+        return authInfo;
     }
 };
 
@@ -145,6 +222,19 @@ TEST_F(DaoRdbUserAuthentication, replacing_system_nonce)
 {
     whenReplacedExistingNonce();
     thenNonceCanBeFetched();
+}
+
+TEST_F(DaoRdbUserAuthentication, fetching_every_system_of_an_account)
+{
+    givenAccountWithMultipleSystems();
+    thenEverySystemInformationCanBeSelected();
+}
+
+TEST_F(DaoRdbUserAuthentication, deleting_every_auth_record_of_an_account)
+{
+    givenAccountWithMultipleSystems();
+    whenDeleteAllRecords();
+    thenAllRecordsHaveBeenDeleted();
 }
 
 } // namespace test

@@ -32,6 +32,14 @@ public:
         const std::string& systemId,
         const std::string& accountId,
         const api::AuthInfo& userAuthRecords) override;
+
+    virtual std::vector<SystemInfo> fetchAccountSystems(
+        nx::db::QueryContext* const queryContext,
+        const std::string& accountId) override;
+
+    virtual void deleteAccountAuthRecords(
+        nx::db::QueryContext* const queryContext,
+        const std::string& accountId) override;
 };
 
 } // namespace rdb

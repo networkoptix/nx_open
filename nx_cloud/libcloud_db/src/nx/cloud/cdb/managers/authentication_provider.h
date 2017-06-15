@@ -43,6 +43,10 @@ public:
         nx::db::QueryContext* const queryContext,
         const api::SystemSharing& sharing,
         SharingType sharingType) override;
+    
+    virtual void afterUpdatingAccountPassword(
+        nx::db::QueryContext* const queryContext,
+        const api::AccountData& account);
 
     /**
      * @return nonce to be used by mediaserver.
@@ -88,14 +92,20 @@ private:
     std::string fetchOrCreateNonce(
         nx::db::QueryContext* const queryContext,
         const std::string& systemId);
-    api::AuthInfoRecord generateAuthRecord(
+    void addUserAuthRecord(
+        nx::db::QueryContext* const queryContext,
         const std::string& systemId,
+        const std::string& vmsUserId,
+        const api::AccountData& account,
+        const std::string& nonce);
+    api::AuthInfoRecord generateAuthRecord(
         const api::AccountData& account,
         const std::string& nonce);
     void removeExpiredRecords(api::AuthInfo* userAuthenticationRecords);
     void generateUpdateUserAuthInfoTransaction(
         nx::db::QueryContext* const queryContext,
-        const api::SystemSharing& sharing,
+        const std::string& systemId,
+        const std::string& vmsUserId,
         const api::AuthInfo& userAuthenticationRecords);
 };
 
