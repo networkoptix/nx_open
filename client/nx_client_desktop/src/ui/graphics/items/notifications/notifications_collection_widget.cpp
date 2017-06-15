@@ -140,7 +140,6 @@ QnNotificationsCollectionWidget::QnNotificationsCollectionWidget(QGraphicsItem* 
     connect(handler,    &QnWorkbenchNotificationsHandler::systemHealthEventRemoved, this,   &QnNotificationsCollectionWidget::hideSystemHealthMessage);
     connect(handler,    &QnWorkbenchNotificationsHandler::cleared,                  this,   &QnNotificationsCollectionWidget::hideAll);
 
-    using namespace nx::client::desktop;
     connect(this->context()->instance<ServerNotificationCache>(),
         &ServerNotificationCache::fileDownloaded,
         this,
@@ -250,7 +249,6 @@ void QnNotificationsCollectionWidget::handleShowPopupAction(
     QnCameraBookmarkList bookmarks;
     for (const auto& resourceId: businessAction->getResources())
     {
-        using namespace nx::client::desktop::ui;
         const auto camera = resourcePool()->getResourceById<QnSecurityCamResource>(resourceId);
         if (!camera)
         {
