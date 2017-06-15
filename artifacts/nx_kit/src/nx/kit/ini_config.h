@@ -24,7 +24,7 @@ namespace kit {
  *         // NOTE: Omit the call to reload() if no load-on-start if needed..
  *         Ini(): IniConfig("my_module.ini") { reload(); }
  *
- *         NX_INI_FLAG(0, myFlag, "Here 0 stands for 'false' as the default value.");
+ *         NX_INI_FLAG(f, myFlag, "Default value can be f, false, 0, or t, true, 1.");
  *         NX_INI_INT(7, myInt, "Here 7 is the default value.");
  *         NX_INI_STRING("Default value", myStr, "Description.");
  *     };
@@ -74,7 +74,9 @@ public:
 
 protected:
     #define NX_INI_FLAG(DEFAULT, PARAM, DESCRIPTION) \
-        const bool PARAM = regBoolParam(&PARAM, DEFAULT, #PARAM, DESCRIPTION)
+        const bool PARAM = regBoolParam(&PARAM, \
+            [&](){ const bool f = false, t = true; (void) f; (void) t; return DEFAULT; }(), \
+            #PARAM, DESCRIPTION)
 
     #define NX_INI_INT(DEFAULT, PARAM, DESCRIPTION) \
         const int PARAM = regIntParam(&PARAM, DEFAULT, #PARAM, DESCRIPTION)
