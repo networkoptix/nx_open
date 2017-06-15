@@ -13,7 +13,6 @@
 
 #include <nx/cloud/cdb/client/data/auth_data.h>
 
-#include "account_manager.h"
 #include "temporary_account_password_manager.h"
 #include "../dao/user_authentication_data_object_factory.h"
 #include "../settings.h"
@@ -27,7 +26,7 @@ namespace cdb {
 
 AuthenticationProvider::AuthenticationProvider(
     const conf::Settings& settings,
-    const AbstractAccountManager& accountManager,
+    AbstractAccountManager* accountManager,
     AbstractSystemSharingManager* systemSharingManager,
     const AbstractTemporaryAccountPasswordManager& temporaryAccountCredentialsManager,
     ec2::AbstractVmsP2pCommandBus* vmsP2pCommandBus)
@@ -39,12 +38,14 @@ AuthenticationProvider::AuthenticationProvider(
     m_authenticationDataObject(dao::UserAuthenticationDataObjectFactory::instance().create()),
     m_vmsP2pCommandBus(vmsP2pCommandBus)
 {
+    m_accountManager->addExtension(this);
     m_systemSharingManager->addSystemSharingExtension(this);
 }
 
 AuthenticationProvider::~AuthenticationProvider()
 {
     m_systemSharingManager->removeSystemSharingExtension(this);
+    m_accountManager->removeExtension(this);
 }
 
 void AuthenticationProvider::getCdbNonce(
@@ -125,7 +126,7 @@ nx::db::DBResult AuthenticationProvider::afterSharingSystem(
 
     const auto nonce = fetchOrCreateNonce(queryContext, sharing.systemId);
         
-    const auto account = m_accountManager.findAccountByUserName(sharing.accountEmail);
+    const auto account = m_accountManager->findAccountByUserName(sharing.accountEmail);
     if (!account)
         throw nx::db::Exception(nx::db::DBResult::notFound);
     if (account->statusCode != api::AccountStatus::activated)
@@ -166,7 +167,7 @@ boost::optional<AuthenticationProvider::AccountWithEffectivePassword>
     AuthenticationProvider::getAccountByLogin(const std::string& login) const
 {
     std::string passwordHa1;
-    auto account = m_accountManager.findAccountByUserName(login.c_str());
+    auto account = m_accountManager->findAccountByUserName(login.c_str());
     if (account)
     {
         passwordHa1 = account->passwordHa1;
@@ -178,7 +179,7 @@ boost::optional<AuthenticationProvider::AccountWithEffectivePassword>
             m_temporaryAccountCredentialsManager.getCredentialsByLogin(login);
         if (temporaryCredentials)
         {
-            account = m_accountManager.findAccountByUserName(
+            account = m_accountManager->findAccountByUserName(
                 temporaryCredentials->accountEmail);
             passwordHa1 = temporaryCredentials->passwordHa1;
         }

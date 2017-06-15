@@ -29,24 +29,25 @@ enum class StreeOperation
 
 QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(StreeOperation)
 
-class StreeManager
-:
-    public Singleton<StreeManager>,
-    public nx::utils::stree::StreeManager
+class StreeManager:
+    public Singleton<StreeManager>
 {
 public:
     /*!
         Performs initial parsing
         \throw \a std::runtime_error in case of parse error
     */
-    StreeManager(
-        const nx::utils::stree::ResourceNameSet& resourceNameSet,
-        const QString& xmlFilePath) noexcept(false);
+    StreeManager(const QString& xmlFilePath) noexcept(false);
 
     void search(
         StreeOperation,
         const nx::utils::stree::AbstractResourceReader& input,
         nx::utils::stree::AbstractResourceWriter* const output) const;
+    const nx::utils::stree::ResourceNameSet& resourceNameSet() const;
+
+private:
+    CdbAttrNameSet m_cdbAttrNameSet;
+    nx::utils::stree::StreeManager m_impl;
 };
 
 }   //cdb

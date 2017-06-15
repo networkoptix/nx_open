@@ -12,11 +12,8 @@
 namespace nx {
 namespace cdb {
 
-StreeManager::StreeManager(
-    const nx::utils::stree::ResourceNameSet& resourceNameSet,
-    const QString& xmlFilePath) noexcept(false)
-:
-    nx::utils::stree::StreeManager(resourceNameSet, xmlFilePath)
+StreeManager::StreeManager(const QString& xmlFilePath) noexcept(false):
+    m_impl(m_cdbAttrNameSet, xmlFilePath)
 {
 }
 
@@ -29,7 +26,12 @@ void StreeManager::search(
         attr::operation, QnLexical::serialized(operation));
     nx::utils::stree::MultiSourceResourceReader realInput(operationRes, input);
 
-    return nx::utils::stree::StreeManager::search(realInput, output);
+    return m_impl.search(realInput, output);
+}
+
+const nx::utils::stree::ResourceNameSet& StreeManager::resourceNameSet() const
+{
+    return m_impl.resourceNameSet();
 }
 
 }   //cdb

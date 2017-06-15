@@ -93,6 +93,7 @@ namespace cdb {
 namespace conf {
 
 Auth::Auth():
+    rulesXmlPath(kDefaultAuthXmlPath),
     nonceValidityPeriod(kDefaultNonceValidityPeriod),
     intermediateResponseValidityPeriod(kDefaultIntermediateResponseValidityPeriod),
     offlineUserHashValidityPeriod(kDefaultOfflineUserHashValidityPeriod)
