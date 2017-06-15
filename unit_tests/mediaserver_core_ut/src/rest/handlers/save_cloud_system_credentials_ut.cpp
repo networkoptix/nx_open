@@ -3,6 +3,7 @@
 #include <api/global_settings.h>
 #include <api/model/cloud_credentials_data.h>
 #include <common/common_module.h>
+#include <nx/core/access/access_types.h>
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource/user_resource.h>
@@ -19,7 +20,7 @@ class MediaServerRestHandlerTestBase
 {
 public:
     MediaServerRestHandlerTestBase():
-        m_commonModule(false)
+        m_commonModule(false, nx::core::access::Mode::direct)
     {
         m_commonModule.setModuleGUID(QnUuid::createUuid());
 

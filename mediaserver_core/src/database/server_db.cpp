@@ -9,6 +9,7 @@
 #include <core/resource/network_resource.h>
 #include <core/resource/camera_bookmark.h>
 #include <core/resource_management/resource_pool.h>
+#include <core/resource_management/user_roles_manager.h>
 
 #include <media_server/serverutil.h>
 
@@ -82,6 +83,9 @@ QnBusinessActionParameters convertOldActionParameters(const QByteArray& value)
     if (value.isEmpty())
         return result;
 
+    static const std::vector<QnUuid> kAdminRoles(
+        QnUserRolesManager::adminRoleIds().toVector().toStdVector());
+
     int i = 0;
     int prevPos = -1;
     while (prevPos < value.size() && i < ParamCount)
@@ -100,7 +104,10 @@ QnBusinessActionParameters convertOldActionParameters(const QByteArray& value)
                 result.emailAddress = QString::fromUtf8(field.data(), field.size());
                 break;
             case UserGroupParam:
-                result.userGroup = static_cast<QnBusiness::UserGroup>(toInt(field));
+                if (static_cast<QnBusiness::UserGroup>(toInt(field)) == QnBusiness::AdminOnly)
+                    result.additionalResources = kAdminRoles;
+                else
+                    result.additionalResources.clear();
                 break;
             case FpsParam:
                 result.fps = toInt(field);

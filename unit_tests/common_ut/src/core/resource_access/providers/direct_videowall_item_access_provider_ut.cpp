@@ -1,4 +1,4 @@
-#include <core/resource_access/providers/base_access_provider_test_fixture.h>
+#include <core/resource_access/providers/direct_base_access_provider_test_fixture.h>
 #include <core/resource_access/providers/videowall_item_access_provider.h>
 
 #include <core/resource_access/resource_access_manager.h>
@@ -15,12 +15,14 @@
 
 #include <nx_ec/data/api_user_role_data.h>
 
-class QnVideoWallItemAccessProviderTest: public QnBaseAccessProviderTestFixture
+using namespace nx::core::access;
+
+class QnDirectVideoWallItemAccessProviderTest: public QnDirectBaseAccessProviderTestFixture
 {
 protected:
     virtual QnAbstractResourceAccessProvider* createAccessProvider() const override
     {
-        return new QnVideoWallItemAccessProvider(commonModule());
+        return new QnVideoWallItemAccessProvider(Mode::direct, commonModule());
     }
 
     QnLayoutResourcePtr addLayoutForVideoWall(const QnVideoWallResourcePtr& videoWall)
@@ -32,7 +34,7 @@ protected:
     }
 };
 
-TEST_F(QnVideoWallItemAccessProviderTest, checkSource)
+TEST_F(QnDirectVideoWallItemAccessProviderTest, checkSource)
 {
     auto videoWall = addVideoWall();
     auto target = addLayoutForVideoWall(videoWall);
@@ -42,7 +44,7 @@ TEST_F(QnVideoWallItemAccessProviderTest, checkSource)
         QnAbstractResourceAccessProvider::Source::videowall);
 }
 
-TEST_F(QnVideoWallItemAccessProviderTest, checkInvalidAccess)
+TEST_F(QnDirectVideoWallItemAccessProviderTest, checkInvalidAccess)
 {
     auto camera = addCamera();
 
@@ -52,20 +54,20 @@ TEST_F(QnVideoWallItemAccessProviderTest, checkInvalidAccess)
     ASSERT_FALSE(accessProvider()->hasAccess(subject, camera));
 }
 
-TEST_F(QnVideoWallItemAccessProviderTest, checkAccessToInvalidResource)
+TEST_F(QnDirectVideoWallItemAccessProviderTest, checkAccessToInvalidResource)
 {
     auto user = addUser(Qn::GlobalAdminPermission);
     ASSERT_FALSE(accessProvider()->hasAccess(user, QnResourcePtr()));
 }
 
-TEST_F(QnVideoWallItemAccessProviderTest, checkDefaultCamera)
+TEST_F(QnDirectVideoWallItemAccessProviderTest, checkDefaultCamera)
 {
     auto target = addCamera();
     auto user = addUser(Qn::GlobalAdminPermission);
     ASSERT_FALSE(accessProvider()->hasAccess(user, target));
 }
 
-TEST_F(QnVideoWallItemAccessProviderTest, checkByAccessRights)
+TEST_F(QnDirectVideoWallItemAccessProviderTest, checkByAccessRights)
 {
     auto target = addLayout();
     auto videoWall = addVideoWall();
@@ -79,7 +81,7 @@ TEST_F(QnVideoWallItemAccessProviderTest, checkByAccessRights)
     ASSERT_FALSE(accessProvider()->hasAccess(user, target));
 }
 
-TEST_F(QnVideoWallItemAccessProviderTest, checkAccessRightsChange)
+TEST_F(QnDirectVideoWallItemAccessProviderTest, checkAccessRightsChange)
 {
     auto videoWall = addVideoWall();
     auto target = addLayoutForVideoWall(videoWall);
@@ -91,7 +93,7 @@ TEST_F(QnVideoWallItemAccessProviderTest, checkAccessRightsChange)
     ASSERT_TRUE(accessProvider()->hasAccess(user, target));
 }
 
-TEST_F(QnVideoWallItemAccessProviderTest, checkLayoutOnVideoWall)
+TEST_F(QnDirectVideoWallItemAccessProviderTest, checkLayoutOnVideoWall)
 {
     auto videoWall = addVideoWall();
     auto target = addLayoutForVideoWall(videoWall);
@@ -100,7 +102,7 @@ TEST_F(QnVideoWallItemAccessProviderTest, checkLayoutOnVideoWall)
     ASSERT_TRUE(accessProvider()->hasAccess(user, target));
 }
 
-TEST_F(QnVideoWallItemAccessProviderTest, checkCameraOnVideoWall)
+TEST_F(QnDirectVideoWallItemAccessProviderTest, checkCameraOnVideoWall)
 {
     auto target = addCamera();
     auto videoWall = addVideoWall();
@@ -114,7 +116,7 @@ TEST_F(QnVideoWallItemAccessProviderTest, checkCameraOnVideoWall)
     ASSERT_TRUE(accessProvider()->hasAccess(user, target));
 }
 
-TEST_F(QnVideoWallItemAccessProviderTest, checkCameraOnLayoutAddedOnVideoWall)
+TEST_F(QnDirectVideoWallItemAccessProviderTest, checkCameraOnLayoutAddedOnVideoWall)
 {
     auto target = addCamera();
     auto videoWall = addVideoWall();
@@ -128,13 +130,12 @@ TEST_F(QnVideoWallItemAccessProviderTest, checkCameraOnLayoutAddedOnVideoWall)
     item.resource.uniqueId = target->getUniqueId();
     layout->addItem(item);
 
-    awaitAccessValue(user, target, QnAbstractResourceAccessProvider::Source::videowall);
     resourcePool()->addResource(layout);
 
     ASSERT_TRUE(accessProvider()->hasAccess(user, target));
 }
 
-TEST_F(QnVideoWallItemAccessProviderTest, checkCameraDroppedOnVideoWall)
+TEST_F(QnDirectVideoWallItemAccessProviderTest, checkCameraDroppedOnVideoWall)
 {
     auto target = addCamera();
     auto videoWall = addVideoWall();
@@ -149,13 +150,12 @@ TEST_F(QnVideoWallItemAccessProviderTest, checkCameraDroppedOnVideoWall)
     layout->addItem(item);
     resourcePool()->addResource(layout);
 
-    awaitAccessValue(user, target, QnAbstractResourceAccessProvider::Source::videowall);
     layout->setParentId(videoWall->getId());
 
     ASSERT_TRUE(accessProvider()->hasAccess(user, target));
 }
 
-TEST_F(QnVideoWallItemAccessProviderTest, checkLayoutRemoved)
+TEST_F(QnDirectVideoWallItemAccessProviderTest, checkLayoutRemoved)
 {
     auto target = addCamera();
     auto videoWall = addVideoWall();
@@ -174,7 +174,7 @@ TEST_F(QnVideoWallItemAccessProviderTest, checkLayoutRemoved)
     ASSERT_FALSE(accessProvider()->hasAccess(user, target));
 }
 
-TEST_F(QnVideoWallItemAccessProviderTest, checkCameraAddedOnVideoWall)
+TEST_F(QnDirectVideoWallItemAccessProviderTest, checkCameraAddedOnVideoWall)
 {
     auto target = addCamera();
     auto videoWall = addVideoWall();
@@ -188,7 +188,7 @@ TEST_F(QnVideoWallItemAccessProviderTest, checkCameraAddedOnVideoWall)
     ASSERT_TRUE(accessProvider()->hasAccess(user, target));
 }
 
-TEST_F(QnVideoWallItemAccessProviderTest, checkVideoWallAdded)
+TEST_F(QnDirectVideoWallItemAccessProviderTest, checkVideoWallAdded)
 {
     auto camera = addCamera();
     auto videoWall = createVideoWall();
@@ -206,7 +206,7 @@ TEST_F(QnVideoWallItemAccessProviderTest, checkVideoWallAdded)
 }
 
 
-TEST_F(QnVideoWallItemAccessProviderTest, checkVideoWallRemoved)
+TEST_F(QnDirectVideoWallItemAccessProviderTest, checkVideoWallRemoved)
 {
     auto camera = addCamera();
     auto videoWall = addVideoWall();
@@ -224,7 +224,7 @@ TEST_F(QnVideoWallItemAccessProviderTest, checkVideoWallRemoved)
 }
 
 
-TEST_F(QnVideoWallItemAccessProviderTest, accessProviders)
+TEST_F(QnDirectVideoWallItemAccessProviderTest, accessProviders)
 {
     auto camera = addCamera();
     auto videoWall = addVideoWall();
@@ -242,7 +242,7 @@ TEST_F(QnVideoWallItemAccessProviderTest, accessProviders)
     ASSERT_TRUE(providers.contains(layout));
 }
 
-TEST_F(QnVideoWallItemAccessProviderTest, checkByLayoutParentId)
+TEST_F(QnDirectVideoWallItemAccessProviderTest, checkByLayoutParentId)
 {
     auto videoWall = addVideoWall();
     auto target = addLayoutForVideoWall(videoWall);
@@ -253,7 +253,7 @@ TEST_F(QnVideoWallItemAccessProviderTest, checkByLayoutParentId)
     ASSERT_TRUE(accessProvider()->hasAccess(user, target));
 }
 
-TEST_F(QnVideoWallItemAccessProviderTest, checkCameraOnVideoWallByParentId)
+TEST_F(QnDirectVideoWallItemAccessProviderTest, checkCameraOnVideoWallByParentId)
 {
     auto target = addCamera();
     auto videoWall = addVideoWall();

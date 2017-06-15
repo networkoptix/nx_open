@@ -1,10 +1,10 @@
 #pragma once
 
-#include <core/resource_access/providers/access_provider_test_fixture.h>
+#include <core/resource_access/providers/direct_access_provider_test_fixture.h>
 
-class QnBaseAccessProviderTestFixture: public QnAccessProviderTestFixture
+class QnDirectBaseAccessProviderTestFixture: public QnDirectAccessProviderTestFixture
 {
-    using base_type = QnAccessProviderTestFixture;
+    using base_type = QnDirectAccessProviderTestFixture;
 
 protected:
     virtual void SetUp() override;

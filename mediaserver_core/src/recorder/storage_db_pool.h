@@ -1,26 +1,27 @@
 #pragma once
 
+#include <QtCore/QSharedPointer>
+
 #include "utils/db/db_helper.h"
 #include "storage_db.h"
-#include <QSharedPointer>
-#include <common/common_module_aware.h>
+#include <nx/utils/uuid.h>
 
 class QnStorageDbPool:
     public QObject,
-    public Singleton<QnStorageDbPool>,
-    public QnCommonModuleAware
+    public Singleton<QnStorageDbPool>
 {
     Q_OBJECT
 public:
-    QnStorageDbPool(QnCommonModule* commonModule);
+    QnStorageDbPool(const QnUuid& moduleGuid);
 
     QnStorageDbPtr getSDB(const QnStorageResourcePtr &storage);
     int getStorageIndex(const QnStorageResourcePtr& storage);
     void removeSDB(const QnStorageResourcePtr &storage);
 
-    static QString getLocalGuid(QnCommonModule* commonModule);
+    static QString getLocalGuid(const QnUuid& moduleGuid);
     void flush();
 private:
+    const QnUuid m_moduleGuid;
     mutable QnMutex m_sdbMutex;
     mutable QnMutex m_mutexStorageIndex;
 

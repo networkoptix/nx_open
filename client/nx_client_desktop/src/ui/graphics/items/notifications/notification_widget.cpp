@@ -291,8 +291,7 @@ void QnNotificationWidget::addActionButton(
 void QnNotificationWidget::addTextButton(
     const QIcon& icon,
     const QString& text,
-    ActionType actionId,
-    const ParametersType& parameters)
+    const ButtonHandler& handler)
 {
     auto button = new QPushButton();
     if (!text.isEmpty())
@@ -301,10 +300,12 @@ void QnNotificationWidget::addTextButton(
         button->setIcon(icon);
 
     connect(button, &QAbstractButton::clicked, this,
-        [this, actionId, parameters]()
+        [this, handler]()
         {
-            emit buttonClicked(getFullAlias(QnLexical::serialized(actionId)));
-            emit actionTriggered(actionId, parameters);
+            if (handler)
+                handler();
+
+            closeTriggered();
         });
 
     auto proxy = new QGraphicsProxyWidget();

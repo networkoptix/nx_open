@@ -27,9 +27,16 @@
     <number>0</number>
    </property>
    <item>
-    <widget class="QCheckBox" name="adminsCheckBox">
+    <widget class="QLabel" name="usersLabel">
      <property name="text">
-      <string>Show to administrators only</string>
+      <string>for</string>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QPushButton" name="selectUsersButton">
+     <property name="text">
+      <string notr="true">&lt;All users&gt;</string>
      </property>
     </widget>
    </item>

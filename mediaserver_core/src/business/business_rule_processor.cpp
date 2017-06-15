@@ -156,6 +156,43 @@ void QnBusinessRuleProcessor::executeAction(const QnAbstractBusinessActionPtr& a
     }
 }
 
+bool QnBusinessRuleProcessor::handleBookmarkAction(const QnAbstractBusinessActionPtr& action)
+{
+    if (!action->getParams().needConfirmation)
+        return false;
+
+    if (action->actionType() != QnBusiness::BookmarkAction)
+    {
+        NX_EXPECT(false, "Invalid action");
+        return false;
+    }
+
+    const auto fixedDurationMs = action->getParams().durationMs;
+    if (fixedDurationMs <= 0)
+    {
+        const auto key = action->getExternalUniqKey();
+        auto runningKey = guidFromArbitraryData(key);
+        if (action->getToggleState() == QnBusiness::ActiveState)
+        {
+            m_runningBookmarkActions[runningKey] =
+                action->getRuntimeParams().eventTimestampUsec;
+            return true;
+        }
+
+        if (!m_runningBookmarkActions.contains(runningKey))
+            return false;
+
+        action->getRuntimeParams().eventTimestampUsec =
+            m_runningBookmarkActions.take(runningKey);
+    }
+
+    action->getParams().targetActionType = action->actionType();
+    action->setActionType(QnBusiness::ShowPopupAction);
+
+    broadcastBusinessAction(action);
+    return true;
+}
+
 void QnBusinessRuleProcessor::executeAction(const QnAbstractBusinessActionPtr& action)
 {
     if (!action) {
@@ -168,29 +205,36 @@ void QnBusinessRuleProcessor::executeAction(const QnAbstractBusinessActionPtr& a
 
     switch (action->actionType())
     {
-    case QnBusiness::ShowTextOverlayAction:
-    case QnBusiness::ShowOnAlarmLayoutAction:
-        if (action->getParams().useSource)
-            resources << resourcePool()->getResources<QnNetworkResource>(action->getSourceResources());
-        break;
+        case QnBusiness::ShowTextOverlayAction:
+        case QnBusiness::ShowOnAlarmLayoutAction:
+            if (action->getParams().useSource)
+                resources << resourcePool()->getResources<QnNetworkResource>(action->getSourceResources());
+            break;
 
-    case QnBusiness::SayTextAction:
-    case QnBusiness::PlaySoundAction:
-    case QnBusiness::PlaySoundOnceAction:
-        {
-            // execute say to client once and before proxy
-            if(!action->isReceivedFromRemoteHost() && action->getParams().playToClient)
+        case QnBusiness::SayTextAction:
+        case QnBusiness::PlaySoundAction:
+        case QnBusiness::PlaySoundOnceAction:
             {
-                broadcastBusinessAction(action);
-                // This actions marked as requiredCameraResource, but can be performed to client without camRes
-                if (resources.isEmpty())
-                    qnServerDb->saveActionToDB(action);
+                // execute say to client once and before proxy
+                if(!action->isReceivedFromRemoteHost() && action->getParams().playToClient)
+                {
+                    broadcastBusinessAction(action);
+                    // This actions marked as requiredCameraResource, but can be performed to client without camRes
+                    if (resources.isEmpty())
+                        qnServerDb->saveActionToDB(action);
+                }
+                break;
             }
+
+        case QnBusiness::BookmarkAction:
+        {
+            if (handleBookmarkAction(action))
+                return;
+
             break;
         }
-
-    default:
-        break;
+        default:
+            break;
     }
 
     if (resources.isEmpty())

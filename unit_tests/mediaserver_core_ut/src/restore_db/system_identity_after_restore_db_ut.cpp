@@ -5,6 +5,7 @@
 #include <common/common_module.h>
 #include <core/resource/user_resource.h>
 #include <core/resource/media_server_resource.h>
+#include <nx/core/access/access_types.h>
 #include <core/resource_management/resource_pool.h>
 #include <plugins/storage/file_storage/file_storage_resource.h>
 #include <common/common_module.h>
@@ -165,7 +166,8 @@ public:
 
         settingsProxy.reset(new detail::TestSettingsProxy);
 
-        commonModule = std::unique_ptr<QnCommonModule>(new QnCommonModule(/*isClient*/false));
+        commonModule = std::unique_ptr<QnCommonModule>(new QnCommonModule(/*isClient*/false,
+            nx::core::access::Mode::direct));
 
         admin = QnUserResourcePtr(new QnUserResource(QnUserType::Local));
         mediaServer = QnMediaServerResourcePtr(new QnMediaServerResource(commonModule.get()));
