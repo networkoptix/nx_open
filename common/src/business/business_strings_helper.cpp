@@ -675,10 +675,16 @@ QString QnBusinessStringsHelper::actionSubjects(
     if (roles.empty())
         return tr("%n Users", "", users.size());
 
-    if (users.empty())
-        return tr("%n Roles", "", roles.size());
+    if (!users.empty())
+    {
+        return lit("%1, %2")
+            .arg(tr("%n Roles", "", roles.size()))
+            .arg(tr("%n Users", "", users.size()));
+    }
 
-    return lit("%1, %2")
-        .arg(tr("%n Roles", "", roles.size()))
-        .arg(tr("%n Users", "", users.size()));
+    static const QSet<QnUuid> kAdminRoles = QnUserRolesManager::adminRoleIds().toSet();
+    if (roles.toSet() == kAdminRoles)
+        return tr("All Administrators");
+
+    return tr("%n Roles", "", roles.size());
 }
