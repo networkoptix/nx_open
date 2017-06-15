@@ -147,10 +147,9 @@ void AuthenticationProvider::afterUpdatingAccountPassword(
     nx::db::QueryContext* const queryContext,
     const api::AccountData& account)
 {
-    m_authenticationDataObject->deleteAccountAuthRecords(
-        queryContext, account.id);
-
     const auto systems = m_authenticationDataObject->fetchAccountSystems(
+        queryContext, account.id);
+    m_authenticationDataObject->deleteAccountAuthRecords(
         queryContext, account.id);
     for (const auto& system: systems)
     {
