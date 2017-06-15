@@ -360,7 +360,7 @@ void QnNotificationsCollectionWidget::showBusinessAction(const QnAbstractBusines
     item->setProperty(kItemTimeStampPropertyName,  timestampMs);
     setHelpTopic(item, QnBusiness::eventHelpId(eventType));
 
-    switch(businessAction->actionType())
+    switch (businessAction->actionType())
     {
         case QnBusiness::PlaySoundAction:
         {
