@@ -81,10 +81,10 @@ QVariant QnAccessibleResourcesModel::data(const QModelIndex& index, int role) co
                     const auto accessLevels = resourceAccessProvider()->accessLevels(m_subject,
                         resource);
 
-                    if (accessLevels.contains(QnAbstractResourceAccessProvider::Source::layout))
+                    if (accessLevels.contains(nx::core::access::Source::layout))
                         return qnResIconCache->icon(QnResourceIconCache::SharedLayout);
 
-                    if (accessLevels.contains(QnAbstractResourceAccessProvider::Source::videowall))
+                    if (accessLevels.contains(nx::core::access::Source::videowall))
                         return qnResIconCache->icon(QnResourceIconCache::VideoWall);
 
                     return QVariant();

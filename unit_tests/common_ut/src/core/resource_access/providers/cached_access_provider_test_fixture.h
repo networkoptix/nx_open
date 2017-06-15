@@ -12,7 +12,7 @@
 class QnCommonModule;
 class QnAbstractResourceAccessProvider;
 
-class QnAccessProviderTestFixture: public testing::Test,
+class QnCachedAccessProviderTestFixture: public testing::Test,
     protected QnResourcePoolTestHelper
 {
 protected:
@@ -22,11 +22,13 @@ protected:
     void setupAwaitAccess();
     virtual QnAbstractResourceAccessProvider* accessProvider() const = 0;
 
+    using Source = nx::core::access::Source;
+
     void awaitAccessValue(const QnResourceAccessSubject& subject, const QnResourcePtr& resource,
-        QnAbstractResourceAccessProvider::Source value);
+        Source value);
 
     void at_accessChanged(const QnResourceAccessSubject& subject, const QnResourcePtr& resource,
-        QnAbstractResourceAccessProvider::Source value);
+        Source value);
 
 private:
     QSharedPointer<QnCommonModule> m_module;
@@ -34,7 +36,7 @@ private:
     struct AwaitedAccess
     {
         AwaitedAccess(const QnResourceAccessSubject& subject, const QnResourcePtr& resource,
-            QnAbstractResourceAccessProvider::Source value)
+            Source value)
             :
             subject(subject),
             resource(resource),
@@ -44,7 +46,7 @@ private:
 
         QnResourceAccessSubject subject;
         QnResourcePtr resource;
-        QnAbstractResourceAccessProvider::Source value;
+        Source value;
     };
     std::deque<AwaitedAccess> m_awaitedAccessQueue;
 };

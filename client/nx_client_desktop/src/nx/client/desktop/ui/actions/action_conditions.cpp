@@ -557,7 +557,7 @@ ActionVisibility StopSharingCondition::check(const Parameters& parameters, QnWor
 
     for (auto resource : parameters.resources())
     {
-        if (context->resourceAccessProvider()->accessibleVia(subject, resource) == QnAbstractResourceAccessProvider::Source::shared)
+        if (context->resourceAccessProvider()->accessibleVia(subject, resource) == nx::core::access::Source::shared)
             return EnabledAction;
     }
 

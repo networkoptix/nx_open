@@ -6,6 +6,7 @@
 
 #include <common/common_module_aware.h>
 
+#include <nx/core/core_fwd.h>
 #include <core/resource/resource_fwd.h>
 
 #include <nx/utils/singleton.h>
@@ -69,7 +70,9 @@ class QnCommonModule: public QObject, public QnInstanceStorage
 {
     Q_OBJECT
 public:
-    explicit QnCommonModule(bool clientMode, QObject *parent = nullptr);
+    explicit QnCommonModule(bool clientMode,
+        nx::core::access::Mode resourceAccessMode,
+        QObject* parent = nullptr);
     virtual ~QnCommonModule();
 
     //using Singleton<QnCommonModule>::instance;

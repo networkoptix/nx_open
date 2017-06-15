@@ -2,6 +2,7 @@
 
 #include <streaming/hls/hls_server.h>
 #include <network/tcp_listener.h>
+#include <nx/core/access/access_types.h>
 #include <common/common_module.h>
 #include <test_support/network/tcp_listener_stub.h>
 
@@ -13,7 +14,7 @@ class QnHttpLiveStreamingProcessorHttpResponse:
 {
 public:
     QnHttpLiveStreamingProcessorHttpResponse(nx_http::MimeProtoVersion httpVersion):
-        m_commonModule(/*clientMode*/ false),
+        m_commonModule(/*clientMode*/ false, nx::core::access::Mode::direct),
         m_tcpListener(&m_commonModule),
         m_hlsRequestProcessor(QSharedPointer<AbstractStreamSocket>(), &m_tcpListener)
     {
@@ -156,7 +157,7 @@ TEST_F(QnHttpLiveStreamingProcessorHttp10Response, unknown_length_resource)
 
 TEST(HLSMimeTypes, main)
 {
-    QnCommonModule commonModule(false);
+    QnCommonModule commonModule(false, nx::core::access::Mode::direct);
     TcpListenerStub tcpListener(&commonModule);
 
     class HlsServerTest : public nx_hls::QnHttpLiveStreamingProcessor
