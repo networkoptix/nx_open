@@ -158,8 +158,10 @@ void QnBusinessRuleProcessor::executeAction(const QnAbstractBusinessActionPtr& a
 
 bool QnBusinessRuleProcessor::handleBookmarkAction(const QnAbstractBusinessActionPtr& action)
 {
-    if (!action->getParams().needConfirmation
-        || action->actionType() != QnBusiness::BookmarkAction)
+    if (!action->getParams().needConfirmation)
+        return false;
+
+    if (action->actionType() != QnBusiness::BookmarkAction)
     {
         NX_EXPECT(false, "Invalid action");
         return false;
