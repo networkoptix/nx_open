@@ -12,6 +12,7 @@
 #include <client_core/client_core_module.h>
 
 #include <core/resource_management/resource_pool.h>
+#include <core/resource_management/user_roles_manager.h>
 
 #include <core/resource/resource.h>
 #include <core/resource/user_resource.h>
@@ -298,7 +299,6 @@ QString QnEventLogModel::getUserNameById(const QnUuid& id)
     return (userResource.isNull() ? kRemovedUserName : userResource->getName());
 }
 
-
 QVariant QnEventLogModel::iconData(Column column, const QnBusinessActionData& action)
 {
     QnUuid resId;
@@ -324,19 +324,20 @@ QVariant QnEventLogModel::iconData(Column column, const QnBusinessActionData& ac
                     return QVariant();
                 }
             }
-            else if (actionType == QnBusiness::ShowPopupAction)
+            else if (actionType == QnBusiness::ShowPopupAction
+                  || actionType == QnBusiness::ShowOnAlarmLayoutAction)
             {
-                if (action.actionParams.userGroup == QnBusiness::AdminOnly)
-                    return qnResIconCache->icon(QnResourceIconCache::User);
-                else
-                    return qnResIconCache->icon(QnResourceIconCache::Users);
-            }
-            else if (actionType == QnBusiness::ShowOnAlarmLayoutAction)
-            {
-                const auto &users = action.actionParams.additionalResources;
-                const bool multipleUsers = (users.empty() || (users.size() > 1));
-                return qnResIconCache->icon(multipleUsers ?
-                    QnResourceIconCache::Users : QnResourceIconCache::User);
+                QnUserResourceList users;
+                QList<QnUuid> roles;
+                qnClientCoreModule->commonModule()->userRolesManager()->usersAndRoles(
+                    action.actionParams.additionalResources, users, roles);
+                const bool multiple = action.actionParams.additionalResources.empty()
+                    || action.actionParams.additionalResources.size() > 1
+                    || users.size() > 1
+                    || !roles.empty();
+                return qnResIconCache->icon(multiple
+                    ? QnResourceIconCache::Users
+                    : QnResourceIconCache::User);
             }
         }
         resId = action.actionParams.actionResourceId;
@@ -353,20 +354,6 @@ QString QnEventLogModel::getResourceNameString(const QnUuid& id)
     auto resourcePool = qnClientCoreModule->commonModule()->resourcePool();
     return QnResourceDisplayInfo(resourcePool->getResourceById(id))
         .toString(qnSettings->extraInfoInTree());
-}
-
-QString QnEventLogModel::getUserGroupString(QnBusiness::UserGroup value)
-{
-    switch (value)
-    {
-        case QnBusiness::EveryOne:
-            return tr("Users");
-        case QnBusiness::AdminOnly:
-            return tr("Administrators Only");
-        default:
-            return QString();
-    }
-    return QString();
 }
 
 QString QnEventLogModel::textData(Column column, const QnBusinessActionData& action) const
@@ -396,19 +383,18 @@ QString QnEventLogModel::textData(Column column, const QnBusinessActionData& act
             QnBusiness::ActionType actionType = action.actionType;
             if (actionType == QnBusiness::SendMailAction)
                 return action.actionParams.emailAddress;
-            else if (actionType == QnBusiness::ShowPopupAction)
-                return getUserGroupString(action.actionParams.userGroup);
-            else if (actionType == QnBusiness::ShowOnAlarmLayoutAction)
+            else if (actionType == QnBusiness::ShowPopupAction
+                  || actionType == QnBusiness::ShowOnAlarmLayoutAction)
             {
-                // For ShowOnAlarmLayoutAction action type additionalResources contains users list
-                const auto &users = action.actionParams.additionalResources;
-                if (users.empty())
+                const auto& usersAndRoles = action.actionParams.additionalResources;
+                if (usersAndRoles.empty())
                     return tr("All users");
 
-                if (users.size() == 1)
-                    return getUserNameById(users.front());
+                //TODO: #vkutin #3.1 Support roles adequately.
+                if (usersAndRoles.size() == 1)
+                    return getUserNameById(usersAndRoles.front());
 
-                return tr("%n users", "", users.size());
+                return tr("%n users and roles", "", usersAndRoles.size());
             }
             else if (actionType == QnBusiness::ExecHttpRequestAction)
             {
