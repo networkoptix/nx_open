@@ -10,21 +10,26 @@
 #include <core/resource/user_resource.h>
 #include <common/common_module.h>
 
-QnBaseResourceAccessProvider::QnBaseResourceAccessProvider(QObject* parent):
-    base_type(parent),
+using namespace nx::core::access;
+
+QnBaseResourceAccessProvider::QnBaseResourceAccessProvider(Mode mode, QObject* parent):
+    base_type(mode, parent),
     QnCommonModuleAware(parent),
     m_mutex(QnMutex::NonRecursive),
     m_accessibleResources()
 {
-    connect(commonModule()->resourcePool(), &QnResourcePool::resourceAdded, this,
-        &QnBaseResourceAccessProvider::handleResourceAdded);
-    connect(commonModule()->resourcePool(), &QnResourcePool::resourceRemoved, this,
-        &QnBaseResourceAccessProvider::handleResourceRemoved);
+    if (mode == Mode::cached)
+    {
+        connect(commonModule()->resourcePool(), &QnResourcePool::resourceAdded, this,
+            &QnBaseResourceAccessProvider::handleResourceAdded);
+        connect(commonModule()->resourcePool(), &QnResourcePool::resourceRemoved, this,
+            &QnBaseResourceAccessProvider::handleResourceRemoved);
 
-    connect(userRolesManager(), &QnUserRolesManager::userRoleAddedOrUpdated, this,
-        &QnBaseResourceAccessProvider::handleRoleAddedOrUpdated);
-    connect(userRolesManager(), &QnUserRolesManager::userRoleRemoved, this,
-        &QnBaseResourceAccessProvider::handleRoleRemoved);
+        connect(userRolesManager(), &QnUserRolesManager::userRoleAddedOrUpdated, this,
+            &QnBaseResourceAccessProvider::handleRoleAddedOrUpdated);
+        connect(userRolesManager(), &QnUserRolesManager::userRoleRemoved, this,
+            &QnBaseResourceAccessProvider::handleRoleRemoved);
+    }
 }
 
 QnBaseResourceAccessProvider::~QnBaseResourceAccessProvider()
@@ -34,10 +39,11 @@ QnBaseResourceAccessProvider::~QnBaseResourceAccessProvider()
 bool QnBaseResourceAccessProvider::hasAccess(const QnResourceAccessSubject& subject,
     const QnResourcePtr& resource) const
 {
-    //NX_EXPECT(!isUpdating()); //we can get here while reconnecting
-
     if (!acceptable(subject, resource))
         return false;
+
+    if (mode() == Mode::direct)
+        return isSubjectEnabled(subject) && calculateAccess(subject, resource);
 
     /* We can get cache miss in the following scenario:
      * * new user was added
@@ -52,13 +58,11 @@ bool QnBaseResourceAccessProvider::hasAccess(const QnResourceAccessSubject& subj
     return m_accessibleResources[subject.id()].contains(resource->getId());
 }
 
-QnAbstractResourceAccessProvider::Source QnBaseResourceAccessProvider::accessibleVia(
+Source QnBaseResourceAccessProvider::accessibleVia(
     const QnResourceAccessSubject& subject,
     const QnResourcePtr& resource,
     QnResourceList* providers) const
 {
-    //NX_EXPECT(!isUpdating()); //we can get here while reconnecting
-
     if (!hasAccess(subject, resource))
         return Source::none;
 
@@ -70,13 +74,19 @@ QnAbstractResourceAccessProvider::Source QnBaseResourceAccessProvider::accessibl
 
 void QnBaseResourceAccessProvider::beforeUpdate()
 {
+    if (mode() == Mode::direct)
+        return;
+
     QnMutexLocker lk(&m_mutex);
     m_accessibleResources.clear();
 }
 
 void QnBaseResourceAccessProvider::afterUpdate()
 {
-    for (const auto& subject : resourceAccessSubjectsCache()->allSubjects())
+    if (mode() == Mode::direct)
+        return;
+
+    for (const auto& subject: resourceAccessSubjectsCache()->allSubjects())
         updateAccessBySubject(subject);
 }
 
@@ -98,6 +108,8 @@ bool QnBaseResourceAccessProvider::isSubjectEnabled(const QnResourceAccessSubjec
 
 void QnBaseResourceAccessProvider::updateAccessToResource(const QnResourcePtr& resource)
 {
+    NX_EXPECT(mode() == Mode::cached);
+
     if (isUpdating())
         return;
 
@@ -107,6 +119,8 @@ void QnBaseResourceAccessProvider::updateAccessToResource(const QnResourcePtr& r
 
 void QnBaseResourceAccessProvider::updateAccessBySubject(const QnResourceAccessSubject& subject)
 {
+    NX_EXPECT(mode() == Mode::cached);
+
     if (isUpdating())
         return;
 
@@ -117,6 +131,8 @@ void QnBaseResourceAccessProvider::updateAccessBySubject(const QnResourceAccessS
 void QnBaseResourceAccessProvider::updateAccess(const QnResourceAccessSubject& subject,
     const QnResourcePtr& resource)
 {
+    NX_EXPECT(mode() == Mode::cached);
+
     if (isUpdating())
         return;
 
@@ -159,6 +175,8 @@ void QnBaseResourceAccessProvider::fillProviders(
 
 void QnBaseResourceAccessProvider::handleResourceAdded(const QnResourcePtr& resource)
 {
+    NX_EXPECT(mode() == Mode::cached);
+
     updateAccessToResource(resource);
 
     if (QnUserResourcePtr user = resource.dynamicCast<QnUserResource>())
@@ -177,6 +195,8 @@ void QnBaseResourceAccessProvider::handleResourceAdded(const QnResourcePtr& reso
 
 void QnBaseResourceAccessProvider::handleResourceRemoved(const QnResourcePtr& resource)
 {
+    NX_EXPECT(mode() == Mode::cached);
+
     disconnect(resource, nullptr, this, nullptr);
 
     if (isUpdating())
@@ -207,12 +227,16 @@ void QnBaseResourceAccessProvider::handleResourceRemoved(const QnResourcePtr& re
 void QnBaseResourceAccessProvider::handleRoleAddedOrUpdated(
     const ec2::ApiUserRoleData& userRole)
 {
+    NX_EXPECT(mode() == Mode::cached);
+
     /* We have no certain way to check if user role was already added. */
     handleSubjectAdded(userRole);
 }
 
 void QnBaseResourceAccessProvider::handleRoleRemoved(const ec2::ApiUserRoleData& userRole)
 {
+    NX_EXPECT(mode() == Mode::cached);
+
     if (isUpdating())
         return;
 
@@ -223,11 +247,15 @@ void QnBaseResourceAccessProvider::handleRoleRemoved(const ec2::ApiUserRoleData&
 
 void QnBaseResourceAccessProvider::handleSubjectAdded(const QnResourceAccessSubject& subject)
 {
+    NX_EXPECT(mode() == Mode::cached);
+
     updateAccessBySubject(subject);
 }
 
 void QnBaseResourceAccessProvider::handleSubjectRemoved(const QnResourceAccessSubject& subject)
 {
+    NX_EXPECT(mode() == Mode::cached);
+
     if (isUpdating())
         return;
 
@@ -247,6 +275,8 @@ void QnBaseResourceAccessProvider::handleSubjectRemoved(const QnResourceAccessSu
 
 QSet<QnUuid> QnBaseResourceAccessProvider::accessible(const QnResourceAccessSubject& subject) const
 {
+    NX_EXPECT(mode() == Mode::cached);
+
     QnMutexLocker lk(&m_mutex);
     return m_accessibleResources.value(subject.id());
 }

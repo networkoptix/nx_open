@@ -17,6 +17,20 @@ const ec2::ApiLayoutTourDataList& QnLayoutTourManager::tours() const
     return m_tours;
 }
 
+ec2::ApiLayoutTourDataList QnLayoutTourManager::tours(const QList<QnUuid>& ids) const
+{
+    QnMutexLocker lock(&m_mutex);
+
+    auto matching = ids.toSet();
+    ec2::ApiLayoutTourDataList result;
+    for (const auto& tour: m_tours)
+    {
+        if (matching.contains(tour.id))
+            result.push_back(tour);
+    }
+    return result;
+}
+
 void QnLayoutTourManager::resetTours(const ec2::ApiLayoutTourDataList& tours)
 {
     QnMutexLocker lock(&m_mutex);

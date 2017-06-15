@@ -13,6 +13,7 @@
 #include <api/runtime_info_manager.h>
 #include <core/resource_management/resource_discovery_manager.h>
 #include <core/resource_management/resource_pool.h>
+#include <nx/core/access/access_types.h>
 #include <llutil/hardware_id.h>
 #include <network/http_connection_listener.h>
 #include <network/tcp_connection_priv.h>
@@ -231,7 +232,7 @@ int Appserver2Process::exec()
         return 0;
     }
 
-    m_commonModule.reset(new QnCommonModule(false));
+    m_commonModule.reset(new QnCommonModule(false, nx::core::access::Mode::direct));
     const auto moduleGuid = settings.moduleGuid();
     m_commonModule->setModuleGUID(
         moduleGuid.isNull() ? QnUuid::createUuid() : moduleGuid);

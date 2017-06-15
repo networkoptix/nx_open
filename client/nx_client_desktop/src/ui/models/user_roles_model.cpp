@@ -2,6 +2,7 @@
 
 #include <algorithm>
 #include <QtCore/QVector>
+#include <QtCore/QScopedValueRollback>
 
 #include <common/common_globals.h>
 
@@ -169,10 +170,7 @@ QVariant QnUserRolesModel::data(const QModelIndex& index, int role) const
 
         /* Role uuid (for custom roles): */
         case Qn::UuidRole:
-            return QVariant::fromValue(
-                roleModel.roleType != Qn::UserRole::CustomUserRole && d->m_predefinedRoleIdsEnabled
-                    ? QnUserRolesManager::predefinedRoleId(roleModel.roleType)
-                    : roleModel.roleUuid);
+            return QVariant::fromValue(d->id(index.row(), d->m_predefinedRoleIdsEnabled));
 
         /* Role permissions (for built-in roles): */
         case Qn::GlobalPermissionsRole:
@@ -208,4 +206,36 @@ bool QnUserRolesModel::setData(const QModelIndex& index, const QVariant& value, 
         index.sibling(index.row(), columnCount() - 1));
 
     return true;
+}
+
+QSet<QnUuid> QnUserRolesModel::checkedRoles() const
+{
+    QSet<QnUuid> result;
+
+    Q_D(const QnUserRolesModel);
+    for (const auto& index: d->m_checked)
+        result.insert(d->id(index.row(), true));
+
+    return result;
+}
+
+void QnUserRolesModel::setCheckedRoles(const QSet<QnUuid>& ids)
+{
+    Q_D(QnUserRolesModel);
+    d->m_checked.clear();
+
+    QHash<QnUuid, int> rowById;
+    for (int row = 0; row < d->count(); ++row)
+        rowById[d->id(row, true)] = row;
+
+    for (const auto& id: ids)
+    {
+        const int row = rowById.value(id, -1);
+        if (row >= 0)
+            d->m_checked.insert(createIndex(row, CheckColumn));
+    }
+
+    emit dataChanged(
+        createIndex(0, 0),
+        createIndex(rowCount() - 1, columnCount() - 1));
 }

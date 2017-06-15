@@ -968,8 +968,10 @@ void QnResourceBrowserWidget::handleItemActivated(const QModelIndex& index, bool
         return;
 
     const bool isLayoutTourReviewMode = workbench()->currentLayout()->isLayoutTourReview();
-    if (isLayoutTourReviewMode)
-        menu()->trigger(action::OpenInNewTabAction, resource);
+    const auto actionId = isLayoutTourReviewMode
+        ? action::OpenInNewTabAction
+        : action::DropResourcesAction;
+    menu()->trigger(actionId, resource);
 }
 
 void QnResourceBrowserWidget::setTooltipResource(const QnResourcePtr& resource)

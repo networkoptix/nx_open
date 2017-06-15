@@ -8,12 +8,19 @@
 #include <core/resource/user_resource.h>
 #include <common/common_module.h>
 
+using namespace nx::core::access;
 
-QnPermissionsResourceAccessProvider::QnPermissionsResourceAccessProvider(QObject* parent):
-    base_type(parent)
+QnPermissionsResourceAccessProvider::QnPermissionsResourceAccessProvider(
+    Mode mode,
+    QObject* parent)
+    :
+    base_type(mode, parent)
 {
-    connect(globalPermissionsManager(), &QnGlobalPermissionsManager::globalPermissionsChanged,
-        this, &QnPermissionsResourceAccessProvider::updateAccessBySubject);
+    if (mode == Mode::cached)
+    {
+        connect(globalPermissionsManager(), &QnGlobalPermissionsManager::globalPermissionsChanged,
+            this, &QnPermissionsResourceAccessProvider::updateAccessBySubject);
+    }
 }
 
 QnPermissionsResourceAccessProvider::~QnPermissionsResourceAccessProvider()
@@ -31,7 +38,7 @@ bool QnPermissionsResourceAccessProvider::hasAccessToDesktopCamera(
             Qn::GlobalControlVideoWallPermission);
 }
 
-QnAbstractResourceAccessProvider::Source QnPermissionsResourceAccessProvider::baseSource() const
+Source QnPermissionsResourceAccessProvider::baseSource() const
 {
     return Source::permissions;
 }
@@ -62,6 +69,8 @@ bool QnPermissionsResourceAccessProvider::calculateAccess(const QnResourceAccess
 
 void QnPermissionsResourceAccessProvider::handleResourceAdded(const QnResourcePtr& resource)
 {
+    NX_EXPECT(mode() == Mode::cached);
+
     base_type::handleResourceAdded(resource);
     if (isLayout(resource))
     {

@@ -167,6 +167,9 @@ private:
     bool needProxyAction(const QnAbstractBusinessActionPtr& action, const QnResourcePtr& res);
     void doProxyAction(const QnAbstractBusinessActionPtr& action, const QnResourcePtr& res);
     void executeAction(const QnAbstractBusinessActionPtr& action, const QnResourcePtr& res);
+
+    bool handleBookmarkAction(const QnAbstractBusinessActionPtr& action);
+
 protected:
     mutable QnMutex m_mutex;
 private:
@@ -201,6 +204,8 @@ private:
         \param isRuleAdded \a true - rule added, \a false - removed
     */
     void notifyResourcesAboutEventIfNeccessary( const QnBusinessEventRulePtr& businessRule, bool isRuleAdded );
+
+    QHash<QnUuid, qint64> m_runningBookmarkActions;
 };
 
 #define qnBusinessRuleProcessor QnBusinessRuleProcessor::instance()

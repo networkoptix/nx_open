@@ -2,6 +2,7 @@
 
 #include <common/common_module.h>
 
+#include <nx/core/access/access_types.h>
 #include <core/resource_management/resource_pool_test_helper.h>
 #include <core/resource_management/resource_pool.h>
 
@@ -24,7 +25,7 @@ protected:
     // virtual void SetUp() will be called before each test is run.
     virtual void SetUp()
     {
-        m_module.reset(new QnCommonModule(true));
+        m_module.reset(new QnCommonModule(false, nx::core::access::Mode::direct));
         initializeContext(m_module.data());
         m_server = addServer();
         m_server->setStatus(Qn::Online);

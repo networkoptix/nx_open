@@ -10,6 +10,7 @@
 #include "utils/common/synctime.h"
 #include "core/resource_management/status_dictionary.h"
 #include "core/resource/resource_fwd.h"
+#include <nx/core/access/access_types.h>
 #include "core/resource/camera_user_attribute_pool.h"
 #include "api/global_settings.h"
 #include "core/resource_management/resource_properties.h"
@@ -87,10 +88,12 @@ int main(int argc, char *argv[])
     }
 
     QnStaticCommonModule staticCommon(Qn::PT_NotDefined, QString(), QString());
-    QnCommonModule common(true);
+    //QnCommonModule common(false, nx::core::access::Mode::direct);
 
-    common.instance<QnFfmpegInitializer>();
-    common.instance<QnLongRunnablePool>();
+    QnFfmpegInitializer ffmpeg;
+    QnLongRunnablePool logRunnablePool;
+    //common.instance<QnFfmpegInitializer>();
+    //common.instance<QnLongRunnablePool>();
     QnStoragePluginFactory::instance()->registerStoragePlugin("file",
         QnQtFileStorageResource::instance, true);
 
@@ -117,7 +120,7 @@ int main(int argc, char *argv[])
         }
     }
 
-    QnCameraPool::initGlobalInstance(new QnCameraPool(localInterfacesToListen, &common));
+    QnCameraPool::initGlobalInstance(new QnCameraPool(localInterfacesToListen, /*&common*/nullptr));
     QnCameraPool::instance()->start();
     for (int i = 1; i < argc; ++i)
     {

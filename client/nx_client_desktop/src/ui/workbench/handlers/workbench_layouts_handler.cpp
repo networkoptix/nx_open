@@ -541,7 +541,7 @@ bool LayoutsHandler::confirmChangeSharedLayout(const LayoutChange& change)
         [this, layout = change.layout](const QnUserResourcePtr& user)
         {
             return resourceAccessProvider()->accessibleVia(user, layout) ==
-                QnAbstractResourceAccessProvider::Source::shared;
+                nx::core::access::Source::shared;
         });
 
     /* Do not warn if there are no such users - no side effects in any case. */
@@ -562,7 +562,7 @@ bool LayoutsHandler::confirmDeleteSharedLayouts(const QnLayoutResourceList& layo
                 [this, user](const QnLayoutResourcePtr& layout)
                 {
                     return resourceAccessProvider()->accessibleVia(user, layout) ==
-                        QnAbstractResourceAccessProvider::Source::shared;
+                        nx::core::access::Source::shared;
                 });
         });
 
@@ -655,7 +655,7 @@ bool LayoutsHandler::confirmStopSharingLayouts(const QnResourceAccessSubject& su
 
         QnResourceList providers;
         auto accessSource = resourceAccessProvider()->accessibleVia(subject, resource, &providers);
-        if (accessSource != QnAbstractResourceAccessProvider::Source::layout)
+        if (accessSource != nx::core::access::Source::layout)
             continue;
 
         QSet<QnUuid> providerIds;
@@ -986,7 +986,7 @@ void LayoutsHandler::at_stopSharingLayoutAction_triggered()
     QnLayoutResourceList sharedLayouts;
     for (auto resource: params.resources().filtered<QnLayoutResource>())
     {
-        if (resourceAccessProvider()->accessibleVia(subject, resource) == QnAbstractResourceAccessProvider::Source::shared)
+        if (resourceAccessProvider()->accessibleVia(subject, resource) == nx::core::access::Source::shared)
             sharedLayouts << resource;
     }
     if (sharedLayouts.isEmpty())

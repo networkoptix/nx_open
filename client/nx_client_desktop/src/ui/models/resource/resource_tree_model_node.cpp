@@ -725,11 +725,19 @@ Qt::ItemFlags QnResourceTreeModelNode::flags(int column) const
     case Qn::LayoutItemNode:
     case Qn::SharedLayoutNode:
     case Qn::SharedResourceNode:
-        if(m_flags & (Qn::media | Qn::layout | Qn::server | Qn::user | Qn::videowall | Qn::web_page))
+    {
+        // Any of flags is sufficient.
+        if (m_flags & (Qn::media | Qn::layout | Qn::server | Qn::videowall))
+            result |= Qt::ItemIsDragEnabled;
+
+        // Web page is a combination of flags.
+        if (m_flags.testFlag(Qn::web_page))
             result |= Qt::ItemIsDragEnabled;
         break;
+    }
     case Qn::VideoWallItemNode: //TODO: #GDM #VW drag of empty item on scene should create new layout
     case Qn::RecorderNode:
+    case Qn::LayoutTourNode:
         result |= Qt::ItemIsDragEnabled;
         break;
     default:

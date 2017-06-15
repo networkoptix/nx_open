@@ -5,6 +5,7 @@
 #include <core/resource/resource.h>
 #include <core/resource/user_resource.h>
 #include <core/resource_management/resource_pool.h>
+#include <core/resource_management/user_roles_manager.h>
 
 #include <nx/fusion/model_functions.h>
 
@@ -162,7 +163,7 @@ bool QnBusinessEventRule::isScheduleMatchTime(const QDateTime& datetime) const
 
 QnBusinessEventRule::QnBusinessEventRule(
     int internalId, int aggregationPeriod, const QByteArray& actionParams, bool isSystem,
-    QnBusiness::ActionType bActionType, QnBusiness::EventType bEventType, const QnUuid& actionResId)
+    QnBusiness::ActionType bActionType, QnBusiness::EventType bEventType, const QList<QnUuid>& subjectIds)
 {
     m_disabled = false;
     m_eventState = QnBusiness::UndefinedState;
@@ -174,10 +175,14 @@ QnBusinessEventRule::QnBusinessEventRule(
     m_eventType = bEventType;
 
     m_actionParams = QJson::deserialized<QnBusinessActionParameters>(actionParams);
-    if (!actionResId.isNull())
-        m_actionResources << actionResId;
-}
+    if (subjectIds.empty())
+        return;
 
+    if (QnBusiness::requiresUserResource(m_actionType))
+        m_actionResources = subjectIds.toVector();
+    else
+        m_actionParams.additionalResources = subjectIds.toVector().toStdVector();
+}
 
 QnBusinessEventRule* QnBusinessEventRule::clone()
 {
@@ -211,29 +216,26 @@ void QnBusinessEventRule::removeResource(const QnUuid& resId)
         if (m_eventResources[i] == resId)
             m_eventResources.removeAt(i);
     }
-
 }
-
 
 QnBusinessEventRuleList QnBusinessEventRule::getDefaultRules()
 {
     QnBusinessEventRuleList result;
-    result << QnBusinessEventRulePtr(new QnBusinessEventRule(1,  30,    "{ \"userGroup\" : 0 }",  0, QnBusiness::ShowPopupAction,   QnBusiness::CameraDisconnectEvent));
-    result << QnBusinessEventRulePtr(new QnBusinessEventRule(2,  30,    QByteArray(),             0, QnBusiness::ShowPopupAction,   QnBusiness::StorageFailureEvent));
-    result << QnBusinessEventRulePtr(new QnBusinessEventRule(3,  30,    QByteArray(),             0, QnBusiness::ShowPopupAction,   QnBusiness::NetworkIssueEvent));
-    result << QnBusinessEventRulePtr(new QnBusinessEventRule(4,  30,    QByteArray(),             0, QnBusiness::ShowPopupAction,   QnBusiness::CameraIpConflictEvent));
-    result << QnBusinessEventRulePtr(new QnBusinessEventRule(5,  30,    QByteArray(),             0, QnBusiness::ShowPopupAction,   QnBusiness::ServerFailureEvent));
-    result << QnBusinessEventRulePtr(new QnBusinessEventRule(6,  30,    QByteArray(),             0, QnBusiness::ShowPopupAction,   QnBusiness::ServerConflictEvent));
-    result << QnBusinessEventRulePtr(new QnBusinessEventRule(7,  21600, QByteArray(),             0, QnBusiness::SendMailAction,    QnBusiness::CameraDisconnectEvent, QnUserResource::kAdminGuid));
-    result << QnBusinessEventRulePtr(new QnBusinessEventRule(8,  24*3600, QByteArray(),           0, QnBusiness::SendMailAction,    QnBusiness::StorageFailureEvent, QnUserResource::kAdminGuid));
-    result << QnBusinessEventRulePtr(new QnBusinessEventRule(9,  21600, QByteArray(),             0, QnBusiness::SendMailAction,    QnBusiness::NetworkIssueEvent, QnUserResource::kAdminGuid));
-    result << QnBusinessEventRulePtr(new QnBusinessEventRule(10, 21600, QByteArray(),             0, QnBusiness::SendMailAction,    QnBusiness::CameraIpConflictEvent, QnUserResource::kAdminGuid));
-    result << QnBusinessEventRulePtr(new QnBusinessEventRule(11, 21600, QByteArray(),             0, QnBusiness::SendMailAction,    QnBusiness::ServerFailureEvent, QnUserResource::kAdminGuid));
-    result << QnBusinessEventRulePtr(new QnBusinessEventRule(12, 21600, QByteArray(),             0, QnBusiness::SendMailAction,    QnBusiness::ServerConflictEvent, QnUserResource::kAdminGuid));
-    result << QnBusinessEventRulePtr(new QnBusinessEventRule(20, 21600, QByteArray(),             0, QnBusiness::SendMailAction,    QnBusiness::ServerStartEvent, QnUserResource::kAdminGuid));
-
-    result << QnBusinessEventRulePtr(new QnBusinessEventRule(22, 21600, QByteArray(),             0, QnBusiness::SendMailAction,    QnBusiness::LicenseIssueEvent, QnUserResource::kAdminGuid));
-    result << QnBusinessEventRulePtr(new QnBusinessEventRule(23, 30,    QByteArray(),             0, QnBusiness::ShowPopupAction,   QnBusiness::LicenseIssueEvent));
+    result << QnBusinessEventRulePtr(new QnBusinessEventRule(1,  30,    QByteArray(),       0, QnBusiness::ShowPopupAction,   QnBusiness::CameraDisconnectEvent));
+    result << QnBusinessEventRulePtr(new QnBusinessEventRule(2,  30,    QByteArray(),       0, QnBusiness::ShowPopupAction,   QnBusiness::StorageFailureEvent, QnUserRolesManager::adminRoleIds()));
+    result << QnBusinessEventRulePtr(new QnBusinessEventRule(3,  30,    QByteArray(),       0, QnBusiness::ShowPopupAction,   QnBusiness::NetworkIssueEvent, QnUserRolesManager::adminRoleIds()));
+    result << QnBusinessEventRulePtr(new QnBusinessEventRule(4,  30,    QByteArray(),       0, QnBusiness::ShowPopupAction,   QnBusiness::CameraIpConflictEvent, QnUserRolesManager::adminRoleIds()));
+    result << QnBusinessEventRulePtr(new QnBusinessEventRule(5,  30,    QByteArray(),       0, QnBusiness::ShowPopupAction,   QnBusiness::ServerFailureEvent, QnUserRolesManager::adminRoleIds()));
+    result << QnBusinessEventRulePtr(new QnBusinessEventRule(6,  30,    QByteArray(),       0, QnBusiness::ShowPopupAction,   QnBusiness::ServerConflictEvent, QnUserRolesManager::adminRoleIds()));
+    result << QnBusinessEventRulePtr(new QnBusinessEventRule(7,  21600, QByteArray(),       0, QnBusiness::SendMailAction,    QnBusiness::CameraDisconnectEvent, { QnUserResource::kAdminGuid }));
+    result << QnBusinessEventRulePtr(new QnBusinessEventRule(8,  24*3600, QByteArray(),     0, QnBusiness::SendMailAction,    QnBusiness::StorageFailureEvent, { QnUserResource::kAdminGuid }));
+    result << QnBusinessEventRulePtr(new QnBusinessEventRule(9,  21600, QByteArray(),       0, QnBusiness::SendMailAction,    QnBusiness::NetworkIssueEvent, { QnUserResource::kAdminGuid }));
+    result << QnBusinessEventRulePtr(new QnBusinessEventRule(10, 21600, QByteArray(),       0, QnBusiness::SendMailAction,    QnBusiness::CameraIpConflictEvent, { QnUserResource::kAdminGuid }));
+    result << QnBusinessEventRulePtr(new QnBusinessEventRule(11, 21600, QByteArray(),       0, QnBusiness::SendMailAction,    QnBusiness::ServerFailureEvent, { QnUserResource::kAdminGuid }));
+    result << QnBusinessEventRulePtr(new QnBusinessEventRule(12, 21600, QByteArray(),       0, QnBusiness::SendMailAction,    QnBusiness::ServerConflictEvent, { QnUserResource::kAdminGuid }));
+    result << QnBusinessEventRulePtr(new QnBusinessEventRule(20, 21600, QByteArray(),       0, QnBusiness::SendMailAction,    QnBusiness::ServerStartEvent, { QnUserResource::kAdminGuid }));
+    result << QnBusinessEventRulePtr(new QnBusinessEventRule(22, 21600, QByteArray(),       0, QnBusiness::SendMailAction,    QnBusiness::LicenseIssueEvent, { QnUserResource::kAdminGuid }));
+    result << QnBusinessEventRulePtr(new QnBusinessEventRule(23, 30,    QByteArray(),       0, QnBusiness::ShowPopupAction,   QnBusiness::LicenseIssueEvent, QnUserRolesManager::adminRoleIds()));
 
     result << getSystemRules() << getRulesUpd43() << getRulesUpd48();
     return result;
@@ -242,15 +244,15 @@ QnBusinessEventRuleList QnBusinessEventRule::getDefaultRules()
 QnBusinessEventRuleList QnBusinessEventRule::getSystemRules()
 {
     QnBusinessEventRuleList result;
-    result << QnBusinessEventRulePtr(new QnBusinessEventRule(900013, 30,    QByteArray(),             1, QnBusiness::DiagnosticsAction, QnBusiness::CameraDisconnectEvent));
-    result << QnBusinessEventRulePtr(new QnBusinessEventRule(900014, 30,    QByteArray(),             1, QnBusiness::DiagnosticsAction, QnBusiness::StorageFailureEvent));
-    result << QnBusinessEventRulePtr(new QnBusinessEventRule(900015, 30,    QByteArray(),             1, QnBusiness::DiagnosticsAction, QnBusiness::NetworkIssueEvent));
-    result << QnBusinessEventRulePtr(new QnBusinessEventRule(900016, 30,    QByteArray(),             1, QnBusiness::DiagnosticsAction, QnBusiness::CameraIpConflictEvent));
-    result << QnBusinessEventRulePtr(new QnBusinessEventRule(900017, 30,    QByteArray(),             1, QnBusiness::DiagnosticsAction, QnBusiness::ServerFailureEvent));
-    result << QnBusinessEventRulePtr(new QnBusinessEventRule(900018, 30,    QByteArray(),             1, QnBusiness::DiagnosticsAction, QnBusiness::ServerConflictEvent));
+    result << QnBusinessEventRulePtr(new QnBusinessEventRule(900013, 30,    QByteArray(),   1, QnBusiness::DiagnosticsAction, QnBusiness::CameraDisconnectEvent));
+    result << QnBusinessEventRulePtr(new QnBusinessEventRule(900014, 30,    QByteArray(),   1, QnBusiness::DiagnosticsAction, QnBusiness::StorageFailureEvent));
+    result << QnBusinessEventRulePtr(new QnBusinessEventRule(900015, 30,    QByteArray(),   1, QnBusiness::DiagnosticsAction, QnBusiness::NetworkIssueEvent));
+    result << QnBusinessEventRulePtr(new QnBusinessEventRule(900016, 30,    QByteArray(),   1, QnBusiness::DiagnosticsAction, QnBusiness::CameraIpConflictEvent));
+    result << QnBusinessEventRulePtr(new QnBusinessEventRule(900017, 30,    QByteArray(),   1, QnBusiness::DiagnosticsAction, QnBusiness::ServerFailureEvent));
+    result << QnBusinessEventRulePtr(new QnBusinessEventRule(900018, 30,    QByteArray(),   1, QnBusiness::DiagnosticsAction, QnBusiness::ServerConflictEvent));
 
-    result << QnBusinessEventRulePtr(new QnBusinessEventRule(900019, 0,     QByteArray(),             1, QnBusiness::DiagnosticsAction, QnBusiness::ServerStartEvent));
-    result << QnBusinessEventRulePtr(new QnBusinessEventRule(900021, 30,    QByteArray(),             1, QnBusiness::DiagnosticsAction, QnBusiness::LicenseIssueEvent));
+    result << QnBusinessEventRulePtr(new QnBusinessEventRule(900019, 0,     QByteArray(),   1, QnBusiness::DiagnosticsAction, QnBusiness::ServerStartEvent));
+    result << QnBusinessEventRulePtr(new QnBusinessEventRule(900021, 30,    QByteArray(),   1, QnBusiness::DiagnosticsAction, QnBusiness::LicenseIssueEvent));
 
     return result;
 }
@@ -258,15 +260,15 @@ QnBusinessEventRuleList QnBusinessEventRule::getSystemRules()
 QnBusinessEventRuleList QnBusinessEventRule::getRulesUpd43()
 {
     QnBusinessEventRuleList result;
-    result << QnBusinessEventRulePtr(new QnBusinessEventRule(24,  0,    QByteArray(),             0, QnBusiness::ShowPopupAction,   QnBusiness::UserDefinedEvent));
-    result << QnBusinessEventRulePtr(new QnBusinessEventRule(900022, 0,     QByteArray(),             1, QnBusiness::DiagnosticsAction, QnBusiness::UserDefinedEvent));
+    result << QnBusinessEventRulePtr(new QnBusinessEventRule(24,  0,        QByteArray(),   0, QnBusiness::ShowPopupAction,   QnBusiness::UserDefinedEvent));
+    result << QnBusinessEventRulePtr(new QnBusinessEventRule(900022, 0,     QByteArray(),   1, QnBusiness::DiagnosticsAction, QnBusiness::UserDefinedEvent));
     return result;
 }
 
 QnBusinessEventRuleList QnBusinessEventRule::getRulesUpd48()
 {
     QnBusinessEventRuleList result;
-    result << QnBusinessEventRulePtr(new QnBusinessEventRule(900023,  0,    QByteArray(),   0, QnBusiness::ShowPopupAction,   QnBusiness::BackupFinishedEvent));
+    result << QnBusinessEventRulePtr(new QnBusinessEventRule(900023,  0,    QByteArray(),   0, QnBusiness::ShowPopupAction,   QnBusiness::BackupFinishedEvent, QnUserRolesManager::adminRoleIds()));
     result << QnBusinessEventRulePtr(new QnBusinessEventRule(900024,  0,    QByteArray(),   1, QnBusiness::DiagnosticsAction, QnBusiness::BackupFinishedEvent));
     return result;
 }

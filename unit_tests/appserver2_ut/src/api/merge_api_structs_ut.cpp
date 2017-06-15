@@ -5,6 +5,8 @@
 #include <nx/utils/std/cpp14.h>
 
 #include <rest/ec2_update_http_handler.h>
+
+#include <nx/core/access/access_types.h>
 #include <core/resource_access/user_access_data.h>
 #include <api/model/audit/auth_session.h>
 #include <nx_ec/data/api_data.h>
@@ -322,7 +324,7 @@ private:
     )};
 
     QnStaticCommonModule m_staticCommonModule;
-    QnCommonModule m_commonModule{/*clientMode*/ false};
+    QnCommonModule m_commonModule{/*clientMode*/ false, nx::core::access::Mode::direct};
     MockQnHttpConnectionListener listener{&m_commonModule};
     QnRestConnectionProcessor m_restConnectionProcessor{m_socket, /*owner*/ &listener };
 
