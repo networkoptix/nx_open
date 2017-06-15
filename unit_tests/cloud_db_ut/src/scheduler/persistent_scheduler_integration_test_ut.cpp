@@ -71,6 +71,20 @@ protected:
                 scheduleUser2FunctorId));
     }
 
+    void andWhenOnlyFirstUserRegistered()
+    {
+        user1 = std::unique_ptr<SchedulerUser>(
+            new SchedulerUser(
+                executor.get(),
+                scheduler.get(),
+                scheduleUser1FunctorId));
+    }
+
+    void andWhenFirstUsersUnsubscribes()
+    {
+        //user2->unsubscribe()
+    }
+
     void whenTwoUsersScheduleTwoTasksEach()
     {
         whenTwoUsersInitializedAndRegistredToScheduler();
@@ -81,9 +95,9 @@ protected:
         user2->subscribe(kSecondUserSecondTaskTimeout);
     }
 
-    void andWhenSchedulerWorksForSomeTime(int timeoutMs)
+    void andWhenSchedulerWorksForSomeTime()
     {
-        std::this_thread::sleep_for(std::chrono::milliseconds(timeoutMs));
+        std::this_thread::sleep_for(std::chrono::milliseconds(1000));
     }
 
     void andWhenSystemRestarts()
@@ -115,9 +129,14 @@ protected:
         assertTasksFiredForUser(user2);
     }
 
+    void thenTasksShouldFireMultipleTimesForTheFirstUser()
+    {
+        assertTasksFiredForUser(user1);
+    }
+
     void thenSchedulerShouldBeIdleWithoutCrashes()
     {
-        andWhenSchedulerWorksForSomeTime(1000);
+        andWhenSchedulerWorksForSomeTime();
     }
 
     QString dbPath;
@@ -132,50 +151,58 @@ protected:
 TEST_F(SchedulerIntegrationTest, TwoUsersScheduleTasks)
 {
     whenTwoUsersScheduleTwoTasksEach();
-    andWhenSchedulerWorksForSomeTime(1000);
+    andWhenSchedulerWorksForSomeTime();
     thenTasksShouldFireMultipleTimesForBothUsers();
 }
 
 TEST_F(SchedulerIntegrationTest, TwoUsersTasks_AfterRestart_NoUsersRegistered)
 {
     whenTwoUsersScheduleTwoTasksEach();
-    andWhenSchedulerWorksForSomeTime(500);
+    andWhenSchedulerWorksForSomeTime();
     andWhenSystemRestarts();
 
     thenSchedulerShouldBeIdleWithoutCrashes();
 }
 
-//TEST_F(SchedulerIntegrationTest, TwoUsersTasks_AfterRestart_TwoUsersRegistered)
-//{
-//    whenTwoUsersScheduleTwoTasksEach();
-//    andSystemRestarts();
-//    andBothUsersRegistred();
-//
-//    thenTasksShouldFireMultipleTimesForBothUsers();
-//}
-//
-//TEST_F(SchedulerIntegrationTest, TwoUsersTasks_AfterRestart_OneUserRegistered)
-//{
-//    whenTwoUsersScheduleTwoTasksEach();
-//    andSystemRestarts();
-//    andOnlyOneUserRegistred();
-//
-//    thenTasksShouldFireMultipleTimesForTheFirstUser();
-//}
-//
-//TEST_F(SchedulerIntegrationTest, TwoUsersTasks_OneUnsubscribed_AfterRestart_TwoUsersRegistered)
-//{
-//    whenTwoUsersScheduleTwoTasksEach();
-//    andFirstUsersUnsubscribes();
-//    thenFirstUserShouldNotReceiveTimerEventsAnyLonger();
-//
-//    andSystemRestarts();
-//    andBothUsersRegistred();
-//
-//    thenTasksShouldFireMultipleTimesForTheSecondUser();
-//    andNoTasksShouldFireForTheFirstUser();
-//}
-//
+TEST_F(SchedulerIntegrationTest, TwoUsersTasks_AfterRestart_TwoUsersRegistered)
+{
+    whenTwoUsersScheduleTwoTasksEach();
+    andWhenSchedulerWorksForSomeTime();
+
+    andWhenSystemRestarts();
+    whenTwoUsersInitializedAndRegistredToScheduler();
+    andWhenSchedulerWorksForSomeTime();
+
+    thenTasksShouldFireMultipleTimesForBothUsers();
+}
+
+TEST_F(SchedulerIntegrationTest, TwoUsersTasks_AfterRestart_OneUserRegistered)
+{
+    whenTwoUsersScheduleTwoTasksEach();
+    andWhenSchedulerWorksForSomeTime();
+
+    andWhenSystemRestarts();
+    andWhenOnlyFirstUserRegistered();
+    andWhenSchedulerWorksForSomeTime();
+
+    thenTasksShouldFireMultipleTimesForTheFirstUser();
+}
+
+TEST_F(SchedulerIntegrationTest, TwoUsersTasks_OneUnsubscribed_AfterRestart_TwoUsersRegistered)
+{
+    whenTwoUsersScheduleTwoTasksEach();
+    andWhenSchedulerWorksForSomeTime();
+
+    andWhenFirstUsersUnsubscribes();
+    thenFirstUserShouldNotReceiveTimerEventsAnyLonger();
+
+    andSystemRestarts();
+    andBothUsersRegistred();
+
+    thenTasksShouldFireMultipleTimesForTheSecondUser();
+    andNoTasksShouldFireForTheFirstUser();
+}
+
 //TEST_F(SchedulerIntegrationTest, OneUserSchedulesLongTask_AfterRestartAndPause_)
 //{
 //    whenTwoUsersScheduleTwoTasksEach();
