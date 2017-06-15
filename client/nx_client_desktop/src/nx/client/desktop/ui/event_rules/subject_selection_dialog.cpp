@@ -336,9 +336,9 @@ SubjectSelectionDialog::SubjectSelectionDialog(QWidget* parent, Qt::WindowFlags 
     rolesChanged(0, m_roles->rowCount() - 1);
 
     const auto updateFilterText =
-        [this, filterRoles]()
+        [this, sortUsersModel, filterRoles]()
         {
-            m_users->setFilterFixedString(ui->searchLineEdit->text());
+            sortUsersModel->setFilterFixedString(ui->searchLineEdit->text());
             filterRoles->setFilterFixedString(ui->searchLineEdit->text());
         };
 
