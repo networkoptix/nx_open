@@ -2,6 +2,7 @@
 
 #include <nx/utils/log/log.h>
 
+#include <nx/core/access/access_types.h>
 #include <common/common_module.h>
 #include <common/common_globals.h>
 #include <common/static_common_module.h>
