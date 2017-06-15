@@ -13,6 +13,9 @@ class UserAuthentication:
     public AbstractUserAuthentication
 {
 public:
+    UserAuthentication() = default;
+    UserAuthentication(const UserAuthentication&) = delete;
+
     virtual boost::optional<std::string> fetchSystemNonce(
         nx::db::QueryContext* const queryContext,
         const std::string& systemId) override;

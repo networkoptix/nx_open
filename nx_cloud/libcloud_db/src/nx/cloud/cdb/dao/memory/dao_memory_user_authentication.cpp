@@ -23,7 +23,7 @@ void UserAuthentication::insertOrReplaceSystemNonce(
     const std::string& systemId,
     const std::string& nonce)
 {
-    m_systemIdToNonce.emplace(systemId, nonce);
+    m_systemIdToNonce[systemId] = nonce;
 }
 
 api::AuthInfo UserAuthentication::fetchUserAuthRecords(

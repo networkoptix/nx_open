@@ -5,6 +5,7 @@
 #include <nx/utils/time.h>
 
 #include <nx/cloud/cdb/dao/rdb/dao_rdb_user_authentication.h>
+#include <nx/cloud/cdb/dao/memory/dao_memory_user_authentication.h>
 
 #include "base_persistent_data_test.h"
 
@@ -16,12 +17,13 @@ namespace test {
 
 using BasePersistentDataTest = cdb::test::BasePersistentDataTest;
 
-class DaoRdbUserAuthentication:
+template<typename DaoType>
+class DaoUserAuthentication:
     public ::testing::Test,
     public BasePersistentDataTest
 {
 public:
-    DaoRdbUserAuthentication()
+    DaoUserAuthentication()
     {
         m_ownerAccount = insertRandomAccount();
         m_system = insertRandomSystem(m_ownerAccount);
@@ -45,11 +47,11 @@ protected:
             m_expectedSystemInfo.emplace(system.id, systemInfo);
 
             executeUpdateQuerySyncThrow(
-                std::bind(&dao::rdb::UserAuthentication::insertUserAuthRecords,
-                    m_dao, _1, system.id, m_ownerAccount.id, authInfo));
+                std::bind(&dao::AbstractUserAuthentication::insertUserAuthRecords,
+                    &m_dao, _1, system.id, m_ownerAccount.id, authInfo));
             executeUpdateQuerySyncThrow(
-                std::bind(&dao::rdb::UserAuthentication::insertOrReplaceSystemNonce,
-                    m_dao, _1, system.id, authInfo.records[0].nonce));
+                std::bind(&dao::AbstractUserAuthentication::insertOrReplaceSystemNonce,
+                    &m_dao, _1, system.id, authInfo.records[0].nonce));
         }
     }
 
@@ -58,8 +60,8 @@ protected:
         using namespace std::placeholders;
 
         executeUpdateQuerySyncThrow(
-            std::bind(&dao::rdb::UserAuthentication::insertUserAuthRecords,
-                m_dao, _1, m_system.id, m_ownerAccount.id, m_expectedAuthInfo));
+            std::bind(&dao::AbstractUserAuthentication::insertUserAuthRecords,
+                &m_dao, _1, m_system.id, m_ownerAccount.id, m_expectedAuthInfo));
     }
 
     void whenFetchedAuthRecords()
@@ -67,8 +69,8 @@ protected:
         using namespace std::placeholders;
 
         m_fetchedAuthInfo = executeSelectQuerySyncThrow(
-            std::bind(&dao::rdb::UserAuthentication::fetchUserAuthRecords,
-                m_dao, _1, m_system.id, m_ownerAccount.id));
+            std::bind(&dao::AbstractUserAuthentication::fetchUserAuthRecords,
+                &m_dao, _1, m_system.id, m_ownerAccount.id));
     }
 
     void whenInsertedSystemNonce()
@@ -78,8 +80,8 @@ protected:
         m_expectedNonce = nx::utils::generateRandomName(12).toStdString();
 
         executeUpdateQuerySyncThrow(
-            std::bind(&dao::rdb::UserAuthentication::insertOrReplaceSystemNonce,
-                m_dao, _1, m_system.id, m_expectedNonce));
+            std::bind(&dao::AbstractUserAuthentication::insertOrReplaceSystemNonce,
+                &m_dao, _1, m_system.id, m_expectedNonce));
     }
 
     void whenReplacedExistingNonce()
@@ -93,8 +95,8 @@ protected:
         using namespace std::placeholders;
 
         m_fetchedNonce = executeSelectQuerySyncThrow(
-            std::bind(&dao::rdb::UserAuthentication::fetchSystemNonce,
-                m_dao, _1, m_system.id));
+            std::bind(&dao::AbstractUserAuthentication::fetchSystemNonce,
+                &m_dao, _1, m_system.id));
     }
 
     void whenDeleteAllRecords()
@@ -102,8 +104,8 @@ protected:
         using namespace std::placeholders;
 
         executeUpdateQuerySyncThrow(
-            std::bind(&dao::rdb::UserAuthentication::deleteAccountAuthRecords,
-                m_dao, _1, m_ownerAccount.id));
+            std::bind(&dao::AbstractUserAuthentication::deleteAccountAuthRecords,
+                &m_dao, _1, m_ownerAccount.id));
     }
 
     void thenAuthRecordCanBeRead()
@@ -133,8 +135,8 @@ protected:
         using namespace std::placeholders;
 
         auto systems = executeSelectQuerySyncThrow(
-            std::bind(&dao::rdb::UserAuthentication::fetchAccountSystems,
-                m_dao, _1, m_ownerAccount.id));
+            std::bind(&dao::AbstractUserAuthentication::fetchAccountSystems,
+                &m_dao, _1, m_ownerAccount.id));
 
         // Validating.
         ASSERT_EQ(m_expectedSystemInfo.size(), systems.size());
@@ -152,19 +154,19 @@ protected:
         using namespace std::placeholders;
 
         auto systems = executeSelectQuerySyncThrow(
-            std::bind(&dao::rdb::UserAuthentication::fetchAccountSystems,
-                m_dao, _1, m_ownerAccount.id));
+            std::bind(&dao::AbstractUserAuthentication::fetchAccountSystems,
+                &m_dao, _1, m_ownerAccount.id));
         for (const auto& system: systems)
         {
             auto fetchedAuthInfo = executeSelectQuerySyncThrow(
-                std::bind(&dao::rdb::UserAuthentication::fetchUserAuthRecords,
-                    m_dao, _1, system.systemId, m_ownerAccount.id));
+                std::bind(&dao::AbstractUserAuthentication::fetchUserAuthRecords,
+                    &m_dao, _1, system.systemId, m_ownerAccount.id));
             ASSERT_TRUE(fetchedAuthInfo.records.empty());
         }
     }
 
 private:
-    rdb::UserAuthentication m_dao;
+    DaoType m_dao;
     api::AccountData m_ownerAccount;
     api::SystemData m_system;
     api::AuthInfo m_expectedAuthInfo;
@@ -191,51 +193,75 @@ private:
     }
 };
 
+TYPED_TEST_CASE_P(DaoUserAuthentication);
+
 //-------------------------------------------------------------------------------------------------
 // Test cases.
 
-TEST_F(DaoRdbUserAuthentication, saved_user_auth_records_can_be_read_later)
+TYPED_TEST_P(DaoUserAuthentication, saved_user_auth_records_can_be_read_later)
 {
     whenAddedAuthRecord();
     thenAuthRecordCanBeRead();
 }
 
-TEST_F(DaoRdbUserAuthentication, fetching_empty_auth_record_list)
+TYPED_TEST_P(DaoUserAuthentication, fetching_empty_auth_record_list)
 {
     whenFetchedAuthRecords();
     thenRecordListIsEmpty();
 }
 
-TEST_F(DaoRdbUserAuthentication, inserting_system_nonce)
+TYPED_TEST_P(DaoUserAuthentication, inserting_system_nonce)
 {
     whenInsertedSystemNonce();
     thenNonceCanBeFetched();
 }
 
-TEST_F(DaoRdbUserAuthentication, fetching_not_existing_nonce)
+TYPED_TEST_P(DaoUserAuthentication, fetching_not_existing_nonce)
 {
     whenFetchedSystemNonce();
     thenNoNonceFound();
 }
 
-TEST_F(DaoRdbUserAuthentication, replacing_system_nonce)
+TYPED_TEST_P(DaoUserAuthentication, replacing_system_nonce)
 {
     whenReplacedExistingNonce();
     thenNonceCanBeFetched();
 }
 
-TEST_F(DaoRdbUserAuthentication, fetching_every_system_of_an_account)
+TYPED_TEST_P(DaoUserAuthentication, fetching_every_system_of_an_account)
 {
     givenAccountWithMultipleSystems();
     thenEverySystemInformationCanBeSelected();
 }
 
-TEST_F(DaoRdbUserAuthentication, deleting_every_auth_record_of_an_account)
+TYPED_TEST_P(DaoUserAuthentication, deleting_every_auth_record_of_an_account)
 {
     givenAccountWithMultipleSystems();
     whenDeleteAllRecords();
     thenAllRecordsHaveBeenDeleted();
 }
+
+REGISTER_TYPED_TEST_CASE_P(DaoUserAuthentication,
+    saved_user_auth_records_can_be_read_later,
+    fetching_empty_auth_record_list,
+    inserting_system_nonce,
+    fetching_not_existing_nonce,
+    replacing_system_nonce,
+    fetching_every_system_of_an_account,
+    deleting_every_auth_record_of_an_account);
+
+//-------------------------------------------------------------------------------------------------
+// Template test invokation.
+
+INSTANTIATE_TYPED_TEST_CASE_P(
+    DaoRdbUserAuthentication,
+    DaoUserAuthentication,
+    rdb::UserAuthentication);
+
+INSTANTIATE_TYPED_TEST_CASE_P(
+    DaoMemoryUserAuthentication,
+    DaoUserAuthentication,
+    memory::UserAuthentication);
 
 } // namespace test
 } // namespace rdb
