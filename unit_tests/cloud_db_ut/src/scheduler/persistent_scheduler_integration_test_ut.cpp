@@ -36,6 +36,14 @@ protected:
     {
         if (scheduler)
             scheduler->stop();
+
+        // mind destruction order
+        scheduler.reset();
+        executor.reset();
+        dbHelper.reset();
+
+        user1.reset();
+        user2.reset();
     }
 
     void initDb()
@@ -56,7 +64,7 @@ protected:
         ASSERT_TRUE(dbHelper->initDb());
     }
 
-    void whenTwoUsersInitializedAndRegistredToScheduler()
+    void whenTwoUsersInitializedAndRegisteredToScheduler()
     {
         user1 = std::unique_ptr<SchedulerUser>(
             new SchedulerUser(
@@ -80,7 +88,7 @@ protected:
                 scheduleUser1FunctorId));
     }
 
-    void andWhenFirstUsersUnsubscribes()
+    void andWhenFirstUsersUnsubscribesAllTasks()
     {
         nx::utils::promise<int> u1t1p;
         nx::utils::promise<int> u1t2p;
@@ -109,9 +117,42 @@ protected:
         user1Task2FiredWhileUnsubscribe = u1t2f.get();
     }
 
+    void andWhenFirstUsersUnsubscribesFirstTask()
+    {
+        nx::utils::promise<int> u1t1p;
+        auto u1t1f = u1t1p.get_future();
+
+        ASSERT_FALSE(user1Task1Id.isNull());
+
+        user1->unsubscribe(
+            user1Task1Id,
+            [u1t1p = std::move(u1t1p)](const SchedulerUser::Task& task) mutable
+            {
+                u1t1p.set_value(task.fired);
+            });
+
+        user1Task1FiredWhileUnsubscribe = u1t1f.get();
+    }
+
+    void whenFirstUserInitializedAndRegisteredToScheduler()
+    {
+        user1 = std::unique_ptr<SchedulerUser>(
+            new SchedulerUser(
+                executor.get(),
+                scheduler.get(),
+                scheduleUser1FunctorId));
+    }
+
+    void whenFirstUserSchedulesALongTask()
+    {
+        whenFirstUserInitializedAndRegisteredToScheduler();
+        const auto kLongTaskTimeout = std::chrono::seconds(3);
+        user1->subscribe(kLongTaskTimeout);
+    }
+
     void whenTwoUsersScheduleTwoTasksEach()
     {
-        whenTwoUsersInitializedAndRegistredToScheduler();
+        whenTwoUsersInitializedAndRegisteredToScheduler();
         nx::utils::promise<QnUuid> u1t1p;
         nx::utils::promise<QnUuid> u1t2p;
         nx::utils::promise<QnUuid> u2t1p;
@@ -152,13 +193,7 @@ protected:
 
     void andWhenSystemRestarts()
     {
-        scheduler->stop();
-        user1.reset();
-        user2.reset();
-        scheduler.reset();
-        dbHelper.reset();
-        executor.reset();
-
+        TearDown();
         SetUp();
     }
 
@@ -207,6 +242,53 @@ protected:
         ASSERT_EQ(user1Tasks.size(), 0);
     }
 
+    void thenFirstUserShouldNotReceiveTimerEventsAnyLongerForTheFirstTask()
+    {
+        auto user1Tasks = user1->tasks();
+        ASSERT_EQ(user1Tasks.size(), 2);
+
+        ASSERT_EQ(user1Tasks[user1Task1Id].fired, user1Task1FiredWhileUnsubscribe);
+    }
+
+    void thenFirstUserShouldContinueToReceiveTimerEventsForTheSecondTask()
+    {
+        auto user1Tasks = user1->tasks();
+        ASSERT_EQ(user1Tasks.size(), 2);
+
+        ASSERT_GT(user1Tasks[user1Task2Id].fired, user1Task2FiredWhileUnsubscribe);
+    }
+
+    void thenSecondTaskShouldFireMultipleTimesForTheFirstUser()
+    {
+        auto user1Tasks = user1->tasks();
+        ASSERT_EQ(user1Tasks.size(), 1);
+
+        for (const auto& task: user1Tasks)
+        {
+            ASSERT_EQ(user1Task2Id, task.first);
+            ASSERT_GT(task.second.fired, 0);
+        }
+    }
+
+    void thenLongTaskNotFiredYet()
+    {
+        auto user1Tasks = user1->tasks();
+        ASSERT_EQ(user1Tasks.size(), 1);
+
+        for (const auto& task: user1Tasks)
+            ASSERT_EQ(task.second.fired, 0);
+    }
+
+    void thenLongTaskShouldAtLastFire()
+    {
+        auto user1Tasks = user1->tasks();
+        ASSERT_EQ(user1Tasks.size(), 1);
+
+        for (const auto& task: user1Tasks)
+            ASSERT_GT(task.second.fired, 0);
+    }
+
+
     QString dbPath;
     db::ConnectionOptions dbOptions;
     std::unique_ptr<db::AsyncSqlQueryExecutor> executor;
@@ -246,7 +328,7 @@ TEST_F(SchedulerIntegrationTest, TwoUsersTasks_AfterRestart_TwoUsersRegistered)
     andWhenSchedulerWorksForSomeTime();
 
     andWhenSystemRestarts();
-    whenTwoUsersInitializedAndRegistredToScheduler();
+    whenTwoUsersInitializedAndRegisteredToScheduler();
     andWhenSchedulerWorksForSomeTime();
 
     thenTasksShouldFireMultipleTimesForBothUsers();
@@ -264,30 +346,59 @@ TEST_F(SchedulerIntegrationTest, TwoUsersTasks_AfterRestart_OneUserRegistered)
     thenTasksShouldFireMultipleTimesForTheFirstUser();
 }
 
-TEST_F(SchedulerIntegrationTest, TwoUsersTasks_OneUnsubscribed_AfterRestart_TwoUsersRegistered)
+TEST_F(SchedulerIntegrationTest, TwoUsersTasks_OneUnsubscribedAllTasks_AfterRestart_TwoUsersRegistered)
 {
     whenTwoUsersScheduleTwoTasksEach();
     andWhenSchedulerWorksForSomeTime();
     thenTasksShouldFireMultipleTimesForBothUsers();
 
-    andWhenFirstUsersUnsubscribes();
+    andWhenFirstUsersUnsubscribesAllTasks();
     andWhenSchedulerWorksForSomeTime();
     andWhenSchedulerWorksForSomeTime();
     thenFirstUserShouldNotReceiveTimerEventsAnyLonger();
 
     andWhenSystemRestarts();
-    whenTwoUsersInitializedAndRegistredToScheduler();
+    whenTwoUsersInitializedAndRegisteredToScheduler();
     andWhenSchedulerWorksForSomeTime();
 
     thenTasksShouldFireMultipleTimesForTheSecondUser();
     andNoTasksShouldFireForTheFirstUser();
 }
 
-//TEST_F(SchedulerIntegrationTest, OneUserSchedulesLongTask_AfterRestartAndPause)
-//{
-//    whenTwoUsersScheduleTwoTasksEach();
-//    thenTasksShouldFireMultipleTimes();
-//}
+TEST_F(SchedulerIntegrationTest, TwoUsersTasks_OneUnsubscribedFirstTask_AfterRestart_TwoUsersRegistered)
+{
+    whenTwoUsersScheduleTwoTasksEach();
+    andWhenSchedulerWorksForSomeTime();
+    thenTasksShouldFireMultipleTimesForBothUsers();
+
+    andWhenFirstUsersUnsubscribesFirstTask();
+    andWhenSchedulerWorksForSomeTime();
+    andWhenSchedulerWorksForSomeTime();
+    thenFirstUserShouldNotReceiveTimerEventsAnyLongerForTheFirstTask();
+    thenFirstUserShouldContinueToReceiveTimerEventsForTheSecondTask();
+
+    andWhenSystemRestarts();
+    whenTwoUsersInitializedAndRegisteredToScheduler();
+    andWhenSchedulerWorksForSomeTime();
+
+    thenTasksShouldFireMultipleTimesForTheSecondUser();
+    thenSecondTaskShouldFireMultipleTimesForTheFirstUser();
+}
+
+
+TEST_F(SchedulerIntegrationTest, OneUserSchedulesLongTask_AfterRestartAndPause)
+{
+    whenFirstUserSchedulesALongTask();
+    andWhenSchedulerWorksForSomeTime();
+    andWhenSchedulerWorksForSomeTime();
+    thenLongTaskNotFiredYet();
+
+    andWhenSystemRestarts();
+    whenFirstUserInitializedAndRegisteredToScheduler();
+    andWhenSchedulerWorksForSomeTime();
+    andWhenSchedulerWorksForSomeTime();
+    thenLongTaskShouldAtLastFire();
+}
 
 }
 }

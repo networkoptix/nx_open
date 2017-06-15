@@ -188,7 +188,7 @@ void PersistentScheduler::timerFunction(
     }
 
     m_sqlExecutor->executeUpdate(
-        [this, receiver, params, &functorId, &taskId](nx::db::QueryContext* queryContext)
+        [this, receiver, params, functorId, taskId](nx::db::QueryContext* queryContext)
         {
             return receiver->persistentTimerFired(taskId, params)(queryContext);
         },
