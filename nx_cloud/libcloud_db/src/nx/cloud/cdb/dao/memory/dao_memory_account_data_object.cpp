@@ -44,7 +44,7 @@ nx::db::DBResult AccountDataObject::fetchAccountByEmail(
 
 nx::db::DBResult AccountDataObject::fetchAccounts(
     nx::db::QueryContext* /*queryContext*/,
-    std::vector<data::AccountData>* accounts)
+    std::vector<data::AccountData>* /*accounts*/)
 {
     // TODO
     return db::DBResult::ok;
@@ -60,7 +60,7 @@ void AccountDataObject::insertEmailVerificationCode(
 }
 
 boost::optional<std::string> AccountDataObject::getVerificationCodeByAccountEmail(
-    nx::db::QueryContext* queryContext,
+    nx::db::QueryContext* /*queryContext*/,
     const std::string& accountEmail)
 {
     for (const auto& val: m_verificationCodeToEmail)

@@ -38,8 +38,8 @@ public:
      * @throw nx::db::Exception.
      */
     virtual void afterUpdatingAccountPassword(
-        nx::db::QueryContext* const queryContext,
-        const api::AccountData& account) {};
+        nx::db::QueryContext* const /*queryContext*/,
+        const api::AccountData& /*account*/) {}
 };
 
 /**
