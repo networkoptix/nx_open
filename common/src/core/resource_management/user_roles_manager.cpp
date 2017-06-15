@@ -1,6 +1,14 @@
 #include "user_roles_manager.h"
 
+#include <set>
+#include <vector>
+
+#include <QtCore/QVector>
+#include <QtCore/QList>
+#include <QtCore/QSet>
+
 #include <core/resource/user_resource.h>
+#include <core/resource_management/resource_pool.h>
 
 namespace Qn {
 
@@ -31,6 +39,32 @@ QnUserRolesManager::QnUserRolesManager(QObject* parent):
 QnUserRolesManager::~QnUserRolesManager()
 {
 }
+
+template<class IDList>
+void QnUserRolesManager::usersAndRoles(const IDList& ids, QnUserResourceList& users, QList<QnUuid>& roles)
+{
+    users = resourcePool()->getResources<QnUserResource>(ids);
+
+    QnMutexLocker lk(&m_mutex);
+    roles.clear();
+    for (const auto& id: ids)
+    {
+        if (isValidRoleId(id))
+            roles << id;
+    }
+}
+
+// Instantiations for std::vector, std::set, QVector, QList and QSet:
+template void QnUserRolesManager::usersAndRoles(
+    const std::vector<QnUuid>& ids, QnUserResourceList& users, QList<QnUuid>& roles);
+template void QnUserRolesManager::usersAndRoles(
+    const std::set<QnUuid>& ids, QnUserResourceList& users, QList<QnUuid>& roles);
+template void QnUserRolesManager::usersAndRoles(
+    const QVector<QnUuid>& ids, QnUserResourceList& users, QList<QnUuid>& roles);
+template void QnUserRolesManager::usersAndRoles(
+    const QList<QnUuid>& ids, QnUserResourceList& users, QList<QnUuid>& roles);
+template void QnUserRolesManager::usersAndRoles(
+    const QSet<QnUuid>& ids, QnUserResourceList& users, QList<QnUuid>& roles);
 
 ec2::ApiUserRoleDataList QnUserRolesManager::userRoles() const
 {

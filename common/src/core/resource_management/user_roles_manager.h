@@ -35,19 +35,8 @@ public:
     }
 
     // Splits subject id list into valid users and valid role ids (including predefined).
-    template<class IDList>
-    void usersAndRoles(const IDList& ids, QnUserResourceList& users, QList<QnUuid>& roles)
-    {
-        users = resourcePool()->getResources<QnUserResource>(ids);
-
-        QnMutexLocker lk(&m_mutex);
-        roles.clear();
-        for (const auto& id: ids)
-        {
-            if (isValidRoleId(id))
-                roles << id;
-        }
-    }
+    template<class IDList> //< std::vector, std::set, QVector, QSet and QList are supported.
+    void usersAndRoles(const IDList& ids, QnUserResourceList& users, QList<QnUuid>& roles);
 
     // Checks if there is a custom user role with specified uuid.
     bool hasRole(const QnUuid& id) const;
