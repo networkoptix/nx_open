@@ -49,8 +49,3 @@ signals:
 private:
     const Mode m_mode;
 };
-
-inline uint qHash(nx::core::access::Source value, uint seed)
-{
-    return qHash(static_cast<int>(value), seed);
-}

@@ -14,6 +14,11 @@ enum class Source
     videowall,      //< Accessible by placing on videowall.
 };
 
+inline uint qHash(Source value, uint seed)
+{
+    return ::qHash(static_cast<int>(value), seed);
+}
+
 enum class Mode
 {
     cached,
