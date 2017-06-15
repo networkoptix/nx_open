@@ -4,7 +4,7 @@
 
 #include <nx/utils/test_support/test_with_temporary_directory.h>
 
-#include <utils/db/types.h>
+#include "../types.h"
 
 namespace nx {
 namespace db {

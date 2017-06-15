@@ -960,6 +960,7 @@ void QnVideoStreamDisplay::blockTimeValueSafe(qint64 time)
 
 bool QnVideoStreamDisplay::isTimeBlocked() const
 {
+    QnMutexLocker lock(&m_renderListMtx);
     if (m_renderList.isEmpty())
         return false;
     QnAbstractRenderer* renderer = *m_renderList.begin();

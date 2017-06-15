@@ -30,11 +30,6 @@ angular.module('webadminApp').controller('ViewdebugCtrl',
         $scope.activeCamera = null;
         $scope.searchCams = '';
 
-
-        mediaserver.systemSettings().then(function(r){
-            $scope.webclientDisabled = r.data.reply.settings.crossdomainEnabled == 'false' ;
-        });
-
         var isAdmin = false;
         var canViewArchive = false;
 
@@ -75,12 +70,6 @@ angular.module('webadminApp').controller('ViewdebugCtrl',
                 id: r.data.reply.id
             };
         });
-
-        if(window.jscd.browser === 'Microsoft Internet Explorer' && ! browserSupports('webm', false, false)){
-            if(window.jscd.osVersion < 10) { //For 10th version webm codec doesn't work
-                $scope.ieNoWebm = true;
-            }
-        }
 
         if(window.jscd.mobile) {
             $scope.mobileStore = window.jscd.os === 'iOS'?'appstore':'googleplay';
@@ -739,7 +728,7 @@ angular.module('webadminApp').controller('ViewdebugCtrl',
             $scope.storage.volumeLevel = $scope.volumeLevel;
         });
 
-        mediaserver.getTime().then(function(result){
+        systemAPI.getTime().then(function(result){
             var serverTime = parseInt(result.data.reply.utcTime);
             var clientTime = (new Date()).getTime();
             if(Math.abs(clientTime - serverTime) > minTimeLag){
@@ -799,11 +788,6 @@ angular.module('webadminApp').controller('ViewdebugCtrl',
 
         $scope.mobileAppAlertClose = function(){
             $scope.session.mobileAppNotified  = true;
-            setTimeout(updateHeights,50);
-        };
-
-        $scope.ieNoWebmAlertClose = function(){
-            $scope.session.ieNoWebmNotified = true;
             setTimeout(updateHeights,50);
         };
 

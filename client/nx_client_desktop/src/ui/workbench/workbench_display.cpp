@@ -207,7 +207,6 @@ QnWorkbenchDisplay::QnWorkbenchDisplay(QObject *parent):
     m_view(NULL),
     m_lightMode(0),
     m_frontZ(0.0),
-    m_frameOpacity(1.0),
     m_zoomedMarginFlags(0),
     m_normalMarginFlags(0),
     m_inChangeLayout(false),
@@ -1083,7 +1082,6 @@ bool QnWorkbenchDisplay::addItemInternal(QnWorkbenchItem *item, bool animate, bo
 
     widget->setParent(this); /* Just to feel totally safe and not to leak memory no matter what happens. */
     widget->setAttribute(Qt::WA_DeleteOnClose);
-    widget->setFrameOpacity(m_frameOpacity);
 
     widget->setFlag(QGraphicsItem::ItemIgnoresParentOpacity, true); /* Optimization. */
     widget->setFlag(QGraphicsItem::ItemIsSelectable, true);
@@ -1172,6 +1170,8 @@ bool QnWorkbenchDisplay::addItemInternal(QnWorkbenchItem *item, bool animate, bo
             qnRedAssController->registerConsumer(mediaWidget->display()->camDisplay());
     }
 
+
+    updateWidgetsFrameOpacity();
     return true;
 }
 
@@ -1370,22 +1370,14 @@ void QnWorkbenchDisplay::updateCurrentMarginFlags()
     synchronizeSceneBoundsExtension();
 }
 
-qreal QnWorkbenchDisplay::widgetsFrameOpacity() const
+void QnWorkbenchDisplay::updateWidgetsFrameOpacity()
 {
-    return m_frameOpacity;
-}
-
-void QnWorkbenchDisplay::setWidgetsFrameOpacity(qreal opacity)
-{
-    if (qFuzzyEquals(m_frameOpacity, opacity))
-        return;
-
-    m_frameOpacity = opacity;
+    // Opacity for all widgets frames
+    const auto normalOpacity = qFuzzyIsNull(workbench()->mapper()->spacing()) ? 0.0 : 1.0;
 
     for (auto widget: m_widgets)
-        widget->setFrameOpacity(opacity);
+        widget->setFrameOpacity(widget->isSelected() ? 1.0 : normalOpacity);
 }
-
 
 // -------------------------------------------------------------------------- //
 // QnWorkbenchDisplay :: calculators
@@ -2268,6 +2260,8 @@ void QnWorkbenchDisplay::at_scene_selectionChanged()
     {
         workbench()->setItem(Qn::SingleSelectedRole, NULL);
     }
+
+    updateWidgetsFrameOpacity();
 }
 
 void QnWorkbenchDisplay::at_view_destroyed()
@@ -2298,11 +2292,7 @@ void QnWorkbenchDisplay::at_mapper_spacingChanged()
     synchronizeAllGeometries(false);
     synchronizeSceneBounds();
     fitInView(false);
-
-    if (qFuzzyIsNull(workbench()->mapper()->spacing()))
-        setWidgetsFrameOpacity(0.0);
-    else
-        setWidgetsFrameOpacity(1.0);
+    updateWidgetsFrameOpacity();
 }
 
 void QnWorkbenchDisplay::at_context_permissionsChanged(const QnResourcePtr &resource)

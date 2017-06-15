@@ -81,7 +81,8 @@ QnAuthHelper::QnAuthHelper(
     QnCommonModuleAware(commonModule),
     m_timeBasedNonceProvider(timeBasedNonceProvider),
     m_nonceProvider(&cloudManagerGroup->authenticationNonceFetcher),
-    m_userDataProvider(&cloudManagerGroup->userAuthenticator)
+    m_userDataProvider(&cloudManagerGroup->userAuthenticator),
+    m_ldap(new QnLdapManager(commonModule))
 {
     Ini ini;
 
@@ -215,30 +216,22 @@ Qn::AuthResult QnAuthHelper::authenticate(
                 if (userResource)
                 {
                     QString desiredRealm = nx::network::AppInfo::realm();
-                    if (userResource->isLdap()) {
-                        auto errCode = QnLdapManager::instance()->realm(&desiredRealm);
-                        NX_DEBUG(this, lm("%1 with ldap (%2)").args(errCode, request.requestLine));
-                        if (errCode != Qn::Auth_OK)
-                            return errCode;
-                    }
-                    if (canUpdateRealm &&
-                        (userResource->getRealm() != desiredRealm ||
-                            userResource->getDigest().isEmpty()))   //in case of ldap digest is initially empty
+                    bool needRecalcPassword =
+                        userResource->getRealm() != desiredRealm ||
+                        (userResource->getDigest().isEmpty() && !userResource->isCloud());
+                    if (canUpdateRealm && needRecalcPassword)
                     {
-                        //requesting client to re-calculate digest after upgrade to 2.4
+                        //requesting client to re-calculate digest after upgrade to 2.4 or fill ldap password
                         nx_http::insertOrReplaceHeader(
                             &response.headers,
                             nx_http::HttpHeader(Qn::REALM_HEADER_NAME, desiredRealm.toLatin1()));
-                        if (!userResource->isLdap())
-                        {
-                            addAuthHeader(
-                                response,
-                                userResource,
-                                isProxy,
-                                false); //requesting Basic authorization
-                            NX_DEBUG(this, lm("%1 requesting basic auth (%2)").args(authResult, request.requestLine));
+
+                        addAuthHeader(
+                            response,
+                            userResource,
+                            isProxy,
+                            false); //requesting Basic authorization
                             return authResult;
-                        }
                     }
                 }
             }
@@ -262,42 +255,46 @@ Qn::AuthResult QnAuthHelper::authenticate(
         //TODO #ak better call m_userDataProvider->authorize here
         QnUserResourcePtr userResource = findUserByName(authorizationHeader.userid());
 
-        QString desiredRealm = nx::network::AppInfo::realm();
-        if (userResource && userResource->isLdap()) {
-            Qn::AuthResult authResult = QnLdapManager::instance()->realm(&desiredRealm);
-            if (authResult != Qn::Auth_OK)
-            {
-                NX_DEBUG(this, lm("%1 with LDAP (%2)").args(authResult, request.requestLine));
-                return authResult;
-            }
-        }
+        // Extra step for LDAP authentication
 
-        UserDigestData userDigestData;
-        userDigestData.parse(request);
-
-        if (userResource)
+        if (userResource && userResource->isLdap() && userResource->passwordExpired())
         {
-            if (!userResource->isEnabled())
+            // Check user password on LDAP server
+            QString password;
+            if (authorizationHeader.authScheme == nx_http::header::AuthScheme::basic)
             {
-                NX_DEBUG(this, lm("%1 user is disabled (%2)").args(Qn::Auth_WrongLogin, request.requestLine));
-                return Qn::Auth_WrongLogin;
+                password = authorizationHeader.basic->password;
+            }
+            else if (authorizationHeader.authScheme == nx_http::header::AuthScheme::digest)
+            {
+                password = userResource->decodeLDAPPassword();
+                if (password.isEmpty())
+                    return Qn::Auth_Forbidden; //< can't perform digest auth for LDAP user yet
             }
 
-            if (userResource->isLdap() &&
-                (userResource->getDigest().isEmpty() || userResource->getRealm() != desiredRealm))
+            auto authResult = m_ldap->authenticate(userResource->getName(), password);
+
+            if ((authResult == Qn::Auth_WrongPassword ||
+                authResult == Qn::Auth_WrongDigest ||
+                authResult == Qn::Auth_WrongLogin) &&
+                authorizationHeader.authScheme == nx_http::header::AuthScheme::digest)
             {
-                //checking received credentials for validity
-                Qn::AuthResult authResult = checkDigestValidity(userResource, userDigestData.ha1Digest);
-                if (authResult != Qn::Auth_OK)
+                if (doDigestAuth(request.requestLine.method,
+                    authorizationHeader, response, isProxy, accessRights) == Qn::Auth_OK)
                 {
-                    NX_DEBUG(this, lm("%1 with LDAP (%2)").args(authResult, request.requestLine));
-                    return authResult;
+                    // Cached value matched user digest by not LDAP server.
+                    // Reset password in database to force user to relogin.
+                    updateUserHashes(userResource, QString());
                 }
-                //changing stored user's password
-                applyClientCalculatedPasswordHashToResource(userResource, userDigestData);
-                userResource->prolongatePassword();
             }
+
+            if (authResult != Qn::Auth_OK)
+                return authResult;
+            updateUserHashes(userResource, password); //< update stored LDAP password/hash if need
+            userResource->prolongatePassword();
         }
+
+        // Standard authentication
 
         Qn::AuthResult authResult = Qn::Auth_Forbidden;
         if (authorizationHeader.authScheme == nx_http::header::AuthScheme::digest)
@@ -314,14 +311,18 @@ Qn::AuthResult QnAuthHelper::authenticate(
             if (usedAuthMethod)
                 *usedAuthMethod = nx_http::AuthMethod::httpBasic;
             authResult = doBasicAuth(request.requestLine.method, authorizationHeader, response, accessRights);
-            NX_DEBUG(this, lm("%1 with basic (%2)").args(authResult, request.requestLine));
+
+            if (authResult == Qn::Auth_OK && userResource &&
+                (userResource->getDigest().isEmpty() || userResource->getRealm() != nx::network::AppInfo::realm()))
+            {
+                updateUserHashes(userResource, authorizationHeader.basic->password);
+            }
         }
         else
         {
             if (usedAuthMethod)
                 *usedAuthMethod = nx_http::AuthMethod::httpBasic;
             authResult = Qn::Auth_Forbidden;
-            NX_DEBUG(this, lm("%1 with basic (%2)").args(authResult, request.requestLine));
         }
 
         if (authResult == Qn::Auth_OK)
@@ -340,23 +341,6 @@ Qn::AuthResult QnAuthHelper::authenticate(
                         *accessRights = Qn::UserAccessData(userRes->getId());
                 }
             }
-
-
-            //checking whether client re-calculated ha1 digest
-            if (userDigestData.empty())
-                return authResult;
-
-            if (!userResource || (userResource->getRealm() == QString::fromUtf8(userDigestData.realm)))
-                return authResult;
-            //saving new user's digest
-            applyClientCalculatedPasswordHashToResource(userResource, userDigestData);
-        }
-        else if (userResource && userResource->isLdap())
-        {
-            //password has been changed in active directory? Requesting new digest...
-            nx_http::insertOrReplaceHeader(
-                &response.headers,
-                nx_http::HttpHeader(Qn::REALM_HEADER_NAME, desiredRealm.toLatin1()));
         }
         return authResult;
     }
@@ -445,26 +429,6 @@ Qn::AuthResult QnAuthHelper::doDigestAuth(
         if (res && accessRights)
             *accessRights = Qn::UserAccessData(res->getId());
 
-        bool tryOnceAgain = false;
-        if (userResource = res.dynamicCast<QnUserResource>())
-        {
-            if (userResource->passwordExpired())
-            {
-                //user password has expired, validating password
-                errCode = doPasswordProlongation(userResource);
-                if (errCode != Qn::Auth_OK)
-                    return errCode;
-                //have to call m_userDataProvider->authorize once again with password prolonged
-                tryOnceAgain = true;
-            }
-        }
-
-        if (tryOnceAgain)
-            errCode = m_userDataProvider->authorize(
-                res,
-                method,
-                authorization,
-                &responseHeaders.headers);
         if (errCode == Qn::Auth_OK)
             return Qn::Auth_OK;
 #else
@@ -559,19 +523,10 @@ Qn::AuthResult QnAuthHelper::doBasicAuth(
         method,
         authorization,
         &response.headers);
-    bool tryOnceAgain = false;
     if (auto user = res.dynamicCast<QnUserResource>())
     {
         if (accessRights)
             *accessRights = Qn::UserAccessData(user->getId());
-        if (user->passwordExpired())
-        {
-            //user password has expired, validating password
-            errCode = doPasswordProlongation(user);
-            if (errCode != Qn::Auth_OK)
-                return errCode;
-            tryOnceAgain = true;
-        }
     }
     else if (auto server = res.dynamicCast<QnMediaServerResource>())
     {
@@ -579,12 +534,6 @@ Qn::AuthResult QnAuthHelper::doBasicAuth(
             *accessRights = Qn::UserAccessData(server->getId());
     }
 
-    if (tryOnceAgain)
-        errCode = m_userDataProvider->authorize(
-            res,
-            method,
-            authorization,
-            &response.headers);
     if (errCode == Qn::Auth_OK)
     {
         if (auto user = res.dynamicCast<QnUserResource>())
@@ -665,6 +614,9 @@ Qn::AuthResult QnAuthHelper::doCookieAuthorization(
         authResult = doDigestAuth(
             method, authorization, tmpHeaders, false, accessRights);
     }
+    if (authResult != Qn::Auth_OK)
+    {
+    }
     return authResult;
 }
 
@@ -676,16 +628,9 @@ void QnAuthHelper::addAuthHeader(
 {
     QString realm;
     if (userResource)
-    {
-        if (userResource->isLdap())
-            QnLdapManager::instance()->realm(&realm);
-        else
-            realm = userResource->getRealm();
-    }
+        realm = userResource->getRealm();
     else
-    {
         realm = nx::network::AppInfo::realm();
-    }
 
     const QString auth =
         isDigest
@@ -730,11 +675,6 @@ void QnAuthHelper::at_resourcePool_resourceRemoved(const QnResourcePtr &res)
     m_servers.remove(res->getId());
 }
 #endif
-
-QByteArray QnAuthHelper::symmetricalEncode(const QByteArray& data)
-{
-    return nx::utils::encodeSimple(data);
-}
 
 Qn::AuthResult QnAuthHelper::authenticateByUrl(
     const QByteArray& authRecordBase64,
@@ -824,55 +764,22 @@ QnUserResourcePtr QnAuthHelper::findUserByName(const QByteArray& nxUserName) con
     return QnUserResourcePtr();
 }
 
-void QnAuthHelper::applyClientCalculatedPasswordHashToResource(
-    const QnUserResourcePtr& userResource,
-    const QnAuthHelper::UserDigestData& userDigestData)
+void QnAuthHelper::updateUserHashes(const QnUserResourcePtr& userResource, const QString& password)
 {
-    //TODO #ak set following properties atomically
-    userResource->setRealm(QString::fromUtf8(userDigestData.realm));
-    userResource->setDigest(userDigestData.ha1Digest, true);
-    userResource->setCryptSha512Hash(userDigestData.cryptSha512Hash);
-    userResource->setHash(QByteArray());
+    if (userResource->isLdap() && userResource->decodeLDAPPassword() == password)
+        return; //< password is not changed
+
+    userResource->setRealm(nx::network::AppInfo::realm());
+    userResource->setPassword(password);
+    userResource->generateHash();
 
     ec2::ApiUserData userData;
     fromResourceToApi(userResource, userData);
-
-
     commonModule()->ec2Connection()->getUserManager(Qn::kSystemAccess)->save(
         userData,
         QString(),
         ec2::DummyHandler::instance(),
         &ec2::DummyHandler::onRequestDone);
-}
-
-Qn::AuthResult QnAuthHelper::doPasswordProlongation(QnUserResourcePtr userResource)
-{
-    if (!userResource->isLdap())
-        return Qn::Auth_OK;
-
-    QString name = userResource->getName();
-    QString digest = userResource->getDigest();
-
-    auto errorCode = QnLdapManager::instance()->authenticateWithDigest(name, digest);
-    if (errorCode != Qn::Auth_OK) {
-        if (!userResource->passwordExpired())
-            return Qn::Auth_OK;
-        else
-            return errorCode;
-    }
-
-    if (userResource->getName() != name || userResource->getDigest() != digest)  //user data has been updated somehow while performing ldap request
-        return userResource->passwordExpirationTimestamp() > qnSyncTime->currentMSecsSinceEpoch() ? Qn::Auth_OK : Qn::Auth_PasswordExpired;
-    userResource->prolongatePassword();
-    return Qn::Auth_OK;
-}
-
-Qn::AuthResult QnAuthHelper::checkDigestValidity(QnUserResourcePtr userResource, const QByteArray& digest)
-{
-    if (!userResource->isLdap())
-        return Qn::Auth_OK;
-
-    return QnLdapManager::instance()->authenticateWithDigest(userResource->getName(), QLatin1String(digest));
 }
 
 bool QnAuthHelper::checkUserPassword(const QnUserResourcePtr& user, const QString& password)
@@ -890,4 +797,9 @@ bool QnAuthHelper::checkUserPassword(const QnUserResourcePtr& user, const QStrin
 
     nx_http::Response response;
     return authenticateByUrl(auth, QByteArray("GET"), response) == Qn::Auth_OK;
+}
+
+QnLdapManager* QnAuthHelper::ldapManager() const
+{
+    return m_ldap.get();
 }

@@ -51,6 +51,21 @@ protected:
     DBResult detailResultCode(QSqlDatabase* const connection, DBResult result) const;
     DBResult lastDBError(QSqlDatabase* const connection) const;
 
+    template<typename Func, typename... Args>
+    DBResult invokeDbQueryFunc(Func& func, const Args&... args)
+    {
+        DBResult dbResult = DBResult::ok;
+        try
+        {
+            dbResult = func(args...);
+        }
+        catch (const Exception& e)
+        {
+            dbResult = e.dbResult();
+        }
+        return dbResult;
+    }
+
 private:
     StatisticsCollector* m_statisticsCollector;
     std::chrono::steady_clock::time_point m_creationTime;
@@ -94,7 +109,7 @@ public:
             return result;
         }
 
-        result = m_dbUpdateFunc(&queryContext, m_input);
+        result = invokeDbQueryFunc(m_dbUpdateFunc, &queryContext, m_input);
         if (result != DBResult::ok)
         {
             result = detailResultCode(connection, result);
@@ -164,7 +179,7 @@ public:
         }
 
         OutputData output;
-        result = m_dbUpdateFunc(&queryContext, m_input, &output);
+        result = invokeDbQueryFunc(m_dbUpdateFunc, &queryContext, m_input, &output);
         if (result != DBResult::ok)
         {
             result = detailResultCode(connection, result);

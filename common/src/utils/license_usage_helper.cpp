@@ -587,8 +587,18 @@ QnVideoWallLicenseUsageWatcher::QnVideoWallLicenseUsageWatcher(QObject* parent):
 /* QnVideoWallLicenseUsageHelper                                        */
 /************************************************************************/
 QnVideoWallLicenseUsageHelper::QnVideoWallLicenseUsageHelper(QObject *parent):
-    base_type(parent),
-    m_proposed(0)
+    base_type(parent)
+{
+    init();
+}
+
+QnVideoWallLicenseUsageHelper::QnVideoWallLicenseUsageHelper(QnCommonModule* commonModule):
+    base_type(commonModule)
+{
+    init();
+}
+
+void QnVideoWallLicenseUsageHelper::init()
 {
     QnVideoWallLicenseUsageWatcher* usageWatcher = new QnVideoWallLicenseUsageWatcher(this);
     connect(usageWatcher, &QnVideoWallLicenseUsageWatcher::licenseUsageChanged, this, &QnLicenseUsageHelper::invalidate);

@@ -33,6 +33,7 @@ QnStaticCommonModule::QnStaticCommonModule(
 {
     Q_INIT_RESOURCE(common);
     QnCommonMetaTypes::initialize();
+    instance<QnLongRunnablePool>();
     nx::network::SocketGlobals::init();
 
     // Providing mediaserver-specific way of validating peer id.
@@ -102,4 +103,25 @@ void QnStaticCommonModule::setEngineVersion(const QnSoftwareVersion &version)
 QnResourceDataPool * QnStaticCommonModule::dataPool() const
 {
     return m_dataPool;
+}
+
+void QnStaticCommonModule::setModuleShortId(const QnUuid& id, int number)
+{
+    QnMutexLocker lock(&m_mutex);
+    m_longToShortInstanceId.insert(id, number);
+}
+
+int QnStaticCommonModule::moduleShortId(const QnUuid& id) const
+{
+    QnMutexLocker lock(&m_mutex);
+    auto itr = m_longToShortInstanceId.find(id);
+    return itr != m_longToShortInstanceId.end() ? itr.value() : -1;
+}
+
+QString QnStaticCommonModule::moduleDisplayName(const QnUuid& id) const
+{
+    QnMutexLocker lock(&m_mutex);
+    auto itr = m_longToShortInstanceId.find(id);
+    return itr != m_longToShortInstanceId.end() ?
+        QString::number(itr.value()) : id.toString();
 }

@@ -22,7 +22,7 @@ QnServerInterfaceWatcher::QnServerInterfaceWatcher(QObject *parent) :
         this, &QnServerInterfaceWatcher::at_resourcePool_resourceAdded);
 }
 
-void QnServerInterfaceWatcher::at_connectionChanged(nx::vms::discovery::Manager::ModuleData module)
+void QnServerInterfaceWatcher::at_connectionChanged(nx::vms::discovery::ModuleEndpoint module)
 {
     at_connectionChangedById(module.id);
 }

@@ -477,7 +477,10 @@ void QnWorkbenchExportHandler::exportTimeSelectionInternal(
                                 + L'\n' + tr("Export anyway?"));
 
                         if (!confirmed)
-                            return;
+                        {
+                            transcodeWarnShown = false;
+                            continue;
+                        }
                     }
 
                 }
@@ -491,7 +494,10 @@ void QnWorkbenchExportHandler::exportTimeSelectionInternal(
                     tr("It will increase CPU usage and may take significant time."));
 
                 if (!confirmed)
-                    return;
+                {
+                    transcodeWarnShown = false;
+                    continue;
+                }
             }
         }
 
@@ -512,7 +518,7 @@ void QnWorkbenchExportHandler::exportTimeSelectionInternal(
                 if (!QnFileMessages::confirmOverwrite(
                     mainWindow(), QFileInfo(fileName).completeBaseName()))
                 {
-                    return;
+                    continue;
                 }
             }
         }

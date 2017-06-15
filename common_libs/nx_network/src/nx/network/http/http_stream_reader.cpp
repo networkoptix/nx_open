@@ -5,67 +5,67 @@
 #include <nx/utils/byte_stream/custom_output_stream.h>
 #include <nx/utils/gzip/gzip_uncompressor.h>
 #include <nx/utils/log/assert.h>
+#include <nx/utils/std/cpp14.h>
 
 namespace nx_http {
 
 HttpStreamReader::HttpStreamReader():
-    m_state( waitingMessageStart ),
-    m_nextState( waitingMessageStart ),
-    m_isChunkedTransfer( false ),
-    m_messageBodyBytesRead( 0 ),
-    m_chunkStreamParseState( waitingChunkStart ),
-    m_nextChunkStreamParseState( undefined ),
-    m_currentChunkSize( 0 ),
-    m_currentChunkBytesRead( 0 ),
-    m_prevChar( 0 ),
-    m_lineEndingOffset( 0 ),
-    m_decodeChunked( true ),
-    m_currentMessageNumber( 0 ),
-    m_breakAfterReadingHeaders( false )
+    m_state(waitingMessageStart),
+    m_nextState(waitingMessageStart),
+    m_isChunkedTransfer(false),
+    m_messageBodyBytesRead(0),
+    m_chunkStreamParseState(waitingChunkStart),
+    m_nextChunkStreamParseState(undefined),
+    m_currentChunkSize(0),
+    m_currentChunkBytesRead(0),
+    m_prevChar(0),
+    m_lineEndingOffset(0),
+    m_decodeChunked(true),
+    m_currentMessageNumber(0),
+    m_breakAfterReadingHeaders(false)
 {
 }
 
-HttpStreamReader::~HttpStreamReader()
-{
-}
-
-bool HttpStreamReader::parseBytes( const BufferType& data, size_t count, size_t* bytesProcessed )
+bool HttpStreamReader::parseBytes(
+    const BufferType& data,
+    size_t count,
+    size_t* bytesProcessed)
 {
     return parseBytes(
         QnByteArrayConstRef(data, 0, count),
-        bytesProcessed );
+        bytesProcessed);
 }
 
 bool HttpStreamReader::parseBytes(
     const QnByteArrayConstRef& data,
-    size_t* bytesProcessed )
+    size_t* bytesProcessed)
 {
-    if( bytesProcessed )
+    if (bytesProcessed)
         *bytesProcessed = 0;
     const size_t count = data.size();
 
-    //reading line-by-line
-    //TODO #ak automate bytesProcessed modification based on currentDataPos
-    for( size_t currentDataPos = 0; currentDataPos < count; )
+    // Reading line-by-line.
+    // TODO #ak automate bytesProcessed modification based on currentDataPos.
+    for (size_t currentDataPos = 0; currentDataPos < count; )
     {
-        switch( m_state )
+        switch (m_state)
         {
             case pullingLineEndingBeforeMessageBody:
             {
-                //reading line ending of the previous line
-                    //this is needed to handle rtsp servers which are allowed to use CRLF and CR or LF alone
-                    //So, we allow HTTP headers to be terminated with CR or LF. Thus, if CRLF has been split to
-                    //different buffers, we MUST read LF before reading message body
+                // Reading line ending of the previous line.
+                // This is needed to handle rtsp servers which are allowed to use CRLF and CR or LF alone.
+                // So, we allow HTTP headers to be terminated with CR or LF. Thus, if CRLF has been split to
+                //   different buffers, we MUST read LF before reading message body.
                 size_t bytesRead = 0;
                 m_lineSplitter.finishCurrentLineEnding(
-                    data.mid( currentDataPos, count-currentDataPos ),
-                    &bytesRead );
+                    data.mid(currentDataPos, count - currentDataPos),
+                    &bytesRead);
                 currentDataPos += bytesRead;
-                if( bytesProcessed )
+                if (bytesProcessed)
                     *bytesProcessed = currentDataPos;
                 m_state = m_nextState;
-                if( m_breakAfterReadingHeaders ||
-                    m_state == messageDone )    //MUST break parsing on message boundary so that calling entity has a chance to handle message
+                if (m_breakAfterReadingHeaders ||
+                    m_state == messageDone)    //< MUST break parsing on message boundary so that calling entity has a chance to handle message.
                 {
                     return true;
                 }
@@ -74,19 +74,22 @@ bool HttpStreamReader::parseBytes(
 
             case readingMessageBody:
             {
-                //if m_contentLength == 0 and m_state == readingMessageBody then content-length is unknown
+                // If m_contentLength == 0 and m_state == readingMessageBody then content-length is unknown.
                 size_t msgBodyBytesRead = 0;
-                if( m_contentDecoder )
+                if (m_contentDecoder)
                 {
                     msgBodyBytesRead = readMessageBody(
-                        data.mid( currentDataPos, count-currentDataPos ),
-                        [this]( const QnByteArrayConstRef& data ){ m_codedMessageBodyBuffer.append(data.constData(), data.size()); } );
-                    //decoding content
-                    if( (msgBodyBytesRead != (size_t)-1) && (msgBodyBytesRead > 0) )
-                    {
-                        if( !m_codedMessageBodyBuffer.isEmpty() )
+                        data.mid(currentDataPos, count - currentDataPos),
+                        [this](const QnByteArrayConstRef& data)
                         {
-                            if( !m_contentDecoder->processData( m_codedMessageBodyBuffer ) )  //result of processing is appended to m_msgBodyBuffer
+                            m_codedMessageBodyBuffer.append(data.constData(), data.size());
+                        });
+                    // Decoding content.
+                    if ((msgBodyBytesRead != (size_t)-1) && (msgBodyBytesRead > 0))
+                    {
+                        if (!m_codedMessageBodyBuffer.isEmpty())
+                        {
+                            if (!m_contentDecoder->processData(m_codedMessageBodyBuffer))  //< Result of processing is appended to m_msgBodyBuffer.
                                 return false;
                             m_codedMessageBodyBuffer.clear();
                         }
@@ -95,25 +98,24 @@ bool HttpStreamReader::parseBytes(
                 else
                 {
                     msgBodyBytesRead = readMessageBody(
-                        data.mid( currentDataPos, count-currentDataPos ),
-                        [this]( const QnByteArrayConstRef& data )
-                            {
-                                QnMutexLocker lk(&m_mutex);
-                                m_msgBodyBuffer.append( data.constData(), data.size() );
-                            }
-                    );
+                        data.mid(currentDataPos, count - currentDataPos),
+                        [this](const QnByteArrayConstRef& data)
+                        {
+                            QnMutexLocker lk(&m_mutex);
+                            m_msgBodyBuffer.append(data.constData(), data.size());
+                        });
                 }
 
-                if( msgBodyBytesRead == (size_t)-1 )
+                if (msgBodyBytesRead == (size_t)-1)
                     return false;
                 currentDataPos += msgBodyBytesRead;
-                if( bytesProcessed )
+                if (bytesProcessed)
                     *bytesProcessed = currentDataPos;
-                if( (m_contentLength &&         //Content-Length known
-                        m_messageBodyBytesRead >= m_contentLength.get()) ||     //read all message body
-                    (m_isChunkedTransfer && m_chunkStreamParseState == reachedChunkStreamEnd) )
+                if ((m_contentLength &&         //< Content-Length known.
+                    m_messageBodyBytesRead >= m_contentLength.get()) ||     //< Read whole message body.
+                    (m_isChunkedTransfer && m_chunkStreamParseState == reachedChunkStreamEnd))
                 {
-                    if( m_contentDecoder )
+                    if (m_contentDecoder)
                         m_contentDecoder->flush();
                     m_state = messageDone;
                     return true;
@@ -123,7 +125,7 @@ bool HttpStreamReader::parseBytes(
 
             case messageDone:
             {
-                //starting next message
+                // Starting next message.
                 resetStateInternal();
                 ++m_currentMessageNumber;
                 continue;
@@ -134,22 +136,22 @@ bool HttpStreamReader::parseBytes(
                 ConstBufferRefType lineBuffer;
                 size_t bytesRead = 0;
                 const bool lineFound = m_lineSplitter.parseByLines(
-                    data.mid( currentDataPos, count-currentDataPos ),
+                    data.mid(currentDataPos, count - currentDataPos),
                     &lineBuffer,
-                    &bytesRead );
+                    &bytesRead);
                 currentDataPos += bytesRead;
-                if( bytesProcessed )
+                if (bytesProcessed)
                     *bytesProcessed = currentDataPos;
-                if( !lineFound )
+                if (!lineFound)
                     break;
-                if( !parseLine( lineBuffer ) )
+                if (!parseLine(lineBuffer))
                 {
                     m_state = parseError;
                     return false;
                 }
-                //we can move to messageDone state in parseLine function if no message body present
-                if( m_state == messageDone )
-                    return true;    //MUST break parsing on message boundary so that calling entity has chance to handle message
+                // We can move to messageDone state in parseLine function if no message body present.
+                if (m_state == messageDone)
+                    return true;    //< MUST break parsing on message boundary so that calling entity has chance to handle message.
                 break;
             }
         }
@@ -188,17 +190,14 @@ size_t HttpStreamReader::messageBodyBufferSize() const
 BufferType HttpStreamReader::fetchMessageBody()
 {
     QnMutexLocker lk(&m_mutex);
-    //BufferType result;
-    //m_msgBodyBuffer.swap( result );
-    //return result;
-    BufferType result = m_msgBodyBuffer;
-    m_msgBodyBuffer.clear();
+    BufferType result;
+    m_msgBodyBuffer.swap(result);
     return result;
 }
 
 QString HttpStreamReader::errorText() const
 {
-    //TODO/IMPL
+    // TODO: #ak
     return QString();
 }
 
@@ -210,7 +209,7 @@ void HttpStreamReader::resetState()
 
 void HttpStreamReader::flush()
 {
-    if( m_contentDecoder )
+    if (m_contentDecoder)
         m_contentDecoder->flush();
 }
 
@@ -220,7 +219,7 @@ void HttpStreamReader::forceEndOfMsgBody()
     m_state = messageDone;
 }
 
-void HttpStreamReader::setDecodeChunkedMessageBody( bool val )
+void HttpStreamReader::setDecodeChunkedMessageBody(bool val)
 {
     m_decodeChunked = val;
 }
@@ -235,111 +234,115 @@ boost::optional<quint64> HttpStreamReader::contentLength() const
     return m_contentLength;
 }
 
-void HttpStreamReader::setBreakAfterReadingHeaders( bool val )
+void HttpStreamReader::setBreakAfterReadingHeaders(bool val)
 {
     m_breakAfterReadingHeaders = val;
 }
 
-bool HttpStreamReader::parseLine( const ConstBufferRefType& data )
+bool HttpStreamReader::parseLine(const ConstBufferRefType& data)
 {
-    switch( m_state )
+    for (;;)
     {
-        case messageDone:
-        case parseError:
-            //starting parsing next message
-            resetStateInternal();
-
-        case waitingMessageStart:
+        switch (m_state)
         {
-            if( data.isEmpty() )
-                return true; //skipping empty lines
-            //deciding what we parsing: request line or status line
-                //splitting to tokens separated by ' '
-                //if first token contains '/' then considering line to be status line, else it is request line
-            //const size_t pos = data.find_first_of( " /\r\n", offset, sizeof(" /\r\n")-1 );
-            static const char separators[] = " /\r\n";
-            const char* pos = std::find_first_of( data.data(), data.data()+data.size(), separators, separators + sizeof(separators)-1 );
-            if( pos == data.data()+data.size() || *pos == '\r' || *pos == '\n' )
-                return false;
-            if( *pos == ' ' )  //considering message to be request (first token does not contain /, so it looks like METHOD)
-            {
-                m_httpMessage = Message( MessageType::request );
-                m_httpMessage.request->requestLine.parse( data );
-            }
-            else    //response
-            {
-                m_httpMessage = Message( MessageType::response );
-                m_httpMessage.response->statusLine.parse( data );
-            }
-            m_state = readingMessageHeaders;
-            return true;
-        }
+            case messageDone:
+            case parseError:
+                // Starting parsing next message.
+                resetStateInternal();
+                continue;
 
-        case readingMessageHeaders:
-        {
-            //parsing header
-            if( data.isEmpty() )    //empty line received: assuming all headers read
+            case waitingMessageStart:
             {
-                if( prepareToReadMessageBody() ) //checking message body parameters in response
+                if (data.isEmpty())
+                    return true; //skipping empty lines
+                                //deciding what we parsing: request line or status line
+                                //splitting to tokens separated by ' '
+                                //if first token contains '/' then considering line to be status line, else it is request line
+                                //const size_t pos = data.find_first_of( " /\r\n", offset, sizeof(" /\r\n")-1 );
+                static const char separators[] = " /\r\n";
+                const char* pos = std::find_first_of(data.data(), data.data() + data.size(), separators, separators + sizeof(separators) - 1);
+                if (pos == data.data() + data.size() || *pos == '\r' || *pos == '\n')
+                    return false;
+                if (*pos == ' ')  //< Considering message to be request (first token does not contain /, so it looks like METHOD).
                 {
-                    //TODO #ak reliably check that message body is expected
-                    //in any case allowing to read message body because it could be present 
-                        //anyway (e.g., some bug on custom http server)
-                    if( m_contentLength && m_contentLength.get() == 0 )
-                    {
-                        //server purposefully reported empty message body
-                        m_state = m_lineSplitter.currentLineEndingClosed()
-                            ? messageDone
-                            : pullingLineEndingBeforeMessageBody;
-                        m_nextState = messageDone;
-                    }
-                    else
-                    {
-                        m_state = pullingLineEndingBeforeMessageBody;
-                        m_nextState = readingMessageBody;
-                        m_chunkStreamParseState = waitingChunkStart;
-                    }
+                    m_httpMessage = Message(MessageType::request);
+                    m_httpMessage.request->requestLine.parse(data);
                 }
-                else
+                else    //< Response.
                 {
-                    //cannot read (decode) message body
-                    m_state = parseError;
+                    m_httpMessage = Message(MessageType::response);
+                    m_httpMessage.response->statusLine.parse(data);
                 }
+                m_state = readingMessageHeaders;
                 return true;
             }
 
-            //parsing header
-            nx_http::StringType headerName;
-            nx_http::StringType headerValue;
-            if( !parseHeader( &headerName, &headerValue, data ) )
-                return false;
-            m_httpMessage.headers().insert( std::make_pair( headerName, headerValue ) );
-            return true;
-        }
+            case readingMessageHeaders:
+            {
+                // Parsing header.
+                if (data.isEmpty())    //< Empty line received: assuming all headers read.
+                {
+                    if (prepareToReadMessageBody()) //< Checking message body parameters in response.
+                    {
+                        // TODO #ak reliably check that message body is expected
+                        //   in any case allowing to read message body because it could be present
+                        //   anyway (e.g., some bug on custom http server).
+                        if (m_contentLength && m_contentLength.get() == 0)
+                        {
+                            // Server purposefully reported empty message body.
+                            m_state = m_lineSplitter.currentLineEndingClosed()
+                                ? messageDone
+                                : pullingLineEndingBeforeMessageBody;
+                            m_nextState = messageDone;
+                        }
+                        else
+                        {
+                            m_state = pullingLineEndingBeforeMessageBody;
+                            m_nextState = readingMessageBody;
+                            m_chunkStreamParseState = waitingChunkStart;
+                        }
+                    }
+                    else
+                    {
+                        // Cannot read (decode) message body.
+                        m_state = parseError;
+                    }
+                    return true;
+                }
 
-        default:
-            NX_ASSERT( false );
-            return false;
+                // Parsing header.
+                nx_http::StringType headerName;
+                nx_http::StringType headerValue;
+                if (!parseHeader(&headerName, &headerValue, data))
+                    return false;
+                m_httpMessage.headers().insert(std::make_pair(headerName, headerValue));
+                return true;
+            }
+
+            default:
+                NX_ASSERT(false);
+                return false;
+        }
     }
 }
 
 bool HttpStreamReader::prepareToReadMessageBody()
 {
-    NX_ASSERT( m_httpMessage.type != MessageType::none );
+    NX_ASSERT(m_httpMessage.type != MessageType::none);
 
-    if( m_httpMessage.type == MessageType::request )
+    if (m_httpMessage.type == MessageType::request)
     {
-        if( m_httpMessage.request->requestLine.method != nx_http::Method::POST &&
-            m_httpMessage.request->requestLine.method != nx_http::Method::PUT )
+        if (m_httpMessage.request->requestLine.method != nx_http::Method::POST &&
+            m_httpMessage.request->requestLine.method != nx_http::Method::PUT)
         {
-            //only POST and PUT are allowed to have message body
+            // Only POST and PUT are allowed to have message body.
             m_contentLength = 0;
             return true;
         }
     }
-    else if( m_httpMessage.type == MessageType::response )
+    else if (m_httpMessage.type == MessageType::response)
     {
-        if( !StatusCode::isMessageBodyAllowed(m_httpMessage.response->statusLine.statusCode) )
+        if (!StatusCode::isMessageBodyAllowed(m_httpMessage.response->statusLine.statusCode))
         {
             m_contentLength = 0;
             return true;
@@ -347,35 +350,35 @@ bool HttpStreamReader::prepareToReadMessageBody()
     }
 
     m_contentDecoder.reset();
-    HttpHeaders::const_iterator contentEncodingIter = m_httpMessage.headers().find( nx_http::StringType("Content-Encoding") );
-    if( contentEncodingIter != m_httpMessage.headers().end() &&
-        contentEncodingIter->second != "identity" )
+    HttpHeaders::const_iterator contentEncodingIter = 
+        m_httpMessage.headers().find(nx_http::StringType("Content-Encoding"));
+    if (contentEncodingIter != m_httpMessage.headers().end() &&
+        contentEncodingIter->second != "identity")
     {
-        nx::utils::bstream::AbstractByteStreamFilter* contentDecoder = 
-            createContentDecoder( contentEncodingIter->second );
-        if( contentDecoder == nullptr )
-            return false;   //cannot decode message body
-        //all operations with m_msgBodyBuffer MUST be done with m_mutex locked
-        auto safeAppendToBufferLambda = [this]( const QnByteArrayConstRef& data )
+        auto contentDecoder = createContentDecoder(contentEncodingIter->second);
+        if (contentDecoder == nullptr)
+            return false;   //< Cannot decode message body.
+                            // All operations with m_msgBodyBuffer MUST be done with m_mutex locked.
+        auto safeAppendToBufferLambda = [this](const QnByteArrayConstRef& data)
         {
             QnMutexLocker lk(&m_mutex);
-            m_msgBodyBuffer.append( data.constData(), data.size() );
+            m_msgBodyBuffer.append(data.constData(), data.size());
         };
         contentDecoder->setNextFilter(
-            std::make_shared<nx::utils::bstream::CustomOutputStream<decltype(safeAppendToBufferLambda)>>(
-                safeAppendToBufferLambda ) );
-        m_contentDecoder.reset( contentDecoder );
+            nx::utils::bstream::makeCustomOutputStream(std::move(safeAppendToBufferLambda)));
+        m_contentDecoder = std::move(contentDecoder);
     }
-        
-    //analyzing message headers to find out if there should be message body
-    //and filling in m_contentLength
-    HttpHeaders::const_iterator transferEncodingIter = m_httpMessage.headers().find( nx_http::StringType("Transfer-Encoding") );
-    if( transferEncodingIter != m_httpMessage.headers().end() )
+
+    // Analyzing message headers to find out if there should be message body
+    //   and filling in m_contentLength.
+    HttpHeaders::const_iterator transferEncodingIter = 
+        m_httpMessage.headers().find(nx_http::StringType("Transfer-Encoding"));
+    if (transferEncodingIter != m_httpMessage.headers().end())
     {
-        //parsing Transfer-Encoding
-        if( transferEncodingIter->second == "chunked" )
+        // Parsing Transfer-Encoding.
+        if (transferEncodingIter->second == "chunked")
         {
-            //ignoring Content-Length header (due to rfc2616, 4.4)
+            // Ignoring Content-Length header (due to rfc2616, 4.4).
             m_contentLength.reset();
             m_isChunkedTransfer = true;
             return true;
@@ -384,8 +387,9 @@ bool HttpStreamReader::prepareToReadMessageBody()
 
     m_isChunkedTransfer = false;
 
-    HttpHeaders::const_iterator contentLengthIter = m_httpMessage.headers().find( nx_http::StringType("Content-Length") );
-    if( contentLengthIter != m_httpMessage.headers().end() )
+    HttpHeaders::const_iterator contentLengthIter = 
+        m_httpMessage.headers().find(nx_http::StringType("Content-Length"));
+    if (contentLengthIter != m_httpMessage.headers().end())
         m_contentLength = contentLengthIter->second.toULongLong();
     return true;
 }
@@ -393,25 +397,25 @@ bool HttpStreamReader::prepareToReadMessageBody()
 template<class Func>
 size_t HttpStreamReader::readMessageBody(
     const QnByteArrayConstRef& data,
-    Func func )
+    Func func)
 {
     return (m_isChunkedTransfer && m_decodeChunked)
-        ? readChunkStream( data, func )
-        : readIdentityStream( data, func );
+        ? readChunkStream(data, func)
+        : readIdentityStream(data, func);
 }
 
 template<class Func>
 size_t HttpStreamReader::readChunkStream(
     const QnByteArrayConstRef& data,
-    Func func )
+    Func func)
 {
     size_t currentOffset = 0;
-    for( ; currentOffset < data.size(); )
+    for (; currentOffset < data.size(); )
     {
         const size_t currentOffsetBak = currentOffset;
 
         const BufferType::value_type currentChar = data[(unsigned int)currentOffset];
-        switch( m_chunkStreamParseState )
+        switch (m_chunkStreamParseState)
         {
             case waitingChunkStart:
                 m_chunkStreamParseState = readingChunkSize;
@@ -420,39 +424,39 @@ size_t HttpStreamReader::readChunkStream(
                 break;
 
             case readingChunkSize:
-                if( (currentChar >= '0' && currentChar <= '9') || 
+                if ((currentChar >= '0' && currentChar <= '9') ||
                     (currentChar >= 'a' && currentChar <= 'f') ||
-                    (currentChar >= 'A' && currentChar <= 'F') )
+                    (currentChar >= 'A' && currentChar <= 'F'))
                 {
                     m_currentChunkSize <<= 4;
                     m_currentChunkSize += hexCharToInt(currentChar);
                 }
-                else if( currentChar == ';' )
+                else if (currentChar == ';')
                 {
                     m_chunkStreamParseState = readingChunkExtension;
                 }
-                else if( currentChar == ' ' )
+                else if (currentChar == ' ')
                 {
-                    //skipping whitespace
+                    // Skipping whitespace.
                 }
-                else if( currentChar == '\r' || currentChar == '\n' )
+                else if (currentChar == '\r' || currentChar == '\n')
                 {
-                    //no extension?
+                    // No extension?
                     m_chunkStreamParseState = skippingCRLF;
                     m_nextChunkStreamParseState = readingChunkData;
                     break;
                 }
                 else
                 {
-                    //parse error
+                    // Parse error.
                     return size_t(-1);
                 }
                 ++currentOffset;
                 break;
 
             case readingChunkExtension:
-                //TODO/IMPL reading extension
-                if( currentChar == '\r' || currentChar == '\n' )
+                // TODO: #ak Reading extension.
+                if (currentChar == '\r' || currentChar == '\n')
                 {
                     m_chunkStreamParseState = skippingCRLF;
                     m_nextChunkStreamParseState = readingChunkData;
@@ -462,13 +466,13 @@ size_t HttpStreamReader::readChunkStream(
                 break;
 
             case skippingCRLF:
-                //supporting CR, LF and CRLF as line-ending, since some buggy rtsp-implementation can do that
-                if( (m_lineEndingOffset < 2) &&
+                // Supporting CR, LF and CRLF as line-ending, since some buggy rtsp-implementation can do that.
+                if ((m_lineEndingOffset < 2) &&
                     ((currentChar == '\r' && m_lineEndingOffset == 0) ||
-                        (currentChar == '\n' && (m_lineEndingOffset == 0 || m_prevChar == '\r'))) )
+                    (currentChar == '\n' && (m_lineEndingOffset == 0 || m_prevChar == '\r'))))
                 {
                     ++m_lineEndingOffset;
-                    ++currentOffset;    //skipping
+                    ++currentOffset;    //< Skipping.
                     break;
                 }
                 else
@@ -481,19 +485,21 @@ size_t HttpStreamReader::readChunkStream(
 
             case readingChunkData:
             {
-                if( !m_currentChunkSize )
+                if (!m_currentChunkSize)
                 {
-                    //last chunk
-                    m_chunkStreamParseState = readingTrailer;   //last chunk
+                    // The last chunk.
+                    m_chunkStreamParseState = readingTrailer;
                     break;
                 }
 
-                const size_t bytesToCopy = std::min<>( m_currentChunkSize - m_currentChunkBytesRead, data.size() - currentOffset );
-                func( data.mid(currentOffset, bytesToCopy) );
+                const size_t bytesToCopy = std::min<>(
+                    m_currentChunkSize - m_currentChunkBytesRead,
+                    data.size() - currentOffset);
+                func(data.mid(currentOffset, bytesToCopy));
                 m_messageBodyBytesRead += bytesToCopy;
                 m_currentChunkBytesRead += bytesToCopy;
                 currentOffset += bytesToCopy;
-                if( m_currentChunkBytesRead == m_currentChunkSize )
+                if (m_currentChunkBytesRead == m_currentChunkSize)
                 {
                     m_chunkStreamParseState = skippingCRLF;
                     m_nextChunkStreamParseState = waitingChunkStart;
@@ -506,28 +512,28 @@ size_t HttpStreamReader::readChunkStream(
                 ConstBufferRefType lineBuffer;
                 size_t bytesRead = 0;
                 const bool lineFound = m_lineSplitter.parseByLines(
-                    data.mid( currentOffset ),
+                    data.mid(currentOffset),
                     &lineBuffer,
-                    &bytesRead );
+                    &bytesRead);
                 currentOffset += bytesRead;
-                if( !lineFound )
+                if (!lineFound)
                     break;
-                if( lineBuffer.isEmpty() )
+                if (lineBuffer.isEmpty())
                 {
-                    //reached end of HTTP/1.1 chunk stream
+                    // Reached end of HTTP/1.1 chunk stream.
                     m_chunkStreamParseState = reachedChunkStreamEnd;
                     return currentOffset;
                 }
-                //TODO #ak parsing entity-header
+                // TODO #ak Parsing entity-header.
                 break;
             }
 
             default:
-                NX_ASSERT( false );
+                NX_ASSERT(false);
                 break;
         }
 
-        if( currentOffset != currentOffsetBak ) //moved cursor
+        if (currentOffset != currentOffsetBak) //< Moved cursor.
             m_prevChar = currentChar;
     }
 
@@ -537,32 +543,33 @@ size_t HttpStreamReader::readChunkStream(
 template<class Func>
 size_t HttpStreamReader::readIdentityStream(
     const QnByteArrayConstRef& data,
-    Func func )
+    Func func)
 {
     const size_t bytesToCopy = m_contentLength
-        ? std::min<size_t>( data.size(), m_contentLength.get()-m_messageBodyBytesRead )
-        : data.size();    //Content-Length is unknown
-    func( data.mid(0, bytesToCopy) );
+        ? std::min<size_t>(data.size(), m_contentLength.get() - m_messageBodyBytesRead)
+        : data.size();    //< Content-Length is unknown.
+    func(data.mid(0, bytesToCopy));
     m_messageBodyBytesRead += bytesToCopy;
     return bytesToCopy;
 }
 
-unsigned int HttpStreamReader::hexCharToInt( BufferType::value_type ch )
+unsigned int HttpStreamReader::hexCharToInt(BufferType::value_type ch)
 {
-    if( ch >= '0' && ch <= '9' )
+    if (ch >= '0' && ch <= '9')
         return ch - '0';
-    if( ch >= 'a' && ch <= 'f' )
+    if (ch >= 'a' && ch <= 'f')
         return ch - 'a' + 10;
-    if( ch >= 'A' && ch <= 'F' )
+    if (ch >= 'A' && ch <= 'F')
         return ch - 'A' + 10;
     return 0;
 }
 
-nx::utils::bstream::AbstractByteStreamFilter* HttpStreamReader::createContentDecoder(
-    const nx_http::StringType& encodingName )
+std::unique_ptr<nx::utils::bstream::AbstractByteStreamFilter> 
+    HttpStreamReader::createContentDecoder(
+        const nx_http::StringType& encodingName)
 {
-    if( encodingName == "gzip" )
-        return new nx::utils::bstream::gzip::Uncompressor();
+    if (encodingName == "gzip")
+        return std::make_unique<nx::utils::bstream::gzip::Uncompressor>();
     return nullptr;
 }
 

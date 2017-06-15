@@ -250,34 +250,38 @@ bool fetchLayouts(const QSqlDatabase& database, const QnUuid& id, ApiLayoutDataL
     return true;
 }
 
-bool saveLayout(const QSqlDatabase& database, const ApiLayoutData& layout)
+bool saveLayout(
+    ec2::database::api::Context* resourceContext,
+    const ApiLayoutData& layout)
 {
     qint32 internalId;
-    if (!insertOrReplaceResource(database, layout, &internalId))
+    if (!insertOrReplaceResource(resourceContext, layout, &internalId))
         return false;
 
-    if (!insertOrReplaceLayout(database, layout, internalId))
+    if (!insertOrReplaceLayout(resourceContext->database, layout, internalId))
         return false;
 
-    return updateItems(database, layout, internalId);
+    return updateItems(resourceContext->database, layout, internalId);
 }
 
-bool removeLayout(const QSqlDatabase& database, const QnUuid& id)
+bool removeLayout(
+    ec2::database::api::Context* resourceContext,
+    const QnUuid& id)
 {
-    int internalId = api::getResourceInternalId(database, id);
+    int internalId = api::getResourceInternalId(resourceContext, id);
     if (internalId == 0)
         return true;
 
-    if (!removeItems(database, internalId))
+    if (!removeItems(resourceContext->database, internalId))
         return false;
 
-    if (!cleanupVideoWalls(database, id))
+    if (!cleanupVideoWalls(resourceContext->database, id))
         return false;
 
-    if (!deleteLayoutInternal(database, internalId))
+    if (!deleteLayoutInternal(resourceContext->database, internalId))
         return false;
 
-    return deleteResourceInternal(database, internalId);
+    return deleteResourceInternal(resourceContext, internalId);
 }
 
 } // namespace api

@@ -145,7 +145,7 @@ private:
         m_requestQueue;
     std::vector<std::unique_ptr<BaseRequestExecutor>> m_dbThreadPool;
     nx::utils::thread m_dropConnectionThread;
-    QnSafeQueue<std::unique_ptr<BaseRequestExecutor>> m_connectionsToDropQueue;
+    nx::utils::SyncQueue<std::unique_ptr<BaseRequestExecutor>> m_connectionsToDropQueue;
     bool m_terminated;
     StatisticsCollector* m_statisticsCollector;
 

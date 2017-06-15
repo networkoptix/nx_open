@@ -9,14 +9,14 @@ class QnProxyConnectionProcessorPrivate;
 struct QnRoute;
 
 namespace ec2 {
-    class QnTransactionMessageBus;
+    class QnTransactionMessageBusBase;
 }
 
 class QnProxyConnectionProcessor: public QnTCPConnectionProcessor
 {
 public:
     QnProxyConnectionProcessor(
-        ec2::QnTransactionMessageBus* messageBus,
+        ec2::QnTransactionMessageBusBase* messageBus,
         QSharedPointer<AbstractStreamSocket> socket,
         QnHttpConnectionListener* owner);
 

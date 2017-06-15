@@ -182,6 +182,8 @@ cp opt/$CUSTOMIZATION/mediaserver/etc/mediaserver.conf.template \
 # Start script and platform-specific scripts.
 cp -R ./etc $BUILD_DIR
 cp -R ./opt $BUILD_DIR
+# Copying debs.
+cp -Rfv $DEBS_DIR $BUILD_DIR/opt
 
 if [ "${box}" = "bpi" ] && [ ! -z "$WITH_CLIENT" ]; then
     # Copy ffmpeg 3.0.2 libs.
@@ -223,8 +225,7 @@ if [ "${box}" = "bpi" ] && [ ! -z "$WITH_CLIENT" ]; then
         cp -Rfv $BINS_DIR/${d} $BUILD_DIR/$PREFIX_DIR/lite_client/bin
     done
 
-    # Copy debs and uboot.
-    cp -Rfv $DEBS_DIR $BUILD_DIR/opt
+    # Copying uboot.
     cp -Rfv $UBOOT_DIR $BUILD_DIR/root
 
     # Copy additional binaries.
@@ -317,7 +318,7 @@ if [ "${box}" = "bpi" ]; then
         tar czf $PACKAGE_NAME ./opt ./etc
     fi
 else
-    tar czf $PACKAGE_NAME .$PREFIX_DIR ./etc
+    tar czf $PACKAGE_NAME ./opt ./etc
 fi
 cp $PACKAGE_NAME ${project.build.directory}
 popd

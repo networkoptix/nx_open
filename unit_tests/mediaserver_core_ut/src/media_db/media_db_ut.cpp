@@ -16,7 +16,6 @@
 #include <utils/common/writer_pool.h>
 #include "plugins/storage/file_storage/file_storage_resource.h"
 #include <recorder/storage_manager.h>
-#include <plugins/storage/file_storage/file_storage_resource.h>
 #include <core/resource_management/status_dictionary.h>
 #include <common/common_module.h>
 #include <core/resource_management/resource_properties.h>
@@ -28,7 +27,7 @@
 #   include <platform/platform_abstraction.h>
 #endif
 
-#include "../utils.h"
+#include <test_support/utils.h>
 #include <media_server/settings.h>
 #include <media_server/media_server_module.h>
 

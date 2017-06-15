@@ -218,6 +218,7 @@ void AddressResolver::resolveAsync(
     if (ipVersion == AF_INET)
     {
         const auto hostStr = hostName.toString().toStdString();
+        // TODO: #ak Use InetPton here on mswin2.
         const auto ipv4Address = inet_addr(hostStr.c_str());
         if (ipv4Address != INADDR_NONE)
         {
@@ -346,6 +347,11 @@ void AddressResolver::pleaseStop(nx::utils::MoveOnlyFunc<void()> handler)
             m_mediatorConnection.reset();
             handler();
         });
+}
+
+bool AddressResolver::isValidForConnect(const SocketAddress& endpoint) const
+{
+    return (endpoint.port != 0) || isCloudHostName(endpoint.address.toString());
 }
 
 AddressResolver::HostAddressInfo::HostAddressInfo(bool _isLikelyCloudAddress)

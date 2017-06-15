@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.7.0 FATAL_ERROR)
+cmake_minimum_required(VERSION 3.8.0 FATAL_ERROR)
 
 set(customization "default" CACHE STRING "Product customization")
 option(beta "Is this build is beta build" ON)
@@ -15,11 +15,17 @@ option(rdepSync
 set(CMAKE_BUILD_TYPE "Debug" CACHE STRING
     "One of [Debug Release RelWithDebInfo MinSizeRel].")
 
-set(target "" CACHE STRING "Target platform.")
+set(targetDevice "" CACHE STRING "Target device. For the list see cmake/toolchains.")
 set(box "none")
 
-if(target)
-    set(CMAKE_TOOLCHAIN_FILE "${CMAKE_CURRENT_LIST_DIR}/cmake/toolchain/${target}.cmake")
+# Early loading rdep to download a toolchain if needed.
+include(build_utils/cmake/find_python.cmake)
+include(build_utils/cmake/rdep.cmake)
+nx_rdep_configure()
+
+if(targetDevice)
+    set(CMAKE_TOOLCHAIN_FILE "${CMAKE_CURRENT_LIST_DIR}/cmake/toolchain/${targetDevice}.cmake")
+    include(cmake/sync_toolchain.cmake)
 endif()
 
 project(vms VERSION 3.1.0)
@@ -37,18 +43,12 @@ list(APPEND CMAKE_MODULE_PATH
 include(CMakeParseArguments)
 include(target_detection)
 include(utils)
-include(find_python)
 include(find_sources)
 include(qrc_utils)
 include(precompiled_header)
-include(rdep)
 include(mercurial)
 include(project_utils)
-
-find_python()
-nx_rdep_configure()
-
-include(android-ndk-workaround)
+include(test_utils)
 
 include(ec_protocol)
 include(maven_compatibility)
@@ -61,16 +61,12 @@ include(properties)
 include(cloud_host)
 include(vms_parts)
 include(compiler_options)
+include(output_directories)
+include(distribution_names)
 
 if(NOT (WINDOWS OR ANDROID OR IOS))
     set(BUILD_SHARED_LIBS ON)
 endif()
-
-set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib")
-set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib")
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin")
-file(MAKE_DIRECTORY "${CMAKE_LIBRARY_OUTPUT_DIRECTORY}")
-file(MAKE_DIRECTORY "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}")
 
 include(dependencies)
 
@@ -84,7 +80,7 @@ list(APPEND CMAKE_PREFIX_PATH ${QT_DIR})
 if(MACOSX)
     set(CMAKE_FRAMEWORK_PATH "${QT_DIR}/lib")
 endif()
-if(NOT WINDOWS)
+if(LINUX)
     set(CMAKE_EXE_LINKER_FLAGS
         "${CMAKE_EXE_LINKER_FLAGS} -Wl,-rpath-link,${QT_DIR}/lib")
     set(CMAKE_SHARED_LINKER_FLAGS
@@ -93,6 +89,11 @@ if(NOT WINDOWS)
         "${CMAKE_EXE_LINKER_FLAGS} -Wl,-rpath-link,${CMAKE_LIBRARY_OUTPUT_DIRECTORY}")
     set(CMAKE_SHARED_LINKER_FLAGS
         "${CMAKE_SHARED_LINKER_FLAGS} -Wl,-rpath-link,${CMAKE_LIBRARY_OUTPUT_DIRECTORY}")
+endif()
+
+if(ANDROID)
+    include(android-ndk-workaround)
+    include(android-apk)
 endif()
 
 link_directories("${CMAKE_LIBRARY_OUTPUT_DIRECTORY}")
@@ -125,6 +126,11 @@ if(ANDROID)
     find_package(Qt5 COMPONENTS AndroidExtras)
 endif()
 
+if(WINDOWS)
+    # Prepare a file to be included into each Visual Studio project.
+    nx_configure_file(${PROJECT_SOURCE_DIR}/msvc.user.props ${CMAKE_BINARY_DIR})
+endif()
+
 # Required for QN_DECLARE_METAOBJECT_HEADER
 include_directories("${PROJECT_SOURCE_DIR}/common_libs/nx_fusion/src")
 
@@ -146,6 +152,7 @@ endif()
 
 if(withTests)
     add_subdirectory(unit_tests)
+    add_subdirectory(tests)
 endif()
 
 include(fix_qt_vars)

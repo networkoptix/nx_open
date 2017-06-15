@@ -277,6 +277,7 @@ public:
     virtual QnAudioTransmitterPtr getAudioTransmitter();
 #endif
 
+    bool isEnoughFpsToRunSecondStream(int currentFps) const;
 public slots:
     virtual void inputPortListenerAttached();
     virtual void inputPortListenerDetached();
@@ -354,7 +355,6 @@ private:
     QString m_groupName;
     QString m_groupId;
     Qn::CameraStatusFlags m_statusFlags;
-    bool m_advancedWorking;
     bool m_manuallyAdded;
     QString m_model;
     QString m_vendor;

@@ -9,8 +9,6 @@
 #include <plugins/storage/file_storage/file_storage_resource.h>
 #include <common/common_module.h>
 #include <database/db_manager.h>
-#include <mediaserver_launcher.h>
-#include <api/global_settings.h>
 
 #define GTEST_HAS_TR1_TUPLE     0
 #define GTEST_USE_OWN_TR1_TUPLE 1
@@ -451,7 +449,7 @@ TEST_F(BaseRestoreDbTest, SetUpSystemIdentity_NoSystemNameAndIdInDb_NoSystemName
     settingsProxy->setIsSystemIdFromSystemName(false);
     nx::mserver_aux::setUpSystemIdentity(restoreData, settingsProxy.get(), std::move(systemNameProxy));
     ASSERT_EQ(settingsProxy->systemName(), detail::TestSystemNameProxy::kDefaultValue);
-    ASSERT_EQ(settingsProxy->localSystemId(), guidFromArbitraryData(settingsProxy->systemName() + settingsProxy->getMaxServerKey()));
+    ASSERT_EQ(settingsProxy->localSystemId(), QnUuid());
 }
 
 
@@ -525,12 +523,4 @@ TEST_F(BaseRestoreDbTest, NeedToResetSystem_NoSetupWizardIsOff_RestoreDataIsSet_
     bool noSetupWizard = false;
     bool serverFoundInDb = false;
     ASSERT_FALSE(nx::mserver_aux::isNewServerInstance(restoreData, serverFoundInDb, noSetupWizard));
-}
-
-TEST_F(BaseRestoreDbTest, GenerateLocalSystemId_IfDefaultSystemNameIsSet)
-{
-    MediaServerLauncher launcher;
-    launcher.addSetting(lit("systemName"), lit("__auto__SYSTEM_NAME"));
-    ASSERT_TRUE(launcher.start());
-    ASSERT_TRUE(launcher.commonModule()->globalSettings()->localSystemId() == QnUuid());
 }

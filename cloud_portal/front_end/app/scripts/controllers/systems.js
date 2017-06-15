@@ -11,21 +11,10 @@ angular.module('cloudApp')
 
         $scope.showSearch = false;
 
-        function sortSystems(systems){
-            // Alphabet sorting
-            var preSort =  _.sortBy(systems,function(system){
-                return $scope.getSystemOwnerName(system,true);
-            });
-            // Sort by usage frequency is more important than Alphabet
-            return _.sortBy(preSort,function(system){
-                return -system.usageFrequency;
-            });
-        }
-
         function delayedUpdateSystems(){
             var pollingSystemsUpdate = $poll(function(){
                 return cloudApi.systems().then(function(result){
-                    $scope.systems = sortSystems(result.data);
+                    $scope.systems = cloudApi.sortSystems(result.data);
 
                     $scope.showSearch = $scope.systems.length >= Config.minSystemsToSearch;
                     return $scope.systems;
@@ -45,11 +34,11 @@ angular.module('cloudApp')
             logoutForbidden: true
         }).then(function(result){
             // Special mode - user will be redirected to default system if default system can be determined (if user has one system)
-            if($routeParams.defaultMode && result.data.length == 1){
+            if(result.data.length == 1){
                 $scope.openSystem(result.data[0]);
                 return;
             }
-            $scope.systems = sortSystems(result.data);
+            $scope.systems = cloudApi.sortSystems(result.data);
             $scope.showSearch = $scope.systems.length >= Config.minSystemsToSearch;
             delayedUpdateSystems();
         });
@@ -57,21 +46,9 @@ angular.module('cloudApp')
         $scope.openSystem = function(system){
             $location.path('/systems/' + system.id);
         };
-
-        $scope.getSystemOwnerName = function(system, forOrder) {
-            if($scope.account && system.ownerAccountEmail == $scope.account.email ){
-                if(forOrder){
-                    return '!!!!!!!'; // Force my systems to be first
-                }
-                return L.system.yourSystem;
-            }
-
-            if(system.ownerFullName && system.ownerFullName.trim() != ''){
-                return system.ownerFullName;
-            }
-
-            return system.ownerAccountEmail;
-        }
+        $scope.getSystemOwnerName = function(system){
+            return cloudApi.getSystemOwnerName(system);
+        };
 
         $scope.search = {value:''};
         function hasMatch(str,search){

@@ -62,7 +62,7 @@
         </profile>
 
         <profile>
-            <id>linux-isd-jaguar</id>
+            <id>linux-edge1</id>
             <activation>
                 <activeByDefault>false</activeByDefault>
                 <os>
@@ -71,30 +71,12 @@
                 </os>
                 <property>
                     <name>box</name>
-                    <value>isd</value>
+                    <value>edge1</value>
                 </property>
             </activation>
             <properties>
                 <rdep.packages></rdep.packages>
-            </properties>            
-        </profile>
-
-        <profile>
-            <id>linux-isd_s2</id>
-            <activation>
-                <activeByDefault>false</activeByDefault>
-                <os>
-                    <family>unix</family>
-                    <name>linux</name>
-                </os>
-                <property>
-                    <name>box</name>
-                    <value>isd_s2</value>
-                </property>
-            </activation>
-            <properties>
-                <rdep.packages></rdep.packages>
-            </properties>            
+            </properties>
         </profile>
         <profile>
             <id>linux-rpi</id>
@@ -111,8 +93,8 @@
             </activation>
             <properties>
                 <rdep.packages>festival-2.1</rdep.packages>
-            </properties>            
-        </profile>        
+            </properties>
+        </profile>
     </profiles>
 
 </project>

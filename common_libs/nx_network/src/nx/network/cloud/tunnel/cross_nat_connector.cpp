@@ -79,7 +79,8 @@ void CrossNatConnector::connect(
             if (auto holder = SocketGlobals::tcpReversePool().getConnectionSource(hostName))
             {
                 s_mediatorResponseCounter.addResult(hpm::api::ResultCode::notImplemented);
-                NX_LOGX(lm("Using TCP reverse connections from pool"), cl_logDEBUG1);
+                NX_DEBUG(this, lm("Using TCP reverse connections from pool to connect to host %1")
+                    .arg(hostName));
 
                 return handler(
                     SystemError::noError,
@@ -283,6 +284,8 @@ void CrossNatConnector::holePunchingDone(
     api::NatTraversalResultCode resultCode,
     SystemError::ErrorCode sysErrorCode)
 {
+    using namespace std::placeholders;
+
     NX_LOGX(lm("cross-nat %1. result: %2, system result code: %3")
         .arg(m_connectSessionId).arg(QnLexical::serialized(resultCode))
         .arg(SystemError::toString(sysErrorCode)),
@@ -303,7 +306,6 @@ void CrossNatConnector::holePunchingDone(
     m_connectResultReport.connectSessionId = m_connectSessionId;
     m_connectResultReport.resultCode = resultCode;
 
-    using namespace std::placeholders;
     m_connectResultReportSender = std::make_unique<stun::UnreliableMessagePipeline>(this);
     m_connectResultReportSender->bindToAioThread(getAioThread());
     stun::Message connectResultReportMessage(
@@ -333,7 +335,7 @@ void CrossNatConnector::connectSessionReportSent(
     {
         sysErrorCodeToReport =
             m_connectResultReport.sysErrorCode == SystemError::noError
-            ? SystemError::connectionReset
+            ? hpm::api::toSystemErrorCode(m_connectResultReport.resultCode)
             : m_connectResultReport.sysErrorCode;
     }
     NX_LOGX(lm("cross-nat %1. report send result code: %2. Invoking handler with result: %3")

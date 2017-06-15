@@ -179,6 +179,7 @@
 #include <rest/handlers/audio_transmission_rest_handler.h>
 #include <rest/handlers/start_lite_client_rest_handler.h>
 #include <rest/handlers/runtime_info_rest_handler.h>
+#include <rest/handlers/distributed_file_downloader_rest_handler.h>
 #ifdef _DEBUG
 #include <rest/handlers/debug_events_rest_handler.h>
 #endif
@@ -213,7 +214,7 @@
 #include "platform/platform_abstraction.h"
 #include "core/ptz/server_ptz_controller_pool.h"
 #include "plugins/resource/acti/acti_resource.h"
-#include "transaction/transaction_message_bus.h"
+#include "transaction/transaction_message_bus_base.h"
 #include "common/common_module.h"
 #include "proxy/proxy_receiver_connection_processor.h"
 #include "proxy/proxy_connection.h"
@@ -248,12 +249,14 @@
 #include <database/server_db.h>
 #include <server/server_globals.h>
 #include <media_server/master_server_status_watcher.h>
+#include "nx/mediaserver/unused_wallpapers_watcher.h"
 #include <media_server/connect_to_cloud_watcher.h>
 #include <rest/helpers/permissions_helper.h>
 #include "misc/migrate_oldwin_dir.h"
 #include "media_server_process_aux.h"
 #include <common/static_common_module.h>
 #include <recorder/storage_db_pool.h>
+#include <transaction/message_bus_selector.h>
 
 #if !defined(EDGE_SERVER)
 #include <nx_speech_synthesizer/text_to_wav.h>
@@ -266,6 +269,7 @@
 #ifdef __arm__
 #include "nx1/info.h"
 #endif
+#include <config.h>
 
 // This constant is used while checking for compatibility.
 // Do not change it until you know what you're doing.
@@ -298,11 +302,13 @@ const QString PENDING_SWITCH_TO_CLUSTER_MODE = lit("pendingSwitchToClusterMode")
 const QString MEDIATOR_ADDRESS_UPDATE = lit("mediatorAddressUpdate");
 
 static const int kPublicIpUpdateTimeoutMs = 60 * 2 * 1000;
+static QString kLogTag = toString(typeid(MediaServerProcess));
 
 bool initResourceTypes(const ec2::AbstractECConnectionPtr& ec2Connection)
 {
     QList<QnResourceTypePtr> resourceTypeList;
-    const ec2::ErrorCode errorCode = ec2Connection->getResourceManager(Qn::kSystemAccess)->getResourceTypesSync(&resourceTypeList);
+    auto manager = ec2Connection->getResourceManager(Qn::kSystemAccess);
+    const ec2::ErrorCode errorCode = manager->getResourceTypesSync(&resourceTypeList);
     if (errorCode != ec2::ErrorCode::ok)
     {
         NX_LOG(QString::fromLatin1("Failed to load resource types. %1").arg(ec2::toString(errorCode)), cl_logERROR);
@@ -457,10 +463,7 @@ QnStorageResourcePtr createStorage(
     const QnUuid& serverId,
     const QString& path)
 {
-    NX_LOG(lit("%1 Attempting to create storage %2")
-            .arg(Q_FUNC_INFO)
-            .arg(path), cl_logDEBUG1);
-
+    NX_VERBOSE(kLogTag, lm("Attempting to create storage %1").arg(path));
     QnStorageResourcePtr storage(QnStoragePluginFactory::instance()->createStorage(commonModule,"ufile"));
     storage->setName("Initial");
     storage->setParentId(serverId);
@@ -470,7 +473,7 @@ QnStorageResourcePtr createStorage(
     const auto partitions = qnPlatform->monitor()->totalPartitionSpaceInfo();
     const auto it = std::find_if(partitions.begin(), partitions.end(),
         [&](const QnPlatformMonitor::PartitionSpace& part)
-    { return storagePath.startsWith(QnStorageResource::toNativeDirPath(part.path)); });
+        { return storagePath.startsWith(QnStorageResource::toNativeDirPath(part.path)); });
 
     const auto storageType = (it != partitions.end()) ? it->type : QnPlatformMonitor::NetworkPartition;
     storage->setStorageType(QnLexical::serialized(storageType));
@@ -482,34 +485,27 @@ QnStorageResourcePtr createStorage(
 
         if (totalSpace < fileStorage->getSpaceLimit())
         {
-            NX_LOG(lit("%1 Storage with this path %2 total space is unknown or totalSpace < spaceLimit. \n\t Total space: %3, Space limit: %4")
-                .arg(Q_FUNC_INFO)
-                .arg(path)
-                .arg(totalSpace)
-                .arg(storage->getSpaceLimit()), cl_logDEBUG1);
-            return QnStorageResourcePtr(); // if storage size isn't known or small do not add it by default
+            NX_DEBUG(kLogTag, lm(
+                "Storage with this path %1 total space is unknown or totalSpace < spaceLimit. "
+                "Total space: %2, Space limit: %3").args(path, totalSpace, storage->getSpaceLimit()));
+            return QnStorageResourcePtr();
         }
     }
     else
     {
-        NX_ASSERT(false);
-        NX_LOG(lit("%1 Failed to create to storage %2").arg(Q_FUNC_INFO).arg(path), cl_logWARNING);
+        NX_ASSERT(false, lm("Failed to create to storage: %1").arg(path));
         return QnStorageResourcePtr();
     }
 
     storage->setUsedForWriting(storage->initOrUpdate() == Qn::StorageInit_Ok && storage->isWritable());
-
-    NX_LOG(lit("%1 Storage %2 is operational: %3")
-            .arg(Q_FUNC_INFO)
-            .arg(path)
-            .arg(storage->isUsedForWriting()), cl_logDEBUG1);
+    NX_DEBUG(kLogTag, lm("Storage %1 is operational: %2").args(path, storage->isUsedForWriting()));
 
     QnResourceTypePtr resType = qnResTypePool->getResourceTypeByName("Storage");
     NX_ASSERT(resType);
     if (resType)
         storage->setTypeId(resType->getId());
-    storage->setParentId(serverGuid());
 
+    storage->setParentId(serverGuid());
     return storage;
 }
 
@@ -563,6 +559,8 @@ static QStringList listRecordFolders(bool includeNetwork = false)
         for (auto& path: folderPaths)
             path = closeDirPath(path) + serverGuid().toString();
     }
+
+    NX_VERBOSE(kLogTag, lm("Record folders: %1").container(folderPaths));
     return folderPaths;
 }
 
@@ -583,12 +581,9 @@ QnStorageResourceList getSmallStorages(const QnStorageResourceList& storages)
         if (totalSpace != QnStorageResource::kUnknownSize && totalSpace < storage->getSpaceLimit())
             result << storage; // if storage size isn't known do not delete it
 
-        NX_LOG(lit("%1 Candidate %2, isFileStorage = %3, totalSpace = %4, spaceLimit = %5")
-               .arg(Q_FUNC_INFO)
-               .arg(storage->getUrl())
-               .arg((bool)fileStorage)
-               .arg(totalSpace)
-               .arg(storage->getSpaceLimit()), cl_logDEBUG2);
+        NX_VERBOSE(kLogTag,
+            lm("Small storage %1, isFileStorage=%2, totalSpace=%3, spaceLimit=%4, toDelete").args(
+                storage->getUrl(), (bool)fileStorage, totalSpace, storage->getSpaceLimit()));
     }
     return result;
 }
@@ -605,21 +600,14 @@ QnStorageResourceList createStorages(
 
     availablePaths = listRecordFolders();
 
-    NX_LOG(lit("%1 Available paths count: %2")
-            .arg(Q_FUNC_INFO)
-            .arg(availablePaths.size()), cl_logDEBUG1);
-
+    NX_DEBUG(kLogTag, lm("Available paths count: %1").arg(availablePaths.size()));
     for(const QString& folderPath: availablePaths)
     {
-        NX_LOG(lit("%1 Available path: %2")
-                .arg(Q_FUNC_INFO)
-                .arg(folderPath), cl_logDEBUG1);
-
+        NX_DEBUG(kLogTag, lm("Available path: %1").arg(folderPath));
         if (!mServer->getStorageByUrl(folderPath).isNull())
         {
-            NX_LOG(lit("%1 Storage with this path %2 already exists. Won't be added.")
-                    .arg(Q_FUNC_INFO)
-                    .arg(folderPath), cl_logDEBUG1);
+            NX_DEBUG(kLogTag,
+                lm("Storage with this path %1 already exists. Won't be added.").arg(folderPath));
             continue;
         }
         // Create new storage because of new partition found that missing in the database
@@ -630,7 +618,7 @@ QnStorageResourceList createStorages(
         qint64 available = storage->getTotalSpace() - storage->getSpaceLimit();
         bigStorageThreshold = qMax(bigStorageThreshold, available);
         storages.append(storage);
-        NX_LOG(QString("Creating new storage: %1").arg(folderPath), cl_logINFO);
+        NX_DEBUG(kLogTag, lm("Creating new storage: %1").arg(folderPath));
     }
     bigStorageThreshold /= QnStorageManager::BIG_STORAGE_THRESHOLD_COEFF;
 
@@ -641,15 +629,17 @@ QnStorageResourceList createStorages(
             storage->setUsedForWriting(false);
     }
 
-    QString logMessage = lit("%1 Storage new candidates:\n").arg(Q_FUNC_INFO);
+    QString logMessage = lit("Storage new candidates:\n");
     for (const auto& storage : storages)
+    {
         logMessage.append(
             lit("\t\turl: %1, totalSpace: %2, spaceLimit: %3")
                 .arg(storage->getUrl())
                 .arg(storage->getTotalSpace())
                 .arg(storage->getSpaceLimit()));
-    NX_LOG(logMessage, cl_logDEBUG1);
+    }
 
+    NX_DEBUG(kLogTag, logMessage);
     return storages;
 }
 
@@ -702,13 +692,15 @@ QnStorageResourceList updateStorages(QnMediaServerResourcePtr mServer)
 
     QString logMesssage = lit("%1 Modified storages:\n").arg(Q_FUNC_INFO);
     for (const auto& storage : result.values())
+    {
         logMesssage.append(
             lit("\t\turl: %1, totalSpace: %2, spaceLimit: %3\n")
                 .arg(storage->getUrl())
                 .arg(storage->getTotalSpace())
                 .arg(storage->getSpaceLimit()));
-    NX_LOG(logMesssage, cl_logDEBUG1);
+    }
 
+    NX_DEBUG(kLogTag, logMesssage);
     return result.values();
 }
 
@@ -717,7 +709,13 @@ void MediaServerProcess::initStoragesAsync(QnCommonMessageProcessor* messageProc
     m_initStoragesAsyncPromise.reset(new nx::utils::promise<void>());
     QtConcurrent::run([messageProcessor, this]
     {
-        const auto setPromiseGuardFunc = makeScopeGuard([&]() { m_initStoragesAsyncPromise->set_value(); });
+        NX_VERBOSE(this, "Init storages begin");
+        const auto setPromiseGuardFunc = makeScopeGuard(
+            [&]()
+            {
+                NX_VERBOSE(this, "Init storages end");
+                m_initStoragesAsyncPromise->set_value();
+            });
 
         //read server's storages
         ec2::AbstractECConnectionPtr ec2Connection = messageProcessor->commonModule()->ec2Connection();
@@ -726,7 +724,7 @@ void MediaServerProcess::initStoragesAsync(QnCommonMessageProcessor* messageProc
 
         while ((rez = ec2Connection->getMediaServerManager(Qn::kSystemAccess)->getStoragesSync(QnUuid(), &storages)) != ec2::ErrorCode::ok)
         {
-            NX_LOG( lit("QnMain::run(): Can't get storage list. Reason: %1").arg(ec2::toString(rez)), cl_logDEBUG1 );
+            NX_DEBUG(this, lm("Can't get storage list. Reason: %1").arg(rez));
             QnSleep::msleep(APP_SERVER_REQUEST_ERROR_TIMEOUT_MS);
             if (m_needStop)
                 return;
@@ -734,10 +732,8 @@ void MediaServerProcess::initStoragesAsync(QnCommonMessageProcessor* messageProc
 
         for(const auto& storage: storages)
         {
-            NX_LOG(lit("%1 Existing storage: %2, spaceLimit = %3")
-                   .arg(Q_FUNC_INFO)
-                   .arg(storage.url)
-                   .arg(storage.spaceLimit), cl_logDEBUG2);
+            NX_DEBUG(this, lm("Existing storage: %1, spaceLimit = %2")
+                .args(storage.url, storage.spaceLimit));
             messageProcessor->updateResource(storage, ec2::NotificationSource::Local);
         }
 
@@ -758,12 +754,12 @@ void MediaServerProcess::initStoragesAsync(QnCommonMessageProcessor* messageProc
 
         storagesToRemove.append(unMountedStorages);
 
-        NX_LOG(lit("%1 Found %2 storages to remove").arg(Q_FUNC_INFO).arg(storagesToRemove.size()), cl_logDEBUG2);
+        NX_DEBUG(this, lm("Found %1 storages to remove").arg(storagesToRemove.size()));
         for (const auto& storage: storagesToRemove)
-            NX_LOG(lit("%1 Storage to remove: %2, id: %3")
-                   .arg(Q_FUNC_INFO)
-                   .arg(storage->getUrl())
-                   .arg(storage->getId().toString()), cl_logDEBUG2);
+        {
+            NX_DEBUG(this, lm("Storage to remove: %2, id: %3").args(
+                storage->getUrl(), storage->getId()));
+        }
 
         if (!storagesToRemove.isEmpty())
         {
@@ -884,7 +880,7 @@ void MediaServerProcess::saveStorages(
     ec2::ErrorCode rez;
     while((rez = ec2Connection->getMediaServerManager(Qn::kSystemAccess)->saveStoragesSync(apiStorages)) != ec2::ErrorCode::ok && !needToStop())
     {
-        qWarning() << "updateStorages(): Call to change server's storages failed. Reason: " << ec2::toString(rez);
+        NX_WARNING(this) "Call to change server's storages failed. Reason: " << rez;
         QnSleep::msleep(APP_SERVER_REQUEST_ERROR_TIMEOUT_MS);
     }
 }
@@ -1013,14 +1009,14 @@ MediaServerProcess::MediaServerProcess(int argc, char* argv[], bool serviceMode)
 
     parseCommandLineParameters(argc, argv);
 
-    MSSettings settings(
+    m_settings.reset(new MSSettings(
         m_cmdLineArguments.configFilePath,
-        m_cmdLineArguments.rwConfigFilePath);
+        m_cmdLineArguments.rwConfigFilePath));
 
-    addCommandLineParametersFromConfig(&settings);
+    addCommandLineParametersFromConfig(m_settings.get());
 
     const bool isStatisticsDisabled =
-        settings.roSettings()->value(QnServer::kNoMonitorStatistics, false).toBool();
+        m_settings->roSettings()->value(QnServer::kNoMonitorStatistics, false).toBool();
 
     m_platform.reset(new QnPlatformAbstraction());
     m_platform->process(NULL)->setPriority(QnPlatformProcess::HighPriority);
@@ -1039,6 +1035,7 @@ void MediaServerProcess::parseCommandLineParameters(int argc, char* argv[])
         "INFO"
 #endif
     );
+    commandLineParser.addParameter(&m_cmdLineArguments.exceptionFilters, "--exception-filters", NULL, "Log filters.");
     commandLineParser.addParameter(&m_cmdLineArguments.msgLogLevel, "--http-log-level", NULL,
         "Log value for http_log.log. Supported values same as above. Default is none (no logging)", "none");
     commandLineParser.addParameter(&m_cmdLineArguments.ec2TranLogLevel, "--ec2-tran-log-level", NULL,
@@ -1067,6 +1064,8 @@ void MediaServerProcess::parseCommandLineParameters(int argc, char* argv[])
         lit("Enforces mediator address"), QString());
     commandLineParser.addParameter(&m_cmdLineArguments.ipVersion, "--ip-version", NULL,
         lit("Force ip version"), QString());
+    commandLineParser.addParameter(&m_cmdLineArguments.createFakeData, "--create-fake-data", NULL,
+        lit("Create fake data: users,cameras,propertiesPerCamera,camerasPerLayout,storageCount"), QString());
     commandLineParser.addParameter(&m_cmdLineArguments.cleanupDb, "--cleanup-db", NULL,
         lit("Deletes resources with NULL ids, "
             "cleans dangling cameras' and servers' user attributes, "
@@ -1696,7 +1695,7 @@ void MediaServerProcess::at_connectionOpened()
     m_firstRunningTime = 0;
 }
 
-void MediaServerProcess::at_serverModuleConflict(nx::vms::discovery::Manager::ModuleData module)
+void MediaServerProcess::at_serverModuleConflict(nx::vms::discovery::ModuleEndpoint module)
 {
     const auto& resPool = commonModule()->resourcePool();
     qnBusinessRuleConnector->at_mediaServerConflict(
@@ -1770,7 +1769,7 @@ void MediaServerProcess::at_cameraIPConflict(const QHostAddress& host, const QSt
 void MediaServerProcess::registerRestHandlers(
     CloudManagerGroup* cloudManagerGroup,
     QnUniversalTcpListener* tcpListener,
-    ec2::QnTransactionMessageBus* messageBus)
+    ec2::QnTransactionMessageBusBase* messageBus)
 {
 	auto processorPool = tcpListener->processorPool();
     const auto welcomePage = lit("/static/index.html");
@@ -1829,6 +1828,8 @@ void MediaServerProcess::registerRestHandlers(
     reg("api/aggregator", new QnJsonAggregatorRestHandler());
     reg("api/ifconfig", new QnIfConfigRestHandler(), kAdmin);
 
+    reg("api/downloader/", new QnDistributedFileDownloaderRestHandler());
+
     reg("api/settime", new QnSetTimeRestHandler(), kAdmin); //< deprecated
     reg("api/setTime", new QnSetTimeRestHandler(), kAdmin); //< new version
 
@@ -1879,7 +1880,7 @@ void MediaServerProcess::registerRestHandlers(
 
 bool MediaServerProcess::initTcpListener(
     CloudManagerGroup* const cloudManagerGroup,
-    ec2::QnTransactionMessageBus* messageBus)
+    ec2::QnTransactionMessageBusBase* messageBus)
 {
     m_autoRequestForwarder.reset( new QnAutoRequestForwarder(commonModule() ));
     m_autoRequestForwarder->addPathToIgnore(lit("/ec2/*"));
@@ -2221,6 +2222,113 @@ void MediaServerProcess::updateGuidIfNeeded()
         setObsoleteGuid(obsoleteGuid);
 }
 
+void MediaServerProcess::makeFakeData(
+    const QString& fakeDataString, const ec2::AbstractECConnectionPtr& connection)
+{
+    if (fakeDataString.isEmpty())
+        return;
+
+    const auto fakeData = fakeDataString.split(',');
+    int userCount = fakeData.value(0).toInt(0);
+    int camerasCount = fakeData.value(1).toInt(0);
+    int propertiesPerCamera = fakeData.value(2).toInt(0);
+    int camerasPerLayout = fakeData.value(3).toInt(0);
+    int storageCount = fakeData.value(4).toInt(0);
+
+    qWarning() << "Create fake data:"
+        << userCount << "users,"
+        << camerasCount << "cameras," << propertiesPerCamera << "properties per camera,"
+        << camerasPerLayout << "cameras per layout," << storageCount << "storages";
+
+    std::vector<ec2::ApiUserData> users;
+    for (int i = 0; i < userCount; ++i)
+    {
+        ec2::ApiUserData userData;
+        userData.id = QnUuid::createUuid();
+        userData.name = lm("user_%1").arg(i);
+        userData.isEnabled = true;
+        userData.isCloud = false;
+        users.push_back(userData);
+    }
+
+    std::vector<ec2::ApiCameraData> cameras;
+    std::vector<ec2::ApiCameraAttributesData> userAttrs;
+    ec2::ApiResourceParamWithRefDataList cameraParams;
+    const auto& moduleGuid = commonModule()->moduleGUID();
+    auto resTypePtr = qnResTypePool->getResourceTypeByName("Camera");
+    NX_ASSERT(!resTypePtr.isNull());
+    for (int i = 0; i < camerasCount; ++i)
+    {
+        ec2::ApiCameraData cameraData;
+        cameraData.typeId = resTypePtr->getId();
+        cameraData.parentId = moduleGuid;
+        cameraData.vendor = "Invalid camera";
+        cameraData.physicalId = QnUuid::createUuid().toString();
+        cameraData.id = ec2::ApiCameraData::physicalIdToId(cameraData.physicalId);
+        cameraData.name = lm("Camera %1").arg(cameraData.id);
+        cameras.push_back(std::move(cameraData));
+
+        ec2::ApiCameraAttributesData userAttr;
+        userAttr.cameraId = cameraData.id;
+        userAttrs.push_back(userAttr);
+
+        for (int j = 0; j < propertiesPerCamera; ++j)
+        {
+            cameraParams.push_back(ec2::ApiResourceParamWithRefData(
+                cameraData.id, lit("property%1").arg(j), lit("value%1").arg(j)));
+        }
+    }
+
+    std::vector<ec2::ApiLayoutData> layouts;
+    if (camerasPerLayout)
+    {
+        for (int minCameraOnLayout = 0; minCameraOnLayout < camerasCount;
+             minCameraOnLayout += camerasPerLayout)
+        {
+            ec2::ApiLayoutData layout;
+            layout.id = QnUuid::createUuid();
+            for (int cameraIndex = minCameraOnLayout;
+                 cameraIndex < minCameraOnLayout + camerasPerLayout && cameraIndex < camerasCount;
+                 ++cameraIndex)
+            {
+                ec2::ApiLayoutItemData item;
+                item.id = cameras[cameraIndex].id;
+                layout.items.push_back(item);
+            }
+
+            layouts.push_back(layout);
+        }
+    }
+
+    std::vector<ec2::ApiStorageData> storages;
+    for (int i = 0; i < storageCount; ++i)
+    {
+        ec2::ApiStorageData storage;
+        storage.id = QnUuid::createUuid();
+        storage.parentId = commonModule()->moduleGUID();
+        storage.name = lm("Fake Storage/%1").arg(storage.id);
+        storage.url = lm("/tmp/fakeStorage/%1").arg(storage.id);
+        storages.push_back(storage);
+    }
+
+    auto userManager = connection->getUserManager(Qn::kSystemAccess);
+    auto cameraManager = connection->getCameraManager(Qn::kSystemAccess);
+    auto resourceManager = connection->getResourceManager(Qn::kSystemAccess);
+    auto layoutManager = connection->getLayoutManager(Qn::kSystemAccess);
+    auto serverManager = connection->getMediaServerManager(Qn::kSystemAccess);
+
+    for (const auto& user: users)
+        NX_ASSERT(ec2::ErrorCode::ok == userManager->saveSync(user));
+
+    NX_ASSERT(ec2::ErrorCode::ok == cameraManager->saveUserAttributesSync(userAttrs));
+    NX_ASSERT(ec2::ErrorCode::ok == resourceManager->saveSync(cameraParams));
+    NX_ASSERT(ec2::ErrorCode::ok == cameraManager->addCamerasSync(cameras));
+    NX_ASSERT(ec2::ErrorCode::ok == serverManager->saveStoragesSync(storages));
+
+    for (const auto& layout: layouts)
+        NX_ASSERT(ec2::ErrorCode::ok == layoutManager->saveSync(layout));
+}
+
 void MediaServerProcess::serviceModeInit()
 {
     const auto settings = qnServerModule->roSettings();
@@ -2250,6 +2358,10 @@ void MediaServerProcess::serviceModeInit()
         };
 
     logSettings.level = makeLevel(cmdLineArguments().logLevel, "logLevel");
+
+    for (const auto& filter: cmdLineArguments().exceptionFilters.split(L';', QString::SkipEmptyParts))
+        logSettings.exceptionFilers.insert(filter);
+
     nx::utils::log::initialize(
         logSettings, dataLocation, qApp->applicationName(), binaryPath);
 
@@ -2286,7 +2398,6 @@ void MediaServerProcess::serviceModeInit()
 
 void MediaServerProcess::run()
 {
-
     std::shared_ptr<QnMediaServerModule> serverModule(new QnMediaServerModule(
         m_cmdLineArguments.enforcedMediatorEndpoint,
         m_cmdLineArguments.configFilePath,
@@ -2461,6 +2572,7 @@ void MediaServerProcess::run()
     ec2::ApiRuntimeData runtimeData;
     runtimeData.peer.id = commonModule()->moduleGUID();
     runtimeData.peer.instanceId = commonModule()->runningInstanceGUID();
+    runtimeData.peer.persistentId = commonModule()->dbId();
     runtimeData.peer.peerType = Qn::PT_Server;
     runtimeData.box = QnAppInfo::armBox();
     runtimeData.brand = QnAppInfo::productNameShort();
@@ -2508,6 +2620,7 @@ void MediaServerProcess::run()
             auto connectionResult = QnConnectionValidator::validateConnection(connectInfo, errorCode);
             if (connectionResult == Qn::SuccessConnectionResult)
             {
+                ec2Connection->getDiscoveryManager(Qn::kSystemAccess)->monitorServerDiscovery();
                 NX_LOG(QString::fromLatin1("Connected to local EC2"), cl_logWARNING);
                 break;
             }
@@ -2530,9 +2643,14 @@ void MediaServerProcess::run()
         QnSleep::msleep(3000);
     }
     QnAppServerConnectionFactory::setEc2Connection(ec2Connection);
+
     const auto& runtimeManager = commonModule()->runtimeInfoManager();
-    connect(runtimeManager, &QnRuntimeInfoManager::runtimeInfoAdded, this, &MediaServerProcess::at_runtimeInfoChanged);
-    connect(runtimeManager, &QnRuntimeInfoManager::runtimeInfoChanged, this, &MediaServerProcess::at_runtimeInfoChanged);
+    connect(
+        runtimeManager, &QnRuntimeInfoManager::runtimeInfoAdded,
+        this, &MediaServerProcess::at_runtimeInfoChanged, Qt::QueuedConnection);
+    connect(
+        runtimeManager, &QnRuntimeInfoManager::runtimeInfoChanged,
+        this, &MediaServerProcess::at_runtimeInfoChanged, Qt::QueuedConnection);
 
     if (needToStop())
         return; //TODO #ak correctly deinitialize what has been initialised
@@ -2866,7 +2984,7 @@ void MediaServerProcess::run()
     if (!qnServerModule->roSettings()->value(QnServer::kNoInitStoragesOnStartup, false).toBool())
         initStoragesAsync(commonModule()->messageProcessor());
 
-    if (!QnPermissionsHelper::isSafeMode())
+    if (!QnPermissionsHelper::isSafeMode(commonModule()))
     {
         if (nx::mserver_aux::needToResetSystem(
                     nx::mserver_aux::isNewServerInstance(
@@ -2996,7 +3114,10 @@ void MediaServerProcess::run()
             commonModule()->moduleDiscoveryManager()->start();
     }
 #endif
+
+    makeFakeData( cmdLineArguments().createFakeData, ec2Connection);
     qnBackupStorageMan->scheduleSync()->start();
+    serverModule->unusedWallpapersWatcher()->start();
     emit started();
     exec();
 
@@ -3083,6 +3204,7 @@ void MediaServerProcess::run()
     //disconnecting from EC2
     clearEc2ConnectionGuard.reset();
 
+    connectToCloudWatcher.reset();
     ec2Connection.reset();
     ec2ConnectionFactory.reset();
 
@@ -3126,13 +3248,15 @@ void MediaServerProcess::at_runtimeInfoChanged(const QnPeerRuntimeInfo& runtimeI
         return;
     if (runtimeInfo.uuid != commonModule()->moduleGUID())
         return;
-
-    QnAppServerConnectionFactory::ec2Connection()
-        ->getMiscManager(Qn::kSystemAccess)
-        ->saveRuntimeInfo(
-            runtimeInfo.data,
-            ec2::DummyHandler::instance(),
-            &ec2::DummyHandler::onRequestDone);
+    auto connection = commonModule()->ec2Connection();
+    if (connection)
+    {
+        ec2::QnTransaction<ec2::ApiRuntimeData> tran(
+            ec2::ApiCommand::runtimeInfoChanged,
+            commonModule()->moduleGUID());
+        tran.params = runtimeInfo.data;
+        sendTransaction(commonModule()->ec2Connection()->messageBus(), tran);
+    }
 }
 
 void MediaServerProcess::at_emptyDigestDetected(const QnUserResourcePtr& user, const QString& login, const QString& password)
@@ -3205,9 +3329,9 @@ protected:
             QCoreApplication::setApplicationVersion(QnAppInfo::applicationVersion());
 
         if (application->isRunning() &&
-            qnServerModule->roSettings()->value(nx_ms_conf::ENABLE_MULTIPLE_INSTANCES).toInt() == 0)
+            m_main->serverSettings()->roSettings()->value(nx_ms_conf::ENABLE_MULTIPLE_INSTANCES).toInt() == 0)
         {
-            NX_LOG("Server already started", cl_logERROR);
+            qWarning() << "Server already started";
             qApp->quit();
             return;
         }

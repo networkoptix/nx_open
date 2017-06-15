@@ -20,6 +20,8 @@
 
 #include <api/app_server_connection.h>
 
+#include <business/event_rule_manager.h>
+
 #include <core/resource_access/user_access_data.h>
 #include <core/resource_access/shared_resources_manager.h>
 #include <core/resource_access/resource_access_manager.h>
@@ -255,16 +257,17 @@ void QnCommonMessageProcessor::on_gotDiscoveryData(const ec2::ApiDiscoveryData &
     server->setIgnoredUrls(ignoredUrls);
 }
 
-void QnCommonMessageProcessor::on_remotePeerFound(const ec2::ApiPeerAliveData &data) {
-    handleRemotePeerFound(data);
-    emit remotePeerFound(data);
+void QnCommonMessageProcessor::on_remotePeerFound(QnUuid data, Qn::PeerType peerType)
+{
+    handleRemotePeerFound(data, peerType);
+    emit remotePeerFound(data, peerType);
 }
 
-void QnCommonMessageProcessor::on_remotePeerLost(const ec2::ApiPeerAliveData &data) {
-    handleRemotePeerLost(data);
-    emit remotePeerLost(data);
+void QnCommonMessageProcessor::on_remotePeerLost(QnUuid data, Qn::PeerType peerType)
+{
+    handleRemotePeerLost(data, peerType);
+    emit remotePeerLost(data, peerType);
 }
-
 
 void QnCommonMessageProcessor::on_resourceStatusChanged(
     const QnUuid& resourceId,
@@ -439,14 +442,14 @@ void QnCommonMessageProcessor::on_licenseRemoved(const QnLicensePtr &license) {
     licensePool()->removeLicense(license);
 }
 
-void QnCommonMessageProcessor::on_businessEventAddedOrUpdated(const QnBusinessEventRulePtr &businessRule){
-    m_rules.insert(businessRule->id(), businessRule);
-    emit businessRuleChanged(businessRule);
+void QnCommonMessageProcessor::on_businessEventAddedOrUpdated(const QnBusinessEventRulePtr& rule)
+{
+    eventRuleManager()->addOrUpdateRule(rule);
 }
 
-void QnCommonMessageProcessor::on_businessEventRemoved(const QnUuid &id) {
-    m_rules.remove(id);
-    emit businessRuleDeleted(id);
+void QnCommonMessageProcessor::on_businessEventRemoved(const QnUuid& id)
+{
+    eventRuleManager()->removeRule(id);
 }
 
 void QnCommonMessageProcessor::on_businessActionBroadcasted( const QnAbstractBusinessActionPtr& /* businessAction */ )
@@ -454,16 +457,11 @@ void QnCommonMessageProcessor::on_businessActionBroadcasted( const QnAbstractBus
     // nothing to do for a while
 }
 
-void QnCommonMessageProcessor::on_businessRuleReset( const ec2::ApiBusinessRuleDataList& rules )
+void QnCommonMessageProcessor::on_businessRuleReset(const ec2::ApiBusinessRuleDataList& rules)
 {
-    QnBusinessEventRuleList qnRules;
-    fromApiToResourceList(rules, qnRules);
-
-    m_rules.clear();
-    for(const QnBusinessEventRulePtr &bRule: qnRules)
-        m_rules[bRule->id()] = bRule;
-
-    emit businessRuleReset(qnRules);
+    QnBusinessEventRuleList ruleList;
+    fromApiToResourceList(rules, ruleList);
+    eventRuleManager()->resetRules(ruleList);
 }
 
 void QnCommonMessageProcessor::on_broadcastBusinessAction( const QnAbstractBusinessActionPtr& action )
@@ -594,14 +592,13 @@ void QnCommonMessageProcessor::removeResourceIgnored(const QnUuid &)
 {
 }
 
-void QnCommonMessageProcessor::handleRemotePeerFound(const ec2::ApiPeerAliveData &data) {
-    Q_UNUSED(data)
+void QnCommonMessageProcessor::handleRemotePeerFound(QnUuid /*data*/, Qn::PeerType /*peerType*/)
+{
 }
 
-void QnCommonMessageProcessor::handleRemotePeerLost(const ec2::ApiPeerAliveData &data) {
-    Q_UNUSED(data)
+void QnCommonMessageProcessor::handleRemotePeerLost(QnUuid /*data*/, Qn::PeerType /*peerType*/)
+{
 }
-
 
 void QnCommonMessageProcessor::resetServerUserAttributesList( const ec2::ApiMediaServerUserAttributesDataList& serverUserAttributesList )
 {
@@ -692,10 +689,6 @@ void QnCommonMessageProcessor::onGotInitialNotification(const ec2::ApiFullInfoDa
     resourceAccessManager()->endUpdate();
 
     emit initialResourcesReceived();
-}
-
-QMap<QnUuid, QnBusinessEventRulePtr> QnCommonMessageProcessor::businessRules() const {
-    return m_rules;
 }
 
 void QnCommonMessageProcessor::updateResource(const QnResourcePtr&, ec2::NotificationSource /*source*/)

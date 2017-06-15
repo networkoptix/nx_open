@@ -19,34 +19,34 @@ namespace server {
  * Connection of stream-orientied protocol of type request/respose.
  * It is not tied to underlying transport (tcp, udp, etc...).
  *
- * CustomConnectionType MUST implement following methods:
+ * CustomConnection MUST implement following methods:
  * <pre><code>
  *     // Called for every received message.
  *     void processMessage(Message request);
  * </code></pre>
  *
- * NOTE: SerializerType::serialize is allowed to reallocate source buffer if needed, 
+ * NOTE: Serializer::serialize is allowed to reallocate source buffer if needed, 
  *   but it is not recommended due to performance considerations!
  * NOTE: It is allowed to free instance within event handler.
  */
 template<
-    class CustomConnectionType,
-    class MessageType,
-    class ParserType,
-    class SerializerType
+    typename CustomConnection,
+    typename Message,
+    typename Parser,
+    typename Serializer
 > class BaseStreamProtocolConnection:
-	public BaseServerConnection<CustomConnectionType>
+	public BaseServerConnection<CustomConnection>
 {
     using self_type = BaseStreamProtocolConnection<
-        CustomConnectionType,
-        MessageType,
-        ParserType,
-        SerializerType>;
-    using base_type = BaseServerConnection<CustomConnectionType>;
+        CustomConnection,
+        Message,
+        Parser,
+        Serializer>;
+    using base_type = BaseServerConnection<CustomConnection>;
 
 public:
     BaseStreamProtocolConnection(
-        StreamConnectionHolder<CustomConnectionType>* connectionManager,
+        StreamConnectionHolder<CustomConnection>* connectionManager,
         std::unique_ptr<AbstractStreamSocket> streamSocket)
         :
         base_type(connectionManager, std::move(streamSocket)),
@@ -138,7 +138,7 @@ public:
      * Initiates asynchoronous message send.
      */
     void sendMessage(
-        MessageType msg,
+        Message msg,
         std::function<void(SystemError::ErrorCode)> handler)
     {
         if (m_sendCompletionHandler)
@@ -160,7 +160,7 @@ public:
         addNewTaskToQueue(std::move(newTask));
     }
 
-    void sendMessage(MessageType msg) //< Template cannot be resolved by default value.
+    void sendMessage(Message msg) //< Template cannot be resolved by default value.
     {
         sendMessage(
             std::move(msg),
@@ -183,7 +183,7 @@ public:
     }
 
 protected:
-    virtual void processMessage(MessageType) = 0;
+    virtual void processMessage(Message message) = 0;
     virtual void processSomeMessageBody(nx::Buffer /*messageBodyBuffer*/) {}
     virtual void processMessageEnd() {}
 
@@ -194,7 +194,7 @@ private:
         SendTask() = default;
 
         SendTask(
-            MessageType _msg,
+            Message _msg,
             std::function<void(SystemError::ErrorCode)> _handler)
             :
             msg(std::move(_msg)),
@@ -211,20 +211,20 @@ private:
         {
         }
 
-        SendTask(SendTask&& right) = default;
+        SendTask(SendTask&& /*right*/) = default;
 
         SendTask(const SendTask&) = delete;
         SendTask& operator=(const SendTask&) = delete;
 
-        boost::optional<MessageType> msg;
+        boost::optional<Message> msg;
         boost::optional<nx::Buffer> buf;
         std::function<void(SystemError::ErrorCode)> handler;
         bool asyncSendIssued = false;
     };
 
-    MessageType m_message;
-    ParserType m_parser;
-    SerializerType m_serializer;
+    Message m_message;
+    Parser m_parser;
+    Serializer m_serializer;
     SerializerState m_serializerState;
     nx::Buffer m_writeBuffer;
     std::function<void(SystemError::ErrorCode)> m_sendCompletionHandler;
@@ -325,7 +325,7 @@ private:
         m_messageReported = false;
     }
 
-    void sendMessageInternal(const MessageType& msg)
+    void sendMessageInternal(const Message& msg)
     {
         // Serializing message.
         m_serializer.setMessage(&msg);
@@ -382,7 +382,7 @@ private:
         }
         this->connectionManager()->closeConnection(
             errorCode,
-            static_cast<CustomConnectionType*>(this));
+            static_cast<CustomConnection*>(this));
     }
 };
 
@@ -391,28 +391,28 @@ private:
  * set with BaseStreamProtocolConnectionEmbeddable::setMessageHandler.
  */
 template<
-    class MessageType,
-    class ParserType,
-    class SerializerType
+    class Message,
+    class Parser,
+    class Serializer
 > class BaseStreamProtocolConnectionEmbeddable:
     public BaseStreamProtocolConnection<
         BaseStreamProtocolConnectionEmbeddable<
-            MessageType,
-            ParserType,
-            SerializerType>,
-        MessageType,
-        ParserType,
-        SerializerType>
+            Message,
+            Parser,
+            Serializer>,
+        Message,
+        Parser,
+        Serializer>
 {
     using self_type = BaseStreamProtocolConnectionEmbeddable<
-        MessageType,
-        ParserType,
-        SerializerType>;
+        Message,
+        Parser,
+        Serializer>;
     using base_type = BaseStreamProtocolConnection<
         self_type,
-        MessageType,
-        ParserType,
-        SerializerType>;
+        Message,
+        Parser,
+        Serializer>;
 
 public:
     BaseStreamProtocolConnectionEmbeddable(
@@ -449,7 +449,7 @@ public:
     }
 
 protected:
-    virtual void processMessage(MessageType msg) override
+    virtual void processMessage(Message msg) override
     {
         if (m_messageHandler)
             m_messageHandler(std::move(msg));
@@ -468,7 +468,7 @@ protected:
     }
 
 private:
-    std::function<void(MessageType)> m_messageHandler;
+    std::function<void(Message)> m_messageHandler;
     std::function<void(nx::Buffer)> m_messageBodyHandler;
     std::function<void()> m_messageEndHandler;
 };

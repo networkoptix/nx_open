@@ -84,6 +84,7 @@ private:
     QMap<QnUuid, qint64> m_runningBookmarkActions;
     QScopedPointer<EmailManagerImpl> m_emailManager;
     QMap<SendEmailAggregationKey, SendEmailAggregationData> m_aggregatedEmails;
+    QThreadPool m_emailThreadPool;
 private:
     bool sendMail(const QnSendMailBusinessActionPtr& action );
     void sendAggregationEmail( const SendEmailAggregationKey& aggregationKey );

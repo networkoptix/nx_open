@@ -32,10 +32,12 @@
 #include <ui/widgets/business/business_event_widget_factory.h>
 #include <ui/widgets/business/business_action_widget_factory.h>
 #include <ui/workbench/workbench_context.h>
-#include <ui/workbench/workbench_resource.h>
 
 #include <client/client_settings.h>
 #include <utils/common/scoped_value_rollback.h>
+#include <nx/client/desktop/utils/mime_data.h>
+
+using namespace nx::client::desktop;
 
 namespace {
 
@@ -343,7 +345,9 @@ bool QnBusinessRuleWidget::eventFilter(QObject *object, QEvent *event)
     if (event->type() == QEvent::DragEnter)
     {
         QDragEnterEvent* de = static_cast<QDragEnterEvent*>(event);
-        m_dropResources = QnWorkbenchResource::deserializeResources(de->mimeData());
+
+        MimeData data(de->mimeData());
+        m_dropResources = resourcePool()->getResources(data.getIds());
         if (!m_dropResources.empty())
             de->acceptProposedAction();
         return true;

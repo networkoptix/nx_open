@@ -1,28 +1,13 @@
 #include "discovery_manager.h"
 
-#include "nx/vms/discovery/manager.h"
+#include <api/global_settings.h>
+#include <common/common_module.h>
+#include <nx/vms/discovery/manager.h>
+
 #include "fixed_url_client_query_processor.h"
 #include "server_query_processor.h"
 #include <common/common_module.h>
-
-namespace {
-
-ec2::QnPeerSet getDirectClientPeers(ec2::QnTransactionMessageBus* messageBus)
-{
-    ec2::QnPeerSet result;
-
-    auto clients = messageBus->aliveClientPeers();
-    for (auto it = clients.begin(); it != clients.end(); ++it)
-    {
-        const auto& clientId = it.key();
-        if (it->routingInfo.contains(clientId))
-            result.insert(clientId);
-    }
-
-    return result;
-}
-
-} // namespace
+#include <transaction/message_bus_selector.h>
 
 namespace ec2 {
 
@@ -181,51 +166,45 @@ int QnDiscoveryManager<QueryProcessorType>::getDiscoveryData(impl::GetDiscoveryD
 }
 
 template<class QueryProcessorType>
-int QnDiscoveryManager<QueryProcessorType>::sendDiscoveredServer(
-    QnTransactionMessageBus* messageBus,
-    const ApiDiscoveredServerData &discoveredServer,
-    impl::SimpleHandlerPtr handler)
+void QnDiscoveryManager<QueryProcessorType>::monitorServerDiscovery()
 {
-    const auto peers = getDirectClientPeers(messageBus);
-    if (peers.isEmpty())
-        return -1;
-
-    QnTransaction<ApiDiscoveredServerData> transaction(
-        ApiCommand::discoveredServerChanged,
-        messageBus->commonModule()->moduleGUID(),
-        discoveredServer);
-
-    const int reqId = generateRequestID();
-
-    messageBus->sendTransaction(transaction, peers);
-    nx::utils::concurrent::run(Ec2ThreadPool::instance(),
-        [handler, reqId]{ handler->done(reqId, ErrorCode::ok); });
-
-    return reqId;
 }
 
-template<class QueryProcessorType>
-int QnDiscoveryManager<QueryProcessorType>::sendDiscoveredServersList(
-    QnTransactionMessageBus* messageBus,
-    const ApiDiscoveredServerDataList &discoveredServersList,
-    impl::SimpleHandlerPtr handler)
+template<>
+void QnDiscoveryManager<ServerQueryProcessorAccess>::monitorServerDiscovery()
 {
-    const auto peers = getDirectClientPeers(messageBus);
-    if (peers.isEmpty())
-        return -1;
+    const auto messageBus = m_queryProcessor->messageBus();
+    QObject::connect(messageBus, &QnTransactionMessageBus::peerFound,
+        [messageBus](QnUuid peerId, Qn::PeerType peerType)
+        {
+            if (!ApiPeerData::isClient(peerType))
+                return;
 
-    QnTransaction<ApiDiscoveredServerDataList> transaction(
-        ApiCommand::discoveredServersList,
-        messageBus->commonModule()->moduleGUID(),
-        discoveredServersList);
+            const auto servers = getServers(messageBus->commonModule()->moduleDiscoveryManager());
+            QnTransaction<ApiDiscoveredServerDataList> transaction(
+                ApiCommand::discoveredServersList, messageBus->commonModule()->moduleGUID(), servers);
 
-    const int reqId = generateRequestID();
+            sendTransaction(messageBus, transaction, peerId);
+        });
 
-    messageBus->sendTransaction(transaction, peers);
-    nx::utils::concurrent::run(Ec2ThreadPool::instance(),
-        [handler, reqId]{ handler->done(reqId, ErrorCode::ok); });
+    const auto updateServerStatus =
+        [messageBus](nx::vms::discovery::ModuleEndpoint module)
+        {
+            const auto peers = messageBus->directlyConnectedClientPeers();
+            if (peers.isEmpty())
+                return;
 
-    return reqId;
+            QnTransaction<ApiDiscoveredServerData> transaction(
+                ApiCommand::discoveredServerChanged, messageBus->commonModule()->moduleGUID(),
+                makeServer(module, messageBus->commonModule()->globalSettings()->localSystemId()));
+
+            sendTransaction(messageBus, transaction, peers);
+        };
+
+    const auto discoveryManager = messageBus->commonModule()->moduleDiscoveryManager();
+    QObject::connect(discoveryManager, &nx::vms::discovery::Manager::found, updateServerStatus);
+    QObject::connect(discoveryManager, &nx::vms::discovery::Manager::changed, updateServerStatus);
+    // TODO: nx::vms::discovery::Manager::lost
 }
 
 template class QnDiscoveryManager<ServerQueryProcessorAccess>;

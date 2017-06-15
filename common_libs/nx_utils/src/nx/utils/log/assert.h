@@ -123,6 +123,8 @@ private:
 /** Useful to convert a single macro arg which has form (A, B, ...) to arg list: A, B, ... */
 #define NX_REMOVE_PARENTHESES(...) __VA_ARGS__
 
+#define NX_GET_2ND_ARG(a1, a2, ...) a2
+#define NX_GET_3RD_ARG(a1, a2, a3, ...) a3
 #define NX_GET_4TH_ARG(a1, a2, a3, a4, ...) a4
 
 #define NX_CRITICAL1(CONDITION) \

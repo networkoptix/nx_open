@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('webadminApp')
-    .factory('mediaserver', function ($http, $modal, $q, $localStorage, $location, $log, nativeClient) {
+    .factory('mediaserver', function ($http, $modal, $q, $localStorage, $location, $log, nativeClient, systemAPI) {
 
         var mediaserver = {};
         var cacheModuleInfo = null;
@@ -199,7 +199,7 @@ angular.module('webadminApp')
 
                 return auth;
             },
-            login:function(login,password){
+            login:function(login, password){
                 login = login.toLowerCase();
                 var self = this;
 
@@ -233,6 +233,7 @@ angular.module('webadminApp')
                             $localStorage.auth = auth;
                             $localStorage.authRtsp = authRtsp;
 
+                            systemAPI.setAuthKeys(auth, null, authRtsp);
                             $log.log("Login3: cookieLogin success!");
                             return data.data.reply;
                         });
@@ -434,9 +435,6 @@ angular.module('webadminApp')
                     cacheCurrentUser = wrapGet(proxy + '/web/api/getCurrentUser');
                 }
                 return cacheCurrentUser;
-            },
-            getTime:function(){
-                return wrapGet(proxy + '/web/api/gettime?local');
             },
             getTimeZones:function(){
                 return wrapGet(proxy + '/web/api/getTimeZones');

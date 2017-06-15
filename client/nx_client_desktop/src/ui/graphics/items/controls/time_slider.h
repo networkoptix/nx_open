@@ -122,7 +122,12 @@ public:
         /**
         * Whether bookmarks viewer should be anchored to timeline pixel location (otherwise - to a timestamp).
         */
-        StillBookmarksViewer = 0x2000
+        StillBookmarksViewer = 0x2000,
+
+        /**
+        * Whether single click with mouse button immediately clears existing selection.
+        */
+        ClearSelectionOnClick = 0x4000
     };
     Q_DECLARE_FLAGS(Options, Option);
 

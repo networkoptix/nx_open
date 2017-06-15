@@ -20,7 +20,6 @@ Pipeline::Pipeline(SSL_CTX* sslContext):
     m_eof(false),
     m_failed(false)
 {
-    initOpenSSLGlobalLock();
     initSslBio(sslContext);
 }
 

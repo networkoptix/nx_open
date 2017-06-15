@@ -22,11 +22,13 @@ QnUuid QnBusinessEventParameters::getParamsHash() const {
             if (reasonCode == QnBusiness::StorageIoErrorReason
                 || reasonCode == QnBusiness::StorageTooSlowReason
                 || reasonCode == QnBusiness::StorageFullReason
+                || reasonCode == QnBusiness::SystemStorageFullReason
                 || reasonCode == QnBusiness::LicenseRemoved)
                 paramKey += '_' + description.toUtf8();
             break;
 
-        //TODO: #vkutin #gdm Do we need to handle SoftwareTriggerEvent here?
+        case QnBusiness::SoftwareTriggerEvent:
+            return QnUuid::createUuid(); //< Warning: early return.
 
         case QnBusiness::CameraInputEvent:
             paramKey += '_' + inputPortId.toUtf8();

@@ -31,6 +31,8 @@
 #include <ui/workbench/workbench_item.h>
 #include <ui/workbench/workbench_layout.h>
 
+#include <utils/common/event_processors.h>
+
 namespace nx {
 namespace client {
 namespace desktop {
@@ -166,12 +168,36 @@ void LayoutTourItemWidget::initOverlay()
     updateOrder(Qn::LayoutTourItemOrderRole);
     connect(item(), &QnWorkbenchItem::dataChanged, this, updateOrder);
 
-    auto delayHintLabel = new GraphicsLabel(tr("Display for"));
+    auto delayHintLabel = new GraphicsLabel();
     delayHintLabel->setPerformanceHint(GraphicsLabel::PixmapCaching);
     delayHintLabel->setAcceptedMouseButtons(0);
     delayHintLabel->setAlignment(Qt::AlignVCenter);
     delayHintLabel->setFont(font);
-    setPaletteColor(delayHintLabel, QPalette::WindowText, QColor("#53707f")); //TODO: #GDM #3.1 customize
+
+    auto updateHint = [this, delayHintLabel]
+        {
+
+            //QColor textColor = palette().color(QPalette::WindowText); //
+            QColor textColor = QColor("#53707f"); //TODO: #GDM #3.1 customize
+            QString text = tr("Display for");
+            switch (selectionState())
+            {
+                case SelectionState::selected:
+                case SelectionState::focusedAndSelected:
+                    //textColor = palette().color(QPalette::Highlight);
+                    textColor = QColor("#2fa2db");  //TODO: #GDM #3.1 customize
+                    text = tr("Display selected for");
+                    break;
+                default:
+                    break;
+            }
+            setPaletteColor(delayHintLabel, QPalette::WindowText, textColor);
+            delayHintLabel->setText(text);
+        };
+
+    connect(this, &QnResourceWidget::selectionStateChanged, this, updateHint);
+    installEventHandler(this, QEvent::PaletteChange, this, updateHint);
+    updateHint();
 
     auto delayEdit = new QSpinBox();
     delayEdit->setSuffix(L' ' + QnTimeStrings::suffix(QnTimeStrings::Suffix::Seconds));

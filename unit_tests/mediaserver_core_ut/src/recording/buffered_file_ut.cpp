@@ -13,7 +13,7 @@
 #include <utils/common/writer_pool.h>
 #include <server/server_globals.h>
 #include <recorder/recording_manager.h>
-#include "utils.h"
+#include <test_support/utils.h>
 
 void doTestInternal(int systemFlags)
 {
@@ -160,7 +160,7 @@ TEST(BufferedFileWriter, AdaptiveBufferSize)
     WriteBufferMultiplierManagerTest bufferManager;
     const size_t kFileCount = 5;
     const int kIoBlockSize = 1024 * 1024 * 4;
-    const int kFfmpegBufferSize = 1024;
+    const int kFfmpegBufferSize = 1024 * 32;
     const int kFfmpegMaxBufferSize = 1024*1024*4;
     const QnUuid kWriterPoolId = QnUuid::createUuid();
     std::vector<FileTestData> files;
@@ -205,12 +205,12 @@ TEST(BufferedFileWriter, AdaptiveBufferSize)
     // seek in memory range
     for (size_t i = 0; i < kFileCount; ++i)
     {
-        files[i].file->write(QByteArray(kIoBlockSize + 1024, 'a'));
+        files[i].file->write(QByteArray(kIoBlockSize + kFfmpegBufferSize, 'a'));
         files[i].file->seek(kIoBlockSize + 5);
         // to force a real seek
         files[i].file->write("b", 1);
         // seek back
-        files[i].file->seek(kIoBlockSize + 1024 -1);
+        files[i].file->seek(kIoBlockSize + kFfmpegBufferSize -1);
         files[i].file->write("b", 1);
         // No seeks in physical file should have been made so far
         ASSERT_TRUE(bufferManager.getRecToSize().empty());
@@ -221,7 +221,7 @@ TEST(BufferedFileWriter, AdaptiveBufferSize)
         files[i].file->seek(kIoBlockSize - 5);
         // real seek attempt is made only on write
         files[i].file->write(QByteArray(3, 'b'));
-        files[i].file->seek(kIoBlockSize + 1024 - 1);
+        files[i].file->seek(kIoBlockSize + kFfmpegBufferSize - 1);
         // to force a real seek
         files[i].file->write("b", 1);
         // Two seeks in physical file have been made.
@@ -234,7 +234,7 @@ TEST(BufferedFileWriter, AdaptiveBufferSize)
             bufferManager.getSizeForCam(
                 QnServer::HiQualityCatalog,
                 files[i].mediaDeviceId),
-            4096);
+            4 * kFfmpegBufferSize);
     }
     // Now seeks within (fileEndPos - 4096, fileEndPos) range
     // should not trigger physical seeks and therefore no seekDetected
@@ -252,7 +252,7 @@ TEST(BufferedFileWriter, AdaptiveBufferSize)
             bufferManager.getSizeForCam(
                 QnServer::HiQualityCatalog,
                 files[i].mediaDeviceId),
-            4096);
+            4 * kFfmpegBufferSize);
     }
     // On QBufferedFile object destruction signal should be emitted
     // with a net effect of deleting corresponding record
@@ -285,13 +285,54 @@ TEST(BufferedFileWriter, VariousSizes)
                         std::shared_ptr<IQnFile>(new QnFile(kTestFileName)),
                         fileBlockSize,
                         minBufSize,
-                        1024*64,
+                        1024 * 64,
                         QnUuid::fromStringSafe("{33531ee9-c4c5-4a95-b708-25e3fa00ff5f}")
                     ));
-
+#ifdef Q_OS_WIN
+                testFile->setSystemFlags(FILE_FLAG_NO_BUFFERING);
+#endif
                 ASSERT_TRUE(testFile->open(QIODevice::WriteOnly));
 
                 std::vector<char> testData(testDataSize);
                 testFile->writeData(testData.data(), testData.size());
+                auto totalDataSize = testFile->pos();
+                testFile->seek(0);
+                testFile->writeData(testData.data(), testData.size());
+
+                auto halfDataSize = testData.size() / 2;
+                testFile->seek(totalDataSize - halfDataSize);
+                testFile->writeData(testData.data(), halfDataSize);
             }
+}
+
+TEST(BufferedFileWriter, seekBeforeEnd)
+{
+    QnWriterPool writerPool;
+
+    const QByteArray kTestFileName("test_data1.bin");
+    QFile::remove(kTestFileName);
+
+    static const int kBlockSize = 1024 * 64;
+
+    std::unique_ptr<QBufferedFile> testFile(
+        new QBufferedFile(
+            std::shared_ptr<IQnFile>(new QnFile(kTestFileName)),
+            kBlockSize,
+            kBlockSize,
+            kBlockSize,
+            QnUuid::fromStringSafe("{33531ee9-c4c5-4a95-b708-25e3fa00ff5f}")
+        ));
+#ifdef Q_OS_WIN
+    testFile->setSystemFlags(FILE_FLAG_NO_BUFFERING);
+#endif
+    ASSERT_TRUE(testFile->open(QIODevice::WriteOnly));
+
+    std::vector<char> testData(1024 * 128);
+    testFile->writeData(testData.data(), testData.size());
+
+    auto totalDataSize = testFile->pos();
+    testFile->seek(totalDataSize - kBlockSize - 1);
+    testFile->writeData(testData.data(), testData.size()); //< Write last block which extends file size
+    ASSERT_EQ(testData.size() * 2 - kBlockSize - 1, testFile->size());
+    testFile->close();
 }

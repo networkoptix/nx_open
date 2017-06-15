@@ -55,7 +55,7 @@
 
     <profiles>
         <profile>
-            <id>linux-isd-jaguar</id>
+            <id>linux-edge1</id>
             <activation>
                 <activeByDefault>false</activeByDefault>
                 <os>
@@ -64,27 +64,7 @@
                 </os>
                 <property>
                     <name>box</name>
-                    <value>isd</value>
-                </property>
-            </activation>
-            <properties>
-                <linux.oslibs>-ldl -lldap</linux.oslibs>
-                <rdep.linux.arm.packages>sasl2 openldap libcreateprocess</rdep.linux.arm.packages>
-                <rdep.linux.packages/>
-            </properties>
-        </profile>
-
-        <profile>
-            <id>linux-isd-s2</id>
-            <activation>
-                <activeByDefault>false</activeByDefault>
-                <os>
-                    <family>unix</family>
-                    <name>linux</name>
-                </os>
-                <property>
-                    <name>box</name>
-                    <value>isd_s2</value>
+                    <value>edge1</value>
                 </property>
             </activation>
             <properties>

@@ -12,8 +12,9 @@
 #include <transaction/transaction.h>
 
 #include <api/global_settings.h>
-#include <cloud_db_client/src/cdb_request_path.h>
+#include <nx/cloud/cdb/client/cdb_request_path.h>
 #include <utils/common/app_info.h>
+#include <transaction/abstract_transaction_transport.h>
 
 namespace nx {
 namespace cdb {
@@ -129,9 +130,8 @@ api::ResultCode Ec2MserverCloudSynchronization::unbindSystem()
         adminUserId,
         "cloudAuthKey",
         QString()));
-    ::ec2::ApiResourceParamWithRefDataList outParams;
     if (m_appserver2.moduleInstance()->ecConnection()->getResourceManager(Qn::kSystemAccess)
-            ->saveSync(params, &outParams) != ::ec2::ErrorCode::ok)
+            ->saveSync(params) != ::ec2::ErrorCode::ok)
     {
         return api::ResultCode::unknownError;
     }
@@ -178,9 +178,8 @@ api::ResultCode Ec2MserverCloudSynchronization::saveCloudSystemCredentials(
         adminUserId,
         "cloudAuthKey",
         QString::fromStdString(m_system.authKey)));
-    ::ec2::ApiResourceParamWithRefDataList outParams;
     if (m_appserver2.moduleInstance()->ecConnection()->getResourceManager(Qn::kSystemAccess)
-            ->saveSync(params, &outParams) != ::ec2::ErrorCode::ok)
+            ->saveSync(params) != ::ec2::ErrorCode::ok)
     {
         return api::ResultCode::unknownError;
     }
@@ -208,12 +207,12 @@ QUrl Ec2MserverCloudSynchronization::cdbEc2TransactionUrl() const
 
 void Ec2MserverCloudSynchronization::establishConnectionBetweenVmsAndCloud()
 {
-    appserver2()->moduleInstance()->ecConnection()->addRemotePeer(cdbEc2TransactionUrl());
+    appserver2()->moduleInstance()->ecConnection()->addRemotePeer(::ec2::kCloudPeerId, cdbEc2TransactionUrl());
 }
 
 void Ec2MserverCloudSynchronization::breakConnectionBetweenVmsAndCloud()
 {
-    appserver2()->moduleInstance()->ecConnection()->deleteRemotePeer(cdbEc2TransactionUrl());
+    appserver2()->moduleInstance()->ecConnection()->deleteRemotePeer(::ec2::kCloudPeerId);
 }
 
 void Ec2MserverCloudSynchronization::verifyTransactionConnection()

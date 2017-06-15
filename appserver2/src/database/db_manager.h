@@ -21,6 +21,8 @@
 #include "core/resource_access/user_access_data.h"
 #include "core/resource_access/resource_access_manager.h"
 #include "core/resource/user_resource.h"
+#include <database/api/db_resource_api.h>
+#include <nx/fusion/serialization/sql.h>
 
 struct BeforeRestoreDbData;
 
@@ -70,8 +72,15 @@ public:
 
 class QnDbManagerAccess;
 
+enum class TransactionLockType
+{
+    Regular, //< do commit as soon as commit() function called
+    Lazy //< delay commit unless regular commit() called
+};
+
 namespace detail
 {
+
     class QnDbManager
     :
         public QObject,
@@ -142,6 +151,18 @@ namespace detail
             return doQueryNoLock(t1, t2);
         }
 
+        template <class OutputData>
+        ErrorCode execSqlQuery(const QString& queryStr, OutputData* outputData)
+        {
+            QnWriteLocker lock(&m_mutex);
+            QSqlQuery query(m_sdb);
+            query.setForwardOnly(true);
+            if (!prepareSQLQuery(&query, queryStr, Q_FUNC_INFO) || !query.exec())
+                return ErrorCode::dbError;
+            QnSql::fetch_many(query, outputData);
+            return ErrorCode::ok;
+        }
+
         //getCurrentTime
         ErrorCode doQuery(const nullptr_t& /*dummy*/, ApiTimeData& currentTime);
 
@@ -169,11 +190,10 @@ namespace detail
 
         //!Reads settings (properties of user 'admin')
 
-        virtual QnDbTransaction* getTransaction() override;
-
         void setTransactionLog(QnTransactionLog* tranLog);
         void setTimeSyncManager(TimeSynchronizationManager* timeSyncManager);
         QnTransactionLog* transactionLog() const;
+        virtual bool tuneDBAfterOpen(QSqlDatabase* const sqlDb) override;
 
     signals:
         //!Emitted after \a QnDbManager::init was successfully executed
@@ -568,7 +588,7 @@ namespace detail
         qint32 getBusinessRuleInternalId( const QnUuid& guid );
 
         bool isReadOnly() const { return m_dbReadOnly; }
-    private:
+    public:
         class QnDbTransactionExt: public QnDbTransaction
         {
         public:
@@ -578,16 +598,41 @@ namespace detail
                 QnReadWriteLock& mutex)
                 :
                 QnDbTransaction(database, mutex),
-                m_tranLog(tranLog)
+                m_tranLog(tranLog),
+                m_lazyTranInProgress(false)
             {
             }
 
             virtual bool beginTran() override;
             virtual void rollback() override;
             virtual bool commit() override;
+
+            bool beginLazyTran();
+            bool commitLazyTran();
         private:
+            void physicalCommitLazyData();
+        private:
+            friend class QnLazyTransactionLocker;
+            friend class QnDbManager; //< Owner
+
             QnTransactionLog* m_tranLog;
+            bool m_lazyTranInProgress;
         };
+
+        class QnLazyTransactionLocker: public QnAbstractTransactionLocker
+        {
+        public:
+            QnLazyTransactionLocker(QnDbTransactionExt* tran);
+            virtual ~QnLazyTransactionLocker();
+            virtual bool commit() override;
+
+        private:
+            bool m_committed;
+            QnDbTransactionExt* m_tran;
+        };
+
+        virtual QnDbTransactionExt* getTransaction() override;
+    private:
 
         enum GuidConversionMethod {CM_Default, CM_Binary, CM_MakeHash, CM_String, CM_INT};
 
@@ -651,6 +696,7 @@ namespace detail
         bool resyncIfNeeded(ResyncFlags flags);
 
         QString getDatabaseName(const QString& baseName);
+        void resetPreparedStatements();
     private:
         QnUuid m_storageTypeId;
         QnUuid m_serverTypeId;
@@ -676,7 +722,14 @@ namespace detail
         ResyncFlags m_resyncFlags;
         QnTransactionLog* m_tranLog;
         TimeSynchronizationManager* m_timeSyncManager;
+
+        std::unique_ptr<QSqlQuery> m_insCameraQuery;
+        std::unique_ptr<QSqlQuery> m_cameraUserAttrQuery;
+        std::unique_ptr<QSqlQuery> m_insCameraScheduleQuery;
+        std::unique_ptr<QSqlQuery> m_kvPairQuery;
+        ec2::database::api::Context m_resourceContext;
     };
+
 } // namespace detail
 
 class QnDbManagerAccess
@@ -725,29 +778,7 @@ public:
         return ErrorCode::ok;
     }
 
-    ErrorCode readApiFullInfoDataForMobileClient(ApiFullInfoData* data, const QnUuid& userId)
-    {
-        const ErrorCode errorCode =
-            m_dbManager->readApiFullInfoDataForMobileClient(data, userId);
-        if (errorCode != ErrorCode::ok)
-            return errorCode;
-
-        filterData(data->servers);
-        filterData(data->serversUserAttributesList);
-        filterData(data->cameras);
-        filterData(data->cameraUserAttributesList);
-        filterData(data->users);
-        filterData(data->userRoles);
-        filterData(data->userRoles);
-        filterData(data->accessRights);
-        filterData(data->layouts);
-        filterData(data->cameraHistory);
-        filterData(data->discoveryData);
-        filterData(data->allProperties);
-        filterData(data->resStatusList);
-
-        return ErrorCode::ok;
-    }
+    ErrorCode readApiFullInfoDataForMobileClient(ApiFullInfoData* data, const QnUuid& userId);
 
     QnDbHelper::QnDbTransaction* getTransaction();
     ApiObjectType getObjectTypeNoLock(const QnUuid& objectId);

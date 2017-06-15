@@ -1,6 +1,6 @@
 "use strict";
 angular.module('nxCommon')
-    .directive('cameraPanel', function () {
+    .directive('cameraPanel', ['$localStorage',function ($localStorage) {
         return {
             restrict: 'E',
             scope:{
@@ -10,22 +10,23 @@ angular.module('nxCommon')
                 "currentResolution": "=",
                 "toggleCameraPanel": "="
             },
-            templateUrl: 'views/components/cameraPanel.html',
+            templateUrl: Config.viewsDirCommon + 'components/cameraPanel.html',
             link: function (scope, element/*, attrs*/) {
                 scope.Config = Config;
-                scope.searchCams = "";
+                scope.storage = $localStorage;
+                scope.searchCams = '';
+                scope.inputPlaceholder = L.common.searchCamPlaceholder;
 
                 var updateCameras = function(){
                     scope.cameras = scope.camerasProvider.cameras;
+                    searchCams();
                 };
                 var updateMediaServers = function(){
                     scope.mediaServers = scope.camerasProvider.getMediaServers();
                 };
 
-                scope.camerasProvider.setSearchCams(searchCams);
-
-                scope.$watch('camerasProvider.cameras',updateCameras);
-                scope.$watch('camerasProvider.mediaServers',updateMediaServers);
+                scope.$watch('camerasProvider.cameras',updateCameras, true);
+                scope.$watch('camerasProvider.mediaServers',updateMediaServers, true);
                 
 
                 scope.selectCamera = function (activeCamera) {
@@ -68,4 +69,4 @@ angular.module('nxCommon')
                 scope.$watch('searchCams',searchCams);
             }   
         };
-    });
+    }]);

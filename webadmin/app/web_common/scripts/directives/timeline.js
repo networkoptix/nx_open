@@ -16,7 +16,7 @@ angular.module('nxCommon')
                 volumeLevel: '=',
                 serverTime: '='
             },
-            templateUrl: 'views/components/timeline.html',
+            templateUrl: Config.viewsDirCommon + 'components/timeline.html',
             link: function (scope, element/*, attrs*/) {
                 /**
                  * This is main timeline module.
@@ -55,12 +55,16 @@ angular.module('nxCommon')
 
                 var debugEventsMode = Config.debug.chunksOnTimeline && Config.allowDebugMode;
 
-                scope.disableVolume = Config.settingsConfig.disableVolume;
+                scope.disableVolume = Config.webclient.disableVolume;
 
                 // !!! Read basic parameters, DOM elements and global objects for module
                 var viewport = element.find('.viewport');
                 var $canvas = element.find('canvas');
                 var canvas = $canvas.get(0);
+
+                scope.toggleActive = function(){
+                    scope.activeVolume = !scope.activeVolume;
+                };
 
 
                 var timelineConfig = TimelineConfig();
@@ -73,7 +77,7 @@ angular.module('nxCommon')
                     timelineConfig.zoomAccuracyMs,
                     timelineConfig.lastMinuteDuration,
                     timelineConfig.minPixelsPerLevel,
-                    Config.settingsConfig.useServerTime,
+                    Config.webclient.useServerTime,
                     $q); //Init boundariesProvider
 
                 var animationState = {
@@ -128,6 +132,10 @@ angular.module('nxCommon')
 
                     timelineActions.updateState();
                     timelineRender.Draw( mouseXOverTimeline, mouseYOverTimeline, timelineActions.scrollingNow, timelineActions.catchScrollBar);
+
+                    if(scope.loading){
+                        scope.loading = false;
+                    }
                 }
 
 
@@ -445,6 +453,7 @@ angular.module('nxCommon')
                         scope.recordsProvider.ready.then(initTimeline);// reinit timeline here
                         scope.recordsProvider.archiveReadyPromise.then(function(hasArchive){
                             scope.emptyArchive = !hasArchive;
+                            scope.loading = hasArchive;
                         });
 
                         timelineRender.setRecordsProvider(scope.recordsProvider);
@@ -453,14 +462,21 @@ angular.module('nxCommon')
 
                 // !!! Finally run required functions to initialize timeline
                 updateTimelineHeight();
-                updateTimelineWidth(); // Adjust width
+                $timeout(updateTimelineWidth); // Adjust width
                 initTimeline(); // Setup boundaries and scale
 
                 // !!! Start drawing
                 animateScope.setDuration(timelineConfig.animationDuration);
                 animateScope.setScope(scope);
                 animateScope.start(render);
-                scope.$on('$destroy', function() { animateScope.stopScope(scope); });
+
+                //scope.scaleManager is set to null so that the garbage collecter cleans the object
+                scope.$on('$destroy', function() {
+                    $( window ).unbind('resize', updateTimelineWidth);
+                    animateScope.stopScope(scope);
+                    animateScope.stopHandler(render);
+                    scope.scaleManager = null;
+                });
             }
         };
     }]);

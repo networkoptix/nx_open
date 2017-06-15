@@ -2,7 +2,7 @@
 
 #include <nx/utils/thread/sync_queue.h>
 
-#include <ec2/compatible_ec2_protocol_version.h>
+#include <nx/cloud/cdb/ec2/compatible_ec2_protocol_version.h>
 
 #include "mserver_cloud_synchronization_connection_fixture.h"
 

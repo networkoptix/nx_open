@@ -20,7 +20,7 @@ void setUseAlternativeGuid(bool value);
 class QnCommonModule;
 
 namespace ec2 {
-    class QnTransactionMessageBus;
+    class QnTransactionMessageBusBase;
     class AbstractECConnection;
 }
 
@@ -127,7 +127,7 @@ struct ConfigureSystemData : public PasswordData
 */
 bool changeLocalSystemId(
     const ConfigureSystemData& data,
-    ec2::QnTransactionMessageBus* messageBus);
+    ec2::QnTransactionMessageBusBase* messageBus);
 
 /**
  * Auto detect HTTP content type based on message body

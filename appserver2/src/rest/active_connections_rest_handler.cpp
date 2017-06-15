@@ -4,34 +4,18 @@
 #include <nx/fusion/model_functions.h>
 
 QnActiveConnectionsRestHandler::QnActiveConnectionsRestHandler(
-    const ec2::QnTransactionMessageBus* messageBus):
+    const ec2::QnTransactionMessageBusBase* messageBus):
     QnJsonRestHandler(),
     m_messageBus(messageBus)
 {
 }
 
 int QnActiveConnectionsRestHandler::executeGet(
-    const QString &path,
-    const QnRequestParams &params,
-    QnJsonRestResult &result,
-    const QnRestConnectionProcessor *)
+    const QString& /*path*/,
+    const QnRequestParams& /*params*/,
+    QnJsonRestResult& result,
+    const QnRestConnectionProcessor* /*owner*/)
 {
-    Q_UNUSED(path)
-    Q_UNUSED(params)
-
-    QList<ec2::QnTransportConnectionInfo> connectionsInfo = m_messageBus->connectionsInfo();
-
-    QJsonArray connections;
-    for (const ec2::QnTransportConnectionInfo &info: connectionsInfo) {
-        QJsonObject map;
-        map.insert(lit("type"), info.incoming ? lit("incoming") : lit("outgoing"));
-        map.insert(lit("url"), info.url.toString());
-        map.insert(lit("remotePeerId"), info.remotePeerId.toString());
-        map.insert(lit("state"), ec2::QnTransactionTransport::toString(info.state));
-        connections.append(map);
-    }
-
-    result.setReply(connections);
-
+    result.setReply(m_messageBus->connectionsInfo());
     return nx_http::StatusCode::ok;
 }

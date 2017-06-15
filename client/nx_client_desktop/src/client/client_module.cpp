@@ -157,9 +157,8 @@ namespace
     }
 }
 
-QnClientModule::QnClientModule(const QnStartupParameters &startupParams
-                               , QObject *parent)
-    : QObject(parent)
+QnClientModule::QnClientModule(const QnStartupParameters& startupParams, QObject* parent):
+    QObject(parent)
 {
     initThread();
     initMetaInfo();
@@ -272,6 +271,8 @@ void QnClientModule::initSingletons(const QnStartupParameters& startupParams)
 
     m_staticCommon.reset(new QnStaticCommonModule(clientPeerType, brand, customization));
 
+    m_clientCoreModule.reset(new QnClientCoreModule());
+
     /* Just to feel safe */
     QScopedPointer<QnClientSettings> clientSettingsPtr(new QnClientSettings(startupParams.forceLocalSettings));
     QnClientSettings* clientSettings = clientSettingsPtr.data();
@@ -287,7 +288,6 @@ void QnClientModule::initSingletons(const QnStartupParameters& startupParams)
 
     /* Init singletons. */
 
-    m_clientCoreModule.reset(new QnClientCoreModule());
     auto commonModule = m_clientCoreModule->commonModule();
 
     commonModule->store(new QnResourceRuntimeDataManager());
@@ -339,7 +339,7 @@ void QnClientModule::initSingletons(const QnStartupParameters& startupParams)
 
     /* Just to feel safe */
     commonModule->store(new QnCloudConnectionProvider());
-    commonModule->instance<QnCloudStatusWatcher>();
+    m_cloudStatusWatcher = commonModule->store(new QnCloudStatusWatcher(commonModule, /*isMobile*/ false));
 
     //NOTE:: QNetworkProxyFactory::setApplicationProxyFactory takes ownership of object
     m_networkProxyFactory = new QnNetworkProxyFactory(commonModule);
@@ -577,4 +577,9 @@ void QnClientModule::initLocalResources(const QnStartupParameters& startupParams
     }
     resourceDiscoveryManager->setReady(true);
     commonModule->store(new QnSystemsWeightsManager());
+}
+
+QnCloudStatusWatcher* QnClientModule::cloudStatusWatcher() const
+{
+    return m_cloudStatusWatcher;
 }

@@ -28,15 +28,13 @@ MessageBodyConverterFactory& MessageBodyConverterFactory::instance()
 std::unique_ptr<AbstractMessageBodyConverter> 
     MessageBodyConverterFactory::defaultFactoryFunction(
         const nx::String& proxyHost,
-        const TargetHost& targetHost,
+        const nx::String& targetHost,
         const nx::String& contentType)
 {
     if (contentType == nx_http::kApplicationMpegUrlMimeType ||
         contentType == nx_http::kAudioMpegUrlMimeType)
     {
-        return std::make_unique<M3uPlaylistConverter>(
-            proxyHost,
-            targetHost.target.toString().toUtf8());
+        return std::make_unique<M3uPlaylistConverter>(proxyHost, targetHost);
     }
 
     return nullptr;

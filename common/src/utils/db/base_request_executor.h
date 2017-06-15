@@ -8,7 +8,6 @@
 #include <nx/utils/thread/joinable.h>
 #include <nx/utils/thread/long_runnable.h>
 #include <nx/utils/thread/stoppable.h>
-#include <utils/common/threadqueue.h>
 
 #include "request_executor.h"
 

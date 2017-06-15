@@ -12,6 +12,7 @@
 
 #include <business/business_event_rule.h>
 #include <business/business_strings_helper.h>
+#include <business/event_rule_manager.h>
 
 #include <camera/resource_display.h>
 #include <camera/cam_display.h>
@@ -318,8 +319,7 @@ QnMediaResourceWidget::QnMediaResourceWidget(QnWorkbenchContext* context, QnWork
     connect(navigator(), &QnWorkbenchNavigator::bookmarksModeEnabledChanged, this,
         &QnMediaResourceWidget::updateCompositeOverlayMode);
 
-    const auto messageProcessor = qnCommonMessageProcessor;
-    connect(messageProcessor, &QnCommonMessageProcessor::businessActionReceived, this,
+    connect(qnCommonMessageProcessor, &QnCommonMessageProcessor::businessActionReceived, this,
         [this](const QnAbstractBusinessActionPtr &businessAction)
         {
             if (businessAction->actionType() != QnBusiness::ExecutePtzPresetAction)
@@ -457,14 +457,16 @@ QnMediaResourceWidget::QnMediaResourceWidget(QnWorkbenchContext* context, QnWork
 
     resetTriggers();
 
-    connect(messageProcessor, &QnCommonMessageProcessor::businessRuleReset,
+    auto eventRuleManager = commonModule()->eventRuleManager();
+
+    connect(eventRuleManager, &QnEventRuleManager::rulesReset,
         this, &QnMediaResourceWidget::resetTriggers);
 
-    connect(messageProcessor, &QnCommonMessageProcessor::businessRuleChanged,
-        this, &QnMediaResourceWidget::at_businessRuleChanged);
+    connect(eventRuleManager, &QnEventRuleManager::ruleAddedOrUpdated,
+        this, &QnMediaResourceWidget::at_eventRuleAddedOrUpdated);
 
-    connect(messageProcessor, &QnCommonMessageProcessor::businessRuleDeleted,
-        this, &QnMediaResourceWidget::at_businessRuleDeleted);
+    connect(eventRuleManager, &QnEventRuleManager::ruleRemoved,
+        this, &QnMediaResourceWidget::at_eventRuleRemoved);
 
     connect(this, &QnMediaResourceWidget::updateInfoTextLater, this,
         &QnMediaResourceWidget::updateCurrentUtcPosMs);
@@ -1740,7 +1742,7 @@ int QnMediaResourceWidget::calculateButtonsVisibility() const
 
 Qn::ResourceStatusOverlay QnMediaResourceWidget::calculateStatusOverlay() const
 {
-    if (qnRuntime->isVideoWallMode() && !QnVideoWallLicenseUsageHelper().isValid())
+    if (qnRuntime->isVideoWallMode() && !QnVideoWallLicenseUsageHelper(commonModule()).isValid())
         return Qn::VideowallWithoutLicenseOverlay;
 
     QnResourcePtr resource = m_display->resource();
@@ -2195,7 +2197,11 @@ void QnMediaResourceWidget::updateCompositeOverlayMode()
     const bool animate = m_compositeOverlay->scene() != nullptr;
     setOverlayWidgetVisible(m_compositeOverlay, visible, animate);
 
-    m_triggersContainer->setEnabled(isLive);
+    for (int i = 0; i < m_triggersContainer->count(); ++i)
+    {
+        if (auto button = qobject_cast<QnSoftwareTriggerButton*>(m_triggersContainer->item(i)))
+            button->setLive(isLive);
+    }
 }
 
 qint64 QnMediaResourceWidget::getUtcCurrentTimeUsec() const
@@ -2380,6 +2386,9 @@ void QnMediaResourceWidget::configureTriggerButton(QnSoftwareTriggerButton* butt
         connect(button, &QnSoftwareTriggerButton::pressed, this,
             [this, button, resultHandler, id = info.triggerId]()
             {
+                if (!button->isLive())
+                    return;
+
                 const auto requestId = invokeTrigger(id, resultHandler, QnBusiness::ActiveState);
                 const bool success = requestId != rest::Handle();
                 button->setProperty(kTriggerRequestIdProperty, requestId);
@@ -2391,6 +2400,9 @@ void QnMediaResourceWidget::configureTriggerButton(QnSoftwareTriggerButton* butt
         connect(button, &QnSoftwareTriggerButton::released, this,
             [this, button, resultHandler, id = info.triggerId]()
             {
+                if (!button->isLive())
+                    return;
+
                 /* In case of activation error don't try to deactivate: */
                 if (button->state() == QnSoftwareTriggerButton::State::Failure)
                     return;
@@ -2408,6 +2420,9 @@ void QnMediaResourceWidget::configureTriggerButton(QnSoftwareTriggerButton* butt
         connect(button, &QnSoftwareTriggerButton::clicked, this,
             [this, button, resultHandler, id = info.triggerId]()
             {
+                if (!button->isLive())
+                    return;
+
                 const auto requestId = invokeTrigger(id, resultHandler);
                 const bool success = requestId != rest::Handle();
                 button->setProperty(kTriggerRequestIdProperty, requestId);
@@ -2417,6 +2432,16 @@ void QnMediaResourceWidget::configureTriggerButton(QnSoftwareTriggerButton* butt
                     : QnSoftwareTriggerButton::State::Failure);
             });
     }
+
+    // Go-to-live handler.
+    connect(button, &QnSoftwareTriggerButton::clicked, this,
+        [this, button]()
+        {
+            if (button->isLive())
+                return;
+
+            action(action::JumpToLiveAction)->trigger();
+        });
 }
 
 void QnMediaResourceWidget::resetTriggers()
@@ -2432,11 +2457,11 @@ void QnMediaResourceWidget::resetTriggers()
         return;
 
     /* Create new relevant triggers: */
-    for (const auto& rule: qnCommonMessageProcessor->businessRules())
+    for (const auto& rule: commonModule()->eventRuleManager()->rules())
         createTriggerIfRelevant(rule); //< creates a trigger only if the rule is relevant
 }
 
-void QnMediaResourceWidget::at_businessRuleDeleted(const QnUuid& id)
+void QnMediaResourceWidget::at_eventRuleRemoved(const QnUuid& id)
 {
     const auto iter = m_softwareTriggers.find(id);
     if (iter == m_softwareTriggers.end())
@@ -2446,7 +2471,7 @@ void QnMediaResourceWidget::at_businessRuleDeleted(const QnUuid& id)
     m_softwareTriggers.erase(iter);
 };
 
-void QnMediaResourceWidget::at_businessRuleChanged(const QnBusinessEventRulePtr& rule)
+void QnMediaResourceWidget::at_eventRuleAddedOrUpdated(const QnBusinessEventRulePtr& rule)
 {
     const auto iter = m_softwareTriggers.find(rule->id());
     if (iter == m_softwareTriggers.end())
@@ -2457,7 +2482,7 @@ void QnMediaResourceWidget::at_businessRuleChanged(const QnBusinessEventRulePtr&
     else
     {
         /* Delete trigger: */
-        at_businessRuleDeleted(rule->id());
+        at_eventRuleRemoved(rule->id());
 
         /* Recreate trigger if the rule is still relevant: */
         createTriggerIfRelevant(rule);

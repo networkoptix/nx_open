@@ -672,11 +672,14 @@ QnTimeSlider::QnTimeSlider(QGraphicsItem* parent, QGraphicsItem* tooltipParent):
 
     setWindowStart(minimum());
     setWindowEnd(maximum());
-    QnTimeSlider::Options defaultOptions = StickToMinimum | StickToMaximum | PreserveWindowSize | UpdateToolTip | SelectionEditable | SnapZoomToSides | UnzoomOnDoubleClick;
+    QnTimeSlider::Options defaultOptions = StickToMinimum | StickToMaximum | PreserveWindowSize
+        | SelectionEditable | ClearSelectionOnClick | SnapZoomToSides | UnzoomOnDoubleClick
+        | UpdateToolTip;
 #ifdef TIMELINE_BEHAVIOR_2_5
     defaultOptions |= AdjustWindowToPosition;
 #else
-    defaultOptions |= StillPosition | HideLivePosition | LeftButtonSelection | DragScrollsWindow | StillBookmarksViewer;
+    defaultOptions |= StillPosition | HideLivePosition | LeftButtonSelection
+        | DragScrollsWindow | StillBookmarksViewer;
 #endif
     setOptions(defaultOptions);
 
@@ -2313,6 +2316,7 @@ bool QnTimeSlider::eventFilter(QObject* target, QEvent* event)
         {
         case QEvent::GraphicsSceneMousePress:
             m_dragDelta = toolTipItem()->tailPos() - static_cast<QGraphicsSceneMouseEvent*>(event)->pos();
+            m_dragMarker = DragMarker;
             dragProcessor()->mousePressEvent(toolTipItem(), static_cast<QGraphicsSceneMouseEvent*>(event), true);
             return true;
 
@@ -3217,6 +3221,8 @@ void QnTimeSlider::mousePressEvent(QGraphicsSceneMouseEvent* event)
             if (canSelect && m_dragMarker == NoMarker && !extendSelectionRequested)
                 m_dragMarker = CreateSelectionMarker;
             immediateDrag = (m_dragMarker == NoMarker) && !extendSelectionRequested;
+            if (m_dragMarker == NoMarker)
+                m_dragMarker = DragMarker; //TODO: #vkutin #3.2 Simplify all this logic!
             break;
 
         case Qt::RightButton:
@@ -3270,8 +3276,11 @@ void QnTimeSlider::mouseReleaseEvent(QGraphicsSceneMouseEvent* event)
 
     dragProcessor()->mouseReleaseEvent(this, event);
 
-    if (m_options.testFlag(LeftButtonSelection) && m_dragMarker == CreateSelectionMarker && !m_selectionInitiated)
+    if (m_options.testFlag(LeftButtonSelection) && m_options.testFlag(ClearSelectionOnClick)
+        && m_dragMarker == CreateSelectionMarker && !m_selectionInitiated)
+    {
         setSelectionValid(false);
+    }
 
     m_dragMarker = NoMarker;
 

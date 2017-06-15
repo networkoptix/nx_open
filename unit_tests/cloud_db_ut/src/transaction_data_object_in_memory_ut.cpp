@@ -2,12 +2,13 @@
 
 #include <nx/utils/test_support/utils.h>
 
-#include <ec2/dao/memory/transaction_data_object_in_memory.h>
-#include <ec2/data_conversion.h>
 #include <nx_ec/data/api_user_data.h>
 #include <transaction/transaction_descriptor.h>
-#include <test_support/business_data_generator.h>
 #include <utils/db/request_execution_thread.h>
+
+#include <nx/cloud/cdb/ec2/dao/memory/transaction_data_object_in_memory.h>
+#include <nx/cloud/cdb/ec2/data_conversion.h>
+#include <nx/cloud/cdb/test_support/business_data_generator.h>
 
 #include "base_persistent_data_test.h"
 

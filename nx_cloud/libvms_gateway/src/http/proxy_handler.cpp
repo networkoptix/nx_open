@@ -77,9 +77,7 @@ void ProxyHandler::sendResponse(
     if (responseMessage)
         *response() = std::move(*responseMessage);
 
-    decltype(m_requestCompletionHandler) handler;
-    handler.swap(m_requestCompletionHandler);
-    handler(std::move(requestResult));
+    nx::utils::swapAndCall(m_requestCompletionHandler, std::move(requestResult));
 }
 
 TargetHost ProxyHandler::cutTargetFromRequest(
@@ -219,8 +217,9 @@ void ProxyHandler::onConnected(
 
     if (errorCode != SystemError::noError)
     {
-        NX_DEBUG(this, lm("Failed to establish connection to %1 (path %2) with SSL=%3")
-            .args(targetAddress, m_request.requestLine.url, isSsl(m_targetPeerSocket)));
+        NX_DEBUG(this, lm("Failed to establish connection to %1 (path %2) with SSL=%3. %4")
+            .args(targetAddress, m_request.requestLine.url, isSsl(m_targetPeerSocket),
+                SystemError::toString(errorCode)));
 
         auto handler = std::move(m_requestCompletionHandler);
         return handler(
@@ -229,13 +228,14 @@ void ProxyHandler::onConnected(
                 : nx_http::StatusCode::serviceUnavailable);
     }
 
-    NX_VERBOSE(this, lm("Successfully established connection to %1(%2) (path %3) from %4 with SSL=%5")
+    NX_VERBOSE(this,
+        lm("Successfully established connection to %1(%2) (path %3) from %4 with SSL=%5")
         .args(targetAddress, m_targetPeerSocket->getForeignAddress(), m_request.requestLine.url,
             m_targetPeerSocket->getLocalAddress(), isSsl(m_targetPeerSocket)));
 
     m_targetPeerSocket->cancelIOSync(nx::network::aio::etNone);
-    m_requestProxyWorker = std::make_unique<RequestProxyWorker>(
-        m_targetHost,
+    m_requestProxyWorker = std::make_unique<ProxyWorker>(
+        m_targetHost.target.toString().toUtf8(),
         std::move(m_request),
         this,
         std::move(m_targetPeerSocket));

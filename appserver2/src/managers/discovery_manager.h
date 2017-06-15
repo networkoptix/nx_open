@@ -34,19 +34,13 @@ namespace ec2
             const Qn::UserAccessData &userAccessData);
         virtual ~QnDiscoveryManager();
 
+        virtual void monitorServerDiscovery() override;
+
     protected:
         virtual int discoverPeer(const QnUuid &id, const QUrl &url, impl::SimpleHandlerPtr handler) override;
         virtual int addDiscoveryInformation(const QnUuid &id, const QUrl &url, bool ignore, impl::SimpleHandlerPtr handler) override;
         virtual int removeDiscoveryInformation(const QnUuid &id, const QUrl &url, bool ignore, impl::SimpleHandlerPtr handler) override;
         virtual int getDiscoveryData(impl::GetDiscoveryDataHandlerPtr handler) override;
-        virtual int sendDiscoveredServer(
-            QnTransactionMessageBus* messageBus,
-            const ApiDiscoveredServerData &discoveredServer,
-            impl::SimpleHandlerPtr handler) override;
-        virtual int sendDiscoveredServersList(
-            QnTransactionMessageBus* messageBus,
-            const ApiDiscoveredServerDataList &discoveredServersList,
-            impl::SimpleHandlerPtr handler) override;
 
     private:
         QueryProcessorType* const m_queryProcessor;

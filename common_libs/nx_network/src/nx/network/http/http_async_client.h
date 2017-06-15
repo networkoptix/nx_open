@@ -21,7 +21,7 @@
 namespace nx_http {
 
 /**
- * Http client. All operations are done asynchronously.
+ * HTTP client. All operations are done asynchronously.
  *
  * All events (setOn...) are delivered within object's aio thread.
  * State is changed just before delivering event.

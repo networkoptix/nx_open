@@ -11,14 +11,17 @@ int QnRecordingBusinessAction::getFps() const {
     return m_params.fps;
 }
 
-Qn::StreamQuality QnRecordingBusinessAction::getStreamQuality() const {
+Qn::StreamQuality QnRecordingBusinessAction::getStreamQuality() const
+{
     return m_params.streamQuality;
 }
 
-int QnRecordingBusinessAction::getRecordDuration() const {
-    return m_params.recordingDuration;
+int QnRecordingBusinessAction::getDurationSec() const
+{
+    return m_params.durationMs / 1000;
 }
 
-int QnRecordingBusinessAction::getRecordAfter() const {
+int QnRecordingBusinessAction::getRecordAfterSec() const
+{
     return m_params.recordAfter;
 }

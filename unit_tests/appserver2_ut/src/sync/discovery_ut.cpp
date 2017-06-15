@@ -12,7 +12,7 @@
 
 static const std::chrono::milliseconds kDiscoveryTimeouts(100);
 size_t kInitialServerCount = 3;
-size_t kAditionalServerCount = 2;
+size_t kAdditionalServerCount = 2;
 
 class DiscoveryTest: public testing::Test
 {
@@ -28,6 +28,7 @@ protected:
 
         auto server = std::make_unique<MediaServer>();
         server->addArg(lit("--dbFile=%1").arg(tmpDir).toStdString().c_str());
+        server->addArg(lit("--disableAuth").toStdString().c_str());
         ASSERT_TRUE(server->startAndWaitUntilStarted());
 
         const auto module = server->moduleInstance().get();
@@ -48,10 +49,10 @@ protected:
     {
         QnSoftwareVersion version(1, 2, 3, 123);
         const auto connection = module->ecConnection();
-        ASSERT_TRUE(connection);
+        ASSERT_NE(nullptr, connection);
 
         const auto resourceManager = connection->getResourceManager(Qn::kSystemAccess);
-        ASSERT_TRUE(resourceManager);
+        ASSERT_NE(nullptr, resourceManager);
 
         QList<QnResourceTypePtr> resourceTypeList;
         ASSERT_EQ(ec2::ErrorCode::ok, resourceManager->getResourceTypesSync(&resourceTypeList));
@@ -70,9 +71,6 @@ protected:
         serverData.networkAddresses = module->endpoint().toString();
         serverData.version = version.toString();
 
-        auto serverManager = connection->getMediaServerManager(Qn::kSystemAccess);
-        ASSERT_EQ(ec2::ErrorCode::ok, serverManager->saveSync(serverData));
-
         QnModuleInformation information;
         information.type = QnModuleInformation::nxMediaServerId();
         information.id = serverData.id;
@@ -80,6 +78,9 @@ protected:
         information.version = version;
         information.runtimeId = module->commonModule()->runningInstanceGUID();
         module->commonModule()->setModuleInformation(information);
+
+        auto serverManager = connection->getMediaServerManager(Qn::kSystemAccess);
+        ASSERT_EQ(ec2::ErrorCode::ok, serverManager->saveSync(serverData));
     }
 
     void checkVisibility()
@@ -141,7 +142,7 @@ TEST_F(DiscoveryTest, main)
         addServer();
     checkVisibility();
 
-    for (size_t i = 0; i < kAditionalServerCount; ++i)
+    for (size_t i = 0; i < kAdditionalServerCount; ++i)
         addServer();
     checkVisibility();
 }

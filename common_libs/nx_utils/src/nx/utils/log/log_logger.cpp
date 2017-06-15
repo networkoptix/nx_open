@@ -29,6 +29,12 @@ void Logger::log(Level level, const QString& tag, const QString& message)
     if (!isToBeLogged(level, tag))
         return;
 
+    logForced(level, tag, message);
+}
+
+void Logger::logForced(Level level, const QString& tag, const QString& message)
+{
+    QnMutexLocker lock(&m_mutex);
     static const QString kTemplate = QLatin1String("%1 %2 %3 %4: %5");
     const auto output = kTemplate
         .arg(QDateTime::currentDateTime().toString("yyyy-MM-dd HH:mm:ss.zzz")).arg(thisThreadId(), 6)

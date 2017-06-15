@@ -21,6 +21,10 @@
 #include "settings.h"
 #include <transaction/transaction_log.h>
 #include <mutex/distributed_mutex_manager.h>
+#include <nx/p2p/p2p_message_bus.h>
+
+#include <transaction/json_transaction_serializer.h>
+#include <transaction/ubjson_transaction_serializer.h>
 
 namespace ec2 {
 
@@ -62,13 +66,23 @@ namespace ec2 {
 
         virtual void setConfParams(std::map<QString, QVariant> confParams) override;
 
-        virtual QnTransactionMessageBus* messageBus() const override;
+        virtual QnTransactionMessageBusBase* messageBus() const override;
         virtual QnDistributedMutexManager* distributedMutex() const override;
         virtual TimeSynchronizationManager* timeSyncManager() const override;
+
+        QnJsonTransactionSerializer* jsonTranSerializer() const;
+        QnUbjsonTransactionSerializer* ubjsonTranSerializer() const;
+
 private:
+    Settings m_settingsInstance;
+
+    std::unique_ptr<QnJsonTransactionSerializer> m_jsonTranSerializer;
+    std::unique_ptr<QnUbjsonTransactionSerializer> m_ubjsonTranSerializer;
+
     std::unique_ptr<detail::QnDbManager> m_dbManager;
     std::unique_ptr<QnTransactionLog> m_transactionLog;
-    std::unique_ptr<QnTransactionMessageBus> m_transactionMessageBus;
+    std::unique_ptr<QnTransactionMessageBusBase> m_bus;
+
     std::unique_ptr<TimeSynchronizationManager> m_timeSynchronizationManager;
     std::unique_ptr<ServerQueryProcessorAccess> m_serverQueryProcessor;
     std::unique_ptr<QnDistributedMutexManager> m_distributedMutexManager;
@@ -78,7 +92,6 @@ private:
 
     ClientQueryProcessor m_remoteQueryProcessor;
     QnMutex m_mutex;
-    Settings m_settingsInstance;
     Ec2DirectConnectionPtr m_directConnection;
 private:
     int establishDirectConnection(const QUrl& url, impl::ConnectHandlerPtr handler);

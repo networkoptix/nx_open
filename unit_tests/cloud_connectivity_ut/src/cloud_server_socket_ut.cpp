@@ -1,6 +1,7 @@
 #include <gtest/gtest.h>
 
 #include <nx/network/cloud/cloud_server_socket.h>
+#include <nx/network/cloud/tunnel/tunnel_acceptor_factory.h>
 #include <nx/network/socket_global.h>
 #include <nx/network/ssl_socket.h>
 #include <nx/network/system_socket.h>
@@ -265,19 +266,26 @@ TEST_F(CloudServerSocketTcpTest, OpenTunnelOnIndication)
         ::testing::_, ::testing::_)).Times(1);
     EXPECT_CALL(*stunAsyncClient, remoteAddress()).Times(::testing::AnyNumber());
 
-    std::vector<CloudServerSocket::AcceptorMaker> acceptorMakers;
-    acceptorMakers.push_back(
-        [&](hpm::api::ConnectionRequestedEvent)
+    auto tunnelAcceptorFactoryFuncBak =
+        TunnelAcceptorFactory::instance().setCustomFunc(
+            [&addressManager](hpm::api::ConnectionRequestedEvent)
+            {
+                std::vector<std::unique_ptr<AbstractTunnelAcceptor>> acceptors;
+                acceptors.push_back(std::make_unique<FakeTcpTunnelAcceptor>(addressManager));
+                return acceptors;
+            });
+    auto tunnelAcceptorFactoryGuard = makeScopeGuard(
+        [tunnelAcceptorFactoryFuncBak = std::move(tunnelAcceptorFactoryFuncBak)]() mutable
         {
-            return std::make_unique<FakeTcpTunnelAcceptor>(addressManager);
+            TunnelAcceptorFactory::instance().setCustomFunc(
+                std::move(tunnelAcceptorFactoryFuncBak));
         });
 
     auto server = std::make_unique<CloudServerSocket>(
         std::make_unique<hpm::api::MediatorServerTcpConnection>(
             stunAsyncClient,
             &nx::network::SocketGlobals::mediatorConnector()),
-        nx::network::RetryPolicy(),
-        std::move(acceptorMakers));
+        nx::network::RetryPolicy());
     ASSERT_TRUE(server->setNonBlockingMode(true));
     ASSERT_TRUE(server->listen(1));
     server->moveToListeningState();
@@ -344,21 +352,24 @@ protected:
             ::testing::_, ::testing::_)).Times(1);
         EXPECT_CALL(*m_stunClient, remoteAddress()).Times(::testing::AnyNumber());
 
-        std::vector<CloudServerSocket::AcceptorMaker> acceptorMakers;
-        acceptorMakers.push_back(
-            [this](hpm::api::ConnectionRequestedEvent event)
-            {
-                SocketAddress address(QLatin1String(event.originatingPeerID));
-                return std::make_unique<FakeTcpTunnelAcceptor>(
-                    network::test::AddressBinder::Manager(
-                        &m_addressBinder, std::move(address)));
-            });
+        m_tunnelAcceptorFactoryFuncBak =
+            TunnelAcceptorFactory::instance().setCustomFunc(
+                [this](hpm::api::ConnectionRequestedEvent event)
+                {
+                    std::vector<std::unique_ptr<AbstractTunnelAcceptor>> acceptors;
+            
+                    SocketAddress address(QLatin1String(event.originatingPeerID));
+                    auto acceptor = std::make_unique<FakeTcpTunnelAcceptor>(
+                        network::test::AddressBinder::Manager(
+                            &m_addressBinder, std::move(address)));
+                    acceptors.push_back(std::move(acceptor));
+                    return acceptors;
+                });
 
         auto cloudServerSocket = std::make_unique<CloudServerSocket>(
             std::make_unique<hpm::api::MediatorServerTcpConnection>(
                 m_stunClient, &SocketGlobals::mediatorConnector()),
-            nx::network::RetryPolicy(),
-            std::move(acceptorMakers));
+            nx::network::RetryPolicy());
         ASSERT_TRUE(cloudServerSocket->setNonBlockingMode(true));
         ASSERT_TRUE(cloudServerSocket->listen(10));
         cloudServerSocket->moveToListeningState();
@@ -519,6 +530,9 @@ protected:
         EXPECT_GE(m_acceptedSockets.size(), kTotalConnects);
         for (auto& socket : m_acceptedSockets)
             socket->pleaseStopSync();
+
+        TunnelAcceptorFactory::instance().setCustomFunc(
+            std::move(m_tunnelAcceptorFactoryFuncBak));
     }
 
     network::test::AddressBinder m_addressBinder;
@@ -532,6 +546,7 @@ protected:
     QnMutex m_mutex;
     std::vector<std::unique_ptr<AbstractStreamSocket>> m_acceptedSockets;
     std::map<void*, std::unique_ptr<AbstractStreamSocket>> m_connectSockets;
+    TunnelAcceptorFactory::Function m_tunnelAcceptorFactoryFuncBak;
 };
 
 TEST_F(CloudServerSocketStressTcpTest, SingleThread)
@@ -772,7 +787,7 @@ protected:
 
     void assertCloudCredentialsHaveBeenProvidedToCustomAcceptors()
     {
-        ASSERT_TRUE(m_providedCloudCredentials);
+        ASSERT_TRUE(static_cast<bool>(m_providedCloudCredentials));
         ASSERT_EQ(
             SocketGlobals::mediatorConnector().getSystemCredentials(),
             *m_providedCloudCredentials);

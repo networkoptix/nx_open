@@ -42,7 +42,7 @@ static int checkPermissions(
     Qn::GlobalPermission requiredPermission = Qn::GlobalViewBookmarksPermission;
     if (isModifyingOperation(op))
     {
-        if (QnPermissionsHelper::isSafeMode())
+        if (QnPermissionsHelper::isSafeMode(commonModule))
         {
             const QnMultiserverRequestData request(commonModule->resourcePool(), params);
             return QnPermissionsHelper::safeModeError(

@@ -11,6 +11,7 @@ class QGLWidget;
 class QnClientCoreModule;
 class QnNetworkProxyFactory;
 class QnStaticCommonModule;
+class QnCloudStatusWatcher;
 
 class QnClientModule: public QObject, public Singleton<QnClientModule>
 {
@@ -24,7 +25,7 @@ public:
     void startLocalSearchers();
 
     QnNetworkProxyFactory* networkProxyFactory() const;
-
+    QnCloudStatusWatcher* cloudStatusWatcher() const;
 private:
     void initApplication();
     void initThread();
@@ -40,6 +41,7 @@ private:
     QScopedPointer<QnStaticCommonModule> m_staticCommon;
     QScopedPointer<QnClientCoreModule> m_clientCoreModule;
     QnNetworkProxyFactory* m_networkProxyFactory;
+    QnCloudStatusWatcher* m_cloudStatusWatcher;
 };
 
 #define qnClientModule QnClientModule::instance()

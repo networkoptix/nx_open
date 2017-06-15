@@ -1,9 +1,13 @@
-add_library(nx_kit
+set(library_type)
+if(WIN32)
+    set(library_type SHARED)
+endif()
+
+add_library(nx_kit ${library_type}
     ${CMAKE_CURRENT_LIST_DIR}/src/nx/kit/debug.cpp
     ${CMAKE_CURRENT_LIST_DIR}/src/nx/kit/ini_config.cpp
     ${CMAKE_CURRENT_LIST_DIR}/src/nx/kit/test.cpp
 )
-
 target_include_directories(nx_kit
     PUBLIC ${CMAKE_CURRENT_LIST_DIR}/src)
 

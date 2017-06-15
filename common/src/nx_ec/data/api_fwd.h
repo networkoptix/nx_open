@@ -44,7 +44,7 @@ namespace ec2 {
     struct ApiResourceTypeData;
     struct ApiScheduleTaskData;
     struct ApiScheduleTaskWithRefData;
-    struct QnTranStateKey;
+    struct ApiPersistentIdData;
     struct QnTranState;
     struct QnTranStateResponse;
     struct ApiSyncRequestData;
@@ -89,6 +89,7 @@ namespace ec2 {
     typedef std::vector<ApiPeerSystemTimeData> ApiPeerSystemTimeDataList;
 
     struct ApiPeerData;
+    struct ApiPeerDataEx;
     struct ApiRuntimeData;
 
     struct ApiDatabaseDumpData;
@@ -179,7 +180,7 @@ namespace ec2 {
     (ApiResourceTypeData)\
     (ApiScheduleTaskData)\
     (ApiScheduleTaskWithRefData)\
-    (QnTranStateKey)\
+    (ApiPersistentIdData)\
     (QnTranState)\
     (ApiSyncRequestData)\
     (QnTranStateResponse)\
@@ -214,6 +215,7 @@ namespace ec2 {
     (ApiTimeData)\
     (ApiMiscData)\
     (ApiPeerData)\
+    (ApiPeerDataEx)\
     (ApiRuntimeData)\
     (ApiDatabaseDumpData)\
     (ApiDatabaseDumpToFileData)\

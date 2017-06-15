@@ -87,6 +87,16 @@ public:
     };
     Q_DECLARE_FLAGS(AspectRatioFlags, AspectRatioFlag)
 
+    enum class SelectionState
+    {
+        invalid,
+        notSelected,
+        inactiveFocused,
+        focused,
+        selected,
+        focusedAndSelected,
+    };
+
     /**
      * Constructor.
      *
@@ -258,8 +268,11 @@ signals:
     void rotationStartRequested();
     void rotationStopRequested();
     void displayInfoChanged();
+    void selectionStateChanged(SelectionState state);
 
 protected:
+
+
     virtual int helpTopicAt(const QPointF &pos) const override;
 
     virtual void hoverEnterEvent(QGraphicsSceneHoverEvent *event) override;
@@ -327,6 +340,10 @@ protected:
 
     float defaultAspectRatio() const;
 
+    virtual QVariant itemChange(GraphicsItemChange change, const QVariant& value) override;
+
+    SelectionState selectionState() const;
+
 private:
     QColor calculateFrameColor() const;
     qreal calculateFrameWidth() const;
@@ -347,19 +364,7 @@ private:
     Q_SLOT void at_buttonBar_checkedButtonsChanged();
 
 private:
-    enum class SelectionState
-    {
-        invalid,
-        notSelected,
-        inactiveFocused,
-        focused,
-        selected,
-        focusedAndSelected,
-    };
-
     void updateSelectedState();
-
-    QVariant itemChange(GraphicsItemChange change, const QVariant& value) override;
 
 protected:
     QnHudOverlayWidget* m_hudOverlay;

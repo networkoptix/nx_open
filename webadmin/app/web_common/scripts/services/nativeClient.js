@@ -4,7 +4,8 @@
 'use strict';
 
 angular.module('nxCommon')
-    .factory('nativeClient', function ($q, $log, $location, $sessionStorage) {
+    .factory('nativeClient', ['$q', '$log', '$location', '$sessionStorage',
+    function ($q, $log, $location, $sessionStorage) {
         var nativeClientObject = typeof(setupDialog)=='undefined'?null:setupDialog; // Qt registered object
         var socketClientController = null;
 
@@ -178,4 +179,4 @@ angular.module('nxCommon')
                 return $q.reject();
             }
         }
-    });
+    }]);

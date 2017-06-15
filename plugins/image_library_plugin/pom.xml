@@ -18,8 +18,6 @@
         <product.title>${project.name}</product.title>
 
         <qt.libs>core</qt.libs>
-
-        <windows.defines>WIN32_LEAN_AND_MEAN</windows.defines>
     </properties>
     <dependencies>
         <dependency>

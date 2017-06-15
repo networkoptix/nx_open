@@ -21,8 +21,6 @@
         <global.libs>-lcommon -lnx_utils -lnx_network</global.libs>
         <windows.oslibs>Ws2_32.lib Iphlpapi.lib Dbghelp.lib Winmm.lib common.lib</windows.oslibs>
 
-        <windows.defines>WIN32_LEAN_AND_MEAN</windows.defines>
-
         <rdep.packages>openssl</rdep.packages>
     </properties>
 

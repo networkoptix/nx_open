@@ -17,7 +17,7 @@ class NX_NETWORK_API MessageParser:
 public:
     MessageParser();
 
-    virtual void setMessage(Message* const msg) override;
+    virtual void setMessage(Message* const message) override;
     /**
      * Methods returns if:
      *   - end of message found
@@ -39,7 +39,7 @@ public:
 
 private:
     HttpStreamReader m_httpStreamReader;
-    Message* m_msg = nullptr;
+    Message* m_message = nullptr;
     bool m_messageTaken = false;
 
     void provideMessageIfNeeded();
@@ -58,16 +58,16 @@ class NX_NETWORK_API MessageParser:
     public nx::network::server::AbstractMessageParser<Message>
 {
 public:
-    virtual void setMessage(Message* const msg) override;
+    virtual void setMessage(Message* const message) override;
     virtual nx::network::server::ParserState parse(
-        const nx::Buffer& buf,
+        const nx::Buffer& buffer,
         size_t* bytesProcessed) override;
 
     virtual void reset() override;
 
 private:
     HttpStreamReader m_httpStreamReader;
-    Message* m_msg = nullptr;
+    Message* m_message = nullptr;
 };
 
 } // namespace deprecated

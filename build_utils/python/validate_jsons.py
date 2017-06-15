@@ -11,8 +11,8 @@ from fnmatch import fnmatch
 
 def main():
     root = os.getcwd()
-    pattern = "*.json"      
-    exclude = set(['cloud_portal', 'webadmin'])
+    pattern = "*.json"
+    exclude = set(['node_modules', 'bower_components'])
     for path, subdirs, files in os.walk(root, topdown=True):
         subdirs[:] = [d for d in subdirs if d not in exclude]
         for name in files:
@@ -22,9 +22,9 @@ def main():
                 print out
                 p.wait()
                 if p.returncode:
-                    print "failed with code: %s" % str(p.returncode) 
+                    print "failed with code: %s" % str(p.returncode)
                     sys.exit(1)
-                
+
 if __name__ == "__main__":
     if sys.platform == 'linux2':
         main()

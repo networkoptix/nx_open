@@ -4,7 +4,6 @@
 #include <map>
 #include <iostream>
 
-#define WIN32_LEAN_AND_MEAN             // Exclude rarely-used stuff from Windows headers
 // Windows Header Files:
 #include <windows.h>
 #include <VersionHelpers.h>
@@ -104,7 +103,7 @@ HRESULT GetDisabledNICSWithEmptyMac(IWbemServices* pSvc, std::vector<_bstr_t>& p
     if (pclsObj!=NULL)
         pclsObj->Release();
 
-	auto it = std::remove_if(paths.begin(), paths.end(), [&devices](const _bstr_t& path) { 
+	auto it = std::remove_if(paths.begin(), paths.end(), [&devices](const _bstr_t& path) {
 		auto it = devices.find(path);
 		return it != devices.end() && !it->second.mac.isEmpty();
 	 });

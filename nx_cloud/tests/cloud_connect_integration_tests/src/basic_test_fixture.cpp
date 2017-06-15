@@ -5,6 +5,7 @@
 #include <nx/network/socket_global.h>
 
 #include <libconnection_mediator/src/mediator_service.h>
+#include <libtraffic_relay/src/model/listening_peer_pool.h>
 
 namespace nx {
 namespace network {
@@ -157,6 +158,13 @@ void BasicTestFixture::startHttpServer()
     m_staticUrl = QUrl(lm("http://%1/static").arg(serverSocketCloudAddress()));
 
     ASSERT_TRUE(m_httpServer->bindAndListen());
+
+    // Waiting for server to be registered on relay.
+    while (!m_trafficRelay.moduleInstance()->listeningPeerPool().isPeerOnline(
+                m_cloudSystemCredentials.id.toStdString()))
+    {
+        std::this_thread::sleep_for(std::chrono::milliseconds(1));
+    }
 }
 
 void BasicTestFixture::onHttpRequestDone(

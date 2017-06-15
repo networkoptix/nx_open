@@ -39,7 +39,7 @@ public:
     };
 
     HttpStreamReader();
-    virtual ~HttpStreamReader();
+    virtual ~HttpStreamReader() = default;
 
     /**
      * Parses count bytes from source buffer data as HTTP.
@@ -50,10 +50,10 @@ public:
     bool parseBytes(
         const BufferType& data,
         size_t count = nx_http::BufferNpos,
-        size_t* bytesProcessed = NULL );
+        size_t* bytesProcessed = NULL);
     bool parseBytes(
         const QnByteArrayConstRef& data,
-        size_t* bytesProcessed = NULL );
+        size_t* bytesProcessed = NULL);
     /**
      * @return Actual only after state changed from readingMessageHeaders 
      * to waitingMessageStart or readingMessageBody.
@@ -90,7 +90,7 @@ public:
      * By default true.
      * @param val If false, chunked message is not decoded and returned as-is by AsyncHttpClient::fetchMessageBodyBuffer.
      */
-    void setDecodeChunkedMessageBody( bool val );
+    void setDecodeChunkedMessageBody(bool val);
     /**
      * Returns sequential HTTP message number.
      */
@@ -98,7 +98,7 @@ public:
     boost::optional<quint64> contentLength() const;
 
     /** If true, then parseBytes always returns after reading http headers and trailing CRLF have been read. */
-    void setBreakAfterReadingHeaders( bool val );
+    void setBreakAfterReadingHeaders(bool val);
 
 private:
     enum ChunkStreamParseState
@@ -137,7 +137,7 @@ private:
     LineSplitter m_lineSplitter;
     mutable QnMutex m_mutex;
 
-    bool parseLine( const ConstBufferRefType& data );
+    bool parseLine(const ConstBufferRefType& data);
     /**
      * Reads message body parameters from message headers and initializes required data.
      * Sets members m_contentLength, m_isChunkedTransfer, a m_contentDecoder.
@@ -151,20 +151,21 @@ private:
     template<class Func>
     size_t readMessageBody(
         const QnByteArrayConstRef& data,
-        Func func );
+        Func func);
     template<class Func>
     size_t readChunkStream(
         const QnByteArrayConstRef& data,
-        Func func );
+        Func func);
     template<class Func>
     size_t readIdentityStream(
         const QnByteArrayConstRef& data,
-        Func func );
-    unsigned int hexCharToInt( BufferType::value_type ch );
+        Func func);
+    unsigned int hexCharToInt(BufferType::value_type ch);
     /**
      * Returns nullptr if encodingName is unknown.
      */
-    nx::utils::bstream::AbstractByteStreamFilter* createContentDecoder( const nx_http::StringType& encodingName );
+    std::unique_ptr<nx::utils::bstream::AbstractByteStreamFilter> createContentDecoder(
+        const nx_http::StringType& encodingName);
     void resetStateInternal();
 };
 

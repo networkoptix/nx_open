@@ -13,6 +13,8 @@ class QnStaticCommonModule;
 class QnStorageDbPool;
 class MSSettings;
 
+namespace nx { namespace mediaserver { class UnusedWallpapersWatcher; } }
+
 class QnMediaServerModule:
     public QObject,
     public QnInstanceStorage,
@@ -36,7 +38,7 @@ public:
     QSettings* roSettings() const;
     QSettings* runTimeSettings() const;
     MSSettings* settings() const;
-
+    nx::mediaserver::UnusedWallpapersWatcher* unusedWallpapersWatcher() const;
 private:
     QnCommonModule* m_commonModule;
     MSSettings* m_settings;
@@ -48,7 +50,7 @@ private:
         std::shared_ptr<QnStorageManager> backupStorageManager;
     };
     std::unique_ptr<UniquePtrContext> m_context;
-
+    nx::mediaserver::UnusedWallpapersWatcher* m_unusedWallpapersWatcher = nullptr;
 };
 
 #define qnServerModule QnMediaServerModule::instance()

@@ -223,7 +223,8 @@ class QnVideoWallLicenseUsageHelper: public QnLicenseUsageHelper
     Q_OBJECT
     using base_type = QnLicenseUsageHelper;
 public:
-    QnVideoWallLicenseUsageHelper(QObject *parent = NULL);
+    QnVideoWallLicenseUsageHelper(QObject *parent);
+    QnVideoWallLicenseUsageHelper(QnCommonModule* commonModule);
 
     /** Propose to use some more or less licenses directly (e.g. to start control session). */
     void propose(int count);
@@ -234,7 +235,9 @@ protected:
     virtual QList<Qn::LicenseType> calculateLicenseTypes() const override;
     virtual void calculateUsedLicenses(licensesArray& basicUsedLicenses, licensesArray& proposedToUse) const override;
 private:
-    int m_proposed;
+    void init();
+private:
+    int m_proposed = 0;
 };
 
 /** Utility RAAA class to propose some licenses usage. */

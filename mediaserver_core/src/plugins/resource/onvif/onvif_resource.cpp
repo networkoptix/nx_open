@@ -308,6 +308,7 @@ QnPlOnvifResource::QnPlOnvifResource(QnCommonModule* commonModule):
     m_audioSamplerate(0),
     m_timeDrift(0),
     m_inputMonitored(false),
+    m_clearInputsTimeoutUSec(0),
     m_eventMonitorType(emtNone),
     m_nextPullMessagesTimerID(0),
     m_renewSubscriptionTimerID(0),
@@ -673,6 +674,13 @@ CameraDiagnostics::Result QnPlOnvifResource::initInternal()
             Qn::RelayOutputCapability,
             resourceData.value<int>(QString("relayOutputCountForced"), 0) > 0);
     }
+    if (resourceData.contains(QString("clearInputsTimeoutSec")))
+    {
+        m_clearInputsTimeoutUSec = resourceData.value<int>(
+            QString("clearInputsTimeoutSec"), 0) * 1000 * 1000;
+    }
+
+    qWarning() << "QnPlOnvifResource::initInternal() m_clearInputsTimeoutUSec =" << m_clearInputsTimeoutUSec;
 
     QnIOPortDataList allPorts = getRelayOutputList();
 
@@ -1078,11 +1086,24 @@ CameraDiagnostics::Result QnPlOnvifResource::readDeviceInformation(const QString
     return CameraDiagnostics::NoErrorResult();
 }
 
-
 void QnPlOnvifResource::notificationReceived(
     const oasisWsnB2__NotificationMessageHolderType& notification,
     time_t minNotificationTime )
 {
+    const auto now = qnSyncTime->currentUSecsSinceEpoch();
+    if( m_clearInputsTimeoutUSec > 0 )
+    {
+        for( auto& state: m_relayInputStates )
+        {
+            if( state.second.value && state.second.timestamp + m_clearInputsTimeoutUSec < now)
+            {
+                state.second.value = false;
+                state.second.timestamp = now;
+                onRelayInputStateChange( state.first, state.second );
+            }
+        }
+    }
+
     if( !notification.Message.__any )
     {
         NX_LOG( lit("Received notification with empty message. Ignoring..."), cl_logDEBUG2 );
@@ -1123,7 +1144,7 @@ void QnPlOnvifResource::notificationReceived(
 
     //parsing Message
     QXmlSimpleReader reader;
-    NotificationMessageParseHandler handler;
+    NotificationMessageParseHandler handler( m_cameraTimeZone );
     reader.setContentHandler( &handler );
     QBuffer srcDataBuffer;
     srcDataBuffer.setData(
@@ -1190,43 +1211,52 @@ void QnPlOnvifResource::notificationReceived(
     }
 
     //saving port state
-    const bool newPortState = (handler.data.value == lit("true")) || (handler.data.value == lit("active")) || (handler.data.value.toInt() > 0);
-    bool& currentPortState = m_relayInputStates[portSourceIter->value];
-    if( currentPortState != newPortState )
+    const bool newValue = (handler.data.value == lit("true")) || (handler.data.value == lit("active")) || (handler.data.value.toInt() > 0);
+    auto& state = m_relayInputStates[portSourceIter->value];
+    state.timestamp = now;
+    if( state.value != newValue )
     {
-        QString portId = portSourceIter->value;
+        state.value = newValue;
+        onRelayInputStateChange( portSourceIter->value, state );
+    }
+}
+
+void QnPlOnvifResource::onRelayInputStateChange(const QString& name, const RelayInputState& state)
+{
+    QString portId = name;
+    {
         bool success = false;
         int intPortId = portId.toInt(&success);
         // Onvif device enumerates ports from 1. see 'allPorts' filling code.
         if (success)
             portId = QString::number(intPortId + 1);
-        size_t aliasesCount = m_portAliases.size();
-        if (aliasesCount && aliasesCount == m_inputPortCount)
+    }
+
+    size_t aliasesCount = m_portAliases.size();
+    if (aliasesCount && aliasesCount == m_inputPortCount)
+    {
+        for (size_t i = 0; i < aliasesCount; i++)
         {
-            for (size_t i = 0; i < aliasesCount; i++)
+            if (m_portAliases[i] == name)
             {
-                if (m_portAliases[i] == portSourceIter->value)
-                {
-                    portId = lit("%1").arg(i + 1);
-                    break;
-                }
+                portId = lit("%1").arg(i + 1);
+                break;
             }
         }
-        else
-        {
-            auto portIndex = getInputPortNumberFromString(portSourceIter->value);
-
-            if (!portIndex.isEmpty())
-                portId = portIndex;
-        }
-
-        currentPortState = newPortState;
-        emit cameraInput(
-            toSharedPointer(),
-            portId,
-            newPortState,
-            qnSyncTime->currentUSecsSinceEpoch() );   //it is not absolutely correct, but better than de-synchronized timestamp from camera
     }
+    else
+    {
+        auto portIndex = getInputPortNumberFromString(name);
+
+        if (!portIndex.isEmpty())
+            portId = portIndex;
+    }
+
+    emit cameraInput(
+        toSharedPointer(),
+        portId,
+        state.value,
+        state.timestamp);
 }
 
 CameraDiagnostics::Result QnPlOnvifResource::fetchAndSetResourceOptions()
@@ -1437,11 +1467,11 @@ void QnPlOnvifResource::setTimeDrift(int value)
 
 void QnPlOnvifResource::calcTimeDrift(int* outSoapRes) const
 {
-    m_timeDrift = calcTimeDrift(getDeviceOnvifUrl(), outSoapRes);
+    m_timeDrift = calcTimeDrift(getDeviceOnvifUrl(), outSoapRes, &m_cameraTimeZone);
     m_timeDriftTimer.restart();
 }
 
-int QnPlOnvifResource::calcTimeDrift(const QString& deviceUrl, int* outSoapRes)
+int QnPlOnvifResource::calcTimeDrift(const QString& deviceUrl, int* outSoapRes, QTimeZone* timeZone)
 {
     DeviceSoapWrapper soapWrapper(deviceUrl.toStdString(), QString(), QString(), 0);
 
@@ -1453,6 +1483,9 @@ int QnPlOnvifResource::calcTimeDrift(const QString& deviceUrl, int* outSoapRes)
 
     if (soapRes == SOAP_OK && response.SystemDateAndTime && response.SystemDateAndTime->UTCDateTime)
     {
+        if (timeZone && response.SystemDateAndTime->TimeZone)
+            *timeZone = QTimeZone(response.SystemDateAndTime->TimeZone->TZ.c_str());
+
         onvifXsd__Date* date = response.SystemDateAndTime->UTCDateTime->Date;
         onvifXsd__Time* time = response.SystemDateAndTime->UTCDateTime->Time;
         if (!date || !time)
@@ -1849,7 +1882,7 @@ bool QnPlOnvifResource::registerNotificationConsumer()
         }
 
         if( response.SubscriptionReference->Address )
-            m_onvifNotificationSubscriptionReference = QString::fromStdString(response.SubscriptionReference->Address->__item);
+            m_onvifNotificationSubscriptionReference = fromOnvifDiscoveredUrl(response.SubscriptionReference->Address->__item);
     }
 
     //launching renew-subscription timer
@@ -3267,7 +3300,8 @@ bool QnPlOnvifResource::SubscriptionReferenceParametersParseHandler::endElement(
 // QnPlOnvifResource::NotificationMessageParseHandler
 //////////////////////////////////////////////////////////
 
-QnPlOnvifResource::NotificationMessageParseHandler::NotificationMessageParseHandler()
+QnPlOnvifResource::NotificationMessageParseHandler::NotificationMessageParseHandler(QTimeZone timeZone):
+    timeZone(timeZone)
 {
     m_parseStateStack.push( init );
 }
@@ -3287,7 +3321,13 @@ bool QnPlOnvifResource::NotificationMessageParseHandler::startElement(
             int utcTimeIndex = atts.index( lit("UtcTime") );
             if( utcTimeIndex == -1 )
                 return false;   //missing required attribute
+
             utcTime = QDateTime::fromString( atts.value(utcTimeIndex), Qt::ISODate );
+            if( utcTime.timeSpec() == Qt::LocalTime )
+                utcTime.setTimeZone( timeZone );
+            if( utcTime.timeSpec() != Qt::UTC )
+                utcTime = utcTime.toUTC();
+
             propertyOperation = atts.value( lit("PropertyOperation") );
             m_parseStateStack.push( readingMessage );
             break;
@@ -3407,7 +3447,7 @@ bool QnPlOnvifResource::createPullPointSubscription()
         }
 
         if( response.SubscriptionReference->Address )
-            m_onvifNotificationSubscriptionReference = QString::fromStdString(response.SubscriptionReference->Address->__item);
+            m_onvifNotificationSubscriptionReference = fromOnvifDiscoveredUrl(response.SubscriptionReference->Address->__item);
     }
 
     //adding task to refresh subscription
@@ -4041,7 +4081,10 @@ void QnPlOnvifResource::fillFullUrlInfo( const CapabilitiesResp& response )
         return;
 
     if (response.Capabilities->Events)
-        m_eventCapabilities.reset( new onvifXsd__EventCapabilities( *response.Capabilities->Events ) );
+    {
+        m_eventCapabilities.reset(new onvifXsd__EventCapabilities(*response.Capabilities->Events));
+        m_eventCapabilities->XAddr = fromOnvifDiscoveredUrl(m_eventCapabilities->XAddr).toStdString();
+    }
 
     if (response.Capabilities->Media)
     {
@@ -4059,9 +4102,15 @@ void QnPlOnvifResource::fillFullUrlInfo( const CapabilitiesResp& response )
     {
         setPtzUrl(fromOnvifDiscoveredUrl(response.Capabilities->PTZ->XAddr));
     }
-    m_deviceIOUrl = response.Capabilities->Extension && response.Capabilities->Extension->DeviceIO
-        ? response.Capabilities->Extension->DeviceIO->XAddr
-        : getDeviceOnvifUrl().toStdString();
+    if (response.Capabilities->Extension && response.Capabilities->Extension->DeviceIO)
+    {
+        m_deviceIOUrl = fromOnvifDiscoveredUrl(response.Capabilities->Extension->DeviceIO->XAddr)
+            .toStdString();
+    }
+    else
+    {
+        m_deviceIOUrl = getDeviceOnvifUrl().toStdString();
+    }
 }
 
 /**

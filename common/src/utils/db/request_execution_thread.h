@@ -3,7 +3,6 @@
 #include <atomic>
 
 #include <nx/utils/std/thread.h>
-
 #include <nx/utils/thread/long_runnable.h>
 
 #include "base_request_executor.h"

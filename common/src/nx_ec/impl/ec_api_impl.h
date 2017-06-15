@@ -175,7 +175,7 @@ namespace ec2
             void onGetMiscParamDone             (int reqID, const ec2::ErrorCode, const ec2::ApiMiscData&);
             void onSaveBusinessRuleDone         (int reqID, const ec2::ErrorCode, const QnBusinessEventRulePtr&);
             void onGetServersDone               (int reqID, const ec2::ErrorCode, const ec2::ApiMediaServerDataList&);
-            void onGetServerUserAttributesDone  (int reqID, const ec2::ErrorCode, const QnMediaServerUserAttributesList&);
+            void onGetServerUserAttributesDone  (int reqID, const ec2::ErrorCode, const ec2::ApiMediaServerUserAttributesDataList&);
             void onGetServersExDone             (int reqID, const ec2::ErrorCode, const ec2::ApiMediaServerDataExList&);
             void onGetStoragesDone              (int reqID, const ec2::ErrorCode, const ec2::ApiStorageDataList&);
             void onGetCamerasDone               (int reqID, const ec2::ErrorCode, const ec2::ApiCameraDataList&);

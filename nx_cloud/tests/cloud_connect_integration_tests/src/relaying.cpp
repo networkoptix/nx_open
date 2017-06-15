@@ -88,7 +88,7 @@ TEST_F(Relaying, exchanging_fixed_data)
     assertDataHasBeenExchangedCorrectly();
 }
 
-TEST_F(Relaying, DISABLED_multiple_connections)
+TEST_F(Relaying, multiple_connections)
 {
     startMoreConnectionsThatAreFoundOnRelay();
     assertDataHasBeenExchangedCorrectly();

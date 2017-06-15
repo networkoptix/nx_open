@@ -4,10 +4,11 @@
 #include <network/module_information.h>
 
 namespace nx { namespace vms { namespace discovery { class Manager; } } }
+namespace nx { namespace vms { namespace discovery { struct ModuleEndpoint; } } }
 
 namespace ec2 {
 
-    struct ApiDiscoveryData : ApiIdData 
+    struct ApiDiscoveryData : ApiIdData
     {
         ApiDiscoveryData(): ignore(false) {}
 
@@ -37,6 +38,8 @@ namespace ec2 {
 #define ApiDiscoveredServerData_Fields QnModuleInformationWithAddresses_Fields(status)
 
 std::vector<ApiDiscoveredServerData> getServers(nx::vms::discovery::Manager* manager);
+ApiDiscoveredServerData makeServer(
+    const nx::vms::discovery::ModuleEndpoint& module, const QnUuid& localSystemId);
 
 } // namespace ec2
 

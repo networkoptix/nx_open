@@ -722,7 +722,7 @@ void QnLoginDialog::at_deleteButton_clicked()
     resetConnectionsModel();
 }
 
-void QnLoginDialog::at_moduleChanged(nx::vms::discovery::Manager::ModuleData module)
+void QnLoginDialog::at_moduleChanged(nx::vms::discovery::ModuleEndpoint module)
 {
     auto isCloudAddress =
         [](const HostAddress& address) -> bool

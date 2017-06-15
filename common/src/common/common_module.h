@@ -31,6 +31,7 @@ class QnResourcePropertyDictionary;
 class QnResourceStatusDictionary;
 class QnResourceDiscoveryManager;
 class QnServerAdditionalAddressesDictionary;
+class QnEventRuleManager;
 
 namespace ec2 { class AbstractECConnection; }
 namespace nx { namespace vms { namespace discovery { class Manager; } } }
@@ -159,6 +160,11 @@ public:
         return m_layoutTourManager;
     }
 
+    QnEventRuleManager* eventRuleManager() const
+    {
+        return m_eventRuleManager;
+    }
+
     QnLicensePool* licensePool() const;
     QnUserRolesManager* userRolesManager() const;
     QnResourceAccessSubjectsCache* resourceAccessSubjectsCache() const;
@@ -173,6 +179,9 @@ public:
 
     void setObsoleteServerGuid(const QnUuid& guid) { m_obsoleteUuid = guid; }
     QnUuid obsoleteServerGuid() const{ return m_obsoleteUuid; }
+
+    QnUuid dbId() const;
+    void setDbId(const QnUuid& uuid);
 
     /*
     * This timestamp is using for database backup/restore operation.
@@ -237,8 +246,6 @@ public:
     void setVideowallGuid(const QnUuid &uuid);
 
     /** instanceCounter used for unit test purpose only */
-    void setInstanceCounter(int value);
-    int instanceCounter() const;
 signals:
     void readOnlyChanged(bool readOnly);
     void moduleInformationChanged();
@@ -262,6 +269,7 @@ private:
     QString m_defaultAdminPassword;
     QnUuid m_uuid;
     QnUuid m_runUuid;
+    QnUuid m_dbId;
     QnUuid m_obsoleteUuid;
     QnUuid m_remoteUuid;
     bool m_cloudMode;
@@ -292,7 +300,7 @@ private:
     QnUserRolesManager* m_userRolesManager = nullptr;
     QnResourceDiscoveryManager* m_resourceDiscoveryManager = nullptr;
     QnLayoutTourManager* m_layoutTourManager = nullptr;
+    QnEventRuleManager* m_eventRuleManager = nullptr;
 
     QnUuid m_videowallGuid;
-    int m_instanceCounter = 0;
 };

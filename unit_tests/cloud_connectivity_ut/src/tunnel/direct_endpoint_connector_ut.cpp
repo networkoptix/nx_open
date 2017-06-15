@@ -68,7 +68,7 @@ TEST_F(TcpTunnelConnector, failModuleInformation)
             server->setServerIdForModuleInformation(boost::none);
         });
 
-    ASSERT_EQ(SystemError::connectionReset, connectResult.errorCode);
+    ASSERT_EQ(SystemError::connectionRefused, connectResult.errorCode);
     ASSERT_EQ(nullptr, connectResult.connection);
 }
 

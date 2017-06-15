@@ -289,7 +289,6 @@ void QnLdapUsersDialog::importUsers(const QnLdapUsers &users) {
             user->setUserRoleId(selectedUserRoleId);
         else
             user->setRawPermissions(permissions);
-        user->generateHash();
 
         qnResourcesChangesManager->saveUser(user, [](const QnUserResourcePtr &){});
     }

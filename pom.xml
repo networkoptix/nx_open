@@ -47,8 +47,8 @@
         <axiscamplugin.guid>{c27722d6-d3ae-41dc-9467-52d93f5b119a}</axiscamplugin.guid>
         <evidence_plugin.guid>{061d1513-9a37-4d14-90f5-11d42d2d7827}</evidence_plugin.guid>
         <genericrtspplugin.guid>{7fafaf1d-0d3d-42ea-aa11-4ffce0f170f9}</genericrtspplugin.guid>
+        <generic_multicast_plugin.guid>{e03f4c6d-2831-44e7-b636-e37f904d7388}</generic_multicast_plugin.guid>
         <image_library_plugin.guid>{62b24237-9c9d-4900-b32d-aa678317b4ba}</image_library_plugin.guid>
-        <isd_native_plugin.guid>{9d3f6a6f-ec63-4269-bf34-cc1060f80e90}</isd_native_plugin.guid>
         <it930x_plugin.guid>{2c75d1b9-a6f1-4aa6-9d7e-8c0e602bd8fd}</it930x_plugin.guid>
         <mjpg_link.guid>{c8a846fd-d881-45d8-9f6c-c3e02eaf5763}</mjpg_link.guid>
         <quicksyncdecoder.guid>{84ca6c5b-525e-438a-940c-50c14db49c66}</quicksyncdecoder.guid>
@@ -86,6 +86,7 @@
         <libtraffic_relay.guid>{237676bc-45ea-43cf-a2c1-4048468d92a9}</libtraffic_relay.guid>
         <traffic_relay.guid>{7f7104b2-1f99-4e4f-bff3-ad050eb0db8e}</traffic_relay.guid>
         <nx_kit.guid>{5db17d17-17fe-4ebe-a14f-ffced5d2c09b}</nx_kit.guid>
+        <vms_cloud_integration_tests.guid>{45F679BE-E497-40AD-9E0E-5401D3BE1C6D}</vms_cloud_integration_tests.guid>
 
         <!-- Components' Naming -->
         <release.version>${parsedVersion.majorVersion}.${parsedVersion.minorVersion}.${parsedVersion.incrementalVersion}</release.version>
@@ -113,6 +114,7 @@
         <axiscamplugin.name>${company.name} AXIS camera integration plugin</axiscamplugin.name>
         <evidence_plugin.name>${company.name} Evidence integration plugin</evidence_plugin.name>
         <genericrtspplugin.name>${company.name} generic RTSP plugin</genericrtspplugin.name>
+        <generic_multicast_plugin.name>${company.name} generic multicast plugin</generic_multicast_plugin.name>
         <client.mediafolder.name>${product.name} Media</client.mediafolder.name>
         <vmaxproxy.name>${company.name} VMax Proxy</vmaxproxy.name>
         <wixsetup.name>${company.name} ${display.product.name} Setup v.${release.version}</wixsetup.name>
@@ -143,6 +145,7 @@
         <newmobile/>
         <liteMode>false</liteMode>
         <iosTarget>iphoneos</iosTarget>
+        <paxton>false</paxton>
 
         <template>lib</template>
         <noQmlInQrc>false</noQmlInQrc>
@@ -175,7 +178,6 @@
         <quazip.version>0.7.1</quazip.version>
         <openal.version>1.16</openal.version>
         <libjpeg-turbo.version>1.4.2</libjpeg-turbo.version>
-        <libcreateprocess.version>0.1</libcreateprocess.version>
         <vmux.version>1.0.0</vmux.version>
         <cpro.version>1.0.0</cpro.version>
         <server-external.version>default</server-external.version>
@@ -275,7 +277,7 @@
         <artifact.name.cloud_debug>${artifact.name.prefix}-cloud_debug-${artifact.name.suffix}</artifact.name.cloud_debug>
         <artifact.name.testcamera>${artifact.name.prefix}-testcamera-${artifact.name.suffix}</artifact.name.testcamera>
 
-        <nxcloud.version>1.0.142</nxcloud.version>
+        <nxcloud.version>latest</nxcloud.version>
     </properties>
 
     <build>
@@ -519,6 +521,7 @@
                 <module>mediaserver_core</module>
 
                 <module>plugins/genericrtspplugin</module>
+                <module>plugins/generic_multicast_plugin</module>
                 <module>plugins/image_library_plugin</module>
                 <module>plugins/mjpg_link</module>
 
@@ -597,7 +600,7 @@
                 <windows>true</windows>
                 <unix>false</unix>
                 <script.extension>bat</script.extension>
-                <global.windows.defines>ENABLE_VMAX</global.windows.defines>
+                <global.windows.defines>ENABLE_VMAX _WINSOCKAPI_=</global.windows.defines>
                 <machine.type>X64</machine.type>
                 <qt.version>5.6.1-1</qt.version>
                 <artifact.name.platform>win64</artifact.name.platform>
@@ -642,9 +645,6 @@
                 <module>plugins/nxcontrol</module>
                 <module>plugins/acs/paxton-plugin</module>
             </modules>
-            <properties>
-                <paxton>true</paxton>
-            </properties>
         </profile>
         <profile>
             <id>windows-nomobile</id>
@@ -849,7 +849,7 @@
         </profile>
 
         <profile>
-            <id>linux-isd-jaguar</id>
+            <id>linux-edge1</id>
             <activation>
                 <activeByDefault>false</activeByDefault>
                 <os>
@@ -858,36 +858,7 @@
                 </os>
                 <property>
                     <name>box</name>
-                    <value>isd</value>
-                </property>
-            </activation>
-            <properties>
-                <toolchain.version>codesourcery-2014.05</toolchain.version>
-                <qt.spec/>
-                <openssl.version>1.0.0j</openssl.version>
-                <quazip.version>0.7.2</quazip.version>
-                <gcc.version>4.9.3</gcc.version>
-                <additional.defines>DISABLE_ALL_VENDORS DISABLE_SOFTWARE_MOTION_DETECTION DISABLE_DESKTOP_CAMERA EDGE_SERVER debug_in_release</additional.defines>
-                <modification>isd</modification>
-                <rdep.target>isd</rdep.target>
-            </properties>
-            <modules>
-                <module>plugins/isd_native_plugin</module>
-                <module>edge_firmware/isd</module>
-            </modules>
-        </profile>
-
-        <profile>
-            <id>linux-isd-s2</id>
-            <activation>
-                <activeByDefault>false</activeByDefault>
-                <os>
-                    <family>unix</family>
-                    <name>linux</name>
-                </os>
-                <property>
-                    <name>box</name>
-                    <value>isd_s2</value>
+                    <value>edge1</value>
                 </property>
             </activation>
             <properties>
@@ -896,12 +867,12 @@
                 <quazip.version>0.7.2</quazip.version>
                 <gcc.version>4.9.3</gcc.version>
                 <additional.defines>DISABLE_ALL_VENDORS DISABLE_DESKTOP_CAMERA EDGE_SERVER debug_in_release</additional.defines>
-                <modification>isd_s2</modification>
+                <modification>edge1</modification>
                 <rdep.target>isd_s2</rdep.target>
+                <rdep.packages>cpro</rdep.packages>
                 <qt.spec/>
             </properties>
             <modules>
-                <module>plugins/isd_native_plugin</module>
                 <module>edge_firmware/isd</module>
             </modules>
         </profile>
@@ -1247,6 +1218,8 @@
                 </property>
             </activation>
             <modules>
+                <!-- TODO: Move unit_tests to tests/ -->
+                <module>tests</module>
                 <module>unit_tests</module>
                 <module>nx_cloud/tests</module>
             </modules>

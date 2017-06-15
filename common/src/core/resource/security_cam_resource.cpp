@@ -59,7 +59,6 @@ QnSecurityCamResource::QnSecurityCamResource(QnCommonModule* commonModule):
     m_dpFactory(0),
     m_recActionCnt(0),
     m_statusFlags(Qn::CSF_NoFlags),
-    m_advancedWorking(false),
     m_manuallyAdded(false),
 	m_cachedLicenseType(Qn::LC_Count),
     m_cachedHasDualStreaming2(
@@ -204,7 +203,7 @@ int QnSecurityCamResource::reservedSecondStreamFps() const
         NX_LOGX(
             lm("Wrong reserved second stream fps value for camera %1")
                 .arg(getName()),
-            cl_logWARNING);        
+            cl_logWARNING);
     }
 
     auto sharingMethod = streamFpsSharingMethod();
@@ -215,6 +214,11 @@ int QnSecurityCamResource::reservedSecondStreamFps() const
         return kSharePixelsDefaultReservedSecondStreamFps;
 
     return 0;
+}
+
+bool QnSecurityCamResource::isEnoughFpsToRunSecondStream(int currentFps) const
+{
+    return streamFpsSharingMethod() != Qn::BasicFpsSharing || getMaxFps() - currentFps >= kDefaultSecondStreamFpsLow;
 }
 
 #ifdef ENABLE_DATA_PROVIDERS
@@ -859,14 +863,6 @@ bool QnSecurityCamResource::isAudioEnabled() const
         return true;
     QnCameraUserAttributePool::ScopedLock userAttributesLock( userAttributesPool(), getId() );
     return (*userAttributesLock)->audioEnabled;
-}
-
-bool QnSecurityCamResource::isAdvancedWorking() const {
-    return m_advancedWorking;
-}
-
-void QnSecurityCamResource::setAdvancedWorking(bool value) {
-    m_advancedWorking = value;
 }
 
 bool QnSecurityCamResource::isManuallyAdded() const {

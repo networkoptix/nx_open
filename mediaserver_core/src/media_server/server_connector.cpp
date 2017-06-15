@@ -27,7 +27,7 @@ QnServerConnector::QnServerConnector(QnCommonModule* commonModule):
 {
 }
 
-static QString makeModuleUrl(const nx::vms::discovery::Manager::ModuleData& module)
+static QString makeModuleUrl(const nx::vms::discovery::ModuleEndpoint& module)
 {
     QUrl moduleUrl;
     moduleUrl.setScheme(module.sslAllowed ? lit("https") : lit("http"));
@@ -36,9 +36,8 @@ static QString makeModuleUrl(const nx::vms::discovery::Manager::ModuleData& modu
     return moduleUrl.toString();
 }
 
-void QnServerConnector::addConnection(const nx::vms::discovery::Manager::ModuleData& module)
+void QnServerConnector::addConnection(const nx::vms::discovery::ModuleEndpoint& module)
 {
-    QString oldUrl;
     const auto newUrl = makeModuleUrl(module);
     {
         QnMutexLocker lock(&m_mutex);
@@ -48,19 +47,11 @@ void QnServerConnector::addConnection(const nx::vms::discovery::Manager::ModuleD
             NX_VERBOSE(this, lm("Module %1 change does not affect URL %2").args(module.id, newUrl));
             return;
         }
-
-        oldUrl = value;
         value = newUrl;
     }
 
     NX_DEBUG(this, lm("Adding connection to module %1 by URL %2").args(module.id, newUrl));
-    commonModule()->ec2Connection()->addRemotePeer(newUrl);
-
-    if (!oldUrl.isNull())
-    {
-        NX_DEBUG(this, lm("Removing old module %1 URL %2").args(module.id, oldUrl));
-        commonModule()->ec2Connection()->deleteRemotePeer(oldUrl);
-    }
+    commonModule()->ec2Connection()->addRemotePeer(module.id, newUrl);
 }
 
 void QnServerConnector::removeConnection(const QnUuid& id)
@@ -74,8 +65,8 @@ void QnServerConnector::removeConnection(const QnUuid& id)
     if (moduleUrl.isNull())
         return;
 
-    NX_DEBUG(this, lm("Removing connection to module %1 by URL %2").args(id, (moduleUrl)));
-    commonModule()->ec2Connection()->deleteRemotePeer(moduleUrl);
+    NX_LOGX(lm("Removing connection to module %1 by URL %2").args(id, (moduleUrl)), cl_logINFO);
+    commonModule()->ec2Connection()->deleteRemotePeer(id);
 
     const auto server = resourcePool()->getResourceById(id);
     if (server && server->getStatus() == Qn::Unauthorized)
@@ -117,7 +108,7 @@ void QnServerConnector::restart()
     start();
 }
 
-void QnServerConnector::at_moduleFound(nx::vms::discovery::Manager::ModuleData module)
+void QnServerConnector::at_moduleFound(nx::vms::discovery::ModuleEndpoint module)
 {
     if (QnConnectionValidator::isCompatibleToCurrentSystem(module, commonModule()))
         return addConnection(module);
@@ -126,7 +117,7 @@ void QnServerConnector::at_moduleFound(nx::vms::discovery::Manager::ModuleData m
         .args(module.id, module.endpoint, module.systemName, module.version));
 }
 
-void QnServerConnector::at_moduleChanged(nx::vms::discovery::Manager::ModuleData module)
+void QnServerConnector::at_moduleChanged(nx::vms::discovery::ModuleEndpoint module)
 {
     if (QnConnectionValidator::isCompatibleToCurrentSystem(module, commonModule()))
         return addConnection(module);

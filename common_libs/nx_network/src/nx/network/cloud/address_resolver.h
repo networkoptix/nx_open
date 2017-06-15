@@ -176,6 +176,9 @@ public:
 
     DnsResolver& dnsResolver() { return m_dnsResolver; }
 
+    /** @return true If endpoint is valid for socket connect. */
+    bool isValidForConnect(const SocketAddress& endpoint) const;
+
 protected:
     struct NX_NETWORK_API HostAddressInfo
     {

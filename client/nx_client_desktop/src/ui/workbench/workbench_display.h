@@ -61,7 +61,6 @@ class QnCamDisplay;
 class QnWorkbenchDisplay: public Connective<QObject>, public QnWorkbenchContextAware, protected QnGeometry, protected QnSceneTransformations
 {
     Q_OBJECT
-    Q_PROPERTY(qreal widgetsFrameOpacity READ widgetsFrameOpacity WRITE setWidgetsFrameOpacity)
 
     using base_type = Connective<QObject>;
 
@@ -338,8 +337,7 @@ protected:
     void initContext(QnWorkbenchContext *context);
     void initBoundingInstrument();
 
-    qreal widgetsFrameOpacity() const;
-    void setWidgetsFrameOpacity(qreal opacity);
+    void updateWidgetsFrameOpacity();
 
     void setWidget(Qn::ItemRole role, QnResourceWidget *widget);
 
@@ -431,9 +429,6 @@ private:
 
     /** Grid background item. */
     QPointer<QnGridBackgroundItem> m_gridBackgroundItem;
-
-    /** Current frame opacity for widgets. */
-    qreal m_frameOpacity;
 
     Qn::MarginFlags m_zoomedMarginFlags, m_normalMarginFlags;
 

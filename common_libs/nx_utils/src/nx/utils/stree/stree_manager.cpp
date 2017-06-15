@@ -15,7 +15,7 @@ namespace stree {
 
 StreeManager::StreeManager(
     const nx::utils::stree::ResourceNameSet& resourceNameSet,
-    const QString& xmlFilePath) throw(std::runtime_error)
+    const QString& xmlFilePath) noexcept(false)
 :
     m_attrNameSet(resourceNameSet),
     m_xmlFilePath(xmlFilePath)
@@ -55,7 +55,7 @@ std::unique_ptr<nx::utils::stree::AbstractNode> StreeManager::loadStree(
     return xmlHandler.releaseTree();
 }
 
-void StreeManager::loadStree() throw(std::runtime_error)
+void StreeManager::loadStree() noexcept(false)
 {
     QFile xmlFile(m_xmlFilePath);
     if (!xmlFile.open(QIODevice::ReadOnly))

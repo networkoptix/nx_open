@@ -12,10 +12,12 @@
 #include <QtCore/QList>
 #include <QtCore/QMap>
 #include <QtCore/QPair>
+#include <QtCore/QTimeZone>
 #include <QSharedPointer>
 #include <nx/utils/thread/wait_condition.h>
 #include <QtXml/QXmlDefaultHandler>
 #include <QElapsedTimer>
+#include <QtCore/QTimeZone>
 
 #include <core/resource/security_cam_resource.h>
 #include <core/resource/camera_resource.h>
@@ -102,6 +104,14 @@ public:
             bool _isBistable,
             const std::string& _delayTime,
             bool _activeByDefault );
+    };
+
+    struct RelayInputState
+    {
+        bool value;
+        qint64 timestamp;
+
+        RelayInputState(): value(false), timestamp(0) {}
     };
 
     enum CODECS
@@ -221,7 +231,7 @@ public:
     virtual QnConstResourceAudioLayoutPtr getAudioLayout(const QnAbstractStreamDataProvider* dataProvider) const override;
 
     void calcTimeDrift(int* outSoapRes = nullptr) const; // calculate clock diff between camera and local clock at seconds
-    static int calcTimeDrift(const QString& deviceUrl, int* outSoapRes = nullptr);
+    static int calcTimeDrift(const QString& deviceUrl, int* outSoapRes = nullptr, QTimeZone* timeZone = nullptr);
 
     virtual bool getParamPhysical(const QString &id, QString &value) override;
     virtual bool getParamsPhysical(const QSet<QString> &idList, QnCameraAdvancedParamValueList& result);
@@ -243,6 +253,7 @@ public:
     void notificationReceived(
         const oasisWsnB2__NotificationMessageHolderType& notification,
         time_t minNotificationTime = (time_t)-1 );
+    void onRelayInputStateChange(const QString& name, const RelayInputState& state);
     QString fromOnvifDiscoveredUrl(const std::string& onvifUrl, bool updatePort = true);
 
     int getMaxChannels() const;
@@ -405,12 +416,13 @@ private:
             }
         };
 
+        const QTimeZone timeZone;
         QString propertyOperation;
         QDateTime utcTime;
         std::list<SimpleItem> source;
         SimpleItem data;
 
-        NotificationMessageParseHandler();
+        NotificationMessageParseHandler(QTimeZone timeZone);
 
         virtual bool startElement( const QString& namespaceURI, const QString& localName, const QString& qName, const QXmlAttributes& atts ) override;
         virtual bool endElement( const QString& namespaceURI, const QString& localName, const QString& qName ) override;
@@ -492,12 +504,14 @@ private:
     QString m_ptzConfigurationToken;
     mutable int m_timeDrift;
     mutable QElapsedTimer m_timeDriftTimer;
+    mutable QTimeZone m_cameraTimeZone;
     std::vector<RelayOutputInfo> m_relayOutputInfo;
-    std::map<QString, bool> m_relayInputStates;
+    std::map<QString, RelayInputState> m_relayInputStates;
     std::string m_deviceIOUrl;
     QString m_onvifNotificationSubscriptionID;
     mutable QnMutex m_ioPortMutex;
     bool m_inputMonitored;
+    qint64 m_clearInputsTimeoutUSec;
     EventMonitorType m_eventMonitorType;
     quint64 m_nextPullMessagesTimerID;
     quint64 m_renewSubscriptionTimerID;

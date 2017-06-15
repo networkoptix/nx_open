@@ -70,8 +70,6 @@ public:
         const QString& path,
         unsigned int periodMillis);
 
-    static QByteArray symmetricalEncode(const QByteArray& data);
-
     enum class NonceProvider { automatic, local };
     QByteArray generateNonce(NonceProvider provider = NonceProvider::automatic) const;
 
@@ -87,6 +85,8 @@ public:
         Qn::UserAccessData* accessRights = nullptr) const;
 
     bool checkUserPassword(const QnUserResourcePtr& user, const QString& password);
+
+    QnLdapManager* ldapManager() const;
 
 signals:
     void emptyDigestDetected(const QnUserResourcePtr& user, const QString& login, const QString& password);
@@ -168,20 +168,20 @@ private:
     AbstractNonceProvider* m_timeBasedNonceProvider;
     AbstractNonceProvider* m_nonceProvider;
     AbstractUserDataProvider* m_userDataProvider;
+    std::unique_ptr<QnLdapManager> m_ldap;
 
     void authenticationExpired( const QString& path, quint64 timerID );
     QnUserResourcePtr findUserByName( const QByteArray& nxUserName ) const;
-    void applyClientCalculatedPasswordHashToResource(
-        const QnUserResourcePtr& userResource,
-        const UserDigestData& userDigestData );
-    Qn::AuthResult doPasswordProlongation(QnUserResourcePtr userResource);
+    void updateUserHashes(const QnUserResourcePtr& userResource, const QString& password);
+
+    bool decodeBasicAuthData(const QByteArray& authData, QString* outUserName, QString* outPassword);
+    bool decodeLDAPPassword(const QByteArray& hash, QString* outPassword);
 
     /*!
         \return \a true if password expiration timestamp has been increased
     */
     //!Check \a digest validity with external authentication service (LDAP currently)
     Qn::AuthResult checkDigestValidity(QnUserResourcePtr userResource, const QByteArray& digest );
-
 };
 
 #define qnAuthHelper QnAuthHelper::instance()

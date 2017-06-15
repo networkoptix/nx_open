@@ -23,7 +23,7 @@
         <targetName>vms_gateway</targetName>
 
         <qt.libs>core network concurrent sql xml</qt.libs>
-        <global.libs>-lnx_network -ludt -lcloud_db_client</global.libs>
+        <global.libs>-lcommon -lnx_network -ludt -lcloud_db_client</global.libs>
         <windows.oslibs>-lws2_32 -lIphlpapi DbgHelp.lib -lwinmm</windows.oslibs>
         <mac.oslibs>-lbz2 -framework IOKit -framework CoreServices -lcrypto</mac.oslibs>
 
@@ -38,6 +38,15 @@
             <type>pom</type>
             <scope>system</scope>
             <systemPath>${root.dir}/common_libs/nx_network/pom.xml</systemPath>
+        </dependency>
+
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>common</artifactId>
+            <version>${project.version}</version>
+            <type>pom</type>
+            <scope>system</scope>
+            <systemPath>${root.dir}/common/pom.xml</systemPath>
         </dependency>
 
         <dependency>

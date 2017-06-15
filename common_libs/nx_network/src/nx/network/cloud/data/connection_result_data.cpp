@@ -8,6 +8,38 @@ namespace api {
 
 using namespace stun::extension;
 
+SystemError::ErrorCode toSystemErrorCode(NatTraversalResultCode resultCode)
+{
+    switch (resultCode)
+    {
+        case NatTraversalResultCode::ok:
+            return SystemError::noError;
+
+        case NatTraversalResultCode::endpointVerificationFailure:
+            return SystemError::connectionRefused;
+
+        case NatTraversalResultCode::udtConnectFailed:
+        case NatTraversalResultCode::tcpConnectFailed:
+        case NatTraversalResultCode::errorConnectingToRelay:
+            return SystemError::connectionReset;
+
+        case NatTraversalResultCode::notFoundOnRelay:
+            return SystemError::hostNotFound;
+
+        case NatTraversalResultCode::noResponseFromMediator:
+        case NatTraversalResultCode::mediatorReportedError:
+        case NatTraversalResultCode::noSynFromTargetPeer:
+        case NatTraversalResultCode::targetPeerHasNoUdpAddress:
+        case NatTraversalResultCode::noSuitableMethod:
+            return SystemError::connectionAbort;
+
+        default:
+            return SystemError::connectionReset;
+    }
+}
+
+//-------------------------------------------------------------------------------------------------
+
 ConnectionResultRequest::ConnectionResultRequest():
     StunRequestData(kMethod),
     resultCode(NatTraversalResultCode::ok),

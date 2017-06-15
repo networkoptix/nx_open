@@ -4,6 +4,7 @@
 #include <string>
 
 #include <nx/fusion/model_functions_fwd.h>
+#include <nx/network/http/http_types.h>
 
 namespace nx {
 namespace cloud {
@@ -21,6 +22,14 @@ struct BeginListeningResponse
 {
     int preemptiveConnectionCount = 0;
 };
+
+NX_NETWORK_API bool serializeToHeaders(
+    nx_http::HttpHeaders* where,
+    const BeginListeningResponse& what);
+
+NX_NETWORK_API bool deserializeFromHeaders(
+    const nx_http::HttpHeaders& from,
+    BeginListeningResponse* what);
 
 inline bool operator==(
     const BeginListeningResponse& left,

@@ -34,6 +34,10 @@
 #include <recorder/storage_manager.h>
 #include <common/static_common_module.h>
 #include <utils/common/app_info.h>
+#include <nx/mediaserver/unused_wallpapers_watcher.h>
+#include <core/resource_management/resource_pool.h>
+
+#include <nx/vms/common/p2p/downloader/downloader.h>
 
 namespace {
 
@@ -44,6 +48,19 @@ void installTranslations()
     QnTranslationManager translationManager;
     QnTranslation defaultTranslation = translationManager.loadTranslation(kDefaultPath);
     QnTranslationManager::installTranslation(defaultTranslation);
+}
+
+QDir downloadsDirectory()
+{
+    const QString varDir = qnServerModule->roSettings()->value("varDir").toString();
+    if (varDir.isEmpty())
+        return QDir();
+
+    const QDir dir(varDir + lit("/downloads"));
+    if (!dir.exists())
+        QDir().mkpath(dir.absolutePath());
+
+    return dir;
 }
 
 } // namespace
@@ -65,8 +82,11 @@ QnMediaServerModule::QnMediaServerModule(
     m_settings = store(new MSSettings(roSettingsPath, rwSettingsPath));
 
     m_commonModule = store(new QnCommonModule(/*clientMode*/ false));
+#ifdef ENABLE_VMAX
+    // It depend on Vmax480Resources in the pool. Pool should be cleared before QnVMax480Server destructor.
+    store(new QnVMax480Server(commonModule()));
+#endif
 
-    instance<QnLongRunnablePool>();
     instance<QnWriterPool>();
 #ifdef ENABLE_ONVIF
     store<PasswordHelper>(new PasswordHelper());
@@ -89,12 +109,12 @@ QnMediaServerModule::QnMediaServerModule(
     nx::network::SocketGlobals::mediatorConnector().enable(true);
 
     store(new QnNewSystemServerFlagWatcher(commonModule()));
-    store(new QnMasterServerStatusWatcher(commonModule()));
+    store(new QnMasterServerStatusWatcher(
+        commonModule(),
+        m_settings->delayBeforeSettingMasterFlag()));
+    m_unusedWallpapersWatcher = store(new nx::mediaserver::UnusedWallpapersWatcher(commonModule()));
 
     store(new QnBusinessMessageBus(commonModule()));
-#ifdef ENABLE_VMAX
-    store(new QnVMax480Server(commonModule()));
-#endif
 
     store(new QnServerPtzControllerPool(commonModule()));
 
@@ -120,12 +140,16 @@ QnMediaServerModule::QnMediaServerModule(
 
     store(new QnFileDeletor(commonModule()));
 
+    store(new nx::vms::common::p2p::downloader::Downloader(
+        downloadsDirectory(), commonModule()));
+
     // Translations must be installed from the main applicaition thread.
     executeDelayed(&installTranslations, kDefaultDelay, qApp->thread());
 }
 
 QnMediaServerModule::~QnMediaServerModule()
 {
+    m_commonModule->resourcePool()->clear();
     m_context.reset();
     clear();
 }
@@ -153,4 +177,9 @@ MSSettings* QnMediaServerModule::settings() const
 QSettings* QnMediaServerModule::runTimeSettings() const
 {
     return m_settings->runTimeSettings();
+}
+
+nx::mediaserver::UnusedWallpapersWatcher* QnMediaServerModule::unusedWallpapersWatcher() const
+{
+    return m_unusedWallpapersWatcher;
 }

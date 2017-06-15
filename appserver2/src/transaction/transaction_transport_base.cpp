@@ -17,7 +17,7 @@
 #include <nx/utils/gzip/gzip_uncompressor.h>
 #include <nx/utils/system_error.h>
 
-#include <cdb/ec2_request_paths.h>
+#include <nx/cloud/cdb/api/ec2_request_paths.h>
 #include <nx_ec/ec_proto_version.h>
 #include <nx/utils/byte_stream/custom_output_stream.h>
 #include <utils/common/util.h>
@@ -40,9 +40,8 @@ namespace {
     (all transactions that read with single read from socket)
 */
 static const int MAX_TRANS_TO_POST_AT_A_TIME = 16;
-static const QnUuid kCloudPeerId(lit("674BAFD7-4EEC-4BBA-84AA-A1BAEA7FC6DB"));
 
-}
+} // namespace
 
 namespace ec2
 {
@@ -241,7 +240,7 @@ QnTransactionTransportBase::QnTransactionTransportBase(
     m_readBuffer.reserve( DEFAULT_READ_BUFFER_SIZE );
     m_lastReceiveTimer.invalidate();
 
-    NX_LOG(QnLog::EC2_TRAN_LOG, lit("QnTransactionTransportBase for object = %1").arg((size_t) this,  0, 16), cl_logDEBUG1);
+    NX_LOGX(QnLog::EC2_TRAN_LOG, lit("QnTransactionTransportBase for object = %1").arg((size_t) this,  0, 16), cl_logDEBUG2);
 
     //creating parser sequence: multipart_parser -> ext_headers_processor -> transaction handler
     m_multipartContentParser = std::make_shared<nx_http::MultipartContentParser>();
@@ -263,7 +262,7 @@ QnTransactionTransportBase::QnTransactionTransportBase(
 
 QnTransactionTransportBase::~QnTransactionTransportBase()
 {
-    NX_LOG(QnLog::EC2_TRAN_LOG, lit("~QnTransactionTransportBase for object = %1").arg((size_t) this,  0, 16), cl_logDEBUG1);
+    NX_LOGX(QnLog::EC2_TRAN_LOG, lit("~QnTransactionTransportBase for object = %1").arg((size_t) this,  0, 16), cl_logDEBUG2);
 
     stopWhileInAioThread();
 
@@ -1509,37 +1508,6 @@ void QnTransactionTransportBase::setRemoteIdentityTime(qint64 time)
 qint64 QnTransactionTransportBase::remoteIdentityTime() const
 {
     return m_remoteIdentityTime;
-}
-
-bool QnTransactionTransportBase::skipTransactionForMobileClient(ApiCommand::Value command) {
-    switch (command) {
-    case ApiCommand::getMediaServersEx:
-    case ApiCommand::saveCameras:
-    case ApiCommand::getCamerasEx:
-    case ApiCommand::getUsers:
-    case ApiCommand::saveLayouts:
-    case ApiCommand::getLayouts:
-    case ApiCommand::removeResource:
-    case ApiCommand::removeCamera:
-    case ApiCommand::removeMediaServer:
-    case ApiCommand::removeUser:
-    case ApiCommand::removeLayout:
-    case ApiCommand::saveCamera:
-    case ApiCommand::saveMediaServer:
-    case ApiCommand::saveUser:
-    case ApiCommand::saveLayout:
-    case ApiCommand::setResourceStatus:
-    case ApiCommand::setResourceParam:
-    case ApiCommand::setResourceParams:
-    case ApiCommand::saveCameraUserAttributes:
-    case ApiCommand::saveMediaServerUserAttributes:
-    case ApiCommand::getCameraHistoryItems:
-    case ApiCommand::addCameraHistoryItem:
-        return false;
-    default:
-        break;
-    }
-    return true;
 }
 
 void QnTransactionTransportBase::scheduleAsyncRead()

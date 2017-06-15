@@ -49,6 +49,7 @@ class CmdLineArguments
 {
 public:
     QString logLevel;
+    QString exceptionFilters;
     //!Log level of http requests log
     QString msgLogLevel;
     QString ec2TranLogLevel;
@@ -68,7 +69,7 @@ public:
     QString enforceSocketType;
     QString enforcedMediatorEndpoint;
     QString ipVersion;
-
+    QString createFakeData;
 
     CmdLineArguments() :
         logLevel(
@@ -111,6 +112,8 @@ public:
         else
             return nullptr;
     }
+    MSSettings* serverSettings() const { return m_settings.get(); }
+
 signals:
     void started();
 public slots:
@@ -129,7 +132,7 @@ private slots:
     void at_archiveBackupFinished(qint64 backedUpToMs, QnBusiness::EventReason code);
     void at_timer();
     void at_connectionOpened();
-    void at_serverModuleConflict(nx::vms::discovery::Manager::ModuleData module);
+    void at_serverModuleConflict(nx::vms::discovery::ModuleEndpoint module);
 
     void at_appStarted();
     void at_runtimeInfoChanged(const QnPeerRuntimeInfo& runtimeInfo);
@@ -147,10 +150,10 @@ private:
     void registerRestHandlers(
         CloudManagerGroup* const cloudManagerGroup,
         QnUniversalTcpListener* tcpListener,
-        ec2::QnTransactionMessageBus* messageBus);
+        ec2::QnTransactionMessageBusBase* messageBus);
     bool initTcpListener(
         CloudManagerGroup* const cloudManagerGroup,
-        ec2::QnTransactionMessageBus* messageBus);
+        ec2::QnTransactionMessageBusBase* messageBus);
     std::unique_ptr<nx_upnp::PortMapper> initializeUpnpPortMapper();
     Qn::ServerFlags calcServerFlags();
     void initPublicIpDiscovery();
@@ -168,6 +171,11 @@ private:
     void serviceModeInit();
     QString hardwareIdAsGuid() const;
     void updateGuidIfNeeded();
+
+    // TODO: Makes sense to split into helper functions and move into appserver2 so it can be used
+    // in unit tests.
+    void makeFakeData(const QString& fakeDataString, const ec2::AbstractECConnectionPtr& connection);
+
 private:
     int m_argc;
     char** m_argv;
@@ -194,6 +202,7 @@ private:
     std::unique_ptr<nx::utils::promise<void>> m_initStoragesAsyncPromise;
     std::weak_ptr<QnMediaServerModule> m_serverModule;
     bool m_serviceMode;
+    std::unique_ptr<MSSettings> m_settings;
 };
 
 #endif // MEDIA_SERVER_PROCESS_H

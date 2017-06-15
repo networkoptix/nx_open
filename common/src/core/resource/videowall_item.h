@@ -48,12 +48,6 @@ public:
         QnUuid controlledBy;
     } runtimeStatus;
 
-    static QString mimeType();
-
-    static void serializeUuids(const QList<QnUuid>& uuids, QMimeData* mimeData);
-
-    static QList<QnUuid> deserializeUuids(const QMimeData* mimeData);
-
     friend bool operator==(const QnVideoWallItem& l, const QnVideoWallItem& r)
     {
         return (l.layout == r.layout

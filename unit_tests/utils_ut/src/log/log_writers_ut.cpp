@@ -3,6 +3,7 @@
 #include <nx/utils/log/log_writers.h>
 #include <nx/utils/random.h>
 #include <nx/utils/std/cpp14.h>
+#include <nx/utils/test_support/test_options.h>
 
 #include <QtCore/QFile>
 
@@ -21,7 +22,11 @@ class LogFile: public ::testing::Test
 {
 public:
     // TODO: Use temp directory from TestOptions when avaliable.
-    LogFile(): m_basePath(lm("/tmp/log_test_%1/log").arg(nx::utils::random::number())) {}
+    LogFile():
+        m_basePath(lm("%1/log%2").args(
+            TestOptions::temporaryDirectoryPath(), nx::utils::random::number()))
+    {
+    }
 
     std::unique_ptr<AbstractWriter> makeWriter(size_t size, size_t count = 0)
     {

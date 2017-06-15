@@ -215,11 +215,17 @@ angular.module('nxCommon')
             },
             stopScope:function(scope){
                 var targetAnimation = _.find(animations,function(anim){ // Try to find,if there
-                    return anim.scope === scope && anim.value === value;
+
+                    return anim.scope === scope;
                 });
                 if(targetAnimation){
                     targetAnimation.breakAnimation();
                 } 
+            },
+            stopHandler:function(handler){
+                if(animationHandler === handler){
+                    animationHandler = null;
+                }
             }
         };
     }]);

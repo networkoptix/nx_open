@@ -4,7 +4,7 @@ import Nx.Media 1.0
 import Nx.Controls 1.0
 import Nx.Items 1.0
 import Nx.Models 1.0
-
+import Nx.Settings 1.0
 import com.networkoptix.qml 1.0
 
 import "private/VideoScreen"
@@ -21,6 +21,8 @@ PageBase
     VideoScreenController
     {
         id: videoScreenController
+
+        mediaPlayer.videoQuality: settings.lastUsedQuality
 
         mediaPlayer.onPlayingChanged:
         {
@@ -166,7 +168,7 @@ PageBase
                 dialog.onActiveQualityChanged.connect(
                     function()
                     {
-                        videoScreenController.mediaPlayer.videoQuality = dialog.activeQuality
+                        settings.lastUsedQuality = dialog.activeQuality
                     }
                 )
             }

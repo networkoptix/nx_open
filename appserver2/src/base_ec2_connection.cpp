@@ -66,7 +66,7 @@ BaseEc2Connection<QueryProcessorType>::~BaseEc2Connection()
 template<class QueryProcessorType>
 void BaseEc2Connection<QueryProcessorType>::startReceivingNotifications()
 {
-    connect(m_connectionFactory->messageBus(), &QnTransactionMessageBus::peerFound,
+    connect(m_connectionFactory->messageBus(), &QnTransactionMessageBusBase::peerFound,
         this, &BaseEc2Connection<QueryProcessorType>::remotePeerFound, Qt::DirectConnection);
     connect(m_connectionFactory->messageBus(), &QnTransactionMessageBus::peerLost,
         this, &BaseEc2Connection<QueryProcessorType>::remotePeerLost, Qt::DirectConnection);
@@ -262,7 +262,7 @@ AbstractUpdatesManagerPtr BaseEc2Connection<QueryProcessorType>::getUpdatesManag
     const Qn::UserAccessData& userAccessData)
 {
     return std::make_shared<QnUpdatesManager<QueryProcessorType>>(
-        m_queryProcessor, userAccessData);
+        m_queryProcessor, userAccessData, messageBus());
 }
 
 template<class QueryProcessorType>
@@ -371,23 +371,18 @@ int BaseEc2Connection<QueryProcessorType>::restoreDatabaseAsync(
 }
 
 template<class QueryProcessorType>
-void BaseEc2Connection<QueryProcessorType>::addRemotePeer(const QUrl& _url)
+void BaseEc2Connection<QueryProcessorType>::addRemotePeer(const QnUuid& id, const QUrl& _url)
 {
     QUrl url(_url);
-    url.setPath("/ec2/events");
     QUrlQuery q;
     url.setQuery(q);
-    m_connectionFactory->messageBus()->addConnectionToPeer(url);
+    m_connectionFactory->messageBus()->addOutgoingConnectionToPeer(id, url);
 }
 
 template<class QueryProcessorType>
-void BaseEc2Connection<QueryProcessorType>::deleteRemotePeer(const QUrl& _url)
+void BaseEc2Connection<QueryProcessorType>::deleteRemotePeer(const QnUuid& id)
 {
-    QUrl url(_url);
-    url.setPath("/ec2/events");
-    QUrlQuery q;
-    url.setQuery(q);
-    m_connectionFactory->messageBus()->removeConnectionFromPeer(url);
+    m_connectionFactory->messageBus()->removeOutgoingConnectionFromPeer (id);
 }
 
 template<class QueryProcessorType>
@@ -399,7 +394,7 @@ QnUuid BaseEc2Connection<QueryProcessorType>::routeToPeerVia(
 }
 
 template<class QueryProcessorType>
-QnTransactionMessageBus* BaseEc2Connection<QueryProcessorType>::messageBus() const
+QnTransactionMessageBusBase* BaseEc2Connection<QueryProcessorType>::messageBus() const
 {
     return m_connectionFactory->messageBus();
 }

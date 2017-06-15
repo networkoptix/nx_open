@@ -1,3 +1,0 @@
-This library provides just one method that just calls posix_spawn.
-It is needed to use posix_spawn on ISD Jaguar, since if compile code with posix_spawn with codesourcery gcc 4.8.1, resulting binary cannot be started on ISD Jaguar due to GLIBC_2.15 requirement,
-so building this library with gcc 4.6 and linking to project

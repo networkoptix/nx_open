@@ -248,6 +248,7 @@ public:
     int maxRecorderQueueSizePackets() const;
 
 signals:
+    void adminUserFound(const QnResourcePtr& resource); //use queued signal to prevent previous behavior
     void initialized();
 
     void systemNameChanged();
@@ -280,7 +281,7 @@ private:
     AdaptorList initCloudAdaptors();
     AdaptorList initMiscAdaptors();
 
-    void at_resourcePool_resourceAdded(const QnResourcePtr &resource);
+    void at_adminUserAdded(const QnResourcePtr &resource);
     void at_resourcePool_resourceRemoved(const QnResourcePtr &resource);
 
 private:

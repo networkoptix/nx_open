@@ -21,11 +21,12 @@
 #include <nx/utils/log/log.h>
 #include <utils/common/app_info.h>
 
-#include "business/business_strings_helper.h"
-#include "common/common_module.h"
-#include "nx_ec/data/api_business_rule_data.h"
-#include "nx_ec/data/api_conversion_functions.h"
-#include "database/server_db.h"
+#include <business/business_strings_helper.h>
+#include <business/event_rule_manager.h>
+#include <common/common_module.h>
+#include <nx_ec/data/api_business_rule_data.h>
+#include <nx_ec/data/api_conversion_functions.h>
+#include <database/server_db.h>
 #include <common/common_module.h>
 
 QnBusinessRuleProcessor::QnBusinessRuleProcessor(QnCommonModule* commonModule):
@@ -45,12 +46,12 @@ QnBusinessRuleProcessor::QnBusinessRuleProcessor(QnCommonModule* commonModule):
         this, static_cast<void (QnBusinessRuleProcessor::*)(const QnAbstractBusinessActionPtr&)>(&QnBusinessRuleProcessor::executeAction),
 		Qt::QueuedConnection);
 
-    connect(commonModule->messageProcessor(),       &QnCommonMessageProcessor::businessRuleChanged,
-            this, &QnBusinessRuleProcessor::at_businessRuleChanged);
-    connect(commonModule->messageProcessor(),       &QnCommonMessageProcessor::businessRuleDeleted,
-            this, &QnBusinessRuleProcessor::at_businessRuleDeleted);
-    connect(commonModule->messageProcessor(),       &QnCommonMessageProcessor::businessRuleReset,
-            this, &QnBusinessRuleProcessor::at_businessRuleReset);
+    connect(eventRuleManager(), &QnEventRuleManager::ruleAddedOrUpdated,
+            this, &QnBusinessRuleProcessor::at_eventRuleChanged);
+    connect(eventRuleManager(), &QnEventRuleManager::ruleRemoved,
+            this, &QnBusinessRuleProcessor::at_eventRuleRemoved);
+    connect(eventRuleManager(), &QnEventRuleManager::rulesReset,
+            this, &QnBusinessRuleProcessor::at_eventRulesReset);
 
     connect(&m_timer, &QTimer::timeout, this, &QnBusinessRuleProcessor::at_timer, Qt::QueuedConnection);
     m_timer.start(1000);
@@ -250,7 +251,7 @@ bool QnBusinessRuleProcessor::executeActionInternal(const QnAbstractBusinessActi
 
 void QnBusinessRuleProcessor::addBusinessRule(const QnBusinessEventRulePtr& value)
 {
-    at_businessRuleChanged(value);
+    at_eventRuleChanged(value);
 }
 
 void QnBusinessRuleProcessor::processBusinessEvent(const QnAbstractBusinessEventPtr& bEvent)
@@ -357,7 +358,7 @@ QnAbstractBusinessActionPtr QnBusinessRuleProcessor::processInstantAction(
         return QnBusinessActionFactory::instantiateAction(rule, bEvent, commonModule()->moduleGUID());
 
     QString eventKey = rule->getUniqueId();
-    if (bEvent->getResource())
+    if (bEvent->getResource() && bEvent->getEventType() != QnBusiness::SoftwareTriggerEvent)
         eventKey += bEvent->getResource()->getUniqueId();
 
     QnProcessorAggregationInfo& aggInfo = m_aggregateActions[eventKey];
@@ -478,7 +479,7 @@ bool QnBusinessRuleProcessor::broadcastBusinessAction(const QnAbstractBusinessAc
     return true;
 }
 
-void QnBusinessRuleProcessor::at_businessRuleChanged_i(const QnBusinessEventRulePtr& bRule)
+void QnBusinessRuleProcessor::at_eventRuleChanged_i(const QnBusinessEventRulePtr& bRule)
 {
     for (int i = 0; i < m_rules.size(); ++i)
     {
@@ -500,13 +501,13 @@ void QnBusinessRuleProcessor::at_businessRuleChanged_i(const QnBusinessEventRule
         notifyResourcesAboutEventIfNeccessary( bRule, true );
 }
 
-void QnBusinessRuleProcessor::at_businessRuleChanged(const QnBusinessEventRulePtr& bRule)
+void QnBusinessRuleProcessor::at_eventRuleChanged(const QnBusinessEventRulePtr& bRule)
 {
-    QnMutexLocker lock( &m_mutex );
-    at_businessRuleChanged_i(bRule);
+    QnMutexLocker lock(&m_mutex);
+    at_eventRuleChanged_i(bRule);
 }
 
-void QnBusinessRuleProcessor::at_businessRuleReset(const QnBusinessEventRuleList& rules)
+void QnBusinessRuleProcessor::at_eventRulesReset(const QnBusinessEventRuleList& rules)
 {
     QnMutexLocker lock( &m_mutex );
 
@@ -520,7 +521,7 @@ void QnBusinessRuleProcessor::at_businessRuleReset(const QnBusinessEventRuleList
     m_rules.clear();
 
     for(const QnBusinessEventRulePtr& rule: rules) {
-        at_businessRuleChanged_i(rule);
+        at_eventRuleChanged_i(rule);
     }
 }
 
@@ -591,7 +592,7 @@ void QnBusinessRuleProcessor::terminateRunningRule(const QnBusinessEventRulePtr&
     }
 }
 
-void QnBusinessRuleProcessor::at_businessRuleDeleted(QnUuid id)
+void QnBusinessRuleProcessor::at_eventRuleRemoved(QnUuid id)
 {
     QnMutexLocker lock( &m_mutex );
 

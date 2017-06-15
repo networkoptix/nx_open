@@ -3,8 +3,8 @@
 
 #include <gtest/gtest.h>
 #include <server/server_globals.h>
-#include "utils.h"
-#include "mediaserver_launcher.h"
+#include <test_support/utils.h>
+#include <test_support/mediaserver_launcher.h>
 #include <api/app_server_connection.h>
 #include <nx/network/http/auth_tools.h>
 #include <nx/network/http/http_client.h>
@@ -16,6 +16,8 @@
 #include <network/authutil.h>
 #include <rest/server/json_rest_result.h>
 #include "utils/common/sleep.h"
+#include "common/common_module.h"
+#include <api/global_settings.h>
 
 class AuthReturnCodeTest:
     public ::testing::Test
@@ -54,8 +56,17 @@ public:
         ldapUserWithFilledDigest.name = "ldap user 2";
         ldapUserWithFilledDigest.isEnabled = true;
         ldapUserWithFilledDigest.isLdap = true;
-        ldapUserWithFilledDigest.digest = "some digest";
+
+        auto hashes = PasswordData::calculateHashes(ldapUserWithFilledDigest.name, "some password", true);
+        ldapUserWithFilledDigest.hash = hashes.passwordHash;
+        ldapUserWithFilledDigest.digest = hashes.passwordDigest;
+
         ASSERT_EQ(ec2::ErrorCode::ok, userManager->saveSync(ldapUserWithFilledDigest));
+
+        auto settings = mediaServerLauncher->commonModule()->globalSettings();
+        settings->setCloudSystemId(QnUuid::createUuid().toString());
+        settings->setCloudAuthKey(QnUuid::createUuid().toString());
+        settings->synchronizeNowSync();
     }
 
     void addLocalUser(QString userName, QString password)
@@ -142,6 +153,8 @@ private:
         httpClient.setUserName(login);
         httpClient.setUserPassword(password);
         httpClient.setAuthType(authType);
+        httpClient.addAdditionalHeader(Qn::CUSTOM_CHANGE_REALM_HEADER_NAME, QByteArray());
+
         const auto startTime = std::chrono::steady_clock::now();
         constexpr const auto maxPeriodToWaitForMediaServerStart = std::chrono::seconds(150);
         while (std::chrono::steady_clock::now() - startTime < maxPeriodToWaitForMediaServerStart)

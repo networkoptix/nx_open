@@ -49,10 +49,10 @@ public:
   template<typename F>
   movable_func(F f) : held_(new holder<F>(std::move(f))) {}
   movable_func() : held_(nullptr) {}
-  movable_func(movable_func<R(Args...)>&& other) = default;
-  movable_func& operator = (movable_func<R(Args...)>&& other) = default;
-  movable_func(const movable_func<R(Args...)>& other) = delete;
-  movable_func& operator = (const movable_func<R(Args...)>& other) = delete;
+  movable_func(movable_func<R(Args...)>&& /*other*/) = default;
+  movable_func& operator = (movable_func<R(Args...)>&& /*other*/) = default;
+  movable_func(const movable_func<R(Args...)>& /*other*/) = delete;
+  movable_func& operator = (const movable_func<R(Args...)>& /*other*/) = delete;
   bool empty() const { return !held_; }
 
   R operator() (Args... args) const {
@@ -329,8 +329,8 @@ class future {
 public:
   future() = default;
 
-  future(const future<T>& other) = delete;
-  future<T>& operator = (const future<T>& other) = delete;
+  future(const future<T>& /*other*/) = delete;
+  future<T>& operator = (const future<T>& /*other*/) = delete;
 
   future(future<T>&& other)
     : state_(std::move(other.state_)) {}

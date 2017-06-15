@@ -6,13 +6,14 @@
 #include <nx_ec/managers/abstract_user_manager.h>
 #include "rest/server/rest_connection_processor.h"
 
+#include <nx/network/http/custom_headers.h>
 #include <nx/network/http/http_types.h>
 #include <network/authenticate_helper.h>
 #include <common/common_module.h>
 
 int QnCurrentUserRestHandler::executeGet(
     const QString&,
-    const QnRequestParams&,
+    const QnRequestParams& params,
     QnJsonRestResult &result,
     const QnRestConnectionProcessor* owner)
 {
@@ -21,15 +22,25 @@ int QnCurrentUserRestHandler::executeGet(
     auto accessRights = owner->accessRights();
     if (accessRights.isNull())
     {
-        const QString& cookie = QLatin1String(nx_http::getHeaderValue(owner->request().headers, "Cookie"));
-        QnAuthHelper::instance()->doCookieAuthorization("GET", cookie.toUtf8(), *owner->response(), &accessRights);
+        QnAuthHelper::instance()->doCookieAuthorization(
+            "GET", nx_http::getHeaderValue(owner->request().headers, "Cookie"),
+            *owner->response(), &accessRights);
+    }
+    if (accessRights.isNull())
+    {
+        nx_http::Response response;
+        QnAuthHelper::instance()->authenticateByUrl(
+            params.value(Qn::URL_QUERY_AUTH_KEY_NAME).toUtf8(), "GET", response, &accessRights);
+    }
+    if (accessRights.isNull())
+    {
+        result.setError(QnJsonRestResult::CantProcessRequest, lit("Auth did not pass"));
+        return nx_http::StatusCode::unauthorized;
     }
 
     ec2::AbstractECConnectionPtr ec2Connection = owner->commonModule()->ec2Connection();
     ec2::ApiUserDataList users;
-    ec2::ErrorCode errCode =
-        ec2Connection->getUserManager(accessRights)
-                     ->getUsersSync(&users);
+    ec2::ErrorCode errCode = ec2Connection->getUserManager(accessRights)->getUsersSync(&users);
     if (errCode !=  ec2::ErrorCode::ok)
     {
         if (errCode == ec2::ErrorCode::forbidden)

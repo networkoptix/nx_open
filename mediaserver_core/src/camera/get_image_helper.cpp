@@ -82,7 +82,7 @@ QSharedPointer<CLVideoDecoderOutput> QnGetImageHelper::readFrame(
 
     CLVideoDecoderOutputPtr outFrame(new CLVideoDecoderOutput());
     QnConstCompressedVideoDataPtr video;
-
+    bool isArchiveVideoPacket = false;
     if (time == DATETIME_NOW)
     {
         // get live data
@@ -103,12 +103,12 @@ QSharedPointer<CLVideoDecoderOutput> QnGetImageHelper::readFrame(
                 serverDelegate.seek(serverDelegate.endTime()-1000*100, true);
             }
             video = getNextArchiveVideoPacket(serverDelegate, AV_NOPTS_VALUE);
-        }
-        else {
-            time = DATETIME_NOW;
+            isArchiveVideoPacket = true;
         }
     }
-    else {
+    else
+    {
+        isArchiveVideoPacket = true;
         // get archive data
         if (!serverDelegate.isOpened()) {
             serverDelegate.open(res);
@@ -143,8 +143,8 @@ QSharedPointer<CLVideoDecoderOutput> QnGetImageHelper::readFrame(
     QnFfmpegVideoDecoder decoder(video->compressionType, video, false);
     bool gotFrame = false;
 
-    if (time == DATETIME_NOW) {
-        if (res->getStatus() == Qn::Online || res->getStatus() == Qn::Recording)
+    if (!isArchiveVideoPacket) {
+        if (res->getStatus() == Qn::Online || res->getStatus() == Qn::Recording || time != DATETIME_NOW)
         {
             gotFrame = decoder.decode(video, &outFrame);
             if (!gotFrame)

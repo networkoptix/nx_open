@@ -16,6 +16,7 @@
     <properties>
         <!-- Change it to point relatively to the root-->
         <root.dir>${basedir}/../..</root.dir>
+        <rdep.linux.packages>cifs-utils</rdep.linux.packages>
     </properties>
     <profiles>
         <profile>

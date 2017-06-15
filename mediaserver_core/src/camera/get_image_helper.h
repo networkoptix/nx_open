@@ -8,6 +8,8 @@
 #include <core/resource/resource_fwd.h>
 #include <camera/video_camera.h>
 
+#include <transcoding/filters/abstract_image_filter.h>
+
 class CLVideoDecoderOutput;
 typedef QSharedPointer<CLVideoDecoderOutput> CLVideoDecoderOutputPtr;
 class QnServerArchiveDelegate;

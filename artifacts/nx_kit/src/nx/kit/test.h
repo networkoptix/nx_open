@@ -73,7 +73,7 @@ NX_KIT_API void assertBool(
     bool expected, bool cond, const char* const condStr, const char* const file, int line);
 
 template<typename Expected, typename Actual>
-NX_KIT_API void assertEq(
+void assertEq(
     const Expected& expected, const char* expectedExpr,
     const Actual& actual, const char* actualExpr,
     const char* const file, int line)
