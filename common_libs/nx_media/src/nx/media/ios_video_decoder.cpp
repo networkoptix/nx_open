@@ -301,11 +301,6 @@ QSize IOSVideoDecoder::maxResolution(const AVCodecID codec)
         return QSize(1280, 720);
 }
 
-QString IOSVideoDecoder::name()
-{
-    return lit("ios_native");
-}
-
 int IOSVideoDecoder::decode(
     const QnConstCompressedVideoDataPtr& compressedVideoData,
     QVideoFramePtr* outDecodedFrame)

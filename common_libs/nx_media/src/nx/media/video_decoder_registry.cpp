@@ -1,5 +1,7 @@
 #include "video_decoder_registry.h"
 
+#include <unordered_map>
+
 #include <QtCore/QMutexLocker>
 
 #include <nx/utils/log/log.h>
@@ -53,7 +55,8 @@ VideoDecoderPtr VideoDecoderRegistry::createCompatibleDecoder(
 }
 
 bool VideoDecoderRegistry::hasCompatibleDecoder(
-    const AVCodecID codec, const QSize& resolution, UsageCountPolicy countCheckPolicy)
+    const AVCodecID codec, const QSize& resolution,
+    const std::vector<AbstractVideoDecoder*>& currentDecoders)
 {
     auto codecString =
         [codec, &resolution]()
@@ -63,10 +66,17 @@ bool VideoDecoderRegistry::hasCompatibleDecoder(
 
     NX_LOGX(lm("Checking for decoder compatible with codec %1.").arg(codecString()), cl_logDEBUG2);
 
+    std::unordered_map<std::type_index, int> decoderCountByTypeIndex;
+    for (const auto& decoder: currentDecoders)
+        ++decoderCountByTypeIndex[std::type_index(typeid(*decoder))];
+
     QMutexLocker lock(&mutex);
     for (const auto& plugin: m_plugins)
     {
-        if (countCheckPolicy == UsageCountPolicy::Check && plugin.useCount >= plugin.maxUseCount)
+        const int availableUsageCount =
+            plugin.useCount - decoderCountByTypeIndex[plugin.typeIndex];
+
+        if (availableUsageCount >= plugin.maxUseCount)
         {
             NX_LOGX(lm("Count exceeded for plugin %1").arg(plugin.name), cl_logDEBUG2);
             continue;

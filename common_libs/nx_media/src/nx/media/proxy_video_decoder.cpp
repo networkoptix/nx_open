@@ -135,11 +135,6 @@ QSize ProxyVideoDecoder::maxResolution(const AVCodecID codec)
     return QSize(w, h);
 }
 
-QString ProxyVideoDecoder::name()
-{
-    return lit("proxy");
-}
-
 int ProxyVideoDecoder::decode(
     const QnConstCompressedVideoDataPtr& compressedVideoData, QVideoFramePtr* outDecodedFrame)
 {

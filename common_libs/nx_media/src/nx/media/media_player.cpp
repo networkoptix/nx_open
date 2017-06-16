@@ -618,13 +618,17 @@ void PlayerPrivate::applyVideoQuality()
     if (!camera)
         return; //< Setting videoQuality for files is not supported.
 
+    const auto currentVideoDecoders = dataConsumer
+        ? dataConsumer->currentVideoDecoders()
+        : std::vector<AbstractVideoDecoder*>();
+
     const auto& result = media_player_quality_chooser::chooseVideoQuality(
         archiveReader->getTranscodingCodec(),
         videoQuality,
         liveMode,
         positionMs,
         camera,
-        media_player_quality_chooser::RequestReason::Playback);
+        currentVideoDecoders);
 
     switch (result.quality)
     {
@@ -1049,12 +1053,14 @@ QList<int> Player::availableVideoQualities(const QList<int>& videoQualities) con
         [&camera,
             codec = d->archiveReader->getTranscodingCodec(),
             liveMode = d->liveMode,
-            positionMs = d->positionMs]
+            positionMs = d->positionMs,
+            currentVideoDecoders = d->dataConsumer
+                ? d->dataConsumer->currentVideoDecoders()
+                : std::vector<AbstractVideoDecoder*>()]
             (int quality)
         {
             return media_player_quality_chooser::chooseVideoQuality(
-                codec, quality, liveMode, positionMs, camera,
-                media_player_quality_chooser::RequestReason::Information);
+                codec, quality, liveMode, positionMs, camera, currentVideoDecoders);
         };
 
     const auto highQuality = getQuality(HighVideoQuality);

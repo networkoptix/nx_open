@@ -146,13 +146,8 @@ static QSize applyTranscodingIfPossible(
     qint64 positionMs,
     const QnVirtualCameraResourcePtr& camera,
     const QSize& desiredResolution,
-    media_player_quality_chooser::RequestReason requestReason)
+    const std::vector<AbstractVideoDecoder*>& currentDecoders)
 {
-    const auto countCheckPolicy =
-        requestReason == media_player_quality_chooser::RequestReason::Information
-            ? VideoDecoderRegistry::UsageCountPolicy::Ignore
-            : VideoDecoderRegistry::UsageCountPolicy::Check;
-
     if (!isTranscodingSupported(liveMode, positionMs, camera))
     {
         NX_LOG(lit("[media_player] Transcoding not supported for the camera => Set low stream"),
@@ -163,7 +158,7 @@ static QSize applyTranscodingIfPossible(
     QSize resolution = limitResolution(desiredResolution, kMaxTranscodingResolution);
 
     if (!VideoDecoderRegistry::instance()->hasCompatibleDecoder(
-        transcodingCodec, resolution, countCheckPolicy))
+        transcodingCodec, resolution, currentDecoders))
     {
         NX_LOG(lit("[media_player] Transcoding to %1 x %2 not supported => Set low stream")
             .arg(resolution.width()).arg(resolution.height()), cl_logDEBUG1);
@@ -190,13 +185,8 @@ QSize media_player_quality_chooser::chooseHighStreamIfPossible(
     AVCodecID highCodec,
     const QSize& highResolution,
     const QnConstResourceVideoLayoutPtr& videoLayout,
-    RequestReason requestReason)
+    const std::vector<AbstractVideoDecoder*>& currentDecoders)
 {
-    const auto countCheckPolicy =
-        requestReason == media_player_quality_chooser::RequestReason::Information
-            ? VideoDecoderRegistry::UsageCountPolicy::Ignore
-            : VideoDecoderRegistry::UsageCountPolicy::Check;
-
     if (highCodec != AV_CODEC_ID_NONE && !highResolution.isEmpty()) //< High stream exists.
     {
         if (videoLayout->channelCount() > 1) //< Panoramic camera.
@@ -212,12 +202,12 @@ QSize media_player_quality_chooser::chooseHighStreamIfPossible(
                 cl_logDEBUG1);
 
             const QSize& quality = applyTranscodingIfPossible(
-                transcodingCodec, liveMode, positionMs, camera, resolution, requestReason);
+                transcodingCodec, liveMode, positionMs, camera, resolution, currentDecoders);
             if (quality.isValid())
                 return quality;
         }
         else if (VideoDecoderRegistry::instance()->hasCompatibleDecoder(
-            highCodec, highResolution, countCheckPolicy))
+            highCodec, highResolution, currentDecoders))
         {
             NX_LOG(lit("[media_player] High stream requested => Set high stream"),
                 cl_logDEBUG1);
@@ -228,7 +218,7 @@ QSize media_player_quality_chooser::chooseHighStreamIfPossible(
             NX_LOG(lit("[media_player] High stream requested but compatible decoder missing:"),
                 cl_logDEBUG1);
             const QSize& quality = applyTranscodingIfPossible(
-                transcodingCodec, liveMode, positionMs, camera, highResolution, requestReason);
+                transcodingCodec, liveMode, positionMs, camera, highResolution, currentDecoders);
             if (quality.isValid())
                 return quality;
         }
@@ -248,7 +238,7 @@ media_player_quality_chooser::Result media_player_quality_chooser::chooseVideoQu
     bool liveMode,
     qint64 positionMs,
     const QnVirtualCameraResourcePtr& camera,
-    RequestReason requestReason)
+    const std::vector<AbstractVideoDecoder*>& currentDecoders)
 {
     // Obtain Low and High stream codec and resolution.
     QSize highResolution;
@@ -297,7 +287,7 @@ media_player_quality_chooser::Result media_player_quality_chooser::chooseVideoQu
         const QSize& quality = chooseHighStreamIfPossible(
             transcodingCodec, liveMode, positionMs, camera,
             highCodec, highResolution, videoLayout,
-            requestReason);
+            currentDecoders);
         return makeResult(quality);
     }
     else if (lowStreamRequested)
@@ -309,7 +299,7 @@ media_player_quality_chooser::Result media_player_quality_chooser::chooseVideoQu
         const QSize& resolution = transcodingResolution(
             lowResolution, highResolution, videoQuality, transcodingCodec);
         const QSize& quality = applyTranscodingIfPossible(
-            transcodingCodec, liveMode, positionMs, camera, resolution, requestReason);
+            transcodingCodec, liveMode, positionMs, camera, resolution, currentDecoders);
         if (quality.isValid())
             return makeResult(quality);
     }

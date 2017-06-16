@@ -37,11 +37,6 @@ QSize JpegDecoder::maxResolution(const AVCodecID codec)
     return QSize();
 }
 
-QString JpegDecoder::name()
-{
-    return lit("jpeg");
-}
-
 int JpegDecoder::decode(const QnConstCompressedVideoDataPtr& frame, QVideoFramePtr* result)
 {
     Q_D(JpegDecoder);
