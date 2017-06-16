@@ -193,12 +193,12 @@ void Settings::loadListeningPeer()
             settings().value(kInternalTimerPeriod).toString(),
             kDefaultInternalTimerPeriod);
 
-    m_listeningPeer.tcpKeepAlive.time = duration_cast<seconds>(
+    m_listeningPeer.tcpKeepAlive.inactivityPeriodBeforeFirstProbe = duration_cast<seconds>(
         nx::utils::parseTimerDuration(
             settings().value(kInactivityPeriodBeforeFirstProbe).toString(),
             kDefaultInactivityPeriodBeforeFirstProbe));
 
-    m_listeningPeer.tcpKeepAlive.interval = duration_cast<seconds>(
+    m_listeningPeer.tcpKeepAlive.probeSendPeriod = duration_cast<seconds>(
         nx::utils::parseTimerDuration(
             settings().value(kProbeSendPeriod).toString(),
             kDefaultProbeSendPeriod));

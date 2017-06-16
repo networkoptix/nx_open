@@ -678,7 +678,7 @@ TEST_F(CloudServerSocket, reconnect)
 
 TEST_F(CloudServerSocket, serverChecksConnectionState)
 {
-    const KeepAliveOptions kKeepAliveOptions(1, 1, 1);
+    const KeepAliveOptions kKeepAliveOptions(std::chrono::seconds(1), std::chrono::seconds(1), 1);
     m_mediator.addArg(
         "-general/cloudConnectOptions", "serverChecksConnectionState");
     m_mediator.addArg(

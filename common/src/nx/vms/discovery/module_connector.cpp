@@ -9,7 +9,8 @@ namespace vms {
 namespace discovery {
 
 static const auto kUrl = lit("http://%1/api/moduleInformation?showAddresses=false");
-static const KeepAliveOptions kKeepAliveOptions(60, 10, 3);
+static const KeepAliveOptions kKeepAliveOptions(
+    std::chrono::seconds(60), std::chrono::seconds(10), 3);
 
 ModuleConnector::ModuleConnector(network::aio::AbstractAioThread* thread):
     network::aio::BasicPollable(thread),
