@@ -277,8 +277,6 @@ void StandaloneTimerManager::run()
                 const TimerId timerID = taskIter->first.second;
                 auto taskContext = std::move(taskIter->second);
 
-                m_taskToTime.erase(timerID);
-                m_timeToTask.erase(taskIter);
                 m_runningTaskID = timerID;
 
                 {
@@ -290,12 +288,18 @@ void StandaloneTimerManager::run()
                     NX_LOGX(lm("Done task %1").arg(timerID), cl_logDEBUG2);
                 }
 
-                if (!taskContext.singleShot)
-                    addTaskNonSafe(
-                        lk,
-                        timerID,
-                        std::move(taskContext),
-                        taskContext.repeatPeriod);
+                if (m_taskToTime.find(timerID) != m_taskToTime.cend())
+                {
+                    m_taskToTime.erase(timerID);
+                    m_timeToTask.erase(taskIter);
+
+                    if (!taskContext.singleShot)
+                        addTaskNonSafe(
+                            lk,
+                            timerID,
+                            std::move(taskContext),
+                            taskContext.repeatPeriod);
+                }
 
                 m_runningTaskID = 0;
                 m_cond.wakeAll();    //notifying threads, waiting on joinAndDeleteTimer
@@ -367,7 +371,10 @@ void StandaloneTimerManager::deleteTaskNonSafe(
 {
     const std::map<TimerId, qint64>::iterator it = m_taskToTime.find(timerID);
     if (it == m_taskToTime.end())
+    {
+        qWarning() << "timer id" << timerID << "not found";
         return;
+    }
 
     m_timeToTask.erase(make_pair(it->second, it->first));
     m_taskToTime.erase(it);

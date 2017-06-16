@@ -440,6 +440,39 @@ TEST_F(SchedulerIntegrationTest, OneUserSchedulesLongTask_TaskTimeExpiresWhenSer
     thenTaskShouldFireAsIfNoServerWasNotOffline();
 }
 
+//TEST_F(SchedulerIntegrationTest, SubscribeFromExpiredTask)
+//{
+//    whenFirstUserSchedulesALongTaskWithNewSubscribeInside();
+//    andWhenSchedulerWorksForSomeTime();
+//    thenLongTaskNotFiredYet();
+
+//    andWhenTimeToFireComesButServerIsOffline();
+//    andWhenSystemRestarts();
+//    whenFirstUserInitializedAndRegisteredToScheduler();
+//    andWhenSchedulerWorksForSomeVeryShortTime();
+//    thenLongTaskShouldAtLastFire();
+
+//    andWhenTimeToNextScheduledFireComes();
+//    thenTaskShouldFireAsIfNoServerWasNotOffline();
+//    andThenSecondTaskShouldFireMultipleTimes();
+//}
+
+//TEST_F(SchedulerIntegrationTest, UnsubscribeFromExpiredTask)
+//{
+//    whenFirstUserSchedulesALongTaskWithUnSubscribeInside();
+//    andWhenSchedulerWorksForSomeTime();
+//    thenLongTaskNotFiredYet();
+
+//    andWhenTimeToFireComesButServerIsOffline();
+//    andWhenSystemRestarts();
+//    whenFirstUserInitializedAndRegisteredToScheduler();
+//    andWhenSchedulerWorksForSomeVeryShortTime();
+//    thenLongTaskShouldAtLastFire();
+
+//    andWhenTimeToNextScheduledFireComes();
+//    thenNoNewFires();
+//}
+
 
 }
 }

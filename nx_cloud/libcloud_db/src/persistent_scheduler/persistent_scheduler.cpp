@@ -120,6 +120,7 @@ nx::db::DBResult PersistentScheduler::unsubscribe(
     nx::db::QueryContext* queryContext,
     const QnUuid& taskId)
 {
+    qWarning() << "unsubscribe called for task" << taskId;
     auto dbResult = m_dbHelper->unsubscribe(queryContext, taskId);
     if (dbResult != nx::db::DBResult::ok)
     {
@@ -129,6 +130,8 @@ nx::db::DBResult PersistentScheduler::unsubscribe(
     }
 
     removeTimer(taskId);
+    qWarning() << "unsubscribe called for task" << taskId << "DONE";
+
     return nx::db::DBResult::ok;
 }
 
@@ -196,6 +199,7 @@ void PersistentScheduler::addTimer(
                .arg(timerId), cl_logERROR);
         return;
     }
+    qWarning() << "timer added" << timerId;
     m_taskToTimer[taskId] = timerId;
 }
 
