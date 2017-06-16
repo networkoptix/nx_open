@@ -967,19 +967,11 @@ void QnResourceBrowserWidget::handleItemActivated(const QModelIndex& index, bool
     if (nodeType == Qn::ResourceNode && resource->hasFlags(Qn::server) && withMouse)
         return;
 
-    // Layouts are always handled the same way, independently of other circumstances.
-    if (resource->hasFlags(Qn::layout))
-    {
-        menu()->trigger(action::OpenInNewTabAction, resource);
-        return;
-    }
-
-    // Double click shouldn't do anything in layout tour review mode.
     const bool isLayoutTourReviewMode = workbench()->currentLayout()->isLayoutTourReview();
-
-    // Really we should check all special layout modes here
-    if (!isLayoutTourReviewMode)
-        menu()->trigger(action::DropResourcesAction, resource);
+    const auto actionId = isLayoutTourReviewMode
+        ? action::OpenInNewTabAction
+        : action::DropResourcesAction;
+    menu()->trigger(actionId, resource);
 }
 
 void QnResourceBrowserWidget::setTooltipResource(const QnResourcePtr& resource)

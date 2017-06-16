@@ -37,7 +37,7 @@ angular.module('nxCommon')
 
                 scope.formatLink = function(camera, stream,transport){
                     var linkTemplates = {
-                        'preview': 'http://{{host}}/api/image?physicalId={{physicalId}}{{previewPosition}}{{auth}}',
+                        'preview': 'http://{{host}}/ec2/cameraThumbnail?physicalId={{physicalId}}{{previewPosition}}{{auth}}',
                         'hls':'http://{{host}}/hls/{{physicalId}}.m3u8?{{streamLetter}}{{position}}{{auth}}',
                         'rtsp':'rtsp://{{host}}/{{physicalId}}?stream={{streamIndex}}{{position}}{{auth}}',
                         'transrtsp':'rtsp://{{host}}/{{physicalId}}?stream={{streamIndex}}{{position}}&resolution={{resolution}}{{auth}}',

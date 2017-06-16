@@ -2,7 +2,7 @@
 
 #include <iostream>
 
-#include <cdb/cdb_client.h>
+#include <nx/cloud/cdb/api/cdb_client.h>
 
 #include <nx/utils/sync_call.h>
 

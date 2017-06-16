@@ -28,6 +28,7 @@ nx_add_target(mediaserver_core LIBRARY
         "${CMAKE_CURRENT_BINARY_DIR}/mediaserver_core_app_info_impl.cpp"
     ADDITIONAL_RESOURCES
         "${customization_dir}/mediaserver_core/resources"
+        "${customization_dir}/icons/all/favicon.ico"
         "${CMAKE_CURRENT_BINARY_DIR}/resources"
     PUBLIC_LIBS
         qtservice qtsinglecoreapplication Qt5::WebSockets

@@ -1,6 +1,6 @@
 #pragma once
 
-#include <managers/system_sharing_manager.h>
+#include <nx/cloud/cdb/managers/system_sharing_manager.h>
 
 namespace nx {
 namespace cdb {

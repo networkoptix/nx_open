@@ -95,12 +95,9 @@ void ReverseAcceptor::saveConnection(String hostName, nx_http::HttpServerConnect
     auto socket = connection->takeSocket();
     connection->closeConnection(SystemError::badDescriptor);
 
-    auto rawSocket = dynamic_cast<AbstractStreamSocket*>(socket.get());
-    NX_CRITICAL(rawSocket);
-
     {
         QnMutexLocker lk(&m_dataMutex);
-        if (m_keepAliveOptions && !rawSocket->setKeepAlive(m_keepAliveOptions))
+        if (m_keepAliveOptions && !socket->setKeepAlive(m_keepAliveOptions))
         {
             NX_LOGX(lm("Could not set keepAliveOptions=%1 to new socket(%2)")
                 .arg(m_keepAliveOptions).arg(socket), cl_logWARNING);
@@ -109,10 +106,8 @@ void ReverseAcceptor::saveConnection(String hostName, nx_http::HttpServerConnect
         }
     }
 
-    socket.release();
     post(
-        [this, hostName=std::move(hostName),
-            socket = std::unique_ptr<AbstractStreamSocket>(rawSocket)]() mutable
+        [this, hostName = std::move(hostName), socket = std::move(socket)]() mutable
         {
             if (m_connectHandler)
                 m_connectHandler(hostName, std::move(socket));

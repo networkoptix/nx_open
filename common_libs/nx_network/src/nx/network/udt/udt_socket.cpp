@@ -717,8 +717,8 @@ bool UdtStreamSocket::getKeepAlive(boost::optional< KeepAliveOptions >* result) 
 {
     // UDT has keep-alives but provides no way to modify it...
     (*result)->probeCount = 10; // TODO: #ak find real value in udt.
-    (*result)->time = std::chrono::seconds(5);
-    (*result)->interval = std::chrono::seconds(5);
+    (*result)->inactivityPeriodBeforeFirstProbe = std::chrono::seconds(5);
+    (*result)->probeSendPeriod = std::chrono::seconds(5);
     return true;
 }
 

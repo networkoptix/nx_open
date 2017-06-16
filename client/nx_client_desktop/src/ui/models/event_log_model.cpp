@@ -12,6 +12,7 @@
 #include <client_core/client_core_module.h>
 
 #include <core/resource_management/resource_pool.h>
+#include <core/resource_management/user_roles_manager.h>
 
 #include <core/resource/resource.h>
 #include <core/resource/user_resource.h>
@@ -289,15 +290,40 @@ QnResourcePtr QnEventLogModel::getResource(Column column, const QnBusinessAction
     return QnResourcePtr();
 }
 
-QString QnEventLogModel::getUserNameById(const QnUuid& id)
+QString QnEventLogModel::getSubjectsText(const std::vector<QnUuid>& ids) const
 {
-    static const auto kRemovedUserName = L'<' + tr("User removed") + L'>';
+    if (ids.empty())
+        return tr("All users");
 
-    auto resourcePool = qnClientCoreModule->commonModule()->resourcePool();
-    const auto userResource = resourcePool->getResourceById(id).dynamicCast<QnUserResource>();
-    return (userResource.isNull() ? kRemovedUserName : userResource->getName());
+    QnUserResourceList users;
+    QList<QnUuid> roles;
+    userRolesManager()->usersAndRoles(ids, users, roles);
+
+    const int numDeleted = int(ids.size()) - (users.size() + roles.size());
+    if (roles.empty() && users.empty() && numDeleted > 0)
+        return tr("%n Removed subjects", "", numDeleted);
+
+    QString text = m_helper->actionSubjects(users, roles, numDeleted > 0);
+
+    if (numDeleted > 0)
+        text += lit(", ") + tr("%n Removed subjects", "", numDeleted);
+
+    return text;
 }
 
+QString QnEventLogModel::getSubjectNameById(const QnUuid& id) const
+{
+    static const auto kRemovedUserName = L'<' + tr("Subject removed") + L'>';
+
+    QnUserResourceList users;
+    QList<QnUuid> roles;
+    userRolesManager()->usersAndRoles(
+        QVector<QnUuid>{id}, users, roles);
+
+    return users.empty() && roles.empty()
+        ? kRemovedUserName
+        : m_helper->actionSubjects(users, roles, false);
+}
 
 QVariant QnEventLogModel::iconData(Column column, const QnBusinessActionData& action)
 {
@@ -324,19 +350,20 @@ QVariant QnEventLogModel::iconData(Column column, const QnBusinessActionData& ac
                     return QVariant();
                 }
             }
-            else if (actionType == QnBusiness::ShowPopupAction)
+            else if (actionType == QnBusiness::ShowPopupAction
+                  || actionType == QnBusiness::ShowOnAlarmLayoutAction)
             {
-                if (action.actionParams.userGroup == QnBusiness::AdminOnly)
-                    return qnResIconCache->icon(QnResourceIconCache::User);
-                else
-                    return qnResIconCache->icon(QnResourceIconCache::Users);
-            }
-            else if (actionType == QnBusiness::ShowOnAlarmLayoutAction)
-            {
-                const auto &users = action.actionParams.additionalResources;
-                const bool multipleUsers = (users.empty() || (users.size() > 1));
-                return qnResIconCache->icon(multipleUsers ?
-                    QnResourceIconCache::Users : QnResourceIconCache::User);
+                QnUserResourceList users;
+                QList<QnUuid> roles;
+                qnClientCoreModule->commonModule()->userRolesManager()->usersAndRoles(
+                    action.actionParams.additionalResources, users, roles);
+                const bool multiple = action.actionParams.additionalResources.empty()
+                    || action.actionParams.additionalResources.size() > 1
+                    || users.size() > 1
+                    || !roles.empty();
+                return qnResIconCache->icon(multiple
+                    ? QnResourceIconCache::Users
+                    : QnResourceIconCache::User);
             }
         }
         resId = action.actionParams.actionResourceId;
@@ -353,20 +380,6 @@ QString QnEventLogModel::getResourceNameString(const QnUuid& id)
     auto resourcePool = qnClientCoreModule->commonModule()->resourcePool();
     return QnResourceDisplayInfo(resourcePool->getResourceById(id))
         .toString(qnSettings->extraInfoInTree());
-}
-
-QString QnEventLogModel::getUserGroupString(QnBusiness::UserGroup value)
-{
-    switch (value)
-    {
-        case QnBusiness::EveryOne:
-            return tr("Users");
-        case QnBusiness::AdminOnly:
-            return tr("Administrators Only");
-        default:
-            return QString();
-    }
-    return QString();
 }
 
 QString QnEventLogModel::textData(Column column, const QnBusinessActionData& action) const
@@ -396,26 +409,19 @@ QString QnEventLogModel::textData(Column column, const QnBusinessActionData& act
             QnBusiness::ActionType actionType = action.actionType;
             if (actionType == QnBusiness::SendMailAction)
                 return action.actionParams.emailAddress;
-            else if (actionType == QnBusiness::ShowPopupAction)
-                return getUserGroupString(action.actionParams.userGroup);
-            else if (actionType == QnBusiness::ShowOnAlarmLayoutAction)
+            else if (actionType == QnBusiness::ShowPopupAction
+                  || actionType == QnBusiness::ShowOnAlarmLayoutAction)
             {
-                // For ShowOnAlarmLayoutAction action type additionalResources contains users list
-                const auto &users = action.actionParams.additionalResources;
-                if (users.empty())
-                    return tr("All users");
-
-                if (users.size() == 1)
-                    return getUserNameById(users.front());
-
-                return tr("%n users", "", users.size());
+                return getSubjectsText(action.actionParams.additionalResources);
             }
             else if (actionType == QnBusiness::ExecHttpRequestAction)
             {
                 return QUrl(action.actionParams.url).toString(QUrl::RemoveUserInfo);
             }
             else
+            {
                 return getResourceNameString(action.actionParams.actionResourceId);
+            }
         }
         case DescriptionColumn:
         {
@@ -486,7 +492,7 @@ QString QnEventLogModel::tooltip(Column column, const QnBusinessActionData& acti
         else
         {
             for (const auto& userId: users)
-                userNames.append(getUserNameById(userId));
+                userNames.append(getSubjectNameById(userId));
         }
 
         if (userNames.size() > kMaxResourcesCount)

@@ -2,29 +2,27 @@
 #include <utils/common/app_info.h>
 
 #include <api/app_server_connection.h>
-
-#include "utils/common/id.h"
-#include <nx/network/nettools.h> /* For resolveAddress. */
-
+#include <common/common_module.h>
 #include <business/business_aggregation_info.h>
+#include <business/business_event_rule.h>
 #include <business/events/reasoned_business_event.h>
 #include <business/events/network_issue_business_event.h>
 #include <business/events/camera_input_business_event.h>
 #include <business/events/conflict_business_event.h>
+#include <business/events/ip_conflict_business_event.h>
 #include <business/events/mserver_conflict_business_event.h>
-
 #include <core/resource/resource.h>
-
 #include <core/resource/resource_display_info.h>
 #include <core/resource/device_dependent_strings.h>
 #include <core/resource/network_resource.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource_management/resource_pool.h>
-#include "core/resource/camera_history.h"
-#include "events/ip_conflict_business_event.h"
-#include <common/common_module.h>
-#include "business_event_rule.h"
+#include <core/resource_management/user_roles_manager.h>
+#include <core/resource/user_resource.h>
+#include <core/resource/camera_history.h>
+#include <utils/common/id.h>
+#include <nx/network/nettools.h> /* For resolveAddress. */
 
 QnBusinessStringsHelper::QnBusinessStringsHelper(QnCommonModule* commonModule):
     QObject(),
@@ -197,11 +195,11 @@ QString QnBusinessStringsHelper::eventAtResources(const QnBusinessEventParameter
 {
     if (params.eventType == QnBusiness::SoftwareTriggerEvent)
     {
-        return lit("Software Trigger %1 has been activated multiple times")
+        return tr("Software Trigger %1 has been activated multiple times")
             .arg(getSoftwareTriggerName(params));
     }
 
-    return lit("Multiple %1 events have occured").arg(eventName(params.eventType));
+    return tr("Multiple %1 events have occured").arg(eventName(params.eventType));
 }
 
 QString QnBusinessStringsHelper::getResoureNameFromParams(const QnBusinessEventParameters& params,
@@ -641,4 +639,57 @@ QString QnBusinessStringsHelper::getSoftwareTriggerName(const QnBusinessEventPar
 {
     NX_ASSERT(params.eventType == QnBusiness::SoftwareTriggerEvent);
     return getSoftwareTriggerName(params.caption);
+}
+
+QString QnBusinessStringsHelper::actionSubjects(const QnBusinessEventRulePtr& rule,
+    bool noSingleName) const
+{
+    QnUserResourceList users;
+    QList<QnUuid> roles;
+
+    if (QnBusiness::requiresUserResource(rule->actionType()))
+        userRolesManager()->usersAndRoles(rule->actionResources(), users, roles);
+    else
+        userRolesManager()->usersAndRoles(rule->actionParams().additionalResources, users, roles);
+
+    return actionSubjects(users, roles, noSingleName);
+}
+
+QString QnBusinessStringsHelper::actionSubjects(
+    const QnUserResourceList& users,
+    const QList<QnUuid>& roles,
+    bool noSingleName) const
+{
+    if (users.empty() && roles.empty())
+        return tr("All Users");
+
+    if (!noSingleName)
+    {
+        if (users.size() == 1 && roles.empty())
+            return users.front()->getName();
+
+        if (users.empty() && roles.size() == 1)
+        {
+            return lit("%1 %2 %3")
+                .arg(tr("Role"))
+                .arg(L'\x2013') //< En-dash.
+                .arg(userRolesManager()->userRole(roles.front()).name);
+        }
+    }
+
+    if (roles.empty())
+        return tr("%n Users", "", users.size());
+
+    if (!users.empty())
+    {
+        return lit("%1, %2")
+            .arg(tr("%n Roles", "", roles.size()))
+            .arg(tr("%n Users", "", users.size()));
+    }
+
+    static const QSet<QnUuid> kAdminRoles = QnUserRolesManager::adminRoleIds().toSet();
+    if (roles.toSet() == kAdminRoles)
+        return tr("All Administrators");
+
+    return tr("%n Roles", "", roles.size());
 }

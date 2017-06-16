@@ -25,14 +25,14 @@ public:
     virtual void remove(const SYSSOCKET& s) override;
     virtual std::size_t socketsPolledCount() const override;
     virtual int poll(
-        std::map<SYSSOCKET, int>* lrfds,
-        std::map<SYSSOCKET, int>* lwfds,
+        std::map<SYSSOCKET, int>* socketsAvailableForReading,
+        std::map<SYSSOCKET, int>* socketsAvailableForWriting,
         std::chrono::microseconds timeout) override;
     virtual void interrupt() override;
 
 private:
     /** map<local (non-UDT) descriptor, event mask (UDT_EPOLL_IN | UDT_EPOLL_OUT | UDT_EPOLL_ERR)>. */
-    std::map<SYSSOCKET, int> m_sLocals;
+    std::map<SYSSOCKET, int> m_socketDescriptorToEventMask;
     SYSSOCKET m_interruptionSocket;
     sockaddr_in m_interruptionSocketLocalAddress;
 
@@ -44,12 +44,14 @@ private:
     size_t m_exceptfdsCapacity;
 
     void prepareForPolling(
-        std::map<SYSSOCKET, int>* lrfds,
-        std::map<SYSSOCKET, int>* lwfds);
+        std::map<SYSSOCKET, int>* socketsAvailableForReading,
+        std::map<SYSSOCKET, int>* socketsAvailableForWriting);
+
     void prepareOutEvents(
-        std::map<SYSSOCKET, int>* lrfds,
-        std::map<SYSSOCKET, int>* lwfds,
+        std::map<SYSSOCKET, int>* socketsAvailableForReading,
+        std::map<SYSSOCKET, int>* socketsAvailableForWriting,
         bool* receivedInterruptEvent);
+    bool isPollingSocketForEvent(SYSSOCKET handle, int eventMask) const;
 
     void initializeInterruptSocket();
     void freeInterruptSocket();

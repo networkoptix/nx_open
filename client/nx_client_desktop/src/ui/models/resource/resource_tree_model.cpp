@@ -8,6 +8,7 @@
 
 #include <client/client_settings.h>
 
+#include <core/resource_access/resource_access_filter.h>
 #include <core/resource_access/global_permissions_manager.h>
 #include <core/resource_access/shared_resources_manager.h>
 #include <core/resource_access/resource_access_manager.h>
@@ -46,12 +47,13 @@
 #include <ui/help/help_topics.h>
 #include <ui/workbench/workbench_item.h>
 #include <ui/workbench/workbench_context.h>
-#include <ui/workbench/workbench_resource.h>
 #include <ui/workbench/workbench_layout_snapshot_manager.h>
 #include <ui/workbench/workbench_access_controller.h>
 
+#include <nx/client/desktop/utils/mime_data.h>
 #include <utils/common/scoped_value_rollback.h>
 
+using namespace nx::client::desktop;
 using namespace nx::client::desktop::ui;
 
 #define DEBUG_RESOURCE_TREE_MODEL
@@ -63,7 +65,7 @@ using namespace nx::client::desktop::ui;
 
 namespace {
 
-const char *pureTreeResourcesOnlyMimeType = "application/x-noptix-pure-tree-resources-only";
+static const QString pureTreeResourcesOnlyMimeType = lit("application/x-noptix-pure-tree-resources-only");
 
 bool intersects(const QStringList &l, const QStringList &r)
 {
@@ -664,19 +666,16 @@ QHash<int,QByteArray> QnResourceTreeModel::roleNames() const
 
 QStringList QnResourceTreeModel::mimeTypes() const
 {
-    QStringList result = QnWorkbenchResource::resourceMimeTypes();
-    result.append(QLatin1String(pureTreeResourcesOnlyMimeType));
-    result.append(QnVideoWallItem::mimeType());
+    auto result = MimeData::mimeTypes();
+    result.append(pureTreeResourcesOnlyMimeType);
     return result;
 }
 
 QMimeData *QnResourceTreeModel::mimeData(const QModelIndexList &indexes) const
 {
-    QMimeData *mimeData = base_type::mimeData(indexes);
+    auto mimeData = base_type::mimeData(indexes);
     if (!mimeData)
         return nullptr;
-
-    const QStringList types = mimeTypes();
 
     /*
      * This flag services the assertion that cameras can be dropped on server
@@ -684,49 +683,43 @@ QMimeData *QnResourceTreeModel::mimeData(const QModelIndexList &indexes) const
      */
     bool pureTreeResourcesOnly = true;
 
-    if (intersects(types, QnWorkbenchResource::resourceMimeTypes()))
-    {
-        QnResourceList resources;
-        for (const QModelIndex &index : indexes)
-        {
-            auto node = this->node(index);
+    QSet<QnUuid> ids;
 
-            if (node && node->type() == Qn::RecorderNode)
+    for (const auto& index: indexes)
+    {
+        auto node = this->node(index);
+        if (!node)
+            continue;
+
+        switch (node->type())
+        {
+            case Qn::RecorderNode:
             {
                 for (auto child : node->children())
                 {
-                    if (child->resource() && !resources.contains(child->resource()))
-                        resources.append(child->resource());
+                    if (auto res = child->resource())
+                        ids.insert(res->getId());
                 }
+                break;
             }
-
-            if (node && node->resource() && !resources.contains(node->resource()))
-                resources.append(node->resource());
-
-            if (node && (node->type() == Qn::LayoutItemNode))
+            case Qn::VideoWallItemNode:
+            case Qn::LayoutTourNode:
+                ids << node->uuid();
+                break;
+            case Qn::LayoutItemNode:
                 pureTreeResourcesOnly = false;
+                break;
         }
 
-        QnWorkbenchResource::serializeResources(resources, types, mimeData);
+        if (node->resource())
+            ids.insert(node->resource()->getId());
     }
 
-    if (types.contains(QnVideoWallItem::mimeType()))
-    {
-        QSet<QnUuid> uuids;
-        for(const QModelIndex &index: indexes)
-        {
-            auto node = this->node(index);
+    MimeData data(mimeData);
+    data.setIds(ids.toList());
+    data.toMimeData(mimeData);
 
-            if (node && (node->type() == Qn::VideoWallItemNode))
-                uuids << node->uuid();
-        }
-        QnVideoWallItem::serializeUuids(uuids.toList(), mimeData);
-
-    }
-
-    if (types.contains(QLatin1String(pureTreeResourcesOnlyMimeType)))
-        mimeData->setData(QLatin1String(pureTreeResourcesOnlyMimeType), QByteArray(pureTreeResourcesOnly ? "1" : "0"));
-
+    mimeData->setData(pureTreeResourcesOnlyMimeType, QByteArray(pureTreeResourcesOnly ? "1" : "0"));
     return mimeData;
 }
 
@@ -741,9 +734,8 @@ bool QnResourceTreeModel::dropMimeData(const QMimeData* mimeData, Qt::DropAction
         return false;
 
     /* Check if the format is supported. */
-    if (!intersects(mimeData->formats(), QnWorkbenchResource::resourceMimeTypes())
-        && !mimeData->formats().contains(QnVideoWallItem::mimeType()))
-            return base_type::dropMimeData(mimeData, action, row, column, parent);
+    if (!intersects(mimeData->formats(), MimeData::mimeTypes()))
+        return base_type::dropMimeData(mimeData, action, row, column, parent);
 
     /* Check where we're dropping it. */
     auto node = this->node(parent);
@@ -785,27 +777,30 @@ bool QnResourceTreeModel::dropMimeData(const QMimeData* mimeData, Qt::DropAction
     }
 
     /* Decode. */
-    QnResourceList sourceResources = QnWorkbenchResource::deserializeResources(mimeData);
+    // Resource tree drop is working only for resources that are already in the pool.
+    MimeData data(mimeData);
+    const auto ids = data.getIds();
 
     /* Drop on videowall is handled in videowall. */
     if (node->type() == Qn::VideoWallItemNode)
     {
+        const auto videoWallItems = resourcePool()->getVideoWallItemsByUuid(ids);
+
         action::Parameters parameters;
-        if (mimeData->hasFormat(QnVideoWallItem::mimeType()))
+        if (!videoWallItems.empty())
         {
-            parameters = resourcePool()->getVideoWallItemsByUuid(
-                QnVideoWallItem::deserializeUuids(mimeData));
+            parameters = videoWallItems;
         }
         else
         {
-            parameters = sourceResources;
+            parameters = resourcePool()->getResources(ids);
         }
         parameters.setArgument(Qn::VideoWallItemGuidRole, node->uuid());
         menu()->trigger(action::DropOnVideoWallItemAction, parameters);
     }
     else if (node->type() == Qn::RoleNode)
     {
-        auto layoutsToShare = sourceResources.filtered<QnLayoutResource>(
+        auto layoutsToShare = resourcePool()->getResources(ids).filtered<QnLayoutResource>(
             [](const QnLayoutResourcePtr& layout)
             {
                 return !layout->isFile();
@@ -824,7 +819,7 @@ bool QnResourceTreeModel::dropMimeData(const QMimeData* mimeData, Qt::DropAction
     }
     else
     {
-        handleDrop(sourceResources, node->resource(), mimeData);
+        handleDrop(resourcePool()->getResources(ids), node->resource(), mimeData);
     }
 
     return true;
@@ -986,24 +981,12 @@ void QnResourceTreeModel::handleDrop(const QnResourceList& sourceResources, cons
         QnResourceList droppable = sourceResources.filtered(
             [](const QnResourcePtr& resource)
             {
-                /* Allow to drop cameras. */
-                if (resource.dynamicCast<QnMediaResource>())
-                    return true;
-
-                /* Allow to drop servers. */
-                if (resource.dynamicCast<QnMediaServerResource>())
-                    return true;
-
-                /* Allow to drop webpages. */
-                if (resource.dynamicCast<QnWebPageResource>())
-                    return true;
-
-                return false;
+                return QnResourceAccessFilter::isOpenableInLayout(resource);
             });
 
         if (!droppable.isEmpty())
         {
-            menu()->trigger(action::OpenInLayoutAction,  action::Parameters(droppable)
+            menu()->trigger(action::OpenInLayoutAction, action::Parameters(droppable)
                 .withArgument(Qn::LayoutResourceRole, layout));
             menu()->trigger(action::SaveLayoutAction, layout);
         }
@@ -1024,8 +1007,7 @@ void QnResourceTreeModel::handleDrop(const QnResourceList& sourceResources, cons
 
             TRACE("Sharing layout " << sourceLayout->getName() << " with " << targetUser->getName())
             menu()->trigger(action::ShareLayoutAction, action::Parameters(sourceLayout)
-                .withArgument(Qn::UserResourceRole, targetUser)
-            );
+                .withArgument(Qn::UserResourceRole, targetUser));
         }
     }
 
@@ -1036,15 +1018,14 @@ void QnResourceTreeModel::handleDrop(const QnResourceList& sourceResources, cons
             return;
 
         /* Do not allow to drop camera items from layouts. */
-        if (mimeData->data(QLatin1String(pureTreeResourcesOnlyMimeType)) != QByteArray("1"))
+        if (mimeData->data(pureTreeResourcesOnlyMimeType) != QByteArray("1"))
             return;
 
         QnVirtualCameraResourceList cameras = sourceResources.filtered<QnVirtualCameraResource>();
         if (!cameras.empty())
         {
             menu()->trigger(action::MoveCameraAction, action::Parameters(cameras)
-                .withArgument(Qn::MediaServerResourceRole, server)
-            );
+                .withArgument(Qn::MediaServerResourceRole, server));
         }
     }
 }

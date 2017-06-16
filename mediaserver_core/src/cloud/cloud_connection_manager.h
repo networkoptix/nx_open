@@ -9,7 +9,7 @@
 #include <QtCore/QObject>
 #include <QtCore/QString>
 
-#include <cdb/connection.h>
+#include <nx/cloud/cdb/api/connection.h>
 #include <core/resource/resource_fwd.h>
 #include <nx/network/cloud/abstract_cloud_system_credentials_provider.h>
 #include <nx/network/retry_timer.h>
@@ -46,7 +46,6 @@ public:
     void setProxyVia(const SocketAddress& proxyEndpoint);
 
     bool detachSystemFromCloud();
-    bool resetCloudData();
 
 signals:
     void cloudBindingStatusChanged(bool boundToCloud);

@@ -1,7 +1,7 @@
 #pragma once
 
-#include <managers/account_manager.h>
-#include <test_support/business_data_generator.h>
+#include <nx/cloud/cdb/managers/account_manager.h>
+#include <nx/cloud/cdb/test_support/business_data_generator.h>
 
 namespace nx {
 namespace cdb {
@@ -13,6 +13,8 @@ class AccountManagerStub:
 public:
     virtual boost::optional<data::AccountData> findAccountByUserName(
         const std::string& userName) const override;
+    virtual void addExtension(AbstractAccountManagerExtension*) override;
+    virtual void removeExtension(AbstractAccountManagerExtension*) override;
 
     void addAccount(AccountWithPassword account);
 

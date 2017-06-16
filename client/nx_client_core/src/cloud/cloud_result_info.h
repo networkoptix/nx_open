@@ -2,7 +2,7 @@
 
 #include <QtCore/QCoreApplication>
 
-#include <cdb/result_code.h>
+#include <nx/cloud/cdb/api/result_code.h>
 
 
 class QnCloudResultInfo

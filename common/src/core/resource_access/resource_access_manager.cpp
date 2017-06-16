@@ -2,6 +2,7 @@
 
 #include <common/common_module.h>
 
+#include <nx/core/access/access_types.h>
 #include <core/resource_management/resource_pool.h>
 #include <core/resource_management/user_roles_manager.h>
 #include <core/resource_management/layout_tour_manager.h>
@@ -34,40 +35,44 @@
 
 #include <utils/common/scoped_timer.h>
 
-QnResourceAccessManager::QnResourceAccessManager(QObject* parent /*= nullptr*/) :
+using namespace nx::core::access;
+
+QnResourceAccessManager::QnResourceAccessManager(Mode mode, QObject* parent /*= nullptr*/) :
     base_type(parent),
     QnUpdatable(),
     QnCommonModuleAware(parent),
+    m_mode(mode),
     m_mutex(QnMutex::NonRecursive),
     m_permissionsCache()
 {
-    const auto& resPool = commonModule()->resourcePool();
+    if (m_mode == Mode::cached)
+    {
+        const auto& resPool = commonModule()->resourcePool();
 
-    /* This change affects all accessible resources. */
-    connect(commonModule(), &QnCommonModule::readOnlyChanged, this,
-        &QnResourceAccessManager::recalculateAllPermissions);
+        /* This change affects all accessible resources. */
+        connect(commonModule(), &QnCommonModule::readOnlyChanged, this,
+            &QnResourceAccessManager::recalculateAllPermissions);
 
-    connect(
-        commonModule()->resourceAccessProvider(),
-        &QnResourceAccessProvider::accessChanged,
-        this,
-        &QnResourceAccessManager::updatePermissions);
+        connect(commonModule()->resourceAccessProvider(),
+            &QnResourceAccessProvider::accessChanged,
+            this,
+            &QnResourceAccessManager::updatePermissions);
 
-    connect(
-        globalPermissionsManager(),
-        &QnGlobalPermissionsManager::globalPermissionsChanged,
-        this,
-        &QnResourceAccessManager::updatePermissionsBySubject);
+        connect(globalPermissionsManager(),
+            &QnGlobalPermissionsManager::globalPermissionsChanged,
+            this,
+            &QnResourceAccessManager::updatePermissionsBySubject);
 
-    connect(resPool, &QnResourcePool::resourceAdded, this,
-        &QnResourceAccessManager::handleResourceAdded);
-    connect(resPool, &QnResourcePool::resourceRemoved, this,
-        &QnResourceAccessManager::handleResourceRemoved);
+        connect(resPool, &QnResourcePool::resourceAdded, this,
+            &QnResourceAccessManager::handleResourceAdded);
+        connect(resPool, &QnResourcePool::resourceRemoved, this,
+            &QnResourceAccessManager::handleResourceRemoved);
 
-    connect(userRolesManager(), &QnUserRolesManager::userRoleRemoved, this,
-        &QnResourceAccessManager::handleSubjectRemoved);
+        connect(userRolesManager(), &QnUserRolesManager::userRoleRemoved, this,
+            &QnResourceAccessManager::handleSubjectRemoved);
 
-    recalculateAllPermissions();
+        recalculateAllPermissions();
+    }
 }
 
 void QnResourceAccessManager::setPermissionsInternal(const QnResourceAccessSubject& subject,
@@ -150,15 +155,17 @@ Qn::Permissions QnResourceAccessManager::permissions(const QnResourceAccessSubje
             ? Qn::ReadWriteSavePermission
             : Qn::NoPermissions;
 
-    PermissionKey key(subject.id(), resource->getId());
+    if (m_mode == Mode::cached)
     {
-        QnMutexLocker lk(&m_mutex);
-        auto iter = m_permissionsCache.find(key);
-        if (iter != m_permissionsCache.cend())
-            return *iter;
+        PermissionKey key(subject.id(), resource->getId());
+        {
+            QnMutexLocker lk(&m_mutex);
+            auto iter = m_permissionsCache.find(key);
+            if (iter != m_permissionsCache.cend())
+                return *iter;
+        }
     }
 
-    /* We can get here during batch resources adding. */
     return calculatePermissions(subject, resource);
 }
 
@@ -265,6 +272,9 @@ bool QnResourceAccessManager::canCreateResource(const QnResourceAccessSubject& s
 
 void QnResourceAccessManager::beforeUpdate()
 {
+    if (m_mode == Mode::direct)
+        return;
+
     /* We must clear cache here because otherwise there can stay resources, which were removed
      * during update. */
     QnMutexLocker lk(&m_mutex);
@@ -273,11 +283,15 @@ void QnResourceAccessManager::beforeUpdate()
 
 void QnResourceAccessManager::afterUpdate()
 {
+    if (m_mode == Mode::direct)
+        return;
+
     recalculateAllPermissions();
 }
 
 void QnResourceAccessManager::recalculateAllPermissions()
 {
+    NX_EXPECT(m_mode == Mode::cached);
     QN_LOG_TIME(Q_FUNC_INFO);
 
     if (isUpdating())
@@ -290,6 +304,8 @@ void QnResourceAccessManager::recalculateAllPermissions()
 void QnResourceAccessManager::updatePermissions(const QnResourceAccessSubject& subject,
     const QnResourcePtr& target)
 {
+    NX_EXPECT(m_mode == Mode::cached);
+
     if (isUpdating())
         return;
 

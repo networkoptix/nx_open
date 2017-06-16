@@ -41,6 +41,7 @@ protected:
 public:
     virtual ~QnAbstractBusinessAction();
 
+    void setActionType(QnBusiness::ActionType actionType);
     QnBusiness::ActionType actionType() const;
 
     /**
@@ -60,7 +61,7 @@ public:
     QnBusinessActionParameters& getParams();
 
     void setRuntimeParams(const QnBusinessEventParameters& params);
-    const QnBusinessEventParameters& getRuntimeParams() const;
+    QnBusinessEventParameters& getRuntimeParams();
 
     void setBusinessRuleId(const QnUuid& value);
     QnUuid getBusinessRuleId() const;

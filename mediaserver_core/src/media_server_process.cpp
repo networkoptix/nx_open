@@ -181,6 +181,7 @@
 #include <rest/handlers/audio_transmission_rest_handler.h>
 #include <rest/handlers/start_lite_client_rest_handler.h>
 #include <rest/handlers/runtime_info_rest_handler.h>
+#include <rest/handlers/distributed_file_downloader_rest_handler.h>
 #ifdef _DEBUG
 #include <rest/handlers/debug_events_rest_handler.h>
 #endif
@@ -1835,6 +1836,8 @@ void MediaServerProcess::registerRestHandlers(
     reg("api/aggregator", new QnJsonAggregatorRestHandler());
     reg("api/ifconfig", new QnIfConfigRestHandler(), kAdmin);
 
+    reg("api/downloader/", new QnDistributedFileDownloaderRestHandler());
+
     reg("api/settime", new QnSetTimeRestHandler(), kAdmin); //< deprecated
     reg("api/setTime", new QnSetTimeRestHandler(), kAdmin); //< new version
 
@@ -2097,7 +2100,7 @@ void MediaServerProcess::resetSystemState(CloudConnectionManager& cloudConnectio
 {
     for (;;)
     {
-        if (!cloudConnectionManager.resetCloudData())
+        if (!cloudConnectionManager.detachSystemFromCloud())
         {
             qWarning() << "Error while clearing cloud information. Trying again...";
             QnSleep::msleep(APP_SERVER_REQUEST_ERROR_TIMEOUT_MS);

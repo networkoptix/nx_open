@@ -42,6 +42,8 @@ public:
 
     QnListMap(const base_type &other): base_type(other) {}
 
+    QnListMap(std::initializer_list<QPair<Key, Value>> args): base_type(args) {}
+
     Value value(const Key &key, const Value &defaultValue = Value()) const {
         for(const QPair<Key, Value> &pair: *this)
             if(pair.first == key)

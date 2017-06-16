@@ -10,6 +10,11 @@ SqlQuery::SqlQuery(QSqlDatabase connection):
 {
 }
 
+void SqlQuery::setForwardOnly(bool val)
+{
+    m_sqlQuery.setForwardOnly(val);
+}
+
 void SqlQuery::prepare(const QString& query)
 {
     if (!m_sqlQuery.prepare(query))
@@ -38,6 +43,31 @@ void SqlQuery::exec()
             getLastErrorCode(),
             m_sqlQuery.lastError().text().toStdString());
     }
+}
+
+bool SqlQuery::next()
+{
+    return m_sqlQuery.next();
+}
+
+QVariant SqlQuery::value(int index) const
+{
+    return m_sqlQuery.value(index);
+}
+
+QVariant SqlQuery::value(const QString& name) const
+{
+    return m_sqlQuery.value(name);
+}
+
+QSqlQuery& SqlQuery::impl()
+{
+    return m_sqlQuery;
+}
+
+const QSqlQuery& SqlQuery::impl() const
+{
+    return m_sqlQuery;
 }
 
 DBResult SqlQuery::getLastErrorCode()

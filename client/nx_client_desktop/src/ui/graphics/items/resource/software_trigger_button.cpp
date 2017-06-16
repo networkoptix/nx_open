@@ -88,6 +88,18 @@ void SoftwareTriggerButton::setState(State state)
     d->setState(state);
 }
 
+bool SoftwareTriggerButton::isLive() const
+{
+    Q_D(const SoftwareTriggerButton);
+    return d->isLive();
+}
+
+void SoftwareTriggerButton::setLive(bool value)
+{
+    Q_D(SoftwareTriggerButton);
+    d->setLive(value);
+}
+
 void SoftwareTriggerButton::paint(QPainter* painter,
     const QStyleOptionGraphicsItem* option, QWidget* widget)
 {

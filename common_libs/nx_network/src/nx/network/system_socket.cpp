@@ -1096,13 +1096,15 @@ int intDuration(SourceType duration)
 
 bool TCPSocket::setKeepAlive(boost::optional< KeepAliveOptions > info)
 {
+    using namespace std::chrono;
+
 #if defined( _WIN32 )
     struct tcp_keepalive ka = { FALSE, 0, 0 };
     if (info)
     {
         ka.onoff = TRUE;
-        ka.keepalivetime = intDuration<std::chrono::milliseconds>(info->time);
-        ka.keepaliveinterval = intDuration<std::chrono::milliseconds>(info->interval);
+        ka.keepalivetime = intDuration<milliseconds>(info->inactivityPeriodBeforeFirstProbe);
+        ka.keepaliveinterval = intDuration<milliseconds>(info->probeSendPeriod);
 
         // the value can not be changed, 0 means default
         info->probeCount = 0;
@@ -1126,21 +1128,32 @@ bool TCPSocket::setKeepAlive(boost::optional< KeepAliveOptions > info)
         return true;
 
 #if defined( Q_OS_LINUX )
-    const int time = intDuration<std::chrono::seconds>(info->time);
-    if (setsockopt(handle(), SOL_TCP, TCP_KEEPIDLE, &time, sizeof(time)) < 0)
+    const int inactivityPeriodBeforeFirstProbe = 
+        intDuration<seconds>(info->inactivityPeriodBeforeFirstProbe);
+    if (setsockopt(handle(), SOL_TCP, TCP_KEEPIDLE, 
+            &inactivityPeriodBeforeFirstProbe, sizeof(inactivityPeriodBeforeFirstProbe)) < 0)
+    {
         return false;
+    }
 
-    const int interval = intDuration<std::chrono::seconds>(info->interval);
-    if (setsockopt(handle(), SOL_TCP, TCP_KEEPINTVL, &interval, sizeof(interval)) < 0)
+    const int probeSendPeriod = intDuration<seconds>(info->probeSendPeriod);
+    if (setsockopt(handle(), SOL_TCP, TCP_KEEPINTVL,
+            &probeSendPeriod, sizeof(probeSendPeriod)) < 0)
+    {
         return false;
+    }
 
     const int count = (int)info->probeCount;
     if (setsockopt(handle(), SOL_TCP, TCP_KEEPCNT, &count, sizeof(count)) < 0)
         return false;
 #elif defined( Q_OS_MACX )
-    const int time = intDuration<std::chrono::seconds>(info->time);
-    if (setsockopt(handle(), IPPROTO_TCP, TCP_KEEPALIVE, &time, sizeof(time)) < 0)
+    const int inactivityPeriodBeforeFirstProbe = 
+        intDuration<seconds>(info->inactivityPeriodBeforeFirstProbe);
+    if (setsockopt(handle(), IPPROTO_TCP, TCP_KEEPALIVE, 
+            &inactivityPeriodBeforeFirstProbe, sizeof(inactivityPeriodBeforeFirstProbe)) < 0)
+    {
         return false;
+    }
 #endif
 #endif
 
@@ -1149,6 +1162,8 @@ bool TCPSocket::setKeepAlive(boost::optional< KeepAliveOptions > info)
 
 bool TCPSocket::getKeepAlive(boost::optional< KeepAliveOptions >* result) const
 {
+    using namespace std::chrono;
+
     int isEnabled = 0;
     socklen_t length = sizeof(isEnabled);
     if (getsockopt(handle(), SOL_SOCKET, SO_KEEPALIVE,
@@ -1166,27 +1181,33 @@ bool TCPSocket::getKeepAlive(boost::optional< KeepAliveOptions >* result) const
 #else
     *result = KeepAliveOptions();
 #if defined(Q_OS_LINUX)
-    int time;
-    if (getsockopt(handle(), SOL_TCP, TCP_KEEPIDLE, &time, &length) < 0)
+    int inactivityPeriodBeforeFirstProbe = 0;
+    if (getsockopt(handle(), SOL_TCP, TCP_KEEPIDLE, 
+            &inactivityPeriodBeforeFirstProbe, &length) < 0)
+    {
+        return false;
+    }
+
+    int probeSendPeriod = 0;
+    if (getsockopt(handle(), SOL_TCP, TCP_KEEPINTVL, &probeSendPeriod, &length) < 0)
         return false;
 
-    int interval;
-    if (getsockopt(handle(), SOL_TCP, TCP_KEEPINTVL, &interval, &length) < 0)
+    int probeCount = 0;
+    if (getsockopt(handle(), SOL_TCP, TCP_KEEPCNT, &probeCount, &length) < 0)
         return false;
 
-    int count;
-    if (getsockopt(handle(), SOL_TCP, TCP_KEEPCNT, &count, &length) < 0)
-        return false;
-
-    (*result)->time = std::chrono::seconds(time);
-    (*result)->interval = std::chrono::seconds(interval);
-    (*result)->probeCount = (size_t)count;
+    (*result)->inactivityPeriodBeforeFirstProbe = seconds(inactivityPeriodBeforeFirstProbe);
+    (*result)->probeSendPeriod = seconds(probeSendPeriod);
+    (*result)->probeCount = (size_t)probeCount;
 #elif defined( Q_OS_MACX )
-    int time;
-    if (getsockopt(handle(), IPPROTO_TCP, TCP_KEEPALIVE, &time, &length) < 0)
+    int inactivityPeriodBeforeFirstProbe = 0;
+    if (getsockopt(handle(), IPPROTO_TCP, TCP_KEEPALIVE,
+            &inactivityPeriodBeforeFirstProbe, &length) < 0)
+    {
         return false;
+    }
 
-    (*result)->time = std::chrono::seconds(time);
+    (*result)->inactivityPeriodBeforeFirstProbe = seconds(inactivityPeriodBeforeFirstProbe);
 #endif
 #endif
 

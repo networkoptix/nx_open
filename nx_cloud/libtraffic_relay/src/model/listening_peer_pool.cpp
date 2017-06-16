@@ -56,6 +56,14 @@ void ListeningPeerPool::addConnection(
         m_peerExpirationTimers.erase(*peerContext.expirationTimer);
         peerContext.expirationTimer = boost::none;
     }
+
+    if (!connection->setKeepAlive(m_settings.listeningPeer().tcpKeepAlive))
+    {
+        const auto sysErrorCode = SystemError::getLastOSErrorCode();
+        NX_DEBUG(this, lm("Could not enable keep alive on connection from host %1 (%2). %3")
+            .arg(peerName).arg(connection->getForeignAddress())
+            .arg(SystemError::toString(sysErrorCode)));
+    }
     
     if (!peerContext.takeConnectionRequestQueue.empty())
     {

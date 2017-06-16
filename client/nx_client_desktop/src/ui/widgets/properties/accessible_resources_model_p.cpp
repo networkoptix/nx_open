@@ -20,11 +20,20 @@ namespace {
 
 static const int kMaxResourcesInTooltip = 10;
 
+static const QVector<int> kAccessibleResourcesModelSourceColumns =
+    []()
+    {
+        QVector<int> sourceColumns(QnAccessibleResourcesModel::ColumnCount, -1);
+        sourceColumns[QnAccessibleResourcesModel::NameColumn]  = QnResourceListModel::NameColumn;
+        sourceColumns[QnAccessibleResourcesModel::CheckColumn] = QnResourceListModel::CheckColumn;
+        return sourceColumns;
+    }();
+
 } // anonymous namespace
 
 
 QnAccessibleResourcesModel::QnAccessibleResourcesModel(QObject* parent) :
-    base_type(parent),
+    base_type(kAccessibleResourcesModelSourceColumns, parent),
     m_allChecked(false),
     m_subject()
 {
@@ -34,7 +43,6 @@ QnAccessibleResourcesModel::QnAccessibleResourcesModel(QObject* parent) :
             if (subject == m_subject)
                 accessChanged();
         });
-
 }
 
 QnAccessibleResourcesModel::~QnAccessibleResourcesModel()
@@ -52,67 +60,6 @@ void QnAccessibleResourcesModel::setSubject(const QnResourceAccessSubject& subje
         return;
     m_subject = subject;
     accessChanged();
-}
-
-int QnAccessibleResourcesModel::columnCount(const QModelIndex& parent) const
-{
-    if (parent.isValid())
-        return 0;
-
-    return ColumnCount;
-}
-
-QModelIndex QnAccessibleResourcesModel::index(int row, int column, const QModelIndex& parent) const
-{
-    if (parent.isValid())
-        return QModelIndex();
-
-    return createIndex(row, column);
-}
-
-QModelIndex QnAccessibleResourcesModel::sibling(int row, int column, const QModelIndex& idx) const
-{
-    return index(row, column, idx.parent());
-}
-
-QModelIndex QnAccessibleResourcesModel::parent(const QModelIndex& index) const
-{
-    Q_UNUSED(index);
-    return QModelIndex();
-}
-
-QModelIndex QnAccessibleResourcesModel::mapToSource(const QModelIndex& proxyIndex) const
-{
-    if (!proxyIndex.isValid())
-        return QModelIndex();
-
-    NX_ASSERT(proxyIndex.model() == this);
-    switch (proxyIndex.column())
-    {
-        case NameColumn:
-            return sourceModel()->index(proxyIndex.row(), QnResourceListModel::NameColumn);
-        case CheckColumn:
-            return sourceModel()->index(proxyIndex.row(), QnResourceListModel::CheckColumn);
-        default:
-            return QModelIndex();
-    }
-}
-
-QModelIndex QnAccessibleResourcesModel::mapFromSource(const QModelIndex& sourceIndex) const
-{
-    if (!sourceIndex.isValid())
-        return QModelIndex();
-
-    NX_ASSERT(sourceIndex.model() == sourceModel());
-    switch (sourceIndex.column())
-    {
-        case QnResourceListModel::NameColumn:
-            return createIndex(sourceIndex.row(), NameColumn);
-        case QnResourceListModel::CheckColumn:
-            return createIndex(sourceIndex.row(), CheckColumn);
-        default:
-            return QModelIndex();
-    }
 }
 
 QVariant QnAccessibleResourcesModel::data(const QModelIndex& index, int role) const
@@ -134,10 +81,10 @@ QVariant QnAccessibleResourcesModel::data(const QModelIndex& index, int role) co
                     const auto accessLevels = resourceAccessProvider()->accessLevels(m_subject,
                         resource);
 
-                    if (accessLevels.contains(QnAbstractResourceAccessProvider::Source::layout))
+                    if (accessLevels.contains(nx::core::access::Source::layout))
                         return qnResIconCache->icon(QnResourceIconCache::SharedLayout);
 
-                    if (accessLevels.contains(QnAbstractResourceAccessProvider::Source::videowall))
+                    if (accessLevels.contains(nx::core::access::Source::videowall))
                         return qnResIconCache->icon(QnResourceIconCache::VideoWall);
 
                     return QVariant();

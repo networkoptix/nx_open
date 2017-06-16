@@ -557,7 +557,7 @@ ActionVisibility StopSharingCondition::check(const Parameters& parameters, QnWor
 
     for (auto resource : parameters.resources())
     {
-        if (context->resourceAccessProvider()->accessibleVia(subject, resource) == QnAbstractResourceAccessProvider::Source::shared)
+        if (context->resourceAccessProvider()->accessibleVia(subject, resource) == nx::core::access::Source::shared)
             return EnabledAction;
     }
 
@@ -1675,9 +1675,9 @@ ConditionWrapper tourIsRunning()
 ConditionWrapper canSavePtzPosition()
 {
     return new CustomBoolCondition(
-        [](const Parameters& parameters, QnWorkbenchContext* context)
+        [](const Parameters& parameters, QnWorkbenchContext* /*context*/)
         {
-            auto widget = dynamic_cast<const QnMediaResourceWidget*>(parameters.widget());
+            auto widget = qobject_cast<const QnMediaResourceWidget*>(parameters.widget());
             NX_EXPECT(widget);
             if (!widget)
                 return false;

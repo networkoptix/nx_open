@@ -13,8 +13,8 @@
 #define GTEST_HAS_POSIX_RE 0
 #include <gtest/gtest.h>
 #include "media_server/serverutil.h"
-#include "../utils.h"
-#include "mediaserver_launcher.h"
+#include <test_support/utils.h>
+#include <test_support/mediaserver_launcher.h>
 #include <common/static_common_module.h>
 
 namespace

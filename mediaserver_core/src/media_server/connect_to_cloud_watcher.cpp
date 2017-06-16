@@ -6,7 +6,7 @@
 #include <common/common_module.h>
 #include <transaction/transaction_message_bus_base.h>
 #include <transaction/transaction_transport_base.h>
-#include <cdb/ec2_request_paths.h>
+#include <nx/cloud/cdb/api/ec2_request_paths.h>
 
 #include "settings.h"
 #include "media_server_module.h"

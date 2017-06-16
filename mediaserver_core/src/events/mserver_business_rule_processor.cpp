@@ -75,6 +75,7 @@
 #include <api/helpers/thumbnail_request_data.h>
 #include <utils/common/util.h>
 #include <nx/utils/concurrent.h>
+#include <utils/camera/bookmark_helpers.h>
 
 namespace {
 
@@ -483,48 +484,33 @@ bool QnMServerBusinessRuleProcessor::executeRecordingAction(const QnRecordingBus
     return rez;
 }
 
-bool QnMServerBusinessRuleProcessor::executeBookmarkAction(const QnAbstractBusinessActionPtr &action)
+bool QnMServerBusinessRuleProcessor::executeBookmarkAction(
+    const QnAbstractBusinessActionPtr &action)
 {
     NX_ASSERT(action);
-    auto camera = resourcePool()->getResourceById<QnSecurityCamResource>(action->getParams().actionResourceId);
+    const auto camera = resourcePool()->getResourceById<QnSecurityCamResource>(
+        action->getParams().actionResourceId);
     if (!camera)
         return false;
 
-    int fixedDurationMs = action->getParams().durationMs;
-    int recordBeforeMs = action->getParams().recordBeforeMs;
-    int recordAfterMs = action->getParams().recordAfter;
-
     const auto key = action->getExternalUniqKey();
     auto runningKey = guidFromArbitraryData(key);
-    qint64 startTimeMs = action->getRuntimeParams().eventTimestampUsec / 1000;
-    qint64 endTimeMs = startTimeMs;
-
-    if (fixedDurationMs <= 0)
+    if (action->getParams().durationMs <= 0)
     {
-        // bookmark as an prolonged action
-        if (action->getToggleState() == QnBusiness::ActiveState) {
-            m_runningBookmarkActions[runningKey] = startTimeMs;
+        if (action->getToggleState() == QnBusiness::ActiveState)
+        {
+            m_runningBookmarkActions[runningKey] = action->getRuntimeParams().eventTimestampUsec;
             return true;
         }
 
         if (!m_runningBookmarkActions.contains(runningKey))
             return false;
 
-        startTimeMs = m_runningBookmarkActions.take(runningKey);
+        action->getRuntimeParams().eventTimestampUsec =
+            m_runningBookmarkActions.take(runningKey);
     }
 
-    QnCameraBookmark bookmark;
-    bookmark.guid = QnUuid::createUuid();
-    bookmark.startTimeMs = startTimeMs - recordBeforeMs;
-    bookmark.durationMs = fixedDurationMs > 0 ? fixedDurationMs : endTimeMs - startTimeMs;
-    bookmark.durationMs += recordBeforeMs + recordAfterMs;
-    bookmark.cameraId = camera->getId();
-    QnBusinessStringsHelper helper(commonModule());
-    bookmark.name = helper.eventAtResource(action->getRuntimeParams(), Qn::RI_WithUrl);
-    bookmark.description = helper.eventDetails(action->getRuntimeParams()).join(L'\n');
-    bookmark.tags = action->getParams().tags.split(L',', QString::SkipEmptyParts).toSet();
-
-    return qnServerDb->addBookmark(bookmark);
+    return qnServerDb->addBookmark(helpers::bookmarkFromAction(action, camera, commonModule()));
 }
 
 
@@ -688,25 +674,25 @@ void QnMServerBusinessRuleProcessor::sendEmailAsync(
 
 bool QnMServerBusinessRuleProcessor::sendMail(const QnSendMailBusinessActionPtr& action )
 {
-    //QnMutexLocker lk( &m_mutex );  m_mutex is already locked down the stack
+    // QnMutexLocker lk(&m_mutex); <- m_mutex is already locked down the stack.
 
-    //currently, aggregating only cameraDisconnected and networkIssue events
+    // Currently, aggregating only cameraDisconnected and networkIssue events.
     if( action->getRuntimeParams().eventType != QnBusiness::CameraDisconnectEvent &&
         action->getRuntimeParams().eventType != QnBusiness::NetworkIssueEvent )
     {
         return sendMailInternal(action, 1);
     }
 
-    /* Aggregating by recipients and event type. */
+    // Aggregating by recipients and event type.
 
     SendEmailAggregationKey aggregationKey(action->getRuntimeParams().eventType,
-        action->getParams().emailAddress); // all recipients are already computed and packed here
+        action->getParams().emailAddress); //< all recipients are already computed and packed here.
 
     SendEmailAggregationData& aggregatedData = m_aggregatedEmails[aggregationKey];
 
     QnBusinessAggregationInfo aggregationInfo = aggregatedData.action
-        ? aggregatedData.action->aggregationInfo()  //adding event source (camera) to the existing aggregation info
-        : QnBusinessAggregationInfo();              //creating new aggregation info
+        ? aggregatedData.action->aggregationInfo() //< adding event source (camera) to the existing aggregation info.
+        : QnBusinessAggregationInfo();             //< creating new aggregation info.
 
     if( !aggregatedData.action )
     {
@@ -1026,10 +1012,6 @@ void QnMServerBusinessRuleProcessor::updateRecipientsList(
     QStringList additional = action->getParams().emailAddress.split(kOldEmailDelimiter,
         QString::SkipEmptyParts);
 
-    const auto ids = action->getResources();
-    const auto userRoles = userRolesManager()->userRoles(ids);
-    const auto users = resourcePool()->getResources<QnUserResource>(ids);
-
     QStringList recipients;
     auto addRecipient = [&recipients](const QString& email)
         {
@@ -1042,25 +1024,33 @@ void QnMServerBusinessRuleProcessor::updateRecipientsList(
                 recipients.append(address.value());
         };
 
-
     for (const auto& email: additional)
         addRecipient(email);
 
-    for (const auto& user: users)
-    {
-        if (user->isEnabled())
-            addRecipient(user->getEmail());
-    }
+    const auto subjects = action->getResources().toList().toSet();
 
-    for (const auto& userRole: userRoles)
+    //TODO: #vkutin Optimize?
+    for (const auto& user: resourcePool()->getResources<QnUserResource>())
     {
-        for (const auto& subject: resourceAccessSubjectsCache()->usersInRole(userRole.id))
+        if (!user->isEnabled())
+            continue;
+
+        if (subjects.contains(user->getId()))
         {
-            const auto& user = subject.user();
-            NX_ASSERT(user);
-            if (user && user->isEnabled())
-                addRecipient(user->getEmail());
+            addRecipient(user->getEmail());
+            continue;
         }
+
+        const auto role = user->userRole();
+        if (role == Qn::UserRole::CustomPermissions)
+            continue;
+
+        const auto roleId = role == Qn::UserRole::CustomUserRole
+            ? user->userRoleId()
+            : QnUserRolesManager::predefinedRoleId(role);
+
+        if (subjects.contains(roleId))
+            addRecipient(user->getEmail());
     }
 
     recipients.removeDuplicates();
