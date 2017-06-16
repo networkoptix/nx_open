@@ -270,7 +270,7 @@ protected:
         auto user1Tasks = user1->tasks();
         ASSERT_EQ(user1Tasks.size(), 2);
 
-        ASSERT_GT(user1Tasks[user1Task2Id].fired, user1Task2FiredWhileUnsubscribe);
+        ASSERT_TRUE(user1Tasks[user1Task2Id].fired - user1Task2FiredWhileUnsubscribe <= 1);
     }
 
     void thenSecondTaskShouldFireMultipleTimesForTheFirstUser()

@@ -172,7 +172,7 @@ void PersistentScheduler::addTimer(
         }
 
         auto delayInfo = calcDelay(taskInfo);
-        if (delayInfo.fullPeriodsPassed != 0)
+        if (delayInfo.fullPeriodsPassed != 0 && delayInfo.delay > std::chrono::milliseconds(10))
         {
             m_timerManager->addTimer(
                 [this, functorId, taskId, params = taskInfo.params](nx::utils::TimerId)
