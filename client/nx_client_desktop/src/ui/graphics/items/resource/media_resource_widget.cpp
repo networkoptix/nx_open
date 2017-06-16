@@ -2326,10 +2326,19 @@ QnMediaResourceWidget::SoftwareTrigger* QnMediaResourceWidget::createTriggerIfRe
         rule->eventParams().description,
         rule->isActionProlonged() });
 
-    const auto button = new QnSoftwareTriggerButton(this);
-    configureTriggerButton(button, info);
+    std::function<void()> clientsideHandler;
 
-    //TODO: #vkutin For now rule buttons are NOT sorted. Implement some sane sorting later.
+    if (rule->actionType() == QnBusiness::BookmarkAction
+        && !rule->actionParams().needConfirmation)
+    {
+        clientsideHandler =
+            [this] { action(action::BookmarksModeAction)->setChecked(true); };
+    }
+
+    const auto button = new QnSoftwareTriggerButton(this);
+    configureTriggerButton(button, info, clientsideHandler);
+
+    //TODO: #vkutin #3.1 For now rule buttons are NOT sorted. Implement sorting by UUID later.
     const auto overlayItemId = m_triggersContainer->insertItem(0, button);
 
     auto& trigger = m_softwareTriggers[rule->id()];
@@ -2354,7 +2363,7 @@ bool QnMediaResourceWidget::isRelevantTriggerRule(const QnBusinessEventRulePtr& 
 }
 
 void QnMediaResourceWidget::configureTriggerButton(QnSoftwareTriggerButton* button,
-    const SoftwareTriggerInfo& info)
+    const SoftwareTriggerInfo& info, std::function<void()> clientsideHandler)
 {
     NX_EXPECT(button);
 
@@ -2384,7 +2393,7 @@ void QnMediaResourceWidget::configureTriggerButton(QnSoftwareTriggerButton* butt
     if (info.prolonged)
     {
         connect(button, &QnSoftwareTriggerButton::pressed, this,
-            [this, button, resultHandler, id = info.triggerId]()
+            [this, button, resultHandler, clientsideHandler, id = info.triggerId]()
             {
                 if (!button->isLive())
                     return;
@@ -2395,6 +2404,9 @@ void QnMediaResourceWidget::configureTriggerButton(QnSoftwareTriggerButton* butt
                 button->setState(success
                     ? QnSoftwareTriggerButton::State::Waiting
                     : QnSoftwareTriggerButton::State::Failure);
+
+                if (success && clientsideHandler)
+                    clientsideHandler();
             });
 
         connect(button, &QnSoftwareTriggerButton::released, this,
@@ -2418,7 +2430,7 @@ void QnMediaResourceWidget::configureTriggerButton(QnSoftwareTriggerButton* butt
     else
     {
         connect(button, &QnSoftwareTriggerButton::clicked, this,
-            [this, button, resultHandler, id = info.triggerId]()
+            [this, button, resultHandler, clientsideHandler, id = info.triggerId]()
             {
                 if (!button->isLive())
                     return;
@@ -2430,6 +2442,9 @@ void QnMediaResourceWidget::configureTriggerButton(QnSoftwareTriggerButton* butt
                 button->setState(success
                     ? QnSoftwareTriggerButton::State::Waiting
                     : QnSoftwareTriggerButton::State::Failure);
+
+                if (success && clientsideHandler)
+                    clientsideHandler();
             });
     }
 
