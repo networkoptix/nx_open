@@ -23,10 +23,10 @@ public:
     static const int KEEP_ALIVE_TIMEOUT = 5  * 1000;
 
     /**
-     * Called from templates. In derived classes, redefine to return true to enable automatic
-     * request forwarding.
+     * Called from templates. In derived classes, redefine to return true if the last path
+     * component carries camera id.
      */
-    static bool isForwardingRequired() { return false; }
+    static bool doesPathEndWithCameraId() { return false; }
 
     QnTCPConnectionProcessor(QSharedPointer<AbstractStreamSocket> socket, QnTcpListener* owner);
     virtual ~QnTCPConnectionProcessor();

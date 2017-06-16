@@ -1786,7 +1786,7 @@ void MediaServerProcess::registerRestHandlers(
         {
             processorPool->registerHandler(path, handler, permissions);
 
-            const auto& cameraIdUrlParams = handler->cameraIdUrlParamsForRequestForwarding();
+            const auto& cameraIdUrlParams = handler->cameraIdUrlParams();
             if (!cameraIdUrlParams.isEmpty())
                 m_autoRequestForwarder->addCameraIdUrlParams(path, cameraIdUrlParams);
         };
@@ -1889,7 +1889,7 @@ void MediaServerProcess::regTcp(
     m_universalTcpListener->addHandler<TcpConnectionProcessor>(
         protocol, path, extraParam...);
 
-    if (TcpConnectionProcessor::isForwardingRequired())
+    if (TcpConnectionProcessor::doesPathEndWithCameraId())
         m_autoRequestForwarder->addAllowedProtocolAndPathPart(protocol, path);
 }
 

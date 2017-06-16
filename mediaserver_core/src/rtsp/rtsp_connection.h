@@ -87,7 +87,7 @@ class QnRtspConnectionProcessor : public QnTCPConnectionProcessor
     Q_OBJECT
 
 public:
-    static bool isForwardingRequired() { return true; } //< See the base class method.
+    static bool doesPathEndWithCameraId() { return true; } //< See the base class method.
 
     QnRtspConnectionProcessor(QSharedPointer<AbstractStreamSocket> socket, QnTcpListener* owner);
     virtual ~QnRtspConnectionProcessor();

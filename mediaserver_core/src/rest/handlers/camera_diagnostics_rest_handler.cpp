@@ -22,7 +22,7 @@ static const QString kTypeParam = lit("type");
 
 } // namespace
 
-QStringList QnCameraDiagnosticsRestHandler::cameraIdUrlParamsForRequestForwarding() const
+QStringList QnCameraDiagnosticsRestHandler::cameraIdUrlParams() const
 {
     return kCameraIdParams;
 }

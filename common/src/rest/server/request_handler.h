@@ -68,8 +68,8 @@ public:
 
     Qn::GlobalPermission permissions() const { return m_permissions; }
 
-    /** Override if automatic request forwarding is required based on camera id in url params. */
-    virtual QStringList cameraIdUrlParamsForRequestForwarding() const { return {}; }
+    /** In derived classes, report all url params carrying camera id. */
+    virtual QStringList cameraIdUrlParams() const { return {}; }
 
 protected:
     void setPath(const QString& path) { m_path = path; }

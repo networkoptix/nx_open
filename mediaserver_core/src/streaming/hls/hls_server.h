@@ -38,7 +38,7 @@ namespace nx_hls
         Q_OBJECT
 
     public:
-        static bool isForwardingRequired() { return true; } //< See the base class method.
+        static bool doesPathEndWithCameraId() { return true; } //< See the base class method.
 
         QnHttpLiveStreamingProcessor( QSharedPointer<AbstractStreamSocket> socket, QnTcpListener* owner );
         virtual ~QnHttpLiveStreamingProcessor();
