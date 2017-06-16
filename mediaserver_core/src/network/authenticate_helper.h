@@ -25,9 +25,6 @@
 #include <core/resource_access/user_access_data.h>
 #include <common/common_module_aware.h>
 
-#define USE_USER_RESOURCE_PROVIDER
-
-
 struct QnLdapDigestAuthContext;
 class TimeBasedNonceProvider;
 struct CloudManagerGroup;
@@ -91,11 +88,6 @@ public:
 signals:
     void emptyDigestDetected(const QnUserResourcePtr& user, const QString& login, const QString& password);
 
-#ifndef USE_USER_RESOURCE_PROVIDER
-private slots:
-    void at_resourcePool_resourceAdded(const QnResourcePtr &);
-    void at_resourcePool_resourceRemoved(const QnResourcePtr &);
-#endif
 private:
     class TempAuthenticationKeyCtx
     {
@@ -159,10 +151,6 @@ private:
         Qn::UserAccessData* accessRights);
 
     mutable QnMutex m_mutex;
-#ifndef USE_USER_RESOURCE_PROVIDER
-    QMap<QnUuid, QnUserResourcePtr> m_users;
-    QMap<QnUuid, QnMediaServerResourcePtr> m_servers;
-#endif
     nx_http::AuthMethodRestrictionList m_authMethodRestrictionList;
     std::map<QString, TempAuthenticationKeyCtx> m_authenticatedPaths;
     AbstractNonceProvider* m_timeBasedNonceProvider;
