@@ -672,8 +672,8 @@ QString QnBusinessStringsHelper::actionSubjects(
         {
             return lit("%1 %2 %3")
                 .arg(tr("Role"))
-                .arg(L'\x2013') //< En-dash.
-                .arg(userRolesManager()->userRole(roles.front()).name);
+                .arg(QChar(L'\x2013')) //< En-dash.
+                .arg(userRolesManager()->userRoleName(roles.front()));
         }
     }
 
