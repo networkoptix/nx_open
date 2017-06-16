@@ -487,30 +487,16 @@ bool QnMServerBusinessRuleProcessor::executeRecordingAction(const QnRecordingBus
 bool QnMServerBusinessRuleProcessor::executeBookmarkAction(
     const QnAbstractBusinessActionPtr &action)
 {
-    NX_ASSERT(action);
-    const auto camera = resourcePool()->getResourceById<QnSecurityCamResource>(
-        action->getParams().actionResourceId);
-    if (!camera)
+    const auto cameraId = action
+        ? action->getParams().actionResourceId
+        : QnUuid();
+
+    const auto camera = resourcePool()->getResourceById<QnSecurityCamResource>(cameraId);
+    if (!camera || !fixActionTimeFields(action))
         return false;
 
-    const auto key = action->getExternalUniqKey();
-    auto runningKey = guidFromArbitraryData(key);
-    if (action->getParams().durationMs <= 0)
-    {
-        if (action->getToggleState() == QnBusiness::ActiveState)
-        {
-            m_runningBookmarkActions[runningKey] = action->getRuntimeParams().eventTimestampUsec;
-            return true;
-        }
-
-        if (!m_runningBookmarkActions.contains(runningKey))
-            return false;
-
-        action->getRuntimeParams().eventTimestampUsec =
-            m_runningBookmarkActions.take(runningKey);
-    }
-
-    return qnServerDb->addBookmark(helpers::bookmarkFromAction(action, camera, commonModule()));
+    const auto bookmark = helpers::bookmarkFromAction(action, camera, commonModule());
+    return qnServerDb->addBookmark(bookmark);
 }
 
 

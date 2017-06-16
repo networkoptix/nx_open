@@ -29,6 +29,16 @@
 #include <database/server_db.h>
 #include <common/common_module.h>
 
+namespace {
+
+QnUuid getActionRunningKey(const QnAbstractBusinessActionPtr& action)
+{
+    const auto key = action->getExternalUniqKey();
+    return guidFromArbitraryData(key);
+}
+
+} // namespace
+
 QnBusinessRuleProcessor::QnBusinessRuleProcessor(QnCommonModule* commonModule):
     QnCommonModuleAware(commonModule)
 {
@@ -156,6 +166,87 @@ void QnBusinessRuleProcessor::executeAction(const QnAbstractBusinessActionPtr& a
     }
 }
 
+bool QnBusinessRuleProcessor::updateProlongedActionStartTime(
+    const QnAbstractBusinessActionPtr& action)
+{
+    if (!action)
+    {
+        NX_EXPECT(false, "Action is null");
+        return false;
+    }
+
+    if (action->getParams().durationMs > 0
+        || action->getToggleState() != QnBusiness::ActiveState)
+    {
+        return false;
+    }
+
+    const auto key = getActionRunningKey(action);
+    const auto startTimeUsec = action->getRuntimeParams().eventTimestampUsec;
+    const auto it = m_runningBookmarkActions.find(key);
+    if (it == m_runningBookmarkActions.end())
+        m_runningBookmarkActions.insert(key, startTimeUsec);
+    else
+        *it = startTimeUsec;
+    return true;
+}
+
+bool QnBusinessRuleProcessor::popProlongedActionStartTime(
+    const QnAbstractBusinessActionPtr& action,
+    qint64& startTimeUsec)
+{
+    if (!action)
+    {
+        NX_EXPECT(false, "Invalid action");
+        return false;
+    }
+    if (action->getParams().durationMs > 0
+        || action->getToggleState() == QnBusiness::ActiveState)
+    {
+        return false;
+    }
+
+    const auto key = getActionRunningKey(action);
+    const auto it = m_runningBookmarkActions.find(key);
+    if (it == m_runningBookmarkActions.end())
+    {
+        NX_EXPECT(false, "Can't find prolonged action data");
+        return false;
+    }
+
+    startTimeUsec = *it;
+    return true;
+}
+
+bool QnBusinessRuleProcessor::fixActionTimeFields(const QnAbstractBusinessActionPtr& action)
+{
+    if (!action)
+    {
+        NX_EXPECT(false, "Invalid action");
+        return false;
+    }
+
+    const bool isProlonged = action->getParams().durationMs <= 0;
+    if (isProlonged && updateProlongedActionStartTime(action))
+        return false; //< Do not process event until it is finished
+
+    qint64 startTimeUsec = action->getRuntimeParams().eventTimestampUsec;
+    if (isProlonged && !popProlongedActionStartTime(action, startTimeUsec))
+    {
+        NX_EXPECT(false, "Something went wrong");
+        return false; //< Do not process event at all
+    }
+
+    if (isProlonged)
+    {
+        const auto endTimeUsec = action->getRuntimeParams().eventTimestampUsec;
+        action->getParams().durationMs = (endTimeUsec - startTimeUsec) / 1000;
+        action->getRuntimeParams().eventTimestampUsec = startTimeUsec;
+    }
+
+    return true;
+}
+
 bool QnBusinessRuleProcessor::handleBookmarkAction(const QnAbstractBusinessActionPtr& action)
 {
     if (!action->getParams().needConfirmation)
@@ -167,24 +258,8 @@ bool QnBusinessRuleProcessor::handleBookmarkAction(const QnAbstractBusinessActio
         return false;
     }
 
-    const auto fixedDurationMs = action->getParams().durationMs;
-    if (fixedDurationMs <= 0)
-    {
-        const auto key = action->getExternalUniqKey();
-        auto runningKey = guidFromArbitraryData(key);
-        if (action->getToggleState() == QnBusiness::ActiveState)
-        {
-            m_runningBookmarkActions[runningKey] =
-                action->getRuntimeParams().eventTimestampUsec;
-            return true;
-        }
-
-        if (!m_runningBookmarkActions.contains(runningKey))
-            return false;
-
-        action->getRuntimeParams().eventTimestampUsec =
-            m_runningBookmarkActions.take(runningKey);
-    }
+    if (!fixActionTimeFields(action))
+        return false;
 
     action->getParams().targetActionType = action->actionType();
     action->setActionType(QnBusiness::ShowPopupAction);
