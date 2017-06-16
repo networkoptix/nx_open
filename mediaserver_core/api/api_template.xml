@@ -89,6 +89,17 @@
                             <description>Text-search filter string.</description>
                             <optional>true</optional>
                         </param>
+                        <param proprietary="true">
+                            <name>local</name>
+                            <description>If present, the request was sent via redirection.</description>
+                            <optional>true</optional>
+                        </param>
+                        <param proprietary="true">
+                            <name>extraFormatting</name>
+                            <description>If present and the requested result format is non-binary,
+                                indentation and spacing will be used to improve readability.</description>
+                            <optional>true</optional>
+                        </param>
                         <param>
                             <name>format</name>
                             <description>Data format. Default value is "json".</description>
@@ -165,6 +176,17 @@
                             <description>Applied tag. Several tag parameters could be used to specify multiple tags.</description>
                             <optional>true</optional>
                         </param>
+                        <param proprietary="true">
+                            <name>local</name>
+                            <description>If present, the request was sent via redirection.</description>
+                            <optional>true</optional>
+                        </param>
+                        <param proprietary="true">
+                            <name>extraFormatting</name>
+                            <description>If present and the requested result format is non-binary,
+                                indentation and spacing will be used to improve readability.</description>
+                            <optional>true</optional>
+                        </param>
                         <param>
                             <name>format</name>
                             <description>Data format. Default value is "json".</description>
@@ -204,6 +226,17 @@
                             <description>Identifier of the bookmark.</description>
                             <optional>false</optional>
                         </param>
+                        <param proprietary="true">
+                            <name>local</name>
+                            <description>If present, the request was sent via redirection.</description>
+                            <optional>true</optional>
+                        </param>
+                        <param proprietary="true">
+                            <name>extraFormatting</name>
+                            <description>If present and the requested result format is non-binary,
+                                indentation and spacing will be used to improve readability.</description>
+                            <optional>true</optional>
+                        </param>
                         <param>
                             <name>format</name>
                             <description>Data format. Default value is "json".</description>
@@ -241,6 +274,17 @@
                         <param>
                             <name>limit</name>
                             <description>Maximum number of tags to return.</description>
+                            <optional>true</optional>
+                        </param>
+                        <param proprietary="true">
+                            <name>local</name>
+                            <description>If present, the request was sent via redirection.</description>
+                            <optional>true</optional>
+                        </param>
+                        <param proprietary="true">
+                            <name>extraFormatting</name>
+                            <description>If present and the requested result format is non-binary,
+                                indentation and spacing will be used to improve readability.</description>
                             <optional>true</optional>
                         </param>
                         <param>
@@ -319,6 +363,155 @@
                             <description>Applied tag. Serveral tag parameters could be used to specify multiple tags.</description>
                             <optional>true</optional>
                         </param>
+                        <param proprietary="true">
+                            <name>local</name>
+                            <description>If present, the request was sent via redirection.</description>
+                            <optional>true</optional>
+                        </param>
+                        <param proprietary="true">
+                            <name>extraFormatting</name>
+                            <description>If present and the requested result format is non-binary,
+                                indentation and spacing will be used to improve readability.</description>
+                            <optional>true</optional>
+                        </param>
+                        <param>
+                            <name>format</name>
+                            <description>Data format. Default value is "json".</description>
+                            <optional>true</optional>
+                            <values>
+                                <value>
+                                    <name>ubjson</name>
+                                    <description>Universal Binary JSON data format.</description>
+                                </value>
+                                <value>
+                                    <name>json</name>
+                                    <description>JSON data format.</description>
+                                </value>
+                                <value>
+                                    <name>xml</name>
+                                    <description>XML data format.</description>
+                                </value>
+                                <value>
+                                    <name>csv</name>
+                                    <description>
+                                        CSV data format. In case of a hierarchical structure,
+                                        only the top level data is provided.
+                                    </description>
+                                </value>
+                            </values>
+                        </param>
+                    </params>
+                    <result/>
+                </function>
+                <function>
+                    <name>cameraThumbnail</name>
+                    <description>Get the static image from the camera.</description>
+                    <method>GET</method>
+                    <params>
+                        <param>
+                            <name>cameraId</name>
+                            <description>
+                                Camera id (can be obtained from "id" field via /ec2/getCamerasEx or /ec2/getCameras?extraFormatting) or
+                                MAC address (not supported for certain cameras).</description>
+                            <optional>false</optional>
+                        </param>
+                        <param>
+                            <name>time</name>
+                            <description>
+                                Timestamp of the requested image (in milliseconds since epoch).
+                                The special value "latest", which is the default value, requires to
+                                retrieve the latest thumbnail. The special value "now" requires to
+                                retrieve the thumbnail corresponding to the current time.
+                            </description>
+                            <optional>true</optional>
+                        </param>
+                        <param>
+                            <name>rotate</name>
+                            <description>
+                                Image orientation. Can be 0, 90, 180 or 270 degrees. If the
+                                parameter is absent or equals -1, the image will be rotated as
+                                defined in the camera settings.
+                            </description>
+                            <optional>true</optional>
+                        </param>
+                        <param>
+                            <name>height</name>
+                            <description>
+                                Desired image height. Should be not less than 128, or equal to -1
+                                (the default value) which implies the original frame size, and in
+                                this case the width should also be omitted or set to -1.
+                            </description>
+                            <optional>true</optional>
+                        </param>
+                        <param>
+                            <name>width</name>
+                            <description>
+                                Desired image width. Should be not less than 128, or equal to -1
+                                (the default value) which implies autosizing: if the height is
+                                specified, the width will be calculated based on the aspect ratio,
+                                otherwise, the original frame size will be used.
+                            </description>
+                            <optional>true</optional>
+                        </param>
+                        <param>
+                            <name>imageFormat</name>
+                            <description>
+                                Format of the requested image. Default value is "JpgFormat".
+                            </description>
+                            <optional>true</optional>
+                            <values>
+                                <value>
+                                    <name>PngFormat</name>
+                                    <description>PNG</description>
+                                </value>
+                                <value>
+                                    <name>JpgFormat</name>
+                                    <description>JPEG</description>
+                                </value>
+                                <value>
+                                    <name>TiffFormat</name>
+                                    <description>TIFF</description>
+                                </value>
+                                <value>
+                                    <name>RawFormat</name>
+                                    <description>Raw video frame. Makes the request much more lightweight for Edge servers.</description>
+                                </value>
+                            </values>
+                        </param>
+                        <param>
+                            <name>method</name>
+                            <description>
+                                Getting a thumbnail at the exact timestamp is costly, so, it can be
+                                rounded to the nearest keyframe, thus, the default value is
+                                "KeyFrameAfterMethod".
+                            </description>
+                            <optional>true</optional>
+                            <values>
+                                <value>
+                                    <name>KeyFrameBeforeMethod</name>
+                                    <description>Get the thumbnail from the nearest keyframe before the given time.</description>
+                                </value>
+                                <value>
+                                    <name>PreciseMethod</name>
+                                    <description>Get the thumbnail as near to given time as possible.</description>
+                                </value>
+                                <value>
+                                    <name>KeyFrameAfterMethod</name>
+                                    <description>Get the thumbnail from the nearest keyframe after the given time.</description>
+                                </value>
+                            </values>
+                        </param>
+                        <param proprietary="true">
+                            <name>local</name>
+                            <description>If present, the request was sent via redirection.</description>
+                            <optional>true</optional>
+                        </param>
+                        <param proprietary="true">
+                            <name>extraFormatting</name>
+                            <description>If present and the requested result format is non-binary,
+                                indentation and spacing will be used to improve readability.</description>
+                            <optional>true</optional>
+                        </param>
                         <param>
                             <name>format</name>
                             <description>Data format. Default value is "json".</description>
@@ -353,6 +546,17 @@
                     <description>Get free space available for downloading and extracting update files.</description>
                     <method>GET</method>
                     <params>
+                        <param proprietary="true">
+                            <name>local</name>
+                            <description>If present, the request was sent via redirection.</description>
+                            <optional>true</optional>
+                        </param>
+                        <param proprietary="true">
+                            <name>extraFormatting</name>
+                            <description>If present and the requested result format is non-binary,
+                                indentation and spacing will be used to improve readability.</description>
+                            <optional>true</optional>
+                        </param>
                         <param>
                             <name>format</name>
                             <description>Data format. Default value is "json".</description>
@@ -742,7 +946,7 @@
                 <function>
                     <name>image</name>
                     <description>
-                        <b>Deprecated, support expires by 3.1.</b> Use /api/cameraThumbnail instead.
+                        <b>Deprecated, support expires by 3.1.</b> Use /ec2/cameraThumbnail instead.
                         The new method can get thumbnails from cameras located on other servers (the old one can't).
                         <br />
                         Return image from the camera.</description>
@@ -2429,7 +2633,7 @@ the respective JSON fields can be empty.</description>
                         </param>
                         <param>
                             <name>rotation</name>
-                            <description>Rotate item. Can be 0, 90, 180 or 270 degrees. If parameter is absent, video will be rotated to default value defined in a camera settings dialog.
+                            <description>Rotate item. Can be 0, 90, 180 or 270 degrees. If the parameter is absent, video will be rotated to default value defined in a camera settings dialog.
                                          Parameter take place if video transcoding is activated (parameter codec and/or parameter resolution are presents.)</description>
                             <optional>true</optional>
                         </param>
@@ -2520,12 +2724,12 @@ the respective JSON fields can be empty.</description>
                         </param>
                         <param>
                             <name>rotation</name>
-                            <description>Rotate item. Can be 0, 90, 180 or 270 degrees. If parameter is absent, video will be rotated to default value defined in a camera settings dialog</description>
+                            <description>Rotate item. Can be 0, 90, 180 or 270 degrees. If the parameter is absent, video will be rotated to default value defined in a camera settings dialog.</description>
                             <optional>true</optional>
                         </param>
                         <param>
                             <name>sfd</name>
-                            <description>Stand Frame Duration. If parameter is present, video speed is limited by real time.</description>
+                            <description>Stand Frame Duration. If the parameter is present, video speed is limited by real time.</description>
                             <optional>true</optional>
                         </param>
                         <param>
