@@ -46,13 +46,13 @@ static std::chrono::milliseconds kDefaultTakeIdleConnectionTimeout = std::chrono
 static const QLatin1String kInternalTimerPeriod("listeningPeer/internalTimerPeriod");
 static std::chrono::milliseconds kDefaultInternalTimerPeriod = std::chrono::seconds(1);
 
-static const QLatin1String kInactivityPeriodBeforeFirstProbe("listeningPeer/inactivityPeriodBeforeFirstProbe");
+static const QLatin1String kInactivityPeriodBeforeFirstProbe("listeningPeer/tcpInactivityPeriodBeforeFirstProbe");
 static const std::chrono::seconds kDefaultInactivityPeriodBeforeFirstProbe(30);
 
-static const QLatin1String kProbeSendPeriod("listeningPeer/probeSendPeriod");
+static const QLatin1String kProbeSendPeriod("listeningPeer/tcpProbeSendPeriod");
 static const std::chrono::seconds kDefaultProbeSendPeriod(30);
 
-static const QLatin1String kProbeCount("listeningPeer/probeCount");
+static const QLatin1String kProbeCount("listeningPeer/tcpProbeCount");
 static const int kDefaultProbeCount(2);
 
 //-------------------------------------------------------------------------------------------------
