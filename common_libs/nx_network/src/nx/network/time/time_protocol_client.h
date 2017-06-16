@@ -23,7 +23,6 @@ class NX_NETWORK_API TimeProtocolClient:
 {
 public:
     TimeProtocolClient(const QString& timeServerHost);
-    virtual ~TimeProtocolClient();
 
     virtual void stopWhileInAioThread() override;
     virtual void bindToAioThread(aio::AbstractAioThread* aioThread);

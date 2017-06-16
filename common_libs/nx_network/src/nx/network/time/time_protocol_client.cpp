@@ -20,11 +20,6 @@ TimeProtocolClient::TimeProtocolClient(const QString& timeServerHost):
     m_timeStr.reserve(kMaxTimeStrLength);
 }
 
-TimeProtocolClient::~TimeProtocolClient()
-{
-    stopWhileInAioThread();
-}
-
 void TimeProtocolClient::stopWhileInAioThread()
 {
     m_tcpSock.reset();
