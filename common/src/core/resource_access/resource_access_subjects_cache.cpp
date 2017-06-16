@@ -92,17 +92,19 @@ void QnResourceAccessSubjectsCache::updateUserRole(const QnUserResourcePtr& user
 
     QnMutexLocker lk(&m_mutex);
     const auto oldRoleId = m_roleIdByUserId.value(id);
-    const auto newRoleId = user->userRoleId();
+
+    const auto userRole = user->userRole();
+    const auto newRoleId = userRole == Qn::UserRole::CustomUserRole
+        ? user->userRoleId()
+        : QnUserRolesManager::predefinedRoleId(userRole);
+
     if (oldRoleId == newRoleId)
         return;
 
     removeUserFromRole(user, oldRoleId);
 
-    if (!newRoleId.isNull())
-    {
-        m_roleIdByUserId[id] = newRoleId;
-        m_usersByRoleId[newRoleId].append(user);
-    }
+    m_roleIdByUserId[id] = newRoleId;
+    m_usersByRoleId[newRoleId].append(user);
 }
 
 void QnResourceAccessSubjectsCache::handleRoleAdded(const ec2::ApiUserRoleData& userRole)
@@ -134,9 +136,6 @@ void QnResourceAccessSubjectsCache::handleRoleRemoved(const ec2::ApiUserRoleData
 void QnResourceAccessSubjectsCache::removeUserFromRole(const QnUserResourcePtr& user,
     const QnUuid& roleId)
 {
-    if (roleId.isNull())
-        return;
-
     auto users = m_usersByRoleId.find(roleId);
     if (users == m_usersByRoleId.end())
         return;
