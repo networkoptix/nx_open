@@ -13,7 +13,7 @@ class QnPtzRestHandler: public QnJsonRestHandler
     Q_OBJECT
 
 public:
-    virtual QStringList cameraIdUrlParamsForRequestForwarding() const override;
+    virtual QStringList cameraIdUrlParams() const override;
 
     virtual int executePost(
         const QString& path,

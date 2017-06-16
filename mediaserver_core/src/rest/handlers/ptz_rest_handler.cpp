@@ -147,7 +147,7 @@ int QnPtzRestHandler::execCommandAsync(const QString& sequence, AsyncFunc functi
     return CODE_OK;
 }
 
-QStringList QnPtzRestHandler::cameraIdUrlParamsForRequestForwarding() const
+QStringList QnPtzRestHandler::cameraIdUrlParams() const
 {
     return kCameraIdParams;
 }

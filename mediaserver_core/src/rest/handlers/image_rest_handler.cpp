@@ -43,7 +43,7 @@ static const QStringList kCameraIdParams{
 
 } // namespace
 
-QStringList QnImageRestHandler::cameraIdUrlParamsForRequestForwarding() const
+QStringList QnImageRestHandler::cameraIdUrlParams() const
 {
     return kCameraIdParams;
 }
