@@ -39,10 +39,7 @@ int TimeServerProcess::serviceMain(
 {
     try
     {
-        nx::network::TimeProtocolServer timeProtocolServer(
-            false,
-            network::NatTraversalSupport::disabled);
-
+        nx::network::TimeProtocolServer timeProtocolServer(false);
         if (!timeProtocolServer.bind(kTimeProtocolServerEndpoint))
         {
             const auto sysErrorCode = SystemError::getLastOSErrorCode();

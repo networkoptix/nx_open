@@ -34,6 +34,12 @@ TimeProtocolClient::TimeProtocolClient(const QString& timeServerHost):
     m_timeStr.reserve(kMaxTimeStrLength);
 }
 
+TimeProtocolClient::TimeProtocolClient(const SocketAddress& timeServerEndpoint):
+    m_timeServerEndpoint(timeServerEndpoint)
+{
+    m_timeStr.reserve(kMaxTimeStrLength);
+}
+
 void TimeProtocolClient::stopWhileInAioThread()
 {
     m_tcpSock.reset();

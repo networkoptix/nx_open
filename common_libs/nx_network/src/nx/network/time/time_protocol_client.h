@@ -27,7 +27,9 @@ class NX_NETWORK_API TimeProtocolClient:
     public AbstractAccurateTimeFetcher
 {
 public:
+    /** Uses timeServerHost:{standard_time_protocol_port} */
     TimeProtocolClient(const QString& timeServerHost);
+    TimeProtocolClient(const SocketAddress& timeServerEndpoint);
 
     virtual void stopWhileInAioThread() override;
     virtual void bindToAioThread(aio::AbstractAioThread* aioThread);

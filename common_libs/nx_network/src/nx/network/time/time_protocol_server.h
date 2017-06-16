@@ -14,9 +14,7 @@ class NX_NETWORK_API TimeProtocolServer:
         server::StreamSocketServer<TimeProtocolServer, TimeProtocolConnection>;
 
 public:
-    TimeProtocolServer(
-        bool sslRequired,
-        nx::network::NatTraversalSupport natTraversalRequired);
+    TimeProtocolServer(bool sslRequired);
 
 protected:
     virtual std::shared_ptr<ConnectionType> createConnection(

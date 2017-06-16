@@ -3,11 +3,8 @@
 namespace nx {
 namespace network {
 
-TimeProtocolServer::TimeProtocolServer(
-    bool sslRequired,
-    nx::network::NatTraversalSupport natTraversalRequired)
-    :
-    base_type(sslRequired, natTraversalRequired)
+TimeProtocolServer::TimeProtocolServer(bool sslRequired):
+    base_type(sslRequired, nx::network::NatTraversalSupport::disabled)
 {
 }
 

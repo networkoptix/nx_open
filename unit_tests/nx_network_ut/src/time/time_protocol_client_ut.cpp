@@ -1,74 +1,78 @@
-/**********************************************************
-* 6 feb 2015
-* a.kolesnikov
-***********************************************************/
-
-#include <condition_variable>
-#include <mutex>
-
 #include <gtest/gtest.h>
 
 #include <QtCore/QElapsedTimer>
 
-#include <nx/network/time/mean_time_fetcher.h>
 #include <nx/network/time/time_protocol_client.h>
-
-#if 0
+#include <nx/network/time/time_protocol_server.h>
+#include <nx/utils/sync_call.h>
 
 namespace nx {
 namespace network {
+namespace test {
 
-static const char* RFC868_SERVERS[] = { "time.nist.gov", "time.ien.it"/*, "time1.ucla.edu"*/ };
-
-TEST(InternetTimeFetcher, genericTest)
+class TimeProtocolClient:
+    public ::testing::Test
 {
-    std::unique_ptr<MeanTimeFetcher> timeFetcher;
-    timeFetcher.reset(new MeanTimeFetcher());
-
-    for (const char* timeServer  RFC868_SERVERS)
+public:
+    TimeProtocolClient():
+        m_timeServer(false)
     {
-        timeFetcher->addTimeFetcher(std::unique_ptr<AbstractAccurateTimeFetcher>(
-            new TimeProtocolClient(QLatin1String(timeServer))));
     }
 
-    std::condition_variable condVar;
-    std::mutex mutex;
-    bool done = false;
-    std::vector<qint64> utcMillis;
-
-    QElapsedTimer et;
-    et.restart();
-
-    for (int i = 0; i < 10; ++i)
+protected:
+    void whenRequestedTime()
     {
-        timeFetcher->getTimeAsync(
-            [&condVar, &mutex, &done, &utcMillis](
-                qint64 _utcMillis, SystemError::ErrorCode errorCode)
-            {
-                std::unique_lock<std::mutex> lk(mutex);
-                if (errorCode == SystemError::noError)
-                    utcMillis.push_back(_utcMillis);
-                done = true;
-                condVar.notify_all();
-            });
+        using namespace std::placeholders;
 
-        std::unique_lock<std::mutex> lk(mutex);
-        condVar.wait(lk, [&done]()->bool { return done; });
-        done = false;
+        m_timeRequestResult = makeSyncCall<qint64, SystemError::ErrorCode>(
+            std::bind(&network::TimeProtocolClient::getTimeAsync,
+                m_timeProtocolClient.get(), _1));
+    }
+    
+    void thenTimeHasBeenReported()
+    {
+        ASSERT_EQ(
+            SystemError::noError,
+            std::get<SystemError::ErrorCode>(m_timeRequestResult));
+        ASSERT_GE(std::get<qint64>(m_timeRequestResult), ::time(NULL));
     }
 
-    ASSERT_GT(utcMillis.size(), 0);
+private:
+    TimeProtocolServer m_timeServer;
+    std::unique_ptr<network::TimeProtocolClient> m_timeProtocolClient;
+    std::tuple<qint64, SystemError::ErrorCode> m_timeRequestResult;
 
-    qint64 minTimestamp = std::numeric_limits<qint64>::max();
-    for (qint64 ts : utcMillis)
+    virtual void SetUp() override
     {
-        if (ts < minTimestamp)
-            minTimestamp = ts;
-        ASSERT_TRUE(abs(ts - minTimestamp) < (et.elapsed() * 2));
+        ASSERT_TRUE(m_timeServer.bind(SocketAddress::anyPrivateAddress));
+        ASSERT_TRUE(m_timeServer.listen());
+
+        m_timeProtocolClient = std::make_unique<network::TimeProtocolClient>(
+            m_timeServer.address());
+    }
+
+    virtual void TearDown() override
+    {
+        m_timeProtocolClient->pleaseStopSync();
+        m_timeServer.pleaseStopSync();
+    }
+};
+
+TEST_F(TimeProtocolClient, fetches_time)
+{
+    whenRequestedTime();
+    thenTimeHasBeenReported();
+}
+
+TEST_F(TimeProtocolClient, reusing_same_instance)
+{
+    for (int i = 0; i < 3; ++i)
+    {
+        whenRequestedTime();
+        thenTimeHasBeenReported();
     }
 }
 
+} // namespace test
 } // namespace nx
 } // namespace network
-
-#endif
