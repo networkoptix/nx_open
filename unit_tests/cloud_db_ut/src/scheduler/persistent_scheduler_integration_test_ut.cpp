@@ -242,8 +242,8 @@ protected:
         auto user1Tasks = user1->tasks();
         ASSERT_EQ(user1Tasks.size(), 2);
 
-        ASSERT_TRUE(user1Tasks[user1Task1Id].fired - user1Task1FiredWhileUnsubscribe <= 1);
-        ASSERT_TRUE(user1Tasks[user1Task2Id].fired - user1Task2FiredWhileUnsubscribe <= 1);
+        ASSERT_LE(user1Tasks[user1Task1Id].fired - user1Task1FiredWhileUnsubscribe, 1);
+        ASSERT_LE(user1Tasks[user1Task2Id].fired - user1Task2FiredWhileUnsubscribe, 1);
     }
 
     void thenTasksShouldFireMultipleTimesForTheSecondUser()
@@ -262,7 +262,7 @@ protected:
         auto user1Tasks = user1->tasks();
         ASSERT_EQ(user1Tasks.size(), 2);
 
-        ASSERT_EQ(user1Tasks[user1Task1Id].fired, user1Task1FiredWhileUnsubscribe);
+        ASSERT_LE(user1Tasks[user1Task1Id].fired - user1Task1FiredWhileUnsubscribe, 1);
     }
 
     void thenFirstUserShouldContinueToReceiveTimerEventsForTheSecondTask()
@@ -270,7 +270,7 @@ protected:
         auto user1Tasks = user1->tasks();
         ASSERT_EQ(user1Tasks.size(), 2);
 
-        ASSERT_TRUE(user1Tasks[user1Task2Id].fired - user1Task2FiredWhileUnsubscribe <= 1);
+        ASSERT_GT(user1Tasks[user1Task2Id].fired, user1Task2FiredWhileUnsubscribe);
     }
 
     void thenSecondTaskShouldFireMultipleTimesForTheFirstUser()
