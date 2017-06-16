@@ -102,6 +102,11 @@ protected:
         m_poolHasBeenDestroyed = true;
     }
 
+    void whenAddedConnectionToThePool()
+    {
+        addConnection(m_peerName);
+    }
+
     void assertConnectionHasBeenAdded()
     {
         ASSERT_GT(pool().getConnectionCountByPeerName(m_peerName), 0U);
@@ -156,6 +161,16 @@ protected:
     void thenConnectRequestHasCompleted()
     {
         m_takeIdleConnectionResults.pop();
+    }
+
+    void thenKeepAliveHasBeenEnabledOnConnection()
+    {
+        boost::optional<KeepAliveOptions> keepAliveOptions;
+        ASSERT_TRUE(m_peerConnection->getKeepAlive(&keepAliveOptions));
+        ASSERT_TRUE(static_cast<bool>(keepAliveOptions));
+        ASSERT_EQ(
+            m_settingsLoader.settings().listeningPeer().tcpKeepAlive,
+            *keepAliveOptions);
     }
 
     const model::ListeningPeerPool& pool() const
@@ -297,13 +312,19 @@ TEST_F(
     ListeningPeerPool,
     connection_closes_simultaneously_with_take_connection_request)
 {
-    for (int i = 0; i < 100; ++i)
+    for (int i = 0; i < 17; ++i)
     {
         givenConnectionFromPeer();
         whenConnectionIsClosed();
         whenRequestedConnection();
         thenConnectRequestHasCompleted();
     }
+}
+
+TEST_F(ListeningPeerPool, enables_tcp_keep_alive)
+{
+    whenAddedConnectionToThePool();
+    thenKeepAliveHasBeenEnabledOnConnection();
 }
 
 //-------------------------------------------------------------------------------------------------
