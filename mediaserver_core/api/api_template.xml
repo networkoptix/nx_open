@@ -91,7 +91,7 @@
                         </param>
                         <param proprietary="true">
                             <name>local</name>
-                            <description>If present, the request was sent via redirection.</description>
+                            <description>If present, the request should not be redirected to another server.</description>
                             <optional>true</optional>
                         </param>
                         <param proprietary="true">
@@ -178,7 +178,7 @@
                         </param>
                         <param proprietary="true">
                             <name>local</name>
-                            <description>If present, the request was sent via redirection.</description>
+                            <description>If present, the request should not be redirected to another server.</description>
                             <optional>true</optional>
                         </param>
                         <param proprietary="true">
@@ -228,7 +228,7 @@
                         </param>
                         <param proprietary="true">
                             <name>local</name>
-                            <description>If present, the request was sent via redirection.</description>
+                            <description>If present, the request should not be redirected to another server.</description>
                             <optional>true</optional>
                         </param>
                         <param proprietary="true">
@@ -278,7 +278,7 @@
                         </param>
                         <param proprietary="true">
                             <name>local</name>
-                            <description>If present, the request was sent via redirection.</description>
+                            <description>If present, the request should not be redirected to another server.</description>
                             <optional>true</optional>
                         </param>
                         <param proprietary="true">
@@ -365,7 +365,7 @@
                         </param>
                         <param proprietary="true">
                             <name>local</name>
-                            <description>If present, the request was sent via redirection.</description>
+                            <description>If present, the request should not be redirected to another server.</description>
                             <optional>true</optional>
                         </param>
                         <param proprietary="true">
@@ -503,7 +503,7 @@
                         </param>
                         <param proprietary="true">
                             <name>local</name>
-                            <description>If present, the request was sent via redirection.</description>
+                            <description>If present, the request should not be redirected to another server.</description>
                             <optional>true</optional>
                         </param>
                         <param proprietary="true">
@@ -548,7 +548,7 @@
                     <params>
                         <param proprietary="true">
                             <name>local</name>
-                            <description>If present, the request was sent via redirection.</description>
+                            <description>If present, the request should not be redirected to another server.</description>
                             <optional>true</optional>
                         </param>
                         <param proprietary="true">

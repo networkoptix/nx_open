@@ -29,7 +29,7 @@ struct QnMultiserverRequestData
     /** Fix fields to make local request. */
     void makeLocal(Qn::SerializationFormat localFormat = Qn::UbjsonFormat);
 
-    bool isLocal; //< Whether the request was sent via redirection.
+    bool isLocal; //< If set, the request should not be redirected to another server.
     Qn::SerializationFormat format;
     bool extraFormatting;
 
