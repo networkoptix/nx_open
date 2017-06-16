@@ -56,10 +56,13 @@ private:
     void updateButtons(const QnLayoutResourcePtr& layout);
     void updatePlaceholders();
 
+    void resetReviewLayout(const QnLayoutResourcePtr& layout,
+        const ec2::ApiLayoutTourItemDataList& items);
+
     void addItemToReviewLayout(
         const QnLayoutResourcePtr& layout,
         const ec2::ApiLayoutTourItemData& item,
-        const QPointF& position = QPointF());
+        const QPointF& position);
 
     /** Calculate items from the review layout. */
     bool fillTourItems(ec2::ApiLayoutTourItemDataList* items);
@@ -80,6 +83,7 @@ private:
     QHash<QPoint, QSharedPointer<LayoutTourDropPlaceholder> > m_dropPlaceholders;
     QSet<QnUuid> m_saveToursQueue;
     QnPendingOperation* m_saveToursOperation{nullptr};
+    bool m_updating = false;
 };
 
 } // namespace workbench
