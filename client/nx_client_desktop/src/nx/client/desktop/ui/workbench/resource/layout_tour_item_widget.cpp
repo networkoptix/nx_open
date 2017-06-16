@@ -61,6 +61,8 @@ private:
     QWeakPointer<LayoutPreviewPainter> m_previewPainter;
 };
 
+static const int kMargin = 8; // pixels
+
 } // namespace
 
 LayoutTourItemWidget::LayoutTourItemWidget(
@@ -241,6 +243,9 @@ void LayoutTourItemWidget::initOverlay()
     footerLayout->addStretch();
     footerLayout->addItem(delayHintLabel);
     footerLayout->addItem(delayWidget);
+    // Additional top margin to compensate outer preview border
+    footerLayout->setContentsMargins(0, 2, 0, 0);
+    footerLayout->setSpacing(kMargin);
 
     auto updateManualMode = [this, delayHintLabel, delayWidget]
         {
@@ -260,10 +265,11 @@ void LayoutTourItemWidget::initOverlay()
     auto contentWidget = new LayoutPreviewWidget(m_previewPainter);
 
     auto layout = new QGraphicsLinearLayout(Qt::Vertical);
-    layout->setContentsMargins(10.0, 5.0, 5.0, 10.0);
+    layout->setContentsMargins(kMargin, kMargin, kMargin, kMargin);
     layout->addItem(headerLayout);
     layout->addItem(contentWidget);
     layout->addItem(footerLayout);
+    layout->setSpacing(kMargin);
     layout->setStretchFactor(contentWidget, 1000);
 
     auto overlayWidget = new QnViewportBoundWidget(this);
