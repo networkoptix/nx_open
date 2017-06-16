@@ -10,7 +10,6 @@
 #include <string>
 #include <cstdlib>
 #include <cerrno>
-#include <set>
 
 #if !defined(NX_INI_CONFIG_DEFAULT_OUTPUT)
     #define NX_INI_CONFIG_DEFAULT_OUTPUT &std::cerr
@@ -148,29 +147,26 @@ struct Param: AbstractParam
 template<>
 bool Param<bool>::reload(const std::string* value, std::ostream* output)
 {
-    static const std::set<std::string> kTrueValues{"1", "t", "true", "True", "TRUE"};
-    static const std::set<std::string> kFalseValues{"0", "f", "false", "False", "FALSE"};
-
     const bool oldValue = *pValue;
     *pValue = defaultValue;
     const char* error = "";
     if (value && !value->empty()) //< Existing but empty bool values are treated as default.
     {
-        if (kTrueValues.count(*value))
+        if (*value == "true" || *value == "True" || *value == "TRUE" || *value == "1")
             *pValue = true;
-        else if (kFalseValues.count(*value))
+        else if (*value == "false" || *value == "False" || *value == "FALSE" || *value == "0")
             *pValue = false;
         else
             error = " [invalid value]";
     }
-    printValueLine(output, *pValue ? "t" : "f", "=", error, *pValue == defaultValue);
+    printValueLine(output, *pValue ? "1" : "0", " ", error, *pValue == defaultValue);
     return oldValue != *pValue;
 }
 
 template<>
 std::string Param<bool>::defaultValueStr() const
 {
-    return defaultValue ? "true" : "false";
+    return defaultValue ? "1" : "0";
 }
 
 template<>
@@ -189,7 +185,7 @@ bool Param<int>::reload(const std::string* value, std::ostream* output)
         else
             *pValue = (int) v;
     }
-    printValueLine(output, *pValue, "=", error, *pValue == defaultValue);
+    printValueLine(output, *pValue, " = ", error, *pValue == defaultValue);
     return oldValue != *pValue;
 }
 
@@ -225,7 +221,7 @@ bool Param<const char*>::reload(const std::string* value, std::ostream* output)
         memcpy(const_cast<char*>(*pValue), value->c_str(), value->size() + 1);
     }
     const std::string newValue{*pValue ? *pValue : ""};
-    printValueLine(output, "\"" + newValue + "\"", "=", /*error*/ "",
+    printValueLine(output, "\"" + newValue + "\"", " = ", /*error*/ "",
         newValue == (defaultValue ? defaultValue : ""));
     return oldValue != newValue;
 }
