@@ -84,7 +84,7 @@ bool ResourcePtzController::available() const
         return false;
 
     const auto server = cameraResource->getParentServer();
-    if (!server || server->getVersion() < QnSoftwareVersion(2, 6))
+    if (!server || server->getVersion() < QnSoftwareVersion(3, 0))
         return false;
 
     return kSupportMobilePtz && baseController();
