@@ -227,8 +227,8 @@ QnWorkbenchDebugHandler::QnWorkbenchDebugHandler(QObject *parent):
             logger->setWriter(std::make_unique<nx::utils::log::StdOut>());
         };
 
-    const auto kFreeSlotTag = lit("__freeSlot");
-    supressLog(kFreeSlotTag);
+    supressLog(lit("__freeSlot"));
+    supressLog(lit("__workbenchState"));
     supressLog(QnLog::PERMISSIONS_LOG);
 }
 

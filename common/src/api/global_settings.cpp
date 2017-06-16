@@ -86,12 +86,11 @@ QnGlobalSettings::QnGlobalSettings(QObject *parent):
         << initMiscAdaptors()
         ;
 
-    connect(this, &QnGlobalSettings::adminUserFound, this, &QnGlobalSettings::at_adminUserAdded, Qt::QueuedConnection);
     connect(commonModule()->resourcePool(), &QnResourcePool::resourceAdded, this,
         [this](const QnResourcePtr& resource)
         {
             if (resource->getId() == QnUserResource::kAdminGuid)
-                emit adminUserFound(resource);
+                at_adminUserAdded(resource);
         }, Qt::DirectConnection);
 
     connect(commonModule()->resourcePool(), &QnResourcePool::resourceRemoved, this,
@@ -101,9 +100,6 @@ QnGlobalSettings::QnGlobalSettings(QObject *parent):
 
 QnGlobalSettings::~QnGlobalSettings()
 {
-//     disconnect(commonModule()->resourcePool(), NULL, this, NULL);
-//     if(m_admin)
-//         at_resourcePool_resourceRemoved(m_admin);
 }
 
 void QnGlobalSettings::initialize()
@@ -487,7 +483,7 @@ void QnGlobalSettings::at_adminUserAdded(const QnResourcePtr &resource)
     emit initialized();
 }
 
-void QnGlobalSettings::at_resourcePool_resourceRemoved(const QnResourcePtr &resource) 
+void QnGlobalSettings::at_resourcePool_resourceRemoved(const QnResourcePtr &resource)
 {
     if (!m_admin || resource != m_admin)
         return;
