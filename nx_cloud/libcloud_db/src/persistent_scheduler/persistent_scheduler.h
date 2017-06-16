@@ -81,6 +81,7 @@ private:
     std::unique_ptr<nx::utils::StandaloneTimerManager> m_timerManager;
     QnMutex m_timerManagerMutex;
     std::unordered_map<QnUuid, nx::utils::TimerId> m_taskToTimer;
+    std::unordered_map<QnUuid, std::unordered_map<QnUuid, ScheduleParams>> m_functorToTaskToParams;
 };
 
 }

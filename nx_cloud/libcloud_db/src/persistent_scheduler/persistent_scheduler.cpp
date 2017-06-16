@@ -8,19 +8,30 @@ namespace cdb {
 
 namespace {
 
-static std::chrono::milliseconds calcDelay(const ScheduleTaskInfo& taskInfo)
+struct DelayInfo
+{
+    int fullPeriodsPassed;
+    std::chrono::milliseconds delay;
+};
+
+static DelayInfo calcDelay(const ScheduleTaskInfo& taskInfo)
 {
     using namespace std::chrono;
+    DelayInfo result;
 
     auto nowTimePoint = steady_clock::now();
     qint64 durationFromSchedulePointToNowMs = duration_cast<milliseconds>(nowTimePoint - taskInfo.schedulePoint).count();
     qint64 periodMs = taskInfo.period.count();
-    qint64 durationFromSchedulePointToNextFirePointMs = (durationFromSchedulePointToNowMs / periodMs + 1) * periodMs;
+    result.fullPeriodsPassed = durationFromSchedulePointToNowMs / periodMs;
 
-    return std::chrono::milliseconds(
+    qint64 durationFromSchedulePointToNextFirePointMs = (result.fullPeriodsPassed + 1) * periodMs;
+
+    result.delay = std::chrono::milliseconds(
         durationFromSchedulePointToNextFirePointMs
             + duration_cast<milliseconds>(taskInfo.schedulePoint.time_since_epoch()).count()
             - duration_cast<milliseconds>(nowTimePoint.time_since_epoch()).count());
+
+    return result;
 }
 
 }
@@ -62,8 +73,17 @@ void PersistentScheduler::registerEventReceiver(
     const QnUuid& functorId,
     AbstractPersistentScheduleEventReceiver *receiver)
 {
-    QnMutexLocker lock(&m_mutex);
-    m_functorToReceiver[functorId] = receiver;
+    std::unordered_map<QnUuid, ScheduleParams> taskToParams;
+    {
+        QnMutexLocker lock(&m_mutex);
+        m_functorToReceiver[functorId] = receiver;
+
+        if (m_functorToTaskToParams.find(functorId) != m_functorToTaskToParams.cend())
+            taskToParams = m_functorToTaskToParams[functorId];
+    }
+
+    for (const auto& taskToParam: taskToParams)
+        timerFunction(functorId, taskToParam.first, taskToParam.second);
 }
 
 nx::db::DBResult PersistentScheduler::subscribe(
@@ -151,11 +171,20 @@ void PersistentScheduler::addTimer(
             return;
         }
 
+        auto delayInfo = calcDelay(taskInfo);
+        if (delayInfo.fullPeriodsPassed != 0)
+        {
+            m_timerManager->addTimer(
+                [this, functorId, taskId, params = taskInfo.params](nx::utils::TimerId)
+                { timerFunction(functorId, taskId, params); },
+                std::chrono::milliseconds(1));
+        }
+
         timerId = m_timerManager->addNonStopTimer(
             [this, functorId, taskId, params = taskInfo.params](nx::utils::TimerId)
             { timerFunction(functorId, taskId, params); },
             taskInfo.period,
-            calcDelay(taskInfo));
+            delayInfo.delay);
     }
 
     QnMutexLocker lock2(&m_mutex);
@@ -183,6 +212,10 @@ void PersistentScheduler::timerFunction(
         {
             NX_LOG(lit("[Scheduler] No receiver for functor id %1")
                    .arg(functorId.toString()), cl_logDEBUG1);
+
+            auto& taskToParams = m_functorToTaskToParams[functorId];
+            if (taskToParams.find(taskId) == taskToParams.cend())
+                taskToParams.emplace(taskId, params);
             return;
         }
         receiver = it->second;

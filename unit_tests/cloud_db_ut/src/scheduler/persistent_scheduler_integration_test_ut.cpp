@@ -150,6 +150,21 @@ protected:
         user1->subscribe(kLongTaskTimeout);
     }
 
+    void andWhenTimeToFireComesButServerIsOffline()
+    {
+        std::this_thread::sleep_for(std::chrono::seconds(3));
+    }
+
+    void andWhenSchedulerWorksForSomeVeryShortTime()
+    {
+        std::this_thread::sleep_for(std::chrono::milliseconds(20));
+    }
+
+    void andWhenTimeToNextScheduledFireComes()
+    {
+        std::this_thread::sleep_for(std::chrono::milliseconds(2000));
+    }
+
     void whenTwoUsersScheduleTwoTasksEach()
     {
         whenTwoUsersInitializedAndRegisteredToScheduler();
@@ -285,7 +300,16 @@ protected:
         ASSERT_EQ(user1Tasks.size(), 1);
 
         for (const auto& task: user1Tasks)
-            ASSERT_GT(task.second.fired, 0);
+            ASSERT_EQ(task.second.fired, 1);
+    }
+
+    void thenTaskShouldFireAsIfNoServerWasNotOffline()
+    {
+        auto user1Tasks = user1->tasks();
+        ASSERT_EQ(user1Tasks.size(), 1);
+
+        for (const auto& task: user1Tasks)
+            ASSERT_EQ(task.second.fired, 2);
     }
 
 
@@ -399,6 +423,23 @@ TEST_F(SchedulerIntegrationTest, OneUserSchedulesLongTask_AfterRestartAndPause)
     andWhenSchedulerWorksForSomeTime();
     thenLongTaskShouldAtLastFire();
 }
+
+TEST_F(SchedulerIntegrationTest, OneUserSchedulesLongTask_TaskTimeExpiresWhenServerIsOffline_AfterRestartAndPause)
+{
+    whenFirstUserSchedulesALongTask();
+    andWhenSchedulerWorksForSomeTime();
+    thenLongTaskNotFiredYet();
+
+    andWhenTimeToFireComesButServerIsOffline();
+    andWhenSystemRestarts();
+    whenFirstUserInitializedAndRegisteredToScheduler();
+    andWhenSchedulerWorksForSomeVeryShortTime();
+    thenLongTaskShouldAtLastFire();
+
+    andWhenTimeToNextScheduledFireComes();
+    thenTaskShouldFireAsIfNoServerWasNotOffline();
+}
+
 
 }
 }
