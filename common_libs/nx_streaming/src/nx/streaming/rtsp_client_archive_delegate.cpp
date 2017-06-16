@@ -36,7 +36,7 @@ extern "C"
 #include <nx/streaming/basic_media_context.h>
 #include <nx/fusion/serialization/lexical_enum.h>
 
-static const int MAX_RTP_BUFFER_SIZE = 65535;
+static const int MAX_RTP_BUFFER_SIZE = 65536;
 static const int REOPEN_TIMEOUT = 1000;
 
 namespace
