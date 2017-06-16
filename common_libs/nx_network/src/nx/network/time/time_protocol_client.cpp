@@ -10,9 +10,23 @@
 
 constexpr const size_t kMaxTimeStrLength = sizeof(quint32); 
 constexpr const int kSocketRecvTimeout = 7000;
+constexpr const int kMillisPerSec = 1000;
 
 namespace nx {
 namespace network {
+
+qint64 rfc868TimestampToTimeToUtcMillis(const QByteArray& timeStr)
+{
+    quint32 utcTimeSeconds = 0;
+    if ((size_t)timeStr.size() < sizeof(utcTimeSeconds))
+        return -1;
+    memcpy(&utcTimeSeconds, timeStr.constData(), sizeof(utcTimeSeconds));
+    utcTimeSeconds = ntohl(utcTimeSeconds);
+    utcTimeSeconds -= kSecondsFrom19000101To19700101;
+    return ((qint64)utcTimeSeconds) * kMillisPerSec;
+}
+
+//-------------------------------------------------------------------------------------------------
 
 TimeProtocolClient::TimeProtocolClient(const QString& timeServerHost):
     m_timeServerEndpoint(timeServerHost, kTimeProtocolDefaultPort)
@@ -57,7 +71,8 @@ void TimeProtocolClient::getTimeAsyncInAioThread(
         !m_tcpSock->setRecvTimeout(kSocketRecvTimeout) ||
         !m_tcpSock->setSendTimeout(kSocketRecvTimeout))
     {
-        m_completionHandler(-1, SystemError::getLastOSErrorCode());
+        post(std::bind(&TimeProtocolClient::reportResult, this,
+            -1, SystemError::getLastOSErrorCode()));
         return;
     }
 
@@ -77,7 +92,7 @@ void TimeProtocolClient::onConnectionEstablished(
 
     if (errorCode)
     {
-        m_completionHandler(-1, errorCode);
+        reportResult(-1, errorCode);
         return;
     }
 
@@ -104,7 +119,7 @@ void TimeProtocolClient::onSomeBytesRead(
             .arg(m_timeServerEndpoint).arg(SystemError::toString(errorCode)),
             cl_logDEBUG1);
 
-        m_completionHandler(-1, errorCode);
+        reportResult(-1, errorCode);
         return;
     }
 
@@ -114,7 +129,7 @@ void TimeProtocolClient::onSomeBytesRead(
             .arg(m_timeServerEndpoint).arg(m_timeStr.size()),
             cl_logDEBUG2);
 
-        m_completionHandler(-1, SystemError::notConnected);
+        reportResult(-1, SystemError::notConnected);
         return;
     }
 
@@ -128,8 +143,8 @@ void TimeProtocolClient::onSomeBytesRead(
             cl_logDEBUG1);
 
         // Max data size has been read, ignoring futher data.
-        m_completionHandler(
-            nx::utils::rfc868TimestampToTimeToUtcMillis(m_timeStr),
+        reportResult(
+            rfc868TimestampToTimeToUtcMillis(m_timeStr),
             SystemError::noError);
         return;
     }
@@ -138,6 +153,14 @@ void TimeProtocolClient::onSomeBytesRead(
     m_tcpSock->readSomeAsync(
         &m_timeStr,
         std::bind(&TimeProtocolClient::onSomeBytesRead, this, _1, _2));
+}
+
+void TimeProtocolClient::reportResult(
+    qint64 timeMillis,
+    SystemError::ErrorCode sysErrorCode)
+{
+    m_tcpSock.reset();
+    m_completionHandler(timeMillis, sysErrorCode);
 }
 
 } // namespace network

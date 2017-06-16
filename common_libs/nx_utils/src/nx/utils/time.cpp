@@ -24,8 +24,6 @@ namespace {
 static milliseconds utcTimeShift(0);
 static milliseconds monotonicTimeShift(0);
 
-constexpr const int kMillisPerSec = 1000;
-
 } // namespace
 
 /**
@@ -192,17 +190,6 @@ bool setDateTime(qint64 millisecondsSinceEpoch)
     #endif
 
     return true;
-}
-
-qint64 rfc868TimestampToTimeToUtcMillis(const QByteArray& timeStr)
-{
-    quint32 utcTimeSeconds = 0;
-    if ((size_t)timeStr.size() < sizeof(utcTimeSeconds))
-        return -1;
-    memcpy(&utcTimeSeconds, timeStr.constData(), sizeof(utcTimeSeconds));
-    utcTimeSeconds = ntohl(utcTimeSeconds);
-    utcTimeSeconds -= kSecondsFrom19000101To19700101;
-    return ((qint64)utcTimeSeconds) * kMillisPerSec;
 }
 
 namespace test {

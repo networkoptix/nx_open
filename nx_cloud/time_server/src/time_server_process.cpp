@@ -2,13 +2,13 @@
 
 #include <nx/network/socket_common.h>
 #include <nx/network/time/time_protocol_client.h>
+#include <nx/network/time/time_protocol_server.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/log/log_initializer.h>
 #include <nx/utils/scope_guard.h>
 #include <nx/utils/system_error.h>
 
 #include "settings.h"
-#include "time_protocol_server.h"
 #include "time_server_app_info.h"
 
 namespace nx {
@@ -39,7 +39,7 @@ int TimeServerProcess::serviceMain(
 {
     try
     {
-        TimeProtocolServer timeProtocolServer(
+        nx::network::TimeProtocolServer timeProtocolServer(
             false,
             network::NatTraversalSupport::disabled);
 

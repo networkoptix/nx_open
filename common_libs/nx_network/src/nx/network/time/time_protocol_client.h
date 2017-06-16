@@ -15,6 +15,11 @@ constexpr const unsigned int kSecondsFrom19000101To19700101 = 2208988800UL;
 constexpr const unsigned short kTimeProtocolDefaultPort = 37;     //time protocol
 
 /**
+ * Converts time from Time protocol format (rfc868) to millis from epoch (1970-01-01) UTC.
+ */
+NX_NETWORK_API qint64 rfc868TimestampToTimeToUtcMillis(const QByteArray& timeStr);
+
+/**
  * Fetches time using Time (rfc868) protocol.
  * Result time is accurate to second boundary only.
  */
@@ -38,6 +43,7 @@ private:
     void getTimeAsyncInAioThread(CompletionHandler completionHandler);
     void onConnectionEstablished(SystemError::ErrorCode errorCode);
     void onSomeBytesRead(SystemError::ErrorCode errorCode, size_t bytesRead);
+    void reportResult(qint64 timeMillis, SystemError::ErrorCode sysErrorCode);
 };
 
 } // namespace network

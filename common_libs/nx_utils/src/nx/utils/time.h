@@ -59,11 +59,6 @@ std::chrono::system_clock::time_point floor(
         duration_cast<DurationTypeToRoundTo>(timePoint.time_since_epoch()));
 }
 
-/**
- * Converts time from Time protocol format (rfc868) to millis from epoch (1970-01-01) UTC.
- */
-NX_UTILS_API qint64 rfc868TimestampToTimeToUtcMillis(const QByteArray& timeStr);
-
 namespace test {
 
 enum class ClockType

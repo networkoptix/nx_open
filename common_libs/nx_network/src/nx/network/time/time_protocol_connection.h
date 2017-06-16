@@ -4,9 +4,9 @@
 #include <nx/network/connection_server/stream_socket_server.h>
 
 namespace nx {
-namespace time_server {
+namespace network {
 
-class TimeProtocolConnection:
+class NX_NETWORK_API TimeProtocolConnection:
     public network::aio::BasicPollable
 {
 public:
@@ -30,5 +30,5 @@ private:
         size_t bytesSent);
 };
 
-} // namespace time_server
+} // namespace network
 } // namespace nx

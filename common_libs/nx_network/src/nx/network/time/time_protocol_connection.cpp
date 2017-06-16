@@ -6,7 +6,7 @@
 #include <nx/utils/log/log.h>
 
 namespace nx {
-namespace time_server {
+namespace network {
 
 TimeProtocolConnection::TimeProtocolConnection(
     network::server::StreamConnectionHolder<TimeProtocolConnection>* socketServer,
@@ -30,9 +30,6 @@ void TimeProtocolConnection::startReadingConnection(
     using namespace std::placeholders;
 
     std::uint32_t utcTimeSeconds = ::time(NULL);
-    //std::uint32_t utcTimeSeconds = 
-    //    std::chrono::duration_cast<std::chrono::seconds>(
-    //        std::chrono::system_clock::now().time_since_epoch()).count();
 
     NX_LOGX(lm("Sending %1 UTC time to %2")
         .arg(utcTimeSeconds).arg(m_socket->getForeignAddress()),
@@ -71,5 +68,5 @@ void TimeProtocolConnection::onDataSent(
     m_socketServer->closeConnection(errorCode, this);
 }
 
-} // namespace time_server
+} // namespace network
 } // namespace nx
