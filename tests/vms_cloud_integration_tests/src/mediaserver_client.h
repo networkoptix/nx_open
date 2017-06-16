@@ -56,17 +56,23 @@ public:
     //---------------------------------------------------------------------------------------------
     // /ec2/ requests
 
-    void ec2SetResourceParams(
-        const ec2::ApiResourceParamWithRefDataList& request,
-        std::function<void(ec2::ErrorCode)> completionHandler);
-
     void ec2GetUsers(
         std::function<void(ec2::ErrorCode, ec2::ApiUserDataList)> completionHandler);
     ec2::ErrorCode ec2GetUsers(ec2::ApiUserDataList* result);
 
+    void ec2SaveUser(
+        const ec2::ApiUserData& request,
+        std::function<void(ec2::ErrorCode)> completionHandler);
+    ec2::ErrorCode ec2SaveUser(const ec2::ApiUserData& request);
+
     void ec2GetSettings(
         std::function<void(ec2::ErrorCode, ec2::ApiResourceParamDataList)> completionHandler);
     ec2::ErrorCode ec2GetSettings(ec2::ApiResourceParamDataList* result);
+
+    void ec2SetResourceParams(
+        const ec2::ApiResourceParamWithRefDataList& request,
+        std::function<void(ec2::ErrorCode)> completionHandler);
+    ec2::ErrorCode ec2SetResourceParams(const ec2::ApiResourceParamWithRefDataList& request);
 
     void ec2GetResourceParams(
         const QnUuid& resourceId,
