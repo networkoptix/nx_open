@@ -6,6 +6,7 @@
 
 #include <nx/cloud/cdb/api/auth_provider.h>
 
+#include "account_manager.h"
 #include "system_sharing_manager.h"
 #include "../access_control/auth_types.h"
 #include "../dao/abstract_user_authentication_data_object.h"
@@ -19,7 +20,6 @@ namespace cdb {
 namespace conf { class Settings; }
 namespace ec2 { class AbstractVmsP2pCommandBus; }
 
-class AbstractAccountManager;
 class AbstractTemporaryAccountPasswordManager;
 
 /**
@@ -28,12 +28,13 @@ class AbstractTemporaryAccountPasswordManager;
  * NOTE: These requests are allowed for system only.
  */
 class AuthenticationProvider:
-    public AbstractSystemSharingExtension
+    public AbstractSystemSharingExtension,
+    public AbstractAccountManagerExtension
 {
 public:
     AuthenticationProvider(
         const conf::Settings& settings,
-        const AbstractAccountManager& accountManager,
+        AbstractAccountManager* accountManager,
         AbstractSystemSharingManager* systemSharingManager,
         const AbstractTemporaryAccountPasswordManager& temporaryAccountCredentialsManager,
         ec2::AbstractVmsP2pCommandBus* vmsP2pCommandBus);
@@ -43,6 +44,10 @@ public:
         nx::db::QueryContext* const queryContext,
         const api::SystemSharing& sharing,
         SharingType sharingType) override;
+    
+    virtual void afterUpdatingAccountPassword(
+        nx::db::QueryContext* const queryContext,
+        const api::AccountData& account) override;
 
     /**
      * @return nonce to be used by mediaserver.
@@ -69,7 +74,7 @@ private:
     };
 
     const conf::Settings& m_settings;
-    const AbstractAccountManager& m_accountManager;
+    AbstractAccountManager* m_accountManager;
     AbstractSystemSharingManager* m_systemSharingManager;
     const AbstractTemporaryAccountPasswordManager& m_temporaryAccountCredentialsManager;
     std::unique_ptr<dao::AbstractUserAuthentication> m_authenticationDataObject;
@@ -88,14 +93,20 @@ private:
     std::string fetchOrCreateNonce(
         nx::db::QueryContext* const queryContext,
         const std::string& systemId);
-    api::AuthInfoRecord generateAuthRecord(
+    void addUserAuthRecord(
+        nx::db::QueryContext* const queryContext,
         const std::string& systemId,
+        const std::string& vmsUserId,
+        const api::AccountData& account,
+        const std::string& nonce);
+    api::AuthInfoRecord generateAuthRecord(
         const api::AccountData& account,
         const std::string& nonce);
     void removeExpiredRecords(api::AuthInfo* userAuthenticationRecords);
     void generateUpdateUserAuthInfoTransaction(
         nx::db::QueryContext* const queryContext,
-        const api::SystemSharing& sharing,
+        const std::string& systemId,
+        const std::string& vmsUserId,
         const api::AuthInfo& userAuthenticationRecords);
 };
 

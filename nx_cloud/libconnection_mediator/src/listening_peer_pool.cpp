@@ -105,7 +105,7 @@ ListeningPeerPool::DataLocker ListeningPeerPool::insertAndLockPeerData(
     const ConnectionStrongRef& connection,
     const MediaserverData& peerData)
 {
-    QnMutexLocker lk(&m_mutex);
+    QnMutexLocker lock(&m_mutex);
 
     const auto peerIterAndInsertionFlag = m_peers.emplace(peerData, ListeningPeerData());
     const auto peerIter = peerIterAndInsertionFlag.first;
@@ -125,7 +125,7 @@ ListeningPeerPool::DataLocker ListeningPeerPool::insertAndLockPeerData(
         peerIter->second.peerConnection = connection;
         connection->addOnConnectionCloseHandler([this, peerData, connection]()
         {
-            QnMutexLocker lk(&m_mutex);
+            QnMutexLocker lock(&m_mutex);
             const auto peerIter = m_peers.find(peerData);
             if (peerIter == m_peers.end())
                 return;
@@ -141,14 +141,14 @@ ListeningPeerPool::DataLocker ListeningPeerPool::insertAndLockPeerData(
     }
 
     return DataLocker(
-        std::move(lk),
+        std::move(lock),
         peerIter);
 }
 
 boost::optional<ListeningPeerPool::ConstDataLocker> 
     ListeningPeerPool::findAndLockPeerDataByHostName(const nx::String& hostName) const
 {
-    QnMutexLocker lk(&m_mutex);
+    QnMutexLocker lock(&m_mutex);
 
     // TODO: hostName alias resolution in cloud_db
 
@@ -163,7 +163,7 @@ boost::optional<ListeningPeerPool::ConstDataLocker>
         auto peerIter = m_peers.find(MediaserverData(systemId, serverId));
         if (peerIter != m_peers.end())  //found exact match
             return ListeningPeerPool::ConstDataLocker(
-                std::move(lk),
+                std::move(lock),
                 std::move(peerIter));
     }
     else if (ids.size() == 1)
@@ -173,7 +173,7 @@ boost::optional<ListeningPeerPool::ConstDataLocker>
         auto peerIter = m_peers.lower_bound(MediaserverData(systemId, nx::String()));
         if (peerIter != m_peers.end() && peerIter->first.systemId == systemId)
             return ListeningPeerPool::ConstDataLocker(
-                std::move(lk),
+                std::move(lock),
                 std::move(peerIter));
     }
 
@@ -185,7 +185,7 @@ std::vector<MediaserverData> ListeningPeerPool::findPeersBySystemId(
 {
     std::vector<MediaserverData> foundPeers;
 
-    QnMutexLocker lk(&m_mutex);
+    QnMutexLocker lock(&m_mutex);
     for (auto it = m_peers.lower_bound(MediaserverData(systemId));
          it != m_peers.end() && it->first.systemId == systemId; ++it)
     {
@@ -199,7 +199,7 @@ data::ListeningPeersBySystem ListeningPeerPool::getListeningPeers() const
 {
     data::ListeningPeersBySystem result;
 
-    QnMutexLocker lk(&m_mutex);
+    QnMutexLocker lock(&m_mutex);
     for (const auto& peerPair: m_peers)
     {
         data::ListeningPeer peerData;
@@ -219,7 +219,7 @@ data::ListeningPeersBySystem ListeningPeerPool::getListeningPeers() const
 
 std::vector<ConnectionWeakRef> ListeningPeerPool::getAllConnections() const
 {
-    QnMutexLocker lk(&m_mutex);
+    QnMutexLocker lock(&m_mutex);
     std::vector<ConnectionWeakRef> connections;
     for (const auto peer: m_peers)
         connections.push_back(peer.second.peerConnection);

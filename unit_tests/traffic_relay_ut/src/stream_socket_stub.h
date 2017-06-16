@@ -25,6 +25,9 @@ public:
         std::function<void(SystemError::ErrorCode, size_t)> handler) override;
     virtual SocketAddress getForeignAddress() const override;
 
+    virtual bool setKeepAlive(boost::optional<KeepAliveOptions> info) override;
+    virtual bool getKeepAlive(boost::optional<KeepAliveOptions>* result) const override;
+
     QByteArray read();
     void setConnectionToClosedState();
     void setForeignAddress(const SocketAddress& endpoint);
@@ -34,6 +37,7 @@ private:
     nx::network::TCPSocket m_delegatee;
     nx::utils::bstream::ReflectingPipeline m_reflectingPipeline;
     SocketAddress m_foreignAddress;
+    boost::optional<KeepAliveOptions> m_keepAliveOptions;
 };
 
 } // namespace test

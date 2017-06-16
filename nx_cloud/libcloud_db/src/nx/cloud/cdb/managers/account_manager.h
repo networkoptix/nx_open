@@ -12,11 +12,12 @@
 #include <utils/db/filter.h>
 
 #include "cache.h"
+#include "extension_pool.h"
 #include "managers_types.h"
 #include "notification.h"
 #include "../access_control/abstract_authentication_data_provider.h"
 #include "../access_control/auth_types.h"
-#include "../dao/rdb/account_data_object.h"
+#include "../dao/account_data_object.h"
 #include "../data/account_data.h"
 
 namespace nx {
@@ -27,6 +28,19 @@ class AbstractEmailManager;
 class StreeManager;
 
 namespace conf { class Settings; }
+
+class AbstractAccountManagerExtension
+{
+public:
+    virtual ~AbstractAccountManagerExtension() = default;
+
+    /**
+     * @throw nx::db::Exception.
+     */
+    virtual void afterUpdatingAccountPassword(
+        nx::db::QueryContext* const /*queryContext*/,
+        const api::AccountData& /*account*/) {}
+};
 
 /**
  * This interface introduced for testing purposes. 
@@ -42,6 +56,9 @@ public:
      */
     virtual boost::optional<data::AccountData> findAccountByUserName(
         const std::string& userName) const = 0;
+
+    virtual void addExtension(AbstractAccountManagerExtension*) = 0;
+    virtual void removeExtension(AbstractAccountManagerExtension*) = 0;
 };
 
 /**
@@ -143,6 +160,9 @@ public:
         const std::string& accountEmail,
         data::AccountConfirmationCode* const confirmationCode);
 
+    virtual void addExtension(AbstractAccountManagerExtension*) override;
+    virtual void removeExtension(AbstractAccountManagerExtension*) override;
+    // TODO: #ak Modify to an abstract extension.
     void setUpdateAccountSubroutine(UpdateAccountSubroutine func);
 
 private:
@@ -158,7 +178,8 @@ private:
     std::multimap<std::string, data::TemporaryAccountCredentials> m_accountPassword;
     nx::utils::Counter m_startedAsyncCallsCounter;
     UpdateAccountSubroutine m_updateAccountSubroutine;
-    dao::rdb::AccountDataObject m_accountDbController;
+    std::unique_ptr<dao::AbstractAccountDataObject> m_dao;
+    ExtensionPool<AbstractAccountManagerExtension> m_extensions;
 
     nx::db::DBResult fillCache();
     nx::db::DBResult fetchAccounts(nx::db::QueryContext* queryContext);
@@ -196,7 +217,7 @@ private:
         std::string accountEmail,
         std::chrono::system_clock::time_point activationTime);
 
-    nx::db::DBResult updateAccountInDB(
+    nx::db::DBResult updateAccountInDb(
         bool activateAccountIfNotActive,
         nx::db::QueryContext* const tran,
         const data::AccountUpdateDataWithEmail& accountData);
