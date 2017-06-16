@@ -317,7 +317,7 @@ PageBase
             source: lp("/images/timeline_gradient.png")
 
             visible: (d.mode == VideoScreenUtils.VideoScreenMode.Ptz && d.uiVisible)
-                || ptzPanel.moveOnTapMode
+                || ptzPanel.moveOnTapMode || navigationLoader.visible;
             opacity: visible ? 1 : 0
 
             Behavior on opacity
@@ -472,6 +472,10 @@ PageBase
                 LiveVideoNavigation
                 {
                     videoScreenController: d.controller
+                    ptzAvailable: ptzPanel.controller.available
+                        && videoScreenController.accessRightsHelper.canManagePtz
+                        && !videoScreenController.offline
+                    onPtzButtonClicked: d.mode = VideoScreenUtils.VideoScreenMode.Ptz
                 }
             }
         }
