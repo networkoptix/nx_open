@@ -54,7 +54,7 @@ system_clock::time_point utcTime()
 
 seconds timeSinceEpoch()
 {
-    return duration_cast<seconds>(utcTime().time_since_epoch());
+    return seconds(system_clock::to_time_t(utcTime()));
 }
 
 steady_clock::time_point monotonicTime()

@@ -13,7 +13,6 @@ public:
     TimeProtocolConnection(
         network::server::StreamConnectionHolder<TimeProtocolConnection>* socketServer,
         std::unique_ptr<AbstractStreamSocket> _socket);
-    ~TimeProtocolConnection();
 
     void startReadingConnection(boost::optional<std::chrono::milliseconds> inactivityTimeout);
 
