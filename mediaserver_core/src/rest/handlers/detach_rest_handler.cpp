@@ -86,6 +86,7 @@ int QnDetachFromCloudRestHandler::execute(
 
     if (shouldResetSystemToNewState)
     {
+        NX_VERBOSE(this, lm("Resetting system to the \"new\" state"));
         if (!resetSystemToStateNew(owner->commonModule()))
         {
             NX_LOGX(lm("Cannot detach from cloud. Failed to reset system to state new. cloudSystemId %1")
@@ -98,6 +99,8 @@ int QnDetachFromCloudRestHandler::execute(
     }
     else
     {
+        NX_VERBOSE(this, lm("Enabling admin user"));
+
         // first of all, enable admin user and changing its password
         //      so that there is always a way to connect to the system
         if (!updateUserCredentials(
