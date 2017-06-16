@@ -1410,8 +1410,8 @@ void QnWorkbenchUi::createFpsWidget()
     m_fpsItem->setAcceptHoverEvents(false);
     setPaletteColor(m_fpsItem, QPalette::Window, Qt::transparent);
     setPaletteColor(m_fpsItem, QPalette::WindowText, QColor(63, 159, 216));
+    display()->setLayer(m_fpsItem, Qn::MessageBoxLayer);
 
-    display()->view()->addAction(action(action::ShowFpsAction));
     connect(action(action::ShowFpsAction), &QAction::toggled, this, &QnWorkbenchUi::setFpsVisible);
     connect(m_fpsItem, &QGraphicsWidget::geometryChanged, this, &QnWorkbenchUi::updateFpsGeometry);
     setFpsVisible(false);

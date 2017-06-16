@@ -39,6 +39,7 @@ void initialize(Manager* manager, Action* root)
     factory(ShowFpsAction)
         .flags(GlobalHotkey)
         .shortcut(lit("Ctrl+Alt+F"))
+        .checkable()
         .autoRepeat(false);
 
     factory(ShowDebugOverlayAction)
