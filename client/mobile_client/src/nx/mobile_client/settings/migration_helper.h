@@ -9,7 +9,6 @@ namespace nx {
 namespace mobile_client {
 namespace settings {
 
-class SessionsMigrationHelperPrivate;
 class SessionsMigrationHelper: public QObject, public QnConnectionContextAware
 {
     Q_OBJECT
@@ -19,8 +18,8 @@ public:
     ~SessionsMigrationHelper();
 
 private:
-    QScopedPointer<SessionsMigrationHelperPrivate> d_ptr;
-    Q_DECLARE_PRIVATE(SessionsMigrationHelper)
+    class Private;
+    QScopedPointer<Private> const d;
 };
 
 } // namespace settings

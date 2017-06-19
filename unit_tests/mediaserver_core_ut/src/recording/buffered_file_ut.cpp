@@ -13,7 +13,7 @@
 #include <utils/common/writer_pool.h>
 #include <server/server_globals.h>
 #include <recorder/recording_manager.h>
-#include "utils.h"
+#include <test_support/utils.h>
 
 void doTestInternal(int systemFlags)
 {

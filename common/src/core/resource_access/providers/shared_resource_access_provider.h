@@ -8,7 +8,7 @@ class QnSharedResourceAccessProvider: public QnBaseResourceAccessProvider
     using base_type = QnBaseResourceAccessProvider;
 
 public:
-    QnSharedResourceAccessProvider(QObject* parent = nullptr);
+    QnSharedResourceAccessProvider(Mode mode, QObject* parent = nullptr);
     virtual ~QnSharedResourceAccessProvider();
 
 protected:

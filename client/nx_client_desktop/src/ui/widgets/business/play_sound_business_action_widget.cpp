@@ -3,6 +3,7 @@
 #include "ui_play_sound_business_action_widget.h"
 
 #include <QtCore/QFileInfo>
+#include <QtCore/QScopedValueRollback>
 
 #include <business/business_action_parameters.h>
 #include <ui/style/resource_icon_cache.h>
@@ -14,16 +15,16 @@
 #include <ui/workbench/workbench_context.h>
 
 #include <nx/client/desktop/utils/server_notification_cache.h>
-#include <utils/common/scoped_value_rollback.h>
 #include <utils/media/audio_player.h>
 
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
+#include <ui/workaround/widgets_signals_workaround.h>
 #include <core/resource_management/resource_pool.h>
 
 using namespace nx::client::desktop;
 
-QnPlaySoundBusinessActionWidget::QnPlaySoundBusinessActionWidget(QWidget *parent) :
+QnPlaySoundBusinessActionWidget::QnPlaySoundBusinessActionWidget(QWidget* parent):
     base_type(parent),
     QnWorkbenchContextAware(parent),
     ui(new Ui::PlaySoundBusinessActionWidget)
@@ -35,20 +36,38 @@ QnPlaySoundBusinessActionWidget::QnPlaySoundBusinessActionWidget(QWidget *parent
     QnNotificationSoundModel* soundModel = context()->instance<ServerNotificationCache>()->persistentGuiModel();
     ui->pathComboBox->setModel(soundModel);
 
-    connect(soundModel, SIGNAL(listLoaded()), this, SLOT(updateCurrentIndex()));
+    connect(soundModel, &QnNotificationSoundModel::listLoaded,
+        this, &QnPlaySoundBusinessActionWidget::updateCurrentIndex);
 
-    connect(ui->pathComboBox, SIGNAL(currentIndexChanged(int)), this, SLOT(paramsChanged()));
-    connect(ui->testButton, SIGNAL(clicked()), this, SLOT(at_testButton_clicked()));
-    connect(ui->manageButton, SIGNAL(clicked()), this, SLOT(at_manageButton_clicked()));
-    connect(ui->volumeSlider, SIGNAL(valueChanged(int)), this, SLOT(at_volumeSlider_valueChanged(int)));
-    connect(ui->playToClient, SIGNAL(stateChanged(int)), this, SLOT(paramsChanged()));
+    connect(ui->pathComboBox, QnComboboxCurrentIndexChanged,
+        this, &QnPlaySoundBusinessActionWidget::paramsChanged);
+
+    connect(ui->testButton, &QPushButton::clicked,
+        this, &QnPlaySoundBusinessActionWidget::at_testButton_clicked);
+
+    connect(ui->manageButton, &QPushButton::clicked,
+        this, &QnPlaySoundBusinessActionWidget::at_manageButton_clicked);
+
+    connect(ui->volumeSlider, &QSlider::valueChanged,
+        this, &QnPlaySoundBusinessActionWidget::at_volumeSlider_valueChanged);
 
     connect(nx::audio::AudioDevice::instance(), &nx::audio::AudioDevice::volumeChanged, this,
         [this]
         {
-            QN_SCOPED_VALUE_ROLLBACK(&m_updating, true);
+            QScopedValueRollback<bool> updatingRollback(m_updating, true);
             ui->volumeSlider->setValue(qRound(nx::audio::AudioDevice::instance()->volume() * 100));
         });
+
+    connect(ui->playToClient, &QCheckBox::toggled, this,
+        [this](bool checked)
+        {
+            ui->selectUsersButton->setVisible(checked);
+            paramsChanged();
+        });
+
+    ui->playToClient->setFixedHeight(ui->selectUsersButton->minimumSizeHint().height());
+    ui->selectUsersButton->setVisible(ui->playToClient->isChecked());
+    setSubjectsButton(ui->selectUsersButton);
 
     setHelpTopic(this, Qn::EventsActions_PlaySound_Help);
 }
@@ -57,41 +76,53 @@ QnPlaySoundBusinessActionWidget::~QnPlaySoundBusinessActionWidget()
 {
 }
 
-void QnPlaySoundBusinessActionWidget::updateTabOrder(QWidget *before, QWidget *after) {
-    setTabOrder(before,                 ui->pathComboBox);
-    setTabOrder(ui->pathComboBox,       ui->manageButton);
-    setTabOrder(ui->manageButton,       ui->volumeSlider);
-    setTabOrder(ui->volumeSlider,       ui->testButton);
-    setTabOrder(ui->testButton, after);
+void QnPlaySoundBusinessActionWidget::updateTabOrder(QWidget* before, QWidget* after)
+{
+    setTabOrder(before,                ui->playToClient);
+    setTabOrder(ui->playToClient,      ui->selectUsersButton);
+    setTabOrder(ui->selectUsersButton, ui->pathComboBox);
+    setTabOrder(ui->pathComboBox,      ui->manageButton);
+    setTabOrder(ui->manageButton,      ui->volumeSlider);
+    setTabOrder(ui->volumeSlider,      ui->testButton);
+    setTabOrder(ui->testButton,         after);
 }
 
-void QnPlaySoundBusinessActionWidget::updateCurrentIndex() {
-    QN_SCOPED_VALUE_ROLLBACK(&m_updating, true);
+void QnPlaySoundBusinessActionWidget::updateCurrentIndex()
+{
+    QScopedValueRollback<bool> updatingRollback(m_updating, true);
 
-    QnNotificationSoundModel* soundModel = context()->instance<ServerNotificationCache>()->persistentGuiModel();
+    QnNotificationSoundModel* soundModel =
+        context()->instance<ServerNotificationCache>()->persistentGuiModel();
     ui->pathComboBox->setCurrentIndex(soundModel->rowByFilename(m_filename));
 }
 
-void QnPlaySoundBusinessActionWidget::at_model_dataChanged(QnBusiness::Fields fields) {
+void QnPlaySoundBusinessActionWidget::at_model_dataChanged(QnBusiness::Fields fields)
+{
     if (!model())
         return;
 
-    QN_SCOPED_VALUE_ROLLBACK(&m_updating, true);
+    base_type::at_model_dataChanged(fields);
+
+    QScopedValueRollback<bool> updatingRollback(m_updating, true);
 
     auto params = model()->actionParams();
-    if (fields & QnBusiness::ActionParamsField) {
+    if (fields & QnBusiness::ActionParamsField)
+    {
         m_filename = params.url;
-        QnNotificationSoundModel* soundModel = context()->instance<ServerNotificationCache>()->persistentGuiModel();
+        QnNotificationSoundModel* soundModel =
+            context()->instance<ServerNotificationCache>()->persistentGuiModel();
         ui->pathComboBox->setCurrentIndex(soundModel->rowByFilename(m_filename));
         ui->playToClient->setChecked(params.playToClient);
     }
 }
 
-void QnPlaySoundBusinessActionWidget::paramsChanged() {
+void QnPlaySoundBusinessActionWidget::paramsChanged()
+{
     if (!model() || m_updating)
         return;
 
-    QnNotificationSoundModel* soundModel = context()->instance<ServerNotificationCache>()->persistentGuiModel();
+    QnNotificationSoundModel* soundModel =
+        context()->instance<ServerNotificationCache>()->persistentGuiModel();
     if (!soundModel->loaded())
         return;
 
@@ -101,12 +132,15 @@ void QnPlaySoundBusinessActionWidget::paramsChanged() {
     model()->setActionParams(params);
 }
 
-void QnPlaySoundBusinessActionWidget::enableTestButton() {
+void QnPlaySoundBusinessActionWidget::enableTestButton()
+{
     ui->testButton->setEnabled(true);
 }
 
-void QnPlaySoundBusinessActionWidget::at_testButton_clicked() {
-    QnNotificationSoundModel* soundModel = context()->instance<ServerNotificationCache>()->persistentGuiModel();
+void QnPlaySoundBusinessActionWidget::at_testButton_clicked()
+{
+    QnNotificationSoundModel* soundModel =
+        context()->instance<ServerNotificationCache>()->persistentGuiModel();
     if (!soundModel->loaded())
         return;
 
@@ -121,20 +155,22 @@ void QnPlaySoundBusinessActionWidget::at_testButton_clicked() {
 
     if (AudioPlayer::playFileAsync(filePath, this, SLOT(enableTestButton())))
         ui->testButton->setEnabled(false);
-
 }
 
-void QnPlaySoundBusinessActionWidget::at_manageButton_clicked() {
-    QScopedPointer<QnNotificationSoundManagerDialog> dialog(new QnNotificationSoundManagerDialog(this));
-    dialog->exec();
+void QnPlaySoundBusinessActionWidget::at_manageButton_clicked()
+{
+    QnNotificationSoundManagerDialog dialog(this);
+    dialog.exec();
 }
 
-void QnPlaySoundBusinessActionWidget::at_soundModel_itemChanged(const QString &filename) {
+void QnPlaySoundBusinessActionWidget::at_soundModel_itemChanged(const QString& filename)
+{
     if (m_filename != filename)
         return;
 }
 
-void QnPlaySoundBusinessActionWidget::at_volumeSlider_valueChanged(int value) {
+void QnPlaySoundBusinessActionWidget::at_volumeSlider_valueChanged(int value)
+{
     if (m_updating)
         return;
 

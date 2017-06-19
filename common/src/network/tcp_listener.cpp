@@ -88,9 +88,12 @@ QnTcpListener::QnTcpListener(
     int maxConnections,
     bool useSSL)
 :
-    QnCommonModuleAware(commonModule),
+    QnCommonModuleAware(nullptr, true), //< Allow to create listeners without common module.
     d_ptr(new QnTcpListenerPrivate())
 {
+    if (commonModule)
+        initializeContext(commonModule);
+
     Q_D(QnTcpListener);
     d->serverAddress = address;
     d->localPort = port;

@@ -92,7 +92,6 @@
 #include <client/client_settings.h>
 #include <client/client_runtime_settings.h>
 #include <client/client_message_processor.h>
-#include <watchers/server_address_watcher.h>
 
 #include <utils/common/scoped_value_rollback.h>
 #include <utils/screen_manager.h>
@@ -252,14 +251,6 @@ MainWindow::MainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::WindowF
     context->instance<QnWorkbenchLayoutAspectRatioWatcher>();
     context->instance<QnWorkbenchPtzDialogWatcher>();
 
-    const auto getter = []() { return qnSettings->knownServerUrls(); };
-    const auto setter =
-        [](const QnServerAddressWatcher::UrlsList& values)
-        {
-            qnSettings->setKnownServerUrls(values);
-            qnSettings->save();
-        };
-    context->instance<QnServerAddressWatcher>()->setAccessors(getter, setter);
     context->instance<QnWorkbenchResourcesChangesWatcher>();
     context->instance<QnWorkbenchServerSafemodeWatcher>();
     context->instance<QnWorkbenchBookmarkTagsWatcher>();
@@ -308,13 +299,13 @@ MainWindow::MainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::WindowF
     addAction(action(action::AdjustVideoAction));
     addAction(action(action::TogglePanicModeAction));
     addAction(action(action::ToggleLayoutTourModeAction));
-    addAction(action(action::ReviewLayoutTourAction));
     addAction(action(action::DebugIncrementCounterAction));
     addAction(action(action::DebugDecrementCounterAction));
     addAction(action(action::DebugControlPanelAction));
     addAction(action(action::SystemAdministrationAction));
     if (auto screenRecordingAction = action(action::ToggleScreenRecordingAction))
         addAction(screenRecordingAction);
+    addAction(action(action::ShowFpsAction));
 
     connect(action(action::MaximizeAction), &QAction::toggled, this,
         &MainWindow::setMaximized);
@@ -661,6 +652,7 @@ bool MainWindow::handleKeyPress(int key)
     {
         case Qt::Key_Backspace:
         case Qt::Key_Left:
+        case Qt::Key_Up:
         case Qt::Key_PageUp:
         {
             menu()->trigger(action::PreviousLayoutAction);
@@ -670,6 +662,7 @@ bool MainWindow::handleKeyPress(int key)
         case Qt::Key_Return:
         case Qt::Key_Space:
         case Qt::Key_Right:
+        case Qt::Key_Down:
         case Qt::Key_PageDown:
         {
             menu()->trigger(action::NextLayoutAction);

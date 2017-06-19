@@ -167,9 +167,12 @@ void QnResourceItemDelegate::paint(QPainter* painter, const QStyleOptionViewItem
     }
 
     /* Try to consider model's foreground color override: */
-    const auto modelColorOverride = index.data(Qt::ForegroundRole);
-    if (modelColorOverride.canConvert<QBrush>())
-        mainColor = modelColorOverride.value<QBrush>().color();
+    if (!option.state.testFlag(QStyle::State_Selected))
+    {
+        const auto modelColorOverride = index.data(Qt::ForegroundRole);
+        if (modelColorOverride.canConvert<QBrush>())
+            mainColor = modelColorOverride.value<QBrush>().color();
+    }
 
     // TODO #vkutin Get rid of this and draw checkboxes in this delegate like everything else
     /* Check indicators in this implementation are handled elsewhere: */
@@ -177,7 +180,7 @@ void QnResourceItemDelegate::paint(QPainter* painter, const QStyleOptionViewItem
     {
         mainColor.setAlphaF(option.palette.color(QPalette::Text).alphaF());
         option.palette.setColor(QPalette::Text, mainColor);
-        base_type::paint(painter, option, index);
+        style->drawControl(QStyle::CE_ItemViewItem, &option, painter, option.widget);
         return;
     }
 

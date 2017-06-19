@@ -462,7 +462,7 @@ angular.module('nxCommon')
 
                 // !!! Finally run required functions to initialize timeline
                 updateTimelineHeight();
-                updateTimelineWidth(); // Adjust width
+                $timeout(updateTimelineWidth); // Adjust width
                 initTimeline(); // Setup boundaries and scale
 
                 // !!! Start drawing

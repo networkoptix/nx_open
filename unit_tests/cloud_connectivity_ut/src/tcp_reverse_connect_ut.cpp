@@ -46,7 +46,8 @@ protected:
     {
         auto& pool = SocketGlobals::tcpReversePool();
         pool.setPoolSize(poolSize);
-        pool.setKeepAliveOptions(KeepAliveOptions(60, 10, 3));
+        pool.setKeepAliveOptions(KeepAliveOptions(
+            std::chrono::seconds(60), std::chrono::seconds(10), 3));
         ASSERT_TRUE(pool.start(HostAddress::localhost, 0, true));
     }
 

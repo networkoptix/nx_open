@@ -11,10 +11,13 @@
 #include <nx_ec/ec_api.h>
 
 #include <nx/client/desktop/ui/actions/action_manager.h>
+#include <ui/dialogs/common/message_box.h>
+#include <ui/dialogs/common/session_aware_dialog.h>
 #include <ui/style/skin.h>
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench.h>
 #include <ui/workbench/workbench_layout.h>
+#include <ui/workbench/workbench_state_manager.h>
 #include <nx/client/desktop/ui/workbench/extensions/workbench_layout_tour_executor.h>
 #include <nx/client/desktop/ui/workbench/extensions/workbench_layout_tour_review_controller.h>
 
@@ -92,15 +95,14 @@ LayoutToursHandler::LayoutToursHandler(QObject* parent):
             const auto tour = layoutTourManager()->tour(id);
             if (!tour.name.isEmpty())
             {
-                //TODO: #GDM #3.1 add to table, fix text and buttons
-                if (QnMessageBox::warning(
-                    mainWindow(),
-                    tr("Are you sure you want to delete %1?").arg(tour.name),
-                    QString(),
-                    QDialogButtonBox::Ok | QDialogButtonBox::Cancel) != QDialogButtonBox::Ok)
-                {
+                QnSessionAwareMessageBox messageBox(mainWindow());
+                messageBox.setIcon(QnMessageBoxIcon::Question);
+                messageBox.setText(tr("Delete layout tour %1?").arg(tour.name));
+                messageBox.setStandardButtons(QDialogButtonBox::Cancel);
+                messageBox.addCustomButton(QnMessageBoxCustomButton::Delete,
+                    QDialogButtonBox::AcceptRole, Qn::ButtonAccent::Warning);
+                if (messageBox.exec() == QDialogButtonBox::Cancel)
                     return;
-                }
             }
 
             layoutTourManager()->removeTour(id);
@@ -138,6 +140,7 @@ LayoutToursHandler::LayoutToursHandler(QObject* parent):
             {
                 NX_EXPECT(toggled);
                 m_tourExecutor->startTour(layoutTourManager()->tour(id));
+                context()->instance<QnWorkbenchStateManager>()->saveState();
             }
         });
 

@@ -15,9 +15,17 @@
 #include <ui/workbench/workbench_context.h>
 #include <network/system_helpers.h>
 
+#include <nx/fusion/model_functions.h>
+
+#include <nx/utils/log/log.h>
+
 namespace {
+
 static const int kSavedStatesLimit = 20;
-}
+
+static const QString kWorkbenchStateTag = lit("__workbenchState");
+
+} // namespace
 
 QnWorkbenchStateManager::QnWorkbenchStateManager(QObject *parent /* = NULL*/) :
     QObject(parent),
@@ -28,20 +36,7 @@ QnWorkbenchStateManager::QnWorkbenchStateManager(QObject *parent /* = NULL*/) :
 
 bool QnWorkbenchStateManager::tryClose(bool force)
 {
-    /*
-    *  We may get here in the disconnect process when all layouts are already closed.
-    *  Marker of an invalid state - 'dummy' layout in the QnWorkbench class.
-    *  We can detect it by `workbench()->currentLayoutIndex() == -1` check.
-    */
-    bool canSaveState =
-        !commonModule()->remoteGUID().isNull()
-        && qnRuntime->isDesktopMode()
-        && context()->user()
-        && !helpers::currentSystemIsNew(commonModule())
-        && workbench()->currentLayoutIndex() != -1
-        && !force;
-
-    if (canSaveState)
+    if (!force && canSaveState())
     {
         saveState();
         if (auto statisticsManager = commonModule()->instance<QnStatisticsManager>())
@@ -60,6 +55,9 @@ bool QnWorkbenchStateManager::tryClose(bool force)
 
 void QnWorkbenchStateManager::saveState()
 {
+    if (!canSaveState())
+        return;
+
     const auto localSystemId = helpers::currentSystemLocalId(commonModule());
     const auto userId = context()->user()->getId();
     if (localSystemId.isNull() || userId.isNull())
@@ -67,6 +65,9 @@ void QnWorkbenchStateManager::saveState()
         NX_ASSERT(false, "Invalid connections state");
         return;
     }
+    NX_DEBUG(kWorkbenchStateTag, "Saving workbench state...");
+    NX_DEBUG(kWorkbenchStateTag, lm("System ID: %1").arg(localSystemId));
+    NX_DEBUG(kWorkbenchStateTag, lm("User ID: %1").arg(userId));
 
     QnWorkbenchState state;
     state.localSystemId = localSystemId;
@@ -74,6 +75,7 @@ void QnWorkbenchStateManager::saveState()
     workbench()->submit(state);
     for (const auto& d: m_delegates)
         d->submitState(&state);
+    NX_DEBUG(kWorkbenchStateTag, lm("Full state:\n%1").arg(QJson::serialized(state)));
 
     auto states = qnSettings->workbenchStates();
     states.erase(std::remove_if(states.begin(), states.end(),
@@ -88,6 +90,7 @@ void QnWorkbenchStateManager::saveState()
 
     qnSettings->setWorkbenchStates(states);
     qnSettings->save();
+    return;
 }
 
 void QnWorkbenchStateManager::restoreState()
@@ -97,20 +100,52 @@ void QnWorkbenchStateManager::restoreState()
     if (!user)
         return;
 
+    const auto localSystemId = helpers::currentSystemLocalId(commonModule());
+    const auto userId = user->getId();
+
+    NX_DEBUG(kWorkbenchStateTag, "Loading workbench state...");
+    NX_DEBUG(kWorkbenchStateTag, lm("System ID: %1").arg(localSystemId));
+    NX_DEBUG(kWorkbenchStateTag, lm("User ID: %1").arg(userId));
+
     auto states = qnSettings->workbenchStates();
+    if (!states.empty())
+    {
+        NX_DEBUG(kWorkbenchStateTag, lm("Last saved state:\n%1")
+            .arg(QJson::serialized(states.first())));
+    }
+
     auto iter = std::find_if(states.cbegin(), states.cend(),
-        [userId = user->getId(), localId = helpers::currentSystemLocalId(commonModule())]
-        (const QnWorkbenchState& state)
+        [&userId, &localSystemId](const QnWorkbenchState& state)
         {
-            return state.localSystemId == localId && state.userId == userId;
+            return state.localSystemId == localSystemId && state.userId == userId;
         });
 
     if (iter != states.cend())
     {
+        NX_DEBUG(kWorkbenchStateTag, lm("Found saved state:\n%1")
+            .arg(QJson::serialized(*iter)));
         workbench()->update(*iter);
         for (const auto& d : m_delegates)
             d->loadState(*iter);
     }
+    else
+    {
+        NX_DEBUG(kWorkbenchStateTag, "State was not found");
+    }
+}
+
+bool QnWorkbenchStateManager::canSaveState() const
+{
+    /*
+     *  We may get here in the disconnect process when all layouts are already closed.
+     *  Marker of an invalid state - 'dummy' layout in the QnWorkbench class.
+     *  We can detect it by `workbench()->currentLayoutIndex() == -1` check.
+     */
+    return !commonModule()->remoteGUID().isNull()
+        && qnRuntime->isDesktopMode()
+        && context()->user()
+        && !helpers::currentSystemIsNew(commonModule())
+        && workbench()->currentLayoutIndex() != -1;
 }
 
 void QnWorkbenchStateManager::registerDelegate(QnSessionAwareDelegate* d)

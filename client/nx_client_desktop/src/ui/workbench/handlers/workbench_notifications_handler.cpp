@@ -18,6 +18,7 @@
 #include <core/resource/resource.h>
 #include <core/resource/user_resource.h>
 #include <core/resource_management/resource_pool.h>
+#include <core/resource_management/user_roles_manager.h>
 
 #include <nx/client/desktop/ui/actions/action_parameters.h>
 #include <ui/workbench/watchers/workbench_user_email_watcher.h>
@@ -130,9 +131,6 @@ void QnWorkbenchNotificationsHandler::addNotification(const QnAbstractBusinessAc
     if (!isAdmin)
     {
         if (eventType == QnBusiness::LicenseIssueEvent || eventType == QnBusiness::NetworkIssueEvent)
-            return;
-
-        if (businessAction->getParams().userGroup == QnBusiness::AdminOnly)
             return;
     }
 
@@ -389,8 +387,29 @@ void QnWorkbenchNotificationsHandler::at_eventManager_connectionClosed()
     clear();
 }
 
-void QnWorkbenchNotificationsHandler::at_eventManager_actionReceived(const QnAbstractBusinessActionPtr &businessAction)
+void QnWorkbenchNotificationsHandler::at_eventManager_actionReceived(
+    const QnAbstractBusinessActionPtr& businessAction)
 {
+    const auto isTargetUser =
+        [this, &businessAction]() -> bool
+        {
+            const auto& subjects = businessAction->getParams().additionalResources;
+            if (subjects.empty())
+                return true; //< All users.
+
+            const auto currentUser = context()->user();
+            const auto currentUserId = currentUser->getId();
+
+            if (std::find(subjects.cbegin(), subjects.cend(), currentUserId) != subjects.cend())
+                return true;
+
+            const auto roleId = QnUserRolesManager::unifiedUserRoleId(currentUser);
+            return std::find(subjects.cbegin(), subjects.cend(), roleId) != subjects.cend();
+        };
+
+    if (!isTargetUser())
+        return;
+
     switch (businessAction->actionType())
     {
         case QnBusiness::ShowPopupAction:
@@ -399,15 +418,17 @@ void QnWorkbenchNotificationsHandler::at_eventManager_actionReceived(const QnAbs
             addNotification(businessAction);
             break;
         }
+
         case QnBusiness::PlaySoundOnceAction:
         {
             QString filename = businessAction->getParams().url;
             QString filePath = context()->instance<ServerNotificationCache>()->getFullPath(filename);
-            // if file is not exists then it is already deleted or just not downloaded yet
-            // I think it should not be played when downloaded
+            // If file doesn't exist then it's already deleted or not downloaded yet.
+            // I think it should not be played when downloaded.
             AudioPlayer::playFileAsync(filePath);
             break;
         }
+
         case QnBusiness::PlaySoundAction:
         {
             switch (businessAction->getToggleState())
@@ -415,19 +436,23 @@ void QnWorkbenchNotificationsHandler::at_eventManager_actionReceived(const QnAbs
                 case QnBusiness::ActiveState:
                     addNotification(businessAction);
                     break;
+
                 case QnBusiness::InactiveState:
                     emit notificationRemoved(businessAction);
                     break;
+
                 default:
                     break;
             }
             break;
         }
+
         case QnBusiness::SayTextAction:
         {
             AudioPlayer::sayTextAsync(businessAction->getParams().sayText);
             break;
         }
+
         default:
             break;
     }

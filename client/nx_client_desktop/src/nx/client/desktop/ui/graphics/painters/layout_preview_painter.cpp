@@ -118,7 +118,7 @@ void LayoutPreviewPainter::paint(QPainter* painter, const QRect& paintRect)
     qreal sourceAr = cellAspectRatio * bounding.width() / bounding.height();
 
     QRect contentsRect(paintRect);
-    contentsRect.adjust(kFrameWidth * 2, kFrameWidth * 2, -kFrameWidth * 2, -kFrameWidth * 2);
+    contentsRect.adjust(-kFrameWidth, -kFrameWidth, kFrameWidth, kFrameWidth);
     qreal targetAr = QnGeometry::aspectRatio(contentsRect);
     if (sourceAr > targetAr)
     {
@@ -153,7 +153,6 @@ void LayoutPreviewPainter::paint(QPainter* painter, const QRect& paintRect)
 
         QRectF itemRect(x1, y1, w1, h1);
         paintItem(painter, QnGeometry::eroded(itemRect, 1), data);
-        QnNxStyle::paintCosmeticFrame(painter, itemRect, m_frameColor, kFrameWidth, 0);
     }
 
     QnNxStyle::paintCosmeticFrame(painter, paintRect, m_frameColor, kFrameWidth, 0);

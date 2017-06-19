@@ -33,7 +33,6 @@ class QAction;
 class QMenu;
 
 class QnProgressDialog;
-class QnMimeData;
 class QnResourcePool;
 class QnWorkbench;
 class QnWorkbenchContext;
@@ -51,6 +50,9 @@ class QnGraphicsMessageBox;
 namespace nx {
 namespace client {
 namespace desktop {
+
+class MimeData;
+
 namespace ui {
 namespace workbench {
 
@@ -118,7 +120,6 @@ protected:
 protected slots:
 
     void submitDelayedDrops();
-    void submitInstantDrop();
 
     void at_context_userChanged(const QnUserResourcePtr &user);
 
@@ -136,6 +137,7 @@ protected slots:
 
     void at_openCurrentLayoutInNewWindowAction_triggered();
     void at_openNewWindowAction_triggered();
+    void at_reviewLayoutTourInNewWindowAction_triggered();
 
     void at_moveCameraAction_triggered();
     void at_dropResourcesAction_triggered();
@@ -237,8 +239,7 @@ private:
     bool m_delayedDropGuard;
     /** List of serialized resources that are to be dropped on the scene once
     * the user logs in. */
-    QList<QnMimeData> m_delayedDrops;
-    QList<QnMimeData> m_instantDrops;
+    QList<MimeData> m_delayedDrops;
 
     QQueue<QnMediaResourcePtr> m_layoutExportResources;
     QString m_layoutFileName;

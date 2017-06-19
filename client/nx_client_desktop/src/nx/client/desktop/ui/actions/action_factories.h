@@ -57,11 +57,11 @@ public:
     virtual QList<QAction*> newActions(const Parameters& parameters, QObject* parent) override;
 };
 
-class CurrentLayoutTourSettingsFactory: public Factory
+class LayoutTourSettingsFactory: public Factory
 {
     Q_OBJECT
 public:
-    CurrentLayoutTourSettingsFactory(QObject* parent);
+    LayoutTourSettingsFactory(QObject* parent);
     virtual QList<QAction*> newActions(const Parameters& parameters, QObject* parent) override;
 };
 

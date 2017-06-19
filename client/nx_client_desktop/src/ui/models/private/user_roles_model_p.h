@@ -37,6 +37,8 @@ public:
     RoleDescription roleByRow(int row) const;
     int count() const;
 
+    QnUuid id(int row, bool predefinedRoleIdsEnabled) const;
+
     void setCustomRoleStrings(const QString& name, const QString& description);
 
 private:

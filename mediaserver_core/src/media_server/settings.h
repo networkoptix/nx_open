@@ -114,6 +114,9 @@ namespace nx_ms_conf
     static const QLatin1String ONVIF_TIMEOUTS( "onvifTimeouts" );
 
     static const QLatin1String ENABLE_MULTIPLE_INSTANCES("enableMultipleInstances");
+
+    static const QLatin1String DELAY_BEFORE_SETTING_MASTER_FLAG("delayBeforeSettingMasterFlag");
+    static const QLatin1String DEFAULT_DELAY_BEFORE_SETTING_MASTER_FLAG("30s");
 }
 
 /**
@@ -131,6 +134,8 @@ public:
     QSettings* runTimeSettings();
 
     std::chrono::milliseconds hlsTargetDuration() const;
+
+    std::chrono::milliseconds delayBeforeSettingMasterFlag() const;
 
     static QString defaultROSettingsFilePath();
     static QString defaultRunTimeSettingsFilePath();

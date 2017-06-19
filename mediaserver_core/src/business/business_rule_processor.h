@@ -157,6 +157,7 @@ protected:
     QnMediaServerResourcePtr getDestMServer(const QnAbstractBusinessActionPtr& action, const QnResourcePtr& res);
 
     void terminateRunningRule(const QnBusinessEventRulePtr& rule);
+    bool fixActionTimeFields(const QnAbstractBusinessActionPtr& action);
 
 private:
     void at_eventRuleChanged_i(const QnBusinessEventRulePtr& bRule);
@@ -167,6 +168,14 @@ private:
     bool needProxyAction(const QnAbstractBusinessActionPtr& action, const QnResourcePtr& res);
     void doProxyAction(const QnAbstractBusinessActionPtr& action, const QnResourcePtr& res);
     void executeAction(const QnAbstractBusinessActionPtr& action, const QnResourcePtr& res);
+
+    bool handleBookmarkAction(const QnAbstractBusinessActionPtr& action);
+    bool updateProlongedActionStartTime(
+        const QnAbstractBusinessActionPtr& action);
+    bool popProlongedActionStartTime(
+        const QnAbstractBusinessActionPtr& action,
+        qint64& startTimeUsec);
+
 protected:
     mutable QnMutex m_mutex;
 private:
@@ -201,6 +210,8 @@ private:
         \param isRuleAdded \a true - rule added, \a false - removed
     */
     void notifyResourcesAboutEventIfNeccessary( const QnBusinessEventRulePtr& businessRule, bool isRuleAdded );
+
+    QHash<QnUuid, qint64> m_runningBookmarkActions;
 };
 
 #define qnBusinessRuleProcessor QnBusinessRuleProcessor::instance()

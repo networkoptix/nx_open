@@ -3,7 +3,7 @@
 #include <nx/network/url/url_builder.h>
 
 #include <nx_ec/ec_proto_version.h>
-#include <test_support/transaction_connection_helper.h>
+#include <nx/cloud/cdb/test_support/transaction_connection_helper.h>
 
 #include "ec2/cloud_vms_synchro_test_helper.h"
 

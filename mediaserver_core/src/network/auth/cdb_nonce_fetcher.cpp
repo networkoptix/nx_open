@@ -9,7 +9,7 @@
 
 #include <nx/utils/log/log.h>
 
-#include <cdb/cloud_nonce.h>
+#include <nx/cloud/cdb/api/cloud_nonce.h>
 #include <nx/utils/sync_call.h>
 
 #include "cloud/cloud_connection_manager.h"
@@ -129,8 +129,13 @@ QByteArray CdbNonceFetcher::generateNonce()
 
 bool CdbNonceFetcher::isNonceValid(const QByteArray& nonce) const
 {
+    NX_VERBOSE(this, lm("Verifying nonce %1").arg(nonce));
     if (isValidCloudNonce(nonce))
+    {
+        NX_VERBOSE(this, lm("Nonce %1 is a valid cloud nonce").arg(nonce));
         return true;
+    }
+    NX_VERBOSE(this, lm("Passing nonce %1 verification to a default verificator").arg(nonce));
     return m_defaultGenerator->isNonceValid(nonce);
 }
 

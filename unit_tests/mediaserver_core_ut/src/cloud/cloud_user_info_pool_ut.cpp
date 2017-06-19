@@ -54,8 +54,8 @@ public:
             &authClientResponseHeader);
 
         const auto ha1 = nx_http::calcHa1(userName, kTestRealm, kTestPassword, kTestAlgorithm);
-        const auto partialResponse = nx_http::calcIntermediateResponse(ha1, cloudNonce);
-        m_pool->userInfoChanged(ts, userName, cloudNonce, partialResponse);
+        const auto intermediateResponse = nx_http::calcIntermediateResponse(ha1, cloudNonce);
+        m_pool->userInfoChanged(ts, userName, cloudNonce, intermediateResponse);
 
         return authClientResponseHeader;
     }
@@ -96,6 +96,11 @@ protected:
         petya3Auth = supplier->setUserInfo(3, "petya", generateTestNonce(3));
     }
 
+    void whenSameUserIsReported()
+    {
+        vasya1Auth = supplier->setUserInfo(2, "petya", generateTestNonce(2));
+    }
+
     void when3rdWithNonce3HasBeenAdded()
     {
         gena3Auth = supplier->setUserInfo(3, "gena", generateTestNonce(3));
@@ -112,7 +117,7 @@ protected:
         ASSERT_EQ(vasyaNonceSet.find("nonce1"), vasyaNonceSet.cend());
         ASSERT_EQ(vasyaNonceSet.find("nonce2"), vasyaNonceSet.cend());
 
-        auto& petyaNonceSet = userInfoPool.nameToNonces().find("petya")->second;
+        /*auto& petyaNonceSet =*/ userInfoPool.nameToNonces().find("petya")->second;
         ASSERT_EQ(vasyaNonceSet.find("nonce2"), vasyaNonceSet.cend());
     }
 
@@ -133,26 +138,19 @@ protected:
     nx_http::header::Authorization vasya3Auth;
 };
 
-TEST_F(CloudUserInfoPool, deserialize)
-{
-    const QString kSimpleString =
-        lit("{\"timestamp\":1234567,\"cloudNonce\":\"abcdef0123456\",\"partialResponse\":\"response\"}");
-
-    uint64_t ts;
-    nx::Buffer nonce;
-    nx::Buffer response;
-    ASSERT_TRUE(detail::deserialize(kSimpleString, &ts, &nonce, &response));
-
-
-    ASSERT_EQ(ts, 1234567);
-    ASSERT_EQ(nonce, "abcdef0123456");
-    ASSERT_EQ(response, "response");
-}
-
-
 TEST_F(CloudUserInfoPool, commonNonce_simple)
 {
     given2UsersInfos();
+    auto nonce = userInfoPool.newestMostCommonNonce();
+    ASSERT_TRUE((bool)nonce);
+    ASSERT_EQ(*nonce, nx::Buffer(generateTestNonce(2)));
+}
+
+TEST_F(CloudUserInfoPool, sameUserReportedTwice)
+{
+    given2UsersInfos();
+    whenSameUserIsReported();
+
     auto nonce = userInfoPool.newestMostCommonNonce();
     ASSERT_TRUE((bool)nonce);
     ASSERT_EQ(*nonce, nx::Buffer(generateTestNonce(2)));

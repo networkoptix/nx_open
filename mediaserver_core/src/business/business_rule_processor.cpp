@@ -29,6 +29,16 @@
 #include <database/server_db.h>
 #include <common/common_module.h>
 
+namespace {
+
+QnUuid getActionRunningKey(const QnAbstractBusinessActionPtr& action)
+{
+    const auto key = action->getExternalUniqKey();
+    return guidFromArbitraryData(key);
+}
+
+} // namespace
+
 QnBusinessRuleProcessor::QnBusinessRuleProcessor(QnCommonModule* commonModule):
     QnCommonModuleAware(commonModule)
 {
@@ -156,6 +166,105 @@ void QnBusinessRuleProcessor::executeAction(const QnAbstractBusinessActionPtr& a
     }
 }
 
+bool QnBusinessRuleProcessor::updateProlongedActionStartTime(
+    const QnAbstractBusinessActionPtr& action)
+{
+    if (!action)
+    {
+        NX_EXPECT(false, "Action is null");
+        return false;
+    }
+
+    if (action->getParams().durationMs > 0
+        || action->getToggleState() != QnBusiness::ActiveState)
+    {
+        return false;
+    }
+
+    const auto key = getActionRunningKey(action);
+    const auto startTimeUsec = action->getRuntimeParams().eventTimestampUsec;
+    m_runningBookmarkActions[key] = startTimeUsec;
+    return true;
+}
+
+bool QnBusinessRuleProcessor::popProlongedActionStartTime(
+    const QnAbstractBusinessActionPtr& action,
+    qint64& startTimeUsec)
+{
+    if (!action)
+    {
+        NX_EXPECT(false, "Invalid action");
+        return false;
+    }
+    if (action->getParams().durationMs > 0
+        || action->getToggleState() == QnBusiness::ActiveState)
+    {
+        return false;
+    }
+
+    const auto key = getActionRunningKey(action);
+    const auto it = m_runningBookmarkActions.find(key);
+    if (it == m_runningBookmarkActions.end())
+    {
+        NX_EXPECT(false, "Can't find prolonged action data");
+        return false;
+    }
+
+    startTimeUsec = *it;
+    m_runningBookmarkActions.erase(it);
+    return true;
+}
+
+bool QnBusinessRuleProcessor::fixActionTimeFields(const QnAbstractBusinessActionPtr& action)
+{
+    if (!action)
+    {
+        NX_EXPECT(false, "Invalid action");
+        return false;
+    }
+
+    const bool isProlonged = action->getParams().durationMs <= 0;
+    if (isProlonged && updateProlongedActionStartTime(action))
+        return false; //< Do not process event until it is finished
+
+    qint64 startTimeUsec = action->getRuntimeParams().eventTimestampUsec;
+    if (isProlonged && !popProlongedActionStartTime(action, startTimeUsec))
+    {
+        NX_EXPECT(false, "Something went wrong");
+        return false; //< Do not process event at all
+    }
+
+    if (isProlonged)
+    {
+        const auto endTimeUsec = action->getRuntimeParams().eventTimestampUsec;
+        action->getParams().durationMs = (endTimeUsec - startTimeUsec) / 1000;
+        action->getRuntimeParams().eventTimestampUsec = startTimeUsec;
+    }
+
+    return true;
+}
+
+bool QnBusinessRuleProcessor::handleBookmarkAction(const QnAbstractBusinessActionPtr& action)
+{
+    if (!action->getParams().needConfirmation)
+        return false;
+
+    if (action->actionType() != QnBusiness::BookmarkAction)
+    {
+        NX_EXPECT(false, "Invalid action");
+        return false;
+    }
+
+    if (!fixActionTimeFields(action))
+        return false;
+
+    action->getParams().targetActionType = action->actionType();
+    action->setActionType(QnBusiness::ShowPopupAction);
+
+    broadcastBusinessAction(action);
+    return true;
+}
+
 void QnBusinessRuleProcessor::executeAction(const QnAbstractBusinessActionPtr& action)
 {
     if (!action) {
@@ -168,29 +277,36 @@ void QnBusinessRuleProcessor::executeAction(const QnAbstractBusinessActionPtr& a
 
     switch (action->actionType())
     {
-    case QnBusiness::ShowTextOverlayAction:
-    case QnBusiness::ShowOnAlarmLayoutAction:
-        if (action->getParams().useSource)
-            resources << resourcePool()->getResources<QnNetworkResource>(action->getSourceResources());
-        break;
+        case QnBusiness::ShowTextOverlayAction:
+        case QnBusiness::ShowOnAlarmLayoutAction:
+            if (action->getParams().useSource)
+                resources << resourcePool()->getResources<QnNetworkResource>(action->getSourceResources());
+            break;
 
-    case QnBusiness::SayTextAction:
-    case QnBusiness::PlaySoundAction:
-    case QnBusiness::PlaySoundOnceAction:
-        {
-            // execute say to client once and before proxy
-            if(!action->isReceivedFromRemoteHost() && action->getParams().playToClient)
+        case QnBusiness::SayTextAction:
+        case QnBusiness::PlaySoundAction:
+        case QnBusiness::PlaySoundOnceAction:
             {
-                broadcastBusinessAction(action);
-                // This actions marked as requiredCameraResource, but can be performed to client without camRes
-                if (resources.isEmpty())
-                    qnServerDb->saveActionToDB(action);
+                // execute say to client once and before proxy
+                if(!action->isReceivedFromRemoteHost() && action->getParams().playToClient)
+                {
+                    broadcastBusinessAction(action);
+                    // This actions marked as requiredCameraResource, but can be performed to client without camRes
+                    if (resources.isEmpty())
+                        qnServerDb->saveActionToDB(action);
+                }
+                break;
             }
+
+        case QnBusiness::BookmarkAction:
+        {
+            if (handleBookmarkAction(action))
+                return;
+
             break;
         }
-
-    default:
-        break;
+        default:
+            break;
     }
 
     if (resources.isEmpty())
