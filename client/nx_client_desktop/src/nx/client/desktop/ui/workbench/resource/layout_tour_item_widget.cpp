@@ -178,20 +178,26 @@ void LayoutTourItemWidget::initOverlay()
 
     auto updateHint = [this, delayHintLabel]
         {
-
+            const bool isManual = item()->layout()->data(Qn::LayoutTourIsManualRole).toBool();
             //QColor textColor = palette().color(QPalette::WindowText); //
             QColor textColor = QColor("#53707f"); //TODO: #GDM #3.1 customize
-            QString text = tr("Display for");
-            switch (selectionState())
+            QString text = isManual
+                ? tr("Switch by %1").arg(QString::fromWCharArray(L"\x2190 \x2192"))
+                : tr("Display for");
+
+            if (!isManual)
             {
-                case SelectionState::selected:
-                case SelectionState::focusedAndSelected:
-                    //textColor = palette().color(QPalette::Highlight);
-                    textColor = QColor("#2fa2db");  //TODO: #GDM #3.1 customize
-                    text = tr("Display selected for");
-                    break;
-                default:
-                    break;
+                switch (selectionState())
+                {
+                    case SelectionState::selected:
+                    case SelectionState::focusedAndSelected:
+                        //textColor = palette().color(QPalette::Highlight);
+                        textColor = QColor("#2fa2db");  //TODO: #GDM #3.1 customize
+                        text = tr("Display selected for");
+                        break;
+                    default:
+                        break;
+                }
             }
             setPaletteColor(delayHintLabel, QPalette::WindowText, textColor);
             delayHintLabel->setText(text);
@@ -247,18 +253,20 @@ void LayoutTourItemWidget::initOverlay()
     footerLayout->setContentsMargins(0, 2, 0, 0);
     footerLayout->setSpacing(kMargin);
 
-    auto updateManualMode = [this, delayHintLabel, delayWidget]
+    auto updateManualMode = [this, delayWidget]
         {
             const bool isManual = item()->layout()->data(Qn::LayoutTourIsManualRole).toBool();
-            delayHintLabel->setVisible(!isManual);
             delayWidget->setVisible(!isManual);
         };
 
     connect(item()->layout(), &QnWorkbenchLayout::dataChanged, this,
-        [updateManualMode](int role)
+        [updateManualMode, updateHint](int role)
         {
             if (role == Qn::LayoutTourIsManualRole)
+            {
                 updateManualMode();
+                updateHint();
+            }
         });
     updateManualMode();
 
