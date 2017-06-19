@@ -265,7 +265,7 @@ protected:
     void trace(int handle, int obj, const QString& message = QString());
 
 private:
-    void addOldVersionParams(const QnNetworkResourcePtr& camera, QnRequestParamList& params);
+    void addOldVersionPtzParams(const QnNetworkResourcePtr& camera, QnRequestParamList& params);
 
 private:
     QnSoftwareVersion m_serverVersion;
