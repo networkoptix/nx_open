@@ -347,6 +347,13 @@ PageBase
                 {
                     hideUi()
                     moveOnTapOverlay.open()
+                    video.item.fitToBounds()
+
+                    /**
+                      * Workaround. Otverwise it moves content to wrong place.
+                      * TODO: investigate and get rid of this workaround
+                      */
+                    video.item.fitToBounds()
                 }
                 else
                 {
@@ -371,13 +378,6 @@ PageBase
                     ptzPanel.moveViewport(data.viewport, data.aspect)
                     preloader.pos = pos
                     preloader.visible = true
-                    video.item.fitToBounds()
-
-                    /**
-                      * Workaround. Otverwise it moves content to wrong place.
-                      * TODO: investigate and get rid of this workaround
-                      */
-                    video.item.fitToBounds()
                 }
 
                 onVisibleChanged:
