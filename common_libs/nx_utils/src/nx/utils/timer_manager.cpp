@@ -371,10 +371,7 @@ void StandaloneTimerManager::deleteTaskNonSafe(
 {
     const std::map<TimerId, qint64>::iterator it = m_taskToTime.find(timerID);
     if (it == m_taskToTime.end())
-    {
-        qWarning() << "timer id" << timerID << "not found";
         return;
-    }
 
     m_timeToTask.erase(make_pair(it->second, it->first));
     m_taskToTime.erase(it);

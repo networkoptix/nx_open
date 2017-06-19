@@ -196,7 +196,7 @@ protected:
 
     void whenShouldUnsubscribeFromHandler(
         const QnUuid& taskId,
-        nx::utils::MoveOnlyFunc<void(const nx::cdb::test::SchedulerUser::Task&)> unsubscribeCb)
+        nx::utils::MoveOnlyFunc<void(const QnUuid&, const nx::cdb::test::SchedulerUser::Task&)> unsubscribeCb)
     {
         user->setShouldUnsubscribe(taskId, std::move(unsubscribeCb));
     }
@@ -277,7 +277,7 @@ TEST_F(PersistentScheduler, unsubscribe)
     int firedAlready;
     user->unsubscribe(
         taskId,
-        [&firedAlready](const nx::cdb::test::SchedulerUser::Task& task)
+        [&firedAlready](const QnUuid&, const nx::cdb::test::SchedulerUser::Task& task)
         {
             firedAlready = task.fired;
         });
@@ -301,7 +301,7 @@ TEST_F(PersistentScheduler, unsubscribe_dbError)
     int firedAlready = -1;
     user->unsubscribe(
         taskId,
-        [&firedAlready](const nx::cdb::test::SchedulerUser::Task& task)
+        [&firedAlready](const QnUuid&, const nx::cdb::test::SchedulerUser::Task& task)
         {
             firedAlready = task.fired;
         });
@@ -359,7 +359,7 @@ TEST_F(PersistentScheduler, unsubscribeFromHandler)
     int firedAlready;
     whenShouldUnsubscribeFromHandler(
         taskId,
-        [&firedAlready](const nx::cdb::test::SchedulerUser::Task& task)
+        [&firedAlready](const QnUuid&, const nx::cdb::test::SchedulerUser::Task& task)
         {
             firedAlready = task.fired;
         });
