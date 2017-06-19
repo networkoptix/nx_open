@@ -455,9 +455,28 @@ QnMediaResourceWidget::QnMediaResourceWidget(QnWorkbenchContext* context, QnWork
     updateOverlayButton();
     setImageEnhancement(item->imageEnhancement());
 
+    initSoftwareTriggers();
+
     connect(this, &QnMediaResourceWidget::updateInfoTextLater, this,
         &QnMediaResourceWidget::updateCurrentUtcPosMs);
+}
 
+QnMediaResourceWidget::~QnMediaResourceWidget()
+{
+    ensureAboutToBeDestroyedEmitted();
+
+    if (m_display)
+        m_display->removeRenderer(m_renderer);
+
+    m_renderer->destroyAsync();
+
+    for (auto* data : m_binaryMotionMask)
+        qFreeAligned(data);
+    m_binaryMotionMask.clear();
+}
+
+void QnMediaResourceWidget::initSoftwareTriggers()
+{
     if (!display()->camDisplay()->isRealTimeSource())
         return;
 
@@ -473,20 +492,6 @@ QnMediaResourceWidget::QnMediaResourceWidget(QnWorkbenchContext* context, QnWork
 
     connect(eventRuleManager, &QnEventRuleManager::ruleRemoved,
         this, &QnMediaResourceWidget::at_eventRuleRemoved);
-}
-
-QnMediaResourceWidget::~QnMediaResourceWidget()
-{
-    ensureAboutToBeDestroyedEmitted();
-
-    if (m_display)
-        m_display->removeRenderer(m_renderer);
-
-    m_renderer->destroyAsync();
-
-    for (auto* data : m_binaryMotionMask)
-        qFreeAligned(data);
-    m_binaryMotionMask.clear();
 }
 
 void QnMediaResourceWidget::createButtons()

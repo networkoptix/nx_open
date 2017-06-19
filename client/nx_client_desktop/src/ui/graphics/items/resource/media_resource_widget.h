@@ -268,6 +268,8 @@ private:
 
     void setupHud();
 
+    void initSoftwareTriggers();
+
     void setTextOverlayParameters(const QnUuid& id, bool visible,
         const QString& text, const QnHtmlTextItemOptions& options);
 
