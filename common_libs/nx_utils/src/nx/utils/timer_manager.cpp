@@ -242,7 +242,7 @@ void StandaloneTimerManager::joinAndDeleteTimer(const TimerId& timerID)
         //    There is no sense to wait task completion
     }
 
-    //since mutex is locked and m_runningTaskID != timerID, 
+    //since mutex is locked and m_runningTaskID != timerID,
     //    timer handler is not running at the moment
     deleteTaskNonSafe(lk, timerID);
 }
@@ -420,7 +420,7 @@ std::chrono::milliseconds parseTimerDuration(
     const auto toUInt =
         [&](int suffixLen) -> qulonglong
         {
-            const auto& stringWithoutSuffix = 
+            const auto& stringWithoutSuffix =
                 suffixLen
                 ? duration.left(duration.length() - suffixLen)
                 : duration;

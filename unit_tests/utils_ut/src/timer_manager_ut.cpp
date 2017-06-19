@@ -145,6 +145,26 @@ TEST(parseTimerDuration, incorrect_input)
     ASSERT_EQ(defaultValue, parseTimerDuration("", defaultValue));
 }
 
+TEST(deleteFromCallback, simple)
+{
+    utils::StandaloneTimerManager mgr;
+    int fireCount = 0;
+    const std::chrono::milliseconds kTimeout(10);
+
+    mgr.addNonStopTimer(
+        [&mgr, &fireCount](nx::utils::TimerId timerId)
+        {
+            ++fireCount;
+            mgr.deleteTimer(timerId);
+        },
+        kTimeout,
+        kTimeout);
+
+    std::this_thread::sleep_for(std::chrono::milliseconds(kTimeout * 10));
+    mgr.stop();
+    ASSERT_EQ(fireCount, 1);
+}
+
 } // namespace test
 } // namespace utils
 } // namespace nx
