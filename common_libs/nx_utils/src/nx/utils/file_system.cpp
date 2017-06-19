@@ -1,7 +1,5 @@
 #include "file_system.h"
 
-#include <QtCore>
-
 #if defined(Q_OS_UNIX)
     #include <unistd.h>
     #include <QtCore/QStandardPaths>
