@@ -2455,7 +2455,18 @@ void QnMediaResourceWidget::configureTriggerButton(QnSoftwareTriggerButton* butt
             if (button->isLive())
                 return;
 
-            action(action::JumpToLiveAction)->trigger();
+            const auto syncAction = action(action::ToggleSyncAction);
+            const bool sync = syncAction->isEnabled() && syncAction->isChecked();
+
+            if (sync || QnWorkbenchContextAware::display()->widget(Qn::CentralRole) == this)
+            {
+                action(action::JumpToLiveAction)->trigger();
+            }
+            else
+            {
+                display()->archiveReader()->jumpTo(DATETIME_NOW, 0);
+                display()->archiveReader()->resumeMedia();
+            }
         });
 }
 
