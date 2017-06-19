@@ -178,7 +178,8 @@ void LayoutTourItemWidget::initOverlay()
 
     auto updateHint = [this, delayHintLabel]
         {
-            const bool isManual = item()->layout()->data(Qn::LayoutTourIsManualRole).toBool();
+            const bool isManual = item()->layout()
+                && item()->layout()->data(Qn::LayoutTourIsManualRole).toBool();
             //QColor textColor = palette().color(QPalette::WindowText); //
             QColor textColor = QColor("#53707f"); //TODO: #GDM #3.1 customize
             QString text = isManual
