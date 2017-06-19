@@ -63,6 +63,10 @@ private:
         const QnLayoutResourcePtr& layout,
         const ec2::ApiLayoutTourItemData& item,
         const QPointF& position);
+    void addResourcesToReviewLayout(
+        const QnLayoutResourcePtr& layout,
+        const QnResourceList& resources,
+        const QPointF& position);
 
     /** Calculate items from the review layout. */
     bool fillTourItems(ec2::ApiLayoutTourItemDataList* items);

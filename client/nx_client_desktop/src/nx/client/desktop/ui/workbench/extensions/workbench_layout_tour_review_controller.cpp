@@ -442,6 +442,24 @@ void LayoutTourReviewController::addItemToReviewLayout(
     layout->addItem(itemData);
 }
 
+void LayoutTourReviewController::addResourcesToReviewLayout(
+    const QnLayoutResourcePtr& layout,
+    const QnResourceList& resources,
+    const QPointF& position)
+{
+    NX_EXPECT(!m_updating);
+    if (m_updating)
+        return;
+
+    QScopedValueRollback<bool> guard(m_updating, true);
+    for (const auto& resource: resources)
+    {
+        if (!QnResourceAccessFilter::isDroppable(resource))
+            continue;
+        addItemToReviewLayout(layout, {resource->getId(), kDefaultDelayMs}, position);
+    }
+}
+
 bool LayoutTourReviewController::fillTourItems(ec2::ApiLayoutTourItemDataList* items)
 {
     NX_EXPECT(items);
@@ -504,40 +522,10 @@ void LayoutTourReviewController::at_dropResourcesAction_triggered()
     if (!isLayoutTourReviewMode())
         return;
 
-    const auto tourId = currentTourId();
-
-    auto reviewLayout = m_reviewLayouts.value(tourId);
-    NX_EXPECT(reviewLayout);
-    if (!reviewLayout)
-        return;
-
+    const auto reviewLayout = workbench()->currentLayout()->resource();
     const auto parameters = menu()->currentParameters(sender());
     QPointF position = parameters.argument<QPointF>(Qn::ItemPositionRole);
-    {
-        NX_EXPECT(!m_updating);
-        if (m_updating)
-            return;
-        QScopedValueRollback<bool> guard(m_updating, true);
-        for (const auto& resource : parameters.resources())
-        {
-            if (resource->hasFlags(Qn::layout))
-            {
-                const auto layout = resource.dynamicCast<QnLayoutResource>();
-                NX_EXPECT(layout);
-                addItemToReviewLayout(reviewLayout, {layout->getId(), kDefaultDelayMs}, position);
-            }
-            else
-            {
-                const bool allowed = QnResourceAccessFilter::isOpenableInLayout(resource);
-
-                if (!allowed)
-                    continue;
-
-                addItemToReviewLayout(reviewLayout, {resource->getId(), kDefaultDelayMs}, position);
-            }
-        }
-    }
-
+    addResourcesToReviewLayout(reviewLayout, parameters.resources(), position);
     menu()->trigger(action::SaveCurrentLayoutTourAction);
 }
 
