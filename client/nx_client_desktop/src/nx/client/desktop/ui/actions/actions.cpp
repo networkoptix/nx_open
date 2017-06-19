@@ -1170,16 +1170,6 @@ void initialize(Manager* manager, Action* root)
         .condition(!condition::isSafeMode())
         .autoRepeat(false);
 
-    factory(RenameLayoutTourAction)
-        .flags(Tree | NoTarget | IntentionallyAmbiguous)
-        .text(tr("Rename"))
-        .shortcut(lit("F2"))
-        .condition(
-            condition::treeNodeType(Qn::LayoutTourNode)
-            && !condition::isSafeMode()
-        )
-        .autoRepeat(false);
-
     factory()
         .flags(Tree)
         .separator();
@@ -1417,12 +1407,23 @@ void initialize(Manager* manager, Action* root)
         .flags(Scene)
         .separator();
 
+#pragma region Layout Tours
+
     factory(ReviewLayoutTourAction)
         .flags(Tree | NoTarget)
         .mode(DesktopMode)
-        .text(tr("Review Layout Tour"))
+        .text(tr("Open in New Tab"))
         .condition(condition::treeNodeType(Qn::LayoutTourNode))
         .autoRepeat(false);
+
+    factory(ReviewLayoutTourInNewWindowAction)
+        .flags(Tree | NoTarget)
+        .mode(DesktopMode)
+        .text(tr("Open in New Window"))
+        .condition(condition::treeNodeType(Qn::LayoutTourNode))
+        .autoRepeat(false);
+
+    factory().flags(Tree).separator().condition(condition::treeNodeType(Qn::LayoutTourNode));
 
     factory(ToggleLayoutTourModeAction)
         .flags(Scene | Tree | NoTarget | GlobalHotkey)
@@ -1436,14 +1437,6 @@ void initialize(Manager* manager, Action* root)
             || (condition::treeNodeType(Qn::LayoutTourNode)
                 && ConditionWrapper(new ToggleTourCondition())));
 
-    factory(RemoveLayoutTourAction)
-        .flags(Tree | NoTarget | IntentionallyAmbiguous)
-        .mode(DesktopMode)
-        .text(tr("Delete Layout Tour"))
-        .shortcut(lit("Del"))
-        .shortcut(Qt::Key_Backspace, Builder::Mac, true)
-        .condition(condition::treeNodeType(Qn::LayoutTourNode));
-
     factory(StartCurrentLayoutTourAction)
         .flags(NoTarget)
         .mode(DesktopMode)
@@ -1456,6 +1449,26 @@ void initialize(Manager* manager, Action* root)
         )
         .autoRepeat(false);
 
+    factory().flags(Tree).separator().condition(condition::treeNodeType(Qn::LayoutTourNode));
+
+    factory(RemoveLayoutTourAction)
+        .flags(Tree | NoTarget | IntentionallyAmbiguous)
+        .mode(DesktopMode)
+        .text(tr("Delete"))
+        .shortcut(lit("Del"))
+        .shortcut(Qt::Key_Backspace, Builder::Mac, true)
+        .condition(condition::treeNodeType(Qn::LayoutTourNode));
+
+    factory().flags(Tree).separator().condition(condition::treeNodeType(Qn::LayoutTourNode));
+
+    factory(RenameLayoutTourAction)
+        .flags(Tree | NoTarget | IntentionallyAmbiguous)
+        .text(tr("Rename"))
+        .shortcut(lit("F2"))
+        .condition(condition::treeNodeType(Qn::LayoutTourNode)
+            && !condition::isSafeMode())
+        .autoRepeat(false);
+
     factory(SaveLayoutTourAction)
         .flags(NoTarget)
         .mode(DesktopMode);
@@ -1466,9 +1479,7 @@ void initialize(Manager* manager, Action* root)
         .condition(condition::isLayoutTourReviewMode())
         .autoRepeat(false);
 
-    factory()
-        .flags(Scene)
-        .separator();
+    factory().flags(Tree).separator().condition(condition::treeNodeType(Qn::LayoutTourNode));
 
     factory(MakeLayoutTourAction)
         .flags(Tree | MultiTarget | ResourceTarget)
@@ -1476,19 +1487,33 @@ void initialize(Manager* manager, Action* root)
         .condition(condition::hasFlags(Qn::layout, All)
             && !condition::isSafeMode());
 
+    factory(LayoutTourSettingsAction)
+        .flags(Tree | NoTarget)
+        .text(tr("Settings"))
+        .condition(condition::treeNodeType(Qn::LayoutTourNode)
+            && !condition::isSafeMode())
+        .childFactory(new LayoutTourSettingsFactory(manager))
+        .autoRepeat(false);
+
+    factory()
+        .flags(Scene)
+        .separator();
+
+    factory(CurrentLayoutTourSettingsAction)
+        .flags(Scene | NoTarget)
+        .text(tr("Settings"))
+        .condition(condition::isLayoutTourReviewMode())
+        .childFactory(new LayoutTourSettingsFactory(manager))
+        .autoRepeat(false);
+
+#pragma endregion Layout Tours
+
     factory(CurrentLayoutSettingsAction)
         .flags(Scene | NoTarget)
         .requiredTargetPermissions(Qn::CurrentLayoutResourceRole, Qn::EditLayoutSettingsPermission)
         .text(tr("Layout Settings..."))
         .condition(ConditionWrapper(new LightModeCondition(Qn::LightModeNoLayoutBackground))
             && !condition::tourIsRunning());
-
-    factory(CurrentLayoutTourSettingsAction)
-        .flags(Scene | NoTarget)
-        .text(tr("Tour Settings"))
-        .condition(condition::isLayoutTourReviewMode())
-        .childFactory(new CurrentLayoutTourSettingsFactory(manager))
-        .autoRepeat(false);
 
     /* Tab bar actions. */
     factory()
