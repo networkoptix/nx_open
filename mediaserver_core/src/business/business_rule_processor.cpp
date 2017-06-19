@@ -183,11 +183,7 @@ bool QnBusinessRuleProcessor::updateProlongedActionStartTime(
 
     const auto key = getActionRunningKey(action);
     const auto startTimeUsec = action->getRuntimeParams().eventTimestampUsec;
-    const auto it = m_runningBookmarkActions.find(key);
-    if (it == m_runningBookmarkActions.end())
-        m_runningBookmarkActions.insert(key, startTimeUsec);
-    else
-        *it = startTimeUsec;
+    m_runningBookmarkActions[key] = startTimeUsec;
     return true;
 }
 
@@ -215,6 +211,7 @@ bool QnBusinessRuleProcessor::popProlongedActionStartTime(
     }
 
     startTimeUsec = *it;
+    m_runningBookmarkActions.erase(it);
     return true;
 }
 
