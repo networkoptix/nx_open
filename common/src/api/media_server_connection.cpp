@@ -540,6 +540,7 @@ int QnMediaServerConnection::ptzContinuousMoveAsync(
     int sequenceNumber, QObject* target, const char* slot)
 {
     QnRequestParamList params;
+    params << QnRequestParam("resourceId", QnLexical::serialized(camera->getUniqueId()));
     params << QnRequestParam("command", QnLexical::serialized(Qn::ContinuousMovePtzCommand));
     params << QnRequestParam("cameraId", camera->getId());
     params << QnRequestParam("xSpeed", QnLexical::serialized(speed.x()));
