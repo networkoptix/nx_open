@@ -534,7 +534,6 @@ TEST_F(SchedulerIntegrationTest, SubscribeFromExpiredTask)
     andWhenSchedulerWorksForSomeVeryShortTime();
     thenFirstTaskShouldFireAndSecondTaskShouldBeSubscribed();
 
-    qWarning() << 1;
     andWhenTimeToNextScheduledFireComes();
     thenFistTaskShouldFire();
     thenSecondTaskShouldFireMultipleTimes();
