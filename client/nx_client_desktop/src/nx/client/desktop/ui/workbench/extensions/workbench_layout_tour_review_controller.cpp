@@ -40,7 +40,7 @@ static constexpr int kSaveTourIntervalMs = 5000;
 // Update items layout no more often than once in a second.
 static constexpr int kUpdateItemsLayoutIntervalMs = 1000;
 
-static constexpr QSize kCellSize{1, 1};
+static const QSize kCellSize{1, 1};
 
 QRect createItemGrid(const QPoint& topLeft, int itemCount)
 {
