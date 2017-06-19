@@ -526,6 +526,7 @@ static QStringList listRecordFolders(bool includeNetwork = false)
     QStringList folderPaths;
 
 #ifdef Q_OS_WIN
+    using namespace nx::utils::file_system;
     (void)includeNetwork;
     for (const WinDriveInfo& drive: getWinDrivesInfo())
     {

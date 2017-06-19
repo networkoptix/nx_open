@@ -46,7 +46,7 @@ Result NX_UTILS_API copy(const QString& sourcePath, const QString& targetPath,
 
 bool NX_UTILS_API ensureDir(const QDir& dir);
 
-// Functions below are intended for usage in situations where QCoreApplication is unavailable 
+// Functions below are intended for usage in situations where QCoreApplication is unavailable
 QString NX_UTILS_API applicationFilePath(const QString& defaultFilePath);
 QString NX_UTILS_API applicationDirPath(const QString& defaultFilePath);
 
@@ -55,6 +55,33 @@ QString NX_UTILS_API applicationDirPath(int argc, char** argv);
 
 #ifdef Q_OS_WIN
 QString applicationFileNameInternal(const QString& defaultFileName);
+
+struct WinDriveInfo
+{
+    enum Access
+    {
+        NoAccess = 0,
+        Readable = 1,
+        Writable = 2,
+    };
+
+    QString path;
+    unsigned long type;
+    int access;
+
+    WinDriveInfo() :
+        type(0),
+        access(NoAccess)
+    {
+    }
+};
+
+/** @param driveString - any path, starting with drive letter */
+bool NX_UTILS_API mediaIsInserted(const QString& driveString);
+
+using WinDriveInfoList = QList<WinDriveInfo>;
+
+WinDriveInfoList NX_UTILS_API getWinDrivesInfo();
 #endif
 
 } // namespace file_system
