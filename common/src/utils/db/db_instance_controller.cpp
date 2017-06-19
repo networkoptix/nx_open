@@ -87,9 +87,9 @@ bool InstanceController::configureDb()
     m_queryExecutor->executeUpdateWithoutTran(
         std::bind(&InstanceController::configureSqliteInstance, this, _1),
         [&](QueryContext* /*queryContext*/, DBResult dbResult)
-    {
-        cacheFilledPromise.set_value(dbResult);
-    });
+        {
+            cacheFilledPromise.set_value(dbResult);
+        });
 
     return future.get() == DBResult::ok;
 }
