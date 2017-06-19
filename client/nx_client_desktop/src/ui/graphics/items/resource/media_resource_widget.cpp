@@ -455,18 +455,7 @@ QnMediaResourceWidget::QnMediaResourceWidget(QnWorkbenchContext* context, QnWork
     updateOverlayButton();
     setImageEnhancement(item->imageEnhancement());
 
-    resetTriggers();
-
-    auto eventRuleManager = commonModule()->eventRuleManager();
-
-    connect(eventRuleManager, &QnEventRuleManager::rulesReset,
-        this, &QnMediaResourceWidget::resetTriggers);
-
-    connect(eventRuleManager, &QnEventRuleManager::ruleAddedOrUpdated,
-        this, &QnMediaResourceWidget::at_eventRuleAddedOrUpdated);
-
-    connect(eventRuleManager, &QnEventRuleManager::ruleRemoved,
-        this, &QnMediaResourceWidget::at_eventRuleRemoved);
+    initSoftwareTriggers();
 
     connect(this, &QnMediaResourceWidget::updateInfoTextLater, this,
         &QnMediaResourceWidget::updateCurrentUtcPosMs);
@@ -484,6 +473,25 @@ QnMediaResourceWidget::~QnMediaResourceWidget()
     for (auto* data : m_binaryMotionMask)
         qFreeAligned(data);
     m_binaryMotionMask.clear();
+}
+
+void QnMediaResourceWidget::initSoftwareTriggers()
+{
+    if (!display()->camDisplay()->isRealTimeSource())
+        return;
+
+    resetTriggers();
+
+    auto eventRuleManager = commonModule()->eventRuleManager();
+
+    connect(eventRuleManager, &QnEventRuleManager::rulesReset,
+        this, &QnMediaResourceWidget::resetTriggers);
+
+    connect(eventRuleManager, &QnEventRuleManager::ruleAddedOrUpdated,
+        this, &QnMediaResourceWidget::at_eventRuleAddedOrUpdated);
+
+    connect(eventRuleManager, &QnEventRuleManager::ruleRemoved,
+        this, &QnMediaResourceWidget::at_eventRuleRemoved);
 }
 
 void QnMediaResourceWidget::createButtons()
@@ -2326,10 +2334,19 @@ QnMediaResourceWidget::SoftwareTrigger* QnMediaResourceWidget::createTriggerIfRe
         rule->eventParams().description,
         rule->isActionProlonged() });
 
-    const auto button = new QnSoftwareTriggerButton(this);
-    configureTriggerButton(button, info);
+    std::function<void()> clientsideHandler;
 
-    //TODO: #vkutin For now rule buttons are NOT sorted. Implement some sane sorting later.
+    if (rule->actionType() == QnBusiness::BookmarkAction
+        && !rule->actionParams().needConfirmation)
+    {
+        clientsideHandler =
+            [this] { action(action::BookmarksModeAction)->setChecked(true); };
+    }
+
+    const auto button = new QnSoftwareTriggerButton(this);
+    configureTriggerButton(button, info, clientsideHandler);
+
+    //TODO: #vkutin #3.1 For now rule buttons are NOT sorted. Implement sorting by UUID later.
     const auto overlayItemId = m_triggersContainer->insertItem(0, button);
 
     auto& trigger = m_softwareTriggers[rule->id()];
@@ -2354,7 +2371,7 @@ bool QnMediaResourceWidget::isRelevantTriggerRule(const QnBusinessEventRulePtr& 
 }
 
 void QnMediaResourceWidget::configureTriggerButton(QnSoftwareTriggerButton* button,
-    const SoftwareTriggerInfo& info)
+    const SoftwareTriggerInfo& info, std::function<void()> clientsideHandler)
 {
     NX_EXPECT(button);
 
@@ -2384,7 +2401,7 @@ void QnMediaResourceWidget::configureTriggerButton(QnSoftwareTriggerButton* butt
     if (info.prolonged)
     {
         connect(button, &QnSoftwareTriggerButton::pressed, this,
-            [this, button, resultHandler, id = info.triggerId]()
+            [this, button, resultHandler, clientsideHandler, id = info.triggerId]()
             {
                 if (!button->isLive())
                     return;
@@ -2395,6 +2412,9 @@ void QnMediaResourceWidget::configureTriggerButton(QnSoftwareTriggerButton* butt
                 button->setState(success
                     ? QnSoftwareTriggerButton::State::Waiting
                     : QnSoftwareTriggerButton::State::Failure);
+
+                if (success && clientsideHandler)
+                    clientsideHandler();
             });
 
         connect(button, &QnSoftwareTriggerButton::released, this,
@@ -2418,7 +2438,7 @@ void QnMediaResourceWidget::configureTriggerButton(QnSoftwareTriggerButton* butt
     else
     {
         connect(button, &QnSoftwareTriggerButton::clicked, this,
-            [this, button, resultHandler, id = info.triggerId]()
+            [this, button, resultHandler, clientsideHandler, id = info.triggerId]()
             {
                 if (!button->isLive())
                     return;
@@ -2430,17 +2450,33 @@ void QnMediaResourceWidget::configureTriggerButton(QnSoftwareTriggerButton* butt
                 button->setState(success
                     ? QnSoftwareTriggerButton::State::Waiting
                     : QnSoftwareTriggerButton::State::Failure);
+
+                if (success && clientsideHandler)
+                    clientsideHandler();
             });
     }
 
     // Go-to-live handler.
     connect(button, &QnSoftwareTriggerButton::clicked, this,
-        [this, button]()
+        [this, button, workbenchDisplay = QnWorkbenchContextAware::display()]()
         {
             if (button->isLive())
                 return;
 
-            action(action::JumpToLiveAction)->trigger();
+            const auto syncAction = action(action::ToggleSyncAction);
+            const bool sync = syncAction->isEnabled() && syncAction->isChecked();
+
+            if (sync || workbenchDisplay->widget(Qn::CentralRole) == this)
+            {
+                action(action::JumpToLiveAction)->trigger();
+            }
+            else if (auto reader = display()->archiveReader())
+            {
+                //TODO: Refactor workbench navigator to avoid switching to live in different places.
+                reader->jumpTo(DATETIME_NOW, 0);
+                reader->setSpeed(1.0);
+                reader->resumeMedia();
+            }
         });
 }
 

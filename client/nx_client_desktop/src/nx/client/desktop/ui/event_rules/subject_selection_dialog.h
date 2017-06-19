@@ -38,6 +38,9 @@ public:
     QSet<QnUuid> checkedSubjects() const;
 
 private:
+    void showAllUsersChanged(bool value);
+
+private:
     class UserListModel;
     class UserListDelegate;
 
@@ -45,6 +48,7 @@ private:
     QScopedPointer<Ui::SubjectSelectionDialog> ui;
     QnUserRolesModel* m_roles = nullptr;
     UserListModel* m_users = nullptr;
+    UserListDelegate* m_userListDelegate = nullptr;
 };
 
 } // namespace ui

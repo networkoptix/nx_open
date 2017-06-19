@@ -196,14 +196,13 @@ void CloudUserInfoPool::userInfoChanged(
     const nx::Buffer& intermediateResponse)
 {
     QnMutexLocker lock(&m_mutex);
+    updateUserNonceToResponse(userName, cloudNonce, intermediateResponse);
     if (updateNameToNonces(userName, cloudNonce)) //< Already has info for this user in pool
     {
-        NX_ASSERT(m_nonceToTs[cloudNonce] == timestamp);
-        NX_ASSERT(m_userNonceToResponse[detail::UserNonce(userName, cloudNonce)] == intermediateResponse);
+        //NX_ASSERT(m_nonceToTs[cloudNonce] == timestamp);
         return;
     }
     updateNonceToTs(cloudNonce, timestamp);
-    updateUserNonceToResponse(userName, cloudNonce, intermediateResponse);
     updateTsToNonceCount(timestamp, cloudNonce);
 }
 
@@ -226,7 +225,7 @@ void CloudUserInfoPool::updateNonceToTs(const nx::Buffer& cloudNonce, uint64_t t
     auto nonceResult = m_nonceToTs.emplace(cloudNonce, timestamp);
     if (!nonceResult.second)
     {
-        NX_ASSERT(m_nonceToTs[cloudNonce] == timestamp);
+        //NX_ASSERT(m_nonceToTs[cloudNonce] == timestamp);
     }
 }
 
@@ -235,7 +234,7 @@ void CloudUserInfoPool::updateUserNonceToResponse(
     const nx::Buffer& cloudNonce,
     const nx::Buffer& intermediateResponse)
 {
-    auto result = m_userNonceToResponse.emplace(detail::UserNonce(userName, cloudNonce), intermediateResponse);
+    m_userNonceToResponse[detail::UserNonce(userName, cloudNonce)] = intermediateResponse;
 }
 
 void CloudUserInfoPool::updateTsToNonceCount(uint64_t timestamp, const nx::Buffer& cloudNonce)

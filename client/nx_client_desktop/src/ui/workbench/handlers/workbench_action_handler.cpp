@@ -36,6 +36,7 @@
 #include <common/common_module.h>
 
 #include <core/resource_access/resource_access_filter.h>
+#include <core/resource_management/layout_tour_manager.h>
 
 #include <core/resource/resource.h>
 #include <core/resource/device_dependent_strings.h>
@@ -266,6 +267,8 @@ ActionHandler::ActionHandler(QObject *parent) :
 
     connect(action(action::OpenCurrentLayoutInNewWindowAction), SIGNAL(triggered()), this, SLOT(at_openCurrentLayoutInNewWindowAction_triggered()));
     connect(action(action::OpenNewWindowAction), SIGNAL(triggered()), this, SLOT(at_openNewWindowAction_triggered()));
+    connect(action(action::ReviewLayoutTourInNewWindowAction), &QAction::triggered, this,
+        &ActionHandler::at_reviewLayoutTourInNewWindowAction_triggered);
 
     connect(action(action::MediaFileSettingsAction), &QAction::triggered, this, &ActionHandler::at_mediaFileSettingsAction_triggered);
     connect(action(action::CameraIssuesAction), SIGNAL(triggered()), this, SLOT(at_cameraIssuesAction_triggered()));
@@ -549,10 +552,14 @@ void ActionHandler::submitDelayedDrops()
     QScopedValueRollback<bool> guard(m_delayedDropGuard, true);
 
     QnResourceList resources;
+    ec2::ApiLayoutTourDataList tours;
+
     for (const auto& data: m_delayedDrops)
     {
         const auto ids = data.getIds();
         resources.append(resourcePool()->getResources(ids));
+        for (const auto& tour: layoutTourManager()->tours(ids))
+            tours.push_back(tour);
 
         const auto urls = data.getUrls();
         resources.append(QnFileProcessor::createResourcesForFiles(
@@ -561,11 +568,14 @@ void ActionHandler::submitDelayedDrops()
 
     m_delayedDrops.clear();
 
-    if (resources.empty())
+    if (resources.empty() && tours.empty())
         return;
 
     workbench()->clear();
-    menu()->trigger(action::OpenInNewTabAction, resources);
+    if (!resources.empty())
+        menu()->trigger(action::OpenInNewTabAction, resources);
+    for (const auto& tour: tours)
+        menu()->trigger(action::ReviewLayoutTourAction, {Qn::UuidRole, tour.id});
 }
 
 // -------------------------------------------------------------------------- //
@@ -837,6 +847,17 @@ void ActionHandler::at_openCurrentLayoutInNewWindowAction_triggered()
 void ActionHandler::at_openNewWindowAction_triggered()
 {
     openNewWindow(QStringList());
+}
+
+void ActionHandler::at_reviewLayoutTourInNewWindowAction_triggered()
+{
+    // For now place method here until openNewWindow code would be shared.
+    const auto parameters = menu()->currentParameters(sender());
+    auto id = parameters.argument<QnUuid>(Qn::UuidRole);
+
+    MimeData data;
+    data.setIds({id});
+    openNewWindow({lit("--delayed-drop"), data.serialized()});
 }
 
 void ActionHandler::at_cameraListChecked(int status, const QnCameraListReply& reply, int handle)

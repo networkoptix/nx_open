@@ -14,6 +14,7 @@
 #include <ui/style/globals.h>
 #include <ui/style/skin.h>
 #include <ui/widgets/common/snapped_scrollbar.h>
+#include <utils/common/scoped_painter_rollback.h>
 #include <nx/utils/string.h>
 
 #include <nx/client/desktop/ui/common/column_remap_proxy_model.h>
@@ -41,11 +42,20 @@ public:
         ColumnCount
     };
 
-    UserListModel(QObject* parent = nullptr):
+    UserListModel(QnUserRolesModel* rolesModel, QObject* parent = nullptr):
         base_type(parent),
         QnCommonModuleAware(parent),
-        m_usersModel(new QnResourceListModel(this))
+        m_usersModel(new QnResourceListModel(this)),
+        m_rolesModel(rolesModel)
     {
+        NX_ASSERT(rolesModel);
+
+        connect(m_rolesModel, &QnUserRolesModel::modelReset,
+            this, &UserListModel::updateIndicators);
+
+        connect(m_rolesModel, &QnUserRolesModel::dataChanged,
+            this, &UserListModel::updateIndicators);
+
         m_usersModel->setHasCheckboxes(true);
         m_usersModel->setUserCheckable(true);
         m_usersModel->setResources(resourcePool()->getResources<QnUserResource>());
@@ -111,28 +121,6 @@ public:
 
             case Qt::DecorationRole:
             {
-                if (index.column() == NameColumn)
-                {
-                    return base_type::data(index, role);
-                    //TODO: #vkutin #3.1 Implement working coloring
-                    //if (isValid(index))
-                    //    return base_type::data(index, role);
-
-                    //static const QnIcon::SuffixesList uncheckedSuffixes {
-                    //    { QnIcon::Normal,   lit("") },
-                    //    { QnIcon::Selected, lit("") },
-                    //    { QnIcon::Disabled, lit("disabled") } };
-
-                    //static const QnIcon::SuffixesList checkedSuffixes {
-                    //    { QnIcon::Normal,   lit("error") },
-                    //    { QnIcon::Selected, lit("selected") },
-                    //    { QnIcon::Disabled, lit("disabled") } };
-
-                    //return isChecked(index)
-                    //    ? qnSkin->icon(lit("tree/user_alert.png"), QString(), &uncheckedSuffixes)
-                    //    : qnSkin->icon(lit("tree/user_alert.png"), QString(), &checkedSuffixes);
-                }
-
                 if (index.column() != IndicatorColumn)
                     return base_type::data(index, role);
 
@@ -141,11 +129,11 @@ public:
                     return QVariant();
 
                 const auto role = user->userRole();
-                const auto uuid = role == Qn::UserRole::CustomUserRole
+                const auto roleId = role == Qn::UserRole::CustomUserRole
                     ? user->userRoleId()
                     : QnUserRolesManager::predefinedRoleId(role);
 
-                return m_roleSelected.value(uuid)
+                return m_rolesModel->checkedRoles().contains(roleId)
                     ? QVariant(qnSkin->icon(lit("tree/users.png")))
                     : QVariant();
             }
@@ -163,14 +151,8 @@ public:
 
     bool isChecked(const QModelIndex& index) const
     {
-        const auto checkIndex = index.sibling(index.row(), CheckColumn);
+        const auto checkIndex = index.sibling(index.row(), UserListModel::CheckColumn);
         return checkIndex.data(Qt::CheckStateRole).toInt() == Qt::Checked;
-    }
-
-    void roleStateChanged(const QnUuid& roleId, bool selected)
-    {
-        //TODO: #vkutin #3.1 Refactor this, link to QnUserRolesModel
-        m_roleSelected[roleId] = selected;
     }
 
     QnUserResourcePtr user(int row) const
@@ -182,20 +164,57 @@ public:
     void setUserValidator(UserValidator userValidator)
     {
         m_userValidator = userValidator;
-
-        const int numUsers = rowCount();
-        if (numUsers)
-        {
-            emit dataChanged(
-                createIndex(0, 0),
-                createIndex(numUsers - 1, columnCount() - 1));
-        }
+        columnsChanged(0, columnCount() - 1);
     }
 
 private:
-    QHash<QnUuid, bool> m_roleSelected;
+    void columnsChanged(int firstColumn, int lastColumn, const QVector<int> roles = {})
+    {
+        const int lastRow = rowCount() - 1;
+        if (lastRow >= 0)
+            emit dataChanged(index(0, firstColumn), index(lastRow, lastColumn), roles);
+    }
+
+    void updateIndicators()
+    {
+        columnsChanged(IndicatorColumn, IndicatorColumn, { Qt::DecorationRole });
+    };
+
+private:
     QnResourceListModel* const m_usersModel;
+    QnUserRolesModel* const m_rolesModel;
     UserValidator m_userValidator;
+};
+
+class SubjectSelectionDialog::UserListDelegate: public QnResourceItemDelegate
+{
+    using base_type = QnResourceItemDelegate;
+
+public:
+    using base_type::base_type; //< Forward constructors.
+
+protected:
+    virtual void initStyleOption(QStyleOptionViewItem* option,
+        const QModelIndex& index) const override
+    {
+        base_type::initStyleOption(option, index);
+        if (index.data(Qn::ValidRole).toBool())
+            return;
+
+        if (index.column() == UserListModel::NameColumn)
+        {
+            const auto checkIndex = index.sibling(index.row(), UserListModel::CheckColumn);
+            const bool checked = checkIndex.data(Qt::CheckStateRole).toInt() == Qt::Checked;
+            const bool selected = option->state.testFlag(QStyle::State_Selected);
+
+            static const QnIcon::SuffixesList errorSuffixes {
+                { QnIcon::Selected, lit("error") },
+                { QnIcon::Active, lit("error") } };
+
+            option->icon = qnSkin->icon(lit("tree/user_alert.png"), QString(),
+                (selected || !checked) ? nullptr : &errorSuffixes);
+        }
+    }
 };
 
 SubjectSelectionDialog::SubjectSelectionDialog(QWidget* parent, Qt::WindowFlags windowFlags):
@@ -204,11 +223,10 @@ SubjectSelectionDialog::SubjectSelectionDialog(QWidget* parent, Qt::WindowFlags 
     m_roles(new QnUserRolesModel(this,
         QnUserRolesModel::StandardRoleFlag
       | QnUserRolesModel::UserRoleFlag)),
-    m_users(new UserListModel(this))
+    m_users(new UserListModel(m_roles, this)),
+    m_userListDelegate(new UserListDelegate(this))
 {
     ui->setupUi(this);
-
-    //TODO: #vkutin #3.1 Split this looooong constructor to a number of functions.
 
     m_roles->setCheckable(true);
     m_roles->setPredefinedRoleIdsEnabled(true);
@@ -219,25 +237,37 @@ SubjectSelectionDialog::SubjectSelectionDialog(QWidget* parent, Qt::WindowFlags 
     filterRoles->setSourceModel(m_roles);
     ui->rolesTreeView->setModel(filterRoles);
 
-    auto sortUsersModel = new NaturalStringSortProxyModel(this);
-    sortUsersModel->setSortCaseSensitivity(Qt::CaseInsensitive);
-    sortUsersModel->setSourceModel(m_users);
+    auto sortFilterUsers = new NaturalStringSortProxyModel(this);
+    sortFilterUsers->setSortCaseSensitivity(Qt::CaseInsensitive);
+    sortFilterUsers->setSourceModel(m_users);
 
-    ui->usersTreeView->setModel(sortUsersModel);
+    ui->usersTreeView->setModel(sortFilterUsers);
     ui->usersTreeView->sortByColumn(UserListModel::NameColumn, Qt::AscendingOrder);
 
     ui->rolesTreeView->setItemDelegate(new UserRoleSelectionDelegate(
         UserRoleSelectionDelegate::GetRoleStatus(), //TODO: #vkutin #3.1 Implement correct validation.
         this));
 
-    auto userNameDelegate = new QnResourceItemDelegate(this);
-    ui->usersTreeView->setItemDelegateForColumn(UserListModel::NameColumn, userNameDelegate);
+    ui->usersTreeView->setItemDelegate(m_userListDelegate);
 
     auto indicatorDelegate = new QnCustomizableItemDelegate(this);
     indicatorDelegate->setCustomSizeHint(
         [](const QStyleOptionViewItem& option, const QModelIndex& /*index*/)
         {
             return qnSkin->maximumSize(option.icon);
+        });
+
+    indicatorDelegate->setCustomPaint(
+        [](QPainter* painter, const QStyleOptionViewItem& option, const QModelIndex& /*index*/)
+        {
+            option.widget->style()->drawPrimitive(QStyle::PE_PanelItemViewItem,
+                &option, painter, option.widget);
+            QnScopedPainterOpacityRollback opacityRollback(painter);
+            const bool selected = option.state.testFlag(QStyle::State_Selected);
+            if (selected)
+                painter->setOpacity(painter->opacity() * style::Hints::kDisabledItemOpacity);
+            option.icon.paint(painter, option.rect, Qt::AlignCenter,
+                selected ? QIcon::Normal : QIcon::Disabled);
         });
 
     ui->usersTreeView->setItemDelegateForColumn(
@@ -265,80 +295,14 @@ SubjectSelectionDialog::SubjectSelectionDialog(QWidget* parent, Qt::WindowFlags 
     scrollBar->setUseMaximumSpace(true);
     ui->scrollArea->setVerticalScrollBar(scrollBar->proxyScrollBar());
 
-    const auto updateFilter =
-        [this, userNameDelegate](bool checked)
-        {
-            const auto acceptCustomUsers =
-                [this](int sourceRow, const QModelIndex& sourceParent) -> bool
-                {
-                    const auto index = m_users->sourceModel()->index(sourceRow, 0, sourceParent);
-                    const auto user = index.data(Qn::ResourceRole)
-                        .value<QnResourcePtr>().dynamicCast<QnUserResource>();
-                    return user && user->userRole() == Qn::UserRole::CustomPermissions;
-                };
-
-            m_users->setCustomFilterAcceptsRow(checked
-                ? UserListModel::AcceptPredicate()
-                : acceptCustomUsers);
-
-            ui->usersGroupBox->setTitle(checked
-                ? tr("Users")
-                : tr("Custom Users"));
-
-            userNameDelegate->setCustomInfoLevel(checked
-                ? Qn::RI_FullInfo
-                : Qn::RI_NameOnly);
-
-            // Reduce layout flicker:
-            ui->usersGroupBox->updateGeometry();
-            ui->mainWidget->updateGeometry();
-            updateGeometry();
-            layout()->activate();
-        };
-
-    connect(ui->showAllUsers, &QPushButton::toggled, this, updateFilter);
-    updateFilter(ui->showAllUsers->isChecked());
-
-    const auto rolesChanged =
-        [this](int first, int last)
-        {
-            for (int row = first; row <= last; ++row)
-            {
-                const auto index = m_roles->index(row, QnUserRolesModel::CheckColumn);
-                const auto roleId = index.data(Qn::UuidRole).value<QnUuid>();
-                const bool selected = index.data(Qt::CheckStateRole).toInt() == Qt::Checked;
-                m_users->roleStateChanged(roleId, selected);
-            }
-
-            const int numUsers = m_users->rowCount();
-            if (!numUsers)
-                return;
-
-            emit m_users->dataChanged(
-                m_users->index(0, 0),
-                m_users->index(numUsers - 1, UserListModel::ColumnCount - 1));
-        };
-
-    connect(m_roles, &QnUserRolesModel::modelReset, this,
-        [this, rolesChanged]() { rolesChanged(0, m_roles->rowCount() - 1); });
-
-    connect(m_roles, &QnUserRolesModel::dataChanged, this,
-        [this, rolesChanged](const QModelIndex& topLeft, const QModelIndex& bottomRight)
-        {
-            if (bottomRight.column() >= QnUserRolesModel::CheckColumn
-                && topLeft.column() <= QnUserRolesModel::CheckColumn
-                && m_users->rowCount())
-            {
-                rolesChanged(topLeft.row(), bottomRight.row());
-            }
-        });
-
-    rolesChanged(0, m_roles->rowCount() - 1);
+    showAllUsersChanged(ui->showAllUsers->isChecked());
+    connect(ui->showAllUsers, &QPushButton::toggled,
+        this, &SubjectSelectionDialog::showAllUsersChanged);
 
     const auto updateFilterText =
-        [this, sortUsersModel, filterRoles]()
+        [this, sortFilterUsers, filterRoles]()
         {
-            sortUsersModel->setFilterFixedString(ui->searchLineEdit->text());
+            sortFilterUsers->setFilterFixedString(ui->searchLineEdit->text());
             filterRoles->setFilterFixedString(ui->searchLineEdit->text());
         };
 
@@ -357,6 +321,36 @@ SubjectSelectionDialog::SubjectSelectionDialog(QWidget* parent, Qt::WindowFlags 
 
 SubjectSelectionDialog::~SubjectSelectionDialog()
 {
+}
+
+void SubjectSelectionDialog::showAllUsersChanged(bool value)
+{
+    const auto acceptCustomUsers =
+        [this](int sourceRow, const QModelIndex& sourceParent) -> bool
+        {
+            const auto index = m_users->sourceModel()->index(sourceRow, 0, sourceParent);
+            const auto user = index.data(Qn::ResourceRole)
+                .value<QnResourcePtr>().dynamicCast<QnUserResource>();
+            return user && user->userRole() == Qn::UserRole::CustomPermissions;
+        };
+
+    m_users->setCustomFilterAcceptsRow(value
+        ? UserListModel::AcceptPredicate()
+        : acceptCustomUsers);
+
+    ui->usersGroupBox->setTitle(value
+        ? tr("Users")
+        : tr("Custom Users"));
+
+    m_userListDelegate->setCustomInfoLevel(value
+        ? Qn::RI_FullInfo
+        : Qn::RI_NameOnly);
+
+    // Reduce layout flicker.
+    ui->usersGroupBox->updateGeometry();
+    ui->mainWidget->updateGeometry();
+    updateGeometry();
+    layout()->activate();
 }
 
 void SubjectSelectionDialog::setUserValidator(UserValidator userValidator)
