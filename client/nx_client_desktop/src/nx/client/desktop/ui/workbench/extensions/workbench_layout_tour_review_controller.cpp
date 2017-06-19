@@ -259,9 +259,13 @@ void LayoutTourReviewController::connectToLayout(QnWorkbenchLayout* layout)
 
     auto saveAction = action(action::SaveCurrentLayoutTourAction);
 
-    *m_connections << connect(layout, &QnWorkbenchLayout::itemAdded, saveAction, &QAction::trigger);
-    *m_connections << connect(layout, &QnWorkbenchLayout::itemsMoved, saveAction, &QAction::trigger);
-    *m_connections << connect(layout, &QnWorkbenchLayout::itemRemoved, saveAction, &QAction::trigger);
+    // Queued connection to call save after batch operation is complete.
+    *m_connections << connect(layout, &QnWorkbenchLayout::itemAdded, saveAction,
+        &QAction::trigger, Qt::QueuedConnection);
+    *m_connections << connect(layout, &QnWorkbenchLayout::itemsMoved, saveAction,
+        &QAction::trigger, Qt::QueuedConnection);
+    *m_connections << connect(layout, &QnWorkbenchLayout::itemRemoved, saveAction,
+        &QAction::trigger, Qt::QueuedConnection);
     *m_connections << connect(layout, &QnWorkbenchLayout::boundingRectChanged, this,
         &LayoutTourReviewController::updatePlaceholders);
 }
