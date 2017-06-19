@@ -70,12 +70,6 @@ bool VideoDecoderRegistry::hasCompatibleDecoder(
     // happen when a player is playing video and thus acquired one or more decoders. The check may
     // fail if we don't take into account that the player can reuse its decoders.
 
-    // TODO: This still not 100% correct. E.g., if a player already acquired a decoder which can
-    // be used only once, then this check will report true regardless of what the player is doing:
-    // switching the video quality or creating an additional decoder for multi-sensor camera.
-    // So far this isn't critical, because for such cameras the player uses ffmpeg decoder which
-    // doesn't have a count limit.
-
     std::unordered_map<std::type_index, int> decoderCountByTypeIndex;
     for (const auto& decoder: currentDecoders)
         ++decoderCountByTypeIndex[std::type_index(typeid(*decoder))];
