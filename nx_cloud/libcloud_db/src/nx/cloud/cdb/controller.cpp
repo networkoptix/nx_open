@@ -112,7 +112,7 @@ void Controller::performDataMigrations()
 {
     using namespace std::placeholders;
 
-    NX_INFO(this, lm("Performing data migations..."));
+    NX_INFO(this, lm("Performing data migrations..."));
 
     try
     {
@@ -124,7 +124,7 @@ void Controller::performDataMigrations()
     }
     catch (const std::exception e)
     {
-        NX_ERROR(this, lm("Failed to do data migations. %1").arg(e.what()));
+        NX_ERROR(this, lm("Failed to do data migrations. %1").arg(e.what()));
     }
 }
 
