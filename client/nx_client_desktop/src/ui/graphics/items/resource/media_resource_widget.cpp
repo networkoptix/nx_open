@@ -2458,7 +2458,7 @@ void QnMediaResourceWidget::configureTriggerButton(QnSoftwareTriggerButton* butt
 
     // Go-to-live handler.
     connect(button, &QnSoftwareTriggerButton::clicked, this,
-        [this, workbenchDisplay = QnWorkbenchContextAware::display(), button]()
+        [this, button, workbenchDisplay = QnWorkbenchContextAware::display()]()
         {
             if (button->isLive())
                 return;
