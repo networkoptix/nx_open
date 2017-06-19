@@ -38,7 +38,14 @@ QnAutoRequestForwarder::QnAutoRequestForwarder(QnCommonModule* commonModule):
 
 void QnAutoRequestForwarder::processRequest(nx_http::Request* const request)
 {
-    NX_VERBOSE(this) lm("Request URL: [%1]").arg(request->requestLine.url);
+    // Help decluttering logs of /api/moduleInformation when debugging this class.
+    if (ini().ignoreApiModuleInformationInAutoRequestForwarder
+        && request->requestLine.url.path().startsWith("/api/moduleInformation"))
+    {
+        return;
+    }
+
+    NX_VERBOSE(this) lm("Request: [%1]").arg(request->requestLine);
 
     if (isPathIgnored(request))
         return;
@@ -263,8 +270,9 @@ bool QnAutoRequestForwarder::findCameraInUrlPath(
     const QString path = request.requestLine.url.path();
     const int lastSlashPos = path.lastIndexOf('/');
 
+    const QString scheme = request.requestLine.version.protocol.toLower();
     bool found = false;
-    for (const auto& pathPart: m_allowedPathPartByScheme.values(request.requestLine.url.scheme()))
+    for (const auto& pathPart: m_allowedPathPartByScheme.values(scheme))
     {
         if (pathPart != lit("*"))
         {
