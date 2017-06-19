@@ -183,12 +183,6 @@ void CloudConnectionManager::processCloudErrorCode(
 bool CloudConnectionManager::detachSystemFromCloud()
 {
     qnGlobalSettings->resetCloudParams();
-    return qnGlobalSettings->synchronizeNowSync();
-}
-
-bool CloudConnectionManager::resetCloudData()
-{
-    qnGlobalSettings->resetCloudParams();
 
     if (!qnGlobalSettings->synchronizeNowSync())
     {
@@ -235,7 +229,7 @@ bool CloudConnectionManager::makeSystemLocal()
         }
     }
 
-    return resetCloudData();
+    return detachSystemFromCloud();
 }
 
 void CloudConnectionManager::cloudSettingsChanged()

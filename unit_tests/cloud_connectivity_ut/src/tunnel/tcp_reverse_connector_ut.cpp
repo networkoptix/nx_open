@@ -88,7 +88,9 @@ TEST(TcpReverseConnector, General)
             buffer->reserve(100);
             ASSERT_EQ(SystemError::noError, code);
             ASSERT_EQ(boost::make_optional<size_t>(5), connector->getPoolSize());
-            ASSERT_EQ(KeepAliveOptions(1, 2, 3), connector->getKeepAliveOptions());
+            ASSERT_EQ(
+                KeepAliveOptions(std::chrono::seconds(1), std::chrono::seconds(2), 3),
+                connector->getKeepAliveOptions());
 
             std::shared_ptr<AbstractStreamSocket> socket(connector->takeSocket());
             auto socketRaw = socket.get();

@@ -37,6 +37,18 @@ SocketAddress StreamSocketStub::getForeignAddress() const
     return m_foreignAddress;
 }
 
+bool StreamSocketStub::setKeepAlive(boost::optional<KeepAliveOptions> info)
+{
+    m_keepAliveOptions = info;
+    return true;
+}
+
+bool StreamSocketStub::getKeepAlive(boost::optional<KeepAliveOptions>* result) const
+{
+    *result = m_keepAliveOptions;
+    return true;
+}
+
 QByteArray StreamSocketStub::read()
 {
     while (m_reflectingPipeline.totalBytesThrough() == 0)

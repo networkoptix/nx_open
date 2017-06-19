@@ -48,9 +48,22 @@ api::SystemData BasePersistentDataTest::insertRandomSystem(const api::AccountDat
     using namespace std::placeholders;
 
     auto system = cdb::test::BusinessDataGenerator::generateRandomSystem(account);
-    const auto dbResult = executeUpdateQuerySync(
+
+    auto dbResult = executeUpdateQuerySync(
         std::bind(&SystemDataObject::insert, &m_systemDbController,
             _1, system, account.id));
+    NX_GTEST_ASSERT_EQ(nx::db::DBResult::ok, dbResult);
+
+    api::SystemSharingEx sharing;
+    sharing.systemId = system.id;
+    sharing.accountId = account.id;
+    sharing.accessRole = api::SystemAccessRole::owner;
+    sharing.isEnabled = true;
+    sharing.vmsUserId = guidFromArbitraryData(account.email).toSimpleByteArray().toStdString();
+    dbResult = executeUpdateQuerySync(
+        std::bind(&SystemSharingDataObject::insertOrReplaceSharing, &m_systemSharingController,
+            _1, sharing));
+
     NX_GTEST_ASSERT_EQ(nx::db::DBResult::ok, dbResult);
     m_systems.push_back(system);
     return system;

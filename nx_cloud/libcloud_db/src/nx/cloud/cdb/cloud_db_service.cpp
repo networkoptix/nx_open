@@ -117,10 +117,7 @@ int CloudDbService::serviceMain(const utils::AbstractServiceSettings& abstractSe
         EMailManagerFactory::create(settings));
     m_emailManager = emailManager.get();
 
-    CdbAttrNameSet cdbAttrNameSet;
-    StreeManager streeManager(
-        cdbAttrNameSet,
-        settings.auth().rulesXmlPath);
+    StreeManager streeManager(settings.auth().rulesXmlPath);
     m_streeManager = &streeManager;
 
     nx_http::MessageDispatcher httpMessageDispatcher;
@@ -191,7 +188,7 @@ int CloudDbService::serviceMain(const utils::AbstractServiceSettings& abstractSe
 
     AuthenticationProvider authProvider(
         settings,
-        accountManager,
+        &accountManager,
         &systemManager,
         tempPasswordManager,
         &vmsP2pCommandBus);

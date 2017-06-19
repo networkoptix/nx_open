@@ -93,11 +93,9 @@ nx::Buffer CdbNonceFetcher::generateNonceTrailer()
 
 QByteArray CdbNonceFetcher::generateNonce()
 {
-#ifdef ENABLE_CLOUD_USER_OFFLINE_LOGIN
     auto cloudPreviouslyProvidedNonce = m_cloudUserInfoPool.newestMostCommonNonce();
     if (cloudPreviouslyProvidedNonce)
         return *cloudPreviouslyProvidedNonce + generateNonceTrailer();
-#endif
 
     if (!m_cloudConnectionManager->boundToCloud())
         return m_defaultGenerator->generateNonce();
@@ -131,8 +129,13 @@ QByteArray CdbNonceFetcher::generateNonce()
 
 bool CdbNonceFetcher::isNonceValid(const QByteArray& nonce) const
 {
+    NX_VERBOSE(this, lm("Verifying nonce %1").arg(nonce));
     if (isValidCloudNonce(nonce))
+    {
+        NX_VERBOSE(this, lm("Nonce %1 is a valid cloud nonce").arg(nonce));
         return true;
+    }
+    NX_VERBOSE(this, lm("Passing nonce %1 verification to a default verificator").arg(nonce));
     return m_defaultGenerator->isNonceValid(nonce);
 }
 

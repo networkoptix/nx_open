@@ -103,7 +103,11 @@ TargetHost ProxyHandler::cutTargetFromRequest(
     {
         // No cloud address means direct IP.
         if (!m_settings.cloudConnect().allowIpTarget)
+        {
+            NX_DEBUG(this, lm("It is forbidden by settings to proxy to non-cloud address (%1)")
+                .arg(m_targetHost.target));
             return {nx_http::StatusCode::forbidden};
+        }
 
         if (m_targetHost.target.port == 0)
             m_targetHost.target.port = m_settings.http().proxyTargetPort;
@@ -117,7 +121,7 @@ TargetHost ProxyHandler::cutTargetFromRequest(
 
     if (m_targetHost.sslMode == conf::SslMode::enabled && !m_settings.http().sslSupport)
     {
-        NX_DEBUG(this, lm("SSL requestd but forbidden by settings %1")
+        NX_DEBUG(this, lm("SSL requested but forbidden by settings. Originator endpoint: %1")
             .arg(connection.socket()->getForeignAddress()));
 
         return {nx_http::StatusCode::forbidden};
@@ -129,7 +133,11 @@ TargetHost ProxyHandler::cutTargetFromRequest(
 TargetHost ProxyHandler::cutTargetFromUrl(nx_http::Request* const request)
 {
     if (!m_settings.http().allowTargetEndpointInUrl)
+    {
+        NX_DEBUG(this, lm("It is forbidden by settings to specify target in url (%1)")
+            .arg(request->requestLine.url));
         return {nx_http::StatusCode::forbidden};
+    }
 
     // Using original url path.
     auto targetEndpoint = SocketAddress(
