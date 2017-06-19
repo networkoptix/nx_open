@@ -55,6 +55,7 @@ private:
     void updateOrder();
     void updateButtons(const QnLayoutResourcePtr& layout);
     void updatePlaceholders();
+    void updateItemsLayout();
 
     void resetReviewLayout(const QnLayoutResourcePtr& layout,
         const ec2::ApiLayoutTourItemDataList& items);
@@ -62,7 +63,8 @@ private:
     void addItemToReviewLayout(
         const QnLayoutResourcePtr& layout,
         const ec2::ApiLayoutTourItemData& item,
-        const QPointF& position);
+        const QPointF& position,
+        bool pinItem);
     void addResourcesToReviewLayout(
         const QnLayoutResourcePtr& layout,
         const QnResourceList& resources,
