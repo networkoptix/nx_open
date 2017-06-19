@@ -242,18 +242,31 @@ QList<QAction*> AspectRatioFactory::newActions(const Parameters& /*parameters*/,
     return actionGroup->actions();
 }
 
-CurrentLayoutTourSettingsFactory::CurrentLayoutTourSettingsFactory(QObject* parent):
+LayoutTourSettingsFactory::LayoutTourSettingsFactory(QObject* parent):
     Factory(parent)
 {
 }
 
 
-QList<QAction*> CurrentLayoutTourSettingsFactory::newActions(const Parameters& /*parameters*/,
+QList<QAction*> LayoutTourSettingsFactory::newActions(const Parameters& parameters,
     QObject* parent)
 {
-    const auto isManual = workbench()->currentLayout()->data(Qn::LayoutTourIsManualRole).toBool();
     auto actionGroup = new QActionGroup(parent);
     actionGroup->setExclusive(true);
+
+    auto id = parameters.argument<QnUuid>(Qn::UuidRole);
+    const bool isCurrentTour = id.isNull();
+    NX_EXPECT(!isCurrentTour || workbench()->currentLayout()->isLayoutTourReview());
+
+    if (isCurrentTour)
+        id = workbench()->currentLayout()->data(Qn::LayoutTourUuidRole).value<QnUuid>();
+
+    const auto tour = layoutTourManager()->tour(id);
+    NX_EXPECT(tour.isValid());
+    if (!tour.isValid())
+        return actionGroup->actions();
+
+    const auto isManual = tour.settings.manual;
     for (auto manual: {false, true})
     {
         auto action = new QAction(parent);
@@ -263,10 +276,16 @@ QList<QAction*> CurrentLayoutTourSettingsFactory::newActions(const Parameters& /
         action->setCheckable(true);
         action->setChecked(manual == isManual);
         connect(action, &QAction::triggered, this,
-            [this, manual]
+            [this, id, manual]
             {
-                workbench()->currentLayout()->setData(Qn::LayoutTourIsManualRole, manual);
-                menu()->trigger(action::SaveCurrentLayoutTourAction);
+                auto tour = layoutTourManager()->tour(id);
+                NX_EXPECT(tour.isValid());
+                if (!tour.isValid())
+                    return;
+
+                tour.settings.manual = manual;
+                layoutTourManager()->addOrUpdateTour(tour);
+                menu()->trigger(action::SaveLayoutTourAction, {Qn::UuidRole, id});
             });
         actionGroup->addAction(action);
     }

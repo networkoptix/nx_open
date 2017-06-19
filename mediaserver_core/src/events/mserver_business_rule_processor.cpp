@@ -487,30 +487,16 @@ bool QnMServerBusinessRuleProcessor::executeRecordingAction(const QnRecordingBus
 bool QnMServerBusinessRuleProcessor::executeBookmarkAction(
     const QnAbstractBusinessActionPtr &action)
 {
-    NX_ASSERT(action);
-    const auto camera = resourcePool()->getResourceById<QnSecurityCamResource>(
-        action->getParams().actionResourceId);
-    if (!camera)
+    const auto cameraId = action
+        ? action->getParams().actionResourceId
+        : QnUuid();
+
+    const auto camera = resourcePool()->getResourceById<QnSecurityCamResource>(cameraId);
+    if (!camera || !fixActionTimeFields(action))
         return false;
 
-    const auto key = action->getExternalUniqKey();
-    auto runningKey = guidFromArbitraryData(key);
-    if (action->getParams().durationMs <= 0)
-    {
-        if (action->getToggleState() == QnBusiness::ActiveState)
-        {
-            m_runningBookmarkActions[runningKey] = action->getRuntimeParams().eventTimestampUsec;
-            return true;
-        }
-
-        if (!m_runningBookmarkActions.contains(runningKey))
-            return false;
-
-        action->getRuntimeParams().eventTimestampUsec =
-            m_runningBookmarkActions.take(runningKey);
-    }
-
-    return qnServerDb->addBookmark(helpers::bookmarkFromAction(action, camera, commonModule()));
+    const auto bookmark = helpers::bookmarkFromAction(action, camera, commonModule());
+    return qnServerDb->addBookmark(bookmark);
 }
 
 
@@ -1012,11 +998,15 @@ void QnMServerBusinessRuleProcessor::updateRecipientsList(
     QStringList additional = action->getParams().emailAddress.split(kOldEmailDelimiter,
         QString::SkipEmptyParts);
 
+    QList<QnUuid> userRoles;
+    QnUserResourceList users;
+    userRolesManager()->usersAndRoles(action->getResources(), users, userRoles);
+
     QStringList recipients;
     auto addRecipient = [&recipients](const QString& email)
         {
             const QString simplified = email.trimmed().toLower();
-            if (simplified.isEmpty()) //fast check
+            if (simplified.isEmpty())
                 return;
 
             QnEmailAddress address(simplified);
@@ -1027,30 +1017,21 @@ void QnMServerBusinessRuleProcessor::updateRecipientsList(
     for (const auto& email: additional)
         addRecipient(email);
 
-    const auto subjects = action->getResources().toList().toSet();
-
-    //TODO: #vkutin Optimize?
-    for (const auto& user: resourcePool()->getResources<QnUserResource>())
+    for (const auto& user: users)
     {
-        if (!user->isEnabled())
-            continue;
+        if (user->isEnabled())
+            addRecipient(user->getEmail());
+    }
 
-        if (subjects.contains(user->getId()))
+    for (const auto& userRole: userRoles)
+    {
+        for (const auto& subject: resourceAccessSubjectsCache()->usersInRole(userRole))
         {
-            addRecipient(user->getEmail());
-            continue;
+            const auto& user = subject.user();
+            NX_ASSERT(user);
+            if (user && user->isEnabled())
+                addRecipient(user->getEmail());
         }
-
-        const auto role = user->userRole();
-        if (role == Qn::UserRole::CustomPermissions)
-            continue;
-
-        const auto roleId = role == Qn::UserRole::CustomUserRole
-            ? user->userRoleId()
-            : QnUserRolesManager::predefinedRoleId(role);
-
-        if (subjects.contains(roleId))
-            addRecipient(user->getEmail());
     }
 
     recipients.removeDuplicates();

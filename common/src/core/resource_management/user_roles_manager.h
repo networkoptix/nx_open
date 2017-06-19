@@ -59,6 +59,9 @@ public:
     // Returns human-readable name of specified user role.
     static QString userRoleName(Qn::UserRole userRole);
 
+    // Returns human-readable name of specified user role.
+    QString userRoleName(const QnUuid& userRoleId);
+
     // Returns human-readable name of user role of specified user.
     QString userRoleName(const QnUserResourcePtr& user) const;
 

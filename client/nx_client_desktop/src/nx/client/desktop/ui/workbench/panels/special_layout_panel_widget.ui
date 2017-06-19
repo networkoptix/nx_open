@@ -7,10 +7,13 @@
     <x>0</x>
     <y>0</y>
     <width>818</width>
-    <height>111</height>
+    <height>78</height>
    </rect>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout_2" stretch="1,0,0">
+   <property name="bottomMargin">
+    <number>0</number>
+   </property>
    <item>
     <layout class="QHBoxLayout" name="buttonsLayout">
      <item>

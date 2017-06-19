@@ -338,7 +338,7 @@ signals:
      */
     void itemAdded(QnWorkbenchItem* item);
 
-    void itemMoved(QnWorkbenchItem* item);
+    void itemsMoved(QList<QnWorkbenchItem*> items);
 
     void zoomLinkAdded(QnWorkbenchItem* item, QnWorkbenchItem* zoomTargetItem);
     void zoomLinkRemoved(QnWorkbenchItem* item, QnWorkbenchItem* zoomTargetItem);
