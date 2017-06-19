@@ -2465,10 +2465,10 @@ void QnMediaResourceWidget::configureTriggerButton(QnSoftwareTriggerButton* butt
             {
                 action(action::JumpToLiveAction)->trigger();
             }
-            else
+            else if (auto reader = display()->archiveReader())
             {
-                display()->archiveReader()->jumpTo(DATETIME_NOW, 0);
-                display()->archiveReader()->resumeMedia();
+                reader->jumpTo(DATETIME_NOW, 0);
+                reader->resumeMedia();
             }
         });
 }
