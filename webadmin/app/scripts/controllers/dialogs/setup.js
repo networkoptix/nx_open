@@ -5,7 +5,9 @@ angular.module('webadminApp')
         // Preload content into cache
         $http.get(Config.viewsDir + 'dialogs/setup-inline.html', {cache: $templateCache});
     }])
-    .controller('SetupCtrl', function ($scope, mediaserver, cloudAPI, $location, $timeout, $log, $q, nativeClient, $poll) {
+    .controller('SetupCtrl', ['$scope', 'mediaserver', 'cloudAPI', '$location',
+                              '$timeout', '$log', '$q', 'nativeClient', '$poll',
+    function ($scope, mediaserver, cloudAPI, $location, $timeout, $log, $q, nativeClient, $poll) {
         $log.log("Initiate setup wizard (all scripts were loaded and angular started)");
         $scope.Config = Config;
 
@@ -946,4 +948,4 @@ angular.module('webadminApp')
             $log.log("check client Lite:" + result.lite);
             return getCredentialsFromClient();
         }).finally(initWizard);
-    });
+    }]);

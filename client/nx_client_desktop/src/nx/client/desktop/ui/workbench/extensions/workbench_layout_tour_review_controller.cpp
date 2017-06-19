@@ -132,6 +132,8 @@ void LayoutTourReviewController::handleTourRemoved(const QnUuid& tourId)
         {
             wbLayout->deleteLater();
             workbench()->removeLayout(wbLayout);
+            if (workbench()->layouts().empty())
+                menu()->trigger(action::OpenNewTabAction);
         }
     }
 }

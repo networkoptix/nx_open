@@ -5,8 +5,6 @@
 #include <nx/utils/std/cpp14.h>
 #include <nx/utils/time.h>
 
-#include <utils/db/test_support/test_with_db_helper.h>
-
 #include <nx/cloud/cdb/api/cloud_nonce.h>
 
 #include <nx/cloud/cdb/dao/user_authentication_data_object_factory.h>
@@ -44,7 +42,7 @@ public:
 
         m_authenticationProvider = std::make_unique<cdb::AuthenticationProvider>(
             m_settings,
-            m_accountManager,
+            &m_accountManager,
             &m_systemSharingManager,
             m_temporaryAccountPasswordManager,
             &m_vmsP2pCommandBusStub);

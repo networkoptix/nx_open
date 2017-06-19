@@ -79,6 +79,10 @@ public:
 
 	QString getResoureIPFromParams(const QnBusinessEventParameters& params) const;
 
+    QString actionSubjects(const QnBusinessEventRulePtr& rule, bool noSingleName = false) const;
+    QString actionSubjects(const QnUserResourceList& users, const QList<QnUuid>& roles,
+        bool noSingleName = false) const;
+
     static QString defaultSoftwareTriggerName();
     static QString getSoftwareTriggerName(const QString& id);
     static QString getSoftwareTriggerName(const QnBusinessEventParameters& params);

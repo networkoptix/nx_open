@@ -13,6 +13,8 @@ class AccountManagerStub:
 public:
     virtual boost::optional<data::AccountData> findAccountByUserName(
         const std::string& userName) const override;
+    virtual void addExtension(AbstractAccountManagerExtension*) override;
+    virtual void removeExtension(AbstractAccountManagerExtension*) override;
 
     void addAccount(AccountWithPassword account);
 

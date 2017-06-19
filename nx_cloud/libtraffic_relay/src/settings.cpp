@@ -14,44 +14,53 @@ namespace conf {
 
 namespace {
 
-const QLatin1String kDataDir("dataDir");
+static const QLatin1String kDataDir("dataDir");
 
 //-------------------------------------------------------------------------------------------------
 // Http
 
-const QLatin1String kHttpEndpointsToListen("http/listenOn");
-const QLatin1String kDefaultHttpEndpointsToListen("0.0.0.0:3349");
+static const QLatin1String kHttpEndpointsToListen("http/listenOn");
+static const QLatin1String kDefaultHttpEndpointsToListen("0.0.0.0:3349");
 
-const QLatin1String kHttpTcpBacklogSize("http/tcpBacklogSize");
-constexpr int kDefaultHttpTcpBacklogSize = 4096;
+static const QLatin1String kHttpTcpBacklogSize("http/tcpBacklogSize");
+static constexpr int kDefaultHttpTcpBacklogSize = 4096;
 
 //-------------------------------------------------------------------------------------------------
 // ListeningPeer
 
-const QLatin1String kRecommendedPreemptiveConnectionCount(
+static const QLatin1String kRecommendedPreemptiveConnectionCount(
     "listeningPeer/recommendedPreemptiveConnectionCount");
 constexpr int kDefaultRecommendedPreemptiveConnectionCount = 7;
 
-const QLatin1String kMaxPreemptiveConnectionCount(
+static const QLatin1String kMaxPreemptiveConnectionCount(
     "listeningPeer/maxPreemptiveConnectionCount");
 constexpr int kDefaultMaxPreemptiveConnectionCount = 
     kDefaultRecommendedPreemptiveConnectionCount * 2;
 
-const QLatin1String kDisconnectedPeerTimeout("listeningPeer/disconnectedPeerTimeout");
+static const QLatin1String kDisconnectedPeerTimeout("listeningPeer/disconnectedPeerTimeout");
 static std::chrono::milliseconds kDefaultDisconnectedPeerTimeout = std::chrono::seconds(15);
 
-const QLatin1String kTakeIdleConnectionTimeout("listeningPeer/takeIdleConnectionTimeout");
+static const QLatin1String kTakeIdleConnectionTimeout("listeningPeer/takeIdleConnectionTimeout");
 static std::chrono::milliseconds kDefaultTakeIdleConnectionTimeout = std::chrono::seconds(5);
 
-const QLatin1String kInternalTimerPeriod("listeningPeer/internalTimerPeriod");
+static const QLatin1String kInternalTimerPeriod("listeningPeer/internalTimerPeriod");
 static std::chrono::milliseconds kDefaultInternalTimerPeriod = std::chrono::seconds(1);
+
+static const QLatin1String kInactivityPeriodBeforeFirstProbe("listeningPeer/tcpInactivityPeriodBeforeFirstProbe");
+static const std::chrono::seconds kDefaultInactivityPeriodBeforeFirstProbe(30);
+
+static const QLatin1String kProbeSendPeriod("listeningPeer/tcpProbeSendPeriod");
+static const std::chrono::seconds kDefaultProbeSendPeriod(30);
+
+static const QLatin1String kProbeCount("listeningPeer/tcpProbeCount");
+static const int kDefaultProbeCount(2);
 
 //-------------------------------------------------------------------------------------------------
 // ConnectingPeer
 
-const QLatin1String kConnectSessionIdleTimeout(
+static const QLatin1String kConnectSessionIdleTimeout(
     "connectingPeer/connectSessionIdleTimeout");
-constexpr std::chrono::seconds kDefaultConnectSessionIdleTimeout = 
+static constexpr std::chrono::seconds kDefaultConnectSessionIdleTimeout =
     std::chrono::minutes(10);
 
 } // namespace
@@ -71,7 +80,8 @@ ListeningPeer::ListeningPeer():
     maxPreemptiveConnectionCount(kDefaultMaxPreemptiveConnectionCount),
     disconnectedPeerTimeout(kDefaultDisconnectedPeerTimeout),
     takeIdleConnectionTimeout(kDefaultTakeIdleConnectionTimeout),
-    internalTimerPeriod(kDefaultInternalTimerPeriod)
+    internalTimerPeriod(kDefaultInternalTimerPeriod),
+    tcpKeepAlive()
 {
 }
 
@@ -158,6 +168,8 @@ void Settings::loadHttp()
 
 void Settings::loadListeningPeer()
 {
+    using namespace std::chrono;
+
     m_listeningPeer.recommendedPreemptiveConnectionCount = settings().value(
         kRecommendedPreemptiveConnectionCount,
         kDefaultRecommendedPreemptiveConnectionCount).toInt();
@@ -180,6 +192,20 @@ void Settings::loadListeningPeer()
         nx::utils::parseTimerDuration(
             settings().value(kInternalTimerPeriod).toString(),
             kDefaultInternalTimerPeriod);
+
+    m_listeningPeer.tcpKeepAlive.inactivityPeriodBeforeFirstProbe = duration_cast<seconds>(
+        nx::utils::parseTimerDuration(
+            settings().value(kInactivityPeriodBeforeFirstProbe).toString(),
+            kDefaultInactivityPeriodBeforeFirstProbe));
+
+    m_listeningPeer.tcpKeepAlive.probeSendPeriod = duration_cast<seconds>(
+        nx::utils::parseTimerDuration(
+            settings().value(kProbeSendPeriod).toString(),
+            kDefaultProbeSendPeriod));
+
+    m_listeningPeer.tcpKeepAlive.probeCount = settings().value(
+        kProbeCount,
+        kDefaultProbeCount).toInt();
 }
 
 void Settings::loadConnectingPeer()

@@ -5,6 +5,7 @@
 
 #include <client_core/client_core_settings.h>
 
+#include <nx/core/access/access_types.h>
 #include <core/ptz/client_ptz_controller_pool.h>
 #include <core/resource_management/resources_changes_manager.h>
 
@@ -22,7 +23,7 @@ QnClientCoreModule::QnClientCoreModule(QObject* parent):
 {
     Q_INIT_RESOURCE(appserver2);
 
-    m_commonModule = new QnCommonModule(true, this);
+    m_commonModule = new QnCommonModule(true, nx::core::access::Mode::cached, this);
 
     commonModule()->store(new QnClientCoreSettings());
     commonModule()->store(new QnFfmpegInitializer());

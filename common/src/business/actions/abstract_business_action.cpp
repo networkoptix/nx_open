@@ -183,6 +183,11 @@ QnAbstractBusinessAction::QnAbstractBusinessAction(const QnBusiness::ActionType 
 QnAbstractBusinessAction::~QnAbstractBusinessAction()
 {}
 
+void QnAbstractBusinessAction::setActionType(QnBusiness::ActionType actionType)
+{
+    m_actionType = actionType;
+}
+
 QnBusiness::ActionType QnAbstractBusinessAction::actionType() const
 {
     return m_actionType;
@@ -229,7 +234,7 @@ void QnAbstractBusinessAction::setRuntimeParams(const QnBusinessEventParameters&
     m_runtimeParams = params;
 }
 
-const QnBusinessEventParameters& QnAbstractBusinessAction::getRuntimeParams() const
+QnBusinessEventParameters& QnAbstractBusinessAction::getRuntimeParams()
 {
     return m_runtimeParams;
 }

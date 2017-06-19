@@ -2197,7 +2197,11 @@ void QnMediaResourceWidget::updateCompositeOverlayMode()
     const bool animate = m_compositeOverlay->scene() != nullptr;
     setOverlayWidgetVisible(m_compositeOverlay, visible, animate);
 
-    m_triggersContainer->setEnabled(isLive);
+    for (int i = 0; i < m_triggersContainer->count(); ++i)
+    {
+        if (auto button = qobject_cast<QnSoftwareTriggerButton*>(m_triggersContainer->item(i)))
+            button->setLive(isLive);
+    }
 }
 
 qint64 QnMediaResourceWidget::getUtcCurrentTimeUsec() const
@@ -2382,6 +2386,9 @@ void QnMediaResourceWidget::configureTriggerButton(QnSoftwareTriggerButton* butt
         connect(button, &QnSoftwareTriggerButton::pressed, this,
             [this, button, resultHandler, id = info.triggerId]()
             {
+                if (!button->isLive())
+                    return;
+
                 const auto requestId = invokeTrigger(id, resultHandler, QnBusiness::ActiveState);
                 const bool success = requestId != rest::Handle();
                 button->setProperty(kTriggerRequestIdProperty, requestId);
@@ -2393,6 +2400,9 @@ void QnMediaResourceWidget::configureTriggerButton(QnSoftwareTriggerButton* butt
         connect(button, &QnSoftwareTriggerButton::released, this,
             [this, button, resultHandler, id = info.triggerId]()
             {
+                if (!button->isLive())
+                    return;
+
                 /* In case of activation error don't try to deactivate: */
                 if (button->state() == QnSoftwareTriggerButton::State::Failure)
                     return;
@@ -2410,6 +2420,9 @@ void QnMediaResourceWidget::configureTriggerButton(QnSoftwareTriggerButton* butt
         connect(button, &QnSoftwareTriggerButton::clicked, this,
             [this, button, resultHandler, id = info.triggerId]()
             {
+                if (!button->isLive())
+                    return;
+
                 const auto requestId = invokeTrigger(id, resultHandler);
                 const bool success = requestId != rest::Handle();
                 button->setProperty(kTriggerRequestIdProperty, requestId);
@@ -2419,6 +2432,16 @@ void QnMediaResourceWidget::configureTriggerButton(QnSoftwareTriggerButton* butt
                     : QnSoftwareTriggerButton::State::Failure);
             });
     }
+
+    // Go-to-live handler.
+    connect(button, &QnSoftwareTriggerButton::clicked, this,
+        [this, button]()
+        {
+            if (button->isLive())
+                return;
+
+            action(action::JumpToLiveAction)->trigger();
+        });
 }
 
 void QnMediaResourceWidget::resetTriggers()

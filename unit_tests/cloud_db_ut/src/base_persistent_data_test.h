@@ -2,7 +2,7 @@
 
 #include <type_traits>
 
-#include <nx/cloud/cdb/dao/rdb/account_data_object.h>
+#include <nx/cloud/cdb/dao/rdb/rdb_account_data_object.h>
 #include <nx/cloud/cdb/dao/rdb/db_instance_controller.h>
 #include <nx/cloud/cdb/dao/rdb/system_data_object.h>
 #include <nx/cloud/cdb/dao/rdb/system_sharing_data_object.h>

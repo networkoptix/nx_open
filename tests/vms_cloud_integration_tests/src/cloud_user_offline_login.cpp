@@ -4,6 +4,8 @@
 #include <gtest/gtest.h>
 
 #include <nx/cloud/cdb/client/data/auth_data.h>
+#include <nx/network/app_info.h>
+#include <nx/network/http/auth_tools.h>
 
 #include "mediaserver_cloud_integration_test_setup.h"
 
@@ -29,6 +31,11 @@ class CloudUserOfflineLogin:
     public ::testing::Test
 {
 protected:
+    void givenUserInvitedFromDesktopClient()
+    {
+        m_invitedUserEc2Data = inviteRandomCloudUser();
+    }
+
     void whenCloudUserPasswordHasBeenChanged()
     {
         changeCloudOwnerAccountPassword();
@@ -55,6 +62,8 @@ protected:
 
     void whenSystemWentOffline()
     {
+        waitForCloudDataSynchronizedToTheMediaServer();
+
         cdb()->stop();
 
         whenMediaServerRestarted();
@@ -64,6 +73,23 @@ protected:
     {
         mediaServer().stop();
         ASSERT_TRUE(startMediaServer());
+    }
+
+    void whenUserCompletesRegistrationInCloud()
+    {
+        m_invitedAccount.email = m_invitedUserEc2Data.email.toStdString();
+        m_invitedAccount.password = nx::utils::generateRandomName(11).toStdString();
+
+        waitForUserToAppearInCloud(m_invitedAccount.email);
+
+        changeAccountPassword(m_invitedAccount.email, m_invitedAccount.password);
+
+        ASSERT_EQ(
+            nx::cdb::api::ResultCode::ok,
+            cdb()->getAccount(
+                m_invitedAccount.email,
+                m_invitedAccount.password, 
+                &m_invitedAccount));
     }
 
     void thenUserCanStillLogin()
@@ -85,8 +111,19 @@ protected:
         }
     }
 
+    void thenInvitedUserCanLoginToTheSystem()
+    {
+        auto mediaServerClient = prepareMediaServerClientFromCloudOwner();
+        mediaServerClient.setUserName(QString::fromStdString(m_invitedAccount.email));
+        mediaServerClient.setPassword(QString::fromStdString(m_invitedAccount.password));
+        ec2::ApiUserDataList users;
+        ASSERT_EQ(ec2::ErrorCode::ok, mediaServerClient.ec2GetUsers(&users));
+    }
+
 private:
     std::vector<nx::cdb::AccountWithPassword> m_additionalCloudUsers;
+    ::ec2::ApiUserData m_invitedUserEc2Data;
+    nx::cdb::AccountWithPassword m_invitedAccount;
 
     virtual void SetUp() override
     {
@@ -110,6 +147,30 @@ private:
             std::this_thread::sleep_for(std::chrono::milliseconds(100));
         }
     }
+
+    void changeAccountPassword(const std::string& email, const std::string& password)
+    {
+        std::string confirmationCode;
+        ASSERT_EQ(
+            nx::cdb::api::ResultCode::ok,
+            cdb()->resetAccountPassword(email, &confirmationCode));
+
+        nx::cdb::api::AccountUpdateData accountUpdate;
+        accountUpdate.passwordHa1 = nx_http::calcHa1(
+            email.c_str(),
+            nx::network::AppInfo::realm().toStdString().c_str(),
+            password.c_str()).toStdString();
+
+        // Confirmation code has format base64(tmp_password:email).
+        const auto tmpPasswordAndEmail = QByteArray::fromBase64(
+            QByteArray::fromRawData(confirmationCode.data(), confirmationCode.size()));
+        const std::string tmpPassword =
+            tmpPasswordAndEmail.mid(0, tmpPasswordAndEmail.indexOf(':')).toStdString();
+
+        ASSERT_EQ(
+            nx::cdb::api::ResultCode::ok,
+            cdb()->updateAccount(email, tmpPassword, accountUpdate));
+    }
 };
 
 TEST_F(CloudUserOfflineLogin, login_works_on_offline_server_after_restart)
@@ -121,7 +182,6 @@ TEST_F(CloudUserOfflineLogin, login_works_on_offline_server_after_restart)
 TEST_F(CloudUserOfflineLogin, multiple_users_can_login)
 {
     whenAddedMultipleCloudUsers();
-    whenCloudDataHasBeenSynchronizedToTheServer();
     whenSystemWentOffline();
 
     thenAllUsersCanStillLogin();
@@ -131,13 +191,20 @@ TEST_F(CloudUserOfflineLogin, multiple_users_can_login)
 
 // TEST_F(CloudUserOfflineLogin, cloud_user_added_while_system_is_offline_cannot_login_while_others_can)
 
-TEST_F(CloudUserOfflineLogin, DISABLED_user_can_login_after_password_change)
+TEST_F(CloudUserOfflineLogin, user_can_login_after_password_change)
 {
     whenCloudUserPasswordHasBeenChanged();
-    whenCloudDataHasBeenSynchronizedToTheServer();
     whenSystemWentOffline();
 
     thenUserCanStillLogin();
 }
 
-// TEST_F(CloudUserOfflineLogin, user_password_changed_while_system_was_offline)
+TEST_F(CloudUserOfflineLogin, invited_user_can_login_after_completing_registration_in_cloud)
+{
+    givenUserInvitedFromDesktopClient();
+
+    whenUserCompletesRegistrationInCloud();
+    whenSystemWentOffline();
+
+    thenInvitedUserCanLoginToTheSystem();
+}

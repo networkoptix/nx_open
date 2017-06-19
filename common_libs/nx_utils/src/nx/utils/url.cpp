@@ -4,7 +4,7 @@ namespace nx {
 namespace utils {
 namespace url {
 
-NX_UTILS_API bool equal(const QUrl& lhs, const QUrl& rhs, ComparisonFlags flags)
+bool equal(const QUrl& lhs, const QUrl& rhs, ComparisonFlags flags)
 {
     if (flags.testFlag(ComparisonFlag::All))
         return lhs == rhs;

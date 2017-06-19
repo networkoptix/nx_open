@@ -19,8 +19,12 @@ using namespace std::chrono;
 namespace nx {
 namespace utils {
 
+namespace {
+
 static milliseconds utcTimeShift(0);
 static milliseconds monotonicTimeShift(0);
+
+} // namespace
 
 /**
  * On Linux, get filename of a file which is used to set system time zone.
@@ -50,7 +54,7 @@ system_clock::time_point utcTime()
 
 seconds timeSinceEpoch()
 {
-    return duration_cast<seconds>(utcTime().time_since_epoch());
+    return seconds(system_clock::to_time_t(utcTime()));
 }
 
 steady_clock::time_point monotonicTime()

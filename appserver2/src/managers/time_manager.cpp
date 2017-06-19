@@ -412,6 +412,8 @@ void TimeSynchronizationManager::start(const std::shared_ptr<Ec2DirectConnection
             m_broadcastSysTimeTaskID = m_timerManager->addTimer(
                 std::bind( &TimeSynchronizationManager::broadcastLocalSystemTime, this, _1 ),
                 std::chrono::milliseconds::zero());
+
+            initializeTimeFetcher();
             addInternetTimeSynchronizationTask();
 
             m_checkSystemTimeTaskID = m_timerManager->addTimer(
@@ -419,9 +421,11 @@ void TimeSynchronizationManager::start(const std::shared_ptr<Ec2DirectConnection
                 std::chrono::milliseconds(SYSTEM_TIME_CHANGE_CHECK_PERIOD_MS));
         }
         else
+        {
             m_manualTimerServerSelectionCheckTaskID = m_timerManager->addTimer(
                 std::bind( &TimeSynchronizationManager::checkIfManualTimeServerSelectionIsRequired, this, _1 ),
                 std::chrono::milliseconds(MANUAL_TIME_SERVER_SELECTION_NECESSITY_CHECK_PERIOD_MS));
+        }
     }
 }
 
@@ -1062,6 +1066,8 @@ void TimeSynchronizationManager::checkIfManualTimeServerSelectionIsRequired( qui
 
 void TimeSynchronizationManager::syncTimeWithInternet( quint64 taskID )
 {
+    using namespace std::placeholders;
+
     NX_LOGX( lit( "TimeSynchronizationManager::syncTimeWithInternet. taskID %1" ).arg( taskID ), cl_logDEBUG2 );
     const auto& commonModule = m_messageBus->commonModule();
     const bool isSynchronizingTimeWithInternet =
@@ -1084,20 +1090,6 @@ void TimeSynchronizationManager::syncTimeWithInternet( quint64 taskID )
 
     NX_LOGX( lit("TimeSynchronizationManager. Synchronizing time with internet"), cl_logDEBUG1 );
 
-    //synchronizing with some internet server
-    using namespace std::placeholders;
-    if (m_timeSynchronizer)
-    {
-        m_timeSynchronizer->pleaseStopSync(false);
-        m_timeSynchronizer.reset();
-    }
-
-    auto multiFetcher = std::make_unique<nx::network::MeanTimeFetcher>();
-    for (const char* timeServer : RFC868_SERVERS)
-        multiFetcher->addTimeFetcher(
-            std::make_unique<nx::network::TimeProtocolClient>(
-                QLatin1String(timeServer)));
-    m_timeSynchronizer = std::move(multiFetcher);
     m_timeSynchronizer->getTimeAsync(
         std::bind(
             &TimeSynchronizationManager::onTimeFetchingDone,
@@ -1106,8 +1098,6 @@ void TimeSynchronizationManager::syncTimeWithInternet( quint64 taskID )
 
 void TimeSynchronizationManager::onTimeFetchingDone( const qint64 millisFromEpoch, SystemError::ErrorCode errorCode )
 {
-    m_timeSynchronizer.reset();
-
     quint64 localTimePriorityBak = 0;
     quint64 newLocalTimePriority = 0;
     {
@@ -1175,6 +1165,19 @@ void TimeSynchronizationManager::onTimeFetchingDone( const qint64 millisFromEpoc
     /* Can cause signal, going out of mutex locker. */
     if( newLocalTimePriority != localTimePriorityBak )
         updateRuntimeInfoPriority(newLocalTimePriority);
+}
+
+void TimeSynchronizationManager::initializeTimeFetcher()
+{
+    auto meanTimerFetcher = std::make_unique<nx::network::MeanTimeFetcher>();
+    for (const char* timeServer: RFC868_SERVERS)
+    {
+        meanTimerFetcher->addTimeFetcher(
+            std::make_unique<nx::network::TimeProtocolClient>(
+                QLatin1String(timeServer)));
+    }
+
+    m_timeSynchronizer = std::move(meanTimerFetcher);
 }
 
 void TimeSynchronizationManager::addInternetTimeSynchronizationTask()
