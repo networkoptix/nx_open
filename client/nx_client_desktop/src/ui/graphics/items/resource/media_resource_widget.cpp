@@ -455,6 +455,12 @@ QnMediaResourceWidget::QnMediaResourceWidget(QnWorkbenchContext* context, QnWork
     updateOverlayButton();
     setImageEnhancement(item->imageEnhancement());
 
+    connect(this, &QnMediaResourceWidget::updateInfoTextLater, this,
+        &QnMediaResourceWidget::updateCurrentUtcPosMs);
+
+    if (!display()->camDisplay()->isRealTimeSource())
+        return;
+
     resetTriggers();
 
     auto eventRuleManager = commonModule()->eventRuleManager();
@@ -467,9 +473,6 @@ QnMediaResourceWidget::QnMediaResourceWidget(QnWorkbenchContext* context, QnWork
 
     connect(eventRuleManager, &QnEventRuleManager::ruleRemoved,
         this, &QnMediaResourceWidget::at_eventRuleRemoved);
-
-    connect(this, &QnMediaResourceWidget::updateInfoTextLater, this,
-        &QnMediaResourceWidget::updateCurrentUtcPosMs);
 }
 
 QnMediaResourceWidget::~QnMediaResourceWidget()
