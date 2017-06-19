@@ -1056,8 +1056,8 @@ QList<int> Player::availableVideoQualities(const QList<int>& videoQualities) con
             positionMs = d->positionMs,
             currentVideoDecoders = d->dataConsumer
                 ? d->dataConsumer->currentVideoDecoders()
-                : std::vector<AbstractVideoDecoder*>()]
-            (int quality)
+                : std::vector<AbstractVideoDecoder*>()](
+                    int quality)
         {
             return media_player_quality_chooser::chooseVideoQuality(
                 codec, quality, liveMode, positionMs, camera, currentVideoDecoders);

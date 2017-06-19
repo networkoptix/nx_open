@@ -35,7 +35,8 @@ public:
     /**
      * @return True if compatible video decoder found.
      */
-    bool hasCompatibleDecoder(const AVCodecID codec,
+    bool hasCompatibleDecoder(
+        const AVCodecID codec,
         const QSize& resolution,
         const std::vector<AbstractVideoDecoder*>& currentDecoders);
 
