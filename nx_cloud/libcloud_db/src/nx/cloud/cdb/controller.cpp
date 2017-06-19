@@ -2,6 +2,8 @@
 
 #include <nx/utils/log/log.h>
 
+#include "settings.h"
+
 namespace nx {
 namespace cdb {
 
