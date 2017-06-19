@@ -1174,7 +1174,7 @@ ec2::TransactionType::Value getRemoveUserTransactionTypeFromDb(
     detail::QnDbManager* db)
 {
     ApiUserDataList userDataList;
-    ec2::ErrorCode errorCode = db->doQuery(id, userDataList);
+    ec2::ErrorCode errorCode = db->doQueryNoLock(id, userDataList);
 
     if (errorCode != ErrorCode::ok || userDataList.empty())
         return ec2::TransactionType::Unknown;
