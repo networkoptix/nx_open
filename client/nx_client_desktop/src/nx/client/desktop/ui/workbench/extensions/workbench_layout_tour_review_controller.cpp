@@ -32,15 +32,15 @@
 
 namespace {
 
-static const int kDefaultDelayMs = 5000;
+static constexpr int kDefaultDelayMs = 5000;
 
-// Save layout tour not more often than once in 5 seconds.
-static const int kSaveTourIntervalMs = 5000;
+// Save layout tour no more often than once in 5 seconds.
+static constexpr int kSaveTourIntervalMs = 5000;
 
-// Update items layout not more often than once in a second.
-static const int kUpdateItemsLayoutIntervalMs = 1000;
+// Update items layout no more often than once in a second.
+static constexpr int kUpdateItemsLayoutIntervalMs = 1000;
 
-static const QSize kCellSize{1, 1};
+static constexpr QSize kCellSize{1, 1};
 
 QRect createItemGrid(const QPoint& topLeft, int itemCount)
 {
