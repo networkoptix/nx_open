@@ -1,5 +1,6 @@
 #include "workbench_layout_tour_review_controller.h"
 
+#include <QtCore/QScopedValueRollback>
 #include <QtWidgets/QAction>
 
 #include <core/resource_access/resource_access_filter.h>
@@ -31,10 +32,62 @@
 
 namespace {
 
-static const int kDefaultDelayMs = 5000;
+static constexpr int kDefaultDelayMs = 5000;
 
-// Save layout tour not more often than once in 5 seconds.
-static const int kSaveTourIntervalMs = 5000;
+// Save layout tour no more often than once in 5 seconds.
+static constexpr int kSaveTourIntervalMs = 5000;
+
+// Update items layout no more often than once in a second.
+static constexpr int kUpdateItemsLayoutIntervalMs = 1000;
+
+static const QSize kCellSize{1, 1};
+
+QRect createItemGrid(const QPoint& topLeft, int itemCount)
+{
+    static const QSize kMinMatrixSize(2, 2);
+    QSize size(kMinMatrixSize);
+
+    int root = std::ceil(std::sqrt(itemCount));
+
+    if (itemCount > 3)
+        size.setHeight(std::max(3, root));
+    if (itemCount > 5)
+        size.setWidth(std::max(3, root));
+    if (itemCount > 8)
+        size.setHeight(std::max(4, root));
+
+    return QRect(topLeft, size);
+}
+
+struct GridWalker
+{
+public:
+    GridWalker(const QRect& grid):
+        x(grid.left()),
+        y(grid.top()),
+        grid(grid)
+    {}
+
+    QPoint pos() const
+    {
+        return {x, y};
+    }
+
+    bool next()
+    {
+        ++x;
+        if (x > grid.right())
+        {
+            x = grid.left();
+            ++y;
+        }
+        return y <= grid.bottom();
+    }
+
+    int x;
+    int y;
+    const QRect grid;
+};
 
 } // namespace
 
@@ -55,6 +108,13 @@ LayoutTourReviewController::LayoutTourReviewController(QObject* parent):
             m_saveToursQueue.clear();
         };
     m_saveToursOperation = new QnPendingOperation(saveQueuedTours, kSaveTourIntervalMs, this);
+
+    auto updateItemsLayout = [this]
+        {
+            this->updateItemsLayout();
+        };
+    m_updateItemsLayoutOperation = new QnPendingOperation(updateItemsLayout,
+        kUpdateItemsLayoutIntervalMs, this);
 
     connect(layoutTourManager(), &QnLayoutTourManager::tourChanged, this,
         &LayoutTourReviewController::handleTourChanged);
@@ -101,20 +161,17 @@ void LayoutTourReviewController::handleTourChanged(const ec2::ApiLayoutTourData&
 
     reviewLayout->setName(tour.name);
     reviewLayout->setData(Qn::LayoutTourIsManualRole, tour.settings.manual);
-    if (auto wbLayout = QnWorkbenchLayout::instance(reviewLayout))
+    auto wbLayout = QnWorkbenchLayout::instance(reviewLayout);
+    if (wbLayout)
         wbLayout->setData(Qn::LayoutTourIsManualRole, tour.settings.manual);
 
-    // Check if items were not changed (e.g. we have just changed them ourselves).
-    ec2::ApiLayoutTourItemDataList currentItems;
-    if (fillTourItems(&currentItems) && currentItems == tour.items)
+    // If layout is not current, simply overwrite it.
+    if (workbench()->currentLayout() != wbLayout)
+    {
+        resetReviewLayout(reviewLayout, tour.items);
         return;
-
-    // Update items if someone else have changed the tour.
-    for (const auto& itemId: reviewLayout->getItems().keys())
-        qnResourceRuntimeDataManager->cleanupData(itemId);
-    reviewLayout->setItems(QnLayoutItemDataList());
-    for (const auto& item: tour.items)
-        addItemToReviewLayout(reviewLayout, item);
+    }
+    m_updateItemsLayoutOperation->requestOperation();
     updateButtons(reviewLayout);
 }
 
@@ -187,11 +244,9 @@ void LayoutTourReviewController::reviewLayoutTour(const ec2::ApiLayoutTourData& 
     layout->setData(Qn::LayoutTourUuidRole, qVariantFromValue(tour.id));
     layout->setData(Qn::LayoutTourIsManualRole, tour.settings.manual);
     layout->setCellAspectRatio(kCellAspectRatio);
-
-    for (auto item: tour.items)
-        addItemToReviewLayout(layout, item);
-
     m_reviewLayouts.insert(tour.id, layout);
+
+    resetReviewLayout(layout, tour.items);
 
     menu()->trigger(action::OpenInNewTabAction, layout);
     updateButtons(layout);
@@ -212,13 +267,23 @@ void LayoutTourReviewController::connectToLayout(QnWorkbenchLayout* layout)
     if (!layout->resource())
        return;
 
-    auto saveAction = action(action::SaveCurrentLayoutTourAction);
+    auto saveAndUpdateLayout = [this]
+        {
+            if (!isLayoutTourReviewMode())
+                return;
 
-    *m_connections << connect(layout, &QnWorkbenchLayout::itemAdded, saveAction, &QAction::trigger);
-    *m_connections << connect(layout, &QnWorkbenchLayout::itemMoved, saveAction, &QAction::trigger);
-    *m_connections << connect(layout, &QnWorkbenchLayout::itemRemoved, saveAction, &QAction::trigger);
-    *m_connections << connect(layout, &QnWorkbenchLayout::boundingRectChanged, this,
-        &LayoutTourReviewController::updatePlaceholders);
+            // Saving must go before layout updating to make sure item order will be correct.
+            menu()->trigger(action::SaveCurrentLayoutTourAction);
+            m_updateItemsLayoutOperation->requestOperation();
+        };
+
+    // Queued connection to call save after batch operation is complete.
+    *m_connections << connect(layout, &QnWorkbenchLayout::itemAdded, this, saveAndUpdateLayout,
+        Qt::QueuedConnection);
+    *m_connections << connect(layout, &QnWorkbenchLayout::itemsMoved, this, saveAndUpdateLayout,
+        Qt::QueuedConnection);
+    *m_connections << connect(layout, &QnWorkbenchLayout::itemRemoved, this, saveAndUpdateLayout,
+        Qt::QueuedConnection);
 }
 
 void LayoutTourReviewController::updateOrder()
@@ -246,11 +311,9 @@ void LayoutTourReviewController::updateButtons(const QnLayoutResourcePtr& layout
 
 void LayoutTourReviewController::updatePlaceholders()
 {
-    static const QSize kPlaceholderSize(1, 1);
-
     auto createPlaceholder = [this, mapper = workbench()->mapper()](const QPoint& cell)
         {
-            const QRectF geometry = mapper->mapFromGrid({cell, kPlaceholderSize});
+            const QRectF geometry = mapper->mapFromGrid({cell, kCellSize});
 
             QSharedPointer<LayoutTourDropPlaceholder> result(new LayoutTourDropPlaceholder());
             result->setRect(geometry);
@@ -268,11 +331,7 @@ void LayoutTourReviewController::updatePlaceholders()
 
     const int itemCount = layout->items().size();
 
-    QRect boundingRect = layout->boundingRect();
-
-    // Layout can have valid bounds after removing the last item, handling it here to improve UI.
-    if (!boundingRect.isValid() || itemCount == 0)
-        boundingRect = QRect(0, 0, 1, 1);
+    QRect boundingRect = createItemGrid(layout->boundingRect().topLeft(), itemCount);
 
     static const int kMaxSize = 4;
     if (boundingRect.width() > kMaxSize || boundingRect.height() > kMaxSize)
@@ -280,21 +339,6 @@ void LayoutTourReviewController::updatePlaceholders()
         m_dropPlaceholders.clear();
         return;
     }
-
-    int minWidth = 2;
-    int minHeight = 2;
-
-    if (itemCount > 3)
-        minHeight = 3;
-    if (itemCount > 5)
-        minWidth = 3;
-    if (itemCount > 8)
-        minHeight = 4;
-
-    if (boundingRect.width() < minWidth)
-        boundingRect.setWidth(minWidth);
-    if (boundingRect.height() < minHeight)
-        boundingRect.setHeight(minHeight);
 
     for (const auto& p: m_dropPlaceholders.keys())
     {
@@ -307,7 +351,7 @@ void LayoutTourReviewController::updatePlaceholders()
         for (int y = boundingRect.top(); y <= boundingRect.bottom(); ++y)
         {
             const QPoint cell(x, y);
-            const bool isFree = layout->isFreeSlot(cell, kPlaceholderSize);
+            const bool isFree = layout->isFreeSlot(cell, kCellSize);
             const bool placeholderExists = m_dropPlaceholders.contains(cell);
 
             // If cell is empty and there is a placeholder (or vise versa), skip this step.
@@ -321,36 +365,130 @@ void LayoutTourReviewController::updatePlaceholders()
         }
     }
 
-    layout->setData(Qn::LayoutMinimalBoundingRectRole, boundingRect);
-    display()->fitInView(display()->animationAllowed());
+    // Additionally adjust bounding rect to give the tour some more space.
+    static const qreal d = 0.05;
+    layout->setData(Qn::LayoutMinimalBoundingRectRole, QRectF(boundingRect).adjusted(-d, 0, d, d));
+    const bool animate = display()->animationAllowed() && layout->items().size() > 0;
+    display()->fitInView(animate);
+}
+
+void LayoutTourReviewController::updateItemsLayout()
+{
+    if (!isLayoutTourReviewMode())
+        return;
+
+    const auto wbLayout = workbench()->currentLayout();
+    const auto tourId = currentTourId();
+    const auto tour = layoutTourManager()->tour(currentTourId());
+    const auto reviewLayout = wbLayout->resource();
+    NX_EXPECT(reviewLayout == m_reviewLayouts.value(tourId));
+
+    ec2::ApiLayoutTourItemDataList currentItems;
+
+    auto layoutItems = wbLayout->items().toList();
+    QnWorkbenchItem::sortByGeometry(&layoutItems);
+    const auto topLeft = layoutItems.empty()
+        ? QPoint(0, 0)
+        : layoutItems.first()->geometry().topLeft();
+
+    for (auto layoutItem : layoutItems)
+    {
+        const bool unpinned = wbLayout->unpinItem(layoutItem);
+        NX_EXPECT(unpinned);
+    }
+
+    const auto itemGrid = createItemGrid(topLeft, (int)tour.items.size());
+    GridWalker walker(itemGrid);
+
+    // Dynamically reorder existing items to match new order (if something was added or removed).
+    for (const auto& item: tour.items)
+    {
+        // Find first existing item that match the resource.
+        auto existing = std::find_if(layoutItems.begin(), layoutItems.end(),
+            [this, item](QnWorkbenchItem* existing)
+            {
+                const auto resource = resourcePool()->getResourceByUniqueId(existing->resourceUid());
+                return resource && resource->getId() == item.resourceId;
+            });
+
+        // Move existing item to the selected place.
+        if (existing != layoutItems.end())
+        {
+            auto layoutItem = *existing;
+            const bool pinned = wbLayout->pinItem(layoutItem, {walker.pos(), kCellSize});
+            NX_EXPECT(pinned);
+            qnResourceRuntimeDataManager->setLayoutItemData(layoutItem->uuid(),
+                Qn::LayoutTourItemDelayMsRole, item.delayMs);
+            layoutItems.erase(existing);
+        }
+        else
+        {
+            addItemToReviewLayout(reviewLayout, item, walker.pos(), true);
+        }
+        walker.next();
+    }
+
+    // These are items that were not repositioned.
+    for (auto layoutItem: layoutItems)
+    {
+        qnResourceRuntimeDataManager->cleanupData(layoutItem->uuid());
+        reviewLayout->removeItem(layoutItem->uuid());
+    }
+
+    updatePlaceholders();
+    updateOrder();
+}
+
+void LayoutTourReviewController::resetReviewLayout(const QnLayoutResourcePtr& layout,
+    const ec2::ApiLayoutTourItemDataList& items)
+{
+    for (const auto& itemId: layout->getItems().keys())
+        qnResourceRuntimeDataManager->cleanupData(itemId);
+    layout->setItems(QnLayoutItemDataList());
+
+    const auto grid = createItemGrid({0, 0}, (int)items.size());
+    GridWalker walker(grid);
+
+    for (const auto& item: items)
+    {
+        addItemToReviewLayout(layout, item, walker.pos(), true);
+        walker.next();
+    }
+    updateButtons(layout);
 }
 
 void LayoutTourReviewController::addItemToReviewLayout(
     const QnLayoutResourcePtr& layout,
     const ec2::ApiLayoutTourItemData& item,
-    const QPointF& position)
+    const QPointF& position,
+    bool pinItem)
 {
-    static const int kMatrixWidth = 3;
-    const int index = layout->getItems().size();
-
     QnLayoutItemData itemData;
     itemData.uuid = QnUuid::createUuid();
-
-    if (!position.isNull())
-    {
-        itemData.combinedGeometry = QRectF(position, position);
-    }
-    else
-    {
-        QPointF bestPos(index % kMatrixWidth, index / kMatrixWidth);
-        itemData.combinedGeometry = QRectF(bestPos, bestPos);
-    }
-    itemData.flags = Qn::PendingGeometryAdjustment;
+    itemData.combinedGeometry = QRectF(position, kCellSize);
+    if (pinItem)
+        itemData.flags = Qn::Pinned;
     itemData.resource.id = item.resourceId;
     qnResourceRuntimeDataManager->setLayoutItemData(itemData.uuid,
         Qn::LayoutTourItemDelayMsRole, item.delayMs);
-
     layout->addItem(itemData);
+}
+
+void LayoutTourReviewController::addResourcesToReviewLayout(
+    const QnLayoutResourcePtr& layout,
+    const QnResourceList& resources,
+    const QPointF& position)
+{
+    NX_EXPECT(!m_updating);
+    if (m_updating)
+        return;
+
+    QScopedValueRollback<bool> guard(m_updating, true);
+    for (const auto& resource: resources)
+    {
+        if (QnResourceAccessFilter::isDroppable(resource))
+            addItemToReviewLayout(layout, {resource->getId(), kDefaultDelayMs}, position, false);
+    }
 }
 
 bool LayoutTourReviewController::fillTourItems(ec2::ApiLayoutTourItemDataList* items)
@@ -415,35 +553,11 @@ void LayoutTourReviewController::at_dropResourcesAction_triggered()
     if (!isLayoutTourReviewMode())
         return;
 
-    const auto tourId = currentTourId();
-
-    auto reviewLayout = m_reviewLayouts.value(tourId);
-    NX_EXPECT(reviewLayout);
-    if (!reviewLayout)
-        return;
-
+    const auto reviewLayout = workbench()->currentLayout()->resource();
     const auto parameters = menu()->currentParameters(sender());
     QPointF position = parameters.argument<QPointF>(Qn::ItemPositionRole);
-
-    for (const auto& resource: parameters.resources())
-    {
-        if (resource->hasFlags(Qn::layout))
-        {
-            const auto layout = resource.dynamicCast<QnLayoutResource>();
-            NX_EXPECT(layout);
-            addItemToReviewLayout(reviewLayout, {layout->getId(), kDefaultDelayMs}, position);
-        }
-        else
-        {
-            const bool allowed = QnResourceAccessFilter::isOpenableInLayout(resource);
-
-            if (!allowed)
-                continue;
-
-            addItemToReviewLayout(reviewLayout, {resource->getId(), kDefaultDelayMs}, position);
-        }
-
-    }
+    addResourcesToReviewLayout(reviewLayout, parameters.resources(), position);
+    const auto tour = layoutTourManager()->tour(currentTourId());
     menu()->trigger(action::SaveCurrentLayoutTourAction);
 }
 
@@ -460,6 +574,10 @@ void LayoutTourReviewController::at_startCurrentLayoutTourAction_triggered()
 
 void LayoutTourReviewController::at_saveCurrentLayoutTourAction_triggered()
 {
+    if (m_updating)
+        return;
+    QScopedValueRollback<bool> guard(m_updating, true);
+
     NX_EXPECT(isLayoutTourReviewMode());
     const auto id = currentTourId();
     auto tour = layoutTourManager()->tour(id);
@@ -472,10 +590,6 @@ void LayoutTourReviewController::at_saveCurrentLayoutTourAction_triggered()
     fillTourItems(&tour.items);
     tour.settings.manual = workbench()->currentLayout()->data(Qn::LayoutTourIsManualRole).toBool();
     layoutTourManager()->addOrUpdateTour(tour);
-
-    updateOrder();
-    updateButtons(reviewLayout);
-    updatePlaceholders();
 
     m_saveToursQueue.insert(tour.id);
     m_saveToursOperation->requestOperation();

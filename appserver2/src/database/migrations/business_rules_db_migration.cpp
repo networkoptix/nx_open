@@ -189,11 +189,11 @@ bool migrateBusinessRulesToV30(const QSqlDatabase& database)
 {
     QSqlQuery query(database);
     query.setForwardOnly(true);
-    QString sqlText = R"(
+    QString sqlText = R"sql(
         SELECT id, action_type, action_params
         FROM vms_businessrule
         WHERE action_type = ? or action_type = ?
-    )";
+    )sql";
     if (!QnDbHelper::prepareSQLQuery(&query, sqlText, Q_FUNC_INFO))
         return false;
 
@@ -237,11 +237,11 @@ bool migrateBusinessRulesToV31Alpha(const QSqlDatabase& database)
 {
     QSqlQuery query(database);
     query.setForwardOnly(true);
-    QString sqlText = R"(
+    QString sqlText = R"sql(
         SELECT id, action_type, action_params
         FROM vms_businessrule
         WHERE action_type = ?
-    )";
+    )sql";
     if (!QnDbHelper::prepareSQLQuery(&query, sqlText, Q_FUNC_INFO))
         return false;
 

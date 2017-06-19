@@ -79,9 +79,10 @@ public:
 
 	QString getResoureIPFromParams(const QnBusinessEventParameters& params) const;
 
-    QString actionSubjects(const QnBusinessEventRulePtr& rule, bool noSingleName = false) const;
+    // Argument showName controls showing specific subject name in case of just one subject.
+    QString actionSubjects(const QnBusinessEventRulePtr& rule, bool showName = true) const;
     QString actionSubjects(const QnUserResourceList& users, const QList<QnUuid>& roles,
-        bool noSingleName = false) const;
+        bool showName = true) const;
 
     static QString defaultSoftwareTriggerName();
     static QString getSoftwareTriggerName(const QString& id);

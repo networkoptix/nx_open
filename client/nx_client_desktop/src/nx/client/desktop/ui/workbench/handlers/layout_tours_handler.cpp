@@ -17,6 +17,7 @@
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench.h>
 #include <ui/workbench/workbench_layout.h>
+#include <ui/workbench/workbench_state_manager.h>
 #include <nx/client/desktop/ui/workbench/extensions/workbench_layout_tour_executor.h>
 #include <nx/client/desktop/ui/workbench/extensions/workbench_layout_tour_review_controller.h>
 
@@ -139,6 +140,7 @@ LayoutToursHandler::LayoutToursHandler(QObject* parent):
             {
                 NX_EXPECT(toggled);
                 m_tourExecutor->startTour(layoutTourManager()->tour(id));
+                context()->instance<QnWorkbenchStateManager>()->saveState();
             }
         });
 

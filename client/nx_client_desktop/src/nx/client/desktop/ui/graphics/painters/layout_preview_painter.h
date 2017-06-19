@@ -6,6 +6,8 @@
 
 #include <core/resource/resource_fwd.h>
 
+#include <ui/customization/customized.h>
+
 class QnCameraThumbnailManager;
 class QnBusyIndicator;
 
@@ -14,14 +16,14 @@ namespace client {
 namespace desktop {
 namespace ui {
 
-class LayoutPreviewPainter: public QObject
+class LayoutPreviewPainter: public Customized<QObject>
 {
     Q_OBJECT
     Q_PROPERTY(QColor frameColor READ frameColor WRITE setFrameColor)
     Q_PROPERTY(QColor backgroundColor READ backgroundColor WRITE setBackgroundColor)
     Q_PROPERTY(QColor fontColor READ fontColor WRITE setFontColor)
 
-    using base_type = QObject;
+    using base_type = Customized<QObject>;
 
 public:
     LayoutPreviewPainter(QnCameraThumbnailManager* thumbnailManager, QObject* parent = nullptr);
