@@ -2461,7 +2461,7 @@ void QnMediaResourceWidget::configureTriggerButton(QnSoftwareTriggerButton* butt
             const auto syncAction = action(action::ToggleSyncAction);
             const bool sync = syncAction->isEnabled() && syncAction->isChecked();
 
-            if (sync || QnWorkbenchContextAware::display()->widget(Qn::CentralRole) == this)
+            if (sync || this->QnWorkbenchContextAware::display()->widget(Qn::CentralRole) == this)
             {
                 action(action::JumpToLiveAction)->trigger();
             }
