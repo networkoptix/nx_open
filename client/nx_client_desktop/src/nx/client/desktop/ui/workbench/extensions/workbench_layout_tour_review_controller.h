@@ -89,6 +89,7 @@ private:
     QHash<QPoint, QSharedPointer<LayoutTourDropPlaceholder> > m_dropPlaceholders;
     QSet<QnUuid> m_saveToursQueue;
     QnPendingOperation* m_saveToursOperation{nullptr};
+    QnPendingOperation* m_updateItemsLayoutOperation{nullptr};
     bool m_updating = false;
 };
 

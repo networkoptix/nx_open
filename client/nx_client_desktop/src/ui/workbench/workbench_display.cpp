@@ -1496,7 +1496,7 @@ QRectF QnWorkbenchDisplay::fitInViewGeometry() const
         ? layoutBoundingRect
         : layoutBoundingRect.united(backgroundBoundingRect);
 
-    QRect minimalBoundingRect = layout->data(Qn::LayoutMinimalBoundingRectRole).value<QRect>();
+    QRectF minimalBoundingRect = layout->data(Qn::LayoutMinimalBoundingRectRole).value<QRectF>();
     if (!minimalBoundingRect.isEmpty())
         sceneBoundingRect = sceneBoundingRect.united(minimalBoundingRect);
 
