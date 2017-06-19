@@ -36,20 +36,7 @@ QnWorkbenchStateManager::QnWorkbenchStateManager(QObject *parent /* = NULL*/) :
 
 bool QnWorkbenchStateManager::tryClose(bool force)
 {
-    /*
-    *  We may get here in the disconnect process when all layouts are already closed.
-    *  Marker of an invalid state - 'dummy' layout in the QnWorkbench class.
-    *  We can detect it by `workbench()->currentLayoutIndex() == -1` check.
-    */
-    bool canSaveState =
-        !commonModule()->remoteGUID().isNull()
-        && qnRuntime->isDesktopMode()
-        && context()->user()
-        && !helpers::currentSystemIsNew(commonModule())
-        && workbench()->currentLayoutIndex() != -1
-        && !force;
-
-    if (canSaveState)
+    if (!force && canSaveState())
     {
         saveState();
         if (auto statisticsManager = commonModule()->instance<QnStatisticsManager>())
@@ -68,6 +55,9 @@ bool QnWorkbenchStateManager::tryClose(bool force)
 
 void QnWorkbenchStateManager::saveState()
 {
+    if (!canSaveState())
+        return;
+
     const auto localSystemId = helpers::currentSystemLocalId(commonModule());
     const auto userId = context()->user()->getId();
     if (localSystemId.isNull() || userId.isNull())
@@ -100,6 +90,7 @@ void QnWorkbenchStateManager::saveState()
 
     qnSettings->setWorkbenchStates(states);
     qnSettings->save();
+    return;
 }
 
 void QnWorkbenchStateManager::restoreState()
@@ -141,6 +132,20 @@ void QnWorkbenchStateManager::restoreState()
     {
         NX_DEBUG(kWorkbenchStateTag, "State was not found");
     }
+}
+
+bool QnWorkbenchStateManager::canSaveState() const
+{
+    /*
+     *  We may get here in the disconnect process when all layouts are already closed.
+     *  Marker of an invalid state - 'dummy' layout in the QnWorkbench class.
+     *  We can detect it by `workbench()->currentLayoutIndex() == -1` check.
+     */
+    return !commonModule()->remoteGUID().isNull()
+        && qnRuntime->isDesktopMode()
+        && context()->user()
+        && !helpers::currentSystemIsNew(commonModule())
+        && workbench()->currentLayoutIndex() != -1;
 }
 
 void QnWorkbenchStateManager::registerDelegate(QnSessionAwareDelegate* d)
