@@ -122,7 +122,6 @@ void BasePersistentDataTest::initializeDatabase()
 {
     m_persistentDbManager =
         std::make_unique<DbInstanceController>(dbConnectionOptions());
-    ASSERT_TRUE(m_persistentDbManager->initialize());
 }
 
 } // namespace test
