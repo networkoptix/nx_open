@@ -182,7 +182,7 @@ void LayoutTourItemWidget::initOverlay()
             //QColor textColor = palette().color(QPalette::WindowText); //
             QColor textColor = QColor("#53707f"); //TODO: #GDM #3.1 customize
             QString text = isManual
-                ? tr("Switch by %1").arg(QString::fromWCharArray(L"\x2190 \x2192"))
+                ? tr("Switch by %1").arg(QString::fromWCharArray(L"\x2190 \x2192")) //< Arrows.
                 : tr("Display for");
 
             if (!isManual)
