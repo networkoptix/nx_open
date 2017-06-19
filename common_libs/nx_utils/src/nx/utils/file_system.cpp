@@ -1,5 +1,7 @@
 #include "file_system.h"
 
+#include <QtCore>
+
 #if defined(Q_OS_UNIX)
     #include <unistd.h>
     #include <QtCore/QStandardPaths>
@@ -371,6 +373,21 @@ QString applicationFilePath(int argc, char** argv)
 
     return applicationFilePath(defaultFilePath);
 }
+
+#if defined(Q_OS_LINUX) && !defined(Q_OS_ANDROID)
+
+bool isUsb(const QString& devName)
+{
+    for (const QFileInfo& info: QDir("/dev/disk/by-id").entryInfoList(QDir::System))
+    {
+        if (info.fileName().contains("usb-") && info.symLinkTarget().contains(devName))
+            return true;
+    }
+
+    return false;
+}
+
+#endif
 
 } // namespace file_system
 } // namespace utils

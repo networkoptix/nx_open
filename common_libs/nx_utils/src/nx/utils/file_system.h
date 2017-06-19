@@ -84,6 +84,12 @@ using WinDriveInfoList = QList<WinDriveInfo>;
 WinDriveInfoList NX_UTILS_API getWinDrivesInfo();
 #endif
 
+#if defined(Q_OS_LINUX) && !defined(Q_OS_ANDROID)
+
+bool NX_UTILS_API isUsb(const QString& devName);
+
+#endif
+
 } // namespace file_system
 } // namespace utils
 } // namespace nx
