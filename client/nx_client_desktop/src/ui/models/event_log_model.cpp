@@ -300,15 +300,14 @@ QString QnEventLogModel::getSubjectsText(const std::vector<QnUuid>& ids) const
     userRolesManager()->usersAndRoles(ids, users, roles);
 
     const int numDeleted = int(ids.size()) - (users.size() + roles.size());
-    if (roles.empty() && users.empty() && numDeleted > 0)
-        return tr("%n Removed subjects", "", numDeleted);
+    NX_EXPECT(numDeleted >= 0);
+    if (numDeleted <= 0)
+        return m_helper->actionSubjects(users, roles);
 
-    QString text = m_helper->actionSubjects(users, roles, numDeleted > 0);
-
-    if (numDeleted > 0)
-        text += lit(", ") + tr("%n Removed subjects", "", numDeleted);
-
-    return text;
+    const QString removedSubjectsText = tr("%n Removed subjects", "", numDeleted);
+    return roles.empty() && users.empty()
+        ? removedSubjectsText
+        : m_helper->actionSubjects(users, roles, false) + lit(", ") + removedSubjectsText;
 }
 
 QString QnEventLogModel::getSubjectNameById(const QnUuid& id) const

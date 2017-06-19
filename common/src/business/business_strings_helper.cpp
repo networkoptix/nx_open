@@ -641,8 +641,8 @@ QString QnBusinessStringsHelper::getSoftwareTriggerName(const QnBusinessEventPar
     return getSoftwareTriggerName(params.caption);
 }
 
-QString QnBusinessStringsHelper::actionSubjects(const QnBusinessEventRulePtr& rule,
-    bool noSingleName) const
+QString QnBusinessStringsHelper::actionSubjects(
+    const QnBusinessEventRulePtr& rule, bool showName) const
 {
     QnUserResourceList users;
     QList<QnUuid> roles;
@@ -652,18 +652,18 @@ QString QnBusinessStringsHelper::actionSubjects(const QnBusinessEventRulePtr& ru
     else
         userRolesManager()->usersAndRoles(rule->actionParams().additionalResources, users, roles);
 
-    return actionSubjects(users, roles, noSingleName);
+    return actionSubjects(users, roles, showName);
 }
 
 QString QnBusinessStringsHelper::actionSubjects(
     const QnUserResourceList& users,
     const QList<QnUuid>& roles,
-    bool noSingleName) const
+    bool showName) const
 {
     if (users.empty() && roles.empty())
         return tr("All Users");
 
-    if (!noSingleName)
+    if (showName)
     {
         if (users.size() == 1 && roles.empty())
             return users.front()->getName();
