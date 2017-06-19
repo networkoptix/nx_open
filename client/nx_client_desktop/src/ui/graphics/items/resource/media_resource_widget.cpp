@@ -2467,7 +2467,9 @@ void QnMediaResourceWidget::configureTriggerButton(QnSoftwareTriggerButton* butt
             }
             else if (auto reader = display()->archiveReader())
             {
+                //TODO: Refactor workbench navigator to avoid switching to live in different places.
                 reader->jumpTo(DATETIME_NOW, 0);
+                reader->setSpeed(1.0);
                 reader->resumeMedia();
             }
         });
