@@ -21,15 +21,15 @@ Item
 
     function getMoveViewportData(position)
     {
-        for (var i = 0; i != children.length; ++i)
+        for (var i = 0; i != repeater.count; ++i)
         {
-            var child = children[i]
+            var child = repeater.itemAt(i);
             if (typeof child.getMoveViewportData !== "function")
                 continue
 
             var mapped = mapToItem(child, position.x, position.y)
             if (mapped.x < 0 || mapped.y < 0 || mapped.x > child.width || mapped.y > child.height)
-                continue;
+                continue
 
             return child.getMoveViewportData(mapped)
         }
