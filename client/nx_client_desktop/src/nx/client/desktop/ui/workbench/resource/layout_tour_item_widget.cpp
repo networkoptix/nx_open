@@ -105,7 +105,6 @@ void LayoutTourItemWidget::initOverlay()
     auto font = this->font();
     font.setPixelSize(14);
     setFont(font);
-    setPaletteColor(this, QPalette::WindowText, qApp->palette().color(QPalette::Light));
 
     auto titleFont(font);
     titleFont.setWeight(QFont::DemiBold);
@@ -168,6 +167,14 @@ void LayoutTourItemWidget::initOverlay()
     updateOrder(Qn::LayoutTourItemOrderRole);
     connect(item(), &QnWorkbenchItem::dataChanged, this, updateOrder);
 
+    auto updateLightText = [this, title, orderLabel]
+        {
+            setPaletteColor(title, QPalette::WindowText, palette().color(QPalette::Light));
+            setPaletteColor(orderLabel, QPalette::WindowText, palette().color(QPalette::Light));
+        };
+    installEventHandler(this, QEvent::PaletteChange, this, updateLightText);
+    updateLightText();
+
     auto delayHintLabel = new GraphicsLabel();
     delayHintLabel->setPerformanceHint(GraphicsLabel::PixmapCaching);
     delayHintLabel->setAcceptedMouseButtons(0);
@@ -178,8 +185,7 @@ void LayoutTourItemWidget::initOverlay()
         {
             const bool isManual = item()->layout()
                 && item()->layout()->data(Qn::LayoutTourIsManualRole).toBool();
-            //QColor textColor = palette().color(QPalette::WindowText); //
-            QColor textColor = QColor("#53707f"); //TODO: #GDM #3.1 customize
+            QColor textColor = palette().color(QPalette::Dark);
             QString text = isManual
                 ? tr("Switch by %1").arg(QString::fromWCharArray(L"\x2190 \x2192")) //< Arrows.
                 : tr("Display for");
@@ -190,8 +196,7 @@ void LayoutTourItemWidget::initOverlay()
                 {
                     case SelectionState::selected:
                     case SelectionState::focusedAndSelected:
-                        //textColor = palette().color(QPalette::Highlight);
-                        textColor = QColor("#2fa2db");  //TODO: #GDM #3.1 customize
+                        textColor = palette().color(QPalette::Highlight);
                         text = tr("Display selected for");
                         break;
                     default:

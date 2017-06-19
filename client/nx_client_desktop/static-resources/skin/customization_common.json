@@ -498,6 +498,16 @@
     "QnVideowallItemWidget": {
         "palette": { "default": { "window": "dark4" } }
     },
+    
+    "nx::client::desktop::ui::workbench::LayoutTourItemWidget": {
+        "_": "dark is used to paint darker text",
+        "palette": {
+            "default": {
+                "highlight": "brand_core",
+                "dark": "dark17"
+            }
+        }
+    },
 
     "ZoomWindowInstrument": {
         "colors": ["yellow_core", "green_l2", "red_l2"]
