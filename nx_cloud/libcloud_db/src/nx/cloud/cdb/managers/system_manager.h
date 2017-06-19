@@ -153,6 +153,8 @@ public:
         const std::string& accountEmail,
         const std::string& systemId) const override;
 
+    std::vector<api::SystemSharingEx> fetchAllSharings() const;
+
     //---------------------------------------------------------------------------------------------
     // Events.
 

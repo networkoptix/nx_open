@@ -51,6 +51,60 @@ public:
     virtual DBResult execSqlScriptSync(
         const QByteArray& script,
         nx::db::QueryContext* const queryContext) = 0;
+
+    /**
+     * @param queryFunc throws nx::db::Exception.
+     */
+    template<typename QueryFunc, typename... OutputData>
+    void executeUpdateQuerySync(QueryFunc queryFunc)
+    {
+        nx::utils::promise<nx::db::DBResult> queryDonePromise;
+        executeUpdate(
+            [&queryFunc](nx::db::QueryContext* queryContext)
+            {
+                queryFunc(queryContext);
+                return nx::db::DBResult::ok;
+            },
+            [&queryDonePromise](
+                nx::db::QueryContext*,
+                nx::db::DBResult dbResult,
+                OutputData... outputData)
+            {
+                queryDonePromise.set_value(dbResult);
+            });
+        const auto dbResult = queryDonePromise.get_future().get();
+        if (dbResult != nx::db::DBResult::ok)
+            throw nx::db::Exception(dbResult);
+    }
+
+    /**
+     * @param queryFunc throws nx::db::Exception.
+     */
+    template<typename QueryFunc>
+    typename std::result_of<QueryFunc(nx::db::QueryContext*)>::type 
+        executeSelectQuerySync(QueryFunc queryFunc)
+    {
+        typename std::result_of<QueryFunc(nx::db::QueryContext*)>::type result;
+
+        nx::utils::promise<nx::db::DBResult> queryDonePromise;
+        executeSelect(
+            [&queryFunc, &result](nx::db::QueryContext* queryContext)
+            {
+                result = queryFunc(queryContext);
+                return nx::db::DBResult::ok;
+            },
+            [&queryDonePromise](
+                nx::db::QueryContext*,
+                nx::db::DBResult dbResult)
+            {
+                queryDonePromise.set_value(dbResult);
+            });
+        const auto dbResult = queryDonePromise.get_future().get();
+        if (dbResult != nx::db::DBResult::ok)
+            throw nx::db::Exception(dbResult);
+
+        return result;
+    }
 };
 
 /**

@@ -16,8 +16,32 @@ constexpr auto kDbRepeatedConnectionAttemptDelay = std::chrono::seconds(5);
 
 } // namespace
 
-DbInstanceController::DbInstanceController(const nx::db::ConnectionOptions& dbConnectionOptions):
-    nx::db::InstanceController(dbConnectionOptions)
+DbInstanceController::DbInstanceController(
+    const nx::db::ConnectionOptions& dbConnectionOptions,
+    boost::optional<unsigned int> dbVersionToUpdateTo)
+    :
+    nx::db::InstanceController(dbConnectionOptions),
+    m_userAuthRecordsMigrationNeeded(false)
+{
+    initializeStructureMigration();
+    if (dbVersionToUpdateTo)
+        dbStructureUpdater().setVersionToUpdateTo(*dbVersionToUpdateTo);
+
+    if (!initialize())
+    {
+        NX_LOG(lit("Failed to initialize DB connection"), cl_logALWAYS);
+        throw nx::db::Exception(
+            nx::db::DBResult::ioError,
+            "Failed to initialize connection to DB");
+    }
+}
+
+bool DbInstanceController::isUserAuthRecordsMigrationNeeded() const
+{
+    return m_userAuthRecordsMigrationNeeded;
+}
+
+void DbInstanceController::initializeStructureMigration()
 {
     dbStructureUpdater().addFullSchemaScript(13, db::kCreateDbVersion13);
 
@@ -62,14 +86,12 @@ DbInstanceController::DbInstanceController(const nx::db::ConnectionOptions& dbCo
 
     dbStructureUpdater().addUpdateScript(db::kAddSystemUserAuthInfo);
     dbStructureUpdater().addUpdateScript(db::kAddSystemNonce);
-
-    if (!initialize())
-    {
-        NX_LOG(lit("Failed to initialize DB connection"), cl_logALWAYS);
-        throw nx::db::Exception(
-            nx::db::DBResult::ioError,
-            "Failed to initialize connection to DB");
-    }
+    dbStructureUpdater().addUpdateFunc(
+        [this](nx::db::QueryContext*)
+        {
+            m_userAuthRecordsMigrationNeeded = true;
+            return nx::db::DBResult::ok;
+        });
 }
 
 } // namespace rdb

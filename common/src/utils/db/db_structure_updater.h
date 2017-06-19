@@ -2,6 +2,8 @@
 
 #include <vector>
 
+#include <boost/optional.hpp>
+
 #include <QtCore/QByteArray>
 
 #include <nx/utils/move_only_func.h>
@@ -45,6 +47,15 @@ public:
     void addFullSchemaScript(
         unsigned int version,
         QByteArray createSchemaScript);
+    /**
+     * @return Version of the latest known script.
+     */
+    unsigned int maxKnownVersion() const;
+    /**
+     * By default, update is done to the maximum known version. 
+     * I.e., every script/function is applied.
+     */
+    void setVersionToUpdateTo(unsigned int version);
 
     bool updateStructSync();
 
@@ -82,6 +93,7 @@ private:
     unsigned int m_initialVersion;
     std::map<unsigned int, QByteArray> m_fullSchemaScriptByVersion;
     std::vector<DbUpdate> m_updateScripts;
+    boost::optional<unsigned int> m_versionToUpdateTo;
 
     DBResult updateDbInternal(nx::db::QueryContext* const dbConnection);
 
