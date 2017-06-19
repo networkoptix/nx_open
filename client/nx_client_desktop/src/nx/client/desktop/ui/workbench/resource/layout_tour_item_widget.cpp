@@ -82,9 +82,6 @@ LayoutTourItemWidget::LayoutTourItemWidget(
         layout = QnLayoutResource::createFromResource(resource());
 
     m_previewPainter->setLayout(layout);
-    m_previewPainter->setFrameColor(Qt::black);                 //TODO: #GDM #3.1 customize
-    m_previewPainter->setBackgroundColor(QColor("#222B2F"));    //TODO: #GDM #3.1 customize
-    m_previewPainter->setFontColor(palette().color(QPalette::WindowText)); //TODO: #GDM #3.1 customize
 
     initOverlay();
 }
@@ -108,7 +105,7 @@ void LayoutTourItemWidget::initOverlay()
     auto font = this->font();
     font.setPixelSize(14);
     setFont(font);
-    setPaletteColor(this, QPalette::WindowText, QColor("#a5b7c0")); //TODO: #GDM #3.1 customize
+    setPaletteColor(this, QPalette::WindowText, qApp->palette().color(QPalette::Light));
 
     auto titleFont(font);
     titleFont.setWeight(QFont::DemiBold);
@@ -286,7 +283,7 @@ void LayoutTourItemWidget::initOverlay()
     overlayWidget->setLayout(layout);
     overlayWidget->setAcceptedMouseButtons(0);
     overlayWidget->setAutoFillBackground(true);
-    setPaletteColor(overlayWidget, QPalette::Window, qApp->palette().color(QPalette::Window));
+    setPaletteColor(overlayWidget, QPalette::Window, qApp->palette().color(QPalette::Dark));
     addOverlayWidget(overlayWidget, Visible);
 }
 
