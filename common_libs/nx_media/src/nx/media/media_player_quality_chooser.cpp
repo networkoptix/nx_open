@@ -279,7 +279,6 @@ Result chooseVideoQuality(
     const QnVirtualCameraResourcePtr& camera,
     const std::vector<AbstractVideoDecoder*>& currentDecoders)
 {
-    return Result();
     // Obtain Low and High stream codec and resolution.
     QSize highResolution;
     AVCodecID highCodec = AV_CODEC_ID_NONE;
