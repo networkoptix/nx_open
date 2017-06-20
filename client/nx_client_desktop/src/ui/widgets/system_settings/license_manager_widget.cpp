@@ -24,8 +24,9 @@
 #include <common/common_module.h>
 #include <common/static_common_module.h>
 
-#include <core/resource/media_server_resource.h>
 #include <core/resource_management/resource_pool.h>
+#include <core/resource/media_server_resource.h>
+#include <core/resource/user_resource.h>
 
 #include <client/client_translation_manager.h>
 
@@ -46,6 +47,7 @@
 #include <ui/delegates/license_list_item_delegate.h>
 #include <ui/dialogs/license_details_dialog.h>
 #include <ui/widgets/common/snapped_scrollbar.h>
+#include <ui/workbench/workbench_context.h>
 #include <ui/utils/table_export_helper.h>
 
 #include <utils/license_usage_helper.h>
@@ -142,6 +144,7 @@ protected:
 
 QnLicenseManagerWidget::QnLicenseManagerWidget(QWidget *parent) :
     base_type(parent),
+    QnWorkbenchContextAware(parent),
     ui(new Ui::LicenseManagerWidget),
     m_model(new QnLicenseListModel(this)),
     m_validator(new QnLicenseValidator(this))
@@ -808,7 +811,8 @@ void QnLicenseManagerWidget::updateButtons()
     const bool canRemoveAny = std::any_of(selected.cbegin(), selected.cend(),
         [this](const QnLicensePtr& license) { return canRemoveLicense(license); });
 
-    const bool canDeactivateAny = std::any_of(selected.cbegin(), selected.cend(),
+    const bool isOwner = context()->user()->isOwner();
+    const bool canDeactivateAny = isOwner && std::any_of(selected.cbegin(), selected.cend(),
         [this](const QnLicensePtr& license) { return canDeactivateLicense(license); });
 
     m_isRemoveTakeAwayOperation = canRemoveAny || !canDeactivateAny;

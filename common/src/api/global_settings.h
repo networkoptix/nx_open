@@ -248,7 +248,6 @@ public:
     int maxRecorderQueueSizePackets() const;
 
 signals:
-    void adminUserFound(const QnResourcePtr& resource); //use queued signal to prevent previous behavior
     void initialized();
 
     void systemNameChanged();
