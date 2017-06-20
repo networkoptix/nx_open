@@ -2,6 +2,7 @@
 
 #include <chrono>
 
+#include <utils/db/filter.h>
 #include <utils/db/types.h>
 #include <utils/db/query_context.h>
 
@@ -56,6 +57,21 @@ public:
         nx::db::QueryContext* queryContext,
         const std::string& accountEmail,
         std::chrono::system_clock::time_point activationTime) override;
+
+    virtual void updateAccount(
+        nx::db::QueryContext* queryContext,
+        const std::string& accountEmail,
+        const api::AccountUpdateData& accountUpdateData,
+        bool activateAccountIfNotActive) override;
+
+private:
+    std::vector<nx::db::SqlFilterField> prepareAccountFieldsToUpdate(
+        const api::AccountUpdateData& accountData,
+        bool activateAccountIfNotActive);
+    void executeUpdateAccountQuery(
+        nx::db::QueryContext* const queryContext,
+        const std::string& accountEmail,
+        std::vector<nx::db::SqlFilterField> fieldsToSet);
 };
 
 } // namespace rdb

@@ -223,13 +223,6 @@ private:
         nx::db::QueryContext* const tran,
         const data::AccountUpdateDataWithEmail& accountData);
     bool isValidInput(const data::AccountUpdateDataWithEmail& accountData) const;
-    std::vector<nx::db::SqlFilterField> prepareAccountFieldsToUpdate(
-        const data::AccountUpdateDataWithEmail& accountData,
-        bool activateAccountIfNotActive);
-    nx::db::DBResult executeUpdateAccountQuery(
-        nx::db::QueryContext* const queryContext,
-        const std::string& accountEmail,
-        std::vector<nx::db::SqlFilterField> fieldsToSet);
     void updateAccountCache(
         bool activateAccountIfNotActive,
         data::AccountUpdateDataWithEmail accountData);
