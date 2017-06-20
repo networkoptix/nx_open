@@ -1,6 +1,7 @@
 #include "db_instance_controller.h"
 
 #include <thread>
+#include <string>
 
 #include <QtSql/QSqlQuery>
 
@@ -11,6 +12,7 @@ namespace nx {
 namespace db {
 
 constexpr static std::chrono::minutes kDefaultStatisticsAggregationPeriod = std::chrono::minutes(1);
+static const std::string kCdbStructureName = "cdb";
 
 InstanceController::InstanceController(const ConnectionOptions& dbConnectionOptions):
     m_dbConnectionOptions(dbConnectionOptions),

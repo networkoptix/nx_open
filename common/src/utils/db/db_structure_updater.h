@@ -17,9 +17,6 @@ namespace db {
 class AbstractAsyncSqlQueryExecutor;
 class QueryContext;
 
-static const std::string kCdbStructureName = "cdb";
-static const std::string kPersistentShedulerStructureName = "scheduler";
-
 /**
  * Updates are executed in order they have been added to DbStructureUpdater instance.
  * @note Database is not created, it MUST already exist.
@@ -57,7 +54,7 @@ public:
      */
     unsigned int maxKnownVersion() const;
     /**
-     * By default, update is done to the maximum known version. 
+     * By default, update is done to the maximum known version.
      * I.e., every script/function is applied.
      */
     void setVersionToUpdateTo(unsigned int version);

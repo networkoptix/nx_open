@@ -2,6 +2,7 @@
 
 #include <list>
 #include <map>
+#include <string>
 
 #include <nx/fusion/model_functions.h>
 #include <nx/utils/std/cpp14.h>
@@ -13,6 +14,8 @@
 namespace nx {
 namespace db {
 namespace test {
+
+static const std::string kCdbStructureName = "test";
 
 class TestAsyncSqlQueryExecutor:
     public AbstractAsyncSqlQueryExecutor

@@ -1,3 +1,4 @@
+#include <string>
 #include <QtSql>
 #include <nx/utils/log/log.h>
 #include "persistent_scheduler_db_helper.h"
@@ -6,6 +7,7 @@ namespace nx {
 namespace cdb {
 
 static const int kSchedulerDbStartingVersion = 1;
+static const std::string kPersistentShedulerStructureName = "scheduler";
 static const char* const kSchedulerDbScheme =
 R"sql(
 CREATE TABLE schedule_data(
@@ -19,7 +21,7 @@ CREATE TABLE schedule_data(
 )sql";
 
 SchedulerDbHelper::SchedulerDbHelper(nx::db::AbstractAsyncSqlQueryExecutor* sqlExecutor):
-    m_dbStructureUpdater(nx::db::kPersistentShedulerStructureName, sqlExecutor)
+    m_dbStructureUpdater(kPersistentShedulerStructureName, sqlExecutor)
 {
     m_dbStructureUpdater.addFullSchemaScript(kSchedulerDbStartingVersion, kSchedulerDbScheme);
 }
