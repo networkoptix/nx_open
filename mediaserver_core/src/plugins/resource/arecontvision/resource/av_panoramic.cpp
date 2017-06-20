@@ -162,7 +162,7 @@ void QnArecontPanoramicResource::updateFlipState()
     }
 
     QString oldVideoLayout = propertyDictionary->value(getId(), Qn::VIDEO_LAYOUT_PARAM_NAME); // get from kvpairs directly. do not read default value from resourceTypes
-    QString newVideoLayout = layout->toString();
+    QString newVideoLayout = m_customVideoLayout->toString();
     if (newVideoLayout != oldVideoLayout)
     {
         propertyDictionary->setValue(getId(), Qn::VIDEO_LAYOUT_PARAM_NAME, newVideoLayout);
