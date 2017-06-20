@@ -1,8 +1,3 @@
-/**********************************************************
-* Oct 2, 2015
-* akolesnikov
-***********************************************************/
-
 #include "cloud_connection_manager.h"
 
 #include <nx/fusion/serialization/lexical.h>
@@ -13,12 +8,12 @@
 #include <common/common_module.h>
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/user_resource.h>
+#include <core/resource/media_server_resource.h>
 
+#include "media_server/media_server_module.h"
 #include "media_server/settings.h"
 #include "media_server/serverutil.h"
-#include <core/resource/media_server_resource.h>
-#include <server/server_globals.h>
-#include <media_server/media_server_module.h>
+#include "server/server_globals.h"
 
 namespace {
 constexpr const auto kMaxEventConnectionStartRetryPeriod = std::chrono::minutes(1);
@@ -48,14 +43,6 @@ CloudConnectionManager::~CloudConnectionManager()
     directDisconnectAll();
 }
 
-void CloudConnectionManager::setProxyVia(const SocketAddress& proxyEndpoint)
-{
-    QnMutexLocker lock(&m_mutex);
-
-    NX_ASSERT(proxyEndpoint.port > 0);
-    m_proxyAddress = proxyEndpoint;
-}
-
 boost::optional<nx::hpm::api::SystemCredentials>
     CloudConnectionManager::getSystemCredentials() const
 {
@@ -72,45 +59,6 @@ boost::optional<nx::hpm::api::SystemCredentials>
     return cloudCredentials;
 }
 
-void CloudConnectionManager::setCloudCredentials(
-    const QString& cloudSystemId,
-    const QString& cloudAuthKey)
-{
-    NX_LOGX(lm("New cloud credentials: %1:%2")
-        .arg(cloudSystemId).arg(cloudAuthKey.size()), cl_logINFO);
-
-    if (cloudSystemId.isEmpty() != cloudAuthKey.isEmpty())
-        return; //< Ignoring intermediate state.
-
-    const bool boundToCloud = !cloudSystemId.isEmpty() && !cloudAuthKey.isEmpty();
-
-    if (boundToCloud)
-    {
-        nx::hpm::api::SystemCredentials credentials(
-            cloudSystemId.toUtf8(),
-            commonModule()->moduleGUID().toSimpleString().toUtf8(),
-            cloudAuthKey.toUtf8());
-
-        nx::network::SocketGlobals::mediatorConnector()
-            .setSystemCredentials(std::move(credentials));
-
-        qnServerModule->roSettings()->setValue(QnServer::kIsConnectedToCloudKey, "yes");
-    }
-    else
-    {
-        nx::network::SocketGlobals::mediatorConnector()
-            .setSystemCredentials(boost::none);
-        qnServerModule->roSettings()->setValue(QnServer::kIsConnectedToCloudKey, "no");
-        makeSystemLocal();
-    }
-
-    emit cloudBindingStatusChanged(boundToCloud);
-    if (boundToCloud)
-        emit connectedToCloud();
-    else
-        emit disconnectedFromCloud();
-}
-
 bool CloudConnectionManager::boundToCloud() const
 {
     const auto cloudSystemId = qnGlobalSettings->cloudSystemId();
@@ -125,7 +73,8 @@ std::unique_ptr<nx::cdb::api::Connection> CloudConnectionManager::getCloudConnec
     QString proxyLogin;
     QString proxyPassword;
 
-    auto server = resourcePool()->getResourceById<QnMediaServerResource>(commonModule()->moduleGUID());
+    auto server = resourcePool()->getResourceById<QnMediaServerResource>(
+        commonModule()->moduleGUID());
     if (server)
     {
         proxyLogin = server->getId().toString();
@@ -138,8 +87,12 @@ std::unique_ptr<nx::cdb::api::Connection> CloudConnectionManager::getCloudConnec
     QnMutexLocker lock(&m_mutex);
     if (m_proxyAddress)
     {
-        result->setProxyCredentials(proxyLogin.toStdString(), proxyPassword.toStdString());
-        result->setProxyVia(m_proxyAddress->address.toString().toStdString(), m_proxyAddress->port);
+        result->setProxyCredentials(
+            proxyLogin.toStdString(),
+            proxyPassword.toStdString());
+        result->setProxyVia(
+            m_proxyAddress->address.toString().toStdString(),
+            m_proxyAddress->port);
     }
     return result;
 }
@@ -180,6 +133,14 @@ void CloudConnectionManager::processCloudErrorCode(
     }
 }
 
+void CloudConnectionManager::setProxyVia(const SocketAddress& proxyEndpoint)
+{
+    QnMutexLocker lock(&m_mutex);
+
+    NX_ASSERT(proxyEndpoint.port > 0);
+    m_proxyAddress = proxyEndpoint;
+}
+
 bool CloudConnectionManager::detachSystemFromCloud()
 {
     NX_DEBUG(this, lm("Detaching system %1 from cloud ")
@@ -198,6 +159,45 @@ bool CloudConnectionManager::detachSystemFromCloud()
     qnServerModule->roSettings()->setValue(QnServer::kIsConnectedToCloudKey, "no");
 
     return true;
+}
+
+void CloudConnectionManager::setCloudCredentials(
+    const QString& cloudSystemId,
+    const QString& cloudAuthKey)
+{
+    NX_LOGX(lm("New cloud credentials: %1:%2")
+        .arg(cloudSystemId).arg(cloudAuthKey.size()), cl_logINFO);
+
+    if (cloudSystemId.isEmpty() != cloudAuthKey.isEmpty())
+        return; //< Ignoring intermediate state.
+
+    const bool boundToCloud = !cloudSystemId.isEmpty() && !cloudAuthKey.isEmpty();
+
+    if (boundToCloud)
+    {
+        nx::hpm::api::SystemCredentials credentials(
+            cloudSystemId.toUtf8(),
+            commonModule()->moduleGUID().toSimpleString().toUtf8(),
+            cloudAuthKey.toUtf8());
+
+        nx::network::SocketGlobals::mediatorConnector()
+            .setSystemCredentials(std::move(credentials));
+
+        qnServerModule->roSettings()->setValue(QnServer::kIsConnectedToCloudKey, "yes");
+    }
+    else
+    {
+        nx::network::SocketGlobals::mediatorConnector()
+            .setSystemCredentials(boost::none);
+        qnServerModule->roSettings()->setValue(QnServer::kIsConnectedToCloudKey, "no");
+        makeSystemLocal();
+    }
+
+    emit cloudBindingStatusChanged(boundToCloud);
+    if (boundToCloud)
+        emit connectedToCloud();
+    else
+        emit disconnectedFromCloud();
 }
 
 bool CloudConnectionManager::makeSystemLocal()
