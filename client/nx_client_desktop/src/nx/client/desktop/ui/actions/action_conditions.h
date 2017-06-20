@@ -608,6 +608,9 @@ ConditionWrapper always();
 /** Visible when user is logged in (or at least logging in). */
 ConditionWrapper isLoggedIn();
 
+/** Check a condition only in the given scope */
+ConditionWrapper scoped(ActionScope scope, ConditionWrapper&& condition);
+
 /** Visible in preview search mode only. */
 ConditionWrapper isPreviewSearchMode();
 

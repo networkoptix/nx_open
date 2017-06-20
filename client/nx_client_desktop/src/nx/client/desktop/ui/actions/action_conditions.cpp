@@ -145,6 +145,27 @@ private:
     ConditionWrapper m_condition;
 };
 
+class ScopedCondition: public Condition
+{
+public:
+    ScopedCondition(ActionScope scope, ConditionWrapper&& condition):
+        m_scope(scope),
+        m_condition(std::move(condition))
+    {
+    }
+
+    virtual ActionVisibility check(const Parameters& parameters, QnWorkbenchContext* context) override
+    {
+        if (parameters.scope() != m_scope)
+            return EnabledAction;
+        return m_condition->check(parameters, context);
+    }
+
+private:
+    ActionScope m_scope;
+    ConditionWrapper m_condition;
+};
+
 class CustomBoolCondition: public Condition
 {
 public:
@@ -1619,6 +1640,11 @@ ConditionWrapper isLoggedIn()
         {
             return !context->commonModule()->remoteGUID().isNull();
         });
+}
+
+ConditionWrapper scoped(ActionScope scope, ConditionWrapper&& condition)
+{
+    return new ScopedCondition(scope, std::move(condition));
 }
 
 ConditionWrapper isPreviewSearchMode()

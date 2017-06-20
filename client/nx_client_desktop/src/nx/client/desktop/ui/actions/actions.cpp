@@ -366,15 +366,13 @@ void initialize(Manager* manager, Action* root)
             .requiredTargetPermissions(Qn::CurrentLayoutResourceRole, Qn::WritePermission | Qn::AddRemoveItemsPermission)
             .text(tr("File(s)..."))
             .shortcut(lit("Ctrl+O"))
-            .condition(!condition::isLayoutTourReviewMode()
-                && !condition::tourIsRunning())
+            .condition(!condition::tourIsRunning())
             .autoRepeat(false);
 
         factory(OpenFolderAction)
             .flags(Main | Scene)
             .requiredTargetPermissions(Qn::CurrentLayoutResourceRole, Qn::WritePermission | Qn::AddRemoveItemsPermission)
-            .condition(!condition::isLayoutTourReviewMode()
-                && !condition::tourIsRunning())
+            .condition(!condition::tourIsRunning())
             .text(tr("Folder..."));
 
         factory().separator()
@@ -1216,9 +1214,10 @@ void initialize(Manager* manager, Action* root)
             ), manager))
         .requiredGlobalPermission(Qn::GlobalViewLogsPermission)
         .condition(condition::hasFlags(Qn::live_cam, Any)
-            && !condition::isPreviewSearchMode()
             && !condition::tourIsRunning()
-            && !condition::isLayoutTourReviewMode());
+            && condition::scoped(SceneScope,
+                !condition::isLayoutTourReviewMode()
+                && !condition::isPreviewSearchMode()));
 
     factory(CameraBusinessRulesAction)
         .mode(DesktopMode)
@@ -1231,9 +1230,10 @@ void initialize(Manager* manager, Action* root)
             ), manager))
         .requiredGlobalPermission(Qn::GlobalAdminPermission)
         .condition(condition::hasFlags(Qn::live_cam, ExactlyOne)
-            && !condition::isPreviewSearchMode()
             && !condition::tourIsRunning()
-            && !condition::isLayoutTourReviewMode());
+            && condition::scoped(SceneScope,
+                !condition::isLayoutTourReviewMode()
+                && !condition::isPreviewSearchMode()));
 
     factory(CameraSettingsAction)
         .mode(DesktopMode)
@@ -1246,9 +1246,10 @@ void initialize(Manager* manager, Action* root)
             ), manager))
         .requiredGlobalPermission(Qn::GlobalEditCamerasPermission)
         .condition(condition::hasFlags(Qn::live_cam, Any)
-            && !condition::isPreviewSearchMode()
             && !condition::tourIsRunning()
-            && !condition::isLayoutTourReviewMode());
+            && condition::scoped(SceneScope,
+                !condition::isLayoutTourReviewMode()
+                && !condition::isPreviewSearchMode()));
 
     factory(MediaFileSettingsAction)
         .mode(DesktopMode)
@@ -1256,7 +1257,9 @@ void initialize(Manager* manager, Action* root)
         .text(tr("File Settings..."))
         .condition(condition::hasFlags(Qn::local_media, Any)
             && !condition::tourIsRunning()
-            && !condition::isLayoutTourReviewMode());
+            && condition::scoped(SceneScope,
+                !condition::isLayoutTourReviewMode()
+                && !condition::isPreviewSearchMode()));
 
     factory(LayoutSettingsAction)
         .mode(DesktopMode)
@@ -1281,7 +1284,8 @@ void initialize(Manager* manager, Action* root)
             && ConditionWrapper(new EdgeServerCondition(false))
             && !ConditionWrapper(new FakeServerCondition(true))
             && !condition::isSafeMode()
-            && !condition::isLayoutTourReviewMode());
+            && !condition::tourIsRunning()
+            && condition::scoped(SceneScope, !condition::isLayoutTourReviewMode()));
 
     factory(CameraListByServerAction)
         .flags(Scene | Tree | SingleTarget | ResourceTarget | LayoutItemTarget)
@@ -1295,7 +1299,7 @@ void initialize(Manager* manager, Action* root)
             && ConditionWrapper(new EdgeServerCondition(false))
             && !ConditionWrapper(new FakeServerCondition(true))
             && !condition::tourIsRunning()
-            && !condition::isLayoutTourReviewMode());
+            && condition::scoped(SceneScope, !condition::isLayoutTourReviewMode()));
 
     factory(PingAction)
         .flags(NoTarget);
@@ -1307,7 +1311,7 @@ void initialize(Manager* manager, Action* root)
         .condition(condition::hasFlags(Qn::remote_server, ExactlyOne)
             && !ConditionWrapper(new FakeServerCondition(true))
             && !condition::tourIsRunning()
-            && !condition::isLayoutTourReviewMode());
+            && condition::scoped(SceneScope, !condition::isLayoutTourReviewMode()));
 
     factory(ServerIssuesAction)
         .flags(Scene | Tree | SingleTarget | ResourceTarget | LayoutItemTarget)
@@ -1316,7 +1320,7 @@ void initialize(Manager* manager, Action* root)
         .condition(condition::hasFlags(Qn::remote_server, ExactlyOne)
             && !ConditionWrapper(new FakeServerCondition(true))
             && !condition::tourIsRunning()
-            && !condition::isLayoutTourReviewMode());
+            && condition::scoped(SceneScope, !condition::isLayoutTourReviewMode()));
 
     factory(WebAdminAction)
         .flags(Scene | Tree | SingleTarget | MultiTarget | ResourceTarget | LayoutItemTarget)
@@ -1326,7 +1330,7 @@ void initialize(Manager* manager, Action* root)
             && !ConditionWrapper(new FakeServerCondition(true))
             && !ConditionWrapper(new CloudServerCondition(Any))
             && !condition::tourIsRunning()
-            && !condition::isLayoutTourReviewMode());
+            && condition::scoped(SceneScope, !condition::isLayoutTourReviewMode()));
 
     factory(ServerSettingsAction)
         .flags(Scene | Tree | SingleTarget | MultiTarget | ResourceTarget | LayoutItemTarget)
@@ -1335,7 +1339,7 @@ void initialize(Manager* manager, Action* root)
         .condition(condition::hasFlags(Qn::remote_server, ExactlyOne)
             && !ConditionWrapper(new FakeServerCondition(true))
             && !condition::tourIsRunning()
-            && !condition::isLayoutTourReviewMode());
+            && condition::scoped(SceneScope, !condition::isLayoutTourReviewMode()));
 
     factory(ConnectToCurrentSystem)
         .flags(Tree | SingleTarget | MultiTarget | ResourceTarget)
