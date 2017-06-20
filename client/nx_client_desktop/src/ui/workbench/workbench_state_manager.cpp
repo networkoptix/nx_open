@@ -90,7 +90,6 @@ void QnWorkbenchStateManager::saveState()
 
     qnSettings->setWorkbenchStates(states);
     qnSettings->save();
-    return;
 }
 
 void QnWorkbenchStateManager::restoreState()
