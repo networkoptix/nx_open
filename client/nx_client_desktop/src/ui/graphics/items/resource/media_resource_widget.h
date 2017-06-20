@@ -299,7 +299,7 @@ private:
     SoftwareTrigger* createTriggerIfRelevant(const QnBusinessEventRulePtr& rule);
     bool isRelevantTriggerRule(const QnBusinessEventRulePtr& rule) const;
     void configureTriggerButton(QnSoftwareTriggerButton* button, const SoftwareTriggerInfo& info,
-        std::function<void()> clientsideHandler = std::function<void()>());
+        std::function<void()> clientSideHandler = std::function<void()>());
     void resetTriggers();
 
 private:
