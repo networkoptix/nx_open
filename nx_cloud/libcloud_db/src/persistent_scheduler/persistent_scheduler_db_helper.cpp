@@ -79,7 +79,7 @@ nx::db::DBResult SchedulerDbHelper::subscribe(
 
     *outTaskId = QnUuid::createUuid();
 
-    for (const auto& param : taskInfo.params)
+    for (const auto& param: taskInfo.params)
     {
         subscribeQuery.bindValue(":functorId", functorId.toRfc4122());
         subscribeQuery.bindValue(":taskId", outTaskId->toRfc4122());
@@ -121,5 +121,5 @@ nx::db::DBResult SchedulerDbHelper::unsubscribe(
     return nx::db::DBResult::ok;
 }
 
-}
-}
+} // namespace cdb
+} // namespace nx

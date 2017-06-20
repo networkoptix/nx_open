@@ -14,7 +14,7 @@ public:
         int fired;
         bool subscribed;
 
-        Task(int fired, int subscribed) : fired(fired), subscribed(subscribed) {}
+        Task(int fired, int subscribed): fired(fired), subscribed(subscribed) {}
         Task(): fired(0), subscribed(false) {}
     };
 
