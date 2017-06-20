@@ -32,17 +32,21 @@ QGraphicsView *ViewportAnimator::view() const {
     return checked_cast<QGraphicsView *>(targetObject());
 }
 
-void ViewportAnimator::moveTo(const QRectF &rect, bool animate) {
+void ViewportAnimator::moveTo(const QRectF &rect, bool animate)
+{
     m_adjustedTargetRect = rect;
-    
-    if(animate) {
-        setTargetValue(adjustedToReal(rect));
+    setTargetValue(adjustedToReal(rect));
+
+    if (animate)
+    {
         start();
-    } else {
+    }
+    else
+    {
         stop();
         updateCurrentValue(adjustedToReal(rect));
     }
-    
+
     m_adjustedTargetRectValid = true;
 }
 
@@ -135,7 +139,7 @@ QRectF ViewportAnimator::adjustedToReal(const QGraphicsView *view, const QRectF 
 
     MarginsF relativeMargins = QnGeometry::cwiseDiv(m_margins, view->viewport()->size());
 
-    /* Calculate margins that can be used for expanding adjusted to real rect. 
+    /* Calculate margins that can be used for expanding adjusted to real rect.
      * Note that these margins are still positive, so SceneUtility::dilated should be used with them. */
     MarginsF inverseRelativeMargins = QnGeometry::cwiseDiv(relativeMargins, QSize(1.0, 1.0) - QnGeometry::sizeDelta(relativeMargins));
 
@@ -168,4 +172,3 @@ QRectF ViewportAnimator::adjustedToReal(const QGraphicsView *view, const QRectF 
 
     return QRectF(realCenter - QnGeometry::toPoint(realSize) / 2, realSize);
 }
- 
