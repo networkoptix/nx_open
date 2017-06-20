@@ -243,22 +243,22 @@
     },
 
     "QnAlertBar": {
-        "palette": { 
+        "palette": {
             "default": {
                 "window": "#61282b"
             }
         }
     },
-    
+
     "QnPromoBar": {
-        "palette": { 
+        "palette": {
             "default": {
                 "window": "brand_d5",
                 "link": "light4",
                 "linkVisited": "light1"
             }
         }
-    },    
+    },
 
     "QHeaderView": {
         "palette": {
@@ -448,11 +448,11 @@
             }
         }
     },
-    
+
     "QnGridBackgroundItem": {
         "_": "Scene background color for custom layouts.",
         "panelColor": "#1d2327"
-    },    
+    },
 
     "QnControlBackgroundWidget": {
         "_": "Background for ui panels (resource tree, notifications panel).",
@@ -498,7 +498,7 @@
     "QnVideowallItemWidget": {
         "palette": { "default": { "window": "dark4" } }
     },
-    
+
     "nx::client::desktop::ui::workbench::LayoutTourItemWidget": {
         "_": "dark is used to paint darker text",
         "palette": {
@@ -514,10 +514,10 @@
     },
 
     "QnServerUpdatesModel": {
-        "colors": { 
-            "latest": "green_l2", 
-            "target": "yellow_core", 
-            "error": "red_l2" 
+        "colors": {
+            "latest": "green_l2",
+            "target": "yellow_core",
+            "error": "red_l2"
         }
     },
 
@@ -602,7 +602,7 @@
     },
 
     "QCalendarWidget": {
-        "palette": { 
+        "palette": {
             "default": {
                 "base": "dark14",
                 "window": "dark13",
@@ -615,7 +615,7 @@
     },
 
     "QCalendarView": {
-        "palette": { 
+        "palette": {
             "default": {
                 "text": "light4",
                 "shadow": "dark11",
@@ -786,7 +786,7 @@
             }
         }
     },
-    
+
     "QnMediaResourceWidget": {
         "motionSensitivityColors": [
             "light16",
@@ -801,7 +801,7 @@
             "#c22626"
         ]
     },
-    
+
     "QnTimeServerSelectionModel": {
         "colors": [
             "light12",
@@ -819,7 +819,7 @@
     "QnFisheyeCalibrationWidget": {
         "palette": { "default": { "window": "dark4" } }
     },
-    
+
     "QnCloudStatusPanel": {
         "palette": { "default": { "window": "dark8" } }
     },
@@ -835,12 +835,12 @@
             }
         }
     },
-    
+
     "nx::client::desktop::ui::LayoutPreviewPainter": {
         "frameColor": "dark1",
         "fontColor": "light16",
         "backgroundColor": "dark7"
-    },   
+    },
 
     "QnHudOverlayWidget": {
         "palette": {
