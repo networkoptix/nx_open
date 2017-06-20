@@ -139,7 +139,7 @@ protected:
     {
         ASSERT_EQ(1U, m_tempPasswordManager.registeredCredentials().size());
         const auto& tempCredentials = m_tempPasswordManager.registeredCredentials()[0];
-        ASSERT_EQ(1U, tempCredentials.maxUseCount);
+        ASSERT_EQ(1, tempCredentials.maxUseCount);
 
         auto curTime = nx::utils::utcTime();
         ASSERT_TRUE(equalWithError(
