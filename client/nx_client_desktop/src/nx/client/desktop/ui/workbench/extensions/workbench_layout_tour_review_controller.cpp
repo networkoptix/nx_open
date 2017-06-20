@@ -249,7 +249,6 @@ void LayoutTourReviewController::reviewLayoutTour(const ec2::ApiLayoutTourData& 
     resetReviewLayout(layout, tour.items);
 
     menu()->trigger(action::OpenInNewTabAction, layout);
-    updateButtons(layout);
 }
 
 QnUuid LayoutTourReviewController::currentTourId() const
