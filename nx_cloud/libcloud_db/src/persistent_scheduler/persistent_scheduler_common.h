@@ -26,5 +26,5 @@ struct ScheduleData
     TaskToParams taskToParams;
 };
 
-}
-}
+} // namespace cdb
+} // namespace nx

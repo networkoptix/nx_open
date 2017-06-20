@@ -53,5 +53,5 @@ private:
     nx::db::DbStructureUpdater m_dbStructureUpdater;
 };
 
-}
-}
+} // namespace cdb
+} // namespace nx

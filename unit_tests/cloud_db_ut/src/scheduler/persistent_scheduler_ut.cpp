@@ -15,9 +15,15 @@ using namespace ::testing;
 class DbHelperStub: public nx::cdb::AbstractSchedulerDbHelper
 {
 public:
-    MOCK_CONST_METHOD2(getScheduleData, nx::db::DBResult(nx::db::QueryContext*, nx::cdb::ScheduleData*));
-    MOCK_METHOD4(subscribe, nx::db::DBResult(nx::db::QueryContext*, const QnUuid&, QnUuid*, const ScheduleTaskInfo&));
-    MOCK_METHOD2(unsubscribe, nx::db::DBResult(nx::db::QueryContext*, const QnUuid&));
+    MOCK_CONST_METHOD2(
+        getScheduleData,
+        nx::db::DBResult(nx::db::QueryContext*, nx::cdb::ScheduleData*));
+    MOCK_METHOD4(
+        subscribe,
+        nx::db::DBResult(nx::db::QueryContext*, const QnUuid&, QnUuid*, const ScheduleTaskInfo&));
+    MOCK_METHOD2(
+        unsubscribe,
+        nx::db::DBResult(nx::db::QueryContext*, const QnUuid&));
 };
 
 class SqlExecutorStub: public nx::db::AbstractAsyncSqlQueryExecutor
@@ -96,7 +102,7 @@ protected:
         FunctorToTasks functorToTasks;
         functorToTasks.emplace(functorId, std::set<QnUuid>{taskId});
 
-        ScheduleData dbData = { functorToTasks, taskParams };
+        ScheduleData dbData = {functorToTasks, taskParams};
 
         EXPECT_CALL(dbHelper, getScheduleData(_, NotNull()))
             .Times(AtLeast(1))
@@ -166,7 +172,7 @@ protected:
 
     void whenShouldUnsubscribeFromHandler(
         const QnUuid& taskId,
-        nx::utils::MoveOnlyFunc<void(const QnUuid&, const nx::cdb::test::SchedulerUser::Task&)> unsubscribeCb)
+        SchedulerUser::UnsubscribeCb unsubscribeCb)
     {
         user->setShouldUnsubscribe(taskId, std::move(unsubscribeCb));
     }
@@ -284,8 +290,8 @@ TEST_F(PersistentScheduler, unsubscribe_dbError)
 
 TEST_F(PersistentScheduler, running2Tasks)
 {
-    const std::chrono::milliseconds kFirstTaskTimeout{ 10 };
-    const std::chrono::milliseconds kSecondTaskTimeout{ 20 };
+    const std::chrono::milliseconds kFirstTaskTimeout{10};
+    const std::chrono::milliseconds kSecondTaskTimeout{20};
 
     expectingGetScheduledDataFromDbWithNoDataWillBeCalled();
     expectingDbHelperSubscribeWillBeCalledTwice();

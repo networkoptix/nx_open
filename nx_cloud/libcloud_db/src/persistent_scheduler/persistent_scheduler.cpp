@@ -20,7 +20,8 @@ static DelayInfo calcDelay(const ScheduleTaskInfo& taskInfo)
     DelayInfo result;
 
     auto nowTimePoint = steady_clock::now();
-    qint64 durationFromSchedulePointToNowMs = duration_cast<milliseconds>(nowTimePoint - taskInfo.schedulePoint).count();
+    qint64 durationFromSchedulePointToNowMs =
+        duration_cast<milliseconds>(nowTimePoint - taskInfo.schedulePoint).count();
     qint64 periodMs = taskInfo.period.count();
     result.fullPeriodsPassed = durationFromSchedulePointToNowMs / periodMs;
 
@@ -34,7 +35,7 @@ static DelayInfo calcDelay(const ScheduleTaskInfo& taskInfo)
     return result;
 }
 
-}
+} // namespace <anonymous>
 
 PersistentScheduler::PersistentScheduler(
     nx::db::AbstractAsyncSqlQueryExecutor* sqlExecutor,
@@ -212,7 +213,7 @@ void PersistentScheduler::timerFunction(
         if (it == m_functorToReceiver.cend())
         {
             NX_LOG(lit("[Scheduler] No receiver for functor id %1")
-                   .arg(functorId.toString()), cl_logDEBUG1);
+               .arg(functorId.toString()), cl_logDEBUG1);
 
             auto& taskToParams = m_functorToTaskToParams[functorId];
             if (taskToParams.find(taskId) == taskToParams.cend())
@@ -232,7 +233,7 @@ void PersistentScheduler::timerFunction(
             if (result != nx::db::DBResult::ok)
             {
                 NX_LOG(lit("[Scheduler] Use on timer callback returned error %1")
-                       .arg(toString(result)), cl_logERROR);
+                   .arg(toString(result)), cl_logERROR);
             }
         });
 }
@@ -244,9 +245,9 @@ void PersistentScheduler::start()
         m_timerManager.reset(new nx::utils::StandaloneTimerManager);
     }
 
-    for (const auto functorToTask : m_scheduleData.functorToTasks)
+    for (const auto functorToTask: m_scheduleData.functorToTasks)
     {
-        for (const auto taskId : functorToTask.second)
+        for (const auto taskId: functorToTask.second)
         {
             addTimer(
                 functorToTask.first,

@@ -6,7 +6,7 @@ namespace nx {
 namespace cdb {
 namespace test {
 
-class SchedulerUser : public nx::cdb::AbstractPersistentScheduleEventReceiver
+class SchedulerUser: public nx::cdb::AbstractPersistentScheduleEventReceiver
 {
 public:
     struct Task
@@ -15,9 +15,11 @@ public:
         bool subscribed;
 
         Task(int fired, int subscribed) : fired(fired), subscribed(subscribed) {}
-        Task() : fired(0), subscribed(false) {}
+        Task(): fired(0), subscribed(false) {}
     };
 
+    using UnsubscribeCb = nx::utils::MoveOnlyFunc<void(const QnUuid&, const Task& task)>;
+    using SubscribeCb = nx::utils::MoveOnlyFunc<void(const QnUuid&)>;
     using TaskMap = std::unordered_map<QnUuid, Task>;
 
     SchedulerUser(
@@ -45,85 +47,83 @@ public:
         }
 
         return
-            [this](nx::db::QueryContext*)
-        {
-            if (m_shouldSubscribe)
+            [this](nx::db::QueryContext* /*queryContext*/)
             {
-                subscribe(std::chrono::milliseconds(10));
-                m_shouldSubscribe = false;
-            }
+                if (m_shouldSubscribe)
+                {
+                    subscribe(std::chrono::milliseconds(10));
+                    m_shouldSubscribe = false;
+                }
 
-            if (m_shouldUnsubscribe)
-            {
-                unsubscribe(m_unsubscribeId, std::move(m_unsubscribeCallback));
-                m_shouldUnsubscribe = false;
-            }
+                if (m_shouldUnsubscribe)
+                {
+                    unsubscribe(m_unsubscribeId, std::move(m_unsubscribeCallback));
+                    m_shouldUnsubscribe = false;
+                }
 
-            return nx::db::DBResult::ok;
-        };
+                return nx::db::DBResult::ok;
+            };
     }
 
     void unsubscribe(
         const QnUuid& taskId,
-        nx::utils::MoveOnlyFunc<void(const QnUuid&, const Task& task)> completionHandler = [](const QnUuid&, const Task&) {})
+        UnsubscribeCb completionHandler = [](const QnUuid&, const Task&) {})
     {
         m_executor->executeUpdate(
-            [this, taskId, completionHandler = std::move(completionHandler)](nx::db::QueryContext* queryContext)
-        {
-            auto dbResult = m_scheduler->unsubscribe(queryContext, taskId);
-            if (dbResult != nx::db::DBResult::ok)
-                return dbResult;
-            Task task;
+            [this, taskId, completionHandler = std::move(completionHandler)](
+                nx::db::QueryContext* queryContext)
             {
-                QnMutexLocker lock(&m_mutex);
-                NX_ASSERT(m_tasks.find(taskId) != m_tasks.cend());
-                m_tasks[taskId].subscribed = false;
-                task = m_tasks[taskId];
-            }
-            completionHandler(taskId, task);
-            return nx::db::DBResult::ok;
-        },
-            [](nx::db::QueryContext*, nx::db::DBResult)
-        {
-        });
+                auto dbResult = m_scheduler->unsubscribe(queryContext, taskId);
+                if (dbResult != nx::db::DBResult::ok)
+                    return dbResult;
+                Task task;
+                {
+                    QnMutexLocker lock(&m_mutex);
+                    NX_ASSERT(m_tasks.find(taskId) != m_tasks.cend());
+                    m_tasks[taskId].subscribed = false;
+                    task = m_tasks[taskId];
+                }
+                completionHandler(taskId, task);
+                return nx::db::DBResult::ok;
+            },
+            [](nx::db::QueryContext* /*queryContext*/, nx::db::DBResult /*result*/) {});
     }
 
     void subscribe(
         std::chrono::milliseconds timeout,
-        nx::utils::MoveOnlyFunc<void(const QnUuid&)> completionHandler = [](const QnUuid&) {})
+        SubscribeCb completionHandler = [](const QnUuid&) {})
     {
         nx::cdb::ScheduleParams params;
         params["key1"] = "value1";
         params["key2"] = "value1";
 
         m_executor->executeUpdate(
-            [this, params, timeout, completionHandler = std::move(completionHandler)](nx::db::QueryContext* queryContext)
-        {
-            QnUuid taskId;
-            auto dbResult = m_scheduler->subscribe(
-                queryContext,
-                m_functorId,
-                &taskId,
-                timeout,
-                params);
-            if (dbResult != nx::db::DBResult::ok)
-                return dbResult;
-            NX_ASSERT(!taskId.isNull());
+            [this, params, timeout, completionHandler = std::move(completionHandler)](
+                nx::db::QueryContext* queryContext)
             {
-                QnMutexLocker lock(&m_mutex);
-                m_tasks.emplace(taskId, Task(0, true));
-            }
-            completionHandler(taskId);
-            return nx::db::DBResult::ok;
-        },
-            [](nx::db::QueryContext*, nx::db::DBResult)
-        {
-        });
+                QnUuid taskId;
+                auto dbResult = m_scheduler->subscribe(
+                    queryContext,
+                    m_functorId,
+                    &taskId,
+                    timeout,
+                    params);
+                if (dbResult != nx::db::DBResult::ok)
+                    return dbResult;
+                NX_ASSERT(!taskId.isNull());
+                {
+                    QnMutexLocker lock(&m_mutex);
+                    m_tasks.emplace(taskId, Task(0, true));
+                }
+                completionHandler(taskId);
+                return nx::db::DBResult::ok;
+            },
+            [](nx::db::QueryContext* /*queryContext*/, nx::db::DBResult /*result*/)
+            {
+            });
     }
 
-    void setShouldUnsubscribe(
-        const QnUuid& taskId,
-        nx::utils::MoveOnlyFunc<void(const QnUuid& taskId, const Task&)> unsubscribeCb)
+    void setShouldUnsubscribe(const QnUuid& taskId, UnsubscribeCb unsubscribeCb)
     {
         m_unsubscribeId = taskId;
         m_unsubscribeCallback = std::move(unsubscribeCb);
@@ -142,7 +142,7 @@ private:
     nx::cdb::PersistentScheduler* m_scheduler;
     std::atomic<bool> m_shouldUnsubscribe{ false };
     std::atomic<bool> m_shouldSubscribe{ false };
-    nx::utils::MoveOnlyFunc<void(const QnUuid& taskId, const Task& task)> m_unsubscribeCallback;
+    UnsubscribeCb m_unsubscribeCallback;
     QnUuid m_unsubscribeId;
     TaskMap m_tasks;
     QnMutex m_mutex;

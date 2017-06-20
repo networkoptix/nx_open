@@ -8,16 +8,15 @@ namespace cdb {
 
 static const int kSchedulerDbStartingVersion = 1;
 static const std::string kPersistentShedulerStructureName = "scheduler";
-static const char* const kSchedulerDbScheme =
-R"sql(
-CREATE TABLE schedule_data(
-    functor_type_id     VARCHAR(64) NOT NULL,
-    task_id             VARCHAR(64) NOT NULL,
-    schedule_point      BIGINT,
-    period              BIGINT,
-    param_key           VARCHAR(4096) NOT NULL,
-    param_value         VARCHAR(4096) NOT NULL
-);
+static const char* const kSchedulerDbScheme = R"sql(
+    CREATE TABLE schedule_data(
+        functor_type_id     VARCHAR(64) NOT NULL,
+        task_id             VARCHAR(64) NOT NULL,
+        schedule_point      BIGINT,
+        period              BIGINT,
+        param_key           VARCHAR(4096) NOT NULL,
+        param_value         VARCHAR(4096) NOT NULL
+    );
 )sql";
 
 SchedulerDbHelper::SchedulerDbHelper(nx::db::AbstractAsyncSqlQueryExecutor* sqlExecutor):
@@ -55,7 +54,9 @@ nx::db::DBResult SchedulerDbHelper::getScheduleData(
         QString paramValue = scheduleDataQuery.value(5).toString();
 
         scheduleData->functorToTasks[functorId].emplace(taskId);
-        scheduleData->taskToParams[taskId].params.emplace(paramKey.toStdString(), paramValue.toStdString());
+        scheduleData->taskToParams[taskId].params.emplace(
+            paramKey.toStdString(),
+            paramValue.toStdString());
         scheduleData->taskToParams[taskId].schedulePoint =
                 std::chrono::steady_clock::time_point() + std::chrono::milliseconds(schedulePointMs);
         scheduleData->taskToParams[taskId].period = std::chrono::milliseconds(periodMs);
