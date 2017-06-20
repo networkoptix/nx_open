@@ -11,6 +11,8 @@
 #include <core/resource/camera_history.h>
 #include <core/resource/media_server_resource.h>
 
+#include <nx/fusion/model_functions.h>
+
 #include <nx/streaming/archive_stream_reader.h>
 #include <nx/streaming/rtsp_client_archive_delegate.h>
 
@@ -611,6 +613,8 @@ qint64 PlayerPrivate::getDelayForNextFrameWithoutAudioMs(const QVideoFramePtr& f
 
 void PlayerPrivate::applyVideoQuality()
 {
+    Q_Q(Player);
+
     if (!archiveReader)
         return;
 
@@ -632,15 +636,24 @@ void PlayerPrivate::applyVideoQuality()
 
     switch (result.quality)
     {
+        case Player::UnknownQuality:
+            log("applyVideoQuality(): Could not choose quality => setMediaStatus(NoMedia)");
+            setMediaStatus(Player::MediaStatus::NoMedia);
+            q->stop();
+            return;
+
         case Player::HighVideoQuality:
             archiveReader->setQuality(MEDIA_Quality_High, /*fastSwitch*/ true);
             break;
+
         case Player::LowVideoQuality:
             archiveReader->setQuality(MEDIA_Quality_Low, /*fastSwitch*/ true);
             break;
+
         case Player::LowIframesOnlyVideoQuality:
             archiveReader->setQuality(MEDIA_Quality_LowIframesOnly, /*fastSwitch*/ true);
             break;
+
         default:
             // Use "auto" width for correct aspect ratio, because quality.width() is in logical
             // pixels.
@@ -677,6 +690,10 @@ bool PlayerPrivate::initDataProvider()
     }
 
     applyVideoQuality();
+
+    if (!archiveReader)
+        return false;
+
     dataConsumer.reset(new PlayerDataConsumer(archiveReader));
     dataConsumer->setAudioEnabled(isAudioEnabled);
 
@@ -1063,10 +1080,8 @@ QList<int> Player::availableVideoQualities(const QList<int>& videoQualities) con
                 codec, quality, liveMode, positionMs, camera, currentVideoDecoders);
         };
 
-    const auto highQuality = getQuality(HighVideoQuality);
-    const auto maximumHeight = highQuality.frameSize.height() > 0
-        ? highQuality.frameSize.height()
-        : getQuality(LowVideoQuality).frameSize.height();
+    const auto& highQuality = getQuality(HighVideoQuality);
+    const auto& maximumResolution = highQuality.frameSize;
 
     bool customResolutionAvailable = false;
     QList<int> customQualities;
@@ -1075,25 +1090,28 @@ QList<int> Player::availableVideoQualities(const QList<int>& videoQualities) con
     {
         switch (videoQuality)
         {
-            case LowVideoQuality:
             case LowIframesOnlyVideoQuality:
-                result.append(videoQuality);
+            case LowVideoQuality:
+                if (getQuality(videoQuality).quality == videoQuality)
+                    result.append(videoQuality);
                 break;
 
             case HighVideoQuality:
-                if (highQuality.quality == HighVideoQuality)
+                if (highQuality.quality == videoQuality)
                     result.append(videoQuality);
                 break;
 
             default:
             {
                 const auto& resultQuality = getQuality(videoQuality);
-
-                if (resultQuality.quality == CustomVideoQuality)
-                    customResolutionAvailable = true;
-
-                if (resultQuality.frameSize.height() <= maximumHeight)
+                if (resultQuality.quality != UnknownQuality
+                    && resultQuality.frameSize.height() <= maximumResolution.height())
+                {
                     customQualities.append(videoQuality);
+
+                    if (resultQuality.quality == CustomVideoQuality)
+                        customResolutionAvailable = true;
+                }
             }
         }
     }
@@ -1172,6 +1190,8 @@ void Player::testSetCamera(const QnResourcePtr& camera)
     Q_D(Player);
     d->resource = camera;
 }
+
+QN_DEFINE_METAOBJECT_ENUM_LEXICAL_FUNCTIONS(Player, VideoQuality)
 
 } // namespace media
 } // namespace nx

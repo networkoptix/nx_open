@@ -6,6 +6,8 @@
 #include <QtCore/QSize>
 #include <QtCore/QRect>
 
+#include <nx/fusion/model_functions_fwd.h>
+
 class QAbstractVideoSurface;
 
 // for tests
@@ -125,6 +127,7 @@ public:
 
     enum VideoQuality
     {
+        UnknownQuality = -1, //< There's no a quality which could be played by a player.
         HighVideoQuality = 0, //< Native stream, high quality.
         LowVideoQuality = 1, //< Native stream, low quality.
         LowIframesOnlyVideoQuality = 2, //< Native stream, low quality, I-frames only.
@@ -233,6 +236,8 @@ private:
     QScopedPointer<PlayerPrivate> d_ptr;
     Q_DECLARE_PRIVATE(Player)
 };
+
+QN_FUSION_DECLARE_FUNCTIONS(Player::VideoQuality, (lexical))
 
 } // namespace media
 } // namespace nx
