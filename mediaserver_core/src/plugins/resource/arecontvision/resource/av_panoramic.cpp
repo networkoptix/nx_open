@@ -223,6 +223,7 @@ QnConstResourceVideoLayoutPtr QnArecontPanoramicResource::getVideoLayout(const Q
     QnMutexLocker lock(&m_layoutMutex);
     return m_customVideoLayout ?
         m_customVideoLayout.dynamicCast<const QnResourceVideoLayout>() :
+        getDefaultVideoLayout();
 }
 
 #endif
