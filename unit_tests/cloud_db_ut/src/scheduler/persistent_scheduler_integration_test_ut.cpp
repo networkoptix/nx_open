@@ -247,7 +247,7 @@ protected:
     void assertTasksFiredForUser(std::unique_ptr<SchedulerUser>& user)
     {
         auto userTasks = user->tasks();
-        ASSERT_EQ(userTasks.size(), 2);
+        ASSERT_EQ(2U, userTasks.size());
 
         for (const auto& task: userTasks)
             ASSERT_GT(task.second.fired, 0);
@@ -272,7 +272,7 @@ protected:
     void thenFirstUserShouldNotReceiveTimerEventsAnyLonger()
     {
         auto user1Tasks = user1->tasks();
-        ASSERT_EQ(user1Tasks.size(), 2);
+        ASSERT_EQ(2U, user1Tasks.size());
 
         ASSERT_LE(user1Tasks[user1Task1Id].fired - user1Task1FiredWhileUnsubscribe, 1);
         ASSERT_LE(user1Tasks[user1Task2Id].fired - user1Task2FiredWhileUnsubscribe, 1);
@@ -286,13 +286,13 @@ protected:
     void andNoTasksShouldFireForTheFirstUser()
     {
         auto user1Tasks = user1->tasks();
-        ASSERT_EQ(user1Tasks.size(), 0);
+        ASSERT_EQ(0U, user1Tasks.size());
     }
 
     void thenFirstUserShouldNotReceiveTimerEventsAnyLongerForTheFirstTask()
     {
         auto user1Tasks = user1->tasks();
-        ASSERT_EQ(user1Tasks.size(), 2);
+        ASSERT_EQ(2U, user1Tasks.size());
 
         ASSERT_LE(user1Tasks[user1Task1Id].fired - user1Task1FiredWhileUnsubscribe, 1);
     }
@@ -300,7 +300,7 @@ protected:
     void thenFirstUserShouldContinueToReceiveTimerEventsForTheSecondTask()
     {
         auto user1Tasks = user1->tasks();
-        ASSERT_EQ(user1Tasks.size(), 2);
+        ASSERT_EQ(2U, user1Tasks.size());
 
         ASSERT_GT(user1Tasks[user1Task2Id].fired, user1Task2FiredWhileUnsubscribe);
     }
@@ -308,7 +308,7 @@ protected:
     void thenSecondTaskShouldFireMultipleTimesForTheFirstUser()
     {
         auto user1Tasks = user1->tasks();
-        ASSERT_EQ(user1Tasks.size(), 1);
+        ASSERT_EQ(1U, user1Tasks.size());
 
         for (const auto& task: user1Tasks)
         {
@@ -320,7 +320,7 @@ protected:
     void thenLongTaskNotFiredYet()
     {
         auto user1Tasks = user1->tasks();
-        ASSERT_EQ(user1Tasks.size(), 1);
+        ASSERT_EQ(1U, user1Tasks.size());
 
         for (const auto& task: user1Tasks)
             ASSERT_EQ(task.second.fired, 0);
@@ -329,7 +329,7 @@ protected:
     void thenLongTaskShouldAtLastFire()
     {
         auto user1Tasks = user1->tasks();
-        ASSERT_EQ(user1Tasks.size(), 1);
+        ASSERT_EQ(1U, user1Tasks.size());
 
         for (const auto& task: user1Tasks)
             ASSERT_EQ(task.second.fired, 1);
@@ -338,7 +338,7 @@ protected:
     void thenTaskShouldFireAsIfServerWasNotOffline()
     {
         auto user1Tasks = user1->tasks();
-        ASSERT_EQ(user1Tasks.size(), 1);
+        ASSERT_EQ(1U, user1Tasks.size());
 
         for (const auto& task: user1Tasks)
             ASSERT_EQ(task.second.fired, 2);
@@ -347,7 +347,7 @@ protected:
     void thenFistTaskShouldFire()
     {
         auto user1Tasks = user1->tasks();
-        ASSERT_EQ(user1Tasks.size(), 2);
+        ASSERT_EQ(2U, user1Tasks.size());
 
         bool someTaskFiredExactlyTwice = std::any_of(
             user1Tasks.cbegin(),
@@ -362,7 +362,7 @@ protected:
     void thenSecondTaskShouldFireMultipleTimes()
     {
         auto user1Tasks = user1->tasks();
-        ASSERT_EQ(user1Tasks.size(), 2);
+        ASSERT_EQ(2U, user1Tasks.size());
 
         bool someTaskFiredMoreThan2 = std::any_of(
             user1Tasks.cbegin(),
@@ -377,20 +377,20 @@ protected:
     void thenFirstTaskShouldFireAndSecondTaskShouldBeSubscribed()
     {
         auto user1Tasks = user1->tasks();
-        ASSERT_EQ(user1Tasks.size(), 2);
+        ASSERT_EQ(2U, user1Tasks.size());
     }
 
     void thenTaskShouldHaveAlreadyUnsubscribed()
     {
         auto user1Tasks = user1->tasks();
-        ASSERT_EQ(user1Tasks.size(), 0);
+        ASSERT_EQ(0U, user1Tasks.size());
         ASSERT_NE(unsubsribeCalledIds.find(user1Task1Id), unsubsribeCalledIds.cend());
     }
 
     void thenNoNewFires()
     {
         auto user1Tasks = user1->tasks();
-        ASSERT_EQ(user1Tasks.size(), 0);
+        ASSERT_EQ(0U, user1Tasks.size());
     }
 
     QString dbPath;

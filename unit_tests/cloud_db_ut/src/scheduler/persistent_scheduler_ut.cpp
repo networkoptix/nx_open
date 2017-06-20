@@ -40,8 +40,8 @@ public:
     }
 
     virtual void executeUpdateWithoutTran(
-        nx::utils::MoveOnlyFunc<nx::db::DBResult(nx::db::QueryContext*)> dbUpdateFunc,
-        nx::utils::MoveOnlyFunc<void(nx::db::QueryContext*, nx::db::DBResult)> completionHandler) override
+        nx::utils::MoveOnlyFunc<nx::db::DBResult(nx::db::QueryContext*)> /*dbUpdateFunc*/,
+        nx::utils::MoveOnlyFunc<void(nx::db::QueryContext*, nx::db::DBResult)> /*completionHandler*/) override
     {
     }
 
@@ -57,8 +57,8 @@ public:
     }
 
     virtual nx::db::DBResult execSqlScriptSync(
-        const QByteArray& script,
-        nx::db::QueryContext* const queryContext) override
+        const QByteArray& /*script*/,
+        nx::db::QueryContext* const /*queryContext*/) override
     {
         return nx::db::DBResult::ok;
     }
@@ -191,8 +191,8 @@ protected:
 
     void thenTimersFiredSeveralTimes(int taskCount = -1)
     {
-        if (taskCount != -1)
-            ASSERT_EQ(user->tasks().size(), taskCount);
+        if (taskCount >= 0)
+            ASSERT_EQ(user->tasks().size(), static_cast<std::size_t>(taskCount));
 
         for (const auto& task : user->tasks())
             ASSERT_GT(task.second.fired, 0);
@@ -296,7 +296,7 @@ TEST_F(PersistentScheduler, running2Tasks)
 
     std::this_thread::sleep_for(kSleepTimeout);
 
-    ASSERT_EQ(user->tasks().size(), 2);
+    ASSERT_EQ(2U, user->tasks().size());
     thenTaskIdsAre(filled);
     thenTimersFiredSeveralTimes();
 }

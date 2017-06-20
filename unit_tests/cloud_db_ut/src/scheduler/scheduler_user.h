@@ -116,7 +116,7 @@ public:
             completionHandler(taskId);
             return nx::db::DBResult::ok;
         },
-            [](nx::db::QueryContext*, nx::db::DBResult result)
+            [](nx::db::QueryContext*, nx::db::DBResult)
         {
         });
     }
