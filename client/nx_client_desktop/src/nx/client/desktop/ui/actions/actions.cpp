@@ -367,13 +367,14 @@ void initialize(Manager* manager, Action* root)
             .text(tr("File(s)..."))
             .shortcut(lit("Ctrl+O"))
             .condition(!condition::isLayoutTourReviewMode()
-                && condition::tourIsRunning())
+                && !condition::tourIsRunning())
             .autoRepeat(false);
 
         factory(OpenFolderAction)
             .flags(Main | Scene)
             .requiredTargetPermissions(Qn::CurrentLayoutResourceRole, Qn::WritePermission | Qn::AddRemoveItemsPermission)
-            .condition(!condition::isLayoutTourReviewMode())
+            .condition(!condition::isLayoutTourReviewMode()
+                && !condition::tourIsRunning())
             .text(tr("Folder..."));
 
         factory().separator()
