@@ -22,6 +22,7 @@ static const int kFallbackLowQualityLines = 360;
 static const int kHighQualityFallbackThreshold = 560;
 static const QSize kMaxTranscodingResolution(1920, 1080);
 static const QSize kDefaultAspect(16, 9);
+static const QnSoftwareVersion kTranscodingFlagIntroducedVersion(3, 0);
 
 /**
  * If a particular stream is missing, its out parameters are not assigned a value.
@@ -137,6 +138,13 @@ static bool isTranscodingSupported(
 
     if (!server)
         return false;
+
+    if (server->getVersion() < kTranscodingFlagIntroducedVersion)
+    {
+        // Servers < 3.0 don't have SF_SupportsTranscoding flag, so we can't check it. However
+        // only arm servers didn't support transcoding in versions < 3.0 while the others did.
+        return server->getSystemInfo().arch != lit("arm");
+    }
 
     return server->getServerFlags().testFlag(Qn::SF_SupportsTranscoding);
 }
