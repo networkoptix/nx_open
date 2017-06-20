@@ -61,6 +61,7 @@ private:
 
     void setCloudCredentials(const QString& cloudSystemId, const QString& cloudAuthKey);
     bool makeSystemLocal();
+    bool removeCloudUsers();
     void startEventConnection();
     void onEventConnectionEstablished(nx::cdb::api::ResultCode resultCode);
 

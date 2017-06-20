@@ -172,7 +172,7 @@ void CloudConnectionManager::processCloudErrorCode(
         NX_LOGX(lm("Error. Cloud reported %1 error. Removing local cloud credentials...")
             .arg(nx::cdb::api::toString(resultCode)), cl_logDEBUG1);
 
-        //system has been disconnected from cloud: cleaning up cloud credentials...
+        // System has been disconnected from cloud: cleaning up cloud credentials...
         if (!detachSystemFromCloud())
         {
             NX_LOGX(lit("Error resetting cloud credentials in local DB"), cl_logWARNING);
@@ -182,32 +182,17 @@ void CloudConnectionManager::processCloudErrorCode(
 
 bool CloudConnectionManager::detachSystemFromCloud()
 {
-    qnGlobalSettings->resetCloudParams();
+    NX_DEBUG(this, lm("Detaching system %1 from cloud ")
+        .arg(qnGlobalSettings->cloudSystemId()));
 
+    if (!removeCloudUsers())
+        return false;
+
+    qnGlobalSettings->resetCloudParams();
     if (!qnGlobalSettings->synchronizeNowSync())
     {
         NX_LOGX(lit("Error resetting cloud credentials in local DB"), cl_logWARNING);
         return false;
-    }
-
-    // removing cloud users
-    auto usersToRemove = resourcePool()->getResources<QnUserResource>().filtered(
-        [](const QnUserResourcePtr& user)
-        {
-            return user->isCloud();
-        });
-    for (const auto& user: usersToRemove)
-    {
-        auto errCode = QnAppServerConnectionFactory::ec2Connection()
-            ->getUserManager(Qn::kSystemAccess)->removeSync(user->getId());
-        NX_ASSERT(errCode != ec2::ErrorCode::forbidden, "Access check should be implemented before");
-        if (errCode != ec2::ErrorCode::ok)
-        {
-            NX_LOGX(lit("Error removing cloud user (%1:%2) from local DB: %3")
-                .arg(user->getId().toString()).arg(user->getName()).arg(ec2::toString(errCode)),
-                cl_logWARNING);
-            return false;
-        }
     }
 
     qnServerModule->roSettings()->setValue(QnServer::kIsConnectedToCloudKey, "no");
@@ -229,7 +214,31 @@ bool CloudConnectionManager::makeSystemLocal()
         }
     }
 
-    return detachSystemFromCloud();
+    return removeCloudUsers();
+}
+
+bool CloudConnectionManager::removeCloudUsers()
+{
+    auto usersToRemove = resourcePool()->getResources<QnUserResource>().filtered(
+        [](const QnUserResourcePtr& user)
+        {
+            return user->isCloud();
+        });
+    for (const auto& user: usersToRemove)
+    {
+        auto errCode = QnAppServerConnectionFactory::ec2Connection()
+            ->getUserManager(Qn::kSystemAccess)->removeSync(user->getId());
+        NX_ASSERT(errCode != ec2::ErrorCode::forbidden, "Access check should be implemented before");
+        if (errCode != ec2::ErrorCode::ok)
+        {
+            NX_LOGX(lit("Error removing cloud user (%1:%2) from local DB: %3")
+                .arg(user->getId().toString()).arg(user->getName()).arg(ec2::toString(errCode)),
+                cl_logWARNING);
+            return false;
+        }
+    }
+
+    return true;
 }
 
 void CloudConnectionManager::cloudSettingsChanged()
