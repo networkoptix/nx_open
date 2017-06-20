@@ -903,12 +903,14 @@ enum IDType
     RenameLayoutTourAction,
     SaveLayoutTourAction,
     ReviewLayoutTourAction,
+    ReviewLayoutTourInNewWindowAction,
     RemoveLayoutTourAction,
 
     StartCurrentLayoutTourAction,
     SaveCurrentLayoutTourAction,
     RemoveCurrentLayoutTourAction,
 
+    LayoutTourSettingsAction,
     CurrentLayoutTourSettingsAction,
 
     /* Timeline actions. */

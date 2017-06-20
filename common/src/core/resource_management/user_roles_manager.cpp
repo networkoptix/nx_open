@@ -241,6 +241,14 @@ QString QnUserRolesManager::userRoleName(Qn::UserRole userRole)
     return QString();
 }
 
+QString QnUserRolesManager::userRoleName(const QnUuid& userRoleId)
+{
+    const auto role = predefinedRole(userRoleId);
+    return role == Qn::UserRole::CustomUserRole
+        ? userRole(userRoleId).name
+        : userRoleName(role);
+}
+
 QString QnUserRolesManager::userRoleDescription(Qn::UserRole userRole)
 {
     switch (userRole)

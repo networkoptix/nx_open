@@ -268,6 +268,8 @@ private:
 
     void setupHud();
 
+    void initSoftwareTriggers();
+
     void setTextOverlayParameters(const QnUuid& id, bool visible,
         const QString& text, const QnHtmlTextItemOptions& options);
 
@@ -296,7 +298,8 @@ private:
 
     SoftwareTrigger* createTriggerIfRelevant(const QnBusinessEventRulePtr& rule);
     bool isRelevantTriggerRule(const QnBusinessEventRulePtr& rule) const;
-    void configureTriggerButton(QnSoftwareTriggerButton* button, const SoftwareTriggerInfo& info);
+    void configureTriggerButton(QnSoftwareTriggerButton* button, const SoftwareTriggerInfo& info,
+        std::function<void()> clientsideHandler = std::function<void()>());
     void resetTriggers();
 
 private:

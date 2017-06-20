@@ -271,7 +271,7 @@ void QnNotificationsCollectionWidget::handleShowPopupAction(
         return;
 
     widget->addTextButton(qnSkin->icon("buttons/bookmark.png"), tr("Bookmark it"),
-        [bookmarks]()
+        [this, bookmarks]()
         {
             for (const auto bookmark: bookmarks)
                 qnCameraBookmarksManager->addCameraBookmark(bookmark);
@@ -281,6 +281,8 @@ void QnNotificationsCollectionWidget::handleShowPopupAction(
                 ? tr("Bookmark created")
                 : tr("%n bookmarks created", "", bookmarks.count());
             QnGraphicsMessageBox::information(message, kHintTimeoutMs);
+
+            action(action::BookmarksModeAction)->setChecked(true);
         });
 }
 
