@@ -16,6 +16,7 @@
 #include <core/resource/security_cam_resource.h>
 #include <recorder/recording_manager.h>
 #include <nx/streaming/archive_stream_reader.h>
+#include <utils/common/guard.h>
 
 namespace {
 
@@ -23,6 +24,9 @@ bool needSecondaryStream(MediaQuality q)
 {
     return isLowMediaQuality(q);
 }
+
+static const int kTcpSendBlockSize = 1024 * 16;
+static const int kRtpTcpHeaderSize = 4;
 
 } // namespace
 
@@ -469,24 +473,34 @@ void QnRtspDataConsumer::sendMetadata(const QByteArray& metadata)
     RtspServerTrackInfo* metadataTrack = m_owner->getTrackInfo(m_owner->getMetadataChannelNum());
     if (metadataTrack && metadataTrack->clientPort != -1)
     {
-        m_sendBuffer.resize(16);
-        QnRtspEncoder::buildRTPHeader(m_sendBuffer.data()+4, METADATA_SSRC, metadata.size(), qnSyncTime->currentMSecsSinceEpoch(), RTP_METADATA_CODE, metadataTrack->sequence);
+        int dataStartIndex = m_sendBuffer.size();
+        if (m_owner->isTcpMode())
+            m_sendBuffer.resize(m_sendBuffer.size() + kRtpTcpHeaderSize);
+        char* rtpHeaderPtr = m_sendBuffer.data() + m_sendBuffer.size();
+        m_sendBuffer.resize(m_sendBuffer.size() + RtpHeader::RTP_HEADER_SIZE);
+        QnRtspEncoder::buildRTPHeader(rtpHeaderPtr, METADATA_SSRC, metadata.size(), qnSyncTime->currentMSecsSinceEpoch(), RTP_METADATA_CODE, metadataTrack->sequence);
         m_sendBuffer.write(metadata);
 
-        if (m_owner->isTcpMode()) {
-            m_sendBuffer.data()[0] = '$';
-            m_sendBuffer.data()[1] = metadataTrack->clientPort;
-            quint16* lenPtr = (quint16*) (m_sendBuffer.data() + 2);
-            *lenPtr = htons(m_sendBuffer.size() - 4);
-            m_owner->sendBuffer(m_sendBuffer);
-        }
-        else  if (metadataTrack->mediaSocket) {
-            NX_ASSERT(m_sendBuffer.size() > 4 && m_sendBuffer.size() < 16384);
-            metadataTrack->mediaSocket->send(m_sendBuffer.data()+4, m_sendBuffer.size()-4);
-        }
+        if (m_owner->isTcpMode())
+        {
+            m_sendBuffer.data()[dataStartIndex] = '$';
+            m_sendBuffer.data()[dataStartIndex + 1] = metadataTrack->clientPort;
+            quint16* lenPtr = (quint16*) (m_sendBuffer.data() + dataStartIndex + 2);
+            *lenPtr = htons(m_sendBuffer.size() - kRtpTcpHeaderSize - dataStartIndex);
 
+            if (m_sendBuffer.size() >= kTcpSendBlockSize)
+            {
+                m_owner->sendBuffer(m_sendBuffer);
+                m_sendBuffer.clear();
+            }
+        }
+        else  if (metadataTrack->mediaSocket)
+        {
+            NX_ASSERT(m_sendBuffer.size() < 16384);
+            metadataTrack->mediaSocket->send(m_sendBuffer.data(), m_sendBuffer.size());
+            m_sendBuffer.clear();
+        }
         metadataTrack->sequence++;
-        m_sendBuffer.clear();
     }
 }
 
@@ -526,6 +540,17 @@ bool QnRtspDataConsumer::processData(const QnAbstractDataPacketPtr& nonConstData
     QnConstAbstractMediaDataPtr media = std::dynamic_pointer_cast<const QnAbstractMediaData>(data);
     if (!media || media->channelNumber > CL_MAX_CHANNELS)
         return true;
+
+
+    const auto flushBuffer = makeScopedGuard(
+        [this]()
+        {
+            if (m_dataQueue.isEmpty() && m_sendBuffer.size() > 0)
+            {
+                m_owner->sendBuffer(m_sendBuffer);
+                m_sendBuffer.clear();
+            }
+        });
 
     if( (m_streamingSpeed != MAX_STREAMING_SPEED) && (m_streamingSpeed != 1) )
     {
@@ -652,47 +677,63 @@ bool QnRtspDataConsumer::processData(const QnAbstractDataPacketPtr& nonConstData
 
     m_owner->notifyMediaRangeUsed(media->timestamp);
 
-    m_sendBuffer.resize(4); // reserve space for RTP TCP header
-    while(!m_needStop && codecEncoder->getNextPacket(m_sendBuffer))
+    while(!m_needStop)
     {
+        int dataStartIndex = m_sendBuffer.size();
+        if (m_owner->isTcpMode())
+            m_sendBuffer.resize(m_sendBuffer.size() + kRtpTcpHeaderSize); // reserve space for RTP TCP header
+        char* rtpHeaderPtr = m_sendBuffer.data() + m_sendBuffer.size();
+        if (!codecEncoder->getNextPacket(m_sendBuffer))
+        {
+            m_sendBuffer.resize(dataStartIndex);
+            break;
+        }
+
         while (m_pauseNetwork && !m_needStop)
             QnSleep::msleep(1);
         if (m_waitSCeq != -1)
+        {
+            m_sendBuffer.clear(); //< New seek is received.
             break;
+        }
 
         bool isRtcp = false;
         if (codecEncoder->isRtpHeaderExists())
         {
-            RtpHeader* packet = (RtpHeader*) (m_sendBuffer.data() + 4 );
+            RtpHeader* packet = (RtpHeader*) (rtpHeaderPtr);
             isRtcp = packet->payloadType >= 72 && packet->payloadType <= 76;
             if (isRtcp && m_owner->getTracksCount() == 1)
             {
                 // skip RTCP packets is no audio. some clients have problem with it. I don't know why.
-                m_sendBuffer.resize(4);
+                m_sendBuffer.resize(dataStartIndex);
                 continue;
             }
         }
         else {
             const qint64 packetTime = av_rescale_q(media->timestamp, r, time_base);
-            QnRtspEncoder::buildRTPHeader(m_sendBuffer.data() + 4, codecEncoder->getSSRC(), codecEncoder->getRtpMarker(), packetTime, codecEncoder->getPayloadtype(), trackInfo->sequence++);
+            QnRtspEncoder::buildRTPHeader(rtpHeaderPtr, codecEncoder->getSSRC(), codecEncoder->getRtpMarker(), packetTime, codecEncoder->getPayloadtype(), trackInfo->sequence++);
         }
 
-        if (m_owner->isTcpMode()) {
-            m_sendBuffer.data()[0] = '$';
-            m_sendBuffer.data()[1] = isRtcp ? trackInfo->clientRtcpPort : trackInfo->clientPort;
-            quint16* lenPtr = (quint16*) (m_sendBuffer.data() + 2);
-            *lenPtr = htons(m_sendBuffer.size() - 4);
-            m_owner->sendBuffer(m_sendBuffer);
+        if (m_owner->isTcpMode())
+        {
+            m_sendBuffer.data()[dataStartIndex] = '$';
+            m_sendBuffer.data()[dataStartIndex + 1] = isRtcp ? trackInfo->clientRtcpPort : trackInfo->clientPort;
+            quint16* lenPtr = (quint16*) (m_sendBuffer.data() + dataStartIndex + 2);
+            *lenPtr = htons(m_sendBuffer.size() - kRtpTcpHeaderSize - dataStartIndex);
+            if (m_sendBuffer.size() >= kTcpSendBlockSize)
+            {
+                m_owner->sendBuffer(m_sendBuffer);
+                m_sendBuffer.clear();
+            }
         }
-        else {
-            NX_ASSERT(m_sendBuffer.size() > 4 && m_sendBuffer.size() < 16384);
+        else
+        {
+            NX_ASSERT(m_sendBuffer.size() < 16384);
             AbstractDatagramSocket* mediaSocket = isRtcp ? trackInfo->rtcpSocket : trackInfo->mediaSocket;
-            mediaSocket->send(m_sendBuffer.data()+4, m_sendBuffer.size()-4);
+            mediaSocket->send(m_sendBuffer.data(), m_sendBuffer.size());
+            m_sendBuffer.clear();
         }
-
-        m_sendBuffer.resize(4); // reserve space for RTP TCP header
     }
-    m_sendBuffer.clear();
 
     static const int FRAMES_BETWEEN_PLAY_RANGE_CHECK = 20;
     if( (++m_framesSinceRangeCheck) > FRAMES_BETWEEN_PLAY_RANGE_CHECK )

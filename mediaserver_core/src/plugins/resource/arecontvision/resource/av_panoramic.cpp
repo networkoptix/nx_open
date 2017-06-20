@@ -26,7 +26,6 @@ QnArecontPanoramicResource::QnArecontPanoramicResource(const QString& name)
 {
     setName(name);
     m_isRotated = false;
-    m_flipTimer.invalidate();
 }
 
 QnArecontPanoramicResource::~QnArecontPanoramicResource()
@@ -136,9 +135,6 @@ CameraDiagnostics::Result QnArecontPanoramicResource::initInternal()
 
 void QnArecontPanoramicResource::updateFlipState()
 {
-    if (m_flipTimer.isValid() && m_flipTimer.elapsed() < 1000)
-        return;
-    m_flipTimer.restart();
     QUrl devUrl(getUrl());
     CLSimpleHTTPClient connection(getHostAddress(), devUrl.port(80), getNetworkTimeout(), getAuth());
     QString request = QLatin1String("get?rotate");
@@ -151,6 +147,26 @@ void QnArecontPanoramicResource::updateFlipState()
     int valPos = response.indexOf('=');
     if (valPos >= 0) {
         m_isRotated = response.mid(valPos+1).trimmed().toInt();
+    }
+
+    auto layout = QnArecontPanoramicResource::getDefaultVideoLayout();
+    if (!layout)
+        return;
+
+    {
+        QnMutexLocker lock(&m_layoutMutex);
+        m_customVideoLayout.reset(new QnCustomResourceVideoLayout(layout->size()));
+        QVector<int> channels = layout->getChannels();
+        if (m_isRotated)
+            std::reverse(channels.begin(), channels.end());
+        m_customVideoLayout->setChannels(channels);
+    }
+
+    QString oldVideoLayout = commonModule()->propertyDictionary()->value(getId(), Qn::VIDEO_LAYOUT_PARAM_NAME); // get from kvpairs directly. do not read default value from resourceTypes
+    QString newVideoLayout = m_customVideoLayout->toString();
+    if (newVideoLayout != oldVideoLayout) {
+        commonModule()->propertyDictionary()->setValue(getId(), Qn::VIDEO_LAYOUT_PARAM_NAME, newVideoLayout);
+        commonModule()->propertyDictionary()->saveParams(getId());
     }
 }
 
@@ -205,32 +221,8 @@ QnConstResourceVideoLayoutPtr QnArecontPanoramicResource::getVideoLayout(const Q
 
     Q_UNUSED(dataProvider)
     QnMutexLocker lock(&m_layoutMutex);
-
-    QnConstResourceVideoLayoutPtr layout = QnArecontPanoramicResource::getDefaultVideoLayout();
-    const QnCustomResourceVideoLayout* customLayout = dynamic_cast<const QnCustomResourceVideoLayout*>(layout.data());
-    if (!customLayout)
-        return layout;
-    auto nonConstThis = const_cast<QnArecontPanoramicResource*>(this);
-    nonConstThis->updateFlipState();
-    if (m_isRotated)
-    {
-        if (!m_rotatedLayout) {
-            m_rotatedLayout.reset( new QnCustomResourceVideoLayout(customLayout->size()) );
-            QVector<int> channels = customLayout->getChannels();
-            std::reverse(channels.begin(), channels.end());
-            m_rotatedLayout->setChannels(channels);
-        }
-        layout = m_rotatedLayout;
-    }
-
-    QString oldVideoLayout = commonModule()->propertyDictionary()->value(resourceId, Qn::VIDEO_LAYOUT_PARAM_NAME); // get from kvpairs directly. do not read default value from resourceTypes
-    QString newVideoLayout = layout->toString();
-    if (newVideoLayout != oldVideoLayout) {
-        commonModule()->propertyDictionary()->setValue(resourceId, Qn::VIDEO_LAYOUT_PARAM_NAME, newVideoLayout);
-        commonModule()->propertyDictionary()->saveParams(resourceId );
-    }
-
-    return layout;
+    return m_customVideoLayout ?
+        m_customVideoLayout.dynamicCast<const QnResourceVideoLayout>() :
 }
 
 #endif
