@@ -1140,13 +1140,6 @@ ActionVisibility SetAsBackgroundCondition::check(const QnLayoutItemIndexList& la
     return InvisibleAction;
 }
 
-ActionVisibility LoggedInCondition::check(const Parameters& /*parameters*/, QnWorkbenchContext* context)
-{
-    return context->commonModule()->remoteGUID().isNull()
-        ? InvisibleAction
-        : EnabledAction;
-}
-
 ActionVisibility BrowseLocalFilesCondition::check(const Parameters& /*parameters*/, QnWorkbenchContext* context)
 {
     const bool connected = !context->commonModule()->remoteGUID().isNull();
@@ -1616,6 +1609,15 @@ ConditionWrapper always()
         [](const Parameters& /*parameters*/, QnWorkbenchContext* /*context*/)
         {
             return true;
+        });
+}
+
+ConditionWrapper isLoggedIn()
+{
+    return new CustomBoolCondition(
+        [](const Parameters& /*parameters*/, QnWorkbenchContext* context)
+        {
+            return !context->commonModule()->remoteGUID().isNull();
         });
 }
 

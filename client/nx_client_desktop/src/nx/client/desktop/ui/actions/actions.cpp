@@ -235,7 +235,7 @@ void initialize(Manager* manager, Action* root)
         .text(tr("Disconnect from Server"))
         .autoRepeat(false)
         .shortcut(lit("Ctrl+Shift+D"))
-        .condition(new LoggedInCondition());
+        .condition(condition::isLoggedIn());
 
     factory(ResourcesModeAction)
         .flags(Main)
@@ -325,8 +325,8 @@ void initialize(Manager* manager, Action* root)
             .flags(Main | Tree | NoTarget)
             .text(tr("Layout Tour..."))
             .pulledText(tr("New Layout Tour..."))
-            .condition(
-                condition::treeNodeType({Qn::LayoutsNode, Qn::LayoutToursNode})
+            .condition(condition::isLoggedIn()
+                && condition::treeNodeType({Qn::LayoutsNode, Qn::LayoutToursNode})
                 && !condition::isSafeMode()
             )
             .autoRepeat(false);
@@ -385,7 +385,7 @@ void initialize(Manager* manager, Action* root)
             .text(tr("Web Client..."))
             .pulledText(tr("Open Web Client..."))
             .autoRepeat(false)
-            .condition(ConditionWrapper(new LoggedInCondition())
+            .condition(condition::isLoggedIn()
                 && condition::treeNodeType({Qn::CurrentSystemNode, Qn::ServersNode}));
 
     } factory.endSubMenu();
@@ -414,7 +414,7 @@ void initialize(Manager* manager, Action* root)
         .shortcut(lit("Ctrl+Shift+S"))
         .shortcut(lit("Ctrl+Alt+S"), Builder::Windows, false)
         .autoRepeat(false)
-        .condition(ConditionWrapper(new LoggedInCondition())
+        .condition(condition::isLoggedIn()
             && ConditionWrapper(new SaveLayoutAsCondition(true))
             && !condition::isLayoutTourReviewMode()
             && !condition::tourIsRunning());

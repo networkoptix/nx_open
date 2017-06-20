@@ -455,13 +455,6 @@ public:
     virtual ActionVisibility check(const Parameters& parameters, QnWorkbenchContext* context) override;
 };
 
-/** Display action only if user is logged in. */
-class LoggedInCondition: public Condition
-{
-public:
-    virtual ActionVisibility check(const Parameters& parameters, QnWorkbenchContext* context) override;
-};
-
 class BrowseLocalFilesCondition: public Condition
 {
 public:
@@ -611,6 +604,9 @@ namespace condition {
 
 /** Visible always. */
 ConditionWrapper always();
+
+/** Visible when user is logged in (or at least logging in). */
+ConditionWrapper isLoggedIn();
 
 /** Visible in preview search mode only. */
 ConditionWrapper isPreviewSearchMode();
