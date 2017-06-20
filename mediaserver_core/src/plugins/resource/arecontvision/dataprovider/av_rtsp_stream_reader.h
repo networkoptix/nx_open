@@ -37,7 +37,7 @@ protected:
     virtual bool isStreamOpened() const override;
     virtual void pleaseStop() override;
     virtual void pleaseReopenStream() override;
-
+    virtual void beforeRun() override;
 private:
     QnMulticodecRtpReader m_rtpStreamParser;
 
