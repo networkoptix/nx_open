@@ -30,6 +30,7 @@ public:
      * @return                      True if selection is valid and OK button can be pressed.
      */
     virtual bool validate(const QSet<QnUuid>& selectedResources);
+    virtual QString validationMessage(const QSet<QnUuid>& selectedResources) const;
 
     virtual bool isValid(const QnUuid& resource) const;
 
