@@ -51,10 +51,29 @@ public:
 
 //-------------------------------------------------------------------------------------------------
 
-class AbstractTemporaryAccountPasswordManager
+class AbstractTemporaryAccountPasswordManager:
+    public AbstractAuthenticationDataProvider
 {
 public:
     virtual ~AbstractTemporaryAccountPasswordManager() = default;
+
+    virtual void registerTemporaryCredentials(
+        const AuthorizationInfo& authzInfo,
+        data::TemporaryAccountCredentials tmpPasswordData,
+        std::function<void(api::ResultCode)> completionHandler) = 0;
+
+    virtual void addRandomCredentials(data::TemporaryAccountCredentials* const data) = 0;
+
+    virtual nx::db::DBResult registerTemporaryCredentials(
+        nx::db::QueryContext* const queryContext,
+        data::TemporaryAccountCredentials tempPasswordData) = 0;
+
+    virtual nx::db::DBResult removeTemporaryPasswordsFromDbByAccountEmail(
+        nx::db::QueryContext* const queryContext,
+        std::string accountEmail) = 0;
+    
+    virtual void removeTemporaryPasswordsFromCacheByAccountEmail(
+        std::string accountEmail) = 0;
 
     virtual boost::optional<TemporaryAccountCredentialsEx> getCredentialsByLogin(
         const std::string& login) const = 0;
@@ -63,8 +82,7 @@ public:
 //-------------------------------------------------------------------------------------------------
 
 class TemporaryAccountPasswordManager:
-    public AbstractTemporaryAccountPasswordManager,
-    public AbstractAuthenticationDataProvider
+    public AbstractTemporaryAccountPasswordManager
 {
 public:
     TemporaryAccountPasswordManager(
@@ -79,30 +97,31 @@ public:
         nx::utils::stree::ResourceContainer* const authProperties,
         nx::utils::MoveOnlyFunc<void(api::ResultCode)> completionHandler) override;
 
-    void registerTemporaryCredentials(
+    virtual void registerTemporaryCredentials(
         const AuthorizationInfo& authzInfo,
         data::TemporaryAccountCredentials tmpPasswordData,
-        std::function<void(api::ResultCode)> completionHandler);
+        std::function<void(api::ResultCode)> completionHandler) override;
 
-    std::string generateRandomPassword() const;
     /**
      * Adds password and password digest.
      * If data->login is empty, random login is generated.
      */
-    void addRandomCredentials(data::TemporaryAccountCredentials* const data);
+    virtual void addRandomCredentials(data::TemporaryAccountCredentials* const data) override;
 
-    nx::db::DBResult removeTemporaryPasswordsFromDbByAccountEmail(
+    virtual nx::db::DBResult removeTemporaryPasswordsFromDbByAccountEmail(
         nx::db::QueryContext* const queryContext,
-        std::string accountEmail);
-    void removeTemporaryPasswordsFromCacheByAccountEmail(
-        std::string accountEmail);
+        std::string accountEmail) override;
+    virtual void removeTemporaryPasswordsFromCacheByAccountEmail(
+        std::string accountEmail) override;
 
-    nx::db::DBResult registerTemporaryCredentials(
+    virtual nx::db::DBResult registerTemporaryCredentials(
         nx::db::QueryContext* const queryContext,
-        data::TemporaryAccountCredentials tempPasswordData);
+        data::TemporaryAccountCredentials tempPasswordData) override;
 
     virtual boost::optional<TemporaryAccountCredentialsEx> getCredentialsByLogin(
         const std::string& login) const override;
+
+    std::string generateRandomPassword() const;
 
 private:
     typedef boost::multi_index::multi_index_container<

@@ -57,7 +57,10 @@ INSERT INTO db_version_data (db_version) VALUES (0);
 } // namespace
 
 
-DbStructureUpdater::DbStructureUpdater(AbstractAsyncSqlQueryExecutor* const queryExecutor):
+DbStructureUpdater::DbStructureUpdater(
+    std::string /*dbManagerName*/,
+    AbstractAsyncSqlQueryExecutor* const queryExecutor)
+    :
     m_queryExecutor(queryExecutor),
     m_initialVersion(0)
 {
@@ -91,6 +94,16 @@ void DbStructureUpdater::addFullSchemaScript(
 {
     NX_ASSERT(version > 0);
     m_fullSchemaScriptByVersion.emplace(version, std::move(createSchemaScript));
+}
+
+unsigned int DbStructureUpdater::maxKnownVersion() const
+{
+    return m_initialVersion + m_updateScripts.size();
+}
+
+void DbStructureUpdater::setVersionToUpdateTo(unsigned int version)
+{
+    m_versionToUpdateTo = version;
 }
 
 bool DbStructureUpdater::updateStructSync()
@@ -202,7 +215,11 @@ DBResult DbStructureUpdater::applyScriptsMissingInCurrentDb(
 
 bool DbStructureUpdater::gotScriptForUpdate(DbSchemaState* dbState) const
 {
-    return static_cast<size_t>(dbState->version) < (m_initialVersion + m_updateScripts.size());
+    auto versionToUpdateTo = m_initialVersion + m_updateScripts.size();
+    if (m_versionToUpdateTo)
+        versionToUpdateTo = *m_versionToUpdateTo;
+
+    return static_cast<size_t>(dbState->version) < versionToUpdateTo;
 }
 
 DBResult DbStructureUpdater::applyNextUpdateScript(

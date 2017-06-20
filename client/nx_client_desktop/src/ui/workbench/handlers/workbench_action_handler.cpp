@@ -799,7 +799,7 @@ void ActionHandler::at_openInNewTabAction_triggered()
     if (action(action::ToggleLayoutTourModeAction)->isChecked())
         menu()->trigger(action::ToggleLayoutTourModeAction);
 
-    const auto parameters = menu()->currentParameters(sender());
+    auto parameters = menu()->currentParameters(sender());
 
     const auto layouts = parameters.resources().filtered<QnLayoutResource>();
     for (const auto& layout: layouts)
@@ -818,9 +818,10 @@ void ActionHandler::at_openInNewTabAction_triggered()
     const auto openable = parameters.resources().filtered(QnResourceAccessFilter::isOpenableInLayout);
     if (openable.empty())
         return;
+    parameters.setResources(openable);
 
     menu()->trigger(action::OpenNewTabAction);
-    menu()->trigger(action::DropResourcesAction, openable);
+    menu()->trigger(action::DropResourcesAction, parameters);
 }
 
 void ActionHandler::at_openInNewWindowAction_triggered()

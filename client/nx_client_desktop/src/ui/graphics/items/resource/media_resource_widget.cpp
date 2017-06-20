@@ -17,7 +17,7 @@
 #include <camera/resource_display.h>
 #include <camera/cam_display.h>
 #include <camera/camera_data_manager.h>
-#include <camera/loaders/caching_camera_data_loader.h>  //TODO: #GDM remove this dependency
+#include <camera/loaders/caching_camera_data_loader.h> // TODO: #GDM remove this dependency
 
 #include <client/client_settings.h>
 #include <client/client_globals.h>
@@ -351,7 +351,7 @@ QnMediaResourceWidget::QnMediaResourceWidget(QnWorkbenchContext* context, QnWork
     /* Set up overlays */
     if (m_camera && m_camera->hasFlags(Qn::io_module))
     {
-        //TODO: #vkutin #gdm #common Make a style metric that holds this value.
+        // TODO: #vkutin #gdm #common Make a style metric that holds this value.
         auto topMargin = titleBar()
             ? titleBar()->leftButtonsBar()->uniformButtonSize().height()
             : 0.0;
@@ -429,7 +429,7 @@ QnMediaResourceWidget::QnMediaResourceWidget(QnWorkbenchContext* context, QnWork
     }
 
     connect(base_type::resource(), &QnResource::resourceChanged, this,
-        &QnMediaResourceWidget::updateButtonsVisibility); //TODO: #GDM #Common get rid of resourceChanged
+        &QnMediaResourceWidget::updateButtonsVisibility); // TODO: #GDM #Common get rid of resourceChanged
 
     connect(this, &QnResourceWidget::zoomRectChanged, this,
         &QnMediaResourceWidget::at_zoomRectChanged);
@@ -1584,7 +1584,7 @@ QString QnMediaResourceWidget::calculateDetailsText() const
     for (int i = 0; i < channelCount(); i++)
     {
         const QnMediaStreamStatistics *statistics = m_display->mediaProvider()->getStatistics(i);
-        if (statistics->isConnectionLost()) //TODO: #GDM check does not work, case #3993
+        if (statistics->isConnectionLost()) // TODO: #GDM check does not work, case #3993
             continue;
         fps = qMax(fps, static_cast<qreal>(statistics->getFrameRate()));
         mbps += statistics->getBitrateMbps();
@@ -1758,7 +1758,7 @@ Qn::ResourceStatusOverlay QnMediaResourceWidget::calculateStatusOverlay() const
     /// TODO: #ynikitenkov It needs to refactor error\status overlays totally!
     const ResourceStates states = getResourceStates();
 
-    //TODO: #GDM #3.1 This really requires hell a lot of refactoring
+    // TODO: #GDM #3.1 This really requires hell a lot of refactoring
     // for live video make a quick check: status has higher priority than EOF
     if (states.isRealTimeSource)
     {
@@ -2334,19 +2334,19 @@ QnMediaResourceWidget::SoftwareTrigger* QnMediaResourceWidget::createTriggerIfRe
         rule->eventParams().description,
         rule->isActionProlonged() });
 
-    std::function<void()> clientsideHandler;
+    std::function<void()> clientSideHandler;
 
     if (rule->actionType() == QnBusiness::BookmarkAction
         && !rule->actionParams().needConfirmation)
     {
-        clientsideHandler =
+        clientSideHandler =
             [this] { action(action::BookmarksModeAction)->setChecked(true); };
     }
 
     const auto button = new QnSoftwareTriggerButton(this);
-    configureTriggerButton(button, info, clientsideHandler);
+    configureTriggerButton(button, info, clientSideHandler);
 
-    //TODO: #vkutin #3.1 For now rule buttons are NOT sorted. Implement sorting by UUID later.
+    // TODO: #vkutin #3.1 For now rule buttons are NOT sorted. Implement sorting by UUID later.
     const auto overlayItemId = m_triggersContainer->insertItem(0, button);
 
     auto& trigger = m_softwareTriggers[rule->id()];
@@ -2371,7 +2371,7 @@ bool QnMediaResourceWidget::isRelevantTriggerRule(const QnBusinessEventRulePtr& 
 }
 
 void QnMediaResourceWidget::configureTriggerButton(QnSoftwareTriggerButton* button,
-    const SoftwareTriggerInfo& info, std::function<void()> clientsideHandler)
+    const SoftwareTriggerInfo& info, std::function<void()> clientSideHandler)
 {
     NX_EXPECT(button);
 
@@ -2401,7 +2401,7 @@ void QnMediaResourceWidget::configureTriggerButton(QnSoftwareTriggerButton* butt
     if (info.prolonged)
     {
         connect(button, &QnSoftwareTriggerButton::pressed, this,
-            [this, button, resultHandler, clientsideHandler, id = info.triggerId]()
+            [this, button, resultHandler, clientSideHandler, id = info.triggerId]()
             {
                 if (!button->isLive())
                     return;
@@ -2413,8 +2413,8 @@ void QnMediaResourceWidget::configureTriggerButton(QnSoftwareTriggerButton* butt
                     ? QnSoftwareTriggerButton::State::Waiting
                     : QnSoftwareTriggerButton::State::Failure);
 
-                if (success && clientsideHandler)
-                    clientsideHandler();
+                if (success && clientSideHandler)
+                    clientSideHandler();
             });
 
         connect(button, &QnSoftwareTriggerButton::released, this,
@@ -2438,7 +2438,7 @@ void QnMediaResourceWidget::configureTriggerButton(QnSoftwareTriggerButton* butt
     else
     {
         connect(button, &QnSoftwareTriggerButton::clicked, this,
-            [this, button, resultHandler, clientsideHandler, id = info.triggerId]()
+            [this, button, resultHandler, clientSideHandler, id = info.triggerId]()
             {
                 if (!button->isLive())
                     return;
@@ -2451,8 +2451,8 @@ void QnMediaResourceWidget::configureTriggerButton(QnSoftwareTriggerButton* butt
                     ? QnSoftwareTriggerButton::State::Waiting
                     : QnSoftwareTriggerButton::State::Failure);
 
-                if (success && clientsideHandler)
-                    clientsideHandler();
+                if (success && clientSideHandler)
+                    clientSideHandler();
             });
     }
 
@@ -2472,7 +2472,7 @@ void QnMediaResourceWidget::configureTriggerButton(QnSoftwareTriggerButton* butt
             }
             else if (auto reader = display()->archiveReader())
             {
-                //TODO: Refactor workbench navigator to avoid switching to live in different places.
+                // TODO: Refactor workbench navigator to avoid switching to live in different places.
                 reader->jumpTo(DATETIME_NOW, 0);
                 reader->setSpeed(1.0);
                 reader->resumeMedia();

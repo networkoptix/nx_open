@@ -1,10 +1,4 @@
-/**********************************************************
-* Dec 11, 2015
-* a.kolesnikov
-***********************************************************/
-
-#ifndef NX_CDB_ABSTRACT_AUTHENTICATION_DATA_PROVIDER_H
-#define NX_CDB_ABSTRACT_AUTHENTICATION_DATA_PROVIDER_H
+#pragma once
 
 #include <functional>
 
@@ -13,20 +7,20 @@
 #include <nx/utils/move_only_func.h>
 #include <nx/utils/stree/resourcecontainer.h>
 
-
 namespace nx {
 namespace cdb {
 
 class AbstractAuthenticationDataProvider
 {
 public:
-    virtual ~AbstractAuthenticationDataProvider() {}
+    virtual ~AbstractAuthenticationDataProvider() = default;
 
-    /** Finds entity with \a username and validates its password using \a validateHa1Func
-        In case of success, \a completionHandler is called with \a true
-        @param authProperties Some attributes can be added here as a authentication output
-        @param completionHandler Can be invoked within this method
-    */
+    /**
+     * Finds entity with username and validates its password using validateHa1Func
+     * In case of success, completionHandler is called with true.
+     * @param authProperties Some attributes can be added here as a authentication output.
+     * @param completionHandler Can be invoked within this method.
+     */
     virtual void authenticateByName(
         const nx_http::StringType& username,
         std::function<bool(const nx::Buffer&)> validateHa1Func,
@@ -35,7 +29,5 @@ public:
         nx::utils::MoveOnlyFunc<void(api::ResultCode /*authResult*/)> completionHandler) = 0;
 };
 
-}   //cdb
-}   //nx
-
-#endif   //NX_CDB_ABSTRACT_AUTHENTICATION_DATA_PROVIDER_H
+} // namespace cdb
+} // namespace nx

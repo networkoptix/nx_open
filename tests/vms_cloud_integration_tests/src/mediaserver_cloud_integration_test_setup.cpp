@@ -3,6 +3,7 @@
 #include <gtest/gtest.h>
 
 #include <nx/cloud/cdb/api/connection.h>
+#include <nx/cloud/cdb/test_support/business_data_generator.h>
 #include <nx/network/app_info.h>
 #include <nx/network/http/auth_tools.h>
 #include <nx/utils/string.h>
@@ -205,6 +206,48 @@ void MediaServerCloudIntegrationTest::waitForCloudDataSynchronizedToTheMediaServ
                 return elem.name.toStdString() == newAccount.email;
             });
         if (userIter != users.end())
+            break;
+        std::this_thread::sleep_for(std::chrono::milliseconds(100));
+    }
+}
+
+::ec2::ApiUserData MediaServerCloudIntegrationTest::inviteRandomCloudUser()
+{
+    const auto userEmail = 
+        nx::cdb::test::BusinessDataGenerator::generateRandomEmailAddress();
+    ::ec2::ApiUserData userData;
+    userData.id = guidFromArbitraryData(userEmail);
+    userData.typeId = QnUuid("{774e6ecd-ffc6-ae88-0165-8f4a6d0eafa7}");
+    userData.isCloud = true;
+    userData.isEnabled = true;
+    userData.email = QString::fromStdString(userEmail);
+    userData.name = QString::fromStdString(userEmail);
+    //userData.userRoleId = QnUuid::createUuid();
+    userData.realm = nx::network::AppInfo::realm();
+    userData.hash = "password_is_in_cloud";
+    userData.digest = "password_is_in_cloud";
+    userData.permissions = Qn::GlobalLiveViewerPermissionSet;
+
+    auto mediaServerClient = prepareMediaServerClient();
+    NX_GTEST_ASSERT_EQ(::ec2::ErrorCode::ok, mediaServerClient.ec2SaveUser(userData));
+
+    return userData;
+}
+
+void MediaServerCloudIntegrationTest::waitForUserToAppearInCloud(const std::string& email)
+{
+    using namespace nx::cdb::api;
+
+    for (;;)
+    {
+        std::vector<SystemSharingEx> sharings;
+        ASSERT_EQ(ResultCode::ok, cdb()->getSystemSharings(
+            m_ownerAccount.email, m_ownerAccount.password,
+            m_cloudSystem.id, &sharings));
+        auto accountIter = std::find_if(
+            sharings.begin(), sharings.end(),
+            [&email](const SystemSharingEx& sharing) { return sharing.accountEmail == email; });
+        if (accountIter != sharings.end())
             break;
         std::this_thread::sleep_for(std::chrono::milliseconds(100));
     }

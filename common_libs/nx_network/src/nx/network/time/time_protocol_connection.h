@@ -4,16 +4,15 @@
 #include <nx/network/connection_server/stream_socket_server.h>
 
 namespace nx {
-namespace time_server {
+namespace network {
 
-class TimeProtocolConnection:
+class NX_NETWORK_API TimeProtocolConnection:
     public network::aio::BasicPollable
 {
 public:
     TimeProtocolConnection(
         network::server::StreamConnectionHolder<TimeProtocolConnection>* socketServer,
         std::unique_ptr<AbstractStreamSocket> _socket);
-    ~TimeProtocolConnection();
 
     void startReadingConnection(boost::optional<std::chrono::milliseconds> inactivityTimeout);
 
@@ -30,5 +29,5 @@ private:
         size_t bytesSent);
 };
 
-} // namespace time_server
+} // namespace network
 } // namespace nx
