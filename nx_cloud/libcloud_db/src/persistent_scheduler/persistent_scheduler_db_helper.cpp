@@ -13,8 +13,8 @@ CREATE TABLE schedule_data(
     task_id             VARCHAR(64) NOT NULL,
     schedule_point      BIGINT,
     period              BIGINT,
-    param_key           VARCHAR(255) NOT NULL,
-    param_value         VARCHAR(255) NOT NULL
+    param_key           VARCHAR(4096) NOT NULL,
+    param_value         VARCHAR(4096) NOT NULL
 );
 )sql";
 

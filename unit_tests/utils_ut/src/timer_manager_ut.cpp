@@ -145,7 +145,7 @@ TEST(parseTimerDuration, incorrect_input)
     ASSERT_EQ(defaultValue, parseTimerDuration("", defaultValue));
 }
 
-TEST(deleteFromCallback, simple)
+TEST_F(TimerManager, deleteFromCallBack)
 {
     utils::StandaloneTimerManager mgr;
     int fireCount = 0;

@@ -16,13 +16,7 @@ class DbHelperStub: public nx::cdb::AbstractSchedulerDbHelper
 {
 public:
     MOCK_CONST_METHOD2(getScheduleData, nx::db::DBResult(nx::db::QueryContext*, nx::cdb::ScheduleData*));
-    MOCK_METHOD4(
-        subscribe,
-        nx::db::DBResult(
-            nx::db::QueryContext*,
-            const QnUuid&,
-            QnUuid*,
-            const ScheduleTaskInfo&));
+    MOCK_METHOD4(subscribe, nx::db::DBResult(nx::db::QueryContext*, const QnUuid&, QnUuid*, const ScheduleTaskInfo&));
     MOCK_METHOD2(unsubscribe, nx::db::DBResult(nx::db::QueryContext*, const QnUuid&));
 };
 
@@ -106,60 +100,36 @@ protected:
 
         EXPECT_CALL(dbHelper, getScheduleData(_, NotNull()))
             .Times(AtLeast(1))
-            .WillRepeatedly(
-                ::testing::DoAll(
-                    ::testing::SetArgPointee<1>(dbData),
-                    Return(nx::db::DBResult::ok)));
+            .WillRepeatedly(DoAll(SetArgPointee<1>(dbData), Return(nx::db::DBResult::ok)));
     }
 
     void expectingGetScheduledDataFromDbWithNoDataWillBeCalled()
     {
         EXPECT_CALL(dbHelper, getScheduleData(_, NotNull()))
             .Times(AtLeast(1))
-            .WillRepeatedly(
-                ::testing::DoAll(
-                    ::testing::SetArgPointee<1>(ScheduleData()),
-                    Return(nx::db::DBResult::ok)));
+            .WillRepeatedly(DoAll(SetArgPointee<1>(ScheduleData()), Return(nx::db::DBResult::ok)));
     }
 
     void expectingDbHelperSubscribeWillBeCalledOnce(nx::db::DBResult result = nx::db::DBResult::ok)
     {
-        EXPECT_CALL(
-            dbHelper,
-            subscribe(
-                nullptr,
-                functorId,
-                _,
-                _)).Times(AtLeast(1)).WillOnce(
-                    ::testing::DoAll(
-                        ::testing::SetArgPointee<2>(QnUuid::createUuid()),
-                        Return(result)));
+        EXPECT_CALL(dbHelper, subscribe(nullptr, functorId, _, _))
+            .Times(AtLeast(1))
+            .WillOnce(DoAll(SetArgPointee<2>(QnUuid::createUuid()), Return(result)));
     }
 
     void expectingDbHelperUnsubscribeWillBeCalled(nx::db::DBResult result = nx::db::DBResult::ok)
     {
-        EXPECT_CALL(
-            dbHelper,
-            unsubscribe(
-                nullptr,
-                _)).Times(AtLeast(1)).WillOnce(Return(result));
+        EXPECT_CALL(dbHelper, unsubscribe(nullptr, _))
+            .Times(AtLeast(1))
+            .WillOnce(Return(result));
     }
 
     void expectingDbHelperSubscribeWillBeCalledTwice()
     {
-        EXPECT_CALL(
-            dbHelper,
-            subscribe(
-                nullptr,
-                functorId,
-                _,
-                _)).Times(AtLeast(1)).WillOnce(
-                    ::testing::DoAll(
-                        ::testing::SetArgPointee<2>(QnUuid::createUuid()),
-                        Return(nx::db::DBResult::ok))).WillOnce(
-                            ::testing::DoAll(
-                                ::testing::SetArgPointee<2>(QnUuid::createUuid()),
-                                Return(nx::db::DBResult::ok)));
+        EXPECT_CALL(dbHelper, subscribe(nullptr, functorId, _, _))
+            .Times(AtLeast(1))
+            .WillOnce(DoAll(SetArgPointee<2>(QnUuid::createUuid()), Return(nx::db::DBResult::ok)))
+            .WillOnce(DoAll(SetArgPointee<2>(QnUuid::createUuid()), Return(nx::db::DBResult::ok)));
     }
 
     void whenSchedulerAndUserInitialized()
@@ -180,10 +150,10 @@ protected:
         user->subscribe(
             std::chrono::milliseconds(10),
             [&taskId, subPromise = std::move(subPromise)](const QnUuid& subscribedId) mutable
-        {
-            taskId = subscribedId;
-            subPromise.set_value();
-        });
+            {
+                taskId = subscribedId;
+                subPromise.set_value();
+            });
         subFuture.wait();
 
         return taskId;

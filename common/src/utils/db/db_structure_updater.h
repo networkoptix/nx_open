@@ -16,10 +16,10 @@ class AbstractAsyncSqlQueryExecutor;
 class QueryContext;
 
 static const std::string kCdbStructureName = "cdb";
-static const std::string kPersistentShedulerStructureName = "sheduler";
+static const std::string kPersistentShedulerStructureName = "scheduler";
 
 /**
- * Updates are executed in order they have been added to DbStructureUpdater istance.
+ * Updates are executed in order they have been added to DbStructureUpdater instance.
  * @note Database is not created, it MUST already exist.
  * @note This class methods are not thread-safe.
  */
