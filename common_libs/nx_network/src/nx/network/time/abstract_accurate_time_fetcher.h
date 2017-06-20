@@ -9,25 +9,23 @@
 /**
  * Abstract interface for class performing fetching accurate current time from some public server.
  */
-class NX_NETWORK_API AbstractAccurateTimeFetcher
-:
+class NX_NETWORK_API AbstractAccurateTimeFetcher:
     public nx::network::aio::BasicPollable
 {
 public:
     /**
      * Functor arguments:
-     * - \a qint64 on success UTC millis from epoch. On failure -1.
-     * - \a SystemError::ErrorCode last system error code. \a SystemError::noError in case of success.
+     * - qint64 on success UTC millis from epoch. On failure -1.
+     * - SystemError::ErrorCode last system error code. SystemError::noError in case of success.
      */
-    typedef nx::utils::MoveOnlyFunc<void(qint64, SystemError::ErrorCode)>
-        CompletionHandler;
+    using CompletionHandler = nx::utils::MoveOnlyFunc<void(qint64, SystemError::ErrorCode)>;
 
     virtual ~AbstractAccurateTimeFetcher() = default;
 
     /**
      * Initiates asynchronous time request operation.
      * @note Implementation is NOT REQUIRED to support performing multiple simultaneous operations.
-     * @return \a true if request issued successfully, otherwise \a false.
+     * @return true if request issued successfully, otherwise false.
      */
     virtual void getTimeAsync(CompletionHandler handlerFunc) = 0;
 };

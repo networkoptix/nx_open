@@ -15,8 +15,6 @@ class InstanceController
 public:
     InstanceController(const ConnectionOptions& dbConnectionOptions);
 
-    bool initialize();
-
     AsyncSqlQueryExecutor& queryExecutor();
     const AsyncSqlQueryExecutor& queryExecutor() const;
     const StatisticsCollector& statisticsCollector() const;
@@ -24,6 +22,7 @@ public:
 
 protected:
     DbStructureUpdater& dbStructureUpdater();
+    bool initialize();
 
 private:
     const ConnectionOptions m_dbConnectionOptions;

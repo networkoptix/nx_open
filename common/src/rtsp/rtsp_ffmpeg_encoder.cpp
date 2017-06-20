@@ -10,7 +10,11 @@
 #include <utils/common/util.h>
 #include <nx/network/socket.h>
 
-QnRtspFfmpegEncoder::QnRtspFfmpegEncoder(): 
+namespace {
+    static const int kMaxPacketLen = 1024 * 32;
+}
+
+QnRtspFfmpegEncoder::QnRtspFfmpegEncoder():
     m_gotLivePacket(false),
     m_curDataBuffer(0),
     m_liveMarker(0),
@@ -19,7 +23,7 @@ QnRtspFfmpegEncoder::QnRtspFfmpegEncoder():
     m_isLastDataContext(false)
 {
     // Do nothing.
-}    
+}
 
 void QnRtspFfmpegEncoder::setDstResolution(const QSize& dstVideSize, AVCodecID dstCodec)
 {
@@ -28,7 +32,7 @@ void QnRtspFfmpegEncoder::setDstResolution(const QSize& dstVideSize, AVCodecID d
 }
 
 void QnRtspFfmpegEncoder::init()
-{ 
+{
     m_contextSent.reset();
     m_gotLivePacket = false;
     m_eofReached = false;
@@ -131,7 +135,6 @@ bool QnRtspFfmpegEncoder::getNextPacket(QnByteArray& sendBuffer)
     int dataRest = dataEnd - m_curDataBuffer;
     if (m_eofReached)
         return false; // no more data to send
-    int sendLen = qMin(MAX_RTSP_DATA_LEN - RTSP_FFMPEG_MAX_HEADER_SIZE, dataRest);
 
     if (m_curDataBuffer == m_media->data())
     {
@@ -158,7 +161,7 @@ bool QnRtspFfmpegEncoder::getNextPacket(QnByteArray& sendBuffer)
         sendBuffer.write((const char*) &cseq8, 1);
         flags = htons(flags);
         sendBuffer.write((const char*) &flags, 2);
-        if (video) 
+        if (video)
         {
             quint32 videoHeader = htonl(video->dataSize() & 0x00ffffff);
             sendBuffer.write(((const char*) &videoHeader)+1, 3);
@@ -168,7 +171,7 @@ bool QnRtspFfmpegEncoder::getNextPacket(QnByteArray& sendBuffer)
             sendBuffer.write((const char*) &metadataHeader, 4);
         }
     }
-
+    int sendLen = qMin(int(kMaxPacketLen - sendBuffer.size()), dataRest);
     sendBuffer.write(m_curDataBuffer, sendLen);
     m_curDataBuffer += sendLen;
 

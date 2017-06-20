@@ -12,6 +12,9 @@ InstanceController::InstanceController(const nx::db::ConnectionOptions& connecti
     nx::db::InstanceController(connectionOptions)
 {
     dbStructureUpdater().addUpdateScript(kCreateConnectSessionStatisticsTable);
+
+    if (!initialize())
+        throw std::runtime_error("Could not connect to DB");
 }
 
 } // namespace rdb

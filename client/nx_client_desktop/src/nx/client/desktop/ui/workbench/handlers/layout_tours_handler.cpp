@@ -142,6 +142,7 @@ LayoutToursHandler::LayoutToursHandler(QObject* parent):
                 m_tourExecutor->startTour(layoutTourManager()->tour(id));
                 context()->instance<QnWorkbenchStateManager>()->saveState();
             }
+            context()->action(action::FullscreenAction)->setChecked(true);
         });
 
     connect(action(action::PreviousLayoutAction), &QAction::triggered, this,

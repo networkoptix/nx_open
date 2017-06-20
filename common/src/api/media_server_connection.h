@@ -7,7 +7,7 @@
 #include <QtGui/QRegion>
 
 #include <api/helpers/request_helpers_fwd.h>
-#include <api/helpers/thumbnail_request_data.h> //for RoundMethod, delete when getImage... will be removed
+#include <api/helpers/thumbnail_request_data.h> //< For RoundMethod, delete when /api/image is removed.
 
 #include <common/common_globals.h>
 

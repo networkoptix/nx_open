@@ -12,7 +12,7 @@
 #include "ec2_connection.h"
 #include <transaction/transaction_message_bus_base.h>
 #include <nx/p2p/p2p_connection.h>
-#include <config.h>
+#include <ini.h>
 #include <nx/p2p/p2p_serialization.h>
 #include <api/common_message_processor.h>
 

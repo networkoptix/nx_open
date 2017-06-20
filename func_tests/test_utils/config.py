@@ -1,8 +1,10 @@
 import os.path
 import argparse
 import yaml
+import re
 from .utils import SimpleNamespace
 from .server_physical_host import PhysicalInstallationHostConfig
+from datetime import timedelta
 from .host import SshHostConfig
 
 
@@ -11,6 +13,35 @@ def expand_path(path):
     path = os.path.expanduser(path)
     path = os.path.abspath(path)
     return path
+
+TIMEDELTA_REGEXP = re.compile(r'^((?P<days>\d+?)d)?((?P<hours>\d+?)h)?((?P<minutes>\d+?)m)?((?P<seconds>\d+?)s)?$')
+
+def timedelta_constructor(loader, node):
+    value = loader.construct_scalar(node)
+    match = TIMEDELTA_REGEXP.match(value)
+    try:
+        if not match: return timedelta(seconds=int(duration_str))
+        timedelta_params = {k: int(v)
+                            for (k, v) in match.groupdict().iteritems() if v}
+        if not timedelta_params:
+            return timedelta(seconds=int(duration_str))
+        return timedelta(**timedelta_params)
+    except ValueError:
+        return None
+
+
+def timedelta_representer(dumper, data):
+    assert isinstance(data, timedelta)
+    hours = data.seconds / (60 * 60)
+    minutes = (data.seconds - hours * 60 * 60) / 60
+    seconds = data.seconds % 60
+    return dumper.represent_scalar(u'!timedelta', u'%dd%dh%dm%ds' % (
+        data.days, hours, minutes, seconds))
+
+
+yaml.add_constructor(u'!timedelta', timedelta_constructor)
+yaml.add_representer(timedelta, timedelta_representer)
+yaml.add_implicit_resolver(u'!timedelta', TIMEDELTA_REGEXP)
 
 
 class TestsConfig(object):

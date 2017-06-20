@@ -1,5 +1,4 @@
-#ifndef MEDIA_SERVER_PROCESS_H
-#define MEDIA_SERVER_PROCESS_H
+#pragma once
 
 #include <memory>
 
@@ -37,9 +36,7 @@ struct QnModuleInformation;
 struct QnPeerRuntimeInfo;
 class QnLdapManager;
 struct BeforeRestoreDbData;
-namespace ec2 {
-    class CrashReporter;
-}
+namespace ec2 { class CrashReporter; }
 
 struct CloudManagerGroup;
 
@@ -50,10 +47,12 @@ class CmdLineArguments
 public:
     QString logLevel;
     QString exceptionFilters;
-    //!Log level of http requests log
+
+    // Log level of http requests log.
     QString msgLogLevel;
     QString ec2TranLogLevel;
     QString permissionsLogLevel;
+
     QString rebuildArchive;
     QString devModeKey;
     QString allowedDiscoveryPeers;
@@ -71,13 +70,14 @@ public:
     QString ipVersion;
     QString createFakeData;
 
-    CmdLineArguments() :
+    CmdLineArguments():
         logLevel(
-#ifdef _DEBUG
-            lit("DEBUG")),
-#else
-        lit("INFO")),
-#endif
+            #if defined(_DEBUG)
+                lit("DEBUG")
+            #else
+                lit("INFO")
+            #endif
+        ),
         cleanupDb(false),
         moveHandlingCameras(false),
         showVersion(false),
@@ -98,13 +98,14 @@ public:
     void run();
     int getTcpPort() const;
 
-    /** Entry point */
+    /** Entry point. */
     static int main(int argc, char* argv[]);
 
     void setHardwareGuidList(const QVector<QString>& hardwareGuidList);
 
     const CmdLineArguments cmdLineArguments() const;
     void setObsoleteGuid(const QnUuid& obsoleteGuid) { m_obsoleteGuid = obsoleteGuid; }
+
     QnCommonModule* commonModule() const
     {
         if (const auto& module = m_serverModule.lock())
@@ -112,13 +113,16 @@ public:
         else
             return nullptr;
     }
+
     MSSettings* serverSettings() const { return m_settings.get(); }
 
 signals:
     void started();
+
 public slots:
     void stopAsync();
     void stopSync();
+
 private slots:
     void loadResourcesFromECS(
         ec2::AbstractECConnectionPtr ec2Connection,
@@ -127,7 +131,8 @@ private slots:
     void at_serverSaved(int, ec2::ErrorCode err);
     void at_cameraIPConflict(const QHostAddress& host, const QStringList& macAddrList);
     void at_storageManager_noStoragesAvailable();
-    void at_storageManager_storageFailure(const QnResourcePtr& storage, QnBusiness::EventReason reason);
+    void at_storageManager_storageFailure(
+        const QnResourcePtr& storage, QnBusiness::EventReason reason);
     void at_storageManager_rebuildFinished(QnSystemHealth::MessageType msgType);
     void at_archiveBackupFinished(qint64 backedUpToMs, QnBusiness::EventReason code);
     void at_timer();
@@ -136,12 +141,13 @@ private slots:
 
     void at_appStarted();
     void at_runtimeInfoChanged(const QnPeerRuntimeInfo& runtimeInfo);
-    void at_emptyDigestDetected(const QnUserResourcePtr& user, const QString& login, const QString& password);
+    void at_emptyDigestDetected(
+        const QnUserResourcePtr& user, const QString& login, const QString& password);
     void at_databaseDumped();
     void at_systemIdentityTimeChanged(qint64 value, const QnUuid& sender);
-    void at_updatePublicAddress(const QHostAddress& publicIP);
-private:
+    void at_updatePublicAddress(const QHostAddress& publicIp);
 
+private:
     void updateDisabledVendorsIfNeeded();
     void updateAllowCameraCHangesIfNeed();
     void moveHandlingCameras();
@@ -151,14 +157,20 @@ private:
         CloudManagerGroup* const cloudManagerGroup,
         QnUniversalTcpListener* tcpListener,
         ec2::QnTransactionMessageBusBase* messageBus);
+
+    template<class TcpConnectionProcessor, typename... ExtraParam>
+    void regTcp(const QByteArray& protocol, const QString& path, ExtraParam... extraParam);
+
     bool initTcpListener(
         CloudManagerGroup* const cloudManagerGroup,
         ec2::QnTransactionMessageBusBase* messageBus);
+
     std::unique_ptr<nx_upnp::PortMapper> initializeUpnpPortMapper();
     Qn::ServerFlags calcServerFlags();
     void initPublicIpDiscovery();
     QnMediaServerResourcePtr findServer(ec2::AbstractECConnectionPtr ec2Connection);
-    void saveStorages(ec2::AbstractECConnectionPtr ec2Connection, const QnStorageResourceList& storages);
+    void saveStorages(
+        ec2::AbstractECConnectionPtr ec2Connection, const QnStorageResourceList& storages);
     void dumpSystemUsageStats();
     bool isStopping() const;
     void resetSystemState(CloudConnectionManager& cloudConnectionManager);
@@ -172,9 +184,10 @@ private:
     QString hardwareIdAsGuid() const;
     void updateGuidIfNeeded();
 
-    // TODO: Makes sense to split into helper functions and move into appserver2 so it can be used
+    // TODO: Makes sense to split into helper functions and move into appserver2, so it can be used
     // in unit tests.
-    void makeFakeData(const QString& fakeDataString, const ec2::AbstractECConnectionPtr& connection);
+    void makeFakeData(
+        const QString& fakeDataString, const ec2::AbstractECConnectionPtr& connection);
 
 private:
     int m_argc;
@@ -204,5 +217,3 @@ private:
     bool m_serviceMode;
     std::unique_ptr<MSSettings> m_settings;
 };
-
-#endif // MEDIA_SERVER_PROCESS_H

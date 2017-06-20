@@ -2,13 +2,13 @@
 
 #include <QtWidgets/QWidget>
 
-#include <client_core/connection_context_aware.h>
-
 #include <nx_ec/ec_api_fwd.h>
 #include <licensing/license_fwd.h>
 #include <ui/widgets/common/abstract_preferences_widget.h>
 #include <utils/common/connective.h>
 #include <nx/client/desktop/license/license_helpers.h>
+
+#include <ui/workbench/workbench_context_aware.h>
 
 class QModelIndex;
 class QNetworkAccessManager;
@@ -24,7 +24,7 @@ class LicenseManagerWidget;
 
 class QnLicenseManagerWidget:
     public Connective<QnAbstractPreferencesWidget>,
-    public QnConnectionContextAware
+    public QnWorkbenchContextAware
 {
     Q_OBJECT
     typedef Connective<QnAbstractPreferencesWidget> base_type;

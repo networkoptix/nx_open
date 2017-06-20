@@ -1,24 +1,18 @@
-////////////////////////////////////////////////////////////
-// 2 oct 2012    Andrey Kolesnikov
-////////////////////////////////////////////////////////////
-
-#ifndef WILDCARD_H
-#define WILDCARD_H
+#pragma once
 
 #include <QString>
 
+/**
+ * Check whether a string matches a wildcard expression.
+ *
+ * @param str String being validated to match the wildcard expression.
+ * @param mask Wildcard expression. Allowed to contain special chars '?' (matches any char except
+ * '.') and '*' (matches any number of any chars).
+ * @return Whether str matches mask.
+ */
+NX_UTILS_API bool wildcardMatch(const char* mask, const char* str);
 
-//!Validates \a str for appliance to wild-card expression \a mask
-/*!
-    \param mask Wildcard expression. Allowed to contain special symbols ? (any character except .), * (any number of any characters)
-    \param str String being validated for appliance to \a mask
-    \return true, if \a str has been validated with \a mask. false, otherwise
-*/
-NX_UTILS_API bool wildcardMatch( const char* mask, const char* str );
-
-inline bool wildcardMatch( const QString& mask, const QString& str )
+inline bool wildcardMatch(const QString& mask, const QString& str)
 {
-    return wildcardMatch( mask.toLatin1().constData(), str.toLatin1().constData() );
+    return wildcardMatch(mask.toLatin1().constData(), str.toLatin1().constData());
 }
-
-#endif  //WILDCARD_H

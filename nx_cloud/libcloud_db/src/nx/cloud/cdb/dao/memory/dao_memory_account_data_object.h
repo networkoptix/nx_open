@@ -58,6 +58,12 @@ public:
         const std::string& accountEmail,
         std::chrono::system_clock::time_point activationTime) override;
 
+    virtual void updateAccount(
+        nx::db::QueryContext* queryContext,
+        const std::string& accountEmail,
+        const api::AccountUpdateData& accountUpdateData,
+        bool activateAccountIfNotActive) override;
+
 private:
     std::map<std::string, api::AccountData> m_emailToAccount;
     std::map<std::string, std::string> m_verificationCodeToEmail;
