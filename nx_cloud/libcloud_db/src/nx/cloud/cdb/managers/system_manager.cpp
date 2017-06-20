@@ -1256,6 +1256,7 @@ nx::db::DBResult SystemManager::prepareInviteNotification(
     db::DBResult dbResult = m_accountManager->createPasswordResetCode(
         queryContext,
         inviteeAccount.email,
+        m_settings.accountManager().accountActivationCodeExpirationTimeout,
         &accountConfirmationCode);
     if (dbResult != db::DBResult::ok)
         return dbResult;

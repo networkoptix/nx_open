@@ -460,6 +460,7 @@ nx::db::DBResult AccountManager::fetchAccountByEmail(
 nx::db::DBResult AccountManager::createPasswordResetCode(
     nx::db::QueryContext* const queryContext,
     const std::string& accountEmail,
+    std::chrono::seconds codeExpirationTimeout,
     data::AccountConfirmationCode* const confirmationCode)
 {
     //generating temporary password
@@ -468,8 +469,7 @@ nx::db::DBResult AccountManager::createPasswordResetCode(
     tempPasswordData.login = accountEmail;
     tempPasswordData.realm = AuthenticationManager::realm().constData();
     tempPasswordData.expirationTimestampUtc =
-        nx::utils::timeSinceEpoch().count() +
-        m_settings.accountManager().passwordResetCodeExpirationTimeout.count();
+        nx::utils::timeSinceEpoch().count() + codeExpirationTimeout.count();
     tempPasswordData.maxUseCount = 1;
     tempPasswordData.isEmailCode = true;
     tempPasswordData.accessRights.requestsAllowed.push_back(kAccountUpdatePath);
@@ -891,7 +891,10 @@ nx::db::DBResult AccountManager::resetPassword(
         return dbResult;
 
     dbResult = createPasswordResetCode(
-        queryContext, accountEmail, confirmationCode);
+        queryContext,
+        accountEmail,
+        m_settings.accountManager().passwordResetCodeExpirationTimeout,
+        confirmationCode);
     if (dbResult != nx::db::DBResult::ok)
     {
         NX_LOGX(lm("Failed to issue password reset code for account %1")

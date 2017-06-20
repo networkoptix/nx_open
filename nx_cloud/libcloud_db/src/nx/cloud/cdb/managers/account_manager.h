@@ -158,6 +158,7 @@ public:
     nx::db::DBResult createPasswordResetCode(
         nx::db::QueryContext* const queryContext,
         const std::string& accountEmail,
+        std::chrono::seconds codeExpirationTimeout,
         data::AccountConfirmationCode* const confirmationCode);
 
     virtual void addExtension(AbstractAccountManagerExtension*) override;
