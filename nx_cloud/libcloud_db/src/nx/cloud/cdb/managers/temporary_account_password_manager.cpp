@@ -102,15 +102,6 @@ void TemporaryAccountPasswordManager::registerTemporaryCredentials(
         });
 }
 
-std::string TemporaryAccountPasswordManager::generateRandomPassword() const
-{
-    std::string password(nx::utils::random::number<size_t>(10, 20), 'a');
-    std::generate(
-        password.begin(), password.end(),
-        []() { return nx::utils::random::number<int>('a', 'z'); });
-    return password;
-}
-
 void TemporaryAccountPasswordManager::addRandomCredentials(
     data::TemporaryAccountCredentials* const data)
 {
@@ -178,6 +169,15 @@ boost::optional<TemporaryAccountCredentialsEx>
     if (it == temporaryCredentialsByLogin.cend())
         return boost::none;
     return *it;
+}
+
+std::string TemporaryAccountPasswordManager::generateRandomPassword() const
+{
+    std::string password(nx::utils::random::number<size_t>(10, 20), 'a');
+    std::generate(
+        password.begin(), password.end(),
+        []() { return nx::utils::random::number<int>('a', 'z'); });
+    return password;
 }
 
 bool TemporaryAccountPasswordManager::isTemporaryPasswordExpired(

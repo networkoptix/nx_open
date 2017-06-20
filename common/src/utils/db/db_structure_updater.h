@@ -57,8 +57,8 @@ public:
     unsigned int maxKnownVersion() const;
 
     /**
-     * By default, update is done to the maximum known version.
-     * I.e., every script/function is applied.
+     * By default, update is done to the maximum known version. I.e., every script/function is
+     * applied.
      */
     void setVersionToUpdateTo(unsigned int version);
 
