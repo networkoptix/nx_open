@@ -170,7 +170,8 @@ void LayoutTourItemWidget::initOverlay()
     orderLabel->setAcceptedMouseButtons(0);
     orderLabel->setAlignment(Qt::AlignVCenter);
     orderLabel->setFont(orderFont);
-    auto updateOrder = [this, orderLabel](Qn::ItemDataRole role)
+    auto updateOrder =
+        [this, orderLabel](Qn::ItemDataRole role)
         {
             if (role != Qn::LayoutTourItemOrderRole)
                 return;
@@ -181,7 +182,8 @@ void LayoutTourItemWidget::initOverlay()
     updateOrder(Qn::LayoutTourItemOrderRole);
     connect(item(), &QnWorkbenchItem::dataChanged, this, updateOrder);
 
-    auto updateLightText = [this, title, orderLabel]
+    auto updateLightText =
+        [this, title, orderLabel]
         {
             setPaletteColor(title, QPalette::WindowText, palette().color(QPalette::Light));
             setPaletteColor(orderLabel, QPalette::WindowText, palette().color(QPalette::Light));
@@ -195,7 +197,8 @@ void LayoutTourItemWidget::initOverlay()
     delayHintLabel->setAlignment(Qt::AlignVCenter);
     delayHintLabel->setFont(font);
 
-    auto updateHint = [this, delayHintLabel]
+    auto updateHint =
+        [this, delayHintLabel]
         {
             const bool isManual = item()->layout()
                 && item()->layout()->data(Qn::LayoutTourIsManualRole).toBool();
