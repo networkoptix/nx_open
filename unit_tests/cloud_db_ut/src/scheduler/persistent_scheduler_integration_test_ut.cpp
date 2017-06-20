@@ -177,9 +177,9 @@ protected:
         user1->setShouldUnsubscribe(
             user1Task1Id,
             [this](const QnUuid& taskId, const SchedulerUser::Task&)
-        {
-            unsubsribeCalledIds.emplace(taskId);
-        });
+            {
+                unsubsribeCalledIds.emplace(taskId);
+            });
     }
 
     void andWhenTimeToFireComesButServerIsOffline()
@@ -556,7 +556,6 @@ TEST_F(SchedulerIntegrationTest, UnsubscribeFromExpiredTask)
     thenNoNewFires();
 }
 
-
-}
-}
-}
+} // namespace test
+} // namespace cdb
+} // namespace nx
