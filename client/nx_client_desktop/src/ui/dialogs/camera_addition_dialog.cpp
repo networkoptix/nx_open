@@ -47,14 +47,12 @@ QnCameraAdditionDialog::QnCameraAdditionDialog(QWidget *parent):
 {
     ui->setupUi(this);
 
-    QString examples =
-        lit(R"(<html>%1<ul>
+    const auto examples = QString::fromLatin1(R"(<html>%1<ul>
         <li><b>192.168.1.15</b></li>
         <li><b>www.example.com:8080</b></li>
         <li><b>rtsp://example.com:554/video</b></li>
         <li><b>udp://239.250.5.5:1234</b></li>
-        </ul></html>
-        )")
+        </ul></html>)")
         .arg(tr("Examples:"));
 
     ui->singleCameraLineEdit->setToolTip(examples);
