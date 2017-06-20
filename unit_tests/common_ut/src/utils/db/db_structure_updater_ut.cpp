@@ -2,6 +2,7 @@
 
 #include <list>
 #include <map>
+#include <string>
 
 #include <nx/fusion/model_functions.h>
 #include <nx/utils/std/cpp14.h>
@@ -13,6 +14,8 @@
 namespace nx {
 namespace db {
 namespace test {
+
+static const std::string kCdbStructureName = "test";
 
 class TestAsyncSqlQueryExecutor:
     public AbstractAsyncSqlQueryExecutor
@@ -105,7 +108,7 @@ public:
         m_testAsyncSqlQueryExecutor->setCustomExecSqlScriptFunc(
             std::bind(&DbStructureUpdater::execSqlScript, this, _1, _2));
 
-        m_dbUpdater = std::make_unique<db::DbStructureUpdater>(m_testAsyncSqlQueryExecutor.get());
+        m_dbUpdater = std::make_unique<db::DbStructureUpdater>(kCdbStructureName, m_testAsyncSqlQueryExecutor.get());
     }
 
 protected:
@@ -186,7 +189,7 @@ private:
         BaseType::initializeDatabase();
 
         // Creating initial structure.
-        nx::db::DbStructureUpdater updater(asyncSqlQueryExecutor().get());
+        nx::db::DbStructureUpdater updater(kCdbStructureName, asyncSqlQueryExecutor().get());
         ASSERT_TRUE(updater.updateStructSync());
     }
 

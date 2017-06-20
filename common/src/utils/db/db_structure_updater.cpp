@@ -57,7 +57,10 @@ INSERT INTO db_version_data (db_version) VALUES (0);
 } // namespace
 
 
-DbStructureUpdater::DbStructureUpdater(AbstractAsyncSqlQueryExecutor* const queryExecutor):
+DbStructureUpdater::DbStructureUpdater(
+    std::string dbManagerName,
+    AbstractAsyncSqlQueryExecutor* const queryExecutor)
+    :
     m_queryExecutor(queryExecutor),
     m_initialVersion(0)
 {

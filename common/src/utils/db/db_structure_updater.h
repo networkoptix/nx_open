@@ -18,7 +18,7 @@ class AbstractAsyncSqlQueryExecutor;
 class QueryContext;
 
 /**
- * Updates are executed in order they have been added to DbStructureUpdater istance.
+ * Updates are executed in order they have been added to DbStructureUpdater instance.
  * @note Database is not created, it MUST already exist.
  * @note This class methods are not thread-safe.
  */
@@ -28,7 +28,9 @@ public:
     typedef nx::utils::MoveOnlyFunc<nx::db::DBResult(nx::db::QueryContext*)>
         DbUpdateFunc;
 
-    DbStructureUpdater(AbstractAsyncSqlQueryExecutor* const queryExecutor);
+    DbStructureUpdater(
+        std::string dbManagerName,
+        AbstractAsyncSqlQueryExecutor* const queryExecutor);
 
     /**
      * Used to aggregate update scripts.
@@ -52,7 +54,7 @@ public:
      */
     unsigned int maxKnownVersion() const;
     /**
-     * By default, update is done to the maximum known version. 
+     * By default, update is done to the maximum known version.
      * I.e., every script/function is applied.
      */
     void setVersionToUpdateTo(unsigned int version);
