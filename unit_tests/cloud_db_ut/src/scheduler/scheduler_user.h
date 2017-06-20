@@ -131,6 +131,7 @@ public:
     }
 
     void setShouldSubscribe() { m_shouldSubscribe = true; }
+
     TaskMap tasks()
     {
         QnMutexLocker lock(&m_mutex);
@@ -140,8 +141,8 @@ public:
 private:
     nx::db::AbstractAsyncSqlQueryExecutor* m_executor;
     nx::cdb::PersistentScheduler* m_scheduler;
-    std::atomic<bool> m_shouldUnsubscribe{ false };
-    std::atomic<bool> m_shouldSubscribe{ false };
+    std::atomic<bool> m_shouldUnsubscribe{false};
+    std::atomic<bool> m_shouldSubscribe{false};
     UnsubscribeCb m_unsubscribeCallback;
     QnUuid m_unsubscribeId;
     TaskMap m_tasks;
@@ -150,7 +151,7 @@ private:
 };
 
 
-}
-}
-}
+} // namespace test
+} // namespace cdb
+} // namespace nx
 
