@@ -376,7 +376,7 @@ Result::Result(Player::VideoQuality quality, const QSize& frameSize):
 
 bool Result::isValid() const
 {
-    return quality != Player::UnknownQuality && frameSize.isValid();
+    return quality != Player::UnknownVideoQuality && frameSize.isValid();
 }
 
 bool Result::operator==(const Result& other) const

@@ -127,7 +127,7 @@ public:
 
     enum VideoQuality
     {
-        UnknownQuality = -1, //< There's no a quality which could be played by a player.
+        UnknownVideoQuality = -1, //< There's no a quality which could be played by a player.
         HighVideoQuality = 0, //< Native stream, high quality.
         LowVideoQuality = 1, //< Native stream, low quality.
         LowIframesOnlyVideoQuality = 2, //< Native stream, low quality, I-frames only.

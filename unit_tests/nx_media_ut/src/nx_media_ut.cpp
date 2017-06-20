@@ -292,7 +292,7 @@ public:
     QSize maxDecoderResolution;
     QSize highStreamResolution;
     QSize lowStreamResolution;
-    int videoQuality = Player::UnknownQuality;
+    int videoQuality = Player::UnknownVideoQuality;
     media_player_quality_chooser::Result expectedQuality;
 
     TestCase() {}
@@ -376,7 +376,7 @@ public:
 
         switch (quality)
         {
-            case Player::UnknownQuality:
+            case Player::UnknownVideoQuality:
                 expectedQuality = Result();
                 break;
             case Player::LowVideoQuality:
@@ -496,7 +496,7 @@ TEST_F(NxMediaPlayerTest, SetQuality)
     static const auto high = Player::HighVideoQuality;
     static const auto low = Player::LowVideoQuality;
     static const auto lowIframes = Player::LowIframesOnlyVideoQuality;
-    static const auto unknown = Player::UnknownQuality;
+    static const auto unknown = Player::UnknownVideoQuality;
 
     #define T TestCase().setLineNumber(__LINE__).setExecutor(&qualityTest)
 

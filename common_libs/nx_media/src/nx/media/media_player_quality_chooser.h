@@ -26,11 +26,11 @@ namespace media_player_quality_chooser {
 
 struct Result: public boost::equality_comparable1<Result>
 {
-    Player::VideoQuality quality = Player::UnknownQuality;
+    Player::VideoQuality quality = Player::UnknownVideoQuality;
     QSize frameSize;
 
     Result(
-        Player::VideoQuality quality = Player::UnknownQuality,
+        Player::VideoQuality quality = Player::UnknownVideoQuality,
         const QSize& frameSize = QSize());
 
     bool isValid() const;

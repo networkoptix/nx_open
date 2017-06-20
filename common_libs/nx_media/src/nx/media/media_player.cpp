@@ -636,7 +636,7 @@ void PlayerPrivate::applyVideoQuality()
 
     switch (result.quality)
     {
-        case Player::UnknownQuality:
+        case Player::UnknownVideoQuality:
             log("applyVideoQuality(): Could not choose quality => setMediaStatus(NoMedia)");
             setMediaStatus(Player::MediaStatus::NoMedia);
             q->stop();
@@ -1104,7 +1104,7 @@ QList<int> Player::availableVideoQualities(const QList<int>& videoQualities) con
             default:
             {
                 const auto& resultQuality = getQuality(videoQuality);
-                if (resultQuality.quality != UnknownQuality
+                if (resultQuality.quality != UnknownVideoQuality
                     && resultQuality.frameSize.height() <= maximumResolution.height())
                 {
                     customQualities.append(videoQuality);
