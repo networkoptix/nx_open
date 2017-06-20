@@ -41,7 +41,21 @@ namespace workbench {
 
 namespace {
 
-class LayoutPreviewWidget: public GraphicsWidget
+class MouseEaterWidget: public QGraphicsWidget
+{
+public:
+    MouseEaterWidget()
+    {
+        setAcceptedMouseButtons(Qt::LeftButton);
+        auto eventEater = new QnMultiEventEater(Qn::AcceptEvent, this);
+        eventEater->addEventType(QEvent::GraphicsSceneMousePress);
+        eventEater->addEventType(QEvent::GraphicsSceneMouseRelease);
+        eventEater->addEventType(QEvent::GraphicsSceneMouseDoubleClick);
+        installEventFilter(eventEater);
+    }
+};
+
+class LayoutPreviewWidget: public QGraphicsWidget
 {
 public:
     LayoutPreviewWidget(QSharedPointer<LayoutPreviewPainter> previewPainter):
@@ -257,6 +271,9 @@ void LayoutTourItemWidget::initOverlay()
     footerLayout->setContentsMargins(0, 2, 0, 0);
     footerLayout->setSpacing(kSpacing);
 
+    auto footerWidget = new MouseEaterWidget();
+    footerWidget->setLayout(footerLayout);
+
     auto updateManualMode = [this, delayWidget]
         {
             const bool isManual = item()->layout()->data(Qn::LayoutTourIsManualRole).toBool();
@@ -280,7 +297,7 @@ void LayoutTourItemWidget::initOverlay()
     layout->setContentsMargins(kMargin, kMargin, kMargin, kMargin);
     layout->addItem(headerLayout);
     layout->addItem(contentWidget);
-    layout->addItem(footerLayout);
+    layout->addItem(footerWidget);
     layout->setSpacing(kSpacing);
     layout->setStretchFactor(contentWidget, 1000);
 
