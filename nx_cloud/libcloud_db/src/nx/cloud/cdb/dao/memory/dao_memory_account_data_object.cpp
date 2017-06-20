@@ -103,10 +103,10 @@ nx::db::DBResult AccountDataObject::updateAccountToActiveStatus(
 }
 
 void AccountDataObject::updateAccount(
-    nx::db::QueryContext* queryContext,
+    nx::db::QueryContext* /*queryContext*/,
     const std::string& accountEmail,
     const api::AccountUpdateData& accountUpdateData,
-    bool activateAccountIfNotActive)
+    bool /*activateAccountIfNotActive*/)
 {
     auto accountIter = m_emailToAccount.find(accountEmail);
     if (accountIter == m_emailToAccount.end())
