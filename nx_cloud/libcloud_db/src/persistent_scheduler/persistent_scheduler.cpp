@@ -35,7 +35,7 @@ static DelayInfo calcDelay(const ScheduleTaskInfo& taskInfo)
     return result;
 }
 
-} // namespace <anonymous>
+} // namespace
 
 PersistentScheduler::PersistentScheduler(
     nx::db::AbstractAsyncSqlQueryExecutor* sqlExecutor,
