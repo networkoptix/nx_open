@@ -40,6 +40,7 @@ public:
      */
     void setInitialVersion(unsigned int version);
     void addUpdateScript(QByteArray updateScript);
+
     /**
      * Allows to specify script to be run for specific DB version.
      * Script for RdbmsDriverType::unknown is used as a fallback.
@@ -49,10 +50,12 @@ public:
     void addFullSchemaScript(
         unsigned int version,
         QByteArray createSchemaScript);
+
     /**
      * @return Version of the latest known script.
      */
     unsigned int maxKnownVersion() const;
+
     /**
      * By default, update is done to the maximum known version.
      * I.e., every script/function is applied.
