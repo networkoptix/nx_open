@@ -1,3 +1,4 @@
+# Copyright 2017 Network Optix, Inc. Licensed under GNU Lesser General Public License version 3.
 cmake_minimum_required(VERSION 3.3.2)
 project(nx_kit_test)
 

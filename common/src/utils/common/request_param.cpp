@@ -1,24 +1,23 @@
-
 #include "request_param.h"
 
+#include <nx/utils/log/log.h>
 
-QnHTTPRawResponse::QnHTTPRawResponse()
-:
+QnHTTPRawResponse::QnHTTPRawResponse():
     sysErrorCode(SystemError::noError),
     status(QNetworkReply::NoError)
 {
 }
 
 QnHTTPRawResponse::QnHTTPRawResponse(
-    SystemError::ErrorCode _sysErrorCode,
+    SystemError::ErrorCode sysErrorCode,
     const nx_http::StatusLine&  statusLine,
-    const QByteArray& _contentType,
-    const QByteArray& _msgBody)
-:
-    sysErrorCode(_sysErrorCode),
+    const QByteArray& contentType,
+    const QByteArray& msgBody)
+    :
+    sysErrorCode(sysErrorCode),
     status(QNetworkReply::NoError),
-    contentType(_contentType),
-    msgBody(_msgBody)
+    contentType(contentType),
+    msgBody(msgBody)
 {
     if (sysErrorCode != SystemError::noError)
     {
@@ -72,4 +71,16 @@ QNetworkReply::NetworkError QnHTTPRawResponse::httpStatusCodeToNetworkError(
         default:
             return QNetworkReply::UnknownServerError;
     }
+}
+
+QnRequestParams requestParamsFromUrl(const QUrl& url)
+{
+    QnRequestParams params;
+    const QUrlQuery query(url);
+    for (const auto& item: query.queryItems())
+    {
+        if (!params.contains(item.first))
+            params.insert(item.first, item.second);
+    }
+    return params;
 }

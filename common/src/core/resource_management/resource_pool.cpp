@@ -414,11 +414,10 @@ QnNetworkResourceList QnResourcePool::getAllNetResourceByHostAddress(const QStri
     return result;
 }
 
-QnResourcePtr QnResourcePool::getResourceByUniqueId(const QString &uniqueID) const
+QnResourcePtr QnResourcePool::getResourceByUniqueId(const QString& uniqueId) const
 {
     QnMutexLocker locker( &m_resourcesMtx );
-    auto itr = std::find_if( m_resources.begin(), m_resources.end(), [&uniqueID](const QnResourcePtr &resource) { return resource->getUniqueId() == uniqueID; });
-    return itr != m_resources.end() ? itr.value() : QnResourcePtr(0);
+    return m_cache.resourcesByUniqueId.value(uniqueId);
 }
 
 QnResourcePtr QnResourcePool::getResourceByDescriptor(const QnLayoutItemResourceDescriptor& descriptor) const
@@ -632,6 +631,7 @@ bool QnResourcePool::Cache::isIoModule(const QnResourcePtr& res) const
 
 void QnResourcePool::Cache::resourceRemoved(const QnResourcePtr& res)
 {
+    resourcesByUniqueId.remove(res->getUniqueId());
     mediaServers.remove(res->getId());
     if (isIoModule(res))
         --ioModulesCount;
@@ -639,6 +639,7 @@ void QnResourcePool::Cache::resourceRemoved(const QnResourcePtr& res)
 
 void QnResourcePool::Cache::resourceAdded(const QnResourcePtr& res)
 {
+    resourcesByUniqueId.insert(res->getUniqueId(), res);
     if (const auto& server = res.dynamicCast<QnMediaServerResource>())
         mediaServers.insert(server->getId(), server);
     else if (isIoModule(res))

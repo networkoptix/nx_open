@@ -814,40 +814,34 @@ const StringType kUserAgent = "User-Agent";
 
 namespace AuthScheme
 {
-const char* toString(Value val)
+const char* toString( Value val )
 {
-    switch (val)
+    switch( val )
     {
         case basic:
             return "Basic";
         case digest:
             return "Digest";
-        case automatic:
-            return "Automatic";
         default:
             return "None";
     }
 }
 
-Value fromString(const char* str)
+Value fromString( const char* str )
 {
-    if (::strcasecmp(str, "Basic") == 0)
+    if( ::strcasecmp( str, "Basic" ) == 0 )
         return basic;
-    if (::strcasecmp(str, "Digest") == 0)
+    if( ::strcasecmp( str, "Digest" ) == 0 )
         return digest;
-    if (::strcasecmp(str, "Automatic") == 0)
-        return automatic;
     return none;
 }
 
-Value fromString(const ConstBufferRefType& str)
+Value fromString( const ConstBufferRefType& str )
 {
-    if (str == "Basic")
+    if( str == "Basic" )
         return basic;
-    if (str == "Digest")
+    if( str == "Digest" )
         return digest;
-    if (str == "Automatic")
-        return automatic;
     return none;
 }
 }

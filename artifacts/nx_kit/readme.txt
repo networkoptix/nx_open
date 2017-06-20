@@ -1,4 +1,4 @@
-TODO: Add copyright notice.
+# Copyright 2017 Network Optix, Inc. Licensed under GNU Lesser General Public License version 3.
 
 This is a kit of pure C/C++ utils written by Nx and used across various Nx projects. This kit does
 not use any non-standard libraries.

@@ -10,7 +10,6 @@
 
 #include <nx/utils/system_error.h>
 
-
 struct PartitionInfo
 {
     PartitionInfo()
@@ -34,6 +33,8 @@ struct PartitionInfo
 
     /** Total size of this partition in bytes */
     qint64 sizeBytes;
+
+    bool isUsb = false;
 };
 
 SystemError::ErrorCode readPartitions(

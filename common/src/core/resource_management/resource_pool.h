@@ -240,6 +240,7 @@ private:
 
         int ioModulesCount = 0;
         QMap<QnUuid, QnMediaServerResourcePtr> mediaServers;
+        QMap<QString, QnResourcePtr> resourcesByUniqueId;
     private:
         bool isIoModule(const QnResourcePtr& res) const;
     } m_cache;

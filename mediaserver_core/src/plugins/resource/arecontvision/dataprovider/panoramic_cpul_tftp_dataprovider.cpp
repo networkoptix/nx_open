@@ -387,6 +387,8 @@ bool AVPanoramicClientPullSSTFTPStreamreader::needKeyData() const
 void AVPanoramicClientPullSSTFTPStreamreader::beforeRun()
 {
     QnPlAVClinetPullStreamReader::beforeRun();
+    QnArecontPanoramicResourcePtr res = getResource().dynamicCast<QnArecontPanoramicResource>();
+    res->updateFlipState();
 }
 
 #endif

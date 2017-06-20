@@ -1,3 +1,6 @@
+// Copyright 2017 Network Optix, Inc. Licensed under GNU Lesser General Public License version 3.
+#pragma once
+
 /**@file
  * This is a C99 wrapper for C++ module "ini_config". Only one .ini instance is supported for now.
  *

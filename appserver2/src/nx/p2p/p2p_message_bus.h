@@ -120,6 +120,7 @@ private:
         if (!connection->shouldTransactionBeSentToPeer(tran))
             return; //< This peer doesn't handle transactions of such type.
 
+        const ApiPersistentIdData remotePeer(connection->remotePeer());
         const auto& descriptor = ec2::getTransactionDescriptorByTransaction(tran);
         auto remoteAccess = descriptor->
             checkRemotePeerAccessFunc(commonModule(), connection->userAccessData(), tran.params);
@@ -129,7 +130,7 @@ private:
                 this,
                 lm("Permission check failed while sending transaction %1 to peer %2")
                 .arg(tran.toString())
-                .arg(connection->remotePeer().id.toString()));
+                .arg(remotePeer.id.toString()));
             return;
         }
 
@@ -149,7 +150,11 @@ private:
                     return;
             }
         }
-        NX_ASSERT(!(ApiPersistentIdData(connection->remotePeer()) == peerId)); //< loop
+        else if (remotePeer == peerId)
+        {
+            return;
+        }
+        NX_ASSERT(!(remotePeer == peerId)); //< loop
 
         if (nx::utils::log::isToBeLogged(cl_logDEBUG1, this))
             printTran(connection, tran, Connection::Direction::outgoing);
@@ -301,6 +306,9 @@ private:
     void sendInitialDataToClient(const P2pConnectionPtr& connection);
     void sendRuntimeData(const P2pConnectionPtr& connection, const QList<ApiPersistentIdData>& peers);
     void cleanupRuntimeInfo(const ec2::ApiPersistentIdData& peer);
+
+    /** Don't show connection in 'aliveMessage' due to most client connections should stay local for current server */
+    bool isLocalConnection(const ApiPersistentIdData& peer) const;
 public:
     bool needStartConnection(
         const ApiPersistentIdData& peer,
