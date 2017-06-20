@@ -32,7 +32,7 @@ namespace cdb {
 AccountManager::AccountManager(
     const conf::Settings& settings,
     const StreeManager& streeManager,
-    TemporaryAccountPasswordManager* const tempPasswordManager,
+    AbstractTemporaryAccountPasswordManager* const tempPasswordManager,
     nx::db::AsyncSqlQueryExecutor* const dbManager,
     AbstractEmailManager* const emailManager) noexcept(false)
 :

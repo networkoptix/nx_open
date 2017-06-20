@@ -23,7 +23,7 @@
 namespace nx {
 namespace cdb {
 
-class TemporaryAccountPasswordManager;
+class AbstractTemporaryAccountPasswordManager;
 class AbstractEmailManager;
 class StreeManager;
 
@@ -79,7 +79,7 @@ public:
     AccountManager(
         const conf::Settings& settings,
         const StreeManager& streeManager,
-        TemporaryAccountPasswordManager* const tempPasswordManager,
+        AbstractTemporaryAccountPasswordManager* const tempPasswordManager,
         nx::db::AsyncSqlQueryExecutor* const dbManager,
         AbstractEmailManager* const emailManager) noexcept(false);
     virtual ~AccountManager();
@@ -169,7 +169,7 @@ public:
 private:
     const conf::Settings& m_settings;
     const StreeManager& m_streeManager;
-    TemporaryAccountPasswordManager* const m_tempPasswordManager;
+    AbstractTemporaryAccountPasswordManager* const m_tempPasswordManager;
     nx::db::AsyncSqlQueryExecutor* const m_dbManager;
     AbstractEmailManager* const m_emailManager;
     /** map<email, account>. */
