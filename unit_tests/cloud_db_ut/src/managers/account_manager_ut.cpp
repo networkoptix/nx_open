@@ -58,6 +58,8 @@ protected:
 
     void whenUpdatedAccountPassword()
     {
+        using namespace std::placeholders;
+
         using F = void (cdb::AccountManager::*)(
             const AuthorizationInfo& authzInfo,
             data::AccountUpdateData accountData,
@@ -77,7 +79,7 @@ protected:
         std::tie(resultCode) =
             makeSyncCall<api::ResultCode>(
                 std::bind(static_cast<F>(&cdb::AccountManager::updateAccount), 
-                    m_accountManager.get(), authzInfo, accountData, std::placeholders::_1));
+                    m_accountManager.get(), authzInfo, accountData, _1));
         ASSERT_EQ(api::ResultCode::ok, resultCode);
     }
 

@@ -4,9 +4,10 @@
 
 #include <nx/network/time/time_protocol_client.h>
 #include <nx/utils/log/log.h>
+#include <nx/utils/time.h>
 
 namespace nx {
-namespace time_server {
+namespace network {
 
 TimeProtocolConnection::TimeProtocolConnection(
     network::server::StreamConnectionHolder<TimeProtocolConnection>* socketServer,
@@ -18,21 +19,13 @@ TimeProtocolConnection::TimeProtocolConnection(
     bindToAioThread(m_socket->getAioThread());
 }
 
-TimeProtocolConnection::~TimeProtocolConnection()
-{
-    stopWhileInAioThread();
-}
-
 void TimeProtocolConnection::startReadingConnection(
     boost::optional<std::chrono::milliseconds> inactivityTimeout)
 {
     NX_ASSERT(!inactivityTimeout);
     using namespace std::placeholders;
 
-    std::uint32_t utcTimeSeconds = ::time(NULL);
-    //std::uint32_t utcTimeSeconds = 
-    //    std::chrono::duration_cast<std::chrono::seconds>(
-    //        std::chrono::system_clock::now().time_since_epoch()).count();
+    std::uint32_t utcTimeSeconds = nx::utils::timeSinceEpoch().count();
 
     NX_LOGX(lm("Sending %1 UTC time to %2")
         .arg(utcTimeSeconds).arg(m_socket->getForeignAddress()),
@@ -71,5 +64,5 @@ void TimeProtocolConnection::onDataSent(
     m_socketServer->closeConnection(errorCode, this);
 }
 
-} // namespace time_server
+} // namespace network
 } // namespace nx

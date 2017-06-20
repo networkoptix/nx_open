@@ -29,16 +29,7 @@ protected:
         params.back().resourceId = QnUserResource::kAdminGuid;
         params.back().name = nx::settings_names::kNameCloudSystemId;
         params.back().value = QString();
-
-        ec2::ErrorCode resultCode = ec2::ErrorCode::ok;
-        std::tie(resultCode) =
-            makeSyncCall<ec2::ErrorCode>(
-                std::bind(
-                    &MediaServerClient::ec2SetResourceParams,
-                    &mediaServerClient,
-                    std::move(params),
-                    std::placeholders::_1));
-        ASSERT_EQ(ec2::ErrorCode::ok, resultCode);
+        ASSERT_EQ(ec2::ErrorCode::ok, mediaServerClient.ec2SetResourceParams(params));
 
         switchToDefaultCredentials();
     }

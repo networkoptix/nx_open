@@ -9,8 +9,6 @@ namespace stats {
 StatsManager::StatsManager(const conf::Settings& settings):
     m_instanceController(settings.dbConnectionOptions())
 {
-    if (!m_instanceController.initialize())
-        throw std::runtime_error("Could not connect to DB");
     m_collector = std::make_unique<Collector>(
         settings.statistics(),
         &m_instanceController.queryExecutor());

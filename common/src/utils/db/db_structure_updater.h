@@ -2,6 +2,8 @@
 
 #include <vector>
 
+#include <boost/optional.hpp>
+
 #include <QtCore/QByteArray>
 
 #include <nx/utils/move_only_func.h>
@@ -16,7 +18,7 @@ class AbstractAsyncSqlQueryExecutor;
 class QueryContext;
 
 /**
- * Updates are executed in order they have been added to DbStructureUpdater istance.
+ * Updates are executed in order they have been added to DbStructureUpdater instance.
  * @note Database is not created, it MUST already exist.
  * @note This class methods are not thread-safe.
  */
@@ -26,7 +28,9 @@ public:
     typedef nx::utils::MoveOnlyFunc<nx::db::DBResult(nx::db::QueryContext*)>
         DbUpdateFunc;
 
-    DbStructureUpdater(AbstractAsyncSqlQueryExecutor* const queryExecutor);
+    DbStructureUpdater(
+        std::string dbManagerName,
+        AbstractAsyncSqlQueryExecutor* const queryExecutor);
 
     /**
      * Used to aggregate update scripts.
@@ -36,6 +40,7 @@ public:
      */
     void setInitialVersion(unsigned int version);
     void addUpdateScript(QByteArray updateScript);
+
     /**
      * Allows to specify script to be run for specific DB version.
      * Script for RdbmsDriverType::unknown is used as a fallback.
@@ -45,6 +50,17 @@ public:
     void addFullSchemaScript(
         unsigned int version,
         QByteArray createSchemaScript);
+
+    /**
+     * @return Version of the latest known script.
+     */
+    unsigned int maxKnownVersion() const;
+
+    /**
+     * By default, update is done to the maximum known version.
+     * I.e., every script/function is applied.
+     */
+    void setVersionToUpdateTo(unsigned int version);
 
     bool updateStructSync();
 
@@ -82,6 +98,7 @@ private:
     unsigned int m_initialVersion;
     std::map<unsigned int, QByteArray> m_fullSchemaScriptByVersion;
     std::vector<DbUpdate> m_updateScripts;
+    boost::optional<unsigned int> m_versionToUpdateTo;
 
     DBResult updateDbInternal(nx::db::QueryContext* const dbConnection);
 

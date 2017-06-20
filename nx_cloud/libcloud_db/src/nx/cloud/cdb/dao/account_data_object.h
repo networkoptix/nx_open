@@ -61,6 +61,15 @@ public:
         nx::db::QueryContext* queryContext,
         const std::string& accountEmail,
         std::chrono::system_clock::time_point activationTime) = 0;
+
+    /**
+     * @param activateAccountIfNotActive TODO: #ak Remove this argument.
+     */
+    virtual void updateAccount(
+        nx::db::QueryContext* queryContext,
+        const std::string& accountEmail,
+        const api::AccountUpdateData& accountUpdateData,
+        bool activateAccountIfNotActive) = 0;
 };
 
 //-------------------------------------------------------------------------------------------------
