@@ -59,6 +59,9 @@ private:
     SystemManager m_systemManager;
     AuthenticationProvider m_authProvider;
     MaintenanceManager m_maintenanceManager;
+
+    void performDataMigrations();
+    void generateUserAuthRecords(nx::db::QueryContext* queryContext);
 };
 
 } // namespace cdb

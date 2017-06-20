@@ -2,6 +2,8 @@
 
 #include <nx/utils/log/log.h>
 
+#include "settings.h"
+
 namespace nx {
 namespace cdb {
 
@@ -48,6 +50,8 @@ Controller::Controller(const conf::Settings& settings):
         &m_ec2SyncronizationEngine,
         m_dbInstanceController)
 {
+    performDataMigrations();
+
     m_ec2SyncronizationEngine.subscribeToSystemDeletedNotification(
         m_systemManager.systemMarkedAsDeletedSubscription());
     m_timerManager.start();
@@ -102,6 +106,38 @@ AuthenticationProvider& Controller::authProvider()
 MaintenanceManager& Controller::maintenanceManager()
 {
     return m_maintenanceManager;
+}
+
+void Controller::performDataMigrations()
+{
+    using namespace std::placeholders;
+
+    NX_INFO(this, lm("Performing data migrations..."));
+
+    try
+    {
+        if (m_dbInstanceController.isUserAuthRecordsMigrationNeeded())
+        {
+            m_dbInstanceController.queryExecutor().executeUpdateQuerySync(
+                std::bind(&Controller::generateUserAuthRecords, this, _1));
+        }
+    }
+    catch (const std::exception e)
+    {
+        NX_ERROR(this, lm("Failed to do data migrations. %1").arg(e.what()));
+    }
+}
+
+void Controller::generateUserAuthRecords(nx::db::QueryContext* queryContext)
+{
+    const auto allSystemSharings = m_systemManager.fetchAllSharings();
+    for (const auto& sharing: allSystemSharings)
+    {
+        m_authProvider.afterSharingSystem(
+            queryContext,
+            sharing,
+            nx::cdb::SharingType::sharingWithExistingAccount);
+    }
 }
 
 } // namespace cdb

@@ -96,6 +96,16 @@ void DbStructureUpdater::addFullSchemaScript(
     m_fullSchemaScriptByVersion.emplace(version, std::move(createSchemaScript));
 }
 
+unsigned int DbStructureUpdater::maxKnownVersion() const
+{
+    return m_initialVersion + m_updateScripts.size();
+}
+
+void DbStructureUpdater::setVersionToUpdateTo(unsigned int version)
+{
+    m_versionToUpdateTo = version;
+}
+
 bool DbStructureUpdater::updateStructSync()
 {
     nx::utils::promise<DBResult> dbUpdatePromise;
@@ -205,7 +215,11 @@ DBResult DbStructureUpdater::applyScriptsMissingInCurrentDb(
 
 bool DbStructureUpdater::gotScriptForUpdate(DbSchemaState* dbState) const
 {
-    return static_cast<size_t>(dbState->version) < (m_initialVersion + m_updateScripts.size());
+    auto versionToUpdateTo = m_initialVersion + m_updateScripts.size();
+    if (m_versionToUpdateTo)
+        versionToUpdateTo = *m_versionToUpdateTo;
+
+    return static_cast<size_t>(dbState->version) < versionToUpdateTo;
 }
 
 DBResult DbStructureUpdater::applyNextUpdateScript(

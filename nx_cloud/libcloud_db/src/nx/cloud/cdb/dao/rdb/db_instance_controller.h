@@ -13,7 +13,16 @@ class DbInstanceController:
     public nx::db::InstanceController
 {
 public:
-    DbInstanceController(const nx::db::ConnectionOptions& dbConnectionOptions);
+    DbInstanceController(
+        const nx::db::ConnectionOptions& dbConnectionOptions,
+        boost::optional<unsigned int> dbVersionToUpdateTo = boost::none);
+
+    bool isUserAuthRecordsMigrationNeeded() const;
+
+private:
+    bool m_userAuthRecordsMigrationNeeded;
+
+    void initializeStructureMigration();
 };
 
 } // namespace rdb
