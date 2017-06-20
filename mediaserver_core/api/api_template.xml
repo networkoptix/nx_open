@@ -307,7 +307,7 @@
                         <param>
                             <name>startTime</name>
                             <description>Start time of the bookmark (in milliseconds since epoch).</description>
-                            <optional>true</optional>
+                            <optional>false</optional>
                         </param>
                         <param>
                             <name>duration</name>
