@@ -76,18 +76,13 @@ boost::optional<QString> QnRestProcessorPool::getRedirectRule( const QString& pa
         return boost::none;
 }
 
-class QnRestConnectionProcessorPrivate: public QnTCPConnectionProcessorPrivate
-{
-};
-
 QnRestConnectionProcessor::QnRestConnectionProcessor(
     QSharedPointer<AbstractStreamSocket> socket,
     QnHttpConnectionListener* owner)
 :
-    QnTCPConnectionProcessor(new QnRestConnectionProcessorPrivate, socket, owner),
+    QnTCPConnectionProcessor(socket, owner),
     m_noAuth(false)
 {
-    Q_D(QnRestConnectionProcessor);
 }
 
 QnRestConnectionProcessor::~QnRestConnectionProcessor()
@@ -97,13 +92,13 @@ QnRestConnectionProcessor::~QnRestConnectionProcessor()
 
 QnTcpListener* QnRestConnectionProcessor::owner() const
 {
-    Q_D(const QnRestConnectionProcessor);
+    Q_D(const QnTCPConnectionProcessor);
     return d->owner;
 }
 
 void QnRestConnectionProcessor::run()
 {
-    Q_D(QnRestConnectionProcessor);
+    Q_D(QnTCPConnectionProcessor);
 
     initSystemThreadId();
 
@@ -176,13 +171,13 @@ void QnRestConnectionProcessor::run()
 
 Qn::UserAccessData QnRestConnectionProcessor::accessRights() const
 {
-    Q_D(const QnRestConnectionProcessor);
+    Q_D(const QnTCPConnectionProcessor);
     return d->accessRights;
 }
 
 void QnRestConnectionProcessor::setAccessRights(const Qn::UserAccessData& accessRights)
 {
-    Q_D(QnRestConnectionProcessor);
+    Q_D(QnTCPConnectionProcessor);
     d->accessRights = accessRights;
 }
 
@@ -193,13 +188,13 @@ void QnRestConnectionProcessor::setAuthNotRequired(bool noAuth)
 
 const nx_http::Request& QnRestConnectionProcessor::request() const
 {
-    Q_D(const QnRestConnectionProcessor);
+    Q_D(const QnTCPConnectionProcessor);
     return d->request;
 }
 
 nx_http::Response* QnRestConnectionProcessor::response() const
 {
-    Q_D(const QnRestConnectionProcessor);
+    Q_D(const QnTCPConnectionProcessor);
     //TODO #ak remove following const_cast in 2.3.1 (requires change in QnRestRequestHandler API)
     return const_cast<nx_http::Response*>(&d->response);
 }

@@ -515,6 +515,22 @@ SocketAddress QnTCPConnectionProcessor::remoteHostAddress() const
     return d->socket ? d->socket->getForeignAddress() : SocketAddress();
 }
 
+bool QnTCPConnectionProcessor::isSocketTaken() const
+{
+    Q_D(const QnTCPConnectionProcessor);
+    return d->isSocketTaken;
+}
+
+QSharedPointer<AbstractStreamSocket> QnTCPConnectionProcessor::takeSocket()
+{
+    Q_D(QnTCPConnectionProcessor);
+    d->isSocketTaken = true;
+
+    const auto socket = d->socket;
+    d->socket.clear();
+    return socket;
+}
+
 void QnTCPConnectionProcessor::releaseSocket()
 {
     Q_D(QnTCPConnectionProcessor);

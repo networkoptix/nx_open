@@ -45,7 +45,7 @@ QnTransactionTcpProcessor::QnTransactionTcpProcessor(
     QnTCPConnectionProcessor(new QnTransactionTcpProcessorPrivate, socket, owner)
 {
     Q_D(QnTransactionTcpProcessor);
-
+    d->isSocketTaken = true;
     d->messageBus = messageBus;
     setObjectName( "QnTransactionTcpProcessor" );
 }
