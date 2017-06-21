@@ -15,6 +15,8 @@ Text
     property color hoveredColor: Style.lighterColor(Style.label.color);
     property color disabledColor: standardColor;
     property var hoveredCursorShape: Qt.ArrowCursor;
+    property real sourceTextWidth: fontMetrics.tightBoundingRect(control.text).width
+        + leftPadding + rightPadding
 
     signal clicked();
 
@@ -33,6 +35,13 @@ Text
 
     renderType: Text.QtRendering;
     verticalAlignment: Text.AlignVCenter;
+
+    FontMetrics
+    {
+        id: fontMetrics
+        font: control.font
+    }
+
 
     Binding
     {
