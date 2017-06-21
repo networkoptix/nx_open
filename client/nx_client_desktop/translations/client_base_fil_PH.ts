@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
-<TS version="2.1" language="en-GB" sourcelanguage="en">
+<TS version="2.1" language="fil" sourcelanguage="en">
   <context>
     <name>BackupCamerasDialogDelegate</name>
     <message>
@@ -598,11 +598,11 @@ to view more bookmarks</translation>
     </message>
     <message>
       <source>Minimize</source>
-      <translation>Minimise</translation>
+      <translation type="unfinished">Minimize</translation>
     </message>
     <message>
       <source>Maximize</source>
-      <translation>Maximise</translation>
+      <translation type="unfinished">Maximize</translation>
     </message>
     <message>
       <source>Restore Down</source>
@@ -718,7 +718,7 @@ to view more bookmarks</translation>
     </message>
     <message>
       <source>Maximize Item</source>
-      <translation>Maximise Item</translation>
+      <translation type="unfinished">Maximize Item</translation>
     </message>
     <message>
       <source>Restore Item</source>
@@ -998,7 +998,7 @@ to view more bookmarks</translation>
     </message>
     <message>
       <source>Synchronize Streams</source>
-      <translation>Synchronise Streams</translation>
+      <translation type="unfinished">Synchronize Streams</translation>
     </message>
     <message>
       <source>Disable Stream Synchronization</source>
@@ -3071,7 +3071,7 @@ to %1</translation>
     <name>QnDesktopAudioOnlyDataProvider</name>
     <message>
       <source>Could not initialize audio encoder.</source>
-      <translation>Could not initialise audio encoder.</translation>
+      <translation type="unfinished">Could not initialize audio encoder.</translation>
     </message>
     <message>
       <source>Sample format of input device %1 is not supported.</source>
@@ -3094,11 +3094,11 @@ to %1</translation>
     </message>
     <message>
       <source>Could not initialize video encoder.</source>
-      <translation>Could not initialise video encoder.</translation>
+      <translation type="unfinished">Could not initialize video encoder.</translation>
     </message>
     <message>
       <source>Could not initialize audio encoder.</source>
-      <translation>Could not initialise audio encoder.</translation>
+      <translation type="unfinished">Could not initialize audio encoder.</translation>
     </message>
     <message>
       <source>Could not start primary audio device.</source>
@@ -5844,7 +5844,7 @@ to %1</translation>
     </message>
     <message>
       <source>UNAUTHORIZED</source>
-      <translation>UNAUTHORISED</translation>
+      <translation type="unfinished">UNAUTHORIZED</translation>
     </message>
     <message>
       <source>NO SIGNAL</source>
@@ -6182,7 +6182,7 @@ to %1</translation>
     </message>
     <message>
       <source>Select server for others to synchronize time with</source>
-      <translation>Select server for others to synchronise time with</translation>
+      <translation type="unfinished">Select server for others to synchronize time with</translation>
     </message>
     <message>
       <source>System is in safe mode</source>
@@ -6218,7 +6218,7 @@ to %1</translation>
     </message>
     <message>
       <source>Server times are not synchronized and a common time could not be detected automatically.</source>
-      <translation>Server times are not synchronised and a common time could not be detected automatically.</translation>
+      <translation type="unfinished">Server times are not synchronized and a common time could not be detected automatically.</translation>
     </message>
     <message>
       <source>Any configuration changes except license activation are impossible.</source>
@@ -7416,7 +7416,7 @@ to %1</translation>
     <name>QnWorkbenchScreenRecordingHandler</name>
     <message>
       <source>Screen capturing subsystem is not initialized yet. Please try again later.</source>
-      <translation>Screen capturing subsystem is not initialised yet. Please try again later.</translation>
+      <translation type="unfinished">Screen capturing subsystem is not initialized yet. Please try again later.</translation>
     </message>
     <message>
       <source>Recording in %1...</source>
