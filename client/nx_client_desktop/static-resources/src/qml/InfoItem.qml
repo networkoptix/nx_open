@@ -84,7 +84,7 @@ MaskedComboBox
         {
             id: pencilImageHolder;
 
-            property real xPosition: (imageItem.x + imageItem.width + textItem.sourceTextWidth
+            property real xPosition: (imageItem.x + imageItem.width + textItem.visibleTextWidth
                 + textItem.leftPadding + textItem.rightPadding);
             x: ((xPosition + width) > parent.width
                 ? parent.width - pencilImage.width

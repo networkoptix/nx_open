@@ -11,14 +11,14 @@ Rectangle
     property alias textColor: labelText.color;
 
     property real maxWidth: 0
-    property alias sourceTextWidth: labelText.sourceTextWidth
+    property alias visibleTextWidth: labelText.visibleTextWidth
 
     color: Style.colors.red_main;
 
     radius: 2;
 
     implicitHeight: labelText.height;
-    implicitWidth: maxWidth ? maxWidth : labelText.sourceTextWidth
+    implicitWidth: maxWidth ? maxWidth : labelText.visibleTextWidth
 
     NxLabel
     {
@@ -29,7 +29,7 @@ Rectangle
         rightPadding: leftPadding;
 
         font: Style.fonts.systemTile.indicator;
-        elide: control.width < control.sourceTextWidth ? Text.ElideRight : Text.ElideNone
+        elide: control.width < control.visibleTextWidth ? Text.ElideRight : Text.ElideNone
         color: control.textColor;
 
         verticalAlignment: Text.AlignVCenter;

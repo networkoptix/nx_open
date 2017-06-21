@@ -18,7 +18,7 @@ Row
         id: secondaryIndicator
 
         visible: false
-        onSourceTextWidthChanged: updateIndicatorsWidth()
+        onVisibleTextWidthChanged: updateIndicatorsWidth()
     }
 
     Indicator
@@ -26,13 +26,13 @@ Row
         id: primaryIndicator
 
         visible: false
-        onSourceTextWidthChanged: updateIndicatorsWidth()
+        onVisibleTextWidthChanged: updateIndicatorsWidth()
     }
 
     function updateIndicatorsWidth()
     {
-        var primaryWidth = primaryIndicator.sourceTextWidth
-        var secondaryWidth = secondaryIndicator.sourceTextWidth
+        var primaryWidth = primaryIndicator.visibleTextWidth
+        var secondaryWidth = secondaryIndicator.visibleTextWidth
         var totalWidth = primaryWidth + secondaryWidth
         var aspect = totalWidth < maxWidth ? 1 : maxWidth / totalWidth
         primaryIndicator.maxWidth = primaryWidth * aspect
