@@ -10,6 +10,12 @@ from jsonfield import JSONField
 class Product(models.Model):
     name = models.CharField(max_length=255, unique=True)
 
+    def get_fields(self):
+        return ('name',)
+
+    def __str__(self):
+        return self.name
+
 
 class Context(models.Model):
     product = models.ForeignKey(Product, null=True)
@@ -19,6 +25,12 @@ class Context(models.Model):
 
     file_path = models.CharField(max_length=1024, blank=True, default='')
     url = models.CharField(max_length=1024, blank=True, default='')
+
+    def get_fields(self):
+        return ['product', 'name', 'description', 'translatable', 'file_path', 'url']
+
+    def __str__(self):
+        return self.name
 
 
 DATA_TYPES = (
@@ -37,6 +49,12 @@ class DataStructure(models.Model):
     translatable = models.BooleanField(default=True)
     # meta_settings = JSONField()
 
+    def get_fields(self):
+        return ('context', 'name', 'description', 'type', 'default', 'translatable')
+
+    def __str__(self):
+        return self.name
+
 
 # CMS settings. Release engineer can change that
 
@@ -44,11 +62,23 @@ class Language(models.Model):
     name = models.CharField(max_length=255, unique=True)
     code = models.CharField(max_length=8, unique=True)
 
+    def get_fields(self):
+        return ('name','code')
+
+    def __str__(self):
+        return self.name
+
 
 class Customization(models.Model):
     name = models.CharField(max_length=255, unique=True)
     default_language = models.ForeignKey(Language, related_name='default_in_%(class)s')
     languages = models.ManyToManyField(Language)
+
+    def get_fields(self):
+        return ('name', 'default_language', 'languages')
+
+    def __str__(self):
+        return self.name
 
 
 # CMS data. Partners can change that
@@ -64,6 +94,12 @@ class ContentVersion(models.Model):
     accepted_by = models.ForeignKey(settings.AUTH_USER_MODEL, null=True, blank=True,
                                     related_name='accepted_%(class)s')
 
+    def get_fields(self):
+        return ('customization', 'name', 'created_date', 'created_by', 'accepted_date', 'accepted_by')
+
+    def __str__(self):
+        return self.name
+
 
 class DataRecord(models.Model):
     data_structure = models.ForeignKey(DataStructure)
@@ -75,3 +111,14 @@ class DataRecord(models.Model):
     created_by = models.ForeignKey(settings.AUTH_USER_MODEL, null=True, blank=True, related_name='created_%(class)s')
 
     value = models.TextField()
+
+    def get_fields(self):
+        return ('data_structure', 'language', 'customization', 'version', 'created_date', 'created_by', 'value')
+
+    def __str__(self):
+        return self.value
+
+class Blank(models.Model):
+
+    def get_fields(self):
+        return None
