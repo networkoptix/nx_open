@@ -1,0 +1,26 @@
+{% extends "admin/base_site.html" %}
+{% load i18n admin_urls admin_static %}
+
+{% block extrastyle %}
+    {{ block.super }}
+    <link rel="stylesheet" type="text/css" href="{% static 'admin/css/forms.css' %}"/>
+{% endblock %}
+
+{% block content%}
+<h1>Context for Product</h1>
+<form action="/admin/mymodels/" method="post" class="aligned">
+    {% csrf_token %}
+    {% for field in form %}
+        <div class="form-row">
+            {{field.label_tag}}
+            {{field}}
+            <p class="help">{{field.help_text}}</p>
+        </div>
+    {% endfor %}
+    <div class="submit-row">
+        <input type="submit" name="Get Data Structures" value="GetDataStructure" />
+        <input type="submit" name="Save" value="Save" />
+        <input type="reset" value="Reset" />
+    </div>
+</form>
+{% endblock%}

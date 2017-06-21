@@ -22,6 +22,7 @@ import settings
 
 urlpatterns = [
     url(r'^admin/', include(admin.site.urls)),
+    url(r'^admin/mymodels/', include('cms.urls')),
     url(r'^api/', include('api.urls')),
     url(r'^notifications/', include('notifications.urls')),
 

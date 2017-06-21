@@ -40,9 +40,10 @@ case "$1" in
         ;;
     web)
         write_my_cnf
-        echo "CREATE DATABASE IF NOT EXISTS $DB_NAME" | mysql -Dmysql
+        echo "CREATE DATABASE IF NOT EXISTS $DB_NAME" | mysql -Dinformation_schema
 
-        /app/env/bin/python manage.py migrate
+        /app/env/bin/python manage.py makemigrations
+	/app/env/bin/python manage.py migrate
         /app/env/bin/python manage.py createcachetable
 
         find /app/app/static | xargs touch
