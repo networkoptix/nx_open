@@ -16,7 +16,7 @@
 #include <api/app_server_connection.h>
 
 #include <network/h264_rtp_parser.h>
-#include <network/h265_rtp_parser.h>
+#include <network/hevc_rtp_parser.h>
 #include <network/aac_rtp_parser.h>
 #include <network/simpleaudio_rtp_parser.h>
 #include <network/mjpeg_rtp_parser.h>
@@ -385,7 +385,7 @@ QnRtpStreamParser* QnMulticodecRtpReader::createParser(const QString& codecName)
     else if (codecName == QLatin1String("H264"))
         result = new CLH264RtpParser;
     else if (codecName == QLatin1String("H265"))
-        result = new nx::network::rtp::H265Parser();
+        result = new nx::network::rtp::HevcParser();
     else if (codecName == QLatin1String("JPEG"))
         result = new QnMjpegRtpParser;
     else if (codecName == QLatin1String("MPEG4-GENERIC"))
