@@ -413,14 +413,7 @@ Item
                     showBackground: false;
 
                     bkgColor: tileArea.color;
-                    onClicked:
-                    {
-                        // Hides both cloud and local offline tiles
-                        if (isCloudTile)
-                            context.hideSystem(control.systemId);
-                        else
-                            context.hideSystem(control.localId);
-                    }
+                    onClicked: context.hideSystem(control.systemId, control.localId);
                 }
 
                 Loader
