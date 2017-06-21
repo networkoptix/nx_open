@@ -177,7 +177,9 @@ class LocalHost(Host):
             args, cwd=cwd,
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE,
-            stdin=stdin)
+            stdin=stdin,
+            close_fds=True,
+            )
         stdout_buffer = []
         stderr_buffer = []
         stdout_thread = threading.Thread(target=self._read_thread, args=(log.debug, pipe.stdout, stdout_buffer, log_output))
