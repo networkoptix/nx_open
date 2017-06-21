@@ -66,22 +66,36 @@ QValidator::State SubjectSelectionDialog::RoleListModel::validate(const QnUuid& 
     if (!m_userValidator)
         return QValidator::Acceptable;
 
-    const auto users = resourceAccessSubjectsCache()->usersInRole(roleId);
+    enum Composition
+    {
+        noUsers = 0,
+        validUsers = 0x1,
+        invalidUsers = 0x2,
+        mixedUsers = validUsers | invalidUsers
+    };
 
-    if (users.empty())
-        return QValidator::Acceptable;
+    int composition = noUsers;
 
-    const auto isUserValid =
-        [this](const QnResourceAccessSubject& user)
-        {
-            NX_EXPECT(user.isUser());
-            return m_userValidator(user.user());
-        };
+    for (const auto& subject: resourceAccessSubjectsCache()->usersInRole(roleId))
+    {
+        NX_EXPECT(subject.isUser());
+        composition |= (m_userValidator(subject.user()) ? validUsers : invalidUsers);
+        if (composition == mixedUsers)
+            break; //< No need to iterate further.
+    }
 
-    const int numValid = std::count_if(users.cbegin(), users.cend(), isUserValid);
-    return numValid == users.size()
-        ? QValidator::Acceptable
-        : (numValid ? QValidator::Intermediate : QValidator::Invalid);
+    switch (composition)
+    {
+        case noUsers:
+        case validUsers:
+            return QValidator::Acceptable;
+
+        case invalidUsers:
+            return QValidator::Invalid;
+
+        default: // mixedUsers
+            return QValidator::Intermediate;
+    }
 }
 
 QSet<QnUuid> SubjectSelectionDialog::RoleListModel::checkedUsers() const
