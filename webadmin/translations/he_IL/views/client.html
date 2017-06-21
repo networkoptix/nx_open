@@ -1,0 +1,62 @@
+<div class="container-fluid">
+
+    <div>
+        <h2 class="text-center">ברוך הבא לקליינט הקל</h2>
+        <p class="text-center">לקוח lite יכול להציג עד 4 מצלמות, <br>, וניתן לשלוט בו על ידי מקלדת ועכבר מחוברים להתקן, <br>או באמצעות יישום נייד</p>
+    </div>
+    <div class="text-center">
+        <div class="panel panel-default panel-inline system-info">
+            <div class="panel-body">
+                <p class="text-center">
+                    <img src="images/lite_client/control_types_keyboard.png"> <img src="images/lite_client/control_types_mouse.png">
+                </p>
+                <h3 class="text-center">על ידי מקלדת/עכבר</h3>
+                <table>
+                    <tbody>
+                        <tr>
+                            <td>בחר תא</td>
+                            <td class="text-right"><img src="images/lite_client/keyboard_asdw.png"></td>
+                            <td class="grey-text">או <img src="images/lite_client/mouse_click.png"> לחיצה בודדת</td>
+                        </tr>
+                        <tr>
+                            <td>החלף מצלמה בתא</td>
+                            <td class="text-right"><img src="images/lite_client/keyboard_ctrlarrows.png"></td>
+                            <td class="grey-text">או <img src="images/lite_client/mouse_wheel.png"> גלגל</td>
+                        </tr>
+
+                        <tr>
+                            <td>הכנס / צא ממסך מלא</td>
+                            <td class="text-right"><img src="images/lite_client/keyboard_enter.png"></td>
+                            <td class="grey-text">או <img src="images/lite_client/mouse_clickclick.png"> לחיצה כפולה</td>
+                        </tr>
+                        <tr>
+                            <td>צא מתוכנת הקליינט</td>
+                            <td class="text-right"><img src="images/lite_client/keyboard_esc.png"></td>
+                            <td class="grey-text"></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <div class="panel panel-default panel-inline system-info">
+            <div class="panel-body">
+                <p class="text-center">
+                    <img src="images/lite_client/control_mobile.png">
+                </p>
+                <h3 class="text-center">באמצעות האפליקצייה</h3>
+                <table>
+                    <tbody>
+                        <tr><td>התקן את <b>{{Config.productName}}</b> app באמצעות Google Play או App Store</td></tr>
+                        <tr><td>התחבר למערכת "{{settings.systemName}}" ({{IP}}:{{port}})</td></tr>
+                        <tr><td>בחר מסך "{{settings.name}}" בתפריט צד</td></tr>
+                        <tr><td>הפעל את הלקוח Lite ובחר מצלמות לתצוגה</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    <div class="text-center">
+        <button class="btn btn-primary btn-lg" ng-click="startCameras()" auto-focus enter-button>הפעל את הקליינט Lite</button>
+        <p class="grey-text">(הכנס)</p>
+    </div>
+</div>

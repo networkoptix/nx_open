@@ -103,16 +103,13 @@
     "installationError":"更新失败。不能执行安装脚本。",
     "selectFiles":"选择文件"
   },
-  "cameraLinks":{
-    "highStream":"高流",
-    "lowStream":"低流",
-    "transcoding":"转码",
-    "unknown":"未知的"
-  },
   "advanced":{
     "free":"可用",
     "total":"总共",
     "occupied":"正忙",
     "reserved":"保留"
+  },
+  "pageTitles":{
+    "default":"{{PRODUCT_NAME}} web interface"
   }
 }
