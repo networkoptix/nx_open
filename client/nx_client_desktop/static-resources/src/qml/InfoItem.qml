@@ -15,9 +15,6 @@ MaskedComboBox
     property color standardLabelColor: Style.colors.windowText;
     property color hoveredLabelColor: Style.lighterColor(standardLabelColor, 4);
 
-    anchors.left: parent.left;
-    anchors.right: parent.right;
-
     isEditableComboBox: true;
 
     activeFocusOnTab: true;
@@ -39,8 +36,11 @@ MaskedComboBox
 
     areaDelegate: Item
     {
+        id: delegate
 
         height: Math.max(imageItem.height, textItem.height, pencilImage.height);
+        width: parent.width
+
         Image
         {
             id: imageItem;
@@ -58,8 +58,8 @@ MaskedComboBox
         {
             id: textItem;
 
-            anchors.left: imageItem.right;
-            anchors.right: (control.isAvailable ? pencilImageHolder.left : parent.right);
+            x: imageItem.x + imageItem.width
+            width: control.isAvailable ? pencilImageHolder.x - x: parent.width - x
             leftPadding: 4;
             rightPadding: 4;
             anchors.verticalCenter: parent.verticalCenter;
@@ -84,7 +84,7 @@ MaskedComboBox
         {
             id: pencilImageHolder;
 
-            property real xPosition: (imageItem.x + imageItem.width + textItem.contentWidth
+            property real xPosition: (imageItem.x + imageItem.width + textItem.sourceTextWidth
                 + textItem.leftPadding + textItem.rightPadding);
             x: ((xPosition + width) > parent.width
                 ? parent.width - pencilImage.width

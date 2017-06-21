@@ -19,10 +19,12 @@ Item
     property bool savePassword: expandedArea.savePasswordCheckbox.checked;
     property bool autoLogin: expandedArea.autoLoginCheckBox.checked;
     property bool isConnecting: false;
+    property bool isAvailable: false
     property var hostsModel;
     property var authenticationDataModel;
 
     property var prevTabObject;
+    property alias indicators: indicatorsRow
 
     property QtObject activeItemSelector: SingleActiveItemSelector
     {
@@ -85,6 +87,10 @@ Item
 
             model: control.hostsModel;
 
+            anchors.left: parent.left
+            anchors.right: parent.right
+
+            enabled: control.isAvailable
             isAvailable: enabled && control.isExpandedTile && !control.isConnecting;
 
             comboBoxValueRole: "url";
@@ -99,53 +105,73 @@ Item
             KeyNavigation.backtab: (prevTabObject ? prevTabObject : null);
 
             onAccepted: control.connectRequested();
-
         }
 
-        InfoItem
+        Item
         {
-            id: userChooseItem;
+            width: parent.width
+            height: Math.max(userChooseItem.height, indicatorsRow.height)
+            visible: userChooseItem.visible || indicatorsRow.opacity == 1
 
-            model: control.authenticationDataModel;
-
-            Connections
+            InfoItem
             {
-                target: authDataAccessor;
-                onDataChanged:
+                id: userChooseItem;
+
+                model: control.authenticationDataModel;
+                width: indicatorsRow.opacity == 1 ? indicatorsRow.x : parent.width
+
+                anchors.verticalCenter: parent.verticalCenter
+
+                Connections
                 {
-                    if (startRow == 0)
-                        userChooseItem.forceCurrentIndex(0); // Resets user to first.
+                    target: authDataAccessor;
+                    onDataChanged:
+                    {
+                        if (startRow == 0)
+                            userChooseItem.forceCurrentIndex(0); // Resets user to first.
+                    }
+                    onModelChanged:
+                    {
+                        userChooseItem.forceCurrentIndex(userChooseItem.currentItemIndex);
+                    }
                 }
-                onModelChanged:
+
+                enabled: control.isAvailable
+                isAvailable: enabled && control.isExpandedTile  && !control.isConnecting;
+                visible: control.impl.hasRecentConnections;
+
+                iconUrl: "qrc:/skin/welcome_page/user.png";
+                hoveredIconUrl: "qrc:/skin/welcome_page/user_hover.png";
+                disabledIconUrl: "qrc:/skin/welcome_page/user_disabled.png";
+                hoverExtraIconUrl: "qrc:/skin/welcome_page/edit.png";
+
+                Component.onCompleted: activeItemSelector.addItem(this);
+
+                KeyNavigation.tab: expandedArea.loginTextField;
+                KeyNavigation.backtab: hostChooseItem;
+
+                onCurrentItemIndexChanged:
                 {
-                    userChooseItem.forceCurrentIndex(userChooseItem.currentItemIndex);
+                    control.impl.updatePasswordData(currentItemIndex);
                 }
+
+                onValueChanged:
+                {
+                    expandedArea.loginTextField.text = value;
+                }
+
+                onAccepted: control.connectRequested();
             }
 
-            isAvailable: enabled && control.isExpandedTile  && !control.isConnecting;
-            visible: control.impl.hasRecentConnections;
-
-            iconUrl: "qrc:/skin/welcome_page/user.png";
-            hoveredIconUrl: "qrc:/skin/welcome_page/user_hover.png";
-            disabledIconUrl: "qrc:/skin/welcome_page/user_disabled.png";
-            hoverExtraIconUrl: "qrc:/skin/welcome_page/edit.png";
-
-            Component.onCompleted: activeItemSelector.addItem(this);
-
-            KeyNavigation.tab: expandedArea.loginTextField;
-            KeyNavigation.backtab: hostChooseItem;
-
-            onCurrentItemIndexChanged:
+            IndicatorsRow
             {
-                control.impl.updatePasswordData(currentItemIndex);
-            }
+                id: indicatorsRow
 
-            onValueChanged:
-            {
-                expandedArea.loginTextField.text = value;
-            }
+                maxWidth: userChooseItem.visible ? 200 : parent.width
 
-            onAccepted: control.connectRequested();
+                anchors.right: parent.right
+                anchors.verticalCenter: parent.verticalCenter
+            }
         }
     }
 
