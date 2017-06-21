@@ -217,7 +217,7 @@ void QnDirectSystemsFinder::updatePrimaryAddress(nx::vms::discovery::ModuleEndpo
 
     const auto systemDescription = systemIt.value();
     const auto url = nx::network::url::Builder()
-        .setScheme(module.sslAllowed ? lit("https") : QString())
+        .setScheme(module.sslAllowed ? lit("https") : lit("http"))
         .setEndpoint(module.endpoint).toUrl();
     systemDescription->setServerHost(module.id, url);
 
