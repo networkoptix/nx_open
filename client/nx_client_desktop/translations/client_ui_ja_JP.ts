@@ -1,37 +1,37 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
-<TS version="2.1" language="pt-PT" sourcelanguage="en">
+<TS version="2.1" language="ja" sourcelanguage="en">
   <context>
     <name>AboutDialog</name>
     <message>
       <location filename="../src/ui/dialogs/about_dialog.ui"/>
       <source>About</source>
-      <translation>Sobre</translation>
+      <translation>本製品について</translation>
     </message>
     <message>
       <location/>
       <source>Information</source>
-      <translation>Informação</translation>
+      <translation>情報</translation>
     </message>
     <message>
       <location/>
       <source>Credits</source>
-      <translation>Créditos</translation>
+      <translation>クレジット</translation>
     </message>
     <message>
       <location/>
       <source>GPU Information</source>
-      <translation>Informação GPU</translation>
+      <translation>GPU情報</translation>
     </message>
     <message>
       <location/>
       <source>Support</source>
-      <translation>Suporte</translation>
+      <translation>サポート</translation>
     </message>
     <message>
       <location/>
       <source>System Servers</source>
-      <translation type="unfinished">System Servers</translation>
+      <translation>システムサーバー</translation>
     </message>
   </context>
   <context>
@@ -39,7 +39,7 @@
     <message>
       <location filename="../src/ui/widgets/properties/accessible_resources_widget.ui"/>
       <source>Filter</source>
-      <translation>Filtro</translation>
+      <translation>フィルター</translation>
     </message>
   </context>
   <context>
@@ -47,32 +47,32 @@
     <message>
       <location filename="../src/ui/dialogs/adjust_video_dialog.ui"/>
       <source>Image Enhancement</source>
-      <translation>Melhoria de Imagem</translation>
+      <translation>イメージ拡張</translation>
     </message>
     <message>
       <location/>
       <source>Enable image enhancement</source>
-      <translation>Activar Melhoria de Imagem</translation>
+      <translation>イメージ拡張有効</translation>
     </message>
     <message>
       <location/>
       <source>Gamma</source>
-      <translation type="unfinished">Gamma</translation>
+      <translation>ガンマ</translation>
     </message>
     <message>
       <location/>
       <source>Auto</source>
-      <translation type="unfinished">Auto</translation>
+      <translation>自動</translation>
     </message>
     <message>
       <location/>
       <source>Black level</source>
-      <translation>Nível Pretos</translation>
+      <translation>ブラックレベル</translation>
     </message>
     <message>
       <location/>
       <source>White level</source>
-      <translation>Nível Brancos</translation>
+      <translation>ホワイトレベル</translation>
     </message>
   </context>
   <context>
@@ -80,37 +80,37 @@
     <message>
       <location filename="../src/ui/widgets/local_settings/advanced_settings_widget.ui"/>
       <source>Downmix Audio from 5.1 to 2.1</source>
-      <translation>Downmix do áudio de 5.1 para 2.1</translation>
+      <translation>5.1ch→2.1chへオーディオ変換</translation>
     </message>
     <message>
       <location/>
       <source>Double Buffering</source>
-      <translation type="unfinished">Double Buffering</translation>
+      <translation>ダブル バッファリング</translation>
     </message>
     <message>
       <location/>
       <source>Disable only if the client takes too much CPU</source>
-      <translation type="unfinished">Disable only if the client takes too much CPU</translation>
+      <translation>クライアントの CPU 負荷が余りにも高い場合にのみ無効にします</translation>
     </message>
     <message>
       <location/>
       <source>Maximum Live Buffer Length</source>
-      <translation type="unfinished">Maximum Live Buffer Length</translation>
+      <translation>最大ライブ バッファーの長さ</translation>
     </message>
     <message>
       <location/>
       <source>Browse Logs</source>
-      <translation>Pesquisar logs</translation>
+      <translation>ログ参照</translation>
     </message>
     <message>
       <location/>
       <source>Clear Local Cache</source>
-      <translation>Limpar cache local</translation>
+      <translation>ローカルキャッシュのクリア</translation>
     </message>
     <message>
       <location/>
       <source>Reset All Warnings</source>
-      <translation type="unfinished">Reset All Warnings</translation>
+      <translation>すべての警告をリセット</translation>
     </message>
   </context>
   <context>
@@ -118,22 +118,22 @@
     <message>
       <location filename="../src/ui/widgets/business/aggregation_widget.ui"/>
       <source>Check to set aggregation period</source>
-      <translation>Active para definir período de agregação</translation>
+      <translation>間隔チェック</translation>
     </message>
     <message>
       <location/>
       <source>Interval of action :</source>
-      <translation>Intervalo de acção :</translation>
+      <translation>アクションインターバル:</translation>
     </message>
     <message>
       <location/>
       <source>No more than once per</source>
-      <translation>Não mais do que um por cada</translation>
+      <translation>間隔</translation>
     </message>
     <message>
       <location/>
       <source>Instant</source>
-      <translation>Instantâneo</translation>
+      <translation>実行</translation>
     </message>
   </context>
   <context>
@@ -141,27 +141,27 @@
     <message>
       <location filename="../src/nx/client/ui/dialogs/debug/applauncher_control_dialog.ui"/>
       <source>Add External Storage...</source>
-      <translation>Adicionar Armazenamento Externo...</translation>
+      <translation>外部ストレージの追加...</translation>
     </message>
     <message>
       <location/>
       <source>Version:</source>
-      <translation type="unfinished">Version:</translation>
+      <translation>バージョン：</translation>
     </message>
     <message>
       <location/>
       <source>Check</source>
-      <translation>Verificar</translation>
+      <translation>チェック</translation>
     </message>
     <message>
       <location/>
       <source>Not Checked</source>
-      <translation type="unfinished">Not Checked</translation>
+      <translation>チェックされていません</translation>
     </message>
     <message>
       <location/>
       <source>Get Installed Versions</source>
-      <translation type="unfinished">Get Installed Versions</translation>
+      <translation>インストール済のバージョン</translation>
     </message>
   </context>
   <context>
@@ -169,82 +169,82 @@
     <message>
       <location filename="../src/ui/dialogs/audit_log_dialog.ui"/>
       <source>Refresh</source>
-      <translation>Actualizar</translation>
+      <translation>リフレッシュ</translation>
     </message>
     <message>
       <location/>
       <source>User actions</source>
-      <translation>Acções de Utilizador</translation>
+      <translation>ユーザーアクション</translation>
     </message>
     <message>
       <location/>
       <source>Watching archive</source>
-      <translation>A visualizar arquivos</translation>
+      <translation>アーカイブ表示</translation>
     </message>
     <message>
       <location/>
       <source>Exporting video</source>
-      <translation>A exportar vídeo</translation>
+      <translation>ビデオエクスポート</translation>
     </message>
     <message>
       <location/>
       <source>Watching live</source>
-      <translation>A visualizar em directo</translation>
+      <translation>ライブ表示</translation>
     </message>
     <message>
       <location/>
       <source>Login/logout</source>
-      <translation>Login/Logout</translation>
+      <translation>ログイン／ログアウト</translation>
     </message>
     <message>
       <location/>
       <source>Event rules</source>
-      <translation>Regras de Evento</translation>
+      <translation>イベントルール</translation>
     </message>
     <message>
       <location/>
       <source>Server actions</source>
-      <translation>Acções de Servidor</translation>
+      <translation>サーバーアクション</translation>
     </message>
     <message>
       <location/>
       <source>System actions</source>
-      <translation>Acções de Sistema</translation>
+      <translation>システムアクション</translation>
     </message>
     <message>
       <location/>
       <source>Select all</source>
-      <translation>Seleccionar tudo</translation>
+      <translation>全て選択</translation>
     </message>
     <message>
       <location/>
       <source>Sessions</source>
-      <translation>Sessões</translation>
+      <translation>セッション</translation>
     </message>
     <message>
       <location/>
       <source>Details</source>
-      <translation>Detalhes</translation>
+      <translation>詳細</translation>
     </message>
     <message>
       <location/>
       <source>Audit Trail</source>
-      <translation>Trilho de Auditoria</translation>
+      <translation>操作履歴</translation>
     </message>
     <message>
       <location/>
       <source>Clear Filter</source>
-      <translation>Limpar Filtro</translation>
+      <translation>フィルタークリア</translation>
     </message>
     <message>
       <location/>
       <source>Email settings</source>
-      <translation>Definições de E-mail</translation>
+      <translation>Email設定</translation>
     </message>
     <message>
       <location/>
       <source>All servers are offline. Audit data is not available.</source>
-      <translation type="unfinished">All servers are offline. Audit data is not available.</translation>
+      <translation>全サーバーがオフラインの為、操作履歴が表示できません</translation>
     </message>
   </context>
   <context>
@@ -252,37 +252,37 @@
     <message>
       <location filename="../src/ui/dialogs/backup_schedule_dialog.ui"/>
       <source>Backup Schedule...</source>
-      <translation>Agendamento de Backups...</translation>
+      <translation>バックアップスケジュール...</translation>
     </message>
     <message>
       <location/>
       <source>Execute backup on the following days:</source>
-      <translation>Executar o Backup nos seguintes dias:</translation>
+      <translation>バックアップを実行する曜日:</translation>
     </message>
     <message>
       <location/>
       <source>Limit Bandwidth to:</source>
-      <translation>Limitar Larg. Banda:</translation>
+      <translation>最大:帯域:</translation>
     </message>
     <message>
       <location/>
       <source>Mbit/s</source>
-      <translation>Mbps</translation>
+      <translation>Mbit/s</translation>
     </message>
     <message>
       <location/>
       <source>Bitrate limitation could lead to backup failure.</source>
-      <translation type="unfinished">Bitrate limitation could lead to backup failure.</translation>
+      <translation>ビットレート制限は、バックアップ失敗につながる可能性があります</translation>
     </message>
     <message>
       <location/>
       <source>Finish</source>
-      <translation type="unfinished">Finish</translation>
+      <translation>終了:</translation>
     </message>
     <message>
       <location/>
       <source>Start</source>
-      <translation type="unfinished">Start</translation>
+      <translation>開始</translation>
     </message>
   </context>
   <context>
@@ -290,37 +290,37 @@
     <message>
       <location filename="../src/ui/dialogs/backup_settings_dialog.ui"/>
       <source>Backup Settings</source>
-      <translation type="unfinished">Backup Settings</translation>
+      <translation>バックアップ設定</translation>
     </message>
     <message>
       <location/>
       <source>Server Settings</source>
-      <translation type="unfinished">Server Settings</translation>
+      <translation>サーバー設定</translation>
     </message>
     <message>
       <location/>
       <source>Set Schedule...</source>
-      <translation>Definir Agenda...</translation>
+      <translation>スケジュール設定...</translation>
     </message>
     <message>
       <location/>
       <source>Only further recording will be backed up. Backup process will ignore existing footage.</source>
-      <translation type="unfinished">Only further recording will be backed up. Backup process will ignore existing footage.</translation>
+      <translation>開始後の記録をバックアップします　バックアップ プロセスでは既存の記録は無視されます</translation>
     </message>
     <message>
       <location/>
       <source>Execute Backup</source>
-      <translation>Executar Backup</translation>
+      <translation>バックアップ実行</translation>
     </message>
     <message>
       <location/>
       <source>Backup Archive From</source>
-      <translation type="unfinished">Backup Archive From</translation>
+      <translation>バックアップ アーカイブ</translation>
     </message>
     <message>
       <location/>
       <source>Backup Quality</source>
-      <translation type="unfinished">Backup Quality</translation>
+      <translation>バックアップの画質</translation>
     </message>
   </context>
   <context>
@@ -328,27 +328,27 @@
     <message>
       <location filename="../src/ui/widgets/business/bookmark_business_action_widget.ui"/>
       <source>Fixed duration:</source>
-      <translation>Duração Fixa:</translation>
+      <translation>固定期間:</translation>
     </message>
     <message>
       <location/>
       <source>seconds</source>
-      <translation>segundos</translation>
+      <translation>秒</translation>
     </message>
     <message>
       <location/>
       <source>Tags:</source>
-      <translation type="unfinished">Tags:</translation>
+      <translation>タグ:</translation>
     </message>
     <message>
       <location/>
       <source>Pre-recording:</source>
-      <translation>Pré-gravação:</translation>
+      <translation>プリレコーディング:</translation>
     </message>
     <message>
       <location/>
       <source>Post-recording:</source>
-      <translation>Pós-Gravação:</translation>
+      <translation>ポストレコーディング:</translation>
     </message>
   </context>
   <context>
@@ -356,32 +356,32 @@
     <message>
       <location filename="../src/ui/widgets/bookmark_widget.ui"/>
       <source>Popular tags</source>
-      <translation>Tags populares</translation>
+      <translation>ポピュラータグ</translation>
     </message>
     <message>
       <location/>
       <source>Name</source>
-      <translation type="unfinished">Name</translation>
+      <translation>名前</translation>
     </message>
     <message>
       <location/>
       <source>Description</source>
-      <translation>&amp;Descrição</translation>
+      <translation>説明(&amp;D)</translation>
     </message>
     <message>
       <location/>
       <source>Timeout</source>
-      <translation>&amp;Timeout</translation>
+      <translation>タイムアウト(&amp;T)</translation>
     </message>
     <message>
       <location/>
       <source>Tags</source>
-      <translation type="unfinished">Tags</translation>
+      <translation>タグ</translation>
     </message>
     <message>
       <location/>
       <source>List of tags divided by commas</source>
-      <translation type="unfinished">List of tags divided by commas</translation>
+      <translation>カンマで分けられるタグの一覧</translation>
     </message>
   </context>
   <context>
@@ -389,22 +389,22 @@
     <message>
       <location filename="../src/ui/dialogs/search_bookmarks_dialog.ui"/>
       <source>Refresh</source>
-      <translation>Actualizar</translation>
+      <translation>リフレッシュ</translation>
     </message>
     <message>
       <location/>
       <source>All Servers are offline. Logs are not available.</source>
-      <translation>Todos os servidores estão offline. Os Log's não estão disponíveis.</translation>
+      <translation>全サーバーがオフラインの為ログが表示できません.</translation>
     </message>
     <message>
       <location/>
       <source>Bookmark Log</source>
-      <translation>Log de bookmarks</translation>
+      <translation>ブックマークログ</translation>
     </message>
     <message>
       <location/>
       <source>Clear Filter</source>
-      <translation>Limpar Filtro</translation>
+      <translation>フィルタークリア</translation>
     </message>
   </context>
   <context>
@@ -412,37 +412,37 @@
     <message>
       <location filename="../src/ui/widgets/business/business_rule_widget.ui"/>
       <source>Event</source>
-      <translation>Evento</translation>
+      <translation>イベント</translation>
     </message>
     <message>
       <location/>
       <source>at</source>
-      <translation>em</translation>
+      <translation>カメラ</translation>
     </message>
     <message>
       <location/>
       <source>Schedule...</source>
-      <translation>Agenda...</translation>
+      <translation>スケジュール...</translation>
     </message>
     <message>
       <location/>
       <source>Action</source>
-      <translation>Acção</translation>
+      <translation>アクション</translation>
     </message>
     <message>
       <location/>
       <source>Comments:</source>
-      <translation>Comentários:</translation>
+      <translation>コメント:</translation>
     </message>
     <message>
       <location/>
       <source>When</source>
-      <translation>Quando</translation>
+      <translation>何時</translation>
     </message>
     <message>
       <location/>
       <source>Do</source>
-      <translation>Fazer</translation>
+      <translation>動作</translation>
     </message>
   </context>
   <context>
@@ -450,22 +450,22 @@
     <message>
       <location filename="../src/ui/dialogs/business_rules_dialog.ui"/>
       <source>Add</source>
-      <translation>Adicionar</translation>
+      <translation>追加</translation>
     </message>
     <message>
       <location/>
       <source>Delete</source>
-      <translation>Apagar</translation>
+      <translation>削除</translation>
     </message>
     <message>
       <location/>
       <source>Event Rules</source>
-      <translation type="unfinished">Event Rules</translation>
+      <translation>イベントルール</translation>
     </message>
     <message>
       <location/>
       <source>Event Log...</source>
-      <translation type="unfinished">Event Log...</translation>
+      <translation>イベントログ...</translation>
     </message>
   </context>
   <context>
@@ -473,102 +473,102 @@
     <message>
       <location filename="../src/ui/dialogs/camera_addition_dialog.ui"/>
       <source>Server is offline</source>
-      <translation>Servidor offline</translation>
+      <translation>サーバーオフライン</translation>
     </message>
     <message>
       <location/>
       <source>IP, hostname, RTSP link...</source>
-      <translation>IP, nome anfitrião, link RTSP...</translation>
+      <translation>IPアドレス,　 ホスト名,　 RTSPのURL等...</translation>
     </message>
     <message>
       <location/>
       <source>Auto</source>
-      <translation type="unfinished">Auto</translation>
+      <translation>自動</translation>
     </message>
     <message>
       <location/>
       <source>Address</source>
-      <translation>Endereço</translation>
+      <translation>アドレス</translation>
     </message>
     <message>
       <location/>
       <source>Scanning...</source>
-      <translation>A Pesquisar...</translation>
+      <translation>検索中...</translation>
     </message>
     <message>
       <location/>
       <source>Stop</source>
-      <translation>pausa</translation>
+      <translation>停止</translation>
     </message>
     <message>
       <location/>
       <source>Brand</source>
-      <translation>Marca</translation>
+      <translation>ブランド</translation>
     </message>
     <message>
       <location/>
       <source>Model</source>
-      <translation>Modelo</translation>
+      <translation>モデル</translation>
     </message>
     <message>
       <location/>
       <source>New Scan...</source>
-      <translation>Nova Pesquisa...</translation>
+      <translation>新規検索...</translation>
     </message>
     <message>
       <location/>
       <source>Add device(s)...</source>
-      <translation>Adicionar Dispositivo(s)...</translation>
+      <translation>デバイス追加(s)...</translation>
     </message>
     <message>
       <location/>
       <source>Discovered Devices:</source>
-      <translation>Dispositivos Encontrados:</translation>
+      <translation>検索したデバイス:</translation>
     </message>
     <message>
       <location/>
       <source>Device Address</source>
-      <translation>Endereço de Dispositivo:</translation>
+      <translation>デバイスアドレス:</translation>
     </message>
     <message>
       <location/>
       <source>Start IP</source>
-      <translation type="unfinished">Start IP</translation>
+      <translation>開始 IP</translation>
     </message>
     <message>
       <location/>
       <source>End IP</source>
-      <translation type="unfinished">End IP</translation>
+      <translation>終了 IP</translation>
     </message>
     <message>
       <location/>
       <source>Subnet Scan</source>
-      <translation>Pesquisa &amp;Subnet</translation>
+      <translation>サブネット検索(&amp;U)</translation>
     </message>
     <message>
       <location/>
       <source>Discovery Port</source>
-      <translation>Porta de Pes&amp;quisa:</translation>
+      <translation>ポート(&amp;D):</translation>
     </message>
     <message>
       <location/>
       <source>Password</source>
-      <translation type="unfinished">Password</translation>
+      <translation>パスワード</translation>
     </message>
     <message>
       <location/>
       <source>Login</source>
-      <translation type="unfinished">Login</translation>
+      <translation>ログイン</translation>
     </message>
     <message>
       <location/>
       <source>Scan</source>
-      <translation type="unfinished">Scan</translation>
+      <translation>検索</translation>
     </message>
     <message>
       <location/>
       <source>Add selected</source>
-      <translation>&amp;Adicionar seleccionado</translation>
+      <translation>選択追加(&amp;A)</translation>
     </message>
   </context>
   <context>
@@ -576,12 +576,12 @@
     <message>
       <location filename="../src/ui/widgets/properties/camera_advanced_params_widget.ui"/>
       <source>Category</source>
-      <translation>Categoria</translation>
+      <translation>カテゴリー</translation>
     </message>
     <message>
       <location/>
       <source>Refresh</source>
-      <translation>Actualizar</translation>
+      <translation>リフレッシュ</translation>
     </message>
   </context>
   <context>
@@ -594,7 +594,7 @@
     <message>
       <location/>
       <source>Advanced settings are unavailable</source>
-      <translation type="unfinished">Advanced settings are unavailable</translation>
+      <translation>アドバンス設定は利用できません</translation>
     </message>
   </context>
   <context>
@@ -602,122 +602,122 @@
     <message>
       <location filename="../src/ui/widgets/properties/expert_settings_widget.ui"/>
       <source>I have read the manual and understand the risks</source>
-      <translation>Eu li o manual e compreendo os riscos</translation>
+      <translation>エキスパート設定を有効にする</translation>
     </message>
     <message>
       <location/>
       <source>Camera Settings Control</source>
-      <translation>Controlo de definições da câmara</translation>
+      <translation>カメラ設定コントロール</translation>
     </message>
     <message>
       <location/>
       <source>Warning! This will make the Quality and Frame Rate (FPS) settings in the Recording Schedule irrelevant.</source>
-      <translation>Aviso! Esta opção irá tornar irrelevante as definições de Qualidade e Frame Rate (FPS) na Agenda de Gravação.</translation>
+      <translation>注： 画質とフレーム数のみで、録画スケジュールには影響しません.</translation>
     </message>
     <message>
       <location/>
       <source>Secondary Stream Control</source>
-      <translation>Controlo de definições do segundo stream</translation>
+      <translation>2番目のストリームコントロール</translation>
     </message>
     <message>
       <location/>
       <source>Override secondary stream quality</source>
-      <translation>Sobrepor definições de qualidade do segundo stream</translation>
+      <translation>ストリーム設定</translation>
     </message>
     <message>
       <location/>
       <source>Do not use</source>
-      <translation>Não usar</translation>
+      <translation>使用しない</translation>
     </message>
     <message>
       <location/>
       <source>Low quality</source>
-      <translation>Qualidade Baixa</translation>
+      <translation>低画質</translation>
     </message>
     <message>
       <location/>
       <source>Medium quality</source>
-      <translation>Qualidade Média</translation>
+      <translation>標準画質</translation>
     </message>
     <message>
       <location/>
       <source>High quality</source>
-      <translation>Qualidade Alta</translation>
+      <translation>高画質</translation>
     </message>
     <message>
       <location/>
       <source>Warning! Selecting High quality may impact your CPU and network performance and could cause additional issues.</source>
-      <translation>Aviso! Seleccionar Alta Qualidade vai causar um impacto na performance do seu CPU e da rede e pode causar problemas adicionais.</translation>
+      <translation>注：高画質を選択するとCPUおよびネットワーク負荷に影響を及ぼします.</translation>
     </message>
     <message>
       <location/>
       <source>Archive control</source>
-      <translation>Controlo arquivos</translation>
+      <translation>アーカイブコントロール</translation>
     </message>
     <message>
       <location/>
       <source>Do not archive primary stream</source>
-      <translation>Não gravar o stream principal</translation>
+      <translation>プライマリーストリームのアーカイブを行わない</translation>
     </message>
     <message>
       <location/>
       <source>Do not archive secondary stream</source>
-      <translation>Não gravar o stream secundário</translation>
+      <translation>セカンダリーストリームのアーカイブを行わない</translation>
     </message>
     <message>
       <location/>
       <source>Media streaming control</source>
-      <translation>Controlo do streaming do Media</translation>
+      <translation>メディアストリームコントロール</translation>
     </message>
     <message>
       <location/>
       <source>RTP transport:</source>
-      <translation>Transporte RTP:</translation>
+      <translation>RTP:</translation>
     </message>
     <message>
       <location/>
       <source>Auto</source>
-      <translation type="unfinished">Auto</translation>
+      <translation>自動</translation>
     </message>
     <message>
       <location/>
       <source>TCP</source>
-      <translation type="unfinished">TCP</translation>
+      <translation>TCP</translation>
     </message>
     <message>
       <location/>
       <source>UDP</source>
-      <translation type="unfinished">UDP</translation>
+      <translation>UDP</translation>
     </message>
     <message>
       <location/>
       <source>Restore Defaults</source>
-      <translation>Restaurar Padrões</translation>
+      <translation>初期設定に戻す</translation>
     </message>
     <message>
       <location/>
       <source>Warning! Low quality may result in low resolution image.</source>
-      <translation>Aviso! Baixa qualidade pode resultar em imagens de baixa resolução.</translation>
+      <translation>注意　低画質は低解像度が適応されます.</translation>
     </message>
     <message>
       <location/>
       <source>Motion detection control</source>
-      <translation type="unfinished">Motion detection control</translation>
+      <translation>モーション検出コントロール</translation>
     </message>
     <message>
       <location/>
       <source>Force motion detection for stream:</source>
-      <translation type="unfinished">Force motion detection for stream:</translation>
+      <translation>ストリームのモーション検出を強制:</translation>
     </message>
     <message>
       <location/>
       <source>Calculate bitrate per GOP instead of bitrate per second (It will increase bitrate for camera)</source>
-      <translation type="unfinished">Calculate bitrate per GOP instead of bitrate per second (It will increase bitrate for camera)</translation>
+      <translation>ビットレート/秒ではなく GOP でビットレートを計算する (カメラのビットレートが増加します)</translation>
     </message>
     <message>
       <location/>
       <source>Keep camera streams and profiles settings</source>
-      <translation type="unfinished">Keep camera streams and profiles settings</translation>
+      <translation>カメラのストリームおよびプロファイルの設定を保持する</translation>
     </message>
     <message>
       <location/>
@@ -727,7 +727,7 @@
     <message>
       <location/>
       <source>Warning! Do not change these settings unless you are absolutely sure of their potential impact on your System performance.</source>
-      <translation type="unfinished">Warning! Do not change these settings unless you are absolutely sure of their potential impact on your System performance.</translation>
+      <translation>注：システムパフォーマンスに対する影響を理解せずに変更は行わないでください</translation>
     </message>
   </context>
   <context>
@@ -735,7 +735,7 @@
     <message>
       <location filename="../src/ui/widgets/business/camera_input_business_event_widget.ui"/>
       <source>Input ID:</source>
-      <translation>ID de Input:</translation>
+      <translation>入力ID:</translation>
     </message>
   </context>
   <context>
@@ -743,7 +743,7 @@
     <message>
       <location filename="../src/ui/dialogs/camera_list_dialog.ui"/>
       <source>Add Device...</source>
-      <translation type="unfinished">Add Device...</translation>
+      <translation>デバイス追加...</translation>
     </message>
   </context>
   <context>
@@ -751,17 +751,17 @@
     <message>
       <location filename="../src/ui/widgets/business/camera_output_business_action_widget.ui"/>
       <source>Output ID:</source>
-      <translation>ID de &amp;Saída:</translation>
+      <translation>出力ID(&amp;O):</translation>
     </message>
     <message>
       <location/>
       <source>Fixed duration:</source>
-      <translation>Duração Fixa:</translation>
+      <translation>固定期間:</translation>
     </message>
     <message>
       <location/>
       <source>seconds</source>
-      <translation>segundos</translation>
+      <translation>秒</translation>
     </message>
   </context>
   <context>
@@ -769,112 +769,112 @@
     <message>
       <location filename="../src/ui/widgets/properties/camera_schedule_widget.ui"/>
       <source>Schedule Settings</source>
-      <translation>Definições de Agenda</translation>
+      <translation>スケジュール設定</translation>
     </message>
     <message>
       <location/>
       <source>FPS</source>
-      <translation type="unfinished">FPS</translation>
+      <translation>FPS</translation>
     </message>
     <message>
       <location/>
       <source>Quality</source>
-      <translation>Qualidade</translation>
+      <translation>画質</translation>
     </message>
     <message>
       <location/>
       <source>Record Always</source>
-      <translation>Gravar Sempre</translation>
+      <translation>常時録画</translation>
     </message>
     <message>
       <location/>
       <source>Motion Only</source>
-      <translation>Somente Movimento</translation>
+      <translation>モーションのみ</translation>
     </message>
     <message>
       <location/>
       <source>Do Not Record</source>
-      <translation>Não Gravar</translation>
+      <translation>録画しない</translation>
     </message>
     <message>
       <location/>
       <source>Fixed Archive Length</source>
-      <translation>Tamanho fixo do arquivo</translation>
+      <translation>アーカイブ保持期間</translation>
     </message>
     <message>
       <location/>
       <source>Auto</source>
-      <translation type="unfinished">Auto</translation>
+      <translation>自動</translation>
     </message>
     <message>
       <location/>
       <source>Min. Days</source>
-      <translation>Min. Dias</translation>
+      <translation>最低(日)</translation>
     </message>
     <message>
       <location/>
       <source>Max. Days</source>
-      <translation>Máx. Dias</translation>
+      <translation>最大(日)</translation>
     </message>
     <message>
       <location/>
       <source>Motion Recording</source>
-      <translation>Gravação Movimento</translation>
+      <translation>モーション録画</translation>
     </message>
     <message>
       <location/>
       <source>Pre-Recording</source>
-      <translation>Pré-Gravação</translation>
+      <translation>プリレコーディング</translation>
     </message>
     <message>
       <location/>
       <source>Post-Recording</source>
-      <translation>Pós-Gravação</translation>
+      <translation>ポストレコーディング</translation>
     </message>
     <message>
       <location/>
       <source>Copy Schedule...</source>
-      <translation>Copiar Agenda...</translation>
+      <translation>スケジュールコピー...</translation>
     </message>
     <message>
       <location/>
       <source>Recording</source>
-      <translation type="unfinished">Recording</translation>
+      <translation>録画</translation>
     </message>
     <message>
       <location/>
       <source>Activate License...</source>
-      <translation type="unfinished">Activate License...</translation>
+      <translation>ライセンスアクティベート...</translation>
     </message>
     <message>
       <location/>
       <source>Show Quality</source>
-      <translation type="unfinished">Show Quality</translation>
+      <translation>画質表示</translation>
     </message>
     <message>
       <location/>
       <source>Show FPS</source>
-      <translation type="unfinished">Show FPS</translation>
+      <translation>FPS表示</translation>
     </message>
     <message>
       <location/>
       <source>Copying Schedule</source>
-      <translation type="unfinished">Copying Schedule</translation>
+      <translation>スケジュールのコピー</translation>
     </message>
     <message>
       <location/>
       <source>Apply changes before copying schedule.</source>
-      <translation>Aplicar alterações antes de copiar agenda</translation>
+      <translation>スケジュールコピーの前に適用してください</translation>
     </message>
     <message>
       <location/>
       <source>Panic Mode:</source>
-      <translation type="unfinished">Panic Mode:</translation>
+      <translation>パニック モード:</translation>
     </message>
     <message>
       <location/>
       <source>Motion + Lo-Res</source>
-      <translation type="unfinished">Motion + Lo-Res</translation>
+      <translation>常時低 ＋ モーション高解像度</translation>
     </message>
   </context>
   <context>
@@ -882,7 +882,7 @@
     <message>
       <location filename="../src/ui/dialogs/resource_properties/change_user_password_dialog.ui"/>
       <source>Change password</source>
-      <translation type="unfinished">Change password</translation>
+      <translation>パスワードを変更</translation>
     </message>
   </context>
   <context>
@@ -890,12 +890,12 @@
     <message>
       <location filename="../src/ui/dialogs/cloud/connect_to_cloud_dialog.ui"/>
       <source>Stay logged in</source>
-      <translation type="unfinished">Stay logged in</translation>
+      <translation>ログインを維持</translation>
     </message>
     <message>
       <location/>
       <source>Incorrect Email or Password</source>
-      <translation type="unfinished">Incorrect Email or Password</translation>
+      <translation>メールアドレスまたはパスワードが間違っています</translation>
     </message>
   </context>
   <context>
@@ -903,17 +903,17 @@
     <message>
       <location filename="../src/ui/dialogs/connection_name_dialog.ui"/>
       <source>Save connection as...</source>
-      <translation>Gravar ligação como...</translation>
+      <translation>名前を付けて保存...</translation>
     </message>
     <message>
       <location/>
       <source>Enter name:</source>
-      <translation>Introduza nome:</translation>
+      <translation>名前:</translation>
     </message>
     <message>
       <location/>
       <source>Save password</source>
-      <translation>Guardar password</translation>
+      <translation>パスワードを保存する</translation>
     </message>
   </context>
   <context>
@@ -921,12 +921,12 @@
     <message>
       <location filename="../src/ui/dialogs/connection_testing_dialog.ui"/>
       <source>Connection Test</source>
-      <translation>Teste de Ligação</translation>
+      <translation>接続テスト</translation>
     </message>
     <message>
       <location/>
       <source>Testing connection...</source>
-      <translation>A testar Ligação...</translation>
+      <translation>接続テスト中...</translation>
     </message>
   </context>
   <context>
@@ -934,22 +934,22 @@
     <message>
       <location filename="../src/ui/widgets/business/custom_business_event_widget.ui"/>
       <source>Source contains:</source>
-      <translation>Fonte Contém:</translation>
+      <translation>ソースに含まれるもの:</translation>
     </message>
     <message>
       <location/>
       <source>Keywords separated by space</source>
-      <translation>Palavras chave separados por espaço</translation>
+      <translation>キーワードをスペースで区切る</translation>
     </message>
     <message>
       <location/>
       <source>Caption contains:</source>
-      <translation>Captura contém:</translation>
+      <translation>キャプションに含まれる:</translation>
     </message>
     <message>
       <location/>
       <source>Description contains:</source>
-      <translation>Descrição Contém:</translation>
+      <translation>説明に含まれる:</translation>
     </message>
   </context>
   <context>
@@ -957,12 +957,12 @@
     <message>
       <location filename="../src/ui/widgets/system_settings/database_management_widget.ui"/>
       <source>Create Backup...</source>
-      <translation>Criar Backup...</translation>
+      <translation>バックアップ...</translation>
     </message>
     <message>
       <location/>
       <source>Restore from Backup...</source>
-      <translation>Restaurar Backup...</translation>
+      <translation>リストア...</translation>
     </message>
   </context>
   <context>
@@ -970,27 +970,27 @@
     <message>
       <location filename="../src/ui/dialogs/event_log_dialog.ui"/>
       <source>Event Log</source>
-      <translation>Log de Eventos</translation>
+      <translation>イベントログ</translation>
     </message>
     <message>
       <location/>
       <source>Clear Filter</source>
-      <translation>Limpar Filtro</translation>
+      <translation>フィルタークリア</translation>
     </message>
     <message>
       <location/>
       <source>Refresh</source>
-      <translation>Actualizar</translation>
+      <translation>リフレッシュ</translation>
     </message>
     <message>
       <location/>
       <source>All Servers are offline. Logs are not available.</source>
-      <translation>Todos os Servidores estão Offline. Os Logs não estão disponíveis.</translation>
+      <translation>全サーバーがオフラインの為ログが表示できません.</translation>
     </message>
     <message>
       <location/>
       <source>Event Rules...</source>
-      <translation type="unfinished">Event Rules...</translation>
+      <translation>イベントルール...</translation>
     </message>
   </context>
   <context>
@@ -998,37 +998,37 @@
     <message>
       <location filename="../src/ui/widgets/business/exec_http_request_action_widget.ui"/>
       <source>HTTP content</source>
-      <translation>Conteúdo HTTP</translation>
+      <translation>HTTPコンテンツ</translation>
     </message>
     <message>
       <location/>
       <source>Login to authenticate (optional)</source>
-      <translation>Login para autenticar (opcional)</translation>
+      <translation>ログイン認証</translation>
     </message>
     <message>
       <location/>
       <source>Login</source>
-      <translation type="unfinished">Login</translation>
+      <translation>ログイン</translation>
     </message>
     <message>
       <location/>
       <source>Password to authenticate (optional)</source>
-      <translation>Password para autenticar (opcional)</translation>
+      <translation>パスワード認証</translation>
     </message>
     <message>
       <location/>
       <source>Password</source>
-      <translation type="unfinished">Password</translation>
+      <translation>パスワード</translation>
     </message>
     <message>
       <location/>
       <source>Content type</source>
-      <translation type="unfinished">Content type</translation>
+      <translation>コンテンツタイプ</translation>
     </message>
     <message>
       <location/>
       <source>HTTP URL</source>
-      <translation type="unfinished">HTTP URL</translation>
+      <translation>HTTP URL</translation>
     </message>
   </context>
   <context>
@@ -1036,7 +1036,7 @@
     <message>
       <location filename="../src/ui/widgets/business/ptz_preset_business_action_widget.ui"/>
       <source>PTZ preset:</source>
-      <translation>Preset de &amp;PTZ:</translation>
+      <translation>&amp;PTZ プリセット:</translation>
     </message>
   </context>
   <context>
@@ -1044,27 +1044,27 @@
     <message>
       <location filename="../src/ui/dialogs/export_timelapse_dialog.ui"/>
       <source>Export Rapid Review</source>
-      <translation>Exportação "Rapid Review"</translation>
+      <translation>ラピッドレビューのエクスポート</translation>
     </message>
     <message>
       <location/>
       <source>Initial Video Length</source>
-      <translation>Duração Original do vídeo</translation>
+      <translation>イニシャルビデオ長</translation>
     </message>
     <message>
       <location/>
       <source>Exported Video Length</source>
-      <translation>Duração do Vídeo Exportado</translation>
+      <translation>エクスポートビデオ長</translation>
     </message>
     <message>
       <location/>
       <source>Rapid Review speed</source>
-      <translation>Velocidade "Rapid Review"</translation>
+      <translation>ラピッドレビュースピード</translation>
     </message>
     <message>
       <location/>
       <source>Frames Interval</source>
-      <translation>Intervalo de frames</translation>
+      <translation>フレームインターバル</translation>
     </message>
   </context>
   <context>
@@ -1072,52 +1072,52 @@
     <message>
       <location filename="../src/ui/widgets/properties/fisheye_settings_widget.ui"/>
       <source>Ceiling Mount</source>
-      <translation>Montagem em tecto</translation>
+      <translation>天井設置</translation>
     </message>
     <message>
       <location/>
       <source>Wall Mount</source>
-      <translation>Montagem em parede</translation>
+      <translation>壁設置</translation>
     </message>
     <message>
       <location/>
       <source>Floor/Table Mount</source>
-      <translation>Montagem em Chão/Mesa</translation>
+      <translation>フロア/テーブル設置</translation>
     </message>
     <message>
       <location/>
       <source>Fisheye Dewarping</source>
-      <translation type="unfinished">Fisheye Dewarping</translation>
+      <translation>魚眼レンズ歪補正</translation>
     </message>
     <message>
       <location/>
       <source>Auto Calibration</source>
-      <translation>Auto Calibração</translation>
+      <translation>自動キャリブレーション</translation>
     </message>
     <message>
       <location/>
       <source>Mount Angle Correction:</source>
-      <translation type="unfinished">Mount Angle Correction:</translation>
+      <translation>取付角度補正:</translation>
     </message>
     <message>
       <location/>
       <source>Y Offset</source>
-      <translation type="unfinished">Y Offset</translation>
+      <translation>Y オフセット</translation>
     </message>
     <message>
       <location/>
       <source>X Offset</source>
-      <translation type="unfinished">X Offset</translation>
+      <translation>X オフセット</translation>
     </message>
     <message>
       <location/>
       <source>Size</source>
-      <translation type="unfinished">Size</translation>
+      <translation>サイズ</translation>
     </message>
     <message>
       <location/>
       <source>Ellipticity</source>
-      <translation type="unfinished">Ellipticity</translation>
+      <translation>楕円率</translation>
     </message>
   </context>
   <context>
@@ -1125,62 +1125,62 @@
     <message>
       <location filename="../src/ui/widgets/local_settings/general_preferences_widget.ui"/>
       <source>Misc</source>
-      <translation type="unfinished">Misc</translation>
+      <translation>その他</translation>
     </message>
     <message>
       <location/>
       <source>Auto Pause Video</source>
-      <translation>Pausar o video autom.</translation>
+      <translation>自動一時停止</translation>
     </message>
     <message>
       <location/>
       <source>after</source>
-      <translation>depois</translation>
+      <translation>後</translation>
     </message>
     <message>
       <location/>
       <source>Minutes of Inactivity</source>
-      <translation>Minutos de inactividade</translation>
+      <translation>分後</translation>
     </message>
     <message>
       <location/>
       <source>Add...</source>
-      <translation>&amp;Adicionar...</translation>
+      <translation>追加(&amp;A)...</translation>
     </message>
     <message>
       <location/>
       <source>Remove</source>
-      <translation>Remover</translation>
+      <translation>削除</translation>
     </message>
     <message>
       <location/>
       <source>Local Media Folders</source>
-      <translation type="unfinished">Local Media Folders</translation>
+      <translation>ローカル メディア フォルダー</translation>
     </message>
     <message>
       <location/>
       <source>Audio Input</source>
-      <translation type="unfinished">Audio Input</translation>
+      <translation>オーディオ入力</translation>
     </message>
     <message>
       <location/>
       <source>First Source</source>
-      <translation type="unfinished">First Source</translation>
+      <translation>入力１</translation>
     </message>
     <message>
       <location/>
       <source>None</source>
-      <translation>Nenhum</translation>
+      <translation>なし</translation>
     </message>
     <message>
       <location/>
       <source>Second Source</source>
-      <translation type="unfinished">Second Source</translation>
+      <translation>入力2</translation>
     </message>
     <message>
       <location/>
       <source>Run Application when PC Boots up</source>
-      <translation type="unfinished">Run Application when PC Boots up</translation>
+      <translation>PC が起動時にアプリケーション起動</translation>
     </message>
   </context>
   <context>
@@ -1188,12 +1188,12 @@
     <message>
       <location filename="../src/ui/widgets/system_settings/general_system_administration_widget.ui"/>
       <source>System Settings</source>
-      <translation>Definições de Sistema</translation>
+      <translation>システム設定</translation>
     </message>
     <message>
       <location/>
       <source>Backup and Restore</source>
-      <translation type="unfinished">Backup and Restore</translation>
+      <translation>バックアップと復元</translation>
     </message>
   </context>
   <context>
@@ -1201,17 +1201,17 @@
     <message>
       <location filename="../src/ui/widgets/properties/image_control_widget.ui"/>
       <source>Image Control</source>
-      <translation>Controlo de Imagem</translation>
+      <translation>イメージコントロール</translation>
     </message>
     <message>
       <location/>
       <source>Aspect Ratio</source>
-      <translation type="unfinished">Aspect Ratio</translation>
+      <translation>アスペクト比</translation>
     </message>
     <message>
       <location/>
       <source>Rotation</source>
-      <translation type="unfinished">Rotation</translation>
+      <translation>回転</translation>
     </message>
   </context>
   <context>
@@ -1219,17 +1219,17 @@
     <message>
       <location filename="../src/ui/dialogs/image_preview_dialog.ui"/>
       <source>Image View</source>
-      <translation>Ver Imagem</translation>
+      <translation>イメージ表示</translation>
     </message>
     <message>
       <location/>
       <source>Loading Image...Please Wait.</source>
-      <translation>A carregar imagem...Por favor aguarde.</translation>
+      <translation>ローディング中...お待ちください.</translation>
     </message>
     <message>
       <location/>
       <source>No image</source>
-      <translation type="unfinished">No image</translation>
+      <translation>画像なし</translation>
     </message>
   </context>
   <context>
@@ -1237,67 +1237,67 @@
     <message>
       <location filename="../src/ui/dialogs/resource_properties/layout_settings_dialog.ui"/>
       <source>Layout Settings</source>
-      <translation>Definições de Layout</translation>
+      <translation>レイアウト設定</translation>
     </message>
     <message>
       <location/>
       <source>General Settings</source>
-      <translation>Definições Gerais</translation>
+      <translation>一般設定</translation>
     </message>
     <message>
       <location/>
       <source>Layout is Locked</source>
-      <translation>Layout bloqueado</translation>
+      <translation>レイアウトのロック</translation>
     </message>
     <message>
       <location/>
       <source>Background</source>
-      <translation type="unfinished">Background</translation>
+      <translation>背景</translation>
     </message>
     <message>
       <location/>
       <source>Browse...</source>
-      <translation>Procurar...</translation>
+      <translation>参照...</translation>
     </message>
     <message>
       <location/>
       <source>View...</source>
-      <translation>Ver...</translation>
+      <translation>表示...</translation>
     </message>
     <message>
       <location/>
       <source>Clear</source>
-      <translation>Limpar</translation>
+      <translation>クリア</translation>
     </message>
     <message>
       <location/>
       <source>Processing Image...Please Wait.</source>
-      <translation>A processar imagem...Por favor aguarde.</translation>
+      <translation>お待ちください.</translation>
     </message>
     <message>
       <location/>
       <source>Keep Aspect Ratio</source>
-      <translation>Manter formato (Aspect Ratio)</translation>
+      <translation>アスペクト比を固定</translation>
     </message>
     <message>
       <location/>
       <source>Crop to monitor aspect ratio</source>
-      <translation>&amp;Cortar para o formato do monitor</translation>
+      <translation>モニターアスペクト比(&amp;C)</translation>
     </message>
     <message>
       <location/>
       <source>Width:</source>
-      <translation>&amp;Largura:</translation>
+      <translation>幅(&amp;W):</translation>
     </message>
     <message>
       <location/>
       <source>Height:</source>
-      <translation>&amp;Altura:</translation>
+      <translation>高さ(&amp;H):</translation>
     </message>
     <message>
       <location/>
       <source>Opacity:</source>
-      <translation>&amp;Opacidade:</translation>
+      <translation>透過(&amp;O):</translation>
     </message>
   </context>
   <context>
@@ -1305,47 +1305,47 @@
     <message>
       <location filename="../src/ui/dialogs/ldap_settings_dialog.ui"/>
       <source>ldap(s)://host:port</source>
-      <translation>ldap(s)://anfitrião:porto</translation>
+      <translation>ldap(s)://host:port</translation>
     </message>
     <message>
       <location/>
       <source>Optional</source>
-      <translation>Opcional</translation>
+      <translation>オプション</translation>
     </message>
     <message>
       <location/>
       <source>Testing...</source>
-      <translation>A Testar...</translation>
+      <translation>テスト中...</translation>
     </message>
     <message>
       <location/>
       <source>LDAP Settings</source>
-      <translation>Definições LDAP</translation>
+      <translation>LDAP設定</translation>
     </message>
     <message>
       <location/>
       <source>Server URL</source>
-      <translation type="unfinished">Server URL</translation>
+      <translation>サーバーの URL</translation>
     </message>
     <message>
       <location/>
       <source>Admin DN</source>
-      <translation type="unfinished">Admin DN</translation>
+      <translation>管理者 DN</translation>
     </message>
     <message>
       <location/>
       <source>Password</source>
-      <translation type="unfinished">Password</translation>
+      <translation>パスワード</translation>
     </message>
     <message>
       <location/>
       <source>Search Base</source>
-      <translation type="unfinished">Search Base</translation>
+      <translation>検索ベース</translation>
     </message>
     <message>
       <location/>
       <source>Search Filter</source>
-      <translation type="unfinished">Search Filter</translation>
+      <translation>検索フィルター</translation>
     </message>
   </context>
   <context>
@@ -1353,27 +1353,27 @@
     <message>
       <location filename="../src/ui/dialogs/ldap_users_dialog.ui"/>
       <source>Fetch Users from LDAP...</source>
-      <translation>Obter Utilizador através do LDAP...</translation>
+      <translation>LDAPよりユーザー登録...</translation>
     </message>
     <message>
       <location/>
       <source>Loading...</source>
-      <translation>A Carregar...</translation>
+      <translation>ロード中...</translation>
     </message>
     <message>
       <location/>
       <source>Connection error</source>
-      <translation>Erro de ligação</translation>
+      <translation>接続エラー</translation>
     </message>
     <message>
       <location/>
       <source>Role to assign to imported users</source>
-      <translation type="unfinished">Role to assign to imported users</translation>
+      <translation>インポートされたユーザーに割り当てる役割</translation>
     </message>
     <message>
       <location/>
       <source>Disable imported users</source>
-      <translation type="unfinished">Disable imported users</translation>
+      <translation>インポートしたユーザーを無効</translation>
     </message>
   </context>
   <context>
@@ -1381,32 +1381,32 @@
     <message>
       <location filename="../src/ui/dialogs/license_details_dialog.ui"/>
       <source>License Details</source>
-      <translation>Detalhes de Licença</translation>
+      <translation>ライセンス詳細</translation>
     </message>
     <message>
       <location/>
       <source>Generic</source>
-      <translation>Genérico</translation>
+      <translation>一般</translation>
     </message>
     <message>
       <location/>
       <source>License Type:</source>
-      <translation>Tipo de Licença:</translation>
+      <translation>ライセンスタイプ:</translation>
     </message>
     <message>
       <location/>
       <source>License Key:</source>
-      <translation>Chave da Licença:</translation>
+      <translation>ライセンスキー:</translation>
     </message>
     <message>
       <location/>
       <source>Locked to Hardware ID:</source>
-      <translation>Trancado ao ID do Hardware:</translation>
+      <translation>ハードウェアID:</translation>
     </message>
     <message>
       <location/>
       <source>Features</source>
-      <translation>Funções</translation>
+      <translation>機能</translation>
     </message>
   </context>
   <context>
@@ -1414,27 +1414,27 @@
     <message>
       <location filename="../src/ui/widgets/system_settings/license_manager_widget.ui"/>
       <source>Active Licenses</source>
-      <translation>Licenças Activas</translation>
+      <translation>アクティブライセンス</translation>
     </message>
     <message>
       <location/>
       <source>Remove</source>
-      <translation>Remover</translation>
+      <translation>削除</translation>
     </message>
     <message>
       <location/>
       <source>New License</source>
-      <translation>Nova Licença</translation>
+      <translation>新規ライセンス</translation>
     </message>
     <message>
       <location/>
       <source>Details...</source>
-      <translation type="unfinished">Details...</translation>
+      <translation>詳細...</translation>
     </message>
     <message>
       <location/>
       <source>The software is licensed to</source>
-      <translation type="unfinished">The software is licensed to</translation>
+      <translation>ソフトウェアのライセンス</translation>
     </message>
   </context>
   <context>
@@ -1442,12 +1442,12 @@
     <message>
       <location filename="../src/ui/dialogs/license_notification_dialog.ui"/>
       <source>Warning</source>
-      <translation>Aviso</translation>
+      <translation>警告</translation>
     </message>
     <message>
       <location/>
       <source>License issues:</source>
-      <translation type="unfinished">License issues:</translation>
+      <translation>ライセンス問題:</translation>
     </message>
   </context>
   <context>
@@ -1455,67 +1455,67 @@
     <message>
       <location filename="../src/ui/widgets/system_settings/license_widget.ui"/>
       <source>Manual Activation</source>
-      <translation>Activação Manual</translation>
+      <translation>マニュアルアクティベート</translation>
     </message>
     <message>
       <location/>
       <source>Paste from Clipboard</source>
-      <translation>Colar do Clipboard</translation>
+      <translation>クリップボードから貼付け</translation>
     </message>
     <message>
       <location/>
       <source>Copy to Clipboard</source>
-      <translation>Copiar para o Clipboard</translation>
+      <translation>クリップボードにコピー</translation>
     </message>
     <message>
       <location/>
       <source>Select License File...</source>
-      <translation>Seleccionar ficheiro de licença...</translation>
+      <translation>ライセンスファイル選択...</translation>
     </message>
     <message>
       <location/>
       <source>Browse...</source>
-      <translation>Procurar...</translation>
+      <translation>参照...</translation>
     </message>
     <message>
       <location/>
       <source>License will be bound to the current server</source>
-      <translation>A Licença vai ficar atribuída ao servidor actual</translation>
+      <translation>ライセンスは既存のサーバーに統合されます</translation>
     </message>
     <message>
       <location/>
       <source>Activate Free License</source>
-      <translation>Activar Licença Gratuita</translation>
+      <translation>アクティベートフリーライセンス</translation>
     </message>
     <message>
       <location/>
       <source>Activate License</source>
-      <translation>Activar Licença</translation>
+      <translation>アクティベートライセンス</translation>
     </message>
     <message>
       <location/>
       <source>Internet Activation</source>
-      <translation type="unfinished">Internet Activation</translation>
+      <translation>インターネットによるライセンス認証</translation>
     </message>
     <message>
       <location/>
       <source>License Key</source>
-      <translation>Chave da Licença:</translation>
+      <translation>ライセンスキー:</translation>
     </message>
     <message>
       <location/>
       <source>Invalid License Key</source>
-      <translation type="unfinished">Invalid License Key</translation>
+      <translation>無効なライセンス キー</translation>
     </message>
     <message>
       <location/>
       <source>Hardware ID</source>
-      <translation>ID do Hardware:</translation>
+      <translation>ハードウェアID：</translation>
     </message>
     <message>
       <location/>
       <source>Activation Key File</source>
-      <translation>Ficheiro Chave de Activação:</translation>
+      <translation>アクティベートキーファイル：</translation>
     </message>
   </context>
   <context>
@@ -1523,12 +1523,12 @@
     <message>
       <location filename="../src/ui/widgets/licensing/licenses_propose_widget.ui"/>
       <source>Licensing</source>
-      <translation>Licenciamento</translation>
+      <translation>ライセンス</translation>
     </message>
     <message>
       <location/>
       <source>Activate License...</source>
-      <translation type="unfinished">Activate License...</translation>
+      <translation>ライセンスアクティベート...</translation>
     </message>
   </context>
   <context>
@@ -1536,7 +1536,7 @@
     <message>
       <location filename="../src/ui/dialogs/local_settings_dialog.ui"/>
       <source>Local Settings</source>
-      <translation>Definições Locais</translation>
+      <translation>ローカル設定</translation>
     </message>
   </context>
   <context>
@@ -1544,47 +1544,47 @@
     <message>
       <location filename="../src/ui/dialogs/login_dialog.ui"/>
       <source>Save...</source>
-      <translation>Gravar...</translation>
+      <translation>保存...</translation>
     </message>
     <message>
       <location/>
       <source>Delete</source>
-      <translation>Apagar</translation>
+      <translation>削除</translation>
     </message>
     <message>
       <location/>
       <source>Connection Options:</source>
-      <translation>Opções de &amp;Ligação:</translation>
+      <translation>接続オプション(&amp;C):</translation>
     </message>
     <message>
       <location/>
       <source>Host</source>
-      <translation type="unfinished">Host</translation>
+      <translation>ホスト</translation>
     </message>
     <message>
       <location/>
       <source>Port</source>
-      <translation type="unfinished">Port</translation>
+      <translation>ポート</translation>
     </message>
     <message>
       <location/>
       <source>Login</source>
-      <translation type="unfinished">Login</translation>
+      <translation>ログイン</translation>
     </message>
     <message>
       <location/>
       <source>Password</source>
-      <translation type="unfinished">Password</translation>
+      <translation>パスワード</translation>
     </message>
     <message>
       <location/>
       <source>Test</source>
-      <translation>Testar</translation>
+      <translation>テスト</translation>
     </message>
     <message>
       <location/>
       <source>Auto-Login</source>
-      <translation>&amp;Auto-Login</translation>
+      <translation>自動ログイン(&amp;A)</translation>
     </message>
   </context>
   <context>
@@ -1592,57 +1592,57 @@
     <message>
       <location filename="../src/ui/widgets/local_settings/look_and_feel_preferences_widget.ui"/>
       <source>Look and Feel</source>
-      <translation>Aspecto e Ambiente</translation>
+      <translation>表示</translation>
     </message>
     <message>
       <location/>
       <source>Background Image</source>
-      <translation>Imagem de Fundo</translation>
+      <translation>背景イメージ</translation>
     </message>
     <message>
       <location/>
       <source>Browse...</source>
-      <translation>Procurar...</translation>
+      <translation>参照...</translation>
     </message>
     <message>
       <location/>
       <source>Language</source>
-      <translation>Idioma:</translation>
+      <translation>言語:</translation>
     </message>
     <message>
       <location/>
       <source>Time Mode</source>
-      <translation>Modo Horas:</translation>
+      <translation>タイムモード:</translation>
     </message>
     <message>
       <location/>
       <source>Image</source>
-      <translation>Imagem:</translation>
+      <translation>イメージ:</translation>
     </message>
     <message>
       <location/>
       <source>Mode</source>
-      <translation type="unfinished">Mode</translation>
+      <translation>モード</translation>
     </message>
     <message>
       <location/>
       <source>Intensity</source>
-      <translation>Intensidade:</translation>
+      <translation>透過:</translation>
     </message>
     <message>
       <location/>
       <source>Show additional info in tree</source>
-      <translation type="unfinished">Show additional info in tree</translation>
+      <translation>リソースツリーにIP表示</translation>
     </message>
     <message>
       <location/>
       <source>Tour cycle</source>
-      <translation type="unfinished">Tour cycle</translation>
+      <translation>ツアーサイクル</translation>
     </message>
     <message>
       <location/>
       <source>seconds</source>
-      <translation>segundos</translation>
+      <translation>秒</translation>
     </message>
   </context>
   <context>
@@ -1650,7 +1650,7 @@
     <message>
       <location filename="../src/ui/dialogs/common/message_box.ui"/>
       <source>Do not show this message again</source>
-      <translation type="unfinished">Do not show this message again</translation>
+      <translation>今後このメッセージを表示しない</translation>
     </message>
   </context>
   <context>
@@ -1658,37 +1658,37 @@
     <message>
       <location filename="../src/ui/widgets/properties/multiple_camera_settings_widget.ui"/>
       <source>General</source>
-      <translation>Geral</translation>
+      <translation>一般</translation>
     </message>
     <message>
       <location/>
       <source>Authentication</source>
-      <translation>Autenticação</translation>
+      <translation>認証</translation>
     </message>
     <message>
       <location/>
       <source>Password:</source>
-      <translation type="unfinished">Password:</translation>
+      <translation>パスワード:</translation>
     </message>
     <message>
       <location/>
       <source>Login:</source>
-      <translation type="unfinished">Login:</translation>
+      <translation>ログイン:</translation>
     </message>
     <message>
       <location/>
       <source>Enable Audio</source>
-      <translation>Habilitar áudio</translation>
+      <translation>音声使用</translation>
     </message>
     <message>
       <location/>
       <source>Recording</source>
-      <translation>Em gravação</translation>
+      <translation>録画</translation>
     </message>
     <message>
       <location/>
       <source>Expert</source>
-      <translation type="unfinished">Expert</translation>
+      <translation>エキスパート</translation>
     </message>
   </context>
   <context>
@@ -1696,22 +1696,22 @@
     <message>
       <location filename="../src/ui/widgets/business/play_sound_business_action_widget.ui"/>
       <source>Manage...</source>
-      <translation>Gerir...</translation>
+      <translation>管理...</translation>
     </message>
     <message>
       <location/>
       <source>Volume:</source>
-      <translation type="unfinished">Volume:</translation>
+      <translation>ボリューム:</translation>
     </message>
     <message>
       <location/>
       <source>Test...</source>
-      <translation>Testar...</translation>
+      <translation>テスト...</translation>
     </message>
     <message>
       <location/>
       <source>Play to user</source>
-      <translation>Reproduzir ao Utilizador</translation>
+      <translation>ユーザー</translation>
     </message>
   </context>
   <context>
@@ -1719,12 +1719,12 @@
     <message>
       <location filename="../src/ui/widgets/business/popup_business_action_widget.ui"/>
       <source>Show to administrators only</source>
-      <translation>Mostrar somente a Administradores</translation>
+      <translation>アドミニストレーターのみに表示</translation>
     </message>
     <message>
       <location/>
       <source>Global Notification Settings...</source>
-      <translation>Ajustes de Notificação Global...</translation>
+      <translation>グローバル通知設定...</translation>
     </message>
   </context>
   <context>
@@ -1732,17 +1732,17 @@
     <message>
       <location filename="../src/ui/widgets/local_settings/popup_settings_widget.ui"/>
       <source>Show all notifications</source>
-      <translation>Mostrar todas notificações</translation>
+      <translation>全ての通知を表示する</translation>
     </message>
     <message>
       <location/>
       <source>System Notifications</source>
-      <translation>Notificações de Sistema</translation>
+      <translation>システム通知</translation>
     </message>
     <message>
       <location/>
       <source>Events</source>
-      <translation type="unfinished">Events</translation>
+      <translation>イベント</translation>
     </message>
   </context>
   <context>
@@ -1750,52 +1750,52 @@
     <message>
       <location filename="../src/ui/dialogs/ptz_manage_dialog.ui"/>
       <source>Save Current Position</source>
-      <translation>Gravar Posição Actual</translation>
+      <translation>現在のポジションを保存</translation>
     </message>
     <message>
       <location/>
       <source>Go To Position</source>
-      <translation>Ir para Posição</translation>
+      <translation>ポジション移動</translation>
     </message>
     <message>
       <location/>
       <source>Create Tour</source>
-      <translation>Criar Tour</translation>
+      <translation>ツアー登録</translation>
     </message>
     <message>
       <location/>
       <source>Start Tour</source>
-      <translation>Iniciar Tour</translation>
+      <translation>ツアー開始</translation>
     </message>
     <message>
       <location/>
       <source>Delete</source>
-      <translation>Apagar</translation>
+      <translation>削除</translation>
     </message>
     <message>
       <location/>
       <source>Details</source>
-      <translation>Detalhes</translation>
+      <translation>詳細</translation>
     </message>
     <message>
       <location/>
       <source>No Tour Selected</source>
-      <translation>Nenhum tour seleccionado</translation>
+      <translation>ツアーが選択されていません</translation>
     </message>
     <message>
       <location/>
       <source>Preview</source>
-      <translation type="unfinished">Preview</translation>
+      <translation>プレビュー</translation>
     </message>
     <message>
       <location/>
       <source>No preview available</source>
-      <translation>Preview não disponível</translation>
+      <translation>プレビュー不可</translation>
     </message>
     <message>
       <location/>
       <source>Get Preview</source>
-      <translation>Obter Preview</translation>
+      <translation>プレビュー取得</translation>
     </message>
   </context>
   <context>
@@ -1803,17 +1803,17 @@
     <message>
       <location filename="../src/ui/dialogs/ptz_preset_dialog.ui"/>
       <source>Save Position</source>
-      <translation>Gravar posição</translation>
+      <translation>ポジション保存</translation>
     </message>
     <message>
       <location/>
       <source>Name:</source>
-      <translation>Nome:</translation>
+      <translation>名前:</translation>
     </message>
     <message>
       <location/>
       <source>Hotkey:</source>
-      <translation>Atalho:</translation>
+      <translation>ホットキー:</translation>
     </message>
   </context>
   <context>
@@ -1821,12 +1821,12 @@
     <message>
       <location filename="../src/ui/dialogs/attach_to_videowall_dialog.ui"/>
       <source>Attach to Video Wall...</source>
-      <translation>Assignar a Video Wall...</translation>
+      <translation>ビデオウォールレイアウト設定...</translation>
     </message>
     <message>
       <location/>
       <source>Preview</source>
-      <translation type="unfinished">Preview</translation>
+      <translation>プレビュー</translation>
     </message>
   </context>
   <context>
@@ -1834,7 +1834,7 @@
     <message>
       <location filename="../src/ui/dialogs/build_number_dialog.ui"/>
       <source>Choose a specific build</source>
-      <translation type="unfinished">Choose a specific build</translation>
+      <translation>特定のビルドを選択</translation>
     </message>
   </context>
   <context>
@@ -1842,7 +1842,7 @@
     <message>
       <location filename="../src/ui/dialogs/camera_bookmark_dialog.ui"/>
       <source>Bookmark</source>
-      <translation type="unfinished">Bookmark</translation>
+      <translation>ブックマーク</translation>
     </message>
   </context>
   <context>
@@ -1850,7 +1850,7 @@
     <message>
       <location filename="../src/ui/dialogs/compatibility_version_installation_dialog.ui"/>
       <source>Installing Compatibility Version...</source>
-      <translation type="unfinished">Installing Compatibility Version...</translation>
+      <translation>互換バージョンをインストールしています...</translation>
     </message>
   </context>
   <context>
@@ -1858,17 +1858,17 @@
     <message>
       <location filename="../src/ui/dialogs/credentials_dialog.ui"/>
       <source>User:</source>
-      <translation>Utilizador:</translation>
+      <translation>ﾕｰｻﾞｰ:</translation>
     </message>
     <message>
       <location/>
       <source>Password:</source>
-      <translation type="unfinished">Password:</translation>
+      <translation>パスワード:</translation>
     </message>
     <message>
       <location/>
       <source>Enter a valid username and password...</source>
-      <translation>Introduza um utilizador e password válido...</translation>
+      <translation>名前とパスワード入力...</translation>
     </message>
   </context>
   <context>
@@ -1876,12 +1876,12 @@
     <message>
       <location filename="../src/ui/widgets/properties/ioport_settings_widget.ui"/>
       <source>Form</source>
-      <translation>Formulário</translation>
+      <translation>フォーム</translation>
     </message>
     <message>
       <location/>
       <source>Enable tile interface</source>
-      <translation type="unfinished">Enable tile interface</translation>
+      <translation>タイルのインタ フェースを有効にする</translation>
     </message>
   </context>
   <context>
@@ -1889,17 +1889,17 @@
     <message>
       <location filename="../src/ui/dialogs/cloud/login_to_cloud_dialog.ui"/>
       <source>Log in</source>
-      <translation type="unfinished">Log in</translation>
+      <translation>ログイン</translation>
     </message>
     <message>
       <location/>
       <source>Stay logged in</source>
-      <translation type="unfinished">Stay logged in</translation>
+      <translation>ログインを維持</translation>
     </message>
     <message>
       <location/>
       <source>Incorrect Email or Password</source>
-      <translation type="unfinished">Incorrect Email or Password</translation>
+      <translation>メールアドレスまたはパスワードが間違っています</translation>
     </message>
   </context>
   <context>
@@ -1907,7 +1907,7 @@
     <message>
       <location filename="../src/ui/dialogs/media_file_settings_dialog.ui"/>
       <source>File Settings</source>
-      <translation>Definições de Ficheiros</translation>
+      <translation>ファイル設定</translation>
     </message>
   </context>
   <context>
@@ -1915,37 +1915,37 @@
     <message>
       <location filename="../src/ui/dialogs/merge_systems_dialog.ui"/>
       <source>Merge Systems...</source>
-      <translation>"Fundir" Sistemas... (Merge)</translation>
+      <translation>システム統合...</translation>
     </message>
     <message>
       <location/>
       <source>Server URL:</source>
-      <translation>URL Servidor:</translation>
+      <translation>サーバー URL:</translation>
     </message>
     <message>
       <location/>
       <source>Password:</source>
-      <translation type="unfinished">Password:</translation>
+      <translation>パスワード:</translation>
     </message>
     <message>
       <location/>
       <source>Check</source>
-      <translation>Verificar</translation>
+      <translation>チェック</translation>
     </message>
     <message>
       <location/>
       <source>You will be reconnected.</source>
-      <translation>Você será reconectado.</translation>
+      <translation>再接続されます.</translation>
     </message>
     <message>
       <location/>
       <source>Login:</source>
-      <translation type="unfinished">Login:</translation>
+      <translation>ログイン:</translation>
     </message>
     <message>
       <location/>
       <source>The new System will have password and name from System:</source>
-      <translation type="unfinished">The new System will have password and name from System:</translation>
+      <translation>新規システムには既存システムより名前とパスワードが引継がれます:</translation>
     </message>
   </context>
   <context>
@@ -1953,27 +1953,27 @@
     <message>
       <location filename="../src/ui/dialogs/notification_sound_manager_dialog.ui"/>
       <source>Notification Sounds</source>
-      <translation>Sons de Notificação</translation>
+      <translation>通知音</translation>
     </message>
     <message>
       <location/>
       <source>Play</source>
-      <translation type="unfinished">Play</translation>
+      <translation>再生</translation>
     </message>
     <message>
       <location/>
       <source>Add...</source>
-      <translation>&amp;Adicionar...</translation>
+      <translation>追加(&amp;A)...</translation>
     </message>
     <message>
       <location/>
       <source>Rename...</source>
-      <translation>Alterar &amp;Nome...</translation>
+      <translation>名前の変更(&amp;R)...</translation>
     </message>
     <message>
       <location/>
       <source>Delete...</source>
-      <translation>&amp;Apagar...</translation>
+      <translation>削除(&amp;D)...</translation>
     </message>
   </context>
   <context>
@@ -1981,7 +1981,7 @@
     <message>
       <location filename="../src/ui/widgets/resource_tree_widget.ui"/>
       <source>Filter</source>
-      <translation>Filtro</translation>
+      <translation>フィルター</translation>
     </message>
   </context>
   <context>
@@ -1989,22 +1989,22 @@
     <message>
       <location filename="../src/ui/widgets/system_settings/routing_management_widget.ui"/>
       <source>Add URL</source>
-      <translation>Adicionar URL</translation>
+      <translation>URL追加</translation>
     </message>
     <message>
       <location/>
       <source>Remove</source>
-      <translation>Remover</translation>
+      <translation>削除</translation>
     </message>
     <message>
       <location/>
       <source>Add</source>
-      <translation>Adicionar</translation>
+      <translation>追加</translation>
     </message>
     <message>
       <location/>
       <source>Removing this connection option could lead to System malfunction.</source>
-      <translation type="unfinished">Removing this connection option could lead to System malfunction.</translation>
+      <translation>この接続オプションを削除するとシステム誤動作の可能性があります.</translation>
     </message>
   </context>
   <context>
@@ -2012,37 +2012,37 @@
     <message>
       <location filename="../src/ui/widgets/system_settings/server_updates_widget.ui"/>
       <source>Cancel</source>
-      <translation>Cancelar</translation>
+      <translation>キャンセル</translation>
     </message>
     <message>
       <location/>
       <source>It looks like the update process is taking more time than usual. Please keep waiting.</source>
-      <translation>Parece que o processo de actualização está a demorar mais tempo que normal. Por favor aguarde.</translation>
+      <translation>通常より時間を要しますがお待ちください.</translation>
     </message>
     <message>
       <location/>
       <source>Check for updates automatically</source>
-      <translation>Verificar automaticamente por versões mais actuais</translation>
+      <translation>更新を自動でチェックする</translation>
     </message>
     <message>
       <location/>
       <source>Updating to...</source>
-      <translation type="unfinished">Updating to...</translation>
+      <translation>更新しています...</translation>
     </message>
     <message>
       <location/>
       <source>Link copied</source>
-      <translation type="unfinished">Link copied</translation>
+      <translation>リンクのコピー</translation>
     </message>
     <message>
       <location/>
       <source>You have the latest version installed</source>
-      <translation type="unfinished">You have the latest version installed</translation>
+      <translation>最新バージョンを利用しています</translation>
     </message>
     <message>
       <location/>
       <source>Applying System updates at the end of the week is not recommended.</source>
-      <translation type="unfinished">Applying System updates at the end of the week is not recommended.</translation>
+      <translation>週末にシステムの更新プログラムを適用することは推奨されません</translation>
     </message>
   </context>
   <context>
@@ -2050,7 +2050,7 @@
     <message>
       <location filename="../src/ui/dialogs/system_administration_dialog.ui"/>
       <source>System Administration</source>
-      <translation>Administração do Sistema</translation>
+      <translation>システムアドミニストレーション</translation>
     </message>
   </context>
   <context>
@@ -2058,32 +2058,32 @@
     <message>
       <location filename="../src/ui/dialogs/two_step_file_dialog.ui"/>
       <source>Folder:</source>
-      <translation>Pasta:</translation>
+      <translation>フォルダー:</translation>
     </message>
     <message>
       <location/>
       <source>Browse...</source>
-      <translation>Procurar...</translation>
+      <translation>参照...</translation>
     </message>
     <message>
       <location/>
       <source>Filename:</source>
-      <translation>Nome ficheiro:</translation>
+      <translation>ファイル名:</translation>
     </message>
     <message>
       <location/>
       <source>Format:</source>
-      <translation>Formato:</translation>
+      <translation>フォーマット:</translation>
     </message>
     <message>
       <location/>
       <source>Options</source>
-      <translation>Opções</translation>
+      <translation>オプション</translation>
     </message>
     <message>
       <location/>
       <source>Warning: file with the same name already exists!</source>
-      <translation type="unfinished">Warning: file with the same name already exists!</translation>
+      <translation>警告: 同じ名前のファイルが既に存在します!</translation>
     </message>
   </context>
   <context>
@@ -2091,7 +2091,7 @@
     <message>
       <location filename="../src/ui/dialogs/update_dialog.ui"/>
       <source>Update Servers</source>
-      <translation>Actualizar Servidores</translation>
+      <translation>更新サーバー</translation>
     </message>
   </context>
   <context>
@@ -2099,47 +2099,47 @@
     <message>
       <location filename="../src/ui/widgets/system_settings/user_management_widget.ui"/>
       <source>LDAP Settings...</source>
-      <translation>Definições LDAP...</translation>
+      <translation>LDAP設定...</translation>
     </message>
     <message>
       <location/>
       <source>New User...</source>
-      <translation>Novo Utilizador...</translation>
+      <translation>新規ユーザー...</translation>
     </message>
     <message>
       <location/>
       <source>Fetch Users from LDAP...</source>
-      <translation>Obter utilizador a partir do LDAP...</translation>
+      <translation>LDAPよりユーザー登録...</translation>
     </message>
     <message>
       <location/>
       <source>Clear Selection</source>
-      <translation>Limpar Selecção</translation>
+      <translation>選択クリア</translation>
     </message>
     <message>
       <location/>
       <source>Search users</source>
-      <translation type="unfinished">Search users</translation>
+      <translation>ユーザを検索</translation>
     </message>
     <message>
       <location/>
       <source>Enable</source>
-      <translation type="unfinished">Enable</translation>
+      <translation>有効</translation>
     </message>
     <message>
       <location/>
       <source>Disable</source>
-      <translation type="unfinished">Disable</translation>
+      <translation>無効</translation>
     </message>
     <message>
       <location/>
       <source>Delete...</source>
-      <translation>&amp;Apagar...</translation>
+      <translation>削除(&amp;D)...</translation>
     </message>
     <message>
       <location/>
       <source>Edit Roles...</source>
-      <translation type="unfinished">Edit Roles...</translation>
+      <translation>役割を編集...</translation>
     </message>
   </context>
   <context>
@@ -2147,17 +2147,17 @@
     <message>
       <location filename="../src/ui/dialogs/resource_properties/videowall_settings_dialog.ui"/>
       <source>Video Wall Settings</source>
-      <translation>Definições Video Wall</translation>
+      <translation>ビデオウォール設定</translation>
     </message>
     <message>
       <location/>
       <source>Launch video wall when Windows starts.</source>
-      <translation>Executar Video Wall quando o Windows arrancar.</translation>
+      <translation>Windows起動時にビデオウォールを開始する.</translation>
     </message>
     <message>
       <location/>
       <source>Place shortcut on desktop.</source>
-      <translation>Colocar atalho no Ambiente de Trabalho.</translation>
+      <translation>デスクトップにショートカットを作成.</translation>
     </message>
   </context>
   <context>
@@ -2165,12 +2165,12 @@
     <message>
       <location filename="../src/ui/dialogs/reconnect_info_dialog.ui"/>
       <source>Reconnecting...</source>
-      <translation>A restabelecer a ligação...</translation>
+      <translation>再接続...</translation>
     </message>
     <message>
       <location/>
       <source>Please wait while the connection is being restored...</source>
-      <translation>Por favor aguarde enquanto a ligação é restabelecida...</translation>
+      <translation>接続が復旧するまでお待ちください...</translation>
     </message>
   </context>
   <context>
@@ -2178,32 +2178,32 @@
     <message>
       <location filename="../src/ui/widgets/business/recording_business_action_widget.ui"/>
       <source>Quality:</source>
-      <translation>Qualidade:</translation>
+      <translation>画質:</translation>
     </message>
     <message>
       <location/>
       <source>FPS</source>
-      <translation type="unfinished">FPS</translation>
+      <translation>FPS</translation>
     </message>
     <message>
       <location/>
       <source>s</source>
-      <translation type="unfinished">s</translation>
+      <translation>s</translation>
     </message>
     <message>
       <location/>
       <source>max</source>
-      <translation>máx</translation>
+      <translation>最大</translation>
     </message>
     <message>
       <location/>
       <source>Pre-Recording:</source>
-      <translation>Pré-Gravação:</translation>
+      <translation>プリレコーディング:</translation>
     </message>
     <message>
       <location/>
       <source>Post-Recording:</source>
-      <translation>Pós gravação:</translation>
+      <translation>ポストレコーディング:</translation>
     </message>
   </context>
   <context>
@@ -2211,42 +2211,42 @@
     <message>
       <location filename="../src/ui/widgets/local_settings/recording_settings_widget.ui"/>
       <source>Temporary Folder</source>
-      <translation>Pasta Temporária</translation>
+      <translation>一時フォルダー</translation>
     </message>
     <message>
       <location/>
       <source>Capture Mode</source>
-      <translation>Modo de Captura</translation>
+      <translation>キャプチャーモード</translation>
     </message>
     <message>
       <location/>
       <source>Fullscreen</source>
-      <translation>Tela Cheia</translation>
+      <translation>フルスクリーン</translation>
     </message>
     <message>
       <location/>
       <source>Application Window</source>
-      <translation>Janela de Aplicação</translation>
+      <translation>アプリケーションウィンドウ</translation>
     </message>
     <message>
       <location/>
       <source>Additional Options</source>
-      <translation>Opções Adicionais</translation>
+      <translation>追加オプション</translation>
     </message>
     <message>
       <location/>
       <source>Disable Aero</source>
-      <translation>Desabilitar Aero</translation>
+      <translation>Aero無効</translation>
     </message>
     <message>
       <location/>
       <source>Capture Cursor</source>
-      <translation>Capturar Cursor</translation>
+      <translation>キャプチャーカーソル</translation>
     </message>
     <message>
       <location/>
       <source>Quality</source>
-      <translation>Qualidade</translation>
+      <translation>画質</translation>
     </message>
     <message>
       <location/>
@@ -2256,17 +2256,17 @@
     <message>
       <location/>
       <source>Browse...</source>
-      <translation>Procurar...</translation>
+      <translation>参照...</translation>
     </message>
     <message>
       <location/>
       <source>Resolution</source>
-      <translation>Resolução:</translation>
+      <translation>解像度:</translation>
     </message>
     <message>
       <location/>
       <source>Recording Quality</source>
-      <translation>Qualidade Gravação:</translation>
+      <translation>録画画質:</translation>
     </message>
   </context>
   <context>
@@ -2274,12 +2274,12 @@
     <message>
       <location filename="../src/ui/widgets/resource_browser_widget.ui"/>
       <source>Resources</source>
-      <translation>Recursos</translation>
+      <translation>リソース</translation>
     </message>
     <message>
       <location/>
       <source>Search</source>
-      <translation>Pesquisar</translation>
+      <translation>検索</translation>
     </message>
   </context>
   <context>
@@ -2287,27 +2287,27 @@
     <message>
       <location filename="../src/ui/widgets/business/say_text_business_action_widget.ui"/>
       <source>Speak the following:</source>
-      <translation>Falar o seguinte:</translation>
+      <translation>読むテキスト:</translation>
     </message>
     <message>
       <location/>
       <source>Type any text here</source>
-      <translation>Introduza texto aqui</translation>
+      <translation>何かテキストを入力してください</translation>
     </message>
     <message>
       <location/>
       <source>Volume:</source>
-      <translation type="unfinished">Volume:</translation>
+      <translation>ボリューム:</translation>
     </message>
     <message>
       <location/>
       <source>Test...</source>
-      <translation>Testar...</translation>
+      <translation>テスト...</translation>
     </message>
     <message>
       <location/>
       <source>Speak to user</source>
-      <translation>Falar para o utilizador</translation>
+      <translation>スピーク</translation>
     </message>
   </context>
   <context>
@@ -2315,12 +2315,12 @@
     <message>
       <location filename="../src/ui/widgets/business/sendmail_business_action_widget.ui"/>
       <source>Additional Recipients:</source>
-      <translation>&amp;Recipientes Adicionais:</translation>
+      <translation>追加の受信者(&amp;A)：</translation>
     </message>
     <message>
       <location/>
       <source>Global Email Settings...</source>
-      <translation>&amp;Definições globais de Email...</translation>
+      <translation>グローバルEmail設定(&amp;G)...</translation>
     </message>
   </context>
   <context>
@@ -2328,32 +2328,32 @@
     <message>
       <location filename="../src/ui/widgets/properties/server_settings_widget.ui"/>
       <source>Ping</source>
-      <translation type="unfinished">Ping</translation>
+      <translation>Ping</translation>
     </message>
     <message>
       <location/>
       <source>Failover</source>
-      <translation type="unfinished">Failover</translation>
+      <translation>フェイルオーバー</translation>
     </message>
     <message>
       <location/>
       <source>Failover Priority...</source>
-      <translation>Prioridade Failover...</translation>
+      <translation>フェイルオーバー優先順位...</translation>
     </message>
     <message>
       <location/>
       <source>Name</source>
-      <translation type="unfinished">Name</translation>
+      <translation>名前</translation>
     </message>
     <message>
       <location/>
       <source>IP Address</source>
-      <translation>Endereço IP:</translation>
+      <translation>IPアドレス:</translation>
     </message>
     <message>
       <location/>
       <source>Port</source>
-      <translation type="unfinished">Port</translation>
+      <translation>ポート</translation>
     </message>
   </context>
   <context>
@@ -2361,17 +2361,17 @@
     <message>
       <location filename="../src/ui/widgets/business/show_on_alarm_layout_action_widget.ui"/>
       <source>for</source>
-      <translation>para</translation>
+      <translation>ユーザー</translation>
     </message>
     <message>
       <location/>
       <source>Force Alarm Layout opening</source>
-      <translation>Forçar abertura do Layout Alarme</translation>
+      <translation>強制的にアラームレイアウトを開く</translation>
     </message>
     <message>
       <location/>
       <source>Also show source camera</source>
-      <translation>Mostrar também a câmara de origem</translation>
+      <translation>ソースカメラも表示する</translation>
     </message>
   </context>
   <context>
@@ -2379,27 +2379,27 @@
     <message>
       <location filename="../src/ui/widgets/business/show_text_overlay_action_widget.ui"/>
       <source>seconds</source>
-      <translation>segundos</translation>
+      <translation>秒</translation>
     </message>
     <message>
       <location/>
       <source>Display text for:</source>
-      <translation>Mostrar o texto durante:</translation>
+      <translation>テキスト表示:</translation>
     </message>
     <message>
       <location/>
       <source>Use custom text:</source>
-      <translation>Utilizar texto customizado:</translation>
+      <translation>カスタムテキストを使用:</translation>
     </message>
     <message>
       <location/>
       <source>Rule will work only for prolonged events</source>
-      <translation>A regra só vai funcionar para eventos prolongados</translation>
+      <translation>ルールは延長イベントのみ適用</translation>
     </message>
     <message>
       <location/>
       <source>Also show on source camera</source>
-      <translation>Também mostrar na câmara original</translation>
+      <translation>ソースカメラも表示する</translation>
     </message>
   </context>
   <context>
@@ -2407,17 +2407,17 @@
     <message>
       <location filename="../src/ui/dialogs/sign_dialog.ui"/>
       <source>Watermark Check</source>
-      <translation>Verificação de Marca de água</translation>
+      <translation>ウォーターマーク チェック</translation>
     </message>
     <message>
       <location/>
       <source>Checked File:</source>
-      <translation>Ficheiro Conferido:</translation>
+      <translation>チェックしたファイル:</translation>
     </message>
     <message>
       <location/>
       <source>Check Result:</source>
-      <translation>Conferir resultado:</translation>
+      <translation>チェック結果:</translation>
     </message>
   </context>
   <context>
@@ -2425,127 +2425,127 @@
     <message>
       <location filename="../src/ui/widgets/properties/single_camera_settings_widget.ui"/>
       <source>General</source>
-      <translation>Geral</translation>
+      <translation>一般</translation>
     </message>
     <message>
       <location/>
       <source>Address</source>
-      <translation>Endereço</translation>
+      <translation>アドレス</translation>
     </message>
     <message>
       <location/>
       <source>Ping</source>
-      <translation type="unfinished">Ping</translation>
+      <translation>Ping</translation>
     </message>
     <message>
       <location/>
       <source>Authentication</source>
-      <translation>Autenticação</translation>
+      <translation>認証</translation>
     </message>
     <message>
       <location/>
       <source>Recording</source>
-      <translation>Gravação</translation>
+      <translation>録画</translation>
     </message>
     <message>
       <location/>
       <source>Motion</source>
-      <translation>Movimento</translation>
+      <translation>モーション</translation>
     </message>
     <message>
       <location/>
       <source>Advanced</source>
-      <translation>Avançado</translation>
+      <translation>アドバンス</translation>
     </message>
     <message>
       <location/>
       <source>Expert</source>
-      <translation>Avançado</translation>
+      <translation>エキスパート</translation>
     </message>
     <message>
       <location/>
       <source>Enable Audio</source>
-      <translation>Activar Áudio</translation>
+      <translation>音声使用</translation>
     </message>
     <message>
       <location/>
       <source>Motion is not available for this camera.</source>
-      <translation>A Detecção de Movimento não está disponível para esta câmara.</translation>
+      <translation>このカメラではモーションが使用できません.</translation>
     </message>
     <message>
       <location/>
       <source>Motion Detection</source>
-      <translation>Detecção de Movimento</translation>
+      <translation>モーション検知</translation>
     </message>
     <message>
       <location/>
       <source>Fisheye</source>
-      <translation type="unfinished">Fisheye</translation>
+      <translation>魚眼</translation>
     </message>
     <message>
       <location/>
       <source>I/O ports</source>
-      <translation>Portas I/O</translation>
+      <translation>IOポート</translation>
     </message>
     <message>
       <location/>
       <source>Name</source>
-      <translation type="unfinished">Name</translation>
+      <translation>名前</translation>
     </message>
     <message>
       <location/>
       <source>Model</source>
-      <translation>Modelo</translation>
+      <translation>モデル</translation>
     </message>
     <message>
       <location/>
       <source>Firmware</source>
-      <translation>Firmware:</translation>
+      <translation>ファームウェア:</translation>
     </message>
     <message>
       <location/>
       <source>Vendor</source>
-      <translation>Fabricante:</translation>
+      <translation>ベンダー:</translation>
     </message>
     <message>
       <location/>
       <source>Audio</source>
-      <translation type="unfinished">Audio</translation>
+      <translation>オーディオ</translation>
     </message>
     <message>
       <location/>
       <source>Login</source>
-      <translation type="unfinished">Login</translation>
+      <translation>ログイン</translation>
     </message>
     <message>
       <location/>
       <source>Password</source>
-      <translation type="unfinished">Password</translation>
+      <translation>パスワード</translation>
     </message>
     <message>
       <location/>
       <source>IP Address</source>
-      <translation>Endereço IP:</translation>
+      <translation>IPアドレス:</translation>
     </message>
     <message>
       <location/>
       <source>Web Page</source>
-      <translation>Página da Web:</translation>
+      <translation>ウェブページ:</translation>
     </message>
     <message>
       <location/>
       <source>MAC Address</source>
-      <translation>Endereço MAC:</translation>
+      <translation>MAC アドレス:</translation>
     </message>
     <message>
       <location/>
       <source>Sensitivity</source>
-      <translation>Sensibilidade:</translation>
+      <translation>感度:</translation>
     </message>
     <message>
       <location/>
       <source>Reset</source>
-      <translation type="unfinished">Reset</translation>
+      <translation>リセット</translation>
     </message>
     <message>
       <location/>
@@ -2558,27 +2558,27 @@
     <message>
       <location filename="../src/ui/widgets/system_settings/smtp/smtp_advanced_settings_widget.ui"/>
       <source>Unsecure Connection</source>
-      <translation>Ligação insegura</translation>
+      <translation>安全でない接続</translation>
     </message>
     <message>
       <location/>
       <source>(recommended)</source>
-      <translation>(recomendado)</translation>
+      <translation>(推奨)</translation>
     </message>
     <message>
       <location/>
       <source>Secure connection using TLS.</source>
-      <translation>Ligação segura usando TLS.</translation>
+      <translation>TLSでの安全な接続.</translation>
     </message>
     <message>
       <location/>
       <source>Secure connection using SSL.</source>
-      <translation>Ligação segura usando SSL.</translation>
+      <translation>SSLでの安全な接続.</translation>
     </message>
     <message>
       <location/>
       <source>Port:</source>
-      <translation>Porto:</translation>
+      <translation>ポート:</translation>
     </message>
   </context>
   <context>
@@ -2586,17 +2586,17 @@
     <message>
       <location filename="../src/ui/widgets/system_settings/smtp/smtp_settings_widget.ui"/>
       <source>Outgoing Email Settings</source>
-      <translation>Definições de envio de Emails</translation>
+      <translation>送信Email 設定</translation>
     </message>
     <message>
       <location/>
       <source>Advanced settings...</source>
-      <translation>Definições avançadas...</translation>
+      <translation>拡張設定...</translation>
     </message>
     <message>
       <location/>
       <source>Test</source>
-      <translation>Testar</translation>
+      <translation>テスト</translation>
     </message>
   </context>
   <context>
@@ -2604,42 +2604,42 @@
     <message>
       <location filename="../src/ui/widgets/system_settings/smtp/smtp_test_connection_widget.ui"/>
       <source>Server:</source>
-      <translation>Servidor:</translation>
+      <translation>サーバー:</translation>
     </message>
     <message>
       <location/>
       <source>Port:</source>
-      <translation>Porto:</translation>
+      <translation>ポート:</translation>
     </message>
     <message>
       <location/>
       <source>User:</source>
-      <translation>Utilizador:</translation>
+      <translation>ﾕｰｻﾞｰ:</translation>
     </message>
     <message>
       <location/>
       <source>Security:</source>
-      <translation>Segurança:</translation>
+      <translation>セキュリティ:</translation>
     </message>
     <message>
       <location/>
       <source>Progress:</source>
-      <translation>Progresso:</translation>
+      <translation>進捗:</translation>
     </message>
     <message>
       <location/>
       <source>Result:</source>
-      <translation>Resultado:</translation>
+      <translation>結果:</translation>
     </message>
     <message>
       <location/>
       <source>OK</source>
-      <translation type="unfinished">OK</translation>
+      <translation>OK</translation>
     </message>
     <message>
       <location/>
       <source>Cancel</source>
-      <translation>Cancelar</translation>
+      <translation>キャンセル</translation>
     </message>
   </context>
   <context>
@@ -2647,22 +2647,22 @@
     <message>
       <location filename="../src/ui/widgets/properties/storage_analytics_widget.ui"/>
       <source>Current Statistics</source>
-      <translation type="unfinished">Current Statistics</translation>
+      <translation>現在の統計</translation>
     </message>
     <message>
       <location/>
       <source>Forecast for Full Storage Usage</source>
-      <translation type="unfinished">Forecast for Full Storage Usage</translation>
+      <translation>ストレージ使用率を予測</translation>
     </message>
     <message>
       <location/>
       <source>Additional storage:</source>
-      <translation>Armazenamento adicional:</translation>
+      <translation>追加ストレージ:</translation>
     </message>
     <message>
       <location/>
       <source>Server is offline. Statistics are not available.</source>
-      <translation type="unfinished">Server is offline. Statistics are not available.</translation>
+      <translation>サーバーがオフラインです　統計情報は利用できません</translation>
     </message>
   </context>
   <context>
@@ -2670,47 +2670,47 @@
     <message>
       <location filename="../src/ui/widgets/properties/storage_config_widget.ui"/>
       <source>Cancel</source>
-      <translation>Cancelar</translation>
+      <translation>キャンセル</translation>
     </message>
     <message>
       <location/>
       <source>Start Backup Now</source>
-      <translation>Iniciar Backup Agora</translation>
+      <translation>バックアップ開始</translation>
     </message>
     <message>
       <location/>
       <source>Add External Storage...</source>
-      <translation>Adicionar Armazenamento Externo...</translation>
+      <translation>外部ストレージの追加...</translation>
     </message>
     <message>
       <location/>
       <source>Storage Locations</source>
-      <translation type="unfinished">Storage Locations</translation>
+      <translation>ストレージの場所</translation>
     </message>
     <message>
       <location/>
       <source>Reindex Archive</source>
-      <translation type="unfinished">Reindex Archive</translation>
+      <translation>アーカイブの再インデックス</translation>
     </message>
     <message>
       <location/>
       <source>Reindex Backup</source>
-      <translation type="unfinished">Reindex Backup</translation>
+      <translation>バックアップの再インデックス</translation>
     </message>
     <message>
       <location/>
       <source>Backup Archive</source>
-      <translation type="unfinished">Backup Archive</translation>
+      <translation>バックアップ アーカイブ</translation>
     </message>
     <message>
       <location/>
       <source>Backup Settings...</source>
-      <translation type="unfinished">Backup Settings...</translation>
+      <translation>バックアップ設定...</translation>
     </message>
     <message>
       <location/>
       <source>Recording to disabled storage will stop. However, deleting outdated footage from it will continue.</source>
-      <translation type="unfinished">Recording to disabled storage will stop. However, deleting outdated footage from it will continue.</translation>
+      <translation>無効になっているストレージへの記録は停止しますが古い記録の削除は実行されます</translation>
     </message>
   </context>
   <context>
@@ -2718,7 +2718,7 @@
     <message>
       <location filename="../src/ui/widgets/properties/storage_rebuild_widget.ui"/>
       <source>Cancel</source>
-      <translation>Cancelar</translation>
+      <translation>キャンセル</translation>
     </message>
   </context>
   <context>
@@ -2726,27 +2726,27 @@
     <message>
       <location filename="../src/ui/dialogs/storage_url_dialog.ui"/>
       <source>Add External Storage...</source>
-      <translation>Adicionar Armazenamento Externo...</translation>
+      <translation>外部ストレージの追加...</translation>
     </message>
     <message>
       <location/>
       <source>Protocol:</source>
-      <translation>Protocolo:</translation>
+      <translation>プロトコル:</translation>
     </message>
     <message>
       <location/>
       <source>URL:</source>
-      <translation type="unfinished">URL:</translation>
+      <translation>URL:</translation>
     </message>
     <message>
       <location/>
       <source>Login:</source>
-      <translation type="unfinished">Login:</translation>
+      <translation>ログイン:</translation>
     </message>
     <message>
       <location/>
       <source>Password:</source>
-      <translation type="unfinished">Password:</translation>
+      <translation>パスワード:</translation>
     </message>
   </context>
   <context>
@@ -2754,22 +2754,22 @@
     <message>
       <location filename="../src/ui/widgets/system_settings/system_settings_widget.ui"/>
       <source>(recommended)</source>
-      <translation>(recomendado)</translation>
+      <translation>(推奨)</translation>
     </message>
     <message>
       <location/>
       <source>Enable audit trail</source>
-      <translation>Activar Trilho de Auditoria</translation>
+      <translation>操作履歴有効</translation>
     </message>
     <message>
       <location/>
       <source>Send anonymous usage and crash statistics to software developers</source>
-      <translation>Enviar estatísticas anónimas de uso e de problemas para os criadores do software</translation>
+      <translation>anonymou使用とクラッシュ統計をソフトウェア開発に送信</translation>
     </message>
     <message>
       <location/>
       <source>Warning! This will make the Quality and Frame Rate (FPS) settings in the Recording Schedule irrelevant.</source>
-      <translation>Aviso! Esta opção irá tornar irrelevantes as definições na agenda de gravação em relação à "Qualidade e Frame Rate (FPS)".</translation>
+      <translation>注： 画質とフレーム数のみで、録画スケジュールには影響しません.</translation>
     </message>
   </context>
   <context>
@@ -2777,14 +2777,13 @@
     <message>
       <location filename="../src/ui/widgets/system_settings/time_server_selection_widget.ui"/>
       <source>System Time</source>
-      <translation type="unfinished">System Time</translation>
+      <translation>システム時刻</translation>
     </message>
     <message>
       <location/>
       <source>System time is synchronized with the Internet and is independent from server local time.
 Selected server will be used as a time server if System has no Internet access.</source>
-      <translation type="unfinished">System time is synchronized with the Internet and is independent from server local time.
-Selected server will be used as a time server if System has no Internet access.</translation>
+      <translation>システム時刻はインターネットと同期しておりサーバ の ローカル時刻とは独立しています　選択したサーバーはインター ネット アクセスがない場合にはタイム サーバーとして使用されます</translation>
     </message>
   </context>
   <context>
@@ -2792,7 +2791,7 @@ Selected server will be used as a time server if System has no Internet access.<
     <message>
       <location filename="../src/ui/widgets/properties/user_profile_widget.ui"/>
       <source>Change Password...</source>
-      <translation type="unfinished">Change Password...</translation>
+      <translation>パスワードの変更...</translation>
     </message>
   </context>
   <context>
@@ -2800,17 +2799,17 @@ Selected server will be used as a time server if System has no Internet access.<
     <message>
       <location filename="../src/ui/widgets/properties/user_role_settings_widget.ui"/>
       <source>Name</source>
-      <translation type="unfinished">Name</translation>
+      <translation>名前</translation>
     </message>
     <message>
       <location/>
       <source>Users</source>
-      <translation type="unfinished">Users</translation>
+      <translation>ユーザー</translation>
     </message>
     <message>
       <location/>
       <source>Delete Role</source>
-      <translation type="unfinished">Delete Role</translation>
+      <translation>役割を削除</translation>
     </message>
   </context>
   <context>
@@ -2818,7 +2817,7 @@ Selected server will be used as a time server if System has no Internet access.<
     <message>
       <location filename="../src/ui/dialogs/resource_properties/user_roles_dialog.ui"/>
       <source>User Roles</source>
-      <translation type="unfinished">User Roles</translation>
+      <translation>ユーザーの役割</translation>
     </message>
     <message>
       <location/>
@@ -2830,7 +2829,7 @@ Click &quot;New role&quot; button to create one.</translation>
     <message>
       <location/>
       <source>New role</source>
-      <translation type="unfinished">New role</translation>
+      <translation>新しい役割</translation>
     </message>
   </context>
   <context>
@@ -2838,17 +2837,17 @@ Click &quot;New role&quot; button to create one.</translation>
     <message>
       <location filename="../src/ui/widgets/properties/user_settings_widget.ui"/>
       <source>User Type</source>
-      <translation type="unfinished">User Type</translation>
+      <translation>ユーザーの種類</translation>
     </message>
     <message>
       <location/>
       <source>Role</source>
-      <translation type="unfinished">Role</translation>
+      <translation>役割</translation>
     </message>
     <message>
       <location/>
       <source>Edit Roles...</source>
-      <translation type="unfinished">Edit Roles...</translation>
+      <translation>役割を編集...</translation>
     </message>
   </context>
   <context>
@@ -2856,27 +2855,27 @@ Click &quot;New role&quot; button to create one.</translation>
     <message>
       <location filename="../src/ui/dialogs/week_time_schedule_dialog.ui"/>
       <source>Schedule Settings</source>
-      <translation>Definições da Agenda</translation>
+      <translation>スケジュール設定</translation>
     </message>
     <message>
       <location/>
       <source>On</source>
-      <translation>Ligado</translation>
+      <translation>On</translation>
     </message>
     <message>
       <location/>
       <source>Off</source>
-      <translation>Desligado</translation>
+      <translation>Off</translation>
     </message>
     <message>
       <location/>
       <source>Schedule</source>
-      <translation>Agenda</translation>
+      <translation>スケジュール</translation>
     </message>
     <message>
       <location/>
       <source>Note: Schedule is based on server time.</source>
-      <translation>Nota: Agenda é baseada na hora do Servidor.</translation>
+      <translation>注: スケジュールはサーバー時間を使用.</translation>
     </message>
   </context>
 </TS>
