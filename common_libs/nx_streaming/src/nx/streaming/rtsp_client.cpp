@@ -1936,7 +1936,7 @@ int QnRtspClient::readSocketWithBuffering( quint8* buf, size_t bufSize, bool rea
 bool QnRtspClient::sendRequestAndReceiveResponse( nx_http::Request&& request, QByteArray& responseBuf )
 {
     int prevStatusCode = nx_http::StatusCode::ok;
-    if (m_rtspAuthCtx.authenticationHeader())
+    if (m_rtspAuthCtx.authenticationHeader() || m_rtspAuthCtx.shouldGuessDigest())
         addAuth( &request );
     addAdditionAttrs( &request );
 
