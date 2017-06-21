@@ -66,6 +66,12 @@ namespace
 
     const QString kRtpTimeoutMs(lit("rtpTimeoutMs"));
     const int kRtpTimeoutMsDefault(10000);
+
+    const QString kCloudConnectUdpHolePunchingEnabled(lit("cloudConnectUdpHolePunchingEnabled"));
+    const bool kCloudConnectUdpHolePunchingEnabledDefault = true;
+
+    const QString kCloudConnectRelayingEnabled(lit("cloudConnectRelayingEnabled"));
+    const bool kCloudConnectRelayingEnabledDefault = true;
 }
 
 using namespace nx::settings_names;
@@ -358,6 +364,16 @@ QnGlobalSettings::AdaptorList QnGlobalSettings::initMiscAdaptors()
         kRtpTimeoutMsDefault,
         this);
 
+    m_cloudConnectUdpHolePunchingEnabledAdaptor = new QnLexicalResourcePropertyAdaptor<bool>(
+        kCloudConnectUdpHolePunchingEnabled,
+        kCloudConnectUdpHolePunchingEnabledDefault,
+        this);
+
+    m_cloudConnectRelayingEnabledAdaptor = new QnLexicalResourcePropertyAdaptor<bool>(
+        kCloudConnectRelayingEnabled,
+        kCloudConnectRelayingEnabledDefault,
+        this);
+
     connect(m_systemNameAdaptor,                    &QnAbstractResourcePropertyAdaptor::valueChanged,   this,   &QnGlobalSettings::systemNameChanged,                   Qt::QueuedConnection);
     connect(m_localSystemIdAdaptor,                 &QnAbstractResourcePropertyAdaptor::valueChanged,   this,   &QnGlobalSettings::localSystemIdChanged,                Qt::QueuedConnection);
     connect(m_disabledVendorsAdaptor,               &QnAbstractResourcePropertyAdaptor::valueChanged,   this,   &QnGlobalSettings::disabledVendorsChanged,              Qt::QueuedConnection);
@@ -369,7 +385,15 @@ QnGlobalSettings::AdaptorList QnGlobalSettings::initMiscAdaptors()
     connect(m_autoDiscoveryEnabledAdaptor,          &QnAbstractResourcePropertyAdaptor::valueChanged,   this,   &QnGlobalSettings::autoDiscoveryChanged,                Qt::QueuedConnection);
     connect(m_updateNotificationsEnabledAdaptor,    &QnAbstractResourcePropertyAdaptor::valueChanged,   this,   &QnGlobalSettings::updateNotificationsChanged,          Qt::QueuedConnection);
     connect(m_upnpPortMappingEnabledAdaptor,        &QnAbstractResourcePropertyAdaptor::valueChanged,   this,   &QnGlobalSettings::upnpPortMappingEnabledChanged,       Qt::QueuedConnection);
-
+    connect(
+        m_cloudConnectUdpHolePunchingEnabledAdaptor, &QnAbstractResourcePropertyAdaptor::valueChanged,
+        this, &QnGlobalSettings::cloudConnectUdpHolePunchingEnabledChanged,
+        Qt::QueuedConnection);
+    connect(
+        m_cloudConnectRelayingEnabledAdaptor, &QnAbstractResourcePropertyAdaptor::valueChanged,
+        this, &QnGlobalSettings::cloudConnectRelayingEnabledChanged,
+        Qt::QueuedConnection);
+    
     QnGlobalSettings::AdaptorList result;
     result
         << m_systemNameAdaptor
@@ -391,6 +415,8 @@ QnGlobalSettings::AdaptorList QnGlobalSettings::initMiscAdaptors()
         << m_maxRecorderQueueSizeBytes
         << m_maxRecorderQueueSizePackets
         << m_rtpFrameTimeoutMs
+        << m_cloudConnectUdpHolePunchingEnabledAdaptor
+        << m_cloudConnectRelayingEnabledAdaptor
         ;
 
     return result;
@@ -940,6 +966,16 @@ int QnGlobalSettings::maxRecorderQueueSizePackets() const
 std::chrono::seconds QnGlobalSettings::proxyConnectTimeout() const
 {
     return std::chrono::seconds(m_proxyConnectTimeoutAdaptor->value());
+}
+
+bool QnGlobalSettings::cloudConnectUdpHolePunchingEnabled() const
+{
+    return m_cloudConnectUdpHolePunchingEnabledAdaptor->value();
+}
+
+bool QnGlobalSettings::cloudConnectRelayingEnabled() const
+{
+    return m_cloudConnectRelayingEnabledAdaptor->value();
 }
 
 bool QnGlobalSettings::takeCameraOwnershipWithoutLock() const
