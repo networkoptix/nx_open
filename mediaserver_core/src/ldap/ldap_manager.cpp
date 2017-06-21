@@ -15,7 +15,6 @@
 #define QSTOCW(s) (const PWCHAR)(s.utf16())
 
 #define FROM_WCHAR_ARRAY QString::fromWCharArray
-#define DIGEST_MD5 L"DIGEST-MD5"
 #define EMPTY_STR L""
 #define LDAP_RESULT ULONG
 #else
@@ -25,7 +24,6 @@
 #define QSTOCW(s) s.toUtf8().constData()
 #define LdapGetLastError() errno
 #define FROM_WCHAR_ARRAY QString::fromUtf8
-#define DIGEST_MD5 "DIGEST-MD5"
 #define EMPTY_STR ""
 #define PWSTR char*
 #define PWCHAR char*
@@ -41,6 +39,8 @@
 #include "network/authutil.h"
 
 namespace {
+    static const int kPageSize = 1000;
+
     Qn::LdapResult translateErrorCode(LDAP_RESULT ldapCode)
     {
         switch(ldapCode)
@@ -158,13 +158,6 @@ struct OpenLdapType : DirectoryType {
 
 
 namespace {
-    static QByteArray md5(QByteArray data)
-    {
-        QCryptographicHash md5(QCryptographicHash::Md5);
-        md5.addData(data);
-        return md5.result();
-    }
-
     static const QString MAIL(lit("mail"));
 }
 
@@ -213,7 +206,6 @@ public:
     QString getUserDn(const QString& login);
     bool testSettings();
     Qn::AuthResult authenticate(const QString &dn, const QString &password);
-    QString getRealm();
 
     LDAP_RESULT lastErrorCode() const;
     QString lastErrorString() const;
@@ -324,30 +316,92 @@ bool LdapSession::fetchUsers(QnLdapUsers &users, const QString& customFilter)
 
     QString filter = QnLdapFilter(m_dType->Filter()) &
         (customFilter.isEmpty() ? m_settings.searchFilter : customFilter);
-    rc = ldap_search_ext_s(m_ld, QSTOCW(m_settings.searchBase), LDAP_SCOPE_SUBTREE, filter.isEmpty() ? 0 : QSTOCW(filter), NULL, 0, NULL, NULL, LDAP_NO_LIMIT, LDAP_NO_LIMIT, &result);
-    if (rc != LDAP_SUCCESS)
-    {
-        m_lastErrorCode = rc;
-        return false;
-    }
 
-    for (e = ldap_first_entry(m_ld, result); e != NULL; e = ldap_next_entry(m_ld, e)) {
-        PWSTR dn;
-        if ((dn = ldap_get_dn(m_ld, e)) != NULL) {
-            QnLdapUser user;
-            user.dn = FROM_WCHAR_ARRAY(dn);
+    berval *cookie = NULL;
+    LDAPControl *pControl = NULL, *serverControls[2], **retServerControls = NULL;
 
-            user.login = GetFirstValue(m_ld, e, m_dType->UidAttr());
-            user.email = GetFirstValue(m_ld, e, MAIL);
-            user.fullName = GetFirstValue(m_ld, e, m_dType->FullNameAttr());
-
-            if (!user.login.isEmpty())
-                users.append(user);
-            ldap_memfree(dn);
+    do {
+        rc = ldap_create_page_control(m_ld, kPageSize, cookie, 1, &pControl);
+        if (rc != LDAP_SUCCESS) {
+            m_lastErrorCode = rc;
+            return false;
         }
-    }
 
-    ldap_msgfree(result);
+        memset(serverControls, 0, sizeof(serverControls));
+        serverControls[0] = pControl; serverControls[1] = NULL;
+
+        rc = ldap_search_ext_s(m_ld, QSTOCW(m_settings.searchBase), LDAP_SCOPE_SUBTREE, filter.isEmpty() ? 0 : QSTOCW(filter), NULL, 0, serverControls, NULL, LDAP_NO_LIMIT,
+    LDAP_NO_LIMIT, &result);
+        if (rc != LDAP_SUCCESS)
+        {
+            if (pControl)
+                ldap_control_free(pControl);
+
+            m_lastErrorCode = rc;
+            return false;
+        }
+
+        int lerrno = 0;
+        char *lerrstr = NULL;
+
+        if((rc = ldap_parse_result(m_ld, result, &lerrno,
+                                            NULL, &lerrstr, NULL,
+                                            &retServerControls, 0)) != LDAP_SUCCESS){
+            if (pControl)
+                ldap_control_free(pControl);
+
+            m_lastErrorCode = rc;
+            return false;
+        }
+
+        ldap_memfree(lerrstr);
+
+        if(cookie){
+            ber_bvfree(cookie);
+            cookie = NULL;
+        }
+
+        ber_int_t entcnt = 0;
+        if((rc = ldap_parse_page_control(m_ld, retServerControls, &entcnt, &cookie)) != LDAP_SUCCESS) {
+            if (pControl)
+                ldap_control_free(pControl);
+
+            m_lastErrorCode = rc;
+            return false;
+        }
+
+        if (retServerControls){
+            ldap_controls_free(retServerControls);
+            retServerControls = NULL;
+        }
+
+        if (pControl){
+            ldap_control_free(pControl);
+            pControl = NULL;
+        }
+
+
+        for (e = ldap_first_entry(m_ld, result); e != NULL; e = ldap_next_entry(m_ld, e)) {
+            PWSTR dn;
+            if ((dn = ldap_get_dn(m_ld, e)) != NULL) {
+                QnLdapUser user;
+                user.dn = FROM_WCHAR_ARRAY(dn);
+
+                user.login = GetFirstValue(m_ld, e, m_dType->UidAttr());
+                user.email = GetFirstValue(m_ld, e, MAIL);
+                user.fullName = GetFirstValue(m_ld, e, m_dType->FullNameAttr());
+
+                if (!user.login.isEmpty())
+                    users.append(user);
+                ldap_memfree(dn);
+            }
+        }
+
+        ldap_msgfree(result);
+    } while (cookie && cookie->bv_val != NULL && (strlen(cookie->bv_val) > 0));
+
+    if(cookie)
+        ber_bvfree(cookie);
 
     return true;
 }
@@ -389,41 +443,6 @@ Qn::AuthResult LdapSession::authenticate(const QString &dn, const QString &passw
     }
 
     return Qn::Auth_OK;
-}
-
-QString LdapSession::getRealm()
-{
-    QString result;
-
-    struct berval cred;
-    cred.bv_len = 0;
-    cred.bv_val = 0;
-
-    // The servresp will contain the digest-challange after the first call.
-    berval *servresp = NULL;
-    LDAP_RESULT res;
-    ldap_sasl_bind_s(m_ld, EMPTY_STR, DIGEST_MD5, &cred, NULL, NULL, &servresp);
-    ldap_get_option(m_ld, LDAP_OPT_ERROR_NUMBER, &res);
-    if (res != LDAP_SASL_BIND_IN_PROGRESS) {
-        m_lastErrorCode = res;
-        return result;
-    }
-
-    QMap<QByteArray, QByteArray> responseDictionary;
-    QByteArray initialResponse(servresp->bv_val, servresp->bv_len);
-    for (QByteArray line : smartSplit(initialResponse, ',')) {
-        line = line.trimmed();
-        int eqIndex = line.indexOf('=');
-        if (eqIndex == -1)
-            continue;
-
-        if (line.mid(0, eqIndex) == "realm") {
-            result = QString::fromLatin1(unquoteStr(line.mid(eqIndex + 1)));
-            break;
-        }
-    }
-
-    return result;
 }
 
 LDAP_RESULT LdapSession::lastErrorCode() const
@@ -527,35 +546,6 @@ Qn::AuthResult QnLdapManager::authenticate(const QString &login, const QString &
     return authResult;
 }
 
-Qn::AuthResult  QnLdapManager::realm(QString* realm) const
-{
-    QnLdapSettings settings = QnGlobalSettings::instance()->ldapSettings();
-    QString uriString = settings.uri.toString();
-    *realm = QString();
-
-    QnMutexLocker _lock(&m_cacheMutex);
-    if (m_realmCache.find(uriString) == m_realmCache.end() )
-    {
-        LdapSession session(settings);
-        if (!session.connect())
-        {
-            NX_LOG( QString::fromLatin1("QnLdapManager::realm: connect(): %1").arg(session.lastErrorString()), cl_logWARNING );
-            return Qn::Auth_LDAPConnectError;
-        }
-
-        QString realm = session.getRealm();
-        if (realm.isEmpty())
-        {
-            NX_LOG( QString::fromLatin1("QnLdapManager::realm: realm(): %1").arg(session.lastErrorString()), cl_logWARNING );
-            return Qn::Auth_LDAPConnectError;
-        }
-
-        m_realmCache.insert(uriString, realm);
-    }
-    *realm = m_realmCache[uriString];
-    return Qn::Auth_OK;
-}
-
 QString QnLdapManager::errorMessage(Qn::LdapResult ldapResult)
 {
     switch(ldapResult)
@@ -572,6 +562,5 @@ QString QnLdapManager::errorMessage(Qn::LdapResult ldapResult)
 void QnLdapManager::clearCache()
 {
     QnMutexLocker lock(&m_cacheMutex);
-    m_realmCache.clear();
     m_dnCache.clear();
 }
