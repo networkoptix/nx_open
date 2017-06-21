@@ -204,6 +204,7 @@
 #include <nx/network/ssl_socket.h>
 #include <nx/network/socket_global.h>
 #include <nx/network/cloud/mediator_connector.h>
+#include <nx/network/cloud/tunnel/tunnel_acceptor_factory.h>
 
 #include <utils/common/app_info.h>
 #include <transcoding/ffmpeg_video_transcoder.h>
@@ -1954,6 +1955,35 @@ bool MediaServerProcess::initTcpListener(
     return true;
 }
 
+void MediaServerProcess::initializeNetworking()
+{
+    nx::network::SocketGlobals::outgoingTunnelPool()
+        .assignOwnPeerId("ms", commonModule()->moduleGUID());
+
+    nx::network::SocketGlobals::addressPublisher().setRetryInterval(
+        nx::utils::parseTimerDuration(
+            qnServerModule->roSettings()->value(MEDIATOR_ADDRESS_UPDATE).toString(),
+            nx::network::cloud::MediatorAddressPublisher::kDefaultRetryInterval));
+
+    connect(
+        commonModule()->globalSettings(), &QnGlobalSettings::cloudConnectUdpHolePunchingEnabledChanged,
+        this, 
+        [this]()
+        {
+            nx::network::cloud::TunnelAcceptorFactory::instance().setUdpHolePunchingEnabled(
+                commonModule()->globalSettings()->cloudConnectUdpHolePunchingEnabled());
+        });
+
+    connect(
+        commonModule()->globalSettings(), &QnGlobalSettings::cloudConnectRelayingEnabledChanged,
+        this, 
+        [this]()
+        {
+            nx::network::cloud::TunnelAcceptorFactory::instance().setRelayingEnabled(
+                commonModule()->globalSettings()->cloudConnectRelayingEnabled());
+        });
+}
+
 std::unique_ptr<nx_upnp::PortMapper> MediaServerProcess::initializeUpnpPortMapper()
 {
     auto mapper = std::make_unique<nx_upnp::PortMapper>(
@@ -2561,7 +2591,8 @@ void MediaServerProcess::run()
     commonModule()->setBeforeRestoreData(beforeRestoreDbData);
 
     commonModule()->setModuleGUID(serverGuid());
-    nx::network::SocketGlobals::outgoingTunnelPool().assignOwnPeerId("ms", commonModule()->moduleGUID());
+
+    initializeNetworking();
 
     bool compatibilityMode = m_cmdLineArguments.devModeKey == lit("razrazraz");
     const QString appserverHostString = qnServerModule->roSettings()->value("appserverHost").toString();
@@ -2940,11 +2971,6 @@ void MediaServerProcess::run()
     commonModule()->resourceDiscoveryManager()->setResourceProcessor(serverResourceProcessor.get());
 
     std::unique_ptr<QnResourceStatusWatcher> statusWatcher( new QnResourceStatusWatcher(commonModule()));
-
-    nx::network::SocketGlobals::addressPublisher().setRetryInterval(
-        nx::utils::parseTimerDuration(
-            qnServerModule->roSettings()->value(MEDIATOR_ADDRESS_UPDATE).toString(),
-            nx::network::cloud::MediatorAddressPublisher::kDefaultRetryInterval));
 
     /* Searchers must be initialized before the resources are loaded as resources instances are created by searchers. */
     QnMediaServerResourceSearchers searchers(commonModule());
