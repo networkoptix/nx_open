@@ -319,14 +319,14 @@ BaseTile
             if (isFactoryTile)
             {
                 var factorySystemHost = areaLoader.item.host;
-                console.log("Trying tp setup factory system <", control.systemName,
+                console.log("Trying to setup factory system <", control.systemName,
                     ">, host <", factorySystemHost, ">");
 
                 /**
                   * Discussed with R. Vasilenko - we can rely on admin/admin
                   * credentials for factory (new) systems. Otherwise it is error
                   * situation  on server side
-                  * TODO: ynikitenkov use helpers::kFactorySystem... from network/system_helpers.h
+                  * TODO: #ynikitenkov use helpers::kFactorySystem... from network/system_helpers.h
                   */
                 var kFactorySystemUser = "admin";
                 var kFactorySystemPassword = "admin";
