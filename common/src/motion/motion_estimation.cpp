@@ -21,7 +21,7 @@
 /* Do not warn about uninitialized variables in this module due to low-level optimization. */
 #pragma warning( disable : 4700 )
 
-#define DEBUG_CPU_MODE
+//#define DEBUG_CPU_MODE
 static const unsigned char BitReverseTable256[] =
 {
     0x00, 0x80, 0x40, 0xC0, 0x20, 0xA0, 0x60, 0xE0, 0x10, 0x90, 0x50, 0xD0, 0x30, 0xB0, 0x70, 0xF0,
@@ -1039,7 +1039,7 @@ bool QnMotionEstimation::analizeFrame(const QnCompressedVideoDataPtr& videoData)
 
     if (!m_decoder->decode(videoData, &m_frames[idx]))
         return false;
-    if (m_frames[idx]->width <= 8 || m_frames[idx]->height <= 8)
+    if (m_frames[idx]->width < Qn::kMotionGridWidth || m_frames[idx]->height < Qn::kMotionGridHeight)
         return false;
     m_videoResolution.setWidth( m_frames[idx]->width );
     m_videoResolution.setHeight( m_frames[idx]->height );
