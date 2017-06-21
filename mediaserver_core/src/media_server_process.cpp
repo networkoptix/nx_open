@@ -5,12 +5,14 @@
 #include <fstream>
 #include <functional>
 #include <signal.h>
-#ifdef __linux__
-#include <signal.h>
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <unistd.h>
+#if defined(__linux__)
+    #include <signal.h>
+    #include <sys/types.h>
+    #include <sys/stat.h>
+    #include <unistd.h>
 #endif
+
+#include <boost/optional.hpp>
 
 #include <qtsinglecoreapplication.h>
 #include <qtservice.h>
@@ -260,17 +262,16 @@
 #include <transaction/message_bus_selector.h>
 
 #if !defined(EDGE_SERVER)
-#include <nx_speech_synthesizer/text_to_wav.h>
-#include <nx/utils/file_system.h>
+    #include <nx_speech_synthesizer/text_to_wav.h>
+    #include <nx/utils/file_system.h>
 #endif
 
 #include <streaming/audio_streamer_pool.h>
 #include <proxy/2wayaudio/proxy_audio_receiver.h>
 
-#ifdef __arm__
-#include "nx1/info.h"
+#if defined(__arm__)
+    #include "nx1/info.h"
 #endif
-#include <config.h>
 
 // This constant is used while checking for compatibility.
 // Do not change it until you know what you're doing.
@@ -526,6 +527,7 @@ static QStringList listRecordFolders(bool includeNetwork = false)
     QStringList folderPaths;
 
 #ifdef Q_OS_WIN
+    using namespace nx::utils::file_system;
     (void)includeNetwork;
     for (const WinDriveInfo& drive: getWinDrivesInfo())
     {
@@ -1606,13 +1608,13 @@ void MediaServerProcess::saveServerInfo(const QnMediaServerResourcePtr& server)
     #endif
 }
 
-void MediaServerProcess::at_updatePublicAddress(const QHostAddress& publicIP)
+void MediaServerProcess::at_updatePublicAddress(const QHostAddress& publicIp)
 {
     if (isStopping())
         return;
 
     QnPeerRuntimeInfo localInfo = commonModule()->runtimeInfoManager()->localInfo();
-    localInfo.data.publicIP = publicIP.toString();
+    localInfo.data.publicIP = publicIp.toString();
     commonModule()->runtimeInfoManager()->updateLocalItem(localInfo);
 
     const auto& resPool = commonModule()->resourcePool();
@@ -1620,7 +1622,7 @@ void MediaServerProcess::at_updatePublicAddress(const QHostAddress& publicIP)
     if (server)
     {
         Qn::ServerFlags serverFlags = server->getServerFlags();
-        if (publicIP.isNull())
+        if (publicIp.isNull())
             serverFlags &= ~Qn::SF_HasPublicIP;
         else
             serverFlags |= Qn::SF_HasPublicIP;
@@ -1634,7 +1636,7 @@ void MediaServerProcess::at_updatePublicAddress(const QHostAddress& publicIP)
             ec2Connection->getMediaServerManager(Qn::kSystemAccess)->save(apiServer, this, [] {});
         }
 
-        if (server->setProperty(Qn::PUBLIC_IP, publicIP.toString(), QnResource::NO_ALLOW_EMPTY))
+        if (server->setProperty(Qn::PUBLIC_IP, publicIp.toString(), QnResource::NO_ALLOW_EMPTY))
             server->saveParams();
 
         updateAddressesList(); //< update interface list to add/remove publicIP
@@ -1780,14 +1782,21 @@ void MediaServerProcess::registerRestHandlers(
     processorPool->registerRedirectRule(lit("/static/"), welcomePage);
 
     auto reg =
-        [processorPool](const QString& path, QnRestRequestHandler* handler,
+        [this, processorPool](
+            const QString& path,
+            QnRestRequestHandler* handler,
             Qn::GlobalPermission permissions = Qn::NoGlobalPermissions)
         {
             processorPool->registerHandler(path, handler, permissions);
+
+            const auto& cameraIdUrlParams = handler->cameraIdUrlParams();
+            if (!cameraIdUrlParams.isEmpty())
+                m_autoRequestForwarder->addCameraIdUrlParams(path, cameraIdUrlParams);
         };
 
     // TODO: When supported by apidoctool, the comment to these constants should be parsed.
     const auto kAdmin = Qn::GlobalAdminPermission;
+    const auto kViewLogs = Qn::GlobalViewLogsPermission;
 
     reg("api/storageStatus", new QnStorageStatusRestHandler());
     reg("api/storageSpace", new QnStorageSpaceRestHandler());
@@ -1815,8 +1824,8 @@ void MediaServerProcess::registerRestHandlers(
     reg("api/pingSystem", new QnPingSystemRestHandler());
     reg("api/rebuildArchive", new QnRebuildArchiveRestHandler());
     reg("api/backupControl", new QnBackupControlRestHandler());
-    reg("api/events", new QnBusinessEventLogRestHandler(), Qn::GlobalViewLogsPermission); //< deprecated
-    reg("api/getEvents", new QnBusinessLog2RestHandler(), Qn::GlobalViewLogsPermission); //< new version
+    reg("api/events", new QnBusinessEventLogRestHandler(), kViewLogs); //< deprecated
+    reg("api/getEvents", new QnBusinessLog2RestHandler(), kViewLogs); //< new version
     reg("api/showLog", new QnLogRestHandler());
     reg("api/getSystemId", new QnGetSystemIdRestHandler());
     reg("api/doCameraDiagnosticsStep", new QnCameraDiagnosticsRestHandler());
@@ -1871,28 +1880,40 @@ void MediaServerProcess::registerRestHandlers(
 
     reg("api/startLiteClient", new QnStartLiteClientRestHandler());
 
-    #ifdef _DEBUG
+    #if defined(_DEBUG)
         reg("api/debugEvent", new QnDebugEventsRestHandler());
     #endif
 
     reg("ec2/runtimeInfo", new QnRuntimeInfoRestHandler());
+}
 
+template<class TcpConnectionProcessor, typename... ExtraParam>
+void MediaServerProcess::regTcp(
+    const QByteArray& protocol, const QString& path, ExtraParam... extraParam)
+{
+    m_universalTcpListener->addHandler<TcpConnectionProcessor>(
+        protocol, path, extraParam...);
+
+    if (TcpConnectionProcessor::doesPathEndWithCameraId())
+        m_autoRequestForwarder->addAllowedProtocolAndPathPart(protocol, path);
 }
 
 bool MediaServerProcess::initTcpListener(
     CloudManagerGroup* const cloudManagerGroup,
     ec2::QnTransactionMessageBusBase* messageBus)
 {
-    m_autoRequestForwarder.reset( new QnAutoRequestForwarder(commonModule() ));
+    m_autoRequestForwarder.reset( new QnAutoRequestForwarder(commonModule()));
     m_autoRequestForwarder->addPathToIgnore(lit("/ec2/*"));
 
-    const int rtspPort = qnServerModule->roSettings()->value(nx_ms_conf::SERVER_PORT, nx_ms_conf::DEFAULT_SERVER_PORT).toInt();
+    const int rtspPort = qnServerModule->roSettings()->value(
+        nx_ms_conf::SERVER_PORT, nx_ms_conf::DEFAULT_SERVER_PORT).toInt();
 
     // Accept SSL connections in all cases as it is always in use by cloud modules and old clients,
     // config value only affects server preference listed in moduleInformation.
     bool acceptSslConnections = true;
-    int maxConnections = qnServerModule->roSettings()->value("maxConnections", QnTcpListener::DEFAULT_MAX_CONNECTIONS).toInt();
-    NX_LOG(QString("Using maxConnections = %1.").arg(maxConnections), cl_logINFO);
+    int maxConnections = qnServerModule->roSettings()->value(
+        "maxConnections", QnTcpListener::DEFAULT_MAX_CONNECTIONS).toInt();
+    NX_INFO(this) lit("Using maxConnections = %1.").arg(maxConnections);
 
     m_universalTcpListener = new QnUniversalTcpListener(
         commonModule(),
@@ -1900,57 +1921,64 @@ bool MediaServerProcess::initTcpListener(
         QHostAddress::Any,
         rtspPort,
         maxConnections,
-        acceptSslConnections );
+        acceptSslConnections);
 
     m_universalTcpListener->httpModManager()->addCustomRequestMod(std::bind(
         &QnAutoRequestForwarder::processRequest,
         m_autoRequestForwarder.get(),
         std::placeholders::_1));
 
-
-#ifdef ENABLE_ACTI
-    QnActiResource::setEventPort(rtspPort);
-    m_universalTcpListener->processorPool()->registerHandler("api/camera_event", new QnActiEventRestHandler());  //used to receive event from acti camera. TODO: remove this from api
-#endif
+    #if defined(ENABLE_ACTI)
+        QnActiResource::setEventPort(rtspPort);
+        // Used to receive event from an acti camera.
+        // TODO: Remove this from api.
+        m_universalTcpListener->processorPool()->registerHandler(
+            "api/camera_event", new QnActiEventRestHandler());
+    #endif
 
     registerRestHandlers(cloudManagerGroup, m_universalTcpListener, messageBus);
 
-    if( !m_universalTcpListener->bindToLocalAddress() )
+    if (!m_universalTcpListener->bindToLocalAddress())
         return false;
     m_universalTcpListener->setDefaultPage("/static/index.html");
 
-    // Server return code 403 (forbidden) instead of 401 if user isn't authorized for requests starting with 'web' path
+    // Server returns code 403 (forbidden) instead of 401 if the user isn't authorized for requests
+    // starting with "web" path.
     m_universalTcpListener->setPathIgnorePrefix("web/");
     QnAuthHelper::instance()->restrictionList()->deny(lit("/web/*"), nx_http::AuthMethod::http);
 
-    nx_http::AuthMethod::Values methods = (nx_http::AuthMethod::Values)(nx_http::AuthMethod::cookie | nx_http::AuthMethod::urlQueryParam | nx_http::AuthMethod::tempUrlQueryParam);
-    QnUniversalRequestProcessor::setUnauthorizedPageBody(QnFileConnectionProcessor::readStaticFile("static/login.html"), methods);
-    m_universalTcpListener->addHandler<QnRtspConnectionProcessor>("RTSP", "*");
-    m_universalTcpListener->addHandler<QnRestConnectionProcessor>("HTTP", "api");
-    m_universalTcpListener->addHandler<QnRestConnectionProcessor>("HTTP", "ec2");
-    m_universalTcpListener->addHandler<QnFileConnectionProcessor>("HTTP", "static");
-    m_universalTcpListener->addHandler<QnCrossdomainConnectionProcessor>("HTTP", "crossdomain.xml");
-    m_universalTcpListener->addHandler<QnProgressiveDownloadingConsumer>("HTTP", "media");
-    m_universalTcpListener->addHandler<QnIOMonitorConnectionProcessor>("HTTP", "api/iomonitor");
+    nx_http::AuthMethod::Values methods = (nx_http::AuthMethod::Values) (
+        nx_http::AuthMethod::cookie |
+        nx_http::AuthMethod::urlQueryParam |
+        nx_http::AuthMethod::tempUrlQueryParam);
+    QnUniversalRequestProcessor::setUnauthorizedPageBody(
+        QnFileConnectionProcessor::readStaticFile("static/login.html"), methods);
+    regTcp<QnRtspConnectionProcessor>("RTSP", "*");
+    regTcp<QnRestConnectionProcessor>("HTTP", "api");
+    regTcp<QnRestConnectionProcessor>("HTTP", "ec2");
+    regTcp<QnFileConnectionProcessor>("HTTP", "static");
+    regTcp<QnCrossdomainConnectionProcessor>("HTTP", "crossdomain.xml");
+    regTcp<QnProgressiveDownloadingConsumer>("HTTP", "media");
+    regTcp<QnIOMonitorConnectionProcessor>("HTTP", "api/iomonitor");
 
     nx_hls::QnHttpLiveStreamingProcessor::setMinPlayListSizeToStartStreaming(
         qnServerModule->roSettings()->value(
         nx_ms_conf::HLS_PLAYLIST_PRE_FILL_CHUNKS,
         nx_ms_conf::DEFAULT_HLS_PLAYLIST_PRE_FILL_CHUNKS).toInt());
-    m_universalTcpListener->addHandler<nx_hls::QnHttpLiveStreamingProcessor>("HTTP", "hls");
-    //m_universalTcpListener->addHandler<QnDefaultTcpConnectionProcessor>("HTTP", "*");
+    regTcp<nx_hls::QnHttpLiveStreamingProcessor>("HTTP", "hls");
+    //regTcp<QnDefaultTcpConnectionProcessor>("HTTP", "*");
 
-    m_universalTcpListener->addHandler<QnProxyConnectionProcessor>("*", "proxy", messageBus);
-    //m_universalTcpListener->addHandler<QnProxyReceiverConnection>("PROXY", "*");
-    m_universalTcpListener->addHandler<QnProxyReceiverConnection>("HTTP", "proxy-reverse");
-    m_universalTcpListener->addHandler<QnAudioProxyReceiver>("HTTP", "proxy-2wayaudio");
+    regTcp<QnProxyConnectionProcessor>("*", "proxy", messageBus);
+    //regTcp<QnProxyReceiverConnection>("PROXY", "*");
+    regTcp<QnProxyReceiverConnection>("HTTP", "proxy-reverse");
+    regTcp<QnAudioProxyReceiver>("HTTP", "proxy-2wayaudio");
 
-    if( !qnServerModule->roSettings()->value("authenticationEnabled", "true").toBool() )
+    if( !qnServerModule->roSettings()->value("authenticationEnabled", "true").toBool())
         m_universalTcpListener->disableAuth();
 
-#ifdef ENABLE_DESKTOP_CAMERA
-    m_universalTcpListener->addHandler<QnDesktopCameraRegistrator>("HTTP", "desktop_camera");
-#endif   //ENABLE_DESKTOP_CAMERA
+    #if defined(ENABLE_DESKTOP_CAMERA)
+        regTcp<QnDesktopCameraRegistrator>("HTTP", "desktop_camera");
+    #endif
 
     return true;
 }
@@ -2437,6 +2465,7 @@ void MediaServerProcess::run()
 
     if (m_serviceMode)
         serviceModeInit();
+
     updateAllowedInterfaces();
 
     if (!m_cmdLineArguments.enforceSocketType.isEmpty())
@@ -2895,8 +2924,10 @@ void MediaServerProcess::run()
     NX_ASSERT(qnServerModule->roSettings()->value(APPSERVER_PASSWORD).toString().isEmpty(), Q_FUNC_INFO, "appserverPassword is not emptyu in registry. Restart the server as Administrator");
 #endif
 
-    if (needToStop()) {
+    if (needToStop())
+    {
         stopObjects();
+        m_ipDiscovery.reset();
         return;
     }
     const auto& resPool = commonModule()->resourcePool();

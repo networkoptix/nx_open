@@ -32,10 +32,8 @@ private:
     QnConstResourceVideoLayoutPtr getDefaultVideoLayout() const;
     int getChannelCount() const;
 protected:
-    QnResourceVideoLayoutPtr m_vrl;
-    bool m_isRotated;    
-    mutable QnCustomResourceVideoLayoutPtr m_rotatedLayout;
-    QElapsedTimer m_flipTimer;
+    bool m_isRotated;
+    mutable QSharedPointer<QnCustomResourceVideoLayout> m_customVideoLayout;
     mutable QnResourceVideoLayoutPtr m_defaultVideoLayout;
     mutable QnMutex m_layoutMutex;
 };

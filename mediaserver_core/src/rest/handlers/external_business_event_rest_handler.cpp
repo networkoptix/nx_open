@@ -1,7 +1,5 @@
 #include "external_business_event_rest_handler.h"
 
-#include <QtCore/QFileInfo>
-
 #include <core/resource/resource.h>
 #include <core/resource_access/user_access_data.h>
 
@@ -14,6 +12,7 @@
 #include <nx/fusion/model_functions.h>
 #include "common/common_module.h"
 #include <rest/server/rest_connection_processor.h>
+#include <nx/utils/string.h>
 
 QnExternalBusinessEventRestHandler::QnExternalBusinessEventRestHandler()
 {

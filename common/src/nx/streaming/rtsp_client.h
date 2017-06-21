@@ -192,7 +192,10 @@ public:
     //typedef QMap<int, QSharedPointer<SDPTrackInfo> > TrackMap;
     typedef QVector<QSharedPointer<SDPTrackInfo> > TrackMap;
 
-    QnRtspClient( std::unique_ptr<AbstractStreamSocket> tcpSock = std::unique_ptr<AbstractStreamSocket>() );
+    QnRtspClient(
+        bool shouldGuessAuthDigest,
+        std::unique_ptr<AbstractStreamSocket> tcpSock = std::unique_ptr<AbstractStreamSocket>());
+
     ~QnRtspClient();
 
     // returns \a CameraDiagnostics::ErrorCode::noError if stream was opened, error code - otherwise

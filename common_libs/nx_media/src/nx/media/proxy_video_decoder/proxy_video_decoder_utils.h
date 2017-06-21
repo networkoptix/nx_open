@@ -21,9 +21,8 @@ namespace media {
 
 namespace proxy_video_decoder {
 
-class Ini: public nx::kit::IniConfig
+struct Ini: public nx::kit::IniConfig
 {
-public:
     Ini(): IniConfig("ProxyVideoDecoder.ini") {}
 
     NX_INI_FLAG(0, disable, "Fully disable ProxyVideoDecoder: isCompatible() -> false.");

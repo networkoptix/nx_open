@@ -33,7 +33,8 @@ MEDIASERVER_STORAGE_PATH = 'var/data'
 MEDIASERVER_UNSETUP_LOCAL_SYSTEM_ID = '{00000000-0000-0000-0000-000000000000}'  # local system id for not set up server
 
 MEDIASERVER_CREDENTIALS_TIMEOUT_SEC = 60 * 5
-MEDIASERVER_MERGE_TIMEOUT_SEC = MEDIASERVER_CREDENTIALS_TIMEOUT_SEC
+MEDIASERVER_MERGE_TIMEOUT_SEC = MEDIASERVER_CREDENTIALS_TIMEOUT_SEC  # timeout for local system ids become the same
+MEDIASERVER_MERGE_REQUEST_TIMEOUT_SEC = 90  # timeout for mergeSystems REST api request
 
 DEFAULT_SERVER_LOG_LEVEL = 'DEBUG2'
 
@@ -339,6 +340,7 @@ class Server(object):
             getKey=make_key('GET'),
             postKey=make_key('POST'),
             takeRemoteSettings=take_remote_settings,
+            timeout_sec=MEDIASERVER_MERGE_REQUEST_TIMEOUT_SEC,
             )
         if take_remote_settings:
             self.set_user_password(other_server.user, other_server.password)

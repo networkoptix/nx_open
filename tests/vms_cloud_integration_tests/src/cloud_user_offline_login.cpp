@@ -8,6 +8,7 @@
 #include <nx/network/http/auth_tools.h>
 
 #include "mediaserver_cloud_integration_test_setup.h"
+#include <nx/utils/string.h>
 
 namespace {
 
