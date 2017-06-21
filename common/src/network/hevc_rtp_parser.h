@@ -84,7 +84,7 @@ private:
         int payloadLength);
 
     inline bool skipDonIfNeeded(
-        const uint8_t** outPayload, 
+        const uint8_t** outPayload,
         int* outPayloadLength,
         DonType donType = DonType::Donl);
 
@@ -93,7 +93,7 @@ private:
     inline void goBackForPayloadHeader(const uint8_t** outPayload, int* outPayloadLength);
 
     void updateNalFlags(
-        nx::media_utils::hevc::NalUnitType header, 
+        nx::media_utils::hevc::NalUnitType header,
         const uint8_t* payload,
         int payloadLength);
 
@@ -119,7 +119,7 @@ private:
     bool extractPictureDimensionsFromSps(const uint8_t* buffer, int bufferLength);
 
     bool reset(bool softReset = false); //< Always returns false
-    
+
 private:
     HevcContext m_context;
 

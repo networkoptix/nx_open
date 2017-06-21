@@ -396,7 +396,7 @@ bool HevcParser::handleAggregationPacket(
             return false;
 
         updateNalFlags(nalHeader.unitType, payload, payloadLength);
-            
+
         m_chunks.emplace_back(payload - m_rtpBufferBase, nalSize, true);
         m_videoFrameSize += nalSize;
         ++m_numberOfNalUnits;
@@ -555,7 +555,7 @@ QnCompressedVideoDataPtr HevcParser::createVideoData(
         result->timestamp = m_timeHelper->getUsecTime(rtpTime, statistics, m_context.frequency);
     else
         result->timestamp = qnSyncTime->currentMSecsSinceEpoch() * 1000;
-    
+
     return result;
 }
 
@@ -585,7 +585,7 @@ bool HevcParser::reset(bool softReset)
     m_numberOfNalUnits = 0;
     m_rtpBufferBase = nullptr;
     m_chunks.clear();
-    
+
     return false;
 }
 
@@ -621,7 +621,7 @@ void HevcParser::insertPayloadHeader(
 int HevcParser::additionalBufferSize() const
 {
     int additionalBufferSize = 0;
-    
+
     // Space for parameter sets with NAL prefixes
     if (!m_context.inStreamVpsFound && m_context.spropVps)
         additionalBufferSize += sizeof(hevc::kNalUnitPrefix) + m_context.spropVps->size();

@@ -31,7 +31,7 @@ bool Sps::decode(const uint8_t* payload, int payloadLength)
         payload + payloadLength,
         rawDecodedNalBuffer,
         payloadLength + kReservedNalSpace);
-    
+
     BitStreamReader reader;
     reader.setBuffer(rawDecodedNalBuffer, rawDecodedNalBuffer + payloadLength);
 
@@ -45,7 +45,7 @@ bool Sps::decode(const uint8_t* payload, int payloadLength)
             /*profileFlagPresent*/ true,
             spsMaxSubLayersMinus1,
             &profileTierLevel);
-        
+
         if (!result)
             return false;
 
@@ -80,7 +80,7 @@ bool Sps::decodeProfileTierLevel(
         decodeLayer(reader, &(outProfileTierLevel->general));
     else
         outProfileTierLevel->general.levelIdc = reader.getBits(8);
-    
+
     for (auto i = 0; i < maxSublayersMinus1; ++i)
     {
         ProfileTierLevel::SubLayerPresenceFlags flags;
@@ -96,7 +96,7 @@ bool Sps::decodeProfileTierLevel(
         for (auto i = maxSublayersMinus1; i < 8; ++i)
             reader.skipBits(2); // < reserved_zero_2bits
     }
-      
+
     for (auto i = 0; i < maxSublayersMinus1; ++i)
     {
         if (outProfileTierLevel->subLayerPresenceFlags[i].subLayerProfilePresentFlag)
@@ -179,7 +179,7 @@ bool Sps::decodeLayer(BitStreamReader& reader, ProfileTierLevel::Layer* outLayer
         reader.skipBits(32);
         reader.skipBits(11); //< reserved_zero_43_bits
     }
-    
+
     condition = (outLayer->profileIdc >= 1 && outLayer->profileIdc <= 5)
         || outLayer->profileIdc == 9
         || outLayer->profileCompatibilityFlags[1]

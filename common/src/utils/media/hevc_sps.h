@@ -55,7 +55,7 @@ struct ProfileTierLevel
 
     Layer general;
     std::vector<SubLayerPresenceFlags> subLayerPresenceFlags;
-    std::vector<Layer> subLayers;    
+    std::vector<Layer> subLayers;
 };
 
 struct VuiParameters

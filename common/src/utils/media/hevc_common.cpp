@@ -14,7 +14,7 @@ static const uint8_t kStartFuPacketMask = 0x80;
 static const uint8_t kEndFuPacketMask = 0x40;
 static const uint8_t kFuNalUnitTypeMask = 0x3f;
 
-} // namespace 
+} // namespace
 
 bool FuHeader::decode(const uint8_t* const payload, int payloadLength)
 {
@@ -38,7 +38,7 @@ bool NalUnitHeader::decode(const uint8_t* const payload, int payloadLength)
 
     unitType = (NalUnitType)((payload[0] & kPayloadHeaderNalUnitTypeMask) >> 1);
     layerId = ((*((uint16_t*)payload) & kPayloadHeaderLayerIdMask) >> kTidFieldLengthBit);
-    
+
     if (layerId) //< Should always be zero
         return false;
 
