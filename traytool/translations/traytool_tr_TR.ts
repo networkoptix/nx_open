@@ -1,117 +1,117 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
-<TS version="2.1" language="pt-PT" sourcelanguage="en">
+<TS version="2.1" language="tr" sourcelanguage="en">
   <context>
     <name>QObject</name>
     <message>
       <source>System Tray</source>
-      <translation>Barra do sistema</translation>
+      <translation>Sistem Tepsisi</translation>
     </message>
     <message>
       <source>There is no system tray on this system.</source>
-      <translation>Não existe uma 'barra de sistema' neste sistema.</translation>
+      <translation>Bu Sistem Üzerinde Sistem Tepsisi Bulunmuyor.</translation>
     </message>
     <message>
       <source>Application will now quit.</source>
-      <translation>A aplicação vai fechar agora.</translation>
+      <translation>Uygulamadan Çıkılacak.</translation>
     </message>
   </context>
   <context>
     <name>QnElevationChecker</name>
     <message>
       <source>Insufficient rights to manage services.</source>
-      <translation>Privilégio insuficiente para gerir os serviços.</translation>
+      <translation>Servisleri Yönetmek İçin İzinler Yetersiz.</translation>
     </message>
     <message>
       <source>UAC must be enabled to request privileges for non-admin users.</source>
-      <translation>É necessário activar o UAC para requerer privilégios para utilizadores não-admin.</translation>
+      <translation>Yönetici Olmayan Kullanıcılara Ayrıcalık Tanımak İçin UAC Etkinleştirilmelidir.</translation>
     </message>
   </context>
   <context>
     <name>QnSystrayWindow</name>
     <message>
       <source>Access denied.</source>
-      <translation>Acesso proibido.</translation>
+      <translation>Erişim reddedildi.</translation>
     </message>
     <message>
       <source>Specified database does not exist.</source>
-      <translation>A base de dados especificada não existe.</translation>
+      <translation>Belirtilen Veritabanı Yok.</translation>
     </message>
     <message>
       <source>Specified parameter is invalid.</source>
-      <translation>O parâmetro específico é inválido.</translation>
+      <translation>Belirtilen Parametre Geçersiz.</translation>
     </message>
     <message>
       <source>Could not access installed services</source>
-      <translation>Não foi possível acede aos serviços instalados</translation>
+      <translation>Kurulu Servislere Erişilemiyor</translation>
     </message>
     <message>
       <source>No %1 services installed</source>
-      <translation>Nenhuns serviços %1 instalados</translation>
+      <translation>%1 Servisler Kurulamadı</translation>
     </message>
     <message>
       <source>&amp;Quit</source>
-      <translation>&amp;Fechar</translation>
+      <translation>&amp;Çıkış</translation>
     </message>
     <message>
       <source>An error has occurred while trying to access installed services:</source>
-      <translation>Ocorreu um erro enquanto tentava aceder aos serviços instalados:</translation>
+      <translation>Kurulu Servislere Erişmeye Çalışırken Hata Oluştu:</translation>
     </message>
     <message>
       <source>Server has been stopped</source>
-      <translation type="unfinished">Server has been stopped</translation>
+      <translation>Sunucu Durduruldu</translation>
     </message>
     <message>
       <source>Server has been started</source>
-      <translation type="unfinished">Server has been started</translation>
+      <translation>Sunucu Başlatıldı</translation>
     </message>
     <message>
       <source>Server will be stopped. Continue?</source>
-      <translation>O Servidor Media vai ser parado. Continuar?</translation>
+      <translation>Sunucu durdurulacak. Devam edilsin mi?</translation>
     </message>
     <message>
       <source>Show Server Log</source>
-      <translation type="unfinished">Show Server Log</translation>
+      <translation>Sunucu günlüğü göster</translation>
     </message>
     <message>
       <source>Start Server</source>
-      <translation type="unfinished">Start Server</translation>
+      <translation>Başlat</translation>
     </message>
     <message>
       <source>Stop Server</source>
-      <translation type="unfinished">Stop Server</translation>
+      <translation>Durdur</translation>
     </message>
     <message>
       <source>Server Web Page</source>
-      <translation type="unfinished">Server Web Page</translation>
+      <translation>Sunucu web sayfası</translation>
     </message>
     <message>
       <source>stopped</source>
-      <translation type="unfinished">stopped</translation>
+      <translation>Durduruldu</translation>
     </message>
     <message>
       <source>starting</source>
-      <translation type="unfinished">starting</translation>
+      <translation>Başlatılıyor</translation>
     </message>
     <message>
       <source>stopping</source>
-      <translation type="unfinished">stopping</translation>
+      <translation>durduruluyor</translation>
     </message>
     <message>
       <source>started</source>
-      <translation type="unfinished">started</translation>
+      <translation>başlatıldı</translation>
     </message>
     <message>
       <source>resuming</source>
-      <translation type="unfinished">resuming</translation>
+      <translation>sürdürülüyor</translation>
     </message>
     <message>
       <source>paused</source>
-      <translation type="unfinished">paused</translation>
+      <translation>duraklatıldı</translation>
     </message>
     <message>
       <source>pausing</source>
-      <translation type="unfinished">pausing</translation>
+      <translation>duraklatılıyor</translation>
     </message>
   </context>
 </TS>

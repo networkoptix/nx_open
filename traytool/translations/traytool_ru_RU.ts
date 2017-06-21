@@ -1,117 +1,117 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
-<TS version="2.1" language="pt-PT" sourcelanguage="en">
+<TS version="2.1" language="ru" sourcelanguage="en">
   <context>
     <name>QObject</name>
     <message>
       <source>System Tray</source>
-      <translation>Barra do sistema</translation>
+      <translation>Панель задач</translation>
     </message>
     <message>
       <source>There is no system tray on this system.</source>
-      <translation>Não existe uma 'barra de sistema' neste sistema.</translation>
+      <translation>В данной системе нет панели задач.</translation>
     </message>
     <message>
       <source>Application will now quit.</source>
-      <translation>A aplicação vai fechar agora.</translation>
+      <translation>Приложение будет закрыто.</translation>
     </message>
   </context>
   <context>
     <name>QnElevationChecker</name>
     <message>
       <source>Insufficient rights to manage services.</source>
-      <translation>Privilégio insuficiente para gerir os serviços.</translation>
+      <translation>Недостачно прав для управления сервисами.</translation>
     </message>
     <message>
       <source>UAC must be enabled to request privileges for non-admin users.</source>
-      <translation>É necessário activar o UAC para requerer privilégios para utilizadores não-admin.</translation>
+      <translation>Контроль учетных записей (UAC) должен быть включён для запроса привилегий пользователей.</translation>
     </message>
   </context>
   <context>
     <name>QnSystrayWindow</name>
     <message>
       <source>Access denied.</source>
-      <translation>Acesso proibido.</translation>
+      <translation>В доступе отказано.</translation>
     </message>
     <message>
       <source>Specified database does not exist.</source>
-      <translation>A base de dados especificada não existe.</translation>
+      <translation>Запрошенная база данных не существует.</translation>
     </message>
     <message>
       <source>Specified parameter is invalid.</source>
-      <translation>O parâmetro específico é inválido.</translation>
+      <translation>Указан неверный параметр.</translation>
     </message>
     <message>
       <source>Could not access installed services</source>
-      <translation>Não foi possível acede aos serviços instalados</translation>
+      <translation>Невозможно получить доступ к установленным сервисам</translation>
     </message>
     <message>
       <source>No %1 services installed</source>
-      <translation>Nenhuns serviços %1 instalados</translation>
+      <translation>Сервисы %1 не установлены</translation>
     </message>
     <message>
       <source>&amp;Quit</source>
-      <translation>&amp;Fechar</translation>
+      <translation>Выход</translation>
     </message>
     <message>
       <source>An error has occurred while trying to access installed services:</source>
-      <translation>Ocorreu um erro enquanto tentava aceder aos serviços instalados:</translation>
+      <translation>Ошибка при попытке доступа к следующим сервисам:</translation>
     </message>
     <message>
       <source>Server has been stopped</source>
-      <translation type="unfinished">Server has been stopped</translation>
+      <translation>Сервер остановлен</translation>
     </message>
     <message>
       <source>Server has been started</source>
-      <translation type="unfinished">Server has been started</translation>
+      <translation>Сервер запущен</translation>
     </message>
     <message>
       <source>Server will be stopped. Continue?</source>
-      <translation>O Servidor Media vai ser parado. Continuar?</translation>
+      <translation>Сервер будет остановлен. Продолжить?</translation>
     </message>
     <message>
       <source>Show Server Log</source>
-      <translation type="unfinished">Show Server Log</translation>
+      <translation>Показать журнал сервера</translation>
     </message>
     <message>
       <source>Start Server</source>
-      <translation type="unfinished">Start Server</translation>
+      <translation>Запустить сервер</translation>
     </message>
     <message>
       <source>Stop Server</source>
-      <translation type="unfinished">Stop Server</translation>
+      <translation>Остановить сервер</translation>
     </message>
     <message>
       <source>Server Web Page</source>
-      <translation type="unfinished">Server Web Page</translation>
+      <translation>Открыть web-страницу сервера</translation>
     </message>
     <message>
       <source>stopped</source>
-      <translation type="unfinished">stopped</translation>
+      <translation>остановлен</translation>
     </message>
     <message>
       <source>starting</source>
-      <translation type="unfinished">starting</translation>
+      <translation>запускается</translation>
     </message>
     <message>
       <source>stopping</source>
-      <translation type="unfinished">stopping</translation>
+      <translation>заканчивает работу</translation>
     </message>
     <message>
       <source>started</source>
-      <translation type="unfinished">started</translation>
+      <translation>запущен</translation>
     </message>
     <message>
       <source>resuming</source>
-      <translation type="unfinished">resuming</translation>
+      <translation>возобновляется</translation>
     </message>
     <message>
       <source>paused</source>
-      <translation type="unfinished">paused</translation>
+      <translation>приостановлен</translation>
     </message>
     <message>
       <source>pausing</source>
-      <translation type="unfinished">pausing</translation>
+      <translation>приостанавливается</translation>
     </message>
   </context>
 </TS>

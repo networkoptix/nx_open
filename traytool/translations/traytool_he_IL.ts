@@ -1,117 +1,117 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
-<TS version="2.1" language="pt-PT" sourcelanguage="en">
+<TS version="2.1" language="he" sourcelanguage="en">
   <context>
     <name>QObject</name>
     <message>
       <source>System Tray</source>
-      <translation>Barra do sistema</translation>
+      <translation>איזור ההודעות</translation>
     </message>
     <message>
       <source>There is no system tray on this system.</source>
-      <translation>Não existe uma 'barra de sistema' neste sistema.</translation>
+      <translation>אין איזור הודעות במערכת זו.</translation>
     </message>
     <message>
       <source>Application will now quit.</source>
-      <translation>A aplicação vai fechar agora.</translation>
+      <translation>התוכנה תסגר כעת.</translation>
     </message>
   </context>
   <context>
     <name>QnElevationChecker</name>
     <message>
       <source>Insufficient rights to manage services.</source>
-      <translation>Privilégio insuficiente para gerir os serviços.</translation>
+      <translation>הרשאות לא מספיקות לניהול שירותים.</translation>
     </message>
     <message>
       <source>UAC must be enabled to request privileges for non-admin users.</source>
-      <translation>É necessário activar o UAC para requerer privilégios para utilizadores não-admin.</translation>
+      <translation>חובה לאפשר "בקרת חשבון משתמש" (UAC) על מנת לבקש הרשאות למשתמשים שאינם מנהלים.</translation>
     </message>
   </context>
   <context>
     <name>QnSystrayWindow</name>
     <message>
       <source>Access denied.</source>
-      <translation>Acesso proibido.</translation>
+      <translation>הגישה נדחתה.</translation>
     </message>
     <message>
       <source>Specified database does not exist.</source>
-      <translation>A base de dados especificada não existe.</translation>
+      <translation>מסד הנתונים שצוין לא קיים.</translation>
     </message>
     <message>
       <source>Specified parameter is invalid.</source>
-      <translation>O parâmetro específico é inválido.</translation>
+      <translation>הפרמטר שצוין איננו תקין.</translation>
     </message>
     <message>
       <source>Could not access installed services</source>
-      <translation>Não foi possível acede aos serviços instalados</translation>
+      <translation>לא ניתן לגשת לשירותים המותקנים</translation>
     </message>
     <message>
       <source>No %1 services installed</source>
-      <translation>Nenhuns serviços %1 instalados</translation>
+      <translation>אין שירותי %1 מותקנים</translation>
     </message>
     <message>
       <source>&amp;Quit</source>
-      <translation>&amp;Fechar</translation>
+      <translation>&amp;יציאה</translation>
     </message>
     <message>
       <source>An error has occurred while trying to access installed services:</source>
-      <translation>Ocorreu um erro enquanto tentava aceder aos serviços instalados:</translation>
+      <translation>אירעה שגיאה במהלך נסיון לגשת לשירותים מותקנים:</translation>
     </message>
     <message>
       <source>Server has been stopped</source>
-      <translation type="unfinished">Server has been stopped</translation>
+      <translation>השרת נעצר</translation>
     </message>
     <message>
       <source>Server has been started</source>
-      <translation type="unfinished">Server has been started</translation>
+      <translation>השרת הופעל</translation>
     </message>
     <message>
       <source>Server will be stopped. Continue?</source>
-      <translation>O Servidor Media vai ser parado. Continuar?</translation>
+      <translation>שרת המדיה יעצר. להמשיך?</translation>
     </message>
     <message>
       <source>Show Server Log</source>
-      <translation type="unfinished">Show Server Log</translation>
+      <translation>הצג יומן שרת</translation>
     </message>
     <message>
       <source>Start Server</source>
-      <translation type="unfinished">Start Server</translation>
+      <translation>הפעל שרת</translation>
     </message>
     <message>
       <source>Stop Server</source>
-      <translation type="unfinished">Stop Server</translation>
+      <translation>עצור את השרת</translation>
     </message>
     <message>
       <source>Server Web Page</source>
-      <translation type="unfinished">Server Web Page</translation>
+      <translation>דף אינטרנט של השרת</translation>
     </message>
     <message>
       <source>stopped</source>
-      <translation type="unfinished">stopped</translation>
+      <translation>נעצר</translation>
     </message>
     <message>
       <source>starting</source>
-      <translation type="unfinished">starting</translation>
+      <translation>מתחיל</translation>
     </message>
     <message>
       <source>stopping</source>
-      <translation type="unfinished">stopping</translation>
+      <translation>עוצר</translation>
     </message>
     <message>
       <source>started</source>
-      <translation type="unfinished">started</translation>
+      <translation>התחיל</translation>
     </message>
     <message>
       <source>resuming</source>
-      <translation type="unfinished">resuming</translation>
+      <translation>מחדש פעולה</translation>
     </message>
     <message>
       <source>paused</source>
-      <translation type="unfinished">paused</translation>
+      <translation>מושהה</translation>
     </message>
     <message>
       <source>pausing</source>
-      <translation type="unfinished">pausing</translation>
+      <translation>עוצר</translation>
     </message>
   </context>
 </TS>

@@ -1,117 +1,117 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
-<TS version="2.1" language="pt-PT" sourcelanguage="en">
+<TS version="2.1" language="hu" sourcelanguage="en">
   <context>
     <name>QObject</name>
     <message>
       <source>System Tray</source>
-      <translation>Barra do sistema</translation>
+      <translation>Tálca</translation>
     </message>
     <message>
       <source>There is no system tray on this system.</source>
-      <translation>Não existe uma 'barra de sistema' neste sistema.</translation>
+      <translation>Nem található a tálca.</translation>
     </message>
     <message>
       <source>Application will now quit.</source>
-      <translation>A aplicação vai fechar agora.</translation>
+      <translation>Az alkalmazás most bezárúl.</translation>
     </message>
   </context>
   <context>
     <name>QnElevationChecker</name>
     <message>
       <source>Insufficient rights to manage services.</source>
-      <translation>Privilégio insuficiente para gerir os serviços.</translation>
+      <translation>Nem megfelelő jogosultság a szolgáltatások kezeléséhez.</translation>
     </message>
     <message>
       <source>UAC must be enabled to request privileges for non-admin users.</source>
-      <translation>É necessário activar o UAC para requerer privilégios para utilizadores não-admin.</translation>
+      <translation>Nem rendszergazda felhasználóknak engedélyezni kell az UAC-t a jogok kéréséhez.</translation>
     </message>
   </context>
   <context>
     <name>QnSystrayWindow</name>
     <message>
       <source>Access denied.</source>
-      <translation>Acesso proibido.</translation>
+      <translation>Hozzáférés megtagadva.</translation>
     </message>
     <message>
       <source>Specified database does not exist.</source>
-      <translation>A base de dados especificada não existe.</translation>
+      <translation>A megadott adatbázis nem létezik.</translation>
     </message>
     <message>
       <source>Specified parameter is invalid.</source>
-      <translation>O parâmetro específico é inválido.</translation>
+      <translation>A megadott paraméter érvénytelen.</translation>
     </message>
     <message>
       <source>Could not access installed services</source>
-      <translation>Não foi possível acede aos serviços instalados</translation>
+      <translation>Nem lehet hozzáférni a telepített szolgáltatásokhoz</translation>
     </message>
     <message>
       <source>No %1 services installed</source>
-      <translation>Nenhuns serviços %1 instalados</translation>
+      <translation>%1 szolgáltatások nincsenek telepítve</translation>
     </message>
     <message>
       <source>&amp;Quit</source>
-      <translation>&amp;Fechar</translation>
+      <translation>&amp;Kilépés</translation>
     </message>
     <message>
       <source>An error has occurred while trying to access installed services:</source>
-      <translation>Ocorreu um erro enquanto tentava aceder aos serviços instalados:</translation>
+      <translation>Hiba történ a telepített szolgáltatások hozzáférése közben:</translation>
     </message>
     <message>
       <source>Server has been stopped</source>
-      <translation type="unfinished">Server has been stopped</translation>
+      <translation>A szerver leállíva</translation>
     </message>
     <message>
       <source>Server has been started</source>
-      <translation type="unfinished">Server has been started</translation>
+      <translation>A szerver elindítva</translation>
     </message>
     <message>
       <source>Server will be stopped. Continue?</source>
-      <translation>O Servidor Media vai ser parado. Continuar?</translation>
+      <translation>A media szerver le fog állni. Folytatja?</translation>
     </message>
     <message>
       <source>Show Server Log</source>
-      <translation type="unfinished">Show Server Log</translation>
+      <translation>Szervernapló mutatása</translation>
     </message>
     <message>
       <source>Start Server</source>
-      <translation type="unfinished">Start Server</translation>
+      <translation>Szerver indítása</translation>
     </message>
     <message>
       <source>Stop Server</source>
-      <translation type="unfinished">Stop Server</translation>
+      <translation>Szerver leállítása</translation>
     </message>
     <message>
       <source>Server Web Page</source>
-      <translation type="unfinished">Server Web Page</translation>
+      <translation>Szerver weboldala</translation>
     </message>
     <message>
       <source>stopped</source>
-      <translation type="unfinished">stopped</translation>
+      <translation>lellítva</translation>
     </message>
     <message>
       <source>starting</source>
-      <translation type="unfinished">starting</translation>
+      <translation>elindítva</translation>
     </message>
     <message>
       <source>stopping</source>
-      <translation type="unfinished">stopping</translation>
+      <translation>leállás</translation>
     </message>
     <message>
       <source>started</source>
-      <translation type="unfinished">started</translation>
+      <translation>indulás</translation>
     </message>
     <message>
       <source>resuming</source>
-      <translation type="unfinished">resuming</translation>
+      <translation>folytatás</translation>
     </message>
     <message>
       <source>paused</source>
-      <translation type="unfinished">paused</translation>
+      <translation>szüneteltetve</translation>
     </message>
     <message>
       <source>pausing</source>
-      <translation type="unfinished">pausing</translation>
+      <translation>szüneteltetés</translation>
     </message>
   </context>
 </TS>
