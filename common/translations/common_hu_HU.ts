@@ -1,174 +1,174 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
-<TS version="2.1" language="zh-TW" sourcelanguage="en">
+<TS version="2.1" language="hu" sourcelanguage="en">
   <context>
     <name>Language</name>
     <message>
       <source>Language Name</source>
       <extracomment>Language name that will be displayed to user. Must not be empty.</extracomment>
-      <translation>繁体中文</translation>
+      <translation>Magyar</translation>
     </message>
     <message>
       <source>Locale Code</source>
       <extracomment>Internal. Please don&apos;t change existing translation.</extracomment>
-      <translation>zh_TW</translation>
+      <translation>hu</translation>
     </message>
   </context>
   <context>
     <name>MergeSystemsStatusStrings</name>
     <message>
       <source>The password or user name is invalid.</source>
-      <translation>密碼或使用者名稱有誤</translation>
+      <translation>Érvénytelen felhasználónév vagy jelszó.</translation>
     </message>
     <message>
       <source>This user does not have permissions for the requested operation.</source>
-      <translation>此使用者沒有執行此動作的權限.</translation>
+      <translation>Ennek a felhasználónak nincs jogosultsága a kért művelet végrehajtásához.</translation>
     </message>
     <message>
       <source>Cannot create database backup.</source>
-      <translation>不能建立資料庫備份.</translation>
+      <translation>Nem hozható létre a biztonsági mentés az adatbázisról.</translation>
     </message>
     <message>
       <source>System name is not configured yet.</source>
-      <translation>系統名稱尚未配置.</translation>
+      <translation>A rendszer neve még nincs beállítva.</translation>
     </message>
     <message>
       <source>Unknown error.</source>
-      <translation>未知錯誤.</translation>
+      <translation>Ismeretlen hiba.</translation>
     </message>
     <message>
       <source>You are about to merge Systems with Starter licenses.</source>
-      <translation>您正要用 Starter license 合併系統.</translation>
+      <translation>Starter licencel rendelkező szerverek összevonására készül.</translation>
     </message>
     <message>
       <source>Only one Starter license is allowed per System, so the second license will be deactivated.</source>
-      <translation>一個系統只允許一個 Starter license 存在, 所以第二個 Starter license 將被停用.</translation>
+      <translation>Rendszerenként csak egy Starter licenc engedélyezett. A második licence deaktiválva lesz.</translation>
     </message>
     <message>
       <source>Merge anyway?</source>
-      <translation>仍要合併?</translation>
+      <translation>Folytatja az összevonást?</translation>
     </message>
     <message>
       <source>System was not found.</source>
-      <translation>找不到系統.</translation>
+      <translation>A rendszer nem található.</translation>
     </message>
     <message>
       <source>The discovered System %1 has an incompatible version %2.</source>
       <comment>%1 is name of System, %2 is version information</comment>
-      <translation>找到的系統 %1 為不相容的版本 %2.</translation>
+      <translation>A megtalált %1 rendszer, inkompatibilis %2 verzióval üzemel.</translation>
     </message>
     <message>
       <source>Cannot connect to the other System because current System is already connected to %1.</source>
       <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-      <translation>無法連接到另一個系統, 因為目前的系統已連接到 %1.</translation>
+      <translation>Nem lehet csatlakozni a másik rendszerhez, mivel az jelenleg ide csatlakozik: %1.</translation>
     </message>
     <message>
       <source>The discovered System %1 is in safe mode.</source>
       <comment>%1 is name of System</comment>
-      <translation>找到的系統 %1 在安全模式下.</translation>
+      <translation>A megtalált rendszer: %1 csökkentett módban üzemel.</translation>
     </message>
     <message>
       <source>Could not configure the remote System %1.</source>
       <comment>%1 is name of System</comment>
-      <translation>無法配置遠端系統 %1.</translation>
+      <translation>A távoli rendszer %1 nem konfigurálható.</translation>
     </message>
     <message>
       <source>Both Systems are connected to %1. Merge is not allowed.</source>
       <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-      <translation>這兩個系統都連接到 %1. 不允許合併.</translation>
+      <translation>Mindkét rendszer %1 rendszerhez kapcsolódik. Összevonás nem engedélyezett.</translation>
     </message>
     <message>
       <source>These Systems are built with different %1 URL. Merge is not allowed.</source>
       <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-      <translation>這些系統用了不同的 %1 URL建立. 不允許合併.</translation>
+      <translation>Ezek a rendszerek különböző %1 URL- használnak. Összevonás nem engedélyezett.</translation>
     </message>
     <message>
       <source>Cloud System can only be merged with non-Cloud. System name and password are taken from Cloud System.</source>
       <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-      <translation>雲端系統只可以與非雲端系統合併. 系統名稱和密碼將取自雲端系統.</translation>
+      <translation>Felhő rendszer csak nem-felhő rendszerrel vonható össze. A rendszer név és jelszó a felhő rendszerből lesz átvéve.</translation>
     </message>
   </context>
   <context>
     <name>QnBusinessStringsHelper</name>
     <message>
       <source>Bookmark</source>
-      <translation>寫入書籤</translation>
+      <translation>Könyvjelző</translation>
     </message>
     <message>
       <source>Panic recording</source>
-      <translation>緊急錄影</translation>
+      <translation>Pánik rögzítés</translation>
     </message>
     <message>
       <source>Write to log</source>
-      <translation>寫入至日誌</translation>
+      <translation>Írás naplóba</translation>
     </message>
     <message>
       <source>Show notification</source>
-      <translation>顯示通知</translation>
+      <translation>Figyelmeztetés megjleneítése</translation>
     </message>
     <message>
       <source>Repeat sound</source>
-      <translation>重複播放聲音</translation>
+      <translation>Hang ismétlése</translation>
     </message>
     <message>
       <source>Play sound</source>
-      <translation>播放聲音</translation>
+      <translation>Hang lejátszása</translation>
     </message>
     <message>
       <source>Speak</source>
-      <translation>說</translation>
+      <translation>Beszéd</translation>
     </message>
     <message>
       <source>Storage Failure</source>
-      <translation>儲存裝置故障</translation>
+      <translation>Tárhely hiba</translation>
     </message>
     <message>
       <source>Network Issue</source>
-      <translation>網路問題</translation>
+      <translation>Hálózati probléma</translation>
     </message>
     <message>
       <source>Server Failure</source>
-      <translation>伺服器錯誤</translation>
+      <translation>Szerver hiba</translation>
     </message>
     <message>
       <source>Server Conflict</source>
-      <translation>伺服器衝突</translation>
+      <translation>Szerver ütközés</translation>
     </message>
     <message>
       <source>Server Started</source>
-      <translation>伺服器啟動</translation>
+      <translation>Szerver elindult</translation>
     </message>
     <message>
       <source>License Issue</source>
-      <translation>授權問題</translation>
+      <translation>Licence probléma</translation>
     </message>
     <message>
       <source>Any Server Issue</source>
-      <translation>任何伺服器問題</translation>
+      <translation>Bármilyen szerver hiba</translation>
     </message>
     <message>
       <source>Any Event</source>
-      <translation>任何事件</translation>
+      <translation>Bármilyen esemény</translation>
     </message>
     <message>
       <source>Undefined event has occurred on %1</source>
-      <translation>未定義事件發生在 %1</translation>
+      <translation>Nem definiált esemény történ itt: %1</translation>
     </message>
     <message>
       <source>Input on %1</source>
-      <translation>%1 輸入</translation>
+      <translation>Bemenet: %1</translation>
     </message>
     <message>
       <source>Motion on %1</source>
-      <translation>%1 位移偵測</translation>
+      <translation>Mozgás: %1</translation>
     </message>
     <message>
       <source>Storage Failure at %1</source>
-      <translation>%1 儲存裝置故障</translation>
+      <translation>Tárhely hiba: %1</translation>
     </message>
     <message>
       <source>Network Issue at %1</source>
-      <translation>%1 網路問題</translation>
+      <translation>Hálózati probléma: %1</translation>
     </message>
     <message>
       <source>Server &quot;%1&quot; Failure</source>
@@ -184,212 +184,214 @@
     </message>
     <message>
       <source>Event: %1</source>
-      <translation>事件：%1</translation>
+      <translation>Esemény %1</translation>
     </message>
     <message>
       <source>Source: %1</source>
-      <translation>來源：%1</translation>
+      <translation>Forrás: %1</translation>
     </message>
     <message>
       <source>Reason: %1</source>
-      <translation>原因：%1</translation>
+      <translation>Ok: %1</translation>
     </message>
     <message>
       <source>Conflicting Server #%1: %2</source>
       <extracomment>Conflicting Server #5: 10.0.2.1</extracomment>
-      <translation>衝突伺服器 #%1: %2</translation>
+      <translation>Ütköző szerver: #%1: %2</translation>
     </message>
     <message>
       <source>Time: %1 on %2</source>
       <comment>%1 means time, %2 means date</comment>
-      <translation>時間：%1 在 %2</translation>
+      <translation>Alkalom: %1/%2</translation>
     </message>
     <message numerus="yes">
       <source>First occurrence: %1 on %2 (%n times total)</source>
       <comment>%1 means time, %2 means date</comment>
       <translation>
-        <numerusform>第一次出現: %1 在 %2 (共 %n 次)</numerusform>
+        <numerusform>Első előfordulás: %1/%2(%n alkalomból)</numerusform>
+        <numerusform>Első előfordulás: %1/%2(%n alkalomból)</numerusform>
       </translation>
     </message>
     <message>
       <source>RTP packet loss detected, prev seq.=%1 next seq.=%2.</source>
-      <translation>RTP 封包遺失偵測，前一個序列.=%1 下一個序列.=%2.</translation>
+      <translation>RTP csomag vesztés észlelve, előző = %1 következő = %2.</translation>
     </message>
     <message>
       <source>RTP packet loss detected.</source>
-      <translation>RTP 封包遺失偵測.</translation>
+      <translation>RTP csomag vesztés észlelve.</translation>
     </message>
     <message>
       <source>I/O error has occurred at %1.</source>
-      <translation>I/O 錯誤於 %1。</translation>
+      <translation>I/O hiba történt: %1.</translation>
     </message>
     <message>
       <source>Not enough HDD/SSD speed for recording to %1.</source>
-      <translation>HDD/SSD %1 速度不足以錄影。</translation>
+      <translation>Nincs elegendő HDD/SDD sebesség a rögzítéshez: %1.</translation>
     </message>
     <message>
       <source>HDD/SSD disk %1 is full. Disk contains too much data that is not managed by VMS.</source>
-      <translation>HDD/SSD 硬碟 %1 已滿。磁碟內包含太多非本軟體管理之資料。</translation>
+      <translation>%1 HDD/SDD lemez megtelt. A lemez túl sok adatot tartalmaz amit a VMS nem menedzsel.</translation>
     </message>
     <message>
       <source>Conflicting Server: %1</source>
-      <translation>衝突伺服器: %1</translation>
+      <translation>Ütköző szerver: %1</translation>
     </message>
     <message>
       <source>start</source>
-      <translation>開始</translation>
+      <translation>indítás</translation>
     </message>
     <message>
       <source>stop</source>
-      <translation>停止</translation>
+      <translation>megállítás</translation>
     </message>
     <message>
       <source>While %1</source>
-      <translation>當 %1</translation>
+      <translation>%1 alatt</translation>
     </message>
     <message>
       <source>On %1 %2</source>
-      <translation>在 %1 %2</translation>
+      <translation>Itt: %1 %2</translation>
     </message>
     <message>
       <source>An unknown event has occurred</source>
-      <translation>發生未知事件</translation>
+      <translation>Ismeretlen esemény történt</translation>
     </message>
     <message>
       <source>Connection to server is lost.</source>
-      <translation>已失去與伺服器的連線.</translation>
+      <translation>A kapcsolat a szerverrrel megszakadt.</translation>
     </message>
     <message numerus="yes">
       <source>No data received during last %n seconds.</source>
       <translation>
-        <numerusform>已有 %n 秒無接收資料.</numerusform>
+        <numerusform>Nincs fogadott adat az elmúlt %n másodpercben.</numerusform>
+        <numerusform>Nincs fogadott adat az elmúlt %n másodpercben.</numerusform>
       </translation>
     </message>
     <message>
       <source>Generic Event</source>
-      <translation>通用事件</translation>
+      <translation>Általános esemény</translation>
     </message>
     <message>
       <source>Caption: %1</source>
-      <translation>敘述: %1</translation>
+      <translation>Felirat: %1</translation>
     </message>
     <message>
       <source>Connection to camera (primary stream) was unexpectedly closed.</source>
-      <translation>與攝影機的連線(主串流)無預期中斷.</translation>
+      <translation>A kapcsolat a kamerával (elsődleges adatfolyam) váratlanul bezárult.</translation>
     </message>
     <message>
       <source>Connection to camera (secondary stream) was unexpectedly closed.</source>
-      <translation>與攝影機的連線(次串流)無預期中斷.</translation>
+      <translation>A kapcsolat a kamerával (másodlagos adatfolyam) váratlanul bezárult.</translation>
     </message>
     <message>
       <source>Device output</source>
-      <translation>觸發裝置輸出</translation>
+      <translation>Eszköz kimenet</translation>
     </message>
     <message>
       <source>Camera output</source>
-      <translation>觸發攝影機輸出</translation>
+      <translation>Kamera kimenet</translation>
     </message>
     <message>
       <source>Device recording</source>
-      <translation>觸發裝置錄影</translation>
+      <translation>Eszköz rögzítés</translation>
     </message>
     <message>
       <source>Camera recording</source>
-      <translation>觸發攝影機錄影</translation>
+      <translation>Kamera rögzítés</translation>
     </message>
     <message>
       <source>Any Device Issue</source>
-      <translation>任何裝置問題</translation>
+      <translation>Bármilyen eszköz hiba</translation>
     </message>
     <message>
       <source>Any Camera Issue</source>
-      <translation>任何攝影機問題</translation>
+      <translation>Bármilyen kamera hiba</translation>
     </message>
     <message>
       <source>Device %1 was disconnected</source>
-      <translation>裝置 %1 已斷線</translation>
+      <translation>%1 eszköz szétkapcsolt</translation>
     </message>
     <message>
       <source>Camera %1 was disconnected</source>
-      <translation>攝影機 %1 已斷線</translation>
+      <translation>%1 kamera szétkapcsolt</translation>
     </message>
     <message>
       <source>Device IP Conflict at %1</source>
       <extracomment>Device IP Conflict at &lt;server_name&gt;</extracomment>
-      <translation>%1的裝置IP衝突</translation>
+      <translation>Eszköz IP ütközés %1 szerveren</translation>
     </message>
     <message>
       <source>Camera IP Conflict at %1</source>
       <extracomment>Camera IP Conflict at &lt;server_name&gt;</extracomment>
-      <translation>%1的攝影機IP衝突</translation>
+      <translation>Kamera IP ütközés %1 szerveren</translation>
     </message>
     <message>
       <source>Connection to device was unexpectedly closed.</source>
-      <translation>與裝置的連線無預期中斷.</translation>
+      <translation>A kapcsolat az eszközzel váratlanul bezárult.</translation>
     </message>
     <message>
       <source>Execute PTZ preset</source>
-      <translation>移動PTZ至預設點</translation>
+      <translation>PTZ preset indítás</translation>
     </message>
     <message>
       <source>Show text overlay</source>
-      <translation>顯示疊加文字</translation>
+      <translation>Felirat fólia megjelenítése</translation>
     </message>
     <message>
       <source>Show on Alarm Layout</source>
-      <translation>影像彈跳</translation>
+      <translation>Megjelenítés a riasztás elrendezésen</translation>
     </message>
     <message>
       <source>Archive backup finished</source>
-      <translation>影像備份完成</translation>
+      <translation>Archív biztonsági mentés kész</translation>
     </message>
     <message>
       <source>Generic Event at %1</source>
-      <translation>通用事件 %1</translation>
+      <translation>%1 - általános esemény</translation>
     </message>
     <message>
       <source>Input Port: %1</source>
-      <translation>輸入埠 %1</translation>
+      <translation>Bemeneti port: %1</translation>
     </message>
     <message>
       <source>Archive backup is successfully completed</source>
-      <translation>影像備份已成功完成</translation>
+      <translation>Archív biztonsági mentés sikeresen elkészült</translation>
     </message>
     <message>
       <source>I/O Module %1 was disconnected</source>
-      <translation>I/O 模組 %1 已離線</translation>
+      <translation>%1 I/O modul szétkapcsolt</translation>
     </message>
     <message>
       <source>Conflicting Address: %1</source>
-      <translation>衝突位址: %1</translation>
+      <translation>Címütközés: %1</translation>
     </message>
     <message>
       <source>Archive backup failed: No available backup storages with sufficient free space</source>
-      <translation>影像備份失敗: 備份裝置無足夠空間</translation>
+      <translation>Archív biztonsági mentés sikertelen: nincs elég hely a megadott tárolón</translation>
     </message>
     <message>
       <source>Archive backup failed: Target storage failure</source>
-      <translation>影像備份失敗: 目標裝置故障</translation>
+      <translation>Archív biztonsági mentés sikertelen: céltároló hiba</translation>
     </message>
     <message>
       <source>Archive backup failed: Source file open/read error</source>
-      <translation>影像備份失敗: 來源檔案開啟/讀取錯誤</translation>
+      <translation>Archív biztonsági mentés sikertelen: hiba a forrás fájl megnyitásakor</translation>
     </message>
     <message>
       <source>Archive backup failed: Target file create/write error</source>
-      <translation>影像備份失敗: 目標檔案開啟/寫入錯誤</translation>
+      <translation>Archív biztonsági mentés sikertelen: Írási hiba a célfájlban</translation>
     </message>
     <message>
       <source>Archive backup failed: File catalog error</source>
-      <translation>影像備份失敗: 檔案目錄錯誤</translation>
+      <translation>Archív biztonsági mentés sikertelen: fáljegyzék hiba</translation>
     </message>
     <message>
       <source>Archive backup is canceled by user. Data is backed up to %1</source>
-      <translation>檔案備份已被使用者取消. 資料已備份至 %1</translation>
+      <translation>Archív biztonsági mentést a felhasználó megszakította. Az adat lementve %1-ig</translation>
     </message>
     <message>
       <source>Do HTTP request</source>
-      <translation>發送一則HTTP命令</translation>
+      <translation>HTTP kérés</translation>
     </message>
     <message>
       <source>%2 &lt;b&gt;%1&lt;/b&gt;</source>
@@ -401,68 +403,76 @@
       <comment>%1 means time, %2 means date</comment>
       <translation type="unfinished">
         <numerusform>%n times, first: %2 &lt;b&gt;%1&lt;/b&gt;</numerusform>
+        <numerusform>%n times, first: %2 &lt;b&gt;%1&lt;/b&gt;</numerusform>
       </translation>
     </message>
     <message>
       <source>Device does not respond to network requests.</source>
-      <translation>設備未回應網路請求.</translation>
+      <translation>A berendezés nem válaszol a hálózati kérésre.</translation>
     </message>
     <message>
       <source>Server stopped unexpectedly.</source>
-      <translation>伺服器無預警停止.</translation>
+      <translation>A szerver váratlanul leállt.</translation>
     </message>
     <message>
       <source>Not enough licenses. Recording has been disabled on following devices:</source>
-      <translation>沒有足夠的授權. 以下設備錄影已被停用:</translation>
+      <translation>Nincs elég licenc. A felvétel a következő eszközökre le van állítva:</translation>
     </message>
     <message>
       <source>Not enough licenses. Recording has been disabled on following cameras:</source>
-      <translation>沒有足夠的授權. 以下攝影機錄影已被停用:</translation>
+      <translation>Nincs elég licenc. A felvétel a következő kamerákon le van állítva:</translation>
     </message>
     <message>
       <source>Not enough licenses. Recording has been disabled on following I/O modules:</source>
-      <translation>沒有足夠的授權. 以下 I/O 模組已被停用:</translation>
+      <translation>Nincs elég licenc. A felvétel a következő I/O modulokon le van állítva:</translation>
     </message>
     <message numerus="yes">
       <source>Motion on Cameras</source>
       <translation>
-        <numerusform>攝影機位移偵測</numerusform>
+        <numerusform>Mozgás a kamerákon</numerusform>
+        <numerusform>Mozgás a kamerákon</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Input Signal on Devices</source>
       <translation>
-        <numerusform>設備上的 DI</numerusform>
+        <numerusform>Bemeneti jel az eszközökön</numerusform>
+        <numerusform>Bemeneti jel az eszközökön</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Input Signal on Cameras</source>
       <translation>
-        <numerusform>攝影機上的 DI</numerusform>
+        <numerusform>Bemeneti jel a kamerákon</numerusform>
+        <numerusform>Bemeneti jel a kamerákon</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Devices Disconnected</source>
       <translation>
-        <numerusform>設備斷線</numerusform>
+        <numerusform>Eszközök lekapcsolódva</numerusform>
+        <numerusform>Eszközök lekapcsolódva</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Cameras Disconnected</source>
       <translation>
-        <numerusform>攝影機斷線</numerusform>
+        <numerusform>Kamerák lekapcsolódva</numerusform>
+        <numerusform>Kamerák lekapcsolódva</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Devices IP Conflict</source>
       <translation>
-        <numerusform>設備 IP 衝突</numerusform>
+        <numerusform>IP ütközés az eszközöknél</numerusform>
+        <numerusform>IP ütközés az eszközöknél</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Cameras IP Conflict</source>
       <translation>
-        <numerusform>攝影機 IP 衝突</numerusform>
+        <numerusform>IP ütközés a kameráknál</numerusform>
+        <numerusform>IP ütközés a kameráknál</numerusform>
       </translation>
     </message>
     <message>
@@ -475,47 +485,47 @@
     </message>
     <message>
       <source>Archive backup finished, but is not fully completed because backup time is over. Data is backed up to %1</source>
-      <translation>錄影備份結束, 但尚未完全完成因為設定的備份時間已經結束. 資料將備份到 %1</translation>
+      <translation>A rögzített videók biztonsági mentése befejeződött, de nem teljes mert az erre szánt idő lejárt. Az adat lementve %1-ig</translation>
     </message>
     <message>
       <source>MAC #%1: %2</source>
       <extracomment>MAC #2: D0-50-99-38-1E-12</extracomment>
-      <translation>MAC #%1: %2 {1:?} {2?}</translation>
+      <translation>MAC #%1: %2  {1:?} {2?}</translation>
     </message>
     <message>
       <source>Send Email</source>
-      <translation>傳送郵件</translation>
+      <translation>Email küldése</translation>
     </message>
   </context>
   <context>
     <name>QnCameraDiagnosticsErrorCodeStrings</name>
     <message>
       <source>OK</source>
-      <translation>確定</translation>
+      <translation>OK</translation>
     </message>
     <message>
       <source>Server has been stopped.</source>
-      <translation>伺服器已停止運作。</translation>
+      <translation>A szerver leállt.</translation>
     </message>
     <message>
       <source>Media stream is opened but no media data was received.</source>
-      <translation>媒體串流已開啟但沒有接收到媒體資料。</translation>
+      <translation>Media stream nyitva, de nem érkezett media adat.</translation>
     </message>
     <message>
       <source>Unknown error. Please contact support.</source>
-      <translation>未知錯誤，請尋求您的支援廠商。</translation>
+      <translation>Ismeretlen hiba. Kérem keresse fel technikai segítségnyújtóját.</translation>
     </message>
     <message>
       <source>(unknown)</source>
-      <translation>(未知)</translation>
+      <translation>(ismeretlen)</translation>
     </message>
     <message>
       <source>Server %1 is not available.</source>
-      <translation>無法取得伺服器 %1.</translation>
+      <translation>%1 szerver nem elérhető.</translation>
     </message>
     <message>
       <source>Check that Server is up and running.</source>
-      <translation>請確認伺服器已上線.</translation>
+      <translation>Ellenőrizze, hogy a szerver megfelelően működik.</translation>
     </message>
     <message>
       <source>Received bad response from Server %1: &quot;%2&quot;.</source>
@@ -523,23 +533,23 @@
     </message>
     <message>
       <source>Check if Server is up and has the proper version.</source>
-      <translation>請確認伺服器是否上線並為相容版本.</translation>
+      <translation>Ellenőrizze, hogy a szerver működik és a megfelelő verzió fut.</translation>
     </message>
     <message>
       <source>Cannot connect to http port %1.</source>
-      <translation>無法連線至 http port %1.</translation>
+      <translation>Nem lehet csatlakozni a %1 http porthoz.</translation>
     </message>
     <message>
       <source>Finally, try to update firmware. If the problem persists, please contact support.</source>
-      <translation>最後, 試著更新分位. 若問題持續發生, 請連繫技術支援部門.</translation>
+      <translation>Végül, próbálja meg frissíteni a firmware-t. Ha a probléma továbbra is fennáll, lépjen kapcsolatba a technikai segítségnyújtóval.</translation>
     </message>
     <message>
       <source>Failed to configure parameter %1.</source>
-      <translation>設定參數 %1 失敗.</translation>
+      <translation>Nem lehet konfigurálni a %1 paramétert.</translation>
     </message>
     <message>
       <source>Please contact support.</source>
-      <translation>請連繫技術支援部門.</translation>
+      <translation>Kérem keresse fel technikai segítségnyújtóját.</translation>
     </message>
     <message>
       <source>An input/output error has occurred. OS message: &quot;%1&quot;.</source>
@@ -547,23 +557,23 @@
     </message>
     <message>
       <source>Parameters:</source>
-      <translation>參數:</translation>
+      <translation>Paraméterek:</translation>
     </message>
     <message>
       <source>Please try to reboot the device, then restore factory defaults on the web-page.</source>
-      <translation>請嘗試重啟裝置, 接著在裝置網頁上還原預設值.</translation>
+      <translation>Kérem, próbálja meg úraindítani az eszközt, majd a weboldalán visszaállítani a gyári alapértelmezett beállításokra.</translation>
     </message>
     <message>
       <source>Please try to reboot the camera, then restore factory defaults on the web-page.</source>
-      <translation>請嘗試重啟攝影機, 接著在攝影機網頁上還原預設值.</translation>
+      <translation>Kérem, próbálja meg úraindítani a kamerát, majd a weboldalán visszaállítani a gyári alapértelmezett beállításokra.</translation>
     </message>
     <message>
       <source>Make sure the device is plugged into the network. Try to reboot the device.</source>
-      <translation>請確認裝置已接入至網路. 請嘗試重啟此裝置.</translation>
+      <translation>Győződjön meg róla, hogy az eszköz csatlakoztatva van a hálózathoz. Próbálja meg újraindítani az eszközt.</translation>
     </message>
     <message>
       <source>Make sure the camera is plugged into the network. Try to reboot the camera.</source>
-      <translation>請確認攝影機已接入至網路. 請嘗試重啟此攝影機.</translation>
+      <translation>Győződjön meg róla, hogy akamera csatlakoztatva van a hálózathoz. Próbálja meg újraindítani a kamerát.</translation>
     </message>
     <message>
       <source>Device request &quot;%1&quot; failed with error &quot;%2&quot;.</source>
@@ -575,39 +585,39 @@
     </message>
     <message>
       <source>Unknown device issue.</source>
-      <translation>未知的裝置錯誤.</translation>
+      <translation>Ismeretlen eszköz probléma.</translation>
     </message>
     <message>
       <source>Unknown camera issue.</source>
-      <translation>未知的攝影機錯誤.</translation>
+      <translation>Ismeretlen kamera probléma.</translation>
     </message>
     <message>
       <source>Invalid data was received from the device %1.</source>
-      <translation>從裝置 %1 接收到無效的資料.</translation>
+      <translation>Érvénytelen adat érkezett %1 eszköztől.</translation>
     </message>
     <message>
       <source>Invalid data was received from the camera %1.</source>
-      <translation>從攝影機 %1 接收到無效的資料.</translation>
+      <translation>Érvénytelen adat érkezett %1 kamerától.</translation>
     </message>
     <message>
       <source>Too many media errors. Please open device issues dialog for more details.</source>
-      <translation>過多的媒體錯誤. 請開啟裝置問題表以取得更多資訊.</translation>
+      <translation>Ismeretlen media hiba. Kérem nyissa meg az eszköz probléma ablakot a további részletekért.</translation>
     </message>
     <message>
       <source>Too many media errors. Please open camera issues dialog for more details.</source>
-      <translation>過多的媒體錯誤. 請開啟攝影機問題表以取得更多資訊.</translation>
+      <translation>Ismeretlen media hiba. Kérem nyissa meg a kamera probléma ablakot a további részletekért.</translation>
     </message>
     <message>
       <source>Camera plugin error. %1</source>
-      <translation>攝影機插件錯誤 %1</translation>
+      <translation>Kamera plugin hiba. %1</translation>
     </message>
     <message>
       <source>Please try to reboot the I/O module, then restore factory defaults on the web-page.</source>
-      <translation>請試著重啟 I/O 模組, 接著至網頁界面上還原預設值.</translation>
+      <translation>Indítsa újra az I/O modult, majd állítsa vissza az I/O modul weboldalán gyári alapértelmezett beállításokat.</translation>
     </message>
     <message>
       <source>Make sure the I/O module is plugged into the network. Try to reboot the I/O module.</source>
-      <translation>請確認 I/O 裝置已連接至網路. 試著重啟 I/O 模組.</translation>
+      <translation>Ellenőrizze, hogy az I/O modul csatlakoztatva van a rendszerre. Próbálja újraindítani az I/O modult.</translation>
     </message>
     <message>
       <source>I/O Module request &quot;%1&quot; failed with error &quot;%2&quot;.</source>
@@ -615,183 +625,183 @@
     </message>
     <message>
       <source>Unknown I/O module issue.</source>
-      <translation>未知的 I/O 模組問題.</translation>
+      <translation>Ismeretlen I/O modul probléma.</translation>
     </message>
     <message>
       <source>Invalid data was received from the I/O module %1.</source>
-      <translation>從 I/O 模組 %1 接收到無效資料.</translation>
+      <translation>Érvénytelen adat %1 I/O modultól.</translation>
     </message>
     <message>
       <source>Too many media errors. Please open I/O module issues dialog for more details.</source>
-      <translation>過多媒體錯誤. 請開啟 I/O 模組問題列表以取得更多資訊.</translation>
+      <translation>Túl sok média hiba. Nyissa meg I/O modul beállításokat további információkért.</translation>
     </message>
     <message>
       <source>Device initialization process is in progress.</source>
-      <translation>裝置初始程序進行中.</translation>
+      <translation>Eszközinicializálás folyamatban.</translation>
     </message>
     <message>
       <source>Camera initialization process is in progress.</source>
-      <translation>攝影機初始程序進行中.</translation>
+      <translation>Kamerainicializálás folyamatban.</translation>
     </message>
     <message>
       <source>I/O Module initialization process is in progress.</source>
-      <translation>I/O 模組初始程序進行中.</translation>
+      <translation>I/O modul inicializálás folyamatban.</translation>
     </message>
     <message>
       <source>Make sure port %1 is accessible (e.g. forwarded).</source>
-      <translation>請確認 %1 埠可被連結 (譬如已開啟轉發埠).</translation>
+      <translation>Győződjön meg róla, hogy a %1 port elérhető (pl. át van irányítva).</translation>
     </message>
     <message>
       <source>First, try to turn on recording (if it is off) and decrease fps in device settings.</source>
-      <translation>首先, 試著啟動錄影 (如果它是關閉的) 和降低 fps.</translation>
+      <translation>Először próbálja bekapcsolni a rögzítést (ha ki van kapcsolva) és csökkentse az fps beállításokat az eszköz menüjében.</translation>
     </message>
     <message>
       <source>First, try to turn on recording (if it is off) and decrease fps in camera settings.</source>
-      <translation>首先, 試著啟動錄影 (如果它是關閉的) 和降低 fps.</translation>
+      <translation>Először próbálja bekapcsolni a rögzítést (ha ki van kapcsolva) és csökkentse az fps beállításokat a kamera menüjében.</translation>
     </message>
     <message>
       <source>First, try to turn on recording (if it is off) and decrease fps in I/O module settings.</source>
-      <translation>首先, 試著啟動錄影 (如果它是關閉的) 和降低 fps.</translation>
+      <translation>Először próbálja bekapcsolni a rögzítést (ha ki van kapcsolva) és csökkentse az fps beállításokat az I/O modul menüjében.</translation>
     </message>
     <message>
       <source>If it does not help, restore factory defaults on the device web-page.</source>
-      <translation>若無幫助, 請在設備 Web 頁面上還原預設值.</translation>
+      <translation>Ha ez nem segít, állítsa vissza a gyári alapbeállításokat az eszköz web-felületén.</translation>
     </message>
     <message>
       <source>If it does not help, restore factory defaults on the camera web-page.</source>
-      <translation>若無幫助, 請在攝影機 Web 頁面上還原預設值.</translation>
+      <translation>Ha ez nem segít, állítsa vissza a gyári alapbeállításokat a kamera web-felületén.</translation>
     </message>
     <message>
       <source>If it does not help, restore factory defaults on the I/O module web-page.</source>
-      <translation>若無幫助, 請在 I/O 模組 Web 頁面上還原預設值.</translation>
+      <translation>Ha ez nem segít, állítsa vissza a gyári alapbeállításokat az I/O modul web-felületén.</translation>
     </message>
     <message>
       <source>Cannot open media URL %1. Failed to connect to media port %2.</source>
-      <translation>無法開啟媒體 URL %1. 連接到通訊埠 %2 失敗.</translation>
+      <translation>%1 média URL nem nyitható meg. Csatlakozás a %2 számú média portra sikertelen.</translation>
     </message>
     <message>
       <source>Cannot open media URL %1. Connection to port %2 was closed unexpectedly.</source>
-      <translation>無法開啟媒體 URL %1. 與通訊埠 %2 的連線無預警關閉.</translation>
+      <translation>%1 média URL nem nyitható meg. Kapcsolat a %2 számú porttal váratlanul lezárult.</translation>
     </message>
     <message>
       <source>Could not parse device response. URL %1, request name %2.</source>
-      <translation>無法分析設備回應. URL %1, 請求名稱 %2.</translation>
+      <translation>Az eszköz válasza nem értelmezhető. URL %1, %2 néven.</translation>
     </message>
     <message>
       <source>Could not parse camera response. URL %1, request name %2.</source>
-      <translation>無法分析攝影機回應. URL %1, 請求名稱 %2.</translation>
+      <translation>A kamera válasza nem értelmezhető. URL %1, %2 néven.</translation>
     </message>
     <message>
       <source>Could not parse I/O module response. URL %1, request name %2.</source>
-      <translation>無法分析 I/O 模組回應. URL %1, 請求名稱 %2.</translation>
+      <translation>Az I/O modul válasza nem értelmezhető. URL %1, %2 néven.</translation>
     </message>
     <message>
       <source>No supported media tracks at URL %1.</source>
-      <translation>不支援的媒體軌於 URL %1.</translation>
+      <translation>Nem támogatott média %1 URL-ben.</translation>
     </message>
     <message>
       <source>Not authorized. URL %1.</source>
-      <translation>未認証. URL %1.</translation>
+      <translation>Azonosítatlan. URL %1.</translation>
     </message>
     <message>
       <source>Cannot open media URL %1. Unsupported media protocol %2.</source>
-      <translation>無法打開媒體 URL %1. 不支援的媒體協議 %2.</translation>
+      <translation>Média URL %1 nem nyitható meg. %2 média protokoll nem támogatott.</translation>
     </message>
   </context>
   <context>
     <name>QnFfmpegAudioTranscoder</name>
     <message>
       <source>Audio context was not specified.</source>
-      <translation>未指定聲音內容.</translation>
+      <translation>Nincs audió tartalom megadva.</translation>
     </message>
     <message>
       <source>Could not find encoder for codec %1.</source>
-      <translation>找不到 %1 編碼的編碼器.</translation>
+      <translation>Nem található enkóder a %1 codec-hez.</translation>
     </message>
     <message>
       <source>Could not initialize audio encoder.</source>
-      <translation>無法初始化聲音編碼器.</translation>
+      <translation>Audió enkóder nem inicializálható.</translation>
     </message>
     <message>
       <source>Could not initialize audio decoder.</source>
-      <translation>無法初始化聲音解碼器.</translation>
+      <translation>Audió dekóder nem inicializálható.</translation>
     </message>
     <message>
       <source>Could not find decoder for codec %1.</source>
-      <translation>找不到 %1 編碼的編碼器.</translation>
+      <translation>Nem található enkóder a %1 codec-hez.</translation>
     </message>
     <message>
       <source>Could not initialize resampling context, error code: %1</source>
-      <translation>無法初始化重採樣內容, 錯誤代碼: %1</translation>
+      <translation>Mintavételezési környezet inicializálása sikertelen. Hibakód: %1</translation>
     </message>
     <message>
       <source>Could not allocate sample buffers, error code: %1</source>
-      <translation>無法分配樣本緩衝, 錯誤代碼: %1</translation>
+      <translation>Mintapufferek felszabadítása sikertelen. Hibakód: %1</translation>
     </message>
     <message>
       <source>Could not send audio frame to encoder, Error code: %1.</source>
-      <translation>無法傳送音訊至編碼器, 錯誤代碼: %1.</translation>
+      <translation>Audio küldése encoder felé sikertelen. Hibakód: %1.</translation>
     </message>
     <message>
       <source>Could not receive audio packet from encoder, Error code: %1.</source>
-      <translation>無法從編碼器接收音訊封包, 錯誤代碼: %1.</translation>
+      <translation>Audiocsomag fogadása az encodertől sikertelen. Hibakód: %1.</translation>
     </message>
     <message>
       <source>Could not receive audio frame from decoder, Error code: %1.</source>
-      <translation>無法從解碼器接收音訊封包, 錯誤代碼: %1.</translation>
+      <translation>Audiokeret fogadása encoder-től siikertelen. Hibakód: %1.</translation>
     </message>
   </context>
   <context>
     <name>QnFfmpegTranscoder</name>
     <message>
       <source>Container %1 was not found in FFMPEG library.</source>
-      <translation>在 FFMPEG 函式庫內找不到容器 %1 。</translation>
+      <translation>%1 tároló nem található az FFMPEG mappában.</translation>
     </message>
     <message>
       <source>Could not create output context for format %1.</source>
-      <translation>無法建立格式 %1 的輸出內容。</translation>
+      <translation>Nem hozható léttre a kimenti formátum %1.</translation>
     </message>
     <message>
       <source>Could not allocate output stream for recording.</source>
-      <translation>無法分配錄影用的輸出串流。</translation>
+      <translation>Nem lehet lefoglalni a kimeneti stream-et a rogzítéshez.</translation>
     </message>
     <message>
       <source>Could not perform direct stream copy because frame size is undefined.</source>
-      <translation>無法進行直接串流複製，因為未定義圖框尺寸大小。</translation>
+      <translation>Nem lehet a közvetlen stream másolást végrehajtani, mert a képkocka méret nincs definiálva.</translation>
     </message>
     <message>
       <source>Could not find codec %1.</source>
-      <translation>找不到 %1 編碼。</translation>
+      <translation>Nem található %1 codec.</translation>
     </message>
     <message>
       <source>Video or audio codec is incompatible with container %1.</source>
-      <translation>影像或聲音編碼與容器 %1 不相容。</translation>
+      <translation>Videó vagy audió kodek nem kompatibilis %1 tárolóval.</translation>
     </message>
   </context>
   <context>
     <name>QnFfmpegVideoTranscoder</name>
     <message>
       <source>Could not find encoder for codec %1.</source>
-      <translation>找不到 %1 編碼的編碼器.</translation>
+      <translation>Nem található enkóder %1 kodekhez.</translation>
     </message>
     <message>
       <source>Could not initialize video encoder.</source>
-      <translation>無法初始化編碼器.</translation>
+      <translation>Videó enkóder nem inicializálható.</translation>
     </message>
   </context>
   <context>
     <name>QnLicense</name>
     <message>
       <source>Trial</source>
-      <translation>試用</translation>
+      <translation>Próba</translation>
     </message>
     <message>
       <source>Analog</source>
-      <translation>類比</translation>
+      <translation>Analóg</translation>
     </message>
     <message>
       <source>Professional</source>
-      <translation>專業</translation>
+      <translation>Professzionális</translation>
     </message>
     <message>
       <source>Edge</source>
@@ -803,19 +813,19 @@
     </message>
     <message>
       <source>Video Wall</source>
-      <translation>電視牆</translation>
+      <translation>Video fal</translation>
     </message>
     <message>
       <source>Only single license is allowed for this device</source>
-      <translation>此裝置只接受一組授權</translation>
+      <translation>Csak egyedülálló licence engedélyezet ehhez az eszközhöz</translation>
     </message>
     <message>
       <source>Unknown error</source>
-      <translation>未知的錯誤</translation>
+      <translation>Ismeretlen hiba</translation>
     </message>
     <message>
       <source>I/O Module</source>
-      <translation>I/O 模組</translation>
+      <translation>I/O modul</translation>
     </message>
     <message>
       <source>Start</source>
@@ -823,83 +833,83 @@
     </message>
     <message>
       <source>Analog Encoder</source>
-      <translation>類比編碼器</translation>
+      <translation>Analóg enkóder</translation>
     </message>
     <message>
       <source>Trial Licenses</source>
-      <translation>測試用授權</translation>
+      <translation>Próbalicenc</translation>
     </message>
     <message>
       <source>Analog Licenses</source>
-      <translation>類比授權</translation>
+      <translation>Analóg licencek</translation>
     </message>
     <message>
       <source>Professional Licenses</source>
-      <translation>專業授權</translation>
+      <translation>Professional licencek</translation>
     </message>
     <message>
       <source>Edge Licenses</source>
-      <translation>Edge Camera 授權</translation>
+      <translation>Edge licencek</translation>
     </message>
     <message>
       <source>Vmax Licenses</source>
-      <translation>Vmax(DVR) 授權</translation>
+      <translation>Vmax licencek</translation>
     </message>
     <message>
       <source>Analog Encoder Licenses</source>
-      <translation>類比編碼器授權</translation>
+      <translation>Analóg enkóder licencek</translation>
     </message>
     <message>
       <source>Video Wall Licenses</source>
-      <translation>電視牆授權</translation>
+      <translation>Video fal licencek</translation>
     </message>
     <message>
       <source>I/O Module Licenses</source>
-      <translation>I/O 模組授權</translation>
+      <translation>I/O modul licencek</translation>
     </message>
     <message>
       <source>Start Licenses</source>
-      <translation>Start 授權</translation>
+      <translation>Licencek indítása</translation>
     </message>
     <message>
       <source>Server with matching hardware ID not found</source>
-      <translation>找不到符合硬體ID的伺服器</translation>
+      <translation>Nem található szerver eggyező hardver ID-vel</translation>
     </message>
     <message>
       <source>Invalid</source>
-      <translation>無效</translation>
+      <translation>Érvénytelen</translation>
     </message>
     <message>
       <source>Invalid Licenses</source>
-      <translation>無效的授權</translation>
+      <translation>Érvénytelen licencek</translation>
     </message>
     <message>
       <source>Invalid signature</source>
-      <translation>無效的簽章</translation>
+      <translation>Érvénytelen aláírás</translation>
     </message>
     <message>
       <source>Invalid customization</source>
-      <translation>無效的自定義參數</translation>
+      <translation>Érvénytelen testreszabás</translation>
     </message>
     <message>
       <source>License is expired</source>
-      <translation>授權已過期</translation>
+      <translation>A licenc lejárt</translation>
     </message>
     <message>
       <source>Invalid type</source>
-      <translation>無效的類型</translation>
+      <translation>Érvénytelen típus</translation>
     </message>
     <message>
       <source>Free</source>
-      <translation>可用</translation>
+      <translation>Szabad</translation>
     </message>
     <message>
       <source>Free license</source>
-      <translation>可用授權</translation>
+      <translation>Ingyenes licenc</translation>
     </message>
     <message>
       <source>This license type requires higher software version</source>
-      <translation>這授權類型需要較高的軟體版本</translation>
+      <translation>Ez a licenc típus frissebb szoftververziót igényel</translation>
     </message>
   </context>
   <context>
@@ -907,54 +917,58 @@
     <message numerus="yes">
       <source>%n %2 are used out of %1.</source>
       <translation>
-        <numerusform>%n %2 已使用 %1.</numerusform>
+        <numerusform>%1 licencből %n %2 használatban.</numerusform>
+        <numerusform>%1 licencből %n %2 használatban.</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n %2 will be used out of %1.</source>
       <translation>
-        <numerusform>%n %2 將使用 %1.</numerusform>
+        <numerusform>%1 licencből %n %2 használatban lesz.</numerusform>
+        <numerusform>%1 licencből %n %2 használatban lesz.</numerusform>
       </translation>
     </message>
     <message>
       <source>The license key you have entered is invalid. Please check that license key is entered correctly. If problem continues, please contact support team to confirm if license key is valid or to obtain a valid license key.</source>
-      <translation>您輸入的授權有誤. 請檢查您輸入的授權. 如果問題持續發生, 請聯繫您的廠商以確認授權是否有誤或是取得正確授權.</translation>
+      <translation>A megadott licence kulcs érvénytelen. Kérem ellenőrizze a megadott licence kulcs helyességét. Ha a probléma továbbra is fennáll, kérem keresse fel a segítségnyújtó csapatot, hogy megerősítsék a licence kulcs érvényességét vagy egy érvényes licence kulcs beszserzéséhez.</translation>
     </message>
     <message>
       <source>You are trying to activate an incompatible license with your software. Please contact support team to obtain a valid license key.</source>
-      <translation>您正嘗試啟動不相容於軟體的授權. 請聯繫您的廠商以取得有效授權.</translation>
+      <translation>Nem kompatibilis licencet próbál aktiválni a szoftverrel. Kérem keresse fel a segítségnyújtó csapatot az érvényes licence kulcs beszerzéséhez.</translation>
     </message>
     <message>
       <source>There was a problem activating your license key. A database error occurred.</source>
-      <translation>啟動授權碼時發生錯誤. 資料庫發生錯誤.</translation>
+      <translation>Hiba a licenckulcs aktiválása során. Adatbázishiba történt.</translation>
     </message>
     <message>
       <source>There was a problem activating your license key. Invalid data received. Please contact support team to report the issue.</source>
-      <translation>啟動授權碼時發生錯誤. 接收到無效的資料. 請聯絡您的廠商回報此問題.</translation>
+      <translation>Hiba a licenckulcs aktiválása során. Érvénytelen adat. Lépjen kapcsolatba a forgalmazóval.</translation>
     </message>
     <message numerus="yes">
       <source>Activate %n more %1.</source>
       <translation>
-        <numerusform>再啟動 %n 個 %1.</numerusform>
+        <numerusform>Még %1 %n aktiválása.</numerusform>
+        <numerusform>Még %1 %n aktiválása.</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n more %1 will be used.</source>
       <translation>
-        <numerusform>需要再 %n 個 %1.</numerusform>
+        <numerusform>még %n %1 lesz használva.</numerusform>
+        <numerusform>még %n %1 lesz használva.</numerusform>
       </translation>
     </message>
     <message>
       <source>This license key has been previously activated to hardware ID %1 on %2. Please contact support team to obtain a valid license key.</source>
       <comment>%1 is a hardware ID, %2 is an activation time</comment>
-      <translation>此授權已被啟動到硬體 ID %1 於 %2. 請連線我們的支援小組以獲得一個有效的授權.</translation>
+      <translation>Ez a licenckulcs korábban aktiválva lett %1 hardver ID-hez %2 dátummal. Kérjük lépjen kapcsolatba a szoftver forgalmazójával érvényes licenckulcs beszerzésével kapcsolatban.</translation>
     </message>
   </context>
   <context>
     <name>QnLocalSystemDescription</name>
     <message>
       <source>New Server</source>
-      <translation>新的伺服器</translation>
+      <translation>Új szerver</translation>
     </message>
   </context>
   <context>
@@ -962,243 +976,249 @@
     <message numerus="yes">
       <source>%n Camera(s)</source>
       <translation>
-        <numerusform>%n 支攝影機</numerusform>
+        <numerusform>%n Kamera</numerusform>
+        <numerusform>%n Kamera</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n camera(s)</source>
       <translation>
-        <numerusform>%n 支攝影機</numerusform>
+        <numerusform>%n kamera</numerusform>
+        <numerusform>%n kamera</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n Device(s)</source>
       <translation>
-        <numerusform>%n 個裝置</numerusform>
+        <numerusform>%n Eszköz</numerusform>
+        <numerusform>%n Eszköz</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n device(s)</source>
       <translation>
-        <numerusform>%n 個裝置</numerusform>
+        <numerusform>%n eszköz</numerusform>
+        <numerusform>%n eszköz</numerusform>
       </translation>
     </message>
     <message>
       <source>Cameras</source>
-      <translation>攝影機</translation>
+      <translation>Kamerák</translation>
     </message>
     <message>
       <source>cameras</source>
-      <translation>攝影機</translation>
+      <translation>kamerák</translation>
     </message>
     <message>
       <source>Camera</source>
-      <translation>攝影機</translation>
+      <translation>Kamera</translation>
     </message>
     <message>
       <source>camera</source>
-      <translation>攝影機</translation>
+      <translation>kamera</translation>
     </message>
     <message>
       <source>Devices</source>
-      <translation>裝置</translation>
+      <translation>Eszközök</translation>
     </message>
     <message>
       <source>devices</source>
-      <translation>裝置</translation>
+      <translation>eszközök</translation>
     </message>
     <message>
       <source>Device</source>
-      <translation>裝置</translation>
+      <translation>Eszköz</translation>
     </message>
     <message>
       <source>device</source>
-      <translation>裝置</translation>
+      <translation>eszköz</translation>
     </message>
     <message numerus="yes">
       <source>%n I/O Module(s)</source>
       <translation>
-        <numerusform>%n 組 I/O 模組</numerusform>
+        <numerusform>%n I/O modul</numerusform>
+        <numerusform>%n I/O modul</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n I/O module(s)</source>
       <translation>
-        <numerusform>%n 組 I/O 模組</numerusform>
+        <numerusform>%n I/O modul</numerusform>
+        <numerusform>%n I/O modul</numerusform>
       </translation>
     </message>
     <message>
       <source>I/O Modules</source>
-      <translation>I/O 模組</translation>
+      <translation>I/O modulok</translation>
     </message>
     <message>
       <source>I/O modules</source>
-      <translation>I/O 模組</translation>
+      <translation>I/O modulok</translation>
     </message>
     <message>
       <source>I/O Module</source>
-      <translation>I/O 模組</translation>
+      <translation>I/O modul</translation>
     </message>
     <message>
       <source>I/O module</source>
-      <translation>I/O 模組</translation>
+      <translation>I/O modul</translation>
     </message>
   </context>
   <context>
     <name>QnSignHelper</name>
     <message>
       <source>Unknown</source>
-      <translation>未知</translation>
+      <translation>Ismeretlen</translation>
     </message>
     <message>
       <source>Trial License</source>
-      <translation>測試用授權</translation>
+      <translation>Próbalicenc</translation>
     </message>
     <message>
       <source>FREE License</source>
-      <translation>免費授權</translation>
+      <translation>Ingyenes licence</translation>
     </message>
     <message>
       <source>Hardware ID: %1</source>
-      <translation>硬體 ID: %1</translation>
+      <translation>Hardver ID: %1</translation>
     </message>
     <message>
       <source>Licensed To: %1</source>
-      <translation>授權給: %1</translation>
+      <translation>Licencelve: %1</translation>
     </message>
     <message>
       <source>Watermark: %1</source>
-      <translation>浮水印: %1</translation>
+      <translation>Vízjel: %1</translation>
     </message>
   </context>
   <context>
     <name>QnStreamQualityStrings</name>
     <message>
       <source>Lowest</source>
-      <translation>最低 (Ls)</translation>
+      <translation>Legalacsonyabb</translation>
     </message>
     <message>
       <source>Low</source>
-      <translation>低 (L)</translation>
+      <translation>Alacsony</translation>
     </message>
     <message>
       <source>Medium</source>
-      <translation>中 (M)</translation>
+      <translation>Közepes</translation>
     </message>
     <message>
       <source>High</source>
-      <translation>高 (H)</translation>
+      <translation>Magas</translation>
     </message>
     <message>
       <source>Best</source>
-      <translation>最高 (Hs)</translation>
+      <translation>Legjobb</translation>
     </message>
     <message>
       <source>Preset</source>
-      <translation>預設</translation>
+      <translation>Preset</translation>
     </message>
     <message>
       <source>Undefined</source>
-      <translation>未定義</translation>
+      <translation>Nem definiált</translation>
     </message>
     <message>
       <source>Lst</source>
       <extracomment>Short for &apos;Lowest&apos;</extracomment>
-      <translation>Ls</translation>
+      <translation>Legalacsonyabb</translation>
     </message>
     <message>
       <source>Lo</source>
       <extracomment>Short for &apos;Low&apos;</extracomment>
-      <translation>L</translation>
+      <translation>Alacsony</translation>
     </message>
     <message>
       <source>Me</source>
       <extracomment>Short for &apos;Medium&apos;</extracomment>
-      <translation>M</translation>
+      <translation>Közepes</translation>
     </message>
     <message>
       <source>Hi</source>
       <extracomment>Short for &apos;High&apos;</extracomment>
-      <translation>H</translation>
+      <translation>Magas</translation>
     </message>
     <message>
       <source>Bst</source>
       <extracomment>Short for &apos;Best&apos;</extracomment>
-      <translation>Hs</translation>
+      <translation>Legjobb</translation>
     </message>
     <message>
       <source>Ps</source>
       <extracomment>Short for &apos;Preset&apos;</extracomment>
-      <translation>預</translation>
+      <translation>Ps</translation>
     </message>
   </context>
   <context>
     <name>QnStreamRecorder</name>
     <message>
       <source>Corresponding container in FFMPEG library was not found.</source>
-      <translation>找不到相對應的 FFMPEG 函式庫。</translation>
+      <translation>A vonatkozó rész az FFMPEG mappában nem található.</translation>
     </message>
     <message>
       <source>Could not create output file for video recording.</source>
-      <translation>無法建立錄影用的輸出檔案。</translation>
+      <translation>Nem lehet létrehozni kimeneti fájlt a video rögzítéshez.</translation>
     </message>
     <message>
       <source>Could not allocate output stream for recording.</source>
-      <translation>無法分配錄影用的輸出串流。</translation>
+      <translation>Nem lehet lefoglalni a kimeneti streamet a rögzítéshez.</translation>
     </message>
     <message>
       <source>Could not allocate output audio stream.</source>
-      <translation>無法分配聲音輸出串流。</translation>
+      <translation>Nem lehet lefoglalni a kimeneti audio streamet.</translation>
     </message>
     <message>
       <source>Invalid audio codec information.</source>
-      <translation>無效的聲音編碼資訊。</translation>
+      <translation>Érvénytelen audio kodek információ.</translation>
     </message>
     <message>
       <source>Video or audio codec is incompatible with the selected format.</source>
-      <translation>影像或聲音編碼無法相容於選擇的格式。</translation>
+      <translation>Video vagy audio kodek nem kompatibilis a választott formátummal.</translation>
     </message>
     <message>
       <source>File write error. Not enough free space.</source>
-      <translation>檔案寫入錯誤. 無足夠空間.</translation>
+      <translation>Íráshiba. Nincs elég tárhely.</translation>
     </message>
     <message>
       <source>Invalid resource type for data export.</source>
-      <translation>無效的資料匯出資源類型.</translation>
+      <translation>Érvénytelen forrástípus lett megadva az adat exportáláshoz.</translation>
     </message>
   </context>
   <context>
     <name>QnSystemDescription</name>
     <message>
       <source>Unnamed System</source>
-      <translation>未命名的系統</translation>
+      <translation>Névtelen rendszer</translation>
     </message>
   </context>
   <context>
     <name>QnTCPConnectionProcessor</name>
     <message>
       <source>OK</source>
-      <translation>確定</translation>
+      <translation>OK</translation>
     </message>
     <message>
       <source>Not Found</source>
-      <translation>找不到</translation>
+      <translation>Nem található</translation>
     </message>
     <message>
       <source>Not Implemented</source>
-      <translation>未執行</translation>
+      <translation>Nincs végrehajtva</translation>
     </message>
     <message>
       <source>Unsupported Transport</source>
-      <translation>不支援的傳輸</translation>
+      <translation>Nem támogatott átvitel</translation>
     </message>
     <message>
       <source>Internal Server Error</source>
-      <translation>內部伺服器錯誤</translation>
+      <translation>Belső szerver hiba</translation>
     </message>
     <message>
       <source>Invalid Parameter</source>
-      <translation>無效參數</translation>
+      <translation>Érvénytelen paraméter</translation>
     </message>
   </context>
   <context>
@@ -1206,137 +1226,145 @@
     <message>
       <source>ms</source>
       <comment>Suffix for displaying milliseconds</comment>
-      <translation>毫秒</translation>
+      <translation>mmp</translation>
     </message>
     <message>
       <source>s</source>
       <comment>Suffix for displaying seconds</comment>
-      <translation>秒</translation>
+      <translation>mp</translation>
     </message>
     <message>
       <source>m</source>
       <comment>Suffix for displaying minutes</comment>
-      <translation>分</translation>
+      <translation>p</translation>
     </message>
     <message>
       <source>h</source>
       <comment>Suffix for displaying hours</comment>
-      <translation>時</translation>
+      <translation>ó</translation>
     </message>
     <message>
       <source>d</source>
       <comment>Suffix for displaying days</comment>
-      <translation>日</translation>
+      <translation>n</translation>
     </message>
     <message>
       <source>w</source>
       <comment>Suffix for displaying weeks</comment>
-      <translation>週</translation>
+      <translation>h</translation>
     </message>
     <message>
       <source>M</source>
       <comment>Suffix for displaying months</comment>
-      <translation>月</translation>
+      <translation>H</translation>
     </message>
     <message>
       <source>y</source>
       <comment>Suffix for displaying years</comment>
-      <translation>年</translation>
+      <translation>é</translation>
     </message>
     <message>
       <source>msec</source>
       <comment>Long suffix for displaying milliseconds</comment>
-      <translation>毫秒</translation>
+      <translation>milimp</translation>
     </message>
     <message>
       <source>sec</source>
       <comment>Long suffix for displaying seconds</comment>
-      <translation>秒</translation>
+      <translation>mp</translation>
     </message>
     <message>
       <source>min</source>
       <comment>Long suffix for displaying minutes</comment>
-      <translation>分</translation>
+      <translation>perc</translation>
     </message>
     <message>
       <source>hrs</source>
       <comment>Long suffix for displaying hours</comment>
-      <translation>時</translation>
+      <translation>óra</translation>
     </message>
     <message>
       <source>days</source>
       <comment>Long suffix for displaying days</comment>
-      <translation>日</translation>
+      <translation>nap</translation>
     </message>
     <message>
       <source>wks</source>
       <comment>Long suffix for displaying weeks</comment>
-      <translation>週</translation>
+      <translation>hét</translation>
     </message>
     <message>
       <source>mos</source>
       <comment>Long suffix for displaying months</comment>
-      <translation>月</translation>
+      <translation>hó</translation>
     </message>
     <message>
       <source>yrs</source>
       <comment>Long suffix for displaying years</comment>
-      <translation>年</translation>
+      <translation>év</translation>
     </message>
     <message numerus="yes">
       <source>milliseconds</source>
       <comment>Full suffix for displaying milliseconds</comment>
       <translation>
-        <numerusform>毫秒</numerusform>
+        <numerusform>milimásodperc</numerusform>
+        <numerusform>milimásodperc</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>seconds</source>
       <comment>Full suffix for displaying seconds</comment>
       <translation>
-        <numerusform>秒</numerusform>
+        <numerusform>másodperc</numerusform>
+        <numerusform>másodperc</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>minutes</source>
       <comment>Full suffix for displaying minutes</comment>
       <translation>
-        <numerusform>分</numerusform>
+        <numerusform>perc</numerusform>
+        <numerusform>perc</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>hours</source>
       <comment>Full suffix for displaying hours</comment>
       <translation>
-        <numerusform>時</numerusform>
+        <numerusform>óra</numerusform>
+        <numerusform>óra</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>days</source>
       <comment>Full suffix for displaying days</comment>
       <translation>
-        <numerusform>日</numerusform>
+        <numerusform>nap</numerusform>
+        <numerusform>nap</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>weeks</source>
       <comment>Full suffix for displaying weeks</comment>
       <translation>
-        <numerusform>週</numerusform>
+        <numerusform>hét</numerusform>
+        <numerusform>hét</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>months</source>
       <comment>Full suffix for displaying months</comment>
       <translation>
-        <numerusform>月</numerusform>
+        <numerusform>hónap</numerusform>
+        <numerusform>hónap</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>years</source>
       <comment>Full suffix for displaying years</comment>
       <translation>
-        <numerusform>年</numerusform>
+        <numerusform>év</numerusform>
+        <numerusform>év</numerusform>
       </translation>
     </message>
   </context>
@@ -1344,85 +1372,85 @@
     <name>QnTranscoder</name>
     <message>
       <source>OpenCL transcoding is not implemented.</source>
-      <translation>OpenCL 轉碼未執行.</translation>
+      <translation>OpenCL átkódolás nincs megvalósítva.</translation>
     </message>
     <message>
       <source>Unknown transcoding method.</source>
-      <translation>未知轉碼模式。</translation>
+      <translation>Ismeretlen átkódolási metódus.</translation>
     </message>
     <message>
       <source>OpenCLTranscode is not implemented.</source>
-      <translation>OpenCL 轉碼未被執行.</translation>
+      <translation>OpenCL átkódolás nincs megvalósítva.</translation>
     </message>
     <message>
       <source>Unknown transcode method</source>
-      <translation>未知轉碼方式</translation>
+      <translation>Ismeretlen átkódolási metódus</translation>
     </message>
   </context>
   <context>
     <name>QnUserRolesManager</name>
     <message>
       <source>Owner</source>
-      <translation>擁有者</translation>
+      <translation>Tulajdonos</translation>
     </message>
     <message>
       <source>Administrator</source>
-      <translation>管理者</translation>
+      <translation>Adminisztrátor</translation>
     </message>
     <message>
       <source>Advanced Viewer</source>
-      <translation>進階瀏覽</translation>
+      <translation>Speciális felhasználó</translation>
     </message>
     <message>
       <source>Viewer</source>
-      <translation>瀏覽</translation>
+      <translation>Felhasználó</translation>
     </message>
     <message>
       <source>Live Viewer</source>
-      <translation>即時影像瀏覽</translation>
+      <translation>Felhasználó (élő)</translation>
     </message>
     <message>
       <source>Custom Role</source>
-      <translation>自訂角色</translation>
+      <translation>Egyéni szerepkör</translation>
     </message>
     <message>
       <source>Custom</source>
-      <translation>自定</translation>
+      <translation>Egyéni</translation>
     </message>
     <message>
       <source>Can manage all cameras and bookmarks.</source>
-      <translation>可以管理所有的攝影機和書籤</translation>
+      <translation>Kamerák és könyvjelzők kezelése.</translation>
     </message>
     <message>
       <source>Can view all cameras and export video.</source>
-      <translation>可以瀏覽所有的攝影機及匯出影像.</translation>
+      <translation>Kamerák megtekintése és videóexportálás.</translation>
     </message>
     <message>
       <source>Can view live video from all cameras.</source>
-      <translation>可以瀏覽即時影像.</translation>
+      <translation>Élő kameraképek megtekintése.</translation>
     </message>
     <message>
       <source>Custom user role.</source>
-      <translation>自訂使用者角色.</translation>
+      <translation>Egyéni felhasználói szerepkör.</translation>
     </message>
     <message>
       <source>Custom permissions.</source>
-      <translation>自訂權限.</translation>
+      <translation>Egyéni engedélyek.</translation>
     </message>
     <message>
       <source>Has access to whole System and can do everything.</source>
-      <translation>擁有整個系統的權限且可做所有事.</translation>
+      <translation>Teljes körű, mindenre kiterjedő hozzáférés az egész rendszerhez.</translation>
     </message>
     <message>
       <source>Has access to whole System and can manage it. Can create users.</source>
-      <translation>擁有整個系統的權限且可管理系統. 可新增使用者.</translation>
+      <translation>Teljes körű hozzáférés az egész rendszerhez. Felhasználók létrehozása.</translation>
     </message>
   </context>
   <context>
     <name>utils::QnCameraNamesWatcher</name>
     <message>
       <source>Removed camera</source>
-      <translation>移除攝影機</translation>
+      <translation>Eltávolított kamera</translation>
     </message>
   </context>
 </TS>
