@@ -103,16 +103,13 @@
     "installationError":"업데이트 하지 못했습니다. 설치 스크립트를 실행할 수 없습니다.",
     "selectFiles":"파일 선택"
   },
-  "cameraLinks":{
-    "highStream":"고해상도 스트림",
-    "lowStream":"낮은 스트림",
-    "transcoding":"트랜스코딩",
-    "unknown":"알수 없음"
-  },
   "advanced":{
     "free":"무료",
     "total":"전체",
     "occupied":"사용중",
     "reserved":"예약됨"
+  },
+  "pageTitles":{
+    "default":"{{PRODUCT_NAME}} web interface"
   }
 }

@@ -33,7 +33,7 @@
         <h2>Начало работы с {{Config.productName}}</h2>
         <p>Сначала требуется настроить сервер. <br>Выбрать вариант настройки.</p>
         <div class="spacer" ng-if="!settings.liteClient"><br><br><br></div>
-        <button class="btn btn-primary" ng-click="next()">Новая система</button>
+        <button class="btn btn-primary" autofocus ng-click="next()">Новая система</button>
 
         <div class="horisontal-line-text">
             <span class="line"></span>
@@ -242,11 +242,17 @@
                 Пароль должен содержать различные типы символов и иметь по крайней мере 8 символов
             </div>
         </div>
-        <div class="form-group has-error"
-             ng-if="!forms.localForm.passwordInput.$valid && !forms.localForm.passwordInput.$error.required">
-            <div class="help-block">
-                Пароль должен содержать различные типы символов и иметь по крайней мере 8 символов
-            </div>
+        <div class="form-group has-error" ng-if="!forms.localForm.passwordInput.password.$valid">
+            <div class="help-block" ng-if="forms.localForm.passwordInput.password.$error.weak &&
+                  !forms.localForm.passwordInput.password.$error.common &&
+                  !forms.localForm.passwordInput.password.$error.pattern &&
+                  !forms.localForm.passwordInput.password.$error.minlength">{{L.passwordRequirements.weakMessage}}</div>
+            <div class="help-block" ng-if="forms.localForm.passwordInput.password.$error.common &&
+                  !forms.localForm.passwordInput.password.$error.pattern &&
+                  !forms.localForm.passwordInput.password.$error.minlength">{{L.passwordRequirements.commonMessage}}</div>
+            <div class="help-block" ng-if="forms.localForm.passwordInput.password.$error.minlength &&
+                  !forms.localForm.passwordInput.password.$error.pattern">{{L.passwordRequirements.minLengthMessage}}</div>
+            <div class="help-block" ng-if="forms.localForm.passwordInput.password.$error.pattern">{{L.passwordRequirements.requiredMessage}}</div>
         </div>
 
         <div class="form-group has-error"
@@ -469,16 +475,19 @@
     <button class="btn btn-default"
             ng-if="activeStep.cancel"
             ng-disabled="lockNextButton"
-            ng-click="cancel()">Отмена</button>     <button class="btn btn-default"
+            ng-click="cancel()">Cancel</button>
+    <button class="btn btn-default"
             ng-if="activeStep.back"
             ng-disabled="lockNextButton"
-            ng-click="back()"><span class="glyphicon glyphicon-arrow-left"></span></button> <button class="btn btn-primary pull-right"
+            ng-click="back()"><span class="glyphicon glyphicon-arrow-left"></span></button>
+    <button class="btn btn-primary pull-right"
             ng-if="activeStep.next"
             ng-disabled="lockNextButton"
-            enter-button auto-focus
- ng-click="next()">Далее <span class="glyphicon glyphicon-arrow-right"></span></button> <button class="btn btn-primary pull-right"
+            auto-focus
+ ng-click="next()">Next <span class="glyphicon glyphicon-arrow-right"></span></button>
+    <button class="btn btn-primary pull-right"
             ng-if="activeStep.finish"
             ng-disabled="lockNextButton"
-            enter-button auto-focus
- ng-click="finish()">Закончить</button>
+            auto-focus
+ ng-click="finish()">Finish</button>
 </div>

@@ -103,16 +103,13 @@
     "installationError":"Güncelleme başarısız. Yükleme komutları çalıştırılamıyor.",
     "selectFiles":"Dosyaları seç"
   },
-  "cameraLinks":{
-    "highStream":"Yüksek akış",
-    "lowStream":"Düşük akış",
-    "transcoding":"Dönüştürme",
-    "unknown":"Bilinmeyen"
-  },
   "advanced":{
     "free":"Ücretsiz",
     "total":"Toplam",
     "occupied":"Kullanımda",
     "reserved":"Rezerve"
+  },
+  "pageTitles":{
+    "default":"{{PRODUCT_NAME}} web interface"
   }
 }

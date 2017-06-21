@@ -103,16 +103,13 @@
     "installationError":"Mise à jour a échoué. Ne peut pas exécuter le script d’installation.",
     "selectFiles":"Sélectionner fichiers"
   },
-  "cameraLinks":{
-    "highStream":"Flux Haut",
-    "lowStream":"Flux Bas",
-    "transcoding":"Transcodage",
-    "unknown":"Inconnue"
-  },
   "advanced":{
     "free":"Gratuit",
     "total":"Total",
     "occupied":"Occupé",
     "reserved":"Réservés"
+  },
+  "pageTitles":{
+    "default":"{{PRODUCT_NAME}} web interface"
   }
 }

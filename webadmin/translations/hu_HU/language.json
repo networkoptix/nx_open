@@ -103,16 +103,13 @@
     "installationError":"Frissítés sikertelen. A telepítő nem indítható el.",
     "selectFiles":"Fájlok kiválasztása"
   },
-  "cameraLinks":{
-    "highStream":"Nagy stream",
-    "lowStream":"Kis stream",
-    "transcoding":"Transzkódolás",
-    "unknown":"Ismeretlen"
-  },
   "advanced":{
     "free":"Szabad",
     "total":"Teljes",
     "occupied":"Elfoglalt",
     "reserved":"Fenntartott"
+  },
+  "pageTitles":{
+    "default":"{{PRODUCT_NAME}} web interface"
   }
 }

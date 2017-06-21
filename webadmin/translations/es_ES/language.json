@@ -103,16 +103,13 @@
     "installationError":"La actualización falló. No puede ejecutar la escritura de instalación.",
     "selectFiles":"Seleccionar archivos"
   },
-  "cameraLinks":{
-    "highStream":"Corriente de alta",
-    "lowStream":"Corriente de baja",
-    "transcoding":"Transcodificación",
-    "unknown":"Desconocido"
-  },
   "advanced":{
     "free":"Gratis",
     "total":"Total",
     "occupied":"Ocupado",
     "reserved":"Reservado"
+  },
+  "pageTitles":{
+    "default":"{{PRODUCT_NAME}} web interface"
   }
 }

@@ -103,16 +103,13 @@
     "installationError":"Обновление не удалось. Не удалось выполнить сценарий установки.",
     "selectFiles":"Выберите файлы"
   },
-  "cameraLinks":{
-    "highStream":"Выс. кач-во",
-    "lowStream":"Низ. кач-во",
-    "transcoding":"Перекодирование",
-    "unknown":"Неизвестный"
-  },
   "advanced":{
     "free":"Свободно",
     "total":"Всего",
     "occupied":"Занято",
     "reserved":"Зарезервировано"
+  },
+  "pageTitles":{
+    "default":"{{PRODUCT_NAME}} web interface"
   }
 }

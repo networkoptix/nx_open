@@ -1,7 +1,6 @@
 
 <div class="modal-header" ng-if="settings.title">
-    <button type="button" class="close" data-dismiss="modal" aria-label="Close" ng-click="close()" ng-if="settings.closable"><span aria-hidden="true">&times;</span></button>
-    <h4 class="modal-title">{{settings.title}}</h4>
+    <button type="button" class="close" data-dismiss="modal" aria-label="Close" ng-click="close()" ng-if="settings.closable"><span aria-hidden="true"> &times; </span></button> <h4 class="modal-title"> {{settings.title}} </h4>
 </div>
 <div class="modal-body" ng-if="settings.content || settings.needOldPassword || settings.createLoginAndPassword">
     <p ng-if="settings.content" ng-bind-html="settings.content"></p>
@@ -10,7 +9,7 @@
         <form class="master-controls" name="forms.localForm" novalidate disable-autocomplete>
             <div class="form-group" validate-field>
                 <input ng-model="settings.localLogin" name="localLogin" class="form-control"
-                       type="text" placeholder="로그인" required readonly>
+                       type="text" placeholder="Login" required readonly>
             </div>
             <password-input ng-model="settings.localPassword"></password-input>
             <div class="form-group" validate-field ng-class="{'has-error':forms.localForm.passwordInput.$valid &&
@@ -18,7 +17,7 @@
                      forms.localForm.localPasswordConfirmation.$touched &&
                      settings.localPasswordConfirmation != settings.localPassword}">
                 <input ng-model="settings.localPasswordConfirmation" name="localPasswordConfirmation" class="form-control"
-                       type="password" autocomplete="new-password" placeholder="암호 재입력:" required>
+                       type="password" autocomplete="new-password" placeholder="Repeat password" required>
             </div>
 
             <div class="form-group has-error"
@@ -36,16 +35,16 @@
                      forms.localForm.localPasswordConfirmation.$touched &&
                      settings.localPasswordConfirmation != settings.localPassword">
                 <div class="help-block">
-                    비밀번호가 일치하지 않습니다.
+                    패스워드가 일치하지 않습니다.
                 </div>
             </div>
         </form>
     </div>
     <div ng-if="settings.needOldPassword">
         <form class="form" name="oldPasswordForm" novalidate>
-            <label for="oldSystemPassword" class="control-label"> 계속 하려면 현재 암호를 입력 하십시오.</label>
+            <label for="oldSystemPassword" class="control-label"> 계속 하려면 현재 패스워드를 입력 하십시오.</label>
             <input id="oldSystemPassword" type="password" ng-model="settings.oldPassword"
-                   class="form-control" placeholder="비밀번호" required auto-focus>
+                   class="form-control" placeholder="password" required auto-focus>
         </form>
     </div>
 </div>

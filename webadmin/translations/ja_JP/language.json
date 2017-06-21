@@ -103,16 +103,13 @@
     "installationError":"更新に失敗しました　インストール スクリプトを実行することはできません",
     "selectFiles":"ファイルを選択"
   },
-  "cameraLinks":{
-    "highStream":"高解像度ストリーム",
-    "lowStream":"低解像度ストリーム",
-    "transcoding":"トランスコーディング",
-    "unknown":"不明"
-  },
   "advanced":{
     "free":"フリー",
     "total":"合計",
     "occupied":"使用中",
     "reserved":"予約済み"
+  },
+  "pageTitles":{
+    "default":"{{PRODUCT_NAME}} web interface"
   }
 }

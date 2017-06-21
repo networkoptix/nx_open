@@ -103,16 +103,13 @@
     "installationError":"Update fehlgeschlagen. Das Installationsskript kann nicht ausgeführt werden.",
     "selectFiles":"Dateien auswählen"
   },
-  "cameraLinks":{
-    "highStream":"Hoher Stream",
-    "lowStream":"Niedriger Stream",
-    "transcoding":"Umkodierung",
-    "unknown":"Unbekannt"
-  },
   "advanced":{
     "free":"Kostenlos",
     "total":"Insgesamt",
     "occupied":"Belegt",
     "reserved":"Reserviert"
+  },
+  "pageTitles":{
+    "default":"{{PRODUCT_NAME}} web interface"
   }
 }

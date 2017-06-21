@@ -34,7 +34,7 @@
         <p>Bitte konfigurieren Sie den Server zuerst.<br>
 Wählen Sie eine Option.</p>
         <div class="spacer" ng-if="!settings.liteClient"><br><br><br></div>
-        <button class="btn btn-primary" ng-click="next()">Neues System einrichten</button>
+        <button class="btn btn-primary" autofocus ng-click="next()">Neues System einrichten</button>
 
         <div class="horisontal-line-text">
             <span class="line"></span>
@@ -243,11 +243,17 @@ Benötigt eine Internetverbindung
                 Passwort muss verschiedene Arten von Zeichen enthalten und mindestens aus 8 Zeichen bestehen
             </div>
         </div>
-        <div class="form-group has-error"
-             ng-if="!forms.localForm.passwordInput.$valid && !forms.localForm.passwordInput.$error.required">
-            <div class="help-block">
-                Passwort muss verschiedene Arten von Zeichen enthalten und mindestens aus 8 Zeichen bestehen
-            </div>
+        <div class="form-group has-error" ng-if="!forms.localForm.passwordInput.password.$valid">
+            <div class="help-block" ng-if="forms.localForm.passwordInput.password.$error.weak &&
+                  !forms.localForm.passwordInput.password.$error.common &&
+                  !forms.localForm.passwordInput.password.$error.pattern &&
+                  !forms.localForm.passwordInput.password.$error.minlength">{{L.passwordRequirements.weakMessage}}</div>
+            <div class="help-block" ng-if="forms.localForm.passwordInput.password.$error.common &&
+                  !forms.localForm.passwordInput.password.$error.pattern &&
+                  !forms.localForm.passwordInput.password.$error.minlength">{{L.passwordRequirements.commonMessage}}</div>
+            <div class="help-block" ng-if="forms.localForm.passwordInput.password.$error.minlength &&
+                  !forms.localForm.passwordInput.password.$error.pattern">{{L.passwordRequirements.minLengthMessage}}</div>
+            <div class="help-block" ng-if="forms.localForm.passwordInput.password.$error.pattern">{{L.passwordRequirements.requiredMessage}}</div>
         </div>
 
         <div class="form-group has-error"
@@ -474,19 +480,19 @@ indem Sie sich auf dieses Gerät mit einer der folgenden Möglichkeiten verbinde
     <button class="btn btn-default"
             ng-if="activeStep.cancel"
             ng-disabled="lockNextButton"
-            ng-click="cancel()">Abbrechen</button>
-<button class="btn btn-default"
+            ng-click="cancel()">Cancel</button>
+    <button class="btn btn-default"
             ng-if="activeStep.back"
             ng-disabled="lockNextButton"
             ng-click="back()"><span class="glyphicon glyphicon-arrow-left"></span></button>
-<button class="btn btn-primary pull-right"
+    <button class="btn btn-primary pull-right"
             ng-if="activeStep.next"
             ng-disabled="lockNextButton"
-            enter-button auto-focus
- ng-click="next()">Weiter <span class="glyphicon glyphicon-arrow-right"></span></button>
-<button class="btn btn-primary pull-right"
+            auto-focus
+ ng-click="next()">Next <span class="glyphicon glyphicon-arrow-right"></span></button>
+    <button class="btn btn-primary pull-right"
             ng-if="activeStep.finish"
             ng-disabled="lockNextButton"
-            enter-button auto-focus
- ng-click="finish()">Beenden</button>
+            auto-focus
+ ng-click="finish()">Finish</button>
 </div>
