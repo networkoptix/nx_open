@@ -22,7 +22,6 @@ function stage()
 
 	mkdir -p stage/cloud/static/common/static
 	rsync -a --exclude='static/*/static/fonts' $NX_PORTAL_DIR/cloud stage
-    rsync -a $NX_PORTAL_DIR/cloud/static/default/static/fonts stage/cloud/static/common/static
     rm -rf stage/cloud/.idea
 }
 
