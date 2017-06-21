@@ -39,7 +39,7 @@ extern "C"
 #include <nx/streaming/basic_media_context.h>
 #include <nx/fusion/serialization/lexical_enum.h>
 
-static const int MAX_RTP_BUFFER_SIZE = 65535;
+static const int MAX_RTP_BUFFER_SIZE = 65536;
 static const int REOPEN_TIMEOUT = 1000;
 
 namespace
@@ -59,7 +59,7 @@ namespace
 QnRtspClientArchiveDelegate::QnRtspClientArchiveDelegate(QnArchiveStreamReader* reader)
     :
     QnAbstractArchiveDelegate(),
-	m_rtspSession(new QnRtspClient),
+	m_rtspSession(new QnRtspClient(/*shouldGuessAuthDigest*/ true)),
     m_rtpData(0),
     m_tcpMode(true),
     m_position(DATETIME_NOW),
@@ -193,7 +193,7 @@ struct ArchiveTimeCheckInfo
 
 void QnRtspClientArchiveDelegate::checkGlobalTimeAsync(const QnSecurityCamResourcePtr &camera, const QnMediaServerResourcePtr &server, qint64* result)
 {
-    QnRtspClient otherRtspSession;
+    QnRtspClient otherRtspSession(true);
     QnRtspClientArchiveDelegate::setupRtspSession(camera, server,  &otherRtspSession, false);
     if (otherRtspSession.open(QnRtspClientArchiveDelegate::getUrl(camera, server)).errorCode != CameraDiagnostics::ErrorCode::noError)
         return;

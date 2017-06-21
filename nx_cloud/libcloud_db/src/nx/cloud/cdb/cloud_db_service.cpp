@@ -28,23 +28,10 @@
 #include <nx/cloud/cdb/api/ec2_request_paths.h>
 
 #include "access_control/authentication_manager.h"
-#include "dao/rdb/db_instance_controller.h"
-#include "ec2/synchronization_engine.h"
-#include "ec2/vms_p2p_command_bus.h"
+#include "controller.h"
 #include "http_handlers/get_cloud_modules_xml.h"
 #include "http_handlers/ping.h"
 #include "libcloud_db_app_info.h"
-#include "managers/account_manager.h"
-#include "managers/authentication_provider.h"
-#include "managers/cloud_module_url_provider.h"
-#include "managers/email_manager.h"
-#include "managers/event_manager.h"
-#include "managers/maintenance_manager.h"
-#include "managers/system_health_info_provider.h"
-#include "managers/system_manager.h"
-#include "managers/temporary_account_password_manager.h"
-#include "stree/stree_manager.h"
-
 
 static int registerQtResources()
 {
@@ -58,16 +45,9 @@ namespace cdb {
 CloudDbService::CloudDbService(int argc, char **argv):
     base_type(argc, argv, QnLibCloudDbAppInfo::applicationDisplayName()),
     m_settings(nullptr),
-    m_emailManager(nullptr),
-    m_streeManager(nullptr),
     m_httpMessageDispatcher(nullptr),
-    m_tempPasswordManager(nullptr),
-    m_accountManager(nullptr),
-    m_eventManager(nullptr),
-    m_systemManager(nullptr),
     m_authenticationManager(nullptr),
-    m_authorizationManager(nullptr),
-    m_authProvider(nullptr)
+    m_authorizationManager(nullptr)
 {
     //if call Q_INIT_RESOURCE directly, linker will search for nx::cdb::libcloud_db and fail...
     registerQtResources();
@@ -77,8 +57,6 @@ const std::vector<SocketAddress>& CloudDbService::httpEndpoints() const
 {
     return m_httpEndpoints;
 }
-
-static const QnUuid kCdbGuid("{674bafd7-4eec-4bba-84aa-a1baea7fc6db}");
 
 std::unique_ptr<utils::AbstractServiceSettings> CloudDbService::createSettings()
 {
@@ -102,66 +80,10 @@ int CloudDbService::serviceMain(const utils::AbstractServiceSettings& abstractSe
         return 1;
     }
 
-    dao::rdb::DbInstanceController dbInstanceController(
-        settings.dbConnectionOptions());
-    if (!dbInstanceController.initialize())
-    {
-        NX_LOG( lit("Failed to initialize DB connection"), cl_logALWAYS );
-        return 2;
-    }
-
-    nx::utils::StandaloneTimerManager timerManager;
-    timerManager.start();
-
-    std::unique_ptr<AbstractEmailManager> emailManager(
-        EMailManagerFactory::create(settings));
-    m_emailManager = emailManager.get();
-
-    StreeManager streeManager(settings.auth().rulesXmlPath);
-    m_streeManager = &streeManager;
+    Controller controller(settings);
 
     nx_http::MessageDispatcher httpMessageDispatcher;
     m_httpMessageDispatcher = &httpMessageDispatcher;
-
-    TemporaryAccountPasswordManager tempPasswordManager(
-        settings,
-        &dbInstanceController.queryExecutor());
-    m_tempPasswordManager = &tempPasswordManager;
-
-    AccountManager accountManager(
-        settings,
-        streeManager,
-        &tempPasswordManager,
-        &dbInstanceController.queryExecutor(),
-        emailManager.get());
-    m_accountManager = &accountManager;
-
-    EventManager eventManager(settings);
-    m_eventManager = &eventManager;
-
-    ec2::SyncronizationEngine ec2SyncronizationEngine(
-        kCdbGuid,
-        settings.p2pDb(),
-        &dbInstanceController.queryExecutor());
-
-    ec2::VmsP2pCommandBus vmsP2pCommandBus(&ec2SyncronizationEngine);
-
-    SystemHealthInfoProvider systemHealthInfoProvider(
-        &ec2SyncronizationEngine.connectionManager(),
-        &dbInstanceController.queryExecutor());
-
-    SystemManager systemManager(
-        settings,
-        &timerManager,
-        &accountManager,
-        systemHealthInfoProvider,
-        &dbInstanceController.queryExecutor(),
-        emailManager.get(),
-        &ec2SyncronizationEngine);
-    m_systemManager = &systemManager;
-
-    ec2SyncronizationEngine.subscribeToSystemDeletedNotification(
-        systemManager.systemMarkedAsDeletedSubscription());
 
     //TODO #ak move following to stree xml
     nx_http::AuthMethodRestrictionList authRestrictionList;
@@ -172,32 +94,19 @@ int CloudDbService::serviceMain(const utils::AbstractServiceSettings& abstractSe
     authRestrictionList.allow(kAccountReactivatePath, nx_http::AuthMethod::noAuth);
 
     std::vector<AbstractAuthenticationDataProvider*> authDataProviders;
-    authDataProviders.push_back(&accountManager);
-    authDataProviders.push_back(&systemManager);
+    authDataProviders.push_back(&controller.accountManager());
+    authDataProviders.push_back(&controller.systemManager());
     AuthenticationManager authenticationManager(
         std::move(authDataProviders),
         authRestrictionList,
-        streeManager);
+        controller.streeManager());
     m_authenticationManager = &authenticationManager;
 
     AuthorizationManager authorizationManager(
-        streeManager,
-        accountManager,
-        systemManager);
+        controller.streeManager(),
+        controller.accountManager(),
+        controller.systemManager());
     m_authorizationManager = &authorizationManager;
-
-    AuthenticationProvider authProvider(
-        settings,
-        &accountManager,
-        &systemManager,
-        tempPasswordManager,
-        &vmsP2pCommandBus);
-    m_authProvider = &authProvider;
-
-    MaintenanceManager maintenanceManager(
-        kCdbGuid,
-        &ec2SyncronizationEngine,
-        dbInstanceController);
 
     CloudModuleUrlProvider cloudModuleUrlProvider(
         settings.moduleFinder().cloudModulesXmlTemplatePath);
@@ -206,16 +115,16 @@ int CloudDbService::serviceMain(const utils::AbstractServiceSettings& abstractSe
     registerApiHandlers(
         &httpMessageDispatcher,
         authorizationManager,
-        &accountManager,
-        &systemManager,
-        &systemHealthInfoProvider,
-        &authProvider,
-        &eventManager,
-        &ec2SyncronizationEngine.connectionManager(),
-        &maintenanceManager,
+        &controller.accountManager(),
+        &controller.systemManager(),
+        &controller.systemHealthInfoProvider(),
+        &controller.authProvider(),
+        &controller.eventManager(),
+        &controller.ec2SyncronizationEngine().connectionManager(),
+        &controller.maintenanceManager(),
         cloudModuleUrlProvider);
     //TODO #ak remove eventManager.registerHttpHandlers and register in registerApiHandlers
-    eventManager.registerHttpHandlers(
+    controller.eventManager().registerHttpHandlers(
         authorizationManager,
         &httpMessageDispatcher);
 
@@ -258,9 +167,6 @@ int CloudDbService::serviceMain(const utils::AbstractServiceSettings& abstractSe
         [](nx_http::HttpStreamSocketServer* listener) { listener->pleaseStopSync(); });
 
     NX_LOGX(lm("Http server stopped"), cl_logDEBUG1);
-
-    ec2SyncronizationEngine.unsubscribeFromSystemDeletedNotification(
-        systemManager.systemMarkedAsDeletedSubscription());
 
     return result;
 }

@@ -1,5 +1,7 @@
 #include "db_instance_controller.h"
 
+#include <nx/utils/log/log.h>
+
 #include "structure_update_statements.h"
 #include "../../ec2/db/migration/add_history_to_transaction.h"
 
@@ -14,8 +16,32 @@ constexpr auto kDbRepeatedConnectionAttemptDelay = std::chrono::seconds(5);
 
 } // namespace
 
-DbInstanceController::DbInstanceController(const nx::db::ConnectionOptions& dbConnectionOptions):
-    nx::db::InstanceController(dbConnectionOptions)
+DbInstanceController::DbInstanceController(
+    const nx::db::ConnectionOptions& dbConnectionOptions,
+    boost::optional<unsigned int> dbVersionToUpdateTo)
+    :
+    nx::db::InstanceController(dbConnectionOptions),
+    m_userAuthRecordsMigrationNeeded(false)
+{
+    initializeStructureMigration();
+    if (dbVersionToUpdateTo)
+        dbStructureUpdater().setVersionToUpdateTo(*dbVersionToUpdateTo);
+
+    if (!initialize())
+    {
+        NX_LOG(lit("Failed to initialize DB connection"), cl_logALWAYS);
+        throw nx::db::Exception(
+            nx::db::DBResult::ioError,
+            "Failed to initialize connection to DB");
+    }
+}
+
+bool DbInstanceController::isUserAuthRecordsMigrationNeeded() const
+{
+    return m_userAuthRecordsMigrationNeeded;
+}
+
+void DbInstanceController::initializeStructureMigration()
 {
     dbStructureUpdater().addFullSchemaScript(13, db::kCreateDbVersion13);
 
@@ -55,8 +81,17 @@ DbInstanceController::DbInstanceController(const nx::db::ConnectionOptions& dbCo
     dbStructureUpdater().addUpdateScript(db::kAddAccountTimestamps);
     dbStructureUpdater().addUpdateScript(db::kAddSystemRegistrationTimestamp);
     dbStructureUpdater().addUpdateScript(db::kAddSystemHealthStateHistory);
+
+    // Version 3.1.
+
     dbStructureUpdater().addUpdateScript(db::kAddSystemUserAuthInfo);
     dbStructureUpdater().addUpdateScript(db::kAddSystemNonce);
+    dbStructureUpdater().addUpdateFunc(
+        [this](nx::db::QueryContext*)
+        {
+            m_userAuthRecordsMigrationNeeded = true;
+            return nx::db::DBResult::ok;
+        });
 }
 
 } // namespace rdb

@@ -461,24 +461,22 @@ namespace header {
 extern NX_NETWORK_API const StringType kContentType;
 extern NX_NETWORK_API const StringType kUserAgent;
 
-/** HTTP authentication scheme enumeration. */
-namespace AuthScheme {
-
-enum Value
+//!Http authentication scheme enumeration
+namespace AuthScheme
 {
-    none,
-    basic,
-    digest,
-    automatic
-};
+    enum Value
+    {
+        none,
+        basic,
+        digest
+    };
 
-NX_NETWORK_API const char* toString(Value val);
-NX_NETWORK_API Value fromString(const char* str);
-NX_NETWORK_API Value fromString(const ConstBufferRefType& str);
-
+    NX_NETWORK_API const char* toString( Value val );
+    NX_NETWORK_API Value fromString( const char* str );
+    NX_NETWORK_API Value fromString( const ConstBufferRefType& str );
 } // namespace AuthScheme
 
-/** Login/password to use in http authorization. */
+//!Login/password to use in http authorization
 class NX_NETWORK_API UserCredentials
 {
 public:

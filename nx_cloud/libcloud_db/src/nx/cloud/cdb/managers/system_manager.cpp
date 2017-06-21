@@ -669,6 +669,20 @@ boost::optional<api::SystemSharingEx> SystemManager::getSystemSharingData(
     return resultData;
 }
 
+std::vector<api::SystemSharingEx> SystemManager::fetchAllSharings() const
+{
+    QnMutexLocker lock(&m_mutex);
+
+    std::vector<api::SystemSharingEx> sharings;
+    sharings.reserve(m_accountAccessRoleForSystem.size());
+    std::copy(
+        m_accountAccessRoleForSystem.begin(),
+        m_accountAccessRoleForSystem.end(),
+        std::back_inserter(sharings));
+
+    return sharings;
+}
+
 nx::utils::Subscription<std::string>& SystemManager::systemMarkedAsDeletedSubscription()
 {
     return m_systemMarkedAsDeletedSubscription;
@@ -1242,6 +1256,7 @@ nx::db::DBResult SystemManager::prepareInviteNotification(
     db::DBResult dbResult = m_accountManager->createPasswordResetCode(
         queryContext,
         inviteeAccount.email,
+        m_settings.accountManager().accountActivationCodeExpirationTimeout,
         &accountConfirmationCode);
     if (dbResult != db::DBResult::ok)
         return dbResult;

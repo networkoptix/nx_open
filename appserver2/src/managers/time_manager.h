@@ -288,6 +288,7 @@ private:
     /** Periodically synchronizing time with internet (if possible). */
     void syncTimeWithInternet( quint64 taskID );
     void onTimeFetchingDone( qint64 millisFromEpoch, SystemError::ErrorCode errorCode );
+    void initializeTimeFetcher();
     void addInternetTimeSynchronizationTask();
     /** Returns time received from the internet or current local system time. */
     qint64 currentMSecsSinceEpoch() const;

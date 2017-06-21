@@ -9,6 +9,7 @@
 #include "core/resource_management/resource_pool.h"
 #include "recorder/storage_manager.h"
 #include <rest/server/rest_connection_processor.h>
+#include <nx/utils/string.h>
 
 int QnAuditLogRestHandler::executeGet(
     const QString& path,

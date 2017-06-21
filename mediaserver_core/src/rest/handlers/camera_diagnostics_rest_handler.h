@@ -11,8 +11,12 @@ class QnCameraDiagnosticsRestHandler: public QnJsonRestHandler
     Q_OBJECT
 
 public:
+    virtual QStringList cameraIdUrlParams() const override;
+
     virtual int executeGet(
-        const QString& path, const QnRequestParams& params, QnJsonRestResult& result,
+        const QString& path,
+        const QnRequestParams& params,
+        QnJsonRestResult& result,
         const QnRestConnectionProcessor* owner) override;
 
 private:

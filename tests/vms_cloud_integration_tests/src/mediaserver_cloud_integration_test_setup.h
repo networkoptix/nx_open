@@ -36,6 +36,8 @@ public:
     void changeCloudOwnerAccountPassword();
     void switchToDefaultCredentials();
     void waitForCloudDataSynchronizedToTheMediaServer();
+    ::ec2::ApiUserData inviteRandomCloudUser();
+    void waitForUserToAppearInCloud(const std::string& email);
 
 private:
     nx::cdb::CdbLauncher m_cdb;

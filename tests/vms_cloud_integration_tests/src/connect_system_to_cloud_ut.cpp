@@ -23,22 +23,13 @@ protected:
     void whenSetCloudSystemIdToEmptyString()
     {
         auto mediaServerClient = prepareMediaServerClient();
-        
+
         ec2::ApiResourceParamWithRefDataList params;
         params.resize(1);
         params.back().resourceId = QnUserResource::kAdminGuid;
         params.back().name = nx::settings_names::kNameCloudSystemId;
         params.back().value = QString();
-
-        ec2::ErrorCode resultCode = ec2::ErrorCode::ok;
-        std::tie(resultCode) =
-            makeSyncCall<ec2::ErrorCode>(
-                std::bind(
-                    &MediaServerClient::ec2SetResourceParams,
-                    &mediaServerClient,
-                    std::move(params),
-                    std::placeholders::_1));
-        ASSERT_EQ(ec2::ErrorCode::ok, resultCode);
+        ASSERT_EQ(ec2::ErrorCode::ok, mediaServerClient.ec2SetResourceParams(params));
 
         switchToDefaultCredentials();
     }
@@ -49,7 +40,7 @@ protected:
         for (;;)
         {
             QnModuleInformation moduleInformation;
-            QnJsonRestResult resultCode = 
+            QnJsonRestResult resultCode =
                 mediaServerClient.getModuleInformation(&moduleInformation);
             ASSERT_EQ(QnJsonRestResult::NoError, resultCode.error);
 
@@ -77,7 +68,7 @@ protected:
             std::this_thread::sleep_for(kRetryRequestDelay);
         }
     }
-    
+
     void thenCloudAttributesShouldBeRemoved()
     {
         auto mediaServerClient = prepareMediaServerClient();
@@ -87,7 +78,7 @@ protected:
             ec2::ErrorCode resultCode = mediaServerClient.ec2GetSettings(&vmsSettings);
             ASSERT_EQ(ec2::ErrorCode::ok, resultCode);
 
-            const auto cloudSettingsAreEmpty = 
+            const auto cloudSettingsAreEmpty =
                 getValueByName(vmsSettings, nx::settings_names::kNameCloudAccountName).isEmpty() &&
                 getValueByName(vmsSettings, nx::settings_names::kNameCloudSystemId).isEmpty() &&
                 getValueByName(vmsSettings, nx::settings_names::kNameCloudAuthKey).isEmpty();
@@ -193,7 +184,7 @@ protected:
     }
 };
 
-TEST_F(FtDisconnectSystemFromCloud, disconnect_by_mserver_api_call_local_admin_present)
+TEST_F(FtDisconnectSystemFromCloud, DISABLED_disconnect_by_mserver_api_call_local_admin_present)
 {
     givenServerWithLocalAdminConnectedToTheCloud();
 
@@ -203,7 +194,7 @@ TEST_F(FtDisconnectSystemFromCloud, disconnect_by_mserver_api_call_local_admin_p
     thenCloudAttributesShouldBeRemoved();
 }
 
-TEST_F(FtDisconnectSystemFromCloud, disconnect_by_mserver_api_call_cloud_owner_only)
+TEST_F(FtDisconnectSystemFromCloud, DISABLED_disconnect_by_mserver_api_call_cloud_owner_only)
 {
     givenServerConnectedToTheCloudWithCloudOwnerOnly();
 

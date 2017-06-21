@@ -4,9 +4,8 @@
 
 namespace ec2 {
 
-class Ini: public nx::kit::IniConfig
+struct Ini: public nx::kit::IniConfig
 {
-public:
     Ini(): IniConfig("appserver2.ini") { reload(); }
 
     NX_INI_FLAG(0, isP2pMode, "Switch messageBus to the new P2p implementation.");

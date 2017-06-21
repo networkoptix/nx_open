@@ -412,15 +412,16 @@ qint64 QnRtspTimeHelper::getUsecTime(quint32 rtpTime, const QnRtspStatistic& sta
     }
 }
 
-
-static const size_t ADDITIONAL_READ_BUFFER_CAPACITY = 64*1024;
+static const size_t ADDITIONAL_READ_BUFFER_CAPACITY = 64 * 1024;
 
 
 static std::atomic<int> RTPSessionInstanceCounter(0);
 
 // ================================================== QnRtspClient ==========================================
 
-QnRtspClient::QnRtspClient( std::unique_ptr<AbstractStreamSocket> tcpSock )
+QnRtspClient::QnRtspClient(
+    bool shoulGuessAuthDigest,
+    std::unique_ptr<AbstractStreamSocket> tcpSock)
 :
     m_csec(2),
     //m_rtpIo(*this),
@@ -439,6 +440,7 @@ QnRtspClient::QnRtspClient( std::unique_ptr<AbstractStreamSocket> tcpSock )
     m_additionalReadBuffer( nullptr ),
     m_additionalReadBufferPos( 0 ),
     m_additionalReadBufferSize( 0 ),
+    m_rtspAuthCtx(shoulGuessAuthDigest),
     m_userAgent(nx_http::userAgentString()),
     m_defaultAuthScheme(nx_http::header::AuthScheme::basic)
 {
@@ -666,7 +668,10 @@ CameraDiagnostics::Result QnRtspClient::open(const QString& url, qint64 startTim
     m_rtpToTrack.clear();
     m_rtspAuthCtx.clear();
     if (m_defaultAuthScheme == nx_http::header::AuthScheme::basic)
-        m_rtspAuthCtx.authenticateHeader = nx_http::header::WWWAuthenticate(m_defaultAuthScheme);
+    {
+        m_rtspAuthCtx.setAuthenticationHeader(
+            nx_http::header::WWWAuthenticate(m_defaultAuthScheme));
+    }
 
     {
         QnMutexLocker lock(&m_socketMutex);
@@ -690,7 +695,8 @@ CameraDiagnostics::Result QnRtspClient::open(const QString& url, qint64 startTim
     m_tcpSock->setRecvTimeout(m_tcpTimeout);
     m_tcpSock->setSendTimeout(m_tcpTimeout);
 
-    if (m_numOfPredefinedChannels) {
+    if (m_numOfPredefinedChannels)
+    {
         usePredefinedTracks();
         return CameraDiagnostics::NoErrorResult();
     }
@@ -1930,7 +1936,7 @@ int QnRtspClient::readSocketWithBuffering( quint8* buf, size_t bufSize, bool rea
 bool QnRtspClient::sendRequestAndReceiveResponse( nx_http::Request&& request, QByteArray& responseBuf )
 {
     int prevStatusCode = nx_http::StatusCode::ok;
-    if (m_rtspAuthCtx.authenticateHeader)
+    if (m_rtspAuthCtx.authenticationHeader())
         addAuth( &request );
     addAdditionAttrs( &request );
 
@@ -1990,4 +1996,3 @@ AbstractStreamSocket* QnRtspClient::tcpSock()
 {
     return m_tcpSock.get();
 }
-

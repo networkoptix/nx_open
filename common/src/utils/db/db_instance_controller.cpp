@@ -1,6 +1,7 @@
 #include "db_instance_controller.h"
 
 #include <thread>
+#include <string>
 
 #include <QtSql/QSqlQuery>
 
@@ -11,12 +12,13 @@ namespace nx {
 namespace db {
 
 constexpr static std::chrono::minutes kDefaultStatisticsAggregationPeriod = std::chrono::minutes(1);
+static const std::string kCdbStructureName = "cdb";
 
 InstanceController::InstanceController(const ConnectionOptions& dbConnectionOptions):
     m_dbConnectionOptions(dbConnectionOptions),
     m_queryExecutor(std::make_unique<AsyncSqlQueryExecutor>(dbConnectionOptions)),
     m_statisticsCollector(kDefaultStatisticsAggregationPeriod),
-    m_dbStructureUpdater(m_queryExecutor.get())
+    m_dbStructureUpdater(kCdbStructureName, m_queryExecutor.get())
 {
     m_queryExecutor->setStatisticsCollector(&m_statisticsCollector);
 }
@@ -87,9 +89,9 @@ bool InstanceController::configureDb()
     m_queryExecutor->executeUpdateWithoutTran(
         std::bind(&InstanceController::configureSqliteInstance, this, _1),
         [&](QueryContext* /*queryContext*/, DBResult dbResult)
-    {
-        cacheFilledPromise.set_value(dbResult);
-    });
+        {
+            cacheFilledPromise.set_value(dbResult);
+        });
 
     return future.get() == DBResult::ok;
 }

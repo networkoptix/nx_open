@@ -1,8 +1,5 @@
 #pragma once
 
-#include <QtCore/QDateTime>
-#include <QtCore/QDebug>
-
 #include <utils/common/scoped_thread_rollback.h>
 #include <nx/fusion/model_functions.h>
 #include <nx/utils/concurrent.h>

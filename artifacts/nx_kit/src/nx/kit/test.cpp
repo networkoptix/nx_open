@@ -1,8 +1,9 @@
+// Copyright 2017 Network Optix, Inc. Licensed under GNU Lesser General Public License version 3.
+#include "test.h"
+
 #include <cstdio>
 #include <cstdarg>
 #include <vector>
-
-#include "test.h"
 
 namespace nx {
 namespace kit {

@@ -9,6 +9,7 @@
 #include <utils/common/util.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/system_error.h>
+#include <nx/utils/file_system.h>
 #include <utils/common/warnings.h>
 
 #define NOMINMAX
@@ -414,7 +415,7 @@ QList<QnPlatformMonitor::PartitionSpace> QnWindowsMonitor::totalPartitionSpaceIn
         driveInfo.path = QString::fromWCharArray(curDiskName, sizeof(curDiskName)/sizeof(*curDiskName)-1);  //omitting trailing backslash
         NX_LOG( lit("MONITOR. Found disk %1").arg(driveInfo.path), cl_logDEBUG2 );
 
-        if (!mediaIsInserted(driveInfo.path))
+        if (!nx::utils::file_system::mediaIsInserted(driveInfo.path))
         {
             NX_LOG(lit("MONITOR. Failed to check media for disk %1.").arg(driveInfo.path), cl_logDEBUG2);
             continue;
