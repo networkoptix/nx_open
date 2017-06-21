@@ -1,102 +1,102 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
-<TS version="2.1" language="zh-TW" sourcelanguage="en">
+<TS version="2.1" language="de" sourcelanguage="en">
   <context>
     <name>EmptyTilesPlaceholder</name>
     <message>
       <source>Searching servers in your local network...</source>
-      <translation>在您的本地網路中搜尋伺服器...</translation>
+      <translation>Nach Servern im lokalen Netzwerk suchen...</translation>
     </message>
     <message>
       <source>No servers found</source>
-      <translation>沒有找到伺服器</translation>
+      <translation>Keine Server gefunden</translation>
     </message>
     <message>
       <source>Check your network connection or press &quot;Connect to Server&quot; button to enter known server address</source>
-      <translation>請檢查您的網路連接或按&quot;連接到伺服器&quot;按鈕來輸入已知的伺服器位址</translation>
+      <translation>Überprüfen Sie Ihre Netzwerkverbindung oder drücken Sie die &quot;Verbinde zum Server&quot;-Schaltfläche, um eine bekannte Serveradresse einzugeben</translation>
     </message>
   </context>
   <context>
     <name>FactorySystemTileArea</name>
     <message>
       <source>Click to setup</source>
-      <translation>點擊安裝</translation>
+      <translation>Klicken zum Einrichten</translation>
     </message>
   </context>
   <context>
     <name>LocalSystemTileExpandedAreaPart</name>
     <message>
       <source>Login</source>
-      <translation>登入帳號</translation>
+      <translation>Login</translation>
     </message>
     <message>
       <source>Password</source>
-      <translation>密碼</translation>
+      <translation>Passwort</translation>
     </message>
     <message>
       <source>Save password</source>
-      <translation>儲存密碼</translation>
+      <translation>Passwort speichern</translation>
     </message>
     <message>
       <source>Auto-login</source>
-      <translation>自動登入</translation>
+      <translation>Autologin</translation>
     </message>
     <message>
       <source>Connect</source>
-      <translation>連線</translation>
+      <translation>Verbinden</translation>
     </message>
   </context>
   <context>
     <name>NxSearchEdit</name>
     <message>
       <source>Search</source>
-      <translation>搜尋</translation>
+      <translation>Suche</translation>
     </message>
   </context>
   <context>
     <name>SystemTile</name>
     <message>
       <source>SAFE MODE</source>
-      <translation>安全模式</translation>
+      <translation>ABGESICHERTER MODUS</translation>
     </message>
     <message>
       <source>INCOMPATIBLE</source>
-      <translation>不相容</translation>
+      <translation>NICHT KOMPATIBEL</translation>
     </message>
     <message>
       <source>OFFLINE</source>
-      <translation>離線</translation>
+      <translation>OFFLINE</translation>
     </message>
     <message>
       <source>UNREACHABLE</source>
-      <translation>無法連接</translation>
+      <translation>NICHT ERREICHBAR</translation>
     </message>
     <message>
       <source>New Server</source>
-      <translation>新的伺服器</translation>
+      <translation>Neuer Server</translation>
     </message>
   </context>
   <context>
     <name>WelcomeScreen</name>
     <message>
       <source>Nothing found</source>
-      <translation>未找到任何內容</translation>
+      <translation>Nichts gefunden</translation>
     </message>
     <message>
       <source>You have no access to %1. Some features could be unavailable.</source>
-      <translation>你沒有 %1 的權限. 某些功能可能無法使用.</translation>
+      <translation>Sie haben keinen Zugang zu %1. Einige Funktionen sind möglicherweise nicht verfügbar.</translation>
     </message>
     <message>
       <source>Loading...</source>
-      <translation>讀取中...</translation>
+      <translation>Wird geladen...</translation>
     </message>
     <message>
       <source>Connect to Another Server...</source>
-      <translation>連線至其他伺服器...</translation>
+      <translation>Mit einem anderen Server verbinden...</translation>
     </message>
     <message>
       <source>Connect to Server...</source>
-      <translation>連線至伺服器...</translation>
+      <translation>Mit Server verbinden...</translation>
     </message>
   </context>
 </TS>
