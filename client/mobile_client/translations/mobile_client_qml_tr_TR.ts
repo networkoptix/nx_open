@@ -1,102 +1,102 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
-<TS version="2.1" language="pt-PT" sourcelanguage="en">
+<TS version="2.1" language="tr" sourcelanguage="en">
   <context>
     <name>CameraItem</name>
     <message>
       <source>Select camera</source>
-      <translation type="unfinished">Select camera</translation>
+      <translation>Kamera seç</translation>
     </message>
     <message>
       <source>Press Ctrl + Arrow or use mouse wheel</source>
-      <translation type="unfinished">Press Ctrl + Arrow or use mouse wheel</translation>
+      <translation>Ctrl + ok tuşlarına basın veya fare tekerleğini kullanın</translation>
     </message>
     <message>
       <source>Authentication required</source>
-      <translation type="unfinished">Authentication required</translation>
+      <translation>Kimlik doğrulaması gerekli</translation>
     </message>
     <message>
       <source>Offline</source>
-      <translation type="unfinished">Offline</translation>
+      <translation>Çevrimdışı</translation>
     </message>
   </context>
   <context>
     <name>CloudPanel</name>
     <message>
       <source>Log in to %1</source>
-      <translation type="unfinished">Log in to %1</translation>
+      <translation>%1 e giriş yapın</translation>
     </message>
   </context>
   <context>
     <name>CloudScreen</name>
     <message>
       <source>Cloud Account</source>
-      <translation type="unfinished">Cloud Account</translation>
+      <translation>Bulut hesabı</translation>
     </message>
   </context>
   <context>
     <name>CloudSummary</name>
     <message>
       <source>Log out</source>
-      <translation type="unfinished">Log out</translation>
+      <translation>Çıkış</translation>
     </message>
     <message>
       <source>Go to %1</source>
-      <translation type="unfinished">Go to %1</translation>
+      <translation>%1 e git</translation>
     </message>
   </context>
   <context>
     <name>CredentialsEditor</name>
     <message>
       <source>Email</source>
-      <translation type="unfinished">Email</translation>
+      <translation>Eposta</translation>
     </message>
     <message>
       <source>Password</source>
-      <translation type="unfinished">Password</translation>
+      <translation>Parola</translation>
     </message>
     <message>
       <source>Learn more about %1</source>
-      <translation type="unfinished">Learn more about %1</translation>
+      <translation>%1 Detay</translation>
     </message>
     <message>
       <source>Create account</source>
-      <translation type="unfinished">Create account</translation>
+      <translation>Hesap oluştur</translation>
     </message>
     <message>
       <source>Forgot your password?</source>
-      <translation type="unfinished">Forgot your password?</translation>
+      <translation>Parolanızı mı unuttunuz?</translation>
     </message>
     <message>
       <source>Cannot connect to %1</source>
-      <translation type="unfinished">Cannot connect to %1</translation>
+      <translation>%1 e bağlanılamıyor</translation>
     </message>
     <message>
       <source>Email and password cannot be empty</source>
-      <translation type="unfinished">Email and password cannot be empty</translation>
+      <translation>E-posta ve parola boş olamaz</translation>
     </message>
     <message>
       <source>Log in</source>
-      <translation type="unfinished">Log in</translation>
+      <translation>Giriş yap</translation>
     </message>
     <message>
       <source>Incorrect Email or Password</source>
-      <translation type="unfinished">Incorrect Email or Password</translation>
+      <translation>Hatalı e-posta veya parola</translation>
     </message>
   </context>
   <context>
     <name>CustomConnectionScreen</name>
     <message>
       <source>Delete</source>
-      <translation>Apagar</translation>
+      <translation>Sil</translation>
     </message>
     <message>
       <source>Connect to Server</source>
-      <translation type="unfinished">Connect to Server</translation>
+      <translation>Sunucuya bağlan</translation>
     </message>
     <message>
       <source>Enter server address</source>
-      <translation type="unfinished">Enter server address</translation>
+      <translation>Sunucu adresini girin</translation>
     </message>
     <message>
       <source>Delete login &quot;%1&quot;?</source>
@@ -104,61 +104,61 @@
     </message>
     <message>
       <source>Server addresses and other logins will remain saved. To delete all connection information you should delete all saved logins.</source>
-      <translation type="unfinished">Server addresses and other logins will remain saved. To delete all connection information you should delete all saved logins.</translation>
+      <translation>Sunucu adresleri ve oturumlar kaydedildi. Bağlantı bilgilerini silmek için tüm kayıtlı oturumları silmelisiniz.</translation>
     </message>
     <message>
       <source>Delete connection?</source>
-      <translation type="unfinished">Delete connection?</translation>
+      <translation>Bağlantıyı silmek istiyor musunuz?</translation>
     </message>
     <message>
       <source>Login cannot be empty</source>
-      <translation type="unfinished">Login cannot be empty</translation>
+      <translation>Giriş bilgileri boş bırakılamaz</translation>
     </message>
     <message>
       <source>Password cannot be empty</source>
-      <translation type="unfinished">Password cannot be empty</translation>
+      <translation>Parola boş olamaz</translation>
     </message>
   </context>
   <context>
     <name>DeveloperSettingsScreen</name>
     <message>
       <source>Developer Settings</source>
-      <translation type="unfinished">Developer Settings</translation>
+      <translation>Geliştirici Ayarları</translation>
     </message>
     <message>
       <source>Log Level</source>
-      <translation type="unfinished">Log Level</translation>
+      <translation>Günlük kayıt seviyesi</translation>
     </message>
   </context>
   <context>
     <name>DialogButtonBox</name>
     <message>
       <source>OK</source>
-      <translation type="unfinished">OK</translation>
+      <translation>TAMAM</translation>
     </message>
     <message>
       <source>Cancel</source>
-      <translation>Cancelar</translation>
+      <translation>İptal</translation>
     </message>
     <message>
       <source>Close</source>
-      <translation>Fechar</translation>
+      <translation>Kapat</translation>
     </message>
     <message>
       <source>Yes</source>
-      <translation type="unfinished">Yes</translation>
+      <translation>Evet</translation>
     </message>
     <message>
       <source>No</source>
-      <translation type="unfinished">No</translation>
+      <translation>Hayır</translation>
     </message>
     <message>
       <source>Abort</source>
-      <translation type="unfinished">Abort</translation>
+      <translation>İptal</translation>
     </message>
     <message>
       <source>Retry</source>
-      <translation type="unfinished">Retry</translation>
+      <translation>Tekrar Dene</translation>
     </message>
   </context>
   <context>
@@ -166,259 +166,259 @@
     <message>
       <source>To connect to old servers please download the legacy application from Google Play.</source>
       <comment>&quot;Google Play&quot; is the name of the main Android application store.</comment>
-      <translation>Para ligar a servidores mais antigos deve descarregar a aplicação 'Legacy' a partir do 'Google Play'.</translation>
+      <translation>Eski versiyonlara bağlanmak için Lütfen Google Play'den uyumlu versiyonu indirin.</translation>
     </message>
     <message>
       <source>To connect to old servers please download the legacy application from the App Store.</source>
       <comment>&quot;App Store&quot; is the name of the main Apple application store.</comment>
-      <translation>Para ligar a servidores mais antigos deve descarregar a aplicação 'Legacy' a partir da 'App Store'.</translation>
+      <translation>Eski versiyonlara bağlanmak için Lütfen Apple Store'dan uyumlu versiyonu indirin.</translation>
     </message>
     <message>
       <source>To connect to old servers please download the legacy application from the Internet.</source>
-      <translation>Para ligar a servidores mais antigos deve descarregar a aplicação 'Legacy' a partir da Internet.</translation>
+      <translation>Eski versiyonlara bağlanmak için Lütfen uyumlu versiyonu indirin.</translation>
     </message>
     <message>
       <source>Download</source>
-      <translation>Descarregar</translation>
+      <translation>İndir</translation>
     </message>
   </context>
   <context>
     <name>HelpPopup</name>
     <message>
       <source>Select another cell</source>
-      <translation type="unfinished">Select another cell</translation>
+      <translation>Başka bir hücreyi seçin</translation>
     </message>
     <message>
       <source>Switch camera in the cell</source>
-      <translation type="unfinished">Switch camera in the cell</translation>
+      <translation>Hücredeki kamerayı değiştir</translation>
     </message>
     <message>
       <source>Enter or exit fullscreen</source>
-      <translation type="unfinished">Enter or exit fullscreen</translation>
+      <translation>Giriş yapın yada tama ekrandan çıkın</translation>
     </message>
     <message>
       <source>Press any key to go to cameras</source>
-      <translation type="unfinished">Press any key to go to cameras</translation>
+      <translation>Kameralara için gitmek için herhangi bir tuşa basın</translation>
     </message>
     <message>
       <source>Press F1 to show this message again</source>
-      <translation type="unfinished">Press F1 to show this message again</translation>
+      <translation>Bu iletiyi bir daha görmek için F1 tuşuna basın</translation>
     </message>
   </context>
   <context>
     <name>HorizontalCalendar</name>
     <message>
       <source>Close</source>
-      <translation>Fechar</translation>
+      <translation>Kapat</translation>
     </message>
   </context>
   <context>
     <name>InformationLabel</name>
     <message>
       <source>Unknown</source>
-      <translation>Desconhecido</translation>
+      <translation>Belirtilmemiş</translation>
     </message>
     <message>
       <source>%1 fps</source>
-      <translation type="unfinished">%1 fps</translation>
+      <translation>%1 fps</translation>
     </message>
     <message>
       <source>%1 Mbps</source>
-      <translation type="unfinished">%1 Mbps</translation>
+      <translation>%1 Mbps</translation>
     </message>
     <message>
       <source>Hi-Res</source>
-      <translation type="unfinished">Hi-Res</translation>
+      <translation>Yüksek Kalite</translation>
     </message>
     <message>
       <source>Lo-Res</source>
-      <translation type="unfinished">Lo-Res</translation>
+      <translation>Düşük kalite</translation>
     </message>
     <message>
       <source>Keyfr + Lo-Res</source>
-      <translation type="unfinished">Keyfr + Lo-Res</translation>
+      <translation>Keyfr + Lo-Res</translation>
     </message>
     <message>
       <source>Custom-Res</source>
-      <translation type="unfinished">Custom-Res</translation>
+      <translation>Özel Çözünürlük</translation>
     </message>
   </context>
   <context>
     <name>LaunchButton</name>
     <message>
       <source>Turn On</source>
-      <translation type="unfinished">Turn On</translation>
+      <translation>Çalıştır</translation>
     </message>
   </context>
   <context>
     <name>LiteClientControlScreen</name>
     <message>
       <source>Cannot start client</source>
-      <translation type="unfinished">Cannot start client</translation>
+      <translation>İstemci başlatılamıyor</translation>
     </message>
     <message>
       <source>Cannot stop client</source>
-      <translation type="unfinished">Cannot stop client</translation>
+      <translation>İstemci kapatılamadı</translation>
     </message>
     <message>
       <source>Please make sure that display is connected to %1.</source>
-      <translation type="unfinished">Please make sure that display is connected to %1.</translation>
+      <translation>Lütfen %1 e ekran bağlandığına emin olun.</translation>
     </message>
     <message>
       <source>%1 is offline</source>
-      <translation type="unfinished">%1 is offline</translation>
+      <translation>%1 Kapalı</translation>
     </message>
   </context>
   <context>
     <name>LiveVideoNavigation</name>
     <message>
       <source>LIVE</source>
-      <translation>Em Directo</translation>
+      <translation>CANLI</translation>
     </message>
   </context>
   <context>
     <name>LoginButton</name>
     <message>
       <source>Connect</source>
-      <translation>Ligar</translation>
+      <translation>Bağlan</translation>
     </message>
   </context>
   <context>
     <name>NoCameraItem</name>
     <message>
       <source>No image</source>
-      <translation type="unfinished">No image</translation>
+      <translation>İmaj yok</translation>
     </message>
   </context>
   <context>
     <name>NoDisplayDummy</name>
     <message>
       <source>No display connected</source>
-      <translation type="unfinished">No display connected</translation>
+      <translation>Bağlı ekran yok</translation>
     </message>
   </context>
   <context>
     <name>OfflineDummy</name>
     <message>
       <source>You are not connected to any System</source>
-      <translation type="unfinished">You are not connected to any System</translation>
+      <translation>İstemci herhangi bir sisteme bağlı değil</translation>
     </message>
   </context>
   <context>
     <name>QualityDialog</name>
     <message>
       <source>Video Quality</source>
-      <translation type="unfinished">Video Quality</translation>
+      <translation>Video Kalitesi</translation>
     </message>
     <message>
       <source>Unknown</source>
-      <translation>Desconhecido</translation>
+      <translation>Belirtilmemiş</translation>
     </message>
     <message>
       <source>Highest speed</source>
-      <translation type="unfinished">Highest speed</translation>
+      <translation>En yüksek hız</translation>
     </message>
     <message>
       <source>Best quality</source>
-      <translation type="unfinished">Best quality</translation>
+      <translation>En iyi kalite</translation>
     </message>
   </context>
   <context>
     <name>ResourcesScreen</name>
     <message>
       <source>Server offline</source>
-      <translation>Servidor offline</translation>
+      <translation>Sunucu Çevrimdışı</translation>
     </message>
     <message>
       <source>Loading...</source>
-      <translation>A Carregar...</translation>
+      <translation>Yükleniyor...</translation>
     </message>
     <message>
       <source>Connecting...</source>
-      <translation>A Ligar...</translation>
+      <translation>Bağlantı kuruluyor...</translation>
     </message>
     <message>
       <source>No cameras available on this layout</source>
-      <translation type="unfinished">No cameras available on this layout</translation>
+      <translation>Bu düzende erişilebilir kamera yok</translation>
     </message>
     <message>
       <source>Show all cameras</source>
-      <translation type="unfinished">Show all cameras</translation>
+      <translation>Tüm kameralar göster</translation>
     </message>
     <message>
       <source>Nothing found</source>
-      <translation type="unfinished">Nothing found</translation>
+      <translation>Hiçbir şey bulunamadı</translation>
     </message>
     <message>
       <source>Cannot connect to server</source>
-      <translation type="unfinished">Cannot connect to server</translation>
+      <translation>Sunucuya bağlanılamıyor</translation>
     </message>
     <message>
       <source>Press %1 to exit</source>
-      <translation type="unfinished">Press %1 to exit</translation>
+      <translation>Çıkmak için %1 e basın</translation>
     </message>
   </context>
   <context>
     <name>SearchToolBar</name>
     <message>
       <source>Search</source>
-      <translation>Pesquisa</translation>
+      <translation>Arama</translation>
     </message>
   </context>
   <context>
     <name>ServerOfflineDummy</name>
     <message>
       <source>%1 is offline</source>
-      <translation type="unfinished">%1 is offline</translation>
+      <translation>%1 çevrimdışı</translation>
     </message>
   </context>
   <context>
     <name>SessionCredentialsEditor</name>
     <message>
       <source>Host : Port</source>
-      <translation type="unfinished">Host : Port</translation>
+      <translation>Sunucu: bağlantı noktası</translation>
     </message>
     <message>
       <source>Login</source>
-      <translation type="unfinished">Login</translation>
+      <translation>Giriş</translation>
     </message>
     <message>
       <source>Password</source>
-      <translation type="unfinished">Password</translation>
+      <translation>Parola</translation>
     </message>
     <message>
       <source>Hosts</source>
-      <translation type="unfinished">Hosts</translation>
+      <translation>Sunucular</translation>
     </message>
     <message>
       <source>Users</source>
-      <translation type="unfinished">Users</translation>
+      <translation>Kullanıcılar</translation>
     </message>
   </context>
   <context>
     <name>SessionItem</name>
     <message>
       <source>This server has too old version. Please update it to the latest version.</source>
-      <translation type="unfinished">This server has too old version. Please update it to the latest version.</translation>
+      <translation>Sunucu versiyonu çok eski. Lütfen en son sürüme güncelleyin.</translation>
     </message>
     <message>
       <source>OFFLINE</source>
-      <translation type="unfinished">OFFLINE</translation>
+      <translation>ÇEVRİMDIŞI</translation>
     </message>
     <message>
       <source>INCOMPATIBLE</source>
-      <translation type="unfinished">INCOMPATIBLE</translation>
+      <translation>UYUMSUZ</translation>
     </message>
   </context>
   <context>
     <name>SessionsScreen</name>
     <message>
       <source>Log in to %1</source>
-      <translation type="unfinished">Log in to %1</translation>
+      <translation>%1 e giriş yapın</translation>
     </message>
     <message>
       <source>Cannot connect to %1</source>
-      <translation type="unfinished">Cannot connect to %1</translation>
+      <translation>%1 e bağlanılamıyor</translation>
     </message>
     <message>
       <source>Check your network connection or press &quot;%1&quot; button to enter a known server address.</source>
@@ -426,19 +426,19 @@
     </message>
     <message>
       <source>Check your network connection or contact a system administrator</source>
-      <translation type="unfinished">Check your network connection or contact a system administrator</translation>
+      <translation>Bağlanıtınızı kontrol edin veya sistem yöneticinize başvurun</translation>
     </message>
     <message>
       <source>Connect to Server...</source>
-      <translation type="unfinished">Connect to Server...</translation>
+      <translation>Sunucuya Bağlan...</translation>
     </message>
     <message>
       <source>Connect to Another Server...</source>
-      <translation type="unfinished">Connect to Another Server...</translation>
+      <translation>Başka bir Sunucuya Bağlan...</translation>
     </message>
     <message>
       <source>No Systems found</source>
-      <translation type="unfinished">No Systems found</translation>
+      <translation>Hiçbir sistem bulundu</translation>
     </message>
     <message>
       <source>Cannot connect to System &quot;%1&quot;</source>
@@ -446,129 +446,129 @@
     </message>
     <message>
       <source>Cannot connect to Server</source>
-      <translation type="unfinished">Cannot connect to Server</translation>
+      <translation>Sunucuya bağlanılamıyor</translation>
     </message>
   </context>
   <context>
     <name>SettingsScreen</name>
     <message>
       <source>Settings</source>
-      <translation>Definições</translation>
+      <translation>Ayarlar</translation>
     </message>
     <message>
       <source>Live previews in the cameras list</source>
-      <translation type="unfinished">Live previews in the cameras list</translation>
+      <translation>Kamera listesinde canlı önizlemeyi göster</translation>
     </message>
     <message>
       <source>Save passwords for servers</source>
-      <translation type="unfinished">Save passwords for servers</translation>
+      <translation>Bu sunucular için parolayı kaydet</translation>
     </message>
   </context>
   <context>
     <name>SideNavigation</name>
     <message>
       <source>New connection</source>
-      <translation>Nova ligação</translation>
+      <translation>Yeni bağlantı</translation>
     </message>
     <message>
       <source>Settings</source>
-      <translation>Definições</translation>
+      <translation>Ayarlar</translation>
     </message>
     <message>
       <source>Start test</source>
-      <translation type="unfinished">Start test</translation>
+      <translation>Test et</translation>
     </message>
     <message>
       <source>Stop test</source>
-      <translation type="unfinished">Stop test</translation>
+      <translation>Testi durdur</translation>
     </message>
     <message>
       <source>Disconnect from Server</source>
-      <translation type="unfinished">Disconnect from Server</translation>
+      <translation>Sunucu ile bağlantıyı kes</translation>
     </message>
   </context>
   <context>
     <name>StartingDummy</name>
     <message>
       <source>Turning on</source>
-      <translation type="unfinished">Turning on</translation>
+      <translation>Açılıyor</translation>
     </message>
   </context>
   <context>
     <name>StoppingDummy</name>
     <message>
       <source>Turning off</source>
-      <translation type="unfinished">Turning off</translation>
+      <translation>Kapatılıyor</translation>
     </message>
   </context>
   <context>
     <name>SystemInformationBlock</name>
     <message>
       <source>Unknown</source>
-      <translation>Desconhecido</translation>
+      <translation>Belirtilmemiş</translation>
     </message>
   </context>
   <context>
     <name>TestSelectionDialog</name>
     <message>
       <source>Select Test</source>
-      <translation type="unfinished">Select Test</translation>
+      <translation>Test edin</translation>
     </message>
   </context>
   <context>
     <name>TextField</name>
     <message>
       <source>Cut</source>
-      <translation type="unfinished">Cut</translation>
+      <translation>Kes</translation>
     </message>
     <message>
       <source>Copy</source>
-      <translation type="unfinished">Copy</translation>
+      <translation>Kopyala</translation>
     </message>
     <message>
       <source>Paste</source>
-      <translation type="unfinished">Paste</translation>
+      <translation>Yapıştır</translation>
     </message>
     <message>
       <source>Select All</source>
-      <translation type="unfinished">Select All</translation>
+      <translation>Tümünü Seç</translation>
     </message>
   </context>
   <context>
     <name>VerticalCalendar</name>
     <message>
       <source>Close</source>
-      <translation>Fechar</translation>
+      <translation>Kapat</translation>
     </message>
   </context>
   <context>
     <name>VideoDummy</name>
     <message>
       <source>Server offline</source>
-      <translation>Servidor offline</translation>
+      <translation>Sunucu Çevrimdışı</translation>
     </message>
     <message>
       <source>Authentication required</source>
-      <translation type="unfinished">Authentication required</translation>
+      <translation>Kimlik doğrulaması gerekli</translation>
     </message>
     <message>
       <source>Camera offline</source>
-      <translation>Câmara offline</translation>
+      <translation>Kamera çevrimdışı</translation>
     </message>
     <message>
       <source>Cannot load video</source>
-      <translation type="unfinished">Cannot load video</translation>
+      <translation>Video yüklenemiyor</translation>
     </message>
   </context>
   <context>
     <name>VideoNavigation</name>
     <message>
       <source>No Archive</source>
-      <translation>Sem Arquivo</translation>
+      <translation>Arşiv yok</translation>
     </message>
     <message>
       <source>LIVE</source>
-      <translation>Em Directo</translation>
+      <translation>CANLI</translation>
     </message>
     <message>
       <source>d MMMM yyyy</source>
@@ -580,26 +580,26 @@
     <name>VideoScreen</name>
     <message>
       <source>Change Quality</source>
-      <translation type="unfinished">Change Quality</translation>
+      <translation>Kaliteyi değiştir</translation>
     </message>
     <message>
       <source>Information</source>
-      <translation type="unfinished">Information</translation>
+      <translation>Bilgi</translation>
     </message>
     <message>
       <source>Select camera</source>
-      <translation type="unfinished">Select camera</translation>
+      <translation>Kamera seç</translation>
     </message>
     <message>
       <source>Press Ctrl + Arrow or use mouse wheel</source>
-      <translation type="unfinished">Press Ctrl + Arrow or use mouse wheel</translation>
+      <translation>Ctrl + ok tuşlarına basın veya fare tekerleğini kullanın</translation>
     </message>
   </context>
   <context>
     <name>WelcomeScreen</name>
     <message>
       <source>Skip</source>
-      <translation type="unfinished">Skip</translation>
+      <translation>Geç</translation>
     </message>
   </context>
 </TS>

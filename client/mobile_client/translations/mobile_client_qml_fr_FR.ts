@@ -1,102 +1,102 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
-<TS version="2.1" language="pt-PT" sourcelanguage="en">
+<TS version="2.1" language="fr" sourcelanguage="en">
   <context>
     <name>CameraItem</name>
     <message>
       <source>Select camera</source>
-      <translation type="unfinished">Select camera</translation>
+      <translation>Sélectionner caméra</translation>
     </message>
     <message>
       <source>Press Ctrl + Arrow or use mouse wheel</source>
-      <translation type="unfinished">Press Ctrl + Arrow or use mouse wheel</translation>
+      <translation>Appuyez sur Ctrl + Flèche ou utilisez la roulette de la souris</translation>
     </message>
     <message>
       <source>Authentication required</source>
-      <translation type="unfinished">Authentication required</translation>
+      <translation>Authentification requise</translation>
     </message>
     <message>
       <source>Offline</source>
-      <translation type="unfinished">Offline</translation>
+      <translation>Hors ligne</translation>
     </message>
   </context>
   <context>
     <name>CloudPanel</name>
     <message>
       <source>Log in to %1</source>
-      <translation type="unfinished">Log in to %1</translation>
+      <translation>Connexion à %1</translation>
     </message>
   </context>
   <context>
     <name>CloudScreen</name>
     <message>
       <source>Cloud Account</source>
-      <translation type="unfinished">Cloud Account</translation>
+      <translation>Compte nuage</translation>
     </message>
   </context>
   <context>
     <name>CloudSummary</name>
     <message>
       <source>Log out</source>
-      <translation type="unfinished">Log out</translation>
+      <translation>Déconnexion</translation>
     </message>
     <message>
       <source>Go to %1</source>
-      <translation type="unfinished">Go to %1</translation>
+      <translation>Aller à %1</translation>
     </message>
   </context>
   <context>
     <name>CredentialsEditor</name>
     <message>
       <source>Email</source>
-      <translation type="unfinished">Email</translation>
+      <translation>Courriel</translation>
     </message>
     <message>
       <source>Password</source>
-      <translation type="unfinished">Password</translation>
+      <translation>Mot de passe</translation>
     </message>
     <message>
       <source>Learn more about %1</source>
-      <translation type="unfinished">Learn more about %1</translation>
+      <translation>En savoir plus sur %1</translation>
     </message>
     <message>
       <source>Create account</source>
-      <translation type="unfinished">Create account</translation>
+      <translation>Créer compte</translation>
     </message>
     <message>
       <source>Forgot your password?</source>
-      <translation type="unfinished">Forgot your password?</translation>
+      <translation>Mot de passe oublié?</translation>
     </message>
     <message>
       <source>Cannot connect to %1</source>
-      <translation type="unfinished">Cannot connect to %1</translation>
+      <translation>Impossible de se connecter à %1</translation>
     </message>
     <message>
       <source>Email and password cannot be empty</source>
-      <translation type="unfinished">Email and password cannot be empty</translation>
+      <translation>Courriel et mot de passe ne peut pas être vides</translation>
     </message>
     <message>
       <source>Log in</source>
-      <translation type="unfinished">Log in</translation>
+      <translation>Connexion</translation>
     </message>
     <message>
       <source>Incorrect Email or Password</source>
-      <translation type="unfinished">Incorrect Email or Password</translation>
+      <translation>Courriel ou mot de passe incorrect</translation>
     </message>
   </context>
   <context>
     <name>CustomConnectionScreen</name>
     <message>
       <source>Delete</source>
-      <translation>Apagar</translation>
+      <translation>Supprimer</translation>
     </message>
     <message>
       <source>Connect to Server</source>
-      <translation type="unfinished">Connect to Server</translation>
+      <translation>Connecter au serveur</translation>
     </message>
     <message>
       <source>Enter server address</source>
-      <translation type="unfinished">Enter server address</translation>
+      <translation>Entrez l’adresse serveur</translation>
     </message>
     <message>
       <source>Delete login &quot;%1&quot;?</source>
@@ -104,61 +104,61 @@
     </message>
     <message>
       <source>Server addresses and other logins will remain saved. To delete all connection information you should delete all saved logins.</source>
-      <translation type="unfinished">Server addresses and other logins will remain saved. To delete all connection information you should delete all saved logins.</translation>
+      <translation>Adresses serveurs et autres connexions resteront enregistrées. Pour supprimer les informations de connexions, vous devez supprimer toutes connexions sauvegardées.</translation>
     </message>
     <message>
       <source>Delete connection?</source>
-      <translation type="unfinished">Delete connection?</translation>
+      <translation>Supprimer connexion?</translation>
     </message>
     <message>
       <source>Login cannot be empty</source>
-      <translation type="unfinished">Login cannot be empty</translation>
+      <translation>Identifiant ne peut pas être vide</translation>
     </message>
     <message>
       <source>Password cannot be empty</source>
-      <translation type="unfinished">Password cannot be empty</translation>
+      <translation>Mot de passe ne peut pas être vide</translation>
     </message>
   </context>
   <context>
     <name>DeveloperSettingsScreen</name>
     <message>
       <source>Developer Settings</source>
-      <translation type="unfinished">Developer Settings</translation>
+      <translation>Paramètres développeur</translation>
     </message>
     <message>
       <source>Log Level</source>
-      <translation type="unfinished">Log Level</translation>
+      <translation>Niveau Journal</translation>
     </message>
   </context>
   <context>
     <name>DialogButtonBox</name>
     <message>
       <source>OK</source>
-      <translation type="unfinished">OK</translation>
+      <translation>OK</translation>
     </message>
     <message>
       <source>Cancel</source>
-      <translation>Cancelar</translation>
+      <translation>Annuler</translation>
     </message>
     <message>
       <source>Close</source>
-      <translation>Fechar</translation>
+      <translation>Fermer</translation>
     </message>
     <message>
       <source>Yes</source>
-      <translation type="unfinished">Yes</translation>
+      <translation>Oui</translation>
     </message>
     <message>
       <source>No</source>
-      <translation type="unfinished">No</translation>
+      <translation>Non</translation>
     </message>
     <message>
       <source>Abort</source>
-      <translation type="unfinished">Abort</translation>
+      <translation>Abandonner</translation>
     </message>
     <message>
       <source>Retry</source>
-      <translation type="unfinished">Retry</translation>
+      <translation>Réessayer</translation>
     </message>
   </context>
   <context>
@@ -166,259 +166,259 @@
     <message>
       <source>To connect to old servers please download the legacy application from Google Play.</source>
       <comment>&quot;Google Play&quot; is the name of the main Android application store.</comment>
-      <translation>Para ligar a servidores mais antigos deve descarregar a aplicação 'Legacy' a partir do 'Google Play'.</translation>
+      <translation>Pour se connecter sur de vieux serveurs, S.V.P télécharger l'application 'legacy' dans le 'Google Play'.</translation>
     </message>
     <message>
       <source>To connect to old servers please download the legacy application from the App Store.</source>
       <comment>&quot;App Store&quot; is the name of the main Apple application store.</comment>
-      <translation>Para ligar a servidores mais antigos deve descarregar a aplicação 'Legacy' a partir da 'App Store'.</translation>
+      <translation>Pour se connecter sur de vieux serveurs, S.V.P télécharger l'application 'legacy' dans le 'App Store'.</translation>
     </message>
     <message>
       <source>To connect to old servers please download the legacy application from the Internet.</source>
-      <translation>Para ligar a servidores mais antigos deve descarregar a aplicação 'Legacy' a partir da Internet.</translation>
+      <translation>Pour se connecter sur de vieux serveurs, S.V.P télécharger l'application 'legacy' depuis l'internet.</translation>
     </message>
     <message>
       <source>Download</source>
-      <translation>Descarregar</translation>
+      <translation>Téléchargement</translation>
     </message>
   </context>
   <context>
     <name>HelpPopup</name>
     <message>
       <source>Select another cell</source>
-      <translation type="unfinished">Select another cell</translation>
+      <translation>Sélectionner autre cellule</translation>
     </message>
     <message>
       <source>Switch camera in the cell</source>
-      <translation type="unfinished">Switch camera in the cell</translation>
+      <translation>Changer caméra dans la cellule</translation>
     </message>
     <message>
       <source>Enter or exit fullscreen</source>
-      <translation type="unfinished">Enter or exit fullscreen</translation>
+      <translation>Entrer ou sortir plein écran</translation>
     </message>
     <message>
       <source>Press any key to go to cameras</source>
-      <translation type="unfinished">Press any key to go to cameras</translation>
+      <translation>Appuyez sur une touche pour aller aux caméras</translation>
     </message>
     <message>
       <source>Press F1 to show this message again</source>
-      <translation type="unfinished">Press F1 to show this message again</translation>
+      <translation>Appuyez sur F1 pour encore afficher ce message</translation>
     </message>
   </context>
   <context>
     <name>HorizontalCalendar</name>
     <message>
       <source>Close</source>
-      <translation>Fechar</translation>
+      <translation>Fermer</translation>
     </message>
   </context>
   <context>
     <name>InformationLabel</name>
     <message>
       <source>Unknown</source>
-      <translation>Desconhecido</translation>
+      <translation>Inconnue</translation>
     </message>
     <message>
       <source>%1 fps</source>
-      <translation type="unfinished">%1 fps</translation>
+      <translation>%1 ips</translation>
     </message>
     <message>
       <source>%1 Mbps</source>
-      <translation type="unfinished">%1 Mbps</translation>
+      <translation>%1 Mbit/s</translation>
     </message>
     <message>
       <source>Hi-Res</source>
-      <translation type="unfinished">Hi-Res</translation>
+      <translation>Haute-Res</translation>
     </message>
     <message>
       <source>Lo-Res</source>
-      <translation type="unfinished">Lo-Res</translation>
+      <translation>Basse-Res</translation>
     </message>
     <message>
       <source>Keyfr + Lo-Res</source>
-      <translation type="unfinished">Keyfr + Lo-Res</translation>
+      <translation>ImageClé + Basse-Res</translation>
     </message>
     <message>
       <source>Custom-Res</source>
-      <translation type="unfinished">Custom-Res</translation>
+      <translation>Perso-Res</translation>
     </message>
   </context>
   <context>
     <name>LaunchButton</name>
     <message>
       <source>Turn On</source>
-      <translation type="unfinished">Turn On</translation>
+      <translation>Activer</translation>
     </message>
   </context>
   <context>
     <name>LiteClientControlScreen</name>
     <message>
       <source>Cannot start client</source>
-      <translation type="unfinished">Cannot start client</translation>
+      <translation>Impossible de démarrer le client</translation>
     </message>
     <message>
       <source>Cannot stop client</source>
-      <translation type="unfinished">Cannot stop client</translation>
+      <translation>Impossible d'arrêter le client</translation>
     </message>
     <message>
       <source>Please make sure that display is connected to %1.</source>
-      <translation type="unfinished">Please make sure that display is connected to %1.</translation>
+      <translation>Veuillez vous assurer que l’écran est connecté à %1.</translation>
     </message>
     <message>
       <source>%1 is offline</source>
-      <translation type="unfinished">%1 is offline</translation>
+      <translation>%1 est hors ligne</translation>
     </message>
   </context>
   <context>
     <name>LiveVideoNavigation</name>
     <message>
       <source>LIVE</source>
-      <translation>Em Directo</translation>
+      <translation>DIRECT</translation>
     </message>
   </context>
   <context>
     <name>LoginButton</name>
     <message>
       <source>Connect</source>
-      <translation>Ligar</translation>
+      <translation>Connecter</translation>
     </message>
   </context>
   <context>
     <name>NoCameraItem</name>
     <message>
       <source>No image</source>
-      <translation type="unfinished">No image</translation>
+      <translation>Aucune image</translation>
     </message>
   </context>
   <context>
     <name>NoDisplayDummy</name>
     <message>
       <source>No display connected</source>
-      <translation type="unfinished">No display connected</translation>
+      <translation>Aucun écran connecté</translation>
     </message>
   </context>
   <context>
     <name>OfflineDummy</name>
     <message>
       <source>You are not connected to any System</source>
-      <translation type="unfinished">You are not connected to any System</translation>
+      <translation>Vous n’êtes pas connecté à un système</translation>
     </message>
   </context>
   <context>
     <name>QualityDialog</name>
     <message>
       <source>Video Quality</source>
-      <translation type="unfinished">Video Quality</translation>
+      <translation>Qualité vidéo</translation>
     </message>
     <message>
       <source>Unknown</source>
-      <translation>Desconhecido</translation>
+      <translation>Inconnue</translation>
     </message>
     <message>
       <source>Highest speed</source>
-      <translation type="unfinished">Highest speed</translation>
+      <translation>Vitesse maximale</translation>
     </message>
     <message>
       <source>Best quality</source>
-      <translation type="unfinished">Best quality</translation>
+      <translation>Meilleure qualité</translation>
     </message>
   </context>
   <context>
     <name>ResourcesScreen</name>
     <message>
       <source>Server offline</source>
-      <translation>Servidor offline</translation>
+      <translation>Serveur Hors ligne</translation>
     </message>
     <message>
       <source>Loading...</source>
-      <translation>A Carregar...</translation>
+      <translation>Chargement...</translation>
     </message>
     <message>
       <source>Connecting...</source>
-      <translation>A Ligar...</translation>
+      <translation>Connexion...</translation>
     </message>
     <message>
       <source>No cameras available on this layout</source>
-      <translation type="unfinished">No cameras available on this layout</translation>
+      <translation>Aucune caméra disponible dans cette mise en page</translation>
     </message>
     <message>
       <source>Show all cameras</source>
-      <translation type="unfinished">Show all cameras</translation>
+      <translation>Afficher toutes les caméras</translation>
     </message>
     <message>
       <source>Nothing found</source>
-      <translation type="unfinished">Nothing found</translation>
+      <translation>Rien trouvé</translation>
     </message>
     <message>
       <source>Cannot connect to server</source>
-      <translation type="unfinished">Cannot connect to server</translation>
+      <translation>Impossible de se connecter au serveur</translation>
     </message>
     <message>
       <source>Press %1 to exit</source>
-      <translation type="unfinished">Press %1 to exit</translation>
+      <translation>Appuyez %1 pour quitter</translation>
     </message>
   </context>
   <context>
     <name>SearchToolBar</name>
     <message>
       <source>Search</source>
-      <translation>Pesquisa</translation>
+      <translation>Recherche</translation>
     </message>
   </context>
   <context>
     <name>ServerOfflineDummy</name>
     <message>
       <source>%1 is offline</source>
-      <translation type="unfinished">%1 is offline</translation>
+      <translation>%1 est hors ligne</translation>
     </message>
   </context>
   <context>
     <name>SessionCredentialsEditor</name>
     <message>
       <source>Host : Port</source>
-      <translation type="unfinished">Host : Port</translation>
+      <translation>Hôte : Port</translation>
     </message>
     <message>
       <source>Login</source>
-      <translation type="unfinished">Login</translation>
+      <translation>Identifiant</translation>
     </message>
     <message>
       <source>Password</source>
-      <translation type="unfinished">Password</translation>
+      <translation>Mot de passe</translation>
     </message>
     <message>
       <source>Hosts</source>
-      <translation type="unfinished">Hosts</translation>
+      <translation>Hôtes</translation>
     </message>
     <message>
       <source>Users</source>
-      <translation type="unfinished">Users</translation>
+      <translation>Usagers</translation>
     </message>
   </context>
   <context>
     <name>SessionItem</name>
     <message>
       <source>This server has too old version. Please update it to the latest version.</source>
-      <translation type="unfinished">This server has too old version. Please update it to the latest version.</translation>
+      <translation>Ce serveur a une version trop vielle. S’il vous plaît mettre à jour à la dernière version.</translation>
     </message>
     <message>
       <source>OFFLINE</source>
-      <translation type="unfinished">OFFLINE</translation>
+      <translation>HORS LIGNE</translation>
     </message>
     <message>
       <source>INCOMPATIBLE</source>
-      <translation type="unfinished">INCOMPATIBLE</translation>
+      <translation>INCOMPATIBLE</translation>
     </message>
   </context>
   <context>
     <name>SessionsScreen</name>
     <message>
       <source>Log in to %1</source>
-      <translation type="unfinished">Log in to %1</translation>
+      <translation>Connexion à %1</translation>
     </message>
     <message>
       <source>Cannot connect to %1</source>
-      <translation type="unfinished">Cannot connect to %1</translation>
+      <translation>Impossible de se connecter à %1</translation>
     </message>
     <message>
       <source>Check your network connection or press &quot;%1&quot; button to enter a known server address.</source>
@@ -426,19 +426,19 @@
     </message>
     <message>
       <source>Check your network connection or contact a system administrator</source>
-      <translation type="unfinished">Check your network connection or contact a system administrator</translation>
+      <translation>Vérifiez votre connexion réseau ou contactez un administrateur système</translation>
     </message>
     <message>
       <source>Connect to Server...</source>
-      <translation type="unfinished">Connect to Server...</translation>
+      <translation>Connexion au serveur...</translation>
     </message>
     <message>
       <source>Connect to Another Server...</source>
-      <translation type="unfinished">Connect to Another Server...</translation>
+      <translation>Connecter à un autre Serveur...</translation>
     </message>
     <message>
       <source>No Systems found</source>
-      <translation type="unfinished">No Systems found</translation>
+      <translation>Aucun système trouvé</translation>
     </message>
     <message>
       <source>Cannot connect to System &quot;%1&quot;</source>
@@ -446,129 +446,129 @@
     </message>
     <message>
       <source>Cannot connect to Server</source>
-      <translation type="unfinished">Cannot connect to Server</translation>
+      <translation>Impossible de se connecter au serveur</translation>
     </message>
   </context>
   <context>
     <name>SettingsScreen</name>
     <message>
       <source>Settings</source>
-      <translation>Definições</translation>
+      <translation>Paramètres</translation>
     </message>
     <message>
       <source>Live previews in the cameras list</source>
-      <translation type="unfinished">Live previews in the cameras list</translation>
+      <translation>Prévisualisation en direct dans la liste de caméras</translation>
     </message>
     <message>
       <source>Save passwords for servers</source>
-      <translation type="unfinished">Save passwords for servers</translation>
+      <translation>Enregistrer mots de passe des serveurs</translation>
     </message>
   </context>
   <context>
     <name>SideNavigation</name>
     <message>
       <source>New connection</source>
-      <translation>Nova ligação</translation>
+      <translation>Nouvelle connexion</translation>
     </message>
     <message>
       <source>Settings</source>
-      <translation>Definições</translation>
+      <translation>Paramètres</translation>
     </message>
     <message>
       <source>Start test</source>
-      <translation type="unfinished">Start test</translation>
+      <translation>Démarrer test</translation>
     </message>
     <message>
       <source>Stop test</source>
-      <translation type="unfinished">Stop test</translation>
+      <translation>Arrêter test</translation>
     </message>
     <message>
       <source>Disconnect from Server</source>
-      <translation type="unfinished">Disconnect from Server</translation>
+      <translation>Déconnecter du serveur</translation>
     </message>
   </context>
   <context>
     <name>StartingDummy</name>
     <message>
       <source>Turning on</source>
-      <translation type="unfinished">Turning on</translation>
+      <translation>Activation</translation>
     </message>
   </context>
   <context>
     <name>StoppingDummy</name>
     <message>
       <source>Turning off</source>
-      <translation type="unfinished">Turning off</translation>
+      <translation>Désactivation</translation>
     </message>
   </context>
   <context>
     <name>SystemInformationBlock</name>
     <message>
       <source>Unknown</source>
-      <translation>Desconhecido</translation>
+      <translation>Inconnue</translation>
     </message>
   </context>
   <context>
     <name>TestSelectionDialog</name>
     <message>
       <source>Select Test</source>
-      <translation type="unfinished">Select Test</translation>
+      <translation>Sélectionner test</translation>
     </message>
   </context>
   <context>
     <name>TextField</name>
     <message>
       <source>Cut</source>
-      <translation type="unfinished">Cut</translation>
+      <translation>Couper</translation>
     </message>
     <message>
       <source>Copy</source>
-      <translation type="unfinished">Copy</translation>
+      <translation>Copier</translation>
     </message>
     <message>
       <source>Paste</source>
-      <translation type="unfinished">Paste</translation>
+      <translation>Coller</translation>
     </message>
     <message>
       <source>Select All</source>
-      <translation type="unfinished">Select All</translation>
+      <translation>Sélectionner tout</translation>
     </message>
   </context>
   <context>
     <name>VerticalCalendar</name>
     <message>
       <source>Close</source>
-      <translation>Fechar</translation>
+      <translation>Fermer</translation>
     </message>
   </context>
   <context>
     <name>VideoDummy</name>
     <message>
       <source>Server offline</source>
-      <translation>Servidor offline</translation>
+      <translation>Serveur Hors ligne</translation>
     </message>
     <message>
       <source>Authentication required</source>
-      <translation type="unfinished">Authentication required</translation>
+      <translation>Authentification requise</translation>
     </message>
     <message>
       <source>Camera offline</source>
-      <translation>Câmara offline</translation>
+      <translation>Caméra Hors ligne</translation>
     </message>
     <message>
       <source>Cannot load video</source>
-      <translation type="unfinished">Cannot load video</translation>
+      <translation>Impossible de charger la vidéo</translation>
     </message>
   </context>
   <context>
     <name>VideoNavigation</name>
     <message>
       <source>No Archive</source>
-      <translation>Sem Arquivo</translation>
+      <translation>Aucune Archive</translation>
     </message>
     <message>
       <source>LIVE</source>
-      <translation>Em Directo</translation>
+      <translation>DIRECT</translation>
     </message>
     <message>
       <source>d MMMM yyyy</source>
@@ -580,26 +580,26 @@
     <name>VideoScreen</name>
     <message>
       <source>Change Quality</source>
-      <translation type="unfinished">Change Quality</translation>
+      <translation>Changer qualité</translation>
     </message>
     <message>
       <source>Information</source>
-      <translation type="unfinished">Information</translation>
+      <translation>Information</translation>
     </message>
     <message>
       <source>Select camera</source>
-      <translation type="unfinished">Select camera</translation>
+      <translation>Sélectionner caméra</translation>
     </message>
     <message>
       <source>Press Ctrl + Arrow or use mouse wheel</source>
-      <translation type="unfinished">Press Ctrl + Arrow or use mouse wheel</translation>
+      <translation>Appuyez sur Ctrl + Flèche ou utilisez la roulette de la souris</translation>
     </message>
   </context>
   <context>
     <name>WelcomeScreen</name>
     <message>
       <source>Skip</source>
-      <translation type="unfinished">Skip</translation>
+      <translation>Suivant</translation>
     </message>
   </context>
 </TS>

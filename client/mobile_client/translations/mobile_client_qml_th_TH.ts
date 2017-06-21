@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
-<TS version="2.1" language="pt-PT" sourcelanguage="en">
+<TS version="2.1" language="th" sourcelanguage="en">
   <context>
     <name>CameraItem</name>
     <message>
@@ -17,7 +17,7 @@
     </message>
     <message>
       <source>Offline</source>
-      <translation type="unfinished">Offline</translation>
+      <translation>ออฟไลน์</translation>
     </message>
   </context>
   <context>
@@ -53,7 +53,7 @@
     </message>
     <message>
       <source>Password</source>
-      <translation type="unfinished">Password</translation>
+      <translation>รหัสผ่าน</translation>
     </message>
     <message>
       <source>Learn more about %1</source>
@@ -88,7 +88,7 @@
     <name>CustomConnectionScreen</name>
     <message>
       <source>Delete</source>
-      <translation>Apagar</translation>
+      <translation>ลบ</translation>
     </message>
     <message>
       <source>Connect to Server</source>
@@ -138,11 +138,11 @@
     </message>
     <message>
       <source>Cancel</source>
-      <translation>Cancelar</translation>
+      <translation>ยกเลิก</translation>
     </message>
     <message>
       <source>Close</source>
-      <translation>Fechar</translation>
+      <translation>ปิด</translation>
     </message>
     <message>
       <source>Yes</source>
@@ -166,20 +166,20 @@
     <message>
       <source>To connect to old servers please download the legacy application from Google Play.</source>
       <comment>&quot;Google Play&quot; is the name of the main Android application store.</comment>
-      <translation>Para ligar a servidores mais antigos deve descarregar a aplicação 'Legacy' a partir do 'Google Play'.</translation>
+      <translation>เชื่อมต่อกับเซิร์ฟเวอร์เก่าโปรดดาวน์โหลดแอปพลิมรดกจาก Google Play.</translation>
     </message>
     <message>
       <source>To connect to old servers please download the legacy application from the App Store.</source>
       <comment>&quot;App Store&quot; is the name of the main Apple application store.</comment>
-      <translation>Para ligar a servidores mais antigos deve descarregar a aplicação 'Legacy' a partir da 'App Store'.</translation>
+      <translation>เชื่อมต่อกับเซิร์ฟเวอร์เก่าโปรดดาวน์โหลดแอปพลิมรดกจาก App Store.</translation>
     </message>
     <message>
       <source>To connect to old servers please download the legacy application from the Internet.</source>
-      <translation>Para ligar a servidores mais antigos deve descarregar a aplicação 'Legacy' a partir da Internet.</translation>
+      <translation>เชื่อมต่อกับเซิร์ฟเวอร์เก่าโปรดดาวน์โหลดแอปพลิมรดกจากอินเทอร์เน็ต.</translation>
     </message>
     <message>
       <source>Download</source>
-      <translation>Descarregar</translation>
+      <translation>ดาวน์โหลด</translation>
     </message>
   </context>
   <context>
@@ -209,14 +209,14 @@
     <name>HorizontalCalendar</name>
     <message>
       <source>Close</source>
-      <translation>Fechar</translation>
+      <translation>ปิด</translation>
     </message>
   </context>
   <context>
     <name>InformationLabel</name>
     <message>
       <source>Unknown</source>
-      <translation>Desconhecido</translation>
+      <translation>ที่ไม่รู้จัก</translation>
     </message>
     <message>
       <source>%1 fps</source>
@@ -273,14 +273,14 @@
     <name>LiveVideoNavigation</name>
     <message>
       <source>LIVE</source>
-      <translation>Em Directo</translation>
+      <translation>สด</translation>
     </message>
   </context>
   <context>
     <name>LoginButton</name>
     <message>
       <source>Connect</source>
-      <translation>Ligar</translation>
+      <translation>เชื่อมต่อ</translation>
     </message>
   </context>
   <context>
@@ -312,7 +312,7 @@
     </message>
     <message>
       <source>Unknown</source>
-      <translation>Desconhecido</translation>
+      <translation>ที่ไม่รู้จัก</translation>
     </message>
     <message>
       <source>Highest speed</source>
@@ -327,15 +327,15 @@
     <name>ResourcesScreen</name>
     <message>
       <source>Server offline</source>
-      <translation>Servidor offline</translation>
+      <translation>เซิร์ฟเวอร์ออฟไลน์</translation>
     </message>
     <message>
       <source>Loading...</source>
-      <translation>A Carregar...</translation>
+      <translation>กำลังโหลด ...</translation>
     </message>
     <message>
       <source>Connecting...</source>
-      <translation>A Ligar...</translation>
+      <translation>กำลังเชื่อมต่อ ...</translation>
     </message>
     <message>
       <source>No cameras available on this layout</source>
@@ -362,7 +362,7 @@
     <name>SearchToolBar</name>
     <message>
       <source>Search</source>
-      <translation>Pesquisa</translation>
+      <translation>ค้นหา</translation>
     </message>
   </context>
   <context>
@@ -380,11 +380,11 @@
     </message>
     <message>
       <source>Login</source>
-      <translation type="unfinished">Login</translation>
+      <translation>เข้าสู่ระบบ</translation>
     </message>
     <message>
       <source>Password</source>
-      <translation type="unfinished">Password</translation>
+      <translation>รหัสผ่าน</translation>
     </message>
     <message>
       <source>Hosts</source>
@@ -453,7 +453,7 @@
     <name>SettingsScreen</name>
     <message>
       <source>Settings</source>
-      <translation>Definições</translation>
+      <translation>การตั้งค่า</translation>
     </message>
     <message>
       <source>Live previews in the cameras list</source>
@@ -468,11 +468,11 @@
     <name>SideNavigation</name>
     <message>
       <source>New connection</source>
-      <translation>Nova ligação</translation>
+      <translation>การเชื่อมต่อใหม่</translation>
     </message>
     <message>
       <source>Settings</source>
-      <translation>Definições</translation>
+      <translation>การตั้งค่า</translation>
     </message>
     <message>
       <source>Start test</source>
@@ -505,7 +505,7 @@
     <name>SystemInformationBlock</name>
     <message>
       <source>Unknown</source>
-      <translation>Desconhecido</translation>
+      <translation>ที่ไม่รู้จัก</translation>
     </message>
   </context>
   <context>
@@ -538,14 +538,14 @@
     <name>VerticalCalendar</name>
     <message>
       <source>Close</source>
-      <translation>Fechar</translation>
+      <translation>ปิด</translation>
     </message>
   </context>
   <context>
     <name>VideoDummy</name>
     <message>
       <source>Server offline</source>
-      <translation>Servidor offline</translation>
+      <translation>เซิร์ฟเวอร์ออฟไลน์</translation>
     </message>
     <message>
       <source>Authentication required</source>
@@ -553,7 +553,7 @@
     </message>
     <message>
       <source>Camera offline</source>
-      <translation>Câmara offline</translation>
+      <translation>เซิร์ฟเวอร์ออฟไลน์</translation>
     </message>
     <message>
       <source>Cannot load video</source>
@@ -564,11 +564,11 @@
     <name>VideoNavigation</name>
     <message>
       <source>No Archive</source>
-      <translation>Sem Arquivo</translation>
+      <translation>ไม่มีที่เก็บถาวร</translation>
     </message>
     <message>
       <source>LIVE</source>
-      <translation>Em Directo</translation>
+      <translation>สด</translation>
     </message>
     <message>
       <source>d MMMM yyyy</source>

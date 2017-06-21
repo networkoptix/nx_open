@@ -1,102 +1,102 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
-<TS version="2.1" language="pt-PT" sourcelanguage="en">
+<TS version="2.1" language="ko" sourcelanguage="en">
   <context>
     <name>CameraItem</name>
     <message>
       <source>Select camera</source>
-      <translation type="unfinished">Select camera</translation>
+      <translation>카메라 선택</translation>
     </message>
     <message>
       <source>Press Ctrl + Arrow or use mouse wheel</source>
-      <translation type="unfinished">Press Ctrl + Arrow or use mouse wheel</translation>
+      <translation>Ctrl + 화살표를 누르거나 마우스 휠을 사용 하십시요</translation>
     </message>
     <message>
       <source>Authentication required</source>
-      <translation type="unfinished">Authentication required</translation>
+      <translation>인증이 필요합니다</translation>
     </message>
     <message>
       <source>Offline</source>
-      <translation type="unfinished">Offline</translation>
+      <translation>오프라인</translation>
     </message>
   </context>
   <context>
     <name>CloudPanel</name>
     <message>
       <source>Log in to %1</source>
-      <translation type="unfinished">Log in to %1</translation>
+      <translation>%1에 로그인</translation>
     </message>
   </context>
   <context>
     <name>CloudScreen</name>
     <message>
       <source>Cloud Account</source>
-      <translation type="unfinished">Cloud Account</translation>
+      <translation>클라우드 계정</translation>
     </message>
   </context>
   <context>
     <name>CloudSummary</name>
     <message>
       <source>Log out</source>
-      <translation type="unfinished">Log out</translation>
+      <translation>로그아웃</translation>
     </message>
     <message>
       <source>Go to %1</source>
-      <translation type="unfinished">Go to %1</translation>
+      <translation>%1로 이동</translation>
     </message>
   </context>
   <context>
     <name>CredentialsEditor</name>
     <message>
       <source>Email</source>
-      <translation type="unfinished">Email</translation>
+      <translation>이메일</translation>
     </message>
     <message>
       <source>Password</source>
-      <translation type="unfinished">Password</translation>
+      <translation>비밀번호:</translation>
     </message>
     <message>
       <source>Learn more about %1</source>
-      <translation type="unfinished">Learn more about %1</translation>
+      <translation>%1에 대 한 자세한 내용은</translation>
     </message>
     <message>
       <source>Create account</source>
-      <translation type="unfinished">Create account</translation>
+      <translation>계정을 만듭니다</translation>
     </message>
     <message>
       <source>Forgot your password?</source>
-      <translation type="unfinished">Forgot your password?</translation>
+      <translation>비밀번호를 잊으셨습니까?</translation>
     </message>
     <message>
       <source>Cannot connect to %1</source>
-      <translation type="unfinished">Cannot connect to %1</translation>
+      <translation>%1에 연결할 수 없습니다.</translation>
     </message>
     <message>
       <source>Email and password cannot be empty</source>
-      <translation type="unfinished">Email and password cannot be empty</translation>
+      <translation>이메일과 비밀 번호는 비어 있을 수 없습니다.</translation>
     </message>
     <message>
       <source>Log in</source>
-      <translation type="unfinished">Log in</translation>
+      <translation>로그인</translation>
     </message>
     <message>
       <source>Incorrect Email or Password</source>
-      <translation type="unfinished">Incorrect Email or Password</translation>
+      <translation>잘못 된 전자 메일 또는 암호</translation>
     </message>
   </context>
   <context>
     <name>CustomConnectionScreen</name>
     <message>
       <source>Delete</source>
-      <translation>Apagar</translation>
+      <translation>삭제</translation>
     </message>
     <message>
       <source>Connect to Server</source>
-      <translation type="unfinished">Connect to Server</translation>
+      <translation>서버에 연결</translation>
     </message>
     <message>
       <source>Enter server address</source>
-      <translation type="unfinished">Enter server address</translation>
+      <translation>서버 주소 입력</translation>
     </message>
     <message>
       <source>Delete login &quot;%1&quot;?</source>
@@ -104,61 +104,61 @@
     </message>
     <message>
       <source>Server addresses and other logins will remain saved. To delete all connection information you should delete all saved logins.</source>
-      <translation type="unfinished">Server addresses and other logins will remain saved. To delete all connection information you should delete all saved logins.</translation>
+      <translation>서버 주소와 다른 로그인 저장 유지 됩니다. 모든 연결을 삭제 하려면 삭제 해야 하는 모든 로그인 정보를 삭제 해야 합니다.</translation>
     </message>
     <message>
       <source>Delete connection?</source>
-      <translation type="unfinished">Delete connection?</translation>
+      <translation>연결 정보 삭제</translation>
     </message>
     <message>
       <source>Login cannot be empty</source>
-      <translation type="unfinished">Login cannot be empty</translation>
+      <translation>로그인 정보는 비울 수 없습니다.</translation>
     </message>
     <message>
       <source>Password cannot be empty</source>
-      <translation type="unfinished">Password cannot be empty</translation>
+      <translation>비밀번호를 입력해야 합니다</translation>
     </message>
   </context>
   <context>
     <name>DeveloperSettingsScreen</name>
     <message>
       <source>Developer Settings</source>
-      <translation type="unfinished">Developer Settings</translation>
+      <translation>개발자 옵션</translation>
     </message>
     <message>
       <source>Log Level</source>
-      <translation type="unfinished">Log Level</translation>
+      <translation>로그 수준</translation>
     </message>
   </context>
   <context>
     <name>DialogButtonBox</name>
     <message>
       <source>OK</source>
-      <translation type="unfinished">OK</translation>
+      <translation>확인</translation>
     </message>
     <message>
       <source>Cancel</source>
-      <translation>Cancelar</translation>
+      <translation>취소</translation>
     </message>
     <message>
       <source>Close</source>
-      <translation>Fechar</translation>
+      <translation>닫기</translation>
     </message>
     <message>
       <source>Yes</source>
-      <translation type="unfinished">Yes</translation>
+      <translation>예</translation>
     </message>
     <message>
       <source>No</source>
-      <translation type="unfinished">No</translation>
+      <translation>아니오</translation>
     </message>
     <message>
       <source>Abort</source>
-      <translation type="unfinished">Abort</translation>
+      <translation>중단</translation>
     </message>
     <message>
       <source>Retry</source>
-      <translation type="unfinished">Retry</translation>
+      <translation>재시도 하기</translation>
     </message>
   </context>
   <context>
@@ -166,259 +166,259 @@
     <message>
       <source>To connect to old servers please download the legacy application from Google Play.</source>
       <comment>&quot;Google Play&quot; is the name of the main Android application store.</comment>
-      <translation>Para ligar a servidores mais antigos deve descarregar a aplicação 'Legacy' a partir do 'Google Play'.</translation>
+      <translation>오래 된에 연결할 서버 구글 플레이에서 레거시 응용 프로그램을 다운로드 하십시오.</translation>
     </message>
     <message>
       <source>To connect to old servers please download the legacy application from the App Store.</source>
       <comment>&quot;App Store&quot; is the name of the main Apple application store.</comment>
-      <translation>Para ligar a servidores mais antigos deve descarregar a aplicação 'Legacy' a partir da 'App Store'.</translation>
+      <translation>Old 버젼 서버를 접속하려면 엡스토어에서 레거시 버젼을 다운받으세요</translation>
     </message>
     <message>
       <source>To connect to old servers please download the legacy application from the Internet.</source>
-      <translation>Para ligar a servidores mais antigos deve descarregar a aplicação 'Legacy' a partir da Internet.</translation>
+      <translation>Old 버젼 서버를 접속하려면 인터넷에서 레거시 버젼을 다운받으세요</translation>
     </message>
     <message>
       <source>Download</source>
-      <translation>Descarregar</translation>
+      <translation>다운로드</translation>
     </message>
   </context>
   <context>
     <name>HelpPopup</name>
     <message>
       <source>Select another cell</source>
-      <translation type="unfinished">Select another cell</translation>
+      <translation>다른 요소를 선택합니다</translation>
     </message>
     <message>
       <source>Switch camera in the cell</source>
-      <translation type="unfinished">Switch camera in the cell</translation>
+      <translation>셀 안에서 카메라 변경</translation>
     </message>
     <message>
       <source>Enter or exit fullscreen</source>
-      <translation type="unfinished">Enter or exit fullscreen</translation>
+      <translation>입력/전체 화면 종료</translation>
     </message>
     <message>
       <source>Press any key to go to cameras</source>
-      <translation type="unfinished">Press any key to go to cameras</translation>
+      <translation>카메라를 이동 하려면 아무 키나를 누르십시오</translation>
     </message>
     <message>
       <source>Press F1 to show this message again</source>
-      <translation type="unfinished">Press F1 to show this message again</translation>
+      <translation>이 메시지를 다시 표시 하려면 F1 키를 눌러합니다</translation>
     </message>
   </context>
   <context>
     <name>HorizontalCalendar</name>
     <message>
       <source>Close</source>
-      <translation>Fechar</translation>
+      <translation>닫기</translation>
     </message>
   </context>
   <context>
     <name>InformationLabel</name>
     <message>
       <source>Unknown</source>
-      <translation>Desconhecido</translation>
+      <translation>알수 없음</translation>
     </message>
     <message>
       <source>%1 fps</source>
-      <translation type="unfinished">%1 fps</translation>
+      <translation>%1 fps</translation>
     </message>
     <message>
       <source>%1 Mbps</source>
-      <translation type="unfinished">%1 Mbps</translation>
+      <translation>%1 Mbps</translation>
     </message>
     <message>
       <source>Hi-Res</source>
-      <translation type="unfinished">Hi-Res</translation>
+      <translation>고-해상도</translation>
     </message>
     <message>
       <source>Lo-Res</source>
-      <translation type="unfinished">Lo-Res</translation>
+      <translation>저해상도</translation>
     </message>
     <message>
       <source>Keyfr + Lo-Res</source>
-      <translation type="unfinished">Keyfr + Lo-Res</translation>
+      <translation>Keyfr + Lo-Res</translation>
     </message>
     <message>
       <source>Custom-Res</source>
-      <translation type="unfinished">Custom-Res</translation>
+      <translation>사용자 정의 해상도</translation>
     </message>
   </context>
   <context>
     <name>LaunchButton</name>
     <message>
       <source>Turn On</source>
-      <translation type="unfinished">Turn On</translation>
+      <translation>켜기</translation>
     </message>
   </context>
   <context>
     <name>LiteClientControlScreen</name>
     <message>
       <source>Cannot start client</source>
-      <translation type="unfinished">Cannot start client</translation>
+      <translation>클라이언트를 시작할 수 없습니다.</translation>
     </message>
     <message>
       <source>Cannot stop client</source>
-      <translation type="unfinished">Cannot stop client</translation>
+      <translation>클라이언트를 멈출 수 없습니다.</translation>
     </message>
     <message>
       <source>Please make sure that display is connected to %1.</source>
-      <translation type="unfinished">Please make sure that display is connected to %1.</translation>
+      <translation>디스플레이 %1에 연결 되어 있는지 확인 하십시오.</translation>
     </message>
     <message>
       <source>%1 is offline</source>
-      <translation type="unfinished">%1 is offline</translation>
+      <translation>%1는 오프 라인</translation>
     </message>
   </context>
   <context>
     <name>LiveVideoNavigation</name>
     <message>
       <source>LIVE</source>
-      <translation>Em Directo</translation>
+      <translation>실시간 뷰</translation>
     </message>
   </context>
   <context>
     <name>LoginButton</name>
     <message>
       <source>Connect</source>
-      <translation>Ligar</translation>
+      <translation>연결</translation>
     </message>
   </context>
   <context>
     <name>NoCameraItem</name>
     <message>
       <source>No image</source>
-      <translation type="unfinished">No image</translation>
+      <translation>이미지 없음</translation>
     </message>
   </context>
   <context>
     <name>NoDisplayDummy</name>
     <message>
       <source>No display connected</source>
-      <translation type="unfinished">No display connected</translation>
+      <translation>연결된 Display가 없음</translation>
     </message>
   </context>
   <context>
     <name>OfflineDummy</name>
     <message>
       <source>You are not connected to any System</source>
-      <translation type="unfinished">You are not connected to any System</translation>
+      <translation>어떤 시스템에 연결 되지 않았습니다.</translation>
     </message>
   </context>
   <context>
     <name>QualityDialog</name>
     <message>
       <source>Video Quality</source>
-      <translation type="unfinished">Video Quality</translation>
+      <translation>비디오 품질</translation>
     </message>
     <message>
       <source>Unknown</source>
-      <translation>Desconhecido</translation>
+      <translation>알수 없음</translation>
     </message>
     <message>
       <source>Highest speed</source>
-      <translation type="unfinished">Highest speed</translation>
+      <translation>최고 속도</translation>
     </message>
     <message>
       <source>Best quality</source>
-      <translation type="unfinished">Best quality</translation>
+      <translation>최고의 품질</translation>
     </message>
   </context>
   <context>
     <name>ResourcesScreen</name>
     <message>
       <source>Server offline</source>
-      <translation>Servidor offline</translation>
+      <translation>서버 오프라인</translation>
     </message>
     <message>
       <source>Loading...</source>
-      <translation>A Carregar...</translation>
+      <translation>읽는 중...</translation>
     </message>
     <message>
       <source>Connecting...</source>
-      <translation>A Ligar...</translation>
+      <translation>연결중...</translation>
     </message>
     <message>
       <source>No cameras available on this layout</source>
-      <translation type="unfinished">No cameras available on this layout</translation>
+      <translation>이 레이아웃에서 사용할 수 있는 카메라가 없습니다.</translation>
     </message>
     <message>
       <source>Show all cameras</source>
-      <translation type="unfinished">Show all cameras</translation>
+      <translation>모든 카메라 보기</translation>
     </message>
     <message>
       <source>Nothing found</source>
-      <translation type="unfinished">Nothing found</translation>
+      <translation>결과 없음</translation>
     </message>
     <message>
       <source>Cannot connect to server</source>
-      <translation type="unfinished">Cannot connect to server</translation>
+      <translation>서버에 연결할 수 없습니다.</translation>
     </message>
     <message>
       <source>Press %1 to exit</source>
-      <translation type="unfinished">Press %1 to exit</translation>
+      <translation>종료하려면 %1 누르세요</translation>
     </message>
   </context>
   <context>
     <name>SearchToolBar</name>
     <message>
       <source>Search</source>
-      <translation>Pesquisa</translation>
+      <translation>검색</translation>
     </message>
   </context>
   <context>
     <name>ServerOfflineDummy</name>
     <message>
       <source>%1 is offline</source>
-      <translation type="unfinished">%1 is offline</translation>
+      <translation>%1는 오프 라인</translation>
     </message>
   </context>
   <context>
     <name>SessionCredentialsEditor</name>
     <message>
       <source>Host : Port</source>
-      <translation type="unfinished">Host : Port</translation>
+      <translation>호스트: 포트</translation>
     </message>
     <message>
       <source>Login</source>
-      <translation type="unfinished">Login</translation>
+      <translation>로그인</translation>
     </message>
     <message>
       <source>Password</source>
-      <translation type="unfinished">Password</translation>
+      <translation>비밀 번호</translation>
     </message>
     <message>
       <source>Hosts</source>
-      <translation type="unfinished">Hosts</translation>
+      <translation>호스트</translation>
     </message>
     <message>
       <source>Users</source>
-      <translation type="unfinished">Users</translation>
+      <translation>사용자</translation>
     </message>
   </context>
   <context>
     <name>SessionItem</name>
     <message>
       <source>This server has too old version. Please update it to the latest version.</source>
-      <translation type="unfinished">This server has too old version. Please update it to the latest version.</translation>
+      <translation>이 서버는 오래 된 버전입니다. 최신 버전으로 업데이트 하십시오.</translation>
     </message>
     <message>
       <source>OFFLINE</source>
-      <translation type="unfinished">OFFLINE</translation>
+      <translation>오프라인</translation>
     </message>
     <message>
       <source>INCOMPATIBLE</source>
-      <translation type="unfinished">INCOMPATIBLE</translation>
+      <translation>호환 되지 않는</translation>
     </message>
   </context>
   <context>
     <name>SessionsScreen</name>
     <message>
       <source>Log in to %1</source>
-      <translation type="unfinished">Log in to %1</translation>
+      <translation>%1에 로그인</translation>
     </message>
     <message>
       <source>Cannot connect to %1</source>
-      <translation type="unfinished">Cannot connect to %1</translation>
+      <translation>%1에 연결할 수 없습니다.</translation>
     </message>
     <message>
       <source>Check your network connection or press &quot;%1&quot; button to enter a known server address.</source>
@@ -426,19 +426,19 @@
     </message>
     <message>
       <source>Check your network connection or contact a system administrator</source>
-      <translation type="unfinished">Check your network connection or contact a system administrator</translation>
+      <translation>네트워크 연결을 확인 하거나 시스템 관리자에 게 문의</translation>
     </message>
     <message>
       <source>Connect to Server...</source>
-      <translation type="unfinished">Connect to Server...</translation>
+      <translation>서버에 연결...</translation>
     </message>
     <message>
       <source>Connect to Another Server...</source>
-      <translation type="unfinished">Connect to Another Server...</translation>
+      <translation>다른 서버에 연결...</translation>
     </message>
     <message>
       <source>No Systems found</source>
-      <translation type="unfinished">No Systems found</translation>
+      <translation>발견된 시스템 없음.</translation>
     </message>
     <message>
       <source>Cannot connect to System &quot;%1&quot;</source>
@@ -446,129 +446,129 @@
     </message>
     <message>
       <source>Cannot connect to Server</source>
-      <translation type="unfinished">Cannot connect to Server</translation>
+      <translation>서버에 연결할 수 없습니다.</translation>
     </message>
   </context>
   <context>
     <name>SettingsScreen</name>
     <message>
       <source>Settings</source>
-      <translation>Definições</translation>
+      <translation>설정</translation>
     </message>
     <message>
       <source>Live previews in the cameras list</source>
-      <translation type="unfinished">Live previews in the cameras list</translation>
+      <translation>라이브 카메라 목록에서 미리 보기</translation>
     </message>
     <message>
       <source>Save passwords for servers</source>
-      <translation type="unfinished">Save passwords for servers</translation>
+      <translation>서버에 대 한 암호를 저장</translation>
     </message>
   </context>
   <context>
     <name>SideNavigation</name>
     <message>
       <source>New connection</source>
-      <translation>Nova ligação</translation>
+      <translation>새 연결</translation>
     </message>
     <message>
       <source>Settings</source>
-      <translation>Definições</translation>
+      <translation>설정</translation>
     </message>
     <message>
       <source>Start test</source>
-      <translation type="unfinished">Start test</translation>
+      <translation>테스트 시작</translation>
     </message>
     <message>
       <source>Stop test</source>
-      <translation type="unfinished">Stop test</translation>
+      <translation>테스트 중지</translation>
     </message>
     <message>
       <source>Disconnect from Server</source>
-      <translation type="unfinished">Disconnect from Server</translation>
+      <translation>서버와의 연결이 끊겼습니다</translation>
     </message>
   </context>
   <context>
     <name>StartingDummy</name>
     <message>
       <source>Turning on</source>
-      <translation type="unfinished">Turning on</translation>
+      <translation>켜기</translation>
     </message>
   </context>
   <context>
     <name>StoppingDummy</name>
     <message>
       <source>Turning off</source>
-      <translation type="unfinished">Turning off</translation>
+      <translation>끄는 중</translation>
     </message>
   </context>
   <context>
     <name>SystemInformationBlock</name>
     <message>
       <source>Unknown</source>
-      <translation>Desconhecido</translation>
+      <translation>알수 없음</translation>
     </message>
   </context>
   <context>
     <name>TestSelectionDialog</name>
     <message>
       <source>Select Test</source>
-      <translation type="unfinished">Select Test</translation>
+      <translation>테스트 선택</translation>
     </message>
   </context>
   <context>
     <name>TextField</name>
     <message>
       <source>Cut</source>
-      <translation type="unfinished">Cut</translation>
+      <translation>잘라내기</translation>
     </message>
     <message>
       <source>Copy</source>
-      <translation type="unfinished">Copy</translation>
+      <translation>복사</translation>
     </message>
     <message>
       <source>Paste</source>
-      <translation type="unfinished">Paste</translation>
+      <translation>붙여넣기</translation>
     </message>
     <message>
       <source>Select All</source>
-      <translation type="unfinished">Select All</translation>
+      <translation>전체 선택</translation>
     </message>
   </context>
   <context>
     <name>VerticalCalendar</name>
     <message>
       <source>Close</source>
-      <translation>Fechar</translation>
+      <translation>닫기</translation>
     </message>
   </context>
   <context>
     <name>VideoDummy</name>
     <message>
       <source>Server offline</source>
-      <translation>Servidor offline</translation>
+      <translation>서버 오프라인</translation>
     </message>
     <message>
       <source>Authentication required</source>
-      <translation type="unfinished">Authentication required</translation>
+      <translation>인증이 필요합니다</translation>
     </message>
     <message>
       <source>Camera offline</source>
-      <translation>Câmara offline</translation>
+      <translation>오프 라인 카메라</translation>
     </message>
     <message>
       <source>Cannot load video</source>
-      <translation type="unfinished">Cannot load video</translation>
+      <translation>비디오를 로드할 수 없습니다.</translation>
     </message>
   </context>
   <context>
     <name>VideoNavigation</name>
     <message>
       <source>No Archive</source>
-      <translation>Sem Arquivo</translation>
+      <translation>보관하지 않음</translation>
     </message>
     <message>
       <source>LIVE</source>
-      <translation>Em Directo</translation>
+      <translation>실시간 뷰</translation>
     </message>
     <message>
       <source>d MMMM yyyy</source>
@@ -580,26 +580,26 @@
     <name>VideoScreen</name>
     <message>
       <source>Change Quality</source>
-      <translation type="unfinished">Change Quality</translation>
+      <translation>품질 변경</translation>
     </message>
     <message>
       <source>Information</source>
-      <translation type="unfinished">Information</translation>
+      <translation>정보</translation>
     </message>
     <message>
       <source>Select camera</source>
-      <translation type="unfinished">Select camera</translation>
+      <translation>카메라 선택</translation>
     </message>
     <message>
       <source>Press Ctrl + Arrow or use mouse wheel</source>
-      <translation type="unfinished">Press Ctrl + Arrow or use mouse wheel</translation>
+      <translation>Ctrl + 화살표를 누르거나 마우스 휠을 사용 하 여</translation>
     </message>
   </context>
   <context>
     <name>WelcomeScreen</name>
     <message>
       <source>Skip</source>
-      <translation type="unfinished">Skip</translation>
+      <translation>건너 뛰기</translation>
     </message>
   </context>
 </TS>

@@ -1,102 +1,102 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
-<TS version="2.1" language="pt-PT" sourcelanguage="en">
+<TS version="2.1" language="he" sourcelanguage="en">
   <context>
     <name>CameraItem</name>
     <message>
       <source>Select camera</source>
-      <translation type="unfinished">Select camera</translation>
+      <translation>בחר מצלמה</translation>
     </message>
     <message>
       <source>Press Ctrl + Arrow or use mouse wheel</source>
-      <translation type="unfinished">Press Ctrl + Arrow or use mouse wheel</translation>
+      <translation>הקש Ctrl + חץ או השתמש גלגל העכבר</translation>
     </message>
     <message>
       <source>Authentication required</source>
-      <translation type="unfinished">Authentication required</translation>
+      <translation>נדרש אימות</translation>
     </message>
     <message>
       <source>Offline</source>
-      <translation type="unfinished">Offline</translation>
+      <translation>לא מקוון</translation>
     </message>
   </context>
   <context>
     <name>CloudPanel</name>
     <message>
       <source>Log in to %1</source>
-      <translation type="unfinished">Log in to %1</translation>
+      <translation>התחבר אל %1</translation>
     </message>
   </context>
   <context>
     <name>CloudScreen</name>
     <message>
       <source>Cloud Account</source>
-      <translation type="unfinished">Cloud Account</translation>
+      <translation>חשבון ענן</translation>
     </message>
   </context>
   <context>
     <name>CloudSummary</name>
     <message>
       <source>Log out</source>
-      <translation type="unfinished">Log out</translation>
+      <translation>התנתק</translation>
     </message>
     <message>
       <source>Go to %1</source>
-      <translation type="unfinished">Go to %1</translation>
+      <translation>עבור אל %1</translation>
     </message>
   </context>
   <context>
     <name>CredentialsEditor</name>
     <message>
       <source>Email</source>
-      <translation type="unfinished">Email</translation>
+      <translation>דוא"ל</translation>
     </message>
     <message>
       <source>Password</source>
-      <translation type="unfinished">Password</translation>
+      <translation>סיסמא</translation>
     </message>
     <message>
       <source>Learn more about %1</source>
-      <translation type="unfinished">Learn more about %1</translation>
+      <translation>למד עוד אודות %1</translation>
     </message>
     <message>
       <source>Create account</source>
-      <translation type="unfinished">Create account</translation>
+      <translation>צור חשבון</translation>
     </message>
     <message>
       <source>Forgot your password?</source>
-      <translation type="unfinished">Forgot your password?</translation>
+      <translation>שכחת סיסמא?</translation>
     </message>
     <message>
       <source>Cannot connect to %1</source>
-      <translation type="unfinished">Cannot connect to %1</translation>
+      <translation>אין אפשרות להתחבר אל %1</translation>
     </message>
     <message>
       <source>Email and password cannot be empty</source>
-      <translation type="unfinished">Email and password cannot be empty</translation>
+      <translation>כתובת האימייל והסיסמא אינם יכולים להיות ריקים</translation>
     </message>
     <message>
       <source>Log in</source>
-      <translation type="unfinished">Log in</translation>
+      <translation>התחבר</translation>
     </message>
     <message>
       <source>Incorrect Email or Password</source>
-      <translation type="unfinished">Incorrect Email or Password</translation>
+      <translation>דוא"ל או סיסמא שגויים</translation>
     </message>
   </context>
   <context>
     <name>CustomConnectionScreen</name>
     <message>
       <source>Delete</source>
-      <translation>Apagar</translation>
+      <translation>מחיקה</translation>
     </message>
     <message>
       <source>Connect to Server</source>
-      <translation type="unfinished">Connect to Server</translation>
+      <translation>התחבר לשרת</translation>
     </message>
     <message>
       <source>Enter server address</source>
-      <translation type="unfinished">Enter server address</translation>
+      <translation>הזן כתובת שרת</translation>
     </message>
     <message>
       <source>Delete login &quot;%1&quot;?</source>
@@ -104,61 +104,61 @@
     </message>
     <message>
       <source>Server addresses and other logins will remain saved. To delete all connection information you should delete all saved logins.</source>
-      <translation type="unfinished">Server addresses and other logins will remain saved. To delete all connection information you should delete all saved logins.</translation>
+      <translation>כתובות שרת ויומני כניסה אחרים יישמרו. כדי למחוק את כל פרטי החיבור, עליך למחוק את כל פרטי ההתחברות השמורים.</translation>
     </message>
     <message>
       <source>Delete connection?</source>
-      <translation type="unfinished">Delete connection?</translation>
+      <translation>האם למחוק את החיבור?</translation>
     </message>
     <message>
       <source>Login cannot be empty</source>
-      <translation type="unfinished">Login cannot be empty</translation>
+      <translation>לא ניתן להותיר את שדה שם המשתמש ריק</translation>
     </message>
     <message>
       <source>Password cannot be empty</source>
-      <translation type="unfinished">Password cannot be empty</translation>
+      <translation>לא ניתן להותיר את שדה הסיסמה ריק</translation>
     </message>
   </context>
   <context>
     <name>DeveloperSettingsScreen</name>
     <message>
       <source>Developer Settings</source>
-      <translation type="unfinished">Developer Settings</translation>
+      <translation>הגדרות מפתח</translation>
     </message>
     <message>
       <source>Log Level</source>
-      <translation type="unfinished">Log Level</translation>
+      <translation>רמת יומן</translation>
     </message>
   </context>
   <context>
     <name>DialogButtonBox</name>
     <message>
       <source>OK</source>
-      <translation type="unfinished">OK</translation>
+      <translation>אישור</translation>
     </message>
     <message>
       <source>Cancel</source>
-      <translation>Cancelar</translation>
+      <translation>ביטול</translation>
     </message>
     <message>
       <source>Close</source>
-      <translation>Fechar</translation>
+      <translation>סגירה</translation>
     </message>
     <message>
       <source>Yes</source>
-      <translation type="unfinished">Yes</translation>
+      <translation>כן</translation>
     </message>
     <message>
       <source>No</source>
-      <translation type="unfinished">No</translation>
+      <translation>לא</translation>
     </message>
     <message>
       <source>Abort</source>
-      <translation type="unfinished">Abort</translation>
+      <translation>בטל</translation>
     </message>
     <message>
       <source>Retry</source>
-      <translation type="unfinished">Retry</translation>
+      <translation>נסה שוב</translation>
     </message>
   </context>
   <context>
@@ -166,259 +166,259 @@
     <message>
       <source>To connect to old servers please download the legacy application from Google Play.</source>
       <comment>&quot;Google Play&quot; is the name of the main Android application store.</comment>
-      <translation>Para ligar a servidores mais antigos deve descarregar a aplicação 'Legacy' a partir do 'Google Play'.</translation>
+      <translation>להתחברות לשרתים ישנים יש להוריד את האפליקציה הישנה מחנות האפליקציות של גוגל.</translation>
     </message>
     <message>
       <source>To connect to old servers please download the legacy application from the App Store.</source>
       <comment>&quot;App Store&quot; is the name of the main Apple application store.</comment>
-      <translation>Para ligar a servidores mais antigos deve descarregar a aplicação 'Legacy' a partir da 'App Store'.</translation>
+      <translation>להתחברות לשרתים ישנים יש להוריד את האפליקציה הישנה מחנות האפליקציות של אפל.</translation>
     </message>
     <message>
       <source>To connect to old servers please download the legacy application from the Internet.</source>
-      <translation>Para ligar a servidores mais antigos deve descarregar a aplicação 'Legacy' a partir da Internet.</translation>
+      <translation>להתחברות לשרתים ישנים יש להוריד את האפליקציה הישנה מהאינטרנט.</translation>
     </message>
     <message>
       <source>Download</source>
-      <translation>Descarregar</translation>
+      <translation>הורדה</translation>
     </message>
   </context>
   <context>
     <name>HelpPopup</name>
     <message>
       <source>Select another cell</source>
-      <translation type="unfinished">Select another cell</translation>
+      <translation>בחר תא אחר</translation>
     </message>
     <message>
       <source>Switch camera in the cell</source>
-      <translation type="unfinished">Switch camera in the cell</translation>
+      <translation>החלף מצלמה בתא</translation>
     </message>
     <message>
       <source>Enter or exit fullscreen</source>
-      <translation type="unfinished">Enter or exit fullscreen</translation>
+      <translation>הכנס / צא ממסך מלא</translation>
     </message>
     <message>
       <source>Press any key to go to cameras</source>
-      <translation type="unfinished">Press any key to go to cameras</translation>
+      <translation>לחץ על מקש כלשהו כדי לעבור למצלמות</translation>
     </message>
     <message>
       <source>Press F1 to show this message again</source>
-      <translation type="unfinished">Press F1 to show this message again</translation>
+      <translation>לחץ על F1 כדי להציג הודעה זו שוב</translation>
     </message>
   </context>
   <context>
     <name>HorizontalCalendar</name>
     <message>
       <source>Close</source>
-      <translation>Fechar</translation>
+      <translation>סגירה</translation>
     </message>
   </context>
   <context>
     <name>InformationLabel</name>
     <message>
       <source>Unknown</source>
-      <translation>Desconhecido</translation>
+      <translation>לא ידוע</translation>
     </message>
     <message>
       <source>%1 fps</source>
-      <translation type="unfinished">%1 fps</translation>
+      <translation>%1 fps</translation>
     </message>
     <message>
       <source>%1 Mbps</source>
-      <translation type="unfinished">%1 Mbps</translation>
+      <translation>%1 Mbps</translation>
     </message>
     <message>
       <source>Hi-Res</source>
-      <translation type="unfinished">Hi-Res</translation>
+      <translation>רזולוציה גבוהה</translation>
     </message>
     <message>
       <source>Lo-Res</source>
-      <translation type="unfinished">Lo-Res</translation>
+      <translation>רזולוציה נמוכה</translation>
     </message>
     <message>
       <source>Keyfr + Lo-Res</source>
-      <translation type="unfinished">Keyfr + Lo-Res</translation>
+      <translation>Keyfr + Lo-Res</translation>
     </message>
     <message>
       <source>Custom-Res</source>
-      <translation type="unfinished">Custom-Res</translation>
+      <translation>התאמה אישית</translation>
     </message>
   </context>
   <context>
     <name>LaunchButton</name>
     <message>
       <source>Turn On</source>
-      <translation type="unfinished">Turn On</translation>
+      <translation>הפעל</translation>
     </message>
   </context>
   <context>
     <name>LiteClientControlScreen</name>
     <message>
       <source>Cannot start client</source>
-      <translation type="unfinished">Cannot start client</translation>
+      <translation>אין אפשרות להפעיל לקוח</translation>
     </message>
     <message>
       <source>Cannot stop client</source>
-      <translation type="unfinished">Cannot stop client</translation>
+      <translation>לא ניתן לעצור את הלקוח</translation>
     </message>
     <message>
       <source>Please make sure that display is connected to %1.</source>
-      <translation type="unfinished">Please make sure that display is connected to %1.</translation>
+      <translation>ודא שהתצוגה מחוברת ל- %1.</translation>
     </message>
     <message>
       <source>%1 is offline</source>
-      <translation type="unfinished">%1 is offline</translation>
+      <translation>%1 לא מחובר</translation>
     </message>
   </context>
   <context>
     <name>LiveVideoNavigation</name>
     <message>
       <source>LIVE</source>
-      <translation>Em Directo</translation>
+      <translation>חי</translation>
     </message>
   </context>
   <context>
     <name>LoginButton</name>
     <message>
       <source>Connect</source>
-      <translation>Ligar</translation>
+      <translation>חיבור</translation>
     </message>
   </context>
   <context>
     <name>NoCameraItem</name>
     <message>
       <source>No image</source>
-      <translation type="unfinished">No image</translation>
+      <translation>אין תמונה</translation>
     </message>
   </context>
   <context>
     <name>NoDisplayDummy</name>
     <message>
       <source>No display connected</source>
-      <translation type="unfinished">No display connected</translation>
+      <translation>אין תצוגה מחוברת</translation>
     </message>
   </context>
   <context>
     <name>OfflineDummy</name>
     <message>
       <source>You are not connected to any System</source>
-      <translation type="unfinished">You are not connected to any System</translation>
+      <translation>אינך מחובר למערכת כלשהי</translation>
     </message>
   </context>
   <context>
     <name>QualityDialog</name>
     <message>
       <source>Video Quality</source>
-      <translation type="unfinished">Video Quality</translation>
+      <translation>איכות וידאו</translation>
     </message>
     <message>
       <source>Unknown</source>
-      <translation>Desconhecido</translation>
+      <translation>לא ידוע</translation>
     </message>
     <message>
       <source>Highest speed</source>
-      <translation type="unfinished">Highest speed</translation>
+      <translation>המהירות הגבוהה ביותר</translation>
     </message>
     <message>
       <source>Best quality</source>
-      <translation type="unfinished">Best quality</translation>
+      <translation>האיכות הטובה ביותר</translation>
     </message>
   </context>
   <context>
     <name>ResourcesScreen</name>
     <message>
       <source>Server offline</source>
-      <translation>Servidor offline</translation>
+      <translation>השרת במצב לא מקוון</translation>
     </message>
     <message>
       <source>Loading...</source>
-      <translation>A Carregar...</translation>
+      <translation>טוען...</translation>
     </message>
     <message>
       <source>Connecting...</source>
-      <translation>A Ligar...</translation>
+      <translation>מתחבר...</translation>
     </message>
     <message>
       <source>No cameras available on this layout</source>
-      <translation type="unfinished">No cameras available on this layout</translation>
+      <translation>אין מצלמות זמינות בפריסה זו</translation>
     </message>
     <message>
       <source>Show all cameras</source>
-      <translation type="unfinished">Show all cameras</translation>
+      <translation>הצג את כל המצלמות</translation>
     </message>
     <message>
       <source>Nothing found</source>
-      <translation type="unfinished">Nothing found</translation>
+      <translation>לא נמצא דבר</translation>
     </message>
     <message>
       <source>Cannot connect to server</source>
-      <translation type="unfinished">Cannot connect to server</translation>
+      <translation>לא ניתן להתחבר לשרת</translation>
     </message>
     <message>
       <source>Press %1 to exit</source>
-      <translation type="unfinished">Press %1 to exit</translation>
+      <translation>לחץ על %1 ליציאה</translation>
     </message>
   </context>
   <context>
     <name>SearchToolBar</name>
     <message>
       <source>Search</source>
-      <translation>Pesquisa</translation>
+      <translation>חיפוש</translation>
     </message>
   </context>
   <context>
     <name>ServerOfflineDummy</name>
     <message>
       <source>%1 is offline</source>
-      <translation type="unfinished">%1 is offline</translation>
+      <translation>%1 נמצא במצב לא מקוון</translation>
     </message>
   </context>
   <context>
     <name>SessionCredentialsEditor</name>
     <message>
       <source>Host : Port</source>
-      <translation type="unfinished">Host : Port</translation>
+      <translation>מארח: יציאה</translation>
     </message>
     <message>
       <source>Login</source>
-      <translation type="unfinished">Login</translation>
+      <translation>כניסה</translation>
     </message>
     <message>
       <source>Password</source>
-      <translation type="unfinished">Password</translation>
+      <translation>סיסמא</translation>
     </message>
     <message>
       <source>Hosts</source>
-      <translation type="unfinished">Hosts</translation>
+      <translation>מארחים</translation>
     </message>
     <message>
       <source>Users</source>
-      <translation type="unfinished">Users</translation>
+      <translation>משתמשים</translation>
     </message>
   </context>
   <context>
     <name>SessionItem</name>
     <message>
       <source>This server has too old version. Please update it to the latest version.</source>
-      <translation type="unfinished">This server has too old version. Please update it to the latest version.</translation>
+      <translation>לשרת זה יש גרסה ישנה מדי. עדכן אותה לגרסה העדכנית ביותר.</translation>
     </message>
     <message>
       <source>OFFLINE</source>
-      <translation type="unfinished">OFFLINE</translation>
+      <translation>לא מקוון</translation>
     </message>
     <message>
       <source>INCOMPATIBLE</source>
-      <translation type="unfinished">INCOMPATIBLE</translation>
+      <translation>לא תואם</translation>
     </message>
   </context>
   <context>
     <name>SessionsScreen</name>
     <message>
       <source>Log in to %1</source>
-      <translation type="unfinished">Log in to %1</translation>
+      <translation>התחבר אל %1</translation>
     </message>
     <message>
       <source>Cannot connect to %1</source>
-      <translation type="unfinished">Cannot connect to %1</translation>
+      <translation>אין אפשרות להתחבר אל %1</translation>
     </message>
     <message>
       <source>Check your network connection or press &quot;%1&quot; button to enter a known server address.</source>
@@ -426,19 +426,19 @@
     </message>
     <message>
       <source>Check your network connection or contact a system administrator</source>
-      <translation type="unfinished">Check your network connection or contact a system administrator</translation>
+      <translation>בדוק את חיבור הרשת או פנה למנהל מערכת</translation>
     </message>
     <message>
       <source>Connect to Server...</source>
-      <translation type="unfinished">Connect to Server...</translation>
+      <translation>התחבר לשרת...</translation>
     </message>
     <message>
       <source>Connect to Another Server...</source>
-      <translation type="unfinished">Connect to Another Server...</translation>
+      <translation>התחבר לשרת אחר...</translation>
     </message>
     <message>
       <source>No Systems found</source>
-      <translation type="unfinished">No Systems found</translation>
+      <translation>לא נמצאו מערכות</translation>
     </message>
     <message>
       <source>Cannot connect to System &quot;%1&quot;</source>
@@ -446,129 +446,129 @@
     </message>
     <message>
       <source>Cannot connect to Server</source>
-      <translation type="unfinished">Cannot connect to Server</translation>
+      <translation>לא ניתן להתחבר לשרת</translation>
     </message>
   </context>
   <context>
     <name>SettingsScreen</name>
     <message>
       <source>Settings</source>
-      <translation>Definições</translation>
+      <translation>הגדרות</translation>
     </message>
     <message>
       <source>Live previews in the cameras list</source>
-      <translation type="unfinished">Live previews in the cameras list</translation>
+      <translation>תצוגות מקדימות חיות ברשימת המצלמות</translation>
     </message>
     <message>
       <source>Save passwords for servers</source>
-      <translation type="unfinished">Save passwords for servers</translation>
+      <translation>שמור סיסמאות עבור שרתים</translation>
     </message>
   </context>
   <context>
     <name>SideNavigation</name>
     <message>
       <source>New connection</source>
-      <translation>Nova ligação</translation>
+      <translation>חיבור חדש</translation>
     </message>
     <message>
       <source>Settings</source>
-      <translation>Definições</translation>
+      <translation>הגדרות</translation>
     </message>
     <message>
       <source>Start test</source>
-      <translation type="unfinished">Start test</translation>
+      <translation>התחל בדיקה</translation>
     </message>
     <message>
       <source>Stop test</source>
-      <translation type="unfinished">Stop test</translation>
+      <translation>עצור בדיקה</translation>
     </message>
     <message>
       <source>Disconnect from Server</source>
-      <translation type="unfinished">Disconnect from Server</translation>
+      <translation>התנתקת מהשרת</translation>
     </message>
   </context>
   <context>
     <name>StartingDummy</name>
     <message>
       <source>Turning on</source>
-      <translation type="unfinished">Turning on</translation>
+      <translation>מפעיל</translation>
     </message>
   </context>
   <context>
     <name>StoppingDummy</name>
     <message>
       <source>Turning off</source>
-      <translation type="unfinished">Turning off</translation>
+      <translation>מכבה</translation>
     </message>
   </context>
   <context>
     <name>SystemInformationBlock</name>
     <message>
       <source>Unknown</source>
-      <translation>Desconhecido</translation>
+      <translation>לא ידוע</translation>
     </message>
   </context>
   <context>
     <name>TestSelectionDialog</name>
     <message>
       <source>Select Test</source>
-      <translation type="unfinished">Select Test</translation>
+      <translation>בחר בדיקה</translation>
     </message>
   </context>
   <context>
     <name>TextField</name>
     <message>
       <source>Cut</source>
-      <translation type="unfinished">Cut</translation>
+      <translation>גזור</translation>
     </message>
     <message>
       <source>Copy</source>
-      <translation type="unfinished">Copy</translation>
+      <translation>העתק</translation>
     </message>
     <message>
       <source>Paste</source>
-      <translation type="unfinished">Paste</translation>
+      <translation>הדבק</translation>
     </message>
     <message>
       <source>Select All</source>
-      <translation type="unfinished">Select All</translation>
+      <translation>בחר הכל</translation>
     </message>
   </context>
   <context>
     <name>VerticalCalendar</name>
     <message>
       <source>Close</source>
-      <translation>Fechar</translation>
+      <translation>סגירה</translation>
     </message>
   </context>
   <context>
     <name>VideoDummy</name>
     <message>
       <source>Server offline</source>
-      <translation>Servidor offline</translation>
+      <translation>השרת במצב לא מקוון</translation>
     </message>
     <message>
       <source>Authentication required</source>
-      <translation type="unfinished">Authentication required</translation>
+      <translation>נדרש אימות</translation>
     </message>
     <message>
       <source>Camera offline</source>
-      <translation>Câmara offline</translation>
+      <translation>המצלמה לא זמינה</translation>
     </message>
     <message>
       <source>Cannot load video</source>
-      <translation type="unfinished">Cannot load video</translation>
+      <translation>לא ניתן לטעון וידאו</translation>
     </message>
   </context>
   <context>
     <name>VideoNavigation</name>
     <message>
       <source>No Archive</source>
-      <translation>Sem Arquivo</translation>
+      <translation>ללא ארכיון</translation>
     </message>
     <message>
       <source>LIVE</source>
-      <translation>Em Directo</translation>
+      <translation>חי</translation>
     </message>
     <message>
       <source>d MMMM yyyy</source>
@@ -580,26 +580,26 @@
     <name>VideoScreen</name>
     <message>
       <source>Change Quality</source>
-      <translation type="unfinished">Change Quality</translation>
+      <translation>שינוי איכות</translation>
     </message>
     <message>
       <source>Information</source>
-      <translation type="unfinished">Information</translation>
+      <translation>מידע</translation>
     </message>
     <message>
       <source>Select camera</source>
-      <translation type="unfinished">Select camera</translation>
+      <translation>בחר מצלמה</translation>
     </message>
     <message>
       <source>Press Ctrl + Arrow or use mouse wheel</source>
-      <translation type="unfinished">Press Ctrl + Arrow or use mouse wheel</translation>
+      <translation>הקש Ctrl + חץ או השתמש בגלגל העכבר</translation>
     </message>
   </context>
   <context>
     <name>WelcomeScreen</name>
     <message>
       <source>Skip</source>
-      <translation type="unfinished">Skip</translation>
+      <translation>דלג</translation>
     </message>
   </context>
 </TS>
