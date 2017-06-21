@@ -109,6 +109,11 @@ http {
             error_page 404 /static/index.html;
         }
 
+        location /preview/ {
+            root /app/app/static/$CUSTOMIZATION/preview;
+            error_page 404 /static/index.html;
+        }
+
         location /static {
             error_page 404 /static/index.html;
         }

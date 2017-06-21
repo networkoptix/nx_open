@@ -17,6 +17,7 @@ $.ajax({
         // detect preview mode
         var preview = window.location.href.indexOf('preview')>=0;
         if(preview){
+            console.log("preview mode");
             Config.viewsDir = 'preview/' + Config.viewsDir;
         }
         angular.bootstrap(document, ['cloudApp']);

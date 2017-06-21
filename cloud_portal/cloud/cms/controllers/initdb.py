@@ -41,6 +41,8 @@ def init_cms_db():
     # read customizations
     for custom in os.listdir(STATIC_DIR):
         print custom
+        if custom == 'common'
+            continue
         if os.path.isdir(os.path.join(STATIC_DIR, custom)):
             # read languages and languages in customizations
             language_json_filename = os.path.join(STATIC_DIR, custom, 'source/static/languages.json')
