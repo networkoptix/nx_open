@@ -25,7 +25,6 @@
 #include <client/client_settings.h>
 #include <client/client_runtime_settings.h>
 #include <client/client_meta_types.h>
-#include <client/client_translation_manager.h>
 #include <client/client_instance_manager.h>
 #include <client/client_resource_processor.h>
 #include <client/desktop_client_message_processor.h>
@@ -70,6 +69,8 @@
 #include <redass/redass_controller.h>
 
 #include <server/server_storage_manager.h>
+
+#include <translation/translation_manager.h>
 
 #include <utils/common/app_info.h>
 #include <utils/common/command_line_parser.h>
@@ -126,19 +127,19 @@ static void myMsgHandler(QtMsgType type, const QMessageLogContext& ctx, const QS
 
 namespace
 {
-    typedef std::unique_ptr<QnClientTranslationManager> QnClientTranslationManagerPtr;
+    typedef std::unique_ptr<QnTranslationManager> QnTranslationManagerPtr;
 
-    QnClientTranslationManagerPtr initializeTranslations(QnClientSettings *settings
-                                                         , const QString &dynamicTranslationPath)
+    QnTranslationManagerPtr initializeTranslations(QnClientSettings* settings)
     {
-        QnClientTranslationManagerPtr translationManager(new QnClientTranslationManager());
+        QnTranslationManagerPtr translationManager(new QnTranslationManager());
+        translationManager->addPrefix(lit("client_base"));
+        translationManager->addPrefix(lit("client_ui"));
+        translationManager->addPrefix(lit("client_core"));
+        translationManager->addPrefix(lit("client_qml"));
 
         QnTranslation translation;
-        if (!dynamicTranslationPath.isEmpty()) /* From command line. */
-            translation = translationManager->loadTranslation(dynamicTranslationPath);
-
         if (translation.isEmpty()) /* By path. */
-            translation = translationManager->loadTranslation(settings->translationPath());
+            translation = translationManager->loadTranslation(settings->locale());
 
         /* Check if qnSettings value is invalid. */
         if (translation.isEmpty())
@@ -284,8 +285,7 @@ void QnClientModule::initSingletons(const QnStartupParameters& startupParams)
 #endif
 
     /// We should load translations before major client's services are started to prevent races
-    QnClientTranslationManagerPtr translationManager(initializeTranslations(
-        clientSettings, startupParams.dynamicTranslationPath));
+    QnTranslationManagerPtr translationManager(initializeTranslations(clientSettings));
 
     /* Init singletons. */
 
@@ -358,7 +358,7 @@ void QnClientModule::initRuntimeParams(const QnStartupParameters& startupParams)
 {
     qnRuntime->setDevMode(startupParams.isDevMode());
     qnRuntime->setGLDoubleBuffer(qnSettings->isGlDoubleBuffer());
-    qnRuntime->setTranslationPath(qnSettings->translationPath());
+    qnRuntime->setLocale(qnSettings->locale());
     qnRuntime->setSoftwareYuv(startupParams.softwareYuv);
     qnRuntime->setShowFullInfo(startupParams.showFullInfo);
     qnRuntime->setIgnoreVersionMismatch(startupParams.ignoreVersionMismatch);
