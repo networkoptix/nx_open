@@ -4,6 +4,6 @@ from models import *
 
 
 class AccountAdmin(admin.ModelAdmin):
-    pass
+    list_display = [f.name for f in Account._meta.get_fields()]
 
 admin.site.register(Account, AccountAdmin)
