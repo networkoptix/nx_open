@@ -42,8 +42,8 @@ case "$1" in
         write_my_cnf
         echo "CREATE DATABASE IF NOT EXISTS $DB_NAME" | mysql -Dinformation_schema
 
-        /app/env/bin/python manage.py migrate
-        /app/env/bin/python manage.py createcachetable
+        yes "yes" | /app/env/bin/python manage.py migrate
+        yes "yes" | /app/env/bin/python manage.py createcachetable
 
         find /app/app/static | xargs touch
         exec /app/env/bin/gunicorn cloud.wsgi --capture-output --workers 4 --bind :5000 --log-level=debug
