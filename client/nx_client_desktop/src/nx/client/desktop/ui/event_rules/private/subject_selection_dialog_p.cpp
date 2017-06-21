@@ -1,5 +1,7 @@
 #include "subject_selection_dialog_p.h"
 
+#include <algorithm>
+
 #include <client/client_globals.h>
 #include <client/client_meta_types.h>
 #include <core/resource/user_resource.h>
@@ -10,6 +12,19 @@
 #include <ui/models/user_roles_model.h>
 #include <ui/style/globals.h>
 #include <ui/style/skin.h>
+
+namespace {
+
+int countEnabledUsers(const QList<QnResourceAccessSubject>& subjects)
+{
+    return std::count_if(subjects.cbegin(), subjects.cend(),
+        [](const QnResourceAccessSubject& subject) -> bool
+        {
+            return subject.isUser() && subject.user()->isEnabled();
+        });
+}
+
+} // namespace
 
 namespace nx {
 namespace client {
@@ -177,6 +192,26 @@ void SubjectSelectionDialog::UserListModel::setCheckedUsers(const QSet<QnUuid>& 
     m_usersModel->setCheckedResources(ids);
 }
 
+bool SubjectSelectionDialog::UserListModel::customUsersOnly() const
+{
+    return m_customUsersOnly;
+}
+
+void SubjectSelectionDialog::UserListModel::setCustomUsersOnly(bool value)
+{
+    if (m_customUsersOnly == value)
+        return;
+
+    m_customUsersOnly = value;
+    invalidateFilter();
+}
+
+bool SubjectSelectionDialog::UserListModel::systemHasCustomUsers() const
+{
+    const auto id = userRolesManager()->predefinedRoleId(Qn::UserRole::CustomPermissions);
+    return countEnabledUsers(resourceAccessSubjectsCache()->usersInRole(id)) > 0;
+}
+
 Qt::ItemFlags SubjectSelectionDialog::UserListModel::flags(const QModelIndex& index) const
 {
     return index.column() == IndicatorColumn
@@ -201,7 +236,7 @@ QVariant SubjectSelectionDialog::UserListModel::data(const QModelIndex& index, i
             if (index.column() != IndicatorColumn)
                 return base_type::data(index, role);
 
-            const auto user = this->user(index.row());
+            const auto user = getUser(index);
             if (!user)
                 return QVariant();
 
@@ -220,9 +255,22 @@ QVariant SubjectSelectionDialog::UserListModel::data(const QModelIndex& index, i
     }
 }
 
+bool SubjectSelectionDialog::UserListModel::filterAcceptsRow(int sourceRow,
+    const QModelIndex& sourceParent) const
+{
+    const auto user = getUser(sourceModel()->index(sourceRow, 0, sourceParent));
+    if (!user || !user->isEnabled())
+        return false;
+
+    if (m_customUsersOnly && user->userRole() != Qn::UserRole::CustomPermissions)
+        return false;
+
+    return base_type::filterAcceptsRow(sourceRow, sourceParent);
+}
+
 bool SubjectSelectionDialog::UserListModel::isValid(const QModelIndex& index) const
 {
-    const auto user = this->user(index.row());
+    const auto user = getUser(index);
     return user && (!m_userValidator || m_userValidator(user));
 }
 
@@ -232,10 +280,9 @@ bool SubjectSelectionDialog::UserListModel::isChecked(const QModelIndex& index) 
     return checkIndex.data(Qt::CheckStateRole).toInt() == Qt::Checked;
 }
 
-QnUserResourcePtr SubjectSelectionDialog::UserListModel::user(int row) const
+QnUserResourcePtr SubjectSelectionDialog::UserListModel::getUser(const QModelIndex& index)
 {
-    return index(row, NameColumn).data(Qn::ResourceRole)
-        .value<QnResourcePtr>().dynamicCast<QnUserResource>();
+    return index.data(Qn::ResourceRole).value<QnResourcePtr>().dynamicCast<QnUserResource>();
 }
 
 void SubjectSelectionDialog::UserListModel::setUserValidator(Qn::UserValidator userValidator)
@@ -312,7 +359,7 @@ void SubjectSelectionDialog::RoleListDelegate::getDisplayInfo(const QModelIndex&
 {
     static const auto kExtraInfoTemplate = QString::fromWCharArray(L"\x2013 %1"); //< "- %1"
     const auto roleId = index.data(Qn::UuidRole).value<QnUuid>();
-    const int usersInRole = resourceAccessSubjectsCache()->usersInRole(roleId).count();
+    const int usersInRole = countEnabledUsers(resourceAccessSubjectsCache()->usersInRole(roleId));
     baseName = userRolesManager()->userRoleName(roleId);
     extInfo = kExtraInfoTemplate.arg(tr("%n users", "", usersInRole));
 }

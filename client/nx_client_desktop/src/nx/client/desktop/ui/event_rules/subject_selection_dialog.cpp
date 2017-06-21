@@ -10,6 +10,7 @@
 #include <ui/style/globals.h>
 #include <ui/style/skin.h>
 #include <ui/widgets/common/snapped_scrollbar.h>
+#include <ui/widgets/common/item_view_auto_hider.h>
 #include <utils/common/scoped_painter_rollback.h>
 #include <nx/utils/string.h>
 
@@ -39,11 +40,7 @@ SubjectSelectionDialog::SubjectSelectionDialog(QWidget* parent, Qt::WindowFlags 
     filterRoles->setSourceModel(m_roles);
     ui->rolesTreeView->setModel(filterRoles);
 
-    auto sortFilterUsers = new NaturalStringSortProxyModel(this);
-    sortFilterUsers->setSortCaseSensitivity(Qt::CaseInsensitive);
-    sortFilterUsers->setSourceModel(m_users);
-
-    ui->usersTreeView->setModel(sortFilterUsers);
+    ui->usersTreeView->setModel(m_users);
     ui->usersTreeView->sortByColumn(UserListModel::NameColumn, Qt::AscendingOrder);
 
     ui->rolesTreeView->setItemDelegate(m_roleListDelegate);
@@ -99,9 +96,9 @@ SubjectSelectionDialog::SubjectSelectionDialog(QWidget* parent, Qt::WindowFlags 
         this, &SubjectSelectionDialog::showAllUsersChanged);
 
     const auto updateFilterText =
-        [this, sortFilterUsers, filterRoles]()
+        [this, filterRoles]()
         {
-            sortFilterUsers->setFilterFixedString(ui->searchLineEdit->text());
+            m_users->setFilterFixedString(ui->searchLineEdit->text());
             filterRoles->setFilterFixedString(ui->searchLineEdit->text());
         };
 
@@ -129,6 +126,9 @@ SubjectSelectionDialog::SubjectSelectionDialog(QWidget* parent, Qt::WindowFlags 
 
     connectToModelChanges(m_users);
     connectToModelChanges(m_roles);
+
+    QnItemViewAutoHider::create(ui->rolesTreeView, tr("No user roles found"));
+    QnItemViewAutoHider::create(ui->usersTreeView, tr("No users found"));
 }
 
 SubjectSelectionDialog::~SubjectSelectionDialog()
@@ -137,18 +137,9 @@ SubjectSelectionDialog::~SubjectSelectionDialog()
 
 void SubjectSelectionDialog::showAllUsersChanged(bool value)
 {
-    const auto acceptCustomUsers =
-        [this](int sourceRow, const QModelIndex& sourceParent) -> bool
-        {
-            const auto index = m_users->sourceModel()->index(sourceRow, 0, sourceParent);
-            const auto user = index.data(Qn::ResourceRole)
-                .value<QnResourcePtr>().dynamicCast<QnUserResource>();
-            return user && user->userRole() == Qn::UserRole::CustomPermissions;
-        };
+    m_users->setCustomUsersOnly(!value);
 
-    m_users->setCustomFilterAcceptsRow(value
-        ? UserListModel::AcceptPredicate()
-        : acceptCustomUsers);
+    ui->usersGroupBox->setVisible(value || m_users->systemHasCustomUsers());
 
     ui->usersGroupBox->setTitle(value
         ? tr("Users")

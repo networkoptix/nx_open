@@ -12,7 +12,7 @@
 #include <ui/utils/validators.h>
 
 #include <nx/client/desktop/ui/common/column_remap_proxy_model.h>
-#include <nx/client/desktop/ui/common/customizable_sort_filter_proxy_model.h>
+#include <nx/client/desktop/ui/common/natural_string_sort_proxy_model.h>
 #include <nx/client/desktop/ui/event_rules/subject_selection_dialog.h>
 
 class QnUuid;
@@ -53,11 +53,11 @@ private:
 // SubjectSelectionDialog::UserListModel
 
 class SubjectSelectionDialog::UserListModel:
-    public CustomizableSortFilterProxyModel,
+    public NaturalStringSortProxyModel,
     public QnCommonModuleAware
 {
     Q_OBJECT
-    using base_type = CustomizableSortFilterProxyModel;
+    using base_type = NaturalStringSortProxyModel;
 
 public:
     enum Columns
@@ -75,13 +75,20 @@ public:
 
     void setUserValidator(Qn::UserValidator userValidator);
 
+    bool customUsersOnly() const;
+    void setCustomUsersOnly(bool value);
+
+    bool systemHasCustomUsers() const;
+
     virtual Qt::ItemFlags flags(const QModelIndex& index) const override;
     virtual QVariant data(const QModelIndex& index, int role = Qt::DisplayRole) const override;
+
+    virtual bool filterAcceptsRow(int sourceRow, const QModelIndex& sourceParent) const override;
 
     bool isValid(const QModelIndex& index) const;
     bool isChecked(const QModelIndex& index) const;
 
-    QnUserResourcePtr user(int row) const;
+    static QnUserResourcePtr getUser(const QModelIndex& index);
 
 private:
     void columnsChanged(int firstColumn, int lastColumn, const QVector<int> roles = {});
@@ -91,6 +98,7 @@ private:
     QnResourceListModel* const m_usersModel;
     RoleListModel* const m_rolesModel;
     Qn::UserValidator m_userValidator;
+    bool m_customUsersOnly = true;
 };
 
 //------------------------------------------------------------------------------------------------

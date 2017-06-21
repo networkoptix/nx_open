@@ -34,13 +34,14 @@ public:
 
     void setUserValidator(Qn::UserValidator userValidator);
 
+    // Invalid ids are filtered out. Disabled users are kept, but hidden.
     void setCheckedSubjects(const QSet<QnUuid>& ids);
     QSet<QnUuid> checkedSubjects() const;
 
-    QSet<QnUuid> totalCheckedUsers() const;
+    QSet<QnUuid> totalCheckedUsers() const; //< Users checked explicitly + users from checked roles.
 
 signals:
-    void changed();
+    void changed(); //< Selection or contents were changed. Potential alert must be re-evaluated.
 
 private:
     void showAllUsersChanged(bool value);
