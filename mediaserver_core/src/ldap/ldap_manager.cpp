@@ -341,8 +341,8 @@ bool LdapSession::fetchUsers(QnLdapUsers &users, const QString& customFilter)
             return false;
         }
 
-        int lerrno = 0;
-        char *lerrstr = NULL;
+        LDAP_RESULT lerrno = 0;
+        PWCHAR lerrstr = NULL;
 
         if((rc = ldap_parse_result(m_ld, result, &lerrno,
                                             NULL, &lerrstr, NULL,
@@ -361,7 +361,7 @@ bool LdapSession::fetchUsers(QnLdapUsers &users, const QString& customFilter)
             cookie = NULL;
         }
 
-        ber_int_t entcnt = 0;
+        LDAP_RESULT entcnt = 0;
         if((rc = ldap_parse_page_control(m_ld, retServerControls, &entcnt, &cookie)) != LDAP_SUCCESS) {
             if (pControl)
                 ldap_control_free(pControl);
