@@ -46,20 +46,23 @@ std::vector<std::unique_ptr<AbstractTunnelAcceptor>>
 
     std::vector<std::unique_ptr<AbstractTunnelAcceptor>> tunnelAcceptors;
 
-    const auto filteredConnectionMethods = 
-        event.connectionMethods & m_enabledConnectionMethods;
-
-    if ((filteredConnectionMethods & udpHolePunching) && !event.udpEndpointList.empty())
+    if ((event.connectionMethods & udpHolePunching) && !event.udpEndpointList.empty())
     {
         auto acceptor = std::make_unique<udp::TunnelAcceptor>(
-            std::move(event.udpEndpointList), event.params);
+            std::move(event.udpEndpointList),
+            event.params);
+        // TODO: #ak Following call is a result of some architectual problem 
+        // making udp::TunnelAcceptor required for cloud connect to succeed with any method.
+        if ((m_enabledConnectionMethods & hpm::api::ConnectionMethod::udpHolePunching) == 0)
+            acceptor->setHolePunchingEnabled(false);
         tunnelAcceptors.push_back(std::move(acceptor));
     }
 
-    if ((filteredConnectionMethods & reverseConnect) && !event.tcpReverseEndpointList.empty())
+    if ((event.connectionMethods & reverseConnect) && !event.tcpReverseEndpointList.empty())
     {
         auto acceptor = std::make_unique<tcp::ReverseTunnelAcceptor>(
-            std::move(event.tcpReverseEndpointList), event.params);
+            std::move(event.tcpReverseEndpointList),
+            event.params);
         tunnelAcceptors.push_back(std::move(acceptor));
     }
 
