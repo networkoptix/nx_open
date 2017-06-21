@@ -83,7 +83,7 @@ void KnownServerConnections::Private::start()
     if (!qnClientCoreSettings->knownServerUrls().isEmpty())
     {
         m_timer = new QTimer(this);
-        connect(m_timer, &QTimer::timeout, this, &Private::checkKnownUrls);
+        connect(m_timer.data(), &QTimer::timeout, this, &Private::checkKnownUrls);
 
         connect(m_discoveryManager, &vms::discovery::Manager::found, this,
             &Private::at_moduleFound);
