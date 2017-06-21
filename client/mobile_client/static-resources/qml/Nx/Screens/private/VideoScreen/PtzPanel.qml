@@ -14,7 +14,7 @@ Item
     property PtzController controller: PtzController
     {
         property bool supportsPresets: capabilities & Ptz.PresetsPtzCapability
-        property bool supportsMoveOnTap: capabilities & Ptz.AbsolutePtzCapabilities
+        property bool supportsMoveOnTap: capabilities & Ptz.ViewportPtzCapability
     }
 
     property alias customRotation: joystick.customRotation
