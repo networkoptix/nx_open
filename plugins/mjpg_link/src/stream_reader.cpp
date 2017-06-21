@@ -68,6 +68,8 @@ StreamReader::~StreamReader()
 {
     NX_ASSERT( m_isInGetNextData == 0 );
     m_timeProvider->releaseRef();
+
+    m_videoPacket.reset();
 }
 
 //!Implementation of nxpl::PluginInterface::queryInterface
