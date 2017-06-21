@@ -175,7 +175,11 @@ boost::optional<nx::Buffer> CloudUserInfoPool::newestMostCommonNonce() const
     for (auto it = m_tsToNonceUserCount.rbegin(); it != m_tsToNonceUserCount.rend(); ++it)
     {
         if (it->second.userCount == m_userCount)
+        {
+            NX_VERBOSE(this, lm("Proving nonce %1 suitable for every user")
+                .arg(resultIt->second.cloudNonce));
             return it->second.cloudNonce;
+        }
 
         if (it->second.userCount > maxUserCount)
         {
@@ -186,7 +190,9 @@ boost::optional<nx::Buffer> CloudUserInfoPool::newestMostCommonNonce() const
 
     if (resultIt != m_tsToNonceUserCount.rend())
     {
-        NX_VERBOSE(this, lm("Proving nonce %1").arg(resultIt->second.cloudNonce));
+        NX_VERBOSE(this, lm("Proving nonce %1 suitable for %2 out of %3 users")
+            .arg(resultIt->second.cloudNonce).arg(resultIt->second.userCount)
+            .arg(m_userCount));
         return boost::optional<nx::Buffer>(resultIt->second.cloudNonce);
     }
 
