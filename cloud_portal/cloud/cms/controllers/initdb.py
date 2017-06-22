@@ -37,11 +37,9 @@ def init_cms_db():
     product = Product(name='cloud_portal')
     product.save()
 
-    print STATIC_DIR
     # read customizations
     for custom in os.listdir(STATIC_DIR):
-        print custom
-        if custom == 'common'
+        if custom == 'common':
             continue
         if os.path.isdir(os.path.join(STATIC_DIR, custom)):
             # read languages and languages in customizations
