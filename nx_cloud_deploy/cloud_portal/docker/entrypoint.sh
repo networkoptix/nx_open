@@ -42,7 +42,6 @@ case "$1" in
         write_my_cnf
         echo "CREATE DATABASE IF NOT EXISTS $DB_NAME" | mysql -Dinformation_schema
 
-        yes "yes" | /app/env/bin/python manage.py makemigrations
         yes "yes" | /app/env/bin/python manage.py migrate
         yes "yes" | /app/env/bin/python manage.py createcachetable
 

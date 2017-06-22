@@ -14,13 +14,15 @@
         <div class="form-row">
             {{field.label_tag}}
             {{field}}
+            {% if field.help_text %}
             <p class="help">{{field.help_text}}</p>
+            {% endif %}
         </div>
     {% endfor %}
     <div class="submit-row">
-        <input type="submit" name="Get Data Structures" value="Get Data Structures" />
-        <input type="submit" name="Save" value="Save" />
-        <input type="reset" value="Reset" />
+        <button type="submit" name="GetDataStructures" value="GetDataStructures">Get Data Structures</button>
+        <button type="submit" name="Save" value="Save">Save</button>
+        <button type="reset" value="Reset">Reset</button>
     </div>
 </form>
 {% endblock%}

@@ -2,5 +2,5 @@ from django.conf.urls import include, url
 from .views import *
 
 urlpatterns = [
-	url(r'', model_list_view),
+	url(r'', page_edit_view),
 ]
