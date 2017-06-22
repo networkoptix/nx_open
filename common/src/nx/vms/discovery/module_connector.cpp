@@ -119,27 +119,16 @@ ModuleConnector::Module::~Module()
 void ModuleConnector::Module::addEndpoints(std::set<SocketAddress> endpoints)
 {
     NX_VERBOSE(this, lm("Add endpoints %1").container(endpoints));
-    const auto getGroup =
-        [&](Priority p)
-        {
-            return m_endpoints.emplace(p, std::set<SocketAddress>()).first;
-        };
-
-    const auto insertIntoGroup =
-        [&](Endpoints::iterator groupIterator, SocketAddress endpoint)
-        {
-            auto& group = groupIterator->second;
-            return group.insert(std::move(endpoint)).second;
-        };
-
     if (m_id.isNull())
     {
         // For unknown server connect to every new endpoint.
-        const auto group = getGroup(kDefault);
         for (const auto& endpoint: endpoints)
         {
-            if (insertIntoGroup(group, endpoint) && !m_parent->m_isPassiveMode)
-                connectToEndpoint(endpoint, group);
+            if (auto group = saveEndpoint(endpoint))
+            {
+                if (!m_parent->m_isPassiveMode)
+                    connectToEndpoint(endpoint, group.get());
+            }
         }
     }
     else
@@ -147,19 +136,7 @@ void ModuleConnector::Module::addEndpoints(std::set<SocketAddress> endpoints)
         // For known server sort endpoints by accessibility type and connect by order.
         bool hasNewEndpoints = false;
         for (auto& endpoint: endpoints)
-        {
-            Endpoints::iterator group;
-            if (endpoint.address == HostAddress::localhost)
-                group = getGroup(kLocalHost);
-            else if (endpoint.address.isLocal())
-                group = getGroup(kLocalNetwork);
-            else if (endpoint.address.isIpAddress())
-                group = getGroup(kIp); //< TODO: Consider to check if we have such interface.
-            else
-                group = getGroup(kOther);
-
-            hasNewEndpoints |= insertIntoGroup(group, std::move(endpoint));
-        }
+            hasNewEndpoints |= (bool) saveEndpoint(std::move(endpoint));
 
         if (hasNewEndpoints)
             ensureConnection();
@@ -177,6 +154,40 @@ void ModuleConnector::Module::setForbiddenEndpoints(std::set<SocketAddress> endp
     NX_VERBOSE(this, lm("Forbid endpoints %1").container(endpoints));
     NX_ASSERT(!m_id.isNull(), "Does not make sense to block endpoints for unknown servers");
     m_forbiddenEndpoints = std::move(endpoints);
+}
+
+boost::optional<ModuleConnector::Module::Endpoints::iterator>
+    ModuleConnector::Module::saveEndpoint(SocketAddress endpoint)
+{
+    const auto getGroup =
+        [&](Priority p)
+        {
+            return m_endpoints.emplace(p, std::set<SocketAddress>()).first;
+        };
+
+    const auto insertIntoGroup =
+        [&](Endpoints::iterator groupIterator, SocketAddress endpoint)
+        {
+            auto& group = groupIterator->second;
+            return group.insert(std::move(endpoint)).second;
+        };
+
+    Endpoints::iterator group;
+    if (m_id.isNull())
+        group = getGroup(kDefault);
+    if (endpoint.address == HostAddress::localhost)
+        group = getGroup(kLocalHost);
+    else if (endpoint.address.isLocal())
+        group = getGroup(kLocalNetwork);
+    else if (endpoint.address.isIpAddress())
+        group = getGroup(kIp); //< TODO: Consider to check if we have such interface.
+    else
+        group = getGroup(kOther);
+
+    if (insertIntoGroup(group, std::move(endpoint)))
+        return group;
+    else
+        return boost::none;
 }
 
 void ModuleConnector::Module::connectToGroup(Endpoints::iterator endpointsGroup)
@@ -303,7 +314,11 @@ bool ModuleConnector::Module::saveConnection(
    SocketAddress endpoint, nx_http::AsyncHttpClientPtr client, const QnModuleInformation& information)
 {
     NX_ASSERT(!m_id.isNull());
-    if (m_socket || m_id.isNull())
+    if (m_id.isNull())
+        return false;
+
+    saveEndpoint(endpoint);
+    if (m_socket)
         return true;
 
     for (const auto& client: m_httpClients)
