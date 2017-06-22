@@ -1059,8 +1059,9 @@ QList<int> Player::availableVideoQualities(const QList<int>& videoQualities) con
 
     QList<int> result;
 
-    if (!d->archiveReader)
-        return result;
+    const auto transcodingCoded = d->archiveReader
+        ? d->archiveReader->getTranscodingCodec()
+        : QnArchiveStreamReader(d->resource).getTranscodingCodec();
 
     const auto camera = d->resource.dynamicCast<QnVirtualCameraResource>();
     if (!camera)
@@ -1068,7 +1069,7 @@ QList<int> Player::availableVideoQualities(const QList<int>& videoQualities) con
 
     auto getQuality =
         [&camera,
-            codec = d->archiveReader->getTranscodingCodec(),
+            transcodingCoded,
             liveMode = d->liveMode,
             positionMs = d->positionMs,
             currentVideoDecoders = d->dataConsumer
@@ -1077,7 +1078,7 @@ QList<int> Player::availableVideoQualities(const QList<int>& videoQualities) con
                     int quality)
         {
             return media_player_quality_chooser::chooseVideoQuality(
-                codec, quality, liveMode, positionMs, camera, currentVideoDecoders);
+                transcodingCoded, quality, liveMode, positionMs, camera, currentVideoDecoders);
         };
 
     const auto& highQuality = getQuality(HighVideoQuality);
