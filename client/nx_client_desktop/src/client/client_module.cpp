@@ -78,6 +78,7 @@
 #include <utils/media/voice_spectrum_analyzer.h>
 #include <utils/performance_test.h>
 #include <utils/server_interface_watcher.h>
+#include <nx/client/core/watchers/known_server_connections.h>
 #include <nx/client/desktop/utils/applauncher_guard.h>
 
 #include <statistics/statistics_manager.h>
@@ -352,6 +353,8 @@ void QnClientModule::initSingletons(const QnStartupParameters& startupParams)
 
     commonModule->store(new QnQtbugWorkaround());
     commonModule->store(new nx::cloud::gateway::VmsGatewayEmbeddable(true));
+
+    commonModule->findInstance<nx::client::core::watchers::KnownServerConnections>()->start();
 }
 
 void QnClientModule::initRuntimeParams(const QnStartupParameters& startupParams)

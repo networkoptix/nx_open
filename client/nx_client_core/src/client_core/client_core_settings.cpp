@@ -24,8 +24,6 @@ QnClientCoreSettings::QnClientCoreSettings(QObject* parent) :
     m_settings->beginGroup(kCoreSettingsGroup);
     init();
     updateFromSettings(m_settings);
-
-    migrateKnownServerConnections();
 }
 
 QnClientCoreSettings::~QnClientCoreSettings()
@@ -139,37 +137,4 @@ void QnClientCoreSettings::save()
 {
     submitToSettings(m_settings);
     m_settings->sync();
-}
-
-void QnClientCoreSettings::migrateKnownServerConnections()
-{
-    const auto knownUrls = knownServerUrls();
-    if (knownUrls.isEmpty())
-        return;
-
-    const auto recentConnections = recentLocalConnections();
-
-    auto knownConnections = knownServerConnections();
-    const auto oldKnownConnectionsCount = knownConnections.size();
-
-    for (const auto& knownUrl: knownUrls)
-    {
-        const auto it = std::find_if(recentConnections.begin(), recentConnections.end(),
-            [&knownUrl](const nx::client::core::LocalConnectionData& connection)
-            {
-                return std::any_of(connection.urls.begin(), connection.urls.end(),
-                    [&knownUrl](const QUrl& url)
-                    {
-                        return nx::utils::url::addressesEqual(url, knownUrl);
-                    });
-            });
-
-        if (it != recentConnections.end())
-            knownConnections.append(KnownServerConnection{it.key(), knownUrl});
-    }
-
-    if (knownConnections.size() != oldKnownConnectionsCount)
-        setKnownServerConnections(knownConnections);
-
-    setKnownServerUrls(QList<QUrl>());
 }
