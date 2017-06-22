@@ -58,7 +58,6 @@ set(liteDeviceName "Nx1")
 set(freeLicenseKey "0000-0000-0000-0005")
 
 # Installer Customizations
-set(installer.language "en_US")
 set(sign.password "qweasd123")
 set(sign.cer "app.p12")
 set(sign.intermediate.cer "")
