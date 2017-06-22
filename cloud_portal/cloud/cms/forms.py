@@ -22,10 +22,11 @@ class CustomForm(forms.ModelForm):
 			latest_record = data_structure.datarecord_set.latest('created_date')
 			record_value = latest_record.value
 
-			self.fields[ds_name] = forms.CharField(widget=forms.Textarea(attrs={'placeholder':record_value}),
+			self.fields[ds_name] = forms.CharField(widget=forms.Textarea,
 												   required=False,
 												   label=ds_name,
-												   help_text=ds_description)
+												   help_text=ds_description,
+												   initial=record_value)
 
 class ContextForm(forms.ModelForm):
 
