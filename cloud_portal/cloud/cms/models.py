@@ -59,7 +59,7 @@ class Language(models.Model):
     code = models.CharField(max_length=8, unique=True)
 
     def __str__(self):
-        return self.name
+        return self.code
 
 
 class Customization(models.Model):
