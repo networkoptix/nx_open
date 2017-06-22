@@ -32,13 +32,13 @@ admin.site.register(Customization, CustomizationAdmin)
 
 
 class DataRecordAdmin(admin.ModelAdmin):
-    list_display = ('customization__name', 'language__code', 'data_structure__name', 'value', 'version__name')
+    list_display = ('customization', 'language', 'data_structure', 'value', 'version')
 admin.site.register(DataRecord, DataRecordAdmin)
 
 
 class ContentVersionAdmin(admin.ModelAdmin):
-    list_display = ('customization__name', 'name',
-                    'created_date', 'created_by__email',
-                    'accepted_date', 'accepted_by__email')
+    list_display = ('customization', 'name',
+                    'created_date', 'created_by',
+                    'accepted_date', 'accepted_by')
 admin.site.register(ContentVersion, ContentVersionAdmin)
 
