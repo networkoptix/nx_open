@@ -3,7 +3,6 @@
 #include <gtest/gtest.h>
 
 #include <nx/utils/log/log.h>
-#include <nx/utils/app_info.h>
 #include <common/common_globals.h>
 
 #include <nx/media/abstract_video_decoder.h>
@@ -113,7 +112,6 @@ public:
     MockServer()
     {
         setId(QnUuid::createUuid());
-        setVersion(QnSoftwareVersion(nx::utils::AppInfo::applicationVersion()));
     }
 
     void setSupportsTranscoding(bool supportsTranscoding)
