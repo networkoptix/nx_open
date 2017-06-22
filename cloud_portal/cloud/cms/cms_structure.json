@@ -41,7 +41,7 @@
       "url": "/content/eula",
       "translatable": true,
       "values":[
-        ["%CONTENT%","End user licence agreement.","End user license agreement", "html"]
+        ["%CONTENT%","End user licence agreement.","End user license agreement", "HTML"]
       ]
     }
   ]

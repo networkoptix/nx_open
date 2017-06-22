@@ -5,7 +5,7 @@
 # create report: added vs outdated
 import os
 import re
-import filldata
+from ...controllers import filldata
 import json, codecs
 from ...models import Product, Context, DataStructure
 from django.core.management.base import BaseCommand
@@ -73,6 +73,8 @@ def read_structure_json():
             context.save()
 
         for record in context_data["values"]:
+            type = None
+            description = None
             if len(record) == 2:
                 name, value = record
             if len(record) == 3:
@@ -84,7 +86,7 @@ def read_structure_json():
             if description:
                 data_structure.description = description
             if type:
-                data_structure.type = type
+                data_structure.type = DataStructure.get_type(type)
             data_structure.default = value
             data_structure.save()
 

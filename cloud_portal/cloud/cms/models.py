@@ -30,6 +30,7 @@ class Context(models.Model):
 DATA_TYPES = (
     (0, 'Text'),
     (1, 'Image'),
+    (2, 'HTML'),
 )
 
 
@@ -45,6 +46,10 @@ class DataStructure(models.Model):
 
     def __str__(self):
         return self.name
+
+    @staticmethod
+    def get_type(name):
+        return next((type[0] for type in DATA_TYPES if DATA_TYPES[1] == name), 0)
 
 
 # CMS settings. Release engineer can change that
