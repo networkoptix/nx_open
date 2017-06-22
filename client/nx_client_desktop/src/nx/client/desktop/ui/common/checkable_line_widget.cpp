@@ -10,8 +10,6 @@
 #include <ui/style/helper.h>
 #include <ui/widgets/common/tree_view.h>
 
-#include <nx/client/desktop/ui/common/customizable_proxy_model.h>
-
 namespace {
 
 QSize sizeOf(const QMargins& m)
