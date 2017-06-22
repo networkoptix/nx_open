@@ -42,11 +42,9 @@ bool BaseFusionRequestHandler::getDataFormat(
     Qn::SerializationFormat* inputDataFormat,
     FusionRequestResult* errorDescription)
 {
-    // input/output formats can differ. E.g., GET request can specify input data in url query only.
+    // Input/output formats can differ. E.g., GET request can specify input data in url query only.
     // TODO: #ak Fetching m_outputDataFormat from url query.
-    //if( no format in query )
-    //{
-    if (request.requestLine.method == nx_http::Method::GET)
+    if (!nx_http::Method::isMessageBodyAllowed(request.requestLine.method))
     {
         if (inputDataFormat)
         {
@@ -66,7 +64,6 @@ bool BaseFusionRequestHandler::getDataFormat(
         if (inputDataFormat)
             *inputDataFormat = m_outputDataFormat;
     }
-    //}
 
     if (inputDataFormat && !isFormatSupported(*inputDataFormat))
     {
@@ -76,8 +73,8 @@ bool BaseFusionRequestHandler::getDataFormat(
             FusionRequestErrorDetail::notAcceptable,
             lm("Input format %1 not supported. Input data attributes "
                 "can be specified in url or by %2 POST message body")
-            .arg(Qn::serializationFormatToHttpContentType(*inputDataFormat))
-            .arg(Qn::serializationFormatToHttpContentType(Qn::JsonFormat)));
+                .arg(Qn::serializationFormatToHttpContentType(*inputDataFormat))
+                .arg(Qn::serializationFormatToHttpContentType(Qn::JsonFormat)));
         return false;
     }
 
@@ -88,8 +85,8 @@ bool BaseFusionRequestHandler::getDataFormat(
             QnLexical::serialized(FusionRequestErrorDetail::notAcceptable),
             FusionRequestErrorDetail::notAcceptable,
             lm("Output format %1 not supported. Only %2 is supported")
-            .arg(Qn::serializationFormatToHttpContentType(m_outputDataFormat))
-            .arg(Qn::serializationFormatToHttpContentType(Qn::JsonFormat)));
+                .arg(Qn::serializationFormatToHttpContentType(m_outputDataFormat))
+                .arg(Qn::serializationFormatToHttpContentType(Qn::JsonFormat)));
         return false;
     }
 

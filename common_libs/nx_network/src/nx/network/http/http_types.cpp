@@ -319,6 +319,13 @@ const StringType Method::POST("POST");
 const StringType Method::PUT("PUT");
 const StringType Method::OPTIONS("OPTIONS");
 
+bool Method::isMessageBodyAllowed(ValueType method)
+{
+    if (method == GET || method == HEAD)
+        return false;
+    return true;
+}
+
 //namespace Version
 //{
 //    const StringType http_1_0( "HTTP/1.0" );
