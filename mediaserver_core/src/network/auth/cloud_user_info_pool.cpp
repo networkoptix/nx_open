@@ -64,7 +64,7 @@ void CloudUserInfoPoolSupplier::onNewResource(const QnResourcePtr& resource)
             if (key != kCloudAuthInfoKey)
                 return;
 
-            NX_LOGX(lit("Changed for user %1. New value: %2")
+            NX_LOGX(lm("Changed for user %1. New value: %2")
                 .arg(resource->getName())
                 .arg(resource->getProperty(key)), cl_logDEBUG2);
 
@@ -78,7 +78,7 @@ void CloudUserInfoPoolSupplier::reportInfoChanged(
 {
     if (serializedValue.isEmpty())
     {
-        NX_DEBUG(this, lit("User %1. Received empty cloud auth info").arg(userName));
+        NX_DEBUG(this, lm("User %1. Received empty cloud auth info").arg(userName));
         return;
     }
 
@@ -88,7 +88,7 @@ void CloudUserInfoPoolSupplier::reportInfoChanged(
 
     if (!deserializeResult)
     {
-        NX_LOGX(lit("User %1. Deserialization failed")
+        NX_LOGX(lm("User %1. Deserialization failed")
             .arg(userName), cl_logDEBUG1);
         return;
     }
@@ -105,7 +105,7 @@ void CloudUserInfoPoolSupplier::reportInfoChanged(
 
 void CloudUserInfoPoolSupplier::onRemoveResource(const QnResourcePtr& resource)
 {
-    NX_LOGX(lit("User %1 removed. Clearing related data.")
+    NX_LOGX(lm("User %1 removed. Clearing related data.")
         .arg(resource->getName()), cl_logDEBUG1);
     m_pool->userInfoRemoved(resource->getName().toUtf8().toLower());
 }
@@ -128,9 +128,9 @@ bool CloudUserInfoPool::authenticate(
 
     if (!CdbNonceFetcher::parseCloudNonce(nonce, &cloudNonce, &nonceTrailer))
     {
-        NX_LOGX(lit("parseCloudNonce() failed. User: %1, nonce: %2")
-            .arg(QString::fromUtf8(userName))
-            .arg(QString(nonce.toHex())), cl_logERROR);
+        NX_LOGX(lm("parseCloudNonce() failed. User: %1, nonce: %2")
+            .arg(userName)
+            .arg(nonce), cl_logERROR);
         return false;
     }
 
@@ -159,9 +159,9 @@ boost::optional<nx::Buffer> CloudUserInfoPool::intermediateResponseByUserNonce(
     auto nameNonceIt = m_userNonceToResponse.find({ userName, cloudNonce });
     if (nameNonceIt == m_userNonceToResponse.cend())
     {
-        NX_LOGX(lit("Failed to find (user, cloudNonce) pair. User: %1, cloudNonce: %2")
-            .arg(QString::fromUtf8(userName))
-            .arg(QString(cloudNonce.toHex())), cl_logERROR);
+        NX_LOGX(lm("Failed to find (user, cloudNonce) pair. User: %1, cloudNonce: %2")
+            .arg(userName)
+            .arg(cloudNonce), cl_logERROR);
         return boost::none;
     }
     return nameNonceIt->second;
@@ -172,11 +172,27 @@ boost::optional<nx::Buffer> CloudUserInfoPool::newestMostCommonNonce() const
     QnMutexLocker lock(&m_mutex);
     int maxUserCount = 0;
     auto resultIt = m_tsToNonceUserCount.rbegin();
+
+    if (nx::utils::log::isToBeLogged(cl_logDEBUG2))
+    {
+        QString tsToNonceLogMessage;
+        QTextStream tsToNonceLogStream(&tsToNonceLogMessage);
+
+        tsToNonceLogStream << "Ts to Nonces:" << endl;
+        for (auto it = m_tsToNonceUserCount.rbegin(); it != m_tsToNonceUserCount.rend(); ++it)
+        {
+            tsToNonceLogStream << "\t" << it->first << ": (" << it->second.userCount
+                << ", " << it->second.cloudNonce << ")" << endl;
+        }
+
+        NX_VERBOSE(this, tsToNonceLogMessage);
+    }
+
     for (auto it = m_tsToNonceUserCount.rbegin(); it != m_tsToNonceUserCount.rend(); ++it)
     {
         if (it->second.userCount == m_userCount)
         {
-            NX_VERBOSE(this, lm("Proving nonce %1 suitable for every user")
+            NX_VERBOSE(this, lm("Providing nonce %1 suitable for every user")
                 .arg(resultIt->second.cloudNonce));
             return it->second.cloudNonce;
         }
@@ -190,7 +206,7 @@ boost::optional<nx::Buffer> CloudUserInfoPool::newestMostCommonNonce() const
 
     if (resultIt != m_tsToNonceUserCount.rend())
     {
-        NX_VERBOSE(this, lm("Proving nonce %1 suitable for %2 out of %3 users")
+        NX_VERBOSE(this, lm("Providing nonce %1 suitable for %2 out of %3 users")
             .arg(resultIt->second.cloudNonce).arg(resultIt->second.userCount)
             .arg(m_userCount));
         return boost::optional<nx::Buffer>(resultIt->second.cloudNonce);
@@ -206,6 +222,13 @@ void CloudUserInfoPool::userInfoChanged(
     const nx::Buffer& cloudNonce,
     const nx::Buffer& intermediateResponse)
 {
+    NX_VERBOSE(this, lm("User info changed: timestamp: %1, userName: %2, cloudNonce: %3, \
+            intermediateResponse: %4")
+        .arg(timestamp)
+        .arg(userName)
+        .arg(cloudNonce)
+        .arg(intermediateResponse));
+
     QnMutexLocker lock(&m_mutex);
     updateUserNonceToResponse(userName, cloudNonce, intermediateResponse);
     if (updateNameToNonces(userName, cloudNonce)) //< Already has info for this user in pool
@@ -256,7 +279,17 @@ void CloudUserInfoPool::updateTsToNonceCount(uint64_t timestamp, const nx::Buffe
         result.first->second.userCount++;
         NX_ASSERT(result.first->second.userCount <= m_userCount);
         if (result.first->second.userCount == m_userCount)
+        {
+            NX_VERBOSE(this, lm("All users seem to have a newest nonce %1 with ts: %2.\
+                     Cleaning up old ones.")
+                .arg(cloudNonce)
+                .arg(timestamp));
             cleanupOldInfo(result.first->first);
+
+            NX_ASSERT(!m_tsToNonceUserCount.empty());
+            if (m_tsToNonceUserCount.empty())
+                NX_ERROR(this, lm("After cleanup no nonces left"));
+        }
     }
 }
 
