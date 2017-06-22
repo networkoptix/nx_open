@@ -64,7 +64,7 @@ void CloudUserInfoPoolSupplier::onNewResource(const QnResourcePtr& resource)
             if (key != kCloudAuthInfoKey)
                 return;
 
-            NX_LOGX(lit("Changed for user %1. New value: %2")
+            NX_LOGX(lm("Changed for user %1. New value: %2")
                 .arg(resource->getName())
                 .arg(resource->getProperty(key)), cl_logDEBUG2);
 
@@ -78,7 +78,7 @@ void CloudUserInfoPoolSupplier::reportInfoChanged(
 {
     if (serializedValue.isEmpty())
     {
-        NX_DEBUG(this, lit("User %1. Received empty cloud auth info").arg(userName));
+        NX_DEBUG(this, lm("User %1. Received empty cloud auth info").arg(userName));
         return;
     }
 
@@ -88,7 +88,7 @@ void CloudUserInfoPoolSupplier::reportInfoChanged(
 
     if (!deserializeResult)
     {
-        NX_LOGX(lit("User %1. Deserialization failed")
+        NX_LOGX(lm("User %1. Deserialization failed")
             .arg(userName), cl_logDEBUG1);
         return;
     }
@@ -105,7 +105,7 @@ void CloudUserInfoPoolSupplier::reportInfoChanged(
 
 void CloudUserInfoPoolSupplier::onRemoveResource(const QnResourcePtr& resource)
 {
-    NX_LOGX(lit("User %1 removed. Clearing related data.")
+    NX_LOGX(lm("User %1 removed. Clearing related data.")
         .arg(resource->getName()), cl_logDEBUG1);
     m_pool->userInfoRemoved(resource->getName().toUtf8().toLower());
 }
