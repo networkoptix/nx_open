@@ -1689,7 +1689,7 @@ api::SystemAccessRoleList SystemManager::getSharingPermissions(
 
         case api::SystemAccessRole::owner:
             resultData.accessRoles.emplace_back(api::SystemAccessRole::maintenance);
-
+            /*fallthrough*/
         case api::SystemAccessRole::cloudAdmin:
         case api::SystemAccessRole::localAdmin:
             resultData.accessRoles.emplace_back(api::SystemAccessRole::liveViewer);

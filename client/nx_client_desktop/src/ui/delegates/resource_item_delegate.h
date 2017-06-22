@@ -51,27 +51,37 @@ public:
     Options options() const;
     void setOptions(Options value);
 
-    virtual void paint(QPainter* painter, const QStyleOptionViewItem& styleOption, const QModelIndex& index) const;
-    virtual QSize sizeHint(const QStyleOptionViewItem& styleOption, const QModelIndex& index) const override;
+    virtual void paint(QPainter* painter, const QStyleOptionViewItem& styleOption,
+        const QModelIndex& index) const;
+
+    virtual QSize sizeHint(const QStyleOptionViewItem& styleOption,
+        const QModelIndex& index) const override;
 
 protected:
-    virtual void initStyleOption(QStyleOptionViewItem* option, const QModelIndex& index) const;
+    static const QStyle::StateFlag State_Error
+        = QStyle::State_AutoRaise; //< Use unused in item views value.
 
-    virtual QWidget* createEditor(QWidget* parent, const QStyleOptionViewItem& option, const QModelIndex& index) const override;
+    virtual void initStyleOption(QStyleOptionViewItem* option,
+        const QModelIndex& index) const;
+
+    virtual QWidget* createEditor(QWidget* parent, const QStyleOptionViewItem& option,
+        const QModelIndex& index) const override;
     virtual void destroyEditor(QWidget* editor, const QModelIndex& index) const override;
 
     virtual bool eventFilter(QObject* object, QEvent* event) override;
 
-private:
     enum class ItemState
     {
-        Normal,
-        Selected,
-        Accented
+        normal,
+        selected,
+        accented
     };
 
-    ItemState itemState(const QModelIndex& index) const;
+    virtual ItemState itemState(const QModelIndex& index) const;
+    virtual void getDisplayInfo(const QModelIndex& index,
+        QString& baseName, QString& extInfo) const;
 
+private:
     ItemState itemStateForMediaResource(const QModelIndex& index) const;
     ItemState itemStateForLayout(const QModelIndex& index) const;
     ItemState itemStateForRecorder(const QModelIndex& index) const;
@@ -79,8 +89,6 @@ private:
     ItemState itemStateForVideoWall(const QModelIndex& index) const;
     ItemState itemStateForVideoWallItem(const QModelIndex& index) const;
     ItemState itemStateForLayoutTour(const QModelIndex& index) const;
-
-    void getDisplayInfo(const QModelIndex& index, QString& baseName, QString& extInfo) const;
 
 private:
     QPointer<QnWorkbench> m_workbench;

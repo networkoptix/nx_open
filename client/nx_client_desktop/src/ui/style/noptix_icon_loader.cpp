@@ -20,7 +20,8 @@ static const QnIcon::SuffixesList kDefaultSuffixes({
     {QnIcon::Active,   lit("hovered")},
     {QnIcon::Disabled, lit("disabled")},
     {QnIcon::Selected, lit("selected")},
-    {QnIcon::Pressed,  lit("pressed")}
+    {QnIcon::Pressed,  lit("pressed")},
+    {QnIcon::Error,    lit("error")}
 });
 
 } //namespace

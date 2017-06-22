@@ -1,6 +1,7 @@
 #pragma once
 
 #include <QtCore/QMetaType>
+#include <QtGui/QValidator>
 
 #include <nx/fusion/model_functions_fwd.h>
 
@@ -277,6 +278,8 @@ namespace Qn
         GlobalPermissionsRole,                      /**< Global permissions role. Value of type Qn::GlobalPermissions. */
         UserRoleRole,                               /**< Type of user role. Value of type Qn::UserRole. */
 
+        ValidationStateRole,                        /**< A role for validation state. Value of type QValidator::State. */
+
         RoleCount
     };
 
@@ -481,6 +484,8 @@ namespace Qn
 
 
 } // namespace Qn
+
+Q_DECLARE_METATYPE(QValidator::State) //< For Qn::ValidationStateRole QVariant conversion.
 
 QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
     (Qn::ItemRole)(Qn::TimeMode)(Qn::NodeType)(Qn::ThumbnailStatus),

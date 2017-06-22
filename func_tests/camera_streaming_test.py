@@ -56,7 +56,7 @@ def check_media_stream_transports(server):
 # https://networkoptix.atlassian.net/browse/TEST-178
 # https://networkoptix.atlassian.net/wiki/spaces/SD/pages/77234376/Camera+history+test
 @pytest.mark.testcam
-def test_camera_switching_should_be_represented_in_history(artifact_file, server_factory, camera):
+def test_camera_switching_should_be_represented_in_history(artifact_factory, server_factory, camera):
     one = server_factory('one')
     two = server_factory('two')
     one.merge([two])
@@ -76,7 +76,7 @@ def test_camera_switching_should_be_represented_in_history(artifact_file, server
     stream_type = 'hls'
     stream = one.get_media_stream(stream_type, camera)
     metadata_list = stream.load_archive_stream_metadata(
-        artifact_file('stream-media', stream_type), pos=0, duration=3000)
+        artifact_factory(['stream-media', stream_type]), pos=0, duration=3000)
     assert metadata_list  # Must not be empty
 
     check_media_stream_transports(one)
