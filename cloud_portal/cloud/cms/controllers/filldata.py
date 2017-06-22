@@ -90,11 +90,11 @@ def process_file(source_file, customization, product_id, preview, version_id):
     with open(source_file, 'r') as file:
         content = file.read()
 
-    if branding_context.exists():
-        content = process_context_structure(customization, branding_context.first(), content, None, version_id)
     if context.exists() and language:
         content = process_context_structure(customization, context.first(), content, language, version_id)
-
+    if branding_context.exists():
+        content = process_context_structure(customization, branding_context.first(), content, None, version_id)
+        
     filename = context_name
     if language_code:
         filename = filename.replace("{{language}}", language_code)
