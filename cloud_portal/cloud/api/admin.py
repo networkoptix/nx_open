@@ -4,6 +4,7 @@ from models import *
 
 
 class AccountAdmin(admin.ModelAdmin):
-    list_display = [f.name for f in Account._meta.get_fields()]
+    list_display = ('email', 'first_name', 'last_name', 'created_date', 'activated_date', 'last_login',
+                    'subscribe', 'is_staff', 'is_superuser', 'language')
 
 admin.site.register(Account, AccountAdmin)

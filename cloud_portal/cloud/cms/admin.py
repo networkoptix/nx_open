@@ -6,36 +6,39 @@ from models import *
 # CMS structure (data structure). Only developers can change that
 
 class ProductAdmin(admin.ModelAdmin):
-    list_display = [f.name for f in Product._meta.get_fields()]
+    list_display = ('name',)
 admin.site.register(Product, ProductAdmin)
 
 
 class ContextAdmin(admin.ModelAdmin):
-    list_display = [f.name for f in Context._meta.get_fields()]
+    list_display = ('product', 'name', 'description', 'url', 'translatable')
 admin.site.register(Context, ContextAdmin)
 
 
 class DataStructureAdmin(admin.ModelAdmin):
-    list_display = [f.name for f in DataStructure._meta.get_fields()]
+    list_display = ('context', 'name', 'description', 'translatable')
+
 admin.site.register(DataStructure, DataStructureAdmin)
 
 
 class LanguageAdmin(admin.ModelAdmin):
-    list_display = [f.name for f in Language._meta.get_fields()]
+    list_display = ('name', 'code')
 admin.site.register(Language, LanguageAdmin)
 
 
 class CustomizationAdmin(admin.ModelAdmin):
-    list_display = [f.name for f in Customization._meta.get_fields()]
+    list_display = ('name',)
 admin.site.register(Customization, CustomizationAdmin)
 
 
 class DataRecordAdmin(admin.ModelAdmin):
-    list_display = [f.name for f in DataRecord._meta.get_fields()]
+    list_display = ('customization__name', 'language__code', 'data_structure__name', 'value', 'version__name')
 admin.site.register(DataRecord, DataRecordAdmin)
 
 
 class ContentVersionAdmin(admin.ModelAdmin):
-    list_display = [f.name for f in ContentVersion._meta.get_fields()]
+    list_display = ('customization__name', 'name',
+                    'created_date', 'created_by__email',
+                    'accepted_date', 'accepted_by__email')
 admin.site.register(ContentVersion, ContentVersionAdmin)
 
