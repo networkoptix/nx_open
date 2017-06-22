@@ -109,6 +109,12 @@ find_package(Qt5
         Sql
         Concurrent
         Multimedia)
+        
+if(withDesktopClient OR withTrayTool)
+    find_package(Qt5
+        COMPONENTS
+            Widgets)
+endif()
 
 if(withDesktopClient OR withMobileClient)
     find_package(Qt5
@@ -144,6 +150,10 @@ if(withMediaServer)
     add_subdirectory(mediaserver)
     add_subdirectory(plugins)
     add_subdirectory(storage_plugins)
+endif()
+
+if(withTrayTool)
+    add_subdirectory(traytool)
 endif()
 
 if(withDesktopClient OR withMobileClient)
