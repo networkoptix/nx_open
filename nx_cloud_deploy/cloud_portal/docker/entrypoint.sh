@@ -46,6 +46,7 @@ case "$1" in
         yes "yes" | /app/env/bin/python manage.py createcachetable
         /app/env/bin/python manage.py initdb
         /app/env/bin/python manage.py readstructure
+        /app/env/bin/python manage.py filldata
 
         find /app/app/static | xargs touch
         exec /app/env/bin/gunicorn cloud.wsgi --capture-output --workers 4 --bind :5000 --log-level=debug
