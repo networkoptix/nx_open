@@ -42,9 +42,10 @@ def iterate_cms_files(customization_name):
                 yield file
 
 
-def process_context_structure(customization, context, content, language):
+def process_context_structure(customization, context, content, language, version_id):
     for record in context.datastructure_set.all():
         content_record = None
+        content_value = None
         # try to get translated content
         if language:
             content_record = DataRecord.objects.filter(language_id=language.id,
@@ -63,8 +64,14 @@ def process_context_structure(customization, context, content, language):
                                                        customization_id=customization.id)
 
         if content_record and content_record.exists():
-            content_value = content_record.first().value
-        else:  # if no value - use default value from structure
+            if not version_id:
+                content_value = content_record.latest('created_date').value
+            else:  # here find a datarecord with version_id which is not more than version_id
+                content_record = content_record.filter(version_id__lte=version_id)  # filter only accepted content_records
+                if content_record.exists():
+                    content_value = content_record.latest('version_id').value
+
+        if not content_value:  # if no value - use default value from structure
             content_value = record.default
 
         # replace marker with value
@@ -72,7 +79,7 @@ def process_context_structure(customization, context, content, language):
     return content
 
 
-def process_file(source_file, customization, product_id, preview):
+def process_file(source_file, customization, product_id, preview, version_id):
     context_name, language_code = context_for_file(source_file, customization.name)
 
     branding_context = Context.objects.filter(name='branding')
@@ -84,9 +91,9 @@ def process_file(source_file, customization, product_id, preview):
         content = file.read()
 
     if branding_context.exists():
-        content = process_context_structure(customization, branding_context.first(), content, None)
+        content = process_context_structure(customization, branding_context.first(), content, None, version_id)
     if context.exists() and language:
-        content = process_context_structure(customization, context.first(), content, language)
+        content = process_context_structure(customization, context.first(), content, language, version_id)
 
     filename = context_name
     if language_code:
@@ -101,13 +108,32 @@ def process_file(source_file, customization, product_id, preview):
         file.write(content)
 
 
-def fill_content(customization_name='default', product='cloud_portal', preview=True):
+def fill_content(customization_name='default', product='cloud_portal', preview=True, version_id=None):
+
+    # if preview=False
+    #   retrieve latest accepted version
+    #   if version_id is not None and version_id!=latest_id - raise exception
+    # else
+    #   if version_id is None - preview latest available datarecords
+    #   else - preview specific version
     product_id = Product.objects.get(name=product).id
     customization = Customization.objects.get(name=customization_name)
 
+    if not preview:
+        if version_id is not None:
+            raise Exception(
+                'Only latest accepted version can be published without preview flag, version_id id forbidden')
+        versions = ContentVersion.objects.filter(customization_id=customization.id, accepted_date__isnull=False)
+        if versions.exists():
+            version_id = versions.latest('accepted_date')
+        else:
+            version_id = 0
+
+    # here we use version_id if specified, or latest data records otherwise
+
     # iterate all files (same way we fill structure)
     for source_file in iterate_cms_files(customization_name):
-        process_file(source_file, customization, product_id, preview)
+        process_file(source_file, customization, product_id, preview, version_id)
 
 
 # from cms.controllers.filldata import *
