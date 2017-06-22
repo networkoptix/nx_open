@@ -8,9 +8,7 @@
 #include <common/common_module.h>
 #include <common/static_common_module.h>
 
-
 #include <client_core/client_core_module.h>
-
 
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/mobile_client_camera_factory.h>
@@ -39,6 +37,7 @@
 #include <nx/network/socket_global.h>
 #include <nx/mobile_client/settings/migration_helper.h>
 #include <nx/mobile_client/settings/settings_migration.h>
+#include <nx/client/core/watchers/known_server_connections.h>
 #include <client_core/client_core_settings.h>
 #include <core/ptz/client_ptz_controller_pool.h>
 
@@ -127,6 +126,8 @@ QnMobileClientModule::QnMobileClientModule(
                     break;
             }
         });
+
+    commonModule->findInstance<nx::client::core::watchers::KnownServerConnections>()->start();
 }
 
 QnMobileClientModule::~QnMobileClientModule()

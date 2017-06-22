@@ -6,6 +6,7 @@ Column
 {
     property string host;
     property string displayHost;
+    property alias indicators: indicatorsRow
 
     topPadding: 2;
 
@@ -22,28 +23,45 @@ Column
         text: displayHost;
     }
 
-    Row
+    Item
     {
-        spacing: 4;
+        width: parent.width
+        height: setupControlsRow.height
 
-        Image
+        Row
         {
-            id: imageItem;
+            id: setupControlsRow
 
-            width: 24;
-            height: 24;
-            source: "qrc:/skin/welcome_page/gears.png";
+            spacing: 4;
+
+            Image
+            {
+                id: imageItem;
+
+                width: 24;
+                height: 24;
+                source: "qrc:/skin/welcome_page/gears.png";
+            }
+
+            NxLabel
+            {
+                id: setupText;
+
+                anchors.verticalCenter: imageItem.verticalCenter;
+
+                font: Style.fonts.systemTile.setupSystemLink;
+                color: Style.colors.custom.systemTile.setupSystemLink;
+                text: qsTr("Click to setup");
+            }
         }
 
-        NxLabel
+        IndicatorsRow
         {
-            id: setupText;
+            id: indicatorsRow
 
-            anchors.verticalCenter: imageItem.verticalCenter;
-
-            font: Style.fonts.systemTile.setupSystemLink;
-            color: Style.colors.custom.systemTile.setupSystemLink;
-            text: qsTr("Click to setup");
+            anchors.right: parent.right
+            anchors.verticalCenter: parent.verticalCenter
+            maxWidth: parent.width - (setupControlsRow.x + setupControlsRow.width + 14)
         }
     }
 }

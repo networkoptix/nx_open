@@ -67,7 +67,7 @@
            <x>0</x>
            <y>0</y>
            <width>368</width>
-           <height>384</height>
+           <height>394</height>
           </rect>
          </property>
          <property name="sizePolicy">
@@ -94,6 +94,12 @@
           </property>
           <item>
            <widget class="QGroupBox" name="rolesGroupBox">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
             <property name="title">
              <string>Roles</string>
             </property>
@@ -155,6 +161,12 @@
           </item>
           <item>
            <widget class="QGroupBox" name="usersGroupBox">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
             <property name="title">
              <string notr="true">&lt;Users&gt;</string>
             </property>

@@ -8,6 +8,8 @@ Column
 
     property string userName;
     property bool isConnectable: false;
+    property bool isAvailable: false
+    property alias indicators: indicatorsRow
 
     spacing: 14; // TODO: check is bottom margin is 8px
 
@@ -22,30 +24,45 @@ Column
         elide: Text.ElideRight;
 
         disableable: false;
-        enabled: control.enabled;
+        enabled: control.isAvailable;
         text: control.userName;
         font: Style.fonts.systemTile.info;
         standardColor: Style.colors.text;
         disabledColor: Style.colors.midlight;
     }
 
-    Image
+    Item
     {
-        id: imageItem;
-        enabled: control.enabled;
+        width: parent.width
+        height: imageItem.height
 
-        anchors.left: parent.left;
-
-        width: 20;
-        height: 20;
-        source:
+        Image
         {
-           if (!context.isCloudEnabled)
-               return "qrc:/skin/cloud/cloud_20_offline_disabled.png";
+            id: imageItem;
+            enabled: control.isAvailable;
 
-           return (control.isConnectable
-            ? "qrc:/skin/cloud/cloud_20_accented.png"
-            : "qrc:/skin/cloud/cloud_20_disabled.png");
+            anchors.left: parent.left;
+
+            width: 20;
+            height: 20;
+            source:
+            {
+               if (!context.isCloudEnabled)
+                   return "qrc:/skin/cloud/cloud_20_offline_disabled.png";
+
+               return (control.isConnectable
+                ? "qrc:/skin/cloud/cloud_20_accented.png"
+                : "qrc:/skin/cloud/cloud_20_disabled.png");
+            }
+        }
+
+        IndicatorsRow
+        {
+            id: indicatorsRow
+
+            anchors.right: parent.right
+            anchors.verticalCenter: parent.verticalCenter
+            maxWidth: parent.width - (imageItem.x + imageItem.width + 14)
         }
     }
 }

@@ -1,18 +1,147 @@
 project_identifier: nx-witness
 api_key: 42f3cd326fea96b19ad3bf2eb9009b45
 base_path: .
+preserve_hierarchy: true
 
 files:
   -
+    source: '/common/translations/qtbase.ts'
+    dest: '/Common/qtbase.ts'
+    translation: '/common/translations/qtbase_%locale_with_underscore%.ts'
+  -
     source: '/common/translations/common_en_US.ts'
-    translation: '/common/translations/common_%two_letters_code%.ts'
-    languages_mapping:
-      two_letters_code:
-        # crowdin_language_code: local_name
-        zh-CN: zh_CN
-        zh-TW: zh_TW
-        vi: vi_VN
-        en-GB: en_GB
-        nl: nl_BE
-        pt-PT: pt_PT
-        pt-BR: pt_BR
+    dest: '/Common/common.ts'
+    translation: '/common/translations/common_%locale_with_underscore%.ts'
+  -
+    source: '/traytool/translations/traytool_en_US.ts'
+    dest: '/TrayTool/traytool.ts'
+    translation: '/traytool/translations/traytool_%locale_with_underscore%.ts'
+  -
+    source: '/client/nx_client_core/translations/client_core_en_US.ts'
+    dest: '/Client/client_core.ts'
+    translation: '/client/nx_client_core/translations/client_core_%locale_with_underscore%.ts'
+  -
+    source: '/client/nx_client_desktop/translations/client_qml_en_US.ts'
+    dest: '/Client/client_qml.ts'
+    translation: '/client/nx_client_desktop/translations/client_qml_%locale_with_underscore%.ts'
+  -
+    source: '/client/nx_client_desktop/translations/client_base_en_US.ts'
+    dest: '/Client/client_base.ts'
+    translation: '/client/nx_client_desktop/translations/client_base_%locale_with_underscore%.ts'
+  -
+    source: '/client/nx_client_desktop/translations/client_ui_en_US.ts'
+    dest: '/Client/client_ui.ts'
+    translation: '/client/nx_client_desktop/translations/client_ui_%locale_with_underscore%.ts'
+  -
+    source: '/client/mobile_client/translations/mobile_client_base_en_US.ts'
+    dest: '/Mobile/mobile_client_base.ts'
+    translation: '/client/mobile_client/translations/mobile_client_base_%locale_with_underscore%.ts'
+  -
+    source: '/client/mobile_client/translations/mobile_client_qml_en_US.ts'
+    dest: '/Mobile/mobile_client_qml.ts'
+    translation: '/client/mobile_client/translations/mobile_client_qml_%locale_with_underscore%.ts'
+  -
+    source: '/wixsetup/maven/filter-resources/CustomStrings_en-us.wxl'
+    dest: '/Installer/CustomStrings.wxl'
+    translation: '/wixsetup/maven/filter-resources/CustomStrings_%locale%.wxl'
+  -
+    source: '/wixsetup/maven/filter-resources/OptixTheme_en-us.wxl'
+    dest: '/Installer/OptixTheme.wxl'
+    translation: '/wixsetup/maven/filter-resources/OptixTheme_%locale%.wxl'
+  -
+    source: '/webadmin/app/language.json'
+    dest: '/WebAdmin/language.json'
+    translation: '/webadmin/translations/%locale_with_underscore%/language.json'
+  -
+    source: 'webadmin/app/views/advanced.html'
+    dest: '/WebAdmin/advanced.html'
+    translation: '/webadmin/translations/%locale_with_underscore%/views/advanced.html'
+  -
+    source: 'webadmin/app/views/api_changelog.html'
+    dest: '/WebAdmin/api_changelog.html'
+    translation: '/webadmin/translations/%locale_with_underscore%/views/api_changelog.html'
+  -
+    source: 'webadmin/app/views/client.html'
+    dest: '/WebAdmin/client.html'
+    translation: '/webadmin/translations/%locale_with_underscore%/views/client.html'
+  -
+    source: 'webadmin/app/views/components/dialog.html'
+    dest: '/WebAdmin/components/dialog.html'
+    translation: '/webadmin/translations/%locale_with_underscore%/views/components/dialog.html'
+  -
+    source: 'webadmin/app/views/components/health.html'
+    dest: '/WebAdmin/components/health.html'
+    translation: '/webadmin/translations/%locale_with_underscore%/views/components/health.html'
+  -
+    source: 'webadmin/app/views/components/languageSelect.html'
+    dest: '/WebAdmin/components/languageSelect.html'
+    translation: '/webadmin/translations/%locale_with_underscore%/views/components/languageSelect.html'
+  -
+    source: 'webadmin/app/views/components/networkSettings.html'
+    dest: '/WebAdmin/components/networkSettings.html'
+    translation: '/webadmin/translations/%locale_with_underscore%/views/components/networkSettings.html'
+  -
+    source: 'webadmin/app/views/components/offline.html'
+    dest: '/WebAdmin/components/offline.html'
+    translation: '/webadmin/translations/%locale_with_underscore%/views/components/offline.html'
+  -
+    source: 'webadmin/app/views/components/passwordInput.html'
+    dest: '/WebAdmin/components/passwordInput.html'
+    translation: '/webadmin/translations/%locale_with_underscore%/views/components/passwordInput.html'
+  -
+    source: 'webadmin/app/views/components/systemInfo.html'
+    dest: '/WebAdmin/components/systemInfo.html'
+    translation: '/webadmin/translations/%locale_with_underscore%/views/components/systemInfo.html'
+  -
+    source: 'webadmin/app/views/developers.html'
+    dest: '/WebAdmin/developers.html'
+    translation: '/webadmin/translations/%locale_with_underscore%/views/developers.html'
+  -
+    source: 'webadmin/app/views/dialogs/cloudDialog.html'
+    dest: '/WebAdmin/dialogs/cloudDialog.html'
+    translation: '/webadmin/translations/%locale_with_underscore%/views/dialogs/cloudDialog.html'
+  -
+    source: 'webadmin/app/views/dialogs/setup-inline.html'
+    dest: '/WebAdmin/dialogs/setup-inline.html'
+    translation: '/webadmin/translations/%locale_with_underscore%/views/dialogs/setup-inline.html'
+  -
+    source: 'webadmin/app/views/dialogs/setup.html'
+    dest: '/WebAdmin/dialogs/setup.html'
+    translation: '/webadmin/translations/%locale_with_underscore%/views/dialogs/setup.html'
+  -
+    source: 'webadmin/app/views/help.html'
+    dest: '/WebAdmin/help.html'
+    translation: '/webadmin/translations/%locale_with_underscore%/views/help.html'
+  -
+    source: 'webadmin/app/views/info.html'
+    dest: '/WebAdmin/info.html'
+    translation: '/webadmin/translations/%locale_with_underscore%/views/info.html'
+  -
+    source: 'webadmin/app/views/join.html'
+    dest: '/WebAdmin/join.html'
+    translation: '/webadmin/translations/%locale_with_underscore%/views/join.html'
+  -
+    source: 'webadmin/app/views/login.html'
+    dest: '/WebAdmin/login.html'
+    translation: '/webadmin/translations/%locale_with_underscore%/views/login.html'
+  -
+    source: 'webadmin/app/views/navbar.html'
+    dest: '/WebAdmin/navbar.html'
+    translation: '/webadmin/translations/%locale_with_underscore%/views/navbar.html'
+  -
+    source: 'webadmin/app/views/restart.html'
+    dest: '/WebAdmin/restart.html'
+    translation: '/webadmin/translations/%locale_with_underscore%/views/restart.html'
+  -
+    source: 'webadmin/app/views/settings.html'
+    dest: '/WebAdmin/settings.html'
+    translation: '/webadmin/translations/%locale_with_underscore%/views/settings.html'
+  -
+    source: 'webadmin/app/views/support.html'
+    dest: '/WebAdmin/support.html'
+    translation: '/webadmin/translations/%locale_with_underscore%/views/support.html'
+  -
+    source: 'webadmin/app/views/view.html'
+    dest: '/WebAdmin/view.html'
+    translation: '/webadmin/translations/%locale_with_underscore%/views/view.html'
+

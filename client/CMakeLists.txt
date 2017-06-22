@@ -3,7 +3,6 @@ add_subdirectory(nx_client_core)
 if(withDesktopClient)
     find_package(Qt5
         COMPONENTS
-            Widgets
             OpenGL
             QuickWidgets
             WebKit

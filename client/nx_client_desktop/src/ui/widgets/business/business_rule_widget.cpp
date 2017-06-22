@@ -476,9 +476,31 @@ void QnBusinessRuleWidget::at_actionResourcesHolder_clicked()
     {
         SubjectSelectionDialog dialog(this);
         dialog.setCheckedSubjects(m_model->actionResources());
-        //TODO: #vkutin #3.1 Use dialog delegate for validation.
+
+        if (m_model->actionType() == QnBusiness::SendMailAction)
+        {
+            QSharedPointer<QnSendEmailActionDelegate> dialogDelegate(
+                new QnSendEmailActionDelegate(this));
+
+            dialog.setUserValidator(
+                [dialogDelegate](const QnUserResourcePtr& user)
+                {
+                    // TODO: #vkutin This adapter is rather sub-optimal.
+                    return dialogDelegate->isValid(user->getId());
+                });
+
+            connect(&dialog, &SubjectSelectionDialog::changed, this,
+                [&dialog, dialogDelegate]
+                {
+                    // TODO: #vkutin #3.2 Full updates like this are slow. Refactor in 3.2.
+                    dialog.showAlert(dialogDelegate->validationMessage(
+                        dialog.totalCheckedUsers()));
+                });
+        }
+
         if (dialog.exec() != QDialog::Accepted)
             return;
+
         m_model->setActionResources(dialog.checkedSubjects());
     }
     else

@@ -582,9 +582,10 @@ QColor QnWorkbenchWelcomeScreen::colorWithAlpha(QColor color, qreal alpha)
     return color;
 }
 
-void QnWorkbenchWelcomeScreen::hideSystem(const QString& systemId)
+void QnWorkbenchWelcomeScreen::hideSystem(const QString& systemId, const QString& localSystemId)
 {
     qnForgottenSystemsManager->forgetSystem(systemId);
+    qnForgottenSystemsManager->forgetSystem(localSystemId);
 }
 
 bool QnWorkbenchWelcomeScreen::eventFilter(QObject* obj, QEvent* event)

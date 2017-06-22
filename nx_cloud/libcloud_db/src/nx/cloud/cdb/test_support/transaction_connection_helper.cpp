@@ -256,7 +256,7 @@ void TransactionConnectionHelper::onTransactionConnectionStateChanged(
     {
         case ec2::QnTransactionTransportBase::Connected:
             moveConnectionToReadyForStreamingState(connection);
-
+            /*fallthrough*/
         case ec2::QnTransactionTransportBase::NeedStartStreaming:
         case ec2::QnTransactionTransportBase::ReadyForStreaming:
             // Transaction transport invokes this handler with mutex locked, 

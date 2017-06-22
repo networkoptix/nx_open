@@ -248,7 +248,7 @@ void QnResourceBrowserWidget::setCurrentTab(Tab tab)
 
 bool QnResourceBrowserWidget::isLayoutSearchable(QnWorkbenchLayout* layout) const
 {
-    // Search results must not be displayed over layout tours, preview layouts and videowalls
+    // Search results must not be displayed over layout tours, preview layouts and videowalls.
     const auto permissions = Qn::WritePermission | Qn::AddRemoveItemsPermission;
     return accessController()->hasPermissions(layout->resource(), permissions)
         && layout->data(Qn::LayoutTourUuidRole).value<QnUuid>().isNull();
