@@ -625,10 +625,6 @@ QVariant QnResourceTreeModel::data(const QModelIndex &index, int role) const
     if (index.column() == Qn::CustomColumn && role <= Qt::UserRole)
         return m_customColumnDelegate ? m_customColumnDelegate->data(index, role) : QVariant();
 
-    /* And Qn::DisabledRole is delegated to Qt::CheckStateRole of the check column: */
-    if (role == Qn::DisabledRole)
-        return index.sibling(index.row(), Qn::CheckColumn).data(Qt::CheckStateRole).toInt() != Qt::Checked;
-
     return node(index)->data(role, index.column());
 }
 

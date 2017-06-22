@@ -145,6 +145,8 @@ QnBusinessActionParameters filterActionParams(QnBusiness::ActionType actionType,
 
 } //namespace QnBusiness
 
+const QnUuid QnBusinessRuleViewModel::kAllUsersId;
+
 QnBusinessRuleViewModel::QnBusinessRuleViewModel(QObject *parent)
     : base_type(parent)
     , QnWorkbenchContextAware(parent)
@@ -262,10 +264,16 @@ QVariant QnBusinessRuleViewModel::data(const int column, const int role) const
         case Qn::ActionTypeRole:
             return qVariantFromValue(m_actionType);
         case Qn::ActionResourcesRole:
-            return m_actionType != QnBusiness::ShowPopupAction
-                ? qVariantFromValue(filterActionResources(m_actionResources, m_actionType))
-                : qVariantFromValue(QnBusiness::filterSubjectIds(m_actionParams.additionalResources));
+        {
+            auto ids = m_actionType != QnBusiness::ShowPopupAction
+                ? filterActionResources(m_actionResources, m_actionType)
+                : QnBusiness::filterSubjectIds(m_actionParams.additionalResources);
 
+            if (m_actionParams.allUsers)
+                ids.insert(kAllUsersId);
+
+            return qVariantFromValue(ids);
+        }
         case Qn::HelpTopicIdRole:
             return getHelpTopic(column);
         default:
@@ -297,22 +305,35 @@ bool QnBusinessRuleViewModel::setData(const int column, const QVariant &value, i
             setEventResources(value.value<QSet<QnUuid>>());
             return true;
         case QnBusiness::TargetColumn:
+        {
+            auto subjects = value.value<QSet<QnUuid>>();
+            const bool allUsers = subjects.remove(kAllUsersId);
+
+            if (allUsers != m_actionParams.allUsers)
+            {
+                QnBusinessActionParameters params = m_actionParams;
+                params.allUsers = allUsers;
+                setActionParams(params);
+                if (allUsers)
+                    return true;
+            }
+
             switch (m_actionType)
             {
                 case QnBusiness::ShowPopupAction:
                 {
                     QnBusinessActionParameters params = m_actionParams;
-                    const auto subjects = value.value<QSet<QnUuid>>();
                     params.additionalResources = decltype(params.additionalResources)(
                         subjects.cbegin(), subjects.cend());
                     setActionParams(params);
                     break;
                 }
                 default:
-                    setActionResources(value.value<QSet<QnUuid>>());
+                    setActionResources(subjects);
                     break;
             }
             return true;
+        }
         case QnBusiness::AggregationColumn:
             setAggregationPeriod(value.toInt());
             return true;
@@ -806,10 +827,15 @@ QIcon QnBusinessRuleViewModel::getIcon(const int column) const
 
                 case QnBusiness::ShowPopupAction:
                 {
+                    if (m_actionParams.allUsers)
+                        return qnResIconCache->icon(QnResourceIconCache::Users);
+                    if (!isValid(QnBusiness::TargetColumn))
+                        return qnSkin->icon("tree/user_alert.png");
+
                     QnUserResourceList users;
                     QList<QnUuid> roles;
                     userRolesManager()->usersAndRoles(m_actionParams.additionalResources, users, roles);
-                    return (users.empty() && roles.empty()) || users.size() > 1 || !roles.empty()
+                    return (users.size() > 1 || !roles.empty())
                         ? qnResIconCache->icon(QnResourceIconCache::Users)
                         : qnResIconCache->icon(QnResourceIconCache::User);
                 }
@@ -914,6 +940,10 @@ bool QnBusinessRuleViewModel::isValid(int column) const
 		                    resourcePool()->getResources<QnCameraAudioTransmitPolicy::resource_type>(filtered))
 		                    || m_actionParams.playToClient
 		                );
+
+                case QnBusiness::ShowPopupAction:
+                    return m_actionParams.allUsers || !QnBusiness::filterSubjectIds(
+                        m_actionParams.additionalResources).empty();
 
                 case QnBusiness::SayTextAction:
 		            return !m_actionParams.sayText.isEmpty()
@@ -1040,6 +1070,8 @@ QString QnBusinessRuleViewModel::getTargetText(const bool detailed) const
         }
         case QnBusiness::ShowPopupAction:
         {
+            if (m_actionParams.allUsers)
+                return QnBusinessStringsHelper::allUsersText();
             QnUserResourceList users;
             QList<QnUuid> roles;
             userRolesManager()->usersAndRoles(m_actionParams.additionalResources, users, roles);

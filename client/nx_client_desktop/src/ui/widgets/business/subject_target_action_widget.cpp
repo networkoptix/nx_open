@@ -10,6 +10,7 @@
 #include <core/resource_management/user_roles_manager.h>
 #include <ui/dialogs/resource_selection_dialog.h>
 #include <ui/style/resource_icon_cache.h>
+#include <ui/style/custom_style.h>
 #include <ui/style/skin.h>
 
 #include <nx/client/desktop/ui/event_rules/subject_selection_dialog.h>
@@ -43,23 +44,38 @@ void QnSubjectTargetActionWidget::selectSubjects()
         return;
 
     SubjectSelectionDialog dialog(this);
+    auto params = model()->actionParams();
+
     QSet<QnUuid> selected;
-    for (auto id: model()->actionParams().additionalResources)
+    for (auto id: params.additionalResources)
         selected << id;
 
     dialog.setCheckedSubjects(selected);
+    dialog.setAllUsers(params.allUsers);
+
+    connect(&dialog, &SubjectSelectionDialog::changed, this,
+        [&dialog]()
+        {
+            dialog.showAlert(!dialog.allUsers() && dialog.checkedSubjects().empty()
+                ? QnBusinessStringsHelper::needToSelectUserText()
+                : QString());
+        });
+
     if (dialog.exec() != QDialog::Accepted)
         return;
 
     {
         QScopedValueRollback<bool> updatingRollback(m_updating, true);
 
-        std::vector<QnUuid> userIds;
-        for (const auto &id: dialog.checkedSubjects())
-            userIds.push_back(id);
+        params.allUsers = dialog.allUsers();
+        if (!params.allUsers)
+        {
+            params.additionalResources.clear();
 
-        QnBusinessActionParameters params = model()->actionParams();
-        params.additionalResources = userIds;
+            for (const auto& id: dialog.checkedSubjects())
+                params.additionalResources.push_back(id);
+        }
+
         model()->setActionParams(params);
     }
 
@@ -87,34 +103,27 @@ void QnSubjectTargetActionWidget::updateSubjectsButton()
     if (!m_subjectsButton || !model())
         return;
 
+    const auto params = model()->actionParams();
+
     QnUserResourceList users;
     QList<QnUuid> roles;
-    userRolesManager()->usersAndRoles(model()->actionParams().additionalResources, users, roles);
+    userRolesManager()->usersAndRoles(params.additionalResources, users, roles);
 
-    if (m_requiresExplicitSelection && users.isEmpty() && roles.isEmpty())
+    if (!params.allUsers && users.isEmpty() && roles.isEmpty())
     {
-        m_subjectsButton->setText(tr("Select at least one user..."));
+        m_subjectsButton->setText(QnBusinessStringsHelper::needToSelectUserText());
         m_subjectsButton->setIcon(qnSkin->icon(lit("tree/user_alert.png")));
     }
     else
     {
-        m_subjectsButton->setText(m_helper->actionSubjects(users, roles));
-        m_subjectsButton->setIcon(qnResIconCache->icon(users.size() > 1 || !roles.empty()
+        m_subjectsButton->setText(params.allUsers
+            ? QnBusinessStringsHelper::allUsersText()
+            : m_helper->actionSubjects(users, roles));
+
+        const bool multiple = params.allUsers || users.size() > 1 || !roles.empty();
+
+        m_subjectsButton->setIcon(qnResIconCache->icon(multiple
             ? QnResourceIconCache::Users
             : QnResourceIconCache::User));
     }
-}
-
-bool QnSubjectTargetActionWidget::requiresExplicitSelection() const
-{
-    return m_requiresExplicitSelection;
-}
-
-void QnSubjectTargetActionWidget::setRequiresExplicitSelection(bool value)
-{
-    if (m_requiresExplicitSelection == value)
-        return;
-
-    m_requiresExplicitSelection = value;
-    updateSubjectsButton();
 }

@@ -644,6 +644,9 @@ QString QnBusinessStringsHelper::getSoftwareTriggerName(const QnBusinessEventPar
 QString QnBusinessStringsHelper::actionSubjects(
     const QnBusinessEventRulePtr& rule, bool showName) const
 {
+    if (rule->actionParams().allUsers)
+        return allUsersText();
+
     QnUserResourceList users;
     QList<QnUuid> roles;
 
@@ -661,7 +664,7 @@ QString QnBusinessStringsHelper::actionSubjects(
     bool showName) const
 {
     if (users.empty() && roles.empty())
-        return tr("All Users");
+        return needToSelectUserText();
 
     if (showName)
     {
@@ -692,4 +695,14 @@ QString QnBusinessStringsHelper::actionSubjects(
         return tr("All Administrators");
 
     return tr("%n Roles", "", roles.size());
+}
+
+QString QnBusinessStringsHelper::allUsersText()
+{
+    return tr("All Users");
+}
+
+QString QnBusinessStringsHelper::needToSelectUserText()
+{
+    return tr("Select at least one user");
 }

@@ -84,7 +84,15 @@ void QnSelectResourcesDialogButton::at_clicked()
     if (m_target == QnResourceSelectionDialog::Filter::users)
     {
         SubjectSelectionDialog dialog(this);
-        dialog.setCheckedSubjects(m_resources);
+        auto ids = m_resources;
+
+        //TODO: #vkutin #3.2 Temporary workaround to pass "all users" as a special uuid.
+        dialog.setAllUsers(ids.remove(QnBusinessRuleViewModel::kAllUsersId));
+        dialog.setCheckedSubjects(ids);
+
+        //TODO: #vkutin Hack till #3.2
+        const bool isEmail = dynamic_cast<QnSendEmailActionDelegate*>(m_dialogDelegate) != nullptr;
+        dialog.setAllUsersSelectorEnabled(!isEmail);
 
         if (m_dialogDelegate)
         {
@@ -94,20 +102,32 @@ void QnSelectResourcesDialogButton::at_clicked()
                     // TODO: #vkutin #3.2 This adapter is rather sub-optimal.
                     return m_dialogDelegate->isValid(user->getId());
                 });
+        }
 
-            connect(&dialog, &SubjectSelectionDialog::changed, this,
-                [this, &dialog]
+        connect(&dialog, &SubjectSelectionDialog::changed, this,
+            [this, &dialog]
+            {
+                // TODO: #vkutin #3.2 Full updates like this are slow. Refactor in 3.2.
+                if (m_dialogDelegate)
                 {
-                    // TODO: #vkutin #3.2 Full updates like this are slow. Refactor in 3.2.
                     dialog.showAlert(m_dialogDelegate->validationMessage(
                         dialog.totalCheckedUsers()));
-                });
-        }
+                }
+                else
+                {
+                    dialog.showAlert(!dialog.allUsers() && dialog.checkedSubjects().empty()
+                        ? QnBusinessStringsHelper::needToSelectUserText()
+                        : QString());
+                }
+            });
 
         if (dialog.exec() != QDialog::Accepted)
             return;
 
-        m_resources = dialog.checkedSubjects();
+        if (dialog.allUsers())
+            m_resources = QSet<QnUuid>({ QnBusinessRuleViewModel::kAllUsersId });
+        else
+            m_resources = dialog.checkedSubjects();
     }
     else
     {

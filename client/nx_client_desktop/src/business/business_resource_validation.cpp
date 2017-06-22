@@ -3,6 +3,7 @@
 #include <QtWidgets/QLayout>
 
 #include <business/business_action_parameters.h>
+#include <business/business_strings_helper.h>
 
 #include <common/common_module.h>
 #include <client_core/client_core_module.h>
@@ -28,6 +29,15 @@ QString braced(const QString& source)
 QString getShortResourceName(const QnResourcePtr& resource)
 {
     return QnResourceDisplayInfo(resource).toString(Qn::RI_NameOnly);
+}
+
+int countEnabledUsers(const QnUserResourceList& users)
+{
+    return std::count_if(users.cbegin(), users.cend(),
+        [](const QnUserResourcePtr& user) -> bool
+        {
+            return user && user->isEnabled();
+        });
 }
 
 class QnBusinessResourceValidationStrings
@@ -227,12 +237,9 @@ bool QnSendEmailActionDelegate::isValidList(const QSet<QnUuid>& ids, const QStri
 
     auto module = qnClientCoreModule->commonModule();
 
-    /* Return true if there are no invalid emails and there is at least one recipient. */
-    auto users = module->resourcePool()->getResources<QnUserResource>(ids).filtered(
-        [](const QnUserResourcePtr& user)
-    {
-        return user->isEnabled();
-    });
+    QnUserResourceList users;
+    QList<QnUuid> roles;
+    module->userRolesManager()->usersAndRoles(ids, users, roles);
 
     if (!all_of(users, &isValidUser))
         return false;
@@ -241,12 +248,7 @@ bool QnSendEmailActionDelegate::isValidList(const QSet<QnUuid>& ids, const QStri
     if (!all_of(additionalRecipients, nx::email::isValidAddress))
         return false;
 
-    //TODO: #vkutin #3.1 Handle predefined roles if this function is still relevant.
-
-    /* Using lazy calculations to avoid counting roles when not needed. */
-    return !users.empty()
-        || !additionalRecipients.empty()
-        || !module->userRolesManager()->userRoles(ids).empty();
+    return countEnabledUsers(users) != 0 || !roles.empty() || !additionalRecipients.empty();
 }
 
 QString QnSendEmailActionDelegate::getText(const QSet<QnUuid>& ids, const bool detailed,
@@ -254,21 +256,22 @@ QString QnSendEmailActionDelegate::getText(const QSet<QnUuid>& ids, const bool d
 {
     auto module = qnClientCoreModule->commonModule();
 
-    auto roles = module->userRolesManager()->userRoles(ids);
-    auto users = module->resourcePool()->getResources<QnUserResource>(ids).filtered(
-        [](const QnUserResourcePtr& user)
-    {
-        return user->isEnabled();
-    });
+    QnUserResourceList users;
+    QList<QnUuid> roles;
+    module->userRolesManager()->usersAndRoles(ids, users, roles);
+
     auto additional = parseAdditional(additionalList);
 
-    if (users.isEmpty() && roles.empty() && additional.isEmpty())
-        return tr("Select at least one user");
+    if (!countEnabledUsers(users) && roles.empty() && additional.isEmpty())
+        return QnBusinessStringsHelper::needToSelectUserText();
 
     QStringList receivers;
     int invalid = 0;
-    for (const auto& user : users)
+    for (const auto& user: users)
     {
+        if (!user->isEnabled())
+            continue;
+
         QString userMail = user->getEmail();
         if (isValidUser(user))
             receivers << lit("%1 <%2>").arg(user->getName()).arg(userMail);
@@ -276,8 +279,8 @@ QString QnSendEmailActionDelegate::getText(const QSet<QnUuid>& ids, const bool d
             invalid++;
     }
 
-    for (const auto& role : roles)
-        receivers << role.name;
+    for (const auto& roleId: roles)
+        receivers << module->userRolesManager()->userRoleName(roleId);
 
     if (detailed && invalid > 0)
     {
@@ -287,7 +290,7 @@ QString QnSendEmailActionDelegate::getText(const QSet<QnUuid>& ids, const bool d
     }
 
     invalid = 0;
-    for (const QString &email : additional)
+    for (const QString& email: additional)
     {
         if (nx::email::isValidAddress(email))
             receivers << email;
@@ -347,11 +350,12 @@ bool actionAllowedForUser(const QnBusinessActionParameters& params, const QnUser
     if (!user)
         return false;
 
-    const auto& subjects = params.additionalResources;
-    if (subjects.empty())
+    if (params.allUsers)
         return true;
 
     const auto userId = user->getId();
+    const auto& subjects = params.additionalResources;
+
     if (std::find(subjects.cbegin(), subjects.cend(), userId) != subjects.cend())
         return true;
 

@@ -36,15 +36,27 @@ public:
 
     // Invalid ids are filtered out. Disabled users are kept, but hidden.
     void setCheckedSubjects(const QSet<QnUuid>& ids);
+
+    // Explicitly checked subjects, regardless of allUsers value.
     QSet<QnUuid> checkedSubjects() const;
 
-    QSet<QnUuid> totalCheckedUsers() const; //< Users checked explicitly + users from checked roles.
+    // Explicitly checked users + users from checked roles.
+    // If allUsers is set, returns all enabled users in the system.
+    // Used mostly for entire selection validation and calculating alert text.
+    QSet<QnUuid> totalCheckedUsers() const;
+
+    bool allUsers() const; //< Whether all possible users are selected.
+    void setAllUsers(bool value);
+
+    bool allUsersSelectorEnabled() const;
+    void setAllUsersSelectorEnabled(bool value);
 
 signals:
     void changed(); //< Selection or contents were changed. Potential alert must be re-evaluated.
 
 private:
     void showAllUsersChanged(bool value);
+    void validateAllUsers();
 
 private:
     class UserListModel;
