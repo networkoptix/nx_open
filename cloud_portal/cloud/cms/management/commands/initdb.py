@@ -1,7 +1,8 @@
-from ..models import Product, Language, Customization
+from ...models import Product, Language, Customization
 import os
 import codecs
 import json
+from django.core.management.base import BaseCommand
 
 
 STATIC_DIR = 'static/'
@@ -51,3 +52,11 @@ def init_cms_db():
                     language = find_or_add_language(lang["name"], lang["language"])
                     customization = find_or_add_customization(custom, language)
                     find_or_add_language_to_customization(language, customization)
+
+
+class Command(BaseCommand):
+    help = 'Creates initial records for CMS in the database (customizations, languages, products)'
+
+    def handle(self, *args, **options):
+        init_cms_db()
+        self.stdout.write(self.style.SUCCESS('Successfully initiated database records for CMS'))

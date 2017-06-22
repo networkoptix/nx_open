@@ -7,7 +7,8 @@ import os
 import re
 import filldata
 import json, codecs
-from ..models import Product, Context, DataStructure
+from ...models import Product, Context, DataStructure
+from django.core.management.base import BaseCommand
 
 #  from cms.controllers.readstructure import *
 
@@ -86,3 +87,12 @@ def read_structure_json():
                 data_structure.type = type
             data_structure.default = value
             data_structure.save()
+
+
+class Command(BaseCommand):
+    help = 'Creates initial structure for CMS in the database (contexts, datastructure)'
+
+    def handle(self, *args, **options):
+        read_structure_json()
+        read_structure()
+        self.stdout.write(self.style.SUCCESS('Successfully initiated data structure for CMS'))
