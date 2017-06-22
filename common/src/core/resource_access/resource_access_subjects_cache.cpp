@@ -91,17 +91,19 @@ void QnResourceAccessSubjectsCache::updateUserRole(const QnUserResourcePtr& user
     const auto id = user->getId();
 
     QnMutexLocker lk(&m_mutex);
-    const auto oldRoleId = m_roleIdByUserId.value(id);
+    const auto oldRoleIter = m_roleIdByUserId.find(id);
+    const bool knownUser = oldRoleIter != m_roleIdByUserId.end();
 
     const auto userRole = user->userRole();
     const auto newRoleId = userRole == Qn::UserRole::CustomUserRole
         ? user->userRoleId()
         : QnUserRolesManager::predefinedRoleId(userRole);
 
-    if (oldRoleId == newRoleId)
+    if (knownUser && oldRoleIter.value() == newRoleId)
         return;
 
-    removeUserFromRole(user, oldRoleId);
+    if (knownUser)
+        removeUserFromRole(user, oldRoleIter.value());
 
     m_roleIdByUserId[id] = newRoleId;
     m_usersByRoleId[newRoleId].append(user);

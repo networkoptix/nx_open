@@ -127,12 +127,17 @@ public:
         if (!m_warningLabel)
             return true;
 
-        auto resources = getResources(selected);
-        bool valid = isResourcesListValid<CheckingPolicy>(resources);
-        m_warningLabel->setVisible(!valid);
-        if (!valid)
-            m_warningLabel->setText(getText(resources));
+        const auto message = validationMessage(selected);
+        m_warningLabel->setHidden(message.isEmpty());
+        m_warningLabel->setText(message);
         return true;
+    }
+
+    QString validationMessage(const QSet<QnUuid>& selected) const override
+    {
+        const auto resources = getResources(selected);
+        const bool valid = isResourcesListValid<CheckingPolicy>(resources);
+        return valid ? QString() : getText(resources);
     }
 
     bool isValid(const QnUuid& resourceId) const override
@@ -161,7 +166,7 @@ public:
 
     void init(QWidget* parent) override;
 
-    bool validate(const QSet<QnUuid>& selected) override;
+    QString validationMessage(const QSet<QnUuid>& selected) const override;
     bool isValid(const QnUuid& resourceId) const override;
 
     static bool isValidList(const QSet<QnUuid>& ids, const QString& additional);

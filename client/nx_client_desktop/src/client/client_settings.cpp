@@ -25,6 +25,7 @@
 #include <utils/common/warnings.h>
 
 #include <nx/utils/file_system.h>
+#include <nx/utils/url.h>
 
 #include <client_core/client_core_settings.h>
 
@@ -319,13 +320,35 @@ QnPropertyStorage::UpdateStatus QnClientSettings::updateValue(int id, const QVar
 
 void QnClientSettings::migrateKnownServerConnections()
 {
-    const auto knownUrls = knownServerUrls();
+    const auto& knownUrls = knownServerUrls();
     if (knownUrls.isEmpty())
         return;
 
-    qnClientCoreSettings->setKnownServerUrls(knownUrls);
-    qnClientCoreSettings->migrateKnownServerConnections();
+    auto migratedKnownUrls = qnClientCoreSettings->knownServerUrls();
+    const auto& knownConnections = qnClientCoreSettings->knownServerConnections();
 
+    for (const auto url: knownUrls)
+    {
+        if (std::any_of(
+                knownConnections.begin(), knownConnections.end(),
+                [&url](const QnClientCoreSettings::KnownServerConnection& connection)
+                {
+                    return nx::utils::url::addressesEqual(url, connection.url);
+                })
+            || std::any_of(
+                migratedKnownUrls.begin(), migratedKnownUrls.end(),
+                [&url](const QUrl& other)
+                {
+                    return nx::utils::url::addressesEqual(url, other);
+                }))
+        {
+            continue;
+        }
+
+        migratedKnownUrls.prepend(url);
+    }
+
+    qnClientCoreSettings->setKnownServerUrls(migratedKnownUrls);
     setKnownServerUrls(QList<QUrl>());
 }
 

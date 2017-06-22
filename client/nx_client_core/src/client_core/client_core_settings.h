@@ -61,8 +61,6 @@ public:
 
     void save();
 
-    void migrateKnownServerConnections();
-
 private:
     QN_BEGIN_PROPERTY_STORAGE(PropertiesCount)
         QN_DECLARE_RW_PROPERTY(SystemAuthenticationDataHash,

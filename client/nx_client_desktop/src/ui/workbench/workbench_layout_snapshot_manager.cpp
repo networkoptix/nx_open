@@ -69,8 +69,9 @@ void QnWorkbenchLayoutSnapshotManager::setFlags(const QnLayoutResourcePtr& layou
     NX_EXPECT(layout && layout->resourcePool(),
         "Could not set flags to resource which is not in pool");
 
-    if (flags.testFlag(Qn::ResourceIsBeingSaved))
-        NX_EXPECT(accessController()->hasPermissions(layout, Qn::SavePermission), "Saving unsaveable resource");
+    NX_EXPECT(!flags.testFlag(Qn::ResourceIsBeingSaved)
+        || accessController()->hasPermissions(layout, Qn::SavePermission),
+        "Saving unsaveable resource");
 
     if (m_flagsByLayout.value(layout) == flags)
         return;

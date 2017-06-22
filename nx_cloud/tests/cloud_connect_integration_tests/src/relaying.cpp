@@ -82,6 +82,12 @@ TEST_F(Relaying, connection_can_be_established)
     assertConnectionCanBeEstablished();
 }
 
+TEST_F(Relaying, connecting_using_full_server_name)
+{
+    setRemotePeerName(cloudSystemCredentials().hostName());
+    assertConnectionCanBeEstablished();
+}
+
 TEST_F(Relaying, exchanging_fixed_data)
 {
     startExchangingFixedData();

@@ -7,6 +7,7 @@
 
 #include <core/resource/resource_fwd.h>
 #include <ui/dialogs/common/session_aware_dialog.h>
+#include <ui/utils/validators.h>
 
 class QnUserRolesModel;
 class QnUuid;
@@ -31,23 +32,31 @@ public:
 
     void showAlert(const QString& text);
 
-    using UserValidator = std::function<QValidator::State(const QnUserResourcePtr&)>;
-    void setUserValidator(UserValidator userValidator);
+    void setUserValidator(Qn::UserValidator userValidator);
 
+    // Invalid ids are filtered out. Disabled users are kept, but hidden.
     void setCheckedSubjects(const QSet<QnUuid>& ids);
     QSet<QnUuid> checkedSubjects() const;
+
+    QSet<QnUuid> totalCheckedUsers() const; //< Users checked explicitly + users from checked roles.
+
+signals:
+    void changed(); //< Selection or contents were changed. Potential alert must be re-evaluated.
 
 private:
     void showAllUsersChanged(bool value);
 
 private:
     class UserListModel;
+    class RoleListModel;
     class UserListDelegate;
+    class RoleListDelegate;
 
 private:
     QScopedPointer<Ui::SubjectSelectionDialog> ui;
-    QnUserRolesModel* m_roles = nullptr;
+    RoleListModel* m_roles = nullptr;
     UserListModel* m_users = nullptr;
+    RoleListDelegate* m_roleListDelegate = nullptr;
     UserListDelegate* m_userListDelegate = nullptr;
 };
 
