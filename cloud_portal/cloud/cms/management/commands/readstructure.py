@@ -13,6 +13,14 @@ from django.core.management.base import BaseCommand
 #  from cms.controllers.readstructure import *
 
 
+def find_or_add_context_by_file(file_path, product_id, has_language):
+    if Context.objects.filter(file_path=file_path, product_id=product_id).exists():
+        return Context.objects.get(file_path=file_path, product_id=product_id)
+    context = Context(name=file_path, file_path=file_path, product_id=product_id, translatable=has_language)
+    context.save()
+    return context
+
+
 def find_or_add_context(context_name, product_id, has_language):
     if Context.objects.filter(name=context_name, product_id=product_id).exists():
         return Context.objects.get(name=context_name, product_id=product_id)
@@ -45,7 +53,7 @@ def read_structure_file(filename, product_id):
     strings = read_cms_strings(filename)
 
     if strings:     # if there is no records at all - we ignore it
-        context = find_or_add_context(context_name, product_id, bool(language))
+        context = find_or_add_context_by_file(context_name, product_id, bool(language))
         for string in strings:
             find_or_add_data_stucture(string, context.id, bool(language))
 
