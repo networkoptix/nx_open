@@ -6,28 +6,35 @@
 
 #include <nx/utils/uuid.h>
 #include <nx/fusion/model_functions_fwd.h>
-#include <common/common_module_aware.h>
+
+class QTimer;
+
+class QnCommonModule;
 
 namespace nx {
 namespace client {
 namespace core {
 namespace watchers {
 
-class KnownServerConnections: public QObject, public QnCommonModuleAware
+class KnownServerConnections: public QObject
 {
     Q_OBJECT
 
 public:
     struct Connection
     {
-        QnUuid id;
+        QnUuid serverId;
         QUrl url;
     };
 
     explicit KnownServerConnections(QnCommonModule* commonModule, QObject* parent = nullptr);
+    ~KnownServerConnections();
+
+    void start();
 
 private:
-    QList<Connection> m_connections;
+    class Private;
+    QScopedPointer<Private> const d;
 };
 
 QN_FUSION_DECLARE_FUNCTIONS(KnownServerConnections::Connection, (json)(eq))
