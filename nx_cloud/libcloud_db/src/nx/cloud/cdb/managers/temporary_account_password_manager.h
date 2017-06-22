@@ -78,6 +78,11 @@ public:
         nx::db::QueryContext* const queryContext,
         data::TemporaryAccountCredentials tempPasswordData) = 0;
 
+    virtual nx::db::DBResult fetchTemporaryCredentials(
+        nx::db::QueryContext* const queryContext,
+        const data::TemporaryAccountCredentials& tempPasswordData,
+        data::Credentials* credentials) = 0;
+
     virtual nx::db::DBResult removeTemporaryPasswordsFromDbByAccountEmail(
         nx::db::QueryContext* const queryContext,
         std::string accountEmail) = 0;
@@ -128,10 +133,10 @@ public:
         nx::db::QueryContext* const queryContext,
         data::TemporaryAccountCredentials tempPasswordData) override;
 
-    nx::db::DBResult fetchTemporaryCredentials(
+    virtual nx::db::DBResult fetchTemporaryCredentials(
         nx::db::QueryContext* const queryContext,
         const data::TemporaryAccountCredentials& tempPasswordData,
-        data::Credentials* credentials);
+        data::Credentials* credentials) override;
 
     virtual boost::optional<TemporaryAccountCredentialsEx> getCredentialsByLogin(
         const std::string& login) const override;

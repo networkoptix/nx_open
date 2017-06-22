@@ -19,8 +19,7 @@
 
 #include <nx/cloud/cdb/api/cloud_nonce.h>
 #include <nx/cloud/cdb/data/account_data.h>
-
-#include <test_support/business_data_generator.h>
+#include <nx/cloud/cdb/test_support/business_data_generator.h>
 
 #include "email_manager_mocked.h"
 #include "test_setup.h"
