@@ -473,16 +473,40 @@ nx::db::DBResult AccountManager::createPasswordResetCode(
     tempPasswordData.maxUseCount = 1;
     tempPasswordData.isEmailCode = true;
     tempPasswordData.accessRights.requestsAllowed.push_back(kAccountUpdatePath);
-    m_tempPasswordManager->addRandomCredentials(&tempPasswordData);
 
-    //preparing confirmation code
-    auto resetCodeStr = tempPasswordData.password + ":" + accountEmail;
-    confirmationCode->code = QByteArray::fromRawData(
-        resetCodeStr.data(), (int)resetCodeStr.size()).toBase64().constData();
-
-    return m_tempPasswordManager->registerTemporaryCredentials(
+    data::Credentials credentials;
+    auto dbResultCode = m_tempPasswordManager->fetchTemporaryCredentials(
         queryContext,
-        std::move(tempPasswordData));
+        tempPasswordData,
+        &credentials);
+    if (dbResultCode != nx::db::DBResult::ok && dbResultCode != nx::db::DBResult::notFound)
+        return dbResultCode;
+    
+    std::string temporaryPassword;
+    if (dbResultCode == nx::db::DBResult::ok)
+    {
+        NX_LOGX(lm("Found existing password reset code (%1) for account %2")
+            .arg(credentials.password).arg(accountEmail), cl_logDEBUG2);
+        temporaryPassword = credentials.password;
+    }
+    else
+    {
+        m_tempPasswordManager->addRandomCredentials(&tempPasswordData);
+        temporaryPassword = tempPasswordData.password;
+
+        dbResultCode = m_tempPasswordManager->registerTemporaryCredentials(
+            queryContext,
+            std::move(tempPasswordData));
+        if (dbResultCode != nx::db::DBResult::ok)
+            return dbResultCode;
+    }
+
+    // Preparing confirmation code.
+    auto resetCodeStr = temporaryPassword + ":" + accountEmail;
+    confirmationCode->code = QByteArray::fromRawData(
+        resetCodeStr.data(), (int)resetCodeStr.size()).toBase64().toStdString();
+
+    return nx::db::DBResult::ok;
 }
 
 void AccountManager::addExtension(AbstractAccountManagerExtension* extension)
