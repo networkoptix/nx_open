@@ -7,24 +7,28 @@ from django.shortcuts import render
 
 from .forms import *
 
-preModel = {'Product': ('name',),
-			'Context': ('product', 'name', 'description', 'translatable', 'file_path', 'url'),
-			'DataStructure': ('context', 'name', 'description', 'type', 'default', 'translatable'),
-			'Language': ('name','code'),
-			'Customization': ('name', 'default_language'),
-			'ContentVersion': ('customization', 'name', 'created_date', 'created_by', 'accepted_date', 'accepted_by'),
-			'DataRecord': ('data_structure', 'language', 'customization', 'version', 'created_date', 'created_by', 'value')
-}
-
 # Create your views here.
 @api_view(["GET", "POST"])
 def model_list_view(request):
 	form = CustomForm()
 	data_structures = []
-	if request.method == "POST" and 'Get Data Structures' in request.data:
+	if request.method == "POST":
 		context_id = request.data['context']
 		context = Context.objects.get(id=context_id)
-		form.add_fields(context)
+		
+		if 'Get Data Structures' in request.data:
+			form.add_fields(context)
+
+		elif 'Save' in request.data:
+			language = Language.objects.get()
+			customization = Customization.objects.get()
+			for data_structure in context.datastructure_set.all():
+				data_structure_name = str(data_structure.name)
+
+				if data_structure_name in request.data and request.data[data_structure_name]:
+					record = DataRecord(data_structure=data_structure, language=language, 
+										customization=customization, value=request.data[data_structure_name])
+					record.save()
 
 
 
