@@ -45,8 +45,30 @@ files:
     dest: '/Installer/OptixTheme.wxl'
     translation: '/wixsetup/maven/filter-resources/OptixTheme_%locale_with_underscore%.wxl'
   -
+    source: '/webadmin/app/language.json'
+    translation: '/webadmin/translations/%locale_with_underscore%/language.json'
+  -
     source: '/webadmin/app/views/**/*.*'
     translation: '/webadmin/translations/%locale_with_underscore%/views/**/%original_file_name%'
     ignore:
       - /webadmin/app/views/debug.html
       - /webadmin/app/views/viewdebug.html
+  -
+    source: '/cloud_portal/front_end/app/language.json'
+    translation: '/cloud_portal/translations/%locale_with_underscore%/language.json'
+  -
+    source: '/cloud_portal/front_end/app/views/**/*.*'
+    translation: '/cloud_portal/translations/%locale_with_underscore%/views/**/%original_file_name%'
+    ignore:
+      - /cloud_portal/app/views/debug.html
+      - /cloud_portal/app/views/view.html
+      - /cloud_portal/app/static/eula.html
+  -
+    source: '/cloud_portal/cloud/notifications/static/templates/*.json'
+    translation: '/cloud_portal/translations/%locale_with_underscore%/templates/%original_file_name%'
+  -
+    source: '/cloud_portal/cloud/notifications/static/templates/*.html'
+    translation: '/cloud_portal/translations/%locale_with_underscore%/templates/%original_file_name%'
+  -
+    source: '/cloud_portal/cloud/notifications/static/templates/*.txt'
+    translation: '/cloud_portal/translations/%locale_with_underscore%/templates/%original_file_name%'
