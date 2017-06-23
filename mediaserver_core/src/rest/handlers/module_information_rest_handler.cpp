@@ -11,6 +11,10 @@
 #include <rest/helpers/permissions_helper.h>
 #include <rest/server/rest_connection_processor.h>
 
+static const std::chrono::hours kConnectionTimeout(10);
+static const KeepAliveOptions kKeepAliveOptions(
+    std::chrono::seconds(60), std::chrono::seconds(10), 3);
+
 QnModuleInformationRestHandler::~QnModuleInformationRestHandler()
 {
     closeAllSockets();
@@ -82,17 +86,19 @@ void QnModuleInformationRestHandler::afterExecute(
 
     // TODO: Probably owner is supposed to be passed as mutable.
     const auto socket = const_cast<QnRestConnectionProcessor*>(owner)->takeSocket();
-    if (!socket->setNonBlockingMode(true) || !socket->setRecvTimeout(0))
+    if (!socket->setNonBlockingMode(true)
+        || !socket->setRecvTimeout(kConnectionTimeout)
+        || !socket->setKeepAlive(kKeepAliveOptions))
     {
-        NX_WARNING(this) "Failed to configure" << socket.data();
+        NX_WARNING(this) "Failed to configure connection from" << socket->getForeignAddress();
         return;
     }
 
     {
         QnMutexLocker lock(&m_mutex);
         m_savedSockets.insert(socket);
-        NX_DEBUG(this, lm("%1 asks to keep connection open, %2 total")
-            .args(socket.data(), m_savedSockets.size()));
+        NX_DEBUG(this, lm("Connection from %1 asks to keep connection open, %2 total")
+            .args(socket->getForeignAddress(), m_savedSockets.size()));
     }
 
     connect(owner->commonModule(), &QnCommonModule::moduleInformationChanged,
@@ -103,8 +109,8 @@ void QnModuleInformationRestHandler::afterExecute(
     socket->readSomeAsync(buffer.get(),
         [this, socket, buffer](SystemError::ErrorCode code, size_t size)
         {
-            NX_DEBUG(this, lm("Unexpected event on %1 (size=%2): %3")
-                .args(socket.data(), size, SystemError::toString(code)));
+            NX_DEBUG(this, lm("Unexpected event on connection from %1 (size=%2): %3")
+                .args(socket->getForeignAddress(), size, SystemError::toString(code)));
             removeSocket(socket);
         });
 }
