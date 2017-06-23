@@ -40,12 +40,12 @@
                         <p><button type="button" class="btn btn-default" ng-click="openRestoreDefaultsDialog()">שחזר להגדרות ברירת מחדל</button></p>
                     </div>
                     <div>
-                        <h3>הפעל מחדש</h3>
+                        <h3>איתחול</h3>
                         <p><button type="button" class="btn btn-default" ng-click="restart()">הפעל מחדש את השרת</button>                             <button type="button" class="btn btn-default" ng-if="canHardwareRestart" ng-click="hardwareRestart()">אתחול מחדש</button></p>
                     </div>
                     <div ng-if="user.isOwner">
                         <form novalidate name="rootPasswordForm" class="form-horizontal" role="form" >
-                            <h3>שינוי סיסמת מנהל מערכת</h3>
+                            <h3>שנה סיסמת מנהל מערכת</h3>
                             <p>אם המערכת היא מקומית (לא מחוברת אל הענן) פעולה זו תשנה את הסיסמה עבור המשתמש "admin" ואת סיסמת השחזור (root) בשרתים מסוימים. <br>אחרת פעולה זו תשנה את סיסמת השחזור בלבד.</p>
                             <div class="col-sm-6">
                                 <password-input auto-focus="false" ng-model="settings.rootPassword"></password-input>
@@ -53,7 +53,7 @@
 
                             <div class="col-sm-6">
                                 <button type="button" class="btn btn-primary" ng-disabled="!rootPasswordForm.$valid"
-                                        ng-click="changePassword()">שינוי סיסמה</button>
+                                        ng-click="changePassword()">שינוי סיסמא</button>
                             </div>
                         </form>
                     </div>

@@ -1,5 +1,4 @@
 {
-  "language":"ja",
   "language_name":"日本語",
   "productName":"{{PRODUCT_NAME}}",
   "clientProtocol":"{{CLIENT_PROTOCOL}}:",
@@ -30,6 +29,7 @@
     "restorePassword":"パスワードリセット -",
     "restorePasswordSuccess":"パスワードを保存 -",
     "restorePasswordCode":"パスワードリセット -",
+    "view":"View cameras - ",
     "contentPage":"",
     "debug":"デバッグ",
     "login":"ログイン -",
@@ -85,7 +85,6 @@
   },
   "errorCodes":{
     "ok":"ok",
-    "cantChangePasswordPrefix":"パスワードを保存できません",
     "cantSendActivationPrefix":"確認メールを送信できません",
     "cantDisconnectSystemPrefix":"システムを削除できません",
     "cantUnshareWithMeSystemPrefix":"システムを削除できません",
@@ -95,6 +94,7 @@
     "cantRegisterPrefix":"エラーが発生しました",
     "cantGetSystemInfoPrefix":"システム情報はありません",
     "cantChangeAccountPrefix":"変更を保存できません",
+    "cantChangePasswordPrefix":"パスワードを保存できません",
     "cantActivatePrefix":"アカウントをアクティベートできません",
     "cantSendConfirmationPrefix":"確認メールを送信できません",
     "cloudInvalidResponse":"クラウド DB が予期しない応答を返しました",
@@ -109,14 +109,15 @@
     "alreadyExists":"このアカウントは既に存在します",
     "unknownError":"予期しないエラーが発生しました",
     "accountAlreadyActivated":"このアカウントは既にアクティベートされています",
-    "EmailNotFound":"アカウントが存在しません",
+    "emailNotFound":"アカウントが存在しません",
     "EmailAlreadyExists":"このEmailは既に登録されています",
     "oldPasswordMistmatch":"パスワードが違います",
     "passwordMismatch":"間違ったパスワード",
     "cantEditYourself":"自分のアクセス権限を変更することはできません",
     "cantEditAdmin":"このユーザーは管理者権限を持っています",
     "cantOpenClient":"{{VMS_NAME}} アプリケーションが検出されません<a href=\"/download\"> ダウンロード</a>",
-    "lostConnection":"{{systemName}} への接続が失われました"
+    "lostConnection":"{{systemName}} への接続が失われました",
+    "thisSystem":"the system"
   },
   "passwordRequirements":{
     "minLengthMessage":"パスワードは8文字以上必要です",
@@ -211,5 +212,9 @@
   "regActions":{
     "passwordLabel":"パスワード",
     "createAccount":"アカウント作成"
+  },
+  "header":{
+    "allSystems":"All Systems",
+    "systems":"システム"
   }
 }

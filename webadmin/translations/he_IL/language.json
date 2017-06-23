@@ -1,5 +1,4 @@
 {
-  "language":"he",
   "language_name":"עברית",
   "dialogs":{
     "okButton":"אישור",
@@ -22,7 +21,7 @@
     "tabs":{
       "server":"שרת",
       "system":"מערכת",
-      "device":"התקן"
+      "device":"מכשיר"
     },
     "confirmRestart":"להפעיל מחדש את השרת?",
     "couldntCheckInternet":"לא ניתן לבדוק את החיבור לענן",
@@ -72,7 +71,7 @@
     "cloudHostConflict":"אין אפשרות למזג מערכות, מאחר והשרתים נבנו עם שרתי ענן שונים",
     "licenceError":"אזהרה! אתה עומד למזג מערכות עם רישיונות Starter. רשיון Starter אחד בלבד מותר לכל מערכת, הרישיון השני יכובה. האם למזג בכל מקרה?",
     "connectionFailed":"החיבור נכשל: ",
-    "unknownError":"שגיאה לא ידועה",
+    "unknownError":"שגיאה לא מוכרת",
     "mergeFailed":"המיזוג נכשל: ",
     "mergeSucceed":"המיזוג להצליח.",
     "newSystemDisplayName":"מערכת חדשה",

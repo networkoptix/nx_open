@@ -13,13 +13,13 @@
                        class="form-control" ng-value="formatUserName()" readonly>
             </div>
             <div class="form-group">
-                <label for="role">Permissions</label>
+                <label for="role"> Permisos </label>
 
-                <select class="form-control" name="role" id="role" ng-model="user.role"
-                        ng-options="option as option.name for option in accessRoles"></select>
+                 <select class="form-control" name="role" id="role" ng-model="user.role"
+                        ng-options="option as option.name for option in accessRoles"> </select> 
 
-                <span class="help-block">
-                    {{getRoleDescription()}}
+                <span class="help-block"> 
+                    {{getRoleDescription()}} 
                 </span>
             </div>
         </div>

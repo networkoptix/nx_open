@@ -16,10 +16,10 @@
         </div>
 
         <div class="form-group" ng-class="{'has-error' : loginForm.password.$touched && loginForm.password.$invalid && (loginForm.username.$dirty || loginForm.submitted)}">
-            <label for="password" class="control-label">비밀번호:</label>
+            <label for="password" class="control-label">패스워드</label>
             <input type="password" id="password" name="password" class="form-control" ng-model="user.password" required auto-fill-sync>
             <p class="help-block" ng-show="loginForm.password.$invalid && (loginForm.password.$dirty || loginForm.submitted)">
-                비밀번호가 필요합니다.
+                패스워드가 필요합니다.
             </p>
         </div>
     </div>

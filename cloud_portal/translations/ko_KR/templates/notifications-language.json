@@ -1,6 +1,6 @@
 {
   "activate_account":{
-    "emailSubject":"계정 확인"
+    "emailSubject":"계정을 확인 하십시요"
   },
   "restore_password":{
     "emailSubject":"패스워드 복원"

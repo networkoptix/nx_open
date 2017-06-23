@@ -1,5 +1,4 @@
 {
-  "language":"fr",
   "language_name":"Français",
   "dialogs":{
     "okButton":"Ok",
@@ -92,7 +91,7 @@
   "restartDialog":{
     "serverStarting":"démarrage du serveur",
     "serverRestarting":"redémarrage du serveur",
-    "serverOffline":"serveur Hors ligne"
+    "serverOffline":"serveur hors ligne"
   },
   "fileUpload":{
     "started":"Mise à jour démarré avec succès. Cela prendra plusieurs minutes",

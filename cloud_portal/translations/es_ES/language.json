@@ -1,5 +1,4 @@
 {
-  "language":"es",
   "language_name":"Español",
   "productName":"{{PRODUCT_NAME}}",
   "clientProtocol":"{{CLIENT_PROTOCOL}}:",
@@ -30,6 +29,7 @@
     "restorePassword":"Restablecer contraseña -",
     "restorePasswordSuccess":"Contraseña aguardada -",
     "restorePasswordCode":"Restablecer contraseña -",
+    "view":"View cameras - ",
     "contentPage":"",
     "debug":"Depurar",
     "login":"Iniciar sesión -",
@@ -85,7 +85,6 @@
   },
   "errorCodes":{
     "ok":"ok",
-    "cantChangePasswordPrefix":"No se puede guardar la contraseña",
     "cantSendActivationPrefix":"No se puede enviar el correo electrónico de confirmación",
     "cantDisconnectSystemPrefix":"No se puede eliminar el sistema",
     "cantUnshareWithMeSystemPrefix":"No se puede eliminar el sistema",
@@ -95,6 +94,7 @@
     "cantRegisterPrefix":"Error a ocurrido",
     "cantGetSystemInfoPrefix":"La información del sistema es no disponible",
     "cantChangeAccountPrefix":"No puede guardar los cambios",
+    "cantChangePasswordPrefix":"No se puede guardar la contraseña",
     "cantActivatePrefix":"No puede activar su cuenta",
     "cantSendConfirmationPrefix":"No se puede enviar el correo electrónico de confirmación",
     "cloudInvalidResponse":"Cloud DB ha devuelto una respuesta inesperada",
@@ -109,14 +109,15 @@
     "alreadyExists":"Esta cuenta ya existe",
     "unknownError":"Error inesperado",
     "accountAlreadyActivated":"Esta cuenta ya está activada",
-    "EmailNotFound":"Cuenta no existe",
+    "emailNotFound":"Cuenta no existe",
     "EmailAlreadyExists":"Este correo electrónico ya ha sido registrado",
     "oldPasswordMistmatch":"La contraseña actual es incorrecta",
     "passwordMismatch":"Contraseña incorrecta",
     "cantEditYourself":"Cambiar permisos propios no está permitido",
     "cantEditAdmin":"Este usuario tiene permisos de administrador",
     "cantOpenClient":"{{VMS_NAME}} aplicación no es detectada.<a href=\"/download\">Descargar</a>",
-    "lostConnection":"Conexión al {{systemName}} se ha perdido"
+    "lostConnection":"Conexión al {{systemName}} se ha perdido",
+    "thisSystem":"the system"
   },
   "passwordRequirements":{
     "minLengthMessage":"La contraseña debe tener al menos 8 caracteres",
@@ -149,7 +150,7 @@
     "confirmUnshareFromMeAction":"Desconectar",
     "confirmUnshare":"Este usuario no podrá acceder el sistema. ¿Está seguro?",
     "confirmUnshareTitle":"¿Eliminar el usuario?",
-    "confirmUnshareAction":"Borrar",
+    "confirmUnshareAction":"borrar",
     "successDisconnected":"El sistema está desconectado de {{PRODUCT_NAME}}",
     "successDeleted":"Sistema {{systemName}} se ha eliminado de su cuenta",
     "permissionsRemoved":"Los permisos fueron removidos de {{email}}"
@@ -211,5 +212,9 @@
   "regActions":{
     "passwordLabel":"Contraseña",
     "createAccount":"Crear Cuenta"
+  },
+  "header":{
+    "allSystems":"All Systems",
+    "systems":"Sistemas"
   }
 }

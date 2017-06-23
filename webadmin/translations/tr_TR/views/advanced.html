@@ -2,7 +2,7 @@
     <h1>Gelişmiş sunucu ayarları</h1>
 
     <div class="alert alert-danger" role="alert">
-        <b>Dikkat!</b> Yapılan herhangi bir değişiklik sunucunun çalışmamasına neden olabilir.
+        <b>Dikkat!</b> Yapılan herhangi bir değişiklik sunucunun düzgün çalışmamasına neden olabilir.
     </div>
 
 
@@ -19,7 +19,7 @@
                         Boş Alan
                     </th>
                     <th width="150">
-                        Ayrılmış Alan
+                        Ayrılmış alan
                     </th>
                     <th >
                     </th>
@@ -126,8 +126,8 @@
                     <option value="ERROR">Hata: Sadece log hataları.</option>
                     <option value="WARNING">Uyarı: log uyarıları ve hataları.</option>
                     <option value="INFO">Her zaman: Log hataları, uyarılar ve tüm mesajlar.</option>
-                    <option value="DEBUG">Hata ayıklama: tüm sistem mesajları ve hata ayıklama bilgileri günlüğe yazılır.</option>
-                    <option value="DEBUG2">Hata ayıklama: tüm sistem mesajları ve hata ayıklama bilgileri günlüğe yazılır.</option>
+                    <option value="DEBUG">Hata ayıklama: tüm sistem mesajları ve hata ayıklama bilgileri.</option>
+                    <option value="DEBUG2">Hata ayıklama: tüm sistem mesajları ve gelişmiş hata ayıklama bilgileri.</option>
                 </select>
             </div>
         </div>
@@ -135,10 +135,10 @@
             <label class="col-sm-4">İşlem log seviyesi</label>
             <div class="col-sm-8">
                 <select class="form-control" name="transLogLevel" id="transLogLevel" ng-model="transLogLevel">
-                    <option value="NONE">Yok: Günlük devre dışı.</option>
+                    <option value="NONE">None: Günlük Devre dışı.</option>
                     <option value="ALWAYS">Her zaman: Log hataları, uyarılar ve en önemli mesajlar.</option>
                     <option value="ERROR">Hata: Sadece log hataları.</option>
-                    <option value="WARNING">Uyarı: Log uyarıları ve hataları.</option>
+                    <option value="WARNING">Uyarı: log uyarıları ve hataları.</option>
                     <option value="INFO">Her zaman: Log hataları, uyarılar ve tüm mesajlar.</option>
                     <option value="DEBUG">Hata ayıklama: tüm sistem mesajları ve hata ayıklama bilgileri.</option>
                     <option value="DEBUG2">Hata ayıklama: tüm sistem mesajları ve gelişmiş hata ayıklama bilgileri.</option>

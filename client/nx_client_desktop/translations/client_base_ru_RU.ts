@@ -7664,8 +7664,8 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>These %n layouts are shared with other users, so you delete it for them too.</source>
-      <translation type="unfinished">
-        <numerusform>Эта %n раскладка используются совместно с другими пользователями, поэтому удаление коснется также и ее.</numerusform>
+      <translation>
+        <numerusform>Эта раскладка используется совместно с другими пользователями, поэтому удаление коснется также и их.</numerusform>
         <numerusform>Эти %n раскладки используются совместно с другими пользователями, поэтому удаление коснется также и их.</numerusform>
         <numerusform>Эти %n раскладок используются совместно с другими пользователями, поэтому удаление коснется также и их.</numerusform>
       </translation>

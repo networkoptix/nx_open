@@ -12,7 +12,7 @@
         Autorisatie is mislukt.
     </p>
     <p class="master-controls">
-        <button class="btn btn-default" ng-if="canRetry()" ng-click="retry()">Opnieuw</button>
+        <button class="btn btn-default" ng-if="canRetry()" ng-click="retry()">Nogmaals proberen</button>
     </p>
 </div>
 
@@ -24,7 +24,7 @@
         <span ng-bind-html="settings.localError"></span>
     </p>
     <p class="master-controls">
-        <button class="btn btn-default" ng-if="canRetry()" ng-click="retry()">Opnieuw</button>
+        <button class="btn btn-default" ng-if="canRetry()" ng-click="retry()">Nogmaals proberen</button>
     </p>
 </div>
 
@@ -322,7 +322,7 @@
 
 <div class="panel-body text-center" ng-if="stepIs('mergeProcess')">
     <div class="master-icon"><span class="preloader"></span></div>
-    <h2>Samenvoegen van systemen...</h2>
+    <h2>Systemen samenvoegen...</h2>
     <p class="master-description">Dit kan enkele minuten duren</p>
 </div>
 
@@ -415,7 +415,7 @@
 
 
 <div class="panel-body text-center" ng-if="stepIs('noInternetOnClient')">
-    <h2>Geen verbinding maken met {{Config.cloud.productName}}</h2>
+    <h2>Kan geen verbinding maken met {{Config.cloud.productName}}</h2>
     <p class="master-description">
         Controleer uw internetverbinding.
     </p>

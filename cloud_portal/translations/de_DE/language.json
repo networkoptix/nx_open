@@ -1,5 +1,4 @@
 {
-  "language":"de",
   "language_name":"Deutsch",
   "productName":"{{PRODUCT_NAME}}",
   "clientProtocol":"{{CLIENT_PROTOCOL}}:",
@@ -30,6 +29,7 @@
     "restorePassword":"Passwort zurücksetzen -",
     "restorePasswordSuccess":"Passwort gespeichert -",
     "restorePasswordCode":"Passwort zurücksetzen -",
+    "view":"View cameras - ",
     "contentPage":"",
     "debug":"Debug",
     "login":"Anmelden -",
@@ -85,8 +85,7 @@
   },
   "errorCodes":{
     "ok":"ok",
-    "cantChangePasswordPrefix":"Passwort kann nicht gespeichert werden",
-    "cantSendActivationPrefix":"Bestätigungsmail kann nicht gesendet werden",
+    "cantSendActivationPrefix":"Bestätigungsmail konnte nicht gesendet werden",
     "cantDisconnectSystemPrefix":"System kann nicht gelöscht werden",
     "cantUnshareWithMeSystemPrefix":"System kann nicht gelöscht werden",
     "cantSharePrefix":"System kann nicht freigegeben werden",
@@ -95,8 +94,9 @@
     "cantRegisterPrefix":"Ein Fehler ist aufgetreten",
     "cantGetSystemInfoPrefix":"Systeminfo ist nicht verfügbar",
     "cantChangeAccountPrefix":"Änderungen können nicht gespeichert werden",
+    "cantChangePasswordPrefix":"Passwort kann nicht gespeichert werden",
     "cantActivatePrefix":"Account kann nicht aktiviert werden",
-    "cantSendConfirmationPrefix":"Bestätigungsmail kann nicht gesendet werden",
+    "cantSendConfirmationPrefix":"Bestätigungsmail konnte nicht gesendet werden",
     "cloudInvalidResponse":"Cloud-DB hat eine unerwartete Antwort zurückgegeben",
     "notAuthorized":"E-Mail oder Passwort ungültig",
     "wrongParameters":"Einige Parameter in dem Formular sind falsch",
@@ -109,17 +109,18 @@
     "alreadyExists":"Dieser Accounts existiert bereits",
     "unknownError":"Ein unerwarteter Fehler ist aufgetreten",
     "accountAlreadyActivated":"Dieser Account ist bereits aktiviert",
-    "EmailNotFound":"Account existiert nicht",
+    "emailNotFound":"Account existiert nicht",
     "EmailAlreadyExists":"Diese E-Mail ist bereits registriert",
     "oldPasswordMistmatch":"Aktuelles Passwort ist falsch",
     "passwordMismatch":"Falsches Passwort",
     "cantEditYourself":"Eigene Berechtigungen zu ändern ist nicht erlaubt",
     "cantEditAdmin":"Dieser Benutzer hat Administratorberechtigungen",
     "cantOpenClient":"Die Anwendung {{VMS_NAME}} wurde nicht gefunden. <a href=\"/download\">Download</a>",
-    "lostConnection":"Verbindung zu {{systemName}} verloren"
+    "lostConnection":"Verbindung zu {{systemName}} verloren",
+    "thisSystem":"the system"
   },
   "passwordRequirements":{
-    "minLengthMessage":"Das Passwort muss mindestens 8 Zeichen lang sein",
+    "minLengthMessage":"Passwort muss mindestens 8 Zeichen enthalten",
     "requiredMessage":"Verwenden Sie nur alphanumerische Zeichen und Tastatursymbole, vermeiden Sie führende und nachfolgende Leerzeichen",
     "weakMessage":"Verwenden Sie Zahlen, Groß- und Kleinbuchstaben und Sonderzeichen, um Ihr Passwort sicherer machen",
     "strongMessage":"Sicheres Passwort!",
@@ -211,5 +212,9 @@
   "regActions":{
     "passwordLabel":"Passwort",
     "createAccount":"Account erstellen"
+  },
+  "header":{
+    "allSystems":"All Systems",
+    "systems":"Systeme"
   }
 }

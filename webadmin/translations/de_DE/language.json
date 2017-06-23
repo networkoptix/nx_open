@@ -1,5 +1,4 @@
 {
-  "language":"de",
   "language_name":"Deutsch",
   "dialogs":{
     "okButton":"Ok",
@@ -46,7 +45,7 @@
     "connectedSuccess":"Das System wurde erfolgreich verbunden",
     "createLocalOwner":"",
     "createLocalOwnerTitle":"Lokalen Administrator erstellen",
-    "confirmChangePassword":"Adminpasswort ändern",
+    "confirmChangePassword":"Admin-Passwort ändern",
     "confirmChangePasswordTitle":"Systempasswort ändern? Es wird sich auf den Benutzer \"admin\" und das Root-Passwort für einige Server auswirken",
     "confirmChangePasswordAction":"Neues Passwort speichern",
     "nx1ControlHint":"Die Clientanwendung wurde gestartet. Verwenden Sie eine Tastatur/Maus oder die mobile Anwendung, um zu steuern."
@@ -77,7 +76,7 @@
     "mergeSucceed":"Zusammenführung erfolgreich abgeschlossen.",
     "newSystemDisplayName":"Neues System",
     "incompatibleProtocol":"inkompatible Version",
-    "incompatibleCloudHost":"Cloud-Konflikt",
+    "incompatibleCloudHost":"Cloudkonflikt",
     "incompatibleCloudState":"Cloud verbunden"
   },
   "login":{

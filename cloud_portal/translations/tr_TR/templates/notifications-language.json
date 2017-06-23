@@ -1,6 +1,6 @@
 {
   "activate_account":{
-    "emailSubject":"Parolayı onayla"
+    "emailSubject":"Hesabını onayla"
   },
   "restore_password":{
     "emailSubject":"Parolanı sıfırla"

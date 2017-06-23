@@ -1,5 +1,4 @@
 {
-  "language":"ko",
   "language_name":"국어",
   "productName":"{{PRODUCT_NAME}}",
   "clientProtocol":"{{CLIENT_PROTOCOL}}:",
@@ -30,6 +29,7 @@
     "restorePassword":"패스워드 재설정",
     "restorePasswordSuccess":"패스워드 저장됨-",
     "restorePasswordCode":"패스워드 재설정",
+    "view":"View cameras - ",
     "contentPage":"",
     "debug":"디버그",
     "login":"로그인 -",
@@ -85,7 +85,6 @@
   },
   "errorCodes":{
     "ok":"ok",
-    "cantChangePasswordPrefix":"패스워드를 저장할 수 없습니다.",
     "cantSendActivationPrefix":"확인 이메일을 보낼 수 없습니다.",
     "cantDisconnectSystemPrefix":"시스템을 삭제할 수 없습니다.",
     "cantUnshareWithMeSystemPrefix":"시스템을 삭제할 수 없습니다.",
@@ -95,6 +94,7 @@
     "cantRegisterPrefix":"오류가 발생했습니다.",
     "cantGetSystemInfoPrefix":"시스템 정보가 없습니다.",
     "cantChangeAccountPrefix":"변경 사항을 저장할 수 없습니다.",
+    "cantChangePasswordPrefix":"패스워드를 저장할 수 없습니다.",
     "cantActivatePrefix":"계정을 활성화 할 수 없습니다.",
     "cantSendConfirmationPrefix":"확인 이메일을 보낼 수 없습니다.",
     "cloudInvalidResponse":"Cloud DB에서 예기치 않은 응답을 반환했습니다.",
@@ -109,20 +109,21 @@
     "alreadyExists":"이 계정이 이미 존재합니다.",
     "unknownError":"예기치 않은 오류가 발생했습니다.",
     "accountAlreadyActivated":"이 계정은 이미 활성화되었습니다.",
-    "EmailNotFound":"계정이 존재하지 않습니다.",
+    "emailNotFound":"계정이 존재하지 않습니다.",
     "EmailAlreadyExists":"이 전자 메일은 이미 등록되었습니다.",
     "oldPasswordMistmatch":"현재 패스워드가 잘못되었습니다",
     "passwordMismatch":"패스워드가 틀립니다.",
     "cantEditYourself":"자신의 사용 권한 변경은 허용 되지 않습니다.",
     "cantEditAdmin":"이 사용자는 관리자 권한이 있습니다.",
     "cantOpenClient":"{{VMS_NAME}} 프로그램이 감지되지 않았습니다. <a href=\"/download\"> 다운로드 </a>",
-    "lostConnection":"{{systemName}} 연결이 끊어졌습니다."
+    "lostConnection":"{{systemName}} 연결이 끊어졌습니다.",
+    "thisSystem":"the system"
   },
   "passwordRequirements":{
-    "minLengthMessage":"패스워드는 8 자 이상이어야합니다.",
+    "minLengthMessage":"비밀번호는 최소 8자 이상 포함되어야 합니다.",
     "requiredMessage":"라틴 문자, 숫자 및 키보드 기호 만 사용하고 앞뒤 공백은 피하십시오.",
     "weakMessage":"숫자, 대 / 소문자 및 특수 문자를 사용하여 패스워드를 더 강하게 만듭니다.",
-    "strongMessage":"강력한 패스워드!",
+    "strongMessage":"강력한 암호!",
     "commonMessage":"현재 암호는 가능 많이 사용되는 암호입니다."
   },
   "sharing":{
@@ -211,5 +212,9 @@
   "regActions":{
     "passwordLabel":"패스워드",
     "createAccount":"계정 만들기"
+  },
+  "header":{
+    "allSystems":"All Systems",
+    "systems":"시스템"
   }
 }

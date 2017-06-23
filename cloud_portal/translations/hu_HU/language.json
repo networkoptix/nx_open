@@ -1,5 +1,4 @@
 {
-  "language":"hu",
   "language_name":"Magyar",
   "productName":"{{PRODUCT_NAME}}",
   "clientProtocol":"{{CLIENT_PROTOCOL}}:",
@@ -30,6 +29,7 @@
     "restorePassword":"Jelszó visszaállítása -",
     "restorePasswordSuccess":"Jelszó elmentve -",
     "restorePasswordCode":"Jelszó visszaállítása -",
+    "view":"View cameras - ",
     "contentPage":"",
     "debug":"Hibakeresés",
     "login":"Bejelentkezés -",
@@ -85,7 +85,6 @@
   },
   "errorCodes":{
     "ok":"ok",
-    "cantChangePasswordPrefix":"Jelszó mentése nem lehetséges",
     "cantSendActivationPrefix":"Megerősítő e-mailt nem lehet elküldeni",
     "cantDisconnectSystemPrefix":"A rendszer törlése nem lehetséges",
     "cantUnshareWithMeSystemPrefix":"A rendszer törlése nem lehetséges",
@@ -95,6 +94,7 @@
     "cantRegisterPrefix":"Hiba történt",
     "cantGetSystemInfoPrefix":"A rendszerinformáció nem érhető el",
     "cantChangeAccountPrefix":"A módosítások nem menthetők el",
+    "cantChangePasswordPrefix":"Jelszó mentése nem lehetséges",
     "cantActivatePrefix":"A fiók aktiválása nem lehetséges",
     "cantSendConfirmationPrefix":"Megerősítő e-mailt nem lehet elküldeni",
     "cloudInvalidResponse":"Felhő DB ismeretlen választ jelzett vissza",
@@ -109,14 +109,15 @@
     "alreadyExists":"Ez a fiük már létezik",
     "unknownError":"Váratlan hiba történt",
     "accountAlreadyActivated":"Ez a fiók már aktiválva van",
-    "EmailNotFound":"A fiók nem létezik",
+    "emailNotFound":"A fiók nem létezik",
     "EmailAlreadyExists":"Ez az e-mail már regisztrálva van",
     "oldPasswordMistmatch":"A jelenlegi jelszó helytelen",
     "passwordMismatch":"Hibás jelszó",
     "cantEditYourself":"Saját engedélyek módosítása nem engedélyezett",
     "cantEditAdmin":"Ez a felhasználó rendszergazdai jogokkal rendelkezik",
     "cantOpenClient":"{{VMS_NAME}} nincs törölve. <a href=\"/download\">Letöltés</a>",
-    "lostConnection":"{{systemName}} kapcsolat megszakadt"
+    "lostConnection":"{{systemName}} kapcsolat megszakadt",
+    "thisSystem":"the system"
   },
   "passwordRequirements":{
     "minLengthMessage":"A jelszónak legalább 8 karakterből kell állnia",
@@ -211,5 +212,9 @@
   "regActions":{
     "passwordLabel":"Jelszó",
     "createAccount":"Fiók létrehozása"
+  },
+  "header":{
+    "allSystems":"All Systems",
+    "systems":"Rendszerek"
   }
 }

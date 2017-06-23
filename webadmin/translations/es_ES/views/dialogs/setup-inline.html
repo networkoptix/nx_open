@@ -370,7 +370,7 @@
 <div class="panel-body text-center" ng-if="stepIs('cloudSuccess')">
     <div class="master-icon"><span class="icon-success"></span></div>
     <h2>El sistema está listo para su uso</h2>
-    <p>Iniciar Sesión</p>
+    <p>Nombre del usuario</p>
     <h4>{{settings.cloudEmail}}</h4>
     <p>El compartimiento y ajustes de la cuenta</p>
     <h4><a class="external" ng-href="{{portalSystemLink}}"  title="abrir {{Config.cloud.productName}}"
@@ -464,13 +464,13 @@
     <div class="row">
         <div class="col-xs-6">
             <div class="text-center"><b>Mediante navegador web</b></div>
-            <div class="col-xs-4 text-right">Dirección</div><div class="col-xs-8 text-left"><b>https://{{IP}}:{{port}}</b></div>
+            <div class="col-xs-4 text-right"> Dirección </div><div class="col-xs-8 text-left"><b>https://{{IP}}:{{port}}</b></div>
         </div>
         <div class="col-xs-6">
             <div class="text-center"><b>Usando {{Config.productName}} aplicación</b></div>
             <div class="col-xs-6 text-right">Anfitrión</div><div class="col-xs-6 text-left"><b>{{IP}}</b></div>
             <div class="col-xs-6 text-right">Puerto</div><div class="col-xs-6 text-left"><b>{{port}}</b></div>
-            <div class="col-xs-6 text-right">Iniciar Sesión</div><div class="col-xs-6 text-left"><b>{{Config.defaultLogin}}</b></div>
+            <div class="col-xs-6 text-right">Nombre del usuario</div><div class="col-xs-6 text-left"><b>{{Config.defaultLogin}}</b></div>
             <div class="col-xs-6 text-right">Contraseña</div><div class="col-xs-6 text-left"><b>{{Config.defaultPassword}}</b></div>
         </div>
     </div>

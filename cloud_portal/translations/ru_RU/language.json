@@ -1,5 +1,4 @@
 {
-  "language":"ru",
   "language_name":"Русский",
   "productName":"{{PRODUCT_NAME}}",
   "clientProtocol":"{{CLIENT_PROTOCOL}}:",
@@ -11,7 +10,7 @@
     "logoutAuthorisedText":"",
     "logoutAuthorisedTitle":"Вы уже выполнили вход",
     "logoutAuthorisedContinueButton":"Продолжить",
-    "logoutAuthorisedLogoutButton":"Выход"
+    "logoutAuthorisedLogoutButton":"Выйти"
   },
   "pageTitles":{
     "template":"{{title}} {{PRODUCT_NAME}}",
@@ -30,6 +29,7 @@
     "restorePassword":"Сброс пароля -",
     "restorePasswordSuccess":"Пароль сохранен -",
     "restorePasswordCode":"Сброс пароля -",
+    "view":"View cameras - ",
     "contentPage":"",
     "debug":"Отладка",
     "login":"Войти -",
@@ -71,7 +71,7 @@
       "description":"Неограниченный доступ, включая управление общим доступом"
     },
     "Custom":{
-      "label":"Особая",
+      "label":"Особые",
       "description":"Используйте клиентское приложение {{PRODUCT_NAME}} для настройки особых полномочий"
     },
     "cloudAdmin":{
@@ -85,7 +85,6 @@
   },
   "errorCodes":{
     "ok":"ok",
-    "cantChangePasswordPrefix":"Не удается сохранить новый пароль",
     "cantSendActivationPrefix":"Не удается отправить подтверждение по Email",
     "cantDisconnectSystemPrefix":"Не удается удалить систему",
     "cantUnshareWithMeSystemPrefix":"Не удается удалить систему",
@@ -95,6 +94,7 @@
     "cantRegisterPrefix":"Произошла ошибка",
     "cantGetSystemInfoPrefix":"Информация о системе недоступна",
     "cantChangeAccountPrefix":"Не удается сохранить изменения",
+    "cantChangePasswordPrefix":"Cannot save password",
     "cantActivatePrefix":"Не удается активировать вашу учетную запись",
     "cantSendConfirmationPrefix":"Не удается отправить подтверждение по Email",
     "cloudInvalidResponse":"Облачная БД вернула неожиданный ответ",
@@ -109,17 +109,18 @@
     "alreadyExists":"Эта учетная запись уже существует",
     "unknownError":"Произошла непредвиденная ошибка",
     "accountAlreadyActivated":"Эта учетная запись уже активирована",
-    "EmailNotFound":"Учетная запись не существует",
+    "emailNotFound":"Учетная запись не существует",
     "EmailAlreadyExists":"Этот Email уже зарегистрирован",
     "oldPasswordMistmatch":"Текущий пароль указан неверно",
     "passwordMismatch":"Неправильный пароль",
     "cantEditYourself":"Не допускается изменение собственных полномочий",
     "cantEditAdmin":"Этот пользователь имеет полномочия администратора",
     "cantOpenClient":"Приложение {{VMS_NAME}} не обнаружено. <a href=\"/download\">Скачать</a>",
-    "lostConnection":"Подключение к {{systemName}} потеряно"
+    "lostConnection":"Подключение к {{systemName}} потеряно",
+    "thisSystem":"the system"
   },
   "passwordRequirements":{
-    "minLengthMessage":"Пароль должен содержать по крайней мере 8 символов",
+    "minLengthMessage":"Пароль должен содержать не менее 8 символов",
     "requiredMessage":"Используйте только латинские буквы, цифры и символы клавиатуры, избегайте начальных и конечных пробелов",
     "weakMessage":"Для надежности пароля используйте цифры, буквы верхнего и нижнего регистра и специальные символы",
     "strongMessage":"Надежный пароль!",
@@ -211,5 +212,9 @@
   "regActions":{
     "passwordLabel":"Пароль",
     "createAccount":"Зарегистрироваться"
+  },
+  "header":{
+    "allSystems":"All Systems",
+    "systems":"Системы"
   }
 }

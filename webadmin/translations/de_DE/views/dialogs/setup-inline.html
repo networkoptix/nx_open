@@ -261,7 +261,7 @@ Benötigt eine Internetverbindung
                     forms.localForm.passwordInput.$dirty && forms.localForm.passwordInput.$error.required ||
                     forms.localForm.localPasswordConfirmation.$touched && forms.localForm.localPasswordConfirmation.$error.required">
             <div class="help-block">
-                Alle Felder sind Pflichtfelder
+                Alle Felder werden benötigt
             </div>
         </div>
 
@@ -312,7 +312,7 @@ Benötigt eine Internetverbindung
                     forms.remoteSystemForm.remoteLogin.$touched && forms.remoteSystemForm.remoteLogin.$error.required ||
                     forms.remoteSystemForm.remotePassword.$touched && forms.remoteSystemForm.remotePassword.$error.required">
             <div class="help-block">
-                Alle Felder sind Pflichtfelder
+                Alle Felder werden benötigt
             </div>
         </div>
 
@@ -327,7 +327,7 @@ Benötigt eine Internetverbindung
 
 <div class="panel-body text-center" ng-if="stepIs('mergeProcess')">
     <div class="master-icon"><span class="preloader"></span></div>
-    <h2>Systeme zusammenführen...</h2>
+    <h2>Systeme zusammenführen ...</h2>
     <p class="master-description">Dies kann einige Minuten dauern</p>
 </div>
 
@@ -422,7 +422,7 @@ Benötigt eine Internetverbindung
 
 
 <div class="panel-body text-center" ng-if="stepIs('noInternetOnClient')">
-    <h2>Keine Verbindung zu {{Config.cloud.productName}}</h2>
+    <h2>Kann keine Verbindung zu {{Config.cloud.productName}} herstellen</h2>
     <p class="master-description">
         Prüfen Sie die Internetverbindung.
     </p>

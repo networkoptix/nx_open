@@ -12,7 +12,7 @@
         Échec d'autorisation.
     </p>
     <p class="master-controls">
-        <button class="btn btn-default" ng-if="canRetry()" ng-click="retry()">Réessayez</button>
+        <button class="btn btn-default" ng-if="canRetry()" ng-click="retry()">Réessayer</button>
     </p>
 </div>
 
@@ -24,7 +24,7 @@
         <span ng-bind-html="settings.localError"></span>
     </p>
     <p class="master-controls">
-        <button class="btn btn-default" ng-if="canRetry()" ng-click="retry()">Réessayez</button>
+        <button class="btn btn-default" ng-if="canRetry()" ng-click="retry()">Réessayer</button>
     </p>
 </div>
 
@@ -295,7 +295,7 @@
         <div class="form-group" validate-field>
             <input ng-model="settings.remoteLogin" name="remoteLogin" class="form-control" type="text"
                    ng-change="clearRemoteError(true)"
-                   placeholder="Identifiant" required>
+                   placeholder="Login" required>
         </div>
         <div class="form-group" validate-field>
             <input ng-model="settings.remotePassword"
@@ -366,7 +366,7 @@
 <div class="panel-body text-center" ng-if="stepIs('cloudSuccess')">
     <div class="master-icon"><span class="icon-success"></span></div>
     <h2>Système prêt à l’emploi</h2>
-    <p>Identifiant</p>
+    <p>Login</p>
     <h4>{{settings.cloudEmail}}</h4>
     <p>Paramètres de compte et de partage</p>
     <h4><a class="external" ng-href="{{portalSystemLink}}"  title="ouvrir {{Config.cloud.productName}}"
@@ -376,7 +376,7 @@
 <div class="panel-body text-center" ng-if="stepIs('localSuccess')">
     <div class="master-icon"><span class="icon-success"></span></div>
     <h2>Système prêt à l’emploi</h2>
-    <p>Adresse serveur</p>
+    <p>Adresse du serveur</p>
     <h4>{{serverAddress}}</h4>
     <p>Identifiant administrateur</p>
     <h4>{{settings.localLogin}}</h4>
@@ -464,7 +464,7 @@
             <div class="text-center"><b>Utiliser l'application {{Config.productName}}</b></div>
             <div class="col-xs-6 text-right">Hôte</div><div class="col-xs-6 text-left"><b>{{IP}}</b></div>
             <div class="col-xs-6 text-right">Port</div><div class="col-xs-6 text-left"><b>{{port}}</b></div>
-            <div class="col-xs-6 text-right">Identifiant</div><div class="col-xs-6 text-left"><b>{{Config.defaultLogin}}</b></div>
+            <div class="col-xs-6 text-right">Login</div><div class="col-xs-6 text-left"><b>{{Config.defaultLogin}}</b></div>
             <div class="col-xs-6 text-right">Mot de passe</div><div class="col-xs-6 text-left"><b>{{Config.defaultPassword}}</b></div>
         </div>
     </div>

@@ -1,5 +1,4 @@
 {
-  "language":"fr",
   "language_name":"Français",
   "productName":"{{PRODUCT_NAME}}",
   "clientProtocol":"{{CLIENT_PROTOCOL}}:",
@@ -30,6 +29,7 @@
     "restorePassword":"Réinitialiser mot de passe -",
     "restorePasswordSuccess":"Mot de passe sauvé -",
     "restorePasswordCode":"Réinitialiser mot de passe -",
+    "view":"View cameras - ",
     "contentPage":"",
     "debug":"Débogage",
     "login":"Connexion -",
@@ -85,7 +85,6 @@
   },
   "errorCodes":{
     "ok":"ok",
-    "cantChangePasswordPrefix":"Ne peut pas enregistrer le mot de passe",
     "cantSendActivationPrefix":"Impossible d’envoyer courriel de confirmation",
     "cantDisconnectSystemPrefix":"Impossible de supprimer le système",
     "cantUnshareWithMeSystemPrefix":"Impossible de supprimer le système",
@@ -95,6 +94,7 @@
     "cantRegisterPrefix":"Erreur survenue",
     "cantGetSystemInfoPrefix":"Information système non disponible",
     "cantChangeAccountPrefix":"Impossible d'enregistrer les changements",
+    "cantChangePasswordPrefix":"Ne peut pas enregistrer le mot de passe",
     "cantActivatePrefix":"Impossible d'activer votre compte",
     "cantSendConfirmationPrefix":"Impossible d’envoyer courriel de confirmation",
     "cloudInvalidResponse":"BD Nuage a retourné une réponse inattendue",
@@ -109,14 +109,15 @@
     "alreadyExists":"Ce compte existe déjà",
     "unknownError":"Erreur inattendue survenue",
     "accountAlreadyActivated":"Ce compte est déjà activé",
-    "EmailNotFound":"Compte n’existe pas",
+    "emailNotFound":"Compte n’existe pas",
     "EmailAlreadyExists":"Courriel déjà enregistré",
     "oldPasswordMistmatch":"Mot de passe actuel incorrect",
     "passwordMismatch":"Mot de passe incorrect",
     "cantEditYourself":"Modification des propres autorisations n’est pas autorisée",
     "cantEditAdmin":"Cet usager dispose d’autorisations administrateur",
     "cantOpenClient":"{{VMS_NAME}} application non détectée. <a href=\"/download\"> Télécharger</a>",
-    "lostConnection":"Connexion à {{systemName}} perdu"
+    "lostConnection":"Connexion à {{systemName}} perdu",
+    "thisSystem":"the system"
   },
   "passwordRequirements":{
     "minLengthMessage":"Mot de passe doit contenir au moins 8 caractères",
@@ -130,7 +131,7 @@
     "shareTitle":"Partager",
     "shareConfirmButton":"Partager",
     "editShareTitle":"Modifier autorisations",
-    "editShareConfirmButton":"Sauvegarder",
+    "editShareConfirmButton":"Enregistrer",
     "permissionsSaved":"Nouvelles autorisations enregistrées"
   },
   "system":{
@@ -211,5 +212,9 @@
   "regActions":{
     "passwordLabel":"Mot de passe",
     "createAccount":"Créer compte"
+  },
+  "header":{
+    "allSystems":"All Systems",
+    "systems":"Systèmes"
   }
 }

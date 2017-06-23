@@ -1,5 +1,4 @@
 {
-  "language":"LANGUAGE_CODE",
   "language_name":"LANGUAGE_NAME",
   "dialogs":{
     "okButton":"Ok",
@@ -72,7 +71,7 @@
     "cloudHostConflict":"Cannot merge systems, because servers are built with different cloud hosts",
     "licenceError":"Warning! You are about to merge Systems with Starter licenses. Only one Starter license is allowed per System, so the second license will be deactivated. Merge anyway?",
     "connectionFailed":"Connection failed: ",
-    "unknownError":"Unknown error",
+    "unknownError":"Nieznany błąd",
     "mergeFailed":"Merge failed: ",
     "mergeSucceed":"Merge succeed.",
     "newSystemDisplayName":"New system",

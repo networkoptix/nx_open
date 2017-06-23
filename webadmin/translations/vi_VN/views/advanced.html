@@ -13,7 +13,7 @@
             <thead>
                 <tr>
                     <th >
-                        URL
+                        nơi
                     </th>
                     <th width="200">
                         Free Space
@@ -54,7 +54,7 @@
 
                         <div class="progress" style="margin-top:5px" ng-if="!storage.accessible">
                             <div class="progress-bar progress-bar-danger" style="width:100%">
-                                Inaccessible
+                                không thể tiếp cận
                             </div>
                         </div>
                     </td>
@@ -110,8 +110,8 @@
         </div>
         <div class="alert alert-danger"  ng-class="{hidden:form.$valid}">Fix all highlighted settings to save it</div>
 
-        <button class="btn btn-primary" ng-disabled="form.$invalid" ng-click="save()" >Save</button>
-        <button class="btn btn-warning" ng-click="cancel()">Cancel</button>
+        <button class="btn btn-primary" ng-disabled="form.$invalid" ng-click="save()" >tiết kiệm</button>
+        <button class="btn btn-warning" ng-click="cancel()">hủy bỏ</button>
     </form>
 
     <h2>Log settings</h2>
@@ -147,7 +147,7 @@
         </div>
 
         <div class="col-sm-offset-4  col-sm-8">
-            <button class="btn btn-primary" ng-click="changeLogLevels()" >Save</button>
+            <button class="btn btn-primary" ng-click="changeLogLevels()" >tiết kiệm</button>
         </div>
     </form>
 
@@ -202,7 +202,7 @@
 
 
         <div class="col-sm-offset-4  col-sm-8">
-            <button class="btn btn-primary" ng-click="saveSystemSettings()" >Save</button>
+            <button class="btn btn-primary" ng-click="saveSystemSettings()" >tiết kiệm</button>
         </div>
 
     </form>

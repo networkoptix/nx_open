@@ -54,7 +54,7 @@
 
                         <div class="progress" style="margin-top:5px" ng-if="!storage.accessible">
                             <div class="progress-bar progress-bar-danger" style="width:100%">
-                                Inaccessible
+                                Inacessível
                             </div>
                         </div>
                     </td>
@@ -110,8 +110,8 @@
         </div>
         <div class="alert alert-danger"  ng-class="{hidden:form.$valid}">Fix all highlighted settings to save it</div>
 
-        <button class="btn btn-primary" ng-disabled="form.$invalid" ng-click="save()" >Save</button>
-        <button class="btn btn-warning" ng-click="cancel()">Cancel</button>
+        <button class="btn btn-primary" ng-disabled="form.$invalid" ng-click="save()" >Gravar</button>
+        <button class="btn btn-warning" ng-click="cancel()">Cancelar</button>
     </form>
 
     <h2>Log settings</h2>
@@ -147,7 +147,7 @@
         </div>
 
         <div class="col-sm-offset-4  col-sm-8">
-            <button class="btn btn-primary" ng-click="changeLogLevels()" >Save</button>
+            <button class="btn btn-primary" ng-click="changeLogLevels()" >Gravar</button>
         </div>
     </form>
 
@@ -202,7 +202,7 @@
 
 
         <div class="col-sm-offset-4  col-sm-8">
-            <button class="btn btn-primary" ng-click="saveSystemSettings()" >Save</button>
+            <button class="btn btn-primary" ng-click="saveSystemSettings()" >Gravar</button>
         </div>
 
     </form>

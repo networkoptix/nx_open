@@ -12,14 +12,8 @@
                        class="form-control" ng-value="formatUserName()" readonly>
             </div>
             <div class="form-group">
-                <label for="role">Permissions</label>
-
-                <select class="form-control" name="role" id="role" ng-model="user.role"
-                        ng-options="option as option.name for option in accessRoles"></select>
-
-                <span class="help-block">
-                    {{getRoleDescription()}}
-                </span>
+                <label for="role"> 사용 권한 </label> <select class="form-control" name="role" id="role" ng-model="user.role"
+                        ng-options="option as option.name for option in accessRoles"> </select> <span class="help-block"> {{getRoleDescription()}} </span>
             </div>
         </div>
         <div class="modal-footer">

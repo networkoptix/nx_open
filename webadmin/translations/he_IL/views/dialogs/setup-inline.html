@@ -166,7 +166,7 @@
     <form class="master-controls" name="forms.cloudForm" novalidate ng-class="{'has-error':settings.cloudError}">
         <div class="form-group" validate-field>
             <input ng-model="settings.cloudEmail" name="cloudEmail" class="form-control"
-                   type="email" placeholder="אימייל" autocomplete="new-password" required auto-focus ng-change="clearCloudError()">
+                   type="email" placeholder="דוא&quot;ל" autocomplete="new-password" required auto-focus ng-change="clearCloudError()">
         </div>
         <div class="form-group" validate-field>
             <input ng-model="settings.cloudPassword" name="cloudPassword" class="form-control"
@@ -328,62 +328,61 @@
 
 <div class="panel-body text-center" ng-if="stepIs('retryMergeCredentials')">
     <div class="master-icon"><span class="preloader"></span></div>
-    <h2>Merging systems ...</h2>
+    <h2>ממזג מערכות...</h2>
     <p class="master-description">Trying to connect to the system</p>
 </div>
 
 
 <div class="panel-body text-center" ng-if="stepIs('mergeFailure')">
     <div class="master-icon"><span class="icon-fail"></span></div>
-    <h2>Cannot merge systems</h2>
+    <h2>אין אפשרות למזג את מערכות</h2>
     <p class="master-description">
         {{settings.remoteError}}
     </p>
     <p class="master-controls">
-        <button class="btn btn-default" ng-click="retry()">Try again</button>
-        <button class="btn btn-default" ng-click="skip()">Setup a separate system</button>
+        <button class="btn btn-default" ng-click="retry()">. נסה שוב</button>         <button class="btn btn-default" ng-click="skip()">הגדר מערכת נפרדת</button>
     </p>
 </div>
 
 <div class="panel-body text-center" ng-if="stepIs('mergeTemporaryFailure')">
     <div class="master-icon"><span class="icon-fail"></span></div>
-    <h2>System was successfully merged, but is not ready yet.</h2>
+    <h2>המערכת מוזגו בהצלחה, אך עדיין לא מוכנות.</h2>
     <p class="master-description">
         {{settings.remoteError}}
     </p>
     <p class="master-controls">
-        <button class="btn btn-default" ng-click="retry()">Try again</button>
+        <button class="btn btn-default" ng-click="retry()">נסה שוב</button>
     </p>
 </div>
 
 <div class="panel-body text-center" ng-if="stepIs('cloudProcess')">
     <div class="master-icon"><span class="preloader"></span></div>
-    <h2>Connecting to {{Config.cloud.productName}} ...</h2>
-    <p class="master-description">It may take several moments</p>
+    <h2>מתחבר אל {{Config.cloud.productName}}...</h2>
+    <p class="master-description">הפעולה עשויה להימשך מספר רגעים</p>
 </div>
 
 <div class="panel-body text-center" ng-if="stepIs('cloudSuccess')">
     <div class="master-icon"><span class="icon-success"></span></div>
     <h2>המערכת מוכנה לשימוש</h2>
-    <p>Login</p>
+    <p>כניסה</p>
     <h4>{{settings.cloudEmail}}</h4>
-    <p>Sharing and account settings</p>
-    <h4><a class="external" ng-href="{{portalSystemLink}}"  title="open {{Config.cloud.productName}}"
+    <p>הגדרות חשבון ושיתוף</p>
+    <h4><a class="external" ng-href="{{portalSystemLink}}"  title="פתח {{Config.cloud.productName}}"
            ng-click="openLink($event)">{{portalShortLink}}</a></h4>
 </div>
 
 <div class="panel-body text-center" ng-if="stepIs('localSuccess')">
     <div class="master-icon"><span class="icon-success"></span></div>
-    <h2>System is ready for use</h2>
-    <p>Server address</p>
+    <h2>המערכת מוכנה לשימוש</h2>
+    <p>כתובת שרת</p>
     <h4>{{serverAddress}}</h4>
-    <p>Administrator login</p>
+    <p>כניסת מנהל</p>
     <h4>{{settings.localLogin}}</h4>
 </div>
 
 
 <div class="panel-body text-center" ng-if="stepIs('configureWrongNetwork')">
-    <p><b>Please configure network settings first</b></p>
+    <p><b>יש להגדיר הגדרות רשת קודם לכן</b></p>
     <network-settings settings="networkSettings[0]" ></network-settings>
 
     <p class="vertical-bottom">
@@ -392,25 +391,25 @@
 </div>
 
 <div class="panel-body text-center" ng-if="stepIs('configureNetworkForInternet')">
-    <p><b>Configure the network to set up Internet connection</b></p>
+    <p><b>הגדר את הרשת להגדרת חיבור אינטרנט</b></p>
     <network-settings settings="networkSettings[0]" ></network-settings>
 
     <p class="vertical-bottom">
-        <button class="btn btn-primary" ng-click="retry()">Save settings and reboot device</button>
+        <button class="btn btn-primary" ng-click="retry()">שמור הגדרות ואתחל את ההתקן</button>
     </p>
 </div>
 
 
 <div class="panel-body text-center" ng-if="stepIs('noInternetOnServer')">
-    <h2>Connect the server to the Internet</h2>
+    <h2>חבר את השרת לרשת האינטרנט</h2>
     <p class="master-description">
-        Set up Internet connection on the server to be able <br> to connect to it anywhere using {{Config.cloud.productName}}.
+        הגדר את חיבור האינטרנט בשרת בכדי<br>להתחבר אליו מכל מקום בעזרת {{Config.cloud.productName}}.
     </p>
     <p class="master-controls">
         <button class="btn btn-default" ng-click="retry()">נסה שוב.</button>         <button class="btn btn-default" ng-click="skip()">הגדר מערכת מקומית</button>
     </p>
     <p ng-if="serverInfo.flags.canSetupNetwork" class="vertical-bottom">
-        <a href="" ng-click="next('configureNetworkForInternet')">Configure network settings</a>
+        <a href="" ng-click="next('configureNetworkForInternet')">הגדר נתוני רשת</a>
     </p>
 </div>
 
@@ -418,7 +417,7 @@
 <div class="panel-body text-center" ng-if="stepIs('noInternetOnClient')">
     <h2>אין אפשרות להתחבר אל {{Config.cloud.productName}}</h2>
     <p class="master-description">
-        Check the Internet connection.
+        בדוק את החיבור לאינטרנט.
     </p>
     <p class="master-controls">
         <button class="btn btn-default" ng-click="retry()">נסה שוב.</button>         <button class="btn btn-default" ng-click="skip()">הגדר מערכת מקומית</button>
@@ -427,44 +426,41 @@
 
 <div class="panel-body text-center" ng-if="stepIs('cloudFailure')">
     <div class="master-icon"><span class="icon-fail"></span></div>
-    <h2>Cannot connect to {{Config.cloud.productName}}</h2>
+    <h2>אין אפשרות להתחבר אל {{Config.cloud.productName}}</h2>
     <p class="master-description">
         {{cloudError}}
     </p>
     <p class="master-controls">
-        <button class="btn btn-default" ng-click="retry()">Try again</button>
-        <button class="btn btn-default" ng-click="skip()">Setup local system</button>
+        <button class="btn btn-default" ng-click="retry()">נסה שוב.</button>         <button class="btn btn-default" ng-click="skip()">הגדר מערכת מקומית</button>
     </p>
 </div>
 
 <div class="panel-body text-center" ng-if="stepIs('localFailure')">
     <div class="master-icon"><span class="icon-fail"></span></div>
-    <h2>Cannot setup System</h2>
-    <p class="master-description">Something went totally wrong. <br>
-        Error description: {{settings.localError}}
+    <h2>אין אפשרות להגדיר מערכת</h2>
+    <p class="master-description">התרחשה שגיאה. תיאור שגיאה <br>: {{settings.localError}}
     </p>
     <p class="master-controls">
-        <button class="btn btn-default" ng-click="retry()">Try again</button>
+        <button class="btn btn-default" ng-click="retry()">נסה שוב</button>
     </p>
 </div>
 
 
 <div class="panel-footer lite-client-instruction" ng-if="settings.liteClient && stepIs('start')">
     <p>
-        It is possible to set it up from another computer by connecting<br>
-        to this device by one of the following ways:
+        זה אפשרי להגדיר את זה ממחשב אחר על-ידי חיבור <br>להתקן זה באחת הדרכים הבאות:
     </p>
     <div class="row">
         <div class="col-xs-6">
-            <div class="text-center"><b>Using web browser</b></div>
-            <div class="col-xs-4 text-right">Address</div><div class="col-xs-8 text-left"><b>https://{{IP}}:{{port}}</b></div>
+            <div class="text-center"><b>באמצעות דפדפן האינטרנט</b></div>
+            <div class="col-xs-4 text-right">כתובת</div><div class="col-xs-8 text-left"><b>https://{{IP}}:{{port}}</b></div>
         </div>
         <div class="col-xs-6">
-            <div class="text-center"><b>Using {{Config.productName}} application</b></div>
-            <div class="col-xs-6 text-right">Host</div><div class="col-xs-6 text-left"><b>{{IP}}</b></div>
-            <div class="col-xs-6 text-right">Port</div><div class="col-xs-6 text-left"><b>{{port}}</b></div>
-            <div class="col-xs-6 text-right">Login</div><div class="col-xs-6 text-left"><b>{{Config.defaultLogin}}</b></div>
-            <div class="col-xs-6 text-right">Password</div><div class="col-xs-6 text-left"><b>{{Config.defaultPassword}}</b></div>
+            <div class="text-center"><b>באמצעות יישום {{Config.productName}}</b></div>
+            <div class="col-xs-6 text-right">שרת</div><div class="col-xs-6 text-left"><b>{{IP}}</b></div>
+            <div class="col-xs-6 text-right">פורט</div><div class="col-xs-6 text-left"><b>{{port}}</b></div>
+            <div class="col-xs-6 text-right">כניסה</div><div class="col-xs-6 text-left"><b>{{Config.defaultLogin}}</b></div>
+            <div class="col-xs-6 text-right">סיסמא</div><div class="col-xs-6 text-left"><b>{{Config.defaultPassword}}</b></div>
         </div>
     </div>
 </div>

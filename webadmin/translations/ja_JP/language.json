@@ -1,5 +1,4 @@
 {
-  "language":"ja",
   "language_name":"日本語",
   "dialogs":{
     "okButton":"Ok",
@@ -72,7 +71,7 @@
     "cloudHostConflict":"異なるクラウドのホストとサーバーが組み込まれているため、システムを統合できません",
     "licenceError":"警告! スターター ライセンス システムを統合しようとしています　 1 つのスターター ライセンスのみが許可されていて2 番目のライセンスは無効になります　統合しますか？",
     "connectionFailed":"接続失敗: ",
-    "unknownError":"不明なエラー",
+    "unknownError":"未知のエラー",
     "mergeFailed":"統合に失敗: ",
     "mergeSucceed":"統合成功",
     "newSystemDisplayName":"新規システム",
@@ -104,7 +103,7 @@
     "selectFiles":"ファイルを選択"
   },
   "advanced":{
-    "free":"フリー",
+    "free":"無料",
     "total":"合計",
     "occupied":"使用中",
     "reserved":"予約済み"

@@ -1,5 +1,4 @@
 {
-  "language":"th",
   "language_name":"ภาษาไทย",
   "dialogs":{
     "okButton":"Ok",
@@ -20,16 +19,16 @@
   },
   "settings":{
     "tabs":{
-      "server":"Server",
+      "server":"เซิร์ฟเวอร์",
       "system":"System",
-      "device":"Device"
+      "device":"อุุปกรณ์"
     },
     "confirmRestart":"Restart server?",
     "couldntCheckInternet":"Could not check cloud connection",
     "confirmRestoreDefault":"Clear database and settings? This process will take some time and server will be restarted afterwards.",
     "confirmRestoreDefaultTitle":"Restore factory defaults",
     "unexpectedError":"Failed: unexpected error has happened",
-    "connnetionError":"Connection error",
+    "connnetionError":"การเชื่อมต่อผิดพลาด",
     "wrongPassword":"Wrong password.",
     "error":"Error: ",
     "restartNeeded":"Changes saved. Restart server to apply new settings?",
@@ -72,7 +71,7 @@
     "cloudHostConflict":"Cannot merge systems, because servers are built with different cloud hosts",
     "licenceError":"Warning! You are about to merge Systems with Starter licenses. Only one Starter license is allowed per System, so the second license will be deactivated. Merge anyway?",
     "connectionFailed":"Connection failed: ",
-    "unknownError":"Unknown error",
+    "unknownError":"ข้อผิดพลาดที่ไม่รู้จัก",
     "mergeFailed":"Merge failed: ",
     "mergeSucceed":"Merge succeed.",
     "newSystemDisplayName":"New system",

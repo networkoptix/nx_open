@@ -1,5 +1,4 @@
 {
-  "language":"tr",
   "language_name":"Türk",
   "productName":"{{PRODUCT_NAME}}",
   "clientProtocol":"{{CLIENT_PROTOCOL}}:",
@@ -30,6 +29,7 @@
     "restorePassword":"Parolayı sıfırla -",
     "restorePasswordSuccess":"Parola kaydedildi -",
     "restorePasswordCode":"Parolayı sıfırla -",
+    "view":"View cameras - ",
     "contentPage":"",
     "debug":"Hata ayıklama",
     "login":"Giriş yap -",
@@ -85,8 +85,7 @@
   },
   "errorCodes":{
     "ok":"ok",
-    "cantChangePasswordPrefix":"Parola kaydedilemiyor",
-    "cantSendActivationPrefix":"Onay gönderilemiyor E-posta",
+    "cantSendActivationPrefix":"Onay e-posta gönderemezsiniz",
     "cantDisconnectSystemPrefix":"Sistem silinemiyor",
     "cantUnshareWithMeSystemPrefix":"Sistem silinemiyor",
     "cantSharePrefix":"Sistem paylaşılamıyor",
@@ -95,6 +94,7 @@
     "cantRegisterPrefix":"Hata oluştu",
     "cantGetSystemInfoPrefix":"Kullanıcı listesi kullanılamıyor",
     "cantChangeAccountPrefix":"Değişiklikler kaydedilemiyor",
+    "cantChangePasswordPrefix":"Parola kaydedilemiyor",
     "cantActivatePrefix":"Hesabınız etkinleştirilemedi",
     "cantSendConfirmationPrefix":"Onay e-posta gönderemezsiniz",
     "cloudInvalidResponse":"Cloud DB, beklenmedik bir yanıt verdi",
@@ -109,17 +109,18 @@
     "alreadyExists":"Bu hesap zaten mevcut",
     "unknownError":"Beklenmedik bir hata oluştu",
     "accountAlreadyActivated":"Bu hesap zaten etkinleştirildi",
-    "EmailNotFound":"Hesap mevcut değil",
+    "emailNotFound":"Hesap mevcut değil",
     "EmailAlreadyExists":"Bu e-posta adresi zaten kayıtlı",
     "oldPasswordMistmatch":"Parola hatalı",
     "passwordMismatch":"Hatalı parola",
     "cantEditYourself":"Kendi izinlerini değiştirmeye izin verilmiyor",
     "cantEditAdmin":"Bu kullanıcının yönetici izinleri var",
     "cantOpenClient":"{{VMS_NAME}} uygulama algılanmadı. <a href=\"/download\">İndir</a>",
-    "lostConnection":"{{systemName}} ile bağlantı kayboldu"
+    "lostConnection":"{{systemName}} ile bağlantı kayboldu",
+    "thisSystem":"the system"
   },
   "passwordRequirements":{
-    "minLengthMessage":"Parola en az 8 karakterden oluşmalıdır",
+    "minLengthMessage":"Şifre en az 8 karakter içermelidir",
     "requiredMessage":"Sadece alfanümerik ve klavye karakterleri kullanın",
     "weakMessage":"Parolanın güçlü olması için \nküçük büyük harf ve özel karakterler kullanın",
     "strongMessage":"Güçlü parola!",
@@ -211,5 +212,9 @@
   "regActions":{
     "passwordLabel":"Parola",
     "createAccount":"Hesap oluştur"
+  },
+  "header":{
+    "allSystems":"All Systems",
+    "systems":"Sistemler"
   }
 }

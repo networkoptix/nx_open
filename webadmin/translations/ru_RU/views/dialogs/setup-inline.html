@@ -106,7 +106,7 @@
                  ng-click="settings.chooseCloudSystem = false">
                 <div class="checkbox-icon"></div>
                 <div class="master-icon"><span class="icon-localSystem"></span></div>
-                <h3>Локальная</h3>
+                <h3>Локальный</h3>
                 <p>
                     Работает в только локальной сети
  <br>не требует подключения к Интернету
@@ -119,7 +119,7 @@
                  ng-click="settings.chooseCloudSystem = true">
                 <div class="checkbox-icon"></div>
                 <div class="master-icon"><span class="icon-cloud"></span></div>
-                <h3>Облачная</h3>
+                <h3>Облачный</h3>
                 <p>
                     Доступна отовсюду
  <br>требуется Интернет-соединение
@@ -260,7 +260,7 @@
                     forms.localForm.passwordInput.$dirty && forms.localForm.passwordInput.$error.required ||
                     forms.localForm.localPasswordConfirmation.$touched && forms.localForm.localPasswordConfirmation.$error.required">
             <div class="help-block">
-                Все поля обязательны
+                Все поля являются обязательными
             </div>
         </div>
 
@@ -298,7 +298,7 @@
         <div class="form-group" validate-field>
             <input ng-model="settings.remoteLogin" name="remoteLogin" class="form-control" type="text"
                    ng-change="clearRemoteError(true)"
-                   placeholder="Логин" required>
+                   placeholder="Имя пользователя" required>
         </div>
         <div class="form-group" validate-field>
             <input ng-model="settings.remotePassword"
@@ -311,7 +311,7 @@
                     forms.remoteSystemForm.remoteLogin.$touched && forms.remoteSystemForm.remoteLogin.$error.required ||
                     forms.remoteSystemForm.remotePassword.$touched && forms.remoteSystemForm.remotePassword.$error.required">
             <div class="help-block">
-                Все поля обязательны
+                Все поля являются обязательными
             </div>
         </div>
 
@@ -420,7 +420,7 @@
 
 
 <div class="panel-body text-center" ng-if="stepIs('noInternetOnClient')">
-    <h2>Не удается подключиться к {{Config.cloud.productName}}</h2>
+    <h2>Не удаётся подключиться к {{Config.cloud.productName}}</h2>
     <p class="master-description">
         Требуется проверить подключение к Интернету.
     </p>
