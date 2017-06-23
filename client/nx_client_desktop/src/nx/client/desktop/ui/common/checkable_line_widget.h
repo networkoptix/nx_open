@@ -41,7 +41,7 @@ public:
     virtual QSize minimumSizeHint() const override;
 
 signals:
-    void checkStateChanged();
+    void checkStateChanged(Qt::CheckState newCheckState);
 
 private:
     class Model;

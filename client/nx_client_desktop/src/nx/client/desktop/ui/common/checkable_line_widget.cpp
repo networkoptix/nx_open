@@ -32,7 +32,9 @@ class CheckableLineWidget::Model: public QAbstractItemModel
     using base_type = QAbstractItemModel;
 
 public:
-    Model(std::function<void()> checkStateChanged, QObject* parent = nullptr):
+    using CheckStateChangedNotify = std::function<void(Qt::CheckState)>;
+
+    Model(CheckStateChangedNotify checkStateChanged, QObject* parent = nullptr):
         base_type(parent),
         m_checkStateChanged(checkStateChanged)
     {
@@ -126,11 +128,15 @@ public:
 
     bool setData(const QVariant& value, int role)
     {
-        m_data[role] = value;
+        auto& storedValue = m_data[role];
+        if (storedValue == value)
+            return false;
+
+        storedValue = value;
         emit dataChanged(this->index(0, 0), this->index(0, ColumnCount - 1));
 
         if (role == Qt::CheckStateRole && m_checkStateChanged)
-            m_checkStateChanged();
+            m_checkStateChanged(static_cast<Qt::CheckState>(value.toInt()));
 
         return true;
     }
@@ -144,7 +150,7 @@ private:
 
 private:
     QHash<int, QVariant> m_data;
-    std::function<void()> m_checkStateChanged;
+    CheckStateChangedNotify m_checkStateChanged;
 };
 
 //-------------------------------------------------------------------------------------------------
@@ -157,7 +163,9 @@ struct CheckableLineWidget::PrivateData
 
     explicit PrivateData(CheckableLineWidget* parent):
         view(new QnTreeView(parent)),
-        model(new CheckableLineWidget::Model([parent] { parent->checkStateChanged(); }, view))
+        model(new CheckableLineWidget::Model(
+            [parent](Qt::CheckState newState) { emit parent->checkStateChanged(newState); },
+            view))
     {
         view->setModel(model);
         view->setHeaderHidden(true);
