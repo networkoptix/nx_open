@@ -90,7 +90,7 @@ class ContentVersion(models.Model):
 
 class DataRecord(models.Model):
     data_structure = models.ForeignKey(DataStructure)
-    language = models.ForeignKey(Language)
+    language = models.ForeignKey(Language, null=True)
     customization = models.ForeignKey(Customization)
     version = models.ForeignKey(ContentVersion, null=True, blank=True)
 
@@ -101,6 +101,7 @@ class DataRecord(models.Model):
 
     def __str__(self):
         return self.value
+
 
 class Blank(models.Model):
 
