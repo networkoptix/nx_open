@@ -115,6 +115,28 @@ protected:
         supplier->setUserInfo(petya, petyaAuthInfo);
     }
 
+    void andWhenSecondUserNonceInfoIsUpdated()
+    {
+        nx::cdb::api::AuthInfo petyaAuthInfo;
+
+        auto petyaNonce1 = generateTestNonce(1);
+        auto petya = "petya";
+        petyaAuthInfo.records.push_back(
+            nx::cdb::api::AuthInfoRecord(
+                petyaNonce1.toStdString(),
+                generateIntermediateResponse(petya, petyaNonce1).toStdString(),
+                std::chrono::system_clock::time_point(std::chrono::milliseconds(2))));
+
+        auto petyaNonce2 = generateTestNonce(2);
+        petyaAuthInfo.records.push_back(
+            nx::cdb::api::AuthInfoRecord(
+                petyaNonce2.toStdString(),
+                generateIntermediateResponse(petya, petyaNonce2).toStdString(),
+                std::chrono::system_clock::time_point(std::chrono::milliseconds(12))));
+
+        supplier->setUserInfo(petya, petyaAuthInfo);
+    }
+
     void thenBothUsersCanAuthenticateUsingNewestMostCommonNonce()
     {
         ASSERT_TRUE(userInfoPool.authenticate(
@@ -125,25 +147,6 @@ protected:
             kTestMethod,
             generateAuthHeader("petya", *userInfoPool.newestMostCommonNonce())));
     }
-    //void whenSameUserIsReported()
-    //{
-    //    vasya1Auth = supplier->setUserInfo(2, "petya", generateTestNonce(2));
-    //}
-
-    //void when3rdWithNonce3HasBeenAdded()
-    //{
-    //    gena3Auth = supplier->setUserInfo(3, "gena", generateTestNonce(3));
-    //}
-
-    //void whenVasyaNonceUpdatedToTheNewest()
-    //{
-    //    vasya3Auth = supplier->setUserInfo(3, "vasya", generateTestNonce(3));
-    //}
-
-    //void thenOnlyNewestNonceShouldStayInThePool()
-    //{
-    //    ASSERT_TRUE(false);
-    //}
 
     nx::Buffer generateTestNonce(char c)
     {
@@ -163,113 +166,13 @@ TEST_F(CloudUserInfoPool, commonNonce_twoUsers_onlyFirstNonceIsCommon)
     thenBothUsersCanAuthenticateUsingNewestMostCommonNonce();
 }
 
-//TEST_F(CloudUserInfoPool, sameUserReportedTwice)
-//{
-//    given2UsersInfos();
-//    whenSameUserIsReported();
-//
-//    auto nonce = userInfoPool.newestMostCommonNonce();
-//    ASSERT_TRUE((bool)nonce);
-//    ASSERT_EQ(*nonce, nx::Buffer(generateTestNonce(2)));
-//}
-//
-//TEST_F(CloudUserInfoPool, commonNonce_3rdAdded)
-//{
-//    given2UsersInfos();
-//    when3rdWithNonce3HasBeenAdded();
-//
-//    auto nonce = userInfoPool.newestMostCommonNonce();
-//    ASSERT_TRUE((bool)nonce);
-//    ASSERT_EQ(*nonce, nx::Buffer(generateTestNonce(3)));
-//}
-//
-//TEST_F(CloudUserInfoPool, commonNonce_EveryoneHaveNewestNonce)
-//{
-//    given2UsersInfos();
-//    when3rdWithNonce3HasBeenAdded();
-//    whenVasyaNonceUpdatedToTheNewest();
-//    thenOnlyNewestNonceShouldStayInThePool();
-//
-//    auto nonce = userInfoPool.newestMostCommonNonce();
-//    ASSERT_TRUE((bool)nonce);
-//    ASSERT_EQ(*nonce, nx::Buffer(generateTestNonce(3)));
-//}
-//
-//TEST_F(CloudUserInfoPool, auth_2Users)
-//{
-//    given2UsersInfos();
-//    ASSERT_TRUE(userInfoPool.authenticate(kTestMethod, vasya2Auth));
-//    // old nonce user info should have already been deleted
-//    ASSERT_FALSE(userInfoPool.authenticate(kTestMethod, vasya1Auth));
-//
-//    ASSERT_TRUE(userInfoPool.authenticate(kTestMethod, petya2Auth));
-//    // But newer user info should be in the pool
-//    ASSERT_TRUE(userInfoPool.authenticate(kTestMethod, petya3Auth));
-//}
-//
-//TEST_F(CloudUserInfoPool, auth_3Users)
-//{
-//    given2UsersInfos();
-//    when3rdWithNonce3HasBeenAdded();
-//
-//    ASSERT_TRUE(userInfoPool.authenticate(kTestMethod, vasya2Auth));
-//    ASSERT_TRUE(userInfoPool.authenticate(kTestMethod, petya2Auth));
-//    ASSERT_TRUE(userInfoPool.authenticate(kTestMethod, petya3Auth));
-//    ASSERT_TRUE(userInfoPool.authenticate(kTestMethod, gena3Auth));
-//}
-//
-//TEST_F(CloudUserInfoPool, auth_3Users_newNonceAll)
-//{
-//    given2UsersInfos();
-//    when3rdWithNonce3HasBeenAdded();
-//    whenVasyaNonceUpdatedToTheNewest();
-//
-//    // old nonces should have been removed
-//    ASSERT_FALSE(userInfoPool.authenticate(kTestMethod, vasya1Auth));
-//    ASSERT_FALSE(userInfoPool.authenticate(kTestMethod, vasya2Auth));
-//    ASSERT_FALSE(userInfoPool.authenticate(kTestMethod, petya2Auth));
-//
-//    ASSERT_TRUE(userInfoPool.authenticate(kTestMethod, petya3Auth));
-//    ASSERT_TRUE(userInfoPool.authenticate(kTestMethod, gena3Auth));
-//    ASSERT_TRUE(userInfoPool.authenticate(kTestMethod, vasya3Auth));
-//}
-//
-//TEST_F(CloudUserInfoPool, userRemoved)
-//{
-//    given2UsersInfos();
-//    supplier->removeUserInfo("vasya");
-//
-//    auto nonce = userInfoPool.newestMostCommonNonce();
-//    ASSERT_TRUE((bool)nonce);
-//    ASSERT_EQ(*nonce, nx::Buffer(generateTestNonce(3)));
-//
-//    ASSERT_FALSE(userInfoPool.authenticate(kTestMethod, vasya1Auth));
-//    ASSERT_FALSE(userInfoPool.authenticate(kTestMethod, vasya2Auth));
-//
-//    ASSERT_TRUE(userInfoPool.authenticate(kTestMethod, petya2Auth));
-//    ASSERT_TRUE(userInfoPool.authenticate(kTestMethod, petya3Auth));
-//}
-//
-//TEST_F(CloudUserInfoPool, userRemoved_3users)
-//{
-//    given2UsersInfos();
-//    when3rdWithNonce3HasBeenAdded();
-//    whenVasyaNonceUpdatedToTheNewest();
-//
-//    supplier->removeUserInfo("vasya");
-//
-//    auto nonce = userInfoPool.newestMostCommonNonce();
-//    ASSERT_TRUE((bool)nonce);
-//    ASSERT_EQ(*nonce, nx::Buffer(generateTestNonce(3)));
-//
-//    ASSERT_FALSE(userInfoPool.authenticate(kTestMethod, vasya1Auth));
-//    ASSERT_FALSE(userInfoPool.authenticate(kTestMethod, vasya2Auth));
-//    ASSERT_FALSE(userInfoPool.authenticate(kTestMethod, vasya3Auth));
-//    ASSERT_FALSE(userInfoPool.authenticate(kTestMethod, petya2Auth));
-//
-//    ASSERT_TRUE(userInfoPool.authenticate(kTestMethod, petya3Auth));
-//    ASSERT_TRUE(userInfoPool.authenticate(kTestMethod, gena3Auth));
-//}
+TEST_F(CloudUserInfoPool, commonNonce_twoUsers_bothNonceAreCommon)
+{
+    given2UsersInfosWithCommonFirstNonce();
+    andWhenSecondUserNonceInfoIsUpdated();
+    thenBothUsersCanAuthenticateUsingNewestMostCommonNonce();
+}
+
 
 }
 

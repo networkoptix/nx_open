@@ -7,9 +7,19 @@
 #include <nx/network/buffer.h>
 #include <nx/utils/thread/mutex.h>
 #include <nx/utils/safe_direct_connection.h>
-#include <nx/cloud/cdb/client/data/auth_data.h>
 #include <core/resource/resource_fwd.h>
 #include <common/common_module_aware.h>
+
+
+namespace nx {
+namespace cdb {
+namespace api {
+
+class AuthInfo;
+
+}
+}
+}
 
 namespace detail {
 

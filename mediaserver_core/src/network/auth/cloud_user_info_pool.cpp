@@ -6,6 +6,7 @@
 #include <nx/network/http/auth_tools.h>
 #include <nx/cloud/cdb/api/auth_provider.h>
 #include <nx/fusion/serialization/json.h>
+#include <nx/cloud/cdb/client/data/auth_data.h>
 #include "cloud_user_info_pool.h"
 #include "cdb_nonce_fetcher.h"
 
