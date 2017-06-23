@@ -11,7 +11,22 @@
 
 #include <translation/translation_manager.h>
 
-#include <nx/fusion/serialization/json_functions.h>
+QString translationPath30ToLocale(const QString& translationPath)
+{
+    const QString oldLocale = QnTranslationManager::translationPathToLocaleCode(translationPath);
+    return QnTranslationManager::localeCode30to31(oldLocale);
+}
+
+QString readLocaleFromSettings(QSettings* settings)
+{
+    static const QString k30TranslationPath = lit("translationPath");
+    static const QString kLocalePath = lit("locale");
+
+    QString compatibleValue = settings->value(k30TranslationPath).toString();
+    if (!compatibleValue.isEmpty())
+        return translationPath30ToLocale(compatibleValue);
+    return settings->value(kLocalePath, QnAppInfo::defaultLanguage()).toString();
+}
 
 void initTranslations()
 {
@@ -23,27 +38,9 @@ void initTranslations()
     QScopedPointer<QnTranslationManager> translationManager(new QnTranslationManager());
     translationManager->addPrefix(lit("traytool"));
 
-    QString defaultTranslation;
-
-    /* Load from internal resource. */
-    QFile file(lit(":/globals.json"));
-    if(file.open(QIODevice::ReadOnly | QIODevice::Text))
-    {
-        QJsonObject jsonObject;
-        if(!QJson::deserialize(file.readAll(), &jsonObject))
-        {
-            NX_ASSERT(false, Q_FUNC_INFO, "Settings file could not be parsed!");
-        }
-        else
-        {
-            QJsonObject settingsObject = jsonObject.value(lit("settings")).toObject();
-            defaultTranslation = settingsObject.value(lit("translationPath")).toString();
-        }
-    }
-
     QSettings clientSettings(QSettings::UserScope, QnAppInfo::organizationName(), clientName);
-    QString translationPath = clientSettings.value(lit("translationPath"), defaultTranslation).toString();
-    QnTranslation translation = translationManager->loadTranslation(translationPath);
+    QString locale = readLocaleFromSettings(&clientSettings);
+    QnTranslation translation = translationManager->loadTranslation(locale);
     QnTranslationManager::installTranslation(translation);
 }
 

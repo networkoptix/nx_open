@@ -64,7 +64,7 @@ public:
 };
 
 /**
- * Provides some temporary hashes which can be used by mediaserver 
+ * Provides some temporary hashes which can be used by mediaserver
  *   to authenticate requests using cloud account credentials.
  * NOTE: These requests are allowed for system only.
  */
@@ -92,6 +92,18 @@ public:
 class AuthInfoRecord
 {
 public:
+    AuthInfoRecord(
+        const std::string& nonce,
+        const std::string& intermediateResponse,
+        std::chrono::system_clock::time_point expirationTime)
+        :
+        nonce(nonce),
+        intermediateResponse(intermediateResponse),
+        expirationTime(expirationTime)
+    {}
+
+    AuthInfoRecord() = default;
+
     std::string nonce;
     /**
      * See AuthResponse::intermediateResponse.

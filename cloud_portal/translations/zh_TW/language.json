@@ -29,6 +29,7 @@
     "restorePassword":"重置密碼 -",
     "restorePasswordSuccess":"密碼已儲存 -",
     "restorePasswordCode":"重置密碼 -",
+    "view":"View cameras - ",
     "contentPage":"",
     "debug":"除錯",
     "login":"登入 -",
@@ -84,7 +85,6 @@
   },
   "errorCodes":{
     "ok":"ok",
-    "cantChangePasswordPrefix":"無法儲存密碼",
     "cantSendActivationPrefix":"無法發送確認郵件",
     "cantDisconnectSystemPrefix":"無法刪除系統",
     "cantUnshareWithMeSystemPrefix":"無法刪除系統",
@@ -94,6 +94,7 @@
     "cantRegisterPrefix":"出現錯誤",
     "cantGetSystemInfoPrefix":"系統資訊不可用",
     "cantChangeAccountPrefix":"無法儲存變更",
+    "cantChangePasswordPrefix":"無法儲存密碼",
     "cantActivatePrefix":"無法啟動您的帳號",
     "cantSendConfirmationPrefix":"無法發送確認郵件",
     "cloudInvalidResponse":"雲端 DB 回覆預期外的回應",
@@ -108,14 +109,15 @@
     "alreadyExists":"此帳號已存在",
     "unknownError":"發生意外的錯誤",
     "accountAlreadyActivated":"此帳號已啟動",
-    "EmailNotFound":"帳號不存在",
+    "emailNotFound":"帳號不存在",
     "EmailAlreadyExists":"此電子郵件已被註冊",
     "oldPasswordMistmatch":"目前密碼不正確",
     "passwordMismatch":"密碼不正確",
     "cantEditYourself":"不允許變更自己的權限",
     "cantEditAdmin":"此使用者具有管理員權限",
     "cantOpenClient":"{{VMS_NAME}} 應用程式未檢測到.<a href=\"/download\"> 下載</a>",
-    "lostConnection":"與 {{systemName}} 的連線斷開了"
+    "lostConnection":"與 {{systemName}} 的連線斷開了",
+    "thisSystem":"the system"
   },
   "passwordRequirements":{
     "minLengthMessage":"密碼必須包含至少 8 個字元",
@@ -210,5 +212,9 @@
   "regActions":{
     "passwordLabel":"密碼",
     "createAccount":"新建帳號"
+  },
+  "header":{
+    "allSystems":"All Systems",
+    "systems":"系統"
   }
 }

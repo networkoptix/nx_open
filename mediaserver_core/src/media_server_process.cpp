@@ -1983,7 +1983,7 @@ bool MediaServerProcess::initTcpListener(
     return true;
 }
 
-void MediaServerProcess::initializeNetworking()
+void MediaServerProcess::initializeCloudConnect()
 {
     nx::network::SocketGlobals::outgoingTunnelPool()
         .assignOwnPeerId("ms", commonModule()->moduleGUID());
@@ -1995,7 +1995,6 @@ void MediaServerProcess::initializeNetworking()
 
     connect(
         commonModule()->globalSettings(), &QnGlobalSettings::cloudConnectUdpHolePunchingEnabledChanged,
-        this, 
         [this]()
         {
             nx::network::cloud::TunnelAcceptorFactory::instance().setUdpHolePunchingEnabled(
@@ -2004,7 +2003,6 @@ void MediaServerProcess::initializeNetworking()
 
     connect(
         commonModule()->globalSettings(), &QnGlobalSettings::cloudConnectRelayingEnabledChanged,
-        this, 
         [this]()
         {
             nx::network::cloud::TunnelAcceptorFactory::instance().setRelayingEnabled(
@@ -2621,7 +2619,7 @@ void MediaServerProcess::run()
 
     commonModule()->setModuleGUID(serverGuid());
 
-    initializeNetworking();
+    initializeCloudConnect();
 
     bool compatibilityMode = m_cmdLineArguments.devModeKey == lit("razrazraz");
     const QString appserverHostString = qnServerModule->roSettings()->value("appserverHost").toString();

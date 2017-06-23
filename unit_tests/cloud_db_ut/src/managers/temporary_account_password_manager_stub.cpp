@@ -21,6 +21,14 @@ void TemporaryAccountPasswordManagerStub::registerTemporaryCredentials(
 {
 }
 
+nx::db::DBResult TemporaryAccountPasswordManagerStub::fetchTemporaryCredentials(
+    nx::db::QueryContext* const /*queryContext*/,
+    const data::TemporaryAccountCredentials& /*tempPasswordData*/,
+    data::Credentials* /*credentials*/)
+{
+    return nx::db::DBResult::notFound;
+}
+
 void TemporaryAccountPasswordManagerStub::addRandomCredentials(
     data::TemporaryAccountCredentials* const /*data*/)
 {

@@ -1,0 +1,67 @@
+<form class="form" role="form" novalidate name="form" id="mergeDialog">
+    <div class="modal-header">
+        <button type="닫기" class="close" data-dismiss="modal" ng-click="cancel()"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+        <h3 class="modal-title">시스템 머징</h3>
+    </div>
+
+    <div class="col-sm-12">
+        <ng-form name="findSystemForm">
+            <div class="form-group">
+                <label for="otherSystemUrl" class="control-label">다른 시스템 URL</label>
+                <div class="">
+                    <div class="input-group" dropdown>
+                        <input type="text" ng-model="settings.url" class="form-control" id="otherSystemUrl" placeholder="호스트: 포트" required />
+
+                        <ul class="dropdown-menu" role="menu" id="discoveredUrls">
+                            <li ng-if="systems.discoveredUrls.length == 0" id="no-systems-message"><a>발견된 시스템 없음.</a></li>
+                            <li ng-repeat="system in systems.discoveredUrls"
+                                ng-class="{disabled:!system.compatible}">
+                                <a ng-click="system.compatible && selectSystem(system);">{{system.visibleName}}</a>
+                            </li>
+                        </ul>
+
+                        <span type="button" class="input-group-addon dropdown-toggle">
+                            <span class="caret"></span>
+                        </span>
+                    </div>
+                </div>
+            </div>
+
+
+
+            <div class="form-group">
+                <label for="otherSystemLogin" class="control-label"> 다른 시스템 로그인</label>
+                <div class="">
+                    <input ng-model="settings.login" name="otherSystemLogin" id="otherSystemLogin" class="form-control" type="text"
+                           placeholder="Login" required>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="otherSystemPassword" class="control-label"> 다른 시스템 암호</label>
+                <div class="">
+                    <input type="password" ng-model="settings.password"  class="form-control" id="otherSystemPassword"
+                           autocomplete="new-password"
+                           placeholder="패스워드"/>
+                </div>
+            </div>
+        </ng-form>
+
+        <div class="form-group" ng-class="{hidden:!systems.systemFound}">
+            <label for="currentSystemPassword" class="control-label"> (이 시스템) 에 대 한 현재 암호</label>
+            <div class="">
+                <input type="password" ng-model="settings.currentPassword"  class="form-control" id="currentSystemPassword" placeholder="패스워드" required />
+            </div>
+        </div>
+
+        <div class="form-group" ng-class="{hidden:!systems.systemFound}">
+            <p>현재 시스템은 <b>{{systems.systemName}}</b>와<b>{{systems.joinSystemName}}</b>이 병합되었습니다.</p>
+            <p>
+                새 시스템은 아래 시스템으로 부터 암호와 사용자이름을 받습니다: <br/> <label><input type="radio" name="keepMySystem" ng-value="true" ng-disabled="systems.remoteSystemIsNew" ng-model="settings.keepMySystem" id="checkbox-current-system"/> {{systems.systemName}} (전류)</label> <br/> <label ng-if="!systems.remoteSystemIsNew"> <input type="radio" name="keepMySystem" ng-value="false" ng-disabled="systems.remoteSystemIsNew" ng-model="settings.keepMySystem" id="checkbox-external-system"/> {{systems.joinSystemName}}</label>
+            </p>
+        </div>
+    </div>
+    <div class="modal-footer" >
+        <button class="btn btn-default" ng-class="{'btn-primary':!systems.systemFound}" name="button" ng-click="test()" ng-disabled="findSystemForm.$invalid"> 시스템 찾기</button>         <button class="btn btn-primary" ng-class="{hidden:!systems.systemFound}" id="merge-systems-button" name="button" ng-click="join()" ng-disabled="form.$invalid"> {{systems.joinSystemName}}와 병합</button>
+    </div>
+</form>

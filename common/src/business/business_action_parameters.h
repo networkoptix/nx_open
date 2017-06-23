@@ -1,5 +1,4 @@
-#ifndef BUSINESS_ACTION_PARAMETERS_H
-#define BUSINESS_ACTION_PARAMETERS_H
+#pragma once
 
 #include <business/business_fwd.h>
 #include <nx/fusion/model_functions_fwd.h>
@@ -27,9 +26,6 @@ struct QnBusinessActionParameters
 
     // Email
     QString emailAddress;
-
-    // Popups and System Health
-    QnBusiness::UserGroup userGroup;
 
     // Recording
     int fps;
@@ -79,12 +75,10 @@ struct QnBusinessActionParameters
     bool isDefault() const;
 };
 
-#define QnBusinessActionParameters_Fields (targetActionType)(needConfirmation)(actionResourceId)(url)\
-    (emailAddress)(userGroup)(fps)(streamQuality)(recordAfter)\
-    (relayOutputId)(sayText)(tags)(text)(durationMs)(additionalResources)\
-    (forced)(presetId)(useSource)(recordBeforeMs)(playToClient)(contentType)
+#define QnBusinessActionParameters_Fields (targetActionType)(needConfirmation)(actionResourceId)\
+    (url)(emailAddress)(fps)(streamQuality)(recordAfter)(relayOutputId)(sayText)(tags)(text)\
+    (durationMs)(additionalResources)(forced)(presetId)(useSource)(recordBeforeMs)\
+    (playToClient)(contentType)
 
 /* Backward compatibility is not really important here as this class is not stored in the DB. */
 QN_FUSION_DECLARE_FUNCTIONS(QnBusinessActionParameters, (ubjson)(json)(eq)(xml)(csv_record));
-
-#endif // BUSINESS_ACTION_PARAMETERS_H

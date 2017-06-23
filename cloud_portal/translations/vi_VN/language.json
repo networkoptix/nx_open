@@ -4,7 +4,7 @@
   "clientProtocol":"{{CLIENT_PROTOCOL}}:",
   "dialogs":{
     "okButton":"Ok",
-    "cancelButton":"Cancel",
+    "cancelButton":"hủy bỏ",
     "loginTitle":"Log in to {{PRODUCT_NAME}}",
     "loginButton":"Log in",
     "logoutAuthorisedText":"",
@@ -29,6 +29,7 @@
     "restorePassword":"Reset password -",
     "restorePasswordSuccess":"Password saved -",
     "restorePasswordCode":"Reset password -",
+    "view":"View cameras - ",
     "contentPage":"",
     "debug":"Debug",
     "login":"Log in -",
@@ -46,11 +47,11 @@
   },
   "accessRoles":{
     "disabled":{
-      "label":"Disabled",
+      "label":"tàn tật",
       "description":"User is disabled and cannot log in to System"
     },
     "Owner":{
-      "label":"Owner",
+      "label":"chủ nhân",
       "description":"Unrestricted access including the ability to share and connect/disconnect System from cloud"
     },
     "Viewer":{
@@ -66,7 +67,7 @@
       "description":"Can view live video, browse the archive, configure cameras, control PTZ etc"
     },
     "Administrator":{
-      "label":"Administrator",
+      "label":"giám sát viên",
       "description":"Unrestricted access including the ability to share"
     },
     "Custom":{
@@ -74,7 +75,7 @@
       "description":"Use the {{PRODUCT_NAME}} Client application to set up custom permissions"
     },
     "cloudAdmin":{
-      "label":"Administrator",
+      "label":"giám sát viên",
       "description":"Can configure System and share it"
     },
     "customRole":{
@@ -84,7 +85,6 @@
   },
   "errorCodes":{
     "ok":"ok",
-    "cantChangePasswordPrefix":"Cannot save password",
     "cantSendActivationPrefix":"Cannot send confirmation Email",
     "cantDisconnectSystemPrefix":"Cannot delete System",
     "cantUnshareWithMeSystemPrefix":"Cannot delete System",
@@ -94,6 +94,7 @@
     "cantRegisterPrefix":"Error occurred",
     "cantGetSystemInfoPrefix":"System info is unavailable",
     "cantChangeAccountPrefix":"Cannot save changes",
+    "cantChangePasswordPrefix":"Cannot save password",
     "cantActivatePrefix":"Cannot activate your account",
     "cantSendConfirmationPrefix":"Cannot send confirmation Email",
     "cloudInvalidResponse":"Cloud DB returned an unexpected response",
@@ -108,14 +109,15 @@
     "alreadyExists":"This account already exists",
     "unknownError":"Unexpected error occured",
     "accountAlreadyActivated":"This account is already activated",
-    "EmailNotFound":"Account does not exist",
+    "emailNotFound":"Account does not exist",
     "EmailAlreadyExists":"This Email is already registered",
     "oldPasswordMistmatch":"Current password is incorrect",
     "passwordMismatch":"Wrong password",
     "cantEditYourself":"Changing own permissions is not allowed",
     "cantEditAdmin":"This user has administrator permissions",
     "cantOpenClient":"{{VMS_NAME}} application is not detected. <a href=\"/download\">Download</a>",
-    "lostConnection":"Connection to {{systemName}} lost"
+    "lostConnection":"Connection to {{systemName}} lost",
+    "thisSystem":"the system"
   },
   "passwordRequirements":{
     "minLengthMessage":"Password must contain at least 8 characters",
@@ -129,7 +131,7 @@
     "shareTitle":"Share",
     "shareConfirmButton":"Share",
     "editShareTitle":"Edit Permissions",
-    "editShareConfirmButton":"Save",
+    "editShareConfirmButton":"tiết kiệm",
     "permissionsSaved":"New permissions saved"
   },
   "system":{
@@ -139,7 +141,7 @@
     "offline":"System is offline",
     "openClient":"Open in {{VMS_NAME}}",
     "confirmRenameTitle":"System name",
-    "confirmRenameAction":"Save",
+    "confirmRenameAction":"tiết kiệm",
     "successRename":"System name saved",
     "confirmDisconnectTitle":"Disconnect System from {{PRODUCT_NAME}}?",
     "confirmDisconnectAction":"Disconnect",
@@ -148,7 +150,7 @@
     "confirmUnshareFromMeAction":"Disconnect",
     "confirmUnshare":"This user will not be able to access System. Are you sure?",
     "confirmUnshareTitle":"Delete user?",
-    "confirmUnshareAction":"Delete",
+    "confirmUnshareAction":"xóa bỏ",
     "successDisconnected":"System is successfully disconnected from {{PRODUCT_NAME}}",
     "successDeleted":"System {{systemName}} is successfully deleted from your account",
     "permissionsRemoved":"Permissions were removed from {{email}}"
@@ -158,7 +160,7 @@
     "passwordChangedSuccess":"Your account is successfully saved",
     "changePassword":"Change Password",
     "newPasswordLabel":"New password",
-    "saveChanges":"Save"
+    "saveChanges":"tiết kiệm"
   },
   "downloads":{
     "noClientDetectedTitle":"Install {{VMS_NAME}} to view your System",
@@ -204,11 +206,15 @@
   "activeActions":{
     "sendConfirm":"Send",
     "resetPassword":"Reset Password",
-    "setNewPassword":"Save password",
+    "setNewPassword":"Lưu mật khẩu",
     "setNewPasswordLabel":"New password"
   },
   "regActions":{
-    "passwordLabel":"Password",
+    "passwordLabel":"Mật khẩu",
     "createAccount":"Create Account"
+  },
+  "header":{
+    "allSystems":"All Systems",
+    "systems":"Systems"
   }
 }
