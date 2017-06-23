@@ -79,7 +79,7 @@ def generate_languages_files(languages, template_filename):
             })
             merge(data, all_strings)
         save_content("../static/lang_" + lang + "/language.json", json.dumps(all_strings, ensure_ascii=False))
-        merge_json("../static/lang_" + lang + "/language.json", '../static/lang_" + lang + "/web_common/commonLanguage.json','common')
+        merge_json("../static/lang_" + lang + "/language.json", "../static/lang_" + lang + "/web_common/commonLanguage.json", 'common')
     save_content('../static/languages.json', json.dumps(languages_json, ensure_ascii=False))
 
 languages = [o for o in os.listdir('../translations') if os.path.isdir(os.path.join('../translations',o))]
