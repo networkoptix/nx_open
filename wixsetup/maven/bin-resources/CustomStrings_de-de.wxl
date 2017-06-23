@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="utf-8"?>
+<WixLocalization Culture="en-US" xmlns="http://schemas.microsoft.com/wix/2006/localization">
+    <String Id="AdvancedWelcomeEulaDlg_Title"                       Overridable="yes">[ProductTitle]</String>
+    <String Id="BrowseDlg_Title"                                    Overridable="yes">[ProductTitle]</String>
+    <String Id="CancelDlg_Title"                                    Overridable="yes">[ProductTitle]</String>
+    <String Id="CustomizeDlg_Title"                                 Overridable="yes">[ProductTitle]</String>
+    <String Id="DiskCostDlg_Title"                                  Overridable="yes">[ProductTitle]</String>
+    <String Id="ErrorDlg_Title"                                     Overridable="yes">[ProductTitle]</String>
+    <String Id="ExitDialog_Title"                                   Overridable="yes">[ProductTitle]</String>
+    <String Id="FatalError_Title"                                   Overridable="yes">[ProductTitle]</String>
+    <String Id="FeaturesDlg_Title"                                  Overridable="yes">[ProductTitle]</String>
+    <String Id="FilesInUse_Title"                                   Overridable="yes">[ProductTitle]</String>
+    <String Id="InstallDirDlg_Title"                                Overridable="yes">[ProductTitle]</String>
+    <String Id="InstallScopeDlg_Title"                              Overridable="yes">[ProductTitle]</String>
+    <String Id="InvalidDirDlg_Title"                                Overridable="yes">[ProductTitle]</String>
+    <String Id="LicenseAgreementDlg_Title"                          Overridable="yes">[ProductTitle]</String>
+    <String Id="MaintenanceTypeDlg_Title"                           Overridable="yes">[ProductTitle]</String>
+    <String Id="MaintenanceWelcomeDlg_Title"                        Overridable="yes">[ProductTitle]</String>
+    <String Id="MsiRMFilesInUse_Title"                              Overridable="yes">[ProductTitle]</String>
+    <String Id="OutOfDiskDlg_Title"                                 Overridable="yes">[ProductTitle]</String>
+    <String Id="OutOfRbDiskDlg_Title"                               Overridable="yes">[ProductTitle]</String>
+    <String Id="PrepareDlg_Title"                                   Overridable="yes">[ProductTitle]</String>
+    <String Id="ProgressDlg_Title"                                  Overridable="yes">[ProductTitle]</String>
+    <String Id="ResumeDlg_Title"                                    Overridable="yes">[ProductTitle]</String>
+    <String Id="SetupTypeDlg_Title"                                 Overridable="yes">[ProductTitle]</String>
+    <String Id="UserExit_Title"                                     Overridable="yes">[ProductTitle]</String>
+    <String Id="VerifyReadyDlg_Title"                               Overridable="yes">[ProductTitle]</String>
+    <String Id="WaitForCostingDlg_Title"                            Overridable="yes">[ProductTitle]</String>
+    <String Id="WelcomeDlg_Title"                                   Overridable="yes">[ProductTitle]</String>
+    <String Id="WelcomeEulaDlg_Title"                               Overridable="yes">[ProductTitle]</String>
+
+    <!-- Standard Strings (Common Buttons, Labels etc) -->
+    <String Id="StdString_Ok"                                       Overridable="yes">Ok</String>
+    <String Id="StdString_Warning"                                  Overridable="yes">Warnung</String>
+    <String Id="StdString_SetupTitle"                               Overridable="yes">[ProductName] Konfiguration</String>
+
+
+
+    <!-- Associations -->
+    <String Id="Associations_PlayWith"                              Overridable="yes">[ProductName] ausprobieren</String>
+
+    <!-- ClientDlg -->
+    <String Id="ClientDlg_Shortcut"                                 Overridable="yes">Verknüpfungen</String>
+    <String Id="ClientDlg_InstallShortcut"                          Overridable="yes">Verknüpfung auf dem Desktop platzieren</String>
+
+    <!-- NxtoolDlg -->
+    <String Id="NxtoolDlg_Shortcut"                                 Overridable="yes">Verknüpfungen</String>
+    <String Id="NxtoolDlg_InstallShortcut"                          Overridable="yes">Verknüpfung auf dem Desktop platzieren</String>
+
+    <!-- DowngradeWarningDlg -->
+    <String Id="DowngradeWarningDlg_DowngradeWarning"               Overridable="yes">Eine neuere Version von [ProductName] ist bereits installiert.</String>
+
+
+
+
+    <!-- MediaDirDlg -->
+    <String Id="MediaDirDlg_MediaFolderLabel"                       Overridable="yes">Klicken Sie auf Weiter, um den Standardordner zu verwenden oder klicken Sie auf Ändern, um einen anderen zu wählen.</String>
+    <String Id="MediaDirDlg_MediaFolder"                            Overridable="yes">Media-Stammordner</String>
+    <String Id="MediaDirDlg_SelectMediaFolder"                      Overridable="yes">Bitte wählen den Media-Stammordner:</String>
+    <String Id="MediaDirDlg_LoginLabel"                             Overridable="yes">Benutzerkennung:</String>
+
+
+    <!-- MyExitDialog -->
+
+    <!-- MyFeaturesDlg -->
+    <String Id="MyFeaturesDlg_Components"                           Overridable="yes">Komponenten</String>
+    <String Id="MyFeaturesDlg_Client"                               Overridable="yes">[clientInternalName] (Ich möchte Videos in anderen Archiven ansehen)</String>
+    <String Id="MyFeaturesDlg_Mediaserver"                          Overridable="yes">[mediaserverName] (Ich möchte auf diesem Rechner lokal aufzeichnen)</String>
+
+
+
+
+
+    <!-- Product -->
+    <String Id="Product_LaunchClient"                               Overridable="yes">Starten Sie [ProductName] nachdem Setup beendet ist.</String>
+    <String Id="Product_LaunchNxtool"                               Overridable="yes">Starten Sie [nxtoolName] nachdem Setup beendet ist.</String>
+    <String Id="Product_ArchMismatch_x86"                           Overridable="yes">Dieses Paket ist ausschliesllich für 32-Bit-Betriebssystem konzipiert. Das Installationsprogramm beenden sich jetzt.</String>
+    <String Id="Product_ArchMismatch_x64"                           Overridable="yes">Dieses Paket ist ausschliesllich für 64-Bit-Betriebssystem konzipiert. Das Installationsprogramm beenden sich jetzt.</String>
+
+    <!-- SelectionWarningDlg -->
+    <String Id="SelectionWarningDlg_ComponentSelectedMessage"       Overridable="yes">Sie müssen mindestens eine Komponente auswählen</String>
+
+
+    <!-- UpgradeDlg -->
+    <String Id="UpgradeDlg_PreviousDetected"                        Overridable="yes">Ältere Version gefunden</String>
+    <String Id="UpgradeDlg_InstallationType"                        Overridable="yes">Installationstyp</String>
+    <String Id="UpgradeDlg_UpgradeMessage"                          Overridable="yes">Update wird eingespielt</String>
+    <String Id="UpgradeDlg_DatabaseRecovery"                        Overridable="yes">Ihre Datenbank ist beschädigt und kann nicht wiederhergestellt werden. Eine neue Datenbank wurde installiert. Um sich am System anzumelden, verwenden Sie die Benutzerkennung "admin" und das Passwort "admin". Bitte ändern Sie diese Angaben bei der ersten Anmeldung.</String>
+
+    <!-- WixSchedFirewallExceptions -->
+    <String Id="msierrFirewallCannotConnect"                        Overridable="yes">Verbindung zur Windows-Firewall kann nicht aufgebaut werden.  ([2]   [3]   [4]   [5])</String>
+    <String Id="WixSchedFirewallExceptionsInstall"                  Overridable="yes">Konfigurieren der Windows-Firewall</String>
+    <String Id="WixSchedFirewallExceptionsUninstall"                Overridable="yes">Konfigurieren der Windows-Firewall</String>
+    <String Id="WixRollbackFirewallExceptionsInstall"               Overridable="yes">Rollback der Windows-Firewall-Konfiguration</String>
+    <String Id="WixExecFirewallExceptionsInstall"                   Overridable="yes">Installieren der Windows-Firewall-Konfiguration</String>
+    <String Id="WixRollbackFirewallExceptionsUninstall"             Overridable="yes">Rollback der Windows-Firewall-Konfiguration</String>
+    <String Id="WixExecFirewallExceptionsUninstall"                 Overridable="yes">Deinstallieren der Windows-Firewall-Konfiguration</String>
+
+    <!-- WixInstallDirDlgTitle -->
+    <String Id="InstallDirDlg_Title"                                Overridable="yes">[ProductName] Setup</String>
+    <String Id="InstallDirDlgChange"                                Overridable="yes">&amp;Change...</String>
+    <String Id="InstallDirDlgTitle"                                 Overridable="yes">{\WixUI_Font_Title}Destination Folder</String>
+    <String Id="InstallDirDlgDescription"                           Overridable="yes">Click Next to install by default or Change to choose another.</String>
+    <String Id="InstallDirDlgFolderLabel"                           Overridable="yes">Install [ProductName] to:</String>
+    <String Id="Product_ProductIsTooOld"                            Overridable="yes">Update to this version is not allowed. You should first upgrade to version 2.6</String>
+</WixLocalization>

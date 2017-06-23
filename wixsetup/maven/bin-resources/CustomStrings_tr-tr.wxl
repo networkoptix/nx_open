@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="utf-8"?>
+<WixLocalization Culture="en-US" xmlns="http://schemas.microsoft.com/wix/2006/localization">
+    <String Id="AdvancedWelcomeEulaDlg_Title"                       Overridable="yes">[ProductTitle]</String>
+    <String Id="BrowseDlg_Title"                                    Overridable="yes">[ProductTitle]</String>
+    <String Id="CancelDlg_Title"                                    Overridable="yes">[ProductTitle]</String>
+    <String Id="CustomizeDlg_Title"                                 Overridable="yes">[ProductTitle]</String>
+    <String Id="DiskCostDlg_Title"                                  Overridable="yes">[ProductTitle]</String>
+    <String Id="ErrorDlg_Title"                                     Overridable="yes">[ProductTitle]</String>
+    <String Id="ExitDialog_Title"                                   Overridable="yes">[ProductTitle]</String>
+    <String Id="FatalError_Title"                                   Overridable="yes">[ProductTitle]</String>
+    <String Id="FeaturesDlg_Title"                                  Overridable="yes">[ProductTitle]</String>
+    <String Id="FilesInUse_Title"                                   Overridable="yes">[ProductTitle]</String>
+    <String Id="InstallDirDlg_Title"                                Overridable="yes">[ProductTitle]</String>
+    <String Id="InstallScopeDlg_Title"                              Overridable="yes">[ProductTitle]</String>
+    <String Id="InvalidDirDlg_Title"                                Overridable="yes">[ProductTitle]</String>
+    <String Id="LicenseAgreementDlg_Title"                          Overridable="yes">[ProductTitle]</String>
+    <String Id="MaintenanceTypeDlg_Title"                           Overridable="yes">[ProductTitle]</String>
+    <String Id="MaintenanceWelcomeDlg_Title"                        Overridable="yes">[ProductTitle]</String>
+    <String Id="MsiRMFilesInUse_Title"                              Overridable="yes">[ProductTitle]</String>
+    <String Id="OutOfDiskDlg_Title"                                 Overridable="yes">[ProductTitle]</String>
+    <String Id="OutOfRbDiskDlg_Title"                               Overridable="yes">[ProductTitle]</String>
+    <String Id="PrepareDlg_Title"                                   Overridable="yes">[ProductTitle]</String>
+    <String Id="ProgressDlg_Title"                                  Overridable="yes">[ProductTitle]</String>
+    <String Id="ResumeDlg_Title"                                    Overridable="yes">[ProductTitle]</String>
+    <String Id="SetupTypeDlg_Title"                                 Overridable="yes">[ProductTitle]</String>
+    <String Id="UserExit_Title"                                     Overridable="yes">[ProductTitle]</String>
+    <String Id="VerifyReadyDlg_Title"                               Overridable="yes">[ProductTitle]</String>
+    <String Id="WaitForCostingDlg_Title"                            Overridable="yes">[ProductTitle]</String>
+    <String Id="WelcomeDlg_Title"                                   Overridable="yes">[ProductTitle]</String>
+    <String Id="WelcomeEulaDlg_Title"                               Overridable="yes">[ProductTitle]</String>
+
+    <!-- Standard Strings (Common Buttons, Labels etc) -->
+    <String Id="StdString_Ok"                                       Overridable="yes">Tamam</String>
+    <String Id="StdString_Warning"                                  Overridable="yes">Uyarı</String>
+    <String Id="StdString_SetupTitle"                               Overridable="yes">[ProductName] Yükleme</String>
+
+
+
+    <!-- Associations -->
+    <String Id="Associations_PlayWith"                              Overridable="yes">Oynat [ProductName]</String>
+
+    <!-- ClientDlg -->
+    <String Id="ClientDlg_Shortcut"                                 Overridable="yes">Kısayollar</String>
+    <String Id="ClientDlg_InstallShortcut"                          Overridable="yes">Masaüstüne kısayol oluştur</String>
+
+    <!-- NxtoolDlg -->
+    <String Id="NxtoolDlg_Shortcut"                                 Overridable="yes">Kısayollar</String>
+    <String Id="NxtoolDlg_InstallShortcut"                          Overridable="yes">Masaüstüne kısayol oluştur</String>
+
+    <!-- DowngradeWarningDlg -->
+    <String Id="DowngradeWarningDlg_DowngradeWarning"               Overridable="yes">[ProductName] ın son versiyonu zaten yüklü.</String>
+
+
+
+
+    <!-- MediaDirDlg -->
+    <String Id="MediaDirDlg_MediaFolderLabel"                       Overridable="yes">varsayılan kayıt yeri için ileri ye tıklayın yada değiştirmek için tıklayın.</String>
+    <String Id="MediaDirDlg_MediaFolder"                            Overridable="yes">Medya kayıt sunucusu</String>
+    <String Id="MediaDirDlg_SelectMediaFolder"                      Overridable="yes">LÜtfen kayıt klasörünü seçin:</String>
+    <String Id="MediaDirDlg_LoginLabel"                             Overridable="yes">Giriş</String>
+
+
+    <!-- MyExitDialog -->
+
+    <!-- MyFeaturesDlg -->
+    <String Id="MyFeaturesDlg_Components"                           Overridable="yes">Bileşenler</String>
+    <String Id="MyFeaturesDlg_Client"                               Overridable="yes">[clientInternalName] (I want to view video recorded elsewhere)</String>
+    <String Id="MyFeaturesDlg_Mediaserver"                          Overridable="yes">[mediaserverName] (I want to record locally on this PC)</String>
+
+
+
+
+
+    <!-- Product -->
+    <String Id="Product_LaunchClient"                               Overridable="yes">[ProductName] i yükleme bitince çalıştır .</String>
+    <String Id="Product_LaunchNxtool"                               Overridable="yes">[nxtoolName] i yükleme bitince çalıştır.</String>
+    <String Id="Product_ArchMismatch_x86"                           Overridable="yes">bu yükleme dosyası 32 bit OS ler içindir.Yükleme yapılamıyor.</String>
+    <String Id="Product_ArchMismatch_x64"                           Overridable="yes">bu yükleme dosyası 64 bit OS ler içindir.Yükleme yapılamıyor.</String>
+
+    <!-- SelectionWarningDlg -->
+    <String Id="SelectionWarningDlg_ComponentSelectedMessage"       Overridable="yes">En az bir bileşen seçmelisiniz</String>
+
+
+    <!-- UpgradeDlg -->
+    <String Id="UpgradeDlg_PreviousDetected"                        Overridable="yes">Önceki bir sürüm yüklü</String>
+    <String Id="UpgradeDlg_InstallationType"                        Overridable="yes">Yükleme tipi</String>
+    <String Id="UpgradeDlg_UpgradeMessage"                          Overridable="yes">Sistem güncelleniyor</String>
+    <String Id="UpgradeDlg_DatabaseRecovery"                        Overridable="yes">Veritabanı bozuk yada kurtarılamadı. Yeni veritabanı oluşturuldu. Sisteme erişmek için kullanıcı adı admin şifre admin tür.Lütfen ilk oturumda bilgileri güncelleyin.</String>
+
+    <!-- WixSchedFirewallExceptions -->
+    <String Id="msierrFirewallCannotConnect"                        Overridable="yes">Windows güvenlik duvarına bağlanılamadı.  ([2]   [3]   [4]   [5])</String>
+    <String Id="WixSchedFirewallExceptionsInstall"                  Overridable="yes">Güvenlik duvarı konfigüre ediliyor.</String>
+    <String Id="WixSchedFirewallExceptionsUninstall"                Overridable="yes">Güvenlik duvarı konfigüre ediliyor.</String>
+    <String Id="WixRollbackFirewallExceptionsInstall"               Overridable="yes">Güvenlik duvarı ayarları geri alınıyor.</String>
+    <String Id="WixExecFirewallExceptionsInstall"                   Overridable="yes">Güvenlik duvarı ayarları yükleniyor.</String>
+    <String Id="WixRollbackFirewallExceptionsUninstall"             Overridable="yes">Güvenlik duvarı ayarları geri alınıyor.</String>
+    <String Id="WixExecFirewallExceptionsUninstall"                 Overridable="yes">Güvenlik duvarı ayarı kaldırılıyor.</String>
+
+    <!-- WixInstallDirDlgTitle -->
+    <String Id="InstallDirDlg_Title"                                Overridable="yes">[ProductName] Yükleme</String>
+    <String Id="InstallDirDlgChange"                                Overridable="yes">&amp;Change...</String>
+    <String Id="InstallDirDlgTitle"                                 Overridable="yes">{\WixUI_Font_Title}Destination Folder</String>
+    <String Id="InstallDirDlgDescription"                           Overridable="yes">Yükleme için ileri ye tıklayın yada özel yükleme için tıklayın</String>
+    <String Id="InstallDirDlgFolderLabel"                           Overridable="yes">Yükle [ProductName] to:</String>
+
+    <!-- WixInstallDirDlgTitle -->
+    <String Id="InstallDirDlg_Title"                                Overridable="yes">[ProductName] Setup</String>
+    <String Id="InstallDirDlgChange"                                Overridable="yes">&amp;Change...</String>
+    <String Id="InstallDirDlgTitle"                                 Overridable="yes">{\WixUI_Font_Title}Destination Folder</String>
+    <String Id="InstallDirDlgDescription"                           Overridable="yes">Click Next to install by default or Change to choose another.</String>
+    <String Id="InstallDirDlgFolderLabel"                           Overridable="yes">Install [ProductName] to:</String>
+    <String Id="Product_ProductIsTooOld"                            Overridable="yes">Update to this version is not allowed. You should first upgrade to version 2.6</String>
+</WixLocalization>

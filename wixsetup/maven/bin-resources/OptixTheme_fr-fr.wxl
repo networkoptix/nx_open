@@ -58,7 +58,7 @@
   <String Id="FilesInUseDontCloseRadioButton">Ne fermez pas les applications. Un redémarrage sera nécessaire</String>
   <String Id="FilesInUseOkButton">OK</String>
   <String Id="FilesInUseCancelButton">Annuler</String>
-  <String Id="InstallLicenseText">En cliquant sur « Accepter et installer » vous acceptez</String>
+  <String Id="InstallLicenseText">En cliquant sur «Accepter et installer» vous acceptez</String>
   <String Id="Options">Options</String>
   <String Id="SelectApps">Sélectionnez les applications à installer:</String>
 </WixLocalization>

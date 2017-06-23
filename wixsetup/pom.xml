@@ -19,9 +19,10 @@
         <skip.test>true</skip.test>
         <skip.compress>true</skip.compress>
         <nxtool>false</nxtool>
-        <NxtoolQuickControlsDir>${libdir}\bin\${build.configuration}\qml\QtQuick\Controls</NxtoolQuickControlsDir>
-        <ClientFontsDir>${libdir}\bin\${build.configuration}\fonts</ClientFontsDir>
-        <ClientQmlDir>${libdir}\bin\${build.configuration}\qml</ClientQmlDir>
+        <target_bin_path>${libdir}\bin\${build.configuration}</target_bin_path>
+        <NxtoolQuickControlsDir>${target_bin_path}\qml\QtQuick\Controls</NxtoolQuickControlsDir>
+        <ClientFontsDir>${target_bin_path}\fonts</ClientFontsDir>
+        <ClientQmlDir>${target_bin_path}\qml</ClientQmlDir>
         <VC14RedistPath>${environment.dir}/packages/${rdep.target}/vcredist-2015</VC14RedistPath>
         <rdep.packages>vcredist-2015 vmaxproxy-2.1 any/help</rdep.packages>
     </properties>

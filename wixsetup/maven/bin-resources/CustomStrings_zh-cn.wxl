@@ -1,0 +1,110 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<WixLocalization Culture="zh-CN" xmlns="http://schemas.microsoft.com/wix/2006/localization">
+    <String Id="AdvancedWelcomeEulaDlg_Title"                       Overridable="yes">[ProductTitle]</String>
+    <String Id="BrowseDlg_Title"                                    Overridable="yes">[ProductTitle]</String>
+    <String Id="CancelDlg_Title"                                    Overridable="yes">[ProductTitle]</String>
+    <String Id="CustomizeDlg_Title"                                 Overridable="yes">[ProductTitle]</String>
+    <String Id="DiskCostDlg_Title"                                  Overridable="yes">[ProductTitle]</String>
+    <String Id="ErrorDlg_Title"                                     Overridable="yes">[ProductTitle]</String>
+    <String Id="ExitDialog_Title"                                   Overridable="yes">[ProductTitle]</String>
+    <String Id="FatalError_Title"                                   Overridable="yes">[ProductTitle]</String>
+    <String Id="FeaturesDlg_Title"                                  Overridable="yes">[ProductTitle]</String>
+    <String Id="FilesInUse_Title"                                   Overridable="yes">[ProductTitle]</String>
+    <String Id="InstallDirDlg_Title"                                Overridable="yes">[ProductTitle]</String>
+    <String Id="InstallScopeDlg_Title"                              Overridable="yes">[ProductTitle]</String>
+    <String Id="InvalidDirDlg_Title"                                Overridable="yes">[ProductTitle]</String>
+    <String Id="LicenseAgreementDlg_Title"                          Overridable="yes">[ProductTitle]</String>
+    <String Id="MaintenanceTypeDlg_Title"                           Overridable="yes">[ProductTitle]</String>
+    <String Id="MaintenanceWelcomeDlg_Title"                        Overridable="yes">[ProductTitle]</String>
+    <String Id="MsiRMFilesInUse_Title"                              Overridable="yes">[ProductTitle]</String>
+    <String Id="OutOfDiskDlg_Title"                                 Overridable="yes">[ProductTitle]</String>
+    <String Id="OutOfRbDiskDlg_Title"                               Overridable="yes">[ProductTitle]</String>
+    <String Id="PrepareDlg_Title"                                   Overridable="yes">[ProductTitle]</String>
+    <String Id="ProgressDlg_Title"                                  Overridable="yes">[ProductTitle]</String>
+    <String Id="ResumeDlg_Title"                                    Overridable="yes">[ProductTitle]</String>
+    <String Id="SetupTypeDlg_Title"                                 Overridable="yes">[ProductTitle]</String>
+    <String Id="UserExit_Title"                                     Overridable="yes">[ProductTitle]</String>
+    <String Id="VerifyReadyDlg_Title"                               Overridable="yes">[ProductTitle]</String>
+    <String Id="WaitForCostingDlg_Title"                            Overridable="yes">[ProductTitle]</String>
+    <String Id="WelcomeDlg_Title"                                   Overridable="yes">[ProductTitle]</String>
+    <String Id="WelcomeEulaDlg_Title"                               Overridable="yes">[ProductTitle]</String>
+
+    <!-- Standard Strings (Common Buttons, Labels etc) -->
+    <String Id="StdString_Ok"                                       Overridable="yes">确定</String>
+    <String Id="StdString_Warning"                                  Overridable="yes">警告</String>
+    <String Id="StdString_SetupTitle"                               Overridable="yes">[ProductName] 安装</String>
+
+    <!-- Associations -->
+    <String Id="Associations_PlayWith"                              Overridable="yes">运行 [ProductName]</String>
+
+    <!-- ClientDlg -->
+    <String Id="ClientDlg_Shortcut"                                 Overridable="yes">快捷方式</String>
+    <String Id="ClientDlg_InstallShortcut"                          Overridable="yes">请创建桌面快捷方式。</String>
+
+    <!-- NxtoolDlg -->
+    <String Id="NxtoolDlg_Shortcut"                                 Overridable="yes">快捷方式</String>
+    <String Id="NxtoolDlg_InstallShortcut"                          Overridable="yes">请创建桌面快捷方式。</String>
+
+    <!-- DowngradeWarningDlg -->
+    <String Id="DowngradeWarningDlg_DowngradeWarning"               Overridable="yes">已安装 [ProductName]软件的一个版本.</String>
+
+
+
+
+    <!-- MediaDirDlg -->
+    <String Id="MediaDirDlg_MediaFolderLabel"                       Overridable="yes">点击“下一步”软件将安装在默认路径。如果需要更改路径，请点击“浏览“选择安装路径.</String>
+    <String Id="MediaDirDlg_MediaFolder"                            Overridable="yes">媒体根目录文件夹</String>
+    <String Id="MediaDirDlg_SelectMediaFolder"                      Overridable="yes">请选择媒体根目录文件夹：</String>
+    <String Id="MediaDirDlg_LoginLabel"                             Overridable="yes">登录</String>
+
+
+    <!-- MyExitDialog -->
+
+    <!-- MyFeaturesDlg -->
+    <String Id="MyFeaturesDlg_Components"                           Overridable="yes">组件</String>
+    <String Id="MyFeaturesDlg_Client"                               Overridable="yes">[clientInternalName] (客户端，可以使用它访问视频和录像)</String>
+    <String Id="MyFeaturesDlg_Mediaserver"                          Overridable="yes">[mediaserverName] (媒体存储服务，用于视频流媒体转发及录像存储)</String>
+
+
+
+
+
+    <!-- Product -->
+    <String Id="Product_LaunchClient"                               Overridable="yes">当 [ProductName] 安装成后自动运行.</String>
+    <String Id="Product_LaunchNxtool"                               Overridable="yes">当 [nxtoolName] 安装成后自动运行.</String>
+     <String Id="Product_ArchMismatch_x86"                               Overridable="yes">这个包是专为32位操作系统.安装程序将无法继续.</String>
+     <String Id="Product_ArchMismatch_x64"                               Overridable="yes">这个包是专为64位操作系统.安装程序将无法继续.</String>
+    <String Id="Product_CloudHostMismatch"                          Overridable="yes">This beta package is for another cloud instance. Please disconnect from the cloud first. Setup will now exit.</String>
+
+    <!-- SelectionWarningDlg -->
+    <String Id="SelectionWarningDlg_ComponentSelectedMessage"       Overridable="yes">请选择您所需要安装的组件！</String>
+
+
+    <!-- UpgradeDlg -->
+    <String Id="UpgradeDlg_PreviousDetected"                        Overridable="yes">发现已安装版本</String>
+    <String Id="UpgradeDlg_InstallationType"                        Overridable="yes">安装方式</String>
+    <String Id="UpgradeDlg_UpgradeMessage"                          Overridable="yes">系统将开始更新！</String>
+    <String Id="UpgradeDlg_DatabaseRecovery"                        Overridable="yes">您的数据库被破坏，无法恢复。新的数据库已经安装。要访问该系统请使用登录名“admin”和密码“admin”。请在首次登录后更改凭据。</String>
+
+    <!-- WixSchedFirewallExceptions -->
+    <String Id="msierrFirewallCannotConnect"                        Overridable="yes">不能连接到windows防火墙。  ([2]   [3]   [4]   [5])</String>
+    <String Id="WixSchedFirewallExceptionsInstall"                  Overridable="yes">配置windows防火墙</String>
+    <String Id="WixSchedFirewallExceptionsUninstall"                Overridable="yes">正在配置windows防火墙</String>
+    <String Id="WixRollbackFirewallExceptionsInstall"               Overridable="yes">正在回滚到windows防火墙配置</String>
+    <String Id="WixExecFirewallExceptionsInstall"                   Overridable="yes">正在安装windows防火墙配置</String>
+    <String Id="WixRollbackFirewallExceptionsUninstall"             Overridable="yes">正在回滚到windows防火墙配置</String>
+    <String Id="WixExecFirewallExceptionsUninstall"                 Overridable="yes">不能安装windows防火墙配置</String>
+
+    <!-- WixInstallDirDlgTitle -->
+    <String Id="InstallDirDlg_Title"                                Overridable="yes">[ProductName] Setup</String>
+    <String Id="InstallDirDlgChange"                                Overridable="yes">&amp;Change...</String>
+    <String Id="InstallDirDlgTitle"                                 Overridable="yes">{\WixUI_Font_Title}Destination Folder</String>
+    <String Id="InstallDirDlgDescription"                           Overridable="yes">Click Next to install by default or Change to choose another.</String>
+    <String Id="InstallDirDlgFolderLabel"                           Overridable="yes">Install [ProductName] to:</String>
+    <String Id="Product_ProductIsTooOld"                            Overridable="yes">Update to this version is not allowed. You should first upgrade to version 2.6</String>
+
+    <String Id="InstallerTitleClientOnly"                           Overridable="yes">Client only</String>
+    <String Id="InstallerTitleServerOnly"                           Overridable="yes">Server only</String>
+    <String Id="InstallerTitleBundle"                               Overridable="yes">Client &amp; Server</String>
+    <String Id="InstallerTitleServerTool"                           Overridable="yes">Server tool</String>
+</WixLocalization>

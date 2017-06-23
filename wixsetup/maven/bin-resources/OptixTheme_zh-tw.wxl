@@ -58,7 +58,7 @@
   <String Id="FilesInUseDontCloseRadioButton">請勿關閉應用程式. 將需要重新開機</String>
   <String Id="FilesInUseOkButton">確定</String>
   <String Id="FilesInUseCancelButton">取消</String>
-  <String Id="InstallLicenseText">按一下 \"接受並安裝\" 表示您同意</String>
+  <String Id="InstallLicenseText">按一下 "接受並安裝" 表示您同意</String>
   <String Id="Options">選項</String>
   <String Id="SelectApps">選擇要安裝的應用程式︰</String>
 </WixLocalization>
