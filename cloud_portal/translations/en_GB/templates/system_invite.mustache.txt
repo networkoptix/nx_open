@@ -1,0 +1,15 @@
+Hello,
+
+{{#message.sharer_name}}
+{{message.sharer_name}} ({{message.sharer_email}}) has shared access to video management system "{{message.system_name}}" with you.
+
+To view and manage it, please visit the link below to create account on {{PRODUCT_NAME}} and follow further instructions.
+{{/message.sharer_name}}
+
+{{^message.sharer_name}}
+You have been granted access to video management system "{{message.system_name}}".
+You have been granted access to video management system "{{message.system_name}}".
+{{/message.sharer_name}}
+
+{{config.portal_url}}/register/{{message.code}}
+

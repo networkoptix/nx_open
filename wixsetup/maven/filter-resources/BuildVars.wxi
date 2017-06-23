@@ -3,6 +3,7 @@
     <?define installerLanguage="${installer.language}"?>
     <?define companyName="${company.name}"?>
     <?define ServerRegPath="Software\${company.name}\${mediaserver.name}"?>
+    <?define ProductTitle="${product.title}"?>
 
     <?define serverUpgradeCode = "${customization.upgradeCode}"?>
     <?define clientUpgradeCode = "${customization.clientUpgradeCode}"?>

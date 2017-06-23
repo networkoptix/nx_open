@@ -1,0 +1,180 @@
+<div class="container">
+    <div class="row">
+        <div class="col-md-4 col-md-push-8">
+            <system-info></system-info>
+        </div>
+        <div class="col-md-8 col-md-pull-4">
+            <alert type="danger" ng-if="settings.flags.noHDD">
+                Bu cihaz dahili bir disk ile çalışabilir.<br>Lütfen cihazı kapatıp bir disk ekleyin.
+            </alert>
+            <alert type="danger" ng-if="!settings.flags.noHDD && settings.flags.noNetwork">
+                Cihazın çalışabilmesi için ağ bağlantısına ihtiyacı var.<br>
+Lütfen cihazı yerel ağa bağlayın
+            </alert>
+            <alert type="danger" ng-if="!settings.flags.noHDD && !settings.flags.noNetwork && settings.flags.wrongNetwork">
+                Cihaz yanlış ağ ayarına sahip.<br>
+Lütfen ağa bağlanın veya doğru IP Adresini yazın.
+            </alert>
+
+
+            <tabset ng-hide="settings.flags.brokenSystem || settings.flags.cleanSystem">
+                <tab heading="{{L.settings.tabs.server}}" active="active.server">
+                    <div>
+                        <form novalidate name="settingsForm" class="form-horizontal" role="form" >
+                            <h3>Port</h3>
+                            <div class="form-group" ng-class="{'has-error':!settingsForm.port.$valid}">
+                                <div class="col-xs-6">
+                                    <input type="number" class="form-control" id="port" placeholder="Port" name="port" ng-model="settings.port"
+                                           min="1"  max="65000"
+                                           pattern ="^\d*$" required>
+                                </div>
+
+                                <div class="col-xs-6">
+                                    <button type="button" class="btn btn-primary" ng-disabled="!settingsForm.$valid" ng-click="save()">Portu değiştir</button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+
+                    <div>
+                        <h3>Sunucuyu sıfırla</h3>
+                        <p>Bu işlem sunucuyu varsayılan ayarlarına çevirir ( veritabanı ve ayarlar silinir). Sunucu sistemden düşürülecektir. Video kayıtları ise olduğu gibi kalır.</p>
+                        <p><button type="button" class="btn btn-default" ng-click="openRestoreDefaultsDialog()">Fabrika ayarlarına geri yükle</button></p>
+                    </div>
+                    <div>
+                        <h3>Yeniden Başlat</h3>
+                        <p><button type="button" class="btn btn-default" ng-click="restart()">Sunucuyu Yeniden Başlatın</button>
+                            <button type="button" class="btn btn-default" ng-if="canHardwareRestart" ng-click="hardwareRestart()">Yeniden Başlat</button></p>
+                    </div>
+                    <div ng-if="user.isOwner">
+                        <form novalidate name="rootPasswordForm" class="form-horizontal" role="form" >
+                            <h3>Yönetici parolasını değiştir</h3>
+                            <p>Eğer sistem yerel ise ( buluta bağlı değil ise) parola "admin" olarak değişecektir.<br>
+                                Aksi halde sadece kurtarma (root) parolası değişecektir.</p>
+                            <div class="col-sm-6">
+                                <password-input auto-focus="false" ng-model="settings.rootPassword"></password-input>
+                            </div>
+
+                            <div class="col-sm-6">
+                                <button type="button" class="btn btn-primary" ng-disabled="!rootPasswordForm.$valid"
+                                        ng-click="changePassword()">Şifre değiştir</button>
+                            </div>
+                        </form>
+                    </div>
+                </tab>
+
+                <tab heading="{{L.settings.tabs.system}}" active="active.system">
+                    <div>
+                        <h3>Ad</h3>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <input class="form-control" type="text" ng-model="settings.systemName">
+                            </div>
+
+                            <div class="col-md-6">
+                                <button type="button" class="btn btn-default" ng-click="renameSystem()">Sistemi yeniden adlandır</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div ng-if="canMerge" >
+                        <form class="form-horizontal" >
+                            <h3>Sistemleri Birleştir</h3>
+                            <p><button type="button" class="btn btn-default" ng-click="openJoinDialog()">Sistemleri Birleştir</button></p>
+                        </form>
+                    </div>
+
+                    <div>
+                        <h3>{{Config.cloud.productName}}</h3>
+
+                        <div ng-if="cloudSystemID">
+                            <p>Bu sistem {{Config.cloud.productName}}, sistem sahibi: <b>{{cloudAccountName}}</b></p>
+                            <p ng-if="canConnectToCloud"><button class="btn btn-default" ng-click="disconnectFromCloud()">Çıkış yap {{Config.cloud.productName}}</button></p>
+                            <p><a ng-if="!mode.liteClient"
+                                  ng-href="{{Config.cloud.portalUrl}}{{Config.cloud.portalSystemUrl.replace('{systemId}',cloudSystemID) + Config.cloud.webadminContext}}"
+                                  target="_blank">Git {{Config.cloud.productName}} Portal</a></p>
+                        </div>
+
+                        <div ng-if="!cloudSystemID">
+                            <alert type="warning">Bu sistem {{Config.cloud.productName}} ile bağlı.
+                                <a ng-if="!mode.liteClient"
+                                   ng-href="{{Config.cloud.portalUrl}}"
+                                   target="_blank">Daha fazla bilgi</a></alert>
+                            <alert type="error" ng-if="!hasInternetOnServer">{{Config.cloud.productName}} ayarlamak için sunucuyu internete bağlayın</alert>
+                            <alert type="error" ng-if="hasInternetOnServer && !hasInternetOnClient">{{Config.cloud.productName}} bağlanmak için internet gereklidir</alert>
+                            <p ng-if="canConnectToCloud"  ><button
+                                    class="btn btn-default"
+                                    ng-click="connectToCloud()" ng-disabled="!hasInternetOnServer || !hasInternetOnClient">Bağlan {{Config.cloud.productName}}</button>
+                                <a ng-if="!mode.liteClient"  class="btn btn-default"
+                                   ng-href="{{Config.cloud.portalUrl + Config.cloud.portalRegisterUrl + Config.cloud.webadminContext}}"
+                                   target="_blank">Hesap {{Config.cloud.productName}} Yarat</a></p>
+                        </div>
+                    </div>
+                </tab>
+
+                <tab heading="{{L.settings.tabs.device}}" active="active.device" ng-if="controlDevice">
+                    <div ng-if="settings.flags.canSetupNetwork">
+                        <h3>Cihaz Ağ Ayarları</h3>
+                        <network-settings settings="networkSettings[0]" ng-if="networkSettings"></network-settings>
+                        <button class="btn btn-default" ng-click="saveNetworkSettings()">Ayarları kaydet ve cihazı yeniden başlat</button>
+                    </div>
+                    <div ng-if="settings.flags.canSetupTime">
+                        <h3>Tarih ve Zaman</h3>
+                        <form name="timeSettings">
+                            <table>
+                                <tbody>
+                                    <tr>
+                                        <td><label for="timeZone">Zaman Dilimi</label></td>
+                                        <td><label for="date">Tarih</label></td>
+                                        <td><label for="time">Zaman</label></td>
+                                        <td></td>
+                                    </tr>
+                                    <tr>
+                                        <td><select class="form-control"
+                                                    ng-options="zone.id as zone.name for zone in timeZones"
+                                                    id="timeZone"
+                                                    name="timeZone"
+                                                    ng-model="dateTimeSettings.timeZone"
+                                                    required></select></td>
+                                        <td>
+                                            <div class="input-group">
+                                                <input type="text"
+                                                       id="date" name="date"
+                                                       class="form-control"
+                                                       datepicker-popup="{{Config.dateSettingsFormat}}"
+                                                       ng-model="dateTimeSettings.dateTime"
+                                                       required
+ is-open="dateTimeSettings.openDate"
+                                                       close-text="Close" />
+                                                <span class="input-group-btn">
+                                                    <button type="button"
+                                                            class="btn btn-default"
+                                                            ng-click="openDatePicker($event)"><i class="glyphicon glyphicon-calendar"></i></button>
+                                                </span>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <input class="form-control" ng-model="dateTimeSettings.dateTime" ui-timepicker>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </form>
+                        <button class="btn btn-default" ng-click="saveDateTime()">Tarih ve Saati Kaydet</button>
+                    </div>
+                    <div ng-if="(canRestoreSettings || canRestoreSettingsNotNetwork)">
+                        <h3>Sunucu Ayarlarını Geri Yükleme</h3>
+                        <p><button type="button" class="btn btn-default" ng-if="canRestoreSettings" ng-click="restoreSettings()">Tam Geri Yükleme</button>
+                            <button type="button" class="btn btn-default" ng-if="canRestoreSettingsNotNetwork" ng-click="restoreSettingsNotNetwork()">Ağ ayarları hariç geri yükleme</button></p>
+                    </div>
+                    <div ng-if="canRunClient || canStopClient">
+                        <h3>Sunucuda istemci uygulamasını başlat</h3>
+                        <p><button type="button" class="btn btn-default" ng-if="canRunClient" ng-click="runClient()">İstemciyi başlat</button>
+                            <button type="button" class="btn btn-default" ng-if="canStopClient" ng-click="stopClient()">İstemciyi durdur</button></p>
+                        <p>Kontrol etmek için bir klavye/mouse veya mobil uygulama kullan.</p>
+                    </div>
+                </tab>
+            </tabset>
+        </div>
+    </div>
+</div>
