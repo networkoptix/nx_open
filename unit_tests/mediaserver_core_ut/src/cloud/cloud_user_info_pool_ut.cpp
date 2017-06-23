@@ -41,6 +41,11 @@ public:
         m_pool->userInfoChanged(name, info);
     }
 
+    void removeUser(const nx::Buffer& name)
+    {
+        m_pool->userInfoRemoved(name);
+    }
+
 private:
     AbstractCloudUserInfoPool* m_pool;
 };
@@ -137,6 +142,22 @@ protected:
         supplier->setUserInfo(petya, petyaAuthInfo);
     }
 
+    void whenFirstUserIsRemoved()
+    {
+        supplier->removeUser("vasya");
+    }
+
+    void thenSecondStillCanAuth()
+    {
+        ASSERT_FALSE(userInfoPool.authenticate(
+            kTestMethod,
+            generateAuthHeader("vasya", *userInfoPool.newestMostCommonNonce())));
+
+        ASSERT_TRUE(userInfoPool.authenticate(
+            kTestMethod,
+            generateAuthHeader("petya", *userInfoPool.newestMostCommonNonce())));
+    }
+
     void thenBothUsersCanAuthenticateUsingNewestMostCommonNonce()
     {
         ASSERT_TRUE(userInfoPool.authenticate(
@@ -171,6 +192,13 @@ TEST_F(CloudUserInfoPool, commonNonce_twoUsers_bothNonceAreCommon)
     given2UsersInfosWithCommonFirstNonce();
     andWhenSecondUserNonceInfoIsUpdated();
     thenBothUsersCanAuthenticateUsingNewestMostCommonNonce();
+}
+
+TEST_F(CloudUserInfoPool, commonNonce_twoUsers_onlyFirstNonceIsCommon_SecondRemoved)
+{
+    given2UsersInfosWithCommonFirstNonce();
+    whenFirstUserIsRemoved();
+    thenSecondStillCanAuth();
 }
 
 
