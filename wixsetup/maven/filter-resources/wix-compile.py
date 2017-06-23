@@ -125,7 +125,7 @@ def get_light_command(folder, msi, suffix):
     command.append('${libdir}/bin/${build.configuration}/cab')
     command.append('-reusecab')
     command.append('-loc')
-    command.append('CustomStrings_${installer.language}.wxl')
+    command.append('CustomStrings.wxl')
     command.append('-out')
     command.append('{0}/{1}'.format(folder, msi))
     command.append('-pdbout')
