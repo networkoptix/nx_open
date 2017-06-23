@@ -1,6 +1,8 @@
 from ..models import *
 import os
 import re
+import json
+import codecs
 
 
 STATIC_DIR = 'static/{{customization}}/source/'
@@ -114,6 +116,22 @@ def process_file(source_file, customization, product_id, preview, version_id):
         file.write(content)
 
 
+def generate_languages_json(customization_name, preview):
+    def save_content(filename, content):
+        if filename:
+            # proceed with branding
+            make_dir(filename)
+            with codecs.open(filename, "w", "utf-8") as file:
+                file.write(content)
+    customization = Customization.objects.get(name=customization_name)
+    languages_json = [{"name": lang.name, "language": lang.code} for lang in customization.languages.all()]
+    if not preview:
+        target_file = os.path.join('static', customization.name, 'static', 'languages.json')
+    else:
+        target_file = os.path.join('static', customization.name, 'preview', 'static', 'languages.json')
+    save_content(target_file, json.dumps(languages_json, ensure_ascii=False))
+
+
 def fill_content(customization_name='default', product='cloud_portal', preview=True, version_id=None):
 
     # if preview=False
@@ -141,5 +159,5 @@ def fill_content(customization_name='default', product='cloud_portal', preview=T
     for source_file in iterate_cms_files(customization_name, False):
         process_file(source_file, customization, product_id, preview, version_id)
 
-
+    generate_languages_json(customization_name, preview)
 # from cms.controllers.filldata import *
