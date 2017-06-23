@@ -90,7 +90,8 @@ void QnModuleInformationRestHandler::afterExecute(
         || !socket->setRecvTimeout(kConnectionTimeout)
         || !socket->setKeepAlive(kKeepAliveOptions))
     {
-        NX_WARNING(this) "Failed to configure connection from" << socket->getForeignAddress();
+        NX_WARNING(this, lm("Failed to configure connection from %1: %2")
+            .args(socket->getForeignAddress(), SystemError::getLastOSErrorText()));
         return;
     }
 
