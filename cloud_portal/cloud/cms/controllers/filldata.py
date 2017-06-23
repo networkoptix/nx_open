@@ -16,9 +16,12 @@ def make_dir(filename):
                 raise
 
 
-def customizable_file(filename):
-    supported_format = filename.endswith('.json') or filename.endswith('.html') or filename.endswith('.mustache')
-    supported_directory = "lang_" not in filename or "lang_en_US" in filename
+def customizable_file(filename, ignore_not_english):
+    supported_format = filename.endswith('.json') or \
+                       filename.endswith('.html') or \
+                       filename.endswith('.mustache') or \
+                       filename.endswith('apple-app-site-association')
+    supported_directory = not ignore_not_english or "lang_" not in filename or "lang_en_US" in filename
     return supported_format and supported_directory
 
 
@@ -33,12 +36,12 @@ def context_for_file(filename, customization_name):
     return context_name, language
 
 
-def iterate_cms_files(customization_name):
+def iterate_cms_files(customization_name, ignore_not_english):
     custom_dir = STATIC_DIR.replace("{{customization}}", customization_name)
     for root, dirs, files in os.walk(custom_dir):
         for filename in files:
             file = os.path.join(root, filename)
-            if customizable_file(file):
+            if customizable_file(file, ignore_not_english):
                 yield file
 
 
@@ -94,7 +97,7 @@ def process_file(source_file, customization, product_id, preview, version_id):
         content = process_context_structure(customization, context.first(), content, language, version_id)
     if branding_context.exists():
         content = process_context_structure(customization, branding_context.first(), content, None, version_id)
-        
+
     filename = context_name
     if language_code:
         filename = filename.replace("{{language}}", language_code)
@@ -132,7 +135,7 @@ def fill_content(customization_name='default', product='cloud_portal', preview=T
     # here we use version_id if specified, or latest data records otherwise
 
     # iterate all files (same way we fill structure)
-    for source_file in iterate_cms_files(customization_name):
+    for source_file in iterate_cms_files(customization_name, False):
         process_file(source_file, customization, product_id, preview, version_id)
 
 

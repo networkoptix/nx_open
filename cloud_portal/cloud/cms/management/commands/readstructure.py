@@ -60,7 +60,7 @@ def read_structure_file(filename, product_id):
 
 def read_structure():
     product_id = Product.objects.get(name='cloud_portal').id
-    for file in filldata.iterate_cms_files('default'):
+    for file in filldata.iterate_cms_files('default', True):
         read_structure_file(file, product_id)
 
 
