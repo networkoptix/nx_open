@@ -1,5 +1,9 @@
 #include "temporary_account_password_manager.h"
 
+#include <boost/algorithm/string/classification.hpp>
+#include <boost/algorithm/string/join.hpp>
+#include <boost/algorithm/string/split.hpp>
+
 #include <QtSql/QSqlQuery>
 
 #include <nx/fusion/model_functions.h>
@@ -102,15 +106,6 @@ void TemporaryAccountPasswordManager::registerTemporaryCredentials(
         });
 }
 
-std::string TemporaryAccountPasswordManager::generateRandomPassword() const
-{
-    std::string password(nx::utils::random::number<size_t>(10, 20), 'a');
-    std::generate(
-        password.begin(), password.end(),
-        []() { return nx::utils::random::number<int>('a', 'z'); });
-    return password;
-}
-
 void TemporaryAccountPasswordManager::addRandomCredentials(
     data::TemporaryAccountCredentials* const data)
 {
@@ -168,6 +163,49 @@ nx::db::DBResult TemporaryAccountPasswordManager::registerTemporaryCredentials(
         std::move(tmpPasswordDataInternal));
 }
 
+nx::db::DBResult TemporaryAccountPasswordManager::fetchTemporaryCredentials(
+    nx::db::QueryContext* const queryContext,
+    const data::TemporaryAccountCredentials& tempPasswordData,
+    data::Credentials* credentials)
+{
+    QSqlQuery fetchTempPasswordQuery(*queryContext->connection());
+    fetchTempPasswordQuery.prepare(R"sql(
+        SELECT ap.login, ap.password_ha1 AS passwordString
+        FROM account_password ap, account a
+        WHERE ap.account_id=a.id AND a.email=:accountEmail
+            AND max_use_count=:maxUseCount
+            AND is_email_code=:isEmailCode
+            AND access_rights=:accessRights
+            AND prolongation_period_sec=:prolongationPeriodSec
+            AND use_count=0
+        )sql");
+    QnSql::bind(tempPasswordData, &fetchTempPasswordQuery);
+    fetchTempPasswordQuery.bindValue(
+        ":accessRights",
+        QnSql::serialized_field(tempPasswordData.accessRights.toString()));
+    if (!fetchTempPasswordQuery.exec())
+    {
+        NX_LOG(lm("Error fetching temporary password for account %1. %2")
+            .arg(tempPasswordData.accountEmail).arg(fetchTempPasswordQuery.lastError().text()),
+            cl_logDEBUG1);
+        return db::DBResult::ioError;
+    }
+
+    if (!fetchTempPasswordQuery.next())
+        return nx::db::DBResult::notFound;
+
+    credentials->login = fetchTempPasswordQuery.value("login").toString().toStdString();
+    const auto passwordString =
+        fetchTempPasswordQuery.value("passwordString").toString().toStdString();
+
+    std::string passwordHa1;
+    parsePasswordString(passwordString, &passwordHa1, &credentials->password);
+    if (credentials->password.empty()) //< True for credentials created before this code has been written.
+        return nx::db::DBResult::notFound;
+
+    return nx::db::DBResult::ok;
+}
+
 boost::optional<TemporaryAccountCredentialsEx> 
     TemporaryAccountPasswordManager::getCredentialsByLogin(
         const std::string& login) const
@@ -178,6 +216,15 @@ boost::optional<TemporaryAccountCredentialsEx>
     if (it == temporaryCredentialsByLogin.cend())
         return boost::none;
     return *it;
+}
+
+std::string TemporaryAccountPasswordManager::generateRandomPassword() const
+{
+    std::string password(nx::utils::random::number<size_t>(10, 20), 'a');
+    std::generate(
+        password.begin(), password.end(),
+        []() { return nx::utils::random::number<int>('a', 'z'); });
+    return password;
 }
 
 bool TemporaryAccountPasswordManager::isTemporaryPasswordExpired(
@@ -252,8 +299,13 @@ nx::db::DBResult TemporaryAccountPasswordManager::fetchTemporaryPasswords(
 
     std::vector<TemporaryAccountCredentialsEx> tmpPasswords;
     QnSql::fetch_many(readPasswordsQuery, &tmpPasswords);
-    for (auto& tmpPassword : tmpPasswords)
+    for (auto& tmpPassword: tmpPasswords)
     {
+        // TODO: #ak Currently, password_ha1 is actually password_ha1[:plain-text password].
+        // Will switch to a single plain-text password field in a future version.
+        std::string password;
+        parsePasswordString(tmpPassword.passwordHa1, &tmpPassword.passwordHa1, &password);
+
         tmpPassword.accessRights.parse(tmpPassword.accessRightsStr);
         std::string login = tmpPassword.login;
         m_temporaryCredentials.insert(std::move(tmpPassword));
@@ -273,13 +325,20 @@ nx::db::DBResult TemporaryAccountPasswordManager::insertTempPassword(
             expiration_timestamp_utc, prolongation_period_sec, max_use_count, 
             use_count, is_email_code, access_rights) 
         VALUES (:id, (SELECT id FROM account WHERE email=:accountEmail), :login, 
-            :passwordHa1, :realm, :expirationTimestampUtc, :prolongationPeriodSec, 
+            :passwordString, :realm, :expirationTimestampUtc, :prolongationPeriodSec, 
             :maxUseCount, :useCount, :isEmailCode, :accessRights)
         )sql");
     QnSql::bind(tempPasswordData, &insertTempPasswordQuery);
     insertTempPasswordQuery.bindValue(
         ":accessRights",
         QnSql::serialized_field(tempPasswordData.accessRights.toString()));
+
+    auto passwordString = preparePasswordString(
+        tempPasswordData.passwordHa1,
+        tempPasswordData.password);
+    insertTempPasswordQuery.bindValue(
+        ":passwordString",
+        QnSql::serialized_field(passwordString));
     if (!insertTempPasswordQuery.exec())
     {
         NX_LOG(lm("Could not insert temporary password for account %1 into DB. %2")
@@ -385,6 +444,35 @@ void TemporaryAccountPasswordManager::updateExpirationRulesAfterSuccessfulLogin(
         [](TemporaryAccountCredentialsEx& value) { ++value.useCount; });
 
     // TODO: #ak prolonging expiration period if present.
+}
+
+void TemporaryAccountPasswordManager::parsePasswordString(
+    const std::string& passwordString,
+    std::string* passwordHa1,
+    std::string* password)
+{
+    std::vector<std::string> passwordParts;
+    boost::algorithm::split(
+        passwordParts,
+        passwordString,
+        boost::algorithm::is_any_of(":"),
+        boost::algorithm::token_compress_on);
+    if (passwordParts.size() >= 1)
+        *passwordHa1 = passwordParts[0];
+    if (passwordParts.size() >= 2)
+        *password = passwordParts[1];
+}
+
+std::string TemporaryAccountPasswordManager::preparePasswordString(
+    const std::string& passwordHa1,
+    const std::string& password)
+{
+    std::vector<std::string> passwordParts;
+    passwordParts.reserve(2);
+    passwordParts.push_back(passwordHa1);
+    if (!password.empty())
+        passwordParts.push_back(password);
+    return boost::algorithm::join(passwordParts, ":");
 }
 
 } // namespace cdb

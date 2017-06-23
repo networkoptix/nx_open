@@ -1,23 +1,22 @@
-#include <QtCore/QDebug>
-#include <QtCore/QDateTime>
-#include <QtCore/QStringList>
 #include "request_handler.h"
-#include "utils/common/util.h"
+
+#include <QtCore/QDebug>
 
 QnRestRequestHandler::QnRestRequestHandler():
     m_permissions(Qn::NoGlobalPermissions)
 {
-
 }
 
-QString QnRestRequestHandler::extractAction(const QString &path) const {
+QString QnRestRequestHandler::extractAction(const QString& path) const
+{
     QString localPath = path;
     while(localPath.endsWith(L'/'))
         localPath.chop(1);
     return localPath.mid(localPath.lastIndexOf(L'/') + 1);
 }
 
-class QnRestGUIRequestHandlerPrivate {
+class QnRestGUIRequestHandlerPrivate
+{
 public:
     QnRestGUIRequestHandlerPrivate(): result(0), body(0), code(0) {}
 
@@ -32,7 +31,6 @@ public:
 
 QnRestGUIRequestHandler::QnRestGUIRequestHandler(): d_ptr(new QnRestGUIRequestHandlerPrivate)
 {
-
 }
 
 QnRestGUIRequestHandler::~QnRestGUIRequestHandler()
@@ -40,7 +38,11 @@ QnRestGUIRequestHandler::~QnRestGUIRequestHandler()
     delete d_ptr;
 }
 
-int QnRestGUIRequestHandler::executeGet(const QString& path, const QnRequestParamList& params, QByteArray& result, QByteArray& contentType, const  QnRestConnectionProcessor*)
+int QnRestGUIRequestHandler::executeGet(
+    const QString& path,
+    const QnRequestParamList& params,
+    QByteArray& result, QByteArray& contentType,
+    const QnRestConnectionProcessor* /*owner*/)
 {
     Q_D(QnRestGUIRequestHandler);
     d->path = path;
@@ -52,8 +54,14 @@ int QnRestGUIRequestHandler::executeGet(const QString& path, const QnRequestPara
     return d->code;
 }
 
-int QnRestGUIRequestHandler::executePost(const QString& path, const QnRequestParamList& params, const QByteArray& body, const QByteArray& /*srcBodyContentType*/, QByteArray& result, 
-                                         QByteArray& contentType, const  QnRestConnectionProcessor*)
+int QnRestGUIRequestHandler::executePost(
+    const QString& path,
+    const QnRequestParamList& params,
+    const QByteArray& body,
+    const QByteArray& /*srcBodyContentType*/,
+    QByteArray& result,
+    QByteArray& contentType,
+    const QnRestConnectionProcessor* /*owner*/)
 {
     Q_D(QnRestGUIRequestHandler);
     d->params = params;
@@ -73,6 +81,6 @@ void QnRestGUIRequestHandler::methodExecutor()
         d->code = executeGetGUI(d->path, d->params, *d->result);
     else if (d->method == QLatin1String("POST"))
         d->code = executePostGUI(d->path, d->params, *d->body, *d->result);
-    else 
+    else
         qWarning() << "Unknown execute method " << d->method;
 }

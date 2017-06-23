@@ -1,0 +1,497 @@
+<div class="panel-body text-center" ng-if="stepIs(0)">
+    <div class="master-icon"><span class="preloader"></span></div>
+    <div class="vertical-center">
+        <h2>ロード中...</h2>
+    </div>
+</div>
+
+<div class="panel-body text-center" ng-if="stepIs('initFailure')">
+    <div class="master-icon"><span class="icon-fail"></span></div>
+    <h2>システムを初期化できません。</h2>
+    <p class="master-description">
+        認承に失敗しました
+    </p>
+    <p class="master-controls">
+        <button class="btn btn-default" ng-if="canRetry()" ng-click="retry()">再試行</button>
+    </p>
+</div>
+
+
+<div class="panel-body text-center" ng-if="stepIs('brokenSystem')">
+    <div class="master-icon"><span class="icon-fail"></span></div>
+    <h2>システムをセットアップすることはできません</h2>
+    <p class="master-description">システムを構成することはできません <br>
+        <span ng-bind-html="settings.localError"></span>
+    </p>
+    <p class="master-controls">
+        <button class="btn btn-default" ng-if="canRetry()" ng-click="retry()">もう一度やり直してください</button>
+    </p>
+</div>
+
+<div class="panel-body text-center panel-body-big" ng-if="stepIs('start')">
+    <div ng-class="{'vertical-bottom':!settings.liteClient, 'master-description': settings.liteClient}">
+        <h2>{{Config.productName}} を始める</h2>
+        <p>最初にサーバーを構成してください<br>
+オプションを選択します</p>
+        <div class="spacer" ng-if="!settings.liteClient"><br><br><br></div>
+        <button class="btn btn-primary" autofocus ng-click="next()">新しいシステムをセットアップします</button>
+
+        <div class="horisontal-line-text">
+            <span class="line"></span>
+            <span class="text">または</span>
+            <span class="line"></span>
+        </div>
+        <button class="btn btn-default" ng-click="skip()">既存のシステムに追加</button><br>
+        <small>(もし{{Config.productName}} が既に設定されている場合)</small><br>
+        <small ng-if="!settings.liteClient">&nbsp;</small>
+    </div>
+</div>
+
+<div class="panel-body text-center" ng-if="stepIs('systemName')">
+    <h2>システム名を入力してください</h2>
+    <p class="master-description">
+        識別またはシステムを見つけるのために役立ちます
+    </p>
+    <form class="master-controls" name="forms.systemNameForm" novalidate>
+        <div class="form-group" validate-field>
+            <input ng-model="settings.systemName" name="systemName" type="text" class="form-control"
+                   placeholder="システム名" required auto-focus>
+        </div>
+
+        <div class="form-group has-error" ng-if="forms.systemNameForm.systemName.$touched && forms.systemNameForm.systemName.$error.required">
+            <div class="help-block">
+                システム名が必要です
+            </div>
+        </div>
+
+    </form>
+    <p class="vertical-bottom">
+        <a href="" ng-click="next('advanced', true)">詳細設定</a>
+    </p>
+</div>
+
+
+<div class="panel-body text-center" ng-if="stepIs('advanced')">
+    <h2>詳細設定</h2>
+    <form class="master-controls wide text-left" name="forms.advancedSettings" novalidate>
+        <div class="form-group" ng-repeat="(setting, value) in systemSettings">
+            <div class="checkbox" ng-if="Config.settingsConfig[setting].type == 'checkbox' " >
+                <label>
+                    <input type="checkbox" id="{{setting}}"
+                           ng-model="systemSettings[setting]"> <span>{{Config.settingsConfig[setting].label}}</span>
+                </label>
+            </div>
+
+            <label ng-if="Config.settingsConfig[setting].type != 'checkbox' "
+                   for="{{setting}}" >{{Config.settingsConfig[setting].label}}</label>
+            <input ng-if="Config.settingsConfig[setting].type == 'number' " type="number"
+                   id="{{setting}}"
+                   placeholder="{{}}"
+                   ng-model="systemSettings[setting]"
+                   class="form-control input-sm"/>
+            <input ng-if="Config.settingsConfig[setting].type == 'text'" type="text"
+                   id="{{setting}}"
+                   ng-model="systemSettings[setting]"
+                   class="form-control input-sm"/>
+        </div>
+    </form>
+</div>
+
+
+<div class="panel-body text-center"  ng-if="stepIs('chooseCloudOrLocal')">
+    <h2>システムタイプを選択</h2>
+    <div class="row radio-panels">
+        <div class="col-xs-6 radio-panel ">
+            <div class="radio-panel-body"
+                 ng-class="{'selected':!settings.chooseCloudSystem}"
+                 ng-click="settings.chooseCloudSystem = false">
+                <div class="checkbox-icon"></div>
+                <div class="master-icon"><span class="icon-localSystem"></span></div>
+                <h3>ローカル</h3>
+                <p>
+                    ローカルネットワークのみ<br>
+インターネット接続を必要としません
+                </p>
+            </div>
+        </div>
+        <div class="col-xs-6 radio-panel">
+            <div class="radio-panel-body"
+                 ng-class="{'selected':settings.chooseCloudSystem}"
+                 ng-click="settings.chooseCloudSystem = true">
+                <div class="checkbox-icon"></div>
+                <div class="master-icon"><span class="icon-cloud"></span></div>
+                <h3>クラウド</h3>
+                <p>
+                    どこからでも利用できます<br>
+インターネット接続が必要です
+                </p>
+            </div>
+        </div>
+    </div>
+    <p class="vertical-bottom">
+        <a ng-if="!settings.liteClient" class="external" ng-href="{{portalUrl}}" title="learn more about {{Config.cloud.productName}}"
+           target="_blank" ng-click="openLink($event)">ヘルプ</a>
+<span ng-if="settings.liteClient">詳細: {{portalUrl}}</span>
+    </p>
+</div>
+
+
+<div class="panel-body text-center" ng-if="stepIs('cloudIntro')">
+    <div class="master-icon">
+        <span class="icon-account"></span>
+    </div>
+    <h2>{{Config.cloud.productName}} アカウント</h2>
+    <p class="master-description">
+        クラウド システム {{Config.cloud.productName}} を使用するにはアカウントが必要です
+    </p>
+    <p class="master-controls">
+        <button class="btn btn-primary" ng-click="createAccount()" auto-focus>新規アカウントを登録</button>&nbsp;&nbsp;
+<button class="btn btn-default" ng-click="next('cloudLogin', true)">既存アカウントを使用</button>
+    </p>
+</div>
+
+
+<div class="panel-body text-center" ng-if="stepIs('cloudAuthorizedIntro')">
+    <p>システムに接続</p>
+
+    <div class="master-icon"><span class="icon-cloud"></span></div>
+
+    <h2>{{settings.presetCloudEmail}}</h2>
+
+    <p class="vertical-bottom">
+        <a href="" ng-click="next('cloudLogin', true)">別のアカウントに接続</a>
+    </p>
+</div>
+
+<div class="panel-body text-center" ng-if="stepIs('cloudLogin')">
+    <div class="master-icon"><span class="icon-cloud"></span></div>
+
+    <h2><span class="product-name add-version">{{Config.cloud.productName}}</span> へログイン</h2>
+
+    <form class="master-controls" name="forms.cloudForm" novalidate ng-class="{'has-error':settings.cloudError}">
+        <div class="form-group" validate-field>
+            <input ng-model="settings.cloudEmail" name="cloudEmail" class="form-control"
+                   type="email" placeholder="Email" autocomplete="new-password" required auto-focus ng-change="clearCloudError()">
+        </div>
+        <div class="form-group" validate-field>
+            <input ng-model="settings.cloudPassword" name="cloudPassword" class="form-control"
+                   type="password" autocomplete="new-password" required placeholder="パスワード" ng-change="clearCloudError()">
+        </div>
+
+        <div class="checkbox text-left" ng-if="settings.thickClient">
+            <labe>
+                <input ng-model="settings.savePassword" type="checkbox">
+                ログインを維持
+            </labe>
+        </div>
+
+        <div class="form-group has-error"
+             ng-if="forms.cloudForm.cloudEmail.$touched && forms.cloudForm.cloudEmail.$error.email">
+            <div class="help-block">
+                有効なメールアドレスを入力して下さい
+            </div>
+        </div>
+
+        <div class="form-group has-error"
+             ng-if="forms.cloudForm.cloudEmail.$touched && forms.cloudForm.cloudEmail.$error.required ||
+                    forms.cloudForm.cloudPassword.$touched && forms.cloudForm.cloudPassword.$error.required">
+            <div class="help-block">
+                メール アドレスとパスワードが必要
+            </div>
+        </div>
+
+        <div class="form-group has-error" ng-if="settings.cloudError">
+            <p class="help-block">
+                {{settings.cloudError}}
+            </p>
+        </div>
+
+        <div class="form-group" ng-if="settings.liteClient">
+            <p class="help-block">
+                アカウント登録は {{portalUrl}} を参照してください
+            </p>
+        </div>
+    </form>
+</div>
+
+<div class="panel-body text-center" ng-if="stepIs('localLogin')">
+    <h2>管理者パスワードを設定</h2>
+    <form class="master-controls" name="forms.localForm" novalidate disable-autocomplete>
+        <div class="form-group" validate-field>
+            <!-- <input ng-model="settings.localLogin" name="localLogin" class="form-control"
+                   type="text" placeholder="Login" required readonly> -->
+            <div class="form-control text-left readonly" readonly>{{settings.localLogin}}</div>
+        </div>
+        <password-input ng-model="settings.localPassword"></password-input>
+        <div class="form-group" validate-field ng-class="{'has-error':forms.localForm.passwordInput.$valid &&
+                     forms.localForm.localPasswordConfirmation.$valid &&
+                     forms.localForm.localPasswordConfirmation.$touched &&
+                     settings.localPasswordConfirmation != settings.localPassword}">
+            <input ng-model="settings.localPasswordConfirmation" name="localPasswordConfirmation" class="form-control"
+                   type="password" autocomplete="new-password" placeholder="パスワード（確認）" required>
+        </div>
+        <div class="checkbox text-left" ng-if="settings.thickClient">
+            <labe>
+                <input ng-model="settings.savePassword" type="checkbox">
+                パスワードを保存
+            </labe>
+        </div>
+
+        <div class="form-group"
+             ng-if="(!forms.localForm.localLogin.$touched || forms.localForm.localLogin.$valid) && !forms.localForm.passwordInput.$dirty">
+            <div class="help-block">
+                パスワードには異なる種類の文字を含む、少なくとも 8 シンボルが必要です
+            </div>
+        </div>
+        <div class="form-group has-error" ng-if="!forms.localForm.passwordInput.password.$valid">
+            <div class="help-block" ng-if="forms.localForm.passwordInput.password.$error.weak &&
+                  !forms.localForm.passwordInput.password.$error.common &&
+                  !forms.localForm.passwordInput.password.$error.pattern &&
+                  !forms.localForm.passwordInput.password.$error.minlength">{{L.passwordRequirements.weakMessage}}</div>
+            <div class="help-block" ng-if="forms.localForm.passwordInput.password.$error.common &&
+                  !forms.localForm.passwordInput.password.$error.pattern &&
+                  !forms.localForm.passwordInput.password.$error.minlength">{{L.passwordRequirements.commonMessage}}</div>
+            <div class="help-block" ng-if="forms.localForm.passwordInput.password.$error.minlength &&
+                  !forms.localForm.passwordInput.password.$error.pattern">{{L.passwordRequirements.minLengthMessage}}</div>
+            <div class="help-block" ng-if="forms.localForm.passwordInput.password.$error.pattern">{{L.passwordRequirements.requiredMessage}}</div>
+        </div>
+
+        <div class="form-group has-error"
+             ng-if="forms.localForm.localLogin.$touched && forms.localForm.localLogin.$error.required ||
+                    forms.localForm.passwordInput.$dirty && forms.localForm.passwordInput.$error.required ||
+                    forms.localForm.localPasswordConfirmation.$touched && forms.localForm.localPasswordConfirmation.$error.required">
+            <div class="help-block">
+                すべての項目に入力してください
+            </div>
+        </div>
+
+        <div class="form-group has-error"
+             ng-if= "forms.localForm.$valid &&
+                     (settings.localPasswordConfirmation != settings.localPassword)">
+            <div class="help-block">
+                パスワードが一致しません
+            </div>
+        </div>
+    </form>
+</div>
+
+<div class="panel-body text-center" ng-hide="!stepIs('merge')">
+    <h2>サーバーを既存のシステムに接続します</h2>
+    <form class="master-controls wide text-left" name="forms.remoteSystemForm" novalidate disable-autocomplete>
+        <div class="form-group" validate-field>
+
+            <input type="text" ng-model="settings.remoteSystem" name="remoteSystemName"
+                   typeahead="system as system.visibleName for system in discoveredUrls | filter: {isNew:false, visibleName: $viewValue} | limitTo:8"
+                   typeahead-input-formatter="getSystemName($model)"
+                   typeahead-focus-on-select="false"
+                   typeahead-min-length="0"
+                   typeahead-show-hint="true"
+                   typeahead-focus-first="false"
+                   typeahead-focus
+ placeholder="既存のシステム URL (https://host:port)"
+                   required
+ class="form-control">
+
+            <p class="help-block text-left">
+                {{settings.remoteSystem.hint}}
+            </p>
+        </div>
+        <div class="form-group" validate-field>
+            <input ng-model="settings.remoteLogin" name="remoteLogin" class="form-control" type="text"
+                   ng-change="clearRemoteError(true)"
+                   placeholder="ログイン" required>
+        </div>
+        <div class="form-group" validate-field>
+            <input ng-model="settings.remotePassword"
+                   name="remotePassword" autocomplete="new-password" class="form-control" type="password"
+                   ng-change="clearRemoteError(true)"
+                   placeholder="パスワード" required>
+        </div>
+        <div class="form-group has-error"
+             ng-if="forms.remoteSystemForm.remoteSystemName.$touched &&  forms.remoteSystemForm.remoteSystemName.$error.required||
+                    forms.remoteSystemForm.remoteLogin.$touched && forms.remoteSystemForm.remoteLogin.$error.required ||
+                    forms.remoteSystemForm.remotePassword.$touched && forms.remoteSystemForm.remotePassword.$error.required">
+            <div class="help-block">
+                すべての項目に入力してください
+            </div>
+        </div>
+
+        <div class="form-group has-error"  ng-if="settings.remoteError">
+            <div class="help-block">
+                {{settings.remoteError}}
+            </div>
+        </div>
+    </form>
+</div>
+
+
+<div class="panel-body text-center" ng-if="stepIs('mergeProcess')">
+    <div class="master-icon"><span class="preloader"></span></div>
+    <h2>システム統合...</h2>
+    <p class="master-description">数分かかる場合があります</p>
+</div>
+
+<div class="panel-body text-center" ng-if="stepIs('retryMergeCredentials')">
+    <div class="master-icon"><span class="preloader"></span></div>
+    <h2>システム統合...</h2>
+    <p class="master-description">システムに接続しようとしています</p>
+</div>
+
+
+<div class="panel-body text-center" ng-if="stepIs('mergeFailure')">
+    <div class="master-icon"><span class="icon-fail"></span></div>
+    <h2>システムを統合することはできません</h2>
+    <p class="master-description">
+        {{settings.remoteError}}
+    </p>
+    <p class="master-controls">
+        <button class="btn btn-default" ng-click="retry()">再試行</button>       
+<button class="btn btn-default" ng-click="skip()">別システムをセットアップします</button>
+    </p>
+</div>
+
+<div class="panel-body text-center" ng-if="stepIs('mergeTemporaryFailure')">
+    <div class="master-icon"><span class="icon-fail"></span></div>
+    <h2>システムは正常に統合されましたが、まだ準備ができていません</h2>
+    <p class="master-description">
+        {{settings.remoteError}}
+    </p>
+    <p class="master-controls">
+        <button class="btn btn-default" ng-click="retry()">再試行</button>
+    </p>
+</div>
+
+<div class="panel-body text-center" ng-if="stepIs('cloudProcess')">
+    <div class="master-icon"><span class="preloader"></span></div>
+    <h2>{{Config.cloud.productName}} に接続中</h2>
+    <p class="master-description">数分かかる場合があります</p>
+</div>
+
+<div class="panel-body text-center" ng-if="stepIs('cloudSuccess')">
+    <div class="master-icon"><span class="icon-success"></span></div>
+    <h2>システムは使用可能</h2>
+    <p>ログイン</p>
+    <h4>{{settings.cloudEmail}}</h4>
+    <p>共有とアカウントの設定</p>
+    <h4><a class="external" ng-href="{{portalSystemLink}}"  title="{{Config.cloud.productName}} を開く"
+           ng-click="openLink($event)">{{portalShortLink}}</a></h4>
+</div>
+
+<div class="panel-body text-center" ng-if="stepIs('localSuccess')">
+    <div class="master-icon"><span class="icon-success"></span></div>
+    <h2>システムは使用可能</h2>
+    <p>サーバーアドレス</p>
+    <h4>{{serverAddress}}</h4>
+    <p>管理者ログイン</p>
+    <h4>{{settings.localLogin}}</h4>
+</div>
+
+
+<div class="panel-body text-center" ng-if="stepIs('configureWrongNetwork')">
+    <p><b>最初にネットワークの設定を行って下さい</b></p>
+    <network-settings settings="networkSettings[0]" ></network-settings>
+
+    <p class="vertical-bottom">
+        <button class="btn btn-primary" ng-click="retry()">設定を保存し、デバイスを再起動</button>
+    </p>
+</div>
+
+<div class="panel-body text-center" ng-if="stepIs('configureNetworkForInternet')">
+    <p><b>インターネット接続をセットアップするネットワークを構成します</b></p>
+    <network-settings settings="networkSettings[0]" ></network-settings>
+
+    <p class="vertical-bottom">
+        <button class="btn btn-primary" ng-click="retry()">設定を保存し、デバイスを再起動</button>
+    </p>
+</div>
+
+
+<div class="panel-body text-center" ng-if="stepIs('noInternetOnServer')">
+    <h2>サーバーをインターネットに接続します</h2>
+    <p class="master-description">
+        インターネット接続を設定すると何処からでも<br>{{Config.cloud.productName}}を使用して接続することができます
+    </p>
+    <p class="master-controls">
+        <button class="btn btn-default" ng-click="retry()">もう一度試してください</button>       
+<button class="btn btn-default" ng-click="skip()">ローカルシステムをセットアップします</button>
+    </p>
+    <p ng-if="serverInfo.flags.canSetupNetwork" class="vertical-bottom">
+        <a href="" ng-click="next('configureNetworkForInternet')">ネットワーク設定</a>
+    </p>
+</div>
+
+
+<div class="panel-body text-center" ng-if="stepIs('noInternetOnClient')">
+    <h2>{{Config.cloud.productName}} に接続できません</h2>
+    <p class="master-description">
+        インターネット接続を確認してください
+    </p>
+    <p class="master-controls">
+        <button class="btn btn-default" ng-click="retry()">もう一度試してください</button>       
+<button class="btn btn-default" ng-click="skip()">ローカルシステムをセットアップします</button>
+    </p>
+</div>
+
+<div class="panel-body text-center" ng-if="stepIs('cloudFailure')">
+    <div class="master-icon"><span class="icon-fail"></span></div>
+    <h2>{{Config.cloud.productName}} に接続できません</h2>
+    <p class="master-description">
+        {{cloudError}}
+    </p>
+    <p class="master-controls">
+        <button class="btn btn-default" ng-click="retry()">再試行</button>       
+<button class="btn btn-default" ng-click="skip()">ローカルシステムをセットアップします</button>
+    </p>
+</div>
+
+<div class="panel-body text-center" ng-if="stepIs('localFailure')">
+    <div class="master-icon"><span class="icon-fail"></span></div>
+    <h2>システムをセットアップすることはできません</h2>
+    <p class="master-description">何かが完全に間違っています<br>
+エラーの説明: {{settings.localError}}
+    </p>
+    <p class="master-controls">
+        <button class="btn btn-default" ng-click="retry()">再試行</button>
+    </p>
+</div>
+
+
+<div class="panel-footer lite-client-instruction" ng-if="settings.liteClient && stepIs('start')">
+    <p>
+        次の方法のいずれかによって <br>をこのデバイスに接続し別のコンピューターから設定することが可能です
+    </p>
+    <div class="row">
+        <div class="col-xs-6">
+            <div class="text-center"><b>ウェブブラウザ</b></div>
+            <div class="col-xs-4 text-right">アドレス</div><div class="col-xs-8 text-left"><b>https://{{IP}}:{{port}}</b></div>
+        </div>
+        <div class="col-xs-6">
+            <div class="text-center"><b>{{Config.productName}} アプリケーションを使用</b></div>
+            <div class="col-xs-6 text-right">ホスト</div><div class="col-xs-6 text-left"><b>{{IP}}</b></div>
+            <div class="col-xs-6 text-right">ポート</div><div class="col-xs-6 text-left"><b>{{port}}</b></div>
+            <div class="col-xs-6 text-right">ログイン</div><div class="col-xs-6 text-left"><b>{{Config.defaultLogin}}</b></div>
+            <div class="col-xs-6 text-right">パスワード</div><div class="col-xs-6 text-left"><b>{{Config.defaultPassword}}</b></div>
+        </div>
+    </div>
+</div>
+
+<div class="panel-footer" ng-hide="activeStep.noFooter">
+    <button class="btn btn-default"
+            ng-if="activeStep.cancel"
+            ng-disabled="lockNextButton"
+            ng-click="cancel()">Cancel</button>
+    <button class="btn btn-default"
+            ng-if="activeStep.back"
+            ng-disabled="lockNextButton"
+            ng-click="back()"><span class="glyphicon glyphicon-arrow-left"></span></button>
+    <button class="btn btn-primary pull-right"
+            ng-if="activeStep.next"
+            ng-disabled="lockNextButton"
+            auto-focus
+ ng-click="next()">Next <span class="glyphicon glyphicon-arrow-right"></span></button>
+    <button class="btn btn-primary pull-right"
+            ng-if="activeStep.finish"
+            ng-disabled="lockNextButton"
+            auto-focus
+ ng-click="finish()">Finish</button>
+</div>

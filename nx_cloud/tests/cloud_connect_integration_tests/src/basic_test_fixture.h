@@ -3,6 +3,8 @@
 #include <atomic>
 #include <memory>
 
+#include <boost/optional.hpp>
+
 #include <gtest/gtest.h>
 
 #include <nx/network/cloud/cloud_server_socket.h>
@@ -54,6 +56,9 @@ protected:
     nx::hpm::MediatorFunctionalTest& mediator();
     nx::cloud::relay::test::Launcher& trafficRelay();
     nx::String serverSocketCloudAddress() const;
+    const hpm::api::SystemCredentials& cloudSystemCredentials() const;
+
+    void setRemotePeerName(const nx::String& peerName);
 
 private:
     struct HttpRequestResult
@@ -65,7 +70,7 @@ private:
     QnMutex m_mutex;
     const nx_http::BufferType m_staticMsgBody;
     nx::hpm::MediatorFunctionalTest m_mediator;
-    nx::hpm::AbstractCloudDataProvider::System m_cloudSystemCredentials;
+    hpm::api::SystemCredentials m_cloudSystemCredentials;
     nx::cloud::relay::test::Launcher m_trafficRelay;
     PredefinedCredentialsProvider m_credentialsProvider;
     std::shared_ptr<nx::stun::AsyncClient> m_stunClient;
@@ -73,6 +78,7 @@ private:
     QUrl m_staticUrl;
     std::list<std::unique_ptr<nx_http::AsyncClient>> m_httpClients;
     std::atomic<int> m_unfinishedRequestsLeft;
+    boost::optional<nx::String> m_remotePeerName;
 
     nx::utils::SyncQueue<HttpRequestResult> m_httpRequestResults;
     nx_http::BufferType m_expectedMsgBody;

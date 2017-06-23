@@ -11,13 +11,6 @@
 
 namespace
 {
-    const bool kDefaultNoFullScreen =
-#ifdef Q_OS_MAC
-        true;
-#else
-        false;
-#endif
-
     template<typename ValueType>
     void addParserParam(QnCommandLineParser &parser
         , ValueType *valuePtr
@@ -67,10 +60,6 @@ QnStartupParameters QnStartupParameters::fromCommandLineArg(int argc
     addParserParam(commandLineParser, &result.instantDrop, "--instant-drop");
 
     /* Development options */
-#ifdef ENABLE_DYNAMIC_TRANSLATION
-    addParserParam(commandLineParser, &result.dynamicTranslationPath, "--translation");
-#endif
-
     addParserParam(commandLineParser, &result.dynamicCustomizationPath,"--customization");
     addParserParam(commandLineParser, &result.devModeKey,           "--dev-mode-key");
     addParserParam(commandLineParser, &result.softwareYuv,          "--soft-yuv");
@@ -153,34 +142,4 @@ bool QnStartupParameters::isDevMode() const
     /* MD5("razrazraz") */
     return nx::utils::QnCryptographicHash::hash(devModeKey.toLatin1(), nx::utils::QnCryptographicHash::Md5)
         == QByteArray("\x4f\xce\xdd\x9b\x93\x71\x56\x06\x75\x4b\x08\xac\xca\x2d\xbc\x7f");
-}
-
-QnStartupParameters::QnStartupParameters():
-    screen(kInvalidScreen),
-
-    allowMultipleClientInstances(false),
-    skipMediaFolderScan(false),
-    ignoreVersionMismatch(false),
-    vsyncDisabled(false),
-    clientUpdateDisabled(false),
-    softwareYuv(false),
-    forceLocalSettings(false),
-    fullScreenDisabled(kDefaultNoFullScreen),
-    showFullInfo(false),
-    exportedMode(false),
-    selfUpdateMode(false),
-
-    devModeKey(),
-    authenticationString(),
-    delayedDrop(),
-    instantDrop(),
-    logLevel(),
-    ec2TranLogLevel(),
-    dynamicTranslationPath(),
-    lightMode(),
-    videoWallGuid(),
-    videoWallItemGuid(),
-    engineVersion(),
-    dynamicCustomizationPath()
-{
 }

@@ -221,6 +221,29 @@ namespace nx_hls
         }
     }
 
+    namespace {
+
+        static QString formatGUID(const QnUuid& guid)
+        {
+            QString rez = guid.toString();
+            if (rez.startsWith(L'{'))
+                return rez;
+            else
+                return QString(lit("{%1}")).arg(rez);
+        }
+
+    } // namespace
+
+    void QnHttpLiveStreamingProcessor::prepareUrlPath(QUrl* url)
+    {
+#if 0 // Not needed because currently hls requests are forwarded via AutoRequestForwarder.
+        //TODO #ak check that request has been proxied via media server, not regular Http proxy
+        const QString& currentPath = url.path();
+        url.setPath(lit("/proxy/%1/%2").arg(formatGUID(commonModule()->moduleGUID()),
+            currentPath.startsWith(QLatin1Char('/')) ? currentPath.mid(1) : currentPath));
+#endif // 0
+    }
+
     nx_http::StatusCode::Value QnHttpLiveStreamingProcessor::getRequestedFile(
         const nx_http::Request& request,
         nx_http::Response* const response )
@@ -377,15 +400,6 @@ namespace nx_hls
             arg(QString::fromLatin1(m_writeBuffer)), cl_logDEBUG1 );
 
         m_state = sSending;
-    }
-
-    static QString formatGUID(const QnUuid& guid)
-    {
-        QString rez = guid.toString();
-        if (rez.startsWith(L'{'))
-            return rez;
-        else
-            return QString(lit("{%1}")).arg(rez);
     }
 
     bool QnHttpLiveStreamingProcessor::prepareDataToSend()
@@ -556,12 +570,7 @@ namespace nx_hls
             if( !via.parse( viaIter->second ) )
                 return nx_http::StatusCode::badRequest;
             if( !via.entries.empty() )
-            {
-                //TODO #ak check that request has been proxied via media server, not regular Http proxy
-                const QString& currentPath = playlistData.url.path();
-                playlistData.url.setPath( lit("/proxy/%1/%2").arg(formatGUID(commonModule()->moduleGUID())).
-                    arg(currentPath.startsWith(QLatin1Char('/')) ? currentPath.mid(1) : currentPath) );
-            }
+                prepareUrlPath(&playlistData.url);
         }
         QList<QPair<QString, QString> > queryItems = QUrlQuery(request.requestLine.url.query()).queryItems();
         //removing SESSION_ID_PARAM_NAME
@@ -682,12 +691,7 @@ namespace nx_hls
             if( !via.parse( viaIter->second ) )
                 return nx_http::StatusCode::badRequest;
             if( !via.entries.empty() )
-            {
-                //TODO #ak check that request has been proxied via media server, not regular Http proxy
-                const QString& currentPath = baseChunkUrl.path();
-                baseChunkUrl.setPath( lit("/proxy/%1/%2").arg(formatGUID(commonModule()->moduleGUID())).
-                    arg(currentPath.startsWith(QLatin1Char('/')) ? currentPath.mid(1) : currentPath) );
-            }
+                prepareUrlPath(&baseChunkUrl);
         }
 
         const auto chunkAuthenticationQueryItem = session->chunkAuthenticationQueryItem();

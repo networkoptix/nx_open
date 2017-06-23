@@ -85,9 +85,28 @@ void QnSelectResourcesDialogButton::at_clicked()
     {
         SubjectSelectionDialog dialog(this);
         dialog.setCheckedSubjects(m_resources);
-        //TODO: #vkutin #3.1 Use dialog delegate for validation.
+
+        if (m_dialogDelegate)
+        {
+            dialog.setUserValidator(
+                [this](const QnUserResourcePtr& user)
+                {
+                    // TODO: #vkutin #3.2 This adapter is rather sub-optimal.
+                    return m_dialogDelegate->isValid(user->getId());
+                });
+
+            connect(&dialog, &SubjectSelectionDialog::changed, this,
+                [this, &dialog]
+                {
+                    // TODO: #vkutin #3.2 Full updates like this are slow. Refactor in 3.2.
+                    dialog.showAlert(m_dialogDelegate->validationMessage(
+                        dialog.totalCheckedUsers()));
+                });
+        }
+
         if (dialog.exec() != QDialog::Accepted)
             return;
+
         m_resources = dialog.checkedSubjects();
     }
     else
@@ -95,10 +114,13 @@ void QnSelectResourcesDialogButton::at_clicked()
         QnResourceSelectionDialog dialog(m_target, this);
         dialog.setSelectedResources(m_resources);
         dialog.setDelegate(m_dialogDelegate);
+
         if (dialog.exec() != QDialog::Accepted)
             return;
+
         m_resources = dialog.selectedResources();
     }
+
     emit commit();
 }
 

@@ -95,11 +95,11 @@ def test_proxy_requests(env):
     assert direct_response_in_front != direct_response_behind
 
 
-def assert_server_stream(server, camera, sample_media_file, stream_type, artifact_file, start_time):
+def assert_server_stream(server, camera, sample_media_file, stream_type, artifact_factory, start_time):
     assert TimePeriod(start_time, sample_media_file.duration) in server.get_recorded_time_periods(camera)
     stream = server.get_media_stream(stream_type, camera)
     metadata_list = stream.load_archive_stream_metadata(
-        artifact_file('stream-media', stream_type),
+        artifact_factory(['stream-media', stream_type]),
         pos=start_time, duration=sample_media_file.duration)
     for metadata in metadata_list:
         assert metadata.width == sample_media_file.width
@@ -108,7 +108,7 @@ def assert_server_stream(server, camera, sample_media_file, stream_type, artifac
 
 @pytest.mark.parametrize('http_schema', ['http'])
 @pytest.mark.parametrize('nat_schema', ['nat'])
-def test_get_streams(artifact_file, env, camera, sample_media_file, stream_type):
+def test_get_streams(artifact_factory, env, camera, sample_media_file, stream_type):
     env.behind.add_camera(camera)
     start_time_1 = datetime(2017, 1, 27, tzinfo=pytz.utc)
     env.in_front.storage.save_media_sample(camera, start_time_1, sample_media_file)
@@ -117,10 +117,10 @@ def test_get_streams(artifact_file, env, camera, sample_media_file, stream_type)
     env.behind.storage.save_media_sample(camera, start_time_2, sample_media_file)
     env.behind.rebuild_archive()
     assert_server_stream(
-        env.behind, camera, sample_media_file, stream_type, artifact_file, start_time_1)
+        env.behind, camera, sample_media_file, stream_type, artifact_factory, start_time_1)
     assert_server_stream(
-        env.in_front, camera, sample_media_file, stream_type, artifact_file, start_time_1)
+        env.in_front, camera, sample_media_file, stream_type, artifact_factory, start_time_1)
     assert_server_stream(
-        env.behind, camera, sample_media_file, stream_type, artifact_file, start_time_2)
+        env.behind, camera, sample_media_file, stream_type, artifact_factory, start_time_2)
     assert_server_stream(
-        env.in_front, camera, sample_media_file, stream_type, artifact_file, start_time_2)
+        env.in_front, camera, sample_media_file, stream_type, artifact_factory, start_time_2)

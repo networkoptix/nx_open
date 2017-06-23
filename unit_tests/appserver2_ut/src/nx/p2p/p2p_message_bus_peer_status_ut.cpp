@@ -12,7 +12,7 @@
 #include "ec2_connection.h"
 #include <transaction/transaction_message_bus_base.h>
 #include <nx/p2p/p2p_connection.h>
-#include <config.h>
+#include <ini.h>
 #include <nx/p2p/p2p_serialization.h>
 
 namespace nx {
@@ -122,7 +122,7 @@ private:
     std::set<QnUuid> m_alivePeers;
 };
 
-TEST_F(MessageBusOnlinePeers, rhomConnect)
+TEST_F(MessageBusOnlinePeers, rhombConnect)
 {
     rhombConnectMain();
 }

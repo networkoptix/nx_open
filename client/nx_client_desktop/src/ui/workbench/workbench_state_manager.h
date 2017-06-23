@@ -59,6 +59,7 @@ public:
      */
     void saveState();
     void restoreState();
+
 private:
     /**
      * @return True if client is currently in valid connected state.

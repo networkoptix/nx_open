@@ -51,7 +51,6 @@ include(project_utils)
 include(test_utils)
 
 include(ec_protocol)
-include(maven_compatibility)
 
 set(customization_dir "${PROJECT_SOURCE_DIR}/customization/${customization}")
 
@@ -69,12 +68,13 @@ if(NOT (WINDOWS OR ANDROID OR IOS))
 endif()
 
 include(dependencies)
+include(maven_compatibility)
+include(generate_current_config)
 
 if(CMAKE_CROSSCOMPILING)
     set(QT_PREFIX "..")
 else()
     set(QT_PREFIX "${QT_DIR}")
-    file(TO_CMAKE_PATH "${QT_PREFIX}" QT_PREFIX)
 endif()
 list(APPEND CMAKE_PREFIX_PATH ${QT_DIR})
 if(MACOSX)
@@ -109,6 +109,12 @@ find_package(Qt5
         Sql
         Concurrent
         Multimedia)
+        
+if(withDesktopClient OR withTrayTool)
+    find_package(Qt5
+        COMPONENTS
+            Widgets)
+endif()
 
 if(withDesktopClient OR withMobileClient)
     find_package(Qt5
@@ -144,6 +150,10 @@ if(withMediaServer)
     add_subdirectory(mediaserver)
     add_subdirectory(plugins)
     add_subdirectory(storage_plugins)
+endif()
+
+if(withTrayTool)
+    add_subdirectory(traytool)
 endif()
 
 if(withDesktopClient OR withMobileClient)

@@ -68,12 +68,12 @@ void BasicTestFixture::SetUp()
 
 void BasicTestFixture::startServer()
 {
-    m_cloudSystemCredentials = m_mediator.addRandomSystem();
+    auto cloudSystemCredentials = m_mediator.addRandomSystem();
 
-    hpm::api::SystemCredentials credentials;
-    credentials.systemId = m_cloudSystemCredentials.id;
-    credentials.key = m_cloudSystemCredentials.authKey;
-    m_credentialsProvider.setCredentials(std::move(credentials));
+    m_cloudSystemCredentials.systemId = cloudSystemCredentials.id;
+    m_cloudSystemCredentials.serverId = QnUuid::createUuid().toSimpleByteArray();
+    m_cloudSystemCredentials.key = cloudSystemCredentials.authKey;
+    m_credentialsProvider.setCredentials(m_cloudSystemCredentials);
 
     startHttpServer();
 }
@@ -88,9 +88,14 @@ void BasicTestFixture::assertConnectionCanBeEstablished()
     auto clientSocket = SocketFactory::createStreamSocket();
     ASSERT_TRUE(clientSocket->setNonBlockingMode(true));
 
+    nx::String targetAddress = 
+        m_remotePeerName
+        ? *m_remotePeerName
+        : serverSocketCloudAddress();
+
     nx::utils::promise<SystemError::ErrorCode> done;
     clientSocket->connectAsync(
-        serverSocketCloudAddress(),
+        targetAddress,
         [&done](SystemError::ErrorCode sysErrorCode)
         {
             done.set_value(sysErrorCode);
@@ -140,7 +145,17 @@ nx::cloud::relay::test::Launcher& BasicTestFixture::trafficRelay()
 
 nx::String BasicTestFixture::serverSocketCloudAddress() const
 {
-    return m_cloudSystemCredentials.id;
+    return m_cloudSystemCredentials.systemId;
+}
+
+const hpm::api::SystemCredentials& BasicTestFixture::cloudSystemCredentials() const
+{
+    return m_cloudSystemCredentials;
+}
+
+void BasicTestFixture::setRemotePeerName(const nx::String& remotePeerName)
+{
+    m_remotePeerName = remotePeerName;
 }
 
 void BasicTestFixture::startHttpServer()
@@ -161,7 +176,7 @@ void BasicTestFixture::startHttpServer()
 
     // Waiting for server to be registered on relay.
     while (!m_trafficRelay.moduleInstance()->listeningPeerPool().isPeerOnline(
-                m_cloudSystemCredentials.id.toStdString()))
+                m_cloudSystemCredentials.systemId.toStdString()))
     {
         std::this_thread::sleep_for(std::chrono::milliseconds(1));
     }

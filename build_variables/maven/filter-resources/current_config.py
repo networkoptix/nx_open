@@ -12,6 +12,7 @@ PACKAGES_DIR=_abspath("${packages.dir}")
 TARGET_DIR=_abspath("${libdir}")
 QT_DIR=_abspath("${qt.dir}")
 QT_LIB=_abspath("${qt.dir}/lib")
+PROJECT_SOURCE_DIR=_abspath("${PROJECT_SOURCE_DIR}")
 # for win - add QT_LIB to PATH
 # for linux - add QT_LIB to LD_LIBRARY_PATH
 

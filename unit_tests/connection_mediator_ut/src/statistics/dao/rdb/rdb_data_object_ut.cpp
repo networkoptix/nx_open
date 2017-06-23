@@ -76,8 +76,8 @@ private:
         m_dbConnection = std::make_unique<nx::db::DbConnectionHolder>(dbConnectionOptions());
         ASSERT_TRUE(m_dbConnection->open());
 
-        m_dbInstance = std::make_unique<rdb::InstanceController>(dbConnectionOptions());
-        ASSERT_TRUE(m_dbInstance->initialize());
+        ASSERT_NO_THROW(
+            m_dbInstance = std::make_unique<rdb::InstanceController>(dbConnectionOptions()));
     }
 
     void generateRecords()

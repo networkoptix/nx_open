@@ -2,8 +2,10 @@
 
 #include <cassert>
 
-#include <core/resource/resource.h>
 #include <core/resource_management/resource_criterion.h>
+#include <core/resource_access/resource_access_filter.h>
+
+#include <core/resource/resource.h>
 
 #include <ui/models/resource_search_proxy_model.h>
 #include <ui/workbench/workbench_layout.h>
@@ -42,16 +44,17 @@ void QnResourceSearchSynchronizer::setModel(QnResourceSearchProxyModel *model) {
         start();
 }
 
-void QnResourceSearchSynchronizer::setLayout(QnWorkbenchLayout *layout) {
-    if(m_layout == layout)
+void QnResourceSearchSynchronizer::setLayout(QnWorkbenchLayout *layout)
+{
+    if (m_layout == layout)
         return;
 
-    if(m_model != NULL && m_layout != NULL)
+    if (m_model && m_layout)
         stop();
 
     m_layout = layout;
 
-    if(m_model != NULL && m_layout != NULL)
+    if (m_model && m_layout)
         start();
 }
 
@@ -73,7 +76,6 @@ void QnResourceSearchSynchronizer::start() {
     m_hasPendingUpdates = false;
 }
 
-
 void QnResourceSearchSynchronizer::stop() {
     NX_ASSERT(m_model != NULL && m_layout != NULL);
 
@@ -93,16 +95,19 @@ void QnResourceSearchSynchronizer::stop() {
     m_submit = m_update = false;
 }
 
-void QnResourceSearchSynchronizer::update() {
-    if(m_updateListener != NULL) {
+void QnResourceSearchSynchronizer::update()
+{
+    if (m_updateListener != NULL)
+    {
         disconnect(m_updateListener, NULL, this, NULL);
         m_updateListener = NULL;
     }
 
-    if(!m_update)
+    if (!m_update)
         return;
 
-    if(!m_updatesEnabled) {
+    if (!m_updatesEnabled)
+    {
         m_hasPendingUpdates = true;
         return;
     }
@@ -111,15 +116,16 @@ void QnResourceSearchSynchronizer::update() {
     QN_SCOPED_VALUE_ROLLBACK(&m_submit, false);
 
     /* Create a set of items that match the search criteria. */
-    QSet<QnResourcePtr> searchResult = m_modelItemCountByResource.keys().toSet();
-    if(searchResult == m_searchResult)
+    const auto searchResult = m_modelItemCountByResource.keys().toSet();
+    if (searchResult == m_searchResult)
         return;
 
     /* Add & remove items correspondingly. */
     QSet<QnResourcePtr> added = searchResult - m_searchResult;
     QSet<QnResourcePtr> removed = m_searchResult - searchResult;
-    foreach(const QnResourcePtr &resource, added) {
-        QnWorkbenchItem *item = new QnWorkbenchItem(resource->getUniqueId(), QnUuid::createUuid());
+    for (const auto& resource: added)
+    {
+        auto item = new QnWorkbenchItem(resource->getUniqueId(), QnUuid::createUuid());
 
         m_resourceByLayoutItem[item] = resource;
         m_layoutItemByResource[resource] = item;
@@ -127,9 +133,10 @@ void QnResourceSearchSynchronizer::update() {
         m_layout->addItem(item);
         item->adjustGeometry();
     }
-    foreach(const QnResourcePtr &resource, removed) {
-        QnWorkbenchItem *item = m_layoutItemByResource.value(resource);
-        if(item == NULL)
+    for (const auto& resource: removed)
+    {
+        auto item = m_layoutItemByResource.value(resource);
+        if (item == NULL)
             continue; /* Was closed by the user. */
 
         m_resourceByLayoutItem.remove(item);
@@ -214,13 +221,15 @@ void QnResourceSearchSynchronizer::at_model_destroyed() {
     setModel(NULL);
 }
 
-void QnResourceSearchSynchronizer::at_model_rowsInserted(const QModelIndex &parent, int start, int end) {
-    if(!m_update)
+void QnResourceSearchSynchronizer::at_model_rowsInserted(const QModelIndex &parent, int start, int end)
+{
+    if (!m_update)
         return;
 
     QN_SCOPED_VALUE_ROLLBACK(&m_submit, false);
 
-    for (int row = start; row <= end; ++row) {
+    for (int row = start; row <= end; ++row)
+    {
         if (!m_model->hasIndex(row, 0, parent))
             continue;
         const QModelIndex index = m_model->index(row, 0, parent);
@@ -229,14 +238,14 @@ void QnResourceSearchSynchronizer::at_model_rowsInserted(const QModelIndex &pare
             at_model_rowsInserted(index, 0, m_model->rowCount(index) - 1);
 
         QnResourcePtr resource = index.data(Qn::ResourceRole).value<QnResourcePtr>();
-        if(resource.isNull())
+        if (resource.isNull())
             continue;
 
         // server widgets can be present in the tree but should not be present on the scene
         if (resource->hasFlags(Qn::server))
             continue;
-        // layouts can be present in the tree but should not be present on the scene
-        if (resource->hasFlags(Qn::layout))
+
+        if (!QnResourceAccessFilter::isOpenableInLayout(resource))
             continue;
 
         addModelResource(resource);
@@ -274,4 +283,3 @@ void QnResourceSearchSynchronizer::at_model_criteriaChanged() {
 
     updateLater();
 }
-

@@ -110,17 +110,9 @@ private:
 
     //following pointers are here for debugging convenience
     const conf::Settings* m_settings;
-    AbstractEmailManager* m_emailManager;
-    StreeManager* m_streeManager;
     nx_http::MessageDispatcher* m_httpMessageDispatcher;
-    TemporaryAccountPasswordManager* m_tempPasswordManager;
-    AccountManager* m_accountManager;
-    EventManager* m_eventManager;
-    SystemManager* m_systemManager;
-    SystemHealthInfoProvider* m_systemHealthInfoProvider;
     AuthenticationManager* m_authenticationManager;
     AuthorizationManager* m_authorizationManager;
-    AuthenticationProvider* m_authProvider;
 
     void registerApiHandlers(
         nx_http::MessageDispatcher* const msgDispatcher,

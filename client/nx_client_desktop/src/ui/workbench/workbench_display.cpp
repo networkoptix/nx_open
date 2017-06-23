@@ -1014,6 +1014,7 @@ void QnWorkbenchDisplay::fitInView(bool animate)
         m_boundingInstrument->recursiveDisable();
         m_viewportAnimator->moveTo(targetGeometry, false);
         m_boundingInstrument->recursiveEnable(); /* So that caches are updated. */
+        synchronizeSceneBounds();
     }
 }
 

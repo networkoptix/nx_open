@@ -23,7 +23,7 @@
 namespace nx {
 namespace cdb {
 
-class TemporaryAccountPasswordManager;
+class AbstractTemporaryAccountPasswordManager;
 class AbstractEmailManager;
 class StreeManager;
 
@@ -79,7 +79,7 @@ public:
     AccountManager(
         const conf::Settings& settings,
         const StreeManager& streeManager,
-        TemporaryAccountPasswordManager* const tempPasswordManager,
+        AbstractTemporaryAccountPasswordManager* const tempPasswordManager,
         nx::db::AsyncSqlQueryExecutor* const dbManager,
         AbstractEmailManager* const emailManager) noexcept(false);
     virtual ~AccountManager();
@@ -158,6 +158,7 @@ public:
     nx::db::DBResult createPasswordResetCode(
         nx::db::QueryContext* const queryContext,
         const std::string& accountEmail,
+        std::chrono::seconds codeExpirationTimeout,
         data::AccountConfirmationCode* const confirmationCode);
 
     virtual void addExtension(AbstractAccountManagerExtension*) override;
@@ -168,7 +169,7 @@ public:
 private:
     const conf::Settings& m_settings;
     const StreeManager& m_streeManager;
-    TemporaryAccountPasswordManager* const m_tempPasswordManager;
+    AbstractTemporaryAccountPasswordManager* const m_tempPasswordManager;
     nx::db::AsyncSqlQueryExecutor* const m_dbManager;
     AbstractEmailManager* const m_emailManager;
     /** map<email, account>. */
@@ -222,13 +223,6 @@ private:
         nx::db::QueryContext* const tran,
         const data::AccountUpdateDataWithEmail& accountData);
     bool isValidInput(const data::AccountUpdateDataWithEmail& accountData) const;
-    std::vector<nx::db::SqlFilterField> prepareAccountFieldsToUpdate(
-        const data::AccountUpdateDataWithEmail& accountData,
-        bool activateAccountIfNotActive);
-    nx::db::DBResult executeUpdateAccountQuery(
-        nx::db::QueryContext* const queryContext,
-        const std::string& accountEmail,
-        std::vector<nx::db::SqlFilterField> fieldsToSet);
     void updateAccountCache(
         bool activateAccountIfNotActive,
         data::AccountUpdateDataWithEmail accountData);

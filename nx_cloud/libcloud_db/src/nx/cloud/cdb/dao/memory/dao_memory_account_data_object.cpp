@@ -102,6 +102,26 @@ nx::db::DBResult AccountDataObject::updateAccountToActiveStatus(
     return db::DBResult::ok;
 }
 
+void AccountDataObject::updateAccount(
+    nx::db::QueryContext* /*queryContext*/,
+    const std::string& accountEmail,
+    const api::AccountUpdateData& accountUpdateData,
+    bool /*activateAccountIfNotActive*/)
+{
+    auto accountIter = m_emailToAccount.find(accountEmail);
+    if (accountIter == m_emailToAccount.end())
+        throw nx::db::Exception(nx::db::DBResult::notFound);
+
+    if (accountUpdateData.passwordHa1)
+        accountIter->second.passwordHa1 = *accountUpdateData.passwordHa1;
+    if (accountUpdateData.passwordHa1Sha256)
+        accountIter->second.passwordHa1Sha256 = *accountUpdateData.passwordHa1Sha256;
+    if (accountUpdateData.customization)
+        accountIter->second.customization = *accountUpdateData.customization;
+    if (accountUpdateData.fullName)
+        accountIter->second.fullName = *accountUpdateData.fullName;
+}
+
 } // namespace memory
 } // namespace dao
 } // namespace cdb

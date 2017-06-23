@@ -118,7 +118,8 @@ def generate_camera_data(camera_id, **kw):
        secondaryStreamQuality='SSQualityLow',
        status='Unauthorized',
        statusFlags='CSF_NoFlags',
-       typeId='{7d2af20d-04f2-149f-ef37-ad585281e3b7}',
+       typeId='{1b7181ce-0227-d3f7-9443-c86aab922d96}',
+#        typeId='{774e6ecd-ffc6-ae88-0165-8f4a6d0eafa7}',
        url=generate_ip_v4(camera_id, BASE_CAMERA_IP_ADDRESS),
        vendor="NetworkOptix")
     return dict(default_camera_data, **kw)

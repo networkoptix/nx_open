@@ -134,7 +134,7 @@ public slots:
 
     QColor colorWithAlpha(QColor color, qreal alpha);
 
-    void hideSystem(const QString& systemId);
+    void hideSystem(const QString& systemId, const QString& localSystemId);
 
 signals:
     void visibleChanged();

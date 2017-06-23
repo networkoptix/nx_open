@@ -251,6 +251,90 @@ nx::db::DBResult AccountDataObject::updateAccountToActiveStatus(
     return db::DBResult::ok;
 }
 
+void AccountDataObject::updateAccount(
+    nx::db::QueryContext* queryContext,
+    const std::string& accountEmail,
+    const api::AccountUpdateData& accountUpdateData,
+    bool activateAccountIfNotActive)
+{
+    std::vector<nx::db::SqlFilterField> fieldsToSet =
+        prepareAccountFieldsToUpdate(accountUpdateData, activateAccountIfNotActive);
+
+    NX_ASSERT(!fieldsToSet.empty());
+
+    executeUpdateAccountQuery(
+        queryContext,
+        accountEmail,
+        std::move(fieldsToSet));
+}
+
+std::vector<nx::db::SqlFilterField> AccountDataObject::prepareAccountFieldsToUpdate(
+    const api::AccountUpdateData& accountData,
+    bool activateAccountIfNotActive)
+{
+    std::vector<nx::db::SqlFilterField> fieldsToSet;
+
+    if (accountData.passwordHa1)
+    {
+        fieldsToSet.push_back({
+            "password_ha1", ":passwordHa1",
+            QnSql::serialized_field(accountData.passwordHa1.get()) });
+    }
+
+    if (accountData.passwordHa1Sha256)
+    {
+        fieldsToSet.push_back({
+            "password_ha1_sha256", ":passwordHa1Sha256",
+            QnSql::serialized_field(accountData.passwordHa1Sha256.get()) });
+    }
+
+    if (accountData.fullName)
+    {
+        fieldsToSet.push_back({
+            "full_name", ":fullName",
+            QnSql::serialized_field(accountData.fullName.get()) });
+    }
+
+    if (accountData.customization)
+    {
+        fieldsToSet.push_back({
+            "customization", ":customization",
+            QnSql::serialized_field(accountData.customization.get()) });
+    }
+
+    if (activateAccountIfNotActive)
+    {
+        fieldsToSet.push_back({
+            "status_code", ":status_code",
+            QnSql::serialized_field(static_cast<int>(api::AccountStatus::activated)) });
+    }
+
+    return fieldsToSet;
+}
+
+void AccountDataObject::executeUpdateAccountQuery(
+    nx::db::QueryContext* const queryContext,
+    const std::string& accountEmail,
+    std::vector<nx::db::SqlFilterField> fieldsToSet)
+{
+    nx::db::SqlQuery updateAccountQuery(*queryContext->connection());
+    updateAccountQuery.prepare(
+        lit("UPDATE account SET %1 WHERE email=:email").arg(db::joinFields(fieldsToSet, ",")));
+    db::bindFields(&updateAccountQuery.impl(), fieldsToSet);
+    updateAccountQuery.bindValue(
+        ":email",
+        QnSql::serialized_field(accountEmail));
+    try
+    {
+        updateAccountQuery.exec();
+    }
+    catch (nx::db::Exception e)
+    {
+        NX_DEBUG(this, lm("Could not update account in DB. %1").arg(e.what()));
+        throw;
+    }
+}
+
 } // namespace rdb
 } // namespace dao
 } // namespace cdb
