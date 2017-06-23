@@ -164,7 +164,7 @@ private:
     bool initTcpListener(
         CloudManagerGroup* const cloudManagerGroup,
         ec2::QnTransactionMessageBusBase* messageBus);
-    void initializeNetworking();
+    void initializeCloudConnect();
 
     std::unique_ptr<nx_upnp::PortMapper> initializeUpnpPortMapper();
     Qn::ServerFlags calcServerFlags();
