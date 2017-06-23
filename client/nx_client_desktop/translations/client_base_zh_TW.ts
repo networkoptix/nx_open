@@ -69,6 +69,808 @@ to view more bookmarks</source>
     </message>
   </context>
   <context>
+    <name>ContextMenu</name>
+    <message>
+      <source>Filter...</source>
+      <translation>篩選器...</translation>
+    </message>
+    <message>
+      <source>Connect to System</source>
+      <translation>連接到系統</translation>
+    </message>
+    <message>
+      <source>Help</source>
+      <translation>求助</translation>
+    </message>
+    <message>
+      <source>Event Log...</source>
+      <translation>事件記錄...</translation>
+    </message>
+    <message>
+      <source>Cameras to Backup...</source>
+      <translation>要備份的攝影機...</translation>
+    </message>
+    <message>
+      <source>Control Video Wall</source>
+      <translation>控制電視牆</translation>
+    </message>
+    <message>
+      <source>Push my screen</source>
+      <translation>同步我的桌面</translation>
+    </message>
+    <message>
+      <source>Select Time Server</source>
+      <translation>選擇校時伺服器</translation>
+    </message>
+    <message>
+      <source>Fit in View</source>
+      <translation>填滿視窗</translation>
+    </message>
+    <message>
+      <source>Main Menu</source>
+      <translation>主選單</translation>
+    </message>
+    <message>
+      <source>Connect to Server...</source>
+      <translation>連線至伺服器...</translation>
+    </message>
+    <message>
+      <source>Disconnect from Server</source>
+      <translation>中斷連線</translation>
+    </message>
+    <message>
+      <source>Browse Local Files</source>
+      <translation>瀏覽本地檔案</translation>
+    </message>
+    <message>
+      <source>Show Welcome Screen</source>
+      <translation>顯示歡迎畫面</translation>
+    </message>
+    <message>
+      <source>New...</source>
+      <translation>新增...</translation>
+    </message>
+    <message>
+      <source>Tab</source>
+      <translation>頁籤</translation>
+    </message>
+    <message>
+      <source>New Tab</source>
+      <translation>新增頁籤</translation>
+    </message>
+    <message>
+      <source>Window</source>
+      <translation>視窗</translation>
+    </message>
+    <message>
+      <source>New Window</source>
+      <translation>新開視窗</translation>
+    </message>
+    <message>
+      <source>User...</source>
+      <translation>使用者…</translation>
+    </message>
+    <message>
+      <source>New User...</source>
+      <translation>新增使用者…</translation>
+    </message>
+    <message>
+      <source>Video Wall...</source>
+      <translation>電視牆...</translation>
+    </message>
+    <message>
+      <source>New Video Wall...</source>
+      <translation>新增電視牆...</translation>
+    </message>
+    <message>
+      <source>Web Page...</source>
+      <translation>Web 頁面...</translation>
+    </message>
+    <message>
+      <source>New Web Page...</source>
+      <translation>新 Web 頁面...</translation>
+    </message>
+    <message>
+      <source>Layout Tour...</source>
+      <translation type="unfinished">Layout Tour...</translation>
+    </message>
+    <message>
+      <source>New Layout Tour...</source>
+      <translation type="unfinished">New Layout Tour...</translation>
+    </message>
+    <message>
+      <source>New Layout...</source>
+      <translation>新佈局...</translation>
+    </message>
+    <message>
+      <source>Open Layout...</source>
+      <translation>開啟佈局…</translation>
+    </message>
+    <message>
+      <source>Open...</source>
+      <translation>開啟...</translation>
+    </message>
+    <message>
+      <source>File(s)...</source>
+      <translation>檔案...</translation>
+    </message>
+    <message>
+      <source>Folder...</source>
+      <translation>目錄...</translation>
+    </message>
+    <message>
+      <source>Web Client...</source>
+      <translation>Web Client...</translation>
+    </message>
+    <message>
+      <source>Open Web Client...</source>
+      <translation>開啟網頁用戶端…</translation>
+    </message>
+    <message>
+      <source>Save Current Layout</source>
+      <translation>儲存目前佈局</translation>
+    </message>
+    <message>
+      <source>Save Current Layout As...</source>
+      <translation>另存目前佈局為…</translation>
+    </message>
+    <message>
+      <source>Save Video Wall View</source>
+      <translation>儲存電視牆畫面</translation>
+    </message>
+    <message>
+      <source>Drop Resources</source>
+      <translation>丟棄資源</translation>
+    </message>
+    <message>
+      <source>Start Screen Recording</source>
+      <translation>開始螢幕錄影</translation>
+    </message>
+    <message>
+      <source>Stop Screen Recording</source>
+      <translation>停止螢幕錄影</translation>
+    </message>
+    <message>
+      <source>Stop current action</source>
+      <translation>停止目前動作</translation>
+    </message>
+    <message>
+      <source>Go to Fullscreen</source>
+      <translation>切換為全螢幕</translation>
+    </message>
+    <message>
+      <source>Exit Fullscreen</source>
+      <translation>離開全螢幕</translation>
+    </message>
+    <message>
+      <source>Minimize</source>
+      <translation>最小化</translation>
+    </message>
+    <message>
+      <source>Maximize</source>
+      <translation>最大化</translation>
+    </message>
+    <message>
+      <source>Restore Down</source>
+      <translation>恢復視窗化</translation>
+    </message>
+    <message>
+      <source>Open in Browser...</source>
+      <translation>在瀏覽器開啟…</translation>
+    </message>
+    <message>
+      <source>System Administration...</source>
+      <translation>系統管理...</translation>
+    </message>
+    <message>
+      <source>System Update...</source>
+      <translation>系統升級...</translation>
+    </message>
+    <message>
+      <source>User Management...</source>
+      <translation>使用者管理...</translation>
+    </message>
+    <message>
+      <source>Local Settings...</source>
+      <translation>本地設定...</translation>
+    </message>
+    <message>
+      <source>Audit Trail...</source>
+      <translation>使用者行為記錄...</translation>
+    </message>
+    <message>
+      <source>Bookmark Search...</source>
+      <translation>書籤搜尋...</translation>
+    </message>
+    <message>
+      <source>Log in to %1...</source>
+      <comment>Log in to Nx Cloud</comment>
+      <translation>登入到 %1...</translation>
+    </message>
+    <message>
+      <source>Log out from %1</source>
+      <comment>Log out from Nx Cloud</comment>
+      <translation>從 %1 登出</translation>
+    </message>
+    <message>
+      <source>Open %1 Portal...</source>
+      <comment>Open Nx Cloud Portal</comment>
+      <translation>打開 %1 入口...</translation>
+    </message>
+    <message>
+      <source>Account Settings...</source>
+      <translation>帳號設置...</translation>
+    </message>
+    <message>
+      <source>Create Account...</source>
+      <translation>新建帳號...</translation>
+    </message>
+    <message>
+      <source>Event Rules...</source>
+      <translation>事件規則...</translation>
+    </message>
+    <message>
+      <source>Devices List</source>
+      <translation>裝置列表</translation>
+    </message>
+    <message>
+      <source>Cameras List</source>
+      <translation>攝影機列表</translation>
+    </message>
+    <message>
+      <source>Merge Systems...</source>
+      <translation>合併系統...</translation>
+    </message>
+    <message>
+      <source>About...</source>
+      <translation>關於...</translation>
+    </message>
+    <message>
+      <source>Exit</source>
+      <translation>退出</translation>
+    </message>
+    <message>
+      <source>Mark Selection Start</source>
+      <translation>標記此處為開始</translation>
+    </message>
+    <message>
+      <source>Mark Selection End</source>
+      <translation>標記此處為結束</translation>
+    </message>
+    <message>
+      <source>Clear Selection</source>
+      <translation>清除選擇的區塊</translation>
+    </message>
+    <message>
+      <source>Zoom to Selection</source>
+      <translation>拉伸至選擇區域</translation>
+    </message>
+    <message>
+      <source>Add Bookmark...</source>
+      <translation>新增書籤...</translation>
+    </message>
+    <message>
+      <source>Edit Bookmark...</source>
+      <translation>編輯書籤...</translation>
+    </message>
+    <message>
+      <source>Remove Bookmark...</source>
+      <translation>移除書籤...</translation>
+    </message>
+    <message>
+      <source>Remove Bookmarks...</source>
+      <translation>移除書籤...</translation>
+    </message>
+    <message>
+      <source>Export Selected Area...</source>
+      <translation>匯出選擇區段...</translation>
+    </message>
+    <message>
+      <source>Export Multi-Video...</source>
+      <translation>匯出多個影像...</translation>
+    </message>
+    <message>
+      <source>Export Rapid Review...</source>
+      <translation>匯出縮時預覽...</translation>
+    </message>
+    <message>
+      <source>Preview Search...</source>
+      <translation>預覽搜尋...</translation>
+    </message>
+    <message>
+      <source>Server...</source>
+      <translation>伺服器...</translation>
+    </message>
+    <message>
+      <source>Open</source>
+      <translation>開啟</translation>
+    </message>
+    <message>
+      <source>Monitor</source>
+      <translation>顯示器</translation>
+    </message>
+    <message>
+      <source>Open in New Tab</source>
+      <translation>在新頁籤中開啟</translation>
+    </message>
+    <message>
+      <source>Monitor in New Tab</source>
+      <translation>於新頁籤中檢視</translation>
+    </message>
+    <message>
+      <source>Open in Alarm Layout</source>
+      <translation>影像彈跳</translation>
+    </message>
+    <message>
+      <source>Open in New Window</source>
+      <translation>在新視窗中開啟</translation>
+    </message>
+    <message>
+      <source>Monitor in New Window</source>
+      <translation>於新視窗中檢視</translation>
+    </message>
+    <message>
+      <source>Open Video Wall</source>
+      <translation type="unfinished">Open Video Wall</translation>
+    </message>
+    <message>
+      <source>Open Containing Folder</source>
+      <translation>開啟檔案所在目錄</translation>
+    </message>
+    <message>
+      <source>Identify</source>
+      <translation>識別</translation>
+    </message>
+    <message>
+      <source>Attach to Video Wall...</source>
+      <translation>連接電視牆...</translation>
+    </message>
+    <message>
+      <source>Switch to Video Wall mode...</source>
+      <translation>切換至電視牆模式...</translation>
+    </message>
+    <message>
+      <source>Save Video Wall</source>
+      <translation type="unfinished">Save Video Wall</translation>
+    </message>
+    <message>
+      <source>Save Current Matrix</source>
+      <translation>儲存現有矩陣</translation>
+    </message>
+    <message>
+      <source>Load Matrix</source>
+      <translation>讀取矩陣</translation>
+    </message>
+    <message>
+      <source>Delete</source>
+      <translation>刪除</translation>
+    </message>
+    <message>
+      <source>Stop Video Wall</source>
+      <translation>停止電視牆</translation>
+    </message>
+    <message>
+      <source>Clear Screen</source>
+      <translation>清除螢幕</translation>
+    </message>
+    <message>
+      <source>Save Layout</source>
+      <translation>儲存佈局</translation>
+    </message>
+    <message>
+      <source>Save Layout As...</source>
+      <translation>另存佈局為…</translation>
+    </message>
+    <message>
+      <source>Maximize Item</source>
+      <translation>最大化項目</translation>
+    </message>
+    <message>
+      <source>Restore Item</source>
+      <translation>返回項目</translation>
+    </message>
+    <message>
+      <source>Show Info</source>
+      <translation>顯示資訊</translation>
+    </message>
+    <message>
+      <source>Hide Info</source>
+      <translation>隱藏資訊</translation>
+    </message>
+    <message>
+      <source>Change Resolution...</source>
+      <translation>變更解析度...</translation>
+    </message>
+    <message>
+      <source>Auto</source>
+      <translation>自動</translation>
+    </message>
+    <message>
+      <source>Low</source>
+      <translation>低</translation>
+    </message>
+    <message>
+      <source>High</source>
+      <translation>高</translation>
+    </message>
+    <message>
+      <source>PTZ...</source>
+      <translation>PTZ...</translation>
+    </message>
+    <message>
+      <source>Save Current Position...</source>
+      <translation>儲存目前位置...</translation>
+    </message>
+    <message>
+      <source>Manage...</source>
+      <translation>管理…</translation>
+    </message>
+    <message>
+      <source>Show Motion/Smart Search</source>
+      <translation>隱藏位移 / 智慧搜尋</translation>
+    </message>
+    <message>
+      <source>Show Motion</source>
+      <translation>顯示位移</translation>
+    </message>
+    <message>
+      <source>Hide Motion/Smart Search</source>
+      <translation>隱藏位移 / 智慧搜尋</translation>
+    </message>
+    <message>
+      <source>Hide Motion</source>
+      <translation>隱藏位移</translation>
+    </message>
+    <message>
+      <source>Clear Motion Selection</source>
+      <translation>清除位移偵測選擇</translation>
+    </message>
+    <message>
+      <source>Check File Watermark</source>
+      <translation>檢查檔案浮水印</translation>
+    </message>
+    <message>
+      <source>Image Enhancement...</source>
+      <translation>影像強化...</translation>
+    </message>
+    <message>
+      <source>Rotate to...</source>
+      <translation>旋轉視角...</translation>
+    </message>
+    <message>
+      <source>0 degrees</source>
+      <translation>0 度</translation>
+    </message>
+    <message>
+      <source>90 degrees</source>
+      <translation>90 度</translation>
+    </message>
+    <message>
+      <source>180 degrees</source>
+      <translation>180 度</translation>
+    </message>
+    <message>
+      <source>270 degrees</source>
+      <translation>270 度</translation>
+    </message>
+    <message>
+      <source>Remove from Layout</source>
+      <translation>從佈局移除</translation>
+    </message>
+    <message>
+      <source>Remove from Tour</source>
+      <translation type="unfinished">Remove from Tour</translation>
+    </message>
+    <message>
+      <source>Stop Sharing Layout</source>
+      <translation>停止共用佈局</translation>
+    </message>
+    <message>
+      <source>Edit...</source>
+      <translation type="unfinished">Edit...</translation>
+    </message>
+    <message>
+      <source>Rename</source>
+      <translation>重新命名</translation>
+    </message>
+    <message>
+      <source>Delete from Disk</source>
+      <translation>從硬碟上刪除</translation>
+    </message>
+    <message>
+      <source>Set as Layout Background</source>
+      <translation>設為佈局背景 (電子地圖)</translation>
+    </message>
+    <message>
+      <source>User Settings...</source>
+      <translation>使用者設定...</translation>
+    </message>
+    <message>
+      <source>User Roles...</source>
+      <translation>使用者角色...</translation>
+    </message>
+    <message>
+      <source>Role Settings...</source>
+      <translation>角色設定...</translation>
+    </message>
+    <message>
+      <source>Check Device Issues...</source>
+      <translation>檢視裝置問題...</translation>
+    </message>
+    <message>
+      <source>Check Devices Issues...</source>
+      <translation>檢視裝置問題...</translation>
+    </message>
+    <message>
+      <source>Check Camera Issues...</source>
+      <translation>檢視攝影機問題...</translation>
+    </message>
+    <message>
+      <source>Check Cameras Issues...</source>
+      <translation>檢視攝影機問題...</translation>
+    </message>
+    <message>
+      <source>Check I/O Module Issues...</source>
+      <translation>檢查 I/O 模組問題...</translation>
+    </message>
+    <message>
+      <source>Check I/O Modules Issues...</source>
+      <translation>檢查 I/O 模組問題...</translation>
+    </message>
+    <message>
+      <source>Device Rules...</source>
+      <translation>裝置規則...</translation>
+    </message>
+    <message>
+      <source>Devices Rules...</source>
+      <translation>裝置規則...</translation>
+    </message>
+    <message>
+      <source>Camera Rules...</source>
+      <translation>攝影機規則...</translation>
+    </message>
+    <message>
+      <source>Cameras Rules...</source>
+      <translation>攝影機規則...</translation>
+    </message>
+    <message>
+      <source>I/O Module Rules...</source>
+      <translation>I/O 模組規則...</translation>
+    </message>
+    <message>
+      <source>I/O Modules Rules...</source>
+      <translation>I/O 模組規則...</translation>
+    </message>
+    <message>
+      <source>Device Settings...</source>
+      <translation>裝置設定...</translation>
+    </message>
+    <message>
+      <source>Devices Settings...</source>
+      <translation>裝置設定...</translation>
+    </message>
+    <message>
+      <source>Camera Settings...</source>
+      <translation>攝影機設定...</translation>
+    </message>
+    <message>
+      <source>Cameras Settings...</source>
+      <translation>攝影機設定...</translation>
+    </message>
+    <message>
+      <source>I/O Module Settings...</source>
+      <translation>I/O 模組設定...</translation>
+    </message>
+    <message>
+      <source>I/O Modules Settings...</source>
+      <translation>I/O 模組設定...</translation>
+    </message>
+    <message>
+      <source>File Settings...</source>
+      <translation>檔案設定...</translation>
+    </message>
+    <message>
+      <source>Layout Settings...</source>
+      <translation>佈局設定...</translation>
+    </message>
+    <message>
+      <source>Video Wall Settings...</source>
+      <translation>電視牆設定...</translation>
+    </message>
+    <message>
+      <source>Add Device...</source>
+      <translation>新增裝置...</translation>
+    </message>
+    <message>
+      <source>Devices List by Server...</source>
+      <translation>伺服器裝置列表...</translation>
+    </message>
+    <message>
+      <source>Cameras List by Server...</source>
+      <translation>伺服器攝影機列表...</translation>
+    </message>
+    <message>
+      <source>Server Logs...</source>
+      <translation>伺服器記錄...</translation>
+    </message>
+    <message>
+      <source>Server Diagnostics...</source>
+      <translation>伺服器診斷...</translation>
+    </message>
+    <message>
+      <source>Server Web Page...</source>
+      <translation>伺服器 Web 頁面...</translation>
+    </message>
+    <message>
+      <source>Server Settings...</source>
+      <translation>伺服器設定...</translation>
+    </message>
+    <message>
+      <source>Merge to Currently Connected System...</source>
+      <translation>合併至目前連線的系統...</translation>
+    </message>
+    <message>
+      <source>Change Cell Aspect Ratio...</source>
+      <translation>變更 Cell 長寬比...</translation>
+    </message>
+    <message>
+      <source>Change Cell Spacing...</source>
+      <translation>變更 Cell 間距...</translation>
+    </message>
+    <message>
+      <source>None</source>
+      <translation>無</translation>
+    </message>
+    <message>
+      <source>Small</source>
+      <translation>小</translation>
+    </message>
+    <message>
+      <source>Medium</source>
+      <translation>中</translation>
+    </message>
+    <message>
+      <source>Large</source>
+      <translation>大</translation>
+    </message>
+    <message>
+      <source>Start Tour</source>
+      <translation>開始輪跳</translation>
+    </message>
+    <message>
+      <source>Stop Tour</source>
+      <translation>停止輪跳</translation>
+    </message>
+    <message>
+      <source>Make Layout Tour</source>
+      <translation type="unfinished">Make Layout Tour</translation>
+    </message>
+    <message>
+      <source>Settings</source>
+      <translation type="unfinished">Settings</translation>
+    </message>
+    <message>
+      <source>Close</source>
+      <translation>關閉</translation>
+    </message>
+    <message>
+      <source>Close All But This</source>
+      <translation>關閉其他畫面</translation>
+    </message>
+    <message>
+      <source>Play</source>
+      <translation>播放</translation>
+    </message>
+    <message>
+      <source>Pause</source>
+      <translation>暫停</translation>
+    </message>
+    <message>
+      <source>Previous Frame</source>
+      <translation>上一圖框</translation>
+    </message>
+    <message>
+      <source>Next Frame</source>
+      <translation>下一圖框</translation>
+    </message>
+    <message>
+      <source>To Start</source>
+      <translation>到起始點</translation>
+    </message>
+    <message>
+      <source>To End</source>
+      <translation>到結束點</translation>
+    </message>
+    <message>
+      <source>Volume Down</source>
+      <translation>降低音量</translation>
+    </message>
+    <message>
+      <source>Volume Up</source>
+      <translation>提升音量</translation>
+    </message>
+    <message>
+      <source>Toggle Mute</source>
+      <translation>靜音模式切換</translation>
+    </message>
+    <message>
+      <source>Jump to Live</source>
+      <translation>切換為即時畫面</translation>
+    </message>
+    <message>
+      <source>Synchronize Streams</source>
+      <translation>同步所有串流</translation>
+    </message>
+    <message>
+      <source>Disable Stream Synchronization</source>
+      <translation>不同步串流</translation>
+    </message>
+    <message>
+      <source>Show Bookmarks</source>
+      <translation>顯示書籤</translation>
+    </message>
+    <message>
+      <source>Hide Bookmarks</source>
+      <translation>隱藏書籤</translation>
+    </message>
+    <message>
+      <source>Show Calendar</source>
+      <translation>顯示日曆</translation>
+    </message>
+    <message>
+      <source>Hide Calendar</source>
+      <translation>不顯示日曆</translation>
+    </message>
+    <message>
+      <source>Show Title Bar</source>
+      <translation>顯示標題列</translation>
+    </message>
+    <message>
+      <source>Hide Title Bar</source>
+      <translation>隱藏標題列</translation>
+    </message>
+    <message>
+      <source>Pin Tree</source>
+      <translation>固定顯示樹狀表</translation>
+    </message>
+    <message>
+      <source>Unpin Tree</source>
+      <translation>不固定顯示樹狀表</translation>
+    </message>
+    <message>
+      <source>Show Tree</source>
+      <translation>顯示樹狀表</translation>
+    </message>
+    <message>
+      <source>Hide Tree</source>
+      <translation>不顯示樹狀表</translation>
+    </message>
+    <message>
+      <source>Show Timeline</source>
+      <translation>顯示時間軸</translation>
+    </message>
+    <message>
+      <source>Hide Timeline</source>
+      <translation>不顯示時間軸</translation>
+    </message>
+    <message>
+      <source>Show Notifications</source>
+      <translation>顯示通知</translation>
+    </message>
+    <message>
+      <source>Hide Notifications</source>
+      <translation>隱藏通知</translation>
+    </message>
+    <message>
+      <source>Pin Notifications</source>
+      <translation>固定顯示通知</translation>
+    </message>
+    <message>
+      <source>Unpin Notifications</source>
+      <translation>不固定顯示通知</translation>
+    </message>
+  </context>
+  <context>
     <name>CustomHorizontalHeader</name>
     <message>
       <source>5 minutes</source>
@@ -117,6 +919,45 @@ to view more bookmarks</source>
     <message>
       <source>For all data</source>
       <translation>所有資料</translation>
+    </message>
+  </context>
+  <context>
+    <name>Deactivator</name>
+    <message>
+      <source>Unknown error</source>
+      <translation type="unfinished">Unknown error</translation>
+    </message>
+    <message>
+      <source>License does not exist</source>
+      <translation type="unfinished">License does not exist</translation>
+    </message>
+    <message>
+      <source>License is disabled</source>
+      <translation type="unfinished">License is disabled</translation>
+    </message>
+    <message>
+      <source>License is inactive</source>
+      <translation type="unfinished">License is inactive</translation>
+    </message>
+    <message>
+      <source>Invalid license</source>
+      <translation type="unfinished">Invalid license</translation>
+    </message>
+    <message>
+      <source>License is trial</source>
+      <translation type="unfinished">License is trial</translation>
+    </message>
+    <message>
+      <source>License is in deactivation process</source>
+      <translation type="unfinished">License is in deactivation process</translation>
+    </message>
+    <message>
+      <source>Invalid hardware id</source>
+      <translation type="unfinished">Invalid hardware id</translation>
+    </message>
+    <message>
+      <source>Limit exceeded</source>
+      <translation type="unfinished">Limit exceeded</translation>
     </message>
   </context>
   <context>
@@ -234,37 +1075,6 @@ to view more bookmarks</source>
     <message>
       <source>Permissions</source>
       <translation>權限</translation>
-    </message>
-  </context>
-  <context>
-    <name>Ptz</name>
-    <message>
-      <source>Please wait for the camera to go online.</source>
-      <translation>請等待所有攝影機上線.</translation>
-    </message>
-    <message>
-      <source>Failed to get current position</source>
-      <translation>無法取得現在位置</translation>
-    </message>
-    <message>
-      <source>Failed to set current position</source>
-      <translation>無法設定現在位置</translation>
-    </message>
-    <message>
-      <source>Preset used by some tours. Delete it anyway?</source>
-      <translation>這預設點仍被其它巡曳使用. 是否仍要刪除它?</translation>
-    </message>
-    <message>
-      <source>These tours will become invalid.</source>
-      <translation>這些巡曳將失效.</translation>
-    </message>
-    <message>
-      <source>Cannot get the current position from camera &quot;%1&quot;</source>
-      <translation type="unfinished">Cannot get the current position from camera &quot;%1&quot;</translation>
-    </message>
-    <message>
-      <source>Cannot set the current position for camera &quot;%1&quot;</source>
-      <translation type="unfinished">Cannot set the current position for camera &quot;%1&quot;</translation>
     </message>
   </context>
   <context>
@@ -398,940 +1208,6 @@ to view more bookmarks</source>
     </message>
   </context>
   <context>
-    <name>QnActionManager</name>
-    <message>
-      <source>Show FPS</source>
-      <translation>顯示 FPS</translation>
-    </message>
-    <message>
-      <source>Hide FPS</source>
-      <translation>隱藏 FPS</translation>
-    </message>
-    <message>
-      <source>Drop Resources</source>
-      <translation>丟棄資源</translation>
-    </message>
-    <message>
-      <source>Drop Resources into New Layout</source>
-      <translation>將資源放至新佈局</translation>
-    </message>
-    <message>
-      <source>Delayed Open Video Wall</source>
-      <translation>延遲顯示電視牆</translation>
-    </message>
-    <message>
-      <source>Delayed Drop Resources</source>
-      <translation>延遲丟棄資源</translation>
-    </message>
-    <message>
-      <source>Instant Drop Resources</source>
-      <translation>立即丟棄資源</translation>
-    </message>
-    <message>
-      <source>Next Layout</source>
-      <translation>下一佈局</translation>
-    </message>
-    <message>
-      <source>Previous Layout</source>
-      <translation>前一佈局</translation>
-    </message>
-    <message>
-      <source>Select All</source>
-      <translation>選擇全部</translation>
-    </message>
-    <message>
-      <source>Selection Changed</source>
-      <translation>選項已變更</translation>
-    </message>
-    <message>
-      <source>Filter...</source>
-      <translation>篩選器...</translation>
-    </message>
-    <message>
-      <source>Go to Freespace Mode</source>
-      <translation>切換至自由空間模式</translation>
-    </message>
-    <message>
-      <source>Help</source>
-      <translation>求助</translation>
-    </message>
-    <message>
-      <source>Event Log...</source>
-      <translation>事件記錄...</translation>
-    </message>
-    <message>
-      <source>Control Video Wall</source>
-      <translation>控制電視牆</translation>
-    </message>
-    <message>
-      <source>Push my screen</source>
-      <translation>同步我的桌面</translation>
-    </message>
-    <message>
-      <source>Restart application</source>
-      <translation>重新啟動應用程式</translation>
-    </message>
-    <message>
-      <source>Select Time Server</source>
-      <translation>選擇校時伺服器</translation>
-    </message>
-    <message>
-      <source>Go To Saved Position</source>
-      <translation>移至已儲存的位置</translation>
-    </message>
-    <message>
-      <source>Activate PTZ Tour</source>
-      <translation>啟動 PTZ 巡航</translation>
-    </message>
-    <message>
-      <source>Activate PTZ Object</source>
-      <translation>啟動 PTZ 物件</translation>
-    </message>
-    <message>
-      <source>Fit in View</source>
-      <translation>填滿視窗</translation>
-    </message>
-    <message>
-      <source>Main Menu</source>
-      <translation>主選單</translation>
-    </message>
-    <message>
-      <source>Connect to Server...</source>
-      <translation>連線至伺服器...</translation>
-    </message>
-    <message>
-      <source>Start Panic Recording</source>
-      <translation>開始緊急錄影</translation>
-    </message>
-    <message>
-      <source>Stop Panic Recording</source>
-      <translation>停止緊急錄影</translation>
-    </message>
-    <message>
-      <source>New...</source>
-      <translation>新增...</translation>
-    </message>
-    <message>
-      <source>New Layout...</source>
-      <translation>新佈局...</translation>
-    </message>
-    <message>
-      <source>Tab</source>
-      <translation>頁籤</translation>
-    </message>
-    <message>
-      <source>New Tab</source>
-      <translation>新增頁籤</translation>
-    </message>
-    <message>
-      <source>Window</source>
-      <translation>視窗</translation>
-    </message>
-    <message>
-      <source>New Window</source>
-      <translation>新開視窗</translation>
-    </message>
-    <message>
-      <source>User...</source>
-      <translation>使用者…</translation>
-    </message>
-    <message>
-      <source>New User...</source>
-      <translation>新增使用者…</translation>
-    </message>
-    <message>
-      <source>Video Wall...</source>
-      <translation>電視牆...</translation>
-    </message>
-    <message>
-      <source>New Video Wall...</source>
-      <translation>新增電視牆...</translation>
-    </message>
-    <message>
-      <source>Open Layout...</source>
-      <translation>開啟佈局…</translation>
-    </message>
-    <message>
-      <source>Open...</source>
-      <translation>開啟...</translation>
-    </message>
-    <message>
-      <source>File(s)...</source>
-      <translation>檔案...</translation>
-    </message>
-    <message>
-      <source>Folder...</source>
-      <translation>目錄...</translation>
-    </message>
-    <message>
-      <source>Save Current Layout</source>
-      <translation>儲存目前佈局</translation>
-    </message>
-    <message>
-      <source>Save Current Layout As...</source>
-      <translation>另存目前佈局為…</translation>
-    </message>
-    <message>
-      <source>Save Video Wall View</source>
-      <translation>儲存電視牆畫面</translation>
-    </message>
-    <message>
-      <source>Start Screen Recording</source>
-      <translation>開始螢幕錄影</translation>
-    </message>
-    <message>
-      <source>Stop Screen Recording</source>
-      <translation>停止螢幕錄影</translation>
-    </message>
-    <message>
-      <source>Stop current action</source>
-      <translation>停止目前動作</translation>
-    </message>
-    <message>
-      <source>Go to Fullscreen</source>
-      <translation>切換為全螢幕</translation>
-    </message>
-    <message>
-      <source>Exit Fullscreen</source>
-      <translation>離開全螢幕</translation>
-    </message>
-    <message>
-      <source>Minimize</source>
-      <translation>最小化</translation>
-    </message>
-    <message>
-      <source>Maximize</source>
-      <translation>最大化</translation>
-    </message>
-    <message>
-      <source>Restore Down</source>
-      <translation>恢復視窗化</translation>
-    </message>
-    <message>
-      <source>Open in Browser...</source>
-      <translation>在瀏覽器開啟…</translation>
-    </message>
-    <message>
-      <source>System Administration...</source>
-      <translation>系統管理...</translation>
-    </message>
-    <message>
-      <source>Open Web Client...</source>
-      <translation>開啟網頁用戶端…</translation>
-    </message>
-    <message>
-      <source>System Update...</source>
-      <translation>系統升級...</translation>
-    </message>
-    <message>
-      <source>Local Settings...</source>
-      <translation>本地設定...</translation>
-    </message>
-    <message>
-      <source>Merge Systems...</source>
-      <translation>合併系統...</translation>
-    </message>
-    <message>
-      <source>About...</source>
-      <translation>關於...</translation>
-    </message>
-    <message>
-      <source>Exit</source>
-      <translation>退出</translation>
-    </message>
-    <message>
-      <source>Server...</source>
-      <translation>伺服器...</translation>
-    </message>
-    <message>
-      <source>Open in Layout</source>
-      <translation>在佈局內開啟</translation>
-    </message>
-    <message>
-      <source>Open</source>
-      <translation>開啟</translation>
-    </message>
-    <message>
-      <source>Monitor</source>
-      <translation>顯示器</translation>
-    </message>
-    <message>
-      <source>Open in New Tab</source>
-      <translation>在新頁籤中開啟</translation>
-    </message>
-    <message>
-      <source>Open in New Window</source>
-      <translation>在新視窗中開啟</translation>
-    </message>
-    <message>
-      <source>Open Layouts</source>
-      <translation>開啟佈局</translation>
-    </message>
-    <message>
-      <source>Open Layout(s)</source>
-      <translation>開啟佈局</translation>
-    </message>
-    <message>
-      <source>Open Video Wall(s)</source>
-      <translation>開啟電視牆</translation>
-    </message>
-    <message>
-      <source>Open Containing Folder</source>
-      <translation>開啟檔案所在目錄</translation>
-    </message>
-    <message>
-      <source>Identify</source>
-      <translation>識別</translation>
-    </message>
-    <message>
-      <source>Attach to Video Wall...</source>
-      <translation>連接電視牆...</translation>
-    </message>
-    <message>
-      <source>Switch to Video Wall mode...</source>
-      <translation>切換至電視牆模式...</translation>
-    </message>
-    <message>
-      <source>Save Current Matrix</source>
-      <translation>儲存現有矩陣</translation>
-    </message>
-    <message>
-      <source>Load Matrix</source>
-      <translation>讀取矩陣</translation>
-    </message>
-    <message>
-      <source>Delete</source>
-      <translation>刪除</translation>
-    </message>
-    <message>
-      <source>Stop Video Wall</source>
-      <translation>停止電視牆</translation>
-    </message>
-    <message>
-      <source>Save Layout</source>
-      <translation>儲存佈局</translation>
-    </message>
-    <message>
-      <source>Save Layout As...</source>
-      <translation>另存佈局為…</translation>
-    </message>
-    <message>
-      <source>Maximize Item</source>
-      <translation>最大化項目</translation>
-    </message>
-    <message>
-      <source>Restore Item</source>
-      <translation>返回項目</translation>
-    </message>
-    <message>
-      <source>Show Info</source>
-      <translation>顯示資訊</translation>
-    </message>
-    <message>
-      <source>Hide Info</source>
-      <translation>隱藏資訊</translation>
-    </message>
-    <message>
-      <source>Toggle Info</source>
-      <translation>切換資訊</translation>
-    </message>
-    <message>
-      <source>Change Resolution...</source>
-      <translation>變更解析度...</translation>
-    </message>
-    <message>
-      <source>Auto</source>
-      <translation>自動</translation>
-    </message>
-    <message>
-      <source>Low</source>
-      <translation>低</translation>
-    </message>
-    <message>
-      <source>High</source>
-      <translation>高</translation>
-    </message>
-    <message>
-      <source>PTZ...</source>
-      <translation>PTZ...</translation>
-    </message>
-    <message>
-      <source>Save Current Position...</source>
-      <translation>儲存目前位置...</translation>
-    </message>
-    <message>
-      <source>Manage...</source>
-      <translation>管理…</translation>
-    </message>
-    <message>
-      <source>Calibrate Fisheye</source>
-      <translation>魚眼校正</translation>
-    </message>
-    <message>
-      <source>Toggle Resolution Mode</source>
-      <translation>切換解析度模式</translation>
-    </message>
-    <message>
-      <source>Show Motion/Smart Search</source>
-      <translation>隱藏位移 / 智慧搜尋</translation>
-    </message>
-    <message>
-      <source>Show Motion</source>
-      <translation>顯示位移</translation>
-    </message>
-    <message>
-      <source>Hide Motion/Smart Search</source>
-      <translation>隱藏位移 / 智慧搜尋</translation>
-    </message>
-    <message>
-      <source>Hide Motion</source>
-      <translation>隱藏位移</translation>
-    </message>
-    <message>
-      <source>Clear Motion Selection</source>
-      <translation>清除位移偵測選擇</translation>
-    </message>
-    <message>
-      <source>Toggle Smart Search</source>
-      <translation>切換智慧搜尋</translation>
-    </message>
-    <message>
-      <source>Check File Watermark</source>
-      <translation>檢查檔案浮水印</translation>
-    </message>
-    <message>
-      <source>Take Screenshot</source>
-      <translation>螢幕擷取</translation>
-    </message>
-    <message>
-      <source>Image Enhancement...</source>
-      <translation>影像強化...</translation>
-    </message>
-    <message>
-      <source>Create Zoom Window</source>
-      <translation>建立放大窗格</translation>
-    </message>
-    <message>
-      <source>Rotate to...</source>
-      <translation>旋轉視角...</translation>
-    </message>
-    <message>
-      <source>0 degrees</source>
-      <translation>0 度</translation>
-    </message>
-    <message>
-      <source>90 degrees</source>
-      <translation>90 度</translation>
-    </message>
-    <message>
-      <source>180 degrees</source>
-      <translation>180 度</translation>
-    </message>
-    <message>
-      <source>270 degrees</source>
-      <translation>270 度</translation>
-    </message>
-    <message>
-      <source>Remove from Layout</source>
-      <translation>從佈局移除</translation>
-    </message>
-    <message>
-      <source>Rename</source>
-      <translation>重新命名</translation>
-    </message>
-    <message>
-      <source>Delete from Disk</source>
-      <translation>從硬碟上刪除</translation>
-    </message>
-    <message>
-      <source>Set as Layout Background</source>
-      <translation>設為佈局背景 (電子地圖)</translation>
-    </message>
-    <message>
-      <source>User Settings...</source>
-      <translation>使用者設定...</translation>
-    </message>
-    <message>
-      <source>Layout Settings...</source>
-      <translation>佈局設定...</translation>
-    </message>
-    <message>
-      <source>Video Wall Settings...</source>
-      <translation>電視牆設定...</translation>
-    </message>
-    <message>
-      <source>Ping...</source>
-      <translation>Ping...</translation>
-    </message>
-    <message>
-      <source>Server Logs...</source>
-      <translation>伺服器記錄...</translation>
-    </message>
-    <message>
-      <source>Server Diagnostics...</source>
-      <translation>伺服器診斷...</translation>
-    </message>
-    <message>
-      <source>Server Settings...</source>
-      <translation>伺服器設定...</translation>
-    </message>
-    <message>
-      <source>Merge to Currently Connected System...</source>
-      <translation>合併至目前連線的系統...</translation>
-    </message>
-    <message>
-      <source>Change Cell Aspect Ratio...</source>
-      <translation>變更 Cell 長寬比...</translation>
-    </message>
-    <message>
-      <source>Change Cell Spacing...</source>
-      <translation>變更 Cell 間距...</translation>
-    </message>
-    <message>
-      <source>None</source>
-      <translation>無</translation>
-    </message>
-    <message>
-      <source>Small</source>
-      <translation>小</translation>
-    </message>
-    <message>
-      <source>Medium</source>
-      <translation>中</translation>
-    </message>
-    <message>
-      <source>Large</source>
-      <translation>大</translation>
-    </message>
-    <message>
-      <source>Start Tour</source>
-      <translation>開始輪跳</translation>
-    </message>
-    <message>
-      <source>Stop Tour</source>
-      <translation>停止輪跳</translation>
-    </message>
-    <message>
-      <source>Close</source>
-      <translation>關閉</translation>
-    </message>
-    <message>
-      <source>Close All But This</source>
-      <translation>關閉其他畫面</translation>
-    </message>
-    <message>
-      <source>Mark Selection Start</source>
-      <translation>標記此處為開始</translation>
-    </message>
-    <message>
-      <source>Mark Selection End</source>
-      <translation>標記此處為結束</translation>
-    </message>
-    <message>
-      <source>Clear Selection</source>
-      <translation>清除選擇的區塊</translation>
-    </message>
-    <message>
-      <source>Zoom to Selection</source>
-      <translation>拉伸至選擇區域</translation>
-    </message>
-    <message>
-      <source>Edit Bookmark...</source>
-      <translation>編輯書籤...</translation>
-    </message>
-    <message>
-      <source>Remove Bookmark...</source>
-      <translation>移除書籤...</translation>
-    </message>
-    <message>
-      <source>Export Selected Area...</source>
-      <translation>匯出選擇區段...</translation>
-    </message>
-    <message>
-      <source>Export Multi-Video...</source>
-      <translation>匯出多個影像...</translation>
-    </message>
-    <message>
-      <source>Preview Search...</source>
-      <translation>預覽搜尋...</translation>
-    </message>
-    <message>
-      <source>Play</source>
-      <translation>播放</translation>
-    </message>
-    <message>
-      <source>Pause</source>
-      <translation>暫停</translation>
-    </message>
-    <message>
-      <source>Previous Frame</source>
-      <translation>上一圖框</translation>
-    </message>
-    <message>
-      <source>Next Frame</source>
-      <translation>下一圖框</translation>
-    </message>
-    <message>
-      <source>To Start</source>
-      <translation>到起始點</translation>
-    </message>
-    <message>
-      <source>To End</source>
-      <translation>到結束點</translation>
-    </message>
-    <message>
-      <source>Volume Down</source>
-      <translation>降低音量</translation>
-    </message>
-    <message>
-      <source>Volume Up</source>
-      <translation>提升音量</translation>
-    </message>
-    <message>
-      <source>Toggle Mute</source>
-      <translation>靜音模式切換</translation>
-    </message>
-    <message>
-      <source>Jump to Live</source>
-      <translation>切換為即時畫面</translation>
-    </message>
-    <message>
-      <source>Synchronize Streams</source>
-      <translation>同步所有串流</translation>
-    </message>
-    <message>
-      <source>Disable Stream Synchronization</source>
-      <translation>不同步串流</translation>
-    </message>
-    <message>
-      <source>Show Thumbnails</source>
-      <translation>顯示縮圖</translation>
-    </message>
-    <message>
-      <source>Hide Thumbnails</source>
-      <translation>不顯示縮圖</translation>
-    </message>
-    <message>
-      <source>Show Calendar</source>
-      <translation>顯示日曆</translation>
-    </message>
-    <message>
-      <source>Hide Calendar</source>
-      <translation>不顯示日曆</translation>
-    </message>
-    <message>
-      <source>Show Title Bar</source>
-      <translation>顯示標題列</translation>
-    </message>
-    <message>
-      <source>Hide Title Bar</source>
-      <translation>隱藏標題列</translation>
-    </message>
-    <message>
-      <source>Pin Tree</source>
-      <translation>固定顯示樹狀表</translation>
-    </message>
-    <message>
-      <source>Unpin Tree</source>
-      <translation>不固定顯示樹狀表</translation>
-    </message>
-    <message>
-      <source>Show Tree</source>
-      <translation>顯示樹狀表</translation>
-    </message>
-    <message>
-      <source>Hide Tree</source>
-      <translation>不顯示樹狀表</translation>
-    </message>
-    <message>
-      <source>Show Timeline</source>
-      <translation>顯示時間軸</translation>
-    </message>
-    <message>
-      <source>Hide Timeline</source>
-      <translation>不顯示時間軸</translation>
-    </message>
-    <message>
-      <source>Pin Notifications</source>
-      <translation>固定顯示通知</translation>
-    </message>
-    <message>
-      <source>Unpin Notifications</source>
-      <translation>不固定顯示通知</translation>
-    </message>
-    <message>
-      <source>File Settings...</source>
-      <translation>檔案設定...</translation>
-    </message>
-    <message>
-      <source>User Management...</source>
-      <translation>使用者管理...</translation>
-    </message>
-    <message>
-      <source>Audit Trail...</source>
-      <translation>使用者行為記錄...</translation>
-    </message>
-    <message>
-      <source>Failover Priority...</source>
-      <translation>備援優先權...</translation>
-    </message>
-    <message>
-      <source>Move Devices</source>
-      <translation>移動裝置</translation>
-    </message>
-    <message>
-      <source>Move Cameras</source>
-      <translation>移動攝影機</translation>
-    </message>
-    <message>
-      <source>Device Diagnostics...</source>
-      <translation>裝置診斷...</translation>
-    </message>
-    <message>
-      <source>Camera Diagnostics...</source>
-      <translation>攝影機診斷...</translation>
-    </message>
-    <message>
-      <source>Devices List</source>
-      <translation>裝置列表</translation>
-    </message>
-    <message>
-      <source>Cameras List</source>
-      <translation>攝影機列表</translation>
-    </message>
-    <message>
-      <source>Check Device Issues...</source>
-      <translation>檢視裝置問題...</translation>
-    </message>
-    <message>
-      <source>Check Devices Issues...</source>
-      <translation>檢視裝置問題...</translation>
-    </message>
-    <message>
-      <source>Check Camera Issues...</source>
-      <translation>檢視攝影機問題...</translation>
-    </message>
-    <message>
-      <source>Check Cameras Issues...</source>
-      <translation>檢視攝影機問題...</translation>
-    </message>
-    <message>
-      <source>Device Rules...</source>
-      <translation>裝置規則...</translation>
-    </message>
-    <message>
-      <source>Devices Rules...</source>
-      <translation>裝置規則...</translation>
-    </message>
-    <message>
-      <source>Camera Rules...</source>
-      <translation>攝影機規則...</translation>
-    </message>
-    <message>
-      <source>Cameras Rules...</source>
-      <translation>攝影機規則...</translation>
-    </message>
-    <message>
-      <source>Device Settings...</source>
-      <translation>裝置設定...</translation>
-    </message>
-    <message>
-      <source>Devices Settings...</source>
-      <translation>裝置設定...</translation>
-    </message>
-    <message>
-      <source>Camera Settings...</source>
-      <translation>攝影機設定...</translation>
-    </message>
-    <message>
-      <source>Cameras Settings...</source>
-      <translation>攝影機設定...</translation>
-    </message>
-    <message>
-      <source>Devices List by Server...</source>
-      <translation>伺服器裝置列表...</translation>
-    </message>
-    <message>
-      <source>Cameras List by Server...</source>
-      <translation>伺服器攝影機列表...</translation>
-    </message>
-    <message>
-      <source>Cameras to Backup...</source>
-      <translation>要備份的攝影機...</translation>
-    </message>
-    <message>
-      <source>Show Bookmarks</source>
-      <translation>顯示書籤</translation>
-    </message>
-    <message>
-      <source>Hide Bookmarks</source>
-      <translation>隱藏書籤</translation>
-    </message>
-    <message>
-      <source>Pin Calendar</source>
-      <translation>鎖定月曆</translation>
-    </message>
-    <message>
-      <source>Unpin Calendar</source>
-      <translation>解鎖月曆</translation>
-    </message>
-    <message>
-      <source>I/O Module Diagnostics...</source>
-      <translation>I/O 模組診斷...</translation>
-    </message>
-    <message>
-      <source>Web Client...</source>
-      <translation>Web Client...</translation>
-    </message>
-    <message>
-      <source>Bookmark Search...</source>
-      <translation>書籤搜尋...</translation>
-    </message>
-    <message>
-      <source>Open in Alarm Layout</source>
-      <translation>影像彈跳</translation>
-    </message>
-    <message>
-      <source>Check I/O Module Issues...</source>
-      <translation>檢查 I/O 模組問題...</translation>
-    </message>
-    <message>
-      <source>Check I/O Modules Issues...</source>
-      <translation>檢查 I/O 模組問題...</translation>
-    </message>
-    <message>
-      <source>I/O Module Rules...</source>
-      <translation>I/O 模組規則...</translation>
-    </message>
-    <message>
-      <source>I/O Modules Rules...</source>
-      <translation>I/O 模組規則...</translation>
-    </message>
-    <message>
-      <source>I/O Module Settings...</source>
-      <translation>I/O 模組設定...</translation>
-    </message>
-    <message>
-      <source>I/O Modules Settings...</source>
-      <translation>I/O 模組設定...</translation>
-    </message>
-    <message>
-      <source>Remove Bookmarks...</source>
-      <translation>移除書籤...</translation>
-    </message>
-    <message>
-      <source>Monitor in New Tab</source>
-      <translation>於新頁籤中檢視</translation>
-    </message>
-    <message>
-      <source>Monitor in New Window</source>
-      <translation>於新視窗中檢視</translation>
-    </message>
-    <message>
-      <source>Open Layout in New Tab</source>
-      <translation>於新頁籤中開啟佈局</translation>
-    </message>
-    <message>
-      <source>Open Layout(s) in New Window</source>
-      <translation>於新視窗中開啟佈局</translation>
-    </message>
-    <message>
-      <source>Open Current Layout in New Window</source>
-      <translation>於新視窗中開啟當前佈局</translation>
-    </message>
-    <message>
-      <source>Add Bookmark...</source>
-      <translation>新增書籤...</translation>
-    </message>
-    <message>
-      <source>Export Rapid Review...</source>
-      <translation>匯出縮時預覽...</translation>
-    </message>
-    <message>
-      <source>Event Rules...</source>
-      <translation>事件規則...</translation>
-    </message>
-    <message>
-      <source>Disconnect from Server</source>
-      <translation>中斷連線</translation>
-    </message>
-    <message>
-      <source>Browse Local Files</source>
-      <translation>瀏覽本地檔案</translation>
-    </message>
-    <message>
-      <source>Show Welcome Screen</source>
-      <translation>顯示歡迎畫面</translation>
-    </message>
-    <message>
-      <source>Web Page...</source>
-      <translation>Web 頁面...</translation>
-    </message>
-    <message>
-      <source>New Web Page...</source>
-      <translation>新 Web 頁面...</translation>
-    </message>
-    <message>
-      <source>Log in to %1...</source>
-      <comment>Log in to Nx Cloud</comment>
-      <translation>登入到 %1...</translation>
-    </message>
-    <message>
-      <source>Log out from %1</source>
-      <comment>Log out from Nx Cloud</comment>
-      <translation>從 %1 登出</translation>
-    </message>
-    <message>
-      <source>Open %1 Portal...</source>
-      <comment>Open Nx Cloud Portal</comment>
-      <translation>打開 %1 入口...</translation>
-    </message>
-    <message>
-      <source>Stop Sharing Layout</source>
-      <translation>停止共用佈局</translation>
-    </message>
-    <message>
-      <source>User Roles...</source>
-      <translation>使用者角色...</translation>
-    </message>
-    <message>
-      <source>Role Settings...</source>
-      <translation>角色設定...</translation>
-    </message>
-    <message>
-      <source>Show Notifications</source>
-      <translation>顯示通知</translation>
-    </message>
-    <message>
-      <source>Hide Notifications</source>
-      <translation>隱藏通知</translation>
-    </message>
-    <message>
-      <source>Connect to System</source>
-      <translation>連接到系統</translation>
-    </message>
-    <message>
-      <source>Account Settings...</source>
-      <translation>帳號設置...</translation>
-    </message>
-    <message>
-      <source>Create Account...</source>
-      <translation>新建帳號...</translation>
-    </message>
-    <message>
-      <source>Server Web Page...</source>
-      <translation>伺服器 Web 頁面...</translation>
-    </message>
-    <message>
-      <source>Add Device...</source>
-      <translation>新增裝置...</translation>
-    </message>
-    <message>
-      <source>Clear Screen</source>
-      <translation>清除螢幕</translation>
-    </message>
-  </context>
-  <context>
     <name>QnAdjustVideoDialog</name>
     <message>
       <source>Image Enhancement</source>
@@ -1347,13 +1223,6 @@ to view more bookmarks</source>
     <message>
       <source>Folder not found</source>
       <translation>找不到資料夾</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnAlarmLayoutResource</name>
-    <message>
-      <source>Alarms</source>
-      <translation>警報</translation>
     </message>
   </context>
   <context>
@@ -1783,17 +1652,6 @@ to view more bookmarks</source>
     </message>
   </context>
   <context>
-    <name>QnBusinessRuleItemDelegate</name>
-    <message>
-      <source>For Administrators Only</source>
-      <translation>僅針對管理者</translation>
-    </message>
-    <message>
-      <source>For Users</source>
-      <translation>給使用者</translation>
-    </message>
-  </context>
-  <context>
     <name>QnBusinessRuleViewModel</name>
     <message numerus="yes">
       <source>%n Server(s)</source>
@@ -1816,10 +1674,6 @@ to view more bookmarks</source>
     <message>
       <source>Starts</source>
       <translation>開始</translation>
-    </message>
-    <message>
-      <source>Administrators Only</source>
-      <translation>僅管理者</translation>
     </message>
     <message>
       <source>Select at least one device</source>
@@ -1846,10 +1700,6 @@ to view more bookmarks</source>
     <message>
       <source>N/A</source>
       <translation>不存在</translation>
-    </message>
-    <message>
-      <source>Users</source>
-      <translation>使用者</translation>
     </message>
     <message>
       <source>Every %1</source>
@@ -3210,10 +3060,6 @@ to %1</source>
   <context>
     <name>QnEventLogModel</name>
     <message>
-      <source>Administrators Only</source>
-      <translation>僅管理者</translation>
-    </message>
-    <message>
       <source>Motion video</source>
       <translation>有位移的影像</translation>
     </message>
@@ -3253,18 +3099,8 @@ to %1</source>
       </translation>
     </message>
     <message>
-      <source>Users</source>
-      <translation>使用者</translation>
-    </message>
-    <message>
       <source>Open camera</source>
       <translation>開啟攝影機</translation>
-    </message>
-    <message numerus="yes">
-      <source>%n users</source>
-      <translation>
-        <numerusform>%n 個使用者</numerusform>
-      </translation>
     </message>
     <message numerus="yes">
       <source>and %n users more...</source>
@@ -3278,9 +3114,15 @@ to %1</source>
         <numerusform>和再 %n 個...</numerusform>
       </translation>
     </message>
+    <message numerus="yes">
+      <source>%n Removed subjects</source>
+      <translation type="unfinished">
+        <numerusform>%n Removed subjects</numerusform>
+      </translation>
+    </message>
     <message>
-      <source>User removed</source>
-      <translation>使用者移除</translation>
+      <source>Subject removed</source>
+      <translation type="unfinished">Subject removed</translation>
     </message>
   </context>
   <context>
@@ -3970,6 +3812,84 @@ to %1</source>
       <source>This license is already activated and linked to hardware ID %1 on %2</source>
       <translation>這授權已啟動且綁定在硬體 ID %1 上於 %2</translation>
     </message>
+    <message numerus="yes">
+      <source>%n channels</source>
+      <translation type="unfinished">
+        <numerusform>%n channels</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Deactivate licenses?</source>
+      <translation type="unfinished">
+        <numerusform>Deactivate licenses?</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Failed to deactivate license</source>
+      <translation type="unfinished">Failed to deactivate license</translation>
+    </message>
+    <message numerus="yes">
+      <source>Failed to deactivate %n licenses</source>
+      <translation type="unfinished">
+        <numerusform>Failed to deactivate %n licenses</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%1 of %n licenses cannot be deactivated</source>
+      <translation type="unfinished">
+        <numerusform>%1 of %n licenses cannot be deactivated</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Please contact Customer Support</source>
+      <translation type="unfinished">Please contact Customer Support</translation>
+    </message>
+    <message numerus="yes">
+      <source>Deactivate %n other</source>
+      <translation type="unfinished">
+        <numerusform>Deactivate %n other</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Cannot deactivate licenses</source>
+      <translation type="unfinished">
+        <numerusform>Cannot deactivate licenses</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Cannot connect to the License Server</source>
+      <translation type="unfinished">Cannot connect to the License Server</translation>
+    </message>
+    <message>
+      <source>Please make sure your server has active Internet connection or check firewall settings.</source>
+      <translation type="unfinished">Please make sure your server has active Internet connection or check firewall settings.</translation>
+    </message>
+    <message>
+      <source>License Server error</source>
+      <translation type="unfinished">License Server error</translation>
+    </message>
+    <message>
+      <source>If the problem presists please contact Customer Support.</source>
+      <translation type="unfinished">If the problem presists please contact Customer Support.</translation>
+    </message>
+    <message>
+      <source>License deactivated</source>
+      <translation type="unfinished">License deactivated</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n licenses deactivated</source>
+      <translation type="unfinished">
+        <numerusform>%n licenses deactivated</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Remove</source>
+      <translation>移除</translation>
+    </message>
+    <message>
+      <source>Deactivate</source>
+      <translation type="unfinished">Deactivate</translation>
+    </message>
   </context>
   <context>
     <name>QnLicenseWidget</name>
@@ -4261,6 +4181,15 @@ to %1</source>
       <source>Lo-Res</source>
       <translation>低解析度</translation>
     </message>
+    <message>
+      <source>press and hold</source>
+      <comment>Software Trigger</comment>
+      <translation type="unfinished">press and hold</translation>
+    </message>
+    <message>
+      <source>Failed to invoke trigger %1 (%2)</source>
+      <translation type="unfinished">Failed to invoke trigger %1 (%2)</translation>
+    </message>
   </context>
   <context>
     <name>QnMergeSystemsDialog</name>
@@ -4490,6 +4419,20 @@ to %1</source>
       <source>Alarm: %1</source>
       <translation>警報: %1</translation>
     </message>
+    <message>
+      <source>Bookmark it</source>
+      <translation type="unfinished">Bookmark it</translation>
+    </message>
+    <message>
+      <source>Bookmark created</source>
+      <translation type="unfinished">Bookmark created</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n bookmarks created</source>
+      <translation type="unfinished">
+        <numerusform>%n bookmarks created</numerusform>
+      </translation>
+    </message>
   </context>
   <context>
     <name>QnPerformanceTest</name>
@@ -4545,8 +4488,8 @@ to %1</source>
       <translation>使用者輸入</translation>
     </message>
     <message>
-      <source>PTZ, Device Output, 2-way Audio</source>
-      <translation>PTZ, 設備輸出, 雙向語音</translation>
+      <source>PTZ, Device Output, 2-Way Audio, Software Triggers.</source>
+      <translation type="unfinished">PTZ, Device Output, 2-Way Audio, Software Triggers.</translation>
     </message>
   </context>
   <context>
@@ -4668,19 +4611,6 @@ to %1</source>
     <message>
       <source>Hotkey used by tour &quot;%1&quot;</source>
       <translation type="unfinished">Hotkey used by tour &quot;%1&quot;</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnPtzPresetsToursActionFactory</name>
-    <message>
-      <source>%1 (active)</source>
-      <comment>Template for active PTZ preset</comment>
-      <translation>%1 (主動)</translation>
-    </message>
-    <message>
-      <source>%1 (active)</source>
-      <comment>Template for active PTZ tour</comment>
-      <translation>%1 (主動)</translation>
     </message>
   </context>
   <context>
@@ -4993,6 +4923,14 @@ to %1</source>
     <message>
       <source>Local Files</source>
       <translation>本機檔案</translation>
+    </message>
+    <message>
+      <source>Layout Tours</source>
+      <translation type="unfinished">Layout Tours</translation>
+    </message>
+    <message>
+      <source>Layout Tour</source>
+      <translation type="unfinished">Layout Tour</translation>
     </message>
   </context>
   <context>
@@ -5527,25 +5465,6 @@ to %1</source>
     </message>
   </context>
   <context>
-    <name>QnShowOnAlarmLayoutActionWidget</name>
-    <message numerus="yes">
-      <source>%n Users</source>
-      <translation>
-        <numerusform>%n 使用者</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>%n Roles</source>
-      <translation>
-        <numerusform>%n 角色</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>All Users</source>
-      <translation>全部使用者</translation>
-    </message>
-  </context>
-  <context>
     <name>QnShowTextOverlayActionWidget</name>
     <message>
       <source>Html tags could be used within custom text:
@@ -6017,6 +5936,10 @@ to %1</source>
       <source>%1 GB</source>
       <translation>%1 Gb</translation>
     </message>
+    <message>
+      <source>Too small and system partitions are reserved and not used for writing if there is enough other storage space available.</source>
+      <translation type="unfinished">Too small and system partitions are reserved and not used for writing if there is enough other storage space available.</translation>
+    </message>
   </context>
   <context>
     <name>QnStorageRebuildWidget</name>
@@ -6073,6 +5996,13 @@ to %1</source>
     </message>
   </context>
   <context>
+    <name>QnSubjectTargetActionWidget</name>
+    <message>
+      <source>Select at least one user...</source>
+      <translation type="unfinished">Select at least one user...</translation>
+    </message>
+  </context>
+  <context>
     <name>QnSystemAdministrationDialog</name>
     <message>
       <source>General</source>
@@ -6116,10 +6046,6 @@ to %1</source>
     <message>
       <source>Email server is not set</source>
       <translation>Email伺服器尚未設定</translation>
-    </message>
-    <message>
-      <source>Connection to server lost</source>
-      <translation>與伺服器的連線中斷</translation>
     </message>
     <message>
       <source>Select server for others to synchronize time with</source>
@@ -6283,12 +6209,16 @@ to %1</source>
   <context>
     <name>QnTimeServerSelectionWidget</name>
     <message>
-      <source>Time is taken from the Internet.</source>
-      <translation>從網際網路校時.</translation>
+      <source>System time is synchronized with the Internet and is independent from server local times.</source>
+      <translation type="unfinished">System time is synchronized with the Internet and is independent from server local times.</translation>
     </message>
     <message>
-      <source>Time is taken from %1.</source>
-      <translation>從 %1 校時.</translation>
+      <source>System time is synchronized with selected server local time and is independent from other servers.</source>
+      <translation type="unfinished">System time is synchronized with selected server local time and is independent from other servers.</translation>
+    </message>
+    <message>
+      <source>No server has Internet access. Time is not being synchronized.</source>
+      <translation type="unfinished">No server has Internet access. Time is not being synchronized.</translation>
     </message>
   </context>
   <context>
@@ -6810,184 +6740,33 @@ to %1</source>
     </message>
   </context>
   <context>
-    <name>QnWorkbenchActionHandler</name>
+    <name>QnWebpageDialog</name>
     <message>
-      <source>Layout is locked and cannot be changed.</source>
-      <translation>佈局已鎖定且無法變更。</translation>
-    </message>
-    <message>
-      <source>All Supported (*.nov *.avi *.mkv *.mp4 *.mov *.ts *.m2ts *.mpeg *.mpg *.flv *.wmv *.3gp *.jpg *.png *.gif *.bmp *.tiff)</source>
-      <translation>全部支援的檔案 (*.nov *.avi *.mkv *.mp4 *.mov *.ts *.m2ts *.mpeg *.mpg *.flv *.wmv *.3gp *.jpg *.png *.gif *.bmp *.tiff)</translation>
+      <source>Name</source>
+      <translation>名稱</translation>
     </message>
     <message>
-      <source>Video (*.avi *.mkv *.mp4 *.mov *.ts *.m2ts *.mpeg *.mpg *.flv *.wmv *.3gp)</source>
-      <translation>影像 (*.avi *.mkv *.mp4 *.mov *.ts *.m2ts *.mpeg *.mpg *.flv *.wmv *.3gp)</translation>
+      <source>URL</source>
+      <translation>網址</translation>
     </message>
     <message>
-      <source>Pictures (*.jpg *.png *.gif *.bmp *.tiff)</source>
-      <translation>圖片 (*.jpg *.png *.gif *.bmp *.tiff)</translation>
+      <source>URL cannot be empty.</source>
+      <translation type="unfinished">URL cannot be empty.</translation>
     </message>
     <message>
-      <source>All files (*.*)</source>
-      <translation>全部檔案 (*.*)</translation>
+      <source>Wrong URL format.</source>
+      <translation type="unfinished">Wrong URL format.</translation>
     </message>
     <message>
-      <source>Select folder...</source>
-      <translation>伺服器時間...</translation>
+      <source>Web Page</source>
+      <translation type="unfinished">Web Page</translation>
     </message>
+  </context>
+  <context>
+    <name>QnWorkbenchAlarmLayoutHandler</name>
     <message>
-      <source>Preview Search for %1</source>
-      <translation>預覽搜尋 %1</translation>
-    </message>
-    <message>
-      <source>Rename</source>
-      <translation>重新命名</translation>
-    </message>
-    <message>
-      <source>Enter new name for the selected item:</source>
-      <translation>輸入新名稱給選擇的項目:</translation>
-    </message>
-    <message>
-      <source>Update...</source>
-      <translation>更新...</translation>
-    </message>
-    <message>
-      <source>Beta version %1</source>
-      <translation>測試版 %1</translation>
-    </message>
-    <message>
-      <source>Open File</source>
-      <translation>開啟檔案</translation>
-    </message>
-    <message>
-      <source>Updating Background...</source>
-      <translation>背景更新...</translation>
-    </message>
-    <message>
-      <source>Image processing may take a few moments. Please be patient.</source>
-      <translation>影像處理會消耗一些時間。請稍待。</translation>
-    </message>
-    <message numerus="yes">
-      <source>Are you sure you want to permanently delete these %n files?</source>
-      <translation>
-        <numerusform>您確定要永久刪除這 %n 個檔案?</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>Confirm files deleting</source>
-      <translation>確認刪除檔案</translation>
-    </message>
-    <message>
-      <source>Client</source>
-      <translation>用戶端</translation>
-    </message>
-    <message>
-      <source>Server</source>
-      <translation>伺服器</translation>
-    </message>
-    <message numerus="yes">
-      <source>Failed to move %n devices</source>
-      <translation>
-        <numerusform>移動 %n 個設備失敗</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>Failed to move %n cameras</source>
-      <translation>
-        <numerusform>移動 %n 個攝影機失敗</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>Failed to move %n I/O Modules</source>
-      <translation>
-        <numerusform>移動 %n 個 I/O 模組失敗</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>Server &quot;%1&quot; is not responding.</source>
-      <translation type="unfinished">Server &quot;%1&quot; is not responding.</translation>
-    </message>
-    <message>
-      <source>Move</source>
-      <translation>移動</translation>
-    </message>
-    <message>
-      <source>Too short period selected</source>
-      <translation>所選時段太短</translation>
-    </message>
-    <message>
-      <source>Cancel device adding?</source>
-      <translation>取消新增設備嗎?</translation>
-    </message>
-    <message>
-      <source>There is another user with the same name</source>
-      <translation>有另一個具有相同名稱的使用者</translation>
-    </message>
-    <message>
-      <source>Image too big</source>
-      <translation>影像太大</translation>
-    </message>
-    <message>
-      <source>Maximum size is %1 MB.</source>
-      <translation>最大大小為 %1 MB.</translation>
-    </message>
-    <message>
-      <source>Failed to upload image</source>
-      <translation>上傳影像失敗</translation>
-    </message>
-    <message>
-      <source>Please update all components to the version %1</source>
-      <translation>請更新所有元件到 %1 版本</translation>
-    </message>
-    <message>
-      <source>Some functionality may be unavailable or not working properly.</source>
-      <translation>某些功能可能不可用或運作不良.</translation>
-    </message>
-    <message>
-      <source>It will be used by software development team to improve your user experience.</source>
-      <translation>這將用於讓軟體開發團隊提昇您的使用體驗.</translation>
-    </message>
-    <message>
-      <source>Failed to open server web page</source>
-      <translation>無法打開伺服器 web 頁面</translation>
-    </message>
-    <message>
-      <source>Skip</source>
-      <translation>略過</translation>
-    </message>
-    <message>
-      <source>Cannot perform Preview Search. Please select a period of 15 seconds or longer.</source>
-      <translation>無法執行預覽搜尋. 請選擇 15 秒或更長時間的片段.</translation>
-    </message>
-    <message numerus="yes">
-      <source>Server &quot;%1&quot; cannot access %n devices. Move them anyway?</source>
-      <translation type="unfinished">
-        <numerusform>Server &quot;%1&quot; cannot access %n devices. Move them anyway?</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>Server &quot;%1&quot; cannot access %n cameras. Move them anyway?</source>
-      <translation type="unfinished">
-        <numerusform>Server &quot;%1&quot; cannot access %n cameras. Move them anyway?</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>Server &quot;%1&quot; cannot access %n I/O modules. Move them anyway?</source>
-      <translation type="unfinished">
-        <numerusform>Server &quot;%1&quot; cannot access %n I/O modules. Move them anyway?</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>Components of System have different versions:</source>
-      <translation>系統元件有不同的版本:</translation>
-    </message>
-    <message>
-      <source>System sends anonymous usage statistics</source>
-      <translation>系統匿名發送使用狀況統計資訊</translation>
-    </message>
-    <message>
-      <source>To disable it, go to System Administration dialog.</source>
-      <translation>若要停用它, 請進入系統管理對話框.</translation>
+      <source>Alarms</source>
+      <translation>警報</translation>
     </message>
   </context>
   <context>
@@ -7041,13 +6820,6 @@ to %1</source>
     <message>
       <source>Could not connect to server. Video Wall will be closed.</source>
       <translation>無法連接到伺服器. 電視牆將會關閉.</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnWorkbenchController</name>
-    <message>
-      <source>Press any key to stop the tour.</source>
-      <translation>請按任何鍵停止輪跳.</translation>
     </message>
   </context>
   <context>
@@ -7266,29 +7038,6 @@ to %1</source>
     <message>
       <source>Cloud Systems cannot be merged</source>
       <translation>雲端系統不能合併</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnWorkbenchLayoutsHandler</name>
-    <message>
-      <source>Save Layout As</source>
-      <translation>另存佈局為</translation>
-    </message>
-    <message>
-      <source>New Layout</source>
-      <translation>新佈局</translation>
-    </message>
-    <message>
-      <source>Enter the name of the layout to create:</source>
-      <translation>輸入要建立的佈局名稱:</translation>
-    </message>
-    <message>
-      <source>Enter Layout Name:</source>
-      <translation>輸入佈局名稱:</translation>
-    </message>
-    <message>
-      <source>New Layout %1</source>
-      <translation>新佈局 %1</translation>
     </message>
   </context>
   <context>
@@ -7530,23 +7279,158 @@ to %1</source>
   <context>
     <name>QnWorkbenchWebPageHandler</name>
     <message>
-      <source>New Web Page...</source>
-      <translation>新 Web 頁面...</translation>
+      <source>New Web Page</source>
+      <translation type="unfinished">New Web Page</translation>
     </message>
     <message>
-      <source>This Web Page already exists</source>
-      <translation>此網頁已存在</translation>
-    </message>
-    <message>
-      <source>Enter URL of Web Page to add:</source>
-      <translation>輸入 Web 頁面的 URL 來新增:</translation>
+      <source>Edit Web Page</source>
+      <translation type="unfinished">Edit Web Page</translation>
     </message>
   </context>
   <context>
-    <name>Resources</name>
+    <name>SubjectSelectionDialog::RoleListDelegate</name>
+    <message numerus="yes">
+      <source>%n users</source>
+      <translation>
+        <numerusform>%n 個使用者</numerusform>
+      </translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::client::desktop::ui::LayoutPreviewPainter</name>
+    <message>
+      <source>NO DATA</source>
+      <translation>無資料</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::client::desktop::ui::LayoutTourDropPlaceholder</name>
+    <message>
+      <source>Drag layout here to add it to the tour</source>
+      <translation type="unfinished">Drag layout here to add it to the tour</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::client::desktop::ui::SubjectSelectionDialog</name>
+    <message>
+      <source>No user roles found</source>
+      <translation type="unfinished">No user roles found</translation>
+    </message>
+    <message>
+      <source>No users found</source>
+      <translation type="unfinished">No users found</translation>
+    </message>
+    <message>
+      <source>Users</source>
+      <translation>使用者</translation>
+    </message>
+    <message>
+      <source>Custom Users</source>
+      <translation type="unfinished">Custom Users</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::client::desktop::ui::action::LayoutTourSettingsFactory</name>
+    <message>
+      <source>Switch with Hotkeys</source>
+      <translation type="unfinished">Switch with Hotkeys</translation>
+    </message>
+    <message>
+      <source>Switch on Timer</source>
+      <translation type="unfinished">Switch on Timer</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::client::desktop::ui::action::PtzPresetsToursFactory</name>
+    <message>
+      <source>%1 (active)</source>
+      <comment>Template for active PTZ preset</comment>
+      <translation>%1 (主動)</translation>
+    </message>
+    <message>
+      <source>%1 (active)</source>
+      <comment>Template for active PTZ tour</comment>
+      <translation>%1 (主動)</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::client::desktop::ui::dialogs::LicenseDeactivationReason</name>
+    <message>
+      <source>Please fill up information about yourself and reason for license deactivation</source>
+      <translation type="unfinished">Please fill up information about yourself and reason for license deactivation</translation>
+    </message>
+    <message>
+      <source>Next</source>
+      <translation>下一個</translation>
+    </message>
+    <message>
+      <source>Name is necessary</source>
+      <translation type="unfinished">Name is necessary</translation>
+    </message>
+    <message>
+      <source>Reason is necessary</source>
+      <translation type="unfinished">Reason is necessary</translation>
+    </message>
+    <message>
+      <source>Name</source>
+      <translation>名稱</translation>
+    </message>
+    <message>
+      <source>Email</source>
+      <translation>Email</translation>
+    </message>
+    <message>
+      <source>Reason for deactivation</source>
+      <translation type="unfinished">Reason for deactivation</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::client::desktop::ui::graphics::SoftwareTriggerButton</name>
+    <message>
+      <source>Go to Live</source>
+      <translation type="unfinished">Go to Live</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::client::desktop::ui::ptz</name>
+    <message>
+      <source>Cannot get the current position from camera &quot;%1&quot;</source>
+      <translation type="unfinished">Cannot get the current position from camera &quot;%1&quot;</translation>
+    </message>
+    <message>
+      <source>Please wait for the camera to go online.</source>
+      <translation>請等待所有攝影機上線.</translation>
+    </message>
+    <message>
+      <source>Failed to get current position</source>
+      <translation>無法取得現在位置</translation>
+    </message>
+    <message>
+      <source>Cannot set the current position for camera &quot;%1&quot;</source>
+      <translation type="unfinished">Cannot set the current position for camera &quot;%1&quot;</translation>
+    </message>
+    <message>
+      <source>Failed to set current position</source>
+      <translation>無法設定現在位置</translation>
+    </message>
+    <message>
+      <source>Preset used by some tours. Delete it anyway?</source>
+      <translation>這預設點仍被其它巡曳使用. 是否仍要刪除它?</translation>
+    </message>
+    <message>
+      <source>These tours will become invalid.</source>
+      <translation>這些巡曳將失效.</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::client::desktop::ui::resources</name>
     <message>
       <source>There is another layout with the same name</source>
       <translation>有另一個具有相同名稱的佈局</translation>
+    </message>
+    <message>
+      <source>You do not have permission to overwrite it.</source>
+      <translation>您沒有權限來覆蓋它.</translation>
     </message>
     <message>
       <source>Overwrite existing layout?</source>
@@ -7625,6 +7509,10 @@ to %1</source>
       <translation>移除</translation>
     </message>
     <message>
+      <source>You are going to delete some resources to which you have access from Video Wall only. You will not see them in your resource list after it and will not be able to add them to Video Wall again.</source>
+      <translation>您將刪除某些您只有電視牆權限的資源. 您將無法在資源列表上看到他們且無法再加到電視牆.</translation>
+    </message>
+    <message>
       <source>You will lose access to following resources:</source>
       <translation>您將失去以下資源的權限:</translation>
     </message>
@@ -7680,17 +7568,9 @@ to %1</source>
       <source>They may be auto-discovered again after removing.</source>
       <translation>刪除後可能會再被自動加回來.</translation>
     </message>
-    <message>
-      <source>You do not have permission to overwrite it.</source>
-      <translation>您沒有權限來覆蓋它.</translation>
-    </message>
-    <message>
-      <source>You are going to delete some resources to which you have access from Video Wall only. You will not see them in your resource list after it and will not be able to add them to Video Wall again.</source>
-      <translation>您將刪除某些您只有電視牆權限的資源. 您將無法在資源列表上看到他們且無法再加到電視牆.</translation>
-    </message>
   </context>
   <context>
-    <name>VideoWall</name>
+    <name>nx::client::desktop::ui::videowall</name>
     <message>
       <source>There is another video wall with the same name</source>
       <translation>有另一個具有相同名稱的電視牆</translation>
@@ -7714,6 +7594,247 @@ to %1</source>
     <message>
       <source>To display local files on Video Wall, please attach them using computer where Video Wall is hosted.</source>
       <translation>若要在電視牆上顯示檔案, 請手動將檔案放到電視牆電腦上.</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::client::desktop::ui::workbench::ActionHandler</name>
+    <message numerus="yes">
+      <source>Failed to move %n devices</source>
+      <translation>
+        <numerusform>移動 %n 個設備失敗</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Failed to move %n cameras</source>
+      <translation>
+        <numerusform>移動 %n 個攝影機失敗</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Failed to move %n I/O Modules</source>
+      <translation>
+        <numerusform>移動 %n 個 I/O 模組失敗</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Server &quot;%1&quot; is not responding.</source>
+      <translation type="unfinished">Server &quot;%1&quot; is not responding.</translation>
+    </message>
+    <message numerus="yes">
+      <source>Server &quot;%1&quot; cannot access %n devices. Move them anyway?</source>
+      <translation type="unfinished">
+        <numerusform>Server &quot;%1&quot; cannot access %n devices. Move them anyway?</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Server &quot;%1&quot; cannot access %n cameras. Move them anyway?</source>
+      <translation type="unfinished">
+        <numerusform>Server &quot;%1&quot; cannot access %n cameras. Move them anyway?</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Server &quot;%1&quot; cannot access %n I/O modules. Move them anyway?</source>
+      <translation type="unfinished">
+        <numerusform>Server &quot;%1&quot; cannot access %n I/O modules. Move them anyway?</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Move</source>
+      <translation>移動</translation>
+    </message>
+    <message>
+      <source>Layout is locked and cannot be changed.</source>
+      <translation>佈局已鎖定且無法變更。</translation>
+    </message>
+    <message>
+      <source>All Supported (*.nov *.avi *.mkv *.mp4 *.mov *.ts *.m2ts *.mpeg *.mpg *.flv *.wmv *.3gp *.jpg *.png *.gif *.bmp *.tiff)</source>
+      <translation>全部支援的檔案 (*.nov *.avi *.mkv *.mp4 *.mov *.ts *.m2ts *.mpeg *.mpg *.flv *.wmv *.3gp *.jpg *.png *.gif *.bmp *.tiff)</translation>
+    </message>
+    <message>
+      <source>Video (*.avi *.mkv *.mp4 *.mov *.ts *.m2ts *.mpeg *.mpg *.flv *.wmv *.3gp)</source>
+      <translation>影像 (*.avi *.mkv *.mp4 *.mov *.ts *.m2ts *.mpeg *.mpg *.flv *.wmv *.3gp)</translation>
+    </message>
+    <message>
+      <source>Pictures (*.jpg *.png *.gif *.bmp *.tiff)</source>
+      <translation>圖片 (*.jpg *.png *.gif *.bmp *.tiff)</translation>
+    </message>
+    <message>
+      <source>All files (*.*)</source>
+      <translation>全部檔案(*.*)</translation>
+    </message>
+    <message>
+      <source>Open File</source>
+      <translation>開啟檔案</translation>
+    </message>
+    <message>
+      <source>Select folder...</source>
+      <translation>伺服器時間...</translation>
+    </message>
+    <message>
+      <source>Too short period selected</source>
+      <translation>所選時段太短</translation>
+    </message>
+    <message>
+      <source>Cannot perform Preview Search. Please select a period of 15 seconds or longer.</source>
+      <translation>無法執行預覽搜尋. 請選擇 15 秒或更長時間的片段.</translation>
+    </message>
+    <message>
+      <source>Preview Search for %1</source>
+      <translation>預覽搜尋 %1</translation>
+    </message>
+    <message>
+      <source>Cancel device adding?</source>
+      <translation>取消新增設備嗎?</translation>
+    </message>
+    <message>
+      <source>Confirm files deleting</source>
+      <translation>確認刪除檔案</translation>
+    </message>
+    <message numerus="yes">
+      <source>Are you sure you want to permanently delete these %n files?</source>
+      <translation>
+        <numerusform>您確定要永久刪除這 %n 個檔案?</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>There is another user with the same name</source>
+      <translation>有另一個具有相同名稱的使用者</translation>
+    </message>
+    <message>
+      <source>Rename</source>
+      <translation>重新命名</translation>
+    </message>
+    <message>
+      <source>Enter new name for the selected item:</source>
+      <translation>輸入新名稱給選擇的項目:</translation>
+    </message>
+    <message>
+      <source>Updating Background...</source>
+      <translation>背景更新...</translation>
+    </message>
+    <message>
+      <source>Image processing may take a few moments. Please be patient.</source>
+      <translation>影像處理會消耗一些時間。請稍待。</translation>
+    </message>
+    <message>
+      <source>Image too big</source>
+      <translation>影像太大</translation>
+    </message>
+    <message>
+      <source>Maximum size is %1 MB.</source>
+      <translation>最大大小為 %1 MB.</translation>
+    </message>
+    <message>
+      <source>Failed to upload image</source>
+      <translation>上傳影像失敗</translation>
+    </message>
+    <message>
+      <source>Client</source>
+      <translation>用戶端</translation>
+    </message>
+    <message>
+      <source>Server</source>
+      <translation>伺服器</translation>
+    </message>
+    <message>
+      <source>Please update all components to the version %1</source>
+      <translation>請更新所有元件到 %1 版本</translation>
+    </message>
+    <message>
+      <source>Components of System have different versions:</source>
+      <translation>系統元件有不同的版本:</translation>
+    </message>
+    <message>
+      <source>Update...</source>
+      <translation>更新...</translation>
+    </message>
+    <message>
+      <source>Skip</source>
+      <translation>略過</translation>
+    </message>
+    <message>
+      <source>Beta version %1</source>
+      <translation>測試版 %1</translation>
+    </message>
+    <message>
+      <source>Some functionality may be unavailable or not working properly.</source>
+      <translation>某些功能可能不可用或運作不良.</translation>
+    </message>
+    <message>
+      <source>System sends anonymous usage statistics</source>
+      <translation>系統匿名發送使用狀況統計資訊</translation>
+    </message>
+    <message>
+      <source>It will be used by software development team to improve your user experience.</source>
+      <translation>這將用於讓軟體開發團隊提昇您的使用體驗.</translation>
+    </message>
+    <message>
+      <source>To disable it, go to System Administration dialog.</source>
+      <translation>若要停用它, 請進入系統管理對話框.</translation>
+    </message>
+    <message>
+      <source>Failed to open server web page</source>
+      <translation>無法打開伺服器 web 頁面</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::client::desktop::ui::workbench::LayoutTourExecutor</name>
+    <message>
+      <source>Use keyboard arrows to switch layouts. To exit the tour press Esc.</source>
+      <translation type="unfinished">Use keyboard arrows to switch layouts. To exit the tour press Esc.</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::client::desktop::ui::workbench::LayoutTourItemWidget</name>
+    <message>
+      <source>Switch by %1</source>
+      <translation type="unfinished">Switch by %1</translation>
+    </message>
+    <message>
+      <source>Display for</source>
+      <translation type="unfinished">Display for</translation>
+    </message>
+    <message>
+      <source>Display selected for</source>
+      <translation type="unfinished">Display selected for</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::client::desktop::ui::workbench::LayoutToursHandler</name>
+    <message>
+      <source>Layout Tour</source>
+      <translation type="unfinished">Layout Tour</translation>
+    </message>
+    <message>
+      <source>Layout Tour %1</source>
+      <translation type="unfinished">Layout Tour %1</translation>
+    </message>
+    <message>
+      <source>Delete layout tour %1?</source>
+      <translation type="unfinished">Delete layout tour %1?</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::client::desktop::ui::workbench::LayoutsHandler</name>
+    <message>
+      <source>Save Layout As</source>
+      <translation>另存佈局為</translation>
+    </message>
+    <message>
+      <source>Enter Layout Name:</source>
+      <translation>輸入佈局名稱:</translation>
+    </message>
+    <message>
+      <source>New Layout</source>
+      <translation>新佈局</translation>
+    </message>
+    <message>
+      <source>Enter the name of the layout to create:</source>
+      <translation>輸入要建立的佈局名稱:</translation>
+    </message>
+    <message>
+      <source>New Layout %1</source>
+      <translation>新佈局 %1</translation>
     </message>
   </context>
 </TS>

@@ -139,7 +139,7 @@
   <context>
     <name>ApplauncherControlDialog</name>
     <message>
-      <location filename="../src/nx/client/ui/dialogs/debug/applauncher_control_dialog.ui"/>
+      <location filename="../src/nx/client/desktop/ui/dialogs/debug/applauncher_control_dialog.ui"/>
       <source>Add External Storage...</source>
       <translation>Externen Speicher hinzufügen...</translation>
     </message>
@@ -350,6 +350,16 @@
       <source>Post-recording:</source>
       <translation>Nachlaufzeit:</translation>
     </message>
+    <message>
+      <location/>
+      <source>By:</source>
+      <translation type="unfinished">By:</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Ask confirmation before creating bookmark</source>
+      <translation type="unfinished">Ask confirmation before creating bookmark</translation>
+    </message>
   </context>
   <context>
     <name>BookmarkWidget</name>
@@ -416,11 +426,6 @@
     </message>
     <message>
       <location/>
-      <source>at</source>
-      <translation>an</translation>
-    </message>
-    <message>
-      <location/>
       <source>Schedule...</source>
       <translation>Planen...</translation>
     </message>
@@ -443,6 +448,11 @@
       <location/>
       <source>Do</source>
       <translation>Dann</translation>
+    </message>
+    <message>
+      <location/>
+      <source>At</source>
+      <translation type="unfinished">At</translation>
     </message>
   </context>
   <context>
@@ -734,8 +744,8 @@
     <name>CameraInputBusinessEventWidget</name>
     <message>
       <location filename="../src/ui/widgets/business/camera_input_business_event_widget.ui"/>
-      <source>Input ID:</source>
-      <translation>Input-ID:</translation>
+      <source>Input ID</source>
+      <translation type="unfinished">Input ID</translation>
     </message>
   </context>
   <context>
@@ -1710,21 +1720,21 @@
     </message>
     <message>
       <location/>
-      <source>Play to user</source>
-      <translation>Soundausgabe</translation>
+      <source>Play to users</source>
+      <translation type="unfinished">Play to users</translation>
     </message>
   </context>
   <context>
     <name>PopupBusinessActionWidget</name>
     <message>
       <location filename="../src/ui/widgets/business/popup_business_action_widget.ui"/>
-      <source>Show to administrators only</source>
-      <translation>Ansicht auf Admins beschränken</translation>
+      <source>Global Notification Settings...</source>
+      <translation>Allgemeine Benachrichtigungseinstellungen...</translation>
     </message>
     <message>
       <location/>
-      <source>Global Notification Settings...</source>
-      <translation>Allgemeine Benachrichtigungseinstellungen...</translation>
+      <source>for</source>
+      <translation>für</translation>
     </message>
   </context>
   <context>
@@ -2205,6 +2215,16 @@
       <source>Post-Recording:</source>
       <translation>Nachlauf:</translation>
     </message>
+    <message>
+      <location/>
+      <source>Fixed duration:</source>
+      <translation>Feste Dauer:</translation>
+    </message>
+    <message>
+      <location/>
+      <source>seconds</source>
+      <translation>Sekunden</translation>
+    </message>
   </context>
   <context>
     <name>RecordingSettings</name>
@@ -2212,21 +2232,6 @@
       <location filename="../src/ui/widgets/local_settings/recording_settings_widget.ui"/>
       <source>Temporary Folder</source>
       <translation>Temporärer Ordner</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Capture Mode</source>
-      <translation>Aufzeichnungsmodus</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Fullscreen</source>
-      <translation>Vollbild</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Application Window</source>
-      <translation>Anwendungsfenster</translation>
     </message>
     <message>
       <location/>
@@ -2242,11 +2247,6 @@
       <location/>
       <source>Capture Cursor</source>
       <translation>Cursor mit aufzeichnen</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Quality</source>
-      <translation>Qualität</translation>
     </message>
     <message>
       <location/>
@@ -2267,6 +2267,16 @@
       <location/>
       <source>Recording Quality</source>
       <translation>Aufnahmequalität</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Source</source>
+      <translation type="unfinished">Source</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Screen</source>
+      <translation type="unfinished">Screen</translation>
     </message>
   </context>
   <context>
@@ -2306,8 +2316,8 @@
     </message>
     <message>
       <location/>
-      <source>Speak to user</source>
-      <translation>Sprachausgabe</translation>
+      <source>Speak to users</source>
+      <translation type="unfinished">Speak to users</translation>
     </message>
   </context>
   <context>
@@ -2643,6 +2653,37 @@
     </message>
   </context>
   <context>
+    <name>SoftwareTriggerBusinessEventWidget</name>
+    <message>
+      <location filename="../src/ui/widgets/business/software_trigger_business_event_widget.ui"/>
+      <source>Available to</source>
+      <translation type="unfinished">Available to</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Name</source>
+      <translation>Name</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Icon</source>
+      <translation type="unfinished">Icon</translation>
+    </message>
+  </context>
+  <context>
+    <name>SpecialLayoutPanelWidget</name>
+    <message>
+      <location filename="../src/nx/client/desktop/ui/workbench/panels/special_layout_panel_widget.ui"/>
+      <source>&lt;Some Caption&gt;</source>
+      <translation type="unfinished">&lt;Some Caption&gt;</translation>
+    </message>
+    <message>
+      <location/>
+      <source>&lt;Some description&gt;</source>
+      <translation type="unfinished">&lt;Some description&gt;</translation>
+    </message>
+  </context>
+  <context>
     <name>StorageAnalyticsWidget</name>
     <message>
       <location filename="../src/ui/widgets/properties/storage_analytics_widget.ui"/>
@@ -2750,6 +2791,24 @@
     </message>
   </context>
   <context>
+    <name>SubjectSelectionDialog</name>
+    <message>
+      <location filename="../src/nx/client/desktop/ui/event_rules/subject_selection_dialog.ui"/>
+      <source>Dialog</source>
+      <translation type="unfinished">Dialog</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Roles</source>
+      <translation type="unfinished">Roles</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Show all users</source>
+      <translation type="unfinished">Show all users</translation>
+    </message>
+  </context>
+  <context>
     <name>SystemSettingsWidget</name>
     <message>
       <location filename="../src/ui/widgets/system_settings/system_settings_widget.ui"/>
@@ -2781,9 +2840,8 @@
     </message>
     <message>
       <location/>
-      <source>System time is synchronized with the Internet and is independent from server local time.
-Selected server will be used as a time server if System has no Internet access.</source>
-      <translation>Systemzeit synchronisiert mit dem Internet und ist unabhängig von der lokalen Serverzeit. Der ausgewählte Server wird als Zeitserver verwendet werden, wenn das System über keinen Internetzugang verfügt.</translation>
+      <source>Sync time with the Internet</source>
+      <translation type="unfinished">Sync time with the Internet</translation>
     </message>
   </context>
   <context>
@@ -2848,6 +2906,14 @@ Click &quot;New role&quot; button to create one.</translation>
       <location/>
       <source>Edit Roles...</source>
       <translation>Rollen bearbeiten...</translation>
+    </message>
+  </context>
+  <context>
+    <name>WebpageDialog</name>
+    <message>
+      <location filename="../src/ui/dialogs/webpage_dialog.ui"/>
+      <source>Web Page</source>
+      <translation>Webseite:</translation>
     </message>
   </context>
   <context>

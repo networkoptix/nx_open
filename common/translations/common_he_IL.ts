@@ -8,11 +8,6 @@
       <extracomment>Language name that will be displayed to user. Must not be empty.</extracomment>
       <translation>שפה</translation>
     </message>
-    <message>
-      <source>Locale Code</source>
-      <extracomment>Internal. Please don&apos;t change existing translation.</extracomment>
-      <translation>he</translation>
-    </message>
   </context>
   <context>
     <name>MergeSystemsStatusStrings</name>
@@ -229,10 +224,6 @@
     <message>
       <source>Not enough HDD/SSD speed for recording to %1.</source>
       <translation>מהירות הדיסק הקשיח/SSD אינה מספיקה להקלטה אל %1.</translation>
-    </message>
-    <message>
-      <source>HDD/SSD disk %1 is full. Disk contains too much data that is not managed by VMS.</source>
-      <translation>הכונן הקשיח/SSD %1 מלא. הכונן מכיל יותר מדי מידע שאינו מנוהל על ידי מערכת ההקלטה.</translation>
     </message>
     <message>
       <source>Conflicting Server: %1</source>
@@ -516,6 +507,68 @@
       <source>Send Email</source>
       <translation>שלח דוא"ל</translation>
     </message>
+    <message>
+      <source>Software Trigger</source>
+      <translation type="unfinished">Software Trigger</translation>
+    </message>
+    <message>
+      <source>Software trigger %1 at %2</source>
+      <translation type="unfinished">Software trigger %1 at %2</translation>
+    </message>
+    <message>
+      <source>Software Trigger %1 has been activated multiple times</source>
+      <translation type="unfinished">Software Trigger %1 has been activated multiple times</translation>
+    </message>
+    <message>
+      <source>Multiple %1 events have occured</source>
+      <translation type="unfinished">Multiple %1 events have occured</translation>
+    </message>
+    <message>
+      <source>Trigger: %1</source>
+      <translation type="unfinished">Trigger: %1</translation>
+    </message>
+    <message>
+      <source>HDD/SSD disk &quot;%1&quot; is full. Disk contains too much data that is not managed by VMS.</source>
+      <translation type="unfinished">HDD/SSD disk &quot;%1&quot; is full. Disk contains too much data that is not managed by VMS.</translation>
+    </message>
+    <message>
+      <source>System disk &quot;%1&quot; is almost full.</source>
+      <translation type="unfinished">System disk &quot;%1&quot; is almost full.</translation>
+    </message>
+    <message>
+      <source>Default Trigger</source>
+      <translation type="unfinished">Default Trigger</translation>
+    </message>
+    <message>
+      <source>All Users</source>
+      <translation type="unfinished">All Users</translation>
+    </message>
+    <message>
+      <source>Role</source>
+      <translation type="unfinished">Role</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n Users</source>
+      <translation type="unfinished">
+        <numerusform>%n Users</numerusform>
+        <numerusform>%n Users</numerusform>
+        <numerusform>%n Users</numerusform>
+        <numerusform>%n Users</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n Roles</source>
+      <translation type="unfinished">
+        <numerusform>%n Roles</numerusform>
+        <numerusform>%n Roles</numerusform>
+        <numerusform>%n Roles</numerusform>
+        <numerusform>%n Roles</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>All Administrators</source>
+      <translation type="unfinished">All Administrators</translation>
+    </message>
   </context>
   <context>
     <name>QnCameraDiagnosticsErrorCodeStrings</name>
@@ -727,6 +780,10 @@
       <source>Cannot open media URL %1. Unsupported media protocol %2.</source>
       <translation>אין אפשרות לפתוח את כתובת המדיה %1. פרוטוקול מדיה לא נתמך %2.</translation>
     </message>
+    <message>
+      <source>Camera was restored from archive. Delete the camera and add it again to view Live video.</source>
+      <translation type="unfinished">Camera was restored from archive. Delete the camera and add it again to view Live video.</translation>
+    </message>
   </context>
   <context>
     <name>QnFfmpegAudioTranscoder</name>
@@ -836,14 +893,6 @@
       <translation>קיר וידאו</translation>
     </message>
     <message>
-      <source>Only single license is allowed for this device</source>
-      <translation>רשיון אחד בלבד מותר למכשיר זה</translation>
-    </message>
-    <message>
-      <source>Unknown error</source>
-      <translation>שגיאה לא מוגדרת</translation>
-    </message>
-    <message>
       <source>I/O Module</source>
       <translation>מודול קלט/פלט</translation>
     </message>
@@ -892,10 +941,6 @@
       <translation>רשיונות Start</translation>
     </message>
     <message>
-      <source>Server with matching hardware ID not found</source>
-      <translation>לא נמצא שרת עם מזהה חומרה תואם</translation>
-    </message>
-    <message>
       <source>Invalid</source>
       <translation>לא תקין</translation>
     </message>
@@ -904,32 +949,12 @@
       <translation>רשיונות שאינם תקינים</translation>
     </message>
     <message>
-      <source>Invalid signature</source>
-      <translation>החתימה איננה תקינה</translation>
-    </message>
-    <message>
-      <source>Invalid customization</source>
-      <translation>ההתאמה האישית אינה תקינה</translation>
-    </message>
-    <message>
-      <source>License is expired</source>
-      <translation>תוקף הרשיון פג</translation>
-    </message>
-    <message>
-      <source>Invalid type</source>
-      <translation>סוג שגוי</translation>
-    </message>
-    <message>
       <source>Free</source>
       <translation>פנוי</translation>
     </message>
     <message>
       <source>Free license</source>
       <translation>רישיון חינם</translation>
-    </message>
-    <message>
-      <source>This license type requires higher software version</source>
-      <translation>סוג רישיון זה מחייב גרסת תוכנה גבוהה יותר</translation>
     </message>
   </context>
   <context>
@@ -990,6 +1015,41 @@
       <source>This license key has been previously activated to hardware ID %1 on %2. Please contact support team to obtain a valid license key.</source>
       <comment>%1 is a hardware ID, %2 is an activation time</comment>
       <translation>מפתח רישיון זה הופעל בעבר על ידי מזהה החומרה %1 ב- %2. צור קשר עם צוות התמיכה כדי לקבל מפתח רישיון חוקי.</translation>
+    </message>
+  </context>
+  <context>
+    <name>QnLicenseValidator</name>
+    <message>
+      <source>Invalid signature</source>
+      <translation>החתימה איננה תקינה</translation>
+    </message>
+    <message>
+      <source>Server with matching hardware ID not found</source>
+      <translation>לא נמצא שרת עם מזהה חומרה תואם</translation>
+    </message>
+    <message>
+      <source>Invalid customization</source>
+      <translation>ההתאמה האישית אינה תקינה</translation>
+    </message>
+    <message>
+      <source>License is expired</source>
+      <translation>תוקף הרשיון פג</translation>
+    </message>
+    <message>
+      <source>Invalid type</source>
+      <translation>סוג שגוי</translation>
+    </message>
+    <message>
+      <source>Only single license is allowed for this device</source>
+      <translation>רשיון אחד בלבד מותר למכשיר זה</translation>
+    </message>
+    <message>
+      <source>This license type requires higher software version</source>
+      <translation>סוג רישיון זה מחייב גרסת תוכנה גבוהה יותר</translation>
+    </message>
+    <message>
+      <source>Unknown error</source>
+      <translation>שגיאה לא מוגדרת</translation>
     </message>
   </context>
   <context>

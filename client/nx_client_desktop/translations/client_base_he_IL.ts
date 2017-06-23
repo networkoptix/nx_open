@@ -68,6 +68,808 @@ to view more bookmarks</source>
     </message>
   </context>
   <context>
+    <name>ContextMenu</name>
+    <message>
+      <source>Filter...</source>
+      <translation>סנן...</translation>
+    </message>
+    <message>
+      <source>Connect to System</source>
+      <translation>התחבר למערכת</translation>
+    </message>
+    <message>
+      <source>Help</source>
+      <translation>עזרה</translation>
+    </message>
+    <message>
+      <source>Event Log...</source>
+      <translation>רשימת אירועים...</translation>
+    </message>
+    <message>
+      <source>Cameras to Backup...</source>
+      <translation>מצלמה לגיבוי...</translation>
+    </message>
+    <message>
+      <source>Control Video Wall</source>
+      <translation>שליטה בקיר הוידאו</translation>
+    </message>
+    <message>
+      <source>Push my screen</source>
+      <translation>הזז את המסך שלי</translation>
+    </message>
+    <message>
+      <source>Select Time Server</source>
+      <translation>בחר שרת-זמן</translation>
+    </message>
+    <message>
+      <source>Fit in View</source>
+      <translation>התאם לתצוגה</translation>
+    </message>
+    <message>
+      <source>Main Menu</source>
+      <translation>תפריט ראשי</translation>
+    </message>
+    <message>
+      <source>Connect to Server...</source>
+      <translation>התחבר לשרת...</translation>
+    </message>
+    <message>
+      <source>Disconnect from Server</source>
+      <translation>התנתקת מהשרת</translation>
+    </message>
+    <message>
+      <source>Browse Local Files</source>
+      <translation>עיון קבצים מקומיים</translation>
+    </message>
+    <message>
+      <source>Show Welcome Screen</source>
+      <translation>הצג מסך פתיחה</translation>
+    </message>
+    <message>
+      <source>New...</source>
+      <translation>חדש...</translation>
+    </message>
+    <message>
+      <source>Tab</source>
+      <translation>כרטיסיה</translation>
+    </message>
+    <message>
+      <source>New Tab</source>
+      <translation>כרטיסיה חדשה</translation>
+    </message>
+    <message>
+      <source>Window</source>
+      <translation>חלון</translation>
+    </message>
+    <message>
+      <source>New Window</source>
+      <translation>חלון חדש</translation>
+    </message>
+    <message>
+      <source>User...</source>
+      <translation>משתמש...</translation>
+    </message>
+    <message>
+      <source>New User...</source>
+      <translation>משתמש חדש...</translation>
+    </message>
+    <message>
+      <source>Video Wall...</source>
+      <translation>קיר וידאו...</translation>
+    </message>
+    <message>
+      <source>New Video Wall...</source>
+      <translation>קיר וידאו חדש...</translation>
+    </message>
+    <message>
+      <source>Web Page...</source>
+      <translation>דף אינטרנט...</translation>
+    </message>
+    <message>
+      <source>New Web Page...</source>
+      <translation>דף אינטרנט חדש...</translation>
+    </message>
+    <message>
+      <source>Layout Tour...</source>
+      <translation type="unfinished">Layout Tour...</translation>
+    </message>
+    <message>
+      <source>New Layout Tour...</source>
+      <translation type="unfinished">New Layout Tour...</translation>
+    </message>
+    <message>
+      <source>New Layout...</source>
+      <translation>פריסה חדשה...</translation>
+    </message>
+    <message>
+      <source>Open Layout...</source>
+      <translation>פתח פריסה...</translation>
+    </message>
+    <message>
+      <source>Open...</source>
+      <translation>פתח...</translation>
+    </message>
+    <message>
+      <source>File(s)...</source>
+      <translation>קובץ/קבצים...</translation>
+    </message>
+    <message>
+      <source>Folder...</source>
+      <translation>תיקיה...</translation>
+    </message>
+    <message>
+      <source>Web Client...</source>
+      <translation>קליינט רשת...</translation>
+    </message>
+    <message>
+      <source>Open Web Client...</source>
+      <translation>פתח קליינט אינטרנט...</translation>
+    </message>
+    <message>
+      <source>Save Current Layout</source>
+      <translation>שמור פריסה נוכחית</translation>
+    </message>
+    <message>
+      <source>Save Current Layout As...</source>
+      <translation>שמור פריסה נוכחית כ...</translation>
+    </message>
+    <message>
+      <source>Save Video Wall View</source>
+      <translation>שמור תצוגת קיר וידאו</translation>
+    </message>
+    <message>
+      <source>Drop Resources</source>
+      <translation>שחרר משאבים</translation>
+    </message>
+    <message>
+      <source>Start Screen Recording</source>
+      <translation>התחל הקלטת מסך</translation>
+    </message>
+    <message>
+      <source>Stop Screen Recording</source>
+      <translation>הפסק הקלטת מסך</translation>
+    </message>
+    <message>
+      <source>Stop current action</source>
+      <translation>הפסקת פעולה נוכחית</translation>
+    </message>
+    <message>
+      <source>Go to Fullscreen</source>
+      <translation>עבור למסך מלא</translation>
+    </message>
+    <message>
+      <source>Exit Fullscreen</source>
+      <translation>צא ממסך מלא</translation>
+    </message>
+    <message>
+      <source>Minimize</source>
+      <translation>מזער</translation>
+    </message>
+    <message>
+      <source>Maximize</source>
+      <translation>הגדל</translation>
+    </message>
+    <message>
+      <source>Restore Down</source>
+      <translation>שחזר</translation>
+    </message>
+    <message>
+      <source>Open in Browser...</source>
+      <translation>פתח בדפדפן...</translation>
+    </message>
+    <message>
+      <source>System Administration...</source>
+      <translation>ניהול המערכת...</translation>
+    </message>
+    <message>
+      <source>System Update...</source>
+      <translation>עדכון המערכת...</translation>
+    </message>
+    <message>
+      <source>User Management...</source>
+      <translation>ניהול משתמש...</translation>
+    </message>
+    <message>
+      <source>Local Settings...</source>
+      <translation>הגדרות מקומיות...</translation>
+    </message>
+    <message>
+      <source>Audit Trail...</source>
+      <translation>נתיב ביקורת...</translation>
+    </message>
+    <message>
+      <source>Bookmark Search...</source>
+      <translation>חיפוש סימניות...</translation>
+    </message>
+    <message>
+      <source>Log in to %1...</source>
+      <comment>Log in to Nx Cloud</comment>
+      <translation>היכנס ל- %1...</translation>
+    </message>
+    <message>
+      <source>Log out from %1</source>
+      <comment>Log out from Nx Cloud</comment>
+      <translation>התנתק מ- %1</translation>
+    </message>
+    <message>
+      <source>Open %1 Portal...</source>
+      <comment>Open Nx Cloud Portal</comment>
+      <translation>פתח פורטל %1...</translation>
+    </message>
+    <message>
+      <source>Account Settings...</source>
+      <translation>הגדרות חשבון...</translation>
+    </message>
+    <message>
+      <source>Create Account...</source>
+      <translation>יצירת חשבון...</translation>
+    </message>
+    <message>
+      <source>Event Rules...</source>
+      <translation>חוקי אירוע...</translation>
+    </message>
+    <message>
+      <source>Devices List</source>
+      <translation>רשימת התקנים</translation>
+    </message>
+    <message>
+      <source>Cameras List</source>
+      <translation>רשימת מצלמות</translation>
+    </message>
+    <message>
+      <source>Merge Systems...</source>
+      <translation>מזג מערכות...</translation>
+    </message>
+    <message>
+      <source>About...</source>
+      <translation>אודות...</translation>
+    </message>
+    <message>
+      <source>Exit</source>
+      <translation>יציאה</translation>
+    </message>
+    <message>
+      <source>Mark Selection Start</source>
+      <translation>סמן את תחילת הבחירה</translation>
+    </message>
+    <message>
+      <source>Mark Selection End</source>
+      <translation>סמן את סיום הבחירה</translation>
+    </message>
+    <message>
+      <source>Clear Selection</source>
+      <translation>נקה בחירה</translation>
+    </message>
+    <message>
+      <source>Zoom to Selection</source>
+      <translation>התמקד בבחירה</translation>
+    </message>
+    <message>
+      <source>Add Bookmark...</source>
+      <translation>הוסף סימניה...</translation>
+    </message>
+    <message>
+      <source>Edit Bookmark...</source>
+      <translation>ערוך סימניה...</translation>
+    </message>
+    <message>
+      <source>Remove Bookmark...</source>
+      <translation>הסר סימניה...</translation>
+    </message>
+    <message>
+      <source>Remove Bookmarks...</source>
+      <translation>הסר סימניות...</translation>
+    </message>
+    <message>
+      <source>Export Selected Area...</source>
+      <translation>יצא את האיזור שנבחר...</translation>
+    </message>
+    <message>
+      <source>Export Multi-Video...</source>
+      <translation>יצא מולטי-וידאו...</translation>
+    </message>
+    <message>
+      <source>Export Rapid Review...</source>
+      <translation>יצוא סקירה מהירה...</translation>
+    </message>
+    <message>
+      <source>Preview Search...</source>
+      <translation>חיפוש ויזואלי...</translation>
+    </message>
+    <message>
+      <source>Server...</source>
+      <translation>שרת...</translation>
+    </message>
+    <message>
+      <source>Open</source>
+      <translation>פתח</translation>
+    </message>
+    <message>
+      <source>Monitor</source>
+      <translation>נטר</translation>
+    </message>
+    <message>
+      <source>Open in New Tab</source>
+      <translation>פתח בכרטיסיה חדשה</translation>
+    </message>
+    <message>
+      <source>Monitor in New Tab</source>
+      <translation>צפה בכרטיסיה חדשה</translation>
+    </message>
+    <message>
+      <source>Open in Alarm Layout</source>
+      <translation>פתח בפריסת אזעקה</translation>
+    </message>
+    <message>
+      <source>Open in New Window</source>
+      <translation>פתח בחלון חדש</translation>
+    </message>
+    <message>
+      <source>Monitor in New Window</source>
+      <translation>צפה בחלון חדש</translation>
+    </message>
+    <message>
+      <source>Open Video Wall</source>
+      <translation type="unfinished">Open Video Wall</translation>
+    </message>
+    <message>
+      <source>Open Containing Folder</source>
+      <translation>פתח את התיקיה המכילה</translation>
+    </message>
+    <message>
+      <source>Identify</source>
+      <translation>זהה</translation>
+    </message>
+    <message>
+      <source>Attach to Video Wall...</source>
+      <translation>הצמד לקיר וידאו...</translation>
+    </message>
+    <message>
+      <source>Switch to Video Wall mode...</source>
+      <translation>עבור למצב "קיר וידאו"...</translation>
+    </message>
+    <message>
+      <source>Save Video Wall</source>
+      <translation type="unfinished">Save Video Wall</translation>
+    </message>
+    <message>
+      <source>Save Current Matrix</source>
+      <translation>שמור מטריצה נוכחית</translation>
+    </message>
+    <message>
+      <source>Load Matrix</source>
+      <translation>טען מטריצה</translation>
+    </message>
+    <message>
+      <source>Delete</source>
+      <translation>מחק</translation>
+    </message>
+    <message>
+      <source>Stop Video Wall</source>
+      <translation>הפסק את קיר הוידאו</translation>
+    </message>
+    <message>
+      <source>Clear Screen</source>
+      <translation>נקה מסך</translation>
+    </message>
+    <message>
+      <source>Save Layout</source>
+      <translation>שמור פריסה</translation>
+    </message>
+    <message>
+      <source>Save Layout As...</source>
+      <translation>שמור פריסה כ...</translation>
+    </message>
+    <message>
+      <source>Maximize Item</source>
+      <translation>הגדל פריט</translation>
+    </message>
+    <message>
+      <source>Restore Item</source>
+      <translation>שחזר פריט</translation>
+    </message>
+    <message>
+      <source>Show Info</source>
+      <translation>הצג מידע</translation>
+    </message>
+    <message>
+      <source>Hide Info</source>
+      <translation>הסתר מידע</translation>
+    </message>
+    <message>
+      <source>Change Resolution...</source>
+      <translation>שנה רזולוציה...</translation>
+    </message>
+    <message>
+      <source>Auto</source>
+      <translation>אוטומטית</translation>
+    </message>
+    <message>
+      <source>Low</source>
+      <translation>נמוכה</translation>
+    </message>
+    <message>
+      <source>High</source>
+      <translation>גבוהה</translation>
+    </message>
+    <message>
+      <source>PTZ...</source>
+      <translation>מצלמה ממונעת...</translation>
+    </message>
+    <message>
+      <source>Save Current Position...</source>
+      <translation>שמור מיקום נוכחי...</translation>
+    </message>
+    <message>
+      <source>Manage...</source>
+      <translation>נהל...</translation>
+    </message>
+    <message>
+      <source>Show Motion/Smart Search</source>
+      <translation>הצג חיפוש חכם/תנועה</translation>
+    </message>
+    <message>
+      <source>Show Motion</source>
+      <translation>הצג תנועה</translation>
+    </message>
+    <message>
+      <source>Hide Motion/Smart Search</source>
+      <translation>הסתר חיפוש חכם/תנועה</translation>
+    </message>
+    <message>
+      <source>Hide Motion</source>
+      <translation>הסתר תנועה</translation>
+    </message>
+    <message>
+      <source>Clear Motion Selection</source>
+      <translation>נקה בחירת תנועה</translation>
+    </message>
+    <message>
+      <source>Check File Watermark</source>
+      <translation>בדוק סימן מים בקובץ</translation>
+    </message>
+    <message>
+      <source>Image Enhancement...</source>
+      <translation>שיפורי תמונה...</translation>
+    </message>
+    <message>
+      <source>Rotate to...</source>
+      <translation>סובב ל...</translation>
+    </message>
+    <message>
+      <source>0 degrees</source>
+      <translation>0 מעלות</translation>
+    </message>
+    <message>
+      <source>90 degrees</source>
+      <translation>90 מעלות</translation>
+    </message>
+    <message>
+      <source>180 degrees</source>
+      <translation>180 מעלות</translation>
+    </message>
+    <message>
+      <source>270 degrees</source>
+      <translation>270 מעלות</translation>
+    </message>
+    <message>
+      <source>Remove from Layout</source>
+      <translation>הסר מהפריסה</translation>
+    </message>
+    <message>
+      <source>Remove from Tour</source>
+      <translation type="unfinished">Remove from Tour</translation>
+    </message>
+    <message>
+      <source>Stop Sharing Layout</source>
+      <translation>הפסק שיתוף פריסה</translation>
+    </message>
+    <message>
+      <source>Edit...</source>
+      <translation type="unfinished">Edit...</translation>
+    </message>
+    <message>
+      <source>Rename</source>
+      <translation>שנה שם</translation>
+    </message>
+    <message>
+      <source>Delete from Disk</source>
+      <translation>מחק מהכונן</translation>
+    </message>
+    <message>
+      <source>Set as Layout Background</source>
+      <translation>קבע כרקע הפריסה</translation>
+    </message>
+    <message>
+      <source>User Settings...</source>
+      <translation>הגדרות משתמש...</translation>
+    </message>
+    <message>
+      <source>User Roles...</source>
+      <translation>תפקידי משתמשים...</translation>
+    </message>
+    <message>
+      <source>Role Settings...</source>
+      <translation>הגדרות תפקיד...</translation>
+    </message>
+    <message>
+      <source>Check Device Issues...</source>
+      <translation>בדוק בעיות התקן...</translation>
+    </message>
+    <message>
+      <source>Check Devices Issues...</source>
+      <translation>בדוק בעיות בהתקנים...</translation>
+    </message>
+    <message>
+      <source>Check Camera Issues...</source>
+      <translation>בדוק בעיות במצלמה...</translation>
+    </message>
+    <message>
+      <source>Check Cameras Issues...</source>
+      <translation>בדוק בעיות במצלמות...</translation>
+    </message>
+    <message>
+      <source>Check I/O Module Issues...</source>
+      <translation>בדוק בעיות במודול קלט/פלט...</translation>
+    </message>
+    <message>
+      <source>Check I/O Modules Issues...</source>
+      <translation>בדוק בעיות במודולי קלט/פלט...</translation>
+    </message>
+    <message>
+      <source>Device Rules...</source>
+      <translation>חוקי התקן...</translation>
+    </message>
+    <message>
+      <source>Devices Rules...</source>
+      <translation>חוקי התקנים...</translation>
+    </message>
+    <message>
+      <source>Camera Rules...</source>
+      <translation>חוקי מצלמה...</translation>
+    </message>
+    <message>
+      <source>Cameras Rules...</source>
+      <translation>חוקי מצלמות...</translation>
+    </message>
+    <message>
+      <source>I/O Module Rules...</source>
+      <translation>חוקי מודול קלט/פלט...</translation>
+    </message>
+    <message>
+      <source>I/O Modules Rules...</source>
+      <translation>חוקי מודולי קלט/פלט...</translation>
+    </message>
+    <message>
+      <source>Device Settings...</source>
+      <translation>הגדרות התקן...</translation>
+    </message>
+    <message>
+      <source>Devices Settings...</source>
+      <translation>הגדרות התקנים...</translation>
+    </message>
+    <message>
+      <source>Camera Settings...</source>
+      <translation>הגדרות מצלמה...</translation>
+    </message>
+    <message>
+      <source>Cameras Settings...</source>
+      <translation>הגדרות מצלמות...</translation>
+    </message>
+    <message>
+      <source>I/O Module Settings...</source>
+      <translation>הגדרות מודול קלט/פלט...</translation>
+    </message>
+    <message>
+      <source>I/O Modules Settings...</source>
+      <translation>הגדרות מודולי קלט/פלט...</translation>
+    </message>
+    <message>
+      <source>File Settings...</source>
+      <translation>הגדרות קובץ...</translation>
+    </message>
+    <message>
+      <source>Layout Settings...</source>
+      <translation>הגדרות פריסה...</translation>
+    </message>
+    <message>
+      <source>Video Wall Settings...</source>
+      <translation>הגדרות קיר הוידאו...</translation>
+    </message>
+    <message>
+      <source>Add Device...</source>
+      <translation>הוספת התקן...</translation>
+    </message>
+    <message>
+      <source>Devices List by Server...</source>
+      <translation>רשימת התקנים לפי שרת...</translation>
+    </message>
+    <message>
+      <source>Cameras List by Server...</source>
+      <translation>רשימת המצלמות לפי שרת...</translation>
+    </message>
+    <message>
+      <source>Server Logs...</source>
+      <translation>רשומות תיעודי שרת...</translation>
+    </message>
+    <message>
+      <source>Server Diagnostics...</source>
+      <translation>אבחוני שרת...</translation>
+    </message>
+    <message>
+      <source>Server Web Page...</source>
+      <translation>דף אינטרנט של השרת...</translation>
+    </message>
+    <message>
+      <source>Server Settings...</source>
+      <translation>הגדרות שרת...</translation>
+    </message>
+    <message>
+      <source>Merge to Currently Connected System...</source>
+      <translation>מזג למערכת המחוברת כעת...</translation>
+    </message>
+    <message>
+      <source>Change Cell Aspect Ratio...</source>
+      <translation>שנה את יחס הגובה-רוחב של התאים...</translation>
+    </message>
+    <message>
+      <source>Change Cell Spacing...</source>
+      <translation>שנה את המרווח בין התאים...</translation>
+    </message>
+    <message>
+      <source>None</source>
+      <translation>ללא</translation>
+    </message>
+    <message>
+      <source>Small</source>
+      <translation>קטן</translation>
+    </message>
+    <message>
+      <source>Medium</source>
+      <translation>בינוני</translation>
+    </message>
+    <message>
+      <source>Large</source>
+      <translation>גדול</translation>
+    </message>
+    <message>
+      <source>Start Tour</source>
+      <translation>התחל סיור</translation>
+    </message>
+    <message>
+      <source>Stop Tour</source>
+      <translation>עצור סיור</translation>
+    </message>
+    <message>
+      <source>Make Layout Tour</source>
+      <translation type="unfinished">Make Layout Tour</translation>
+    </message>
+    <message>
+      <source>Settings</source>
+      <translation type="unfinished">Settings</translation>
+    </message>
+    <message>
+      <source>Close</source>
+      <translation>סגור</translation>
+    </message>
+    <message>
+      <source>Close All But This</source>
+      <translation>סגור את כל האחרים</translation>
+    </message>
+    <message>
+      <source>Play</source>
+      <translation>הפעל</translation>
+    </message>
+    <message>
+      <source>Pause</source>
+      <translation>השהה</translation>
+    </message>
+    <message>
+      <source>Previous Frame</source>
+      <translation>פריים קודם</translation>
+    </message>
+    <message>
+      <source>Next Frame</source>
+      <translation>פריים הבא</translation>
+    </message>
+    <message>
+      <source>To Start</source>
+      <translation>להתחלה</translation>
+    </message>
+    <message>
+      <source>To End</source>
+      <translation>לסוף</translation>
+    </message>
+    <message>
+      <source>Volume Down</source>
+      <translation>הנמך עוצמת שמע</translation>
+    </message>
+    <message>
+      <source>Volume Up</source>
+      <translation>הגבהה עוצמת שמע</translation>
+    </message>
+    <message>
+      <source>Toggle Mute</source>
+      <translation>הפעל/כבה השתקה</translation>
+    </message>
+    <message>
+      <source>Jump to Live</source>
+      <translation>עבור לשידור חי</translation>
+    </message>
+    <message>
+      <source>Synchronize Streams</source>
+      <translation>סנכרן זרמים</translation>
+    </message>
+    <message>
+      <source>Disable Stream Synchronization</source>
+      <translation>הפסק סינכרון זרמים</translation>
+    </message>
+    <message>
+      <source>Show Bookmarks</source>
+      <translation>הצג סימניות</translation>
+    </message>
+    <message>
+      <source>Hide Bookmarks</source>
+      <translation>הסתר סימניות</translation>
+    </message>
+    <message>
+      <source>Show Calendar</source>
+      <translation>הצג לוח שנה</translation>
+    </message>
+    <message>
+      <source>Hide Calendar</source>
+      <translation>הסתר לוח שנה</translation>
+    </message>
+    <message>
+      <source>Show Title Bar</source>
+      <translation>הצג סרגל כותרת</translation>
+    </message>
+    <message>
+      <source>Hide Title Bar</source>
+      <translation>הסתר סרגל כותרת</translation>
+    </message>
+    <message>
+      <source>Pin Tree</source>
+      <translation>הצמד עץ</translation>
+    </message>
+    <message>
+      <source>Unpin Tree</source>
+      <translation>נתק עץ</translation>
+    </message>
+    <message>
+      <source>Show Tree</source>
+      <translation>הצג עץ</translation>
+    </message>
+    <message>
+      <source>Hide Tree</source>
+      <translation>הסתר עץ</translation>
+    </message>
+    <message>
+      <source>Show Timeline</source>
+      <translation>הצג ציר זמן</translation>
+    </message>
+    <message>
+      <source>Hide Timeline</source>
+      <translation>הסתר ציר זמן</translation>
+    </message>
+    <message>
+      <source>Show Notifications</source>
+      <translation>הצג התראות</translation>
+    </message>
+    <message>
+      <source>Hide Notifications</source>
+      <translation>הסתר התראות</translation>
+    </message>
+    <message>
+      <source>Pin Notifications</source>
+      <translation>הצמד התראות</translation>
+    </message>
+    <message>
+      <source>Unpin Notifications</source>
+      <translation>הפרד התראות</translation>
+    </message>
+  </context>
+  <context>
     <name>CustomHorizontalHeader</name>
     <message>
       <source>5 minutes</source>
@@ -116,6 +918,45 @@ to view more bookmarks</source>
     <message>
       <source>For all data</source>
       <translation>עבור כל הנתונים</translation>
+    </message>
+  </context>
+  <context>
+    <name>Deactivator</name>
+    <message>
+      <source>Unknown error</source>
+      <translation type="unfinished">Unknown error</translation>
+    </message>
+    <message>
+      <source>License does not exist</source>
+      <translation type="unfinished">License does not exist</translation>
+    </message>
+    <message>
+      <source>License is disabled</source>
+      <translation type="unfinished">License is disabled</translation>
+    </message>
+    <message>
+      <source>License is inactive</source>
+      <translation type="unfinished">License is inactive</translation>
+    </message>
+    <message>
+      <source>Invalid license</source>
+      <translation type="unfinished">Invalid license</translation>
+    </message>
+    <message>
+      <source>License is trial</source>
+      <translation type="unfinished">License is trial</translation>
+    </message>
+    <message>
+      <source>License is in deactivation process</source>
+      <translation type="unfinished">License is in deactivation process</translation>
+    </message>
+    <message>
+      <source>Invalid hardware id</source>
+      <translation type="unfinished">Invalid hardware id</translation>
+    </message>
+    <message>
+      <source>Limit exceeded</source>
+      <translation type="unfinished">Limit exceeded</translation>
     </message>
   </context>
   <context>
@@ -233,37 +1074,6 @@ to view more bookmarks</source>
     <message>
       <source>Permissions</source>
       <translation>הרשאות</translation>
-    </message>
-  </context>
-  <context>
-    <name>Ptz</name>
-    <message>
-      <source>Please wait for the camera to go online.</source>
-      <translation>יש להמתין למצלמה שתעבור למצב מקוון.</translation>
-    </message>
-    <message>
-      <source>Failed to get current position</source>
-      <translation>לא ניתן היה לקבל את המיקום הנוכחי</translation>
-    </message>
-    <message>
-      <source>Failed to set current position</source>
-      <translation>הגדרת המיקום הנוכחי נכשלה</translation>
-    </message>
-    <message>
-      <source>Preset used by some tours. Delete it anyway?</source>
-      <translation>הפריסט בשימוש ע"י מספר סיורים. האם למחוק בכל זאת?</translation>
-    </message>
-    <message>
-      <source>These tours will become invalid.</source>
-      <translation>סיורים אלו יהפכו ללא תקינים.</translation>
-    </message>
-    <message>
-      <source>Cannot get the current position from camera &quot;%1&quot;</source>
-      <translation type="unfinished">Cannot get the current position from camera &quot;%1&quot;</translation>
-    </message>
-    <message>
-      <source>Cannot set the current position for camera &quot;%1&quot;</source>
-      <translation type="unfinished">Cannot set the current position for camera &quot;%1&quot;</translation>
     </message>
   </context>
   <context>
@@ -400,940 +1210,6 @@ to view more bookmarks</source>
     </message>
   </context>
   <context>
-    <name>QnActionManager</name>
-    <message>
-      <source>Show FPS</source>
-      <translation>הצג פריימים לשניה</translation>
-    </message>
-    <message>
-      <source>Hide FPS</source>
-      <translation>הסתר פריימים לשניה</translation>
-    </message>
-    <message>
-      <source>Drop Resources</source>
-      <translation>שחרר משאבים</translation>
-    </message>
-    <message>
-      <source>Drop Resources into New Layout</source>
-      <translation>העבר משאבים לתבנית החדשה</translation>
-    </message>
-    <message>
-      <source>Delayed Open Video Wall</source>
-      <translation>פתיחת קיר וידאו מושהת</translation>
-    </message>
-    <message>
-      <source>Delayed Drop Resources</source>
-      <translation>שחרור משאבים מושהה</translation>
-    </message>
-    <message>
-      <source>Instant Drop Resources</source>
-      <translation>שחרור משאבים מיידי</translation>
-    </message>
-    <message>
-      <source>Next Layout</source>
-      <translation>הפריסה הבאה</translation>
-    </message>
-    <message>
-      <source>Previous Layout</source>
-      <translation>הפריסה הקודמת</translation>
-    </message>
-    <message>
-      <source>Select All</source>
-      <translation>בחר הכל</translation>
-    </message>
-    <message>
-      <source>Selection Changed</source>
-      <translation>הבחירה שונתה</translation>
-    </message>
-    <message>
-      <source>Filter...</source>
-      <translation>סנן...</translation>
-    </message>
-    <message>
-      <source>Go to Freespace Mode</source>
-      <translation>עבור למצב "שטח פנוי"</translation>
-    </message>
-    <message>
-      <source>Help</source>
-      <translation>עזרה</translation>
-    </message>
-    <message>
-      <source>Event Log...</source>
-      <translation>רשימת אירועים...</translation>
-    </message>
-    <message>
-      <source>Control Video Wall</source>
-      <translation>שליטה בקיר הוידאו</translation>
-    </message>
-    <message>
-      <source>Push my screen</source>
-      <translation>הזז את המסך שלי</translation>
-    </message>
-    <message>
-      <source>Restart application</source>
-      <translation>אתחל את התוכנה</translation>
-    </message>
-    <message>
-      <source>Select Time Server</source>
-      <translation>בחר שרת-זמן</translation>
-    </message>
-    <message>
-      <source>Go To Saved Position</source>
-      <translation>עבור למיקום שמור</translation>
-    </message>
-    <message>
-      <source>Activate PTZ Tour</source>
-      <translation>הפעל סיור מצלמה ממונעת</translation>
-    </message>
-    <message>
-      <source>Activate PTZ Object</source>
-      <translation>הפעל אובייקט מצלמה ממונעת</translation>
-    </message>
-    <message>
-      <source>Fit in View</source>
-      <translation>התאם לתצוגה</translation>
-    </message>
-    <message>
-      <source>Main Menu</source>
-      <translation>תפריט ראשי</translation>
-    </message>
-    <message>
-      <source>Connect to Server...</source>
-      <translation>התחבר לשרת...</translation>
-    </message>
-    <message>
-      <source>Start Panic Recording</source>
-      <translation>הפעל הקלטת מצוקה</translation>
-    </message>
-    <message>
-      <source>Stop Panic Recording</source>
-      <translation>הפסק הקלטת מצוקה</translation>
-    </message>
-    <message>
-      <source>New...</source>
-      <translation>חדש...</translation>
-    </message>
-    <message>
-      <source>New Layout...</source>
-      <translation>פריסה חדשה...</translation>
-    </message>
-    <message>
-      <source>Tab</source>
-      <translation>כרטיסיה</translation>
-    </message>
-    <message>
-      <source>New Tab</source>
-      <translation>כרטיסיה חדשה</translation>
-    </message>
-    <message>
-      <source>Window</source>
-      <translation>חלון</translation>
-    </message>
-    <message>
-      <source>New Window</source>
-      <translation>חלון חדש</translation>
-    </message>
-    <message>
-      <source>User...</source>
-      <translation>משתמש...</translation>
-    </message>
-    <message>
-      <source>New User...</source>
-      <translation>משתמש חדש...</translation>
-    </message>
-    <message>
-      <source>Video Wall...</source>
-      <translation>קיר וידאו...</translation>
-    </message>
-    <message>
-      <source>New Video Wall...</source>
-      <translation>קיר וידאו חדש...</translation>
-    </message>
-    <message>
-      <source>Open Layout...</source>
-      <translation>פתח פריסה...</translation>
-    </message>
-    <message>
-      <source>Open...</source>
-      <translation>פתח...</translation>
-    </message>
-    <message>
-      <source>File(s)...</source>
-      <translation>קובץ/קבצים...</translation>
-    </message>
-    <message>
-      <source>Folder...</source>
-      <translation>תיקיה...</translation>
-    </message>
-    <message>
-      <source>Save Current Layout</source>
-      <translation>שמור פריסה נוכחית</translation>
-    </message>
-    <message>
-      <source>Save Current Layout As...</source>
-      <translation>שמור פריסה נוכחית כ...</translation>
-    </message>
-    <message>
-      <source>Save Video Wall View</source>
-      <translation>שמור תצוגת קיר וידאו</translation>
-    </message>
-    <message>
-      <source>Start Screen Recording</source>
-      <translation>התחל הקלטת מסך</translation>
-    </message>
-    <message>
-      <source>Stop Screen Recording</source>
-      <translation>הפסק הקלטת מסך</translation>
-    </message>
-    <message>
-      <source>Stop current action</source>
-      <translation>הפסקת פעולה נוכחית</translation>
-    </message>
-    <message>
-      <source>Go to Fullscreen</source>
-      <translation>עבור למסך מלא</translation>
-    </message>
-    <message>
-      <source>Exit Fullscreen</source>
-      <translation>צא ממסך מלא</translation>
-    </message>
-    <message>
-      <source>Minimize</source>
-      <translation>מזער</translation>
-    </message>
-    <message>
-      <source>Maximize</source>
-      <translation>הגדל</translation>
-    </message>
-    <message>
-      <source>Restore Down</source>
-      <translation>שחזר</translation>
-    </message>
-    <message>
-      <source>Open in Browser...</source>
-      <translation>פתח בדפדפן...</translation>
-    </message>
-    <message>
-      <source>System Administration...</source>
-      <translation>ניהול המערכת...</translation>
-    </message>
-    <message>
-      <source>Open Web Client...</source>
-      <translation>פתח קליינט אינטרנט...</translation>
-    </message>
-    <message>
-      <source>System Update...</source>
-      <translation>עדכון המערכת...</translation>
-    </message>
-    <message>
-      <source>Local Settings...</source>
-      <translation>הגדרות מקומיות...</translation>
-    </message>
-    <message>
-      <source>Merge Systems...</source>
-      <translation>מזג מערכות...</translation>
-    </message>
-    <message>
-      <source>About...</source>
-      <translation>אודות...</translation>
-    </message>
-    <message>
-      <source>Exit</source>
-      <translation>יציאה</translation>
-    </message>
-    <message>
-      <source>Server...</source>
-      <translation>שרת...</translation>
-    </message>
-    <message>
-      <source>Open in Layout</source>
-      <translation>פתח בפריסה</translation>
-    </message>
-    <message>
-      <source>Open</source>
-      <translation>פתח</translation>
-    </message>
-    <message>
-      <source>Monitor</source>
-      <translation>נטר</translation>
-    </message>
-    <message>
-      <source>Open in New Tab</source>
-      <translation>פתח בכרטיסיה חדשה</translation>
-    </message>
-    <message>
-      <source>Open in New Window</source>
-      <translation>פתח בחלון חדש</translation>
-    </message>
-    <message>
-      <source>Open Layouts</source>
-      <translation>פתח פריסות</translation>
-    </message>
-    <message>
-      <source>Open Layout(s)</source>
-      <translation>פתח פריסה/פריסות</translation>
-    </message>
-    <message>
-      <source>Open Video Wall(s)</source>
-      <translation>פתח קיר/קירות וידאו</translation>
-    </message>
-    <message>
-      <source>Open Containing Folder</source>
-      <translation>פתח את התיקיה המכילה</translation>
-    </message>
-    <message>
-      <source>Identify</source>
-      <translation>זהה</translation>
-    </message>
-    <message>
-      <source>Attach to Video Wall...</source>
-      <translation>הצמד לקיר וידאו...</translation>
-    </message>
-    <message>
-      <source>Switch to Video Wall mode...</source>
-      <translation>עבור למצב "קיר וידאו"...</translation>
-    </message>
-    <message>
-      <source>Save Current Matrix</source>
-      <translation>שמור מטריצה נוכחית</translation>
-    </message>
-    <message>
-      <source>Load Matrix</source>
-      <translation>טען מטריצה</translation>
-    </message>
-    <message>
-      <source>Delete</source>
-      <translation>מחק</translation>
-    </message>
-    <message>
-      <source>Stop Video Wall</source>
-      <translation>הפסק את קיר הוידאו</translation>
-    </message>
-    <message>
-      <source>Save Layout</source>
-      <translation>שמור פריסה</translation>
-    </message>
-    <message>
-      <source>Save Layout As...</source>
-      <translation>שמור פריסה כ...</translation>
-    </message>
-    <message>
-      <source>Maximize Item</source>
-      <translation>הגדל פריט</translation>
-    </message>
-    <message>
-      <source>Restore Item</source>
-      <translation>שחזר פריט</translation>
-    </message>
-    <message>
-      <source>Show Info</source>
-      <translation>הצג מידע</translation>
-    </message>
-    <message>
-      <source>Hide Info</source>
-      <translation>הסתר מידע</translation>
-    </message>
-    <message>
-      <source>Toggle Info</source>
-      <translation>החלף מידע</translation>
-    </message>
-    <message>
-      <source>Change Resolution...</source>
-      <translation>שנה רזולוציה...</translation>
-    </message>
-    <message>
-      <source>Auto</source>
-      <translation>אוטומטית</translation>
-    </message>
-    <message>
-      <source>Low</source>
-      <translation>נמוכה</translation>
-    </message>
-    <message>
-      <source>High</source>
-      <translation>גבוהה</translation>
-    </message>
-    <message>
-      <source>PTZ...</source>
-      <translation>מצלמה ממונעת...</translation>
-    </message>
-    <message>
-      <source>Save Current Position...</source>
-      <translation>שמור מיקום נוכחי...</translation>
-    </message>
-    <message>
-      <source>Manage...</source>
-      <translation>נהל...</translation>
-    </message>
-    <message>
-      <source>Calibrate Fisheye</source>
-      <translation>כיול עין-הדג</translation>
-    </message>
-    <message>
-      <source>Toggle Resolution Mode</source>
-      <translation>החלף מצב רזולוציה</translation>
-    </message>
-    <message>
-      <source>Show Motion/Smart Search</source>
-      <translation>הצג חיפוש חכם/תנועה</translation>
-    </message>
-    <message>
-      <source>Show Motion</source>
-      <translation>הצג תנועה</translation>
-    </message>
-    <message>
-      <source>Hide Motion/Smart Search</source>
-      <translation>הסתר חיפוש חכם/תנועה</translation>
-    </message>
-    <message>
-      <source>Hide Motion</source>
-      <translation>הסתר תנועה</translation>
-    </message>
-    <message>
-      <source>Clear Motion Selection</source>
-      <translation>נקה בחירת תנועה</translation>
-    </message>
-    <message>
-      <source>Toggle Smart Search</source>
-      <translation>הדלק/כבה חיפוש חכם</translation>
-    </message>
-    <message>
-      <source>Check File Watermark</source>
-      <translation>בדוק סימן מים בקובץ</translation>
-    </message>
-    <message>
-      <source>Take Screenshot</source>
-      <translation>צילום מסך</translation>
-    </message>
-    <message>
-      <source>Image Enhancement...</source>
-      <translation>שיפורי תמונה...</translation>
-    </message>
-    <message>
-      <source>Create Zoom Window</source>
-      <translation>צור חלון מיקוד</translation>
-    </message>
-    <message>
-      <source>Rotate to...</source>
-      <translation>סובב ל...</translation>
-    </message>
-    <message>
-      <source>0 degrees</source>
-      <translation>0 מעלות</translation>
-    </message>
-    <message>
-      <source>90 degrees</source>
-      <translation>90 מעלות</translation>
-    </message>
-    <message>
-      <source>180 degrees</source>
-      <translation>180 מעלות</translation>
-    </message>
-    <message>
-      <source>270 degrees</source>
-      <translation>270 מעלות</translation>
-    </message>
-    <message>
-      <source>Remove from Layout</source>
-      <translation>הסר מהפריסה</translation>
-    </message>
-    <message>
-      <source>Rename</source>
-      <translation>שנה שם</translation>
-    </message>
-    <message>
-      <source>Delete from Disk</source>
-      <translation>מחק מהכונן</translation>
-    </message>
-    <message>
-      <source>Set as Layout Background</source>
-      <translation>קבע כרקע הפריסה</translation>
-    </message>
-    <message>
-      <source>User Settings...</source>
-      <translation>הגדרות משתמש...</translation>
-    </message>
-    <message>
-      <source>Layout Settings...</source>
-      <translation>הגדרות פריסה...</translation>
-    </message>
-    <message>
-      <source>Video Wall Settings...</source>
-      <translation>הגדרות קיר הוידאו...</translation>
-    </message>
-    <message>
-      <source>Ping...</source>
-      <translation>Ping...</translation>
-    </message>
-    <message>
-      <source>Server Logs...</source>
-      <translation>רשומות תיעודי שרת...</translation>
-    </message>
-    <message>
-      <source>Server Diagnostics...</source>
-      <translation>אבחוני שרת...</translation>
-    </message>
-    <message>
-      <source>Server Settings...</source>
-      <translation>הגדרות שרת...</translation>
-    </message>
-    <message>
-      <source>Merge to Currently Connected System...</source>
-      <translation>מזג למערכת המחוברת כעת...</translation>
-    </message>
-    <message>
-      <source>Change Cell Aspect Ratio...</source>
-      <translation>שנה את יחס הגובה-רוחב של התאים...</translation>
-    </message>
-    <message>
-      <source>Change Cell Spacing...</source>
-      <translation>שנה את המרווח בין התאים...</translation>
-    </message>
-    <message>
-      <source>None</source>
-      <translation>ללא</translation>
-    </message>
-    <message>
-      <source>Small</source>
-      <translation>קטן</translation>
-    </message>
-    <message>
-      <source>Medium</source>
-      <translation>בינוני</translation>
-    </message>
-    <message>
-      <source>Large</source>
-      <translation>גדול</translation>
-    </message>
-    <message>
-      <source>Start Tour</source>
-      <translation>התחל סיור</translation>
-    </message>
-    <message>
-      <source>Stop Tour</source>
-      <translation>עצור סיור</translation>
-    </message>
-    <message>
-      <source>Close</source>
-      <translation>סגור</translation>
-    </message>
-    <message>
-      <source>Close All But This</source>
-      <translation>סגור את כל האחרים</translation>
-    </message>
-    <message>
-      <source>Mark Selection Start</source>
-      <translation>סמן את תחילת הבחירה</translation>
-    </message>
-    <message>
-      <source>Mark Selection End</source>
-      <translation>סמן את סיום הבחירה</translation>
-    </message>
-    <message>
-      <source>Clear Selection</source>
-      <translation>נקה בחירה</translation>
-    </message>
-    <message>
-      <source>Zoom to Selection</source>
-      <translation>התמקד בבחירה</translation>
-    </message>
-    <message>
-      <source>Edit Bookmark...</source>
-      <translation>ערוך סימניה...</translation>
-    </message>
-    <message>
-      <source>Remove Bookmark...</source>
-      <translation>הסר סימניה...</translation>
-    </message>
-    <message>
-      <source>Export Selected Area...</source>
-      <translation>יצא את האיזור שנבחר...</translation>
-    </message>
-    <message>
-      <source>Export Multi-Video...</source>
-      <translation>יצא מולטי-וידאו...</translation>
-    </message>
-    <message>
-      <source>Preview Search...</source>
-      <translation>חיפוש ויזואלי...</translation>
-    </message>
-    <message>
-      <source>Play</source>
-      <translation>הפעל</translation>
-    </message>
-    <message>
-      <source>Pause</source>
-      <translation>השהה</translation>
-    </message>
-    <message>
-      <source>Previous Frame</source>
-      <translation>פריים קודם</translation>
-    </message>
-    <message>
-      <source>Next Frame</source>
-      <translation>פריים הבא</translation>
-    </message>
-    <message>
-      <source>To Start</source>
-      <translation>להתחלה</translation>
-    </message>
-    <message>
-      <source>To End</source>
-      <translation>לסוף</translation>
-    </message>
-    <message>
-      <source>Volume Down</source>
-      <translation>הנמך עוצמת שמע</translation>
-    </message>
-    <message>
-      <source>Volume Up</source>
-      <translation>הגבהה עוצמת שמע</translation>
-    </message>
-    <message>
-      <source>Toggle Mute</source>
-      <translation>הפעל/כבה השתקה</translation>
-    </message>
-    <message>
-      <source>Jump to Live</source>
-      <translation>עבור לשידור חי</translation>
-    </message>
-    <message>
-      <source>Synchronize Streams</source>
-      <translation>סנכרן זרמים</translation>
-    </message>
-    <message>
-      <source>Disable Stream Synchronization</source>
-      <translation>הפסק סינכרון זרמים</translation>
-    </message>
-    <message>
-      <source>Show Thumbnails</source>
-      <translation>הצג תמונות ממוזערות</translation>
-    </message>
-    <message>
-      <source>Hide Thumbnails</source>
-      <translation>הסתר תמונות ממוזערות</translation>
-    </message>
-    <message>
-      <source>Show Calendar</source>
-      <translation>הצג לוח שנה</translation>
-    </message>
-    <message>
-      <source>Hide Calendar</source>
-      <translation>הסתר לוח שנה</translation>
-    </message>
-    <message>
-      <source>Show Title Bar</source>
-      <translation>הצג סרגל כותרת</translation>
-    </message>
-    <message>
-      <source>Hide Title Bar</source>
-      <translation>הסתר סרגל כותרת</translation>
-    </message>
-    <message>
-      <source>Pin Tree</source>
-      <translation>הצמד עץ</translation>
-    </message>
-    <message>
-      <source>Unpin Tree</source>
-      <translation>נתק עץ</translation>
-    </message>
-    <message>
-      <source>Show Tree</source>
-      <translation>הצג עץ</translation>
-    </message>
-    <message>
-      <source>Hide Tree</source>
-      <translation>הסתר עץ</translation>
-    </message>
-    <message>
-      <source>Show Timeline</source>
-      <translation>הצג ציר זמן</translation>
-    </message>
-    <message>
-      <source>Hide Timeline</source>
-      <translation>הסתר ציר זמן</translation>
-    </message>
-    <message>
-      <source>Pin Notifications</source>
-      <translation>הצמד התראות</translation>
-    </message>
-    <message>
-      <source>Unpin Notifications</source>
-      <translation>הפרד התראות</translation>
-    </message>
-    <message>
-      <source>File Settings...</source>
-      <translation>הגדרות קובץ...</translation>
-    </message>
-    <message>
-      <source>User Management...</source>
-      <translation>ניהול משתמש...</translation>
-    </message>
-    <message>
-      <source>Audit Trail...</source>
-      <translation>נתיב ביקורת...</translation>
-    </message>
-    <message>
-      <source>Failover Priority...</source>
-      <translation>קדימות גיבוי בעת כשל...</translation>
-    </message>
-    <message>
-      <source>Move Devices</source>
-      <translation>הזז התקנים</translation>
-    </message>
-    <message>
-      <source>Move Cameras</source>
-      <translation>הזז מצלמות</translation>
-    </message>
-    <message>
-      <source>Device Diagnostics...</source>
-      <translation>אבחון התקן...</translation>
-    </message>
-    <message>
-      <source>Camera Diagnostics...</source>
-      <translation>אבחון מצלמה...</translation>
-    </message>
-    <message>
-      <source>Devices List</source>
-      <translation>רשימת התקנים</translation>
-    </message>
-    <message>
-      <source>Cameras List</source>
-      <translation>רשימת מצלמות</translation>
-    </message>
-    <message>
-      <source>Check Device Issues...</source>
-      <translation>בדוק בעיות התקן...</translation>
-    </message>
-    <message>
-      <source>Check Devices Issues...</source>
-      <translation>בדוק בעיות בהתקנים...</translation>
-    </message>
-    <message>
-      <source>Check Camera Issues...</source>
-      <translation>בדוק בעיות במצלמה...</translation>
-    </message>
-    <message>
-      <source>Check Cameras Issues...</source>
-      <translation>בדוק בעיות במצלמות...</translation>
-    </message>
-    <message>
-      <source>Device Rules...</source>
-      <translation>חוקי התקן...</translation>
-    </message>
-    <message>
-      <source>Devices Rules...</source>
-      <translation>חוקי התקנים...</translation>
-    </message>
-    <message>
-      <source>Camera Rules...</source>
-      <translation>חוקי מצלמה...</translation>
-    </message>
-    <message>
-      <source>Cameras Rules...</source>
-      <translation>חוקי מצלמות...</translation>
-    </message>
-    <message>
-      <source>Device Settings...</source>
-      <translation>הגדרות התקן...</translation>
-    </message>
-    <message>
-      <source>Devices Settings...</source>
-      <translation>הגדרות התקנים...</translation>
-    </message>
-    <message>
-      <source>Camera Settings...</source>
-      <translation>הגדרות מצלמה...</translation>
-    </message>
-    <message>
-      <source>Cameras Settings...</source>
-      <translation>הגדרות מצלמות...</translation>
-    </message>
-    <message>
-      <source>Devices List by Server...</source>
-      <translation>רשימת התקנים לפי שרת...</translation>
-    </message>
-    <message>
-      <source>Cameras List by Server...</source>
-      <translation>רשימת המצלמות לפי שרת...</translation>
-    </message>
-    <message>
-      <source>Cameras to Backup...</source>
-      <translation>מצלמה לגיבוי...</translation>
-    </message>
-    <message>
-      <source>Show Bookmarks</source>
-      <translation>הצג סימניות</translation>
-    </message>
-    <message>
-      <source>Hide Bookmarks</source>
-      <translation>הסתר סימניות</translation>
-    </message>
-    <message>
-      <source>Pin Calendar</source>
-      <translation>הצמד לוח שנה</translation>
-    </message>
-    <message>
-      <source>Unpin Calendar</source>
-      <translation>בטל הצמדה של לוח השנה</translation>
-    </message>
-    <message>
-      <source>I/O Module Diagnostics...</source>
-      <translation>אבחון מודול קלט/פלט...</translation>
-    </message>
-    <message>
-      <source>Web Client...</source>
-      <translation>קליינט רשת...</translation>
-    </message>
-    <message>
-      <source>Bookmark Search...</source>
-      <translation>חיפוש סימניות...</translation>
-    </message>
-    <message>
-      <source>Open in Alarm Layout</source>
-      <translation>פתח בפריסת אזעקה</translation>
-    </message>
-    <message>
-      <source>Check I/O Module Issues...</source>
-      <translation>בדוק בעיות במודול קלט/פלט...</translation>
-    </message>
-    <message>
-      <source>Check I/O Modules Issues...</source>
-      <translation>בדוק בעיות במודולי קלט/פלט...</translation>
-    </message>
-    <message>
-      <source>I/O Module Rules...</source>
-      <translation>חוקי מודול קלט/פלט...</translation>
-    </message>
-    <message>
-      <source>I/O Modules Rules...</source>
-      <translation>חוקי מודולי קלט/פלט...</translation>
-    </message>
-    <message>
-      <source>I/O Module Settings...</source>
-      <translation>הגדרות מודול קלט/פלט...</translation>
-    </message>
-    <message>
-      <source>I/O Modules Settings...</source>
-      <translation>הגדרות מודולי קלט/פלט...</translation>
-    </message>
-    <message>
-      <source>Remove Bookmarks...</source>
-      <translation>הסר סימניות...</translation>
-    </message>
-    <message>
-      <source>Monitor in New Tab</source>
-      <translation>צפה בכרטיסיה חדשה</translation>
-    </message>
-    <message>
-      <source>Monitor in New Window</source>
-      <translation>צפה בחלון חדש</translation>
-    </message>
-    <message>
-      <source>Open Layout in New Tab</source>
-      <translation>פתח פריסה בכרטיסיה חדשה</translation>
-    </message>
-    <message>
-      <source>Open Layout(s) in New Window</source>
-      <translation>פתח פריסות בחלון חדש</translation>
-    </message>
-    <message>
-      <source>Open Current Layout in New Window</source>
-      <translation>פתח פריסה נוכחית בחלון חדש</translation>
-    </message>
-    <message>
-      <source>Add Bookmark...</source>
-      <translation>הוסף סימניה...</translation>
-    </message>
-    <message>
-      <source>Export Rapid Review...</source>
-      <translation>יצוא סקירה מהירה...</translation>
-    </message>
-    <message>
-      <source>Event Rules...</source>
-      <translation>חוקי אירוע...</translation>
-    </message>
-    <message>
-      <source>Disconnect from Server</source>
-      <translation>התנתקת מהשרת</translation>
-    </message>
-    <message>
-      <source>Browse Local Files</source>
-      <translation>עיון קבצים מקומיים</translation>
-    </message>
-    <message>
-      <source>Show Welcome Screen</source>
-      <translation>הצג מסך פתיחה</translation>
-    </message>
-    <message>
-      <source>Web Page...</source>
-      <translation>דף אינטרנט...</translation>
-    </message>
-    <message>
-      <source>New Web Page...</source>
-      <translation>דף אינטרנט חדש...</translation>
-    </message>
-    <message>
-      <source>Log in to %1...</source>
-      <comment>Log in to Nx Cloud</comment>
-      <translation>היכנס ל- %1...</translation>
-    </message>
-    <message>
-      <source>Log out from %1</source>
-      <comment>Log out from Nx Cloud</comment>
-      <translation>התנתק מ- %1</translation>
-    </message>
-    <message>
-      <source>Open %1 Portal...</source>
-      <comment>Open Nx Cloud Portal</comment>
-      <translation>פתח פורטל %1...</translation>
-    </message>
-    <message>
-      <source>Stop Sharing Layout</source>
-      <translation>הפסק שיתוף פריסה</translation>
-    </message>
-    <message>
-      <source>User Roles...</source>
-      <translation>תפקידי משתמשים...</translation>
-    </message>
-    <message>
-      <source>Role Settings...</source>
-      <translation>הגדרות תפקיד...</translation>
-    </message>
-    <message>
-      <source>Show Notifications</source>
-      <translation>הצג התראות</translation>
-    </message>
-    <message>
-      <source>Hide Notifications</source>
-      <translation>הסתר התראות</translation>
-    </message>
-    <message>
-      <source>Connect to System</source>
-      <translation>התחבר למערכת</translation>
-    </message>
-    <message>
-      <source>Account Settings...</source>
-      <translation>הגדרות חשבון...</translation>
-    </message>
-    <message>
-      <source>Create Account...</source>
-      <translation>יצירת חשבון...</translation>
-    </message>
-    <message>
-      <source>Server Web Page...</source>
-      <translation>דף אינטרנט של השרת...</translation>
-    </message>
-    <message>
-      <source>Add Device...</source>
-      <translation>הוספת התקן...</translation>
-    </message>
-    <message>
-      <source>Clear Screen</source>
-      <translation>נקה מסך</translation>
-    </message>
-  </context>
-  <context>
     <name>QnAdjustVideoDialog</name>
     <message>
       <source>Image Enhancement</source>
@@ -1349,13 +1225,6 @@ to view more bookmarks</source>
     <message>
       <source>Folder not found</source>
       <translation>התיקיה לא נמצאת</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnAlarmLayoutResource</name>
-    <message>
-      <source>Alarms</source>
-      <translation>אזעקות</translation>
     </message>
   </context>
   <context>
@@ -1815,17 +1684,6 @@ to view more bookmarks</source>
     </message>
   </context>
   <context>
-    <name>QnBusinessRuleItemDelegate</name>
-    <message>
-      <source>For Administrators Only</source>
-      <translation>למנהלים בלבד</translation>
-    </message>
-    <message>
-      <source>For Users</source>
-      <translation>עבור משתמשים</translation>
-    </message>
-  </context>
-  <context>
     <name>QnBusinessRuleViewModel</name>
     <message numerus="yes">
       <source>%n Server(s)</source>
@@ -1851,10 +1709,6 @@ to view more bookmarks</source>
     <message>
       <source>Starts</source>
       <translation>התחלות</translation>
-    </message>
-    <message>
-      <source>Administrators Only</source>
-      <translation>מנהלים בלבד</translation>
     </message>
     <message>
       <source>Select at least one device</source>
@@ -1884,10 +1738,6 @@ to view more bookmarks</source>
     <message>
       <source>N/A</source>
       <translation>לא זמין</translation>
-    </message>
-    <message>
-      <source>Users</source>
-      <translation>משתמשים</translation>
     </message>
     <message>
       <source>Every %1</source>
@@ -3293,10 +3143,6 @@ to %1</source>
   <context>
     <name>QnEventLogModel</name>
     <message>
-      <source>Administrators Only</source>
-      <translation>מנהלים בלבד</translation>
-    </message>
-    <message>
       <source>Motion video</source>
       <translation>וידאו תנועה</translation>
     </message>
@@ -3339,21 +3185,8 @@ to %1</source>
       </translation>
     </message>
     <message>
-      <source>Users</source>
-      <translation>משתמשים</translation>
-    </message>
-    <message>
       <source>Open camera</source>
       <translation>הפעל מצלמה</translation>
-    </message>
-    <message numerus="yes">
-      <source>%n users</source>
-      <translation>
-        <numerusform>%n משתמשים</numerusform>
-        <numerusform>%n משתמשים</numerusform>
-        <numerusform>%n משתמשים</numerusform>
-        <numerusform>%n משתמשים</numerusform>
-      </translation>
     </message>
     <message numerus="yes">
       <source>and %n users more...</source>
@@ -3373,9 +3206,18 @@ to %1</source>
         <numerusform>ו %n נוספים...</numerusform>
       </translation>
     </message>
+    <message numerus="yes">
+      <source>%n Removed subjects</source>
+      <translation type="unfinished">
+        <numerusform>%n Removed subjects</numerusform>
+        <numerusform>%n Removed subjects</numerusform>
+        <numerusform>%n Removed subjects</numerusform>
+        <numerusform>%n Removed subjects</numerusform>
+      </translation>
+    </message>
     <message>
-      <source>User removed</source>
-      <translation>המשתמש הוסר</translation>
+      <source>Subject removed</source>
+      <translation type="unfinished">Subject removed</translation>
     </message>
   </context>
   <context>
@@ -4077,6 +3919,105 @@ to %1</source>
       <source>This license is already activated and linked to hardware ID %1 on %2</source>
       <translation>רישיון זה הוא כבר הופעל ומקושר אל החומרה עם מזהה %1 על %2</translation>
     </message>
+    <message numerus="yes">
+      <source>%n channels</source>
+      <translation type="unfinished">
+        <numerusform>%n channels</numerusform>
+        <numerusform>%n channels</numerusform>
+        <numerusform>%n channels</numerusform>
+        <numerusform>%n channels</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Deactivate licenses?</source>
+      <translation type="unfinished">
+        <numerusform>Deactivate licenses?</numerusform>
+        <numerusform>Deactivate licenses?</numerusform>
+        <numerusform>Deactivate licenses?</numerusform>
+        <numerusform>Deactivate licenses?</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Failed to deactivate license</source>
+      <translation type="unfinished">Failed to deactivate license</translation>
+    </message>
+    <message numerus="yes">
+      <source>Failed to deactivate %n licenses</source>
+      <translation type="unfinished">
+        <numerusform>Failed to deactivate %n licenses</numerusform>
+        <numerusform>Failed to deactivate %n licenses</numerusform>
+        <numerusform>Failed to deactivate %n licenses</numerusform>
+        <numerusform>Failed to deactivate %n licenses</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%1 of %n licenses cannot be deactivated</source>
+      <translation type="unfinished">
+        <numerusform>%1 of %n licenses cannot be deactivated</numerusform>
+        <numerusform>%1 of %n licenses cannot be deactivated</numerusform>
+        <numerusform>%1 of %n licenses cannot be deactivated</numerusform>
+        <numerusform>%1 of %n licenses cannot be deactivated</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Please contact Customer Support</source>
+      <translation type="unfinished">Please contact Customer Support</translation>
+    </message>
+    <message numerus="yes">
+      <source>Deactivate %n other</source>
+      <translation type="unfinished">
+        <numerusform>Deactivate %n other</numerusform>
+        <numerusform>Deactivate %n other</numerusform>
+        <numerusform>Deactivate %n other</numerusform>
+        <numerusform>Deactivate %n other</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Cannot deactivate licenses</source>
+      <translation type="unfinished">
+        <numerusform>Cannot deactivate licenses</numerusform>
+        <numerusform>Cannot deactivate licenses</numerusform>
+        <numerusform>Cannot deactivate licenses</numerusform>
+        <numerusform>Cannot deactivate licenses</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Cannot connect to the License Server</source>
+      <translation type="unfinished">Cannot connect to the License Server</translation>
+    </message>
+    <message>
+      <source>Please make sure your server has active Internet connection or check firewall settings.</source>
+      <translation type="unfinished">Please make sure your server has active Internet connection or check firewall settings.</translation>
+    </message>
+    <message>
+      <source>License Server error</source>
+      <translation type="unfinished">License Server error</translation>
+    </message>
+    <message>
+      <source>If the problem presists please contact Customer Support.</source>
+      <translation type="unfinished">If the problem presists please contact Customer Support.</translation>
+    </message>
+    <message>
+      <source>License deactivated</source>
+      <translation type="unfinished">License deactivated</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n licenses deactivated</source>
+      <translation type="unfinished">
+        <numerusform>%n licenses deactivated</numerusform>
+        <numerusform>%n licenses deactivated</numerusform>
+        <numerusform>%n licenses deactivated</numerusform>
+        <numerusform>%n licenses deactivated</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Remove</source>
+      <translation>הסרה</translation>
+    </message>
+    <message>
+      <source>Deactivate</source>
+      <translation type="unfinished">Deactivate</translation>
+    </message>
   </context>
   <context>
     <name>QnLicenseWidget</name>
@@ -4380,6 +4321,15 @@ to %1</source>
       <source>Lo-Res</source>
       <translation>רזולוציה נמוכה</translation>
     </message>
+    <message>
+      <source>press and hold</source>
+      <comment>Software Trigger</comment>
+      <translation type="unfinished">press and hold</translation>
+    </message>
+    <message>
+      <source>Failed to invoke trigger %1 (%2)</source>
+      <translation type="unfinished">Failed to invoke trigger %1 (%2)</translation>
+    </message>
   </context>
   <context>
     <name>QnMergeSystemsDialog</name>
@@ -4612,6 +4562,23 @@ to %1</source>
       <source>Alarm: %1</source>
       <translation>אזעקה: %1</translation>
     </message>
+    <message>
+      <source>Bookmark it</source>
+      <translation type="unfinished">Bookmark it</translation>
+    </message>
+    <message>
+      <source>Bookmark created</source>
+      <translation type="unfinished">Bookmark created</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n bookmarks created</source>
+      <translation type="unfinished">
+        <numerusform>%n bookmarks created</numerusform>
+        <numerusform>%n bookmarks created</numerusform>
+        <numerusform>%n bookmarks created</numerusform>
+        <numerusform>%n bookmarks created</numerusform>
+      </translation>
+    </message>
   </context>
   <context>
     <name>QnPerformanceTest</name>
@@ -4667,8 +4634,8 @@ to %1</source>
       <translation>קלט משתמש</translation>
     </message>
     <message>
-      <source>PTZ, Device Output, 2-way Audio</source>
-      <translation>PTZ, יציאת התקן, שמע דו-כיוונית</translation>
+      <source>PTZ, Device Output, 2-Way Audio, Software Triggers.</source>
+      <translation type="unfinished">PTZ, Device Output, 2-Way Audio, Software Triggers.</translation>
     </message>
   </context>
   <context>
@@ -4799,19 +4766,6 @@ to %1</source>
     <message>
       <source>Hotkey used by tour &quot;%1&quot;</source>
       <translation type="unfinished">Hotkey used by tour &quot;%1&quot;</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnPtzPresetsToursActionFactory</name>
-    <message>
-      <source>%1 (active)</source>
-      <comment>Template for active PTZ preset</comment>
-      <translation>%1 (פעיל)</translation>
-    </message>
-    <message>
-      <source>%1 (active)</source>
-      <comment>Template for active PTZ tour</comment>
-      <translation>%1 (פעיל)</translation>
     </message>
   </context>
   <context>
@@ -5133,6 +5087,14 @@ to %1</source>
     <message>
       <source>Local Files</source>
       <translation>קבצים מקומיים</translation>
+    </message>
+    <message>
+      <source>Layout Tours</source>
+      <translation type="unfinished">Layout Tours</translation>
+    </message>
+    <message>
+      <source>Layout Tour</source>
+      <translation type="unfinished">Layout Tour</translation>
     </message>
   </context>
   <context>
@@ -5676,43 +5638,18 @@ to %1</source>
     <message>
       <source>Incompatible %1 instance. To update disconnect System from %1 first.</source>
       <comment>%1 here will be substituted with cloud name e.g. &apos;Nx Cloud&apos;.</comment>
-      <translation type="unfinished">Incompatible %1 instance. To update disconnect System from %1 first.</translation>
+      <translation>מופע לא תואם %1. כדי לעדכן נתק את המערכת מ- %1 תחילה.</translation>
     </message>
   </context>
   <context>
     <name>QnSessionAwareTabbedDialog</name>
     <message>
       <source>Unsaved changes:</source>
-      <translation type="unfinished">Unsaved changes:</translation>
+      <translation>שינויים שלא נשמרו:</translation>
     </message>
     <message>
       <source>Save changes before exit?</source>
-      <translation type="unfinished">Save changes before exit?</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnShowOnAlarmLayoutActionWidget</name>
-    <message numerus="yes">
-      <source>%n Users</source>
-      <translation type="unfinished">
-        <numerusform>%n Users</numerusform>
-        <numerusform>%n Users</numerusform>
-        <numerusform>%n Users</numerusform>
-        <numerusform>%n Users</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>%n Roles</source>
-      <translation type="unfinished">
-        <numerusform>%n Roles</numerusform>
-        <numerusform>%n Roles</numerusform>
-        <numerusform>%n Roles</numerusform>
-        <numerusform>%n Roles</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>All Users</source>
-      <translation>כל המשתמשים</translation>
+      <translation>שמור שינויים לפני היציאה?</translation>
     </message>
   </context>
   <context>
@@ -5761,27 +5698,27 @@ to %1</source>
     </message>
     <message>
       <source>Motion detection will work only when camera is being viewed. Enable recording to make it work all the time.</source>
-      <translation type="unfinished">Motion detection will work only when camera is being viewed. Enable recording to make it work all the time.</translation>
+      <translation>זיהוי תנועה יפעל רק כאשר המצלמה מוצגת. אפשר הקלטה בכדי לגרום לזה לעבוד כל הזמן.</translation>
     </message>
     <message>
       <source>FPS too high</source>
-      <translation type="unfinished">FPS too high</translation>
+      <translation>FPS גבוה מדי</translation>
     </message>
     <message>
       <source>FPS in the schedule was lowered from %1 to %2, which is the maximum for this camera.</source>
-      <translation type="unfinished">FPS in the schedule was lowered from %1 to %2, which is the maximum for this camera.</translation>
+      <translation>FPS בלוח הזמנים הורד מ- %1 ל- %2, המהווה את המקסימום עבור מצלמה זו.</translation>
     </message>
     <message>
       <source>For software motion detection, 2 FPS are reserved for the secondary stream.</source>
-      <translation type="unfinished">For software motion detection, 2 FPS are reserved for the secondary stream.</translation>
+      <translation>עבור זיהוי תנועה בתוכנה, 2 FPS שמורות לתזרים המשני.</translation>
     </message>
     <message>
       <source>FPS in the schedule was lowered from %1 to %2.</source>
-      <translation type="unfinished">FPS in the schedule was lowered from %1 to %2.</translation>
+      <translation>FPS בלוח הזמנים הוריד מ- %1 ל- %2.</translation>
     </message>
     <message>
       <source>Secondary stream disabled for this camera</source>
-      <translation type="unfinished">Secondary stream disabled for this camera</translation>
+      <translation>זרם משני מושבת עבור מצלמה זו</translation>
     </message>
     <message>
       <source>Set Recording to &quot;Always&quot;</source>
@@ -5789,15 +5726,15 @@ to %1</source>
     </message>
     <message>
       <source>Enable Secondary Stream</source>
-      <translation type="unfinished">Enable Secondary Stream</translation>
+      <translation>אפשר זרם משני</translation>
     </message>
     <message>
       <source>Reset motion regions to default?</source>
-      <translation type="unfinished">Reset motion regions to default?</translation>
+      <translation>איפוס אזורי תנועה לברירת המחדל?</translation>
     </message>
     <message>
       <source>This action cannot be undone.</source>
-      <translation type="unfinished">This action cannot be undone.</translation>
+      <translation>פעולה זו אינה הפיכה.</translation>
     </message>
     <message>
       <source>&quot;Motion + Low - Res&quot; recording option cannot be set.</source>
@@ -5816,11 +5753,11 @@ to %1</source>
     </message>
     <message>
       <source>SMTP Server</source>
-      <translation type="unfinished">SMTP Server</translation>
+      <translation>SMTP שרת</translation>
     </message>
     <message>
       <source>Server cannot be empty.</source>
-      <translation type="unfinished">Server cannot be empty.</translation>
+      <translation>השם אינו יכול להשאר ריק.</translation>
     </message>
     <message>
       <source>User</source>
@@ -5832,15 +5769,15 @@ to %1</source>
     </message>
     <message>
       <source>System Signature</source>
-      <translation type="unfinished">System Signature</translation>
+      <translation>חתימת מערכת</translation>
     </message>
     <message>
       <source>Support Signature</source>
-      <translation type="unfinished">Support Signature</translation>
+      <translation>חתימה תמיכה</translation>
     </message>
     <message>
       <source>Enter a short System description here.</source>
-      <translation type="unfinished">Enter a short System description here.</translation>
+      <translation>הזן כאן תיאור קצר של המערכת.</translation>
     </message>
   </context>
   <context>
@@ -5863,11 +5800,11 @@ to %1</source>
     </message>
     <message>
       <source>System Signature</source>
-      <translation type="unfinished">System Signature</translation>
+      <translation>חתימת מערכת</translation>
     </message>
     <message>
       <source>Support Signature</source>
-      <translation type="unfinished">Support Signature</translation>
+      <translation>חתימה תמיכה</translation>
     </message>
     <message>
       <source>No preset found. Use &quot;Advanced&quot; option.</source>
@@ -5875,7 +5812,7 @@ to %1</source>
     </message>
     <message>
       <source>Enter a short System description here.</source>
-      <translation type="unfinished">Enter a short System description here.</translation>
+      <translation>הזן כאן תיאור קצר של המערכת.</translation>
     </message>
   </context>
   <context>
@@ -5886,11 +5823,11 @@ to %1</source>
     </message>
     <message>
       <source>TLS</source>
-      <translation type="unfinished">TLS</translation>
+      <translation>TLS</translation>
     </message>
     <message>
       <source>SSL</source>
-      <translation type="unfinished">SSL</translation>
+      <translation>SSL</translation>
     </message>
     <message>
       <source>Unsecured</source>
@@ -5906,15 +5843,15 @@ to %1</source>
     </message>
     <message>
       <source>Connection timed out</source>
-      <translation type="unfinished">Connection timed out</translation>
+      <translation>זמן החיבור פג</translation>
     </message>
     <message>
       <source>Authentication failed</source>
-      <translation type="unfinished">Authentication failed</translation>
+      <translation>אימות נכשל</translation>
     </message>
     <message>
       <source>SMTP Error %1</source>
-      <translation type="unfinished">SMTP Error %1</translation>
+      <translation>שגיאת SMTP %1</translation>
     </message>
     <message>
       <source>Network error</source>
@@ -5922,22 +5859,22 @@ to %1</source>
     </message>
     <message>
       <source>Invalid parameters</source>
-      <translation type="unfinished">Invalid parameters</translation>
+      <translation>פרמטרים לא חוקיים</translation>
     </message>
     <message>
       <source>Cannot perform the test.</source>
-      <translation type="unfinished">Cannot perform the test.</translation>
+      <translation>לא ניתן לבצע את הבדיקה.</translation>
     </message>
     <message>
       <source>No Servers connected to Internet</source>
-      <translation type="unfinished">No Servers connected to Internet</translation>
+      <translation>אין שרתים המחוברים לאינטרנט</translation>
     </message>
   </context>
   <context>
     <name>QnSpeedSlider</name>
     <message>
       <source>%1x</source>
-      <translation type="unfinished">%1x</translation>
+      <translation>%1x</translation>
     </message>
     <message>
       <source>Paused</source>
@@ -5948,7 +5885,7 @@ to %1</source>
     <name>QnStatusOverlayController</name>
     <message>
       <source>NOT ENOUGH LICENCES</source>
-      <translation type="unfinished">NOT ENOUGH LICENCES</translation>
+      <translation>אין מספיק רישיונות</translation>
     </message>
     <message>
       <source>NO DATA</source>
@@ -5956,7 +5893,7 @@ to %1</source>
     </message>
     <message>
       <source>UNAUTHORIZED</source>
-      <translation type="unfinished">UNAUTHORIZED</translation>
+      <translation>לא מורשה</translation>
     </message>
     <message>
       <source>NO SIGNAL</source>
@@ -5964,15 +5901,15 @@ to %1</source>
     </message>
     <message>
       <source>SERVER UNAVAILABLE</source>
-      <translation type="unfinished">SERVER UNAVAILABLE</translation>
+      <translation>השרת אינו זמין</translation>
     </message>
     <message>
       <source>NO ACCESS</source>
-      <translation type="unfinished">NO ACCESS</translation>
+      <translation>אין גישה</translation>
     </message>
     <message>
       <source>DEVICE DISABLED</source>
-      <translation type="unfinished">DEVICE DISABLED</translation>
+      <translation>התקן מושבת</translation>
     </message>
     <message>
       <source>Device Settings</source>
@@ -5988,7 +5925,7 @@ to %1</source>
     </message>
     <message>
       <source>Diagnostics</source>
-      <translation type="unfinished">Diagnostics</translation>
+      <translation>אבחון</translation>
     </message>
     <message>
       <source>Enable</source>
@@ -6000,7 +5937,7 @@ to %1</source>
     </message>
     <message>
       <source>Please check authentication information</source>
-      <translation type="unfinished">Please check authentication information</translation>
+      <translation>בדוק את פרטי האימות</translation>
     </message>
   </context>
   <context>
@@ -6019,7 +5956,7 @@ to %1</source>
     </message>
     <message>
       <source>Refresh</source>
-      <translation type="unfinished">Refresh</translation>
+      <translation>רענן</translation>
     </message>
     <message>
       <source>Export selected events to file</source>
@@ -6028,7 +5965,7 @@ to %1</source>
     <message numerus="yes">
       <source>%n TB</source>
       <comment>TB - terabytes</comment>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%n TB</numerusform>
         <numerusform>%n TB</numerusform>
         <numerusform>%n TB</numerusform>
@@ -6038,7 +5975,7 @@ to %1</source>
     <message>
       <source>TB</source>
       <comment>TB - terabytes</comment>
-      <translation type="unfinished">TB</translation>
+      <translation>TB</translation>
     </message>
   </context>
   <context>
@@ -6053,19 +5990,19 @@ to %1</source>
     </message>
     <message>
       <source>Backup is in progress...</source>
-      <translation type="unfinished">Backup is in progress...</translation>
+      <translation>הגיבוי נמצא בתהליך...</translation>
     </message>
     <message>
       <source>Main</source>
-      <translation type="unfinished">Main</translation>
+      <translation>ראשי</translation>
     </message>
     <message>
       <source>Backup</source>
-      <translation type="unfinished">Backup</translation>
+      <translation>גיבוי</translation>
     </message>
     <message>
       <source>Add more drives to use them as backup storage.</source>
-      <translation type="unfinished">Add more drives to use them as backup storage.</translation>
+      <translation>הוסף כוננים נוספים כדי להשתמש בהם כגיבוי אחסון.</translation>
     </message>
     <message>
       <source>Change &quot;Main&quot; to &quot;Backup&quot; for some of the storage above to enable backup.</source>
@@ -6073,11 +6010,11 @@ to %1</source>
     </message>
     <message>
       <source>Apply changes to start backup.</source>
-      <translation type="unfinished">Apply changes to start backup.</translation>
+      <translation>החל שינויים כדי להתחיל בגיבוי.</translation>
     </message>
     <message>
       <source>in %1</source>
-      <translation type="unfinished">in %1</translation>
+      <translation>ב- %1</translation>
     </message>
     <message>
       <source>%1 before now</source>
@@ -6085,15 +6022,15 @@ to %1</source>
     </message>
     <message>
       <source>Realtime backup is active...</source>
-      <translation type="unfinished">Realtime backup is active...</translation>
+      <translation>גיבוי בזמן אמת פעיל...</translation>
     </message>
     <message>
       <source>Realtime backup is set up.</source>
-      <translation type="unfinished">Realtime backup is set up.</translation>
+      <translation>גיבוי בזמן אמת מוגדר.</translation>
     </message>
     <message>
       <source>There is no backup yet.</source>
-      <translation type="unfinished">There is no backup yet.</translation>
+      <translation>אין עדיין גיבוי.</translation>
     </message>
     <message>
       <source>Archive backup is completed up to &lt;b&gt;%1&lt;/b&gt;</source>
@@ -6105,47 +6042,47 @@ to %1</source>
     </message>
     <message>
       <source>Next backup is not scheduled.</source>
-      <translation type="unfinished">Next backup is not scheduled.</translation>
+      <translation>הגיבוי הבא אינו מתוזמן.</translation>
     </message>
     <message>
       <source>Depending on the total size of the archive, reindexing can take up to several hours.</source>
-      <translation type="unfinished">Depending on the total size of the archive, reindexing can take up to several hours.</translation>
+      <translation>בהתאם לגודל הארכיון, יצירת אינדקס מחדש עשויה להימשך מספר שעות.</translation>
     </message>
     <message>
       <source>Reindexing is only necessary if your archive folders have been moved, renamed or deleted.</source>
-      <translation type="unfinished">Reindexing is only necessary if your archive folders have been moved, renamed or deleted.</translation>
+      <translation>יצירת אינדקס מחדש נחוצה רק אם תיקיות הארכיון הועברו, שינו את שמן או נמחקו.</translation>
     </message>
     <message>
       <source>You can cancel this operation at any moment without data loss.</source>
-      <translation type="unfinished">You can cancel this operation at any moment without data loss.</translation>
+      <translation>ניתן לבטל את הפעולה בכל רגע ללא אובדן נתונים.</translation>
     </message>
     <message>
       <source>Continue anyway?</source>
-      <translation type="unfinished">Continue anyway?</translation>
+      <translation>להמשיך בכל זאת?</translation>
     </message>
     <message>
       <source>Hard disk load will increase significantly</source>
-      <translation type="unfinished">Hard disk load will increase significantly</translation>
+      <translation>עומס הדיסק הקשיח יגדל באופן משמעותי</translation>
     </message>
     <message>
       <source>Select at least one device in the Backup Settings to start backup.</source>
-      <translation type="unfinished">Select at least one device in the Backup Settings to start backup.</translation>
+      <translation>בחר התקן אחד לפחות בהגדרות הגיבוי כדי להתחיל גיבוי.</translation>
     </message>
     <message>
       <source>Select at least one camera in the Backup Settings to start backup.</source>
-      <translation type="unfinished">Select at least one camera in the Backup Settings to start backup.</translation>
+      <translation>בחר מצלמה אחת לפחות בהגדרות הגיבוי כדי להתחיל בגיבוי.</translation>
     </message>
     <message>
       <source>Archive reindexing completed</source>
-      <translation type="unfinished">Archive reindexing completed</translation>
+      <translation>יצירת אינדקס מחדש עבור הארכיון הושלמה</translation>
     </message>
     <message>
       <source>Backup reindexing completed</source>
-      <translation type="unfinished">Backup reindexing completed</translation>
+      <translation>יצירת אינדקס מחדש עבור הגיבוי הושלמה</translation>
     </message>
     <message>
       <source>Backup completed</source>
-      <translation type="unfinished">Backup completed</translation>
+      <translation>הגיבוי הושלם</translation>
     </message>
   </context>
   <context>
@@ -6180,34 +6117,38 @@ to %1</source>
     </message>
     <message>
       <source>Backup</source>
-      <translation type="unfinished">Backup</translation>
+      <translation>גיבוי</translation>
     </message>
     <message>
       <source>Main</source>
-      <translation type="unfinished">Main</translation>
+      <translation>ראשי</translation>
     </message>
     <message>
       <source>%1 GB</source>
       <translation>%1 Gb</translation>
+    </message>
+    <message>
+      <source>Too small and system partitions are reserved and not used for writing if there is enough other storage space available.</source>
+      <translation type="unfinished">Too small and system partitions are reserved and not used for writing if there is enough other storage space available.</translation>
     </message>
   </context>
   <context>
     <name>QnStorageRebuildWidget</name>
     <message>
       <source>Fast Backup Scan...</source>
-      <translation type="unfinished">Fast Backup Scan...</translation>
+      <translation>סריקת גיבוי מהירה...</translation>
     </message>
     <message>
       <source>Fast Archive Scan...</source>
-      <translation type="unfinished">Fast Archive Scan...</translation>
+      <translation>סריקת ארכיון מהירה...</translation>
     </message>
     <message>
       <source>Reindexing Backup...</source>
-      <translation type="unfinished">Reindexing Backup...</translation>
+      <translation>יוצר אינדקס מחדש לגיבוי...</translation>
     </message>
     <message>
       <source>Reindexing Archive...</source>
-      <translation type="unfinished">Reindexing Archive...</translation>
+      <translation>יוצר אינדקס מחדש לארכיון...</translation>
     </message>
   </context>
   <context>
@@ -6222,27 +6163,34 @@ to %1</source>
     </message>
     <message>
       <source>Invalid credentials for external storage</source>
-      <translation type="unfinished">Invalid credentials for external storage</translation>
+      <translation>אישורים לא חוקיים לאחסון חיצוני</translation>
     </message>
     <message>
       <source>Invalid storage path</source>
-      <translation type="unfinished">Invalid storage path</translation>
+      <translation>נתיב אחסון לא חוקי</translation>
     </message>
     <message>
       <source>Add this storage anyway?</source>
-      <translation type="unfinished">Add this storage anyway?</translation>
+      <translation>האם להוסיף את האחסון הזה בכל זאת?</translation>
     </message>
     <message>
       <source>Storage path used by another server</source>
-      <translation type="unfinished">Storage path used by another server</translation>
+      <translation>נתיב האחסון משמש שרת אחר</translation>
     </message>
     <message>
       <source>Add Storage</source>
-      <translation type="unfinished">Add Storage</translation>
+      <translation>הוסף אחסון</translation>
     </message>
     <message>
       <source>It is not recommended to use one recording location for different servers.</source>
-      <translation type="unfinished">It is not recommended to use one recording location for different servers.</translation>
+      <translation>לא מומלץ להשתמש במיקום הקלטה אחד עבור שרתים שונים.</translation>
+    </message>
+  </context>
+  <context>
+    <name>QnSubjectTargetActionWidget</name>
+    <message>
+      <source>Select at least one user...</source>
+      <translation type="unfinished">Select at least one user...</translation>
     </message>
   </context>
   <context>
@@ -6289,10 +6237,6 @@ to %1</source>
     <message>
       <source>Email server is not set</source>
       <translation>שרת דואר לא מוגדר</translation>
-    </message>
-    <message>
-      <source>Connection to server lost</source>
-      <translation>החיבור לשרת אבד</translation>
     </message>
     <message>
       <source>Select server for others to synchronize time with</source>
@@ -6364,36 +6308,36 @@ to %1</source>
     </message>
     <message>
       <source>Learn more</source>
-      <translation type="unfinished">Learn more</translation>
+      <translation>למד עוד</translation>
     </message>
     <message>
       <source>Some users have not set their Email addresses</source>
-      <translation type="unfinished">Some users have not set their Email addresses</translation>
+      <translation>לחלק מהמשתמשים לא הוגדרה כתובות הדוא"ל שלהם</translation>
     </message>
     <message>
       <source>Error while sending Email</source>
-      <translation type="unfinished">Error while sending Email</translation>
+      <translation>שגיאה בעת שליחת דוא"ל</translation>
     </message>
     <message>
       <source>Some users have not set their Email addresses.</source>
-      <translation type="unfinished">Some users have not set their Email addresses.</translation>
+      <translation>לחלק מהמשתמשים לא הוגדרה כתובות הדוא"ל.</translation>
     </message>
     <message>
       <source>System is running in safe mode.</source>
-      <translation type="unfinished">System is running in safe mode.</translation>
+      <translation>המערכת פועלת במצב בטוח.</translation>
     </message>
     <message>
       <source>Check out %1 &amp;mdash; connect to your servers from anywhere</source>
       <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-      <translation type="unfinished">Check out %1 &amp;mdash; connect to your servers from anywhere</translation>
+      <translation>בדוק את %1 &amp;mdash; כדי להתחבר לשרתים שלך מכל מקום</translation>
     </message>
     <message>
       <source>You cannot receive System notifications by Email.</source>
-      <translation type="unfinished">You cannot receive System notifications by Email.</translation>
+      <translation>לא ניתן לקבל הודעות מערכת בדוא"ל.</translation>
     </message>
     <message>
       <source>They cannot receive System notifications by Email.</source>
-      <translation type="unfinished">They cannot receive System notifications by Email.</translation>
+      <translation>הם אינם יכולים לקבל הודעות מערכת באמצעות אימייל.</translation>
     </message>
   </context>
   <context>
@@ -6408,26 +6352,26 @@ to %1</source>
     </message>
     <message>
       <source>Allow System to optimize device settings</source>
-      <translation type="unfinished">Allow System to optimize device settings</translation>
+      <translation>אפשר למערכת לשפר את הגדרות ההתקן</translation>
     </message>
     <message>
       <source>Allow System to optimize camera settings</source>
-      <translation type="unfinished">Allow System to optimize camera settings</translation>
+      <translation>אפשר למערכת לבצע אופטימיזציה להגדרות המצלמה</translation>
     </message>
   </context>
   <context>
     <name>QnTableExportHelper</name>
     <message>
       <source>HTML file (*.html);;Spread Sheet (CSV) File (*.csv)</source>
-      <translation type="unfinished">HTML file (*.html);;Spread Sheet (CSV) File (*.csv)</translation>
+      <translation>HTML file (*.html);;Spread Sheet (CSV) File (*.csv)</translation>
     </message>
     <message>
       <source>Close all programs which may use this file and try again</source>
-      <translation type="unfinished">Close all programs which may use this file and try again</translation>
+      <translation>סגור את כל התוכניות שעשויות להשתמש בקובץ זה ונסה שוב</translation>
     </message>
     <message>
       <source>File used by another process</source>
-      <translation type="unfinished">File used by another process</translation>
+      <translation>קובץ בשימוש על-ידי תהליך אחר</translation>
     </message>
   </context>
   <context>
@@ -6446,7 +6390,7 @@ to %1</source>
     </message>
     <message>
       <source>Timezone</source>
-      <translation type="unfinished">Timezone</translation>
+      <translation>אזור זמן</translation>
     </message>
     <message>
       <source>Time</source>
@@ -6456,12 +6400,16 @@ to %1</source>
   <context>
     <name>QnTimeServerSelectionWidget</name>
     <message>
-      <source>Time is taken from the Internet.</source>
-      <translation>השעה נלקחת מהאינטרנט.</translation>
+      <source>System time is synchronized with the Internet and is independent from server local times.</source>
+      <translation type="unfinished">System time is synchronized with the Internet and is independent from server local times.</translation>
     </message>
     <message>
-      <source>Time is taken from %1.</source>
-      <translation>השעה נלקחת מ%1.</translation>
+      <source>System time is synchronized with selected server local time and is independent from other servers.</source>
+      <translation type="unfinished">System time is synchronized with selected server local time and is independent from other servers.</translation>
+    </message>
+    <message>
+      <source>No server has Internet access. Time is not being synchronized.</source>
+      <translation type="unfinished">No server has Internet access. Time is not being synchronized.</translation>
     </message>
   </context>
   <context>
@@ -6472,7 +6420,7 @@ to %1</source>
     </message>
     <message>
       <source>No thumbnails available</source>
-      <translation type="unfinished">No thumbnails available</translation>
+      <translation>תמונות ממוזערות אינן זמינות</translation>
     </message>
     <message>
       <source>hh:mm</source>
@@ -6563,7 +6511,7 @@ to %1</source>
     </message>
     <message>
       <source>Streaming is not ready yet</source>
-      <translation type="unfinished">Streaming is not ready yet</translation>
+      <translation>השידור אינו זמין עדיין</translation>
     </message>
     <message>
       <source>Network error</source>
@@ -6674,19 +6622,19 @@ to %1</source>
     </message>
     <message>
       <source>Local user</source>
-      <translation type="unfinished">Local user</translation>
+      <translation>משתמש מקומי</translation>
     </message>
     <message>
       <source>Cloud user</source>
-      <translation type="unfinished">Cloud user</translation>
+      <translation>משתמש ענן</translation>
     </message>
     <message>
       <source>Login</source>
-      <translation type="unfinished">Login</translation>
+      <translation>כניסה</translation>
     </message>
     <message>
       <source>Role</source>
-      <translation type="unfinished">Role</translation>
+      <translation>תפקיד</translation>
     </message>
   </context>
   <context>
@@ -6725,21 +6673,21 @@ to %1</source>
     </message>
     <message>
       <source>Control Video Walls</source>
-      <translation type="unfinished">Control Video Walls</translation>
+      <translation>שליטה בקיר הוידאו</translation>
     </message>
   </context>
   <context>
     <name>QnUserManagementWidget</name>
     <message>
       <source>Edit</source>
-      <translation type="unfinished">Edit</translation>
+      <translation>ערוך</translation>
     </message>
   </context>
   <context>
     <name>QnUserProfileWidget</name>
     <message>
       <source>Login</source>
-      <translation type="unfinished">Login</translation>
+      <translation>כניסה</translation>
     </message>
     <message>
       <source>Name</source>
@@ -6747,7 +6695,7 @@ to %1</source>
     </message>
     <message>
       <source>Role</source>
-      <translation type="unfinished">Role</translation>
+      <translation>תפקיד</translation>
     </message>
     <message>
       <source>Email</source>
@@ -6758,42 +6706,42 @@ to %1</source>
     <name>QnUserRoleSettingsWidget</name>
     <message>
       <source>Role name cannot be empty.</source>
-      <translation type="unfinished">Role name cannot be empty.</translation>
+      <translation>שם התפקיד אינו יכול להיות ריק.</translation>
     </message>
     <message>
       <source>Role with same name already exists.</source>
-      <translation type="unfinished">Role with same name already exists.</translation>
+      <translation>תפקיד עם שם זהה כבר קיים.</translation>
     </message>
   </context>
   <context>
     <name>QnUserRoleSettingsWidgetPrivate</name>
     <message>
       <source>No users have this role</source>
-      <translation type="unfinished">No users have this role</translation>
+      <translation>אין משתמשים עם תפקיד זה</translation>
     </message>
     <message>
       <source>Custom with no permissions</source>
-      <translation type="unfinished">Custom with no permissions</translation>
+      <translation>מותאם אישית ללא הרשאות</translation>
     </message>
     <message>
       <source>Users will have no permissions unless changed later.</source>
-      <translation type="unfinished">Users will have no permissions unless changed later.</translation>
+      <translation>למשתמשים לא יהיו הרשאות אלא אם ישתנו מאוחר יותר.</translation>
     </message>
     <message>
       <source>Assign a new role</source>
-      <translation type="unfinished">Assign a new role</translation>
+      <translation>הקצה תפקיד חדש</translation>
     </message>
     <message>
       <source>Delete such users</source>
-      <translation type="unfinished">Delete such users</translation>
+      <translation>מחק משתמשים כאלה</translation>
     </message>
     <message numerus="yes">
       <source>Please select an action to perform on %n users with this role</source>
-      <translation type="unfinished">
-        <numerusform>Please select an action to perform on %n users with this role</numerusform>
-        <numerusform>Please select an action to perform on %n users with this role</numerusform>
-        <numerusform>Please select an action to perform on %n users with this role</numerusform>
-        <numerusform>Please select an action to perform on %n users with this role</numerusform>
+      <translation>
+        <numerusform>בחר פעולה לביצוע על %n משתמשים בתפקיד זה</numerusform>
+        <numerusform>בחר פעולה לביצוע על %n משתמשים בתפקיד זה</numerusform>
+        <numerusform>בחר פעולה לביצוע על %n משתמשים בתפקיד זה</numerusform>
+        <numerusform>בחר פעולה לביצוע על %n משתמשים בתפקיד זה</numerusform>
       </translation>
     </message>
   </context>
@@ -6801,7 +6749,7 @@ to %1</source>
     <name>QnUserRolesDialog</name>
     <message>
       <source>Role Info</source>
-      <translation type="unfinished">Role Info</translation>
+      <translation>פרטי תפקיד</translation>
     </message>
     <message>
       <source>Permissions</source>
@@ -6809,26 +6757,26 @@ to %1</source>
     </message>
     <message>
       <source>Cameras &amp;&amp; Resources</source>
-      <translation type="unfinished">Cameras &amp;&amp; Resources</translation>
+      <translation>מצלמות ומשאבים</translation>
     </message>
     <message>
       <source>Layouts</source>
-      <translation type="unfinished">Layouts</translation>
+      <translation>פריסות</translation>
     </message>
     <message>
       <source>New Role</source>
-      <translation type="unfinished">New Role</translation>
+      <translation>תפקיד חדש</translation>
     </message>
     <message>
       <source>New Role %1</source>
-      <translation type="unfinished">New Role %1</translation>
+      <translation>תפקיד חדש %1</translation>
     </message>
   </context>
   <context>
     <name>QnUserSettingsDialog</name>
     <message>
       <source>User Information</source>
-      <translation type="unfinished">User Information</translation>
+      <translation>פרטי המשתמש</translation>
     </message>
     <message>
       <source>Permissions</source>
@@ -6836,15 +6784,15 @@ to %1</source>
     </message>
     <message>
       <source>Cameras &amp;&amp; Resources</source>
-      <translation type="unfinished">Cameras &amp;&amp; Resources</translation>
+      <translation>מצלמות ומשאבים</translation>
     </message>
     <message>
       <source>Layouts</source>
-      <translation type="unfinished">Layouts</translation>
+      <translation>פריסות</translation>
     </message>
     <message>
       <source>Send Invite</source>
-      <translation type="unfinished">Send Invite</translation>
+      <translation>שלח הזמנה</translation>
     </message>
     <message>
       <source>New User...</source>
@@ -6852,11 +6800,11 @@ to %1</source>
     </message>
     <message>
       <source>User Settings - %1 (readonly)</source>
-      <translation type="unfinished">User Settings - %1 (readonly)</translation>
+      <translation>הגדרות משתמש - %1 (לקריאה בלבד)</translation>
     </message>
     <message>
       <source>User Settings - %1</source>
-      <translation type="unfinished">User Settings - %1</translation>
+      <translation>הגדרות משתמש - %1</translation>
     </message>
     <message>
       <source>Enabled</source>
@@ -6864,11 +6812,11 @@ to %1</source>
     </message>
     <message>
       <source>User is disabled</source>
-      <translation type="unfinished">User is disabled</translation>
+      <translation>המשתמש מושבת</translation>
     </message>
     <message>
       <source>Apply changes before switching to another user?</source>
-      <translation type="unfinished">Apply changes before switching to another user?</translation>
+      <translation>האם להחיל שינויים לפני המעבר למשתמש אחר?</translation>
     </message>
   </context>
   <context>
@@ -6879,11 +6827,11 @@ to %1</source>
     </message>
     <message>
       <source>Cloud</source>
-      <translation type="unfinished">Cloud</translation>
+      <translation>ענן</translation>
     </message>
     <message>
       <source>Login</source>
-      <translation type="unfinished">Login</translation>
+      <translation>כניסה</translation>
     </message>
     <message>
       <source>Login cannot be empty.</source>
@@ -6907,7 +6855,7 @@ to %1</source>
     </message>
     <message>
       <source>Email cannot be empty.</source>
-      <translation type="unfinished">Email cannot be empty.</translation>
+      <translation>דואר אלקטרוני אינו יכול להיות ריק.</translation>
     </message>
     <message>
       <source>Password</source>
@@ -6915,7 +6863,7 @@ to %1</source>
     </message>
     <message>
       <source>Confirm Password</source>
-      <translation type="unfinished">Confirm Password</translation>
+      <translation>אימות סיסמא</translation>
     </message>
     <message>
       <source>Passwords do not match.</source>
@@ -6923,14 +6871,14 @@ to %1</source>
     </message>
     <message>
       <source>Cloud user with specified Email already exists.</source>
-      <translation type="unfinished">Cloud user with specified Email already exists.</translation>
+      <translation>משתמש ענן עם דוא"ל שצוין כבר קיים.</translation>
     </message>
   </context>
   <context>
     <name>QnValidatorStrings</name>
     <message>
       <source>Email cannot be empty.</source>
-      <translation type="unfinished">Email cannot be empty.</translation>
+      <translation>דואר אלקטרוני אינו יכול להיות ריק.</translation>
     </message>
     <message>
       <source>Email is not valid.</source>
@@ -6942,7 +6890,7 @@ to %1</source>
     </message>
     <message>
       <source>Avoid leading and trailing spaces.</source>
-      <translation type="unfinished">Avoid leading and trailing spaces.</translation>
+      <translation>הימנע מרווחים בהתחלה ובסוף.</translation>
     </message>
   </context>
   <context>
@@ -6961,7 +6909,7 @@ to %1</source>
     </message>
     <message>
       <source>Display %1</source>
-      <translation type="unfinished">Display %1</translation>
+      <translation>תצוגה %1</translation>
     </message>
     <message>
       <source>Delete &quot;%1&quot;?</source>
@@ -6976,16 +6924,16 @@ to %1</source>
     </message>
     <message>
       <source>PC %1 - Display %2</source>
-      <translation type="unfinished">PC %1 - Display %2</translation>
+      <translation>מחשב %1 - תצוגה %2</translation>
     </message>
     <message numerus="yes">
       <source>PC %1 - Displays %2</source>
       <comment>%2 will be substituted by _list_ of displays</comment>
-      <translation type="unfinished">
-        <numerusform>PC %1 - Displays %2</numerusform>
-        <numerusform>PC %1 - Displays %2</numerusform>
-        <numerusform>PC %1 - Displays %2</numerusform>
-        <numerusform>PC %1 - Displays %2</numerusform>
+      <translation>
+        <numerusform>מחשב %1 - תצוגות %2</numerusform>
+        <numerusform>מחשב %1 - תצוגות %2</numerusform>
+        <numerusform>מחשב %1 - תצוגות %2</numerusform>
+        <numerusform>מחשב %1 - תצוגות %2</numerusform>
       </translation>
     </message>
   </context>
@@ -7000,209 +6948,37 @@ to %1</source>
     <name>QnWebResourceWidget</name>
     <message>
       <source>Fullscreen mode</source>
-      <translation type="unfinished">Fullscreen mode</translation>
+      <translation>מצב מסך מלא</translation>
     </message>
   </context>
   <context>
-    <name>QnWorkbenchActionHandler</name>
+    <name>QnWebpageDialog</name>
     <message>
-      <source>Layout is locked and cannot be changed.</source>
-      <translation>הפריסה נעולה ואינה ניתנת לשנוי.</translation>
-    </message>
-    <message>
-      <source>All Supported (*.nov *.avi *.mkv *.mp4 *.mov *.ts *.m2ts *.mpeg *.mpg *.flv *.wmv *.3gp *.jpg *.png *.gif *.bmp *.tiff)</source>
-      <translation>כל הנתמכים (*.nov *.avi *.mkv *.mp4 *.mov *.ts *.m2ts *.mpeg *.mpg *.flv *.wmv *.3gp *.jpg *.png *.gif *.bmp *.tiff)</translation>
+      <source>Name</source>
+      <translation>שם</translation>
     </message>
     <message>
-      <source>Video (*.avi *.mkv *.mp4 *.mov *.ts *.m2ts *.mpeg *.mpg *.flv *.wmv *.3gp)</source>
-      <translation>וידאו (*.avi *.mkv *.mp4 *.mov *.ts *.m2ts *.mpeg *.mpg *.flv *.wmv *.3gp)</translation>
+      <source>URL</source>
+      <translation>כתובת(URL)</translation>
     </message>
     <message>
-      <source>Pictures (*.jpg *.png *.gif *.bmp *.tiff)</source>
-      <translation>תמונות (*.jpg *.png *.gif *.bmp *.tiff)</translation>
+      <source>URL cannot be empty.</source>
+      <translation type="unfinished">URL cannot be empty.</translation>
     </message>
     <message>
-      <source>All files (*.*)</source>
-      <translation>כל הקבצים (*.*)</translation>
+      <source>Wrong URL format.</source>
+      <translation type="unfinished">Wrong URL format.</translation>
     </message>
     <message>
-      <source>Select folder...</source>
-      <translation>בחר תיקיה...</translation>
+      <source>Web Page</source>
+      <translation type="unfinished">Web Page</translation>
     </message>
+  </context>
+  <context>
+    <name>QnWorkbenchAlarmLayoutHandler</name>
     <message>
-      <source>Preview Search for %1</source>
-      <translation>חיפוש ויזואלי עבור %1</translation>
-    </message>
-    <message>
-      <source>Rename</source>
-      <translation>שנה שם</translation>
-    </message>
-    <message>
-      <source>Enter new name for the selected item:</source>
-      <translation>הכנס שם חדש לפריט שנבחר:</translation>
-    </message>
-    <message>
-      <source>Update...</source>
-      <translation>עדכן...</translation>
-    </message>
-    <message>
-      <source>Beta version %1</source>
-      <translation>גירסת ביתא %1</translation>
-    </message>
-    <message>
-      <source>Open File</source>
-      <translation>פתח קובץ</translation>
-    </message>
-    <message>
-      <source>Updating Background...</source>
-      <translation>מעדכן רקע...</translation>
-    </message>
-    <message>
-      <source>Image processing may take a few moments. Please be patient.</source>
-      <translation>עיבוד התמונה עשוי לקחת מספר שניות, אנא המתן.</translation>
-    </message>
-    <message numerus="yes">
-      <source>Are you sure you want to permanently delete these %n files?</source>
-      <translation type="unfinished">
-        <numerusform>האם אתה בטוח שברצונך למחוק %n קובץ זה?</numerusform>
-        <numerusform>האם אתה בטוח שברצונך למחוק את %n הקבצים האלו?</numerusform>
-        <numerusform>Are you sure you want to permanently delete these %n files?</numerusform>
-        <numerusform>Are you sure you want to permanently delete these %n files?</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>Confirm files deleting</source>
-      <translation type="unfinished">Confirm files deleting</translation>
-    </message>
-    <message>
-      <source>Client</source>
-      <translation>קליינט</translation>
-    </message>
-    <message>
-      <source>Server</source>
-      <translation>שרת</translation>
-    </message>
-    <message numerus="yes">
-      <source>Failed to move %n devices</source>
-      <translation type="unfinished">
-        <numerusform>Failed to move %n devices</numerusform>
-        <numerusform>Failed to move %n devices</numerusform>
-        <numerusform>Failed to move %n devices</numerusform>
-        <numerusform>Failed to move %n devices</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>Failed to move %n cameras</source>
-      <translation type="unfinished">
-        <numerusform>Failed to move %n cameras</numerusform>
-        <numerusform>Failed to move %n cameras</numerusform>
-        <numerusform>Failed to move %n cameras</numerusform>
-        <numerusform>Failed to move %n cameras</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>Failed to move %n I/O Modules</source>
-      <translation type="unfinished">
-        <numerusform>Failed to move %n I/O Modules</numerusform>
-        <numerusform>Failed to move %n I/O Modules</numerusform>
-        <numerusform>Failed to move %n I/O Modules</numerusform>
-        <numerusform>Failed to move %n I/O Modules</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>Server &quot;%1&quot; is not responding.</source>
-      <translation type="unfinished">Server &quot;%1&quot; is not responding.</translation>
-    </message>
-    <message>
-      <source>Move</source>
-      <translation type="unfinished">Move</translation>
-    </message>
-    <message>
-      <source>Too short period selected</source>
-      <translation type="unfinished">Too short period selected</translation>
-    </message>
-    <message>
-      <source>Cancel device adding?</source>
-      <translation type="unfinished">Cancel device adding?</translation>
-    </message>
-    <message>
-      <source>There is another user with the same name</source>
-      <translation type="unfinished">There is another user with the same name</translation>
-    </message>
-    <message>
-      <source>Image too big</source>
-      <translation type="unfinished">Image too big</translation>
-    </message>
-    <message>
-      <source>Maximum size is %1 MB.</source>
-      <translation type="unfinished">Maximum size is %1 MB.</translation>
-    </message>
-    <message>
-      <source>Failed to upload image</source>
-      <translation type="unfinished">Failed to upload image</translation>
-    </message>
-    <message>
-      <source>Please update all components to the version %1</source>
-      <translation type="unfinished">Please update all components to the version %1</translation>
-    </message>
-    <message>
-      <source>Some functionality may be unavailable or not working properly.</source>
-      <translation type="unfinished">Some functionality may be unavailable or not working properly.</translation>
-    </message>
-    <message>
-      <source>It will be used by software development team to improve your user experience.</source>
-      <translation type="unfinished">It will be used by software development team to improve your user experience.</translation>
-    </message>
-    <message>
-      <source>Failed to open server web page</source>
-      <translation type="unfinished">Failed to open server web page</translation>
-    </message>
-    <message>
-      <source>Skip</source>
-      <translation type="unfinished">Skip</translation>
-    </message>
-    <message>
-      <source>Cannot perform Preview Search. Please select a period of 15 seconds or longer.</source>
-      <translation type="unfinished">Cannot perform Preview Search. Please select a period of 15 seconds or longer.</translation>
-    </message>
-    <message numerus="yes">
-      <source>Server &quot;%1&quot; cannot access %n devices. Move them anyway?</source>
-      <translation type="unfinished">
-        <numerusform>Server &quot;%1&quot; cannot access %n devices. Move them anyway?</numerusform>
-        <numerusform>Server &quot;%1&quot; cannot access %n devices. Move them anyway?</numerusform>
-        <numerusform>Server &quot;%1&quot; cannot access %n devices. Move them anyway?</numerusform>
-        <numerusform>Server &quot;%1&quot; cannot access %n devices. Move them anyway?</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>Server &quot;%1&quot; cannot access %n cameras. Move them anyway?</source>
-      <translation type="unfinished">
-        <numerusform>Server &quot;%1&quot; cannot access %n cameras. Move them anyway?</numerusform>
-        <numerusform>Server &quot;%1&quot; cannot access %n cameras. Move them anyway?</numerusform>
-        <numerusform>Server &quot;%1&quot; cannot access %n cameras. Move them anyway?</numerusform>
-        <numerusform>Server &quot;%1&quot; cannot access %n cameras. Move them anyway?</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>Server &quot;%1&quot; cannot access %n I/O modules. Move them anyway?</source>
-      <translation type="unfinished">
-        <numerusform>Server &quot;%1&quot; cannot access %n I/O modules. Move them anyway?</numerusform>
-        <numerusform>Server &quot;%1&quot; cannot access %n I/O modules. Move them anyway?</numerusform>
-        <numerusform>Server &quot;%1&quot; cannot access %n I/O modules. Move them anyway?</numerusform>
-        <numerusform>Server &quot;%1&quot; cannot access %n I/O modules. Move them anyway?</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>Components of System have different versions:</source>
-      <translation type="unfinished">Components of System have different versions:</translation>
-    </message>
-    <message>
-      <source>System sends anonymous usage statistics</source>
-      <translation type="unfinished">System sends anonymous usage statistics</translation>
-    </message>
-    <message>
-      <source>To disable it, go to System Administration dialog.</source>
-      <translation type="unfinished">To disable it, go to System Administration dialog.</translation>
+      <source>Alarms</source>
+      <translation>אזעקות</translation>
     </message>
   </context>
   <context>
@@ -7221,23 +6997,23 @@ to %1</source>
     </message>
     <message>
       <source>Server offline</source>
-      <translation type="unfinished">Server offline</translation>
+      <translation>השרת אינו זמין</translation>
     </message>
     <message>
       <source>Bookmarks can only be edited on an online Server.</source>
-      <translation type="unfinished">Bookmarks can only be edited on an online Server.</translation>
+      <translation>ניתן לערוך סימניות רק בשרת מקוון.</translation>
     </message>
     <message>
       <source>Delete bookmark?</source>
-      <translation type="unfinished">Delete bookmark?</translation>
+      <translation>מחק סימניה?</translation>
     </message>
     <message numerus="yes">
       <source>Delete %n bookmarks?</source>
-      <translation type="unfinished">
-        <numerusform>Delete %n bookmarks?</numerusform>
-        <numerusform>Delete %n bookmarks?</numerusform>
-        <numerusform>Delete %n bookmarks?</numerusform>
-        <numerusform>Delete %n bookmarks?</numerusform>
+      <translation>
+        <numerusform>מחק %n סימניות?</numerusform>
+        <numerusform>מחק %n סימניות?</numerusform>
+        <numerusform>מחק %n סימניות?</numerusform>
+        <numerusform>מחק %n סימניות?</numerusform>
       </translation>
     </message>
   </context>
@@ -7254,29 +7030,22 @@ to %1</source>
     <message>
       <source>%1 in %2</source>
       <comment>%1 is user name, %2 is name of system</comment>
-      <translation type="unfinished">%1 in %2</translation>
+      <translation>%1 ב- %2</translation>
     </message>
     <message>
       <source>Could not connect to server. Video Wall will be closed.</source>
-      <translation type="unfinished">Could not connect to server. Video Wall will be closed.</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnWorkbenchController</name>
-    <message>
-      <source>Press any key to stop the tour.</source>
-      <translation>לחץ על כל מקש על מנת להפסיק את הסיור.</translation>
+      <translation>ההתחברות לשרת נכשלה. קיר הווידאו ייסגר.</translation>
     </message>
   </context>
   <context>
     <name>QnWorkbenchExportHandler</name>
     <message>
       <source>Executable %1 Media File (x64) (*.exe)</source>
-      <translation type="unfinished">Executable %1 Media File (x64) (*.exe)</translation>
+      <translation>Executable %1 Media File (x64) (*.exe)</translation>
     </message>
     <message>
       <source>Executable %1 Media File (x86) (*.exe)</source>
-      <translation type="unfinished">Executable %1 Media File (x86) (*.exe)</translation>
+      <translation>Executable %1 Media File (x86) (*.exe)</translation>
     </message>
     <message>
       <source>Exporting Layout</source>
@@ -7344,35 +7113,35 @@ to %1</source>
     </message>
     <message>
       <source>File already used for recording</source>
-      <translation type="unfinished">File already used for recording</translation>
+      <translation>הקובץ כבר משמש עבור הקלטה</translation>
     </message>
     <message>
       <source>Please choose another name or wait until recording is finished.</source>
-      <translation type="unfinished">Please choose another name or wait until recording is finished.</translation>
+      <translation>בחר שם אחר או המתן עד לסיום ההקלטה.</translation>
     </message>
     <message>
       <source>You are about to export a long video</source>
-      <translation type="unfinished">You are about to export a long video</translation>
+      <translation>אתה עומד לייצא סרטון ארוך</translation>
     </message>
     <message>
       <source>It may require over a gigabyte of HDD space and take several minutes to complete.</source>
-      <translation type="unfinished">It may require over a gigabyte of HDD space and take several minutes to complete.</translation>
+      <translation>זה עשוי לדרוש מעל ג'יגה של שטח אחסון ולהימשך כמה דקות עד להשלמה.</translation>
     </message>
     <message>
       <source>Export anyway?</source>
-      <translation type="unfinished">Export anyway?</translation>
+      <translation>האם לייצא בכל מקרה?</translation>
     </message>
     <message>
       <source>Export to AVI anyway?</source>
-      <translation type="unfinished">Export to AVI anyway?</translation>
+      <translation>ייצא ל- AVI בכל מקרה?</translation>
     </message>
     <message>
       <source>Selected format not recommended</source>
-      <translation type="unfinished">Selected format not recommended</translation>
+      <translation>פורמט נבחר לא מומלץ</translation>
     </message>
     <message>
       <source>To avoid video downscaling, NOV or EXE formats are recommended for this camera.</source>
-      <translation type="unfinished">To avoid video downscaling, NOV or EXE formats are recommended for this camera.</translation>
+      <translation>כדי למנוע פגיעה באיכות, מומלץ להשתמש בפןרמט NOV או EXE עבור מצלמה זו.</translation>
     </message>
     <message>
       <source>Export with transcoding?</source>
@@ -7487,29 +7256,6 @@ to %1</source>
     </message>
   </context>
   <context>
-    <name>QnWorkbenchLayoutsHandler</name>
-    <message>
-      <source>Save Layout As</source>
-      <translation>שמור פריסה כ</translation>
-    </message>
-    <message>
-      <source>New Layout</source>
-      <translation>פריסה חדשה</translation>
-    </message>
-    <message>
-      <source>Enter the name of the layout to create:</source>
-      <translation>הכנס את שם הפריסה שברצונך ליצור:</translation>
-    </message>
-    <message>
-      <source>Enter Layout Name:</source>
-      <translation>הכנס את שם הפריסה:</translation>
-    </message>
-    <message>
-      <source>New Layout %1</source>
-      <translation>פריסה חדשה %1</translation>
-    </message>
-  </context>
-  <context>
     <name>QnWorkbenchResourcesChangesWatcher</name>
     <message numerus="yes">
       <source>The following %n items are not saved:</source>
@@ -7570,7 +7316,7 @@ to %1</source>
     </message>
     <message>
       <source>Recording in %1...</source>
-      <translation type="unfinished">Recording in %1...</translation>
+      <translation>הקלטה ב- %1...</translation>
     </message>
     <message>
       <source>Recorded Video</source>
@@ -7582,11 +7328,11 @@ to %1</source>
     </message>
     <message>
       <source>AVI (Audio/Video Interleaved) (*.avi)</source>
-      <translation type="unfinished">AVI (Audio/Video Interleaved) (*.avi)</translation>
+      <translation>AVI (Audio/Video Interleaved) (*.avi)</translation>
     </message>
     <message>
       <source>Failed to start recording</source>
-      <translation type="unfinished">Failed to start recording</translation>
+      <translation>הפעלת ההקלטה נכשלה</translation>
     </message>
   </context>
   <context>
@@ -7637,11 +7383,11 @@ to %1</source>
     </message>
     <message>
       <source>Failed to save screenshot</source>
-      <translation type="unfinished">Failed to save screenshot</translation>
+      <translation>שמירת צילום המסך נכשלה</translation>
     </message>
     <message>
       <source>Failed to take screenshot</source>
-      <translation type="unfinished">Failed to take screenshot</translation>
+      <translation>צילום מסך נכשל</translation>
     </message>
   </context>
   <context>
@@ -7652,11 +7398,11 @@ to %1</source>
     </message>
     <message>
       <source>%1 version available</source>
-      <translation type="unfinished">%1 version available</translation>
+      <translation>גרסה %1 זמינה</translation>
     </message>
     <message>
       <source>Major issues have been fixed. Update is strongly recommended.</source>
-      <translation type="unfinished">Major issues have been fixed. Update is strongly recommended.</translation>
+      <translation>תקלות חשובות תוקנו. העדכון מומלץ מאוד.</translation>
     </message>
     <message>
       <source>Update...</source>
@@ -7664,7 +7410,7 @@ to %1</source>
     </message>
     <message>
       <source>Do not notify again about this update</source>
-      <translation type="unfinished">Do not notify again about this update</translation>
+      <translation>אל תודיע שוב על עדכון זה</translation>
     </message>
   </context>
   <context>
@@ -7763,23 +7509,161 @@ to %1</source>
   <context>
     <name>QnWorkbenchWebPageHandler</name>
     <message>
-      <source>New Web Page...</source>
-      <translation type="unfinished">New Web Page...</translation>
+      <source>New Web Page</source>
+      <translation type="unfinished">New Web Page</translation>
     </message>
     <message>
-      <source>This Web Page already exists</source>
-      <translation type="unfinished">This Web Page already exists</translation>
-    </message>
-    <message>
-      <source>Enter URL of Web Page to add:</source>
-      <translation type="unfinished">Enter URL of Web Page to add:</translation>
+      <source>Edit Web Page</source>
+      <translation type="unfinished">Edit Web Page</translation>
     </message>
   </context>
   <context>
-    <name>Resources</name>
+    <name>SubjectSelectionDialog::RoleListDelegate</name>
+    <message numerus="yes">
+      <source>%n users</source>
+      <translation>
+        <numerusform>%n משתמשים</numerusform>
+        <numerusform>%n משתמשים</numerusform>
+        <numerusform>%n משתמשים</numerusform>
+        <numerusform>%n משתמשים</numerusform>
+      </translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::client::desktop::ui::LayoutPreviewPainter</name>
+    <message>
+      <source>NO DATA</source>
+      <translation>אין נתונים</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::client::desktop::ui::LayoutTourDropPlaceholder</name>
+    <message>
+      <source>Drag layout here to add it to the tour</source>
+      <translation type="unfinished">Drag layout here to add it to the tour</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::client::desktop::ui::SubjectSelectionDialog</name>
+    <message>
+      <source>No user roles found</source>
+      <translation type="unfinished">No user roles found</translation>
+    </message>
+    <message>
+      <source>No users found</source>
+      <translation type="unfinished">No users found</translation>
+    </message>
+    <message>
+      <source>Users</source>
+      <translation>משתמשים</translation>
+    </message>
+    <message>
+      <source>Custom Users</source>
+      <translation type="unfinished">Custom Users</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::client::desktop::ui::action::LayoutTourSettingsFactory</name>
+    <message>
+      <source>Switch with Hotkeys</source>
+      <translation type="unfinished">Switch with Hotkeys</translation>
+    </message>
+    <message>
+      <source>Switch on Timer</source>
+      <translation type="unfinished">Switch on Timer</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::client::desktop::ui::action::PtzPresetsToursFactory</name>
+    <message>
+      <source>%1 (active)</source>
+      <comment>Template for active PTZ preset</comment>
+      <translation>%1 (פעיל)</translation>
+    </message>
+    <message>
+      <source>%1 (active)</source>
+      <comment>Template for active PTZ tour</comment>
+      <translation>%1 (פעיל)</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::client::desktop::ui::dialogs::LicenseDeactivationReason</name>
+    <message>
+      <source>Please fill up information about yourself and reason for license deactivation</source>
+      <translation type="unfinished">Please fill up information about yourself and reason for license deactivation</translation>
+    </message>
+    <message>
+      <source>Next</source>
+      <translation>הבא</translation>
+    </message>
+    <message>
+      <source>Name is necessary</source>
+      <translation type="unfinished">Name is necessary</translation>
+    </message>
+    <message>
+      <source>Reason is necessary</source>
+      <translation type="unfinished">Reason is necessary</translation>
+    </message>
+    <message>
+      <source>Name</source>
+      <translation>שם</translation>
+    </message>
+    <message>
+      <source>Email</source>
+      <translation>אימייל</translation>
+    </message>
+    <message>
+      <source>Reason for deactivation</source>
+      <translation type="unfinished">Reason for deactivation</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::client::desktop::ui::graphics::SoftwareTriggerButton</name>
+    <message>
+      <source>Go to Live</source>
+      <translation type="unfinished">Go to Live</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::client::desktop::ui::ptz</name>
+    <message>
+      <source>Cannot get the current position from camera &quot;%1&quot;</source>
+      <translation type="unfinished">Cannot get the current position from camera &quot;%1&quot;</translation>
+    </message>
+    <message>
+      <source>Please wait for the camera to go online.</source>
+      <translation>יש להמתין למצלמה שתעבור למצב מקוון.</translation>
+    </message>
+    <message>
+      <source>Failed to get current position</source>
+      <translation>לא ניתן היה לקבל את המיקום הנוכחי</translation>
+    </message>
+    <message>
+      <source>Cannot set the current position for camera &quot;%1&quot;</source>
+      <translation type="unfinished">Cannot set the current position for camera &quot;%1&quot;</translation>
+    </message>
+    <message>
+      <source>Failed to set current position</source>
+      <translation>הגדרת המיקום הנוכחי נכשלה</translation>
+    </message>
+    <message>
+      <source>Preset used by some tours. Delete it anyway?</source>
+      <translation>הפריסט בשימוש ע"י מספר סיורים. האם למחוק בכל זאת?</translation>
+    </message>
+    <message>
+      <source>These tours will become invalid.</source>
+      <translation>סיורים אלו יהפכו ללא תקינים.</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::client::desktop::ui::resources</name>
     <message>
       <source>There is another layout with the same name</source>
       <translation type="unfinished">There is another layout with the same name</translation>
+    </message>
+    <message>
+      <source>You do not have permission to overwrite it.</source>
+      <translation type="unfinished">You do not have permission to overwrite it.</translation>
     </message>
     <message>
       <source>Overwrite existing layout?</source>
@@ -7882,6 +7766,10 @@ to %1</source>
       <translation>הסרה</translation>
     </message>
     <message>
+      <source>You are going to delete some resources to which you have access from Video Wall only. You will not see them in your resource list after it and will not be able to add them to Video Wall again.</source>
+      <translation type="unfinished">You are going to delete some resources to which you have access from Video Wall only. You will not see them in your resource list after it and will not be able to add them to Video Wall again.</translation>
+    </message>
+    <message>
       <source>You will lose access to following resources:</source>
       <translation type="unfinished">You will lose access to following resources:</translation>
     </message>
@@ -7961,17 +7849,9 @@ to %1</source>
       <source>They may be auto-discovered again after removing.</source>
       <translation type="unfinished">They may be auto-discovered again after removing.</translation>
     </message>
-    <message>
-      <source>You do not have permission to overwrite it.</source>
-      <translation type="unfinished">You do not have permission to overwrite it.</translation>
-    </message>
-    <message>
-      <source>You are going to delete some resources to which you have access from Video Wall only. You will not see them in your resource list after it and will not be able to add them to Video Wall again.</source>
-      <translation type="unfinished">You are going to delete some resources to which you have access from Video Wall only. You will not see them in your resource list after it and will not be able to add them to Video Wall again.</translation>
-    </message>
   </context>
   <context>
-    <name>VideoWall</name>
+    <name>nx::client::desktop::ui::videowall</name>
     <message>
       <source>There is another video wall with the same name</source>
       <translation type="unfinished">There is another video wall with the same name</translation>
@@ -7995,6 +7875,268 @@ to %1</source>
     <message>
       <source>To display local files on Video Wall, please attach them using computer where Video Wall is hosted.</source>
       <translation type="unfinished">To display local files on Video Wall, please attach them using computer where Video Wall is hosted.</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::client::desktop::ui::workbench::ActionHandler</name>
+    <message numerus="yes">
+      <source>Failed to move %n devices</source>
+      <translation>
+        <numerusform>העברת %n התקנים נכשלה</numerusform>
+        <numerusform>העברת %n התקנים נכשלה</numerusform>
+        <numerusform>העברת %n התקנים נכשלה</numerusform>
+        <numerusform>העברת %n התקנים נכשלה</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Failed to move %n cameras</source>
+      <translation>
+        <numerusform>העברת %n מצלמות נכשלה</numerusform>
+        <numerusform>העברת %n מצלמות נכשלה</numerusform>
+        <numerusform>העברת %n מצלמות נכשלה</numerusform>
+        <numerusform>העברת %n מצלמות נכשלה</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Failed to move %n I/O Modules</source>
+      <translation>
+        <numerusform>העברת %n התקני קלט/פלט נכשלה</numerusform>
+        <numerusform>העברת %n התקני קלט/פלט נכשלה</numerusform>
+        <numerusform>העברת %n התקני קלט/פלט נכשלה</numerusform>
+        <numerusform>העברת %n התקני קלט/פלט נכשלה</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Server &quot;%1&quot; is not responding.</source>
+      <translation type="unfinished">Server &quot;%1&quot; is not responding.</translation>
+    </message>
+    <message numerus="yes">
+      <source>Server &quot;%1&quot; cannot access %n devices. Move them anyway?</source>
+      <translation type="unfinished">
+        <numerusform>Server &quot;%1&quot; cannot access %n devices. Move them anyway?</numerusform>
+        <numerusform>Server &quot;%1&quot; cannot access %n devices. Move them anyway?</numerusform>
+        <numerusform>Server &quot;%1&quot; cannot access %n devices. Move them anyway?</numerusform>
+        <numerusform>Server &quot;%1&quot; cannot access %n devices. Move them anyway?</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Server &quot;%1&quot; cannot access %n cameras. Move them anyway?</source>
+      <translation type="unfinished">
+        <numerusform>Server &quot;%1&quot; cannot access %n cameras. Move them anyway?</numerusform>
+        <numerusform>Server &quot;%1&quot; cannot access %n cameras. Move them anyway?</numerusform>
+        <numerusform>Server &quot;%1&quot; cannot access %n cameras. Move them anyway?</numerusform>
+        <numerusform>Server &quot;%1&quot; cannot access %n cameras. Move them anyway?</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Server &quot;%1&quot; cannot access %n I/O modules. Move them anyway?</source>
+      <translation type="unfinished">
+        <numerusform>Server &quot;%1&quot; cannot access %n I/O modules. Move them anyway?</numerusform>
+        <numerusform>Server &quot;%1&quot; cannot access %n I/O modules. Move them anyway?</numerusform>
+        <numerusform>Server &quot;%1&quot; cannot access %n I/O modules. Move them anyway?</numerusform>
+        <numerusform>Server &quot;%1&quot; cannot access %n I/O modules. Move them anyway?</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Move</source>
+      <translation>העבר</translation>
+    </message>
+    <message>
+      <source>Layout is locked and cannot be changed.</source>
+      <translation>הפריסה נעולה ואינה ניתנת לשנוי.</translation>
+    </message>
+    <message>
+      <source>All Supported (*.nov *.avi *.mkv *.mp4 *.mov *.ts *.m2ts *.mpeg *.mpg *.flv *.wmv *.3gp *.jpg *.png *.gif *.bmp *.tiff)</source>
+      <translation>כל הנתמכים (*.nov *.avi *.mkv *.mp4 *.mov *.ts *.m2ts *.mpeg *.mpg *.flv *.wmv *.3gp *.jpg *.png *.gif *.bmp *.tiff)</translation>
+    </message>
+    <message>
+      <source>Video (*.avi *.mkv *.mp4 *.mov *.ts *.m2ts *.mpeg *.mpg *.flv *.wmv *.3gp)</source>
+      <translation>וידאו (*.avi *.mkv *.mp4 *.mov *.ts *.m2ts *.mpeg *.mpg *.flv *.wmv *.3gp)</translation>
+    </message>
+    <message>
+      <source>Pictures (*.jpg *.png *.gif *.bmp *.tiff)</source>
+      <translation>תמונות (*.jpg *.png *.gif *.bmp *.tiff)</translation>
+    </message>
+    <message>
+      <source>All files (*.*)</source>
+      <translation>כל הקבצים (*.*)</translation>
+    </message>
+    <message>
+      <source>Open File</source>
+      <translation>פתח קובץ</translation>
+    </message>
+    <message>
+      <source>Select folder...</source>
+      <translation>בחר תיקיה...</translation>
+    </message>
+    <message>
+      <source>Too short period selected</source>
+      <translation>נבחרה תקופה קצרה מדי</translation>
+    </message>
+    <message>
+      <source>Cannot perform Preview Search. Please select a period of 15 seconds or longer.</source>
+      <translation>לא ניתן לבצע חיפוש בתצוגה מקדימה. בחר תקופה של 15 שניות או יותר.</translation>
+    </message>
+    <message>
+      <source>Preview Search for %1</source>
+      <translation>חיפוש ויזואלי עבור %1</translation>
+    </message>
+    <message>
+      <source>Cancel device adding?</source>
+      <translation>לבטל את הוספת התקן?</translation>
+    </message>
+    <message>
+      <source>Confirm files deleting</source>
+      <translation>אשר מחיקה של קבצים</translation>
+    </message>
+    <message numerus="yes">
+      <source>Are you sure you want to permanently delete these %n files?</source>
+      <translation type="unfinished">
+        <numerusform>האם אתה בטוח שברצונך למחוק %n קובץ זה?</numerusform>
+        <numerusform>האם אתה בטוח שברצונך למחוק את %n הקבצים האלו?</numerusform>
+        <numerusform>Are you sure you want to permanently delete these %n files?</numerusform>
+        <numerusform>Are you sure you want to permanently delete these %n files?</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>There is another user with the same name</source>
+      <translation>קיים משתמש אחר עם אותו שם</translation>
+    </message>
+    <message>
+      <source>Rename</source>
+      <translation>שנה שם</translation>
+    </message>
+    <message>
+      <source>Enter new name for the selected item:</source>
+      <translation>הכנס שם חדש לפריט שנבחר:</translation>
+    </message>
+    <message>
+      <source>Updating Background...</source>
+      <translation>מעדכן רקע...</translation>
+    </message>
+    <message>
+      <source>Image processing may take a few moments. Please be patient.</source>
+      <translation>עיבוד התמונה עשוי לקחת מספר שניות, אנא המתן.</translation>
+    </message>
+    <message>
+      <source>Image too big</source>
+      <translation>התמונה גדולה מדי</translation>
+    </message>
+    <message>
+      <source>Maximum size is %1 MB.</source>
+      <translation>הגודל המרבי הוא %1 MB.</translation>
+    </message>
+    <message>
+      <source>Failed to upload image</source>
+      <translation>טעינת התמונה נכשלה</translation>
+    </message>
+    <message>
+      <source>Client</source>
+      <translation>קליינט</translation>
+    </message>
+    <message>
+      <source>Server</source>
+      <translation>שרת</translation>
+    </message>
+    <message>
+      <source>Please update all components to the version %1</source>
+      <translation>עדכן את כל הרכיבים לגרסה %1</translation>
+    </message>
+    <message>
+      <source>Components of System have different versions:</source>
+      <translation>לרכיבי המערכת יש גרסאות שונות:</translation>
+    </message>
+    <message>
+      <source>Update...</source>
+      <translation>עדכן...</translation>
+    </message>
+    <message>
+      <source>Skip</source>
+      <translation>דלג</translation>
+    </message>
+    <message>
+      <source>Beta version %1</source>
+      <translation>גירסת ביתא %1</translation>
+    </message>
+    <message>
+      <source>Some functionality may be unavailable or not working properly.</source>
+      <translation>ייתכן שחלק מהפונקציונליות אינה זמינה או שאינה פועלת כראוי.</translation>
+    </message>
+    <message>
+      <source>System sends anonymous usage statistics</source>
+      <translation>המערכת שולחת סטטיסטיקות שימוש אנונימיות</translation>
+    </message>
+    <message>
+      <source>It will be used by software development team to improve your user experience.</source>
+      <translation>זה ישמש את צוות פיתוח התוכנה כדי לשפר את חוויית המשתמש.</translation>
+    </message>
+    <message>
+      <source>To disable it, go to System Administration dialog.</source>
+      <translation>כדי להשבית אותה, עבור אל הגדרות ניהול מערכת.</translation>
+    </message>
+    <message>
+      <source>Failed to open server web page</source>
+      <translation>פתיחת דף האינטרנט של השרת נכשלה</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::client::desktop::ui::workbench::LayoutTourExecutor</name>
+    <message>
+      <source>Use keyboard arrows to switch layouts. To exit the tour press Esc.</source>
+      <translation type="unfinished">Use keyboard arrows to switch layouts. To exit the tour press Esc.</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::client::desktop::ui::workbench::LayoutTourItemWidget</name>
+    <message>
+      <source>Switch by %1</source>
+      <translation type="unfinished">Switch by %1</translation>
+    </message>
+    <message>
+      <source>Display for</source>
+      <translation type="unfinished">Display for</translation>
+    </message>
+    <message>
+      <source>Display selected for</source>
+      <translation type="unfinished">Display selected for</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::client::desktop::ui::workbench::LayoutToursHandler</name>
+    <message>
+      <source>Layout Tour</source>
+      <translation type="unfinished">Layout Tour</translation>
+    </message>
+    <message>
+      <source>Layout Tour %1</source>
+      <translation type="unfinished">Layout Tour %1</translation>
+    </message>
+    <message>
+      <source>Delete layout tour %1?</source>
+      <translation type="unfinished">Delete layout tour %1?</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::client::desktop::ui::workbench::LayoutsHandler</name>
+    <message>
+      <source>Save Layout As</source>
+      <translation>שמור פריסה כ</translation>
+    </message>
+    <message>
+      <source>Enter Layout Name:</source>
+      <translation>הכנס את שם הפריסה:</translation>
+    </message>
+    <message>
+      <source>New Layout</source>
+      <translation>פריסה חדשה</translation>
+    </message>
+    <message>
+      <source>Enter the name of the layout to create:</source>
+      <translation>הכנס את שם הפריסה שברצונך ליצור:</translation>
+    </message>
+    <message>
+      <source>New Layout %1</source>
+      <translation>פריסה חדשה %1</translation>
     </message>
   </context>
 </TS>

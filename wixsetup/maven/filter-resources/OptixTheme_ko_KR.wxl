@@ -58,7 +58,7 @@
   <String Id="FilesInUseDontCloseRadioButton">응용 프로그램을 닫지 마십시오. 재 부 팅 해야 합니다.</String>
   <String Id="FilesInUseOkButton">확인</String>
   <String Id="FilesInUseCancelButton">취소</String>
-  <String Id="InstallLicenseText">"동의 및 설치"를 클릭 하 여 동의 하세요</String>
+  <String Id="InstallLicenseText">\"동의 및 설치\"를 클릭 하 여 동의 하세요</String>
   <String Id="Options">옵션:</String>
   <String Id="SelectApps">설치할 응용 프로그램을 선택 합니다.</String>
 </WixLocalization>

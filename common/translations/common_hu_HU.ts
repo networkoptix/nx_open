@@ -8,11 +8,6 @@
       <extracomment>Language name that will be displayed to user. Must not be empty.</extracomment>
       <translation>Magyar</translation>
     </message>
-    <message>
-      <source>Locale Code</source>
-      <extracomment>Internal. Please don&apos;t change existing translation.</extracomment>
-      <translation>hu</translation>
-    </message>
   </context>
   <context>
     <name>MergeSystemsStatusStrings</name>
@@ -227,10 +222,6 @@
     <message>
       <source>Not enough HDD/SSD speed for recording to %1.</source>
       <translation>Nincs elegendő HDD/SDD sebesség a rögzítéshez: %1.</translation>
-    </message>
-    <message>
-      <source>HDD/SSD disk %1 is full. Disk contains too much data that is not managed by VMS.</source>
-      <translation>%1 HDD/SDD lemez megtelt. A lemez túl sok adatot tartalmaz amit a VMS nem menedzsel.</translation>
     </message>
     <message>
       <source>Conflicting Server: %1</source>
@@ -496,6 +487,64 @@
       <source>Send Email</source>
       <translation>Email küldése</translation>
     </message>
+    <message>
+      <source>Software Trigger</source>
+      <translation type="unfinished">Software Trigger</translation>
+    </message>
+    <message>
+      <source>Software trigger %1 at %2</source>
+      <translation type="unfinished">Software trigger %1 at %2</translation>
+    </message>
+    <message>
+      <source>Software Trigger %1 has been activated multiple times</source>
+      <translation type="unfinished">Software Trigger %1 has been activated multiple times</translation>
+    </message>
+    <message>
+      <source>Multiple %1 events have occured</source>
+      <translation type="unfinished">Multiple %1 events have occured</translation>
+    </message>
+    <message>
+      <source>Trigger: %1</source>
+      <translation type="unfinished">Trigger: %1</translation>
+    </message>
+    <message>
+      <source>HDD/SSD disk &quot;%1&quot; is full. Disk contains too much data that is not managed by VMS.</source>
+      <translation type="unfinished">HDD/SSD disk &quot;%1&quot; is full. Disk contains too much data that is not managed by VMS.</translation>
+    </message>
+    <message>
+      <source>System disk &quot;%1&quot; is almost full.</source>
+      <translation type="unfinished">System disk &quot;%1&quot; is almost full.</translation>
+    </message>
+    <message>
+      <source>Default Trigger</source>
+      <translation type="unfinished">Default Trigger</translation>
+    </message>
+    <message>
+      <source>All Users</source>
+      <translation type="unfinished">All Users</translation>
+    </message>
+    <message>
+      <source>Role</source>
+      <translation type="unfinished">Role</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n Users</source>
+      <translation type="unfinished">
+        <numerusform>%n Users</numerusform>
+        <numerusform>%n Users</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n Roles</source>
+      <translation type="unfinished">
+        <numerusform>%n Roles</numerusform>
+        <numerusform>%n Roles</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>All Administrators</source>
+      <translation type="unfinished">All Administrators</translation>
+    </message>
   </context>
   <context>
     <name>QnCameraDiagnosticsErrorCodeStrings</name>
@@ -707,6 +756,10 @@
       <source>Cannot open media URL %1. Unsupported media protocol %2.</source>
       <translation>Média URL %1 nem nyitható meg. %2 média protokoll nem támogatott.</translation>
     </message>
+    <message>
+      <source>Camera was restored from archive. Delete the camera and add it again to view Live video.</source>
+      <translation type="unfinished">Camera was restored from archive. Delete the camera and add it again to view Live video.</translation>
+    </message>
   </context>
   <context>
     <name>QnFfmpegAudioTranscoder</name>
@@ -816,14 +869,6 @@
       <translation>Video fal</translation>
     </message>
     <message>
-      <source>Only single license is allowed for this device</source>
-      <translation>Csak egyedülálló licence engedélyezet ehhez az eszközhöz</translation>
-    </message>
-    <message>
-      <source>Unknown error</source>
-      <translation>Ismeretlen hiba</translation>
-    </message>
-    <message>
       <source>I/O Module</source>
       <translation>I/O modul</translation>
     </message>
@@ -872,10 +917,6 @@
       <translation>Licencek indítása</translation>
     </message>
     <message>
-      <source>Server with matching hardware ID not found</source>
-      <translation>Nem található szerver eggyező hardver ID-vel</translation>
-    </message>
-    <message>
       <source>Invalid</source>
       <translation>Érvénytelen</translation>
     </message>
@@ -884,32 +925,12 @@
       <translation>Érvénytelen licencek</translation>
     </message>
     <message>
-      <source>Invalid signature</source>
-      <translation>Érvénytelen aláírás</translation>
-    </message>
-    <message>
-      <source>Invalid customization</source>
-      <translation>Érvénytelen testreszabás</translation>
-    </message>
-    <message>
-      <source>License is expired</source>
-      <translation>A licenc lejárt</translation>
-    </message>
-    <message>
-      <source>Invalid type</source>
-      <translation>Érvénytelen típus</translation>
-    </message>
-    <message>
       <source>Free</source>
       <translation>Szabad</translation>
     </message>
     <message>
       <source>Free license</source>
       <translation>Ingyenes licenc</translation>
-    </message>
-    <message>
-      <source>This license type requires higher software version</source>
-      <translation>Ez a licenc típus frissebb szoftververziót igényel</translation>
     </message>
   </context>
   <context>
@@ -962,6 +983,41 @@
       <source>This license key has been previously activated to hardware ID %1 on %2. Please contact support team to obtain a valid license key.</source>
       <comment>%1 is a hardware ID, %2 is an activation time</comment>
       <translation>Ez a licenckulcs korábban aktiválva lett %1 hardver ID-hez %2 dátummal. Kérjük lépjen kapcsolatba a szoftver forgalmazójával érvényes licenckulcs beszerzésével kapcsolatban.</translation>
+    </message>
+  </context>
+  <context>
+    <name>QnLicenseValidator</name>
+    <message>
+      <source>Invalid signature</source>
+      <translation>Érvénytelen aláírás</translation>
+    </message>
+    <message>
+      <source>Server with matching hardware ID not found</source>
+      <translation>Nem található szerver eggyező hardver ID-vel</translation>
+    </message>
+    <message>
+      <source>Invalid customization</source>
+      <translation>Érvénytelen testreszabás</translation>
+    </message>
+    <message>
+      <source>License is expired</source>
+      <translation>A licenc lejárt</translation>
+    </message>
+    <message>
+      <source>Invalid type</source>
+      <translation>Érvénytelen típus</translation>
+    </message>
+    <message>
+      <source>Only single license is allowed for this device</source>
+      <translation>Csak egyedülálló licence engedélyezet ehhez az eszközhöz</translation>
+    </message>
+    <message>
+      <source>This license type requires higher software version</source>
+      <translation>Ez a licenc típus frissebb szoftververziót igényel</translation>
+    </message>
+    <message>
+      <source>Unknown error</source>
+      <translation>Ismeretlen hiba</translation>
     </message>
   </context>
   <context>

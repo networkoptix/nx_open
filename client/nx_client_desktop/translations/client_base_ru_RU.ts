@@ -69,6 +69,808 @@ to view more bookmarks</source>
     </message>
   </context>
   <context>
+    <name>ContextMenu</name>
+    <message>
+      <source>Filter...</source>
+      <translation>Фильтр...</translation>
+    </message>
+    <message>
+      <source>Connect to System</source>
+      <translation>Подключиться к системе</translation>
+    </message>
+    <message>
+      <source>Help</source>
+      <translation>Помощь</translation>
+    </message>
+    <message>
+      <source>Event Log...</source>
+      <translation>Журнал событий...</translation>
+    </message>
+    <message>
+      <source>Cameras to Backup...</source>
+      <translation>Камеры для резервного копирования...</translation>
+    </message>
+    <message>
+      <source>Control Video Wall</source>
+      <translation>Управление видеостеной</translation>
+    </message>
+    <message>
+      <source>Push my screen</source>
+      <translation>Передать мой экоан</translation>
+    </message>
+    <message>
+      <source>Select Time Server</source>
+      <translation>Выбрать сервер времени</translation>
+    </message>
+    <message>
+      <source>Fit in View</source>
+      <translation>Вписать в экран</translation>
+    </message>
+    <message>
+      <source>Main Menu</source>
+      <translation>Главное меню</translation>
+    </message>
+    <message>
+      <source>Connect to Server...</source>
+      <translation>Подключиться к серверу...</translation>
+    </message>
+    <message>
+      <source>Disconnect from Server</source>
+      <translation>Отключение от сервера</translation>
+    </message>
+    <message>
+      <source>Browse Local Files</source>
+      <translation>Просмотр локальных файлов</translation>
+    </message>
+    <message>
+      <source>Show Welcome Screen</source>
+      <translation>Показать заставку</translation>
+    </message>
+    <message>
+      <source>New...</source>
+      <translation>Создать...</translation>
+    </message>
+    <message>
+      <source>Tab</source>
+      <translation>Вкладку</translation>
+    </message>
+    <message>
+      <source>New Tab</source>
+      <translation>Создать вкладку</translation>
+    </message>
+    <message>
+      <source>Window</source>
+      <translation>Окно</translation>
+    </message>
+    <message>
+      <source>New Window</source>
+      <translation>Создать окно</translation>
+    </message>
+    <message>
+      <source>User...</source>
+      <translation>Пользователя...</translation>
+    </message>
+    <message>
+      <source>New User...</source>
+      <translation>Создать пользователя...</translation>
+    </message>
+    <message>
+      <source>Video Wall...</source>
+      <translation>Видеостену...</translation>
+    </message>
+    <message>
+      <source>New Video Wall...</source>
+      <translation>Новая видеостена...</translation>
+    </message>
+    <message>
+      <source>Web Page...</source>
+      <translation>Web-страница...</translation>
+    </message>
+    <message>
+      <source>New Web Page...</source>
+      <translation>Новая web-страница...</translation>
+    </message>
+    <message>
+      <source>Layout Tour...</source>
+      <translation type="unfinished">Layout Tour...</translation>
+    </message>
+    <message>
+      <source>New Layout Tour...</source>
+      <translation type="unfinished">New Layout Tour...</translation>
+    </message>
+    <message>
+      <source>New Layout...</source>
+      <translation>Создать раскладку...</translation>
+    </message>
+    <message>
+      <source>Open Layout...</source>
+      <translation>Открыть раскладку...</translation>
+    </message>
+    <message>
+      <source>Open...</source>
+      <translation>Открыть...</translation>
+    </message>
+    <message>
+      <source>File(s)...</source>
+      <translation>Файл(ы)...</translation>
+    </message>
+    <message>
+      <source>Folder...</source>
+      <translation>Папк(и)...</translation>
+    </message>
+    <message>
+      <source>Web Client...</source>
+      <translation>Web клиент...</translation>
+    </message>
+    <message>
+      <source>Open Web Client...</source>
+      <translation>Открыть Web клиент...</translation>
+    </message>
+    <message>
+      <source>Save Current Layout</source>
+      <translation>Сохранить раскладку</translation>
+    </message>
+    <message>
+      <source>Save Current Layout As...</source>
+      <translation>Сохранить раскладку как...</translation>
+    </message>
+    <message>
+      <source>Save Video Wall View</source>
+      <translation>Сохранить раскладку видеостены</translation>
+    </message>
+    <message>
+      <source>Drop Resources</source>
+      <translation>Положить ресурсы</translation>
+    </message>
+    <message>
+      <source>Start Screen Recording</source>
+      <translation>Начать захват экрана</translation>
+    </message>
+    <message>
+      <source>Stop Screen Recording</source>
+      <translation>Закончить захват экрана</translation>
+    </message>
+    <message>
+      <source>Stop current action</source>
+      <translation>Остановить текущее действие</translation>
+    </message>
+    <message>
+      <source>Go to Fullscreen</source>
+      <translation>На полный экран</translation>
+    </message>
+    <message>
+      <source>Exit Fullscreen</source>
+      <translation>В оконный режим</translation>
+    </message>
+    <message>
+      <source>Minimize</source>
+      <translation>Свернуть</translation>
+    </message>
+    <message>
+      <source>Maximize</source>
+      <translation>Развернуть</translation>
+    </message>
+    <message>
+      <source>Restore Down</source>
+      <translation>Уменьшить в окно</translation>
+    </message>
+    <message>
+      <source>Open in Browser...</source>
+      <translation>Открыть в браузере...</translation>
+    </message>
+    <message>
+      <source>System Administration...</source>
+      <translation>Администрирование системы...</translation>
+    </message>
+    <message>
+      <source>System Update...</source>
+      <translation>Обновление системы...</translation>
+    </message>
+    <message>
+      <source>User Management...</source>
+      <translation>Управление пользователями...</translation>
+    </message>
+    <message>
+      <source>Local Settings...</source>
+      <translation>Локальные настройки...</translation>
+    </message>
+    <message>
+      <source>Audit Trail...</source>
+      <translation>Аудит...</translation>
+    </message>
+    <message>
+      <source>Bookmark Search...</source>
+      <translation>Поиск по закладкам...</translation>
+    </message>
+    <message>
+      <source>Log in to %1...</source>
+      <comment>Log in to Nx Cloud</comment>
+      <translation>Войти в %1...</translation>
+    </message>
+    <message>
+      <source>Log out from %1</source>
+      <comment>Log out from Nx Cloud</comment>
+      <translation>Отсоединиться от %1</translation>
+    </message>
+    <message>
+      <source>Open %1 Portal...</source>
+      <comment>Open Nx Cloud Portal</comment>
+      <translation>Открыть портал %1...</translation>
+    </message>
+    <message>
+      <source>Account Settings...</source>
+      <translation>Настройки учётной записи...</translation>
+    </message>
+    <message>
+      <source>Create Account...</source>
+      <translation>Создать учётную запись...</translation>
+    </message>
+    <message>
+      <source>Event Rules...</source>
+      <translation>Правила событий...</translation>
+    </message>
+    <message>
+      <source>Devices List</source>
+      <translation>Список устройств</translation>
+    </message>
+    <message>
+      <source>Cameras List</source>
+      <translation>Список камер</translation>
+    </message>
+    <message>
+      <source>Merge Systems...</source>
+      <translation>Объединить системы...</translation>
+    </message>
+    <message>
+      <source>About...</source>
+      <translation>О программе...</translation>
+    </message>
+    <message>
+      <source>Exit</source>
+      <translation>Выход</translation>
+    </message>
+    <message>
+      <source>Mark Selection Start</source>
+      <translation>Отметить начало выделения</translation>
+    </message>
+    <message>
+      <source>Mark Selection End</source>
+      <translation>Отметить конец выделения</translation>
+    </message>
+    <message>
+      <source>Clear Selection</source>
+      <translation>Очистить выделение</translation>
+    </message>
+    <message>
+      <source>Zoom to Selection</source>
+      <translation>Приблизить выделенный фрагмент</translation>
+    </message>
+    <message>
+      <source>Add Bookmark...</source>
+      <translation>Добавить закладку...</translation>
+    </message>
+    <message>
+      <source>Edit Bookmark...</source>
+      <translation>Редактировать закладку...</translation>
+    </message>
+    <message>
+      <source>Remove Bookmark...</source>
+      <translation>Удалить закладку...</translation>
+    </message>
+    <message>
+      <source>Remove Bookmarks...</source>
+      <translation>Удалить закладки...</translation>
+    </message>
+    <message>
+      <source>Export Selected Area...</source>
+      <translation>Экспорт выбранного фрагмента...</translation>
+    </message>
+    <message>
+      <source>Export Multi-Video...</source>
+      <translation>Мульти-Видео Экспорт...</translation>
+    </message>
+    <message>
+      <source>Export Rapid Review...</source>
+      <translation>Экспорт с быстрой прокруткой...</translation>
+    </message>
+    <message>
+      <source>Preview Search...</source>
+      <translation>Поиск по интервалам...</translation>
+    </message>
+    <message>
+      <source>Server...</source>
+      <translation>Сервер...</translation>
+    </message>
+    <message>
+      <source>Open</source>
+      <translation>Открыть</translation>
+    </message>
+    <message>
+      <source>Monitor</source>
+      <translation>Мониторинг</translation>
+    </message>
+    <message>
+      <source>Open in New Tab</source>
+      <translation>Открыть в новой вкладке</translation>
+    </message>
+    <message>
+      <source>Monitor in New Tab</source>
+      <translation>Открыть мониторинг в новой вкладке</translation>
+    </message>
+    <message>
+      <source>Open in Alarm Layout</source>
+      <translation>Открыть на тревожной раскладке</translation>
+    </message>
+    <message>
+      <source>Open in New Window</source>
+      <translation>Открыть в новом окне</translation>
+    </message>
+    <message>
+      <source>Monitor in New Window</source>
+      <translation>Открыть мониторинг в новом окне</translation>
+    </message>
+    <message>
+      <source>Open Video Wall</source>
+      <translation type="unfinished">Open Video Wall</translation>
+    </message>
+    <message>
+      <source>Open Containing Folder</source>
+      <translation>Открыть в каталоге</translation>
+    </message>
+    <message>
+      <source>Identify</source>
+      <translation>Идентифицировать</translation>
+    </message>
+    <message>
+      <source>Attach to Video Wall...</source>
+      <translation>Прикрепить к видеостене...</translation>
+    </message>
+    <message>
+      <source>Switch to Video Wall mode...</source>
+      <translation>Переключиться в режим видеостены...</translation>
+    </message>
+    <message>
+      <source>Save Video Wall</source>
+      <translation type="unfinished">Save Video Wall</translation>
+    </message>
+    <message>
+      <source>Save Current Matrix</source>
+      <translation>Сохранить текущую матрицу</translation>
+    </message>
+    <message>
+      <source>Load Matrix</source>
+      <translation>Загрузить матрицу</translation>
+    </message>
+    <message>
+      <source>Delete</source>
+      <translation>Удалить</translation>
+    </message>
+    <message>
+      <source>Stop Video Wall</source>
+      <translation>Остановить видеостену</translation>
+    </message>
+    <message>
+      <source>Clear Screen</source>
+      <translation>Очистить экран</translation>
+    </message>
+    <message>
+      <source>Save Layout</source>
+      <translation>Сохранить раскладку</translation>
+    </message>
+    <message>
+      <source>Save Layout As...</source>
+      <translation>Сохранить раскладку как...</translation>
+    </message>
+    <message>
+      <source>Maximize Item</source>
+      <translation>Видео на полный экран</translation>
+    </message>
+    <message>
+      <source>Restore Item</source>
+      <translation>Видео в режим сетки</translation>
+    </message>
+    <message>
+      <source>Show Info</source>
+      <translation>Показать информацию</translation>
+    </message>
+    <message>
+      <source>Hide Info</source>
+      <translation>Скрыть информацию</translation>
+    </message>
+    <message>
+      <source>Change Resolution...</source>
+      <translation>Изменить разрешение...</translation>
+    </message>
+    <message>
+      <source>Auto</source>
+      <translation>Авто</translation>
+    </message>
+    <message>
+      <source>Low</source>
+      <translation>Низкое</translation>
+    </message>
+    <message>
+      <source>High</source>
+      <translation>Высокое</translation>
+    </message>
+    <message>
+      <source>PTZ...</source>
+      <translation>PTZ...</translation>
+    </message>
+    <message>
+      <source>Save Current Position...</source>
+      <translation>Записать позицию...</translation>
+    </message>
+    <message>
+      <source>Manage...</source>
+      <translation>Настроить...</translation>
+    </message>
+    <message>
+      <source>Show Motion/Smart Search</source>
+      <translation>Показать движение/поиск по движению</translation>
+    </message>
+    <message>
+      <source>Show Motion</source>
+      <translation>Показать движение</translation>
+    </message>
+    <message>
+      <source>Hide Motion/Smart Search</source>
+      <translation>Скрыть движение/поиск по движению</translation>
+    </message>
+    <message>
+      <source>Hide Motion</source>
+      <translation>Скрыть движение</translation>
+    </message>
+    <message>
+      <source>Clear Motion Selection</source>
+      <translation>Очистить регион поиска движения</translation>
+    </message>
+    <message>
+      <source>Check File Watermark</source>
+      <translation>Проверить целостность файла</translation>
+    </message>
+    <message>
+      <source>Image Enhancement...</source>
+      <translation>Коррекция изображения...</translation>
+    </message>
+    <message>
+      <source>Rotate to...</source>
+      <translation>Повернуть на...</translation>
+    </message>
+    <message>
+      <source>0 degrees</source>
+      <translation>0 градусов</translation>
+    </message>
+    <message>
+      <source>90 degrees</source>
+      <translation>90 градусов</translation>
+    </message>
+    <message>
+      <source>180 degrees</source>
+      <translation>180 градусов</translation>
+    </message>
+    <message>
+      <source>270 degrees</source>
+      <translation>270 градусов</translation>
+    </message>
+    <message>
+      <source>Remove from Layout</source>
+      <translation>Убрать с раскладки</translation>
+    </message>
+    <message>
+      <source>Remove from Tour</source>
+      <translation type="unfinished">Remove from Tour</translation>
+    </message>
+    <message>
+      <source>Stop Sharing Layout</source>
+      <translation>Убрать раскладку из общего</translation>
+    </message>
+    <message>
+      <source>Edit...</source>
+      <translation type="unfinished">Edit...</translation>
+    </message>
+    <message>
+      <source>Rename</source>
+      <translation>Переименовать</translation>
+    </message>
+    <message>
+      <source>Delete from Disk</source>
+      <translation>Удалить с диска</translation>
+    </message>
+    <message>
+      <source>Set as Layout Background</source>
+      <translation>Установить как фон на раскладку</translation>
+    </message>
+    <message>
+      <source>User Settings...</source>
+      <translation>Настройки пользователя...</translation>
+    </message>
+    <message>
+      <source>User Roles...</source>
+      <translation>Роли пользователей...</translation>
+    </message>
+    <message>
+      <source>Role Settings...</source>
+      <translation>Настройки роли...</translation>
+    </message>
+    <message>
+      <source>Check Device Issues...</source>
+      <translation>Проверить устройство на ошибки...</translation>
+    </message>
+    <message>
+      <source>Check Devices Issues...</source>
+      <translation>Проверить устройства на ошибки...</translation>
+    </message>
+    <message>
+      <source>Check Camera Issues...</source>
+      <translation>Проверить камеру на ошибки...</translation>
+    </message>
+    <message>
+      <source>Check Cameras Issues...</source>
+      <translation>Проверить камеры на ошибки...</translation>
+    </message>
+    <message>
+      <source>Check I/O Module Issues...</source>
+      <translation>Проверить модуль ввода-вывода на ошибки...</translation>
+    </message>
+    <message>
+      <source>Check I/O Modules Issues...</source>
+      <translation>Проверить модули ввода-вывода на ошибки...</translation>
+    </message>
+    <message>
+      <source>Device Rules...</source>
+      <translation>Правила для устройства...</translation>
+    </message>
+    <message>
+      <source>Devices Rules...</source>
+      <translation>Правила для устройств...</translation>
+    </message>
+    <message>
+      <source>Camera Rules...</source>
+      <translation>Правила для камеры...</translation>
+    </message>
+    <message>
+      <source>Cameras Rules...</source>
+      <translation>Правила для камер...</translation>
+    </message>
+    <message>
+      <source>I/O Module Rules...</source>
+      <translation>Правила для модуля ввода-вывода...</translation>
+    </message>
+    <message>
+      <source>I/O Modules Rules...</source>
+      <translation>Правила для модулей ввода-вывода...</translation>
+    </message>
+    <message>
+      <source>Device Settings...</source>
+      <translation>Настройки устройства...</translation>
+    </message>
+    <message>
+      <source>Devices Settings...</source>
+      <translation>Настройки устройств...</translation>
+    </message>
+    <message>
+      <source>Camera Settings...</source>
+      <translation>Настройки камеры...</translation>
+    </message>
+    <message>
+      <source>Cameras Settings...</source>
+      <translation>Настройки камер...</translation>
+    </message>
+    <message>
+      <source>I/O Module Settings...</source>
+      <translation>Настройки модуля ввода-вывода...</translation>
+    </message>
+    <message>
+      <source>I/O Modules Settings...</source>
+      <translation>Настройки модулей ввода-вывода...</translation>
+    </message>
+    <message>
+      <source>File Settings...</source>
+      <translation>Настройки...</translation>
+    </message>
+    <message>
+      <source>Layout Settings...</source>
+      <translation>Настройки раскладки...</translation>
+    </message>
+    <message>
+      <source>Video Wall Settings...</source>
+      <translation>Настройки видеостены...</translation>
+    </message>
+    <message>
+      <source>Add Device...</source>
+      <translation>Добавить устройство...</translation>
+    </message>
+    <message>
+      <source>Devices List by Server...</source>
+      <translation>Список устройств на сервере...</translation>
+    </message>
+    <message>
+      <source>Cameras List by Server...</source>
+      <translation>Список камер на сервере...</translation>
+    </message>
+    <message>
+      <source>Server Logs...</source>
+      <translation>Журнал сервера...</translation>
+    </message>
+    <message>
+      <source>Server Diagnostics...</source>
+      <translation>Диагностика сервера...</translation>
+    </message>
+    <message>
+      <source>Server Web Page...</source>
+      <translation>Открыть web-страницу сервера...</translation>
+    </message>
+    <message>
+      <source>Server Settings...</source>
+      <translation>Настройки сервера...</translation>
+    </message>
+    <message>
+      <source>Merge to Currently Connected System...</source>
+      <translation>Присоединить сервер к текущей системе...</translation>
+    </message>
+    <message>
+      <source>Change Cell Aspect Ratio...</source>
+      <translation>Соотношение сторон ячеек...</translation>
+    </message>
+    <message>
+      <source>Change Cell Spacing...</source>
+      <translation>Расстояние между ячейками...</translation>
+    </message>
+    <message>
+      <source>None</source>
+      <translation>Нет</translation>
+    </message>
+    <message>
+      <source>Small</source>
+      <translation>Маленькое</translation>
+    </message>
+    <message>
+      <source>Medium</source>
+      <translation>Среднее</translation>
+    </message>
+    <message>
+      <source>Large</source>
+      <translation>Большое</translation>
+    </message>
+    <message>
+      <source>Start Tour</source>
+      <translation>Начать тур</translation>
+    </message>
+    <message>
+      <source>Stop Tour</source>
+      <translation>Закончить тур</translation>
+    </message>
+    <message>
+      <source>Make Layout Tour</source>
+      <translation type="unfinished">Make Layout Tour</translation>
+    </message>
+    <message>
+      <source>Settings</source>
+      <translation type="unfinished">Settings</translation>
+    </message>
+    <message>
+      <source>Close</source>
+      <translation>Закрыть</translation>
+    </message>
+    <message>
+      <source>Close All But This</source>
+      <translation>Закрыть все кроме этой</translation>
+    </message>
+    <message>
+      <source>Play</source>
+      <translation>Воспроизведение</translation>
+    </message>
+    <message>
+      <source>Pause</source>
+      <translation>Пауза</translation>
+    </message>
+    <message>
+      <source>Previous Frame</source>
+      <translation>Предыдущий кадр</translation>
+    </message>
+    <message>
+      <source>Next Frame</source>
+      <translation>Следующий кадр</translation>
+    </message>
+    <message>
+      <source>To Start</source>
+      <translation>В начало</translation>
+    </message>
+    <message>
+      <source>To End</source>
+      <translation>В конец</translation>
+    </message>
+    <message>
+      <source>Volume Down</source>
+      <translation>Тише</translation>
+    </message>
+    <message>
+      <source>Volume Up</source>
+      <translation>Громче</translation>
+    </message>
+    <message>
+      <source>Toggle Mute</source>
+      <translation>Вкл/Выкл звук</translation>
+    </message>
+    <message>
+      <source>Jump to Live</source>
+      <translation>Видео в реальном времени</translation>
+    </message>
+    <message>
+      <source>Synchronize Streams</source>
+      <translation>Сонхронизация видео</translation>
+    </message>
+    <message>
+      <source>Disable Stream Synchronization</source>
+      <translation>Отключить синхронизацию видео</translation>
+    </message>
+    <message>
+      <source>Show Bookmarks</source>
+      <translation>Показать закладки</translation>
+    </message>
+    <message>
+      <source>Hide Bookmarks</source>
+      <translation>Скрыть закладки</translation>
+    </message>
+    <message>
+      <source>Show Calendar</source>
+      <translation>Показать календарь</translation>
+    </message>
+    <message>
+      <source>Hide Calendar</source>
+      <translation>Скрыть календарь</translation>
+    </message>
+    <message>
+      <source>Show Title Bar</source>
+      <translation>Показать заголовок</translation>
+    </message>
+    <message>
+      <source>Hide Title Bar</source>
+      <translation>Скрыть заголовок</translation>
+    </message>
+    <message>
+      <source>Pin Tree</source>
+      <translation>Прикрепить дерево</translation>
+    </message>
+    <message>
+      <source>Unpin Tree</source>
+      <translation>Открепить дерево</translation>
+    </message>
+    <message>
+      <source>Show Tree</source>
+      <translation>Показать дерево</translation>
+    </message>
+    <message>
+      <source>Hide Tree</source>
+      <translation>Скрыть дерево</translation>
+    </message>
+    <message>
+      <source>Show Timeline</source>
+      <translation>Показать шкалу времени</translation>
+    </message>
+    <message>
+      <source>Hide Timeline</source>
+      <translation>Скрыть шкалу времени</translation>
+    </message>
+    <message>
+      <source>Show Notifications</source>
+      <translation>Показать уведомления</translation>
+    </message>
+    <message>
+      <source>Hide Notifications</source>
+      <translation>Скрыть уведомления</translation>
+    </message>
+    <message>
+      <source>Pin Notifications</source>
+      <translation>Прикрепить панель оповещений</translation>
+    </message>
+    <message>
+      <source>Unpin Notifications</source>
+      <translation>Открепить панель оповещений</translation>
+    </message>
+  </context>
+  <context>
     <name>CustomHorizontalHeader</name>
     <message>
       <source>5 minutes</source>
@@ -117,6 +919,45 @@ to view more bookmarks</source>
     <message>
       <source>For all data</source>
       <translation>Для всех данных</translation>
+    </message>
+  </context>
+  <context>
+    <name>Deactivator</name>
+    <message>
+      <source>Unknown error</source>
+      <translation type="unfinished">Unknown error</translation>
+    </message>
+    <message>
+      <source>License does not exist</source>
+      <translation type="unfinished">License does not exist</translation>
+    </message>
+    <message>
+      <source>License is disabled</source>
+      <translation type="unfinished">License is disabled</translation>
+    </message>
+    <message>
+      <source>License is inactive</source>
+      <translation type="unfinished">License is inactive</translation>
+    </message>
+    <message>
+      <source>Invalid license</source>
+      <translation type="unfinished">Invalid license</translation>
+    </message>
+    <message>
+      <source>License is trial</source>
+      <translation type="unfinished">License is trial</translation>
+    </message>
+    <message>
+      <source>License is in deactivation process</source>
+      <translation type="unfinished">License is in deactivation process</translation>
+    </message>
+    <message>
+      <source>Invalid hardware id</source>
+      <translation type="unfinished">Invalid hardware id</translation>
+    </message>
+    <message>
+      <source>Limit exceeded</source>
+      <translation type="unfinished">Limit exceeded</translation>
     </message>
   </context>
   <context>
@@ -234,37 +1075,6 @@ to view more bookmarks</source>
     <message>
       <source>Permissions</source>
       <translation>Полномочия</translation>
-    </message>
-  </context>
-  <context>
-    <name>Ptz</name>
-    <message>
-      <source>Please wait for the camera to go online.</source>
-      <translation>Пожалуйста дождитесь включения камеры.</translation>
-    </message>
-    <message>
-      <source>Failed to get current position</source>
-      <translation>Не удалось получить текущую позицию</translation>
-    </message>
-    <message>
-      <source>Failed to set current position</source>
-      <translation>Не удалось задать текущую позицию</translation>
-    </message>
-    <message>
-      <source>Preset used by some tours. Delete it anyway?</source>
-      <translation>Позиция используется в нескольких турах. Удалить ее?</translation>
-    </message>
-    <message>
-      <source>These tours will become invalid.</source>
-      <translation>Эти туры станут недействительными.</translation>
-    </message>
-    <message>
-      <source>Cannot get the current position from camera &quot;%1&quot;</source>
-      <translation type="unfinished">Cannot get the current position from camera &quot;%1&quot;</translation>
-    </message>
-    <message>
-      <source>Cannot set the current position for camera &quot;%1&quot;</source>
-      <translation type="unfinished">Cannot set the current position for camera &quot;%1&quot;</translation>
     </message>
   </context>
   <context>
@@ -400,940 +1210,6 @@ to view more bookmarks</source>
     </message>
   </context>
   <context>
-    <name>QnActionManager</name>
-    <message>
-      <source>Show FPS</source>
-      <translation>Показать частоту кадров</translation>
-    </message>
-    <message>
-      <source>Hide FPS</source>
-      <translation>Скрыть частоту кадров</translation>
-    </message>
-    <message>
-      <source>Drop Resources</source>
-      <translation>Положить ресурсы</translation>
-    </message>
-    <message>
-      <source>Drop Resources into New Layout</source>
-      <translation>Поместить ресурсы на новую раскладку</translation>
-    </message>
-    <message>
-      <source>Delayed Open Video Wall</source>
-      <translation>Отложенный запуск видеостены</translation>
-    </message>
-    <message>
-      <source>Delayed Drop Resources</source>
-      <translation>Положить ресурсы при возможности</translation>
-    </message>
-    <message>
-      <source>Instant Drop Resources</source>
-      <translation>Положить ресурсы сразу</translation>
-    </message>
-    <message>
-      <source>Next Layout</source>
-      <translation>Следующая раскладка</translation>
-    </message>
-    <message>
-      <source>Previous Layout</source>
-      <translation>Предыдущая раскладка</translation>
-    </message>
-    <message>
-      <source>Select All</source>
-      <translation>Выбрать все</translation>
-    </message>
-    <message>
-      <source>Selection Changed</source>
-      <translation>Выборка изменена</translation>
-    </message>
-    <message>
-      <source>Filter...</source>
-      <translation>Фильтр...</translation>
-    </message>
-    <message>
-      <source>Go to Freespace Mode</source>
-      <translation>Перейти в режим Freespace</translation>
-    </message>
-    <message>
-      <source>Help</source>
-      <translation>Помощь</translation>
-    </message>
-    <message>
-      <source>Event Log...</source>
-      <translation>Журнал событий...</translation>
-    </message>
-    <message>
-      <source>Control Video Wall</source>
-      <translation>Управление видеостеной</translation>
-    </message>
-    <message>
-      <source>Push my screen</source>
-      <translation>Передать мой экоан</translation>
-    </message>
-    <message>
-      <source>Restart application</source>
-      <translation>Перезапуск приложения</translation>
-    </message>
-    <message>
-      <source>Select Time Server</source>
-      <translation>Выбрать сервер времени</translation>
-    </message>
-    <message>
-      <source>Go To Saved Position</source>
-      <translation>Переместиться на сохраненную позицию</translation>
-    </message>
-    <message>
-      <source>Activate PTZ Tour</source>
-      <translation>Активировать маршрут обхода</translation>
-    </message>
-    <message>
-      <source>Activate PTZ Object</source>
-      <translation>Активировать объект PTZ</translation>
-    </message>
-    <message>
-      <source>Fit in View</source>
-      <translation>Вписать в экран</translation>
-    </message>
-    <message>
-      <source>Main Menu</source>
-      <translation>Главное меню</translation>
-    </message>
-    <message>
-      <source>Connect to Server...</source>
-      <translation>Подключиться к серверу...</translation>
-    </message>
-    <message>
-      <source>Start Panic Recording</source>
-      <translation>Начать запись по тревоге</translation>
-    </message>
-    <message>
-      <source>Stop Panic Recording</source>
-      <translation>Остановить запись по тревоге</translation>
-    </message>
-    <message>
-      <source>New...</source>
-      <translation>Создать...</translation>
-    </message>
-    <message>
-      <source>New Layout...</source>
-      <translation>Создать раскладку...</translation>
-    </message>
-    <message>
-      <source>Tab</source>
-      <translation>Вкладку</translation>
-    </message>
-    <message>
-      <source>New Tab</source>
-      <translation>Создать вкладку</translation>
-    </message>
-    <message>
-      <source>Window</source>
-      <translation>Окно</translation>
-    </message>
-    <message>
-      <source>New Window</source>
-      <translation>Создать окно</translation>
-    </message>
-    <message>
-      <source>User...</source>
-      <translation>Пользователя...</translation>
-    </message>
-    <message>
-      <source>New User...</source>
-      <translation>Создать пользователя...</translation>
-    </message>
-    <message>
-      <source>Video Wall...</source>
-      <translation>Видеостену...</translation>
-    </message>
-    <message>
-      <source>New Video Wall...</source>
-      <translation>Новая видеостена...</translation>
-    </message>
-    <message>
-      <source>Open Layout...</source>
-      <translation>Открыть раскладку...</translation>
-    </message>
-    <message>
-      <source>Open...</source>
-      <translation>Открыть...</translation>
-    </message>
-    <message>
-      <source>File(s)...</source>
-      <translation>Файл(ы)...</translation>
-    </message>
-    <message>
-      <source>Folder...</source>
-      <translation>Папк(и)...</translation>
-    </message>
-    <message>
-      <source>Save Current Layout</source>
-      <translation>Сохранить раскладку</translation>
-    </message>
-    <message>
-      <source>Save Current Layout As...</source>
-      <translation>Сохранить раскладку как...</translation>
-    </message>
-    <message>
-      <source>Save Video Wall View</source>
-      <translation>Сохранить раскладку видеостены</translation>
-    </message>
-    <message>
-      <source>Start Screen Recording</source>
-      <translation>Начать захват экрана</translation>
-    </message>
-    <message>
-      <source>Stop Screen Recording</source>
-      <translation>Закончить захват экрана</translation>
-    </message>
-    <message>
-      <source>Stop current action</source>
-      <translation>Остановить текущее действие</translation>
-    </message>
-    <message>
-      <source>Go to Fullscreen</source>
-      <translation>На полный экран</translation>
-    </message>
-    <message>
-      <source>Exit Fullscreen</source>
-      <translation>В оконный режим</translation>
-    </message>
-    <message>
-      <source>Minimize</source>
-      <translation>Свернуть</translation>
-    </message>
-    <message>
-      <source>Maximize</source>
-      <translation>Развернуть</translation>
-    </message>
-    <message>
-      <source>Restore Down</source>
-      <translation>Уменьшить в окно</translation>
-    </message>
-    <message>
-      <source>Open in Browser...</source>
-      <translation>Открыть в браузере...</translation>
-    </message>
-    <message>
-      <source>System Administration...</source>
-      <translation>Администрирование системы...</translation>
-    </message>
-    <message>
-      <source>Open Web Client...</source>
-      <translation>Открыть Web клиент...</translation>
-    </message>
-    <message>
-      <source>System Update...</source>
-      <translation>Обновление системы...</translation>
-    </message>
-    <message>
-      <source>Local Settings...</source>
-      <translation>Локальные настройки...</translation>
-    </message>
-    <message>
-      <source>Merge Systems...</source>
-      <translation>Объединить системы...</translation>
-    </message>
-    <message>
-      <source>About...</source>
-      <translation>О программе...</translation>
-    </message>
-    <message>
-      <source>Exit</source>
-      <translation>Выход</translation>
-    </message>
-    <message>
-      <source>Server...</source>
-      <translation>Сервер...</translation>
-    </message>
-    <message>
-      <source>Open in Layout</source>
-      <translation>Открыть в раскладке</translation>
-    </message>
-    <message>
-      <source>Open</source>
-      <translation>Открыть</translation>
-    </message>
-    <message>
-      <source>Monitor</source>
-      <translation>Мониторинг</translation>
-    </message>
-    <message>
-      <source>Open in New Tab</source>
-      <translation>Открыть в новой вкладке</translation>
-    </message>
-    <message>
-      <source>Open in New Window</source>
-      <translation>Открыть в новом окне</translation>
-    </message>
-    <message>
-      <source>Open Layouts</source>
-      <translation>Открыть раскладки</translation>
-    </message>
-    <message>
-      <source>Open Layout(s)</source>
-      <translation>Открыть раскладк(и)</translation>
-    </message>
-    <message>
-      <source>Open Video Wall(s)</source>
-      <translation>Открыть видеостен(ы)</translation>
-    </message>
-    <message>
-      <source>Open Containing Folder</source>
-      <translation>Открыть в каталоге</translation>
-    </message>
-    <message>
-      <source>Identify</source>
-      <translation>Идентифицировать</translation>
-    </message>
-    <message>
-      <source>Attach to Video Wall...</source>
-      <translation>Прикрепить к видеостене...</translation>
-    </message>
-    <message>
-      <source>Switch to Video Wall mode...</source>
-      <translation>Переключиться в режим видеостены...</translation>
-    </message>
-    <message>
-      <source>Save Current Matrix</source>
-      <translation>Сохранить текущую матрицу</translation>
-    </message>
-    <message>
-      <source>Load Matrix</source>
-      <translation>Загрузить матрицу</translation>
-    </message>
-    <message>
-      <source>Delete</source>
-      <translation>Удалить</translation>
-    </message>
-    <message>
-      <source>Stop Video Wall</source>
-      <translation>Остановить видеостену</translation>
-    </message>
-    <message>
-      <source>Save Layout</source>
-      <translation>Сохранить раскладку</translation>
-    </message>
-    <message>
-      <source>Save Layout As...</source>
-      <translation>Сохранить раскладку как...</translation>
-    </message>
-    <message>
-      <source>Maximize Item</source>
-      <translation>Видео на полный экран</translation>
-    </message>
-    <message>
-      <source>Restore Item</source>
-      <translation>Видео в режим сетки</translation>
-    </message>
-    <message>
-      <source>Show Info</source>
-      <translation>Показать информацию</translation>
-    </message>
-    <message>
-      <source>Hide Info</source>
-      <translation>Скрыть информацию</translation>
-    </message>
-    <message>
-      <source>Toggle Info</source>
-      <translation>Показать/скрыть информацию</translation>
-    </message>
-    <message>
-      <source>Change Resolution...</source>
-      <translation>Изменить разрешение...</translation>
-    </message>
-    <message>
-      <source>Auto</source>
-      <translation>Авто</translation>
-    </message>
-    <message>
-      <source>Low</source>
-      <translation>Низкое</translation>
-    </message>
-    <message>
-      <source>High</source>
-      <translation>Высокое</translation>
-    </message>
-    <message>
-      <source>PTZ...</source>
-      <translation>PTZ...</translation>
-    </message>
-    <message>
-      <source>Save Current Position...</source>
-      <translation>Записать позицию...</translation>
-    </message>
-    <message>
-      <source>Manage...</source>
-      <translation>Настроить...</translation>
-    </message>
-    <message>
-      <source>Calibrate Fisheye</source>
-      <translation>Калибровка камер "Рыбий глаз"</translation>
-    </message>
-    <message>
-      <source>Toggle Resolution Mode</source>
-      <translation>Переключение разрешения</translation>
-    </message>
-    <message>
-      <source>Show Motion/Smart Search</source>
-      <translation>Показать движение/поиск по движению</translation>
-    </message>
-    <message>
-      <source>Show Motion</source>
-      <translation>Показать движение</translation>
-    </message>
-    <message>
-      <source>Hide Motion/Smart Search</source>
-      <translation>Скрыть движение/поиск по движению</translation>
-    </message>
-    <message>
-      <source>Hide Motion</source>
-      <translation>Скрыть движение</translation>
-    </message>
-    <message>
-      <source>Clear Motion Selection</source>
-      <translation>Очистить регион поиска движения</translation>
-    </message>
-    <message>
-      <source>Toggle Smart Search</source>
-      <translation>Переключение в режим поиска движения</translation>
-    </message>
-    <message>
-      <source>Check File Watermark</source>
-      <translation>Проверить целостность файла</translation>
-    </message>
-    <message>
-      <source>Take Screenshot</source>
-      <translation>Сделать стоп-кадр</translation>
-    </message>
-    <message>
-      <source>Image Enhancement...</source>
-      <translation>Коррекция изображения...</translation>
-    </message>
-    <message>
-      <source>Create Zoom Window</source>
-      <translation>Создать окно приближения</translation>
-    </message>
-    <message>
-      <source>Rotate to...</source>
-      <translation>Повернуть на...</translation>
-    </message>
-    <message>
-      <source>0 degrees</source>
-      <translation>0 градусов</translation>
-    </message>
-    <message>
-      <source>90 degrees</source>
-      <translation>90 градусов</translation>
-    </message>
-    <message>
-      <source>180 degrees</source>
-      <translation>180 градусов</translation>
-    </message>
-    <message>
-      <source>270 degrees</source>
-      <translation>270 градусов</translation>
-    </message>
-    <message>
-      <source>Remove from Layout</source>
-      <translation>Убрать с раскладки</translation>
-    </message>
-    <message>
-      <source>Rename</source>
-      <translation>Переименовать</translation>
-    </message>
-    <message>
-      <source>Delete from Disk</source>
-      <translation>Удалить с диска</translation>
-    </message>
-    <message>
-      <source>Set as Layout Background</source>
-      <translation>Установить как фон на раскладку</translation>
-    </message>
-    <message>
-      <source>User Settings...</source>
-      <translation>Настройки пользователя...</translation>
-    </message>
-    <message>
-      <source>Layout Settings...</source>
-      <translation>Настройки раскладки...</translation>
-    </message>
-    <message>
-      <source>Video Wall Settings...</source>
-      <translation>Настройки видеостены...</translation>
-    </message>
-    <message>
-      <source>Ping...</source>
-      <translation>Пинг...</translation>
-    </message>
-    <message>
-      <source>Server Logs...</source>
-      <translation>Журнал сервера...</translation>
-    </message>
-    <message>
-      <source>Server Diagnostics...</source>
-      <translation>Диагностика сервера...</translation>
-    </message>
-    <message>
-      <source>Server Settings...</source>
-      <translation>Настройки сервера...</translation>
-    </message>
-    <message>
-      <source>Merge to Currently Connected System...</source>
-      <translation>Присоединить сервер к текущей системе...</translation>
-    </message>
-    <message>
-      <source>Change Cell Aspect Ratio...</source>
-      <translation>Соотношение сторон ячеек...</translation>
-    </message>
-    <message>
-      <source>Change Cell Spacing...</source>
-      <translation>Расстояние между ячейками...</translation>
-    </message>
-    <message>
-      <source>None</source>
-      <translation>Нет</translation>
-    </message>
-    <message>
-      <source>Small</source>
-      <translation>Маленькое</translation>
-    </message>
-    <message>
-      <source>Medium</source>
-      <translation>Среднее</translation>
-    </message>
-    <message>
-      <source>Large</source>
-      <translation>Большое</translation>
-    </message>
-    <message>
-      <source>Start Tour</source>
-      <translation>Начать тур</translation>
-    </message>
-    <message>
-      <source>Stop Tour</source>
-      <translation>Закончить тур</translation>
-    </message>
-    <message>
-      <source>Close</source>
-      <translation>Закрыть</translation>
-    </message>
-    <message>
-      <source>Close All But This</source>
-      <translation>Закрыть все кроме этой</translation>
-    </message>
-    <message>
-      <source>Mark Selection Start</source>
-      <translation>Отметить начало выделения</translation>
-    </message>
-    <message>
-      <source>Mark Selection End</source>
-      <translation>Отметить конец выделения</translation>
-    </message>
-    <message>
-      <source>Clear Selection</source>
-      <translation>Очистить выделение</translation>
-    </message>
-    <message>
-      <source>Zoom to Selection</source>
-      <translation>Приблизить выделенный фрагмент</translation>
-    </message>
-    <message>
-      <source>Edit Bookmark...</source>
-      <translation>Редактировать закладку...</translation>
-    </message>
-    <message>
-      <source>Remove Bookmark...</source>
-      <translation>Удалить закладку...</translation>
-    </message>
-    <message>
-      <source>Export Selected Area...</source>
-      <translation>Экспорт выбранного фрагмента...</translation>
-    </message>
-    <message>
-      <source>Export Multi-Video...</source>
-      <translation>Мульти-Видео Экспорт...</translation>
-    </message>
-    <message>
-      <source>Preview Search...</source>
-      <translation>Поиск по интервалам...</translation>
-    </message>
-    <message>
-      <source>Play</source>
-      <translation>Воспроизведение</translation>
-    </message>
-    <message>
-      <source>Pause</source>
-      <translation>Пауза</translation>
-    </message>
-    <message>
-      <source>Previous Frame</source>
-      <translation>Предыдущий кадр</translation>
-    </message>
-    <message>
-      <source>Next Frame</source>
-      <translation>Следующий кадр</translation>
-    </message>
-    <message>
-      <source>To Start</source>
-      <translation>В начало</translation>
-    </message>
-    <message>
-      <source>To End</source>
-      <translation>В конец</translation>
-    </message>
-    <message>
-      <source>Volume Down</source>
-      <translation>Тише</translation>
-    </message>
-    <message>
-      <source>Volume Up</source>
-      <translation>Громче</translation>
-    </message>
-    <message>
-      <source>Toggle Mute</source>
-      <translation>Вкл/Выкл звук</translation>
-    </message>
-    <message>
-      <source>Jump to Live</source>
-      <translation>Видео в реальном времени</translation>
-    </message>
-    <message>
-      <source>Synchronize Streams</source>
-      <translation>Сонхронизация видео</translation>
-    </message>
-    <message>
-      <source>Disable Stream Synchronization</source>
-      <translation>Отключить синхронизацию видео</translation>
-    </message>
-    <message>
-      <source>Show Thumbnails</source>
-      <translation>Показать миниатюры</translation>
-    </message>
-    <message>
-      <source>Hide Thumbnails</source>
-      <translation>Скрыть миниатюры</translation>
-    </message>
-    <message>
-      <source>Show Calendar</source>
-      <translation>Показать календарь</translation>
-    </message>
-    <message>
-      <source>Hide Calendar</source>
-      <translation>Скрыть календарь</translation>
-    </message>
-    <message>
-      <source>Show Title Bar</source>
-      <translation>Показать заголовок</translation>
-    </message>
-    <message>
-      <source>Hide Title Bar</source>
-      <translation>Скрыть заголовок</translation>
-    </message>
-    <message>
-      <source>Pin Tree</source>
-      <translation>Прикрепить дерево</translation>
-    </message>
-    <message>
-      <source>Unpin Tree</source>
-      <translation>Открепить дерево</translation>
-    </message>
-    <message>
-      <source>Show Tree</source>
-      <translation>Показать дерево</translation>
-    </message>
-    <message>
-      <source>Hide Tree</source>
-      <translation>Скрыть дерево</translation>
-    </message>
-    <message>
-      <source>Show Timeline</source>
-      <translation>Показать шкалу времени</translation>
-    </message>
-    <message>
-      <source>Hide Timeline</source>
-      <translation>Скрыть шкалу времени</translation>
-    </message>
-    <message>
-      <source>Pin Notifications</source>
-      <translation>Прикрепить панель оповещений</translation>
-    </message>
-    <message>
-      <source>Unpin Notifications</source>
-      <translation>Открепить панель оповещений</translation>
-    </message>
-    <message>
-      <source>File Settings...</source>
-      <translation>Настройки...</translation>
-    </message>
-    <message>
-      <source>User Management...</source>
-      <translation>Управление пользователями...</translation>
-    </message>
-    <message>
-      <source>Audit Trail...</source>
-      <translation>Аудит...</translation>
-    </message>
-    <message>
-      <source>Failover Priority...</source>
-      <translation>Приоритет резервирования...</translation>
-    </message>
-    <message>
-      <source>Move Devices</source>
-      <translation>Переместить устройства</translation>
-    </message>
-    <message>
-      <source>Move Cameras</source>
-      <translation>Переместить камеры</translation>
-    </message>
-    <message>
-      <source>Device Diagnostics...</source>
-      <translation>Диагностика устройства...</translation>
-    </message>
-    <message>
-      <source>Camera Diagnostics...</source>
-      <translation>Диагностика камеры...</translation>
-    </message>
-    <message>
-      <source>Devices List</source>
-      <translation>Список устройств</translation>
-    </message>
-    <message>
-      <source>Cameras List</source>
-      <translation>Список камер</translation>
-    </message>
-    <message>
-      <source>Check Device Issues...</source>
-      <translation>Проверить устройство на ошибки...</translation>
-    </message>
-    <message>
-      <source>Check Devices Issues...</source>
-      <translation>Проверить устройства на ошибки...</translation>
-    </message>
-    <message>
-      <source>Check Camera Issues...</source>
-      <translation>Проверить камеру на ошибки...</translation>
-    </message>
-    <message>
-      <source>Check Cameras Issues...</source>
-      <translation>Проверить камеры на ошибки...</translation>
-    </message>
-    <message>
-      <source>Device Rules...</source>
-      <translation>Правила для устройства...</translation>
-    </message>
-    <message>
-      <source>Devices Rules...</source>
-      <translation>Правила для устройств...</translation>
-    </message>
-    <message>
-      <source>Camera Rules...</source>
-      <translation>Правила для камеры...</translation>
-    </message>
-    <message>
-      <source>Cameras Rules...</source>
-      <translation>Правила для камер...</translation>
-    </message>
-    <message>
-      <source>Device Settings...</source>
-      <translation>Настройки устройства...</translation>
-    </message>
-    <message>
-      <source>Devices Settings...</source>
-      <translation>Настройки устройств...</translation>
-    </message>
-    <message>
-      <source>Camera Settings...</source>
-      <translation>Настройки камеры...</translation>
-    </message>
-    <message>
-      <source>Cameras Settings...</source>
-      <translation>Настройки камер...</translation>
-    </message>
-    <message>
-      <source>Devices List by Server...</source>
-      <translation>Список устройств на сервере...</translation>
-    </message>
-    <message>
-      <source>Cameras List by Server...</source>
-      <translation>Список камер на сервере...</translation>
-    </message>
-    <message>
-      <source>Cameras to Backup...</source>
-      <translation>Камеры для резервного копирования...</translation>
-    </message>
-    <message>
-      <source>Show Bookmarks</source>
-      <translation>Показать закладки</translation>
-    </message>
-    <message>
-      <source>Hide Bookmarks</source>
-      <translation>Скрыть закладки</translation>
-    </message>
-    <message>
-      <source>Pin Calendar</source>
-      <translation>Прикрепить календарь</translation>
-    </message>
-    <message>
-      <source>Unpin Calendar</source>
-      <translation>Открепить календарь</translation>
-    </message>
-    <message>
-      <source>I/O Module Diagnostics...</source>
-      <translation>Диагностика модуля ввода/вывода...</translation>
-    </message>
-    <message>
-      <source>Web Client...</source>
-      <translation>Web клиент...</translation>
-    </message>
-    <message>
-      <source>Bookmark Search...</source>
-      <translation>Поиск по закладкам...</translation>
-    </message>
-    <message>
-      <source>Open in Alarm Layout</source>
-      <translation>Открыть на тревожной раскладке</translation>
-    </message>
-    <message>
-      <source>Check I/O Module Issues...</source>
-      <translation>Проверить модуль ввода-вывода на ошибки...</translation>
-    </message>
-    <message>
-      <source>Check I/O Modules Issues...</source>
-      <translation>Проверить модули ввода-вывода на ошибки...</translation>
-    </message>
-    <message>
-      <source>I/O Module Rules...</source>
-      <translation>Правила для модуля ввода-вывода...</translation>
-    </message>
-    <message>
-      <source>I/O Modules Rules...</source>
-      <translation>Правила для модулей ввода-вывода...</translation>
-    </message>
-    <message>
-      <source>I/O Module Settings...</source>
-      <translation>Настройки модуля ввода-вывода...</translation>
-    </message>
-    <message>
-      <source>I/O Modules Settings...</source>
-      <translation>Настройки модулей ввода-вывода...</translation>
-    </message>
-    <message>
-      <source>Remove Bookmarks...</source>
-      <translation>Удалить закладки...</translation>
-    </message>
-    <message>
-      <source>Monitor in New Tab</source>
-      <translation>Открыть мониторинг в новой вкладке</translation>
-    </message>
-    <message>
-      <source>Monitor in New Window</source>
-      <translation>Открыть мониторинг в новом окне</translation>
-    </message>
-    <message>
-      <source>Open Layout in New Tab</source>
-      <translation>Открыть раскладку в новой вкладке</translation>
-    </message>
-    <message>
-      <source>Open Layout(s) in New Window</source>
-      <translation>Открыть раскладку в новом окне</translation>
-    </message>
-    <message>
-      <source>Open Current Layout in New Window</source>
-      <translation>Открыть эту раскладку в новом окне</translation>
-    </message>
-    <message>
-      <source>Add Bookmark...</source>
-      <translation>Добавить закладку...</translation>
-    </message>
-    <message>
-      <source>Export Rapid Review...</source>
-      <translation>Экспорт с быстрой прокруткой...</translation>
-    </message>
-    <message>
-      <source>Event Rules...</source>
-      <translation>Правила событий...</translation>
-    </message>
-    <message>
-      <source>Disconnect from Server</source>
-      <translation>Отключение от сервера</translation>
-    </message>
-    <message>
-      <source>Browse Local Files</source>
-      <translation>Просмотр локальных файлов</translation>
-    </message>
-    <message>
-      <source>Show Welcome Screen</source>
-      <translation>Показать заставку</translation>
-    </message>
-    <message>
-      <source>Web Page...</source>
-      <translation>Web-страница...</translation>
-    </message>
-    <message>
-      <source>New Web Page...</source>
-      <translation>Новая web-страница...</translation>
-    </message>
-    <message>
-      <source>Log in to %1...</source>
-      <comment>Log in to Nx Cloud</comment>
-      <translation>Войти в %1...</translation>
-    </message>
-    <message>
-      <source>Log out from %1</source>
-      <comment>Log out from Nx Cloud</comment>
-      <translation>Отсоединиться от %1</translation>
-    </message>
-    <message>
-      <source>Open %1 Portal...</source>
-      <comment>Open Nx Cloud Portal</comment>
-      <translation>Открыть портал %1...</translation>
-    </message>
-    <message>
-      <source>Stop Sharing Layout</source>
-      <translation>Убрать раскладку из общего</translation>
-    </message>
-    <message>
-      <source>User Roles...</source>
-      <translation>Роли пользователей...</translation>
-    </message>
-    <message>
-      <source>Role Settings...</source>
-      <translation>Настройки роли...</translation>
-    </message>
-    <message>
-      <source>Show Notifications</source>
-      <translation>Показать уведомления</translation>
-    </message>
-    <message>
-      <source>Hide Notifications</source>
-      <translation>Скрыть уведомления</translation>
-    </message>
-    <message>
-      <source>Connect to System</source>
-      <translation>Подключиться к системе</translation>
-    </message>
-    <message>
-      <source>Account Settings...</source>
-      <translation>Настройки учётной записи...</translation>
-    </message>
-    <message>
-      <source>Create Account...</source>
-      <translation>Создать учётную запись...</translation>
-    </message>
-    <message>
-      <source>Server Web Page...</source>
-      <translation>Открыть web-страницу сервера...</translation>
-    </message>
-    <message>
-      <source>Add Device...</source>
-      <translation>Добавить устройство...</translation>
-    </message>
-    <message>
-      <source>Clear Screen</source>
-      <translation>Очистить экран</translation>
-    </message>
-  </context>
-  <context>
     <name>QnAdjustVideoDialog</name>
     <message>
       <source>Image Enhancement</source>
@@ -1349,13 +1225,6 @@ to view more bookmarks</source>
     <message>
       <source>Folder not found</source>
       <translation>Папка не найдена</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnAlarmLayoutResource</name>
-    <message>
-      <source>Alarms</source>
-      <translation>Тревога</translation>
     </message>
   </context>
   <context>
@@ -1805,17 +1674,6 @@ to view more bookmarks</source>
     </message>
   </context>
   <context>
-    <name>QnBusinessRuleItemDelegate</name>
-    <message>
-      <source>For Administrators Only</source>
-      <translation>Только администраторам</translation>
-    </message>
-    <message>
-      <source>For Users</source>
-      <translation>Для пользователей</translation>
-    </message>
-  </context>
-  <context>
     <name>QnBusinessRuleViewModel</name>
     <message numerus="yes">
       <source>%n Server(s)</source>
@@ -1840,10 +1698,6 @@ to view more bookmarks</source>
     <message>
       <source>Starts</source>
       <translation>Начинается</translation>
-    </message>
-    <message>
-      <source>Administrators Only</source>
-      <translation>Только администраторам</translation>
     </message>
     <message>
       <source>Select at least one device</source>
@@ -1872,10 +1726,6 @@ to view more bookmarks</source>
     <message>
       <source>N/A</source>
       <translation>Нет</translation>
-    </message>
-    <message>
-      <source>Users</source>
-      <translation>Пользователи</translation>
     </message>
     <message>
       <source>Every %1</source>
@@ -3268,10 +3118,6 @@ to %1</source>
   <context>
     <name>QnEventLogModel</name>
     <message>
-      <source>Administrators Only</source>
-      <translation>Только администраторам</translation>
-    </message>
-    <message>
       <source>Motion video</source>
       <translation>Движение в видео</translation>
     </message>
@@ -3313,20 +3159,8 @@ to %1</source>
       </translation>
     </message>
     <message>
-      <source>Users</source>
-      <translation>Пользователи</translation>
-    </message>
-    <message>
       <source>Open camera</source>
       <translation>Открыть камеру</translation>
-    </message>
-    <message numerus="yes">
-      <source>%n users</source>
-      <translation>
-        <numerusform>%n user</numerusform>
-        <numerusform>%n пользователя</numerusform>
-        <numerusform>%n пользователей</numerusform>
-      </translation>
     </message>
     <message numerus="yes">
       <source>and %n users more...</source>
@@ -3344,9 +3178,17 @@ to %1</source>
         <numerusform>и ещё %n...</numerusform>
       </translation>
     </message>
+    <message numerus="yes">
+      <source>%n Removed subjects</source>
+      <translation type="unfinished">
+        <numerusform>%n Removed subjects</numerusform>
+        <numerusform>%n Removed subjects</numerusform>
+        <numerusform>%n Removed subjects</numerusform>
+      </translation>
+    </message>
     <message>
-      <source>User removed</source>
-      <translation>Пользователь удалён</translation>
+      <source>Subject removed</source>
+      <translation type="unfinished">Subject removed</translation>
     </message>
   </context>
   <context>
@@ -4044,6 +3886,98 @@ to %1</source>
       <source>This license is already activated and linked to hardware ID %1 on %2</source>
       <translation>Эта лицензия уже активирована и связана с аппаратным ID %1 на %2</translation>
     </message>
+    <message numerus="yes">
+      <source>%n channels</source>
+      <translation type="unfinished">
+        <numerusform>%n channels</numerusform>
+        <numerusform>%n channels</numerusform>
+        <numerusform>%n channels</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Deactivate licenses?</source>
+      <translation type="unfinished">
+        <numerusform>Deactivate licenses?</numerusform>
+        <numerusform>Deactivate licenses?</numerusform>
+        <numerusform>Deactivate licenses?</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Failed to deactivate license</source>
+      <translation type="unfinished">Failed to deactivate license</translation>
+    </message>
+    <message numerus="yes">
+      <source>Failed to deactivate %n licenses</source>
+      <translation type="unfinished">
+        <numerusform>Failed to deactivate %n licenses</numerusform>
+        <numerusform>Failed to deactivate %n licenses</numerusform>
+        <numerusform>Failed to deactivate %n licenses</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%1 of %n licenses cannot be deactivated</source>
+      <translation type="unfinished">
+        <numerusform>%1 of %n licenses cannot be deactivated</numerusform>
+        <numerusform>%1 of %n licenses cannot be deactivated</numerusform>
+        <numerusform>%1 of %n licenses cannot be deactivated</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Please contact Customer Support</source>
+      <translation type="unfinished">Please contact Customer Support</translation>
+    </message>
+    <message numerus="yes">
+      <source>Deactivate %n other</source>
+      <translation type="unfinished">
+        <numerusform>Deactivate %n other</numerusform>
+        <numerusform>Deactivate %n other</numerusform>
+        <numerusform>Deactivate %n other</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Cannot deactivate licenses</source>
+      <translation type="unfinished">
+        <numerusform>Cannot deactivate licenses</numerusform>
+        <numerusform>Cannot deactivate licenses</numerusform>
+        <numerusform>Cannot deactivate licenses</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Cannot connect to the License Server</source>
+      <translation type="unfinished">Cannot connect to the License Server</translation>
+    </message>
+    <message>
+      <source>Please make sure your server has active Internet connection or check firewall settings.</source>
+      <translation type="unfinished">Please make sure your server has active Internet connection or check firewall settings.</translation>
+    </message>
+    <message>
+      <source>License Server error</source>
+      <translation type="unfinished">License Server error</translation>
+    </message>
+    <message>
+      <source>If the problem presists please contact Customer Support.</source>
+      <translation type="unfinished">If the problem presists please contact Customer Support.</translation>
+    </message>
+    <message>
+      <source>License deactivated</source>
+      <translation type="unfinished">License deactivated</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n licenses deactivated</source>
+      <translation type="unfinished">
+        <numerusform>%n licenses deactivated</numerusform>
+        <numerusform>%n licenses deactivated</numerusform>
+        <numerusform>%n licenses deactivated</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Remove</source>
+      <translation>Удалить</translation>
+    </message>
+    <message>
+      <source>Deactivate</source>
+      <translation type="unfinished">Deactivate</translation>
+    </message>
   </context>
   <context>
     <name>QnLicenseWidget</name>
@@ -4343,6 +4277,15 @@ to %1</source>
       <source>Lo-Res</source>
       <translation>Низ</translation>
     </message>
+    <message>
+      <source>press and hold</source>
+      <comment>Software Trigger</comment>
+      <translation type="unfinished">press and hold</translation>
+    </message>
+    <message>
+      <source>Failed to invoke trigger %1 (%2)</source>
+      <translation type="unfinished">Failed to invoke trigger %1 (%2)</translation>
+    </message>
   </context>
   <context>
     <name>QnMergeSystemsDialog</name>
@@ -4574,6 +4517,22 @@ to %1</source>
       <source>Alarm: %1</source>
       <translation>Тревога: %1</translation>
     </message>
+    <message>
+      <source>Bookmark it</source>
+      <translation type="unfinished">Bookmark it</translation>
+    </message>
+    <message>
+      <source>Bookmark created</source>
+      <translation type="unfinished">Bookmark created</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n bookmarks created</source>
+      <translation type="unfinished">
+        <numerusform>%n bookmarks created</numerusform>
+        <numerusform>%n bookmarks created</numerusform>
+        <numerusform>%n bookmarks created</numerusform>
+      </translation>
+    </message>
   </context>
   <context>
     <name>QnPerformanceTest</name>
@@ -4629,8 +4588,8 @@ to %1</source>
       <translation>Другие действия</translation>
     </message>
     <message>
-      <source>PTZ, Device Output, 2-way Audio</source>
-      <translation>PTZ, выводы устройств, 2x-сторонний звук</translation>
+      <source>PTZ, Device Output, 2-Way Audio, Software Triggers.</source>
+      <translation type="unfinished">PTZ, Device Output, 2-Way Audio, Software Triggers.</translation>
     </message>
   </context>
   <context>
@@ -4758,19 +4717,6 @@ to %1</source>
     <message>
       <source>Hotkey used by tour &quot;%1&quot;</source>
       <translation type="unfinished">Hotkey used by tour &quot;%1&quot;</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnPtzPresetsToursActionFactory</name>
-    <message>
-      <source>%1 (active)</source>
-      <comment>Template for active PTZ preset</comment>
-      <translation>%1 (активен)</translation>
-    </message>
-    <message>
-      <source>%1 (active)</source>
-      <comment>Template for active PTZ tour</comment>
-      <translation>%1 (активен)</translation>
     </message>
   </context>
   <context>
@@ -5089,6 +5035,14 @@ to %1</source>
     <message>
       <source>Local Files</source>
       <translation>Локальные файлы</translation>
+    </message>
+    <message>
+      <source>Layout Tours</source>
+      <translation type="unfinished">Layout Tours</translation>
+    </message>
+    <message>
+      <source>Layout Tour</source>
+      <translation type="unfinished">Layout Tour</translation>
     </message>
   </context>
   <context>
@@ -5639,29 +5593,6 @@ to %1</source>
     </message>
   </context>
   <context>
-    <name>QnShowOnAlarmLayoutActionWidget</name>
-    <message numerus="yes">
-      <source>%n Users</source>
-      <translation>
-        <numerusform>%n User</numerusform>
-        <numerusform>%n пользователя</numerusform>
-        <numerusform>%n пользователей</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>%n Roles</source>
-      <translation>
-        <numerusform>%n Role</numerusform>
-        <numerusform>%n роли</numerusform>
-        <numerusform>%n ролей</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>All Users</source>
-      <translation>Все пользователи</translation>
-    </message>
-  </context>
-  <context>
     <name>QnShowTextOverlayActionWidget</name>
     <message>
       <source>Html tags could be used within custom text:
@@ -6135,6 +6066,10 @@ to %1</source>
       <source>%1 GB</source>
       <translation>%1 ГБ</translation>
     </message>
+    <message>
+      <source>Too small and system partitions are reserved and not used for writing if there is enough other storage space available.</source>
+      <translation type="unfinished">Too small and system partitions are reserved and not used for writing if there is enough other storage space available.</translation>
+    </message>
   </context>
   <context>
     <name>QnStorageRebuildWidget</name>
@@ -6191,6 +6126,13 @@ to %1</source>
     </message>
   </context>
   <context>
+    <name>QnSubjectTargetActionWidget</name>
+    <message>
+      <source>Select at least one user...</source>
+      <translation type="unfinished">Select at least one user...</translation>
+    </message>
+  </context>
+  <context>
     <name>QnSystemAdministrationDialog</name>
     <message>
       <source>General</source>
@@ -6234,10 +6176,6 @@ to %1</source>
     <message>
       <source>Email server is not set</source>
       <translation>Не настроен сервер Email</translation>
-    </message>
-    <message>
-      <source>Connection to server lost</source>
-      <translation>Соединение с сервером разорвано</translation>
     </message>
     <message>
       <source>Select server for others to synchronize time with</source>
@@ -6401,12 +6339,16 @@ to %1</source>
   <context>
     <name>QnTimeServerSelectionWidget</name>
     <message>
-      <source>Time is taken from the Internet.</source>
-      <translation>Время интернета.</translation>
+      <source>System time is synchronized with the Internet and is independent from server local times.</source>
+      <translation type="unfinished">System time is synchronized with the Internet and is independent from server local times.</translation>
     </message>
     <message>
-      <source>Time is taken from %1.</source>
-      <translation>Время %1.</translation>
+      <source>System time is synchronized with selected server local time and is independent from other servers.</source>
+      <translation type="unfinished">System time is synchronized with selected server local time and is independent from other servers.</translation>
+    </message>
+    <message>
+      <source>No server has Internet access. Time is not being synchronized.</source>
+      <translation type="unfinished">No server has Internet access. Time is not being synchronized.</translation>
     </message>
   </context>
   <context>
@@ -6942,198 +6884,33 @@ to %1</source>
     </message>
   </context>
   <context>
-    <name>QnWorkbenchActionHandler</name>
+    <name>QnWebpageDialog</name>
     <message>
-      <source>Layout is locked and cannot be changed.</source>
-      <translation>Раскладка заблокирована и не может быть изменена.</translation>
-    </message>
-    <message>
-      <source>All Supported (*.nov *.avi *.mkv *.mp4 *.mov *.ts *.m2ts *.mpeg *.mpg *.flv *.wmv *.3gp *.jpg *.png *.gif *.bmp *.tiff)</source>
-      <translation>Все поддерживаемые (*.nov *.avi *.mkv *.mp4 *.mov *.ts *.m2ts *.mpeg *.mpg *.flv *.wmv *.3gp *.jpg *.png *.gif *.bmp *.tiff)</translation>
+      <source>Name</source>
+      <translation>Имя</translation>
     </message>
     <message>
-      <source>Video (*.avi *.mkv *.mp4 *.mov *.ts *.m2ts *.mpeg *.mpg *.flv *.wmv *.3gp)</source>
-      <translation>Видео (*.avi *.mkv *.mp4 *.mov *.ts *.m2ts *.mpeg *.mpg *.flv *.wmv *.3gp)</translation>
+      <source>URL</source>
+      <translation>URL</translation>
     </message>
     <message>
-      <source>Pictures (*.jpg *.png *.gif *.bmp *.tiff)</source>
-      <translation>Изображения (*.jpg *.png *.gif *.bmp *.tiff)</translation>
+      <source>URL cannot be empty.</source>
+      <translation type="unfinished">URL cannot be empty.</translation>
     </message>
     <message>
-      <source>All files (*.*)</source>
-      <translation>Все файлы (*.*)</translation>
+      <source>Wrong URL format.</source>
+      <translation type="unfinished">Wrong URL format.</translation>
     </message>
     <message>
-      <source>Select folder...</source>
-      <translation>Выбрать каталог...</translation>
+      <source>Web Page</source>
+      <translation type="unfinished">Web Page</translation>
     </message>
+  </context>
+  <context>
+    <name>QnWorkbenchAlarmLayoutHandler</name>
     <message>
-      <source>Preview Search for %1</source>
-      <translation>Поиск по фрагментам для %1</translation>
-    </message>
-    <message>
-      <source>Rename</source>
-      <translation>Переименовать</translation>
-    </message>
-    <message>
-      <source>Enter new name for the selected item:</source>
-      <translation>Введите новое имя для выбранного элемента:</translation>
-    </message>
-    <message>
-      <source>Update...</source>
-      <translation>Обновление...</translation>
-    </message>
-    <message>
-      <source>Beta version %1</source>
-      <translation>Бета-версия %1</translation>
-    </message>
-    <message>
-      <source>Open File</source>
-      <translation>Открыть файл</translation>
-    </message>
-    <message>
-      <source>Updating Background...</source>
-      <translation>Обновление заднего фона...</translation>
-    </message>
-    <message>
-      <source>Image processing may take a few moments. Please be patient.</source>
-      <translation>Обработка изображения может занять длительное время. Наберитесь терпения.</translation>
-    </message>
-    <message numerus="yes">
-      <source>Are you sure you want to permanently delete these %n files?</source>
-      <translation>
-        <numerusform>Вы уверены, что хотите навсегда удалить %n файл?</numerusform>
-        <numerusform>Вы уверены, что хотите навсегда удалить эти %n файла?</numerusform>
-        <numerusform>Вы уверены, что хотите навсегда удалить эти %n файлов?</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>Confirm files deleting</source>
-      <translation>Подтвердите удаление файлов</translation>
-    </message>
-    <message>
-      <source>Client</source>
-      <translation>Клиент</translation>
-    </message>
-    <message>
-      <source>Server</source>
-      <translation>Сервер</translation>
-    </message>
-    <message numerus="yes">
-      <source>Failed to move %n devices</source>
-      <translation>
-        <numerusform>Failed to move %n device</numerusform>
-        <numerusform>Не удалось переместить %n устройства</numerusform>
-        <numerusform>Не удалось переместить %n устройств</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>Failed to move %n cameras</source>
-      <translation>
-        <numerusform>Failed to move %n camera</numerusform>
-        <numerusform>Не удалось переместить %n камеры</numerusform>
-        <numerusform>Не удалось переместить %n камер</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>Failed to move %n I/O Modules</source>
-      <translation>
-        <numerusform>Failed to move %n I/O Module</numerusform>
-        <numerusform>Не удалось переместить %n модуля ввода-вывода</numerusform>
-        <numerusform>Не удалось переместить %n модулей ввода-вывода</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>Server &quot;%1&quot; is not responding.</source>
-      <translation type="unfinished">Server &quot;%1&quot; is not responding.</translation>
-    </message>
-    <message>
-      <source>Move</source>
-      <translation>Переместить</translation>
-    </message>
-    <message>
-      <source>Too short period selected</source>
-      <translation>Выбран слишком короткий период</translation>
-    </message>
-    <message>
-      <source>Cancel device adding?</source>
-      <translation>Отменить добавление устройств?</translation>
-    </message>
-    <message>
-      <source>There is another user with the same name</source>
-      <translation>Существует другой пользователь с тем же именем</translation>
-    </message>
-    <message>
-      <source>Image too big</source>
-      <translation>Изображение слишком большое</translation>
-    </message>
-    <message>
-      <source>Maximum size is %1 MB.</source>
-      <translation>Максимальный размер составляет %1 МБ.</translation>
-    </message>
-    <message>
-      <source>Failed to upload image</source>
-      <translation>Не удалось загрузить изображение</translation>
-    </message>
-    <message>
-      <source>Please update all components to the version %1</source>
-      <translation>Пожалуйста, обновите все компоненты системы на версию %1</translation>
-    </message>
-    <message>
-      <source>Some functionality may be unavailable or not working properly.</source>
-      <translation>Некоторые функции могут быть недоступны или не работать должным образом.</translation>
-    </message>
-    <message>
-      <source>It will be used by software development team to improve your user experience.</source>
-      <translation>Она будет использоваться командой разработки для того чтобы сделать систему проще и понятнее для пользователей.</translation>
-    </message>
-    <message>
-      <source>Failed to open server web page</source>
-      <translation>Не удалось открыть web-страницу сервера</translation>
-    </message>
-    <message>
-      <source>Skip</source>
-      <translation>Пропустить</translation>
-    </message>
-    <message>
-      <source>Cannot perform Preview Search. Please select a period of 15 seconds or longer.</source>
-      <translation>Не удаётся выполнить поиск по интервалам. Пожалуйста, выберите период 15 секунд или дольше.</translation>
-    </message>
-    <message numerus="yes">
-      <source>Server &quot;%1&quot; cannot access %n devices. Move them anyway?</source>
-      <translation type="unfinished">
-        <numerusform>Server &quot;%1&quot; cannot access %n devices. Move them anyway?</numerusform>
-        <numerusform>Server &quot;%1&quot; cannot access %n devices. Move them anyway?</numerusform>
-        <numerusform>Server &quot;%1&quot; cannot access %n devices. Move them anyway?</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>Server &quot;%1&quot; cannot access %n cameras. Move them anyway?</source>
-      <translation type="unfinished">
-        <numerusform>Server &quot;%1&quot; cannot access %n cameras. Move them anyway?</numerusform>
-        <numerusform>Server &quot;%1&quot; cannot access %n cameras. Move them anyway?</numerusform>
-        <numerusform>Server &quot;%1&quot; cannot access %n cameras. Move them anyway?</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>Server &quot;%1&quot; cannot access %n I/O modules. Move them anyway?</source>
-      <translation type="unfinished">
-        <numerusform>Server &quot;%1&quot; cannot access %n I/O modules. Move them anyway?</numerusform>
-        <numerusform>Server &quot;%1&quot; cannot access %n I/O modules. Move them anyway?</numerusform>
-        <numerusform>Server &quot;%1&quot; cannot access %n I/O modules. Move them anyway?</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>Components of System have different versions:</source>
-      <translation>Компоненты системы имеют разные версии:</translation>
-    </message>
-    <message>
-      <source>System sends anonymous usage statistics</source>
-      <translation>Система отправляет анонимную статистику использования</translation>
-    </message>
-    <message>
-      <source>To disable it, go to System Administration dialog.</source>
-      <translation>Чтобы отключить ее, перейдите на диалоговое окно Системное администрирование.</translation>
+      <source>Alarms</source>
+      <translation>Тревога</translation>
     </message>
   </context>
   <context>
@@ -7189,13 +6966,6 @@ to %1</source>
     <message>
       <source>Could not connect to server. Video Wall will be closed.</source>
       <translation>Не удалось подключиться к серверу. Видеостена будет закрыта.</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnWorkbenchController</name>
-    <message>
-      <source>Press any key to stop the tour.</source>
-      <translation>Нажмите любую кнопку, чтобы остановить тур.</translation>
     </message>
   </context>
   <context>
@@ -7414,29 +7184,6 @@ to %1</source>
     <message>
       <source>Cloud Systems cannot be merged</source>
       <translation>Облачные системы не могут быть объединены</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnWorkbenchLayoutsHandler</name>
-    <message>
-      <source>Save Layout As</source>
-      <translation>Сохранить раскладку как</translation>
-    </message>
-    <message>
-      <source>New Layout</source>
-      <translation>Новая раскладка</translation>
-    </message>
-    <message>
-      <source>Enter the name of the layout to create:</source>
-      <translation>Введите имя создаваемой раскладки:</translation>
-    </message>
-    <message>
-      <source>Enter Layout Name:</source>
-      <translation>Введите имя раскладки:</translation>
-    </message>
-    <message>
-      <source>New Layout %1</source>
-      <translation>Новая раскладка %1</translation>
     </message>
   </context>
   <context>
@@ -7688,23 +7435,160 @@ to %1</source>
   <context>
     <name>QnWorkbenchWebPageHandler</name>
     <message>
-      <source>New Web Page...</source>
-      <translation>Новая web-страница...</translation>
+      <source>New Web Page</source>
+      <translation type="unfinished">New Web Page</translation>
     </message>
     <message>
-      <source>This Web Page already exists</source>
-      <translation>Эта web-страница уже существует</translation>
-    </message>
-    <message>
-      <source>Enter URL of Web Page to add:</source>
-      <translation>Введите URL web-страницы для добавления:</translation>
+      <source>Edit Web Page</source>
+      <translation type="unfinished">Edit Web Page</translation>
     </message>
   </context>
   <context>
-    <name>Resources</name>
+    <name>SubjectSelectionDialog::RoleListDelegate</name>
+    <message numerus="yes">
+      <source>%n users</source>
+      <translation>
+        <numerusform>%n user</numerusform>
+        <numerusform>%n пользователя</numerusform>
+        <numerusform>%n пользователей</numerusform>
+      </translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::client::desktop::ui::LayoutPreviewPainter</name>
+    <message>
+      <source>NO DATA</source>
+      <translation>НЕТ ДАННЫХ</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::client::desktop::ui::LayoutTourDropPlaceholder</name>
+    <message>
+      <source>Drag layout here to add it to the tour</source>
+      <translation type="unfinished">Drag layout here to add it to the tour</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::client::desktop::ui::SubjectSelectionDialog</name>
+    <message>
+      <source>No user roles found</source>
+      <translation type="unfinished">No user roles found</translation>
+    </message>
+    <message>
+      <source>No users found</source>
+      <translation type="unfinished">No users found</translation>
+    </message>
+    <message>
+      <source>Users</source>
+      <translation>Пользователи</translation>
+    </message>
+    <message>
+      <source>Custom Users</source>
+      <translation type="unfinished">Custom Users</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::client::desktop::ui::action::LayoutTourSettingsFactory</name>
+    <message>
+      <source>Switch with Hotkeys</source>
+      <translation type="unfinished">Switch with Hotkeys</translation>
+    </message>
+    <message>
+      <source>Switch on Timer</source>
+      <translation type="unfinished">Switch on Timer</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::client::desktop::ui::action::PtzPresetsToursFactory</name>
+    <message>
+      <source>%1 (active)</source>
+      <comment>Template for active PTZ preset</comment>
+      <translation>%1 (активен)</translation>
+    </message>
+    <message>
+      <source>%1 (active)</source>
+      <comment>Template for active PTZ tour</comment>
+      <translation>%1 (активен)</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::client::desktop::ui::dialogs::LicenseDeactivationReason</name>
+    <message>
+      <source>Please fill up information about yourself and reason for license deactivation</source>
+      <translation type="unfinished">Please fill up information about yourself and reason for license deactivation</translation>
+    </message>
+    <message>
+      <source>Next</source>
+      <translation>Далее</translation>
+    </message>
+    <message>
+      <source>Name is necessary</source>
+      <translation type="unfinished">Name is necessary</translation>
+    </message>
+    <message>
+      <source>Reason is necessary</source>
+      <translation type="unfinished">Reason is necessary</translation>
+    </message>
+    <message>
+      <source>Name</source>
+      <translation>Имя</translation>
+    </message>
+    <message>
+      <source>Email</source>
+      <translation>Email</translation>
+    </message>
+    <message>
+      <source>Reason for deactivation</source>
+      <translation type="unfinished">Reason for deactivation</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::client::desktop::ui::graphics::SoftwareTriggerButton</name>
+    <message>
+      <source>Go to Live</source>
+      <translation type="unfinished">Go to Live</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::client::desktop::ui::ptz</name>
+    <message>
+      <source>Cannot get the current position from camera &quot;%1&quot;</source>
+      <translation type="unfinished">Cannot get the current position from camera &quot;%1&quot;</translation>
+    </message>
+    <message>
+      <source>Please wait for the camera to go online.</source>
+      <translation>Пожалуйста дождитесь включения камеры.</translation>
+    </message>
+    <message>
+      <source>Failed to get current position</source>
+      <translation>Не удалось получить текущую позицию</translation>
+    </message>
+    <message>
+      <source>Cannot set the current position for camera &quot;%1&quot;</source>
+      <translation type="unfinished">Cannot set the current position for camera &quot;%1&quot;</translation>
+    </message>
+    <message>
+      <source>Failed to set current position</source>
+      <translation>Не удалось задать текущую позицию</translation>
+    </message>
+    <message>
+      <source>Preset used by some tours. Delete it anyway?</source>
+      <translation>Позиция используется в нескольких турах. Удалить ее?</translation>
+    </message>
+    <message>
+      <source>These tours will become invalid.</source>
+      <translation>Эти туры станут недействительными.</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::client::desktop::ui::resources</name>
     <message>
       <source>There is another layout with the same name</source>
       <translation>Существует другая раскладка с тем же именем</translation>
+    </message>
+    <message>
+      <source>You do not have permission to overwrite it.</source>
+      <translation>Отсутствуют полномочия на перезапись.</translation>
     </message>
     <message>
       <source>Overwrite existing layout?</source>
@@ -7799,6 +7683,10 @@ to %1</source>
       <translation>Удалить</translation>
     </message>
     <message>
+      <source>You are going to delete some resources to which you have access from Video Wall only. You will not see them in your resource list after it and will not be able to add them to Video Wall again.</source>
+      <translation>Вы собираетесь удалить некоторые ресурсы, доступные только из режима видеостены. Вы не увидите их в списке ресурсов после этого и не сможете снова добавить их на видеостену.</translation>
+    </message>
+    <message>
       <source>You will lose access to following resources:</source>
       <translation>Вы потеряете доступ к следующим ресурсам:</translation>
     </message>
@@ -7836,8 +7724,8 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>Delete %n items?</source>
-      <translation>
-        <numerusform>Delete %n item?</numerusform>
+      <translation type="unfinished">
+        <numerusform>Удалить %n элемент?</numerusform>
         <numerusform>Удалить %n элемента?</numerusform>
         <numerusform>Удалить %n элементов?</numerusform>
       </translation>
@@ -7870,17 +7758,9 @@ to %1</source>
       <source>They may be auto-discovered again after removing.</source>
       <translation>Они могут быть снова автоматически обнаружены после удаления.</translation>
     </message>
-    <message>
-      <source>You do not have permission to overwrite it.</source>
-      <translation>Отсутствуют полномочия на перезапись.</translation>
-    </message>
-    <message>
-      <source>You are going to delete some resources to which you have access from Video Wall only. You will not see them in your resource list after it and will not be able to add them to Video Wall again.</source>
-      <translation>Вы собираетесь удалить некоторые ресурсы, доступные только из режима видеостены. Вы не увидите их в списке ресурсов после этого и не сможете снова добавить их на видеостену.</translation>
-    </message>
   </context>
   <context>
-    <name>VideoWall</name>
+    <name>nx::client::desktop::ui::videowall</name>
     <message>
       <source>There is another video wall with the same name</source>
       <translation>Существует другая видеостена с тем же именем</translation>
@@ -7904,6 +7784,261 @@ to %1</source>
     <message>
       <source>To display local files on Video Wall, please attach them using computer where Video Wall is hosted.</source>
       <translation>Для отображения локальных файлов на видеостене, пожалуйста, поместите их на видеостену на компьютере, с которого она управляется.</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::client::desktop::ui::workbench::ActionHandler</name>
+    <message numerus="yes">
+      <source>Failed to move %n devices</source>
+      <translation>
+        <numerusform>Failed to move %n device</numerusform>
+        <numerusform>Не удалось переместить %n устройства</numerusform>
+        <numerusform>Не удалось переместить %n устройств</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Failed to move %n cameras</source>
+      <translation>
+        <numerusform>Failed to move %n camera</numerusform>
+        <numerusform>Не удалось переместить %n камеры</numerusform>
+        <numerusform>Не удалось переместить %n камер</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Failed to move %n I/O Modules</source>
+      <translation>
+        <numerusform>Failed to move %n I/O Module</numerusform>
+        <numerusform>Не удалось переместить %n модуля ввода-вывода</numerusform>
+        <numerusform>Не удалось переместить %n модулей ввода-вывода</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Server &quot;%1&quot; is not responding.</source>
+      <translation type="unfinished">Server &quot;%1&quot; is not responding.</translation>
+    </message>
+    <message numerus="yes">
+      <source>Server &quot;%1&quot; cannot access %n devices. Move them anyway?</source>
+      <translation type="unfinished">
+        <numerusform>Server &quot;%1&quot; cannot access %n devices. Move them anyway?</numerusform>
+        <numerusform>Server &quot;%1&quot; cannot access %n devices. Move them anyway?</numerusform>
+        <numerusform>Server &quot;%1&quot; cannot access %n devices. Move them anyway?</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Server &quot;%1&quot; cannot access %n cameras. Move them anyway?</source>
+      <translation type="unfinished">
+        <numerusform>Server &quot;%1&quot; cannot access %n cameras. Move them anyway?</numerusform>
+        <numerusform>Server &quot;%1&quot; cannot access %n cameras. Move them anyway?</numerusform>
+        <numerusform>Server &quot;%1&quot; cannot access %n cameras. Move them anyway?</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Server &quot;%1&quot; cannot access %n I/O modules. Move them anyway?</source>
+      <translation type="unfinished">
+        <numerusform>Server &quot;%1&quot; cannot access %n I/O modules. Move them anyway?</numerusform>
+        <numerusform>Server &quot;%1&quot; cannot access %n I/O modules. Move them anyway?</numerusform>
+        <numerusform>Server &quot;%1&quot; cannot access %n I/O modules. Move them anyway?</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Move</source>
+      <translation>Переместить</translation>
+    </message>
+    <message>
+      <source>Layout is locked and cannot be changed.</source>
+      <translation>Раскладка заблокирована и не может быть изменена.</translation>
+    </message>
+    <message>
+      <source>All Supported (*.nov *.avi *.mkv *.mp4 *.mov *.ts *.m2ts *.mpeg *.mpg *.flv *.wmv *.3gp *.jpg *.png *.gif *.bmp *.tiff)</source>
+      <translation>Все поддерживаемые (*.nov *.avi *.mkv *.mp4 *.mov *.ts *.m2ts *.mpeg *.mpg *.flv *.wmv *.3gp *.jpg *.png *.gif *.bmp *.tiff)</translation>
+    </message>
+    <message>
+      <source>Video (*.avi *.mkv *.mp4 *.mov *.ts *.m2ts *.mpeg *.mpg *.flv *.wmv *.3gp)</source>
+      <translation>Видео (*.avi *.mkv *.mp4 *.mov *.ts *.m2ts *.mpeg *.mpg *.flv *.wmv *.3gp)</translation>
+    </message>
+    <message>
+      <source>Pictures (*.jpg *.png *.gif *.bmp *.tiff)</source>
+      <translation>Изображения (*.jpg *.png *.gif *.bmp *.tiff)</translation>
+    </message>
+    <message>
+      <source>All files (*.*)</source>
+      <translation>Все файлы (*.*)</translation>
+    </message>
+    <message>
+      <source>Open File</source>
+      <translation>Открыть файл</translation>
+    </message>
+    <message>
+      <source>Select folder...</source>
+      <translation>Выбрать каталог...</translation>
+    </message>
+    <message>
+      <source>Too short period selected</source>
+      <translation>Выбран слишком короткий период</translation>
+    </message>
+    <message>
+      <source>Cannot perform Preview Search. Please select a period of 15 seconds or longer.</source>
+      <translation>Не удаётся выполнить поиск по интервалам. Пожалуйста, выберите период 15 секунд или дольше.</translation>
+    </message>
+    <message>
+      <source>Preview Search for %1</source>
+      <translation>Поиск по фрагментам для %1</translation>
+    </message>
+    <message>
+      <source>Cancel device adding?</source>
+      <translation>Отменить добавление устройств?</translation>
+    </message>
+    <message>
+      <source>Confirm files deleting</source>
+      <translation>Подтвердите удаление файлов</translation>
+    </message>
+    <message numerus="yes">
+      <source>Are you sure you want to permanently delete these %n files?</source>
+      <translation>
+        <numerusform>Вы уверены, что хотите навсегда удалить %n файл?</numerusform>
+        <numerusform>Вы уверены, что хотите навсегда удалить эти %n файла?</numerusform>
+        <numerusform>Вы уверены, что хотите навсегда удалить эти %n файлов?</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>There is another user with the same name</source>
+      <translation>Существует другой пользователь с тем же именем</translation>
+    </message>
+    <message>
+      <source>Rename</source>
+      <translation>Переименовать</translation>
+    </message>
+    <message>
+      <source>Enter new name for the selected item:</source>
+      <translation>Введите новое имя для выбранного элемента:</translation>
+    </message>
+    <message>
+      <source>Updating Background...</source>
+      <translation>Обновление заднего фона...</translation>
+    </message>
+    <message>
+      <source>Image processing may take a few moments. Please be patient.</source>
+      <translation>Обработка изображения может занять длительное время. Наберитесь терпения.</translation>
+    </message>
+    <message>
+      <source>Image too big</source>
+      <translation>Изображение слишком большое</translation>
+    </message>
+    <message>
+      <source>Maximum size is %1 MB.</source>
+      <translation>Максимальный размер составляет %1 МБ.</translation>
+    </message>
+    <message>
+      <source>Failed to upload image</source>
+      <translation>Не удалось загрузить изображение</translation>
+    </message>
+    <message>
+      <source>Client</source>
+      <translation>Клиент</translation>
+    </message>
+    <message>
+      <source>Server</source>
+      <translation>Сервер</translation>
+    </message>
+    <message>
+      <source>Please update all components to the version %1</source>
+      <translation>Пожалуйста, обновите все компоненты системы на версию %1</translation>
+    </message>
+    <message>
+      <source>Components of System have different versions:</source>
+      <translation>Компоненты системы имеют разные версии:</translation>
+    </message>
+    <message>
+      <source>Update...</source>
+      <translation>Обновление...</translation>
+    </message>
+    <message>
+      <source>Skip</source>
+      <translation>Пропустить</translation>
+    </message>
+    <message>
+      <source>Beta version %1</source>
+      <translation>Бета-версия %1</translation>
+    </message>
+    <message>
+      <source>Some functionality may be unavailable or not working properly.</source>
+      <translation>Некоторые функции могут быть недоступны или не работать должным образом.</translation>
+    </message>
+    <message>
+      <source>System sends anonymous usage statistics</source>
+      <translation>Система отправляет анонимную статистику использования</translation>
+    </message>
+    <message>
+      <source>It will be used by software development team to improve your user experience.</source>
+      <translation>Она будет использоваться командой разработки для того чтобы сделать систему проще и понятнее для пользователей.</translation>
+    </message>
+    <message>
+      <source>To disable it, go to System Administration dialog.</source>
+      <translation>Чтобы отключить ее, перейдите на диалоговое окно Системное администрирование.</translation>
+    </message>
+    <message>
+      <source>Failed to open server web page</source>
+      <translation>Не удалось открыть web-страницу сервера</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::client::desktop::ui::workbench::LayoutTourExecutor</name>
+    <message>
+      <source>Use keyboard arrows to switch layouts. To exit the tour press Esc.</source>
+      <translation type="unfinished">Use keyboard arrows to switch layouts. To exit the tour press Esc.</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::client::desktop::ui::workbench::LayoutTourItemWidget</name>
+    <message>
+      <source>Switch by %1</source>
+      <translation type="unfinished">Switch by %1</translation>
+    </message>
+    <message>
+      <source>Display for</source>
+      <translation type="unfinished">Display for</translation>
+    </message>
+    <message>
+      <source>Display selected for</source>
+      <translation type="unfinished">Display selected for</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::client::desktop::ui::workbench::LayoutToursHandler</name>
+    <message>
+      <source>Layout Tour</source>
+      <translation type="unfinished">Layout Tour</translation>
+    </message>
+    <message>
+      <source>Layout Tour %1</source>
+      <translation type="unfinished">Layout Tour %1</translation>
+    </message>
+    <message>
+      <source>Delete layout tour %1?</source>
+      <translation type="unfinished">Delete layout tour %1?</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::client::desktop::ui::workbench::LayoutsHandler</name>
+    <message>
+      <source>Save Layout As</source>
+      <translation>Сохранить раскладку как</translation>
+    </message>
+    <message>
+      <source>Enter Layout Name:</source>
+      <translation>Введите имя раскладки:</translation>
+    </message>
+    <message>
+      <source>New Layout</source>
+      <translation>Новая раскладка</translation>
+    </message>
+    <message>
+      <source>Enter the name of the layout to create:</source>
+      <translation>Введите имя создаваемой раскладки:</translation>
+    </message>
+    <message>
+      <source>New Layout %1</source>
+      <translation>Новая раскладка %1</translation>
     </message>
   </context>
 </TS>

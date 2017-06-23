@@ -8,11 +8,6 @@
       <extracomment>Language name that will be displayed to user. Must not be empty.</extracomment>
       <translation>Polish</translation>
     </message>
-    <message>
-      <source>Locale Code</source>
-      <extracomment>Internal. Please don&apos;t change existing translation.</extracomment>
-      <translation type="unfinished">Locale Code</translation>
-    </message>
   </context>
   <context>
     <name>MergeSystemsStatusStrings</name>
@@ -228,10 +223,6 @@
     <message>
       <source>Not enough HDD/SSD speed for recording to %1.</source>
       <translation type="unfinished">Not enough HDD/SSD speed for recording to %1.</translation>
-    </message>
-    <message>
-      <source>HDD/SSD disk %1 is full. Disk contains too much data that is not managed by VMS.</source>
-      <translation type="unfinished">HDD/SSD disk %1 is full. Disk contains too much data that is not managed by VMS.</translation>
     </message>
     <message>
       <source>Conflicting Server: %1</source>
@@ -506,6 +497,66 @@
       <source>Send Email</source>
       <translation type="unfinished">Send Email</translation>
     </message>
+    <message>
+      <source>Software Trigger</source>
+      <translation type="unfinished">Software Trigger</translation>
+    </message>
+    <message>
+      <source>Software trigger %1 at %2</source>
+      <translation type="unfinished">Software trigger %1 at %2</translation>
+    </message>
+    <message>
+      <source>Software Trigger %1 has been activated multiple times</source>
+      <translation type="unfinished">Software Trigger %1 has been activated multiple times</translation>
+    </message>
+    <message>
+      <source>Multiple %1 events have occured</source>
+      <translation type="unfinished">Multiple %1 events have occured</translation>
+    </message>
+    <message>
+      <source>Trigger: %1</source>
+      <translation type="unfinished">Trigger: %1</translation>
+    </message>
+    <message>
+      <source>HDD/SSD disk &quot;%1&quot; is full. Disk contains too much data that is not managed by VMS.</source>
+      <translation type="unfinished">HDD/SSD disk &quot;%1&quot; is full. Disk contains too much data that is not managed by VMS.</translation>
+    </message>
+    <message>
+      <source>System disk &quot;%1&quot; is almost full.</source>
+      <translation type="unfinished">System disk &quot;%1&quot; is almost full.</translation>
+    </message>
+    <message>
+      <source>Default Trigger</source>
+      <translation type="unfinished">Default Trigger</translation>
+    </message>
+    <message>
+      <source>All Users</source>
+      <translation type="unfinished">All Users</translation>
+    </message>
+    <message>
+      <source>Role</source>
+      <translation type="unfinished">Role</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n Users</source>
+      <translation type="unfinished">
+        <numerusform>%n Users</numerusform>
+        <numerusform>%n Users</numerusform>
+        <numerusform>%n Users</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n Roles</source>
+      <translation type="unfinished">
+        <numerusform>%n Roles</numerusform>
+        <numerusform>%n Roles</numerusform>
+        <numerusform>%n Roles</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>All Administrators</source>
+      <translation type="unfinished">All Administrators</translation>
+    </message>
   </context>
   <context>
     <name>QnCameraDiagnosticsErrorCodeStrings</name>
@@ -717,6 +768,10 @@
       <source>Cannot open media URL %1. Unsupported media protocol %2.</source>
       <translation type="unfinished">Cannot open media URL %1. Unsupported media protocol %2.</translation>
     </message>
+    <message>
+      <source>Camera was restored from archive. Delete the camera and add it again to view Live video.</source>
+      <translation type="unfinished">Camera was restored from archive. Delete the camera and add it again to view Live video.</translation>
+    </message>
   </context>
   <context>
     <name>QnFfmpegAudioTranscoder</name>
@@ -826,14 +881,6 @@
       <translation type="unfinished">Video Wall</translation>
     </message>
     <message>
-      <source>Only single license is allowed for this device</source>
-      <translation type="unfinished">Only single license is allowed for this device</translation>
-    </message>
-    <message>
-      <source>Unknown error</source>
-      <translation type="unfinished">Unknown error</translation>
-    </message>
-    <message>
       <source>I/O Module</source>
       <translation type="unfinished">I/O Module</translation>
     </message>
@@ -882,10 +929,6 @@
       <translation type="unfinished">Start Licenses</translation>
     </message>
     <message>
-      <source>Server with matching hardware ID not found</source>
-      <translation type="unfinished">Server with matching hardware ID not found</translation>
-    </message>
-    <message>
       <source>Invalid</source>
       <translation type="unfinished">Invalid</translation>
     </message>
@@ -894,32 +937,12 @@
       <translation type="unfinished">Invalid Licenses</translation>
     </message>
     <message>
-      <source>Invalid signature</source>
-      <translation type="unfinished">Invalid signature</translation>
-    </message>
-    <message>
-      <source>Invalid customization</source>
-      <translation type="unfinished">Invalid customization</translation>
-    </message>
-    <message>
-      <source>License is expired</source>
-      <translation type="unfinished">License is expired</translation>
-    </message>
-    <message>
-      <source>Invalid type</source>
-      <translation type="unfinished">Invalid type</translation>
-    </message>
-    <message>
       <source>Free</source>
       <translation type="unfinished">Free</translation>
     </message>
     <message>
       <source>Free license</source>
       <translation type="unfinished">Free license</translation>
-    </message>
-    <message>
-      <source>This license type requires higher software version</source>
-      <translation type="unfinished">This license type requires higher software version</translation>
     </message>
   </context>
   <context>
@@ -976,6 +999,41 @@
       <source>This license key has been previously activated to hardware ID %1 on %2. Please contact support team to obtain a valid license key.</source>
       <comment>%1 is a hardware ID, %2 is an activation time</comment>
       <translation type="unfinished">This license key has been previously activated to hardware ID %1 on %2. Please contact support team to obtain a valid license key.</translation>
+    </message>
+  </context>
+  <context>
+    <name>QnLicenseValidator</name>
+    <message>
+      <source>Invalid signature</source>
+      <translation type="unfinished">Invalid signature</translation>
+    </message>
+    <message>
+      <source>Server with matching hardware ID not found</source>
+      <translation type="unfinished">Server with matching hardware ID not found</translation>
+    </message>
+    <message>
+      <source>Invalid customization</source>
+      <translation type="unfinished">Invalid customization</translation>
+    </message>
+    <message>
+      <source>License is expired</source>
+      <translation type="unfinished">License is expired</translation>
+    </message>
+    <message>
+      <source>Invalid type</source>
+      <translation type="unfinished">Invalid type</translation>
+    </message>
+    <message>
+      <source>Only single license is allowed for this device</source>
+      <translation type="unfinished">Only single license is allowed for this device</translation>
+    </message>
+    <message>
+      <source>This license type requires higher software version</source>
+      <translation type="unfinished">This license type requires higher software version</translation>
+    </message>
+    <message>
+      <source>Unknown error</source>
+      <translation type="unfinished">Unknown error</translation>
     </message>
   </context>
   <context>

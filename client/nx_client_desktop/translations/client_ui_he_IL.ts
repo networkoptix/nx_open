@@ -139,7 +139,7 @@
   <context>
     <name>ApplauncherControlDialog</name>
     <message>
-      <location filename="../src/nx/client/ui/dialogs/debug/applauncher_control_dialog.ui"/>
+      <location filename="../src/nx/client/desktop/ui/dialogs/debug/applauncher_control_dialog.ui"/>
       <source>Add External Storage...</source>
       <translation>הוסף אחסון חיצוני...</translation>
     </message>
@@ -350,6 +350,16 @@
       <source>Post-recording:</source>
       <translation>אחרי הקלטה:</translation>
     </message>
+    <message>
+      <location/>
+      <source>By:</source>
+      <translation>על ידי:</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Ask confirmation before creating bookmark</source>
+      <translation>בקש אישור לפני יצירת סימנייה</translation>
+    </message>
   </context>
   <context>
     <name>BookmarkWidget</name>
@@ -416,11 +426,6 @@
     </message>
     <message>
       <location/>
-      <source>at</source>
-      <translation>ב</translation>
-    </message>
-    <message>
-      <location/>
       <source>Schedule...</source>
       <translation>לוח זמנים...</translation>
     </message>
@@ -443,6 +448,11 @@
       <location/>
       <source>Do</source>
       <translation>בצע</translation>
+    </message>
+    <message>
+      <location/>
+      <source>At</source>
+      <translation>ב</translation>
     </message>
   </context>
   <context>
@@ -722,7 +732,7 @@
     <message>
       <location/>
       <source>&quot;Allow System to optimize camera settings&quot; is disabled in System Administration.</source>
-      <translation type="unfinished">&quot;Allow System to optimize camera settings&quot; is disabled in System Administration.</translation>
+      <translation>"אפשר למערכת לבצע אופטימיזציה להגדרות המצלמה  &quot;מבוטל ב"ניהול המערכת &quot;.</translation>
     </message>
     <message>
       <location/>
@@ -734,8 +744,8 @@
     <name>CameraInputBusinessEventWidget</name>
     <message>
       <location filename="../src/ui/widgets/business/camera_input_business_event_widget.ui"/>
-      <source>Input ID:</source>
-      <translation>מזהה קלט:</translation>
+      <source>Input ID</source>
+      <translation>מזהה קלט</translation>
     </message>
   </context>
   <context>
@@ -1710,21 +1720,21 @@
     </message>
     <message>
       <location/>
-      <source>Play to user</source>
-      <translation>נגן למתשתמש</translation>
+      <source>Play to users</source>
+      <translation>נגן למתשתמשים</translation>
     </message>
   </context>
   <context>
     <name>PopupBusinessActionWidget</name>
     <message>
       <location filename="../src/ui/widgets/business/popup_business_action_widget.ui"/>
-      <source>Show to administrators only</source>
-      <translation>הצג למנהלים בלבד</translation>
+      <source>Global Notification Settings...</source>
+      <translation>הגדרות התראות גלובליות...</translation>
     </message>
     <message>
       <location/>
-      <source>Global Notification Settings...</source>
-      <translation>הגדרות התראות גלובליות...</translation>
+      <source>for</source>
+      <translation>ל</translation>
     </message>
   </context>
   <context>
@@ -2205,6 +2215,16 @@
       <source>Post-Recording:</source>
       <translation>לאחר התנועה:</translation>
     </message>
+    <message>
+      <location/>
+      <source>Fixed duration:</source>
+      <translation>משך זמן קבוע:</translation>
+    </message>
+    <message>
+      <location/>
+      <source>seconds</source>
+      <translation>שניות</translation>
+    </message>
   </context>
   <context>
     <name>RecordingSettings</name>
@@ -2212,21 +2232,6 @@
       <location filename="../src/ui/widgets/local_settings/recording_settings_widget.ui"/>
       <source>Temporary Folder</source>
       <translation>תיקיה זמנית</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Capture Mode</source>
-      <translation>מצב צילום</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Fullscreen</source>
-      <translation>מסך מלא</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Application Window</source>
-      <translation>חלון התוכנה</translation>
     </message>
     <message>
       <location/>
@@ -2245,13 +2250,8 @@
     </message>
     <message>
       <location/>
-      <source>Quality</source>
-      <translation>איכות</translation>
-    </message>
-    <message>
-      <location/>
       <source>A powerful computer is recommended for &quot;Best&quot; quality and resolution.</source>
-      <translation type="unfinished">A powerful computer is recommended for &quot;Best&quot; quality and resolution.</translation>
+      <translation>מחשב חזק מומלץ עבור רזולוציה ואיכות &quot;הטובים ביותר &quot;.</translation>
     </message>
     <message>
       <location/>
@@ -2267,6 +2267,16 @@
       <location/>
       <source>Recording Quality</source>
       <translation>איכות הקלטה</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Source</source>
+      <translation>מקור</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Screen</source>
+      <translation>מסך</translation>
     </message>
   </context>
   <context>
@@ -2306,8 +2316,8 @@
     </message>
     <message>
       <location/>
-      <source>Speak to user</source>
-      <translation>דבר אל המשתמש</translation>
+      <source>Speak to users</source>
+      <translation>דבר למשתמשים</translation>
     </message>
   </context>
   <context>
@@ -2643,6 +2653,37 @@
     </message>
   </context>
   <context>
+    <name>SoftwareTriggerBusinessEventWidget</name>
+    <message>
+      <location filename="../src/ui/widgets/business/software_trigger_business_event_widget.ui"/>
+      <source>Available to</source>
+      <translation>זמין ל</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Name</source>
+      <translation>שם</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Icon</source>
+      <translation>סמל</translation>
+    </message>
+  </context>
+  <context>
+    <name>SpecialLayoutPanelWidget</name>
+    <message>
+      <location filename="../src/nx/client/desktop/ui/workbench/panels/special_layout_panel_widget.ui"/>
+      <source>&lt;Some Caption&gt;</source>
+      <translation>&lt; כותרת &gt;</translation>
+    </message>
+    <message>
+      <location/>
+      <source>&lt;Some description&gt;</source>
+      <translation>&lt; תיאור &gt;</translation>
+    </message>
+  </context>
+  <context>
     <name>StorageAnalyticsWidget</name>
     <message>
       <location filename="../src/ui/widgets/properties/storage_analytics_widget.ui"/>
@@ -2750,6 +2791,24 @@
     </message>
   </context>
   <context>
+    <name>SubjectSelectionDialog</name>
+    <message>
+      <location filename="../src/nx/client/desktop/ui/event_rules/subject_selection_dialog.ui"/>
+      <source>Dialog</source>
+      <translation>דיאלוג</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Roles</source>
+      <translation>תפקידים</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Show all users</source>
+      <translation>הצג את כל המשתמשים</translation>
+    </message>
+  </context>
+  <context>
     <name>SystemSettingsWidget</name>
     <message>
       <location filename="../src/ui/widgets/system_settings/system_settings_widget.ui"/>
@@ -2781,9 +2840,8 @@
     </message>
     <message>
       <location/>
-      <source>System time is synchronized with the Internet and is independent from server local time.
-Selected server will be used as a time server if System has no Internet access.</source>
-      <translation>זמן המערכת מסונכרן עם האינטרנט ואינו תלוי בזמן המקומי של השרת. שרת נבחר ישמש כשרת זמן אם למערכת אין גישה לאינטרנט.</translation>
+      <source>Sync time with the Internet</source>
+      <translation>סנכרן זמן עם האינטרנט</translation>
     </message>
   </context>
   <context>
@@ -2823,8 +2881,7 @@ Selected server will be used as a time server if System has no Internet access.<
       <location/>
       <source>There are no custom user roles yet.
 Click &quot;New role&quot; button to create one.</source>
-      <translation type="unfinished">There are no custom user roles yet.
-Click &quot;New role&quot; button to create one.</translation>
+      <translation>אין עדיין תפקידי משתמש מותאמים אישית. לחץ על  &quot;תפקיד חדש &quot; כדי ליצור אחד.</translation>
     </message>
     <message>
       <location/>
@@ -2848,6 +2905,14 @@ Click &quot;New role&quot; button to create one.</translation>
       <location/>
       <source>Edit Roles...</source>
       <translation>עריכת תפקידים...</translation>
+    </message>
+  </context>
+  <context>
+    <name>WebpageDialog</name>
+    <message>
+      <location filename="../src/ui/dialogs/webpage_dialog.ui"/>
+      <source>Web Page</source>
+      <translation>דף אינטרנט</translation>
     </message>
   </context>
   <context>

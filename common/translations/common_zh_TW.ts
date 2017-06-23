@@ -8,11 +8,6 @@
       <extracomment>Language name that will be displayed to user. Must not be empty.</extracomment>
       <translation>繁体中文</translation>
     </message>
-    <message>
-      <source>Locale Code</source>
-      <extracomment>Internal. Please don&apos;t change existing translation.</extracomment>
-      <translation>zh_TW</translation>
-    </message>
   </context>
   <context>
     <name>MergeSystemsStatusStrings</name>
@@ -226,10 +221,6 @@
     <message>
       <source>Not enough HDD/SSD speed for recording to %1.</source>
       <translation>HDD/SSD %1 速度不足以錄影。</translation>
-    </message>
-    <message>
-      <source>HDD/SSD disk %1 is full. Disk contains too much data that is not managed by VMS.</source>
-      <translation>HDD/SSD 硬碟 %1 已滿。磁碟內包含太多非本軟體管理之資料。</translation>
     </message>
     <message>
       <source>Conflicting Server: %1</source>
@@ -486,6 +477,62 @@
       <source>Send Email</source>
       <translation>傳送郵件</translation>
     </message>
+    <message>
+      <source>Software Trigger</source>
+      <translation type="unfinished">Software Trigger</translation>
+    </message>
+    <message>
+      <source>Software trigger %1 at %2</source>
+      <translation type="unfinished">Software trigger %1 at %2</translation>
+    </message>
+    <message>
+      <source>Software Trigger %1 has been activated multiple times</source>
+      <translation type="unfinished">Software Trigger %1 has been activated multiple times</translation>
+    </message>
+    <message>
+      <source>Multiple %1 events have occured</source>
+      <translation type="unfinished">Multiple %1 events have occured</translation>
+    </message>
+    <message>
+      <source>Trigger: %1</source>
+      <translation type="unfinished">Trigger: %1</translation>
+    </message>
+    <message>
+      <source>HDD/SSD disk &quot;%1&quot; is full. Disk contains too much data that is not managed by VMS.</source>
+      <translation type="unfinished">HDD/SSD disk &quot;%1&quot; is full. Disk contains too much data that is not managed by VMS.</translation>
+    </message>
+    <message>
+      <source>System disk &quot;%1&quot; is almost full.</source>
+      <translation type="unfinished">System disk &quot;%1&quot; is almost full.</translation>
+    </message>
+    <message>
+      <source>Default Trigger</source>
+      <translation type="unfinished">Default Trigger</translation>
+    </message>
+    <message>
+      <source>All Users</source>
+      <translation type="unfinished">All Users</translation>
+    </message>
+    <message>
+      <source>Role</source>
+      <translation type="unfinished">Role</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n Users</source>
+      <translation type="unfinished">
+        <numerusform>%n Users</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n Roles</source>
+      <translation type="unfinished">
+        <numerusform>%n Roles</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>All Administrators</source>
+      <translation type="unfinished">All Administrators</translation>
+    </message>
   </context>
   <context>
     <name>QnCameraDiagnosticsErrorCodeStrings</name>
@@ -697,6 +744,10 @@
       <source>Cannot open media URL %1. Unsupported media protocol %2.</source>
       <translation>無法打開媒體 URL %1. 不支援的媒體協議 %2.</translation>
     </message>
+    <message>
+      <source>Camera was restored from archive. Delete the camera and add it again to view Live video.</source>
+      <translation type="unfinished">Camera was restored from archive. Delete the camera and add it again to view Live video.</translation>
+    </message>
   </context>
   <context>
     <name>QnFfmpegAudioTranscoder</name>
@@ -806,14 +857,6 @@
       <translation>電視牆</translation>
     </message>
     <message>
-      <source>Only single license is allowed for this device</source>
-      <translation>此裝置只接受一組授權</translation>
-    </message>
-    <message>
-      <source>Unknown error</source>
-      <translation>未知的錯誤</translation>
-    </message>
-    <message>
       <source>I/O Module</source>
       <translation>I/O 模組</translation>
     </message>
@@ -862,10 +905,6 @@
       <translation>Start 授權</translation>
     </message>
     <message>
-      <source>Server with matching hardware ID not found</source>
-      <translation>找不到符合硬體ID的伺服器</translation>
-    </message>
-    <message>
       <source>Invalid</source>
       <translation>無效</translation>
     </message>
@@ -874,32 +913,12 @@
       <translation>無效的授權</translation>
     </message>
     <message>
-      <source>Invalid signature</source>
-      <translation>無效的簽章</translation>
-    </message>
-    <message>
-      <source>Invalid customization</source>
-      <translation>無效的自定義參數</translation>
-    </message>
-    <message>
-      <source>License is expired</source>
-      <translation>授權已過期</translation>
-    </message>
-    <message>
-      <source>Invalid type</source>
-      <translation>無效的類型</translation>
-    </message>
-    <message>
       <source>Free</source>
       <translation>可用</translation>
     </message>
     <message>
       <source>Free license</source>
       <translation>可用授權</translation>
-    </message>
-    <message>
-      <source>This license type requires higher software version</source>
-      <translation>這授權類型需要較高的軟體版本</translation>
     </message>
   </context>
   <context>
@@ -948,6 +967,41 @@
       <source>This license key has been previously activated to hardware ID %1 on %2. Please contact support team to obtain a valid license key.</source>
       <comment>%1 is a hardware ID, %2 is an activation time</comment>
       <translation>此授權已被啟動到硬體 ID %1 於 %2. 請連線我們的支援小組以獲得一個有效的授權.</translation>
+    </message>
+  </context>
+  <context>
+    <name>QnLicenseValidator</name>
+    <message>
+      <source>Invalid signature</source>
+      <translation>無效的簽章</translation>
+    </message>
+    <message>
+      <source>Server with matching hardware ID not found</source>
+      <translation>找不到符合硬體ID的伺服器</translation>
+    </message>
+    <message>
+      <source>Invalid customization</source>
+      <translation>無效的自定義參數</translation>
+    </message>
+    <message>
+      <source>License is expired</source>
+      <translation>授權已過期</translation>
+    </message>
+    <message>
+      <source>Invalid type</source>
+      <translation>無效的類型</translation>
+    </message>
+    <message>
+      <source>Only single license is allowed for this device</source>
+      <translation>此裝置只接受一組授權</translation>
+    </message>
+    <message>
+      <source>This license type requires higher software version</source>
+      <translation>這授權類型需要較高的軟體版本</translation>
+    </message>
+    <message>
+      <source>Unknown error</source>
+      <translation>未知的錯誤</translation>
     </message>
   </context>
   <context>

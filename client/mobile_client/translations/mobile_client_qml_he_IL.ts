@@ -100,7 +100,7 @@
     </message>
     <message>
       <source>Delete login &quot;%1&quot;?</source>
-      <translation type="unfinished">Delete login &quot;%1&quot;?</translation>
+      <translation>האם למחוק את פרטי ההתחברות &quot;%1&quot;?</translation>
     </message>
     <message>
       <source>Server addresses and other logins will remain saved. To delete all connection information you should delete all saved logins.</source>
@@ -305,6 +305,20 @@
     </message>
   </context>
   <context>
+    <name>PresetsButton</name>
+    <message>
+      <source>PRESETS</source>
+      <translation>פריסטים</translation>
+    </message>
+  </context>
+  <context>
+    <name>PresetsDialog</name>
+    <message>
+      <source>PTZ Presets</source>
+      <translation>פריסטים ל PTZ</translation>
+    </message>
+  </context>
+  <context>
     <name>QualityDialog</name>
     <message>
       <source>Video Quality</source>
@@ -422,7 +436,7 @@
     </message>
     <message>
       <source>Check your network connection or press &quot;%1&quot; button to enter a known server address.</source>
-      <translation type="unfinished">Check your network connection or press &quot;%1&quot; button to enter a known server address.</translation>
+      <translation>בדוק את חיבור הרשת או לחץ על &quot;%1&quot; כדי להזין כתובת שרת.</translation>
     </message>
     <message>
       <source>Check your network connection or contact a system administrator</source>
@@ -442,7 +456,7 @@
     </message>
     <message>
       <source>Cannot connect to System &quot;%1&quot;</source>
-      <translation type="unfinished">Cannot connect to System &quot;%1&quot;</translation>
+      <translation>אין אפשרות להתחבר למערכת "%1";</translation>
     </message>
     <message>
       <source>Cannot connect to Server</source>

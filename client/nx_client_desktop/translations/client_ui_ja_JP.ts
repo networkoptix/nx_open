@@ -139,7 +139,7 @@
   <context>
     <name>ApplauncherControlDialog</name>
     <message>
-      <location filename="../src/nx/client/ui/dialogs/debug/applauncher_control_dialog.ui"/>
+      <location filename="../src/nx/client/desktop/ui/dialogs/debug/applauncher_control_dialog.ui"/>
       <source>Add External Storage...</source>
       <translation>外部ストレージの追加...</translation>
     </message>
@@ -350,6 +350,16 @@
       <source>Post-recording:</source>
       <translation>ポストレコーディング:</translation>
     </message>
+    <message>
+      <location/>
+      <source>By:</source>
+      <translation type="unfinished">By:</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Ask confirmation before creating bookmark</source>
+      <translation type="unfinished">Ask confirmation before creating bookmark</translation>
+    </message>
   </context>
   <context>
     <name>BookmarkWidget</name>
@@ -416,11 +426,6 @@
     </message>
     <message>
       <location/>
-      <source>at</source>
-      <translation>カメラ</translation>
-    </message>
-    <message>
-      <location/>
       <source>Schedule...</source>
       <translation>スケジュール...</translation>
     </message>
@@ -443,6 +448,11 @@
       <location/>
       <source>Do</source>
       <translation>動作</translation>
+    </message>
+    <message>
+      <location/>
+      <source>At</source>
+      <translation type="unfinished">At</translation>
     </message>
   </context>
   <context>
@@ -734,8 +744,8 @@
     <name>CameraInputBusinessEventWidget</name>
     <message>
       <location filename="../src/ui/widgets/business/camera_input_business_event_widget.ui"/>
-      <source>Input ID:</source>
-      <translation>入力ID:</translation>
+      <source>Input ID</source>
+      <translation type="unfinished">Input ID</translation>
     </message>
   </context>
   <context>
@@ -1710,21 +1720,21 @@
     </message>
     <message>
       <location/>
-      <source>Play to user</source>
-      <translation>ユーザー</translation>
+      <source>Play to users</source>
+      <translation type="unfinished">Play to users</translation>
     </message>
   </context>
   <context>
     <name>PopupBusinessActionWidget</name>
     <message>
       <location filename="../src/ui/widgets/business/popup_business_action_widget.ui"/>
-      <source>Show to administrators only</source>
-      <translation>アドミニストレーターのみに表示</translation>
+      <source>Global Notification Settings...</source>
+      <translation>グローバル通知設定...</translation>
     </message>
     <message>
       <location/>
-      <source>Global Notification Settings...</source>
-      <translation>グローバル通知設定...</translation>
+      <source>for</source>
+      <translation>ユーザー</translation>
     </message>
   </context>
   <context>
@@ -2205,6 +2215,16 @@
       <source>Post-Recording:</source>
       <translation>ポストレコーディング:</translation>
     </message>
+    <message>
+      <location/>
+      <source>Fixed duration:</source>
+      <translation>固定期間:</translation>
+    </message>
+    <message>
+      <location/>
+      <source>seconds</source>
+      <translation>秒</translation>
+    </message>
   </context>
   <context>
     <name>RecordingSettings</name>
@@ -2212,21 +2232,6 @@
       <location filename="../src/ui/widgets/local_settings/recording_settings_widget.ui"/>
       <source>Temporary Folder</source>
       <translation>一時フォルダー</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Capture Mode</source>
-      <translation>キャプチャーモード</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Fullscreen</source>
-      <translation>フルスクリーン</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Application Window</source>
-      <translation>アプリケーションウィンドウ</translation>
     </message>
     <message>
       <location/>
@@ -2242,11 +2247,6 @@
       <location/>
       <source>Capture Cursor</source>
       <translation>キャプチャーカーソル</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Quality</source>
-      <translation>画質</translation>
     </message>
     <message>
       <location/>
@@ -2267,6 +2267,16 @@
       <location/>
       <source>Recording Quality</source>
       <translation>録画画質:</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Source</source>
+      <translation type="unfinished">Source</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Screen</source>
+      <translation type="unfinished">Screen</translation>
     </message>
   </context>
   <context>
@@ -2306,8 +2316,8 @@
     </message>
     <message>
       <location/>
-      <source>Speak to user</source>
-      <translation>スピーク</translation>
+      <source>Speak to users</source>
+      <translation type="unfinished">Speak to users</translation>
     </message>
   </context>
   <context>
@@ -2643,6 +2653,37 @@
     </message>
   </context>
   <context>
+    <name>SoftwareTriggerBusinessEventWidget</name>
+    <message>
+      <location filename="../src/ui/widgets/business/software_trigger_business_event_widget.ui"/>
+      <source>Available to</source>
+      <translation type="unfinished">Available to</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Name</source>
+      <translation>名前</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Icon</source>
+      <translation type="unfinished">Icon</translation>
+    </message>
+  </context>
+  <context>
+    <name>SpecialLayoutPanelWidget</name>
+    <message>
+      <location filename="../src/nx/client/desktop/ui/workbench/panels/special_layout_panel_widget.ui"/>
+      <source>&lt;Some Caption&gt;</source>
+      <translation type="unfinished">&lt;Some Caption&gt;</translation>
+    </message>
+    <message>
+      <location/>
+      <source>&lt;Some description&gt;</source>
+      <translation type="unfinished">&lt;Some description&gt;</translation>
+    </message>
+  </context>
+  <context>
     <name>StorageAnalyticsWidget</name>
     <message>
       <location filename="../src/ui/widgets/properties/storage_analytics_widget.ui"/>
@@ -2750,6 +2791,24 @@
     </message>
   </context>
   <context>
+    <name>SubjectSelectionDialog</name>
+    <message>
+      <location filename="../src/nx/client/desktop/ui/event_rules/subject_selection_dialog.ui"/>
+      <source>Dialog</source>
+      <translation type="unfinished">Dialog</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Roles</source>
+      <translation type="unfinished">Roles</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Show all users</source>
+      <translation type="unfinished">Show all users</translation>
+    </message>
+  </context>
+  <context>
     <name>SystemSettingsWidget</name>
     <message>
       <location filename="../src/ui/widgets/system_settings/system_settings_widget.ui"/>
@@ -2781,9 +2840,8 @@
     </message>
     <message>
       <location/>
-      <source>System time is synchronized with the Internet and is independent from server local time.
-Selected server will be used as a time server if System has no Internet access.</source>
-      <translation>システム時刻はインターネットと同期しておりサーバ の ローカル時刻とは独立しています　選択したサーバーはインター ネット アクセスがない場合にはタイム サーバーとして使用されます</translation>
+      <source>Sync time with the Internet</source>
+      <translation type="unfinished">Sync time with the Internet</translation>
     </message>
   </context>
   <context>
@@ -2848,6 +2906,14 @@ Click &quot;New role&quot; button to create one.</translation>
       <location/>
       <source>Edit Roles...</source>
       <translation>役割を編集...</translation>
+    </message>
+  </context>
+  <context>
+    <name>WebpageDialog</name>
+    <message>
+      <location filename="../src/ui/dialogs/webpage_dialog.ui"/>
+      <source>Web Page</source>
+      <translation>ウェブページ:</translation>
     </message>
   </context>
   <context>

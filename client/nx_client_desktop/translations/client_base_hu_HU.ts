@@ -69,6 +69,808 @@ több könyvjelző megjelenítéséhez</translation>
     </message>
   </context>
   <context>
+    <name>ContextMenu</name>
+    <message>
+      <source>Filter...</source>
+      <translation>Szűrő...</translation>
+    </message>
+    <message>
+      <source>Connect to System</source>
+      <translation>Csatlakozás a rendszerhez</translation>
+    </message>
+    <message>
+      <source>Help</source>
+      <translation>Súgó</translation>
+    </message>
+    <message>
+      <source>Event Log...</source>
+      <translation>Eseménylista...</translation>
+    </message>
+    <message>
+      <source>Cameras to Backup...</source>
+      <translation>Kamerák biztonsági mentése...</translation>
+    </message>
+    <message>
+      <source>Control Video Wall</source>
+      <translation>Videofal vezérlése</translation>
+    </message>
+    <message>
+      <source>Push my screen</source>
+      <translation>Saját képernyő átadása</translation>
+    </message>
+    <message>
+      <source>Select Time Server</source>
+      <translation>Időszerver kiválasztása</translation>
+    </message>
+    <message>
+      <source>Fit in View</source>
+      <translation>Beillesztés nézetbe</translation>
+    </message>
+    <message>
+      <source>Main Menu</source>
+      <translation>Főmenü</translation>
+    </message>
+    <message>
+      <source>Connect to Server...</source>
+      <translation>Csatlakozás szerverhez...</translation>
+    </message>
+    <message>
+      <source>Disconnect from Server</source>
+      <translation>Kijelentkezés a szerverről</translation>
+    </message>
+    <message>
+      <source>Browse Local Files</source>
+      <translation>Helyi fájlok tallózása</translation>
+    </message>
+    <message>
+      <source>Show Welcome Screen</source>
+      <translation>Üdvözlő képernyő megjelenítése</translation>
+    </message>
+    <message>
+      <source>New...</source>
+      <translation>Új...</translation>
+    </message>
+    <message>
+      <source>Tab</source>
+      <translation>Lap</translation>
+    </message>
+    <message>
+      <source>New Tab</source>
+      <translation>Új lap</translation>
+    </message>
+    <message>
+      <source>Window</source>
+      <translation>Ablak</translation>
+    </message>
+    <message>
+      <source>New Window</source>
+      <translation>Új ablak</translation>
+    </message>
+    <message>
+      <source>User...</source>
+      <translation>Felhasználó...</translation>
+    </message>
+    <message>
+      <source>New User...</source>
+      <translation>Új felhasználó...</translation>
+    </message>
+    <message>
+      <source>Video Wall...</source>
+      <translation>Videófal...</translation>
+    </message>
+    <message>
+      <source>New Video Wall...</source>
+      <translation>Új videófal...</translation>
+    </message>
+    <message>
+      <source>Web Page...</source>
+      <translation>Weboldal...</translation>
+    </message>
+    <message>
+      <source>New Web Page...</source>
+      <translation>Új weboldal...</translation>
+    </message>
+    <message>
+      <source>Layout Tour...</source>
+      <translation type="unfinished">Layout Tour...</translation>
+    </message>
+    <message>
+      <source>New Layout Tour...</source>
+      <translation type="unfinished">New Layout Tour...</translation>
+    </message>
+    <message>
+      <source>New Layout...</source>
+      <translation>Új elrendezés...</translation>
+    </message>
+    <message>
+      <source>Open Layout...</source>
+      <translation>Elrendezés megnyitása...</translation>
+    </message>
+    <message>
+      <source>Open...</source>
+      <translation>Megnyitás...</translation>
+    </message>
+    <message>
+      <source>File(s)...</source>
+      <translation>Fájl(ok)...</translation>
+    </message>
+    <message>
+      <source>Folder...</source>
+      <translation>Mappa...</translation>
+    </message>
+    <message>
+      <source>Web Client...</source>
+      <translation>Webkliens...</translation>
+    </message>
+    <message>
+      <source>Open Web Client...</source>
+      <translation>Megnyitás web kliensben...</translation>
+    </message>
+    <message>
+      <source>Save Current Layout</source>
+      <translation>Jelenlegi elrendezés mentése</translation>
+    </message>
+    <message>
+      <source>Save Current Layout As...</source>
+      <translation>Jelenlegi elrendezés mentése mint...</translation>
+    </message>
+    <message>
+      <source>Save Video Wall View</source>
+      <translation>Videofal nézet mentése</translation>
+    </message>
+    <message>
+      <source>Drop Resources</source>
+      <translation>Eszköz bedobása</translation>
+    </message>
+    <message>
+      <source>Start Screen Recording</source>
+      <translation>Képernyőfelvétel indítása</translation>
+    </message>
+    <message>
+      <source>Stop Screen Recording</source>
+      <translation>Képernyőfelvétel leállítása</translation>
+    </message>
+    <message>
+      <source>Stop current action</source>
+      <translation>Jelenlegi munkamenet leállítása</translation>
+    </message>
+    <message>
+      <source>Go to Fullscreen</source>
+      <translation>Váltás teljesképernyőre</translation>
+    </message>
+    <message>
+      <source>Exit Fullscreen</source>
+      <translation>Kilépés teljesképernyős módból</translation>
+    </message>
+    <message>
+      <source>Minimize</source>
+      <translation>Minimalizálás</translation>
+    </message>
+    <message>
+      <source>Maximize</source>
+      <translation>Maximalizálás</translation>
+    </message>
+    <message>
+      <source>Restore Down</source>
+      <translation>Visszaállítás tálcaméretre</translation>
+    </message>
+    <message>
+      <source>Open in Browser...</source>
+      <translation>Megnyitás böngészőben...</translation>
+    </message>
+    <message>
+      <source>System Administration...</source>
+      <translation>Rendszer adminisztráció...</translation>
+    </message>
+    <message>
+      <source>System Update...</source>
+      <translation>Rendszer frissítése...</translation>
+    </message>
+    <message>
+      <source>User Management...</source>
+      <translation>Felhasználó kezelés...</translation>
+    </message>
+    <message>
+      <source>Local Settings...</source>
+      <translation>Helyi beállítások...</translation>
+    </message>
+    <message>
+      <source>Audit Trail...</source>
+      <translation>Audit napló...</translation>
+    </message>
+    <message>
+      <source>Bookmark Search...</source>
+      <translation>Könyvjelzőkeresés...</translation>
+    </message>
+    <message>
+      <source>Log in to %1...</source>
+      <comment>Log in to Nx Cloud</comment>
+      <translation>Bejelentkezés ide: %1...</translation>
+    </message>
+    <message>
+      <source>Log out from %1</source>
+      <comment>Log out from Nx Cloud</comment>
+      <translation>Jelentkezzen ki a %1-ból</translation>
+    </message>
+    <message>
+      <source>Open %1 Portal...</source>
+      <comment>Open Nx Cloud Portal</comment>
+      <translation>Nyissa meg a %1 portált...</translation>
+    </message>
+    <message>
+      <source>Account Settings...</source>
+      <translation>Fiókbeállítások...</translation>
+    </message>
+    <message>
+      <source>Create Account...</source>
+      <translation>Fiók létrehozása...</translation>
+    </message>
+    <message>
+      <source>Event Rules...</source>
+      <translation>Esemény szabályok...</translation>
+    </message>
+    <message>
+      <source>Devices List</source>
+      <translation>Eszközlista</translation>
+    </message>
+    <message>
+      <source>Cameras List</source>
+      <translation>Kameralista</translation>
+    </message>
+    <message>
+      <source>Merge Systems...</source>
+      <translation>Rendszerek összevonása...</translation>
+    </message>
+    <message>
+      <source>About...</source>
+      <translation>Névjegy...</translation>
+    </message>
+    <message>
+      <source>Exit</source>
+      <translation>Kilépés</translation>
+    </message>
+    <message>
+      <source>Mark Selection Start</source>
+      <translation>Adja meg a jelölés kezdetét</translation>
+    </message>
+    <message>
+      <source>Mark Selection End</source>
+      <translation>Adja meg a jelölés végét</translation>
+    </message>
+    <message>
+      <source>Clear Selection</source>
+      <translation>Jelölés törlése</translation>
+    </message>
+    <message>
+      <source>Zoom to Selection</source>
+      <translation>Zoomolás a jelölésre</translation>
+    </message>
+    <message>
+      <source>Add Bookmark...</source>
+      <translation>Könyvjelző hozzáadása...</translation>
+    </message>
+    <message>
+      <source>Edit Bookmark...</source>
+      <translation>Könyvjelző szerkesztése...</translation>
+    </message>
+    <message>
+      <source>Remove Bookmark...</source>
+      <translation>Könyvjelző eltávolítása...</translation>
+    </message>
+    <message>
+      <source>Remove Bookmarks...</source>
+      <translation>Könyvejlzők eltávolítása...</translation>
+    </message>
+    <message>
+      <source>Export Selected Area...</source>
+      <translation>Kijelölt terület exportálása...</translation>
+    </message>
+    <message>
+      <source>Export Multi-Video...</source>
+      <translation>Multi-videó exportálása...</translation>
+    </message>
+    <message>
+      <source>Export Rapid Review...</source>
+      <translation>Gyors áttekintés exportálása...</translation>
+    </message>
+    <message>
+      <source>Preview Search...</source>
+      <translation>Keresés előnézet...</translation>
+    </message>
+    <message>
+      <source>Server...</source>
+      <translation>Szerver...</translation>
+    </message>
+    <message>
+      <source>Open</source>
+      <translation>Megnyitás</translation>
+    </message>
+    <message>
+      <source>Monitor</source>
+      <translation>Szerverállapot</translation>
+    </message>
+    <message>
+      <source>Open in New Tab</source>
+      <translation>Megnyitás új lapon</translation>
+    </message>
+    <message>
+      <source>Monitor in New Tab</source>
+      <translation>Szerverállapot új lapon</translation>
+    </message>
+    <message>
+      <source>Open in Alarm Layout</source>
+      <translation>Megnyitás a riasztás elrendezésben</translation>
+    </message>
+    <message>
+      <source>Open in New Window</source>
+      <translation>Megnyitás új ablakban</translation>
+    </message>
+    <message>
+      <source>Monitor in New Window</source>
+      <translation>Szerverállapot új ablakban</translation>
+    </message>
+    <message>
+      <source>Open Video Wall</source>
+      <translation type="unfinished">Open Video Wall</translation>
+    </message>
+    <message>
+      <source>Open Containing Folder</source>
+      <translation>Tartalmazó mappa megnyitása</translation>
+    </message>
+    <message>
+      <source>Identify</source>
+      <translation>Azonosítás</translation>
+    </message>
+    <message>
+      <source>Attach to Video Wall...</source>
+      <translation>Videófal csatlakoztatása...</translation>
+    </message>
+    <message>
+      <source>Switch to Video Wall mode...</source>
+      <translation>Váltás videófal módra...</translation>
+    </message>
+    <message>
+      <source>Save Video Wall</source>
+      <translation type="unfinished">Save Video Wall</translation>
+    </message>
+    <message>
+      <source>Save Current Matrix</source>
+      <translation>Jelenlegi mártix mentése</translation>
+    </message>
+    <message>
+      <source>Load Matrix</source>
+      <translation>Mátrix betöltése</translation>
+    </message>
+    <message>
+      <source>Delete</source>
+      <translation>Törlés</translation>
+    </message>
+    <message>
+      <source>Stop Video Wall</source>
+      <translation>Videófal leállítása</translation>
+    </message>
+    <message>
+      <source>Clear Screen</source>
+      <translation>Képernyő törlése</translation>
+    </message>
+    <message>
+      <source>Save Layout</source>
+      <translation>Elrendezés mentése</translation>
+    </message>
+    <message>
+      <source>Save Layout As...</source>
+      <translation>Elrendezés mentése mint...</translation>
+    </message>
+    <message>
+      <source>Maximize Item</source>
+      <translation>Elem maximalizálása</translation>
+    </message>
+    <message>
+      <source>Restore Item</source>
+      <translation>Elem visszaállítása</translation>
+    </message>
+    <message>
+      <source>Show Info</source>
+      <translation>Info megjelenítése</translation>
+    </message>
+    <message>
+      <source>Hide Info</source>
+      <translation>Info elrejtése</translation>
+    </message>
+    <message>
+      <source>Change Resolution...</source>
+      <translation>Felbontás változtatása...</translation>
+    </message>
+    <message>
+      <source>Auto</source>
+      <translation>Auto</translation>
+    </message>
+    <message>
+      <source>Low</source>
+      <translation>Alacsony</translation>
+    </message>
+    <message>
+      <source>High</source>
+      <translation>Magas</translation>
+    </message>
+    <message>
+      <source>PTZ...</source>
+      <translation>PTZ...</translation>
+    </message>
+    <message>
+      <source>Save Current Position...</source>
+      <translation>Jelenlegi pozíció mentése...</translation>
+    </message>
+    <message>
+      <source>Manage...</source>
+      <translation>Kezelés...</translation>
+    </message>
+    <message>
+      <source>Show Motion/Smart Search</source>
+      <translation>Mozgás megjelenítése/Okoskeresés</translation>
+    </message>
+    <message>
+      <source>Show Motion</source>
+      <translation>Mozgás megjelenítése</translation>
+    </message>
+    <message>
+      <source>Hide Motion/Smart Search</source>
+      <translation>Mozgás elrejtése/Okoskeresés</translation>
+    </message>
+    <message>
+      <source>Hide Motion</source>
+      <translation>Mozgás elrejtése</translation>
+    </message>
+    <message>
+      <source>Clear Motion Selection</source>
+      <translation>Mozgás kiválasztás törlése</translation>
+    </message>
+    <message>
+      <source>Check File Watermark</source>
+      <translation>Vízjel ellenőrzése</translation>
+    </message>
+    <message>
+      <source>Image Enhancement...</source>
+      <translation>Kép javítása...</translation>
+    </message>
+    <message>
+      <source>Rotate to...</source>
+      <translation>Forgatás mértéke...</translation>
+    </message>
+    <message>
+      <source>0 degrees</source>
+      <translation>0 fok</translation>
+    </message>
+    <message>
+      <source>90 degrees</source>
+      <translation>90 fok</translation>
+    </message>
+    <message>
+      <source>180 degrees</source>
+      <translation>180 fok</translation>
+    </message>
+    <message>
+      <source>270 degrees</source>
+      <translation>270 fok</translation>
+    </message>
+    <message>
+      <source>Remove from Layout</source>
+      <translation>Eltávolítás az elrendezésből</translation>
+    </message>
+    <message>
+      <source>Remove from Tour</source>
+      <translation type="unfinished">Remove from Tour</translation>
+    </message>
+    <message>
+      <source>Stop Sharing Layout</source>
+      <translation>Elrendezések megosztásának leállítása</translation>
+    </message>
+    <message>
+      <source>Edit...</source>
+      <translation type="unfinished">Edit...</translation>
+    </message>
+    <message>
+      <source>Rename</source>
+      <translation>Átnevezés</translation>
+    </message>
+    <message>
+      <source>Delete from Disk</source>
+      <translation>Törlés a lemezről</translation>
+    </message>
+    <message>
+      <source>Set as Layout Background</source>
+      <translation>Bellállítás az elrendezés háttereként</translation>
+    </message>
+    <message>
+      <source>User Settings...</source>
+      <translation>Felhasználó beállítások...</translation>
+    </message>
+    <message>
+      <source>User Roles...</source>
+      <translation>Felhasználó szerepkörök...</translation>
+    </message>
+    <message>
+      <source>Role Settings...</source>
+      <translation>Szerepkör beállítások...</translation>
+    </message>
+    <message>
+      <source>Check Device Issues...</source>
+      <translation>Eszköz problémák ellenőrzése...</translation>
+    </message>
+    <message>
+      <source>Check Devices Issues...</source>
+      <translation>Eszközök problémáinak ellenőrzése...</translation>
+    </message>
+    <message>
+      <source>Check Camera Issues...</source>
+      <translation>Kamera problémák ellenőrzése...</translation>
+    </message>
+    <message>
+      <source>Check Cameras Issues...</source>
+      <translation>Kamerák problémáinak ellenőrzése...</translation>
+    </message>
+    <message>
+      <source>Check I/O Module Issues...</source>
+      <translation>I/O modul jellemzőinek ellenőrzése...</translation>
+    </message>
+    <message>
+      <source>Check I/O Modules Issues...</source>
+      <translation>I/O modulok jellemzőinek ellenőrzése...</translation>
+    </message>
+    <message>
+      <source>Device Rules...</source>
+      <translation>Eszköz szabályok...</translation>
+    </message>
+    <message>
+      <source>Devices Rules...</source>
+      <translation>Eszközök szabályai...</translation>
+    </message>
+    <message>
+      <source>Camera Rules...</source>
+      <translation>Kamera szabályok...</translation>
+    </message>
+    <message>
+      <source>Cameras Rules...</source>
+      <translation>Kamerák szabályai...</translation>
+    </message>
+    <message>
+      <source>I/O Module Rules...</source>
+      <translation>I/O modul szabályok...</translation>
+    </message>
+    <message>
+      <source>I/O Modules Rules...</source>
+      <translation>I/O modulok szabályai...</translation>
+    </message>
+    <message>
+      <source>Device Settings...</source>
+      <translation>Eszköz beállítások...</translation>
+    </message>
+    <message>
+      <source>Devices Settings...</source>
+      <translation>Eszközök beállításai...</translation>
+    </message>
+    <message>
+      <source>Camera Settings...</source>
+      <translation>Kamera beállítások...</translation>
+    </message>
+    <message>
+      <source>Cameras Settings...</source>
+      <translation>Kamerák beállításai...</translation>
+    </message>
+    <message>
+      <source>I/O Module Settings...</source>
+      <translation>I/O modul beállításai...</translation>
+    </message>
+    <message>
+      <source>I/O Modules Settings...</source>
+      <translation>I/O modulok beállításai...</translation>
+    </message>
+    <message>
+      <source>File Settings...</source>
+      <translation>Fájl beállítások...</translation>
+    </message>
+    <message>
+      <source>Layout Settings...</source>
+      <translation>Elrendezés beállításai...</translation>
+    </message>
+    <message>
+      <source>Video Wall Settings...</source>
+      <translation>Videófal beállításai...</translation>
+    </message>
+    <message>
+      <source>Add Device...</source>
+      <translation>Eszköz hozzáadása...</translation>
+    </message>
+    <message>
+      <source>Devices List by Server...</source>
+      <translation>Eszközlista szerver szerint...</translation>
+    </message>
+    <message>
+      <source>Cameras List by Server...</source>
+      <translation>Kamera lista szerver szerint...</translation>
+    </message>
+    <message>
+      <source>Server Logs...</source>
+      <translation>Szerver naplók...</translation>
+    </message>
+    <message>
+      <source>Server Diagnostics...</source>
+      <translation>Szerver diagnosztikák...</translation>
+    </message>
+    <message>
+      <source>Server Web Page...</source>
+      <translation>Szerver weboldala...</translation>
+    </message>
+    <message>
+      <source>Server Settings...</source>
+      <translation>Szerver beállításbeállítások...</translation>
+    </message>
+    <message>
+      <source>Merge to Currently Connected System...</source>
+      <translation>Összevonás a ejelenleg csatlakoztatott rendszerrel...</translation>
+    </message>
+    <message>
+      <source>Change Cell Aspect Ratio...</source>
+      <translation>Cella képarány megváltoztatása...</translation>
+    </message>
+    <message>
+      <source>Change Cell Spacing...</source>
+      <translation>Cellaközök megváltoztatása...</translation>
+    </message>
+    <message>
+      <source>None</source>
+      <translation>Semmi</translation>
+    </message>
+    <message>
+      <source>Small</source>
+      <translation>Kicsi</translation>
+    </message>
+    <message>
+      <source>Medium</source>
+      <translation>Közepes</translation>
+    </message>
+    <message>
+      <source>Large</source>
+      <translation>Nagy</translation>
+    </message>
+    <message>
+      <source>Start Tour</source>
+      <translation>Túra indítása</translation>
+    </message>
+    <message>
+      <source>Stop Tour</source>
+      <translation>Túra leállítása</translation>
+    </message>
+    <message>
+      <source>Make Layout Tour</source>
+      <translation type="unfinished">Make Layout Tour</translation>
+    </message>
+    <message>
+      <source>Settings</source>
+      <translation type="unfinished">Settings</translation>
+    </message>
+    <message>
+      <source>Close</source>
+      <translation>Bezár</translation>
+    </message>
+    <message>
+      <source>Close All But This</source>
+      <translation>Minden más bezárása</translation>
+    </message>
+    <message>
+      <source>Play</source>
+      <translation>Letjátszás</translation>
+    </message>
+    <message>
+      <source>Pause</source>
+      <translation>Szünet</translation>
+    </message>
+    <message>
+      <source>Previous Frame</source>
+      <translation>Előző kocka</translation>
+    </message>
+    <message>
+      <source>Next Frame</source>
+      <translation>Következő kocka</translation>
+    </message>
+    <message>
+      <source>To Start</source>
+      <translation>Elejéhez</translation>
+    </message>
+    <message>
+      <source>To End</source>
+      <translation>Végéhez</translation>
+    </message>
+    <message>
+      <source>Volume Down</source>
+      <translation>Hangerő le</translation>
+    </message>
+    <message>
+      <source>Volume Up</source>
+      <translation>Hangerő fel</translation>
+    </message>
+    <message>
+      <source>Toggle Mute</source>
+      <translation>Némitás váltása</translation>
+    </message>
+    <message>
+      <source>Jump to Live</source>
+      <translation>Élőmódba ugrás</translation>
+    </message>
+    <message>
+      <source>Synchronize Streams</source>
+      <translation>Streamek szinkronizálása</translation>
+    </message>
+    <message>
+      <source>Disable Stream Synchronization</source>
+      <translation>Stream szinkronizálás tiltása</translation>
+    </message>
+    <message>
+      <source>Show Bookmarks</source>
+      <translation>Könyvjelzők megjelenítése</translation>
+    </message>
+    <message>
+      <source>Hide Bookmarks</source>
+      <translation>Könyvjelzők elrejtése</translation>
+    </message>
+    <message>
+      <source>Show Calendar</source>
+      <translation>Naptár megjelenítése</translation>
+    </message>
+    <message>
+      <source>Hide Calendar</source>
+      <translation>Naptár elrejtése</translation>
+    </message>
+    <message>
+      <source>Show Title Bar</source>
+      <translation>Címsor megjelenítése</translation>
+    </message>
+    <message>
+      <source>Hide Title Bar</source>
+      <translation>Címsor elrejtése</translation>
+    </message>
+    <message>
+      <source>Pin Tree</source>
+      <translation>Faszerkezet rögzítése</translation>
+    </message>
+    <message>
+      <source>Unpin Tree</source>
+      <translation>Faszerkezet feloldása</translation>
+    </message>
+    <message>
+      <source>Show Tree</source>
+      <translation>Faszerkezet megjelenítése</translation>
+    </message>
+    <message>
+      <source>Hide Tree</source>
+      <translation>Faszerkezet elrejtése</translation>
+    </message>
+    <message>
+      <source>Show Timeline</source>
+      <translation>Idővonal megjelenítése</translation>
+    </message>
+    <message>
+      <source>Hide Timeline</source>
+      <translation>Idővonal elrejtése</translation>
+    </message>
+    <message>
+      <source>Show Notifications</source>
+      <translation>Értesítések megjelenítése</translation>
+    </message>
+    <message>
+      <source>Hide Notifications</source>
+      <translation>Értesítések elrejtése</translation>
+    </message>
+    <message>
+      <source>Pin Notifications</source>
+      <translation>Figyelmeztetések rögzítése</translation>
+    </message>
+    <message>
+      <source>Unpin Notifications</source>
+      <translation>Figylemeztetések feloldása</translation>
+    </message>
+  </context>
+  <context>
     <name>CustomHorizontalHeader</name>
     <message>
       <source>5 minutes</source>
@@ -117,6 +919,45 @@ több könyvjelző megjelenítéséhez</translation>
     <message>
       <source>For all data</source>
       <translation>Az összes adara</translation>
+    </message>
+  </context>
+  <context>
+    <name>Deactivator</name>
+    <message>
+      <source>Unknown error</source>
+      <translation type="unfinished">Unknown error</translation>
+    </message>
+    <message>
+      <source>License does not exist</source>
+      <translation type="unfinished">License does not exist</translation>
+    </message>
+    <message>
+      <source>License is disabled</source>
+      <translation type="unfinished">License is disabled</translation>
+    </message>
+    <message>
+      <source>License is inactive</source>
+      <translation type="unfinished">License is inactive</translation>
+    </message>
+    <message>
+      <source>Invalid license</source>
+      <translation type="unfinished">Invalid license</translation>
+    </message>
+    <message>
+      <source>License is trial</source>
+      <translation type="unfinished">License is trial</translation>
+    </message>
+    <message>
+      <source>License is in deactivation process</source>
+      <translation type="unfinished">License is in deactivation process</translation>
+    </message>
+    <message>
+      <source>Invalid hardware id</source>
+      <translation type="unfinished">Invalid hardware id</translation>
+    </message>
+    <message>
+      <source>Limit exceeded</source>
+      <translation type="unfinished">Limit exceeded</translation>
     </message>
   </context>
   <context>
@@ -234,37 +1075,6 @@ több könyvjelző megjelenítéséhez</translation>
     <message>
       <source>Permissions</source>
       <translation>Engedélyek</translation>
-    </message>
-  </context>
-  <context>
-    <name>Ptz</name>
-    <message>
-      <source>Please wait for the camera to go online.</source>
-      <translation>Kérem várjon míg a kamera elérhetővé válik.</translation>
-    </message>
-    <message>
-      <source>Failed to get current position</source>
-      <translation>Nem sikerült beolvasni a jelenlegi pozíciót</translation>
-    </message>
-    <message>
-      <source>Failed to set current position</source>
-      <translation>Nem sikerült beállítani a jelenlegi pozíciót</translation>
-    </message>
-    <message>
-      <source>Preset used by some tours. Delete it anyway?</source>
-      <translation>A persetet néhány túra használja. Mégis törli?</translation>
-    </message>
-    <message>
-      <source>These tours will become invalid.</source>
-      <translation>Ezek a túrák érvénytelenné válnak.</translation>
-    </message>
-    <message>
-      <source>Cannot get the current position from camera &quot;%1&quot;</source>
-      <translation type="unfinished">Cannot get the current position from camera &quot;%1&quot;</translation>
-    </message>
-    <message>
-      <source>Cannot set the current position for camera &quot;%1&quot;</source>
-      <translation type="unfinished">Cannot set the current position for camera &quot;%1&quot;</translation>
     </message>
   </context>
   <context>
@@ -399,940 +1209,6 @@ több könyvjelző megjelenítéséhez</translation>
     </message>
   </context>
   <context>
-    <name>QnActionManager</name>
-    <message>
-      <source>Show FPS</source>
-      <translation>FPS megjelenítése</translation>
-    </message>
-    <message>
-      <source>Hide FPS</source>
-      <translation>FPS elrejtése</translation>
-    </message>
-    <message>
-      <source>Drop Resources</source>
-      <translation>Eszköz bedobása</translation>
-    </message>
-    <message>
-      <source>Drop Resources into New Layout</source>
-      <translation>Eszköz bedobása új elrednezésre</translation>
-    </message>
-    <message>
-      <source>Delayed Open Video Wall</source>
-      <translation>Videófal késleltetett megnyitása</translation>
-    </message>
-    <message>
-      <source>Delayed Drop Resources</source>
-      <translation>Késleltetett eszköz bedobás</translation>
-    </message>
-    <message>
-      <source>Instant Drop Resources</source>
-      <translation>Eszköz azonnali bedobása</translation>
-    </message>
-    <message>
-      <source>Next Layout</source>
-      <translation>Következő elrendezés</translation>
-    </message>
-    <message>
-      <source>Previous Layout</source>
-      <translation>Előző elrendezés</translation>
-    </message>
-    <message>
-      <source>Select All</source>
-      <translation>Mind kijelölése</translation>
-    </message>
-    <message>
-      <source>Selection Changed</source>
-      <translation>Kijelölés megváltozott</translation>
-    </message>
-    <message>
-      <source>Filter...</source>
-      <translation>Szűrő...</translation>
-    </message>
-    <message>
-      <source>Go to Freespace Mode</source>
-      <translation>Freespace módra váltás</translation>
-    </message>
-    <message>
-      <source>Help</source>
-      <translation>Súgó</translation>
-    </message>
-    <message>
-      <source>Event Log...</source>
-      <translation>Eseménylista...</translation>
-    </message>
-    <message>
-      <source>Control Video Wall</source>
-      <translation>Videofal vezérlése</translation>
-    </message>
-    <message>
-      <source>Push my screen</source>
-      <translation>Saját képernyő átadása</translation>
-    </message>
-    <message>
-      <source>Restart application</source>
-      <translation>Alkalmazás újraindítása</translation>
-    </message>
-    <message>
-      <source>Select Time Server</source>
-      <translation>Időszerver kiválasztása</translation>
-    </message>
-    <message>
-      <source>Go To Saved Position</source>
-      <translation>Lépés mentett pozícióra</translation>
-    </message>
-    <message>
-      <source>Activate PTZ Tour</source>
-      <translation>PTZ túra indítása</translation>
-    </message>
-    <message>
-      <source>Activate PTZ Object</source>
-      <translation>PTZ objektum indítása</translation>
-    </message>
-    <message>
-      <source>Fit in View</source>
-      <translation>Beillesztés nézetbe</translation>
-    </message>
-    <message>
-      <source>Main Menu</source>
-      <translation>Főmenü</translation>
-    </message>
-    <message>
-      <source>Connect to Server...</source>
-      <translation>Csatlakozás szerverhez...</translation>
-    </message>
-    <message>
-      <source>Start Panic Recording</source>
-      <translation>Pánikrögzítés indítása</translation>
-    </message>
-    <message>
-      <source>Stop Panic Recording</source>
-      <translation>Pánikrögzítés leállítása</translation>
-    </message>
-    <message>
-      <source>New...</source>
-      <translation>Új...</translation>
-    </message>
-    <message>
-      <source>New Layout...</source>
-      <translation>Új elrendezés...</translation>
-    </message>
-    <message>
-      <source>Tab</source>
-      <translation>Lap</translation>
-    </message>
-    <message>
-      <source>New Tab</source>
-      <translation>Új lap</translation>
-    </message>
-    <message>
-      <source>Window</source>
-      <translation>Ablak</translation>
-    </message>
-    <message>
-      <source>New Window</source>
-      <translation>Új ablak</translation>
-    </message>
-    <message>
-      <source>User...</source>
-      <translation>Felhasználó...</translation>
-    </message>
-    <message>
-      <source>New User...</source>
-      <translation>Új felhasználó...</translation>
-    </message>
-    <message>
-      <source>Video Wall...</source>
-      <translation>Videófal...</translation>
-    </message>
-    <message>
-      <source>New Video Wall...</source>
-      <translation>Új videófal...</translation>
-    </message>
-    <message>
-      <source>Open Layout...</source>
-      <translation>Elrendezés megnyitása...</translation>
-    </message>
-    <message>
-      <source>Open...</source>
-      <translation>Megnyitás...</translation>
-    </message>
-    <message>
-      <source>File(s)...</source>
-      <translation>Fájl(ok)...</translation>
-    </message>
-    <message>
-      <source>Folder...</source>
-      <translation>Mappa...</translation>
-    </message>
-    <message>
-      <source>Save Current Layout</source>
-      <translation>Jelenlegi elrendezés mentése</translation>
-    </message>
-    <message>
-      <source>Save Current Layout As...</source>
-      <translation>Jelenlegi elrendezés mentése mint...</translation>
-    </message>
-    <message>
-      <source>Save Video Wall View</source>
-      <translation>Videofal nézet mentése</translation>
-    </message>
-    <message>
-      <source>Start Screen Recording</source>
-      <translation>Képernyőfelvétel indítása</translation>
-    </message>
-    <message>
-      <source>Stop Screen Recording</source>
-      <translation>Képernyőfelvétel leállítása</translation>
-    </message>
-    <message>
-      <source>Stop current action</source>
-      <translation>Jelenlegi munkamenet leállítása</translation>
-    </message>
-    <message>
-      <source>Go to Fullscreen</source>
-      <translation>Váltás teljesképernyőre</translation>
-    </message>
-    <message>
-      <source>Exit Fullscreen</source>
-      <translation>Kilépés teljesképernyős módból</translation>
-    </message>
-    <message>
-      <source>Minimize</source>
-      <translation>Minimalizálás</translation>
-    </message>
-    <message>
-      <source>Maximize</source>
-      <translation>Maximalizálás</translation>
-    </message>
-    <message>
-      <source>Restore Down</source>
-      <translation>Visszaállítás tálcaméretre</translation>
-    </message>
-    <message>
-      <source>Open in Browser...</source>
-      <translation>Megnyitás böngészőben...</translation>
-    </message>
-    <message>
-      <source>System Administration...</source>
-      <translation>Rendszer adminisztráció...</translation>
-    </message>
-    <message>
-      <source>Open Web Client...</source>
-      <translation>Megnyitás web kliensben...</translation>
-    </message>
-    <message>
-      <source>System Update...</source>
-      <translation>Rendszer frissítése...</translation>
-    </message>
-    <message>
-      <source>Local Settings...</source>
-      <translation>Helyi beállítások...</translation>
-    </message>
-    <message>
-      <source>Merge Systems...</source>
-      <translation>Rendszerek összevonása...</translation>
-    </message>
-    <message>
-      <source>About...</source>
-      <translation>Névjegy...</translation>
-    </message>
-    <message>
-      <source>Exit</source>
-      <translation>Kilépés</translation>
-    </message>
-    <message>
-      <source>Server...</source>
-      <translation>Szerver...</translation>
-    </message>
-    <message>
-      <source>Open in Layout</source>
-      <translation>Megnyitás elrendezésben</translation>
-    </message>
-    <message>
-      <source>Open</source>
-      <translation>Megnyitás</translation>
-    </message>
-    <message>
-      <source>Monitor</source>
-      <translation>Szerverállapot</translation>
-    </message>
-    <message>
-      <source>Open in New Tab</source>
-      <translation>Megnyitás új lapon</translation>
-    </message>
-    <message>
-      <source>Open in New Window</source>
-      <translation>Megnyitás új ablakban</translation>
-    </message>
-    <message>
-      <source>Open Layouts</source>
-      <translation>Elrendezések megnyitása</translation>
-    </message>
-    <message>
-      <source>Open Layout(s)</source>
-      <translation>Elrendezés(ek) megnyitása</translation>
-    </message>
-    <message>
-      <source>Open Video Wall(s)</source>
-      <translation>Videófal(ak) megnyitása</translation>
-    </message>
-    <message>
-      <source>Open Containing Folder</source>
-      <translation>Tartalmazó mappa megnyitása</translation>
-    </message>
-    <message>
-      <source>Identify</source>
-      <translation>Azonosítás</translation>
-    </message>
-    <message>
-      <source>Attach to Video Wall...</source>
-      <translation>Videófal csatlakoztatása...</translation>
-    </message>
-    <message>
-      <source>Switch to Video Wall mode...</source>
-      <translation>Váltás videófal módra...</translation>
-    </message>
-    <message>
-      <source>Save Current Matrix</source>
-      <translation>Jelenlegi mártix mentése</translation>
-    </message>
-    <message>
-      <source>Load Matrix</source>
-      <translation>Mátrix betöltése</translation>
-    </message>
-    <message>
-      <source>Delete</source>
-      <translation>Törlés</translation>
-    </message>
-    <message>
-      <source>Stop Video Wall</source>
-      <translation>Videófal leállítása</translation>
-    </message>
-    <message>
-      <source>Save Layout</source>
-      <translation>Elrendezés mentése</translation>
-    </message>
-    <message>
-      <source>Save Layout As...</source>
-      <translation>Elrendezés mentése mint...</translation>
-    </message>
-    <message>
-      <source>Maximize Item</source>
-      <translation>Elem maximalizálása</translation>
-    </message>
-    <message>
-      <source>Restore Item</source>
-      <translation>Elem visszaállítása</translation>
-    </message>
-    <message>
-      <source>Show Info</source>
-      <translation>Info megjelenítése</translation>
-    </message>
-    <message>
-      <source>Hide Info</source>
-      <translation>Info elrejtése</translation>
-    </message>
-    <message>
-      <source>Toggle Info</source>
-      <translation>Info állpaotváltása</translation>
-    </message>
-    <message>
-      <source>Change Resolution...</source>
-      <translation>Felbontás változtatása...</translation>
-    </message>
-    <message>
-      <source>Auto</source>
-      <translation>Auto</translation>
-    </message>
-    <message>
-      <source>Low</source>
-      <translation>Alacsony</translation>
-    </message>
-    <message>
-      <source>High</source>
-      <translation>Magas</translation>
-    </message>
-    <message>
-      <source>PTZ...</source>
-      <translation>PTZ...</translation>
-    </message>
-    <message>
-      <source>Save Current Position...</source>
-      <translation>Jelenlegi pozíció mentése...</translation>
-    </message>
-    <message>
-      <source>Manage...</source>
-      <translation>Kezelés...</translation>
-    </message>
-    <message>
-      <source>Calibrate Fisheye</source>
-      <translation>Halszem kalibrálása</translation>
-    </message>
-    <message>
-      <source>Toggle Resolution Mode</source>
-      <translation>Felbontás mód váltása</translation>
-    </message>
-    <message>
-      <source>Show Motion/Smart Search</source>
-      <translation>Mozgás megjelenítése/Okoskeresés</translation>
-    </message>
-    <message>
-      <source>Show Motion</source>
-      <translation>Mozgás megjelenítése</translation>
-    </message>
-    <message>
-      <source>Hide Motion/Smart Search</source>
-      <translation>Mozgás elrejtése/Okoskeresés</translation>
-    </message>
-    <message>
-      <source>Hide Motion</source>
-      <translation>Mozgás elrejtése</translation>
-    </message>
-    <message>
-      <source>Clear Motion Selection</source>
-      <translation>Mozgás kiválasztás törlése</translation>
-    </message>
-    <message>
-      <source>Toggle Smart Search</source>
-      <translation>Okoskeresés váltása</translation>
-    </message>
-    <message>
-      <source>Check File Watermark</source>
-      <translation>Vízjel ellenőrzése</translation>
-    </message>
-    <message>
-      <source>Take Screenshot</source>
-      <translation>Fénykép készítése</translation>
-    </message>
-    <message>
-      <source>Image Enhancement...</source>
-      <translation>Kép javítása...</translation>
-    </message>
-    <message>
-      <source>Create Zoom Window</source>
-      <translation>Zoom ablak létrehozása</translation>
-    </message>
-    <message>
-      <source>Rotate to...</source>
-      <translation>Forgatás mértéke...</translation>
-    </message>
-    <message>
-      <source>0 degrees</source>
-      <translation>0 fok</translation>
-    </message>
-    <message>
-      <source>90 degrees</source>
-      <translation>90 fok</translation>
-    </message>
-    <message>
-      <source>180 degrees</source>
-      <translation>180 fok</translation>
-    </message>
-    <message>
-      <source>270 degrees</source>
-      <translation>270 fok</translation>
-    </message>
-    <message>
-      <source>Remove from Layout</source>
-      <translation>Eltávolítás az elrendezésből</translation>
-    </message>
-    <message>
-      <source>Rename</source>
-      <translation>Átnevezés</translation>
-    </message>
-    <message>
-      <source>Delete from Disk</source>
-      <translation>Törlés a lemezről</translation>
-    </message>
-    <message>
-      <source>Set as Layout Background</source>
-      <translation>Bellállítás az elrendezés háttereként</translation>
-    </message>
-    <message>
-      <source>User Settings...</source>
-      <translation>Felhasználó beállítások...</translation>
-    </message>
-    <message>
-      <source>Layout Settings...</source>
-      <translation>Elrendezés beállításai...</translation>
-    </message>
-    <message>
-      <source>Video Wall Settings...</source>
-      <translation>Videófal beállításai...</translation>
-    </message>
-    <message>
-      <source>Ping...</source>
-      <translation>Ping...</translation>
-    </message>
-    <message>
-      <source>Server Logs...</source>
-      <translation>Szerver naplók...</translation>
-    </message>
-    <message>
-      <source>Server Diagnostics...</source>
-      <translation>Szerver diagnosztikák...</translation>
-    </message>
-    <message>
-      <source>Server Settings...</source>
-      <translation>Szerver beállításbeállítások...</translation>
-    </message>
-    <message>
-      <source>Merge to Currently Connected System...</source>
-      <translation>Összevonás a ejelenleg csatlakoztatott rendszerrel...</translation>
-    </message>
-    <message>
-      <source>Change Cell Aspect Ratio...</source>
-      <translation>Cella képarány megváltoztatása...</translation>
-    </message>
-    <message>
-      <source>Change Cell Spacing...</source>
-      <translation>Cellaközök megváltoztatása...</translation>
-    </message>
-    <message>
-      <source>None</source>
-      <translation>Semmi</translation>
-    </message>
-    <message>
-      <source>Small</source>
-      <translation>Kicsi</translation>
-    </message>
-    <message>
-      <source>Medium</source>
-      <translation>Közepes</translation>
-    </message>
-    <message>
-      <source>Large</source>
-      <translation>Nagy</translation>
-    </message>
-    <message>
-      <source>Start Tour</source>
-      <translation>Túra indítása</translation>
-    </message>
-    <message>
-      <source>Stop Tour</source>
-      <translation>Túra leállítása</translation>
-    </message>
-    <message>
-      <source>Close</source>
-      <translation>Bezár</translation>
-    </message>
-    <message>
-      <source>Close All But This</source>
-      <translation>Minden más bezárása</translation>
-    </message>
-    <message>
-      <source>Mark Selection Start</source>
-      <translation>Adja meg a jelölés kezdetét</translation>
-    </message>
-    <message>
-      <source>Mark Selection End</source>
-      <translation>Adja meg a jelölés végét</translation>
-    </message>
-    <message>
-      <source>Clear Selection</source>
-      <translation>Jelölés törlése</translation>
-    </message>
-    <message>
-      <source>Zoom to Selection</source>
-      <translation>Zoomolás a jelölésre</translation>
-    </message>
-    <message>
-      <source>Edit Bookmark...</source>
-      <translation>Könyvjelző szerkesztése...</translation>
-    </message>
-    <message>
-      <source>Remove Bookmark...</source>
-      <translation>Könyvjelző eltávolítása...</translation>
-    </message>
-    <message>
-      <source>Export Selected Area...</source>
-      <translation>Kijelölt terület exportálása...</translation>
-    </message>
-    <message>
-      <source>Export Multi-Video...</source>
-      <translation>Multi-videó exportálása...</translation>
-    </message>
-    <message>
-      <source>Preview Search...</source>
-      <translation>Keresés előnézet...</translation>
-    </message>
-    <message>
-      <source>Play</source>
-      <translation>Letjátszás</translation>
-    </message>
-    <message>
-      <source>Pause</source>
-      <translation>Szünet</translation>
-    </message>
-    <message>
-      <source>Previous Frame</source>
-      <translation>Előző kocka</translation>
-    </message>
-    <message>
-      <source>Next Frame</source>
-      <translation>Következő kocka</translation>
-    </message>
-    <message>
-      <source>To Start</source>
-      <translation>Elejéhez</translation>
-    </message>
-    <message>
-      <source>To End</source>
-      <translation>Végéhez</translation>
-    </message>
-    <message>
-      <source>Volume Down</source>
-      <translation>Hangerő le</translation>
-    </message>
-    <message>
-      <source>Volume Up</source>
-      <translation>Hangerő fel</translation>
-    </message>
-    <message>
-      <source>Toggle Mute</source>
-      <translation>Némitás váltása</translation>
-    </message>
-    <message>
-      <source>Jump to Live</source>
-      <translation>Élőmódba ugrás</translation>
-    </message>
-    <message>
-      <source>Synchronize Streams</source>
-      <translation>Streamek szinkronizálása</translation>
-    </message>
-    <message>
-      <source>Disable Stream Synchronization</source>
-      <translation>Stream szinkronizálás tiltása</translation>
-    </message>
-    <message>
-      <source>Show Thumbnails</source>
-      <translation>Miniatűr megjelenítése</translation>
-    </message>
-    <message>
-      <source>Hide Thumbnails</source>
-      <translation>Miniatűr elrejtése</translation>
-    </message>
-    <message>
-      <source>Show Calendar</source>
-      <translation>Naptár megjelenítése</translation>
-    </message>
-    <message>
-      <source>Hide Calendar</source>
-      <translation>Naptár elrejtése</translation>
-    </message>
-    <message>
-      <source>Show Title Bar</source>
-      <translation>Címsor megjelenítése</translation>
-    </message>
-    <message>
-      <source>Hide Title Bar</source>
-      <translation>Címsor elrejtése</translation>
-    </message>
-    <message>
-      <source>Pin Tree</source>
-      <translation>Faszerkezet rögzítése</translation>
-    </message>
-    <message>
-      <source>Unpin Tree</source>
-      <translation>Faszerkezet feloldása</translation>
-    </message>
-    <message>
-      <source>Show Tree</source>
-      <translation>Faszerkezet megjelenítése</translation>
-    </message>
-    <message>
-      <source>Hide Tree</source>
-      <translation>Faszerkezet elrejtése</translation>
-    </message>
-    <message>
-      <source>Show Timeline</source>
-      <translation>Idővonal megjelenítése</translation>
-    </message>
-    <message>
-      <source>Hide Timeline</source>
-      <translation>Idővonal elrejtése</translation>
-    </message>
-    <message>
-      <source>Pin Notifications</source>
-      <translation>Figyelmeztetések rögzítése</translation>
-    </message>
-    <message>
-      <source>Unpin Notifications</source>
-      <translation>Figylemeztetések feloldása</translation>
-    </message>
-    <message>
-      <source>File Settings...</source>
-      <translation>Fájl beállítások...</translation>
-    </message>
-    <message>
-      <source>User Management...</source>
-      <translation>Felhasználó kezelés...</translation>
-    </message>
-    <message>
-      <source>Audit Trail...</source>
-      <translation>Audit napló...</translation>
-    </message>
-    <message>
-      <source>Failover Priority...</source>
-      <translation>Feladatátvétel prioritás...</translation>
-    </message>
-    <message>
-      <source>Move Devices</source>
-      <translation>Eszközök áthelyezése</translation>
-    </message>
-    <message>
-      <source>Move Cameras</source>
-      <translation>Kamerák mozgatása</translation>
-    </message>
-    <message>
-      <source>Device Diagnostics...</source>
-      <translation>Eszköz diagnosztika...</translation>
-    </message>
-    <message>
-      <source>Camera Diagnostics...</source>
-      <translation>Kamera diagnosztika...</translation>
-    </message>
-    <message>
-      <source>Devices List</source>
-      <translation>Eszközlista</translation>
-    </message>
-    <message>
-      <source>Cameras List</source>
-      <translation>Kameralista</translation>
-    </message>
-    <message>
-      <source>Check Device Issues...</source>
-      <translation>Eszköz problémák ellenőrzése...</translation>
-    </message>
-    <message>
-      <source>Check Devices Issues...</source>
-      <translation>Eszközök problémáinak ellenőrzése...</translation>
-    </message>
-    <message>
-      <source>Check Camera Issues...</source>
-      <translation>Kamera problémák ellenőrzése...</translation>
-    </message>
-    <message>
-      <source>Check Cameras Issues...</source>
-      <translation>Kamerák problémáinak ellenőrzése...</translation>
-    </message>
-    <message>
-      <source>Device Rules...</source>
-      <translation>Eszköz szabályok...</translation>
-    </message>
-    <message>
-      <source>Devices Rules...</source>
-      <translation>Eszközök szabályai...</translation>
-    </message>
-    <message>
-      <source>Camera Rules...</source>
-      <translation>Kamera szabályok...</translation>
-    </message>
-    <message>
-      <source>Cameras Rules...</source>
-      <translation>Kamerák szabályai...</translation>
-    </message>
-    <message>
-      <source>Device Settings...</source>
-      <translation>Eszköz beállítások...</translation>
-    </message>
-    <message>
-      <source>Devices Settings...</source>
-      <translation>Eszközök beállításai...</translation>
-    </message>
-    <message>
-      <source>Camera Settings...</source>
-      <translation>Kamera beállítások...</translation>
-    </message>
-    <message>
-      <source>Cameras Settings...</source>
-      <translation>Kamerák beállításai...</translation>
-    </message>
-    <message>
-      <source>Devices List by Server...</source>
-      <translation>Eszközlista szerver szerint...</translation>
-    </message>
-    <message>
-      <source>Cameras List by Server...</source>
-      <translation>Kamera lista szerver szerint...</translation>
-    </message>
-    <message>
-      <source>Cameras to Backup...</source>
-      <translation>Kamerák biztonsági mentése...</translation>
-    </message>
-    <message>
-      <source>Show Bookmarks</source>
-      <translation>Könyvjelzők megjelenítése</translation>
-    </message>
-    <message>
-      <source>Hide Bookmarks</source>
-      <translation>Könyvjelzők elrejtése</translation>
-    </message>
-    <message>
-      <source>Pin Calendar</source>
-      <translation>Naptár rögzítése</translation>
-    </message>
-    <message>
-      <source>Unpin Calendar</source>
-      <translation>Naptár feloldása</translation>
-    </message>
-    <message>
-      <source>I/O Module Diagnostics...</source>
-      <translation>I/O modul diagnosztika...</translation>
-    </message>
-    <message>
-      <source>Web Client...</source>
-      <translation>Webkliens...</translation>
-    </message>
-    <message>
-      <source>Bookmark Search...</source>
-      <translation>Könyvjelzőkeresés...</translation>
-    </message>
-    <message>
-      <source>Open in Alarm Layout</source>
-      <translation>Megnyitás a riasztás elrendezésben</translation>
-    </message>
-    <message>
-      <source>Check I/O Module Issues...</source>
-      <translation>I/O modul jellemzőinek ellenőrzése...</translation>
-    </message>
-    <message>
-      <source>Check I/O Modules Issues...</source>
-      <translation>I/O modulok jellemzőinek ellenőrzése...</translation>
-    </message>
-    <message>
-      <source>I/O Module Rules...</source>
-      <translation>I/O modul szabályok...</translation>
-    </message>
-    <message>
-      <source>I/O Modules Rules...</source>
-      <translation>I/O modulok szabályai...</translation>
-    </message>
-    <message>
-      <source>I/O Module Settings...</source>
-      <translation>I/O modul beállításai...</translation>
-    </message>
-    <message>
-      <source>I/O Modules Settings...</source>
-      <translation>I/O modulok beállításai...</translation>
-    </message>
-    <message>
-      <source>Remove Bookmarks...</source>
-      <translation>Könyvejlzők eltávolítása...</translation>
-    </message>
-    <message>
-      <source>Monitor in New Tab</source>
-      <translation>Szerverállapot új lapon</translation>
-    </message>
-    <message>
-      <source>Monitor in New Window</source>
-      <translation>Szerverállapot új ablakban</translation>
-    </message>
-    <message>
-      <source>Open Layout in New Tab</source>
-      <translation>Elrendezés megnyitása új lapon</translation>
-    </message>
-    <message>
-      <source>Open Layout(s) in New Window</source>
-      <translation>Elrendezés(ek) megnyitása új ablakban</translation>
-    </message>
-    <message>
-      <source>Open Current Layout in New Window</source>
-      <translation>Jelenlegi elrendezés megnyitása új ablakban</translation>
-    </message>
-    <message>
-      <source>Add Bookmark...</source>
-      <translation>Könyvjelző hozzáadása...</translation>
-    </message>
-    <message>
-      <source>Export Rapid Review...</source>
-      <translation>Gyors áttekintés exportálása...</translation>
-    </message>
-    <message>
-      <source>Event Rules...</source>
-      <translation>Esemény szabályok...</translation>
-    </message>
-    <message>
-      <source>Disconnect from Server</source>
-      <translation>Kijelentkezés a szerverről</translation>
-    </message>
-    <message>
-      <source>Browse Local Files</source>
-      <translation>Helyi fájlok tallózása</translation>
-    </message>
-    <message>
-      <source>Show Welcome Screen</source>
-      <translation>Üdvözlő képernyő megjelenítése</translation>
-    </message>
-    <message>
-      <source>Web Page...</source>
-      <translation>Weboldal...</translation>
-    </message>
-    <message>
-      <source>New Web Page...</source>
-      <translation>Új weboldal...</translation>
-    </message>
-    <message>
-      <source>Log in to %1...</source>
-      <comment>Log in to Nx Cloud</comment>
-      <translation>Bejelentkezés ide: %1...</translation>
-    </message>
-    <message>
-      <source>Log out from %1</source>
-      <comment>Log out from Nx Cloud</comment>
-      <translation>Jelentkezzen ki a %1-ból</translation>
-    </message>
-    <message>
-      <source>Open %1 Portal...</source>
-      <comment>Open Nx Cloud Portal</comment>
-      <translation>Nyissa meg a %1 portált...</translation>
-    </message>
-    <message>
-      <source>Stop Sharing Layout</source>
-      <translation>Elrendezések megosztásának leállítása</translation>
-    </message>
-    <message>
-      <source>User Roles...</source>
-      <translation>Felhasználó szerepkörök...</translation>
-    </message>
-    <message>
-      <source>Role Settings...</source>
-      <translation>Szerepkör beállítások...</translation>
-    </message>
-    <message>
-      <source>Show Notifications</source>
-      <translation>Értesítések megjelenítése</translation>
-    </message>
-    <message>
-      <source>Hide Notifications</source>
-      <translation>Értesítések elrejtése</translation>
-    </message>
-    <message>
-      <source>Connect to System</source>
-      <translation>Csatlakozás a rendszerhez</translation>
-    </message>
-    <message>
-      <source>Account Settings...</source>
-      <translation>Fiókbeállítások...</translation>
-    </message>
-    <message>
-      <source>Create Account...</source>
-      <translation>Fiók létrehozása...</translation>
-    </message>
-    <message>
-      <source>Server Web Page...</source>
-      <translation>Szerver weboldala...</translation>
-    </message>
-    <message>
-      <source>Add Device...</source>
-      <translation>Eszköz hozzáadása...</translation>
-    </message>
-    <message>
-      <source>Clear Screen</source>
-      <translation>Képernyő törlése</translation>
-    </message>
-  </context>
-  <context>
     <name>QnAdjustVideoDialog</name>
     <message>
       <source>Image Enhancement</source>
@@ -1348,13 +1224,6 @@ több könyvjelző megjelenítéséhez</translation>
     <message>
       <source>Folder not found</source>
       <translation>A mappa nem található</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnAlarmLayoutResource</name>
-    <message>
-      <source>Alarms</source>
-      <translation>Riasztások</translation>
     </message>
   </context>
   <context>
@@ -1794,17 +1663,6 @@ több könyvjelző megjelenítéséhez</translation>
     </message>
   </context>
   <context>
-    <name>QnBusinessRuleItemDelegate</name>
-    <message>
-      <source>For Administrators Only</source>
-      <translation>Csak adminisztrátoroknak</translation>
-    </message>
-    <message>
-      <source>For Users</source>
-      <translation>A felhasználók számára</translation>
-    </message>
-  </context>
-  <context>
     <name>QnBusinessRuleViewModel</name>
     <message numerus="yes">
       <source>%n Server(s)</source>
@@ -1828,10 +1686,6 @@ több könyvjelző megjelenítéséhez</translation>
     <message>
       <source>Starts</source>
       <translation>Indul</translation>
-    </message>
-    <message>
-      <source>Administrators Only</source>
-      <translation>Csak adminisztrátorok</translation>
     </message>
     <message>
       <source>Select at least one device</source>
@@ -1859,10 +1713,6 @@ több könyvjelző megjelenítéséhez</translation>
     <message>
       <source>N/A</source>
       <translation>N/A</translation>
-    </message>
-    <message>
-      <source>Users</source>
-      <translation>Felhasználók</translation>
     </message>
     <message>
       <source>Every %1</source>
@@ -3237,10 +3087,6 @@ to %1</source>
   <context>
     <name>QnEventLogModel</name>
     <message>
-      <source>Administrators Only</source>
-      <translation>Csak adminisztrátorok</translation>
-    </message>
-    <message>
       <source>Motion video</source>
       <translation>Mozgás videó</translation>
     </message>
@@ -3281,19 +3127,8 @@ to %1</source>
       </translation>
     </message>
     <message>
-      <source>Users</source>
-      <translation>Felhasználók</translation>
-    </message>
-    <message>
       <source>Open camera</source>
       <translation>Kamera megnyitása</translation>
-    </message>
-    <message numerus="yes">
-      <source>%n users</source>
-      <translation>
-        <numerusform>%n felhasználó</numerusform>
-        <numerusform>%n felhasználó</numerusform>
-      </translation>
     </message>
     <message numerus="yes">
       <source>and %n users more...</source>
@@ -3309,9 +3144,16 @@ to %1</source>
         <numerusform>és még %n...</numerusform>
       </translation>
     </message>
+    <message numerus="yes">
+      <source>%n Removed subjects</source>
+      <translation type="unfinished">
+        <numerusform>%n Removed subjects</numerusform>
+        <numerusform>%n Removed subjects</numerusform>
+      </translation>
+    </message>
     <message>
-      <source>User removed</source>
-      <translation>Felhasználó eltávolítva</translation>
+      <source>Subject removed</source>
+      <translation type="unfinished">Subject removed</translation>
     </message>
   </context>
   <context>
@@ -4005,6 +3847,91 @@ to %1</source>
       <source>This license is already activated and linked to hardware ID %1 on %2</source>
       <translation>Ez a licenc már aktiválva van %1 hardver ID-hoz (%2)</translation>
     </message>
+    <message numerus="yes">
+      <source>%n channels</source>
+      <translation type="unfinished">
+        <numerusform>%n channels</numerusform>
+        <numerusform>%n channels</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Deactivate licenses?</source>
+      <translation type="unfinished">
+        <numerusform>Deactivate licenses?</numerusform>
+        <numerusform>Deactivate licenses?</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Failed to deactivate license</source>
+      <translation type="unfinished">Failed to deactivate license</translation>
+    </message>
+    <message numerus="yes">
+      <source>Failed to deactivate %n licenses</source>
+      <translation type="unfinished">
+        <numerusform>Failed to deactivate %n licenses</numerusform>
+        <numerusform>Failed to deactivate %n licenses</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%1 of %n licenses cannot be deactivated</source>
+      <translation type="unfinished">
+        <numerusform>%1 of %n licenses cannot be deactivated</numerusform>
+        <numerusform>%1 of %n licenses cannot be deactivated</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Please contact Customer Support</source>
+      <translation type="unfinished">Please contact Customer Support</translation>
+    </message>
+    <message numerus="yes">
+      <source>Deactivate %n other</source>
+      <translation type="unfinished">
+        <numerusform>Deactivate %n other</numerusform>
+        <numerusform>Deactivate %n other</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Cannot deactivate licenses</source>
+      <translation type="unfinished">
+        <numerusform>Cannot deactivate licenses</numerusform>
+        <numerusform>Cannot deactivate licenses</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Cannot connect to the License Server</source>
+      <translation type="unfinished">Cannot connect to the License Server</translation>
+    </message>
+    <message>
+      <source>Please make sure your server has active Internet connection or check firewall settings.</source>
+      <translation type="unfinished">Please make sure your server has active Internet connection or check firewall settings.</translation>
+    </message>
+    <message>
+      <source>License Server error</source>
+      <translation type="unfinished">License Server error</translation>
+    </message>
+    <message>
+      <source>If the problem presists please contact Customer Support.</source>
+      <translation type="unfinished">If the problem presists please contact Customer Support.</translation>
+    </message>
+    <message>
+      <source>License deactivated</source>
+      <translation type="unfinished">License deactivated</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n licenses deactivated</source>
+      <translation type="unfinished">
+        <numerusform>%n licenses deactivated</numerusform>
+        <numerusform>%n licenses deactivated</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Remove</source>
+      <translation>Eltávolítás</translation>
+    </message>
+    <message>
+      <source>Deactivate</source>
+      <translation type="unfinished">Deactivate</translation>
+    </message>
   </context>
   <context>
     <name>QnLicenseWidget</name>
@@ -4300,6 +4227,15 @@ to %1</source>
       <source>Lo-Res</source>
       <translation>Alacsony felbontás</translation>
     </message>
+    <message>
+      <source>press and hold</source>
+      <comment>Software Trigger</comment>
+      <translation type="unfinished">press and hold</translation>
+    </message>
+    <message>
+      <source>Failed to invoke trigger %1 (%2)</source>
+      <translation type="unfinished">Failed to invoke trigger %1 (%2)</translation>
+    </message>
   </context>
   <context>
     <name>QnMergeSystemsDialog</name>
@@ -4530,6 +4466,21 @@ to %1</source>
       <source>Alarm: %1</source>
       <translation>Riasztás: %1</translation>
     </message>
+    <message>
+      <source>Bookmark it</source>
+      <translation type="unfinished">Bookmark it</translation>
+    </message>
+    <message>
+      <source>Bookmark created</source>
+      <translation type="unfinished">Bookmark created</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n bookmarks created</source>
+      <translation type="unfinished">
+        <numerusform>%n bookmarks created</numerusform>
+        <numerusform>%n bookmarks created</numerusform>
+      </translation>
+    </message>
   </context>
   <context>
     <name>QnPerformanceTest</name>
@@ -4585,8 +4536,8 @@ to %1</source>
       <translation>Felhasználó bevitel</translation>
     </message>
     <message>
-      <source>PTZ, Device Output, 2-way Audio</source>
-      <translation>PTZ, eszköz kimenet, 2-irányú audio</translation>
+      <source>PTZ, Device Output, 2-Way Audio, Software Triggers.</source>
+      <translation type="unfinished">PTZ, Device Output, 2-Way Audio, Software Triggers.</translation>
     </message>
   </context>
   <context>
@@ -4711,19 +4662,6 @@ to %1</source>
     <message>
       <source>Hotkey used by tour &quot;%1&quot;</source>
       <translation type="unfinished">Hotkey used by tour &quot;%1&quot;</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnPtzPresetsToursActionFactory</name>
-    <message>
-      <source>%1 (active)</source>
-      <comment>Template for active PTZ preset</comment>
-      <translation>%1 (aktív)</translation>
-    </message>
-    <message>
-      <source>%1 (active)</source>
-      <comment>Template for active PTZ tour</comment>
-      <translation>%1 (aktív)</translation>
     </message>
   </context>
   <context>
@@ -5039,6 +4977,14 @@ to %1</source>
     <message>
       <source>Local Files</source>
       <translation>Helyi fájlok</translation>
+    </message>
+    <message>
+      <source>Layout Tours</source>
+      <translation type="unfinished">Layout Tours</translation>
+    </message>
+    <message>
+      <source>Layout Tour</source>
+      <translation type="unfinished">Layout Tour</translation>
     </message>
   </context>
   <context>
@@ -5581,27 +5527,6 @@ to %1</source>
     </message>
   </context>
   <context>
-    <name>QnShowOnAlarmLayoutActionWidget</name>
-    <message numerus="yes">
-      <source>%n Users</source>
-      <translation>
-        <numerusform>%n felhasználó</numerusform>
-        <numerusform>%n felhasználó</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>%n Roles</source>
-      <translation>
-        <numerusform>%n szerepkör</numerusform>
-        <numerusform>%n szerepkör</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>All Users</source>
-      <translation>Minden felhasználó</translation>
-    </message>
-  </context>
-  <context>
     <name>QnShowTextOverlayActionWidget</name>
     <message>
       <source>Html tags could be used within custom text:
@@ -6074,6 +5999,10 @@ to %1</source>
       <source>%1 GB</source>
       <translation>%1 GB</translation>
     </message>
+    <message>
+      <source>Too small and system partitions are reserved and not used for writing if there is enough other storage space available.</source>
+      <translation type="unfinished">Too small and system partitions are reserved and not used for writing if there is enough other storage space available.</translation>
+    </message>
   </context>
   <context>
     <name>QnStorageRebuildWidget</name>
@@ -6130,6 +6059,13 @@ to %1</source>
     </message>
   </context>
   <context>
+    <name>QnSubjectTargetActionWidget</name>
+    <message>
+      <source>Select at least one user...</source>
+      <translation type="unfinished">Select at least one user...</translation>
+    </message>
+  </context>
+  <context>
     <name>QnSystemAdministrationDialog</name>
     <message>
       <source>General</source>
@@ -6173,10 +6109,6 @@ to %1</source>
     <message>
       <source>Email server is not set</source>
       <translation>Nincs Email szerver beállítva</translation>
-    </message>
-    <message>
-      <source>Connection to server lost</source>
-      <translation>Megszakadt a kapcsolat a szerverrel</translation>
     </message>
     <message>
       <source>Select server for others to synchronize time with</source>
@@ -6340,12 +6272,16 @@ to %1</source>
   <context>
     <name>QnTimeServerSelectionWidget</name>
     <message>
-      <source>Time is taken from the Internet.</source>
-      <translation>Az idő az Internetről beállítva.</translation>
+      <source>System time is synchronized with the Internet and is independent from server local times.</source>
+      <translation type="unfinished">System time is synchronized with the Internet and is independent from server local times.</translation>
     </message>
     <message>
-      <source>Time is taken from %1.</source>
-      <translation>Idő vétele innen: %1.</translation>
+      <source>System time is synchronized with selected server local time and is independent from other servers.</source>
+      <translation type="unfinished">System time is synchronized with selected server local time and is independent from other servers.</translation>
+    </message>
+    <message>
+      <source>No server has Internet access. Time is not being synchronized.</source>
+      <translation type="unfinished">No server has Internet access. Time is not being synchronized.</translation>
     </message>
   </context>
   <context>
@@ -6874,191 +6810,33 @@ to %1</source>
     </message>
   </context>
   <context>
-    <name>QnWorkbenchActionHandler</name>
+    <name>QnWebpageDialog</name>
     <message>
-      <source>Layout is locked and cannot be changed.</source>
-      <translation>Az elrendezés lezárva és nem lehet megváltoztatni.</translation>
-    </message>
-    <message>
-      <source>All Supported (*.nov *.avi *.mkv *.mp4 *.mov *.ts *.m2ts *.mpeg *.mpg *.flv *.wmv *.3gp *.jpg *.png *.gif *.bmp *.tiff)</source>
-      <translation>Minden támogatott (*.nov *.avi *.mkv *.mp4 *.mov *.ts *.m2ts *.mpeg *.mpg *.flv *.wmv *.3gp *.jpg *.png *.gif *.bmp *.tiff)</translation>
+      <source>Name</source>
+      <translation>Név</translation>
     </message>
     <message>
-      <source>Video (*.avi *.mkv *.mp4 *.mov *.ts *.m2ts *.mpeg *.mpg *.flv *.wmv *.3gp)</source>
-      <translation>Videó (*.avi *.mkv *.mp4 *.mov *.ts *.m2ts *.mpeg *.mpg *.flv *.wmv *.3gp)</translation>
+      <source>URL</source>
+      <translation>URL</translation>
     </message>
     <message>
-      <source>Pictures (*.jpg *.png *.gif *.bmp *.tiff)</source>
-      <translation>Kép (*.jpg *.png *.gif *.bmp *.tiff)</translation>
+      <source>URL cannot be empty.</source>
+      <translation type="unfinished">URL cannot be empty.</translation>
     </message>
     <message>
-      <source>All files (*.*)</source>
-      <translation>Minden fájl (*.*)</translation>
+      <source>Wrong URL format.</source>
+      <translation type="unfinished">Wrong URL format.</translation>
     </message>
     <message>
-      <source>Select folder...</source>
-      <translation>Mappa választása...</translation>
+      <source>Web Page</source>
+      <translation type="unfinished">Web Page</translation>
     </message>
+  </context>
+  <context>
+    <name>QnWorkbenchAlarmLayoutHandler</name>
     <message>
-      <source>Preview Search for %1</source>
-      <translation>%1 előnézetes keresése</translation>
-    </message>
-    <message>
-      <source>Rename</source>
-      <translation>Átnevezés</translation>
-    </message>
-    <message>
-      <source>Enter new name for the selected item:</source>
-      <translation>Adja meg a kiválasztott elem új nevét:</translation>
-    </message>
-    <message>
-      <source>Update...</source>
-      <translation>Frissítés...</translation>
-    </message>
-    <message>
-      <source>Beta version %1</source>
-      <translation>%1 Beta verzió</translation>
-    </message>
-    <message>
-      <source>Open File</source>
-      <translation>Fájl megnyitása</translation>
-    </message>
-    <message>
-      <source>Updating Background...</source>
-      <translation>Háttér frissítése...</translation>
-    </message>
-    <message>
-      <source>Image processing may take a few moments. Please be patient.</source>
-      <translation>A kép feldolgozása sok időt vehet igénybe. Kérem legyen türelmes.</translation>
-    </message>
-    <message numerus="yes">
-      <source>Are you sure you want to permanently delete these %n files?</source>
-      <translation>
-        <numerusform>Biztos benne, hogy véglegesen törli ezt a %n fájlt?</numerusform>
-        <numerusform>Biztos benne, hogy véglegesen törli ezt a %n fájlt?</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>Confirm files deleting</source>
-      <translation>Erősítse meg a fájlok törlését</translation>
-    </message>
-    <message>
-      <source>Client</source>
-      <translation>Kliens</translation>
-    </message>
-    <message>
-      <source>Server</source>
-      <translation>Szerver</translation>
-    </message>
-    <message numerus="yes">
-      <source>Failed to move %n devices</source>
-      <translation>
-        <numerusform>%n eszköz áthelyezése sikertelen</numerusform>
-        <numerusform>%n eszköz áthelyezése sikertelen</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>Failed to move %n cameras</source>
-      <translation>
-        <numerusform>%n kamera áthelyezése sikertelen</numerusform>
-        <numerusform>%n kamera áthelyezése sikertelen</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>Failed to move %n I/O Modules</source>
-      <translation>
-        <numerusform>%n I/O mkodul áthelyezése sikertelen</numerusform>
-        <numerusform>%n I/O mkodul áthelyezése sikertelen</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>Server &quot;%1&quot; is not responding.</source>
-      <translation type="unfinished">Server &quot;%1&quot; is not responding.</translation>
-    </message>
-    <message>
-      <source>Move</source>
-      <translation>Áthelyezés</translation>
-    </message>
-    <message>
-      <source>Too short period selected</source>
-      <translation>Túl rövid intervallum lett kijelölve</translation>
-    </message>
-    <message>
-      <source>Cancel device adding?</source>
-      <translation>Leállítja az eszköz hozzáadást?</translation>
-    </message>
-    <message>
-      <source>There is another user with the same name</source>
-      <translation>Ugyanezzel a névvel már létezik egy felhasználó</translation>
-    </message>
-    <message>
-      <source>Image too big</source>
-      <translation>A kép túl nagy</translation>
-    </message>
-    <message>
-      <source>Maximum size is %1 MB.</source>
-      <translation>Maximális méret %1 MB.</translation>
-    </message>
-    <message>
-      <source>Failed to upload image</source>
-      <translation>Hiba a kép feltöltése során</translation>
-    </message>
-    <message>
-      <source>Please update all components to the version %1</source>
-      <translation>Frissítsen minden összetevőt %1 verzióra</translation>
-    </message>
-    <message>
-      <source>Some functionality may be unavailable or not working properly.</source>
-      <translation>Néhány funkció lehet, hogy nem érhető el vagy nem működik megfelelően.</translation>
-    </message>
-    <message>
-      <source>It will be used by software development team to improve your user experience.</source>
-      <translation>A szoftver fejlesztő csapat fogja használni a felhasználói élmény javítására érdekében.</translation>
-    </message>
-    <message>
-      <source>Failed to open server web page</source>
-      <translation>Nem sikerült megnyitni a szerver weboldalt</translation>
-    </message>
-    <message>
-      <source>Skip</source>
-      <translation>Kihagy</translation>
-    </message>
-    <message>
-      <source>Cannot perform Preview Search. Please select a period of 15 seconds or longer.</source>
-      <translation>Keresési előnézet nem indítható, Jelöljön ki 15 másodperccel hosszabb időtartamot.</translation>
-    </message>
-    <message numerus="yes">
-      <source>Server &quot;%1&quot; cannot access %n devices. Move them anyway?</source>
-      <translation type="unfinished">
-        <numerusform>Server &quot;%1&quot; cannot access %n devices. Move them anyway?</numerusform>
-        <numerusform>Server &quot;%1&quot; cannot access %n devices. Move them anyway?</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>Server &quot;%1&quot; cannot access %n cameras. Move them anyway?</source>
-      <translation type="unfinished">
-        <numerusform>Server &quot;%1&quot; cannot access %n cameras. Move them anyway?</numerusform>
-        <numerusform>Server &quot;%1&quot; cannot access %n cameras. Move them anyway?</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>Server &quot;%1&quot; cannot access %n I/O modules. Move them anyway?</source>
-      <translation type="unfinished">
-        <numerusform>Server &quot;%1&quot; cannot access %n I/O modules. Move them anyway?</numerusform>
-        <numerusform>Server &quot;%1&quot; cannot access %n I/O modules. Move them anyway?</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>Components of System have different versions:</source>
-      <translation>Rendszer elemei különböző verziókból állnak:</translation>
-    </message>
-    <message>
-      <source>System sends anonymous usage statistics</source>
-      <translation>A rendszer névtelen felhasználói statisztikákat küld</translation>
-    </message>
-    <message>
-      <source>To disable it, go to System Administration dialog.</source>
-      <translation>A tiltásához látogasson el a Rendszer adminisztráció lapra.</translation>
+      <source>Alarms</source>
+      <translation>Riasztások</translation>
     </message>
   </context>
   <context>
@@ -7113,13 +6891,6 @@ to %1</source>
     <message>
       <source>Could not connect to server. Video Wall will be closed.</source>
       <translation>Nem sikerült csatlakozni a szerverhez. A videofal be lesz zárva.</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnWorkbenchController</name>
-    <message>
-      <source>Press any key to stop the tour.</source>
-      <translation>Nyomjon meg egy gombot a túra megállításához.</translation>
     </message>
   </context>
   <context>
@@ -7338,29 +7109,6 @@ to %1</source>
     <message>
       <source>Cloud Systems cannot be merged</source>
       <translation>Felhő rendszerek nem vonhatók össze</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnWorkbenchLayoutsHandler</name>
-    <message>
-      <source>Save Layout As</source>
-      <translation>Elrendezés mentése mint</translation>
-    </message>
-    <message>
-      <source>New Layout</source>
-      <translation>Új elrendezés</translation>
-    </message>
-    <message>
-      <source>Enter the name of the layout to create:</source>
-      <translation>Adja meg az elrendezés nevét a létrehozáshoz:</translation>
-    </message>
-    <message>
-      <source>Enter Layout Name:</source>
-      <translation>Adja meg az elrendezés nevét:</translation>
-    </message>
-    <message>
-      <source>New Layout %1</source>
-      <translation>Új elrendezés %1</translation>
     </message>
   </context>
   <context>
@@ -7607,23 +7355,159 @@ to %1</source>
   <context>
     <name>QnWorkbenchWebPageHandler</name>
     <message>
-      <source>New Web Page...</source>
-      <translation>Új Weboldal...</translation>
+      <source>New Web Page</source>
+      <translation type="unfinished">New Web Page</translation>
     </message>
     <message>
-      <source>This Web Page already exists</source>
-      <translation>Ez a weboldal már létezik</translation>
-    </message>
-    <message>
-      <source>Enter URL of Web Page to add:</source>
-      <translation>Adja meg a weboldal URL-jét a hozzáadáshoz:</translation>
+      <source>Edit Web Page</source>
+      <translation type="unfinished">Edit Web Page</translation>
     </message>
   </context>
   <context>
-    <name>Resources</name>
+    <name>SubjectSelectionDialog::RoleListDelegate</name>
+    <message numerus="yes">
+      <source>%n users</source>
+      <translation>
+        <numerusform>%n felhasználó</numerusform>
+        <numerusform>%n felhasználó</numerusform>
+      </translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::client::desktop::ui::LayoutPreviewPainter</name>
+    <message>
+      <source>NO DATA</source>
+      <translation>NINCS ADAT</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::client::desktop::ui::LayoutTourDropPlaceholder</name>
+    <message>
+      <source>Drag layout here to add it to the tour</source>
+      <translation type="unfinished">Drag layout here to add it to the tour</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::client::desktop::ui::SubjectSelectionDialog</name>
+    <message>
+      <source>No user roles found</source>
+      <translation type="unfinished">No user roles found</translation>
+    </message>
+    <message>
+      <source>No users found</source>
+      <translation type="unfinished">No users found</translation>
+    </message>
+    <message>
+      <source>Users</source>
+      <translation>Felhasználók</translation>
+    </message>
+    <message>
+      <source>Custom Users</source>
+      <translation type="unfinished">Custom Users</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::client::desktop::ui::action::LayoutTourSettingsFactory</name>
+    <message>
+      <source>Switch with Hotkeys</source>
+      <translation type="unfinished">Switch with Hotkeys</translation>
+    </message>
+    <message>
+      <source>Switch on Timer</source>
+      <translation type="unfinished">Switch on Timer</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::client::desktop::ui::action::PtzPresetsToursFactory</name>
+    <message>
+      <source>%1 (active)</source>
+      <comment>Template for active PTZ preset</comment>
+      <translation>%1 (aktív)</translation>
+    </message>
+    <message>
+      <source>%1 (active)</source>
+      <comment>Template for active PTZ tour</comment>
+      <translation>%1 (aktív)</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::client::desktop::ui::dialogs::LicenseDeactivationReason</name>
+    <message>
+      <source>Please fill up information about yourself and reason for license deactivation</source>
+      <translation type="unfinished">Please fill up information about yourself and reason for license deactivation</translation>
+    </message>
+    <message>
+      <source>Next</source>
+      <translation>Következő</translation>
+    </message>
+    <message>
+      <source>Name is necessary</source>
+      <translation type="unfinished">Name is necessary</translation>
+    </message>
+    <message>
+      <source>Reason is necessary</source>
+      <translation type="unfinished">Reason is necessary</translation>
+    </message>
+    <message>
+      <source>Name</source>
+      <translation>Név</translation>
+    </message>
+    <message>
+      <source>Email</source>
+      <translation>Email</translation>
+    </message>
+    <message>
+      <source>Reason for deactivation</source>
+      <translation type="unfinished">Reason for deactivation</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::client::desktop::ui::graphics::SoftwareTriggerButton</name>
+    <message>
+      <source>Go to Live</source>
+      <translation type="unfinished">Go to Live</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::client::desktop::ui::ptz</name>
+    <message>
+      <source>Cannot get the current position from camera &quot;%1&quot;</source>
+      <translation type="unfinished">Cannot get the current position from camera &quot;%1&quot;</translation>
+    </message>
+    <message>
+      <source>Please wait for the camera to go online.</source>
+      <translation>Kérem várjon míg a kamera elérhetővé válik.</translation>
+    </message>
+    <message>
+      <source>Failed to get current position</source>
+      <translation>Nem sikerült beolvasni a jelenlegi pozíciót</translation>
+    </message>
+    <message>
+      <source>Cannot set the current position for camera &quot;%1&quot;</source>
+      <translation type="unfinished">Cannot set the current position for camera &quot;%1&quot;</translation>
+    </message>
+    <message>
+      <source>Failed to set current position</source>
+      <translation>Nem sikerült beállítani a jelenlegi pozíciót</translation>
+    </message>
+    <message>
+      <source>Preset used by some tours. Delete it anyway?</source>
+      <translation>A persetet néhány túra használja. Mégis törli?</translation>
+    </message>
+    <message>
+      <source>These tours will become invalid.</source>
+      <translation>Ezek a túrák érvénytelenné válnak.</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::client::desktop::ui::resources</name>
     <message>
       <source>There is another layout with the same name</source>
       <translation>Ugyanezzel a névvel már létezik egy elrendezés</translation>
+    </message>
+    <message>
+      <source>You do not have permission to overwrite it.</source>
+      <translation>Nincs engedélye a felülíráshoz.</translation>
     </message>
     <message>
       <source>Overwrite existing layout?</source>
@@ -7710,6 +7594,10 @@ to %1</source>
       <translation>Eltávolítás</translation>
     </message>
     <message>
+      <source>You are going to delete some resources to which you have access from Video Wall only. You will not see them in your resource list after it and will not be able to add them to Video Wall again.</source>
+      <translation>Olyan források törlésére készül, melyekhez csak a videófalon fér hozzá. Ezek eltűnnek a forrásfából és később nem tudja a videófalhoz sem hozzáadni.</translation>
+    </message>
+    <message>
       <source>You will lose access to following resources:</source>
       <translation>Elveszti hozzáférését a következő forrásokhoz:</translation>
     </message>
@@ -7773,17 +7661,9 @@ to %1</source>
       <source>They may be auto-discovered again after removing.</source>
       <translation>Eltávolítás után újból automatikusan hozzáadódhatnak a fához.</translation>
     </message>
-    <message>
-      <source>You do not have permission to overwrite it.</source>
-      <translation>Nincs engedélye a felülíráshoz.</translation>
-    </message>
-    <message>
-      <source>You are going to delete some resources to which you have access from Video Wall only. You will not see them in your resource list after it and will not be able to add them to Video Wall again.</source>
-      <translation>Olyan források törlésére készül, melyekhez csak a videófalon fér hozzá. Ezek eltűnnek a forrásfából és később nem tudja a videófalhoz sem hozzáadni.</translation>
-    </message>
   </context>
   <context>
-    <name>VideoWall</name>
+    <name>nx::client::desktop::ui::videowall</name>
     <message>
       <source>There is another video wall with the same name</source>
       <translation>Ugyanezzel a névvel már létezik egy videófal</translation>
@@ -7807,6 +7687,254 @@ to %1</source>
     <message>
       <source>To display local files on Video Wall, please attach them using computer where Video Wall is hosted.</source>
       <translation>Helyi fájlok videófalon történő megjelenítéséhez, másolja át a videófal kiszolgáló számítógépére.</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::client::desktop::ui::workbench::ActionHandler</name>
+    <message numerus="yes">
+      <source>Failed to move %n devices</source>
+      <translation>
+        <numerusform>%n eszköz áthelyezése sikertelen</numerusform>
+        <numerusform>%n eszköz áthelyezése sikertelen</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Failed to move %n cameras</source>
+      <translation>
+        <numerusform>%n kamera áthelyezése sikertelen</numerusform>
+        <numerusform>%n kamera áthelyezése sikertelen</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Failed to move %n I/O Modules</source>
+      <translation>
+        <numerusform>%n I/O mkodul áthelyezése sikertelen</numerusform>
+        <numerusform>%n I/O mkodul áthelyezése sikertelen</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Server &quot;%1&quot; is not responding.</source>
+      <translation type="unfinished">Server &quot;%1&quot; is not responding.</translation>
+    </message>
+    <message numerus="yes">
+      <source>Server &quot;%1&quot; cannot access %n devices. Move them anyway?</source>
+      <translation type="unfinished">
+        <numerusform>Server &quot;%1&quot; cannot access %n devices. Move them anyway?</numerusform>
+        <numerusform>Server &quot;%1&quot; cannot access %n devices. Move them anyway?</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Server &quot;%1&quot; cannot access %n cameras. Move them anyway?</source>
+      <translation type="unfinished">
+        <numerusform>Server &quot;%1&quot; cannot access %n cameras. Move them anyway?</numerusform>
+        <numerusform>Server &quot;%1&quot; cannot access %n cameras. Move them anyway?</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Server &quot;%1&quot; cannot access %n I/O modules. Move them anyway?</source>
+      <translation type="unfinished">
+        <numerusform>Server &quot;%1&quot; cannot access %n I/O modules. Move them anyway?</numerusform>
+        <numerusform>Server &quot;%1&quot; cannot access %n I/O modules. Move them anyway?</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Move</source>
+      <translation>Áthelyezés</translation>
+    </message>
+    <message>
+      <source>Layout is locked and cannot be changed.</source>
+      <translation>Az elrendezés lezárva és nem lehet megváltoztatni.</translation>
+    </message>
+    <message>
+      <source>All Supported (*.nov *.avi *.mkv *.mp4 *.mov *.ts *.m2ts *.mpeg *.mpg *.flv *.wmv *.3gp *.jpg *.png *.gif *.bmp *.tiff)</source>
+      <translation>Minden támogatott (*.nov *.avi *.mkv *.mp4 *.mov *.ts *.m2ts *.mpeg *.mpg *.flv *.wmv *.3gp *.jpg *.png *.gif *.bmp *.tiff)</translation>
+    </message>
+    <message>
+      <source>Video (*.avi *.mkv *.mp4 *.mov *.ts *.m2ts *.mpeg *.mpg *.flv *.wmv *.3gp)</source>
+      <translation>Videó (*.avi *.mkv *.mp4 *.mov *.ts *.m2ts *.mpeg *.mpg *.flv *.wmv *.3gp)</translation>
+    </message>
+    <message>
+      <source>Pictures (*.jpg *.png *.gif *.bmp *.tiff)</source>
+      <translation>Kép (*.jpg *.png *.gif *.bmp *.tiff)</translation>
+    </message>
+    <message>
+      <source>All files (*.*)</source>
+      <translation>Minden fájl (*.*)</translation>
+    </message>
+    <message>
+      <source>Open File</source>
+      <translation>Fájl megnyitása</translation>
+    </message>
+    <message>
+      <source>Select folder...</source>
+      <translation>Mappa választása...</translation>
+    </message>
+    <message>
+      <source>Too short period selected</source>
+      <translation>Túl rövid intervallum lett kijelölve</translation>
+    </message>
+    <message>
+      <source>Cannot perform Preview Search. Please select a period of 15 seconds or longer.</source>
+      <translation>Keresési előnézet nem indítható, Jelöljön ki 15 másodperccel hosszabb időtartamot.</translation>
+    </message>
+    <message>
+      <source>Preview Search for %1</source>
+      <translation>%1 előnézetes keresése</translation>
+    </message>
+    <message>
+      <source>Cancel device adding?</source>
+      <translation>Leállítja az eszköz hozzáadást?</translation>
+    </message>
+    <message>
+      <source>Confirm files deleting</source>
+      <translation>Erősítse meg a fájlok törlését</translation>
+    </message>
+    <message numerus="yes">
+      <source>Are you sure you want to permanently delete these %n files?</source>
+      <translation>
+        <numerusform>Biztos benne, hogy véglegesen törli ezt a %n fájlt?</numerusform>
+        <numerusform>Biztos benne, hogy véglegesen törli ezt a %n fájlt?</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>There is another user with the same name</source>
+      <translation>Ugyanezzel a névvel már létezik egy felhasználó</translation>
+    </message>
+    <message>
+      <source>Rename</source>
+      <translation>Átnevezés</translation>
+    </message>
+    <message>
+      <source>Enter new name for the selected item:</source>
+      <translation>Adja meg a kiválasztott elem új nevét:</translation>
+    </message>
+    <message>
+      <source>Updating Background...</source>
+      <translation>Háttér frissítése...</translation>
+    </message>
+    <message>
+      <source>Image processing may take a few moments. Please be patient.</source>
+      <translation>A kép feldolgozása sok időt vehet igénybe. Kérem legyen türelmes.</translation>
+    </message>
+    <message>
+      <source>Image too big</source>
+      <translation>A kép túl nagy</translation>
+    </message>
+    <message>
+      <source>Maximum size is %1 MB.</source>
+      <translation>Maximális méret %1 MB.</translation>
+    </message>
+    <message>
+      <source>Failed to upload image</source>
+      <translation>Hiba a kép feltöltése során</translation>
+    </message>
+    <message>
+      <source>Client</source>
+      <translation>Kliens</translation>
+    </message>
+    <message>
+      <source>Server</source>
+      <translation>Szerver</translation>
+    </message>
+    <message>
+      <source>Please update all components to the version %1</source>
+      <translation>Frissítsen minden összetevőt %1 verzióra</translation>
+    </message>
+    <message>
+      <source>Components of System have different versions:</source>
+      <translation>Rendszer elemei különböző verziókból állnak:</translation>
+    </message>
+    <message>
+      <source>Update...</source>
+      <translation>Frissítés...</translation>
+    </message>
+    <message>
+      <source>Skip</source>
+      <translation>Kihagy</translation>
+    </message>
+    <message>
+      <source>Beta version %1</source>
+      <translation>%1 Beta verzió</translation>
+    </message>
+    <message>
+      <source>Some functionality may be unavailable or not working properly.</source>
+      <translation>Néhány funkció lehet, hogy nem érhető el vagy nem működik megfelelően.</translation>
+    </message>
+    <message>
+      <source>System sends anonymous usage statistics</source>
+      <translation>A rendszer névtelen felhasználói statisztikákat küld</translation>
+    </message>
+    <message>
+      <source>It will be used by software development team to improve your user experience.</source>
+      <translation>A szoftver fejlesztő csapat fogja használni a felhasználói élmény javítására érdekében.</translation>
+    </message>
+    <message>
+      <source>To disable it, go to System Administration dialog.</source>
+      <translation>A tiltásához látogasson el a Rendszer adminisztráció lapra.</translation>
+    </message>
+    <message>
+      <source>Failed to open server web page</source>
+      <translation>Nem sikerült megnyitni a szerver weboldalt</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::client::desktop::ui::workbench::LayoutTourExecutor</name>
+    <message>
+      <source>Use keyboard arrows to switch layouts. To exit the tour press Esc.</source>
+      <translation type="unfinished">Use keyboard arrows to switch layouts. To exit the tour press Esc.</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::client::desktop::ui::workbench::LayoutTourItemWidget</name>
+    <message>
+      <source>Switch by %1</source>
+      <translation type="unfinished">Switch by %1</translation>
+    </message>
+    <message>
+      <source>Display for</source>
+      <translation type="unfinished">Display for</translation>
+    </message>
+    <message>
+      <source>Display selected for</source>
+      <translation type="unfinished">Display selected for</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::client::desktop::ui::workbench::LayoutToursHandler</name>
+    <message>
+      <source>Layout Tour</source>
+      <translation type="unfinished">Layout Tour</translation>
+    </message>
+    <message>
+      <source>Layout Tour %1</source>
+      <translation type="unfinished">Layout Tour %1</translation>
+    </message>
+    <message>
+      <source>Delete layout tour %1?</source>
+      <translation type="unfinished">Delete layout tour %1?</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::client::desktop::ui::workbench::LayoutsHandler</name>
+    <message>
+      <source>Save Layout As</source>
+      <translation>Elrendezés mentése mint</translation>
+    </message>
+    <message>
+      <source>Enter Layout Name:</source>
+      <translation>Adja meg az elrendezés nevét:</translation>
+    </message>
+    <message>
+      <source>New Layout</source>
+      <translation>Új elrendezés</translation>
+    </message>
+    <message>
+      <source>Enter the name of the layout to create:</source>
+      <translation>Adja meg az elrendezés nevét a létrehozáshoz:</translation>
+    </message>
+    <message>
+      <source>New Layout %1</source>
+      <translation>Új elrendezés %1</translation>
     </message>
   </context>
 </TS>

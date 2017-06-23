@@ -58,7 +58,7 @@
   <String Id="FilesInUseDontCloseRadioButton">アプリケーションは閉じないでください　再起動が必要になります</String>
   <String Id="FilesInUseOkButton">OK</String>
   <String Id="FilesInUseCancelButton">キャンセル</String>
-  <String Id="InstallLicenseText">"同意してインストール" をクリックして同意する</String>
+  <String Id="InstallLicenseText">\"インストール\"をクリックして同意する</String>
   <String Id="Options">オプション</String>
   <String Id="SelectApps">インストールするアプリケーションを選択:</String>
 </WixLocalization>

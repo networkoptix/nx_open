@@ -69,6 +69,808 @@ to view more bookmarks</translation>
     </message>
   </context>
   <context>
+    <name>ContextMenu</name>
+    <message>
+      <source>Filter...</source>
+      <translation>Lọc...</translation>
+    </message>
+    <message>
+      <source>Connect to System</source>
+      <translation type="unfinished">Connect to System</translation>
+    </message>
+    <message>
+      <source>Help</source>
+      <translation>sự trông cậy</translation>
+    </message>
+    <message>
+      <source>Event Log...</source>
+      <translation>ghi sự kiện ...</translation>
+    </message>
+    <message>
+      <source>Cameras to Backup...</source>
+      <translation>Máy ảnh để sao lưu ...</translation>
+    </message>
+    <message>
+      <source>Control Video Wall</source>
+      <translation>Kiểm soát bức tường video</translation>
+    </message>
+    <message>
+      <source>Push my screen</source>
+      <translation>Đẩy màn hình của tôi</translation>
+    </message>
+    <message>
+      <source>Select Time Server</source>
+      <translation>Chọn máy chủ thời gian</translation>
+    </message>
+    <message>
+      <source>Fit in View</source>
+      <translation>điền view</translation>
+    </message>
+    <message>
+      <source>Main Menu</source>
+      <translation>menu chính</translation>
+    </message>
+    <message>
+      <source>Connect to Server...</source>
+      <translation>Kết nối đến máy chủ...</translation>
+    </message>
+    <message>
+      <source>Disconnect from Server</source>
+      <translation type="unfinished">Disconnect from Server</translation>
+    </message>
+    <message>
+      <source>Browse Local Files</source>
+      <translation type="unfinished">Browse Local Files</translation>
+    </message>
+    <message>
+      <source>Show Welcome Screen</source>
+      <translation type="unfinished">Show Welcome Screen</translation>
+    </message>
+    <message>
+      <source>New...</source>
+      <translation>thêm...</translation>
+    </message>
+    <message>
+      <source>Tab</source>
+      <translation type="unfinished">Tab</translation>
+    </message>
+    <message>
+      <source>New Tab</source>
+      <translation>Tab thêm</translation>
+    </message>
+    <message>
+      <source>Window</source>
+      <translation>cửa sổ</translation>
+    </message>
+    <message>
+      <source>New Window</source>
+      <translation>Cửa sổ mới được mở ra</translation>
+    </message>
+    <message>
+      <source>User...</source>
+      <translation>người sử dụng…</translation>
+    </message>
+    <message>
+      <source>New User...</source>
+      <translation>Người dùng mới…</translation>
+    </message>
+    <message>
+      <source>Video Wall...</source>
+      <translation>tường video ...</translation>
+    </message>
+    <message>
+      <source>New Video Wall...</source>
+      <translation>Tường video mới ...</translation>
+    </message>
+    <message>
+      <source>Web Page...</source>
+      <translation type="unfinished">Web Page...</translation>
+    </message>
+    <message>
+      <source>New Web Page...</source>
+      <translation type="unfinished">New Web Page...</translation>
+    </message>
+    <message>
+      <source>Layout Tour...</source>
+      <translation type="unfinished">Layout Tour...</translation>
+    </message>
+    <message>
+      <source>New Layout Tour...</source>
+      <translation type="unfinished">New Layout Tour...</translation>
+    </message>
+    <message>
+      <source>New Layout...</source>
+      <translation>việc bố trí mới...</translation>
+    </message>
+    <message>
+      <source>Open Layout...</source>
+      <translation>mở bố trí…</translation>
+    </message>
+    <message>
+      <source>Open...</source>
+      <translation>mở...</translation>
+    </message>
+    <message>
+      <source>File(s)...</source>
+      <translation>văn khố...</translation>
+    </message>
+    <message>
+      <source>Folder...</source>
+      <translation>Table of Contents...</translation>
+    </message>
+    <message>
+      <source>Web Client...</source>
+      <translation>khách hàng web ...</translation>
+    </message>
+    <message>
+      <source>Open Web Client...</source>
+      <translation>Mở một khách hàng web…</translation>
+    </message>
+    <message>
+      <source>Save Current Layout</source>
+      <translation>Lưu lại giao diện hiện tại</translation>
+    </message>
+    <message>
+      <source>Save Current Layout As...</source>
+      <translation>Lưu lại giao diện hiện tại…</translation>
+    </message>
+    <message>
+      <source>Save Video Wall View</source>
+      <translation>lưu video xem tường</translation>
+    </message>
+    <message>
+      <source>Drop Resources</source>
+      <translation>Tài Discard</translation>
+    </message>
+    <message>
+      <source>Start Screen Recording</source>
+      <translation>Màn hình khởi quay video</translation>
+    </message>
+    <message>
+      <source>Stop Screen Recording</source>
+      <translation>Dừng Screen Video Capture</translation>
+    </message>
+    <message>
+      <source>Stop current action</source>
+      <translation>Ngừng các hành động hiện tại</translation>
+    </message>
+    <message>
+      <source>Go to Fullscreen</source>
+      <translation>Chuyển sang màn hình đầy đủ</translation>
+    </message>
+    <message>
+      <source>Exit Fullscreen</source>
+      <translation>Để lại toàn màn hình</translation>
+    </message>
+    <message>
+      <source>Minimize</source>
+      <translation>giảm thiểu</translation>
+    </message>
+    <message>
+      <source>Maximize</source>
+      <translation>Tối đa hóa</translation>
+    </message>
+    <message>
+      <source>Restore Down</source>
+      <translation>Phục hồi dựa trên Windows</translation>
+    </message>
+    <message>
+      <source>Open in Browser...</source>
+      <translation>Trong mở trình duyệt…</translation>
+    </message>
+    <message>
+      <source>System Administration...</source>
+      <translation>quản trị hệ thống ...</translation>
+    </message>
+    <message>
+      <source>System Update...</source>
+      <translation>Cập nhật hệ thống ...</translation>
+    </message>
+    <message>
+      <source>User Management...</source>
+      <translation>Quản lý người sử dụng ...</translation>
+    </message>
+    <message>
+      <source>Local Settings...</source>
+      <translation>thiết lập địa phương ...</translation>
+    </message>
+    <message>
+      <source>Audit Trail...</source>
+      <translation>Đường mòn kiểm toán...</translation>
+    </message>
+    <message>
+      <source>Bookmark Search...</source>
+      <translation>Bookmark Tìm kiếm ...</translation>
+    </message>
+    <message>
+      <source>Log in to %1...</source>
+      <comment>Log in to Nx Cloud</comment>
+      <translation type="unfinished">Log in to %1...</translation>
+    </message>
+    <message>
+      <source>Log out from %1</source>
+      <comment>Log out from Nx Cloud</comment>
+      <translation type="unfinished">Log out from %1</translation>
+    </message>
+    <message>
+      <source>Open %1 Portal...</source>
+      <comment>Open Nx Cloud Portal</comment>
+      <translation type="unfinished">Open %1 Portal...</translation>
+    </message>
+    <message>
+      <source>Account Settings...</source>
+      <translation type="unfinished">Account Settings...</translation>
+    </message>
+    <message>
+      <source>Create Account...</source>
+      <translation type="unfinished">Create Account...</translation>
+    </message>
+    <message>
+      <source>Event Rules...</source>
+      <translation type="unfinished">Event Rules...</translation>
+    </message>
+    <message>
+      <source>Devices List</source>
+      <translation>Danh sách các thiết bị</translation>
+    </message>
+    <message>
+      <source>Cameras List</source>
+      <translation>Danh sách máy ảnh</translation>
+    </message>
+    <message>
+      <source>Merge Systems...</source>
+      <translation>hợp nhất các hệ thống ...</translation>
+    </message>
+    <message>
+      <source>About...</source>
+      <translation>đối với...</translation>
+    </message>
+    <message>
+      <source>Exit</source>
+      <translation type="unfinished">Exit</translation>
+    </message>
+    <message>
+      <source>Mark Selection Start</source>
+      <translation>Chọn đánh dấu sự khởi đầu</translation>
+    </message>
+    <message>
+      <source>Mark Selection End</source>
+      <translation>End của các marker chọn lọc</translation>
+    </message>
+    <message>
+      <source>Clear Selection</source>
+      <translation>rõ ràng Selection</translation>
+    </message>
+    <message>
+      <source>Zoom to Selection</source>
+      <translation>Kéo dài đến vùng lựa chọn</translation>
+    </message>
+    <message>
+      <source>Add Bookmark...</source>
+      <translation>thêm Bookmark ...</translation>
+    </message>
+    <message>
+      <source>Edit Bookmark...</source>
+      <translation>Chỉnh sửa dấu trang ...</translation>
+    </message>
+    <message>
+      <source>Remove Bookmark...</source>
+      <translation>loại bỏ các dấu trang ...</translation>
+    </message>
+    <message>
+      <source>Remove Bookmarks...</source>
+      <translation>Di chuyển Bookmarks ...</translation>
+    </message>
+    <message>
+      <source>Export Selected Area...</source>
+      <translation>Xuất chọn múi...</translation>
+    </message>
+    <message>
+      <source>Export Multi-Video...</source>
+      <translation>Xuất khẩu nhiều hình ảnh...</translation>
+    </message>
+    <message>
+      <source>Export Rapid Review...</source>
+      <translation>Xuất khẩu nhanh chóng xem xét lại ...</translation>
+    </message>
+    <message>
+      <source>Preview Search...</source>
+      <translation>Preview Tìm kiếm...</translation>
+    </message>
+    <message>
+      <source>Server...</source>
+      <translation>máy chủ ...</translation>
+    </message>
+    <message>
+      <source>Open</source>
+      <translation>mở</translation>
+    </message>
+    <message>
+      <source>Monitor</source>
+      <translation type="unfinished">Monitor</translation>
+    </message>
+    <message>
+      <source>Open in New Tab</source>
+      <translation>Mở trong một tab mới</translation>
+    </message>
+    <message>
+      <source>Monitor in New Tab</source>
+      <translation>Màn hình trong tab mới</translation>
+    </message>
+    <message>
+      <source>Open in Alarm Layout</source>
+      <translation>Mở trong diện báo động</translation>
+    </message>
+    <message>
+      <source>Open in New Window</source>
+      <translation>Mở trong một cửa sổ mới</translation>
+    </message>
+    <message>
+      <source>Monitor in New Window</source>
+      <translation>Giám sát trong cửa sổ mới</translation>
+    </message>
+    <message>
+      <source>Open Video Wall</source>
+      <translation type="unfinished">Open Video Wall</translation>
+    </message>
+    <message>
+      <source>Open Containing Folder</source>
+      <translation>Mở thư mục tập tin</translation>
+    </message>
+    <message>
+      <source>Identify</source>
+      <translation>Xác định</translation>
+    </message>
+    <message>
+      <source>Attach to Video Wall...</source>
+      <translation>gắn vào tường video ...</translation>
+    </message>
+    <message>
+      <source>Switch to Video Wall mode...</source>
+      <translation>chuyển sang chế độ tường video ...</translation>
+    </message>
+    <message>
+      <source>Save Video Wall</source>
+      <translation type="unfinished">Save Video Wall</translation>
+    </message>
+    <message>
+      <source>Save Current Matrix</source>
+      <translation>Lưu ma trận hiện tại</translation>
+    </message>
+    <message>
+      <source>Load Matrix</source>
+      <translation>tải ma trận</translation>
+    </message>
+    <message>
+      <source>Delete</source>
+      <translation>xóa bỏ</translation>
+    </message>
+    <message>
+      <source>Stop Video Wall</source>
+      <translation>Bức tường video stop</translation>
+    </message>
+    <message>
+      <source>Clear Screen</source>
+      <translation type="unfinished">Clear Screen</translation>
+    </message>
+    <message>
+      <source>Save Layout</source>
+      <translation>Cách bài trí cửa</translation>
+    </message>
+    <message>
+      <source>Save Layout As...</source>
+      <translation>Lưu bố trí…</translation>
+    </message>
+    <message>
+      <source>Maximize Item</source>
+      <translation>Tối đa hóa dự án</translation>
+    </message>
+    <message>
+      <source>Restore Item</source>
+      <translation>trở lại với dự án</translation>
+    </message>
+    <message>
+      <source>Show Info</source>
+      <translation>Thông tin hiển thị</translation>
+    </message>
+    <message>
+      <source>Hide Info</source>
+      <translation>Thông tin ẩn</translation>
+    </message>
+    <message>
+      <source>Change Resolution...</source>
+      <translation>Thay đổi Nghị quyết...</translation>
+    </message>
+    <message>
+      <source>Auto</source>
+      <translation>tự động</translation>
+    </message>
+    <message>
+      <source>Low</source>
+      <translation>thấp</translation>
+    </message>
+    <message>
+      <source>High</source>
+      <translation>cao</translation>
+    </message>
+    <message>
+      <source>PTZ...</source>
+      <translation type="unfinished">PTZ...</translation>
+    </message>
+    <message>
+      <source>Save Current Position...</source>
+      <translation>Lưu vị trí hiện tại...</translation>
+    </message>
+    <message>
+      <source>Manage...</source>
+      <translation>quản lý…</translation>
+    </message>
+    <message>
+      <source>Show Motion/Smart Search</source>
+      <translation>Hide chuyển / Wisdom Tìm kiếm</translation>
+    </message>
+    <message>
+      <source>Show Motion</source>
+      <translation>Display chuyển</translation>
+    </message>
+    <message>
+      <source>Hide Motion/Smart Search</source>
+      <translation>Hide chuyển / Wisdom Tìm kiếm</translation>
+    </message>
+    <message>
+      <source>Hide Motion</source>
+      <translation>Hide chuyển</translation>
+    </message>
+    <message>
+      <source>Clear Motion Selection</source>
+      <translation>Lựa chọn Clear Motion Detection</translation>
+    </message>
+    <message>
+      <source>Check File Watermark</source>
+      <translation>Kiểm tra các tập tin watermark</translation>
+    </message>
+    <message>
+      <source>Image Enhancement...</source>
+      <translation>image Enhancement...</translation>
+    </message>
+    <message>
+      <source>Rotate to...</source>
+      <translation>xoay camera...</translation>
+    </message>
+    <message>
+      <source>0 degrees</source>
+      <translation>0 trình độ</translation>
+    </message>
+    <message>
+      <source>90 degrees</source>
+      <translation>90 trình độ</translation>
+    </message>
+    <message>
+      <source>180 degrees</source>
+      <translation>180 trình độ</translation>
+    </message>
+    <message>
+      <source>270 degrees</source>
+      <translation>270 trình độ</translation>
+    </message>
+    <message>
+      <source>Remove from Layout</source>
+      <translation>Gỡ bỏ khỏi bố trí</translation>
+    </message>
+    <message>
+      <source>Remove from Tour</source>
+      <translation type="unfinished">Remove from Tour</translation>
+    </message>
+    <message>
+      <source>Stop Sharing Layout</source>
+      <translation type="unfinished">Stop Sharing Layout</translation>
+    </message>
+    <message>
+      <source>Edit...</source>
+      <translation type="unfinished">Edit...</translation>
+    </message>
+    <message>
+      <source>Rename</source>
+      <translation>đổi tên</translation>
+    </message>
+    <message>
+      <source>Delete from Disk</source>
+      <translation>Xóa từ ổ đĩa cứng</translation>
+    </message>
+    <message>
+      <source>Set as Layout Background</source>
+      <translation>Hãy bố trí nền (đồ điện tử)</translation>
+    </message>
+    <message>
+      <source>User Settings...</source>
+      <translation>thiết lập người dùng...</translation>
+    </message>
+    <message>
+      <source>User Roles...</source>
+      <translation type="unfinished">User Roles...</translation>
+    </message>
+    <message>
+      <source>Role Settings...</source>
+      <translation type="unfinished">Role Settings...</translation>
+    </message>
+    <message>
+      <source>Check Device Issues...</source>
+      <translation>Kiểm tra vấn đề thiết bị ...</translation>
+    </message>
+    <message>
+      <source>Check Devices Issues...</source>
+      <translation>Kiểm tra vấn đề thiết bị ...</translation>
+    </message>
+    <message>
+      <source>Check Camera Issues...</source>
+      <translation>Kiểm tra vấn đề Camera ...</translation>
+    </message>
+    <message>
+      <source>Check Cameras Issues...</source>
+      <translation>Kiểm tra vấn đề Máy ảnh ...</translation>
+    </message>
+    <message>
+      <source>Check I/O Module Issues...</source>
+      <translation>Kiểm tra sự cố I / O Module ...</translation>
+    </message>
+    <message>
+      <source>Check I/O Modules Issues...</source>
+      <translation>Kiểm tra sự cố I / O Modules ...</translation>
+    </message>
+    <message>
+      <source>Device Rules...</source>
+      <translation>Quy định thiết bị ...</translation>
+    </message>
+    <message>
+      <source>Devices Rules...</source>
+      <translation>Thiết bị quy ...</translation>
+    </message>
+    <message>
+      <source>Camera Rules...</source>
+      <translation>Nội quy Camera ...</translation>
+    </message>
+    <message>
+      <source>Cameras Rules...</source>
+      <translation>Máy ảnh quy tắc ...</translation>
+    </message>
+    <message>
+      <source>I/O Module Rules...</source>
+      <translation>I / O Module quy ...</translation>
+    </message>
+    <message>
+      <source>I/O Modules Rules...</source>
+      <translation>I / O Modules quy ...</translation>
+    </message>
+    <message>
+      <source>Device Settings...</source>
+      <translation>Cài đặt thiết bị ...</translation>
+    </message>
+    <message>
+      <source>Devices Settings...</source>
+      <translation>Các thiết bị cài đặt ...</translation>
+    </message>
+    <message>
+      <source>Camera Settings...</source>
+      <translation>Cài đặt Camera ...</translation>
+    </message>
+    <message>
+      <source>Cameras Settings...</source>
+      <translation>Cài đặt máy ảnh ...</translation>
+    </message>
+    <message>
+      <source>I/O Module Settings...</source>
+      <translation>I / O Module thiết lập ...</translation>
+    </message>
+    <message>
+      <source>I/O Modules Settings...</source>
+      <translation>I / O Modules thiết lập ...</translation>
+    </message>
+    <message>
+      <source>File Settings...</source>
+      <translation>Cài đặt tập tin ...</translation>
+    </message>
+    <message>
+      <source>Layout Settings...</source>
+      <translation>Giao diện thiết lập...</translation>
+    </message>
+    <message>
+      <source>Video Wall Settings...</source>
+      <translation>thiết lập bức tường video ...</translation>
+    </message>
+    <message>
+      <source>Add Device...</source>
+      <translation type="unfinished">Add Device...</translation>
+    </message>
+    <message>
+      <source>Devices List by Server...</source>
+      <translation>Danh sách các thiết bị của máy chủ ...</translation>
+    </message>
+    <message>
+      <source>Cameras List by Server...</source>
+      <translation>Máy ảnh Danh sách bởi máy chủ ...</translation>
+    </message>
+    <message>
+      <source>Server Logs...</source>
+      <translation>máy chủ bản ghi...</translation>
+    </message>
+    <message>
+      <source>Server Diagnostics...</source>
+      <translation>Chẩn đoán máy chủ...</translation>
+    </message>
+    <message>
+      <source>Server Web Page...</source>
+      <translation type="unfinished">Server Web Page...</translation>
+    </message>
+    <message>
+      <source>Server Settings...</source>
+      <translation>cài đặt máy chủ...</translation>
+    </message>
+    <message>
+      <source>Merge to Currently Connected System...</source>
+      <translation>Hợp nhất để kết nối hệ thống Hiện nay ...</translation>
+    </message>
+    <message>
+      <source>Change Cell Aspect Ratio...</source>
+      <translation>thay đổi Cell Aspect Ratio...</translation>
+    </message>
+    <message>
+      <source>Change Cell Spacing...</source>
+      <translation>thay đổi Cell Spacing...</translation>
+    </message>
+    <message>
+      <source>None</source>
+      <translation>không</translation>
+    </message>
+    <message>
+      <source>Small</source>
+      <translation>nhỏ</translation>
+    </message>
+    <message>
+      <source>Medium</source>
+      <translation>trong</translation>
+    </message>
+    <message>
+      <source>Large</source>
+      <translation>lớn</translation>
+    </message>
+    <message>
+      <source>Start Tour</source>
+      <translation>Vòng đầu nhảy</translation>
+    </message>
+    <message>
+      <source>Stop Tour</source>
+      <translation>Ngừng nhảy vòng</translation>
+    </message>
+    <message>
+      <source>Make Layout Tour</source>
+      <translation type="unfinished">Make Layout Tour</translation>
+    </message>
+    <message>
+      <source>Settings</source>
+      <translation type="unfinished">Settings</translation>
+    </message>
+    <message>
+      <source>Close</source>
+      <translation>đóng cửa</translation>
+    </message>
+    <message>
+      <source>Close All But This</source>
+      <translation>Đóng tất cả các khác</translation>
+    </message>
+    <message>
+      <source>Play</source>
+      <translation>Broadcast</translation>
+    </message>
+    <message>
+      <source>Pause</source>
+      <translation>giờ nghĩ giảo lao</translation>
+    </message>
+    <message>
+      <source>Previous Frame</source>
+      <translation>Trên một khung</translation>
+    </message>
+    <message>
+      <source>Next Frame</source>
+      <translation>Các khung hình tiếp theo</translation>
+    </message>
+    <message>
+      <source>To Start</source>
+      <translation>đến điểm khởi</translation>
+    </message>
+    <message>
+      <source>To End</source>
+      <translation>Để một điểm kết thúc</translation>
+    </message>
+    <message>
+      <source>Volume Down</source>
+      <translation>volume Down</translation>
+    </message>
+    <message>
+      <source>Volume Up</source>
+      <translation>tăng cường khối lượng</translation>
+    </message>
+    <message>
+      <source>Toggle Mute</source>
+      <translation>Chuyển chế độ im lặng</translation>
+    </message>
+    <message>
+      <source>Jump to Live</source>
+      <translation>Chuyển sang hình ảnh thời gian thực</translation>
+    </message>
+    <message>
+      <source>Synchronize Streams</source>
+      <translation>Đồng bộ hóa tất cả các dòng</translation>
+    </message>
+    <message>
+      <source>Disable Stream Synchronization</source>
+      <translation>Đồng bộ hóa tất cả các dòng</translation>
+    </message>
+    <message>
+      <source>Show Bookmarks</source>
+      <translation>Hiện Bookmarks</translation>
+    </message>
+    <message>
+      <source>Hide Bookmarks</source>
+      <translation>Ẩn Bookmarks</translation>
+    </message>
+    <message>
+      <source>Show Calendar</source>
+      <translation>Hiện lịch</translation>
+    </message>
+    <message>
+      <source>Hide Calendar</source>
+      <translation>Không hiển thị lịch</translation>
+    </message>
+    <message>
+      <source>Show Title Bar</source>
+      <translation>Hiển thị đề cột</translation>
+    </message>
+    <message>
+      <source>Hide Title Bar</source>
+      <translation>Thanh tiêu đề Hide</translation>
+    </message>
+    <message>
+      <source>Pin Tree</source>
+      <translation>Cây hiển thị cố định</translation>
+    </message>
+    <message>
+      <source>Unpin Tree</source>
+      <translation>Không có cây hiển thị cố định</translation>
+    </message>
+    <message>
+      <source>Show Tree</source>
+      <translation>Hiện Tree</translation>
+    </message>
+    <message>
+      <source>Hide Tree</source>
+      <translation>Không hiển thị một cây</translation>
+    </message>
+    <message>
+      <source>Show Timeline</source>
+      <translation>Hiển thị Time cột</translation>
+    </message>
+    <message>
+      <source>Hide Timeline</source>
+      <translation>Thời gian cột không hiển thị</translation>
+    </message>
+    <message>
+      <source>Show Notifications</source>
+      <translation type="unfinished">Show Notifications</translation>
+    </message>
+    <message>
+      <source>Hide Notifications</source>
+      <translation type="unfinished">Hide Notifications</translation>
+    </message>
+    <message>
+      <source>Pin Notifications</source>
+      <translation>Thông báo hiển thị cố định</translation>
+    </message>
+    <message>
+      <source>Unpin Notifications</source>
+      <translation>Hiển thị một thông báo là không cố định</translation>
+    </message>
+  </context>
+  <context>
     <name>CustomHorizontalHeader</name>
     <message>
       <source>5 minutes</source>
@@ -117,6 +919,45 @@ to view more bookmarks</translation>
     <message>
       <source>For all data</source>
       <translation type="unfinished">For all data</translation>
+    </message>
+  </context>
+  <context>
+    <name>Deactivator</name>
+    <message>
+      <source>Unknown error</source>
+      <translation type="unfinished">Unknown error</translation>
+    </message>
+    <message>
+      <source>License does not exist</source>
+      <translation type="unfinished">License does not exist</translation>
+    </message>
+    <message>
+      <source>License is disabled</source>
+      <translation type="unfinished">License is disabled</translation>
+    </message>
+    <message>
+      <source>License is inactive</source>
+      <translation type="unfinished">License is inactive</translation>
+    </message>
+    <message>
+      <source>Invalid license</source>
+      <translation type="unfinished">Invalid license</translation>
+    </message>
+    <message>
+      <source>License is trial</source>
+      <translation type="unfinished">License is trial</translation>
+    </message>
+    <message>
+      <source>License is in deactivation process</source>
+      <translation type="unfinished">License is in deactivation process</translation>
+    </message>
+    <message>
+      <source>Invalid hardware id</source>
+      <translation type="unfinished">Invalid hardware id</translation>
+    </message>
+    <message>
+      <source>Limit exceeded</source>
+      <translation type="unfinished">Limit exceeded</translation>
     </message>
   </context>
   <context>
@@ -234,37 +1075,6 @@ to view more bookmarks</translation>
     <message>
       <source>Permissions</source>
       <translation>Quyền</translation>
-    </message>
-  </context>
-  <context>
-    <name>Ptz</name>
-    <message>
-      <source>Please wait for the camera to go online.</source>
-      <translation>Xin vui lòng chờ máy ảnh để đi trực tuyến.</translation>
-    </message>
-    <message>
-      <source>Failed to get current position</source>
-      <translation type="unfinished">Failed to get current position</translation>
-    </message>
-    <message>
-      <source>Failed to set current position</source>
-      <translation type="unfinished">Failed to set current position</translation>
-    </message>
-    <message>
-      <source>Preset used by some tours. Delete it anyway?</source>
-      <translation type="unfinished">Preset used by some tours. Delete it anyway?</translation>
-    </message>
-    <message>
-      <source>These tours will become invalid.</source>
-      <translation type="unfinished">These tours will become invalid.</translation>
-    </message>
-    <message>
-      <source>Cannot get the current position from camera &quot;%1&quot;</source>
-      <translation type="unfinished">Cannot get the current position from camera &quot;%1&quot;</translation>
-    </message>
-    <message>
-      <source>Cannot set the current position for camera &quot;%1&quot;</source>
-      <translation type="unfinished">Cannot set the current position for camera &quot;%1&quot;</translation>
     </message>
   </context>
   <context>
@@ -398,940 +1208,6 @@ to view more bookmarks</translation>
     </message>
   </context>
   <context>
-    <name>QnActionManager</name>
-    <message>
-      <source>Show FPS</source>
-      <translation>buổi diễn FPS</translation>
-    </message>
-    <message>
-      <source>Hide FPS</source>
-      <translation>giấu FPS</translation>
-    </message>
-    <message>
-      <source>Drop Resources</source>
-      <translation>Tài Discard</translation>
-    </message>
-    <message>
-      <source>Drop Resources into New Layout</source>
-      <translation>Vứt bỏ các nguồn lực để bố trí mới</translation>
-    </message>
-    <message>
-      <source>Delayed Open Video Wall</source>
-      <translation>Trì hoãn bức tường video mở</translation>
-    </message>
-    <message>
-      <source>Delayed Drop Resources</source>
-      <translation>Trì hoãn bỏ nguồn</translation>
-    </message>
-    <message>
-      <source>Instant Drop Resources</source>
-      <translation>Tài ngay lập tức loại bỏ</translation>
-    </message>
-    <message>
-      <source>Next Layout</source>
-      <translation>việc bố trí tiếp theo</translation>
-    </message>
-    <message>
-      <source>Previous Layout</source>
-      <translation>cựu bố trí</translation>
-    </message>
-    <message>
-      <source>Select All</source>
-      <translation>chọn tất cả</translation>
-    </message>
-    <message>
-      <source>Selection Changed</source>
-      <translation>Tùy chọn đã được thay đổi</translation>
-    </message>
-    <message>
-      <source>Filter...</source>
-      <translation>Lọc...</translation>
-    </message>
-    <message>
-      <source>Go to Freespace Mode</source>
-      <translation>Chuyển sang chế độ không gian miễn phí</translation>
-    </message>
-    <message>
-      <source>Help</source>
-      <translation>sự trông cậy</translation>
-    </message>
-    <message>
-      <source>Event Log...</source>
-      <translation>ghi sự kiện ...</translation>
-    </message>
-    <message>
-      <source>Control Video Wall</source>
-      <translation>Kiểm soát bức tường video</translation>
-    </message>
-    <message>
-      <source>Push my screen</source>
-      <translation>Đẩy màn hình của tôi</translation>
-    </message>
-    <message>
-      <source>Restart application</source>
-      <translation>Khởi động lại ứng dụng</translation>
-    </message>
-    <message>
-      <source>Select Time Server</source>
-      <translation>Chọn máy chủ thời gian</translation>
-    </message>
-    <message>
-      <source>Go To Saved Position</source>
-      <translation>Chỉ vị trí đã lưu</translation>
-    </message>
-    <message>
-      <source>Activate PTZ Tour</source>
-      <translation>Bắt đầu lên PTZ Cruise</translation>
-    </message>
-    <message>
-      <source>Activate PTZ Object</source>
-      <translation>Kích hoạt PTZ đối tượng</translation>
-    </message>
-    <message>
-      <source>Fit in View</source>
-      <translation>điền view</translation>
-    </message>
-    <message>
-      <source>Main Menu</source>
-      <translation>menu chính</translation>
-    </message>
-    <message>
-      <source>Connect to Server...</source>
-      <translation>Kết nối đến máy chủ...</translation>
-    </message>
-    <message>
-      <source>Start Panic Recording</source>
-      <translation>Video bắt khẩn cấp</translation>
-    </message>
-    <message>
-      <source>Stop Panic Recording</source>
-      <translation>Dừng khẩn cấp video</translation>
-    </message>
-    <message>
-      <source>New...</source>
-      <translation>thêm...</translation>
-    </message>
-    <message>
-      <source>New Layout...</source>
-      <translation>việc bố trí mới...</translation>
-    </message>
-    <message>
-      <source>Tab</source>
-      <translation type="unfinished">Tab</translation>
-    </message>
-    <message>
-      <source>New Tab</source>
-      <translation>Tab thêm</translation>
-    </message>
-    <message>
-      <source>Window</source>
-      <translation>cửa sổ</translation>
-    </message>
-    <message>
-      <source>New Window</source>
-      <translation>Cửa sổ mới được mở ra</translation>
-    </message>
-    <message>
-      <source>User...</source>
-      <translation>người sử dụng…</translation>
-    </message>
-    <message>
-      <source>New User...</source>
-      <translation>Người dùng mới…</translation>
-    </message>
-    <message>
-      <source>Video Wall...</source>
-      <translation>tường video ...</translation>
-    </message>
-    <message>
-      <source>New Video Wall...</source>
-      <translation>Tường video mới ...</translation>
-    </message>
-    <message>
-      <source>Open Layout...</source>
-      <translation>mở bố trí…</translation>
-    </message>
-    <message>
-      <source>Open...</source>
-      <translation>mở...</translation>
-    </message>
-    <message>
-      <source>File(s)...</source>
-      <translation>văn khố...</translation>
-    </message>
-    <message>
-      <source>Folder...</source>
-      <translation>Table of Contents...</translation>
-    </message>
-    <message>
-      <source>Save Current Layout</source>
-      <translation>Lưu lại giao diện hiện tại</translation>
-    </message>
-    <message>
-      <source>Save Current Layout As...</source>
-      <translation>Lưu lại giao diện hiện tại…</translation>
-    </message>
-    <message>
-      <source>Save Video Wall View</source>
-      <translation>lưu video xem tường</translation>
-    </message>
-    <message>
-      <source>Start Screen Recording</source>
-      <translation>Màn hình khởi quay video</translation>
-    </message>
-    <message>
-      <source>Stop Screen Recording</source>
-      <translation>Dừng Screen Video Capture</translation>
-    </message>
-    <message>
-      <source>Stop current action</source>
-      <translation>Ngừng các hành động hiện tại</translation>
-    </message>
-    <message>
-      <source>Go to Fullscreen</source>
-      <translation>Chuyển sang màn hình đầy đủ</translation>
-    </message>
-    <message>
-      <source>Exit Fullscreen</source>
-      <translation>Để lại toàn màn hình</translation>
-    </message>
-    <message>
-      <source>Minimize</source>
-      <translation>giảm thiểu</translation>
-    </message>
-    <message>
-      <source>Maximize</source>
-      <translation>Tối đa hóa</translation>
-    </message>
-    <message>
-      <source>Restore Down</source>
-      <translation>Phục hồi dựa trên Windows</translation>
-    </message>
-    <message>
-      <source>Open in Browser...</source>
-      <translation>Trong mở trình duyệt…</translation>
-    </message>
-    <message>
-      <source>System Administration...</source>
-      <translation>quản trị hệ thống ...</translation>
-    </message>
-    <message>
-      <source>Open Web Client...</source>
-      <translation>Mở một khách hàng web…</translation>
-    </message>
-    <message>
-      <source>System Update...</source>
-      <translation>Cập nhật hệ thống ...</translation>
-    </message>
-    <message>
-      <source>Local Settings...</source>
-      <translation>thiết lập địa phương ...</translation>
-    </message>
-    <message>
-      <source>Merge Systems...</source>
-      <translation>hợp nhất các hệ thống ...</translation>
-    </message>
-    <message>
-      <source>About...</source>
-      <translation>đối với...</translation>
-    </message>
-    <message>
-      <source>Exit</source>
-      <translation type="unfinished">Exit</translation>
-    </message>
-    <message>
-      <source>Server...</source>
-      <translation>máy chủ ...</translation>
-    </message>
-    <message>
-      <source>Open in Layout</source>
-      <translation>Bật trong cách bố trí</translation>
-    </message>
-    <message>
-      <source>Open</source>
-      <translation>mở</translation>
-    </message>
-    <message>
-      <source>Monitor</source>
-      <translation type="unfinished">Monitor</translation>
-    </message>
-    <message>
-      <source>Open in New Tab</source>
-      <translation>Mở trong một tab mới</translation>
-    </message>
-    <message>
-      <source>Open in New Window</source>
-      <translation>Mở trong một cửa sổ mới</translation>
-    </message>
-    <message>
-      <source>Open Layouts</source>
-      <translation>mở bố trí</translation>
-    </message>
-    <message>
-      <source>Open Layout(s)</source>
-      <translation>mở bố trí</translation>
-    </message>
-    <message>
-      <source>Open Video Wall(s)</source>
-      <translation>tường mở video (s)</translation>
-    </message>
-    <message>
-      <source>Open Containing Folder</source>
-      <translation>Mở thư mục tập tin</translation>
-    </message>
-    <message>
-      <source>Identify</source>
-      <translation>Xác định</translation>
-    </message>
-    <message>
-      <source>Attach to Video Wall...</source>
-      <translation>gắn vào tường video ...</translation>
-    </message>
-    <message>
-      <source>Switch to Video Wall mode...</source>
-      <translation>chuyển sang chế độ tường video ...</translation>
-    </message>
-    <message>
-      <source>Save Current Matrix</source>
-      <translation>Lưu ma trận hiện tại</translation>
-    </message>
-    <message>
-      <source>Load Matrix</source>
-      <translation>tải ma trận</translation>
-    </message>
-    <message>
-      <source>Delete</source>
-      <translation>xóa bỏ</translation>
-    </message>
-    <message>
-      <source>Stop Video Wall</source>
-      <translation>Bức tường video stop</translation>
-    </message>
-    <message>
-      <source>Save Layout</source>
-      <translation>Cách bài trí cửa</translation>
-    </message>
-    <message>
-      <source>Save Layout As...</source>
-      <translation>Lưu bố trí…</translation>
-    </message>
-    <message>
-      <source>Maximize Item</source>
-      <translation>Tối đa hóa dự án</translation>
-    </message>
-    <message>
-      <source>Restore Item</source>
-      <translation>trở lại với dự án</translation>
-    </message>
-    <message>
-      <source>Show Info</source>
-      <translation>Thông tin hiển thị</translation>
-    </message>
-    <message>
-      <source>Hide Info</source>
-      <translation>Thông tin ẩn</translation>
-    </message>
-    <message>
-      <source>Toggle Info</source>
-      <translation>chuyển đổi thông tin</translation>
-    </message>
-    <message>
-      <source>Change Resolution...</source>
-      <translation>Thay đổi Nghị quyết...</translation>
-    </message>
-    <message>
-      <source>Auto</source>
-      <translation>tự động</translation>
-    </message>
-    <message>
-      <source>Low</source>
-      <translation>thấp</translation>
-    </message>
-    <message>
-      <source>High</source>
-      <translation>cao</translation>
-    </message>
-    <message>
-      <source>PTZ...</source>
-      <translation type="unfinished">PTZ...</translation>
-    </message>
-    <message>
-      <source>Save Current Position...</source>
-      <translation>Lưu vị trí hiện tại...</translation>
-    </message>
-    <message>
-      <source>Manage...</source>
-      <translation>quản lý…</translation>
-    </message>
-    <message>
-      <source>Calibrate Fisheye</source>
-      <translation>Correction Fish-Eye</translation>
-    </message>
-    <message>
-      <source>Toggle Resolution Mode</source>
-      <translation>Chuyển đổi chế độ phân giải</translation>
-    </message>
-    <message>
-      <source>Show Motion/Smart Search</source>
-      <translation>Hide chuyển / Wisdom Tìm kiếm</translation>
-    </message>
-    <message>
-      <source>Show Motion</source>
-      <translation>Display chuyển</translation>
-    </message>
-    <message>
-      <source>Hide Motion/Smart Search</source>
-      <translation>Hide chuyển / Wisdom Tìm kiếm</translation>
-    </message>
-    <message>
-      <source>Hide Motion</source>
-      <translation>Hide chuyển</translation>
-    </message>
-    <message>
-      <source>Clear Motion Selection</source>
-      <translation>Lựa chọn Clear Motion Detection</translation>
-    </message>
-    <message>
-      <source>Toggle Smart Search</source>
-      <translation>Chuyển khôn ngoan Search</translation>
-    </message>
-    <message>
-      <source>Check File Watermark</source>
-      <translation>Kiểm tra các tập tin watermark</translation>
-    </message>
-    <message>
-      <source>Take Screenshot</source>
-      <translation>Screen Capture</translation>
-    </message>
-    <message>
-      <source>Image Enhancement...</source>
-      <translation>image Enhancement...</translation>
-    </message>
-    <message>
-      <source>Create Zoom Window</source>
-      <translation>Thiết lập cửa sổ zoom</translation>
-    </message>
-    <message>
-      <source>Rotate to...</source>
-      <translation>xoay camera...</translation>
-    </message>
-    <message>
-      <source>0 degrees</source>
-      <translation>0 trình độ</translation>
-    </message>
-    <message>
-      <source>90 degrees</source>
-      <translation>90 trình độ</translation>
-    </message>
-    <message>
-      <source>180 degrees</source>
-      <translation>180 trình độ</translation>
-    </message>
-    <message>
-      <source>270 degrees</source>
-      <translation>270 trình độ</translation>
-    </message>
-    <message>
-      <source>Remove from Layout</source>
-      <translation>Gỡ bỏ khỏi bố trí</translation>
-    </message>
-    <message>
-      <source>Rename</source>
-      <translation>đổi tên</translation>
-    </message>
-    <message>
-      <source>Delete from Disk</source>
-      <translation>Xóa từ ổ đĩa cứng</translation>
-    </message>
-    <message>
-      <source>Set as Layout Background</source>
-      <translation>Hãy bố trí nền (đồ điện tử)</translation>
-    </message>
-    <message>
-      <source>User Settings...</source>
-      <translation>thiết lập người dùng...</translation>
-    </message>
-    <message>
-      <source>Layout Settings...</source>
-      <translation>Giao diện thiết lập...</translation>
-    </message>
-    <message>
-      <source>Video Wall Settings...</source>
-      <translation>thiết lập bức tường video ...</translation>
-    </message>
-    <message>
-      <source>Ping...</source>
-      <translation type="unfinished">Ping...</translation>
-    </message>
-    <message>
-      <source>Server Logs...</source>
-      <translation>máy chủ bản ghi...</translation>
-    </message>
-    <message>
-      <source>Server Diagnostics...</source>
-      <translation>Chẩn đoán máy chủ...</translation>
-    </message>
-    <message>
-      <source>Server Settings...</source>
-      <translation>cài đặt máy chủ...</translation>
-    </message>
-    <message>
-      <source>Merge to Currently Connected System...</source>
-      <translation>Hợp nhất để kết nối hệ thống Hiện nay ...</translation>
-    </message>
-    <message>
-      <source>Change Cell Aspect Ratio...</source>
-      <translation>thay đổi Cell Aspect Ratio...</translation>
-    </message>
-    <message>
-      <source>Change Cell Spacing...</source>
-      <translation>thay đổi Cell Spacing...</translation>
-    </message>
-    <message>
-      <source>None</source>
-      <translation>không</translation>
-    </message>
-    <message>
-      <source>Small</source>
-      <translation>nhỏ</translation>
-    </message>
-    <message>
-      <source>Medium</source>
-      <translation>trong</translation>
-    </message>
-    <message>
-      <source>Large</source>
-      <translation>lớn</translation>
-    </message>
-    <message>
-      <source>Start Tour</source>
-      <translation>Vòng đầu nhảy</translation>
-    </message>
-    <message>
-      <source>Stop Tour</source>
-      <translation>Ngừng nhảy vòng</translation>
-    </message>
-    <message>
-      <source>Close</source>
-      <translation>đóng cửa</translation>
-    </message>
-    <message>
-      <source>Close All But This</source>
-      <translation>Đóng tất cả các khác</translation>
-    </message>
-    <message>
-      <source>Mark Selection Start</source>
-      <translation>Chọn đánh dấu sự khởi đầu</translation>
-    </message>
-    <message>
-      <source>Mark Selection End</source>
-      <translation>End của các marker chọn lọc</translation>
-    </message>
-    <message>
-      <source>Clear Selection</source>
-      <translation>rõ ràng Selection</translation>
-    </message>
-    <message>
-      <source>Zoom to Selection</source>
-      <translation>Kéo dài đến vùng lựa chọn</translation>
-    </message>
-    <message>
-      <source>Edit Bookmark...</source>
-      <translation>Chỉnh sửa dấu trang ...</translation>
-    </message>
-    <message>
-      <source>Remove Bookmark...</source>
-      <translation>loại bỏ các dấu trang ...</translation>
-    </message>
-    <message>
-      <source>Export Selected Area...</source>
-      <translation>Xuất chọn múi...</translation>
-    </message>
-    <message>
-      <source>Export Multi-Video...</source>
-      <translation>Xuất khẩu nhiều hình ảnh...</translation>
-    </message>
-    <message>
-      <source>Preview Search...</source>
-      <translation>Preview Tìm kiếm...</translation>
-    </message>
-    <message>
-      <source>Play</source>
-      <translation>Broadcast</translation>
-    </message>
-    <message>
-      <source>Pause</source>
-      <translation>giờ nghĩ giảo lao</translation>
-    </message>
-    <message>
-      <source>Previous Frame</source>
-      <translation>Trên một khung</translation>
-    </message>
-    <message>
-      <source>Next Frame</source>
-      <translation>Các khung hình tiếp theo</translation>
-    </message>
-    <message>
-      <source>To Start</source>
-      <translation>đến điểm khởi</translation>
-    </message>
-    <message>
-      <source>To End</source>
-      <translation>Để một điểm kết thúc</translation>
-    </message>
-    <message>
-      <source>Volume Down</source>
-      <translation>volume Down</translation>
-    </message>
-    <message>
-      <source>Volume Up</source>
-      <translation>tăng cường khối lượng</translation>
-    </message>
-    <message>
-      <source>Toggle Mute</source>
-      <translation>Chuyển chế độ im lặng</translation>
-    </message>
-    <message>
-      <source>Jump to Live</source>
-      <translation>Chuyển sang hình ảnh thời gian thực</translation>
-    </message>
-    <message>
-      <source>Synchronize Streams</source>
-      <translation>Đồng bộ hóa tất cả các dòng</translation>
-    </message>
-    <message>
-      <source>Disable Stream Synchronization</source>
-      <translation>Đồng bộ hóa tất cả các dòng</translation>
-    </message>
-    <message>
-      <source>Show Thumbnails</source>
-      <translation>thumbnail Display</translation>
-    </message>
-    <message>
-      <source>Hide Thumbnails</source>
-      <translation>Không hiển thị thumbnail</translation>
-    </message>
-    <message>
-      <source>Show Calendar</source>
-      <translation>Hiện lịch</translation>
-    </message>
-    <message>
-      <source>Hide Calendar</source>
-      <translation>Không hiển thị lịch</translation>
-    </message>
-    <message>
-      <source>Show Title Bar</source>
-      <translation>Hiển thị đề cột</translation>
-    </message>
-    <message>
-      <source>Hide Title Bar</source>
-      <translation>Thanh tiêu đề Hide</translation>
-    </message>
-    <message>
-      <source>Pin Tree</source>
-      <translation>Cây hiển thị cố định</translation>
-    </message>
-    <message>
-      <source>Unpin Tree</source>
-      <translation>Không có cây hiển thị cố định</translation>
-    </message>
-    <message>
-      <source>Show Tree</source>
-      <translation>Hiện Tree</translation>
-    </message>
-    <message>
-      <source>Hide Tree</source>
-      <translation>Không hiển thị một cây</translation>
-    </message>
-    <message>
-      <source>Show Timeline</source>
-      <translation>Hiển thị Time cột</translation>
-    </message>
-    <message>
-      <source>Hide Timeline</source>
-      <translation>Thời gian cột không hiển thị</translation>
-    </message>
-    <message>
-      <source>Pin Notifications</source>
-      <translation>Thông báo hiển thị cố định</translation>
-    </message>
-    <message>
-      <source>Unpin Notifications</source>
-      <translation>Hiển thị một thông báo là không cố định</translation>
-    </message>
-    <message>
-      <source>File Settings...</source>
-      <translation>Cài đặt tập tin ...</translation>
-    </message>
-    <message>
-      <source>User Management...</source>
-      <translation>Quản lý người sử dụng ...</translation>
-    </message>
-    <message>
-      <source>Audit Trail...</source>
-      <translation>Đường mòn kiểm toán...</translation>
-    </message>
-    <message>
-      <source>Failover Priority...</source>
-      <translation>Failover ưu tiên ...</translation>
-    </message>
-    <message>
-      <source>Move Devices</source>
-      <translation>Thiết bị di chuyển</translation>
-    </message>
-    <message>
-      <source>Move Cameras</source>
-      <translation>di chuyển Máy ảnh</translation>
-    </message>
-    <message>
-      <source>Device Diagnostics...</source>
-      <translation>Thiết bị chẩn đoán ...</translation>
-    </message>
-    <message>
-      <source>Camera Diagnostics...</source>
-      <translation>Chẩn đoán máy ảnh ...</translation>
-    </message>
-    <message>
-      <source>Devices List</source>
-      <translation>Danh sách các thiết bị</translation>
-    </message>
-    <message>
-      <source>Cameras List</source>
-      <translation>Danh sách máy ảnh</translation>
-    </message>
-    <message>
-      <source>Check Device Issues...</source>
-      <translation>Kiểm tra vấn đề thiết bị ...</translation>
-    </message>
-    <message>
-      <source>Check Devices Issues...</source>
-      <translation>Kiểm tra vấn đề thiết bị ...</translation>
-    </message>
-    <message>
-      <source>Check Camera Issues...</source>
-      <translation>Kiểm tra vấn đề Camera ...</translation>
-    </message>
-    <message>
-      <source>Check Cameras Issues...</source>
-      <translation>Kiểm tra vấn đề Máy ảnh ...</translation>
-    </message>
-    <message>
-      <source>Device Rules...</source>
-      <translation>Quy định thiết bị ...</translation>
-    </message>
-    <message>
-      <source>Devices Rules...</source>
-      <translation>Thiết bị quy ...</translation>
-    </message>
-    <message>
-      <source>Camera Rules...</source>
-      <translation>Nội quy Camera ...</translation>
-    </message>
-    <message>
-      <source>Cameras Rules...</source>
-      <translation>Máy ảnh quy tắc ...</translation>
-    </message>
-    <message>
-      <source>Device Settings...</source>
-      <translation>Cài đặt thiết bị ...</translation>
-    </message>
-    <message>
-      <source>Devices Settings...</source>
-      <translation>Các thiết bị cài đặt ...</translation>
-    </message>
-    <message>
-      <source>Camera Settings...</source>
-      <translation>Cài đặt Camera ...</translation>
-    </message>
-    <message>
-      <source>Cameras Settings...</source>
-      <translation>Cài đặt máy ảnh ...</translation>
-    </message>
-    <message>
-      <source>Devices List by Server...</source>
-      <translation>Danh sách các thiết bị của máy chủ ...</translation>
-    </message>
-    <message>
-      <source>Cameras List by Server...</source>
-      <translation>Máy ảnh Danh sách bởi máy chủ ...</translation>
-    </message>
-    <message>
-      <source>Cameras to Backup...</source>
-      <translation>Máy ảnh để sao lưu ...</translation>
-    </message>
-    <message>
-      <source>Show Bookmarks</source>
-      <translation>Hiện Bookmarks</translation>
-    </message>
-    <message>
-      <source>Hide Bookmarks</source>
-      <translation>Ẩn Bookmarks</translation>
-    </message>
-    <message>
-      <source>Pin Calendar</source>
-      <translation>pin Lịch</translation>
-    </message>
-    <message>
-      <source>Unpin Calendar</source>
-      <translation>Lịch Unpin</translation>
-    </message>
-    <message>
-      <source>I/O Module Diagnostics...</source>
-      <translation>I / O Module chẩn đoán ...</translation>
-    </message>
-    <message>
-      <source>Web Client...</source>
-      <translation>khách hàng web ...</translation>
-    </message>
-    <message>
-      <source>Bookmark Search...</source>
-      <translation>Bookmark Tìm kiếm ...</translation>
-    </message>
-    <message>
-      <source>Open in Alarm Layout</source>
-      <translation>Mở trong diện báo động</translation>
-    </message>
-    <message>
-      <source>Check I/O Module Issues...</source>
-      <translation>Kiểm tra sự cố I / O Module ...</translation>
-    </message>
-    <message>
-      <source>Check I/O Modules Issues...</source>
-      <translation>Kiểm tra sự cố I / O Modules ...</translation>
-    </message>
-    <message>
-      <source>I/O Module Rules...</source>
-      <translation>I / O Module quy ...</translation>
-    </message>
-    <message>
-      <source>I/O Modules Rules...</source>
-      <translation>I / O Modules quy ...</translation>
-    </message>
-    <message>
-      <source>I/O Module Settings...</source>
-      <translation>I / O Module thiết lập ...</translation>
-    </message>
-    <message>
-      <source>I/O Modules Settings...</source>
-      <translation>I / O Modules thiết lập ...</translation>
-    </message>
-    <message>
-      <source>Remove Bookmarks...</source>
-      <translation>Di chuyển Bookmarks ...</translation>
-    </message>
-    <message>
-      <source>Monitor in New Tab</source>
-      <translation>Màn hình trong tab mới</translation>
-    </message>
-    <message>
-      <source>Monitor in New Window</source>
-      <translation>Giám sát trong cửa sổ mới</translation>
-    </message>
-    <message>
-      <source>Open Layout in New Tab</source>
-      <translation>Mở bố trí trong tab mới</translation>
-    </message>
-    <message>
-      <source>Open Layout(s) in New Window</source>
-      <translation>Mở bố trí trong cửa sổ mới</translation>
-    </message>
-    <message>
-      <source>Open Current Layout in New Window</source>
-      <translation>Mở Giao diện hiện tại trong cửa sổ mới</translation>
-    </message>
-    <message>
-      <source>Add Bookmark...</source>
-      <translation>thêm Bookmark ...</translation>
-    </message>
-    <message>
-      <source>Export Rapid Review...</source>
-      <translation>Xuất khẩu nhanh chóng xem xét lại ...</translation>
-    </message>
-    <message>
-      <source>Event Rules...</source>
-      <translation type="unfinished">Event Rules...</translation>
-    </message>
-    <message>
-      <source>Disconnect from Server</source>
-      <translation type="unfinished">Disconnect from Server</translation>
-    </message>
-    <message>
-      <source>Browse Local Files</source>
-      <translation type="unfinished">Browse Local Files</translation>
-    </message>
-    <message>
-      <source>Show Welcome Screen</source>
-      <translation type="unfinished">Show Welcome Screen</translation>
-    </message>
-    <message>
-      <source>Web Page...</source>
-      <translation type="unfinished">Web Page...</translation>
-    </message>
-    <message>
-      <source>New Web Page...</source>
-      <translation type="unfinished">New Web Page...</translation>
-    </message>
-    <message>
-      <source>Log in to %1...</source>
-      <comment>Log in to Nx Cloud</comment>
-      <translation type="unfinished">Log in to %1...</translation>
-    </message>
-    <message>
-      <source>Log out from %1</source>
-      <comment>Log out from Nx Cloud</comment>
-      <translation type="unfinished">Log out from %1</translation>
-    </message>
-    <message>
-      <source>Open %1 Portal...</source>
-      <comment>Open Nx Cloud Portal</comment>
-      <translation type="unfinished">Open %1 Portal...</translation>
-    </message>
-    <message>
-      <source>Stop Sharing Layout</source>
-      <translation type="unfinished">Stop Sharing Layout</translation>
-    </message>
-    <message>
-      <source>User Roles...</source>
-      <translation type="unfinished">User Roles...</translation>
-    </message>
-    <message>
-      <source>Role Settings...</source>
-      <translation type="unfinished">Role Settings...</translation>
-    </message>
-    <message>
-      <source>Show Notifications</source>
-      <translation type="unfinished">Show Notifications</translation>
-    </message>
-    <message>
-      <source>Hide Notifications</source>
-      <translation type="unfinished">Hide Notifications</translation>
-    </message>
-    <message>
-      <source>Connect to System</source>
-      <translation type="unfinished">Connect to System</translation>
-    </message>
-    <message>
-      <source>Account Settings...</source>
-      <translation type="unfinished">Account Settings...</translation>
-    </message>
-    <message>
-      <source>Create Account...</source>
-      <translation type="unfinished">Create Account...</translation>
-    </message>
-    <message>
-      <source>Server Web Page...</source>
-      <translation type="unfinished">Server Web Page...</translation>
-    </message>
-    <message>
-      <source>Add Device...</source>
-      <translation type="unfinished">Add Device...</translation>
-    </message>
-    <message>
-      <source>Clear Screen</source>
-      <translation type="unfinished">Clear Screen</translation>
-    </message>
-  </context>
-  <context>
     <name>QnAdjustVideoDialog</name>
     <message>
       <source>Image Enhancement</source>
@@ -1347,13 +1223,6 @@ to view more bookmarks</translation>
     <message>
       <source>Folder not found</source>
       <translation type="unfinished">Folder not found</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnAlarmLayoutResource</name>
-    <message>
-      <source>Alarms</source>
-      <translation>báo động</translation>
     </message>
   </context>
   <context>
@@ -1783,17 +1652,6 @@ to view more bookmarks</translation>
     </message>
   </context>
   <context>
-    <name>QnBusinessRuleItemDelegate</name>
-    <message>
-      <source>For Administrators Only</source>
-      <translation>Đối với nhà quản lý</translation>
-    </message>
-    <message>
-      <source>For Users</source>
-      <translation type="unfinished">For Users</translation>
-    </message>
-  </context>
-  <context>
     <name>QnBusinessRuleViewModel</name>
     <message numerus="yes">
       <source>%n Server(s)</source>
@@ -1816,10 +1674,6 @@ to view more bookmarks</translation>
     <message>
       <source>Starts</source>
       <translation>bắt đầu</translation>
-    </message>
-    <message>
-      <source>Administrators Only</source>
-      <translation>chỉ có các nhà quản lý</translation>
     </message>
     <message>
       <source>Select at least one device</source>
@@ -1846,10 +1700,6 @@ to view more bookmarks</translation>
     <message>
       <source>N/A</source>
       <translation type="unfinished">N/A</translation>
-    </message>
-    <message>
-      <source>Users</source>
-      <translation>người sử dụng</translation>
     </message>
     <message>
       <source>Every %1</source>
@@ -3210,10 +3060,6 @@ to %1</translation>
   <context>
     <name>QnEventLogModel</name>
     <message>
-      <source>Administrators Only</source>
-      <translation>chỉ có các nhà quản lý</translation>
-    </message>
-    <message>
       <source>Motion video</source>
       <translation>chuyển động video</translation>
     </message>
@@ -3253,18 +3099,8 @@ to %1</translation>
       </translation>
     </message>
     <message>
-      <source>Users</source>
-      <translation>người sử dụng</translation>
-    </message>
-    <message>
       <source>Open camera</source>
       <translation type="unfinished">Open camera</translation>
-    </message>
-    <message numerus="yes">
-      <source>%n users</source>
-      <translation type="unfinished">
-        <numerusform>%n users</numerusform>
-      </translation>
     </message>
     <message numerus="yes">
       <source>and %n users more...</source>
@@ -3278,9 +3114,15 @@ to %1</translation>
         <numerusform>and %n more...</numerusform>
       </translation>
     </message>
+    <message numerus="yes">
+      <source>%n Removed subjects</source>
+      <translation type="unfinished">
+        <numerusform>%n Removed subjects</numerusform>
+      </translation>
+    </message>
     <message>
-      <source>User removed</source>
-      <translation>người dùng xóa</translation>
+      <source>Subject removed</source>
+      <translation type="unfinished">Subject removed</translation>
     </message>
   </context>
   <context>
@@ -3970,6 +3812,84 @@ to %1</translation>
       <source>This license is already activated and linked to hardware ID %1 on %2</source>
       <translation type="unfinished">This license is already activated and linked to hardware ID %1 on %2</translation>
     </message>
+    <message numerus="yes">
+      <source>%n channels</source>
+      <translation type="unfinished">
+        <numerusform>%n channels</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Deactivate licenses?</source>
+      <translation type="unfinished">
+        <numerusform>Deactivate licenses?</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Failed to deactivate license</source>
+      <translation type="unfinished">Failed to deactivate license</translation>
+    </message>
+    <message numerus="yes">
+      <source>Failed to deactivate %n licenses</source>
+      <translation type="unfinished">
+        <numerusform>Failed to deactivate %n licenses</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%1 of %n licenses cannot be deactivated</source>
+      <translation type="unfinished">
+        <numerusform>%1 of %n licenses cannot be deactivated</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Please contact Customer Support</source>
+      <translation type="unfinished">Please contact Customer Support</translation>
+    </message>
+    <message numerus="yes">
+      <source>Deactivate %n other</source>
+      <translation type="unfinished">
+        <numerusform>Deactivate %n other</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Cannot deactivate licenses</source>
+      <translation type="unfinished">
+        <numerusform>Cannot deactivate licenses</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Cannot connect to the License Server</source>
+      <translation type="unfinished">Cannot connect to the License Server</translation>
+    </message>
+    <message>
+      <source>Please make sure your server has active Internet connection or check firewall settings.</source>
+      <translation type="unfinished">Please make sure your server has active Internet connection or check firewall settings.</translation>
+    </message>
+    <message>
+      <source>License Server error</source>
+      <translation type="unfinished">License Server error</translation>
+    </message>
+    <message>
+      <source>If the problem presists please contact Customer Support.</source>
+      <translation type="unfinished">If the problem presists please contact Customer Support.</translation>
+    </message>
+    <message>
+      <source>License deactivated</source>
+      <translation type="unfinished">License deactivated</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n licenses deactivated</source>
+      <translation type="unfinished">
+        <numerusform>%n licenses deactivated</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Remove</source>
+      <translation>Gỡ bỏ</translation>
+    </message>
+    <message>
+      <source>Deactivate</source>
+      <translation type="unfinished">Deactivate</translation>
+    </message>
   </context>
   <context>
     <name>QnLicenseWidget</name>
@@ -4261,6 +4181,15 @@ to %1</translation>
       <source>Lo-Res</source>
       <translation type="unfinished">Lo-Res</translation>
     </message>
+    <message>
+      <source>press and hold</source>
+      <comment>Software Trigger</comment>
+      <translation type="unfinished">press and hold</translation>
+    </message>
+    <message>
+      <source>Failed to invoke trigger %1 (%2)</source>
+      <translation type="unfinished">Failed to invoke trigger %1 (%2)</translation>
+    </message>
   </context>
   <context>
     <name>QnMergeSystemsDialog</name>
@@ -4490,6 +4419,20 @@ to %1</translation>
       <source>Alarm: %1</source>
       <translation>báo động: %1</translation>
     </message>
+    <message>
+      <source>Bookmark it</source>
+      <translation type="unfinished">Bookmark it</translation>
+    </message>
+    <message>
+      <source>Bookmark created</source>
+      <translation type="unfinished">Bookmark created</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n bookmarks created</source>
+      <translation type="unfinished">
+        <numerusform>%n bookmarks created</numerusform>
+      </translation>
+    </message>
   </context>
   <context>
     <name>QnPerformanceTest</name>
@@ -4545,8 +4488,8 @@ to %1</translation>
       <translation type="unfinished">User Input</translation>
     </message>
     <message>
-      <source>PTZ, Device Output, 2-way Audio</source>
-      <translation type="unfinished">PTZ, Device Output, 2-way Audio</translation>
+      <source>PTZ, Device Output, 2-Way Audio, Software Triggers.</source>
+      <translation type="unfinished">PTZ, Device Output, 2-Way Audio, Software Triggers.</translation>
     </message>
   </context>
   <context>
@@ -4668,19 +4611,6 @@ to %1</translation>
     <message>
       <source>Hotkey used by tour &quot;%1&quot;</source>
       <translation type="unfinished">Hotkey used by tour &quot;%1&quot;</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnPtzPresetsToursActionFactory</name>
-    <message>
-      <source>%1 (active)</source>
-      <comment>Template for active PTZ preset</comment>
-      <translation>%1 (sáng kiến)</translation>
-    </message>
-    <message>
-      <source>%1 (active)</source>
-      <comment>Template for active PTZ tour</comment>
-      <translation>%1 (sáng kiến)</translation>
     </message>
   </context>
   <context>
@@ -4993,6 +4923,14 @@ to %1</translation>
     <message>
       <source>Local Files</source>
       <translation type="unfinished">Local Files</translation>
+    </message>
+    <message>
+      <source>Layout Tours</source>
+      <translation type="unfinished">Layout Tours</translation>
+    </message>
+    <message>
+      <source>Layout Tour</source>
+      <translation type="unfinished">Layout Tour</translation>
     </message>
   </context>
   <context>
@@ -5527,25 +5465,6 @@ to %1</translation>
     </message>
   </context>
   <context>
-    <name>QnShowOnAlarmLayoutActionWidget</name>
-    <message numerus="yes">
-      <source>%n Users</source>
-      <translation type="unfinished">
-        <numerusform>%n Users</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>%n Roles</source>
-      <translation type="unfinished">
-        <numerusform>%n Roles</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>All Users</source>
-      <translation>Tất cả người dùng</translation>
-    </message>
-  </context>
-  <context>
     <name>QnShowTextOverlayActionWidget</name>
     <message>
       <source>Html tags could be used within custom text:
@@ -6017,6 +5936,10 @@ to %1</translation>
       <source>%1 GB</source>
       <translation>%1 Gb</translation>
     </message>
+    <message>
+      <source>Too small and system partitions are reserved and not used for writing if there is enough other storage space available.</source>
+      <translation type="unfinished">Too small and system partitions are reserved and not used for writing if there is enough other storage space available.</translation>
+    </message>
   </context>
   <context>
     <name>QnStorageRebuildWidget</name>
@@ -6073,6 +5996,13 @@ to %1</translation>
     </message>
   </context>
   <context>
+    <name>QnSubjectTargetActionWidget</name>
+    <message>
+      <source>Select at least one user...</source>
+      <translation type="unfinished">Select at least one user...</translation>
+    </message>
+  </context>
+  <context>
     <name>QnSystemAdministrationDialog</name>
     <message>
       <source>General</source>
@@ -6116,10 +6046,6 @@ to %1</translation>
     <message>
       <source>Email server is not set</source>
       <translation>Email server không được thiết lập</translation>
-    </message>
-    <message>
-      <source>Connection to server lost</source>
-      <translation>Kết nối đến máy chủ bị mất</translation>
     </message>
     <message>
       <source>Select server for others to synchronize time with</source>
@@ -6283,12 +6209,16 @@ to %1</translation>
   <context>
     <name>QnTimeServerSelectionWidget</name>
     <message>
-      <source>Time is taken from the Internet.</source>
-      <translation>Thời gian được lấy từ Internet.</translation>
+      <source>System time is synchronized with the Internet and is independent from server local times.</source>
+      <translation type="unfinished">System time is synchronized with the Internet and is independent from server local times.</translation>
     </message>
     <message>
-      <source>Time is taken from %1.</source>
-      <translation>Thời gian được lấy từ %1.</translation>
+      <source>System time is synchronized with selected server local time and is independent from other servers.</source>
+      <translation type="unfinished">System time is synchronized with selected server local time and is independent from other servers.</translation>
+    </message>
+    <message>
+      <source>No server has Internet access. Time is not being synchronized.</source>
+      <translation type="unfinished">No server has Internet access. Time is not being synchronized.</translation>
     </message>
   </context>
   <context>
@@ -6810,184 +6740,33 @@ to %1</translation>
     </message>
   </context>
   <context>
-    <name>QnWorkbenchActionHandler</name>
+    <name>QnWebpageDialog</name>
     <message>
-      <source>Layout is locked and cannot be changed.</source>
-      <translation>Giao diện đã bị khóa và không thể thay đổi.</translation>
-    </message>
-    <message>
-      <source>All Supported (*.nov *.avi *.mkv *.mp4 *.mov *.ts *.m2ts *.mpeg *.mpg *.flv *.wmv *.3gp *.jpg *.png *.gif *.bmp *.tiff)</source>
-      <translation>Tất cả tập tin hỗ trợ (*.nov *.avi *.mkv *.mp4 *.mov *.ts *.m2ts *.mpeg *.mpg *.flv *.wmv *.3gp *.jpg *.png *.gif *.bmp *.tiff)</translation>
+      <source>Name</source>
+      <translation>tên</translation>
     </message>
     <message>
-      <source>Video (*.avi *.mkv *.mp4 *.mov *.ts *.m2ts *.mpeg *.mpg *.flv *.wmv *.3gp)</source>
-      <translation>hình ảnh (*.avi *.mkv *.mp4 *.mov *.ts *.m2ts *.mpeg *.mpg *.flv *.wmv *.3gp)</translation>
+      <source>URL</source>
+      <translation>nơi</translation>
     </message>
     <message>
-      <source>Pictures (*.jpg *.png *.gif *.bmp *.tiff)</source>
-      <translation>hình ảnh (*.jpg *.png *.gif *.bmp *.tiff)</translation>
+      <source>URL cannot be empty.</source>
+      <translation type="unfinished">URL cannot be empty.</translation>
     </message>
     <message>
-      <source>All files (*.*)</source>
-      <translation>tất cả các file (*.*)</translation>
+      <source>Wrong URL format.</source>
+      <translation type="unfinished">Wrong URL format.</translation>
     </message>
     <message>
-      <source>Select folder...</source>
-      <translation>thời gian máy chủ...</translation>
+      <source>Web Page</source>
+      <translation type="unfinished">Web Page</translation>
     </message>
+  </context>
+  <context>
+    <name>QnWorkbenchAlarmLayoutHandler</name>
     <message>
-      <source>Preview Search for %1</source>
-      <translation>Preview Tìm kiếm %1</translation>
-    </message>
-    <message>
-      <source>Rename</source>
-      <translation>đổi tên</translation>
-    </message>
-    <message>
-      <source>Enter new name for the selected item:</source>
-      <translation>Nhập tên mới cho các sản phẩm được chọn:</translation>
-    </message>
-    <message>
-      <source>Update...</source>
-      <translation>Cập nhật ...</translation>
-    </message>
-    <message>
-      <source>Beta version %1</source>
-      <translation>Phiên bản Beta %1</translation>
-    </message>
-    <message>
-      <source>Open File</source>
-      <translation>mở tập tin</translation>
-    </message>
-    <message>
-      <source>Updating Background...</source>
-      <translation>nền Đang cập nhật...</translation>
-    </message>
-    <message>
-      <source>Image processing may take a few moments. Please be patient.</source>
-      <translation>Xử lý hình ảnh sẽ tiêu thụ một số thời gian, xin vui lòng chờ đợi.</translation>
-    </message>
-    <message numerus="yes">
-      <source>Are you sure you want to permanently delete these %n files?</source>
-      <translation>
-        <numerusform>Bạn có chắc chắn muốn xóa vĩnh viễn các tập tin%n?</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>Confirm files deleting</source>
-      <translation type="unfinished">Confirm files deleting</translation>
-    </message>
-    <message>
-      <source>Client</source>
-      <translation>khách hàng</translation>
-    </message>
-    <message>
-      <source>Server</source>
-      <translation>máy chủ</translation>
-    </message>
-    <message numerus="yes">
-      <source>Failed to move %n devices</source>
-      <translation type="unfinished">
-        <numerusform>Failed to move %n devices</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>Failed to move %n cameras</source>
-      <translation type="unfinished">
-        <numerusform>Failed to move %n cameras</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>Failed to move %n I/O Modules</source>
-      <translation type="unfinished">
-        <numerusform>Failed to move %n I/O Modules</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>Server &quot;%1&quot; is not responding.</source>
-      <translation type="unfinished">Server &quot;%1&quot; is not responding.</translation>
-    </message>
-    <message>
-      <source>Move</source>
-      <translation type="unfinished">Move</translation>
-    </message>
-    <message>
-      <source>Too short period selected</source>
-      <translation type="unfinished">Too short period selected</translation>
-    </message>
-    <message>
-      <source>Cancel device adding?</source>
-      <translation type="unfinished">Cancel device adding?</translation>
-    </message>
-    <message>
-      <source>There is another user with the same name</source>
-      <translation type="unfinished">There is another user with the same name</translation>
-    </message>
-    <message>
-      <source>Image too big</source>
-      <translation type="unfinished">Image too big</translation>
-    </message>
-    <message>
-      <source>Maximum size is %1 MB.</source>
-      <translation type="unfinished">Maximum size is %1 MB.</translation>
-    </message>
-    <message>
-      <source>Failed to upload image</source>
-      <translation type="unfinished">Failed to upload image</translation>
-    </message>
-    <message>
-      <source>Please update all components to the version %1</source>
-      <translation type="unfinished">Please update all components to the version %1</translation>
-    </message>
-    <message>
-      <source>Some functionality may be unavailable or not working properly.</source>
-      <translation type="unfinished">Some functionality may be unavailable or not working properly.</translation>
-    </message>
-    <message>
-      <source>It will be used by software development team to improve your user experience.</source>
-      <translation type="unfinished">It will be used by software development team to improve your user experience.</translation>
-    </message>
-    <message>
-      <source>Failed to open server web page</source>
-      <translation type="unfinished">Failed to open server web page</translation>
-    </message>
-    <message>
-      <source>Skip</source>
-      <translation type="unfinished">Skip</translation>
-    </message>
-    <message>
-      <source>Cannot perform Preview Search. Please select a period of 15 seconds or longer.</source>
-      <translation type="unfinished">Cannot perform Preview Search. Please select a period of 15 seconds or longer.</translation>
-    </message>
-    <message numerus="yes">
-      <source>Server &quot;%1&quot; cannot access %n devices. Move them anyway?</source>
-      <translation type="unfinished">
-        <numerusform>Server &quot;%1&quot; cannot access %n devices. Move them anyway?</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>Server &quot;%1&quot; cannot access %n cameras. Move them anyway?</source>
-      <translation type="unfinished">
-        <numerusform>Server &quot;%1&quot; cannot access %n cameras. Move them anyway?</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>Server &quot;%1&quot; cannot access %n I/O modules. Move them anyway?</source>
-      <translation type="unfinished">
-        <numerusform>Server &quot;%1&quot; cannot access %n I/O modules. Move them anyway?</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>Components of System have different versions:</source>
-      <translation type="unfinished">Components of System have different versions:</translation>
-    </message>
-    <message>
-      <source>System sends anonymous usage statistics</source>
-      <translation type="unfinished">System sends anonymous usage statistics</translation>
-    </message>
-    <message>
-      <source>To disable it, go to System Administration dialog.</source>
-      <translation type="unfinished">To disable it, go to System Administration dialog.</translation>
+      <source>Alarms</source>
+      <translation>báo động</translation>
     </message>
   </context>
   <context>
@@ -7041,13 +6820,6 @@ to %1</translation>
     <message>
       <source>Could not connect to server. Video Wall will be closed.</source>
       <translation type="unfinished">Could not connect to server. Video Wall will be closed.</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnWorkbenchController</name>
-    <message>
-      <source>Press any key to stop the tour.</source>
-      <translation>Nhấn phím bất kỳ để ngăn chặn bánh xe hop.</translation>
     </message>
   </context>
   <context>
@@ -7266,29 +7038,6 @@ to %1</translation>
     <message>
       <source>Cloud Systems cannot be merged</source>
       <translation type="unfinished">Cloud Systems cannot be merged</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnWorkbenchLayoutsHandler</name>
-    <message>
-      <source>Save Layout As</source>
-      <translation>Lưu bố trí</translation>
-    </message>
-    <message>
-      <source>New Layout</source>
-      <translation>việc bố trí mới</translation>
-    </message>
-    <message>
-      <source>Enter the name of the layout to create:</source>
-      <translation>Nhập tên mà bạn muốn xây dựng bố cục:</translation>
-    </message>
-    <message>
-      <source>Enter Layout Name:</source>
-      <translation>Nhập tên bố trí:</translation>
-    </message>
-    <message>
-      <source>New Layout %1</source>
-      <translation>việc bố trí mới %1</translation>
     </message>
   </context>
   <context>
@@ -7530,23 +7279,158 @@ to %1</translation>
   <context>
     <name>QnWorkbenchWebPageHandler</name>
     <message>
-      <source>New Web Page...</source>
-      <translation type="unfinished">New Web Page...</translation>
+      <source>New Web Page</source>
+      <translation type="unfinished">New Web Page</translation>
     </message>
     <message>
-      <source>This Web Page already exists</source>
-      <translation type="unfinished">This Web Page already exists</translation>
-    </message>
-    <message>
-      <source>Enter URL of Web Page to add:</source>
-      <translation type="unfinished">Enter URL of Web Page to add:</translation>
+      <source>Edit Web Page</source>
+      <translation type="unfinished">Edit Web Page</translation>
     </message>
   </context>
   <context>
-    <name>Resources</name>
+    <name>SubjectSelectionDialog::RoleListDelegate</name>
+    <message numerus="yes">
+      <source>%n users</source>
+      <translation type="unfinished">
+        <numerusform>%n users</numerusform>
+      </translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::client::desktop::ui::LayoutPreviewPainter</name>
+    <message>
+      <source>NO DATA</source>
+      <translation>không có sẵn</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::client::desktop::ui::LayoutTourDropPlaceholder</name>
+    <message>
+      <source>Drag layout here to add it to the tour</source>
+      <translation type="unfinished">Drag layout here to add it to the tour</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::client::desktop::ui::SubjectSelectionDialog</name>
+    <message>
+      <source>No user roles found</source>
+      <translation type="unfinished">No user roles found</translation>
+    </message>
+    <message>
+      <source>No users found</source>
+      <translation type="unfinished">No users found</translation>
+    </message>
+    <message>
+      <source>Users</source>
+      <translation>người sử dụng</translation>
+    </message>
+    <message>
+      <source>Custom Users</source>
+      <translation type="unfinished">Custom Users</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::client::desktop::ui::action::LayoutTourSettingsFactory</name>
+    <message>
+      <source>Switch with Hotkeys</source>
+      <translation type="unfinished">Switch with Hotkeys</translation>
+    </message>
+    <message>
+      <source>Switch on Timer</source>
+      <translation type="unfinished">Switch on Timer</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::client::desktop::ui::action::PtzPresetsToursFactory</name>
+    <message>
+      <source>%1 (active)</source>
+      <comment>Template for active PTZ preset</comment>
+      <translation>%1 (sáng kiến)</translation>
+    </message>
+    <message>
+      <source>%1 (active)</source>
+      <comment>Template for active PTZ tour</comment>
+      <translation>%1 (sáng kiến)</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::client::desktop::ui::dialogs::LicenseDeactivationReason</name>
+    <message>
+      <source>Please fill up information about yourself and reason for license deactivation</source>
+      <translation type="unfinished">Please fill up information about yourself and reason for license deactivation</translation>
+    </message>
+    <message>
+      <source>Next</source>
+      <translation type="unfinished">Next</translation>
+    </message>
+    <message>
+      <source>Name is necessary</source>
+      <translation type="unfinished">Name is necessary</translation>
+    </message>
+    <message>
+      <source>Reason is necessary</source>
+      <translation type="unfinished">Reason is necessary</translation>
+    </message>
+    <message>
+      <source>Name</source>
+      <translation>tên</translation>
+    </message>
+    <message>
+      <source>Email</source>
+      <translation>Emai</translation>
+    </message>
+    <message>
+      <source>Reason for deactivation</source>
+      <translation type="unfinished">Reason for deactivation</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::client::desktop::ui::graphics::SoftwareTriggerButton</name>
+    <message>
+      <source>Go to Live</source>
+      <translation type="unfinished">Go to Live</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::client::desktop::ui::ptz</name>
+    <message>
+      <source>Cannot get the current position from camera &quot;%1&quot;</source>
+      <translation type="unfinished">Cannot get the current position from camera &quot;%1&quot;</translation>
+    </message>
+    <message>
+      <source>Please wait for the camera to go online.</source>
+      <translation>Xin vui lòng chờ máy ảnh để đi trực tuyến.</translation>
+    </message>
+    <message>
+      <source>Failed to get current position</source>
+      <translation type="unfinished">Failed to get current position</translation>
+    </message>
+    <message>
+      <source>Cannot set the current position for camera &quot;%1&quot;</source>
+      <translation type="unfinished">Cannot set the current position for camera &quot;%1&quot;</translation>
+    </message>
+    <message>
+      <source>Failed to set current position</source>
+      <translation type="unfinished">Failed to set current position</translation>
+    </message>
+    <message>
+      <source>Preset used by some tours. Delete it anyway?</source>
+      <translation type="unfinished">Preset used by some tours. Delete it anyway?</translation>
+    </message>
+    <message>
+      <source>These tours will become invalid.</source>
+      <translation type="unfinished">These tours will become invalid.</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::client::desktop::ui::resources</name>
     <message>
       <source>There is another layout with the same name</source>
       <translation type="unfinished">There is another layout with the same name</translation>
+    </message>
+    <message>
+      <source>You do not have permission to overwrite it.</source>
+      <translation type="unfinished">You do not have permission to overwrite it.</translation>
     </message>
     <message>
       <source>Overwrite existing layout?</source>
@@ -7625,6 +7509,10 @@ to %1</translation>
       <translation>Gỡ bỏ</translation>
     </message>
     <message>
+      <source>You are going to delete some resources to which you have access from Video Wall only. You will not see them in your resource list after it and will not be able to add them to Video Wall again.</source>
+      <translation type="unfinished">You are going to delete some resources to which you have access from Video Wall only. You will not see them in your resource list after it and will not be able to add them to Video Wall again.</translation>
+    </message>
+    <message>
       <source>You will lose access to following resources:</source>
       <translation type="unfinished">You will lose access to following resources:</translation>
     </message>
@@ -7680,17 +7568,9 @@ to %1</translation>
       <source>They may be auto-discovered again after removing.</source>
       <translation type="unfinished">They may be auto-discovered again after removing.</translation>
     </message>
-    <message>
-      <source>You do not have permission to overwrite it.</source>
-      <translation type="unfinished">You do not have permission to overwrite it.</translation>
-    </message>
-    <message>
-      <source>You are going to delete some resources to which you have access from Video Wall only. You will not see them in your resource list after it and will not be able to add them to Video Wall again.</source>
-      <translation type="unfinished">You are going to delete some resources to which you have access from Video Wall only. You will not see them in your resource list after it and will not be able to add them to Video Wall again.</translation>
-    </message>
   </context>
   <context>
-    <name>VideoWall</name>
+    <name>nx::client::desktop::ui::videowall</name>
     <message>
       <source>There is another video wall with the same name</source>
       <translation type="unfinished">There is another video wall with the same name</translation>
@@ -7714,6 +7594,247 @@ to %1</translation>
     <message>
       <source>To display local files on Video Wall, please attach them using computer where Video Wall is hosted.</source>
       <translation type="unfinished">To display local files on Video Wall, please attach them using computer where Video Wall is hosted.</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::client::desktop::ui::workbench::ActionHandler</name>
+    <message numerus="yes">
+      <source>Failed to move %n devices</source>
+      <translation type="unfinished">
+        <numerusform>Failed to move %n devices</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Failed to move %n cameras</source>
+      <translation type="unfinished">
+        <numerusform>Failed to move %n cameras</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Failed to move %n I/O Modules</source>
+      <translation type="unfinished">
+        <numerusform>Failed to move %n I/O Modules</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Server &quot;%1&quot; is not responding.</source>
+      <translation type="unfinished">Server &quot;%1&quot; is not responding.</translation>
+    </message>
+    <message numerus="yes">
+      <source>Server &quot;%1&quot; cannot access %n devices. Move them anyway?</source>
+      <translation type="unfinished">
+        <numerusform>Server &quot;%1&quot; cannot access %n devices. Move them anyway?</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Server &quot;%1&quot; cannot access %n cameras. Move them anyway?</source>
+      <translation type="unfinished">
+        <numerusform>Server &quot;%1&quot; cannot access %n cameras. Move them anyway?</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Server &quot;%1&quot; cannot access %n I/O modules. Move them anyway?</source>
+      <translation type="unfinished">
+        <numerusform>Server &quot;%1&quot; cannot access %n I/O modules. Move them anyway?</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Move</source>
+      <translation type="unfinished">Move</translation>
+    </message>
+    <message>
+      <source>Layout is locked and cannot be changed.</source>
+      <translation>Giao diện đã bị khóa và không thể thay đổi.</translation>
+    </message>
+    <message>
+      <source>All Supported (*.nov *.avi *.mkv *.mp4 *.mov *.ts *.m2ts *.mpeg *.mpg *.flv *.wmv *.3gp *.jpg *.png *.gif *.bmp *.tiff)</source>
+      <translation>Tất cả tập tin hỗ trợ (*.nov *.avi *.mkv *.mp4 *.mov *.ts *.m2ts *.mpeg *.mpg *.flv *.wmv *.3gp *.jpg *.png *.gif *.bmp *.tiff)</translation>
+    </message>
+    <message>
+      <source>Video (*.avi *.mkv *.mp4 *.mov *.ts *.m2ts *.mpeg *.mpg *.flv *.wmv *.3gp)</source>
+      <translation>hình ảnh (*.avi *.mkv *.mp4 *.mov *.ts *.m2ts *.mpeg *.mpg *.flv *.wmv *.3gp)</translation>
+    </message>
+    <message>
+      <source>Pictures (*.jpg *.png *.gif *.bmp *.tiff)</source>
+      <translation>hình ảnh (*.jpg *.png *.gif *.bmp *.tiff)</translation>
+    </message>
+    <message>
+      <source>All files (*.*)</source>
+      <translation>tất cả các file(*.*)</translation>
+    </message>
+    <message>
+      <source>Open File</source>
+      <translation>mở tập tin</translation>
+    </message>
+    <message>
+      <source>Select folder...</source>
+      <translation>Chọn thư mục...</translation>
+    </message>
+    <message>
+      <source>Too short period selected</source>
+      <translation type="unfinished">Too short period selected</translation>
+    </message>
+    <message>
+      <source>Cannot perform Preview Search. Please select a period of 15 seconds or longer.</source>
+      <translation type="unfinished">Cannot perform Preview Search. Please select a period of 15 seconds or longer.</translation>
+    </message>
+    <message>
+      <source>Preview Search for %1</source>
+      <translation>Preview Tìm kiếm %1</translation>
+    </message>
+    <message>
+      <source>Cancel device adding?</source>
+      <translation type="unfinished">Cancel device adding?</translation>
+    </message>
+    <message>
+      <source>Confirm files deleting</source>
+      <translation type="unfinished">Confirm files deleting</translation>
+    </message>
+    <message numerus="yes">
+      <source>Are you sure you want to permanently delete these %n files?</source>
+      <translation>
+        <numerusform>Bạn có chắc chắn muốn xóa vĩnh viễn các tập tin%n?</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>There is another user with the same name</source>
+      <translation type="unfinished">There is another user with the same name</translation>
+    </message>
+    <message>
+      <source>Rename</source>
+      <translation>đổi tên</translation>
+    </message>
+    <message>
+      <source>Enter new name for the selected item:</source>
+      <translation>Nhập tên mới cho các sản phẩm được chọn:</translation>
+    </message>
+    <message>
+      <source>Updating Background...</source>
+      <translation>nền Đang cập nhật...</translation>
+    </message>
+    <message>
+      <source>Image processing may take a few moments. Please be patient.</source>
+      <translation>Xử lý hình ảnh sẽ tiêu thụ một số thời gian, xin vui lòng chờ đợi.</translation>
+    </message>
+    <message>
+      <source>Image too big</source>
+      <translation type="unfinished">Image too big</translation>
+    </message>
+    <message>
+      <source>Maximum size is %1 MB.</source>
+      <translation type="unfinished">Maximum size is %1 MB.</translation>
+    </message>
+    <message>
+      <source>Failed to upload image</source>
+      <translation type="unfinished">Failed to upload image</translation>
+    </message>
+    <message>
+      <source>Client</source>
+      <translation>khách hàng</translation>
+    </message>
+    <message>
+      <source>Server</source>
+      <translation>máy chủ</translation>
+    </message>
+    <message>
+      <source>Please update all components to the version %1</source>
+      <translation type="unfinished">Please update all components to the version %1</translation>
+    </message>
+    <message>
+      <source>Components of System have different versions:</source>
+      <translation type="unfinished">Components of System have different versions:</translation>
+    </message>
+    <message>
+      <source>Update...</source>
+      <translation>Cập nhật ...</translation>
+    </message>
+    <message>
+      <source>Skip</source>
+      <translation type="unfinished">Skip</translation>
+    </message>
+    <message>
+      <source>Beta version %1</source>
+      <translation>Phiên bản Beta %1</translation>
+    </message>
+    <message>
+      <source>Some functionality may be unavailable or not working properly.</source>
+      <translation type="unfinished">Some functionality may be unavailable or not working properly.</translation>
+    </message>
+    <message>
+      <source>System sends anonymous usage statistics</source>
+      <translation type="unfinished">System sends anonymous usage statistics</translation>
+    </message>
+    <message>
+      <source>It will be used by software development team to improve your user experience.</source>
+      <translation type="unfinished">It will be used by software development team to improve your user experience.</translation>
+    </message>
+    <message>
+      <source>To disable it, go to System Administration dialog.</source>
+      <translation type="unfinished">To disable it, go to System Administration dialog.</translation>
+    </message>
+    <message>
+      <source>Failed to open server web page</source>
+      <translation type="unfinished">Failed to open server web page</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::client::desktop::ui::workbench::LayoutTourExecutor</name>
+    <message>
+      <source>Use keyboard arrows to switch layouts. To exit the tour press Esc.</source>
+      <translation type="unfinished">Use keyboard arrows to switch layouts. To exit the tour press Esc.</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::client::desktop::ui::workbench::LayoutTourItemWidget</name>
+    <message>
+      <source>Switch by %1</source>
+      <translation type="unfinished">Switch by %1</translation>
+    </message>
+    <message>
+      <source>Display for</source>
+      <translation type="unfinished">Display for</translation>
+    </message>
+    <message>
+      <source>Display selected for</source>
+      <translation type="unfinished">Display selected for</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::client::desktop::ui::workbench::LayoutToursHandler</name>
+    <message>
+      <source>Layout Tour</source>
+      <translation type="unfinished">Layout Tour</translation>
+    </message>
+    <message>
+      <source>Layout Tour %1</source>
+      <translation type="unfinished">Layout Tour %1</translation>
+    </message>
+    <message>
+      <source>Delete layout tour %1?</source>
+      <translation type="unfinished">Delete layout tour %1?</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::client::desktop::ui::workbench::LayoutsHandler</name>
+    <message>
+      <source>Save Layout As</source>
+      <translation>Lưu bố trí</translation>
+    </message>
+    <message>
+      <source>Enter Layout Name:</source>
+      <translation>Nhập tên bố trí:</translation>
+    </message>
+    <message>
+      <source>New Layout</source>
+      <translation>việc bố trí mới</translation>
+    </message>
+    <message>
+      <source>Enter the name of the layout to create:</source>
+      <translation>Nhập tên mà bạn muốn xây dựng bố cục:</translation>
+    </message>
+    <message>
+      <source>New Layout %1</source>
+      <translation>việc bố trí mới %1</translation>
     </message>
   </context>
 </TS>

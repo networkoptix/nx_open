@@ -305,6 +305,20 @@
     </message>
   </context>
   <context>
+    <name>PresetsButton</name>
+    <message>
+      <source>PRESETS</source>
+      <translation type="unfinished">PRESETS</translation>
+    </message>
+  </context>
+  <context>
+    <name>PresetsDialog</name>
+    <message>
+      <source>PTZ Presets</source>
+      <translation type="unfinished">PTZ Presets</translation>
+    </message>
+  </context>
+  <context>
     <name>QualityDialog</name>
     <message>
       <source>Video Quality</source>

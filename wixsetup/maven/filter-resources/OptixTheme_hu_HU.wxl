@@ -58,7 +58,7 @@
   <String Id="FilesInUseDontCloseRadioButton">Ne zárja be az alkalmazásokat. Újraindítás lesz szükséges</String>
   <String Id="FilesInUseOkButton">Ok</String>
   <String Id="FilesInUseCancelButton">Mégse</String>
-  <String Id="InstallLicenseText">"Elfogad és telepít" gombra kattintva elfogadja a</String>
+  <String Id="InstallLicenseText">\"Elfogad és telepít\" gombra kattintva elfogadja a</String>
   <String Id="Options">Opciók</String>
   <String Id="SelectApps">Válassza ki a telepítendő alkalmazásokat:</String>
 </WixLocalization>
