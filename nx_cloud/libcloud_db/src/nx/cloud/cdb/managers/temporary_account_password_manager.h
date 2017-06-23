@@ -50,6 +50,16 @@ public:
     TemporaryAccountCredentials_Fields (id)(accessRightsStr)
 
 //-------------------------------------------------------------------------------------------------
+namespace data {
+
+class Credentials
+{
+public:
+    std::string login;
+    std::string password;
+};
+
+} // namespace data
 
 class AbstractTemporaryAccountPasswordManager:
     public AbstractAuthenticationDataProvider
@@ -67,6 +77,11 @@ public:
     virtual nx::db::DBResult registerTemporaryCredentials(
         nx::db::QueryContext* const queryContext,
         data::TemporaryAccountCredentials tempPasswordData) = 0;
+
+    virtual nx::db::DBResult fetchTemporaryCredentials(
+        nx::db::QueryContext* const queryContext,
+        const data::TemporaryAccountCredentials& tempPasswordData,
+        data::Credentials* credentials) = 0;
 
     virtual nx::db::DBResult removeTemporaryPasswordsFromDbByAccountEmail(
         nx::db::QueryContext* const queryContext,
@@ -117,6 +132,11 @@ public:
     virtual nx::db::DBResult registerTemporaryCredentials(
         nx::db::QueryContext* const queryContext,
         data::TemporaryAccountCredentials tempPasswordData) override;
+
+    virtual nx::db::DBResult fetchTemporaryCredentials(
+        nx::db::QueryContext* const queryContext,
+        const data::TemporaryAccountCredentials& tempPasswordData,
+        data::Credentials* credentials) override;
 
     virtual boost::optional<TemporaryAccountCredentialsEx> getCredentialsByLogin(
         const std::string& login) const override;
@@ -182,6 +202,14 @@ private:
         const QnMutexLockerBase& lk,
         Index& index,
         Iterator it);
+
+    void parsePasswordString(
+        const std::string& passwordString,
+        std::string* passwordHa1,
+        std::string* password);
+    std::string preparePasswordString(
+        const std::string& passwordHa1,
+        const std::string& password);
 };
 
 } // namespace cdb

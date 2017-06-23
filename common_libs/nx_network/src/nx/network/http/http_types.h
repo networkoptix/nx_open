@@ -282,6 +282,8 @@ public:
     static const StringType POST;
     static const StringType PUT;
     static const StringType OPTIONS;
+
+    static bool isMessageBodyAllowed(ValueType);
 };
 
 /** Represents string like HTTP/1.1, RTSP/1.0. */
