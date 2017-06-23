@@ -41,16 +41,12 @@ files:
     dest: '/Mobile/mobile_client_qml.ts'
     translation: '/client/mobile_client/translations/mobile_client_qml_%locale_with_underscore%.ts'
   -
-    source: '/wixsetup/maven/filter-resources/CustomStrings_en_US.wxl'
-    dest: '/Installer/CustomStrings.wxl'
-    translation: '/wixsetup/maven/filter-resources/CustomStrings_%locale_with_underscore%.wxl'
-  -
     source: '/wixsetup/maven/filter-resources/OptixTheme_en_US.wxl'
     dest: '/Installer/OptixTheme.wxl'
     translation: '/wixsetup/maven/filter-resources/OptixTheme_%locale_with_underscore%.wxl'
   -
     source: '/webadmin/app/views/**/*.*'
-    translation: '/webadmin/translations/%locale_with_underscore%/views/**'
+    translation: '/webadmin/translations/%locale_with_underscore%/views/**/%original_file_name%'
     ignore:
       - /webadmin/app/views/debug.html
       - /webadmin/app/views/viewdebug.html
