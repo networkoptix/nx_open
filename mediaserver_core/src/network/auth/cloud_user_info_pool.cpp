@@ -109,7 +109,7 @@ void CloudUserInfoPoolSupplier::onRemoveResource(const QnResourcePtr& resource)
 }
 
 // CloudUserInfoPool
-CloudUserInfoPool::CloudUserInfoPool(std::unique_ptr<AbstractCloudUserInfoPoolSupplier> supplier) :
+CloudUserInfoPool::CloudUserInfoPool(std::unique_ptr<AbstractCloudUserInfoPoolSupplier> supplier):
     m_supplier(std::move(supplier))
 {
     m_supplier->setPool(this);
@@ -157,8 +157,17 @@ boost::optional<nx::Buffer> CloudUserInfoPool::intermediateResponseByUserNonce(
     for (const auto& rec: m_cloudUserInfoRecordList)
     {
         if (rec.userName == userName && rec.nonce == cloudNonce)
+        {
+            NX_VERBOSE(this, lm("Found intermediate response for user %1, nonce %2")
+                .arg(userName)
+                .arg(cloudNonce));
             return rec.intermediateResponse;
+        }
     }
+
+    NX_VERBOSE(this, lm("Failed to find intermediate response for user %1, nonce %2")
+        .arg(userName)
+        .arg(cloudNonce));
 
     return boost::none;
 }
@@ -195,11 +204,51 @@ void CloudUserInfoPool::userInfoChanged(
     updateNonce();
 }
 
+void CloudUserInfoPool::logNonceUpdates(
+    const std::map<nx::Buffer, int>& nonceToCount,
+    const std::map<nx::Buffer, uint64_t>& nonceToMaxTs)
+{
+    if (nx::utils::log::isToBeLogged(cl_logDEBUG2))
+    {
+        QString logMessage;
+        QTextStream logStream(&logMessage);
+        std::map<nx::Buffer, std::set<std::pair<nx::Buffer, uint64_t>>> userToNoncesTs;
+
+        for (const auto& rec: m_cloudUserInfoRecordList)
+            userToNoncesTs[rec.userName].emplace(std::make_pair(rec.nonce, rec.timestamp));
+
+        logStream << endl << "Updating nonce cache" << endl;
+        for (auto userIt = userToNoncesTs.cbegin(); userIt != userToNoncesTs.cend(); ++userIt)
+        {
+            logStream << "\t User: " << userIt->first << endl;
+            for (auto nonceIt = userIt->second.cbegin();
+                 nonceIt != userIt->second.cend();
+                 ++nonceIt)
+            {
+                logStream << "\t\t nonce: " << nonceIt->first
+                    << "\t ts: " << nonceIt->second << endl;
+            }
+        }
+
+        logStream << endl << "\t Nonce count:" << endl;
+        for (auto it = nonceToCount.cbegin(); it != nonceToCount.cend(); ++it)
+            logStream << "\t\t nonce: " << it->first << "\t count: " << it->second << endl;
+
+        logStream << endl << "\t Nonce max ts:" << endl;
+        for (auto it = nonceToMaxTs.cbegin(); it != nonceToMaxTs.cend(); ++it)
+            logStream << "\t\t nonce: " << it->first << "\t max ts: " << it->second << endl;
+
+        logStream << endl << "\t Selected nonce: " << m_nonce << endl << endl;
+        NX_VERBOSE(this, logMessage);
+    }
+}
+
 void CloudUserInfoPool::updateNonce()
 {
     std::map<nx::Buffer, int> nonceToCount;
     std::map<nx::Buffer, uint64_t> nonceToMaxTs;
 
+    m_nonce.clear();
     for (const auto& rec: m_cloudUserInfoRecordList)
     {
         auto nonceToCountRes = nonceToCount.emplace(rec.nonce, 1);
@@ -225,6 +274,9 @@ void CloudUserInfoPool::updateNonce()
             m_nonce = nonceToCountPair.first;
         }
     }
+
+    logNonceUpdates(nonceToCount, nonceToMaxTs);
+    NX_ASSERT(!m_nonce.isEmpty());
 }
 
 void CloudUserInfoPool::removeInfoForUser(const nx::Buffer& userName)

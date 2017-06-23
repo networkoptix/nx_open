@@ -108,6 +108,9 @@ private:
     virtual void userInfoRemoved(const nx::Buffer& userName) override;
     void updateNonce();
     void removeInfoForUser(const nx::Buffer& userName);
+    void logNonceUpdates(
+        const std::map<nx::Buffer, int>& nonceToCount,
+        const std::map<nx::Buffer, uint64_t>& nonceToMaxTs);
     boost::optional<nx::Buffer> intermediateResponseByUserNonce(
         const nx::Buffer& userName,
         const nx::Buffer& cloudNonce) const;
