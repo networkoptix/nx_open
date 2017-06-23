@@ -1,5 +1,6 @@
 #include "manager.h"
 
+#include <api/global_settings.h>
 #include <common/common_module.h>
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/media_server_resource.h>
@@ -221,6 +222,15 @@ void Manager::initializeMulticastFinders(bool clientMode)
                     m_multicastFinder->multicastInformation(s->getModuleInformationWithAddresses());
             });
     }
+
+    m_multicastFinder->setIsMulticastEnabledFunction(
+        [common = commonModule()]()
+        {
+            if (const auto settings = common->globalSettings())
+                return settings->isInitialized() && settings->isAutoDiscoveryEnabled();
+
+            return false;
+        });
 
     DeprecatedMulticastFinder::Options options;
     if (clientMode)

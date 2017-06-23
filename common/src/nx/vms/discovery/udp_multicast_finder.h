@@ -36,6 +36,7 @@ public:
 
     virtual void stopWhileInAioThread() override;
     void updateInterfaces();
+    void setIsMulticastEnabledFunction(nx::utils::MoveOnlyFunc<bool()> function);
 
 private:
     typedef std::map<HostAddress, std::unique_ptr<network::UDPSocket>> Senders;
@@ -49,6 +50,7 @@ private:
     SocketAddress m_multicastEndpoint;
     std::chrono::milliseconds m_updateInterfacesInterval;
     std::chrono::milliseconds m_sendInterval;
+    nx::utils::MoveOnlyFunc<bool()> m_isMulticastEnabledFunction;
 
     network::aio::Timer m_updateTimer;
     Buffer m_ownModuleInformation;
