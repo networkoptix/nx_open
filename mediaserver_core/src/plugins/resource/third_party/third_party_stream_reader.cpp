@@ -183,10 +183,12 @@ CameraDiagnostics::Result ThirdPartyStreamReader::openStreamInternal(bool isCame
             if( (m_cameraCapabilities & nxcip::BaseCameraManager::audioCapability) && m_thirdPartyRes->isAudioEnabled() )
                 config.flags |= nxcip::LiveStreamConfig::LIVE_STREAM_FLAG_AUDIO_ENABLED;
 
-            nxcip::StreamReader * tmpReader = nullptr;
-            int ret = mediaEncoder3->getConfiguredLiveStreamReader(&config, &tmpReader);
             QnMutexLocker lock(&m_streamReaderMutex);
             m_liveStreamReader.reset(); // release an old one first
+            lock.unlock();
+            nxcip::StreamReader * tmpReader = nullptr;
+            int ret = mediaEncoder3->getConfiguredLiveStreamReader(&config, &tmpReader);
+            lock.relock();
             m_liveStreamReader.reset( tmpReader, refDeleter );
 
             if( ret != nxcip::NX_NO_ERROR )
@@ -194,9 +196,11 @@ CameraDiagnostics::Result ThirdPartyStreamReader::openStreamInternal(bool isCame
         }
         else
         {
-            auto liveReader = mediaEncoder3->getLiveStreamReader();
             QnMutexLocker lock(&m_streamReaderMutex);
             m_liveStreamReader.reset();
+            lock.unlock();
+            auto liveReader = mediaEncoder3->getLiveStreamReader();
+            lock.relock();
             m_liveStreamReader.reset( liveReader, refDeleter );
         }
     }
@@ -230,9 +234,11 @@ CameraDiagnostics::Result ThirdPartyStreamReader::openStreamInternal(bool isCame
 
         if( m_mediaEncoder2 )
         {
-            auto liveReader = m_mediaEncoder2->getLiveStreamReader();
             QnMutexLocker lock(&m_streamReaderMutex);
             m_liveStreamReader.reset();
+            lock.unlock();
+            auto liveReader = m_mediaEncoder2->getLiveStreamReader();
+            lock.relock();
             m_liveStreamReader.reset( liveReader, refDeleter );
         }
     }
