@@ -1,11 +1,11 @@
 <ng-include ng-if="!register.success && !registerSuccess && session.fromClient" src="$root.C.viewsDir + 'static/register-intro.html'"></ng-include>
 <div class="auth-hidden">
     <h1 class="process-success" ng-if="(register.success || registerSuccess) && !activated">
-        帐户已注册。确认消息发送电子邮件 <br>{{account.email}}
+        Account is created. <br>Confirmation message is sent to <br>{{account.email}}
     </h1>
 
     <h1 class="process-success" ng-if="(register.success || registerSuccess) && activated">
-        成功注册帐户。
+        Account is successfully created.
     </h1>
 
     <form name="registerForm" class="form-horizontal" ng-if="!register.success && !registerSuccess" ng-init="setRegisterForm(this)" novalidate autocomplete="off">

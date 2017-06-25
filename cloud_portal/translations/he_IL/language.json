@@ -1,0 +1,220 @@
+{
+  "language_name":"עברית",
+  "productName":"{{PRODUCT_NAME}}",
+  "clientProtocol":"{{CLIENT_PROTOCOL}}:",
+  "dialogs":{
+    "okButton":"אישור",
+    "cancelButton":"ביטול",
+    "loginTitle":"Log in to {{PRODUCT_NAME}}",
+    "loginButton":"התחבר",
+    "logoutAuthorisedText":"",
+    "logoutAuthorisedTitle":"You are already logged in",
+    "logoutAuthorisedContinueButton":"Continue",
+    "logoutAuthorisedLogoutButton":"יציאה"
+  },
+  "pageTitles":{
+    "template":"{{title}} {{PRODUCT_NAME}}",
+    "default":"{{PRODUCT_NAME}}",
+    "registerSuccess":"Welcome to",
+    "register":"Create account in",
+    "changePassword":"Change password -",
+    "account":"Account settings -",
+    "systems":"Systems -",
+    "system":"System -",
+    "systemShare":"Share System -",
+    "activate":"Activate account -",
+    "activateSent":"Activate account -",
+    "activateSuccess":"Account activated -",
+    "activateCode":"Activate account -",
+    "restorePassword":"Reset password -",
+    "restorePasswordSuccess":"Password saved -",
+    "restorePasswordCode":"Reset password -",
+    "view":"View cameras - ",
+    "contentPage":"",
+    "debug":"Debug",
+    "login":"Log in -",
+    "download":"Download {{VMS_NAME}}",
+    "downloadPlatform":"Download {{VMS_NAME}} for ",
+    "startPage":"",
+    "pageNotFound":"Page not found"
+  },
+  "systemStatuses":{
+    "notActivated":"not activated",
+    "activated":"activated",
+    "online":"online",
+    "offline":"offline",
+    "unavailable":"unavailable"
+  },
+  "accessRoles":{
+    "disabled":{
+      "label":"כבוי",
+      "description":"User is disabled and cannot log in to System"
+    },
+    "Owner":{
+      "label":"בעלים",
+      "description":"Unrestricted access including the ability to share and connect/disconnect System from cloud"
+    },
+    "Viewer":{
+      "label":"צופה",
+      "description":"Can view live video and browse the archive"
+    },
+    "Live Viewer":{
+      "label":"צופה בשידור חי",
+      "description":"Can only view live video"
+    },
+    "Advanced Viewer":{
+      "label":"תצוגה מתקדמת",
+      "description":"Can view live video, browse the archive, configure cameras, control PTZ etc"
+    },
+    "Administrator":{
+      "label":"מנהל",
+      "description":"Unrestricted access including the ability to share"
+    },
+    "Custom":{
+      "label":"התאמה אישית",
+      "description":"Use the {{PRODUCT_NAME}} Client application to set up custom permissions"
+    },
+    "cloudAdmin":{
+      "label":"מנהל",
+      "description":"Can configure System and share it"
+    },
+    "customRole":{
+      "label":"Custom role",
+      "description":"Custom user role specified in System"
+    }
+  },
+  "errorCodes":{
+    "ok":"ok",
+    "cantSendActivationPrefix":"Cannot send confirmation Email",
+    "cantDisconnectSystemPrefix":"Cannot delete System",
+    "cantUnshareWithMeSystemPrefix":"Cannot delete System",
+    "cantSharePrefix":"Cannot share System",
+    "cantGetUsersListPrefix":"Users list is unavailable",
+    "cantGetSystemsListPrefix":"System list is unavailable",
+    "cantRegisterPrefix":"Error occurred",
+    "cantGetSystemInfoPrefix":"System info is unavailable",
+    "cantChangeAccountPrefix":"Cannot save changes",
+    "cantChangePasswordPrefix":"Cannot save password",
+    "cantActivatePrefix":"Cannot activate your account",
+    "cantSendConfirmationPrefix":"Cannot send confirmation Email",
+    "cloudInvalidResponse":"Cloud DB returned an unexpected response",
+    "notAuthorized":"Incorrect Email or password",
+    "wrongParameters":"Some parameters on the form are incorrect",
+    "wrongCode":"Account is already activated or confirmation code is incorrect",
+    "wrongCodeRestore":"Confirmation code is already used or incorrect",
+    "forbidden":"You do not have permissions to perform this action",
+    "accountNotActivated":"This account is not activated yet. <a href=\"/activate\">Send activation link again</a>",
+    "accountBlocked":"This account is blocked",
+    "notFound":"Not found",
+    "alreadyExists":"This account already exists",
+    "unknownError":"Unexpected error occured",
+    "accountAlreadyActivated":"This account is already activated",
+    "emailNotFound":"Account does not exist",
+    "EmailAlreadyExists":"This Email is already registered",
+    "oldPasswordMistmatch":"Current password is incorrect",
+    "passwordMismatch":"Wrong password",
+    "cantEditYourself":"Changing own permissions is not allowed",
+    "cantEditAdmin":"This user has administrator permissions",
+    "cantOpenClient":"{{VMS_NAME}} application is not detected. <a href=\"/download\">Download</a>",
+    "lostConnection":"Connection to {{systemName}} lost",
+    "thisSystem":"the system"
+  },
+  "passwordRequirements":{
+    "minLengthMessage":"הסיסמה חייבת להכיל 8 תווים לפחות",
+    "requiredMessage":"Use only latin letters, numbers and keyboard symbols, avoid leading and trailing spaces",
+    "weakMessage":"Use numbers, upper and lower case letters and special characters to make your password stronger",
+    "strongMessage":"סיסמה חזקה!",
+    "commonMessage":"סיסמה זו חלשה מאחר והיא מהסיסמאות הפופולריות ביותר בעולם"
+  },
+  "sharing":{
+    "confirmOwner":"If you change System owner, you will revoke ownership from the current account. This action is irreversible. Are you sure?",
+    "shareTitle":"Share",
+    "shareConfirmButton":"Share",
+    "editShareTitle":"Edit Permissions",
+    "editShareConfirmButton":"שמור",
+    "permissionsSaved":"New permissions saved"
+  },
+  "system":{
+    "yourSystem":"המערכת שלך",
+    "mySystemSearch":"IMeMyMine",
+    "unavailable":"System is unreachable",
+    "offline":"System is offline",
+    "openClient":"Open in {{VMS_NAME}}",
+    "confirmRenameTitle":"שם מערכת",
+    "confirmRenameAction":"שמור",
+    "successRename":"System name saved",
+    "confirmDisconnectTitle":"Disconnect System from {{PRODUCT_NAME}}?",
+    "confirmDisconnectAction":"התנתק",
+    "confirmUnshareFromMe":"You are about to disconnect this System from your account. You will not be able to access this System anymore. Are you sure?",
+    "confirmUnshareFromMeTitle":"Disconnect System?",
+    "confirmUnshareFromMeAction":"התנתק",
+    "confirmUnshare":"This user will not be able to access System. Are you sure?",
+    "confirmUnshareTitle":"Delete user?",
+    "confirmUnshareAction":"מחיקה",
+    "successDisconnected":"System is successfully disconnected from {{PRODUCT_NAME}}",
+    "successDeleted":"System {{systemName}} is successfully deleted from your account",
+    "permissionsRemoved":"Permissions were removed from {{email}}"
+  },
+  "account":{
+    "accountSavedSuccess":"Your account is successfully saved",
+    "passwordChangedSuccess":"Your account is successfully saved",
+    "changePassword":"Change Password",
+    "newPasswordLabel":"New password",
+    "saveChanges":"שמור"
+  },
+  "downloads":{
+    "noClientDetectedTitle":"Install {{VMS_NAME}} to view your System",
+    "noClientDetectedMessage":"",
+    "action":"Download {{VMS_NAME}}",
+    "mobile":{
+      "ios":{
+        "link":"{{IOS_APP_LINK}}"
+      },
+      "android":{
+        "link":"{{ANDROID_APP_LINK}}"
+      }
+    },
+    "groups":{
+      "windows":{
+        "label":"Windows",
+        "supported":"Vista, 7, 8, 10, Server 2003, Server 2008, Server 2012"
+      },
+      "mac":{
+        "label":"Mac OS",
+        "supported":"OSX 10.11 El Capitan 10.10 Yosemite, 10.9 Mavericks, 10.8 Mountain Lion"
+      },
+      "linux":{
+        "label":"Ubuntu Linux",
+        "shortLabel":"Ubuntu",
+        "supported":"Ubuntu 14.04 LTS, 12.04 LTS, 10.04 LTS"
+      }
+    },
+    "platforms":{
+      "win64":"x64",
+      "win86":"x86",
+      "linux64":"x64",
+      "linux86":"x86",
+      "mac":"X"
+    },
+    "appTypes":{
+      "client":"לקוח בלבד",
+      "server":"שרת בלבד",
+      "bundle":"לקוח ושרת",
+      "servertool":"Configuration tool"
+    }
+  },
+  "activeActions":{
+    "sendConfirm":"Send",
+    "resetPassword":"Reset Password",
+    "setNewPassword":"שמור סיסמה",
+    "setNewPasswordLabel":"New password"
+  },
+  "regActions":{
+    "passwordLabel":"סיסמא",
+    "createAccount":"Create Account"
+  },
+  "header":{
+    "allSystems":"All Systems",
+    "systems":"Systems"
+  }
+}

@@ -99,6 +99,7 @@ function(get_dependencies)
     endif()
 
     nx_rdep_add_package(qt PATH_VARIABLE QT_DIR)
+    file(TO_CMAKE_PATH "${QT_DIR}" QT_DIR)
     set(QT_DIR ${QT_DIR} PARENT_SCOPE)
 
     nx_rdep_add_package(any/boost)

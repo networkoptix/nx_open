@@ -51,7 +51,6 @@ include(project_utils)
 include(test_utils)
 
 include(ec_protocol)
-include(maven_compatibility)
 
 set(customization_dir "${PROJECT_SOURCE_DIR}/customization/${customization}")
 
@@ -69,12 +68,13 @@ if(NOT (WINDOWS OR ANDROID OR IOS))
 endif()
 
 include(dependencies)
+include(maven_compatibility)
+include(generate_current_config)
 
 if(CMAKE_CROSSCOMPILING)
     set(QT_PREFIX "..")
 else()
     set(QT_PREFIX "${QT_DIR}")
-    file(TO_CMAKE_PATH "${QT_PREFIX}" QT_PREFIX)
 endif()
 list(APPEND CMAKE_PREFIX_PATH ${QT_DIR})
 if(MACOSX)

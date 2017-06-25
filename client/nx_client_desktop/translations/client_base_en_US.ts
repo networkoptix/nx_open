@@ -68,6 +68,808 @@ to view more bookmarks</source>
     </message>
 </context>
 <context>
+    <name>ContextMenu</name>
+    <message>
+        <source>Filter...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Connect to System</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Help</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Event Log...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cameras to Backup...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Control Video Wall</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Push my screen</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Select Time Server</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Fit in View</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Main Menu</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Connect to Server...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Disconnect from Server</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Browse Local Files</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Show Welcome Screen</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>New...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Tab</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>New Tab</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Window</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>New Window</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>User...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>New User...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Video Wall...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>New Video Wall...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Web Page...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>New Web Page...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Layout Tour...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>New Layout Tour...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>New Layout...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Open Layout...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Open...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>File(s)...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Folder...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Web Client...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Open Web Client...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Save Current Layout</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Save Current Layout As...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Save Video Wall View</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Drop Resources</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Start Screen Recording</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Stop Screen Recording</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Stop current action</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Go to Fullscreen</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Exit Fullscreen</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Minimize</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Maximize</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Restore Down</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Open in Browser...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>System Administration...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>System Update...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>User Management...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Local Settings...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Audit Trail...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Bookmark Search...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Log in to %1...</source>
+        <comment>Log in to Nx Cloud</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Log out from %1</source>
+        <comment>Log out from Nx Cloud</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Open %1 Portal...</source>
+        <comment>Open Nx Cloud Portal</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Account Settings...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Create Account...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Event Rules...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Devices List</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cameras List</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Merge Systems...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>About...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Exit</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Mark Selection Start</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Mark Selection End</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Clear Selection</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Zoom to Selection</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Add Bookmark...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Edit Bookmark...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Remove Bookmark...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Remove Bookmarks...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Export Selected Area...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Export Multi-Video...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Export Rapid Review...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Preview Search...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Server...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Open</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Monitor</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Open in New Tab</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Monitor in New Tab</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Open in Alarm Layout</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Open in New Window</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Monitor in New Window</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Open Video Wall</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Open Containing Folder</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Identify</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Attach to Video Wall...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Switch to Video Wall mode...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Save Video Wall</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Save Current Matrix</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Load Matrix</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Delete</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Stop Video Wall</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Clear Screen</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Save Layout</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Save Layout As...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Maximize Item</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Restore Item</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Show Info</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Hide Info</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Change Resolution...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Auto</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Low</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>High</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>PTZ...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Save Current Position...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Manage...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Show Motion/Smart Search</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Show Motion</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Hide Motion/Smart Search</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Hide Motion</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Clear Motion Selection</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Check File Watermark</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Image Enhancement...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Rotate to...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>0 degrees</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>90 degrees</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>180 degrees</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>270 degrees</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Remove from Layout</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Remove from Tour</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Stop Sharing Layout</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Edit...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Rename</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Delete from Disk</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Set as Layout Background</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>User Settings...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>User Roles...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Role Settings...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Check Device Issues...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Check Devices Issues...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Check Camera Issues...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Check Cameras Issues...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Check I/O Module Issues...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Check I/O Modules Issues...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Device Rules...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Devices Rules...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Camera Rules...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cameras Rules...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>I/O Module Rules...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>I/O Modules Rules...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Device Settings...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Devices Settings...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Camera Settings...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cameras Settings...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>I/O Module Settings...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>I/O Modules Settings...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>File Settings...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Layout Settings...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Video Wall Settings...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Add Device...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Devices List by Server...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cameras List by Server...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Server Logs...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Server Diagnostics...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Server Web Page...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Server Settings...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Merge to Currently Connected System...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Change Cell Aspect Ratio...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Change Cell Spacing...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>None</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Small</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Medium</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Large</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Start Tour</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Stop Tour</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Make Layout Tour</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Close</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Close All But This</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Play</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Pause</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Previous Frame</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Next Frame</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>To Start</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>To End</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Volume Down</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Volume Up</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Toggle Mute</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Jump to Live</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Synchronize Streams</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Disable Stream Synchronization</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Show Bookmarks</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Hide Bookmarks</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Show Calendar</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Hide Calendar</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Show Title Bar</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Hide Title Bar</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Pin Tree</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Unpin Tree</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Show Tree</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Hide Tree</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Show Timeline</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Hide Timeline</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Show Notifications</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Hide Notifications</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Pin Notifications</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Unpin Notifications</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>CustomHorizontalHeader</name>
     <message>
         <source>5 minutes</source>
@@ -115,6 +917,45 @@ to view more bookmarks</source>
     </message>
     <message>
         <source>For all data</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>Deactivator</name>
+    <message>
+        <source>Unknown error</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>License does not exist</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>License is disabled</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>License is inactive</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Invalid license</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>License is trial</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>License is in deactivation process</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Invalid hardware id</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Limit exceeded</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -232,37 +1073,6 @@ to view more bookmarks</source>
     </message>
     <message>
         <source>Permissions</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
-    <name>Ptz</name>
-    <message>
-        <source>Please wait for the camera to go online.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Failed to get current position</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Failed to set current position</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Preset used by some tours. Delete it anyway?</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>These tours will become invalid.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Cannot get the current position from camera &quot;%1&quot;</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Cannot set the current position for camera &quot;%1&quot;</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -398,940 +1208,6 @@ to view more bookmarks</source>
     </message>
 </context>
 <context>
-    <name>QnActionManager</name>
-    <message>
-        <source>Show FPS</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Hide FPS</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Drop Resources</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Drop Resources into New Layout</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Delayed Open Video Wall</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Delayed Drop Resources</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Instant Drop Resources</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Next Layout</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Previous Layout</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Select All</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Selection Changed</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Filter...</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Go to Freespace Mode</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Help</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Event Log...</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Control Video Wall</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Push my screen</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Restart application</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Select Time Server</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Go To Saved Position</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Activate PTZ Tour</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Activate PTZ Object</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Fit in View</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Main Menu</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Connect to Server...</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Start Panic Recording</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Stop Panic Recording</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>New...</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>New Layout...</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Tab</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>New Tab</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Window</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>New Window</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>User...</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>New User...</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Video Wall...</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>New Video Wall...</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Open Layout...</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Open...</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>File(s)...</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Folder...</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Save Current Layout</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Save Current Layout As...</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Save Video Wall View</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Start Screen Recording</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Stop Screen Recording</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Stop current action</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Go to Fullscreen</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Exit Fullscreen</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Minimize</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Maximize</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Restore Down</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Open in Browser...</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>System Administration...</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Open Web Client...</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>System Update...</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Local Settings...</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Merge Systems...</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>About...</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Exit</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Server...</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Open in Layout</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Open</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Monitor</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Open in New Tab</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Open in New Window</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Open Layouts</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Open Layout(s)</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Open Video Wall(s)</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Open Containing Folder</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Identify</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Attach to Video Wall...</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Switch to Video Wall mode...</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Save Current Matrix</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Load Matrix</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Delete</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Stop Video Wall</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Save Layout</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Save Layout As...</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Maximize Item</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Restore Item</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Show Info</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Hide Info</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Toggle Info</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Change Resolution...</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Auto</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Low</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>High</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>PTZ...</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Save Current Position...</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Manage...</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Calibrate Fisheye</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Toggle Resolution Mode</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Show Motion/Smart Search</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Show Motion</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Hide Motion/Smart Search</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Hide Motion</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Clear Motion Selection</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Toggle Smart Search</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Check File Watermark</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Take Screenshot</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Image Enhancement...</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Create Zoom Window</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Rotate to...</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>0 degrees</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>90 degrees</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>180 degrees</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>270 degrees</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Remove from Layout</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Rename</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Delete from Disk</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Set as Layout Background</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>User Settings...</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Layout Settings...</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Video Wall Settings...</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Ping...</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Server Logs...</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Server Diagnostics...</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Server Settings...</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Merge to Currently Connected System...</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Change Cell Aspect Ratio...</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Change Cell Spacing...</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>None</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Small</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Medium</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Large</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Start Tour</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Stop Tour</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Close</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Close All But This</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Mark Selection Start</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Mark Selection End</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Clear Selection</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Zoom to Selection</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Edit Bookmark...</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Remove Bookmark...</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Export Selected Area...</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Export Multi-Video...</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Preview Search...</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Play</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Pause</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Previous Frame</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Next Frame</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>To Start</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>To End</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Volume Down</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Volume Up</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Toggle Mute</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Jump to Live</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Synchronize Streams</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Disable Stream Synchronization</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Show Thumbnails</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Hide Thumbnails</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Show Calendar</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Hide Calendar</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Show Title Bar</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Hide Title Bar</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Pin Tree</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Unpin Tree</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Show Tree</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Hide Tree</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Show Timeline</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Hide Timeline</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Pin Notifications</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Unpin Notifications</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>File Settings...</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>User Management...</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Audit Trail...</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Failover Priority...</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Move Devices</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Move Cameras</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Device Diagnostics...</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Camera Diagnostics...</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Devices List</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Cameras List</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Check Device Issues...</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Check Devices Issues...</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Check Camera Issues...</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Check Cameras Issues...</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Device Rules...</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Devices Rules...</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Camera Rules...</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Cameras Rules...</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Device Settings...</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Devices Settings...</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Camera Settings...</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Cameras Settings...</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Devices List by Server...</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Cameras List by Server...</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Cameras to Backup...</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Show Bookmarks</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Hide Bookmarks</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Pin Calendar</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Unpin Calendar</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>I/O Module Diagnostics...</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Web Client...</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Bookmark Search...</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Open in Alarm Layout</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Check I/O Module Issues...</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Check I/O Modules Issues...</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>I/O Module Rules...</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>I/O Modules Rules...</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>I/O Module Settings...</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>I/O Modules Settings...</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Remove Bookmarks...</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Monitor in New Tab</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Monitor in New Window</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Open Layout in New Tab</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Open Layout(s) in New Window</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Open Current Layout in New Window</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Add Bookmark...</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Export Rapid Review...</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Event Rules...</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Disconnect from Server</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Browse Local Files</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Show Welcome Screen</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Web Page...</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>New Web Page...</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Log in to %1...</source>
-        <comment>Log in to Nx Cloud</comment>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Log out from %1</source>
-        <comment>Log out from Nx Cloud</comment>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Open %1 Portal...</source>
-        <comment>Open Nx Cloud Portal</comment>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Stop Sharing Layout</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>User Roles...</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Role Settings...</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Show Notifications</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Hide Notifications</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Connect to System</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Account Settings...</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Create Account...</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Server Web Page...</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Add Device...</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Clear Screen</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
     <name>QnAdjustVideoDialog</name>
     <message>
         <source>Image Enhancement</source>
@@ -1346,13 +1222,6 @@ to view more bookmarks</source>
     <name>QnAdvancedSettingsWidget</name>
     <message>
         <source>Folder not found</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
-    <name>QnAlarmLayoutResource</name>
-    <message>
-        <source>Alarms</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -1793,17 +1662,6 @@ to view more bookmarks</source>
     </message>
 </context>
 <context>
-    <name>QnBusinessRuleItemDelegate</name>
-    <message>
-        <source>For Administrators Only</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>For Users</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
     <name>QnBusinessRuleViewModel</name>
     <message numerus="yes">
         <source>%n Server(s)</source>
@@ -1827,10 +1685,6 @@ to view more bookmarks</source>
     <message>
         <source>Starts</source>
         <translation></translation>
-    </message>
-    <message>
-        <source>Administrators Only</source>
-        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Select at least one device</source>
@@ -1857,10 +1711,6 @@ to view more bookmarks</source>
     </message>
     <message>
         <source>N/A</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Users</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -3234,10 +3084,6 @@ to %1</source>
 <context>
     <name>QnEventLogModel</name>
     <message>
-        <source>Administrators Only</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>Motion video</source>
         <translation></translation>
     </message>
@@ -3278,19 +3124,8 @@ to %1</source>
         </translation>
     </message>
     <message>
-        <source>Users</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Open camera</source>
         <translation type="unfinished"></translation>
-    </message>
-    <message numerus="yes">
-        <source>%n users</source>
-        <translation>
-            <numerusform>%n user</numerusform>
-            <numerusform>%n users</numerusform>
-        </translation>
     </message>
     <message numerus="yes">
         <source>and %n users more...</source>
@@ -3306,8 +3141,15 @@ to %1</source>
             <numerusform>and %n more...</numerusform>
         </translation>
     </message>
+    <message numerus="yes">
+        <source>%n Removed subjects</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
+    </message>
     <message>
-        <source>User removed</source>
+        <source>Subject removed</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -4002,6 +3844,91 @@ to %1</source>
         <source>This license is already activated and linked to hardware ID %1 on %2</source>
         <translation type="unfinished"></translation>
     </message>
+    <message numerus="yes">
+        <source>%n channels</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>Deactivate licenses?</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>Failed to deactivate license</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message numerus="yes">
+        <source>Failed to deactivate %n licenses</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>%1 of %n licenses cannot be deactivated</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>Please contact Customer Support</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message numerus="yes">
+        <source>Deactivate %n other</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>Cannot deactivate licenses</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>Cannot connect to the License Server</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Please make sure your server has active Internet connection or check firewall settings.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>License Server error</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>If the problem presists please contact Customer Support.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>License deactivated</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message numerus="yes">
+        <source>%n licenses deactivated</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>Remove</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Deactivate</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>QnLicenseWidget</name>
@@ -4297,6 +4224,15 @@ to %1</source>
         <source>Lo-Res</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>press and hold</source>
+        <comment>Software Trigger</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Failed to invoke trigger %1 (%2)</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>QnMergeSystemsDialog</name>
@@ -4527,6 +4463,21 @@ to %1</source>
         <source>Alarm: %1</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Bookmark it</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Bookmark created</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message numerus="yes">
+        <source>%n bookmarks created</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
+    </message>
 </context>
 <context>
     <name>QnPerformanceTest</name>
@@ -4582,7 +4533,7 @@ to %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>PTZ, Device Output, 2-way Audio</source>
+        <source>PTZ, Device Output, 2-Way Audio, Software Triggers.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -4708,19 +4659,6 @@ to %1</source>
     <message>
         <source>Hotkey used by tour &quot;%1&quot;</source>
         <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
-    <name>QnPtzPresetsToursActionFactory</name>
-    <message>
-        <source>%1 (active)</source>
-        <comment>Template for active PTZ preset</comment>
-        <translation></translation>
-    </message>
-    <message>
-        <source>%1 (active)</source>
-        <comment>Template for active PTZ tour</comment>
-        <translation></translation>
     </message>
 </context>
 <context>
@@ -5035,6 +4973,14 @@ to %1</source>
     </message>
     <message>
         <source>Local Files</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Layout Tours</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Layout Tour</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -5578,27 +5524,6 @@ to %1</source>
     </message>
 </context>
 <context>
-    <name>QnShowOnAlarmLayoutActionWidget</name>
-    <message numerus="yes">
-        <source>%n Users</source>
-        <translation>
-            <numerusform>%n User</numerusform>
-            <numerusform>%n Users</numerusform>
-        </translation>
-    </message>
-    <message numerus="yes">
-        <source>%n Roles</source>
-        <translation>
-            <numerusform>%n Role</numerusform>
-            <numerusform>%n Roles</numerusform>
-        </translation>
-    </message>
-    <message>
-        <source>All Users</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
     <name>QnShowTextOverlayActionWidget</name>
     <message>
         <source>Html tags could be used within custom text:
@@ -6070,6 +5995,10 @@ to %1</source>
         <source>%1 GB</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Too small and system partitions are reserved and not used for writing if there is enough other storage space available.</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>QnStorageRebuildWidget</name>
@@ -6126,6 +6055,13 @@ to %1</source>
     </message>
 </context>
 <context>
+    <name>QnSubjectTargetActionWidget</name>
+    <message>
+        <source>Select at least one user...</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>QnSystemAdministrationDialog</name>
     <message>
         <source>General</source>
@@ -6168,10 +6104,6 @@ to %1</source>
     </message>
     <message>
         <source>Email server is not set</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Connection to server lost</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -6336,12 +6268,16 @@ to %1</source>
 <context>
     <name>QnTimeServerSelectionWidget</name>
     <message>
-        <source>Time is taken from the Internet.</source>
-        <translation></translation>
+        <source>System time is synchronized with the Internet and is independent from server local times.</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Time is taken from %1.</source>
-        <translation></translation>
+        <source>System time is synchronized with selected server local time and is independent from other servers.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>No server has Internet access. Time is not being synchronized.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -6870,190 +6806,32 @@ to %1</source>
     </message>
 </context>
 <context>
-    <name>QnWorkbenchActionHandler</name>
+    <name>QnWebpageDialog</name>
     <message>
-        <source>Layout is locked and cannot be changed.</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>All Supported (*.nov *.avi *.mkv *.mp4 *.mov *.ts *.m2ts *.mpeg *.mpg *.flv *.wmv *.3gp *.jpg *.png *.gif *.bmp *.tiff)</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Video (*.avi *.mkv *.mp4 *.mov *.ts *.m2ts *.mpeg *.mpg *.flv *.wmv *.3gp)</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Pictures (*.jpg *.png *.gif *.bmp *.tiff)</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>All files (*.*)</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Select folder...</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Preview Search for %1</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Rename</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Enter new name for the selected item:</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Update...</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Beta version %1</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Open File</source>
+        <source>Name</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Updating Background...</source>
+        <source>URL</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Image processing may take a few moments. Please be patient.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message numerus="yes">
-        <source>Are you sure you want to permanently delete these %n files?</source>
-        <translation>
-            <numerusform>Are you sure you want to permanently delete %n file?</numerusform>
-            <numerusform>Are you sure you want to permanently delete these %n files?</numerusform>
-        </translation>
-    </message>
-    <message>
-        <source>Confirm files deleting</source>
+        <source>URL cannot be empty.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Client</source>
+        <source>Wrong URL format.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Server</source>
+        <source>Web Page</source>
         <translation type="unfinished"></translation>
     </message>
-    <message numerus="yes">
-        <source>Failed to move %n devices</source>
-        <translation>
-            <numerusform>Failed to move %n device</numerusform>
-            <numerusform>Failed to move %n devices</numerusform>
-        </translation>
-    </message>
-    <message numerus="yes">
-        <source>Failed to move %n cameras</source>
-        <translation>
-            <numerusform>Failed to move %n camera</numerusform>
-            <numerusform>Failed to move %n cameras</numerusform>
-        </translation>
-    </message>
-    <message numerus="yes">
-        <source>Failed to move %n I/O Modules</source>
-        <translation>
-            <numerusform>Failed to move %n I/O Module</numerusform>
-            <numerusform>Failed to move %n I/O Modules</numerusform>
-        </translation>
-    </message>
+</context>
+<context>
+    <name>QnWorkbenchAlarmLayoutHandler</name>
     <message>
-        <source>Server &quot;%1&quot; is not responding.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Move</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Too short period selected</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Cancel device adding?</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>There is another user with the same name</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Image too big</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Maximum size is %1 MB.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Failed to upload image</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Please update all components to the version %1</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Some functionality may be unavailable or not working properly.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>It will be used by software development team to improve your user experience.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Failed to open server web page</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Skip</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Cannot perform Preview Search. Please select a period of 15 seconds or longer.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message numerus="yes">
-        <source>Server &quot;%1&quot; cannot access %n devices. Move them anyway?</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
-        </translation>
-    </message>
-    <message numerus="yes">
-        <source>Server &quot;%1&quot; cannot access %n cameras. Move them anyway?</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
-        </translation>
-    </message>
-    <message numerus="yes">
-        <source>Server &quot;%1&quot; cannot access %n I/O modules. Move them anyway?</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
-        </translation>
-    </message>
-    <message>
-        <source>Components of System have different versions:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>System sends anonymous usage statistics</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>To disable it, go to System Administration dialog.</source>
+        <source>Alarms</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -7108,13 +6886,6 @@ to %1</source>
     </message>
     <message>
         <source>Could not connect to server. Video Wall will be closed.</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
-    <name>QnWorkbenchController</name>
-    <message>
-        <source>Press any key to stop the tour.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -7333,29 +7104,6 @@ to %1</source>
     </message>
     <message>
         <source>Cloud Systems cannot be merged</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
-    <name>QnWorkbenchLayoutsHandler</name>
-    <message>
-        <source>Save Layout As</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>New Layout</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Enter the name of the layout to create:</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Enter Layout Name:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>New Layout %1</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -7603,22 +7351,158 @@ to %1</source>
 <context>
     <name>QnWorkbenchWebPageHandler</name>
     <message>
-        <source>New Web Page...</source>
+        <source>New Web Page</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>This Web Page already exists</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Enter URL of Web Page to add:</source>
+        <source>Edit Web Page</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
-    <name>Resources</name>
+    <name>SubjectSelectionDialog::RoleListDelegate</name>
+    <message numerus="yes">
+        <source>%n users</source>
+        <translation type="unfinished">
+            <numerusform>%n user</numerusform>
+            <numerusform>%n users</numerusform>
+        </translation>
+    </message>
+</context>
+<context>
+    <name>nx::client::desktop::ui::LayoutPreviewPainter</name>
+    <message>
+        <source>NO DATA</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>nx::client::desktop::ui::LayoutTourDropPlaceholder</name>
+    <message>
+        <source>Drag layout here to add it to the tour</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>nx::client::desktop::ui::SubjectSelectionDialog</name>
+    <message>
+        <source>No user roles found</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>No users found</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Users</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Custom Users</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>nx::client::desktop::ui::action::LayoutTourSettingsFactory</name>
+    <message>
+        <source>Switch with Hotkeys</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Switch on Timer</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>nx::client::desktop::ui::action::PtzPresetsToursFactory</name>
+    <message>
+        <source>%1 (active)</source>
+        <comment>Template for active PTZ preset</comment>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>%1 (active)</source>
+        <comment>Template for active PTZ tour</comment>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>nx::client::desktop::ui::dialogs::LicenseDeactivationReason</name>
+    <message>
+        <source>Please fill up information about yourself and reason for license deactivation</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Next</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Name is necessary</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Reason is necessary</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Name</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Email</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Reason for deactivation</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>nx::client::desktop::ui::graphics::SoftwareTriggerButton</name>
+    <message>
+        <source>Go to Live</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>nx::client::desktop::ui::ptz</name>
+    <message>
+        <source>Cannot get the current position from camera &quot;%1&quot;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Please wait for the camera to go online.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Failed to get current position</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cannot set the current position for camera &quot;%1&quot;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Failed to set current position</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Preset used by some tours. Delete it anyway?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>These tours will become invalid.</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>nx::client::desktop::ui::resources</name>
     <message>
         <source>There is another layout with the same name</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>You do not have permission to overwrite it.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -7631,7 +7515,7 @@ to %1</source>
     </message>
     <message numerus="yes">
         <source>User will still have access to %n removed resources:</source>
-        <translation>
+        <translation type="unfinished">
             <numerusform>User will still have access to %n removed resource:</numerusform>
             <numerusform>User will still have access to %n removed resources:</numerusform>
         </translation>
@@ -7642,7 +7526,7 @@ to %1</source>
     </message>
     <message numerus="yes">
         <source>All users with this role will get access to %n resources:</source>
-        <translation>
+        <translation type="unfinished">
             <numerusform>All users with this role will get access to %n resource:</numerusform>
             <numerusform>All users with this role will get access to %n resources:</numerusform>
         </translation>
@@ -7653,7 +7537,7 @@ to %1</source>
     </message>
     <message numerus="yes">
         <source>All users with this role will still have access to %n removed resources:</source>
-        <translation>
+        <translation type="unfinished">
             <numerusform>All users with this role will still have access to %n removed resource:</numerusform>
             <numerusform>All users with this role will still have access to %n removed resources:</numerusform>
         </translation>
@@ -7668,35 +7552,35 @@ to %1</source>
     </message>
     <message numerus="yes">
         <source>User will lose access to %n resources:</source>
-        <translation>
+        <translation type="unfinished">
             <numerusform>User will lose access to %n resource:</numerusform>
             <numerusform>User will lose access to %n resources:</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>All users with this role will lose access to %n resources:</source>
-        <translation>
+        <translation type="unfinished">
             <numerusform>All users with this role will lose access to %n resource:</numerusform>
             <numerusform>All users with this role will lose access to %n resources:</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>Delete %n shared layouts?</source>
-        <translation>
+        <translation type="unfinished">
             <numerusform>Delete %n shared layout?</numerusform>
             <numerusform>Delete %n shared layouts?</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>These %n layouts are shared with other users, so you delete it for them too.</source>
-        <translation>
+        <translation type="unfinished">
             <numerusform>This layout is shared with other users, so it will be deleted from their accounts as well.</numerusform>
             <numerusform>These %n layouts are shared with other users, so they will be deleted from their accounts as well.</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>Remove %n items from layout?</source>
-        <translation>
+        <translation type="unfinished">
             <numerusform>Remove %n item from layout?</numerusform>
             <numerusform>Remove %n items from layout?</numerusform>
         </translation>
@@ -7706,61 +7590,65 @@ to %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
+        <source>You are going to delete some resources to which you have access from Video Wall only. You will not see them in your resource list after it and will not be able to add them to Video Wall again.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>You will lose access to following resources:</source>
         <translation type="unfinished"></translation>
     </message>
     <message numerus="yes">
         <source>Delete %n users?</source>
-        <translation>
+        <translation type="unfinished">
             <numerusform>Delete %n user?</numerusform>
             <numerusform>Delete %n users?</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>Delete %n devices?</source>
-        <translation>
+        <translation type="unfinished">
             <numerusform>Delete %n device?</numerusform>
             <numerusform>Delete %n devices?</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>Delete %n cameras?</source>
-        <translation>
+        <translation type="unfinished">
             <numerusform>Delete %n camera?</numerusform>
             <numerusform>Delete %n cameras?</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>Delete %n I/O Modules?</source>
-        <translation>
+        <translation type="unfinished">
             <numerusform>Delete %n I/O Module?</numerusform>
             <numerusform>Delete %n I/O Modules?</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>Delete %n items?</source>
-        <translation>
-            <numerusform>Delete %n item?</numerusform>
+        <translation type="unfinished">
+            <numerusform>Delete item?</numerusform>
             <numerusform>Delete %n items?</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>%n of them are auto-discovered.</source>
-        <translation>
+        <translation type="unfinished">
             <numerusform>%n of them is auto-discovered.</numerusform>
             <numerusform>%n of them are auto-discovered.</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>%n cameras are auto-discovered.</source>
-        <translation>
+        <translation type="unfinished">
             <numerusform>%n camera is auto-discovered.</numerusform>
             <numerusform>%n cameras are auto-discovered.</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>%n I/O modules are auto-discovered.</source>
-        <translation>
+        <translation type="unfinished">
             <numerusform>%n I/O module is auto-discovered.</numerusform>
             <numerusform>%n I/O modules are auto-discovered.</numerusform>
         </translation>
@@ -7769,17 +7657,9 @@ to %1</source>
         <source>They may be auto-discovered again after removing.</source>
         <translation type="unfinished"></translation>
     </message>
-    <message>
-        <source>You do not have permission to overwrite it.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>You are going to delete some resources to which you have access from Video Wall only. You will not see them in your resource list after it and will not be able to add them to Video Wall again.</source>
-        <translation type="unfinished"></translation>
-    </message>
 </context>
 <context>
-    <name>VideoWall</name>
+    <name>nx::client::desktop::ui::videowall</name>
     <message>
         <source>There is another video wall with the same name</source>
         <translation type="unfinished"></translation>
@@ -7802,6 +7682,254 @@ to %1</source>
     </message>
     <message>
         <source>To display local files on Video Wall, please attach them using computer where Video Wall is hosted.</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>nx::client::desktop::ui::workbench::ActionHandler</name>
+    <message numerus="yes">
+        <source>Failed to move %n devices</source>
+        <translation type="unfinished">
+            <numerusform>Failed to move %n device</numerusform>
+            <numerusform>Failed to move %n devices</numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>Failed to move %n cameras</source>
+        <translation type="unfinished">
+            <numerusform>Failed to move %n camera</numerusform>
+            <numerusform>Failed to move %n cameras</numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>Failed to move %n I/O Modules</source>
+        <translation type="unfinished">
+            <numerusform>Failed to move %n I/O Module</numerusform>
+            <numerusform>Failed to move %n I/O Modules</numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>Server &quot;%1&quot; is not responding.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message numerus="yes">
+        <source>Server &quot;%1&quot; cannot access %n devices. Move them anyway?</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>Server &quot;%1&quot; cannot access %n cameras. Move them anyway?</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message numerus="yes">
+        <source>Server &quot;%1&quot; cannot access %n I/O modules. Move them anyway?</source>
+        <translation type="unfinished">
+            <numerusform></numerusform>
+            <numerusform></numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>Move</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Layout is locked and cannot be changed.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>All Supported (*.nov *.avi *.mkv *.mp4 *.mov *.ts *.m2ts *.mpeg *.mpg *.flv *.wmv *.3gp *.jpg *.png *.gif *.bmp *.tiff)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Video (*.avi *.mkv *.mp4 *.mov *.ts *.m2ts *.mpeg *.mpg *.flv *.wmv *.3gp)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Pictures (*.jpg *.png *.gif *.bmp *.tiff)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>All files (*.*)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Open File</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Select folder...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Too short period selected</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cannot perform Preview Search. Please select a period of 15 seconds or longer.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Preview Search for %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Cancel device adding?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Confirm files deleting</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message numerus="yes">
+        <source>Are you sure you want to permanently delete these %n files?</source>
+        <translation type="unfinished">
+            <numerusform>Are you sure you want to permanently delete %n file?</numerusform>
+            <numerusform>Are you sure you want to permanently delete these %n files?</numerusform>
+        </translation>
+    </message>
+    <message>
+        <source>There is another user with the same name</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Rename</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Enter new name for the selected item:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Updating Background...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Image processing may take a few moments. Please be patient.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Image too big</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Maximum size is %1 MB.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Failed to upload image</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Client</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Server</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Please update all components to the version %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Components of System have different versions:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Update...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Skip</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Beta version %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Some functionality may be unavailable or not working properly.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>System sends anonymous usage statistics</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>It will be used by software development team to improve your user experience.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>To disable it, go to System Administration dialog.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Failed to open server web page</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>nx::client::desktop::ui::workbench::LayoutTourExecutor</name>
+    <message>
+        <source>Use keyboard arrows to switch layouts. To exit the tour press Esc.</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>nx::client::desktop::ui::workbench::LayoutTourItemWidget</name>
+    <message>
+        <source>Switch by %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Display for</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Display selected for</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>nx::client::desktop::ui::workbench::LayoutToursHandler</name>
+    <message>
+        <source>Layout Tour</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Layout Tour %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Delete layout tour %1?</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>nx::client::desktop::ui::workbench::LayoutsHandler</name>
+    <message>
+        <source>Save Layout As</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Enter Layout Name:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>New Layout</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Enter the name of the layout to create:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>New Layout %1</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

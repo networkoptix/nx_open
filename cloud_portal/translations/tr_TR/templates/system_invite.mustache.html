@@ -1,0 +1,12 @@
+<h1>{{PRODUCT_NAME}}'e hoş geldiniz</h1>
+
+{{#message.sharer_name}}
+<p><a href="mailto:{{message.sharer_email}}"> {{message.sharer_name}} </a> Sizi <a href="{{config.portal_url}}"> {{PRODUCT_NAME}}'e davet ediyor </a> Ve {{message.system_name}} sistemini sizinle paylaştı.</p>
+{{/message.sharer_name}}
+
+{{^message.sharer_name}}
+<p><a href="{{config.portal_url}}"> {{PRODUCT_NAME}}'e katılmaya davet edildiniz </a> . {{message.system_name}} sistemi sizinle paylaşıldı.</p>
+{{/message.sharer_name}}
+
+<a class="btn" href="{{config.portal_url}}/register/{{message.code}}">Sistemi kaydedin ve görüntüleyin</a>
+

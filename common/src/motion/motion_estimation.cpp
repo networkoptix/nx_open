@@ -238,8 +238,7 @@ void getFrame_avgY_array_8_x(const CLVideoDecoderOutput* frame, const CLVideoDec
         for (int x = 0; x < xSteps; ++x)
         {
 #if defined(__i386) || defined(__amd64) || defined(_WIN32)
-            __m128i blockSum;
-            blockSum = _mm_xor_si128(blockSum, blockSum);
+            __m128i blockSum = _mm_setzero_si128();
             const __m128i* src = linePtr;
             const __m128i* srcPrev = linePtrPrev;
             for (int i = 0; i < rowCnt;)
