@@ -54,6 +54,16 @@ int QnRestGUIRequestHandler::executeGet(
     return d->code;
 }
 
+int QnRestRequestHandler::executeDelete(
+    const QString& /*path*/,
+    const QnRequestParamList& /*params*/,
+    QByteArray& /*result*/,
+    QByteArray& /*contentType*/,
+    const QnRestConnectionProcessor* /*owner*/)
+{
+    return nx_http::StatusCode::notImplemented;
+}
+
 int QnRestGUIRequestHandler::executePost(
     const QString& path,
     const QnRequestParamList& params,
@@ -72,6 +82,19 @@ int QnRestGUIRequestHandler::executePost(
     d->contentType = contentType;
     QMetaObject::invokeMethod(this, "methodExecutor", Qt::BlockingQueuedConnection);
     return d->code;
+}
+
+int QnRestRequestHandler::executePut(
+    const QString& path,
+    const QnRequestParamList& params,
+    const QByteArray& body,
+    const QByteArray& srcBodyContentType,
+    QByteArray& result,
+    QByteArray& resultContentType,
+    const QnRestConnectionProcessor* owner)
+{
+    return executePost(
+        path, params, body, srcBodyContentType, result, resultContentType, owner);
 }
 
 void QnRestGUIRequestHandler::methodExecutor()

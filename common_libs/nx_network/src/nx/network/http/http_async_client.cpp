@@ -178,7 +178,7 @@ void AsyncClient::doGet(const QUrl& url)
     resetDataBeforeNewRequest();
     m_requestUrl = url;
     m_contentLocationUrl = url;
-    composeRequest(nx_http::Method::GET);
+    composeRequest(nx_http::Method::Get);
     initiateHttpMessageDelivery();
 }
 
@@ -197,7 +197,7 @@ void AsyncClient::doPost(const QUrl& url)
     resetDataBeforeNewRequest();
     m_requestUrl = url;
     m_contentLocationUrl = url;
-    composeRequest(nx_http::Method::POST);
+    composeRequest(nx_http::Method::Post);
     addBodyToRequest();
 
     initiateHttpMessageDelivery();
@@ -218,7 +218,7 @@ void AsyncClient::doPut(const QUrl& url)
     resetDataBeforeNewRequest();
     m_requestUrl = url;
     m_contentLocationUrl = url;
-    composeRequest(nx_http::Method::PUT);
+    composeRequest(nx_http::Method::Put);
     addBodyToRequest();
 
     initiateHttpMessageDelivery();
@@ -246,7 +246,7 @@ void AsyncClient::doUpgrade(
     m_contentLocationUrl = url;
     m_additionalHeaders.emplace("Connection", "Upgrade");
     m_additionalHeaders.emplace("Upgrade", protocolToUpgradeTo);
-    composeRequest(nx_http::Method::OPTIONS);
+    composeRequest(nx_http::Method::Options);
     initiateHttpMessageDelivery();
 }
 
@@ -1020,7 +1020,7 @@ void AsyncClient::composeRequest(const nx_http::StringType& httpMethod)
     }
     else    //if no proxy specified then erasing http://host:port from request url
     {
-        if (httpMethod == nx_http::Method::OPTIONS && m_contentLocationUrl.path().isEmpty())
+        if (httpMethod == nx_http::Method::Options && m_contentLocationUrl.path().isEmpty())
             m_request.requestLine.url = "*";
         else
             m_request.requestLine.url = m_contentLocationUrl.path();
@@ -1037,7 +1037,7 @@ void AsyncClient::composeRequest(const nx_http::StringType& httpMethod)
         m_userAgent.isEmpty() ? nx_http::userAgentString() : m_userAgent.toLatin1());
     if (useHttp11)
     {
-        if (httpMethod == nx_http::Method::GET || httpMethod == nx_http::Method::HEAD)
+        if (httpMethod == nx_http::Method::Get || httpMethod == nx_http::Method::Head)
         {
             //m_request.headers.insert( std::make_pair("Accept", "*/*") );
             if (m_contentEncodingUsed)

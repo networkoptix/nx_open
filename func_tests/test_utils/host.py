@@ -365,15 +365,20 @@ class RemoteSshHost(Host):
         self.run_command(['rm', '-r', path], check_retcode=not ignore_errors)
 
     def expand_path(self, path):
+        assert '*' not in path, repr(path)  # this function is only for expanding ~ and $VARs. for globs use expand_glob
         return self.run_command(['echo', path]).strip()
 
     def expand_glob(self, path_mask, for_shell=False):
+        assert not path_mask.startswith('~/'), repr(path_mask)  # this function is only for expanding '*' globs, use expand_path for that
         if for_shell:
             return [path_mask]  # ssh expands '*' masks automatically
         else:
             assert ' ' not in path_mask  # spaces in path are not supported by the following command
-            output = self.run_command(['echo', path_mask])
-            return output.strip().split()
+            output = self.run_command(['echo', path_mask]).strip()
+            if output == path_mask:
+                return []  # this means nothing is found
+            else:
+                return output.split()
 
     def get_timezone(self):
         tzname = self.read_file('/etc/timezone').strip()

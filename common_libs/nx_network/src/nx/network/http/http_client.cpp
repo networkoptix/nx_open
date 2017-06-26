@@ -82,6 +82,14 @@ bool HttpClient::doPut(
         std::move(messageBody)));
 }
 
+bool HttpClient::doDelete(const QUrl& url)
+{
+    using namespace std::placeholders;
+    return doRequest(std::bind(
+        static_cast<void(AsyncHttpClient::*)(const QUrl&)>(
+            &nx_http::AsyncHttpClient::doDelete), _1, url));
+}
+
 const Response* HttpClient::response() const
 {
     return m_asyncHttpClient->response();

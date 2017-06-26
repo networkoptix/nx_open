@@ -75,7 +75,7 @@ protected:
 
     void assertHandlerIsFound(
         const nx_http::StringType& path,
-        nx_http::StringType method = nx_http::Method::GET)
+        nx_http::StringType method = nx_http::Method::Get)
     {
         assertRequestIsDispatched(path, method);
 
@@ -84,7 +84,7 @@ protected:
 
     void assertHandlerNotFound(
         const nx_http::StringType& path,
-        nx_http::StringType method = nx_http::Method::GET)
+        nx_http::StringType method = nx_http::Method::Get)
     {
         ASSERT_FALSE(
             m_messageDispatcher.dispatchRequest(
@@ -96,7 +96,7 @@ protected:
 
     void assertDefaultHandlerFound(
         const nx_http::StringType& path,
-        nx_http::StringType method = nx_http::Method::GET)
+        nx_http::StringType method = nx_http::Method::Get)
     {
         assertRequestIsDispatched(path, method);
 
@@ -189,10 +189,10 @@ TYPED_TEST_P(HttpServerBasicMessageDispatcher, default_handler_has_lowest_priori
 
 TYPED_TEST_P(HttpServerBasicMessageDispatcher, register_handler_for_specific_method)
 {
-    this->registerHandler("/accounts/", nx_http::Method::GET);
+    this->registerHandler("/accounts/", nx_http::Method::Get);
     
-    this->assertHandlerIsFound("/accounts/", nx_http::Method::GET);
-    this->assertHandlerNotFound("/accounts/", nx_http::Method::POST);
+    this->assertHandlerIsFound("/accounts/", nx_http::Method::Get);
+    this->assertHandlerNotFound("/accounts/", nx_http::Method::Post);
 }
 
 REGISTER_TYPED_TEST_CASE_P(

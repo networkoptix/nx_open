@@ -277,11 +277,12 @@ class NX_NETWORK_API Method
 public:
     typedef StringType ValueType;
 
-    static const StringType GET;
-    static const StringType HEAD;
-    static const StringType POST;
-    static const StringType PUT;
-    static const StringType OPTIONS;
+    static const StringType Get;
+    static const StringType Head;
+    static const StringType Post;
+    static const StringType Put;
+    static const StringType Delete;
+    static const StringType Options;
 
     static bool isMessageBodyAllowed(ValueType);
 };
