@@ -9,7 +9,7 @@
               <RegistryValue Root="HKCR" Type="string" Key="HDW.nov\DefaultIcon" Value="&quot;[#client.exe]&quot;" />
               <RegistryValue Root="HKCR" Type="string" Key=".nov" Value="HDW.nov" />
 
-              <RegistryValue Root="HKLM" Key="SOFTWARE\Classes\SystemFileAssociations\.nov\shell\play.$(var.clientInternalName).exe" Value="!(loc.Associations_PlayWith)" Type="string" />
+              <RegistryValue Root="HKLM" Key="SOFTWARE\Classes\SystemFileAssociations\.nov\shell\play.$(var.clientInternalName).exe" Value="Play with [ProductName]" Type="string" />
               <RegistryValue Root="HKLM" Key="SOFTWARE\Classes\SystemFileAssociations\.nov\shell\play.$(var.clientInternalName).exe\command" Value="&quot;[#client.exe]&quot; &quot;%1&quot;" Type="string" />
 
               <RegistryValue Root="HKCR" Type="string" Key="Applications\$(var.clientInternalName).exe\SupportedTypes" Name=".nov" Value=""/>

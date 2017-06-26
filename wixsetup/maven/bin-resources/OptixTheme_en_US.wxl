@@ -61,4 +61,17 @@
   <String Id="InstallLicenseText">By clicking "Accept and Install" you agree to</String>
   <String Id="Options">Options</String>
   <String Id="SelectApps">Select applications to be installed:</String>
+  
+  <!-- WixSchedFirewallExceptions -->
+  <String Id="msierrFirewallCannotConnect">Cannot connect to Windows Firewall.  ([2]   [3]   [4]   [5])</String>
+  <String Id="WixSchedFirewallExceptionsInstall">Configuring Windows Firewall</String>
+  <String Id="WixSchedFirewallExceptionsUninstall">Configuring Windows Firewall</String>
+  <String Id="WixRollbackFirewallExceptionsInstall">Rolling back Windows Firewall configuration</String>
+  <String Id="WixExecFirewallExceptionsInstall">Installing Windows Firewall configuration</String>
+  <String Id="WixRollbackFirewallExceptionsUninstall">Rolling back Windows Firewall configuration</String>
+  <String Id="WixExecFirewallExceptionsUninstall">Uninstalling Windows Firewall configuration</String>
+  
+  <!-- ArchCheck -->
+  <String Id="Product_ArchMismatch_x86">This package is designed for 32-bit OS. Setup will now exit.</String>
+  <String Id="Product_ArchMismatch_x64">This package is designed for 64-bit OS. Setup will now exit.</String>
 </WixLocalization>
