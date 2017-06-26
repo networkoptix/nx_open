@@ -587,7 +587,7 @@
     <message>
       <source>d MMMM yyyy</source>
       <comment>DO NOT TRANSLATE THIS STRING!</comment>
-      <translation type="unfinished">d MMMM yyyy</translation>
+      <translation>d MMMM yyyy</translation>
     </message>
   </context>
   <context>
