@@ -1079,7 +1079,7 @@ QSize QnVideoStreamDisplay::getImageSize() const
 bool QnVideoStreamDisplay::getLastDecodedFrame( QnAbstractVideoDecoder* dec, QSharedPointer<CLVideoDecoderOutput>* const outFrame )
 {
     const AVFrame* lastFrame = dec->lastFrame();
-    if( !lastFrame || dec->GetPixelFormat() == -1 || dec->getWidth() == 0 )
+    if (!lastFrame || !lastFrame->data[0] || dec->GetPixelFormat() == -1 || dec->getWidth() == 0)
         return false;
 
     (*outFrame)->setUseExternalData( false );
@@ -1102,7 +1102,7 @@ bool QnVideoStreamDisplay::getLastDecodedFrame( QnAbstractVideoDecoder* dec, QSh
         if( (*outFrame)->format == AV_PIX_FMT_YUV420P )
         {
             // optimization
-            for (int i = 0; i < 3; ++i)
+            for (int i = 0; i < 3 && lastFrame->data[i]; ++i)
             {
                 int h = lastFrame->height >> (i > 0 ? 1 : 0);
                 memcpy( (*outFrame)->data[i], lastFrame->data[i], lastFrame->linesize[i]* h );
