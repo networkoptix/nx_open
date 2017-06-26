@@ -34,7 +34,7 @@ TemporaryAccountPasswordManager::TemporaryAccountPasswordManager(
     m_settings(settings),
     m_dbManager(dbManager)
 {
-    if (fillCache() != db::DBResult::ok)
+    if (fillCache() != nx::utils::db::DBResult::ok)
         throw std::runtime_error("Failed to fill temporary account password cache");
 }
 
@@ -94,7 +94,7 @@ void TemporaryAccountPasswordManager::registerTemporaryCredentials(
                 nx::utils::db::DBResult dbResult,
                 TemporaryAccountCredentialsEx tempPasswordData)
         {
-            if (dbResult != db::DBResult::ok)
+            if (dbResult != nx::utils::db::DBResult::ok)
             {
                 NX_LOG(lm("add_temporary_account_password (%1). "
                         "Failed to save password to DB. DB error: %2")
@@ -188,7 +188,7 @@ nx::utils::db::DBResult TemporaryAccountPasswordManager::fetchTemporaryCredentia
         NX_LOG(lm("Error fetching temporary password for account %1. %2")
             .arg(tempPasswordData.accountEmail).arg(fetchTempPasswordQuery.lastError().text()),
             cl_logDEBUG1);
-        return db::DBResult::ioError;
+        return nx::utils::db::DBResult::ioError;
     }
 
     if (!fetchTempPasswordQuery.next())
@@ -253,16 +253,17 @@ void TemporaryAccountPasswordManager::removeTemporaryCredentialsFromDbDelayed(
         });
 }
 
-db::DBResult TemporaryAccountPasswordManager::fillCache()
+nx::utils::db::DBResult TemporaryAccountPasswordManager::fillCache()
 {
-    nx::utils::promise<db::DBResult> cacheFilledPromise;
-    auto future = cacheFilledPromise.get_future();
     using namespace std::placeholders;
+
+    nx::utils::promise<nx::utils::db::DBResult> cacheFilledPromise;
+    auto future = cacheFilledPromise.get_future();
     m_dbManager->executeSelect(
         std::bind(&TemporaryAccountPasswordManager::fetchTemporaryPasswords, this, _1),
         [&cacheFilledPromise](
             nx::utils::db::QueryContext* /*queryContext*/,
-            db::DBResult dbResult)
+            nx::utils::db::DBResult dbResult)
         {
             cacheFilledPromise.set_value(dbResult);
         });
@@ -294,7 +295,7 @@ nx::utils::db::DBResult TemporaryAccountPasswordManager::fetchTemporaryPasswords
     {
         NX_LOG(lit("Failed to read temporary passwords from DB. %1").
             arg(readPasswordsQuery.lastError().text()), cl_logWARNING);
-        return db::DBResult::ioError;
+        return nx::utils::db::DBResult::ioError;
     }
 
     std::vector<TemporaryAccountCredentialsEx> tmpPasswords;
@@ -311,7 +312,7 @@ nx::utils::db::DBResult TemporaryAccountPasswordManager::fetchTemporaryPasswords
         m_temporaryCredentials.insert(std::move(tmpPassword));
     }
 
-    return db::DBResult::ok;
+    return nx::utils::db::DBResult::ok;
 }
 
 nx::utils::db::DBResult TemporaryAccountPasswordManager::insertTempPassword(
@@ -344,7 +345,7 @@ nx::utils::db::DBResult TemporaryAccountPasswordManager::insertTempPassword(
         NX_LOG(lm("Could not insert temporary password for account %1 into DB. %2")
             .arg(tempPasswordData.accountEmail).arg(insertTempPasswordQuery.lastError().text()),
             cl_logDEBUG1);
-        return db::DBResult::ioError;
+        return nx::utils::db::DBResult::ioError;
     }
 
     queryContext->transaction()->addOnSuccessfulCommitHandler(
@@ -353,7 +354,7 @@ nx::utils::db::DBResult TemporaryAccountPasswordManager::insertTempPassword(
             saveTempPasswordToCache(std::move(tempPasswordData));
         });
 
-    return db::DBResult::ok;
+    return nx::utils::db::DBResult::ok;
 }
 
 void TemporaryAccountPasswordManager::saveTempPasswordToCache(
@@ -376,10 +377,10 @@ nx::utils::db::DBResult TemporaryAccountPasswordManager::deleteTempPassword(
         NX_LOG(lm("Could not delete temporary password %1 from DB. %2")
             .arg(tempPasswordID).arg(deleteTempPassword.lastError().text()),
             cl_logDEBUG1);
-        return db::DBResult::ioError;
+        return nx::utils::db::DBResult::ioError;
     }
 
-    return db::DBResult::ok;
+    return nx::utils::db::DBResult::ok;
 }
 
 boost::optional<const TemporaryAccountCredentialsEx&> 

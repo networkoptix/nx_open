@@ -31,10 +31,10 @@ nx::utils::db::DBResult SystemSharingDataObject::insertOrReplaceSharing(
             .arg(QnLexical::serialized(sharing.accessRole))
             .arg(replaceSharingQuery.lastError().text()),
             cl_logDEBUG1);
-        return db::DBResult::ioError;
+        return nx::utils::db::DBResult::ioError;
     }
 
-    return db::DBResult::ok;
+    return nx::utils::db::DBResult::ok;
 }
 
 nx::utils::db::DBResult SystemSharingDataObject::fetchAllUserSharings(
@@ -114,14 +114,14 @@ nx::utils::db::DBResult SystemSharingDataObject::deleteSharing(
     QString filterStr;
     if (!filterFields.empty())
     {
-        filterStr = db::joinFields(filterFields, " AND ");
+        filterStr = nx::utils::db::joinFields(filterFields, " AND ");
         sqlQueryStr += " AND " + filterStr;
     }
     removeSharingQuery.prepare(sqlQueryStr);
     removeSharingQuery.bindValue(
         ":systemId",
         QnSql::serialized_field(systemId));
-    db::bindFields(&removeSharingQuery, filterFields);
+    nx::utils::db::bindFields(&removeSharingQuery, filterFields);
     if (!removeSharingQuery.exec())
     {
         NX_LOGX(
@@ -129,9 +129,9 @@ nx::utils::db::DBResult SystemSharingDataObject::deleteSharing(
             lm("Failed to remove sharing. system %1, filter \"%2\". %3")
             .arg(systemId).arg(filterStr).arg(removeSharingQuery.lastError().text()),
             cl_logDEBUG1);
-        return db::DBResult::ioError;
+        return nx::utils::db::DBResult::ioError;
     }
-    return db::DBResult::ok;
+    return nx::utils::db::DBResult::ok;
 }
 
 nx::utils::db::DBResult SystemSharingDataObject::calculateUsageFrequencyForANewSystem(
@@ -220,14 +220,14 @@ nx::utils::db::DBResult SystemSharingDataObject::fetchUserSharings(
     QString filterStr;
     if (!filterFields.empty())
     {
-        filterStr = db::joinFields(filterFields, " AND ");
+        filterStr = nx::utils::db::joinFields(filterFields, " AND ");
         sqlRequestStr += " AND " + filterStr;
     }
 
     QSqlQuery selectSharingQuery(*queryContext->connection());
     selectSharingQuery.setForwardOnly(true);
     selectSharingQuery.prepare(sqlRequestStr);
-    db::bindFields(&selectSharingQuery, filterFields);
+    nx::utils::db::bindFields(&selectSharingQuery, filterFields);
     if (!selectSharingQuery.exec())
     {
         NX_LOGX(lm("Error executing request to select sharings with filter \"%1\". %2")

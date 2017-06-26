@@ -80,7 +80,7 @@ nx::utils::db::DBResult AccountDataObject::fetchAccountByEmail(
         NX_LOGX(lm("Error fetching account %1 from DB. %2")
             .arg(accountEmail).arg(fetchAccountQuery.lastError().text()),
             cl_logDEBUG1);
-        return db::DBResult::ioError;
+        return nx::utils::db::DBResult::ioError;
     }
 
     if (!fetchAccountQuery.next())
@@ -91,7 +91,7 @@ nx::utils::db::DBResult AccountDataObject::fetchAccountByEmail(
         QnSql::mapping<data::AccountData>(fetchAccountQuery),
         fetchAccountQuery.record(),
         accountData);
-    return db::DBResult::ok;
+    return nx::utils::db::DBResult::ok;
 }
 
 nx::utils::db::DBResult AccountDataObject::fetchAccounts(
@@ -110,12 +110,12 @@ nx::utils::db::DBResult AccountDataObject::fetchAccounts(
     {
         NX_LOG(lit("Failed to read account list from DB. %1").
             arg(readAccountsQuery.lastError().text()), cl_logWARNING);
-        return db::DBResult::ioError;
+        return nx::utils::db::DBResult::ioError;
     }
 
     QnSql::fetch_many(readAccountsQuery, accounts);
 
-    return db::DBResult::ok;
+    return nx::utils::db::DBResult::ok;
 }
 
 void AccountDataObject::insertEmailVerificationCode(
@@ -194,17 +194,17 @@ nx::utils::db::DBResult AccountDataObject::getAccountEmailByVerificationCode(
         )sql");
     QnSql::bind(verificationCode, &getAccountByVerificationCode);
     if (!getAccountByVerificationCode.exec())
-        return db::DBResult::ioError;
+        return nx::utils::db::DBResult::ioError;
     if (!getAccountByVerificationCode.next())
     {
         NX_LOG(lit("Email verification code %1 was not found in the database").
             arg(QString::fromStdString(verificationCode.code)), cl_logDEBUG1);
-        return db::DBResult::notFound;
+        return nx::utils::db::DBResult::notFound;
     }
     *accountEmail = QnSql::deserialized_field<QString>(
         getAccountByVerificationCode.value(0)).toStdString();
 
-    return db::DBResult::ok;
+    return nx::utils::db::DBResult::ok;
 }
 
 nx::utils::db::DBResult AccountDataObject::removeVerificationCode(
@@ -222,10 +222,10 @@ nx::utils::db::DBResult AccountDataObject::removeVerificationCode(
             .arg(QString::fromStdString(verificationCode.code))
             .arg(removeVerificationCodeQuery.lastError().text()),
             cl_logDEBUG1);
-        return db::DBResult::ioError;
+        return nx::utils::db::DBResult::ioError;
     }
 
-    return db::DBResult::ok;
+    return nx::utils::db::DBResult::ok;
 }
 
 nx::utils::db::DBResult AccountDataObject::updateAccountToActiveStatus(
@@ -245,10 +245,10 @@ nx::utils::db::DBResult AccountDataObject::updateAccountToActiveStatus(
         NX_LOG(lm("Failed to update account %1 status. %2").
             arg(accountEmail).arg(updateAccountStatus.lastError().text()),
             cl_logDEBUG1);
-        return db::DBResult::ioError;
+        return nx::utils::db::DBResult::ioError;
     }
 
-    return db::DBResult::ok;
+    return nx::utils::db::DBResult::ok;
 }
 
 void AccountDataObject::updateAccount(
@@ -319,8 +319,9 @@ void AccountDataObject::executeUpdateAccountQuery(
 {
     nx::utils::db::SqlQuery updateAccountQuery(*queryContext->connection());
     updateAccountQuery.prepare(
-        lit("UPDATE account SET %1 WHERE email=:email").arg(db::joinFields(fieldsToSet, ",")));
-    db::bindFields(&updateAccountQuery.impl(), fieldsToSet);
+        lm("UPDATE account SET %1 WHERE email=:email")
+            .arg(nx::utils::db::joinFields(fieldsToSet, ",")));
+    nx::utils::db::bindFields(&updateAccountQuery.impl(), fieldsToSet);
     updateAccountQuery.bindValue(
         ":email",
         QnSql::serialized_field(accountEmail));

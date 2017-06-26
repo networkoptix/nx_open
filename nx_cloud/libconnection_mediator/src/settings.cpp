@@ -210,7 +210,7 @@ const TrafficRelay& Settings::trafficRelay() const
 
 void Settings::initializeWithDefaultValues()
 {
-    m_dbConnectionOptions.driverType = db::RdbmsDriverType::sqlite;
+    m_dbConnectionOptions.driverType = nx::utils::db::RdbmsDriverType::sqlite;
     m_dbConnectionOptions.dbName = "mediator_statistics.sqlite";
 }
 

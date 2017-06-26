@@ -43,7 +43,7 @@ AccountManager::AccountManager(
     m_emailManager(emailManager),
     m_dao(dao::AccountDataObjectFactory::instance().create())
 {
-    if( fillCache() != db::DBResult::ok )
+    if( fillCache() != nx::utils::db::DBResult::ok )
         throw std::runtime_error( "Failed to fill account cache" );
 }
 
@@ -127,7 +127,7 @@ void AccountManager::registerAccount(
             completionHandler = std::move(completionHandler),
             requestSourceSecured](
                 nx::utils::db::QueryContext* const /*queryContext*/,
-                db::DBResult dbResult,
+                nx::utils::db::DBResult dbResult,
                 data::AccountData /*account*/,
                 data::AccountConfirmationCode confirmationCode)
         {
@@ -201,7 +201,7 @@ void AccountManager::updateAccount(
                 nx::utils::db::DBResult resultCode,
                 data::AccountUpdateDataWithEmail accountData)
         {
-            if (resultCode == db::DBResult::ok)
+            if (resultCode == nx::utils::db::DBResult::ok)
                 updateAccountCache(authenticatedByEmailCode, std::move(accountData));
             completionHandler(dbResultToApiResult(resultCode));
         };
@@ -394,7 +394,7 @@ boost::optional<data::AccountData> AccountManager::findAccountByUserName(
     return m_cache.find(userName);
 }
 
-db::DBResult AccountManager::insertAccount(
+nx::utils::db::DBResult AccountManager::insertAccount(
     nx::utils::db::QueryContext* const queryContext,
     data::AccountData account)
 {
@@ -479,8 +479,11 @@ nx::utils::db::DBResult AccountManager::createPasswordResetCode(
         queryContext,
         tempPasswordData,
         &credentials);
-    if (dbResultCode != nx::utils::db::DBResult::ok && dbResultCode != nx::utils::db::DBResult::notFound)
+    if (dbResultCode != nx::utils::db::DBResult::ok && 
+        dbResultCode != nx::utils::db::DBResult::notFound)
+    {
         return dbResultCode;
+    }
     
     std::string temporaryPassword;
     if (dbResultCode == nx::utils::db::DBResult::ok)
@@ -524,9 +527,9 @@ void AccountManager::setUpdateAccountSubroutine(UpdateAccountSubroutine func)
     m_updateAccountSubroutine = std::move(func);
 }
 
-db::DBResult AccountManager::fillCache()
+nx::utils::db::DBResult AccountManager::fillCache()
 {
-    nx::utils::promise<db::DBResult> cacheFilledPromise;
+    nx::utils::promise<nx::utils::db::DBResult> cacheFilledPromise;
     auto future = cacheFilledPromise.get_future();
 
     //starting async operation
@@ -535,7 +538,7 @@ db::DBResult AccountManager::fillCache()
         std::bind(&AccountManager::fetchAccounts, this, _1),
         [&cacheFilledPromise](
             nx::utils::db::QueryContext* /*queryContext*/,
-            db::DBResult dbResult)
+            nx::utils::db::DBResult dbResult)
         {
             cacheFilledPromise.set_value( dbResult );
         });
@@ -545,7 +548,8 @@ db::DBResult AccountManager::fillCache()
     return future.get();
 }
 
-db::DBResult AccountManager::fetchAccounts(nx::utils::db::QueryContext* queryContext)
+nx::utils::db::DBResult AccountManager::fetchAccounts(
+    nx::utils::db::QueryContext* queryContext)
 {
     std::vector<data::AccountData> accounts;
     auto dbResult = m_dao->fetchAccounts(queryContext, &accounts);
@@ -561,7 +565,7 @@ db::DBResult AccountManager::fetchAccounts(nx::utils::db::QueryContext* queryCon
         }
     }
 
-    return db::DBResult::ok;
+    return nx::utils::db::DBResult::ok;
 }
 
 nx::utils::db::DBResult AccountManager::registerNewAccountInDb(
@@ -630,7 +634,7 @@ nx::utils::db::DBResult AccountManager::registerNewAccountInDb(
         confirmationCode);
 }
 
-db::DBResult AccountManager::issueAccountActivationCode(
+nx::utils::db::DBResult AccountManager::issueAccountActivationCode(
     nx::utils::db::QueryContext* const queryContext,
     const std::string& accountEmail,
     std::unique_ptr<AbstractActivateAccountNotification> notification,
@@ -670,7 +674,7 @@ db::DBResult AccountManager::issueAccountActivationCode(
                 std::function<void(bool)>());
         });
 
-    return db::DBResult::ok;
+    return nx::utils::db::DBResult::ok;
 }
 
 void AccountManager::accountReactivated(
@@ -684,7 +688,7 @@ void AccountManager::accountReactivated(
 {
     //adding activation code only in response to portal
     completionHandler(
-        resultCode == db::DBResult::ok
+        resultCode == nx::utils::db::DBResult::ok
             ? api::ResultCode::ok
             : api::ResultCode::dbError,
         requestSourceSecured
@@ -733,7 +737,7 @@ nx::utils::db::DBResult AccountManager::verifyAccount(
 
     *resultAccountEmail = std::move(accountEmail);
 
-    return db::DBResult::ok;
+    return nx::utils::db::DBResult::ok;
 }
 
 void AccountManager::sendActivateAccountResponse(
@@ -744,7 +748,7 @@ void AccountManager::sendActivateAccountResponse(
     std::string accountEmail,
     std::function<void(api::ResultCode, api::AccountEmail)> completionHandler)
 {
-    if (resultCode != db::DBResult::ok)
+    if (resultCode != nx::utils::db::DBResult::ok)
     {
         return completionHandler(
             dbResultToApiResult(resultCode),

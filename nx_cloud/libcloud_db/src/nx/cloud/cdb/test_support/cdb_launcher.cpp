@@ -27,7 +27,7 @@ namespace cdb {
 // CdbLauncher
 
 CdbLauncher::CdbLauncher(QString tmpDir):
-    db::test::TestWithDbHelper("cdb", tmpDir),
+    nx::utils::db::test::TestWithDbHelper("cdb", tmpDir),
     m_port(0),
     m_connectionFactory(createConnectionFactory(), &destroyConnectionFactory)
 {
@@ -41,8 +41,7 @@ CdbLauncher::CdbLauncher(QString tmpDir):
     const auto dbConnectionOptionsToUse = dbConnectionOptions();
 
     addArg("-db/driverName");
-    addArg(QnLexical::serialized<nx::utils::db::RdbmsDriverType>(
-        dbConnectionOptionsToUse.driverType).toLatin1().constData());
+    addArg(toString(dbConnectionOptionsToUse.driverType));
 
     if (!dbConnectionOptionsToUse.hostName.isEmpty())
     {

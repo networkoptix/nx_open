@@ -126,7 +126,7 @@ private:
         const auto dbResult = m_transactionDataObject.insertOrReplaceTransaction(
             m_currentTran ? m_currentTran.get() : nullptr,
             transactionData);
-        ASSERT_EQ(db::DBResult::ok, dbResult);
+        ASSERT_EQ(nx::utils::db::DBResult::ok, dbResult);
     }
 
     ::ec2::QnTransaction<::ec2::ApiUserData> generateTransaction()
@@ -152,7 +152,7 @@ private:
             0,
             std::numeric_limits<int64_t>::max(),
             &transactions);
-        NX_GTEST_ASSERT_EQ(db::DBResult::ok, resultCode);
+        NX_GTEST_ASSERT_EQ(nx::utils::db::DBResult::ok, resultCode);
         return transactions;
     }
 };

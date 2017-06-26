@@ -217,7 +217,7 @@ protected:
             queryContext.get(),
             m_systemId.c_str(),
             cdb::ec2::SerializableTransaction<::ec2::ApiUserData>(std::move(transaction)));
-        ASSERT_EQ(db::DBResult::cancelled, resultCode);
+        ASSERT_EQ(nx::utils::db::DBResult::cancelled, resultCode);
     }
 
 private:
@@ -337,7 +337,7 @@ private:
             m_systemId.c_str(),
             cdb::ec2::UbjsonSerializedTransaction<::ec2::ApiUserData>(std::move(transaction)));
         ASSERT_TRUE(dbResult == nx::utils::db::DBResult::ok || dbResult == nx::utils::db::DBResult::cancelled)
-            << "Got " << QnLexical::serialized(dbResult).toStdString();
+            << "Got " << toString(dbResult);
     }
 
     ::ec2::QnTransaction<::ec2::ApiUserData> getTransactionFromLog()

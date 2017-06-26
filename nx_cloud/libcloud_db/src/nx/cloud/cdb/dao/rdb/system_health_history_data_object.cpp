@@ -61,12 +61,12 @@ nx::utils::db::DBResult SystemHealthHistoryDataObject::selectHistoryBySystem(
         NX_LOG(lm("Error selecting system %1 history. %2")
             .arg(systemId).arg(selectSystemHealthHistoryQuery.lastError().text()),
             cl_logDEBUG1);
-        return db::DBResult::ioError;
+        return nx::utils::db::DBResult::ioError;
     }
     
     QnSql::fetch_many(selectSystemHealthHistoryQuery, &history->events);
 
-    return db::DBResult::ok;
+    return nx::utils::db::DBResult::ok;
 }
 
 } // namespace rdb

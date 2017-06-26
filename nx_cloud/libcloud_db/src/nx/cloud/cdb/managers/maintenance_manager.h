@@ -30,7 +30,7 @@ public:
     MaintenanceManager(
         const QnUuid& moduleGuid,
         ec2::SyncronizationEngine* const syncronizationEngine,
-        const db::InstanceController& dbInstanceController);
+        const nx::utils::db::InstanceController& dbInstanceController);
     ~MaintenanceManager();
 
     void getVmsConnections(
@@ -55,7 +55,7 @@ public:
 private:
     const QnUuid m_moduleGuid;
     ec2::SyncronizationEngine* const m_syncronizationEngine;
-    const db::InstanceController& m_dbInstanceController;
+    const nx::utils::db::InstanceController& m_dbInstanceController;
     nx::network::aio::Timer m_timer;
     nx::utils::Counter m_startedAsyncCallsCounter;
 

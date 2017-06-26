@@ -17,12 +17,12 @@ namespace rdb {
 namespace test {
 
 class StatisticsRdbDataObject:
-    public db::test::TestWithDbHelper,
+    public nx::utils::db::test::TestWithDbHelper,
     public ::testing::Test
 {
 public:
     StatisticsRdbDataObject():
-        db::test::TestWithDbHelper("hpm", QString())
+        nx::utils::db::test::TestWithDbHelper("hpm", QString())
     {
         init();
     }
@@ -34,9 +34,13 @@ protected:
         auto queryContext = m_dbConnection->begin();
         for (const auto& statsRecord: m_records)
         {
-            ASSERT_EQ(db::DBResult::ok, m_dao.save(queryContext.get(), statsRecord));
+            ASSERT_EQ(
+                nx::utils::db::DBResult::ok,
+                m_dao.save(queryContext.get(), statsRecord));
         }
-        ASSERT_EQ(nx::utils::db::DBResult::ok, queryContext->transaction()->commit());
+        ASSERT_EQ(
+            nx::utils::db::DBResult::ok,
+            queryContext->transaction()->commit());
     }
 
     void havingReinitializedDao()
@@ -51,7 +55,9 @@ protected:
     {
         const auto queryContext = m_dbConnection->begin();
         std::deque<stats::ConnectSession> readRecords;
-        ASSERT_EQ(db::DBResult::ok, m_dao.readAllRecords(queryContext.get(), &readRecords));
+        ASSERT_EQ(
+            nx::utils::db::DBResult::ok,
+            m_dao.readAllRecords(queryContext.get(), &readRecords));
 
         auto comparator =
             [](const stats::ConnectSession& one, const stats::ConnectSession& two)

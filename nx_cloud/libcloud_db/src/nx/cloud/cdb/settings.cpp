@@ -173,7 +173,7 @@ const nx::utils::log::Settings& Settings::vmsSynchronizationLogging() const
     return m_vmsSynchronizationLogging;
 }
 
-const db::ConnectionOptions& Settings::dbConnectionOptions() const
+const nx::utils::db::ConnectionOptions& Settings::dbConnectionOptions() const
 {
     return m_dbConnectionOptions;
 }

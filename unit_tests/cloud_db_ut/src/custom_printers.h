@@ -18,13 +18,16 @@ void PrintTo(ResultCode val, ::std::ostream* os);
 
 } // namespace api
 } // namespace cdb
+} // namespace nx
 
+namespace nx {
+namespace utils {
 namespace db {
 
 void PrintTo(const DBResult val, ::std::ostream* os);
 
 } // namespace db
-
+} // namespace utils
 } // namespace nx
 
 namespace ec2 {

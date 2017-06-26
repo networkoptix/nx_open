@@ -37,13 +37,13 @@ public:
             m_saveMethodBlocker->get_future().wait();
 
         NX_GTEST_ASSERT_EQ(
-            db::DBResult::ok,
+            nx::utils::db::DBResult::ok,
             m_delegate.save(queryContext, std::move(connectionRecord)));
 
         if (m_onRecordSavedHandler)
             m_onRecordSavedHandler();
 
-        return db::DBResult::ok;
+        return nx::utils::db::DBResult::ok;
     }
 
     virtual nx::utils::db::DBResult readAllRecords(
@@ -75,12 +75,12 @@ private:
 };
 
 class Statistics:
-    public db::test::TestWithDbHelper,
+    public nx::utils::db::test::TestWithDbHelper,
     public ::testing::Test
 {
 public:
     Statistics():
-        db::test::TestWithDbHelper("hpm", QString()),
+        nx::utils::db::test::TestWithDbHelper("hpm", QString()),
         m_testDataObject(nullptr)
     {
         init();

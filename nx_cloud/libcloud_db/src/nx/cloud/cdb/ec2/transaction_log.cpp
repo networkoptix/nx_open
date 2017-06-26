@@ -154,7 +154,7 @@ void TransactionLog::shiftLocalTransactionSequence(
 
 nx::utils::db::DBResult TransactionLog::fillCache()
 {
-    nx::utils::promise<db::DBResult> cacheFilledPromise;
+    nx::utils::promise<nx::utils::db::DBResult> cacheFilledPromise;
     auto future = cacheFilledPromise.get_future();
 
     // Starting async operation.
@@ -163,7 +163,7 @@ nx::utils::db::DBResult TransactionLog::fillCache()
         std::bind(&TransactionLog::fetchTransactionState, this, _1),
         [&cacheFilledPromise](
             nx::utils::db::QueryContext* /*queryContext*/,
-            db::DBResult dbResult)
+            nx::utils::db::DBResult dbResult)
         {
             cacheFilledPromise.set_value(dbResult);
         });

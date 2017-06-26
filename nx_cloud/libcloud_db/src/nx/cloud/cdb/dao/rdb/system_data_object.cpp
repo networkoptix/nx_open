@@ -67,11 +67,11 @@ nx::utils::db::DBResult SystemDataObject::selectSystemSequence(
         NX_LOG(lm("Error selecting sequence of system %1. %2")
             .arg(systemId).arg(selectSystemSequence.lastError().text()),
             cl_logDEBUG1);
-        return db::DBResult::ioError;
+        return nx::utils::db::DBResult::ioError;
     }
     *sequence = selectSystemSequence.value(0).toULongLong();
 
-    return db::DBResult::ok;
+    return nx::utils::db::DBResult::ok;
 }
 
 nx::utils::db::DBResult SystemDataObject::markSystemAsDeleted(
@@ -102,10 +102,10 @@ nx::utils::db::DBResult SystemDataObject::markSystemAsDeleted(
         NX_LOG(lm("Error marking system %1 as deleted. %2")
             .arg(systemId).arg(markSystemAsRemoved.lastError().text()),
             cl_logDEBUG1);
-        return db::DBResult::ioError;
+        return nx::utils::db::DBResult::ioError;
     }
 
-    return db::DBResult::ok;
+    return nx::utils::db::DBResult::ok;
 }
 
 nx::utils::db::DBResult SystemDataObject::deleteSystem(
@@ -120,10 +120,10 @@ nx::utils::db::DBResult SystemDataObject::deleteSystem(
         NX_LOG(lm("Could not delete system %1. %2")
             .arg(systemId).arg(removeSystem.lastError().text()),
             cl_logDEBUG1);
-        return db::DBResult::ioError;
+        return nx::utils::db::DBResult::ioError;
     }
 
-    return db::DBResult::ok;
+    return nx::utils::db::DBResult::ok;
 }
 
 nx::utils::db::DBResult SystemDataObject::execSystemNameUpdate(
@@ -142,10 +142,10 @@ nx::utils::db::DBResult SystemDataObject::execSystemNameUpdate(
         NX_LOGX(lm("Failed to update system %1 name in DB to %2. %3")
             .arg(data.systemId).arg(data.name.get())
             .arg(updateSystemNameQuery.lastError().text()), cl_logWARNING);
-        return db::DBResult::ioError;
+        return nx::utils::db::DBResult::ioError;
     }
 
-    return db::DBResult::ok;
+    return nx::utils::db::DBResult::ok;
 }
 
 nx::utils::db::DBResult SystemDataObject::execSystemOpaqueUpdate(
@@ -166,10 +166,10 @@ nx::utils::db::DBResult SystemDataObject::execSystemOpaqueUpdate(
         NX_LOGX(lm("Error updating system %1. %2")
             .arg(data.systemId).arg(updateSystemOpaqueQuery.lastError().text()),
             cl_logWARNING);
-        return db::DBResult::ioError;
+        return nx::utils::db::DBResult::ioError;
     }
 
-    return db::DBResult::ok;
+    return nx::utils::db::DBResult::ok;
 }
 
 nx::utils::db::DBResult SystemDataObject::activateSystem(
@@ -194,10 +194,10 @@ nx::utils::db::DBResult SystemDataObject::activateSystem(
     {
         NX_LOG(lit("Failed to read system list from DB. %1").
             arg(updateSystemStatusQuery.lastError().text()), cl_logWARNING);
-        return db::DBResult::ioError;
+        return nx::utils::db::DBResult::ioError;
     }
 
-    return db::DBResult::ok;
+    return nx::utils::db::DBResult::ok;
 }
 
 nx::utils::db::DBResult SystemDataObject::fetchSystems(
@@ -220,24 +220,24 @@ nx::utils::db::DBResult SystemDataObject::fetchSystems(
     QString filterStr;
     if (!filterFields.empty())
     {
-        filterStr = db::joinFields(filterFields, " AND ");
+        filterStr = nx::utils::db::joinFields(filterFields, " AND ");
         sqlQueryStr += " AND " + filterStr;
     }
 
     QSqlQuery readSystemsQuery(*queryContext->connection());
     readSystemsQuery.setForwardOnly(true);
     readSystemsQuery.prepare(sqlQueryStr);
-    db::bindFields(&readSystemsQuery, filterFields);
+    nx::utils::db::bindFields(&readSystemsQuery, filterFields);
     if (!readSystemsQuery.exec())
     {
         NX_LOG(lit("Failed to read system list with filter \"%1\" from DB. %2")
             .arg(filterStr).arg(readSystemsQuery.lastError().text()),
             cl_logWARNING);
-        return db::DBResult::ioError;
+        return nx::utils::db::DBResult::ioError;
     }
 
     QnSql::fetch_many(readSystemsQuery, systems);
-    return db::DBResult::ok;
+    return nx::utils::db::DBResult::ok;
 }
 
 nx::utils::db::DBResult SystemDataObject::deleteExpiredSystems(nx::utils::db::QueryContext* queryContext)
@@ -261,10 +261,10 @@ nx::utils::db::DBResult SystemDataObject::deleteExpiredSystems(nx::utils::db::Qu
     {
         NX_LOGX(lit("Error deleting expired systems from DB. %1").
             arg(dropExpiredSystems.lastError().text()), cl_logWARNING);
-        return db::DBResult::ioError;
+        return nx::utils::db::DBResult::ioError;
     }
 
-    return db::DBResult::ok;
+    return nx::utils::db::DBResult::ok;
 }
 
 } // namespace rdb

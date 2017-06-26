@@ -24,7 +24,7 @@ namespace cdb {
 
 class CdbLauncher:
     public utils::test::ModuleLauncher<CloudDbServicePublic>,
-    public db::test::TestWithDbHelper
+    public nx::utils::db::test::TestWithDbHelper
 {
 public:
     //!Calls \a start

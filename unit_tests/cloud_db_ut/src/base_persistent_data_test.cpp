@@ -141,7 +141,7 @@ nx::utils::db::AsyncSqlQueryExecutor& DaoHelper::queryExecutor()
 //-------------------------------------------------------------------------------------------------
 
 BasePersistentDataTest::BasePersistentDataTest(DbInitializationType dbInitializationType):
-    db::test::TestWithDbHelper("cdb", QString()),
+    nx::utils::db::test::TestWithDbHelper("cdb", QString()),
     DaoHelper(dbConnectionOptions())
 {
     if (dbInitializationType == DbInitializationType::immediate)

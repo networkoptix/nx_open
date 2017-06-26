@@ -111,7 +111,7 @@ private:
 //-------------------------------------------------------------------------------------------------
 
 class BasePersistentDataTest:
-    public db::test::TestWithDbHelper,
+    public nx::utils::db::test::TestWithDbHelper,
     public DaoHelper
 {
 public:

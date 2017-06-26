@@ -36,10 +36,10 @@ nx::utils::db::DBResult AccountDataObject::fetchAccountByEmail(
 {
     auto it = m_emailToAccount.find(accountEmail);
     if (it == m_emailToAccount.end())
-        return db::DBResult::notFound;
+        return nx::utils::db::DBResult::notFound;
 
     *accountData = it->second;
-    return db::DBResult::ok;
+    return nx::utils::db::DBResult::ok;
 }
 
 nx::utils::db::DBResult AccountDataObject::fetchAccounts(
@@ -47,7 +47,7 @@ nx::utils::db::DBResult AccountDataObject::fetchAccounts(
     std::vector<data::AccountData>* /*accounts*/)
 {
     // TODO
-    return db::DBResult::ok;
+    return nx::utils::db::DBResult::ok;
 }
 
 void AccountDataObject::insertEmailVerificationCode(
@@ -82,7 +82,7 @@ nx::utils::db::DBResult AccountDataObject::getAccountEmailByVerificationCode(
         return nx::utils::db::DBResult::notFound;
 
     *accountEmail = it->second;
-    return db::DBResult::ok;
+    return nx::utils::db::DBResult::ok;
 }
 
 nx::utils::db::DBResult AccountDataObject::removeVerificationCode(
@@ -90,7 +90,7 @@ nx::utils::db::DBResult AccountDataObject::removeVerificationCode(
     const data::AccountConfirmationCode& verificationCode)
 {
     m_verificationCodeToEmail.erase(verificationCode.code);
-    return db::DBResult::ok;
+    return nx::utils::db::DBResult::ok;
 }
 
 nx::utils::db::DBResult AccountDataObject::updateAccountToActiveStatus(
@@ -99,7 +99,7 @@ nx::utils::db::DBResult AccountDataObject::updateAccountToActiveStatus(
     std::chrono::system_clock::time_point /*activationTime*/)
 {
     // TODO
-    return db::DBResult::ok;
+    return nx::utils::db::DBResult::ok;
 }
 
 void AccountDataObject::updateAccount(

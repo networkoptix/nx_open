@@ -5,6 +5,7 @@
 #include <nx/utils/db/db_statistics_collector.h>
 
 namespace nx {
+namespace utils {
 namespace db {
 
 #define DurationStatistics_Fields (min)(max)(average)
@@ -18,6 +19,7 @@ QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
     (json))
 
 } // namespace db
+} // namespace utils
 } // namespace nx
 
 namespace nx {

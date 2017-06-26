@@ -14,12 +14,12 @@ namespace cdb {
 namespace test {
 
 class Controller:
-    public db::test::TestWithDbHelper,
+    public nx::utils::db::test::TestWithDbHelper,
     public ::testing::Test
 {
 public:
     Controller():
-        db::test::TestWithDbHelper("cdb", QString())
+        nx::utils::db::test::TestWithDbHelper("cdb", QString())
     {
     }
 

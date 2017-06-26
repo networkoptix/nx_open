@@ -62,7 +62,7 @@ nx::utils::db::DBResult SchedulerDbHelper::getScheduleData(
         scheduleData->taskToParams[taskId].period = std::chrono::milliseconds(periodMs);
     }
 
-    return db::DBResult::ok;
+    return nx::utils::db::DBResult::ok;
 }
 
 nx::utils::db::DBResult SchedulerDbHelper::subscribe(
