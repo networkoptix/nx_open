@@ -84,8 +84,7 @@ void QnAutoRequestForwarder::processRequest(nx_http::Request* const request)
         }
         else
         {
-            NX_VERBOSE(this) lm("Cloud request. Skipped: No servers found")
-                .arg(servers.front()->getId().toString());
+            NX_VERBOSE(this) lm("Cloud request. Skipped: No servers found");
         }
         return;
     }

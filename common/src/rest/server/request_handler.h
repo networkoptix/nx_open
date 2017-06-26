@@ -38,15 +38,29 @@ public:
     // TODO: #rvasilenko looks like QnRestConnectionProcessor* is used only to get and modify its
     // headers.
 
-    /** @return Http status code. */
+    /**
+     * @return Http status code.
+     */
     virtual int executeGet(
         const QString& path,
         const QnRequestParamList& params,
         QByteArray& result,
         QByteArray& contentType,
-        const QnRestConnectionProcessor* /*owner*/) = 0;
+        const QnRestConnectionProcessor* owner) = 0;
 
-    /** @return Http status code. */
+    /**
+     * @return HTTP status code.
+     */
+    virtual int executeDelete(
+        const QString& path,
+        const QnRequestParamList& params,
+        QByteArray& result,
+        QByteArray& contentType,
+        const QnRestConnectionProcessor* owner);
+
+    /**
+     * @return HTTP status code.
+     */
     virtual int executePost(
         const QString& path,
         const QnRequestParamList& params,
@@ -54,7 +68,19 @@ public:
         const QByteArray& srcBodyContentType,
         QByteArray& result,
         QByteArray& resultContentType,
-        const QnRestConnectionProcessor* /*owner*/) = 0;
+        const QnRestConnectionProcessor* owner) = 0;
+
+    /**
+     * @return HTTP status code.
+     */
+    virtual int executePut(
+            const QString& path,
+            const QnRequestParamList& params,
+            const QByteArray& body,
+            const QByteArray& srcBodyContentType,
+            QByteArray& result,
+            QByteArray& resultContentType,
+            const QnRestConnectionProcessor* owner);
 
     virtual void afterExecute(
         const QString& /*path*/,

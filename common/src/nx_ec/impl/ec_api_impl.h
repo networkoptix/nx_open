@@ -108,7 +108,9 @@ namespace ec2
         //!Connection to peer is impossible due to incompatible protocol
         incompatiblePeer,
         //!Can't check authorization because of cloud is offline
-        cloud_temporary_unauthorized
+        cloud_temporary_unauthorized,
+        //!User is disabled
+        disabled_user_unauthorized
 
     };
 

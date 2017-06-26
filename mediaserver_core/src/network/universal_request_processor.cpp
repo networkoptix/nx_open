@@ -227,10 +227,10 @@ bool QnUniversalRequestProcessor::processRequest(bool noAuth)
     if ( !needToStop() )
     {
         copyClientRequestTo(*d->processor);
-        if (d->processor->isTakeSockOwnership())
+        if (d->processor->isSocketTaken())
             d->socket.clear(); // some of handlers have addition thread and depend of socket destructor. We should clear socket immediately to prevent race condition
         d->processor->execute(d->mutex);
-        if (!d->processor->isTakeSockOwnership())
+        if (!d->processor->isSocketTaken())
             d->processor->releaseSocket();
         else
             d->socket.clear(); // some of handlers set ownership dynamically during a execute call. So, check it again.

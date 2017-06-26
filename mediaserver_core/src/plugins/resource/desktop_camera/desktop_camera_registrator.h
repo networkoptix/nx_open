@@ -10,13 +10,10 @@ class QnDesktopCameraRegistratorPrivate;
 class QnDesktopCameraRegistrator: public QnTCPConnectionProcessor
 {
 public:
-    QnDesktopCameraRegistrator(QSharedPointer<AbstractStreamSocket> socket, QnTcpListener* _owner);
-    
-    virtual bool isTakeSockOwnership() const override { return true; }
+    QnDesktopCameraRegistrator(QSharedPointer<AbstractStreamSocket> socket, QnTcpListener* owner);
+
 protected:
     virtual void run();
-private:
-    Q_DECLARE_PRIVATE(QnDesktopCameraRegistrator);
 };
 
 #endif //ENABLE_DESKTOP_CAMERA

@@ -1,6 +1,6 @@
-New message
+הודעה חדשה
 
-Type: {{message.type}}
-Data: {{{message.data}}}
+סוג: {{message.type}}
+נתונים: {{{message.data}}}
 
-There is no specific template for this type of message
+אין תבנית ספציפית עבור סוג זה של הודעה

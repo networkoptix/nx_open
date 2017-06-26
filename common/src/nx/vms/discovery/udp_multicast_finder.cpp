@@ -105,6 +105,15 @@ void UdpMulticastFinder::updateInterfaces()
     }
 }
 
+void UdpMulticastFinder::setIsMulticastEnabledFunction(utils::MoveOnlyFunc<bool()> function)
+{
+    m_updateTimer.dispatch(
+        [this, function = std::move(function)]() mutable
+        {
+            m_isMulticastEnabledFunction = std::move(function);
+        });
+}
+
 std::unique_ptr<network::UDPSocket> UdpMulticastFinder::makeSocket(const SocketAddress& endpoint)
 {
     auto socket = std::make_unique<network::UDPSocket>();
@@ -178,6 +187,13 @@ void UdpMulticastFinder::sendModuleInformation(Senders::iterator senderIterator)
 {
     const auto socket = senderIterator->second.get();
     socket->cancelIOSync(network::aio::etNone);
+    if (m_isMulticastEnabledFunction && !m_isMulticastEnabledFunction())
+    {
+        NX_LOGX(lm("Multicasts are disabled by function"), cl_logDEBUG1);
+        return socket->registerTimer(m_sendInterval,
+            [this, senderIterator](){ sendModuleInformation(senderIterator); });
+    }
+
     socket->sendToAsync(m_ownModuleInformation, m_multicastEndpoint,
         [this, senderIterator, socket](SystemError::ErrorCode code, SocketAddress, size_t)
         {

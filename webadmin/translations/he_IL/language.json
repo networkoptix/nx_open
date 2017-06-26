@@ -109,6 +109,6 @@
     "reserved":"שמור"
   },
   "pageTitles":{
-    "default":"{{PRODUCT_NAME}} web interface"
+    "default":"ממשק אינטרנט ל {{PRODUCT_NAME}}"
   }
 }

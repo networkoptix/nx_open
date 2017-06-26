@@ -167,15 +167,15 @@
     </message>
     <message>
       <source>Server &quot;%1&quot; Failure</source>
-      <translation type="unfinished">Server &quot;%1&quot; Failure</translation>
+      <translation>תקלה בשרת &quot;%1&quot;</translation>
     </message>
     <message>
       <source>Server &quot;%1&quot; Conflict</source>
-      <translation type="unfinished">Server &quot;%1&quot; Conflict</translation>
+      <translation>קונפליקט בשרת &quot;%1&quot;</translation>
     </message>
     <message>
       <source>Server &quot;%1&quot; Started</source>
-      <translation type="unfinished">Server &quot;%1&quot; Started</translation>
+      <translation>שרת &quot;%1&quot; הופעל</translation>
     </message>
     <message>
       <source>Event: %1</source>
@@ -391,16 +391,16 @@
     <message>
       <source>%2 &lt;b&gt;%1&lt;/b&gt;</source>
       <comment>%1 means time, %2 means date</comment>
-      <translation type="unfinished">%2 &lt;b&gt;%1&lt;/b&gt;</translation>
+      <translation>%2 &lt;b&gt;%1&lt;/b&gt;</translation>
     </message>
     <message numerus="yes">
       <source>%n times, first: %2 &lt;b&gt;%1&lt;/b&gt;</source>
       <comment>%1 means time, %2 means date</comment>
-      <translation type="unfinished">
-        <numerusform>%n times, first: %2 &lt;b&gt;%1&lt;/b&gt;</numerusform>
-        <numerusform>%n times, first: %2 &lt;b&gt;%1&lt;/b&gt;</numerusform>
-        <numerusform>%n times, first: %2 &lt;b&gt;%1&lt;/b&gt;</numerusform>
-        <numerusform>%n times, first: %2 &lt;b&gt;%1&lt;/b&gt;</numerusform>
+      <translation>
+        <numerusform>%n פעמים, ראשון: %2 &lt;b&gt;%1&lt;/b&gt;</numerusform>
+        <numerusform>%n פעמים, ראשון: %2 &lt;b&gt;%1&lt;/b&gt;</numerusform>
+        <numerusform>%n פעמים, ראשון: %2 &lt;b&gt;%1&lt;/b&gt;</numerusform>
+        <numerusform>%n פעמים, ראשון: %2 &lt;b&gt;%1&lt;/b&gt;</numerusform>
       </translation>
     </message>
     <message>
@@ -488,11 +488,11 @@
     </message>
     <message>
       <source>Server &quot;%1&quot; has a license problem</source>
-      <translation type="unfinished">Server &quot;%1&quot; has a license problem</translation>
+      <translation>לשרת &quot;%1&quot; יש בעיית רישוי</translation>
     </message>
     <message>
       <source>Server &quot;%1&quot; has finished an archive backup</source>
-      <translation type="unfinished">Server &quot;%1&quot; has finished an archive backup</translation>
+      <translation>שרת &quot;%1&quot; סיים גיבוי ארכיון</translation>
     </message>
     <message>
       <source>Archive backup finished, but is not fully completed because backup time is over. Data is backed up to %1</source>
@@ -509,65 +509,65 @@
     </message>
     <message>
       <source>Software Trigger</source>
-      <translation type="unfinished">Software Trigger</translation>
+      <translation>מיתוג תוכנתי</translation>
     </message>
     <message>
       <source>Software trigger %1 at %2</source>
-      <translation type="unfinished">Software trigger %1 at %2</translation>
+      <translation>מיתוג תוכנתי %1 ב %2</translation>
     </message>
     <message>
       <source>Software Trigger %1 has been activated multiple times</source>
-      <translation type="unfinished">Software Trigger %1 has been activated multiple times</translation>
+      <translation>מיתוג תוכנתי %1 הופעל מספר פעמים</translation>
     </message>
     <message>
       <source>Multiple %1 events have occured</source>
-      <translation type="unfinished">Multiple %1 events have occured</translation>
+      <translation>התרחשו אירועים מרובים של %1</translation>
     </message>
     <message>
       <source>Trigger: %1</source>
-      <translation type="unfinished">Trigger: %1</translation>
+      <translation>מיתוג: %1</translation>
     </message>
     <message>
       <source>HDD/SSD disk &quot;%1&quot; is full. Disk contains too much data that is not managed by VMS.</source>
-      <translation type="unfinished">HDD/SSD disk &quot;%1&quot; is full. Disk contains too much data that is not managed by VMS.</translation>
+      <translation>הכונן הקשיח &quot;%1&quot; מלא. הכונן מכיל יותר מדי מידע שאינו מנוהל על ידי מערכת ההקלטה.</translation>
     </message>
     <message>
       <source>System disk &quot;%1&quot; is almost full.</source>
-      <translation type="unfinished">System disk &quot;%1&quot; is almost full.</translation>
+      <translation>דיסק המערכת &quot;%1&quot; כמעט מלא.</translation>
     </message>
     <message>
       <source>Default Trigger</source>
-      <translation type="unfinished">Default Trigger</translation>
+      <translation>מיתוג ברירת מחדל</translation>
     </message>
     <message>
       <source>All Users</source>
-      <translation type="unfinished">All Users</translation>
+      <translation>כל המשתמשים</translation>
     </message>
     <message>
       <source>Role</source>
-      <translation type="unfinished">Role</translation>
+      <translation>תפקיד</translation>
     </message>
     <message numerus="yes">
       <source>%n Users</source>
-      <translation type="unfinished">
-        <numerusform>%n Users</numerusform>
-        <numerusform>%n Users</numerusform>
-        <numerusform>%n Users</numerusform>
-        <numerusform>%n Users</numerusform>
+      <translation>
+        <numerusform>%n משתמשים</numerusform>
+        <numerusform>%n משתמשים</numerusform>
+        <numerusform>%n משתמשים</numerusform>
+        <numerusform>%n משתמשים</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n Roles</source>
-      <translation type="unfinished">
-        <numerusform>%n Roles</numerusform>
-        <numerusform>%n Roles</numerusform>
-        <numerusform>%n Roles</numerusform>
-        <numerusform>%n Roles</numerusform>
+      <translation>
+        <numerusform>%n תפקידים</numerusform>
+        <numerusform>%n תפקידים</numerusform>
+        <numerusform>%n תפקידים</numerusform>
+        <numerusform>%n תפקידים</numerusform>
       </translation>
     </message>
     <message>
       <source>All Administrators</source>
-      <translation type="unfinished">All Administrators</translation>
+      <translation>כל מנהלי המערכת</translation>
     </message>
   </context>
   <context>
@@ -602,7 +602,7 @@
     </message>
     <message>
       <source>Received bad response from Server %1: &quot;%2&quot;.</source>
-      <translation type="unfinished">Received bad response from Server %1: &quot;%2&quot;.</translation>
+      <translation>התקבלה תגובה לא תקינה מהשרת %1: &quot;%2&quot;.</translation>
     </message>
     <message>
       <source>Check if Server is up and has the proper version.</source>
@@ -626,7 +626,7 @@
     </message>
     <message>
       <source>An input/output error has occurred. OS message: &quot;%1&quot;.</source>
-      <translation type="unfinished">An input/output error has occurred. OS message: &quot;%1&quot;.</translation>
+      <translation>שגיאת קלט/פלט אירעה. הודעת מערכת ההפעלה: &quot;%1&quot;.</translation>
     </message>
     <message>
       <source>Parameters:</source>
@@ -650,11 +650,11 @@
     </message>
     <message>
       <source>Device request &quot;%1&quot; failed with error &quot;%2&quot;.</source>
-      <translation type="unfinished">Device request &quot;%1&quot; failed with error &quot;%2&quot;.</translation>
+      <translation>בקשת ההתקן &quot;%1&quot; נכשלה עם שגיאה &quot;%2&quot;.</translation>
     </message>
     <message>
       <source>Camera request &quot;%1&quot; failed with error &quot;%2&quot;.</source>
-      <translation type="unfinished">Camera request &quot;%1&quot; failed with error &quot;%2&quot;.</translation>
+      <translation>בקשת המצלמה &quot;%1&quot; נכשלה עם שגיאה &quot;%2&quot;.</translation>
     </message>
     <message>
       <source>Unknown device issue.</source>
@@ -694,7 +694,7 @@
     </message>
     <message>
       <source>I/O Module request &quot;%1&quot; failed with error &quot;%2&quot;.</source>
-      <translation type="unfinished">I/O Module request &quot;%1&quot; failed with error &quot;%2&quot;.</translation>
+      <translation>בקשת התקן קלט/פלט &quot;%1&quot; נכשלה עם שגיאה &quot;%2&quot;.</translation>
     </message>
     <message>
       <source>Unknown I/O module issue.</source>
@@ -782,7 +782,7 @@
     </message>
     <message>
       <source>Camera was restored from archive. Delete the camera and add it again to view Live video.</source>
-      <translation type="unfinished">Camera was restored from archive. Delete the camera and add it again to view Live video.</translation>
+      <translation>המצלמה שוחזרה מארכיון. מחק את המצלמה והוסף אותה שוב לתצוגת וידאו חי.</translation>
     </message>
   </context>
   <context>
@@ -882,11 +882,11 @@
     </message>
     <message>
       <source>Edge</source>
-      <translation type="unfinished">Edge</translation>
+      <translation>קצה</translation>
     </message>
     <message>
       <source>Vmax</source>
-      <translation type="unfinished">Vmax</translation>
+      <translation>Vmax</translation>
     </message>
     <message>
       <source>Video Wall</source>
@@ -898,7 +898,7 @@
     </message>
     <message>
       <source>Start</source>
-      <translation type="unfinished">Start</translation>
+      <translation>התחל</translation>
     </message>
     <message>
       <source>Analog Encoder</source>

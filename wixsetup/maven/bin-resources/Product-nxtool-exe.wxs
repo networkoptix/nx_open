@@ -27,7 +27,7 @@
                 LaunchTarget="$(var.nxtoolInstallFullPath)\$(var.nxtoolName).exe"/>
         </BootstrapperApplicationRef>
 
-        <Variable Name="InstallerTitle" Value="!(loc.InstallerTitleServerTool)" />
+        <Variable Name="InstallerTitle" Value="Server tool" />
 
         <WixVariable Id="WixExtbaThemeXml" Value="OptixTheme.xml" />
         <WixVariable Id="WixExtbaThemeWxl" Value="OptixTheme_$(var.installerLanguage).wxl" />

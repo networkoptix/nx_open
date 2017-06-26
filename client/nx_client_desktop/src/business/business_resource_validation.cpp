@@ -2,6 +2,8 @@
 
 #include <QtWidgets/QLayout>
 
+#include <business/business_action_parameters.h>
+
 #include <common/common_module.h>
 #include <client_core/client_core_module.h>
 
@@ -336,3 +338,25 @@ bool QnSendEmailActionDelegate::isValidUser(const QnUserResourcePtr& user)
 
     return nx::email::isValidAddress(user->getEmail());
 }
+
+namespace QnBusiness {
+
+// TODO: #vkutin It's here until full refactoring.
+bool actionAllowedForUser(const QnBusinessActionParameters& params, const QnUserResourcePtr& user)
+{
+    if (!user)
+        return false;
+
+    const auto& subjects = params.additionalResources;
+    if (subjects.empty())
+        return true;
+
+    const auto userId = user->getId();
+    if (std::find(subjects.cbegin(), subjects.cend(), userId) != subjects.cend())
+        return true;
+
+    const auto roleId = QnUserRolesManager::unifiedUserRoleId(user);
+    return std::find(subjects.cbegin(), subjects.cend(), roleId) != subjects.cend();
+}
+
+} // namespace QnBusiness

@@ -19,7 +19,22 @@ int QnFusionRestHandler::executePost(
     return nx_http::StatusCode::notImplemented;
 }
 
+int QnFusionRestHandler::executePut(
+    const QString& /*path*/, const QnRequestParamList& /*params*/, const QByteArray& /*body*/,
+    const QByteArray& /*srcBodyContentType*/, QByteArray& /*result*/,
+    QByteArray& /*resultContentType*/, const QnRestConnectionProcessor* /*processor*/)
+{
+    return nx_http::StatusCode::notImplemented;
+}
+
 int QnFusionRestHandler::executeGet(
+    const QString& /*path*/, const QnRequestParamList& /*params*/, QByteArray& /*result*/,
+    QByteArray& /*contentType*/, const QnRestConnectionProcessor* /*processor*/)
+{
+    return nx_http::StatusCode::notImplemented;
+}
+
+int QnFusionRestHandler::executeDelete(
     const QString& /*path*/, const QnRequestParamList& /*params*/, QByteArray& /*result*/,
     QByteArray& /*contentType*/, const QnRestConnectionProcessor* /*processor*/)
 {

@@ -274,5 +274,17 @@
         <resource name = "AXISC1004" public = "AXISC3003E"/>
         <resource name = "AXISM1045" public = "AXISM3004"/>
         <resource name = "AXISQ6054" public = "AXISM3004"/>
+        <resource name = "AXISQ1659" public = "AXIS_COMMON">
+            <params>
+                <param name = "MaxFPS" default_value = "8"/>
+            </params>
+        </resource>
+        <resource name = "AXISP3227" public = "AXISM3104"/>
+        <resource name = "AXISP3228" public = "AXISM3104"/>
+        <resource name = "AXISQ1942" public = "AXIS_COMMON">
+            <params>
+                <param name = "MaxFPS" default_value = "30"/>
+            </params>
+        </resource>
     </oem>
 </resources>
