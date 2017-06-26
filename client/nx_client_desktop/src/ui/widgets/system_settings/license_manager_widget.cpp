@@ -28,7 +28,7 @@
 #include <core/resource/media_server_resource.h>
 #include <core/resource/user_resource.h>
 
-#include <client/client_translation_manager.h>
+#include <client/client_runtime_settings.h>
 
 #include <licensing/license.h>
 #include <licensing/license_validator.h>
@@ -440,7 +440,7 @@ void QnLicenseManagerWidget::updateFromServer(const QByteArray &licenseKey, bool
     params.addQueryItem(lit("box"), runtimeData.box);
     params.addQueryItem(lit("brand"), runtimeData.brand);
     params.addQueryItem(lit("version"), qnStaticCommon->engineVersion().toString());
-    params.addQueryItem(lit("lang"), commonModule()->instance<QnClientTranslationManager>()->getCurrentLanguage());
+    params.addQueryItem(lit("lang"), qnRuntime->locale());
 
     if (!runtimeData.nx1mac.isEmpty())
     {

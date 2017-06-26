@@ -30,6 +30,11 @@ public:
         nx::db::QueryContext* const queryContext,
         data::TemporaryAccountCredentials tempPasswordData) override;
 
+    virtual nx::db::DBResult fetchTemporaryCredentials(
+        nx::db::QueryContext* const queryContext,
+        const data::TemporaryAccountCredentials& tempPasswordData,
+        data::Credentials* credentials) override;
+
     virtual nx::db::DBResult removeTemporaryPasswordsFromDbByAccountEmail(
         nx::db::QueryContext* const queryContext,
         std::string accountEmail) override;

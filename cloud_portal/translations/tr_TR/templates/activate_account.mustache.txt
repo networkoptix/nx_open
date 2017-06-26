@@ -1,0 +1,8 @@
+{{PRODUCT_NAME}}'e hoş geldiniz
+
+{{PRODUCT_NAME}}'e katıldığınız için teşekkür ederiz. E-posta adresinizi doğrulamak ve hesabı etkinleştirmek için lütfen aşağıdaki düğmeye tıklayın.
+
+Hesabı etkinleştir: {{config.portal_url}} / etkinleştir / {{message.code}}
+
+{{PRODUCT_NAME}}'e kaydolmadıysanız, bu e-postayı yok sayın.
+Lütfen mesajı veya bağlantıyı üçüncü taraflarla paylaşmayın.

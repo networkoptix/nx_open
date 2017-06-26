@@ -199,26 +199,24 @@ void QnSendEmailActionDelegate::init(QWidget* parent)
     parent->layout()->addWidget(m_warningLabel);
 }
 
-bool QnSendEmailActionDelegate::validate(const QSet<QnUuid>& selected)
+QString QnSendEmailActionDelegate::validationMessage(const QSet<QnUuid>& selected) const
 {
-    if (!m_warningLabel)
-        return true;
-
-    bool valid = isValidList(selected, QString());
-    m_warningLabel->setVisible(!valid);
-    if (!valid)
-        m_warningLabel->setText(getText(selected, true, QString()));
-    return true;
+    const bool valid = isValidList(selected, QString()); //TODO: FIXME! Why additional is empty?
+    return valid ? QString() : getText(selected, true, QString());
 }
 
 bool QnSendEmailActionDelegate::isValid(const QnUuid& resourceId) const
 {
+    if (resourceId.isNull()) //< custom permissions "Custom" role is not accepted.
+        return false;
+
     if (auto user = resourcePool()->getResourceById<QnUserResource>(resourceId))
         return isValidUser(user);
 
     /* We can get here either user id or role id. User should be checked additionally, role is
      * always counted as valid (if exists). */
-    return !userRolesManager()->userRole(resourceId).isNull();
+    return !userRolesManager()->userRole(resourceId).isNull()
+        || userRolesManager()->predefinedRole(resourceId) != Qn::UserRole::CustomUserRole;
 }
 
 bool QnSendEmailActionDelegate::isValidList(const QSet<QnUuid>& ids, const QString& additional)
@@ -240,6 +238,8 @@ bool QnSendEmailActionDelegate::isValidList(const QSet<QnUuid>& ids, const QStri
     const auto additionalRecipients = parseAdditional(additional);
     if (!all_of(additionalRecipients, nx::email::isValidAddress))
         return false;
+
+    //TODO: #vkutin #3.1 Handle predefined roles if this function is still relevant.
 
     /* Using lazy calculations to avoid counting roles when not needed. */
     return !users.empty()

@@ -1,0 +1,67 @@
+<form class="form" role="form" novalidate name="form" id="mergeDialog">
+    <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" ng-click="cancel()"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+        <h3 class="modal-title">Samenvoegen van systemen</h3>
+    </div>
+
+    <div class="col-sm-12">
+        <ng-form name="findSystemForm">
+            <div class="form-group">
+                <label for="otherSystemUrl" class="control-label">URL van het andere systeem</label>
+                <div class="">
+                    <div class="input-group" dropdown>
+                        <input type="text" ng-model="settings.url" class="form-control" id="otherSystemUrl" placeholder="host: poort" required />
+
+                        <ul class="dropdown-menu" role="menu" id="discoveredUrls">
+                            <li ng-if="systems.discoveredUrls.length == 0" id="no-systems-message"><a>Geen systemen gevonden</a></li>
+                            <li ng-repeat="system in systems.discoveredUrls"
+                                ng-class="{disabled:!system.compatible}">
+                                <a ng-click="system.compatible && selectSystem(system);">{{system.visibleName}}</a>
+                            </li>
+                        </ul>
+
+                        <span type="button" class="input-group-addon dropdown-toggle">
+                            <span class="caret"></span>
+                        </span>
+                    </div>
+                </div>
+            </div>
+
+
+
+            <div class="form-group">
+                <label for="otherSystemLogin" class="control-label">Login van het andere systeem</label>
+                <div class="">
+                    <input ng-model="settings.login" name="otherSystemLogin" id="otherSystemLogin" class="form-control" type="text"
+                           placeholder="Login" required>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="otherSystemPassword" class="control-label">Wachtwoord van het andere systeem</label>
+                <div class="">
+                    <input type="password" ng-model="settings.password"  class="form-control" id="otherSystemPassword"
+                           autocomplete="new-password"
+                           placeholder="Wachtwoord"/>
+                </div>
+            </div>
+        </ng-form>
+
+        <div class="form-group" ng-class="{hidden:!systems.systemFound}">
+            <label for="currentSystemPassword" class="control-label">Huidige wachtwoord (voor dit systeem)</label>
+            <div class="">
+                <input type="password" ng-model="settings.currentPassword"  class="form-control" id="currentSystemPassword" placeholder="Wachtwoord" required />
+            </div>
+        </div>
+
+        <div class="form-group" ng-class="{hidden:!systems.systemFound}">
+            <p>Het huidige systeem zal worden samengevoegd <b>{{systems.systemName}}</b> met systeem <b>{{systems.joinSystemName}}</b></p>
+            <p>
+                Het nieuwe systeem zal hebben wachtwoord en de naam krijgen van het volgende systeem: <br/> <label><input type="radio" name="keepMySystem" ng-value="true" ng-disabled="systems.remoteSystemIsNew" ng-model="settings.keepMySystem" id="checkbox-current-system"/> {{systems.systemName}} (huidige)</label> <br/> <label ng-if="!systems.remoteSystemIsNew"><input type="radio" name="keepMySystem" ng-value="false" ng-disabled="systems.remoteSystemIsNew" ng-model="settings.keepMySystem" id="checkbox-external-system"/> {{systems.joinSystemName}}</label>
+            </p>
+        </div>
+    </div>
+    <div class="modal-footer" >
+        <button class="btn btn-default" ng-class="{'btn-primary':!systems.systemFound}" name="button" ng-click="test()" ng-disabled="findSystemForm.$invalid">Systeem zoeken</button>         <button class="btn btn-primary " ng-class="{hidden:!systems.systemFound}" id="merge-systems-button" name="button" ng-click="join()" ng-disabled="form.$invalid">Samenvoegen met {{systems.joinSystemName}}</button>
+    </div>
+</form>

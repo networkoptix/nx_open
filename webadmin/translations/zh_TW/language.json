@@ -1,5 +1,4 @@
 {
-  "language":"zh_TW",
   "language_name":"繁体中文",
   "dialogs":{
     "okButton":"確定",
@@ -103,16 +102,13 @@
     "installationError":"更新失敗. 無法執行安裝腳本.",
     "selectFiles":"選擇檔案"
   },
-  "cameraLinks":{
-    "highStream":"高解析串流",
-    "lowStream":"低解析串流",
-    "transcoding":"轉碼",
-    "unknown":"未知"
-  },
   "advanced":{
     "free":"可用",
     "total":"合計",
     "occupied":"被佔用",
     "reserved":"保留"
+  },
+  "pageTitles":{
+    "default":"{{PRODUCT_NAME}} web interface"
   }
 }

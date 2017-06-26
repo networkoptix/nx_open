@@ -139,7 +139,7 @@ def brand_file(filename):
     save_content(filename, active_content)
 
 
-def brand_directory(directory, file_filter, exclude_file = None):
+def brand_directory(directory, file_filter, exclude_file=None):
     all_strings = []
     for root, dirs, files in os.walk(directory):
         for filename in files:

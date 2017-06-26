@@ -1,6 +1,8 @@
 from ..models import *
 import os
 import re
+import json
+import codecs
 
 
 STATIC_DIR = 'static/{{customization}}/source/'
@@ -16,9 +18,12 @@ def make_dir(filename):
                 raise
 
 
-def customizable_file(filename):
-    supported_format = filename.endswith('.json') or filename.endswith('.html') or filename.endswith('.mustache')
-    supported_directory = "lang_" not in filename or "lang_en_US" in filename
+def customizable_file(filename, ignore_not_english):
+    supported_format = filename.endswith('.json') or \
+                       filename.endswith('.html') or \
+                       filename.endswith('.mustache') or \
+                       filename.endswith('apple-app-site-association')
+    supported_directory = not ignore_not_english or "lang_" not in filename or "lang_en_US" in filename
     return supported_format and supported_directory
 
 
@@ -33,37 +38,45 @@ def context_for_file(filename, customization_name):
     return context_name, language
 
 
-def iterate_cms_files(customization_name):
+def iterate_cms_files(customization_name, ignore_not_english):
     custom_dir = STATIC_DIR.replace("{{customization}}", customization_name)
     for root, dirs, files in os.walk(custom_dir):
         for filename in files:
             file = os.path.join(root, filename)
-            if customizable_file(file):
+            if customizable_file(file, ignore_not_english):
                 yield file
 
 
-def process_context_structure(customization, context, content, language):
+def process_context_structure(customization, context, content, language, version_id):
     for record in context.datastructure_set.all():
+        content_record = None
+        content_value = None
         # try to get translated content
         if language:
             content_record = DataRecord.objects.filter(language_id=language.id,
                                                        data_structure_id=record.id,
                                                        customization_id=customization.id)
         # if not - get default language
-        if not content_record.exists():
+        if not content_record or not content_record.exists():
             content_record = DataRecord.objects.filter(language_id=customization.default_language_id,
                                                        data_structure_id=record.id,
                                                        customization_id=customization.id)
 
         # if not - get record without language
-        if not content_record.exists():
+        if not content_record or not content_record.exists():
             content_record = DataRecord.objects.filter(language_id=None,
                                                        data_structure_id=record.id,
                                                        customization_id=customization.id)
 
         if content_record and content_record.exists():
-            content_value = content_record.first().value
-        else:  # if no value - use default value from structure
+            if not version_id:
+                content_value = content_record.latest('created_date').value
+            else:  # here find a datarecord with version_id which is not more than version_id
+                content_record = content_record.filter(version_id__lte=version_id)  # filter only accepted content_records
+                if content_record.exists():
+                    content_value = content_record.latest('version_id').value
+
+        if not content_value:  # if no value - use default value from structure
             content_value = record.default
 
         # replace marker with value
@@ -71,21 +84,24 @@ def process_context_structure(customization, context, content, language):
     return content
 
 
-def process_file(source_file, customization, product_id, preview):
+def process_file(source_file, customization, product_id, preview, version_id):
     context_name, language_code = context_for_file(source_file, customization.name)
 
     branding_context = Context.objects.filter(name='branding')
-    context = Context.objects.filter(name=context_name, product_id=product_id)
+    context = Context.objects.filter(file_path=context_name, product_id=product_id)
     if language_code:
-        language = Language.objects.get(code=language_code)
+        language = Language.objects.filter(code=language_code)
+        if not language.exists():
+            return
+        language = language.first()
 
     with open(source_file, 'r') as file:
         content = file.read()
 
-    if branding_context.exists():
-        content = process_context_structure(customization, branding_context.first(), content, None)
     if context.exists() and language:
-        content = process_context_structure(customization, context.first(), content, language)
+        content = process_context_structure(customization, context.first(), content, language, version_id)
+    if branding_context.exists():
+        content = process_context_structure(customization, branding_context.first(), content, None, version_id)
 
     filename = context_name
     if language_code:
@@ -100,13 +116,48 @@ def process_file(source_file, customization, product_id, preview):
         file.write(content)
 
 
-def fill_content(customization_name='default', product='cloud_portal', preview=True):
+def generate_languages_json(customization_name, preview):
+    def save_content(filename, content):
+        if filename:
+            # proceed with branding
+            make_dir(filename)
+            with codecs.open(filename, "w", "utf-8") as file:
+                file.write(content)
+    customization = Customization.objects.get(name=customization_name)
+    languages_json = [{"name": lang.name, "language": lang.code} for lang in customization.languages.all()]
+    if not preview:
+        target_file = os.path.join('static', customization.name, 'static', 'languages.json')
+    else:
+        target_file = os.path.join('static', customization.name, 'preview', 'static', 'languages.json')
+    save_content(target_file, json.dumps(languages_json, ensure_ascii=False))
+
+
+def fill_content(customization_name='default', product='cloud_portal', preview=True, version_id=None):
+
+    # if preview=False
+    #   retrieve latest accepted version
+    #   if version_id is not None and version_id!=latest_id - raise exception
+    # else
+    #   if version_id is None - preview latest available datarecords
+    #   else - preview specific version
     product_id = Product.objects.get(name=product).id
     customization = Customization.objects.get(name=customization_name)
 
+    if not preview:
+        if version_id is not None:
+            raise Exception(
+                'Only latest accepted version can be published without preview flag, version_id id forbidden')
+        versions = ContentVersion.objects.filter(customization_id=customization.id, accepted_date__isnull=False)
+        if versions.exists():
+            version_id = versions.latest('accepted_date')
+        else:
+            version_id = 0
+
+    # here we use version_id if specified, or latest data records otherwise
+
     # iterate all files (same way we fill structure)
-    for source_file in iterate_cms_files(customization_name):
-        process_file(source_file, customization, product_id, preview)
+    for source_file in iterate_cms_files(customization_name, False):
+        process_file(source_file, customization, product_id, preview, version_id)
 
-
+    generate_languages_json(customization_name, preview)
 # from cms.controllers.filldata import *

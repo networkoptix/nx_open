@@ -30,6 +30,7 @@ class Context(models.Model):
 DATA_TYPES = (
     (0, 'Text'),
     (1, 'Image'),
+    (2, 'HTML'),
 )
 
 
@@ -46,6 +47,10 @@ class DataStructure(models.Model):
     def __str__(self):
         return self.name
 
+    @staticmethod
+    def get_type(name):
+        return next((type[0] for type in DATA_TYPES if DATA_TYPES[1] == name), 0)
+
 
 # CMS settings. Release engineer can change that
 
@@ -54,7 +59,7 @@ class Language(models.Model):
     code = models.CharField(max_length=8, unique=True)
 
     def __str__(self):
-        return self.name
+        return self.code
 
 
 class Customization(models.Model):
@@ -85,7 +90,7 @@ class ContentVersion(models.Model):
 
 class DataRecord(models.Model):
     data_structure = models.ForeignKey(DataStructure)
-    language = models.ForeignKey(Language)
+    language = models.ForeignKey(Language, null=True)
     customization = models.ForeignKey(Customization)
     version = models.ForeignKey(ContentVersion, null=True, blank=True)
 
@@ -96,6 +101,7 @@ class DataRecord(models.Model):
 
     def __str__(self):
         return self.value
+
 
 class Blank(models.Model):
 

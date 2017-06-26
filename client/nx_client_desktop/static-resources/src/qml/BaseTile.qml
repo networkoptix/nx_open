@@ -2,6 +2,7 @@ import QtQuick 2.5;
 import QtQuick.Controls 1.2;
 import QtGraphicalEffects 1.0;
 import Qt.labs.controls 1.0;
+import com.networkoptix.qml 1.0;
 
 import "."
 
@@ -19,8 +20,6 @@ Item
     property alias titleLabel: systemNameLabel;
     property alias collapseButton: collapseTileButton;
     property alias menuButton: menuButtonControl;
-    property alias indicator: primaryIndicator;
-    property alias secondaryIndicator: otherIndicator;
 
     property alias areaLoader: areaLoader;
 
@@ -32,7 +31,7 @@ Item
     property bool isCloudTile: false;
     property string systemId;
     property string localId;
-
+    property real collapsedItemsOpacity: 1
     signal collapsedTileClicked(int buttons, int x, int y);
 
     property bool forceImmediateAnimation: false;
@@ -134,20 +133,14 @@ Item
 
                 PropertyChanges
                 {
-                    target: primaryIndicator;
-                    opacity: 1;
-                }
-
-                PropertyChanges
-                {
-                    target: otherIndicator;
-                    opacity: 1;
-                }
-
-                PropertyChanges
-                {
                     target: menuButtonControl;
                     opacity: 1;
+                }
+
+                PropertyChanges
+                {
+                    target: control
+                    collapsedItemsOpacity: 1
                 }
             },
 
@@ -176,7 +169,6 @@ Item
                     opacity: 0;
                 }
 
-
                 PropertyChanges
                 {
                     target: shadow;
@@ -185,20 +177,14 @@ Item
 
                 PropertyChanges
                 {
-                    target: primaryIndicator;
-                    opacity: 0;
-                }
-
-                PropertyChanges
-                {
-                    target: otherIndicator;
-                    opacity: 0;
-                }
-
-                PropertyChanges
-                {
                     target: menuButtonControl;
                     opacity: 0;
+                }
+
+                PropertyChanges
+                {
+                    target: control
+                    collapsedItemsOpacity: 0
                 }
             }
         ]
@@ -253,24 +239,6 @@ Item
                         properties: "opacity";
                         easing.type: Easing.OutCubic;
                         duration: control.getDuration(400);
-                    }
-
-                    NumberAnimation
-                    {
-                        target: primaryIndicator;
-                        properties: "opacity";
-                        easing.type: (tileHolder.state == "collapsed" ?
-                              Easing.InCubic : Easing.OutCubic);
-                        duration: control.getDuration(200);
-                    }
-
-                    NumberAnimation
-                    {
-                        target: otherIndicator;
-                        properties: "opacity";
-                        easing.type: (tileHolder.state == "collapsed" ?
-                              Easing.InCubic : Easing.OutCubic);
-                        duration: control.getDuration(200);
                     }
                 }
 
@@ -445,60 +413,19 @@ Item
                     showBackground: false;
 
                     bkgColor: tileArea.color;
-                    onClicked:
-                    {
-                        // Hides both cloud and local offline tiles
-                        if (isCloudTile)
-                            context.hideSystem(control.systemId);
-                        context.hideSystem(control.localId);
-                    }
+                    onClicked: context.hideSystem(control.systemId, control.localId);
                 }
 
                 Loader
                 {
                     id: areaLoader;
 
-                    property bool visibleIndicators:
-                        ((primaryIndicator.visible && (primaryIndicator.opacity == 1.0))
-                         || (otherIndicator.visible && (otherIndicator.opacity == 1.0)));
-                    anchors.left: parent.left;
-                    anchors.right: (visibleIndicators
-                        ? indicatorsRow.left
-                        : parent.right);
+                    x: 12
+                    width: parent.width - x - 14
                     anchors.top: systemNameLabel.bottom;
-
-                    anchors.leftMargin: 12;
-                    anchors.rightMargin: (visibleIndicators ? 0 : 16);
 
                     sourceComponent: control.centralAreaDelegate;
                 }
-
-                Row
-                {
-                    id: indicatorsRow;
-
-                    anchors.right: parent.right;
-                    anchors.top: parent.top;
-                    anchors.rightMargin: 14;
-                    anchors.topMargin: 66;
-
-                    spacing: 2;
-
-                    Indicator
-                    {
-                        id: otherIndicator;
-
-                        visible: false;
-                    }
-
-                    Indicator
-                    {
-                        id: primaryIndicator;
-
-                        visible: false;
-                    }
-                }
-
             }
 
             NxDotPreloader
