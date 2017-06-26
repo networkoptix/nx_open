@@ -626,7 +626,7 @@ QString QnBusinessStringsHelper::bruleDescriptionText(const QnBusinessEventRuleP
 
 QString QnBusinessStringsHelper::defaultSoftwareTriggerName()
 {
-    return tr("Default Trigger");
+    return tr("Trigger Name");
 }
 
 QString QnBusinessStringsHelper::getSoftwareTriggerName(const QString& id)
