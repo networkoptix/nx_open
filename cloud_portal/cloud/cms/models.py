@@ -80,7 +80,7 @@ class ContentVersion(models.Model):
                                     related_name='accepted_%(class)s')
 
     def __str__(self):
-        return self.name
+        return str(self.id)
 
 
 class DataRecord(models.Model):

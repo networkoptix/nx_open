@@ -19,10 +19,29 @@
             {% endif %}
         </div>
     {% endfor %}
+
     <div class="submit-row">
-        <button type="submit" name="GetDataStructures" value="GetDataStructures">Get Data Structures</button>
-        <button type="submit" name="Save" value="Save">Save</button>
+        <button type="submit" name="GetDataStructures" value="1">Get Data Structures</button>
+        <button type="submit" name="SaveDraft" value="1">Save Draft</button>
         <button type="reset" value="Reset">Reset</button>
     </div>
+    {% if post_made %}
+    <div class="submit-row">
+        <button type="submit" name="Preview" value="1">Preview Page</button>
+        <button type="submit" name="SendReview" value="1">Send For Review</button>
+        <button type="submit" name="Publish" value="1">Publish Page</button>
+    </div>
+    {% endif %}
 </form>
+
+{% if preview_link %}
+<div class="submit-row">
+<button onClick="openPreview()">Open Preview</button>
+
+<script>
+    function openPreview(){
+        window.open("{{preview_link}}");
+    }
+</script>
+{% endif %}
 {% endblock%}

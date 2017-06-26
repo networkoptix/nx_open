@@ -37,7 +37,7 @@ admin.site.register(DataRecord, DataRecordAdmin)
 
 
 class ContentVersionAdmin(admin.ModelAdmin):
-    list_display = ('customization', 'name',
+    list_display = ('id', 'customization',
                     'created_date', 'created_by',
                     'accepted_date', 'accepted_by')
 admin.site.register(ContentVersion, ContentVersionAdmin)

@@ -33,6 +33,9 @@ class Account(PermissionsMixin):
     def get_username(self):
         return self.email
 
+    def __str__(self):
+        return self.get_username()
+
     @staticmethod
     def is_authenticated():
         return True

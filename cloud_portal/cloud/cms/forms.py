@@ -19,17 +19,12 @@ class CustomForm(forms.ModelForm):
 		for data_structure in data_structures:
 			ds_name = data_structure.name
 			ds_description = data_structure.description
-			latest_record = data_structure.datarecord_set.latest('created_date')
-			record_value = latest_record.value
+			latest_record = data_structure.datarecord_set
+			
+			record_value = latest_record.latest('created_date').value if latest_record.exists() else ""
 
 			self.fields[ds_name] = forms.CharField(widget=forms.Textarea,
 												   required=False,
 												   label=ds_name,
 												   help_text=ds_description,
 												   initial=record_value)
-
-class ContextForm(forms.ModelForm):
-
-	class Meta():
-		fields = "__all__"
-		model = DataStructure
