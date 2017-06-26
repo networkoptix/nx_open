@@ -14,6 +14,9 @@
 #include <utils/common/util.h>
 #include <utils/math/math.h>
 #include <utils/crypt/symmetrical.h>
+#include <common/static_common_module.h>
+#include "core/resource/resource_data.h"
+#include "core/resource_management/resource_data_pool.h"
 
 namespace {
 
@@ -67,6 +70,7 @@ QnPhysicalCameraResource::QnPhysicalCameraResource():
     m_channelNumber(0)
 {
     setFlags(Qn::local_live_cam);
+    m_lastInitTime.invalidate();
 }
 
 float QnPhysicalCameraResource::rawSuggestBitrateKbps(Qn::StreamQuality quality, QSize resolution, int fps) const
@@ -173,7 +177,22 @@ QSize QnPhysicalCameraResource::getNearestResolution(const QSize& resolution, fl
     return bestIndex >= 0 ? resolutionList[bestIndex]: EMPTY_RESOLUTION_PAIR;
 }
 
-CameraDiagnostics::Result QnPhysicalCameraResource::initInternal() {
+CameraDiagnostics::Result QnPhysicalCameraResource::initInternal()
+{
+    auto resData = qnStaticCommon->dataPool()->data(toSharedPointer(this));
+    int timeoutSec = resData.value<int>(lit("unauthorizedTimeoutSec"));
+    auto credentials = getAuth();
+    auto status = getStatus();
+    if (timeoutSec > 0 &&
+        m_lastInitTime.isValid() &&
+        m_lastInitTime.elapsed() < timeoutSec * 1000 &&
+        status == Qn::Unauthorized &&
+        m_unauthorizedCredentials == credentials)
+    {
+        m_unauthorizedCredentials = credentials;
+        return CameraDiagnostics::NotAuthorisedResult(getUrl());
+    }
+    m_lastInitTime.restart();
     return CameraDiagnostics::NoErrorResult();
 }
 
