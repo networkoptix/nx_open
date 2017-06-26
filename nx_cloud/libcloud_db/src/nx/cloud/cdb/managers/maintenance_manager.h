@@ -6,7 +6,7 @@
 #include <nx_ec/data/api_fwd.h>
 #include <nx/network/aio/timer.h>
 #include <nx/utils/counter.h>
-#include <utils/db/db_instance_controller.h>
+#include <nx/utils/db/db_instance_controller.h>
 
 #include "../data/statistics_data.h"
 #include "../data/system_data.h"

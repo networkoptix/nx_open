@@ -11,7 +11,7 @@
 #include <nx/utils/basic_service_settings.h>
 
 #include <utils/common/command_line_parser.h>
-#include <utils/db/types.h>
+#include <nx/utils/db/types.h>
 #include <utils/email/email.h>
 
 #include "ec2/p2p_sync_settings.h"

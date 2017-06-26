@@ -8,8 +8,8 @@
 #include <nx/fusion/serialization/sql.h>
 #include <nx/utils/test_support/utils.h>
 
-#include <utils/db/async_sql_query_executor.h>
-#include <utils/db/types.h>
+#include <nx/utils/db/async_sql_query_executor.h>
+#include <nx/utils/db/types.h>
 
 #include "test_setup.h"
 
@@ -35,14 +35,14 @@ protected:
     template<typename RecordStructure>
     std::vector<RecordStructure> executeSelect(const QString& queryText)
     {
-        nx::utils::promise<nx::db::DBResult> queryCompletedPromise;
+        nx::utils::promise<nx::utils::db::DBResult> queryCompletedPromise;
         auto future = queryCompletedPromise.get_future();
 
         std::vector<RecordStructure> records;
 
         asyncSqlQueryExecutor()->executeSelect(
             [queryText, &records](
-                nx::db::QueryContext* queryContext)
+                nx::utils::db::QueryContext* queryContext)
             {
                 QSqlQuery query(*queryContext->connection());
                 query.prepare(queryText);
@@ -52,7 +52,7 @@ protected:
                 return DBResult::ok;
             },
             [&queryCompletedPromise](
-                nx::db::QueryContext* /*queryContext*/,
+                nx::utils::db::QueryContext* /*queryContext*/,
                 DBResult dbResult)
             {
                 queryCompletedPromise.set_value(dbResult);
@@ -66,13 +66,13 @@ protected:
     template<typename DbQueryFunc>
     DBResult executeQuery(DbQueryFunc dbQueryFunc)
     {
-        nx::utils::promise<nx::db::DBResult> queryCompletedPromise;
+        nx::utils::promise<nx::utils::db::DBResult> queryCompletedPromise;
 
         //starting async operation
         asyncSqlQueryExecutor()->executeUpdate(
             dbQueryFunc,
             [&queryCompletedPromise](
-                nx::db::QueryContext* /*queryContext*/, DBResult dbResult)
+                nx::utils::db::QueryContext* /*queryContext*/, DBResult dbResult)
             {
                 queryCompletedPromise.set_value(dbResult);
             });

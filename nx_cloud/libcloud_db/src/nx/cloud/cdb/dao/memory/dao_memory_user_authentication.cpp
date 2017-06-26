@@ -9,7 +9,7 @@ namespace dao {
 namespace memory {
 
 boost::optional<std::string> UserAuthentication::fetchSystemNonce(
-    nx::db::QueryContext* const /*queryContext*/,
+    nx::utils::db::QueryContext* const /*queryContext*/,
     const std::string& systemId)
 {
     auto it = m_systemIdToNonce.find(systemId);
@@ -19,7 +19,7 @@ boost::optional<std::string> UserAuthentication::fetchSystemNonce(
 }
 
 void UserAuthentication::insertOrReplaceSystemNonce(
-    nx::db::QueryContext* const /*queryContext*/,
+    nx::utils::db::QueryContext* const /*queryContext*/,
     const std::string& systemId,
     const std::string& nonce)
 {
@@ -27,7 +27,7 @@ void UserAuthentication::insertOrReplaceSystemNonce(
 }
 
 api::AuthInfo UserAuthentication::fetchUserAuthRecords(
-    nx::db::QueryContext* const /*queryContext*/,
+    nx::utils::db::QueryContext* const /*queryContext*/,
     const std::string& systemId,
     const std::string& accountId)
 {
@@ -39,7 +39,7 @@ api::AuthInfo UserAuthentication::fetchUserAuthRecords(
 }
 
 void UserAuthentication::insertUserAuthRecords(
-    nx::db::QueryContext* const /*queryContext*/,
+    nx::utils::db::QueryContext* const /*queryContext*/,
     const std::string& systemId,
     const std::string& accountId,
     const api::AuthInfo& userAuthRecords)
@@ -49,7 +49,7 @@ void UserAuthentication::insertUserAuthRecords(
 
 std::vector<AbstractUserAuthentication::SystemInfo> 
     UserAuthentication::fetchAccountSystems(
-        nx::db::QueryContext* const /*queryContext*/,
+        nx::utils::db::QueryContext* const /*queryContext*/,
         const std::string& accountId)
 {
     std::vector<SystemInfo> result;
@@ -75,7 +75,7 @@ std::vector<AbstractUserAuthentication::SystemInfo>
 }
 
 void UserAuthentication::deleteAccountAuthRecords(
-    nx::db::QueryContext* const /*queryContext*/,
+    nx::utils::db::QueryContext* const /*queryContext*/,
     const std::string& accountId)
 {
     for (auto it = m_userAuthInfo.begin(); it != m_userAuthInfo.end(); )

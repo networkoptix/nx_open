@@ -51,7 +51,7 @@ const std::unique_ptr<AsyncSqlQueryExecutor>& BaseDbTest::asyncSqlQueryExecutor(
 void BaseDbTest::executeUpdate(const QString& queryText)
 {
     const auto dbResult = executeQuery(
-        [queryText](nx::db::QueryContext* queryContext)
+        [queryText](nx::utils::db::QueryContext* queryContext)
         {
             QSqlQuery query(*queryContext->connection());
             query.prepare(queryText);

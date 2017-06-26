@@ -21,8 +21,8 @@ SystemDataObject::SystemDataObject(const conf::Settings& settings):
 {
 }
 
-nx::db::DBResult SystemDataObject::insert(
-    nx::db::QueryContext* const queryContext,
+nx::utils::db::DBResult SystemDataObject::insert(
+    nx::utils::db::QueryContext* const queryContext,
     const data::SystemData& system,
     const std::string& accountId)
 {
@@ -44,14 +44,14 @@ nx::db::DBResult SystemDataObject::insert(
         NX_LOG(lm("Could not insert system %1 (%2) into DB. %3")
             .arg(system.name).arg(system.id).arg(insertSystemQuery.lastError().text()),
             cl_logDEBUG1);
-        return nx::db::DBResult::ioError;
+        return nx::utils::db::DBResult::ioError;
     }
 
-    return nx::db::DBResult::ok;
+    return nx::utils::db::DBResult::ok;
 }
 
-nx::db::DBResult SystemDataObject::selectSystemSequence(
-    nx::db::QueryContext* const queryContext,
+nx::utils::db::DBResult SystemDataObject::selectSystemSequence(
+    nx::utils::db::QueryContext* const queryContext,
     const std::string& systemId,
     std::uint64_t* const sequence)
 {
@@ -74,8 +74,8 @@ nx::db::DBResult SystemDataObject::selectSystemSequence(
     return db::DBResult::ok;
 }
 
-nx::db::DBResult SystemDataObject::markSystemAsDeleted(
-    nx::db::QueryContext* const queryContext,
+nx::utils::db::DBResult SystemDataObject::markSystemAsDeleted(
+    nx::utils::db::QueryContext* const queryContext,
     const std::string& systemId)
 {
     QSqlQuery markSystemAsRemoved(*queryContext->connection());
@@ -108,8 +108,8 @@ nx::db::DBResult SystemDataObject::markSystemAsDeleted(
     return db::DBResult::ok;
 }
 
-nx::db::DBResult SystemDataObject::deleteSystem(
-    nx::db::QueryContext* const queryContext,
+nx::utils::db::DBResult SystemDataObject::deleteSystem(
+    nx::utils::db::QueryContext* const queryContext,
     const std::string& systemId)
 {
     QSqlQuery removeSystem(*queryContext->connection());
@@ -126,8 +126,8 @@ nx::db::DBResult SystemDataObject::deleteSystem(
     return db::DBResult::ok;
 }
 
-nx::db::DBResult SystemDataObject::execSystemNameUpdate(
-    nx::db::QueryContext* const queryContext,
+nx::utils::db::DBResult SystemDataObject::execSystemNameUpdate(
+    nx::utils::db::QueryContext* const queryContext,
     const data::SystemAttributesUpdate& data)
 {
     QSqlQuery updateSystemNameQuery(*queryContext->connection());
@@ -148,8 +148,8 @@ nx::db::DBResult SystemDataObject::execSystemNameUpdate(
     return db::DBResult::ok;
 }
 
-nx::db::DBResult SystemDataObject::execSystemOpaqueUpdate(
-    nx::db::QueryContext* const queryContext,
+nx::utils::db::DBResult SystemDataObject::execSystemOpaqueUpdate(
+    nx::utils::db::QueryContext* const queryContext,
     const data::SystemAttributesUpdate& data)
 {
     // TODO: #ak: this is a copy-paste of a previous method. Refactor!
@@ -172,8 +172,8 @@ nx::db::DBResult SystemDataObject::execSystemOpaqueUpdate(
     return db::DBResult::ok;
 }
 
-nx::db::DBResult SystemDataObject::activateSystem(
-    nx::db::QueryContext* const queryContext,
+nx::utils::db::DBResult SystemDataObject::activateSystem(
+    nx::utils::db::QueryContext* const queryContext,
     const std::string& systemId)
 {
     QSqlQuery updateSystemStatusQuery(*queryContext->connection());
@@ -200,9 +200,9 @@ nx::db::DBResult SystemDataObject::activateSystem(
     return db::DBResult::ok;
 }
 
-nx::db::DBResult SystemDataObject::fetchSystems(
-    nx::db::QueryContext* queryContext,
-    const nx::db::InnerJoinFilterFields& filterFields,
+nx::utils::db::DBResult SystemDataObject::fetchSystems(
+    nx::utils::db::QueryContext* queryContext,
+    const nx::utils::db::InnerJoinFilterFields& filterFields,
     std::vector<data::SystemData>* const systems)
 {
     constexpr const char kSelectAllSystemsQuery[] =
@@ -240,7 +240,7 @@ nx::db::DBResult SystemDataObject::fetchSystems(
     return db::DBResult::ok;
 }
 
-nx::db::DBResult SystemDataObject::deleteExpiredSystems(nx::db::QueryContext* queryContext)
+nx::utils::db::DBResult SystemDataObject::deleteExpiredSystems(nx::utils::db::QueryContext* queryContext)
 {
     //dropping expired not-activated systems and expired marked-for-removal systems
     QSqlQuery dropExpiredSystems(*queryContext->connection());

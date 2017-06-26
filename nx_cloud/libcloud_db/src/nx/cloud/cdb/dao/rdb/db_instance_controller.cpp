@@ -17,10 +17,10 @@ constexpr auto kDbRepeatedConnectionAttemptDelay = std::chrono::seconds(5);
 } // namespace
 
 DbInstanceController::DbInstanceController(
-    const nx::db::ConnectionOptions& dbConnectionOptions,
+    const nx::utils::db::ConnectionOptions& dbConnectionOptions,
     boost::optional<unsigned int> dbVersionToUpdateTo)
     :
-    nx::db::InstanceController(dbConnectionOptions),
+    nx::utils::db::InstanceController(dbConnectionOptions),
     m_userAuthRecordsMigrationNeeded(false)
 {
     initializeStructureMigration();
@@ -30,8 +30,8 @@ DbInstanceController::DbInstanceController(
     if (!initialize())
     {
         NX_LOG(lit("Failed to initialize DB connection"), cl_logALWAYS);
-        throw nx::db::Exception(
-            nx::db::DBResult::ioError,
+        throw nx::utils::db::Exception(
+            nx::utils::db::DBResult::ioError,
             "Failed to initialize connection to DB");
     }
 }
@@ -76,8 +76,8 @@ void DbInstanceController::initializeStructureMigration()
     dbStructureUpdater().addUpdateScript(db::kRenameGroupToRole);
     dbStructureUpdater().addUpdateScript(db::kSetIsEnabledToTrueWhereUndefined);
     dbStructureUpdater().addUpdateScript(
-        {{nx::db::RdbmsDriverType::mysql, db::kRestoreSystemToAccountReferenceUniquenessMySql},
-         {nx::db::RdbmsDriverType::unknown, db::kRestoreSystemToAccountReferenceUniquenessSqlite}});
+        {{nx::utils::db::RdbmsDriverType::mysql, db::kRestoreSystemToAccountReferenceUniquenessMySql},
+         {nx::utils::db::RdbmsDriverType::unknown, db::kRestoreSystemToAccountReferenceUniquenessSqlite}});
     dbStructureUpdater().addUpdateScript(db::kAddAccountTimestamps);
     dbStructureUpdater().addUpdateScript(db::kAddSystemRegistrationTimestamp);
     dbStructureUpdater().addUpdateScript(db::kAddSystemHealthStateHistory);
@@ -87,10 +87,10 @@ void DbInstanceController::initializeStructureMigration()
     dbStructureUpdater().addUpdateScript(db::kAddSystemUserAuthInfo);
     dbStructureUpdater().addUpdateScript(db::kAddSystemNonce);
     dbStructureUpdater().addUpdateFunc(
-        [this](nx::db::QueryContext*)
+        [this](nx::utils::db::QueryContext*)
         {
             m_userAuthRecordsMigrationNeeded = true;
-            return nx::db::DBResult::ok;
+            return nx::utils::db::DBResult::ok;
         });
 }
 

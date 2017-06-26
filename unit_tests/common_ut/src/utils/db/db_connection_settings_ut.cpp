@@ -4,7 +4,7 @@
 #include <nx/utils/settings.h>
 #include <nx/utils/uuid.h>
 
-#include <utils/db/types.h>
+#include <nx/utils/db/types.h>
 
 namespace nx {
 namespace db {

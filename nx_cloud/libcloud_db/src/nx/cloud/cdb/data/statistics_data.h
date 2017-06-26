@@ -2,7 +2,7 @@
 
 #include <nx/fusion/model_functions_fwd.h>
 
-#include <utils/db/db_statistics_collector.h>
+#include <nx/utils/db/db_statistics_collector.h>
 
 namespace nx {
 namespace db {
@@ -27,7 +27,7 @@ namespace data {
 struct Statistics
 {
     int onlineServerCount;
-    nx::db::QueryStatistics dbQueryStatistics;
+    nx::utils::db::QueryStatistics dbQueryStatistics;
     std::size_t pendingSqlQueryCount;
 
     Statistics():

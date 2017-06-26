@@ -11,7 +11,7 @@ namespace ec2 {
 namespace migration {
 namespace addHistoryToTransaction {
 
-nx::db::DBResult migrate(nx::db::QueryContext* const queryContext)
+nx::utils::db::DBResult migrate(nx::utils::db::QueryContext* const queryContext)
 {
     return detail::upgradeSerializedTransactions<
         before::QnAbstractTransaction,

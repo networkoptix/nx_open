@@ -3,8 +3,8 @@
 #include <nx/utils/random.h>
 #include <nx/utils/test_support/utils.h>
 
-#include <utils/db/db_connection_holder.h>
-#include <utils/db/test_support/test_with_db_helper.h>
+#include <nx/utils/db/db_connection_holder.h>
+#include <nx/utils/db/test_support/test_with_db_helper.h>
 
 #include <statistics/dao/rdb/instance_controller.h>
 #include <statistics/dao/rdb/rdb_data_object.h>
@@ -36,7 +36,7 @@ protected:
         {
             ASSERT_EQ(db::DBResult::ok, m_dao.save(queryContext.get(), statsRecord));
         }
-        ASSERT_EQ(nx::db::DBResult::ok, queryContext->transaction()->commit());
+        ASSERT_EQ(nx::utils::db::DBResult::ok, queryContext->transaction()->commit());
     }
 
     void havingReinitializedDao()
@@ -66,14 +66,14 @@ protected:
     }
 
 private:
-    std::unique_ptr<nx::db::DbConnectionHolder> m_dbConnection;
+    std::unique_ptr<nx::utils::db::DbConnectionHolder> m_dbConnection;
     std::unique_ptr<rdb::InstanceController> m_dbInstance;
     rdb::DataObject m_dao;
     std::deque<stats::ConnectSession> m_records;
 
     void init()
     {
-        m_dbConnection = std::make_unique<nx::db::DbConnectionHolder>(dbConnectionOptions());
+        m_dbConnection = std::make_unique<nx::utils::db::DbConnectionHolder>(dbConnectionOptions());
         ASSERT_TRUE(m_dbConnection->open());
 
         ASSERT_NO_THROW(

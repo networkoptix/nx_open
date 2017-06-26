@@ -12,7 +12,7 @@ namespace cdb {
 
 SystemHealthInfoProvider::SystemHealthInfoProvider(
     ec2::ConnectionManager* ec2ConnectionManager,
-    nx::db::AsyncSqlQueryExecutor* const dbManager)
+    nx::utils::db::AsyncSqlQueryExecutor* const dbManager)
     :
     m_ec2ConnectionManager(ec2ConnectionManager),
     m_dbManager(dbManager),
@@ -57,7 +57,7 @@ void SystemHealthInfoProvider::getSystemHealthHistory(
         [locker = m_startedAsyncCallsCounter.getScopedIncrement(),
             completionHandler = std::move(completionHandler),
             resultData = std::move(resultData)](
-                nx::db::QueryContext* /*queryContext*/,
+                nx::utils::db::QueryContext* /*queryContext*/,
                 db::DBResult dbResult)
         {
             completionHandler(dbResultToApiResult(dbResult), std::move(*resultData));
@@ -80,7 +80,7 @@ void SystemHealthInfoProvider::onSystemStatusChanged(
         std::bind(&dao::rdb::SystemHealthHistoryDataObject::insert,
             &m_systemHealthHistoryDataObject, _1, systemId, healthHistoryItem),
         [this, systemId, locker = m_startedAsyncCallsCounter.getScopedIncrement()](
-            nx::db::QueryContext* /*queryContext*/,
+            nx::utils::db::QueryContext* /*queryContext*/,
             db::DBResult dbResult)
         {
             NX_LOGX(lm("Save system %1 history item finished with result %2")

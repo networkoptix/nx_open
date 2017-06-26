@@ -28,11 +28,11 @@ bool insertOrReplaceWebPage(
         )
     )sql");
 
-    if (!SqlQueryExecutionHelper::prepareSQLQuery(&query, queryStr, Q_FUNC_INFO))
+    if (!nx::utils::db::SqlQueryExecutionHelper::prepareSQLQuery(&query, queryStr, Q_FUNC_INFO))
         return false;
 
     query.bindValue(":internalId", internalId);
-    return SqlQueryExecutionHelper::execSQLQuery(&query, Q_FUNC_INFO);
+    return nx::utils::db::SqlQueryExecutionHelper::execSQLQuery(&query, Q_FUNC_INFO);
 }
 
 bool saveWebPage(ec2::database::api::Context* resourceContext, const ApiWebPageData& webPage)

@@ -20,7 +20,7 @@ public:
     SyncronizationEngine(
         const QnUuid& moduleGuid,
         const Settings& settings,
-        nx::db::AsyncSqlQueryExecutor* const dbManager);
+        nx::utils::db::AsyncSqlQueryExecutor* const dbManager);
     ~SyncronizationEngine();
 
     OutgoingTransactionDispatcher& outgoingTransactionDispatcher();

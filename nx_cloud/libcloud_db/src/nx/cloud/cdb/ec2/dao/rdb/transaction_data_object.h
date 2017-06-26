@@ -1,7 +1,7 @@
 #pragma once
 
-#include <utils/db/types.h>
-#include <utils/db/query_context.h>
+#include <nx/utils/db/types.h>
+#include <nx/utils/db/query_context.h>
 
 #include "../abstract_transaction_data_object.h"
 
@@ -15,17 +15,17 @@ class TransactionDataObject:
     public AbstractTransactionDataObject
 {
 public:
-    virtual nx::db::DBResult insertOrReplaceTransaction(
-        nx::db::QueryContext* queryContext,
+    virtual nx::utils::db::DBResult insertOrReplaceTransaction(
+        nx::utils::db::QueryContext* queryContext,
         const TransactionData& transactionData) override;
 
-    virtual nx::db::DBResult updateTimestampHiForSystem(
-        nx::db::QueryContext* queryContext,
+    virtual nx::utils::db::DBResult updateTimestampHiForSystem(
+        nx::utils::db::QueryContext* queryContext,
         const nx::String& systemId,
         quint64 newValue) override;
 
-    virtual nx::db::DBResult fetchTransactionsOfAPeerQuery(
-        nx::db::QueryContext* queryContext,
+    virtual nx::utils::db::DBResult fetchTransactionsOfAPeerQuery(
+        nx::utils::db::QueryContext* queryContext,
         const nx::String& systemId,
         const QString& peerId,
         const QString& dbInstanceId,

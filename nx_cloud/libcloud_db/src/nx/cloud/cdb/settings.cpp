@@ -135,7 +135,7 @@ Settings::Settings():
         QnLibCloudDbAppInfo::applicationName(),
         kModuleName)
 {
-    m_dbConnectionOptions.driverType = nx::db::RdbmsDriverType::mysql;
+    m_dbConnectionOptions.driverType = nx::utils::db::RdbmsDriverType::mysql;
     m_dbConnectionOptions.hostName = "127.0.0.1";
     m_dbConnectionOptions.port = 3306;
     m_dbConnectionOptions.dbName = "nx_cloud";

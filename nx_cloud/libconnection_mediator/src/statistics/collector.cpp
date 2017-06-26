@@ -8,7 +8,7 @@ namespace stats {
 
 Collector::Collector(
     const conf::Statistics& settings,
-    nx::db::AsyncSqlQueryExecutor* sqlQueryExecutor)
+    nx::utils::db::AsyncSqlQueryExecutor* sqlQueryExecutor)
     :
     m_settings(settings),
     m_sqlQueryExecutor(sqlQueryExecutor),

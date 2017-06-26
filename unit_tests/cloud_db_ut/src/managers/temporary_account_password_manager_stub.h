@@ -26,17 +26,17 @@ public:
 
     virtual void addRandomCredentials(data::TemporaryAccountCredentials* const data) override;
 
-    virtual nx::db::DBResult registerTemporaryCredentials(
-        nx::db::QueryContext* const queryContext,
+    virtual nx::utils::db::DBResult registerTemporaryCredentials(
+        nx::utils::db::QueryContext* const queryContext,
         data::TemporaryAccountCredentials tempPasswordData) override;
 
-    virtual nx::db::DBResult fetchTemporaryCredentials(
-        nx::db::QueryContext* const queryContext,
+    virtual nx::utils::db::DBResult fetchTemporaryCredentials(
+        nx::utils::db::QueryContext* const queryContext,
         const data::TemporaryAccountCredentials& tempPasswordData,
         data::Credentials* credentials) override;
 
-    virtual nx::db::DBResult removeTemporaryPasswordsFromDbByAccountEmail(
-        nx::db::QueryContext* const queryContext,
+    virtual nx::utils::db::DBResult removeTemporaryPasswordsFromDbByAccountEmail(
+        nx::utils::db::QueryContext* const queryContext,
         std::string accountEmail) override;
 
     virtual void removeTemporaryPasswordsFromCacheByAccountEmail(

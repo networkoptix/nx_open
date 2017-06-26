@@ -9,9 +9,9 @@
 #include <nx/utils/std/future.h>
 #include <nx/utils/test_support/utils.h>
 
-#include <utils/db/async_sql_query_executor.h>
-#include <utils/db/request_executor_factory.h>
-#include <utils/db/request_execution_thread.h>
+#include <nx/utils/db/async_sql_query_executor.h>
+#include <nx/utils/db/request_executor_factory.h>
+#include <nx/utils/db/request_execution_thread.h>
 
 #include "base_db_test.h"
 
@@ -112,7 +112,7 @@ private:
     void emulateQueryError(DBResult dbResultToEmulate)
     {
         const auto dbResult = executeQuery(
-            [dbResultToEmulate](nx::db::QueryContext* /*queryContext*/)
+            [dbResultToEmulate](nx::utils::db::QueryContext* /*queryContext*/)
             {
                 return dbResultToEmulate;
             });

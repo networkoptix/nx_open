@@ -193,7 +193,7 @@ const ConnectionParameters& Settings::connectionParameters() const
     return m_connectionParameters;
 }
 
-const nx::db::ConnectionOptions& Settings::dbConnectionOptions() const
+const nx::utils::db::ConnectionOptions& Settings::dbConnectionOptions() const
 {
     return m_dbConnectionOptions;
 }

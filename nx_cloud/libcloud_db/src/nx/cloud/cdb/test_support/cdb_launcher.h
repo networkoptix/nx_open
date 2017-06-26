@@ -12,8 +12,8 @@
 #include <nx/utils/test_support/module_instance_launcher.h>
 
 #include <nx/cloud/cdb/api/connection.h>
-#include <utils/db/test_support/test_with_db_helper.h>
-#include <utils/db/types.h>
+#include <nx/utils/db/test_support/test_with_db_helper.h>
+#include <nx/utils/db/types.h>
 
 #include "account_with_password.h"
 #include "../cloud_db_service_public.h"
