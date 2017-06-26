@@ -31,7 +31,7 @@
                 LaunchTarget="$(var.clientInstallFullPath)\$(var.releaseVersionFull)\$(var.minilauncherBinaryName)"/>
         </BootstrapperApplicationRef>
 
-        <Variable Name="InstallerTitle" Value="Client only" />
+        <Variable Name="InstallerTitle" Value="!(loc.ClientOnly)" />
         <WixVariable Id="WixExtbaThemeXml" Value="OptixTheme.xml" />
         <WixVariable Id="WixExtbaThemeWxl" Value="OptixTheme_$(var.installerLanguage).wxl" />
 
