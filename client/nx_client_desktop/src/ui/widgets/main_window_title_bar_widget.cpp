@@ -293,10 +293,7 @@ void QnMainWindowTitleBarWidget::dragEnterEvent(QDragEnterEvent* event)
     const auto resources = resourcePool->getResources(ids);
 
     Q_D(QnMainWindowTitleBarWidget);
-    d->dropResources = resources.filtered([](const QnResourcePtr& resource)
-        {
-            return QnResourceAccessFilter::isDroppable(resource);
-        });
+    d->dropResources = resources.filtered(QnResourceAccessFilter::isDroppable);
 
     if (d->dropResources.empty())
         return;
