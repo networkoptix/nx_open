@@ -17,7 +17,7 @@ namespace db {
  * Connection can be closed by timeout or due to error. 
  * Use DbRequestExecutionThread::isOpen to test it.
  */
-class DbRequestExecutionThread:
+class NX_UTILS_API DbRequestExecutionThread:
     public BaseRequestExecutor
 {
 public:

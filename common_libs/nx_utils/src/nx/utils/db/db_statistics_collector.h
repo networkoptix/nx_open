@@ -20,7 +20,7 @@ struct QueryExecutionInfo
     boost::optional<std::chrono::milliseconds> executionDuration;
 };
 
-struct DurationStatistics
+struct NX_UTILS_API DurationStatistics
 {
     std::chrono::milliseconds min;
     std::chrono::milliseconds max;
@@ -29,7 +29,7 @@ struct DurationStatistics
     DurationStatistics();
 };
 
-struct QueryStatistics
+struct NX_UTILS_API QueryStatistics
 {
     std::chrono::milliseconds statisticalPeriod;
     int requestsSucceeded;
@@ -41,7 +41,7 @@ struct QueryStatistics
     QueryStatistics();
 };
 
-class StatisticsCollector
+class NX_UTILS_API StatisticsCollector
 {
 public:
     StatisticsCollector(std::chrono::milliseconds period);

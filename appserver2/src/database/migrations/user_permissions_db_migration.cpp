@@ -104,7 +104,7 @@ int fixCustomFlag(int oldPermissions)
 
     QString logMessage = lit("Fix User Permissions Custom Flag: %1 -> %2")
         .arg(QnLexical::serialized(static_cast<Qn::GlobalPermissions>(oldPermissions)))
-        .arg(QnLexical::serialized(result));
+        .arg(result);
     NX_LOG(logMessage, cl_logINFO);
 
     return result;

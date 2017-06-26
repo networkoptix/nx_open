@@ -5,9 +5,8 @@
 #include <QtSql/QSqlRecord>
 #include <QtSql/QSqlError>
 
+#include <nx/utils/db/sql_query_execution_helper.h>
 #include <nx/utils/log/log.h>
-
-#include "sql_query_execution_helper.h"
 
 //TODO #AK QnDbTransaction is a bad name for this class since it actually lives beyond DB transaction
     //and no concurrent transactions supported. Maybe QnDbConnection?

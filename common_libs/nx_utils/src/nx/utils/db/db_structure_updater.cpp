@@ -5,7 +5,6 @@
 #include <QtSql/QSqlError>
 #include <QtSql/QSqlQuery>
 
-#include <nx/fusion/model_functions.h>
 #include <nx/utils/log/log.h>
 
 #include "async_sql_query_executor.h"
@@ -287,7 +286,7 @@ bool DbStructureUpdater::execStructureUpdateTask(
     if (selectedScriptIter == dbTypeToScript.end())
     {
         NX_LOGX(lm("Could not find script version for DB %1. Aborting...")
-            .arg(QnLexical::serialized(driverType)), cl_logDEBUG1);
+            .arg(driverType), cl_logDEBUG1);
         return false;
     }
 

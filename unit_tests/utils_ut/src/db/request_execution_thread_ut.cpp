@@ -9,6 +9,7 @@
 #include "base_db_test.h"
 
 namespace nx {
+namespace utils {
 namespace db {
 namespace test {
 
@@ -54,4 +55,5 @@ TEST_F(DbRequestExecutionThread, stops_after_termination_request)
 
 } // namespace test
 } // namespace db
+} // namespace utils
 } // namespace nx

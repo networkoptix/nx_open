@@ -10,15 +10,16 @@
 
 #include <nx/utils/db/async_sql_query_executor.h>
 #include <nx/utils/db/types.h>
-
-#include "test_setup.h"
+#include <nx/utils/test_support/test_with_temporary_directory.h>
 
 namespace nx {
+namespace utils {
 namespace db {
 namespace test {
 
 class BaseDbTest:
-    public ::testing::Test
+    public ::testing::Test,
+    public nx::utils::test::TestWithTemporaryDirectory
 {
 public:
     BaseDbTest();
@@ -91,4 +92,5 @@ private:
 
 } // namespace test
 } // namespace db
+} // namespace utils
 } // namespace nx

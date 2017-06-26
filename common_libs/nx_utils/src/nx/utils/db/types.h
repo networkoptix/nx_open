@@ -6,8 +6,6 @@
 #include <QtCore/QString>
 #include <QtSql/QSqlDatabase>
 
-#include <nx/fusion/model_functions_fwd.h>
-
 class QnSettings;
 
 namespace nx {
@@ -30,7 +28,7 @@ enum class DBResult
     connectionError
 };
 
-QString toString(DBResult result);
+NX_UTILS_API const char* toString(DBResult value);
 
 enum class RdbmsDriverType
 {
@@ -41,7 +39,10 @@ enum class RdbmsDriverType
     oracle
 };
 
-class ConnectionOptions
+NX_UTILS_API const char* toString(RdbmsDriverType value);
+NX_UTILS_API RdbmsDriverType rdbmsDriverTypeFromString(const char* str);
+
+class NX_UTILS_API ConnectionOptions
 {
 public:
     RdbmsDriverType driverType;
@@ -71,12 +72,9 @@ public:
     bool operator==(const ConnectionOptions&) const;
 };
 
-QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(nx::utils::db::DBResult)
-QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(nx::utils::db::RdbmsDriverType)
-
 //-------------------------------------------------------------------------------------------------
 
-class Exception:
+class NX_UTILS_API Exception:
     public std::runtime_error
 {
     using base_type = std::runtime_error;
@@ -94,6 +92,3 @@ private:
 } // namespace db
 } // namespace utils
 } // namespace nx
-
-QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES((nx::utils::db::DBResult), (lexical))
-QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES((nx::utils::db::RdbmsDriverType), (lexical))

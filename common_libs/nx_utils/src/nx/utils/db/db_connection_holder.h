@@ -11,7 +11,7 @@ namespace nx {
 namespace utils {
 namespace db {
 
-class DbConnectionHolder
+class NX_UTILS_API DbConnectionHolder
 {
 public:
     DbConnectionHolder(const ConnectionOptions& connectionOptions);

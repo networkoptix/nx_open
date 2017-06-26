@@ -8,7 +8,7 @@ namespace nx {
 namespace utils {
 namespace db {
 
-class SqlQueryExecutionHelper
+class NX_UTILS_API SqlQueryExecutionHelper
 {
 public:
     static bool execSQLQuery(const QString& query, QSqlDatabase& database, const char* details);

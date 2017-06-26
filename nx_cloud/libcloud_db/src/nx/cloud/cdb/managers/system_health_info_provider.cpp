@@ -84,7 +84,7 @@ void SystemHealthInfoProvider::onSystemStatusChanged(
             db::DBResult dbResult)
         {
             NX_LOGX(lm("Save system %1 history item finished with result %2")
-                .arg(systemId).arg(QnLexical::serialized(dbResult)), cl_logDEBUG2);
+                .arg(systemId).arg(dbResult), cl_logDEBUG2);
         });
 }
 

@@ -7,7 +7,7 @@ namespace nx {
 namespace utils {
 namespace db {
 
-class QueryContext
+class NX_UTILS_API QueryContext
 {
 public:
     QueryContext(

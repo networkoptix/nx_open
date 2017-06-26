@@ -7,6 +7,7 @@
 #include <nx/utils/db/types.h>
 
 namespace nx {
+namespace utils {
 namespace db {
 namespace test {
 
@@ -60,4 +61,5 @@ TEST_F(DbConnectionOptions, custom_default_values_are_not_overwritten)
 
 } // namespace test
 } // namespace db
+} // namespace utils
 } // namespace nx

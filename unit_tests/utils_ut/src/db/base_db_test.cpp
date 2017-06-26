@@ -6,17 +6,18 @@
 #include <nx/utils/test_support/utils.h>
 
 namespace nx {
+namespace utils {
 namespace db {
 namespace test {
 
-BaseDbTest::BaseDbTest()
+BaseDbTest::BaseDbTest():
+    nx::utils::test::TestWithTemporaryDirectory("utils_ut", "")
 {
     init();
 }
 
 BaseDbTest::~BaseDbTest()
 {
-    QDir(m_tmpDir).removeRecursively();
 }
 
 ConnectionOptions& BaseDbTest::connectionOptions()
@@ -64,11 +65,12 @@ void BaseDbTest::executeUpdate(const QString& queryText)
 
 void BaseDbTest::init()
 {
-    m_tmpDir = TestSetup::getTemporaryDirectoryPath() + "/db_test/";
+    m_tmpDir = testDataDir() + "/db_test/";
     QDir(m_tmpDir).removeRecursively();
     ASSERT_TRUE(QDir().mkpath(m_tmpDir));
 }
 
 } // namespace test
 } // namespace db
+} // namespace utils
 } // namespace nx

@@ -4,7 +4,6 @@
 
 #include <nx/utils/log/log.h>
 
-#include "db_helper.h"
 #include "request_executor_factory.h"
 #include "sql_query_execution_helper.h"
 

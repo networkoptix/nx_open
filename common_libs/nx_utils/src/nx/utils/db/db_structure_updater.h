@@ -23,7 +23,7 @@ class QueryContext;
  * @note Database is not created, it MUST already exist.
  * @note This class methods are not thread-safe.
  */
-class DbStructureUpdater
+class NX_UTILS_API DbStructureUpdater
 {
 public:
     typedef nx::utils::MoveOnlyFunc<nx::utils::db::DBResult(nx::utils::db::QueryContext*)>
@@ -32,6 +32,9 @@ public:
     DbStructureUpdater(
         std::string dbManagerName,
         AbstractAsyncSqlQueryExecutor* const queryExecutor);
+
+    DbStructureUpdater(const DbStructureUpdater&) = delete;
+    DbStructureUpdater& operator=(const DbStructureUpdater&) = delete;
 
     /**
      * Used to aggregate update scripts.

@@ -6,6 +6,7 @@
 #include <nx/utils/db/db_statistics_collector.h>
 
 namespace nx {
+namespace utils {
 namespace db {
 namespace test {
 
@@ -202,4 +203,5 @@ TEST_F(DbStatisticsCollector, expired_elements_are_removed)
 
 } // namespace test
 } // namespace db
+} // namespace utils
 } // namespace nx

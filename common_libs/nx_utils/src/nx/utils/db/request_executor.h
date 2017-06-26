@@ -19,7 +19,7 @@ namespace db {
 
 class StatisticsCollector;
 
-class AbstractExecutor
+class NX_UTILS_API AbstractExecutor
 {
 public:
     virtual ~AbstractExecutor() {}
@@ -32,7 +32,7 @@ public:
 //-------------------------------------------------------------------------------------------------
 // BaseExecutor
 
-class BaseExecutor:
+class NX_UTILS_API BaseExecutor:
     public AbstractExecutor
 {
 public:
@@ -216,7 +216,7 @@ private:
 //-------------------------------------------------------------------------------------------------
 // UpdateWithoutAnyDataExecutor
 
-class UpdateWithoutAnyDataExecutor:
+class NX_UTILS_API UpdateWithoutAnyDataExecutor:
     public BaseExecutor
 {
 public:
@@ -235,7 +235,7 @@ private:
 //-------------------------------------------------------------------------------------------------
 // UpdateWithoutAnyDataExecutorNoTran
 
-class UpdateWithoutAnyDataExecutorNoTran:
+class NX_UTILS_API UpdateWithoutAnyDataExecutorNoTran:
     public BaseExecutor
 {
 public:
@@ -254,8 +254,7 @@ private:
 //-------------------------------------------------------------------------------------------------
 // SelectExecutor
 
-//!Executor of SELECT requests
-class SelectExecutor:
+class NX_UTILS_API SelectExecutor:
     public BaseExecutor
 {
 public:

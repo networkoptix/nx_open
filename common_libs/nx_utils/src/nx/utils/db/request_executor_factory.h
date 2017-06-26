@@ -8,7 +8,7 @@ namespace nx {
 namespace utils {
 namespace db {
 
-class RequestExecutorFactory
+class NX_UTILS_API RequestExecutorFactory
 {
 public:
     typedef nx::utils::MoveOnlyFunc<

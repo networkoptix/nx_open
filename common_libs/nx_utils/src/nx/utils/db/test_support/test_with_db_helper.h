@@ -11,7 +11,7 @@ namespace utils {
 namespace db {
 namespace test {
 
-class TestWithDbHelper:
+class NX_UTILS_API TestWithDbHelper:
     public utils::test::TestWithTemporaryDirectory
 {
 public:

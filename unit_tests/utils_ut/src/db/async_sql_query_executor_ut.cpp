@@ -16,6 +16,7 @@
 #include "base_db_test.h"
 
 namespace nx {
+namespace utils {
 namespace db {
 namespace test {
 
@@ -219,4 +220,5 @@ TEST_F(DbAsyncSqlQueryExecutor, many_recoverable_errors_in_a_row_cause_reconnect
 
 } // namespace test
 } // namespace db
+} // namespace utils
 } // namespace nx

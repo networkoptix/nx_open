@@ -1177,7 +1177,7 @@ nx::utils::db::DBResult SystemManager::fetchAccountToShareWith(
 
         default:
             NX_LOGX(lm("Error fetching account by email %1. %2")
-                .arg(sharing.accountEmail).arg(QnLexical::serialized(dbResult)),
+                .arg(sharing.accountEmail).arg(dbResult),
                 cl_logDEBUG1);
             return dbResult;
     }
@@ -1288,7 +1288,7 @@ nx::utils::db::DBResult SystemManager::updateSharingInDbAndGenerateTransaction(
     {
         NX_LOGX(lm("Error sharing/unsharing system %1 with account %2. %3")
             .arg(sharing.systemId).arg(sharing.accountEmail)
-            .arg(QnLexical::serialized(result)),
+            .arg(result),
             cl_logDEBUG1);
         return result;
     }
@@ -1611,7 +1611,7 @@ nx::utils::db::DBResult SystemManager::saveUserSessionStart(
         NX_LOGX(lm("Error fetching user sharing (%1, %2). %3")
             .arg(*userSessionDescriptor.accountEmail)
             .arg(*userSessionDescriptor.systemId)
-            .arg(QnLexical::serialized(dbResult)),
+            .arg(dbResult),
             cl_logDEBUG1);
         return dbResult;
     }

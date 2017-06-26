@@ -4,14 +4,13 @@
 #include <map>
 #include <string>
 
-#include <nx/fusion/model_functions.h>
-#include <nx/utils/std/cpp14.h>
-
 #include <nx/utils/db/db_structure_updater.h>
+#include <nx/utils/std/cpp14.h>
 
 #include "base_db_test.h"
 
 namespace nx {
+namespace utils {
 namespace db {
 namespace test {
 
@@ -117,7 +116,7 @@ protected:
         QByteArray script = QByteArray())
     {
         if (script.isEmpty())
-            script = QnLexical::serialized(dbType).toLatin1();
+            script = toString(dbType);
         m_registeredScripts.emplace(script, dbType);
         m_dbTypeToScript.emplace(dbType, script);
     }
@@ -249,4 +248,5 @@ TEST_F(DbStructureUpdater, proper_dialect_fix_is_applied)
 
 } // namespace test
 } // namespace db
+} // namespace utils
 } // namespace nx

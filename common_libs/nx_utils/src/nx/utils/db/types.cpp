@@ -3,7 +3,6 @@
 #include <chrono>
 #include <thread>
 
-#include <nx/fusion/model_functions.h>
 #include <nx/utils/timer_manager.h>
 #include <nx/utils/settings.h>
 
@@ -11,9 +10,60 @@ namespace nx {
 namespace utils {
 namespace db {
 
-QString toString(DBResult result)
+const char* toString(DBResult result)
 {
-    return QnLexical::serialized(result);
+    switch (result)
+    {
+        case DBResult::ok:
+            return "ok";
+        case DBResult::statementError:
+            return "statementError";
+        case DBResult::ioError:
+            return "ioError";
+        case DBResult::notFound:
+            return "notFound";
+        case DBResult::cancelled:
+            return "cancelled";
+        case DBResult::retryLater:
+            return "retryLater";
+        case DBResult::uniqueConstraintViolation:
+            return "uniqueConstraintViolation";
+        case DBResult::connectionError:
+            return "connectionError";
+        default:
+            return "unknown";
+    }
+}
+
+const char* toString(RdbmsDriverType value)
+{
+    switch (value)
+    {
+        case RdbmsDriverType::sqlite:
+            return "QSQLITE";
+        case RdbmsDriverType::mysql:
+            return "QMYSQL";
+        case RdbmsDriverType::postgresql:
+            return "QPSQL";
+        case RdbmsDriverType::oracle:
+            return "QOCI";
+        default:
+            return "bad_driver_name";
+    }
+}
+
+RdbmsDriverType rdbmsDriverTypeFromString(const char* str)
+{
+    if (strcmp(str, "QSQLITE") == 0)
+        return RdbmsDriverType::sqlite;
+    else if (strcmp(str, "QMYSQL") == 0)
+        return RdbmsDriverType::mysql;
+    else if (strcmp(str, "QPSQL") == 0)
+        return RdbmsDriverType::postgresql;
+    else if (strcmp(str, "QOCI") == 0)
+        return RdbmsDriverType::oracle;
+    else
+        return RdbmsDriverType::unknown;
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -63,9 +113,8 @@ void ConnectionOptions::loadFromSettings(const QnSettings& settings)
 
     if (settings.contains(kDbDriverName))
     {
-        driverType = QnLexical::deserialized<nx::utils::db::RdbmsDriverType>(
-            settings.value(kDbDriverName).toString(),
-            nx::utils::db::RdbmsDriverType::unknown);
+        const auto str = settings.value(kDbDriverName).toString().toStdString();
+        driverType = rdbmsDriverTypeFromString(str.c_str());
     }
 
     if (settings.contains(kDbHostName))
@@ -125,7 +174,7 @@ bool ConnectionOptions::operator==(const ConnectionOptions& rhs) const
 //-------------------------------------------------------------------------------------------------
 
 Exception::Exception(DBResult dbResult):
-    base_type(QnLexical::serialized(dbResult).toStdString()),
+    base_type(toString(dbResult)),
     m_dbResult(dbResult)
 {
 }
@@ -147,22 +196,3 @@ DBResult Exception::dbResult() const
 } // namespace db
 } // namespace utils
 } // namespace nx
-
-QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(nx::utils::db, RdbmsDriverType,
-    (nx::utils::db::RdbmsDriverType::unknown, "bad_driver_name")
-    (nx::utils::db::RdbmsDriverType::sqlite, "QSQLITE")
-    (nx::utils::db::RdbmsDriverType::mysql, "QMYSQL")
-    (nx::utils::db::RdbmsDriverType::postgresql, "QPSQL")
-    (nx::utils::db::RdbmsDriverType::oracle, "QOCI")
-)
-
-QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(nx::utils::db, DBResult,
-    (nx::utils::db::DBResult::ok, "ok")
-    (nx::utils::db::DBResult::statementError, "statementError")
-    (nx::utils::db::DBResult::ioError, "ioError")
-    (nx::utils::db::DBResult::notFound, "notFound")
-    (nx::utils::db::DBResult::cancelled, "cancelled")
-    (nx::utils::db::DBResult::retryLater, "retryLater")
-    (nx::utils::db::DBResult::uniqueConstraintViolation, "uniqueConstraintViolation")
-    (nx::utils::db::DBResult::connectionError, "connectionError")
-)

@@ -22,11 +22,10 @@ enum class ConnectionState
     closed
 };
 
-typedef nx::utils::SyncQueueWithItemStayTimeout<
-    std::unique_ptr<AbstractExecutor>
-> QueryExecutorQueue;
+using QueryExecutorQueue =
+    nx::utils::SyncQueueWithItemStayTimeout<std::unique_ptr<AbstractExecutor>>;
 
-class BaseRequestExecutor:
+class NX_UTILS_API BaseRequestExecutor:
     public QnStoppable,
     public QnJoinable
 {

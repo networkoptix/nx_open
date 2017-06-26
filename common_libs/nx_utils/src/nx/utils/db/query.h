@@ -1,5 +1,6 @@
 #pragma once
 
+#include <QtCore/QVariant>
 #include <QtSql/QSqlQuery>
 
 #include "types.h"
@@ -12,7 +13,7 @@ namespace db {
  * Follows same conventions as QSqlQuery except error reporting: 
  * methods of this class throw nx::utils::db::Exception on error.
  */
-class SqlQuery
+class NX_UTILS_API SqlQuery
 {
 public:
     SqlQuery(QSqlDatabase connection);

@@ -4,7 +4,6 @@
 #include <QtSql/QSqlError>
 #include <QtSql/QSqlQuery>
 
-#include <nx/fusion/serialization/lexical.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/scope_guard.h>
 #include <nx/utils/std/cpp14.h>
@@ -127,16 +126,14 @@ void DbRequestExecutionThread::processTask(std::unique_ptr<AbstractExecutor> tas
             ++m_numberOfFailedRequestsInARow;
             if (isDbErrorRecoverable(result))
             {
-                NX_LOGX(lit("DB query failed with result code %1. Db text %2")
-                    .arg(QnLexical::serialized(result))
-                    .arg(m_dbConnectionHolder.dbConnection()->lastError().text()),
+                NX_LOGX(lm("DB query failed with result code %1. Db text %2")
+                    .arg(result).arg(m_dbConnectionHolder.dbConnection()->lastError().text()),
                     cl_logDEBUG1);
             }
             else
             {
-                NX_LOGX(lit("Dropping DB connection due to unrecoverable error %1. Db text %2")
-                    .arg(QnLexical::serialized(result))
-                    .arg(m_dbConnectionHolder.dbConnection()->lastError().text()),
+                NX_LOGX(lm("Dropping DB connection due to unrecoverable error %1. Db text %2")
+                    .arg(result).arg(m_dbConnectionHolder.dbConnection()->lastError().text()),
                     cl_logWARNING);
                 closeConnection();
                 break;
@@ -145,8 +142,8 @@ void DbRequestExecutionThread::processTask(std::unique_ptr<AbstractExecutor> tas
             if (m_numberOfFailedRequestsInARow >= 
                 connectionOptions().maxErrorsInARowBeforeClosingConnection)
             {
-                NX_LOGX(lit("Dropping DB connection due to %1 errors in a row. Db text %2")
-                    .arg(QnLexical::serialized(result)), cl_logWARNING);
+                NX_LOGX(lm("Dropping DB connection due to %1 errors in a row. Db text %2")
+                    .arg(result), cl_logWARNING);
                 closeConnection();
                 break;
             }

@@ -98,7 +98,7 @@ void TemporaryAccountPasswordManager::registerTemporaryCredentials(
             {
                 NX_LOG(lm("add_temporary_account_password (%1). "
                         "Failed to save password to DB. DB error: %2")
-                    .arg(tempPasswordData.accountEmail).arg(QnLexical::serialized(dbResult)),
+                    .arg(tempPasswordData.accountEmail).arg(dbResult),
                     cl_logDEBUG1);
             }
 

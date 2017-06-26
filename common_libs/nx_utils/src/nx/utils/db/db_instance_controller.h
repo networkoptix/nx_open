@@ -11,7 +11,7 @@ namespace nx {
 namespace utils {
 namespace db {
 
-class InstanceController
+class NX_UTILS_API InstanceController
 {
 public:
     InstanceController(const ConnectionOptions& dbConnectionOptions);

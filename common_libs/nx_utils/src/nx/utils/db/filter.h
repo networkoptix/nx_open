@@ -17,13 +17,13 @@ struct SqlFilterField
     QVariant value;
 };
 
-typedef std::vector<SqlFilterField> InnerJoinFilterFields;
+using InnerJoinFilterFields = std::vector<SqlFilterField>;
 
 /**
  * @return fieldName1=placeHolderName1#separator...fieldNameN=placeHolderNameN
  */
-QString joinFields(const InnerJoinFilterFields& fields, const QString& separator);
-void bindFields(QSqlQuery* const query, const InnerJoinFilterFields& fields);
+NX_UTILS_API QString joinFields(const InnerJoinFilterFields& fields, const QString& separator);
+NX_UTILS_API void bindFields(QSqlQuery* const query, const InnerJoinFilterFields& fields);
 
 } // namespace db
 } // namespace utils

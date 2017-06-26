@@ -3,7 +3,6 @@
 #include <QtSql/QSqlError>
 #include <QtSql/QSqlQuery>
 
-#include <nx/fusion/serialization/lexical.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/std/cpp14.h>
 #include <nx/utils/uuid.h>
@@ -32,7 +31,7 @@ bool DbConnectionHolder::open()
     // Using uuid as a unique connection name.
     m_connectionName = QUuid::createUuid().toString();
     m_dbConnection = QSqlDatabase::addDatabase(
-        QnLexical::serialized<RdbmsDriverType>(connectionOptions().driverType),
+        toString(connectionOptions().driverType),
         m_connectionName);
 
     m_dbConnection.setConnectOptions(connectionOptions().connectOptions);
