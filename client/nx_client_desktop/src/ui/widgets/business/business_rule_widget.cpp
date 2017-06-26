@@ -494,13 +494,16 @@ void QnBusinessRuleWidget::at_actionResourcesHolder_clicked()
                     return dialogDelegate->isValid(user->getId());
                 });
 
-            connect(&dialog, &SubjectSelectionDialog::changed, this,
+            const auto updateAlert =
                 [&dialog, dialogDelegate]
                 {
                     // TODO: #vkutin #3.2 Full updates like this are slow. Refactor in 3.2.
                     dialog.showAlert(dialogDelegate->validationMessage(
                         dialog.totalCheckedUsers()));
-                });
+                };
+
+            connect(&dialog, &SubjectSelectionDialog::changed, this, updateAlert);
+            updateAlert();
         }
 
         if (dialog.exec() != QDialog::Accepted)

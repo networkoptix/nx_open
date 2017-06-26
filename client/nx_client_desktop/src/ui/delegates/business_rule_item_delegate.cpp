@@ -104,7 +104,7 @@ void QnSelectResourcesDialogButton::at_clicked()
                 });
         }
 
-        connect(&dialog, &SubjectSelectionDialog::changed, this,
+        const auto updateAlert =
             [this, &dialog]
             {
                 // TODO: #vkutin #3.2 Full updates like this are slow. Refactor in 3.2.
@@ -119,7 +119,10 @@ void QnSelectResourcesDialogButton::at_clicked()
                         ? QnBusinessStringsHelper::needToSelectUserText()
                         : QString());
                 }
-            });
+            };
+
+        connect(&dialog, &SubjectSelectionDialog::changed, this, updateAlert);
+        updateAlert();
 
         if (dialog.exec() != QDialog::Accepted)
             return;

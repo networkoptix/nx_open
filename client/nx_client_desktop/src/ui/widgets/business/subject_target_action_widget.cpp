@@ -53,13 +53,16 @@ void QnSubjectTargetActionWidget::selectSubjects()
     dialog.setCheckedSubjects(selected);
     dialog.setAllUsers(params.allUsers);
 
-    connect(&dialog, &SubjectSelectionDialog::changed, this,
+    const auto updateAlert =
         [&dialog]()
         {
             dialog.showAlert(!dialog.allUsers() && dialog.checkedSubjects().empty()
                 ? QnBusinessStringsHelper::needToSelectUserText()
                 : QString());
-        });
+        };
+
+    connect(&dialog, &SubjectSelectionDialog::changed, this, updateAlert);
+    updateAlert();
 
     if (dialog.exec() != QDialog::Accepted)
         return;
