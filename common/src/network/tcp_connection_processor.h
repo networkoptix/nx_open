@@ -66,7 +66,8 @@ public:
     bool readSingleRequest();
     virtual void parseRequest();
 
-    virtual bool isTakeSockOwnership() const { return false; }
+    bool isSocketTaken() const;
+    QSharedPointer<AbstractStreamSocket> takeSocket();
     void releaseSocket();
 
     int redirectTo(const QByteArray& page, QByteArray& contentType);

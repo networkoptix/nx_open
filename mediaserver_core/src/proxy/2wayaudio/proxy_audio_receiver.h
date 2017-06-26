@@ -8,11 +8,8 @@ class QnAudioProxyReceiverPrivate;
 class QnAudioProxyReceiver: public QnTCPConnectionProcessor
 {
 public:
-    QnAudioProxyReceiver(QSharedPointer<AbstractStreamSocket> socket,
-                                         QnHttpConnectionListener* owner);
-    virtual bool isTakeSockOwnership() const override;
+    QnAudioProxyReceiver(QSharedPointer<AbstractStreamSocket> socket, QnHttpConnectionListener* owner);
+
 protected:
     virtual void run();
-private:
-    Q_DECLARE_PRIVATE(QnAudioProxyReceiver);
 };

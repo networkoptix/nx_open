@@ -22,16 +22,16 @@ public:
         QnTcpListener* owner);
 
     virtual ~ConnectionProcessor();
-    virtual bool isTakeSockOwnership() const override { return true; }
+
 protected:
     virtual void run() override;
+
 private:
     QByteArray responseBody(Qn::SerializationFormat dataFormat);
     bool isDisabledPeer(const ec2::ApiPeerData& remotePeer) const;
     bool isPeerCompatible(const ec2::ApiPeerDataEx& remotePeer) const;
     ec2::ApiPeerDataEx deserializeRemotePeerInfo();
     Qn::UserAccessData userAccessData(const ec2::ApiPeerDataEx& remotePeer) const;
-private:
 };
 
 } // namespace p2p

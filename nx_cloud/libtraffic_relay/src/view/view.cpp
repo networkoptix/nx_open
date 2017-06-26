@@ -54,9 +54,9 @@ std::vector<SocketAddress> View::httpEndpoints() const
 
 void View::registerApiHandlers()
 {
-    registerApiHandler<view::BeginListeningHandler>(nx_http::Method::OPTIONS);
-    registerApiHandler<view::CreateClientSessionHandler>(nx_http::Method::POST);
-    registerApiHandler<view::ConnectToPeerHandler>(nx_http::Method::OPTIONS);
+    registerApiHandler<view::BeginListeningHandler>(nx_http::Method::Options);
+    registerApiHandler<view::CreateClientSessionHandler>(nx_http::Method::Post);
+    registerApiHandler<view::ConnectToPeerHandler>(nx_http::Method::Options);
 }
 
 template<typename Handler>
