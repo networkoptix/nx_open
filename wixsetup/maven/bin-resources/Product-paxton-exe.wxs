@@ -24,7 +24,6 @@
             PaxtonDirExists
         </bal:Condition>
 
-
         <BootstrapperApplicationRef Id="WixExtendedBootstrapperApplication.HyperlinkLicense">
             <Payload SourceFile="License.html" />
             <Payload SourceFile="installer_bg.png" />
@@ -38,7 +37,7 @@
                 SuppressRepair="yes" />
         </BootstrapperApplicationRef>
 
-        <Variable Name="InstallerTitle" Value="!(loc.InstallerTitlePaxton)" />
+        <Variable Name="InstallerTitle" Value="Paxton plugin" />
         <WixVariable Id="WixExtbaThemeXml" Value="OptixTheme.xml" />
         <WixVariable Id="WixExtbaThemeWxl" Value="OptixTheme_$(var.installerLanguage).wxl" />
 

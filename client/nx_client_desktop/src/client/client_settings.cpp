@@ -21,6 +21,8 @@
 #include <client/client_meta_types.h>
 #include <client/client_runtime_settings.h>
 
+#include <translation/translation_manager.h>
+
 #include <utils/common/app_info.h>
 #include <utils/common/warnings.h>
 
@@ -29,14 +31,28 @@
 
 #include <client_core/client_core_settings.h>
 
-namespace
-{
+namespace {
+
 static const QString kXorKey = lit("ItIsAGoodDayToDie");
 
 static const auto kNameTag = lit("name");
 static const auto kUrlTag = lit("url");
 static const auto kLocalId = lit("localId");
 static const auto kPasswordTag = lit("pwd");
+
+static const QString k30TranslationPath = lit("translationPath");
+
+QString localeTo30TranslationPath(const QString& locale)
+{
+    const QString oldLocale = QnTranslationManager::localeCode31to30(locale);
+    return QnTranslationManager::localeCodeToTranslationPath(oldLocale);
+}
+
+QString translationPath30ToLocale(const QString& translationPath)
+{
+    const QString oldLocale = QnTranslationManager::translationPathToLocaleCode(translationPath);
+    return QnTranslationManager::localeCode30to31(oldLocale);
+}
 
 QnConnectionData readConnectionData(QSettings *settings)
 {
@@ -70,7 +86,8 @@ void writeConnectionData(QSettings *settings, const QnConnectionData &connection
     settings->setValue(kLocalId, connection.localId.toQUuid());
 }
 
-} // anonymous namespace
+} // namespace
+
 QnClientSettings::QnClientSettings(bool forceLocalSettings, QObject *parent):
     base_type(parent),
     m_loading(true)
@@ -209,6 +226,14 @@ QVariant QnClientSettings::readValueFromSettings(QSettings *settings, int id, co
                 defaultLevel));
         }
 
+        case LOCALE:
+        {
+            QString compatibleValue = settings->value(k30TranslationPath).toString();
+            if (!compatibleValue.isEmpty())
+                return translationPath30ToLocale(compatibleValue);
+            return base_type::readValueFromSettings(settings, id, defaultValue);
+        }
+
         default:
             return base_type::readValueFromSettings(settings, id, defaultValue);
             break;
@@ -293,6 +318,13 @@ void QnClientSettings::writeValueToSettings(QSettings *settings, int id, const Q
             QString asJson = QString::fromUtf8(QJson::serialized(level));
             base_type::writeValueToSettings(settings, id, asJson);
             settings->setValue(lit("isIpShownInTree"), (level != Qn::RI_NameOnly));
+            break;
+        }
+
+        case LOCALE:
+        {
+            base_type::writeValueToSettings(settings, id, value);
+            settings->setValue(k30TranslationPath, localeTo30TranslationPath(value.toString()));
             break;
         }
 

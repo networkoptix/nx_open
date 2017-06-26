@@ -1,0 +1,13 @@
+ברוך הבא אל {{PRODUCT_NAME}}
+
+{{#message.sharer_name}}
+{{message.sharer_name}} ({{message.sharer_email}}) מזמין אותך להצטרף אל {{PRODUCT_NAME}} ושיתף את המערכת שלו {{message.system_name}} איתך.
+{{/message.sharer_name}}
+
+{{^message.sharer_name}}
+אתה מוזמן להצטרף אל {{PRODUCT_NAME}}.
+מערכת הווידאו {{message.system_name}} שותפה איתך.
+{{/message.sharer_name}}
+
+הרשם וצפה במערכת: {{config.portal_url}} / register / {{message.code}}
+

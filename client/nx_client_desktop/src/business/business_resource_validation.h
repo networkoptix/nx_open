@@ -11,6 +11,14 @@
 #include <ui/delegates/resource_selection_dialog_delegate.h>
 #include <ui/style/custom_style.h>
 
+struct QnBusinessActionParameters;
+
+namespace QnBusiness {
+
+bool actionAllowedForUser(const QnBusinessActionParameters& params, const QnUserResourcePtr& user);
+
+} // namespace QnBusiness
+
 class QnCameraInputPolicy
 {
     Q_DECLARE_TR_FUNCTIONS(QnCameraInputPolicy)

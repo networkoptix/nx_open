@@ -120,12 +120,12 @@ def get_light_command(folder, msi, suffix):
     command.append('-sice:ICE60')
     command.append('-sice:ICE69')
     command.append('-sice:ICE91')
-    command.append('-cultures:${installer.language}')
+    command.append('-cultures:${installer.cultures}')
     command.append('-cc')
     command.append('${libdir}/bin/${build.configuration}/cab')
     command.append('-reusecab')
     command.append('-loc')
-    command.append('CustomStrings_${installer.language}.wxl')
+    command.append('OptixTheme_${installer.language}.wxl')
     command.append('-out')
     command.append('{0}/{1}'.format(folder, msi))
     command.append('-pdbout')
@@ -179,9 +179,10 @@ def create_sign_burn_exe_command_set(folder, engine_folder, exe):
     ]
 
 def execute_command(command):
-    print 'Executing command:\n{0}\n'.format(' '.join(command))
+    print '>> {0}'.format(' '.join(command))
     retcode = subprocess.call(command)
-    print "finished with return code {0}".format(retcode)
+    if retcode != 0:
+        print "Return code {0}".format(retcode)
     if retcode != 0 and retcode != 204:
         sys.exit(1)
 
@@ -267,7 +268,6 @@ def main():
         add_build_nxtool_commands(commands)
 
     for command in commands:
-        print(command)
         execute_command(command)
 
     # Debug code to make applauncher work from the build_environment/target/bin folder

@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
     <Fragment>
-        <?include BuildVars.wxi ?>    
+        <?include BuildVars.wxi ?>
         <DirectoryRef Id="AxClientParentDir">
             <Directory Id="$(var.paxtonDirId)" Name="${release.version}">
                 <Component Id="AxClass">
-                    <File Id="fil3026E8B92FE2CBB52B6417893B92EFA1" KeyPath="yes" Source="${libdir}\bin\Release\ax${ax.className}${parsedVersion.majorVersion}.dll">
+                    <File Id="fil3026E8B92FE2CBB52B6417893B92EFA1" KeyPath="yes" Source="$(var.SourceDir)\ax${ax.className}${parsedVersion.majorVersion}.dll">
                         <Class Id="${ax.classId}" Context="InprocServer32" Description="Ax${ax.className} Class" Version="${nxec.ec2ProtoVersion}" Programmable="yes" Control="yes">
                             <ProgId Id="axhdwitness.Ax${ax.className}.${nxec.ec2ProtoVersion}" Description="Ax${ax.className} Class">
                                 <ProgId Id="axhdwitness.Ax${ax.className}" Description="Ax${ax.className} Class" />
@@ -31,7 +31,7 @@
                 <Component Id="ClientSigar">
                     <File Id="sigar.dll" Name="sigar.dll" Source="$(var.SourceDir)\sigar.dll" DiskId="6"/>
                 </Component>
-            </Directory>            
+            </Directory>
         </DirectoryRef>
         <ComponentGroup Id="ClientFFmpegLibraries" Directory="$(var.paxtonDirId)">
             <Component>
@@ -84,7 +84,7 @@
             <Component>
                 <File Id="OpenAL32.dll" Name="OpenAL32.dll" Source="$(var.SourceDir)\OpenAL32.dll" DiskId="13"/>
             </Component>
-        </ComponentGroup>            
+        </ComponentGroup>
 
         <ComponentGroup Id="ClientQTLibraries" Directory="$(var.paxtonDirId)">
             <Component>

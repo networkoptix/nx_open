@@ -1,0 +1,11 @@
+המערכת שותפה איתך
+
+{{#message.sharer_name}}
+{{message.sharer_name}} ({{message.sharer_email}}) מערכת משותפת {{message.system_name}} איתך.
+{{/message.sharer_name}}
+
+{{^message.sharer_name}}
+המערכת {{message.system_name}} שותפה איתך.
+{{/message.sharer_name}}
+
+פתח את המערכת: {{config.portal_url}} / systems / {{message.system_id}}
