@@ -204,6 +204,9 @@ nx_cloud_deploy/nxcloud_host_agent/docker/docker
 nx_cloud_deploy/nxcloud_host_agent/docker/docker-compose
 nx_cloud_deploy/nxcloud_host_agent/docker/docker-machine
 nx_cloud_deploy/nxcloud_host_agent/docker/kubectl
+nx_cloud_deploy/cloud_modules/vendor
+nx_cloud_deploy/cloud_modules/build
+nx_cloud_deploy/cloud_modules/.glide
 cmake_build/**
 
 syntax: regexp
