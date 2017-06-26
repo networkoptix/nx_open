@@ -6,6 +6,7 @@
 #include <nx/streaming/archive_stream_reader.h>
 
 #include <business/actions/abstract_business_action.h>
+#include <business/business_resource_validation.h>
 
 #include <camera/resource_display.h>
 #include <camera/cam_display.h>
@@ -76,26 +77,8 @@ QnWorkbenchAlarmLayoutHandler::QnWorkbenchAlarmLayoutHandler(QObject *parent):
 
     const auto messageProcessor = qnClientMessageProcessor;
 
-    auto allowedForUser =
-        [this](const std::vector<QnUuid>& ids)
-        {
-            if (ids.empty())
-                return true;
-
-            auto user = context()->user();
-            if (!user)
-                return false;
-
-            if (std::find(ids.cbegin(), ids.cend(), user->getId()) != ids.cend())
-                return true;
-
-            auto roleId = user->userRoleId();
-            return !roleId.isNull()
-                && std::find(ids.cbegin(), ids.cend(), roleId) != ids.cend();
-        };
-
     connect(messageProcessor, &QnCommonMessageProcessor::businessActionReceived, this,
-        [this, allowedForUser](const QnAbstractBusinessActionPtr &businessAction)
+        [this](const QnAbstractBusinessActionPtr &businessAction)
         {
             if (businessAction->actionType() != QnBusiness::ShowOnAlarmLayoutAction)
                 return;
@@ -106,7 +89,7 @@ QnWorkbenchAlarmLayoutHandler::QnWorkbenchAlarmLayoutHandler(QObject *parent):
             const auto params = businessAction->getParams();
 
             /* Skip action if it contains list of users and we are not on the list. */
-            if (!allowedForUser(businessAction->getParams().additionalResources))
+            if (!QnBusiness::actionAllowedForUser(businessAction->getParams(), context()->user()))
                 return;
 
             auto targetCameras = resourcePool()->getResources<QnVirtualCameraResource>(businessAction->getResources());

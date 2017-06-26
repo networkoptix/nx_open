@@ -39,7 +39,7 @@ public:
         m_checkStateChanged(checkStateChanged)
     {
         m_data[Qt::CheckStateRole] = qVariantFromValue<int>(Qt::Unchecked);
-        m_data[Qt::DisplayRole] = lit("All Items"); //< Just a default.
+        m_data[Qt::DisplayRole] = lit("<All Items>"); //< Just a default.
     }
 
     enum Columns

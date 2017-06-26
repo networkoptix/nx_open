@@ -14,6 +14,7 @@ set(short.company.name "${company.name}")
 set(backgroundImage "{}")
 set(defaultWebPages "{}")
 set(installer.language "en_US")
+set(installer.cultures "en-us")
 
 set(freeLicenseCount "4")
 set(freeLicenseIsTrial "true")
