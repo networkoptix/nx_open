@@ -227,7 +227,7 @@ void Manager::initializeMulticastFinders(bool clientMode)
         [common = commonModule()]()
         {
             if (const auto settings = common->globalSettings())
-                return settings->isInitialized() && settings->isAutoDiscoveryEnabled();
+                return !settings->isInitialized() || settings->isAutoDiscoveryEnabled();
 
             return false;
         });
