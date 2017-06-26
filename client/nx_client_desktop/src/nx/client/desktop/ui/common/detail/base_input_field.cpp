@@ -53,7 +53,7 @@ public:
     const BaseInputField::AccessorPtr placeholderAccessor;
 
 private:
-    void updatePalette();
+    void updateVisualState();
 
 private:
     Qn::ValidationResult lastResult;
@@ -88,7 +88,7 @@ Qn::ValidationResult BaseInputFieldPrivate::getLastResult() const
     return lastResult;
 }
 
-void BaseInputFieldPrivate::updatePalette()
+void BaseInputFieldPrivate::updateVisualState()
 {
     setHintText(lastResult.errorMessage);
 
@@ -109,7 +109,7 @@ void BaseInputFieldPrivate::setLastResult(Qn::ValidationResult result)
 
     lastResult = result;
 
-    updatePalette();
+    updateVisualState();
     emit parent->isValidChanged();
 }
 
