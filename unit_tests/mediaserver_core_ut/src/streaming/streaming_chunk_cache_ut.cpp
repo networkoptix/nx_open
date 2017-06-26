@@ -86,6 +86,11 @@ protected:
         ASSERT_NE(m_readyChunk, streamingChunk);
     }
 
+    void thenOriginalChunkHasBeenRemovedFromCache()
+    {
+        ASSERT_TRUE(m_readyChunk.unique());
+    }
+
 private:
     std::unique_ptr<::StreamingChunkCache> m_streamingChunkCache;
     StreamingChunkProviderFactory::Function m_factoryFunctionBak;
@@ -137,14 +142,19 @@ TEST_F(StreamingChunkCache, chunked_is_cached)
 TEST_F(StreamingChunkCache, too_large_chunk_is_not_cached)
 {
     givenReadyChunkLargerThanCache();
+
     thenNewChunkIsReturnedByCache();
+    thenOriginalChunkHasBeenRemovedFromCache();
 }
 
 TEST_F(StreamingChunkCache, truncated_from_the_beginning_chunk_is_removed_from_cache)
 {
     givenReadyChunk();
+
     whenChunkHasBeenTruncatedFromTheBeginning();
+
     thenNewChunkIsReturnedByCache();
+    thenOriginalChunkHasBeenRemovedFromCache();
 }
 
 } // namespace test
