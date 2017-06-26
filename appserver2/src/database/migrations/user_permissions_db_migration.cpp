@@ -35,11 +35,11 @@ bool doRemap(const QSqlDatabase& database, const UserPermissionsRemapData& data)
     QSqlQuery query(database);
     query.setForwardOnly(true);
     QString sqlText("UPDATE vms_userprofile set rights = :permissions where user_id = :id");
-    if (!QnDbHelper::prepareSQLQuery(&query, sqlText, Q_FUNC_INFO))
+    if (!SqlQueryExecutionHelper::prepareSQLQuery(&query, sqlText, Q_FUNC_INFO))
         return false;
     query.bindValue(":id", data.id);
     query.bindValue(":permissions", data.permissions);
-    return QnDbHelper::execSQLQuery(&query, Q_FUNC_INFO);
+    return SqlQueryExecutionHelper::execSQLQuery(&query, Q_FUNC_INFO);
 }
 
 bool doMigration(const QSqlDatabase& database, std::function<int(int)> migrateFunc)
@@ -47,10 +47,10 @@ bool doMigration(const QSqlDatabase& database, std::function<int(int)> migrateFu
     QSqlQuery query(database);
     query.setForwardOnly(true);
     QString sqlText = "SELECT user_id, rights from vms_userprofile";
-    if (!QnDbHelper::prepareSQLQuery(&query, sqlText, Q_FUNC_INFO))
+    if (!SqlQueryExecutionHelper::prepareSQLQuery(&query, sqlText, Q_FUNC_INFO))
         return false;
 
-    if (!QnDbHelper::execSQLQuery(&query, Q_FUNC_INFO))
+    if (!SqlQueryExecutionHelper::execSQLQuery(&query, Q_FUNC_INFO))
         return false;
 
     std::vector<UserPermissionsRemapData> migrationQueue;

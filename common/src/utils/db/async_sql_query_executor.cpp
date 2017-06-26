@@ -6,6 +6,7 @@
 
 #include "db_helper.h"
 #include "request_executor_factory.h"
+#include "sql_query_execution_helper.h"
 
 namespace nx {
 namespace db {
@@ -86,7 +87,7 @@ DBResult AsyncSqlQueryExecutor::execSqlScriptSync(
     const QByteArray& script,
     nx::db::QueryContext* const queryContext)
 {
-    return QnDbHelper::execSQLScript(script, *queryContext->connection())
+    return SqlQueryExecutionHelper::execSQLScript(script, *queryContext->connection())
         ? DBResult::ok
         : DBResult::ioError;
 }
