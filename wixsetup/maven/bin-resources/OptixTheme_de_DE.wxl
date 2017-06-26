@@ -58,7 +58,7 @@
   <String Id="FilesInUseDontCloseRadioButton">Anwendungen nicht schließen. Ein Neustart wird erforderlich sein</String>
   <String Id="FilesInUseOkButton">Ok</String>
   <String Id="FilesInUseCancelButton">Abbrechen</String>
-  <String Id="InstallLicenseText">Wenn Sie auf "Akzeptieren und Installieren" klicken, stimmen Sie zu</String>
+  <String Id="InstallLicenseText">Wenn Sie auf \"Akzeptieren und Installieren\" klicken, stimmen Sie zu</String>
   <String Id="Options">Optionen</String>
   <String Id="SelectApps">Wählen Sie die zu installierenden Anwendungen:</String>
 </WixLocalization>
