@@ -620,8 +620,8 @@ void QnTCPConnectionProcessor::sendUnauthorizedResponse(nx_http::StatusCode::Val
 {
     Q_D(QnTCPConnectionProcessor);
 
-    if( d->request.requestLine.method == nx_http::Method::GET ||
-        d->request.requestLine.method == nx_http::Method::HEAD )
+    if( d->request.requestLine.method == nx_http::Method::Get ||
+        d->request.requestLine.method == nx_http::Method::Head )
     {
         d->response.messageBody = messageBody;
     }

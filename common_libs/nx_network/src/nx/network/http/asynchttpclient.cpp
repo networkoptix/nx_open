@@ -190,7 +190,7 @@ void AsyncHttpClient::doGet(const QUrl& url)
     resetDataBeforeNewRequest();
     m_requestUrl = url;
     m_contentLocationUrl = url;
-    composeRequest(nx_http::Method::GET);
+    composeRequest(nx_http::Method::Get);
     initiateHttpMessageDelivery();
 }
 
@@ -215,7 +215,7 @@ void AsyncHttpClient::doPost(
     resetDataBeforeNewRequest();
     m_requestUrl = url;
     m_contentLocationUrl = url;
-    composeRequest(nx_http::Method::POST);
+    composeRequest(nx_http::Method::Post);
     m_request.headers.insert(make_pair("Content-Type", contentType));
     if (includeContentLength)
         m_request.headers.insert(make_pair("Content-Length", StringType::number(messageBody.size())));
@@ -257,7 +257,7 @@ void AsyncHttpClient::doPut(
     resetDataBeforeNewRequest();
     m_requestUrl = url;
     m_contentLocationUrl = url;
-    composeRequest(nx_http::Method::PUT);
+    composeRequest(nx_http::Method::Put);
     m_request.headers.insert(make_pair("Content-Type", contentType));
     m_request.headers.insert(make_pair("Content-Length", StringType::number(messageBody.size())));
     //TODO #ak support chunked encoding & compression
@@ -292,7 +292,7 @@ void AsyncHttpClient::doDelete(const QUrl& url)
     m_requestUrl = url;
     m_contentLocationUrl = url;
     m_contentLocationUrl.setPath(QLatin1String("*"));
-    composeRequest(nx_http::Method::DELETE);
+    composeRequest(nx_http::Method::Delete);
     initiateHttpMessageDelivery();
 }
 
@@ -315,7 +315,7 @@ void AsyncHttpClient::doOptions(const QUrl& url)
     m_requestUrl = url;
     m_contentLocationUrl = url;
     m_contentLocationUrl.setPath(QLatin1String("*"));
-    composeRequest(nx_http::Method::OPTIONS);
+    composeRequest(nx_http::Method::Options);
     initiateHttpMessageDelivery();
 }
 
@@ -1091,7 +1091,7 @@ void AsyncHttpClient::composeRequest(const nx_http::StringType& httpMethod)
         m_userAgent.isEmpty() ? nx_http::userAgentString() : m_userAgent.toLatin1());
     if (useHttp11)
     {
-        if (httpMethod == nx_http::Method::GET || httpMethod == nx_http::Method::HEAD)
+        if (httpMethod == nx_http::Method::Get || httpMethod == nx_http::Method::Head)
         {
             //m_request.headers.insert( std::make_pair("Accept", "*/*") );
             if (m_contentEncodingUsed)

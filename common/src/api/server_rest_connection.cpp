@@ -138,7 +138,7 @@ Handle ServerConnection::getStatisticsSettingsAsync(
         return Handle(); //< can't process request now. No internet access
 
     nx_http::ClientPool::Request request = prepareRequest(
-        nx_http::Method::GET, prepareUrl(path, emptyRequest.toParams()));
+        nx_http::Method::Get, prepareUrl(path, emptyRequest.toParams()));
     nx_http::HttpHeader header(Qn::SERVER_GUID_HEADER_NAME, server->getId().toByteArray());
     nx_http::insertOrReplaceHeader(&request.headers, header);
     auto handle = request.isValid() ? executeRequest(request, callback, targetThread) : Handle();
@@ -163,7 +163,7 @@ Handle ServerConnection::sendStatisticsAsync(
         return Handle();
 
     nx_http::ClientPool::Request request = prepareRequest(
-        nx_http::Method::POST,
+        nx_http::Method::Post,
         prepareUrl(path, statisticsData.toParams()),
         kJsonContentType,
         data);
@@ -407,7 +407,7 @@ Handle ServerConnection::executeGet(
     REST_CALLBACK(ResultType) callback,
     QThread* targetThread)
 {
-    auto request = prepareRequest(nx_http::Method::GET, prepareUrl(path, params));
+    auto request = prepareRequest(nx_http::Method::Get, prepareUrl(path, params));
     auto handle = request.isValid()
         ? executeRequest(request, callback, targetThread)
         : Handle();
@@ -426,7 +426,7 @@ Handle ServerConnection::executePost(
     QThread* targetThread)
 {
     auto request = prepareRequest(
-        nx_http::Method::POST, prepareUrl(path, params), contentType, messageBody);
+        nx_http::Method::Post, prepareUrl(path, params), contentType, messageBody);
     auto handle = request.isValid()
         ? executeRequest(request, callback, targetThread)
         : Handle();
@@ -445,7 +445,7 @@ Handle ServerConnection::executePut(
     QThread* targetThread)
 {
     auto request = prepareRequest(
-        nx_http::Method::PUT, prepareUrl(path, params), contentType, messageBody);
+        nx_http::Method::Put, prepareUrl(path, params), contentType, messageBody);
     auto handle = request.isValid()
         ? executeRequest(request, callback, targetThread)
         : Handle();
@@ -461,7 +461,7 @@ Handle ServerConnection::executeDelete(
     REST_CALLBACK(ResultType) callback,
     QThread* targetThread)
 {
-    auto request = prepareRequest(nx_http::Method::DELETE, prepareUrl(path, params));
+    auto request = prepareRequest(nx_http::Method::Delete, prepareUrl(path, params));
     auto handle = request.isValid()
         ? executeRequest(request, callback, targetThread)
         : Handle();
