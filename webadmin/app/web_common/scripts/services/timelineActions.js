@@ -259,25 +259,31 @@ TimelineActions.prototype.zoomTo = function(zoomTarget, zoomDate, instant, linea
 };
 
 // Relative zoom (incremental)
-TimelineActions.prototype.zoom = function(zoomIn, slow, linear, zoomDate){
-    var zoomSpeed = slow? this.timelineConfig.slowZoomSpeed : this.timelineConfig.zoomSpeed;
-    var zoomTarget = this.scaleManager.zoom() - (zoomIn ? 1 : -1) * zoomSpeed;
-    this.zoomTo(zoomTarget, zoomDate, false, linear);
+TimelineActions.prototype.zoom = function(zoomIn){
+    var zoomDate = null;
+    /*
+        We need zoomDate here:
+        On press on zoom buttons the following point on timeline should (usually, see exceptions) keep its position:
+            If time marker is not displayed - center of the timeline
+            If time marker is displayed in extreme 64px (on both sides) - the extreme side point of the timeline
+            If time marker is displayed in the central area - point under time marker
+
+        Exception - if playback is on "LIVE" then treat it like timemarker on specific point
+    */
+    var zoomTarget = this.scaleManager.zoom() - (zoomIn ? 1 : -1) * this.timelineConfig.slowZoomSpeed;
+    this.zoomTo(zoomTarget, zoomDate, false, false);
 };
 
 // Continuus zooming - every render
 TimelineActions.prototype.zoomingRenew = function(){ // renew zooming
     if(this.zoomingNow) { // If continuous zooming is on
-        this.zoom(this.zoomingIn, true, false); // Do incremental slow zoom
+        this.zoom(this.zoomingIn); // Repeat incremental zoom
     }
 };
 
 // Release zoom button - stop continuus zooming
 TimelineActions.prototype.zoomingStop = function() {
-    if( this.zoomingNow) { // If continuous zooming is on
-        this.zoomingNow = false; //  Stop continuous zooming
-        this.zoom(this.zoomingIn, true, true); // Do last zoom iteration instantly
-    }
+    this.zoomingNow = false; //  Stop continuous zooming
 };
 
 // Press zoom button - start continuus zooming
@@ -286,11 +292,9 @@ TimelineActions.prototype.zoomingStart = function(zoomIn) {
     if(this.scaleManager.disableZoomOut&&!zoomIn || this.scaleManager.disableZoomIn&&zoomIn){
         return;
     }
-
     this.zoomingNow = true; // Start continuous zooming
     this.zoomingIn = zoomIn; // Set continuous zooming direction
-
-    // this.zoomingRenew();
+    this.zoom(this.zoomingIn); // Run zoom at least once
 };
 
 // Double click zoom out button - zoom out completely
