@@ -1,5 +1,6 @@
-
 #include "client_startup_parameters.h"
+
+#include <QtCore/QFile>
 
 #include <utils/common/app_info.h>
 #include <utils/common/command_line_parser.h>
