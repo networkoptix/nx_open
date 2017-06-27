@@ -58,6 +58,7 @@
 #include "restype_xml_parser.h"
 #include "business/business_event_rule.h"
 #include "settings.h"
+#include <database/api/db_resource_api.h>
 
 #include <nx/fusion/model_functions.h>
 
