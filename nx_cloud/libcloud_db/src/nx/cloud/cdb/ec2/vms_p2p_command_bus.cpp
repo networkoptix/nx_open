@@ -11,8 +11,8 @@ VmsP2pCommandBus::VmsP2pCommandBus(SyncronizationEngine* syncronizationEngine):
 {
 }
 
-nx::db::DBResult VmsP2pCommandBus::saveResourceAttribute(
-    nx::db::QueryContext* queryContext,
+nx::utils::db::DBResult VmsP2pCommandBus::saveResourceAttribute(
+    nx::utils::db::QueryContext* queryContext,
     const std::string& systemId,
     ::ec2::ApiResourceParamWithRefData data)
 {

@@ -217,12 +217,12 @@ private:
         sharing.vmsUserId = guidFromArbitraryData(email).toSimpleByteArray().toStdString();
 
         ASSERT_EQ(
-            nx::db::DBResult::ok,
+            nx::utils::db::DBResult::ok,
             m_authenticationProvider->afterSharingSystem(
                 nullptr, sharing, SharingType::sharingWithExistingAccount));
     }
 
-    nx::db::DBResult onSaveResourceAttribute(
+    nx::utils::db::DBResult onSaveResourceAttribute(
         const std::string& systemId,
         const ::ec2::ApiResourceParamWithRefData& data)
     {
@@ -233,7 +233,7 @@ private:
                 QJson::deserialized<api::AuthInfo>(data.value.toUtf8()));
         }
 
-        return nx::db::DBResult::ok;
+        return nx::utils::db::DBResult::ok;
     }
 
     void assertUserAuthRecordsAreValidForSystem(const std::string& systemId)
@@ -294,7 +294,7 @@ TEST_F(AuthenticationProvider, afterSharingSystem_uses_system_wide_nonce_for_eve
 
 TEST_F(AuthenticationProvider, afterSharingSystem_throws_on_not_found_account)
 {
-    ASSERT_THROW(whenSharingSystemWithNotExistingAccount(), nx::db::Exception);
+    ASSERT_THROW(whenSharingSystemWithNotExistingAccount(), nx::utils::db::Exception);
 }
 
 TEST_F(AuthenticationProvider, afterSharingSystem_generates_update_user_transaction)

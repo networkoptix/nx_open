@@ -19,7 +19,7 @@ static const char* const kSchedulerDbScheme = R"sql(
     );
 )sql";
 
-SchedulerDbHelper::SchedulerDbHelper(nx::db::AbstractAsyncSqlQueryExecutor* sqlExecutor):
+SchedulerDbHelper::SchedulerDbHelper(nx::utils::db::AbstractAsyncSqlQueryExecutor* sqlExecutor):
     m_dbStructureUpdater(kPersistentShedulerStructureName, sqlExecutor)
 {
     m_dbStructureUpdater.addFullSchemaScript(kSchedulerDbStartingVersion, kSchedulerDbScheme);
@@ -30,8 +30,8 @@ bool SchedulerDbHelper::initDb()
     return m_dbStructureUpdater.updateStructSync();
 }
 
-nx::db::DBResult SchedulerDbHelper::getScheduleData(
-    nx::db::QueryContext* queryContext,
+nx::utils::db::DBResult SchedulerDbHelper::getScheduleData(
+    nx::utils::db::QueryContext* queryContext,
     ScheduleData* scheduleData) const
 {
     QSqlQuery scheduleDataQuery(*queryContext->connection());
@@ -41,7 +41,7 @@ nx::db::DBResult SchedulerDbHelper::getScheduleData(
     if (!scheduleDataQuery.exec())
     {
         NX_LOG(lit("[Scheduler, db] Failed to fetch schedule data"), cl_logERROR);
-        return nx::db::DBResult::ioError;
+        return nx::utils::db::DBResult::ioError;
     }
 
     while (scheduleDataQuery.next())
@@ -62,11 +62,11 @@ nx::db::DBResult SchedulerDbHelper::getScheduleData(
         scheduleData->taskToParams[taskId].period = std::chrono::milliseconds(periodMs);
     }
 
-    return db::DBResult::ok;
+    return nx::utils::db::DBResult::ok;
 }
 
-nx::db::DBResult SchedulerDbHelper::subscribe(
-    nx::db::QueryContext* queryContext,
+nx::utils::db::DBResult SchedulerDbHelper::subscribe(
+    nx::utils::db::QueryContext* queryContext,
     const QnUuid& functorId,
     QnUuid* outTaskId,
     const ScheduleTaskInfo& taskInfo)
@@ -96,15 +96,15 @@ nx::db::DBResult SchedulerDbHelper::subscribe(
         {
             NX_LOG(lit("[Scheduler, db] Failed to insert subscribe info, error: %1")
                    .arg(subscribeQuery.lastError().text()), cl_logERROR);
-            return nx::db::DBResult::ioError;
+            return nx::utils::db::DBResult::ioError;
         }
     }
 
-    return nx::db::DBResult::ok;
+    return nx::utils::db::DBResult::ok;
 }
 
-nx::db::DBResult SchedulerDbHelper::unsubscribe(
-    nx::db::QueryContext* queryContext,
+nx::utils::db::DBResult SchedulerDbHelper::unsubscribe(
+    nx::utils::db::QueryContext* queryContext,
     const QnUuid& taskId)
 {
     QSqlQuery unsubscribeQuery(*queryContext->connection());
@@ -115,10 +115,10 @@ nx::db::DBResult SchedulerDbHelper::unsubscribe(
     {
         NX_LOG(lit("[Scheduler, db] Failed to delete task info, error: %1")
                .arg(unsubscribeQuery.lastError().text()), cl_logERROR);
-        return nx::db::DBResult::ioError;
+        return nx::utils::db::DBResult::ioError;
     }
 
-    return nx::db::DBResult::ok;
+    return nx::utils::db::DBResult::ok;
 }
 
 } // namespace cdb

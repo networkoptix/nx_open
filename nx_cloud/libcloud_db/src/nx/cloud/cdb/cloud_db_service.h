@@ -15,7 +15,7 @@
 
 #include <nx/cloud/cdb/api/result_code.h>
 #include <nx/utils/stree/resourcecontainer.h>
-#include <utils/db/async_sql_query_executor.h>
+#include <nx/utils/db/async_sql_query_executor.h>
 
 #include "access_control/auth_types.h"
 #include "managers/managers_types.h"

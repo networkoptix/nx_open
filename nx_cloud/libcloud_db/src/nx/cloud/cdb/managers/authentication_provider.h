@@ -40,13 +40,13 @@ public:
         ec2::AbstractVmsP2pCommandBus* vmsP2pCommandBus);
     virtual ~AuthenticationProvider();
 
-    virtual nx::db::DBResult afterSharingSystem(
-        nx::db::QueryContext* const queryContext,
+    virtual nx::utils::db::DBResult afterSharingSystem(
+        nx::utils::db::QueryContext* const queryContext,
         const api::SystemSharing& sharing,
         SharingType sharingType) override;
     
     virtual void afterUpdatingAccountPassword(
-        nx::db::QueryContext* const queryContext,
+        nx::utils::db::QueryContext* const queryContext,
         const api::AccountData& account) override;
 
     /**
@@ -91,10 +91,10 @@ private:
         const std::string& passwordHa1) const;
 
     std::string fetchOrCreateNonce(
-        nx::db::QueryContext* const queryContext,
+        nx::utils::db::QueryContext* const queryContext,
         const std::string& systemId);
     void addUserAuthRecord(
-        nx::db::QueryContext* const queryContext,
+        nx::utils::db::QueryContext* const queryContext,
         const std::string& systemId,
         const std::string& vmsUserId,
         const api::AccountData& account,
@@ -104,7 +104,7 @@ private:
         const std::string& nonce);
     void removeExpiredRecords(api::AuthInfo* userAuthenticationRecords);
     void generateUpdateUserAuthInfoTransaction(
-        nx::db::QueryContext* const queryContext,
+        nx::utils::db::QueryContext* const queryContext,
         const std::string& systemId,
         const std::string& vmsUserId,
         const api::AuthInfo& userAuthenticationRecords);
