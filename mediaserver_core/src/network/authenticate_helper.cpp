@@ -193,6 +193,7 @@ Qn::AuthResult QnAuthHelper::authenticate(
                     QString desiredRealm = QnAppInfo::realm();
                     bool needRecalcPassword =
                         userResource->getRealm() != desiredRealm ||
+                        (userResource->isLdap() && userResource->passwordExpired()) ||
                         (userResource->getDigest().isEmpty() && !userResource->isCloud());
                     if (canUpdateRealm && needRecalcPassword)
                     {

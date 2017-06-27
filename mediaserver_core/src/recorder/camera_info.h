@@ -53,12 +53,10 @@ public:
     virtual ComposerHandler* composerHandler(const QString& cameraId) = 0;
 };
 
-const std::chrono::minutes kWriteInfoFilesInterval(5);
-
 class Writer
 {
 public:
-    Writer(WriterHandler* writeHandler, std::chrono::milliseconds writeInterval = kWriteInfoFilesInterval);
+    Writer(WriterHandler* writeHandler);
     void write();
 
 private:
@@ -69,13 +67,8 @@ private:
         QnServer::ChunksCatalog catalog,
         const QString& cameraId);
 
-protected:
-    void setWriteInterval(std::chrono::milliseconds interval);
-
 private:
     WriterHandler* m_handler;
-    std::chrono::milliseconds m_writeInterval;
-    std::chrono::time_point<std::chrono::steady_clock> m_lastWriteTime;
     QMap<QString, QByteArray> m_infoPathToCameraInfo;
     Composer m_composer;
 };

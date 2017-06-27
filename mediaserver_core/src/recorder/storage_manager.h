@@ -23,6 +23,7 @@
 #include "utils/db/db_helper.h"
 #include "storage_db.h"
 #include <nx/utils/uuid.h>
+#include <nx/utils/timer_manager.h>
 #include <set>
 #include <unordered_map>
 #include "api/model/rebuild_archive_reply.h"
@@ -44,6 +45,7 @@ class QnAbstractMediaStreamDataProvider;
 class TestStorageThread;
 class RebuildAsyncTask;
 class ScanMediaFilesTask;
+class AuxiliaryTask;
 class QnUuid;
 class QnScheduleSync;
 
@@ -194,7 +196,7 @@ private:
         std::function<bool (const QnStorageResourcePtr& storage)> filter) const;
 
     QnStorageResourcePtr getUsedWritableStorageByIndex(int storageIndex);
-		
+
     void changeStorageStatus(const QnStorageResourcePtr &fileStorage, Qn::ResourceStatus status);
     DeviceFileCatalogPtr getFileCatalogInternal(const QString& cameraUniqueId, QnServer::ChunksCatalog catalog);
 
@@ -236,6 +238,7 @@ private:
     static std::vector<QnUuid> getCamerasWithArchive();
     int64_t calculateNxOccupiedSpace(int storageIndex) const;
     QnStorageResourcePtr getStorageByIndex(int index) const;
+    void startAuxTimerTasks();
 private:
     const QnServer::StoragePool m_role;
     StorageMap                  m_storageRoots;
@@ -262,6 +265,7 @@ private:
 
     friend class RebuildAsyncTask;
     friend class ScanMediaFilesTask;
+    friend class AuxiliaryTask;
 
     ScanMediaFilesTask* m_rebuildArchiveThread;
 
@@ -280,6 +284,8 @@ private:
     nx::recorder::SpaceInfo m_spaceInfo;
     nx::caminfo::ServerWriterHandler m_camInfoWriterHandler;
     nx::caminfo::Writer m_camInfoWriter;
+
+    nx::utils::StandaloneTimerManager m_auxTasksTimerManager;
 };
 
 #define qnNormalStorageMan QnStorageManager::normalInstance()

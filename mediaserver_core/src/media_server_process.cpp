@@ -2632,8 +2632,10 @@ void MediaServerProcess::run()
     NX_ASSERT(MSSettings::roSettings()->value(APPSERVER_PASSWORD).toString().isEmpty(), Q_FUNC_INFO, "appserverPassword is not emptyu in registry. Restart the server as Administrator");
 #endif
 
-    if (needToStop()) {
+    if (needToStop())
+    {
         stopObjects();
+        m_ipDiscovery.reset();
         return;
     }
 

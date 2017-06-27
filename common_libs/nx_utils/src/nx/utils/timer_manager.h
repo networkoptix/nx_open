@@ -3,8 +3,7 @@
 * a.kolesnikov
 ***********************************************************/
 
-#ifndef TIMERMANAGER_H
-#define TIMERMANAGER_H
+#pragma once
 
 #include <chrono>
 #include <functional>
@@ -31,7 +30,7 @@ public:
 
     //!Called on timer event
     /*!
-        \param timerID 
+        \param timerID
     */
     virtual void onTimer(const TimerId& timerID) = 0;
 };
@@ -43,16 +42,15 @@ public:
     \note This timer require nor event loop (as QTimer), nor it's thread-dependent (as SystemTimer), but it delivers timer events to internal thread,
         so additional synchronization in timer event handler may be required
 */
-class NX_UTILS_API TimerManager
+class NX_UTILS_API StandaloneTimerManager
 :
-    public QThread,
-    public Singleton<TimerManager>
+    public QThread
 {
 public:
     //!This class is to simplify timer id usage
     /*!
         \note Not thread-safe
-        \warning This class calls \a TimerManager::joinAndDeleteTimer, so watch out for deadlock!
+        \warning This class calls \a StandaloneTimerManager::joinAndDeleteTimer, so watch out for deadlock!
     */
     class NX_UTILS_API TimerGuard
     {
@@ -61,7 +59,7 @@ public:
 
     public:
         TimerGuard();
-        TimerGuard(TimerManager* const timerManager, TimerId timerID);
+        TimerGuard(StandaloneTimerManager* const StandaloneTimerManager, TimerId timerID);
         TimerGuard(TimerGuard&& right);
         /*!
         Calls \a TimerGuard::reset()
@@ -81,7 +79,7 @@ public:
         bool operator!=(const TimerGuard& right) const;
 
     private:
-        TimerManager* m_timerManager;
+        StandaloneTimerManager* m_standaloneTimerManager;
         TimerId m_timerID;
 
         TimerGuard(const TimerGuard& right);
@@ -91,8 +89,8 @@ public:
     /*!
         Launches internal thread
     */
-    TimerManager();
-    virtual ~TimerManager();
+    StandaloneTimerManager();
+    virtual ~StandaloneTimerManager();
 
     //!Adds timer that is executed once after \a delay expiration
     /*!
@@ -182,6 +180,12 @@ private:
     uint64_t generateNextTimerId();
 };
 
+class NX_UTILS_API TimerManager:
+    public StandaloneTimerManager,
+    public Singleton<TimerManager>
+{
+};
+
 /** Parses time period like 123ms (milliseconds).
     Supported suffix: ms, s (second), m (minute), h (hour), d (day).
     If no suffix is found value considered to be seconds
@@ -197,4 +201,3 @@ boost::optional<std::chrono::milliseconds> NX_UTILS_API parseOptionalTimerDurati
 }   //namespace utils
 }   //namespace nx
 
-#endif //TIMERMANAGER_H

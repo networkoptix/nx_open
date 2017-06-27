@@ -5,6 +5,7 @@
 #include <nx/utils/std/future.h>
 
 #include "aio/pollset_factory.h"
+#include "ssl/ssl_static_data.h"
 
 const std::chrono::seconds kReloadDebugConfigInterval(10);
 
@@ -73,6 +74,10 @@ SocketGlobals::SocketGlobals(int initializationFlags):
         m_pollSetFactory.disableUdt();
 
     m_aioServiceGuard.initialize();
+
+#ifdef ENABLE_SSL
+    ssl::initOpenSSLGlobalLock();
+#endif
 }
 
 SocketGlobals::~SocketGlobals()

@@ -184,8 +184,10 @@ CameraDiagnostics::Result ThirdPartyStreamReader::openStreamInternal(bool isCame
 
             QnMutexLocker lock(&m_streamReaderMutex);
             m_liveStreamReader.reset(); // release an old one first
+            lock.unlock();
             nxcip::StreamReader * tmpReader = nullptr;
-            int ret = mediaEncoder3->getConfiguredLiveStreamReader( &config, &tmpReader );
+            int ret = mediaEncoder3->getConfiguredLiveStreamReader(&config, &tmpReader);
+            lock.relock();
             m_liveStreamReader.reset( tmpReader, refDeleter );
 
             if( ret != nxcip::NX_NO_ERROR )
@@ -195,7 +197,10 @@ CameraDiagnostics::Result ThirdPartyStreamReader::openStreamInternal(bool isCame
         {
             QnMutexLocker lock(&m_streamReaderMutex);
             m_liveStreamReader.reset();
-            m_liveStreamReader.reset( mediaEncoder3->getLiveStreamReader(), refDeleter );
+            lock.unlock();
+            auto liveReader = mediaEncoder3->getLiveStreamReader();
+            lock.relock();
+            m_liveStreamReader.reset( liveReader, refDeleter );
         }
     }
     else // multiple-calls config
@@ -230,7 +235,10 @@ CameraDiagnostics::Result ThirdPartyStreamReader::openStreamInternal(bool isCame
         {
             QnMutexLocker lock(&m_streamReaderMutex);
             m_liveStreamReader.reset();
-            m_liveStreamReader.reset( m_mediaEncoder2->getLiveStreamReader(), refDeleter );
+            lock.unlock();
+            auto liveReader = m_mediaEncoder2->getLiveStreamReader();
+            lock.relock();
+            m_liveStreamReader.reset( liveReader, refDeleter );
         }
     }
 
@@ -279,8 +287,7 @@ CameraDiagnostics::Result ThirdPartyStreamReader::openStreamInternal(bool isCame
             rtspStreamReader->setUserAgent(QnAppInfo::productName());
             rtspStreamReader->setRequest( mediaUrlStr );
             rtspStreamReader->setRole(role);
-            rtspStreamReader->setPrefferedAuthScheme(nx_http::header::AuthScheme::automatic);
-			m_thirdPartyRes->updateSourceUrl(rtspStreamReader->getCurrentStreamUrl(), getRole());
+            m_thirdPartyRes->updateSourceUrl(rtspStreamReader->getCurrentStreamUrl(), getRole());
             QnMutexLocker lock(&m_streamReaderMutex);
             m_builtinStreamReader.reset( rtspStreamReader );
         }

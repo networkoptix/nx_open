@@ -1008,8 +1008,6 @@ SslSocket::SslSocket(
     base_type([wrappedSocket](){ return wrappedSocket; }),
     d_ptr(priv)
 {
-    ssl::initOpenSSLGlobalLock();
-
     Q_D(SslSocket);
     d->wrappedSocket = wrappedSocket;
     d->isServerSide = isServerSide;
@@ -1851,7 +1849,6 @@ SslServerSocket::SslServerSocket(
     m_allowNonSecureConnect(allowNonSecureConnect),
     m_delegateSocket(delegateSocket)
 {
-    ssl::initOpenSSLGlobalLock();
 }
 
 bool SslServerSocket::listen(int queueLen)

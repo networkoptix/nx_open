@@ -85,7 +85,6 @@ qint64 getDiskTotalSpace(const QString &root);
 #define DEFAULT_APPSERVER_PORT 7001
 
 //#define MAX_RTSP_DATA_LEN (65535 - 16)
-#define MAX_RTSP_DATA_LEN (16*1024 - 16)
 
 #define BACKWARD_SEEK_STEP (1000ll * 1000)
 
