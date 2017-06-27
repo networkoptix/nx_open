@@ -75,6 +75,7 @@
 #include <api/helpers/thumbnail_request_data.h>
 #include <utils/common/util.h>
 #include <nx/utils/concurrent.h>
+#include <utils/camera/bookmark_helpers.h>
 
 namespace {
 
@@ -469,67 +470,45 @@ bool ExtendedRuleProcessor::executeRecordingAction(const vms::event::RecordingAc
     auto camera = resourcePool()->getResourceById<QnSecurityCamResource>(action->getParams().actionResourceId);
     //NX_ASSERT(camera);
     bool rez = false;
-    if (camera) {
+    if (camera)
+    {
+        auto toggleState = action->getToggleState();
         // todo: if camera is offline function return false. Need some tries on timer event
-        if (action->getToggleState() == vms::event::ActiveState)
+        if (toggleState == vms::event::ActiveState || //< Prolonged actions starts
+            action->getDurationSec() > 0) //< Instant action
+        {
             rez = qnRecordingManager->startForcedRecording(
                 camera,
-                action->getStreamQuality(), action->getFps(),
+                action->getStreamQuality(),
+                action->getFps(),
                 0, /* Record-before setup is forbidden */
-                action->getRecordAfter(),
-                action->getRecordDuration());
+                action->getRecordAfterSec(),
+                action->getDurationSec());
+        }
         else
+        {
             rez = qnRecordingManager->stopForcedRecording(camera);
+        }
     }
     return rez;
 }
 
-bool ExtendedRuleProcessor::executeBookmarkAction(const vms::event::AbstractActionPtr &action)
+bool ExtendedRuleProcessor::executeBookmarkAction(const vms::event::AbstractActionPtr& action)
 {
-    NX_ASSERT(action);
-    auto camera = resourcePool()->getResourceById<QnSecurityCamResource>(action->getParams().actionResourceId);
-    if (!camera)
+    const auto cameraId = action
+        ? action->getParams().actionResourceId
+        : QnUuid();
+
+    const auto camera = resourcePool()->getResourceById<QnSecurityCamResource>(cameraId);
+    if (!camera || !fixActionTimeFields(action))
         return false;
 
-    int fixedDurationMs = action->getParams().durationMs;
-    int recordBeforeMs = action->getParams().recordBeforeMs;
-    int recordAfterMs = action->getParams().recordAfter;
-
-    const auto key = action->getExternalUniqKey();
-    auto runningKey = guidFromArbitraryData(key);
-    qint64 startTimeMs = action->getRuntimeParams().eventTimestampUsec / 1000;
-    qint64 endTimeMs = startTimeMs;
-
-    if (fixedDurationMs <= 0)
-    {
-        // bookmark as an prolonged action
-        if (action->getToggleState() == vms::event::ActiveState) {
-            m_runningBookmarkActions[runningKey] = startTimeMs;
-            return true;
-        }
-
-        if (!m_runningBookmarkActions.contains(runningKey))
-            return false;
-
-        startTimeMs = m_runningBookmarkActions.take(runningKey);
-    }
-
-    QnCameraBookmark bookmark;
-    bookmark.guid = QnUuid::createUuid();
-    bookmark.startTimeMs = startTimeMs - recordBeforeMs;
-    bookmark.durationMs = fixedDurationMs > 0 ? fixedDurationMs : endTimeMs - startTimeMs;
-    bookmark.durationMs += recordBeforeMs + recordAfterMs;
-    bookmark.cameraId = camera->getId();
-    vms::event::StringsHelper helper(commonModule());
-    bookmark.name = helper.eventAtResource(action->getRuntimeParams(), Qn::RI_WithUrl);
-    bookmark.description = helper.eventDetails(action->getRuntimeParams()).join(L'\n');
-    bookmark.tags = action->getParams().tags.split(L',', QString::SkipEmptyParts).toSet();
-
+    const auto bookmark = helpers::bookmarkFromAction(action, camera, commonModule());
     return qnServerDb->addBookmark(bookmark);
 }
 
-
-QnUuid ExtendedRuleProcessor::getGuid() const {
+QnUuid ExtendedRuleProcessor::getGuid() const
+{
     return serverGuid();
 }
 
@@ -691,25 +670,24 @@ void ExtendedRuleProcessor::sendEmailAsync(
 
 bool ExtendedRuleProcessor::sendMail(const vms::event::SendMailActionPtr& action)
 {
-    //QnMutexLocker lk(&m_mutex);  m_mutex is already locked down the stack
+    // QnMutexLocker lk(&m_mutex); <- m_mutex is already locked down the stack.
 
-    //currently, aggregating only cameraDisconnected and networkIssue events
-    if (action->getRuntimeParams().eventType != vms::event::CameraDisconnectEvent &&
-        action->getRuntimeParams().eventType != vms::event::NetworkIssueEvent)
+    if( action->getRuntimeParams().eventType != vms::event::CameraDisconnectEvent &&
+        action->getRuntimeParams().eventType != vms::event::NetworkIssueEvent )
     {
         return sendMailInternal(action, 1);
     }
 
-    /* Aggregating by recipients and event type. */
+    // Aggregating by recipients and event type.
 
     SendEmailAggregationKey aggregationKey(action->getRuntimeParams().eventType,
-        action->getParams().emailAddress); // all recipients are already computed and packed here
+        action->getParams().emailAddress); //< all recipients are already computed and packed here.
 
     SendEmailAggregationData& aggregatedData = m_aggregatedEmails[aggregationKey];
 
     vms::event::AggregationInfo aggregationInfo = aggregatedData.action
-        ? aggregatedData.action->aggregationInfo()  //adding event source (camera) to the existing aggregation info
-        : vms::event::AggregationInfo();              //creating new aggregation info
+        ? aggregatedData.action->aggregationInfo() //< adding event source (camera) to the existing aggregation info.
+        : vms::event::AggregationInfo();           //< creating new aggregation info.
 
     if (!aggregatedData.action)
     {
@@ -1027,22 +1005,21 @@ void ExtendedRuleProcessor::updateRecipientsList(
     QStringList additional = action->getParams().emailAddress.split(kOldEmailDelimiter,
         QString::SkipEmptyParts);
 
-    const auto ids = action->getResources();
-    const auto userRoles = userRolesManager()->userRoles(ids);
-    const auto users = resourcePool()->getResources<QnUserResource>(ids);
+    QList<QnUuid> userRoles;
+    QnUserResourceList users;
+    userRolesManager()->usersAndRoles(action->getResources(), users, userRoles);
 
     QStringList recipients;
     auto addRecipient = [&recipients](const QString& email)
         {
             const QString simplified = email.trimmed().toLower();
-            if (simplified.isEmpty()) //fast check
+            if (simplified.isEmpty())
                 return;
 
             QnEmailAddress address(simplified);
             if (address.isValid())
                 recipients.append(address.value());
         };
-
 
     for (const auto& email: additional)
         addRecipient(email);
@@ -1055,7 +1032,7 @@ void ExtendedRuleProcessor::updateRecipientsList(
 
     for (const auto& userRole: userRoles)
     {
-        for (const auto& subject: resourceAccessSubjectsCache()->usersInRole(userRole.id))
+        for (const auto& subject: resourceAccessSubjectsCache()->usersInRole(userRole))
         {
             const auto& user = subject.user();
             NX_ASSERT(user);

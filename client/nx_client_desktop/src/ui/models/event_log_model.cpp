@@ -14,6 +14,7 @@
 #include <client_core/client_core_module.h>
 
 #include <core/resource_management/resource_pool.h>
+#include <core/resource_management/user_roles_manager.h>
 
 #include <core/resource/resource.h>
 #include <core/resource/user_resource.h>
@@ -293,15 +294,36 @@ QnResourcePtr QnEventLogModel::getResource(Column column, const vms::event::Acti
     return QnResourcePtr();
 }
 
-QString QnEventLogModel::getUserNameById(const QnUuid& id)
+QString QnEventLogModel::getSubjectsText(const std::vector<QnUuid>& ids) const
 {
-    static const auto kRemovedUserName = L'<' + tr("User removed") + L'>';
+    QnUserResourceList users;
+    QList<QnUuid> roles;
+    userRolesManager()->usersAndRoles(ids, users, roles);
 
-    auto resourcePool = qnClientCoreModule->commonModule()->resourcePool();
-    const auto userResource = resourcePool->getResourceById(id).dynamicCast<QnUserResource>();
-    return (userResource.isNull() ? kRemovedUserName : userResource->getName());
+    const int numDeleted = int(ids.size()) - (users.size() + roles.size());
+    NX_EXPECT(numDeleted >= 0);
+    if (numDeleted <= 0)
+        return m_helper->actionSubjects(users, roles);
+
+    const QString removedSubjectsText = tr("%n Removed subjects", "", numDeleted);
+    return roles.empty() && users.empty()
+        ? removedSubjectsText
+        : m_helper->actionSubjects(users, roles, false) + lit(", ") + removedSubjectsText;
 }
 
+QString QnEventLogModel::getSubjectNameById(const QnUuid& id) const
+{
+    static const auto kRemovedUserName = L'<' + tr("Subject removed") + L'>';
+
+    QnUserResourceList users;
+    QList<QnUuid> roles;
+    userRolesManager()->usersAndRoles(
+        QVector<QnUuid>{id}, users, roles);
+
+    return users.empty() && roles.empty()
+        ? kRemovedUserName
+        : m_helper->actionSubjects(users, roles, false);
+}
 
 QVariant QnEventLogModel::iconData(Column column, const vms::event::ActionData& action)
 {
@@ -328,19 +350,20 @@ QVariant QnEventLogModel::iconData(Column column, const vms::event::ActionData& 
                     return QVariant();
                 }
             }
-            else if (actionType == vms::event::ShowPopupAction)
+            else if (actionType == vms::event::ShowPopupAction
+                  || actionType == vms::event::ShowOnAlarmLayoutAction)
             {
-                if (action.actionParams.userGroup == vms::event::AdminOnly)
-                    return qnResIconCache->icon(QnResourceIconCache::User);
-                else
-                    return qnResIconCache->icon(QnResourceIconCache::Users);
-            }
-            else if (actionType == vms::event::ShowOnAlarmLayoutAction)
-            {
-                const auto &users = action.actionParams.additionalResources;
-                const bool multipleUsers = (users.empty() || (users.size() > 1));
-                return qnResIconCache->icon(multipleUsers ?
-                    QnResourceIconCache::Users : QnResourceIconCache::User);
+                QnUserResourceList users;
+                QList<QnUuid> roles;
+                qnClientCoreModule->commonModule()->userRolesManager()->usersAndRoles(
+                    action.actionParams.additionalResources, users, roles);
+                const bool multiple = action.actionParams.additionalResources.empty()
+                    || action.actionParams.additionalResources.size() > 1
+                    || users.size() > 1
+                    || !roles.empty();
+                return qnResIconCache->icon(multiple
+                    ? QnResourceIconCache::Users
+                    : QnResourceIconCache::User);
             }
         }
         resId = action.actionParams.actionResourceId;
@@ -357,20 +380,6 @@ QString QnEventLogModel::getResourceNameString(const QnUuid& id)
     auto resourcePool = qnClientCoreModule->commonModule()->resourcePool();
     return QnResourceDisplayInfo(resourcePool->getResourceById(id))
         .toString(qnSettings->extraInfoInTree());
-}
-
-QString QnEventLogModel::getUserGroupString(vms::event::UserGroup value)
-{
-    switch (value)
-    {
-        case vms::event::EveryOne:
-            return tr("Users");
-        case vms::event::AdminOnly:
-            return tr("Administrators Only");
-        default:
-            return QString();
-    }
-    return QString();
 }
 
 QString QnEventLogModel::textData(Column column, const vms::event::ActionData& action) const
@@ -397,29 +406,23 @@ QString QnEventLogModel::textData(Column column, const vms::event::ActionData& a
             return m_helper->actionName(action.actionType);
         case ActionCameraColumn:
         {
-            vms::event::ActionType actionType = action.actionType;
-            if (actionType == vms::event::SendMailAction)
-                return action.actionParams.emailAddress;
-            else if (actionType == vms::event::ShowPopupAction)
-                return getUserGroupString(action.actionParams.userGroup);
-            else if (actionType == vms::event::ShowOnAlarmLayoutAction)
+            switch (action.actionType)
             {
-                // For ShowOnAlarmLayoutAction action type additionalResources contains users list
-                const auto &users = action.actionParams.additionalResources;
-                if (users.empty())
-                    return tr("All users");
+                case vms::event::SendMailAction:
+                    return action.actionParams.emailAddress;
 
-                if (users.size() == 1)
-                    return getUserNameById(users.front());
+                case vms::event::ShowPopupAction:
+                case vms::event::ShowOnAlarmLayoutAction:
+                    return action.actionParams.allUsers
+                        ? tr("All users")
+                        : getSubjectsText(action.actionParams.additionalResources);
 
-                return tr("%n users", "", int(users.size()));
+                case vms::event::ExecHttpRequestAction:
+                    return QUrl(action.actionParams.url).toString(QUrl::RemoveUserInfo);
+
+                default:
+                    return getResourceNameString(action.actionParams.actionResourceId);
             }
-            else if (actionType == vms::event::ExecHttpRequestAction)
-            {
-                return QUrl(action.actionParams.url).toString(QUrl::RemoveUserInfo);
-            }
-            else
-                return getResourceNameString(action.actionParams.actionResourceId);
         }
         case DescriptionColumn:
         {
@@ -490,7 +493,7 @@ QString QnEventLogModel::tooltip(Column column, const vms::event::ActionData& ac
         else
         {
             for (const auto& userId: users)
-                userNames.append(getUserNameById(userId));
+                userNames.append(getSubjectNameById(userId));
         }
 
         if (userNames.size() > kMaxResourcesCount)

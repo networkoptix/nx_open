@@ -17,7 +17,7 @@
 #include <camera/resource_display.h>
 #include <camera/cam_display.h>
 #include <camera/camera_data_manager.h>
-#include <camera/loaders/caching_camera_data_loader.h>  //TODO: #GDM remove this dependency
+#include <camera/loaders/caching_camera_data_loader.h> // TODO: #GDM remove this dependency
 
 #include <client/client_settings.h>
 #include <client/client_globals.h>
@@ -34,6 +34,7 @@
 #include <core/resource/camera_history.h>
 #include <core/resource/layout_resource.h>
 #include <core/resource_management/resources_changes_manager.h>
+#include <core/resource_management/user_roles_manager.h>
 #include <core/ptz/ptz_controller_pool.h>
 #include <core/ptz/preset_ptz_controller.h>
 #include <core/ptz/tour_ptz_controller.h>
@@ -352,7 +353,7 @@ QnMediaResourceWidget::QnMediaResourceWidget(QnWorkbenchContext* context, QnWork
     /* Set up overlays */
     if (m_camera && m_camera->hasFlags(Qn::io_module))
     {
-        //TODO: #vkutin #gdm #common Make a style metric that holds this value.
+        // TODO: #vkutin #gdm #common Make a style metric that holds this value.
         auto topMargin = titleBar()
             ? titleBar()->leftButtonsBar()->uniformButtonSize().height()
             : 0.0;
@@ -430,7 +431,7 @@ QnMediaResourceWidget::QnMediaResourceWidget(QnWorkbenchContext* context, QnWork
     }
 
     connect(base_type::resource(), &QnResource::resourceChanged, this,
-        &QnMediaResourceWidget::updateButtonsVisibility); //TODO: #GDM #Common get rid of resourceChanged
+        &QnMediaResourceWidget::updateButtonsVisibility); // TODO: #GDM #Common get rid of resourceChanged
 
     connect(this, &QnResourceWidget::zoomRectChanged, this,
         &QnMediaResourceWidget::at_zoomRectChanged);
@@ -456,18 +457,7 @@ QnMediaResourceWidget::QnMediaResourceWidget(QnWorkbenchContext* context, QnWork
     updateOverlayButton();
     setImageEnhancement(item->imageEnhancement());
 
-    resetTriggers();
-
-    auto eventRuleManager = commonModule()->eventRuleManager();
-
-    connect(eventRuleManager, &vms::event::RuleManager::rulesReset,
-        this, &QnMediaResourceWidget::resetTriggers);
-
-    connect(eventRuleManager, &vms::event::RuleManager::ruleAddedOrUpdated,
-        this, &QnMediaResourceWidget::at_eventRuleAddedOrUpdated);
-
-    connect(eventRuleManager, &vms::event::RuleManager::ruleRemoved,
-        this, &QnMediaResourceWidget::at_eventRuleRemoved);
+    initSoftwareTriggers();
 
     connect(this, &QnMediaResourceWidget::updateInfoTextLater, this,
         &QnMediaResourceWidget::updateCurrentUtcPosMs);
@@ -485,6 +475,25 @@ QnMediaResourceWidget::~QnMediaResourceWidget()
     for (auto* data : m_binaryMotionMask)
         qFreeAligned(data);
     m_binaryMotionMask.clear();
+}
+
+void QnMediaResourceWidget::initSoftwareTriggers()
+{
+    if (!display()->camDisplay()->isRealTimeSource())
+        return;
+
+    resetTriggers();
+
+    auto eventRuleManager = commonModule()->eventRuleManager();
+
+    connect(eventRuleManager, &vms::event::RuleManager::rulesReset,
+        this, &QnMediaResourceWidget::resetTriggers);
+
+    connect(eventRuleManager, &vms::event::RuleManager::ruleAddedOrUpdated,
+        this, &QnMediaResourceWidget::at_eventRuleAddedOrUpdated);
+
+    connect(eventRuleManager, &vms::event::RuleManager::ruleRemoved,
+        this, &QnMediaResourceWidget::at_eventRuleRemoved);
 }
 
 void QnMediaResourceWidget::createButtons()
@@ -1577,7 +1586,7 @@ QString QnMediaResourceWidget::calculateDetailsText() const
     for (int i = 0; i < channelCount(); i++)
     {
         const QnMediaStreamStatistics *statistics = m_display->mediaProvider()->getStatistics(i);
-        if (statistics->isConnectionLost()) //TODO: #GDM check does not work, case #3993
+        if (statistics->isConnectionLost()) // TODO: #GDM check does not work, case #3993
             continue;
         fps = qMax(fps, static_cast<qreal>(statistics->getFrameRate()));
         mbps += statistics->getBitrateMbps();
@@ -1751,7 +1760,7 @@ Qn::ResourceStatusOverlay QnMediaResourceWidget::calculateStatusOverlay() const
     /// TODO: #ynikitenkov It needs to refactor error\status overlays totally!
     const ResourceStates states = getResourceStates();
 
-    //TODO: #GDM #3.1 This really requires hell a lot of refactoring
+    // TODO: #GDM #3.1 This really requires hell a lot of refactoring
     // for live video make a quick check: status has higher priority than EOF
     if (states.isRealTimeSource)
     {
@@ -2198,7 +2207,11 @@ void QnMediaResourceWidget::updateCompositeOverlayMode()
     const bool animate = m_compositeOverlay->scene() != nullptr;
     setOverlayWidgetVisible(m_compositeOverlay, visible, animate);
 
-    m_triggersContainer->setEnabled(isLive);
+    for (int i = 0; i < m_triggersContainer->count(); ++i)
+    {
+        if (auto button = qobject_cast<QnSoftwareTriggerButton*>(m_triggersContainer->item(i)))
+            button->setLive(isLive);
+    }
 }
 
 qint64 QnMediaResourceWidget::getUtcCurrentTimeUsec() const
@@ -2323,10 +2336,19 @@ QnMediaResourceWidget::SoftwareTrigger* QnMediaResourceWidget::createTriggerIfRe
         rule->eventParams().description,
         rule->isActionProlonged() });
 
-    const auto button = new QnSoftwareTriggerButton(this);
-    configureTriggerButton(button, info);
+    std::function<void()> clientSideHandler;
 
-    //TODO: #vkutin For now rule buttons are NOT sorted. Implement some sane sorting later.
+    if (rule->actionType() == nx::vms::event::BookmarkAction
+        && !rule->actionParams().needConfirmation)
+    {
+        clientSideHandler =
+            [this] { action(action::BookmarksModeAction)->setChecked(true); };
+    }
+
+    const auto button = new QnSoftwareTriggerButton(this);
+    configureTriggerButton(button, info, clientSideHandler);
+
+    // TODO: #vkutin #3.1 For now rule buttons are NOT sorted. Implement sorting by UUID later.
     const auto overlayItemId = m_triggersContainer->insertItem(0, button);
 
     auto& trigger = m_softwareTriggers[rule->id()];
@@ -2339,19 +2361,24 @@ bool QnMediaResourceWidget::isRelevantTriggerRule(const vms::event::RulePtr& rul
     if (rule->isDisabled() || rule->eventType() != vms::event::SoftwareTriggerEvent)
         return false;
 
-    const auto users = rule->eventParams().metadata.instigators;
-    if (!users.empty() && !::contains(users, accessController()->user()->getId()))
-        return false;
-
     const auto resourceId = m_resource->toResource()->getId();
     if (!rule->eventResources().empty() && !rule->eventResources().contains(resourceId))
         return false;
 
-    return true;
+    if (rule->eventParams().metadata.allUsers)
+        return true;
+
+    const auto currentUser = accessController()->user();
+
+    const auto subjects = rule->eventParams().metadata.instigators;
+    if (::contains(subjects, currentUser->getId()))
+        return true;
+
+    return ::contains(subjects, QnUserRolesManager::unifiedUserRoleId(currentUser));
 }
 
 void QnMediaResourceWidget::configureTriggerButton(QnSoftwareTriggerButton* button,
-    const SoftwareTriggerInfo& info)
+    const SoftwareTriggerInfo& info, std::function<void()> clientSideHandler)
 {
     NX_EXPECT(button);
 
@@ -2381,19 +2408,28 @@ void QnMediaResourceWidget::configureTriggerButton(QnSoftwareTriggerButton* butt
     if (info.prolonged)
     {
         connect(button, &QnSoftwareTriggerButton::pressed, this,
-            [this, button, resultHandler, id = info.triggerId]()
+            [this, button, resultHandler, clientSideHandler, id = info.triggerId]()
             {
+                if (!button->isLive())
+                    return;
+
                 const auto requestId = invokeTrigger(id, resultHandler, vms::event::ActiveState);
                 const bool success = requestId != rest::Handle();
                 button->setProperty(kTriggerRequestIdProperty, requestId);
                 button->setState(success
                     ? QnSoftwareTriggerButton::State::Waiting
                     : QnSoftwareTriggerButton::State::Failure);
+
+                if (success && clientSideHandler)
+                    clientSideHandler();
             });
 
         connect(button, &QnSoftwareTriggerButton::released, this,
             [this, button, resultHandler, id = info.triggerId]()
             {
+                if (!button->isLive())
+                    return;
+
                 /* In case of activation error don't try to deactivate: */
                 if (button->state() == QnSoftwareTriggerButton::State::Failure)
                     return;
@@ -2409,8 +2445,11 @@ void QnMediaResourceWidget::configureTriggerButton(QnSoftwareTriggerButton* butt
     else
     {
         connect(button, &QnSoftwareTriggerButton::clicked, this,
-            [this, button, resultHandler, id = info.triggerId]()
+            [this, button, resultHandler, clientSideHandler, id = info.triggerId]()
             {
+                if (!button->isLive())
+                    return;
+
                 const auto requestId = invokeTrigger(id, resultHandler);
                 const bool success = requestId != rest::Handle();
                 button->setProperty(kTriggerRequestIdProperty, requestId);
@@ -2418,8 +2457,34 @@ void QnMediaResourceWidget::configureTriggerButton(QnSoftwareTriggerButton* butt
                 button->setState(success
                     ? QnSoftwareTriggerButton::State::Waiting
                     : QnSoftwareTriggerButton::State::Failure);
+
+                if (success && clientSideHandler)
+                    clientSideHandler();
             });
     }
+
+    // Go-to-live handler.
+    connect(button, &QnSoftwareTriggerButton::clicked, this,
+        [this, button, workbenchDisplay = QnWorkbenchContextAware::display()]()
+        {
+            if (button->isLive())
+                return;
+
+            const auto syncAction = action(action::ToggleSyncAction);
+            const bool sync = syncAction->isEnabled() && syncAction->isChecked();
+
+            if (sync || workbenchDisplay->widget(Qn::CentralRole) == this)
+            {
+                action(action::JumpToLiveAction)->trigger();
+            }
+            else if (auto reader = display()->archiveReader())
+            {
+                // TODO: Refactor workbench navigator to avoid switching to live in different places.
+                reader->jumpTo(DATETIME_NOW, 0);
+                reader->setSpeed(1.0);
+                reader->resumeMedia();
+            }
+        });
 }
 
 void QnMediaResourceWidget::resetTriggers()

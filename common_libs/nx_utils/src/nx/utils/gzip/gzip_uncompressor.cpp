@@ -48,6 +48,7 @@ bool Uncompressor::processData(const QnByteArrayConstRef& data)
                     NX_ASSERT(false);
                 }
                 m_state = State::inProgress;
+                continue;
 
             case State::inProgress:
             {
@@ -124,6 +125,8 @@ bool Uncompressor::processData(const QnByteArrayConstRef& data)
                                 m_nextFilter->processData(QnByteArrayConstRef(m_outputBuffer, 0, m_outputBuffer.size() - m_zStream.avail_out));
                             return true;
                         }
+                        m_state = State::failed;
+                        break;
 
                     default:
                         m_state = State::failed;

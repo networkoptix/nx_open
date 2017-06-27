@@ -125,6 +125,8 @@ void CLVideoDecoderOutput::fillRightEdge()
     if (format == -1)
         return;
     const AVPixFmtDescriptor* descr = av_pix_fmt_desc_get((AVPixelFormat) format);
+    if (descr == nullptr)
+        return;
     quint32 filler = 0;
     int w = width;
     int h = height;

@@ -1,0 +1,30 @@
+
+<div class="panel panel-default" ng-if="system.isMine">
+    <div class="panel-body">
+        <h2>Ihr System</h2>
+        <p></p>
+        <p>
+            <button class="btn btn-default" ng-click="rename()">System umbenennen</button>
+        </p>
+        <button class="btn btn-default" ng-click="disconnect()">Von
+            <span class="product-name">{{PRODUCT_NAME}}</span> trennen</button>
+    </div>
+</div>
+
+<div class="panel panel-default" ng-if="!system.isMine">
+    <div class="panel-body">
+        <h2>Besitzer</h2>
+        <h3 class="user-name">{{system.info.ownerFullName}}</h3>
+        <a ng-href="mailto:{{system.info.ownerAccountEmail}}">{{system.info.ownerAccountEmail}}</a>
+        <hr>
+        <p>
+            Ihre Berechtigungen:
+            <b>{{$root.L.accessRoles[system.accessRole].label || system.accessRole}}</b>
+        </p>
+
+        <p ng-if="system.permissions.isAdmin">
+            <button class="btn btn-default" ng-click="rename()">System umbenennen</button>
+        </p>
+        <button class="btn btn-default" ng-click="delete()">Von meinem Account trennen</button>
+    </div>
+</div>

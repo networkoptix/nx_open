@@ -87,7 +87,7 @@ angular.module('nxCommon')
             this.deferred.reject(this.scope[this.value]);
         };
         Animation.prototype.update = function() {
-            if( this.isFinished){
+            if(this.isFinished){
                 return;
             }
             var time = (new Date()).getTime() - this.started;
@@ -175,12 +175,9 @@ angular.module('nxCommon')
             },
             animating:function(scope,value){
                 var targetAnimation = _.find(animations,function(anim){ // Try to find,if there
-                    return anim.scope === scope && anim.value === value;
+                    return anim.scope === scope && anim.value === value && !anim.isFinished;
                 });
-                if(!targetAnimation){
-                    return false;
-                }
-                return targetAnimation;
+                return targetAnimation || false;
             },
             animate:function(scope,value,target,dependency,duration){
 
@@ -190,12 +187,10 @@ angular.module('nxCommon')
                 }
 
                 if(Number.isNaN(value)){
-                    throw "Animation target is not a number";
+                    throw 'Animation target is not a number';
                 }
 
-                var targetAnimation = _.find(animations,function(anim){ // Try to find,if there
-                    return anim.scope === scope && anim.value === value;
-                });
+                var targetAnimation = this.animating(scope, value);
                 if(targetAnimation){
                     targetAnimation.breakAnimation();
                 }
@@ -215,11 +210,17 @@ angular.module('nxCommon')
             },
             stopScope:function(scope){
                 var targetAnimation = _.find(animations,function(anim){ // Try to find,if there
-                    return anim.scope === scope && anim.value === value;
+
+                    return anim.scope === scope;
                 });
                 if(targetAnimation){
                     targetAnimation.breakAnimation();
                 } 
+            },
+            stopHandler:function(handler){
+                if(animationHandler === handler){
+                    animationHandler = null;
+                }
             }
         };
     }]);

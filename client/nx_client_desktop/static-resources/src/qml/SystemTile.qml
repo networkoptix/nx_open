@@ -59,26 +59,12 @@ BaseTile
                 : Style.colors.custom.systemTile.background);
     }
 
-    secondaryIndicator
+    property QtObject primaryIndicatorProperties: QtObject
     {
-        visible: control.safeMode;
-        text: qsTr("SAFE MODE");
-        textColor: Style.colors.shadow;
-        color: Style.colors.yellow_main;
-    }
+        property bool visible: control.wrongVersion || control.compatibleVersion
+            || !control.isConnectable || !isCompatibleInternal
 
-    indicator
-    {
-        visible:
-        {
-            if (control.impl.isFactoryTile)
-                return false;    //< We don't have indicator for new systems
-
-            return (wrongVersion || compatibleVersion
-                || !control.isConnectable || !isCompatibleInternal);
-        }
-
-        text:
+        property string text:
         {
             if (!isCompatibleInternal)
                 return qsTr("INCOMPATIBLE");
@@ -94,7 +80,7 @@ BaseTile
             return "";
         }
 
-        textColor:
+        property color textColor:
         {
            if (wrongVersion || compatibleVersion || !isCompatibleInternal)
                return Style.colors.shadow;
@@ -102,7 +88,7 @@ BaseTile
                return Style.colors.windowText;
         }
 
-        color:
+        property color color:
         {
             if (wrongVersion || !isCompatibleInternal)
                 return Style.colors.red_main;
@@ -111,6 +97,14 @@ BaseTile
             else
                 return Style.colors.custom.systemTile.offlineIndicatorBkg;
         }
+    }
+
+    property QtObject secondaryIndicatorProperties: QtObject
+    {
+        property bool visible: control.safeMode;
+        property string text: qsTr("SAFE MODE");
+        property color textColor: Style.colors.shadow;
+        property color color: Style.colors.yellow_main;
     }
 
     NxPopupMenu
@@ -201,6 +195,14 @@ BaseTile
     {
         target: areaLoader;
 
+        function setupIndicator(indicator, properties)
+        {
+            indicator.visible = Qt.binding(function() { return properties.visible })
+            indicator.color = Qt.binding(function() { return properties.color })
+            indicator.text = Qt.binding(function() { return properties.text })
+            indicator.textColor = Qt.binding(function() { return properties.textColor })
+        }
+
         onStatusChanged:
         {
             if (areaLoader.status != Loader.Ready)
@@ -216,7 +218,7 @@ BaseTile
                 currentAreaItem.expandedOpacity = Qt.binding( function() { return control.expandedOpacity; });
                 currentAreaItem.hostsModel = control.impl.hostsModel;
                 currentAreaItem.authenticationDataModel = control.impl.authenticationDataModel;
-                currentAreaItem.enabled = Qt.binding( function () { return control.isAvailable; });
+                currentAreaItem.isAvailable = Qt.binding( function () { return control.isAvailable; });
                 currentAreaItem.prevTabObject = Qt.binding( function() { return control.collapseButton; });
                 currentAreaItem.isConnecting = Qt.binding( function() { return control.isConnecting; });
                 currentAreaItem.factorySystem = Qt.binding( function() { return control.factorySystem; });
@@ -232,8 +234,13 @@ BaseTile
             {
                 currentAreaItem.userName = Qt.binding( function() { return control.ownerDescription; });
                 currentAreaItem.isConnectable = Qt.binding( function() { return control.isConnectable; });
-                currentAreaItem.enabled = Qt.binding( function() { return control.isAvailable; });
+                currentAreaItem.isAvailable = Qt.binding( function() { return control.isAvailable; });
             }
+
+            var indicators = currentAreaItem.indicators
+            indicators.opacity = Qt.binding(function() { return control.collapsedItemsOpacity })
+            setupIndicator(indicators.primaryIndicator, control.primaryIndicatorProperties)
+            setupIndicator(indicators.secondaryIndicator, control.secondaryIndicatorProperties)
         }
     }
 
@@ -312,14 +319,14 @@ BaseTile
             if (isFactoryTile)
             {
                 var factorySystemHost = areaLoader.item.host;
-                console.log("Trying tp setup factory system <", control.systemName,
+                console.log("Trying to setup factory system <", control.systemName,
                     ">, host <", factorySystemHost, ">");
 
                 /**
                   * Discussed with R. Vasilenko - we can rely on admin/admin
                   * credentials for factory (new) systems. Otherwise it is error
                   * situation  on server side
-                  * TODO: ynikitenkov use helpers::kFactorySystem... from network/system_helpers.h
+                  * TODO: #ynikitenkov use helpers::kFactorySystem... from network/system_helpers.h
                   */
                 var kFactorySystemUser = "admin";
                 var kFactorySystemPassword = "admin";
@@ -338,9 +345,6 @@ BaseTile
                     tile.selectedUser, tile.selectedPassword,
                     tile.savePassword, tile.autoLogin);
             }
-
-
-
         }
     }
 }

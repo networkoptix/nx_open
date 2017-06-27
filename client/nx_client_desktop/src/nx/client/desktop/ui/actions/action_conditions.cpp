@@ -2,6 +2,8 @@
 
 #include <QtWidgets/QAction>
 
+#include <boost/algorithm/cxx11/all_of.hpp>
+#include <boost/algorithm/cxx11/any_of.hpp>
 #include <boost/range/algorithm/count_if.hpp>
 
 #include <api/app_server_connection.h>
@@ -142,6 +144,27 @@ public:
     }
 
 private:
+    ConditionWrapper m_condition;
+};
+
+class ScopedCondition: public Condition
+{
+public:
+    ScopedCondition(ActionScope scope, ConditionWrapper&& condition):
+        m_scope(scope),
+        m_condition(std::move(condition))
+    {
+    }
+
+    virtual ActionVisibility check(const Parameters& parameters, QnWorkbenchContext* context) override
+    {
+        if (parameters.scope() != m_scope)
+            return EnabledAction;
+        return m_condition->check(parameters, context);
+    }
+
+private:
+    ActionScope m_scope;
     ConditionWrapper m_condition;
 };
 
@@ -557,7 +580,7 @@ ActionVisibility StopSharingCondition::check(const Parameters& parameters, QnWor
 
     for (auto resource : parameters.resources())
     {
-        if (context->resourceAccessProvider()->accessibleVia(subject, resource) == QnAbstractResourceAccessProvider::Source::shared)
+        if (context->resourceAccessProvider()->accessibleVia(subject, resource) == nx::core::access::Source::shared)
             return EnabledAction;
     }
 
@@ -1037,14 +1060,7 @@ bool OpenInLayoutCondition::canOpen(const QnResourceList& resources,
     const QnLayoutResourcePtr& layout) const
 {
     if (!layout)
-    {
-        return any_of(resources, QnResourceAccessFilter::isOpenableInLayout)
-            || any_of(resources,
-                [](const QnResourcePtr& resource)
-                {
-                    return resource->hasFlags(Qn::layout);
-                });
-    }
+        return any_of(resources, QnResourceAccessFilter::isDroppable);
 
     bool isExportedLayout = layout->isFile();
 
@@ -1138,13 +1154,6 @@ ActionVisibility SetAsBackgroundCondition::check(const QnLayoutItemIndexList& la
     }
 
     return InvisibleAction;
-}
-
-ActionVisibility LoggedInCondition::check(const Parameters& /*parameters*/, QnWorkbenchContext* context)
-{
-    return context->commonModule()->remoteGUID().isNull()
-        ? InvisibleAction
-        : EnabledAction;
 }
 
 ActionVisibility BrowseLocalFilesCondition::check(const Parameters& /*parameters*/, QnWorkbenchContext* context)
@@ -1619,6 +1628,20 @@ ConditionWrapper always()
         });
 }
 
+ConditionWrapper isLoggedIn()
+{
+    return new CustomBoolCondition(
+        [](const Parameters& /*parameters*/, QnWorkbenchContext* context)
+        {
+            return !context->commonModule()->remoteGUID().isNull();
+        });
+}
+
+ConditionWrapper scoped(ActionScope scope, ConditionWrapper&& condition)
+{
+    return new ScopedCondition(scope, std::move(condition));
+}
+
 ConditionWrapper isPreviewSearchMode()
 {
     return new CustomBoolCondition(
@@ -1675,9 +1698,9 @@ ConditionWrapper tourIsRunning()
 ConditionWrapper canSavePtzPosition()
 {
     return new CustomBoolCondition(
-        [](const Parameters& parameters, QnWorkbenchContext* context)
+        [](const Parameters& parameters, QnWorkbenchContext* /*context*/)
         {
-            auto widget = dynamic_cast<const QnMediaResourceWidget*>(parameters.widget());
+            auto widget = qobject_cast<const QnMediaResourceWidget*>(parameters.widget());
             NX_EXPECT(widget);
             if (!widget)
                 return false;

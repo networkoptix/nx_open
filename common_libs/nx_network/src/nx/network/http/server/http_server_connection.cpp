@@ -198,13 +198,10 @@ void HttpServerConnection::processResponse(
         return;
     }
 
-    #if defined(_DEBUG)
-        if (responseMessageContext.msgBody)
-        {
-            NX_ASSERT(nx_http::StatusCode::isMessageBodyAllowed(
-                responseMessageContext.msg.response->statusLine.statusCode));
-        }
-    #endif
+    NX_ASSERT(
+        !responseMessageContext.msgBody ||
+        nx_http::StatusCode::isMessageBodyAllowed(
+            responseMessageContext.msg.response->statusLine.statusCode));
 
     strongThis->post(
         [this, strongThis = std::move(strongThis),
@@ -293,7 +290,7 @@ void HttpServerConnection::addMessageBodyHeaders(
                         static_cast<qulonglong>(contentLength.get()))));
         }
     }
-    else
+    else if (nx_http::StatusCode::isMessageBodyAllowed(response->statusLine.statusCode))
     {
         nx_http::insertOrReplaceHeader(
             &response->headers,

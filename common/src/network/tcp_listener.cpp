@@ -88,9 +88,12 @@ QnTcpListener::QnTcpListener(
     int maxConnections,
     bool useSSL)
 :
-    QnCommonModuleAware(commonModule),
+    QnCommonModuleAware(nullptr, true), //< Allow to create listeners without common module.
     d_ptr(new QnTcpListenerPrivate())
 {
+    if (commonModule)
+        initializeContext(commonModule);
+
     Q_D(QnTcpListener);
     d->serverAddress = address;
     d->localPort = port;
@@ -134,7 +137,7 @@ bool QnTcpListener::bindToLocalAddress()
         d->localPort = d->localEndpoint.port;
     }
 
-    NX_LOGX(lm("Server started at %1").arg(localAddress), cl_logINFO);
+    NX_LOGX(lm("Server started at %1").arg(localAddress), cl_logDEBUG1);
     return true;
 }
 
@@ -238,7 +241,7 @@ void QnTcpListener::pleaseStop()
 {
     QnLongRunnable::pleaseStop();
 
-    NX_LOGX(lm("QnTcpListener::pleaseStop() called"), cl_logWARNING);
+    NX_LOGX(lm("QnTcpListener::pleaseStop() called"), cl_logDEBUG1);
 }
 
 void QnTcpListener::removeAllConnections()
@@ -263,7 +266,7 @@ void QnTcpListener::removeAllConnections()
     {
         QnLongRunnable* processor = *itr;
         NX_LOG(lit("TCPListener. Stopping processor (sysThreadID %1)")
-            .arg(processor->systemThreadId()), cl_logWARNING);
+            .arg(processor->systemThreadId()), cl_logDEBUG1);
         delete processor;
     }
 }
@@ -292,7 +295,7 @@ void QnTcpListener::run()
         bindToLocalAddress();
 
     NX_LOG(lit("Entered QnTcpListener::run. %1:%2, system thread id %3")
-        .arg(d->serverAddress.toString()).arg(d->localPort).arg(systemThreadId()), cl_logINFO);
+        .arg(d->serverAddress.toString()).arg(d->localPort).arg(systemThreadId()), cl_logDEBUG1);
     try
     {
         if (!d->serverSocket)
@@ -379,12 +382,12 @@ void QnTcpListener::run()
     }
 
     NX_LOG(lit("TCPListener (%1:%2). Removing all connections before stop")
-        .arg(d->serverAddress.toString()).arg(d->localPort), cl_logWARNING);
+        .arg(d->serverAddress.toString()).arg(d->localPort), cl_logDEBUG1);
     removeAllConnections();
     destroyServerSocket(d->serverSocket);
     d->serverSocket = nullptr;
     NX_LOG(lit("Exiting QnTcpListener::run. %1:%2")
-        .arg(d->serverAddress.toString()).arg(d->localPort), cl_logWARNING);
+        .arg(d->serverAddress.toString()).arg(d->localPort), cl_logDEBUG1);
 }
 
 int QnTcpListener::getPort() const

@@ -7,6 +7,10 @@ namespace Ui {
 class SoftwareTriggerBusinessEventWidget;
 } // namespace Ui
 
+namespace nx { namespace vms { namespace event {
+class StringsHelper;
+}}} // namespace nx::vms::event
+
 class QnSoftwareTriggerBusinessEventWidget: public QnAbstractBusinessParamsWidget
 {
     Q_OBJECT
@@ -23,8 +27,10 @@ protected:
 
 private:
     void at_usersButton_clicked();
+    void updateUsersButton();
     void paramsChanged();
 
 private:
     QScopedPointer<Ui::SoftwareTriggerBusinessEventWidget> ui;
+    QScopedPointer<nx::vms::event::StringsHelper> m_helper;
 };

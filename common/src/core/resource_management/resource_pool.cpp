@@ -31,7 +31,12 @@ QnResourcePool::QnResourcePool(QObject* parent):
     m_resourcesMtx(QnMutex::Recursive),
     m_tranInProgress(false)
 {
-    invalidateCache();
+    connect(this, &QnResourcePool::resourceAddedInternal, this,
+        [this](const QnResourcePtr &resource)
+        {
+            emit resourceAdded(resource); //< always emit resourceAdded from own thread
+        }
+    );
 }
 
 QnResourcePool::~QnResourcePool()
@@ -135,11 +140,18 @@ void QnResourcePool::addResources(const QnResourceList& resources, bool mainPool
         }
     }
 
-
-    for (const auto& resource: addedResources)
+    const bool isOwnThread = QThread::currentThread() == thread();
+    for (const auto& resource : addedResources)
     {
         TRACE("RESOURCE ADDED" << resource->metaObject()->className() << resource->getName());
+#if 0
+        if (isOwnThread)
+            emit resourceAdded(resource);
+        else
+            emit resourceAddedInternal(resource);
+#else
         emit resourceAdded(resource);
+#endif
     }
 }
 
@@ -167,7 +179,7 @@ void QnResourcePool::removeResources(const QnResourceList& resources)
 
         disconnect(resource, nullptr, this, nullptr);
 
-        resource->setRemovedFromPool(true);
+        resource->addFlags(Qn::removed);
         NX_EXPECT(resource->resourcePool() == this);
 
 #ifdef DESKTOP_CAMERA_DEBUG
@@ -185,8 +197,8 @@ void QnResourcePool::removeResources(const QnResourceList& resources)
 
         if (resIter != m_resources.end())
         {
+            m_cache.resourceRemoved(resource);
             m_resources.erase(resIter);
-            invalidateCache();
             appendRemovedResource(resource);
         }
         else
@@ -195,7 +207,6 @@ void QnResourcePool::removeResources(const QnResourceList& resources)
             if (resIter != m_incompatibleResources.end())
             {
                 m_incompatibleResources.erase(resIter);
-                invalidateCache();
                 appendRemovedResource(resource);
             }
         }
@@ -331,17 +342,17 @@ QnVirtualCameraResourceList QnResourcePool::getAllCameras(const QnResourcePtr &m
 QnMediaServerResourceList QnResourcePool::getAllServers(Qn::ResourceStatus status) const
 {
     QnMutexLocker lock( &m_resourcesMtx ); //m_resourcesMtx is recursive
-    ensureCache();
 
     if (status == Qn::AnyStatus)
-        return m_cache.serversList;
+        return m_cache.mediaServers.values();
 
-    const auto statusFilter = [status](const QnMediaServerResourcePtr &serverResource)
+    QnMediaServerResourceList result;
+    for (const auto& server : m_cache.mediaServers.values())
     {
-        return (serverResource->getStatus() == status);
-    };
-
-    return m_cache.serversList.filtered(statusFilter);
+        if (server->getStatus() == status)
+            result.push_back(server);
+    }
+    return result;
 }
 
 QnResourceList QnResourcePool::getResourcesByParentId(const QnUuid& parentId) const
@@ -403,11 +414,10 @@ QnNetworkResourceList QnResourcePool::getAllNetResourceByHostAddress(const QStri
     return result;
 }
 
-QnResourcePtr QnResourcePool::getResourceByUniqueId(const QString &uniqueID) const
+QnResourcePtr QnResourcePool::getResourceByUniqueId(const QString& uniqueId) const
 {
     QnMutexLocker locker( &m_resourcesMtx );
-    auto itr = std::find_if( m_resources.begin(), m_resources.end(), [&uniqueID](const QnResourcePtr &resource) { return resource->getUniqueId() == uniqueID; });
-    return itr != m_resources.end() ? itr.value() : QnResourcePtr(0);
+    return m_cache.resourcesByUniqueId.value(uniqueId);
 }
 
 QnResourcePtr QnResourcePool::getResourceByDescriptor(const QnLayoutItemResourceDescriptor& descriptor) const
@@ -504,10 +514,10 @@ void QnResourcePool::clear()
     m_resources.clear();
 }
 
-bool QnResourcePool::containsIoModules() const {
+bool QnResourcePool::containsIoModules() const
+{
     QnMutexLocker lk( &m_resourcesMtx );
-    ensureCache();
-    return m_cache.containsIoModules;
+    return m_cache.ioModulesCount > 0;
 }
 
 void QnResourcePool::markLayoutLiteClient(const QnLayoutResourcePtr& layout)
@@ -536,10 +546,12 @@ bool QnResourcePool::insertOrUpdateResource( const QnResourcePtr &resource, QHas
 {
     const QnUuid& id = resource->getId();
     auto itr = resourcePool->find(id);
-    if (itr == resourcePool->end()) {
+    if (itr == resourcePool->end())
+    {
         // new resource
         resourcePool->insert(id, resource);
-        invalidateCache();
+        if (resourcePool == &m_resources)
+            m_cache.resourceAdded(resource);
         return true;
     }
     else {
@@ -610,22 +622,26 @@ QnVideoWallMatrixIndexList QnResourcePool::getVideoWallMatricesByUuid(const QLis
     return result;
 }
 
-void QnResourcePool::invalidateCache()
+bool QnResourcePool::Cache::isIoModule(const QnResourcePtr& res) const
 {
-    QnMutexLocker lk( &m_resourcesMtx );
-    m_cache.valid = false;
-    m_cache.containsIoModules = false;
-    m_cache.serversList.clear();
+    if (const auto& device = res.dynamicCast<QnVirtualCameraResource>())
+        return device->isIOModule() && !device->hasVideo(nullptr);
+    return false;
 }
 
-void QnResourcePool::ensureCache() const {
-    QnMutexLocker lk( &m_resourcesMtx );
-    if (m_cache.valid)
-        return;
+void QnResourcePool::Cache::resourceRemoved(const QnResourcePtr& res)
+{
+    resourcesByUniqueId.remove(res->getUniqueId());
+    mediaServers.remove(res->getId());
+    if (isIoModule(res))
+        --ioModulesCount;
+}
 
-    m_cache.containsIoModules = boost::algorithm::any_of(getResources<QnVirtualCameraResource>(), [](const QnVirtualCameraResourcePtr &device) {
-        return device->isIOModule() && !device->hasVideo(nullptr);
-    });
-    m_cache.serversList = getResources<QnMediaServerResource>();
-    m_cache.valid = true;
+void QnResourcePool::Cache::resourceAdded(const QnResourcePtr& res)
+{
+    resourcesByUniqueId.insert(res->getUniqueId(), res);
+    if (const auto& server = res.dynamicCast<QnMediaServerResource>())
+        mediaServers.insert(server->getId(), server);
+    else if (isIoModule(res))
+        ++ioModulesCount;
 }

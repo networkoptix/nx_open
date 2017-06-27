@@ -196,7 +196,13 @@ bool QnRecordingManager::isResourceDisabled(const QnResourcePtr& res) const
     return  cameraRes && cameraRes->isScheduleDisabled();
 }
 
-bool QnRecordingManager::startForcedRecording(const QnSecurityCamResourcePtr& camRes, Qn::StreamQuality quality, int fps, int beforeThreshold, int afterThreshold, int maxDuration)
+bool QnRecordingManager::startForcedRecording(
+    const QnSecurityCamResourcePtr& camRes,
+    Qn::StreamQuality quality,
+    int fps,
+    int beforeThresholdSec,
+    int afterThresholdSec,
+    int maxDurationSec)
 {
     updateCamera(camRes); // ensure recorders are created
     auto camera = qnCameraPool->getVideoCamera(camRes);
@@ -214,9 +220,9 @@ bool QnRecordingManager::startForcedRecording(const QnSecurityCamResourcePtr& ca
     // update current schedule task
     const Recorders& recorders = itrRec.value();
     if (recorders.recorderHiRes)
-        recorders.recorderHiRes->startForcedRecording(quality, fps, beforeThreshold, afterThreshold, maxDuration);
+        recorders.recorderHiRes->startForcedRecording(quality, fps, beforeThresholdSec, afterThresholdSec, maxDurationSec);
     if (recorders.recorderLowRes)
-        recorders.recorderLowRes->startForcedRecording(quality, fps, beforeThreshold, afterThreshold, maxDuration);
+        recorders.recorderLowRes->startForcedRecording(quality, fps, beforeThresholdSec, afterThresholdSec, maxDurationSec);
 
     // start recorder threads
     startOrStopRecording(camRes, camera, recorders.recorderHiRes, recorders.recorderLowRes);
@@ -297,7 +303,7 @@ bool QnRecordingManager::startOrStopRecording(
             float currentFps = recorderHiRes ? recorderHiRes->currentScheduleTask().getFps() : 0;
 
             // second stream should run if camera do not share fps or at least MIN_SECONDARY_FPS frames left for second stream
-            bool runSecondStream = (cameraRes->streamFpsSharingMethod() != Qn::BasicFpsSharing || cameraRes->getMaxFps() - currentFps >= MIN_SECONDARY_FPS) &&
+            bool runSecondStream = cameraRes->isEnoughFpsToRunSecondStream(currentFps) &&
                                     cameraRes->hasDualStreaming2() && providerLow;
             if (runSecondStream)
             {

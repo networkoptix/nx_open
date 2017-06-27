@@ -24,7 +24,7 @@
 namespace {
 
 static const int kTimerPrecisionMs = 500;
-static const int kHintTimeoutMs = 10000;
+static const int kHintTimeoutMs = 3000;
 
 } // namespace
 
@@ -116,11 +116,13 @@ QnUuid LayoutTourExecutor::runningTour() const
 
 void LayoutTourExecutor::prevTourStep()
 {
+    setHintVisible(false);
     processTourStepInternal(false, true);
 }
 
 void LayoutTourExecutor::nextTourStep()
 {
+    setHintVisible(false);
     processTourStepInternal(true, true);
 }
 
@@ -190,7 +192,6 @@ void LayoutTourExecutor::resetTourItems(const ec2::ApiLayoutTourItemDataList& it
             | QnLayoutFlag::NoResize
             | QnLayoutFlag::NoMove
             | QnLayoutFlag::NoTimeline
-            | QnLayoutFlag::FillViewport
         ));
         layout->setData(Qn::LayoutPermissionsRole, static_cast<int>(Qn::ReadPermission));
 
@@ -318,9 +319,7 @@ void LayoutTourExecutor::setHintVisible(bool visible)
     if (visible)
     {
         m_hintLabel = QnGraphicsMessageBox::information(
-            tr("Use Left/Right arrows, Page Up/Page Down, Enter, Space and Backspace to control the tour.")
-            + L'\n'
-            + tr("Press any other key to stop the tour."),
+            tr("Use keyboard arrows to switch layouts. To exit the tour press Esc."),
             kHintTimeoutMs);
     }
     else if (m_hintLabel)

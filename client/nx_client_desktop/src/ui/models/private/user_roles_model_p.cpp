@@ -19,13 +19,7 @@ bool lessRoleByName(const ec2::ApiUserRoleData& r1, const ec2::ApiUserRoleData& 
 
 QList<Qn::UserRole> allStandardRoles()
 {
-    static QList<Qn::UserRole> roles;
-    if (roles.empty())
-    {
-        roles = QnUserRolesManager::predefinedRoles();
-        roles.removeOne(Qn::UserRole::Owner);
-    }
-    return roles;
+    return QnUserRolesManager::predefinedRoles();
 }
 
 } // namespace
@@ -55,11 +49,15 @@ QnUserRolesModelPrivate::QnUserRolesModelPrivate(
     base_type(),
     QnWorkbenchContextAware(parent),
     q_ptr(parent),
-    m_customRoleEnabled(flags.testFlag(QnUserRolesModel::CustomRoleFlag))
+    m_customRoleEnabled(flags.testFlag(QnUserRolesModel::CustomRoleFlag)),
+    m_onlyAssignable(flags.testFlag(QnUserRolesModel::AssignableFlag))
 {
     connect(context(), &QnWorkbenchContext::userChanged, this,
         &QnUserRolesModelPrivate::updateStandardRoles);
     updateStandardRoles();
+
+    connect(parent, &QAbstractItemModel::modelAboutToBeReset, this,
+        [this]() { m_checked.clear(); });
 
     if (flags.testFlag(QnUserRolesModel::UserRoleFlag))
     {
@@ -127,13 +125,20 @@ void QnUserRolesModelPrivate::setUserRoles(ec2::ApiUserRoleDataList value)
 void QnUserRolesModelPrivate::updateStandardRoles()
 {
     QList<Qn::UserRole> available;
-    if (auto user = context()->user())
+    if (m_onlyAssignable)
     {
-        for (auto role : allStandardRoles())
+        if (auto user = context()->user())
         {
-            if (resourceAccessManager()->canCreateUser(user, role))
-                available << role;
+            for (auto role: allStandardRoles())
+            {
+                if (resourceAccessManager()->canCreateUser(user, role))
+                    available << role;
+            }
         }
+    }
+    else
+    {
+        available = allStandardRoles();
     }
 
     if (available == m_standardRoles)
@@ -287,4 +292,12 @@ void QnUserRolesModelPrivate::setCustomRoleStrings(const QString& name, const QS
     Q_Q(QnUserRolesModel);
     QModelIndex customRoleIndex = q->index(count() - 1, 0);
     emit q->dataChanged(customRoleIndex, customRoleIndex);
+}
+
+QnUuid QnUserRolesModelPrivate::id(int row, bool predefinedRoleIdsEnabled) const
+{
+    const auto role = roleByRow(row);
+    return role.roleType != Qn::UserRole::CustomUserRole && predefinedRoleIdsEnabled
+        ? QnUserRolesManager::predefinedRoleId(role.roleType)
+        : role.roleUuid;
 }

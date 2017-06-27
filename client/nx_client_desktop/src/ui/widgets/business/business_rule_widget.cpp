@@ -33,10 +33,15 @@
 #include <ui/widgets/business/business_event_widget_factory.h>
 #include <ui/widgets/business/business_action_widget_factory.h>
 #include <ui/workbench/workbench_context.h>
-#include <ui/workbench/workbench_resource.h>
 
 #include <client/client_settings.h>
 #include <utils/common/scoped_value_rollback.h>
+#include <nx/client/desktop/utils/mime_data.h>
+
+#include <nx/client/desktop/ui/event_rules/subject_selection_dialog.h>
+
+using namespace nx::client::desktop;
+using namespace nx::client::desktop::ui;
 
 using namespace nx;
 
@@ -346,7 +351,9 @@ bool QnBusinessRuleWidget::eventFilter(QObject *object, QEvent *event)
     if (event->type() == QEvent::DragEnter)
     {
         QDragEnterEvent* de = static_cast<QDragEnterEvent*>(event);
-        m_dropResources = QnWorkbenchResource::deserializeResources(de->mimeData());
+
+        MimeData data(de->mimeData());
+        m_dropResources = resourcePool()->getResources(data.getIds());
         if (!m_dropResources.empty())
             de->acceptProposedAction();
         return true;
@@ -468,27 +475,72 @@ void QnBusinessRuleWidget::at_actionResourcesHolder_clicked()
     else
         return;
 
-    QnResourceSelectionDialog dialog(target, this);
+    if (target == QnResourceSelectionDialog::Filter::users)
+    {
+        SubjectSelectionDialog dialog(this);
+        dialog.setCheckedSubjects(m_model->actionResources());
 
-    vms::event::ActionType actionType = m_model->actionType();
-    if (actionType == vms::event::CameraRecordingAction)
-        dialog.setDelegate(new QnCheckResourceAndWarnDelegate<QnCameraRecordingPolicy>(this));
-    if (actionType == vms::event::BookmarkAction)
-        dialog.setDelegate(new QnCheckResourceAndWarnDelegate<QnBookmarkActionPolicy>(this));
-    else if (actionType == vms::event::CameraOutputAction)
-        dialog.setDelegate(new QnCheckResourceAndWarnDelegate<QnCameraOutputPolicy>(this));
-    else if (actionType == vms::event::ExecutePtzPresetAction)
-        dialog.setDelegate(new QnCheckResourceAndWarnDelegate<QnExecPtzPresetPolicy>(this));
-    else if (actionType == vms::event::SendMailAction)
-        dialog.setDelegate(new QnSendEmailActionDelegate(this));
-    else if (actionType == vms::event::PlaySoundAction || actionType == vms::event::PlaySoundOnceAction || actionType == vms::event::SayTextAction)
-        dialog.setDelegate(new QnCheckResourceAndWarnDelegate<QnCameraAudioTransmitPolicy>(this));
+        auto params = m_model->actionParams();
+        dialog.setAllUsers(params.allUsers);
 
-    dialog.setSelectedResources(m_model->actionResources());
+        if (m_model->actionType() == vms::event::SendMailAction)
+        {
+            QSharedPointer<QnSendEmailActionDelegate> dialogDelegate(
+                new QnSendEmailActionDelegate(this));
 
-    if (dialog.exec() != QDialog::Accepted)
-        return;
-    m_model->setActionResources(dialog.selectedResources());
+            dialog.setAllUsersSelectorEnabled(false); //< No spam, baby.
+
+            dialog.setUserValidator(
+                [dialogDelegate](const QnUserResourcePtr& user)
+                {
+                    // TODO: #vkutin This adapter is rather sub-optimal.
+                    return dialogDelegate->isValid(user->getId());
+                });
+
+            const auto updateAlert =
+                [&dialog, dialogDelegate]
+                {
+                    // TODO: #vkutin #3.2 Full updates like this are slow. Refactor in 3.2.
+                    dialog.showAlert(dialogDelegate->validationMessage(
+                        dialog.totalCheckedUsers()));
+                };
+
+            connect(&dialog, &SubjectSelectionDialog::changed, this, updateAlert);
+            updateAlert();
+        }
+
+        if (dialog.exec() != QDialog::Accepted)
+            return;
+
+        m_model->setActionResources(dialog.checkedSubjects());
+
+        params.allUsers = dialog.allUsers();
+        m_model->setActionParams(params);
+    }
+    else
+    {
+        QnResourceSelectionDialog dialog(target, this);
+
+        vms::event::ActionType actionType = m_model->actionType();
+        if (actionType == vms::event::CameraRecordingAction)
+            dialog.setDelegate(new QnCheckResourceAndWarnDelegate<QnCameraRecordingPolicy>(this));
+        if (actionType == vms::event::BookmarkAction)
+            dialog.setDelegate(new QnCheckResourceAndWarnDelegate<QnBookmarkActionPolicy>(this));
+        else if (actionType == vms::event::CameraOutputAction)
+            dialog.setDelegate(new QnCheckResourceAndWarnDelegate<QnCameraOutputPolicy>(this));
+        else if (actionType == vms::event::ExecutePtzPresetAction)
+            dialog.setDelegate(new QnCheckResourceAndWarnDelegate<QnExecPtzPresetPolicy>(this));
+        else if (actionType == vms::event::SendMailAction)
+            dialog.setDelegate(new QnSendEmailActionDelegate(this));
+        else if (actionType == vms::event::PlaySoundAction || actionType == vms::event::PlaySoundOnceAction || actionType == vms::event::SayTextAction)
+            dialog.setDelegate(new QnCheckResourceAndWarnDelegate<QnCameraAudioTransmitPolicy>(this));
+
+        dialog.setSelectedResources(m_model->actionResources());
+
+        if (dialog.exec() != QDialog::Accepted)
+            return;
+        m_model->setActionResources(dialog.selectedResources());
+    }
 }
 
 void QnBusinessRuleWidget::at_scheduleButton_clicked()

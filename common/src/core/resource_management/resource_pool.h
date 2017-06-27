@@ -223,6 +223,9 @@ signals:
 
     void aboutToBeDestroyed();
 private:
+signals:
+    void resourceAddedInternal(const QnResourcePtr &resource);
+private:
     /*!
         \note MUST be called with \a m_resourcesMtx locked
     */
@@ -230,10 +233,16 @@ private:
     void ensureCache() const;
 
 private:
-    mutable struct Cache {
-        bool valid;
-        bool containsIoModules;
-        QnMediaServerResourceList serversList;
+    mutable struct Cache
+    {
+        void resourceRemoved(const QnResourcePtr& res);
+        void resourceAdded(const QnResourcePtr& res);
+
+        int ioModulesCount = 0;
+        QMap<QnUuid, QnMediaServerResourcePtr> mediaServers;
+        QMap<QString, QnResourcePtr> resourcesByUniqueId;
+    private:
+        bool isIoModule(const QnResourcePtr& res) const;
     } m_cache;
 
     mutable QnMutex m_resourcesMtx;

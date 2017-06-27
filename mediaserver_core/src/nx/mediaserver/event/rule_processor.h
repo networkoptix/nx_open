@@ -90,9 +90,10 @@ class RuleProcessor:
     public QnCommonModuleAware
 {
     Q_OBJECT
+
 public:
     RuleProcessor(QnCommonModule* commonModule);
-    virtual ~RuleProcessor();
+    virtual ~RuleProcessor() override;
 
     void addRule(const vms::event::RulePtr& value);
 
@@ -153,6 +154,8 @@ protected:
 
     void terminateRunningRule(const vms::event::RulePtr& rule);
 
+    bool fixActionTimeFields(const vms::event::AbstractActionPtr& action);
+
 private:
     void at_ruleAddedOrUpdated_impl(const vms::event::RulePtr& rule);
 
@@ -168,6 +171,13 @@ private:
     bool needProxyAction(const vms::event::AbstractActionPtr& action, const QnResourcePtr& res);
     void doProxyAction(const vms::event::AbstractActionPtr& action, const QnResourcePtr& res);
     void doExecuteAction(const vms::event::AbstractActionPtr& action, const QnResourcePtr& res);
+
+    bool handleBookmarkAction(const vms::event::AbstractActionPtr& action);
+
+    bool updateProlongedActionStartTime(const vms::event::AbstractActionPtr& action);
+    bool popProlongedActionStartTime(
+        const vms::event::AbstractActionPtr& action,
+        qint64& startTimeUsec);
 
 protected:
     mutable QnMutex m_mutex;
@@ -204,6 +214,8 @@ private:
         \param isRuleAdded \a true - rule added, \a false - removed
     */
     void notifyResourcesAboutEventIfNeccessary(const vms::event::RulePtr& rule, bool isRuleAdded);
+
+    QHash<QnUuid, qint64> m_runningBookmarkActions;
 };
 
 #define qnEventRuleProcessor nx::mediaserver::event::RuleProcessor::instance()

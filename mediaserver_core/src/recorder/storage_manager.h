@@ -23,6 +23,7 @@
 #include "utils/db/db_helper.h"
 #include "storage_db.h"
 #include <nx/utils/uuid.h>
+#include <nx/utils/timer_manager.h>
 #include <set>
 #include <unordered_map>
 #include "api/model/rebuild_archive_reply.h"
@@ -45,6 +46,7 @@ class QnAbstractMediaStreamDataProvider;
 class TestStorageThread;
 class RebuildAsyncTask;
 class ScanMediaFilesTask;
+class AuxiliaryTask;
 class QnUuid;
 class QnScheduleSync;
 
@@ -129,6 +131,7 @@ public:
     bool hasRebuildingStorages() const;
 
     void clearSpace(bool forced=false);
+    void checkSystemStorageSpace();
     void removeEmptyDirs(const QnStorageResourcePtr &storage);
 
     bool clearOldestSpace(const QnStorageResourcePtr &storage, bool useMinArchiveDays);
@@ -238,6 +241,8 @@ private:
     int64_t calculateNxOccupiedSpace(int storageIndex) const;
     QnStorageResourcePtr getStorageByIndex(int index) const;
     bool getSqlDbPath(const QnStorageResourcePtr &storage, QString &dbFolderPath) const;
+    void startAuxTimerTasks();
+
 private:
     const QnServer::StoragePool m_role;
     StorageMap                  m_storageRoots;
@@ -264,6 +269,7 @@ private:
 
     friend class RebuildAsyncTask;
     friend class ScanMediaFilesTask;
+    friend class AuxiliaryTask;
 
     ScanMediaFilesTask* m_rebuildArchiveThread;
 
@@ -281,6 +287,9 @@ private:
     nx::recorder::SpaceInfo m_spaceInfo;
     nx::caminfo::ServerWriterHandler m_camInfoWriterHandler;
     nx::caminfo::Writer m_camInfoWriter;
+
+    nx::utils::StandaloneTimerManager m_auxTasksTimerManager;
+    bool m_lowSysStorageSpaceWarnShown;
 };
 
 #define qnNormalStorageMan QnStorageManager::normalInstance()

@@ -1,6 +1,6 @@
 #include "save_cloud_system_credentials.h"
 
-#include <cdb/connection.h>
+#include <nx/cloud/cdb/api/connection.h>
 
 #include <nx/network/http/http_types.h>
 #include <nx/utils/log/log.h>
@@ -87,7 +87,7 @@ bool QnSaveCloudSystemCredentialsHandler::authorize(
     nx_http::StatusCode::Value* const authorizationStatusCode)
 {
     using namespace nx_http;
-    if (QnPermissionsHelper::isSafeMode())
+    if (QnPermissionsHelper::isSafeMode(owner->commonModule()))
     {
         *authorizationStatusCode = (StatusCode::Value)QnPermissionsHelper::safeModeError(*result);
         return false;
@@ -245,7 +245,7 @@ bool QnSaveCloudSystemCredentialsHandler::fetchNecessaryDataFromCloud(
 }
 
 bool QnSaveCloudSystemCredentialsHandler::initializeCloudRelatedManagers(
-    const CloudCredentialsData& data,
+    const CloudCredentialsData& /*data*/,
     QnJsonRestResult* result)
 {
     using namespace nx::cdb;

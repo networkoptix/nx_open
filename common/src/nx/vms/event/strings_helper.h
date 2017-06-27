@@ -15,6 +15,7 @@ class StringsHelper: public QObject, public QnCommonModuleAware
 {
     Q_OBJECT
     using base_type = QObject;
+
 public:
     StringsHelper(QnCommonModule* commonModule);
 
@@ -82,6 +83,14 @@ public:
         Qn::ResourceInfoLevel detailLevel) const;
 
 	QString getResoureIPFromParams(const EventParameters& params) const;
+
+    // Argument showName controls showing specific subject name in case of just one subject.
+    QString actionSubjects(const RulePtr& rule, bool showName = true) const;
+    QString actionSubjects(const QnUserResourceList& users, const QList<QnUuid>& roles,
+        bool showName = true) const;
+
+    static QString allUsersText();
+    static QString needToSelectUserText();
 
     static QString defaultSoftwareTriggerName();
     static QString getSoftwareTriggerName(const QString& id);

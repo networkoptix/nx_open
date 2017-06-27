@@ -54,6 +54,9 @@ void ConnectSessionManager::beginListening(
 
     NX_LOGX(lm("beginListening. peerName %1").arg(request.peerName), cl_logDEBUG2);
 
+    // TODO: #ak Using getConnectionCountByPeerName makes folowing code not atomic.
+    //   That can lead to server registering more connections than was allowed.
+
     const auto peerConnectionCount =
         m_listeningPeerPool->getConnectionCountByPeerName(request.peerName);
     if (peerConnectionCount >=
@@ -103,7 +106,7 @@ void ConnectSessionManager::createClientSession(
     if (peerName.empty())
     {
         NX_LOGX(lm("Session %1. Listening peer %2 was not found")
-            .arg(request.targetPeerName), cl_logDEBUG1);
+            .arg(request.desiredSessionId).arg(request.targetPeerName), cl_logDEBUG1);
         return completionHandler(
             api::ResultCode::notFound,
             std::move(response));

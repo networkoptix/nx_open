@@ -141,7 +141,7 @@ void thread::join() noexcept(false)
     m_actualThread->join();
 }
 
-void thread::detach() throw (std::system_error)
+void thread::detach() noexcept(false)
 {
     if (!joinable())
         throw std::system_error(std::make_error_code(std::errc::invalid_argument));

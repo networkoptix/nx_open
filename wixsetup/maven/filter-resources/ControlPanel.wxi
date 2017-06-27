@@ -1,7 +1,7 @@
 <?include BuildVars.wxi ?>
 
 <Include>
-  <Property Id="ARPCOMMENTS" Value="${company.name} ${display.product.name}" />
+  <Property Id="ARPCOMMENTS" Value="$(var.companyName) $(var.productName)" />
   <Property Id="ARPCONTACT" Value="${companyUrl}" />
   <Property Id="ARPPRODUCTICON" Value="favicon.ico" />
   <Property Id="ARPHELPLINK" Value="${productUrl}" />
@@ -11,8 +11,8 @@
   <Property Id="ARPHELPTELEPHONE" Value="${companyUrl}" />
   <Property Id="ARPAUTHORIZEDCDFPREFIX" Value="${companyUrl}" />
 
-  <Property Id="ARPNOREPAIR" Value="1" />    
-  <Property Id="ARPNOMODIFY" Value="1" />    
+  <Property Id="ARPNOREPAIR" Value="1" />
+  <Property Id="ARPNOMODIFY" Value="1" />
 
   <Icon Id="favicon.ico" SourceFile="favicon.ico"/>
 
@@ -35,5 +35,5 @@
             </Directory>
         </Directory>
     </DirectoryRef>
-  
+
 </Include>

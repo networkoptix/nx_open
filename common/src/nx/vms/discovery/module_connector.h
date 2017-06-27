@@ -51,6 +51,7 @@ private:
         enum Priority { kDefault, kLocalHost, kLocalNetwork, kIp, kOther };
         typedef std::map<Priority, std::set<SocketAddress>> Endpoints;
 
+        boost::optional<Endpoints::iterator> saveEndpoint(SocketAddress endpoint);
         void connectToGroup(Endpoints::iterator endpointsGroup);
         void connectToEndpoint(const SocketAddress& endpoint, Endpoints::iterator endpointsGroup);
         boost::optional<QnModuleInformation> getInformation(nx_http::AsyncHttpClientPtr client);

@@ -10,6 +10,8 @@
 #include <QtCore/QSettings>
 #include <QtCore/QFileInfo>
 
+#include <nx/utils/timer_manager.h>
+
 #include <utils/common/app_info.h>
 #include <media_server/media_server_app_info.h>
 #include <media_server/media_server_module.h>
@@ -95,6 +97,14 @@ std::chrono::milliseconds MSSettings::hlsTargetDuration() const
     return value > std::chrono::milliseconds::zero()
         ? value
         : std::chrono::milliseconds(nx_ms_conf::DEFAULT_TARGET_DURATION_MS);
+}
+
+std::chrono::milliseconds MSSettings::delayBeforeSettingMasterFlag() const
+{
+    return nx::utils::parseTimerDuration(
+        m_roSettings->value(
+            nx_ms_conf::DELAY_BEFORE_SETTING_MASTER_FLAG,
+            nx_ms_conf::DEFAULT_DELAY_BEFORE_SETTING_MASTER_FLAG).toString());
 }
 
 QString MSSettings::defaultRunTimeSettingsFilePath()

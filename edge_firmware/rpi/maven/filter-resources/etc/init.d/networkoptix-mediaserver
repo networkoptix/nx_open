@@ -95,10 +95,10 @@ startquiet()
     start
 }
 
-stop()
+stop() # [<signal>]
 {
     echo -n "Stopping $BIN_NAME... "
-    killall "$1" "$BIN_NAME" >/dev/null 2>&1
+    killall $1 "$BIN_NAME" >/dev/null 2>&1
     local i=0
     while pidof "$BIN_NAME" >/dev/null; do
         sleep 1

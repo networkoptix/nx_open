@@ -121,6 +121,10 @@ public:
     QStandardItemModel* eventStatesModel();
     QStandardItemModel* actionTypesModel();
 
+public:
+    //TODO: #vkutin #3.2 Temporary workaround to pass "all users" as a special uuid.
+    static const QnUuid kAllUsersId;
+
 signals:
     void dataChanged(Fields fields);
 

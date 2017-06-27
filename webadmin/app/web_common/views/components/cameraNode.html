@@ -3,11 +3,12 @@
         <div>
             <camera-status camera="camera" type="'camera'"></camera-status>
         </div>
-        <div class="camera-preview-image" ng-style="{'background-image':'url(' + camera.preview + ')'}">
-            <img ng-if="camera.status != 'Offline' && camera.status != 'Unauthorized'"
-                    ng-src="{{camera.preview}}" >
-        </div>
+        <span ng-if="camera.status == 'Offline' || camera.status == 'Unauthorized'"
+             ng-class="camera.status == 'Offline' ? 'camera-preview-offline' : 'camera-preview-unauthorized'"></span>
+        <img ng-if="camera.status != 'Offline' && camera.status != 'Unauthorized'"
+                ng-src="{{camera.preview}}" onerror="this.parentNode.removeChild(this)">
     </div>
-    {{camera.name}}<br/>
-    <small ng-if="toggleInfo">{{camera.url}}</small>
+    <div class="camera-name">{{camera.name}}<br/>
+        <small ng-if="toggleInfo">{{camera.url}}</small>
+    </div>
 </a>

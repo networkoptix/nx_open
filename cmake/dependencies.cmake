@@ -19,12 +19,17 @@ function(detect_package_versions)
         set(_qt_version "5.6.1-1")
     endif()
 
+    if(LINUX AND arch STREQUAL "x86")
+        set(_festival_version "2.1")
+    endif()
+
     if(MACOSX)
         set(_quazip_version "0.7.2")
         set(_festival_version "2.1")
     endif()
 
     if(ANDROID)
+        set(_qt_version "5.6.2-2")
         set(_openssl_version "1.0.2g")
         set(_openal_version "1.17.2")
     endif()
@@ -36,6 +41,8 @@ function(detect_package_versions)
 
     if(box STREQUAL "bananapi")
         set(_ffmpeg_version "3.1.1-bananapi")
+        set(_qt_version "5.6.1")
+        set(_openssl_version "1.0.0j")
     endif()
 
     if(box STREQUAL "rpi")
@@ -67,6 +74,7 @@ function(detect_package_versions)
     set(gtest_version ${_gtest_version} CACHE STRING "")
     set(gmock_version ${_gmock_version} CACHE STRING "")
     set(directx_version ${_directx_version} CACHE STRING "")
+    set(server-external_version "" CACHE STRING "")
 
     set(help_version "${customization}-${releaseVersion.short}" PARENT_SCOPE)
 endfunction()
@@ -84,11 +92,14 @@ function(get_dependencies)
         set(haveMobileClient TRUE)
     endif()
 
-    if(WINDOWS OR MACOSX OR (LINUX AND NOT ANDROID AND box MATCHES "none|bpi|tx1"))
+    if(WINDOWS OR MACOSX
+        OR (LINUX AND NOT arch STREQUAL "x86" AND NOT ANDROID AND box MATCHES "none|bpi|tx1"))
+
         set(haveTests TRUE)
     endif()
 
     nx_rdep_add_package(qt PATH_VARIABLE QT_DIR)
+    file(TO_CMAKE_PATH "${QT_DIR}" QT_DIR)
     set(QT_DIR ${QT_DIR} PARENT_SCOPE)
 
     nx_rdep_add_package(any/boost)
@@ -100,7 +111,7 @@ function(get_dependencies)
     nx_rdep_add_package(openssl)
     nx_rdep_add_package(ffmpeg)
 
-    if(box MATCHES "bpi")
+    if(box MATCHES "bpi|bananapi")
         nx_rdep_add_package(sysroot)
     endif()
 
@@ -158,9 +169,19 @@ function(get_dependencies)
         nx_rdep_add_package(any/apidoctool PATH_VARIABLE APIDOCTOOL_PATH)
         set(APIDOCTOOL_PATH ${APIDOCTOOL_PATH} PARENT_SCOPE)
 
-        nx_rdep_add_package(any/server-external-${branch} OPTIONAL PATH_VARIABLE server_external_path)
-        if(NOT server_external_path)
-            nx_rdep_add_package(any/server-external-${releaseVersion})
+        if(server-external_version)
+            nx_rdep_add_package(any/server-external)
+        else()
+            hg_last_commit_branch("${PROJECT_SOURCE_DIR}" _branch)
+            set(server_external_path)
+            while(NOT server_external_path AND _branch)
+                nx_rdep_add_package(any/server-external-${_branch} OPTIONAL
+                    PATH_VARIABLE server_external_path)
+                hg_parent_branch("${PROJECT_SOURCE_DIR}" ${_branch} _branch)
+            endwhile()
+            if(NOT server_external_path)
+                message(FATAL_ERROR "Package server-external not found.")
+            endif()
         endif()
 
         if(LINUX AND arch MATCHES "arm|aarch64")

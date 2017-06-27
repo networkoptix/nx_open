@@ -32,7 +32,7 @@
 #include <core/resource_management/resource_properties.h>
 
 #include <nx/fusion/model_functions.h>
-#include <transaction/transaction_message_bus.h>
+#include <transaction/transaction_message_bus_base.h>
 #include <core/resource_access/resource_access_manager.h>
 #include <network/authutil.h>
 
@@ -204,7 +204,7 @@ bool backupDatabase(std::shared_ptr<ec2::AbstractECConnection> connection)
     return true;
 }
 
-void dropConnectionsToRemotePeers(ec2::QnTransactionMessageBus* messageBus)
+void dropConnectionsToRemotePeers(ec2::QnTransactionMessageBusBase* messageBus)
 {
     if (QnServerConnector::instance())
         QnServerConnector::instance()->stop();
@@ -218,7 +218,7 @@ void resumeConnectionsToRemotePeers()
         QnServerConnector::instance()->start();
 }
 
-bool changeLocalSystemId(const ConfigureSystemData& data, ec2::QnTransactionMessageBus* messageBus)
+bool changeLocalSystemId(const ConfigureSystemData& data, ec2::QnTransactionMessageBusBase* messageBus)
 {
     const auto& commonModule = messageBus->commonModule();
     if (commonModule->globalSettings()->localSystemId() == data.localSystemId)
@@ -247,8 +247,7 @@ bool changeLocalSystemId(const ConfigureSystemData& data, ec2::QnTransactionMess
     }
 
     // add foreign resource params
-    ec2::ApiResourceParamWithRefDataList dummyData;
-    if (connection->getResourceManager(Qn::kSystemAccess)->saveSync(data.additionParams, &dummyData) != ec2::ErrorCode::ok)
+    if (connection->getResourceManager(Qn::kSystemAccess)->saveSync(data.additionParams) != ec2::ErrorCode::ok)
     {
         if (!data.wholeSystem)
             resumeConnectionsToRemotePeers();
@@ -273,6 +272,10 @@ bool changeLocalSystemId(const ConfigureSystemData& data, ec2::QnTransactionMess
 
     if (data.localSystemId.isNull())
         commonModule->globalSettings()->resetCloudParams();
+
+    if (!data.systemName.isEmpty())
+        commonModule->globalSettings()->setSystemName(data.systemName);
+
     commonModule->globalSettings()->setLocalSystemId(data.localSystemId);
     commonModule->globalSettings()->synchronizeNowSync();
 

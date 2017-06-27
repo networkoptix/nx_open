@@ -109,7 +109,7 @@ QN_FUSION_ADAPT_STRUCT_FUNCTIONS(
     MergeSystemData, (json),
     (url)(getKey)(postKey)(takeRemoteSettings)(mergeOneServer)(ignoreIncompatible))
 
-QnMergeSystemsRestHandler::QnMergeSystemsRestHandler(ec2::QnTransactionMessageBus* messageBus):
+QnMergeSystemsRestHandler::QnMergeSystemsRestHandler(ec2::QnTransactionMessageBusBase* messageBus):
     QnJsonRestHandler(),
     m_messageBus(messageBus)
 {}
@@ -144,7 +144,7 @@ int QnMergeSystemsRestHandler::execute(
 {
     using MergeStatus = utils::MergeSystemsStatus::Value;
 
-    if (QnPermissionsHelper::isSafeMode())
+    if (QnPermissionsHelper::isSafeMode(owner->commonModule()))
         return QnPermissionsHelper::safeModeError(result);
     if (!QnPermissionsHelper::hasOwnerPermissions(owner->resourcePool(), owner->accessRights()))
         return QnPermissionsHelper::notOwnerError(result);
@@ -314,7 +314,9 @@ int QnMergeSystemsRestHandler::execute(
 
     if (data.takeRemoteSettings)
     {
-        if (!applyRemoteSettings(data.url, remoteModuleInformation.localSystemId, data.getKey, data.postKey, owner))
+        if (!applyRemoteSettings(data.url,
+                remoteModuleInformation.localSystemId, remoteModuleInformation.systemName,
+                data.getKey, data.postKey, owner))
         {
             NX_LOG(lit("QnMergeSystemsRestHandler. takeRemoteSettings %1. Failed to apply remote settings")
                 .arg(data.takeRemoteSettings), cl_logDEBUG1);
@@ -500,6 +502,7 @@ bool executeRequest(
 bool QnMergeSystemsRestHandler::applyRemoteSettings(
     const QUrl& remoteUrl,
     const QnUuid& systemId,
+    const QString& systemName,
     const QString& getKey,
     const QString& postKey,
     const QnRestConnectionProcessor* owner)
@@ -545,6 +548,7 @@ bool QnMergeSystemsRestHandler::applyRemoteSettings(
     data.wholeSystem = true;
     data.sysIdTime = pingReply.sysIdTime;
     data.tranLogTime = pingReply.tranLogTime;
+    data.systemName = systemName;
 
     for (const auto& userData: users)
     {

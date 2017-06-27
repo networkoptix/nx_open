@@ -1301,8 +1301,8 @@ APPLY(9006, restoreDatabase, ApiDatabaseDumpData, \
                        AdminOnlyAccessOut(), /* Check remote peer rights for outgoing transaction */ \
                        LocalTransactionType()) /* local transaction type */ \
 APPLY(9009, updatePersistentSequence, ApiUpdateSequenceData, \
-                       false, \
-                       false, \
+                       true, /* persistent*/ \
+                       false,  /* system*/ \
                        InvalidGetHashHelper(), \
                        EmptyNotificationHelper(), \
                        AdminOnlyAccess(), /* save permission checker */ \
@@ -1590,6 +1590,7 @@ APPLY(10101, getMiscParam, ApiMiscData, \
     {
         QnUuid tranGuid;
         QnAbstractTransaction tran;
+        int dataSize = 0;
 
         ApiTransactionData() {}
         ApiTransactionData(const QnUuid& peerGuid): tran(peerGuid) {}
@@ -1599,7 +1600,7 @@ APPLY(10101, getMiscParam, ApiMiscData, \
         ApiTransactionData(ApiTransactionData&&) = default;
         ApiTransactionData& operator=(ApiTransactionData&&) = default;
     };
-#define ApiTransactionData_Fields (tranGuid)(tran)
+#define ApiTransactionData_Fields (tranGuid)(tran)(dataSize)
 QN_FUSION_DECLARE_FUNCTIONS(ApiTransactionData, (json)(ubjson)(xml)(csv_record))
 
     int generateRequestID();

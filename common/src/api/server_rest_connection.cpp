@@ -138,7 +138,7 @@ Handle ServerConnection::getStatisticsSettingsAsync(
         return Handle(); //< can't process request now. No internet access
 
     nx_http::ClientPool::Request request = prepareRequest(
-        nx_http::Method::GET, prepareUrl(path, emptyRequest.toParams()));
+        nx_http::Method::Get, prepareUrl(path, emptyRequest.toParams()));
     nx_http::HttpHeader header(Qn::SERVER_GUID_HEADER_NAME, server->getId().toByteArray());
     nx_http::insertOrReplaceHeader(&request.headers, header);
     auto handle = request.isValid() ? executeRequest(request, callback, targetThread) : Handle();
@@ -163,7 +163,7 @@ Handle ServerConnection::sendStatisticsAsync(
         return Handle();
 
     nx_http::ClientPool::Request request = prepareRequest(
-        nx_http::Method::POST,
+        nx_http::Method::Post,
         prepareUrl(path, statisticsData.toParams()),
         kJsonContentType,
         data);
@@ -248,6 +248,127 @@ Handle ServerConnection::checkCloudHost(
         targetThread);
 }
 
+Handle ServerConnection::downloaderAddDownload(
+    const QString& fileName,
+    int size,
+    const QByteArray& md5,
+    const QUrl& url,
+    GetCallback callback,
+    QThread* targetThread)
+{
+    return executeGet(
+        lit("/api/downloader/addDownload"),
+        QnRequestParamList{
+            {lit("fileName"), fileName},
+            {lit("size"), QString::number(size)},
+            {lit("md5"), QString::fromUtf8(md5)},
+            {lit("url"), url.toString()}},
+        callback,
+        targetThread);
+}
+
+Handle ServerConnection::downloaderRemoveDownload(
+    const QString& fileName,
+    bool deleteData,
+    GetCallback callback,
+    QThread* targetThread)
+{
+    return executeGet(
+        lit("/api/downloader/removeDownload"),
+        QnRequestParamList{
+            {lit("fileName"), fileName},
+            {lit("deleteData"), QnLexical::serialized(deleteData)}},
+        callback,
+        targetThread);
+}
+
+Handle ServerConnection::downloaderChunkChecksums(
+    const QString& fileName,
+    GetCallback callback,
+    QThread* targetThread)
+{
+    return executeGet(
+        lit("/api/downloader/chunkChecksums"),
+        QnRequestParamList{{lit("fileName"), fileName}},
+        callback,
+        targetThread);
+}
+
+Handle ServerConnection::downloaderDownloadChunk(
+    const QString& fileName,
+    int index,
+    Result<QByteArray>::type callback,
+    QThread* targetThread)
+{
+    return executeGet(
+        lit("/api/downloader/downloadChunk"),
+        QnRequestParamList{
+            {lit("fileName"), fileName},
+            {lit("index"), QString::number(index)}},
+        callback,
+        targetThread);
+}
+
+Handle ServerConnection::downloaderDownloadChunkFromInternet(
+    const QString& fileName,
+    const QUrl& url,
+    int chunkIndex,
+    int chunkSize,
+    Result<QByteArray>::type callback,
+    QThread* targetThread)
+{
+    return executeGet(
+        lit("/api/downloader/downloadChunkFromInternet"),
+        QnRequestParamList{
+            {lit("fileName"), fileName},
+            {lit("url"), url.toString()},
+            {lit("chunkIndex"), QString::number(chunkIndex)},
+            {lit("chunkSize"), QString::number(chunkSize)}},
+        callback,
+        targetThread);
+}
+
+Handle ServerConnection::downloaderUploadChunk(
+    const QString& fileName,
+    int index,
+    const QByteArray& data,
+    GetCallback callback,
+    QThread* targetThread)
+{
+    return executePost(
+        lit("/api/downloader/uploadChunk"),
+        QnRequestParamList{
+            {lit("fileName"), fileName},
+            {lit("index"), QString::number(index)}},
+        "application/octet-stream",
+        data,
+        callback,
+        targetThread);
+}
+
+Handle ServerConnection::downloaderStatus(
+    GetCallback callback,
+    QThread* targetThread)
+{
+    return executeGet(
+        lit("/api/downloader/status"),
+        QnRequestParamList(),
+        callback,
+        targetThread);
+}
+
+Handle ServerConnection::downloaderFileStatus(
+    const QString& fileName,
+    GetCallback callback,
+    QThread* targetThread)
+{
+    return executeGet(
+        lit("/api/downloader/status"),
+        QnRequestParamList{{lit("fileName"), fileName}},
+        callback,
+        targetThread);
+}
+
 // --------------------------- private implementation -------------------------------------
 
 QUrl ServerConnection::prepareUrl(const QString& path, const QnRequestParamList& params) const
@@ -280,24 +401,71 @@ T parseMessageBody(const Qn::SerializationFormat& format, const nx_http::BufferT
 }
 
 template <typename ResultType>
-Handle ServerConnection::executeGet(const QString& path, const QnRequestParamList& params, REST_CALLBACK(ResultType) callback, QThread* targetThread)
+Handle ServerConnection::executeGet(
+    const QString& path,
+    const QnRequestParamList& params,
+    REST_CALLBACK(ResultType) callback,
+    QThread* targetThread)
 {
-    nx_http::ClientPool::Request request = prepareRequest(nx_http::Method::GET, prepareUrl(path, params));
-    auto handle = request.isValid() ? executeRequest(request, callback, targetThread) : Handle();
+    auto request = prepareRequest(nx_http::Method::Get, prepareUrl(path, params));
+    auto handle = request.isValid()
+        ? executeRequest(request, callback, targetThread)
+        : Handle();
+
     trace(handle, path);
     return handle;
 }
 
 template <typename ResultType>
-Handle ServerConnection::executePost(const QString& path,
-                                           const QnRequestParamList& params,
-                                           const nx_http::StringType& contentType,
-                                           const nx_http::StringType& messageBody,
-                                           REST_CALLBACK(ResultType) callback,
-                                           QThread* targetThread)
+Handle ServerConnection::executePost(
+    const QString& path,
+    const QnRequestParamList& params,
+    const nx_http::StringType& contentType,
+    const nx_http::StringType& messageBody,
+    REST_CALLBACK(ResultType) callback,
+    QThread* targetThread)
 {
-    nx_http::ClientPool::Request request = prepareRequest(nx_http::Method::POST, prepareUrl(path, params), contentType, messageBody);
-    auto handle = request.isValid() ? executeRequest(request, callback, targetThread) : Handle();
+    auto request = prepareRequest(
+        nx_http::Method::Post, prepareUrl(path, params), contentType, messageBody);
+    auto handle = request.isValid()
+        ? executeRequest(request, callback, targetThread)
+        : Handle();
+
+    trace(handle, path);
+    return handle;
+}
+
+template <typename ResultType>
+Handle ServerConnection::executePut(
+    const QString& path,
+    const QnRequestParamList& params,
+    const nx_http::StringType& contentType,
+    const nx_http::StringType& messageBody,
+    REST_CALLBACK(ResultType) callback,
+    QThread* targetThread)
+{
+    auto request = prepareRequest(
+        nx_http::Method::Put, prepareUrl(path, params), contentType, messageBody);
+    auto handle = request.isValid()
+        ? executeRequest(request, callback, targetThread)
+        : Handle();
+
+    trace(handle, path);
+    return handle;
+}
+
+template <typename ResultType>
+Handle ServerConnection::executeDelete(
+    const QString& path,
+    const QnRequestParamList& params,
+    REST_CALLBACK(ResultType) callback,
+    QThread* targetThread)
+{
+    auto request = prepareRequest(nx_http::Method::Delete, prepareUrl(path, params));
+    auto handle = request.isValid()
+        ? executeRequest(request, callback, targetThread)
+        : Handle();
+
     trace(handle, path);
     return handle;
 }

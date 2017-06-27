@@ -1,30 +1,28 @@
 #pragma once
 
-#include <QtWidgets/QWidget>
+#include <QtCore/QScopedPointer>
 
-#include <ui/widgets/business/abstract_business_params_widget.h>
+#include <ui/widgets/business/subject_target_action_widget.h>
 
 namespace Ui {
-    class ShowOnAlarmLayoutActionWidget;
-}
+class ShowOnAlarmLayoutActionWidget;
+} // namespace Ui
 
-class QnShowOnAlarmLayoutActionWidget : public QnAbstractBusinessParamsWidget
+class QnShowOnAlarmLayoutActionWidget: public QnSubjectTargetActionWidget
 {
     Q_OBJECT
-    typedef QnAbstractBusinessParamsWidget base_type;
-    
-public:
-    explicit QnShowOnAlarmLayoutActionWidget(QWidget *parent = 0);
-    ~QnShowOnAlarmLayoutActionWidget();
+    using base_type = QnSubjectTargetActionWidget;
 
-    virtual void updateTabOrder(QWidget *before, QWidget *after) override;
+public:
+    explicit QnShowOnAlarmLayoutActionWidget(QWidget* parent = nullptr);
+    virtual ~QnShowOnAlarmLayoutActionWidget() override;
+
+    virtual void updateTabOrder(QWidget* before, QWidget* after) override;
 
 protected slots:
     virtual void at_model_dataChanged(Fields fields) override;
 
 private:
-    void selectUsers();
-    void updateUsersButtonText();
     void paramsChanged();
 
 private:

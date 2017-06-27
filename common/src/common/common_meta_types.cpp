@@ -139,6 +139,8 @@ void QnCommonMetaTypes::initialize() {
     qRegisterMetaType<QnResourceTypeList>();
     qRegisterMetaType<QnResourcePtr>();
     qRegisterMetaType<QnResourceList>();
+    qRegisterMetaType<Qn::ResourceFlags>();
+    QMetaType::registerConverter<Qn::ResourceFlags, int>();
     qRegisterMetaType<Qn::ResourceStatus>();
     qRegisterMetaType<Qn::BitratePerGopType>();
     qRegisterMetaType<nx::vms::event::EventReason>();
@@ -203,7 +205,7 @@ void QnCommonMetaTypes::initialize() {
 
     qRegisterMetaType<TypeSpecificParamMap>();
     qRegisterMetaType<QnCameraAdvancedParamValue>();
-	qRegisterMetaType<QnCameraAdvancedParamValueList>();
+    qRegisterMetaType<QnCameraAdvancedParamValueList>();
 
     qRegisterMetaType<QVector<int> >(); /* This one is used by QAbstractItemModel. */
 
@@ -292,6 +294,8 @@ void QnCommonMetaTypes::initialize() {
     qRegisterMetaType<ec2::QnPeerTimeInfo>( "QnPeerTimeInfo" );
     qRegisterMetaType<ec2::QnPeerTimeInfoList>( "QnPeerTimeInfoList" );
     qRegisterMetaType<ec2::ApiPeerAliveData>( "ApiPeerAliveData" );
+    qRegisterMetaType<ec2::ApiPeerData>("ApiPeerData");
+    qRegisterMetaType<ec2::ApiPeerData>();
     qRegisterMetaType<ec2::ApiDiscoveryDataList>( "ApiDiscoveryDataList" );
     qRegisterMetaType<ec2::ApiDiscoveryData>( "ApiDiscoveryData" );
     qRegisterMetaType<ec2::ApiDiscoveredServerData>("ApiDiscoveredServerData");

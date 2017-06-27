@@ -143,7 +143,7 @@ bool QnStorageDb::deleteRecords(const QString& cameraUniqueId,
     int cameraId = getCameraIdHash(cameraUniqueId);
     if (cameraId == -1)
     {
-        NX_LOG(lit("[media_db, delete] camera id hash is not generated. Unable to delete"), cl_logWARNING); 
+        NX_LOG(lit("[media_db, delete] camera id hash is not generated. Unable to delete"), cl_logWARNING);
         return false;
     }
     mediaFileOp.setCameraId(cameraId);
@@ -218,7 +218,7 @@ bool QnStorageDb::addRecord(const QString& cameraUniqueId,
     int cameraId = getCameraIdHash(cameraUniqueId);
     if (cameraId == -1)
     {
-        NX_LOG(lit("[media_db, add] camera id hash is not generated. Unable to add record"), cl_logWARNING); 
+        NX_LOG(lit("[media_db, add] camera id hash is not generated. Unable to add record"), cl_logWARNING);
         return false;
     }
     mediaFileOp.setCameraId(cameraId);
@@ -359,6 +359,9 @@ bool QnStorageDb::startDbFile()
 QVector<DeviceFileCatalogPtr> QnStorageDb::loadChunksFileCatalog()
 {
     QVector<DeviceFileCatalogPtr> result;
+    NX_LOG(lit("[StorageDb] loading chunks from DB. storage: %1, file: %2")
+            .arg(m_storage->getUrl())
+            .arg(m_dbFileName), cl_logINFO);
     vacuum(&result);
     return result;
 }

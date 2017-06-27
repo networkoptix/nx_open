@@ -111,7 +111,9 @@ TEST_F(FtHolePunchingProcessor, generic_tests)
 
         const auto listenResult = server1->listen();
         ASSERT_EQ(api::ResultCode::ok, listenResult.first);
-        ASSERT_EQ(KeepAliveOptions(10, 10, 3), listenResult.second.tcpConnectionKeepAlive);
+        ASSERT_EQ(
+            KeepAliveOptions(std::chrono::seconds(10), std::chrono::seconds(10), 3),
+            listenResult.second.tcpConnectionKeepAlive);
 
         //requesting connect to the server
         reinitializeUdpClient();

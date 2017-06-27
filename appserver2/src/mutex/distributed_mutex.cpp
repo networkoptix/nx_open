@@ -2,12 +2,11 @@
 
 #include <numeric>
 
-#include "transaction/transaction_message_bus.h"
+#include <transaction/message_bus_selector.h>
 #include "common/common_module.h"
 #include "utils/common/synctime.h"
 #include "utils/common/delete_later.h"
 #include "distributed_mutex_manager.h"
-
 
 namespace ec2
 {
@@ -55,31 +54,34 @@ void QnDistributedMutex::sendTransaction(const LockRuntimeInfo& lockInfo, ApiCom
     tran.params.timestamp = lockInfo.timestamp;
     if (m_owner->m_userDataHandler)
         tran.params.userData = m_owner->m_userDataHandler->getUserData(lockInfo.name);
-    m_owner->messageBus()->sendTransaction(tran, dstPeer);
+    if (dstPeer.isNull())
+        ec2::sendTransaction(m_owner->messageBus(), tran); //< Broadcast
+    else
+        ec2::sendTransaction(m_owner->messageBus(), tran, dstPeer);
 }
 
-void QnDistributedMutex::at_newPeerFound(ec2::ApiPeerAliveData data)
+void QnDistributedMutex::at_newPeerFound(QnUuid peer, Qn::PeerType peerType)
 {
-    if (data.peer.peerType != Qn::PT_Server)
+    if (peerType != Qn::PT_Server)
         return;
 
     QnMutexLocker lock( &m_mutex );
-    NX_ASSERT(data.peer.id != m_owner->messageBus()->commonModule()->moduleGUID());
+    NX_ASSERT(peer != m_owner->messageBus()->commonModule()->moduleGUID());
     if (!m_selfLock.isEmpty())
-        sendTransaction(m_selfLock, ApiCommand::lockRequest, data.peer.id);
+        sendTransaction(m_selfLock, ApiCommand::lockRequest, peer);
 }
 
-void QnDistributedMutex::at_peerLost(ec2::ApiPeerAliveData data)
+void QnDistributedMutex::at_peerLost(QnUuid peer, Qn::PeerType peerType)
 {
-    if (data.peer.peerType != Qn::PT_Server)
+    if (peerType != Qn::PT_Server)
         return;
 
     QnMutexLocker lock( &m_mutex );
 
-    m_proccesedPeers.remove(data.peer.id);
+    m_proccesedPeers.remove(peer);
     for (LockedMap::iterator itr = m_peerLockInfo.begin(); itr != m_peerLockInfo.end();)
     {
-        if (itr.key().peer == data.peer.id)
+        if (itr.key().peer == peer)
             itr = m_peerLockInfo.erase(itr);
         else
             ++itr;

@@ -111,6 +111,7 @@ bool supportsDuration(ActionType actionType)
         case BookmarkAction:
         case ShowTextOverlayAction:
         case CameraOutputAction:
+        case CameraRecordingAction:
             return true;
         default:
             return false;
@@ -142,6 +143,7 @@ bool isActionProlonged(ActionType actionType, const ActionParameters &parameters
         case BookmarkAction:
         case ShowTextOverlayAction:
         case CameraOutputAction:
+        case CameraRecordingAction:
             return parameters.durationMs <= 0;
 
         default:
@@ -190,6 +192,11 @@ ActionType AbstractAction::actionType() const
     return m_actionType;
 }
 
+void AbstractAction::setActionType(ActionType actionType)
+{
+    m_actionType = actionType;
+}
+
 void AbstractAction::setResources(const QVector<QnUuid>& resources)
 {
     m_resources = resources;
@@ -232,6 +239,11 @@ void AbstractAction::setRuntimeParams(const EventParameters& params)
 }
 
 const EventParameters& AbstractAction::getRuntimeParams() const
+{
+    return m_runtimeParams;
+}
+
+EventParameters& AbstractAction::getRuntimeParams()
 {
     return m_runtimeParams;
 }

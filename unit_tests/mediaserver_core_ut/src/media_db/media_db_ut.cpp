@@ -27,7 +27,7 @@
 #   include <platform/platform_abstraction.h>
 #endif
 
-#include "../utils.h"
+#include <test_support/utils.h>
 #include <media_server/settings.h>
 #include <media_server/media_server_module.h>
 
@@ -813,10 +813,11 @@ TEST(MediaDbTest, StorageDB)
 
     const QString workDirPath = *workDirResource.getDirName();
 
-    QnWriterPool writerPool;
+    const QnUuid moduleGuid("{A680980C-70D1-4545-A5E5-72D89E33648B}");
+
     auto platformAbstraction = std::unique_ptr<QnPlatformAbstraction>(new QnPlatformAbstraction());
     std::unique_ptr<QnMediaServerModule> serverModule(new QnMediaServerModule());
-    serverModule->commonModule()->setModuleGUID(QnUuid("{A680980C-70D1-4545-A5E5-72D89E33648B}"));
+    serverModule->commonModule()->setModuleGUID(moduleGuid);
 
     bool result;
     QnFileStorageResourcePtr storage(new QnFileStorageResource(serverModule->commonModule()));
@@ -940,15 +941,17 @@ TEST(MediaDbTest, StorageDB)
 
 TEST(MediaDbTest, Migration_from_sqlite)
 {
+    const QnUuid moduleGuid("{A680980C-70D1-4545-A5E5-72D89E33648B}");
+
     auto platformAbstraction = std::unique_ptr<QnPlatformAbstraction>(new QnPlatformAbstraction());
     std::unique_ptr<QnMediaServerModule> serverModule(new QnMediaServerModule());
-    serverModule->commonModule()->setModuleGUID(QnUuid("{A680980C-70D1-4545-A5E5-72D89E33648B}"));
+    serverModule->commonModule()->setModuleGUID(moduleGuid);
 
     nx::ut::utils::WorkDirResource workDirResource;
     ASSERT_TRUE((bool)workDirResource.getDirName());
 
     const QString workDirPath = *workDirResource.getDirName();
-    QString simplifiedGUID = QnStorageDbPool::getLocalGuid(serverModule->commonModule());
+    QString simplifiedGUID = QnStorageDbPool::getLocalGuid(moduleGuid);
     QString fileName = closeDirPath(workDirPath) + QString::fromLatin1("%1_media.sqlite").arg(simplifiedGUID);
     //QString fileName = closeDirPath(workDirPath) + lit("media.sqlite");
     auto sqlDb = std::unique_ptr<QSqlDatabase>(

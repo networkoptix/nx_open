@@ -740,7 +740,8 @@ void QnActiResource::stopInputPortMonitoringAsync()
 
     QAuthenticator auth = getAuth();
     QUrl url = getUrl();
-    url.setPath( lit("/cgi-bin/%1?USER=%2&PWD=%3&%4").arg(lit("encoder")).arg(auth.user()).arg(auth.password()).arg(registerEventRequestStr) );
+    url.setPath(lit("/cgi-bin/%1").arg(lit("encoder")));
+    url.setQuery(lit("USER=%1&PWD=%2&%3").arg(auth.user()).arg(auth.password()).arg(registerEventRequestStr));
     nx_http::AsyncHttpClientPtr httpClient = nx_http::AsyncHttpClient::create();
     //TODO #ak do not use DummyHandler here. httpClient->doGet should accept functor
     connect( httpClient.get(), &nx_http::AsyncHttpClient::done,

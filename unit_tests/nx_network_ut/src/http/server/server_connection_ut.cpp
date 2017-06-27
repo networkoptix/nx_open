@@ -128,7 +128,7 @@ TEST_F(HttpAsyncServerConnectionTest, requestPipeliningTest)
 
     //opening connection and sending multiple requests
     nx_http::Request request;
-    request.requestLine.method = nx_http::Method::GET;
+    request.requestLine.method = nx_http::Method::Get;
     request.requestLine.version = nx_http::http_1_1;
     request.requestLine.url = PipeliningTestHandler::PATH;
 
@@ -298,6 +298,7 @@ protected:
                 response.set_value(*httpClient.response());
             });
         m_httpResponse = response.get_future().get();
+        httpClient.pleaseStopSync();
     }
 
     void assertThatResponseIsValid()
@@ -311,6 +312,12 @@ protected:
         ASSERT_EQ(
             kProtocolToUpgradeTo,
             nx_http::getHeaderValue(m_httpResponse.headers, "Upgrade"));
+    }
+
+    void assertNoMessageBodyHeadersPresent()
+    {
+        ASSERT_TRUE(m_httpResponse.headers.find("Content-Length") == m_httpResponse.headers.end());
+        ASSERT_TRUE(m_httpResponse.headers.find("Content-Type") == m_httpResponse.headers.end());
     }
 
 private:
@@ -336,6 +343,12 @@ TEST_F(HttpAsyncServerConnectionUpgrade, required_headers_are_added_to_response)
 {
     issueUpgradeRequest();
     assertThatResponseIsValid();
+}
+
+TEST_F(HttpAsyncServerConnectionUpgrade, response_with_1xx_status_does_not_contain_content_length)
+{
+    issueUpgradeRequest();
+    assertNoMessageBodyHeadersPresent();
 }
 
 } // namespace nx_http

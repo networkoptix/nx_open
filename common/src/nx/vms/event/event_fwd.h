@@ -40,12 +40,15 @@ class Rule;
 typedef QSharedPointer<Rule> RulePtr;
 typedef QList<RulePtr> RuleList;
 
+struct EventParameters;
+struct ActionParameters;
+
 } // namespace event
 
 #ifdef THIS_BLOCK_IS_REQUIRED_TO_MAKE_FILE_BE_PROCESSED_BY_MOC_DO_NOT_DELETE
 Q_OBJECT
 #endif
-QN_DECLARE_METAOBJECT_HEADER(event, EventReason EventState EventType ActionType UserGroup, )
+QN_DECLARE_METAOBJECT_HEADER(event, EventReason EventState EventType ActionType, )
 
 enum EventReason
 {
@@ -58,8 +61,8 @@ enum EventReason
     StorageIoErrorReason,
     StorageTooSlowReason,
     StorageFullReason,
+    SystemStorageFullReason,
     LicenseRemoved,
-
     BackupFailedNoBackupStorageError,
     BackupFailedSourceStorageError,
     BackupFailedSourceFileError,
@@ -222,13 +225,6 @@ enum ActionType
 };
 QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(ActionType)
 
-enum UserGroup
-{
-    EveryOne  = 0,
-    AdminOnly = 1,
-};
-QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(UserGroup)
-
 } // namespace event
 } // namespace vms
 } // namespace nx
@@ -237,9 +233,6 @@ QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(UserGroup)
     (nx::vms::event::EventReason) \
     (nx::vms::event::EventType) \
     (nx::vms::event::ActionType) \
-    (nx::vms::event::UserGroup) \
     (nx::vms::event::EventState)
 
 QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(QN_VMS_EVENT_ENUM_TYPES, (metatype)(lexical))
-
-

@@ -1,5 +1,6 @@
 #include "global_permissions_manager.h"
 
+#include <nx/core/access/access_types.h>
 #include <core/resource_access/resource_access_subjects_cache.h>
 
 #include <core/resource_management/resource_pool.h>
@@ -8,21 +9,27 @@
 #include <core/resource/user_resource.h>
 #include <common/common_module.h>
 
-QnGlobalPermissionsManager::QnGlobalPermissionsManager(QObject* parent):
+using namespace nx::core::access;
+
+QnGlobalPermissionsManager::QnGlobalPermissionsManager(Mode mode, QObject* parent):
     base_type(parent),
     QnCommonModuleAware(parent),
+    m_mode(mode),
     m_mutex(QnMutex::NonRecursive),
     m_cache()
 {
-    connect(resourcePool(), &QnResourcePool::resourceAdded, this,
-        &QnGlobalPermissionsManager::handleResourceAdded);
-    connect(resourcePool(), &QnResourcePool::resourceRemoved, this,
-        &QnGlobalPermissionsManager::handleResourceRemoved);
+    if (mode == Mode::cached)
+    {
+        connect(resourcePool(), &QnResourcePool::resourceAdded, this,
+            &QnGlobalPermissionsManager::handleResourceAdded);
+        connect(resourcePool(), &QnResourcePool::resourceRemoved, this,
+            &QnGlobalPermissionsManager::handleResourceRemoved);
 
-    connect(userRolesManager(), &QnUserRolesManager::userRoleAddedOrUpdated, this,
-        &QnGlobalPermissionsManager::handleRoleAddedOrUpdated);
-    connect(userRolesManager(), &QnUserRolesManager::userRoleRemoved, this,
-        &QnGlobalPermissionsManager::handleRoleRemoved);
+        connect(userRolesManager(), &QnUserRolesManager::userRoleAddedOrUpdated, this,
+            &QnGlobalPermissionsManager::handleRoleAddedOrUpdated);
+        connect(userRolesManager(), &QnUserRolesManager::userRoleRemoved, this,
+            &QnGlobalPermissionsManager::handleRoleRemoved);
+    }
 }
 
 QnGlobalPermissionsManager::~QnGlobalPermissionsManager()
@@ -48,6 +55,7 @@ Qn::GlobalPermissions QnGlobalPermissionsManager::dependentPermissions(Qn::Globa
 Qn::GlobalPermissions QnGlobalPermissionsManager::globalPermissions(
     const QnResourceAccessSubject& subject) const
 {
+    if (m_mode == Mode::cached)
     {
         QnMutexLocker lk(&m_mutex);
         auto iter = m_cache.find(subject.effectiveId());
@@ -79,12 +87,6 @@ bool QnGlobalPermissionsManager::hasGlobalPermission(const Qn::UserAccessData& a
     return hasGlobalPermission(user, requiredPermission);
 }
 
-void QnGlobalPermissionsManager::recalculateAllPermissions()
-{
-    for (const auto& subject: resourceAccessSubjectsCache()->allSubjects())
-        updateGlobalPermissions(subject);
-}
-
 Qn::GlobalPermissions QnGlobalPermissionsManager::filterDependentPermissions(Qn::GlobalPermissions source) const
 {
     //TODO: #GDM code duplication with ::dependentPermissions() method.
@@ -104,6 +106,8 @@ Qn::GlobalPermissions QnGlobalPermissionsManager::filterDependentPermissions(Qn:
 
 void QnGlobalPermissionsManager::updateGlobalPermissions(const QnResourceAccessSubject& subject)
 {
+    NX_EXPECT(m_mode == Mode::cached);
+
     setGlobalPermissionsInternal(subject, calculateGlobalPermissions(subject));
 }
 

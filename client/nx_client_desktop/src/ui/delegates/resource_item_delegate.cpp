@@ -23,6 +23,7 @@
 #include <client/client_settings.h>
 
 #include <ui/style/skin.h>
+#include <ui/style/globals.h>
 #include <ui/style/helper.h>
 #include <ui/style/noptix_style.h>
 
@@ -144,32 +145,44 @@ void QnResourceItemDelegate::paint(QPainter* painter, const QStyleOptionViewItem
 
     switch (itemState(index))
     {
-        case ItemState::Normal:
+        case ItemState::normal:
             iconMode = QIcon::Normal;
             mainColor = m_colors.mainText;
             extraColor = m_colors.extraText;
             break;
 
-        case ItemState::Selected:
+        case ItemState::selected:
             iconMode = QIcon::Selected;
             mainColor = m_colors.mainTextSelected;
             extraColor = m_colors.extraTextSelected;
             break;
 
-        case ItemState::Accented:
+        case ItemState::accented:
             iconMode = QIcon::Active;
             mainColor = m_colors.mainTextAccented;
             extraColor = m_colors.extraTextAccented;
             break;
 
         default:
-            NX_ASSERT(false); // Should never get here
+            NX_ASSERT(false); //< Should never get here.
     }
 
-    /* Try to consider model's foreground color override: */
-    const auto modelColorOverride = index.data(Qt::ForegroundRole);
-    if (modelColorOverride.canConvert<QBrush>())
-        mainColor = modelColorOverride.value<QBrush>().color();
+    if (!option.state.testFlag(QStyle::State_Selected))
+    {
+        if (option.state.testFlag(State_Error))
+        {
+            // Use error text color.
+            mainColor = qnGlobals->errorTextColor();
+            iconMode = QnIcon::Error;
+        }
+        else
+        {
+            // Try to consider model's foreground color override.
+            const auto modelColorOverride = index.data(Qt::ForegroundRole);
+            if (modelColorOverride.canConvert<QBrush>())
+                mainColor = modelColorOverride.value<QBrush>().color();
+        }
+    }
 
     // TODO #vkutin Get rid of this and draw checkboxes in this delegate like everything else
     /* Check indicators in this implementation are handled elsewhere: */
@@ -177,7 +190,7 @@ void QnResourceItemDelegate::paint(QPainter* painter, const QStyleOptionViewItem
     {
         mainColor.setAlphaF(option.palette.color(QPalette::Text).alphaF());
         option.palette.setColor(QPalette::Text, mainColor);
-        base_type::paint(painter, option, index);
+        style->drawControl(QStyle::CE_ItemViewItem, &option, painter, option.widget);
         return;
     }
 
@@ -355,6 +368,25 @@ void QnResourceItemDelegate::initStyleOption(QStyleOptionViewItem* option, const
 
     if (!option->state.testFlag(QStyle::State_Enabled))
         option->state &= ~(QStyle::State_Selected | QStyle::State_MouseOver);
+
+    // Determine validity.
+    if (m_options.testFlag(ValidateOnlyChecked))
+    {
+        const auto checkState = rowCheckState(index);
+        if (checkState.canConvert<int>() && checkState.toInt() == Qt::Unchecked)
+            return;
+    }
+
+    const auto isValid = index.data(Qn::ValidRole);
+    if (isValid.canConvert<bool>() && !isValid.toBool())
+        option->state |= State_Error;
+
+    const auto validationState = index.data(Qn::ValidationStateRole);
+    if (validationState.canConvert<QValidator::State>()
+        && validationState.value<QValidator::State>() == QValidator::Invalid)
+    {
+        option->state |= State_Error;
+    }
 }
 
 QWidget* QnResourceItemDelegate::createEditor(QWidget* parent, const QStyleOptionViewItem& option, const QModelIndex& index) const
@@ -371,17 +403,17 @@ QWidget* QnResourceItemDelegate::createEditor(QWidget* parent, const QStyleOptio
     QPalette editorPalette = editor->palette();
     switch (itemState(index))
     {
-        case ItemState::Normal:
+        case ItemState::normal:
             editorPalette.setColor(QPalette::Text, m_colors.mainText);
             editorPalette.setColor(QPalette::HighlightedText, m_colors.mainText);
             break;
 
-        case ItemState::Selected:
+        case ItemState::selected:
             editorPalette.setColor(QPalette::Text, m_colors.mainTextSelected);
             editorPalette.setColor(QPalette::HighlightedText, m_colors.mainTextSelected);
             break;
 
-        case ItemState::Accented:
+        case ItemState::accented:
             editorPalette.setColor(QPalette::Text, m_colors.mainTextAccented);
             editorPalette.setColor(QPalette::HighlightedText, m_colors.mainTextAccented);
             break;
@@ -412,13 +444,15 @@ bool QnResourceItemDelegate::eventFilter(QObject* object, QEvent* event)
 
 QnResourceItemDelegate::ItemState QnResourceItemDelegate::itemState(const QModelIndex& index) const
 {
-    /* Fetch information from model first. */
-    QVariant disabled = index.data(Qn::DisabledRole); // in accordance with QnResourceListModel
-    if (disabled.canConvert<bool>() && !disabled.toBool())
-        return ItemState::Selected;
+    if (m_options.testFlag(HighlightChecked))
+    {
+        const auto checkState = rowCheckState(index);
+        if (checkState.canConvert<int>())
+            return checkState.toInt() == Qt::Checked ? ItemState::selected : ItemState::normal;
+    }
 
     if (!workbench())
-        return ItemState::Normal;
+        return ItemState::normal;
 
     Qn::NodeType nodeType = index.data(Qn::NodeTypeRole).value<Qn::NodeType>();
 
@@ -426,7 +460,7 @@ QnResourceItemDelegate::ItemState QnResourceItemDelegate::itemState(const QModel
     {
         case Qn::CurrentSystemNode:
         case Qn::CurrentUserNode:
-            return ItemState::Selected;
+            return ItemState::selected;
 
         /*
          * Media resources are Selected when they are placed on the scene, Active - when chosen
@@ -445,7 +479,7 @@ QnResourceItemDelegate::ItemState QnResourceItemDelegate::itemState(const QModel
             QnResourcePtr resource = index.data(Qn::ResourceRole).value<QnResourcePtr>();
             NX_ASSERT(resource);
             if (!resource)
-                return ItemState::Normal;
+                return ItemState::normal;
 
             if (resource->hasFlags(Qn::videowall))
                 return itemStateForVideoWall(index);
@@ -471,7 +505,7 @@ QnResourceItemDelegate::ItemState QnResourceItemDelegate::itemState(const QModel
         default:
             break;
     }
-    return ItemState::Normal;
+    return ItemState::normal;
 }
 
 QnResourceItemDelegate::ItemState QnResourceItemDelegate::itemStateForMediaResource(
@@ -483,18 +517,18 @@ QnResourceItemDelegate::ItemState QnResourceItemDelegate::itemStateForMediaResou
      */
     const auto currentLayout = workbench()->currentLayout()->resource();
     if (!currentLayout)
-        return ItemState::Normal;
+        return ItemState::normal;
 
     const auto centralItem = workbench()->item(Qn::CentralRole);
     QnResourcePtr resource = index.data(Qn::ResourceRole).value<QnResourcePtr>();
 
     if (centralItem && centralItem->resourceUid() == resource->getUniqueId())
-        return ItemState::Accented;
+        return ItemState::accented;
 
     if (currentLayout->layoutResourceIds().contains(resource->getId()))
-        return ItemState::Selected;
+        return ItemState::selected;
 
-    return ItemState::Normal;
+    return ItemState::normal;
 }
 
 QnResourceItemDelegate::ItemState QnResourceItemDelegate::itemStateForLayout(
@@ -506,8 +540,8 @@ QnResourceItemDelegate::ItemState QnResourceItemDelegate::itemStateForLayout(
     QnResourcePtr resource = index.data(Qn::ResourceRole).value<QnResourcePtr>();
 
     if (currentLayout && currentLayout == resource)
-        return ItemState::Selected;
-    return ItemState::Normal;
+        return ItemState::selected;
+    return ItemState::normal;
 }
 
 QnResourceItemDelegate::ItemState QnResourceItemDelegate::itemStateForRecorder(
@@ -518,22 +552,22 @@ QnResourceItemDelegate::ItemState QnResourceItemDelegate::itemStateForRecorder(
     const auto model = index.model();
     NX_EXPECT(model);
     if (!model)
-        return ItemState::Normal;
+        return ItemState::normal;
 
     bool hasSelectedChild = false;
     for (int i = 0; i < model->rowCount(index); ++i)
     {
         const auto child = index.child(i, 0);
         const auto childState = itemStateForMediaResource(child);
-        if (childState == ItemState::Accented)
-            return ItemState::Accented;
+        if (childState == ItemState::accented)
+            return ItemState::accented;
 
-        hasSelectedChild |= (childState == ItemState::Selected);
+        hasSelectedChild |= (childState == ItemState::selected);
     }
 
     return hasSelectedChild
-        ? ItemState::Selected
-        : ItemState::Normal;
+        ? ItemState::selected
+        : ItemState::normal;
 }
 
 QnResourceItemDelegate::ItemState QnResourceItemDelegate::itemStateForLayoutItem(
@@ -545,19 +579,19 @@ QnResourceItemDelegate::ItemState QnResourceItemDelegate::itemStateForLayoutItem
     */
     const auto currentLayout = workbench()->currentLayout()->resource();
     if (!currentLayout)
-        return ItemState::Normal;
+        return ItemState::normal;
 
     const auto owningLayout = index.parent().data(Qn::ResourceRole).value<QnResourcePtr>();
     if (!owningLayout || owningLayout != currentLayout)
-        return ItemState::Normal;
+        return ItemState::normal;
 
     const auto uuid = index.data(Qn::ItemUuidRole).value<QnUuid>();
     const auto centralItem = workbench()->item(Qn::CentralRole);
 
     if (centralItem && centralItem->uuid() == uuid)
-        return ItemState::Accented;
+        return ItemState::accented;
 
-    return ItemState::Selected;
+    return ItemState::selected;
 }
 
 QnResourceItemDelegate::ItemState QnResourceItemDelegate::itemStateForVideoWall(
@@ -569,21 +603,21 @@ QnResourceItemDelegate::ItemState QnResourceItemDelegate::itemStateForVideoWall(
     const auto videowall = resource.dynamicCast<QnVideoWallResource>();
     NX_EXPECT(videowall);
     if (!videowall)
-        return ItemState::Normal;
+        return ItemState::normal;
 
     auto layout = workbench()->currentLayout();
     auto videoWallControlModeUuid = layout->data(Qn::VideoWallItemGuidRole).value<QnUuid>();
     if (!videoWallControlModeUuid.isNull())
     {
         return videowall->items()->hasItem(videoWallControlModeUuid)
-            ? ItemState::Selected
-            : ItemState::Normal;
+            ? ItemState::selected
+            : ItemState::normal;
     }
 
     auto videoWallReview = layout->data(Qn::VideoWallResourceRole).value<QnVideoWallResourcePtr>();
     return (videoWallReview == videowall)
-        ? ItemState::Selected
-        : ItemState::Normal;
+        ? ItemState::selected
+        : ItemState::normal;
 }
 
 QnResourceItemDelegate::ItemState QnResourceItemDelegate::itemStateForVideoWallItem(
@@ -597,7 +631,7 @@ QnResourceItemDelegate::ItemState QnResourceItemDelegate::itemStateForVideoWallI
         .dynamicCast<QnVideoWallResource>();
     NX_EXPECT(owningVideoWall);
     if (!owningVideoWall)
-        return ItemState::Normal;
+        return ItemState::normal;
 
     QnUuid uuid = index.data(Qn::ItemUuidRole).value<QnUuid>();
     NX_EXPECT(!uuid.isNull());
@@ -607,17 +641,17 @@ QnResourceItemDelegate::ItemState QnResourceItemDelegate::itemStateForVideoWallI
     if (!videoWallControlModeUuid.isNull())
     {
         return videoWallControlModeUuid == uuid
-            ? ItemState::Accented
-            : ItemState::Normal;
+            ? ItemState::accented
+            : ItemState::normal;
     }
 
     auto videoWall = layout->data(Qn::VideoWallResourceRole).value<QnVideoWallResourcePtr>();
     if (videoWall != owningVideoWall)
-        return ItemState::Normal;
+        return ItemState::normal;
 
     auto centralItem = workbench()->item(Qn::CentralRole);
     if (!centralItem || uuid.isNull())
-        return ItemState::Selected;
+        return ItemState::selected;
 
     auto indices = qnResourceRuntimeDataManager->layoutItemData(centralItem->uuid(),
         Qn::VideoWallItemIndicesRole).value<QnVideoWallItemIndexList>();
@@ -626,9 +660,9 @@ QnResourceItemDelegate::ItemState QnResourceItemDelegate::itemStateForVideoWallI
     {
         NX_EXPECT(itemIndex.videowall() == videoWall);
         if (itemIndex.uuid() == uuid)
-            return ItemState::Accented;
+            return ItemState::accented;
     }
-    return ItemState::Selected;
+    return ItemState::selected;
 }
 
 QnResourceItemDelegate::ItemState QnResourceItemDelegate::itemStateForLayoutTour(
@@ -637,8 +671,8 @@ QnResourceItemDelegate::ItemState QnResourceItemDelegate::itemStateForLayoutTour
     /* Layout Tours are Selected when they are opened on the scene. */
     const QnUuid currentTourId = workbench()->currentLayout()->data(Qn::LayoutTourUuidRole).value<QnUuid>();
     if (!currentTourId.isNull() && index.data(Qn::UuidRole).value<QnUuid>() == currentTourId)
-        return ItemState::Selected;
-    return ItemState::Normal;
+        return ItemState::selected;
+    return ItemState::normal;
 }
 
 void QnResourceItemDelegate::getDisplayInfo(const QModelIndex& index, QString& baseName, QString& extInfo) const
@@ -691,4 +725,23 @@ void QnResourceItemDelegate::getDisplayInfo(const QModelIndex& index, QString& b
         if (resource->hasFlags(Qn::user) && !extInfo.isEmpty())
             extInfo = kCustomExtInfoTemplate.arg(extInfo);
     }
+}
+
+int QnResourceItemDelegate::checkBoxColumn() const
+{
+    return m_checkBoxColumn;
+}
+
+void QnResourceItemDelegate::setCheckBoxColumn(int value)
+{
+    m_checkBoxColumn = value;
+}
+
+QVariant QnResourceItemDelegate::rowCheckState(const QModelIndex& index) const
+{
+    if (m_checkBoxColumn < 0)
+        return QVariant();
+
+    const auto checkIndex = index.sibling(index.row(), m_checkBoxColumn);
+    return checkIndex.data(Qt::CheckStateRole);
 }

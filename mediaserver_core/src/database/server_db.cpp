@@ -9,6 +9,7 @@
 #include <core/resource/network_resource.h>
 #include <core/resource/camera_bookmark.h>
 #include <core/resource_management/resource_pool.h>
+#include <core/resource_management/user_roles_manager.h>
 
 #include <media_server/serverutil.h>
 
@@ -84,6 +85,9 @@ vms::event::ActionParameters convertOldActionParameters(const QByteArray& value)
     if (value.isEmpty())
         return result;
 
+    static const std::vector<QnUuid> kAdminRoles(
+        QnUserRolesManager::adminRoleIds().toVector().toStdVector());
+
     int i = 0;
     int prevPos = -1;
     while (prevPos < value.size() && i < ParamCount)
@@ -102,7 +106,11 @@ vms::event::ActionParameters convertOldActionParameters(const QByteArray& value)
                 result.emailAddress = QString::fromUtf8(field.data(), field.size());
                 break;
             case UserGroupParam:
-                result.userGroup = static_cast<vms::event::UserGroup>(toInt(field));
+                enum { kAdminOnly = 1 };
+                if (toInt(field) == kAdminOnly)
+                    result.additionalResources = kAdminRoles;
+                else
+                    result.additionalResources.clear();
                 break;
             case FpsParam:
                 result.fps = toInt(field);
@@ -111,7 +119,7 @@ vms::event::ActionParameters convertOldActionParameters(const QByteArray& value)
                 result.streamQuality = static_cast<Qn::StreamQuality>(toInt(field));
                 break;
             case DurationParam:
-                result.recordingDuration = toInt(field);
+                result.durationMs = toInt(field) * 1000;
                 break;
             case RecordBeforeParam:
                 break;

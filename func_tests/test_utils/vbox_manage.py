@@ -122,10 +122,10 @@ class VBoxManage(object):
     def _add_dhcp_server(self, dhcp_server):
         self._run_command(['dhcpserver', 'add',
                            '--netname', dhcp_server.name,
-                           '--ip', dhcp_server.ip.ip,
-                           '--netmask', dhcp_server.ip.netmask,
-                           '--lowerip', dhcp_server.lower_ip_address.ip,
-                           '--upperip', dhcp_server.upper_ip_address.ip,
+                           '--ip', str(dhcp_server.ip.ip),
+                           '--netmask', str(dhcp_server.ip.netmask),
+                           '--lowerip', str(dhcp_server.lower_ip_address.ip),
+                           '--upperip', str(dhcp_server.upper_ip_address.ip),
                            '--enable',
                            ])
 

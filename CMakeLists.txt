@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.8.1 FATAL_ERROR)
+cmake_minimum_required(VERSION 3.8.0 FATAL_ERROR)
 
 set(customization "default" CACHE STRING "Product customization")
 option(beta "Is this build is beta build" ON)
@@ -48,11 +48,9 @@ include(qrc_utils)
 include(precompiled_header)
 include(mercurial)
 include(project_utils)
-
-include(android-ndk-workaround)
+include(test_utils)
 
 include(ec_protocol)
-include(maven_compatibility)
 
 set(customization_dir "${PROJECT_SOURCE_DIR}/customization/${customization}")
 
@@ -63,24 +61,26 @@ include(cloud_host)
 include(vms_parts)
 include(compiler_options)
 include(output_directories)
+include(distribution_names)
 
 if(NOT (WINDOWS OR ANDROID OR IOS))
     set(BUILD_SHARED_LIBS ON)
 endif()
 
 include(dependencies)
+include(maven_compatibility)
+include(generate_current_config)
 
 if(CMAKE_CROSSCOMPILING)
     set(QT_PREFIX "..")
 else()
     set(QT_PREFIX "${QT_DIR}")
-    file(TO_CMAKE_PATH "${QT_PREFIX}" QT_PREFIX)
 endif()
 list(APPEND CMAKE_PREFIX_PATH ${QT_DIR})
 if(MACOSX)
     set(CMAKE_FRAMEWORK_PATH "${QT_DIR}/lib")
 endif()
-if(NOT WINDOWS)
+if(LINUX)
     set(CMAKE_EXE_LINKER_FLAGS
         "${CMAKE_EXE_LINKER_FLAGS} -Wl,-rpath-link,${QT_DIR}/lib")
     set(CMAKE_SHARED_LINKER_FLAGS
@@ -89,6 +89,11 @@ if(NOT WINDOWS)
         "${CMAKE_EXE_LINKER_FLAGS} -Wl,-rpath-link,${CMAKE_LIBRARY_OUTPUT_DIRECTORY}")
     set(CMAKE_SHARED_LINKER_FLAGS
         "${CMAKE_SHARED_LINKER_FLAGS} -Wl,-rpath-link,${CMAKE_LIBRARY_OUTPUT_DIRECTORY}")
+endif()
+
+if(ANDROID)
+    include(android-ndk-workaround)
+    include(android-apk)
 endif()
 
 link_directories("${CMAKE_LIBRARY_OUTPUT_DIRECTORY}")
@@ -104,6 +109,12 @@ find_package(Qt5
         Sql
         Concurrent
         Multimedia)
+
+if(withDesktopClient OR withTrayTool)
+    find_package(Qt5
+        COMPONENTS
+            Widgets)
+endif()
 
 if(withDesktopClient OR withMobileClient)
     find_package(Qt5
@@ -124,8 +135,6 @@ endif()
 if(WINDOWS)
     # Prepare a file to be included into each Visual Studio project.
     nx_configure_file(${PROJECT_SOURCE_DIR}/msvc.user.props ${CMAKE_BINARY_DIR})
-    
-    add_definitions(-DWIN32_LEAN_AND_MEAN=1)
 endif()
 
 # Required for QN_DECLARE_METAOBJECT_HEADER
@@ -143,12 +152,17 @@ if(withMediaServer)
     add_subdirectory(storage_plugins)
 endif()
 
+if(withTrayTool)
+    add_subdirectory(traytool)
+endif()
+
 if(withDesktopClient OR withMobileClient)
     add_subdirectory(client)
 endif()
 
 if(withTests)
     add_subdirectory(unit_tests)
+    add_subdirectory(tests)
 endif()
 
 include(fix_qt_vars)

@@ -37,7 +37,6 @@ public:
     QnCommonModule* commonModule() const;
     ec2::AbstractECConnection* ecConnection();
     SocketAddress endpoint() const;
-
 private:
     int m_argc;
     char** m_argv;
@@ -69,7 +68,6 @@ public:
     ec2::AbstractECConnection* ecConnection();
     SocketAddress endpoint() const;
     QnCommonModule* commonModule() const;
-
 private:
     Appserver2Process* m_impl;
 };

@@ -6,6 +6,7 @@
 #include <nx/streaming/archive_stream_reader.h>
 
 #include <nx/vms/event/actions/abstract_action.h>
+#include <business/business_resource_validation.h>
 
 #include <camera/resource_display.h>
 #include <camera/cam_display.h>
@@ -77,49 +78,31 @@ QnWorkbenchAlarmLayoutHandler::QnWorkbenchAlarmLayoutHandler(QObject *parent):
 
     const auto messageProcessor = qnClientMessageProcessor;
 
-    auto allowedForUser =
-        [this](const std::vector<QnUuid>& ids)
-        {
-            if (ids.empty())
-                return true;
-
-            auto user = context()->user();
-            if (!user)
-                return false;
-
-            if (std::find(ids.cbegin(), ids.cend(), user->getId()) != ids.cend())
-                return true;
-
-            auto roleId = user->userRoleId();
-            return !roleId.isNull()
-                && std::find(ids.cbegin(), ids.cend(), roleId) != ids.cend();
-        };
-
     connect(messageProcessor, &QnCommonMessageProcessor::businessActionReceived, this,
-        [this, allowedForUser](const vms::event::AbstractActionPtr &businessAction)
+        [this](const vms::event::AbstractActionPtr& action)
         {
-            if (businessAction->actionType() != vms::event::ShowOnAlarmLayoutAction)
+            if (action->actionType() != vms::event::ShowOnAlarmLayoutAction)
                 return;
 
             if (!context()->user())
                 return;
 
-            const auto params = businessAction->getParams();
+            const auto params = action->getParams();
 
             /* Skip action if it contains list of users and we are not on the list. */
-            if (!allowedForUser(businessAction->getParams().additionalResources))
+            if (!QnBusiness::actionAllowedForUser(action->getParams(), context()->user()))
                 return;
 
-            auto targetCameras = resourcePool()->getResources<QnVirtualCameraResource>(businessAction->getResources());
-            if (businessAction->getParams().useSource)
-                targetCameras << resourcePool()->getResources<QnVirtualCameraResource>(businessAction->getSourceResources());
+            auto targetCameras = resourcePool()->getResources<QnVirtualCameraResource>(action->getResources());
+            if (action->getParams().useSource)
+                targetCameras << resourcePool()->getResources<QnVirtualCameraResource>(action->getSourceResources());
             targetCameras = accessController()->filtered(targetCameras, Qn::ViewContentPermission);
             targetCameras = targetCameras.toSet().toList();
 
             if (targetCameras.isEmpty())
                 return;
 
-            ActionKey key(businessAction->getRuleId(), businessAction->getRuntimeParams().eventTimestampUsec);
+            ActionKey key(action->getRuleId(), action->getRuntimeParams().eventTimestampUsec);
             if (m_processingActions.contains(key))
                 return; /* See m_processingActions comment. */
 

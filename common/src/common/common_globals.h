@@ -226,6 +226,7 @@ QN_DECLARE_METAOBJECT_HEADER(Qn,
 
         /* Client-only flag. */
         exported                    = 0x20000000,   /**< Exported media file. */
+        removed                     = 0x40000000,   /**< resource removed from pool. */
 
 
         local_media = local | media | url,
@@ -526,10 +527,11 @@ QN_DECLARE_METAOBJECT_HEADER(Qn,
         Auth_WrongInternalLogin, // invalid login used for internal auth scheme
         Auth_WrongDigest,   // invalid or empty digest
         Auth_WrongPassword, // invalid password
-        Auth_Forbidden,     // no auth mehod found or custom auth scheme without login/password is failed
+        Auth_Forbidden,     // no auth method found or custom auth scheme without login/password is failed
         Auth_PasswordExpired, // Password is expired
         Auth_LDAPConnectError,   // can't connect to the LDAP system to authenticate
-        Auth_CloudConnectError   // can't connect to the Cloud to authenticate
+        Auth_CloudConnectError,   // can't connect to the Cloud to authenticate
+        Auth_DisabledUser,    // disabled user
     };
     QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(AuthResult)
     QString toString(AuthResult value);
@@ -747,7 +749,8 @@ QN_DECLARE_METAOBJECT_HEADER(Qn,
         IncompatibleCloudHostConnectionResult,      /*< Server has different cloud host. */
         IncompatibleVersionConnectionResult,        /*< Server version is too low. */
         IncompatibleProtocolConnectionResult,       /*< Ec2 protocol versions differs.*/
-        ForbiddenConnectionResult                   /*< Connection is not allowed yet. Try again later*/
+        ForbiddenConnectionResult,                   /*< Connection is not allowed yet. Try again later*/
+        DisabledUserConnectionResult                /*< Disabled user*/
     };
 
     /**
@@ -767,6 +770,7 @@ QN_DECLARE_METAOBJECT_HEADER(Qn,
 } // namespace Qn
 
 Q_DECLARE_METATYPE(Qn::StatusChangeReason)
+Q_DECLARE_METATYPE(Qn::ResourceFlags)
 
 // TODO: #Elric #enum
 
@@ -777,16 +781,16 @@ QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
 
 QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
     (Qn::PtzObjectType)(Qn::PtzCommand)(Qn::PtzCoordinateSpace)(Qn::MotionType)
-        (Qn::StreamQuality)(Qn::SecondStreamQuality)(Qn::StatisticsDeviceType)
-        (Qn::ServerFlag)(Qn::BackupType)(Qn::CameraBackupQuality)(Qn::StorageInitResult)
-        (Qn::PanicMode)(Qn::RecordingType)
-        (Qn::ConnectionRole)(Qn::ResourceStatus)(Qn::BitratePerGopType)
-        (Qn::PeerType)(Qn::RebuildState)(Qn::BackupState)
-        (Qn::BookmarkSortField)(Qt::SortOrder)
-        (Qn::RebuildAction)(Qn::BackupAction)
-        (Qn::TTHeaderFlag)(Qn::IOPortType)(Qn::IODefaultState)(Qn::AuditRecordType)(Qn::AuthResult)
-        (Qn::FailoverPriority)
-        ,
+    (Qn::StreamQuality)(Qn::SecondStreamQuality)(Qn::StatisticsDeviceType)
+    (Qn::ServerFlag)(Qn::BackupType)(Qn::CameraBackupQuality)(Qn::StorageInitResult)
+    (Qn::PanicMode)(Qn::RecordingType)
+    (Qn::ConnectionRole)(Qn::ResourceStatus)(Qn::BitratePerGopType)
+    (Qn::PeerType)(Qn::RebuildState)(Qn::BackupState)
+    (Qn::BookmarkSortField)(Qt::SortOrder)
+    (Qn::RebuildAction)(Qn::BackupAction)
+    (Qn::TTHeaderFlag)(Qn::IOPortType)(Qn::IODefaultState)(Qn::AuditRecordType)(Qn::AuthResult)
+    (Qn::FailoverPriority)
+    ,
     (metatype)(lexical)
 )
 

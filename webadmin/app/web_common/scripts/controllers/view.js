@@ -12,8 +12,8 @@ angular.module('nxCommon').controller('ViewCtrl',
             Low: 'lo'
         };
 
-        if($routeParams.systemId){
-            systemAPI = systemAPI($routeParams.systemId);
+        if($scope.system){ // Use system from outer scope (directive)
+            systemAPI = $scope.system;
         }
         $scope.systemAPI = systemAPI;
 
@@ -226,6 +226,10 @@ angular.module('nxCommon').controller('ViewCtrl',
         };
 
         function updateVideoSource(playing) {
+            if($scope.playerAPI) {
+                // Pause playing
+                $scope.playerAPI.pause();
+            }
             updateAvailableResolutions();
             var live = !playing;
 
@@ -401,9 +405,7 @@ angular.module('nxCommon').controller('ViewCtrl',
             }
         });
 
-        systemAPI.getCurrentUser().then(function(result) {
-            $scope.canViewArchive = result.data.reply.isAdmin || (result.data.reply.permissions.indexOf(Config.globalViewArchivePermission)>=0);
-            var userId = result.data.reply.id;
+        function requestResources(){
             $scope.camerasProvider.requestResources().then(function(res){
                 if(!$scope.storage.cameraId)
                 {
@@ -411,22 +413,17 @@ angular.module('nxCommon').controller('ViewCtrl',
 
                 }
                 $scope.activeCamera = $scope.camerasProvider.getCamera($scope.storage.cameraId);
+
+                $scope.ready = true;
+                $timeout(updateHeights);
                 $scope.camerasProvider.startPoll();
             });
+        }
+
+        systemAPI.checkPermissions(Config.globalViewArchivePermission).then(function(result){
+            $scope.canViewArchive = result;
+            requestResources();
         });
-
-        var killSubscription = $rootScope.$on('$routeChangeStart', function (event,next) {
-            timeFromUrl = $location.search().time;
-            $scope.activeCamera = $scope.camerasProvider.getCamera(next.params.cameraId);
-        });
-
-        $scope.$on( '$destroy', function() {
-            $scope.camerasProvider.stopPoll();
-            killSubscription();
-        });
-
-
-
 
         // This hack was meant for IE and iPad to fix some issues with overflow:scroll and height:100%
         // But I kept it for all browsers to avoid future possible bugs in different browsers
@@ -437,6 +434,7 @@ angular.module('nxCommon').controller('ViewCtrl',
         var updateHeights = function() {
             var $viewPanel = $('.view-panel');
             var $camerasPanel = $('.cameras-panel');
+            var $placeholder = $(".webclient-placeholder .placeholder");
             var windowHeight = $window.height();
             var headerHeight = $header.outerHeight();
 
@@ -452,6 +450,7 @@ angular.module('nxCommon').controller('ViewCtrl',
 
             $camerasPanel.css('height',viewportHeight );
             $viewPanel.css('height',viewportHeight );
+            $placeholder.css('height',viewportHeight);
 
             //One more IE hack.
             if(window.jscd.browser === 'Microsoft Internet Explorer') {
@@ -471,5 +470,19 @@ angular.module('nxCommon').controller('ViewCtrl',
         };
 
         $('.video-icon.pull-left-5').dropdown();
+
+
+        var killSubscription = $rootScope.$on('$routeChangeStart', function (event,next) {
+            timeFromUrl = $location.search().time;
+            $scope.activeCamera = $scope.camerasProvider.getCamera(next.params.cameraId);
+        });
+
+        $('html').addClass('webclient-page');
+        $scope.$on('$destroy', function( event ) {
+            killSubscription();
+            $scope.camerasProvider.stopPoll();
+            $window.unbind('resize', updateHeights);
+            $('html').removeClass('webclient-page');
+        });
 
     }]);

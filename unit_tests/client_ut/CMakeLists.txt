@@ -1,1 +1,1 @@
-nx_add_target(client_ut EXECUTABLE PUBLIC_LIBS nx_client_desktop festival GTest)
+nx_add_test(client_ut PUBLIC_LIBS nx_client_desktop festival GTest)

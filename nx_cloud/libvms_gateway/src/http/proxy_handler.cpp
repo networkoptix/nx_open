@@ -103,7 +103,11 @@ TargetHost ProxyHandler::cutTargetFromRequest(
     {
         // No cloud address means direct IP.
         if (!m_settings.cloudConnect().allowIpTarget)
+        {
+            NX_DEBUG(this, lm("It is forbidden by settings to proxy to non-cloud address (%1)")
+                .arg(m_targetHost.target));
             return {nx_http::StatusCode::forbidden};
+        }
 
         if (m_targetHost.target.port == 0)
             m_targetHost.target.port = m_settings.http().proxyTargetPort;
@@ -117,7 +121,7 @@ TargetHost ProxyHandler::cutTargetFromRequest(
 
     if (m_targetHost.sslMode == conf::SslMode::enabled && !m_settings.http().sslSupport)
     {
-        NX_DEBUG(this, lm("SSL requestd but forbidden by settings %1")
+        NX_DEBUG(this, lm("SSL requested but forbidden by settings. Originator endpoint: %1")
             .arg(connection.socket()->getForeignAddress()));
 
         return {nx_http::StatusCode::forbidden};
@@ -129,7 +133,11 @@ TargetHost ProxyHandler::cutTargetFromRequest(
 TargetHost ProxyHandler::cutTargetFromUrl(nx_http::Request* const request)
 {
     if (!m_settings.http().allowTargetEndpointInUrl)
+    {
+        NX_DEBUG(this, lm("It is forbidden by settings to specify target in url (%1)")
+            .arg(request->requestLine.url));
         return {nx_http::StatusCode::forbidden};
+    }
 
     // Using original url path.
     auto targetEndpoint = SocketAddress(
@@ -217,8 +225,9 @@ void ProxyHandler::onConnected(
 
     if (errorCode != SystemError::noError)
     {
-        NX_DEBUG(this, lm("Failed to establish connection to %1 (path %2) with SSL=%3")
-            .args(targetAddress, m_request.requestLine.url, isSsl(m_targetPeerSocket)));
+        NX_DEBUG(this, lm("Failed to establish connection to %1 (path %2) with SSL=%3. %4")
+            .args(targetAddress, m_request.requestLine.url, isSsl(m_targetPeerSocket),
+                SystemError::toString(errorCode)));
 
         auto handler = std::move(m_requestCompletionHandler);
         return handler(
@@ -227,7 +236,8 @@ void ProxyHandler::onConnected(
                 : nx_http::StatusCode::serviceUnavailable);
     }
 
-    NX_VERBOSE(this, lm("Successfully established connection to %1(%2) (path %3) from %4 with SSL=%5")
+    NX_VERBOSE(this,
+        lm("Successfully established connection to %1(%2) (path %3) from %4 with SSL=%5")
         .args(targetAddress, m_targetPeerSocket->getForeignAddress(), m_request.requestLine.url,
             m_targetPeerSocket->getLocalAddress(), isSsl(m_targetPeerSocket)));
 

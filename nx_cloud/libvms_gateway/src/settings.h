@@ -42,7 +42,7 @@ class Http
 {
 public:
     int proxyTargetPort;
-    /** Enables support of Http CONNECT method. */
+    /** Enables support of HTTP CONNECT method. */
     bool connectSupport;
     bool allowTargetEndpointInUrl;
     bool sslSupport;

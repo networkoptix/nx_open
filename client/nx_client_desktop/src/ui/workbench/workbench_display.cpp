@@ -1015,6 +1015,7 @@ void QnWorkbenchDisplay::fitInView(bool animate)
         m_boundingInstrument->recursiveDisable();
         m_viewportAnimator->moveTo(targetGeometry, false);
         m_boundingInstrument->recursiveEnable(); /* So that caches are updated. */
+        synchronizeSceneBounds();
     }
 }
 
@@ -1497,7 +1498,7 @@ QRectF QnWorkbenchDisplay::fitInViewGeometry() const
         ? layoutBoundingRect
         : layoutBoundingRect.united(backgroundBoundingRect);
 
-    QRect minimalBoundingRect = layout->data(Qn::LayoutMinimalBoundingRectRole).value<QRect>();
+    QRectF minimalBoundingRect = layout->data(Qn::LayoutMinimalBoundingRectRole).value<QRectF>();
     if (!minimalBoundingRect.isEmpty())
         sceneBoundingRect = sceneBoundingRect.united(minimalBoundingRect);
 
@@ -1614,11 +1615,7 @@ void QnWorkbenchDisplay::synchronizeGeometry(QnResourceWidget *widget, bool anim
     QnWorkbenchItem *item = widget->item();
 
     if (m_draggedItems.contains(item))
-    {
-        qDebug() << "cannot sync geometry for dragged item";
         return;
-    }
-
 
     QnResourceWidget *zoomedWidget = m_widgetByRole[Qn::ZoomedRole];
     QnResourceWidget *raisedWidget = m_widgetByRole[Qn::RaisedRole];

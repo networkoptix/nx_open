@@ -17,9 +17,9 @@ class QnResourceSearchProxyModel;
 class QnResourceSearchSynchronizerCriterion;
 
 /**
- * This class performs bidirectional synchronization of 
+ * This class performs bidirectional synchronization of
  * <tt>QnWorkbenchLayout</tt> and <tt>QnResourceSearchProxyModel</tt> instances.
- * 
+ *
  * For all resources found, it adds new items to the layout. When the search
  * criteria changes, added items are replaced with the newly found ones.
  */
@@ -51,14 +51,14 @@ public:
 
 public slots:
     /**
-     * Forces layout update from the proxy model. 
+     * Forces layout update from the proxy model.
      */
     void update();
 
     /**
      * Performs delayed update of the layout from the proxy model.
-     * 
-     * Layout will be update only once even if this function was 
+     *
+     * Layout will be update only once even if this function was
      * called several times.
      */
     void updateLater();
@@ -74,7 +74,7 @@ protected slots:
     void at_layout_aboutToBeDestroyed();
     void at_layout_itemAdded(QnWorkbenchItem *item);
     void at_layout_itemRemoved(QnWorkbenchItem *item);
-    
+
     void at_model_destroyed();
     void at_model_rowsInserted(const QModelIndex &parent, int start, int end);
     void at_model_rowsAboutToBeRemoved(const QModelIndex &parent, int start, int end);

@@ -179,7 +179,7 @@ namespace ec2
         if (!settings->isStatisticsAllowed()
             || settings->isNewSystem())
         {
-            NX_LOGX(lm("Automatic report system is disabled"), cl_logINFO);
+            NX_LOGX(lm("Automatic report system is disabled"), cl_logDEBUG1);
 
             // Better luck next time (if report system will be enabled by another mediaserver)
             setupTimer();

@@ -13,10 +13,13 @@
 namespace nx {
 namespace utils {
 
+#define TEST_OPTIONS_SET_VALUE(VARIABLE, VALUE) \
+    VARIABLE = VALUE; \
+    qDebug() << lm(">>>>> %1: %2 = %3").args(typeid(TestOptions), #VARIABLE, VALUE);
+
 void TestOptions::setTimeoutMultiplier(size_t value)
 {
-    s_timeoutMultiplier = value;
-    qWarning() << ">>> TestOptions::setTimeoutMultiplier(" << value << ") <<<";
+    TEST_OPTIONS_SET_VALUE(s_timeoutMultiplier, value);
 }
 
 size_t TestOptions::timeoutMultiplier()
@@ -26,8 +29,7 @@ size_t TestOptions::timeoutMultiplier()
 
 void TestOptions::disableTimeAsserts(bool areDisabled)
 {
-    s_disableTimeAsserts = areDisabled;
-    qWarning() << ">>> TestOptions::disableTimeAsserts(" << areDisabled << ") <<<";
+    TEST_OPTIONS_SET_VALUE(s_disableTimeAsserts, areDisabled);
 }
 
 bool TestOptions::areTimeAssertsDisabled()
@@ -35,15 +37,29 @@ bool TestOptions::areTimeAssertsDisabled()
     return s_disableTimeAsserts;
 }
 
+void TestOptions::setTemporaryDirectoryPath(const QString& path)
+{
+    QnMutexLocker lock(&s_mutex);
+    TEST_OPTIONS_SET_VALUE(s_temporaryDirectoryPath, path);
+}
+
+QString TestOptions::temporaryDirectoryPath()
+{
+    QnMutexLocker lock(&s_mutex);
+    QDir().mkpath(s_temporaryDirectoryPath);
+    return s_temporaryDirectoryPath;
+}
+
 void TestOptions::setLoadMode(const QString& mode)
 {
-    qWarning() << ">>> TestOptions::setLoadMode(" << mode << ") <<<";
+    QString loadMode;
+    TEST_OPTIONS_SET_VALUE(loadMode, mode.toLower());
 
-    if (mode == QLatin1String("light"))
+    if (loadMode == QLatin1String("light"))
         s_loadMode = LoadMode::light;
-    else if (mode == QLatin1String("normal"))
+    else if (loadMode == QLatin1String("normal"))
         s_loadMode = LoadMode::normal;
-    else if (mode == QLatin1String("stress"))
+    else if (loadMode == QLatin1String("stress"))
         s_loadMode = LoadMode::stress;
     else
         NX_CRITICAL(false, lm("Unrecognized load mode: %1").arg(mode));
@@ -62,11 +78,11 @@ void TestOptions::applyArguments(const utils::ArgumentParser& arguments)
     if (arguments.get("disable-time-asserts"))
         disableTimeAsserts();
 
-    if (const auto value = arguments.get("load-mode"))
-        setLoadMode(*value);
-
     if (const auto value = arguments.get("tmp"))
         setTemporaryDirectoryPath(*value);
+
+    if (const auto value = arguments.get("load-mode"))
+        setLoadMode(*value);
 
 #ifdef _WIN32
     bool enableCrashDump = true;
@@ -83,20 +99,6 @@ void TestOptions::applyArguments(const utils::ArgumentParser& arguments)
         win32_exception::setCreateFullCrashDump(generateFullCrashDump);
     }
 #endif
-}
-
-void TestOptions::setTemporaryDirectoryPath(const QString& path)
-{
-    QnMutexLocker lock(&s_mutex);
-    s_temporaryDirectoryPath = path;
-    qWarning() << ">>> TestOptions::setTemporaryDirectoryPath(" << path << ") <<<";
-}
-
-QString TestOptions::temporaryDirectoryPath()
-{
-    QnMutexLocker lock(&s_mutex);
-    QDir().mkpath(s_temporaryDirectoryPath);
-    return s_temporaryDirectoryPath;
 }
 
 std::atomic<size_t> TestOptions::s_timeoutMultiplier(1);

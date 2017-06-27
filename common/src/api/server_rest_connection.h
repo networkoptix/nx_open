@@ -106,6 +106,56 @@ namespace rest
             Result<QnCloudHostCheckReply>::type callback,
             QThread* targetThread = nullptr);
 
+        /* DistributedFileDownloader API */
+        Handle downloaderAddDownload(
+            const QString& fileName,
+            int size,
+            const QByteArray& md5,
+            const QUrl& url,
+            GetCallback callback,
+            QThread* targetThread = nullptr);
+
+        Handle downloaderRemoveDownload(
+            const QString& fileName,
+            bool deleteData,
+            GetCallback callback,
+            QThread* targetThread = nullptr);
+
+        Handle downloaderChunkChecksums(
+            const QString& fileName,
+            GetCallback callback,
+            QThread* targetThread = nullptr);
+
+        Handle downloaderDownloadChunk(
+            const QString& fileName,
+            int index,
+            Result<QByteArray>::type callback,
+            QThread* targetThread = nullptr);
+
+        Handle downloaderDownloadChunkFromInternet(
+            const QString& fileName,
+            const QUrl& url,
+            int chunkIndex,
+            int chunkSize,
+            Result<QByteArray>::type callback,
+            QThread* targetThread = nullptr);
+
+        Handle downloaderUploadChunk(
+            const QString& fileName,
+            int index,
+            const QByteArray& data,
+            GetCallback callback,
+            QThread* targetThread = nullptr);
+
+        Handle downloaderStatus(
+            GetCallback callback,
+            QThread* targetThread = nullptr);
+
+        Handle downloaderFileStatus(
+            const QString& fileName,
+            GetCallback callback,
+            QThread* targetThread = nullptr);
+
         /**
         * Cancel running request by known requestID. If request is canceled, callback isn't called.
         * If target thread has been used then callback may be called after 'cancelRequest' in case of data already received and queued to a target thread.
@@ -127,6 +177,20 @@ namespace rest
             const QnRequestParamList& params,
             const nx_http::StringType& contentType,
             const nx_http::StringType& messageBody,
+            REST_CALLBACK(ResultType) callback,
+            QThread* targetThread);
+
+        template <typename ResultType> Handle executePut(
+            const QString& path,
+            const QnRequestParamList& params,
+            const nx_http::StringType& contentType,
+            const nx_http::StringType& messageBody,
+            REST_CALLBACK(ResultType) callback,
+            QThread* targetThread);
+
+        template <typename ResultType> Handle executeDelete(
+            const QString& path,
+            const QnRequestParamList& params,
             REST_CALLBACK(ResultType) callback,
             QThread* targetThread);
 

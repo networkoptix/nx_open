@@ -69,7 +69,7 @@ struct NX_NETWORK_API ci_less:
     }
 };
 
-/** Http header container.
+/** HTTP header container.
  * WARNING: This is multimap(!) to allow same header be present multiple times in a 
  * single http message. 
  * To insert or replace use nx_http::insertOrReplaceHeader
@@ -277,11 +277,14 @@ class NX_NETWORK_API Method
 public:
     typedef StringType ValueType;
 
-    static const StringType GET;
-    static const StringType HEAD;
-    static const StringType POST;
-    static const StringType PUT;
-    static const StringType OPTIONS;
+    static const StringType Get;
+    static const StringType Head;
+    static const StringType Post;
+    static const StringType Put;
+    static const StringType Delete;
+    static const StringType Options;
+
+    static bool isMessageBodyAllowed(ValueType);
 };
 
 /** Represents string like HTTP/1.1, RTSP/1.0. */
@@ -454,31 +457,29 @@ public:
     StringType toString() const;
 };
 
-/** Contains http header structures. */
+/** Contains HTTP header structures. */
 namespace header {
 
 /** Common header name constants. */
 extern NX_NETWORK_API const StringType kContentType;
 extern NX_NETWORK_API const StringType kUserAgent;
 
-/** Http authentication scheme enumeration. */
-namespace AuthScheme {
-
-enum Value
+//!Http authentication scheme enumeration
+namespace AuthScheme
 {
-    none,
-    basic,
-    digest,
-    automatic
-};
+    enum Value
+    {
+        none,
+        basic,
+        digest
+    };
 
-NX_NETWORK_API const char* toString(Value val);
-NX_NETWORK_API Value fromString(const char* str);
-NX_NETWORK_API Value fromString(const ConstBufferRefType& str);
-
+    NX_NETWORK_API const char* toString( Value val );
+    NX_NETWORK_API Value fromString( const char* str );
+    NX_NETWORK_API Value fromString( const ConstBufferRefType& str );
 } // namespace AuthScheme
 
-/** Login/password to use in http authorization. */
+//!Login/password to use in http authorization
 class NX_NETWORK_API UserCredentials
 {
 public:

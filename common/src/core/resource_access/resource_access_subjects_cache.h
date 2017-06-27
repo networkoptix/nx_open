@@ -18,10 +18,10 @@ class QnResourceAccessSubjectsCache:
 public:
     QnResourceAccessSubjectsCache(QObject* parent);
 
-    /** List of all subjects of the resources access: users and roles. */
+    /** List of all subjects of the resources access: users and roles (excl. predefined). */
     QList<QnResourceAccessSubject> allSubjects() const;
 
-    /** List of users, belonging to given role. */
+    /** List of users, belonging to given role (predefined roles are also supported). */
     QList<QnResourceAccessSubject> usersInRole(const QnUuid& roleId) const;
 
 private:

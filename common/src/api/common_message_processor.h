@@ -69,8 +69,8 @@ signals:
     void videowallControlMessageReceived(const ec2::ApiVideowallControlMessageData& message);
 
     void runtimeInfoChanged(const ec2::ApiRuntimeData &runtimeInfo);
-    void remotePeerFound(const ec2::ApiPeerAliveData &data);
-    void remotePeerLost(const ec2::ApiPeerAliveData &data);
+    void remotePeerFound(QnUuid data, Qn::PeerType peerType);
+    void remotePeerLost(QnUuid data, Qn::PeerType peerType);
 
     void syncTimeChanged(qint64 syncTime);
     void peerTimeChanged(const QnUuid &peerId, qint64 syncTime, qint64 peerTime);
@@ -82,8 +82,8 @@ protected:
     virtual void connectToConnection(const ec2::AbstractECConnectionPtr &connection);
     virtual void disconnectFromConnection(const ec2::AbstractECConnectionPtr &connection);
 
-    virtual void handleRemotePeerFound(const ec2::ApiPeerAliveData &data);
-    virtual void handleRemotePeerLost(const ec2::ApiPeerAliveData &data);
+    virtual void handleRemotePeerFound(QnUuid data, Qn::PeerType peerType);
+    virtual void handleRemotePeerLost(QnUuid data, Qn::PeerType peerType);
 
     virtual void onGotInitialNotification(const ec2::ApiFullInfoData& fullData);
     virtual void onResourceStatusChanged(
@@ -112,8 +112,8 @@ private slots:
     void on_gotInitialNotification(const ec2::ApiFullInfoData& fullData);
     void on_gotDiscoveryData(const ec2::ApiDiscoveryData &discoveryData, bool addInformation);
 
-    void on_remotePeerFound(const ec2::ApiPeerAliveData& data);
-    void on_remotePeerLost(const ec2::ApiPeerAliveData& data);
+    void on_remotePeerFound(QnUuid data, Qn::PeerType peerType);
+    void on_remotePeerLost(QnUuid data, Qn::PeerType peerType);
 
     void on_resourceStatusChanged(const QnUuid &resourceId, Qn::ResourceStatus status, ec2::NotificationSource source);
     void on_resourceParamChanged(const ec2::ApiResourceParamWithRefData& param );

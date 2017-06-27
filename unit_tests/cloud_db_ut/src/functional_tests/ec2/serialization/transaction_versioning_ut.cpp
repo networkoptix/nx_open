@@ -108,7 +108,7 @@ public:
         const auto sourceSerialized = QnUbjson::serialized(source);
 
         bool isSucceeded = false;
-        const auto dest = QnUbjson::deserialized<TypeToDeserialize>(
+        QnUbjson::deserialized<TypeToDeserialize>(
             sourceSerialized, TypeToDeserialize(), &isSucceeded);
         ASSERT_TRUE(isSucceeded);
     }

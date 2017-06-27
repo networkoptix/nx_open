@@ -22,9 +22,11 @@ class QnResourceItemDelegate : public Customized<QStyledItemDelegate>
 public:
     enum Option
     {
-        NoOptions      = 0x0,
-        RecordingIcons = 0x1,
-        ProblemIcons   = 0x2
+        NoOptions           = 0x0,
+        RecordingIcons      = 0x1,
+        ProblemIcons        = 0x2,
+        HighlightChecked    = 0x4,
+        ValidateOnlyChecked = 0x8
     };
     Q_DECLARE_FLAGS(Options, Option)
 
@@ -51,27 +53,40 @@ public:
     Options options() const;
     void setOptions(Options value);
 
-    virtual void paint(QPainter* painter, const QStyleOptionViewItem& styleOption, const QModelIndex& index) const;
-    virtual QSize sizeHint(const QStyleOptionViewItem& styleOption, const QModelIndex& index) const override;
+    virtual void paint(QPainter* painter, const QStyleOptionViewItem& styleOption,
+        const QModelIndex& index) const;
+
+    virtual QSize sizeHint(const QStyleOptionViewItem& styleOption,
+        const QModelIndex& index) const override;
+
+    int checkBoxColumn() const;
+    void setCheckBoxColumn(int value);
 
 protected:
-    virtual void initStyleOption(QStyleOptionViewItem* option, const QModelIndex& index) const;
+    static const QStyle::StateFlag State_Error
+        = QStyle::State_AutoRaise; //< Use unused in item views value.
 
-    virtual QWidget* createEditor(QWidget* parent, const QStyleOptionViewItem& option, const QModelIndex& index) const override;
+    virtual void initStyleOption(QStyleOptionViewItem* option,
+        const QModelIndex& index) const;
+
+    virtual QWidget* createEditor(QWidget* parent, const QStyleOptionViewItem& option,
+        const QModelIndex& index) const override;
     virtual void destroyEditor(QWidget* editor, const QModelIndex& index) const override;
 
     virtual bool eventFilter(QObject* object, QEvent* event) override;
 
-private:
     enum class ItemState
     {
-        Normal,
-        Selected,
-        Accented
+        normal,
+        selected,
+        accented
     };
 
-    ItemState itemState(const QModelIndex& index) const;
+    virtual ItemState itemState(const QModelIndex& index) const;
+    virtual void getDisplayInfo(const QModelIndex& index,
+        QString& baseName, QString& extInfo) const;
 
+private:
     ItemState itemStateForMediaResource(const QModelIndex& index) const;
     ItemState itemStateForLayout(const QModelIndex& index) const;
     ItemState itemStateForRecorder(const QModelIndex& index) const;
@@ -80,7 +95,7 @@ private:
     ItemState itemStateForVideoWallItem(const QModelIndex& index) const;
     ItemState itemStateForLayoutTour(const QModelIndex& index) const;
 
-    void getDisplayInfo(const QModelIndex& index, QString& baseName, QString& extInfo) const;
+    QVariant rowCheckState(const QModelIndex& index) const;
 
 private:
     QPointer<QnWorkbench> m_workbench;
@@ -92,6 +107,7 @@ private:
     int m_rowSpacing;
     Qn::ResourceInfoLevel m_customInfoLevel;
     Options m_options;
+    int m_checkBoxColumn = -1;
     mutable QnTextPixmapCache m_textPixmapCache;
 };
 

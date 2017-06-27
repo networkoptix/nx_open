@@ -1,27 +1,27 @@
 #include "strings_helper.h"
 
-#include <utils/common/app_info.h>
-#include <utils/common/id.h>
-
 #include <api/app_server_connection.h>
-
-#include <nx/network/nettools.h> /* For resolveAddress. */
-
-#include <nx/vms/event/aggregation_info.h>
-#include <nx/vms/event/rule.h>
-#include <nx/vms/event/events/events.h>
-
+#include <common/common_module.h>
 #include <core/resource/resource.h>
+#include <core/resource/user_resource.h>
 #include <core/resource/resource_display_info.h>
 #include <core/resource/device_dependent_strings.h>
 #include <core/resource/network_resource.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource_management/resource_pool.h>
+#include <core/resource_management/user_roles_manager.h>
 #include <core/resource/camera_history.h>
+#include <nx/network/nettools.h> /* For resolveAddress. */
+#include <utils/common/app_info.h>
+#include <utils/common/id.h>
 
-#include <common/common_module.h>
+#include <nx/vms/event/aggregation_info.h>
+#include <nx/vms/event/rule.h>
+#include <nx/vms/event/events/events.h>
 
+//#include <core/resource/camera_history.h>
+//#include <utils/common/id.h>
 namespace nx {
 namespace vms {
 namespace event {
@@ -201,11 +201,11 @@ QString StringsHelper::eventAtResources(const EventParameters& params) const
 {
     if (params.eventType == SoftwareTriggerEvent)
     {
-        return lit("Software Trigger %1 has been activated multiple times")
+        return tr("Software Trigger %1 has been activated multiple times")
             .arg(getSoftwareTriggerName(params));
     }
 
-    return lit("Multiple %1 events have occured").arg(eventName(params.eventType));
+    return tr("Multiple %1 events have occured").arg(eventName(params.eventType));
 }
 
 QString StringsHelper::getResoureNameFromParams(const EventParameters& params,
@@ -451,7 +451,13 @@ QString StringsHelper::eventReason(const EventParameters& params) const
         case StorageFullReason:
         {
             QString storageUrl = reasonParamsEncoded;
-            result = tr("HDD/SSD disk %1 is full. Disk contains too much data that is not managed by VMS.").arg(storageUrl);
+            result = tr("HDD/SSD disk \"%1\" is full. Disk contains too much data that is not managed by VMS.").arg(storageUrl);
+            break;
+        }
+        case SystemStorageFullReason:
+        {
+            QString storageUrl = reasonParamsEncoded;
+            result = tr("System disk \"%1\" is almost full.").arg(storageUrl);
             break;
         }
         case BackupFailedNoBackupStorageError:
@@ -499,7 +505,6 @@ QString StringsHelper::eventReason(const EventParameters& params) const
             result = tr("Archive backup is canceled by user. Data is backed up to %1").arg(dt.toString(Qt::DefaultLocaleShortDate));
             break;
         }
-
         case LicenseRemoved:
         {
             QnVirtualCameraResourceList disabledCameras;
@@ -634,7 +639,7 @@ QString StringsHelper::ruleDescriptionText(const RulePtr& rule) const
 
 QString StringsHelper::defaultSoftwareTriggerName()
 {
-    return tr("Default Trigger");
+    return tr("Trigger Name");
 }
 
 QString StringsHelper::getSoftwareTriggerName(const QString& id)
@@ -647,6 +652,71 @@ QString StringsHelper::getSoftwareTriggerName(const EventParameters& params)
 {
     NX_ASSERT(params.eventType == SoftwareTriggerEvent);
     return getSoftwareTriggerName(params.caption);
+}
+
+QString StringsHelper::actionSubjects(const RulePtr& rule, bool showName) const
+{
+    if (rule->actionParams().allUsers)
+        return allUsersText();
+
+    QnUserResourceList users;
+    QList<QnUuid> roles;
+
+    if (requiresUserResource(rule->actionType()))
+        userRolesManager()->usersAndRoles(rule->actionResources(), users, roles);
+    else
+        userRolesManager()->usersAndRoles(rule->actionParams().additionalResources, users, roles);
+
+    return actionSubjects(users, roles, showName);
+}
+
+QString StringsHelper::actionSubjects(
+    const QnUserResourceList& users,
+    const QList<QnUuid>& roles,
+    bool showName) const
+{
+    if (users.empty() && roles.empty())
+        return needToSelectUserText();
+
+    if (showName)
+    {
+        if (users.size() == 1 && roles.empty())
+            return users.front()->getName();
+
+        if (users.empty() && roles.size() == 1)
+        {
+            return lit("%1 %2 %3")
+                .arg(tr("Role"))
+                .arg(QChar(L'\x2013')) //< En-dash.
+                .arg(userRolesManager()->userRoleName(roles.front()));
+        }
+    }
+
+    if (roles.empty())
+        return tr("%n Users", "", users.size());
+
+    if (!users.empty())
+    {
+        return lit("%1, %2")
+            .arg(tr("%n Roles", "", roles.size()))
+            .arg(tr("%n Users", "", users.size()));
+    }
+
+    static const QSet<QnUuid> kAdminRoles = QnUserRolesManager::adminRoleIds().toSet();
+    if (roles.toSet() == kAdminRoles)
+        return tr("All Administrators");
+
+    return tr("%n Roles", "", roles.size());
+}
+
+QString StringsHelper::allUsersText()
+{
+    return tr("All Users");
+}
+
+QString StringsHelper::needToSelectUserText()
+{
+    return tr("Select at least one user");
 }
 
 } // namespace event

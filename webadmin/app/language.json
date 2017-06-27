@@ -1,5 +1,4 @@
 {
-    "language": "LANGUAGE_CODE",
     "language_name": "LANGUAGE_NAME",
     "dialogs":{
         "okButton": "Ok",
@@ -114,19 +113,6 @@
         "total": "Total",
         "occupied": "Occupied",
         "reserved": "Reserved"
-    },
-    "cameraStates":{
-        "offline": "OFFLINE",
-        "unauthorized": "UNAUTHORIZED",
-        "iosVideoTooLarge": "Video cannot be played.<br>iOS does not support video larger than fullHD (2MP: 1920x1080).",
-        "flashRequired": "Video cannot be played.<br>Please <a href='https://get.adobe.com/flashplayer/' target='_blank'>install Adobe Flash</a> for playing video from ARM-based servers.",
-        "flashOrWebmRequired": "Video cannot be played.<br>Please <a href='https://get.adobe.com/flashplayer/' target='_blank'>install Adobe Flash</a> or<a href='https://tools.google.com/dlpage/webmmf/' target='_blank'>WebM codec</a> for playing video in Internet Explorer.",
-        "noArmSupport": "Video cannot be played.<br>This browser or device does not support video playback from ARM-based servers.",
-        "noFormat": "Video cannot be played.<br>This browser or device does not support video playback from  this camera.",
-        "ieNoWebm": "Video cannot be played.<br>Please, install <a href='https://tools.google.com/dlpage/webmmf/' target='_blank'>WebM codec</a> for Internet Explorer.",
-        "ieWin10": "Video cannot be played.<br>Please, use Microsoft Edge or Google Chrome browsers.",
-        "ubuntuNX": "Video cannot be played.<br>This browser does not support video from ARM-based servers. Please, use Chromium browser instead.",
-        "errorLoading": "Video cannot be played.<br>Error occurred."
     },
     "pageTitles": {
         "default": "{{PRODUCT_NAME}} web interface"

@@ -12,6 +12,7 @@
 #include <utils/common/synctime.h>
 #include <nx/fusion/model_functions.h>
 #include <nx/mediaserver/event/event_connector.h>
+#include <nx/utils/string.h>
 #include <nx/vms/event/event_parameters.h>
 
 using namespace nx;

@@ -20,7 +20,8 @@ static const QnIcon::SuffixesList kDefaultSuffixes({
     {QnIcon::Active,   lit("hovered")},
     {QnIcon::Disabled, lit("disabled")},
     {QnIcon::Selected, lit("selected")},
-    {QnIcon::Pressed,  lit("pressed")}
+    {QnIcon::Pressed,  lit("pressed")},
+    {QnIcon::Error,    lit("error")}
 });
 
 } //namespace
@@ -151,13 +152,21 @@ void QnNoptixIconLoader::loadIconInternal(
 
     /* Create normal icon. */
     QnIconBuilder builder;
-    builder.addPixmap(skin->pixmap(name), QnIcon::Normal, QnIcon::Off);
+    QPixmap basePixmap = skin->pixmap(name);
+    builder.addPixmap(basePixmap, QnIcon::Normal, QnIcon::Off);
 
     for (auto suffix: *suffixes)
     {
-        path = prefix + lit("_") + suffix.second + extension;
-        if (skin->hasFile(path))
-            builder.addPixmap(skin->pixmap(path), suffix.first, QnIcon::Off);
+        if (suffix.second.isEmpty())
+        {
+            builder.addPixmap(basePixmap, suffix.first, QnIcon::Off);
+        }
+        else
+        {
+            path = prefix + lit("_") + suffix.second + extension;
+            if (skin->hasFile(path))
+                builder.addPixmap(skin->pixmap(path), suffix.first, QnIcon::Off);
+        }
     }
 
     decompose(checkedName.isEmpty()
@@ -166,14 +175,27 @@ void QnNoptixIconLoader::loadIconInternal(
         &prefix, &extension);
 
     path = prefix + extension;
+    QPixmap baseCheckedPixmap;
+
     if (skin->hasFile(path))
-        builder.addPixmap(skin->pixmap(path), QnIcon::On);
+    {
+        baseCheckedPixmap = skin->pixmap(path);
+        builder.addPixmap(baseCheckedPixmap, QnIcon::On);
+    }
 
     for (auto suffix: *suffixes)
     {
-        path = prefix + lit("_") + suffix.second + extension;
-        if (skin->hasFile(path))
-            builder.addPixmap(skin->pixmap(path), suffix.first, QnIcon::On);
+        if (suffix.second.isEmpty())
+        {
+            if (!baseCheckedPixmap.isNull())
+                builder.addPixmap(baseCheckedPixmap, suffix.first, QnIcon::On);
+        }
+        else
+        {
+            path = prefix + lit("_") + suffix.second + extension;
+            if (skin->hasFile(path))
+                builder.addPixmap(skin->pixmap(path), suffix.first, QnIcon::On);
+        }
     }
 
     QIcon icon = builder.createIcon();

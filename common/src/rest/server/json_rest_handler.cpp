@@ -31,6 +31,23 @@ int QnJsonRestHandler::executeGet(
     return returnCode;
 }
 
+int QnJsonRestHandler::executeDelete(
+    const QString& path, const QnRequestParamList& params, QByteArray& result,
+    QByteArray& contentType, const QnRestConnectionProcessor* owner)
+{
+    QnJsonRestResult jsonResult;
+    const auto paramsMap = processParams(params);
+    int returnCode = executeDelete(path, paramsMap, jsonResult, owner);
+
+    result = QJson::serialized(jsonResult);
+    if (paramsMap.contains(kExtraFormatting))
+        result = formatJSonString(result);
+
+    contentType = m_contentType;
+
+    return returnCode;
+}
+
 int QnJsonRestHandler::executePost(
     const QString& path, const QnRequestParamList& params, const QByteArray& body,
     const QByteArray& /*srcBodyContentType*/, QByteArray& result, QByteArray& contentType,
@@ -42,7 +59,26 @@ int QnJsonRestHandler::executePost(
 
     result = QJson::serialized(jsonResult);
     if (paramsMap.contains(kExtraFormatting))
+        result = formatJSonString(result);
+
+    contentType = m_contentType;
+
+    return returnCode;
+}
+
+int QnJsonRestHandler::executePut(
+    const QString& path, const QnRequestParamList& params, const QByteArray& body,
+    const QByteArray& /*srcBodyContentType*/, QByteArray& result, QByteArray& contentType,
+    const QnRestConnectionProcessor* owner)
+{
+    QnJsonRestResult jsonResult;
+    const auto paramsMap = processParams(params);
+    int returnCode = executePut(path, paramsMap, body, jsonResult, owner);
+
+    result = QJson::serialized(jsonResult);
+    if (paramsMap.contains(kExtraFormatting))
         result  = formatJSonString(result);
+
     contentType = m_contentType;
 
     return returnCode;
@@ -55,11 +91,25 @@ int QnJsonRestHandler::executePost(
     return executeGet(path, params, result, owner);
 }
 
+int QnJsonRestHandler::executePut(
+    const QString& path, const QnRequestParams& params, const QByteArray& body,
+    QnJsonRestResult& result, const QnRestConnectionProcessor* owner)
+{
+    return executePost(path, params, body, result, owner);
+}
+
 int QnJsonRestHandler::executeGet(
     const QString& path, const QnRequestParams& params, QnJsonRestResult& result,
     const QnRestConnectionProcessor* owner)
 {
     return executePost(path, params, QByteArray(), result, owner);
+}
+
+int QnJsonRestHandler::executeDelete(
+    const QString& /*path*/, const QnRequestParams& /*params*/, QnJsonRestResult& /*result*/,
+    const QnRestConnectionProcessor* /*owner*/)
+{
+    return nx_http::StatusCode::notImplemented;
 }
 
 QnRequestParams QnJsonRestHandler::processParams(const QnRequestParamList& params) const

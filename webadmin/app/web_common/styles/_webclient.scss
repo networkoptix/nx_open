@@ -1,6 +1,5 @@
 @import '../../styles/native-theme/theme_palette';
 
-
 ::-webkit-scrollbar {
   width: 8px;
 }
@@ -13,11 +12,6 @@
 ::-webkit-scrollbar-thumb
 {
   background: $light8;
-}
-
-::-webkit-scrollbar-track:hover
-{
-  background: $light9;
 }
 
 ::-webkit-scrollbar-thumb:hover
@@ -33,6 +27,9 @@
 ::-ms-clear { display: none; }
 
 
+.visibility-hidden{
+    visibility:hidden;
+}
 .webclient{
   &{
     height:100%;
@@ -53,10 +50,6 @@
 
         .offline {
           color:silver;
-        }
-
-        li>.collapse-group{
-          padding:10px;
         }
 
         & > li{
@@ -195,11 +188,11 @@ table.webclient-window>tbody>tr>td{
 }
 
 .cameras-panel{
-  min-width: 320px;
-  overflow-y: auto;
+  /*min-width: 320px;*/
+  overflow-y: scroll;
   overflow-x: hidden;
   height: 100%;
-  width:100%;
+  width:320px;
 
   background-color: $additional_light2;
 }
@@ -213,55 +206,124 @@ table.webclient-window>tbody>tr>td{
   }
 }
 
-/* Cameras panel */
+/* Cameras search */
 .cameras-search{
-  padding:10px 0 10px 0;
-  margin-top:3px;
   height: 44px;
-  border-bottom: 1px solid $light6;
   font-size: 13px;
   background-color: $additional_light2;
+  color: $light16;
+  position: relative;
 
-  &>.input-group{
-    margin-top: -11px;
+  &>*{
+    background: transparent;
+    height: 44px;
+  }
+  .icon-left{
+    position: absolute;
+    text-align: center;
+    line-height: 54px;
+    height: 100%;
+    width: 44px;
+    float: left;
+  }
+
+  .icons-right{
+    height: 100%;
+    float: right;
+    display: inline-block;
+    position: relative;
+    z-index: 1;
+
+    .clear-button{
+      float: left;
+      width: 40px;
+      height: 44px;
+      line-height: 44px;
+    }
+
+    .clear-divider{
+      background-color: $light4 !important;
+      height: 24px;
+      width: 1px;
+
+      position: relative;
+      top: 10px;
+    }
+
+    .info-icon{
+      line-height: 54px;
+      float: right;
+      width: 44px;
+      height: 44px;
+      &.active{
+        color: $blue10 !important;  
+      }
+      
+      &:hover, &.active:hover{
+        background-color: $additional_light3 !important;  
+      }
+
+      &:active, &.active:active{
+        background-color: $light5 !important;
+      }
+    }
     
-    .input-group-addon{
-      border: none !important;
-    }
-
-    &>input{
-      margin-bottom: -20px;
-      color: $light16;
-      border:none;
-      box-shadow:none;
-      font-size: 16px;
-
-      &::-webkit-input-placeholder {}
-      &:-moz-placeholder{}
-      &::-moz-placeholder{}
-      &:-ms-input-placeholder {}
-
-    }
     &>*{
-      background: transparent;
-      color:$light16;   
+      text-align: center;
+      display: inline-block;
     }
   }
 
-  &:hover{
-    backgroud-color: $light2;
+  input{
+    width: 100%;
+    padding: 0 85px 0 44px;
+    position: absolute;
+    border: none;
+    box-shadow: none;
+    outline: none !important;
+    font-size: 16px;
+    border-bottom: 1px solid $light6;
+    
+    &:hover{
+      background-color: $light2;
+    }
+
+    &.active,&:active,
+    &:focus{
+      background-color: $light1;
+    }
   }
 
-  &.active,&:active{
-    background-color: $light1;
+  @mixin placeholder{
+    color: $light16;
+    font-size: 13px;
+    line-height: 44px;
+  }
+
+  input::placeholder{
+    @include placeholder;
+  }
+  input::-webkit-input-placeholder{
+    @include placeholder;
+  }
+  input::-moz-placeholder{
+    @include placeholder;
+  }
+  input:-ms-input-placeholder{
+    @include placeholder;
+  }
+  input:-moz-placeholder{
+    @include placeholder;
   }
 }
 
+
+/* Camera Panel*/
 .server{
   &-link{
     height:40px;
-    line-height:20px !important;
-    padding: 10px;
+    padding: 0 8px !important;
+    line-height: 40px;
 
     &:hover{
       background-color: $additional_light3 !important;
@@ -279,18 +341,9 @@ table.webclient-window>tbody>tr>td{
       color: $light16;
       line-height: 18px;  
     }
-
-    & > .pull-right{
-      margin-top: 2px;
-    }
-
-    & > *{
-      vertical-align: middle;  
-    }
   }
 
   &-name{
-    margin-left: -17px;
     font-size: 14px;
     font-weight: 500;
     color: $dark9;
@@ -305,33 +358,20 @@ table.webclient-window>tbody>tr>td{
 }
 
 .camera{
-  &-status{
-    display:inline-block;
-    width:1em;
-    text-align: center;
-    font-size:180%;
-    line-height: 1;
-
-    &.online-cam{
-      top: -8px;
-      left: -5px;  
-    }
-
-    &.offline-cam{
-      top: -8px;
-      left: -7px;
-      font-size: 200%;
-      font-weight: bolder;  
-    }
-  }
-
   &-info{
     margin-left: -32px;
+  }
+
+  &-name{
+    margin-left: 8px;
   }
 
   &-preview .camera-status{
     position: absolute;
     z-index: 1;
+    top: 4px;
+    left: 4px;
+    width: 8px;
   }
 
   &-settings{
@@ -344,8 +384,8 @@ table.webclient-window>tbody>tr>td{
 }
 
 .camera-preview{
-  width:68px !important;
-  height:38px !important;
+  width:70px !important;
+  height:40px !important;
   margin-right: 10px;
   background-color: $light5;
   border-radius: 1px;
@@ -354,13 +394,11 @@ table.webclient-window>tbody>tr>td{
 
 
   position:absolute;
-  margin-left:-86px;
+  margin-left: -72px;
   margin-top: -2px;
 }
 
 .cameras-panel .nav > li.active > a .camera-preview{
-  height: 38px !important;
-  width: 68px !important;
   border: 1px solid $light1;
 }
 
@@ -390,12 +428,12 @@ table.webclient-window>tbody>tr>td{
     color:$light16 !important;
 
     small{
-      color: $dark15;    
+      color: $light10 !important;
     }
 
     .camera-preview{
-      background-color: $dark7;
-      border: 1px solid $dark5;
+      background-color: $light3 !important;
+      border: 1px solid $light5 !important;
 
       img{
         display:none;
@@ -404,98 +442,36 @@ table.webclient-window>tbody>tr>td{
   }
 }
 
-.camera-preview>.camera-preview-image {
-  display:block;
-  position: relative;
-  top: 50%;
-  transform: translateY(-50%);
-  -ms-transform: translateY(-50%);
-  background-size: 100% 100%;
-
-  margin-left: auto;
-  margin-right: auto;
-}
-
-.camera-preview>.camera-preview-image>img{
-  visibility:hidden;
+.camera-preview > img{
   max-width:68px !important;
   max-height:38px !important;
-}
-
-.camera-states{
-  width: 100%;
-  height: 100%;
-}
-
-.camera-view-informer{ 
-  &{
-    text-align: center;
-
-    position: relative;
-    top: 50%;
-    transform: translateY(-50%);
-    -ms-transform: translateY(-50%);
-
-    font-weight: 400;
-    font-size:130%;
-    line-height:30px;
-    color:$dark17;
-  }
-  a{
-    color: $light12;
-    text-decoration: underline;
-
-    &:hover, &:active{
-      color: $light1;  
-    }
-  }
-
-  .camera-view-message-icon{
-    display: inline-block;
-    margin-bottom: 20px;
-  }
-}
-
-.camera-view-message{
-  font-weight: 300;
-  color: $dark13;
-  font-size: 40px;
-  display: inline-block;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
 }
 
 .cameras-panel .nav > li{
-  & > a{
-    color:$dark9;
-    font-weight: normal;
-
+  & ul > li > a{
     white-space: nowrap;
     text-overflow: ellipsis;
     overflow: hidden;
     padding-right: 10px;
-    padding-left:95px;
-  }
-
-  & > a:hover, & > a:focus{
-    text-decoration: none;
-    background-color: rgba($dark11,0.2);  
+    padding-left: 78px;
   }
 
   & > a:hover{
+    border-radius: 2px;
+    text-decoration: none;
     background-color: $additional_light3;
   }
 
-  &.active > a{
+  &.active > a,
+  &.active > a:active{
+    border-radius: 2px;
     text-decoration: none;
     background-color: $light5;
   }
-}
-
-.not-supported.camera-view-message{
-  line-height:40px;
-  text-align: center;
-  height:100%;
-
-  padding-top: 10px;
 }
 
 /* View */
@@ -543,7 +519,7 @@ table.webclient-window>tbody>tr>td{
     width:100%;
     height:100%;
 
-    padding: 0px 20px;
+    padding: 0;
   }
 }
 
@@ -564,19 +540,6 @@ table.webclient-window>tbody>tr>td{
   line-height: 19px !important;
   color: $light1;
   text-shadow: 0px 1px 3px rgba($dark1,1)
-}
-
-.video-status{
-  &{
-    width: 24px;
-    font-size: 180%;
-    line-height: 12px;
-  }
-  &.offline-video{
-    line-height: 16px;
-    font-size: 200% !important;
-    font-weight: bolder;  
-  }
 }
 
 .video-icon{
@@ -645,10 +608,16 @@ table.webclient-window>tbody>tr>td{
 }
 
 .video-preview{
-  height: 100%;
-  max-width: 100%;
   background-color: $dark1;
+  max-width: 100%;
+  max-height: 100%;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  opacity:0.5;
 }
+
 
 .min-40{
   width:40px;
@@ -719,225 +688,12 @@ table.webclient-window>tbody>tr>td{
   width:100% !important;
 }
 
-.raise-input-up{
-  margin-bottom: -5px !important;
-}
-
-.clear-button{
-  &{
-    width: 40px;
-    height: 43px;
-  }
-  &-right{
-    background-color: $light4 !important;
-    position: relative;
-    height: 24px;
-    width: 1px;
-    top: 10px;
-  }
-}
-
-.icon{
-  width: 44px;
-  height: 43px;
-}
-
-.info-icon{
-  &.active{
-    color: $blue10 !important;  
-  }
-  
-  &:hover, &.active:hover{
-    background-color: $additional_light3 !important;  
-  }
-
-  &:active, &.active:active{
-    background-color: $light5 !important;
-  }
-}
-
-div{
-  &.text-left{
-    width:106px;
-    height:100%;
-    background-color: $additional_light2;
-    border-left: 1px solid $light6;
-    border-right: 1px solid $light6;
-  }
-
-  &.text-right{
-    &{
-      width:104px;
-      height:100%;
-      background-color: $additional_light2;
-    }
-
-    &.no-volume{
-      width: 64px !important;
-    }
-  }
-
-  &.text-center{
-    &{
-      margin: 0 104px 0 106px;
-      height:100%;
-    }
-
-    &.no-volume{
-      margin-right:64px;
-    }
-  }
-}
-
-.side-shadow{
-  width:2px;
-  height: 100%;
-  background-color: $dark1;
-  opacity: 0.05;
-  position: absolute;
-
-  &.right{
-    right:0;
-  }
-}
-
-
-.player-controls{
-  padding: 33px 25px 32px 25px !important;
-}
-
-.zoom-level{
-  margin-top: 6px;
-}
-
-.live-circle{
-  padding: 3px;
-  margin: 2px 8px 2px 0;
-  background-color: $light6;
-  display: inline-block;
-  -moz-border-radius: 100px;
-  -webkit-border-radius: 100px;
-  border-radius: 100px;
-  -moz-box-shadow: 0px 0px 2px #888;
-  -webkit-box-shadow: 0px 0px 2px #888;
-  box-shadow: 0px 0px 2px #888;
-}
-
-.live-button{
-  width: 64px;
-  height: 100%;
-  text-align: center;
-  line-height: 100px;
-  background-color:$additional_light2;
-  border-left: 1px solid $light6 !important;
-  border-right: 1px solid $light4 !important;
-
-  .webclient-button{
-    margin: 40px auto;
-  }
-
-  .active{
-    background-color: $light5 !important;
-    border-left: 1px solid $light8 !important;
-    border-right: 1px solid $light7 !important; 
-  }
-
-  &:hover{
-    background-color: $additional_light3 !important;
-    border-left: 1px solid $light6 !important;
-    border-right: 1px solid $light5 !important; 
-  }
-
-  &.active:hover{
-    background-color: $light4 !important;
-    border-left: 1px solid $light7 !important;
-    border-right: 1px solid $light6 !important; 
-  }
-
-  &:active,
-  &.active:active {
-    background-color: $light5 !important;
-    border-left: 1px solid $light8 !important;
-    border-right: 1px solid $light7 !important; 
-  }
-
-  &.active > .live-circle{
-    background-color: chartreuse !important;
-  }
-}
-
-.volume{
-  width: 41px;
-  height: 100px;
-
-  .glyphicon-volume-up{
-    margin: 40px auto !important;
-  }
-
-  &-control{
-    width: 212px;
-    height: 44px;
-    position: absolute;
-    right: 0;
-    top: -44px;
-    background-color: #333333;
-  }
-  &-icons{
-    width: 44px;
-    height: 44px;
-
-    .glyphicon{
-      position: relative;
-      top: 14px;
-      left: 16px;
-    }
-
-    output{
-      position: relative;
-      top: 4px;
-      left: 6px;
-    }
-  }  
-}
-
 .dropdown > .webclient-button{
   width:90px;
 }
 
 .dropdown.open > .webclient-button{
   background-color: rgba($dark1,0.1);
-}
-
-.glyphicon-backward,
-.glyphicon-forward,
-.glyphicon-pause,
-.glyphicon-play,
-.live-button {
-  color:black;
-}
-
-.glyphicon-volume-off,
-.glyphicon-volume-up,
-.glyphicon-minus,
-.glyphicon-plus {
-  color:gray;
-}
-
-.glyphicon-pp{
-  width: 63px;
-  height: 100%;
-}
-
-.glyphicon-fwbw{
-  height: 40px;
-  width: 32px;
-  padding: 0 !important;
-}
-
-.glyphicon-pm{
-  height: 44px;
-  width: 40px;
-  display: block !important;
 }
 
 .caption-row {
@@ -981,7 +737,7 @@ div{
     margin: 0 !important;
   }
   .glyphicon-pm{
-    height: 60px;
+    height: 60px !important;
     display: inline-block !important;
   }
 
@@ -1013,4 +769,30 @@ div{
     color:$light1;
   }
 
+}
+
+.live-button {
+  color:black;
+}
+
+.glyphicon-volume-off,
+.glyphicon-volume-up{
+  color:gray;
+}
+
+.glyphicon-pp{
+  width: 63px;
+  height: 100%;
+}
+
+.glyphicon-fwbw{
+  height: 40px;
+  width: 32px;
+  padding: 0 !important;
+}
+
+.glyphicon-pm{
+  height: 44px;
+  width: 40px;
+  display: block;
 }

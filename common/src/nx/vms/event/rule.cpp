@@ -3,6 +3,7 @@
 #include <core/resource/resource.h>
 #include <core/resource/user_resource.h>
 #include <core/resource_management/resource_pool.h>
+#include <core/resource_management/user_roles_manager.h>
 
 #include <nx/vms/event/action_factory.h>
 #include <nx/fusion/model_functions.h>
@@ -11,10 +12,18 @@ namespace nx {
 namespace vms {
 namespace event {
 
-Rule::Rule():
+namespace {
+
+static const QList<QnUuid> kOwnerRoleIds {
+    QnUserRolesManager::predefinedRoleId(Qn::UserRole::Owner) };
+
+} // namespace
+
+Rule::Rule() :
     m_id(),
     m_eventType(UndefinedEvent),
-    m_eventState(ActiveState), //by default, rule triggers on toggle event start. for example: if motion start/stop, send alert on start only
+    m_eventState(ActiveState), //< By default, rule triggers on toggle event start.
+                               //< For example, if motion starts/stops, send alert on start only.
     m_actionType(UndefinedAction),
     m_aggregationPeriod(0),
     m_disabled(false),
@@ -186,8 +195,8 @@ bool Rule::isScheduleMatchTime(const QDateTime& datetime) const
 }
 
 Rule::Rule(
-    int internalId, int aggregationPeriod, const QByteArray& actionParams, bool isSystem,
-    ActionType bActionType, EventType bEventType, const QnUuid& actionResId)
+    int internalId, int aggregationPeriod, bool isSystem, ActionType bActionType,
+    EventType bEventType, const QList<QnUuid>& subjectIds, bool allUsers)
 {
     m_disabled = false;
     m_eventState = UndefinedState;
@@ -198,9 +207,15 @@ Rule::Rule(
     m_actionType = bActionType;
     m_eventType = bEventType;
 
-    m_actionParams = QJson::deserialized<ActionParameters>(actionParams);
-    if (!actionResId.isNull())
-        m_actionResources << actionResId;
+    if (subjectIds.empty())
+        return;
+
+    if (requiresUserResource(m_actionType))
+        m_actionResources = subjectIds.toVector();
+    else
+        m_actionParams.additionalResources = subjectIds.toVector().toStdVector();
+
+    m_actionParams.allUsers = allUsers;
 }
 
 Rule* Rule::clone()
@@ -235,28 +250,27 @@ void Rule::removeResource(const QnUuid& resId)
         if (m_eventResources[i] == resId)
             m_eventResources.removeAt(i);
     }
-
 }
 
 RuleList Rule::getDefaultRules()
 {
     RuleList result;
-    result << RulePtr(new Rule(1,  30,    "{ \"userGroup\" : 0 }",  0, ShowPopupAction,   CameraDisconnectEvent));
-    result << RulePtr(new Rule(2,  30,    QByteArray(),             0, ShowPopupAction,   StorageFailureEvent));
-    result << RulePtr(new Rule(3,  30,    QByteArray(),             0, ShowPopupAction,   NetworkIssueEvent));
-    result << RulePtr(new Rule(4,  30,    QByteArray(),             0, ShowPopupAction,   CameraIpConflictEvent));
-    result << RulePtr(new Rule(5,  30,    QByteArray(),             0, ShowPopupAction,   ServerFailureEvent));
-    result << RulePtr(new Rule(6,  30,    QByteArray(),             0, ShowPopupAction,   ServerConflictEvent));
-    result << RulePtr(new Rule(7,  21600, QByteArray(),             0, SendMailAction,    CameraDisconnectEvent, QnUserResource::kAdminGuid));
-    result << RulePtr(new Rule(8,  24*3600, QByteArray(),           0, SendMailAction,    StorageFailureEvent, QnUserResource::kAdminGuid));
-    result << RulePtr(new Rule(9,  21600, QByteArray(),             0, SendMailAction,    NetworkIssueEvent, QnUserResource::kAdminGuid));
-    result << RulePtr(new Rule(10, 21600, QByteArray(),             0, SendMailAction,    CameraIpConflictEvent, QnUserResource::kAdminGuid));
-    result << RulePtr(new Rule(11, 21600, QByteArray(),             0, SendMailAction,    ServerFailureEvent, QnUserResource::kAdminGuid));
-    result << RulePtr(new Rule(12, 21600, QByteArray(),             0, SendMailAction,    ServerConflictEvent, QnUserResource::kAdminGuid));
-    result << RulePtr(new Rule(20, 21600, QByteArray(),             0, SendMailAction,    ServerStartEvent, QnUserResource::kAdminGuid));
+    result << RulePtr(new Rule(1,  30,      0, ShowPopupAction,   CameraDisconnectEvent, {}, true));
+    result << RulePtr(new Rule(2,  30,      0, ShowPopupAction,   StorageFailureEvent,   {}, true));
+    result << RulePtr(new Rule(3,  30,      0, ShowPopupAction,   NetworkIssueEvent,     {}, true));
+    result << RulePtr(new Rule(4,  30,      0, ShowPopupAction,   CameraIpConflictEvent, {}, true));
+    result << RulePtr(new Rule(5,  30,      0, ShowPopupAction,   ServerFailureEvent,    {}, true));
+    result << RulePtr(new Rule(6,  30,      0, ShowPopupAction,   ServerConflictEvent,   {}, true));
+    result << RulePtr(new Rule(7,  21600,   0, SendMailAction,    CameraDisconnectEvent, kOwnerRoleIds));
+    result << RulePtr(new Rule(8,  24*3600, 0, SendMailAction,    StorageFailureEvent,   kOwnerRoleIds));
+    result << RulePtr(new Rule(9,  21600,   0, SendMailAction,    NetworkIssueEvent,     kOwnerRoleIds));
+    result << RulePtr(new Rule(10, 21600,   0, SendMailAction,    CameraIpConflictEvent, kOwnerRoleIds));
+    result << RulePtr(new Rule(11, 21600,   0, SendMailAction,    ServerFailureEvent,    kOwnerRoleIds));
+    result << RulePtr(new Rule(12, 21600,   0, SendMailAction,    ServerConflictEvent,   kOwnerRoleIds));
+    result << RulePtr(new Rule(20, 21600,   0, SendMailAction,    ServerStartEvent,      kOwnerRoleIds));
 
-    result << RulePtr(new Rule(22, 21600, QByteArray(),             0, SendMailAction,    LicenseIssueEvent, QnUserResource::kAdminGuid));
-    result << RulePtr(new Rule(23, 30,    QByteArray(),             0, ShowPopupAction,   LicenseIssueEvent));
+    result << RulePtr(new Rule(22, 21600,   0, SendMailAction,    LicenseIssueEvent,     kOwnerRoleIds));
+    result << RulePtr(new Rule(23, 30,      0, ShowPopupAction,   LicenseIssueEvent,     {}, true));
 
     result << getSystemRules() << getRulesUpd43() << getRulesUpd48();
     return result;
@@ -265,28 +279,28 @@ RuleList Rule::getDefaultRules()
 RuleList Rule::getSystemRules()
 {
     return {
-        RulePtr(new Rule(900013, 30, QByteArray(), 1, DiagnosticsAction, CameraDisconnectEvent)),
-        RulePtr(new Rule(900014, 30, QByteArray(), 1, DiagnosticsAction, StorageFailureEvent)),
-        RulePtr(new Rule(900015, 30, QByteArray(), 1, DiagnosticsAction, NetworkIssueEvent)),
-        RulePtr(new Rule(900016, 30, QByteArray(), 1, DiagnosticsAction, CameraIpConflictEvent)),
-        RulePtr(new Rule(900017, 30, QByteArray(), 1, DiagnosticsAction, ServerFailureEvent)),
-        RulePtr(new Rule(900018, 30, QByteArray(), 1, DiagnosticsAction, ServerConflictEvent)),
-        RulePtr(new Rule(900019, 0,  QByteArray(), 1, DiagnosticsAction, ServerStartEvent)),
-        RulePtr(new Rule(900021, 30, QByteArray(), 1, DiagnosticsAction, LicenseIssueEvent)) };
+        RulePtr(new Rule(900013, 30, 1, DiagnosticsAction, CameraDisconnectEvent)),
+        RulePtr(new Rule(900014, 30, 1, DiagnosticsAction, StorageFailureEvent)),
+        RulePtr(new Rule(900015, 30, 1, DiagnosticsAction, NetworkIssueEvent)),
+        RulePtr(new Rule(900016, 30, 1, DiagnosticsAction, CameraIpConflictEvent)),
+        RulePtr(new Rule(900017, 30, 1, DiagnosticsAction, ServerFailureEvent)),
+        RulePtr(new Rule(900018, 30, 1, DiagnosticsAction, ServerConflictEvent)),
+        RulePtr(new Rule(900019, 0,  1, DiagnosticsAction, ServerStartEvent)),
+        RulePtr(new Rule(900021, 30, 1, DiagnosticsAction, LicenseIssueEvent)) };
 }
 
 RuleList Rule::getRulesUpd43()
 {
     return {
-        RulePtr(new Rule(24,     0,  QByteArray(), 0, ShowPopupAction,   UserDefinedEvent)),
-        RulePtr(new Rule(900022, 0,  QByteArray(), 1, DiagnosticsAction, UserDefinedEvent)) };
+        RulePtr(new Rule(24,     0, 0, ShowPopupAction,   UserDefinedEvent, {}, true)),
+        RulePtr(new Rule(900022, 0, 1, DiagnosticsAction, UserDefinedEvent)) };
 }
 
 RuleList Rule::getRulesUpd48()
 {
     return {
-        RulePtr(new Rule(900023,  0, QByteArray(), 0, ShowPopupAction,   BackupFinishedEvent)),
-        RulePtr(new Rule(900024, 0, QByteArray(), 1, DiagnosticsAction, BackupFinishedEvent)) };
+        RulePtr(new Rule(900023, 0, 0, ShowPopupAction,   BackupFinishedEvent, {}, true)),
+        RulePtr(new Rule(900024, 0, 1, DiagnosticsAction, BackupFinishedEvent)) };
 }
 
 } // namespace event

@@ -17,6 +17,9 @@ public:
     static void disableTimeAsserts(bool areDisabled = true);
     static bool areTimeAssertsDisabled();
 
+    static void setTemporaryDirectoryPath(const QString& path);
+    static QString temporaryDirectoryPath();
+
     enum class LoadMode { light, normal, stress };
     static void setLoadMode(const QString& mode);
     static LoadMode getLoadMode();
@@ -25,9 +28,6 @@ public:
     static Count applyLoadMode(Count count);
 
     static void applyArguments(const ArgumentParser& args);
-
-    static void setTemporaryDirectoryPath(const QString& path);
-    static QString temporaryDirectoryPath();
 
 private:
     static std::atomic<size_t> s_timeoutMultiplier;

@@ -11,6 +11,7 @@
 #include "server_query_processor.h"
 #include "nx_ec/data/api_business_rule_data.h"
 #include "nx_ec/data/api_conversion_functions.h"
+#include <transaction/message_bus_selector.h>
 
 using namespace nx;
 
@@ -19,7 +20,7 @@ namespace ec2
 
 template<class QueryProcessorType>
 QnBusinessEventManager<QueryProcessorType>::QnBusinessEventManager(
-    QnTransactionMessageBus* messageBus,
+    QnTransactionMessageBusBase* messageBus,
     QueryProcessorType* const queryProcessor,
     const Qn::UserAccessData &userAccessData)
 :
@@ -83,7 +84,7 @@ int QnBusinessEventManager<T>::broadcastBusinessAction( const vms::event::Abstra
 {
     const int reqID = generateRequestID();
     auto tran = prepareTransaction( ApiCommand::broadcastAction, businessAction );
-    m_messageBus->sendTransaction(tran);
+    sendTransaction(m_messageBus, tran);
     nx::utils::concurrent::run(
         Ec2ThreadPool::instance(),
         std::bind( &impl::SimpleHandler::done, handler, reqID, ErrorCode::ok ) );
@@ -95,7 +96,7 @@ int QnBusinessEventManager<T>::sendBusinessAction( const vms::event::AbstractAct
 {
     const int reqID = generateRequestID();
     auto tran = prepareTransaction( ApiCommand::execAction, businessAction );
-    m_messageBus->sendTransaction(tran, dstPeer);
+    sendTransaction(m_messageBus, tran, dstPeer);
     nx::utils::concurrent::run(
         Ec2ThreadPool::instance(),
         std::bind( &impl::SimpleHandler::done, handler, reqID, ErrorCode::ok ) );

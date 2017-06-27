@@ -6,6 +6,7 @@
 
 #include <common/common_module_aware.h>
 
+#include <nx/core/core_fwd.h>
 #include <core/resource/resource_fwd.h>
 
 #include <nx/utils/singleton.h>
@@ -70,7 +71,9 @@ class QnCommonModule: public QObject, public QnInstanceStorage
 {
     Q_OBJECT
 public:
-    explicit QnCommonModule(bool clientMode, QObject *parent = nullptr);
+    explicit QnCommonModule(bool clientMode,
+        nx::core::access::Mode resourceAccessMode,
+        QObject* parent = nullptr);
     virtual ~QnCommonModule();
 
     //using Singleton<QnCommonModule>::instance;
@@ -181,6 +184,9 @@ public:
     void setObsoleteServerGuid(const QnUuid& guid) { m_obsoleteUuid = guid; }
     QnUuid obsoleteServerGuid() const{ return m_obsoleteUuid; }
 
+    QnUuid dbId() const;
+    void setDbId(const QnUuid& uuid);
+
     /*
     * This timestamp is using for database backup/restore operation.
     * Server has got systemIdentity time after DB restore operation
@@ -244,8 +250,6 @@ public:
     void setVideowallGuid(const QnUuid &uuid);
 
     /** instanceCounter used for unit test purpose only */
-    void setInstanceCounter(int value);
-    int instanceCounter() const;
 signals:
     void readOnlyChanged(bool readOnly);
     void moduleInformationChanged();
@@ -269,6 +273,7 @@ private:
     QString m_defaultAdminPassword;
     QnUuid m_uuid;
     QnUuid m_runUuid;
+    QnUuid m_dbId;
     QnUuid m_obsoleteUuid;
     QnUuid m_remoteUuid;
     bool m_cloudMode;
@@ -302,5 +307,4 @@ private:
     nx::vms::event::RuleManager* m_eventRuleManager = nullptr;
 
     QnUuid m_videowallGuid;
-    int m_instanceCounter = 0;
 };

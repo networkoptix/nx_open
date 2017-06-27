@@ -37,7 +37,7 @@ angular.module('nxCommon')
 
                 scope.formatLink = function(camera, stream,transport){
                     var linkTemplates = {
-                        'preview': 'http://{{host}}/api/image?physicalId={{physicalId}}{{previewPosition}}{{auth}}',
+                        'preview': 'http://{{host}}/ec2/cameraThumbnail?physicalId={{physicalId}}{{previewPosition}}{{auth}}',
                         'hls':'http://{{host}}/hls/{{physicalId}}.m3u8?{{streamLetter}}{{position}}{{auth}}',
                         'rtsp':'rtsp://{{host}}/{{physicalId}}?stream={{streamIndex}}{{position}}{{auth}}',
                         'transrtsp':'rtsp://{{host}}/{{physicalId}}?stream={{streamIndex}}{{position}}&resolution={{resolution}}{{auth}}',
@@ -46,8 +46,6 @@ angular.module('nxCommon')
                         'download':'http://{{host}}/hls/{{physicalId}}.mkv?{{streamLetter}}{{position}}&duration={{duration}}{{auth}}'
                     };
 
-                    
-
                     return linkTemplates[transport].
                         replace("{{host}}", window.location.host).
                         replace("{{physicalId}}", camera.physicalId).
@@ -55,8 +53,8 @@ angular.module('nxCommon')
                         replace("{{streamLetter}}", stream?'lo':'hi').
                         replace("{{auth}}", !scope.useAuth?'':'&auth=' + (transport=='rtsp'?systemAPI.authPlay():systemAPI.authGet())).
                         replace("{{auth}}", !scope.useAuth?'':'&auth=' + (systemAPI.authGet())).
-                        replace("{{position}}", scope.liveMode || !scope.position?'':'&pos=' + scope.position).
-                        replace("{{previewPosition}}", scope.liveMode || !scope.position?'&time=LATEST':'&time=' + scope.position).
+                        replace("{{position}}", scope.liveMode || !scope.position?'':'&pos=' + Math.round(scope.position)).
+                        replace("{{previewPosition}}", scope.liveMode || !scope.position?'&time=LATEST':'&time=' + Math.round(scope.position)).
                         replace("{{duration}}", scope.duration).
                         replace("{{resolution}}", scope.resolution);
                 };

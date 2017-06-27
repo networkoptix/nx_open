@@ -31,7 +31,7 @@ struct AuthInfo
 class AsyncHttpClientPtr;
 
 /**
- * Http client. All operations are done asynchronously.
+ * HTTP client. All operations are done asynchronously.
  *
  * To get new instance use AsyncHttpClient::create
  * This class methods are not thread-safe
@@ -163,6 +163,11 @@ public:
         const QUrl& url,
         const nx_http::StringType& contentType,
         nx_http::StringType messageBody,
+        nx::utils::MoveOnlyFunc<void(AsyncHttpClientPtr)> completionHandler);
+
+    void doDelete(const QUrl& url);
+    void doDelete(
+        const QUrl& url,
         nx::utils::MoveOnlyFunc<void(AsyncHttpClientPtr)> completionHandler);
 
     void doOptions(const QUrl& url);

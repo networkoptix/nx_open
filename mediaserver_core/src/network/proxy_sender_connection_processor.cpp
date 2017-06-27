@@ -1,4 +1,3 @@
-
 #include "proxy_sender_connection_processor.h"
 
 #include <QtCore/QElapsedTimer>
@@ -23,8 +22,8 @@
 
 #include <utils/common/app_info.h>
 
-static const int SOCKET_TIMEOUT = 1000 * 5;
-static const int PROXY_KEEP_ALIVE_INTERVAL = 60 * 1000;
+static const int kSocketTimeout = 1000 * 5;
+static const int kProxyKeepAliveInterval = 60 * 1000;
 
 class QnProxySenderConnectionPrivate: public QnUniversalRequestProcessorPrivate
 {
@@ -34,13 +33,16 @@ public:
 };
 
 QnProxySenderConnection::QnProxySenderConnection(
-        const SocketAddress& proxyServerUrl, const QnUuid& guid,
-        QnUniversalTcpListener* owner, bool needAuth)
-    : QnUniversalRequestProcessor(
-          new QnProxySenderConnectionPrivate,
-          QSharedPointer<AbstractStreamSocket>(
-                SocketFactory::createStreamSocket().release()),
-          owner, needAuth)
+    const SocketAddress& proxyServerUrl,
+    const QnUuid& guid,
+    QnUniversalTcpListener* owner,
+    bool needAuth)
+    :
+    QnUniversalRequestProcessor(
+        new QnProxySenderConnectionPrivate,
+        QSharedPointer<AbstractStreamSocket>(SocketFactory::createStreamSocket().release()),
+        owner,
+        needAuth)
 {
     Q_D(QnProxySenderConnection);
     d->proxyServerUrl = proxyServerUrl;
@@ -61,11 +63,12 @@ QByteArray QnProxySenderConnection::readProxyResponse()
     size_t bufLen = 0;
     while (d->socket->isConnected() && !m_needStop && bufLen < sizeof(buffer))
     {
-        int readed = d->socket->recv(buffer + bufLen, sizeof(buffer) - static_cast<unsigned int>(bufLen));
-        if (readed < 1)
+        int bytesRead = d->socket->recv(
+            buffer + bufLen, sizeof(buffer) - static_cast<unsigned int>(bufLen));
+        if (bytesRead < 1)
             return QByteArray();
-        bufLen += readed;
-        QByteArray result = QByteArray::fromRawData((const char*)buffer, static_cast<int>(bufLen));
+        bufLen += bytesRead;
+        QByteArray result = QByteArray::fromRawData((const char*) buffer, (int) bufLen);
         if (QnTCPConnectionProcessor::isFullMessage(result))
             return result;
     }
@@ -105,7 +108,8 @@ QByteArray QnProxySenderConnection::makeProxyRequest(
     const QByteArray H_PATH("/proxy-reverse");
     const QByteArray H_AUTH("auth-int");
 
-    QnMediaServerResourcePtr server = resourcePool()->getResourceById<QnMediaServerResource>(serverUuid);
+    QnMediaServerResourcePtr server = resourcePool()->getResourceById<QnMediaServerResource>(
+        serverUuid);
     if (!server)
         return QByteArray();
 
@@ -153,14 +157,14 @@ void QnProxySenderConnection::run()
         return;
     }
 
-    if (!d->socket->connect(d->proxyServerUrl, SOCKET_TIMEOUT))
+    if (!d->socket->connect(d->proxyServerUrl, kSocketTimeout))
         return;
 
-    d->socket->setSendTimeout(SOCKET_TIMEOUT);
-    d->socket->setRecvTimeout(SOCKET_TIMEOUT);
+    d->socket->setSendTimeout(kSocketTimeout);
+    d->socket->setRecvTimeout(kSocketTimeout);
 
-    int sended = sendRequest(proxyRequest);
-    if (sended < proxyRequest.length())
+    int bytesSent = sendRequest(proxyRequest);
+    if (bytesSent < proxyRequest.length())
     {
         NX_WARNING(this, lm("Can not send request to %1").arg(d->proxyServerUrl));
         d->socket->close();
@@ -175,7 +179,7 @@ void QnProxySenderConnection::run()
         return;
     }
 
-    // wait main request from remote host
+    // Wait for the main request from the remote host.
     bool gotRequest = false;
     QElapsedTimer timer;
     timer.restart();
@@ -186,17 +190,18 @@ void QnProxySenderConnection::run()
         {
             timer.restart();
             if (d->clientRequest.startsWith("HTTP 200 OK"))
-                gotRequest = false; // proxy keep-alive packets
+                gotRequest = false; //< proxy keep-alive packets
             else
                 break;
         }
-        else {
-            if (timer.elapsed() > PROXY_KEEP_ALIVE_INTERVAL)
+        else
+        {
+            if (timer.elapsed() > kProxyKeepAliveInterval)
                 break;
         }
     }
 
-    if (!gotRequest && timer.elapsed() < PROXY_KEEP_ALIVE_INTERVAL)
+    if (!gotRequest && timer.elapsed() < kProxyKeepAliveInterval)
         doDelay();
 
     if (!m_needStop && gotRequest)

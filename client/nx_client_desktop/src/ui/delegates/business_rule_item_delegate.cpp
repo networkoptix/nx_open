@@ -27,11 +27,14 @@
 #include <ui/style/helper.h>
 #include <ui/widgets/business/aggregation_widget.h>
 #include <ui/workbench/workbench_context.h>
-
-#include <nx/client/desktop/utils/server_notification_cache.h>
 #include <utils/math/color_transformations.h>
 
+#include <nx/client/desktop/ui/event_rules/subject_selection_dialog.h>
+#include <nx/client/desktop/utils/server_notification_cache.h>
+
+
 using namespace nx;
+using namespace nx::client::desktop::ui;
 
 namespace {
 enum { comboBoxMaxVisibleItems = 100 };
@@ -81,13 +84,69 @@ void QnSelectResourcesDialogButton::setSelectionTarget(QnResourceSelectionDialog
 
 void QnSelectResourcesDialogButton::at_clicked()
 {
-    QnResourceSelectionDialog dialog(m_target, this);
-    dialog.setSelectedResources(m_resources);
-    dialog.setDelegate(m_dialogDelegate);
-    int result = dialog.exec();
-    if (result != QDialog::Accepted)
-        return;
-    m_resources = dialog.selectedResources();
+    if (m_target == QnResourceSelectionDialog::Filter::users)
+    {
+        SubjectSelectionDialog dialog(this);
+        auto ids = m_resources;
+
+        //TODO: #vkutin #3.2 Temporary workaround to pass "all users" as a special uuid.
+        dialog.setAllUsers(ids.remove(QnBusinessRuleViewModel::kAllUsersId));
+        dialog.setCheckedSubjects(ids);
+
+        //TODO: #vkutin Hack till #3.2
+        const bool isEmail = dynamic_cast<QnSendEmailActionDelegate*>(m_dialogDelegate) != nullptr;
+        dialog.setAllUsersSelectorEnabled(!isEmail);
+
+        if (m_dialogDelegate)
+        {
+            dialog.setUserValidator(
+                [this](const QnUserResourcePtr& user)
+                {
+                    // TODO: #vkutin #3.2 This adapter is rather sub-optimal.
+                    return m_dialogDelegate->isValid(user->getId());
+                });
+        }
+
+        const auto updateAlert =
+            [this, &dialog]
+            {
+                // TODO: #vkutin #3.2 Full updates like this are slow. Refactor in 3.2.
+                if (m_dialogDelegate)
+                {
+                    dialog.showAlert(m_dialogDelegate->validationMessage(
+                        dialog.totalCheckedUsers()));
+                }
+                else
+                {
+                    dialog.showAlert(!dialog.allUsers() && dialog.checkedSubjects().empty()
+                        ? vms::event::StringsHelper::needToSelectUserText()
+                        : QString());
+                }
+            };
+
+        connect(&dialog, &SubjectSelectionDialog::changed, this, updateAlert);
+        updateAlert();
+
+        if (dialog.exec() != QDialog::Accepted)
+            return;
+
+        if (dialog.allUsers())
+            m_resources = QSet<QnUuid>({ QnBusinessRuleViewModel::kAllUsersId });
+        else
+            m_resources = dialog.checkedSubjects();
+    }
+    else
+    {
+        QnResourceSelectionDialog dialog(m_target, this);
+        dialog.setSelectedResources(m_resources);
+        dialog.setDelegate(m_dialogDelegate);
+
+        if (dialog.exec() != QDialog::Accepted)
+            return;
+
+        m_resources = dialog.selectedResources();
+    }
+
     emit commit();
 }
 
@@ -214,19 +273,6 @@ QWidget* QnBusinessRuleItemDelegate::createEditor(QWidget *parent, const QStyleO
         {
             vms::event::ActionType actionType = index.data(Qn::ActionTypeRole).value<vms::event::ActionType>();
 
-            switch (actionType)
-            {
-                case vms::event::ShowPopupAction:
-                {
-                    QComboBox* comboBox = new QComboBox(parent);
-                    comboBox->addItem(tr("For Users"), vms::event::EveryOne);
-                    comboBox->addItem(tr("For Administrators Only"), vms::event::AdminOnly);
-                    return comboBox;
-                }
-                default:
-                    break;
-            }
-
             QnSelectResourcesDialogButton* btn = new QnSelectResourcesDialogButton(parent);
             connect(btn, SIGNAL(commit()), this, SLOT(at_editor_commit()));
 
@@ -249,6 +295,10 @@ QWidget* QnBusinessRuleItemDelegate::createEditor(QWidget *parent, const QStyleO
             else if (actionType == vms::event::SendMailAction)
             {
                 btn->setDialogDelegate(new QnSendEmailActionDelegate(btn));
+                btn->setSelectionTarget(QnResourceSelectionDialog::Filter::users);
+            }
+            else if (actionType == vms::event::ShowPopupAction)
+            {
                 btn->setSelectionTarget(QnResourceSelectionDialog::Filter::users);
             }
             else if (actionType == vms::event::PlaySoundAction ||
@@ -310,23 +360,6 @@ void QnBusinessRuleItemDelegate::setEditorData(QWidget *editor, const QModelInde
         }
         case Column::target:
         {
-            vms::event::ActionType actionType = index.data(Qn::ActionTypeRole).value<vms::event::ActionType>();
-
-            switch (actionType)
-            {
-                case vms::event::ShowPopupAction:
-                {
-                    if (QComboBox* comboBox = dynamic_cast<QComboBox *>(editor))
-                    {
-                        comboBox->setCurrentIndex(comboBox->findData(index.data(Qt::EditRole)));
-                        connect(comboBox, SIGNAL(currentIndexChanged(int)), this, SLOT(at_editor_commit()));
-                    }
-                    return;
-                }
-                default:
-                    break;
-            }
-
             if (QnSelectResourcesDialogButton* btn = dynamic_cast<QnSelectResourcesDialogButton *>(editor))
             {
                 btn->setResources(index.data(Qn::ActionResourcesRole).value<QSet<QnUuid>>());
@@ -368,39 +401,13 @@ void QnBusinessRuleItemDelegate::setModelData(QWidget *editor, QAbstractItemMode
     switch (Column(index.column()))
     {
         case Column::source:
-        {
-            if (QnSelectResourcesDialogButton* btn = dynamic_cast<QnSelectResourcesDialogButton *>(editor))
-            {
-                model->setData(index, QVariant::fromValue<QSet<QnUuid>>(btn->resources()));
-                return;
-            }
-
-            break;
-        }
         case Column::target:
         {
-            vms::event::ActionType actionType = index.data(Qn::ActionTypeRole).value<vms::event::ActionType>();
-
-            switch (actionType)
-            {
-                case vms::event::ShowPopupAction:
-                {
-                    if (QComboBox* comboBox = dynamic_cast<QComboBox *>(editor))
-                    {
-                        model->setData(index, comboBox->itemData(comboBox->currentIndex()));
-                    }
-                    return;
-                }
-                default:
-                    break;
-            }
-
             if (QnSelectResourcesDialogButton* btn = dynamic_cast<QnSelectResourcesDialogButton *>(editor))
             {
-                model->setData(index, QVariant::fromValue<QSet<QnUuid>>(btn->resources()));
+                model->setData(index, qVariantFromValue(btn->resources()));
                 return;
             }
-
             break;
         }
         case Column::event:
@@ -439,7 +446,7 @@ void QnBusinessRuleItemDelegate::at_editor_commit()
 void QnBusinessRuleItemDelegate::updateEditorGeometry(QWidget* editor,
     const QStyleOptionViewItem& option, const QModelIndex& index) const
 {
-    switch (index.column())
+    switch (Column(index.column()))
     {
         case Column::event:
         case Column::action:

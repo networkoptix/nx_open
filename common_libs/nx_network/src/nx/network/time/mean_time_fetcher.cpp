@@ -61,11 +61,12 @@ void MeanTimeFetcher::getTimeAsyncInAioThread(
 
     for (std::unique_ptr<TimeFetcherContext>& ctx: m_timeFetchers)
     {
+        ctx->errorCode = SystemError::noError;
+        ctx->utcMillis = -1;
         ctx->timeFetcher->getTimeAsync(std::bind(
             &MeanTimeFetcher::timeFetchingDone,
             this, ctx.get(), _1, _2));
         ++m_awaitedAnswers;
-        ctx->errorCode = SystemError::noError;
     }
 
     m_completionHandler = std::move(completionHandler);
@@ -101,8 +102,7 @@ void MeanTimeFetcher::timeFetchingDone(
     {
         if (ctx->errorCode != SystemError::noError)
         {
-            auto completionHandler = std::move(m_completionHandler);
-            completionHandler(-1, ctx->errorCode);
+            nx::utils::swapAndCall(m_completionHandler, -1, ctx->errorCode);
             return;
         }
 
@@ -110,9 +110,7 @@ void MeanTimeFetcher::timeFetchingDone(
         if ((minUtcTimeMillis != std::numeric_limits<qint64>::max()) &&
             (qAbs(ctx->utcMillis - minUtcTimeMillis) > m_maxDeviationMillis))
         {
-            //failure
-            auto completionHandler = std::move(m_completionHandler);
-            completionHandler(-1, SystemError::invalidData);
+            nx::utils::swapAndCall(m_completionHandler, -1, SystemError::invalidData);
             return;
         }
 
@@ -124,8 +122,8 @@ void MeanTimeFetcher::timeFetchingDone(
 
     NX_ASSERT(collectedValuesCount > 0);
 
-    auto completionHandler = std::move(m_completionHandler);
-    completionHandler(
+    nx::utils::swapAndCall(
+        m_completionHandler,
         sumOfReceivedUtcTimesMillis / collectedValuesCount,
         SystemError::noError);
 }

@@ -14,6 +14,17 @@ function instantiate_config()
     mv $tmp $CLOUD_PORTAL_CONF_DIR/cloud_portal.yaml
 }
 
+function write_my_cnf()
+{
+    cat > ~/.my.cnf << EOF
+[client]
+user = $DB_USER
+password = $DB_PASSWORD
+host = $DB_HOST
+database = $DB_NAME
+EOF
+}
+
 ORIG_CUSTOMIZATION=$CUSTOMIZATION
 
 for customization in $ALL_CUSTOMIZATIONS
@@ -28,6 +39,9 @@ case "$1" in
         cp -R /app/app/static /static_volume
         ;;
     web)
+        write_my_cnf
+        echo "CREATE DATABASE IF NOT EXISTS $DB_NAME" | mysql -Dinformation_schema
+
         /app/env/bin/python manage.py migrate
         /app/env/bin/python manage.py createcachetable
 
@@ -35,6 +49,7 @@ case "$1" in
         exec /app/env/bin/gunicorn cloud.wsgi --capture-output --workers 4 --bind :5000 --log-level=debug
         ;;
     celery)
+        write_my_cnf
         rm -f /tmp/*.pid
         exec /app/env/bin/celery worker -A notifications -l info --concurrency=1 --pidfile=/tmp/celery-w1.pid
         ;;

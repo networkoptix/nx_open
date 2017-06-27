@@ -28,11 +28,21 @@
 #include <nx/vms/event/actions/send_mail_action.h>
 #include <nx/vms/event/actions/camera_output_action.h>
 
+namespace {
+
+QnUuid getActionRunningKey(const nx::vms::event::AbstractActionPtr& action)
+{
+    const auto key = action->getExternalUniqKey();
+    return guidFromArbitraryData(key);
+}
+
+} // namespace
+
 namespace nx {
 namespace mediaserver {
 namespace event {
 
-RuleProcessor::RuleProcessor(QnCommonModule* commonModule) :
+RuleProcessor::RuleProcessor(QnCommonModule* commonModule):
     QnCommonModuleAware(commonModule)
 {
     connect(qnEventMessageBus, &EventMessageBus::actionDelivered,
@@ -213,6 +223,13 @@ void RuleProcessor::executeAction(const vms::event::AbstractActionPtr& action)
             break;
         }
 
+        case vms::event::BookmarkAction:
+        {
+            if (handleBookmarkAction(action))
+                return;
+            break;
+        }
+
         default:
             break;
     }
@@ -276,6 +293,105 @@ bool RuleProcessor::executeActionInternal(const vms::event::AbstractActionPtr& a
     }
 
     return false;
+}
+
+bool RuleProcessor::updateProlongedActionStartTime(const vms::event::AbstractActionPtr& action)
+{
+    if (!action)
+    {
+        NX_EXPECT(false, "Action is null");
+        return false;
+    }
+
+    if (action->getParams().durationMs > 0
+        || action->getToggleState() != vms::event::ActiveState)
+    {
+        return false;
+    }
+
+    const auto key = getActionRunningKey(action);
+    const auto startTimeUsec = action->getRuntimeParams().eventTimestampUsec;
+    m_runningBookmarkActions[key] = startTimeUsec;
+    return true;
+}
+
+bool RuleProcessor::popProlongedActionStartTime(
+    const vms::event::AbstractActionPtr& action,
+    qint64& startTimeUsec)
+{
+    if (!action)
+    {
+        NX_EXPECT(false, "Invalid action");
+        return false;
+    }
+
+    if (action->getParams().durationMs > 0
+        || action->getToggleState() == vms::event::ActiveState)
+    {
+        return false;
+    }
+
+    const auto key = getActionRunningKey(action);
+    const auto it = m_runningBookmarkActions.find(key);
+    if (it == m_runningBookmarkActions.end())
+    {
+        NX_EXPECT(false, "Can't find prolonged action data");
+        return false;
+    }
+
+    startTimeUsec = *it;
+    m_runningBookmarkActions.erase(it);
+    return true;
+}
+
+bool RuleProcessor::fixActionTimeFields(const vms::event::AbstractActionPtr& action)
+{
+    if (!action)
+    {
+        NX_EXPECT(false, "Invalid action");
+        return false;
+    }
+
+    const bool isProlonged = action->getParams().durationMs <= 0;
+    if (isProlonged && updateProlongedActionStartTime(action))
+        return false; //< Do not process event until it is finished
+
+    qint64 startTimeUsec = action->getRuntimeParams().eventTimestampUsec;
+    if (isProlonged && !popProlongedActionStartTime(action, startTimeUsec))
+    {
+        NX_EXPECT(false, "Something went wrong");
+        return false; //< Do not process event at all
+    }
+
+    if (isProlonged)
+    {
+        const auto endTimeUsec = action->getRuntimeParams().eventTimestampUsec;
+        action->getParams().durationMs = (endTimeUsec - startTimeUsec) / 1000;
+        action->getRuntimeParams().eventTimestampUsec = startTimeUsec;
+    }
+
+    return true;
+}
+
+bool RuleProcessor::handleBookmarkAction(const vms::event::AbstractActionPtr& action)
+{
+    if (!action->getParams().needConfirmation)
+        return false;
+
+    if (action->actionType() != vms::event::BookmarkAction)
+    {
+        NX_EXPECT(false, "Invalid action");
+        return false;
+    }
+
+    if (!fixActionTimeFields(action))
+        return false;
+
+    action->getParams().targetActionType = action->actionType();
+    action->setActionType(vms::event::ShowPopupAction);
+
+    broadcastAction(action);
+    return true;
 }
 
 void RuleProcessor::addRule(const vms::event::RulePtr& value)

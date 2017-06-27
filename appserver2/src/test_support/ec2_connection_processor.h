@@ -20,7 +20,8 @@ protected:
     virtual void run() override;
     virtual void pleaseStop() override;
     bool processRequest(bool noAuth);
-
+    bool authenticate();
+    void addAuthHeader(nx_http::Response& response);
 private:
     QnMutex m_mutex;
     QnTCPConnectionProcessor* m_processor = nullptr;

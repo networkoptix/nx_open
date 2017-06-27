@@ -5,6 +5,7 @@
 #include <network/http_connection_listener.h>
 #include <network/tcp_connection_priv.h>
 #include <rest/server/rest_connection_processor.h>
+#include <nx/network/app_info.h>
 
 Ec2ConnectionProcessor::Ec2ConnectionProcessor(
     QSharedPointer<AbstractStreamSocket> socket,
@@ -18,6 +19,38 @@ Ec2ConnectionProcessor::Ec2ConnectionProcessor(
 Ec2ConnectionProcessor::~Ec2ConnectionProcessor()
 {
     stop();
+}
+
+void Ec2ConnectionProcessor::addAuthHeader(nx_http::Response& response)
+{
+    const QString auth =
+        lit("Digest realm=\"%1\", nonce=\"%2\", algorithm=MD5")
+        .arg(nx::network::AppInfo::realm())
+        .arg(QDateTime::currentDateTime().toMSecsSinceEpoch());
+
+    nx_http::insertOrReplaceHeader(&response.headers, nx_http::HttpHeader(
+        "WWW-Authenticate",
+        auth.toLatin1()));
+}
+
+bool Ec2ConnectionProcessor::authenticate()
+{
+    Q_D(QnTCPConnectionProcessor);
+
+    auto owner = static_cast<QnHttpConnectionListener*>(d->owner);
+    if (!owner->needAuth())
+        return true;
+
+    const nx_http::StringType& authorization =
+        nx_http::getHeaderValue(d->request.headers, "Authorization");
+    if (authorization.isEmpty())
+    {
+        addAuthHeader(
+            d->response);
+        return false;
+    }
+
+    return true;
 }
 
 void Ec2ConnectionProcessor::run()
@@ -34,20 +67,29 @@ void Ec2ConnectionProcessor::run()
     bool ready = true;
     bool isKeepAlive = false;
 
-    while (1)
+    int authenticateTries = 0;
+    while (authenticateTries < 3)
     {
         if (ready)
         {
             t.restart();
             parseRequest();
 
-            bool noAuth = true;
+            if (!authenticate())
+            {
+                sendUnauthorizedResponse(nx_http::StatusCode::unauthorized, STATIC_UNAUTHORIZED_HTML);
+                ready = readRequest();
+                ++authenticateTries;
+                continue;
+            }
+            authenticateTries = 0;
 
             isKeepAlive = isConnectionCanBePersistent();
 
 
             // getting a new handler inside is necessary due to possibility of
             // changing request during authentication
+            bool noAuth = false;
             if (!processRequest(noAuth))
             {
                 QByteArray contentType;
@@ -86,10 +128,10 @@ bool Ec2ConnectionProcessor::processRequest(bool noAuth)
     if (!needToStop())
     {
         copyClientRequestTo(*m_processor);
-        if (m_processor->isTakeSockOwnership())
+        if (m_processor->isSocketTaken())
             d->socket.clear(); // some of handlers have addition thread and depend of socket destructor. We should clear socket immediately to prevent race condition
         m_processor->execute(m_mutex);
-        if (!m_processor->isTakeSockOwnership())
+        if (!m_processor->isSocketTaken())
             m_processor->releaseSocket();
         else
             d->socket.clear(); // some of handlers set ownership dynamically during a execute call. So, check it again.

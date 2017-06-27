@@ -21,6 +21,8 @@ from test_utils.server_factory import ServerFactory
 from test_utils.camera import SampleMediaFile, CameraFactory
 
 
+JUNK_SHOP_PLUGIN_NAME = 'junk-shop-db-capture'
+
 DEFAULT_CLOUD_GROUP = 'test'
 DEFAULT_CUSTOMIZATION = 'default'
 
@@ -89,8 +91,6 @@ def pytest_addoption(parser):
     parser.addoption('--log-level', default=log_levels[0], type=str.upper,
                      choices=log_levels,
                      help='Change log level (%s). Default is %s' % (', '.join(log_levels), log_levels[0]))
-    parser.addoption('--scalability-yaml-config-file',
-                     help='Configuration file for the scalability test.')
     parser.addoption('--tests-config-file', type=TestsConfig.from_yaml_file, nargs='*',
                      help='Configuration file for tests, in yaml format.')
 
@@ -144,11 +144,22 @@ def test_config(request, run_options):
         return SingleTestConfig()
 
 @pytest.fixture
-def artifact_file(request, run_options):
+def artifact_factory(request, run_options):
+    db_capture_plugin = request.config.pluginmanager.getplugin(JUNK_SHOP_PLUGIN_NAME)
+    if db_capture_plugin:
+        db_capture_repository = db_capture_plugin.repo
+        current_test_run = db_capture_plugin.current_test_run
+        assert current_test_run
+    else:
+        db_capture_repository = None
+        current_test_run = None
     artifact_path_prefix = os.path.join(
         run_options.work_dir,
-        os.path.basename(request.node.nodeid.replace(':', '_').replace('.py', '')))
-    return ArtifactFactory(artifact_path_prefix)
+        os.path.basename(request.node.nodeid.replace('::', '-').replace('.py', '')))
+    artifact_set = set()
+    artifact_factory = ArtifactFactory.from_path(db_capture_repository, current_test_run, artifact_set, artifact_path_prefix)
+    yield artifact_factory
+    artifact_factory.release()
 
 
 @pytest.fixture(scope='session')
@@ -201,11 +212,11 @@ def physical_installation_ctl(run_options, init_logging, customization_company_n
     return pic
 
 @pytest.fixture
-def server_factory(run_options, init_logging, artifact_file, customization_company_name,
+def server_factory(run_options, init_logging, artifact_factory, customization_company_name,
                    cloud_host_host, box, physical_installation_ctl):
     server_factory = ServerFactory(
         run_options.reset_servers,
-        artifact_file,
+        artifact_factory,
         customization_company_name,
         cloud_host_host,
         box,

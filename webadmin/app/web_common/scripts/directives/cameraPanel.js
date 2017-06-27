@@ -7,26 +7,28 @@ angular.module('nxCommon')
                 "activeCamera":"=",
                 "camerasProvider": "=",
                 "player": "=",
+                "system": "=",
                 "currentResolution": "=",
+                "positionProvider": "=",
                 "toggleCameraPanel": "="
             },
             templateUrl: Config.viewsDirCommon + 'components/cameraPanel.html',
             link: function (scope, element/*, attrs*/) {
                 scope.Config = Config;
-                scope.searchCams = "";
                 scope.storage = $localStorage;
+                scope.searchCams = '';
+                scope.inputPlaceholder = L.common.searchCamPlaceholder;
 
                 var updateCameras = function(){
                     scope.cameras = scope.camerasProvider.cameras;
+                    searchCams();
                 };
                 var updateMediaServers = function(){
                     scope.mediaServers = scope.camerasProvider.getMediaServers();
                 };
 
-                scope.camerasProvider.setSearchCams(searchCams);
-
-                scope.$watch('camerasProvider.cameras',updateCameras);
-                scope.$watch('camerasProvider.mediaServers',updateMediaServers);
+                scope.$watch('camerasProvider.cameras',updateCameras, true);
+                scope.$watch('camerasProvider.mediaServers',updateMediaServers, true);
                 
 
                 scope.selectCamera = function (activeCamera) {

@@ -90,6 +90,15 @@ QSet<QnUuid> filterEventResources(const QSet<QnUuid>& ids, vms::event::EventType
     return QSet<QnUuid>();
 }
 
+template<class IDList>
+QSet<QnUuid> filterSubjectIds(const IDList& ids)
+{
+    QnUserResourceList users;
+    QList<QnUuid> roles;
+    qnClientCoreModule->commonModule()->userRolesManager()->usersAndRoles(ids, users, roles);
+    return toIds(users).unite(roles.toSet());
+}
+
 QSet<QnUuid> filterActionResources(const QSet<QnUuid>& ids, vms::event::ActionType actionType)
 {
     auto resourcePool = qnClientCoreModule->commonModule()->resourcePool();
@@ -97,15 +106,8 @@ QSet<QnUuid> filterActionResources(const QSet<QnUuid>& ids, vms::event::ActionTy
     if (vms::event::requiresCameraResource(actionType))
         return toIds(resourcePool->getResources<QnVirtualCameraResource>(ids));
 
-    if (vms::event::requiresUserResource(actionType))
-    {
-        auto users = resourcePool->getResources<QnUserResource>(ids);
-        auto roles = qnClientCoreModule->commonModule()->userRolesManager()->userRoles(ids);
-        auto result = toIds(users);
-        for (auto role : roles)
-            result << role.id;
-        return result;
-    }
+    if (requiresUserResource(actionType))
+        return filterSubjectIds(ids);
 
     return QSet<QnUuid>();
 }
@@ -137,6 +139,8 @@ QList<QnBusinessRuleViewModel::Column> QnBusinessRuleViewModel::allColumns()
     return result;
 }
 
+const QnUuid QnBusinessRuleViewModel::kAllUsersId;
+
 QnBusinessRuleViewModel::QnBusinessRuleViewModel(QObject* parent):
     base_type(parent),
     QnWorkbenchContextAware(parent),
@@ -152,7 +156,6 @@ QnBusinessRuleViewModel::QnBusinessRuleViewModel(QObject* parent):
     m_actionTypesModel(new QStandardItemModel(this)),
     m_helper(new vms::event::StringsHelper(commonModule()))
 {
-
     QnBusinessTypesComparator lexComparator;
     for (vms::event::EventType eventType : lexComparator.lexSortedEvents())
     {
@@ -225,17 +228,9 @@ QVariant QnBusinessRuleViewModel::data(Column column, const int role) const
                 case Column::action:
                     return m_actionType;
                 case Column::target:
-                {
-                    switch (m_actionType)
-                    {
-                        case vms::event::SendMailAction:
-                            return m_actionParams.emailAddress;
-                        case vms::event::ShowPopupAction:
-                            return (int) m_actionParams.userGroup;
-                        default:
-                            break;
-                    }
-                }
+                    if (m_actionType == vms::event::SendMailAction)
+                        return m_actionParams.emailAddress;
+                    break;
                 case Column::aggregation:
                     return m_aggregationPeriodSec;
                 default:
@@ -258,12 +253,20 @@ QVariant QnBusinessRuleViewModel::data(Column column, const int role) const
         case Qn::EventTypeRole:
             return qVariantFromValue(m_eventType);
         case Qn::EventResourcesRole:
-            return QVariant::fromValue<QSet<QnUuid>>(filterEventResources(m_eventResources, m_eventType));
+            return qVariantFromValue(filterEventResources(m_eventResources, m_eventType));
         case Qn::ActionTypeRole:
             return qVariantFromValue(m_actionType);
         case Qn::ActionResourcesRole:
-            return QVariant::fromValue<QSet<QnUuid>>(filterActionResources(m_actionResources, m_actionType));
+        {
+            auto ids = m_actionType != vms::event::ShowPopupAction
+                ? filterActionResources(m_actionResources, m_actionType)
+                : filterSubjectIds(m_actionParams.additionalResources);
 
+            if (m_actionParams.allUsers)
+                ids.insert(kAllUsersId);
+
+            return qVariantFromValue(ids);
+        }
         case Qn::HelpTopicIdRole:
             return getHelpTopic(column);
         default:
@@ -288,33 +291,50 @@ bool QnBusinessRuleViewModel::setData(Column column, const QVariant& value, int 
         case Column::event:
             setEventType((vms::event::EventType)value.toInt());
             return true;
+
         case Column::action:
             setActionType((vms::event::ActionType)value.toInt());
             return true;
+
         case Column::source:
             setEventResources(value.value<QSet<QnUuid>>());
             return true;
+
         case Column::target:
+        {
+            auto subjects = value.value<QSet<QnUuid>>();
+            const bool allUsers = subjects.remove(kAllUsersId);
+
+            if (allUsers != m_actionParams.allUsers)
+            {
+                auto params = m_actionParams;
+                params.allUsers = allUsers;
+                setActionParams(params);
+                if (allUsers)
+                    return true;
+            }
+
             switch (m_actionType)
             {
                 case vms::event::ShowPopupAction:
                 {
-                    vms::event::ActionParameters params = m_actionParams;
-
-                    // TODO: #GDM #Business you're implicitly relying on what enum values are, which is very bad.
-                    // This code will fail silently if someone changes the header. Please write it properly.
-                    params.userGroup = (vms::event::UserGroup) value.toInt();
+                    auto params = m_actionParams;
+                    params.additionalResources = decltype(params.additionalResources)(
+                        subjects.cbegin(), subjects.cend());
                     setActionParams(params);
                     break;
                 }
                 default:
-                    setActionResources(value.value<QSet<QnUuid>>());
+                    setActionResources(subjects);
                     break;
             }
             return true;
+        }
+
         case Column::aggregation:
             setAggregationPeriod(value.toInt());
             return true;
+
         default:
             break;
     }
@@ -805,9 +825,17 @@ QIcon QnBusinessRuleViewModel::getIcon(Column column) const
 
                 case vms::event::ShowPopupAction:
                 {
-                    if (m_actionParams.userGroup == vms::event::AdminOnly)
-                        return qnResIconCache->icon(QnResourceIconCache::User);
-                    return qnResIconCache->icon(QnResourceIconCache::Users);
+                    if (m_actionParams.allUsers)
+                        return qnResIconCache->icon(QnResourceIconCache::Users);
+                    if (!isValid(Column::target))
+                        return qnSkin->icon("tree/user_alert.png");
+
+                    QnUserResourceList users;
+                    QList<QnUuid> roles;
+                    userRolesManager()->usersAndRoles(m_actionParams.additionalResources, users, roles);
+                    return (users.size() > 1 || !roles.empty())
+                        ? qnResIconCache->icon(QnResourceIconCache::Users)
+                        : qnResIconCache->icon(QnResourceIconCache::User);
                 }
 
                 case vms::event::ShowTextOverlayAction:
@@ -867,8 +895,6 @@ bool QnBusinessRuleViewModel::isValid(Column column) const
 {
     switch (column)
     {
-        //TODO: #vkutin Add Software Triggers support
-
         case Column::source:
         {
             auto filtered = filterEventResources(m_eventResources, m_eventType);
@@ -880,6 +906,9 @@ bool QnBusinessRuleViewModel::isValid(Column column) const
                 case vms::event::CameraInputEvent:
                     return isResourcesListValid<QnCameraInputPolicy>(
                         resourcePool()->getResources<QnCameraInputPolicy::resource_type>(filtered));
+                case vms::event::SoftwareTriggerEvent:
+                    return m_eventParams.metadata.allUsers
+                        || !m_eventParams.metadata.instigators.empty();
                 default:
                     return true;
             }
@@ -907,6 +936,10 @@ bool QnBusinessRuleViewModel::isValid(Column column) const
 		                    resourcePool()->getResources<QnCameraAudioTransmitPolicy::resource_type>(filtered))
 		                    || m_actionParams.playToClient
 		                );
+
+                case vms::event::ShowPopupAction:
+                    return m_actionParams.allUsers || !filterSubjectIds(
+                        m_actionParams.additionalResources).empty();
 
                 case vms::event::SayTextAction:
 		            return !m_actionParams.sayText.isEmpty()
@@ -1033,10 +1066,12 @@ QString QnBusinessRuleViewModel::getTargetText(const bool detailed) const
         }
         case vms::event::ShowPopupAction:
         {
-            if (m_actionParams.userGroup == vms::event::AdminOnly)
-                return tr("Administrators Only");
-            else
-                return tr("Users");
+            if (m_actionParams.allUsers)
+                return nx::vms::event::StringsHelper::allUsersText();
+            QnUserResourceList users;
+            QList<QnUuid> roles;
+            userRolesManager()->usersAndRoles(m_actionParams.additionalResources, users, roles);
+            return m_helper->actionSubjects(users, roles);
         }
         case vms::event::BookmarkAction:
         case vms::event::CameraRecordingAction:

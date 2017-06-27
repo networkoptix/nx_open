@@ -1,0 +1,17 @@
+<div class="modal-header">
+    <h3 class="modal-title">מאתחל מערכת...</h3>
+</div>
+
+<form class="form" role="form" id="restartDialog">
+    <div class="col-sm-12">
+        <p>הפעלת המערכת מחדש עשויה להימשך זמן מה. לאחר מכן הדף יתרענן באופן אוטומטי.</p>
+        <progressbar class="progress-striped active" type="info" value="100" id="restartingProgress">{{state}}</progressbar>
+
+        <p>אם לא יקרה כלום במשך זמן מה, אנא רענן את הדף באופן ידני</p>
+    </div>
+
+    <div class="modal-footer">
+        <button class="btn btn-primary pull-left" name="button" ng-click="refresh()" ng-disabled="form.$invalid">רענן</button>
+    </div>
+
+</form>

@@ -99,7 +99,10 @@ TEST_F(TcpReverseAcceptorTest, Connect)
         for (const OptSize& poolSize: {OptSize(), OptSize(3), OptSize(5)})
         {
             typedef boost::optional<KeepAliveOptions> OptKa;
-            for (const OptKa& keepAlive: {OptKa(), OptKa(KeepAliveOptions(3, 2, 1))})
+            const auto keepAliveOptionsArray = {
+                OptKa(),
+                OptKa(KeepAliveOptions(std::chrono::seconds(3), std::chrono::seconds(2), 1))};
+            for (const OptKa& keepAlive: keepAliveOptionsArray)
             {
                 for (const auto& message: {Buffer(""), nx::utils::random::generate(1024)})
                 {

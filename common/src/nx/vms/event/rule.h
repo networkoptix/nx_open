@@ -78,8 +78,8 @@ public:
     void removeResource(const QnUuid& resId);
 
 private:
-    Rule(int internalId, int aggregationPeriod, const QByteArray& actionParams, bool isSystem,
-        ActionType bActionType, EventType bEventType, const QnUuid& actionResId = QnUuid());
+    Rule(int internalId, int aggregationPeriod,  bool isSystem, ActionType bActionType,
+        EventType bEventType, const QList<QnUuid>& subjectIds = {}, bool allUsers = false);
 
     QnUuid m_id;
 

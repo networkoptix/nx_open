@@ -241,84 +241,88 @@ void HttpStreamReader::setBreakAfterReadingHeaders(bool val)
 
 bool HttpStreamReader::parseLine(const ConstBufferRefType& data)
 {
-    switch (m_state)
+    for (;;)
     {
-        case messageDone:
-        case parseError:
-            // Starting parsing next message.
-            resetStateInternal();
-
-        case waitingMessageStart:
+        switch (m_state)
         {
-            if (data.isEmpty())
-                return true; //skipping empty lines
-                             //deciding what we parsing: request line or status line
-                             //splitting to tokens separated by ' '
-                             //if first token contains '/' then considering line to be status line, else it is request line
-                             //const size_t pos = data.find_first_of( " /\r\n", offset, sizeof(" /\r\n")-1 );
-            static const char separators[] = " /\r\n";
-            const char* pos = std::find_first_of(data.data(), data.data() + data.size(), separators, separators + sizeof(separators) - 1);
-            if (pos == data.data() + data.size() || *pos == '\r' || *pos == '\n')
-                return false;
-            if (*pos == ' ')  //< Considering message to be request (first token does not contain /, so it looks like METHOD).
-            {
-                m_httpMessage = Message(MessageType::request);
-                m_httpMessage.request->requestLine.parse(data);
-            }
-            else    //< Response.
-            {
-                m_httpMessage = Message(MessageType::response);
-                m_httpMessage.response->statusLine.parse(data);
-            }
-            m_state = readingMessageHeaders;
-            return true;
-        }
+            case messageDone:
+            case parseError:
+                // Starting parsing next message.
+                resetStateInternal();
+                continue;
 
-        case readingMessageHeaders:
-        {
-            // Parsing header.
-            if (data.isEmpty())    //< Empty line received: assuming all headers read.
+            case waitingMessageStart:
             {
-                if (prepareToReadMessageBody()) //< Checking message body parameters in response.
+                if (data.isEmpty())
+                    return true; //skipping empty lines
+                                //deciding what we parsing: request line or status line
+                                //splitting to tokens separated by ' '
+                                //if first token contains '/' then considering line to be status line, else it is request line
+                                //const size_t pos = data.find_first_of( " /\r\n", offset, sizeof(" /\r\n")-1 );
+                static const char separators[] = " /\r\n";
+                const char* pos = std::find_first_of(data.data(), data.data() + data.size(), separators, separators + sizeof(separators) - 1);
+                if (pos == data.data() + data.size() || *pos == '\r' || *pos == '\n')
+                    return false;
+                if (*pos == ' ')  //< Considering message to be request (first token does not contain /, so it looks like METHOD).
                 {
-                    // TODO #ak reliably check that message body is expected
-                    //   in any case allowing to read message body because it could be present
-                    //   anyway (e.g., some bug on custom http server).
-                    if (m_contentLength && m_contentLength.get() == 0)
-                    {
-                        // Server purposefully reported empty message body.
-                        m_state = m_lineSplitter.currentLineEndingClosed()
-                            ? messageDone
-                            : pullingLineEndingBeforeMessageBody;
-                        m_nextState = messageDone;
-                    }
-                    else
-                    {
-                        m_state = pullingLineEndingBeforeMessageBody;
-                        m_nextState = readingMessageBody;
-                        m_chunkStreamParseState = waitingChunkStart;
-                    }
+                    m_httpMessage = Message(MessageType::request);
+                    m_httpMessage.request->requestLine.parse(data);
                 }
-                else
+                else    //< Response.
                 {
-                    // Cannot read (decode) message body.
-                    m_state = parseError;
+                    m_httpMessage = Message(MessageType::response);
+                    m_httpMessage.response->statusLine.parse(data);
                 }
+                m_state = readingMessageHeaders;
                 return true;
             }
 
-            // Parsing header.
-            nx_http::StringType headerName;
-            nx_http::StringType headerValue;
-            if (!parseHeader(&headerName, &headerValue, data))
-                return false;
-            m_httpMessage.headers().insert(std::make_pair(headerName, headerValue));
-            return true;
-        }
+            case readingMessageHeaders:
+            {
+                // Parsing header.
+                if (data.isEmpty())    //< Empty line received: assuming all headers read.
+                {
+                    if (prepareToReadMessageBody()) //< Checking message body parameters in response.
+                    {
+                        // TODO #ak reliably check that message body is expected
+                        //   in any case allowing to read message body because it could be present
+                        //   anyway (e.g., some bug on custom http server).
+                        if (m_contentLength && m_contentLength.get() == 0)
+                        {
+                            // Server purposefully reported empty message body.
+                            m_state = m_lineSplitter.currentLineEndingClosed()
+                                ? messageDone
+                                : pullingLineEndingBeforeMessageBody;
+                            m_nextState = messageDone;
+                        }
+                        else
+                        {
+                            m_state = pullingLineEndingBeforeMessageBody;
+                            m_nextState = readingMessageBody;
+                            m_chunkStreamParseState = waitingChunkStart;
+                        }
+                    }
+                    else
+                    {
+                        // Cannot read (decode) message body.
+                        m_state = parseError;
+                    }
+                    return true;
+                }
 
-        default:
-            NX_ASSERT(false);
-            return false;
+                // Parsing header.
+                nx_http::StringType headerName;
+                nx_http::StringType headerValue;
+                if (!parseHeader(&headerName, &headerValue, data))
+                    return false;
+                m_httpMessage.headers().insert(std::make_pair(headerName, headerValue));
+                return true;
+            }
+
+            default:
+                NX_ASSERT(false);
+                return false;
+        }
     }
 }
 
@@ -328,8 +332,8 @@ bool HttpStreamReader::prepareToReadMessageBody()
 
     if (m_httpMessage.type == MessageType::request)
     {
-        if (m_httpMessage.request->requestLine.method != nx_http::Method::POST &&
-            m_httpMessage.request->requestLine.method != nx_http::Method::PUT)
+        if (m_httpMessage.request->requestLine.method != nx_http::Method::Post &&
+            m_httpMessage.request->requestLine.method != nx_http::Method::Put)
         {
             // Only POST and PUT are allowed to have message body.
             m_contentLength = 0;

@@ -6,8 +6,10 @@
 #include <QtCore/QHash>
 #include <QtCore/QVector>
 
+#include <utils/common/util.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/system_error.h>
+#include <nx/utils/file_system.h>
 #include <utils/common/warnings.h>
 
 #define NOMINMAX
@@ -36,7 +38,7 @@ namespace {
         int localId = _wtoi(description);
         if(localId == 0 && description[0] != L'0')
             return false;
-        
+
         if(partitions) {
             if (hasName)
                 *partitions = pos;
@@ -75,8 +77,8 @@ public:
         PDH_RAW_COUNTER counter;
     };
 
-    QnWindowsMonitorPrivate(): 
-        pdhLibrary(0), 
+    QnWindowsMonitorPrivate():
+        pdhLibrary(0),
         query(0),
         diskCounter(0),
         lastCollectTimeMSec(0),
@@ -107,10 +109,10 @@ public:
         }
 
         /* Note:
-         * 
+         *
          * 234 = PhysicalDisk
          * 200 = % Disk Time
-         * 
+         *
          * See http://support.microsoft.com/?scid=kb%3Ben-us%3B287159&x=11&y=9  */
         QString diskQuery = QString(QLatin1String("\\%1(*)\\%2")).arg(perfName(234)).arg(perfName(200));
         if(INVOKE(PdhAddCounterW(query, reinterpret_cast<LPCWSTR>(diskQuery.utf16()), 0, &diskCounter)) != ERROR_SUCCESS)
@@ -124,7 +126,7 @@ public:
 
         /* Note that we can't use GetTickCount64 since it doesn't exist under XP.
          * GetTickCount wraps every ~50 days, but for this check the wrap is irrelevant. */
-        ULONGLONG timeMSec = GetTickCount(); 
+        ULONGLONG timeMSec = GetTickCount();
         if(timeMSec - lastCollectTimeMSec < UpdateIntervalMSec)
             return; /* Don't update too often. */
 
@@ -188,7 +190,7 @@ public:
     void readDiskCounterValues(PDH_HCOUNTER counter, QHash<int, HddItem> *items) {
         NX_ASSERT(items);
         items->clear();
-        
+
         DWORD bufferSize = 0, itemCount = 0;
 
         PDH_STATUS status = PdhGetRawCounterArrayW(counter, &bufferSize, &itemCount, NULL);
@@ -224,9 +226,9 @@ public:
     }
 
     qreal diskCounterValue(PDH_HCOUNTER counter, const PDH_RAW_COUNTER &last, const PDH_RAW_COUNTER &current) {
-        if(last.FirstValue == current.FirstValue) 
+        if(last.FirstValue == current.FirstValue)
             return 0.0;
-        
+
         PDH_FMT_COUNTERVALUE result;
         PDH_STATUS status = PdhCalculateCounterFromRawValue(
             counter,
@@ -237,8 +239,8 @@ public:
         if(status != PDH_CSTATUS_NEW_DATA && status != ERROR_SUCCESS) {
             checkError("PdhCalculateCounterFromRawValue", status);
             return 0.0;
-        } 
-        
+        }
+
         return result.doubleValue / 100.0;
     }
 
@@ -331,7 +333,7 @@ public:
 
 private:
     const QnWindowsMonitorPrivate *d_func() const { return this; } /* For INVOKE to work. */
-    
+
     struct NetworkInterfaceStatData
     {
         QnPlatformMonitor::NetworkLoad load;
@@ -358,16 +360,16 @@ private:
 
     /** Disk time counter, <tt>'\PhysicalDisk(*)\% Disk Time'</tt>. */
     PDH_HCOUNTER diskCounter;
-    
+
     /** Time of the last collect operation. Counter is not re-read if the
      * time passed since the last collect is small. */
     ULONGLONG lastCollectTimeMSec;
 
-    /** Data collected from the disk time counter, in a sane format. 
+    /** Data collected from the disk time counter, in a sane format.
      * Note that strings stored here point into the raw data buffer. */
     QHash<int, HddItem> itemByDiskId;
 
-    /** Data collected from the disk time counter during the last collect 
+    /** Data collected from the disk time counter during the last collect
      * operation. */
     QHash<int, HddItem> lastItemByDiskId;
 
@@ -412,6 +414,13 @@ QList<QnPlatformMonitor::PartitionSpace> QnWindowsMonitor::totalPartitionSpaceIn
         PartitionSpace driveInfo;
         driveInfo.path = QString::fromWCharArray(curDiskName, sizeof(curDiskName)/sizeof(*curDiskName)-1);  //omitting trailing backslash
         NX_LOG( lit("MONITOR. Found disk %1").arg(driveInfo.path), cl_logDEBUG2 );
+
+        if (!nx::utils::file_system::mediaIsInserted(driveInfo.path))
+        {
+            NX_LOG(lit("MONITOR. Failed to check media for disk %1.").arg(driveInfo.path), cl_logDEBUG2);
+            continue;
+        }
+
         switch( GetDriveType(curDiskName) )
         {
             case DRIVE_NO_ROOT_DIR:
@@ -467,7 +476,7 @@ QList<QnPlatformMonitor::HddLoad> QnWindowsMonitor::totalHddLoad() {
     QList<QnPlatformMonitor::HddLoad> result;
     for(const QnWindowsMonitorPrivate::HddItem &item: d->itemByDiskId) {
         qreal load = 0.0;
-        if(d->lastItemByDiskId.contains(item.hdd.id)) 
+        if(d->lastItemByDiskId.contains(item.hdd.id))
             load = d->diskCounterValue(d->diskCounter, d->lastItemByDiskId[item.hdd.id].counter, item.counter);
 
         result.push_back(HddLoad(item.hdd, load));

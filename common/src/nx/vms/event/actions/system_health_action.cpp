@@ -3,6 +3,7 @@
 #include <nx/vms/event/events/abstract_event.h>
 #include <nx/vms/event/action_parameters.h>
 
+#include <core/resource_management/user_roles_manager.h>
 #include <utils/common/synctime.h>
 
 namespace nx {
@@ -22,7 +23,7 @@ SystemHealthAction::SystemHealthAction(
     setRuntimeParams(runtimeParams);
 
     ActionParameters actionParams;
-    actionParams.userGroup = AdminOnly;
+    actionParams.additionalResources = QnUserRolesManager::adminRoleIds().toVector().toStdVector();
     setParams(actionParams);
 }
 

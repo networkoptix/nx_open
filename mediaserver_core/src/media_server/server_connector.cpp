@@ -38,7 +38,6 @@ static QString makeModuleUrl(const nx::vms::discovery::ModuleEndpoint& module)
 
 void QnServerConnector::addConnection(const nx::vms::discovery::ModuleEndpoint& module)
 {
-    QString oldUrl;
     const auto newUrl = makeModuleUrl(module);
     {
         QnMutexLocker lock(&m_mutex);
@@ -48,19 +47,11 @@ void QnServerConnector::addConnection(const nx::vms::discovery::ModuleEndpoint& 
             NX_VERBOSE(this, lm("Module %1 change does not affect URL %2").args(module.id, newUrl));
             return;
         }
-
-        oldUrl = value;
         value = newUrl;
     }
 
     NX_DEBUG(this, lm("Adding connection to module %1 by URL %2").args(module.id, newUrl));
-    commonModule()->ec2Connection()->addRemotePeer(newUrl);
-
-    if (!oldUrl.isNull())
-    {
-        NX_DEBUG(this, lm("Removing old module %1 URL %2").args(module.id, oldUrl));
-        commonModule()->ec2Connection()->deleteRemotePeer(oldUrl);
-    }
+    commonModule()->ec2Connection()->addRemotePeer(module.id, newUrl);
 }
 
 void QnServerConnector::removeConnection(const QnUuid& id)
@@ -74,8 +65,8 @@ void QnServerConnector::removeConnection(const QnUuid& id)
     if (moduleUrl.isNull())
         return;
 
-    NX_DEBUG(this, lm("Removing connection to module %1 by URL %2").args(id, (moduleUrl)));
-    commonModule()->ec2Connection()->deleteRemotePeer(moduleUrl);
+    NX_LOGX(lm("Removing connection to module %1 by URL %2").args(id, (moduleUrl)), cl_logINFO);
+    commonModule()->ec2Connection()->deleteRemotePeer(id);
 
     const auto server = resourcePool()->getResourceById(id);
     if (server && server->getStatus() == Qn::Unauthorized)

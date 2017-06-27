@@ -21,12 +21,12 @@ Qn::StreamQuality RecordingAction::getStreamQuality() const
     return m_params.streamQuality;
 }
 
-int RecordingAction::getRecordDuration() const
+int RecordingAction::getDurationSec() const
 {
-    return m_params.recordingDuration;
+    return m_params.durationMs / 1000;
 }
 
-int RecordingAction::getRecordAfter() const
+int RecordingAction::getRecordAfterSec() const
 {
     return m_params.recordAfter;
 }

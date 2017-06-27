@@ -17,8 +17,8 @@ public:
 
     int getFps() const;
     Qn::StreamQuality getStreamQuality() const;
-    int getRecordDuration() const;
-    int getRecordAfter() const;
+    int getDurationSec() const;
+    int getRecordAfterSec() const;
 };
 
 } // namespace event

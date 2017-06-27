@@ -15,7 +15,6 @@
 #include <nx/mediaserver/event/event_connector.h>
 #include <nx/mediaserver/event/rule_processor.h>
 
-
 static const long long USEC_PER_MSEC = 1000;
 static const int SEND_ERROR_TIMEOUT = 1000 * 60;
 
@@ -54,6 +53,7 @@ void MediaServerStatusWatcher::at_resource_removed( const QnResourcePtr& resourc
 
 void MediaServerStatusWatcher::at_resource_statusChanged( const QnResourcePtr& resource )
 {
+
     const QnMediaServerResourcePtr& mserverRes = resource.dynamicCast<QnMediaServerResource>();
     if( !mserverRes )
         return;

@@ -120,7 +120,7 @@ namespace detail {
 template<typename T, typename F>
 ErrorCode saveTransactionImpl(const QnTransaction<T>& tran, ec2::QnTransactionLog *tlog, F f)
 {
-    QByteArray serializedTran = QnUbjsonTransactionSerializer::instance()->serializedTransaction(tran);
+    QByteArray serializedTran = tlog->serializer()->serializedTransaction(tran);
     return tlog->saveToDB(tran, f(tran.params), serializedTran);
 }
 
@@ -1174,7 +1174,7 @@ ec2::TransactionType::Value getRemoveUserTransactionTypeFromDb(
     detail::QnDbManager* db)
 {
     ApiUserDataList userDataList;
-    ec2::ErrorCode errorCode = db->doQuery(id, userDataList);
+    ec2::ErrorCode errorCode = db->doQueryNoLock(id, userDataList);
 
     if (errorCode != ErrorCode::ok || userDataList.empty())
         return ec2::TransactionType::Unknown;

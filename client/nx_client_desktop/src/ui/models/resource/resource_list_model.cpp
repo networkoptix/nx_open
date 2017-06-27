@@ -215,10 +215,6 @@ QVariant QnResourceListModel::data(const QModelIndex &index, int role) const
                     : Qt::Unchecked;
             break;
 
-        //TODO: #vkutin #GDM #common Refactor/replace this role
-        case Qn::DisabledRole:
-            return !m_checkedResources.contains(resource->getId());
-
         case Qn::ResourceRole:
             return QVariant::fromValue<QnResourcePtr>(resource);
         case Qn::ResourceFlagsRole:
@@ -258,7 +254,7 @@ bool QnResourceListModel::setData(const QModelIndex &index, const QVariant &valu
 
         emit dataChanged(index.sibling(index.row(), 0),
                          index.sibling(index.row(), ColumnCount - 1),
-                         { Qt::CheckStateRole, Qn::DisabledRole });
+                         { Qt::CheckStateRole });
         return true;
     }
 

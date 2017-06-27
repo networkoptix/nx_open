@@ -17,9 +17,11 @@ public:
      */
     typedef QMap<QnUuid, QPair<bool, bool>> ConnectingInfoMap;
 
+    bool contains(const QnUuid& id) const;
+
     ConnectingInfoMap m_connectingList;
     QSet<QnUuid> m_connectedList;
-    QnMutex m_mutex;
+    mutable QnMutex m_mutex;
 };
 
 } // namespace ec2

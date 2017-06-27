@@ -1,4 +1,4 @@
-nx_add_target(common_ut EXECUTABLE
+nx_add_test(common_ut
     PUBLIC_LIBS
         GTest GMock
         common

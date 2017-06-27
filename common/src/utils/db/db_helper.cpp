@@ -48,7 +48,15 @@ bool QnDbHelper::tuneDBAfterOpen(QSqlDatabase* const sqlDb)
         qWarning() << "Failed to enable FK support on sqlLite database!" << enableFKQuery.lastError().text();
         return false;
     }
-
+#if 0
+    QSqlQuery additionTuningQuery(*sqlDb);
+    additionTuningQuery.prepare(lit("PRAGMA synchronous=OFF"));
+    if (!additionTuningQuery.exec())
+    {
+        qWarning() << "Failed to turn off synchronous mode on sqlLite database!" << additionTuningQuery.lastError().text();
+        return false;
+    }
+#endif
     return true;
 }
 

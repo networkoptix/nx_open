@@ -410,7 +410,7 @@ QString QnAuditLogModel::eventDescriptionText(const QnAuditRecord* data) const
     case Qn::AR_ViewLive:
     case Qn::AR_ExportVideo:
         result = lit("%1 - %2, ").arg(formatDateTime(data->rangeStartSec)).arg(formatDateTime(data->rangeEndSec));
-        //fall-through
+        /*fallthrough*/
     case Qn::AR_CameraUpdate:
     case Qn::AR_CameraInsert:
         result += QnDeviceDependentStrings::getNumericName(

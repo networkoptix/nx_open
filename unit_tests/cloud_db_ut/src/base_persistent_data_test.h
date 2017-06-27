@@ -1,32 +1,28 @@
 #pragma once
 
-#include <dao/rdb/db_instance_controller.h>
-#include <dao/rdb/account_data_object.h>
-#include <dao/rdb/system_data_object.h>
-#include <dao/rdb/system_sharing_data_object.h>
+#include <type_traits>
+
+#include <nx/cloud/cdb/dao/rdb/rdb_account_data_object.h>
+#include <nx/cloud/cdb/dao/rdb/db_instance_controller.h>
+#include <nx/cloud/cdb/dao/rdb/system_data_object.h>
+#include <nx/cloud/cdb/dao/rdb/system_sharing_data_object.h>
+#include <nx/cloud/cdb/dao/rdb/dao_rdb_user_authentication.h>
+
 #include <utils/db/test_support/test_with_db_helper.h>
 
-#include <libcloud_db/src/settings.h>
+#include <nx/cloud/cdb/settings.h>
 
 namespace nx {
 namespace cdb {
 namespace test {
 
-class BasePersistentDataTest:
-    public db::test::TestWithDbHelper
+class DaoHelper
 {
 public:
-    enum class DbInitializationType
-    {
-        immediate,
-        delayed
-    };
+    DaoHelper(const nx::db::ConnectionOptions& dbConnectionOptions);
 
-    BasePersistentDataTest(
-        DbInitializationType dbInitializationType = DbInitializationType::immediate);
+    void initializeDatabase();
 
-protected:
-    const std::unique_ptr<dao::rdb::DbInstanceController>& persistentDbManager() const;
     api::AccountData insertRandomAccount();
     api::SystemData insertRandomSystem(const api::AccountData& account);
 
@@ -38,7 +34,14 @@ protected:
     const std::vector<api::AccountData>& accounts() const;
     const std::vector<data::SystemData>& systems() const;
     dao::rdb::SystemSharingDataObject& systemSharingDao();
-    void initializeDatabase();
+    dao::rdb::UserAuthentication& userAuthentication();
+
+    void setDbVersionToUpdateTo(unsigned int dbVersion);
+
+    nx::db::AsyncSqlQueryExecutor& queryExecutor();
+
+protected:
+    const std::unique_ptr<dao::rdb::DbInstanceController>& persistentDbManager() const;
 
     template<typename QueryFunc, typename... OutputData>
     nx::db::DBResult executeUpdateQuerySync(QueryFunc queryFunc)
@@ -71,14 +74,55 @@ protected:
         return queryDonePromise.get_future().get();
     }
 
+    /**
+     * @param queryFunc throws nx::db::Exception.
+     */
+    template<typename QueryFunc, typename... OutputData>
+    void executeUpdateQuerySyncThrow(QueryFunc queryFunc)
+    {
+        m_persistentDbManager->queryExecutor()
+            .executeUpdateQuerySync(std::move(queryFunc));
+    }
+
+    /**
+     * @param queryFunc throws nx::db::Exception.
+     */
+    template<typename QueryFunc>
+    typename std::result_of<QueryFunc(nx::db::QueryContext*)>::type 
+        executeSelectQuerySyncThrow(QueryFunc queryFunc)
+    {
+        return m_persistentDbManager->queryExecutor()
+            .executeSelectQuerySync(std::move(queryFunc));
+    }
+
 private:
+    nx::db::ConnectionOptions m_dbConnectionOptions;
     conf::Settings m_settings;
     std::unique_ptr<dao::rdb::DbInstanceController> m_persistentDbManager;
     dao::rdb::AccountDataObject m_accountDbController;
     dao::rdb::SystemDataObject m_systemDbController;
     dao::rdb::SystemSharingDataObject m_systemSharingController;
+    dao::rdb::UserAuthentication m_userAuthentication;
     std::vector<api::AccountData> m_accounts;
     std::vector<data::SystemData> m_systems;
+    boost::optional<unsigned int> m_dbVersionToUpdateTo;
+};
+
+//-------------------------------------------------------------------------------------------------
+
+class BasePersistentDataTest:
+    public db::test::TestWithDbHelper,
+    public DaoHelper
+{
+public:
+    enum class DbInitializationType
+    {
+        immediate,
+        delayed
+    };
+
+    BasePersistentDataTest(
+        DbInitializationType dbInitializationType = DbInitializationType::immediate);
 };
 
 } // namespace test

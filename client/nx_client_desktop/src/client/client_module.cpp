@@ -25,7 +25,6 @@
 #include <client/client_settings.h>
 #include <client/client_runtime_settings.h>
 #include <client/client_meta_types.h>
-#include <client/client_translation_manager.h>
 #include <client/client_instance_manager.h>
 #include <client/client_resource_processor.h>
 #include <client/desktop_client_message_processor.h>
@@ -71,6 +70,8 @@
 
 #include <server/server_storage_manager.h>
 
+#include <translation/translation_manager.h>
+
 #include <utils/common/app_info.h>
 #include <utils/common/command_line_parser.h>
 #include <utils/common/synctime.h>
@@ -78,6 +79,7 @@
 #include <utils/media/voice_spectrum_analyzer.h>
 #include <utils/performance_test.h>
 #include <utils/server_interface_watcher.h>
+#include <nx/client/core/watchers/known_server_connections.h>
 #include <nx/client/desktop/utils/applauncher_guard.h>
 
 #include <statistics/statistics_manager.h>
@@ -119,25 +121,26 @@ static void myMsgHandler(QtMsgType type, const QMessageLogContext& ctx, const QS
 #endif
     }
 
+    NX_EXPECT(!msg.contains(lit("QObject::connect")));
     qnLogMsgHandler(type, ctx, msg);
 }
 
 
 namespace
 {
-    typedef std::unique_ptr<QnClientTranslationManager> QnClientTranslationManagerPtr;
+    typedef std::unique_ptr<QnTranslationManager> QnTranslationManagerPtr;
 
-    QnClientTranslationManagerPtr initializeTranslations(QnClientSettings *settings
-                                                         , const QString &dynamicTranslationPath)
+    QnTranslationManagerPtr initializeTranslations(QnClientSettings* settings)
     {
-        QnClientTranslationManagerPtr translationManager(new QnClientTranslationManager());
+        QnTranslationManagerPtr translationManager(new QnTranslationManager());
+        translationManager->addPrefix(lit("client_base"));
+        translationManager->addPrefix(lit("client_ui"));
+        translationManager->addPrefix(lit("client_core"));
+        translationManager->addPrefix(lit("client_qml"));
 
         QnTranslation translation;
-        if (!dynamicTranslationPath.isEmpty()) /* From command line. */
-            translation = translationManager->loadTranslation(dynamicTranslationPath);
-
         if (translation.isEmpty()) /* By path. */
-            translation = translationManager->loadTranslation(settings->translationPath());
+            translation = translationManager->loadTranslation(settings->locale());
 
         /* Check if qnSettings value is invalid. */
         if (translation.isEmpty())
@@ -157,9 +160,8 @@ namespace
     }
 }
 
-QnClientModule::QnClientModule(const QnStartupParameters &startupParams
-                               , QObject *parent)
-    : QObject(parent)
+QnClientModule::QnClientModule(const QnStartupParameters& startupParams, QObject* parent):
+    QObject(parent)
 {
     initThread();
     initMetaInfo();
@@ -272,6 +274,8 @@ void QnClientModule::initSingletons(const QnStartupParameters& startupParams)
 
     m_staticCommon.reset(new QnStaticCommonModule(clientPeerType, brand, customization));
 
+    m_clientCoreModule.reset(new QnClientCoreModule());
+
     /* Just to feel safe */
     QScopedPointer<QnClientSettings> clientSettingsPtr(new QnClientSettings(startupParams.forceLocalSettings));
     QnClientSettings* clientSettings = clientSettingsPtr.data();
@@ -282,12 +286,10 @@ void QnClientModule::initSingletons(const QnStartupParameters& startupParams)
 #endif
 
     /// We should load translations before major client's services are started to prevent races
-    QnClientTranslationManagerPtr translationManager(initializeTranslations(
-        clientSettings, startupParams.dynamicTranslationPath));
+    QnTranslationManagerPtr translationManager(initializeTranslations(clientSettings));
 
     /* Init singletons. */
 
-    m_clientCoreModule.reset(new QnClientCoreModule());
     auto commonModule = m_clientCoreModule->commonModule();
 
     commonModule->store(new QnResourceRuntimeDataManager());
@@ -339,7 +341,7 @@ void QnClientModule::initSingletons(const QnStartupParameters& startupParams)
 
     /* Just to feel safe */
     commonModule->store(new QnCloudConnectionProvider());
-    commonModule->instance<QnCloudStatusWatcher>();
+    m_cloudStatusWatcher = commonModule->store(new QnCloudStatusWatcher(commonModule, /*isMobile*/ false));
 
     //NOTE:: QNetworkProxyFactory::setApplicationProxyFactory takes ownership of object
     m_networkProxyFactory = new QnNetworkProxyFactory(commonModule);
@@ -351,13 +353,15 @@ void QnClientModule::initSingletons(const QnStartupParameters& startupParams)
 
     commonModule->store(new QnQtbugWorkaround());
     commonModule->store(new nx::cloud::gateway::VmsGatewayEmbeddable(true));
+
+    commonModule->findInstance<nx::client::core::watchers::KnownServerConnections>()->start();
 }
 
 void QnClientModule::initRuntimeParams(const QnStartupParameters& startupParams)
 {
     qnRuntime->setDevMode(startupParams.isDevMode());
     qnRuntime->setGLDoubleBuffer(qnSettings->isGlDoubleBuffer());
-    qnRuntime->setTranslationPath(qnSettings->translationPath());
+    qnRuntime->setLocale(qnSettings->locale());
     qnRuntime->setSoftwareYuv(startupParams.softwareYuv);
     qnRuntime->setShowFullInfo(startupParams.showFullInfo);
     qnRuntime->setIgnoreVersionMismatch(startupParams.ignoreVersionMismatch);
@@ -577,4 +581,9 @@ void QnClientModule::initLocalResources(const QnStartupParameters& startupParams
     }
     resourceDiscoveryManager->setReady(true);
     commonModule->store(new QnSystemsWeightsManager());
+}
+
+QnCloudStatusWatcher* QnClientModule::cloudStatusWatcher() const
+{
+    return m_cloudStatusWatcher;
 }

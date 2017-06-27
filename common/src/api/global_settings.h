@@ -236,6 +236,9 @@ public:
 
     std::chrono::seconds proxyConnectTimeout() const;
 
+    bool cloudConnectUdpHolePunchingEnabled() const;
+    bool cloudConnectRelayingEnabled() const;
+
     /*!
         \a QnAbstractResourcePropertyAdaptor class methods are thread-safe
         \note returned list is not changed during \a QnGlobalSettings instance life-time
@@ -268,6 +271,8 @@ signals:
     void cloudSettingsChanged();
     void cloudCredentialsChanged();
     void timeSynchronizationSettingsChanged();
+    void cloudConnectUdpHolePunchingEnabledChanged();
+    void cloudConnectRelayingEnabledChanged();
 
 private:
     typedef QList<QnAbstractResourcePropertyAdaptor*> AdaptorList;
@@ -280,7 +285,7 @@ private:
     AdaptorList initCloudAdaptors();
     AdaptorList initMiscAdaptors();
 
-    void at_resourcePool_resourceAdded(const QnResourcePtr &resource);
+    void at_adminUserAdded(const QnResourcePtr &resource);
     void at_resourcePool_resourceRemoved(const QnResourcePtr &resource);
 
 private:
@@ -355,6 +360,9 @@ private:
     QnResourcePropertyAdaptor<int>* m_maxRtpRetryCount;
 
     QnResourcePropertyAdaptor<int>* m_rtpFrameTimeoutMs;
+
+    QnResourcePropertyAdaptor<bool>* m_cloudConnectUdpHolePunchingEnabledAdaptor;
+    QnResourcePropertyAdaptor<bool>* m_cloudConnectRelayingEnabledAdaptor;
 
     AdaptorList m_allAdaptors;
 

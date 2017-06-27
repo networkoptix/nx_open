@@ -27,12 +27,15 @@ QnUuid EventParameters::getParamsHash() const
             if (reasonCode == StorageIoErrorReason
                 || reasonCode == StorageTooSlowReason
                 || reasonCode == StorageFullReason
+                || reasonCode == SystemStorageFullReason
                 || reasonCode == LicenseRemoved)
+            {
                 paramKey += '_' + description.toUtf8();
+            }
             break;
 
         case SoftwareTriggerEvent:
-            return QnUuid::createUuid();
+            return QnUuid::createUuid(); //< Warning: early return.
             break;
 
         case CameraInputEvent:

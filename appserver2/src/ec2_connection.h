@@ -10,7 +10,6 @@
 
 #include "base_ec2_connection.h"
 #include "ec2_statictics_reporter.h"
-#include "database/db_manager.h"
 #include "server_query_processor.h"
 
 namespace ec2

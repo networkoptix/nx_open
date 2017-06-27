@@ -175,7 +175,7 @@ class APILogicException(APIException):
 def validate_mediaserver_response(func):
     def validate_error(response_data):
         if 'resultCode' not in response_data or 'errorText' not in response_data:
-            raise APIInternalException('No valid error message from cloud_db', ErrorCodes.cloud_invalid_response)
+            raise APIInternalException('No valid error message from gateway', ErrorCodes.cloud_invalid_response)
 
     def validator(*args, **kwargs):
         response = func(*args, **kwargs)
@@ -202,7 +202,7 @@ def validate_mediaserver_response(func):
         if response.status_code in errors:
             if response_data:
                 validate_error(response_data)
-                raise errors[response.status_code](response_data['errorText'], error_code=response_data['resultCode'])
+                raise errors[response.status_code](response_data['errorText'], error_code=response_data['resultCode'], error_data=response_data)
             else:
                 raise errors[response.status_code](response.text, error_code=ErrorCodes.unknown_error)
 
@@ -277,6 +277,14 @@ def handle_exceptions(func):
     :param func:
     :return:
     """
+    def clean_passwords(dictionary):
+        if isinstance(dictionary, dict):
+            if 'password' in dictionary:
+                dictionary['password'] = '*****'
+            if 'new_password' in dictionary:
+                dictionary['new_password'] = '****'
+            if 'old_password' in dictionary:
+                dictionary['old_password'] = '***'
 
     def log_error(request, error, log_level):
         page_url = 'unknown'
@@ -297,10 +305,7 @@ def handle_exceptions(func):
         if isinstance(error, APIException):
             error_text = "{}({})".format(error.error_text, error.error_code)
             if error.error_data:
-                if 'password' in error.error_data:
-                    error.error_data['password'] = '*****'
-                if 'old_password' in error.error_data:
-                    error.error_data['password'] = '***'
+                clean_passwords(error.error_data)
             error_formatted = 'Status: {}\nMessage: {}\nError code: {}\nError data: {}'.\
                               format(error.status_code,
                                      error.error_text,
@@ -311,6 +316,7 @@ def handle_exceptions(func):
             error_text = 'unknown'
             error_formatted = 'Unexpected error'
 
+        clean_passwords(request_data)
         error_formatted = '\n{}:{}\nPortal URL: {}\nUser: {}\nUser IP:{}\nRequest: {}\n{}\nCall Stack: \n{}'.\
             format(error.__class__.__name__,
                    error_text,

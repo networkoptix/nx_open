@@ -2,13 +2,13 @@
 
 #include <QtWidgets/QWidget>
 
-#include <client_core/connection_context_aware.h>
-
 #include <nx_ec/ec_api_fwd.h>
 #include <licensing/license_fwd.h>
-
 #include <ui/widgets/common/abstract_preferences_widget.h>
 #include <utils/common/connective.h>
+#include <nx/client/desktop/license/license_helpers.h>
+
+#include <ui/workbench/workbench_context_aware.h>
 
 class QModelIndex;
 class QNetworkAccessManager;
@@ -24,7 +24,7 @@ class LicenseManagerWidget;
 
 class QnLicenseManagerWidget:
     public Connective<QnAbstractPreferencesWidget>,
-    public QnConnectionContextAware
+    public QnWorkbenchContextAware
 {
     Q_OBJECT
     typedef Connective<QnAbstractPreferencesWidget> base_type;
@@ -80,7 +80,36 @@ private:
 
     QnLicenseList selectedLicenses() const;
     bool canRemoveLicense(const QnLicensePtr &license) const;
-    void removeSelectedLicenses();
+    bool canDeactivateLicense(const QnLicensePtr &license) const;
+
+    enum class ForceRemove
+    {
+        No,
+        Yes
+    };
+
+    void takeAwaySelectedLicenses();
+
+    void removeLicense(const QnLicensePtr& license, ForceRemove force);
+
+    void deactivateLicenses(const QnLicenseList& licenses);
+
+    bool confirmDeactivation(const QStringList& extras);
+
+    QString getLicenseDescription(const QnLicensePtr& license) const;
+
+    using DeactivationErrors = nx::client::desktop::license::Deactivator::LicenseErrorHash;
+    void showDeactivationErrorsDialog(
+        const QnLicenseList& licenses,
+        const DeactivationErrors& errors);
+
+    QString getDeactivationErrorCaption(
+        int licensesCount,
+        int errorsCount) const;
+
+    QString getDeactivationErrorMessage(
+        const QnLicenseList& licenses,
+        const DeactivationErrors& errors) const;
 
     void exportLicenses();
 
@@ -105,4 +134,8 @@ private:
     QPushButton* m_exportLicensesButton {nullptr};
     QnLicenseList m_licenses;
     QnLicenseValidator* m_validator {nullptr};
+    bool m_isRemoveTakeAwayOperation = true;
+
+    using RequestInfo = nx::client::desktop::license::RequestInfo;
+    RequestInfo m_deactivationReason;
 };

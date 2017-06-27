@@ -6,25 +6,8 @@
 
 #include "fixed_url_client_query_processor.h"
 #include "server_query_processor.h"
-
-namespace {
-
-ec2::QnPeerSet getDirectClientPeers(ec2::QnTransactionMessageBus* messageBus)
-{
-    ec2::QnPeerSet result;
-
-    auto clients = messageBus->aliveClientPeers();
-    for (auto it = clients.begin(); it != clients.end(); ++it)
-    {
-        const auto& clientId = it.key();
-        if (it->routingInfo.contains(clientId))
-            result.insert(clientId);
-    }
-
-    return result;
-}
-
-} // namespace
+#include <common/common_module.h>
+#include <transaction/message_bus_selector.h>
 
 namespace ec2 {
 
@@ -192,22 +175,22 @@ void QnDiscoveryManager<ServerQueryProcessorAccess>::monitorServerDiscovery()
 {
     const auto messageBus = m_queryProcessor->messageBus();
     QObject::connect(messageBus, &QnTransactionMessageBus::peerFound,
-        [messageBus](ApiPeerAliveData data)
+        [messageBus](QnUuid peerId, Qn::PeerType peerType)
         {
-            if (!data.peer.isClient())
+            if (!ApiPeerData::isClient(peerType))
                 return;
 
             const auto servers = getServers(messageBus->commonModule()->moduleDiscoveryManager());
             QnTransaction<ApiDiscoveredServerDataList> transaction(
                 ApiCommand::discoveredServersList, messageBus->commonModule()->moduleGUID(), servers);
 
-            messageBus->sendTransaction(transaction, data.peer.id);
+            sendTransaction(messageBus, transaction, peerId);
         });
 
     const auto updateServerStatus =
         [messageBus](nx::vms::discovery::ModuleEndpoint module)
         {
-            const auto peers = getDirectClientPeers(messageBus);
+            const auto peers = messageBus->directlyConnectedClientPeers();
             if (peers.isEmpty())
                 return;
 
@@ -215,7 +198,7 @@ void QnDiscoveryManager<ServerQueryProcessorAccess>::monitorServerDiscovery()
                 ApiCommand::discoveredServerChanged, messageBus->commonModule()->moduleGUID(),
                 makeServer(module, messageBus->commonModule()->globalSettings()->localSystemId()));
 
-            messageBus->sendTransaction(transaction, peers);
+            sendTransaction(messageBus, transaction, peers);
         };
 
     const auto discoveryManager = messageBus->commonModule()->moduleDiscoveryManager();

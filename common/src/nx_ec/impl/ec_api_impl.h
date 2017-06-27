@@ -108,7 +108,9 @@ namespace ec2
         //!Connection to peer is impossible due to incompatible protocol
         incompatiblePeer,
         //!Can't check authorization because of cloud is offline
-        cloud_temporary_unauthorized
+        cloud_temporary_unauthorized,
+        //!User is disabled
+        disabled_user_unauthorized
 
     };
 
@@ -175,7 +177,7 @@ namespace ec2
             void onGetMiscParamDone             (int reqID, const ec2::ErrorCode, const ec2::ApiMiscData&);
             void onSaveBusinessRuleDone         (int reqID, const ec2::ErrorCode, const nx::vms::event::RulePtr&);
             void onGetServersDone               (int reqID, const ec2::ErrorCode, const ec2::ApiMediaServerDataList&);
-            void onGetServerUserAttributesDone  (int reqID, const ec2::ErrorCode, const QnMediaServerUserAttributesList&);
+            void onGetServerUserAttributesDone  (int reqID, const ec2::ErrorCode, const ec2::ApiMediaServerUserAttributesDataList&);
             void onGetServersExDone             (int reqID, const ec2::ErrorCode, const ec2::ApiMediaServerDataExList&);
             void onGetStoragesDone              (int reqID, const ec2::ErrorCode, const ec2::ApiStorageDataList&);
             void onGetCamerasDone               (int reqID, const ec2::ErrorCode, const ec2::ApiCameraDataList&);

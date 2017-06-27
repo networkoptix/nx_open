@@ -39,6 +39,7 @@ protected:
 public:
     virtual ~AbstractAction();
 
+    void setActionType(ActionType actionType);
     ActionType actionType() const;
 
     /**
@@ -59,6 +60,7 @@ public:
 
     void setRuntimeParams(const EventParameters& params);
     const EventParameters& getRuntimeParams() const;
+    EventParameters& getRuntimeParams();
 
     void setRuleId(const QnUuid& value);
     QnUuid getRuleId() const;

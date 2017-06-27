@@ -20,8 +20,6 @@ Q_OBJECT
 #endif
 QN_DECLARE_METAOBJECT_HEADER(action, IDType, )
 
-QN_DECLARE_TR_FUNCTIONS("nx::client::desktop::ui::action")
-
 /**
  * Enum of all menu actions.
  */
@@ -903,12 +901,14 @@ enum IDType
     RenameLayoutTourAction,
     SaveLayoutTourAction,
     ReviewLayoutTourAction,
+    ReviewLayoutTourInNewWindowAction,
     RemoveLayoutTourAction,
 
     StartCurrentLayoutTourAction,
     SaveCurrentLayoutTourAction,
     RemoveCurrentLayoutTourAction,
 
+    LayoutTourSettingsAction,
     CurrentLayoutTourSettingsAction,
 
     /* Timeline actions. */

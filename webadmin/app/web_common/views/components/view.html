@@ -1,4 +1,5 @@
-<table ng-controller="ViewCtrl" style="width:100%" class="webclient-window">
+<placeholder ng-if='!ready' preloader="true" class="webclient-placeholder"></placeholder>
+<table ng-class="{'visibility-hidden':!ready}" class="webclient-window">
     <tbody>
         <tr class="alerts-row" ng-if="hasMobileApp && !session.mobileAppNotified">
             <td colspan="2" class="alert">
@@ -22,6 +23,7 @@
             <td>
                 <div class="view-wrapper">
                     <camera-panel cameras-provider="camerasProvider" active-camera="activeCamera"
+                                  position-provider="positionProvider" system="systemAPI"
                                   player="player" current-resolution="currentResolution" toggle-camera-panel="toggleCameraPanel"
                                   class="cameras-panel-toggle"
                                   ng-class="{'hide-panel':!toggleCameraPanel}"></camera-panel>
@@ -59,9 +61,11 @@
                                 </div>
                                 <div class="hide-excess-text video-title-back-button">
                                         <span class="visible-xs" ng-click="toggleCameraPanel=true"
-                                              ng-class="{'back-button': !toggleCameraPanel}"><span class="glyphicon glyphicon-arrow-left"></span></span>
+                                              ng-class="{'back-button': !toggleCameraPanel}">
+                                            <span class="glyphicon glyphicon-arrow-left"></span>
+                                        </span>
+                                        <camera-status camera="activeCamera" type="'video'"></camera-status>
                                         <span class="caption-row video-name">
-                                            <camera-status camera="activeCamera" type="'video'"></camera-status>
                                             {{activeCamera.name + " (" + activeResolution + ")"}}
                                         </span>
                                 </div>
@@ -70,12 +74,12 @@
 
                         <div class="float-size">
                             <camera-view-informer flags="{'status':activeCamera.status,
-                                                              'positionSelected': positionSelected,
-                                                              'iOSVideoTooLarge': iOSVideoTooLarge}">
+                                                          'positionSelected': positionSelected,
+                                                          'iOSVideoTooLarge': iOSVideoTooLarge}">
                             </camera-view-informer>
                             <videowindow ng-class="{invisible: iOSVideoTooLarge || !positionSelected &&
                                                         (activeCamera.status == 'Offline' || activeCamera.status == 'Unauthorized')}"
-                                         vg-update-time="updateTime($currentTime, $duration)" preview="activeCamera.preview"
+                                         vg-update-time="updateTime($currentTime, $duration)" preview="activeCamera.fullPreview"
                                          vg-player-ready="playerReady($API)" rotation="rotation" playing="positionProvider.playing"
                                          vg-src="activeVideoSource" player="player" active-format="activeFormat">
                             </videowindow>

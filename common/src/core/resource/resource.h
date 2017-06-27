@@ -38,6 +38,7 @@ public:
 class QN_EXPORT QnResource: public QObject, public QnFromThisToShared<QnResource>
 {
     Q_OBJECT
+    Q_FLAGS(Qn::ResourceFlags)
     Q_FLAGS(Ptz::Capabilities)
     Q_PROPERTY(QnUuid id READ getId WRITE setId)
     Q_PROPERTY(QnUuid typeId READ getTypeId WRITE setTypeId)
@@ -235,7 +236,6 @@ public:
 
     static QnInitResPool* initAsyncPoolInstance();
     static bool isStopping() { return m_appStopping; }
-    void setRemovedFromPool(bool value);
 
     virtual bool saveParams();
     virtual int saveParamsAsync();
@@ -412,7 +412,6 @@ private:
     QAtomicInt m_initializationAttemptCount;
     //!map<key, <value, isDirty>>
     std::map<QString, LocalPropertyValue> m_locallySavedProperties;
-    bool m_removedFromPool;
     bool m_initInProgress;
     QnCommonModule* m_commonModule;
 };

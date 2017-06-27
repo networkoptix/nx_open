@@ -25,61 +25,12 @@ const KeepAliveOptions kDefaultKeepAlive(std::chrono::minutes(1), std::chrono::s
 
 } // namespace
 
-static const std::vector<CloudServerSocket::AcceptorMaker> defaultAcceptorMakers()
-{
-    std::vector<CloudServerSocket::AcceptorMaker> makers;
-
-    makers.push_back(
-        [](const hpm::api::ConnectionRequestedEvent& event)
-        {
-            using namespace hpm::api::ConnectionMethod;
-            if (event.connectionMethods & udpHolePunching)
-            {
-                if (!event.udpEndpointList.size())
-                    return std::unique_ptr<AbstractTunnelAcceptor>();
-
-                auto acceptor = std::make_unique<udp::TunnelAcceptor>(
-                    std::move(event.udpEndpointList), event.params);
-
-                return std::unique_ptr<AbstractTunnelAcceptor>(std::move(acceptor));
-            }
-
-            return std::unique_ptr<AbstractTunnelAcceptor>();
-        });
-
-    makers.push_back(
-        [](const hpm::api::ConnectionRequestedEvent& event)
-        {
-            using namespace hpm::api::ConnectionMethod;
-            if (event.connectionMethods & reverseConnect)
-            {
-                if (!event.tcpReverseEndpointList.size())
-                    return std::unique_ptr<AbstractTunnelAcceptor>();
-
-                auto acceptor = std::make_unique<tcp::ReverseTunnelAcceptor>(
-                    std::move(event.tcpReverseEndpointList), event.params);
-
-                return std::unique_ptr<AbstractTunnelAcceptor>(std::move(acceptor));
-            }
-
-            return std::unique_ptr<AbstractTunnelAcceptor>();
-        });
-
-    // TODO: #mux add other connectors when supported
-    return makers;
-}
-
-const std::vector<CloudServerSocket::AcceptorMaker>
-    CloudServerSocket::kDefaultAcceptorMakers = defaultAcceptorMakers();
-
 CloudServerSocket::CloudServerSocket(
     std::unique_ptr<hpm::api::MediatorServerTcpConnection> mediatorConnection,
-    nx::network::RetryPolicy mediatorRegistrationRetryPolicy,
-    std::vector<AcceptorMaker> acceptorMakers)
+    nx::network::RetryPolicy mediatorRegistrationRetryPolicy)
 :
     m_mediatorConnection(std::move(mediatorConnection)),
     m_mediatorRegistrationRetryTimer(std::move(mediatorRegistrationRetryPolicy)),
-    m_acceptorMakers(acceptorMakers),
     m_acceptQueueLen(kDefaultAcceptQueueSize),
     m_state(State::init)
 {
@@ -567,19 +518,17 @@ void CloudServerSocket::onConnectionRequested(
         .args(event.connectSessionId, event.originatingPeerID,
             hpm::api::ConnectionMethod::toString(event.connectionMethods)));
 
-    for (const auto& maker: m_acceptorMakers)
+    auto acceptors = TunnelAcceptorFactory::instance().create(event);
+    for (auto& acceptor: acceptors)
     {
-        if (auto acceptor = maker(event))
-        {
-            DEBUG_LOG(lm("Create acceptor '%1' by connection request %2 from %3")
-                .args(acceptor, event.connectSessionId, event.originatingPeerID));
+        DEBUG_LOG(lm("Create acceptor '%1' by connection request %2 from %3")
+            .args(acceptor, event.connectSessionId, event.originatingPeerID));
 
-            acceptor->setConnectionInfo(
-                event.connectSessionId, event.originatingPeerID);
+        acceptor->setConnectionInfo(
+            event.connectSessionId, event.originatingPeerID);
 
-            acceptor->setMediatorConnection(m_mediatorConnection.get());
-            startAcceptor(std::move(acceptor));
-        }
+        acceptor->setMediatorConnection(m_mediatorConnection.get());
+        startAcceptor(std::move(acceptor));
     }
 }
 
@@ -614,7 +563,7 @@ void CloudServerSocket::stopWhileInAioThread()
 //-------------------------------------------------------------------------------------------------
 
 CustomAcceptorFactory::CustomAcceptorFactory():
-    base_type(std::bind(&CustomAcceptorFactory::defaultFactoryFunc, this,
+    base_type(std::bind(&CustomAcceptorFactory::defaultFactoryFunction, this,
         std::placeholders::_1, std::placeholders::_2))
 {
 }
@@ -626,7 +575,7 @@ CustomAcceptorFactory& CustomAcceptorFactory::instance()
 }
 
 std::vector<std::unique_ptr<AbstractConnectionAcceptor>> 
-    CustomAcceptorFactory::defaultFactoryFunc(
+    CustomAcceptorFactory::defaultFactoryFunction(
         const nx::hpm::api::SystemCredentials& credentials,
         const hpm::api::ListenResponse& response)
 {
@@ -635,7 +584,7 @@ std::vector<std::unique_ptr<AbstractConnectionAcceptor>>
     if (response.trafficRelayUrl)
     {
         QUrl trafficRelayUrlWithCredentials = QString::fromUtf8(*response.trafficRelayUrl);
-        trafficRelayUrlWithCredentials.setUserName(credentials.systemId);
+        trafficRelayUrlWithCredentials.setUserName(credentials.hostName());
         trafficRelayUrlWithCredentials.setPassword(credentials.key);
         acceptors.push_back(
             std::make_unique<relay::ConnectionAcceptor>(

@@ -14,6 +14,8 @@ public:
     virtual void remove(const SYSSOCKET& s) = 0;
     virtual std::size_t socketsPolledCount() const = 0;
     /**
+     * @param lrfds Sockets, available for reading. map<{socket handle}, {bitmap of UDT_EPOLL_* values}>.
+     * @param lwfds Sockets, available for writing. map<{socket handle}, {bitmap of UDT_EPOLL_* values}>.
      * @param std::chrono::microseconds::max() means no timeout.
      * @return Number of events triggered. -1 in case of error. 0 in case of timeout expiration 
      *   or interruption due to AbstractEpoll::interrupt called prior to this method or 

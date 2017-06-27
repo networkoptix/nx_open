@@ -8,9 +8,7 @@
 #include <common/common_module.h>
 #include <common/static_common_module.h>
 
-
 #include <client_core/client_core_module.h>
-
 
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/mobile_client_camera_factory.h>
@@ -26,7 +24,6 @@
 #include <watchers/user_watcher.h>
 #include <watchers/available_cameras_watcher.h>
 #include <watchers/cloud_status_watcher.h>
-#include <watchers/server_address_watcher.h>
 #include <finders/systems_finder.h>
 #include <client/system_weights_manager.h>
 #include <utils/media/ffmpeg_initializer.h>
@@ -40,6 +37,7 @@
 #include <nx/network/socket_global.h>
 #include <nx/mobile_client/settings/migration_helper.h>
 #include <nx/mobile_client/settings/settings_migration.h>
+#include <nx/client/core/watchers/known_server_connections.h>
 #include <client_core/client_core_settings.h>
 #include <core/ptz/client_ptz_controller_pool.h>
 
@@ -89,14 +87,6 @@ QnMobileClientModule::QnMobileClientModule(
 
     auto userWatcher = commonModule->store(new QnUserWatcher());
 
-    auto availableCamerasWatcher = commonModule->instance<QnAvailableCamerasWatcher>();
-    connect(userWatcher, &QnUserWatcher::userChanged,
-        availableCamerasWatcher, &QnAvailableCamerasWatcher::setUser);
-
-    commonModule->store(new QnCloudConnectionProvider());
-    commonModule->instance<QnCloudStatusWatcher>();
-    QNetworkProxyFactory::setApplicationProxyFactory(new QnSimpleNetworkProxyFactory(commonModule));
-
     ec2::ApiRuntimeData runtimeData;
     runtimeData.peer.id = commonModule->moduleGUID();
     runtimeData.peer.instanceId = commonModule->runningInstanceGUID();
@@ -108,14 +98,13 @@ QnMobileClientModule::QnMobileClientModule(
         runtimeData.videoWallInstanceGuid = startupParameters.videowallInstanceGuid;
     commonModule->runtimeInfoManager()->updateLocalItem(runtimeData);
 
-    const auto getter = []() { return qnClientCoreSettings->knownServerUrls(); };
-    const auto setter =
-        [](const QnServerAddressWatcher::UrlsList& values)
-        {
-            qnClientCoreSettings->setKnownServerUrls(values);
-            qnClientCoreSettings->save();
-        };
-    commonModule->store(new QnServerAddressWatcher(getter, setter, commonModule));
+    auto availableCamerasWatcher = commonModule->instance<QnAvailableCamerasWatcher>();
+    connect(userWatcher, &QnUserWatcher::userChanged,
+        availableCamerasWatcher, &QnAvailableCamerasWatcher::setUser);
+
+    commonModule->store(new QnCloudConnectionProvider());
+    m_cloudStatusWatcher = commonModule->store(new QnCloudStatusWatcher(commonModule, /*isMobile*/ true));
+    QNetworkProxyFactory::setApplicationProxyFactory(new QnSimpleNetworkProxyFactory(commonModule));
 
     commonModule->instance<QnSystemsFinder>();
     commonModule->store(new QnSystemsWeightsManager());
@@ -137,10 +126,17 @@ QnMobileClientModule::QnMobileClientModule(
                     break;
             }
         });
+
+    commonModule->findInstance<nx::client::core::watchers::KnownServerConnections>()->start();
 }
 
 QnMobileClientModule::~QnMobileClientModule()
 {
     qApp->disconnect(this);
     QNetworkProxyFactory::setApplicationProxyFactory(nullptr);
+}
+
+QnCloudStatusWatcher* QnMobileClientModule::cloudStatusWatcher() const
+{
+    return m_cloudStatusWatcher;
 }

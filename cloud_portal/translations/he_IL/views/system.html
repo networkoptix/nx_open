@@ -1,0 +1,24 @@
+<div class="auth-visible" process-loading="gettingSystem">
+    <div ng-if="systemNoAccess" class="text-center">
+        <h1>הגישה למערכת נכשלה</h1>
+        <p>קישור זה אינו תקין, <br> ניתן לנתק את המערכת מ {{PRODUCT_NAME}}, <br> הגישה למערכת זו עשויה להישלל, <br> או שאתה עשוי להיכנס לחשבון אחר</p>
+        <p>
+            <a href="/systems" class="btn btn-default">רשימת מערכות זמינות</a>
+        </p>
+    </div>
+
+    <ng-include ng-if="gettingSystem.success" src="$root.C.viewsDir + 'components/system-header.html'"></ng-include>
+    <div class="row"  ng-if="gettingSystem.success">
+        <div class="col-md-4 col-md-push-8">
+            <ng-include src="$root.C.viewsDir + 'components/system-card.html'"></ng-include>
+        </div>
+        <div class="col-md-8 col-md-pull-4">
+            <div class="no-data-panel light-color border-top border-bottom" ng-if="!system.permissions.editUsers" >
+                <span class="no-data-panel-body">
+                    אין לך גישה למידע מערכת.
+                </span>
+            </div>
+            <ng-include src="$root.C.viewsDir + 'components/system-users.html'" ng-if="system.permissions.editUsers" ></ng-include>
+        </div>
+    </div>
+</div>

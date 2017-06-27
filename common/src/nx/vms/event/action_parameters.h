@@ -12,6 +12,13 @@ struct ActionParameters
 {
     ActionParameters();
 
+    /**
+      * Shows if action should be confirmed by user. Currently used for bookmarks confirmation
+      */
+    bool needConfirmation = false;
+
+    ActionType targetActionType = UndefinedAction;
+
     /** Additional parameter for event log convenience. Does not filled when the action really occurs. */
     QnUuid actionResourceId;
 
@@ -21,13 +28,9 @@ struct ActionParameters
     // Email
     QString emailAddress;
 
-    // Popups and System Health
-    UserGroup userGroup;
-
     // Recording
     int fps;
     Qn::StreamQuality streamQuality;
-    int recordingDuration; //< Seconds.
     //! for bookmarks this represents epsilon, bookmark end time extended by
     int recordAfter; //< Seconds.
 
@@ -48,6 +51,9 @@ struct ActionParameters
 
     // Generic additional resources List: Show On Alarm Layout - users
     std::vector<QnUuid> additionalResources;
+
+    // When set, signalizes that all users must be targeted by the action.
+    bool allUsers;
 
     // Alarm Layout - if it must be opened immediately
     bool forced;
@@ -73,8 +79,10 @@ struct ActionParameters
     bool isDefault() const;
 };
 
-#define ActionParameters_Fields (actionResourceId)(url)(emailAddress)(userGroup)(fps)(streamQuality)(recordingDuration)(recordAfter)\
-    (relayOutputId)(sayText)(tags)(text)(durationMs)(additionalResources)(forced)(presetId)(useSource)(recordBeforeMs)(playToClient)(contentType)
+#define ActionParameters_Fields (targetActionType)(needConfirmation)(actionResourceId)\
+    (url)(emailAddress)(fps)(streamQuality)(recordAfter)(relayOutputId)(sayText)(tags)(text)\
+    (durationMs)(additionalResources)(allUsers)(forced)(presetId)(useSource)(recordBeforeMs)\
+    (playToClient)(contentType)
 
 /* Backward compatibility is not really important here as this class is not stored in the DB. */
 QN_FUSION_DECLARE_FUNCTIONS(ActionParameters, (ubjson)(json)(eq)(xml)(csv_record));

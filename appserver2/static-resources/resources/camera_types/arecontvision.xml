@@ -167,5 +167,22 @@
                 <param name = "VideoLayout" default_value = "width=2;height=2;sensors=0,1,2,3"/>                    
             </params>
         </resource>  		
+        <resource name = "3325" public = "3556"/>
+        <resource name = "3326" public = "3556"/>
+        <resource name = "2325" public = "2195"/>
+        <resource name = "2326" public = "2195"/>
+        <resource name = "20365" public = "20185"> 
+            <params>
+                <param name = "VideoLayout" default_value = "width=2;height=2;sensors=0,1,2,3"/>     
+                <param name = "MaxFPS" default_value = "7"/>
+            </params>
+        </resource>
+        <resource name = "12375" public = "12176"> 
+            <params>
+                <param name = "VideoLayout" default_value = "width=2;height=2;sensors=0,1,2,3"/>     
+                <param name = "MaxFPS" default_value = "7"/>
+            </params>
+        </resource>
+        <resource name = "12376" public = "12375"/>
     </oem>
 </resources>

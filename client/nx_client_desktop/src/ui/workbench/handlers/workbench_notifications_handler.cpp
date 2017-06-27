@@ -6,32 +6,28 @@
 
 #include <api/global_settings.h>
 #include <api/app_server_connection.h>
-
-#include <common/common_module.h>
-
+#include <business/business_resource_validation.h>
 #include <client/client_settings.h>
 #include <client/client_message_processor.h>
 #include <client/client_show_once_settings.h>
-
-#include <nx/vms/event/strings_helper.h>
-
+#include <common/common_module.h>
 #include <core/resource/resource.h>
 #include <core/resource/user_resource.h>
 #include <core/resource_management/resource_pool.h>
-
+#include <core/resource_management/user_roles_manager.h>
 #include <nx/client/desktop/ui/actions/action_parameters.h>
 #include <ui/workbench/watchers/workbench_user_email_watcher.h>
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_access_controller.h>
 #include <ui/workbench/workbench_state_manager.h>
-
 #include <utils/resource_property_adaptors.h>
-#include <nx/client/desktop/utils/server_notification_cache.h>
 #include <utils/common/warnings.h>
 #include <utils/email/email.h>
 #include <utils/media/audio_player.h>
-
 #include <watchers/cloud_status_watcher.h>
+
+#include <nx/client/desktop/utils/server_notification_cache.h>
+#include <nx/vms/event/strings_helper.h>
 
 using namespace nx;
 using namespace nx::client::desktop;
@@ -41,8 +37,7 @@ namespace {
 
 static const QString kCloudPromoShowOnceKey(lit("CloudPromoNotification"));
 
-}
-
+} // namespace
 
 QnWorkbenchNotificationsHandler::QnWorkbenchNotificationsHandler(QObject *parent):
     base_type(parent),
@@ -121,9 +116,9 @@ void QnWorkbenchNotificationsHandler::clear()
     emit cleared();
 }
 
-void QnWorkbenchNotificationsHandler::addNotification(const vms::event::AbstractActionPtr &businessAction)
+void QnWorkbenchNotificationsHandler::addNotification(const vms::event::AbstractActionPtr &action)
 {
-    vms::event::EventParameters params = businessAction->getRuntimeParams();
+    vms::event::EventParameters params = action->getRuntimeParams();
     vms::event::EventType eventType = params.eventType;
 
     const bool isAdmin = accessController()->hasGlobalPermission(Qn::GlobalAdminPermission);
@@ -132,50 +127,27 @@ void QnWorkbenchNotificationsHandler::addNotification(const vms::event::Abstract
     {
         if (eventType == vms::event::LicenseIssueEvent || eventType == vms::event::NetworkIssueEvent)
             return;
-
-        if (businessAction->getParams().userGroup == vms::event::AdminOnly)
-            return;
     }
 
     if (eventType >= vms::event::SystemHealthEvent && eventType <= vms::event::MaxSystemHealthEvent)
     {
         int healthMessage = eventType - vms::event::SystemHealthEvent;
-        addSystemHealthEvent(QnSystemHealth::MessageType(healthMessage), businessAction);
+        addSystemHealthEvent(QnSystemHealth::MessageType(healthMessage), action);
         return;
     }
 
     if (!context()->user())
         return;
 
-    if (businessAction->actionType() == vms::event::ShowOnAlarmLayoutAction)
+    if (action->actionType() == vms::event::ShowOnAlarmLayoutAction)
     {
-        //TODO: #GDM code duplication
-        auto allowedForUser =
-            [this](const std::vector<QnUuid>& ids)
-            {
-                if (ids.empty())
-                    return true;
-
-                auto user = context()->user();
-                if (!user)
-                    return false;
-
-                if (std::find(ids.cbegin(), ids.cend(), user->getId()) != ids.cend())
-                    return true;
-
-                auto roleId = user->userRoleId();
-                return !roleId.isNull()
-                    && std::find(ids.cbegin(), ids.cend(), roleId) != ids.cend();
-            };
-
-
         /* Skip action if it contains list of users, and we are not on the list. */
-        if (!allowedForUser(businessAction->getParams().additionalResources))
+        if (!QnBusiness::actionAllowedForUser(action->getParams(), context()->user()))
             return;
     }
 
     bool alwaysNotify = false;
-    switch (businessAction->actionType())
+    switch (action->actionType())
     {
         case vms::event::ShowOnAlarmLayoutAction:
         case vms::event::PlaySoundAction:
@@ -190,7 +162,7 @@ void QnWorkbenchNotificationsHandler::addNotification(const vms::event::Abstract
     if (!alwaysNotify && !m_adaptor->isAllowed(eventType))
         return;
 
-    emit notificationAdded(businessAction);
+    emit notificationAdded(action);
 }
 
 void QnWorkbenchNotificationsHandler::addSystemHealthEvent(QnSystemHealth::MessageType message)
@@ -198,7 +170,7 @@ void QnWorkbenchNotificationsHandler::addSystemHealthEvent(QnSystemHealth::Messa
     addSystemHealthEvent(message, vms::event::AbstractActionPtr());
 }
 
-void QnWorkbenchNotificationsHandler::addSystemHealthEvent(QnSystemHealth::MessageType message, const vms::event::AbstractActionPtr &businessAction)
+void QnWorkbenchNotificationsHandler::addSystemHealthEvent(QnSystemHealth::MessageType message, const vms::event::AbstractActionPtr &action)
 {
     if (message == QnSystemHealth::StoragesAreFull)
         return; //Bug #2308: Need to remove notification "Storages are full"
@@ -206,7 +178,7 @@ void QnWorkbenchNotificationsHandler::addSystemHealthEvent(QnSystemHealth::Messa
     if (!(qnSettings->popupSystemHealth() & (1ull << message)))
         return;
 
-    setSystemHealthEventVisibleInternal(message, QVariant::fromValue(businessAction), true);
+    setSystemHealthEventVisibleInternal(message, QVariant::fromValue(action), true);
 }
 
 bool QnWorkbenchNotificationsHandler::tryClose(bool /*force*/)
@@ -390,45 +362,55 @@ void QnWorkbenchNotificationsHandler::at_eventManager_connectionClosed()
     clear();
 }
 
-void QnWorkbenchNotificationsHandler::at_eventManager_actionReceived(const vms::event::AbstractActionPtr &businessAction)
+void QnWorkbenchNotificationsHandler::at_eventManager_actionReceived(
+    const vms::event::AbstractActionPtr& action)
 {
-    switch (businessAction->actionType())
+    if (!QnBusiness::actionAllowedForUser(action->getParams(), context()->user()))
+        return;
+
+    switch (action->actionType())
     {
         case vms::event::ShowPopupAction:
         case vms::event::ShowOnAlarmLayoutAction:
         {
-            addNotification(businessAction);
+            addNotification(action);
             break;
         }
+
         case vms::event::PlaySoundOnceAction:
         {
-            QString filename = businessAction->getParams().url;
+            QString filename = action->getParams().url;
             QString filePath = context()->instance<ServerNotificationCache>()->getFullPath(filename);
-            // if file is not exists then it is already deleted or just not downloaded yet
-            // I think it should not be played when downloaded
+            // If file doesn't exist then it's already deleted or not downloaded yet.
+            // I think it should not be played when downloaded.
             AudioPlayer::playFileAsync(filePath);
             break;
         }
+
         case vms::event::PlaySoundAction:
         {
-            switch (businessAction->getToggleState())
+            switch (action->getToggleState())
             {
                 case vms::event::ActiveState:
-                    addNotification(businessAction);
+                    addNotification(action);
                     break;
+
                 case vms::event::InactiveState:
-                    emit notificationRemoved(businessAction);
+                    emit notificationRemoved(action);
                     break;
+
                 default:
                     break;
             }
             break;
         }
+
         case vms::event::SayTextAction:
         {
-            AudioPlayer::sayTextAsync(businessAction->getParams().sayText);
+            AudioPlayer::sayTextAsync(action->getParams().sayText);
             break;
         }
+
         default:
             break;
     }

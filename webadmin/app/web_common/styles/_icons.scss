@@ -1,0 +1,198 @@
+@mixin icon{
+  display: inline-block;
+  background-size: 192px 408px;
+  background-image: url(../web_common/images/icons/web_interface_sprite.png);
+  @media only screen and (-webkit-min-device-pixel-ratio: 2), only screen and (min-device-pixel-ratio: 2){
+    background-image: url(../web_common/images/icons/web_interface_sprite@2x.png);
+  }
+}
+
+@mixin kill-glyphicon{
+  @include icon;
+  width: 20px !important;
+  height: 20px !important;
+  &:before{
+    content: none;
+  }
+}
+
+.glyphicon-play{
+  @include kill-glyphicon;
+  background-position: -1px -2px;
+}
+
+.glyphicon-pause{
+  @include kill-glyphicon;
+  background-position: -26px -2px;
+}
+
+.glyphicon-backward{
+  @include kill-glyphicon;
+  background-position: -50px -2px;
+}
+
+.glyphicon-forward{
+  @include kill-glyphicon;
+  background-position: -74px -2px;
+}
+
+.glyphicon-plus{
+  @include kill-glyphicon;
+  background-position: -2px -26px;
+}
+
+.glyphicon-minus{
+  @include kill-glyphicon;
+  background-position: -26px -26px;
+}
+
+.glyphicon-chevron-up{
+  @include kill-glyphicon;
+  width: 10px !important;
+  height: 10px !important;
+  background-position: -49px -49px;
+}
+
+.glyphicon-chevron-down{
+  @include kill-glyphicon;
+  width: 10px !important;
+  height: 10px !important;
+  background-position: -61px -49px;
+}
+
+.glyphicon-cog{
+  @include kill-glyphicon;
+  background-position: -50px -99px;
+  
+  &:hover{
+    background-position: -50px -123px;
+  }
+  &:active{
+    background-position: -50px -147px;
+  }
+}
+
+.glyphicon-fullscreen{
+  @include kill-glyphicon;
+  background-position: -2px -99px;
+
+  &:hover{
+    background-position: -2px -123px;
+  }
+  &:active{
+    background-position: -2px -147px;
+  }
+}
+
+.glyphicon-th-list{
+  @include kill-glyphicon;
+  top: 4px !important;
+  background-position: -1px -170px;
+}
+
+.glyphicon-search{
+  @include kill-glyphicon;
+  background-position: -50px -26px;
+}
+
+.glyphicon-info-sign{
+  @include kill-glyphicon;
+  &{
+    background-position: -74px -26px;
+  }
+  &.active{
+    background-position: -98px -26px;
+  }
+}
+/* Check CLOUD-1197 - this style affected some other remove buttons, so we limit its effect to cameras-panel only */
+.cameras-panel .glyphicon-remove{
+  @include kill-glyphicon;
+  height: 10px !important;
+  width: 10px !important;
+  background-position: -73px -49px;
+  
+  &:hover,
+  &:active{
+    background-position: -73px -61px;
+  }
+}
+
+.camera-preview-offline{
+  @include icon;
+  width: 25px !important;
+  height: 25px !important;
+  position: relative;
+  left: 20px;
+  top: 5px;
+  background-position: -24px -191px;
+}
+.camera-preview-unauthorized{
+  @include icon;
+  width: 25px !important;
+  height: 25px !important;
+  position: relative;
+  left: 20px;
+  top: 5px;
+  background-position: 1px -191px;
+}
+
+.camera-status{
+  @include kill-glyphicon;
+  width: 10px !important;
+  height: 10px !important;
+  &.offline-recording{
+    background-position: -97px -49px;
+  }
+
+  &.online-recording{
+    background-position: -85px -49px; 
+  }
+
+  &.not-recording{
+    background-position: -109px -49px;
+  }
+
+  &.offline{
+    background-position: -121px -49px; 
+  }
+}
+
+.video-status{
+  @include kill-glyphicon;
+  &.online-recording{
+    background-position: -1px -74px;
+  }
+  &.offline-recording{
+    background-position: -25px -74px;
+  }
+  &.not-recording{
+    background-position: -50px -74px;
+  }
+}
+
+.camera-view-unauthorized{
+  @include icon;
+  width: 96px !important;
+  height: 96px !important;
+  background-position: 0px -216px;
+}
+.camera-view-offline{
+  @include icon;
+  width: 96px !important;
+  height: 96px !important;
+  background-position: -96px -216px;
+}
+
+.server-offline{
+  @include icon;
+  width: 96px !important;
+  height: 96px !important;
+  background-position: -96px -316px;
+}
+
+.camera-view-error{
+  @include icon;
+  width: 96px !important;
+  height: 96px !important;
+  background-position: 0px -316px;
+}

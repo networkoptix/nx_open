@@ -1,5 +1,6 @@
 #include "manager.h"
 
+#include <api/global_settings.h>
 #include <common/common_module.h>
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/media_server_resource.h>
@@ -108,7 +109,9 @@ boost::optional<ModuleEndpoint> Manager::getModule(const QnUuid& id) const
 
 void Manager::checkEndpoint(SocketAddress endpoint, QnUuid expectedId)
 {
-    NX_EXPECT(endpoint.isValid(), lm("Invalid endpoint: %1").arg(endpoint));
+    NX_EXPECT(nx::network::SocketGlobals::addressResolver().isValidForConnect(endpoint),
+        lm("Invalid endpoint: %1").arg(endpoint));
+
     m_moduleConnector->dispatch(
         [this, endpoint = std::move(endpoint), expectedId = std::move(expectedId)]() mutable
         {
@@ -220,6 +223,15 @@ void Manager::initializeMulticastFinders(bool clientMode)
             });
     }
 
+    m_multicastFinder->setIsMulticastEnabledFunction(
+        [common = commonModule()]()
+        {
+            if (const auto settings = common->globalSettings())
+                return !settings->isInitialized() || settings->isAutoDiscoveryEnabled();
+
+            return false;
+        });
+
     DeprecatedMulticastFinder::Options options;
     if (clientMode)
         options.multicastCount = 5;
@@ -268,7 +280,6 @@ void Manager::updateEndpoints(const QnMediaServerResource* server)
     }
 
     auto port = (uint16_t) server->getPort();
-    NX_ASSERT(port);
     if (port == 0)
         return;
 

@@ -29,6 +29,7 @@
 #include <nx/client/desktop/ui/actions/action_manager.h>
 #include <ui/common/geometry.h>
 #include <ui/common/notification_levels.h>
+#include <ui/graphics/items/generic/graphics_message_box.h>
 
 //TODO: #gdm think about moving out pages enums
 #include <ui/dialogs/resource_properties/user_settings_dialog.h>
@@ -54,10 +55,13 @@
 #include <utils/common/scoped_painter_rollback.h>
 #include <utils/common/util.h> /* For random. */
 #include <utils/math/color_transformations.h>
+#include <utils/camera/bookmark_helpers.h>
 #include <nx/client/desktop/utils/server_notification_cache.h>
 #include <utils/multi_image_provider.h>
 
 #include <nx/fusion/model_functions.h>
+#include <camera/camera_bookmarks_manager.h>
+#include <core/resource/security_cam_resource.h>
 
 using namespace nx;
 using namespace nx::client::desktop;
@@ -138,7 +142,6 @@ QnNotificationsCollectionWidget::QnNotificationsCollectionWidget(QGraphicsItem* 
     connect(handler,    &QnWorkbenchNotificationsHandler::systemHealthEventRemoved, this,   &QnNotificationsCollectionWidget::hideSystemHealthMessage);
     connect(handler,    &QnWorkbenchNotificationsHandler::cleared,                  this,   &QnNotificationsCollectionWidget::hideAll);
 
-    using namespace nx::client::desktop;
     connect(this->context()->instance<ServerNotificationCache>(),
         &ServerNotificationCache::fileDownloaded,
         this,
@@ -234,6 +237,56 @@ void QnNotificationsCollectionWidget::loadThumbnailForItem(
     item->setImageProvider(new QnMultiImageProvider(std::move(providers), Qt::Vertical, kMultiThumbnailSpacing, item));
 }
 
+void QnNotificationsCollectionWidget::handleShowPopupAction(
+    const vms::event::AbstractActionPtr& businessAction,
+    QnNotificationWidget* widget)
+{
+    const auto params = businessAction->getParams();
+    if (params.targetActionType == vms::event::UndefinedAction)
+        return;
+
+    if (params.targetActionType != vms::event::BookmarkAction)
+        return;
+
+    QnCameraBookmarkList bookmarks;
+    for (const auto& resourceId: businessAction->getResources())
+    {
+        const auto camera = resourcePool()->getResourceById<QnSecurityCamResource>(resourceId);
+        if (!camera)
+        {
+            NX_EXPECT(false, "Invalid camera resource");
+            continue;
+        }
+
+        const auto bookmark = helpers::bookmarkFromAction(businessAction, camera, commonModule());
+        if (!bookmark.isValid())
+        {
+            NX_EXPECT(false, "Invalid bookmark");
+            continue;
+        }
+
+        bookmarks.append(bookmark);
+    }
+
+    if (bookmarks.isEmpty())
+        return;
+
+    widget->addTextButton(qnSkin->icon("buttons/bookmark.png"), tr("Bookmark it"),
+        [this, bookmarks]()
+        {
+            for (const auto bookmark: bookmarks)
+                qnCameraBookmarksManager->addCameraBookmark(bookmark);
+
+            static constexpr int kHintTimeoutMs = 5000;
+            const auto message = bookmarks.count() == 1
+                ? tr("Bookmark created")
+                : tr("%n bookmarks created", "", bookmarks.count());
+            QnGraphicsMessageBox::information(message, kHintTimeoutMs);
+
+            action(action::BookmarksModeAction)->setChecked(true);
+        });
+}
+
 void QnNotificationsCollectionWidget::showEventAction(const vms::event::AbstractActionPtr& action)
 {
     if (m_list->itemCount() >= kMaxNotificationItems)
@@ -317,12 +370,21 @@ void QnNotificationsCollectionWidget::showEventAction(const vms::event::Abstract
     item->setProperty(kItemTimeStampPropertyName,  timestampMs);
     setHelpTopic(item, QnBusiness::eventHelpId(eventType));
 
-    if (action->actionType() == vms::event::PlaySoundAction)
+    switch (action->actionType())
     {
-        QString soundUrl = action->getParams().url;
-        m_itemsByLoadingSound.insert(soundUrl, item);
-        context()->instance<ServerNotificationCache>()->downloadFile(soundUrl);
-    }
+        case vms::event::PlaySoundAction:
+        {
+            QString soundUrl = action->getParams().url;
+            m_itemsByLoadingSound.insert(soundUrl, item);
+            context()->instance<ServerNotificationCache>()->downloadFile(soundUrl);
+            break;
+        }
+        case vms::event::ShowPopupAction:
+            handleShowPopupAction(action, item);
+            break;
+        default:
+            break;
+    };
 
     QIcon icon = iconForAction(action);
 
@@ -433,13 +495,16 @@ void QnNotificationsCollectionWidget::showEventAction(const vms::event::Abstract
 
     m_itemsByEventRuleId.insert(ruleId, item);
 
-    connect(item, &QnNotificationWidget::buttonClicked, this, [this](const QString& alias)
-    {
-        context()->statisticsModule()->registerClick(alias);
-    });
+    connect(item, &QnNotificationWidget::buttonClicked, this,
+        [this](const QString& alias)
+        {
+            context()->statisticsModule()->registerClick(alias);
+        });
 
     /* We use Qt::QueuedConnection as our handler may start the event loop. */
-    connect(item, &QnNotificationWidget::actionTriggered, this, &QnNotificationsCollectionWidget::at_item_actionTriggered, Qt::QueuedConnection);
+    connect(item, &QnNotificationWidget::actionTriggered, this,
+        &QnNotificationsCollectionWidget::at_item_actionTriggered, Qt::QueuedConnection);
+
     m_list->addItem(item, action->actionType() == vms::event::PlaySoundAction);
 }
 

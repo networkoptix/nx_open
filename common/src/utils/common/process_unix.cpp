@@ -1,5 +1,4 @@
 #include "process.h"
-
 #if !defined(QT_NO_PROCESS)
 
 #include <sys/types.h>
@@ -29,11 +28,11 @@ SystemError::ErrorCode startProcessDetached(
     const QString& workingDirectory,
     qint64* pid)
 {
-    // TODO #ak on linux should always use posix_spawn.
+    // TODO: #ak on linux should always use posix_spawn.
 
     #if defined(ISD_JAGUAR)
-        // TODO #ak support workingDirectory.
-        // TODO #ak check if executablePath is script or binary.
+        // TODO: #ak support workingDirectory.
+        // TODO: #ak check if executablePath is script or binary.
 
         static const char* kShellExecutable = "/bin/sh";
         const int kExtraArgs = 3; //< Shell executable, target executable and nullptr.
@@ -70,11 +69,11 @@ SystemError::ErrorCode startProcessDetached(
             *pid = childPid;
 
         return SystemError::noError;
-    #else // defined(ISD_JAGUAR)
+    #else
         return QProcess::startDetached(executablePath, arguments, workingDirectory, pid)
             ? SystemError::noError
-            : SystemError::fileNotFound; // TODO #ak get proper error code.
-    #endif // defined(ISD_JAGUAR)
+            : SystemError::fileNotFound; // TODO: #ak get proper error code.
+    #endif
 }
 
 bool checkProcessExists(qint64 pid)

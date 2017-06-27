@@ -642,15 +642,19 @@ void QnMediaServerResource::setResourcePool(QnResourcePool *resourcePool)
 
     if (auto pool = this->resourcePool())
     {
-        connect(pool, &QnResourcePool::resourceAdded,
-            this, &QnMediaServerResource::onNewResource, Qt::DirectConnection);
+        if (getServerFlags() & Qn::SF_Edge)
+        {
+            // watch to own camera to change default server name
+            connect(pool, &QnResourcePool::resourceAdded,
+                this, &QnMediaServerResource::onNewResource, Qt::DirectConnection);
 
-        connect(pool, &QnResourcePool::resourceRemoved,
-            this, &QnMediaServerResource::onRemoveResource, Qt::DirectConnection);
+            connect(pool, &QnResourcePool::resourceRemoved,
+                this, &QnMediaServerResource::onRemoveResource, Qt::DirectConnection);
 
-        QnResourceList resList = pool->getResourcesByParentId(getId()).filtered<QnSecurityCamResource>();
-        if (!resList.isEmpty())
-            m_firstCamera = resList.first();
+            QnResourceList resList = pool->getResourcesByParentId(getId()).filtered<QnSecurityCamResource>();
+            if (!resList.isEmpty())
+                m_firstCamera = resList.first();
+        }
 
         const auto& settings = pool->commonModule()->globalSettings();
         connect(settings, &QnGlobalSettings::cloudSettingsChanged,

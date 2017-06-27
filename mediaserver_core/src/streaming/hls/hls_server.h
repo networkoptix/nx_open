@@ -38,6 +38,8 @@ namespace nx_hls
         Q_OBJECT
 
     public:
+        static bool doesPathEndWithCameraId() { return true; } //< See the base class method.
+
         QnHttpLiveStreamingProcessor( QSharedPointer<AbstractStreamSocket> socket, QnTcpListener* owner );
         virtual ~QnHttpLiveStreamingProcessor();
 
@@ -73,6 +75,9 @@ namespace nx_hls
         QString m_currentFileName;
         size_t m_bytesSent;
         static size_t m_minPlaylistSizeToStartStreaming;
+
+        /** Prepare path for m3u, e.g. add proxying if needed. */
+        void prepareUrlPath(QUrl* url);
 
         //!
         /*!

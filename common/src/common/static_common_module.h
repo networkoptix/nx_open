@@ -12,6 +12,8 @@
 
 #include <utils/common/instance_storage.h>
 #include <utils/common/software_version.h>
+#include <nx/utils/thread/mutex.h>
+#include <nx/utils/uuid.h>
 
 class QnResourceDataPool;
 struct QnStaticCommonModulePrivate;
@@ -49,11 +51,17 @@ public:
 
     QnResourceDataPool *dataPool() const;
 
+    void setModuleShortId(const QnUuid& id, int number);
+    int moduleShortId(const QnUuid& id) const;
+    QString moduleDisplayName(const QnUuid& id) const;
 protected:
     static void loadResourceData(QnResourceDataPool *dataPool, const QString &fileName, bool required);
 
 private:
+    mutable QnMutex m_mutex;
+	QMap<QnUuid, int> m_longToShortInstanceId;
     QnStaticCommonModulePrivate* m_private;
+
     const Qn::PeerType m_localPeerType;
     const QString m_brand;
     const QString m_customization;

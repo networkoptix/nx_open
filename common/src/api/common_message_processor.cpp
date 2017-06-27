@@ -258,16 +258,17 @@ void QnCommonMessageProcessor::on_gotDiscoveryData(const ec2::ApiDiscoveryData &
     server->setIgnoredUrls(ignoredUrls);
 }
 
-void QnCommonMessageProcessor::on_remotePeerFound(const ec2::ApiPeerAliveData &data) {
-    handleRemotePeerFound(data);
-    emit remotePeerFound(data);
+void QnCommonMessageProcessor::on_remotePeerFound(QnUuid data, Qn::PeerType peerType)
+{
+    handleRemotePeerFound(data, peerType);
+    emit remotePeerFound(data, peerType);
 }
 
-void QnCommonMessageProcessor::on_remotePeerLost(const ec2::ApiPeerAliveData &data) {
-    handleRemotePeerLost(data);
-    emit remotePeerLost(data);
+void QnCommonMessageProcessor::on_remotePeerLost(QnUuid data, Qn::PeerType peerType)
+{
+    handleRemotePeerLost(data, peerType);
+    emit remotePeerLost(data, peerType);
 }
-
 
 void QnCommonMessageProcessor::on_resourceStatusChanged(
     const QnUuid& resourceId,
@@ -592,14 +593,13 @@ void QnCommonMessageProcessor::removeResourceIgnored(const QnUuid &)
 {
 }
 
-void QnCommonMessageProcessor::handleRemotePeerFound(const ec2::ApiPeerAliveData &data) {
-    Q_UNUSED(data)
+void QnCommonMessageProcessor::handleRemotePeerFound(QnUuid /*data*/, Qn::PeerType /*peerType*/)
+{
 }
 
-void QnCommonMessageProcessor::handleRemotePeerLost(const ec2::ApiPeerAliveData &data) {
-    Q_UNUSED(data)
+void QnCommonMessageProcessor::handleRemotePeerLost(QnUuid /*data*/, Qn::PeerType /*peerType*/)
+{
 }
-
 
 void QnCommonMessageProcessor::resetServerUserAttributesList( const ec2::ApiMediaServerUserAttributesDataList& serverUserAttributesList )
 {

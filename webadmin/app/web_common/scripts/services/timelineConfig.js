@@ -10,16 +10,16 @@ function TimelineConfig(){
             size:13,
             weight:400,
             face:'Roboto',
-            color: [43,56,63] // Color for text for top labels
+            color: [43,56,63] // Color for text for top labels //$dark9
         },
-        topLabelMarkerColor: [105,135,150], // Color for mark for top label
+        topLabelMarkerColor: [105,135,150], // Color for mark for top label //$light16
         topLabelMarkerAttach:'top', // top, bottom
         topLabelMarkerHeight: 20/100,
-        topLabelBgColor: [255,255,255],
-        topLabelBgOddColor: [240,243,244],
+        topLabelBgColor: [255,255,255], //$light1
+        topLabelBgOddColor: [240,243,244], //$additional_light2
         topLabelPositionFix:-2, //Vertical fix for position
         topLabelFixed: true,
-        topLabelBottomBorderColor: [73,98,111,0.3],
+        topLabelBottomBorderColor: [73,98,111,0.3],  //$dark15
 
         labelAlign:'above',// center, left, above
         labelHeight:40/100, // %
@@ -27,11 +27,11 @@ function TimelineConfig(){
             size:15,
             weight:400,
             face:'Roboto',
-            color: [105,135,150] // Color for text for top labels
+            color: [105,135,150] // Color for text for top labels //$light16
         },
         labelMarkerAttach:'top', // top, bottom
-        labelMarkerColor:[105,135,150],//false
-        labelBgColor: [28,35,39],
+        labelMarkerColor:[105,135,150],//false  //$light16
+        labelBgColor: [28,35,39],  //$dark6
         labelPositionFix:5, //Vertical fix for position
         labelMarkerHeight:10/100,
         labelFixed: false,
@@ -39,7 +39,7 @@ function TimelineConfig(){
 
         marksAttach:'top', // top, bottom
         marksHeight:5/100,
-        marksColor:[83,112,127,0.6],
+        marksColor:[83,112,127,0.6], //$dark_core
         oldStyle:true
     };
 
@@ -94,7 +94,7 @@ function TimelineConfig(){
             }
         },
 
-        timelineBgColor: [28,35,39,0.6], //Color for ruler marks and labels
+        timelineBgColor: [28,35,39,0.6], //Color for ruler marks and labels  //$dark6
         font:'Roboto',//'sans-serif',
 
         labelPadding: 10,
@@ -103,32 +103,32 @@ function TimelineConfig(){
         chunkHeight:24/100, // %    //Height for event line
         minChunkWidth: 0,
         minPixelsPerLevel: 1,
-        chunksBgColor:[235,239,241],
-        chunksBgBorderColor: [225,231,234],
-        exactChunkColor: [76,188,40], //Archive
-        loadingChunkColor: [0,255,255,0.3],
-        blindChunkColor:  [255,0,255,0.3],
-        highlighChunkColor: [255,255,0,1],
-        lastMinuteColor: [58,145,30,0.3],
+        chunksBgColor:[235,239,241],  //$light3
+        chunksBgBorderColor: [225,231,234],  //$light4
+        exactChunkColor: [76,188,40], //Archive  //$green_l2
+        loadingChunkColor: [0,255,255,0.3], //#00FFFF this is not in palette
+        blindChunkColor:  [255,0,255,0.3],  //#FF00FF this is not in palette
+        highlighChunkColor: [255,255,0,1],  //#FFFF00 this is not in palette
+        lastMinuteColor: [58,145,30,0.3],   //$green_main
 
         scrollBarSpeed: 0.1, // By default - scroll by 10%
         scrollBarHeight: 14/100, // %
         minScrollBarWidth: 40, // px
-        scrollBarBgColor: [255,255,255],
-        scrollBarColor: [145,167,178],
-        scrollBarHighlightColor: [165,183,192],
-        scrollBarHighlightColorActive: [155,175,185],
+        scrollBarBgColor: [255,255,255],  //$light1
+        scrollBarColor: [145,167,178],  //$light12
+        scrollBarHighlightColor: [165,183,192],  //$light10
+        scrollBarHighlightColorActive: [155,175,185],  //$light11
         
 
         //Scroll bar marks
-        scrollBarMarksColor : [105,135,150],
+        scrollBarMarksColor : [105,135,150],  //$light16
         scrollBarMarksHeightOffset : 3,
         scrollBarMarksSpacing : 4,
 
-        timeMarkerColor: [43,56,63, 0.9], // Timemarker color
-        timeMarkerTextColor: [255,255,255],
-        pointerMarkerColor: [205,215,220, 0.9], // Mouse pointer marker color
-        pointerMarkerTextColor: [43,56,63],
+        timeMarkerColor: [43,56,63, 0.9], // Timemarker color //$dark9
+        timeMarkerTextColor: [255,255,255],  //$light1
+        pointerMarkerColor: [205,215,220, 0.9], // Mouse pointer marker color //$light6
+        pointerMarkerTextColor: [43,56,63],  //$dark9
         timeMarkerLineWidth: 1,
         timeMarkerPointerLineWidth: 2,
         markerDateFont:{
@@ -144,20 +144,21 @@ function TimelineConfig(){
         markerWidth: 140,
         markerHeight: 48/100,
         markerPullDown: 3,
-        markerTriangleHeight: 5/100,
+        markerTriangleHeight: 3/100,
+        triangleHeightOffset: 3,
         markerLineHeightOffset: 4,
         dateFormat: 'd mmmm yyyy', // Timemarker format for date
         timeFormat: 'HH:MM:ss', // Timemarker format for time
 
 
-        scrollButtonsColor: [105,135,150,0.3],
-        scrollButtonsHoverColor: [105,135,150,0.5],
-        scrollButtonsActiveColor: [105,135,150,0.4],
+        scrollButtonsColor: [105,135,150,0.3],  //$light16
+        scrollButtonsHoverColor: [105,135,150,0.5],  //$light16
+        scrollButtonsActiveColor: [105,135,150,0.4],  //$light16
         scrollButtonsWidth: 24,
         scrollButtonsHeight: 48/100,
         scrollButtonsArrowLineWidth:2,
-        scrollButtonsArrowColor:[255,255,255,0.8],
-        scrollButtonsArrowActiveColor:[255,255,255,1],
+        scrollButtonsArrowColor:[255,255,255,0.8],  //$light1
+        scrollButtonsArrowActiveColor:[255,255,255,1],  //$light1
         scrollButtonsArrow:{
             size:20,
             width:10

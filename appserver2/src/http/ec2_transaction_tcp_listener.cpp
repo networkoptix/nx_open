@@ -45,7 +45,7 @@ QnTransactionTcpProcessor::QnTransactionTcpProcessor(
     QnTCPConnectionProcessor(new QnTransactionTcpProcessorPrivate, socket, owner)
 {
     Q_D(QnTransactionTcpProcessor);
-
+    d->isSocketTaken = true;
     d->messageBus = messageBus;
     setObjectName( "QnTransactionTcpProcessor" );
 }
@@ -98,7 +98,7 @@ void QnTransactionTcpProcessor::run()
 
     ApiPeerData remotePeer(remoteGuid, remoteRuntimeGuid, peerType, dataFormat);
 
-    if (peerType == Qn::PT_Server && ec2::Settings::instance()->dbReadOnly())
+    if (peerType == Qn::PT_Server && commonModule()->isReadOnly())
     {
         sendResponse(nx_http::StatusCode::forbidden, nx_http::StringType());
         return;
@@ -110,8 +110,8 @@ void QnTransactionTcpProcessor::run()
         nx_http::header::KeepAlive(
             commonModule->globalSettings()->connectionKeepAliveTimeout()).toString());
 
-    if( d->request.requestLine.method == nx_http::Method::POST ||
-        d->request.requestLine.method == nx_http::Method::PUT )
+    if( d->request.requestLine.method == nx_http::Method::Post ||
+        d->request.requestLine.method == nx_http::Method::Put )
     {
         auto connectionGuidIter = d->request.headers.find( Qn::EC2_CONNECTION_GUID_HEADER_NAME );
         if( connectionGuidIter == d->request.headers.end() )
@@ -341,4 +341,4 @@ void QnTransactionTcpProcessor::run()
 }
 
 
-}
+} // namespace ec2
