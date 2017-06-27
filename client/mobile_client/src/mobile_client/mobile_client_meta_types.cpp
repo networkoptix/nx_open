@@ -27,11 +27,14 @@
 #include <mobile_client/mobile_client_ui_controller.h>
 #include <client_core/client_core_meta_types.h>
 #include <controllers/lite_client_controller.h>
-#include <helpers/lite_client_layout_helper.h>
 #include <helpers/cloud_url_helper.h>
 #include <utils/developer_settings_helper.h>
 #include <settings/qml_settings_adaptor.h>
 #include <nx/mobile_client/helpers/inter_client_message.h>
+#include <nx/mobile_client/controllers/resource_ptz_controller.h>
+#include <nx/mobile_client/models/ptz_preset_model.h>
+#include <nx/client/core/resource/layout_accessor.h>
+#include <nx/client/mobile/resource/lite_client_layout_helper.h>
 
 using namespace nx::client::mobile;
 
@@ -61,6 +64,7 @@ void QnMobileClientMetaTypes::registerQmlTypes() {
     qmlRegisterType<QnCalendarModel>("com.networkoptix.qml", 1, 0, "QnCalendarModel");
     qmlRegisterType<QnLayoutsModel>("com.networkoptix.qml", 1, 0, "QnLayoutsModel");
     qmlRegisterType<QnMediaResourceHelper>("Nx.Core", 1, 0, "MediaResourceHelper");
+    qmlRegisterType<nx::client::core::resource::LayoutAccessor>("Nx.Core", 1, 0, "LayoutAccessor");
     qmlRegisterType<QnCameraAccessRightsHelper>("com.networkoptix.qml", 1, 0, "QnCameraAccessRightsHelper");
     qmlRegisterType<QnTimeline>("com.networkoptix.qml", 1, 0, "QnTimelineView");
     qmlRegisterType<QnCameraChunkProvider>("com.networkoptix.qml", 1, 0, "QnCameraChunkProvider");
@@ -77,9 +81,15 @@ void QnMobileClientMetaTypes::registerQmlTypes() {
     qmlRegisterType<QnQuickTextInput>("Nx.Controls", 1, 0, "TextInput");
     qmlRegisterType<QnMobileClientUiController>("com.networkoptix.qml", 1, 0, "QnMobileClientUiController");
     qmlRegisterType<QnLiteClientController>("com.networkoptix.qml", 1, 0, "QnLiteClientController");
-    qmlRegisterType<QnLiteClientLayoutHelper>("com.networkoptix.qml", 1, 0, "QnLiteClientLayoutHelper");
+    qmlRegisterType<resource::LiteClientLayoutHelper>("Nx.Core", 1, 0, "LiteClientLayoutHelper");
     qmlRegisterType<utils::DeveloperSettingsHelper>(
-        "com.networkoptix.qml", 1, 0, "DeveloperSettingsHelper");
+        "Nx.Core", 1, 0, "DeveloperSettingsHelper");
+
+    // Ptz related classes
+    qmlRegisterUncreatableType<Ptz>("Nx.Core", 1, 0, "Ptz",
+        lit("Cannot create an instance of Ptz class"));
+    qmlRegisterType<nx::client::mobile::ResourcePtzController>("Nx.Core", 1, 0, "PtzController");
+    qmlRegisterType<nx::client::mobile::PtzPresetModel>("Nx.Core", 1, 0, "PtzPresetModel");
 
     qmlRegisterRevision<QQuickTextInput, 6>("Nx.Controls", 1, 0);
     qmlRegisterRevision<QQuickItem, 1>("Nx.Controls", 1, 0);

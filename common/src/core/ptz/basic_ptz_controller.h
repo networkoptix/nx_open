@@ -1,43 +1,45 @@
-#ifndef QN_BASIC_PTZ_CONTROLLER_H
-#define QN_BASIC_PTZ_CONTROLLER_H
+#pragma once
 
-#include "abstract_ptz_controller.h"
+#include <core/ptz/abstract_ptz_controller.h>
 
-class QnBasicPtzController: public QnAbstractPtzController {
+class QnBasicPtzController: public QnAbstractPtzController
+{
     Q_OBJECT
-    typedef QnAbstractPtzController base_type;
+    using base_type = QnAbstractPtzController;
 
 public:
-    QnBasicPtzController(const QnResourcePtr &resource): base_type(resource) {}
+    QnBasicPtzController(const QnResourcePtr &resource);
+    virtual Ptz::Capabilities getCapabilities() const override;
 
-    virtual Qn::PtzCapabilities getCapabilities() override                                  { return Qn::NoPtzCapabilities; }
+    virtual bool continuousMove(const QVector3D& speed) override;
+    virtual bool continuousFocus(qreal speed) override;
+    virtual bool absoluteMove(
+        Qn::PtzCoordinateSpace space,
+        const QVector3D& position,
+        qreal speed) override;
+    virtual bool viewportMove(qreal aspectRatio, const QRectF& viewport, qreal speed) override;
 
-    virtual bool continuousMove(const QVector3D &) override                                 { return false; }
-    virtual bool continuousFocus(qreal) override                                            { return false; }
-    virtual bool absoluteMove(Qn::PtzCoordinateSpace, const QVector3D &, qreal) override    { return false; }
-    virtual bool viewportMove(qreal, const QRectF &, qreal) override                        { return false; }
+    virtual bool getPosition(Qn::PtzCoordinateSpace space, QVector3D* position) const override;
+    virtual bool getLimits(Qn::PtzCoordinateSpace space, QnPtzLimits* limits) const override;
+    virtual bool getFlip(Qt::Orientations* flip) const override;
 
-    virtual bool getPosition(Qn::PtzCoordinateSpace, QVector3D *) override                  { return false; }
-    virtual bool getLimits(Qn::PtzCoordinateSpace, QnPtzLimits *) override                  { return false; }
-    virtual bool getFlip(Qt::Orientations *) override                                       { return false; }
+    virtual bool createPreset(const QnPtzPreset& preset) override;
+    virtual bool updatePreset(const QnPtzPreset& preset) override;
+    virtual bool removePreset(const QString& presetId) override;
+    virtual bool activatePreset(const QString& presetId, qreal speed) override;
+    virtual bool getPresets(QnPtzPresetList* presets) const override;
 
-    virtual bool createPreset(const QnPtzPreset &) override                                 { return false; }
-    virtual bool updatePreset(const QnPtzPreset &) override                                 { return false; }
-    virtual bool removePreset(const QString &) override                                     { return false; }
-    virtual bool activatePreset(const QString &, qreal) override                            { return false; }
-    virtual bool getPresets(QnPtzPresetList *) override                                     { return false; }
+    virtual bool createTour(const QnPtzTour& tour) override;
+    virtual bool removeTour(const QString& tourId) override;
+    virtual bool activateTour(const QString& tourId) override;
+    virtual bool getTours(QnPtzTourList* tours) const override;
 
-    virtual bool createTour(const QnPtzTour &) override                                     { return false; }
-    virtual bool removeTour(const QString &) override                                       { return false; }
-    virtual bool activateTour(const QString &) override                                     { return false; }
-    virtual bool getTours(QnPtzTourList *) override                                         { return false; }
+    virtual bool getActiveObject(QnPtzObject* activeObject) const override;
+    virtual bool updateHomeObject(const QnPtzObject& homeObject) override;
+    virtual bool getHomeObject(QnPtzObject* homeObject) const override;
 
-    virtual bool getActiveObject(QnPtzObject *) override                                    { return false; }
-    virtual bool updateHomeObject(const QnPtzObject &) override                             { return false; }
-    virtual bool getHomeObject(QnPtzObject *) override                                      { return false; }
-
-    virtual bool getAuxilaryTraits(QnPtzAuxilaryTraitList *)                                { return false; }
-    virtual bool runAuxilaryCommand(const QnPtzAuxilaryTrait &, const QString &)            { return false; }
+    virtual bool getAuxilaryTraits(QnPtzAuxilaryTraitList* auxilaryTraits) const override;
+    virtual bool runAuxilaryCommand(
+        const QnPtzAuxilaryTrait& trait,
+        const QString& data) override;
 };
-
-#endif // QN_BASIC_PTZ_CONTROLLER_H

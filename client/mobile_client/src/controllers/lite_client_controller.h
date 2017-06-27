@@ -4,7 +4,17 @@
 
 #include <utils/common/connective.h>
 
-class QnLiteClientLayoutHelper;
+namespace nx {
+namespace client {
+namespace mobile {
+namespace resource {
+
+class LiteClientLayoutHelper;
+
+} // namespace resource
+} // namespace mobile
+} // namespace client
+} // namespace nx
 
 class QnLiteClientControllerPrivate;
 
@@ -15,7 +25,8 @@ class QnLiteClientController : public Connective<QObject>
     Q_PROPERTY(QString serverId READ serverId WRITE setServerId NOTIFY serverIdChanged)
     Q_PROPERTY(State clientState READ clientState NOTIFY clientStateChanged)
     Q_PROPERTY(bool serverOnline READ isServerOnline NOTIFY serverOnlineChanged)
-    Q_PROPERTY(QnLiteClientLayoutHelper* layoutHelper READ layoutHelper NOTIFY nothingChanged)
+    Q_PROPERTY(nx::client::mobile::resource::LiteClientLayoutHelper* layoutHelper
+        READ layoutHelper NOTIFY nothingChanged)
 
     using base_type = Connective<QObject>;
 
@@ -39,7 +50,7 @@ public:
 
     bool isServerOnline() const;
 
-    QnLiteClientLayoutHelper* layoutHelper() const;
+    nx::client::mobile::resource::LiteClientLayoutHelper* layoutHelper() const;
 
     Q_INVOKABLE void startLiteClient();
     Q_INVOKABLE void stopLiteClient();

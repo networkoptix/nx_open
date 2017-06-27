@@ -818,7 +818,7 @@ namespace nxcip
             Passing zero in speed should stop PTZ movement.
 
             This function is expected to be implemented if this controller has
-            at least one of the <tt>Qn::ContinuousPtzCapabilities</tt>.
+            at least one of the <tt>Ptz::ContinuousPtzCapabilities</tt>.
 
             \param panSpeed
             \param tiltSpeed

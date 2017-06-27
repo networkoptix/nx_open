@@ -9,6 +9,7 @@ Control
 
     property bool active: false
     property alias text: label.text
+    property alias textColor: label.color
 
     signal clicked()
 
@@ -26,6 +27,7 @@ Control
             anchors.fill: parent
             visible: control.activeFocus || control.active
             color: control.active ? ColorTheme.brand_main : ColorTheme.brand_l2
+            opacity: enabled ? 1.0 : 0.2
         }
 
         MaterialEffect
@@ -55,6 +57,7 @@ Control
         width: parent.availableWidth
         font: control.font
         color: control.active ? ColorTheme.brand_contrast : ColorTheme.base1
+        opacity: enabled || control.active ? 1.0 : 0.2
     }
 
     Keys.onEnterPressed: clicked()

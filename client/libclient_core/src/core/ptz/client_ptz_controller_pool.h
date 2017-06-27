@@ -19,4 +19,5 @@ private:
     void cacheCameraPresets(const QnResourcePtr &resource);
 };
 
+#define qnClientPtzPool QnClientPtzControllerPool::instance()
 #endif // QN_CLIENT_PTZ_CONTROLLER_POOL_H

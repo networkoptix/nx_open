@@ -132,8 +132,7 @@ CameraDiagnostics::Result QnTestCameraStreamReader::openStreamInternal(bool isCa
         return CameraDiagnostics::CannotOpenCameraMediaPortResult(url.toString(), url.port());
     }
     QByteArray path = urlStr.mid(urlStr.lastIndexOf(QLatin1String("/"))).toUtf8();
-    path += QByteArray('\0');
-    m_tcpSock->send(path.data(), path.size());
+    m_tcpSock->send(path.data(), path.size() + 1);
 
     return CameraDiagnostics::NoErrorResult();
 }
