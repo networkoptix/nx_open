@@ -185,7 +185,7 @@ QSize QnPhysicalCameraResource::getNearestResolution(const QSize& resolution, fl
 CameraDiagnostics::Result QnPhysicalCameraResource::initInternal()
 {
     auto resData = qnStaticCommon->dataPool()->data(toSharedPointer(this));
-    int timeoutSec = resData.value<int>(lit("unauthorizedTimeoutSec"));
+    int timeoutSec = resData.value<int>(Qn::kUnauthrizedTimeoutParamName);
     auto credentials = getAuth();
     auto status = getStatus();
     if (timeoutSec > 0 &&
