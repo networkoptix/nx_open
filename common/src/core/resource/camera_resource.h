@@ -108,7 +108,7 @@ private:
     QnMutex m_mediaStreamsMutex;
     int m_channelNumber; // video/audio source number
     QElapsedTimer m_lastInitTime;
-    QAuthenticator m_unauthorizedCredentials;
+    QAuthenticator m_lastCredentials;
 };
 
 

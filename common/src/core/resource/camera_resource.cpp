@@ -192,12 +192,12 @@ CameraDiagnostics::Result QnPhysicalCameraResource::initInternal()
         m_lastInitTime.isValid() &&
         m_lastInitTime.elapsed() < timeoutSec * 1000 &&
         status == Qn::Unauthorized &&
-        m_unauthorizedCredentials == credentials)
+        m_lastCredentials == credentials)
     {
-        m_unauthorizedCredentials = credentials;
         return CameraDiagnostics::NotAuthorisedResult(getUrl());
     }
     m_lastInitTime.restart();
+    m_lastCredentials = credentials;
     return CameraDiagnostics::NoErrorResult();
 }
 
