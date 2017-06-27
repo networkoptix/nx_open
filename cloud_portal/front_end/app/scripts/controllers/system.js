@@ -109,16 +109,27 @@ angular.module('cloudApp')
             // Call share dialog, run process inside
             return dialogs.share($scope.system).then(loadUsers);
         };
-
+        $scope.locked = {};
         $scope.editShare = function(user){
             //Pass user inside
-            return dialogs.share($scope.system, user).then(loadUsers);
+
+            if($scope.locked[user.email]){
+                return;
+            }
+            $scope.locked[user.email] = true;
+            return dialogs.share($scope.system, user).then(loadUsers).finally(function(){
+                $scope.locked[user.email] = false;
+            });
         };
 
         $scope.unshare = function(user){
             if($scope.account.email == user.email){
                 return $scope.delete();
             }
+            if($scope.locked[user.email]){
+                return;
+            }
+            $scope.locked[user.email] = true;
             dialogs.confirm(L.system.confirmUnshare, L.system.confirmUnshareTitle, L.system.confirmUnshareAction, 'danger').
                 then(function(){
                     // Run a process of sharing
@@ -127,6 +138,10 @@ angular.module('cloudApp')
                     },{
                         successMessage: L.system.permissionsRemoved.replace('{{email}}',user.email),
                         errorPrefix: L.errorCodes.cantSharePrefix
+                    }).then(function(){
+                        $scope.locked[user.email] = false;
+                    },function(){
+                        $scope.locked[user.email] = false;
                     });
                     $scope.unsharing.run();
                 });

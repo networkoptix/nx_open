@@ -226,6 +226,10 @@ angular.module('nxCommon').controller('ViewCtrl',
         };
 
         function updateVideoSource(playing) {
+            if($scope.playerAPI) {
+                // Pause playing
+                $scope.playerAPI.pause();
+            }
             updateAvailableResolutions();
             var live = !playing;
 

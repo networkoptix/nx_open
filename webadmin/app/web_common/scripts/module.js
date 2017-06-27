@@ -1,6 +1,8 @@
 angular.module('nxCommon', [
     'ngStorage'
-]).run(['$route', '$rootScope', '$location', 'page', '$localStorage', function ($route, $rootScope, $location, page, $localStorage) {
+]).config(['$compileProvider', function($compileProvider) {
+    $compileProvider.aHrefSanitizationWhitelist(/^\s*(https?|rtsp|tel|mailto):/);
+}]).run(['$route', '$rootScope', '$location', 'page', '$localStorage', function ($route, $rootScope, $location, page, $localStorage) {
 
     // Support changing location without reloading controller
     var original = $location.path;

@@ -35,7 +35,7 @@ admins:
         - 'cloud-portal-admins@networkoptix.com'
 
 languages:
-    - ru
+    - ru_RU
 
 queue_name: '$INSTANCE_NAME'
 
