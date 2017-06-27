@@ -7,7 +7,9 @@ angular.module('nxCommon')
                 "activeCamera":"=",
                 "camerasProvider": "=",
                 "player": "=",
+                "system": "=",
                 "currentResolution": "=",
+                "positionProvider": "=",
                 "toggleCameraPanel": "="
             },
             templateUrl: Config.viewsDirCommon + 'components/cameraPanel.html',
