@@ -10,7 +10,7 @@
 #include <core/resource_access/resource_access_manager.h>
 #include <core/resource/resource_display_info.h>
 
-//TODO: #vkutin Move these to proper locations and namespaces
+// TODO: #vkutin Move these to proper locations and namespaces
 #include <business/business_resource_validation.h>
 #include <business/business_types_comparator.h>
 

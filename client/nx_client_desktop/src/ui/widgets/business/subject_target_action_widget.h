@@ -20,7 +20,7 @@ public:
 protected:
     virtual void at_model_dataChanged(Fields fields) override;
 
-    //TODO: #vkutin #3.2 Refactor this along with all event/action widgets.
+    // TODO: #vkutin #3.2 Refactor this along with all event/action widgets.
     void setSubjectsButton(QPushButton* button);
 
 private:
