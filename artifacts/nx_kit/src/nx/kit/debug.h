@@ -2,7 +2,8 @@
 #pragma once
 
 /**@file
- * Utilities for debugging and logging debug values.
+ * Utilities for debugging: measuring execution time and FPS, working with strings, logging values
+ * and messages.
  *
  * This unit can be compiled in the context of any C++ project. If Qt headers are included before
  * this one, some Qt support is enabled via "#if defined(QT_CORE_LIB)".
@@ -33,7 +34,7 @@ namespace debug {
 
 NX_KIT_API uint8_t* unalignedPtr(void* data);
 
-NX_KIT_API std::string format(const std::string formatStr, ...);
+NX_KIT_API std::string format(std::string formatStr, ...);
 
 NX_KIT_API bool isAsciiPrintable(int c);
 
@@ -44,7 +45,7 @@ NX_KIT_API size_t commonPrefixSize(const std::string& s1, const std::string& s2)
 
 /**
  * Extract part of the source code filename which follows the uninteresting common part.
- * @return Pointer into the some char inside the given string.
+ * @return Pointer to some char inside the given string.
  */
 NX_KIT_API const char* relativeSrcFilename(const char* file);
 
