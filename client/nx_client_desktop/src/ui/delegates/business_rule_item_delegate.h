@@ -28,6 +28,7 @@ public:
 
     QnResourceSelectionDialog::Filter selectionTarget() const;
     void setSelectionTarget(QnResourceSelectionDialog::Filter target);
+
 signals:
     void commit();
 

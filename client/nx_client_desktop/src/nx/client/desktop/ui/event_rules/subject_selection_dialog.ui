@@ -51,6 +51,9 @@
        <widget class="QnSearchLineEdit" name="searchLineEdit" native="true"/>
       </item>
       <item>
+       <widget class="nx::client::desktop::ui::CheckableLineWidget" name="allUsersCheckableLine" native="true"/>
+      </item>
+      <item>
        <widget class="QScrollArea" name="scrollArea">
         <property name="frameShape">
          <enum>QFrame::NoFrame</enum>
@@ -67,7 +70,7 @@
            <x>0</x>
            <y>0</y>
            <width>368</width>
-           <height>394</height>
+           <height>368</height>
           </rect>
          </property>
          <property name="sizePolicy">
@@ -308,7 +311,19 @@
    <extends>QWidget</extends>
    <header location="global">ui/widgets/common/alert_bar.h</header>
   </customwidget>
+  <customwidget>
+   <class>nx::client::desktop::ui::CheckableLineWidget</class>
+   <extends>QWidget</extends>
+   <header location="global">nx/client/desktop/ui/common/checkable_line_widget.h</header>
+   <container>1</container>
+  </customwidget>
  </customwidgets>
+ <tabstops>
+  <tabstop>scrollArea</tabstop>
+  <tabstop>rolesTreeView</tabstop>
+  <tabstop>usersTreeView</tabstop>
+  <tabstop>showAllUsers</tabstop>
+ </tabstops>
  <resources/>
  <connections>
   <connection>

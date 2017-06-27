@@ -138,7 +138,7 @@ bool DropInstrument::dragEnterEvent(QGraphicsItem *, QGraphicsSceneDragDropEvent
 #ifdef Q_OS_MAC
     if (mimeData->hasUrls())
     {
-        foreach(const QUrl &url, mimeData->urls())
+        for (const auto& url: mimeData->urls())
         {
             if (url.isLocalFile() && QFile::exists(url.toLocalFile()))
                 mac_saveFileBookmark(url.path());

@@ -15,9 +15,6 @@ public:
     explicit QnSubjectTargetActionWidget(QWidget* parent = nullptr);
     virtual ~QnSubjectTargetActionWidget() override;
 
-    bool requiresExplicitSelection() const;
-    void setRequiresExplicitSelection(bool value);
-
 protected:
     virtual void at_model_dataChanged(QnBusiness::Fields fields) override;
 
@@ -31,5 +28,4 @@ private:
 private:
     QPushButton* m_subjectsButton = nullptr;
     QScopedPointer<QnBusinessStringsHelper> m_helper;
-    bool m_requiresExplicitSelection = false;
 };
