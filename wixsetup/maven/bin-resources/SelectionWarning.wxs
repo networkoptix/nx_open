@@ -13,11 +13,11 @@
 <Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
     <Fragment>
         <UI>
-            <Dialog Id="SelectionWarningDlg" Width="260" Height="85" Title="!(loc.StdString_SetupTitle)">
-                <Control Id="Ok" Type="PushButton" X="195" Y="58" Width="56" Height="17" Text="!(loc.StdString_Ok)">
+            <Dialog Id="SelectionWarningDlg" Width="260" Height="85" Title="[ProductTitle]">
+                <Control Id="Ok" Type="PushButton" X="195" Y="58" Width="56" Height="17" Text="!(loc.WixUIOK)">
                     <Publish Event="EndDialog" Value="Return">1</Publish>
                 </Control>
-                <Control Id="Text" Type="Text" X="57" Y="18" Width="194" Height="30" NoPrefix="yes" Text="!(loc.SelectionWarningDlg_ComponentSelectedMessage)" />
+                <Control Id="Text" Type="Text" X="57" Y="18" Width="194" Height="30" NoPrefix="yes" Text="At least one component should be selected" />
             </Dialog>
         </UI>
     </Fragment>

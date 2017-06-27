@@ -210,9 +210,13 @@ void QnTimeServerSelectionWidget::applyChanges()
 
 bool QnTimeServerSelectionWidget::hasChanges() const
 {
-    return m_model->selectedServer() != selectedServer()
-        || (qnGlobalSettings->isSynchronizingTimeWithInternet()
-            != ui->syncWithInternetCheckBox->isChecked());
+    const bool syncWithInternet = ui->syncWithInternetCheckBox->isChecked();
+    if (qnGlobalSettings->isSynchronizingTimeWithInternet() != syncWithInternet)
+        return true;
+
+    return syncWithInternet
+        ? false
+        : m_model->selectedServer() != selectedServer();
 }
 
 QnUuid QnTimeServerSelectionWidget::selectedServer() const

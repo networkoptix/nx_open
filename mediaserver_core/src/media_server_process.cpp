@@ -3166,7 +3166,10 @@ void MediaServerProcess::run()
         // Connect to local database. Start peer-to-peer sync (enter to cluster mode)
         commonModule()->setCloudMode(true);
         if (!isDiscoveryDisabled)
+        {
+            // Should be called after global settings are initialized.
             commonModule()->moduleDiscoveryManager()->start();
+        }
     }
 #endif
 

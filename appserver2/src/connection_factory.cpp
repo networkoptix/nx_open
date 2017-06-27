@@ -1641,6 +1641,7 @@ void Ec2DirectConnectionFactory::remoteConnectionFinished(
         case ec2::ErrorCode::forbidden:
         case ec2::ErrorCode::ldap_temporary_unauthorized:
         case ec2::ErrorCode::cloud_temporary_unauthorized:
+        case ec2::ErrorCode::disabled_user_unauthorized:
             break;
 
         default:
@@ -1682,7 +1683,8 @@ void Ec2DirectConnectionFactory::remoteTestConnectionFinished(
         || errorCode == ErrorCode::unauthorized
         || errorCode == ErrorCode::forbidden
         || errorCode == ErrorCode::ldap_temporary_unauthorized
-        || errorCode == ErrorCode::cloud_temporary_unauthorized)
+        || errorCode == ErrorCode::cloud_temporary_unauthorized
+        || errorCode == ErrorCode::disabled_user_unauthorized)
     {
         handler->done(reqId, errorCode, connectionInfo);
         QnMutexLocker lk(&m_mutex);

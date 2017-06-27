@@ -15,7 +15,7 @@
         <?define VmsRemoving=" (Installed AND REMOVE = "ALL") "?>
         <?define VmsInstallingOrChanging="($(var.VmsInstalling) OR $(var.VmsChanging))" ?>
 
-        <?define LaunchNxtoolChecBoxText="!(loc.Product_LaunchNxtool)" ?>
+        <?define LaunchNxtoolChecBoxText="Launch [nxtoolName] when setup exits." ?>
         
         <?if $(var.arch) = x86 ?>
         <Condition Message="This package is designed for 32-bit OS. Setup will now exit.">

@@ -1,0 +1,7 @@
+<sequence>
+    <set resName="cdb" resValue="https://{{.CloudDb.Host}}:{{.CloudDb.Port}}"/>
+    {{ range $ConnectionMediator := .ConnectionMediators -}}
+    <set resName="hpm" resValue="stun://{{$ConnectionMediator.Host}}:{{$ConnectionMediator.Port}}"/>
+    {{ end -}}
+    <set resName="notification_module" resValue="https://{{.CloudPortal.Host}}:{{.CloudPortal.Port}}"/>
+</sequence>
