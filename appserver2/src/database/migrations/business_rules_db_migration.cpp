@@ -157,18 +157,44 @@ struct BusinessActionParameters31Beta
     bool playToClient = true;
     QString contentType;
 };
-
 #define BusinessActionParameters31Beta_Fields (targetActionType)(needConfirmation)(actionResourceId)\
     (url)(emailAddress)(fps)(streamQuality)(recordAfter)(relayOutputId)(sayText)(tags)(text)\
     (durationMs)(additionalResources)(allUsers)(forced)(presetId)(useSource)(recordBeforeMs)\
     (playToClient)(contentType)
+
+struct EventMetaData31Beta
+{
+    std::vector<QnUuid> cameraRefs;
+    std::vector<QnUuid> instigators;
+    bool allUsers = false;
+};
+#define EventMetaData31Beta_Fields (cameraRefs)(instigators)(allUsers)
+
+struct BusinessEventParameters31Beta
+{
+    QnBusiness::EventType eventType;
+    qint64 eventTimestampUsec;
+    QnUuid eventResourceId;
+    QString resourceName;
+    QnUuid sourceServerId;
+    QnBusiness::EventReason reasonCode;
+    QString inputPortId;
+    QString caption;
+    QString description;
+    EventMetaData31Beta metadata;
+};
+#define BusinessEventParameters31Beta_Fields \
+    (eventType)(eventTimestampUsec)(eventResourceId)(resourceName)(sourceServerId) \
+    (reasonCode)(inputPortId)(caption)(description)(metadata)
 
 #define MIGRATION_ACTION_PARAM_TYPES \
     (CameraOutputParametersV23)\
     (CameraOutputParametersV30)\
     (ShowPopupParametersV30)\
     (ShowPopupParametersV31Alpha)\
-    (BusinessActionParameters31Beta)
+    (BusinessActionParameters31Beta)\
+    (EventMetaData31Beta)\
+    (BusinessEventParameters31Beta)
 
 QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(MIGRATION_ACTION_PARAM_TYPES, (json))
 
@@ -349,6 +375,48 @@ bool migrateBusinessActionsAllUsers(const QSqlDatabase& database)
 
         params.allUsers = allUsers;
         if (!doRemap(database, data.id, QJson::serialized(params), "action_params"))
+            return false;
+    }
+
+    return true;
+}
+
+bool migrateBusinessEventsAllUsers(const QSqlDatabase& database)
+{
+    QSqlQuery query(database);
+    query.setForwardOnly(true);
+    QString sqlText = R"sql(
+        SELECT id, event_condition
+        FROM vms_businessrule
+        WHERE event_type = ?
+    )sql";
+    if (!QnDbHelper::prepareSQLQuery(&query, sqlText, Q_FUNC_INFO))
+        return false;
+
+    query.addBindValue(QnBusiness::SoftwareTriggerEvent);
+    if (!QnDbHelper::execSQLQuery(&query, Q_FUNC_INFO))
+        return false;
+
+    QVector<QPair<int, QByteArray>> oldData;
+    while (query.next())
+    {
+        oldData << qMakePair(
+            query.value("id").toInt(),
+            query.value("event_condition").toByteArray());
+    }
+
+    for (const auto& old: oldData)
+    {
+        const int id = old.first;
+        auto params = QJson::deserialized<BusinessEventParameters31Beta>(old.second);
+
+        const bool allUsers = params.metadata.instigators.empty();
+        if (params.metadata.allUsers == allUsers)
+            continue;
+
+        params.metadata.allUsers = allUsers;
+
+        if (!doRemap(database, id, QJson::serialized(params), "event_condition"))
             return false;
     }
 

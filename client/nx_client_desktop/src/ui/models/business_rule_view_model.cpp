@@ -913,6 +913,9 @@ bool QnBusinessRuleViewModel::isValid(int column) const
                 case QnBusiness::CameraInputEvent:
                     return isResourcesListValid<QnCameraInputPolicy>(
                         resourcePool()->getResources<QnCameraInputPolicy::resource_type>(filtered));
+                case QnBusiness::SoftwareTriggerEvent:
+                    return m_eventParams.metadata.allUsers
+                        || !m_eventParams.metadata.instigators.empty();
                 default:
                     return true;
             }
