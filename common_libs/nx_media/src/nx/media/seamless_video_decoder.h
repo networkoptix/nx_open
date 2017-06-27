@@ -9,6 +9,7 @@
 namespace nx {
 namespace media {
 
+class AbstractVideoDecoder;
 class SeamlessVideoDecoderPrivate;
 
 /**
@@ -56,6 +57,8 @@ public:
 
     /** Can be AV_CODEC_ID_NONE if not available. */
     AVCodecID currentCodec() const;
+
+    AbstractVideoDecoder* currentDecoder() const;
 
     void pleaseStop();
 

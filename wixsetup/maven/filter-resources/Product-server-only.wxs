@@ -89,7 +89,10 @@
             <RegistrySearch Id="ServerPortReg" Root="HKLM" Key="$(var.ServerRegPath)" Name="port" Type="raw" Win64="yes"/>
         </Property> -->
 
-        <Property Id="ALLOW_CAMERA_CHANGES" Value="1" Secure="yes"/>
+        <Property Id="ALLOW_CAMERA_CHANGES" Secure="yes">
+            <RegistrySearch Id="CameraSettingsOptimizationReg" Root="HKLM" Key="$(var.ServerRegPath)" Name="cameraSettingsOptimization" Type="raw" Win64="yes"/>
+        </Property>
+
         <Property Id="STATISTICS_REPORT_ALLOWED" Value="1" Secure="yes"/>
    
         <Property Id="SERVER_LOGIN" Value="admin"/>
@@ -99,15 +102,14 @@
             <Property Id="SERVER_PASSWORD_CONFIRM" Value="admin" Secure="yes"/>
         <?endif?>
 
-        <Property Id="ALLOW_CAMERA_CHANGES_REF" Value="ALLOW_CAMERA_CHANGES"/>
-        <Property Id="STATISTICS_REPORT_ALLOWED_REF" Value="STATISTICS_REPORT_ALLOWED"/>        
-
         <Binary Id="CustomActions.dll" SourceFile="CustomActions\Release\CustomActions.dll" />
 
         <!-- Custom actions -->
         <CustomAction Id="SetPreviousServerInstalled" BinaryKey="CustomActions.dll" DllEntry="SetPreviousServerInstalled" Execute="immediate" Return="check"/>
 
-        <SetProperty Action="SetStatisticsReportAllowed1" Id="STATISTICS_REPORT_ALLOWED" Value="1" After="SetPreviousServerInstalled" Sequence="ui">$(var.VmsInstalling)</SetProperty>
+        <SetProperty Action="SetStatisticsReportAllowed1" Id="ALLOW_CAMERA_CHANGES" Value="1" After="SetPreviousServerInstalled" Sequence="ui">$(var.VmsInstalling)</SetProperty>
+        <SetProperty Action="SetAllowCameraOptimization1" Id="STATISTICS_REPORT_ALLOWED" Value="1" After="AppSearch">$(var.VmsInstalling)</SetProperty>
+    
         <CustomAction Id="ResetPreselected" Property="Preselected" Value="" />
         <CustomAction Id="GenerateGuidsForServers" BinaryKey="CustomActions.dll" DllEntry="GenerateGuidsForServers"/>
         <CustomAction Id="DeleteDatabaseFile" BinaryKey="CustomActions.dll" DllEntry="DeleteDatabaseFile" Execute="deferred" Impersonate="no"/>

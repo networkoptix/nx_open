@@ -13,7 +13,7 @@ Control
 
     property alias resourceId: resourceHelper.resourceId
     property bool paused: false
-    property QnLiteClientLayoutHelper layoutHelper: null
+    property LiteClientLayoutHelper layoutHelper: null
     property int layoutX: -1
     property int layoutY: -1
 

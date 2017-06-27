@@ -1,7 +1,8 @@
+#include <functional>
+
 #include <gtest/gtest.h>
 
 #include <nx/utils/log/log.h>
-
 #include <nx/core/access/access_types.h>
 #include <common/common_module.h>
 #include <common/common_globals.h>
@@ -22,40 +23,29 @@
 #include <core/resource_management/resource_pool.h>
 #include <nx/fusion/serialization/lexical_enum.h>
 
+// TODO: #dklychkov Move mock classes to a separate file.
+// TODO: #dklychkov Rename this test to something like quality_chooser_ut.
+// TODO: #dklychkov Implement Player test.
+
 namespace nx {
 namespace media {
 namespace test {
 
 namespace {
 
-static std::string qSizeToStdString(const QSize& size)
+static QString qSizeToString(const QSize& size)
 {
-    return lit("%1 x %2").arg(size.width()).arg(size.height()).toLatin1().constData();
+    if (size.height() >= 0)
+    {
+        if (size.width() >= 0)
+            return lit("%1 x %2").arg(size.width()).arg(size.height());
+        return lit("%1").arg(size.height());
+    }
+    return lit("<invalid>");
 }
 
 //-------------------------------------------------------------------------------------------------
 // Test/mock classes.
-
-class TestPlayer: public Player
-{
-public:
-    TestPlayer(QnArchiveStreamReader* archiveReader, QnCommonModule* commonModule):
-        m_module(commonModule)
-    {
-        testSetOwnedArchiveReader(archiveReader);
-    }
-
-    using Player::testSetCamera;
-
-protected:
-    virtual QnCommonModule* commonModule() const override
-    {
-        return m_module;
-    }
-
-private:
-    QnCommonModule* m_module;
-};
 
 class MockVideoDecoder: public AbstractVideoDecoder
 {
@@ -274,169 +264,206 @@ private:
     Qn::LicenseType m_cameraType;
 };
 
-class MockArchiveStreamReader: public QnArchiveStreamReader
-{
-public:
-    typedef std::function<void(
-        MediaQuality quality, bool fastSwitch, const QSize& resolution)> QualitySetCallback;
-
-    MockArchiveStreamReader(
-        const QnResourcePtr& camera, QualitySetCallback qualitySetCallback)
-        :
-        QnArchiveStreamReader(camera),
-        m_qualitySetCallback(qualitySetCallback)
-    {
-    }
-
-    void setQuality(MediaQuality quality, bool fastSwitch, const QSize& resolution) override
-    {
-        m_qualitySetCallback(quality, fastSwitch, resolution);
-    }
-
-private:
-    QualitySetCallback m_qualitySetCallback;
-};
-
 //-------------------------------------------------------------------------------------------------
 // Test mechanism.
+
+class TestCase;
 
 class PlayerSetQualityTest
 {
 public:
-    PlayerSetQualityTest()
-    {
-        m_module->resourcePool()->clear(); //< Just in case.
-        m_module->resourcePool()->addResource(m_server);
-        m_module->resourcePool()->addResource(m_camera);
-    }
-
-    ~PlayerSetQualityTest()
-    {
-        m_module->resourcePool()->clear();
-    }
+    PlayerSetQualityTest();
+    ~PlayerSetQualityTest();
 
     // Can be called multiple times.
-    void test(
-        int sourceCodeLineNumber,
-        const char* sourceCodeLineString,
-        int channelCount,
-        bool clientSupportsTranscoding,
-        bool serverSupportsTranscoding,
-        QSize maxTranscodingResolution,
-        QSize maxDecoderResolution,
-        QSize highStreamResolution,
-        QSize lowStreamResolution,
-        int videoQuality,
-        QSize expectedQuality)
-    {
-        NX_LOG(lit("[TEST] ====================================================================="),
-            cl_logINFO);
-        NX_LOG(lit("[TEST] line %1: %2\n").arg(sourceCodeLineNumber).arg(sourceCodeLineString),
-            cl_logINFO);
-
-        VideoDecoderRegistry::instance()->setTranscodingEnabled(clientSupportsTranscoding);
-        m_server->setSupportsTranscoding(serverSupportsTranscoding);
-        MockVideoDecoder::s_maxResolution = maxDecoderResolution;
-        MockVideoDecoder::s_transcodingCodec = m_archiveReader->getTranscodingCodec();
-        MockVideoDecoder::s_maxTranscodedResolution = maxTranscodingResolution;
-        m_camera->setStreams(highStreamResolution, lowStreamResolution);
-        m_camera->setChannelCount(channelCount);
-
-        m_calledSetQuality = false;
-
-        // Reset stored Video Quality value to guarantee that our new value will be processed.
-        m_player->testSetCamera(QnResourcePtr(nullptr));
-        m_player->setVideoQuality(-1);
-        m_player->testSetCamera(m_camera);
-
-        m_player->setVideoQuality(videoQuality); //< Calls handleSetQuality().
-
-        EXPECT_TRUE(m_calledSetQuality) << "setQuality() has not been called by Player";
-        if (m_calledSetQuality)
-        {
-            if (expectedQuality == media_player_quality_chooser::kQualityLow)
-            {
-                checkActualValues(MEDIA_Quality_Low, QSize());
-            }
-            else if (expectedQuality == media_player_quality_chooser::kQualityHigh)
-            {
-                checkActualValues(MEDIA_Quality_High, QSize());
-            }
-            else if (expectedQuality == media_player_quality_chooser::kQualityLowIframesOnly)
-            {
-                checkActualValues(MEDIA_Quality_LowIframesOnly, QSize());
-            }
-            else
-            {
-                checkActualValues(MEDIA_Quality_CustomResolution,
-                    QSize(/*width*/ 0, expectedQuality.height())); //< Player sets "auto" width.
-            }
-        }
-    }
-
-private:
-    void checkActualValues(MediaQuality expectedMediaQuality, QSize expectedResolution)
-    {
-        // ASSERT_EQ not used to properly convert values to strings.
-
-        if (expectedMediaQuality != m_actualQuality)
-        {
-            ADD_FAILURE() << "MediaQuality: "
-                << "expected " << QnLexical::serialized(expectedMediaQuality).toUtf8().constData()
-                << ", actual " << QnLexical::serialized(m_actualQuality).toUtf8().constData();
-        }
-
-        if (expectedResolution != m_actualResolution)
-        {
-            ADD_FAILURE() << "Resolution: "
-                << "expected " << qSizeToStdString(expectedResolution)
-                << ", actual " << qSizeToStdString(m_actualResolution);
-        }
-    }
-
-    void handleSetQuality(MediaQuality quality, bool fastSwitch, const QSize& resolution)
-    {
-        EXPECT_TRUE(fastSwitch);
-
-        EXPECT_FALSE(m_calledSetQuality) << "setQuality() called more than once.";
-        m_calledSetQuality = true;
-
-        NX_LOG(lit("[TEST] setQuality(%1, fastSwitch: %2, %3 x %4);")
-            .arg(QnLexical::serialized(quality))
-            .arg(fastSwitch)
-            .arg(resolution.width())
-            .arg(resolution.height()), cl_logINFO);
-
-        m_actualQuality = quality;
-        m_actualResolution = resolution;
-    }
+    void test(const TestCase& testCase);
 
 private:
     QnStaticCommonModule m_staticCommon;
-    std::unique_ptr<QnCommonModule> m_module{new QnCommonModule(false, nx::core::access::Mode::direct)};
-
+    std::unique_ptr<QnCommonModule> m_module{
+        new QnCommonModule(false, nx::core::access::Mode::direct)};
     QnSharedResourcePointer<MockServer> m_server{new MockServer(m_module.get())};
-
     QnSharedResourcePointer<MockCamera> m_camera{new MockCamera(m_server->getId())};
-
-    MockArchiveStreamReader* m_archiveReader{new MockArchiveStreamReader(
-        m_camera,
-        [this](MediaQuality quality, bool fastSwitch, const QSize& resolution)
-        {
-            handleSetQuality(quality, fastSwitch, resolution);
-        }
-    )};
-
-    std::unique_ptr<TestPlayer> m_player{new TestPlayer(m_archiveReader, m_module.get())};
-
-    bool m_calledSetQuality;
-
-    // Test results.
-    MediaQuality m_actualQuality;
-    QSize m_actualResolution;
 };
 
-} // namespace
+class TestCase
+{
+    PlayerSetQualityTest* executor = nullptr;
+
+public:
+    int lineNumber = 0;
+    int channelCount = 1;
+    bool clientSupportsTranscoding = true;
+    bool serverSupportsTranscoding = true;
+    QSize maxTranscodingResolution;
+    QSize maxDecoderResolution;
+    QSize highStreamResolution;
+    QSize lowStreamResolution;
+    int videoQuality = Player::UnknownVideoQuality;
+    media_player_quality_chooser::Result expectedQuality;
+
+    TestCase() {}
+
+    ~TestCase()
+    {
+        if (executor)
+            executor->test(*this);
+    }
+
+    TestCase& setLineNumber(int line)
+    {
+        lineNumber = line;
+        return *this;
+    }
+
+    TestCase& req(int quality)
+    {
+        videoQuality = quality;
+        return *this;
+    }
+
+    TestCase& low(int width, int height)
+    {
+        lowStreamResolution = QSize(width, height);
+        return *this;
+    }
+
+    TestCase& high(int width, int height)
+    {
+        highStreamResolution = QSize(width, height);
+        return *this;
+    }
+
+    TestCase& channels(int count)
+    {
+        channelCount = count;
+        return *this;
+    }
+
+    TestCase& noClientTrans()
+    {
+        clientSupportsTranscoding = false;
+        return *this;
+    }
+
+    TestCase& noServerTrans()
+    {
+        serverSupportsTranscoding = false;
+        return *this;
+    }
+
+    TestCase& noTrans()
+    {
+        serverSupportsTranscoding = false;
+        clientSupportsTranscoding = false;
+        return *this;
+    }
+
+    TestCase& maxTrans(int width, int height)
+    {
+        maxTranscodingResolution = QSize(width, height);
+        return *this;
+    }
+
+    TestCase& max(int width, int height)
+    {
+        maxDecoderResolution = QSize(width, height);
+        return *this;
+    }
+
+    TestCase& setExecutor(PlayerSetQualityTest* executor)
+    {
+        this->executor = executor;
+        return *this;
+    }
+
+    TestCase& operator>>(Player::VideoQuality quality)
+    {
+        using Result = media_player_quality_chooser::Result;
+
+        switch (quality)
+        {
+            case Player::UnknownVideoQuality:
+                expectedQuality = Result();
+                break;
+            case Player::LowVideoQuality:
+            case Player::LowIframesOnlyVideoQuality:
+                expectedQuality = Result(quality, lowStreamResolution);
+                break;
+            case Player::HighVideoQuality:
+                expectedQuality = Result(quality, highStreamResolution);
+                break;
+            default:
+                NX_ASSERT(false, "To set custom quality use explicit Result.");
+        }
+
+        return *this;
+    }
+
+    TestCase& operator>>(const QSize& resolution)
+    {
+        expectedQuality = media_player_quality_chooser::Result(
+            Player::CustomVideoQuality, resolution);
+
+        return *this;
+    }
+
+    QString toString() const
+    {
+        return lit("Line %1: ").arg(lineNumber)
+            + lit("\nChannels: %1").arg(channelCount)
+            + lit("\nClient transcoding: %1").arg(clientSupportsTranscoding)
+            + lit("\nServer transcoding: %1").arg(serverSupportsTranscoding)
+            + lit("\nMax transcoding resolution: %1").arg(qSizeToString(maxTranscodingResolution))
+            + lit("\nMax decoder resolution: %1").arg(qSizeToString(maxDecoderResolution))
+            + lit("\nHigh resolution: %1").arg(qSizeToString(highStreamResolution))
+            + lit("\nLow resolution: %1").arg(qSizeToString(lowStreamResolution))
+            + lit("\nRequested quality: %1")
+                .arg(QnLexical::serialized(static_cast<Player::VideoQuality>(videoQuality)))
+            + lit("\nExpected quality: %1").arg(expectedQuality.toString());
+    }
+};
+
+PlayerSetQualityTest::PlayerSetQualityTest()
+{
+    m_module->resourcePool()->clear(); //< Just in case.
+    m_module->resourcePool()->addResource(m_server);
+    m_module->resourcePool()->addResource(m_camera);
+}
+
+PlayerSetQualityTest::~PlayerSetQualityTest()
+{
+    m_module->resourcePool()->clear();
+}
+
+void PlayerSetQualityTest::test(const TestCase& testCase)
+{
+    NX_LOG(lit("[TEST] ====================================================================="),
+        cl_logINFO);
+    NX_LOG(lit("[TEST] %1\n").arg(testCase.toString()), cl_logDEBUG2);
+
+    VideoDecoderRegistry::instance()->setTranscodingEnabled(
+        testCase.clientSupportsTranscoding);
+    m_server->setSupportsTranscoding(testCase.serverSupportsTranscoding);
+    MockVideoDecoder::s_maxResolution = testCase.maxDecoderResolution;
+    MockVideoDecoder::s_transcodingCodec =
+        std::make_unique<QnArchiveStreamReader>(m_camera)->getTranscodingCodec();
+    MockVideoDecoder::s_maxTranscodedResolution = testCase.maxTranscodingResolution;
+    m_camera->setStreams(testCase.highStreamResolution, testCase.lowStreamResolution);
+    m_camera->setChannelCount(testCase.channelCount);
+
+    const auto& result = media_player_quality_chooser::chooseVideoQuality(
+        MockVideoDecoder::s_transcodingCodec, testCase.videoQuality, true, -1, m_camera);
+
+    if (result != testCase.expectedQuality)
+    {
+        ADD_FAILURE() <<
+            lit("Expected: %1, actual: %2\nTest: %3")
+                .arg(testCase.expectedQuality.toString(), result.toString())
+                .arg(testCase.toString())
+                .toUtf8().constData();
+    }
+}
 
 class NxMediaPlayerTest: public ::testing::Test
 {
@@ -465,73 +492,77 @@ private:
     QScopedPointer<QnCommonModule> m_common;
 };
 
+} // namespace
+
 //-------------------------------------------------------------------------------------------------
 // Test cases.
 
 TEST_F(NxMediaPlayerTest, SetQuality)
 {
-    PlayerSetQualityTest test;
+    PlayerSetQualityTest qualityTest;
 
-    static const QSize none{};
-    static const QSize high{media_player_quality_chooser::kQualityHigh};
-    static const QSize low{media_player_quality_chooser::kQualityLow};
-    static const QSize lowIframes{media_player_quality_chooser::kQualityLowIframesOnly};
-    static const Player::VideoQuality hi{Player::HighVideoQuality};
-    static const Player::VideoQuality lo{Player::LowVideoQuality};
-    static const Player::VideoQuality li{Player::LowIframesOnlyVideoQuality};
-    static const bool no = false;
-    static const bool yes = true;
-    #define T(...) test.test(__LINE__, #__VA_ARGS__, __VA_ARGS__)
+    static const auto high = Player::HighVideoQuality;
+    static const auto low = Player::LowVideoQuality;
+    static const auto lowIframes = Player::LowIframesOnlyVideoQuality;
+    static const auto unknown = Player::UnknownVideoQuality;
 
-    // NOTE: kMaxTranscodingResolution is defined in Player private as 1920 x 1080.
+    #define T TestCase().setLineNumber(__LINE__).setExecutor(&qualityTest)
 
-  //     TranscSup                                                       Quality
-  // #Ch Cli  Ser  MaxTranscRes MaxDecodRes  HiStreamRes  LoStreamRes  hi/lo Expected
+    // High quality requested.
+    T.noTrans().low(320, 240).high(1920, 1080).max(1920, 1080).req(high) >> high;
+    T.noTrans().low(320, 240).high(1920, 1080).max(1920, 1080).req(1080) >> high;
+    T.noTrans().low(320, 240).high(1920, 1080).max(640, 480)  .req(high) >> low;
+    T.noTrans()              .high(2560, 1440).max(1920, 1080).req(high) >> unknown;
+    T          .low(320, 240).high(1920, 1080).max(1920, 1080).req(1080) >> high;
+    T          .low(320, 240).high(1280, 720) .max(640, 480)  .req(high) >> low;
+    T          .low(320, 240).high(2560, 1440).max(1920, 1080).req(high) >> QSize(1920, 1080);
 
-    // High stream requested.
-    T(1, no,  no,  none,        {1920,1080}, {1920,1080}, { 320, 240},   hi, high       );
-    T(1, no,  no,  none,        {1920,1080}, {1920,1080}, { 320, 240}, 1080, high       );
-    T(1, no,  no,  none,        {1920,1080}, {1920,1080}, { 320, 240},   hi, high       );
-    T(1, no,  no,  none,        { 640, 480}, {1920,1080}, { 320, 240},   hi, low        );
-    T(1, yes, yes, none,        { 640, 480}, {1280, 720}, { 320, 240},   hi, low        );
-    T(1, yes, yes, none,        {1920,1080}, {2560,1440}, { 320, 240},   hi, {1920,1080});
-    T(1, yes, yes, none,        {1920,1080}, none,        { 320, 240},   hi, low        );
+    // Low quality requested.
+    T          .low(320, 240).high(1920, 1080).max(1920, 1080).req(low)  >> low;
+    T          .low(320, 240).high(1920, 1080).max(1920, 1080).req(240)  >> low;
 
-    // Low stream requested.
-    T(1, yes, yes, none,        {1920,1080}, {1920,1080}, { 320, 240},   lo, low        );
-    T(1, yes, yes, none,        {1920,1080}, {1920,1080}, { 320, 240},  240, low        );
-
-    // Invalid Video Quality.
-    T(1, yes, yes, none,        none,        {1920,1080}, { 640, 480}, -113, low        );
+    // Invalid video quality.
+    T          .low(320, 240).high(1920, 1080).max(1920, 1080).req(-113) >> unknown;
 
     // Transcoding requested and is available.
-    T(1, yes, yes, none,        none,        none,        { 640, 480},  360, { 480, 360});
+    T          .low(640, 480).high(1920, 1080).max(1920, 1080).req(360)  >> QSize(640, 360);
 
     // Transcoding requested but is not available.
-    T(1, no,  no,  none,        none,        none,        { 640, 480},  360, low        );
-    T(1, yes, no,  none,        none,        none,        { 640, 480},  360, low        );
-    T(1, no,  yes, none,        none,        none,        { 640, 480},  360, low        );
+    T.noTrans().low(640, 480).high(1920, 1080).max(1920, 1080).req(360)  >> low;
+    T.noClientTrans()
+               .low(640, 480).high(1920, 1080).max(1920, 1080).req(360)  >> low;
+    T.noServerTrans()
+               .low(640, 480).high(1920, 1080).max(1920, 1080).req(360)  >> low;
+
+    T.noTrans()              .high(1920, 1080).max(1920, 1080).req(360)  >> high;
+    T.noTrans()              .high(2560, 1440).max(1920, 1080).req(360)  >> unknown;
+    T.noTrans().low(320, 240).high(2560, 1440).max(1920, 1080).req(360)  >> low;
 
     // Transcoding to the requested resolution which is within limits.
-    T(1, yes, yes, none,        {1920,1080}, {1920,1080}, { 320, 240},  720, {1280, 720});
+    T          .low(320, 240).high(1920, 1080).max(1920, 1080).req(720)  >> QSize(1280, 720);
 
     // Transcoding to a resolution limited by MaxDecoderRes.
-    T(1, yes, yes, none,        {1280, 720}, {2560,1440}, { 320, 240}, 1080, {1280, 720});
+    T          .low(320, 240).high(2560, 1440).max(1280, 720) .req(1080) >> QSize(1280, 720);
 
     // Transcoding to a resolution limited by kMaxTranscodingResolution.
-    T(1, yes, yes, none,        none,        {3840,2160}, { 320, 240}, 1440, {1920,1080});
+    T          .low(320, 240).high(3840, 2160).max(3840, 2160).req(1440) >> QSize(1920, 1080);
 
     // Transcoding to a resolution not supported by the decoder for the transcoding codec.
-    T(1, yes, yes, {1280, 720}, none,        {3840,2160}, { 320, 240}, 1440, low        );
-
-    // Panoramic camera: transcoding is supported, thus, should be used.
-    T(4, yes, yes, none,        {1920,1080}, {1920,1080}, { 320, 240},   hi, {1920,1080});
-
-    // Panoramic camera: transcoding is not supported, thus, low quality should be chosen.
-    T(4, no,  no,  none,        {1920,1080}, {1920,1080}, { 320, 240},   hi, low        );
+    T.maxTrans(1280, 720)
+               .low(320, 240).high(3840, 2160).max(3840, 2160).req(1440) >> high;
 
     // Low stream I-frames only requested.
-    T(1, yes, yes, none,        {1920,1080}, {1920,1080}, { 320, 240},   li, lowIframes );
+    T          .low(320, 240).high(1920, 1080).max(1920, 1080).req(lowIframes) >> lowIframes;
+
+    // Low stream I-frames only requested but low stream is not available.
+    T                        .high(1920, 1080).max(1920, 1080).req(lowIframes) >> unknown;
+
+    // Panoramic camera: transcoding is supported, thus, should be used.
+    T.channels(4)
+               .low(320, 240).high(1920, 1080).max(1920, 1080).req(high) >> QSize(1920, 1080);
+
+    T.channels(4).noTrans()
+               .low(320, 240).high(1920, 1080).max(1920, 1080).req(high) >> low;
 
     #undef T
 }

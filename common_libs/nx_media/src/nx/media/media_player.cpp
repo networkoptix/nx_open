@@ -20,6 +20,8 @@
 #include <plugins/resource/avi/avi_resource.h>
 #include <plugins/resource/avi/avi_archive_delegate.h>
 
+#include <nx/fusion/model_functions.h>
+
 #include <nx/streaming/archive_stream_reader.h>
 #include <nx/streaming/rtsp_client_archive_delegate.h>
 
@@ -613,6 +615,8 @@ qint64 PlayerPrivate::getDelayForNextFrameWithoutAudioMs(const QVideoFramePtr& f
 
 void PlayerPrivate::applyVideoQuality()
 {
+    Q_Q(Player);
+
     if (!archiveReader)
         return;
 
@@ -620,31 +624,44 @@ void PlayerPrivate::applyVideoQuality()
     if (!camera)
         return; //< Setting videoQuality for files is not supported.
 
-    const QSize& quality = media_player_quality_chooser::chooseVideoQuality(
+    const auto currentVideoDecoders = dataConsumer
+        ? dataConsumer->currentVideoDecoders()
+        : std::vector<AbstractVideoDecoder*>();
+
+    const auto& result = media_player_quality_chooser::chooseVideoQuality(
         archiveReader->getTranscodingCodec(),
         videoQuality,
         liveMode,
         positionMs,
-        camera);
+        camera,
+        currentVideoDecoders);
 
-    if (quality == media_player_quality_chooser::kQualityHigh)
+    switch (result.quality)
     {
-        archiveReader->setQuality(MEDIA_Quality_High, /*fastSwitch*/ true);
-    }
-    else if (quality == media_player_quality_chooser::kQualityLow)
-    {
-        archiveReader->setQuality(MEDIA_Quality_Low, /*fastSwitch*/ true);
-    }
-    else if (quality == media_player_quality_chooser::kQualityLowIframesOnly)
-    {
-        archiveReader->setQuality(MEDIA_Quality_LowIframesOnly, /*fastSwitch*/ true);
-    }
-    else
-    {
-        // Use "auto" width for correct aspect ratio, because quality.width() is in logical pixels.
-        NX_ASSERT(quality.isValid());
-        archiveReader->setQuality(MEDIA_Quality_CustomResolution, /*fastSwitch*/ true,
-            QSize(/*width*/ 0, quality.height()));
+        case Player::UnknownVideoQuality:
+            log("applyVideoQuality(): Could not choose quality => setMediaStatus(NoMedia)");
+            setMediaStatus(Player::MediaStatus::NoMedia);
+            q->stop();
+            return;
+
+        case Player::HighVideoQuality:
+            archiveReader->setQuality(MEDIA_Quality_High, /*fastSwitch*/ true);
+            break;
+
+        case Player::LowVideoQuality:
+            archiveReader->setQuality(MEDIA_Quality_Low, /*fastSwitch*/ true);
+            break;
+
+        case Player::LowIframesOnlyVideoQuality:
+            archiveReader->setQuality(MEDIA_Quality_LowIframesOnly, /*fastSwitch*/ true);
+            break;
+
+        default:
+            // Use "auto" width for correct aspect ratio, because quality.width() is in logical
+            // pixels.
+            NX_ASSERT(result.frameSize.isValid());
+            archiveReader->setQuality(MEDIA_Quality_CustomResolution, /*fastSwitch*/ true,
+                QSize(/*width*/ 0, result.frameSize.height()));
     }
     at_hurryUp(); //< skip waiting for current frame
 }
@@ -675,6 +692,10 @@ bool PlayerPrivate::initDataProvider()
     }
 
     applyVideoQuality();
+
+    if (!archiveReader)
+        return false;
+
     dataConsumer.reset(new PlayerDataConsumer(archiveReader));
     dataConsumer->setAudioEnabled(isAudioEnabled);
 
@@ -1032,6 +1053,80 @@ Player::VideoQuality Player::actualVideoQuality() const
     }
 }
 
+QList<int> Player::availableVideoQualities(const QList<int>& videoQualities) const
+{
+    Q_D(const Player);
+
+    d->log(lit("availableVideoQualities() BEGIN"));
+
+    QList<int> result;
+
+    const auto transcodingCoded = d->archiveReader
+        ? d->archiveReader->getTranscodingCodec()
+        : QnArchiveStreamReader(d->resource).getTranscodingCodec();
+
+    const auto camera = d->resource.dynamicCast<QnVirtualCameraResource>();
+    if (!camera)
+        return result; //< Setting videoQuality for files is not supported.
+
+    auto getQuality =
+        [&camera,
+            transcodingCoded,
+            liveMode = d->liveMode,
+            positionMs = d->positionMs,
+            currentVideoDecoders = d->dataConsumer
+                ? d->dataConsumer->currentVideoDecoders()
+                : std::vector<AbstractVideoDecoder*>()](
+                    int quality)
+        {
+            return media_player_quality_chooser::chooseVideoQuality(
+                transcodingCoded, quality, liveMode, positionMs, camera, currentVideoDecoders);
+        };
+
+    const auto& highQuality = getQuality(HighVideoQuality);
+    const auto& maximumResolution = highQuality.frameSize;
+
+    bool customResolutionAvailable = false;
+    QList<int> customQualities;
+
+    for (auto videoQuality: videoQualities)
+    {
+        switch (videoQuality)
+        {
+            case LowIframesOnlyVideoQuality:
+            case LowVideoQuality:
+                if (getQuality(videoQuality).quality == videoQuality)
+                    result.append(videoQuality);
+                break;
+
+            case HighVideoQuality:
+                if (highQuality.quality == videoQuality)
+                    result.append(videoQuality);
+                break;
+
+            default:
+            {
+                const auto& resultQuality = getQuality(videoQuality);
+                if (resultQuality.quality != UnknownVideoQuality
+                    && resultQuality.frameSize.height() <= maximumResolution.height())
+                {
+                    customQualities.append(videoQuality);
+
+                    if (resultQuality.quality == CustomVideoQuality)
+                        customResolutionAvailable = true;
+                }
+            }
+        }
+    }
+
+    d->log(lit("availableVideoQualities() END"));
+
+    if (customResolutionAvailable)
+        return result + customQualities;
+
+    return result;
+}
+
 QSize Player::currentResolution() const
 {
     Q_D(const Player);
@@ -1098,6 +1193,8 @@ void Player::testSetCamera(const QnResourcePtr& camera)
     Q_D(Player);
     d->resource = camera;
 }
+
+QN_DEFINE_METAOBJECT_ENUM_LEXICAL_FUNCTIONS(Player, VideoQuality)
 
 } // namespace media
 } // namespace nx
