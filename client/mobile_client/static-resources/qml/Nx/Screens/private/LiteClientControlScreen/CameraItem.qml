@@ -13,7 +13,7 @@ Rectangle
     property alias resourceId: resourceHelper.resourceId
     property alias status: resourceHelper.resourceStatus
     property alias resourceName: resourceHelper.resourceName
-    property QnLiteClientLayoutHelper layoutHelper: null
+    property LiteClientLayoutHelper layoutHelper: null
 
     property bool useDummyText: true
     property int layoutX: -1

@@ -11,6 +11,8 @@ DialogBase
 
     property int activeQuality: MediaPlayer.LowVideoQuality
     property size actualQuality
+    property var customQualities: []
+    property var availableVideoQualities: []
 
     deleteOnClose: true
 
@@ -59,7 +61,7 @@ DialogBase
 
         Repeater
         {
-            model: [ 1080, 720, 480, 360 ]
+            model: customQualities
             QualityItem { quality: modelData }
         }
     }

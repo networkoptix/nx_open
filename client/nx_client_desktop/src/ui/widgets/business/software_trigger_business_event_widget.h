@@ -7,6 +7,8 @@ namespace Ui {
 class SoftwareTriggerBusinessEventWidget;
 } // namespace Ui
 
+class QnBusinessStringsHelper;
+
 class QnSoftwareTriggerBusinessEventWidget: public QnAbstractBusinessParamsWidget
 {
     Q_OBJECT
@@ -23,8 +25,10 @@ protected:
 
 private:
     void at_usersButton_clicked();
+    void updateUsersButton();
     void paramsChanged();
 
 private:
     QScopedPointer<Ui::SoftwareTriggerBusinessEventWidget> ui;
+    QScopedPointer<QnBusinessStringsHelper> m_helper;
 };

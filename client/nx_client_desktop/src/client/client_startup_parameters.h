@@ -41,6 +41,7 @@ struct QnStartupParameters
     bool fullScreenDisabled = kFullScreenDisabledByDefault;
     bool showFullInfo = false;
     bool exportedMode = false;  /*< Client was run from an exported video exe-file. */
+    bool hiDpiDisabled = false;
 
     bool selfUpdateMode = false;
     const static QString kSelfUpdateKey;
@@ -63,4 +64,6 @@ struct QnStartupParameters
 
     QString enforceSocketType;
     QString enforceMediatorEndpoint;
+
+    QStringList files; //< File paths passed to the client.
 };

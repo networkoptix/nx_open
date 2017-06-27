@@ -1,5 +1,6 @@
 import QtQuick 2.6
 import Nx 1.0
+import Nx.Core 1.0
 import com.networkoptix.qml 1.0
 
 Item
@@ -8,7 +9,7 @@ Item
 
     property alias layoutId: gridLayoutHelper.layoutId
 
-    QnLiteClientLayoutHelper
+    LiteClientLayoutHelper
     {
         id: gridLayoutHelper
 
@@ -29,7 +30,7 @@ Item
             if (!layoutId)
                 return
 
-            if (displayMode == QnLiteClientLayoutHelper.SingleCamera)
+            if (displayMode === LiteClientLayoutHelper.SingleCamera)
             {
                 if (stackView.currentItem.objectName != "videoScreen")
                 {

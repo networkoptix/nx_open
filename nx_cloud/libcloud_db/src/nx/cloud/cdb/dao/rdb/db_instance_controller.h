@@ -2,7 +2,7 @@
 
 #include <memory>
 
-#include <utils/db/db_instance_controller.h>
+#include <nx/utils/db/db_instance_controller.h>
 
 namespace nx {
 namespace cdb {
@@ -10,11 +10,11 @@ namespace dao {
 namespace rdb {
 
 class DbInstanceController:
-    public nx::db::InstanceController
+    public nx::utils::db::InstanceController
 {
 public:
     DbInstanceController(
-        const nx::db::ConnectionOptions& dbConnectionOptions,
+        const nx::utils::db::ConnectionOptions& dbConnectionOptions,
         boost::optional<unsigned int> dbVersionToUpdateTo = boost::none);
 
     bool isUserAuthRecordsMigrationNeeded() const;

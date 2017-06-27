@@ -1,12 +1,10 @@
-#ifndef QN_ZOOM_WINDOW_INSTRUMENT_H
-#define QN_ZOOM_WINDOW_INSTRUMENT_H
-
-#include "drag_processing_instrument.h"
+#pragma once
 
 #include <client/client_globals.h>
 
 #include <core/resource/resource_fwd.h>
 
+#include <ui/graphics/instruments/drag_processing_instrument.h>
 #include <ui/workbench/workbench_context_aware.h>
 
 class FixedArSelectionItem;
@@ -17,14 +15,17 @@ class ResizingInstrument;
 class QnResourceWidget;
 class QnMediaResourceWidget;
 
-class ZoomWindowInstrument: public DragProcessingInstrument, public QnWorkbenchContextAware {
+class ZoomWindowInstrument:
+    public DragProcessingInstrument,
+    public QnWorkbenchContextAware
+{
     Q_OBJECT
-
     Q_PROPERTY(QVector<QColor> colors READ colors WRITE setColors)
-    typedef DragProcessingInstrument base_type;
+
+    using base_type = DragProcessingInstrument;
 
 public:
-    ZoomWindowInstrument(QObject *parent = NULL);
+    ZoomWindowInstrument(QObject *parent = nullptr);
     virtual ~ZoomWindowInstrument();
 
     QVector<QColor> colors() const;
@@ -49,7 +50,6 @@ protected:
     virtual bool mousePressEvent(QWidget* viewport, QMouseEvent*event) override;
     virtual bool mousePressEvent(QGraphicsItem* item, QGraphicsSceneMouseEvent* event) override;
     virtual bool mouseMoveEvent(QWidget* viewport, QMouseEvent* event) override;
-//    virtual bool mouseReleaseEvent(QWidget* viewport, QMouseEvent* event) override;
 
     virtual void startDragProcess(DragInfo *info) override;
     virtual void startDrag(DragInfo *info) override;
@@ -57,7 +57,7 @@ protected:
     virtual void finishDrag(DragInfo *info) override;
     virtual void finishDragProcess(DragInfo *info) override;
 
-private slots:
+private:
     void at_widget_aboutToBeDestroyed();
     void at_widget_zoomRectChanged();
     void at_widget_frameColorChanged();
@@ -76,32 +76,31 @@ private slots:
 private:
     QColor nextZoomWindowColor() const;
 
-    ZoomOverlayWidget *overlayWidget(QnMediaResourceWidget *widget) const;
-    ZoomOverlayWidget *ensureOverlayWidget(QnMediaResourceWidget *widget);
-    ZoomWindowWidget *windowWidget(QnMediaResourceWidget *widget) const;
+    QPointer<ZoomOverlayWidget> overlayWidget(QnMediaResourceWidget *widget) const;
+    QPointer<ZoomOverlayWidget> ensureOverlayWidget(QnMediaResourceWidget *widget);
+    QPointer<ZoomWindowWidget> windowWidget(QnMediaResourceWidget *widget) const;
 
-    QnMediaResourceWidget *target() const;
+    QPointer<QnMediaResourceWidget> target() const;
 
-    ZoomWindowWidget *windowTarget() const;
+    QPointer<ZoomWindowWidget> windowTarget() const;
 
-    FixedArSelectionItem *selectionItem() const;
+    QPointer<FixedArSelectionItem> selectionItem() const;
     void ensureSelectionItem();
 
     void registerWidget(QnMediaResourceWidget *widget);
     void unregisterWidget(QnMediaResourceWidget *widget);
-    void registerLink(QnMediaResourceWidget *widget, QnMediaResourceWidget *zoomTargetWidget);
-    void unregisterLink(QnMediaResourceWidget *widget, QnMediaResourceWidget *zoomTargetWidget, bool deleteWindowWidget = true);
+    void registerLink(QnMediaResourceWidget* widget, QnMediaResourceWidget* zoomTargetWidget);
+    void unregisterLink(QnMediaResourceWidget* widget, bool deleteWindowWidget = true);
 
     void updateOverlayMode(QnMediaResourceWidget *widget);
     void updateWindowFromWidget(QnMediaResourceWidget *widget);
     void updateWidgetFromWindow(ZoomWindowWidget *windowWidget);
 
 private:
-    struct ZoomData {
-        ZoomData(): overlayWidget(NULL), windowWidget(NULL) {}
-
-        ZoomOverlayWidget *overlayWidget;
-        ZoomWindowWidget *windowWidget;
+    struct ZoomData
+    {
+        QPointer<ZoomOverlayWidget> overlayWidget;
+        QPointer<ZoomWindowWidget> windowWidget;
     };
 
     bool m_zoomWindowStartedEmitted;
@@ -111,11 +110,9 @@ private:
     QPointer<QWidget> m_viewport;
     QColor m_zoomWindowColor;
     QPointer<QnMediaResourceWidget> m_target;
-    QHash<QObject *, ZoomData> m_dataByWidget;
-    QSet<QObject *> m_processingWidgets;
+    QHash<QObject*, ZoomData> m_dataByWidget;
+    QSet<QObject*> m_processingWidgets;
     QPointer<QnMediaResourceWidget> m_zoomedWidget;
     QPointer<ZoomWindowWidget> m_windowTarget;
     QPointer<ZoomWindowWidget> m_storedWindowWidget;
 };
-
-#endif // QN_ZOOM_WINDOW_INSTRUMENT_H

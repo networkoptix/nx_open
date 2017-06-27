@@ -11,8 +11,8 @@ namespace ec2 {
 namespace dao {
 namespace rdb {
 
-nx::db::DBResult TransactionDataObject::insertOrReplaceTransaction(
-    nx::db::QueryContext* queryContext,
+nx::utils::db::DBResult TransactionDataObject::insertOrReplaceTransaction(
+    nx::utils::db::QueryContext* queryContext,
     const TransactionData& tran)
 {
     QSqlQuery saveTranQuery(*queryContext->connection());
@@ -39,14 +39,14 @@ nx::db::DBResult TransactionDataObject::insertOrReplaceTransaction(
             .arg(tran.systemId).arg(::ec2::ApiCommand::toString(tran.header.command))
             .arg(tran.header).arg(tran.hash).arg(saveTranQuery.lastError().text()),
             cl_logWARNING);
-        return nx::db::DBResult::ioError;
+        return nx::utils::db::DBResult::ioError;
     }
 
-    return nx::db::DBResult::ok;
+    return nx::utils::db::DBResult::ok;
 }
 
-nx::db::DBResult TransactionDataObject::updateTimestampHiForSystem(
-    nx::db::QueryContext* queryContext,
+nx::utils::db::DBResult TransactionDataObject::updateTimestampHiForSystem(
+    nx::utils::db::QueryContext* queryContext,
     const nx::String& systemId,
     quint64 newValue)
 {
@@ -63,14 +63,14 @@ nx::db::DBResult TransactionDataObject::updateTimestampHiForSystem(
             lm("systemId %1. Error saving transaction timestamp sequence %2 to log. %3")
             .arg(systemId).arg(newValue).arg(saveSystemTimestampSequence.lastError().text()),
             cl_logWARNING);
-        return nx::db::DBResult::ioError;
+        return nx::utils::db::DBResult::ioError;
     }
 
-    return nx::db::DBResult::ok;
+    return nx::utils::db::DBResult::ok;
 }
 
-nx::db::DBResult TransactionDataObject::fetchTransactionsOfAPeerQuery(
-    nx::db::QueryContext* queryContext,
+nx::utils::db::DBResult TransactionDataObject::fetchTransactionsOfAPeerQuery(
+    nx::utils::db::QueryContext* queryContext,
     const nx::String& systemId,
     const QString& peerId,
     const QString& dbInstanceId,
@@ -98,7 +98,7 @@ nx::db::DBResult TransactionDataObject::fetchTransactionsOfAPeerQuery(
                 "for peer (%2; %3). %4")
             .arg(peerId).arg(dbInstanceId).arg(fetchTransactionsOfAPeerQuery.lastError().text()),
             cl_logERROR);
-        return nx::db::DBResult::ioError;
+        return nx::utils::db::DBResult::ioError;
     }
 
     while (fetchTransactionsOfAPeerQuery.next())
@@ -112,7 +112,7 @@ nx::db::DBResult TransactionDataObject::fetchTransactionsOfAPeerQuery(
                 });
     }
 
-    return nx::db::DBResult::ok;
+    return nx::utils::db::DBResult::ok;
 }
 
 } // namespace rdb

@@ -477,10 +477,15 @@ void QnBusinessRuleWidget::at_actionResourcesHolder_clicked()
         SubjectSelectionDialog dialog(this);
         dialog.setCheckedSubjects(m_model->actionResources());
 
+        auto params = m_model->actionParams();
+        dialog.setAllUsers(params.allUsers);
+
         if (m_model->actionType() == QnBusiness::SendMailAction)
         {
             QSharedPointer<QnSendEmailActionDelegate> dialogDelegate(
                 new QnSendEmailActionDelegate(this));
+
+            dialog.setAllUsersSelectorEnabled(false); //< No spam, baby.
 
             dialog.setUserValidator(
                 [dialogDelegate](const QnUserResourcePtr& user)
@@ -489,19 +494,25 @@ void QnBusinessRuleWidget::at_actionResourcesHolder_clicked()
                     return dialogDelegate->isValid(user->getId());
                 });
 
-            connect(&dialog, &SubjectSelectionDialog::changed, this,
+            const auto updateAlert =
                 [&dialog, dialogDelegate]
                 {
                     // TODO: #vkutin #3.2 Full updates like this are slow. Refactor in 3.2.
                     dialog.showAlert(dialogDelegate->validationMessage(
                         dialog.totalCheckedUsers()));
-                });
+                };
+
+            connect(&dialog, &SubjectSelectionDialog::changed, this, updateAlert);
+            updateAlert();
         }
 
         if (dialog.exec() != QDialog::Accepted)
             return;
 
         m_model->setActionResources(dialog.checkedSubjects());
+
+        params.allUsers = dialog.allUsers();
+        m_model->setActionParams(params);
     }
     else
     {

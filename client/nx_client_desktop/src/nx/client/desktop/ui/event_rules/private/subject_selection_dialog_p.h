@@ -5,6 +5,7 @@
 #include <QtGui/QValidator>
 
 #include <common/common_module_aware.h>
+#include <core/resource_access/resource_access_subjects_cache.h>
 #include <ui/delegates/resource_item_delegate.h>
 #include <ui/delegates/customizable_item_delegate.h>
 #include <ui/models/user_roles_model.h>
@@ -39,13 +40,21 @@ public:
 
     virtual QVariant data(const QModelIndex& index, int role = Qt::DisplayRole) const override;
 
+    // All users from explicitly checked roles, regardless of allUsers value.
     QSet<QnUuid> checkedUsers() const;
 
+    QValidator::State validateRole(const QnUuid& roleId) const;
+    QValidator::State validateUsers(const QList<QnResourceAccessSubject>& subjects) const;
+
+    bool allUsers() const;
+    void setAllUsers(bool value);
+
 private:
-    QValidator::State validate(const QnUuid& roleId) const;
+    void emitDataChanged();
 
 private:
     Qn::UserValidator m_userValidator;
+    bool m_allUsers = false; //< All users are considered checked.
     mutable QHash<QnUuid, QValidator::State> m_validationStates;
 };
 
@@ -70,7 +79,9 @@ public:
 
     explicit UserListModel(RoleListModel* rolesModel, QObject* parent);
 
+    // Explicitly checked users, regardless of allUsers value.
     QSet<QnUuid> checkedUsers() const;
+
     void setCheckedUsers(const QSet<QnUuid>& ids);
 
     void setUserValidator(Qn::UserValidator userValidator);
@@ -88,6 +99,9 @@ public:
     bool isValid(const QModelIndex& index) const;
     bool isChecked(const QModelIndex& index) const;
 
+    bool allUsers() const;
+    void setAllUsers(bool value);
+
     static QnUserResourcePtr getUser(const QModelIndex& index);
 
 private:
@@ -98,7 +112,8 @@ private:
     QnResourceListModel* const m_usersModel;
     RoleListModel* const m_rolesModel;
     Qn::UserValidator m_userValidator;
-    bool m_customUsersOnly = true;
+    bool m_customUsersOnly = true; //< Non-custom users are filtered out.
+    bool m_allUsers = false; //< All users are considered checked.
 };
 
 //------------------------------------------------------------------------------------------------
@@ -119,7 +134,6 @@ protected:
     virtual void initStyleOption(QStyleOptionViewItem* option,
         const QModelIndex& index) const override;
 
-    virtual ItemState itemState(const QModelIndex& index) const override;
     virtual void getDisplayInfo(const QModelIndex& index,
         QString& baseName, QString& extInfo) const override;
 };
@@ -134,7 +148,7 @@ class SubjectSelectionDialog::UserListDelegate:
     using base_type = QnResourceItemDelegate;
 
 public:
-    using base_type::base_type; //< Forward constructors.
+    explicit UserListDelegate(QObject* parent);
 
 protected:
     virtual void initStyleOption(QStyleOptionViewItem* option,
