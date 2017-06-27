@@ -119,7 +119,7 @@ protected:
 
     virtual DBResult execSqlScript(
         const QByteArray& script,
-        nx::utils::db::QueryContext* const queryContext)
+        nx::utils::db::QueryContext* const /*queryContext*/)
     {
         m_executedScripts.push_back(script);
         return DBResult::ok;
