@@ -14,9 +14,8 @@
 #include <nx/fusion/serialization/lexical.h>
 #include <nx/network/cloud/data/connection_parameters.h>
 #include <nx/network/url/url_builder.h>
+#include <nx/utils/app_info.h>
 #include <nx/utils/timer_manager.h>
-
-#include <utils/common/app_info.h>
 
 #include "libconnection_mediator_app_info.h"
 
@@ -151,7 +150,7 @@ ConnectionParameters::ConnectionParameters():
 
 Settings::Settings():
     base_type(
-        QnAppInfo::organizationNameForSettings(),
+        nx::utils::AppInfo::organizationNameForSettings(),
         QnLibConnectionMediatorAppInfo::applicationName(),
         kModuleName)
 {
@@ -295,7 +294,7 @@ void Settings::loadSettings()
     {
 #ifdef Q_OS_LINUX
         m_general.dataDir = QString("/opt/%1/%2/var")
-            .arg(QnAppInfo::linuxOrganizationName()).arg(kModuleName);
+            .arg(nx::utils::linuxOrganizationName()).arg(kModuleName);
 #else
         const QStringList& dataDirList = QStandardPaths::standardLocations(QStandardPaths::DataLocation);
         m_general.dataDir = dataDirList.isEmpty() ? QString() : dataDirList[0];
