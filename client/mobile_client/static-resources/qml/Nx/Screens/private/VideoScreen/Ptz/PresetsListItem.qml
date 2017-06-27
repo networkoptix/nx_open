@@ -9,7 +9,7 @@ Flickable
     property int presetsCount: 0
     property int currentPresetIndex: -1
 
-    signal goToPreset(int presetIndex)
+    signal goToPreset(int index)
 
     clip: true
     width: parent.width
@@ -32,25 +32,27 @@ Flickable
 
             model: control.presetsCount
 
-            delegate: MouseArea
+            delegate: Button
             {
+                text: index + 1
+
+                leftPadding: 0
+                rightPadding: 0
+                topPadding: 0
+                bottomPadding: 0
+                padding: 0
                 width: 32
-                height: 56
+                height: 48
 
-                Text
-                {
-                    anchors.centerIn: parent
+                color: "transparent"
+                textColor: index == currentPresetIndex
+                    ? ColorTheme.windowText
+                    : ColorTheme.transparent(ColorTheme.windowText, 0.2)
 
-                    color: index == currentPresetIndex
-                        ? ColorTheme.windowText
-                        : ColorTheme.transparent(ColorTheme.windowText, 0.2)
+                font.pixelSize: 16
+                font.weight: Font.DemiBold
 
-                    font.pixelSize: 16
-                    font.weight: Font.DemiBold
-                    text: index + 1
-                }
-
-                onClicked: { control.goToPreset(index) }
+                onClicked: control.goToPreset(index)
             }
         }
     }

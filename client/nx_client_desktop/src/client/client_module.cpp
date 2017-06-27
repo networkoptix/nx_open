@@ -334,6 +334,9 @@ void QnClientModule::initSingletons(const QnStartupParameters& startupParams)
 
     commonModule->store(new QnVoiceSpectrumAnalyzer());
 
+    // Must be called before QnCloudStatusWatcher but after setModuleGUID() call.
+    initLocalInfo(startupParams);
+
     initializeStatisticsManager(commonModule);
 
     /* Long runnables depend on QnCameraHistoryPool and other singletons. */
@@ -489,15 +492,6 @@ void QnClientModule::initNetwork(const QnStartupParameters& startupParams)
         //commonModule->setInstanceGuid(startupParams.videoWallItemGuid);
     }
 
-    ec2::ApiRuntimeData runtimeData;
-    runtimeData.peer.id = commonModule->moduleGUID();
-    runtimeData.peer.instanceId = commonModule->runningInstanceGUID();
-    runtimeData.peer.peerType = qnStaticCommon->localPeerType();
-    runtimeData.brand = qnStaticCommon->brand();
-    runtimeData.customization = qnStaticCommon->customization();
-    runtimeData.videoWallInstanceGuid = startupParams.videoWallItemGuid;
-    commonModule->runtimeInfoManager()->updateLocalItem(runtimeData);    // initializing localInfo
-
     commonModule->moduleDiscoveryManager()->start();
 
     commonModule->instance<QnSystemsFinder>();
@@ -586,4 +580,22 @@ void QnClientModule::initLocalResources(const QnStartupParameters& startupParams
 QnCloudStatusWatcher* QnClientModule::cloudStatusWatcher() const
 {
     return m_cloudStatusWatcher;
+}
+
+void QnClientModule::initLocalInfo(const QnStartupParameters& startupParams)
+{
+    auto commonModule = m_clientCoreModule->commonModule();
+
+    Qn::PeerType clientPeerType = startupParams.videoWallGuid.isNull()
+        ? Qn::PT_DesktopClient
+        : Qn::PT_VideowallClient;
+
+    ec2::ApiRuntimeData runtimeData;
+    runtimeData.peer.id = commonModule->moduleGUID();
+    runtimeData.peer.instanceId = commonModule->runningInstanceGUID();
+    runtimeData.peer.peerType = clientPeerType;
+    runtimeData.brand = qnRuntime->isDevMode() ? QString() : QnAppInfo::productNameShort();
+    runtimeData.customization = qnRuntime->isDevMode() ? QString() : QnAppInfo::customizationName();
+    runtimeData.videoWallInstanceGuid = startupParams.videoWallItemGuid;
+    commonModule->runtimeInfoManager()->updateLocalItem(runtimeData); // initializing localInfo
 }

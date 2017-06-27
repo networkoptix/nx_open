@@ -368,6 +368,25 @@ void QnResourceItemDelegate::initStyleOption(QStyleOptionViewItem* option, const
 
     if (!option->state.testFlag(QStyle::State_Enabled))
         option->state &= ~(QStyle::State_Selected | QStyle::State_MouseOver);
+
+    // Determine validity.
+    if (m_options.testFlag(ValidateOnlyChecked))
+    {
+        const auto checkState = rowCheckState(index);
+        if (checkState.canConvert<int>() && checkState.toInt() == Qt::Unchecked)
+            return;
+    }
+
+    const auto isValid = index.data(Qn::ValidRole);
+    if (isValid.canConvert<bool>() && !isValid.toBool())
+        option->state |= State_Error;
+
+    const auto validationState = index.data(Qn::ValidationStateRole);
+    if (validationState.canConvert<QValidator::State>()
+        && validationState.value<QValidator::State>() == QValidator::Invalid)
+    {
+        option->state |= State_Error;
+    }
 }
 
 QWidget* QnResourceItemDelegate::createEditor(QWidget* parent, const QStyleOptionViewItem& option, const QModelIndex& index) const
@@ -425,10 +444,12 @@ bool QnResourceItemDelegate::eventFilter(QObject* object, QEvent* event)
 
 QnResourceItemDelegate::ItemState QnResourceItemDelegate::itemState(const QModelIndex& index) const
 {
-    /* Fetch information from model first. */
-    QVariant disabled = index.data(Qn::DisabledRole); // in accordance with QnResourceListModel
-    if (disabled.canConvert<bool>() && !disabled.toBool())
-        return ItemState::selected;
+    if (m_options.testFlag(HighlightChecked))
+    {
+        const auto checkState = rowCheckState(index);
+        if (checkState.canConvert<int>())
+            return checkState.toInt() == Qt::Checked ? ItemState::selected : ItemState::normal;
+    }
 
     if (!workbench())
         return ItemState::normal;
@@ -704,4 +725,23 @@ void QnResourceItemDelegate::getDisplayInfo(const QModelIndex& index, QString& b
         if (resource->hasFlags(Qn::user) && !extInfo.isEmpty())
             extInfo = kCustomExtInfoTemplate.arg(extInfo);
     }
+}
+
+int QnResourceItemDelegate::checkBoxColumn() const
+{
+    return m_checkBoxColumn;
+}
+
+void QnResourceItemDelegate::setCheckBoxColumn(int value)
+{
+    m_checkBoxColumn = value;
+}
+
+QVariant QnResourceItemDelegate::rowCheckState(const QModelIndex& index) const
+{
+    if (m_checkBoxColumn < 0)
+        return QVariant();
+
+    const auto checkIndex = index.sibling(index.row(), m_checkBoxColumn);
+    return checkIndex.data(Qt::CheckStateRole);
 }

@@ -8,26 +8,27 @@ namespace
     const int kDefaultRecordBeforeMs = 1000;
 }
 
-QnBusinessActionParameters::QnBusinessActionParameters()
-    : actionResourceId()
-    , url()
-    , emailAddress()
-    , fps(10)
-    , streamQuality(Qn::QualityHighest)
-    , recordAfter(0)
-    , relayOutputId()
-    , sayText()
-    , tags()
-    , text()
-    , durationMs(kDefaultFixedDurationMs)
-    , additionalResources()
-    , forced(true)
-    , presetId()
-    , useSource(false)
-    , recordBeforeMs(kDefaultRecordBeforeMs)
-    , playToClient(true)
-{}
-
+QnBusinessActionParameters::QnBusinessActionParameters():
+    actionResourceId(),
+    url(),
+    emailAddress(),
+    fps(10),
+    streamQuality(Qn::QualityHighest),
+    recordAfter(0),
+    relayOutputId(),
+    sayText(),
+    tags(),
+    text(),
+    durationMs(kDefaultFixedDurationMs),
+    additionalResources(),
+    allUsers(false),
+    forced(true),
+    presetId(),
+    useSource(false),
+    recordBeforeMs(kDefaultRecordBeforeMs),
+    playToClient(true)
+{
+}
 
 bool QnBusinessActionParameters::isDefault() const
 {

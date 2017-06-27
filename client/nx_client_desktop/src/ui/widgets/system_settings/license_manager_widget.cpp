@@ -811,7 +811,7 @@ void QnLicenseManagerWidget::updateButtons()
     const bool canRemoveAny = std::any_of(selected.cbegin(), selected.cend(),
         [this](const QnLicensePtr& license) { return canRemoveLicense(license); });
 
-    const bool isOwner = context()->user()->isOwner();
+    const bool isOwner = context()->user() && context()->user()->isOwner();
     const bool canDeactivateAny = isOwner && std::any_of(selected.cbegin(), selected.cend(),
         [this](const QnLicensePtr& license) { return canDeactivateLicense(license); });
 

@@ -1,7 +1,7 @@
 import QtQuick 2.6
 import Nx 1.0
 import Nx.Controls 1.0
-import com.networkoptix.qml 1.0
+import Nx.Core 1.0
 
 Item
 {
@@ -9,7 +9,7 @@ Item
 
     property CameraItem activeItem: null
     property int activeItemIndex: 0
-    property QnLiteClientLayoutHelper layoutHelper: null
+    property LiteClientLayoutHelper layoutHelper: null
 
     readonly property alias gridWidth: grid.columns
     readonly property alias gridHeight: grid.rows

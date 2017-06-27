@@ -483,11 +483,8 @@ void LayoutTourReviewController::addResourcesToReviewLayout(
         return;
 
     QScopedValueRollback<bool> guard(m_updating, true);
-    for (const auto& resource: resources)
-    {
-        if (QnResourceAccessFilter::isDroppable(resource))
-            addItemToReviewLayout(layout, {resource->getId(), kDefaultDelayMs}, position, false);
-    }
+    for (const auto& resource: resources.filtered(QnResourceAccessFilter::isDroppable))
+        addItemToReviewLayout(layout, {resource->getId(), kDefaultDelayMs}, position, false);
 }
 
 bool LayoutTourReviewController::fillTourItems(ec2::ApiLayoutTourItemDataList* items)

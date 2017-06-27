@@ -468,6 +468,17 @@ bool DeviceSoapWrapper::fetchLoginPassword(const QString& manufacturer, const QS
             possibleCredentials.append(credentials);
     }
 
+    QnResourceData resData = qnStaticCommon->dataPool()->data(manufacturer, model);
+    int timeoutSec = resData.value<int>(Qn::kUnauthrizedTimeoutParamName);
+    if (timeoutSec > 0 && possibleCredentials.size() > 1)
+    {
+        possibleCredentials.erase(possibleCredentials.begin() + 1, possibleCredentials.end());
+        NX_WARNING(this,
+            lm("Discovery----: strict credentials list for camera %1 to 1 record. because of non zero '%2' parameter.").
+            arg(getEndpointUrl()).
+            arg(Qn::kUnauthrizedTimeoutParamName));
+    }
+
     if (possibleCredentials.size() <= 1)
     {
         nx::common::utils::Credentials credentials;
