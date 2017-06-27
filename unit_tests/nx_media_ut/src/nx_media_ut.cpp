@@ -1,9 +1,8 @@
 #include <functional>
 
-#include <memory>
-
 #include <gtest/gtest.h>
 
+#include <nx/utils/std/cpp14.h>
 #include <nx/utils/log/log.h>
 #include <nx/core/access/access_types.h>
 #include <common/common_module.h>
