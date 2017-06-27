@@ -22,8 +22,8 @@ protected:
     void addServer()
     {
         static int instanceCounter = 0;
-        const auto tmpDir = QDir::homePath() + "/ec2_discovery_ut.data"
-            + QString::number(instanceCounter++);
+        const auto tmpDir = nx::utils::TestOptions::temporaryDirectoryPath() +
+            lit("/ec2_discovery_ut.data") + QString::number(instanceCounter++);
         QDir(tmpDir).removeRecursively();
 
         auto server = std::make_unique<MediaServer>();
