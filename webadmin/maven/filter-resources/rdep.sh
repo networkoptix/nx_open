@@ -18,3 +18,7 @@ function upload() {
 }
 
 upload "server-external-${branch}"
+if [[ "${branch}" == "vms_${parsedVersion.majorVersion}.${parsedVersion.minorVersion}_web" ]]
+then
+    upload "server-external-${parsedVersion.majorVersion}.${parsedVersion.minorVersion}"
+fi
