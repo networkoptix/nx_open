@@ -17,26 +17,26 @@ class DbHelperStub: public nx::cdb::AbstractSchedulerDbHelper
 public:
     MOCK_CONST_METHOD2(
         getScheduleData,
-        nx::db::DBResult(nx::db::QueryContext*, nx::cdb::ScheduleData*));
+        nx::utils::db::DBResult(nx::utils::db::QueryContext*, nx::cdb::ScheduleData*));
     MOCK_METHOD4(
         subscribe,
-        nx::db::DBResult(nx::db::QueryContext*, const QnUuid&, QnUuid*, const ScheduleTaskInfo&));
+        nx::utils::db::DBResult(nx::utils::db::QueryContext*, const QnUuid&, QnUuid*, const ScheduleTaskInfo&));
     MOCK_METHOD2(
         unsubscribe,
-        nx::db::DBResult(nx::db::QueryContext*, const QnUuid&));
+        nx::utils::db::DBResult(nx::utils::db::QueryContext*, const QnUuid&));
 };
 
-class SqlExecutorStub: public nx::db::AbstractAsyncSqlQueryExecutor
+class SqlExecutorStub: public nx::utils::db::AbstractAsyncSqlQueryExecutor
 {
 public:
-    virtual const nx::db::ConnectionOptions& connectionOptions() const override
+    virtual const nx::utils::db::ConnectionOptions& connectionOptions() const override
     {
         return m_connectionOptions;
     }
 
     virtual void executeUpdate(
-        nx::utils::MoveOnlyFunc<nx::db::DBResult(nx::db::QueryContext*)> dbUpdateFunc,
-        nx::utils::MoveOnlyFunc<void(nx::db::QueryContext*, nx::db::DBResult)> completionHandler) override
+        nx::utils::MoveOnlyFunc<nx::utils::db::DBResult(nx::utils::db::QueryContext*)> dbUpdateFunc,
+        nx::utils::MoveOnlyFunc<void(nx::utils::db::QueryContext*, nx::utils::db::DBResult)> completionHandler) override
     {
         std::thread(
             [dbUpdateFunc = std::move(dbUpdateFunc), completionHandler= std::move(completionHandler)]()
@@ -46,14 +46,14 @@ public:
     }
 
     virtual void executeUpdateWithoutTran(
-        nx::utils::MoveOnlyFunc<nx::db::DBResult(nx::db::QueryContext*)> /*dbUpdateFunc*/,
-        nx::utils::MoveOnlyFunc<void(nx::db::QueryContext*, nx::db::DBResult)> /*completionHandler*/) override
+        nx::utils::MoveOnlyFunc<nx::utils::db::DBResult(nx::utils::db::QueryContext*)> /*dbUpdateFunc*/,
+        nx::utils::MoveOnlyFunc<void(nx::utils::db::QueryContext*, nx::utils::db::DBResult)> /*completionHandler*/) override
     {
     }
 
     virtual void executeSelect(
-        nx::utils::MoveOnlyFunc<nx::db::DBResult(nx::db::QueryContext*)> dbSelectFunc,
-        nx::utils::MoveOnlyFunc<void(nx::db::QueryContext*, nx::db::DBResult)> completionHandler) override
+        nx::utils::MoveOnlyFunc<nx::utils::db::DBResult(nx::utils::db::QueryContext*)> dbSelectFunc,
+        nx::utils::MoveOnlyFunc<void(nx::utils::db::QueryContext*, nx::utils::db::DBResult)> completionHandler) override
     {
         std::thread(
             [dbSelectFunc = std::move(dbSelectFunc), completionHandler= std::move(completionHandler)]()
@@ -62,14 +62,14 @@ public:
             }).detach();
     }
 
-    virtual nx::db::DBResult execSqlScriptSync(
+    virtual nx::utils::db::DBResult execSqlScriptSync(
         const QByteArray& /*script*/,
-        nx::db::QueryContext* const /*queryContext*/) override
+        nx::utils::db::QueryContext* const /*queryContext*/) override
     {
-        return nx::db::DBResult::ok;
+        return nx::utils::db::DBResult::ok;
     }
 
-    nx::db::ConnectionOptions m_connectionOptions;
+    nx::utils::db::ConnectionOptions m_connectionOptions;
 };
 
 static const QnUuid functorId = QnUuid::createUuid();
@@ -106,24 +106,24 @@ protected:
 
         EXPECT_CALL(dbHelper, getScheduleData(_, NotNull()))
             .Times(AtLeast(1))
-            .WillRepeatedly(DoAll(SetArgPointee<1>(dbData), Return(nx::db::DBResult::ok)));
+            .WillRepeatedly(DoAll(SetArgPointee<1>(dbData), Return(nx::utils::db::DBResult::ok)));
     }
 
     void expectingGetScheduledDataFromDbWithNoDataWillBeCalled()
     {
         EXPECT_CALL(dbHelper, getScheduleData(_, NotNull()))
             .Times(AtLeast(1))
-            .WillRepeatedly(DoAll(SetArgPointee<1>(ScheduleData()), Return(nx::db::DBResult::ok)));
+            .WillRepeatedly(DoAll(SetArgPointee<1>(ScheduleData()), Return(nx::utils::db::DBResult::ok)));
     }
 
-    void expectingDbHelperSubscribeWillBeCalledOnce(nx::db::DBResult result = nx::db::DBResult::ok)
+    void expectingDbHelperSubscribeWillBeCalledOnce(nx::utils::db::DBResult result = nx::utils::db::DBResult::ok)
     {
         EXPECT_CALL(dbHelper, subscribe(nullptr, functorId, _, _))
             .Times(AtLeast(1))
             .WillOnce(DoAll(SetArgPointee<2>(QnUuid::createUuid()), Return(result)));
     }
 
-    void expectingDbHelperUnsubscribeWillBeCalled(nx::db::DBResult result = nx::db::DBResult::ok)
+    void expectingDbHelperUnsubscribeWillBeCalled(nx::utils::db::DBResult result = nx::utils::db::DBResult::ok)
     {
         EXPECT_CALL(dbHelper, unsubscribe(nullptr, _))
             .Times(AtLeast(1))
@@ -134,8 +134,8 @@ protected:
     {
         EXPECT_CALL(dbHelper, subscribe(nullptr, functorId, _, _))
             .Times(AtLeast(1))
-            .WillOnce(DoAll(SetArgPointee<2>(QnUuid::createUuid()), Return(nx::db::DBResult::ok)))
-            .WillOnce(DoAll(SetArgPointee<2>(QnUuid::createUuid()), Return(nx::db::DBResult::ok)));
+            .WillOnce(DoAll(SetArgPointee<2>(QnUuid::createUuid()), Return(nx::utils::db::DBResult::ok)))
+            .WillOnce(DoAll(SetArgPointee<2>(QnUuid::createUuid()), Return(nx::utils::db::DBResult::ok)));
     }
 
     void whenSchedulerAndUserInitialized()
@@ -232,7 +232,7 @@ TEST_F(PersistentScheduler, subscribe)
 TEST_F(PersistentScheduler, subscribe_dbError)
 {
     expectingGetScheduledDataFromDbWithNoDataWillBeCalled();
-    expectingDbHelperSubscribeWillBeCalledOnce(nx::db::DBResult::ioError);
+    expectingDbHelperSubscribeWillBeCalledOnce(nx::utils::db::DBResult::ioError);
     whenSchedulerAndUserInitialized();
 
     user->subscribe(std::chrono::milliseconds(10));
@@ -268,7 +268,7 @@ TEST_F(PersistentScheduler, unsubscribe_dbError)
 {
     expectingGetScheduledDataFromDbWithNoDataWillBeCalled();
     expectingDbHelperSubscribeWillBeCalledOnce();
-    expectingDbHelperUnsubscribeWillBeCalled(nx::db::DBResult::ioError);
+    expectingDbHelperUnsubscribeWillBeCalled(nx::utils::db::DBResult::ioError);
 
     whenSchedulerAndUserInitialized();
 

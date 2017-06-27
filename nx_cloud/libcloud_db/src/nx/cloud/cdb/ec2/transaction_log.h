@@ -14,7 +14,7 @@
 #include <nx/cloud/cdb/api/result_code.h>
 #include <nx_ec/ec_proto_version.h>
 #include <utils/common/id.h>
-#include <utils/db/async_sql_query_executor.h>
+#include <nx/utils/db/async_sql_query_executor.h>
 
 #include <transaction/transaction.h>
 #include <transaction/transaction_descriptor.h>
@@ -45,7 +45,7 @@ QString toString(const ::ec2::QnAbstractTransaction& tran);
  * In this case transactions will reported to AbstractOutgoingTransactionDispatcher 
  * in ascending sequence order.
  * 
- * @note Calls with the same nx::db::QueryContext object MUST happen within single thread.
+ * @note Calls with the same nx::utils::db::QueryContext object MUST happen within single thread.
  */
 class TransactionLog
 {
@@ -62,25 +62,25 @@ public:
      */
     TransactionLog(
         const QnUuid& peerId,
-        nx::db::AsyncSqlQueryExecutor* const dbManager,
+        nx::utils::db::AsyncSqlQueryExecutor* const dbManager,
         AbstractOutgoingTransactionDispatcher* const outgoingTransactionDispatcher);
 
     /** 
      * Begins SQL DB transaction and passes that to dbOperationsFunc.
-     * @note nx::db::DBResult::retryLater can be reported to onDbUpdateCompleted if 
+     * @note nx::utils::db::DBResult::retryLater can be reported to onDbUpdateCompleted if 
      *      there are already too many requests for transaction
      * @note In case of error dbUpdateFunc can be skipped
      */
     void startDbTransaction(
         const nx::String& systemId,
-        nx::utils::MoveOnlyFunc<nx::db::DBResult(nx::db::QueryContext*)> dbUpdateFunc,
-        nx::utils::MoveOnlyFunc<void(nx::db::QueryContext*, nx::db::DBResult)> onDbUpdateCompleted);
+        nx::utils::MoveOnlyFunc<nx::utils::db::DBResult(nx::utils::db::QueryContext*)> dbUpdateFunc,
+        nx::utils::MoveOnlyFunc<void(nx::utils::db::QueryContext*, nx::utils::db::DBResult)> onDbUpdateCompleted);
 
     /**
      * @note This call should be made only once when generating first transaction.
      */
-    nx::db::DBResult updateTimestampHiForSystem(
-        nx::db::QueryContext* connection,
+    nx::utils::db::DBResult updateTimestampHiForSystem(
+        nx::utils::db::QueryContext* connection,
         const nx::String& systemId,
         quint64 newValue);
 
@@ -89,8 +89,8 @@ public:
      *      db::DBResult::cancelled is returned.
      */
     template<typename TransactionDataType>
-    nx::db::DBResult checkIfNeededAndSaveToLog(
-        nx::db::QueryContext* connection,
+    nx::utils::db::DBResult checkIfNeededAndSaveToLog(
+        nx::utils::db::QueryContext* connection,
         const nx::String& systemId,
         const SerializableTransaction<TransactionDataType>& transaction)
     {
@@ -110,8 +110,8 @@ public:
                     .arg(transaction.get())
                     .arg(calculateTransactionHash(transaction.get())),
                 cl_logDEBUG1);
-            // Returning nx::db::DBResult::cancelled if transaction should be skipped.
-            return nx::db::DBResult::cancelled;
+            // Returning nx::utils::db::DBResult::cancelled if transaction should be skipped.
+            return nx::utils::db::DBResult::cancelled;
         }
 
         return saveToDb(
@@ -123,8 +123,8 @@ public:
     }
 
     template<typename TransactionDataType>
-    nx::db::DBResult generateTransactionAndSaveToLog(
-        nx::db::QueryContext* queryContext,
+    nx::utils::db::DBResult generateTransactionAndSaveToLog(
+        nx::utils::db::QueryContext* queryContext,
         const nx::String& systemId,
         ::ec2::ApiCommand::Value commandCode,
         TransactionDataType transactionData)
@@ -140,8 +140,8 @@ public:
      * This method should be used when generating new transactions.
      */
     template<typename TransactionDataType>
-    nx::db::DBResult saveLocalTransaction(
-        nx::db::QueryContext* queryContext,
+    nx::utils::db::DBResult saveLocalTransaction(
+        nx::utils::db::QueryContext* queryContext,
         const nx::String& systemId,
         ::ec2::QnTransaction<TransactionDataType> transaction)
     {
@@ -171,7 +171,7 @@ public:
             transaction,
             transactionHash,
             serializedTransaction);
-        if (result != nx::db::DBResult::ok)
+        if (result != nx::utils::db::DBResult::ok)
             return result;
 
         auto transactionSerializer = std::make_unique<
@@ -186,12 +186,12 @@ public:
             dbTranContext.cacheTranId,
             std::move(transactionSerializer));
 
-        return nx::db::DBResult::ok;
+        return nx::utils::db::DBResult::ok;
     }
 
     template<typename TransactionDataType>
     ::ec2::QnTransaction<TransactionDataType> prepareLocalTransaction(
-        nx::db::QueryContext* queryContext,
+        nx::utils::db::QueryContext* queryContext,
         const nx::String& systemId,
         ::ec2::ApiCommand::Value commandCode,
         TransactionDataType transactionData)
@@ -272,7 +272,7 @@ private:
     };
 
     typedef nx::utils::SafeMap<
-        std::pair<nx::db::QueryContext*, nx::String>,
+        std::pair<nx::utils::db::QueryContext*, nx::String>,
         DbTransactionContext
     > DbTransactionContextMap;
 
@@ -285,7 +285,7 @@ private:
     };
 
     const QnUuid m_peerId;
-    nx::db::AsyncSqlQueryExecutor* const m_dbManager;
+    nx::utils::db::AsyncSqlQueryExecutor* const m_dbManager;
     AbstractOutgoingTransactionDispatcher* const m_outgoingTransactionDispatcher;
     mutable QnMutex m_mutex;
     DbTransactionContextMap m_dbTransactionContexts;
@@ -294,13 +294,13 @@ private:
     std::unique_ptr<dao::AbstractTransactionDataObject> m_transactionDataObject;
 
     /** Fills transaction state cache. */
-    nx::db::DBResult fillCache();
-    nx::db::DBResult fetchTransactionState(nx::db::QueryContext* connection);
+    nx::utils::db::DBResult fillCache();
+    nx::utils::db::DBResult fetchTransactionState(nx::utils::db::QueryContext* connection);
     /**
      * Selects transactions from DB by condition.
      */
-    nx::db::DBResult fetchTransactions(
-        nx::db::QueryContext* connection,
+    nx::utils::db::DBResult fetchTransactions(
+        nx::utils::db::QueryContext* connection,
         const nx::String& systemId,
         const ::ec2::QnTranState& from,
         const ::ec2::QnTranState& to,
@@ -308,13 +308,13 @@ private:
         TransactionReadResult* const outputData);
 
     bool isShouldBeIgnored(
-        nx::db::QueryContext* connection,
+        nx::utils::db::QueryContext* connection,
         const nx::String& systemId,
         const ::ec2::QnAbstractTransaction& transaction,
         const QByteArray& transactionHash);
 
-    nx::db::DBResult saveToDb(
-        nx::db::QueryContext* connection,
+    nx::utils::db::DBResult saveToDb(
+        nx::utils::db::QueryContext* connection,
         const nx::String& systemId,
         const ::ec2::QnAbstractTransaction& transaction,
         const QByteArray& transactionHash,
@@ -329,7 +329,7 @@ private:
 
     int generateNewTransactionSequence(
         const QnMutexLockerBase& lock,
-        nx::db::QueryContext* connection,
+        nx::utils::db::QueryContext* connection,
         const nx::String& systemId);
 
     ::ec2::Timestamp generateNewTransactionTimestamp(
@@ -338,13 +338,13 @@ private:
         const nx::String& systemId);
 
     void onDbTransactionCompleted(
-        nx::db::QueryContext* dbConnection,
+        nx::utils::db::QueryContext* dbConnection,
         const nx::String& systemId,
-        nx::db::DBResult dbResult);
+        nx::utils::db::DBResult dbResult);
 
     DbTransactionContext& getDbTransactionContext(
         const QnMutexLockerBase& lock,
-        nx::db::QueryContext* const queryContext,
+        nx::utils::db::QueryContext* const queryContext,
         const nx::String& systemId);
 
     TransactionLogContext* getTransactionLogContext(
@@ -352,11 +352,11 @@ private:
         const nx::String& systemId);
 
     std::tuple<int, ::ec2::Timestamp> generateNewTransactionAttributes(
-        nx::db::QueryContext* queryContext,
+        nx::utils::db::QueryContext* queryContext,
         const nx::String& systemId);
 
     void updateTimestampHiInCache(
-        nx::db::QueryContext* queryContext,
+        nx::utils::db::QueryContext* queryContext,
         const nx::String& systemId,
         quint64 newValue);
 };

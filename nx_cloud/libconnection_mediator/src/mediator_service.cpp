@@ -17,10 +17,8 @@
 #include <nx/network/http/server/http_message_dispatcher.h>
 #include <nx/network/http/server/http_stream_socket_server.h>
 #include <nx/utils/platform/current_process.h>
-#include <utils/common/command_line_parser.h>
 #include <nx/utils/scope_guard.h>
 #include <nx/utils/system_error.h>
-#include <utils/common/app_info.h>
 
 #include "business_logic_composite.h"
 #include "http/get_listening_peer_list_handler.h"

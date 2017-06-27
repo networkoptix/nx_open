@@ -2,8 +2,8 @@
 
 #include <gtest/gtest.h>
 
-#include <utils/db/async_sql_query_executor.h>
-#include <utils/db/test_support/test_with_db_helper.h>
+#include <nx/utils/db/async_sql_query_executor.h>
+#include <nx/utils/db/test_support/test_with_db_helper.h>
 
 #include <nx/cloud/cdb/controller.h>
 
@@ -14,12 +14,12 @@ namespace cdb {
 namespace test {
 
 class Controller:
-    public db::test::TestWithDbHelper,
+    public nx::utils::db::test::TestWithDbHelper,
     public ::testing::Test
 {
 public:
     Controller():
-        db::test::TestWithDbHelper("cdb", QString())
+        nx::utils::db::test::TestWithDbHelper("cdb", QString())
     {
     }
 

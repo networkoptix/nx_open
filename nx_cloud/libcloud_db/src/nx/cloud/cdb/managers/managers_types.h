@@ -13,7 +13,7 @@
 #include <QtCore/QUrlQuery>
 
 #include <nx/fusion/model_functions_fwd.h>
-#include <utils/db/types.h>
+#include <nx/utils/db/types.h>
 #include <nx/fusion/fusion/fusion_fwd.h>
 
 #include <nx/cloud/cdb/api/result_code.h>
@@ -22,7 +22,7 @@
 namespace nx {
 namespace cdb {
 
-api::ResultCode dbResultToApiResult( nx::db::DBResult );
+api::ResultCode dbResultToApiResult( nx::utils::db::DBResult );
 
 enum class EntityType
 {

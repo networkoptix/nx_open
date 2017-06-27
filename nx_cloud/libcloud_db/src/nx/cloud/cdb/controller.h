@@ -61,7 +61,7 @@ private:
     MaintenanceManager m_maintenanceManager;
 
     void performDataMigrations();
-    void generateUserAuthRecords(nx::db::QueryContext* queryContext);
+    void generateUserAuthRecords(nx::utils::db::QueryContext* queryContext);
 };
 
 } // namespace cdb
