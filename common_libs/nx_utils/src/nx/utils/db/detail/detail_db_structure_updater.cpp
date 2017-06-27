@@ -1,4 +1,4 @@
-#include "db_structure_updater.h"
+#include "detail_db_structure_updater.h"
 
 #include <functional>
 
@@ -7,11 +7,12 @@
 
 #include <nx/utils/log/log.h>
 
-#include "async_sql_query_executor.h"
+#include "../async_sql_query_executor.h"
 
 namespace nx {
 namespace utils {
 namespace db {
+namespace detail {
 
 namespace {
 
@@ -43,28 +44,19 @@ static ReplacementsDictionary initializeReplacements()
 
 static const ReplacementsDictionary kSqlReplacements = initializeReplacements();
 
-static const char kCreateDbVersionTable[] = 
-R"sql(
-
-CREATE TABLE db_version_data (
-    db_version      integer NOT NULL DEFAULT 0
-);
-
-INSERT INTO db_version_data (db_version) VALUES (0);
-
-)sql";
-
 } // namespace
 
+//-------------------------------------------------------------------------------------------------
 
 DbStructureUpdater::DbStructureUpdater(
-    std::string /*dbManagerName*/,
+    const std::string& schemaName,
     AbstractAsyncSqlQueryExecutor* const queryExecutor)
     :
+    m_schemaName(schemaName),
     m_queryExecutor(queryExecutor),
     m_initialVersion(0)
 {
-    m_updateScripts.emplace_back(QByteArray(kCreateDbVersionTable));
+    m_updateScripts.emplace_back(QByteArray()); //< Just a placeholder to keep version number.
 }
 
 void DbStructureUpdater::setInitialVersion(unsigned int version)
@@ -155,8 +147,9 @@ DbStructureUpdater::DbSchemaState DbStructureUpdater::analyzeDbSchemaState(
 
     //reading current DB version
     QSqlQuery fetchDbVersionQuery(*queryContext->connection());
-    fetchDbVersionQuery.prepare(lit("SELECT db_version FROM db_version_data"));
-    //absense of table db_version_data is normal: DB is just empty
+    fetchDbVersionQuery.prepare(
+        "SELECT db_version FROM db_version_data WHERE schema_name=:schemaName");
+    fetchDbVersionQuery.bindValue(":schemaName", QString::fromStdString(m_schemaName));
     if (fetchDbVersionQuery.exec() && fetchDbVersionQuery.next())
     {
         dbSchemaState.version = fetchDbVersionQuery.value(lit("db_version")).toUInt();
@@ -170,12 +163,6 @@ DBResult DbStructureUpdater::createInitialSchema(
     nx::utils::db::QueryContext* const queryContext,
     DbSchemaState* dbSchemaState)
 {
-    if (!execSqlScript(queryContext, kCreateDbVersionTable, RdbmsDriverType::unknown))
-    {
-        NX_LOG(lit("DbStructureUpdater. Failed to apply kCreateDbVersionTable script. %1")
-            .arg(queryContext->connection()->lastError().text()), cl_logWARNING);
-        return DBResult::ioError;
-    }
     dbSchemaState->version = 1;
 
     if (!m_fullSchemaScriptByVersion.empty())
@@ -226,11 +213,11 @@ DBResult DbStructureUpdater::applyNextUpdateScript(
     nx::utils::db::QueryContext* queryContext,
     DbSchemaState* dbState)
 {
-    NX_LOGX(lm("Updating structure to version %1")
-        .arg(dbState->version)/*.arg(m_updateScripts[dbState->version - m_initialVersion].sqlScript)*/,
-        cl_logDEBUG2);
+    NX_LOGX(lm("Updating structure to version %1").arg(dbState->version), cl_logDEBUG2);
 
-    if (!execDbUpdate(m_updateScripts[dbState->version - m_initialVersion], queryContext))
+    if (!execDbUpdate(
+            m_updateScripts[dbState->version - m_initialVersion],
+            queryContext))
     {
         NX_LOG(lit("DbStructureUpdater. Failure updating to version %1: %2")
             .arg(dbState->version).arg(queryContext->connection()->lastError().text()),
@@ -248,8 +235,12 @@ DBResult DbStructureUpdater::updateDbVersion(
     const DbSchemaState& dbSchemaState)
 {
     QSqlQuery updateDbVersionQuery(*queryContext->connection());
-    updateDbVersionQuery.prepare(lit("UPDATE db_version_data SET db_version = :dbVersion"));
-    updateDbVersionQuery.bindValue(lit(":dbVersion"), dbSchemaState.version);
+    updateDbVersionQuery.prepare(R"sql(
+        REPLACE INTO db_version_data(schema_name, db_version) 
+        VALUES (:schemaName, :dbVersion)
+    )sql");
+    updateDbVersionQuery.bindValue(":schemaName", QString::fromStdString(m_schemaName));
+    updateDbVersionQuery.bindValue(":dbVersion", dbSchemaState.version);
     return updateDbVersionQuery.exec() ? DBResult::ok : DBResult::ioError;
 }
 
@@ -338,6 +329,7 @@ QByteArray DbStructureUpdater::fixSqlDialect(
     return script;
 }
 
+} // namespace detail
 } // namespace db
 } // namespace utils
 } // namespace nx

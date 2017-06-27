@@ -9,7 +9,7 @@
 #include <nx/utils/move_only_func.h>
 #include <nx/utils/std/future.h>
 
-#include "types.h"
+#include "../types.h"
 
 namespace nx {
 namespace utils {
@@ -18,11 +18,8 @@ namespace db {
 class AbstractAsyncSqlQueryExecutor;
 class QueryContext;
 
-/**
- * Updates are executed in order they have been added to DbStructureUpdater instance.
- * @note Database is not created, it MUST already exist.
- * @note This class methods are not thread-safe.
- */
+namespace detail {
+
 class NX_UTILS_API DbStructureUpdater
 {
 public:
@@ -30,40 +27,23 @@ public:
         DbUpdateFunc;
 
     DbStructureUpdater(
-        std::string dbManagerName,
+        const std::string& schemaName,
         AbstractAsyncSqlQueryExecutor* const queryExecutor);
 
     DbStructureUpdater(const DbStructureUpdater&) = delete;
     DbStructureUpdater& operator=(const DbStructureUpdater&) = delete;
 
-    /**
-     * Used to aggregate update scripts.
-     * if not set, initial version is considered to be zero.
-     * Subsequent call to addUpdate* method will add script with initial version.
-     * WARNING: DB of version less than initial will fail to be upgraded!
-     */
     void setInitialVersion(unsigned int version);
     void addUpdateScript(QByteArray updateScript);
 
-    /**
-     * Allows to specify script to be run for specific DB version.
-     * Script for RdbmsDriverType::unknown is used as a fallback.
-     */
     void addUpdateScript(std::map<RdbmsDriverType, QByteArray> scriptByDbType);
     void addUpdateFunc(DbUpdateFunc dbUpdateFunc);
     void addFullSchemaScript(
         unsigned int version,
         QByteArray createSchemaScript);
 
-    /**
-     * @return Version of the latest known script.
-     */
     unsigned int maxKnownVersion() const;
 
-    /**
-     * By default, update is done to the maximum known version. I.e., every script/function is
-     * applied.
-     */
     void setVersionToUpdateTo(unsigned int version);
 
     bool updateStructSync();
@@ -98,6 +78,7 @@ private:
         bool someSchemaExists;
     };
 
+    std::string m_schemaName;
     AbstractAsyncSqlQueryExecutor* const m_queryExecutor;
     unsigned int m_initialVersion;
     std::map<unsigned int, QByteArray> m_fullSchemaScriptByVersion;
@@ -146,6 +127,7 @@ private:
     QByteArray fixSqlDialect(QByteArray initialScript, RdbmsDriverType targetDialect);
 };
 
+} // namespace detail
 } // namespace db
 } // namespace utils
 } // namespace nx

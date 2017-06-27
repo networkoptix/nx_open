@@ -78,6 +78,8 @@ public:
             throw nx::utils::db::Exception(dbResult);
     }
 
+    void executeSqlSync(QByteArray sqlStatement);
+
     /**
      * @param queryFunc throws nx::utils::db::Exception.
      */
