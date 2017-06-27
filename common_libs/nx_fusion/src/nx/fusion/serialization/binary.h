@@ -1,5 +1,4 @@
-#ifndef QN_SERIALIZATION_BINARY_H
-#define QN_SERIALIZATION_BINARY_H
+#pragma once
 
 #include <nx/fusion/serialization/serialization.h>
 
@@ -17,7 +16,6 @@ namespace QnBinary {
         return QnSerialization::deserialize(stream, target);
     }
 
-#ifndef QN_NO_QT
     template<class T>
     QByteArray serialized(const T &value) {
         QByteArray result;
@@ -35,9 +33,5 @@ namespace QnBinary {
             *success = result;
         return result ? target : defaultValue;
     }
-#endif
 
 } // namespace QnBinary
-
-
-#endif // QN_SERIALIZATION_BINARY_H

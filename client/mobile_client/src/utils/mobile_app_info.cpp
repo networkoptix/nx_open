@@ -1,5 +1,6 @@
 #include "mobile_app_info.h"
 
+#include <nx/network/app_info.h>
 #include <nx/utils/software_version.h>
 #include <utils/common/app_info.h>
 #include <mobile_client/mobile_client_app_info.h>
@@ -34,7 +35,7 @@ QString QnMobileAppInfo::version() const
 
 QString QnMobileAppInfo::cloudName() const
 {
-    return QnAppInfo::cloudName();
+    return nx::network::AppInfo::cloudName();
 }
 
 QString QnMobileAppInfo::liteDeviceName() const

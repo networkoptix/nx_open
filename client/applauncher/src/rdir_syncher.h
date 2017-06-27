@@ -19,7 +19,7 @@
 #include <QtCore/QString>
 #include <QtCore/QUrl>
 
-#include <utils/common/stoppable.h>
+#include <nx/utils/thread/stoppable.h>
 
 #include "rdir_synchronization_operation.h"
 #include "list_directory_operation.h"

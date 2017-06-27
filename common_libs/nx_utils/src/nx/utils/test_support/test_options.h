@@ -3,6 +3,7 @@
 #include <atomic>
 
 #include <nx/utils/argument_parser.h>
+#include <nx/utils/thread/mutex.h>
 
 namespace nx {
 namespace utils {
@@ -15,6 +16,9 @@ public:
 
     static void disableTimeAsserts(bool areDisabled = true);
     static bool areTimeAssertsDisabled();
+
+    static void setTemporaryDirectoryPath(const QString& path);
+    static QString temporaryDirectoryPath();
 
     enum class LoadMode { light, normal, stress };
     static void setLoadMode(const QString& mode);
@@ -29,6 +33,9 @@ private:
     static std::atomic<size_t> s_timeoutMultiplier;
     static std::atomic<bool> s_disableTimeAsserts;
     static std::atomic<LoadMode> s_loadMode;
+
+    static QnMutex s_mutex;
+    static QString s_temporaryDirectoryPath;
 };
 
 template<typename Count>

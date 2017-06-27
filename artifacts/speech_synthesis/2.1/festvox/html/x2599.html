@@ -1,0 +1,245 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>Checking and correcting diphones</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REL="HOME"
+TITLE="Building Synthetic Voices"
+HREF="book1.html"><LINK
+REL="UP"
+TITLE="Diphone databases"
+HREF="c2261.html"><LINK
+REL="PREVIOUS"
+TITLE="Defining a diphone voice"
+HREF="x2593.html"><LINK
+REL="NEXT"
+TITLE="Diphone check list"
+HREF="x2619.html"></HEAD
+><BODY
+CLASS="SECT1"
+BGCOLOR="#FFFFFF"
+TEXT="#000000"
+LINK="#0000FF"
+VLINK="#840084"
+ALINK="#0000FF"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="3"
+ALIGN="center"
+>Building Synthetic Voices</TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="bottom"
+><A
+HREF="x2593.html"
+ACCESSKEY="P"
+>&#60;&#60;&#60; Previous</A
+></TD
+><TD
+WIDTH="80%"
+ALIGN="center"
+VALIGN="bottom"
+>Diphone databases</TD
+><TD
+WIDTH="10%"
+ALIGN="right"
+VALIGN="bottom"
+><A
+HREF="x2619.html"
+ACCESSKEY="N"
+>Next &#62;&#62;&#62;</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="SECT1"
+><H1
+CLASS="SECT1"
+><A
+NAME="AEN2599"
+>Checking and correcting diphones</A
+></H1
+><P
+>This probably sounds like we're repeating ourselves here, and we are, 
+because it's quite important for the overall quality of the voice: once 
+you have the basic diphone database working it is worthwhile 
+systematically testing it as it is common to have mistakes. These may 
+be mislabeling, and mispronunciation for the phones themselves. Two 
+possible strategies are possible for testing both of which have their 
+advantages. This first is a simple exhaustive synthesis of all 
+diphones. Ideally, the diphone prompts are exactly the set of 
+utterances that test each and every diphone. using the <CODE
+CLASS="VARNAME"
+>SayPhones</CODE
+> 
+function you can synthesize and listen to each prompt. Actually, for a 
+first pass, it may even be useful to synthesize each nonsense word 
+without listening as some of the problems missing files, missing 
+diphones, badly extracted pitchmarks will show up without you having to 
+listen to at all. </P
+><P
+>When a problem occurs, trace back why, check the entry in the diphone 
+index, then check the label for the nonsense word, then check how that 
+label matches the actually waveform file itself (display the waveform 
+with the label file and spectrogram to see if the label is correct). </P
+><P
+>Listing all the problems that could occur is impossible. What you need 
+to do is break down the problem and find out where it might be occurring. 
+If you just get apparent garbage being synthesized, take a look at the 
+synthesized waveform 
+<A
+NAME="AEN2605"
+></A
+><BLOCKQUOTE
+CLASS="BLOCKQUOTE"
+><P
+CLASS="LITERALLAYOUT"
+>(set!&nbsp;utt1&nbsp;(SayPhones&nbsp;'(pau&nbsp;hh&nbsp;ah&nbsp;l&nbsp;ow&nbsp;pau)))<br>
+(utt.save.wave&nbsp;utt1&nbsp;"hello.wav")</P
+></BLOCKQUOTE
+>
+Is it <I
+CLASS="EMPHASIS"
+>garbage</I
+>, can you recognized any part of it? It 
+could be a byte swap problem or a format problem for your files. 
+Can your nonsense word file be played and displayed as is? Can 
+your LPC residual files be played and displayed. Residual files should 
+look like very low powered waveform files and sound very buzzy when 
+played but almost recognizable if you know what is being said 
+(sort of like Kenny from South Park). </P
+><P
+>If you can recognize some of what is being said but it is fairly 
+uniformly garbled it is possible your pitchmarks are not being aligned 
+properly. Use some display mechanism to see where the pitchmarks 
+are. These should be aligned (during voiced speech) with the peaks 
+in the signal. </P
+><P
+>If all is well except for some parts of the signal are bad or 
+overflowed, then check the diphone where the errors occur. </P
+><P
+>&#13;There are a number of solutions to problems that may save you some time, 
+for the most part they should be considered cheating, but they may save 
+having to re-record, which is something that you will probably want to 
+avoid if at all possible. </P
+><P
+>Note that some phones are very similar, particular the left half 
+side of most stops are indistinguishable, as the consist of mostly 
+silence. Thus if you find you didn't get a good <CODE
+CLASS="VARNAME"
+>SOMETHING-p</CODE
+> 
+diphone you can easily make it use the <CODE
+CLASS="VARNAME"
+>SOMETHING-b</CODE
+> diphone 
+instead. You can do this by hand editing the diphone index 
+file accordingly. </P
+><P
+>The linguists among you may not find that acceptable, but you can go 
+further, the burst part of /p/ and /b/ isn't that different when it 
+comes down to it and if is it just one or two diphones you can simply 
+map those too. Considering problems are often in one or two badly 
+articulated phones replace a /p/ with a /b/ (or similar) in one or two 
+diphones may not be that bad. </P
+><P
+>Once, however, the problems become systematic over a number of phones 
+re-recording them should be considered. Though remember if you do have 
+to re-record you want to have as similar an environment as possible 
+which is not always easy. Eventually you may need to re-record the 
+whole database again. </P
+><P
+>Recording diphone databases is not an exact science, although we have a 
+fair amount of experience in recording these databases, they never 
+completely go as planned. Some apparently minor problem often occurs, 
+noise on the channel, slightly different power over two sessions. Even 
+when everything seems the same and we can't identify any difference 
+between two recording environments we have found that some voices are 
+better than others for building diphone databases. We can't immediately 
+say why, we discussed some of these issues above in selecting a speaker 
+but there is still some other parameters which we can't identify so 
+don't be disheartened when you database isn't as good as you hoped, ours 
+sometimes fail too. </P
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="x2593.html"
+ACCESSKEY="P"
+>&#60;&#60;&#60; Previous</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="book1.html"
+ACCESSKEY="H"
+>Home</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="x2619.html"
+ACCESSKEY="N"
+>Next &#62;&#62;&#62;</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>Defining a diphone voice</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="c2261.html"
+ACCESSKEY="U"
+>Up</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>Diphone check list</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

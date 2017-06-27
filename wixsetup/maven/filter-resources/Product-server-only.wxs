@@ -28,7 +28,7 @@
         <?define CloudHostIsDifferent="(CLOUD_HOST <> "" AND CLOUD_HOST <> "$(var.cloudHost)")" ?>
 
         <!-- Exit if upgrading and cloud hosts differ -->
-        <Condition Message="!(loc.Product_CloudHostMismatch)">
+        <Condition Message="This beta package is for another cloud instance. Please disconnect from the cloud first. Setup will now exit.">
             <![CDATA[ NOT ($(var.VmsUpgrading) AND IS_CONNECTED_TO_CLOUD = "yes" AND $(var.CloudHostIsDifferent)) ]]>
         </Condition>
 
@@ -56,7 +56,7 @@
         <Property Id="WIXUI_EXITDIALOGOPTIONALCHECKBOXTEXT" Secure="yes" />
 
         <!-- Properties -->
-        <Property Id="WelcomeDlg_Title" Value="$(var.ProductName) Installer Setup" />
+        <Property Id="WelcomeDlg_Title" Value="${product.title}" />
 
         <Property Id="BUSYPORT" Secure="yes"/>
 
@@ -166,7 +166,7 @@
 
         <MajorUpgrade AllowSameVersionUpgrades="yes"
             Schedule="afterInstallInitialize"
-            DowngradeErrorMessage="!(loc.DowngradeWarningDlg_DowngradeWarning)"
+            DowngradeErrorMessage="A latter version of [ProductName] is already installed."
             MigrateFeatures="yes" />
 
         <InstallUISequence>

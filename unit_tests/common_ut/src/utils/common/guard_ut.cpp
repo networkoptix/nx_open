@@ -1,12 +1,12 @@
 #include <gtest/gtest.h>
-#include <utils/common/guard.h>
+#include <nx/utils/scope_guard.h>
 
 TEST(UtilsCommon, Guard)
 {
     int a = 1;
     {
         Guard g([&](){ a = 2; });
-        ASSERT_TRUE( g );
+        ASSERT_TRUE( static_cast<bool>(g) );
     }
     ASSERT_EQ(a, 2);
     {

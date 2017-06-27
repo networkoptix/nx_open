@@ -7,7 +7,7 @@
 
 #include <chrono>
 
-#include <utils/common/stoppable.h>
+#include <nx/network/async_stoppable.h>
 
 #include "nx/network/aio/basic_pollable.h"
 #include "nx/network/socket_attributes_cache.h"

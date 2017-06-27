@@ -12,7 +12,8 @@ class QnGlobalMonitorPrivate;
  *
  * Updates on regular time intervals and is thread-safe.
  */
-class QnGlobalMonitor: public QnPlatformMonitor {
+class QnGlobalMonitor: public QnPlatformMonitor
+{
     Q_OBJECT;
 
     typedef QnPlatformMonitor base_type;
@@ -27,18 +28,18 @@ public:
      * \param parent                    Parent of this object.
      * \param updatePeriodMs            statistics update period. It's disabled if 0.
      */
-    QnGlobalMonitor(QnPlatformMonitor *base, QObject *parent, int updatePeriodMs);
+    QnGlobalMonitor(QnPlatformMonitor *base, QObject *parent);
     virtual ~QnGlobalMonitor();
 
     /**
      * \returns                         Update period of this global monitor object, in milliseconds.
      */
-    qint64 updatePeriod() const;
+    qint64 updatePeriodMs() const;
 
     /**
      * \param updateTime                New update period for this global monitor object, in milliseconds.
      */
-    void setUpdatePeriod(qint64 updatePeriod);
+    void setUpdatePeriodMs(qint64 updatePeriod);
 
     /**
      * Server up time in milliseconds.

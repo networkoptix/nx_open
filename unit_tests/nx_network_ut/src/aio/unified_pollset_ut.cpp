@@ -6,6 +6,7 @@
 #include <nx/network/system_socket.h>
 #include <nx/network/udt/udt_socket_impl.h>
 #include <nx/network/udt/udt_socket.h>
+#include <nx/network/http/test_http_server.h>
 #include <nx/utils/random.h>
 #include <nx/utils/std/future.h>
 #include <nx/utils/test_support/utils.h>
@@ -82,7 +83,7 @@ private:
 
     void onConnectionAccepted(
         SystemError::ErrorCode /*sysErrorCode*/,
-        AbstractStreamSocket* streamSocket)
+        std::unique_ptr<AbstractStreamSocket> streamSocket)
     {
         using namespace std::placeholders;
 
@@ -90,9 +91,8 @@ private:
         ASSERT_TRUE(streamSocket->setNonBlockingMode(true));
         streamSocket->sendAsync(
             m_dataToSend,
-            std::bind(&UnifiedPollSet::onBytesSent, this, streamSocket, _1, _2));
-        m_acceptedConnections.push_back(
-            std::unique_ptr<AbstractStreamSocket>(streamSocket));
+            std::bind(&UnifiedPollSet::onBytesSent, this, streamSocket.get(), _1, _2));
+        m_acceptedConnections.push_back(std::move(streamSocket));
 
         m_udtServerSocket.acceptAsync(
             std::bind(&UnifiedPollSet::onConnectionAccepted, this, _1, _2));
@@ -120,6 +120,98 @@ TEST(UnifiedPollSet, all_tests)
 }
 
 INSTANTIATE_TYPED_TEST_CASE_P(UnifiedPollSet, PollSetPerformance, aio::UnifiedPollSet);
+
+//-------------------------------------------------------------------------------------------------
+
+class UdtEpollDummyWrapper:
+    public AbstractUdtEpollWrapper
+{
+public:
+    std::map<AbstractSocket::SOCKET_HANDLE, int> readEvents;
+    std::map<AbstractSocket::SOCKET_HANDLE, int> writeEvents;
+
+    virtual int epollWait(
+        int /*epollFd*/,
+        std::map<UDTSOCKET, int>* /*readReadyUdtSockets*/,
+        std::map<UDTSOCKET, int>* /*writeReadyUdtSockets*/,
+        int64_t /*timeoutMillis*/,
+        std::map<AbstractSocket::SOCKET_HANDLE, int>* readReadySystemSockets,
+        std::map<AbstractSocket::SOCKET_HANDLE, int>* writeReadySystemSockets) override
+    {
+        *readReadySystemSockets = readEvents;
+        *writeReadySystemSockets = writeEvents;
+        return (int)(readReadySystemSockets->size() + writeReadySystemSockets->size());
+    }
+
+    std::size_t emulatedEventCount() const
+    {
+        return readEvents.size() + writeEvents.size();
+    }
+};
+
+class UnifiedPollSetSpecificTests:
+    public ::testing::Test
+{
+public:
+    UnifiedPollSetSpecificTests()
+    {
+        auto udtEpollDummyWrapper = std::make_unique<UdtEpollDummyWrapper>();
+        m_udtEpollDummyWrapper = udtEpollDummyWrapper.get();
+        m_pollset = std::make_unique<aio::UnifiedPollSet>(std::move(udtEpollDummyWrapper));
+    }
+
+protected:
+    void initializeMultipleSockets(int socketCount)
+    {
+        for (int i = 0; i < socketCount; ++i)
+        {
+            m_sockets.push_back(std::make_unique<TCPSocket>(AF_INET));
+            ASSERT_TRUE(m_pollset->add(m_sockets.back().get(), aio::EventType::etRead));
+        }
+    }
+
+    void emulateSocketReadEvent(SYSSOCKET handle, int eventMask)
+    {
+        m_udtEpollDummyWrapper->readEvents.emplace(handle, eventMask);
+    }
+
+    void emulateSocketWriteEvent(SYSSOCKET handle, int eventMask)
+    {
+        m_udtEpollDummyWrapper->writeEvents.emplace(handle, eventMask);
+    }
+
+    std::size_t emulatedEventCount()
+    {
+        return m_udtEpollDummyWrapper->emulatedEventCount();
+    }
+
+    std::vector<std::unique_ptr<TCPSocket>> m_sockets;
+    std::unique_ptr<aio::UnifiedPollSet> m_pollset;
+
+private:
+    UdtEpollDummyWrapper* m_udtEpollDummyWrapper = nullptr;
+};
+
+TEST_F(UnifiedPollSetSpecificTests, removing_socket_which_has_error_event_reported)
+{
+    const int kSocketCount = 2;
+
+    initializeMultipleSockets(kSocketCount);
+
+    emulateSocketReadEvent(m_sockets[0]->handle(), UDT_EPOLL_IN);
+    emulateSocketReadEvent(m_sockets[1]->handle(), UDT_EPOLL_ERR);
+    //emulateSocketWriteEvent(m_sockets[1]->handle(), UDT_EPOLL_ERR);
+
+    ASSERT_EQ((int)emulatedEventCount(), m_pollset->poll());
+
+    m_pollset->remove(m_sockets[1].get(), aio::etRead);
+
+    for (auto it = m_pollset->begin(); it != m_pollset->end(); ++it)
+    {
+        ASSERT_EQ(m_sockets[0].get(), it.socket());
+        ASSERT_EQ(aio::etRead, it.eventType());
+    }
+}
 
 } // namespace test
 } // namespace aio

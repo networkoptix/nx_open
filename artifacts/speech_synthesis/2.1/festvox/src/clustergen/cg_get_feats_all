@@ -1,0 +1,118 @@
+#!/bin/sh
+#####################################################-*-mode:shell-script-*-
+##                                                                       ##
+##                     Carnegie Mellon University                        ##
+##                         Copyright (c) 2005                            ##
+##                        All Rights Reserved.                           ##
+##                                                                       ##
+##  Permission is hereby granted, free of charge, to use and distribute  ##
+##  this software and its documentation without restriction, including   ##
+##  without limitation the rights to use, copy, modify, merge, publish,  ##
+##  distribute, sublicense, and/or sell copies of this work, and to      ##
+##  permit persons to whom this work is furnished to do so, subject to   ##
+##  the following conditions:                                            ##
+##   1. The code must retain the above copyright notice, this list of    ##
+##      conditions and the following disclaimer.                         ##
+##   2. Any modifications must be clearly marked as such.                ##
+##   3. Original authors' names are not deleted.                         ##
+##   4. The authors' names are not used to endorse or promote products   ##
+##      derived from this software without specific prior written        ##
+##      permission.                                                      ##
+##                                                                       ##
+##  CARNEGIE MELLON UNIVERSITY AND THE CONTRIBUTORS TO THIS WORK         ##
+##  DISCLAIM ALL WARRANTIES WITH REGARD TO THIS SOFTWARE, INCLUDING      ##
+##  ALL IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS, IN NO EVENT   ##
+##  SHALL CARNEGIE MELLON UNIVERSITY NOR THE CONTRIBUTORS BE LIABLE      ##
+##  FOR ANY SPECIAL, INDIRECT OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES    ##
+##  WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN   ##
+##  AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION,          ##
+##  ARISING OUT OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF       ##
+##  THIS SOFTWARE.                                                       ##
+##                                                                       ##
+###########################################################################
+##                                                                       ##
+##  Extract all the feats in one go (much feaster)                       ##
+##                                                                       ##
+##  This isn't very safe, and should be PERL                             ##
+##                                                                       ##
+##  saves about 33 hours from a 39 hours voice build                     ##
+##                                                                       ##
+###########################################################################
+
+DATAFILE=$1
+
+if [ $# != 1 ]
+then
+   echo usage: cg_get_feats_all etc/txt.done.data
+   exit -1
+fi
+
+awk '{print $2}' $DATAFILE |
+while read i
+do
+   cat festival/coeffs/$i.feats
+done | sort -n >festival/coeffs/all_sorted.feats
+
+awk '{print $2}' $DATAFILE |
+while read i
+do
+   cat festival/coeffs/$i.mcep
+done | 
+awk '{printf("%s %d ",$1,NR);
+      for (i=2; i<=NF; i++)
+         printf("%s ",$i);
+      printf("\n");}' |
+sort >festival/coeffs/all_sorted.mcep
+
+cat festival/coeffs/all_sorted.feats |
+awk '{if ($1 != l)
+      {
+         if (NR > 1)
+            printf("EOF_%s\n",l);
+         printf("sort -n <<EOF_%s | cat >festival/feats/%s.feats\n",$1,$1);
+         l = $1; 
+         n = 1;
+      }
+         for (i=2; i<=NF; i++)
+            printf("%s ",$i);
+         printf("\n");
+      }
+      END {printf("EOF_%s\n",l)}' >xx.feats.sh
+sh xx.feats.sh
+
+cat festival/coeffs/all_sorted.mcep |
+awk '{if ($1 != l)
+      {
+         if (NR > 1)
+         {
+            printf("EOF_%s\n",l);
+            printf("sort -n xxx.mcep | sed '"'"'s/^[^ ]*//'"'"' | $ESTDIR/bin/ch_track -itype ascii -otype est_ascii -s 0.005 -o festival/disttabs/%s.mcep\n",l);
+         }
+         printf("cat >xxx.mcep <<EOF_%s\n",$1,$1);
+         l = $1; 
+         n = 1;
+      }
+         for (i=2; i<=NF; i++)
+            printf("%s ",$i);
+         printf("\n");
+         n = n + 1;
+      }
+      END {printf("EOF_%s\n",l)
+           printf("sort -n xxx.mcep | sed '"'"'s/^[^ ]*//'"'"' | $ESTDIR/bin/ch_track -itype ascii -otype est_ascii -s 0.005 -o festival/disttabs/%s.mcep\n",l);
+          }' >xx.mcep.sh
+sh xx.mcep.sh
+
+awk '{print $1}' festival/coeffs/all_sorted.mcep |
+sort -u |
+while read x
+do
+   $ESTDIR/bin/ch_track -c 0 festival/disttabs/$x.mcep -otype ascii |
+   cat >xxx.f0
+   cut --delimiter=" " -f 2- festival/feats/$x.feats |
+   cat >xxx.feats   
+   paste xxx.f0 xxx.feats | sed 's/ 	/ /' >festival/feats/${x}_f0.feats
+done
+
+rm -f festival/coeffs/all_sorted.mcep festival/coeffs/all_sorted.feats
+rm -f xx.feats.sh xx.mcep.sh xxx.mcep xxx.feats xxx.f0
+

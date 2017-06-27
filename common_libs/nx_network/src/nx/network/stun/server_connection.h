@@ -1,14 +1,8 @@
-/**********************************************************
-* 19 dec 2013
-* a.kolesnikov
-***********************************************************/
-
-#ifndef STUN_SERVER_CONNECTION_H
-#define STUN_SERVER_CONNECTION_H
+#pragma once 
 
 #include <functional>
 
-#include <utils/common/stoppable.h>
+#include <nx/network/async_stoppable.h>
 #include <nx/network/stun/message.h>
 #include <nx/network/stun/message_parser.h>
 #include <nx/network/stun/message_serializer.h>
@@ -24,7 +18,7 @@ namespace stun {
 class MessageDispatcher;
 
 class NX_NETWORK_API ServerConnection:
-    public nx_api::BaseStreamProtocolConnection<
+    public nx::network::server::BaseStreamProtocolConnection<
         stun::ServerConnection,
         Message,
         MessageParser,
@@ -33,7 +27,7 @@ class NX_NETWORK_API ServerConnection:
     public std::enable_shared_from_this<ServerConnection>
 {
 public:
-    typedef nx_api::BaseStreamProtocolConnection<
+    typedef nx::network::server::BaseStreamProtocolConnection<
         ServerConnection,
         Message,
         MessageParser,
@@ -41,7 +35,7 @@ public:
     > BaseType;
 
     ServerConnection(
-        StreamConnectionHolder<ServerConnection>* socketServer,
+        nx::network::server::StreamConnectionHolder<ServerConnection>* socketServer,
         std::unique_ptr<AbstractStreamSocket> sock,
         const MessageDispatcher& dispatcher);
     ~ServerConnection();
@@ -55,8 +49,10 @@ public:
     virtual AbstractCommunicatingSocket* socket() override;
     virtual void close() override;
 
-    void processMessage(Message message);
     void setDestructHandler(std::function< void() > handler = nullptr);
+
+protected:
+    virtual void processMessage(Message message) override;
 
 private:
     void processBindingRequest(Message message);
@@ -72,5 +68,3 @@ private:
 
 } // namespace stun
 } // namespace nx
-
-#endif  //STUN_SERVER_CONNECTION_H

@@ -1,6 +1,7 @@
 'use strict';
 
 angular.module('webadminApp', [
+    'nxCommon',
     'ngResource',
     'ngSanitize',
     'ngRoute',
@@ -88,12 +89,20 @@ angular.module('webadminApp', [
         })
         .when('/view', {
             templateUrl: Config.viewsDir + 'view.html',
-            controller: 'ViewCtrl',
             reloadOnSearch: false
         })
         .when('/view/:cameraId', {
             templateUrl: Config.viewsDir + 'view.html',
-            controller: 'ViewCtrl',
+            reloadOnSearch: false
+        })
+        .when('/viewdebug', {
+            templateUrl: Config.viewsDir + 'viewdebug.html',
+            controller: 'ViewdebugCtrl',
+            reloadOnSearch: false
+        })
+        .when('/viewdebug/:cameraId', {
+            templateUrl: Config.viewsDir + 'viewdebug.html',
+            controller: 'ViewdebugCtrl',
             reloadOnSearch: false
         })
         .when('/sdkeula', {
@@ -115,23 +124,4 @@ angular.module('webadminApp', [
         .otherwise({
             redirectTo: '/'
         });
-}).run(['$route', '$rootScope', '$location', function ($route, $rootScope, $location, $localStorage) {
-    var original = $location.path;
-    $rootScope.storage = $localStorage;
-    $location.path = function (path, reload) {
-        if(reload === false) {
-            if (original.apply($location) == path) return;
-
-            var routeToKeep = $route.current;
-            var unsubscribe = $rootScope.$on('$locationChangeSuccess', function () {
-                if (routeToKeep) {
-                    $route.current = routeToKeep;
-                    routeToKeep = null;
-                }
-                unsubscribe();
-                unsubscribe = null;
-            });
-        }
-        return original.apply($location, [path]);
-    };
-}]);
+});

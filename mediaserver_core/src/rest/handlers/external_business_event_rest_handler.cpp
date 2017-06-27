@@ -1,8 +1,7 @@
 #include "external_business_event_rest_handler.h"
 
-#include <QtCore/QFileInfo>
-
 #include <core/resource/resource.h>
+#include <core/resource_access/user_access_data.h>
 
 #include "network/tcp_connection_priv.h"
 #include "core/resource_management/resource_pool.h"
@@ -12,12 +11,18 @@
 #include <business/business_event_parameters.h>
 #include <nx/fusion/model_functions.h>
 #include "common/common_module.h"
+#include <rest/server/rest_connection_processor.h>
+#include <nx/utils/string.h>
 
 QnExternalBusinessEventRestHandler::QnExternalBusinessEventRestHandler()
 {
 }
 
-int QnExternalBusinessEventRestHandler::executeGet(const QString &path, const QnRequestParams &params, QnJsonRestResult &result, const QnRestConnectionProcessor*)
+int QnExternalBusinessEventRestHandler::executeGet(
+    const QString &path,
+    const QnRequestParams &params,
+    QnJsonRestResult &result,
+    const QnRestConnectionProcessor* owner)
 {
     Q_UNUSED(path)
 
@@ -38,7 +43,7 @@ int QnExternalBusinessEventRestHandler::executeGet(const QString &path, const Qn
     if (params.contains("eventResourceId"))
         businessParams.eventResourceId = QnUuid::fromStringSafe(params["eventResourceId"]);
     if (params.contains("state")) {
-        eventState = QnLexical::deserialized<QnBusiness::EventState>(params["state"], QnBusiness::EventState(), &ok);
+        eventState = QnLexical::deserialized<QnBusiness::EventState>(params["state"], QnBusiness::UndefinedState, &ok);
         if (!ok) {
             result.setError(QnRestResult::InvalidParameter, "Invalid value for parameter 'state'.");
             return CODE_OK;
@@ -69,12 +74,14 @@ int QnExternalBusinessEventRestHandler::executeGet(const QString &path, const Qn
 
     if (businessParams.eventTimestampUsec == 0)
         businessParams.eventTimestampUsec = qnSyncTime->currentUSecsSinceEpoch();
-    businessParams.sourceServerId = qnCommon->moduleGUID();
+    businessParams.sourceServerId = owner->commonModule()->moduleGUID();
 
     if (businessParams.eventType == QnBusiness::UndefinedEvent)
         businessParams.eventType = QnBusiness::UserDefinedEvent; // default value for type is 'CustomEvent'
 
-    if (!qnBusinessRuleConnector->createEventFromParams(businessParams, eventState, &errStr))
+    const auto& userId = owner->accessRights().userId;
+
+    if (!qnBusinessRuleConnector->createEventFromParams(businessParams, eventState, userId, &errStr))
         result.setError(QnRestResult::InvalidParameter, errStr);
 
     return CODE_OK;

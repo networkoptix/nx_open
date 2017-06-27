@@ -1,7 +1,0 @@
-{
-    "settings": {
-        "updateFeedUrl":      "${updateFeedUrl}",
-        "translationPath":    ":/translations/common_${translation1}.qm",
-        "backgroundImage":    ${backgroundImage}
-    }
-}

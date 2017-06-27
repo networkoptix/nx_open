@@ -109,6 +109,7 @@ LIBS += -L$$OUTPUT_PATH/lib -L$$OUTPUT_PATH/lib/$$CONFIGURATION -L$$OUTPUT_PATH/
     LIBS += -Wl,-rpath-link,$$OUTPUT_PATH/lib/$$CONFIGURATION
 }
 LIBS += ${global.libs}
+LIBS += ${subdirectory.global.libs}
 
 INCLUDEPATH +=  ${project.build.sourceDirectory} \
                 ${project.build.directory} \
@@ -116,14 +117,15 @@ INCLUDEPATH +=  ${project.build.sourceDirectory} \
                 $$ROOT_DIR/common_libs/nx_network/src \
                 $$ROOT_DIR/common_libs/nx_fusion/src \
                 $$ROOT_DIR/common_libs/nx_utils/src \
-                $$ROOT_DIR/common_libs/nx_streaming/src \
                 $$ROOT_DIR/common_libs/nx_media/src \
                 $$ROOT_DIR/common_libs/nx_audio/src \
+                ${packages.dir}/any/nx_kit/src \
                 $$clean_path("${libdir}")/include \
                 $$ADDITIONAL_QT_INCLUDES
 
 win* {
     DEFINES += \
+        NX_KIT_API=__declspec(dllimport) \
         NX_NETWORK_API=__declspec(dllimport) \
         NX_UTILS_API=__declspec(dllimport) \
         NX_FUSION_API=__declspec(dllimport) \
@@ -132,6 +134,7 @@ win* {
 
 } else {
     DEFINES += \
+        NX_KIT_API= \
         NX_NETWORK_API= \
         NX_UTILS_API= \
         NX_FUSION_API= \
@@ -222,7 +225,7 @@ unix: {
   } else {
     #QMAKE_CXXFLAGS += -std=c++1y
   }
-  QMAKE_CXXFLAGS += -Werror=enum-compare -Werror=reorder -Werror=delete-non-virtual-dtor -Werror=return-type -Werror=conversion-null -Wuninitialized
+  QMAKE_CXXFLAGS += -Werror=enum-compare -Werror=reorder -Werror=delete-non-virtual-dtor -Werror=return-type -Werror=conversion-null -Wuninitialized -Wno-error=maybe-uninitialized
 }
 
 !win32 {

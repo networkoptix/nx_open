@@ -2,8 +2,8 @@
 
 #include <memory>
 
-#include <utils/common/counter.h>
-#include <utils/db/async_sql_query_executor.h>
+#include <nx/utils/counter.h>
+#include <nx/utils/db/async_sql_query_executor.h>
 
 #include "connection_statistics_info.h"
 #include "dao/abstract_data_object.h"
@@ -27,16 +27,16 @@ class Collector:
 public:
     Collector(
         const conf::Statistics& settings,
-        nx::db::AsyncSqlQueryExecutor* sqlQueryExecutor);
+        nx::utils::db::AsyncSqlQueryExecutor* sqlQueryExecutor);
     virtual ~Collector() override;
 
     virtual void saveConnectSessionStatistics(ConnectSession data) override;
 
 private:
     const conf::Statistics m_settings;
-    nx::db::AsyncSqlQueryExecutor* m_sqlQueryExecutor;
+    nx::utils::db::AsyncSqlQueryExecutor* m_sqlQueryExecutor;
     std::unique_ptr<dao::AbstractDataObject> m_dataObject;
-    QnCounter m_startedAsyncCallsCounter;
+    nx::utils::Counter m_startedAsyncCallsCounter;
 };
 
 } // namespace stats

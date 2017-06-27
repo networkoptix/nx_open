@@ -5,9 +5,7 @@
 
 #include <type_traits> /* For std::enable_if, std::is_base_of, std::integral_constant. */
 
-#ifndef QN_NO_QT
 #include <QtCore/QVariant>
-#endif
 
 #include <nx/utils/log/assert.h>
 #include <nx/utils/conversion_wrapper.h>
@@ -83,13 +81,11 @@ public:
 
     QnContextSerializer(int type): QnContextSerializerBase(type) {}
 
-#ifndef QN_NO_QT
     void serialize(context_type *ctx, const QVariant &value, data_type *target) const {
         NX_ASSERT(ctx && value.userType() == type() && target);
 
         serializeInternal(ctx, value.constData(), target);
     }
-#endif
 
     void serialize(context_type *ctx, const void *value, data_type *target) const {
         NX_ASSERT(ctx && value && target);
@@ -97,14 +93,12 @@ public:
         serializeInternal(ctx, value, target);
     }
 
-#ifndef QN_NO_QT
     bool deserialize(context_type *ctx, const data_type &value, QVariant *target) const {
         NX_ASSERT(ctx && target);
 
         *target = QVariant(type(), static_cast<const void *>(NULL));
         return deserializeInternal(ctx, value, target->data());
     }
-#endif
 
     bool deserialize(context_type *ctx, const data_type &value, void *target) const {
         NX_ASSERT(ctx && target);
@@ -142,13 +136,11 @@ public:
 
     QnBasicSerializer(int type): QnBasicSerializerBase(type) {}
 
-#ifndef QN_NO_QT
     void serialize(const QVariant &value, data_type *target) const {
         NX_ASSERT(value.userType() == type() && target);
 
         serializeInternal(value.constData(), target);
     }
-#endif
 
     void serialize(const void *value, data_type *target) const {
         NX_ASSERT(value && target);
@@ -156,14 +148,12 @@ public:
         serializeInternal(value, target);
     }
 
-#ifndef QN_NO_QT
     bool deserialize(const data_type &value, QVariant *target) const {
         NX_ASSERT(target);
 
         *target = QVariant(type(), static_cast<const void *>(NULL));
         return deserializeInternal(value, target->data());
     }
-#endif
 
     bool deserialize(const data_type &value, void *target) const {
         NX_ASSERT(target);

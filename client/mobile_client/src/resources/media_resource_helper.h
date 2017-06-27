@@ -1,10 +1,11 @@
 #pragma once
 
+#include <client_core/connection_context_aware.h>
 #include <core/ptz/media_dewarping_params.h>
 #include <utils/common/connective.h>
 
 class QnMediaResourceHelperPrivate;
-class QnMediaResourceHelper: public Connective<QObject>
+class QnMediaResourceHelper: public Connective<QObject>, public QnConnectionContextAware
 {
     Q_OBJECT
 

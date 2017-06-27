@@ -1,0 +1,6 @@
+{
+    "settings": {
+        "updateFeedUrl":      "${updateFeedUrl}",
+        "backgroundImage":    ${backgroundImage}
+    }
+}

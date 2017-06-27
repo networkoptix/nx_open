@@ -3,16 +3,16 @@
     <parent>
         <artifactId>build_ut</artifactId>
         <groupId>com.networkoptix.hdwitness</groupId>
-        <version>3.0.0-SNAPSHOT</version>
+        <version>3.1.0-SNAPSHOT</version>
         <relativePath>../build_ut</relativePath>
     </parent>
 
     <groupId>com.networkoptix.hdwitness</groupId>
-    <version>3.0.0-SNAPSHOT</version>
+    <version>3.1.0-SNAPSHOT</version>
     <modelVersion>4.0.0</modelVersion>
     <artifactId>common_ut</artifactId>
     <packaging>pom</packaging>
-    <name>VMS Common Libraryrary Unit Tests</name>
+    <name>VMS Common Library Unit Tests</name>
 
     <properties>
         <root.dir>${basedir}/../..</root.dir>
@@ -21,7 +21,7 @@
         <master.project.directory>common</master.project.directory>
 
         <qt.libs>core gui network xml xmlpatterns sql concurrent multimedia</qt.libs>
-        <global.libs>-lcommon -lnx_fusion -lnx_network -lnx_streaming -ludt -lnx_utils</global.libs>
+        <global.libs>-lcommon -lnx_fusion -lnx_network -ludt -lnx_utils</global.libs>
         <windows.oslibs>Ws2_32.lib DbgHelp.lib -lIphlpapi -lwinmm Wldap32.lib</windows.oslibs>
         <mac.oslibs>-lbz2 -framework IOKit -framework CoreServices</mac.oslibs>
 

@@ -2,10 +2,8 @@
 
 #include "messaging.h"
 
-#include <QElapsedTimer>
+#include <QtCore/QElapsedTimer>
 #include <QDateTime>
-
-#include <utils/memory/data_stream_helpers.h>
 
 static const quint32 LIFETIME = 1 * 60 * 60;
 static const int RESPONCE_WAIT = 1000;
@@ -60,7 +58,9 @@ QByteArray Router::makeMapRequest(Mapping& mapping)
     header.version = VERSION;
     header.opcode = Opcode::MAP;
     header.lifeTime = LIFETIME;
-    header.clientIp = dsh::rawBytes(*mapping.internal.address.ipV6());
+    header.clientIp = QByteArray(
+        reinterpret_cast<const char*>(mapping.internal.address.ipV6().get_ptr()),
+        sizeof(*mapping.internal.address.ipV6()));
 
     MapMessage message;
     message.nonce = mapping.nonce;

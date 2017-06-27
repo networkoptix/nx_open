@@ -3,6 +3,7 @@ import Nx 1.0
 import Nx.Core 1.0
 import Nx.Controls 1.0
 import Nx.Dialogs 1.0
+import Nx.Settings 1.0
 
 Page
 {

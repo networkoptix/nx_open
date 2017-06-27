@@ -11,7 +11,6 @@ namespace after {
 
 QnAbstractTransaction::QnAbstractTransaction():
     command(ApiCommand::NotDefined),
-    peerID(qnCommon->moduleGUID()),
     transactionType(TransactionType::Regular)
 {
 }

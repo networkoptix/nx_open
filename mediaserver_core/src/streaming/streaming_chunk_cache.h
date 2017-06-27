@@ -9,19 +9,19 @@
 #include "streaming_chunk.h"
 #include "streaming_chunk_cache_key.h"
 #include "streaming_chunk_provider.h"
+#include <common/common_module.h>
 
 
 /*!
     Cache cost is measured in seconds
 */
-class StreamingChunkCache
-:
+class StreamingChunkCache:
+    public QObject,
     public ItemCache<StreamingChunkCacheKey, StreamingChunkPtr, StreamingChunkProvider>
 {
+    Q_OBJECT
 public:
-    StreamingChunkCache();
-
-    static StreamingChunkCache* instance();
+    StreamingChunkCache(QnCommonModule* commonModule);
 };
 
 #endif  //STREAMING_CHUNK_CACHE_H

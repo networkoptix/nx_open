@@ -7,13 +7,13 @@
 
 #include "connection_factory.h"
 
-
 extern "C"
 {
     ec2::AbstractECConnectionFactory* getConnectionFactory(
         Qn::PeerType peerType,
-        nx::utils::TimerManager* const timerManager)
+        nx::utils::TimerManager* const timerManager,
+        QnCommonModule* commonModule)
     {
-        return new ec2::Ec2DirectConnectionFactory(peerType, timerManager);
+        return new ec2::Ec2DirectConnectionFactory(peerType, timerManager, commonModule);
     }
 }

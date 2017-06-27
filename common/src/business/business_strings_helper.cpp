@@ -2,64 +2,73 @@
 #include <utils/common/app_info.h>
 
 #include <api/app_server_connection.h>
-
-#include "utils/common/id.h"
-#include <nx/network/nettools.h> /* For resolveAddress. */
-
+#include <common/common_module.h>
 #include <business/business_aggregation_info.h>
+#include <business/business_event_rule.h>
 #include <business/events/reasoned_business_event.h>
 #include <business/events/network_issue_business_event.h>
 #include <business/events/camera_input_business_event.h>
 #include <business/events/conflict_business_event.h>
+#include <business/events/ip_conflict_business_event.h>
 #include <business/events/mserver_conflict_business_event.h>
-
 #include <core/resource/resource.h>
-
 #include <core/resource/resource_display_info.h>
 #include <core/resource/device_dependent_strings.h>
 #include <core/resource/network_resource.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource_management/resource_pool.h>
-#include "core/resource/camera_history.h"
-#include "events/ip_conflict_business_event.h"
-#include "business_event_rule.h"
+#include <core/resource_management/user_roles_manager.h>
+#include <core/resource/user_resource.h>
+#include <core/resource/camera_history.h>
+#include <utils/common/id.h>
+#include <nx/network/nettools.h> /* For resolveAddress. */
 
-QString QnBusinessStringsHelper::actionName(QnBusiness::ActionType value) {
+QnBusinessStringsHelper::QnBusinessStringsHelper(QnCommonModule* commonModule):
+    QObject(),
+    QnCommonModuleAware(commonModule)
+{
+}
+
+QString QnBusinessStringsHelper::actionName(QnBusiness::ActionType value) const
+{
     using namespace QnBusiness;
 
-    switch(value) {
-    case UndefinedAction:           return QString();
-    case CameraOutputAction:        return QnDeviceDependentStrings::getDefaultNameFromSet(
-                                        tr("Device output"),
-                                        tr("Camera output")
-                                    );
-    case CameraRecordingAction:     return QnDeviceDependentStrings::getDefaultNameFromSet(
-                                        tr("Device recording"),
-                                        tr("Camera recording")
-                                    );
-    case BookmarkAction:            return tr("Bookmark");
-    case PanicRecordingAction:      return tr("Panic recording");
-    case SendMailAction:            return tr("Send Email");
-    case DiagnosticsAction:         return tr("Write to log");
-    case ShowPopupAction:           return tr("Show notification");
-    case PlaySoundAction:           return tr("Repeat sound");
-    case PlaySoundOnceAction:       return tr("Play sound");
-    case SayTextAction:             return tr("Speak");
-    case ExecutePtzPresetAction:    return tr("Execute PTZ preset");
-    case ShowTextOverlayAction:     return tr("Show text overlay");
-    case ShowOnAlarmLayoutAction:   return tr("Show on Alarm Layout");
-    case ExecHttpRequestAction:     return tr("Do HTTP request");
+    switch (value)
+    {
+        case UndefinedAction:           return QString();
+        case CameraOutputAction:        return QnDeviceDependentStrings::getDefaultNameFromSet(
+            resourcePool(),
+            tr("Device output"),
+            tr("Camera output")
+        );
+        case CameraRecordingAction:     return QnDeviceDependentStrings::getDefaultNameFromSet(
+            resourcePool(),
+            tr("Device recording"),
+            tr("Camera recording")
+        );
+        case BookmarkAction:            return tr("Bookmark");
+        case PanicRecordingAction:      return tr("Panic recording");
+        case SendMailAction:            return tr("Send Email");
+        case DiagnosticsAction:         return tr("Write to log");
+        case ShowPopupAction:           return tr("Show notification");
+        case PlaySoundAction:           return tr("Repeat sound");
+        case PlaySoundOnceAction:       return tr("Play sound");
+        case SayTextAction:             return tr("Speak");
+        case ExecutePtzPresetAction:    return tr("Execute PTZ preset");
+        case ShowTextOverlayAction:     return tr("Show text overlay");
+        case ShowOnAlarmLayoutAction:   return tr("Show on Alarm Layout");
+        case ExecHttpRequestAction:     return tr("Do HTTP request");
 
-    default:
-        break;
+        default:
+            break;
     }
 
     NX_ASSERT(false, Q_FUNC_INFO, "All enumeration values must be handled here");
     return lit("Unknown (%1)").arg(static_cast<int>(value));
 }
 
-QString QnBusinessStringsHelper::eventName(QnBusiness::EventType value, int count)
+QString QnBusinessStringsHelper::eventName(QnBusiness::EventType value, int count) const
 {
     using namespace QnBusiness;
 
@@ -71,41 +80,49 @@ QString QnBusinessStringsHelper::eventName(QnBusiness::EventType value, int coun
         return result;
     }
 
-    switch( value )
+    switch (value)
     {
-    case CameraMotionEvent:     return tr("Motion on Cameras", "", count);
-    case CameraInputEvent:      return QnDeviceDependentStrings::getDefaultNameFromSet(
-                                    tr("Input Signal on Devices", "", count),
-                                    tr("Input Signal on Cameras", "", count)
-                                );
-    case CameraDisconnectEvent: return QnDeviceDependentStrings::getDefaultNameFromSet(
-                                    tr("Devices Disconnected", "", count),
-                                    tr("Cameras Disconnected", "", count)
-                                );
-    case CameraIpConflictEvent: return QnDeviceDependentStrings::getDefaultNameFromSet(
-                                    tr("Devices IP Conflict", "", count),
-                                    tr("Cameras IP Conflict", "", count)
-                                );
-    case AnyCameraEvent:        return QnDeviceDependentStrings::getDefaultNameFromSet(
-                                    tr("Any Device Issue"),
-                                    tr("Any Camera Issue")
-                                );
-    case StorageFailureEvent:   return tr("Storage Failure");
-    case NetworkIssueEvent:     return tr("Network Issue");
-    case ServerFailureEvent:    return tr("Server Failure");
-    case ServerConflictEvent:   return tr("Server Conflict");
-    case ServerStartEvent:      return tr("Server Started");
-    case LicenseIssueEvent:     return tr("License Issue");
-    case BackupFinishedEvent:   return tr("Archive backup finished");
+        case CameraMotionEvent:     return tr("Motion on Cameras", "", count);
+        case CameraInputEvent:      return QnDeviceDependentStrings::getDefaultNameFromSet(
+            resourcePool(),
+            tr("Input Signal on Devices", "", count),
+            tr("Input Signal on Cameras", "", count)
+        );
+        case CameraDisconnectEvent: return QnDeviceDependentStrings::getDefaultNameFromSet(
+            resourcePool(),
+            tr("Devices Disconnected", "", count),
+            tr("Cameras Disconnected", "", count)
+        );
+        case CameraIpConflictEvent: return QnDeviceDependentStrings::getDefaultNameFromSet(
+            resourcePool(),
+            tr("Devices IP Conflict", "", count),
+            tr("Cameras IP Conflict", "", count)
+        );
+        case AnyCameraEvent:        return QnDeviceDependentStrings::getDefaultNameFromSet(
+            resourcePool(),
+            tr("Any Device Issue"),
+            tr("Any Camera Issue")
+        );
+        case StorageFailureEvent:   return tr("Storage Failure");
+        case NetworkIssueEvent:     return tr("Network Issue");
+        case ServerFailureEvent:    return tr("Server Failure");
+        case ServerConflictEvent:   return tr("Server Conflict");
+        case ServerStartEvent:      return tr("Server Started");
+        case LicenseIssueEvent:     return tr("License Issue");
+        case BackupFinishedEvent:   return tr("Archive backup finished");
 
-    case AnyServerEvent:        return tr("Any Server Issue");
-    case AnyBusinessEvent:      return tr("Any Event");
-    default:
-        return QString();
+        case AnyServerEvent:        return tr("Any Server Issue");
+        case AnyBusinessEvent:      return tr("Any Event");
+
+        case SoftwareTriggerEvent:  return tr("Software Trigger");
+
+        default:
+            return QString();
     }
 }
 
-QString QnBusinessStringsHelper::eventAtResource(const QnBusinessEventParameters &params,  Qn::ResourceInfoLevel detailLevel)
+QString QnBusinessStringsHelper::eventAtResource(const QnBusinessEventParameters &params,
+    Qn::ResourceInfoLevel detailLevel) const
 {
     using namespace QnBusiness;
 
@@ -118,6 +135,7 @@ QString QnBusinessStringsHelper::eventAtResource(const QnBusinessEventParameters
 
     case CameraDisconnectEvent:
         return QnDeviceDependentStrings::getNameFromSet(
+            resourcePool(),
             QnCameraDeviceStringSet(
                 tr("Device %1 was disconnected"),
                 tr("Camera %1 was disconnected"),
@@ -142,6 +160,7 @@ QString QnBusinessStringsHelper::eventAtResource(const QnBusinessEventParameters
 
     case CameraIpConflictEvent:
         return QnDeviceDependentStrings::getDefaultNameFromSet(
+            resourcePool(),
     		//: Device IP Conflict at <server_name>
             tr("Device IP Conflict at %1"),
 
@@ -162,24 +181,36 @@ QString QnBusinessStringsHelper::eventAtResource(const QnBusinessEventParameters
         return (!params.caption.isEmpty() ? params.caption
             : (params.resourceName.isEmpty() ? tr("Generic Event")
                 : tr("Generic Event at %1").arg(params.resourceName)));
+    case SoftwareTriggerEvent:
+        return tr("Software trigger %1 at %2")
+            .arg(getSoftwareTriggerName(params))
+            .arg(resourceName);
     default:
         break;
     }
     return tr("An unknown event has occurred");
 }
 
-QString QnBusinessStringsHelper::eventAtResources(const QnBusinessEventParameters &params)
+QString QnBusinessStringsHelper::eventAtResources(const QnBusinessEventParameters& params) const
 {
-    return lit("Multiple %1 events have occured").arg(eventName(params.eventType));
+    if (params.eventType == QnBusiness::SoftwareTriggerEvent)
+    {
+        return tr("Software Trigger %1 has been activated multiple times")
+            .arg(getSoftwareTriggerName(params));
+    }
+
+    return tr("Multiple %1 events have occured").arg(eventName(params.eventType));
 }
 
-QString QnBusinessStringsHelper::getResoureNameFromParams(const QnBusinessEventParameters& params, Qn::ResourceInfoLevel detailLevel)
+QString QnBusinessStringsHelper::getResoureNameFromParams(const QnBusinessEventParameters& params,
+    Qn::ResourceInfoLevel detailLevel) const
 {
     QString result = QnResourceDisplayInfo(eventSource(params)).toString(detailLevel);
     return result.isEmpty() ? params.resourceName : result;
 }
 
-QString QnBusinessStringsHelper::getResoureIPFromParams(const QnBusinessEventParameters& params)
+QString QnBusinessStringsHelper::getResoureIPFromParams(
+    const QnBusinessEventParameters& params) const
 {
 	QString result = QnResourceDisplayInfo(eventSource(params)).host();
 	return result.isNull() ? params.resourceName : result;
@@ -187,7 +218,7 @@ QString QnBusinessStringsHelper::getResoureIPFromParams(const QnBusinessEventPar
 
 QStringList QnBusinessStringsHelper::eventDescription(const QnAbstractBusinessActionPtr& action,
     const QnBusinessAggregationInfo &aggregationInfo,
-    Qn::ResourceInfoLevel detailLevel)
+    Qn::ResourceInfoLevel detailLevel) const
 {
     QStringList result;
 
@@ -212,14 +243,15 @@ QStringList QnBusinessStringsHelper::eventDescription(const QnAbstractBusinessAc
     return result;
 }
 
-QStringList QnBusinessStringsHelper::eventDetailsWithTimestamp(const QnBusinessEventParameters &params, int aggregationCount)
+QStringList QnBusinessStringsHelper::eventDetailsWithTimestamp(
+    const QnBusinessEventParameters &params, int aggregationCount) const
 {
     return QStringList()
         << eventTimestamp(params, aggregationCount)
         << eventDetails(params);
 }
 
-QStringList QnBusinessStringsHelper::eventDetails(const QnBusinessEventParameters& params)
+QStringList QnBusinessStringsHelper::eventDetails(const QnBusinessEventParameters& params) const
 {
     using namespace QnBusiness;
 
@@ -281,6 +313,9 @@ QStringList QnBusinessStringsHelper::eventDetails(const QnBusinessEventParameter
         if (!params.description.isEmpty())
             result << params.description;
         break;
+    case SoftwareTriggerEvent:
+        result << tr("Trigger: %1").arg(getSoftwareTriggerName(params));
+        break;
     default:
         break;
     }
@@ -288,7 +323,8 @@ QStringList QnBusinessStringsHelper::eventDetails(const QnBusinessEventParameter
     return result;
 }
 
-QString QnBusinessStringsHelper::eventTimestampShort(const QnBusinessEventParameters &params, int aggregationCount)
+QString QnBusinessStringsHelper::eventTimestampShort(const QnBusinessEventParameters &params,
+    int aggregationCount) const
 {
     quint64 ts = params.eventTimestampUsec;
     QDateTime time = QDateTime::fromMSecsSinceEpoch(ts/1000);
@@ -304,7 +340,8 @@ QString QnBusinessStringsHelper::eventTimestampShort(const QnBusinessEventParame
             .arg(time.date().toString(Qt::DefaultLocaleShortDate));
 }
 
-QString QnBusinessStringsHelper::eventTimestamp(const QnBusinessEventParameters &params, int aggregationCount)
+QString QnBusinessStringsHelper::eventTimestamp(const QnBusinessEventParameters &params,
+    int aggregationCount) const
 {
     quint64 ts = params.eventTimestampUsec;
     QDateTime time = QDateTime::fromMSecsSinceEpoch(ts/1000);
@@ -320,26 +357,29 @@ QString QnBusinessStringsHelper::eventTimestamp(const QnBusinessEventParameters 
             .arg(time.date().toString(Qt::DefaultLocaleShortDate));
 }
 
-QString QnBusinessStringsHelper::eventTimestampDate(const QnBusinessEventParameters &params) {
+QString QnBusinessStringsHelper::eventTimestampDate(const QnBusinessEventParameters &params) const
+{
 	quint64 ts = params.eventTimestampUsec;
 	QDateTime time = QDateTime::fromMSecsSinceEpoch(ts / 1000);
 	return time.date().toString(Qt::DefaultLocaleShortDate);
 }
-QString QnBusinessStringsHelper::eventTimestampTime(const QnBusinessEventParameters &params) {
+
+QString QnBusinessStringsHelper::eventTimestampTime(const QnBusinessEventParameters &params) const
+{
 	quint64 ts = params.eventTimestampUsec;
 	QDateTime time = QDateTime::fromMSecsSinceEpoch(ts / 1000);
 	return time.time().toString(Qt::DefaultLocaleShortDate);
 }
 
-QnResourcePtr QnBusinessStringsHelper::eventSource(const QnBusinessEventParameters &params)
+QnResourcePtr QnBusinessStringsHelper::eventSource(const QnBusinessEventParameters &params) const
 {
     QnUuid id = params.eventResourceId;
     return !id.isNull()
-        ? qnResPool->getResourceById(id)
+        ? resourcePool()->getResourceById(id)
         : QnResourcePtr();
 }
 
-QString QnBusinessStringsHelper::eventReason(const QnBusinessEventParameters& params)
+QString QnBusinessStringsHelper::eventReason(const QnBusinessEventParameters& params) const
 {
     using namespace QnBusiness;
 
@@ -405,7 +445,13 @@ QString QnBusinessStringsHelper::eventReason(const QnBusinessEventParameters& pa
     case StorageFullReason:
     {
         QString storageUrl = reasonParamsEncoded;
-        result = tr("HDD/SSD disk %1 is full. Disk contains too much data that is not managed by VMS.").arg(storageUrl);
+        result = tr("HDD/SSD disk \"%1\" is full. Disk contains too much data that is not managed by VMS.").arg(storageUrl);
+        break;
+    }
+    case SystemStorageFullReason:
+    {
+        QString storageUrl = reasonParamsEncoded;
+        result = tr("System disk \"%1\" is almost full.").arg(storageUrl);
         break;
     }
     case BackupFailedNoBackupStorageError:
@@ -458,11 +504,12 @@ QString QnBusinessStringsHelper::eventReason(const QnBusinessEventParameters& pa
     {
         QnVirtualCameraResourceList disabledCameras;
         for (const QString &id: reasonParamsEncoded.split(L';'))
-            if (const QnVirtualCameraResourcePtr &camera = qnResPool->getResourceById<QnVirtualCameraResource>(QnUuid(id)))
+            if (const QnVirtualCameraResourcePtr &camera = resourcePool()->getResourceById<QnVirtualCameraResource>(QnUuid(id)))
                 disabledCameras << camera;
         NX_ASSERT(!disabledCameras.isEmpty(), Q_FUNC_INFO, "At least one camera should be disabled on this event");
 
         result = QnDeviceDependentStrings::getNameFromSet(
+                resourcePool(),
                 QnCameraDeviceStringSet(
                     tr("Not enough licenses. Recording has been disabled on following devices:"),
                     tr("Not enough licenses. Recording has been disabled on following cameras:"),
@@ -482,7 +529,7 @@ QString QnBusinessStringsHelper::eventReason(const QnBusinessEventParameters& pa
 
 QStringList QnBusinessStringsHelper::aggregatedEventDetails(
     const QnAbstractBusinessActionPtr& action,
-    const QnBusinessAggregationInfo& aggregationInfo)
+    const QnBusinessAggregationInfo& aggregationInfo) const
 {
     QStringList result;
     if (aggregationInfo.isEmpty())
@@ -497,15 +544,16 @@ QStringList QnBusinessStringsHelper::aggregatedEventDetails(
     return result;
 }
 
-QString QnBusinessStringsHelper::urlForCamera(const QnUuid& id, qint64 timestampUsec, bool isPublic)
+QString QnBusinessStringsHelper::urlForCamera(const QnUuid& id, qint64 timestampUsec,
+    bool isPublic) const
 {
     QnNetworkResourcePtr res = !id.isNull() ?
-                            qnResPool->getResourceById<QnNetworkResource>(id) :
+                            resourcePool()->getResourceById<QnNetworkResource>(id) :
                             QnNetworkResourcePtr();
     if (id.isNull())
         return QString();
 
-    QnVirtualCameraResourcePtr camera = qnResPool->getResourceById<QnVirtualCameraResource>(id);
+    QnVirtualCameraResourcePtr camera = resourcePool()->getResourceById<QnVirtualCameraResource>(id);
     if (!camera)
         return QString();
 
@@ -514,32 +562,35 @@ QString QnBusinessStringsHelper::urlForCamera(const QnUuid& id, qint64 timestamp
         return QString();
 
     quint64 timeStampMs = timestampUsec / 1000;
-    QnMediaServerResourcePtr newServer = qnCameraHistoryPool->getMediaServerOnTime(camera, timeStampMs);
+    QnMediaServerResourcePtr newServer = cameraHistoryPool()->getMediaServerOnTime(camera, timeStampMs);
     if (newServer)
         mserverRes = newServer;
 
-    QUrl appServerUrl = QnAppServerConnectionFactory::url();
-    if (appServerUrl.host().isEmpty() || resolveAddress(appServerUrl.host()) == QHostAddress::LocalHost)
+    if (const auto& connection = camera->commonModule()->ec2Connection())
     {
-        appServerUrl = mserverRes->getApiUrl();
-        if (isPublic) {
-            QString publicIP = mserverRes->getProperty(Qn::PUBLIC_IP);
-            if (!publicIP.isEmpty()) {
-                QStringList parts = publicIP.split(L':');
-                appServerUrl.setHost(parts[0]);
-                if (parts.size() > 1)
-                    appServerUrl.setPort(parts[1].toInt());
+        QUrl appServerUrl = connection->connectionInfo().ecUrl;
+        if (appServerUrl.host().isEmpty() || resolveAddress(appServerUrl.host()) == QHostAddress::LocalHost)
+        {
+            appServerUrl = mserverRes->getApiUrl();
+            if (isPublic) {
+                QString publicIP = mserverRes->getProperty(Qn::PUBLIC_IP);
+                if (!publicIP.isEmpty()) {
+                    QStringList parts = publicIP.split(L':');
+                    appServerUrl.setHost(parts[0]);
+                    if (parts.size() > 1)
+                        appServerUrl.setPort(parts[1].toInt());
+                }
             }
         }
+        QString result(lit("http://%1:%2/static/index.html#/view/%3?time=%4"));
+        result = result.arg(appServerUrl.host()).arg(appServerUrl.port(80)).arg(camera->getUniqueId()).arg(timeStampMs);
+        return result;
     }
 
-    QString result(lit("http://%1:%2/static/index.html#/view/%3?time=%4"));
-    result = result.arg(appServerUrl.host()).arg(appServerUrl.port(80)).arg(camera->getUniqueId()).arg(timeStampMs);
-
-    return result;
+    return QString();
 }
 
-QString QnBusinessStringsHelper::toggleStateToString(QnBusiness::EventState state)
+QString QnBusinessStringsHelper::toggleStateToString(QnBusiness::EventState state) const
 {
     switch (state) {
     case QnBusiness::ActiveState:
@@ -558,7 +609,7 @@ QString QnBusinessStringsHelper::eventTypeString(
         QnBusiness::EventType eventType,
         QnBusiness::EventState eventState,
         QnBusiness::ActionType actionType,
-        const QnBusinessActionParameters &actionParams)
+        const QnBusinessActionParameters &actionParams) const
 {
     QString typeStr = QnBusinessStringsHelper::eventName(eventType);
     if (QnBusiness::isActionProlonged(actionType, actionParams))
@@ -567,9 +618,91 @@ QString QnBusinessStringsHelper::eventTypeString(
         return tr("On %1 %2").arg(typeStr).arg(toggleStateToString(eventState));
 }
 
-
-QString QnBusinessStringsHelper::bruleDescriptionText(const QnBusinessEventRulePtr& bRule)
+QString QnBusinessStringsHelper::bruleDescriptionText(const QnBusinessEventRulePtr& bRule) const
 {
     QString eventString = eventTypeString(bRule->eventType(), bRule->eventState(), bRule->actionType(), bRule->actionParams());
     return lit("%1 --> %2").arg(eventString).arg(actionName(bRule->actionType()));
+}
+
+QString QnBusinessStringsHelper::defaultSoftwareTriggerName()
+{
+    return tr("Trigger Name");
+}
+
+QString QnBusinessStringsHelper::getSoftwareTriggerName(const QString& id)
+{
+    const auto triggerId = id.trimmed();
+    return triggerId.isEmpty() ? defaultSoftwareTriggerName() : triggerId;
+}
+
+QString QnBusinessStringsHelper::getSoftwareTriggerName(const QnBusinessEventParameters& params)
+{
+    NX_ASSERT(params.eventType == QnBusiness::SoftwareTriggerEvent);
+    return getSoftwareTriggerName(params.caption);
+}
+
+QString QnBusinessStringsHelper::actionSubjects(
+    const QnBusinessEventRulePtr& rule, bool showName) const
+{
+    if (rule->actionParams().allUsers)
+        return allUsersText();
+
+    QnUserResourceList users;
+    QList<QnUuid> roles;
+
+    if (QnBusiness::requiresUserResource(rule->actionType()))
+        userRolesManager()->usersAndRoles(rule->actionResources(), users, roles);
+    else
+        userRolesManager()->usersAndRoles(rule->actionParams().additionalResources, users, roles);
+
+    return actionSubjects(users, roles, showName);
+}
+
+QString QnBusinessStringsHelper::actionSubjects(
+    const QnUserResourceList& users,
+    const QList<QnUuid>& roles,
+    bool showName) const
+{
+    if (users.empty() && roles.empty())
+        return needToSelectUserText();
+
+    if (showName)
+    {
+        if (users.size() == 1 && roles.empty())
+            return users.front()->getName();
+
+        if (users.empty() && roles.size() == 1)
+        {
+            return lit("%1 %2 %3")
+                .arg(tr("Role"))
+                .arg(QChar(L'\x2013')) //< En-dash.
+                .arg(userRolesManager()->userRoleName(roles.front()));
+        }
+    }
+
+    if (roles.empty())
+        return tr("%n Users", "", users.size());
+
+    if (!users.empty())
+    {
+        return lit("%1, %2")
+            .arg(tr("%n Roles", "", roles.size()))
+            .arg(tr("%n Users", "", users.size()));
+    }
+
+    static const QSet<QnUuid> kAdminRoles = QnUserRolesManager::adminRoleIds().toSet();
+    if (roles.toSet() == kAdminRoles)
+        return tr("All Administrators");
+
+    return tr("%n Roles", "", roles.size());
+}
+
+QString QnBusinessStringsHelper::allUsersText()
+{
+    return tr("All Users");
+}
+
+QString QnBusinessStringsHelper::needToSelectUserText()
+{
+    return tr("Select at least one user");
 }

@@ -26,13 +26,13 @@
 
 #include <nx/network/nettools.h>
 
-#include <utils/crypt/linux_passwd_crypt.h>
+#include <nx/utils/crypt/linux_passwd_crypt.h>
 #include <core/resource/user_resource.h>
 #include <server/host_system_password_synchronizer.h>
 #include <core/resource_management/resource_properties.h>
 
 #include <nx/fusion/model_functions.h>
-#include <transaction/transaction_message_bus.h>
+#include <transaction/transaction_message_bus_base.h>
 #include <core/resource_access/resource_access_manager.h>
 #include <network/authutil.h>
 
@@ -47,6 +47,7 @@
 
 #include "server_connector.h"
 #include "server/server_globals.h"
+#include <media_server/media_server_module.h>
 #include <utils/crypt/symmetrical.h>
 
 namespace
@@ -67,7 +68,7 @@ QnUuid serverGuid()
     if (!guid.isNull())
         return guid;
 
-    guid = QnUuid(MSSettings::roSettings()->value(lit("serverGuid")).toString());
+    guid = QnUuid(qnServerModule->roSettings()->value(lit("serverGuid")).toString());
 
     return guid;
 }
@@ -78,13 +79,13 @@ bool isLocalAppServer(const QString &host) {
 
 QString getDataDirectory()
 {
-    const QString& dataDirFromSettings = MSSettings::roSettings()->value( "dataDir" ).toString();
+    const QString& dataDirFromSettings = qnServerModule->roSettings()->value( "dataDir" ).toString();
     if( !dataDirFromSettings.isEmpty() )
         return dataDirFromSettings;
 
 #ifdef Q_OS_LINUX
     QString defVarDirName = QString("/opt/%1/mediaserver/var").arg(QnAppInfo::linuxOrganizationName());
-    QString varDirName = MSSettings::roSettings()->value("varDir", defVarDirName).toString();
+    QString varDirName = qnServerModule->roSettings()->value("varDir", defVarDirName).toString();
     return varDirName;
 #else
     const QStringList& dataDirList = QStandardPaths::standardLocations(QStandardPaths::DataLocation);
@@ -97,7 +98,12 @@ QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(
     (json),
     _Fields)
 
-bool updateUserCredentials(PasswordData data, QnOptionalBool isEnabled, const QnUserResourcePtr& userRes, QString* errString)
+bool updateUserCredentials(
+    std::shared_ptr<ec2::AbstractECConnection> connection,
+    PasswordData data,
+    QnOptionalBool isEnabled,
+    const QnUserResourcePtr& userRes,
+    QString* errString)
 {
     if (!userRes)
     {
@@ -143,9 +149,7 @@ bool updateUserCredentials(PasswordData data, QnOptionalBool isEnabled, const Qn
 
     ec2::ApiUserData apiUser;
     fromResourceToApi(updatedUser, apiUser);
-    auto errCode = QnAppServerConnectionFactory::getConnection2()
-        ->getUserManager(Qn::kSystemAccess)
-        ->saveSync(apiUser, data.password);
+    auto errCode = connection->getUserManager(Qn::kSystemAccess)->saveSync(apiUser, data.password);
     NX_ASSERT(errCode != ec2::ErrorCode::forbidden, "Access check should be implemented before");
     if (errCode != ec2::ErrorCode::ok)
     {
@@ -180,7 +184,8 @@ bool validatePasswordData(const PasswordData& passwordData, QString* errStr)
 }
 
 
-bool backupDatabase() {
+bool backupDatabase(std::shared_ptr<ec2::AbstractECConnection> connection)
+{
     QString dir = getDataDirectory() + lit("/");
     QString fileName;
     for (int i = -1; ; i++) {
@@ -190,7 +195,7 @@ bool backupDatabase() {
             break;
     }
 
-    const ec2::ErrorCode errorCode = QnAppServerConnectionFactory::getConnection2()->dumpDatabaseToFileSync( fileName );
+    const ec2::ErrorCode errorCode = connection->dumpDatabaseToFileSync( fileName );
     if (errorCode != ec2::ErrorCode::ok) {
         NX_LOG(lit("Failed to dump EC database: %1").arg(ec2::toString(errorCode)), cl_logERROR);
         return false;
@@ -199,12 +204,12 @@ bool backupDatabase() {
     return true;
 }
 
-void dropConnectionsToRemotePeers()
+void dropConnectionsToRemotePeers(ec2::QnTransactionMessageBusBase* messageBus)
 {
     if (QnServerConnector::instance())
         QnServerConnector::instance()->stop();
 
-    qnTransactionBus->dropConnections();
+    messageBus->dropConnections();
 }
 
 void resumeConnectionsToRemotePeers()
@@ -213,21 +218,22 @@ void resumeConnectionsToRemotePeers()
         QnServerConnector::instance()->start();
 }
 
-bool changeLocalSystemId(const ConfigureSystemData& data)
+bool changeLocalSystemId(const ConfigureSystemData& data, ec2::QnTransactionMessageBusBase* messageBus)
 {
-    if (qnGlobalSettings->localSystemId() == data.localSystemId)
+    const auto& commonModule = messageBus->commonModule();
+    if (commonModule->globalSettings()->localSystemId() == data.localSystemId)
         return true;
 
-    QnMediaServerResourcePtr server = qnResPool->getResourceById<QnMediaServerResource>(qnCommon->moduleGUID());
+    QnMediaServerResourcePtr server = commonModule->resourcePool()->getResourceById<QnMediaServerResource>(commonModule->moduleGUID());
     if (!server) {
         NX_LOG("Cannot find self server resource!", cl_logERROR);
         return false;
     }
 
     if (!data.wholeSystem)
-        dropConnectionsToRemotePeers();
+        dropConnectionsToRemotePeers(messageBus);
 
-    auto connection = QnAppServerConnectionFactory::getConnection2();
+    auto connection = commonModule->ec2Connection();
 
     // add foreign users
     for (const auto& user: data.foreignUsers)
@@ -241,8 +247,7 @@ bool changeLocalSystemId(const ConfigureSystemData& data)
     }
 
     // add foreign resource params
-    ec2::ApiResourceParamWithRefDataList dummyData;
-    if (connection->getResourceManager(Qn::kSystemAccess)->saveSync(data.additionParams, &dummyData) != ec2::ErrorCode::ok)
+    if (connection->getResourceManager(Qn::kSystemAccess)->saveSync(data.additionParams) != ec2::ErrorCode::ok)
     {
         if (!data.wholeSystem)
             resumeConnectionsToRemotePeers();
@@ -250,7 +255,7 @@ bool changeLocalSystemId(const ConfigureSystemData& data)
     }
 
     // apply remove settings
-    const auto& settings = QnGlobalSettings::instance()->allSettings();
+    const auto& settings = commonModule->globalSettings()->allSettings();
     for(const auto& foreignSetting: data.foreignSettings)
     {
         for(QnAbstractResourcePropertyAdaptor* setting: settings)
@@ -263,14 +268,18 @@ bool changeLocalSystemId(const ConfigureSystemData& data)
         }
     }
 
-    qnCommon->setSystemIdentityTime(data.sysIdTime, qnCommon->moduleGUID());
+    commonModule->setSystemIdentityTime(data.sysIdTime, commonModule->moduleGUID());
 
     if (data.localSystemId.isNull())
-        qnGlobalSettings->resetCloudParams();
-    qnGlobalSettings->setLocalSystemId(data.localSystemId);
-    qnGlobalSettings->synchronizeNowSync();
+        commonModule->globalSettings()->resetCloudParams();
 
-    QnAppServerConnectionFactory::getConnection2()->setTransactionLogTime(data.tranLogTime);
+    if (!data.systemName.isEmpty())
+        commonModule->globalSettings()->setSystemName(data.systemName);
+
+    commonModule->globalSettings()->setLocalSystemId(data.localSystemId);
+    commonModule->globalSettings()->synchronizeNowSync();
+
+    commonModule->ec2Connection()->setTransactionLogTime(data.tranLogTime);
 
     // update auth key if system name is changed
     server->setAuthKey(QnUuid::createUuid().toString());
@@ -297,33 +306,33 @@ bool changeLocalSystemId(const ConfigureSystemData& data)
     return true;
 }
 
-bool resetSystemToStateNew()
+bool resetSystemToStateNew(QnCommonModule* commonModule)
 {
     NX_LOG(lit("Resetting system to the \"new\" state"), cl_logINFO);
 
-    qnGlobalSettings->setLocalSystemId(QnUuid());   //< Marking system as a "new".
-    if (!qnGlobalSettings->synchronizeNowSync())
+    commonModule->globalSettings()->setLocalSystemId(QnUuid());   //< Marking system as a "new".
+    if (!commonModule->globalSettings()->synchronizeNowSync())
     {
         NX_LOG(lit("Error saving changes to global settings"), cl_logINFO);
         return false;
     }
 
-    auto adminUserResource = qnResPool->getAdministrator();
+    auto adminUserResource = commonModule->resourcePool()->getAdministrator();
     PasswordData data;
     data.password = helpers::kFactorySystemPassword;
-    return updateUserCredentials(data, QnOptionalBool(true), adminUserResource, nullptr);
+    return updateUserCredentials(commonModule->ec2Connection(), data, QnOptionalBool(true), adminUserResource, nullptr);
 }
 
 // -------------- nx::ServerSetting -----------------------
 
 qint64 nx::ServerSetting::getSysIdTime()
 {
-    return MSSettings::roSettings()->value(SYSTEM_IDENTITY_TIME).toLongLong();
+    return qnServerModule->roSettings()->value(SYSTEM_IDENTITY_TIME).toLongLong();
 }
 
 void nx::ServerSetting::setSysIdTime(qint64 value)
 {
-    auto settings = MSSettings::roSettings();
+    auto settings = qnServerModule->roSettings();
     settings->setValue(SYSTEM_IDENTITY_TIME, value);
 }
 
@@ -343,8 +352,8 @@ QByteArray nx::ServerSetting::decodeAuthKey(const QByteArray& authKey)
 
 QByteArray nx::ServerSetting::getAuthKey()
 {
-    QByteArray authKey = MSSettings::roSettings()->value(AUTH_KEY).toByteArray();
-    QString appserverHostString = MSSettings::roSettings()->value("appserverHost").toString();
+    QByteArray authKey = qnServerModule->roSettings()->value(AUTH_KEY).toByteArray();
+    QString appserverHostString = qnServerModule->roSettings()->value("appserverHost").toString();
     if (!authKey.isEmpty())
     {
         // convert from v2.2 format and encode value
@@ -362,7 +371,7 @@ void nx::ServerSetting::setAuthKey(const QByteArray& authKey)
     QByteArray prefix("SK_");
     QByteArray authKeyBin = QnUuid(authKey).toRfc4122();
     QByteArray authKeyEncoded = nx::utils::encodeSimple(authKeyBin).toHex();
-    MSSettings::roSettings()->setValue(AUTH_KEY, prefix + authKeyEncoded); // encode and update in settings
+    qnServerModule->roSettings()->setValue(AUTH_KEY, prefix + authKeyEncoded); // encode and update in settings
 }
 
 
@@ -398,7 +407,7 @@ bool nx::SystemName::saveToConfig()
 {
     const auto prevValueBak = m_prevValue;
     m_prevValue = m_value;
-    auto settings = MSSettings::roSettings();
+    auto settings = qnServerModule->roSettings();
     if (!settings->isWritable())
     {
         m_prevValue = prevValueBak;
@@ -411,7 +420,7 @@ bool nx::SystemName::saveToConfig()
 
 void nx::SystemName::loadFromConfig()
 {
-    auto settings = MSSettings::roSettings();
+    auto settings = qnServerModule->roSettings();
     m_value = settings->value(SYSTEM_NAME_KEY).toString();
     m_prevValue = settings->value(PREV_SYSTEM_NAME_KEY).toString();
 }

@@ -20,6 +20,7 @@
 #include <business/business_action_parameters.h>
 #include <health/system_health.h>
 #include <nx/utils/log/log.h>
+#include <common/common_module.h>
 
 
 namespace {
@@ -81,7 +82,7 @@ void QnCameraHistoryPool::checkCameraHistoryDelayed(QnSecurityCamResourcePtr cam
 
             m_camerasToCheck.remove(id);
 
-            QnSecurityCamResourcePtr cam = qnResPool->getResourceById<QnSecurityCamResource>(id);
+            QnSecurityCamResourcePtr cam = commonModule()->resourcePool()->getResourceById<QnSecurityCamResource>(id);
             if (!cam)
                 return;
 
@@ -95,10 +96,11 @@ void QnCameraHistoryPool::checkCameraHistoryDelayed(QnSecurityCamResourcePtr cam
 
 QnCameraHistoryPool::QnCameraHistoryPool(QObject *parent):
     QObject(parent),
+    QnCommonModuleAware(parent),
     m_historyCheckDelay(kDefaultHistoryCheckDelay),
     m_mutex(QnMutex::Recursive)
 {
-    connect(qnResPool, &QnResourcePool::statusChanged, this, [this](const QnResourcePtr &resource)
+    connect(commonModule()->resourcePool(), &QnResourcePool::statusChanged, this, [this](const QnResourcePtr &resource)
     {
 
         NX_LOG(lit("%1 statusChanged signal received for resource %2, %3, %4")
@@ -126,25 +128,35 @@ QnCameraHistoryPool::QnCameraHistoryPool(QObject *parent):
             if (QnSecurityCamResourcePtr camera = toCamera(cameraId))
                 emit cameraFootageChanged(camera);
     });
-    QnCommonMessageProcessor *messageProcessor = QnCommonMessageProcessor::instance();
-    connect(messageProcessor,   &QnCommonMessageProcessor::businessActionReceived, this,
-            [this] (const QnAbstractBusinessActionPtr &businessAction)
-    {
-        QnBusiness::EventType eventType = businessAction->getRuntimeParams().eventType;
-        if (eventType >= QnBusiness::SystemHealthEvent && eventType <= QnBusiness::MaxSystemHealthEvent) {
-            QnSystemHealth::MessageType healthMessage = QnSystemHealth::MessageType(eventType - QnBusiness::SystemHealthEvent);
-            if (healthMessage == QnSystemHealth::ArchiveRebuildFinished || healthMessage == QnSystemHealth::ArchiveFastScanFinished)
-            {
-                auto cameras = getServerFootageData(businessAction->getRuntimeParams().eventResourceId);
-                for (const auto &cameraId: cameras)
-                    invalidateCameraHistory(cameraId);
+}
 
-                for (const auto &cameraId: cameras)
-                    if (QnSecurityCamResourcePtr camera = toCamera(cameraId))
-                        emit cameraFootageChanged(camera);
+void QnCameraHistoryPool::setMessageProcessor(const QnCommonMessageProcessor* messageProcessor)
+{
+    if (m_messageProcessor)
+        disconnect(m_messageProcessor, nullptr, this, nullptr);
+
+    if (messageProcessor)
+    {
+        connect(messageProcessor, &QnCommonMessageProcessor::businessActionReceived, this,
+            [this](const QnAbstractBusinessActionPtr &businessAction)
+        {
+            QnBusiness::EventType eventType = businessAction->getRuntimeParams().eventType;
+            if (eventType >= QnBusiness::SystemHealthEvent && eventType <= QnBusiness::MaxSystemHealthEvent) {
+                QnSystemHealth::MessageType healthMessage = QnSystemHealth::MessageType(eventType - QnBusiness::SystemHealthEvent);
+                if (healthMessage == QnSystemHealth::ArchiveRebuildFinished || healthMessage == QnSystemHealth::ArchiveFastScanFinished)
+                {
+                    auto cameras = getServerFootageData(businessAction->getRuntimeParams().eventResourceId);
+                    for (const auto &cameraId : cameras)
+                        invalidateCameraHistory(cameraId);
+
+                    for (const auto &cameraId : cameras)
+                        if (QnSecurityCamResourcePtr camera = toCamera(cameraId))
+                            emit cameraFootageChanged(camera);
+                }
             }
-        }
-    });
+        });
+    }
+    m_messageProcessor = messageProcessor;
 }
 
 QnCameraHistoryPool::~QnCameraHistoryPool() {}
@@ -157,7 +169,7 @@ bool QnCameraHistoryPool::isCameraHistoryValid(const QnSecurityCamResourcePtr &c
 void QnCameraHistoryPool::invalidateCameraHistory(const QnUuid &cameraId) {
     bool notify = false;
 
-    QnMediaServerResourcePtr server = qnCommon->currentServer();
+    QnMediaServerResourcePtr server = commonModule()->currentServer();
     if (!server)
         return; // somethink wrong
 
@@ -197,7 +209,7 @@ QnCameraHistoryPool::StartResult QnCameraHistoryPool::updateCameraHistoryAsync(c
     if (isCameraHistoryValid(camera))
         return StartResult::ommited;
 
-    QnMediaServerResourcePtr server = qnCommon->currentServer();
+    QnMediaServerResourcePtr server = commonModule()->currentServer();
     if (!server)
         return StartResult::failed;
 
@@ -371,12 +383,12 @@ ec2::ApiCameraHistoryItemDataList QnCameraHistoryPool::filterOnlineServers(const
 
 QnSecurityCamResourcePtr QnCameraHistoryPool::toCamera(const QnUuid& guid) const
 {
-    return qnResPool->getResourceById(guid).dynamicCast<QnSecurityCamResource>();
+    return commonModule()->resourcePool()->getResourceById(guid).dynamicCast<QnSecurityCamResource>();
 }
 
 QnMediaServerResourcePtr QnCameraHistoryPool::toMediaServer(const QnUuid& guid) const
 {
-    return qnResPool->getResourceById(guid).dynamicCast<QnMediaServerResource>();
+    return commonModule()->resourcePool()->getResourceById(guid).dynamicCast<QnMediaServerResource>();
 }
 
 QnMediaServerResourcePtr QnCameraHistoryPool::getMediaServerOnTime(const QnSecurityCamResourcePtr &camera, qint64 timestamp, QnTimePeriod* foundPeriod) const

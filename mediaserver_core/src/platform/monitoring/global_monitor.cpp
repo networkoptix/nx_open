@@ -48,10 +48,10 @@ public:
 // -------------------------------------------------------------------------- //
 class QnGlobalMonitorPrivate {
 public:
-    QnGlobalMonitorPrivate(int updatePeriod)
+    QnGlobalMonitorPrivate()
     :
         base(NULL),
-        updatePeriod(updatePeriod),
+        updatePeriod(0),
         stopped(true),
         requestCount(0),
         totalCpuUsage(0.0),
@@ -111,11 +111,10 @@ private:
 // -------------------------------------------------------------------------- //
 QnGlobalMonitor::QnGlobalMonitor(
     QnPlatformMonitor *base,
-    QObject *parent,
-    int updatePeriod)
-    :
+    QObject *parent)
+:
     base_type(parent),
-    d_ptr(new QnGlobalMonitorPrivate(updatePeriod))
+    d_ptr(new QnGlobalMonitorPrivate())
 {
     Q_D(QnGlobalMonitor);
 
@@ -146,14 +145,16 @@ QnGlobalMonitor::~QnGlobalMonitor() {
     return;
 }
 
-qint64 QnGlobalMonitor::updatePeriod() const {
+qint64 QnGlobalMonitor::updatePeriodMs() const
+{
     Q_D(const QnGlobalMonitor);
     QnMutexLocker locker( &d->mutex );
 
     return d->updatePeriod;
 }
 
-void QnGlobalMonitor::setUpdatePeriod(qint64 updatePeriod) {
+void QnGlobalMonitor::setUpdatePeriodMs(qint64 updatePeriod)
+{
     Q_D(QnGlobalMonitor);
     QnMutexLocker locker( &d->mutex );
 

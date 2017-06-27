@@ -3,7 +3,9 @@
 #include <QtCore/QObject>
 
 #include <common/common_globals.h>
+#include <common/common_module_aware.h>
 
+#include <nx/core/core_fwd.h>
 #include <core/resource_access/resource_access_subject.h>
 #include <core/resource_access/user_access_data.h>
 
@@ -20,13 +22,13 @@
 class QnResourceAccessManager:
     public Connective<QObject>,
     public QnUpdatable,
-    public Singleton<QnResourceAccessManager>
+    public QnCommonModuleAware
 {
     Q_OBJECT
     typedef Connective<QObject> base_type;
 
 public:
-    QnResourceAccessManager(QObject* parent = nullptr);
+    QnResourceAccessManager(nx::core::access::Mode mode, QObject* parent = nullptr);
 
     /**
     * \param user                      User or role to get global permissions for.
@@ -168,6 +170,8 @@ private:
         const QnResourcePtr& resource, Qn::Permissions permissions);
 
 private:
+    const nx::core::access::Mode m_mode;
+
     mutable QnMutex m_mutex;
 
     struct PermissionKey
@@ -191,5 +195,3 @@ private:
 
     QHash<PermissionKey, Qn::Permissions> m_permissionsCache;
 };
-
-#define qnResourceAccessManager QnResourceAccessManager::instance()

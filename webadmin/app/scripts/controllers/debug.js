@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('webadminApp')
-    .controller('DebugCtrl', function ($scope, mediaserver, $sessionStorage, $location, dialogs, $timeout) {
+    .controller('DebugCtrl', function ($scope, mediaserver, $sessionStorage, $location, dialogs, $timeout, systemAPI) {
 
         mediaserver.getUser().then(function(user){
             /*if(!user.isOwner){
@@ -13,10 +13,10 @@ angular.module('webadminApp')
         $scope.session = $sessionStorage;
         $scope.resources = [];
 
-        mediaserver.getMediaServers().then(function(result){
+        systemAPI.getMediaServers().then(function(result){
             $scope.resources =  $scope.resources.concat(result.data);
         });
-        mediaserver.getCameras().then(function(result){
+        systemAPI.getCameras().then(function(result){
             $scope.resources =  $scope.resources.concat(result.data);
         });
         $scope.filterResources = function(filter){

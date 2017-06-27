@@ -3,19 +3,21 @@
 
 #include <QtCore/QVariantList>
 
-#include <nx/network/http/httptypes.h>
+#include <nx/network/http/http_types.h>
 
 #include "network/tcp_connection_processor.h"
 #include "request_handler.h"
 #include <core/resource_access/user_access_data.h>
 
+class QnHttpConnectionListener;
+
 class QnRestProcessorPool
-:
-    public Singleton<QnRestProcessorPool>
 {
 public:
     typedef QMap<QString, QnRestRequestHandlerPtr> Handlers;
     typedef QMap<QString, QString> RedirectRules;
+
+    QnRestProcessorPool();
 
     /*!
         Takes ownership of \a handler
@@ -32,13 +34,14 @@ private:
     RedirectRules m_redirectRules;
 };
 
-class QnRestConnectionProcessorPrivate;
-
-class QnRestConnectionProcessor: public QnTCPConnectionProcessor {
+class QnRestConnectionProcessor: public QnTCPConnectionProcessor
+{
     Q_OBJECT
 
 public:
-    QnRestConnectionProcessor(QSharedPointer<AbstractStreamSocket> socket, QnTcpListener* owner);
+    QnRestConnectionProcessor(
+        QSharedPointer<AbstractStreamSocket> socket,
+        QnHttpConnectionListener* owner);
     virtual ~QnRestConnectionProcessor();
     void setAuthNotRequired(bool noAuth);
 
@@ -49,12 +52,12 @@ public:
     const nx_http::Request& request() const;
     nx_http::Response* response() const;
     QnTcpListener* owner() const;
+
 protected:
     virtual void run() override;
 
 private:
     bool m_noAuth;
-    Q_DECLARE_PRIVATE(QnRestConnectionProcessor);
 };
 
 #endif // _REST_CONNECTION_PROCESSOR_H__

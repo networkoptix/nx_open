@@ -2,7 +2,6 @@
 #define __RUNTIME_TRANSACTION_LOG_H_
 
 #include <QtCore/QSet>
-#include <QtCore/QElapsedTimer>
 #include <nx/utils/thread/mutex.h>
 
 #include "transaction.h"
@@ -11,18 +10,19 @@
 #include "ubjson_transaction_serializer.h"
 #include "nx_ec/data/api_tran_state_data.h"
 #include "api/runtime_info_manager.h"
+#include <common/common_module_aware.h>
 
 namespace ec2
 {
-    class QnRuntimeTransactionLog: public QObject
+    class QnRuntimeTransactionLog: public QObject, public QnCommonModuleAware
     {
         Q_OBJECT
     public:
 
-        QnRuntimeTransactionLog(QObject* parent = NULL);
+        QnRuntimeTransactionLog(QnCommonModule* commonModule);
 		~QnRuntimeTransactionLog();
 
-        void clearOldRuntimeData(const QnTranStateKey& key);
+        void clearOldRuntimeData(const ApiPersistentIdData& key);
         void clearRuntimeData(const QnUuid& id);
         bool contains(const QnTranState& state) const;
         bool contains(const QnTransaction<ApiRuntimeData>& tran) const;
@@ -39,12 +39,12 @@ signals:
         */
         void runtimeDataUpdated(const QnTransaction<ApiRuntimeData>& data);
 private:
-        void clearOldRuntimeDataUnsafe(QnMutexLockerBase& lock, const QnTranStateKey& key);
+        void clearOldRuntimeDataUnsafe(QnMutexLockerBase& lock, const ApiPersistentIdData& key);
 private slots:
         void at_runtimeInfoChanged(const QnPeerRuntimeInfo& runtimeInfo);
     private:
         QnTranState m_state;
-        QMap<QnTranStateKey, ApiRuntimeData> m_data;
+        QMap<ApiPersistentIdData, ApiRuntimeData> m_data;
         mutable QnMutex m_mutex;
     };
 };

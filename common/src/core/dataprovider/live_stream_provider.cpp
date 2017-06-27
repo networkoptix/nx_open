@@ -3,6 +3,7 @@
 #ifdef ENABLE_DATA_PROVIDERS
 
 #include <nx/utils/log/log.h>
+#include <nx/utils/safe_direct_connection.h>
 
 #include <motion/motion_detection.h>
 
@@ -11,7 +12,6 @@
 #include "utils/media/h264_utils.h"
 #include "utils/media/jpeg_utils.h"
 #include "utils/media/nalUnits.h"
-#include "utils/common/safe_direct_connection.h"
 #include "utils/common/synctime.h"
 
 #include <utils/media/av_codec_helper.h>
@@ -237,7 +237,7 @@ void QnLiveStreamProvider::setFps(float f)
         if (std::abs(m_newLiveParams.fps - f) < 0.1)
             return; // same fps?
 
-        m_newLiveParams.fps = qMax(1, qMin((int)f, getDefaultFps()));
+        m_newLiveParams.fps = qMax(1, qMin((int)f, m_cameraRes->getMaxFps()));
         f = m_newLiveParams.fps;
     }
 
@@ -355,7 +355,7 @@ void QnLiveStreamProvider::onGotAudioFrame(const QnCompressedAudioDataPtr& audio
         if (savedCodec.isEmpty())
         {
             m_cameraRes->setProperty(Qn::CAMERA_AUDIO_CODEC_PARAM_NAME, actualCodec);
-            propertyDictionary->saveParams(m_cameraRes->getId());
+            m_cameraRes->saveParams();
         }
     }
 }

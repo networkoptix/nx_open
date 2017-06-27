@@ -1,8 +1,8 @@
 #include "save_cloud_system_credentials.h"
 
-#include <cdb/connection.h>
+#include <nx/cloud/cdb/api/connection.h>
 
-#include <nx/network/http/httptypes.h>
+#include <nx/network/http/http_types.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/string.h>
 
@@ -10,7 +10,7 @@
 #include <api/model/cloud_credentials_data.h>
 #include <api/global_settings.h>
 #include <media_server/serverutil.h>
-#include <utils/common/sync_call.h>
+#include <nx/utils/sync_call.h>
 
 #include <nx_ec/data/api_cloud_system_data.h>
 #include <nx/fusion/model_functions.h>
@@ -53,13 +53,13 @@ int QnSaveCloudSystemCredentialsHandler::execute(
     if (!authorize(owner, &result, &statusCode))
         return statusCode;
 
-    if (!validateInputData(data, &result))
+    if (!validateInputData(owner->commonModule(), data, &result))
         return nx_http::StatusCode::badRequest;
 
-    if (!checkInternetConnection(&result))
+    if (!checkInternetConnection(owner->commonModule(), &result))
         return nx_http::StatusCode::badRequest;
 
-    if (!saveCloudData(data, &result))
+    if (!saveCloudData(owner->commonModule(), data, &result))
         return nx_http::StatusCode::internalServerError;
 
     // Trying to connect to the cloud to activate system.
@@ -69,9 +69,9 @@ int QnSaveCloudSystemCredentialsHandler::execute(
     // is some system in cloud, but system does not know its credentials
     // and there is no way to find them out.
 
-    if (!fetchNecessaryDataFromCloud(data, &result))
+    if (!fetchNecessaryDataFromCloud(owner->commonModule(), data, &result))
     {
-        if (rollback())
+        if (rollback(owner->commonModule()))
             return nx_http::StatusCode::serviceUnavailable;
         else
             return nx_http::StatusCode::internalServerError;
@@ -87,13 +87,12 @@ bool QnSaveCloudSystemCredentialsHandler::authorize(
     nx_http::StatusCode::Value* const authorizationStatusCode)
 {
     using namespace nx_http;
-
-    if (QnPermissionsHelper::isSafeMode())
+    if (QnPermissionsHelper::isSafeMode(owner->commonModule()))
     {
         *authorizationStatusCode = (StatusCode::Value)QnPermissionsHelper::safeModeError(*result);
         return false;
     }
-    if (!QnPermissionsHelper::hasOwnerPermissions(owner->accessRights()))
+    if (!QnPermissionsHelper::hasOwnerPermissions(owner->commonModule()->resourcePool(), owner->accessRights()))
     {
         *authorizationStatusCode = (StatusCode::Value)QnPermissionsHelper::notOwnerError(*result);
         return false;
@@ -103,6 +102,7 @@ bool QnSaveCloudSystemCredentialsHandler::authorize(
 }
 
 bool QnSaveCloudSystemCredentialsHandler::validateInputData(
+    QnCommonModule* commonModule,
     const CloudCredentialsData& data,
     QnJsonRestResult* result)
 {
@@ -132,9 +132,9 @@ bool QnSaveCloudSystemCredentialsHandler::validateInputData(
         return false;
     }
 
-    const QString cloudSystemId = qnGlobalSettings->cloudSystemId();
+    const QString cloudSystemId = commonModule->globalSettings()->cloudSystemId();
     if (!cloudSystemId.isEmpty() &&
-        !qnGlobalSettings->cloudAuthKey().isEmpty())
+        !commonModule->globalSettings()->cloudAuthKey().isEmpty())
     {
         NX_LOGX(lit("Attempt to bind to cloud already-bound system"), cl_logDEBUG1);
         result->setError(
@@ -147,9 +147,10 @@ bool QnSaveCloudSystemCredentialsHandler::validateInputData(
 }
 
 bool QnSaveCloudSystemCredentialsHandler::checkInternetConnection(
+    QnCommonModule* commonModule,
     QnJsonRestResult* result)
 {
-    auto server = qnResPool->getResourceById<QnMediaServerResource>(qnCommon->moduleGUID());
+    auto server = commonModule->resourcePool()->getResourceById<QnMediaServerResource>(commonModule->moduleGUID());
     bool hasPublicIP = server && server->getServerFlags().testFlag(Qn::SF_HasPublicIP);
     if (!hasPublicIP)
     {
@@ -164,28 +165,30 @@ bool QnSaveCloudSystemCredentialsHandler::checkInternetConnection(
 }
 
 bool QnSaveCloudSystemCredentialsHandler::saveCloudData(
+    QnCommonModule* commonModule,
     const CloudCredentialsData& data,
     QnJsonRestResult* result)
 {
-    if (!saveCloudCredentials(data, result))
+    if (!saveCloudCredentials(commonModule, data, result))
         return false;
 
-    if (!insertCloudOwner(data, result))
+    if (!insertCloudOwner(commonModule, data, result))
         return false;
 
     return true;
 }
 
 bool QnSaveCloudSystemCredentialsHandler::saveCloudCredentials(
+    QnCommonModule* commonModule,
     const CloudCredentialsData& data,
     QnJsonRestResult* result)
 {
     NX_LOGX(lm("Saving cloud credentials"), cl_logDEBUG1);
 
-    qnGlobalSettings->setCloudSystemId(data.cloudSystemID);
-    qnGlobalSettings->setCloudAccountName(data.cloudAccountName);
-    qnGlobalSettings->setCloudAuthKey(data.cloudAuthKey);
-    if (!qnGlobalSettings->synchronizeNowSync())
+    commonModule->globalSettings()->setCloudSystemId(data.cloudSystemID);
+    commonModule->globalSettings()->setCloudAccountName(data.cloudAccountName);
+    commonModule->globalSettings()->setCloudAuthKey(data.cloudAuthKey);
+    if (!commonModule->globalSettings()->synchronizeNowSync())
     {
         NX_LOGX(lit("Error saving cloud credentials to the local DB"), cl_logWARNING);
         result->setError(
@@ -198,6 +201,7 @@ bool QnSaveCloudSystemCredentialsHandler::saveCloudCredentials(
 }
 
 bool QnSaveCloudSystemCredentialsHandler::insertCloudOwner(
+    QnCommonModule* commonModule,
     const CloudCredentialsData& data,
     QnJsonRestResult* result)
 {
@@ -210,17 +214,17 @@ bool QnSaveCloudSystemCredentialsHandler::insertCloudOwner(
     userData.permissions = Qn::GlobalAdminPermissionSet;
     userData.isAdmin = true;
     userData.isEnabled = true;
-    userData.realm = QnAppInfo::realm();
+    userData.realm = nx::network::AppInfo::realm();
     userData.hash = ec2::ApiUserData::kCloudPasswordStub;
     userData.digest = ec2::ApiUserData::kCloudPasswordStub;
 
     const auto resultCode =
-        QnAppServerConnectionFactory::getConnection2()
+        commonModule->ec2Connection()
             ->getUserManager(Qn::kSystemAccess)->saveSync(userData);
     if (resultCode != ec2::ErrorCode::ok)
     {
         NX_LOGX(
-            lm("Error inserting cloud owner to the local DB. %1").str(resultCode),
+            lm("Error inserting cloud owner to the local DB. %1").arg(resultCode),
             cl_logWARNING);
         result->setError(
             QnJsonRestResult::CantProcessRequest,
@@ -232,15 +236,16 @@ bool QnSaveCloudSystemCredentialsHandler::insertCloudOwner(
 }
 
 bool QnSaveCloudSystemCredentialsHandler::fetchNecessaryDataFromCloud(
+    QnCommonModule* commonModule,
     const CloudCredentialsData& data,
     QnJsonRestResult* result)
 {
-    return saveLocalSystemIdToCloud(data, result) &&
+    return saveLocalSystemIdToCloud(commonModule, data, result) &&
         initializeCloudRelatedManagers(data, result);
 }
 
 bool QnSaveCloudSystemCredentialsHandler::initializeCloudRelatedManagers(
-    const CloudCredentialsData& data,
+    const CloudCredentialsData& /*data*/,
     QnJsonRestResult* result)
 {
     using namespace nx::cdb;
@@ -262,13 +267,14 @@ bool QnSaveCloudSystemCredentialsHandler::initializeCloudRelatedManagers(
 }
 
 bool QnSaveCloudSystemCredentialsHandler::saveLocalSystemIdToCloud(
+    QnCommonModule* commonModule,
     const CloudCredentialsData& data,
     QnJsonRestResult* result)
 {
     using namespace nx::cdb;
 
     ec2::ApiCloudSystemData opaque;
-    opaque.localSystemId = qnGlobalSettings->localSystemId();
+    opaque.localSystemId = commonModule->globalSettings()->localSystemId();
 
     api::SystemAttributesUpdate systemAttributesUpdate;
     systemAttributesUpdate.systemId = data.cloudSystemID.toStdString();
@@ -298,10 +304,10 @@ bool QnSaveCloudSystemCredentialsHandler::saveLocalSystemIdToCloud(
     return true;
 }
 
-bool QnSaveCloudSystemCredentialsHandler::rollback()
+bool QnSaveCloudSystemCredentialsHandler::rollback(QnCommonModule* commonModule)
 {
-    qnGlobalSettings->resetCloudParams();
-    if (!qnGlobalSettings->synchronizeNowSync())
+    commonModule->globalSettings()->resetCloudParams();
+    if (!commonModule->globalSettings()->synchronizeNowSync())
     {
         NX_LOGX(lit("Error resetting failed cloud credentials in the local DB"), cl_logWARNING);
         return false;

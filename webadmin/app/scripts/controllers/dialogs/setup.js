@@ -1,7 +1,13 @@
 'use strict';
 
 angular.module('webadminApp')
-    .controller('SetupCtrl', function ($scope, mediaserver, cloudAPI, $location, $timeout, $log, $q, nativeClient, $poll) {
+    .run(['$http','$templateCache', function($http,$templateCache) {
+        // Preload content into cache
+        $http.get(Config.viewsDir + 'dialogs/setup-inline.html', {cache: $templateCache});
+    }])
+    .controller('SetupCtrl', ['$scope', 'mediaserver', 'cloudAPI', '$location',
+                              '$timeout', '$log', '$q', 'nativeClient', '$poll',
+    function ($scope, mediaserver, cloudAPI, $location, $timeout, $log, $q, nativeClient, $poll) {
         $log.log("Initiate setup wizard (all scripts were loaded and angular started)");
         $scope.Config = Config;
 
@@ -381,7 +387,7 @@ angular.module('webadminApp')
 
              Serverside related changes:
 
-             result.setError(QnRestResult::CantProcessRequest, QnAppInfo::cloudName() + " is not accessible yet. Please try again later.");
+             result.setError(QnRestResult::CantProcessRequest, nx::network::AppInfo::cloudName() + " is not accessible yet. Please try again later.");
              +        return nx_http::StatusCode::ok;
 
              */
@@ -942,4 +948,4 @@ angular.module('webadminApp')
             $log.log("check client Lite:" + result.lite);
             return getCredentialsFromClient();
         }).finally(initWizard);
-    });
+    }]);

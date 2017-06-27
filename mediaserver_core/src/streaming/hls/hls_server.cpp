@@ -19,10 +19,11 @@
 #include <core/resource/user_resource.h>
 #include <core/resource_access/resource_access_manager.h>
 
-#include <network/authenticate_helper.h>
+#include <nx/network/http/http_content_type.h>
+#include <nx/network/hls/hls_types.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/string.h>
-#include <utils/common/systemerror.h>
+#include <nx/utils/system_error.h>
 #include <utils/media/ffmpeg_helper.h>
 #include <utils/media/av_codec_helper.h>
 #include <utils/media/media_stream_cache.h>
@@ -33,11 +34,13 @@
 #include "hls_live_playlist_manager.h"
 #include "hls_playlist_manager_proxy.h"
 #include "hls_session_pool.h"
-#include "hls_types.h"
 #include "media_server/settings.h"
 #include "streaming/streaming_chunk_cache.h"
 #include "streaming/streaming_params.h"
-#include "network/tcp_connection_priv.h"
+#include <network/authenticate_helper.h>
+#include <network/tcp_connection_priv.h>
+#include <network/tcp_listener.h>
+#include <media_server/media_server_module.h>
 
 //TODO #ak if camera has hi stream only, than playlist request with no quality specified returns No Content, hi returns OK, lo returns Not Found
 
@@ -57,16 +60,13 @@ namespace nx_hls
     static const int COMMON_KEY_FRAME_TO_NON_KEY_FRAME_RATIO = 5;
     static const int DEFAULT_PRIMARY_STREAM_BITRATE = 4*1024*1024;
 
-    const char *const kApplicationMpegUrlMimeType = "application/vnd.apple.mpegurl";
-    const char *const kAudioMpegUrlMimeType = "audio/mpegurl";
-
     //static const int DEFAULT_SECONDARY_STREAM_BITRATE = 512*1024;
 
     size_t QnHttpLiveStreamingProcessor::m_minPlaylistSizeToStartStreaming = nx_ms_conf::DEFAULT_HLS_PLAYLIST_PRE_FILL_CHUNKS;
 
-    QnHttpLiveStreamingProcessor::QnHttpLiveStreamingProcessor( QSharedPointer<AbstractStreamSocket> socket, QnTcpListener* /*owner*/ )
+    QnHttpLiveStreamingProcessor::QnHttpLiveStreamingProcessor( QSharedPointer<AbstractStreamSocket> socket, QnTcpListener* owner )
     :
-        QnTCPConnectionProcessor( socket ),
+        QnTCPConnectionProcessor( socket, owner ),
         m_state( sReceiving ),
         m_switchToChunkedTransfer( false ),
         m_useChunkedTransfer( false ),
@@ -88,7 +88,7 @@ namespace nx_hls
         {
             //disconnecting and waiting for already-emitted signals from m_currentChunk to be delivered and processed
             //TODO #ak cancel on-going transcoding. Currently, it just wastes CPU time
-            StreamingChunkCache::instance()->putBackUsedItem( m_currentChunk->params(), m_currentChunk );
+            QnMediaServerModule::instance()->streamingChunkCache()->putBackUsedItem( m_currentChunk->params(), m_currentChunk );
             m_chunkInputStream.reset();
             m_currentChunk.reset();
         }
@@ -221,6 +221,29 @@ namespace nx_hls
         }
     }
 
+    namespace {
+
+        static QString formatGUID(const QnUuid& guid)
+        {
+            QString rez = guid.toString();
+            if (rez.startsWith(L'{'))
+                return rez;
+            else
+                return QString(lit("{%1}")).arg(rez);
+        }
+
+    } // namespace
+
+    void QnHttpLiveStreamingProcessor::prepareUrlPath(QUrl* url)
+    {
+#if 0 // Not needed because currently hls requests are forwarded via AutoRequestForwarder.
+        //TODO #ak check that request has been proxied via media server, not regular Http proxy
+        const QString& currentPath = url.path();
+        url.setPath(lit("/proxy/%1/%2").arg(formatGUID(commonModule()->moduleGUID()),
+            currentPath.startsWith(QLatin1Char('/')) ? currentPath.mid(1) : currentPath));
+#endif // 0
+    }
+
     nx_http::StatusCode::Value QnHttpLiveStreamingProcessor::getRequestedFile(
         const nx_http::Request& request,
         nx_http::Response* const response )
@@ -259,26 +282,26 @@ namespace nx_hls
         QnResourcePtr resource;
         const QnUuid uuid = QnUuid::fromStringSafe(resId);
         if (!uuid.isNull())
-            resource = qnResPool->getResourceById(uuid);
+            resource = resourcePool()->getResourceById(uuid);
         if (!resource)
-            resource = qnResPool->getResourceByUniqueId(resId);
+            resource = resourcePool()->getResourceByUniqueId(resId);
         if (!resource)
-            resource = qnResPool->getResourceByMacAddress(resId);
+            resource = resourcePool()->getResourceByMacAddress(resId);
         if (!resource)
-            resource = qnResPool->getResourceByUrl(resId);
+            resource = resourcePool()->getResourceByUrl(resId);
         if (!resource)
         {
             NX_LOG(lit("HLS. Requested resource %1 not found").arg(resId), cl_logDEBUG1);
             return nx_http::StatusCode::notFound;
         }
 
-        if (!qnResourceAccessManager->hasPermission(d_ptr->accessRights, resource, Qn::ReadPermission))
+        if (!resourceAccessManager()->hasPermission(d_ptr->accessRights, resource, Qn::ReadPermission))
             return nx_http::StatusCode::forbidden;
 
         QnSecurityCamResourcePtr camResource = resource.dynamicCast<QnSecurityCamResource>();
         if( !camResource )
         {
-            NX_LOG( lit("HLS. Requested resource %1 is not camera").
+            NX_LOG( lit("HLS. Requested resource %1 is not a camera").
                 arg(QString::fromRawData(shortFileName.constData(), shortFileName.size())), cl_logDEBUG1 );
             return nx_http::StatusCode::notFound;
         }
@@ -287,7 +310,7 @@ namespace nx_hls
         QnVideoCameraPtr camera = qnCameraPool->getVideoCamera( camResource );
         if( !camera )
         {
-            NX_LOG( lit("Error. HLS request to resource %1 which is not camera").arg(camResource->getUniqueId()), cl_logDEBUG2 );
+            NX_LOG( lit("Error. HLS request to resource %1 which is not a camera").arg(camResource->getUniqueId()), cl_logDEBUG2 );
             return nx_http::StatusCode::forbidden;
         }
 
@@ -379,15 +402,6 @@ namespace nx_hls
         m_state = sSending;
     }
 
-    static QString formatGUID(const QnUuid& guid)
-    {
-        QString rez = guid.toString();
-        if (rez.startsWith(L'{'))
-            return rez;
-        else
-            return QString(lit("{%1}")).arg(rez);
-    }
-
     bool QnHttpLiveStreamingProcessor::prepareDataToSend()
     {
         static const int kMaxBytesToRead = 1024*1024;
@@ -422,9 +436,9 @@ namespace nx_hls
     const char* QnHttpLiveStreamingProcessor::mimeTypeByExtension(const QString& extension) const
     {
         if (extension.toLower() == lit("m3u8"))
-            return kApplicationMpegUrlMimeType;
+            return nx_http::kApplicationMpegUrlMimeType;
 
-        return kAudioMpegUrlMimeType;
+        return nx_http::kAudioMpegUrlMimeType;
     }
 
     typedef std::multimap<QString, QString> RequestParamsType;
@@ -504,7 +518,7 @@ namespace nx_hls
         }
 
         if (!session->isLive() &&
-            !qnResourceAccessManager->hasGlobalPermission(accessRights, Qn::GlobalViewArchivePermission))
+            !commonModule()->resourceAccessManager()->hasGlobalPermission(accessRights, Qn::GlobalViewArchivePermission))
         {
             return nx_http::StatusCode::forbidden;
         }
@@ -556,12 +570,7 @@ namespace nx_hls
             if( !via.parse( viaIter->second ) )
                 return nx_http::StatusCode::badRequest;
             if( !via.entries.empty() )
-            {
-                //TODO #ak check that request has been proxied via media server, not regular Http proxy
-                const QString& currentPath = playlistData.url.path();
-                playlistData.url.setPath( lit("/proxy/%1/%2").arg(formatGUID(qnCommon->moduleGUID())).
-                    arg(currentPath.startsWith(QLatin1Char('/')) ? currentPath.mid(1) : currentPath) );
-            }
+                prepareUrlPath(&playlistData.url);
         }
         QList<QPair<QString, QString> > queryItems = QUrlQuery(request.requestLine.url.query()).queryItems();
         //removing SESSION_ID_PARAM_NAME
@@ -682,12 +691,7 @@ namespace nx_hls
             if( !via.parse( viaIter->second ) )
                 return nx_http::StatusCode::badRequest;
             if( !via.entries.empty() )
-            {
-                //TODO #ak check that request has been proxied via media server, not regular Http proxy
-                const QString& currentPath = baseChunkUrl.path();
-                baseChunkUrl.setPath( lit("/proxy/%1/%2").arg(formatGUID(qnCommon->moduleGUID())).
-                    arg(currentPath.startsWith(QLatin1Char('/')) ? currentPath.mid(1) : currentPath) );
-            }
+                prepareUrlPath(&baseChunkUrl);
         }
 
         const auto chunkAuthenticationQueryItem = session->chunkAuthenticationQueryItem();
@@ -820,14 +824,15 @@ namespace nx_hls
             requestParams );
 
         if (!currentChunkKey.live() &&
-            !qnResourceAccessManager->hasGlobalPermission(d_ptr->accessRights, Qn::GlobalViewArchivePermission))
+            !commonModule()->resourceAccessManager()->hasGlobalPermission(d_ptr->accessRights, Qn::GlobalViewArchivePermission))
         {
             return nx_http::StatusCode::forbidden;
         }
 
         //retrieving streaming chunk
         StreamingChunkPtr chunk;
-        if( !StreamingChunkCache::instance()->takeForUse( currentChunkKey, &chunk ) )
+        const auto& chunkCache = QnMediaServerModule::instance()->streamingChunkCache();
+        if( !chunkCache->takeForUse( currentChunkKey, &chunk ) )
         {
             NX_LOG( lit("Could not get chunk %1 of resource %2 requested by %3").
                 arg(request.requestLine.url.query()).arg(uniqueResourceID.toString()).arg(remoteHostAddress().toString()), cl_logDEBUG1 );
@@ -838,7 +843,7 @@ namespace nx_hls
         if( m_currentChunk )
         {
             //disconnecting and waiting for already-emitted signals from m_currentChunk to be delivered and processed
-            StreamingChunkCache::instance()->putBackUsedItem( currentChunkKey, m_currentChunk );
+            chunkCache->putBackUsedItem( currentChunkKey, m_currentChunk );
             m_currentChunk.reset();
         }
 
@@ -974,7 +979,7 @@ namespace nx_hls
         std::unique_ptr<HLSSession> newHlsSession(
             new HLSSession(
                 sessionID,
-                duration_cast<milliseconds>(MSSettings::hlsTargetDuration()).count(),
+                duration_cast<milliseconds>(qnServerModule->settings()->hlsTargetDuration()).count(),
                 !startTimestamp,   //if no start date specified, providing live stream
                 streamQuality,
                 videoCamera,

@@ -106,7 +106,7 @@ public:
      * Call handler from within aio thread sock is bound to.
      * @note Call will always be queued. I.e., if called from handler 
      *   running in aio thread, it will be called after handler has returned.
-     * @warning Currently, there is no way to find out whether call 
+     * WARNING: Currently, there is no way to find out whether call 
      *   has been posted or being executed currently.
      */
     void post(Pollable* sock, nx::utils::MoveOnlyFunc<void()> handler);

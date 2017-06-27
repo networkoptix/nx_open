@@ -97,7 +97,7 @@ namespace nx
 
                 onError(
                     errorCode,
-                    lm("Error while connecting to endpoint %1.").str(m_endpoint));
+                    lm("Error while connecting to endpoint %1.").arg(m_endpoint));
 
                 return;
             }
@@ -131,10 +131,9 @@ namespace nx
             emit done(message);
         }
 
-        void QnModbusAsyncClient::closeConnection(SystemError::ErrorCode closeReason, ConnectionType* connection)
+        void QnModbusAsyncClient::closeConnection(SystemError::ErrorCode closeReason,
+            ConnectionType* /*connection*/)
         {
-            QN_UNUSED(connection);
-
             m_modbusConnection.reset();
             m_state = ModbusClientState::disconnected;
 
@@ -160,7 +159,7 @@ namespace nx
         {
             {
                 QnMutexLocker lock(&m_mutex);
-                m_lastErrorString = errorStr + lm(" Error code: %1").str(errorCode);
+                m_lastErrorString = errorStr + lm(" Error code: %1").arg(errorCode);
             }
 
             emit error();

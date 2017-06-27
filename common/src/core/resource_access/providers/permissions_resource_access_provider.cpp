@@ -6,13 +6,21 @@
 
 #include <core/resource/camera_resource.h>
 #include <core/resource/user_resource.h>
+#include <common/common_module.h>
 
+using namespace nx::core::access;
 
-QnPermissionsResourceAccessProvider::QnPermissionsResourceAccessProvider(QObject* parent):
-    base_type(parent)
+QnPermissionsResourceAccessProvider::QnPermissionsResourceAccessProvider(
+    Mode mode,
+    QObject* parent)
+    :
+    base_type(mode, parent)
 {
-    connect(qnGlobalPermissionsManager, &QnGlobalPermissionsManager::globalPermissionsChanged,
-        this, &QnPermissionsResourceAccessProvider::updateAccessBySubject);
+    if (mode == Mode::cached)
+    {
+        connect(globalPermissionsManager(), &QnGlobalPermissionsManager::globalPermissionsChanged,
+            this, &QnPermissionsResourceAccessProvider::updateAccessBySubject);
+    }
 }
 
 QnPermissionsResourceAccessProvider::~QnPermissionsResourceAccessProvider()
@@ -26,11 +34,11 @@ bool QnPermissionsResourceAccessProvider::hasAccessToDesktopCamera(
      * if the user has the ability to push his screen. */
     return subject.user()
         && subject.user()->getName() == resource->getName()
-        && qnGlobalPermissionsManager->hasGlobalPermission(subject,
+        && globalPermissionsManager()->hasGlobalPermission(subject,
             Qn::GlobalControlVideoWallPermission);
 }
 
-QnAbstractResourceAccessProvider::Source QnPermissionsResourceAccessProvider::baseSource() const
+Source QnPermissionsResourceAccessProvider::baseSource() const
 {
     return Source::permissions;
 }
@@ -56,11 +64,13 @@ bool QnPermissionsResourceAccessProvider::calculateAccess(const QnResourceAccess
     else if (isLayout(resource) && subject.user() && resource->getParentId() == subject.id())
         requiredPermission = Qn::NoGlobalPermissions;
 
-    return qnGlobalPermissionsManager->hasGlobalPermission(subject, requiredPermission);
+    return globalPermissionsManager()->hasGlobalPermission(subject, requiredPermission);
 }
 
 void QnPermissionsResourceAccessProvider::handleResourceAdded(const QnResourcePtr& resource)
 {
+    NX_EXPECT(mode() == Mode::cached);
+
     base_type::handleResourceAdded(resource);
     if (isLayout(resource))
     {

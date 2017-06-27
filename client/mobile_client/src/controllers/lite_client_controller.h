@@ -2,6 +2,8 @@
 
 #include <QtCore/QObject>
 
+#include <client_core/connection_context_aware.h>
+
 #include <utils/common/connective.h>
 
 namespace nx {
@@ -18,7 +20,7 @@ class LiteClientLayoutHelper;
 
 class QnLiteClientControllerPrivate;
 
-class QnLiteClientController : public Connective<QObject>
+class QnLiteClientController: public Connective<QObject>, public QnConnectionContextAware
 {
     Q_OBJECT
 

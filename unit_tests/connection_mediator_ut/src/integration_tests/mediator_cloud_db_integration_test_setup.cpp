@@ -23,7 +23,7 @@ bool MediatorCloudDbIntegrationTestSetup::startCdb()
 bool MediatorCloudDbIntegrationTestSetup::startMediator()
 {
     QString cdbUrlArgument = 
-        lm("--cloud_db/url=http://%1/").str(m_cdbLauncher->endpoint());
+        lm("--cloud_db/url=http://%1/").arg(m_cdbLauncher->endpoint());
     m_mediator->addArg(cdbUrlArgument.toLatin1().constData());
 
     return m_mediator->startAndWaitUntilStarted();

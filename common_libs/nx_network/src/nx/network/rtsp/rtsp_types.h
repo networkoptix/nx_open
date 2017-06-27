@@ -6,7 +6,7 @@
 #ifndef NX_RTSP_TYPES_H
 #define NX_RTSP_TYPES_H
 
-#include "../http/httptypes.h"
+#include "../http/http_types.h"
 
 
 namespace nx_rtsp

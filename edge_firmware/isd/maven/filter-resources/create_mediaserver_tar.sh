@@ -57,8 +57,8 @@ copyLibsWithoutQt()
         libcommon.so
         libcloud_db_client.so
         libnx_fusion.so
+        libnx_kit.so
         libnx_network.so
-        libnx_streaming.so
         libnx_utils.so
         libnx_email.so
         libappserver2.so
@@ -75,7 +75,6 @@ copyLibsWithoutQt()
     )
 
     [ -e "$LIBS_DIR/libvpx.so" ] && LIBS_TO_COPY+=( libvpx.so )
-    [ -e "$LIBS_DIR/libcreateprocess.so" ] && LIBS_TO_COPY+=( libcreateprocess.so )
 
     local LIB
     for LIB in "${LIBS_TO_COPY[@]}"; do
@@ -97,7 +96,7 @@ copyQtLibs()
 
     mkdir -p "$INSTALL_DIR/$MODULE/lib/"
 
-    QT_LIBS_TO_COPY=( Core Gui Xml XmlPatterns Concurrent Network Sql Multimedia )
+    QT_LIBS_TO_COPY=(Core Gui Xml XmlPatterns Concurrent Network Sql Multimedia WebSockets)
 
     local QT_LIB
     for QT_LIB in "${QT_LIBS_TO_COPY[@]}"; do

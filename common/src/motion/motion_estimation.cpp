@@ -238,8 +238,7 @@ void getFrame_avgY_array_8_x(const CLVideoDecoderOutput* frame, const CLVideoDec
         for (int x = 0; x < xSteps; ++x)
         {
 #if defined(__i386) || defined(__amd64) || defined(_WIN32)
-            __m128i blockSum;
-            blockSum = _mm_xor_si128(blockSum, blockSum);
+            __m128i blockSum = _mm_setzero_si128();
             const __m128i* src = linePtr;
             const __m128i* srcPrev = linePtrPrev;
             for (int i = 0; i < rowCnt;)
@@ -293,8 +292,7 @@ void getFrame_avgY_array_8_x_mc(const CLVideoDecoderOutput* frame, quint8* dst)
         for (int x = 0; x < xSteps; ++x)
         {
 #if defined(__i386) || defined(__amd64) || defined(_WIN32)
-            __m128i blockSum;
-            blockSum = _mm_xor_si128(blockSum, blockSum); // SSE2
+            __m128i blockSum = _mm_setzero_si128();
             const __m128i* src = linePtr;
             for (int i = 0; i < rowCnt;)
             {
@@ -356,8 +354,7 @@ void getFrame_avgY_array_16_x(const CLVideoDecoderOutput* frame, const CLVideoDe
         for (int x = 0; x < xSteps; ++x)
         {
 #if defined(__i386) || defined(__amd64) || defined(_WIN32)
-            __m128i blockSum;
-            blockSum = _mm_xor_si128(blockSum, blockSum); // SSE2
+            __m128i blockSum = _mm_setzero_si128();
             const __m128i* src = linePtr;
             const __m128i* src2 = linePtr2;
             for (int i = 0; i < rowCnt;)
@@ -405,8 +402,7 @@ void getFrame_avgY_array_16_x_mc(const CLVideoDecoderOutput* frame, quint8* dst)
         for (int x = 0; x < xSteps; ++x)
         {
 #if defined(__i386) || defined(__amd64) || defined(_WIN32)
-            __m128i blockSum;
-            blockSum = _mm_xor_si128(blockSum, blockSum); // SSE2
+            __m128i blockSum = _mm_setzero_si128();
             const __m128i* src = linePtr;
             for (int i = 0; i < rowCnt;)
             {
@@ -493,8 +489,7 @@ void getFrame_avgY_array_x_x(const CLVideoDecoderOutput* frame, const CLVideoDec
         for (int x = 0; x < xSteps; ++x)
         {
 #if defined(__i386) || defined(__amd64) || defined(_WIN32)
-            __m128i blockSum;
-            blockSum = _mm_xor_si128(blockSum, blockSum); // SSE2
+            __m128i blockSum = _mm_setzero_si128();
             const __m128i* src = linePtr;
             const __m128i* src2 = linePtr2;
             for (int i = 0; i < rowCnt; ++i)
@@ -564,8 +559,7 @@ void getFrame_avgY_array_x_x_mc(const CLVideoDecoderOutput* frame, quint8* dst, 
         for (int x = 0; x < xSteps; ++x)
         {
 #if defined(__i386) || defined(__amd64) || defined(_WIN32)
-            __m128i blockSum;
-            blockSum = _mm_xor_si128(blockSum, blockSum); // SSE2
+            __m128i blockSum = _mm_setzero_si128();
             const __m128i* src = linePtr;
             for (int i = 0; i < rowCnt;)
             {

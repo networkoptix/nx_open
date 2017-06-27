@@ -37,6 +37,8 @@
 #include <QCryptographicHash>
 
 #include "network/authutil.h"
+#include <common/common_module.h>
+#include <nx/utils/string.h>
 
 namespace {
     static const int kPageSize = 1000;
@@ -186,9 +188,10 @@ namespace {
     }
 }
 
-QnLdapManager::QnLdapManager()
+QnLdapManager::QnLdapManager(QnCommonModule* commonModule):
+    QnCommonModuleAware(commonModule)
 {
-    connect(qnGlobalSettings, &QnGlobalSettings::ldapSettingsChanged, this, &QnLdapManager::clearCache);
+    connect(commonModule->globalSettings(), &QnGlobalSettings::ldapSettingsChanged, this, &QnLdapManager::clearCache);
 }
 
 QnLdapManager::~QnLdapManager()
@@ -509,14 +512,15 @@ Qn::LdapResult QnLdapManager::fetchUsers(QnLdapUsers &users, const QnLdapSetting
     return Qn::Ldap_NoError;
 }
 
-Qn::LdapResult QnLdapManager::fetchUsers(QnLdapUsers &users) {
-    QnLdapSettings settings = QnGlobalSettings::instance()->ldapSettings();
+Qn::LdapResult QnLdapManager::fetchUsers(QnLdapUsers &users)
+{
+    QnLdapSettings settings = commonModule()->globalSettings()->ldapSettings();
     return fetchUsers(users, settings);
 }
 
 Qn::AuthResult QnLdapManager::authenticate(const QString &login, const QString &password)
 {
-    QnLdapSettings settings = QnGlobalSettings::instance()->ldapSettings();
+    QnLdapSettings settings = commonModule()->globalSettings()->ldapSettings();
     LdapSession session(settings);
     if (!session.connect())
     {

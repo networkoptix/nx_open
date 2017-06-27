@@ -33,16 +33,23 @@ QnMultiserverThumbnailRestHandler::QnMultiserverThumbnailRestHandler( const QStr
         urlPath = path;
 }
 
-int QnMultiserverThumbnailRestHandler::executeGet( const QString& path, const QnRequestParamList& params, QByteArray& result, QByteArray& contentType, const QnRestConnectionProcessor *processor )
+int QnMultiserverThumbnailRestHandler::executeGet(
+    const QString& /*path*/,
+    const QnRequestParamList& params,
+    QByteArray& result, QByteArray& contentType,
+    const QnRestConnectionProcessor* processor )
 {
-    Q_UNUSED(path);
-
-    auto request = QnMultiserverRequestData::fromParams<QnThumbnailRequestData>(params);
+    auto request = QnMultiserverRequestData::fromParams<QnThumbnailRequestData>(processor->commonModule()->resourcePool(), params);
     const auto ownerPort = processor->owner()->getPort();
-    return getScreenshot(request, result, contentType, ownerPort);
+    return getScreenshot(processor->commonModule(), request, result, contentType, ownerPort);
 }
 
-int QnMultiserverThumbnailRestHandler::getScreenshot(const QnThumbnailRequestData &request, QByteArray& result, QByteArray& contentType, int ownerPort)
+int QnMultiserverThumbnailRestHandler::getScreenshot(
+    QnCommonModule* commonModule,
+    const QnThumbnailRequestData &request,
+    QByteArray& result,
+    QByteArray& contentType,
+    int ownerPort)
 {
     if (request.camera && !request.camera->hasVideo(nullptr))
     {
@@ -66,16 +73,18 @@ int QnMultiserverThumbnailRestHandler::getScreenshot(const QnThumbnailRequestDat
             , request.extraFormatting);
     }
 
-    auto server = targetServer(request);
-    if (!server || server->getId() == qnCommon->moduleGUID() || server->getStatus() != Qn::Online)
+    auto server = targetServer(commonModule, request);
+    if (!server || server->getId() == commonModule->moduleGUID() || server->getStatus() != Qn::Online)
         return getThumbnailLocal(request, result, contentType);
 
     return getThumbnailRemote(server, request, result, contentType, ownerPort);
 }
 
-QnMediaServerResourcePtr QnMultiserverThumbnailRestHandler::targetServer( const QnThumbnailRequestData &request ) const
+QnMediaServerResourcePtr QnMultiserverThumbnailRestHandler::targetServer(
+    QnCommonModule* commonModule,
+    const QnThumbnailRequestData &request ) const
 {
-    auto currentServer = qnResPool->getResourceById<QnMediaServerResource>(qnCommon->moduleGUID());
+    auto currentServer = commonModule->resourcePool()->getResourceById<QnMediaServerResource>(commonModule->moduleGUID());
 
     if (request.isLocal)
         return currentServer;
@@ -83,7 +92,7 @@ QnMediaServerResourcePtr QnMultiserverThumbnailRestHandler::targetServer( const 
     if (QnThumbnailRequestData::isSpecialTimeValue(request.msecSinceEpoch))
         return request.camera->getParentServer();
 
-    return qnCameraHistoryPool->getMediaServerOnTimeSync(request.camera, request.msecSinceEpoch);
+    return commonModule->cameraHistoryPool()->getMediaServerOnTimeSync(request.camera, request.msecSinceEpoch);
 }
 
 int QnMultiserverThumbnailRestHandler::getThumbnailLocal( const QnThumbnailRequestData &request, QByteArray& result, QByteArray& contentType ) const
@@ -138,7 +147,12 @@ int QnMultiserverThumbnailRestHandler::getThumbnailLocal( const QnThumbnailReque
 }
 
 
-int QnMultiserverThumbnailRestHandler::getThumbnailRemote( const QnMediaServerResourcePtr &server, const QnThumbnailRequestData &request, QByteArray& result, QByteArray& contentType, int ownerPort ) const
+int QnMultiserverThumbnailRestHandler::getThumbnailRemote(
+    const QnMediaServerResourcePtr &server,
+    const QnThumbnailRequestData &request,
+    QByteArray& result,
+    QByteArray& contentType,
+    int ownerPort ) const
 {
     typedef QnMultiserverRequestContext<QnThumbnailRequestData> QnThumbnailRequestContext;
 
@@ -164,7 +178,7 @@ int QnMultiserverThumbnailRestHandler::getThumbnailRemote( const QnMediaServerRe
             context.requestProcessed();
         });
     };
-    runMultiserverDownloadRequest(apiUrl, server, requestCompletionFunc, &context);
+    runMultiserverDownloadRequest(server->commonModule()->router(), apiUrl, server, requestCompletionFunc, &context);
     context.waitForDone();
 
     QByteArray imageFormat = QnLexical::serialized<QnThumbnailRequestData::ThumbnailFormat>(request.imageFormat).toUtf8();

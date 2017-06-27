@@ -185,19 +185,25 @@ class NX_UTILS_API TimerManager:
     public Singleton<TimerManager>
 {
 };
-
-/** Parses time period like 123ms (milliseconds).
-    Supported suffix: ms, s (second), m (minute), h (hour), d (day).
-    If no suffix is found value considered to be seconds
-*/
+/**
+ * Parses time period like 123ms (milliseconds).
+ * Supported suffix: ms, s (second), m (minute), h (hour), d (day).
+ * If no suffix is found value considered to be seconds.
+ */
 std::chrono::milliseconds NX_UTILS_API parseTimerDuration(
     const QString& duration,
     std::chrono::milliseconds defaultValue = std::chrono::milliseconds::zero());
+
+template<typename Duration>
+Duration parseTimerDurationTyped(const QString& durationStr, Duration defaultValue)
+{
+    return std::chrono::duration_cast<Duration>(
+        parseTimerDuration(durationStr, defaultValue));
+}
 
 boost::optional<std::chrono::milliseconds> NX_UTILS_API parseOptionalTimerDuration(
     const QString& duration,
     std::chrono::milliseconds defaultValue = std::chrono::milliseconds::zero());
 
-}   //namespace utils
-}   //namespace nx
-
+} // namespace utils
+} // namespace nx

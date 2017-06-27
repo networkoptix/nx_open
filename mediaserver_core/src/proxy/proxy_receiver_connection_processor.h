@@ -4,18 +4,14 @@
 #include "network/universal_request_processor.h"
 #include "proxy_connection.h"
 
-class QnProxyReceiverConnectionPrivate;
-
 class QnProxyReceiverConnection: public QnTCPConnectionProcessor
 {
 public:
-    QnProxyReceiverConnection(QSharedPointer<AbstractStreamSocket> socket,
-                              QnHttpConnectionListener* owner);
-    virtual bool isTakeSockOwnership() const override;
+    QnProxyReceiverConnection(
+        QSharedPointer<AbstractStreamSocket> socket, QnHttpConnectionListener* owner);
+
 protected:
     virtual void run();
-private:
-    Q_DECLARE_PRIVATE(QnProxyReceiverConnection);
 };
 
 #endif // __BACK_PROXY_CONNECTION_PROCESSOR_H__

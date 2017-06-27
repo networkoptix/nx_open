@@ -3,11 +3,12 @@
 
 #include <nx_ec/data/api_fwd.h>
 #include <utils/email/email_fwd.h>
+#include <common/common_module_aware.h>
 
-class EmailManagerImpl
+class EmailManagerImpl: public QnCommonModuleAware
 {
 public:
-    EmailManagerImpl();
+    EmailManagerImpl(QnCommonModule* commonModule);
 
     SmtpOperationResult sendEmail(
         const QnEmailSettings& settings,

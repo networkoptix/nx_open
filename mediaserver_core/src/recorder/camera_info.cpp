@@ -113,9 +113,14 @@ QString Writer::makeFullPath(
     return basePath + cameraId + separator + lit("info.txt");
 }
 
-ServerWriterHandler::ServerWriterHandler(QnStorageManager* storageManager):
-    m_storageManager(storageManager)
-{}
+ServerWriterHandler::ServerWriterHandler(
+    QnStorageManager* storageManager,
+    QnResourcePool* resPool)
+    :
+    m_storageManager(storageManager),
+    m_resPool(resPool)
+{
+}
 
 QStringList ServerWriterHandler::storagesUrls() const
 {
@@ -198,7 +203,7 @@ QList<QPair<QString, QString>> ServerWriterHandler::properties() const
 
 ComposerHandler* ServerWriterHandler::composerHandler(const QString& cameraId)
 {
-    m_camera = qnResPool->getResourceByUniqueId<QnSecurityCamResource>(cameraId);
+    m_camera = m_resPool->getResourceByUniqueId<QnSecurityCamResource>(cameraId);
     if (!static_cast<bool>(m_camera))
         return nullptr;
     return this;
@@ -373,9 +378,15 @@ void Reader::addProperty(const ParseResult& result)
         m_archiveCamData.properties.emplace_back(result.key(), result.value());
 }
 
+ServerReaderHandler::ServerReaderHandler(const QnUuid& moduleId, QnResourcePool* resPool):
+    m_moduleId(moduleId),
+    m_resPool(resPool)
+{
+}
+
 QnUuid ServerReaderHandler::moduleGuid() const
 {
-    return qnCommon->moduleGUID();
+    return m_moduleId;
 }
 
 QnUuid ServerReaderHandler::archiveCamTypeId() const
@@ -387,7 +398,7 @@ QnUuid ServerReaderHandler::archiveCamTypeId() const
 
 bool ServerReaderHandler::isCameraInResPool(const QnUuid& cameraId) const
 {
-    return static_cast<bool>(qnResPool->getResourceById(cameraId));
+    return static_cast<bool>(m_resPool->getResourceById(cameraId));
 }
 
 void ServerReaderHandler::handleError(const ReaderErrorInfo& errorInfo) const

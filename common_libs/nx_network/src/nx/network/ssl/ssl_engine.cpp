@@ -1,5 +1,7 @@
 #include "ssl_engine.h"
 
+#ifdef ENABLE_SSL
+
 #include <QtCore/QDir>
 
 #include <nx/utils/log/log.h>
@@ -10,13 +12,14 @@
 
 namespace nx {
 namespace network {
+namespace ssl {
 
-const size_t SslEngine::kBufferSize = 1024 * 10;
-const int SslEngine::kRsaLength = 2048;
-const std::chrono::seconds SslEngine::kCertExpiration =
+const size_t Engine::kBufferSize = 1024 * 10;
+const int Engine::kRsaLength = 2048;
+const std::chrono::seconds Engine::kCertExpiration =
     std::chrono::hours(5 * 365 * 24); // 5 years
 
-String SslEngine::makeCertificateAndKey(
+String Engine::makeCertificateAndKey(
     const String& common, const String& country, const String& company)
 {
     ssl::SslStaticData::instance();
@@ -170,13 +173,13 @@ static bool pKeyLoad(ssl::SslStaticData* sslData, const Buffer& certBytes)
     return true;
 }
 
-bool SslEngine::useCertificateAndPkey(const String& certData)
+bool Engine::useCertificateAndPkey(const String& certData)
 {
     const auto sslData = ssl::SslStaticData::instance();
     return x509load(sslData, certData) && pKeyLoad(sslData, certData);
 }
 
-void SslEngine::useOrCreateCertificate(
+void Engine::useOrCreateCertificate(
     const QString& filePath,
     const String& name, const String& country, const String& company)
 {
@@ -210,7 +213,7 @@ void SslEngine::useOrCreateCertificate(
     useCertificateAndPkey(certData);
 }
 
-void SslEngine::useRandomCertificate(const String& module)
+void Engine::useRandomCertificate(const String& module)
 {
     const auto sslCert = makeCertificateAndKey(
         module, "US", "Network Optix");
@@ -219,15 +222,18 @@ void SslEngine::useRandomCertificate(const String& module)
     NX_CRITICAL(useCertificateAndPkey(sslCert));
 }
 
-void SslEngine::setAllowedServerVersions(const String& versions)
+void Engine::setAllowedServerVersions(const String& versions)
 {
     ssl::SslStaticData::setAllowedServerVersions(versions);
 }
 
-void SslEngine::setAllowedServerCiphers(const String& ciphers)
+void Engine::setAllowedServerCiphers(const String& ciphers)
 {
     ssl::SslStaticData::setAllowedServerCiphers(ciphers);
 }
 
+} // namespace ssl
 } // namespace network
 } // namespace nx
+
+#endif // ENABLE_SSL

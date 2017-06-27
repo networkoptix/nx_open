@@ -3,16 +3,19 @@
 #include <core/resource_access/providers/abstract_resource_access_provider.h>
 
 #include <nx/utils/thread/mutex.h>
+#include <common/common_module_aware.h>
 
 /** Abstract base class for access providers containing common code.
  *  Thread-safety is achieved by using only signal-slot system with auto-connections.
  */
-class QnBaseResourceAccessProvider: public QnAbstractResourceAccessProvider
+class QnBaseResourceAccessProvider:
+    public QnAbstractResourceAccessProvider,
+    public QnCommonModuleAware
 {
     using base_type = QnAbstractResourceAccessProvider;
 
 public:
-    QnBaseResourceAccessProvider(QObject* parent = nullptr);
+    QnBaseResourceAccessProvider(Mode mode, QObject* parent = nullptr);
     virtual ~QnBaseResourceAccessProvider();
 
     virtual bool hasAccess(const QnResourceAccessSubject& subject,

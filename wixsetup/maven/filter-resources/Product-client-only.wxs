@@ -4,7 +4,7 @@
      xmlns:fire="http://schemas.microsoft.com/wix/FirewallExtension">
 
     <Product Id="*" Name="${display.product.name} Client" Language="1033" Version="${release.version}.${buildNumber}" Manufacturer="${company.name}" UpgradeCode="${customization.clientUpgradeCode}">
-        <Package Id="*" InstallerVersion="405" Compressed="yes" Keywords="Installer" Comments="${company.name} ${display.product.name} Installer" Manufacturer="${company.name}" InstallPrivileges="elevated" InstallScope="perMachine"/>
+        <Package Id="*" InstallerVersion="405" Compressed="yes" Keywords="Installer" Comments="${product.title}" Manufacturer="${company.name}" InstallPrivileges="elevated" InstallScope="perMachine"/>
 
         <?include ControlPanel.wxi ?>
 
@@ -18,7 +18,7 @@
         <?define VmsRemoving=" (Installed AND REMOVE = "ALL") "?>
         <?define VmsInstallingOrChanging="($(var.VmsInstalling) OR $(var.VmsChanging))" ?>
 
-        <?define LaunchClientChecBoxText="!(loc.Product_LaunchClient)" ?>
+        <?define LaunchClientChecBoxText="Launch [ProductName] when setup exits." ?>
 
         <?if $(var.arch) = x86 ?>
         <Condition Message="This package is designed for 32-bit OS. Setup will now exit.">
@@ -53,7 +53,7 @@
         <Property Id="LAUNCHAPPONEXIT" Secure="yes" />
 
         <!-- Properties -->
-        <Property Id="WelcomeDlg_Title" Value="${display.product.name} Installer Setup" />
+        <Property Id="WelcomeDlg_Title" Value="${product.title}" />
 
         <!-- Client properties-->
         <Property Id="CLIENT_APPSERVER_HOST" Secure="yes" Value="localhost"/>

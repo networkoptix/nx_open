@@ -71,14 +71,18 @@ QnCameraPool* QnCameraPool::instance()
     return inst;
 }
 
-QnCameraPool::QnCameraPool( const QStringList& localInterfacesToListen )
-:
-    QnTcpListener( localInterfacesToListen.isEmpty() ? QHostAddress::Any : QHostAddress(localInterfacesToListen[0]), MEDIA_PORT ),
+QnCameraPool::QnCameraPool(const QStringList& localInterfacesToListen,
+    QnCommonModule* commonModule)
+    :
+    QnTcpListener(commonModule,
+        localInterfacesToListen.isEmpty()
+        ? QHostAddress::Any
+        : QHostAddress(localInterfacesToListen[0]), MEDIA_PORT),
     m_cameraNum(0)
 {
     m_discoveryListener = new QnCameraDiscoveryListener(localInterfacesToListen);
     m_discoveryListener->start();
-}   
+}
 
 QnCameraPool::~QnCameraPool()
 {
@@ -104,9 +108,9 @@ void QnCameraPool::addCameras(bool cameraForEachFile, int count, QStringList pri
             m_cameras.insert(camera->getMac(), camera);
         }
     }
-    else 
+    else
     { // Special case - we run one camera for each source
-        for (int i = 0; i < primaryFileList.length(); i++) 
+        for (int i = 0; i < primaryFileList.length(); i++)
         {
             QString primaryFile = primaryFileList[i];
             QString secondaryFile = i < secondaryFileList.length() ? secondaryFileList[i] : ""; // secondary file is optional
@@ -118,7 +122,7 @@ void QnCameraPool::addCameras(bool cameraForEachFile, int count, QStringList pri
 
             QnFileCache::instance()->getMediaData(primaryFile);
             if (!secondaryFile.isEmpty()) // secondary file is optional
-            { 
+            {
                 QnFileCache::instance()->getMediaData(secondaryFile);
             }
             m_cameras.insert(camera->getMac(), camera);
@@ -129,7 +133,7 @@ void QnCameraPool::addCameras(bool cameraForEachFile, int count, QStringList pri
 QnTCPConnectionProcessor* QnCameraPool::createRequestProcessor(QSharedPointer<AbstractStreamSocket> clientSocket)
 {
     QMutexLocker lock(&m_mutex);
-    return new QnTestCameraProcessor(clientSocket);
+    return new QnTestCameraProcessor(clientSocket, this);
 }
 
 QByteArray QnCameraPool::getDiscoveryResponse()

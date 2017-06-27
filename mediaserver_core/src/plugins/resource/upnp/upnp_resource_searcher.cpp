@@ -1,7 +1,7 @@
 #include "upnp_resource_searcher.h"
 #include "utils/common/sleep.h"
 #include <nx/network/simple_http_client.h>
-#include <nx/network/http/httptypes.h>
+#include <nx/network/http/http_types.h>
 #include <nx/network/simple_http_client.h>
 #include <nx/network/system_socket.h>
 
@@ -82,7 +82,9 @@ public:
 
 
 // ====================================================================
-QnUpnpResourceSearcher::QnUpnpResourceSearcher():
+QnUpnpResourceSearcher::QnUpnpResourceSearcher(QnCommonModule* commonModule):
+    QnAbstractResourceSearcher(commonModule),
+    QnAbstractNetworkResourceSearcher(commonModule),
     m_receiveSocket(0)
 {
     m_cacheLivetime.restart();
@@ -143,7 +145,8 @@ AbstractDatagramSocket* QnUpnpResourceSearcher::sockByName(const QnInterfaceAndA
 
 QByteArray QnUpnpResourceSearcher::getDeviceDescription(const QByteArray& uuidStr, const QUrl& url)
 {
-    if (m_cacheLivetime.elapsed() > nx_upnp::DeviceSearcher::cacheTimeout()) {
+    if (m_cacheLivetime.elapsed() > nx_upnp::DeviceSearcher::instance()->cacheTimeout())
+    {
         m_cacheLivetime.restart();
         m_deviceXmlCache.clear();
     }
@@ -297,6 +300,12 @@ QnResourceList QnUpnpResourceSearcher::findResources(void)
 ////////////////////////////////////////////////////////////
 //// class QnUpnpResourceSearcherAsync
 ////////////////////////////////////////////////////////////
+
+QnUpnpResourceSearcherAsync::QnUpnpResourceSearcherAsync(QnCommonModule* commonModule) :
+    QnAbstractResourceSearcher(commonModule),
+    QnAbstractNetworkResourceSearcher(commonModule)
+{
+}
 
 QnResourceList QnUpnpResourceSearcherAsync::findResources()
 {

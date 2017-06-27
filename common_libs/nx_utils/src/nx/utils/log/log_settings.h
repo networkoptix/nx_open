@@ -1,7 +1,10 @@
 #pragma once
 
-#include "log.h"
-#include "../settings.h"
+#include <nx/utils/string.h>
+
+#include "log_logger.h"
+
+class QnSettings;
 
 namespace nx {
 namespace utils {
@@ -11,12 +14,13 @@ class NX_UTILS_API Settings
 {
 public:
     #ifdef _DEBUG
-        static constexpr QnLogLevel kDefaultLogLevel = cl_logDEBUG1;
+        static constexpr Level kDefaultLevel = Level::debug;
     #else
-        static constexpr QnLogLevel kDefaultLogLevel = cl_logINFO;
+        static constexpr Level kDefaultLevel = Level::info;
     #endif
 
-    QnLogLevel level = kDefaultLogLevel;
+    Level level = kDefaultLevel;
+    std::set<QString> exceptionFilers;
     QString directory = QString(); //< dataDir/log
     quint32 maxFileSize = nx::utils::stringToBytesConst("10M");
     quint8 maxBackupCount = 5;

@@ -9,13 +9,13 @@
 #include <core/resource_access/resource_access_manager.h>
 
 #include <nx/utils/log/log.h>
-#include <nx/network/http/httptypes.h>
+#include <nx/network/http/http_types.h>
 #include <nx/fusion/model_functions.h>
 #include <network/tcp_connection_priv.h>
 #include <rest/server/rest_connection_processor.h>
 
 #include <utils/xml/camera_advanced_param_reader.h>
-#include "http/custom_headers.h"
+#include <nx/network/http/custom_headers.h>
 #include <api/helpers/camera_id_helper.h>
 
 namespace {
@@ -53,7 +53,10 @@ int QnCameraSettingsRestHandler::executeGet(
 
     QString notFoundCameraId = QString::null;
     auto camera = nx::camera_id_helper::findCameraByFlexibleIds(
-        &notFoundCameraId, params, {kCameraIdParam, kDeprecatedResIdParam});
+        owner->resourcePool(),
+        &notFoundCameraId,
+        params,
+        {kCameraIdParam, kDeprecatedResIdParam});
     if (!camera)
     {
         if (notFoundCameraId.isNull())
@@ -62,8 +65,13 @@ int QnCameraSettingsRestHandler::executeGet(
             return CODE_NOT_FOUND;
     }
 
-    if (!qnResourceAccessManager->hasPermission(owner->accessRights(), camera, Qn::Permission::ReadPermission))
+    if (!owner->resourceAccessManager()->hasPermission(
+        owner->accessRights(),
+        camera,
+        Qn::Permission::ReadPermission))
+    {
         return nx_http::StatusCode::forbidden;
+    }
 
     // Clean params that are not keys.
     QnRequestParams locParams = params;

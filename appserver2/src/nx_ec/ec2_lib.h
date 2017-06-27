@@ -1,10 +1,4 @@
-/**********************************************************
-* 24 jan 2014
-* a.kolesnikov
-***********************************************************/
-
-#ifndef EC2_LIB_H
-#define EC2_LIB_H
+#pragma once
 
 #include <nx_ec/ec_api.h>
 #include <common/common_globals.h>
@@ -18,6 +12,8 @@ class TimerManager;
 } // namespace utils
 } // namespace nx
 
+class QnCommonModule;
+
 extern "C"
 {
     /*!
@@ -25,7 +21,7 @@ extern "C"
     */
     ec2::AbstractECConnectionFactory* getConnectionFactory(
         Qn::PeerType peerType,
-        nx::utils::TimerManager* const timerManager);
+        nx::utils::TimerManager* const timerManager,
+        QnCommonModule* commonModule);
 }
 
-#endif  //EC2_LIB_H

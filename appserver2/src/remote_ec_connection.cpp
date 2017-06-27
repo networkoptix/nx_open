@@ -7,19 +7,23 @@
 
 #include <api/app_server_connection.h>
 
-#include "transaction/transaction_message_bus.h"
+#include <transaction/transaction_message_bus.h>
+#include <nx/p2p/p2p_message_bus.h>
 #include "common/common_module.h"
 #include "managers/time_manager.h"
 
 namespace ec2
 {
     RemoteEC2Connection::RemoteEC2Connection(
+        const AbstractECConnectionFactory* connectionFactory,
+        const QnUuid& remotePeerId,
         const FixedUrlClientQueryProcessorPtr& queryProcessor,
         const QnConnectionInfo& connectionInfo )
     :
-        base_type( queryProcessor.get() ),
+        base_type(connectionFactory, queryProcessor.get() ),
         m_queryProcessor( queryProcessor ),
-        m_connectionInfo( connectionInfo )
+        m_connectionInfo( connectionInfo ),
+        m_remotePeerId(remotePeerId)
     {
     }
 
@@ -31,14 +35,14 @@ namespace ec2
         return m_connectionInfo;
     }
 
-    QString RemoteEC2Connection::authInfo() const
+    void RemoteEC2Connection::updateConnectionUrl(const QUrl& url)
     {
-        return m_connectionInfo.ecUrl.password();
+        m_connectionInfo.ecUrl = url;
     }
 
-    void RemoteEC2Connection::startReceivingNotifications() {
-
-        QnTransactionMessageBus::instance()->setHandler( notificationManager() );
+    void RemoteEC2Connection::startReceivingNotifications()
+    {
+        m_connectionFactory->messageBus()->setHandler(notificationManager());
 
         base_type::startReceivingNotifications();
 
@@ -48,19 +52,33 @@ namespace ec2
         url = QUrl( url.toString( QUrl::RemovePath | QUrl::RemoveQuery ) + lit("/ec2/events") );
         QUrlQuery q;
         url.setQuery(q);
-        m_peerUrl = url;
-        QnTransactionMessageBus::instance()->addConnectionToPeer(url);
+        m_connectionFactory->messageBus()->addOutgoingConnectionToPeer(m_remotePeerId, url);
     }
 
-    void RemoteEC2Connection::stopReceivingNotifications() {
+    void RemoteEC2Connection::stopReceivingNotifications()
+    {
         base_type::stopReceivingNotifications();
-        if (QnTransactionMessageBus::instance()) {
-            QnTransactionMessageBus::instance()->removeConnectionFromPeer( m_peerUrl );
-            QnTransactionMessageBus::instance()->removeHandler( notificationManager() );
+        if (m_connectionFactory->messageBus())
+        {
+            m_connectionFactory->messageBus()->removeOutgoingConnectionFromPeer(m_remotePeerId);
+            m_connectionFactory->messageBus()->removeHandler( notificationManager() );
         }
 
         //TODO #ak next call can be placed here just because we always have just one connection to EC
-        TimeSynchronizationManager::instance()->forgetSynchronizedTime();
+        //todo: #singletone it is not true any more
+        m_connectionFactory->timeSyncManager()->forgetSynchronizedTime();
+    }
+
+    Timestamp RemoteEC2Connection::getTransactionLogTime() const
+    {
+        NX_ASSERT(true); //< not implemented
+        return Timestamp();
+    }
+
+    void RemoteEC2Connection::setTransactionLogTime(Timestamp /*value*/)
+    {
+        NX_ASSERT(true); //< not implemented
     }
 
 }
+

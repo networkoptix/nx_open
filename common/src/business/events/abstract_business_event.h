@@ -95,7 +95,17 @@ public:
      */
     virtual bool checkEventParams(const QnBusinessEventParameters &params) const;
 
+    /**
+    * @brief getRuntimeParams     Fills event parameters structure with runtime event information
+    */
     virtual QnBusinessEventParameters getRuntimeParams() const;
+
+    /**
+    * @brief getRuntimeParams     Fills event parameters structure with runtime event information
+    *                             and additional information from business rule event parameters
+    */
+    virtual QnBusinessEventParameters getRuntimeParamsEx(
+        const QnBusinessEventParameters& ruleEventParams) const;
 
 private:
     /**

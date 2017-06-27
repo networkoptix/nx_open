@@ -36,6 +36,7 @@ namespace ec2
 
         //!Implementation of QnMediaServerManager::getServers
         virtual int getServers(impl::GetServersHandlerPtr handler) override;
+        virtual int getServersEx(impl::GetServersExHandlerPtr handler) override;
         //!Implementation of QnMediaServerManager::saveServer
         virtual int save( const ec2::ApiMediaServerData&, impl::SimpleHandlerPtr handler ) override;
         //!Implementation of QnMediaServerManager::remove

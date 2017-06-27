@@ -19,7 +19,6 @@ namespace ec2
         return true;
     }
 
-#ifndef QN_NO_QT
     uint qHash(const QnUbjsonTransactionSerializer::CacheKey &id) 
     {
         return ::qHash(QByteArray(id.persistentInfo.dbID.toRfc4122()).
@@ -27,5 +26,4 @@ namespace ec2
             append((const char*)&id.persistentInfo.sequence, sizeof(id.persistentInfo.sequence)),
             id.command);
     }
-#endif
 }

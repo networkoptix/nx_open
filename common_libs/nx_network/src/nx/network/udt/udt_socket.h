@@ -42,7 +42,7 @@ class UdtSocket:
     public InterfaceToImplement
 {
 public:
-    UdtSocket();
+    UdtSocket(int ipVersion);
     virtual ~UdtSocket();
 
     /**
@@ -82,11 +82,16 @@ public:
     virtual void dispatch(nx::utils::MoveOnlyFunc<void()> handler) override;
 
 protected:
-    detail::SocketState m_state;
-    detail::UdtSocketImpl* m_impl;
     friend class UdtPollSet;
 
-    UdtSocket(detail::UdtSocketImpl* impl, detail::SocketState state);
+    detail::SocketState m_state;
+    detail::UdtSocketImpl* m_impl;
+    const int m_ipVersion;
+
+    UdtSocket(
+        int ipVersion,
+        detail::UdtSocketImpl* impl,
+        detail::SocketState state);
 
     bool open();
 
@@ -99,9 +104,14 @@ protected:
 class NX_NETWORK_API UdtStreamSocket:
     public UdtSocket<AbstractStreamSocket>
 {
+    using base_type = UdtSocket<AbstractStreamSocket>;
+
 public:
     explicit UdtStreamSocket(int ipVersion = AF_INET);
-    UdtStreamSocket(detail::UdtSocketImpl* impl, detail::SocketState state);
+    UdtStreamSocket(
+        int ipVersion,
+        detail::UdtSocketImpl* impl,
+        detail::SocketState state);
     // We must declare this trivial constructor even it is trivial.
     // Since this will make std::unique_ptr call correct destructor for our
     // partial, forward declaration of class UdtSocketImp;
@@ -167,6 +177,8 @@ private:
 class NX_NETWORK_API UdtStreamServerSocket:
     public UdtSocket<AbstractStreamServerSocket>
 {
+    using base_type = UdtSocket<AbstractStreamServerSocket>;
+
 public:
     explicit UdtStreamServerSocket(int ipVersion = AF_INET);
     virtual ~UdtStreamServerSocket();
@@ -177,10 +189,7 @@ public:
     // AbstractStreamServerSocket -------------- interface
     virtual bool listen(int queueLen = 128);
     virtual AbstractStreamSocket* accept();
-    virtual void acceptAsync(
-        nx::utils::MoveOnlyFunc<void(
-            SystemError::ErrorCode,
-            AbstractStreamSocket*)> handler);
+    virtual void acceptAsync(AcceptCompletionHandler handler);
     virtual void cancelIOAsync(nx::utils::MoveOnlyFunc<void()> handler) override;
     virtual void cancelIOSync() override;
 

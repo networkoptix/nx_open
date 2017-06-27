@@ -1,5 +1,9 @@
 #include "resource_ptz_controller.h"
 
+#include <common/common_module.h>
+
+#include <client_core/client_core_module.h>
+
 #include <core/ptz/activity_ptz_controller.h>
 #include <core/ptz/client_ptz_controller_pool.h>
 #include <core/resource/camera_resource.h>
@@ -27,11 +31,12 @@ ResourcePtzController::ResourcePtzController(QObject* parent):
     connect(this, &ResourcePtzController::resourceIdChanged, this,
         [this]()
         {
-            const auto resource = qnResPool->getResourceById(m_resourceId);
-            auto controller = qnClientPtzPool->controller(resource);
+            const auto resource = qnClientCoreModule->commonModule()
+                ->resourcePool()->getResourceById(m_resourceId);
+            auto controller = qnClientCoreModule->ptzControllerPool()->controller(resource);
             if (controller)
             {
-                controller.reset(new QnActivityPtzController(
+                controller.reset(new QnActivityPtzController(qnClientCoreModule->commonModule(),
                     QnActivityPtzController::Client, controller));
             }
             setBaseController(controller);
@@ -167,7 +172,6 @@ int ResourcePtzController::indexOfPreset(const QString& id) const
 
     return it == presets.end() ? -1 : it - presets.begin();
 }
-
 
 bool ResourcePtzController::setAutoFocus()
 {

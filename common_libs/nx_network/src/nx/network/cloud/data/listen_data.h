@@ -1,5 +1,7 @@
 #pragma once
 
+#include <boost/optional.hpp>
+
 #include <nx/network/abstract_socket.h>
 #include <nx/network/cloud/cloud_connect_version.h>
 #include <nx/network/cloud/cloud_connect_options.h>
@@ -19,7 +21,7 @@ public:
 
     // TODO: #mux Remove systemId and serverId as redandant.
     // Every server message is signed up with system id, server id and message integrity based on
-    // authentification key by MediatorServerConnection.
+    // authentication key by MediatorServerConnection.
     nx::String systemId;
     nx::String serverId;
     CloudConnectVersion cloudConnectVersion;
@@ -37,6 +39,7 @@ public:
 
     boost::optional<KeepAliveOptions> tcpConnectionKeepAlive;
     CloudConnectOptions cloudConnectOptions;
+    boost::optional<nx::String> trafficRelayUrl;
 
     ListenResponse();
     void serializeAttributes(nx::stun::Message* const message);

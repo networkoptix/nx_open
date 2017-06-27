@@ -7,7 +7,7 @@
 #include <nx/utils/std/cpp14.h>
 #include <nx/utils/std/future.h>
 #include <nx/utils/test_support/test_options.h>
-#include <utils/common/guard.h>
+#include <nx/utils/scope_guard.h>
 
 namespace nx {
 namespace network {
@@ -134,13 +134,14 @@ private:
 
     void onNewConnectionAccepted(
         SystemError::ErrorCode errorCode,
-        AbstractStreamSocket* socket)
+        std::unique_ptr<AbstractStreamSocket> socket)
     {
-        std::unique_ptr<AbstractStreamSocket> socketAp(socket);
+        using namespace std::placeholders;
+
         if (m_first)
         {
             NX_ASSERT(errorCode == SystemError::noError);
-            m_controlConnection = std::move(socketAp);
+            m_controlConnection = std::move(socket);
             m_first = false;
             if (m_onControlConnectionEstablishedHander)
                 m_onControlConnectionEstablishedHander();
@@ -149,17 +150,15 @@ private:
         {
             if (errorCode == SystemError::noError)
             {
-                m_acceptedSockets.emplace_back(std::move(socketAp));
+                m_acceptedSockets.emplace_back(std::move(socket));
                 //TODO #ak waiting for accepted socket to close
             }
         }
 
         m_serverSocket->acceptAsync(
             std::bind(
-                &OutgoingTunnelConnectionTest::onNewConnectionAccepted,
-                this,
-                std::placeholders::_1,
-                std::placeholders::_2));
+                &OutgoingTunnelConnectionTest::onNewConnectionAccepted, this,
+                _1, _2));
     }
 };
 
@@ -219,6 +218,9 @@ TEST_F(OutgoingTunnelConnectionTest, timeout)
         nx::network::SocketGlobals::aioService().getRandomAioThread(),
         QnUuid::createUuid().toByteArray(),
         std::move(udtConnection));
+    auto tunnelConnectionGuard = makeScopeGuard(
+        [&tunnelConnection]() { tunnelConnection.pleaseStopSync(); });
+        
     tunnelConnection.start();
 
     m_serverSocket->pleaseStopSync();
@@ -254,8 +256,6 @@ TEST_F(OutgoingTunnelConnectionTest, timeout)
             }
         #endif
     }
-
-    tunnelConnection.pleaseStopSync();
 }
 
 TEST_F(OutgoingTunnelConnectionTest, cancellation)
@@ -330,9 +330,9 @@ TEST_F(OutgoingTunnelConnectionTest, controlConnectionFailure)
             controlConnectionClosedPromise.set_value();
         });
 
-    auto tunnelConnectionGuard = makeScopedGuard(
+    auto tunnelConnectionGuard = makeScopeGuard(
         [&tunnelConnection]{ tunnelConnection.pleaseStopSync(); });
-    auto controlConnectionGuard = makeScopedGuard(
+    auto controlConnectionGuard = makeScopeGuard(
         [this]
         {
             if (!m_controlConnection)

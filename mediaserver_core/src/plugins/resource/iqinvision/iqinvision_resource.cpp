@@ -3,6 +3,7 @@
 #include "../onvif/dataprovider/onvif_mjpeg.h"
 #include "iqinvision_resource.h"
 #include "../onvif/dataprovider/rtp_stream_provider.h"
+#include <common/static_common_module.h>
 
 const QString QnPlIqResource::MANUFACTURE(lit("IqEye"));
 
@@ -24,7 +25,7 @@ void QnPlIqResource::setIframeDistance(int /*frames*/, int /*timems*/)
 
 QnAbstractStreamDataProvider* QnPlIqResource::createLiveDataProvider()
 {
-    
+
     //return new MJPEGStreamReader(toSharedPointer(), "mjpg/video.mjpg");
 
     if (isRtp())
@@ -51,7 +52,7 @@ CameraDiagnostics::Result QnPlIqResource::initInternal()
     {
         case CL_HTTP_AUTH_REQUIRED:
             return CameraDiagnostics::NotAuthorisedResult( QString() );
-        case CL_HTTP_SUCCESS: 
+        case CL_HTTP_SUCCESS:
         case CL_HTTP_REDIRECT:
             break;
         default:
@@ -74,7 +75,7 @@ CLHttpStatus QnPlIqResource::readOID(const QString& oid, QString& result)
     {
         setStatus(Qn::Unauthorized);
     }
-    
+
     return status;
 }
 
@@ -114,7 +115,7 @@ QSize QnPlIqResource::getMaxResolution() const
 bool QnPlIqResource::isRtp() const
 {
     QString name = getModel().toUpper();
-    return 
+    return
 		name == QLatin1String("IQA35") ||
         name == QLatin1String("IQA33N") ||
         //name == QLatin1String("IQA32N") ||

@@ -12,9 +12,9 @@
 #include <functional>
 
 #include <nx/utils/log/log.h>
-#include <utils/gzip/gzip_uncompressor.h>
+#include <nx/utils/gzip/gzip_uncompressor.h>
 #include <utils/fs/async_file_processor.h>
-#include <utils/media/custom_output_stream.h>
+#include <nx/utils/byte_stream/custom_output_stream.h>
 
 #include <applauncher_app_info.h>
 #include "applauncher_process.h"
@@ -290,9 +290,9 @@ namespace detail
 
                 using namespace std::placeholders;
                 auto func = std::bind( &QnFile::writeAsync, m_outFile, _1, this );
-                m_fileDataProcessor = std::make_shared<CustomOutputStream<decltype(func)>>( func );
+                m_fileDataProcessor = std::make_shared<nx::utils::bstream::CustomOutputStream<decltype(func)>>( func );
                 if( entryPath.endsWith(".gz") )
-                    m_fileDataProcessor = std::make_shared<GZipUncompressor>(m_fileDataProcessor);
+                    m_fileDataProcessor = std::make_shared<nx::utils::bstream::gzip::Uncompressor>(m_fileDataProcessor);
                 break;
             }
 

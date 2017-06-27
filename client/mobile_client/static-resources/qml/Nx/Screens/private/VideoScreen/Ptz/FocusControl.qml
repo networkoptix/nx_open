@@ -8,8 +8,8 @@ GenericValueControl
     id: control
 
     property alias supportsAutoFocus: control.showCentralArea
-    property bool focusInPressed: control.upButton.pressed
-    property bool focusOutPressed: control.downButton.pressed
+    readonly property bool focusInPressed: control.upButton.pressed
+    readonly property bool focusOutPressed: control.downButton.pressed
 
     centralAreaText: "FOCUS"
 

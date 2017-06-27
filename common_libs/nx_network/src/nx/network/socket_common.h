@@ -15,14 +15,16 @@
 
 #include <stdint.h>
 
-#include <QString>
-#include <QUrl>
+#include <QtCore/QtEndian>
+#include <QtCore/QHash>
+#include <QtCore/QObject>
+#include <QtCore/QString>
 
 #ifndef Q_MOC_RUN
 #include <boost/optional.hpp>
 #endif
-#include <utils/common/hash.h>
-#include <utils/common/systemerror.h>
+
+#include <nx/utils/system_error.h>
 
 namespace nx {
 namespace network {
@@ -147,7 +149,6 @@ public:
 
     QString toString() const;
     std::string toStdString() const;
-    QUrl toUrl(const QString& scheme = QString()) const;
     bool isNull() const;
 
     static const SocketAddress anyAddress;
@@ -159,5 +160,30 @@ inline uint qHash(const SocketAddress &address)
 {
     return qHash(address.address.toString(), address.port);
 }
+
+namespace std {
+
+template <> struct hash<SocketAddress>
+{
+    size_t operator()(const SocketAddress& socketAddress) const
+    {
+        const auto stdString = socketAddress.toString().toStdString();
+        return hash<std::string>{}(stdString);
+    }
+};
+
+} // namespace std
+
+inline unsigned long long qn_htonll(unsigned long long value) { return qToBigEndian(value); }
+inline unsigned long long qn_ntohll(unsigned long long value) { return qFromBigEndian(value); }
+
+/* Note that we have to use #defines here so that these functions work even if
+ * they are also defined in system network headers. */
+#ifndef htonll
+#define htonll qn_htonll
+#endif
+#ifndef ntohll
+#define ntohll qn_ntohll
+#endif
 
 Q_DECLARE_METATYPE(SocketAddress)

@@ -16,13 +16,15 @@
 
 #include "camera/video_camera.h"
 #include "core/misc/schedule_task.h"
-
+#include <nx/utils/singleton.h>
+#include <common/common_module_aware.h>
 
 class QnServerStreamRecorder;
 class QnVideoCamera;
 class QnDualStreamingHelper;
 
 namespace ec2 {
+    class QnDistributedMutexManager;
     class QnDistributedMutex;
 }
 
@@ -51,8 +53,8 @@ public: // 'public' for ut. don't use directly
     };
     friend bool operator < (const Key& lhs, const Key& rhs)
     {
-        return lhs.resourceId < rhs.resourceId ? 
-            true : lhs.resourceId > rhs.resourceId ? 
+        return lhs.resourceId < rhs.resourceId ?
+            true : lhs.resourceId > rhs.resourceId ?
 				   false : lhs.catalog < rhs.catalog;
     }
     typedef std::map<Key, int> RecToSizeType;
@@ -60,34 +62,34 @@ public: // 'public' for ut. don't use directly
 
 public:
     int getSizeForCam(
-        QnServer::ChunksCatalog catalog, 
+        QnServer::ChunksCatalog catalog,
         const QnUuid& resourceId);
     void setFilePtr(
         uintptr_t filePtr,
-        QnServer::ChunksCatalog catalog, 
+        QnServer::ChunksCatalog catalog,
         const QnUuid& resourceId);
 public slots:
     void at_seekDetected(uintptr_t filePtr, int size);
     void at_fileClosed(uintptr_t filePtr);
-        
+
 protected: // 'protected' -> enable access for ut
     RecToSizeType m_recToMult;
     FileToRecType m_fileToRec;
     QnMutex m_mutex;
 };
 
-class QnRecordingManager: public QThread
+class QnRecordingManager:
+    public QThread,
+    public QnCommonModuleAware,
+    public Singleton<QnRecordingManager>
 {
     Q_OBJECT
 public:
     static const int RECORDING_CHUNK_LEN = 60; // seconds
-    static const int MIN_SECONDARY_FPS = 2;
 
-
-    static void initStaticInstance( QnRecordingManager* );
-    static QnRecordingManager* instance();
-
-    QnRecordingManager();
+    QnRecordingManager(
+        QnCommonModule* commonModule,
+        ec2::QnDistributedMutexManager* mutexManager);
     virtual ~QnRecordingManager();
 
     void start();
@@ -96,7 +98,13 @@ public:
 
     Recorders findRecorders(const QnResourcePtr& res) const;
 
-    bool startForcedRecording(const QnSecurityCamResourcePtr& camRes, Qn::StreamQuality quality, int fps, int beforeThreshold, int afterThreshold, int maxDuration);
+    bool startForcedRecording(
+        const QnSecurityCamResourcePtr& camRes,
+        Qn::StreamQuality quality,
+        int fps,
+        int beforeThresholdSec,
+        int afterThresholdSec,
+        int maxDurationSec);
 
     bool stopForcedRecording(const QnSecurityCamResourcePtr& camRes, bool afterThresholdCheck = true);
 
@@ -112,9 +120,10 @@ private slots:
     void at_checkLicenses();
     void at_serverPropertyChanged(const QnResourcePtr &, const QString &key);
 private:
+    void updateRuntimeInfoAfterLicenseOverflowTransaction(qint64 prematureLicenseExperationDate);
     void updateCamera(const QnSecurityCamResourcePtr& camera);
 
-    QnServerStreamRecorder* createRecorder(const QnResourcePtr &res, const QSharedPointer<QnAbstractMediaStreamDataProvider>& reader, 
+    QnServerStreamRecorder* createRecorder(const QnResourcePtr &res, const QSharedPointer<QnAbstractMediaStreamDataProvider>& reader,
                                            QnServer::ChunksCatalog catalog, const QSharedPointer<QnDualStreamingHelper>& dualStreamingHelper);
     bool startOrStopRecording(const QnResourcePtr& res, const QnVideoCameraPtr& camera, QnServerStreamRecorder* recorderHiRes, QnServerStreamRecorder* recorderLowRes);
     bool isResourceDisabled(const QnResourcePtr& res) const;
@@ -137,6 +146,7 @@ private:
     QTimer m_scheduleWatchingTimer;
     QTimer m_licenseTimer;
     QMap<QnSecurityCamResourcePtr, qint64> m_delayedStop;
+    ec2::QnDistributedMutexManager* m_mutexManager;
     ec2::QnDistributedMutex* m_licenseMutex;
     int m_tooManyRecordingCnt;
     qint64 m_recordingStopTime;

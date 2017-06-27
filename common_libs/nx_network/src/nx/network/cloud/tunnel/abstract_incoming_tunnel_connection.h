@@ -1,9 +1,8 @@
 #pragma once
 
-#include <utils/common/stoppable.h>
-#include <utils/common/systemerror.h>
-
 #include <nx/network/abstract_socket.h>
+#include <nx/network/aio/basic_pollable.h>
+#include <nx/utils/system_error.h>
 
 namespace nx {
 namespace network {
@@ -16,7 +15,7 @@ namespace cloud {
  *  traversal methods.
  */
 class NX_NETWORK_API AbstractIncomingTunnelConnection:
-    public QnStoppableAsync
+    public aio::BasicPollable
 {
 public:
     typedef std::function<void(

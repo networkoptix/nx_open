@@ -11,10 +11,9 @@
 #include "database/db_manager.h"
 #include "common/common_module.h"
 #include "transaction/transaction_transport.h"
-#include "http/custom_headers.h"
+#include <nx/network/http/custom_headers.h>
 #include "audit/audit_manager.h"
 #include "settings.h"
-#include <core/resource_management/resource_pool.h>
 #include <core/resource/media_server_resource.h>
 #include <nx/fusion/serialization/lexical.h>
 
@@ -30,19 +29,24 @@ class QnTransactionTcpProcessorPrivate: public QnTCPConnectionProcessorPrivate
 public:
 
     QnTransactionTcpProcessorPrivate():
-        QnTCPConnectionProcessorPrivate()
+        QnTCPConnectionProcessorPrivate(),
+        messageBus(nullptr)
     {
     }
+
+    QnTransactionMessageBus* messageBus;
 };
 
 QnTransactionTcpProcessor::QnTransactionTcpProcessor(
+    QnTransactionMessageBus* messageBus,
     QSharedPointer<AbstractStreamSocket> socket,
-    QnTcpListener* _owner)
+    QnTcpListener* owner)
     :
-    QnTCPConnectionProcessor(new QnTransactionTcpProcessorPrivate, socket)
+    QnTCPConnectionProcessor(new QnTransactionTcpProcessorPrivate, socket, owner)
 {
-    Q_UNUSED(_owner)
-
+    Q_D(QnTransactionTcpProcessor);
+    d->isSocketTaken = true;
+    d->messageBus = messageBus;
     setObjectName( "QnTransactionTcpProcessor" );
 }
 
@@ -94,19 +98,20 @@ void QnTransactionTcpProcessor::run()
 
     ApiPeerData remotePeer(remoteGuid, remoteRuntimeGuid, peerType, dataFormat);
 
-    if (peerType == Qn::PT_Server && ec2::Settings::instance()->dbReadOnly())
+    if (peerType == Qn::PT_Server && commonModule()->isReadOnly())
     {
         sendResponse(nx_http::StatusCode::forbidden, nx_http::StringType());
         return;
     }
 
+    const auto& commonModule = d->messageBus->commonModule();
     d->response.headers.emplace(
         Qn::EC2_CONNECTION_TIMEOUT_HEADER_NAME,
         nx_http::header::KeepAlive(
-            QnGlobalSettings::instance()->connectionKeepAliveTimeout()).toString());
+            commonModule->globalSettings()->connectionKeepAliveTimeout()).toString());
 
-    if( d->request.requestLine.method == nx_http::Method::POST ||
-        d->request.requestLine.method == nx_http::Method::PUT )
+    if( d->request.requestLine.method == nx_http::Method::Post ||
+        d->request.requestLine.method == nx_http::Method::Put )
     {
         auto connectionGuidIter = d->request.headers.find( Qn::EC2_CONNECTION_GUID_HEADER_NAME );
         if( connectionGuidIter == d->request.headers.end() )
@@ -133,7 +138,7 @@ void QnTransactionTcpProcessor::run()
         //  but not move initializer. So, have to declare localSocket
         auto localSocket = std::move(d->socket);
         d->socket.clear();
-        QnTransactionMessageBus::instance()->gotIncomingTransactionsConnectionFromRemotePeer(
+        d->messageBus->gotIncomingTransactionsConnectionFromRemotePeer(
             connectionGuid,
             std::move(localSocket),
             remotePeer,
@@ -144,31 +149,37 @@ void QnTransactionTcpProcessor::run()
         return;
     }
 
-
-    d->response.headers.insert(nx_http::HttpHeader(Qn::EC2_GUID_HEADER_NAME, qnCommon->moduleGUID().toByteArray()));
-    d->response.headers.insert(nx_http::HttpHeader(Qn::EC2_RUNTIME_GUID_HEADER_NAME, qnCommon->runningInstanceGUID().toByteArray()));
-    d->response.headers.insert(nx_http::HttpHeader(Qn::EC2_SYSTEM_IDENTITY_HEADER_NAME, QByteArray::number(qnCommon->systemIdentityTime())));
+    d->response.headers.insert(nx_http::HttpHeader(
+        Qn::EC2_GUID_HEADER_NAME,
+        commonModule->moduleGUID().toByteArray()));
+    d->response.headers.insert(nx_http::HttpHeader(
+        Qn::EC2_RUNTIME_GUID_HEADER_NAME,
+        commonModule->runningInstanceGUID().toByteArray()));
+    d->response.headers.insert(nx_http::HttpHeader(
+        Qn::EC2_SYSTEM_IDENTITY_HEADER_NAME,
+        QByteArray::number(commonModule->systemIdentityTime())));
     d->response.headers.insert(nx_http::HttpHeader(
         Qn::EC2_PROTO_VERSION_HEADER_NAME,
         nx_http::StringType::number(nx_ec::EC2_PROTO_VERSION)));
     d->response.headers.insert(nx_http::HttpHeader(
         Qn::EC2_CLOUD_HOST_HEADER_NAME,
-        QnAppInfo::defaultCloudHost().toUtf8()));
+        nx::network::AppInfo::defaultCloudHost().toUtf8()));
     d->response.headers.insert(nx_http::HttpHeader(
         Qn::EC2_SYSTEM_ID_HEADER_NAME,
-        qnGlobalSettings->localSystemId().toByteArray()));
+        commonModule->globalSettings()->localSystemId().toByteArray()));
 
     auto systemNameHeaderIter = d->request.headers.find(Qn::EC2_SYSTEM_ID_HEADER_NAME);
     if( (systemNameHeaderIter != d->request.headers.end()) &&
         (nx_http::getHeaderValue(d->request.headers, Qn::EC2_SYSTEM_ID_HEADER_NAME) !=
-            qnGlobalSettings->localSystemId().toByteArray()) )
+            commonModule->globalSettings()->localSystemId().toByteArray()) )
     {
         sendResponse(nx_http::StatusCode::forbidden, nx_http::StringType());
         return;
     }
 
     ConnectionLockGuard connectionLockGuard(
-        QnTransactionMessageBus::instance()->connectionGuardSharedState(),
+        commonModule->moduleGUID(),
+        d->messageBus->connectionGuardSharedState(),
         remoteGuid,
         ConnectionLockGuard::Direction::Incoming);
 
@@ -192,24 +203,30 @@ void QnTransactionTcpProcessor::run()
 
         parseRequest();
 
-        d->response.headers.insert(nx_http::HttpHeader(Qn::EC2_GUID_HEADER_NAME, qnCommon->moduleGUID().toByteArray()));
-        d->response.headers.insert(nx_http::HttpHeader(Qn::EC2_RUNTIME_GUID_HEADER_NAME, qnCommon->runningInstanceGUID().toByteArray()));
-        d->response.headers.insert(nx_http::HttpHeader(Qn::EC2_SYSTEM_IDENTITY_HEADER_NAME, QByteArray::number(qnCommon->systemIdentityTime())));
+        d->response.headers.insert(nx_http::HttpHeader(
+            Qn::EC2_GUID_HEADER_NAME,
+            commonModule->moduleGUID().toByteArray()));
+        d->response.headers.insert(nx_http::HttpHeader(
+            Qn::EC2_RUNTIME_GUID_HEADER_NAME,
+            commonModule->runningInstanceGUID().toByteArray()));
+        d->response.headers.insert(nx_http::HttpHeader(
+            Qn::EC2_SYSTEM_IDENTITY_HEADER_NAME,
+            QByteArray::number(commonModule->systemIdentityTime())));
         d->response.headers.insert(nx_http::HttpHeader(
             Qn::EC2_PROTO_VERSION_HEADER_NAME,
             nx_http::StringType::number(nx_ec::EC2_PROTO_VERSION)));
         d->response.headers.insert(nx_http::HttpHeader(
             Qn::EC2_CLOUD_HOST_HEADER_NAME,
-            QnAppInfo::defaultCloudHost().toUtf8()));
+            nx::network::AppInfo::defaultCloudHost().toUtf8()));
 
         d->response.headers.insert(nx_http::HttpHeader(
             Qn::EC2_SYSTEM_ID_HEADER_NAME,
-            qnGlobalSettings->localSystemId().toByteArray()));
+            commonModule->globalSettings()->localSystemId().toByteArray()));
 
         auto systemNameHeaderIter = d->request.headers.find(Qn::EC2_SYSTEM_ID_HEADER_NAME);
         if( (systemNameHeaderIter != d->request.headers.end()) &&
             (nx_http::getHeaderValue(d->request.headers, Qn::EC2_SYSTEM_ID_HEADER_NAME) !=
-                qnGlobalSettings->localSystemId().toByteArray()) )
+                commonModule->globalSettings()->localSystemId().toByteArray()) )
         {
             sendResponse(nx_http::StatusCode::forbidden, nx_http::StringType());
             return;
@@ -218,7 +235,7 @@ void QnTransactionTcpProcessor::run()
         d->response.headers.emplace(
             Qn::EC2_CONNECTION_TIMEOUT_HEADER_NAME,
             nx_http::header::KeepAlive(
-                QnGlobalSettings::instance()->connectionKeepAliveTimeout()).toString());
+                commonModule->globalSettings()->connectionKeepAliveTimeout()).toString());
     }
 
     QnUuid connectionGuid;
@@ -257,10 +274,10 @@ void QnTransactionTcpProcessor::run()
         fail = !connectionLockGuard.tryAcquireConnected();
     }
 
-    if (!qnCommon->allowedPeers().isEmpty() && !qnCommon->allowedPeers().contains(remotePeer.id) && !remotePeer.isClient())
+    if (!commonModule->allowedPeers().isEmpty() && !commonModule->allowedPeers().contains(remotePeer.id) && !remotePeer.isClient())
         fail = true; // accept only allowed peers
 
-    if (remotePeer.id == qnCommon->moduleGUID())
+    if (remotePeer.id == commonModule->moduleGUID())
         fail = true; //< Rejecting connect from ourselves.
 
     d->chunkedMode = false;
@@ -296,8 +313,7 @@ void QnTransactionTcpProcessor::run()
             // checking mechanics.
             if (access != Qn::kSystemAccess)
             {
-                auto user = qnResPool->getResourceById<QnUserResource>(d->accessRights.userId);
-                bool authAsOwner = (user && user->userRole() == Qn::UserRole::Owner);
+                bool authAsOwner = d->accessRights.userId == QnUserResource::kAdminGuid;
                 NX_ASSERT(authAsOwner, "Server must always be authorised as owner");
                 if (authAsOwner)
                     access = Qn::kSystemAccess;
@@ -308,7 +324,7 @@ void QnTransactionTcpProcessor::run()
             access.access = Qn::UserAccessData::Access::ReadAllResources;
         }
 
-        QnTransactionMessageBus::instance()->gotConnectionFromRemotePeer(
+        d->messageBus->gotConnectionFromRemotePeer(
             connectionGuid,
             std::move(connectionLockGuard),
             std::move(d->socket),
@@ -320,9 +336,9 @@ void QnTransactionTcpProcessor::run()
             ttFinishCallback,
             access);
 
-        QnTransactionMessageBus::instance()->moveConnectionToReadyForStreaming(connectionGuid);
+        d->messageBus->moveConnectionToReadyForStreaming(connectionGuid);
     }
 }
 
 
-}
+} // namespace ec2

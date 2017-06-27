@@ -18,8 +18,8 @@ public:
         \param curUsageParams Currently used resources are taken from usage watcher
     */
     virtual bool isEnoughHWResourcesForAnotherDecoder(
-        const stree::AbstractResourceReader& mediaStreamParams,
-        const stree::AbstractResourceReader& curUsageParams ) const = 0;
+        const nx::utils::stree::AbstractResourceReader& mediaStreamParams,
+        const nx::utils::stree::AbstractResourceReader& curUsageParams ) const = 0;
 };
 
 #endif  //ABSTRACTVIDEODECODERUSAGECALCULATOR_H

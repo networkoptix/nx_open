@@ -12,11 +12,12 @@
 #include <nx_ec/data/api_peer_system_time_data.h>
 #include <utils/common/enable_multi_thread_direct_connection.h>
 #include <utils/common/id.h>
+#include <nx/utils/thread/stoppable.h>
 #include <nx/utils/timer_manager.h>
-#include <utils/common/safe_direct_connection.h>
+#include <nx/utils/safe_direct_connection.h>
 #include <nx/utils/singleton.h>
 #include <nx/network/time/abstract_accurate_time_fetcher.h>
-#include <nx/network/http/httptypes.h>
+#include <nx/network/http/http_types.h>
 
 #include "nx_ec/data/api_data.h"
 #include "transaction/transaction.h"
@@ -53,18 +54,22 @@
 
 namespace ec2 {
 
+class Ec2DirectConnection;
+class Settings;
+class QnTransactionMessageBusBase;
+
 /**
- * Sequence has less priority than TimeSynchronizationManager::peerIsServer and 
+ * Sequence has less priority than TimeSynchronizationManager::peerIsServer and
  * TimeSynchronizationManager::peerTimeSynchronizedWithInternetServer flags
  */
 class TimePriorityKey
 {
 public:
-    /** Sequence number. Incremented with each peer selection by user. */
+        //!sequence number. Incremented with each peer selection by user
     quint16 sequence;
-    /** Bitset of flags from TimeSynchronizationManager class. */
+        //!bitset of flags from \a TimeSynchronizationManager class
     quint16 flags;
-    /** Some random number. */
+        //!some random number
     quint32 seed;
 
     TimePriorityKey();
@@ -110,7 +115,6 @@ class TimeSynchronizationManager:
     public QObject,
     public QnStoppable,
     public EnableMultiThreadDirectConnection<TimeSynchronizationManager>,
-    public Singleton<TimeSynchronizationManager>,
     public Qn::EnableSafeDirectConnection
 {
     Q_OBJECT
@@ -121,7 +125,9 @@ public:
      */
     TimeSynchronizationManager(
         Qn::PeerType peerType,
-        nx::utils::TimerManager* const timerManager);
+        nx::utils::TimerManager* const timerManager,
+        QnTransactionMessageBusBase* messageBus,
+        Settings* settings);
     virtual ~TimeSynchronizationManager();
 
     /** Implemenattion of QnStoppable::pleaseStop. */
@@ -132,7 +138,7 @@ public:
      * @note Cannot do it in constructor to keep valid object destruction order.
      * TODO #ak look like incapsulation failure. Better remove this method.
      */
-    void start();
+    void start(const std::shared_ptr<Ec2DirectConnection>& connection);
 
     /** Returns synchronized time (millis from epoch, UTC). */
     qint64 getSyncTime() const;
@@ -211,6 +217,7 @@ private:
             authData( std::move(_authData) )
         {}
 
+            //PeerContext( PeerContext&& right ) = default;
         PeerContext( PeerContext&& right )
         :
             peerAddress( std::move(right.peerAddress) ),
@@ -219,6 +226,7 @@ private:
             httpClient( std::move(right.httpClient) )
         {}
 
+            //PeerContext& operator=( PeerContext&& right ) = default;
         PeerContext& operator=( PeerContext&& right )
         {
             peerAddress = std::move(right.peerAddress);
@@ -243,6 +251,8 @@ private:
     boost::optional<qint64> m_prevSysTime;
     boost::optional<qint64> m_prevMonotonicClock;
     bool m_terminated;
+    std::shared_ptr<Ec2DirectConnection> m_connection;
+    QnTransactionMessageBusBase* m_messageBus;
     /** TimeSyncInfo::syncTime stores local time on specified server. */
     std::map<QnUuid, TimeSyncInfo> m_systemTimeByPeer;
     const Qn::PeerType m_peerType;
@@ -252,9 +262,10 @@ private:
     bool m_timeSynchronized;
     int m_internetSynchronizationFailureCount;
     std::map<QnUuid, PeerContext> m_peersToSendTimeSyncTo;
+    Settings* m_settings;
 
     void selectLocalTimeAsSynchronized(
-        QnMutexLockerBase* const lk,
+        QnMutexLockerBase* const lock,
         quint16 newTimePriorityKeySequence);
     /**
      * @param lock Locked m_mutex. This method will unlock it to emit TimeSynchronizationManager::timeChanged signal.
@@ -277,6 +288,7 @@ private:
     /** Periodically synchronizing time with internet (if possible). */
     void syncTimeWithInternet( quint64 taskID );
     void onTimeFetchingDone( qint64 millisFromEpoch, SystemError::ErrorCode errorCode );
+    void initializeTimeFetcher();
     void addInternetTimeSynchronizationTask();
     /** Returns time received from the internet or current local system time. */
     qint64 currentMSecsSinceEpoch() const;
@@ -295,7 +307,7 @@ private:
         nx_http::AsyncHttpClientPtr clientPtr,
         qint64 requestRttMillis);
     TimeSyncInfo getTimeSyncInfoNonSafe() const;
-    void syncTimeWithAllKnownServers(QnMutexLockerBase* const lock);
+    void syncTimeWithAllKnownServers(const QnMutexLockerBase& /*lock*/);
     void onBeforeSendingTransaction(
         QnTransactionTransportBase* transport,
         nx_http::HttpHeaders* const headers);
@@ -305,11 +317,23 @@ private:
     void forgetSynchronizedTimeNonSafe(QnMutexLockerBase* const lock);
     void switchBackToLocalTime(QnMutexLockerBase* const /*lock*/);
     void checkSystemTimeForChange();
-    void handleLocalTimePriorityKeyChange(QnMutexLockerBase* const lk);
+    void handleLocalTimePriorityKeyChange(QnMutexLockerBase* const lock);
+
+    void saveSyncTimeAsync(
+        QnMutexLockerBase* const lock,
+        qint64 syncTimeToLocalDelta,
+        TimePriorityKey syncTimeKey);
+
+    void saveSyncTimeAsync(
+        qint64 syncTimeToLocalDelta,
+        const TimePriorityKey& syncTimeKey);
+    bool saveSyncTimeSync(
+        qint64 syncTimeToLocalDelta,
+        const TimePriorityKey& syncTimeKey);
 
 private slots:
     void onNewConnectionEstablished(QnTransactionTransportBase* transport );
-    void onPeerLost( ApiPeerAliveData data );
+    void onPeerLost(QnUuid peer, Qn::PeerType peerType);
     void onDbManagerInitialized();
     void onTimeSynchronizationSettingsChanged();
 };

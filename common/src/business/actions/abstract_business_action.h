@@ -41,6 +41,7 @@ protected:
 public:
     virtual ~QnAbstractBusinessAction();
 
+    void setActionType(QnBusiness::ActionType actionType);
     QnBusiness::ActionType actionType() const;
 
     /**
@@ -60,7 +61,7 @@ public:
     QnBusinessActionParameters& getParams();
 
     void setRuntimeParams(const QnBusinessEventParameters& params);
-    const QnBusinessEventParameters& getRuntimeParams() const;
+    QnBusinessEventParameters& getRuntimeParams();
 
     void setBusinessRuleId(const QnUuid& value);
     QnUuid getBusinessRuleId() const;
@@ -82,6 +83,9 @@ public:
      * Do not used for instant actions
      */
     virtual QString getExternalUniqKey() const;
+
+    /** Virtual assignment operation. */
+    virtual void assign(const QnAbstractBusinessAction& other);
 
 protected:
     QnBusiness::ActionType m_actionType;

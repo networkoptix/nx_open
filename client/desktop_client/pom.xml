@@ -3,12 +3,12 @@
     <parent>
         <artifactId>cpp</artifactId>
         <groupId>com.networkoptix.hdwitness</groupId>
-        <version>3.0.0-SNAPSHOT</version>
+        <version>3.1.0-SNAPSHOT</version>
         <relativePath>../../cpp</relativePath>
     </parent>
 
     <groupId>com.networkoptix.hdwitness</groupId>
-    <version>3.0.0-SNAPSHOT</version>
+    <version>3.1.0-SNAPSHOT</version>
     <modelVersion>4.0.0</modelVersion>
     <artifactId>desktop_client</artifactId>
     <packaging>pom</packaging>
@@ -22,7 +22,7 @@
         <template>app</template>
 
         <qt.libs>core gui network opengl xml sql multimedia qtmultimediaquicktools_private concurrent webkit webkitwidgets qml quick quickwidgets xmlpatterns</qt.libs>
-        <global.libs>-lcommon -lnx_vms_utils -lnx_network -lnx_streaming -lappserver2 -lclient_core -lclient -lnx_speech_synthesizer -lcloud_db_client -lnx_fusion -lnx_utils -lnx_audio -lnx_media -lvms_gateway</global.libs>
+        <global.libs>-lcommon -lnx_vms_utils -lnx_network -lappserver2 -lnx_client_core -lclient -lnx_speech_synthesizer -lcloud_db_client -lnx_fusion -lnx_utils -lnx_audio -lnx_media -lvms_gateway -lnx_kit</global.libs>
         <windows.oslibs>DbgHelp.lib -lws2_32 -lIphlpapi -lwinmm -ld3d9</windows.oslibs>
         <linux.oslibs>-lz -lopenal -lX11 -lXfixes -lGL -lGLU -lXss</linux.oslibs>
         <mac.oslibs>-lbz2 -lz -framework IOKit -framework CoreServices -framework OpenAL</mac.oslibs>
@@ -41,15 +41,6 @@
             <type>pom</type>
             <scope>system</scope>
             <systemPath>${root.dir}/common/pom.xml</systemPath>
-        </dependency>
-
-        <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>nx_streaming</artifactId>
-            <version>${project.version}</version>
-            <type>pom</type>
-            <scope>system</scope>
-            <systemPath>${root.dir}/common_libs/nx_streaming/pom.xml</systemPath>
         </dependency>
 
         <dependency>
@@ -90,11 +81,11 @@
 
         <dependency>
             <groupId>${project.groupId}</groupId>
-            <artifactId>libclient_core</artifactId>
+            <artifactId>nx_client_core</artifactId>
             <version>${project.version}</version>
             <type>pom</type>
             <scope>system</scope>
-            <systemPath>${root.dir}/client/libclient_core/pom.xml</systemPath>
+            <systemPath>${root.dir}/client/nx_client_core/pom.xml</systemPath>
         </dependency>
 
         <dependency>
@@ -108,11 +99,11 @@
 
         <dependency>
             <groupId>${project.groupId}</groupId>
-            <artifactId>libclient</artifactId>
+            <artifactId>nx_client_desktop</artifactId>
             <version>${project.version}</version>
             <type>pom</type>
             <scope>system</scope>
-            <systemPath>${root.dir}/client/libclient/pom.xml</systemPath>
+            <systemPath>${root.dir}/client/nx_client_desktop/pom.xml</systemPath>
         </dependency>
     </dependencies>
 </project>

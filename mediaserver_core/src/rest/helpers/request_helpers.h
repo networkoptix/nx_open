@@ -1,9 +1,9 @@
 #pragma once
 
 #include <network/router.h>
-#include <http/custom_headers.h>
+#include <nx/network/http/custom_headers.h>
 #include <nx/network/http/asynchttpclient.h>
-#include <utils/common/systemerror.h>
+#include <nx/utils/system_error.h>
 #include <core/resource/resource_fwd.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource/user_resource.h>
@@ -11,14 +11,16 @@
 #include <core/resource_management/resource_pool.h>
 
 template<typename Context, typename RequestFunc>
-void runMultiserverRequest(QUrl url
-    , const RequestFunc &request
-    , const QnMediaServerResourcePtr &server
-    , Context *context)
+void runMultiserverRequest(
+    QnRouter* router,
+    QUrl url,
+    const RequestFunc &request,
+    const QnMediaServerResourcePtr &server,
+    Context *context)
 {
     nx_http::HttpHeaders headers;
     headers.emplace(Qn::SERVER_GUID_HEADER_NAME, server->getId().toByteArray());
-    const QnRoute route = QnRouter::instance()->routeTo(server->getId());
+    const QnRoute route = router->routeTo(server->getId());
     if (route.reverseConnect)
     {
         static const auto kLocalHost = "127.0.0.1";
@@ -40,10 +42,12 @@ void runMultiserverRequest(QUrl url
 }
 
 template<typename Context, typename CompletionFunc>
-void runMultiserverDownloadRequest(QUrl url
-    , const QnMediaServerResourcePtr &server
-    , const CompletionFunc &requestCompletionFunc
-    , Context *context)
+void runMultiserverDownloadRequest(
+    QnRouter* router,
+    QUrl url,
+    const QnMediaServerResourcePtr &server,
+    const CompletionFunc &requestCompletionFunc,
+    Context *context)
 {
     const auto downloadRequest = [requestCompletionFunc]
         (const QUrl &url, const nx_http::HttpHeaders &headers, Context *context)
@@ -55,18 +59,20 @@ void runMultiserverDownloadRequest(QUrl url
         });
     };
 
-    runMultiserverRequest(url, downloadRequest, server, context);
+    runMultiserverRequest(router, url, downloadRequest, server, context);
 }
 
 template<typename Context, typename CompletionFunc>
-void runMultiserverUploadRequest(QUrl url
-    , const QByteArray &data
-    , const QByteArray &contentType
-    , const QString &user
-    , const QString &password
-    , const QnMediaServerResourcePtr &server
-    , const CompletionFunc &completionFunc
-    , Context *context)
+void runMultiserverUploadRequest(
+    QnRouter* router,
+    QUrl url,
+    const QByteArray &data,
+    const QByteArray &contentType,
+    const QString &user,
+    const QString &password,
+    const QnMediaServerResourcePtr &server,
+    const CompletionFunc &completionFunc,
+    Context *context)
 {
     const auto downloadRequest = [completionFunc, data, contentType, user, password]
         (const QUrl &url, const nx_http::HttpHeaders &headers, Context *context)
@@ -80,5 +86,5 @@ void runMultiserverUploadRequest(QUrl url
         });
     };
 
-    runMultiserverRequest(url, downloadRequest, server, context);
+    runMultiserverRequest(router, url, downloadRequest, server, context);
 }

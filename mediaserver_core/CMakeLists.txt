@@ -1,7 +1,4 @@
-nx_rdep_add_package(any/nx_sdk-1.6.0)
-nx_rdep_add_package(any/nx_storage_sdk-1.6.0)
-nx_rdep_add_package(onvif)
-nx_rdep_add_package(sigar)
+find_package(Qt5 COMPONENTS WebSockets)
 
 set(product.title "${mediaserver.name}")
 set(product.display.title "${mediaserver.display.name}")
@@ -16,31 +13,63 @@ nx_copy(IF_NEWER "${NX_SDK_PACKAGE}"
 nx_copy(IF_NEWER "${NX_STORAGE_SDK_PACKAGE}"
     DESTINATION "${CMAKE_CURRENT_BINARY_DIR}/resources/static")
 
+set(apidoctool_jar "${APIDOCTOOL_PATH}/apidoctool.jar")
+
 execute_process(
+    COMMAND java -jar "${apidoctool_jar}" print-deps
+    RESULT_VARIABLE apidoctool_result
+    OUTPUT_VARIABLE apidoctool_deps
+)
+
+if(NOT apidoctool_result EQUAL 0)
+    message(FATAL ERROR "Cannot get dependencies list from apidoctool.")
+endif()
+
+separate_arguments(apidoctool_deps)
+set(apidoctool_deps_absolute)
+foreach(dependency ${apidoctool_deps})
+    list(APPEND apidoctool_deps_absolute "${PROJECT_SOURCE_DIR}/${dependency}")
+endforeach()
+
+add_custom_command(
+    OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/resources/static/api.xml"
+    MAIN_DEPENDENCY "${apidoctool_jar}"
+    DEPENDS
+        "${CMAKE_CURRENT_SOURCE_DIR}/api/api_template.xml"
+        ${apidoctool_deps_absolute}
     COMMAND
-        java -jar "${APIDOCTOOL_PATH}/apidoctool.jar"
+        java -jar "${apidoctool_jar}"
         code-to-xml
         -vms-path "${PROJECT_SOURCE_DIR}"
         -template-xml "${CMAKE_CURRENT_SOURCE_DIR}/api/api_template.xml"
-        -output-xml "${CMAKE_CURRENT_BINARY_DIR}/api.xml")
-nx_copy(IF_DIFFERENT "${CMAKE_CURRENT_BINARY_DIR}/api.xml"
-    DESTINATION "${CMAKE_CURRENT_BINARY_DIR}/resources/static")
+        -output-xml "${CMAKE_CURRENT_BINARY_DIR}/api.xml"
+    COMMAND
+        ${CMAKE_COMMAND} -E copy_if_different
+            "${CMAKE_CURRENT_BINARY_DIR}/api.xml"
+            "${CMAKE_CURRENT_BINARY_DIR}/resources/static/api.xml"
+)
 
 nx_add_target(mediaserver_core LIBRARY
     ADDITIONAL_SOURCES
         "${CMAKE_CURRENT_BINARY_DIR}/mediaserver_core_app_info_impl.cpp"
     ADDITIONAL_RESOURCES
         "${customization_dir}/mediaserver_core/resources"
+        "${customization_dir}/icons/all/favicon.ico"
         "${CMAKE_CURRENT_BINARY_DIR}/resources"
+        "${CMAKE_CURRENT_BINARY_DIR}/resources/static/api.xml"
     PUBLIC_LIBS
-        qtservice qtsinglecoreapplication
+        qtservice qtsinglecoreapplication Qt5::WebSockets
         onvif sigar
         appserver2 nx_email nx_speech_synthesizer cloud_db_client)
 
 if(LINUX)
     target_link_libraries(mediaserver_core PRIVATE ldap)
+
+    if(arch MATCHES "arm|aarch64")
+        target_link_libraries(mediaserver_core PRIVATE sasl2)
+    endif()
 endif()
 
-if(WIN32)
+if(WINDOWS)
     target_link_libraries(mediaserver_core PRIVATE Wldap32.dll Iphlpapi.dll Crypt32.lib)
 endif()

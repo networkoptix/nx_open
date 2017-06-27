@@ -18,7 +18,6 @@ bool QnSystemHealth::isMessageLocked(MessageType message)
 {
     switch (message)
     {
-        case QnSystemHealth::ConnectionLost:
         case QnSystemHealth::CloudPromo:
         case QnSystemHealth::EmailIsEmpty:
         case QnSystemHealth::NoLicenses:

@@ -8,11 +8,12 @@
 #include <QtCore/QPair>
 #include <QtCore/QString>
 #include <QtCore/QMetaType>
+#include <QtCore/QUrlQuery>
 
-#include <nx/network/http/httptypes.h>
+#include <nx/network/http/http_types.h>
 #include <nx/utils/uuid.h>
 
-#include <utils/common/systemerror.h>
+#include <nx/utils/system_error.h>
 
 
 class QnRequestParam: public QPair<QString, QString> {
@@ -40,6 +41,8 @@ public:
     QnListMap() {}
 
     QnListMap(const base_type &other): base_type(other) {}
+
+    QnListMap(std::initializer_list<QPair<Key, Value>> args): base_type(args) {}
 
     Value value(const Key &key, const Value &defaultValue = Value()) const {
         for(const QPair<Key, Value> &pair: *this)
@@ -93,15 +96,17 @@ typedef QnListMap<QByteArray, QByteArray> QnReplyHeaderList;
 
 typedef QHash<QString, QString> QnRequestParams;
 
+/** NOTE: If identical param names exist in url, the first one is taken. */
+QnRequestParams requestParamsFromUrl(const QUrl& url);
 
 struct QnHTTPRawResponse
 {
     QnHTTPRawResponse();
     QnHTTPRawResponse(
-        SystemError::ErrorCode _sysErrorCode,
+        SystemError::ErrorCode sysErrorCode,
         const nx_http::StatusLine& statusLine,
-        const QByteArray& _contentType,
-        const QByteArray& _msgBody);
+        const QByteArray& contentType,
+        const QByteArray& msgBody);
 
     SystemError::ErrorCode sysErrorCode;
     QNetworkReply::NetworkError status;

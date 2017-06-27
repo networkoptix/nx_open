@@ -7,19 +7,28 @@
 #include <core/resource/layout_resource.h>
 
 #include <nx/utils/log/log.h>
+#include <common/common_module.h>
 
-QnSharedResourceAccessProvider::QnSharedResourceAccessProvider(QObject* parent):
-    base_type(parent)
+using namespace nx::core::access;
+
+QnSharedResourceAccessProvider::QnSharedResourceAccessProvider(
+    Mode mode,
+    QObject* parent)
+    :
+    base_type(mode, parent)
 {
-    connect(qnSharedResourcesManager, &QnSharedResourcesManager::sharedResourcesChanged, this,
-        &QnSharedResourceAccessProvider::handleSharedResourcesChanged);
+    if (mode == Mode::cached)
+    {
+        connect(sharedResourcesManager(), &QnSharedResourcesManager::sharedResourcesChanged, this,
+            &QnSharedResourceAccessProvider::handleSharedResourcesChanged);
+    }
 }
 
 QnSharedResourceAccessProvider::~QnSharedResourceAccessProvider()
 {
 }
 
-QnAbstractResourceAccessProvider::Source QnSharedResourceAccessProvider::baseSource() const
+Source QnSharedResourceAccessProvider::baseSource() const
 {
     return Source::shared;
 }
@@ -49,7 +58,7 @@ bool QnSharedResourceAccessProvider::calculateAccess(const QnResourceAccessSubje
         return false;
     }
 
-    bool result = qnSharedResourcesManager->sharedResources(subject).contains(resource->getId());
+    bool result = sharedResourcesManager()->sharedResources(subject).contains(resource->getId());
 
     NX_LOG(QnLog::PERMISSIONS_LOG, lit("QnSharedResourceAccessProvider: update access %1 to %2: %3")
         .arg(subject.name())
@@ -62,6 +71,8 @@ bool QnSharedResourceAccessProvider::calculateAccess(const QnResourceAccessSubje
 
 void QnSharedResourceAccessProvider::handleResourceAdded(const QnResourcePtr& resource)
 {
+    NX_EXPECT(mode() == Mode::cached);
+
     base_type::handleResourceAdded(resource);
 
     if (auto layout = resource.dynamicCast<QnLayoutResource>())
@@ -76,6 +87,8 @@ void QnSharedResourceAccessProvider::handleSharedResourcesChanged(
     const QSet<QnUuid>& oldValues,
     const QSet<QnUuid>& newValues)
 {
+    NX_EXPECT(mode() == Mode::cached);
+
     NX_ASSERT(subject.isValid());
     if (!subject.isValid())
         return;
@@ -84,7 +97,7 @@ void QnSharedResourceAccessProvider::handleSharedResourcesChanged(
 
     QString subjectName = subject.name();
 
-    for (auto resource: qnResPool->getResources(changed))
+    for (auto resource: commonModule()->resourcePool()->getResources(changed))
     {
         if (newValues.contains(resource->getId()))
         {

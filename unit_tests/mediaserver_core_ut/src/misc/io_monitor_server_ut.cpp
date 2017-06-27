@@ -2,7 +2,7 @@
 
 #include <gtest/gtest.h>
 #include <api/test_api_requests.h>
-#include "http/custom_headers.h"
+#include <nx/network/http/custom_headers.h>
 
 #include <nx/fusion/serialization/json.h>
 #include <nx/fusion/model_functions.h>
@@ -23,7 +23,7 @@ namespace {
 namespace nx {
 namespace test {
 
-class IoMonitorParser: public AbstractByteStreamFilter
+class IoMonitorParser: public nx::utils::bstream::AbstractByteStreamFilter
 {
 public:
     IoMonitorParser(const QnIOStateDataList& data): m_data(data) {}
@@ -94,7 +94,7 @@ static void prepareDbTestData(const MediaServerLauncher* const launcher)
     auto resTypePtr = qnResTypePool->getResourceType(resTypeId);
     ASSERT_FALSE(resTypePtr.isNull());
     cameraData.typeId = resTypePtr->getId();
-    cameraData.parentId = qnCommon->moduleGUID();
+    cameraData.parentId = launcher->commonModule()->moduleGUID();
     cameraData.vendor = QnTestCameraResource::kManufacturer;
     cameraData.physicalId = kTestCamPhysicalId;
     cameraData.id = ec2::ApiCameraData::physicalIdToId(cameraData.physicalId);
@@ -106,13 +106,13 @@ TEST(IoServerMonitorTest, main)
     MediaServerLauncher launcher;
     ASSERT_TRUE(launcher.start());
     // Prevent opening stream from testCamera and moving camera to offline state
-    qnGlobalSettings->setAutoUpdateThumbnailsEnabled(false);
+    launcher.commonModule()->globalSettings()->setAutoUpdateThumbnailsEnabled(false);
 
     prepareDbTestData(&launcher);
     auto testData = genTestData();
 
     auto httpClient = nx_http::AsyncHttpClient::create();
-    auto httpClientGuard = makeScopedGuard([&httpClient]() { httpClient->pleaseStopSync(); });
+    auto httpClientGuard = makeScopeGuard([&httpClient]() { httpClient->pleaseStopSync(); });
 
     httpClient->setUserName("admin");
     httpClient->setUserPassword("admin");
@@ -120,7 +120,7 @@ TEST(IoServerMonitorTest, main)
     QUrl url = launcher.apiUrl();
     url.setPath("/api/iomonitor");
     QUrlQuery query;
-    query.addQueryItem(Qn::CAMERA_UNIQUE_ID_HEADER_NAME, kTestCamPhysicalId);
+    query.addQueryItem("cameraId", kTestCamPhysicalId);
     url.setQuery(query);
 
     auto contentParser = std::make_shared<nx_http::MultipartContentParser>();
@@ -151,14 +151,14 @@ TEST(IoServerMonitorTest, main)
 
     QObject::connect(
         httpClient.get(), &nx_http::AsyncHttpClient::done,
-        [&allDataProcessed](nx_http::AsyncHttpClientPtr httpClient)
+        [&allDataProcessed](nx_http::AsyncHttpClientPtr /*httpClient*/)
         {
             allDataProcessed.set_value();
         });
 
-    auto camera = qnResPool->getResourceByUniqueId<QnSecurityCamResource>(kTestCamPhysicalId);
+    auto camera = launcher.commonModule()->resourcePool()->getResourceByUniqueId<QnSecurityCamResource>(kTestCamPhysicalId);
     ASSERT_TRUE(camera);
-    qnStatusDictionary->setValue(camera->getId(), Qn::Online);
+    launcher.commonModule()->statusDictionary()->setValue(camera->getId(), Qn::Online);
     httpClient->doGet(url);
 
     ASSERT_EQ(

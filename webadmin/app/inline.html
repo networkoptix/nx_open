@@ -21,6 +21,7 @@
     <link rel="stylesheet" href="bower_components/sass-bootstrap/dist/css/bootstrap.css" />
     <link rel="stylesheet" href="bower_components/hint.css/hint.min.css" />
     <link rel="stylesheet" href="bower_components/jquery-timepicker-jt/jquery.timepicker.css" />
+    <link rel="stylesheet" href="bower_components/rangeslider.js/dist/rangeslider.css" />
     <!-- endbower -->
     <!-- endbuild -->
     <!-- build:css({.tmp,app}) styles/inline.css -->
@@ -37,7 +38,7 @@
 
 <!-- build:js scripts/vendor-inline.js -->
 <!-- bower:js -->
-<script src="bower_components/jquery/dist/jquery.js"></script>
+<script src="bower_components/jquery/jquery.js"></script>
 <script src="bower_components/angular/angular.js"></script>
 <script src="bower_components/json3/lib/json3.js"></script>
 <script src="bower_components/sass-bootstrap/dist/js/bootstrap.js"></script>
@@ -53,6 +54,7 @@
 <script src="bower_components/chartjs/Chart.js"></script>
 <script src="bower_components/jquery-timepicker-jt/jquery.timepicker.js"></script>
 <script src="bower_components/angular-jquery-timepicker/src/timepickerdirective.js"></script>
+<script src="bower_components/rangeslider.js/dist/rangeslider.js"></script>
 <!-- endbower -->
 
 <script src="scripts/vendor/date.js"></script>
@@ -65,17 +67,23 @@
 <!-- endbuild -->
 
 
+<!-- build:js({.tmp,app}) scripts/common-inline.js -->
+<script src="web_common/scripts/module.js"></script>
+<script src="web_common/scripts/services/systemAPI.js"></script>
+<script src="web_common/scripts/services/nativeClient.js"></script>
+<script src="web_common/scripts/services/poll.js"></script>
+<script src="web_common/scripts/services/page.js"></script>
+<!-- endbuild -->
+
 <!-- build:js({.tmp,app}) scripts/scripts-inline.js -->
 <script src="scripts/bootstrap.js"></script>
 
 <script src="scripts/config.js"></script>
 <script src="scripts/app-inline.js"></script>
 
-<script src="scripts/services/mediaserver.js"></script>
 <script src="scripts/services/cloudAPI.js"></script>
-<script src="scripts/services/poll.js"></script>
+<script src="scripts/services/mediaserver.js"></script>
 <script src="scripts/services/dialogs.js"></script>
-<script src="scripts/services/nativeClient.js"></script>
 
 <script src="scripts/directives/autofocus.js"></script>
 <script src="scripts/directives/validateField.js"></script>

@@ -124,6 +124,23 @@
 			"adamOutputCount": 6
 		},
         {
+            "keys": ["FLIR|FC*"],
+            "ioSettings": [
+                {
+                    "id": "$DI:0",
+                    "inputName": "Digital Input 1",
+                    "portType": "Input",
+                    "supportedPortTypes": "Input"
+                },
+                {
+                    "id": "$DO:0",
+                    "outputName": "Digital Output 0",
+                    "portType": "Output",
+                    "supportedPortTypes": "Output"
+                }
+            ]
+        },
+        {
             "keys": [
                 "FLIR|AX8"
             ],
@@ -220,7 +237,15 @@
             "keys":[
                 "FLIR Systems|FC-*", "FLIR|FC-*"
             ],
-            "forceSingleStream": true
+            "forceSingleStream": true,
+            "ignoreONVIF": true
+        },
+        {
+            "__comment": "Onvif probe matches for Flir FC-Series cameras has such manufacturers",
+            "keys":[
+                "FC-Series-R|*", "FC-Series-S|*"
+            ],
+            "ignoreONVIF": true
         },
         {
             "keys":[
@@ -343,7 +368,8 @@
                     "user": "admin",
                     "password": "12345"
                 }
-            ]
+            ],
+            "unauthorizedTimeoutSec": 185
         },        
         {
             "keys": [

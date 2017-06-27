@@ -2,7 +2,7 @@
 
 #include <transaction/transaction_message_bus.h>
 #include <utils/common/scoped_thread_rollback.h>
-#include <utils/common/concurrent.h>
+#include <nx/utils/concurrent.h>
 
 #include "ec2_thread_pool.h"
 #include "fixed_url_client_query_processor.h"
@@ -46,9 +46,14 @@ namespace ec2 {
 
 
     template<class QueryProcessorType>
-    QnUpdatesManager<QueryProcessorType>::QnUpdatesManager(QueryProcessorType * const queryProcessor, const Qn::UserAccessData &userAccessData) :
+    QnUpdatesManager<QueryProcessorType>::QnUpdatesManager(
+        QueryProcessorType * const queryProcessor,
+        const Qn::UserAccessData &userAccessData,
+        QnTransactionMessageBusBase* messageBus)
+    :
         m_queryProcessor(queryProcessor),
-        m_userAccessData(userAccessData)
+        m_userAccessData(userAccessData),
+        m_messageBus(messageBus)
     {
     }
 
@@ -56,17 +61,21 @@ namespace ec2 {
     QnUpdatesManager<QueryProcessorType>::~QnUpdatesManager() {}
 
     template<class QueryProcessorType>
-    int QnUpdatesManager<QueryProcessorType>::sendUpdatePackageChunk(const QString &updateId, const QByteArray &data, qint64 offset, const QnPeerSet &peers, impl::SimpleHandlerPtr handler)
+    int QnUpdatesManager<QueryProcessorType>::sendUpdatePackageChunk(const QString &updateId, const QByteArray &data, qint64 offset, const QnPeerSet& peers, impl::SimpleHandlerPtr handler)
     {
         const int reqId = generateRequestID();
 
-        QnTransaction<ApiUpdateUploadData> transaction(ApiCommand::uploadUpdate);
+        QnTransaction<ApiUpdateUploadData> transaction(
+            ApiCommand::uploadUpdate,
+            m_messageBus->commonModule()->moduleGUID());
         transaction.params.updateId = updateId;
         transaction.params.data = data;
         transaction.params.offset = offset;
 
-        QnTransactionMessageBus::instance()->sendTransaction(transaction, peers);
-        QnConcurrent::run( Ec2ThreadPool::instance(),[handler, reqId](){ handler->done(reqId, ErrorCode::ok); });
+        sendTransaction(m_messageBus, transaction, peers);
+        nx::utils::concurrent::run(
+            Ec2ThreadPool::instance(),
+            [handler, reqId]() { handler->done(reqId, ErrorCode::ok); });
 
         return reqId;
     }
@@ -85,19 +94,6 @@ namespace ec2 {
         m_queryProcessor->getAccess(m_userAccessData).processUpdateAsync(
             ApiCommand::uploadUpdateResponce, params,
             [handler, reqId](ErrorCode errorCode){ handler->done(reqId, errorCode); });
-
-        return reqId;
-    }
-
-    template<class QueryProcessorType>
-    int QnUpdatesManager<QueryProcessorType>::installUpdate(const QString &updateId, const QnPeerSet &peers, impl::SimpleHandlerPtr handler)
-    {
-        const int reqId = generateRequestID();
-        QnTransaction<ApiUpdateInstallData> transaction(ApiCommand::installUpdate);
-        transaction.params = updateId;
-
-        QnTransactionMessageBus::instance()->sendTransaction(transaction, peers);
-        QnConcurrent::run( Ec2ThreadPool::instance(),[handler, reqId](){ handler->done(reqId, ErrorCode::ok); });
 
         return reqId;
     }

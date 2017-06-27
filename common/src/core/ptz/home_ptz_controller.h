@@ -16,7 +16,7 @@ class QnHomePtzController: public QnProxyPtzController
     using base_type = QnProxyPtzController;
 
 public:
-    QnHomePtzController(const QnPtzControllerPtr& baseController);
+    QnHomePtzController(const QnPtzControllerPtr& baseController, QThread* executorThread);
     virtual ~QnHomePtzController();
 
     static bool extends(Ptz::Capabilities capabilities);

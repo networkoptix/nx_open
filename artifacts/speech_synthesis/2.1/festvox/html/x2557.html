@@ -1,0 +1,292 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>Building LPC parameters</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REL="HOME"
+TITLE="Building Synthetic Voices"
+HREF="book1.html"><LINK
+REL="UP"
+TITLE="Diphone databases"
+HREF="c2261.html"><LINK
+REL="PREVIOUS"
+TITLE="Extracting the pitchmarks"
+HREF="x2522.html"><LINK
+REL="NEXT"
+TITLE="Defining a diphone voice"
+HREF="x2593.html"></HEAD
+><BODY
+CLASS="SECT1"
+BGCOLOR="#FFFFFF"
+TEXT="#000000"
+LINK="#0000FF"
+VLINK="#840084"
+ALINK="#0000FF"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="3"
+ALIGN="center"
+>Building Synthetic Voices</TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="bottom"
+><A
+HREF="x2522.html"
+ACCESSKEY="P"
+>&#60;&#60;&#60; Previous</A
+></TD
+><TD
+WIDTH="80%"
+ALIGN="center"
+VALIGN="bottom"
+>Diphone databases</TD
+><TD
+WIDTH="10%"
+ALIGN="right"
+VALIGN="bottom"
+><A
+HREF="x2593.html"
+ACCESSKEY="N"
+>Next &#62;&#62;&#62;</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="SECT1"
+><H1
+CLASS="SECT1"
+><A
+NAME="AEN2557"
+>Building LPC parameters</A
+></H1
+><P
+>&#13; 
+
+Currently the only publically distributed signal processing method in
+Festival is residual excited LPC.  To use this, you must extract LPC
+parameters and LPC residual files for each file in the diphone
+database. Ideally, the LPC analysis should be done
+pitch-synchronously, thus requiring that pitch marks are created
+before the LPC analysis takes place.&#13;</P
+><P
+>A script suitable for generating the LPC coefficients and residuals 
+is given in <TT
+CLASS="FILENAME"
+>festvox/src/general/make_lpc</TT
+> and is repeated 
+here. 
+<A
+NAME="AEN2566"
+></A
+><BLOCKQUOTE
+CLASS="BLOCKQUOTE"
+><P
+CLASS="LITERALLAYOUT"
+>for&nbsp;i&nbsp;in&nbsp;$*<br>
+do<br>
+&nbsp;&nbsp;&nbsp;fname=`basename&nbsp;$i&nbsp;.wav`<br>
+&nbsp;&nbsp;&nbsp;echo&nbsp;$i<br>
+<br>
+&nbsp;&nbsp;&nbsp;#&nbsp;Potential&nbsp;normalise&nbsp;the&nbsp;power<br>
+&nbsp;&nbsp;&nbsp;#$ESTDIR/bin/ch_wave&nbsp;-scaleN&nbsp;0.5&nbsp;$i&nbsp;-o&nbsp;/tmp/tmp$$.wav<br>
+&nbsp;&nbsp;&nbsp;#&nbsp;resampling&nbsp;can&nbsp;be&nbsp;done&nbsp;now&nbsp;too<br>
+&nbsp;&nbsp;&nbsp;#$ESTDIR/bin/ch_wave&nbsp;-F&nbsp;11025&nbsp;$i&nbsp;-o&nbsp;/tmp/tmp$$.wav<br>
+&nbsp;&nbsp;&nbsp;#&nbsp;Or&nbsp;use&nbsp;as&nbsp;is<br>
+&nbsp;&nbsp;&nbsp;cp&nbsp;-p&nbsp;$i&nbsp;/tmp/tmp$$.wav<br>
+&nbsp;&nbsp;&nbsp;$ESTDIR/bin/sig2fv&nbsp;/tmp/tmp$$.wav&nbsp;-o&nbsp;lpc/$fname.lpc&nbsp;\<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;-otype&nbsp;est&nbsp;-lpc_order&nbsp;16&nbsp;-coefs&nbsp;"lpc"&nbsp;\&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;-pm&nbsp;pm/$fname.pm&nbsp;-preemph&nbsp;0.95&nbsp;-factor&nbsp;3&nbsp;\<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;-window_type&nbsp;hamming<br>
+&nbsp;&nbsp;&nbsp;$ESTDIR/bin/sigfilter&nbsp;/tmp/tmp$$.wav&nbsp;-o&nbsp;lpc/$fname.res&nbsp;\<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;-otype&nbsp;nist&nbsp;-lpcfilter&nbsp;lpc/$fname.lpc&nbsp;-inv_filter<br>
+&nbsp;&nbsp;&nbsp;rm&nbsp;/tmp/tmp$$.wav<br>
+done</P
+></BLOCKQUOTE
+>
+
+
+Note the (optional) use of <TT
+CLASS="FILENAME"
+>ch_wave</TT
+> to attempt to normalize the 
+power in the wave to a percentage of its maximum. This is a very crude 
+method for making the waveforms have a reasonably equivalent power. 
+Wildly different power fluctuations in power between segments is likely 
+to be noticed when they are joined. Differing power in the nonsense 
+words may occur if not enough care has been taking in the recording. 
+Either the settings on the recording equipment have been changed (bad) 
+or the speaker has changed their vocal effort (worse). It is important 
+that this should be avoided as the above normalization does not make the 
+problem of different power go away it only makes the problem slightly 
+less bad. </P
+><P
+>A more elaborate power normaliziation has been successful, but it is a 
+little harder, though it was definitely successful for the KED US 
+American voice that had major power fluctuations over different 
+recording sesssions. The idea is to find the power during vowels in 
+each nonsense word, then find the mean power for each vowel overall 
+files. Then, for each file, find the average factor difference for each 
+actual vowel with the mean for that vowel and scale the waveform 
+according to that value. We now provided a basic script which does this 
+<A
+NAME="AEN2574"
+></A
+><BLOCKQUOTE
+CLASS="BLOCKQUOTE"
+><P
+CLASS="LITERALLAYOUT"
+>bin/find_powerfacts&nbsp;lab/*.lab</P
+></BLOCKQUOTE
+>
+This script creates (among others) <TT
+CLASS="FILENAME"
+>etc/powfacts</TT
+> which if it 
+exists, is used to normalize the power of each waveform file during 
+the making of the LPC coefficients. </P
+><P
+>We generate a set of <TT
+CLASS="FILENAME"
+>ch_wave</TT
+> commands that extract the parts of 
+the wave from that are vowels (using <TT
+CLASS="FILENAME"
+>-start</TT
+> and <TT
+CLASS="FILENAME"
+>-end</TT
+> 
+options, make the output be in ascii <TT
+CLASS="FILENAME"
+>-otype raw</TT
+> <TT
+CLASS="FILENAME"
+>-ostype 
+ascii</TT
+> and use a simple script to calculate the RMS power. We then 
+calculate the mean power for each vowel with another awk script using 
+the result as a table, then finally we process the fileid, actual vowel 
+power information to generate a power factor to by averaging the ration 
+of each vowel's actual power to the mean power for that vowel. You may 
+wish to still modify the power further after this if it is too low or 
+high. </P
+><P
+>Note that power normalization is intended to remove artifacts caused by 
+different recording environment, i.e. the person moved from the 
+microphone, the levels were changed etc. they should not modify the 
+intrinsic power differences in the phones themselves. The above 
+techniques try to preserve the intrinsic power, which is why we take the 
+average over all vowels in a nonsense word, though you should listen to 
+the results and make the ultimate decision yourself. </P
+><P
+>If all has been recorded properly, of course, individual power 
+modification should be unnecessary. Once again, we can't stress 
+enough how important it is to have good and consistent recording 
+conditions, so as to avoid steps like this. </P
+><P
+>&#13;If you want to generate a database using a different sampling rate than 
+the recordings were made with, this is the time to resample. For 
+example an 8KHz or 11.025KHz will be smaller than a 16KHz database. If 
+the eventual voice is to be played over the telephone, for example, 
+there is little point in generating anything but 8Khz. Also it will be 
+faster to synthesize 8Khz utterances than 16Khz ones. </P
+><P
+>&#13;The number of LPC coefficients used to represent each pitch period can 
+be changed depending on sample rate you choose. Hearsay, reasonable 
+experience, and perhaps some theoretical underpining, suggests the 
+following formula for calculating the order 
+<A
+NAME="AEN2591"
+></A
+><BLOCKQUOTE
+CLASS="BLOCKQUOTE"
+><P
+CLASS="LITERALLAYOUT"
+>(sample_rate/1000)+2</P
+></BLOCKQUOTE
+>
+But that should only be taken as a rough guide though a larger sample 
+rate deserves a greater number of coeeficients. </P
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="x2522.html"
+ACCESSKEY="P"
+>&#60;&#60;&#60; Previous</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="book1.html"
+ACCESSKEY="H"
+>Home</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="x2593.html"
+ACCESSKEY="N"
+>Next &#62;&#62;&#62;</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>Extracting the pitchmarks</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="c2261.html"
+ACCESSKEY="U"
+>Up</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>Defining a diphone voice</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

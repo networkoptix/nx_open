@@ -3,12 +3,15 @@
 #include <QtCore/QDebug>
 #include <QtCore/QDateTime>
 
-#include <nx/fusion/model_functions.h>
-
 #include <utils/math/math.h>
 #include <utils/common/util.h>
-#include <nx/fusion/serialization/json_functions.h>
+
 #include <nx/fusion/fusion/fusion_adaptor.h>
+#include <nx/fusion/model_functions.h>
+#include <nx/fusion/serialization/json_functions.h>
+#include <nx/network/socket_common.h>
+#include <nx/utils/datetime.h>
+
 #include "time_period_list.h"
 
 QN_FUSION_ADAPT_STRUCT(QnTimePeriod, (startTimeMs)(durationMs))
@@ -176,16 +179,6 @@ bool QnTimePeriod::isNull() const {
 
 bool QnTimePeriod::isInfinite() const {
     return durationMs == ::infiniteDuration;
-}
-
-Qn::TimePeriodType QnTimePeriod::type() const {
-    if(isNull())
-        return Qn::NullTimePeriod;
-
-    if(isEmpty())
-        return Qn::EmptyTimePeriod;
-
-    return Qn::NormalTimePeriod;
 }
 
 qint64 QnTimePeriod::infiniteDuration() {

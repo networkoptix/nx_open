@@ -1,5 +1,9 @@
 #include "media_player.h"
 
+#include <common/common_module.h>
+
+#include <client_core/client_core_module.h>
+
 namespace nx {
 namespace client {
 namespace mobile {
@@ -79,6 +83,11 @@ bool MediaPlayer::playing() const
 bool MediaPlayer::failed() const
 {
     return m_failed;
+}
+
+QnCommonModule* MediaPlayer::commonModule() const
+{
+    return qnClientCoreModule->commonModule();
 }
 
 } // namespace mobile

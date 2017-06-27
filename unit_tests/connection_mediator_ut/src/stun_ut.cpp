@@ -11,7 +11,7 @@
 #include <nx/utils/test_support/sync_queue.h>
 
 #include <common/common_globals.h>
-#include <utils/common/guard.h>
+#include <nx/utils/scope_guard.h>
 
 #include <listening_peer_pool.h>
 #include <peer_registrator.h>
@@ -28,10 +28,10 @@ using namespace stun;
 class StunCustomTest : public testing::Test
 {
 protected:
-    StunCustomTest()
-        : mediaserverApi(&cloudData, &stunMessageDispatcher)
-        , listeningPeerRegistrator(settings, &cloudData, &stunMessageDispatcher, &listeningPeerPool)
-        , server(
+    StunCustomTest():
+        mediaserverApi(&cloudData, &stunMessageDispatcher),
+        listeningPeerRegistrator(settings, &cloudData, &stunMessageDispatcher, &listeningPeerPool),
+        server(
             &stunMessageDispatcher,
             false,
             nx::network::NatTraversalSupport::disabled)
@@ -43,6 +43,11 @@ protected:
         address = SocketAddress(HostAddress::localhost, server.endpoints().front().port);
     }
 
+    ~StunCustomTest()
+    {
+        server.pleaseStopSync();
+    }
+
     SocketAddress address;
     MessageDispatcher stunMessageDispatcher;
     CloudDataProviderMock cloudData;
@@ -50,7 +55,7 @@ protected:
     conf::Settings settings;
     ListeningPeerPool listeningPeerPool;
     PeerRegistrator listeningPeerRegistrator;
-    MultiAddressServer<SocketServer> server;
+    network::server::MultiAddressServer<SocketServer> server;
 };
 
 static const auto SYSTEM_ID = QnUuid::createUuid().toSimpleString().toUtf8();
@@ -64,7 +69,7 @@ static const SocketAddress BAD_ADDRESS ( lit( "world.hello:321" ) );
 TEST_F( StunCustomTest, Ping )
 {
     AsyncClient client;
-    auto clientGuard = makeScopedGuard([&client]() { client.pleaseStopSync(); });
+    auto clientGuard = makeScopeGuard([&client]() { client.pleaseStopSync(); });
 
     client.connect( address );
 
@@ -102,7 +107,7 @@ TEST_F( StunCustomTest, Ping )
 TEST_F( StunCustomTest, BindResolve )
 {
     AsyncClient msClient;
-    auto msClientGuard = makeScopedGuard([&msClient]() { msClient.pleaseStopSync(); });
+    auto msClientGuard = makeScopeGuard([&msClient]() { msClient.pleaseStopSync(); });
 
     msClient.connect( address );
     {
@@ -124,7 +129,7 @@ TEST_F( StunCustomTest, BindResolve )
     }
 
     AsyncClient connectClient;
-    auto connectClientGuard = makeScopedGuard([&connectClient]() { connectClient.pleaseStopSync(); });
+    auto connectClientGuard = makeScopeGuard([&connectClient]() { connectClient.pleaseStopSync(); });
 
     connectClient.connect( address );
     {
@@ -277,19 +282,19 @@ TEST_F(StunCustomTest, ClientBind)
     cloudData.expect_getSystem(SYSTEM_ID, AUTH_KEY, 3);
 
     AsyncClient msClient;
-    auto msClientGuard = makeScopedGuard([&msClient]() { msClient.pleaseStopSync(); });
+    auto msClientGuard = makeScopeGuard([&msClient]() { msClient.pleaseStopSync(); });
 
     msClient.connect(address);
     const auto msIndications = listenForClientBind(&msClient, SERVER_ID, settings);
 
     AsyncClient bindClient;
-    auto bindClientGuard = makeScopedGuard([&bindClient]() { bindClient.pleaseStopSync(); });
+    auto bindClientGuard = makeScopeGuard([&bindClient]() { bindClient.pleaseStopSync(); });
 
     bindClient.connect(address);
     bindClientSync(&bindClient, "VmsGateway", GOOD_ADDRESS);
 
     AsyncClient msClient2;
-    auto msClient2Guard = makeScopedGuard([&msClient2]() { msClient2.pleaseStopSync(); });
+    auto msClient2Guard = makeScopeGuard([&msClient2]() { msClient2.pleaseStopSync(); });
 
     msClient2.connect(address);
     const auto msIndications2 = listenForClientBind(&msClient2, SERVER_ID2, settings);
@@ -314,7 +319,7 @@ TEST_F(StunCustomTest, ClientBind)
 
     // The next server gets only one indication:
     AsyncClient msClient3;
-    auto msClient3Guard = makeScopedGuard([&msClient3]() { msClient3.pleaseStopSync(); });
+    auto msClient3Guard = makeScopeGuard([&msClient3]() { msClient3.pleaseStopSync(); });
 
     msClient3.connect(address);
     const auto msIndications3 = listenForClientBind(&msClient3, SERVER_ID, settings);

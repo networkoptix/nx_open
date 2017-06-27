@@ -1,7 +1,5 @@
 #include "stun_extension_types.h"
 
-#include <common/common_globals.h>
-
 namespace nx {
 namespace stun {
 namespace extension {
@@ -72,6 +70,14 @@ const char* toString(AttributeType val)
             return "connectionMethods";
         case ignoreSourceAddress:
             return "ignoreSourceAddress";
+        case tcpReverseEndpointList:
+            return "tcpReverseEndpointList";
+        case isPersistent:
+            return "isPersistent";
+        case isListening:
+            return "isListening";
+        case trafficRelayUrl:
+            return "trafficRelayUrl";
 
         case udpHolePunchingResultCode:
             return "udpHolePunchingResultCode";
@@ -81,6 +87,31 @@ const char* toString(AttributeType val)
             return "udpTunnelKeepAliveInterval";
         case udpTunnelKeepAliveRetries:
             return "udpTunnelKeepAliveRetries";
+        case tcpReverseRetryMaxCount:
+            return "tcpReverseRetryMaxCount";
+        case tcpReverseRetryInitialDelay:
+            return "tcpReverseRetryInitialDelay";
+        case tcpReverseRetryDelayMultiplier:
+            return "tcpReverseRetryDelayMultiplier";
+        case tcpReverseRetryMaxDelay:
+            return "tcpReverseRetryMaxDelay";
+        case tcpReverseHttpSendTimeout:
+            return "tcpReverseHttpSendTimeout";
+        case tcpReverseHttpReadTimeout:
+            return "tcpReverseHttpReadTimeout";
+        case tcpReverseHttpMsgBodyTimeout:
+            return "tcpReverseHttpMsgBodyTimeout";
+        case tunnelInactivityTimeout:
+            return "tunnelInactivityTimeout";
+        case tcpConnectionKeepAlive:
+            return "tcpConnectionKeepAlive";
+
+        case udpHolePunchingStartDelay:
+            return "udpHolePunchingStartDelay";
+        case trafficRelayingStartDelay:
+            return "trafficRelayingStartDelay";
+        case directTcpConnectStartDelay:
+            return "directTcpConnectStartDelay";
 
         case systemErrorCode:
             return "systemErrorCode";
@@ -104,6 +135,20 @@ static String endpointsToString( const std::list< SocketAddress >& endpoints )
 
     return list.join( lit(",") ).toUtf8();
 }
+
+//-------------------------------------------------------------------------------------------------
+
+Endpoint::Endpoint(int type, const SocketAddress& endpoint)
+    : BaseStringAttribute(type, endpoint.toString().toUtf8())
+{
+}
+
+SocketAddress Endpoint::get() const
+{
+    return SocketAddress(getString());
+}
+
+//-------------------------------------------------------------------------------------------------
 
 EndpointList::EndpointList( int type, const std::list< SocketAddress >& endpoints )
     : BaseStringAttribute( type, endpointsToString( endpoints ) )

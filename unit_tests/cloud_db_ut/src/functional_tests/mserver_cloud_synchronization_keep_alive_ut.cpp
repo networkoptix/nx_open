@@ -1,9 +1,9 @@
 #include <gtest/gtest.h>
 
-#include <nx/utils/url_builder.h>
+#include <nx/network/url/url_builder.h>
 
 #include <nx_ec/ec_proto_version.h>
-#include <test_support/transaction_connection_helper.h>
+#include <nx/cloud/cdb/test_support/transaction_connection_helper.h>
 
 #include "ec2/cloud_vms_synchro_test_helper.h"
 
@@ -64,7 +64,7 @@ void Ec2MserverCloudSynchronizationKeepAlive::testTransactionConnectionKeepAlive
 
     m_connectionId =
         m_transactionConnectionHelper.establishTransactionConnection(
-            utils::UrlBuilder().setScheme("http")
+            network::url::Builder().setScheme("http")
                 .setHost(cdb()->endpoint().address.toString()).setPort(cdb()->endpoint().port),
             registeredSystemData().id,
             registeredSystemData().authKey,

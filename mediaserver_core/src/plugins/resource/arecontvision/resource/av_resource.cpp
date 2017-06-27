@@ -12,11 +12,11 @@
 
 #include <api/global_settings.h>
 #include <common/common_module.h>
-#include <utils/common/concurrent.h>
+#include <nx/utils/concurrent.h>
 #include <nx/utils/log/log.h>
 #include <utils/common/synctime.h>
 #include <nx/utils/timer_manager.h>
-#include <nx/network/http/httpclient.h>
+#include <nx/network/http/http_client.h>
 #include <nx/network/nettools.h>
 #include <nx/network/ping.h>
 
@@ -27,6 +27,7 @@
 #include "av_resource.h"
 #include "av_panoramic.h"
 #include "av_singesensor.h"
+#include <common/static_common_module.h>
 
 
 const QString QnPlAreconVisionResource::MANUFACTURE(lit("ArecontVision"));
@@ -135,7 +136,7 @@ void QnPlAreconVisionResource::setHostAddress(const QString& hostAddr)
 
 bool QnPlAreconVisionResource::ping()
 {
-    QnConcurrent::QnFuture<bool> result(1);
+    nx::utils::concurrent::Future<bool> result(1);
     checkIfOnlineAsync(
         [&result]( bool onlineOrNot ) {
             result.setResultAt(0, onlineOrNot);
@@ -155,7 +156,8 @@ void QnPlAreconVisionResource::checkIfOnlineAsync( std::function<void(bool)> com
         url.setScheme( lit("http") );
         url.setHost( urlStr );
     }
-    url.setPath( lit("/get?mac") );
+    url.setPath(lit("/get"));
+    url.setQuery(lit("mac"));
     QAuthenticator auth = getAuth();
     url.setUserName( auth.user() );
     url.setPassword( auth.password() );
@@ -254,9 +256,9 @@ CameraDiagnostics::Result QnPlAreconVisionResource::initInternal()
     if (zone_size<1)
         zone_size = 1;
 
-    if (qnCommon->dataPool()->data(toSharedPointer(this)).value<bool>(lit("hasRelayInput"), true))
+    if (qnStaticCommon->dataPool()->data(toSharedPointer(this)).value<bool>(lit("hasRelayInput"), true))
         setCameraCapability(Qn::RelayInputCapability, true);
-    if (qnCommon->dataPool()->data(toSharedPointer(this)).value<bool>(lit("hasRelayOutput"), true))
+    if (qnStaticCommon->dataPool()->data(toSharedPointer(this)).value<bool>(lit("hasRelayOutput"), true))
         setCameraCapability(Qn::RelayOutputCapability, true);
 
     setFirmware(firmwareVersion);
@@ -305,7 +307,8 @@ bool QnPlAreconVisionResource::setRelayOutputState(
     url.setScheme(lit("http"));
     url.setHost(getHostAddress());
     url.setPort(QUrl(getUrl()).port(nx_http::DEFAULT_HTTP_PORT));
-    url.setPath(lit("/set?auxout=%1").arg(activate ? lit("on") : lit("off")));
+    url.setPath(lit("/set"));
+    url.setQuery(lit("auxout=%1").arg(activate ? lit("on") : lit("off")));
 
     QAuthenticator auth = getAuth();
 
@@ -328,7 +331,8 @@ bool QnPlAreconVisionResource::setRelayOutputState(
             nx::utils::TimerManager::instance()->addTimer(
                 [url](qint64){
                     auto resetOutputUrl = url;
-                    resetOutputUrl.setPath(lit("/set?auxout=off"));
+                    resetOutputUrl.setPath(lit("/set"));
+                    resetOutputUrl.setQuery(lit("auxout=off"));
                     nx_http::downloadFileAsync(
                         resetOutputUrl,
                         [](SystemError::ErrorCode, int, nx_http::BufferType){});
@@ -676,7 +680,8 @@ bool QnPlAreconVisionResource::startInputPortMonitoringAsync(std::function<void(
     url.setScheme(lit("http"));
     url.setHost(getHostAddress());
     url.setPort(QUrl(getUrl()).port(nx_http::DEFAULT_HTTP_PORT));
-    url.setPath(lit("/get?auxin"));
+    url.setPath(lit("/get"));
+    url.setQuery(lit("auxin"));
 
     QAuthenticator auth = getAuth();
 
@@ -740,14 +745,14 @@ void QnPlAreconVisionResource::inputPortStateRequestDone(nx_http::AsyncHttpClien
 }
 
 bool QnPlAreconVisionResource::isRTSPSupported() const
-{   
-    auto resData = qnCommon->dataPool()->data(toSharedPointer(this));
-    auto arecontRtspIsAllowed = QnGlobalSettings::instance()->arecontRtspEnabled();
+{
+    auto resData = qnStaticCommon->dataPool()->data(toSharedPointer(this));
+    auto arecontRtspIsAllowed = qnGlobalSettings->arecontRtspEnabled();
     auto cameraSupportsH264 = isH264();
     auto cameraSupportsRtsp = resData.value<bool>(lit("isRTSPSupported"), true);
     auto rtspIsForcedOnCamera = resData.value<bool>(lit("forceRtspSupport"), false);
 
-    return arecontRtspIsAllowed 
+    return arecontRtspIsAllowed
         && ((cameraSupportsH264 && cameraSupportsRtsp) || rtspIsForcedOnCamera);
 }
 

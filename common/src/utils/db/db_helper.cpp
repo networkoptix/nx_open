@@ -1,13 +1,11 @@
 #include "db_helper.h"
 
 #include <QtCore/QCoreApplication>
-#include <QtCore/QFileInfo>
-
 #include <QtSql/QSqlQuery>
 #include <QtSql/QSqlRecord>
-#include <QFile>
 #include <QtSql/QSqlError>
-#include "qcoreapplication.h"
+
+#include <nx/utils/db/sql_query_execution_helper.h>
 #include <nx/utils/log/log.h>
 
 //TODO #AK QnDbTransaction is a bad name for this class since it actually lives beyond DB transaction
@@ -51,7 +49,15 @@ bool QnDbHelper::tuneDBAfterOpen(QSqlDatabase* const sqlDb)
         qWarning() << "Failed to enable FK support on sqlLite database!" << enableFKQuery.lastError().text();
         return false;
     }
-
+#if 0
+    QSqlQuery additionTuningQuery(*sqlDb);
+    additionTuningQuery.prepare(lit("PRAGMA synchronous=OFF"));
+    if (!additionTuningQuery.exec())
+    {
+        qWarning() << "Failed to turn off synchronous mode on sqlLite database!" << additionTuningQuery.lastError().text();
+        return false;
+    }
+#endif
     return true;
 }
 
@@ -114,103 +120,6 @@ QnDbHelper::QnDbHelper()
 QnDbHelper::~QnDbHelper()
 {
     removeDatabase();
-}
-
-QList<QByteArray> quotedSplit(const QByteArray& data)
-{
-    QList<QByteArray> result;
-    const char* curPtr = data.data();
-    const char* prevPtr = curPtr;
-    const char* end = curPtr + data.size();
-    bool inQuote1 = false;
-    bool inQuote2 = false;
-    for (;curPtr < end; ++curPtr) {
-        if (*curPtr == '\'')
-            inQuote1 = !inQuote1;
-        else if (*curPtr == '\"')
-            inQuote2 = !inQuote2;
-        else if (*curPtr == ';' && !inQuote1 && !inQuote2)
-        {
-            //*curPtr = 0;
-            result << QByteArray::fromRawData(prevPtr, curPtr - prevPtr);
-            prevPtr = curPtr+1;
-        }
-    }
-
-    return result;
-}
-
-bool QnDbHelper::execSQLQuery(const QString& queryStr, QSqlDatabase& database, const char* details) {
-    QSqlQuery query(database);
-    return prepareSQLQuery(&query, queryStr, details) && execSQLQuery(&query, details);
-}
-
-bool QnDbHelper::execSQLQuery(QSqlQuery *query, const char* details)
-{
-    NX_EXPECT(validateParams(*query));
-    if (!query->exec())
-    {
-        auto error = query->lastError();
-        NX_ASSERT(error.type() != QSqlError::StatementError,
-            error.text() + lit(":\n") + query->lastQuery());
-        NX_LOG(lit("%1 %2").arg(QLatin1String(details)).arg(error.text()), cl_logERROR);
-
-        return false;
-    }
-    return true;
-}
-
-bool QnDbHelper::prepareSQLQuery(QSqlQuery *query, const QString &queryStr, const char* details)
-{
-    if (!query->prepare(queryStr))
-    {
-        NX_LOG(lit("%1 %2").arg(QLatin1String(details)).arg(query->lastError().text()), cl_logERROR);
-        NX_ASSERT(false, details, "Unable to prepare SQL query");
-        return false;
-    }
-    return true;
-}
-
-bool QnDbHelper::execSQLScript(const QByteArray& scriptData, QSqlDatabase& database)
-{
-    QList<QByteArray> commands = quotedSplit(scriptData);
-#ifdef DB_DEBUG
-    int n = commands.size();
-    qDebug() << "creating db" << n << "commands queued";
-    int i = 0;
-#endif // DB_DEBUG
-    for(const QByteArray& singleCommand: commands)
-    {
-#ifdef DB_DEBUG
-        qDebug() << QString(QLatin1String("processing command %1 of %2")).arg(++i).arg(n);
-#endif // DB_DEBUG
-        QString command = QString::fromUtf8(singleCommand).trimmed();
-        if (command.isEmpty())
-            continue;
-        QSqlQuery ddlQuery(database);
-        if (!prepareSQLQuery(&ddlQuery, command, Q_FUNC_INFO))
-            return false;
-        if (!execSQLQuery(&ddlQuery, Q_FUNC_INFO))
-            return false;
-    }
-    return true;
-}
-
-bool QnDbHelper::execSQLFile(const QString& fileName, QSqlDatabase& database)
-{
-    QFile file(fileName);
-    if (!file.open(QFile::ReadOnly))
-        return false;
-    QByteArray data = file.readAll();
-    if (data.isEmpty())
-        return true;
-
-    if( !execSQLScript( data, database ) )
-    {
-        NX_LOG(lit("Error while executing SQL file %1").arg(fileName), cl_logERROR);
-        return false;
-    }
-    return true;
 }
 
 bool QnDbHelper::isObjectExists(const QString& objectType, const QString& objectName, QSqlDatabase& database)
@@ -278,7 +187,7 @@ bool QnDbHelper::applyUpdates(const QString &dirName) {
             NX_LOG(lit("Applying SQL update %1").arg(fileName), cl_logDEBUG1);
             if (!beforeInstallUpdate(fileName))
                 return false;
-            if (!execSQLFile(fileName, m_sdb))
+            if (!nx::utils::db::SqlQueryExecutionHelper::execSQLFile(fileName, m_sdb))
                 return false;
             if (!afterInstallUpdate(fileName))
                 return false;
@@ -309,15 +218,5 @@ bool QnDbHelper::beforeInstallUpdate(const QString& updateName)
 bool QnDbHelper::afterInstallUpdate(const QString& updateName)
 {
     Q_UNUSED(updateName);
-    return true;
-}
-
-bool QnDbHelper::validateParams(const QSqlQuery& query)
-{
-    for (const auto& value: query.boundValues().values())
-    {
-        if (!value.isValid())
-            return false;
-    }
     return true;
 }

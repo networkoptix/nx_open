@@ -99,8 +99,8 @@ NX_NETWORK_TRANSFER_SOCKET_TESTS_CASE_EX(
 TEST_F(UdpHolePunching, TransferSyncSsl)
 {
     network::test::socketTransferSync(
-        [&]() { return std::make_unique<SslServerSocket>(cloudServerSocket().release(), false); },
-        []() { return std::make_unique<SslSocket>(new CloudStreamSocket(AF_INET), false); },
+        [&]() { return std::make_unique<deprecated::SslServerSocket>(cloudServerSocket(), false); },
+        []() { return std::make_unique<deprecated::SslSocket>(std::make_unique<CloudStreamSocket>(AF_INET), false); },
         SocketAddress(m_server->fullName()));
 }
 
@@ -117,7 +117,7 @@ TEST_F(UdpHolePunching, loadTest)
 
     server.setServerSocket(cloudServerSocket());
     ASSERT_TRUE(server.start());
-    auto serverGuard = makeScopedGuard([&server]() { server.pleaseStopSync(); });
+    auto serverGuard = makeScopeGuard([&server]() { server.pleaseStopSync(); });
 
     test::ConnectionsGenerator connectionsGenerator(
         SocketAddress(QString::fromUtf8(m_server->fullName()), 0),
@@ -185,10 +185,11 @@ protected:
     {
         m_serverSocket = cloudServerSocket();
         m_serverSocket->acceptAsync(
-            [this](SystemError::ErrorCode /*errorCode*/, AbstractStreamSocket* newConnection)
+            [this](
+                SystemError::ErrorCode /*errorCode*/,
+                std::unique_ptr<AbstractStreamSocket> newConnection)
             {
-                m_acceptedConnections.push_back(
-                    std::unique_ptr<AbstractStreamSocket>(newConnection));
+                m_acceptedConnections.push_back(std::move(newConnection));
             });
     }
 

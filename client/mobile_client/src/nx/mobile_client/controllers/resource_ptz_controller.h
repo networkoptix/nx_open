@@ -2,6 +2,7 @@
 
 #include <core/ptz/ptz_constants.h>
 #include <core/ptz/proxy_ptz_controller.h>
+#include <nx/utils/uuid.h>
 
 namespace nx {
 namespace client {

@@ -2,17 +2,19 @@
 
 #include "server_rest_connection_fwd.h"
 
-#include <nx/network/http/httptypes.h>
-#include "utils/common/systemerror.h"
+#include <nx/network/http/http_types.h>
+#include <nx/utils/system_error.h>
 #include "utils/common/request_param.h"
 #include "nx_ec/data/api_fwd.h"
 #include <api/helpers/request_helpers_fwd.h>
 #include <nx/network/http/asynchttpclient.h>
 
 #include <rest/server/json_rest_result.h>
-#include <utils/common/safe_direct_connection.h>
+#include <nx/utils/safe_direct_connection.h>
 #include <api/http_client_pool.h>
+#include <business/business_fwd.h>
 #include <core/resource/resource_fwd.h>
+#include <common/common_module_aware.h>
 
 /*
 * New class for HTTP requests to mediaServer. It should be used instead of deprecated class QnMediaServerConnection.
@@ -25,11 +27,12 @@ namespace rest
 {
     class ServerConnection:
         public QObject,
+        public QnCommonModuleAware,
         public Qn::EnableSafeDirectConnection
     {
         Q_OBJECT
     public:
-        ServerConnection(const QnUuid& serverId);
+        ServerConnection(QnCommonModule* commonModule, const QnUuid& serverId);
         virtual ~ServerConnection();
 
 
@@ -63,6 +66,9 @@ namespace rest
             QThread* targetThread = 0);
 
         Handle twoWayAudioCommand(const QnUuid& cameraId, bool start, GetCallback callback, QThread* targetThread = 0);
+
+        Handle softwareTriggerCommand(const QnUuid& cameraId, const QString& triggerId,
+            QnBusiness::EventState toggleState, GetCallback callback, QThread* targetThread = nullptr);
 
         Handle getStatisticsSettingsAsync(Result<QByteArray>::type callback
             , QThread *targetThread = nullptr);
@@ -100,6 +106,56 @@ namespace rest
             Result<QnCloudHostCheckReply>::type callback,
             QThread* targetThread = nullptr);
 
+        /* DistributedFileDownloader API */
+        Handle downloaderAddDownload(
+            const QString& fileName,
+            int size,
+            const QByteArray& md5,
+            const QUrl& url,
+            GetCallback callback,
+            QThread* targetThread = nullptr);
+
+        Handle downloaderRemoveDownload(
+            const QString& fileName,
+            bool deleteData,
+            GetCallback callback,
+            QThread* targetThread = nullptr);
+
+        Handle downloaderChunkChecksums(
+            const QString& fileName,
+            GetCallback callback,
+            QThread* targetThread = nullptr);
+
+        Handle downloaderDownloadChunk(
+            const QString& fileName,
+            int index,
+            Result<QByteArray>::type callback,
+            QThread* targetThread = nullptr);
+
+        Handle downloaderDownloadChunkFromInternet(
+            const QString& fileName,
+            const QUrl& url,
+            int chunkIndex,
+            int chunkSize,
+            Result<QByteArray>::type callback,
+            QThread* targetThread = nullptr);
+
+        Handle downloaderUploadChunk(
+            const QString& fileName,
+            int index,
+            const QByteArray& data,
+            GetCallback callback,
+            QThread* targetThread = nullptr);
+
+        Handle downloaderStatus(
+            GetCallback callback,
+            QThread* targetThread = nullptr);
+
+        Handle downloaderFileStatus(
+            const QString& fileName,
+            GetCallback callback,
+            QThread* targetThread = nullptr);
+
         /**
         * Cancel running request by known requestID. If request is canceled, callback isn't called.
         * If target thread has been used then callback may be called after 'cancelRequest' in case of data already received and queued to a target thread.
@@ -121,6 +177,20 @@ namespace rest
             const QnRequestParamList& params,
             const nx_http::StringType& contentType,
             const nx_http::StringType& messageBody,
+            REST_CALLBACK(ResultType) callback,
+            QThread* targetThread);
+
+        template <typename ResultType> Handle executePut(
+            const QString& path,
+            const QnRequestParamList& params,
+            const nx_http::StringType& contentType,
+            const nx_http::StringType& messageBody,
+            REST_CALLBACK(ResultType) callback,
+            QThread* targetThread);
+
+        template <typename ResultType> Handle executeDelete(
+            const QString& path,
+            const QnRequestParamList& params,
             REST_CALLBACK(ResultType) callback,
             QThread* targetThread);
 

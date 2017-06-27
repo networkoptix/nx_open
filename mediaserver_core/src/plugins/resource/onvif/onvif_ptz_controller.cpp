@@ -11,6 +11,7 @@
 #include <onvif/soapPTZBindingProxy.h>
 #include <plugins/resource/onvif/onvif_resource.h>
 #include <nx/utils/math/fuzzy.h>
+#include <common/static_common_module.h>
 
 #include "soap_wrapper.h"
 
@@ -65,10 +66,9 @@ QnOnvifPtzController::QnOnvifPtzController(const QnPlOnvifResourcePtr &resource)
     SpeedLimits defaultLimits(-QnAbstractPtzController::MaxPtzSpeed, QnAbstractPtzController::MaxPtzSpeed);
     m_panSpeedLimits = m_tiltSpeedLimits = m_zoomSpeedLimits = m_focusSpeedLimits = defaultLimits;
 
-    QnResourceData data = qnCommon->dataPool()->data(resource);
-    m_stopBroken = qnCommon->dataPool()->data(resource).value<bool>(lit("onvifPtzStopBroken"), false);
-    m_speedBroken = qnCommon->dataPool()->data(resource).value<bool>(lit("onvifPtzSpeedBroken"), false);
-
+    QnResourceData data = qnStaticCommon->dataPool()->data(resource);
+    m_stopBroken = qnStaticCommon->dataPool()->data(resource).value<bool>(lit("onvifPtzStopBroken"), false);
+    m_speedBroken = qnStaticCommon->dataPool()->data(resource).value<bool>(lit("onvifPtzSpeedBroken"), false);
     bool absoluteMoveBroken = data.value<bool>(lit("onvifPtzAbsoluteMoveBroken"),   false);
     bool focusEnabled       = data.value<bool>(lit("onvifPtzFocusEnabled"),         false);
     bool presetsEnabled     = data.value<bool>(lit("onvifPtzPresetsEnabled"),       false);
@@ -387,6 +387,17 @@ bool QnOnvifPtzController::absoluteMove(Qn::PtzCoordinateSpace space, const QVec
     onvifPosition.PanTilt = &onvifPanTilt;
     onvifPosition.Zoom = &onvifZoom;
 
+    onvifXsd__Vector2D onvifPanTiltSpeed;
+    onvifPanTiltSpeed.x = speed; // TODO: #Elric #PTZ do we need to adjust speed to speed limits here?
+    onvifPanTiltSpeed.y = speed;
+
+    onvifXsd__Vector1D onvifZoomSpeed;
+    onvifZoomSpeed.x = speed;
+
+    onvifXsd__PTZSpeed onvifSpeed;
+    onvifSpeed.PanTilt = &onvifPanTiltSpeed;
+    onvifSpeed.Zoom = &onvifZoomSpeed;
+
     _onvifPtz__AbsoluteMove request;
     request.ProfileToken = m_resource->getPtzProfileToken().toStdString();
     request.Position = &onvifPosition;
@@ -542,6 +553,17 @@ bool QnOnvifPtzController::activatePreset(const QString &presetId, qreal speed) 
     PtzSoapWrapper ptz (ptzUrl.toStdString(), auth.user(), auth.password(), m_resource->getTimeDrift());
     ptz.getProxy()->soap->float_format = m_floatFormat;
     ptz.getProxy()->soap->double_format = m_doubleFormat;
+
+    onvifXsd__Vector2D onvifPanTiltSpeed;
+    onvifPanTiltSpeed.x = speed; // TODO: #Elric #PTZ do we need to adjust speed to speed limits here?
+    onvifPanTiltSpeed.y = speed;
+
+    onvifXsd__Vector1D onvifZoomSpeed;
+    onvifZoomSpeed.x = speed;
+
+    onvifXsd__PTZSpeed onvifSpeed;
+    onvifSpeed.PanTilt = &onvifPanTiltSpeed;
+    onvifSpeed.Zoom = &onvifZoomSpeed;
 
     GotoPresetReq request;
     GotoPresetResp response;

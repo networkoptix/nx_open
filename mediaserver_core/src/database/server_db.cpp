@@ -9,6 +9,7 @@
 #include <core/resource/network_resource.h>
 #include <core/resource/camera_bookmark.h>
 #include <core/resource_management/resource_pool.h>
+#include <core/resource_management/user_roles_manager.h>
 
 #include <media_server/serverutil.h>
 
@@ -21,6 +22,8 @@
 #include <utils/common/util.h>
 #include <nx/fusion/model_functions.h>
 #include <api/global_settings.h>
+#include <common/common_module.h>
+#include <media_server/media_server_module.h>
 
 namespace {
 
@@ -80,6 +83,9 @@ QnBusinessActionParameters convertOldActionParameters(const QByteArray& value)
     if (value.isEmpty())
         return result;
 
+    static const std::vector<QnUuid> kAdminRoles(
+        QnUserRolesManager::adminRoleIds().toVector().toStdVector());
+
     int i = 0;
     int prevPos = -1;
     while (prevPos < value.size() && i < ParamCount)
@@ -98,7 +104,10 @@ QnBusinessActionParameters convertOldActionParameters(const QByteArray& value)
                 result.emailAddress = QString::fromUtf8(field.data(), field.size());
                 break;
             case UserGroupParam:
-                result.userGroup = static_cast<QnBusiness::UserGroup>(toInt(field));
+                if (static_cast<QnBusiness::UserGroup>(toInt(field)) == QnBusiness::AdminOnly)
+                    result.additionalResources = kAdminRoles;
+                else
+                    result.additionalResources.clear();
                 break;
             case FpsParam:
                 result.fps = toInt(field);
@@ -107,7 +116,7 @@ QnBusinessActionParameters convertOldActionParameters(const QByteArray& value)
                 result.streamQuality = static_cast<Qn::StreamQuality>(toInt(field));
                 break;
             case DurationParam:
-                result.recordingDuration = toInt(field);
+                result.durationMs = toInt(field) * 1000;
                 break;
             case RecordBeforeParam:
                 break;
@@ -284,7 +293,8 @@ int getBookmarksQueryLimit(const QnCameraBookmarkSearchFilter &filter)
 
 static const qint64 CLEANUP_INTERVAL = 1000000ll * 3600;
 
-QnServerDb::QnServerDb():
+QnServerDb::QnServerDb(QnCommonModule* commonModule):
+    QnCommonModuleAware(commonModule),
     m_lastCleanuptime(0),
     m_auditCleanuptime(0),
     m_runtimeActionsTotalRecords(0),
@@ -292,7 +302,7 @@ QnServerDb::QnServerDb():
 {
     const QString fileName =
         closeDirPath(
-            MSSettings::roSettings()->value("eventsDBFilePath", getDataDirectory()).toString())
+            qnServerModule->roSettings()->value("eventsDBFilePath", getDataDirectory()).toString())
         + QString(lit("mserver.sqlite"));
     addDatabase(fileName, "QnServerDb");
     if (m_sdb.open())
@@ -917,7 +927,7 @@ void QnServerDb::getAndSerializeActions(
         {
             QnUuid eventResId = QnUuid::fromRfc4122(actionsQuery.value(eventResIdx).toByteArray());
             QnNetworkResourcePtr camRes =
-                qnResPool->getResourceById<QnNetworkResource>(eventResId);
+                resourcePool()->getResourceById<QnNetworkResource>(eventResId);
             if (camRes)
             {
                 if (QnStorageManager::isArchiveTimeExists(

@@ -72,9 +72,9 @@ void QnMobileClientMetaTypes::registerQmlTypes() {
     qmlRegisterType<QnCloudSystemInformationWatcher>("com.networkoptix.qml", 1, 0, "QnCloudSystemInformationWatcher");
     qmlRegisterType<QnUserWatcher>("com.networkoptix.qml", 1, 0, "QnUserWatcher");
     /* NxMediaPlayer should not be used.
-       It is here only to allow assignments of MediaPlyer to properties of this type. */
-    qmlRegisterType<nx::media::Player>("Nx.Media", 1, 0, "NxMediaPlayer");
+       It is here only to allow assignments of MediaPlayer to properties of this type. */
     qmlRegisterType<MediaPlayer>("Nx.Media", 1, 0, "MediaPlayer");
+    qmlRegisterUncreatableType<nx::media::Player>("Nx.Media", 1, 0, "NxMediaPlayer", lit("Cannot create an instance of abstract class."));
     qmlRegisterType<QnActiveCameraThumbnailLoader>("com.networkoptix.qml", 1, 0, "QnActiveCameraThumbnailLoader");
     qmlRegisterType<QnThumbnailCacheAccessor>("com.networkoptix.qml", 1, 0, "QnThumbnailCacheAccessor");
     qmlRegisterType<QnQuickItemMouseTracker>("com.networkoptix.qml", 1, 0, "ItemMouseTracker");
@@ -83,7 +83,7 @@ void QnMobileClientMetaTypes::registerQmlTypes() {
     qmlRegisterType<QnLiteClientController>("com.networkoptix.qml", 1, 0, "QnLiteClientController");
     qmlRegisterType<resource::LiteClientLayoutHelper>("Nx.Core", 1, 0, "LiteClientLayoutHelper");
     qmlRegisterType<utils::DeveloperSettingsHelper>(
-        "Nx.Core", 1, 0, "DeveloperSettingsHelper");
+        "Nx.Settings", 1, 0, "DeveloperSettingsHelper");
 
     // Ptz related classes
     qmlRegisterUncreatableType<Ptz>("Nx.Core", 1, 0, "Ptz",

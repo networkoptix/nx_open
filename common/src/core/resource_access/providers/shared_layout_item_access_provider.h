@@ -1,6 +1,7 @@
 #pragma once
 
 #include <core/resource_access/providers/base_resource_access_provider.h>
+#include <common/common_module_aware.h>
 
 class QnLayoutItemAggregator;
 using QnLayoutItemAggregatorPtr = QSharedPointer<QnLayoutItemAggregator>;
@@ -11,7 +12,7 @@ class QnSharedLayoutItemAccessProvider: public QnBaseResourceAccessProvider
     using base_type = QnBaseResourceAccessProvider;
 
 public:
-    QnSharedLayoutItemAccessProvider(QObject* parent = nullptr);
+    QnSharedLayoutItemAccessProvider(Mode mode, QObject* parent = nullptr);
     virtual ~QnSharedLayoutItemAccessProvider();
 
 protected:

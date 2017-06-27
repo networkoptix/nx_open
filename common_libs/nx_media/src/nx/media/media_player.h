@@ -15,6 +15,7 @@ class QnArchiveStreamReader;
 class QnResource;
 template<class Resource> class QnSharedResourcePointer;
 typedef QnSharedResourcePointer<QnResource> QnResourcePtr;
+class QnCommonModule;
 
 namespace nx {
 namespace media {
@@ -231,6 +232,8 @@ signals:
 protected: //< for tests
     void testSetOwnedArchiveReader(QnArchiveStreamReader* archiveReader);
     void testSetCamera(const QnResourcePtr& camera);
+
+    virtual QnCommonModule* commonModule() const = 0;
 
 private:
     QScopedPointer<PlayerPrivate> d_ptr;

@@ -10,7 +10,7 @@
 #include <sstream>
 
 #include <nx/utils/log/log.h>
-#include <utils/common/systemerror.h>
+#include <nx/utils/system_error.h>
 
 
 static const unsigned int ERROR_SKIP_TIMEOUT_MS = 500;

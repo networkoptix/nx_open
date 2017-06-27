@@ -10,13 +10,13 @@
 struct QnThumbnailRequestData: public QnMultiserverRequestData
 {
     /**
-     * Getting thumbnail from fixed time is costly, so we can round it to the nearest keyframe.
+     * Getting a thumbnail at the exact timestamp is costly, so we can round it to the nearest keyframe.
      */
     enum RoundMethod
     {
-        KeyFrameBeforeMethod, //< Get thumbnail from the nearest keyframe before the given time.
-        PreciseMethod, //< Get thumbnail as near to given time as possible.
-        KeyFrameAfterMethod, //< Get thumbnail from the nearest keyframe after the given time.
+        KeyFrameBeforeMethod, //< Get the thumbnail from the nearest keyframe before the given time.
+        PreciseMethod, //< Get the thumbnail as near to given time as possible.
+        KeyFrameAfterMethod, //< Get the thumbnail from the nearest keyframe after the given time.
     };
 
     enum ThumbnailFormat
@@ -29,7 +29,7 @@ struct QnThumbnailRequestData: public QnMultiserverRequestData
 
     QnThumbnailRequestData();
 
-    void loadFromParams(const QnRequestParamList& params);
+    void loadFromParams(QnResourcePool* resourcePool, const QnRequestParamList& params);
     QnRequestParamList toParams() const;
     bool isValid() const;
 
@@ -43,22 +43,25 @@ struct QnThumbnailRequestData: public QnMultiserverRequestData
     /** Target camera. */
     QnVirtualCameraResourcePtr camera;
 
-    /** Timestamp. Negative value means 'latest'. Can take the special value DATETIME_NOW. */
+    /**
+     * Timestamp of the image. A negative value means "latest" Can have the special value
+     * DATETIME_NOW.
+     */
     qint64 msecSinceEpoch;
 
-    /** Forced rotation. Negative value means take default rotation from camera settings. */
+    /** Forced rotation. Negative value means take default rotation from the camera settings. */
     int rotation;
 
     /**
-     * Image size. If have only height or only width, aspect ratio will be used. Any value must be
-     * not less than 128.
+     * Image size. If the image has only height or only width, aspect ratio will be used. Any value
+     * must be not less than 128, or -1. If the width is not -1, the height should not be -1.
      */
     QSize size;
 
-    /** Result image format. */
+    /** Resulting image format. */
     ThumbnailFormat imageFormat;
 
-    /** Precision option. */
+    /** Method of rounding, influences the precision. */
     RoundMethod roundMethod;
 };
 

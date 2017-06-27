@@ -16,8 +16,8 @@ const QnSoftwareVersion kUserPermissionsRefactoredVersion(3, 0);
 
 } using namespace detail;
 
-QnMobileClientMessageProcessor::QnMobileClientMessageProcessor() :
-    base_type()
+QnMobileClientMessageProcessor::QnMobileClientMessageProcessor(QObject* parent):
+    base_type(parent)
 {
 }
 
@@ -41,7 +41,7 @@ void QnMobileClientMessageProcessor::updateResource(
     using namespace nx::common::compatibility::user_permissions;
 
     // TODO: #mshevchenko #3.1 Refactor it to use API versioning instead.
-    const auto& info = QnAppServerConnectionFactory::connectionInfo();
+    const auto& info = commonModule()->ec2Connection()->connectionInfo();
     if (info.version < kUserPermissionsRefactoredVersion)
     {
         if (const auto user = resource.dynamicCast<QnUserResource>())
@@ -54,7 +54,7 @@ void QnMobileClientMessageProcessor::updateResource(
 
     base_type::updateResource(resource, source);
 
-    if (resource->getId() == qnCommon->remoteGUID())
+    if (resource->getId() == commonModule()->remoteGUID())
         updateMainServerApiUrl(resource.dynamicCast<QnMediaServerResource>());
 }
 
@@ -68,7 +68,7 @@ void QnMobileClientMessageProcessor::updateMainServerApiUrl(const QnMediaServerR
     if (!server)
         return;
 
-    QUrl url = QnAppServerConnectionFactory::url();
+    QUrl url = commonModule()->currentUrl();
     if (!url.isValid())
         return;
 

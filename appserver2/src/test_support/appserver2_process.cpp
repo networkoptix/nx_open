@@ -8,26 +8,30 @@
 #include <chrono>
 #include <thread>
 
-#include <nx_ec/ec2_lib.h>
-#include <nx/network/http/http_mod_manager.h>
-#include <nx/utils/log/log.h>
-#include <nx/utils/timer_manager.h>
-#include <nx/utils/settings.h>
-
 #include <api/app_server_connection.h>
 #include <api/common_message_processor.h>
 #include <api/runtime_info_manager.h>
-#include <common/common_module.h>
 #include <core/resource_management/resource_discovery_manager.h>
 #include <core/resource_management/resource_pool.h>
+#include <nx/core/access/access_types.h>
 #include <llutil/hardware_id.h>
 #include <network/http_connection_listener.h>
+#include <network/tcp_connection_priv.h>
+#include <nx1/info.h>
+#include <nx_ec/ec2_lib.h>
+#include <nx/fusion/serialization/json.h>
+#include <nx/network/http/http_mod_manager.h>
+#include <nx/utils/log/log.h>
+#include <nx/utils/scope_guard.h>
+#include <nx/utils/settings.h>
+#include <nx/utils/timer_manager.h>
+#include <nx/vms/discovery/manager.h>
+#include <rest/server/json_rest_result.h>
 #include <rest/server/rest_connection_processor.h>
 #include <utils/common/app_info.h>
-#include <utils/common/guard.h>
-#include <nx1/info.h>
 
 #include "ec2_connection_processor.h"
+#include <test_support/resource/test_resource_factory.h>
 
 static int registerQtResources()
 {
@@ -64,9 +68,24 @@ public:
         return m_settings.value("dbFile", "ecs.sqlite").toString();
     }
 
+    int moduleInstance() const
+    {
+        return m_settings.value("moduleInstance").toInt();
+    }
+
     SocketAddress endpoint() const
     {
         return SocketAddress(m_settings.value("endpoint", "0.0.0.0:0").toString());
+    }
+
+    QnUuid moduleGuid() const
+    {
+        return QnUuid(m_settings.value("moduleGuid").toString());
+    }
+
+    bool isAuthDisabled() const
+    {
+        return m_settings.contains("disableAuth");
     }
 
 private:
@@ -76,18 +95,39 @@ private:
 
 }   // namespace conf
 
+class QnMuduleInformationConnectionProcessor: public QnTCPConnectionProcessor
+{
+public:
+    QnMuduleInformationConnectionProcessor(
+        QSharedPointer<AbstractStreamSocket> socket,
+        QnHttpConnectionListener* owner)
+    :
+        QnTCPConnectionProcessor(socket, owner)
+    {
+    }
+
+    virtual void run() override
+    {
+        QnJsonRestResult result;
+        result.setReply(commonModule()->moduleInformation());
+        d_ptr->response.messageBody = QJson::serialized(result);
+        sendResponse(nx_http::StatusCode::ok,
+            Qn::serializationFormatToHttpContentType(Qn::JsonFormat));
+    }
+};
 
 class QnSimpleHttpConnectionListener:
     public QnHttpConnectionListener
 {
 public:
     QnSimpleHttpConnectionListener(
+        QnCommonModule* commonModule,
         const QHostAddress& address,
         int port,
         int maxConnections,
         bool useSsl)
     :
-        QnHttpConnectionListener(address, port, maxConnections, useSsl)
+        QnHttpConnectionListener(commonModule, address, port, maxConnections, useSsl)
     {
     }
 
@@ -112,12 +152,9 @@ class Appserver2MessageProcessor:
     public QnCommonMessageProcessor
 {
 public:
-    Appserver2MessageProcessor(
-        QnResourcePool* const resourcePool,
-        QnResourceDiscoveryManager* resourceDiscoveryManager)
-        :
-        m_resourcePool(resourcePool),
-        m_resourceDiscoveryManager(resourceDiscoveryManager)
+    Appserver2MessageProcessor(QObject* parent):
+        QnCommonMessageProcessor(parent),
+        m_factory(new nx::TestResourceFactory())
     {
     }
 
@@ -131,19 +168,18 @@ protected:
 
     virtual QnResourceFactory* getResourceFactory() const override
     {
-        return m_resourceDiscoveryManager;
+        return nx::TestResourceFactory::instance();
     }
 
     virtual void updateResource(
         const QnResourcePtr& resource,
         ec2::NotificationSource /*source*/) override
     {
-        m_resourcePool->addResource(resource);
+        commonModule()->resourcePool()->addResource(resource);
     }
 
 protected:
-    QnResourcePool* const m_resourcePool;
-    QnResourceDiscoveryManager* m_resourceDiscoveryManager;
+    std::unique_ptr<nx::TestResourceFactory> m_factory;
 };
 
 Appserver2Process::Appserver2Process(int argc, char** argv)
@@ -165,7 +201,7 @@ void Appserver2Process::pleaseStop()
     //m_processTerminationEvent.set_value();
     QnMutexLocker lk(&m_mutex);
     m_terminated = true;
-    m_cond.wakeAll();
+    m_eventLoop.quit();
 }
 
 void Appserver2Process::setOnStartedEventHandler(
@@ -176,11 +212,8 @@ void Appserver2Process::setOnStartedEventHandler(
 
 int Appserver2Process::exec()
 {
-    nx::utils::TimerManager timerManager;
-    timerManager.start();
-
     bool processStartResult = false;
-    auto triggerOnStartedEventHandlerGuard = makeScopedGuard(
+    auto triggerOnStartedEventHandlerGuard = makeScopeGuard(
         [this, &processStartResult]
         {
             if (m_onStartedEventHandler)
@@ -189,20 +222,28 @@ int Appserver2Process::exec()
 
     registerQtResources();
 
-    QnCommonModule commonModule;
-    commonModule.setModuleGUID(QnUuid::createUuid());
+    conf::Settings settings;
+    //parsing command line arguments
+    settings.load(m_argc, m_argv);
+    if (settings.showHelp())
+    {
+        //settings.printCmdLineArgsHelp();
+        //TODO
+        return 0;
+    }
 
-    QnResourceDiscoveryManager resourceDiscoveryManager;
+    m_commonModule.reset(new QnCommonModule(false, nx::core::access::Mode::direct));
+    const auto moduleGuid = settings.moduleGuid();
+    m_commonModule->setModuleGUID(
+        moduleGuid.isNull() ? QnUuid::createUuid() : moduleGuid);
+
+    QnResourceDiscoveryManager resourceDiscoveryManager(m_commonModule.get());
     // Starting receiving notifications.
-    auto messageProcessor = std::make_unique<Appserver2MessageProcessor>(
-        QnResourcePool::instance(),
-        &resourceDiscoveryManager);
-
-    QnRuntimeInfoManager runtimeInfoManager;
+    m_commonModule->createMessageProcessor<Appserver2MessageProcessor>();
 
     ec2::ApiRuntimeData runtimeData;
-    runtimeData.peer.id = qnCommon->moduleGUID();
-    runtimeData.peer.instanceId = qnCommon->runningInstanceGUID();
+    runtimeData.peer.id = m_commonModule->moduleGUID();
+    runtimeData.peer.instanceId = m_commonModule->runningInstanceGUID();
     runtimeData.peer.peerType = Qn::PT_Server;
     runtimeData.box = QnAppInfo::armBox();
     runtimeData.brand = QnAppInfo::productNameShort();
@@ -215,21 +256,13 @@ int Appserver2Process::exec()
     }
 
     runtimeData.hardwareIds << QnUuid::createUuid().toString();
-    runtimeInfoManager.updateLocalItem(runtimeData);    // initializing localInfo
+    m_commonModule->runtimeInfoManager()->updateLocalItem(runtimeData);    // initializing localInfo
 
-    conf::Settings settings;
-    //parsing command line arguments
-    settings.load(m_argc, m_argv);
-    if (settings.showHelp())
-    {
-        //settings.printCmdLineArgsHelp();
-        //TODO
-        return 0;
-    }
+    qnStaticCommon->setModuleShortId(m_commonModule->moduleGUID(), settings.moduleInstance());
 
     //initializeLogging(settings);
     std::unique_ptr<ec2::AbstractECConnectionFactory>
-        ec2ConnectionFactory(getConnectionFactory(Qn::PT_Server, &timerManager));
+        ec2ConnectionFactory(getConnectionFactory(Qn::PT_Server, nx::utils::TimerManager::instance(), m_commonModule.get()));
 
     std::map<QString, QVariant> confParams;
     ec2ConnectionFactory->setConfParams(std::move(confParams));
@@ -245,7 +278,7 @@ int Appserver2Process::exec()
         if (errorCode == ec2::ErrorCode::ok)
         {
             //connectInfo = ec2Connection->connectionInfo();
-            NX_LOG(lit("Connected to local EC2"), cl_logWARNING);
+            NX_LOG(lit("Connected to local EC2"), cl_logDEBUG1);
             break;
         }
 
@@ -253,24 +286,30 @@ int Appserver2Process::exec()
         std::this_thread::sleep_for(std::chrono::seconds(3));
     }
 
-    std::unique_ptr<QnRestProcessorPool> restProcessorPool(new QnRestProcessorPool());
-    ec2ConnectionFactory->registerRestHandlers(restProcessorPool.get());
+    //QnAppServerConnectionFactory appServerConnectionFactory;
+    //appServerConnectionFactory.setUrl(dbUrl);
+    //appServerConnectionFactory.setEC2ConnectionFactory(ec2ConnectionFactory.get());
 
-    QnAppServerConnectionFactory appServerConnectionFactory;
-    appServerConnectionFactory.setUrl(dbUrl);
-    appServerConnectionFactory.setEC2ConnectionFactory(ec2ConnectionFactory.get());
-    appServerConnectionFactory.setEc2Connection(ec2Connection);
+    //Must call messageProcessor->init(ec2Connection)
+    //commonModule->setEc2Connection(ec2Connection);
 
-    nx_http::HttpModManager httpModManager;
     QnSimpleHttpConnectionListener tcpListener(
+        m_commonModule.get(),
         QHostAddress::Any,
         settings.endpoint().port,
         QnTcpListener::DEFAULT_MAX_CONNECTIONS,
         true);
+
+    if (settings.isAuthDisabled())
+        tcpListener.disableAuth();
+
+    ec2ConnectionFactory->registerRestHandlers(tcpListener.processorPool());
+
     if (!tcpListener.bindToLocalAddress())
     {
-        appServerConnectionFactory.setEc2Connection(nullptr);
-        appServerConnectionFactory.setEC2ConnectionFactory(nullptr);
+        //Must call messageProcessor->init(ec2Connection)
+        //commonModule->setEc2Connection(nullptr);
+        //appServerConnectionFactory.setEC2ConnectionFactory(nullptr);
         return 1;
     }
 
@@ -279,34 +318,30 @@ int Appserver2Process::exec()
         m_tcpListener = &tcpListener;
     }
 
+    tcpListener.addHandler<QnMuduleInformationConnectionProcessor>("HTTP", "api/moduleInformation");
     tcpListener.addHandler<QnRestConnectionProcessor>("HTTP", "ec2");
+    ec2ConnectionFactory->registerTransactionListener(&tcpListener);
 
     tcpListener.start();
 
-    messageProcessor->init(QnAppServerConnectionFactory::getConnection2());
+    m_commonModule->messageProcessor()->init(ec2Connection);
+    m_ecConnection = ec2Connection.get();
     //ec2Connection->startReceivingNotifications();
 
     processStartResult = true;
     triggerOnStartedEventHandlerGuard.fire();
 
-    m_ecConnection = ec2Connection.get();
+    m_eventLoop.exec();
 
-    {
-        QnMutexLocker lk(&m_mutex);
-        while (!m_terminated)
-            m_cond.wait(lk.mutex());
-
-        m_tcpListener = nullptr;
-    }
-
+    m_tcpListener = nullptr;
     tcpListener.pleaseStop();
 
+    m_commonModule->moduleDiscoveryManager()->stop();
     ec2Connection->stopReceivingNotifications();
-    appServerConnectionFactory.setEc2Connection(nullptr);
-    appServerConnectionFactory.setEC2ConnectionFactory(nullptr);
-
-    m_ecConnection = nullptr;
+    //Must call messageProcessor->init(ec2Connection)
+    m_commonModule->messageProcessor()->init(nullptr);
     ec2Connection.reset();
+    m_ecConnection = nullptr;
 
     return 0;
 }
@@ -314,6 +349,11 @@ int Appserver2Process::exec()
 ec2::AbstractECConnection* Appserver2Process::ecConnection()
 {
     return m_ecConnection.load();
+}
+
+QnCommonModule* Appserver2Process::commonModule() const
+{
+    return m_commonModule.get();
 }
 
 SocketAddress Appserver2Process::endpoint() const
@@ -324,7 +364,6 @@ SocketAddress Appserver2Process::endpoint() const
         endpoint.address = HostAddress::localhost;
     return endpoint;
 }
-
 
 ////////////////////////////////////////////////////////////
 //// class Appserver2ProcessPublic
@@ -371,6 +410,11 @@ ec2::AbstractECConnection* Appserver2ProcessPublic::ecConnection()
 SocketAddress Appserver2ProcessPublic::endpoint() const
 {
     return m_impl->endpoint();
+}
+
+QnCommonModule* Appserver2ProcessPublic::commonModule() const
+{
+    return m_impl->commonModule();
 }
 
 }   // namespace ec2

@@ -6,6 +6,16 @@
 #include <utils/common/warnings.h>
 #include <utils/math/coordinate_transformations.h>
 
+namespace {
+
+enum class Projection
+{
+    Rectilinear,
+    Equirectangular
+};
+
+} // namespace
+
 QnViewportPtzController::QnViewportPtzController(const QnPtzControllerPtr &baseController):
     base_type(baseController)
 {
@@ -39,12 +49,12 @@ bool QnViewportPtzController::viewportMove(qreal aspectRatio, const QRectF &view
     /* Note that we don't care about getLimits result as default-constructed
      * limits is actually 'no limits'. */
     QnPtzLimits limits;
-    getLimits(Qn::LogicalPtzCoordinateSpace, &limits); 
+    getLimits(Qn::LogicalPtzCoordinateSpace, &limits);
 
     /* This is hacky. In theory projection should be a part of controller's interface. */
-    Qn::Projection projection = Qn::RectilinearProjection;
+    Projection projection = Projection::Rectilinear;
     if(limits.maxFov > 180.0 || qFuzzyCompare(limits.maxFov, 180.0))
-        projection = Qn::EquirectangularProjection;
+        projection = Projection::Equirectangular;
 
     /* Same here, we don't care about getFlip result. */
     Qt::Orientations flip = 0;
@@ -57,12 +67,13 @@ bool QnViewportPtzController::viewportMove(qreal aspectRatio, const QRectF &view
     QVector2D delta = QVector2D(viewport.center()) - QVector2D(0.5, 0.5);
     delta.setY(delta.y() / aspectRatio);
 
-    if(projection == Qn::RectilinearProjection) {
-        /* Viewport space to 3D conversion base. 
-         * 
+    if(projection == Projection::Rectilinear)
+    {
+        /* Viewport space to 3D conversion base.
+         *
          *     unit
          * <----------->
-         *     
+         *
          * +-----+-----+   ^
          *  \    |    /    |
          *   \   |   /     |
@@ -70,10 +81,10 @@ bool QnViewportPtzController::viewportMove(qreal aspectRatio, const QRectF &view
          *     \ | /       |
          *      \|/        |
          *       +         v
-         * 
+         *
          *      <->
          *      fov
-         *     angle   
+         *     angle
          */
         float unit = std::tan(qDegreesToRadians(oldPosition.z()) / 2.0) * 2.0;
 
@@ -90,7 +101,7 @@ bool QnViewportPtzController::viewportMove(qreal aspectRatio, const QRectF &view
         float newPan = qRadiansToDegrees(newSpherical.phi);
         float newTilt = qRadiansToDegrees(newSpherical.psi);
         QVector3D newPosition = qBound(QVector3D(newPan, newTilt, newFov), limits);
-    
+
         /* Send it to the camera. */
         return absoluteMove(Qn::LogicalPtzCoordinateSpace, newPosition, speed);
     } else {
@@ -99,7 +110,7 @@ bool QnViewportPtzController::viewportMove(qreal aspectRatio, const QRectF &view
         float newTilt = oldPosition.y() - oldPosition.z() * delta.y();
         float newFov = oldPosition.z() / zoom;
         QVector3D newPosition = qBound(QVector3D(newPan, newTilt, newFov), limits);
-    
+
         /* Send it to the camera. */
         return absoluteMove(Qn::LogicalPtzCoordinateSpace, newPosition, speed);
     }

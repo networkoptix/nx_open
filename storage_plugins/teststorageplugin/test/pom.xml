@@ -3,12 +3,12 @@
     <parent>
         <artifactId>storage_plugins</artifactId>
         <groupId>com.networkoptix.hdwitness</groupId>
-        <version>3.0.0-SNAPSHOT</version>
+        <version>3.1.0-SNAPSHOT</version>
         <relativePath>../..</relativePath>
     </parent>
 
     <groupId>com.networkoptix.hdwitness</groupId>
-    <version>3.0.0-SNAPSHOT</version>
+    <version>3.1.0-SNAPSHOT</version>
     <artifactId>teststorageplugin_test</artifactId>
     <packaging>pom</packaging>
     <name>Nx Test storage plugin test</name>	
@@ -21,7 +21,7 @@
         <linux.oslibs>-ldl -lteststorageplugin</linux.oslibs>
         <rdep.packages>gtest gmock</rdep.packages>
 
-        <windows.defines>WIN32_LEAN_AND_MEAN NOMINMAX _CRT_NON_CONFORMING_SWPRINTFS _CRT_SECURE_NO_WARNINGS _CRT_NONSTDC_NO_DEPRECATE</windows.defines>
+        <windows.defines>NOMINMAX _CRT_NON_CONFORMING_SWPRINTFS _CRT_SECURE_NO_WARNINGS _CRT_NONSTDC_NO_DEPRECATE</windows.defines>
         <additional.defines>NOLFS NOSSL STORAGE_EXPORTS</additional.defines>
         
         <root.dir>${basedir}/../../..</root.dir>

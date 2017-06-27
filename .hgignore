@@ -1,4 +1,5 @@
 syntax: glob
+
 ecs.db-shm
 ecs.db-wal
 *.swp
@@ -36,12 +37,18 @@ vms*.pro
 x86/*
 x64/*
 target/*
+target-edge1/*
+target-rpi/*
 target-bpi/*
+target-bananapi/*
+target-tx1/*
 packages.config
 .vs
+.vscode
 .git
 TAGS
 *.kdev4
+*/*.VC.db
 
 .DS_Store
 Debug
@@ -56,11 +63,13 @@ Release
 */arm-edge1/*
 */arm-rpi/*
 */arm-bpi/*
+*/arm-bananapi/*
 */arm-tx1/*
 */target/*
 */target-edge1/*
 */target-rpi/*
 */target-bpi/*
+*/target-bananapi/*
 */target-tx1/*
 
 android-build
@@ -91,6 +100,8 @@ mediaserver/src/server.pro
 mediaserver/src/*.vsp
 mediaserver/src/server.vcproj
 mediaserver/mediaserver.mak*
+
+nx_kit/src
 
 vmaxproxy/bin
 vmaxproxy/build
@@ -135,13 +146,14 @@ edge_firmware/isd/*.tar.gz
 
 cloud_portal/front_end/node_modules
 cloud_portal/front_end/app/styles/custom
-cloud_portal/front_end/dist 
+cloud_portal/front_end/dist
 cloud_portal/front_end/config.json
-cloud_portal/front_end/.tmp  
+cloud_portal/front_end/.tmp
 cloud_portal/front_end/.sass-cache
 cloud_portal/front_end/bower_components
 cloud_portal/front_end/test/visual
 cloud_portal/build_scripts/language_pack
+cloud_portal/build_scripts/stage
 cloud_portal/env
 cloud_portal/cloud/static
 .DS_Store
@@ -150,7 +162,7 @@ cloud_portal/cloud/static
 *.pid
 *.log
 
- 
+
 webadmin/node_modules
 webadmin/dist
 webadmin/static
@@ -187,7 +199,21 @@ customization/*.html
 .sources_cache
 plugins/acs/paxton-plugin/packages/*
 plugins/acs/paxton-plugin/CustomProperties.cs
+nx_cloud_deploy/*/stage
+nx_cloud_deploy/nxcloud_host_agent/docker/docker
+nx_cloud_deploy/nxcloud_host_agent/docker/docker-compose
+nx_cloud_deploy/nxcloud_host_agent/docker/docker-machine
+nx_cloud_deploy/nxcloud_host_agent/docker/kubectl
+nx_cloud_deploy/cloud_modules/vendor
+nx_cloud_deploy/cloud_modules/build
+nx_cloud_deploy/cloud_modules/.glide
+cmake_build/**
+
 syntax: regexp
 ^core$
 ^Makefile$
 ^app_process$
+
+nx_cloud/cloud_tests/monitoring/monitoring_simple.egg-info
+nx_cloud/cloud_tests/monitoring/env
+nx_cloud/cloud_tests/monitoring/dist

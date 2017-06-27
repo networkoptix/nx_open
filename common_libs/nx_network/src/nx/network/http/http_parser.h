@@ -1,41 +1,74 @@
 #pragma once 
 
-#include "httpstreamreader.h"
-#include "httptypes.h"
+#include "http_stream_reader.h"
+#include "http_types.h"
 #include "../buffer.h"
 #include "../connection_server/base_protocol_message_types.h"
 
 namespace nx_http {
 
 /**
- * This class is just a wrapper for use with \a nx_api::BaseStreamProtocolConnection class. 
+ * This class is just a wrapper on top of nx_http::HttpStreamReader 
+ * for use with nx::network::server::BaseStreamProtocolConnection class. 
  */
-class NX_NETWORK_API MessageParser
+class NX_NETWORK_API MessageParser:
+    public nx::network::server::AbstractMessageParser<Message>
 {
 public:
     MessageParser();
 
-    void setMessage( Message* const msg );
-    //!Returns current parse state
-    /*!
-        Methods returns if:\n
-            - end of message found
-            - source data depleted
+    virtual void setMessage(Message* const message) override;
+    /**
+     * Methods returns if:
+     *   - end of message found
+     *   - source data depleted
+     *
+     * @param bytesProcessed Number of bytes from buf which were read and parsed is stored here.
+     * Returns current parse state.
+     * NOTE: *buf MAY NOT contain whole message, but any part of it (it can be as little as 1 byte).
+     * NOTE: Reads whole message even if parse error occured.
+     */
+    virtual nx::network::server::ParserState parse(
+        const nx::Buffer& buf,
+        size_t* bytesProcessed) override;
 
-        \param buf
-        \param bytesProcessed Number of bytes from \a buf which were read and parsed is stored here
-        \note \a *buf MAY NOT contain whole message, but any part of it (it can be as little as 1 byte)
-        \note Reads whole message even if parse error occured
-    */
-    nx_api::ParserState parse( const nx::Buffer& buf, size_t* bytesProcessed );
-    nx_api::ParserState processEof();
+    virtual nx::Buffer fetchMessageBody() override;
 
-    //!Resets parse state and prepares for parsing different data
-    void reset();
+    /** Resets parse state and prepares for parsing different data. */
+    virtual void reset() override;
 
 private:
     HttpStreamReader m_httpStreamReader;
-    Message* m_msg;
+    Message* m_message = nullptr;
+    bool m_messageTaken = false;
+
+    void provideMessageIfNeeded();
 };
 
+//-------------------------------------------------------------------------------------------------
+
+namespace deprecated {
+
+/**
+ * This parser provides only whole message without providing message body on availability.
+ * Introduced for backward compatibility. 
+ * Should be removed and all usages refactored to use MessageParser.
+ */
+class NX_NETWORK_API MessageParser:
+    public nx::network::server::AbstractMessageParser<Message>
+{
+public:
+    virtual void setMessage(Message* const message) override;
+    virtual nx::network::server::ParserState parse(
+        const nx::Buffer& buffer,
+        size_t* bytesProcessed) override;
+
+    virtual void reset() override;
+
+private:
+    HttpStreamReader m_httpStreamReader;
+    Message* m_message = nullptr;
+};
+
+} // namespace deprecated
 } // namespace nx_http

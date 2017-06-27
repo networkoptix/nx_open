@@ -4,7 +4,7 @@
 
 #include <QtCore/QString>
 
-#include <utils/common/systemerror.h>
+#include <nx/utils/system_error.h>
 
 #include "../socket_common.h"
 

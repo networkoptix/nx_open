@@ -5,11 +5,13 @@
 #include <QtCore/QUrl>
 #include <QtCore/QUrlQuery>
 
-#include <common/common_globals.h>
-#include <utils/common/stoppable.h>
-#include <nx/network/http/asynchttpclient.h>
+#include <nx/fusion/serialization_format.h>
 #include <nx/fusion/serialization/json.h>
 #include <nx/fusion/serialization/lexical_functions.h>
+#include <nx/network/aio/basic_pollable.h>
+#include <nx/network/http/buffer_source.h>
+#include <nx/network/http/http_async_client.h>
+#include <nx/utils/move_only_func.h>
 
 namespace nx_http {
 namespace detail {
@@ -25,7 +27,7 @@ void serializeToUrl(const InputData& data, QUrl* const url)
 
 template<typename OutputData>
 void processHttpResponse(
-    std::function<void(SystemError::ErrorCode, const nx_http::Response*, OutputData)> handler,
+    nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode, const nx_http::Response*, OutputData)> handler,
     SystemError::ErrorCode errCode,
     const nx_http::Response* response,
     nx_http::BufferType msgBody)
@@ -52,104 +54,129 @@ void processHttpResponse(
     handler(SystemError::noError, response, std::move(outputData));
 }
 
-
 template<typename HandlerFunc>
-class BaseFusionDataHttpClient
-:
-    public QnStoppableAsync
+class BaseFusionDataHttpClient:
+    public nx::network::aio::BasicPollable
 {
+    using base_type = nx::network::aio::BasicPollable;
+    using self_type = BaseFusionDataHttpClient<HandlerFunc>;
+
 public:
-    BaseFusionDataHttpClient(QUrl url, AuthInfo auth)
-    :
-        m_url(std::move(url)),
-        m_httpClient(nx_http::AsyncHttpClient::create())
+    BaseFusionDataHttpClient(QUrl url, AuthInfo auth):
+        m_url(std::move(url))
     {
-        QObject::connect(
-            m_httpClient.get(), &nx_http::AsyncHttpClient::done,
-            m_httpClient.get(), [this](nx_http::AsyncHttpClientPtr client){ requestDone(client); },
-            Qt::DirectConnection);
-        m_httpClient->setAuth(auth);
+        m_httpClient.setAuth(auth);
+        bindToAioThread(getAioThread());
     }
 
-    virtual ~BaseFusionDataHttpClient() {}
+    virtual ~BaseFusionDataHttpClient() = default;
 
-    //!Implementation of QnStoppableAsync::pleaseStopAsync
-    virtual void pleaseStop(nx::utils::MoveOnlyFunc<void()> handler) override
+    virtual void bindToAioThread(nx::network::aio::AbstractAioThread* aioThread)
     {
-        m_httpClient->pleaseStopSync();
-        handler();
+        base_type::bindToAioThread(aioThread);
+        m_httpClient.bindToAioThread(aioThread);
     }
 
-    void execute(std::function<HandlerFunc> handler)
+    void execute(nx::utils::MoveOnlyFunc<HandlerFunc> handler)
     {
         m_handler = std::move(handler);
+        addRequestBody();
+        auto completionHandler = std::bind(&self_type::requestDone, this, &m_httpClient);
+
         if (m_requestContentType.isEmpty())
-        {
-            m_httpClient->doGet(m_url);
-        }
+            m_httpClient.doGet(m_url, std::move(completionHandler));
         else
-        {
-            decltype(m_requestBody) requestBody;
-            requestBody.swap(m_requestBody);
-            m_httpClient->doPost(m_url, m_requestContentType, std::move(requestBody));
-        }
+            m_httpClient.doPost(m_url, std::move(completionHandler));
+    }
+
+    void executeUpgrade(
+        const nx_http::StringType& protocolToUpgradeConnectionTo,
+        nx::utils::MoveOnlyFunc<HandlerFunc> handler)
+    {
+        m_handler = std::move(handler);
+        addRequestBody();
+
+        m_httpClient.doUpgrade(
+            m_url,
+            protocolToUpgradeConnectionTo,
+            std::bind(&self_type::requestDone, this, &m_httpClient));
     }
 
     void setRequestTimeout(std::chrono::milliseconds timeout)
     {
-        m_httpClient->setSendTimeoutMs(timeout.count());
-        m_httpClient->setResponseReadTimeoutMs(timeout.count());
-        m_httpClient->setMessageBodyReadTimeoutMs(timeout.count());
+        m_httpClient.setSendTimeout(timeout);
+        m_httpClient.setResponseReadTimeout(timeout);
+        m_httpClient.setMessageBodyReadTimeout(timeout);
+    }
+
+    std::unique_ptr<AbstractStreamSocket> takeSocket()
+    {
+        return m_httpClient.takeSocket();
     }
 
 protected:
     QUrl m_url;
     nx_http::StringType m_requestContentType;
     nx_http::BufferType m_requestBody;
-    std::function<HandlerFunc> m_handler;
+    nx::utils::MoveOnlyFunc<HandlerFunc> m_handler;
 
-    virtual void requestDone(nx_http::AsyncHttpClientPtr client) = 0;
+    virtual void requestDone(nx_http::AsyncClient* client) = 0;
 
 private:
-    nx_http::AsyncHttpClientPtr m_httpClient;
+    nx_http::AsyncClient m_httpClient;
+
+    virtual void stopWhileInAioThread() override
+    {
+        m_httpClient.pleaseStopSync();
+    }
+
+    void addRequestBody()
+    {
+        decltype(m_requestBody) requestBody;
+        requestBody.swap(m_requestBody);
+
+        m_httpClient.setRequestBody(
+            std::make_unique<nx_http::BufferSource>(
+                m_requestContentType,
+                std::move(requestBody)));
+    }
 };
 
 } // namespace detail
 
-//!HTTP client that uses \a fusion to serialize/deserialize input/output data
-/*!
-    If output data is expected, then only GET request can be used.
-    Input data in this case is serialized to the url by calling \a serializeToUrlQuery(InputData, QUrlQuery*).
-    \note Reports \a SystemError::invalidData on failure to parse response
-*/
+/**
+ * HTTP client that uses fusion to serialize/deserialize input/output data.
+ * If output data is expected, then only GET request can be used.
+ * Input data in this case is serialized to the url by calling serializeToUrlQuery(InputData, QUrlQuery*).
+ * @note Reports SystemError::invalidData on failure to parse response.
+ */
 template<typename InputData, typename OutputData>
-class FusionDataHttpClient
-:
+class FusionDataHttpClient:
     public detail::BaseFusionDataHttpClient<
         void(SystemError::ErrorCode, const nx_http::Response*, OutputData)>
 {
-    typedef detail::BaseFusionDataHttpClient<
-        void(SystemError::ErrorCode, const nx_http::Response*, OutputData)> ParentType;
+    using base_type =
+        detail::BaseFusionDataHttpClient<
+            void(SystemError::ErrorCode, const nx_http::Response*, OutputData)>;
 
 public:
-    /*!
-        TODO #ak if response Content-Type is multipart, then \a handler is invoked for every body part
-    */
+    /**
+     * TODO: #ak If response Content-Type is multipart, then handler is invoked for every body part.
+     */
     FusionDataHttpClient(
         QUrl url,
         AuthInfo auth,
         const InputData& input)
-    :
-        ParentType(std::move(url), std::move(auth))
+        :
+        base_type(std::move(url), std::move(auth))
     {
         this->m_requestBody = QJson::serialized(input);
         this->m_requestContentType =
             Qn::serializationFormatToHttpContentType(Qn::JsonFormat);
-        //detail::serializeToUrl(input, &this->m_url);
     }
 
 private:
-    virtual void requestDone(nx_http::AsyncHttpClientPtr client) override
+    virtual void requestDone(nx_http::AsyncClient* client) override
     {
         decltype(this->m_handler) handler;
         handler.swap(this->m_handler);
@@ -161,10 +188,11 @@ private:
     }
 };
 
-//!Specialization for void input data
+/**
+ * Specialization for void input data.
+ */
 template<typename OutputData>
-class FusionDataHttpClient<void, OutputData>
-:
+class FusionDataHttpClient<void, OutputData>:
     public detail::BaseFusionDataHttpClient<
         void(SystemError::ErrorCode, const nx_http::Response*, OutputData)>
 {
@@ -172,14 +200,13 @@ class FusionDataHttpClient<void, OutputData>
         void(SystemError::ErrorCode, const nx_http::Response*, OutputData)> ParentType;
 
 public:
-    FusionDataHttpClient(QUrl url, AuthInfo auth)
-    :
+    FusionDataHttpClient(QUrl url, AuthInfo auth):
         ParentType(std::move(url), std::move(auth))
     {
     }
 
 private:
-    virtual void requestDone(nx_http::AsyncHttpClientPtr client) override
+    virtual void requestDone(nx_http::AsyncClient* client) override
     {
         decltype(this->m_handler) handler;
         handler.swap(this->m_handler);
@@ -191,10 +218,11 @@ private:
     }
 };
 
-//!Specialization for void output data
+/** 
+ * Specialization for void output data.
+ */
 template<typename InputData>
-class FusionDataHttpClient<InputData, void>
-:
+class FusionDataHttpClient<InputData, void>:
     public detail::BaseFusionDataHttpClient<
         void(SystemError::ErrorCode, const nx_http::Response*)>
 {
@@ -206,17 +234,16 @@ public:
         QUrl url,
         AuthInfo auth,
         const InputData& input)
-    :
+        :
         ParentType(std::move(url), std::move(auth))
     {
         this->m_requestBody = QJson::serialized(input);
         this->m_requestContentType =
             Qn::serializationFormatToHttpContentType(Qn::JsonFormat);
-        //detail::serializeToUrl(input, &m_url);
     }
 
 private:
-    virtual void requestDone(nx_http::AsyncHttpClientPtr client) override
+    virtual void requestDone(nx_http::AsyncClient* client) override
     {
         decltype(this->m_handler) handler;
         handler.swap(this->m_handler);
@@ -226,10 +253,11 @@ private:
     }
 };
 
-//!Specialization for both input & output data void
+/**
+ * Specialization for both input & output data void.
+ */
 template<>
-class FusionDataHttpClient<void, void>
-:
+class FusionDataHttpClient<void, void>:
     public detail::BaseFusionDataHttpClient<
         void(SystemError::ErrorCode, const nx_http::Response*)>
 {
@@ -237,14 +265,13 @@ class FusionDataHttpClient<void, void>
         void(SystemError::ErrorCode, const nx_http::Response*)> ParentType;
 
 public:
-    FusionDataHttpClient(QUrl url, AuthInfo auth)
-    :
+    FusionDataHttpClient(QUrl url, AuthInfo auth):
         ParentType(std::move(url), std::move(auth))
     {
     }
 
 private:
-    virtual void requestDone(nx_http::AsyncHttpClientPtr client) override
+    virtual void requestDone(nx_http::AsyncClient* client) override
     {
         decltype(this->m_handler) handler;
         handler.swap(this->m_handler);

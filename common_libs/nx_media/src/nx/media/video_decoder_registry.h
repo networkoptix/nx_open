@@ -98,7 +98,7 @@ private:
             this->allocator = std::move(allocator);
             this->maxUseCount = maxUseCount;
             typeIndex = std::type_index(typeid(Decoder));
-            name = NX_TYPE_NAME(typeid(Decoder));
+            name = ::toString(typeid(Decoder));
         }
     };
 

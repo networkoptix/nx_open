@@ -8,7 +8,7 @@
 #include <QtCore/QScopedPointer>
 #include <QtCore/QUrlQuery>
 
-#include <nx/network/http/httptypes.h>
+#include <nx/network/http/http_types.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/std/future.h>
 
@@ -18,16 +18,17 @@
 #include "common/common_module.h"
 #include "app_server_connection.h"
 #include <api/network_proxy_factory.h>
-#include <http/custom_headers.h>
+#include <nx/network/http/custom_headers.h>
 #include "http_client_pool.h"
+#include <nx_ec/ec_api.h>
 
 // -------------------------------------------------------------------------- //
 // QnSessionManager
 // -------------------------------------------------------------------------- //
 
-QnSessionManager::QnSessionManager(QObject *parent)
-:
-    QObject(parent)
+QnSessionManager::QnSessionManager(QObject* parent):
+    QObject(parent),
+    QnCommonModuleAware(parent)
 {
     qRegisterMetaType<AsyncRequestInfo>();
 
@@ -49,12 +50,6 @@ QnSessionManager::~QnSessionManager()
     auto httpPool = nx_http::ClientPool::instance();
     for (auto& httpClientAndRequestInfo : requestInProgress)
         httpPool->terminate(httpClientAndRequestInfo.first);
-}
-
-QnSessionManager *QnSessionManager::instance()
-{
-    NX_ASSERT(qnCommon->instance<QnSessionManager>(), Q_FUNC_INFO, "Make sure session manager exists");
-    return qnCommon->instance<QnSessionManager>();
 }
 
 void QnSessionManager::start()
@@ -119,7 +114,7 @@ int QnSessionManager::sendSyncGetRequest(const QUrl& url, const QString &objectN
 }
 
 int QnSessionManager::sendSyncGetRequest(const QUrl& url, const QString &objectName, nx_http::HttpHeaders headers, const QnRequestParamList &params, QnHTTPRawResponse& response) {
-    return sendSyncRequest(nx_http::Method::GET, url, objectName, std::move(headers), params, QByteArray(), response);
+    return sendSyncRequest(nx_http::Method::Get, url, objectName, std::move(headers), params, QByteArray(), response);
 }
 
 int QnSessionManager::sendSyncPostRequest(const QUrl& url, const QString &objectName, QByteArray msgBody, QnHTTPRawResponse& response) {
@@ -127,7 +122,7 @@ int QnSessionManager::sendSyncPostRequest(const QUrl& url, const QString &object
 }
 
 int QnSessionManager::sendSyncPostRequest(const QUrl& url, const QString &objectName, nx_http::HttpHeaders headers, const QnRequestParamList &params, QByteArray msgBody, QnHTTPRawResponse& response) {
-    return sendSyncRequest(nx_http::Method::POST, url, objectName, std::move(headers), params, std::move(msgBody), response);
+    return sendSyncRequest(nx_http::Method::Post, url, objectName, std::move(headers), params, std::move(msgBody), response);
 }
 
 
@@ -176,7 +171,7 @@ int QnSessionManager::sendAsyncGetRequest(const QUrl& url, const QString &object
 
 int QnSessionManager::sendAsyncGetRequest(const QUrl& url, const QString &objectName, nx_http::HttpHeaders headers, const QnRequestParamList &params, QObject *target, const char *slot, Qt::ConnectionType connectionType)
 {
-    return sendAsyncRequest(nx_http::Method::GET, url, objectName, std::move(headers), params, QByteArray(), target, slot, connectionType);
+    return sendAsyncRequest(nx_http::Method::Get, url, objectName, std::move(headers), params, QByteArray(), target, slot, connectionType);
 }
 
 int QnSessionManager::sendAsyncPostRequest(const QUrl& url, const QString &objectName, QByteArray msgBody, QObject *target, const char *slot, Qt::ConnectionType connectionType) {
@@ -186,7 +181,7 @@ int QnSessionManager::sendAsyncPostRequest(const QUrl& url, const QString &objec
 int QnSessionManager::sendAsyncPostRequest(const QUrl& url, const QString &objectName, nx_http::HttpHeaders headers, const QnRequestParamList &params, QByteArray msgBody, QObject *target,
                                            const char *slot, Qt::ConnectionType connectionType)
 {
-    return sendAsyncRequest(nx_http::Method::POST, url, objectName, std::move(headers), params, std::move(msgBody), target, slot, connectionType);
+    return sendAsyncRequest(nx_http::Method::Post, url, objectName, std::move(headers), params, std::move(msgBody), target, slot, connectionType);
 }
 
 
@@ -239,15 +234,23 @@ int QnSessionManager::sendAsyncRequest(
         }
     }
 
-    if (method != nx_http::Method::GET &&
-        method != nx_http::Method::POST)
+    if (method != nx_http::Method::Get &&
+        method != nx_http::Method::Post)
     {
         NX_ASSERT(false, Q_FUNC_INFO,
             lit("Unknown HTTP operation '%1'.").arg(QString::fromLatin1(method)));
         return -1;
     }
 
-    const auto appServerUrl = QnAppServerConnectionFactory::url();
+    const auto& connection = commonModule()->ec2Connection();
+    if (!connection)
+    {
+        NX_ASSERT(false, Q_FUNC_INFO,
+            lit("Not connected to ec2 database."));
+        return -1;
+    }
+
+    const QUrl appServerUrl = connection->connectionInfo().ecUrl;
     auto requestUrl = createApiUrl(url, objectName, params);
     requestUrl.setUserName(_url.userName().isEmpty() ? appServerUrl.userName() : _url.userName());
     requestUrl.setPassword(_url.password().isEmpty() ? appServerUrl.password() : _url.password());
@@ -258,7 +261,7 @@ int QnSessionManager::sendAsyncRequest(
         nx_http::getHeaderValue(headers, nx_http::header::kContentType);
     headers.emplace(Qn::CUSTOM_CHANGE_REALM_HEADER_NAME, QByteArray());
 
-    if (method == nx_http::Method::GET)
+    if (method == nx_http::Method::Get)
         requestInfo.handle = httpPool->doGet(requestUrl, std::move(headers));
     else
         requestInfo.handle = httpPool->doPost(requestUrl, msgBodyContentType, msgBody, std::move(headers));

@@ -13,6 +13,7 @@
 #include <nx/utils/uuid.h>
 #include <nx/utils/singleton.h>
 #include "server/server_globals.h"
+#include <common/common_module_aware.h>
 
 class QnTimePeriod;
 
@@ -24,12 +25,13 @@ namespace pb {
 /** Per-server database. Stores event log, audit data and bookmarks. */
 class QnServerDb :
     public QObject,
+    public QnCommonModuleAware,
     public QnDbHelper,
     public Singleton<QnServerDb>
 {
     Q_OBJECT
 public:
-    QnServerDb();
+    QnServerDb(QnCommonModule* commonModule);
 
     virtual QnDbTransaction* getTransaction() override;
 

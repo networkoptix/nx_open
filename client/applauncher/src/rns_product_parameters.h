@@ -6,7 +6,7 @@
 #ifndef RNS_PRODUCT_PARAMETERS_H
 #define RNS_PRODUCT_PARAMETERS_H
 
-#include <plugins/videodecoder/stree/resourcenameset.h>
+#include <nx/utils/stree/resourcenameset.h>
 
 
 namespace ProductParameters
@@ -33,7 +33,7 @@ namespace ProductParameters
 
 class ProductResourcesNameset
 :
-    public stree::ResourceNameSet
+    public nx::utils::stree::ResourceNameSet
 {
 public:
     ProductResourcesNameset();

@@ -1,7 +1,7 @@
 #ifdef ENABLE_ARECONT
 
 #include <nx/utils/log/log.h>
-#include <nx/network/http/httptypes.h>
+#include <nx/network/http/http_types.h>
 
 #include "../dataprovider/av_rtsp_stream_reader.h"
 #include "../dataprovider/panoramic_cpul_tftp_dataprovider.h"
@@ -10,7 +10,8 @@
 #include "av_resource.h"
 #include "av_panoramic.h"
 #include "core/resource_management/resource_properties.h"
-
+#include "core/resource/resource.h"
+#include <common/common_module.h>
 
 #define MAX_RESPONSE_LEN (4*1024)
 
@@ -161,12 +162,11 @@ void QnArecontPanoramicResource::updateFlipState()
         m_customVideoLayout->setChannels(channels);
     }
 
-    QString oldVideoLayout = propertyDictionary->value(getId(), Qn::VIDEO_LAYOUT_PARAM_NAME); // get from kvpairs directly. do not read default value from resourceTypes
+    QString oldVideoLayout = commonModule()->propertyDictionary()->value(getId(), Qn::VIDEO_LAYOUT_PARAM_NAME); // get from kvpairs directly. do not read default value from resourceTypes
     QString newVideoLayout = m_customVideoLayout->toString();
-    if (newVideoLayout != oldVideoLayout)
-    {
-        propertyDictionary->setValue(getId(), Qn::VIDEO_LAYOUT_PARAM_NAME, newVideoLayout);
-        propertyDictionary->saveParams(getId());
+    if (newVideoLayout != oldVideoLayout) {
+        commonModule()->propertyDictionary()->setValue(getId(), Qn::VIDEO_LAYOUT_PARAM_NAME, newVideoLayout);
+        commonModule()->propertyDictionary()->saveParams(getId());
     }
 }
 

@@ -3,6 +3,8 @@
 #include <QtCore/QObject>
 #include <QtCore/QElapsedTimer>
 
+#include <client_core/connection_context_aware.h>
+
 #include <core/resource/resource_fwd.h>
 #include <api/helpers/thumbnail_request_data.h>
 #include <utils/common/id.h>
@@ -10,7 +12,10 @@
 #include <nx/utils/thread/mutex.h>
 #include <camera/thumbnail_cache_base.h>
 
-class QnCameraThumbnailCache : public QObject, public QnThumbnailCacheBase, public Singleton<QnCameraThumbnailCache>
+class QnCameraThumbnailCache : public QObject,
+    public QnThumbnailCacheBase,
+    public Singleton<QnCameraThumbnailCache>,
+    public QnConnectionContextAware
 {
     Q_OBJECT
 

@@ -242,7 +242,7 @@ void StandaloneTimerManager::joinAndDeleteTimer(const TimerId& timerID)
         //    There is no sense to wait task completion
     }
 
-    //since mutex is locked and m_runningTaskID != timerID, 
+    //since mutex is locked and m_runningTaskID != timerID,
     //    timer handler is not running at the moment
     deleteTaskNonSafe(lk, timerID);
 }
@@ -258,7 +258,9 @@ void StandaloneTimerManager::run()
 
     while (!m_terminated)
     {
-        boost::optional<std::chrono::milliseconds> timeToWait;
+        boost::optional<std::chrono::milliseconds> timeToWait(
+            std::chrono::milliseconds::zero());
+        timeToWait.reset();
 
         try
         {
@@ -275,8 +277,6 @@ void StandaloneTimerManager::run()
                 const TimerId timerID = taskIter->first.second;
                 auto taskContext = std::move(taskIter->second);
 
-                m_taskToTime.erase(timerID);
-                m_timeToTask.erase(taskIter);
                 m_runningTaskID = timerID;
 
                 {
@@ -288,12 +288,18 @@ void StandaloneTimerManager::run()
                     NX_LOGX(lm("Done task %1").arg(timerID), cl_logDEBUG2);
                 }
 
-                if (!taskContext.singleShot)
-                    addTaskNonSafe(
-                        lk,
-                        timerID,
-                        std::move(taskContext),
-                        taskContext.repeatPeriod);
+                if (m_taskToTime.find(timerID) != m_taskToTime.cend())
+                {
+                    m_taskToTime.erase(timerID);
+                    m_timeToTask.erase(taskIter);
+
+                    if (!taskContext.singleShot)
+                        addTaskNonSafe(
+                            lk,
+                            timerID,
+                            std::move(taskContext),
+                            taskContext.repeatPeriod);
+                }
 
                 m_runningTaskID = 0;
                 m_cond.wakeAll();    //notifying threads, waiting on joinAndDeleteTimer
@@ -411,7 +417,7 @@ std::chrono::milliseconds parseTimerDuration(
     const auto toUInt =
         [&](int suffixLen) -> qulonglong
         {
-            const auto& stringWithoutSuffix = 
+            const auto& stringWithoutSuffix =
                 suffixLen
                 ? duration.left(duration.length() - suffixLen)
                 : duration;

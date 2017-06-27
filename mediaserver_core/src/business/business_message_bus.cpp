@@ -7,18 +7,10 @@
 #include <nx_ec/data/api_business_rule_data.h>
 #include <nx_ec/data/api_conversion_functions.h>
 #include "api/app_server_connection.h"
+#include <common/common_module.h>
 
-Q_GLOBAL_STATIC(QnBusinessMessageBus, QnBusinessMessageBus_instance)
-
-QnBusinessMessageBus* QnBusinessMessageBus::instance()
-{
-    QnBusinessMessageBus* _instance = QnBusinessMessageBus_instance();
-    if( !_instance->isRunning() )
-        _instance->start();
-    return _instance;
-}
-
-QnBusinessMessageBus::QnBusinessMessageBus()
+QnBusinessMessageBus::QnBusinessMessageBus(QnCommonModule* commonModule):
+    QnCommonModuleAware(commonModule)
 {
 }
 
@@ -43,7 +35,7 @@ int QnBusinessMessageBus::deliveryBusinessEvent(QnAbstractBusinessEventPtr bEven
 
 int QnBusinessMessageBus::deliveryBusinessAction(const QnAbstractBusinessActionPtr &bAction, const QnUuid& dstPeer)
 {
-    ec2::AbstractECConnectionPtr ec2Connection = QnAppServerConnectionFactory::getConnection2();
+    ec2::AbstractECConnectionPtr ec2Connection = commonModule()->ec2Connection();
     int handle = ec2Connection->getBusinessEventManager(Qn::kSystemAccess)->sendBusinessAction(bAction, dstPeer, this, &QnBusinessMessageBus::at_DeliveryBusinessActionFinished);
 
     QnMutexLocker lock(&m_mutex);

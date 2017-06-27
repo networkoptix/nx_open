@@ -15,7 +15,10 @@
 
 #include <nx/utils/thread/mutex.h>
 #include <nx/utils/thread/wait_condition.h>
+#include <common/common_module_aware.h>
 
+class QnCommonMessageProcessor;
+class QnCommonMessageProcessor;
 
 /**
  *  Class for maintaining camera history - what server contains which part of the camera archive.
@@ -35,11 +38,12 @@
  *  All methods that require camera history to operate are non-reliable.
  *
  */
-class QnCameraHistoryPool: public QObject, public Singleton<QnCameraHistoryPool> {
+class QnCameraHistoryPool: public QObject, public QnCommonModuleAware
+{
     Q_OBJECT
 
 public:
-    QnCameraHistoryPool(QObject *parent = NULL);
+    QnCameraHistoryPool(QObject* parent = nullptr);
     virtual ~QnCameraHistoryPool();
 
     /** Reset information about camera footage presence on different servers. */
@@ -130,6 +134,7 @@ public:
         const ec2::ApiCameraHistoryItemDataList& historyDetails);
 
     void setHistoryCheckDelay(int value);
+    void setMessageProcessor(const QnCommonMessageProcessor* messageProcessor);
 signals:
     /**
      * \brief                       Notify that camera footage is changed - a server was added or removed or changed its status.
@@ -187,9 +192,7 @@ private:
     mutable QnMutex m_syncLoadMutex;
     QnWaitCondition m_syncLoadWaitCond;
     QSet<QnUuid> m_camerasToCheck;
+    const QnCommonMessageProcessor* m_messageProcessor = nullptr;
 };
-
-
-#define qnCameraHistoryPool (QnCameraHistoryPool::instance())
 
 #endif // QN_CAMERA_HISTORY_H

@@ -14,6 +14,7 @@
 #include "rest/server/rest_connection_processor.h"
 #include "core/resource_management/resource_pool.h"
 #include "core/resource/user_resource.h"
+#include <common/static_common_module.h>
 
 int QnUpdateRestHandler::executeGet(const QString &path, const QnRequestParams &params, QnJsonRestResult &result, const QnRestConnectionProcessor *processor)
 {
@@ -29,7 +30,7 @@ int QnUpdateRestHandler::executePost(
 {
     Q_UNUSED(path)
 
-    bool remotePeerHasAdminRights = qnResourceAccessManager->hasGlobalPermission(
+    bool remotePeerHasAdminRights = processor->resourceAccessManager()->hasGlobalPermission(
         processor->accessRights(),
         Qn::GlobalAdminPermission);
 
@@ -72,13 +73,13 @@ int QnUpdateRestHandler::executePost(
     {
         QBuffer buffer(const_cast<QByteArray*>(&body)); // we're going to read data, so const_cast is safe
         if (!verifyUpdatePackage(&buffer, &version, &sysInfo)) {
-            cl_log.log("An upload has been received but not veryfied", cl_logWARNING);
+            NX_WARNING(this, "An upload has been received but not veryfied");
             result.setError(QnJsonRestResult::CantProcessRequest, lit("INVALID_FILE"));
             return nx_http::StatusCode::ok;
         }
     }
 
-    if (version == qnCommon->engineVersion()) {
+    if (version == qnStaticCommon->engineVersion()) {
         result.setError(QnJsonRestResult::NoError, lit("UP_TO_DATE"));
         return nx_http::StatusCode::ok;
     }

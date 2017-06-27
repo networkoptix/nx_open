@@ -14,12 +14,11 @@
 
 
 //!Provides externally-supplied QIODevice as resource
-class QnExtIODeviceStorageResource
-:
-    public QnStorageResource
+class QnExtIODeviceStorageResource: public QnStorageResource
 {
+    using base_type = QnStorageResource;
 public:
-    QnExtIODeviceStorageResource();
+    QnExtIODeviceStorageResource(QnCommonModule* commonModule);
     /*!
         Destroys any registered data
     */

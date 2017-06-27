@@ -10,7 +10,7 @@ class QnStardotResourceSearcher : public QnAbstractNetworkResourceSearcher
 {
 
 public:
-    QnStardotResourceSearcher();
+    QnStardotResourceSearcher(QnCommonModule* commonModule);
 
     virtual QnResourcePtr createResource(const QnUuid &resourceTypeId, const QnResourceParams& params) override;
 

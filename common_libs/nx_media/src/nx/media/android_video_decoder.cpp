@@ -3,6 +3,8 @@
 
 #include <deque>
 
+#include <QtCore/QElapsedTimer>
+
 #include <QtGui/QOpenGLContext>
 #include <QtGui/QOpenGLFunctions>
 #include <QtGui/QOpenGLShaderProgram>
@@ -17,7 +19,6 @@
 #include <nx/utils/thread/mutex.h>
 #include <utils/media/h264_utils.h>
 #include <nx/utils/log/log.h>
-#include <nx/utils/debug_utils.h>
 
 #include <QAndroidJniObject>
 #include <QAndroidJniEnvironment>
@@ -36,8 +37,8 @@ static const qint64 kDecodeOneFrameTimeout = 1000 * 33;
 static const int kNoInputBuffers = -7;
 static const int kCodecFailed = -8;
 
-// some decoders may have not input buffers left because of long decoding time
-// We will try to skip single output frame to clear space in input buffers
+// Some decoders may have no input buffers left because of long decoding time.
+// We will try to skip single output frame to clear space in input buffers.
 static const int kDequeueInputBufferRetyrCounter = 3;
 
 static const GLfloat g_vertex_data[] = {
@@ -80,9 +81,8 @@ static QString codecToString(AVCodecID codecId)
 }
 
 static void fillInputBuffer(
-    JNIEnv *env, jobject thiz, jobject buffer, jlong srcDataPtr, jint dataSize, jint capacity)
+    JNIEnv *env, jobject /*thiz*/, jobject buffer, jlong srcDataPtr, jint dataSize, jint capacity)
 {
-    Q_UNUSED(thiz);
     void* bytes = env->GetDirectBufferAddress(buffer);
     void* srcData = (void*) srcDataPtr;
     if (capacity < dataSize)
@@ -343,7 +343,7 @@ FboPtr AndroidVideoDecoderPrivate::renderFrameToFbo()
 
     if (threadGlCtx)
     {
-        // we used decoder thread to render. flush everythink to the texture
+        // We used decoder thread to render. Flush everything to the texture.
         glFlush();
         glFinish();
     }
@@ -402,7 +402,8 @@ void AndroidVideoDecoderPrivate::createGlResources()
     }
 }
 
-// ---------------------- AndroidVideoDecoder ----------------------
+//-------------------------------------------------------------------------------------------------
+// AndroidVideoDecoder
 
 AndroidVideoDecoder::AndroidVideoDecoder(
     const ResourceAllocatorPtr& allocator, const QSize& /*resolution*/)
@@ -432,7 +433,7 @@ AndroidVideoDecoder::AndroidVideoDecoder(
                 d->threadGlCtx.reset();
             }
         }
-    #endif // defined(USE_SHARED_CTX) && !defined(USE_GUI_RENDERING)
+    #endif
 }
 
 AndroidVideoDecoder::~AndroidVideoDecoder()
@@ -455,8 +456,6 @@ void AndroidVideoDecoderPrivate::addMaxResolutionIfNeeded(const AVCodecID codec)
             "maxDecoderWidth", "(Ljava/lang/String;)I", jCodecName.object<jstring>());
         jint maxHeight = javaDecoder.callMethod<jint>(
             "maxDecoderHeight", "(Ljava/lang/String;)I", jCodecName.object<jstring>());
-        NX_LOG(lm("Maximum hardware decoder resolution: (%1, %2) for codec %3")
-            .arg(maxWidth).arg(maxHeight).arg(codecMimeType), cl_logWARNING);
         const QSize maxSize{maxWidth, maxHeight};
         if (maxSize.isEmpty())
         {
@@ -466,8 +465,8 @@ void AndroidVideoDecoderPrivate::addMaxResolutionIfNeeded(const AVCodecID codec)
         }
         else
         {
-            NX_LOG(lm("Maximum hardware decoder resolution: (%1, %2) for codec %3")
-                .arg(maxSize.width()).arg(maxSize.height()).arg(codecMimeType), cl_logWARNING);
+            NX_LOG(lm("Maximum hardware decoder resolution: %1 for codec %2")
+                .arg(maxSize).arg(codecMimeType), cl_logWARNING);
             maxResolutions[codec] = maxSize;
         }
     }
@@ -485,10 +484,8 @@ bool AndroidVideoDecoder::isCompatible(const AVCodecID codec, const QSize& resol
 
     if (resolution.width() > maxSize.width() || resolution.height() > maxSize.height())
     {
-        NX_LOG(lm("Codec for %1 is not compatible with resolution (%2, %3) because max is (%4, %5)")
-            .arg(codecToString(codec))
-            .arg(resolution.width()).arg(resolution.height())
-            .arg(maxSize.width()).arg(maxSize.height()), cl_logWARNING);
+        NX_LOG(lm("Codec for %1 is not compatible with resolution %2 because max is %3")
+            .arg(codecToString(codec)).arg(resolution).arg(maxSize), cl_logWARNING);
         return false;
     }
 
@@ -516,7 +513,7 @@ int AndroidVideoDecoder::decode(const QnConstCompressedVideoDataPtr& frame, QVid
         if (d->frameSize.isEmpty())
             d->frameSize = nx::media::AbstractVideoDecoder::mediaSizeFromRawData(frame);
         if (d->frameSize.isEmpty())
-            return 0; //< wait for I frame to be able to extract data from binary stream
+            return 0; //< Wait for I frame to be able to extract data from the binary stream.
 
         QString codecName = codecToString(frame->compressionType);
         QAndroidJniObject jCodecName = QAndroidJniObject::fromString(codecName);
@@ -535,8 +532,9 @@ int AndroidVideoDecoder::decode(const QnConstCompressedVideoDataPtr& frame, QVid
     {
         if (frame)
         {
-            ++d->frameNumber; //< put input frames in range [1..N]
-            d->frameNumToPtsCache.push_back(AndroidVideoDecoderPrivate::PtsData(d->frameNumber, frame->timestamp));
+            ++d->frameNumber; //< Put input frames in range [1..N].
+            d->frameNumToPtsCache.push_back(
+                AndroidVideoDecoderPrivate::PtsData(d->frameNumber, frame->timestamp));
             outFrameNum = d->javaDecoder.callMethod<jlong>(
                 "decodeFrame", "(JIJ)J",
                 (jlong) frame->data(),
@@ -544,8 +542,11 @@ int AndroidVideoDecoder::decode(const QnConstCompressedVideoDataPtr& frame, QVid
                 (jlong) d->frameNumber);
             if (outFrameNum == kNoInputBuffers)
             {
-                if (d->javaDecoder.callMethod<jlong>("flushFrame", "(J)J", (jlong) kDecodeOneFrameTimeout) <= 0)
+                if (d->javaDecoder.callMethod<jlong>(
+                    "flushFrame", "(J)J", (jlong) kDecodeOneFrameTimeout) <= 0)
+                {
                     break;
+                }
             }
             else if (outFrameNum == kCodecFailed)
             {
@@ -565,7 +566,7 @@ int AndroidVideoDecoder::decode(const QnConstCompressedVideoDataPtr& frame, QVid
 
     auto time1 = tm.elapsed();
 
-    // got frame
+    // Got a frame.
 
     FboPtr fboToRender;
     #if !defined(USE_GUI_RENDERING)
@@ -582,7 +583,7 @@ int AndroidVideoDecoder::decode(const QnConstCompressedVideoDataPtr& frame, QVid
                 },
                 nullptr);
         }
-    #endif // USE_GUI_RENDERING
+    #endif
 
     //NX_LOG(lit("--got frame num %1 decode time1=%2 time2=%3").arg(outFrameNum).arg(time1).arg(tm.elapsed()), cl_logINFO);
 

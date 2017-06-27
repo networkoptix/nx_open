@@ -8,12 +8,12 @@
 #include <gtest/gtest.h>
 #include <gmock/gmock.h>
 
-#include <nx/utils/uuid.h>
+#include <nx/utils/scope_guard.h>
 #include <nx/utils/test_support/utils.h>
 #include <nx/utils/thread/sync_queue.h>
+#include <nx/utils/uuid.h>
 
-#include <utils/common/guard.h>
-#include <utils/common/sync_call.h>
+#include <nx/utils/sync_call.h>
 
 #include <server/hole_punching_processor.h>
 #include <settings.h>
@@ -43,7 +43,30 @@ public:
         {
             NX_GTEST_ASSERT_TRUE(startAndWaitUntilStarted());
         }
+
+        m_system = addRandomSystem();
     }
+
+    ~FtHolePunchingProcessor()
+    {
+        if (m_udpClient)
+            m_udpClient->pleaseStopSync();
+    }
+
+protected:
+    void reinitializeUdpClient()
+    {
+        m_udpClient = std::make_unique<nx::hpm::api::MediatorClientUdpConnection>(stunEndpoint());
+    }
+
+    void resetUdpClient()
+    {
+        m_udpClient->pleaseStopSync();
+        m_udpClient.reset();
+    }
+
+    nx::hpm::AbstractCloudDataProvider::System m_system;
+    std::unique_ptr<nx::hpm::api::MediatorClientUdpConnection> m_udpClient;
 };
 
 TEST_F(FtHolePunchingProcessor, generic_tests)
@@ -52,8 +75,7 @@ TEST_F(FtHolePunchingProcessor, generic_tests)
 
     using namespace nx::hpm;
 
-    const auto system1 = addRandomSystem();
-    const auto server1 = addRandomServer(system1, boost::none, hpm::ServerTweak::noBindEndpoint);
+    const auto server1 = addRandomServer(m_system, boost::none, hpm::ServerTweak::noBindEndpoint);
     ASSERT_NE(nullptr, server1);
 
     static const std::vector<std::list<SocketAddress>> kTestCases =
@@ -89,11 +111,12 @@ TEST_F(FtHolePunchingProcessor, generic_tests)
 
         const auto listenResult = server1->listen();
         ASSERT_EQ(api::ResultCode::ok, listenResult.first);
-        ASSERT_EQ(KeepAliveOptions(10, 10, 3), listenResult.second.tcpConnectionKeepAlive);
+        ASSERT_EQ(
+            KeepAliveOptions(std::chrono::seconds(10), std::chrono::seconds(10), 3),
+            listenResult.second.tcpConnectionKeepAlive);
 
         //requesting connect to the server
-        nx::hpm::api::MediatorClientUdpConnection udpClient(stunEndpoint());
-        auto udpClientGuard = makeScopedGuard([&udpClient]() { udpClient.pleaseStopSync(); });
+        reinitializeUdpClient();
 
         nx::utils::promise<api::ResultCode> connectResultPromise;
 
@@ -111,8 +134,8 @@ TEST_F(FtHolePunchingProcessor, generic_tests)
         connectRequest.originatingPeerId = QnUuid::createUuid().toByteArray();
         connectRequest.connectSessionId = QnUuid::createUuid().toByteArray();
         connectRequest.connectionMethods = api::ConnectionMethod::udpHolePunching;
-        connectRequest.destinationHostName = server1->serverId() + "." + system1.id;
-        udpClient.connect(
+        connectRequest.destinationHostName = server1->serverId() + "." + m_system.id;
+        m_udpClient->connect(
             connectRequest,
             connectCompletionHandler);
 
@@ -133,7 +156,7 @@ TEST_F(FtHolePunchingProcessor, generic_tests)
             connectionRequestedEventData->originatingPeerID);
         ASSERT_EQ(1U, connectionRequestedEventData->udpEndpointList.size());
         ASSERT_EQ(
-            udpClient.localAddress().port,
+            m_udpClient->localAddress().port,
             connectionRequestedEventData->udpEndpointList.front().port);    //not comparing interface since it may be 0.0.0.0 for server
 
         api::ResultCode resultCode = api::ResultCode::ok;
@@ -143,7 +166,7 @@ TEST_F(FtHolePunchingProcessor, generic_tests)
             makeSyncCall<api::ResultCode>(
                 std::bind(
                     &nx::hpm::api::MediatorClientUdpConnection::send<api::ConnectionResultRequest>,
-                    &udpClient,
+                    m_udpClient.get(),
                     std::move(connectionResult),
                     std::placeholders::_1));
 
@@ -155,10 +178,12 @@ TEST_F(FtHolePunchingProcessor, generic_tests)
             makeSyncCall<api::ResultCode>(
                 std::bind(
                     &nx::hpm::api::MediatorClientUdpConnection::send<api::ConnectionResultRequest>,
-                    &udpClient,
+                    m_udpClient.get(),
                     std::move(connectionResult),
                     std::placeholders::_1));
         ASSERT_EQ(api::ResultCode::notFound, resultCode);
+
+        resetUdpClient();
     }
 }
 
@@ -173,16 +198,64 @@ public:
 
         NX_GTEST_ASSERT_TRUE(startAndWaitUntilStarted());
     }
+
+protected:
+    void assertConnectRequestProducesResult(
+        const MediaServerEmulator& mediaServer,
+        api::ResultCode expectedResult)
+    {
+        m_lastConnectSessionId = QnUuid::createUuid().toByteArray();
+
+        nx::utils::promise<api::ResultCode> connectResult;
+
+        api::ConnectResponse connectResponseData;
+        auto connectCompletionHandler =
+            [&connectResult, &connectResponseData](
+                stun::TransportHeader /*stunTransportHeader*/,
+                api::ResultCode resultCode,
+                api::ConnectResponse responseData)
+            {
+                connectResponseData = std::move(responseData);
+                connectResult.set_value(resultCode);
+            };
+        api::ConnectRequest connectRequest;
+        connectRequest.originatingPeerId = QnUuid::createUuid().toByteArray();
+        connectRequest.connectSessionId = m_lastConnectSessionId;
+        connectRequest.connectionMethods = api::ConnectionMethod::udpHolePunching;
+        connectRequest.destinationHostName = mediaServer.serverId() + "." + m_system.id;
+        m_udpClient->connect(
+            connectRequest,
+            connectCompletionHandler);
+
+        //waiting for connect response and checking server UDP endpoint in response
+        ASSERT_EQ(expectedResult, connectResult.get_future().get());
+    }
+
+    void assertMediatorHasDroppedConnectSession()
+    {
+        api::ResultCode resultCode = api::ResultCode::ok;
+        api::ConnectionResultRequest connectionResult;
+        connectionResult.connectSessionId = m_lastConnectSessionId;
+        connectionResult.resultCode = api::NatTraversalResultCode::udtConnectFailed;
+        std::tie(resultCode) =
+            makeSyncCall<api::ResultCode>(
+                std::bind(
+                    &nx::hpm::api::MediatorClientUdpConnection::send<api::ConnectionResultRequest>,
+                    m_udpClient.get(),
+                    std::move(connectionResult),
+                    std::placeholders::_1));
+        ASSERT_EQ(api::ResultCode::notFound, resultCode);
+    }
+
+private:
+    nx::String m_lastConnectSessionId;
 };
 
 TEST_F(FtHolePunchingProcessorServerFailure, server_failure)
 {
-    const std::chrono::milliseconds kMaxConnectResponseWaitTimeout(15000);
-
     using namespace nx::hpm;
 
-    const auto system1 = addRandomSystem();
-    const auto server1 = addRandomServer(system1, boost::none);
+    const auto server1 = addRandomServer(m_system, boost::none);
 
     typedef MediaServerEmulator::ActionToTake MsAction;
     static const std::map<MsAction, api::ResultCode> kTestCases =
@@ -196,10 +269,6 @@ TEST_F(FtHolePunchingProcessorServerFailure, server_failure)
         const auto actionToTake = testCase.first;
         const auto expectedResult = testCase.second;
 
-        //TODO #ak #msvc2015 use future/promise
-        QnMutex mtx;
-        QnWaitCondition waitCond;
-
         boost::optional<api::ConnectionRequestedEvent> connectionRequestedEventData;
         server1->setOnConnectionRequestedHandler(
             [&connectionRequestedEventData, actionToTake](api::ConnectionRequestedEvent data)
@@ -211,81 +280,37 @@ TEST_F(FtHolePunchingProcessorServerFailure, server_failure)
 
         ASSERT_EQ(api::ResultCode::ok, server1->listen().first);
 
-        //requesting connect to the server 
-        nx::hpm::api::MediatorClientUdpConnection udpClient(stunEndpoint());
-        auto udpClientGuard = makeScopedGuard([&udpClient]() { udpClient.pleaseStopSync(); });
+        reinitializeUdpClient();
 
-        boost::optional<api::ResultCode> connectResult;
-
-        api::ConnectResponse connectResponseData;
-        auto connectCompletionHandler =
-            [&mtx, &waitCond, &connectResult, &connectResponseData](
-                stun::TransportHeader /*stunTransportHeader*/,
-                api::ResultCode resultCode,
-                api::ConnectResponse responseData)
-            {
-                QnMutexLocker lk(&mtx);
-                connectResult = resultCode;
-                connectResponseData = std::move(responseData);
-                waitCond.wakeAll();
-            };
-        api::ConnectRequest connectRequest;
-        connectRequest.originatingPeerId = QnUuid::createUuid().toByteArray();
-        connectRequest.connectSessionId = QnUuid::createUuid().toByteArray();
-        connectRequest.connectionMethods = api::ConnectionMethod::udpHolePunching;
-        connectRequest.destinationHostName = server1->serverId() + "." + system1.id;
-        udpClient.connect(
-            connectRequest,
-            connectCompletionHandler);
-
-        //waiting for connect response and checking server UDP endpoint in response
-        {
-            QnMutexLocker lk(&mtx);
-            while (!static_cast<bool>(connectResult))
-                ASSERT_TRUE(waitCond.wait(lk.mutex(), kMaxConnectResponseWaitTimeout.count()));
-        }
-
-        const auto connectResultVal = connectResult.get();
-        ASSERT_EQ(expectedResult, connectResultVal);
+        assertConnectRequestProducesResult(*server1, expectedResult);
 
         if (actionToTake != MsAction::closeConnectionToMediator)
         {
-            //testing that mediator has cleaned up session data
-            api::ResultCode resultCode = api::ResultCode::ok;
-            api::ConnectionResultRequest connectionResult;
-            connectionResult.connectSessionId = connectRequest.connectSessionId;
-            connectionResult.resultCode = api::NatTraversalResultCode::udtConnectFailed;
-            std::tie(resultCode) =
-                makeSyncCall<api::ResultCode>(
-                    std::bind(
-                        &nx::hpm::api::MediatorClientUdpConnection::send<api::ConnectionResultRequest>,
-                        &udpClient,
-                        std::move(connectionResult),
-                        std::placeholders::_1));
-            ASSERT_EQ(api::ResultCode::notFound, resultCode);
+            // Testing that mediator has cleaned up session data.
+            assertMediatorHasDroppedConnectSession();
         }
+
+        resetUdpClient();
     }
 }
 
 TEST_F(FtHolePunchingProcessor, destruction)
 {
-    const auto system1 = addRandomSystem();
-    const auto server1 = addRandomServer(system1);
+    const auto server1 = addRandomServer(m_system);
 
     ASSERT_EQ(api::ResultCode::ok, server1->listen().first);
 
     for (int i = 0; i < 100; ++i)
     {
-        nx::hpm::api::MediatorClientUdpConnection udpClient(stunEndpoint());
-        auto udpClientGuard = makeScopedGuard([&udpClient]() { udpClient.pleaseStopSync(); });
+        reinitializeUdpClient();
 
         api::ConnectRequest connectRequest;
         connectRequest.originatingPeerId = QnUuid::createUuid().toByteArray();
         connectRequest.connectSessionId = QnUuid::createUuid().toByteArray();
         connectRequest.connectionMethods = api::ConnectionMethod::udpHolePunching;
-        connectRequest.destinationHostName = server1->serverId() + "." + system1.id;
+        connectRequest.destinationHostName = server1->serverId() + "." + m_system.id;
         nx::utils::promise<void> connectResponsePromise;
-        udpClient.connect(
+        m_udpClient->connect(
             connectRequest,
             [&connectResponsePromise](
                 stun::TransportHeader /*stunTransportHeader*/,
@@ -295,6 +320,8 @@ TEST_F(FtHolePunchingProcessor, destruction)
                 connectResponsePromise.set_value();
             });
         connectResponsePromise.get_future().wait();
+
+        resetUdpClient();
     }
 }
 

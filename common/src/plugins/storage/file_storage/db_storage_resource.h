@@ -2,9 +2,11 @@
 
 #include <core/resource/storage_resource.h>
 #include <api/app_server_connection.h>
+#include <nx/utils/thread/wait_condition.h>
 
-class QnDbStorageResource : public QnStorageResource
+class QnDbStorageResource: public QnStorageResource
 {
+    using base_type = QnStorageResource;
 Q_OBJECT
     enum class QnDbStorageResourceState
     {
@@ -13,10 +15,10 @@ Q_OBJECT
     };
 
 public:
-    QnDbStorageResource();
+    QnDbStorageResource(QnCommonModule* commonModule);
     ~QnDbStorageResource();
 
-    static QnStorageResource* instance(const QString&);
+    static QnStorageResource* instance(QnCommonModule* commonModule, const QString&);
 
     virtual QIODevice* open(const QString& fileName, QIODevice::OpenMode openMode) override;
     virtual int getCapabilities() const override;

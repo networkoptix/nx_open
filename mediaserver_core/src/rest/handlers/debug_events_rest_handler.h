@@ -8,7 +8,13 @@ public:
     virtual int executeGet(const QString &path, const QnRequestParams &params, QnJsonRestResult &result, const QnRestConnectionProcessor*) override;
 
 private:
-    int testNetworkIssue(const QnRequestParams & params, QnJsonRestResult &result);
-    int testCameraDisconnected(const QnRequestParams & params, QnJsonRestResult &result);
+    int testNetworkIssue(
+        const QnRequestParams & params,
+        QnJsonRestResult &result,
+        const QnRestConnectionProcessor* owner);
+    int testCameraDisconnected(
+        const QnRequestParams & params,
+        QnJsonRestResult &result,
+        const QnRestConnectionProcessor* owner);
 
 };

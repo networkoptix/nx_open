@@ -1,0 +1,354 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>Overview of Speech Synthesis</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REL="HOME"
+TITLE="Building Synthetic Voices"
+HREF="book1.html"><LINK
+REL="UP"
+TITLE="Speech Synthesis"
+HREF="p20.html"><LINK
+REL="PREVIOUS"
+TITLE="Speech Synthesis"
+HREF="p20.html"><LINK
+REL="NEXT"
+TITLE="Uses of Speech Synthesis "
+HREF="x94.html"></HEAD
+><BODY
+CLASS="CHAPTER"
+BGCOLOR="#FFFFFF"
+TEXT="#000000"
+LINK="#0000FF"
+VLINK="#840084"
+ALINK="#0000FF"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="3"
+ALIGN="center"
+>Building Synthetic Voices</TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="bottom"
+><A
+HREF="p20.html"
+ACCESSKEY="P"
+>&#60;&#60;&#60; Previous</A
+></TD
+><TD
+WIDTH="80%"
+ALIGN="center"
+VALIGN="bottom"
+></TD
+><TD
+WIDTH="10%"
+ALIGN="right"
+VALIGN="bottom"
+><A
+HREF="x94.html"
+ACCESSKEY="N"
+>Next &#62;&#62;&#62;</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="CHAPTER"
+><H1
+><A
+NAME="BSV-INTRO-CH"
+></A
+>Overview of Speech Synthesis</H1
+><DIV
+CLASS="SECT1"
+><H1
+CLASS="SECT1"
+><A
+NAME="AEN61"
+>History</A
+></H1
+><P
+><SPAN
+CLASS="COMMENT"
+>AWB: probably way too biased as a history</SPAN
+> The idea
+that a machine could generate speech has been with us for some time,
+but the realization of such machines has only really been practical
+within the last 50 years.  Even more recently, it's in the last 20
+years or so that we've seen practical examples of text-to-speech
+systems that can say any text they're given -- though it might be "wrong."</P
+><P
+>The creation of synthetic speech covers a whole range of processes,
+and though often they are all lumped under the general term
+<I
+CLASS="FIRSTTERM"
+>text-to-speech</I
+>, a good deal of work has gone
+into generating speech from sequences of speech sounds; this would be
+a speech-sound (phoneme) to audio waveform synthesis, rather than
+going all the way from text to phonemes (speech sounds), and then to
+sound.</P
+><P
+>One of the first practical application of speech synthesis was in 1936
+when the U.K. Telephone Company introduced a speaking clock.  It used
+optical storage for the phrases, words, and part-words ("noun,"
+"verb," and so on) which were appropriately concatenated to form
+complete sentences.</P
+><P
+>Also around that time, Homer Dudley developed a mechanical device at
+Bell Laboratories that operated through the movement of pedals, and mechanical
+keys, like an organ. With a trained operator, it could be made to
+create sounds that, if given a good set-up, almost sounded like
+speech.  Called the <I
+CLASS="FIRSTTERM"
+>Voder</I
+>, it was demonstrated
+at the 1939 World's Fair in New York and San Francisco.  A recording
+of this device exists, and can be heard as part of a collection of
+historical synthesis examples that were distributed on a record as
+part of [<SPAN
+CLASS="CITATION"
+>klatt87</SPAN
+>].</P
+><P
+>The realization that the speech signal could be decomposed as a
+source-and-filter model, with the glottis acting as a sound source and
+the oral tract being a filter, was used to build analog electronic
+devices that could be used to mimic human speech.  The
+<I
+CLASS="FIRSTTERM"
+>vocoder</I
+>, also developed by Homer Dudley, is one
+such example.  Much of the work in synthesis in the 40s and 50s was
+primarily concerned with constructing replicas of the signal itself
+rather than generating the phones from an abstract form like text.</P
+><P
+>Further decomposition of the speech signal allowed the development of
+<I
+CLASS="FIRSTTERM"
+>formant synthesis</I
+>, where collections of signals
+were composed to form recognization speech.  The prediction of
+parameters that compactly represent the signal, without the loss of
+any information critical for reconstruction, has always been, and
+still is, difficult.  Early versions of formant synthesis allowed
+these to be specified by hand, with automatic modeling as a goal.
+Today, formant synthesizers can produce high quality, recognizable
+speech if the parameters are properly adjusted, and these systems can
+work very well for some applications.  It's still hard to get
+fully natural sounding speech from these when the process is fully
+automatic -- as it is from all synthesis methods.</P
+><P
+>With the rise of digital representations of speech, digital signal
+processing, and the proliferation of cheap, general-purpose computer
+hardware, more work was done in concatenation of natural recorded
+speech.  <I
+CLASS="FIRSTTERM"
+>Diphones</I
+> appeared; that is, two
+adjacent half-phones (context-dependent phoneme realizations), cut in
+the middle, joined into one unit.  The justification was that phone
+boundaries are much more dynamic than stable, interior parts of
+phones, and therefore mid-phone is a better place to concatenate
+units, as the stable points have, by definition, little rapid change,
+whereas there are rapid changes at the boundaries that depend upon the
+previous or next unit.</P
+><P
+>The rise of concatenative synthesis began in the 70s, and has largely
+become practical as large-scale electronic storage has become cheap
+and robust.  When a megabyte of memory was a significant part of
+researchers salary, less resource-intensive techniques were worth
+their...  weight in saved cycles in gold, to use an odd metaphor.  Of
+course formant, synthesis can still require significant computational
+power, even if it requires less storage; the 80s speech synthesis
+relied on specialized hardware to deal with the constraints of the
+time.</P
+><P
+>In 1972, the standard Unix manual (3rd edition) included commands to
+process text to speech, form text analysis, prosodic prediction,
+phoneme generation, and waveform synthesis through a specialized piece
+of hardware.  Of course Unix had only about 16 installations at the
+time and most, perhaps even all, were located in Bell Labs at Murray
+Hill.</P
+><P
+>Techniques were developed to compress (code) speech in a way that it
+could be more easily used in applications.  The Texas Instruments
+<I
+CLASS="FIRSTTERM"
+>Speak 'n Spell</I
+> toy, released in the late 70s,
+was one of the early examples of mass production of speech synthesis.
+The quality was poor, by modern standards, but for the time it was
+very impressive.  Speech was basically encoded using LPC (linear
+Predictive Coding) and mostly used isolated words and letters though
+there were also a few phrases formed by concatenation.  Simple
+text-to-speech (TTS) engines based on specialised chips became popular
+on home computers such as the BBC Micro in the UK and the Apple ][.</P
+><P
+>Dennis Klatt's MITalk synthesizer [<SPAN
+CLASS="CITATION"
+>allen87</SPAN
+>] in many
+senses defined the perception of automatic speech synthesis to the
+world at large.  Later developed into the product DECTalk, it produces
+somewhat robotic, but very understandable, speech.  It is a formant
+synthesizer, reflecting the state of the art at the time.</P
+><P
+>Before 1980, research in speech synthesis was limited to the large
+laboratories that could afford to invest the time and money for
+hardware.  By the mid-80s, more labs and universities started to join
+in as the cost of the hardware dropped.  By the late eighties, purely
+software synthesizers became feasible; the speech quality was still
+decidedly inhuman (and largely still is), but it could be generated in
+near real-time.</P
+><P
+>Of course, with faster machines and large disk space, people began to
+look to improving synthesis by using larger, and more varied
+inventories for concatenative speech.  Yoshinori Sagisaka at Advanced
+Telecommunications Research (ATR) in Japan developed nuu-talk
+[<SPAN
+CLASS="CITATION"
+>nuutalk92</SPAN
+>] in the late 80s and early 90s. It
+introduced a much larger inventory of concatenative units; thus,
+instead of one example of each diphone unit, there could be many, and
+an automatic, acoustically based distance function was used to find
+the best selection of sub-word units from a fairly broad database of
+general speech.  This work was done in Japanese, which has a much
+simpler phonetic structure than English, making it possible to get
+high quality with a relatively small databases.  Even up through 1994,
+the time needed to generate of the parameter files for a new voice in
+nuu-talk (503 senetences) was on the order of several days of CPU
+time, and synthesis was not generally possible in real time.</P
+><P
+>With the demonstration of general <I
+CLASS="FIRSTTERM"
+>unit selection
+synthesis</I
+> in English in Rob Donovan's PhD work
+[<SPAN
+CLASS="CITATION"
+>donovan95</SPAN
+>], and ATR's CHATR system
+([<SPAN
+CLASS="CITATION"
+>campbell96</SPAN
+>] and [<SPAN
+CLASS="CITATION"
+>hunt96</SPAN
+>]), by
+the end of the 90's, unit selection had become a hot topic in speech
+synthesis research.  However, despite examples of it working
+excellently, generalized unit selection is known for producing very
+bad quality synthesis from time to time.  As the optimial search and
+selection agorithms used are not 100% reliable, both high and low
+quality synthesis is produced -- and many diffilculties still exists
+in turning general corpora into high-quality synthesizers as of this
+writing.</P
+><P
+>Of course, the development of speech synthesis is not isolated from
+other developments in speech technology.  Speech recognition, which
+has also benefited from the reduction in cost of computational power
+and increased availability of general computing into the populace,
+informs a the work on speech synthesis, and vice versa.  There are now
+many more people who have the computational resouces and interest in
+running speech applications, and this ability to run such applications
+puts the demand on the technology to deliver both working recognition
+and acceptable quality speech synthesis.</P
+><P
+>The availability of free and semi-free synthesis systems, such as
+the Festival Speech Synthesis System and the MBROLA project, makes the
+cost of entering the field of speech synthesis much lower, and many
+more groups have now joined in the development.</P
+><P
+>However, although we are now at the stage were talking computers are
+with us, there is still a great deal of work to be done.  We can now
+build synthesizers of (probably) any language that can produce
+reconizable speech, with a sufficient amount of work; but if we are to
+use speech to receive information as easily when we're talking with
+computers as we do in everyday conversation, synthesized speech must
+be natural, controllable and efficient (both in rendering and in the
+building of new voices).</P
+></DIV
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="p20.html"
+ACCESSKEY="P"
+>&#60;&#60;&#60; Previous</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="book1.html"
+ACCESSKEY="H"
+>Home</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="x94.html"
+ACCESSKEY="N"
+>Next &#62;&#62;&#62;</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>Speech Synthesis</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="p20.html"
+ACCESSKEY="U"
+>Up</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>Uses of Speech Synthesis</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

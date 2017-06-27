@@ -1,7 +1,9 @@
 #pragma once
 
-#include <memory>
+#ifdef ENABLE_SSL
+
 #include <atomic>
+#include <memory>
 
 #include <openssl/ssl.h>
 
@@ -16,7 +18,7 @@ namespace ssl {
  */
 void initOpenSSLGlobalLock();
 
-class SslStaticData
+class NX_NETWORK_API SslStaticData
 {
 public:
     std::unique_ptr<EVP_PKEY, decltype(&EVP_PKEY_free)> pkey;
@@ -45,3 +47,5 @@ private:
 } // namespace ssl
 } // namespace network
 } // namespace nx
+
+#endif // ENABLE_SSL

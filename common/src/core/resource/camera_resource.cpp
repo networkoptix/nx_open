@@ -14,6 +14,13 @@
 #include <utils/common/util.h>
 #include <utils/math/math.h>
 #include <utils/crypt/symmetrical.h>
+#include <core/resource_management/resource_pool.h>
+#include <common/common_module.h>
+#include <core/resource_access/user_access_data.h>
+#include <nx_ec/ec_api.h>
+#include <common/static_common_module.h>
+#include "core/resource/resource_data.h"
+#include "core/resource_management/resource_data_pool.h"
 
 namespace {
 
@@ -37,7 +44,8 @@ bool storeUrlForRole(Qn::ConnectionRole role)
 
 } //anonymous namespace
 
-QnVirtualCameraResource::QnVirtualCameraResource():
+QnVirtualCameraResource::QnVirtualCameraResource(QnCommonModule* commonModule):
+    base_type(commonModule),
     m_dtsFactory(0),
     m_issueCounter(0),
     m_lastIssueTimer()
@@ -62,11 +70,12 @@ QString QnVirtualCameraResource::toSearchString() const
     return result;
 }
 
-QnPhysicalCameraResource::QnPhysicalCameraResource():
-    QnVirtualCameraResource(),
+QnPhysicalCameraResource::QnPhysicalCameraResource(QnCommonModule* commonModule):
+    QnVirtualCameraResource(commonModule),
     m_channelNumber(0)
 {
     setFlags(Qn::local_live_cam);
+    m_lastInitTime.invalidate();
 }
 
 float QnPhysicalCameraResource::rawSuggestBitrateKbps(Qn::StreamQuality quality, QSize resolution, int fps) const
@@ -173,7 +182,22 @@ QSize QnPhysicalCameraResource::getNearestResolution(const QSize& resolution, fl
     return bestIndex >= 0 ? resolutionList[bestIndex]: EMPTY_RESOLUTION_PAIR;
 }
 
-CameraDiagnostics::Result QnPhysicalCameraResource::initInternal() {
+CameraDiagnostics::Result QnPhysicalCameraResource::initInternal()
+{
+    auto resData = qnStaticCommon->dataPool()->data(toSharedPointer(this));
+    int timeoutSec = resData.value<int>(Qn::kUnauthrizedTimeoutParamName);
+    auto credentials = getAuth();
+    auto status = getStatus();
+    if (timeoutSec > 0 &&
+        m_lastInitTime.isValid() &&
+        m_lastInitTime.elapsed() < timeoutSec * 1000 &&
+        status == Qn::Unauthorized &&
+        m_lastCredentials == credentials)
+    {
+        return CameraDiagnostics::NotAuthorisedResult(getUrl());
+    }
+    m_lastInitTime.restart();
+    m_lastCredentials = credentials;
     return CameraDiagnostics::NoErrorResult();
 }
 
@@ -451,16 +475,6 @@ void QnVirtualCameraResource::forceDisableAudio()
     saveParams();
 }
 
-void QnVirtualCameraResource::saveParams()
-{
-    propertyDictionary->saveParams(getId());
-}
-
-void QnVirtualCameraResource::saveParamsAsync()
-{
-    propertyDictionary->saveParamsAsync(getId());
-}
-
 void QnVirtualCameraResource::updateDefaultAuthIfEmpty(const QString& login, const QString& password)
 {
     auto decodedCredentials = nx::utils::decodeStringFromHexStringAES128CBC(
@@ -512,7 +526,7 @@ int QnVirtualCameraResource::saveAsync()
     ec2::ApiCameraData apiCamera;
     fromResourceToApi(toSharedPointer(this), apiCamera);
 
-    ec2::AbstractECConnectionPtr conn = QnAppServerConnectionFactory::getConnection2();
+    ec2::AbstractECConnectionPtr conn = commonModule()->ec2Connection();
     return conn->getCameraManager(Qn::kSystemAccess)->addCamera(apiCamera, this, []{});
 }
 

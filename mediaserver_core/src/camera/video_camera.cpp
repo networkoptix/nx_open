@@ -8,17 +8,20 @@
 #include <utils/media/media_stream_cache.h>
 #include <utils/memory/cyclic_allocator.h>
 
+#include <nx/network/hls/hls_types.h>
 #include <nx/streaming/abstract_media_stream_data_provider.h>
 #include <nx/streaming/media_data_packet.h>
 #include <nx/streaming/config.h>
 #include <nx/utils/random.h>
+#include <nx/utils/std/cpp14.h>
 #include <core/dataprovider/cpull_media_stream_provider.h>
 #include <core/dataprovider/live_stream_provider.h>
 #include <core/resource/camera_resource.h>
 
 #include <media_server/settings.h>
-#include <streaming/hls/hls_types.h>
 #include <api/global_settings.h>
+#include <common/common_module.h>
+#include <media_server/media_server_module.h>
 
 static const qint64 CAMERA_UPDATE_INTERNVAL = 3600 * 1000000ll;
 static const qint64 KEEP_IFRAMES_INTERVAL = 1000000ll * 80;
@@ -303,7 +306,7 @@ void QnVideoCameraGopKeeper::updateCameraActivity()
     }
     if (!m_resource->hasFlags(Qn::foreigner) && m_resource->isInitialized() &&
        (lastKeyTime == (qint64)AV_NOPTS_VALUE || qnSyncTime->currentUSecsSinceEpoch() - lastKeyTime > CAMERA_UPDATE_INTERNVAL) &&
-        qnGlobalSettings->isAutoUpdateThumbnailsEnabled())
+        m_resource->commonModule()->globalSettings()->isAutoUpdateThumbnailsEnabled())
     {
         if (m_nextMinTryTime == 0) // get first screenshot after minor delay
             m_nextMinTryTime = usecTime + nx::utils::random::number(5000, 10000) * 1000ll;
@@ -350,10 +353,10 @@ QnVideoCamera::QnVideoCamera(const QnResourcePtr& resource)
     m_resource(resource),
     m_primaryGopKeeper(nullptr),
     m_secondaryGopKeeper(nullptr),
-    m_loStreamHlsInactivityPeriodMS( MSSettings::roSettings()->value(
+    m_loStreamHlsInactivityPeriodMS( qnServerModule->roSettings()->value(
         nx_ms_conf::HLS_INACTIVITY_PERIOD,
         nx_ms_conf::DEFAULT_HLS_INACTIVITY_PERIOD ).toInt() * MSEC_PER_SEC ),
-    m_hiStreamHlsInactivityPeriodMS( MSSettings::roSettings()->value(
+    m_hiStreamHlsInactivityPeriodMS( qnServerModule->roSettings()->value(
         nx_ms_conf::HLS_INACTIVITY_PERIOD,
         nx_ms_conf::DEFAULT_HLS_INACTIVITY_PERIOD ).toInt() * MSEC_PER_SEC )
 {
@@ -484,7 +487,7 @@ void QnVideoCamera::startLiveCacheIfNeeded()
             ensureLiveCacheStarted(
                 MEDIA_Quality_Low,
                 m_secondaryReader,
-                duration_cast<microseconds>(MSSettings::hlsTargetDuration()).count());
+                duration_cast<microseconds>(qnServerModule->settings()->hlsTargetDuration()).count());
     }
     else if (m_primaryReader && !m_liveCache[MEDIA_Quality_High])
     {
@@ -495,7 +498,7 @@ void QnVideoCamera::startLiveCacheIfNeeded()
             ensureLiveCacheStarted(
                 MEDIA_Quality_High,
                 m_primaryReader,
-                duration_cast<microseconds>(MSSettings::hlsTargetDuration()).count());
+                duration_cast<microseconds>(qnServerModule->settings()->hlsTargetDuration()).count());
         }
     }
 }
@@ -788,7 +791,7 @@ bool QnVideoCamera::ensureLiveCacheStarted(
             MEDIA_CACHE_SIZE_MILLIS,
             MEDIA_CACHE_SIZE_MILLIS*10) );  //hls spec requires 7 last chunks to be in memory, adding extra 3 just for case
 
-        int removedChunksToKeepCount = MSSettings::roSettings()->value(
+        int removedChunksToKeepCount = qnServerModule->roSettings()->value(
             nx_ms_conf::HLS_REMOVED_LIVE_CHUNKS_TO_KEEP,
             nx_ms_conf::DEFAULT_HLS_REMOVED_LIVE_CHUNKS_TO_KEEP).toInt();
 

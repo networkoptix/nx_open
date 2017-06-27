@@ -1,19 +1,22 @@
 #include "flir_onvif_resource.h"
 
-#ifdef ENABLE_ONVIF
+#if defined(ENABLE_ONVIF) && defined(ENABLE_FLIR)
 
-QnFlirOnvifResource::QnFlirOnvifResource()
+namespace nx {
+namespace plugins {
+namespace flir {
+
+OnvifResource::OnvifResource()
 {
 }
 
-CameraDiagnostics::Result QnFlirOnvifResource::initInternal()
+CameraDiagnostics::Result OnvifResource::initInternal()
 {
-    QnPlOnvifResource::initInternal();
-
-    /*fetchAndSetAdvancedParameters();
-    saveParams();*/
-
-    return CameraDiagnostics::NoErrorResult();
+    return QnPlOnvifResource::initInternal();
 }
+
+} // namespace flir
+} // namespace plugins
+} // namespace nx
 
 #endif // ENABLE_ONVIF

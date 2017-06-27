@@ -12,8 +12,8 @@ namespace stats {
 namespace dao {
 namespace rdb {
 
-nx::db::DBResult DataObject::save(
-    nx::db::QueryContext* queryContext,
+nx::utils::db::DBResult DataObject::save(
+    nx::utils::db::QueryContext* queryContext,
     ConnectSession stats)
 {
     const char queryText[] = R"sql(
@@ -31,7 +31,7 @@ nx::db::DBResult DataObject::save(
         NX_ASSERT(false);
         NX_LOGX(lm("Failed to prepare connect session statistics query. %1")
             .arg(saveRecordQuery.lastError().text()), cl_logDEBUG1);
-        return nx::db::DBResult::statementError;
+        return nx::utils::db::DBResult::statementError;
     }
 
     QnSql::bind(stats, &saveRecordQuery);
@@ -49,14 +49,14 @@ nx::db::DBResult DataObject::save(
     {
         NX_LOGX(lm("Failed to save connect session statistics to DB. %1")
             .arg(saveRecordQuery.lastError().text()), cl_logDEBUG1);
-        return nx::db::DBResult::ioError;
+        return nx::utils::db::DBResult::ioError;
     }
 
-    return nx::db::DBResult::ok;
+    return nx::utils::db::DBResult::ok;
 }
 
-nx::db::DBResult DataObject::readAllRecords(
-    nx::db::QueryContext* queryContext,
+nx::utils::db::DBResult DataObject::readAllRecords(
+    nx::utils::db::QueryContext* queryContext,
     std::deque<ConnectSession>* connectionRecords)
 {
     const char queryText[] = R"sql(
@@ -79,19 +79,19 @@ nx::db::DBResult DataObject::readAllRecords(
         NX_ASSERT(false);
         NX_LOGX(lm("Failed to prepare fetch connect session statistics query. %1")
             .arg(fetchAllRecordsQuery.lastError().text()), cl_logDEBUG1);
-        return nx::db::DBResult::statementError;
+        return nx::utils::db::DBResult::statementError;
     }
 
     if (!fetchAllRecordsQuery.exec())
     {
         NX_LOGX(lm("Failed to fetch connect session statistics from DB. %1")
             .arg(fetchAllRecordsQuery.lastError().text()), cl_logDEBUG1);
-        return nx::db::DBResult::ioError;
+        return nx::utils::db::DBResult::ioError;
     }
 
     QnSql::fetch_many(fetchAllRecordsQuery, connectionRecords);
 
-    return nx::db::DBResult::ok;
+    return nx::utils::db::DBResult::ok;
 }
 
 } // namespace rdb

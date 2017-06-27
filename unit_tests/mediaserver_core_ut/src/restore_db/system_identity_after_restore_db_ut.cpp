@@ -5,6 +5,7 @@
 #include <common/common_module.h>
 #include <core/resource/user_resource.h>
 #include <core/resource/media_server_resource.h>
+#include <nx/core/access/access_types.h>
 #include <core/resource_management/resource_pool.h>
 #include <plugins/storage/file_storage/file_storage_resource.h>
 #include <common/common_module.h>
@@ -21,7 +22,7 @@ namespace detail {
 class TestSystemNameProxy : public nx::mserver_aux::SystemNameProxy
 {
 public:
-    enum class SystemNameInConfig 
+    enum class SystemNameInConfig
     {
         yes,
         no
@@ -165,11 +166,11 @@ public:
 
         settingsProxy.reset(new detail::TestSettingsProxy);
 
-        resourcePool = std::unique_ptr<QnResourcePool>(new QnResourcePool);
-        commonModule = std::unique_ptr<QnCommonModule>(new QnCommonModule);
+        commonModule = std::unique_ptr<QnCommonModule>(new QnCommonModule(/*isClient*/false,
+            nx::core::access::Mode::direct));
 
         admin = QnUserResourcePtr(new QnUserResource(QnUserType::Local));
-        mediaServer = QnMediaServerResourcePtr(new QnMediaServerResource);
+        mediaServer = QnMediaServerResourcePtr(new QnMediaServerResource(commonModule.get()));
     }
 
     void fillDefaultAdminAuth()
@@ -267,7 +268,6 @@ public:
     TestSystemNameProxyPtr systemNameProxy;
     TestSettingsProxyPtr settingsProxy;
 
-    std::unique_ptr<QnResourcePool> resourcePool;
     std::unique_ptr<QnCommonModule> commonModule;
 };
 
@@ -421,8 +421,8 @@ TEST_F(BaseRestoreDbTest, SetUpSystemIdentity_NoSystemNameAndIdInDb_SystemNameIn
     systemNameProxy.reset(new detail::TestSystemNameProxy(detail::TestSystemNameProxy::SystemNameInConfig::yes));
     nx::mserver_aux::setUpSystemIdentity(restoreData, settingsProxy.get(), std::move(systemNameProxy));
     ASSERT_EQ(settingsProxy->systemName(), detail::TestSystemNameProxy::kConfigValue);
-    ASSERT_EQ(settingsProxy->localSystemId(), 
-              guidFromArbitraryData(detail::TestSystemNameProxy::kConfigValue + 
+    ASSERT_EQ(settingsProxy->localSystemId(),
+              guidFromArbitraryData(detail::TestSystemNameProxy::kConfigValue +
                   settingsProxy->getMaxServerKey()));
 }
 
@@ -432,7 +432,7 @@ TEST_F(BaseRestoreDbTest, SetUpSystemIdentity_NoSystemNameAndIdInDb_SystemNameIn
     settingsProxy->setIsSystemIdFromSystemName(true);
     nx::mserver_aux::setUpSystemIdentity(restoreData, settingsProxy.get(), std::move(systemNameProxy));
     ASSERT_EQ(settingsProxy->systemName(), detail::TestSystemNameProxy::kConfigValue);
-    ASSERT_EQ(settingsProxy->localSystemId(), 
+    ASSERT_EQ(settingsProxy->localSystemId(),
               guidFromArbitraryData(detail::TestSystemNameProxy::kConfigValue));
 }
 

@@ -3,7 +3,7 @@
 #include "dlink_ptz_controller.h"
 #include "nx/utils/math/fuzzy.h"
 #include "plugins/resource/onvif/onvif_resource.h"
-#include "utils/common/long_runnable.h"
+#include "nx/utils/thread/long_runnable.h"
 
 //static const int CACHE_UPDATE_TIMEOUT = 60 * 1000;
 

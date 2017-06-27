@@ -2,6 +2,8 @@
 
 #include <QtCore/QSize>
 
+#include <common/common_module.h>
+
 #include <nx/fusion/model_functions.h>
 #include <nx/utils/log/log.h>
 
@@ -131,9 +133,14 @@ static bool isTranscodingSupported(
     if (!VideoDecoderRegistry::instance()->isTranscodingEnabled())
         return false;
 
+    auto module = camera->commonModule();
+    NX_ASSERT(module);
+    if (!module)
+        return false;
+
     QnMediaServerResourcePtr server = liveMode
         ? camera->getParentServer()
-        : qnCameraHistoryPool->getMediaServerOnTime(camera, positionMs);
+        : module->cameraHistoryPool()->getMediaServerOnTime(camera, positionMs);
 
     if (!server)
         return false;

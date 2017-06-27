@@ -49,25 +49,39 @@ public:
     * * For mixed list "%n Devices" is used;
     * @param capitalize Should the word begin from the capital letter, default value is true.
     */
-    static QString getNumericName(const QnVirtualCameraResourceList &devices, bool capitalize = true);
+    static QString getNumericName(
+        QnResourcePool* resPool,
+        const QnVirtualCameraResourceList &devices,
+        bool capitalize = true);
 
     /**
     * @brief Select string from the given set based on the target devices list.
     */
-    static QString getNameFromSet(const QnCameraDeviceStringSet &set, const QnVirtualCameraResourceList &devices);
+    static QString getNameFromSet(
+        QnResourcePool* resPool,
+        const QnCameraDeviceStringSet &set,
+        const QnVirtualCameraResourceList &devices);
 
     /**
     * @brief Select string from the given set based on the target devices list.
     */
-    static QString getNameFromSet(const QnCameraDeviceStringSet &set, const QnVirtualCameraResourcePtr &device);
+    static QString getNameFromSet(
+        QnResourcePool* resPool,
+        const QnCameraDeviceStringSet &set,
+        const QnVirtualCameraResourcePtr &device);
 
     /**
     * @brief Select default string from the given set based on all devices in the system.
     */
-    static QString getDefaultNameFromSet(const QnCameraDeviceStringSet &set);
+    static QString getDefaultNameFromSet(
+        QnResourcePool* resPool,
+        const QnCameraDeviceStringSet &set);
 
     /**
     * @brief Select default string from the given set based on all devices in the system.
     */
-    static QString getDefaultNameFromSet(const QString &mixedString, const QString &cameraString);
+    static QString getDefaultNameFromSet(
+        QnResourcePool* resPool,
+        const QString &mixedString,
+        const QString &cameraString);
 };

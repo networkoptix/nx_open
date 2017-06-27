@@ -14,7 +14,7 @@ namespace modbus
 {
 
 using ModbusProtocolConnection =
-    nx_api::BaseStreamProtocolConnectionEmbeddable<
+    nx::network::server::BaseStreamProtocolConnectionEmbeddable<
         ModbusMessage,
         ModbusMessageParser,
         ModbusMessageSerializer>;
@@ -23,7 +23,7 @@ using namespace nx::network;
 
 class QnModbusAsyncClient: 
     public QObject,
-    public StreamConnectionHolder<ModbusProtocolConnection>,
+    public network::server::StreamConnectionHolder<ModbusProtocolConnection>,
     public aio::BasicPollable
 {
     Q_OBJECT

@@ -6,7 +6,7 @@
 #include <core/resource/resource_fwd.h>
 #include "nx_ec/impl/ec_api_impl.h"
 #include "nx_ec/data/api_peer_alive_data.h"
-#include <nx/network/http/httptypes.h>
+#include <nx/network/http/http_types.h>
 #include "network/universal_tcp_listener.h"
 
 
@@ -18,7 +18,7 @@ class QnServerMessageProcessor : public QnCommonMessageProcessor
 
     typedef QnCommonMessageProcessor base_type;
 public:
-    QnServerMessageProcessor();
+    QnServerMessageProcessor(QnCommonModule* commonModule);
 
     virtual void updateResource(const QnResourcePtr &resource, ec2::NotificationSource source) override;
     void registerProxySender(QnUniversalTcpListener* tcpListener);
@@ -28,8 +28,8 @@ protected:
     virtual void connectToConnection(const ec2::AbstractECConnectionPtr &connection) override;
     virtual void disconnectFromConnection(const ec2::AbstractECConnectionPtr &connection) override;
 
-    virtual void handleRemotePeerFound(const ec2::ApiPeerAliveData &data) override;
-    virtual void handleRemotePeerLost(const ec2::ApiPeerAliveData &data) override;
+    virtual void handleRemotePeerFound(QnUuid peer, Qn::PeerType peerType) override;
+    virtual void handleRemotePeerLost(QnUuid peer, Qn::PeerType peerType) override;
 
     virtual void onResourceStatusChanged(const QnResourcePtr &resource, Qn::ResourceStatus, ec2::NotificationSource source) override;
     virtual void init(const ec2::AbstractECConnectionPtr& connection) override;

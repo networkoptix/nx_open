@@ -72,7 +72,7 @@ Qn::AuthResult QnClientAuthHelper::addAuthorizationToRequest(
             &request->headers,
             nx_http::parseHeader(CLSimpleHTTPClient::digestAccess(
                 auth,
-                QnAppInfo::realm(),
+                nx::network::AppInfo::realm(),
                 QString::number(qnSyncTime->currentUSecsSinceEpoch(), 16),
                 QLatin1String(request->requestLine.method),
                 request->requestLine.url.toString(),

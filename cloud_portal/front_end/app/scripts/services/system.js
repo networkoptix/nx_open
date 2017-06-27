@@ -3,7 +3,7 @@
 // Special service for operating with systems at high-level
 
 angular.module('cloudApp')
-    .factory('system', ['cloudApi', 'mediaserver', '$q', 'uuid2', '$log', function (cloudApi, mediaserver, $q, uuid2, $log) {
+    .factory('system', ['cloudApi', 'systemAPI', '$q', 'uuid2', '$log', function (cloudApi, systemAPI, $q, uuid2, $log) {
 
         var systems = {};
 
@@ -19,18 +19,31 @@ angular.module('cloudApp')
             this.accessRole = '';
             
             this.currentUserEmail = currentUserEmail;
-            this.mediaserver = mediaserver(systemId);
+            var self = this;
+            this.mediaserver = systemAPI(currentUserEmail, systemId, null, function(){
+                // Unauthorised request handler
+                // Some options here:
+                // * Access was revoked
+                // * System was disconnected from cloud
+                // * Password was changed
+                // * Nonce expired
+
+                // We try to update nonce and auth on the server again
+                // Other cases are not distinguishable
+                return self.updateSystemAuth(true);
+            });
             this.updateSystemState();
         }
         system.prototype.updateSystemAuth = function(force){
             var self = this;
             if(!force && self.auth){ //no need to update
-                return;
+                return $q.resolve(true);
             }
+            self.auth = false;
             return cloudApi.getSystemAuth(self.id).then(function(data){
-                self.auth = data.data.auth;
-                return self.mediaserver.login(self.auth);
-            })
+                self.auth = true;
+                return self.mediaserver.setAuthKeys(data.data.authGet, data.data.authPost, data.data.authPlay);
+            });
         };
         system.prototype.updateSystemState = function(){
             this.stateMessage = '';
@@ -346,29 +359,6 @@ angular.module('cloudApp')
                     }
                 }
                 return self;
-            },function(error){
-                if(secondAttempt){
-                    // Something strange is happening here - pass it to controller
-                    return $q.reject(error);
-                }
-                if(error.status === 403 || error.status === 401) {
-                    // Some options here:
-                    // * Access was revoked
-                    // * System was disconnected from cloud
-                    // * Password was changed
-                    // * Nonce expired
-
-                    // We double-check nonce by trying to auth on the server again
-                    // Other cases are not distinguishable - so we just pass the error further
-
-                    return self.updateSystemAuth(true).then(function(){
-                        // Ok, just continue our data request
-                         return self.update(true);
-                    },function(){
-                        // We failed - let controller handle this situation
-                        return $q.reject(error);
-                    });
-                }
             });
         }
 

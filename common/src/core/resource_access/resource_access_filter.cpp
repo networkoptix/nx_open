@@ -44,6 +44,24 @@ bool QnResourceAccessFilter::isShareable(Filter filter, const QnResourcePtr& res
     return false;
 }
 
+bool QnResourceAccessFilter::isDroppable(const QnResourcePtr& resource)
+{
+    NX_EXPECT(resource);
+    if (!resource)
+        return false;
+
+    return resource->hasFlags(Qn::layout) || isOpenableInLayout(resource);
+}
+
+bool QnResourceAccessFilter::isOpenableInLayout(const QnResourcePtr& resource)
+{
+    NX_EXPECT(resource);
+    if (!resource)
+        return false;
+
+    return isShareableMedia(resource) || resource->hasFlags(Qn::local_media);
+}
+
 QList<QnResourceAccessFilter::Filter> QnResourceAccessFilter::allFilters()
 {
     return kAllFilters;
@@ -68,10 +86,13 @@ QnResourceList QnResourceAccessFilter::filteredResources(Filter filter, const Qn
     return QnResourceList();
 }
 
-QSet<QnUuid> QnResourceAccessFilter::filteredResources(Filter filter, const QSet<QnUuid>& source)
+QSet<QnUuid> QnResourceAccessFilter::filteredResources(
+    QnResourcePool* resPool,
+    Filter filter,
+    const QSet<QnUuid>& source)
 {
     QSet<QnUuid> result;
-    for (const auto& resource : filteredResources(filter, qnResPool->getResources(source)))
+    for (const auto& resource : filteredResources(filter, resPool->getResources(source)))
         result << resource->getId();
     return result;
 }

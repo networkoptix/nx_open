@@ -9,6 +9,7 @@ nx_add_target(libvms_gateway LIBRARY
     ADDITIONAL_SOURCES
         "${CMAKE_CURRENT_BINARY_DIR}/libvms_gateway_app_info_impl.cpp"
     PUBLIC_LIBS
-        cloud_db_client nx_network)
+        common nx_network cloud_db_client
+)
 
 set_target_properties(libvms_gateway PROPERTIES PREFIX "")

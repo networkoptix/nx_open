@@ -8,7 +8,7 @@
 #include <memory>
 
 #include <api/applauncher_api.h>
-#include <utils/common/long_runnable.h>
+#include <nx/utils/thread/long_runnable.h>
 #include <utils/ipc/named_pipe_server.h>
 
 #include "blocking_queue.h"

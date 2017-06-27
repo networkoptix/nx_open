@@ -1,6 +1,6 @@
 #pragma once
 
-#include <test_support/transaction_connection_helper.h>
+#include <nx/cloud/cdb/test_support/transaction_connection_helper.h>
 
 #include "ec2/cloud_vms_synchro_test_helper.h"
 
@@ -24,7 +24,10 @@ public:
      * Opens connection. Each has random peerId.
      */
     void openTransactionConnections(int count);
-    void openTransactionConnectionsOfSpecifiedVersion(int count, int protoVersion);
+    /**
+     * @return Ids of connections created.
+     */
+    std::vector<int> openTransactionConnectionsOfSpecifiedVersion(int count, int protoVersion);
     void waitForConnectionsToMoveToACertainState(
         const std::vector<::ec2::QnTransactionTransportBase::State>& desiredStates,
         std::chrono::milliseconds waitTimeout);
@@ -32,6 +35,7 @@ public:
     void waitUntilActiveConnectionCountReaches(int count);
     void waitUntilClosedConnectionCountReaches(int count);
     void closeAllConnections();
+    void useAnotherSystem();
 
     QUrl cdbSynchronizationUrl() const;
 

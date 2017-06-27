@@ -391,16 +391,7 @@ QList<QHostAddress> pingableAddresses(const QHostAddress& startAddr, const QHost
     }
 
     NX_LOG(lit("Done. time elapsed = %1").arg(time.elapsed()), cl_logINFO);
-
-    CL_LOG(cl_logDEBUG1)
-    {
-        NX_LOG(lit("ping results..."), cl_logDEBUG1);
-        for(const QHostAddress& addr: result)
-            NX_LOG(addr.toString(), cl_logDEBUG1);
-    }
-
-
-
+    NX_LOG(lm("Ping results %1").container(result), cl_logINFO);
     return result;
 }
 

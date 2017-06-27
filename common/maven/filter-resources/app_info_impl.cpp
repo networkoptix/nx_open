@@ -18,11 +18,6 @@ QString QnAppInfo::linuxOrganizationName()
     return QStringLiteral("${deb.customization.company.name}");
 }
 
-QString QnAppInfo::realm()
-{
-    return QStringLiteral("VMS");
-}
-
 QString QnAppInfo::applicationVersion()
 {
     return QStringLiteral("${parsedVersion.majorVersion}.${parsedVersion.minorVersion}.${parsedVersion.incrementalVersion}.${buildNumber}");
@@ -77,15 +72,6 @@ bool QnAppInfo::beta()
     static const bool beta =
         (betaString == lit("on") || betaString == lit("true"));
     return beta;
-}
-
-QString QnAppInfo::productName()
-{
-#ifdef _WIN32
-    return QStringLiteral("${product.name}");
-#else
-    return QStringLiteral("${product.appName}");
-#endif
 }
 
 QString QnAppInfo::productNameShort()
@@ -151,36 +137,6 @@ QString QnAppInfo::supportPhone()
 QString QnAppInfo::updateGeneratorUrl()
 {
     return QStringLiteral("${update.generator.url}");
-}
-
-//Filling string constant with zeros to be able to change this constant in already-built binary
-static const char* kCloudHostNameWithPrefix = "this_is_cloud_host_name ${cloudHost}\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0";
-static const char* kCloudHostName = kCloudHostNameWithPrefix + sizeof("this_is_cloud_host_name");
-
-QString QnAppInfo::defaultCloudHost()
-{
-    return QString::fromUtf8(kCloudHostName);
-}
-
-QString QnAppInfo::defaultCloudPortalUrl()
-{
-    return QString::fromLatin1("https://%1").arg(defaultCloudHost());
-}
-
-QString QnAppInfo::defaultCloudModulesXmlUrl()
-{
-    return QString::fromLatin1("http://%1/api/cloud_modules.xml").arg(defaultCloudHost());
-}
-
-QString QnAppInfo::cloudName()
-{
-    return QStringLiteral("${cloudName}");
-}
-
-QStringList QnAppInfo::compatibleCloudHosts()
-{
-    const auto hostsString = QString::fromLatin1("${compatibleCloudHosts}");
-    return hostsString.split(L';');
 }
 
 int QnAppInfo::freeLicenseCount()

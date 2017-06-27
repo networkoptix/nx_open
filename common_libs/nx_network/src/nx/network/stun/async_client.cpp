@@ -1,7 +1,6 @@
 #include "async_client.h"
 
-#include "common/common_globals.h"
-#include "utils/common/guard.h"
+#include <nx/utils/scope_guard.h>
 #include <nx/utils/log/log.h>
 
 namespace nx {
@@ -94,7 +93,7 @@ bool AsyncClient::addConnectionTimer(
     if (m_state != State::connected)
     {
         NX_LOGX(lm("Ignore timer from client(%1), state is %2")
-            .strs(client, static_cast<int>(m_state)), cl_logDEBUG1);
+            .args(client, static_cast<int>(m_state)), cl_logDEBUG1);
      
         return false;
     }
@@ -171,7 +170,7 @@ void AsyncClient::setKeepAliveOptions(KeepAliveOptions options)
                 return;
             }
 
-            NX_LOGX(lm("Set keep alive: %1").str(options), cl_logDEBUG1);
+            NX_LOGX(lm("Set keep alive: %1").arg(options), cl_logDEBUG1);
             const auto keepAlive = m_baseConnection->socket()->setKeepAlive(std::move(options));
             NX_ASSERT(keepAlive, SystemError::getLastOSErrorText());
         });
@@ -237,7 +236,7 @@ void AsyncClient::openConnectionImpl(QnMutexLockerBase* lock)
             {
                 const auto sysErrorCode = SystemError::getLastOSErrorCode();
                 NX_LOGX(lm("Failed to open connection to %1: Failed to configure socket: %2")
-                    .str(*m_endpoint).arg(SystemError::toString(sysErrorCode)), cl_logDEBUG2);
+                    .arg(*m_endpoint).arg(SystemError::toString(sysErrorCode)), cl_logDEBUG2);
                 m_connectingSocket->post(
                     std::bind(onComplete, sysErrorCode));
                 return;
@@ -295,7 +294,7 @@ void AsyncClient::closeConnectionImpl(
         [this]
         {
             NX_LOGX(lm("Trying to restore connection to STUN server %1 ...")
-                .str(m_endpoint ? *m_endpoint : SocketAddress()), cl_logDEBUG1);
+                .arg(m_endpoint ? *m_endpoint : SocketAddress()), cl_logDEBUG1);
 
             QnMutexLocker lock(&m_mutex);
             openConnectionImpl(&lock);
@@ -334,7 +333,7 @@ void AsyncClient::dispatchRequestsInQueue(const QnMutexLockerBase* /*lock*/)
                 if( code != SystemError::noError )
                 {
                     NX_LOGX(lm("Failed to send request to %1. %2")
-                        .str(m_baseConnection->socket()->getForeignAddress())
+                        .arg(m_baseConnection->socket()->getForeignAddress())
                         .arg(SystemError::toString(code)), cl_logDEBUG2);
                     dispatchRequestsInQueue( &lock );
                 }
@@ -348,10 +347,10 @@ void AsyncClient::onConnectionComplete(SystemError::ErrorCode code)
         m_resolvedEndpoint = m_connectingSocket->getForeignAddress();
 
     NX_LOGX(lm("Connect to %1 completed with result: %2")
-        .str(remoteAddress()).arg(SystemError::toString(code)), cl_logDEBUG2);
+        .arg(remoteAddress()).arg(SystemError::toString(code)), cl_logDEBUG2);
 
     ConnectHandler connectCompletionHandler;
-    const auto executeOnConnectedHandlerGuard = makeScopedGuard(
+    const auto executeOnConnectedHandlerGuard = makeScopeGuard(
         [&connectCompletionHandler, code]()
         {
             if (connectCompletionHandler)
@@ -366,7 +365,7 @@ void AsyncClient::onConnectionComplete(SystemError::ErrorCode code)
 
     m_reconnectTimer->cancelSync();
     NX_ASSERT(!m_baseConnection);
-    NX_LOGX(lm("Connected to %1").str(*m_endpoint), cl_logINFO);
+    NX_LOGX(lm("Connected to %1").arg(*m_endpoint), cl_logINFO);
 
     m_baseConnection = std::make_unique<BaseConnectionType>(this, std::move(m_connectingSocket));
     m_baseConnection->bindToAioThread(getAioThread());
@@ -444,7 +443,7 @@ void AsyncClient::startTimer(
     ConnectionTimers::iterator timer, std::chrono::milliseconds period, TimerHandler handler)
 {
     NX_LOGX(lm("Set timer(%1) for client(%2) after %3")
-        .strs(timer->second, timer->first, period), cl_logDEBUG2);
+        .args(timer->second, timer->first, period), cl_logDEBUG2);
     
     timer->second->start(
         period,

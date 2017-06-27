@@ -5,11 +5,17 @@
 #include <nx/utils/std/cpp14.h>
 
 #include <rest/ec2_update_http_handler.h>
+
+#include <nx/core/access/access_types.h>
 #include <core/resource_access/user_access_data.h>
 #include <api/model/audit/auth_session.h>
 #include <nx_ec/data/api_data.h>
 
 #include "mock_stream_socket.h"
+#include <network/tcp_listener.h>
+#include "network/http_connection_listener.h"
+#include <rest/server/rest_connection_processor.h>
+#include <common/static_common_module.h>
 
 namespace ec2 {
 namespace test {
@@ -18,6 +24,21 @@ namespace {
 
 //-------------------------------------------------------------------------------------------------
 // Test/mock classes.
+
+class MockQnHttpConnectionListener: public QnHttpConnectionListener
+{
+public:
+    MockQnHttpConnectionListener(QnCommonModule* commonModule):
+        QnHttpConnectionListener(commonModule, QHostAddress::Any, /*port*/ 0)
+    {
+    }
+
+    virtual QnTCPConnectionProcessor* createRequestProcessor(
+        QSharedPointer<AbstractStreamSocket> clientSocket) override
+    {
+        return nullptr;
+    }
+};
 
 struct ApiMockInnerData
 {
@@ -302,7 +323,10 @@ private:
         }
     )};
 
-    QnRestConnectionProcessor m_restConnectionProcessor{m_socket, /*owner*/ nullptr};
+    QnStaticCommonModule m_staticCommonModule;
+    QnCommonModule m_commonModule{/*clientMode*/ false, nx::core::access::Mode::direct};
+    MockQnHttpConnectionListener listener{&m_commonModule};
+    QnRestConnectionProcessor m_restConnectionProcessor{m_socket, /*owner*/ &listener };
 
     std::unique_ptr<TestUpdateHttpHandler> m_updateHttpHandler{new TestUpdateHttpHandler(
         m_connection)};
@@ -317,32 +341,10 @@ private:
 
 } // namespace
 
-class RestApiTest: public ::testing::Test
-{
-protected:
-    static void SetUpTestCase()
-    {
-        // Init singletons.
-        m_common = new QnCommonModule();
-        m_common->setModuleGUID(QnUuid::createUuid());
-    }
-
-    static void TearDownTestCase()
-    {
-        delete m_common;
-        m_common = nullptr;
-    }
-
-private:
-    static QnCommonModule* m_common;
-    StructMergingTest* m_test;
-};
-QnCommonModule* RestApiTest::m_common = nullptr;
-
 //-------------------------------------------------------------------------------------------------
 // Test cases.
 
-TEST_F(RestApiTest, StructMerging)
+TEST(RestApiTest, StructMerging)
 {
     StructMergingTest test;
 

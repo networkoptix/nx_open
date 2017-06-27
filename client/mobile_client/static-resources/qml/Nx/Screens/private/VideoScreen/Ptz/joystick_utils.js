@@ -71,7 +71,7 @@ function getSectorData(type)
         case Type.FreeWayPtz:
             return SectorData.FreeWayPtz
         default:
-            return null //< No ptz supported
+            return null //< No ptz support
     }
 }
 

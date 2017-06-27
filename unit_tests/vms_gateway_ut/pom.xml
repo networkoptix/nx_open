@@ -5,12 +5,12 @@
     <parent>
         <artifactId>build_ut</artifactId>
         <groupId>com.networkoptix.hdwitness</groupId>
-        <version>3.0.0-SNAPSHOT</version>
+        <version>3.1.0-SNAPSHOT</version>
         <relativePath>../build_ut</relativePath>
     </parent>
 
     <groupId>com.networkoptix.hdwitness</groupId>
-    <version>3.0.0-SNAPSHOT</version>
+    <version>3.1.0-SNAPSHOT</version>
     <modelVersion>4.0.0</modelVersion>
     <artifactId>vms_gateway_ut</artifactId>
     <packaging>pom</packaging>
@@ -19,7 +19,7 @@
     <properties>
         <guid>${vms_gateway_ut.guid}</guid>
         <qt.libs>core network xml concurrent sql multimedia</qt.libs>
-        <global.libs>-lcommon -lnx_utils -lnx_streaming -lnx_network -ludt -lvms_gateway -lconnection_mediator -lcloud_db_client</global.libs>
+        <global.libs>-lvms_gateway -lcommon -lnx_fusion -lnx_utils -lnx_network -ludt -lconnection_mediator -lcloud_db_client</global.libs>
         <windows.oslibs>Ws2_32.lib DbgHelp.lib Winmm.lib Iphlpapi.lib</windows.oslibs>
 
         <windows.defines>_VARIADIC_MAX=10</windows.defines>
@@ -35,6 +35,7 @@
             <scope>system</scope>
             <systemPath>${root.dir}/nx_cloud/libvms_gateway/pom.xml</systemPath>
         </dependency>
+
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>libconnection_mediator</artifactId>

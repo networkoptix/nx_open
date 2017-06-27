@@ -1,0 +1,445 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>General Anatomy of a Synthesizer</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REL="HOME"
+TITLE="Building Synthetic Voices"
+HREF="book1.html"><LINK
+REL="UP"
+TITLE="Overview of Speech Synthesis"
+HREF="c59.html"><LINK
+REL="PREVIOUS"
+TITLE="Uses of Speech Synthesis "
+HREF="x94.html"><LINK
+REL="NEXT"
+TITLE="Speech Science"
+HREF="c176.html"></HEAD
+><BODY
+CLASS="SECT1"
+BGCOLOR="#FFFFFF"
+TEXT="#000000"
+LINK="#0000FF"
+VLINK="#840084"
+ALINK="#0000FF"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="3"
+ALIGN="center"
+>Building Synthetic Voices</TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="bottom"
+><A
+HREF="x94.html"
+ACCESSKEY="P"
+>&#60;&#60;&#60; Previous</A
+></TD
+><TD
+WIDTH="80%"
+ALIGN="center"
+VALIGN="bottom"
+>Overview of Speech Synthesis</TD
+><TD
+WIDTH="10%"
+ALIGN="right"
+VALIGN="bottom"
+><A
+HREF="c176.html"
+ACCESSKEY="N"
+>Next &#62;&#62;&#62;</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="SECT1"
+><H1
+CLASS="SECT1"
+><A
+NAME="AEN98"
+>General Anatomy of a Synthesizer</A
+></H1
+><P
+><A
+NAME="AEN101"
+></A
+><BLOCKQUOTE
+CLASS="BLOCKQUOTE"
+><P
+CLASS="LITERALLAYOUT"
+>[&nbsp;diagram:&nbsp;text&nbsp;going&nbsp;in&nbsp;and&nbsp;moving&nbsp;around,&nbsp;coming&nbsp;out&nbsp;audio&nbsp;]</P
+></BLOCKQUOTE
+></P
+><P
+>Within Festival we can identify three basic parts of the 
+TTS process 
+<P
+></P
+><DIV
+CLASS="VARIABLELIST"
+><DL
+><DT
+><I
+CLASS="EMPHASIS"
+>Text analysis:</I
+></DT
+><DD
+><P
+>From raw text to identified words and basic utterances. </P
+></DD
+><DT
+><I
+CLASS="EMPHASIS"
+>Linguistic analysis:</I
+></DT
+><DD
+><P
+>Finding pronunciations of the words and assigning prosodic 
+structure to them: phrasing, intonation and durations. </P
+></DD
+><DT
+><I
+CLASS="EMPHASIS"
+>Waveform generation:</I
+></DT
+><DD
+><P
+>From a fully specified form (pronunciation and prosody) generate 
+a waveform. </P
+></DD
+></DL
+></DIV
+>
+These partitions are not absolute, but they are a good way of chunking 
+the problem. Of course, different waveform generation techniques may 
+need different types of information. <I
+CLASS="EMPHASIS"
+>Pronunciation</I
+> may not 
+always use standard phones, and <I
+CLASS="EMPHASIS"
+>intonation</I
+> need not necessarily 
+mean an F0 contour. For the main part, at along least the path which is 
+likely to generate a working voice, rather than the more research 
+oriented techniques described, the above three sections will be fairly 
+cleanly adhered to. </P
+><P
+>There is another part to TTS which is normally not mentioned, we will 
+mention it here as it is the most important aspect of Festival that 
+makes building of new voices possible -- the system <I
+CLASS="EMPHASIS"
+>architecture</I
+>. 
+Festival provides a basic utterance structure, a language to manipulate 
+it, and methods for construction and deletion; it also interacts with 
+your audio system in an efficient way, spooling audio files while the 
+rest of the synthesis process can continue. With the Edinburgh Speech 
+Tools, it offers basic analysis tools (pitch trackers, classification 
+and regression tree builders, waveform I/O etc) and a simple but 
+powerful scripting language. All of these functions make it so that you 
+may get on with the task of building a voice, rather than worrying about 
+the underlying software too much. </P
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="AEN124"
+>Text</A
+></H2
+><P
+>We try to model the voice independently of the meaning, with machine
+learning techniques and statistical methods.  This is an important
+abstraction, as it moves us from the realm of "all human thought" to
+"all possible sequences."  Rather than asking "when and why should
+this be said," we ask "how is this performed, as a series of speech
+sounds?" In general, we'll discuss this under the heading of text
+analysis -- going from written text, possibly with some mark-up, to a
+set of words and their relationships in an internal representation,
+called an utterance structure.</P
+><P
+>&#13;
+Text analysis is the task of identifying the <I
+CLASS="EMPHASIS"
+>words</I
+> in the text. 
+By <I
+CLASS="EMPHASIS"
+>words</I
+>, we mean tokens for which there is a well defined method 
+of finding their pronunciation, i.e. from a lexicon, or using 
+letter-to-sound rules. The first task in text analysis is to make 
+chunks out of the input text -- <I
+CLASS="EMPHASIS"
+>tokenizing</I
+> it. In Festival, at this 
+stage, we also chunk the text into more reasonably sized utterances. An 
+utterance structure is used to hold the information for what might most 
+simply be described as a <I
+CLASS="EMPHASIS"
+>sentence</I
+>. We use the term loosely, as 
+it need not be anything syntactic in the traditional linguistic sense, 
+though it most often has prosodic boundaries or edge effects. 
+Separating a text into utterances is important, as it allows synthesis to 
+work bit by bit, allowing the waveform of the first utterance to be 
+available more quickly than if the whole files was processed as one. 
+Otherwise, one would simply play an entire recorded utterance -- which 
+is not nearly as flexible, and in some domains is even impossible. </P
+><P
+>&#13;
+Utterance chunking is an externally specifiable part of Festival, as it 
+may vary from language to language. For many languages, tokens are 
+white-space separated and utterances can, to a first approximation, be 
+separated after full stops (periods), question marks, or exclamation 
+points. Further complications, such as abbreviations, other-end 
+punctuation (as the upside-down question mark in Spanish), blank lines 
+and so on, make the definition harder. For languages such as Japanese 
+and Chinese, where white space is not normally used to separate what we 
+would term words, a different strategy must be used, though both these 
+languages still use punctuation that can be used to identify utterance 
+boundaries, and word segmentation can be a second process. </P
+><P
+>Apart from chunking, text analysis also does text <I
+CLASS="EMPHASIS"
+>normalization</I
+>. 
+There are many tokens which appear in text that do not have 
+a direct relationship to their pronunciation. Numbers are perhaps 
+the most obvious example. Consider the following 
+sentence 
+<A
+NAME="AEN143"
+></A
+><BLOCKQUOTE
+CLASS="BLOCKQUOTE"
+><P
+CLASS="LITERALLAYOUT"
+>On&nbsp;May&nbsp;5&nbsp;1996,&nbsp;the&nbsp;university&nbsp;bought&nbsp;1996&nbsp;computers.&nbsp;</P
+></BLOCKQUOTE
+>
+In English, tokens consisting of solely digits have a number of different 
+forms of pronunciation. The <SPAN
+CLASS="QUOTE"
+>"<I
+CLASS="EMPHASIS"
+>5</I
+>"</SPAN
+> above is pronounced <SPAN
+CLASS="QUOTE"
+>"<I
+CLASS="EMPHASIS"
+>fifth</I
+>"</SPAN
+>, an 
+ordinal, because it is the day in a month, The first <SPAN
+CLASS="QUOTE"
+>"<I
+CLASS="EMPHASIS"
+>1996</I
+>"</SPAN
+> is 
+pronounced as <SPAN
+CLASS="QUOTE"
+>"<I
+CLASS="EMPHASIS"
+>nineteen ninety six</I
+>"</SPAN
+> because it is a year, and the 
+second <SPAN
+CLASS="QUOTE"
+>"<I
+CLASS="EMPHASIS"
+>1996</I
+>"</SPAN
+> is pronounced as <SPAN
+CLASS="QUOTE"
+>"<I
+CLASS="EMPHASIS"
+>one thousand nine hundred 
+and ninety size</I
+>"</SPAN
+> (British English) as it is a quantity. </P
+><P
+>&#13;
+Two problems that turn up here: non-trivial relationship of tokens to 
+words, and <I
+CLASS="EMPHASIS"
+>homographs</I
+>, where the same token may have alternate 
+pronunciations in different contexts. In Festival, homograph 
+disambiguation is considered as part of text analysis. In addition to 
+numbers, there are many other symbols which have internal structure that 
+require special processing -- such as money, times, addresses, etc. All 
+of these can be dealt with in Festival by what is termed 
+<I
+CLASS="EMPHASIS"
+>token-to-word rules</I
+>. These are language specific (and sometimes 
+text mode specific). Detailed examples will be given in the text 
+analysis chapter below. </P
+></DIV
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="AEN164"
+>Lexicons</A
+></H2
+><P
+>After we have a set of words to be spoken, we have to decide what the
+sounds should be -- what phonemes, or basic speech sounds, are spoken.
+Each language and dialect has a phoneme set associated with it, and
+the choice of this inventory is still not agreed upon; different
+theories posit different feature geometries. Given a set of units, we
+can, once again, train models from them, but it is up to linguistics
+(and practice) to help us find good levels of structure and the units
+at each. </P
+></DIV
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="AEN167"
+>Prosody</A
+></H2
+><P
+>Prosody, or the way things are spoken, is an extremely important part
+of the speech message.  Changing the placement of emphasis in a
+sentence can change the meaning of a word, and this emphasis might be
+revealed as a change in pitch, volume, voice quality, or timing.</P
+><P
+>We'll present two approaches to taming the prosodic beast: limiting
+the domain to be spoken, and intonation modeling.  By limiting the
+domain, we can collect enough data to cover the whole output.  For
+some things, like weather or stock quotes, very high quality can be
+produced, since these are rather contained.  For general synthesis,
+however, we need to be able to turn any text, or perhaps concept, into
+a spoken form, and we can never collect all the sentences anyone could
+ever say.  To handle this, we break the prosody into a set of
+features, which we predict using statistically trained models.</P
+><P
+> - phrasing
+ - duration
+ - intonation
+ - energy
+ - voice quality</P
+></DIV
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="AEN172"
+>Waveform generation</A
+></H2
+><P
+>For the case of concatenative synthesis, we actually collect
+recordings of voice talent, and this captures the voice quality to
+some degree. This way, we avoid detailed physical simulation of the
+oral tract, and perform synthesis by integrating pieces that we have
+in our inventory; as we don't have to produce the precisely controlled
+articulatory motion, we can model the speech using the units available
+in the sound alone -- though these are the surface realization of an
+underlying, physically generated signal, and knowledge of that system
+informs what we do.  During waveform generation, the system assembles
+the units into an audio file or stream, and that can be finally
+"spoken."  There can be some distortion as these units are joined
+together, but the results can also be quite good. </P
+><P
+>We systematically collect the units, in all variations, so as to be
+able to reproduce them later as needed.  To do this, we design a set
+of utterances that contain all of the variation that produces
+meaningful or apparent contrast in the language, and record it.  Of
+course, this requires a theory of how to break speech into relevant
+parts and their associated features; various linguistic theories
+predict these for us, though none are undisputed. There are several
+different possible unit inventories, and each has tradeoffs, in terms
+of size, speed, and quality; we will discuss these in some detail.</P
+></DIV
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="x94.html"
+ACCESSKEY="P"
+>&#60;&#60;&#60; Previous</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="book1.html"
+ACCESSKEY="H"
+>Home</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="c176.html"
+ACCESSKEY="N"
+>Next &#62;&#62;&#62;</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>Uses of Speech Synthesis</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="c59.html"
+ACCESSKEY="U"
+>Up</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>Speech Science</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

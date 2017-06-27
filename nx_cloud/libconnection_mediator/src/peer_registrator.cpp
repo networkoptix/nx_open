@@ -3,9 +3,8 @@
 #include <functional>
 #include <iostream>
 
-#include <common/common_globals.h>
-#include <nx/utils/log/log.h>
 #include <nx/network/stun/extension/stun_extension_types.h>
+#include <nx/utils/log/log.h>
 
 #include "listening_peer_pool.h"
 #include "data/listening_peer.h"
@@ -200,6 +199,8 @@ void PeerRegistrator::listen(
     }
 
     api::ListenResponse response;
+    if (!m_settings.trafficRelay().url.isEmpty())
+        response.trafficRelayUrl = m_settings.trafficRelay().url.toUtf8();
     response.tcpConnectionKeepAlive = m_settings.stun().keepAliveOptions;
     response.cloudConnectOptions = m_settings.general().cloudConnectOptions;
     completionHandler(api::ResultCode::ok, std::move(response));
@@ -298,7 +299,7 @@ void PeerRegistrator::resolvePeer(
             api::ConnectionMethod::proxy;
 
     NX_LOGX(lm("Successfully resolved host %1 (requested from %2)")
-        .str(peerDataLocker->value())
+        .arg(peerDataLocker->value())
         .arg(connection->getSourceAddress().toString()), cl_logDEBUG2);
 
     completionHandler(api::ResultCode::ok, std::move(responseData));
@@ -313,7 +314,7 @@ void PeerRegistrator::clientBind(
     const auto reject = [&](api::ResultCode code)
     {
         NX_LOGX(lm("Reject client bind (requested from %1): %2")
-            .strs(connection->getSourceAddress(), code), cl_logDEBUG2);
+            .args(connection->getSourceAddress(), code), cl_logDEBUG2);
 
         completionHandler(code, {});
     };
@@ -335,8 +336,8 @@ void PeerRegistrator::clientBind(
         info.tcpReverseEndpoints = std::move(requestData.tcpReverseEndpoints);
 
         NX_LOGX(lm("Successfully bound client %1 with tcpReverseEndpoints=%2 (requested from %3)")
-            .str(peerId).container(info.tcpReverseEndpoints)
-            .str(connection->getSourceAddress()), cl_logDEBUG1);
+            .arg(peerId).container(info.tcpReverseEndpoints)
+            .arg(connection->getSourceAddress()), cl_logDEBUG1);
 
         indication = makeIndication(peerId, info);
         listeningPeerConnections = m_listeningPeerPool->getAllConnections();
@@ -350,7 +351,7 @@ void PeerRegistrator::clientBind(
             if (it == m_boundClients.end() || it->second.connection.lock() != connection)
                 return;
 
-            NX_LOGX(lm("Client %1 has disconnected").str(peerId), cl_logDEBUG1);
+            NX_LOGX(lm("Client %1 has disconnected").arg(peerId), cl_logDEBUG1);
             m_boundClients.erase(it);
         });
 

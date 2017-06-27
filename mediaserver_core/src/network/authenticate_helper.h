@@ -15,18 +15,15 @@
 #include <nx/utils/timer_manager.h>
 #include <nx/utils/uuid.h>
 #include <nx/utils/singleton.h>
-#include <nx/network/http/httptypes.h>
+#include <nx/network/http/http_types.h>
 #include <nx/utils/thread/mutex.h>
-#include <nx/network/auth_restriction_list.h>
+#include <nx/network/http/auth_restriction_list.h>
 
 #include "ldap/ldap_manager.h"
 #include "network/auth/abstract_nonce_provider.h"
 #include "network/auth/abstract_user_data_provider.h"
 #include <core/resource_access/user_access_data.h>
-
-
-#define USE_USER_RESOURCE_PROVIDER
-
+#include <common/common_module_aware.h>
 
 struct QnLdapDigestAuthContext;
 class TimeBasedNonceProvider;
@@ -35,6 +32,7 @@ struct CloudManagerGroup;
 class QnAuthHelper
 :
     public QObject,
+    public QnCommonModuleAware,
     public Singleton<QnAuthHelper>
 {
     Q_OBJECT
@@ -43,6 +41,7 @@ public:
     static const unsigned int MAX_AUTHENTICATION_KEY_LIFE_TIME_MS;
 
     QnAuthHelper(
+        QnCommonModule* commonModule,
         TimeBasedNonceProvider* timeBasedNonceProvider,
         CloudManagerGroup* cloudManagerGroup);
     virtual ~QnAuthHelper();
@@ -53,9 +52,9 @@ public:
         nx_http::Response& response,
         bool isProxy = false,
         Qn::UserAccessData* accessRights = 0,
-        AuthMethod::Value* usedAuthMethod = 0);
+        nx_http::AuthMethod::Value* usedAuthMethod = 0);
 
-    QnAuthMethodRestrictionList* restrictionList();
+    nx_http::AuthMethodRestrictionList* restrictionList();
 
     //!Creates query item for \a path which does not require authentication
     /*!
@@ -84,14 +83,11 @@ public:
 
     bool checkUserPassword(const QnUserResourcePtr& user, const QString& password);
 
+    QnLdapManager* ldapManager() const;
+
 signals:
     void emptyDigestDetected(const QnUserResourcePtr& user, const QString& login, const QString& password);
 
-#ifndef USE_USER_RESOURCE_PROVIDER
-private slots:
-    void at_resourcePool_resourceAdded(const QnResourcePtr &);
-    void at_resourcePool_resourceRemoved(const QnResourcePtr &);
-#endif
 private:
     class TempAuthenticationKeyCtx
     {
@@ -155,15 +151,12 @@ private:
         Qn::UserAccessData* accessRights);
 
     mutable QnMutex m_mutex;
-#ifndef USE_USER_RESOURCE_PROVIDER
-    QMap<QnUuid, QnUserResourcePtr> m_users;
-    QMap<QnUuid, QnMediaServerResourcePtr> m_servers;
-#endif
-    QnAuthMethodRestrictionList m_authMethodRestrictionList;
+    nx_http::AuthMethodRestrictionList m_authMethodRestrictionList;
     std::map<QString, TempAuthenticationKeyCtx> m_authenticatedPaths;
     AbstractNonceProvider* m_timeBasedNonceProvider;
     AbstractNonceProvider* m_nonceProvider;
     AbstractUserDataProvider* m_userDataProvider;
+    std::unique_ptr<QnLdapManager> m_ldap;
 
     void authenticationExpired( const QString& path, quint64 timerID );
     QnUserResourcePtr findUserByName( const QByteArray& nxUserName ) const;
@@ -177,7 +170,6 @@ private:
     */
     //!Check \a digest validity with external authentication service (LDAP currently)
     Qn::AuthResult checkDigestValidity(QnUserResourcePtr userResource, const QByteArray& digest );
-
 };
 
 #define qnAuthHelper QnAuthHelper::instance()

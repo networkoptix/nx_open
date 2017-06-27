@@ -4,6 +4,7 @@
 #include "media_server/settings.h"
 #include "utils/common/buffered_file.h"
 #include "utils/fs/file.h"
+#include <media_server/media_server_module.h>
 
 namespace aux
 {
@@ -157,6 +158,7 @@ namespace aux
 } //namespace aux
 
 QnStorageResource* QnThirdPartyStorageResource::instance(
+    QnCommonModule* commonModule,
     const QString               &url,
     const StorageFactoryPtrType &sf
 )
@@ -164,6 +166,7 @@ QnStorageResource* QnThirdPartyStorageResource::instance(
     try
     {
         return new QnThirdPartyStorageResource(
+            commonModule,
             sf,
             url
         );
@@ -175,9 +178,12 @@ QnStorageResource* QnThirdPartyStorageResource::instance(
 }
 
 QnThirdPartyStorageResource::QnThirdPartyStorageResource(
+        QnCommonModule* commonModule,
         const StorageFactoryPtrType &sf,
-        const QString               &storageUrl
-) : m_valid(true)
+        const QString               &storageUrl)
+:
+    base_type(commonModule),
+    m_valid(true)
 {
     openStorage(
         storageUrl.toLatin1().constData(),
@@ -185,8 +191,9 @@ QnThirdPartyStorageResource::QnThirdPartyStorageResource(
     );
 }
 
-QnThirdPartyStorageResource::QnThirdPartyStorageResource()
-    : m_valid(false)
+QnThirdPartyStorageResource::QnThirdPartyStorageResource():
+    base_type(nullptr),
+    m_valid(false)
 {}
 
 QnThirdPartyStorageResource::~QnThirdPartyStorageResource()
@@ -200,7 +207,7 @@ void QnThirdPartyStorageResource::openStorage(
     QnMutexLocker lock(&m_mutex);
 
     int ecode;
-    nx_spl::Storage* spRaw = sf->createStorage(storageUrl, &ecode);
+    nx_spl::Storage* spRaw = sf->createStorage(commonModule(), storageUrl, &ecode);
 
     if (ecode != nx_spl::error::NoError)
     {
@@ -285,18 +292,18 @@ QIODevice *QnThirdPartyStorageResource::open(
         int ffmpegBufferSize = 0;
 
         int ffmpegMaxBufferSize =
-            MSSettings::roSettings()->value(
+            qnServerModule->roSettings()->value(
                 nx_ms_conf::MAX_FFMPEG_BUFFER_SIZE,
                 nx_ms_conf::DEFAULT_MAX_FFMPEG_BUFFER_SIZE).toInt();
 
         if (openMode & QIODevice::WriteOnly)
         {
-            ioBlockSize = MSSettings::roSettings()->value(
+            ioBlockSize = qnServerModule->roSettings()->value(
                 nx_ms_conf::IO_BLOCK_SIZE,
                 nx_ms_conf::DEFAULT_IO_BLOCK_SIZE
             ).toInt();
 
-            ffmpegBufferSize = MSSettings::roSettings()->value(
+            ffmpegBufferSize = qnServerModule->roSettings()->value(
                 nx_ms_conf::FFMPEG_BUFFER_SIZE,
                 nx_ms_conf::DEFAULT_FFMPEG_BUFFER_SIZE
             ).toInt();

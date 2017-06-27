@@ -10,6 +10,7 @@
 #include <core/resource_management/resource_data_pool.h>
 #include <utils/xml/camera_advanced_param_reader.h>
 #include <plugins/resource/onvif/onvif_stream_reader.h>
+#include <common/static_common_module.h>
 
 static const int HTTP_PORT = 80;
 
@@ -40,7 +41,7 @@ bool QnDigitalWatchdogResource::isCproChipset() const
 
 bool QnDigitalWatchdogResource::useOnvifAdvancedParameterProviders() const
 {
-    auto resData = qnCommon->dataPool()->data(toSharedPointer(this));
+    auto resData = qnStaticCommon->dataPool()->data(toSharedPointer(this));
     return isCproChipset() || resData.value<bool>(lit("forceOnvifAdvancedParameters"));
 }
 
@@ -125,7 +126,7 @@ void QnDigitalWatchdogResource::enableOnvifSecondStream()
 
 bool QnDigitalWatchdogResource::disableB2FramesForActiDW()
 {
-    QnResourceData resourceData = qnCommon->dataPool()->data(toSharedPointer(this));
+    QnResourceData resourceData = qnStaticCommon->dataPool()->data(toSharedPointer(this));
     bool isRebrendedActiCamera = resourceData.value<bool>(lit("isRebrendedActiCamera"), false);
     if (!isRebrendedActiCamera)
         return true;
@@ -138,7 +139,7 @@ bool QnDigitalWatchdogResource::disableB2FramesForActiDW()
 
 QnAbstractPtzController *QnDigitalWatchdogResource::createPtzControllerInternal()
 {
-    QnResourceData resourceData = qnCommon->dataPool()->data(toSharedPointer(this));
+    QnResourceData resourceData = qnStaticCommon->dataPool()->data(toSharedPointer(this));
     bool useHttpPtz = resourceData.value<bool>(lit("dw-http-ptz"), false);
     QScopedPointer<QnAbstractPtzController> result;
     if (useHttpPtz)
@@ -158,7 +159,7 @@ QnAbstractPtzController *QnDigitalWatchdogResource::createPtzControllerInternal(
 
 bool QnDigitalWatchdogResource::loadAdvancedParametersTemplate(QnCameraAdvancedParams &params) const
 {
-    QnResourceData resourceData = qnCommon->dataPool()->data(toSharedPointer(this));
+    QnResourceData resourceData = qnStaticCommon->dataPool()->data(toSharedPointer(this));
     if (useOnvifAdvancedParameterProviders())
         return base_type::loadAdvancedParametersTemplate(params); //< dw-cpro chipset (or something else that has uncompatible cgi interface)
     else if (resourceData.value<bool>(lit("dw-pravis-chipset")))
@@ -169,13 +170,13 @@ bool QnDigitalWatchdogResource::loadAdvancedParametersTemplate(QnCameraAdvancedP
 
 void QnDigitalWatchdogResource::initAdvancedParametersProviders(QnCameraAdvancedParams &params)
 {
-    QnResourceData resourceData = qnCommon->dataPool()->data(toSharedPointer(this));
+    QnResourceData resourceData = qnStaticCommon->dataPool()->data(toSharedPointer(this));
     if (useOnvifAdvancedParameterProviders())
     {
         base_type::initAdvancedParametersProviders(params);
         return;
     }
-    
+
     if (resourceData.value<bool>(lit("dw-pravis-chipset")))
         m_cameraProxy.reset(new QnPravisCameraProxy(getHostAddress(), 80, getNetworkTimeout(), getAuth()));
     else

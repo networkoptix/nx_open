@@ -10,8 +10,11 @@ import logging
 import threading
 import subprocess
 import errno
+import glob
 import shutil
-from .utils import quote
+import pytz
+import tzlocal
+from .utils import quote, is_list_inst
 
 
 log = logging.getLogger(__name__)
@@ -54,10 +57,23 @@ def log_output(name, output):
 
 class SshHostConfig(object):
 
-    def __init__(self, host, user, key_file_path):
+    @classmethod
+    def from_dict(cls, d):
+        assert isinstance(d, dict), 'ssh location should be dict: %r'  % d
+        assert 'host' in d, '"host" is required parameter for host location'
+        return cls(
+            host=d['host'],
+            user=d.get('user'),
+            key_file_path=d.get('key_file'),
+            )
+
+    def __init__(self, host, user=None, key_file_path=None):
         self.host = host
         self.user = user
         self.key_file_path = key_file_path
+
+    def __repr__(self):
+        return '<host=%r user=%r key_file=%r>' % (self.host, self.user, self.key_file_path)
 
 
 def host_from_config(config):
@@ -85,6 +101,10 @@ class Host(object):
         pass
 
     @abc.abstractmethod
+    def dir_exists(self, path):
+        pass
+
+    @abc.abstractmethod
     def put_file(self, from_local_path, to_remote_path):
         pass
 
@@ -104,6 +124,30 @@ class Host(object):
     def get_file_size(self, path):
         pass
 
+    # create parent dirs as well
+    @abc.abstractmethod
+    def mk_dir(self, path):
+        pass
+
+    @abc.abstractmethod
+    def rm_tree(self, path, ignore_errors=False):
+        pass
+
+    @abc.abstractmethod
+    def expand_path(self, path):
+        pass
+
+    # expand path with '*' mask into list of paths
+    # if for_shell=True, returns path_mask as is for remote ssh host -
+    #   it is assumed to be used in shell command then, and shell will expand it by itself
+    @abc.abstractmethod
+    def expand_glob(self, path_mask, for_shell=False):
+        pass
+
+    @abc.abstractmethod
+    def get_timezone(self):
+        pass
+
     def make_proxy_command(self):
         return []
 
@@ -121,6 +165,7 @@ class LocalHost(Host):
         return 'localhost'
 
     def run_command(self, args, input=None, cwd=None, check_retcode=True, log_output=True):
+        assert is_list_inst(args, (str, unicode)), repr(args)
         args = map(str, args)
         if input:
             log.debug('executing: %s (with %d bytes input)', subprocess.list2cmdline(args), len(input))
@@ -132,7 +177,9 @@ class LocalHost(Host):
             args, cwd=cwd,
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE,
-            stdin=stdin)
+            stdin=stdin,
+            close_fds=True,
+            )
         stdout_buffer = []
         stderr_buffer = []
         stdout_thread = threading.Thread(target=self._read_thread, args=(log.debug, pipe.stdout, stdout_buffer, log_output))
@@ -192,15 +239,20 @@ class LocalHost(Host):
             return '.'
 
     def file_exists(self, path):
-        return os.path.isfile(path)
+        return os.path.isfile(self.expand_path(path))
+
+    def dir_exists(self, path):
+        return os.path.isdir(self.expand_path(path))
 
     def put_file(self, from_local_path, to_remote_path):
-        self._copy(from_local_path, to_remote_path)
+        self._copy(self.expand_path(from_local_path), to_remote_path)
 
     def get_file(self, from_remote_path, to_local_path):
-        self._copy(from_remote_path, to_local_path)
+        self._copy(from_remote_path, self.expand_path(to_local_path))
 
     def _copy(self, from_path, to_path):
+        from_path = self.expand_path(from_path)
+        to_path = self.expand_path(to_path)
         log.debug('copying %s -> %s', from_path, to_path)
         shutil.copy2(from_path, to_path)
 
@@ -219,7 +271,27 @@ class LocalHost(Host):
             f.write(contents)
 
     def get_file_size(self, path):
-        return os.stat(path).st_size
+        return os.stat(self.expand_path(path)).st_size
+
+    def mk_dir(self, path):
+        path = self.expand_path(path)
+        if not os.path.isdir(path):
+            os.makedirs(path)
+    
+    def rm_tree(self, path, ignore_errors=False):
+        shutil.rmtree(self.expand_path(path), ignore_errors)
+
+    def expand_path(self, path):
+        path = os.path.expandvars(path)
+        path = os.path.expanduser(path)
+        path = os.path.abspath(path)
+        return path
+
+    def expand_glob(self, path_mask, for_shell=False):
+        return glob.glob(path_mask)
+
+    def get_timezone(self):
+        return tzlocal.get_localzone()
 
 
 class RemoteSshHost(Host):
@@ -244,7 +316,7 @@ class RemoteSshHost(Host):
         return self._host
 
     def run_command(self, args, input=None, cwd=None, check_retcode=True, log_output=True):
-        ssh_cmd = self._make_ssh_cmd() + ['{user}@{host}'.format(user=self._user, host=self._host)]
+        ssh_cmd = self._make_ssh_cmd() + [self._user_and_host]
         if cwd:
             args = [subprocess.list2cmdline(['cd', cwd, '&&'] + args)]
         return self._local_host.run_command(ssh_cmd + args, input, check_retcode=check_retcode, log_output=log_output)
@@ -254,16 +326,21 @@ class RemoteSshHost(Host):
         assert output in ['yes', 'no'], repr(output)
         return output == 'yes'
 
+    def dir_exists(self, path):
+        output = self.run_command(['[', '-d', path, ']', '&&', 'echo', 'yes', '||', 'echo', 'no']).strip()
+        assert output in ['yes', 'no'], repr(output)
+        return output == 'yes'
+
     def put_file(self, from_local_path, to_remote_path):
         #assert not self._proxy_host, repr(self._proxy_host)  # Can not proxy this... Or can we?
         cmd = ['rsync', '-aL', '-e', ' '.join(self._make_ssh_cmd(must_quote=True)),
                from_local_path,
-               '{user}@{host}:{path}'.format(user=self._user, host=self._host, path=to_remote_path)]
+               '{user_and_host}:{path}'.format(user_and_host=self._user_and_host, path=to_remote_path)]
         self._local_host.run_command(cmd)
 
     def get_file(self, from_remote_path, to_local_path):
         cmd = ['rsync', '-aL', '-e', subprocess.list2cmdline(self._make_ssh_cmd(must_quote=True)),
-               '{user}@{host}:{path}'.format(user=self._user, host=self._host, path=from_remote_path),
+               '{user_and_host}:{path}'.format(user_and_host=self._user_and_host, path=from_remote_path),
                to_local_path]
         self._local_host.run_command(cmd)
 
@@ -281,10 +358,41 @@ class RemoteSshHost(Host):
     def get_file_size(self, path):
         return self.run_command(['stat', '--format=%s', path])
 
+    def mk_dir(self, path):
+        self.run_command(['mkdir', '-p', path])
+
+    def rm_tree(self, path, ignore_errors=False):
+        self.run_command(['rm', '-r', path], check_retcode=not ignore_errors)
+
+    def expand_path(self, path):
+        assert '*' not in path, repr(path)  # this function is only for expanding ~ and $VARs. for globs use expand_glob
+        return self.run_command(['echo', path]).strip()
+
+    def expand_glob(self, path_mask, for_shell=False):
+        assert not path_mask.startswith('~/'), repr(path_mask)  # this function is only for expanding '*' globs, use expand_path for that
+        if for_shell:
+            return [path_mask]  # ssh expands '*' masks automatically
+        else:
+            assert ' ' not in path_mask  # spaces in path are not supported by the following command
+            output = self.run_command(['echo', path_mask]).strip()
+            if output == path_mask:
+                return []  # this means nothing is found
+            else:
+                return output.split()
+
+    def get_timezone(self):
+        tzname = self.read_file('/etc/timezone').strip()
+        return pytz.timezone(tzname)
+        
     def make_proxy_command(self):
-        return (self._make_ssh_cmd()
-                + ['{user}@{host}'.format(user=self._user, host=self._host),
-                   'nc', '-q0', '%h', '%p'])
+        return (self._make_ssh_cmd() + [self._user_and_host, 'nc', '-q0', '%h', '%p'])
+
+    @property
+    def _user_and_host(self):
+        if self._user:
+            return '{user}@{host}'.format(user=self._user, host=self._host)
+        else:
+            return self._host
 
     def _make_ssh_cmd(self, must_quote=False):
         return ['ssh'] + self._make_identity_args() + self._make_config_args() + self._make_proxy_args(must_quote)

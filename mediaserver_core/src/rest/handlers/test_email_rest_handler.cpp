@@ -9,8 +9,14 @@
 
 #include "nx_ec/data/api_conversion_functions.h"
 #include "nx_ec/data/api_email_data.h"
+#include <rest/server/rest_connection_processor.h>
 
-int QnTestEmailSettingsHandler::executePost(const QString &path, const QnRequestParams &params, const QByteArray &body, QnJsonRestResult &result, const QnRestConnectionProcessor*)
+int QnTestEmailSettingsHandler::executePost(
+    const QString &path,
+    const QnRequestParams &params,
+    const QByteArray &body,
+    QnJsonRestResult &result,
+    const QnRestConnectionProcessor* owner)
 {
     Q_UNUSED(path);
     Q_UNUSED(params);
@@ -19,7 +25,7 @@ int QnTestEmailSettingsHandler::executePost(const QString &path, const QnRequest
     ec2::ApiEmailSettingsData apiData = QJson::deserialized(body, ec2::ApiEmailSettingsData());
     QnEmailSettings settings;
     fromApiToResource(apiData, settings);
-    EmailManagerImpl emailManagerImpl;
+    EmailManagerImpl emailManagerImpl(owner->commonModule());
 
     SmtpOperationResult smtpResult = emailManagerImpl.testConnection(settings);
 

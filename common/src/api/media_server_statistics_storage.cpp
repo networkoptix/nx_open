@@ -6,6 +6,7 @@
 #include <core/resource_management/resource_pool.h>
 
 #include <utils/common/synctime.h>
+#include <common/common_module.h>
 
 namespace {
     const int noDataValue = -1;
@@ -25,6 +26,7 @@ namespace {
 
 QnMediaServerStatisticsStorage::QnMediaServerStatisticsStorage(const QnUuid &serverId, int pointsLimit, QObject *parent):
     QObject(parent),
+    QnCommonModuleAware(parent),
     m_serverId(serverId),
     m_updateRequests(0),
     m_updateRequestHandle(0),
@@ -74,7 +76,7 @@ void QnMediaServerStatisticsStorage::setFlagsFilter(Qn::StatisticsDeviceType dev
 }
 
 void QnMediaServerStatisticsStorage::update() {
-    QnMediaServerResourcePtr server = qnResPool->getResourceById<QnMediaServerResource>(m_serverId);
+    QnMediaServerResourcePtr server = commonModule()->resourcePool()->getResourceById<QnMediaServerResource>(m_serverId);
     bool canRequest = server && server->getStatus() == Qn::Online;
 
     if (!m_listeners || m_updateRequests > 0 || !canRequest) {

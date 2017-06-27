@@ -40,6 +40,13 @@ public:
         return static_cast<T*>(result);
     }
 
+    // TODO: Rename findInstance to instance and remove the original method.
+    template<class T>
+    T* findInstance()
+    {
+        return static_cast<T*>(m_instanceByMetaObject.value(&T::staticMetaObject));
+    }
+
 protected:
     template<class T>
     T* store(T* instance)

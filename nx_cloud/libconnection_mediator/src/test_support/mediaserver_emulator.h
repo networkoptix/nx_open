@@ -10,7 +10,7 @@
 #include <nx/network/stun/async_client.h>
 #include <nx/network/udt/udt_socket.h>
 #include <nx/utils/std/cpp14.h>
-#include <utils/common/stoppable.h>
+#include <nx/utils/thread/stoppable.h>
 
 #include "../cloud_data_provider.h"
 
@@ -19,7 +19,7 @@ namespace hpm {
 
 class MediaServerEmulator:
     public network::aio::BasicPollable,
-    public StreamConnectionHolder<stun::MessagePipeline>
+    public nx::network::server::StreamConnectionHolder<stun::MessagePipeline>
 {
 public:
     enum class ActionToTake
@@ -102,7 +102,7 @@ private:
     void onUdtConnectDone(SystemError::ErrorCode errorCode);
     void onUdtConnectionAccepted(
         SystemError::ErrorCode errorCode,
-        AbstractStreamSocket* acceptedSocket);
+        std::unique_ptr<AbstractStreamSocket> acceptedSocket);
     void onMessageReceived(nx::stun::Message message);
 
     virtual void closeConnection(

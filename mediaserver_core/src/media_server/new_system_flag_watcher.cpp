@@ -11,16 +11,17 @@
 
 #include <core/resource/media_server_resource.h>
 
-QnNewSystemServerFlagWatcher::QnNewSystemServerFlagWatcher(QObject* parent /*= nullptr*/):
-    base_type(parent)
+QnNewSystemServerFlagWatcher::QnNewSystemServerFlagWatcher(QObject* parent):
+    base_type(parent),
+    QnCommonModuleAware(parent)
 {
-    connect(qnGlobalSettings, &QnGlobalSettings::initialized, this, &QnNewSystemServerFlagWatcher::update);
-    connect(qnGlobalSettings, &QnGlobalSettings::localSystemIdChanged, this, &QnNewSystemServerFlagWatcher::update);
+    connect(globalSettings(), &QnGlobalSettings::initialized, this, &QnNewSystemServerFlagWatcher::update);
+    connect(globalSettings(), &QnGlobalSettings::localSystemIdChanged, this, &QnNewSystemServerFlagWatcher::update);
 }
 
 void QnNewSystemServerFlagWatcher::update()
 {
-    auto server = qnCommon->currentServer();
+    auto server = commonModule()->currentServer();
     NX_ASSERT(server);
     if (!server)
         return;
@@ -35,7 +36,7 @@ void QnNewSystemServerFlagWatcher::update()
     if (serverFlags != server->getServerFlags())
     {
         server->setServerFlags(serverFlags);
-        ec2::AbstractECConnectionPtr ec2Connection = QnAppServerConnectionFactory::getConnection2();
+        ec2::AbstractECConnectionPtr ec2Connection = QnAppServerConnectionFactory::ec2Connection();
 
         ec2::ApiMediaServerData apiServer;
         fromResourceToApi(server, apiServer);

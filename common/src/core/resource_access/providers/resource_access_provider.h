@@ -3,6 +3,7 @@
 #include <core/resource_access/providers/abstract_resource_access_provider.h>
 
 #include <nx/utils/singleton.h>
+#include <common/common_module_aware.h>
 
 /**
  * Class-facade that collects data from base providers.
@@ -11,12 +12,12 @@
  */
 class QnResourceAccessProvider:
     public QnAbstractResourceAccessProvider,
-    public Singleton<QnResourceAccessProvider>
+    public QnCommonModuleAware
 {
     using base_type = QnAbstractResourceAccessProvider;
 
 public:
-    QnResourceAccessProvider(QObject* parent = nullptr);
+    QnResourceAccessProvider(Mode mode, QObject* parent = nullptr);
     virtual ~QnResourceAccessProvider();
 
     virtual bool hasAccess(const QnResourceAccessSubject& subject,
@@ -65,5 +66,3 @@ private:
 private:
     QList<QnAbstractResourceAccessProvider*> m_providers;
 };
-
-#define qnResourceAccessProvider QnResourceAccessProvider::instance()

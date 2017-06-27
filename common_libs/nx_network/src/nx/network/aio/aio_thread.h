@@ -2,7 +2,7 @@
 
 #include <memory>
 
-#include <utils/common/long_runnable.h>
+#include <nx/utils/thread/long_runnable.h>
 
 #include "abstract_pollset.h"
 #include "aio_event_handler.h"

@@ -5,7 +5,7 @@
 #include <nx/utils/thread/mutex.h>
 
 #include <nx/fusion/serialization/json_functions.h>
-#include <utils/common/long_runnable.h>
+#include <nx/utils/thread/long_runnable.h>
 
 #include <api/resource_property_adaptor.h>
 
@@ -18,18 +18,20 @@ bool deserialize(const QString& /*value*/, QnPtzTourHash* /*target*/)
     return false;
 }
 
-QnTourPtzController::QnTourPtzController(const QnPtzControllerPtr& baseController):
+QnTourPtzController::QnTourPtzController(
+    const QnPtzControllerPtr &baseController,
+    QThreadPool* threadPool,
+    QThread* executorThread):
     base_type(baseController),
     m_adaptor(new QnJsonResourcePropertyAdaptor<QnPtzTourHash>(
         lit("ptzTours"), QnPtzTourHash(), this)),
-    m_executor(new QnTourPtzExecutor(baseController))
+    m_executor(new QnTourPtzExecutor(baseController, threadPool))
 {
-    NX_ASSERT(qnPtzPool); /* Ptz pool must exist as it hosts executor thread. */
     NX_ASSERT(!baseController->hasCapabilities(Ptz::AsynchronousPtzCapability)); // TODO: #Elric
 
     // TODO: #Elric implement it in a saner way
     if (!baseController->hasCapabilities(Ptz::VirtualPtzCapability))
-        m_executor->moveToThread(qnPtzPool->executorThread());
+        m_executor->moveToThread(executorThread);
 
     m_adaptor->setResource(baseController->resource());
     connect(m_adaptor, &QnAbstractResourcePropertyAdaptor::valueChanged, this,

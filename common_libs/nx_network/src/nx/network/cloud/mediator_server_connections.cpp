@@ -44,7 +44,7 @@ void MediatorServerTcpConnection::monitorListeningState(
                 {
                     if (code != ResultCode::ok)
                     {
-                        NX_LOGX(lm("Check own state has failed: %1").str(code), cl_logDEBUG1);
+                        NX_LOGX(lm("Check own state has failed: %1").arg(code), cl_logDEBUG1);
                         return client()->closeConnection(SystemError::invalidData);
                     }
 

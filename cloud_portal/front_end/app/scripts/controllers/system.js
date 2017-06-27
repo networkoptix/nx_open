@@ -42,20 +42,12 @@ angular.module('cloudApp')
 
         function delayedUpdateSystemInfo(){
             var pollingSystemUpdate = $poll(function(){
-                return $scope.system.update().catch(function(error){
-                    if(error.status === 403 || error.status === 401 || error.data.resultCode == "forbidden"){
-                        // Either we lost access to the system
-                        // Or it was disconnected from the cloud
-                        // Send user to /systems/ and show him the message
-                        dialogs.notify(L.errorCodes.lostConnection.replace("{{systemName}}", $scope.system.info.name), 'warning');
-                        $location.path("/systems/");
-                    }
-                });
+                return $scope.system.update();
             },Config.updateInterval);
 
             $scope.$on('$destroy', function( event ) {
                 $poll.cancel(pollingSystemUpdate);
-            } );
+            });
         }
 
         //Retrieve users list
@@ -117,16 +109,27 @@ angular.module('cloudApp')
             // Call share dialog, run process inside
             return dialogs.share($scope.system).then(loadUsers);
         };
-
+        $scope.locked = {};
         $scope.editShare = function(user){
             //Pass user inside
-            return dialogs.share($scope.system, user).then(loadUsers);
+
+            if($scope.locked[user.email]){
+                return;
+            }
+            $scope.locked[user.email] = true;
+            return dialogs.share($scope.system, user).then(loadUsers).finally(function(){
+                $scope.locked[user.email] = false;
+            });
         };
 
         $scope.unshare = function(user){
             if($scope.account.email == user.email){
                 return $scope.delete();
             }
+            if($scope.locked[user.email]){
+                return;
+            }
+            $scope.locked[user.email] = true;
             dialogs.confirm(L.system.confirmUnshare, L.system.confirmUnshareTitle, L.system.confirmUnshareAction, 'danger').
                 then(function(){
                     // Run a process of sharing
@@ -135,6 +138,10 @@ angular.module('cloudApp')
                     },{
                         successMessage: L.system.permissionsRemoved.replace('{{email}}',user.email),
                         errorPrefix: L.errorCodes.cantSharePrefix
+                    }).then(function(){
+                        $scope.locked[user.email] = false;
+                    },function(){
+                        $scope.locked[user.email] = false;
                     });
                     $scope.unsharing.run();
                 });
@@ -151,6 +158,15 @@ angular.module('cloudApp')
             if(option.permissions){
                 option.permissions = normalizePermissionString(option.permissions);
             }
+        });
+
+        var cancelSubscription = $scope.$on("unauthirosed_" + $routeParams.systemId,function(event,data){
+             dialogs.notify(L.errorCodes.lostConnection.replace("{{systemName}}", $scope.system.name || L.errorCodes.thisSystem), 'warning');
+             $location.path("/systems");
+        });
+
+        $scope.$on('$destroy', function( event ) {
+            cancelSubscription();
         });
 
 

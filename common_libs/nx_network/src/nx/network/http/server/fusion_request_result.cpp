@@ -43,12 +43,27 @@ FusionRequestResult::FusionRequestResult(
 {
 }
 
+void FusionRequestResult::setHttpStatusCode(
+    nx_http::StatusCode::Value statusCode)
+{
+    m_httpStatusCode = statusCode;
+}
+
 nx_http::StatusCode::Value FusionRequestResult::httpStatusCode() const
+{
+    if (m_httpStatusCode)
+        return *m_httpStatusCode;
+    else
+        return calculateHttpStatusCode();
+}
+
+nx_http::StatusCode::Value FusionRequestResult::calculateHttpStatusCode() const
 {
     switch (errorClass)
     {
         case FusionRequestErrorClass::noError:
             return nx_http::StatusCode::ok;
+
         case FusionRequestErrorClass::badRequest:
             switch (static_cast<FusionRequestErrorDetail>(errorDetail))
             {
@@ -57,19 +72,24 @@ nx_http::StatusCode::Value FusionRequestResult::httpStatusCode() const
                 default:
                     return nx_http::StatusCode::badRequest;
             }
+
         case FusionRequestErrorClass::unauthorized:
             // This is authorization failure, not authentication! 
                 // "401 Unauthorized" is not applicable here since it 
                 // actually signals authentication error.
             return nx_http::StatusCode::forbidden;
+
         case FusionRequestErrorClass::logicError:
             // Using "404 Not Found" to signal any logic error. 
                 // It is allowed by HTTP. See [rfc2616, 10.4.5] for details
             return nx_http::StatusCode::notFound;
+
         case FusionRequestErrorClass::ioError:
             return nx_http::StatusCode::serviceUnavailable;
+
         case FusionRequestErrorClass::internalError:
             return nx_http::StatusCode::internalServerError;
+
         default:
             NX_ASSERT(false);
             return nx_http::StatusCode::internalServerError;

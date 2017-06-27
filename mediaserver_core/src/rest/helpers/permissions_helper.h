@@ -3,13 +3,15 @@
 #include <rest/server/json_rest_result.h>
 #include <core/resource_access/user_access_data.h>
 
+class QnCommonModule;
+
 struct QnPermissionsHelper
 {
     /** Check if server is running in safe mode. */
-    static bool isSafeMode();
+    static bool isSafeMode(const QnCommonModule* commonModule);
 
     /** Check if user is system owner. */
-    static bool hasOwnerPermissions(const Qn::UserAccessData& accessRights);
+    static bool hasOwnerPermissions(QnResourcePool* resPool, const Qn::UserAccessData& accessRights);
 
     /** Fill result with correct values and return fixed error code. */
     static int safeModeError(QnRestResult& result);

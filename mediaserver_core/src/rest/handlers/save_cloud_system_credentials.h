@@ -4,6 +4,7 @@
 
 struct CloudCredentialsData;
 struct CloudManagerGroup;
+class QnCommonModule;
 
 class QnSaveCloudSystemCredentialsHandler:
     public QnJsonRestHandler
@@ -32,18 +33,36 @@ private:
         const QnRestConnectionProcessor* owner,
         QnJsonRestResult* result,
         nx_http::StatusCode::Value* const authorizationStatusCode);
-    bool validateInputData(const CloudCredentialsData& data, QnJsonRestResult* result);
-    bool checkInternetConnection(QnJsonRestResult* result);
+    bool validateInputData(
+        QnCommonModule* commonModule,
+        const CloudCredentialsData& data,
+        QnJsonRestResult* result);
+    bool checkInternetConnection(QnCommonModule* commonModule, QnJsonRestResult* result);
 
-    bool saveCloudData(const CloudCredentialsData& data, QnJsonRestResult* result);
-    bool saveCloudCredentials(const CloudCredentialsData& data, QnJsonRestResult* result);
-    bool insertCloudOwner(const CloudCredentialsData& data, QnJsonRestResult* result);
+    bool saveCloudData(
+        QnCommonModule* commonModule,
+        const CloudCredentialsData& data,
+        QnJsonRestResult* result);
+    bool saveCloudCredentials(
+        QnCommonModule* commonModule,
+        const CloudCredentialsData& data,
+        QnJsonRestResult* result);
+    bool insertCloudOwner(
+        QnCommonModule* commonModule,
+        const CloudCredentialsData& data,
+        QnJsonRestResult* result);
 
-    bool fetchNecessaryDataFromCloud(const CloudCredentialsData& data, QnJsonRestResult* result);
-    bool saveLocalSystemIdToCloud(const CloudCredentialsData& data, QnJsonRestResult* result);
+    bool fetchNecessaryDataFromCloud(
+        QnCommonModule* commonModule,
+        const CloudCredentialsData& data,
+        QnJsonRestResult* result);
+    bool saveLocalSystemIdToCloud(
+        QnCommonModule* commonModule,
+        const CloudCredentialsData& data,
+        QnJsonRestResult* result);
     bool initializeCloudRelatedManagers(
         const CloudCredentialsData& data,
         QnJsonRestResult* result);
 
-    bool rollback();
+    bool rollback(QnCommonModule* commonModule);
 };

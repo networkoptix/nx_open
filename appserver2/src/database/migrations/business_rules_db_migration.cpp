@@ -5,7 +5,11 @@
 #include <QtSql/QSqlDatabase>
 #include <QtSql/QSqlQuery>
 
+#include <core/resource/user_resource.h>
+#include <core/resource_management/user_roles_manager.h>
+
 #include <business/business_fwd.h>
+#include <business/business_event_rule.h>
 
 #include <utils/db/db_helper.h>
 #include <nx/fusion/model_functions.h>
@@ -117,25 +121,96 @@ struct CameraOutputParametersV30
 };
 #define CameraOutputParametersV30_Fields (relayOutputId)(durationMs)
 
+struct ShowPopupParametersV30
+{
+    QnBusiness::UserGroup userGroup;
+};
+#define ShowPopupParametersV30_Fields (userGroup)
+
+struct ShowPopupParametersV31Alpha
+{
+    std::vector<QnUuid> additionalResources;
+};
+#define ShowPopupParametersV31Alpha_Fields (additionalResources)
+
+struct BusinessActionParameters31Beta
+{
+    bool needConfirmation = false;
+    QnBusiness::ActionType targetActionType = QnBusiness::UndefinedAction;
+    QnUuid actionResourceId;
+    QString url;
+    QString emailAddress;
+    int fps = 10;
+    Qn::StreamQuality streamQuality = Qn::QualityHighest;
+    int recordAfter = 0;
+    QString relayOutputId;
+    QString sayText;
+    QString tags;
+    QString text;
+    int durationMs = 5000;
+    std::vector<QnUuid> additionalResources;
+    bool allUsers = false;
+    bool forced = true;
+    QString presetId;
+    bool useSource = false;
+    int recordBeforeMs = 1000;
+    bool playToClient = true;
+    QString contentType;
+};
+#define BusinessActionParameters31Beta_Fields (targetActionType)(needConfirmation)(actionResourceId)\
+    (url)(emailAddress)(fps)(streamQuality)(recordAfter)(relayOutputId)(sayText)(tags)(text)\
+    (durationMs)(additionalResources)(allUsers)(forced)(presetId)(useSource)(recordBeforeMs)\
+    (playToClient)(contentType)
+
+struct EventMetaData31Beta
+{
+    std::vector<QnUuid> cameraRefs;
+    std::vector<QnUuid> instigators;
+    bool allUsers = false;
+};
+#define EventMetaData31Beta_Fields (cameraRefs)(instigators)(allUsers)
+
+struct BusinessEventParameters31Beta
+{
+    QnBusiness::EventType eventType;
+    qint64 eventTimestampUsec;
+    QnUuid eventResourceId;
+    QString resourceName;
+    QnUuid sourceServerId;
+    QnBusiness::EventReason reasonCode;
+    QString inputPortId;
+    QString caption;
+    QString description;
+    EventMetaData31Beta metadata;
+};
+#define BusinessEventParameters31Beta_Fields \
+    (eventType)(eventTimestampUsec)(eventResourceId)(resourceName)(sourceServerId) \
+    (reasonCode)(inputPortId)(caption)(description)(metadata)
+
 #define MIGRATION_ACTION_PARAM_TYPES \
     (CameraOutputParametersV23)\
     (CameraOutputParametersV30)\
+    (ShowPopupParametersV30)\
+    (ShowPopupParametersV31Alpha)\
+    (BusinessActionParameters31Beta)\
+    (EventMetaData31Beta)\
+    (BusinessEventParameters31Beta)
 
 QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(MIGRATION_ACTION_PARAM_TYPES, (json))
 
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(
-    MIGRATION_ACTION_PARAM_TYPES, (json), _Fields, (optional, false))
+    MIGRATION_ACTION_PARAM_TYPES, (json), _Fields, (brief, true))
 
 bool doRemap(const QSqlDatabase& database, int id, const QVariant& newVal, const QString& fieldName)
 {
     QSqlQuery query(database);
     query.setForwardOnly(true);
     QString sqlText = QString("UPDATE vms_businessrule set %1 = ? where id = ?").arg(fieldName);
-    if (!QnDbHelper::prepareSQLQuery(&query, sqlText, Q_FUNC_INFO))
+    if (!nx::utils::db::SqlQueryExecutionHelper::prepareSQLQuery(&query, sqlText, Q_FUNC_INFO))
         return false;
     query.addBindValue(newVal);
     query.addBindValue(id);
-    return QnDbHelper::execSQLQuery(&query, Q_FUNC_INFO);
+    return nx::utils::db::SqlQueryExecutionHelper::execSQLQuery(&query, Q_FUNC_INFO);
 }
 
 bool migrateBusinessRulesToV23(const QSqlDatabase& database)
@@ -143,9 +218,9 @@ bool migrateBusinessRulesToV23(const QSqlDatabase& database)
     QSqlQuery query(database);
     query.setForwardOnly(true);
     QString sqlText = "SELECT id,event_type, action_type from vms_businessrule";
-    if (!QnDbHelper::prepareSQLQuery(&query, sqlText, Q_FUNC_INFO))
+    if (!nx::utils::db::SqlQueryExecutionHelper::prepareSQLQuery(&query, sqlText, Q_FUNC_INFO))
         return false;
-    if (!QnDbHelper::execSQLQuery(&query, Q_FUNC_INFO))
+    if (!nx::utils::db::SqlQueryExecutionHelper::execSQLQuery(&query, Q_FUNC_INFO))
         return false;
 
     QVector<BusinessRuleRemapData> oldData;
@@ -173,18 +248,18 @@ bool migrateBusinessRulesToV30(const QSqlDatabase& database)
 {
     QSqlQuery query(database);
     query.setForwardOnly(true);
-    QString sqlText = R"(
+    QString sqlText = R"sql(
         SELECT id, action_type, action_params
         FROM vms_businessrule
         WHERE action_type = ? or action_type = ?
-    )";
-    if (!QnDbHelper::prepareSQLQuery(&query, sqlText, Q_FUNC_INFO))
+    )sql";
+    if (!nx::utils::db::SqlQueryExecutionHelper::prepareSQLQuery(&query, sqlText, Q_FUNC_INFO))
         return false;
 
     /* Updating duration field. */
     query.addBindValue(QnBusinessV23::CameraOutputOnceAction);
     query.addBindValue(QnBusiness::CameraOutputAction);
-    if (!QnDbHelper::execSQLQuery(&query, Q_FUNC_INFO))
+    if (!nx::utils::db::SqlQueryExecutionHelper::execSQLQuery(&query, Q_FUNC_INFO))
         return false;
 
     QVector<BusinessRuleRemapData> oldData;
@@ -217,5 +292,136 @@ bool migrateBusinessRulesToV30(const QSqlDatabase& database)
     return true;
 }
 
+bool migrateBusinessRulesToV31Alpha(const QSqlDatabase& database)
+{
+    QSqlQuery query(database);
+    query.setForwardOnly(true);
+    QString sqlText = R"sql(
+        SELECT id, action_type, action_params
+        FROM vms_businessrule
+        WHERE action_type = ?
+    )sql";
+    if (!nx::utils::db::SqlQueryExecutionHelper::prepareSQLQuery(&query, sqlText, Q_FUNC_INFO))
+        return false;
+
+    query.addBindValue(QnBusiness::ShowPopupAction);
+    if (!nx::utils::db::SqlQueryExecutionHelper::execSQLQuery(&query, Q_FUNC_INFO))
+        return false;
+
+    QVector<BusinessRuleRemapData> oldData;
+    while (query.next())
+    {
+        BusinessRuleRemapData data;
+        data.id = query.value("id").toInt();
+        data.actionParams = query.value("action_params").toByteArray();
+        oldData << data;
+    }
+
+    for (const BusinessRuleRemapData& data: oldData)
+    {
+        auto oldParams = QJson::deserialized<ShowPopupParametersV30>(data.actionParams);
+        ShowPopupParametersV31Alpha newParams;
+        if (oldParams.userGroup == QnBusiness::AdminOnly)
+        {
+            newParams.additionalResources =
+                QnUserRolesManager::adminRoleIds().toVector().toStdVector();
+        }
+
+        if (!doRemap(database, data.id, QJson::serialized(newParams), "action_params"))
+            return false;
+    }
+
+    return true;
 }
+
+bool migrateBusinessActionsAllUsers(const QSqlDatabase& database)
+{
+    QSqlQuery query(database);
+    query.setForwardOnly(true);
+    QString sqlText = R"sql(
+        SELECT id, action_type, action_params
+        FROM vms_businessrule
+        WHERE action_type = ? or action_type = ? or action_type = ?
+           or action_type = ? or action_type = ? or action_type = ?
+    )sql";
+    if (!QnDbHelper::prepareSQLQuery(&query, sqlText, Q_FUNC_INFO))
+        return false;
+
+    query.addBindValue(QnBusiness::ShowPopupAction);
+    query.addBindValue(QnBusiness::ShowOnAlarmLayoutAction);
+    query.addBindValue(QnBusiness::BookmarkAction);
+    query.addBindValue(QnBusiness::PlaySoundAction);
+    query.addBindValue(QnBusiness::PlaySoundOnceAction);
+    query.addBindValue(QnBusiness::SayTextAction);
+    if (!QnDbHelper::execSQLQuery(&query, Q_FUNC_INFO))
+        return false;
+
+    QVector<BusinessRuleRemapData> oldData;
+    while (query.next())
+    {
+        BusinessRuleRemapData data;
+        data.id = query.value("id").toInt();
+        data.actionParams = query.value("action_params").toByteArray();
+        oldData << data;
+    }
+
+    for (const BusinessRuleRemapData& data: oldData)
+    {
+        auto params = QJson::deserialized<BusinessActionParameters31Beta>(data.actionParams);
+        const bool allUsers = params.additionalResources.empty();
+
+        if (params.allUsers == allUsers)
+            continue;
+
+        params.allUsers = allUsers;
+        if (!doRemap(database, data.id, QJson::serialized(params), "action_params"))
+            return false;
+    }
+
+    return true;
 }
+
+bool migrateBusinessEventsAllUsers(const QSqlDatabase& database)
+{
+    QSqlQuery query(database);
+    query.setForwardOnly(true);
+    QString sqlText = R"sql(
+        SELECT id, event_condition
+        FROM vms_businessrule
+        WHERE event_type = ?
+    )sql";
+    if (!QnDbHelper::prepareSQLQuery(&query, sqlText, Q_FUNC_INFO))
+        return false;
+
+    query.addBindValue(QnBusiness::SoftwareTriggerEvent);
+    if (!QnDbHelper::execSQLQuery(&query, Q_FUNC_INFO))
+        return false;
+
+    QVector<QPair<int, QByteArray>> oldData;
+    while (query.next())
+    {
+        oldData << qMakePair(
+            query.value("id").toInt(),
+            query.value("event_condition").toByteArray());
+    }
+
+    for (const auto& old: oldData)
+    {
+        const int id = old.first;
+        auto params = QJson::deserialized<BusinessEventParameters31Beta>(old.second);
+
+        const bool allUsers = params.metadata.instigators.empty();
+        if (params.metadata.allUsers == allUsers)
+            continue;
+
+        params.metadata.allUsers = allUsers;
+
+        if (!doRemap(database, id, QJson::serialized(params), "event_condition"))
+            return false;
+    }
+
+    return true;
+}
+
+} // namespace db
+} // namespace ec2

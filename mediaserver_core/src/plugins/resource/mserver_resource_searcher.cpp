@@ -19,6 +19,7 @@
 #include <media_server/settings.h>
 #include "common/common_module.h"
 #include <api/global_settings.h>
+#include "media_server/media_server_module.h"
 
 
 using nx::network::UDPSocket;
@@ -30,7 +31,7 @@ static const QByteArray guidStr("{756E732D-0FB1-4f91-8CE0-381D1A3F84E8}");
 
 QByteArray localAppServerHost()
 {
-    QByteArray result = MSSettings::roSettings()->value("appserverHost", QLatin1String(DEFAULT_APPSERVER_HOST)).toString().toUtf8();
+    QByteArray result = qnServerModule->roSettings()->value("appserverHost", QLatin1String(DEFAULT_APPSERVER_HOST)).toString().toUtf8();
     if (isLocalAppServer(result)) {
         QList<QnInterfaceAndAddr> interfaces = getAllIPv4Interfaces();
         if (!interfaces.isEmpty())
@@ -97,12 +98,15 @@ public:
         }
     }
 
-    static QStringList getLocalUsingCameras()
+    static QStringList getLocalUsingCameras(const QnCommonModule* commonModule)
     {
         QStringList result;
-        QnMediaServerResourcePtr mediaServer = qSharedPointerDynamicCast<QnMediaServerResource> (qnResPool->getResourceById(serverGuid()));
-        if (mediaServer) {
-            QnResourceList resList = qnResPool->getResourcesWithParentId(mediaServer->getId());
+        const auto& pool = commonModule->resourcePool();
+        QnMediaServerResourcePtr mediaServer = qSharedPointerDynamicCast<QnMediaServerResource> (
+            pool->getResourceById(commonModule->moduleGUID()));
+        if (mediaServer)
+        {
+            QnResourceList resList = pool->getResourcesWithParentId(mediaServer->getId());
             for (int i = 0; i < resList.size(); ++i) {
                 QnNetworkResourcePtr netRes = resList[i].dynamicCast<QnNetworkResource>();
                 if (netRes && hasRunningLiveProvider(netRes))
@@ -127,20 +131,21 @@ public:
         return m_systemId;
     }
 
-    static QByteArray getRequest(const QByteArray& systemId)
+    static QByteArray getRequest(const QnCommonModule* commonModule)
     {
         QList<QByteArray> result;
         result << guidStr;
-        result << systemId;
+        result << commonModule->globalSettings()->localSystemId().toByteArray();
         result << localAppServerHost();
-        QStringList cameras = getLocalUsingCameras();
+        QStringList cameras = getLocalUsingCameras(commonModule);
         for (const QString &camera: cameras)
             result.append(camera.toUtf8());
         return listToByteArray(result);
     }
 
-    void fillCameraConflictList(QStringList &result) const {
-        QStringList localCameras = getLocalUsingCameras();
+    void fillCameraConflictList(QnCommonModule* commonModule, QStringList &result) const
+    {
+        QStringList localCameras = getLocalUsingCameras(commonModule);
         if (localCameras.isEmpty())
             return;
 
@@ -152,28 +157,15 @@ public:
     }
 };
 
-
-//Q_GLOBAL_STATIC(QnMServerResourceSearcher, inst)
-static QnMServerResourceSearcher* staticInstance = NULL;
-
-void QnMServerResourceSearcher::initStaticInstance( QnMServerResourceSearcher* inst )
+QnMServerResourceSearcher::QnMServerResourceSearcher(QnCommonModule* commonModule):
+    QnCommonModuleAware(commonModule)
 {
-    staticInstance = inst;
-}
-
-QnMServerResourceSearcher* QnMServerResourceSearcher::instance()
-{
-    return staticInstance;
 }
 
 QnMServerResourceSearcher::~QnMServerResourceSearcher()
 {
     stop();
     deleteSocketList();
-}
-
-QnMServerResourceSearcher::QnMServerResourceSearcher()
-{
 }
 
 void QnMServerResourceSearcher::run()
@@ -241,7 +233,7 @@ void QnMServerResourceSearcher::readDataFromSocket()
         AbstractDatagramSocket* sock = m_socketList[i];
 
         // send request for next read
-        QByteArray datagram = DiscoveryPacket::getRequest(qnGlobalSettings->localSystemId().toByteArray());
+        QByteArray datagram = DiscoveryPacket::getRequest(commonModule());
         sock->sendTo(datagram.data(), datagram.size(), groupAddress, DISCOVERY_PORT);
     }
 
@@ -252,7 +244,7 @@ void QnMServerResourceSearcher::readDataFromSocket()
     readSocketInternal(m_receiveSocket.get(), conflicts);
     if (!conflicts.camerasByServer.isEmpty()) {
         conflicts.sourceServer = localAppServerHost();
-        QnMediaServerResourcePtr mediaServer = qSharedPointerDynamicCast<QnMediaServerResource> (qnResPool->getResourceById(serverGuid()));
+        QnMediaServerResourcePtr mediaServer = qSharedPointerDynamicCast<QnMediaServerResource> (resourcePool()->getResourceById(serverGuid()));
         if (mediaServer)
             qnBusinessRuleConnector->at_mediaServerConflict(mediaServer, qnSyncTime->currentUSecsSinceEpoch(), conflicts);
     }
@@ -273,7 +265,7 @@ void QnMServerResourceSearcher::readSocketInternal(AbstractDatagramSocket* socke
                 QStringList cameras = conflictList.camerasByServer.contains(packet.appServerHost())
                     ? conflictList.camerasByServer[packet.appServerHost()]
                     : QStringList();
-                packet.fillCameraConflictList(cameras);
+                packet.fillCameraConflictList(commonModule(), cameras);
                 if (!cameras.isEmpty())
                     conflictList.camerasByServer[packet.appServerHost()] = cameras;
             }

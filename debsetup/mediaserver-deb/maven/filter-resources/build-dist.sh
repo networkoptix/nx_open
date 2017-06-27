@@ -70,7 +70,7 @@ then
 fi
 
 #copying qt libs
-QTLIBS="Core Gui Xml XmlPatterns Concurrent Network Sql"
+QTLIBS="Core Gui Xml XmlPatterns Concurrent Network Sql WebSockets"
 for var in $QTLIBS
 do
     qtlib=libQt5$var.so
@@ -117,6 +117,7 @@ install -m 644 systemd/networkoptix-mediaserver.service $SYSTEMDSTAGE/$COMPANY_N
 
 # Prepare DEBIAN dir
 mkdir -p $STAGE/DEBIAN
+chmod go+rx $STAGE/DEBIAN
 
 INSTALLED_SIZE=`du -s $STAGE | awk '{print $1;}'`
 

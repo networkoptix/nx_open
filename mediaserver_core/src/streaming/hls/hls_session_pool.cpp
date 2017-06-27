@@ -27,6 +27,7 @@ namespace nx_hls
         m_live( _isLive ),
         m_streamQuality( streamQuality ),
         m_cameraId( videoCamera->resource()->getId() ),
+        m_resPool(videoCamera->resource()->resourcePool()),
         m_authSession( authSession )
     {
         //verifying m_playlistManagers will not take much memory
@@ -50,7 +51,7 @@ namespace nx_hls
     {
         if( m_live )
         {
-            QnResourcePtr resource = QnResourcePool::instance()->getResourceById( m_cameraId );
+            QnResourcePtr resource = m_resPool->getResourceById( m_cameraId );
             if( resource )
             {
                 //checking resource stream type. Only h.264 is OK for HLS

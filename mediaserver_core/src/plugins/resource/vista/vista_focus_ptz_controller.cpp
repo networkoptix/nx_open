@@ -12,6 +12,7 @@
 #include <common/common_module.h>
 #include <core/resource/resource_data.h>
 #include <core/resource_management/resource_data_pool.h>
+#include <common/static_common_module.h>
 
 #include "vista_resource.h"
 
@@ -75,7 +76,7 @@ void QnVistaFocusPtzController::init() {
     }
 
     if(options.contains(lit("PTZ"))) {
-        QnResourceData data = qnCommon->dataPool()->data(m_resource);
+        QnResourceData data = qnStaticCommon->dataPool()->data(m_resource);
         Ptz::Capabilities extraCaps = Ptz::NoPtzCapabilities;
         data.value(Qn::PTZ_CAPABILITIES_PARAM_NAME, &extraCaps);
         if(extraCaps & Ptz::ContinuousFocusCapability) {

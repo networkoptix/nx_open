@@ -1,5 +1,4 @@
-#ifndef EC2_LAYOUT_DATA_H
-#define EC2_LAYOUT_DATA_H
+#pragma once
 
 #include "api_globals.h"
 #include "api_data.h"
@@ -35,10 +34,7 @@ namespace ec2
                                     (displayInfo)
 
 
-    struct ApiLayoutItemWithRefData: ApiLayoutItemData {
-        QnUuid layoutId;
-    };
-#define ApiLayoutItemWithRefData_Fields ApiLayoutItemData_Fields (layoutId)
+
 
 
     struct ApiLayoutData: ApiResourceData
@@ -48,19 +44,17 @@ namespace ec2
             typeId = QnResourceTypePool::kLayoutTypeUuid;
         }
 
-        float cellAspectRatio;
-        float horizontalSpacing;
-        float verticalSpacing;
+        float cellAspectRatio = 0;
+        float horizontalSpacing = 0;
+        float verticalSpacing = 0;
         std::vector<ApiLayoutItemData> items;
-        bool   locked;
+        bool   locked = false;
         QString backgroundImageFilename;
-        qint32  backgroundWidth;
-        qint32  backgroundHeight;
-        float backgroundOpacity;
+        qint32  backgroundWidth = 0;
+        qint32  backgroundHeight = 0;
+        float backgroundOpacity = 0;
     };
 #define ApiLayoutData_Fields ApiResourceData_Fields (cellAspectRatio)(horizontalSpacing)(verticalSpacing)(items)(locked) \
                                 (backgroundImageFilename)(backgroundWidth)(backgroundHeight)(backgroundOpacity)
 
 }
-
-#endif  //EC2_LAYOUT_DATA_H

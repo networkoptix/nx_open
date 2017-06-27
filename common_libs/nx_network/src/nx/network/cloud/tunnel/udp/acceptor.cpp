@@ -1,10 +1,8 @@
-
 #include "acceptor.h"
 
 #include <nx/fusion/serialization/lexical.h>
 
 #include "incoming_tunnel_connection.h"
-
 
 namespace nx {
 namespace network {
@@ -18,7 +16,8 @@ TunnelAcceptor::TunnelAcceptor(
     m_peerAddresses(std::move(peerAddresses)),
     m_connectionParameters(std::move(connectionParametes)),
     m_udpRetransmissionTimeout(stun::UdpClient::kDefaultRetransmissionTimeOut),
-    m_udpMaxRetransmissions(stun::UdpClient::kDefaultMaxRetransmissions)
+    m_udpMaxRetransmissions(stun::UdpClient::kDefaultMaxRetransmissions),
+    m_holePunchingEnabled(true)
 {
 }
 
@@ -31,6 +30,11 @@ void TunnelAcceptor::setUdpRetransmissionTimeout(
 void TunnelAcceptor::setUdpMaxRetransmissions(int count)
 {
     m_udpMaxRetransmissions = count;
+}
+
+void TunnelAcceptor::setHolePunchingEnabled(bool value)
+{
+    m_holePunchingEnabled = value;
 }
 
 void TunnelAcceptor::accept(AcceptHandler handler)
@@ -95,12 +99,18 @@ void TunnelAcceptor::connectionAckResult(
         return executeAcceptHandler(SystemError::connectionAbort);
     }
 
+    if (!m_holePunchingEnabled)
+    {
+        NX_VERBOSE(this, lm("Interrupting UDP hole punching due to configuration"));
+        return executeAcceptHandler(SystemError::interrupted);
+    }
+
     auto udpSocket = m_udpMediatorConnection->takeSocket();
     m_udpMediatorConnection.reset();
 
     auto localAddress = udpSocket->getLocalAddress();
     auto timeout = m_connectionParameters.rendezvousConnectTimeout.count();
-    for (const auto& address : m_peerAddresses)
+    for (const auto& address: m_peerAddresses)
     {
         auto udtSocket = std::make_unique<UdtStreamSocket>(AF_INET);
         udtSocket->bindToAioThread(m_mediatorConnection->getAioThread());
@@ -130,7 +140,7 @@ void TunnelAcceptor::startUdtConnection(
     NX_ASSERT(m_mediatorConnection->isInSelfAioThread());
     NX_LOGX(lm("Initiate rendevous UDT connection from %1 to %2, "
         "connectionId=%3, remotePeerId=%4")
-        .str((*socketIt)->getLocalAddress()).str(target)
+        .arg((*socketIt)->getLocalAddress()).arg(target)
         .arg(m_connectionId).arg(m_remotePeerId), cl_logDEBUG2);
 
     (*socketIt)->connectAsync(
@@ -142,7 +152,7 @@ void TunnelAcceptor::startUdtConnection(
 
             NX_LOGX(lm("Rendezvous UDT connection from %1 to %2 result: %3, "
                 "connectionId=%4, remotePeerId=%5")
-                .str(socket->getLocalAddress()).str(target).arg(SystemError::toString(code))
+                .arg(socket->getLocalAddress()).arg(target).arg(SystemError::toString(code))
                 .arg(m_connectionId).arg(m_remotePeerId), cl_logDEBUG1);
 
             if (code != SystemError::noError)

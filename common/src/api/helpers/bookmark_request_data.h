@@ -11,7 +11,8 @@ struct QnGetBookmarksRequestData: public QnMultiserverRequestData
 {
     QnGetBookmarksRequestData();
 
-    virtual void loadFromParams(const QnRequestParamList& params) override;
+    virtual void loadFromParams(QnResourcePool* resourcePool,
+        const QnRequestParamList& params) override;
     virtual QnRequestParamList toParams() const override;
     virtual bool isValid() const override;
 
@@ -23,7 +24,8 @@ struct QnGetBookmarkTagsRequestData: public QnMultiserverRequestData
 {
     explicit QnGetBookmarkTagsRequestData(int limit = unlimited());
 
-    virtual void loadFromParams(const QnRequestParamList& params) override;
+    virtual void loadFromParams(QnResourcePool* resourcePool,
+        const QnRequestParamList& params) override;
     virtual QnRequestParamList toParams() const override;
     virtual bool isValid() const override;
 
@@ -37,7 +39,8 @@ struct QnUpdateBookmarkRequestData: public QnMultiserverRequestData
     QnUpdateBookmarkRequestData();
     QnUpdateBookmarkRequestData(const QnCameraBookmark& bookmark);
 
-    virtual void loadFromParams(const QnRequestParamList& params) override;
+    virtual void loadFromParams(QnResourcePool* resourcePool,
+        const QnRequestParamList& params) override;
     virtual QnRequestParamList toParams() const override;
     virtual bool isValid() const override;
 
@@ -49,7 +52,8 @@ struct QnDeleteBookmarkRequestData: public QnMultiserverRequestData
     QnDeleteBookmarkRequestData();
     QnDeleteBookmarkRequestData(const QnUuid& bookmarkId);
 
-    virtual void loadFromParams(const QnRequestParamList& params) override;
+    virtual void loadFromParams(QnResourcePool* resourcePool,
+        const QnRequestParamList& params) override;
     virtual QnRequestParamList toParams() const override;
     virtual bool isValid() const override;
 

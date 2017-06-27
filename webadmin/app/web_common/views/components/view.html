@@ -1,0 +1,102 @@
+<placeholder ng-if='!ready' preloader="true" class="webclient-placeholder"></placeholder>
+<table ng-class="{'visibility-hidden':!ready}" class="webclient-window">
+    <tbody>
+        <tr class="alerts-row" ng-if="hasMobileApp && !session.mobileAppNotified">
+            <td colspan="2" class="alert">
+                <div class="webclient-panel mobile-alert" ng-if="hasMobileApp && !session.mobileAppNotified">
+                    <div class="pull-right" >
+                        <a ng-href="{{mobileAppLink}}" class="btn webclient-button caption-row" ng-class="mobileStore">
+                            Install
+                        </a>
+                            <span class="webclient-button caption-row invisible-xs"
+                                  ng-click="mobileAppAlertClose()"><span class="glyphicon glyphicon-remove"></span></span>
+                    </div>
+                    <div>
+                            <span class="caption-row ">
+                                Please, use the mobile application to view video
+                            </span>
+                    </div>
+                </div>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <div class="view-wrapper">
+                    <camera-panel cameras-provider="camerasProvider" active-camera="activeCamera"
+                                  position-provider="positionProvider" system="systemAPI"
+                                  player="player" current-resolution="currentResolution" toggle-camera-panel="toggleCameraPanel"
+                                  class="cameras-panel-toggle"
+                                  ng-class="{'hide-panel':!toggleCameraPanel}"></camera-panel>
+                </div>
+            </td>
+            <td width="100%">
+                <div class="view-wrapper" ng-class="{invisible:!activeCamera}">
+                    <div class="view-panel" ng-class="{'no-archive': !canViewArchive}">
+                        <div class="stick-to-top top-gradient">
+                            <div class="webclient-panel webclient-bottom-border">
+                                <div class="pull-right" >
+                                    <div class="min-40 inline">&nbsp;</div>
+                                    <div class="btn-group pull-up-5">
+                                            <span class="video-icon pull-left-5" data-toggle="dropdown" href="#">
+                                                <span class="glyphicon glyphicon-cog"></span>
+                                            </span>
+                                        <ul class="dropdown-menu video-settings" ng-class="{'no-fullscreen': !enableFullScreen}">
+                                            <li class="video-settings-36"><label>Quality</label></li>
+                                            <li class="video-settings-separation-line"></li>
+                                            <li ng-repeat="resolution in availableResolutions"><a href="#" class="video-settings-20"
+                                                                                                  ng-class="{active:resolution == activeResolution}"
+                                                                                                  ng-click="selectResolution(resolution);$event.preventDefault();">{{resolution}}</a></li>
+
+                                            <li class="video-settings-separation-line"  ng-if="debugMode"></li>
+                                            <li class="video-settings-36"               ng-if="debugMode"><label>Video Player</label></li>
+                                            <li class="video-settings-separation-line"  ng-if="debugMode"></li>
+                                            <li ng-repeat="format in manualFormats"     ng-if="debugMode"><a href="#" class="video-settings-20"
+                                                                                                             ng-class="{active:format == activeFormat}"
+                                                                                                             ng-click="selectFormat(format);$event.preventDefault();">{{format}}</a></li>
+                                        </ul>
+                                    </div>
+                                        <span class="video-icon" ng-if="enableFullScreen" ng-click="fullScreen()">
+                                            <span class="glyphicon glyphicon-fullscreen"></span>
+                                        </span>
+                                </div>
+                                <div class="hide-excess-text video-title-back-button">
+                                        <span class="visible-xs" ng-click="toggleCameraPanel=true"
+                                              ng-class="{'back-button': !toggleCameraPanel}">
+                                            <span class="glyphicon glyphicon-arrow-left"></span>
+                                        </span>
+                                        <camera-status camera="activeCamera" type="'video'"></camera-status>
+                                        <span class="caption-row video-name">
+                                            {{activeCamera.name + " (" + activeResolution + ")"}}
+                                        </span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="float-size">
+                            <camera-view-informer flags="{'status':activeCamera.status,
+                                                          'positionSelected': positionSelected,
+                                                          'iOSVideoTooLarge': iOSVideoTooLarge}">
+                            </camera-view-informer>
+                            <videowindow ng-class="{invisible: iOSVideoTooLarge || !positionSelected &&
+                                                        (activeCamera.status == 'Offline' || activeCamera.status == 'Unauthorized')}"
+                                         vg-update-time="updateTime($currentTime, $duration)" preview="activeCamera.fullPreview"
+                                         vg-player-ready="playerReady($API)" rotation="rotation" playing="positionProvider.playing"
+                                         vg-src="activeVideoSource" player="player" active-format="activeFormat">
+                            </videowindow>
+                        </div>
+
+                        <div class="stick-to-bottom" ng-class="{invisible:liveOnly && !activeCamera}">
+                            <timeline
+                                    can-play-live="!(activeCamera.status == 'Offline' || activeCamera.status == 'Unauthorized')"
+                                    live-only="liveOnly"
+                                    records-provider="activeVideoRecords"
+                                    position-handler="switchPosition"
+                                    play-handler="switchPlaying" can-view-archive="canViewArchive"
+                                    position-provider="positionProvider" volume-level="volumeLevel" server-time="serverTime"></timeline>
+                        </div>
+                    </div>
+                </div>
+            </td>
+        </tr>
+    </tbody>
+</table>

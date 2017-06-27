@@ -1,6 +1,6 @@
 #pragma once
 
-/*
+/**
  * This is a private header intended to be included only to password_analyzer.cpp
  */
 
@@ -12,89 +12,89 @@
 #include <QtCore/QFile>
 #include <QtCore/QTextStream>
 
-namespace
+namespace {
+
+class CharCategoryLookup
 {
-    class CharCategoryLookup
+public:
+    enum Category
     {
-    public:
-        enum Category
-        {
-            Invalid = -1,
+        Invalid = -1,
 
-            Number,
-            LowercaseLetter,
-            UppercaseLetter,
-            Symbol,
-            Space,
+        Number,
+        LowercaseLetter,
+        UppercaseLetter,
+        Symbol,
+        Space,
 
-            ValidCategoryCount
-        };
-
-        CharCategoryLookup(const QByteArray& specialSymbols);
-
-        Category operator[] (short index) const;
-
-    private:
-        std::array<Category, 256> m_table;
+        ValidCategoryCount
     };
 
-    class CommonPasswordsDictionary
+    CharCategoryLookup(const QByteArray& specialSymbols);
+
+    Category operator[] (short index) const;
+
+private:
+    std::array<Category, 256> m_table;
+};
+
+class CommonPasswordsDictionary
+{
+public:
+    CommonPasswordsDictionary(const QString& dictionaryPath = lit(":/common_passwords.txt"));
+
+    bool operator () (const QString& password) const;
+
+private:
+    QSet<QString> m_dictionary;
+};
+
+//-------------------------------------------------------------------------------------------------
+
+CharCategoryLookup::CharCategoryLookup(const QByteArray& specialSymbols)
+{
+    m_table.fill(Invalid);
+
+    for (char ch = 'a'; ch <= 'z'; ++ch)
+        m_table[ch] = LowercaseLetter;
+
+    for (char ch = 'A'; ch <= 'Z'; ++ch)
+        m_table[ch] = UppercaseLetter;
+
+    for (char ch = '0'; ch <= '9'; ++ch)
+        m_table[ch] = Number;
+
+    m_table[' '] = Space;
+
+    for (char ch : specialSymbols)
     {
-    public:
-        CommonPasswordsDictionary(const QString& dictionaryPath = lit(":/common_passwords.txt"));
+        m_table[static_cast<unsigned char>(ch)] = Symbol;
+    }
+}
 
-        bool operator () (const QString& password) const;
+CharCategoryLookup::Category CharCategoryLookup::operator[] (short index) const
+{
+    return (index >= 0 && (size_t)index < m_table.size()) ? m_table[index] : Invalid;
+}
 
-    private:
-        QSet<QString> m_dictionary;
-    };
-
-    /* --------------------------------------------------------------------- */
-
-    CharCategoryLookup::CharCategoryLookup(const QByteArray& specialSymbols)
+CommonPasswordsDictionary::CommonPasswordsDictionary(const QString& dictionaryPath)
+{
+    QFile passwords(dictionaryPath);
+    if (!passwords.open(QFile::ReadOnly))
     {
-        m_table.fill(Invalid);
-
-        for (char ch = 'a'; ch <= 'z'; ++ch)
-            m_table[ch] = LowercaseLetter;
-
-        for (char ch = 'A'; ch <= 'Z'; ++ch)
-            m_table[ch] = UppercaseLetter;
-
-        for (char ch = '0'; ch <= '9'; ++ch)
-            m_table[ch] = Number;
-
-        m_table[' '] = Space;
-
-        for (char ch : specialSymbols)
-        {
-            m_table[static_cast<unsigned char>(ch)] = Symbol;
-        }
+        NX_ASSERT(false);
+        return;
     }
 
-    CharCategoryLookup::Category CharCategoryLookup::operator[] (short index) const
-    {
-        return (index >= 0 && (size_t)index < m_table.size()) ? m_table[index] : Invalid;
-    }
+    QTextStream reader(&passwords);
 
-    CommonPasswordsDictionary::CommonPasswordsDictionary(const QString& dictionaryPath)
-    {
-        QFile passwords(dictionaryPath);
-        if (!passwords.open(QFile::ReadOnly))
-        {
-            NX_ASSERT(false);
-            return;
-        }
+    while (!reader.atEnd())
+        m_dictionary.insert(reader.readLine().trimmed());
+}
 
-        QTextStream reader(&passwords);
+bool CommonPasswordsDictionary::operator () (const QString& password) const
+{
+    return m_dictionary.contains(password);
+}
 
-        while (!reader.atEnd())
-            m_dictionary.insert(reader.readLine().trimmed());
-    }
-
-    bool CommonPasswordsDictionary::operator () (const QString& password) const
-    {
-        return m_dictionary.contains(password);
-    }
-
-} // unnamed namespace
+} // namespace

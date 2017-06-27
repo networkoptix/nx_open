@@ -2,10 +2,9 @@
 
 #include <nx/network/cloud/cloud_stream_socket.h>
 #include <nx/network/cloud/tunnel/tcp/direct_endpoint_connector.h>
-#include <nx/network/http/httpclient.h>
+#include <nx/network/http/http_client.h>
 #include <nx/network/test_support/socket_test_helper.h>
 
-#include <utils/common/command_line_parser.h>
 #include <nx/utils/string.h>
 
 static const auto kDefaultTotalConnections = 100;
@@ -156,7 +155,7 @@ int runInConnectMode(const nx::utils::ArgumentParser& args)
 
     limitStringList(&targetStrings);
     std::cout << lm("Client mode: %1, limit: %2(%3b), max concurent connections: %4, total: %5")
-        .strs(transmissionMode, trafficLimitType, nx::utils::bytesToString(trafficLimitBytes),
+        .args(transmissionMode, trafficLimitType, nx::utils::bytesToString(trafficLimitBytes),
             maxConcurrentConnections, totalConnections).toStdString() << std::endl;
 
     std::cout << lm("Target(s): %1").arg(targetStrings.join(lit(", "))).toStdString() << std::endl;

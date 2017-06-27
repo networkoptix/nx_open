@@ -58,10 +58,17 @@ void DirectTcpEndpointTunnel::start()
     NX_ASSERT(m_controlConnection->setKeepAlive(kControlConnectionKeepAlive));
     m_controlConnection->readSomeAsync(
         buffer.get(),
-        [this, buffer](SystemError::ErrorCode code, size_t size)
+        [this, buffer](SystemError::ErrorCode code, size_t bytesRead)
         {
-            NX_LOGX(lm("Unexpected event on control connection (size=%1): %2").strs(
-                size, SystemError::toString(code)), cl_logDEBUG1);
+            if (code == SystemError::noError && bytesRead == 0)
+            {
+                NX_LOGX(lm("Control connection has been closed by remote peer"), cl_logDEBUG1);
+            }
+            else
+            {
+                NX_LOGX(lm("Unexpected read event on control connection (size=%1): %2").args(
+                    bytesRead, SystemError::toString(code)), cl_logDEBUG1);
+            }
 
             m_controlConnection.reset();
             if (m_connectionClosedHandler)
@@ -96,7 +103,8 @@ void DirectTcpEndpointTunnel::startConnection(
     std::list<ConnectionContext>::iterator connectionContextIter,
     std::chrono::milliseconds timeout)
 {
-    connectionContextIter->tcpSocket = std::make_unique<TCPSocket>(AF_INET);
+    connectionContextIter->tcpSocket = 
+        std::make_unique<TCPSocket>(SocketFactory::tcpClientIpVersion());
     connectionContextIter->tcpSocket->bindToAioThread(getAioThread());
     if (!connectionContextIter->tcpSocket->setNonBlockingMode(true) ||
         !connectionContextIter->tcpSocket->setSendTimeout(timeout.count()))

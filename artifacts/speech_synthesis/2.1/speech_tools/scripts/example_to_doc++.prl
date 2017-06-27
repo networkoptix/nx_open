@@ -1,0 +1,173 @@
+#!__PERL__ -w
+
+ ###########################################################################
+ ##                                                                       ##
+ ## Extract the doc++ comments and any grouped code from an example       ##
+ ## program.                                                              ##
+ ##                                                                       ##
+ ## This is very hacky and probably doesn't generalise properly.          ##
+ ## I'll try and rewrite it as a full parse and recreate system at some   ##
+ ## point.                                                                ##
+ ##                                                                       ##
+ ###########################################################################
+
+$comment_bottom = undef;
+$code = undef;
+
+$state='outside';
+
+$filename = $ARGV[0];
+
+open(F, $filename) ||
+    die "can't open $filename - $!";
+
+$filename =~ m%([^/]+)$%;
+$name = $1;
+
+@decls=();
+@pending_decls=();
+
+while (<F>)
+    {
+    push (@pending_decls, "$1\n")
+	if (m%^\s*(.*)//\s*decl\s*$%);
+    if ($state eq 'outside' && m%^\s*/\*\*[^*]%)
+	{
+	$state = 'comment_top';
+	print $_;
+	$comment_bottom = undef;
+	$code = undef;
+	next;
+	}
+    if ($state eq 'outside' && m%^\s*//\s*\@\{\s*code%i)
+	{
+	$state = 'code';
+	$code = [];
+	next;
+	} 
+    if ($state eq 'outside' && m%^\s*//\s*\@\{%)
+	{
+	dump_it();
+	$state = 'outside';
+	next;
+	} 
+    if ($state eq 'outside' && m%^\s*//\s*\@\}%)
+	{
+	print $_;
+	$state = 'outside';
+	next;
+	} 
+    if ($state eq 'comment_top')
+	{
+	if (m%^\s*\*/%)
+	    {
+	    $comment_bottom = '';
+	    $state = 'outside';
+	    }
+	elsif (m%^\s*\*\s*\@%)
+	    {
+	    $comment_bottom = $_;
+	    $state = 'comment_bottom';
+	    }
+	else
+	    {
+	    print $_;
+	    }
+	next;
+	}
+    if ($state eq 'comment_bottom')
+	{
+	if (m%^\s*\*/%)
+	    {
+	    $state = 'outside';
+	    }
+	else
+	    {
+	    $comment_bottom .= $_;
+	    }
+	next;
+	}
+    if ($state eq 'code')
+	{
+	if (m%^\s*//\@\}%)
+	    {
+	    $state = 'outside';
+	    dump_it();
+	    print "$_\n";
+	    }
+	else
+	    {
+	    $_ =~ s/\t/        /;
+	    push (@$code, $_);
+	    }
+	next;
+	}
+    }
+
+dump_it()
+    if defined($comment_bottom);
+
+sub dump_it
+{
+    if ($code)
+	{
+	print "  *\n";
+	print "  * {\\it Example code from {\\tt $name}}\\\\\n";
+	print_code($code);
+	push (@decls, @pending_decls);
+	@pending_decls = ();
+	}
+    print $comment_bottom;
+    print "  */\n  //\@{\n";
+    $comment_bottom=undef;
+    $code=undef;
+}
+
+
+sub print_code
+{
+    my($code) = @_;
+    my ($comment) = 0;
+
+    print "  *\\begin{verbatim}";
+    print "--- + --- + --- + --- + --- + --- + --- + --- + ---\n";
+    if ($#decls >=0)
+	{
+	print @decls;
+	print "\n// [...]\n";
+	}
+    foreach $line (@$code)
+	{
+	if ($line =~ m%^\s*$%)
+	    {
+	    print "\n";
+	    }
+	elsif ($line =~ m%^(\s*//\s*)(.*)%)
+	    {
+	    my ($p, $t) = ($1, $2);
+	    if (!$comment)
+		{
+		$comment =1;
+		print "\\end{verbatim}  ";
+		}
+
+	    print "#$p#{\\bf $t}\\\\\n";
+	    }
+	else
+	    {
+	    if ($comment)
+		{
+		$comment = 0;
+		print "\\begin{verbatim}";
+		}
+
+	    if ($line =~ m%^(.*)//\s*decl\s*$%)
+		{
+		$line = "$1\n";
+		}
+	    print $line;
+	    }
+	}
+    print "--- + --- + --- + --- + --- + --- + --- + --- + ---  ";
+    print "\\end{verbatim}\n";
+}

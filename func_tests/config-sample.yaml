@@ -1,0 +1,25 @@
+# Sample configuration file for --tests-config-file option
+
+# By default mediaservers are run in separate vagrant boxes each.
+# If a test requires mediaserver installed on some physical host,
+#  this host can be provided in 'hosts' section:
+hosts:
+  - name: local  # optional
+    host: localhost  # mandatory; localhost is special value indicating local machine
+    dir: ~/run/test-load  # mandatory; servers will be installed in this directory
+    limit: 2  # optional; install only 2 servers max here
+  - name: remote
+    host: 172.17.0.2  # or domain name; ssh will be used to go there
+    key_file: /home/test/.vagrant.d/insecure_private_key  # optional
+    user: vagrant  # optional; ssh user
+    dir: /tmp/load-test
+
+# configuration overrides for specific tests:
+tests:
+  scalability_test:
+    # lowercased config values defined when used test_config fixture (see 'config' fixture in scalability_test.py)
+    server_count: 2
+    cameras_per_server: 5
+    users_per_server: 1
+    storages_per_server: 1
+    

@@ -46,7 +46,7 @@ void QnMediaResourceHelper::setResourceId(const QString& id)
 {
     Q_D(QnMediaResourceHelper);
 
-    auto camera = qnResPool->getResourceById<QnVirtualCameraResource>(QnUuid::fromStringSafe(id));
+    auto camera = resourcePool()->getResourceById<QnVirtualCameraResource>(QnUuid::fromStringSafe(id));
     if (camera == d->camera)
         return;
 

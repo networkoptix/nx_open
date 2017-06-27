@@ -1,5 +1,7 @@
 #include "ssl_static_data.h"
 
+#ifdef ENABLE_SSL
+
 #include <memory>
 #include <mutex>
 
@@ -178,7 +180,7 @@ void SslStaticData::setAllowedServerVersions(const String& versions)
         if (s == "tls1_2" || s == "tlsv1_2" || s == "tls1.2" || s == "tlsv1.2")
             disabledVersions ^= SSL_OP_NO_TLSv1_2;
         else
-            NX_ASSERT(false, lm("Unknown SSL version: %1").str(s));
+            NX_ASSERT(false, lm("Unknown SSL version: %1").arg(s));
     }
 
     if (disabledVersions == kDisableAllSslVerions)
@@ -191,7 +193,7 @@ void SslStaticData::setAllowedServerVersions(const String& versions)
 
 void SslStaticData::setAllowedServerCiphers(const String& ciphers)
 {
-    NX_LOG(lm("Set server SSL ciphers: %1").str(ciphers), cl_logALWAYS);
+    NX_LOG(lm("Set server SSL ciphers: %1").arg(ciphers), cl_logALWAYS);
     s_allowedServerCiphers = ciphers;
     NX_ASSERT(!s_isInitialized, "SSL ciphers does not take effect after first SSL engine usage");
 }
@@ -203,3 +205,5 @@ String SslStaticData::s_allowedServerCiphers("HIGH:!RC4:!3DES");
 } // namespace ssl
 } // namespace network
 } // namespace nx
+
+#endif // ENABLE_SSL

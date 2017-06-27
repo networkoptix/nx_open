@@ -108,6 +108,7 @@ bool supportsDuration(ActionType actionType)
         case BookmarkAction:
         case ShowTextOverlayAction:
         case CameraOutputAction:
+        case CameraRecordingAction:
             return true;
         default:
             return false;
@@ -138,6 +139,7 @@ bool isActionProlonged(ActionType actionType, const QnBusinessActionParameters &
         case BookmarkAction:
         case ShowTextOverlayAction:
         case CameraOutputAction:
+        case CameraRecordingAction:
             return parameters.durationMs <= 0;
 
         default:
@@ -180,6 +182,11 @@ QnAbstractBusinessAction::QnAbstractBusinessAction(const QnBusiness::ActionType 
 
 QnAbstractBusinessAction::~QnAbstractBusinessAction()
 {}
+
+void QnAbstractBusinessAction::setActionType(QnBusiness::ActionType actionType)
+{
+    m_actionType = actionType;
+}
 
 QnBusiness::ActionType QnAbstractBusinessAction::actionType() const
 {
@@ -227,7 +234,7 @@ void QnAbstractBusinessAction::setRuntimeParams(const QnBusinessEventParameters&
     m_runtimeParams = params;
 }
 
-const QnBusinessEventParameters& QnAbstractBusinessAction::getRuntimeParams() const
+QnBusinessEventParameters& QnAbstractBusinessAction::getRuntimeParams()
 {
     return m_runtimeParams;
 }
@@ -280,6 +287,11 @@ void QnAbstractBusinessAction::setAggregationCount(int value)
 QString QnAbstractBusinessAction::getExternalUniqKey() const
 {
     return lit("action_") + QString::number(static_cast<int>(m_actionType)) + L'_';
+}
+
+void QnAbstractBusinessAction::assign(const QnAbstractBusinessAction& other)
+{
+    (*this) = other;
 }
 
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(

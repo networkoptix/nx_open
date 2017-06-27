@@ -3,7 +3,7 @@
 #include <QtNetwork/QAuthenticator>
 
 #include <common/common_globals.h>
-#include <nx/network/http/httptypes.h>
+#include <nx/network/http/http_types.h>
 
 class HttpAuthenticationClientContext
 {

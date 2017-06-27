@@ -3,12 +3,12 @@
 	<parent>
 		<artifactId>plugins</artifactId>
 		<groupId>com.networkoptix.hdwitness</groupId>
-		<version>3.0.0-SNAPSHOT</version>
+		<version>3.1.0-SNAPSHOT</version>
 		<relativePath>..</relativePath>
 	</parent>
 
 	<groupId>com.networkoptix.hdwitness</groupId>
-	<version>3.0.0-SNAPSHOT</version>
+	<version>3.1.0-SNAPSHOT</version>
 	<artifactId>quicksyncdecoder</artifactId>
 	<packaging>pom</packaging>
 	<name>Nx Witness Intel Quick Sync decoder plugin</name>	
@@ -18,10 +18,10 @@
         <product.title>${quicksyncdecoder.name}</product.title>	
 
 		<qt.libs>core gui network opengl xml multimedia concurrent</qt.libs>
-		<global.libs>-lcommon -lnx_streaming -lprotobuf</global.libs>
+		<global.libs>-lcommon -lprotobuf</global.libs>
 		<windows.oslibs>DbgHelp.lib -lDxErr -ld3d9 -lws2_32 -lIphlpapi -lwinmm -lopengl32 -lglu32 -lDxva2</windows.oslibs>
 
-        <windows.defines>WIN32_LEAN_AND_MEAN NOMINMAX</windows.defines>
+        <windows.defines>NOMINMAX</windows.defines>
 
         <rdep.packages>openssl ffmpeg mfx-2012-R2</rdep.packages>
 	</properties>

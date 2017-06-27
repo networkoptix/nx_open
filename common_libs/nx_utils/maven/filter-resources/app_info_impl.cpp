@@ -51,6 +51,44 @@ QString AppInfo::applicationArch()
     return QStringLiteral("${arch}");
 }
 
+QString AppInfo::organizationName()
+{
+    return QStringLiteral("${company.name}");
+}
+
+QString AppInfo::linuxOrganizationName()
+{
+    return QStringLiteral("${deb.customization.company.name}");
+}
+
+QString AppInfo::organizationNameForSettings()
+{
+#ifdef _WIN32
+    return organizationName();
+#else
+    return linuxOrganizationName();
+#endif
+}
+
+QString AppInfo::productNameShort()
+{
+    return QStringLiteral("${product.name.short}");
+}
+
+QString AppInfo::productNameLong()
+{
+    return QStringLiteral("${display.product.name}");
+}
+
+QString AppInfo::productName()
+{
+#ifdef _WIN32
+    return QStringLiteral("${product.name}");
+#else
+    return QStringLiteral("${product.appName}");
+#endif
+}
+
 QString AppInfo::armBox()
 {
     // TODO: #akolesnikov: For now, box value has sense on ARM devices only.

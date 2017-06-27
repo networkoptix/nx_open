@@ -7,10 +7,10 @@
 
 QnResourceAccessSubjectsCache::QnResourceAccessSubjectsCache(QObject* parent):
     base_type(parent),
+    QnCommonModuleAware(parent),
     m_mutex(QnMutex::NonRecursive)
 {
-
-    connect(qnResPool, &QnResourcePool::resourceAdded, this,
+    connect(resourcePool(), &QnResourcePool::resourceAdded, this,
         [this](const QnResourcePtr& resource)
         {
             /* Quick check */
@@ -23,7 +23,7 @@ QnResourceAccessSubjectsCache::QnResourceAccessSubjectsCache(QObject* parent):
                 handleUserAdded(user);
         });
 
-    connect(qnResPool, &QnResourcePool::resourceRemoved, this,
+    connect(resourcePool(), &QnResourcePool::resourceRemoved, this,
         [this](const QnResourcePtr& resource)
         {
             /* Quick check */
@@ -36,15 +36,15 @@ QnResourceAccessSubjectsCache::QnResourceAccessSubjectsCache(QObject* parent):
                 handleUserRemoved(user);
         });
 
-    connect(qnUserRolesManager, &QnUserRolesManager::userRoleAddedOrUpdated, this,
+    connect(userRolesManager(), &QnUserRolesManager::userRoleAddedOrUpdated, this,
         &QnResourceAccessSubjectsCache::handleRoleAdded);
-    connect(qnUserRolesManager, &QnUserRolesManager::userRoleRemoved, this,
+    connect(userRolesManager(), &QnUserRolesManager::userRoleRemoved, this,
         &QnResourceAccessSubjectsCache::handleRoleRemoved);
 
-    for (const auto& user : qnResPool->getResources<QnUserResource>())
+    for (const auto& user: resourcePool()->getResources<QnUserResource>())
         handleUserAdded(user);
 
-    for (const auto& role : qnUserRolesManager->userRoles())
+    for (const auto& role : userRolesManager()->userRoles())
         handleRoleAdded(role);
 }
 
@@ -91,18 +91,22 @@ void QnResourceAccessSubjectsCache::updateUserRole(const QnUserResourcePtr& user
     const auto id = user->getId();
 
     QnMutexLocker lk(&m_mutex);
-    const auto oldRoleId = m_roleIdByUserId.value(id);
-    const auto newRoleId = user->userRoleId();
-    if (oldRoleId == newRoleId)
+    const auto oldRoleIter = m_roleIdByUserId.find(id);
+    const bool knownUser = oldRoleIter != m_roleIdByUserId.end();
+
+    const auto userRole = user->userRole();
+    const auto newRoleId = userRole == Qn::UserRole::CustomUserRole
+        ? user->userRoleId()
+        : QnUserRolesManager::predefinedRoleId(userRole);
+
+    if (knownUser && oldRoleIter.value() == newRoleId)
         return;
 
-    removeUserFromRole(user, oldRoleId);
+    if (knownUser)
+        removeUserFromRole(user, oldRoleIter.value());
 
-    if (!newRoleId.isNull())
-    {
-        m_roleIdByUserId[id] = newRoleId;
-        m_usersByRoleId[newRoleId].append(user);
-    }
+    m_roleIdByUserId[id] = newRoleId;
+    m_usersByRoleId[newRoleId].append(user);
 }
 
 void QnResourceAccessSubjectsCache::handleRoleAdded(const ec2::ApiUserRoleData& userRole)
@@ -134,9 +138,6 @@ void QnResourceAccessSubjectsCache::handleRoleRemoved(const ec2::ApiUserRoleData
 void QnResourceAccessSubjectsCache::removeUserFromRole(const QnUserResourcePtr& user,
     const QnUuid& roleId)
 {
-    if (roleId.isNull())
-        return;
-
     auto users = m_usersByRoleId.find(roleId);
     if (users == m_usersByRoleId.end())
         return;

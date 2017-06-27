@@ -30,8 +30,7 @@ namespace ec2 {
         void fillSequence(
             const QnUuid& moduleId,
             const QnUuid& runningInstanceGUID);
-        /** Calls previous method passing it value from \a qnCommon. */
-        void fillSequence();
+        /** Calls previous method passing it value from \a commonModule(). */
 
         bool isNull() const;
 
@@ -53,8 +52,6 @@ namespace ec2 {
 
 } // namespace ec2
 
-#ifndef QN_NO_QT
 Q_DECLARE_METATYPE(ec2::QnTransactionTransportHeader);
-#endif
 
 #endif // QN_TRANSACTION_TRANSPORT_HEADER_H

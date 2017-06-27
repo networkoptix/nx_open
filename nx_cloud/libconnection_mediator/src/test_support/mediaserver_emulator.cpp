@@ -6,14 +6,13 @@
 #include <nx/network/cloud/data/tunnel_connection_chosen_data.h>
 #include <nx/network/cloud/data/udp_hole_punching_connection_initiation_data.h>
 #include <nx/network/http/buffer_source.h>
+#include <nx/utils/crypt/linux_passwd_crypt.h>
 #include <nx/utils/string.h>
+#include <nx/utils/sync_call.h>
 #include <nx/utils/thread/barrier_handler.h>
 
-#include <common/common_globals.h>
 #include <network/module_information.h>
 #include <rest/server/json_rest_result.h>
-#include <utils/common/sync_call.h>
-#include <utils/crypt/linux_passwd_crypt.h>
 
 namespace nx {
 namespace hpm {
@@ -33,7 +32,7 @@ public:
 
     virtual void processRequest(
         nx_http::HttpServerConnection* const /*connection*/,
-        stree::ResourceContainer /*authInfo*/,
+        nx::utils::stree::ResourceContainer /*authInfo*/,
         nx_http::Request /*request*/,
         nx_http::Response* const /*response*/,
         nx_http::RequestProcessedHandler handler) override
@@ -352,8 +351,8 @@ void MediaServerEmulator::onConnectionAckResponseReceived(
     m_udtStreamServerSocket = std::move(udtStreamServerSocket);
 
     NX_LOGX(lm("Starting rendezvous connect from %1 to %2")
-        .str(m_udtStreamSocket->getLocalAddress())
-        .str(m_connectionRequestedData.udpEndpointList.front()), cl_logDEBUG2);
+        .arg(m_udtStreamSocket->getLocalAddress())
+        .arg(m_connectionRequestedData.udpEndpointList.front()), cl_logDEBUG2);
 
     using namespace std::placeholders;
     m_udtStreamSocket->connectAsync(
@@ -381,9 +380,8 @@ void MediaServerEmulator::onUdtConnectDone(SystemError::ErrorCode errorCode)
 
 void MediaServerEmulator::onUdtConnectionAccepted(
     SystemError::ErrorCode /*errorCode*/,
-    AbstractStreamSocket* acceptedSocket)
+    std::unique_ptr<AbstractStreamSocket> /*acceptedSocket*/)
 {
-    delete acceptedSocket;
 }
 
 void MediaServerEmulator::onMessageReceived(

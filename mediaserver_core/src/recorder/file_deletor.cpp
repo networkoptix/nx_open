@@ -4,7 +4,7 @@
 #include <nx/utils/random.h>
 #include "utils/common/util.h"
 #include "storage_manager.h"
-#include "utils/common/systemerror.h"
+#include <nx/utils/system_error.h>
 #include <core/resource_management/resource_pool.h>
 
 static const int POSTPONE_FILES_INTERVAL = 1000*60;
@@ -12,7 +12,8 @@ static const int SPACE_CLEARANCE_INTERVAL = 10;
 
 QnFileDeletor* QnFileDeletor_inst = 0;
 
-QnFileDeletor::QnFileDeletor()
+QnFileDeletor::QnFileDeletor(QnCommonModule* commonModule):
+    QnCommonModuleAware(commonModule)
 {
     m_postponeTimer.start();
     m_storagesTimer.start();
@@ -154,7 +155,7 @@ void QnFileDeletor::processPostponedFiles()
             internalDeleteFile(itr->fileName);
         else
         {
-            auto storage = qnResPool->getResourceById(itr->storageId);
+            auto storage = resourcePool()->getResourceById(itr->storageId);
             bool needToPostpone = !storage || storage->getStatus() == Qn::ResourceStatus::Offline;
 
             if (!storage)

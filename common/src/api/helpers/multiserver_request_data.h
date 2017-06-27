@@ -2,22 +2,26 @@
 
 #include <QUrlQuery>
 
+#include <common/common_globals.h>
+
 #include <utils/common/request_param.h>
+
+class QnResourcePool;
 
 struct QnMultiserverRequestData
 {
     template<typename T, typename Params>
-    static T fromParams(const Params& params)
+    static T fromParams(QnResourcePool* resourcePool, const Params& params)
     {
         T request;
-        request.loadFromParams(params);
+        request.loadFromParams(resourcePool, params);
         return request;
     }
 
-    explicit QnMultiserverRequestData(const QnRequestParamList& params);
+    QnMultiserverRequestData(QnResourcePool* resourcePool, const QnRequestParamList& params);
 
-    virtual void loadFromParams(const QnRequestParamList& params);
-    virtual void loadFromParams(const QnRequestParams& params);
+    virtual void loadFromParams(QnResourcePool* resourcePool, const QnRequestParamList& params);
+    virtual void loadFromParams(QnResourcePool* resourcePool, const QnRequestParams& params);
     virtual QnRequestParamList toParams() const;
     virtual QUrlQuery toUrlQuery() const;
     virtual bool isValid() const;
@@ -25,7 +29,7 @@ struct QnMultiserverRequestData
     /** Fix fields to make local request. */
     void makeLocal(Qn::SerializationFormat localFormat = Qn::UbjsonFormat);
 
-    bool isLocal; //< Shows if this request is sent by redirection.
+    bool isLocal; //< If set, the request should not be redirected to another server.
     Qn::SerializationFormat format;
     bool extraFormatting;
 

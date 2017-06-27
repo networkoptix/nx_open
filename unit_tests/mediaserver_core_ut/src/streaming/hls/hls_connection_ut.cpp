@@ -1,6 +1,10 @@
 #include <gtest/gtest.h>
 
 #include <streaming/hls/hls_server.h>
+#include <network/tcp_listener.h>
+#include <nx/core/access/access_types.h>
+#include <common/common_module.h>
+#include <test_support/network/tcp_listener_stub.h>
 
 namespace nx_hls {
 namespace test {
@@ -10,7 +14,9 @@ class QnHttpLiveStreamingProcessorHttpResponse:
 {
 public:
     QnHttpLiveStreamingProcessorHttpResponse(nx_http::MimeProtoVersion httpVersion):
-        m_hlsRequestProcessor(QSharedPointer<AbstractStreamSocket>(), nullptr)
+        m_commonModule(/*clientMode*/ false, nx::core::access::Mode::direct),
+        m_tcpListener(&m_commonModule),
+        m_hlsRequestProcessor(QSharedPointer<AbstractStreamSocket>(), &m_tcpListener)
     {
         m_request.requestLine.version = httpVersion;
     }
@@ -79,6 +85,8 @@ public:
     }
 
 private:
+    QnCommonModule m_commonModule;
+    TcpListenerStub m_tcpListener;
     QnHttpLiveStreamingProcessor m_hlsRequestProcessor;
     nx_http::Request m_request;
     nx_http::Response m_response;
@@ -149,6 +157,9 @@ TEST_F(QnHttpLiveStreamingProcessorHttp10Response, unknown_length_resource)
 
 TEST(HLSMimeTypes, main)
 {
+    QnCommonModule commonModule(false, nx::core::access::Mode::direct);
+    TcpListenerStub tcpListener(&commonModule);
+
     class HlsServerTest : public nx_hls::QnHttpLiveStreamingProcessor
     {
     public:
@@ -157,7 +168,7 @@ TEST(HLSMimeTypes, main)
         {
             return nx_hls::QnHttpLiveStreamingProcessor::mimeTypeByExtension(extension);
         }
-    } hlsServerTest(QSharedPointer<AbstractStreamSocket>(), nullptr);
+    } hlsServerTest(QSharedPointer<AbstractStreamSocket>(), &tcpListener);
 
     ASSERT_EQ(QString::fromLocal8Bit(hlsServerTest.mimeTypeByExtension("m3u8")), lit("application/vnd.apple.mpegurl"));
     ASSERT_EQ(QString::fromLocal8Bit(hlsServerTest.mimeTypeByExtension("M3U8")), lit("application/vnd.apple.mpegurl"));

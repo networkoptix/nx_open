@@ -9,7 +9,7 @@
 #include <QtQuick/QSGVertexColorMaterial>
 #include <QtQuick/QSGTextureMaterial>
 #include <QtQuick/QQuickWindow>
-#include <QtCore/qmath.h>
+#include <QtCore/QtMath>
 #include <QtCore/QElapsedTimer>
 #include <QtGui/QFontMetricsF>
 #include <QtGui/QPainter>

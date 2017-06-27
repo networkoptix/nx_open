@@ -24,7 +24,6 @@ DEPENDENCY_VERSIONS = {
     "quazip": "${quazip.version}",
     "openal": "${openal.version}",
     "libjpeg-turbo": "${libjpeg-turbo.version}",
-    "libcreateprocess": "${libcreateprocess.version}",
     "vmux": "${vmux.version}",
     "cpro": "${cpro.version}",
     "server-external": "${server-external.version}",

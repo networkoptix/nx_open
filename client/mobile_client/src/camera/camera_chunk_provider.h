@@ -2,11 +2,13 @@
 
 #include <QtCore/QObject>
 
+#include <client_core/connection_context_aware.h>
+
 #include <recording/time_period_list.h>
 
 class QnFlatCameraDataLoader;
 
-class QnCameraChunkProvider: public QObject
+class QnCameraChunkProvider: public QObject, public QnConnectionContextAware
 {
     Q_OBJECT
     Q_PROPERTY(QString resourceId READ resourceId WRITE setResourceId NOTIFY resourceIdChanged)

@@ -10,14 +10,17 @@
 #include <core/resource/device_dependent_strings.h>
 
 #include <nx/utils/log/assert.h>
+#include <core/resource/camera_resource.h>
 
 class QnCameraDiagnosticsErrorCodeStrings
 {
-    Q_DECLARE_TR_FUNCTIONS(QnCameraDiagnosticsErrorCodeStrings);
+    Q_DECLARE_TR_FUNCTIONS(QnCameraDiagnosticsErrorCodeStrings)
 
 public:
     //!Returns textual description of error with  parameters
-    static QString toString(CameraDiagnostics::ErrorCode::Value val,
+    static QString toString(
+        CameraDiagnostics::ErrorCode::Value val,
+        QnResourcePool* resourcePool,
         const QnVirtualCameraResourcePtr& device,
         const QList<QString>& errorParams)
     {
@@ -38,15 +41,15 @@ public:
         QString firmwareSupport = tr("Finally, try to update firmware. If the problem persists, please contact support.");
 
         auto getParam = [&errorParams](int index)
-            {
-                QString result;
-                if (errorParams.size() > index)
-                    result = errorParams[index];
+        {
+            QString result;
+            if (errorParams.size() > index)
+                result = errorParams[index];
 
-                return result.isEmpty()
-                    ? tr("(unknown)")
-                    : result;
-            };
+            return result.isEmpty()
+                ? tr("(unknown)")
+                : result;
+        };
 
         // Pre-cache to simplify format strings
         const QString p1 = getParam(0);
@@ -79,7 +82,7 @@ public:
             {
                 errorMessageParts
                     << tr("Cannot connect to http port %1.").arg(p1)
-                    << QnDeviceDependentStrings::getNameFromSet(detailsPluggedReboot, device);
+                    << QnDeviceDependentStrings::getNameFromSet(resourcePool, detailsPluggedReboot, device);
                 break;
             }
             case cannotOpenCameraMediaPort:
@@ -87,14 +90,20 @@ public:
                 errorMessageParts
                     << tr("Cannot open media URL %1. Failed to connect to media port %2.").arg(p1).arg(p2)
                     << tr("Make sure port %1 is accessible (e.g. forwarded).").arg(p2)
-                    << QnDeviceDependentStrings::getNameFromSet(detailsRebootRestore, device);
+                    << QnDeviceDependentStrings::getNameFromSet(resourcePool, detailsRebootRestore, device);
+                break;
+            }
+            case liveVideoIsNotSupportedError:
+            {
+                errorMessageParts
+                    << tr("Camera was restored from archive. Delete the camera and add it again to view Live video.");
                 break;
             }
             case connectionClosedUnexpectedly:
             {
                 errorMessageParts
                     << tr("Cannot open media URL %1. Connection to port %2 was closed unexpectedly.").arg(p1).arg(p2)
-                    << QnDeviceDependentStrings::getNameFromSet(detailsPluggedReboot, device);
+                    << QnDeviceDependentStrings::getNameFromSet(resourcePool, detailsPluggedReboot, device);
                 break;
             }
             case responseParseError:
@@ -106,15 +115,15 @@ public:
                 );
 
                 errorMessageParts
-                    << QnDeviceDependentStrings::getNameFromSet(detailsBase, device)
-                    << QnDeviceDependentStrings::getNameFromSet(detailsRebootRestore, device)
+                    << QnDeviceDependentStrings::getNameFromSet(resourcePool, detailsBase, device)
+                    << QnDeviceDependentStrings::getNameFromSet(resourcePool, detailsRebootRestore, device)
                     << firmwareSupport;
                 break;
             }
             case noMediaTrack:
             {
                 errorMessageParts << tr("No supported media tracks at URL %1.").arg(p1)
-                    << QnDeviceDependentStrings::getNameFromSet(detailsRebootRestore, device)
+                    << QnDeviceDependentStrings::getNameFromSet(resourcePool, detailsRebootRestore, device)
                     << firmwareSupport;
                 break;
             }
@@ -127,7 +136,7 @@ public:
             {
                 errorMessageParts
                     << tr("Cannot open media URL %1. Unsupported media protocol %2.").arg(p1).arg(p2)
-                    << QnDeviceDependentStrings::getNameFromSet(detailsRebootRestore, device)
+                    << QnDeviceDependentStrings::getNameFromSet(resourcePool, detailsRebootRestore, device)
                     << firmwareSupport;
                 break;
             }
@@ -146,8 +155,8 @@ public:
 
                 errorMessageParts
                     << tr("Failed to configure parameter %1.").arg(p1)
-                    << QnDeviceDependentStrings::getNameFromSet(detailsBase, device)
-                    << QnDeviceDependentStrings::getNameFromSet(detailsAdvanced, device)
+                    << QnDeviceDependentStrings::getNameFromSet(resourcePool, detailsBase, device)
+                    << QnDeviceDependentStrings::getNameFromSet(resourcePool, detailsAdvanced, device)
                     << firmwareSupport;
                 break;
             }
@@ -159,8 +168,8 @@ public:
                     tr("I/O Module request \"%1\" failed with error \"%2\".").arg(p1).arg(p2)
                 );
                 errorMessageParts
-                    << QnDeviceDependentStrings::getNameFromSet(detailsBase, device)
-                    << QnDeviceDependentStrings::getNameFromSet(detailsRebootRestore, device)
+                    << QnDeviceDependentStrings::getNameFromSet(resourcePool, detailsBase, device)
+                    << QnDeviceDependentStrings::getNameFromSet(resourcePool, detailsRebootRestore, device)
                     << firmwareSupport;
                 break;
             }
@@ -173,7 +182,7 @@ public:
                 );
 
                 errorMessageParts
-                    << QnDeviceDependentStrings::getNameFromSet(details, device)
+                    << QnDeviceDependentStrings::getNameFromSet(resourcePool, details, device)
                     << tr("Please contact support.");
                 break;
             }
@@ -181,7 +190,7 @@ public:
             {
                 errorMessageParts
                     << tr("An input/output error has occurred. OS message: \"%1\".").arg(p1)
-                    << QnDeviceDependentStrings::getNameFromSet(detailsPluggedReboot, device);
+                    << QnDeviceDependentStrings::getNameFromSet(resourcePool, detailsPluggedReboot, device);
                 break;
             }
             case serverTerminated:
@@ -198,7 +207,7 @@ public:
                 );
 
                 errorMessageParts
-                    << QnDeviceDependentStrings::getNameFromSet(details, device);
+                    << QnDeviceDependentStrings::getNameFromSet(resourcePool, details, device);
                 break;
             }
             case badMediaStream:
@@ -210,7 +219,7 @@ public:
                 );
 
                 errorMessageParts
-                    << QnDeviceDependentStrings::getNameFromSet(details, device);
+                    << QnDeviceDependentStrings::getNameFromSet(resourcePool, details, device);
                 break;
             }
             case noMediaStream:
@@ -228,7 +237,7 @@ public:
                 );
 
                 errorMessageParts
-                    << QnDeviceDependentStrings::getNameFromSet(details, device);
+                    << QnDeviceDependentStrings::getNameFromSet(resourcePool, details, device);
                 break;
             }
             case cameraPluginError:
@@ -257,86 +266,92 @@ public:
 };
 
 
-namespace CameraDiagnostics
+namespace CameraDiagnostics {
+
+namespace Step {
+// TODO : #Elric classic enum name mapping
+
+QString toString(Value val)
 {
-    namespace Step
+    switch (val)
     {
-        // TODO : #Elric classic enum name mapping
-
-        QString toString( Value val )
-        {
-            switch( val )
-            {
-                case none:
-                    return lit("none");
-                case mediaServerAvailability:
-                    return lit("mediaServerAvailability");
-                case cameraAvailability:
-                    return lit("cameraAvailability");
-                case mediaStreamAvailability:
-                    return lit("mediaStreamAvailability");
-                case mediaStreamIntegrity:
-                    return lit("mediaStreamIntegrity");
-                default:
-                    return lit("unknown");
-            }
-        }
-
-        Value fromString( const QString& str )
-        {
-            if( str == lit("mediaServerAvailability") )
-                return mediaServerAvailability;
-            else if( str == lit("cameraAvailability") )
-                return cameraAvailability;
-            else if( str == lit("mediaStreamAvailability") )
-                return mediaStreamAvailability;
-            else if( str == lit("mediaStreamIntegrity") )
-                return mediaStreamIntegrity;
-            else
-                return none;
-        }
-    }
-
-    namespace ErrorCode
-    {
-
-        QString toString(Value val
-            , const QnVirtualCameraResourcePtr &device
-            , const ErrorParams& errorParams)
-        {
-            return QnCameraDiagnosticsErrorCodeStrings::toString(val, device, errorParams);
-        }
-
-        QString toString(int val
-            , const QnVirtualCameraResourcePtr &device
-            , const ErrorParams& errorParams)
-        {
-            return toString(static_cast<Value>(val), device, errorParams);
-        }
-    }
-
-
-    Result::Result()
-    :
-        errorCode( ErrorCode::noError )
-    {
-    }
-
-    Result::Result( ErrorCode::Value _errorCode, const QString& param1, const QString& param2 )
-    :
-        errorCode( _errorCode )
-    {
-        errorParams.push_back(param1);
-        errorParams.push_back(param2);
-    }
-
-    QString Result::toString() const
-    {
-        return ErrorCode::toString( errorCode, QnVirtualCameraResourcePtr(), errorParams );
-    }
-
-    Result::operator safe_bool_type() const
-    {
-        return errorCode == ErrorCode::noError ? &Result::safe_bool_type_retval : 0;
+        case none:
+            return lit("none");
+        case mediaServerAvailability:
+            return lit("mediaServerAvailability");
+        case cameraAvailability:
+            return lit("cameraAvailability");
+        case mediaStreamAvailability:
+            return lit("mediaStreamAvailability");
+        case mediaStreamIntegrity:
+            return lit("mediaStreamIntegrity");
+        default:
+            return lit("unknown");
     }
 }
+
+Value fromString(const QString& str)
+{
+    if (str == lit("mediaServerAvailability"))
+        return mediaServerAvailability;
+    else if (str == lit("cameraAvailability"))
+        return cameraAvailability;
+    else if (str == lit("mediaStreamAvailability"))
+        return mediaStreamAvailability;
+    else if (str == lit("mediaStreamIntegrity"))
+        return mediaStreamIntegrity;
+    else
+        return none;
+}
+
+} // namespace Step
+
+namespace ErrorCode {
+
+QString toString(
+    Value val,
+    QnResourcePool* resourcePool,
+    const QnVirtualCameraResourcePtr &device,
+    const ErrorParams& errorParams)
+{
+    return QnCameraDiagnosticsErrorCodeStrings::toString(val, resourcePool, device, errorParams);
+}
+
+QString toString(int val,
+    QnResourcePool* resourcePool,
+    const QnVirtualCameraResourcePtr &device,
+    const ErrorParams& errorParams)
+{
+    return toString(static_cast<Value>(val), resourcePool, device, errorParams);
+}
+
+} // namespace ErrorCode
+
+
+Result::Result():
+    errorCode(ErrorCode::noError)
+{
+}
+
+Result::Result(
+    ErrorCode::Value _errorCode,
+    const QString& param1,
+    const QString& param2)
+    :
+    errorCode(_errorCode)
+{
+    errorParams.push_back(param1);
+    errorParams.push_back(param2);
+}
+
+Result::operator bool() const
+{
+    return errorCode == ErrorCode::noError;
+}
+
+QString Result::toString(QnResourcePool* resourcePool) const
+{
+    return ErrorCode::toString(errorCode, resourcePool, QnVirtualCameraResourcePtr(), errorParams);
+}
+
+} // namespace CameraDiagnostics

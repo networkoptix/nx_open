@@ -13,26 +13,29 @@ namespace ec2 {
 namespace database {
 namespace api {
 
-qint32 getResourceInternalId(const QSqlDatabase& database, const QnUuid& guid)
+qint32 getResourceInternalId(
+    Context* context,
+    const QnUuid& guid)
 {
-    const QString queryStr = R"sql(
-        SELECT id from vms_resource where guid = ?
-    )sql";
+    if (!context->getIdQuery)
+    {
+        context->getIdQuery.reset(new QSqlQuery(context->database));
+        const QString queryStr = R"sql(SELECT id from vms_resource where guid = ?)sql";
 
-    QSqlQuery query(database);
-    query.setForwardOnly(true);
-    if (!QnDbHelper::prepareSQLQuery(&query, queryStr, Q_FUNC_INFO))
+        context->getIdQuery->setForwardOnly(true);
+        if (!nx::utils::db::SqlQueryExecutionHelper::prepareSQLQuery(context->getIdQuery.get(), queryStr, Q_FUNC_INFO))
+            return 0;
+    }
+
+    context->getIdQuery->addBindValue(guid.toRfc4122());
+    if (!context->getIdQuery->exec() || !context->getIdQuery->next())
         return 0;
 
-    query.addBindValue(guid.toRfc4122());
-    if (!query.exec() || !query.next())
-        return 0;
-
-    return query.value(0).toInt();
+    return context->getIdQuery->value(0).toInt();
 }
 
 bool insertOrReplaceResource(
-    const QSqlDatabase& database,
+    Context* context,
     const ApiResourceData& data,
     qint32* internalId)
 {
@@ -40,56 +43,65 @@ bool insertOrReplaceResource(
     if (data.id.isNull())
         return false;
 
-    *internalId = getResourceInternalId(database, data.id);
-    QSqlQuery query(database);
+    *internalId = getResourceInternalId(context, data.id);
+    QSqlQuery* query = nullptr;
     if (*internalId)
     {
-        const QString queryStr = R"sql(
-            UPDATE vms_resource
-            SET guid = :id, xtype_guid = :typeId, parent_guid = :parentId, name = :name, url = :url
-            WHERE id = :internalId
-        )sql";
+        if (!context->updQuery)
+        {
+            context->updQuery.reset(new QSqlQuery(context->database));
+            const QString queryStr = R"sql(
+                UPDATE vms_resource
+                SET xtype_guid = :typeId, parent_guid = :parentId, name = :name, url = :url
+                WHERE id = :internalId
+            )sql";
 
-        if (!QnDbHelper::prepareSQLQuery(&query, queryStr, Q_FUNC_INFO))
-            return false;
-
-        query.bindValue(":internalId", *internalId);
+            if (!nx::utils::db::SqlQueryExecutionHelper::prepareSQLQuery(context->updQuery.get(), queryStr, Q_FUNC_INFO))
+                return false;
+        }
+        context->updQuery->bindValue(":internalId", *internalId);
+        query = context->updQuery.get();
     }
     else
     {
-        const QString queryStr = R"sql(
-            INSERT INTO vms_resource
-            (guid, xtype_guid, parent_guid, name, url)
-            VALUES
-            (:id, :typeId, :parentId, :name, :url)
-        )sql";
+        if (!context->insQuery)
+        {
+            context->insQuery.reset(new QSqlQuery(context->database));
+            const QString queryStr = R"sql(
+                INSERT INTO vms_resource
+                (guid, xtype_guid, parent_guid, name, url)
+                VALUES
+                (:id, :typeId, :parentId, :name, :url)
+            )sql";
 
-        if (!QnDbHelper::prepareSQLQuery(&query, queryStr, Q_FUNC_INFO))
-            return false;
+            if (!nx::utils::db::SqlQueryExecutionHelper::prepareSQLQuery(context->insQuery.get(), queryStr, Q_FUNC_INFO))
+                return false;
+        }
+        query = context->insQuery.get();
     }
-    QnSql::bind(data, &query);
+    QnSql::bind(data, query);
 
-    if (!QnDbHelper::execSQLQuery(&query, Q_FUNC_INFO))
+    if (!nx::utils::db::SqlQueryExecutionHelper::execSQLQuery(query, Q_FUNC_INFO))
         return false;
 
     if (*internalId == 0)
-        *internalId = query.lastInsertId().toInt();
+        *internalId = query->lastInsertId().toInt();
 
     return true;
 }
 
-bool deleteResourceInternal(const QSqlDatabase& database, int internalId)
+bool deleteResourceInternal(Context* context, int internalId)
 {
     const QString queryStr(R"sql(
         DELETE FROM vms_resource where id = ?
     )sql");
 
-    QSqlQuery query(database);
-    if (!QnDbHelper::prepareSQLQuery(&query, queryStr, Q_FUNC_INFO))
+    QSqlQuery query(context->database);
+    if (!nx::utils::db::SqlQueryExecutionHelper::prepareSQLQuery(&query, queryStr, Q_FUNC_INFO))
         return false;
 
     query.addBindValue(internalId);
-    return QnDbHelper::execSQLQuery(&query, Q_FUNC_INFO);
+    return nx::utils::db::SqlQueryExecutionHelper::execSQLQuery(&query, Q_FUNC_INFO);
 }
 
 } // namespace api

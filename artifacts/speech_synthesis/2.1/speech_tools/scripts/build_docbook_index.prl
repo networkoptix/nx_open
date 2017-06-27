@@ -1,0 +1,301 @@
+#!__PERL__
+
+$rcsId=' $Id: build_docbook_index.prl,v 1.2 2001/04/04 13:11:27 awb Exp $ ';
+
+=head1 build_html_index [-v]
+
+=over 4
+
+=item Created by
+
+    Richard Caley, Sun Feb 14 1999
+
+=item Last Modification
+
+    $Date: 2001/04/04 13:11:27 $ by $Author: awb $
+
+=item Locked by
+
+    $Locker:  $
+
+=back
+
+=cut
+
+sub useage
+{
+    print <<END;
+    Useage:
+	build_html_index [-v|-h] -m MODE -t TITLE IFILE OFILE
+
+	-m MODE		MODE (html only at the moment)
+	-t TITLE	Title for the index.
+	IFILE		File produced by jade.
+	OFILE		Docbook index is put in this file
+END
+}
+
+#__SHARED_SETUP__
+
+$title='';
+$mode='debug';
+$verbose=0;
+
+while ($#ARGV>=0)
+	{
+	if ($ARGV[0] eq '-v')
+	      {
+	      $verbose++;
+	      shift @ARGV;
+	      }
+	elsif ($ARGV[0] eq '-t')
+	      {
+	      shift @ARGV;
+	      $title=shift @ARGV;
+	      }
+	elsif ($ARGV[0] eq '-m')
+	      {
+	      shift @ARGV;
+	      $mode=shift @ARGV;
+	      }
+	elsif ($ARGV[0] eq '-h')
+	      {
+	      useage();
+	      exit 0;
+	      }
+	else
+		{
+		last;
+		}
+	}
+
+if ($#ARGV != 1)
+    {
+    useage();
+    exit(1);
+    }
+
+if (!defined(&{"print_tree_as_$mode"}))
+    {
+    useage();
+    exit(1);
+    }
+
+
+$datafile= shift @ARGV;
+$indexfile= shift @ARGV;
+
+open(DATA, $datafile) ||
+    die "can't open $datafile - $!";
+
+open(INDEX, ">$indexfile") ||
+    die "can't create $indexfile - $!";
+
+@entries=();
+
+while(<DATA>)
+    {
+    if (/^INDEXTERM\s+(.*)/)
+	{
+	$current = {};
+	$$current{INDEXTERM}=$1;
+	}
+    elsif (/^\/INDEXTERM/)
+	{
+	push(@entries, $current);
+	}
+    elsif (/^([a-z]+)\s+(.*)/i)
+	{
+	$$current{lc $1}=$2;
+	}
+    }
+
+close(DATA);
+
+
+@entries = sort entry_order @entries;
+
+$tree=build_tree(\@entries);
+
+&{"print_tree_as_$mode"}($tree, INDEX);
+
+close(INDEX);
+
+exit 0;
+
+sub entry_order
+{
+    my ($o) = lc $$a{primary} cmp lc $$b{primary};
+
+    $o = (lc $$a{secondary} cmp lc $$b{secondary})
+	if $o ==0;
+
+    $o = (lc $$a{tertiary} cmp lc $$b{tertiary})
+	if $o ==0;
+
+    $o = (lc $$a{id} cmp lc $$b{id})
+	if $o ==0;
+
+    return $o;
+}
+
+sub build_tree
+{
+    my ($entries) = @_;
+
+    my ($root) = [];
+
+    foreach $e (@$entries)
+	{
+	if ($#$root<0 || $$e{primary} ne $root->[$#$root][0])
+	    {
+	    push (@$root, [ $$e{primary}, []]);
+	    }
+	my ($p) = $root->[$#$root][1];
+
+	if ($#$p<0 || $$e{secondary} ne $p->[$#$p][0])
+	    {
+	    push (@$p, [ $$e{secondary}, []]);
+	    }
+	my ($s) = $p->[$#$p][1];
+
+	if ($#$s<0 || $$e{tertiary} ne $s->[$#$s][0])
+	    {
+	    push (@$s, [ $$e{tertiary}, []]);
+	    }
+	my ($t) = $s->[$#$s][1];
+
+	push(@$t, $e);
+	}
+
+    return $root;
+}
+
+sub print_tree_as_debug
+{
+    my ($root) = @_;
+
+    print "[\n";
+    foreach $p (@$root)
+	{
+	print $$p[0], "\n";
+	print "  [\n";
+	foreach $s (@{$$p[1]})
+	    {
+	    print "  ", $$s[0], "\n";
+	    print "    [\n";
+	    foreach $t (@{$$s[1]})
+		{
+		print "    ", $$t[0], "\n";
+		print "      {";
+		foreach $e (@{$$t[1]})
+		    {
+		    print " $$e{id}";
+		    }
+		print "}\n";
+		}
+	    print "    ]\n";
+	    }
+	print "  ]\n";
+	}
+    print "]\n";
+}
+
+sub print_tree_as_html
+{
+    my ($root, $s) = @_;
+
+    my ($div) = '';
+
+    print $s "<index>\n";
+    print $s "<title>$title</title>\n"
+	if $title;
+    foreach $p (@$root)
+	{
+	my ($pname) = $$p[0];
+
+	my ($initial) = lc substr($pname, 0, 1);
+	if ($initial ne $div)
+	    {
+	    print $s "</indexdiv>"
+		if $div;
+	    print $s "<indexdiv> <title> $initial </title>\n";
+	    $div=$initial;
+	    }
+	print $s "  <indexentry>\n";
+	print_node($s, $p, "    ", "primary", "secondary", "tertiary");
+	print $s "  </indexentry>\n";
+	}
+    print $s "</indexdiv>\n"
+	if $div;
+    print $s "</index>\n";
+}
+
+sub print_node
+{
+    my ($s, $node, $ind, $which, @rest) = @_;
+
+    my ($name) = $$node[0];
+    my ($bits) = $$node[1];
+    my ($i)=0;
+    my (@links) = ();
+
+    unless (ref($bits->[0]) eq 'ARRAY' && $bits->[0]->[0])
+	{
+	$i++;
+
+	@links = @{get_links($bits)};
+	}
+
+    print_ie($s, $ind, $which, \@links, $name);
+
+    if ($#rest >=0)
+	{
+	my ($next) = shift @rest;
+
+	for(; $i <= $#$bits; $i++)
+	    {
+	    print_node($s, $$bits[$i], $ind."  ", $next, @rest);
+	    }
+	}
+}
+
+sub print_ie
+{
+    my ($s, $ind, $which, $links, $name) = @_;
+
+    my ($c) =1;
+    my ($lab) = $name;
+
+    print $s "$ind<${which}ie>";
+    if ($#$links >=0 )
+	{
+	foreach $e (@$links)
+	    {
+	    print $s "<link linkend='$$e{id}'>$lab</link> ";
+	    $c++;
+	    $lab = "ref $c";
+	    }
+	}
+    else
+	{
+	print $s "$lab";
+	}
+    print $s "</${which}ie>\n";
+}
+
+sub get_links
+{
+    my ($node) = @_;
+
+    while (ref($$node[0]) eq 'ARRAY')
+	{
+	$node = $node->[0]->[1];
+	}
+    return $node;
+}
+
+
+sub setup
+{
+}

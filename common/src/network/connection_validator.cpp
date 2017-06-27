@@ -6,6 +6,7 @@
 #include <nx_ec/impl/ec_api_impl.h>
 
 #include <common/common_module.h>
+#include <common/static_common_module.h>
 
 #include <network/module_information.h>
 
@@ -13,12 +14,14 @@
 #include <utils/common/app_info.h>
 #include <api/global_settings.h>
 #include <network/system_helpers.h>
+#include <common/common_module_aware.h>
+#include <nx/network/app_info.h>
 
 namespace {
 
-QnSoftwareVersion minSupportedVersion(const ec2::ApiRuntimeData& localInfo)
+QnSoftwareVersion minSupportedVersion(Qn::PeerType localPeerType)
 {
-    if (localInfo.peer.isMobileClient())
+    if (ec2::ApiPeerData::isMobileClient(localPeerType))
         return QnSoftwareVersion("2.5");
 
     if (QnAppInfo::applicationPlatform() == lit("macosx"))
@@ -47,15 +50,15 @@ bool compatibleCloudHost(const QString& cloudHost, bool isMobile)
     if (cloudHost.isEmpty())
         return true;
 
-    return cloudHost == QnAppInfo::defaultCloudHost()
-        || (isMobile && QnAppInfo::compatibleCloudHosts().contains(cloudHost));
+    return cloudHost == nx::network::AppInfo::defaultCloudHost()
+        || (isMobile && nx::network::AppInfo::compatibleCloudHosts().contains(cloudHost));
 }
 
 } // namespace
 
 QnSoftwareVersion QnConnectionValidator::minSupportedVersion()
 {
-    return ::minSupportedVersion(qnRuntimeInfoManager->localInfo().data);
+    return ::minSupportedVersion(qnStaticCommon->localPeerType());
 }
 
 Qn::ConnectionResult QnConnectionValidator::validateConnection(
@@ -81,6 +84,8 @@ Qn::ConnectionResult QnConnectionValidator::validateConnection(
         return Qn::LdapTemporaryUnauthorizedConnectionResult;
     else if (networkError == ec2::ErrorCode::cloud_temporary_unauthorized)
         return Qn::CloudTemporaryUnauthorizedConnectionResult;
+    else if (networkError == ec2::ErrorCode::disabled_user_unauthorized)
+        return Qn::DisabledUserConnectionResult;
     else if (networkError == ec2::ErrorCode::forbidden)
         return Qn::ForbiddenConnectionResult;
 
@@ -95,10 +100,11 @@ Qn::ConnectionResult QnConnectionValidator::validateConnection(
         connectionInfo.cloudHost);
 }
 
-bool QnConnectionValidator::isCompatibleToCurrentSystem(const QnModuleInformation& info)
+bool QnConnectionValidator::isCompatibleToCurrentSystem(const QnModuleInformation& info,
+    const QnCommonModule* commonModule)
 {
     return !info.localSystemId.isNull()
-        && helpers::serverBelongsToCurrentSystem(info)
+        && helpers::serverBelongsToCurrentSystem(info, commonModule)
         && validateConnection(info) == Qn::SuccessConnectionResult;
 }
 
@@ -109,13 +115,12 @@ Qn::ConnectionResult QnConnectionValidator::validateConnectionInternal(
     const QnSoftwareVersion& version,
     const QString& cloudHost)
 {
-    auto localInfo = qnRuntimeInfoManager->localInfo().data;
-    bool isMobile = localInfo.peer.isMobileClient();
+    bool isMobile = ec2::ApiPeerData::isMobileClient(qnStaticCommon->localPeerType());
 
-    if (!compatibleCustomization(brand, localInfo.brand, isMobile))
+    if (!compatibleCustomization(brand, qnStaticCommon->brand(), isMobile))
         return Qn::IncompatibleInternalConnectionResult;
 
-    if (!compatibleCustomization(customization, localInfo.customization, isMobile))
+    if (!compatibleCustomization(customization, qnStaticCommon->customization(), isMobile))
         return Qn::IncompatibleInternalConnectionResult;
 
     if (!compatibleCloudHost(cloudHost, isMobile))

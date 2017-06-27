@@ -1,17 +1,19 @@
 #include "lite_client_handler.h"
 
+#include <mobile_client/mobile_client_message_processor.h>
+#include <mobile_client/mobile_client_ui_controller.h>
+#include <client_core/connection_context_aware.h>
+
 #include <api/runtime_info_manager.h>
 #include <nx_ec/data/api_conversion_functions.h>
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/layout_resource.h>
 #include <common/common_module.h>
-#include <mobile_client/mobile_client_message_processor.h>
-#include <mobile_client/mobile_client_ui_controller.h>
 #include <nx/client/mobile/resource/lite_client_layout_helper.h>
 
 using namespace nx::client::mobile;
 
-class QnLiteClientHandlerPrivate: public QObject
+class QnLiteClientHandlerPrivate: public QObject, public QnConnectionContextAware
 {
     QnLiteClientHandler* q_ptr;
     Q_DECLARE_PUBLIC(QnLiteClientHandler)
@@ -50,7 +52,7 @@ void QnLiteClientHandler::setUiController(QnMobileClientUiController* controller
 QnLiteClientHandlerPrivate::QnLiteClientHandlerPrivate(QnLiteClientHandler* parent):
     QObject(parent),
     q_ptr(parent),
-    videowallGuid(QnRuntimeInfoManager::instance()->localInfo().data.videoWallInstanceGuid)
+    videowallGuid(runtimeInfoManager()->localInfo().data.videoWallInstanceGuid)
 {
     connect(qnClientMessageProcessor, &QnClientMessageProcessor::videowallControlMessageReceived,
         this, &QnLiteClientHandlerPrivate::at_videowallControlMessageReceived);
@@ -78,10 +80,12 @@ void QnLiteClientHandlerPrivate::at_videowallControlMessageReceived(
 
 void QnLiteClientHandlerPrivate::at_initialResourcesReceived()
 {
-    layout = resource::LiteClientLayoutHelper::findLayoutForServer(videowallGuid);
+    resource::LiteClientLayoutHelper helper;
+
+    layout = helper.findLayoutForServer(videowallGuid);
     if (!layout)
     {
-        layout = resource::LiteClientLayoutHelper::createLayoutForServer(videowallGuid);
+        layout = helper.createLayoutForServer(videowallGuid);
 
         if (!layout)
             return;

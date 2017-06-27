@@ -2,7 +2,7 @@
 #define PCP_CLIENT_H
 
 #include <nx/network/socket_factory.h>
-#include "utils/common/subscription.h"
+#include <nx/utils/subscription.h>
 
 #include <QtCore/QMutex>
 

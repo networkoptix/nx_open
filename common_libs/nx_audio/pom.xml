@@ -2,12 +2,12 @@
     <parent>
         <artifactId>common_libs</artifactId>
         <groupId>com.networkoptix.hdwitness</groupId>
-        <version>3.0.0-SNAPSHOT</version>
+        <version>3.1.0-SNAPSHOT</version>
         <relativePath>..</relativePath>
     </parent>
 
     <groupId>com.networkoptix.hdwitness</groupId>
-    <version>3.0.0-SNAPSHOT</version>
+    <version>3.1.0-SNAPSHOT</version>
     <modelVersion>4.0.0</modelVersion>
     <artifactId>nx_audio</artifactId>
     <packaging>pom</packaging>
@@ -18,7 +18,7 @@
         <product.title>${company.name} nx_audio</product.title>
 
         <qt.libs>core</qt.libs>
-        <global.libs>-lcommon -lnx_streaming</global.libs>
+        <global.libs>-lcommon</global.libs>
         <ios.oslibs>-framework OpenAL</ios.oslibs>
         <rdep.windows.packages>openal</rdep.windows.packages>
         <rdep.android.packages>openal</rdep.android.packages>
@@ -32,18 +32,9 @@
             <type>pom</type>
             <scope>system</scope>
             <systemPath>${root.dir}/common/pom.xml</systemPath>
-        </dependency>    
-        
-        <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>nx_streaming</artifactId>
-            <version>${project.version}</version>
-            <type>pom</type>
-            <scope>system</scope>
-            <systemPath>${root.dir}/common_libs/nx_streaming/pom.xml</systemPath>
-        </dependency>           
-    </dependencies>      
-    
+        </dependency>
+    </dependencies>
+
     <profiles>
         <profile>
             <id>windows</id>

@@ -8,7 +8,7 @@
 #include <nx/utils/std/future.h>
 #include <nx/network/aio/timer.h>
 
-#include <utils/common/guard.h>
+#include <nx/utils/scope_guard.h>
 
 namespace nx {
 namespace network {
@@ -103,7 +103,7 @@ TEST_F(FtAioTimer, modify_timeout)
     for (int i = 0; i < 29; ++i)
     {
         aio::Timer timer;
-        auto timerGuard = makeScopedGuard([&timer]() { timer.pleaseStopSync(); });
+        auto timerGuard = makeScopeGuard([&timer]() { timer.pleaseStopSync(); });
 
         nx::utils::promise<void> timedoutPromise;
         auto timeoutHandler = [&timedoutPromise]{ timedoutPromise.set_value(); };
@@ -124,7 +124,7 @@ TEST_F(FtAioTimer, cancellation)
     auto timeoutHandler = [&timedoutPromise] { timedoutPromise.set_value(); };
 
     aio::Timer timer;
-    auto timerGuard = makeScopedGuard([&timer]() { timer.pleaseStopSync(); });
+    auto timerGuard = makeScopeGuard([&timer]() { timer.pleaseStopSync(); });
 
     timer.start(timeout, timeoutHandler);
     timer.post([&timer]{ timer.cancelSync(); });

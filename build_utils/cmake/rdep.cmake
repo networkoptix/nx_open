@@ -1,4 +1,4 @@
-set(RDEP_DIR "${PROJECT_SOURCE_DIR}/build_utils/python" CACHE PATH "Path to rdep scripts")
+set(RDEP_DIR "${CMAKE_SOURCE_DIR}/build_utils/python" CACHE PATH "Path to rdep scripts")
 mark_as_advanced(RDEP_DIR)
 set(PACKAGES_DIR "$ENV{environment}/packages" CACHE STRING "Path to local rdep repository")
 mark_as_advanced(PACKAGES_DIR)
@@ -28,6 +28,7 @@ endfunction()
 function(nx_rdep_sync_package package)
     cmake_parse_arguments(RDEP "" "RESULT_VARIABLE" "" ${ARGN})
 
+    message(STATUS "Syncing package ${package}")
     execute_process(
         COMMAND
             ${PYTHON_EXECUTABLE}
@@ -49,9 +50,13 @@ function(_rdep_load_package_from_dir package_dir)
 endfunction()
 
 function(_rdep_try_package package)
-    cmake_parse_arguments(RDEP "" "PATH_VARIABLE;RESULT_VARIABLE" "" ${ARGN})
+    cmake_parse_arguments(RDEP "DEBUG_PACKAGE_FOUND" "PATH_VARIABLE;RESULT_VARIABLE" "" ${ARGN})
 
     set(package_dir "${PACKAGES_DIR}/${package}")
+
+    if(package MATCHES "-debug$")
+        set(debug_package TRUE)
+    endif()
 
     if(rdepSync)
         nx_rdep_sync_package(${package} RESULT_VARIABLE result)
@@ -68,7 +73,20 @@ function(_rdep_try_package package)
         _rdep_load_package_from_dir("${package_dir}")
 
         if(NOT EXISTS "${package_dir}/.nocopy")
-            nx_copy_package("${package_dir}")
+            if(CMAKE_MULTI_CONFIGURATION_MODE)
+                if(debug_package)
+                    set(configurations "Debug")
+                else()
+                    set(configurations ${CMAKE_ACTIVE_CONFIGURATIONS})
+                    if(RDEP_DEBUG_PACKAGE_FOUND)
+                        list(REMOVE_ITEM configurations "Debug")
+                    endif()
+                endif()
+            else()
+                set(configurations)
+            endif()
+
+            nx_copy_package("${package_dir}" CONFIGURATIONS ${configurations})
         endif()
 
         if(RDEP_PATH_VARIABLE)
@@ -95,12 +113,17 @@ function(nx_rdep_add_package package)
         _rdep_try_package("${package}-debug"
              PATH_VARIABLE package_dir
              RESULT_VARIABLE package_found)
+
+        if(package_found)
+            set(debug_package_found DEBUG_PACKAGE_FOUND)
+        endif()
     endif()
 
-    if(NOT package_found)
+    if(NOT package_found OR CMAKE_MULTI_CONFIGURATION_MODE)
         _rdep_try_package("${package}"
              PATH_VARIABLE package_dir
-             RESULT_VARIABLE package_found)
+             RESULT_VARIABLE package_found
+             ${debug_package_found})
     endif()
 
     if(NOT package_found)

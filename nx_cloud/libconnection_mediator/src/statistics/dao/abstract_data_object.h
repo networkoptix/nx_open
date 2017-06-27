@@ -2,8 +2,8 @@
 
 #include <deque>
 
-#include <utils/db/types.h>
-#include <utils/db/query_context.h>
+#include <nx/utils/db/types.h>
+#include <nx/utils/db/query_context.h>
 
 #include "../connection_statistics_info.h"
 
@@ -17,12 +17,12 @@ class AbstractDataObject
 public:
     virtual ~AbstractDataObject() = default;
 
-    virtual nx::db::DBResult save(
-        nx::db::QueryContext* /*queryContext*/,
+    virtual nx::utils::db::DBResult save(
+        nx::utils::db::QueryContext* /*queryContext*/,
         ConnectSession connectionRecord) = 0;
 
-    virtual nx::db::DBResult readAllRecords(
-        nx::db::QueryContext* /*queryContext*/,
+    virtual nx::utils::db::DBResult readAllRecords(
+        nx::utils::db::QueryContext* /*queryContext*/,
         std::deque<ConnectSession>* connectionRecords) = 0;
 };
 

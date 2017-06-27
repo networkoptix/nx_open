@@ -17,14 +17,20 @@ constexpr const std::chrono::seconds kDefaultTestTimeout = std::chrono::seconds(
 TunnelConnector::~TunnelConnector()
 {
     if (m_oldFactoryFunc)
-        ConnectorFactory::setFactoryFunc(std::move(*m_oldFactoryFunc));
+    {
+        CrossNatConnectorFactory::instance().setCustomFunc(
+            std::move(*m_oldFactoryFunc));
+    }
 }
 
-void TunnelConnector::setConnectorFactoryFunc(ConnectorFactory::FactoryFunc newFactoryFunc)
+void TunnelConnector::setConnectorFactoryFunc(
+    CrossNatConnectorFactory::Function newFactoryFunc)
 {
-    auto oldFunc = ConnectorFactory::setFactoryFunc(std::move(newFactoryFunc));
+    auto oldFunc = 
+        CrossNatConnectorFactory::instance().setCustomFunc(
+            std::move(newFactoryFunc));
     if (!m_oldFactoryFunc)
-        m_oldFactoryFunc = oldFunc;
+        m_oldFactoryFunc = std::move(oldFunc);
 }
 
 const hpm::MediatorFunctionalTest& TunnelConnector::mediator() const
@@ -143,7 +149,7 @@ void TunnelConnector::doSimpleConnectTest(
     CrossNatConnector connector(
         SocketAddress((server->serverId() + "." + system.id).constData()),
         mediatorAddressForConnector);
-    auto connectorGuard = makeScopedGuard([&connector]() { connector.pleaseStopSync(); });
+    auto connectorGuard = makeScopeGuard([&connector]() { connector.pleaseStopSync(); });
 
     auto t1 = std::chrono::steady_clock::now();
     connector.connect(

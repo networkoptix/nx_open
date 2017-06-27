@@ -2,8 +2,12 @@
 
 #include <gtest/gtest.h>
 
+#include <nx/utils/std/cpp14.h>
 #include <nx/utils/log/log.h>
+#include <nx/core/access/access_types.h>
+#include <common/common_module.h>
 #include <common/common_globals.h>
+#include <common/static_common_module.h>
 
 #include <nx/media/abstract_video_decoder.h>
 #include <nx/media/video_decoder_registry.h>
@@ -109,7 +113,8 @@ QSize MockVideoDecoder::s_maxTranscodedResolution{};
 class MockServer: public QnMediaServerResource
 {
 public:
-    MockServer()
+    MockServer(QnCommonModule* commonModule):
+        QnMediaServerResource(commonModule)
     {
         setId(QnUuid::createUuid());
     }
@@ -227,7 +232,7 @@ protected:
 private:
     void debugLogStreams()
     {
-        if (!QnLog::logs() || QnLog::logs()->get()->logLevel() < cl_logDEBUG1)
+        if (!nx::utils::log::isToBeLogged(nx::utils::log::Level::debug))
             return;
 
         for (const auto& stream: mediaStreams().streams)
@@ -275,7 +280,10 @@ public:
     void test(const TestCase& testCase);
 
 private:
-    QnSharedResourcePointer<MockServer> m_server{new MockServer()};
+    QnStaticCommonModule m_staticCommon;
+    std::unique_ptr<QnCommonModule> m_module{
+        new QnCommonModule(false, nx::core::access::Mode::direct)};
+    QnSharedResourcePointer<MockServer> m_server{new MockServer(m_module.get())};
     QnSharedResourcePointer<MockCamera> m_camera{new MockCamera(m_server->getId())};
 };
 
@@ -419,14 +427,14 @@ public:
 
 PlayerSetQualityTest::PlayerSetQualityTest()
 {
-    QnResourcePool::instance()->clear(); //< Just in case.
-    QnResourcePool::instance()->addResource(m_server);
-    QnResourcePool::instance()->addResource(m_camera);
+    m_module->resourcePool()->clear(); //< Just in case.
+    m_module->resourcePool()->addResource(m_server);
+    m_module->resourcePool()->addResource(m_camera);
 }
 
 PlayerSetQualityTest::~PlayerSetQualityTest()
 {
-    QnResourcePool::instance()->clear();
+    m_module->resourcePool()->clear();
 }
 
 void PlayerSetQualityTest::test(const TestCase& testCase)
@@ -461,10 +469,11 @@ void PlayerSetQualityTest::test(const TestCase& testCase)
 class NxMediaPlayerTest: public ::testing::Test
 {
 protected:
-    static void SetUpTestCase()
+    virtual void SetUp()
     {
+        m_staticCommon.reset(new QnStaticCommonModule());
         // Init singletons.
-        m_common = new QnCommonModule();
+        m_common.reset(new QnCommonModule(false, nx::core::access::Mode::direct));
         m_common->setModuleGUID(QnUuid::createUuid());
         m_common->store(new QnFfmpegInitializer());
 
@@ -472,17 +481,17 @@ protected:
         VideoDecoderRegistry::instance()->addPlugin<MockVideoDecoder>();
     }
 
-    static void TearDownTestCase()
+    virtual void TearDown()
     {
-        delete m_common;
-        m_common = nullptr;
+        m_common.reset();
+        m_staticCommon.reset();
         VideoDecoderRegistry::instance()->reinitialize();
     }
 
 private:
-    static QnCommonModule* m_common;
+    QScopedPointer<QnStaticCommonModule> m_staticCommon;
+    QScopedPointer<QnCommonModule> m_common;
 };
-QnCommonModule* NxMediaPlayerTest::m_common = nullptr;
 
 } // namespace
 

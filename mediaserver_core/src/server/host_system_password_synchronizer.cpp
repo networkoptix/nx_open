@@ -13,18 +13,19 @@
 #include <core/resource/user_resource.h>
 #include <core/resource_management/resource_pool.h>
 #include <utils/common/app_info.h>
-#include <utils/crypt/linux_passwd_crypt.h>
+#include <nx/utils/crypt/linux_passwd_crypt.h>
 
 #include "platform/platform_abstraction.h"
 #include "platform/monitoring/platform_monitor.h"
 
-HostSystemPasswordSynchronizer::HostSystemPasswordSynchronizer()
+HostSystemPasswordSynchronizer::HostSystemPasswordSynchronizer(QnCommonModule* commonModule):
+    QnCommonModuleAware(commonModule)
 {
     Qn::directConnect(
-        qnResPool, &QnResourcePool::resourceAdded,
+        resourcePool(), &QnResourcePool::resourceAdded,
         this, &HostSystemPasswordSynchronizer::at_resourceFound);
 
-    if (QnUserResourcePtr admin = qnResPool->getAdministrator())
+    if (QnUserResourcePtr admin = resourcePool()->getAdministrator())
         setAdmin(admin);
 }
 

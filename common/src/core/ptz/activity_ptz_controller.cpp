@@ -7,10 +7,12 @@
 
 
 QnActivityPtzController::QnActivityPtzController(
+    QnCommonModule* commonModule,
     Mode mode,
     const QnPtzControllerPtr& baseController)
     :
     base_type(baseController),
+    QnCommonModuleAware(commonModule),
     m_mode(mode)
 {
     m_adaptor = new QnJsonResourcePropertyAdaptor<QnPtzObject>(
@@ -28,7 +30,7 @@ QnActivityPtzController::QnActivityPtzController(
     connect(m_adaptor, &QnAbstractResourcePropertyAdaptor::synchronizationNeeded, this,
         [this](const QnResourcePtr& resource)
         {
-            propertyDictionary->saveParamsAsync(resource->getId());
+            propertyDictionary()->saveParamsAsync(resource->getId());
         });
 }
 

@@ -2,11 +2,11 @@
 
 #include <QtCore/QDir>
 
+#include "test_options.h"
+
 namespace nx {
 namespace utils {
 namespace test {
-
-QString TestWithTemporaryDirectory::sTemporaryDirectoryPath;
 
 TestWithTemporaryDirectory::TestWithTemporaryDirectory(QString moduleName, QString tmpDir):
     m_tmpDir(tmpDir)
@@ -14,7 +14,8 @@ TestWithTemporaryDirectory::TestWithTemporaryDirectory(QString moduleName, QStri
     if (m_tmpDir.isEmpty())
     {
         m_tmpDir =
-            (sTemporaryDirectoryPath.isEmpty() ? QDir::homePath() : sTemporaryDirectoryPath) +
+            (TestOptions::temporaryDirectoryPath().isEmpty()
+                ? QDir::homePath() : TestOptions::temporaryDirectoryPath()) +
             lit("/%1_ut.data").arg(moduleName);
     }
     QDir(m_tmpDir).removeRecursively();
@@ -29,16 +30,6 @@ TestWithTemporaryDirectory::~TestWithTemporaryDirectory()
 QString TestWithTemporaryDirectory::testDataDir() const
 {
     return m_tmpDir;
-}
-
-void TestWithTemporaryDirectory::setTemporaryDirectoryPath(const QString& path)
-{
-    sTemporaryDirectoryPath = path;
-}
-
-QString TestWithTemporaryDirectory::temporaryDirectoryPath()
-{
-    return sTemporaryDirectoryPath;
 }
 
 } // namespace test

@@ -2,12 +2,12 @@
     <parent>
         <artifactId>cpp</artifactId>
         <groupId>com.networkoptix.hdwitness</groupId>
-        <version>3.0.0-SNAPSHOT</version>
+        <version>3.1.0-SNAPSHOT</version>
         <relativePath>../cpp</relativePath>
     </parent>
 
     <groupId>com.networkoptix.hdwitness</groupId>
-    <version>3.0.0-SNAPSHOT</version>
+    <version>3.1.0-SNAPSHOT</version>
     <modelVersion>4.0.0</modelVersion>
     <artifactId>mediaserver_core</artifactId>
     <packaging>pom</packaging>
@@ -19,15 +19,15 @@
         <product.display.title>${mediaserver.display.name}</product.display.title>
         <template>lib</template>
 
-        <qt.libs>core network xml xmlpatterns sql concurrent multimedia</qt.libs>
-        <global.libs>-lcommon -lappserver2 -lcloud_db_client -ludt -lnx_email -lnx_streaming -lnx_network -lnx_speech_synthesizer -lnx_fusion -lnx_utils</global.libs>
+        <qt.libs>core network xml xmlpatterns sql concurrent multimedia websockets</qt.libs>
+        <global.libs>-lcommon -lappserver2 -ludt -lnx_email -lnx_network -lnx_speech_synthesizer -lnx_fusion -lnx_utils -lnx_kit</global.libs>
         <windows.oslibs>Ws2_32.lib DbgHelp.lib -lIphlpapi -lwinmm</windows.oslibs>
         <linux.oslibs>-ldl</linux.oslibs>
         <mac.oslibs>-lbz2 -framework IOKit -framework CoreServices</mac.oslibs>
 
         <windows.defines>EC2_LIB_API=__declspec(dllimport)</windows.defines>
 
-        <rdep.packages>any/server-external-${branch}|any/server-external any/apidoctool openssl ffmpeg onvif quazip sigar any/qtsinglecoreapplication any/qtservice</rdep.packages>
+        <rdep.packages>any/server-external-${branch}|any/server-external any/apidoctool openssl ffmpeg onvif quazip sigar any/qtsinglecoreapplication any/qtservice any/nx_kit</rdep.packages>
         <rdep.linux.arm.packages>openldap</rdep.linux.arm.packages>
     </properties>
 
@@ -75,15 +75,6 @@
             <type>pom</type>
             <scope>system</scope>
             <systemPath>${root.dir}/common_libs/nx_email/pom.xml</systemPath>
-        </dependency>
-
-        <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>nx_streaming</artifactId>
-            <version>${project.version}</version>
-            <type>pom</type>
-            <scope>system</scope>
-            <systemPath>${root.dir}/common_libs/nx_streaming/pom.xml</systemPath>
         </dependency>
 
         <dependency>

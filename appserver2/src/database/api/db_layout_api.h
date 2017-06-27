@@ -3,6 +3,7 @@
 #include <QtSql/QSqlDatabase>
 
 #include <nx_ec/data/api_fwd.h>
+#include <database/api/db_resource_api.h>
 
 namespace ec2 {
 namespace database {
@@ -23,7 +24,9 @@ bool fetchLayouts(const QSqlDatabase& database, const QnUuid& id, ApiLayoutDataL
 * @param in layout Layout api data.
 * @returns True if operation was successful, false otherwise.
 */
-bool saveLayout(const QSqlDatabase& database, const ApiLayoutData& layout);
+bool saveLayout(
+    ec2::database::api::Context* resourceContext,
+    const ApiLayoutData& layout);
 
 /**
 * Remove layout.
@@ -31,7 +34,9 @@ bool saveLayout(const QSqlDatabase& database, const ApiLayoutData& layout);
 * @param in guid Layout id.
 * @returns True if operation was successful, false otherwise.
 */
-bool removeLayout(const QSqlDatabase& database, const QnUuid& id);
+bool removeLayout(
+    ec2::database::api::Context* resourceContext,
+    const QnUuid& id);
 
 } // namespace api
 } // namespace database

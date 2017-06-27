@@ -10,7 +10,7 @@
 class QnAbstractPtzCommand: public QnPtzCommandBase, public QRunnable
 {
 public:
-    QnAbstractPtzCommand(const QnPtzControllerPtr& controller, Qn::PtzCommand command):
+    QnAbstractPtzCommand(const QnPtzControllerPtr &controller, Qn::PtzCommand command): 
         m_controller(controller),
         m_command(command)
     {
@@ -85,9 +85,12 @@ private:
         return true;                                                                \
     }
 
-QnThreadedPtzController::QnThreadedPtzController(const QnPtzControllerPtr& baseController):
+QnThreadedPtzController::QnThreadedPtzController(
+    const QnPtzControllerPtr& baseController,
+    QThreadPool* threadPool)
+    :
     base_type(baseController),
-    m_threadPool(qnPtzPool->commandThreadPool())
+    m_threadPool(threadPool)
 {
 }
 

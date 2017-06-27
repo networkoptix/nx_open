@@ -1,5 +1,4 @@
-#ifndef QN_RESOURCE_DISCOVERY_MANAGER_H
-#define QN_RESOURCE_DISCOVERY_MANAGER_H
+#pragma once
 
 #include <memory> // for auto_ptr
 #include <atomic>
@@ -9,7 +8,7 @@
 #include <QtCore/QTimer>
 #include <QtNetwork/QAuthenticator>
 
-#include <utils/common/long_runnable.h>
+#include <nx/utils/thread/long_runnable.h>
 #include <nx/utils/singleton.h>
 #include <nx/network/netstate.h>
 #include <nx/network/nettools.h>
@@ -22,6 +21,7 @@
 
 #include <utils/common/connective.h>
 #include <nx/utils/log/log.h>
+#include <common/common_module_aware.h>
 
 //#define DISCOVERY_DBG
 
@@ -32,7 +32,7 @@
             .arg(res->getUrl()) \
             .arg(res->getHostAddress()) \
             .arg(res->getMAC().toString()) \
-            .arg(res->getUniqueId()) 
+            .arg(res->getUniqueId())
 # define FL1(x) QString::fromLatin1(x)
 #else
 #   define DLOG(...)
@@ -87,7 +87,7 @@ class QnResourceDiscoveryManager
 :
     public Connective<QnLongRunnable>,
     public QnResourceFactory,
-    public Singleton<QnResourceDiscoveryManager>
+    public QnCommonModuleAware
 {
     Q_OBJECT
 
@@ -102,7 +102,7 @@ public:
 
     typedef QList<QnAbstractResourceSearcher*> ResourceSearcherList;
 
-    QnResourceDiscoveryManager();
+    QnResourceDiscoveryManager(QObject* parent);
     ~QnResourceDiscoveryManager();
 
     // this function returns only new devices( not in all_devices list);
@@ -196,5 +196,3 @@ private:
 protected:
     int m_serverOfflineTimeout;
 };
-
-#endif //QN_RESOURCE_DISCOVERY_MANAGER_H

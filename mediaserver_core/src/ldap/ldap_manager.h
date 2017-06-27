@@ -8,7 +8,8 @@
 #include <nx/utils/singleton.h>
 #include <utils/common/ldap.h>
 #include <nx/utils/thread/mutex.h>
-#include "common/common_globals.h"
+#include <common/common_globals.h>
+#include <common/common_module_aware.h>
 
 class QnLdapManagerPrivate;
 
@@ -21,15 +22,13 @@ namespace Qn {
     };
 }
 
-class QnLdapManager:
-    public QObject,
-    public Singleton<QnLdapManager>
+class QnLdapManager: public QObject, public QnCommonModuleAware
 {
     Q_OBJECT
 
 public:
 
-    QnLdapManager();
+    QnLdapManager(QnCommonModule* commonModule);
     ~QnLdapManager();
 
     static QString errorMessage(Qn::LdapResult ldapResult);

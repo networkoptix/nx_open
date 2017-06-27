@@ -8,31 +8,21 @@
 
 #include <core/resource/layout_resource.h>
 #include <core/resource/user_resource.h>
+#include <common/common_module.h>
 
-namespace {
+using namespace nx::core::access;
 
-QSet<QnUuid> layoutItems(const QnLayoutResourcePtr& layout)
+QnSharedLayoutItemAccessProvider::QnSharedLayoutItemAccessProvider(
+    Mode mode,
+    QObject* parent)
+    :
+    base_type(mode, parent)
 {
-    QSet<QnUuid> result;
-    for (const auto& item : layout->getItems())
+    if (mode == Mode::cached)
     {
-        /* Only remote resources with correct id can be accessed. */
-        auto id = item.resource.id;
-        if (id.isNull())
-            continue;
-
-        result << id;
+        connect(sharedResourcesManager(), &QnSharedResourcesManager::sharedResourcesChanged, this,
+            &QnSharedLayoutItemAccessProvider::handleSharedResourcesChanged);
     }
-    return result;
-}
-
-}
-
-QnSharedLayoutItemAccessProvider::QnSharedLayoutItemAccessProvider(QObject* parent):
-    base_type(parent)
-{
-    connect(qnSharedResourcesManager, &QnSharedResourcesManager::sharedResourcesChanged, this,
-        &QnSharedLayoutItemAccessProvider::handleSharedResourcesChanged);
 }
 
 QnSharedLayoutItemAccessProvider::~QnSharedLayoutItemAccessProvider()
@@ -40,7 +30,7 @@ QnSharedLayoutItemAccessProvider::~QnSharedLayoutItemAccessProvider()
 
 }
 
-QnAbstractResourceAccessProvider::Source QnSharedLayoutItemAccessProvider::baseSource() const
+Source QnSharedLayoutItemAccessProvider::baseSource() const
 {
     return Source::layout;
 }
@@ -50,6 +40,29 @@ bool QnSharedLayoutItemAccessProvider::calculateAccess(const QnResourceAccessSub
 {
     if (!isMediaResource(resource))
         return false;
+
+    if (mode() == Mode::direct)
+    {
+        auto sharedLayouts = commonModule()->resourcePool()->getResources<QnLayoutResource>(
+            sharedResourcesManager()->sharedResources(subject));
+
+        auto resourceId = resource->getId();
+        for (const auto& layout: sharedLayouts)
+        {
+            // Layout may be not shared yet in the process of sharing
+            if (!layout->isShared())
+                continue;
+
+            for (const auto& item: layout->getItems())
+            {
+                if (item.resource.id == resourceId)
+                    return true;
+            }
+        }
+        return false;
+    }
+
+    NX_EXPECT(mode() == Mode::cached);
 
     // Method is called under the mutex.
     // Using effective id as aggregators are created for users and roles separately
@@ -77,17 +90,17 @@ void QnSharedLayoutItemAccessProvider::fillProviders(
     if (!isMediaResource(resource))
         return;
 
-    auto sharedLayouts = qnResPool->getResources<QnLayoutResource>(
-        qnSharedResourcesManager->sharedResources(subject));
+    auto sharedLayouts = commonModule()->resourcePool()->getResources<QnLayoutResource>(
+        sharedResourcesManager()->sharedResources(subject));
 
     auto resourceId = resource->getId();
-    for (const auto& layout : sharedLayouts)
+    for (const auto& layout: sharedLayouts)
     {
         NX_ASSERT(layout->isShared());
         if (!layout->isShared())
             continue;
 
-        for (const auto& item : layout->getItems())
+        for (const auto& item: layout->getItems())
         {
             if (item.resource.id != resourceId)
                 continue;
@@ -99,6 +112,8 @@ void QnSharedLayoutItemAccessProvider::fillProviders(
 
 void QnSharedLayoutItemAccessProvider::handleResourceAdded(const QnResourcePtr& resource)
 {
+    NX_EXPECT(mode() == Mode::cached);
+
     base_type::handleResourceAdded(resource);
 
     if (auto layout = resource.dynamicCast<QnLayoutResource>())
@@ -115,6 +130,8 @@ void QnSharedLayoutItemAccessProvider::handleResourceAdded(const QnResourcePtr& 
 
 void QnSharedLayoutItemAccessProvider::handleResourceRemoved(const QnResourcePtr& resource)
 {
+    NX_EXPECT(mode() == Mode::cached);
+
     base_type::handleResourceRemoved(resource);
     if (auto layout = resource.dynamicCast<QnLayoutResource>())
     {
@@ -140,10 +157,12 @@ void QnSharedLayoutItemAccessProvider::handleResourceRemoved(const QnResourcePtr
 
 void QnSharedLayoutItemAccessProvider::handleSubjectAdded(const QnResourceAccessSubject& subject)
 {
+    NX_EXPECT(mode() == Mode::cached);
+
     auto aggregator = ensureAggregatorForSubject(subject);
 
-    auto sharedLayouts = qnResPool->getResources<QnLayoutResource>(
-        qnSharedResourcesManager->sharedResources(subject));
+    auto sharedLayouts = commonModule()->resourcePool()->getResources<QnLayoutResource>(
+        sharedResourcesManager()->sharedResources(subject));
     for (auto layout : sharedLayouts)
         aggregator->addWatchedLayout(layout);
 
@@ -152,6 +171,8 @@ void QnSharedLayoutItemAccessProvider::handleSubjectAdded(const QnResourceAccess
 
 void QnSharedLayoutItemAccessProvider::handleSubjectRemoved(const QnResourceAccessSubject& subject)
 {
+    NX_EXPECT(mode() == Mode::cached);
+
     {
         QnMutexLocker lk(&m_mutex);
         m_aggregatorsBySubject.remove(subject.id());
@@ -164,6 +185,8 @@ void QnSharedLayoutItemAccessProvider::handleSharedResourcesChanged(
     const QSet<QnUuid>& oldValues,
     const QSet<QnUuid>& newValues)
 {
+    NX_EXPECT(mode() == Mode::cached);
+
     NX_ASSERT(subject.isValid());
     if (!subject.isValid())
         return;
@@ -173,13 +196,13 @@ void QnSharedLayoutItemAccessProvider::handleSharedResourcesChanged(
     auto added = (newValues - oldValues);
     auto removed = (oldValues - newValues);
 
-    for (const auto& layout: qnResPool->getResources<QnLayoutResource>(added))
+    for (const auto& layout: commonModule()->resourcePool()->getResources<QnLayoutResource>(added))
     {
         if (layout->isShared())
            aggregator->addWatchedLayout(layout);
     }
 
-    for (const auto& layout: qnResPool->getResources<QnLayoutResource>(removed))
+    for (const auto& layout: commonModule()->resourcePool()->getResources<QnLayoutResource>(removed))
     {
         if (layout->isShared())
             aggregator->removeWatchedLayout(layout);
@@ -188,13 +211,15 @@ void QnSharedLayoutItemAccessProvider::handleSharedResourcesChanged(
 
 void QnSharedLayoutItemAccessProvider::updateAccessToLayout(const QnLayoutResourcePtr& layout)
 {
+    NX_EXPECT(mode() == Mode::cached);
+
     if (!layout->isShared())
         return;
 
     const auto layoutId = layout->getId();
-    for (const auto& subject : qnResourceAccessSubjectsCache->allSubjects())
+    for (const auto& subject : resourceAccessSubjectsCache()->allSubjects())
     {
-        auto shared = qnSharedResourcesManager->sharedResources(subject);
+        auto shared = sharedResourcesManager()->sharedResources(subject);
         if (!shared.contains(layoutId))
             continue;
 
@@ -205,6 +230,8 @@ void QnSharedLayoutItemAccessProvider::updateAccessToLayout(const QnLayoutResour
 QnLayoutItemAggregatorPtr QnSharedLayoutItemAccessProvider::ensureAggregatorForSubject(
     const QnResourceAccessSubject& subject)
 {
+    NX_EXPECT(mode() == Mode::cached);
+
     auto id = subject.id();
 
     auto updateAccessToResourceBySubject = [this, subject](const QnUuid& resourceId)
@@ -212,7 +239,7 @@ QnLayoutItemAggregatorPtr QnSharedLayoutItemAccessProvider::ensureAggregatorForS
             if (isUpdating())
                 return;
 
-            auto resource = qnResPool->getResourceById(resourceId);
+            auto resource = commonModule()->resourcePool()->getResourceById(resourceId);
             if (!resource || !isMediaResource(resource))
                 return;
 

@@ -2,12 +2,14 @@
 
 #include <QtCore/QTime>
 
-#include <nx/utils/log/log.h>
-#include <utils/common/util.h>
-
+#include <nx/network/aio/unified_pollset.h>
 #include <nx/network/flash_socket/types.h>
-#include <nx/network/http/httptypes.h>
+#include <nx/network/http/http_types.h>
 #include <nx/network/http/http_mod_manager.h>
+#include <nx/utils/log/log.h>
+#include <nx/utils/gzip/gzip_compressor.h>
+
+#include <utils/common/util.h>
 
 #include "tcp_listener.h"
 #include "tcp_connection_priv.h"
@@ -16,10 +18,8 @@
 #   include <netinet/tcp.h>
 #endif
 #include "core/resource_management/resource_pool.h"
-#include "http/custom_headers.h"
+#include <nx/network/http/custom_headers.h>
 #include "common/common_module.h"
-#include "utils/gzip/gzip_compressor.h"
-#include "nx/network/aio/unified_pollset.h"
 
 // we need enough size for updates
 #ifdef __arm__
@@ -29,23 +29,42 @@
 #endif
 
 
-QnTCPConnectionProcessor::QnTCPConnectionProcessor(QSharedPointer<AbstractStreamSocket> socket):
+QnTCPConnectionProcessor::QnTCPConnectionProcessor(
+    QSharedPointer<AbstractStreamSocket> socket,
+    QnTcpListener* owner)
+:
+    QnCommonModuleAware(owner->commonModule()),
     d_ptr(new QnTCPConnectionProcessorPrivate)
 {
     Q_D(QnTCPConnectionProcessor);
     d->socket = socket;
-    d->chunkedMode = false;
+    d->owner = owner;
 }
 
-QnTCPConnectionProcessor::QnTCPConnectionProcessor(QnTCPConnectionProcessorPrivate* dptr, QSharedPointer<AbstractStreamSocket> socket):
+QnTCPConnectionProcessor::QnTCPConnectionProcessor(
+    QnTCPConnectionProcessorPrivate* dptr,
+    QSharedPointer<AbstractStreamSocket> socket,
+    QnTcpListener* owner)
+:
+    QnCommonModuleAware(owner->commonModule()),
     d_ptr(dptr)
 {
     Q_D(QnTCPConnectionProcessor);
     d->socket = socket;
-    //d->socket->setNoDelay(true);
-    d->chunkedMode = false;
+    d->owner = owner;
 }
 
+QnTCPConnectionProcessor::QnTCPConnectionProcessor(
+    QnTCPConnectionProcessorPrivate* dptr,
+    QSharedPointer<AbstractStreamSocket> socket,
+    QnCommonModule* commonModule)
+:
+    QnCommonModuleAware(commonModule),
+    d_ptr(dptr)
+{
+    Q_D(QnTCPConnectionProcessor);
+    d->socket = socket;
+}
 
 QnTCPConnectionProcessor::~QnTCPConnectionProcessor()
 {
@@ -122,8 +141,8 @@ void QnTCPConnectionProcessor::parseRequest()
     }
     d->protocol = d->request.requestLine.version.protocol;
     d->requestBody = d->request.messageBody;
-
-    nx_http::HttpModManager::instance()->apply( &d->request );
+    if (d->owner)
+        d->owner->applyModToRequest(&d->request);
 }
 
 /*
@@ -240,7 +259,7 @@ QByteArray QnTCPConnectionProcessor::createResponse(int httpStatusCode, const QB
     }
     nx_http::insertOrReplaceHeader(
         &d->response.headers,
-        nx_http::HttpHeader("Date", dateTimeToHTTPFormat(QDateTime::currentDateTime())) );
+        nx_http::HttpHeader("Date", nx_http::formatDateTime(QDateTime::currentDateTime())) );
 
     // this header required to perform new HTTP requests if server port has been on the fly changed
     nx_http::insertOrReplaceHeader( &d->response.headers, nx_http::HttpHeader( "Access-Control-Allow-Origin", "*" ) );
@@ -452,7 +471,8 @@ bool QnTCPConnectionProcessor::readSingleRequest()
             d->protocol = d->request.requestLine.version.protocol;
             d->requestBody = d->httpStreamReader.fetchMessageBody();
 
-            nx_http::HttpModManager::instance()->apply( &d->request );
+            if (d->owner)
+                d->owner->applyModToRequest(&d->request);
 
             //TODO #ak logging
             //NX_LOG( QnLog::HTTP_LOG_INDEX, QString::fromLatin1("Received request from %1:\n%2-------------------\n\n\n").
@@ -493,6 +513,22 @@ SocketAddress QnTCPConnectionProcessor::remoteHostAddress() const
 {
     Q_D(const QnTCPConnectionProcessor);
     return d->socket ? d->socket->getForeignAddress() : SocketAddress();
+}
+
+bool QnTCPConnectionProcessor::isSocketTaken() const
+{
+    Q_D(const QnTCPConnectionProcessor);
+    return d->isSocketTaken;
+}
+
+QSharedPointer<AbstractStreamSocket> QnTCPConnectionProcessor::takeSocket()
+{
+    Q_D(QnTCPConnectionProcessor);
+    d->isSocketTaken = true;
+
+    const auto socket = d->socket;
+    d->socket.clear();
+    return socket;
 }
 
 void QnTCPConnectionProcessor::releaseSocket()
@@ -540,8 +576,7 @@ QnAuthSession QnTCPConnectionProcessor::authSession() const
         result.fromByteArray(existSession);
         return result;
     }
-
-    if (const auto& userRes = qnResPool->getResourceById(d->accessRights.userId))
+    if (const auto& userRes = resourcePool()->getResourceById(d->accessRights.userId))
         result.userName = userRes->getName();
     else if (!nx_http::getHeaderValue( d->request.headers,  Qn::VIDEOWALL_GUID_HEADER_NAME).isEmpty())
         result.userName = lit("Video wall");
@@ -585,13 +620,13 @@ void QnTCPConnectionProcessor::sendUnauthorizedResponse(nx_http::StatusCode::Val
 {
     Q_D(QnTCPConnectionProcessor);
 
-    if( d->request.requestLine.method == nx_http::Method::GET ||
-        d->request.requestLine.method == nx_http::Method::HEAD )
+    if( d->request.requestLine.method == nx_http::Method::Get ||
+        d->request.requestLine.method == nx_http::Method::Head )
     {
         d->response.messageBody = messageBody;
     }
     if (nx_http::getHeaderValue( d->response.headers, Qn::SERVER_GUID_HEADER_NAME ).isEmpty())
-        d->response.headers.insert(nx_http::HttpHeader(Qn::SERVER_GUID_HEADER_NAME, qnCommon->moduleGUID().toByteArray()));
+        d->response.headers.insert(nx_http::HttpHeader(Qn::SERVER_GUID_HEADER_NAME, commonModule()->moduleGUID().toByteArray()));
 
     auto acceptEncodingHeaderIter = d->request.headers.find( "Accept-Encoding" );
     QByteArray contentEncoding;
@@ -606,7 +641,7 @@ void QnTCPConnectionProcessor::sendUnauthorizedResponse(nx_http::StatusCode::Val
         {
             contentEncoding = "gzip";
             if( !d->response.messageBody.isEmpty() )
-                d->response.messageBody = GZipCompressor::compressData(d->response.messageBody);
+                d->response.messageBody = nx::utils::bstream::gzip::Compressor::compressData(d->response.messageBody);
         }
         else
         {

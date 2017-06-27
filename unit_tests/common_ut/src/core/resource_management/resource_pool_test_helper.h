@@ -1,13 +1,21 @@
 #pragma once
 
 #include <common/common_globals.h>
+
+#include <common/common_module_aware.h>
+
 #include <nx_ec/data/api_fwd.h>
 #include <core/resource/resource_fwd.h>
 #include <core/resource/user_resource.h> //not so good but we can allow it for test module
 
-class QnResourcePoolTestHelper
+class QnStaticCommonModule;
+
+class QnResourcePoolTestHelper: public QnCommonModuleAware
 {
 public:
+    QnResourcePoolTestHelper();
+    virtual ~QnResourcePoolTestHelper();
+
     static QString kTestUserName;
     static QString kTestUserName2;
 
@@ -22,9 +30,8 @@ public:
     QnLayoutResourcePtr createLayout();
     QnLayoutResourcePtr addLayout();
 
-    QnVirtualCameraResourcePtr createCamera();
-
-    QnVirtualCameraResourcePtr addCamera();
+    QnVirtualCameraResourcePtr createCamera(Qn::LicenseType licenseType = Qn::LC_Professional);
+    QnVirtualCameraResourcePtr addCamera(Qn::LicenseType licenseType = Qn::LC_Professional);
 
     QnWebPageResourcePtr addWebPage();
 
@@ -36,4 +43,8 @@ public:
     QnStorageResourcePtr addStorage(const QnMediaServerResourcePtr& server);
 
     ec2::ApiUserRoleData createRole(Qn::GlobalPermissions permissions);
+
+private:
+    QScopedPointer<QnStaticCommonModule> m_staticCommon;
+
 };

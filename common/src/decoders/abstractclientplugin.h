@@ -5,7 +5,7 @@
 #ifndef ABSTRACTCLIENTPLUGIN_H
 #define ABSTRACTCLIENTPLUGIN_H
 
-class QnLog;
+struct QnLog;
 
 //!Base class for all dynamically-linked plugins to client
 class QnAbstractClientPlugin

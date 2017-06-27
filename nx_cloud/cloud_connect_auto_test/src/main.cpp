@@ -10,7 +10,7 @@
 #include <QtCore/QDir>
 #include <QtCore/QFile>
 
-#include <nx/network/http/httpclient.h>
+#include <nx/network/http/http_client.h>
 #include <nx/network/socket_global.h>
 #include <nx/utils/log/log.h>
 

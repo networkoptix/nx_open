@@ -12,6 +12,7 @@
 #include <QtCore/QList>
 #include <QtCore/QMap>
 #include <QtCore/QPair>
+#include <QtCore/QTimeZone>
 #include <QSharedPointer>
 #include <nx/utils/thread/wait_condition.h>
 #include <QtXml/QXmlDefaultHandler>
@@ -76,13 +77,12 @@ struct QnOnvifServiceUrls
 
 };
 
-class QnPlOnvifResource
-:
-    public QnPhysicalCameraResource
+class QnPlOnvifResource: public QnPhysicalCameraResource
 {
     Q_OBJECT
-
+    using base_type = QnPhysicalCameraResource;
 public:
+
     typedef GSoapAsyncCallWrapper <
         PullPointSubscriptionWrapper,
         _onvifEvents__PullMessages,
@@ -141,7 +141,7 @@ public:
 
     static const QString fetchMacAddress(const NetIfacesResp& response, const QString& senderIpAddress);
 
-    QnPlOnvifResource();
+    QnPlOnvifResource(QnCommonModule* commonModule = nullptr);
     virtual ~QnPlOnvifResource();
 
     static const QString createOnvifEndpointUrl(const QString& ipAddress);

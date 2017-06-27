@@ -10,7 +10,7 @@ class QnVideoWallItemAccessProvider: public QnBaseResourceAccessProvider
     using base_type = QnBaseResourceAccessProvider;
 
 public:
-    QnVideoWallItemAccessProvider(QObject* parent = nullptr);
+    QnVideoWallItemAccessProvider(Mode mode, QObject* parent = nullptr);
     virtual ~QnVideoWallItemAccessProvider();
 
 protected:
@@ -34,7 +34,7 @@ private:
     void updateAccessToLayout(const QnLayoutResourcePtr& layout);
     void handleItemAdded(const QnUuid& resourceId);
     void handleItemRemoved(const QnUuid& resourceId);
-
+    QnLayoutResourceList getLayoutsForVideoWall(const QnVideoWallResourcePtr& videoWall) const;
 private:
     /* Only resources with valid id can be accessible through layouts. */
     QScopedPointer<QnLayoutItemAggregator> m_itemAggregator;

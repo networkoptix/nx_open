@@ -7,6 +7,10 @@
 #include <nx/utils/uuid.h>
 #include <nx/network/cloud/cloud_module_url_fetcher.h>
 
+namespace ec2 {
+    class QnTransactionMessageBusBase;
+}
+
 /**
  * Monitor runtime flags RF_CloudSync. Only one server at once should has it
  */
@@ -15,15 +19,15 @@ class QnConnectToCloudWatcher: public QObject
 {
     Q_OBJECT
 public:
-    QnConnectToCloudWatcher();
+    QnConnectToCloudWatcher(ec2::QnTransactionMessageBusBase* messageBus);
     virtual ~QnConnectToCloudWatcher();
 private slots:
     void at_updateConnection();
     void restartTimer();
+    void addCloudPeer(QUrl url);
 private:
     QUrl m_cloudUrl;
     QTimer m_timer;
     std::unique_ptr<nx::network::cloud::CloudModuleUrlFetcher> m_cdbEndPointFetcher;
-
-    void addCloudPeer(QUrl url);
+    ec2::QnTransactionMessageBusBase* m_messageBus;
 };

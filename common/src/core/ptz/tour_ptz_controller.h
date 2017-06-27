@@ -15,7 +15,10 @@ class QnTourPtzController: public QnProxyPtzController
     using base_type = QnProxyPtzController;
 
 public:
-    QnTourPtzController(const QnPtzControllerPtr& baseController);
+    QnTourPtzController(
+        const QnPtzControllerPtr &baseController,
+        QThreadPool* threadPool,
+        QThread* executorThread);
     virtual ~QnTourPtzController();
 
     static bool extends(Ptz::Capabilities capabilities);

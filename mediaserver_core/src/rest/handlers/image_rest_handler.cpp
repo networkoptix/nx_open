@@ -17,7 +17,9 @@ extern "C" {
 #include <rest/server/rest_connection_processor.h>
 #include <core/resource_access/resource_access_manager.h>
 #include <nx/utils/log/log.h>
+#include <nx/utils/string.h>
 #include <api/helpers/camera_id_helper.h>
+#include <common/common_module.h>
 
 int QnImageRestHandler::noVideoError(QByteArray& result, qint64 time) const
 {
@@ -36,8 +38,15 @@ namespace {
 static const QString kCameraIdParam = lit("cameraId");
 static const QString kDeprecatedResIdParam = lit("res_id");
 static const QString kDeprecatedPhysicalIdParam = lit("physicalId");
+static const QStringList kCameraIdParams{
+    kCameraIdParam, kDeprecatedResIdParam, kDeprecatedPhysicalIdParam};
 
 } // namespace
+
+QStringList QnImageRestHandler::cameraIdUrlParams() const
+{
+    return kCameraIdParams;
+}
 
 int QnImageRestHandler::executeGet(
     const QString& path,
@@ -57,9 +66,7 @@ int QnImageRestHandler::executeGet(
 
     QString notFoundCameraId = QString::null;
     QnSecurityCamResourcePtr camera = nx::camera_id_helper::findCameraByFlexibleIds(
-        &notFoundCameraId,
-        params.toHash(),
-        {kCameraIdParam, kDeprecatedResIdParam, kDeprecatedPhysicalIdParam});
+        owner->resourcePool(), &notFoundCameraId, params.toHash(), kCameraIdParams);
     if (!camera)
     {
         result.append("<root>\n");
@@ -144,7 +151,7 @@ int QnImageRestHandler::executeGet(
         return CODE_INVALID_PARAMETER;
     }
 
-    if (!qnResourceAccessManager->hasPermission(
+    if (!owner->commonModule()->resourceAccessManager()->hasPermission(
         owner->accessRights(), camera, Qn::Permission::ReadPermission))
     {
         return nx_http::StatusCode::forbidden;

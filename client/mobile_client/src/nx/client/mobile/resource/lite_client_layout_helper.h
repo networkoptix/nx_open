@@ -40,8 +40,8 @@ public:
     Q_INVOKABLE QString cameraIdOnCell(int x, int y) const;
     Q_INVOKABLE void setCameraIdOnCell(int x, int y, const QString& cameraId);
 
-    static QnLayoutResourcePtr createLayoutForServer(const QnUuid& serverId);
-    static QnLayoutResourcePtr findLayoutForServer(const QnUuid& serverId);
+    QnLayoutResourcePtr createLayoutForServer(const QnUuid& serverId) const;
+    QnLayoutResourcePtr findLayoutForServer(const QnUuid& serverId) const;
 
 signals:
     void displayCellChanged();

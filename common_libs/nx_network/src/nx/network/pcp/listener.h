@@ -2,7 +2,7 @@
 #define LISTENER_H
 
 #include "messaging.h"
-#include "utils/common/long_runnable.h"
+#include "nx/utils/thread/long_runnable.h"
 #include <nx/network/socket_factory.h>
 
 namespace pcp {

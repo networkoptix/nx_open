@@ -17,7 +17,7 @@
 #include <nx/utils/thread/mutex.h>
 #include <nx/utils/thread/wait_condition.h>
 #include <nx/network/buffer.h>
-#include <nx/network/http/httptypes.h>
+#include <nx/network/http/http_types.h>
 
 #include "camera/camera_pool.h"
 #include "streaming_chunk_cache_key.h"
@@ -28,7 +28,7 @@
 class StreamingChunk;
 typedef std::shared_ptr<StreamingChunk> StreamingChunkPtr;
 
-//!Chunk of media data, ready to be used by some streaming protocol (e.g., hls). 
+//!Chunk of media data, ready to be used by some streaming protocol (e.g., hls).
 /*!
     In general, it is transcoded small (~10s) part of archive chunk.
 
@@ -47,7 +47,7 @@ class StreamingChunk
     Q_OBJECT
 
 public:
-    //!For sequential chunk reading 
+    //!For sequential chunk reading
     class SequentialReadingContext
     {
         friend class StreamingChunk;
@@ -70,7 +70,7 @@ public:
         rcError
     };
 
-    StreamingChunk( const StreamingChunkCacheKey& params );
+    StreamingChunk(QnResourcePool* resPool, const StreamingChunkCacheKey& params );
     virtual ~StreamingChunk();
 
     const StreamingChunkCacheKey& params() const;
@@ -140,7 +140,7 @@ private:
 #endif
     std::size_t m_maxInternalBufferSize;
     /** Data offset corresponding to the beginning of \a m_data.
-        Can be greater then zero if data is removed from the front of the buffer 
+        Can be greater then zero if data is removed from the front of the buffer
         due to very large chunk size (e.g., in case of using it for export)
     */
     quint64 m_dataOffsetAtTheFrontOfTheBuffer;
@@ -164,7 +164,7 @@ public:
 
 //!Reads from \a StreamingChunk
 /*!
-   \note Not thread-safe! 
+   \note Not thread-safe!
 */
 class StreamingChunkInputStream
 :

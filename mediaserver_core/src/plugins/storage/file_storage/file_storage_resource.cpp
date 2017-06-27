@@ -13,6 +13,7 @@
 #include <common/common_module.h>
 #include <utils/common/writer_pool.h>
 #include <nx/fusion/serialization/lexical.h>
+#include <media_server/media_server_module.h>
 
 #ifndef _WIN32
 #   include <platform/monitoring/global_monitor.h>
@@ -177,19 +178,19 @@ QIODevice* QnFileStorageResource::open(
     int ffmpegBufferSize = 0;
 
     int ffmpegMaxBufferSize =
-        MSSettings::roSettings()->value(
+        qnServerModule->roSettings()->value(
             nx_ms_conf::MAX_FFMPEG_BUFFER_SIZE,
             nx_ms_conf::DEFAULT_MAX_FFMPEG_BUFFER_SIZE).toInt();
 
     int systemFlags = 0;
     if (openMode & QIODevice::WriteOnly)
     {
-        ioBlockSize = MSSettings::roSettings()->value(
+        ioBlockSize = qnServerModule->roSettings()->value(
             nx_ms_conf::IO_BLOCK_SIZE,
             nx_ms_conf::DEFAULT_IO_BLOCK_SIZE).toInt();
 
         ffmpegBufferSize = qMax(
-            MSSettings::roSettings()->value(
+            qnServerModule->roSettings()->value(
                 nx_ms_conf::FFMPEG_BUFFER_SIZE,
                 nx_ms_conf::DEFAULT_FFMPEG_BUFFER_SIZE).toInt(),
             bufferSize);
@@ -197,7 +198,7 @@ QIODevice* QnFileStorageResource::open(
 #ifdef Q_OS_WIN
         if ((openMode & QIODevice::ReadWrite) == QIODevice::ReadWrite)
             systemFlags = 0;
-        else if (MSSettings::roSettings()->value(nx_ms_conf::DISABLE_DIRECT_IO).toInt() != 1)
+        else if (qnServerModule->roSettings()->value(nx_ms_conf::DISABLE_DIRECT_IO).toInt() != 1)
             systemFlags = FILE_FLAG_NO_BUFFERING;
 #endif
     }
@@ -697,7 +698,8 @@ void QnFileStorageResource::setUrl(const QString& url)
     m_valid = false;
 }
 
-QnFileStorageResource::QnFileStorageResource():
+QnFileStorageResource::QnFileStorageResource(QnCommonModule* commonModule):
+    base_type(commonModule),
     m_valid(false),
     m_capabilities(0),
     m_cachedTotalSpace(QnStorageResource::kUnknownSize),
@@ -834,7 +836,7 @@ qint64 QnFileStorageResource::getFileSize(const QString& url) const
 bool QnFileStorageResource::testWriteCapInternal() const
 {
     QString fileName(lit("%1%2.tmp"));
-    QString localGuid = qnCommon->moduleGUID().toString();
+    QString localGuid = commonModule()->moduleGUID().toString();
     localGuid = localGuid.mid(1, localGuid.length() - 2);
     fileName = fileName.arg(closeDirPath(translateUrlToLocal(getPath()))).arg(localGuid);
     QFile file(fileName);
@@ -886,16 +888,16 @@ QString QnFileStorageResource::removeProtocolPrefix(const QString& url)
     return prefix == -1 ? url :QUrl(url).path().mid(1);
 }
 
-QnStorageResource* QnFileStorageResource::instance(const QString&)
+QnStorageResource* QnFileStorageResource::instance(QnCommonModule* commonModule, const QString&)
 {
-    return new QnFileStorageResource();
+    return new QnFileStorageResource(commonModule);
 }
 
 qint64 QnFileStorageResource::calcInitialSpaceLimit()
 {
     auto local = isLocal();
     qint64 baseSpaceLimit = calcSpaceLimit(
-        local ? QnPlatformMonitor::LocalDiskPartition : 
+        local ? QnPlatformMonitor::LocalDiskPartition :
         QnPlatformMonitor::NetworkPartition);
 
     if (m_cachedTotalSpace < 0)
@@ -913,7 +915,7 @@ qint64 QnFileStorageResource::calcInitialSpaceLimit()
 
 qint64 QnFileStorageResource::calcSpaceLimit(QnPlatformMonitor::PartitionType ptype)
 {
-    const qint64 defaultStorageSpaceLimit = MSSettings::roSettings()->value(
+    const qint64 defaultStorageSpaceLimit = qnServerModule->roSettings()->value(
         nx_ms_conf::MIN_STORAGE_SPACE,
         nx_ms_conf::DEFAULT_MIN_STORAGE_SPACE
     ).toLongLong();
@@ -933,7 +935,7 @@ bool QnFileStorageResource::isLocal()
     if (!storageTypeString.isEmpty())
     {
        if (storageTypeString == QnLexical::serialized(QnPlatformMonitor::LocalDiskPartition))
-          return true; 
+          return true;
        return false;
     }
 

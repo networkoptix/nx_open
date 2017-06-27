@@ -1,5 +1,9 @@
 #include "ptz_preset_model.h"
 
+#include <common/common_module.h>
+
+#include <client_core/client_core_module.h>
+
 #include <core/ptz/abstract_ptz_controller.h>
 #include <core/ptz/client_ptz_controller_pool.h>
 #include <core/resource_management/resource_pool.h>
@@ -30,8 +34,9 @@ PtzPresetModel::PtzPresetModel(QObject* parent):
     connect(this, &PtzPresetModel::resourceIdChanged, this,
         [this]()
         {
-            const auto resource = qnResPool->getResourceById(d->uniqueResourceId);
-            const auto controller = qnClientPtzPool->controller(resource);
+            const auto resource = qnClientCoreModule->commonModule()
+                ->resourcePool()->getResourceById(d->uniqueResourceId);
+            const auto controller = qnClientCoreModule->ptzControllerPool()->controller(resource);
             const auto presets = core::ptz::helpers::getSortedPresets(controller);
 
             if (presets == d->presets)

@@ -36,10 +36,10 @@ QnHikvisionOnvifResource::~QnHikvisionOnvifResource()
 CameraDiagnostics::Result QnHikvisionOnvifResource::initInternal()
 {
     auto result = QnPlOnvifResource::initInternal();
-    if (result != CameraDiagnostics::NoErrorResult())
+    if (result.errorCode != CameraDiagnostics::ErrorCode::noError)
         return result;
 
-    initialize2WayAudio();    
+    initialize2WayAudio();
     saveParams();
 
     return CameraDiagnostics::NoErrorResult();
@@ -112,7 +112,7 @@ CameraDiagnostics::Result QnHikvisionOnvifResource::initialize2WayAudio()
         if (hikTransmitter)
         {
             hikTransmitter->setChannelId(channel->id);
-            hikTransmitter->setAudioUploadHttpMethod(nx_http::Method::PUT);
+            hikTransmitter->setAudioUploadHttpMethod(nx_http::Method::Put);
         }
 
         setCameraCapabilities(getCameraCapabilities() | Qn::AudioTransmitCapability);

@@ -4,8 +4,9 @@
 #include "vmax480_resource.h"
 #include "utils/common/sleep.h"
 #include <nx/network/simple_http_client.h>
-#include <nx/network/http/httptypes.h>
+#include <nx/network/http/http_types.h>
 #include <nx/network/simple_http_client.h>
+#include <nx/utils/log/log.h>
 
 #include <QtXml/QXmlDefaultHandler>
 #include <QtCore/QUrlQuery>
@@ -19,7 +20,10 @@ static const int TCP_TIMEOUT = 3000;
 static const QString NAME_PREFIX(QLatin1String("VMAX-"));
 
 // ====================================================================
-QnPlVmax480ResourceSearcher::QnPlVmax480ResourceSearcher()
+QnPlVmax480ResourceSearcher::QnPlVmax480ResourceSearcher(QnCommonModule* commonModule):
+    QnAbstractResourceSearcher(commonModule),
+    QnAbstractNetworkResourceSearcher(commonModule),
+    QnUpnpResourceSearcherAsync(commonModule)
 {
 
 }
@@ -75,7 +79,7 @@ void QnPlVmax480ResourceSearcher::processPacket(const QHostAddress& discoveryAdd
         QString uniqId = QString(QLatin1String("%1_%2")).arg(mac.toString()).arg(i+1);
         bool needHttpData = true;
 
-        QnPlVmax480ResourcePtr existsRes = qnResPool->getResourceByUniqueId<QnPlVmax480Resource>(uniqId);
+        QnPlVmax480ResourcePtr existsRes = resourcePool()->getResourceByUniqueId<QnPlVmax480Resource>(uniqId);
         if (existsRes && (existsRes->getStatus() == Qn::Online || existsRes->getStatus() == Qn::Recording))
         {
             resource->setName(existsRes->getName());
@@ -223,9 +227,17 @@ QMap<int, QByteArray> QnPlVmax480ResourceSearcher::getCamNames(const QByteArray&
 
 bool QnPlVmax480ResourceSearcher::vmaxAuthenticate(CLSimpleHTTPClient& client, const QAuthenticator& auth)
 {
+    NX_VERBOSE(
+        "QnPlVmax480ResourceSearcher::vmaxAuthenticate",
+        lm("Authenticating itself on VMAX %1:%2").arg(client.host()).arg(client.port()));
+
     QString body(QLatin1String("login_txt_id=%1&login_txt_pw=%2"));
     body = body.arg(auth.user()).arg(auth.password());
     CLHttpStatus status = client.doPOST(QLatin1String("cgi-bin/design/html_template/Login.cgi"), body);
+
+    NX_VERBOSE(
+        "QnPlVmax480ResourceSearcher::vmaxAuthenticate",
+        lm("Authentication request completed with result %1").arg(toString(status)));
 
     if (status != CL_HTTP_SUCCESS)
         return false;
@@ -291,7 +303,7 @@ QList<QnResourcePtr> QnPlVmax480ResourceSearcher::checkHostAddr(const QUrl& url,
         QnPlVmax480ResourcePtr existsRes;
         for (int i = 0; i < VMAX_MAX_CH; ++i) {
             QString uniqId = QString(QLatin1String("VMAX_DVR_%1_%2")).arg(url.host()).arg(i+1);
-            existsRes = qnResPool->getResourceByUniqueId<QnPlVmax480Resource>(uniqId);
+            existsRes = resourcePool()->getResourceByUniqueId<QnPlVmax480Resource>(uniqId);
             if (existsRes)
                 break;
         }

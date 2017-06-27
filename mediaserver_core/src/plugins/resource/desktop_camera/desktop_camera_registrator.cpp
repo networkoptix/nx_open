@@ -7,20 +7,18 @@
 #include "network/tcp_listener.h"
 #include "nx_ec/data/api_statistics.h"
 
-class QnDesktopCameraRegistratorPrivate: public QnTCPConnectionProcessorPrivate
+QnDesktopCameraRegistrator::QnDesktopCameraRegistrator(
+    QSharedPointer<AbstractStreamSocket> socket, QnTcpListener* owner)
+:
+    QnTCPConnectionProcessor(socket, owner)
 {
-public:
-};
-
-QnDesktopCameraRegistrator::QnDesktopCameraRegistrator(QSharedPointer<AbstractStreamSocket> socket, QnTcpListener* _owner):
-    QnTCPConnectionProcessor(new QnDesktopCameraRegistratorPrivate, socket)
-{
-    Q_UNUSED(_owner)
+    Q_D(QnTCPConnectionProcessor);
+    d->isSocketTaken = true;
 }
 
 void QnDesktopCameraRegistrator::run()
 {
-    Q_D(QnDesktopCameraRegistrator);
+    Q_D(QnTCPConnectionProcessor);
 
     parseRequest();
     sendResponse(nx_http::StatusCode::ok, QByteArray());
@@ -30,7 +28,7 @@ void QnDesktopCameraRegistrator::run()
 
 	if (auto s = QnDesktopCameraResourceSearcher::instance())
         s->registerCamera(d->socket, userName, userId);
-    
+
 	d->socket.clear();
 }
 

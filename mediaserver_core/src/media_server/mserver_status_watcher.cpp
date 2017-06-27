@@ -13,16 +13,16 @@
 #include "serverutil.h"
 #include "business/events/mserver_failure_business_event.h"
 #include "business/business_rule_processor.h"
-#include <core/resource/camera_resource.h>
-
+#include <common/common_module.h>
 
 static const long long USEC_PER_MSEC = 1000;
 static const int SEND_ERROR_TIMEOUT = 1000 * 60;
 
-MediaServerStatusWatcher::MediaServerStatusWatcher()
+MediaServerStatusWatcher::MediaServerStatusWatcher(QnCommonModule* commonModule):
+    QnCommonModuleAware(commonModule)
 {
-    connect(qnResPool, &QnResourcePool::statusChanged, this, &MediaServerStatusWatcher::at_resource_statusChanged);
-    connect(qnResPool, &QnResourcePool::resourceRemoved, this, &MediaServerStatusWatcher::at_resource_removed);
+    connect(commonModule->resourcePool(), &QnResourcePool::statusChanged, this, &MediaServerStatusWatcher::at_resource_statusChanged);
+    connect(commonModule->resourcePool(), &QnResourcePool::resourceRemoved, this, &MediaServerStatusWatcher::at_resource_removed);
 }
 
 MediaServerStatusWatcher::~MediaServerStatusWatcher()
@@ -34,7 +34,7 @@ void MediaServerStatusWatcher::sendError()
     auto itr = m_candidatesToError.begin();
     while (itr != m_candidatesToError.end()) {
         OfflineServerData& data = itr.value();
-        if (data.timer.elapsed() > SEND_ERROR_TIMEOUT/2) 
+        if (data.timer.elapsed() > SEND_ERROR_TIMEOUT/2)
         {
             qnBusinessRuleProcessor->processBusinessEvent(data.serverData);
             itr = m_candidatesToError.erase(itr);
@@ -53,17 +53,6 @@ void MediaServerStatusWatcher::at_resource_removed( const QnResourcePtr& resourc
 
 void MediaServerStatusWatcher::at_resource_statusChanged( const QnResourcePtr& resource )
 {
-    const QnSecurityCamResourcePtr& cameraRes = resource.dynamicCast<QnSecurityCamResource>();
-    if (cameraRes)
-    {
-        if (cameraRes->getStatus() >= Qn::Online &&
-            !cameraRes->hasFlags(Qn::foreigner) &&
-            !cameraRes->isInitialized())
-        {
-            cameraRes->initAsync(false /*optional*/);
-        }
-        return;
-    }
 
     const QnMediaServerResourcePtr& mserverRes = resource.dynamicCast<QnMediaServerResource>();
     if( !mserverRes )
@@ -83,7 +72,7 @@ void MediaServerStatusWatcher::at_resource_statusChanged( const QnResourcePtr& r
         //next (in guid ascending order) online server after fallen one is expected to generate this event
         //it is possible, that multiple servers will decide to generate event, if servers statuses are being changed at the moment, but this is OK for now
 
-    const QnMediaServerResourceList& mserversList = qnResPool->getResources<QnMediaServerResource>();
+    const QnMediaServerResourceList& mserversList = resourcePool()->getResources<QnMediaServerResource>();
     if( !mserversList.isEmpty() )   //in a strange case when there are no servers generating event
     {
         std::map<QnUuid, QnMediaServerResource*> mserversById;

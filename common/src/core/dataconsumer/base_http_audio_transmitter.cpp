@@ -2,6 +2,8 @@
 
 #include "base_http_audio_transmitter.h"
 
+#include <nx/utils/std/future.h>
+
 #include <core/resource/security_cam_resource.h>
 #include <core/resource/media_server_resource.h>
 
@@ -29,7 +31,7 @@ BaseHttpAudioTransmitter::BaseHttpAudioTransmitter(QnSecurityCamResource* res):
     m_state(TransmitterState::WaitingForConnection),
     m_transcoder(nullptr),
     m_socket(nullptr),
-    m_uploadMethod(nx_http::Method::POST)
+    m_uploadMethod(nx_http::Method::Post)
 {
     connect(
         m_resource, &QnResource::parentIdChanged, this,
@@ -192,7 +194,7 @@ bool BaseHttpAudioTransmitter::startTransmission()
 
     QnMutexLocker lock(&m_mutex);
 
-    if (m_uploadMethod == nx_http::Method::POST)
+    if (m_uploadMethod == nx_http::Method::Post)
     {
         httpClient
             ->doPost(
@@ -201,7 +203,7 @@ bool BaseHttpAudioTransmitter::startTransmission()
                 contentBody,
                 true);
     }
-    else if (m_uploadMethod == nx_http::Method::PUT)
+    else if (m_uploadMethod == nx_http::Method::Put)
     {
         httpClient
             ->doPut(

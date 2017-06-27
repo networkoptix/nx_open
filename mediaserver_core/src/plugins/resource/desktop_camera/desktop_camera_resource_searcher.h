@@ -11,10 +11,13 @@
 #include <nx/utils/singleton.h>
 
 
-class QnDesktopCameraResourceSearcher : public QnAbstractNetworkResourceSearcher, public Singleton<QnDesktopCameraResourceSearcher> {
+class QnDesktopCameraResourceSearcher:
+    public QnAbstractNetworkResourceSearcher,
+    public Singleton<QnDesktopCameraResourceSearcher>
+{
     typedef QnAbstractNetworkResourceSearcher base_type;
 public:
-    QnDesktopCameraResourceSearcher();
+    QnDesktopCameraResourceSearcher(QnCommonModule* commonModule);
     virtual ~QnDesktopCameraResourceSearcher();
 
     virtual QnResourcePtr createResource(const QnUuid &resourceTypeId, const QnResourceParams& params) override;
@@ -26,10 +29,10 @@ public:
 
     virtual QnResourceList findResources(void) override;
 
-    void registerCamera(const QSharedPointer<AbstractStreamSocket>& connection, 
+    void registerCamera(const QSharedPointer<AbstractStreamSocket>& connection,
 		                const QString& userName, const QString &userId);
 
-    
+
     quint32 incCSeq(const TCPSocketPtr& socket);
 
     TCPSocketPtr acquireConnection(const QString& userId);

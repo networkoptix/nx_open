@@ -10,15 +10,18 @@
 
 #include "session_manager.h"
 #include "abstract_reply_processor.h"
+#include <common/common_module.h>
 
 Q_GLOBAL_STATIC(QnEnumLexicalSerializer<int>, qn_abstractConnection_emptySerializer);
 
-void QnAbstractReplyProcessor::processReply(const QnHTTPRawResponse &response, int handle) {
+void QnAbstractReplyProcessor::processReply(const QnHTTPRawResponse &response, int handle)
+{
     Q_UNUSED(response);
     Q_UNUSED(handle);
 }
 
-bool QnAbstractReplyProcessor::connect(const char *signal, QObject *receiver, const char *method, Qt::ConnectionType type) {
+bool QnAbstractReplyProcessor::connect(const char *signal, QObject *receiver, const char *method, Qt::ConnectionType type)
+{
     if(method && std::strstr(method, "QVariant")) {
         return connect(this, SIGNAL(finished(int, const QVariant &, int, const QString &)), receiver, method, type);
     } else {
@@ -26,8 +29,12 @@ bool QnAbstractReplyProcessor::connect(const char *signal, QObject *receiver, co
     }
 }
 
-QnAbstractConnection::QnAbstractConnection(QObject *parent, const QnResourcePtr& targetRes):
-    base_type(parent),
+QnAbstractConnection::QnAbstractConnection(
+    QnCommonModule* commonModule,
+    const QnResourcePtr& targetRes)
+    :
+    base_type(),
+    QnCommonModuleAware(commonModule),
     m_targetRes(targetRes)
 {}
 
@@ -88,8 +95,8 @@ int QnAbstractConnection::sendAsyncRequest(
     if (!isReady())
         return -1;
 
-    NX_ASSERT(QnSessionManager::instance(), Q_FUNC_INFO, "Session manager object must exist here");
-    if (!QnSessionManager::instance())
+    NX_ASSERT(commonModule(), Q_FUNC_INFO, "Session manager object must exist here");
+    if (!commonModule())
         return -1;
 
     QnAbstractReplyProcessor *processor = nullptr;
@@ -118,7 +125,7 @@ int QnAbstractConnection::sendAsyncRequest(
     QUrl url = m_url;
     url.setQuery(urlQuery);
 
-    return QnSessionManager::instance()->sendAsyncRequest(
+    return commonModule()->sessionManager()->sendAsyncRequest(
         std::move(method),
         url,
         objectName(object),
@@ -131,7 +138,7 @@ int QnAbstractConnection::sendAsyncRequest(
 
 int QnAbstractConnection::sendAsyncGetRequest(int object, nx_http::HttpHeaders headers, const QnRequestParamList &params, const char *replyTypeName, QObject *target, const char *slot) {
     return sendAsyncRequest(
-        nx_http::Method::GET,
+        nx_http::Method::Get,
         object,
         std::move(headers),
         params,
@@ -146,7 +153,7 @@ int QnAbstractConnection::sendAsyncGetRequest(int object, const QnRequestParamLi
 }
 
 int QnAbstractConnection::sendAsyncPostRequest(int object, nx_http::HttpHeaders headers, const QnRequestParamList &params, QByteArray msgBody, const char *replyTypeName, QObject *target, const char *slot) {
-    return sendAsyncRequest(nx_http::Method::POST, object, std::move(headers), params, std::move(msgBody), replyTypeName, target, slot);
+    return sendAsyncRequest(nx_http::Method::Post, object, std::move(headers), params, std::move(msgBody), replyTypeName, target, slot);
 }
 
 int QnAbstractConnection::sendAsyncPostRequest(int object, const QnRequestParamList &params, QByteArray msgBody, const char *replyTypeName, QObject *target, const char *slot) {
@@ -154,8 +161,8 @@ int QnAbstractConnection::sendAsyncPostRequest(int object, const QnRequestParamL
 }
 
 int QnAbstractConnection::sendSyncRequest(nx_http::Method::ValueType method, int object, nx_http::HttpHeaders actualHeaders, const QnRequestParamList &params, QByteArray msgBody, QVariant *reply) {
-    NX_ASSERT(QnSessionManager::instance(), Q_FUNC_INFO, "Session manager object must exist here");
-    if (!QnSessionManager::instance())
+    NX_ASSERT(commonModule(), Q_FUNC_INFO, "Session manager object must exist here");
+    if (!commonModule())
         return -1;
 
     if (!m_extraHeaders.empty())
@@ -165,7 +172,7 @@ int QnAbstractConnection::sendSyncRequest(nx_http::Method::ValueType method, int
             std::inserter(actualHeaders, actualHeaders.end()));
 
     QnHTTPRawResponse response;
-    int status = QnSessionManager::instance()->sendSyncRequest(
+    int status = commonModule()->sessionManager()->sendSyncRequest(
         method,
         m_url,
         objectName(object),
@@ -187,7 +194,7 @@ int QnAbstractConnection::sendSyncRequest(nx_http::Method::ValueType method, int
 }
 
 int QnAbstractConnection::sendSyncGetRequest(int object, nx_http::HttpHeaders headers, const QnRequestParamList &params, QVariant *reply) {
-    return sendSyncRequest(nx_http::Method::GET, object, std::move(headers), params, QByteArray(), reply);
+    return sendSyncRequest(nx_http::Method::Get, object, std::move(headers), params, QByteArray(), reply);
 }
 
 int QnAbstractConnection::sendSyncGetRequest(int object, const QnRequestParamList &params, QVariant *reply) {
@@ -195,7 +202,7 @@ int QnAbstractConnection::sendSyncGetRequest(int object, const QnRequestParamLis
 }
 
 int QnAbstractConnection::sendSyncPostRequest(int object, nx_http::HttpHeaders headers, const QnRequestParamList &params, QByteArray msgBody, QVariant *reply) {
-    return sendSyncRequest(nx_http::Method::POST, object, std::move(headers), params, std::move(msgBody), reply);
+    return sendSyncRequest(nx_http::Method::Post, object, std::move(headers), params, std::move(msgBody), reply);
 }
 
 int QnAbstractConnection::sendSyncPostRequest(int object, const QnRequestParamList &params, QByteArray msgBody, QVariant *reply) {

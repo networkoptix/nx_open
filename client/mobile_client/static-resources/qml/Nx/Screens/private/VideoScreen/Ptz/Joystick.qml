@@ -119,7 +119,7 @@ Rectangle
             var radius = control.radius
             var holeLength = markerShadow.width
 
-            switch(type)
+            switch (type)
             {
                 case JoystickUtils.Type.TwoWayHorizontal:
                     var verticalOffset = Qt.vector2d(0, radius)

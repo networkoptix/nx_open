@@ -51,7 +51,7 @@ TEST(GetStorages, saveAndMerge)
 
     NX_LOG("[TEST] Create a new storage with auto-generated id.", cl_logINFO);
     storage.name = "original name";
-    storage.parentId = qnCommon->moduleGUID();
+    storage.parentId = launcher.commonModule()->moduleGUID();
     storage.spaceLimit = 113326;
     storage.storageType = "local";
     NX_TEST_API_POST(&launcher,
@@ -60,7 +60,7 @@ TEST(GetStorages, saveAndMerge)
     NX_LOG("[TEST] Retrieve the created storage.", cl_logINFO);
     NX_TEST_API_GET(&launcher, lit("/ec2/getStorages"), &storages);
     NX_FIND_STORAGE_BY_NAME(storages, &storage, storage.name, storage.parentId);
-    ASSERT_EQ(1, storages.size());
+    ASSERT_EQ(1U, storages.size());
 
     NX_LOG("[TEST] Rename the storage via Merge.", cl_logINFO);
     storage.name = "new name";
@@ -70,13 +70,13 @@ TEST(GetStorages, saveAndMerge)
     NX_LOG("[TEST] Check that the storage is renamed.", cl_logINFO);
     NX_TEST_API_GET(&launcher, lit("/ec2/getStorages"), &storages);
     NX_FIND_STORAGE_BY_NAME(storages, &storage, storage.name, storage.parentId, storage.id);
-    ASSERT_EQ(1, storages.size());
+    ASSERT_EQ(1U, storages.size());
 
     NX_LOG("[TEST] Check the storage can be found by its parent server id.", cl_logINFO);
     NX_TEST_API_GET(&launcher,
         lit("/ec2/getStorages?id=%1").arg(storage.parentId.toString()), &storages);
     NX_FIND_STORAGE_BY_NAME(storages, &storage, storage.name, storage.parentId, storage.id);
-    ASSERT_EQ(1, storages.size());
+    ASSERT_EQ(1U, storages.size());
 
     NX_LOG("[TEST] Check that no storages are found by another (non-existing) parent server id.", cl_logINFO);
     NX_TEST_API_GET(&launcher,

@@ -1,5 +1,4 @@
-#ifndef BUSINESS_ACTION_PARAMETERS_H
-#define BUSINESS_ACTION_PARAMETERS_H
+#pragma once
 
 #include <business/business_fwd.h>
 #include <nx/fusion/model_functions_fwd.h>
@@ -11,6 +10,14 @@ struct QnBusinessActionParameters
 {
     QnBusinessActionParameters();
 
+    /**
+      * Shows if action should be confirmed by user. Currently used for bookmarks confirmation
+      */
+    bool needConfirmation = false;
+
+    QnBusiness::ActionType targetActionType = QnBusiness::UndefinedAction;
+
+
     /** Additional parameter for event log convenience. Does not filled when the action really occurs. */
     QnUuid actionResourceId;
 
@@ -20,13 +27,9 @@ struct QnBusinessActionParameters
     // Email
     QString emailAddress;
 
-    // Popups and System Health
-    QnBusiness::UserGroup userGroup;
-
     // Recording
     int fps;
     Qn::StreamQuality streamQuality;
-    int recordingDuration; //< Seconds.
     //! for bookmarks this represents epsilon, bookmark end time extended by
     int recordAfter; //< Seconds.
 
@@ -47,6 +50,9 @@ struct QnBusinessActionParameters
 
     // Generic additional resources List: Show On Alarm Layout - users
     std::vector<QnUuid> additionalResources;
+
+    // When set, signalizes that all users must be targeted by the action.
+    bool allUsers;
 
     // Alarm Layout - if it must be opened immediately
     bool forced;
@@ -72,10 +78,10 @@ struct QnBusinessActionParameters
     bool isDefault() const;
 };
 
-#define QnBusinessActionParameters_Fields (actionResourceId)(url)(emailAddress)(userGroup)(fps)(streamQuality)(recordingDuration)(recordAfter)\
-    (relayOutputId)(sayText)(tags)(text)(durationMs)(additionalResources)(forced)(presetId)(useSource)(recordBeforeMs)(playToClient)(contentType)
+#define QnBusinessActionParameters_Fields (targetActionType)(needConfirmation)(actionResourceId)\
+    (url)(emailAddress)(fps)(streamQuality)(recordAfter)(relayOutputId)(sayText)(tags)(text)\
+    (durationMs)(additionalResources)(allUsers)(forced)(presetId)(useSource)(recordBeforeMs)\
+    (playToClient)(contentType)
 
 /* Backward compatibility is not really important here as this class is not stored in the DB. */
 QN_FUSION_DECLARE_FUNCTIONS(QnBusinessActionParameters, (ubjson)(json)(eq)(xml)(csv_record));
-
-#endif // BUSINESS_ACTION_PARAMETERS_H

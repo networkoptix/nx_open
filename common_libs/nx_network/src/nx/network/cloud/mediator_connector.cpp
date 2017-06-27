@@ -5,8 +5,6 @@
 #include <nx/utils/log/log.h>
 #include <nx/utils/std/cpp14.h>
 
-#include "common/common_globals.h"
-
 static const std::chrono::milliseconds kRetryIntervalInitial = std::chrono::seconds(1);
 static const std::chrono::milliseconds kRetryIntervalMax = std::chrono::minutes(10);
 
@@ -101,7 +99,7 @@ void MediatorConnector::mockupAddress( SocketAddress address, bool suppressWarni
     if (!suppressWarning)
     {
         NX_LOGX( lit( "Mediator address is mocked up: %1" )
-                 .arg( address.toString() ), cl_logWARNING );
+                 .arg( address.toString() ), cl_logINFO );
     }
 
     m_mediatorAddress = address;
@@ -172,7 +170,7 @@ void MediatorConnector::fetchEndpoint()
         }
         else
         {
-            NX_LOGX(lm("Fetched mediator url: %1").str(url), cl_logDEBUG1);
+            NX_LOGX(lm("Fetched mediator url: %1").arg(url), cl_logDEBUG1);
             m_stunClient->connect(
                 SocketAddress(url.host(), url.port()),
                 false /* SSL disabled */,
@@ -184,7 +182,7 @@ void MediatorConnector::fetchEndpoint()
                             QnMutexLocker lk(&m_mutex);
                             m_mediatorAddress = m_stunClient->remoteAddress();
                             NX_LOGX(lm("Connected to mediator by: %1")
-                                .str(m_mediatorAddress), cl_logDEBUG1);
+                                .arg(m_mediatorAddress), cl_logDEBUG1);
                         };
 
                     if (code == SystemError::noError)

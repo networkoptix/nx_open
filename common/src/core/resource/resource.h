@@ -28,6 +28,7 @@
 class QnAbstractStreamDataProvider;
 class QnResourceConsumer;
 class QnResourcePool;
+class QnCommonModule;
 
 class QnInitResPool: public QThreadPool
 {
@@ -37,6 +38,7 @@ public:
 class QN_EXPORT QnResource: public QObject, public QnFromThisToShared<QnResource>
 {
     Q_OBJECT
+    Q_FLAGS(Qn::ResourceFlags)
     Q_FLAGS(Ptz::Capabilities)
     Q_PROPERTY(QnUuid id READ getId WRITE setId)
     Q_PROPERTY(QnUuid typeId READ getTypeId WRITE setTypeId)
@@ -51,7 +53,7 @@ class QN_EXPORT QnResource: public QObject, public QnFromThisToShared<QnResource
     Q_PROPERTY(Ptz::Capabilities ptzCapabilities READ getPtzCapabilities WRITE setPtzCapabilities)
 public:
 
-    QnResource();
+    QnResource(QnCommonModule* commonModule = nullptr);
     QnResource(const QnResource&);
     virtual ~QnResource();
 
@@ -90,6 +92,7 @@ public:
         Calls \a QnResource::init. If \a QnResource::init is already running in another thread, this method waits for it to complete
     */
     void blockingInit();
+    // TODO: comment
     void initAsync(bool optional);
     CameraDiagnostics::Result prevInitializationResult() const;
     //!Returns counter of resource initialization attempts (every attempt: successful or not)
@@ -113,7 +116,7 @@ public:
     void setLastDiscoveredTime(const QDateTime &time);
 
     QnResourcePool *resourcePool() const;
-    void setResourcePool(QnResourcePool *resourcePool);
+    virtual void setResourcePool(QnResourcePool *resourcePool);
 
     virtual QString toSearchString() const;
 
@@ -192,7 +195,11 @@ public:
 
     virtual bool hasProperty(const QString &key) const;
     virtual QString getProperty(const QString &key) const;
-    static QString getResourceProperty(const QString& key, const QnUuid &resourceId, const QnUuid &resourceTypeId);
+    static QString getResourceProperty(
+        QnCommonModule* commonModule,
+        const QString& key,
+        const QnUuid &resourceId,
+        const QnUuid &resourceTypeId);
 
     ec2::ApiResourceParamDataList getRuntimeProperties() const;
     ec2::ApiResourceParamDataList getAllProperties() const;
@@ -229,7 +236,9 @@ public:
 
     static QnInitResPool* initAsyncPoolInstance();
     static bool isStopping() { return m_appStopping; }
-    void setRemovedFromPool(bool value);
+
+    virtual bool saveParams();
+    virtual int saveParamsAsync();
 signals:
     void parameterValueChanged(const QnResourcePtr &resource, const QString &param) const;
     void statusChanged(const QnResourcePtr &resource, Qn::StatusChangeReason reason);
@@ -293,6 +302,9 @@ public:
 
     void getParamsPhysicalAsync(const QSet<QString> &ids);
     void setParamsPhysicalAsync(const QnCameraAdvancedParamValueList &values);
+
+    void setCommonModule(QnCommonModule* commonModule);
+    QnCommonModule* commonModule() const;
 protected:
     virtual void updateInternal(const QnResourcePtr &other, Qn::NotifierList& notifiers);
 
@@ -302,7 +314,7 @@ protected:
 
     virtual QnAbstractPtzController *createPtzControllerInternal(); // TODO: #Elric does not belong here
 
-    virtual CameraDiagnostics::Result initInternal() { return CameraDiagnostics::NoErrorResult(); };
+    virtual CameraDiagnostics::Result initInternal();;
     //!Called just after successful \a initInternal()
     /*!
         Inherited class implementation MUST call base class method first
@@ -400,8 +412,8 @@ private:
     QAtomicInt m_initializationAttemptCount;
     //!map<key, <value, isDirty>>
     std::map<QString, LocalPropertyValue> m_locallySavedProperties;
-    bool m_removedFromPool;
     bool m_initInProgress;
+    QnCommonModule* m_commonModule;
 };
 
 template<class Resource>

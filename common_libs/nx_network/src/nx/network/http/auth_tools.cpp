@@ -11,36 +11,38 @@ bool addAuthorization(
     const StringType& userName,
     const boost::optional<StringType>& userPassword,
     const boost::optional<BufferType>& predefinedHA1,
-    const header::WWWAuthenticate& wwwAuthenticateHeader )
+    const header::WWWAuthenticate& wwwAuthenticateHeader)
 {
-    if( wwwAuthenticateHeader.authScheme == header::AuthScheme::basic )
+    if (wwwAuthenticateHeader.authScheme == header::AuthScheme::basic)
     {
-        header::BasicAuthorization basicAuthorization( userName, userPassword ? userPassword.get() : StringType() );
+        header::BasicAuthorization basicAuthorization(userName, userPassword ? userPassword.get() : StringType());
         nx_http::insertOrReplaceHeader(
             &request->headers,
             nx_http::HttpHeader(
                 header::Authorization::NAME,
-                basicAuthorization.serialized() ) );
+                basicAuthorization.serialized()));
         return true;
     }
-    else if( wwwAuthenticateHeader.authScheme == header::AuthScheme::digest )
+    else if (wwwAuthenticateHeader.authScheme == header::AuthScheme::digest)
     {
         header::DigestAuthorization digestAuthorizationHeader;
         //calculating authorization header
-        if( !calcDigestResponse(
+        if (!calcDigestResponse(
                 request->requestLine.method,
                 userName,
                 userPassword,
                 predefinedHA1,
                 request->requestLine.url.path().toUtf8(),
                 wwwAuthenticateHeader,
-                &digestAuthorizationHeader ) )
+                &digestAuthorizationHeader))
         {
             return false;
         }
         insertOrReplaceHeader(
             &request->headers,
-            nx_http::HttpHeader( header::Authorization::NAME, digestAuthorizationHeader.serialized() ) );
+            nx_http::HttpHeader(
+                header::Authorization::NAME,
+                digestAuthorizationHeader.serialized()));
         return true;
     }
 
@@ -95,9 +97,6 @@ BufferType calcHa1(
         StringType(userPassword), StringType(algorithm));
 }
 
-/*!
-    \note HA2 in case of qop=auth-int is not supported
-*/
 BufferType calcHa2(
     const StringType& method,
     const StringType& uri,
@@ -110,9 +109,6 @@ BufferType calcHa2(
     return md5HashCalc.result().toHex();
 }
 
-/*!
-    \return response in hex representation
-*/
 BufferType calcResponse(
     const BufferType& ha1,
     const BufferType& nonce,
@@ -128,7 +124,6 @@ BufferType calcResponse(
     return md5HashCalc.result().toHex();
 }
 
-//!Calculate Digest response with message-body validation (auth-int)
 BufferType calcResponseAuthInt(
     const BufferType& ha1,
     const BufferType& nonce,
@@ -169,7 +164,7 @@ static bool calcDigestResponse(
     const boost::optional<BufferType>& predefinedHA1,
     const StringType& uri,
     const QMap<BufferType, BufferType>& inputParams,
-    QMap<BufferType, BufferType>* const outputParams )
+    QMap<BufferType, BufferType>* const outputParams)
 {
     const auto algorithm = fieldOrEmpty(inputParams, "algorithm");
     if (!parseAlgorithm(algorithm))
@@ -263,7 +258,7 @@ bool validateAuthorization(
 
     const auto algorithm = fieldOrEmpty(digestParams, "algorithm");
     if (!parseAlgorithm(algorithm))
-        return false; // such algorithm is not supported
+        return false; //< Such algorithm is not supported.
 
     QMap<BufferType, BufferType> outputParams;
     const auto result = calcDigestResponse(
@@ -303,7 +298,7 @@ BufferType calcResponseFromIntermediate(
     const BufferType& nonceTrailer,
     const BufferType& ha2)
 {
-    NX_ASSERT((MD5_DIGEST_LENGTH*2 + 1 + intermediateResponseNonceLen) % MD5_CHUNK_LEN == 0);
+    NX_ASSERT((MD5_DIGEST_LENGTH * 2 + 1 + intermediateResponseNonceLen) % MD5_CHUNK_LEN == 0);
 
     const auto intermediateResponseBin = QByteArray::fromHex(intermediateResponse);
 
@@ -311,7 +306,7 @@ BufferType calcResponseFromIntermediate(
     memset(&md5Ctx, 0, sizeof(md5Ctx));
     memcpy(&md5Ctx, intermediateResponseBin.constData(), MD5_DIGEST_LENGTH);
     md5Ctx.Nl = (MD5_DIGEST_LENGTH * 2 + 1 + intermediateResponseNonceLen) << 3;
-    //as if we have just passed ha1:nonceBase to MD5_Update
+    // As if we have just passed ha1:nonceBase to MD5_Update.
     MD5_Update(&md5Ctx, nonceTrailer.constData(), nonceTrailer.size());
     MD5_Update(&md5Ctx, ":", 1);
     MD5_Update(&md5Ctx, ha2.constData(), ha2.size());

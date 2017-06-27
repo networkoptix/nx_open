@@ -30,6 +30,7 @@
 #include "../resource_management/status_dictionary.h"
 
 #include <core/resource/security_cam_resource.h>
+#include <common/common_module.h>
 
 std::atomic<bool> QnResource::m_appStopping(false);
 QnMutex QnResource::m_initAsyncMutex;
@@ -172,7 +173,7 @@ typedef std::shared_ptr<QnResourceSetParamsCommand> QnResourceSetParamsCommandPt
 // -------------------------------------------------------------------------- //
 // QnResource
 // -------------------------------------------------------------------------- //
-QnResource::QnResource():
+QnResource::QnResource(QnCommonModule* commonModule):
     QObject(),
     m_mutex(QnMutex::Recursive),
     m_initMutex(QnMutex::Recursive),
@@ -182,8 +183,8 @@ QnResource::QnResource():
     m_lastInitTime(0),
     m_prevInitializationResult(CameraDiagnostics::ErrorCode::unknown),
     m_lastMediaIssue(CameraDiagnostics::NoErrorResult()),
-    m_removedFromPool(false),
-    m_initInProgress(false)
+    m_initInProgress(false),
+    m_commonModule(commonModule)
 {
 }
 
@@ -205,8 +206,8 @@ QnResource::QnResource(const QnResource& right)
     m_lastMediaIssue(right.m_lastMediaIssue),
     m_initializationAttemptCount(right.m_initializationAttemptCount),
     m_locallySavedProperties(right.m_locallySavedProperties),
-    m_removedFromPool(right.m_removedFromPool),
-    m_initInProgress(right.m_initInProgress)
+    m_initInProgress(right.m_initInProgress),
+    m_commonModule(right.m_commonModule)
 {
 }
 
@@ -225,7 +226,6 @@ QnResourcePool *QnResource::resourcePool() const
 void QnResource::setResourcePool(QnResourcePool *resourcePool)
 {
     QnMutexLocker mutexLocker(&m_mutex);
-
     m_resourcePool = resourcePool;
 }
 
@@ -329,7 +329,7 @@ void QnResource::update(const QnResourcePtr& other)
 
             for (auto prop : locallySavedProperties)
             {
-                if (propertyDictionary->setValue(
+                if (commonModule()->propertyDictionary()->setValue(
                     id,
                     prop.first,
                     prop.second.value,
@@ -589,7 +589,7 @@ void QnResource::setTypeByName(const QString& resTypeName)
 
 Qn::ResourceStatus QnResource::getStatus() const
 {
-    return qnStatusDictionary->value(getId());
+    return commonModule()->statusDictionary()->value(getId());
 }
 
 void QnResource::doStatusChanged(Qn::ResourceStatus oldStatus, Qn::ResourceStatus newStatus, Qn::StatusChangeReason reason)
@@ -625,16 +625,14 @@ void QnResource::setStatus(Qn::ResourceStatus newStatus, Qn::StatusChangeReason 
     if (newStatus == Qn::NotDefined)
         return;
 
-    if (m_removedFromPool)
+    if (hasFlags(Qn::removed))
         return;
-
-
 
     QnUuid id = getId();
-    Qn::ResourceStatus oldStatus = qnStatusDictionary->value(id);
+    Qn::ResourceStatus oldStatus = commonModule()->statusDictionary()->value(id);
     if (oldStatus == newStatus)
         return;
-    qnStatusDictionary->setValue(id, newStatus);
+    commonModule()->statusDictionary()->setValue(id, newStatus);
     doStatusChanged(oldStatus, newStatus, reason);
 }
 
@@ -824,13 +822,21 @@ QnAbstractPtzController *QnResource::createPtzControllerInternal()
     return NULL;
 }
 
+CameraDiagnostics::Result QnResource::initInternal()
+{
+    return CameraDiagnostics::NoErrorResult();
+}
+
 void QnResource::initializationDone()
 {
 }
 
 bool QnResource::hasProperty(const QString &key) const
 {
-    return propertyDictionary->hasProperty(getId(), key);
+    if (!commonModule())
+        return false;
+
+    return commonModule()->propertyDictionary()->hasProperty(getId(), key);
 }
 
 QString QnResource::getProperty(const QString &key) const
@@ -844,9 +850,9 @@ QString QnResource::getProperty(const QString &key) const
             if (itr != m_locallySavedProperties.end())
                 value = itr->second.value;
         }
-        else
+        else if (commonModule())
         {
-            value = propertyDictionary->value(m_id, key);
+            value = commonModule()->propertyDictionary()->value(m_id, key);
         }
     }
 
@@ -861,12 +867,16 @@ QString QnResource::getProperty(const QString &key) const
     return value;
 }
 
-QString QnResource::getResourceProperty(const QString& key, const QnUuid &resourceId, const QnUuid &resourceTypeId)
+QString QnResource::getResourceProperty(
+    QnCommonModule* commonModule,
+    const QString& key,
+    const QnUuid &resourceId,
+    const QnUuid &resourceTypeId)
 {
     //TODO: #GDM think about code duplication
     NX_ASSERT(!resourceId.isNull() && !resourceTypeId.isNull(), Q_FUNC_INFO, "Invalid input, reading from local data is requred.");
 
-    QString value = propertyDictionary->value(resourceId, key);
+    QString value = commonModule->propertyDictionary()->value(resourceId, key);
     if (value.isNull())
     {
         // find default value in resourceType
@@ -892,13 +902,13 @@ bool QnResource::setProperty(const QString &key, const QString &value, PropertyO
             //saving property to some internal dictionary. Will apply to global dictionary when id is known
             m_locallySavedProperties[key] = LocalPropertyValue(value, markDirty, replaceIfExists);
 
-            //calling propertyDictionary->saveParams(...) does not make any sense
+            //calling propertyDictionary()->saveParams(...) does not make any sense
             return false;
         }
     }
 
     NX_ASSERT(!getId().isNull());
-    bool isModified = propertyDictionary->setValue(getId(), key, value, markDirty, replaceIfExists);
+    bool isModified = commonModule()->propertyDictionary()->setValue(getId(), key, value, markDirty, replaceIfExists);
     if (isModified)
         emitPropertyChanged(key);
 
@@ -917,7 +927,7 @@ bool QnResource::removeProperty(const QString& key)
     }
 
     NX_ASSERT(!getId().isNull());
-    propertyDictionary->removeProperty(getId(), key);
+    commonModule()->propertyDictionary()->removeProperty(getId(), key);
     emitPropertyChanged(key);
 
     return true;
@@ -949,14 +959,14 @@ ec2::ApiResourceParamDataList QnResource::getRuntimeProperties() const
     }
     else
     {
-        return propertyDictionary->allProperties(getId());
+        return commonModule()->propertyDictionary()->allProperties(getId());
     }
 }
 
 ec2::ApiResourceParamDataList QnResource::getAllProperties() const
 {
     ec2::ApiResourceParamDataList result;
-    ec2::ApiResourceParamDataList runtimeProperties = propertyDictionary->allProperties(getId());
+    ec2::ApiResourceParamDataList runtimeProperties = commonModule()->propertyDictionary()->allProperties(getId());
     ParamTypeMap staticDefaultProperties;
 
     QnResourceTypePtr resType = qnResTypePool->getResourceType(getTypeId());
@@ -1203,8 +1213,33 @@ void QnResource::setPtzCapability(Ptz::Capabilities capability, bool value)
     setPtzCapabilities(value ? (getPtzCapabilities() | capability) : (getPtzCapabilities() & ~capability));
 }
 
-void QnResource::setRemovedFromPool(bool value)
+void QnResource::setCommonModule(QnCommonModule* commonModule)
 {
     QnMutexLocker mutexLocker(&m_mutex);
-    m_removedFromPool = value;
+    m_commonModule = commonModule;
 }
+
+QnCommonModule* QnResource::commonModule() const
+{
+    {
+        QnMutexLocker mutexLocker(&m_mutex);
+        if (m_commonModule)
+            return m_commonModule;
+    }
+
+    if (const auto pool = resourcePool())
+        return pool->commonModule();
+
+    return nullptr;
+}
+
+bool QnResource::saveParams()
+{
+    return commonModule()->propertyDictionary()->saveParams(getId());
+}
+
+int QnResource::saveParamsAsync()
+{
+    return commonModule()->propertyDictionary()->saveParamsAsync(getId());
+}
+

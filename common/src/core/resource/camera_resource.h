@@ -25,9 +25,9 @@ class QN_EXPORT QnVirtualCameraResource : public QnSecurityCamResource
     Q_OBJECT
     Q_FLAGS(Qn::CameraCapabilities)
     Q_PROPERTY(Qn::CameraCapabilities cameraCapabilities READ getCameraCapabilities WRITE setCameraCapabilities)
-
+    using base_type = QnSecurityCamResource;
 public:
-    QnVirtualCameraResource();
+    QnVirtualCameraResource(QnCommonModule* commonModule = nullptr);
 
     QnAbstractDTSFactory* getDTSFactory();
     void setDTSFactory(QnAbstractDTSFactory* factory);
@@ -40,8 +40,6 @@ public:
     void forceEnableAudio();
     void forceDisableAudio();
     bool isForcedAudioSupported() const;
-    virtual void saveParams();
-    virtual void saveParamsAsync();
     virtual int saveAsync();
     void updateDefaultAuthIfEmpty(const QString& login, const QString& password);
 
@@ -77,7 +75,7 @@ class QN_EXPORT QnPhysicalCameraResource : public QnVirtualCameraResource
 {
     Q_OBJECT
 public:
-    QnPhysicalCameraResource();
+    QnPhysicalCameraResource(QnCommonModule* commonModule = nullptr);
 
     // the difference between desired and real is that camera can have multiple clients we do not know about or big exposure time
     int getPrimaryStreamRealFps() const;
@@ -109,6 +107,8 @@ private:
 private:
     QnMutex m_mediaStreamsMutex;
     int m_channelNumber; // video/audio source number
+    QElapsedTimer m_lastInitTime;
+    QAuthenticator m_lastCredentials;
 };
 
 

@@ -6,33 +6,6 @@ template <typename T, size_t N>
 char (&ArraySizeHelper(T (&array)[N]))[N];
 #define arraysize(array) (sizeof(ArraySizeHelper(array)))
 
-#if defined (Q_OS_WIN32)
-
-struct WinDriveInfo
-{
-    enum Access
-    {
-        NoAccess = 0,
-        Readable = 1,
-        Writable = 2,
-    };
-
-    QString path;
-    unsigned long type;
-    int access;
-
-    WinDriveInfo():
-        type(0),
-        access(NoAccess)
-    {
-    }
-};
-
-using WinDriveInfoList = QList<WinDriveInfo>;
-
-WinDriveInfoList getWinDrivesInfo();
-#endif
-
 /**
  * Remove directory recursively.
  *
@@ -122,8 +95,3 @@ QByteArray formatJSonString(const QByteArray& data);
 #ifdef _DEBUG
 QString debugTime(qint64 timeMSec, const QString &fmt = QString());
 #endif
-
-/**
- * Convert QDateTime to HTTP header date format (rfc822#section-5)
- */
-QByteArray dateTimeToHTTPFormat(const QDateTime& value);

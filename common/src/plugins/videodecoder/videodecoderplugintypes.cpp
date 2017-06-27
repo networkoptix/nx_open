@@ -155,9 +155,9 @@ DecoderResourcesNameset::DecoderResourcesNameset()
 }
 
 MediaStreamParameterSumContainer::MediaStreamParameterSumContainer(
-    const stree::ResourceNameSet& rns,
-    const stree::AbstractResourceReader& rc1,
-    const stree::AbstractResourceReader& rc2 )
+    const nx::utils::stree::ResourceNameSet& rns,
+    const nx::utils::stree::AbstractResourceReader& rc1,
+    const nx::utils::stree::AbstractResourceReader& rc2 )
 :
     m_rns( rns ),
     m_rc1( rc1 ),

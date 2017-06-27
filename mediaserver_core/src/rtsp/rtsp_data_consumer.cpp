@@ -16,7 +16,7 @@
 #include <core/resource/security_cam_resource.h>
 #include <recorder/recording_manager.h>
 #include <nx/streaming/archive_stream_reader.h>
-#include <utils/common/guard.h>
+#include <nx/utils/scope_guard.h>
 
 namespace {
 
@@ -542,7 +542,7 @@ bool QnRtspDataConsumer::processData(const QnAbstractDataPacketPtr& nonConstData
         return true;
 
 
-    const auto flushBuffer = makeScopedGuard(
+    const auto flushBuffer = makeScopeGuard(
         [this]()
         {
             if (m_dataQueue.isEmpty() && m_sendBuffer.size() > 0)
