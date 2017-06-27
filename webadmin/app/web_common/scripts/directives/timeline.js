@@ -202,9 +202,6 @@ angular.module('nxCommon')
                 function scrollbarClickOrHold(left){
                     timelineActions.scrollingStart(left, timelineConfig.scrollSpeed * scope.viewportWidth);
                 }
-                function scrollbarDblClick(mouseX){
-                    timelineActions.animateScroll(mouseX / scope.viewportWidth);
-                }
 
                 function scrollButtonClickOrHold(left){
                     timelineActions.scrollingStart(left, timelineConfig.scrollButtonSpeed * scope.viewportWidth);
@@ -316,14 +313,6 @@ angular.module('nxCommon')
                     if(mouseOverElements.rightButton){
                         scrollButtonDblClick(false);
                         return;
-                    }
-                    if(mouseOverElements.timeline){
-                        timelineActions.zoomInToPoint(mouseX);
-                        return;
-                    }
-
-                    if(mouseOverElements.scrollbar && !mouseOverElements.scrollbarSlider){
-                        scrollbarDblClick(mouseXOverTimeline);
                     }
                 }
                 function viewportMouseDown(event){

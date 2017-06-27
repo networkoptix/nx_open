@@ -325,11 +325,6 @@ TimelineActions.prototype.updateState = function(){
 };
 
 
-TimelineActions.prototype.zoomInToPoint = function(mouseX) {
-    this.zoom(true, false, false, this.scaleManager.setAnchorCoordinate(mouseX));
-};
-
-
 
 TimelineActions.prototype.scrollbarSliderDragStart = function(mouseX){
     this.scaleManager.stopWatching();
