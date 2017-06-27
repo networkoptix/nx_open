@@ -66,9 +66,12 @@ def page_edit_view(request):
 			form.add_fields(context)
 
 		elif 'SaveDraft' in request_data and check_if_form_touched(request_data, 'SaveDraft'):
-				update_data_records_for_context(customization, language, context.datastructure_set.all(), request_data, user)
+			update_data_records_for_context(customization, language, context.datastructure_set.all(), request_data, user)
 
 		elif 'Preview' in request_data:
+			if check_if_form_touched(request_data, 'Preview'):
+				update_data_records_for_context(customization, language, context.datastructure_set.all(), request_data, user)
+			
 			version_id = ContentVersion.objects.latest('created_date').id
 
 			fill_content(customization_name=settings.CUSTOMIZATION, version_id=version_id)
@@ -95,3 +98,4 @@ def page_edit_view(request):
 
 
 	return render(request, 'page_edit_form.html', {'form': form, 'post_made': post_made, 'preview_link': preview_link})
+
