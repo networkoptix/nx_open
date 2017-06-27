@@ -49,7 +49,7 @@ angular.module('nxCommon')
                 scope.jshlsHideError = Config.debug.jshlsHideError && Config.allowDebugMode;
                 scope.jshlsDebugMode = Config.debug.jshlsDebug && Config.allowDebugMode;
                 scope.videoFlags = {};
-                scope.loading = false;
+                scope.loading = false; // Initiate state - not loading (do nothing)
                 
                 function getFormatSrc(mediaformat) {
                     var src = _.find(scope.vgSrc,function(src){return src.type == mimeTypes[mediaformat];});
@@ -74,7 +74,6 @@ angular.module('nxCommon')
                         ieWin10: false,                    
                         ubuntuNX: false
                     };
-                    scope.loading = false;
 
                     if(scope.debugMode && scope.activeFormat != "Auto"){
                         return scope.activeFormat;
@@ -212,16 +211,12 @@ angular.module('nxCommon')
                             scope.vgApi = api;
 
                             if (scope.vgSrc) {
-                                $timeout(function () {
-                                scope.loading = !!format;
-                                });
-
-                                if(format == 'webm' && window.jscd.os == "Android" ){ // TODO: this is hach for android bug. remove it later
+                                if(format == 'webm' && window.jscd.os == "Android" ){ // TODO: this is hack for android bug. remove it later
                                     if(autoshow){
                                         $timeout.cancel(autoshow);
                                     }
                                     autoshow = $timeout(function () {
-                                    scope.loading = false;
+                                        scope.loading = false; // Automatically disable loading state after timeout (20 seconds)
                                         autoshow = null;
                                     },20000);
                                 }
@@ -230,7 +225,7 @@ angular.module('nxCommon')
 
                                 scope.vgApi.addEventListener("timeupdate", function (event) {
                                     var video = event.srcElement || event.originalTarget;
-                                    scope.loading = false;
+                                    scope.loading = false; // Video is playing - disable loading
                                     scope.vgUpdateTime({$currentTime: video.currentTime, $duration: video.duration});
                                 });
 
@@ -281,18 +276,14 @@ angular.module('nxCommon')
                             flashlsAPI.init(playerId, function (api) {
                                 scope.vgApi = api;
                                 if (scope.vgSrc) {
-                                    $timeout(function () {
-                                        scope.loading = !!format;
-                                    });
                                     scope.vgApi.load(getFormatSrc('hls'));
-
                                 }
 
                                 scope.vgPlayerReady({$API: api});
                             }, function (error) {
                                 $timeout(function () {
                                     scope.videoFlags.errorLoading = true;
-                                    scope.loading = false;
+                                    scope.loading = false; // Some error happended - stop loading
                                     scope.flashls = false;// Kill flashls with his error
                                     scope.native = false;
                                     scoep.jsHls = false;
@@ -300,7 +291,7 @@ angular.module('nxCommon')
                                 console.error(error);
                             }, function (position, duration) {
                                 if (position != 0) {
-                                    scope.loading = false;
+                                    scope.loading = false; // Video is playing - disable loading
                                     scope.vgUpdateTime({$currentTime: position, $duration: duration});
                                 }
                             });
@@ -320,21 +311,19 @@ angular.module('nxCommon')
                         jsHlsAPI.init( element.find(".videoplayer"), scope.jshlsHideError, scope.jshlsDebugMode, function (api) {
                             scope.vgApi = api;
                             if (scope.vgSrc) {
-                                $timeout(function(){
-                                scope.loading = !!format;
-                                });
                                 scope.vgApi.load(getFormatSrc('hls'));
                                 scope.vgApi.addEventListener("timeupdate", function (event) {
                                     var video = event.srcElement || event.originalTarget;
-                                scope.loading = false;
+                                    if(video.currentTime){ // When video is playing - disable loading
+                                        scope.loading = false;
+                                    }
                                     scope.vgUpdateTime({$currentTime: video.currentTime, $duration: video.duration});
                                 });
                             }
                             scope.vgPlayerReady({$API:api});
                         },  function (api) {
                             scope.videoFlags.errorLoading = true;
-                                scope.jsHls = false;
-                                console.log(api);
+                            scope.jsHls = false;
                         });
                         videoPlayers.push(jsHlsAPI);
                     });
@@ -368,7 +357,7 @@ angular.module('nxCommon')
                 }
 
                 function srcChanged(){
-                    scope.loading = false;
+                    scope.loading = true; // source changed - start loading
                     scope.videoFlags.errorLoading = false;
 
                     if(scope.vgSrc ) {
@@ -377,6 +366,7 @@ angular.module('nxCommon')
                             scope.native = false;
                             scope.flashls = false;
                             scope.jsHls = false;
+                            scope.loading = false; // no supported format - no loading
                             return;
                         }
                         if(!recyclePlayer(format)){ // Remove or recycle old player.
@@ -418,8 +408,9 @@ angular.module('nxCommon')
                     }
                 });
 
-                if(scope.debugMode)
+                if(scope.debugMode){
                     scope.$watch('activeFormat', srcChanged);
+                }
                 
                 scope.initFlash = function(){
                     var playerId = !scope.playerId ? 'player0': scope.playerId;
