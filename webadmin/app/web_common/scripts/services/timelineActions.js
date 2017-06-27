@@ -171,7 +171,7 @@ TimelineActions.prototype.scrollByPixels = function(pixels){
 
 // Main zoom function - handle zoom logic, animations, etc
 // gets absolute zoom value - to target level from 0 to 1
-TimelineActions.prototype.zoomTo = function(zoomTarget, zoomCoordinate, instant, linear){
+TimelineActions.prototype.zoomTo = function(zoomTarget, zoomCoordinate, instant){
     var self = this;
     zoomTarget = this.scaleManager.boundZoom(zoomTarget);
 
@@ -250,7 +250,7 @@ TimelineActions.prototype.zoomTo = function(zoomTarget, zoomCoordinate, instant,
         }
 
         self.delayWatchingPlayingPosition();
-        self.animateScope.animate(self.scope, 'zoomTarget', zoomTarget, linear?'linear':'dryResistance').then(
+        self.animateScope.animate(self.scope, 'zoomTarget', zoomTarget, 'dryResistance').then(
             function () {},
             function () {},
             setZoom);
@@ -280,7 +280,7 @@ TimelineActions.prototype.zoom = function(zoomIn){
     }
 
     var zoomTarget = this.scaleManager.zoom() - (zoomIn ? 1 : -1) * this.timelineConfig.slowZoomSpeed;
-    this.zoomTo(zoomTarget, zoomCoordinate, false, false);
+    this.zoomTo(zoomTarget, zoomCoordinate, false);
 };
 
 // Continuus zooming - every render
