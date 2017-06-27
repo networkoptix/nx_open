@@ -38,6 +38,7 @@ Qn::HelpTopic helpTopic(Qn::ConnectionResult result)
         case Qn::CloudTemporaryUnauthorizedConnectionResult:
         case Qn::IncompatibleInternalConnectionResult:
         case Qn::ForbiddenConnectionResult:
+        case Qn::DisabledUserConnectionResult:
             return Qn::Login_Help;
         case Qn::IncompatibleCloudHostConnectionResult:
         case Qn::IncompatibleVersionConnectionResult:
@@ -80,6 +81,8 @@ QString QnConnectionDiagnosticsHelper::getErrorDescription(
     case Qn::CloudTemporaryUnauthorizedConnectionResult:
         return getErrorString(ErrorStrings::CloudIsNotReady)
             + L'\n' + getErrorString(ErrorStrings::ContactAdministrator);
+    case Qn::DisabledUserConnectionResult:
+        return tr("This user is disabled by system administrator.");
     case Qn::ForbiddenConnectionResult:
         return tr("Operation is not permitted now. It could happen due to server is restarting now. Please try again later.")
             + L'\n' + getErrorString(ErrorStrings::ContactAdministrator);
@@ -163,6 +166,9 @@ void QnConnectionDiagnosticsHelper::showValidateConnectionErrorMessage(
                 kFailedToConnectText,
                 tr("Server may be restarting now. Please try again later.")
                     + L'\n' + getErrorString(ErrorStrings::ContactAdministrator));
+            break;
+        case Qn::DisabledUserConnectionResult:
+            QnMessageBox::warning(parentWidget, tr("This user is disabled by system administrator."));
             break;
         case Qn::NetworkErrorConnectionResult:
             QnMessageBox::critical(parentWidget,

@@ -138,7 +138,7 @@ Handle ServerConnection::getStatisticsSettingsAsync(
         return Handle(); //< can't process request now. No internet access
 
     nx_http::ClientPool::Request request = prepareRequest(
-        nx_http::Method::GET, prepareUrl(path, emptyRequest.toParams()));
+        nx_http::Method::Get, prepareUrl(path, emptyRequest.toParams()));
     nx_http::HttpHeader header(Qn::SERVER_GUID_HEADER_NAME, server->getId().toByteArray());
     nx_http::insertOrReplaceHeader(&request.headers, header);
     auto handle = request.isValid() ? executeRequest(request, callback, targetThread) : Handle();
@@ -163,7 +163,7 @@ Handle ServerConnection::sendStatisticsAsync(
         return Handle();
 
     nx_http::ClientPool::Request request = prepareRequest(
-        nx_http::Method::POST,
+        nx_http::Method::Post,
         prepareUrl(path, statisticsData.toParams()),
         kJsonContentType,
         data);
@@ -401,24 +401,71 @@ T parseMessageBody(const Qn::SerializationFormat& format, const nx_http::BufferT
 }
 
 template <typename ResultType>
-Handle ServerConnection::executeGet(const QString& path, const QnRequestParamList& params, REST_CALLBACK(ResultType) callback, QThread* targetThread)
+Handle ServerConnection::executeGet(
+    const QString& path,
+    const QnRequestParamList& params,
+    REST_CALLBACK(ResultType) callback,
+    QThread* targetThread)
 {
-    nx_http::ClientPool::Request request = prepareRequest(nx_http::Method::GET, prepareUrl(path, params));
-    auto handle = request.isValid() ? executeRequest(request, callback, targetThread) : Handle();
+    auto request = prepareRequest(nx_http::Method::Get, prepareUrl(path, params));
+    auto handle = request.isValid()
+        ? executeRequest(request, callback, targetThread)
+        : Handle();
+
     trace(handle, path);
     return handle;
 }
 
 template <typename ResultType>
-Handle ServerConnection::executePost(const QString& path,
-                                           const QnRequestParamList& params,
-                                           const nx_http::StringType& contentType,
-                                           const nx_http::StringType& messageBody,
-                                           REST_CALLBACK(ResultType) callback,
-                                           QThread* targetThread)
+Handle ServerConnection::executePost(
+    const QString& path,
+    const QnRequestParamList& params,
+    const nx_http::StringType& contentType,
+    const nx_http::StringType& messageBody,
+    REST_CALLBACK(ResultType) callback,
+    QThread* targetThread)
 {
-    nx_http::ClientPool::Request request = prepareRequest(nx_http::Method::POST, prepareUrl(path, params), contentType, messageBody);
-    auto handle = request.isValid() ? executeRequest(request, callback, targetThread) : Handle();
+    auto request = prepareRequest(
+        nx_http::Method::Post, prepareUrl(path, params), contentType, messageBody);
+    auto handle = request.isValid()
+        ? executeRequest(request, callback, targetThread)
+        : Handle();
+
+    trace(handle, path);
+    return handle;
+}
+
+template <typename ResultType>
+Handle ServerConnection::executePut(
+    const QString& path,
+    const QnRequestParamList& params,
+    const nx_http::StringType& contentType,
+    const nx_http::StringType& messageBody,
+    REST_CALLBACK(ResultType) callback,
+    QThread* targetThread)
+{
+    auto request = prepareRequest(
+        nx_http::Method::Put, prepareUrl(path, params), contentType, messageBody);
+    auto handle = request.isValid()
+        ? executeRequest(request, callback, targetThread)
+        : Handle();
+
+    trace(handle, path);
+    return handle;
+}
+
+template <typename ResultType>
+Handle ServerConnection::executeDelete(
+    const QString& path,
+    const QnRequestParamList& params,
+    REST_CALLBACK(ResultType) callback,
+    QThread* targetThread)
+{
+    auto request = prepareRequest(nx_http::Method::Delete, prepareUrl(path, params));
+    auto handle = request.isValid()
+        ? executeRequest(request, callback, targetThread)
+        : Handle();
+
     trace(handle, path);
     return handle;
 }

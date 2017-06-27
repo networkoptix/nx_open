@@ -43,11 +43,11 @@ void HttpServer::at_gotRequest(const QUuid& requestId, const QUuid& clientId, co
         httpClient.reset();
     }, Qt::DirectConnection);
 
-    if (request.method == nx_http::Method::GET)
+    if (request.method == nx_http::Method::Get)
     {
         httpClient->doGet(url);
     }
-    else if (request.method == nx_http::Method::POST)
+    else if (request.method == nx_http::Method::Post)
     {
         httpClient->doPost(url, request.contentType, request.messageBody);
     }

@@ -9,7 +9,7 @@ function TimelineActions(timelineConfig, positionProvider, scaleManager, animati
     this.timelineConfig = timelineConfig;
 
     this.stopDelay = null;
-    this.nextPlayedPosition = 0;
+    this.nextPlayedPosition = false;
     this.scope.lastPlayedPosition = 0;
 
     this.scrollingNow = false;
@@ -67,7 +67,7 @@ TimelineActions.prototype.delayWatchingPlayingPosition = function(){
 
 
 TimelineActions.prototype.stopAnimatingMove = function(){
-    var animation = this.animateScope.animating(self.scope, 'lastPlayedPosition');
+    var animation = this.animateScope.animating(this.scope, 'lastPlayedPosition');
     if(animation){
         animation.breakAnimation();
     }
@@ -75,15 +75,11 @@ TimelineActions.prototype.stopAnimatingMove = function(){
 TimelineActions.prototype.updatePosition = function(){
     var self = this;
     if(self.positionProvider) {
-
-        if(self.nextPlayedPosition ){
-            self.stopAnimatingMove();
-
+        if(self.nextPlayedPosition){
             if(self.positionProvider.liveMode || self.nextPlayedPosition == self.positionProvider.playedPosition){
-                self.scope.lastPlayedPosition = self.nextPlayedPosition;
-                self.nextPlayedPosition = 0;
-                self.scaleManager.tryToSetLiveDate(self.scope.lastPlayedPosition, self.positionProvider.liveMode, (new Date()).getTime());
+                self.nextPlayedPosition = false;
             }
+
             return; // ignore changes until played position wasn't changed
         }
 
@@ -95,6 +91,7 @@ TimelineActions.prototype.updatePosition = function(){
             return;
         }
         if (!largeJump || !self.animateScope.animating(self.scope, 'lastPlayedPosition')) { // Large jump
+            // this animation makes scaleManager move smoothly while playing
             self.animateScope.animate(self.scope, 'lastPlayedPosition', self.positionProvider.playedPosition,
                 largeJump ? 'smooth' : 'linear', duration).then(
                 function () {},
@@ -102,6 +99,7 @@ TimelineActions.prototype.updatePosition = function(){
                 function (value) {
                     if(self.nextPlayedPosition){
                         console.log("problem with playing position",value,self.nextPlayedPosition);
+                        self.scope.lastPlayedPosition = self.nextPlayedPosition;
                         return;
                     }
                     self.scaleManager.tryToSetLiveDate(value, self.positionProvider.liveMode, (new Date()).getTime());
@@ -111,13 +109,15 @@ TimelineActions.prototype.updatePosition = function(){
 };
 
 TimelineActions.prototype.setAnchorCoordinate = function(mouseX){
-    this.delayWatchingPlayingPosition();
-    this.stopAnimatingMove();
+    var position = this.scaleManager.setAnchorCoordinate(mouseX); // Set position to keep and get time to set
 
-    this.nextPlayedPosition = this.scaleManager.screenCoordinateToDate(mouseX);
-    this.scaleManager.setAnchorCoordinate(mouseX);// Set position to keep
+    this.nextPlayedPosition = position; // Setting this we will ignore timeupdates until new position starts playing
 
-    return this.nextPlayedPosition;
+    this.stopAnimatingMove(); // Instantly jump to new position
+    this.scope.lastPlayedPosition = position;
+    this.scaleManager.tryToSetLiveDate(position, this.positionProvider.liveMode, (new Date()).getTime());
+
+    return position;
 };
 
 

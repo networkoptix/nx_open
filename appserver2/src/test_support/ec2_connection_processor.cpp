@@ -128,10 +128,10 @@ bool Ec2ConnectionProcessor::processRequest(bool noAuth)
     if (!needToStop())
     {
         copyClientRequestTo(*m_processor);
-        if (m_processor->isTakeSockOwnership())
+        if (m_processor->isSocketTaken())
             d->socket.clear(); // some of handlers have addition thread and depend of socket destructor. We should clear socket immediately to prevent race condition
         m_processor->execute(m_mutex);
-        if (!m_processor->isTakeSockOwnership())
+        if (!m_processor->isSocketTaken())
             m_processor->releaseSocket();
         else
             d->socket.clear(); // some of handlers set ownership dynamically during a execute call. So, check it again.

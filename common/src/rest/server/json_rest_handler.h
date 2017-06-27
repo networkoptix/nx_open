@@ -48,7 +48,15 @@ public:
         const QString& path, const QnRequestParams& params, QnJsonRestResult& result,
         const QnRestConnectionProcessor* owner);
 
+    virtual int executeDelete(
+        const QString& path, const QnRequestParams& params, QnJsonRestResult& result,
+        const QnRestConnectionProcessor* owner);
+
     virtual int executePost(
+        const QString& path, const QnRequestParams& params, const QByteArray& body,
+        QnJsonRestResult& result, const QnRestConnectionProcessor* owner);
+
+    virtual int executePut(
         const QString& path, const QnRequestParams& params, const QByteArray& body,
         QnJsonRestResult& result, const QnRestConnectionProcessor* owner);
 
@@ -57,7 +65,16 @@ protected:
         const QString& path, const QnRequestParamList& params, QByteArray& result,
         QByteArray& contentType, const QnRestConnectionProcessor* owner) override final;
 
+    virtual int executeDelete(
+        const QString& path, const QnRequestParamList& params, QByteArray& result,
+        QByteArray& contentType, const QnRestConnectionProcessor* owner) override final;
+
     virtual int executePost(
+        const QString& path, const QnRequestParamList& params, const QByteArray& body,
+        const QByteArray& srcBodyContentType, QByteArray& result, QByteArray& contentType,
+        const QnRestConnectionProcessor* owner) override;
+
+    virtual int executePut(
         const QString& path, const QnRequestParamList& params, const QByteArray& body,
         const QByteArray& srcBodyContentType, QByteArray& result, QByteArray& contentType,
         const QnRestConnectionProcessor* owner) override;

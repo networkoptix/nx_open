@@ -61,7 +61,7 @@ private:
     int msInQueue() const;
 
     bool initFormatConvertRule(QnAudioFormat format);
-
+    bool createDecoder(const QnCompressedAudioDataPtr& data);
 private:
     enum class SampleConvertMethod { none, float2Int32, float2Int16, int32ToInt16 };
 

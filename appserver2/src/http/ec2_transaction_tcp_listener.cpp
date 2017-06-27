@@ -45,7 +45,7 @@ QnTransactionTcpProcessor::QnTransactionTcpProcessor(
     QnTCPConnectionProcessor(new QnTransactionTcpProcessorPrivate, socket, owner)
 {
     Q_D(QnTransactionTcpProcessor);
-
+    d->isSocketTaken = true;
     d->messageBus = messageBus;
     setObjectName( "QnTransactionTcpProcessor" );
 }
@@ -110,8 +110,8 @@ void QnTransactionTcpProcessor::run()
         nx_http::header::KeepAlive(
             commonModule->globalSettings()->connectionKeepAliveTimeout()).toString());
 
-    if( d->request.requestLine.method == nx_http::Method::POST ||
-        d->request.requestLine.method == nx_http::Method::PUT )
+    if( d->request.requestLine.method == nx_http::Method::Post ||
+        d->request.requestLine.method == nx_http::Method::Put )
     {
         auto connectionGuidIter = d->request.headers.find( Qn::EC2_CONNECTION_GUID_HEADER_NAME );
         if( connectionGuidIter == d->request.headers.end() )
