@@ -8,8 +8,8 @@
 #include <nx/network/buffer.h>
 #include <nx/utils/thread/mutex.h>
 #include <nx/utils/counter.h>
-#include <utils/db/async_sql_query_executor.h>
-#include <utils/db/filter.h>
+#include <nx/utils/db/async_sql_query_executor.h>
+#include <nx/utils/db/filter.h>
 
 #include "cache.h"
 #include "extension_pool.h"
@@ -35,10 +35,10 @@ public:
     virtual ~AbstractAccountManagerExtension() = default;
 
     /**
-     * @throw nx::db::Exception.
+     * @throw nx::utils::db::Exception.
      */
     virtual void afterUpdatingAccountPassword(
-        nx::db::QueryContext* const /*queryContext*/,
+        nx::utils::db::QueryContext* const /*queryContext*/,
         const api::AccountData& /*account*/) {}
 };
 
@@ -70,7 +70,7 @@ class AccountManager:
 {
 public:
     typedef nx::utils::MoveOnlyFunc<
-        nx::db::DBResult(nx::db::QueryContext*, const data::AccountUpdateDataWithEmail&)
+        nx::utils::db::DBResult(nx::utils::db::QueryContext*, const data::AccountUpdateDataWithEmail&)
     > UpdateAccountSubroutine;
 
     /**
@@ -80,7 +80,7 @@ public:
         const conf::Settings& settings,
         const StreeManager& streeManager,
         AbstractTemporaryAccountPasswordManager* const tempPasswordManager,
-        nx::db::AsyncSqlQueryExecutor* const dbManager,
+        nx::utils::db::AsyncSqlQueryExecutor* const dbManager,
         AbstractEmailManager* const emailManager) noexcept(false);
     virtual ~AccountManager();
 
@@ -143,20 +143,20 @@ public:
     virtual boost::optional<data::AccountData> findAccountByUserName(
         const std::string& userName) const override;
     
-    nx::db::DBResult insertAccount(
-        nx::db::QueryContext* const queryContext,
+    nx::utils::db::DBResult insertAccount(
+        nx::utils::db::QueryContext* const queryContext,
         data::AccountData account);
-    nx::db::DBResult updateAccount(
-        nx::db::QueryContext* const queryContext,
+    nx::utils::db::DBResult updateAccount(
+        nx::utils::db::QueryContext* const queryContext,
         data::AccountData account);
 
-    nx::db::DBResult fetchAccountByEmail(
-        nx::db::QueryContext* queryContext,
+    nx::utils::db::DBResult fetchAccountByEmail(
+        nx::utils::db::QueryContext* queryContext,
         const std::string& accountEmail,
         data::AccountData* const accountData);
 
-    nx::db::DBResult createPasswordResetCode(
-        nx::db::QueryContext* const queryContext,
+    nx::utils::db::DBResult createPasswordResetCode(
+        nx::utils::db::QueryContext* const queryContext,
         const std::string& accountEmail,
         std::chrono::seconds codeExpirationTimeout,
         data::AccountConfirmationCode* const confirmationCode);
@@ -170,7 +170,7 @@ private:
     const conf::Settings& m_settings;
     const StreeManager& m_streeManager;
     AbstractTemporaryAccountPasswordManager* const m_tempPasswordManager;
-    nx::db::AsyncSqlQueryExecutor* const m_dbManager;
+    nx::utils::db::AsyncSqlQueryExecutor* const m_dbManager;
     AbstractEmailManager* const m_emailManager;
     /** map<email, account>. */
     Cache<std::string, data::AccountData> m_cache;
@@ -182,35 +182,35 @@ private:
     std::unique_ptr<dao::AbstractAccountDataObject> m_dao;
     ExtensionPool<AbstractAccountManagerExtension> m_extensions;
 
-    nx::db::DBResult fillCache();
-    nx::db::DBResult fetchAccounts(nx::db::QueryContext* queryContext);
+    nx::utils::db::DBResult fillCache();
+    nx::utils::db::DBResult fetchAccounts(nx::utils::db::QueryContext* queryContext);
 
-    nx::db::DBResult registerNewAccountInDb(
-        nx::db::QueryContext* const queryContext,
+    nx::utils::db::DBResult registerNewAccountInDb(
+        nx::utils::db::QueryContext* const queryContext,
         const data::AccountData& accountData,
         data::AccountConfirmationCode* const confirmationCode);
-    nx::db::DBResult issueAccountActivationCode(
-        nx::db::QueryContext* const queryContext,
+    nx::utils::db::DBResult issueAccountActivationCode(
+        nx::utils::db::QueryContext* const queryContext,
         const std::string& accountEmail,
         std::unique_ptr<AbstractActivateAccountNotification> notification,
         data::AccountConfirmationCode* const resultData);
     void accountReactivated(
         nx::utils::Counter::ScopedIncrement asyncCallLocker,
         bool requestSourceSecured,
-        nx::db::QueryContext* /*queryContext*/,
-        nx::db::DBResult resultCode,
+        nx::utils::db::QueryContext* /*queryContext*/,
+        nx::utils::db::DBResult resultCode,
         std::string email,
         data::AccountConfirmationCode resultData,
         std::function<void(api::ResultCode, data::AccountConfirmationCode)> completionHandler);
 
-    nx::db::DBResult verifyAccount(
-        nx::db::QueryContext* const tran,
+    nx::utils::db::DBResult verifyAccount(
+        nx::utils::db::QueryContext* const tran,
         const data::AccountConfirmationCode& verificationCode,
         std::string* const accountEmail);
     void sendActivateAccountResponse(
         nx::utils::Counter::ScopedIncrement asyncCallLocker,
-        nx::db::QueryContext* /*queryContext*/,
-        nx::db::DBResult resultCode,
+        nx::utils::db::QueryContext* /*queryContext*/,
+        nx::utils::db::DBResult resultCode,
         data::AccountConfirmationCode verificationCode,
         std::string accountEmail,
         std::function<void(api::ResultCode, api::AccountEmail)> completionHandler);
@@ -218,17 +218,17 @@ private:
         std::string accountEmail,
         std::chrono::system_clock::time_point activationTime);
 
-    nx::db::DBResult updateAccountInDb(
+    nx::utils::db::DBResult updateAccountInDb(
         bool activateAccountIfNotActive,
-        nx::db::QueryContext* const tran,
+        nx::utils::db::QueryContext* const tran,
         const data::AccountUpdateDataWithEmail& accountData);
     bool isValidInput(const data::AccountUpdateDataWithEmail& accountData) const;
     void updateAccountCache(
         bool activateAccountIfNotActive,
         data::AccountUpdateDataWithEmail accountData);
 
-    nx::db::DBResult resetPassword(
-        nx::db::QueryContext* const queryContext,
+    nx::utils::db::DBResult resetPassword(
+        nx::utils::db::QueryContext* const queryContext,
         const std::string& accountEmail,
         data::AccountConfirmationCode* const confirmationCode);
 

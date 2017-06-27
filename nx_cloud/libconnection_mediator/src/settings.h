@@ -17,7 +17,7 @@
 #include <nx/utils/settings.h>
 
 #include <utils/common/command_line_parser.h>
-#include <utils/db/types.h>
+#include <nx/utils/db/types.h>
 #include <utils/email/email.h>
 
 namespace nx {
@@ -105,7 +105,7 @@ public:
     const Stun& stun() const;
     const Http& http() const;
     const ConnectionParameters& connectionParameters() const;
-    const nx::db::ConnectionOptions& dbConnectionOptions() const;
+    const nx::utils::db::ConnectionOptions& dbConnectionOptions() const;
     const Statistics& statistics() const;
     const TrafficRelay& trafficRelay() const;
 
@@ -116,7 +116,7 @@ private:
     Stun m_stun;
     Http m_http;
     ConnectionParameters m_connectionParameters;
-    nx::db::ConnectionOptions m_dbConnectionOptions;
+    nx::utils::db::ConnectionOptions m_dbConnectionOptions;
     Statistics m_statistics;
     TrafficRelay m_trafficRelay;
 

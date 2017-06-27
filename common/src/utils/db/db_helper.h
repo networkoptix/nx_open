@@ -5,15 +5,14 @@
 #include <QtSql/QSqlQuery>
 #include <QtSql/QSqlRecord>
 
+#include <nx/utils/db/sql_query_execution_helper.h>
 #include <nx/utils/thread/mutex.h>
 #include <nx/utils/uuid.h>
-
-#include "sql_query_execution_helper.h"
 
 class QSqlDatabase;
 
 class QnDbHelper:
-    public SqlQueryExecutionHelper
+    public nx::utils::db::SqlQueryExecutionHelper
 {
 public:
     class QnDbTransaction

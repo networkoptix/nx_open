@@ -17,7 +17,7 @@ using AccountDataObject = cdb::dao::rdb::AccountDataObject;
 using SystemDataObject = cdb::dao::rdb::SystemDataObject;
 using SystemSharingDataObject = cdb::dao::rdb::SystemSharingDataObject;
 
-DaoHelper::DaoHelper(const nx::db::ConnectionOptions& dbConnectionOptions):
+DaoHelper::DaoHelper(const nx::utils::db::ConnectionOptions& dbConnectionOptions):
     m_dbConnectionOptions(dbConnectionOptions),
     m_systemDbController(m_settings)
 {
@@ -43,7 +43,7 @@ api::AccountData DaoHelper::insertRandomAccount()
     const auto dbResult = executeUpdateQuerySync(
         std::bind(&AccountDataObject::insert, &m_accountDbController,
             _1, account));
-    NX_GTEST_ASSERT_EQ(nx::db::DBResult::ok, dbResult);
+    NX_GTEST_ASSERT_EQ(nx::utils::db::DBResult::ok, dbResult);
     m_accounts.push_back(account);
     return account;
 }
@@ -57,7 +57,7 @@ api::SystemData DaoHelper::insertRandomSystem(const api::AccountData& account)
     auto dbResult = executeUpdateQuerySync(
         std::bind(&SystemDataObject::insert, &m_systemDbController,
             _1, system, account.id));
-    NX_GTEST_ASSERT_EQ(nx::db::DBResult::ok, dbResult);
+    NX_GTEST_ASSERT_EQ(nx::utils::db::DBResult::ok, dbResult);
 
     api::SystemSharingEx sharing;
     sharing.systemId = system.id;
@@ -69,7 +69,7 @@ api::SystemData DaoHelper::insertRandomSystem(const api::AccountData& account)
         std::bind(&SystemSharingDataObject::insertOrReplaceSharing, &m_systemSharingController,
             _1, sharing));
 
-    NX_GTEST_ASSERT_EQ(nx::db::DBResult::ok, dbResult);
+    NX_GTEST_ASSERT_EQ(nx::utils::db::DBResult::ok, dbResult);
     m_systems.push_back(system);
     return system;
 }
@@ -81,12 +81,12 @@ void DaoHelper::insertSystemSharing(const api::SystemSharingEx& sharing)
     const auto dbResult = executeUpdateQuerySync(
         std::bind(&SystemSharingDataObject::insertOrReplaceSharing,
             &m_systemSharingController, _1, sharing));
-    ASSERT_EQ(nx::db::DBResult::ok, dbResult);
+    ASSERT_EQ(nx::utils::db::DBResult::ok, dbResult);
 }
 
 void DaoHelper::deleteSystemSharing(const api::SystemSharingEx& sharing)
 {
-    const nx::db::InnerJoinFilterFields sqlFilter =
+    const nx::utils::db::InnerJoinFilterFields sqlFilter =
         {{"account_id", ":accountId",
            QnSql::serialized_field(sharing.accountId)}};
 
@@ -95,7 +95,7 @@ void DaoHelper::deleteSystemSharing(const api::SystemSharingEx& sharing)
     const auto dbResult = executeUpdateQuerySync(
         std::bind(&SystemSharingDataObject::deleteSharing,
             &m_systemSharingController, _1, sharing.systemId, sqlFilter));
-    ASSERT_EQ(nx::db::DBResult::ok, dbResult);
+    ASSERT_EQ(nx::utils::db::DBResult::ok, dbResult);
 }
 
 const api::AccountData& DaoHelper::getAccount(std::size_t index) const
@@ -133,7 +133,7 @@ void DaoHelper::setDbVersionToUpdateTo(unsigned int dbVersion)
     m_dbVersionToUpdateTo = dbVersion;
 }
 
-nx::db::AsyncSqlQueryExecutor& DaoHelper::queryExecutor()
+nx::utils::db::AsyncSqlQueryExecutor& DaoHelper::queryExecutor()
 {
     return m_persistentDbManager->queryExecutor();
 }
@@ -141,7 +141,7 @@ nx::db::AsyncSqlQueryExecutor& DaoHelper::queryExecutor()
 //-------------------------------------------------------------------------------------------------
 
 BasePersistentDataTest::BasePersistentDataTest(DbInitializationType dbInitializationType):
-    db::test::TestWithDbHelper("cdb", QString()),
+    nx::utils::db::test::TestWithDbHelper("cdb", QString()),
     DaoHelper(dbConnectionOptions())
 {
     if (dbInitializationType == DbInitializationType::immediate)

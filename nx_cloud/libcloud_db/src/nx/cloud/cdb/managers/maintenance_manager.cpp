@@ -10,7 +10,7 @@ namespace cdb {
 MaintenanceManager::MaintenanceManager(
     const QnUuid& moduleGuid,
     ec2::SyncronizationEngine* const syncronizationEngine,
-    const db::InstanceController& dbInstanceController)
+    const nx::utils::db::InstanceController& dbInstanceController)
     :
     m_moduleGuid(moduleGuid),
     m_syncronizationEngine(syncronizationEngine),

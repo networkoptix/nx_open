@@ -5,9 +5,8 @@
 #include <QtSql/QSqlRecord>
 #include <QtSql/QSqlError>
 
+#include <nx/utils/db/sql_query_execution_helper.h>
 #include <nx/utils/log/log.h>
-
-#include "sql_query_execution_helper.h"
 
 //TODO #AK QnDbTransaction is a bad name for this class since it actually lives beyond DB transaction
     //and no concurrent transactions supported. Maybe QnDbConnection?
@@ -188,7 +187,7 @@ bool QnDbHelper::applyUpdates(const QString &dirName) {
             NX_LOG(lit("Applying SQL update %1").arg(fileName), cl_logDEBUG1);
             if (!beforeInstallUpdate(fileName))
                 return false;
-            if (!SqlQueryExecutionHelper::execSQLFile(fileName, m_sdb))
+            if (!nx::utils::db::SqlQueryExecutionHelper::execSQLFile(fileName, m_sdb))
                 return false;
             if (!afterInstallUpdate(fileName))
                 return false;

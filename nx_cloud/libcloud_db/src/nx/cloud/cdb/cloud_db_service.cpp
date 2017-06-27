@@ -22,7 +22,7 @@
 #include <common/common_module.h>
 #include <nx/utils/platform/current_process.h>
 #include <utils/common/app_info.h>
-#include <utils/db/db_structure_updater.h>
+#include <nx/utils/db/db_structure_updater.h>
 
 #include <nx/cloud/cdb/client/cdb_request_path.h>
 #include <nx/cloud/cdb/api/ec2_request_paths.h>

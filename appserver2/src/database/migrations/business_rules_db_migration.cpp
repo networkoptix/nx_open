@@ -147,11 +147,11 @@ bool doRemap(const QSqlDatabase& database, int id, const QVariant& newVal, const
     QSqlQuery query(database);
     query.setForwardOnly(true);
     QString sqlText = QString("UPDATE vms_businessrule set %1 = ? where id = ?").arg(fieldName);
-    if (!SqlQueryExecutionHelper::prepareSQLQuery(&query, sqlText, Q_FUNC_INFO))
+    if (!nx::utils::db::SqlQueryExecutionHelper::prepareSQLQuery(&query, sqlText, Q_FUNC_INFO))
         return false;
     query.addBindValue(newVal);
     query.addBindValue(id);
-    return SqlQueryExecutionHelper::execSQLQuery(&query, Q_FUNC_INFO);
+    return nx::utils::db::SqlQueryExecutionHelper::execSQLQuery(&query, Q_FUNC_INFO);
 }
 
 bool migrateBusinessRulesToV23(const QSqlDatabase& database)
@@ -159,9 +159,9 @@ bool migrateBusinessRulesToV23(const QSqlDatabase& database)
     QSqlQuery query(database);
     query.setForwardOnly(true);
     QString sqlText = "SELECT id,event_type, action_type from vms_businessrule";
-    if (!SqlQueryExecutionHelper::prepareSQLQuery(&query, sqlText, Q_FUNC_INFO))
+    if (!nx::utils::db::SqlQueryExecutionHelper::prepareSQLQuery(&query, sqlText, Q_FUNC_INFO))
         return false;
-    if (!SqlQueryExecutionHelper::execSQLQuery(&query, Q_FUNC_INFO))
+    if (!nx::utils::db::SqlQueryExecutionHelper::execSQLQuery(&query, Q_FUNC_INFO))
         return false;
 
     QVector<BusinessRuleRemapData> oldData;
@@ -194,13 +194,13 @@ bool migrateBusinessRulesToV30(const QSqlDatabase& database)
         FROM vms_businessrule
         WHERE action_type = ? or action_type = ?
     )sql";
-    if (!SqlQueryExecutionHelper::prepareSQLQuery(&query, sqlText, Q_FUNC_INFO))
+    if (!nx::utils::db::SqlQueryExecutionHelper::prepareSQLQuery(&query, sqlText, Q_FUNC_INFO))
         return false;
 
     /* Updating duration field. */
     query.addBindValue(QnBusinessV23::CameraOutputOnceAction);
     query.addBindValue(QnBusiness::CameraOutputAction);
-    if (!SqlQueryExecutionHelper::execSQLQuery(&query, Q_FUNC_INFO))
+    if (!nx::utils::db::SqlQueryExecutionHelper::execSQLQuery(&query, Q_FUNC_INFO))
         return false;
 
     QVector<BusinessRuleRemapData> oldData;
@@ -242,12 +242,12 @@ bool migrateBusinessRulesToV31Alpha(const QSqlDatabase& database)
         FROM vms_businessrule
         WHERE action_type = ?
     )sql";
-    if (!SqlQueryExecutionHelper::prepareSQLQuery(&query, sqlText, Q_FUNC_INFO))
+    if (!nx::utils::db::SqlQueryExecutionHelper::prepareSQLQuery(&query, sqlText, Q_FUNC_INFO))
         return false;
 
     /* Updating duration field. */
     query.addBindValue(QnBusiness::ShowPopupAction);
-    if (!SqlQueryExecutionHelper::execSQLQuery(&query, Q_FUNC_INFO))
+    if (!nx::utils::db::SqlQueryExecutionHelper::execSQLQuery(&query, Q_FUNC_INFO))
         return false;
 
     QVector<BusinessRuleRemapData> oldData;
