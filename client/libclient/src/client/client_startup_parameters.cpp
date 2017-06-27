@@ -3,6 +3,7 @@
 
 #include <utils/common/app_info.h>
 #include <utils/common/command_line_parser.h>
+#include <utils/common/util.h>
 #include <utils/crypt/encoded_string.h>
 
 #include <nx/vms/utils/app_info.h>
@@ -51,12 +52,13 @@ const QString QnStartupParameters::kScreenKey(lit("--screen"));
 const QString QnStartupParameters::kAllowMultipleClientInstancesKey(lit("--no-single-application"));
 const QString QnStartupParameters::kSelfUpdateKey(lit("--self-update"));
 
-QnStartupParameters QnStartupParameters::fromCommandLineArg(int argc
-    , char **argv)
+QnStartupParameters QnStartupParameters::fromCommandLineArg(int argc, char** argv)
 {
     QnStartupParameters result;
 
     QnCommandLineParser commandLineParser;
+    QStringList unparsed;
+    commandLineParser.storeUnparsed(&unparsed);
 
     /* Options used to open new client window. */
     addParserParam(commandLineParser, &result.allowMultipleClientInstances, kAllowMultipleClientInstancesKey);
@@ -79,6 +81,7 @@ QnStartupParameters QnStartupParameters::fromCommandLineArg(int argc
     addParserParam(commandLineParser, &result.engineVersion,        "--override-version");
     addParserParam(commandLineParser, &result.showFullInfo,         "--show-full-info");
     addParserParam(commandLineParser, &result.exportedMode,         "--exported");
+    addParserParam(commandLineParser, &result.hiDpiDisabled,        "--no-hidpi");
     addParserParam(commandLineParser, &result.selfUpdateMode,       kSelfUpdateKey);
     addParserParam(commandLineParser, &result.ipVersion,            "--ip-version");
 
@@ -116,6 +119,15 @@ QnStartupParameters QnStartupParameters::fromCommandLineArg(int argc
     }
     result.videoWallGuid = QnUuid(strVideoWallGuid);
     result.videoWallItemGuid = QnUuid(strVideoWallItemGuid);
+
+    // First unparsed entry is the application path.
+    NX_EXPECT(!unparsed.empty());
+    for (int i = 1; i < unparsed.size(); ++i)
+    {
+        QByteArray source = unparsed[i].toUtf8(); //< String was created using ::fromUtf8 conversion
+        QString fileName = QFile::decodeName(source);
+        result.files.append(fromNativePath(fileName));
+    }
 
     return result;
 }
