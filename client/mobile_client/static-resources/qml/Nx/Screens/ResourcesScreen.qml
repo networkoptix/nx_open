@@ -1,6 +1,7 @@
 import QtQuick 2.6
 import Qt.labs.controls 1.0
 import Nx 1.0
+import Nx.Core 1.0
 import Nx.Controls 1.0
 import Nx.Items 1.0
 import com.networkoptix.qml 1.0
@@ -34,11 +35,17 @@ Page
         }
     ]
 
+    LayoutAccessor
+    {
+        id: layout
+        layoutId: uiController.layoutId
+    }
+
     Binding
     {
         target: resourcesScreen
         property: "title"
-        value: connectionManager.systemName
+        value: layout.name || connectionManager.systemName
         when: connectionManager.online
     }
 

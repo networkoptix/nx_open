@@ -187,24 +187,37 @@ void QnDiscoveryManager<ServerQueryProcessorAccess>::monitorServerDiscovery()
             sendTransaction(messageBus, transaction, peerId);
         });
 
-    const auto updateServerStatus =
-        [messageBus](nx::vms::discovery::ModuleEndpoint module)
+    const auto sendServerStatus =
+        [messageBus](const ApiDiscoveredServerData& serverData)
         {
             const auto peers = messageBus->directlyConnectedClientPeers();
             if (peers.isEmpty())
                 return;
 
             QnTransaction<ApiDiscoveredServerData> transaction(
-                ApiCommand::discoveredServerChanged, messageBus->commonModule()->moduleGUID(),
-                makeServer(module, messageBus->commonModule()->globalSettings()->localSystemId()));
+                ApiCommand::discoveredServerChanged, messageBus->commonModule()->moduleGUID(), serverData);
 
             sendTransaction(messageBus, transaction, peers);
+        };
+
+    const auto updateServerStatus =
+        [settings = messageBus->commonModule()->globalSettings(), sendServerStatus](
+            nx::vms::discovery::ModuleEndpoint module)
+        {
+            sendServerStatus(makeServer(module, settings->localSystemId()));
         };
 
     const auto discoveryManager = messageBus->commonModule()->moduleDiscoveryManager();
     QObject::connect(discoveryManager, &nx::vms::discovery::Manager::found, updateServerStatus);
     QObject::connect(discoveryManager, &nx::vms::discovery::Manager::changed, updateServerStatus);
-    // TODO: nx::vms::discovery::Manager::lost
+    QObject::connect(discoveryManager, &nx::vms::discovery::Manager::lost,
+        [sendServerStatus](QnUuid id)
+        {
+            ApiDiscoveredServerData serverData;
+            serverData.id = id;
+            serverData.status = Qn::ResourceStatus::Offline;
+            sendServerStatus(serverData);
+        });
 }
 
 template class QnDiscoveryManager<ServerQueryProcessorAccess>;
