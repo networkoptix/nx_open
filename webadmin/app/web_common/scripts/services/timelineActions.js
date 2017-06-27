@@ -262,16 +262,23 @@ TimelineActions.prototype.zoomTo = function(zoomTarget, zoomCoordinate, instant,
 
 // Relative zoom (incremental)
 TimelineActions.prototype.zoom = function(zoomIn){
-    var zoomCoordinate = this.scaleManager.viewportWidth/2;
-    /*
-        We need zoomDate here:
-        On press on zoom buttons the following point on timeline should (usually, see exceptions) keep its position:
-            If time marker is not displayed - center of the timeline
-            If time marker is displayed in extreme 64px (on both sides) - the extreme side point of the timeline
-            If time marker is displayed in the central area - point under time marker
+    var markerDate = this.scaleManager.playedPosition;
 
-        Exception - if playback is on "LIVE" then treat it like timemarker on specific point
-    */
+    //By default - use point under time marker
+    var zoomCoordinate = this.scaleManager.dateToScreenCoordinate(markerDate);
+
+    // If time marker is not displayed - use center of the timeline
+    if(zoomCoordinate < -1 || zoomCoordinate > this.scaleManager.viewportWidth+1) {
+        zoomCoordinate = this.scaleManager.viewportWidth/2;
+    }
+    // If time marker is displayed in extreme 64px (on both sides) - the extreme side point of the timeline
+    if(zoomCoordinate < this.timelineConfig.borderAreaWidth){
+        zoomCoordinate = 0;
+    }
+    if(zoomCoordinate > this.scaleManager.viewportWidth - this.timelineConfig.borderAreaWidth){
+        zoomCoordinate = this.scaleManager.viewportWidth;
+    }
+
     var zoomTarget = this.scaleManager.zoom() - (zoomIn ? 1 : -1) * this.timelineConfig.slowZoomSpeed;
     this.zoomTo(zoomTarget, zoomCoordinate, false, false);
 };
