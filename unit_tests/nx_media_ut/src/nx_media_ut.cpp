@@ -1,5 +1,7 @@
 #include <functional>
 
+#include <memory>
+
 #include <gtest/gtest.h>
 
 #include <nx/utils/log/log.h>
