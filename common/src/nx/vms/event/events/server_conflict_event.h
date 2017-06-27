@@ -8,7 +8,7 @@
 
 struct QnModuleInformation;
 
-//TODO: #vkutin Think of a location to put this to
+// TODO: #vkutin Think of a location to put this to
 struct QnCameraConflictList
 {
     QString sourceServer;

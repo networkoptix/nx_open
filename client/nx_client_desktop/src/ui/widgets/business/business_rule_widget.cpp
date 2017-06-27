@@ -11,7 +11,7 @@
 #include <QtGui/QIcon>
 #include <QtGui/QDragEnterEvent>
 
-//TODO: #vkutin Think of a proper location and namespace.
+// TODO: #vkutin Think of a proper location and namespace.
 #include <business/business_resource_validation.h>
 
 #include <core/resource/device_dependent_strings.h>

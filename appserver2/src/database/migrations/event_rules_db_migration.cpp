@@ -18,7 +18,7 @@ using namespace nx;
 namespace ec2 {
 namespace db {
 
-/* Enumerator values from v2.2. */
+// Enumerator values from v2.2.
 namespace eventV22 {
 
 enum BusinessEventType
@@ -53,7 +53,7 @@ enum BusinessActionType
 
 } // namespace eventV22
 
-/* Enumerator values from v2.3. */
+// Enumerator values from v2.3.
 namespace eventV23 {
 
 enum BusinessActionType

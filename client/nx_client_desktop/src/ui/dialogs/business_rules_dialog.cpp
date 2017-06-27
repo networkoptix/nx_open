@@ -13,7 +13,7 @@
 
 #include <api/app_server_connection.h>
 
-//TODO: #vkutin Think of a better location and namespace.
+// TODO: #vkutin Think of a better location and namespace.
 #include <business/business_types_comparator.h>
 
 #include <client/client_settings.h>

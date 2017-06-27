@@ -7,7 +7,7 @@
 
 #include <nx/vms/event/event_fwd.h>
 
-//TODO: #vkutin Think of a better name, location and namespace.
+// TODO: #vkutin Think of a better name, location and namespace.
 class QnBusinessEventsFilterResourcePropertyAdaptor: public QnLexicalResourcePropertyAdaptor<quint64> {
     Q_OBJECT
     typedef QnLexicalResourcePropertyAdaptor<quint64> base_type;

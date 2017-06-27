@@ -643,7 +643,7 @@ void ExtendedRuleProcessor::sendEmailAsync(
     QString messageBody;
     renderTemplateFromFile(attachmentData.templatePath, contextMap, &messageBody);
 
-    //TODO: #vkutin #gdm Need to refactor aggregation entirely.
+    // TODO: #vkutin #gdm Need to refactor aggregation entirely.
     // I can't figure a proper abstraction for it at this point.
     const int aggregatedCount = action->getRuntimeParams().eventType == vms::event::SoftwareTriggerEvent
         ? action->aggregationInfo().toList().count()

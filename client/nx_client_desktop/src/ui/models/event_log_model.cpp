@@ -4,7 +4,7 @@
 
 #include <QtGui/QPalette>
 
-//TODO: #vkutin Think of a proper location and namespace
+// TODO: #vkutin Think of a proper location and namespace
 #include <business/business_types_comparator.h>
 
 #include <nx/vms/event/events/reasoned_event.h>

@@ -6,7 +6,7 @@
 #include <QtWidgets/QLayout>
 #include <QtWidgets/QComboBox>
 
-//TODO: #vkutin Think about proper location and namespace.
+// TODO: #vkutin Think about proper location and namespace.
 #include <business/business_resource_validation.h>
 #include <business/business_types_comparator.h>
 
@@ -89,11 +89,11 @@ void QnSelectResourcesDialogButton::at_clicked()
         SubjectSelectionDialog dialog(this);
         auto ids = m_resources;
 
-        //TODO: #vkutin #3.2 Temporary workaround to pass "all users" as a special uuid.
+        // TODO: #vkutin #3.2 Temporary workaround to pass "all users" as a special uuid.
         dialog.setAllUsers(ids.remove(QnBusinessRuleViewModel::kAllUsersId));
         dialog.setCheckedSubjects(ids);
 
-        //TODO: #vkutin Hack till #3.2
+        // TODO: #vkutin Hack till #3.2
         const bool isEmail = dynamic_cast<QnSendEmailActionDelegate*>(m_dialogDelegate) != nullptr;
         dialog.setAllUsersSelectorEnabled(!isEmail);
 

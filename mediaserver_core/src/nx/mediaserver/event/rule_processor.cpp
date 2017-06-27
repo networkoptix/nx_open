@@ -85,11 +85,11 @@ QnMediaServerResourcePtr RuleProcessor::getDestinationServer(
     {
         case vms::event::SendMailAction:
         {
-            // looking for server with public IP address
+            // Look for server with public IP address.
             const auto server = resourcePool()->getResourceById<QnMediaServerResource>(
                 commonModule()->moduleGUID());
             if (!server || (server->getServerFlags() & Qn::SF_HasPublicIP))
-                return QnMediaServerResourcePtr(); // do not proxy
+                return QnMediaServerResourcePtr(); //< Do not proxy.
 
             const auto onlineServers = resourcePool()->getAllServers(Qn::Online);
             for (const auto& server: onlineServers)
@@ -105,12 +105,12 @@ QnMediaServerResourcePtr RuleProcessor::getDestinationServer(
         case vms::event::ShowTextOverlayAction:
         case vms::event::ShowOnAlarmLayoutAction:
         case vms::event::ExecHttpRequestAction:
-            return QnMediaServerResourcePtr(); // no need transfer to other server. Execute action here.
+            return QnMediaServerResourcePtr(); //< Don't transfer to other server, execute here.
 
         default:
             return res
                 ? resourcePool()->getResourceById<QnMediaServerResource>(res->getParentId())
-                : QnMediaServerResourcePtr(); // can not find routeTo resource
+                : QnMediaServerResourcePtr(); //< Can't find route to resource.
     }
 }
 
@@ -126,7 +126,7 @@ bool RuleProcessor::needProxyAction(const vms::event::AbstractActionPtr& action,
         if (res)
             actionKey += QString(L'_') + res->getUniqueId();
         if (m_actionInProgress.contains(actionKey))
-            return false; //< do not proxy until finish locally started action
+            return false; //< Don't proxy until locally started action finishes.
     }
 
     const auto routeToServer = getDestinationServer(action, res);
@@ -138,7 +138,7 @@ void RuleProcessor::doProxyAction(const vms::event::AbstractActionPtr& action,
 {
     if (action->isProlonged())
     {
-        // remove started actions because it actions for other server
+        // Remove started action because it moves to another server.
         QString actionKey = action->getExternalUniqKey();
         if (res)
             actionKey += QString(L'_') + res->getUniqueId();
@@ -148,7 +148,7 @@ void RuleProcessor::doProxyAction(const vms::event::AbstractActionPtr& action,
     const auto routeToServer = getDestinationServer(action, res);
     if (routeToServer)
     {
-        // todo: it is better to use action.clone here
+        // TODO: #rvasilenko It is better to use action.clone() here.
         ec2::ApiBusinessActionData actionData;
         vms::event::AbstractActionPtr actionToSend;
 
@@ -164,7 +164,7 @@ void RuleProcessor::doProxyAction(const vms::event::AbstractActionPtr& action,
 
         // We need to save action to the log before proxy.
         // It is needed for event log for 'view video' operation.
-        // Otherwise foreign server can't perform this
+        // Foreign server won't be able to perform this.
         qnServerDb->saveActionToDB(action);
     }
 }
@@ -191,7 +191,7 @@ void RuleProcessor::executeAction(const vms::event::AbstractActionPtr& action)
     if (!action)
     {
         NX_ASSERT(0, Q_FUNC_INFO, "No action to execute");
-        return; // something wrong. It shouldn't be
+        return; //< Something is wrong.
     }
 
     prepareAdditionActionParams(action);
@@ -212,11 +212,11 @@ void RuleProcessor::executeAction(const vms::event::AbstractActionPtr& action)
         case vms::event::PlaySoundAction:
         case vms::event::PlaySoundOnceAction:
         {
-            // execute say to client once and before proxy
             if (!action->isReceivedFromRemoteHost() && action->getParams().playToClient)
             {
                 broadcastAction(action);
-                // This actions marked as requiredCameraResource, but can be performed to client without camRes
+                // These actions are marked as requiring camera resource,
+                // but in "play to client" mode they don't require it.
                 if (resources.isEmpty())
                     qnServerDb->saveActionToDB(action);
             }
@@ -237,7 +237,7 @@ void RuleProcessor::executeAction(const vms::event::AbstractActionPtr& action)
     if (resources.isEmpty())
     {
         if (vms::event::requiresCameraResource(action->actionType()))
-            return; //camera does not exist anymore
+            return; //< Camera doesn't exist anymore.
         else
             doExecuteAction(action, QnResourcePtr());
     }
@@ -255,7 +255,8 @@ bool RuleProcessor::executeActionInternal(const vms::event::AbstractActionPtr& a
 
     if (action->isProlonged())
     {
-        // check for duplicate actions. For example: camera start recording by 2 different events e.t.c
+        // Check for duplicate actions.
+        // For example, camera starts recording by 2 different events etc.
         QString actionKey = action->getExternalUniqKey();
         if (res)
             actionKey += QString(L'_') + res->getUniqueId();
@@ -265,14 +266,14 @@ bool RuleProcessor::executeActionInternal(const vms::event::AbstractActionPtr& a
             QSet<QnUuid>& runningRules = m_actionInProgress[actionKey];
             runningRules.insert(ruleId);
             if (runningRules.size() > 2)
-                return true; // ignore duplicated start
+                return true; //< Ignore duplicated start.
         }
         else if (action->getToggleState() == vms::event::InactiveState)
         {
             QSet<QnUuid>& runningRules = m_actionInProgress[actionKey];
             runningRules.remove(ruleId);
             if (!runningRules.isEmpty())
-                return true; // ignore duplicated stop
+                return true; //< Ignore duplicated stop.
 
             m_actionInProgress.remove(actionKey);
         }
@@ -354,13 +355,13 @@ bool RuleProcessor::fixActionTimeFields(const vms::event::AbstractActionPtr& act
 
     const bool isProlonged = action->getParams().durationMs <= 0;
     if (isProlonged && updateProlongedActionStartTime(action))
-        return false; //< Do not process event until it is finished
+        return false; //< Do not process event until it's finished.
 
     qint64 startTimeUsec = action->getRuntimeParams().eventTimestampUsec;
     if (isProlonged && !popProlongedActionStartTime(action, startTimeUsec))
     {
         NX_EXPECT(false, "Something went wrong");
-        return false; //< Do not process event at all
+        return false; //< Do not process event at all.
     }
 
     if (isProlonged)
@@ -437,14 +438,15 @@ vms::event::AbstractActionPtr RuleProcessor::processToggleableAction(
 
     RunningRuleInfo& runtimeRule = m_rulesInProgress[rule->getUniqueId()];
 
+    // Ignore 'Off' event if some event resources are still running.
     if (event->getToggleState() == vms::event::InactiveState && !runtimeRule.resources.isEmpty())
-        return vms::event::AbstractActionPtr(); // ignore 'Off' event if some event resources still running
+        return vms::event::AbstractActionPtr();
 
     if (!runtimeRule.isActionRunning.isEmpty())
     {
         // Toggle event repeated with some interval with state 'on'.
-        // if toggled action is used and condition is no longer valid - stop action
-        // Or toggle event goes to 'off'. stop action
+        // If toggled action is used and condition is no longer valid, stop action.
+        // If toggle event goes to 'off', stop action.
         if (!condOK || event->getToggleState() == vms::event::InactiveState)
             action = vms::event::ActionFactory::instantiateAction(
                 rule,
@@ -452,7 +454,7 @@ vms::event::AbstractActionPtr RuleProcessor::processToggleableAction(
                 commonModule()->moduleGUID(),
                 vms::event::InactiveState);
         else
-            return vms::event::AbstractActionPtr(); // ignore repeating 'On' event
+            return vms::event::AbstractActionPtr(); //< Ignore repeating 'On' event.
     }
     else if (condOK)
     {
@@ -479,18 +481,23 @@ vms::event::AbstractActionPtr RuleProcessor::processInstantAction(
     RunningRuleMap::iterator itr = m_rulesInProgress.find(rule->getUniqueId());
     if (itr != m_rulesInProgress.end())
     {
-        // instant action connected to continue event. update stats to prevent multiple action for repeation 'on' event state
+        // Instant action connected to continue event.
+        // Update stats to prevent multiple action for repeation 'on' event state.
         RunningRuleInfo& runtimeRule = itr.value();
         QnUuid resId = event->getResource() ? event->getResource()->getId() : QnUuid();
 
-        if (condOK && event->getToggleState() == vms::event::ActiveState) {
+        if (condOK && event->getToggleState() == vms::event::ActiveState)
+        {
+            // Allow separate action for each resource of source event but ingore repeated 'on' state.
             if (runtimeRule.isActionRunning.contains(resId))
-                return vms::event::AbstractActionPtr(); // action by rule already was ran. Allow separate action for each resource of source event but ingore repeated 'on' state
+                return vms::event::AbstractActionPtr(); //< If action by rule was already run.
             else
                 runtimeRule.isActionRunning.insert(resId);
         }
         else
+        {
             runtimeRule.isActionRunning.remove(resId);
+        }
     }
 
     if (!condOK)
@@ -563,7 +570,7 @@ bool RuleProcessor::checkEventCondition(const vms::event::AbstractEventPtr& even
     if (!vms::event::hasToggleState(event->getEventType()))
         return true;
 
-    // for continue event put information to m_eventsInProgress
+    // For continuing event put information to m_eventsInProgress.
     QnUuid resId = event->getResource() ? event->getResource()->getId() : QnUuid();
     RunningRuleInfo& runtimeRule = m_rulesInProgress[rule->getUniqueId()];
     if (event->getToggleState() == vms::event::ActiveState)
@@ -606,13 +613,13 @@ vms::event::AbstractActionList RuleProcessor::matchActions(
 void RuleProcessor::at_actionDelivered(const vms::event::AbstractActionPtr& action)
 {
     Q_UNUSED(action)
-    //TODO: #vasilenko implement me
+    // TODO: #vasilenko implement me.
 }
 
 void RuleProcessor::at_actionDeliveryFailed(const vms::event::AbstractActionPtr& action)
 {
     Q_UNUSED(action)
-    //TODO: #vasilenko implement me
+    // TODO: #vasilenko implement me.
 }
 
 void RuleProcessor::at_broadcastActionFinished(int handle, ec2::ErrorCode errorCode)
@@ -646,7 +653,7 @@ void RuleProcessor::at_ruleAddedOrUpdated_impl(const vms::event::RulePtr& rule)
         }
     }
 
-    //adding new rule
+    // Add new rule.
     m_rules << rule;
     if (!rule->isDisabled())
         notifyResourcesAboutEventIfNeccessary(rule, true);
@@ -662,7 +669,7 @@ void RuleProcessor::at_rulesReset(const vms::event::RuleList& rules)
 {
     QnMutexLocker lock(&m_mutex);
 
-    // Remove all rules
+    // Remove all rules.
     for (const auto& rule: m_rules)
     {
         if (!rule->isDisabled())
@@ -691,7 +698,7 @@ void RuleProcessor::toggleInputPortMonitoring(const QnResourcePtr& resource, boo
         if (rule->eventType() == vms::event::CameraInputEvent)
         {
             auto resList = resourcePool()->getResources<QnVirtualCameraResource>(rule->eventResources());
-            if (resList.isEmpty() ||            //listening all cameras
+            if (resList.isEmpty() ||            //< Listening to all cameras.
                 resList.contains(camResource))
             {
                 if (on)
@@ -707,17 +714,17 @@ void RuleProcessor::terminateRunningRule(const vms::event::RulePtr& rule)
 {
     QString ruleId = rule->getUniqueId();
     RunningRuleInfo runtimeRule = m_rulesInProgress.value(ruleId);
-    bool isToggledAction = vms::event::hasToggleState(rule->actionType()); // We decided to terminate continues actions only if rule is changed
+    bool isToggledAction = vms::event::hasToggleState(rule->actionType()); //< We decided to terminate continuous actions only if rule is changed.
     if (!runtimeRule.isActionRunning.isEmpty() && !runtimeRule.resources.isEmpty() && isToggledAction)
     {
         for (const QnUuid& resId: runtimeRule.isActionRunning)
         {
-            // terminate all actions. If instant action, terminate all resources on which it was started
+            // Terminate all actions. If action is instant, terminate all resources on which it was started.
             vms::event::AbstractEventPtr event;
             if (!resId.isNull())
                 event = runtimeRule.resources.value(resId);
             else
-                event = runtimeRule.resources.begin().value(); // for continues action resourceID is not specified and only one record is used
+                event = runtimeRule.resources.begin().value(); //< For continuous action, resourceID is not specified and only one record is used.
             if (event)
             {
                 vms::event::AbstractActionPtr action = vms::event::ActionFactory::instantiateAction(
@@ -762,7 +769,7 @@ void RuleProcessor::at_ruleRemoved(QnUuid id)
 void RuleProcessor::notifyResourcesAboutEventIfNeccessary(
     const vms::event::RulePtr& businessRule, bool isRuleAdded)
 {
-    //notifying resources to start input monitoring
+    // Notifying resources to start input monitoring.
     {
         if (businessRule->eventType() == vms::event::CameraInputEvent)
         {
@@ -781,7 +788,7 @@ void RuleProcessor::notifyResourcesAboutEventIfNeccessary(
         }
     }
 
-    //notifying resources about recording action
+    // Notifying resources about recording action.
     {
         if (businessRule->actionType() == vms::event::CameraRecordingAction)
         {

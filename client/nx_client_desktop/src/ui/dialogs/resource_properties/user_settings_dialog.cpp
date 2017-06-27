@@ -263,7 +263,7 @@ QnUserSettingsDialog::QnUserSettingsDialog(QWidget *parent) :
     {
         if (resource != m_user)
         {
-            //TODO: #vkutin #GDM check if permissions change is correctly handled through a chain of signals
+            // TODO: #vkutin #GDM check if permissions change is correctly handled through a chain of signals
             return;
         }
         setUser(QnUserResourcePtr());

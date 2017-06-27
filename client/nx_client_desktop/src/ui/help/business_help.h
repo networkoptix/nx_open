@@ -3,7 +3,7 @@
 #include <nx/vms/event/event_fwd.h>
 #include <health/system_health.h>
 
-//TODO: #vkutin Think of a proper namespace
+// TODO: #vkutin Think of a proper namespace
 namespace QnBusiness {
 
 int eventHelpId(nx::vms::event::EventType type);

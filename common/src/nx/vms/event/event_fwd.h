@@ -11,7 +11,7 @@
 
 #include <nx/fusion/model_functions_fwd.h>
 
-//TODO: #vkutin Think of a location to put this to
+// TODO: #vkutin Think of a location to put this to
 struct QnCameraConflictList;
 
 namespace nx {

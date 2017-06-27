@@ -438,7 +438,7 @@ void QnUserManagementWidget::openLdapSettings()
 
 void QnUserManagementWidget::editRoles()
 {
-    menu()->triggerIfPossible(action::UserRolesAction); //TODO: #vkutin #GDM correctly set parent widget
+    menu()->triggerIfPossible(action::UserRolesAction); // TODO: #vkutin #GDM correctly set parent widget
 }
 
 void QnUserManagementWidget::createUser()

@@ -4,7 +4,7 @@
 
 using namespace nx;
 
-//TODO: #vkutin Think of a proper namespace
+// TODO: #vkutin Think of a proper namespace
 namespace QnBusiness {
 
 int eventHelpId(vms::event::EventType type)

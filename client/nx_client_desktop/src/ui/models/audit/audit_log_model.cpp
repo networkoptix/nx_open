@@ -486,7 +486,7 @@ QString QnAuditLogModel::htmlData(const Column& column, const QnAuditRecord* dat
 }
 
 QString QnAuditLogModel::makeSearchPattern(const QnAuditRecord* record) const {
-    //TODO: #vkutin Do we really want TimestampColumn, EndTimestampColumn, DurationColumn here?
+    // TODO: #vkutin Do we really want TimestampColumn, EndTimestampColumn, DurationColumn here?
     Column columnsToFilter[] =
     {
         TimestampColumn,

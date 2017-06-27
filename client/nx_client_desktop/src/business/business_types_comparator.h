@@ -4,7 +4,7 @@
 
 #include <client_core/connection_context_aware.h>
 
-//TODO: #vkutin Get rid of 'business' and put this class to proper namespace.
+// TODO: #vkutin Get rid of 'business' and put this class to proper namespace.
 
 /** Helper class to sort business types lexicographically. */
 class QnBusinessTypesComparator: public QObject, public QnConnectionContextAware
