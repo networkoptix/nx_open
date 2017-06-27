@@ -38,7 +38,7 @@ static DelayInfo calcDelay(const ScheduleTaskInfo& taskInfo)
 } // namespace
 
 PersistentScheduler::PersistentScheduler(
-    nx::db::AbstractAsyncSqlQueryExecutor* sqlExecutor,
+    nx::utils::db::AbstractAsyncSqlQueryExecutor* sqlExecutor,
     AbstractSchedulerDbHelper* dbHelper)
     :
     m_sqlExecutor(sqlExecutor),
@@ -48,16 +48,16 @@ PersistentScheduler::PersistentScheduler(
     auto f = p.get_future();
 
     m_sqlExecutor->executeSelect(
-        [this](nx::db::QueryContext* queryContext)
+        [this](nx::utils::db::QueryContext* queryContext)
         {
             return m_dbHelper->getScheduleData(queryContext, &m_scheduleData);
         },
-        [p = std::move(p)](nx::db::QueryContext*, nx::db::DBResult result) mutable
+        [p = std::move(p)](nx::utils::db::QueryContext*, nx::utils::db::DBResult result) mutable
         {
-            if (result != nx::db::DBResult::ok)
+            if (result != nx::utils::db::DBResult::ok)
             {
                 NX_LOG(lit("[Scheduler] Failed to load schedule data. Error code: %1")
-                    .arg(nx::db::toString(result)), cl_logERROR);
+                    .arg(nx::utils::db::toString(result)), cl_logERROR);
             }
             p.set_value();
         });
@@ -87,8 +87,8 @@ void PersistentScheduler::registerEventReceiver(
         timerFunction(functorId, taskToParam.first, taskToParam.second);
 }
 
-nx::db::DBResult PersistentScheduler::subscribe(
-    nx::db::QueryContext* queryContext,
+nx::utils::db::DBResult PersistentScheduler::subscribe(
+    nx::utils::db::QueryContext* queryContext,
     const QnUuid& functorId,
     QnUuid* outTaskId,
     std::chrono::milliseconds period,
@@ -99,14 +99,14 @@ nx::db::DBResult PersistentScheduler::subscribe(
         { params, period, std::chrono::steady_clock::now() });
 }
 
-nx::db::DBResult PersistentScheduler::subscribe(
-    nx::db::QueryContext* queryContext,
+nx::utils::db::DBResult PersistentScheduler::subscribe(
+    nx::utils::db::QueryContext* queryContext,
     const QnUuid& functorId,
     QnUuid* outTaskId,
     const ScheduleTaskInfo& taskInfo)
 {
     auto dbResult = m_dbHelper->subscribe(queryContext, functorId, outTaskId, taskInfo);
-    if (dbResult != nx::db::DBResult::ok)
+    if (dbResult != nx::utils::db::DBResult::ok)
     {
         NX_LOG(lit("[Scheduler] Failed to subscribe. Functor id: %1")
             .arg(functorId.toString()), cl_logERROR);
@@ -114,15 +114,15 @@ nx::db::DBResult PersistentScheduler::subscribe(
     }
 
     addTimer(functorId, *outTaskId, taskInfo);
-    return nx::db::DBResult::ok;
+    return nx::utils::db::DBResult::ok;
 }
 
-nx::db::DBResult PersistentScheduler::unsubscribe(
-    nx::db::QueryContext* queryContext,
+nx::utils::db::DBResult PersistentScheduler::unsubscribe(
+    nx::utils::db::QueryContext* queryContext,
     const QnUuid& taskId)
 {
     auto dbResult = m_dbHelper->unsubscribe(queryContext, taskId);
-    if (dbResult != nx::db::DBResult::ok)
+    if (dbResult != nx::utils::db::DBResult::ok)
     {
         NX_LOG(lit("[Scheduler] Failed to unsubscribe. Task id: %1")
             .arg(taskId.toString()), cl_logERROR);
@@ -131,7 +131,7 @@ nx::db::DBResult PersistentScheduler::unsubscribe(
 
     removeTimer(taskId);
 
-    return nx::db::DBResult::ok;
+    return nx::utils::db::DBResult::ok;
 }
 
 void PersistentScheduler::removeTimer(const QnUuid& taskId)
@@ -224,13 +224,13 @@ void PersistentScheduler::timerFunction(
     }
 
     m_sqlExecutor->executeUpdate(
-        [this, receiver, params, functorId, taskId](nx::db::QueryContext* queryContext)
+        [this, receiver, params, functorId, taskId](nx::utils::db::QueryContext* queryContext)
         {
             return receiver->persistentTimerFired(taskId, params)(queryContext);
         },
-        [this](nx::db::QueryContext*, nx::db::DBResult result)
+        [this](nx::utils::db::QueryContext*, nx::utils::db::DBResult result)
         {
-            if (result != nx::db::DBResult::ok)
+            if (result != nx::utils::db::DBResult::ok)
             {
                 NX_LOG(lit("[Scheduler] Use on timer callback returned error %1")
                    .arg(toString(result)), cl_logERROR);

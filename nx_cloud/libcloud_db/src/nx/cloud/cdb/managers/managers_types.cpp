@@ -11,28 +11,28 @@
 namespace nx {
 namespace cdb {
 
-api::ResultCode dbResultToApiResult( nx::db::DBResult dbResult )
+api::ResultCode dbResultToApiResult( nx::utils::db::DBResult dbResult )
 {
     switch( dbResult )
     {
-        case nx::db::DBResult::ok:
+        case nx::utils::db::DBResult::ok:
             return api::ResultCode::ok;
 
-        case nx::db::DBResult::notFound:
+        case nx::utils::db::DBResult::notFound:
             return api::ResultCode::notFound;
 
-        case nx::db::DBResult::cancelled:
+        case nx::utils::db::DBResult::cancelled:
             return api::ResultCode::retryLater;
 
-        case nx::db::DBResult::ioError:
-        case nx::db::DBResult::statementError:
-        case nx::db::DBResult::connectionError:
+        case nx::utils::db::DBResult::ioError:
+        case nx::utils::db::DBResult::statementError:
+        case nx::utils::db::DBResult::connectionError:
             return api::ResultCode::dbError;
 
-        case nx::db::DBResult::retryLater:
+        case nx::utils::db::DBResult::retryLater:
             return api::ResultCode::retryLater;
 
-        case nx::db::DBResult::uniqueConstraintViolation:
+        case nx::utils::db::DBResult::uniqueConstraintViolation:
             return api::ResultCode::alreadyExists;
     }
 

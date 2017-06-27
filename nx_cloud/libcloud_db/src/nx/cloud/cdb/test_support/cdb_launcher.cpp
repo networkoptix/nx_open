@@ -27,7 +27,7 @@ namespace cdb {
 // CdbLauncher
 
 CdbLauncher::CdbLauncher(QString tmpDir):
-    db::test::TestWithDbHelper("cdb", tmpDir),
+    nx::utils::db::test::TestWithDbHelper("cdb", tmpDir),
     m_port(0),
     m_connectionFactory(createConnectionFactory(), &destroyConnectionFactory)
 {
@@ -41,8 +41,7 @@ CdbLauncher::CdbLauncher(QString tmpDir):
     const auto dbConnectionOptionsToUse = dbConnectionOptions();
 
     addArg("-db/driverName");
-    addArg(QnLexical::serialized<nx::db::RdbmsDriverType>(
-        dbConnectionOptionsToUse.driverType).toLatin1().constData());
+    addArg(toString(dbConnectionOptionsToUse.driverType));
 
     if (!dbConnectionOptionsToUse.hostName.isEmpty())
     {
@@ -924,14 +923,14 @@ api::ResultCode CdbLauncher::getStatistics(api::Statistics* const statistics)
 
 bool CdbLauncher::isStartedWithExternalDb() const
 {
-    const nx::db::ConnectionOptions connectionOptions = dbConnectionOptions();
+    const nx::utils::db::ConnectionOptions connectionOptions = dbConnectionOptions();
     return !connectionOptions.dbName.isEmpty();
 }
 
 bool CdbLauncher::placePreparedDB(const QString& dbDumpPath)
 {
     //starting with old db
-    const nx::db::ConnectionOptions connectionOptions = dbConnectionOptions();
+    const nx::utils::db::ConnectionOptions connectionOptions = dbConnectionOptions();
     if (!connectionOptions.dbName.isEmpty())
         return false; //test is started with external DB: ignoring
 

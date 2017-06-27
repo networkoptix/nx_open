@@ -1,8 +1,8 @@
 #pragma once
 
-#include <utils/db/query_context.h>
-#include <utils/db/types.h>
-#include <utils/db/db_structure_updater.h>
+#include <nx/utils/db/query_context.h>
+#include <nx/utils/db/types.h>
+#include <nx/utils/db/db_structure_updater.h>
 #include <nx/utils/uuid.h>
 #include "persistent_scheduler_common.h"
 
@@ -12,18 +12,18 @@ namespace cdb {
 class AbstractSchedulerDbHelper
 {
 public:
-    virtual nx::db::DBResult getScheduleData(
-        nx::db::QueryContext* queryContext,
+    virtual nx::utils::db::DBResult getScheduleData(
+        nx::utils::db::QueryContext* queryContext,
         ScheduleData* scheduleData) const = 0;
 
-    virtual nx::db::DBResult subscribe(
-        nx::db::QueryContext* queryContext,
+    virtual nx::utils::db::DBResult subscribe(
+        nx::utils::db::QueryContext* queryContext,
         const QnUuid& functorId,
         QnUuid* outTaskId,
         const ScheduleTaskInfo& taskInfo) = 0;
 
-    virtual nx::db::DBResult unsubscribe(
-        nx::db::QueryContext* queryContext,
+    virtual nx::utils::db::DBResult unsubscribe(
+        nx::utils::db::QueryContext* queryContext,
         const QnUuid& taskId) = 0;
 
 };
@@ -31,26 +31,26 @@ public:
 class SchedulerDbHelper : public AbstractSchedulerDbHelper
 {
 public:
-    SchedulerDbHelper(nx::db::AbstractAsyncSqlQueryExecutor* sqlExecutor);
+    SchedulerDbHelper(nx::utils::db::AbstractAsyncSqlQueryExecutor* sqlExecutor);
 
     bool initDb();
 
-    virtual nx::db::DBResult getScheduleData(
-        nx::db::QueryContext* queryContext,
+    virtual nx::utils::db::DBResult getScheduleData(
+        nx::utils::db::QueryContext* queryContext,
         ScheduleData* scheduleData) const override;
 
-    virtual nx::db::DBResult subscribe(
-        nx::db::QueryContext* queryContext,
+    virtual nx::utils::db::DBResult subscribe(
+        nx::utils::db::QueryContext* queryContext,
         const QnUuid& functorId,
         QnUuid* outTaskId,
         const ScheduleTaskInfo& taskInfo) override;
 
-    virtual nx::db::DBResult unsubscribe(
-        nx::db::QueryContext* queryContext,
+    virtual nx::utils::db::DBResult unsubscribe(
+        nx::utils::db::QueryContext* queryContext,
         const QnUuid& taskId) override;
 
 private:
-    nx::db::DbStructureUpdater m_dbStructureUpdater;
+    nx::utils::db::DbStructureUpdater m_dbStructureUpdater;
 };
 
 } // namespace cdb

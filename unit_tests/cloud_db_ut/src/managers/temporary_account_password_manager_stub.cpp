@@ -21,12 +21,12 @@ void TemporaryAccountPasswordManagerStub::registerTemporaryCredentials(
 {
 }
 
-nx::db::DBResult TemporaryAccountPasswordManagerStub::fetchTemporaryCredentials(
-    nx::db::QueryContext* const /*queryContext*/,
+nx::utils::db::DBResult TemporaryAccountPasswordManagerStub::fetchTemporaryCredentials(
+    nx::utils::db::QueryContext* const /*queryContext*/,
     const data::TemporaryAccountCredentials& /*tempPasswordData*/,
     data::Credentials* /*credentials*/)
 {
-    return nx::db::DBResult::notFound;
+    return nx::utils::db::DBResult::notFound;
 }
 
 void TemporaryAccountPasswordManagerStub::addRandomCredentials(
@@ -34,20 +34,20 @@ void TemporaryAccountPasswordManagerStub::addRandomCredentials(
 {
 }
 
-nx::db::DBResult TemporaryAccountPasswordManagerStub::registerTemporaryCredentials(
-    nx::db::QueryContext* const /*queryContext*/,
+nx::utils::db::DBResult TemporaryAccountPasswordManagerStub::registerTemporaryCredentials(
+    nx::utils::db::QueryContext* const /*queryContext*/,
     data::TemporaryAccountCredentials tempPasswordData)
 {
     m_registeredCredentials.push_back(tempPasswordData);
-    return nx::db::DBResult::ok;
+    return nx::utils::db::DBResult::ok;
 }
 
-nx::db::DBResult TemporaryAccountPasswordManagerStub::removeTemporaryPasswordsFromDbByAccountEmail(
-    nx::db::QueryContext* const /*queryContext*/,
+nx::utils::db::DBResult TemporaryAccountPasswordManagerStub::removeTemporaryPasswordsFromDbByAccountEmail(
+    nx::utils::db::QueryContext* const /*queryContext*/,
     std::string /*accountEmail*/)
 {
     // TODO
-    return nx::db::DBResult::ok;
+    return nx::utils::db::DBResult::ok;
 }
 
 void TemporaryAccountPasswordManagerStub::removeTemporaryPasswordsFromCacheByAccountEmail(
