@@ -1267,11 +1267,9 @@ ScaleManager.prototype.zoom = function(zoomValue){ // Get or set zoom value (fro
 
     this.updateCurrentInterval();
 };
-ScaleManager.prototype.zoomAroundDate = function(zoomValue, aroundDate){
-    var anchorDate = this.anchorDate;
-    this.tryToRestoreAnchorDate(aroundDate); // try to set new anchorDate
+ScaleManager.prototype.zoomAroundPoint = function(zoomValue, coordinate){
+    this.setAnchorCoordinate(coordinate); // try to set new anchorDate
     this.zoom(zoomValue);                    // zoom and update visible interval
-    this.tryToRestoreAnchorDate(anchorDate); // try to restore anchorDate
 };
 
 ScaleManager.prototype.lastMinute = function(){

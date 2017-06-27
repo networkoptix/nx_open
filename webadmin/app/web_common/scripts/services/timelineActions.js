@@ -171,9 +171,13 @@ TimelineActions.prototype.scrollByPixels = function(pixels){
 
 // Main zoom function - handle zoom logic, animations, etc
 // gets absolute zoom value - to target level from 0 to 1
-TimelineActions.prototype.zoomTo = function(zoomTarget, zoomDate, instant, linear){
+TimelineActions.prototype.zoomTo = function(zoomTarget, zoomCoordinate, instant, linear){
     var self = this;
     zoomTarget = this.scaleManager.boundZoom(zoomTarget);
+
+    if(typeof(zoomCoordinate)=='undefined'){
+        zoomCoordinate = this.scaleManager.viewportWidth/2;
+    }
 
     var zoom = self.scaleManager.zoom();
     if(zoom == zoomTarget){
@@ -226,14 +230,12 @@ TimelineActions.prototype.zoomTo = function(zoomTarget, zoomDate, instant, linea
 
 
     function setZoom(value){
-        if (zoomDate) {
-            self.scaleManager.zoomAroundDate(
-                value,
-                zoomDate
-            );
-        } else {
-            self.scaleManager.zoom(value);
-        }
+
+    // Actually, we'd better use zoom around coordinate instead of date?
+        self.scaleManager.zoomAroundPoint(
+            value,
+            zoomCoordinate
+        );
         self.scaleManager.checkZoomAsync().then(function(){
             // TODO: here we need to apply the change to scope - call digest if anything changed
             self.scope.$digest();
@@ -260,7 +262,7 @@ TimelineActions.prototype.zoomTo = function(zoomTarget, zoomDate, instant, linea
 
 // Relative zoom (incremental)
 TimelineActions.prototype.zoom = function(zoomIn){
-    var zoomDate = null;
+    var zoomCoordinate = this.scaleManager.viewportWidth/2;
     /*
         We need zoomDate here:
         On press on zoom buttons the following point on timeline should (usually, see exceptions) keep its position:
@@ -271,7 +273,7 @@ TimelineActions.prototype.zoom = function(zoomIn){
         Exception - if playback is on "LIVE" then treat it like timemarker on specific point
     */
     var zoomTarget = this.scaleManager.zoom() - (zoomIn ? 1 : -1) * this.timelineConfig.slowZoomSpeed;
-    this.zoomTo(zoomTarget, zoomDate, false, false);
+    this.zoomTo(zoomTarget, zoomCoordinate, false, false);
 };
 
 // Continuus zooming - every render
@@ -319,15 +321,17 @@ TimelineActions.prototype.zoomByWheel = function(clicks, mouseOverElements, mous
         this.zoomByWheelTarget = this.scaleManager.boundZoom(this.zoomByWheelTarget);
     }
 
+    // Actually, we'd better use zoom coordinate instead of date?
+
     // Get anchor date for zoom
-    var zoomDate = this.scaleManager.screenCoordinateToDate(mouseXOverTimeline);
+    var zoomCoordinate = mouseXOverTimeline;
     if(mouseOverElements.rightBorder){ // Close to right border - use right visible end date
-        zoomDate = this.scaleManager.visibleEnd;
+        zoomCoordinate = this.scaleManager.viewportWidth;
     }
     if(mouseOverElements.leftBorder){ // Close to left border - use left visible end date
-        zoomDate = this.scaleManager.visibleStart;
+        zoomCoordinate = 0;
     }
-    this.zoomTo(this.zoomByWheelTarget, zoomDate, window.jscd.touch);
+    this.zoomTo(this.zoomByWheelTarget, zoomCoordinate, window.jscd.touch);
 };
 
 /* / End of Zoom logic */
