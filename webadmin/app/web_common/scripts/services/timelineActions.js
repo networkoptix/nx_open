@@ -166,7 +166,11 @@ TimelineActions.prototype.scrollByPixels = function(pixels){
     this.delayWatchingPlayingPosition();   
 };
 
-//Absolute zoom - to target level from 0 to 1
+
+/* Zoom logic */
+
+// Main zoom function - handle zoom logic, animations, etc
+// gets absolute zoom value - to target level from 0 to 1
 TimelineActions.prototype.zoomTo = function(zoomTarget, zoomDate, instant, linear){
     var self = this;
     zoomTarget = this.scaleManager.boundZoom(zoomTarget);
@@ -254,48 +258,52 @@ TimelineActions.prototype.zoomTo = function(zoomTarget, zoomDate, instant, linea
     }
 };
 
-//Relative zoom (step)
-TimelineActions.prototype.zoom = function(zoomIn,slow,linear, zoomDate){
-    var zoomTarget = this.scaleManager.zoom() - (zoomIn ? 1 : -1) * (slow?this.timelineConfig.slowZoomSpeed:this.timelineConfig.zoomSpeed);
+// Relative zoom (incremental)
+TimelineActions.prototype.zoom = function(zoomIn, slow, linear, zoomDate){
+    var zoomSpeed = slow? this.timelineConfig.slowZoomSpeed : this.timelineConfig.zoomSpeed;
+    var zoomTarget = this.scaleManager.zoom() - (zoomIn ? 1 : -1) * zoomSpeed;
     this.zoomTo(zoomTarget, zoomDate, false, linear);
 };
 
-
-
+// Continuus zooming - every render
 TimelineActions.prototype.zoomingRenew = function(){ // renew zooming
-    if(this.zoomingNow) {
-        this.zoom(this.zoomingIn, true, false);
+    if(this.zoomingNow) { // If continuous zooming is on
+        this.zoom(this.zoomingIn, true, false); // Do incremental slow zoom
     }
 };
 
+// Release zoom button - stop continuus zooming
 TimelineActions.prototype.zoomingStop = function() {
-    if( this.zoomingNow) {
-        this.zoomingNow = false;
-        this.zoom( this.zoomingIn, true, true);
+    if( this.zoomingNow) { // If continuous zooming is on
+        this.zoomingNow = false; //  Stop continuous zooming
+        this.zoom(this.zoomingIn, true, true); // Do last zoom iteration instantly
     }
 };
 
+// Press zoom button - start continuus zooming
 TimelineActions.prototype.zoomingStart = function(zoomIn) {
+    // check if we can start zooming in that direction:
     if(this.scaleManager.disableZoomOut&&!zoomIn || this.scaleManager.disableZoomIn&&zoomIn){
         return;
     }
 
-    this.zoomingNow = true;
-    this.zoomingIn = zoomIn;
+    this.zoomingNow = true; // Start continuous zooming
+    this.zoomingIn = zoomIn; // Set continuous zooming direction
 
-    this.zoomingRenew();
+    // this.zoomingRenew();
 };
 
+// Double click zoom out button - zoom out completely
 TimelineActions.prototype.fullZoomOut = function(){
-    this.zoomingStop();
-    this.zoomTo(1);
+    this.zoomingStop(); // stop slow zooming
+    this.zoomTo(1); // zoom out completely
 };
 
+// Zoom by wheel logic - slighly different for Mac and Win (Mac does smooth scroll on OS level, Win - does not
 TimelineActions.prototype.zoomByWheel = function(clicks, mouseOverElements, mouseXOverTimeline){
+    var zoom = this.scaleManager.zoom(); // Get instant zoom level
 
-    var zoom = this.scaleManager.zoom();
-
-    if(window.jscd.touch ) {
+    if(window.jscd.touch) { // Mac support - touchpad, clicks changes smoothly
         this.zoomByWheelTarget = zoom - clicks / this.timelineConfig.maxVerticalScrollForZoomWithTouch;
     }else{
         // We need to smooth zoom here
@@ -307,24 +315,26 @@ TimelineActions.prototype.zoomByWheel = function(clicks, mouseOverElements, mous
         this.zoomByWheelTarget = this.scaleManager.boundZoom(this.zoomByWheelTarget);
     }
 
+    // Get anchor date for zoom
     var zoomDate = this.scaleManager.screenCoordinateToDate(mouseXOverTimeline);
-    if(mouseOverElements.rightBorder && !mouseOverElements.rightButton){
-        zoomDate = this.scaleManager.end;
+    if(mouseOverElements.rightBorder){ // Close to right border - use right visible end date
+        zoomDate = this.scaleManager.visibleEnd;
     }
-    if(mouseOverElements.leftBorder && !mouseOverElements.leftButton){
-        zoomDate = this.scaleManager.start;
+    if(mouseOverElements.leftBorder){ // Close to left border - use left visible end date
+        zoomDate = this.scaleManager.visibleStart;
     }
-
     this.zoomTo(this.zoomByWheelTarget, zoomDate, window.jscd.touch);
 };
 
+/* / End of Zoom logic */
+
+
+// Update timeline state - process animations every render
 TimelineActions.prototype.updateState = function(){
     this.updatePosition();
     this.zoomingRenew();
     this.scrollingRenew();
 };
-
-
 
 TimelineActions.prototype.scrollbarSliderDragStart = function(mouseX){
     this.scaleManager.stopWatching();
