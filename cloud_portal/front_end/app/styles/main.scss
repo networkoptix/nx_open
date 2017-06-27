@@ -175,6 +175,13 @@ footer {
 
 }
 
+a.disabled {
+  /* Make the disabled links grayish*/
+  color: gray;
+  /* And disable the pointer events */
+  pointer-events: none;
+}
+
 .warning-label{
     color: $brand-danger;
 }
@@ -235,10 +242,9 @@ footer {
 .no-data-panel
 {
   width:100%;
-  height:100%;
   z-index:100;
 
-  min-height: 100px;
+  height: 100px;
 
   text-align: center;
 

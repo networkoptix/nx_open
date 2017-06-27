@@ -41,9 +41,9 @@ files:
     dest: '/Mobile/mobile_client_qml.ts'
     translation: '/client/mobile_client/translations/mobile_client_qml_%locale_with_underscore%.ts'
   -
-    source: '/wixsetup/maven/filter-resources/OptixTheme_en_US.wxl'
+    source: '/wixsetup/maven/bin-resources/OptixTheme_en_US.wxl'
     dest: '/Installer/OptixTheme.wxl'
-    translation: '/wixsetup/maven/filter-resources/OptixTheme_%locale_with_underscore%.wxl'
+    translation: '/wixsetup/maven/bin-resources/OptixTheme_%locale_with_underscore%.wxl'
   -
     source: '/webadmin/app/language.json'
     translation: '/webadmin/translations/%locale_with_underscore%/language.json'

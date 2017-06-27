@@ -53,6 +53,12 @@ public:
         const nx_http::StringType& contentType,
         nx_http::StringType messageBody);
 
+    /**
+     * Return on receiving response.
+     * @return True if response has been received.
+     */
+    bool doDelete(const QUrl& url);
+
     const Response* response() const;
     SystemError::ErrorCode lastSysErrorCode() const;
     bool isValid() const;

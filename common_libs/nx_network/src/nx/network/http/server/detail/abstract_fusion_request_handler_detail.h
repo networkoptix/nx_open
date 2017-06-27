@@ -223,7 +223,7 @@ private:
         Input inputData;
         if (!this->template parseAnyFusionFormat<Input>(
                 inputDataFormat,
-                request.requestLine.method == nx_http::Method::GET
+                request.requestLine.method == nx_http::Method::Get
                     ? request.requestLine.url.query().toUtf8()
                     : request.messageBody,
                 &inputData))

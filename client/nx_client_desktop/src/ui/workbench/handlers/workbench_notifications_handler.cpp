@@ -13,6 +13,7 @@
 #include <client/client_message_processor.h>
 #include <client/client_show_once_settings.h>
 
+#include <business/business_resource_validation.h>
 #include <business/business_strings_helper.h>
 
 #include <core/resource/resource.h>
@@ -146,28 +147,8 @@ void QnWorkbenchNotificationsHandler::addNotification(const QnAbstractBusinessAc
 
     if (businessAction->actionType() == QnBusiness::ShowOnAlarmLayoutAction)
     {
-        //TODO: #GDM code duplication
-        auto allowedForUser =
-            [this](const std::vector<QnUuid>& ids)
-            {
-                if (ids.empty())
-                    return true;
-
-                auto user = context()->user();
-                if (!user)
-                    return false;
-
-                if (std::find(ids.cbegin(), ids.cend(), user->getId()) != ids.cend())
-                    return true;
-
-                auto roleId = user->userRoleId();
-                return !roleId.isNull()
-                    && std::find(ids.cbegin(), ids.cend(), roleId) != ids.cend();
-            };
-
-
         /* Skip action if it contains list of users, and we are not on the list. */
-        if (!allowedForUser(businessAction->getParams().additionalResources))
+        if (!QnBusiness::actionAllowedForUser(businessAction->getParams(), context()->user()))
             return;
     }
 
@@ -390,24 +371,7 @@ void QnWorkbenchNotificationsHandler::at_eventManager_connectionClosed()
 void QnWorkbenchNotificationsHandler::at_eventManager_actionReceived(
     const QnAbstractBusinessActionPtr& businessAction)
 {
-    const auto isTargetUser =
-        [this, &businessAction]() -> bool
-        {
-            const auto& subjects = businessAction->getParams().additionalResources;
-            if (subjects.empty())
-                return true; //< All users.
-
-            const auto currentUser = context()->user();
-            const auto currentUserId = currentUser->getId();
-
-            if (std::find(subjects.cbegin(), subjects.cend(), currentUserId) != subjects.cend())
-                return true;
-
-            const auto roleId = QnUserRolesManager::unifiedUserRoleId(currentUser);
-            return std::find(subjects.cbegin(), subjects.cend(), roleId) != subjects.cend();
-        };
-
-    if (!isTargetUser())
+    if (!QnBusiness::actionAllowedForUser(businessAction->getParams(), context()->user()))
         return;
 
     switch (businessAction->actionType())

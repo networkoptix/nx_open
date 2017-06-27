@@ -112,7 +112,7 @@ CameraDiagnostics::Result QnHikvisionOnvifResource::initialize2WayAudio()
         if (hikTransmitter)
         {
             hikTransmitter->setChannelId(channel->id);
-            hikTransmitter->setAudioUploadHttpMethod(nx_http::Method::PUT);
+            hikTransmitter->setAudioUploadHttpMethod(nx_http::Method::Put);
         }
 
         setCameraCapabilities(getCameraCapabilities() | Qn::AudioTransmitCapability);
