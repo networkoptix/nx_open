@@ -5,10 +5,12 @@ from rest_framework.response import Response
 from django.core.exceptions import PermissionDenied
 from django.shortcuts import render
 from cloud import settings
+from datetime import datetime
 
 from .forms import *
 from .controllers.filldata import fill_content
 from api.models import Account
+from notifications.tasks import send_email
 
 
 def update_data_records_for_context(customization, language, data_structures, request_data, user, version=None):
@@ -47,7 +49,6 @@ def page_edit_view(request):
 	preview_link = ""
 	post_made = False
 	if request.method == "POST":
-		post_made = True
 		request_data = request.data
 
 		context_id = request_data['context']
@@ -61,30 +62,36 @@ def page_edit_view(request):
 		user = Account.objects.get(email=request.user)
 		
 		if 'GetDataStructures' in request_data:
+			post_made = True
 			form.add_fields(context)
 
 		elif 'SaveDraft' in request_data and check_if_form_touched(request_data, 'SaveDraft'):
 				update_data_records_for_context(customization, language, context.datastructure_set.all(), request_data, user)
 
 		elif 'Preview' in request_data:
-			fill_content(customization_name=settings.CUSTOMIZATION)
+			version_id = ContentVersion.objects.latest('created_date').id
+
+			fill_content(customization_name=settings.CUSTOMIZATION, version_id=version_id)
 			preview_link = context.url + "?preview"
 
-		elif 'SendReview' in request_data:
-
-			if check_if_form_touched(request_data, 'Review'):
-				version = ContentVersion(customization=customization, name="N/A", created_by=user)
-				version.save()
+		elif 'SendReview' in request_data and check_if_form_touched(request_data, 'Review'):
+			version = ContentVersion(customization=customization, name="N/A", created_by=user)
+			version.save()
 			
 			update_data_records_for_context(customization, language, context.datastructure_set.all(), request_data, user, version)
-			#send email notification??????
-			#to whom, what is the type, what is the message, customization
-			#TODO add notification need to make template for this, to whom will be all super users for the time being
+			#TODO add notification need to make template for this
+			'''super_users = Account.objects.filter(is_superuser).all()
+			for user in super_users:
+				send_email(user.email, "version_ready_to_publish","",settings.CUSTOMIZATION)'''
 
 		elif 'Publish' in request.data:
-			#Add logic for accepting latest version and updating versions on unapproved builds
-			#Add logic to purge old and unaccepted records
-			filldata(customization_name=settings.CUSTOMIZATION, preview=False)
+			unaccepted_versions = ContentVersion.objects.filter(accepted_date=None).all()
+			for version in unaccepted_versions:
+				version.accepted_by = user;
+				version.accepted_date = datetime.now()
+				version.save()
+
+			fill_content(customization_name=settings.CUSTOMIZATION, preview=False)
 
 
 	return render(request, 'page_edit_form.html', {'form': form, 'post_made': post_made, 'preview_link': preview_link})
