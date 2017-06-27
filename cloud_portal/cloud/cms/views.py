@@ -80,12 +80,12 @@ def page_edit_view(request):
 			
 			update_data_records_for_context(customization, language, context.datastructure_set.all(), request_data, user, version)
 			#TODO add notification need to make template for this
-			'''super_users = Account.objects.filter(is_superuser).all()
+			'''super_users = Account.objects.filter(is_superuser)
 			for user in super_users:
 				send_email(user.email, "version_ready_to_publish","",settings.CUSTOMIZATION)'''
 
 		elif 'Publish' in request.data:
-			unaccepted_versions = ContentVersion.objects.filter(accepted_date=None).all()
+			unaccepted_versions = ContentVersion.objects.filter(accepted_date=None)
 			for version in unaccepted_versions:
 				version.accepted_by = user;
 				version.accepted_date = datetime.now()
