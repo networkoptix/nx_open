@@ -245,18 +245,21 @@ TimelineActions.prototype.zoomTo = function(zoomTarget, zoomCoordinate, instant)
 
 
     if(!instant) {
-        if(!self.zoomTarget) {
-            self.zoomTarget = self.scaleManager.zoom();
+        if(!self.scope.zoomTarget) {
+            self.scope.zoomTarget = self.scaleManager.zoom();
         }
 
         self.delayWatchingPlayingPosition();
         self.animateScope.animate(self.scope, 'zoomTarget', zoomTarget, 'dryResistance').then(
-            function () {},
+            function () {
+                self.zoomByWheelTarget = 0; // When animation if over - clean zoomByWheelTarget
+            },
             function () {},
             setZoom);
     }else{
         setZoom(zoomTarget);
-        self.zoomTarget = self.scaleManager.zoom();
+        self.scope.zoomTarget = self.scaleManager.zoom();
+        self.zoomByWheelTarget = 0;
     }
 };
 
@@ -293,6 +296,11 @@ TimelineActions.prototype.zoomingRenew = function(){ // renew zooming
 // Release zoom button - stop continuus zooming
 TimelineActions.prototype.zoomingStop = function() {
     this.zoomingNow = false; //  Stop continuous zooming
+    this.zoomByWheelTarget = 0;
+    var animation = this.animateScope.animating(self.scope, 'zoomTarget');
+    if(animation){
+        animation.breakAnimation();
+    }
 };
 
 // Press zoom button - start continuus zooming
@@ -315,8 +323,8 @@ TimelineActions.prototype.fullZoomOut = function(){
 // Zoom by wheel logic - slighly different for Mac and Win (Mac does smooth scroll on OS level, Win - does not
 TimelineActions.prototype.zoomByWheel = function(clicks, mouseOverElements, mouseXOverTimeline){
     var zoom = this.scaleManager.zoom(); // Get instant zoom level
-
     if(window.jscd.touch) { // Mac support - touchpad, clicks changes smoothly
+        this.zoomingStop(); // Stop all previous zoom animations
         this.zoomByWheelTarget = zoom - clicks / this.timelineConfig.maxVerticalScrollForZoomWithTouch;
     }else{
         // We need to smooth zoom here
