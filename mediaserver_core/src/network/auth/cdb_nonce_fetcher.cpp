@@ -150,11 +150,15 @@ bool CdbNonceFetcher::isValidCloudNonce(const QByteArray& nonce) const
         const std::string cloudNonceBase(nonce.constData(), nonce.size() - kNonceTrailerLength);
         const auto cloudSystemCredentials = m_cloudConnectionManager->getSystemCredentials();
         if (!cloudSystemCredentials)
+        {
+            NX_VERBOSE(this, "NO cloud system credentials");
             return false;   //we can't say if that nonce is ok for us
+        }
         return nx::cdb::api::isValidCloudNonceBase(
             cloudNonceBase,
             cloudSystemCredentials->systemId.constData());
     }
+    NX_VERBOSE(this, "Nonce size < trailer size or trailer is not magic");
     return false;
 }
 
