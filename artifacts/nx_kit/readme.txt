@@ -32,3 +32,18 @@ symbol visibility if compiled as a dynamic library. See its usage in "nx_kit.cma
 
 Tests for these utils are located in the "test" folder, and should not be deployed to the artifact.
 The test project can be built and run on Linux or Windows with Cygwin, using cmake or CLion IDE.
+
+To build and run tests on Linux, with CMake version >= 3.3.2, g++ version 4.8.4:
+
+# Make a folder for build results.
+mkdir .../nx_kit-build
+cd .../nx_kit-build
+
+# Generate Makefiles.
+cmake .../nx_open/artifacts/nx_kit
+
+# Compile and link.
+cmake --build .
+
+# Run tests.
+./nx_kit_test
