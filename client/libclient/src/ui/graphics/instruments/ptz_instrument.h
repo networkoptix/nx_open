@@ -177,5 +177,8 @@ private:
     QBasicTimer m_clickTimer;
     QPointF m_clickPos;
 
+    class MovementFilter;
+    QScopedPointer<MovementFilter> m_movementFilter;
+
     QList<SplashItemAnimation> m_freeAnimations, m_activeAnimations;
 };
