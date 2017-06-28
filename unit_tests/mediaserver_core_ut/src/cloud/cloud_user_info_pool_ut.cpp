@@ -153,6 +153,12 @@ protected:
         supplier->removeUser("petya");
     }
 
+    void whenClearCalled()
+    {
+        userInfoPool.clear();
+    }
+
+
     void thenCommonNonceShouldBeNull ()
     {
         ASSERT_FALSE((bool)userInfoPool.newestMostCommonNonce());
@@ -216,6 +222,13 @@ TEST_F(CloudUserInfoPool, allUsersRemoved_nonceCleared)
 {
     given2UsersInfosWithCommonFirstNonce();
     whenAllUsersRemoved();
+    thenCommonNonceShouldBeNull();
+}
+
+TEST_F(CloudUserInfoPool, clear)
+{
+    given2UsersInfosWithCommonFirstNonce();
+    whenClearCalled();
     thenCommonNonceShouldBeNull();
 }
 

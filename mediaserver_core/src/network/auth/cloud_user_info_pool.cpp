@@ -300,3 +300,11 @@ void CloudUserInfoPool::userInfoRemoved(const nx::Buffer& userName)
     removeInfoForUser(userName);
     updateNonce();
 }
+
+void CloudUserInfoPool::clear()
+{
+    QnMutexLocker lock(&m_mutex);
+    NX_VERBOSE(this, "Removing all users info");
+    m_nonce.clear();
+    m_cloudUserInfoRecordList.clear();
+}

@@ -181,7 +181,7 @@ nx::cdb::api::ResultCode CdbNonceFetcher::initializeConnectionToCloudSync()
         return resultCode;
 
     QnMutexLocker lock(&m_mutex);
-    
+
     cloudBindingStatusChangedUnsafe(lock, true);
     saveCloudNonce(std::move(cloudNonce));
 
@@ -328,5 +328,6 @@ void CdbNonceFetcher::cloudBindingStatusChangedUnsafe(
 void CdbNonceFetcher::cloudBindingStatusChanged(bool boundToCloud)
 {
     QnMutexLocker lock(&m_mutex);
+    m_cloudUserInfoPool.clear();
     cloudBindingStatusChangedUnsafe(lock, boundToCloud);
 }
