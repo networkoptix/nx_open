@@ -114,7 +114,7 @@ Rectangle
                     {
                         target: grid;
                         property: "opacity";
-                        duration: 200;
+                        duration: 220;
                         easing.type: Easing.Linear;
                         to: 0;
                     }
@@ -128,7 +128,7 @@ Rectangle
                     {
                         target: grid;
                         property: "opacity";
-                        duration: 200;
+                        duration: 220;
                         easing.type: Easing.Linear;
                         to: 1;
                     }
@@ -225,7 +225,7 @@ Rectangle
                     {
                         if (grid.model)
                         {
-                            grid.setPage(0);
+                            pageSwitcher.setPage(0);
                             searchEdit.clear();
                         }
 

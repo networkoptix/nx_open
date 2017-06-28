@@ -265,13 +265,13 @@ void QnSortFilterListModelPrivate::handleSourceRowsMoved(
     const QModelIndex& destination,
     int /* row */)
 {
+    // TODO: #ynikitenkov support handling of moving items
+    NX_ASSERT(false, "QnSortFilterListModel does not handle moves yet");
     NX_ASSERT(!parent.isValid() && !destination.isValid(),
         "QnSortFilterListModel works only with flat lists models");
     if (parent.isValid() || destination.isValid())
         return;
 
-    // TODO: #ynikitenkov support handling of moving items
-    NX_ASSERT(false, "QnSortFilterListModel does not handle moves yet");
 }
 
 void QnSortFilterListModelPrivate::handleSourceDataChanged(
