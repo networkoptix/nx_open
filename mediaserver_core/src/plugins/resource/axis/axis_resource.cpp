@@ -1293,14 +1293,14 @@ void QnPlAxisResource::notificationReceived( const nx_http::ConstBufferRefType& 
 
     //notification
     size_t sepPos = nx_http::find_first_of( notification, ":" );
-    if (sepPos == nx_http::BufferNpos || sepPos+1 >= notification.size())
+    if (sepPos == nx::utils::BufferNpos || sepPos+1 >= notification.size())
     {
         NX_LOG( lit("Error parsing notification %1 from %2. Event type not found").arg(QLatin1String((QByteArray)notification)).arg(getUrl()), cl_logINFO );
         return;
     }
     const char eventType = notification[sepPos+1];
-    size_t portTypePos = nx_http::find_first_not_of( notification, "0123456789" );
-    if (portTypePos == nx_http::BufferNpos)
+    size_t portTypePos = nx::utils::find_first_not_of( notification, "0123456789" );
+    if (portTypePos == nx::utils::BufferNpos)
     {
         NX_LOG( lit("Error parsing notification %1 from %2. Port type not found").arg(QLatin1String((QByteArray)notification)).arg(getUrl()), cl_logINFO );
         return;
