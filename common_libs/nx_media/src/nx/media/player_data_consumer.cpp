@@ -429,6 +429,19 @@ AVCodecID PlayerDataConsumer::currentCodec() const
     return AV_CODEC_ID_NONE;
 }
 
+std::vector<AbstractVideoDecoder*> PlayerDataConsumer::currentVideoDecoders() const
+{
+    std::vector<AbstractVideoDecoder*> result;
+
+    for (const auto& videoDecoder: m_videoDecoders)
+    {
+        if (const auto decoder = videoDecoder->currentDecoder())
+            result.push_back(decoder);
+    }
+
+    return result;
+}
+
 void PlayerDataConsumer::setVideoGeometryAccessor(VideoGeometryAccessor videoGeometryAccessor)
 {
     NX_ASSERT(videoGeometryAccessor);

@@ -60,11 +60,11 @@ void QnWorkbenchPtzCameraWatcher::at_resourcePool_resourceRemoved(const QnResour
 
 void QnWorkbenchPtzCameraWatcher::at_resource_ptzCapabilitiesChanged(const QnResourcePtr &resource)
 {
-    if(QnVirtualCameraResourcePtr camera = resource.dynamicCast<QnVirtualCameraResource>()) {
-        if(resource->getPtzCapabilities() != Qn::NoPtzCapabilities) {
+    if(QnVirtualCameraResourcePtr camera = resource.dynamicCast<QnVirtualCameraResource>())
+    {
+        if(resource->getPtzCapabilities())
             addPtzCamera(camera);
-        } else {
+        else
             removePtzCamera(camera);
-        }
     }
 }

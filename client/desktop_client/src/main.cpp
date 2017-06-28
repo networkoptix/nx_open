@@ -63,7 +63,6 @@
 #endif
 
 #include <utils/common/app_info.h>
-#include <utils/common/util.h>
 #include <utils/common/command_line_parser.h>
 #include <utils/common/waiting_for_qthread_to_empty_event_queue.h>
 
@@ -77,10 +76,8 @@ namespace
 
 #ifndef API_TEST_MAIN
 
-int runApplication(QtSingleApplication* application, int argc, char **argv)
+int runApplication(QtSingleApplication* application, const QnStartupParameters& startupParams)
 {
-    const QnStartupParameters startupParams = QnStartupParameters::fromCommandLineArg(argc, argv);
-
     const bool allowMultipleClientInstances = startupParams.allowMultipleClientInstances
         || !startupParams.customUri.isNull()
         || !startupParams.videoWallGuid.isNull();
@@ -107,15 +104,10 @@ int runApplication(QtSingleApplication* application, int argc, char **argv)
         manager->post(request, QJsonDocument(data).toJson(QJsonDocument::Compact));
     }
 
-
     if (!allowMultipleClientInstances)
     {
-        QString argsMessage;
-        for (int i = 1; i < argc; ++i)
-            argsMessage += fromNativePath(QFile::decodeName(argv[i])) + QLatin1Char('\n');
-
         /* Check if application is already running. */
-        if (application->isRunning() && application->sendMessage(argsMessage))
+        if (application->isRunning() && application->sendMessage(startupParams.files.join(L'\n')))
             return kSuccessCode;
     }
 
@@ -243,9 +235,13 @@ int main(int argc, char** argv)
     textToWaveServer->waitForStarted();
 #endif
 
-    /* These attributes must be set before application instance is created. */
-    QApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
-    QApplication::setAttribute(Qt::AA_UseHighDpiPixmaps);
+    const QnStartupParameters startupParams = QnStartupParameters::fromCommandLineArg(argc, argv);
+    if (!startupParams.hiDpiDisabled) //< Double negation to keep startup params semantics.
+    {
+        // These attributes must be set before application instance is created.
+        QApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
+        QApplication::setAttribute(Qt::AA_UseHighDpiPixmaps);
+    }
     QScopedPointer<QtSingleApplication> application(new QtSingleApplication(argc, argv));
 
     // this is necessary to prevent crashes when we want use QDesktopWidget from the non-main thread before any window has been created
@@ -265,7 +261,7 @@ int main(int argc, char** argv)
     mac_restoreFileAccess();
 #endif
 
-    int result = runApplication(application.data(), argc, argv);
+    int result = runApplication(application.data(), startupParams);
 
 #ifdef Q_OS_MAC
     mac_stopFileAccess();

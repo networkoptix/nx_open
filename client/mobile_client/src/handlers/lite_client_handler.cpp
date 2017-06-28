@@ -7,7 +7,9 @@
 #include <common/common_module.h>
 #include <mobile_client/mobile_client_message_processor.h>
 #include <mobile_client/mobile_client_ui_controller.h>
-#include <helpers/lite_client_layout_helper.h>
+#include <nx/client/mobile/resource/lite_client_layout_helper.h>
+
+using namespace nx::client::mobile;
 
 class QnLiteClientHandlerPrivate: public QObject
 {
@@ -76,10 +78,10 @@ void QnLiteClientHandlerPrivate::at_videowallControlMessageReceived(
 
 void QnLiteClientHandlerPrivate::at_initialResourcesReceived()
 {
-    layout = QnLiteClientLayoutHelper::findLayoutForServer(videowallGuid);
+    layout = resource::LiteClientLayoutHelper::findLayoutForServer(videowallGuid);
     if (!layout)
     {
-        layout = QnLiteClientLayoutHelper::createLayoutForServer(videowallGuid);
+        layout = resource::LiteClientLayoutHelper::createLayoutForServer(videowallGuid);
 
         if (!layout)
             return;

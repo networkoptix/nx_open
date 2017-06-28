@@ -6,7 +6,7 @@ class QnCameraAccessRightsHelper : public QObject
     Q_OBJECT
     Q_PROPERTY(QString resourceId READ resourceId WRITE setResourceId NOTIFY resourceIdChanged)
     Q_PROPERTY(bool canViewArchive READ canViewArchive NOTIFY canViewArchiveChanged)
-
+    Q_PROPERTY(bool canManagePtz READ canManagePtz NOTIFY canManagePtzChanged)
 public:
     explicit QnCameraAccessRightsHelper(QObject *parent = nullptr);
     ~QnCameraAccessRightsHelper();
@@ -16,9 +16,12 @@ public:
 
     bool canViewArchive() const;
 
+    bool canManagePtz() const;
+
 signals:
     void resourceIdChanged();
     void canViewArchiveChanged();
+    void canManagePtzChanged();
 
 private:
     QScopedPointer<QnCameraAccessRightsHelperPrivate> const d_ptr;

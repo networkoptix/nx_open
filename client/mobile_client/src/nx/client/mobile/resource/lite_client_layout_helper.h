@@ -1,20 +1,22 @@
 #pragma once
 
-#include <core/resource/resource_fwd.h>
+#include <nx/client/core/resource/layout_accessor.h>
 #include <utils/common/id.h>
-#include <utils/common/connective.h>
 
-class QnLiteClientLayoutHelperPrivate;
-class QnLiteClientLayoutHelper: public Connective<QObject>
+namespace nx {
+namespace client {
+namespace mobile {
+namespace resource {
+
+class LiteClientLayoutHelper: public nx::client::core::resource::LayoutAccessor
 {
     Q_OBJECT
 
-    Q_PROPERTY(QString layoutId READ layoutId WRITE setLayoutId NOTIFY layoutChanged)
     Q_PROPERTY(QPoint displayCell READ displayCell WRITE setDisplayCell NOTIFY displayCellChanged)
     Q_PROPERTY(DisplayMode displayMode READ displayMode NOTIFY displayCellChanged)
     Q_PROPERTY(QString singleCameraId READ singleCameraId WRITE setSingleCameraId NOTIFY singleCameraIdChanged)
 
-    using base_type = Connective<QObject>;
+    using base_type = nx::client::core::resource::LayoutAccessor;
 
 public:
     enum class DisplayMode
@@ -24,14 +26,8 @@ public:
     };
     Q_ENUM(DisplayMode)
 
-    QnLiteClientLayoutHelper(QObject* parent = nullptr);
-    ~QnLiteClientLayoutHelper();
-
-    QString layoutId() const;
-    void setLayoutId(const QString& layoutId);
-
-    QnLayoutResourcePtr layout() const;
-    void setLayout(const QnLayoutResourcePtr& layout);
+    LiteClientLayoutHelper(QObject* parent = nullptr);
+    ~LiteClientLayoutHelper();
 
     QPoint displayCell() const;
     void setDisplayCell(const QPoint& cell);
@@ -48,12 +44,16 @@ public:
     static QnLayoutResourcePtr findLayoutForServer(const QnUuid& serverId);
 
 signals:
-    void layoutChanged();
     void displayCellChanged();
     void singleCameraIdChanged();
     void cameraIdChanged(int x, int y, const QString& resourceId);
 
 private:
-    Q_DECLARE_PRIVATE(QnLiteClientLayoutHelper)
-    QScopedPointer<QnLiteClientLayoutHelperPrivate> d_ptr;
+    class Private;
+    QScopedPointer<Private> d;
 };
+
+} // namespace resource
+} // namespace mobile
+} // namespace client
+} // namespace nx

@@ -123,6 +123,9 @@ void QnAudioStreamDisplay::enqueueData(QnCompressedAudioDataPtr data, qint64 min
 {
     QnMutexLocker lock(&m_audioQueueMutex);
 
+    if (!createDecoder(data))
+        return;
+
     m_lastAudioTime = data->timestamp;
     m_audioQueue.enqueue(data);
 
@@ -187,17 +190,22 @@ bool QnAudioStreamDisplay::initFormatConvertRule(QnAudioFormat format)
     return false; //< conversion rule not found
 }
 
-bool QnAudioStreamDisplay::putData(QnCompressedAudioDataPtr data, qint64 minTime)
+bool QnAudioStreamDisplay::createDecoder(const QnCompressedAudioDataPtr& data)
 {
-    QnMutexLocker lock(&m_audioQueueMutex);
-
     if (m_decoders[data->compressionType] == nullptr)
     {
         m_decoders[data->compressionType] = QnAudioDecoderFactory::createDecoder(data);
         if (m_decoders[data->compressionType] == nullptr)
             return false;
     }
+    return true;
+}
 
+bool QnAudioStreamDisplay::putData(QnCompressedAudioDataPtr data, qint64 minTime)
+{
+    QnMutexLocker lock(&m_audioQueueMutex);
+    if (!createDecoder(data))
+        return false;
 
     m_lastAudioTime = data->timestamp;
     static const int MAX_BUFFER_LEN = 3000;

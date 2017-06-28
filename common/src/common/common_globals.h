@@ -21,14 +21,14 @@ Q_OBJECT
 #endif
 QN_DECLARE_METAOBJECT_HEADER(Qn,
     Border Corner ExtrapolationMode CameraCapability PtzObjectType PtzCommand PtzDataField PtzCoordinateSpace
-    PtzCapability StreamFpsSharingMethod MotionType TimePeriodType TimePeriodContent SystemComponent
+    StreamFpsSharingMethod MotionType TimePeriodType TimePeriodContent SystemComponent
     ConnectionRole ResourceStatus BitratePerGopType
     StreamQuality SecondStreamQuality PanicMode RebuildState BackupState RecordingType PropertyDataType SerializationFormat PeerType StatisticsDeviceType
     ServerFlag BackupType StorageInitResult CameraBackupQuality CameraStatusFlag IOPortType IODefaultState AuditRecordType AuthResult
     RebuildAction BackupAction FailoverPriority
     Permission GlobalPermission UserRole ConnectionResult
     ,
-    Borders Corners ResourceFlags CameraCapabilities PtzDataFields PtzCapabilities PtzTraits
+    Borders Corners ResourceFlags CameraCapabilities PtzDataFields
     MotionTypes TimePeriodTypes
     ServerFlags CameraBackupQualities TimeFlags CameraStatusFlags IOPortTypes
     Permissions GlobalPermissions
@@ -164,63 +164,10 @@ QN_DECLARE_METAOBJECT_HEADER(Qn,
         InvalidPtzObject = -1
     };
 
-    enum PtzCapability {
-        NoPtzCapabilities                   = 0x00000000,
-
-        ContinuousPanCapability             = 0x00000001,
-        ContinuousTiltCapability            = 0x00000002,
-        ContinuousZoomCapability            = 0x00000004,
-        ContinuousFocusCapability           = 0x00000008,
-
-        AbsolutePanCapability               = 0x00000010,
-        AbsoluteTiltCapability              = 0x00000020,
-        AbsoluteZoomCapability              = 0x00000040,
-
-        ViewportPtzCapability               = 0x00000080,
-
-        FlipPtzCapability                   = 0x00000100,
-        LimitsPtzCapability                 = 0x00000200,
-
-        DevicePositioningPtzCapability      = 0x00001000,
-        LogicalPositioningPtzCapability     = 0x00002000,
-
-        PresetsPtzCapability                = 0x00010000,
-        ToursPtzCapability                  = 0x00020000,
-        ActivityPtzCapability               = 0x00040000,
-        HomePtzCapability                   = 0x00080000,
-
-        AsynchronousPtzCapability           = 0x00100000,
-        SynchronizedPtzCapability           = 0x00200000,
-        VirtualPtzCapability                = 0x00400000,
-
-        AuxilaryPtzCapability               = 0x01000000,
-
-        /* Shortcuts */
-        ContinuousPanTiltCapabilities       = ContinuousPanCapability | ContinuousTiltCapability,
-        ContinuousPtzCapabilities           = ContinuousPanCapability | ContinuousTiltCapability | ContinuousZoomCapability,
-        AbsolutePtzCapabilities             = AbsolutePanCapability | AbsoluteTiltCapability | AbsoluteZoomCapability,
-    };
-    QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(PtzCapability)
-
-    Q_DECLARE_FLAGS(PtzCapabilities, PtzCapability)
-    Q_DECLARE_OPERATORS_FOR_FLAGS(PtzCapabilities)
-
-
     enum Projection {
         RectilinearProjection,
         EquirectangularProjection
     };
-
-
-    enum PtzTrait {
-        NoPtzTraits             = 0x00,
-        FourWayPtzTrait         = 0x01,
-        EightWayPtzTrait        = 0x02,
-        ManualAutoFocusPtzTrait = 0x04,
-    };
-    Q_DECLARE_FLAGS(PtzTraits, PtzTrait);
-    Q_DECLARE_OPERATORS_FOR_FLAGS(PtzTraits);
-
 
     enum StreamFpsSharingMethod {
         /** If second stream is running whatever fps it has, first stream can get maximumFps - secondstreamFps. */
@@ -900,7 +847,7 @@ QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
 )
 
 QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
-    (Qn::PtzObjectType)(Qn::PtzCommand)(Qn::PtzTrait)(Qn::PtzTraits)(Qn::PtzCoordinateSpace)(Qn::MotionType)
+    (Qn::PtzObjectType)(Qn::PtzCommand)(Qn::PtzCoordinateSpace)(Qn::MotionType)
         (Qn::StreamQuality)(Qn::SecondStreamQuality)(Qn::StatisticsDeviceType)
         (Qn::ServerFlag)(Qn::BackupType)(Qn::CameraBackupQuality)(Qn::StorageInitResult)
         (Qn::PanicMode)(Qn::RecordingType)
@@ -915,7 +862,7 @@ QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
 )
 
 QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
-    (Qn::PtzCapabilities)(Qn::ServerFlags)(Qn::CameraBackupQualities)(Qn::TimeFlags)(Qn::CameraStatusFlags)
+    (Qn::ServerFlags)(Qn::CameraBackupQualities)(Qn::TimeFlags)(Qn::CameraStatusFlags)
     (Qn::Permission)(Qn::GlobalPermission)(Qn::Permissions)(Qn::GlobalPermissions)(Qn::IOPortTypes)
     ,
     (metatype)(numeric)(lexical)

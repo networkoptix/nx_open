@@ -13,8 +13,9 @@ QnDwZoomPtzController::~QnDwZoomPtzController() {
     return;
 }
 
-Qn::PtzCapabilities QnDwZoomPtzController::getCapabilities() {
-    return Qn::ContinuousZoomCapability;
+Ptz::Capabilities QnDwZoomPtzController::getCapabilities() const
+{
+    return Ptz::ContinuousZoomCapability;
 }
 
 bool QnDwZoomPtzController::continuousMove(const QVector3D &speed) {

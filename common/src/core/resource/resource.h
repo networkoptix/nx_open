@@ -17,6 +17,7 @@
 #include <utils/common/functional.h>
 
 #include <core/ptz/ptz_fwd.h>
+#include <core/ptz/ptz_constants.h>
 
 #include <common/common_globals.h>
 #include "shared_resource_pointer.h"
@@ -36,7 +37,7 @@ public:
 class QN_EXPORT QnResource: public QObject, public QnFromThisToShared<QnResource>
 {
     Q_OBJECT
-    Q_FLAGS(Qn::PtzCapabilities)
+    Q_FLAGS(Ptz::Capabilities)
     Q_PROPERTY(QnUuid id READ getId WRITE setId)
     Q_PROPERTY(QnUuid typeId READ getTypeId WRITE setTypeId)
     Q_PROPERTY(QString uniqueId READ getUniqueId)
@@ -47,7 +48,7 @@ class QN_EXPORT QnResource: public QObject, public QnFromThisToShared<QnResource
     Q_PROPERTY(QString url READ getUrl WRITE setUrl NOTIFY urlChanged)
     Q_PROPERTY(QDateTime lastDiscoveredTime READ getLastDiscoveredTime WRITE setLastDiscoveredTime)
     Q_PROPERTY(QStringList tags READ getTags WRITE setTags)
-    Q_PROPERTY(Qn::PtzCapabilities ptzCapabilities READ getPtzCapabilities WRITE setPtzCapabilities)
+    Q_PROPERTY(Ptz::Capabilities ptzCapabilities READ getPtzCapabilities WRITE setPtzCapabilities)
 public:
 
     QnResource();
@@ -177,12 +178,12 @@ public:
     /**
         Control PTZ flags. Better place is mediaResource but no signals allowed in MediaResource
     */
-    Qn::PtzCapabilities getPtzCapabilities() const;
+    Ptz::Capabilities getPtzCapabilities() const;
 
     /** Check if camera has any of provided capabilities. */
-    bool hasAnyOfPtzCapabilities(Qn::PtzCapabilities capabilities) const;
-    void setPtzCapabilities(Qn::PtzCapabilities capabilities);
-    void setPtzCapability(Qn::PtzCapabilities capability, bool value);
+    bool hasAnyOfPtzCapabilities(Ptz::Capabilities capabilities) const;
+    void setPtzCapabilities(Ptz::Capabilities capabilities);
+    void setPtzCapability(Ptz::Capabilities capability, bool value);
     QnAbstractPtzController *createPtzController(); // TODO: #Elric does not belong here
 
     /* Note that these functions hide property API inherited from QObject.

@@ -6,7 +6,7 @@
     </parent>
 
     <groupId>com.networkoptix.hdwitness</groupId>
-    <version>3.0.4-SNAPSHOT</version>
+    <version>17.2-SNAPSHOT</version>
     <modelVersion>4.0.0</modelVersion>
     <artifactId>mobile_client</artifactId>
     <packaging>pom</packaging>
@@ -163,6 +163,20 @@
                 </plugins>
             </build>
         </profile>
+        <profile>
+            <id>itunes</id>
+            <activation>
+                <property>
+                    <name>itunes</name>
+                    <value>true</value>
+                </property>
+            </activation>
+            <properties>
+                <provisioning_profile>${static.customization.dir}/mobile_client/ios/provisioning_profiles/testing.mobileprovision</provisioning_profile>
+                <mobile_client_entitlements>mobile_client-beta.entitlements</mobile_client_entitlements>
+            </properties>
+        </profile>
+
         <profile>
             <id>mobile-ios</id>
             <activation>

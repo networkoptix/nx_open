@@ -9,7 +9,7 @@ class CLSimpleHTTPClient;
 class QnIniSection;
 
 /**
- * Controller for vista-specific PTZ focus functions. 
+ * Controller for vista-specific PTZ focus functions.
  */
 class QnVistaFocusPtzController: public QnProxyPtzController {
     Q_OBJECT
@@ -19,11 +19,11 @@ public:
     QnVistaFocusPtzController(const QnPtzControllerPtr &baseController);
     virtual ~QnVistaFocusPtzController();
 
-    virtual Qn::PtzCapabilities getCapabilities() override;
+    virtual Ptz::Capabilities getCapabilities() const override;
 
     virtual bool continuousFocus(qreal speed) override;
 
-    virtual bool getAuxilaryTraits(QnPtzAuxilaryTraitList *auxilaryTraits);
+    virtual bool getAuxilaryTraits(QnPtzAuxilaryTraitList *auxilaryTraits) const;
     virtual bool runAuxilaryCommand(const QnPtzAuxilaryTrait &trait, const QString &data);
 
 private:
@@ -36,7 +36,7 @@ private:
 
 private:
     QnVistaResourcePtr m_resource;
-    Qn::PtzCapabilities m_capabilities;
+    Ptz::Capabilities m_capabilities;
     QnPtzAuxilaryTraitList m_traits;
     bool m_isMotor;
 

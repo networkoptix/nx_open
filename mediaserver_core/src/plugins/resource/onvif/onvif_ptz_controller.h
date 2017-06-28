@@ -18,17 +18,17 @@ public:
     QnOnvifPtzController(const QnPlOnvifResourcePtr &resource);
     virtual ~QnOnvifPtzController();
 
-    virtual Qn::PtzCapabilities getCapabilities() override;
-    
+    virtual Ptz::Capabilities getCapabilities() const override;
+
     virtual bool continuousMove(const QVector3D &speed) override;
     virtual bool continuousFocus(qreal speed) override;
     virtual bool absoluteMove(Qn::PtzCoordinateSpace space, const QVector3D &position, qreal speed) override;
-    
-    virtual bool getPosition(Qn::PtzCoordinateSpace space, QVector3D *position) override;
-    virtual bool getLimits(Qn::PtzCoordinateSpace space, QnPtzLimits *limits) override;
-    virtual bool getFlip(Qt::Orientations *flip) override;
 
-    virtual bool getPresets(QnPtzPresetList *presets) override;
+    virtual bool getPosition(Qn::PtzCoordinateSpace space, QVector3D *position) const override;
+    virtual bool getLimits(Qn::PtzCoordinateSpace space, QnPtzLimits *limits) const override;
+    virtual bool getFlip(Qt::Orientations *flip) const override;
+
+    virtual bool getPresets(QnPtzPresetList *presets) const override;
     virtual bool activatePreset(const QString &presetId, qreal speed) override;
     virtual bool createPreset(const QnPtzPreset &preset) override;
     virtual bool updatePreset(const QnPtzPreset &preset) override;
@@ -44,9 +44,9 @@ private:
     };
 
     static double normalizeSpeed(qreal speed, const SpeedLimits &speedLimits);
-    
-    Qn::PtzCapabilities initMove();
-    Qn::PtzCapabilities initContinuousFocus();
+
+    Ptz::Capabilities initMove();
+    Ptz::Capabilities initContinuousFocus();
     bool readBuiltinPresets();
 
     bool stopInternal();
@@ -56,7 +56,7 @@ private:
 
 private:
     QnPlOnvifResourcePtr m_resource;
-    Qn::PtzCapabilities m_capabilities;
+    Ptz::Capabilities m_capabilities;
     bool m_stopBroken;
     bool m_speedBroken;
 
