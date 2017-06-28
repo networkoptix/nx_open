@@ -13,8 +13,7 @@ angular.module('nxCommon')
                 canPlayLive: '=',
                 ngClick: '&',
                 positionHandler: '=',
-                volumeLevel: '=',
-                serverTime: '='
+                volumeLevel: '='
             },
             templateUrl: Config.viewsDirCommon + 'components/timeline.html',
             link: function (scope, element/*, attrs*/) {
@@ -77,7 +76,6 @@ angular.module('nxCommon')
                     timelineConfig.zoomAccuracyMs,
                     timelineConfig.lastMinuteDuration,
                     timelineConfig.minPixelsPerLevel,
-                    Config.webclient.useServerTime,
                     $q); //Init boundariesProvider
 
                 var animationState = {
@@ -428,10 +426,6 @@ angular.module('nxCommon')
                     if(scope.positionProvider && scope.positionProvider.liveMode) {
                         goToLive (true);
                     }
-                });
-
-                scope.$watch('serverTime.timeZoneOffset', function(){
-                    scope.scaleManager.updateServerOffset(scope.serverTime);
                 });
 
                 if(scope.positionProvider) {

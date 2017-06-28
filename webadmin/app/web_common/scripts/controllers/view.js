@@ -39,11 +39,6 @@ angular.module('nxCommon').controller('ViewCtrl',
 
         var minTimeLag = 2000;// Two seconds
 
-        $scope.serverTime = {
-            timeLatency: 0,
-            timeZoneOffset: 0
-        };
-
         $scope.activeResolution = 'Auto';
         // TODO: detect better resolution here?
         var transcodingResolutions = ['Auto', '1080p', '720p', '640p', '320p', '240p'];
@@ -204,10 +199,8 @@ angular.module('nxCommon').controller('ViewCtrl',
             position = position?parseInt(position):oldTimePosition;
 
             if ($scope.activeCamera) {
-                $scope.positionProvider = cameraRecords.getPositionProvider([$scope.activeCamera.physicalId], systemAPI,
-                                                                            $scope.serverTime.timeLatency);
-                $scope.activeVideoRecords = cameraRecords.getRecordsProvider([$scope.activeCamera.physicalId], systemAPI,
-                                                                              640, $scope.serverTime.timeLatency);
+                $scope.positionProvider = cameraRecords.getPositionProvider([$scope.activeCamera.physicalId], systemAPI);
+                $scope.activeVideoRecords = cameraRecords.getRecordsProvider([$scope.activeCamera.physicalId], systemAPI, 640);
                 $scope.liveOnly = true;
                 if($scope.canViewArchive) {
                     $scope.activeVideoRecords.archiveReadyPromise.then(function (hasArchive) {
@@ -242,7 +235,7 @@ angular.module('nxCommon').controller('ViewCtrl',
                 return;
             }
 
-            $scope.positionProvider.init(playing, $scope.serverTime.timeLatency, $scope.positionProvider.playing);
+            $scope.positionProvider.init(playing, $scope.positionProvider.playing);
             if(live){
                 playing = (new Date()).getTime();
             }else{
@@ -397,16 +390,18 @@ angular.module('nxCommon').controller('ViewCtrl',
 
             var serverTime = parseInt(result.data.reply.utcTime);
             var clientTime = clientDate.getTime();
+
+            var latency = 0;
             if(Math.abs(clientTime - serverTime) > minTimeLag){
-                $scope.serverTime.timeLatency = clientTime - serverTime;
+                latency = clientTime - serverTime;
             }
             
-            $scope.serverTime.timeZoneOffset = parseInt(result.data.reply.timeZoneOffset);
+            var timeZoneOffset = parseInt(result.data.reply.timeZoneOffset);
 
             if(Config.webclient.useServerTime){
-                $scope.serverTime.timeLatency =
-                    $scope.serverTime.timeZoneOffset + clientDate.getTimezoneOffset() * 60000 - $scope.serverTime.timeLatency;
+                latency = timeZoneOffset + clientDate.getTimezoneOffset() * 60000 - latency;
             }
+            serverTime.init(Config.webclient.useServerTime, timeZoneOffset, latency);
         });
 
         function requestResources(){

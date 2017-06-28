@@ -1,6 +1,35 @@
 'use strict';
 
 
+/*
+Input: date to be corrected
+Output: date adjusted to server time
+Summary: 1)We convert the input date into a Date object.
+         2)We convert the timezone offset from minutes to ms.
+         3)Add timezone offset to current time in ms.
+         4)Adding the server's timezone and minus the timeLatency sets the
+           local time to the server's time.
+*/
+
+function serverTime(date, reverse){
+    /*if(reverse){
+        return date - serverTime.timeLatency;
+    }else{
+        return date + serverTime.timeLatency;
+    }*/
+
+    if(!serverTime.useServerTime){
+        return date;
+    }
+    var currentTime = new Date(date);
+    return (currentTime.getTime() + currentTime.getTimezoneOffset() * 60000) + serverTime.timeZoneOffset - serverTime.timeLatency;
+};
+serverTime.init = function(useServerTime, timeZoneOffset, timeLatency ){
+    serverTime.useServerTime = useServerTime;
+    serverTime.timeZoneOffset = timeZoneOffset;
+    serverTime.timeLatency = timeLatency;
+};
+
 //Record
 function Chunk(boundaries,start,end,level,title,extension){
     this.start = start;
@@ -228,14 +257,14 @@ var RulerModel = {
 };
 
 //Provider for records from mediaserver
-function CameraRecordsProvider(cameras,mediaserver,$q,width,timeLatency) {
+function CameraRecordsProvider(cameras, mediaserver, $q, width) {
 
     this.cameras = cameras;
     this.mediaserver = mediaserver;
     this.$q = $q;
     this.chunksTree = null;
     this.requestedCache = [];
-    this.timeLatency = timeLatency || 0;
+    this.timeLatency = 0;
     var self = this;
     //1. request first detailization to get initial bounds
 
@@ -622,7 +651,7 @@ CameraRecordsProvider.prototype.selectRecords = function(result, start, end, lev
  * ShortCache - special collection for short chunks with best detailization for calculating playing position and date
  * @constructor
  */
-function ShortCache(cameras, mediaserver, $q, timeLatency){
+function ShortCache(cameras, mediaserver, $q){
 
     this.$q = $q;
 
@@ -645,9 +674,9 @@ function ShortCache(cameras, mediaserver, $q, timeLatency){
     this.limitChunks = 100; // limit for number of chunks
     this.checkpointsFrequency = 60 * 1000;//Checkpoints - not often that once in a minute
 
-    this.timeLatency = timeLatency || 0;
+    this.timeLatency = 0;
 }
-ShortCache.prototype.init = function(start, timeLatency, isPlaying){
+ShortCache.prototype.init = function(start, isPlaying){
     this.liveMode = false;
     if(!start){
         this.liveMode = true;
@@ -663,7 +692,6 @@ ShortCache.prototype.init = function(start, timeLatency, isPlaying){
 
     this.lastPlayedPosition = 0; // Save the boundaries of uploaded cache
     this.lastPlayedDate = 0;
-    this.timeLatency = timeLatency;
     this.playing = typeof(isPlaying) != "undefined" ? isPlaying : true;
 
     this.update();
@@ -842,14 +870,13 @@ ShortCache.prototype.setPlayingPosition = function(position){
 
 
 function ScaleManager (minMsPerPixel, maxMsPerPixel, defaultIntervalInMS, initialWidth, stickToLiveMs, zoomAccuracyMs,
-                       lastMinuteInterval, minPixelsPerLevel, useServerTime, $q){
+                       lastMinuteInterval, minPixelsPerLevel, $q){
     this.absMaxMsPerPixel = maxMsPerPixel;
     this.minMsPerPixel = minMsPerPixel;
     this.stickToLiveMs = stickToLiveMs;
     this.zoomAccuracyMs = zoomAccuracyMs;
     this.minPixelsPerLevel = minPixelsPerLevel;
     this.lastMinuteInterval  = lastMinuteInterval;
-    this.useServerTime = useServerTime;
     this.$q = $q;
 
     this.levels = {
@@ -872,9 +899,6 @@ function ScaleManager (minMsPerPixel, maxMsPerPixel, defaultIntervalInMS, initia
     this.anchorPoint = 1;
     this.anchorDate = this.end;
     this.updateCurrentInterval();
-
-    this.timeZoneOffset = 0;
-    this.timeLatency = 0;
 }
 
 ScaleManager.prototype.updateTotalInterval = function(){
@@ -888,12 +912,12 @@ ScaleManager.prototype.setViewportWidth = function(width){ // For initialization
     this.updateCurrentInterval();
 };
 ScaleManager.prototype.setStart = function(start){// Update the begining end of the timeline. Live mode must be supported here
-    this.start = this.serverTime(start);
+    this.start = serverTime(start);
     this.updateTotalInterval();
 };
 ScaleManager.prototype.setEnd = function(end){ // Update right end of the timeline. Live mode must be supported here
     var needZoomOut = !this.checkZoomOut();
-    this.end = this.serverTime(end);
+    this.end = serverTime(end);
     this.updateTotalInterval();
     if(needZoomOut){
         this.zoom(1);
@@ -1274,26 +1298,4 @@ ScaleManager.prototype.zoomAroundPoint = function(zoomValue, coordinate){
 
 ScaleManager.prototype.lastMinute = function(){
     return (new Date(this.end - this.lastMinuteInterval)).getTime();
-};
-
-ScaleManager.prototype.updateServerOffset = function(serverOffset){
-    this.timeZoneOffset = serverOffset.timeZoneOffset;
-    this.timeLatency = serverOffset.timeLatency;
-};
-
-
-/*
-Input: date to be corrected
-Output: date adjusted to server time
-Summary: 1)We convert the input date into a Date object.
-         2)We convert the timezone offset from minutes to ms.
-         3)Add timezone offset to current time in ms.
-         4)Adding the server's timezone and minus the timeLatency sets the
-           local time to the server's time.
-*/
-ScaleManager.prototype.serverTime = function(date){
-    if(!this.useServerTime)
-        return date;
-    var currentTime = new Date(date);
-    return (currentTime.getTime() + currentTime.getTimezoneOffset() * 60000) + this.timeZoneOffset - this.timeLatency;
 };
