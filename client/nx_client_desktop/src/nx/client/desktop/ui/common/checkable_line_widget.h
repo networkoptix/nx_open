@@ -21,8 +21,6 @@ public:
     explicit CheckableLineWidget(QWidget* parent = nullptr);
     virtual ~CheckableLineWidget() override;
 
-    QnTreeView* view() const;
-
     QString text() const;
     void setText(const QString& value);
 
@@ -39,6 +37,15 @@ public:
 
     virtual QSize sizeHint() const override;
     virtual QSize minimumSizeHint() const override;
+
+    enum Columns //< Information for view item delegate customization.
+    {
+        NameColumn,
+        CheckColumn,
+        ColumnCount
+    };
+
+    QnTreeView* view() const;
 
 signals:
     void checkStateChanged(Qt::CheckState newCheckState);

@@ -111,7 +111,7 @@ find_package(Qt5
         Sql
         Concurrent
         Multimedia)
-        
+
 if(withDesktopClient OR withTrayTool)
     find_package(Qt5
         COMPONENTS

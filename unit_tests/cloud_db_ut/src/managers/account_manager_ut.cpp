@@ -162,7 +162,7 @@ private:
     data::AccountData m_account;
 
     virtual void afterUpdatingAccountPassword(
-        nx::db::QueryContext* const /*queryContext*/,
+        nx::utils::db::QueryContext* const /*queryContext*/,
         const api::AccountData& account)
     {
         m_extensionCalls.push(account);

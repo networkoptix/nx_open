@@ -42,13 +42,6 @@ public:
         m_data[Qt::DisplayRole] = lit("<All Items>"); //< Just a default.
     }
 
-    enum Columns
-    {
-        NameColumn,
-        CheckColumn,
-        ColumnCount
-    };
-
     virtual QModelIndex index(int row, int column,
         const QModelIndex& parent = QModelIndex()) const override
     {
@@ -182,7 +175,7 @@ struct CheckableLineWidget::PrivateData
 
         view->header()->setStretchLastSection(false);
         view->header()->setSectionResizeMode(QHeaderView::ResizeToContents);
-        view->header()->setSectionResizeMode(Model::NameColumn, QHeaderView::Stretch);
+        view->header()->setSectionResizeMode(NameColumn, QHeaderView::Stretch);
     }
 };
 

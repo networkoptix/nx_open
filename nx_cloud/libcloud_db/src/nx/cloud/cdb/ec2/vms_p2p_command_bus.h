@@ -1,6 +1,6 @@
 #pragma once
 
-#include <utils/db/query_context.h>
+#include <nx/utils/db/query_context.h>
 
 #include <nx_ec/data/api_resource_data.h>
 #include <transaction/transaction.h>
@@ -14,8 +14,8 @@ class AbstractVmsP2pCommandBus
 public:
     virtual ~AbstractVmsP2pCommandBus() = default;
 
-    virtual nx::db::DBResult saveResourceAttribute(
-        nx::db::QueryContext* queryContext,
+    virtual nx::utils::db::DBResult saveResourceAttribute(
+        nx::utils::db::QueryContext* queryContext,
         const std::string& systemId,
         ::ec2::ApiResourceParamWithRefData data) = 0;
 };
@@ -30,8 +30,8 @@ class VmsP2pCommandBus:
 public:
     VmsP2pCommandBus(SyncronizationEngine* syncronizationEngine);
 
-    virtual nx::db::DBResult saveResourceAttribute(
-        nx::db::QueryContext* queryContext,
+    virtual nx::utils::db::DBResult saveResourceAttribute(
+        nx::utils::db::QueryContext* queryContext,
         const std::string& systemId,
         ::ec2::ApiResourceParamWithRefData data) override;
 

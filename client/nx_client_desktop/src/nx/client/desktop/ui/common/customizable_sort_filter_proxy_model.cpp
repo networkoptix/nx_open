@@ -52,6 +52,18 @@ bool CustomizableSortFilterProxyModel::filterAcceptsColumn(
         : base_type::filterAcceptsColumn(sourceColumn, sourceParent);
 }
 
+bool CustomizableSortFilterProxyModel::baseFilterAcceptsRow(int sourceRow,
+    const QModelIndex& sourceParent) const
+{
+    return base_type::filterAcceptsRow(sourceRow, sourceParent);
+}
+
+bool CustomizableSortFilterProxyModel::baseFilterAcceptsColumn(int sourceColumn,
+    const QModelIndex& sourceParent) const
+{
+    return base_type::filterAcceptsColumn(sourceColumn, sourceParent);
+}
+
 } // namespace ui
 } // namespace desktop
 } // namespace client

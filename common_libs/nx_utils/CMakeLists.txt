@@ -11,7 +11,7 @@ nx_add_target(nx_utils LIBRARY ${library_type}
     ADDITIONAL_SOURCES
         "${CMAKE_CURRENT_BINARY_DIR}/app_info_impl.cpp"
     PUBLIC_LIBS
-        boost openssl Qt5::Core Qt5::Xml
+        boost openssl Qt5::Core Qt5::Xml Qt5::Sql
         nx_kit
 )
 

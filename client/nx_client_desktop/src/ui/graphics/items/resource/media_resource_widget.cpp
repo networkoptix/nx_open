@@ -34,6 +34,7 @@
 #include <core/resource/camera_history.h>
 #include <core/resource/layout_resource.h>
 #include <core/resource_management/resources_changes_manager.h>
+#include <core/resource_management/user_roles_manager.h>
 #include <core/ptz/ptz_controller_pool.h>
 #include <core/ptz/preset_ptz_controller.h>
 #include <core/ptz/tour_ptz_controller.h>
@@ -2359,15 +2360,20 @@ bool QnMediaResourceWidget::isRelevantTriggerRule(const QnBusinessEventRulePtr& 
     if (rule->isDisabled() || rule->eventType() != QnBusiness::SoftwareTriggerEvent)
         return false;
 
-    const auto users = rule->eventParams().metadata.instigators;
-    if (!users.empty() && !::contains(users, accessController()->user()->getId()))
-        return false;
-
     const auto resourceId = m_resource->toResource()->getId();
     if (!rule->eventResources().empty() && !rule->eventResources().contains(resourceId))
         return false;
 
-    return true;
+    if (rule->eventParams().metadata.allUsers)
+        return true;
+
+    const auto currentUser = accessController()->user();
+
+    const auto subjects = rule->eventParams().metadata.instigators;
+    if (::contains(subjects, currentUser->getId()))
+        return true;
+
+    return ::contains(subjects, QnUserRolesManager::unifiedUserRoleId(currentUser));
 }
 
 void QnMediaResourceWidget::configureTriggerButton(QnSoftwareTriggerButton* button,

@@ -37,11 +37,11 @@ admins:
 languages:
     - en_US
     - en_GB
-    - ru
-    - fr
-    - de
-    - es
-    - hu
+    - ru_RU
+    - fr_FR
+    - de_DE
+    - es_ES
+    - hu_HU
 
 queue_name: '$INSTANCE_NAME'
 

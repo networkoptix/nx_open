@@ -51,6 +51,9 @@ struct QnBusinessActionParameters
     // Generic additional resources List: Show On Alarm Layout - users
     std::vector<QnUuid> additionalResources;
 
+    // When set, signalizes that all users must be targeted by the action.
+    bool allUsers;
+
     // Alarm Layout - if it must be opened immediately
     bool forced;
 
@@ -77,7 +80,7 @@ struct QnBusinessActionParameters
 
 #define QnBusinessActionParameters_Fields (targetActionType)(needConfirmation)(actionResourceId)\
     (url)(emailAddress)(fps)(streamQuality)(recordAfter)(relayOutputId)(sayText)(tags)(text)\
-    (durationMs)(additionalResources)(forced)(presetId)(useSource)(recordBeforeMs)\
+    (durationMs)(additionalResources)(allUsers)(forced)(presetId)(useSource)(recordBeforeMs)\
     (playToClient)(contentType)
 
 /* Backward compatibility is not really important here as this class is not stored in the DB. */

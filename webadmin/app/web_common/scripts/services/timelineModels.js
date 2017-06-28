@@ -622,7 +622,7 @@ CameraRecordsProvider.prototype.selectRecords = function(result, start, end, lev
  * ShortCache - special collection for short chunks with best detailization for calculating playing position and date
  * @constructor
  */
-function ShortCache(cameras,mediaserver,$q,timeCorrection){
+function ShortCache(cameras, mediaserver, $q, timeCorrection){
 
     this.$q = $q;
 
@@ -703,44 +703,44 @@ ShortCache.prototype.update = function(requestPosition,position){
     );
 
     this.currentRequest.then(function(data){
-            self.updating = false;
+        self.updating = false;
 
-            var chunks = data.data.reply;
+        var chunks = data.data.reply;
 
-            _.forEach(chunks,function(chunk){
-                chunk.durationMs = parseInt(chunk.durationMs);
-                chunk.startTimeMs = parseInt(chunk.startTimeMs) + self.timeCorrection;
+        _.forEach(chunks,function(chunk){
+            chunk.durationMs = parseInt(chunk.durationMs);
+            chunk.startTimeMs = parseInt(chunk.startTimeMs) + self.timeCorrection;
 
-                if(chunk.durationMs == -1){
-                    chunk.durationMs = (new Date()).getTime() - chunk.startTimeMs;//in future
-                }
-            });
-
-            //if(chunks.length == 0){ } // no chunks for this camera and interval
-
-
-            if(chunks.length > 0 && chunks[0].startTimeMs < requestPosition){ // Crop first chunk.
-                chunks[0].durationMs += chunks[0].startTimeMs - requestPosition ;
-                chunks[0].startTimeMs = requestPosition;
+            if(chunk.durationMs == -1){
+                chunk.durationMs = (new Date()).getTime() - chunk.startTimeMs;//in future
             }
-            self.currentDetailization = chunks;
-
-            var lastCheckPointDate = self.lastRequestDate;
-            var lastCheckPointPosition = self.lastRequestPosition;
-            var lastSavedCheckpoint = 0; // First chunk will be forced to save
-
-            for(var i=0; i<self.currentDetailization.length; i++){
-                lastCheckPointPosition += self.currentDetailization[i].durationMs;// Duration of chunks count
-                lastCheckPointDate = self.currentDetailization[i].startTimeMs + self.currentDetailization[i].durationMs;
-
-                if( lastCheckPointDate - lastSavedCheckpoint > self.checkpointsFrequency) {
-                    lastSavedCheckpoint = lastCheckPointDate;
-                    self.checkPoints[lastCheckPointPosition] = lastCheckPointDate; // Too many checkpoints at this point
-                }
-            }
-
-            self.setPlayingPosition(self.played);
         });
+
+        //if(chunks.length == 0){ } // no chunks for this camera and interval
+
+
+        if(chunks.length > 0 && chunks[0].startTimeMs < requestPosition){ // Crop first chunk.
+            chunks[0].durationMs += chunks[0].startTimeMs - requestPosition ;
+            chunks[0].startTimeMs = requestPosition;
+        }
+        self.currentDetailization = chunks;
+
+        var lastCheckPointDate = self.lastRequestDate;
+        var lastCheckPointPosition = self.lastRequestPosition;
+        var lastSavedCheckpoint = 0; // First chunk will be forced to save
+
+        for(var i=0; i<self.currentDetailization.length; i++){
+            lastCheckPointPosition += self.currentDetailization[i].durationMs;// Duration of chunks count
+            lastCheckPointDate = self.currentDetailization[i].startTimeMs + self.currentDetailization[i].durationMs;
+
+            if( lastCheckPointDate - lastSavedCheckpoint > self.checkpointsFrequency) {
+                lastSavedCheckpoint = lastCheckPointDate;
+                self.checkPoints[lastCheckPointPosition] = lastCheckPointDate; // Too many checkpoints at this point
+            }
+        }
+
+        self.setPlayingPosition(self.played);
+    });
 };
 
 // Check playing date - return videoposition if possible
@@ -833,7 +833,6 @@ ShortCache.prototype.setPlayingPosition = function(position){
     if(oldPosition > this.playedPosition && Config.allowDebugMode){
         console.error("Position jumped back! ms:" , oldPosition - this.playedPosition);
     }
-    
     return this.playedPosition;
 };
 
@@ -842,7 +841,8 @@ ShortCache.prototype.setPlayingPosition = function(position){
 
 
 
-function ScaleManager (minMsPerPixel, maxMsPerPixel, defaultIntervalInMS, initialWidth, stickToLiveMs, zoomAccuracyMs, lastMinuteInterval, minPixelsPerLevel, useServerTime, $q){
+function ScaleManager (minMsPerPixel, maxMsPerPixel, defaultIntervalInMS, initialWidth, stickToLiveMs, zoomAccuracyMs,
+                       lastMinuteInterval, minPixelsPerLevel, useServerTime, $q){
     this.absMaxMsPerPixel = maxMsPerPixel;
     this.minMsPerPixel = minMsPerPixel;
     this.stickToLiveMs = stickToLiveMs;
@@ -1001,7 +1001,7 @@ ScaleManager.prototype.tryToSetLiveDate = function(playing, liveMode, end){
     }
 
     if(!this.wasForcedToStopWatchPlaying && !this.watchPlayingPosition){
-        this.checkWatchPlaying(playing,liveMode);
+        this.checkWatchPlaying(playing, liveMode);
     }
     if(this.watchPlayingPosition){
         this.setAnchorDateAndPoint(playing, liveMode ? 1:this.anchorPoint);
@@ -1020,13 +1020,14 @@ ScaleManager.prototype.tryToRestoreAnchorDate = function(date){
 };
 
 ScaleManager.prototype.setAnchorCoordinate = function(coordinate){ // Set anchor date
-    this.setAnchorDateAndPoint(this.screenCoordinateToDate(coordinate),coordinate / this.viewportWidth);
+    var position = this.screenCoordinateToDate(coordinate);
+    this.setAnchorDateAndPoint(position, coordinate / this.viewportWidth);
+    return position;
 };
 
 ScaleManager.prototype.setAnchorDateAndPoint = function(date,point){ // Set anchor date
     this.anchorDate = date;
     if(typeof(point)!="undefined") {
-        //console.log('anchorPoint', point);
         this.anchorPoint = point;
     }
     this.updateCurrentInterval();

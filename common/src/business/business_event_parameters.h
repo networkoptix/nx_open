@@ -15,8 +15,9 @@ struct QnEventMetaData
      */
     std::vector<QnUuid> cameraRefs;
 
-    //! Users that can generate this event. Empty == any user
+    //! Users that can generate this event.
     std::vector<QnUuid> instigators;
+    bool allUsers = false;
 
     QnEventMetaData() = default;
     QnEventMetaData(const QnEventMetaData&) = default;
@@ -24,7 +25,7 @@ struct QnEventMetaData
     QnEventMetaData& operator= (const QnEventMetaData&) = default;
     QnEventMetaData& operator= (QnEventMetaData&&) = default;
 };
-#define QnEventMetaData_Fields (cameraRefs)(instigators)
+#define QnEventMetaData_Fields (cameraRefs)(instigators)(allUsers)
 QN_FUSION_DECLARE_FUNCTIONS(QnEventMetaData, (ubjson)(json)(eq)(xml)(csv_record));
 
 struct QnBusinessEventParameters

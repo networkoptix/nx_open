@@ -79,6 +79,8 @@ QnAccessibleResourcesWidget::QnAccessibleResourcesWidget(
     connect(this, &QnAccessibleResourcesWidget::controlsChanged,
         m_accessibleResourcesModel, &QnAccessibleResourcesModel::setAllChecked);
 
+    // TODO: #vkutin #3.2 Replace controlsTreeView with CheckableLineWidget
+
     ui->resourcesTreeView->setModel(m_accessibleResourcesModel);
     ui->controlsTreeView->setModel(m_controlsModel);
     ui->controlsTreeView->setVisible(m_controlsVisible);
@@ -108,6 +110,8 @@ QnAccessibleResourcesWidget::QnAccessibleResourcesWidget(
         });
 
     auto itemDelegate = new QnResourceItemDelegate(this);
+    itemDelegate->setOptions(QnResourceItemDelegate::HighlightChecked);
+    itemDelegate->setCheckBoxColumn(QnAccessibleResourcesModel::CheckColumn);
     itemDelegate->setCustomInfoLevel(Qn::RI_FullInfo);
 
     auto setupTreeView = [itemDelegate](QnTreeView* treeView)

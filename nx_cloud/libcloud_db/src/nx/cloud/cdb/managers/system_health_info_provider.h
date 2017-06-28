@@ -6,7 +6,7 @@
 
 #include <nx/utils/counter.h>
 #include <nx/utils/subscription.h>
-#include <utils/db/async_sql_query_executor.h>
+#include <nx/utils/db/async_sql_query_executor.h>
 
 #include "../access_control/auth_types.h"
 #include "../dao/rdb/system_health_history_data_object.h"
@@ -25,7 +25,7 @@ class SystemHealthInfoProvider
 public:
     SystemHealthInfoProvider(
         ec2::ConnectionManager* ec2ConnectionManager,
-        nx::db::AsyncSqlQueryExecutor* const dbManager);
+        nx::utils::db::AsyncSqlQueryExecutor* const dbManager);
     ~SystemHealthInfoProvider();
 
     bool isSystemOnline(const std::string& systemId) const;
@@ -37,7 +37,7 @@ public:
 
 private:
     ec2::ConnectionManager* m_ec2ConnectionManager;
-    nx::db::AsyncSqlQueryExecutor* const m_dbManager;
+    nx::utils::db::AsyncSqlQueryExecutor* const m_dbManager;
     nx::utils::Counter m_startedAsyncCallsCounter;
     dao::rdb::SystemHealthHistoryDataObject m_systemHealthHistoryDataObject;
     nx::utils::SubscriptionId m_systemStatusChangedSubscriptionId;
