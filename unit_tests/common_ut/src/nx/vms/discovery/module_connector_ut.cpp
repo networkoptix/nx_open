@@ -16,7 +16,9 @@ class DiscoveryModuleConnector: public testing::Test
 public:
     DiscoveryModuleConnector()
     {
-        connector.setReconnectInterval(std::chrono::seconds(1));
+        connector.setReconnectPolicy(network::RetryPolicy(network::RetryPolicy::kInfiniteRetries,
+            std::chrono::seconds(1), 1, std::chrono::seconds(1)));
+
         connector.setConnectHandler(
             [this](QnModuleInformation information, SocketAddress endpoint, HostAddress /*ip*/)
             {

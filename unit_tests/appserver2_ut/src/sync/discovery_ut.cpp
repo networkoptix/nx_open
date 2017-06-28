@@ -13,6 +13,8 @@
 static const std::chrono::milliseconds kDiscoveryTimeouts(100);
 size_t kInitialServerCount = 3;
 size_t kAdditionalServerCount = 2;
+nx::network::RetryPolicy kReconnectPolicy(
+    nx::network::RetryPolicy::kInfiniteRetries, kDiscoveryTimeouts, 1, kDiscoveryTimeouts);
 
 class DiscoveryTest: public testing::Test
 {
@@ -39,7 +41,7 @@ protected:
             module->commonModule()->moduleGUID(), server->moduleInstance()->endpoint()));
 
         const auto discoveryManager = module->commonModule()->moduleDiscoveryManager();
-        discoveryManager->setReconnectInterval(kDiscoveryTimeouts);
+        discoveryManager->setReconnectPolicy(kReconnectPolicy);
         discoveryManager->setMulticastInterval(kDiscoveryTimeouts);
         discoveryManager->start();
         m_servers.emplace(module->commonModule()->moduleGUID(), std::move(server));
