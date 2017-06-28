@@ -1292,7 +1292,7 @@ void QnPlAxisResource::notificationReceived( const nx_http::ConstBufferRefType& 
     NX_LOG( lit("Received notification %1 from %2").arg(QLatin1String((QByteArray)notification)).arg(getUrl()), cl_logDEBUG1 );
 
     //notification
-    size_t sepPos = nx_http::find_first_of( notification, ":" );
+    size_t sepPos = nx::utils::find_first_of( notification, ":" );
     if (sepPos == nx::utils::BufferNpos || sepPos+1 >= notification.size())
     {
         NX_LOG( lit("Error parsing notification %1 from %2. Event type not found").arg(QLatin1String((QByteArray)notification)).arg(getUrl()), cl_logINFO );
