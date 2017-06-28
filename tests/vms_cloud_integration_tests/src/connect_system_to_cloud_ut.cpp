@@ -5,6 +5,10 @@
 #include <api/global_settings.h>
 #include <core/resource/user_resource.h>
 #include <nx/utils/sync_call.h>
+#include <nx/utils/std/future.h>
+#include <nx/cloud/cdb/api/cloud_nonce.h>
+#include <network/auth/cdb_nonce_fetcher.h>
+#include <nx/network/http/asynchttpclient.h>
 
 #include <test_support/mediaserver_launcher.h>
 #include "mediaserver_cloud_integration_test_setup.h"
@@ -87,6 +91,73 @@ protected:
                 break;
             std::this_thread::sleep_for(kRetryRequestDelay);
         }
+    }
+
+    void assertResponseNonce(bool isCloud)
+    {
+        auto httpClient = nx_http::AsyncHttpClient::create();
+        auto endpoint = mediaServerEndpoint();
+
+        QUrl url("http://somehost/ec2/getUsers");
+        url.setHost(endpoint.address.toString());
+        url.setPort(endpoint.port);
+
+        nx::utils::promise<void> readyPromise;
+        auto readyFuture = readyPromise.get_future();
+
+        httpClient->doGet(
+            url,
+            [p = std::move(readyPromise), isCloud](nx_http::AsyncHttpClientPtr httpClient) mutable
+            {
+                auto response = httpClient->response();
+                ASSERT_EQ(response->statusLine.statusCode, 401);
+
+                auto authHeaderIt = response->headers.find("WWW-Authenticate");
+                ASSERT_NE(authHeaderIt, httpClient->response()->headers.cend());
+
+                nx_http::header::DigestAuthorization auth;
+                ASSERT_TRUE(auth.parse(authHeaderIt->second));
+
+                ASSERT_NE(auth.digest->params.find("nonce"), auth.digest->params.cend());
+                auto nonceString = auth.digest->params["nonce"];
+
+                nx::Buffer nonceWithoutTrailer;
+                nx::Buffer trailer;
+
+                auto parseResult = CdbNonceFetcher::parseCloudNonce(
+                    nonceString,
+                    &nonceWithoutTrailer,
+                    &trailer);
+
+                if (!isCloud)
+                {
+                    ASSERT_FALSE(parseResult);
+                }
+                else
+                {
+                    uint32_t ts;
+                    std::string hash;
+
+                    ASSERT_TRUE(parseResult);
+                    ASSERT_TRUE(nx::cdb::api::parseCloudNonceBase(
+                        nonceWithoutTrailer.toStdString(),
+                        &ts,
+                        &hash));
+                }
+                p.set_value();
+            });
+
+        readyFuture.wait();
+    }
+
+    void thenAnyRequestShouldAuthWithCloudNonce()
+    {
+        assertResponseNonce(true);
+    }
+
+    void thenAnyRequestShouldAuthWithNONCloudNonce()
+    {
+        assertResponseNonce(false);
     }
 
 private:
@@ -204,4 +275,13 @@ TEST_F(FtDisconnectSystemFromCloud, DISABLED_disconnect_by_mserver_api_call_clou
     thenCloudUsersShouldBeRemoved();
     thenCloudAttributesShouldBeRemoved();
     thenSystemStateShouldBecomeNew();
+}
+
+TEST_F(FtDisconnectSystemFromCloud, AfterDisconnect_NonCloudNonce)
+{
+    givenServerConnectedToTheCloudWithCloudOwnerOnly();
+    thenAnyRequestShouldAuthWithCloudNonce();
+
+    whenInvokedDetachFromCloudRestMethod();
+    thenAnyRequestShouldAuthWithNONCloudNonce();
 }
