@@ -86,6 +86,8 @@ bool StreamingChunkTranscoder::transcodeAsync(
     const StreamingChunkCacheKey& transcodeParams,
     StreamingChunkPtr chunk )
 {
+    using namespace std::chrono;
+
     // Searching for resource.
     QnSecurityCamResourcePtr cameraResource =
         nx::camera_id_helper::findCameraByFlexibleId(
@@ -180,7 +182,7 @@ bool StreamingChunkTranscoder::transcodeAsync(
                 true);
             archiveReader->setPlaybackRange( QnTimePeriod(
                 transcodeParams.startTimestamp() / USEC_IN_MSEC,
-                transcodeParams.duration().count() ) );
+                duration_cast<milliseconds>(transcodeParams.duration()).count() ) );
             mediaDataProvider = OnDemandMediaDataProviderPtr( new OnDemandMediaDataProvider( dp ) );
             archiveReader->start();
         }
