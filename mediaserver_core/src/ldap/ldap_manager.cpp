@@ -407,7 +407,7 @@ bool LdapSession::fetchUsers(QnLdapUsers &users, const QString& customFilter)
             retServerControls = NULL;
         }
 
-        if (pControl
+        if (pControl)
         {
             ldap_control_free(pControl);
             pControl = NULL;
