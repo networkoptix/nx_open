@@ -82,7 +82,7 @@ private:
     nxpt::ScopedRef<GenericRTSPPlugin> m_pluginRef;
     nxcip::CameraInfo m_info;
     unsigned int m_capabilities;
-    std::auto_ptr<GenericRTSPMediaEncoder> m_encoder;
+    std::unique_ptr<GenericRTSPMediaEncoder> m_encoder;
 };
 
 #endif  //GENERIC_RTSP_CAMERA_MANAGER_H

@@ -54,7 +54,10 @@ QnAbstractVideoDecoder* QnVideoDecoderFactory::createDecoder(
                 }
                 if( videoDecoderPlugin )
                 {
-                    std::auto_ptr<QnAbstractVideoDecoder> decoder( videoDecoderPlugin->create( data->compressionType, data, glContext, swDecoderCount.load() ) );
+                    std::unique_ptr<QnAbstractVideoDecoder> decoder(
+                        videoDecoderPlugin->create(
+                            data->compressionType, data, glContext, swDecoderCount.load()));
+
                     if( decoder.get() && decoder->isHardwareAccelerationEnabled() )
                         return decoder.release();
                 }

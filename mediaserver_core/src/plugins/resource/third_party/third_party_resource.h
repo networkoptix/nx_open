@@ -123,7 +123,7 @@ private:
     std::unique_ptr<nxcip_qt::BaseCameraManager> m_camManager;
     nxcip_qt::CameraDiscoveryManager m_discoveryManager;
     QVector<EncoderData> m_encoderData;
-    std::auto_ptr<nxcip_qt::CameraRelayIOManager> m_relayIOManager;
+    std::unique_ptr<nxcip_qt::CameraRelayIOManager> m_relayIOManager;
     QAtomicInt m_refCounter;
     QString m_defaultOutputID;
     int m_encoderCount;

@@ -78,21 +78,28 @@ static const int MAX_MILLIS_TO_WAIT_CLIENT_CONNECTION = 1000;
 
 void TaskServerNew::run()
 {
-    while( !m_terminated )
+    while (!m_terminated)
     {
-        NamedPipeSocket* clientConnection = NULL;
-        const SystemError::ErrorCode osError = m_server.accept( &clientConnection, MAX_MILLIS_TO_WAIT_CLIENT_CONNECTION );
-        if( osError != SystemError::noError )
+        NamedPipeSocket* clientConnection = nullptr;
+        const auto osError =
+            m_server.accept(&clientConnection, MAX_MILLIS_TO_WAIT_CLIENT_CONNECTION);
+
+        std::unique_ptr<NamedPipeSocket> clientConnectionPtr(clientConnection);
+
+        if (osError != SystemError::noError)
         {
-            if( osError == SystemError::timedOut )
+            if (osError == SystemError::timedOut)
                 continue;
-            NX_LOG( QString::fromLatin1("Failed to listen to pipe %1. %2").arg(m_pipeName).arg(SystemError::toString(osError)), cl_logDEBUG1 );
-            msleep( ERROR_SLEEP_TIMEOUT_MS );
+
+            NX_DEBUG(this,
+                lm("Failed to listen to pipe %1. %2")
+                    .arg(m_pipeName).arg(SystemError::toString(osError)));
+
+            msleep(ERROR_SLEEP_TIMEOUT_MS);
             continue;
         }
 
-        std::auto_ptr<NamedPipeSocket> clientConnectionAp( clientConnection );
-        processNewConnection( clientConnection );
+        processNewConnection(clientConnectionPtr.get());
     }
 }
 

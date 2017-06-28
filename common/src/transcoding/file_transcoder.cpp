@@ -132,7 +132,7 @@ bool FileTranscoder::setTagValue(
             formatCtx->video_codec_id = formatCtx->streams[i]->codec->codec_id;
     }
 
-    std::auto_ptr<FileTranscoder> transcoder( new FileTranscoder() );
+    std::unique_ptr<FileTranscoder> transcoder(new FileTranscoder());
     if( !transcoder->setSourceFile( srcFilePath ) ||
         !transcoder->setDestFile( tempFilePath ) ||
         !transcoder->setContainer( QLatin1String(formatCtx->iformat->name) ) ||
