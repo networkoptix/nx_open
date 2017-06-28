@@ -17,8 +17,8 @@ static const std::string kCdbStructureName = "cdb_BF58C070-B0E6-4327-BB2E-417A68
 
 InstanceController::InstanceController(const ConnectionOptions& dbConnectionOptions):
     m_dbConnectionOptions(dbConnectionOptions),
-    m_queryExecutor(std::make_unique<AsyncSqlQueryExecutor>(dbConnectionOptions)),
     m_statisticsCollector(kDefaultStatisticsAggregationPeriod),
+    m_queryExecutor(std::make_unique<AsyncSqlQueryExecutor>(dbConnectionOptions)),
     m_dbStructureUpdater(kCdbStructureName, m_queryExecutor.get())
 {
     m_queryExecutor->setStatisticsCollector(&m_statisticsCollector);
