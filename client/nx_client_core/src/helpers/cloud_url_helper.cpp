@@ -7,6 +7,8 @@
 #include <utils/common/app_info.h>
 #include <watchers/cloud_status_watcher.h>
 
+#include <nx/utils/log/log.h>
+
 using namespace nx::vms::utils;
 
 QnCloudUrlHelper::QnCloudUrlHelper(
@@ -64,5 +66,6 @@ QUrl QnCloudUrlHelper::makeUrl(const QString& path, bool auth) const
 
     QUrl result = uri.toUrl();
     result.setPath(path);
+    NX_DEBUG("CloudURL", result.toString());
     return result;
 }
