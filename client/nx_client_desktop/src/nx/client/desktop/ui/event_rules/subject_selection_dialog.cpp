@@ -155,8 +155,12 @@ SubjectSelectionDialog::SubjectSelectionDialog(QWidget* parent, Qt::WindowFlags 
     ui->allUsersCheckableLine->setText(tr("All Users"));
     setupTreeView(ui->allUsersCheckableLine->view());
 
-    auto allUsersDelegate = new UserListDelegate(this);
+    auto allUsersDelegate = new QnResourceItemDelegate(this);
     allUsersDelegate->setCheckBoxColumn(CheckableLineWidget::CheckColumn);
+    allUsersDelegate->setOptions(
+        QnResourceItemDelegate::HighlightChecked
+      | QnResourceItemDelegate::ValidateOnlyChecked);
+
     ui->allUsersCheckableLine->view()->setItemDelegate(allUsersDelegate);
 
     const auto allUsersCheckStateChanged =
@@ -214,7 +218,7 @@ void SubjectSelectionDialog::setUserValidator(Qn::UserValidator userValidator)
 
 void SubjectSelectionDialog::validateAllUsers()
 {
-    auto validationState = m_roles->validateUsers(
+    const auto validationState = m_roles->validateUsers(
         resourceAccessSubjectsCache()->allSubjects());
 
     QIcon icon = (validationState == QValidator::Acceptable
@@ -222,7 +226,9 @@ void SubjectSelectionDialog::validateAllUsers()
         : qnSkin->icon(lit("tree/users_alert.png")));
 
     ui->allUsersCheckableLine->setIcon(icon);
-    ui->allUsersCheckableLine->setData(validationState, Qn::ValidationStateRole);
+
+    ui->allUsersCheckableLine->setData(qVariantFromValue(validationState),
+        Qn::ValidationStateRole);
 }
 
 void SubjectSelectionDialog::setCheckedSubjects(const QSet<QnUuid>& ids)
