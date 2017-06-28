@@ -328,6 +328,7 @@ void CdbNonceFetcher::cloudBindingStatusChangedUnsafe(
 void CdbNonceFetcher::cloudBindingStatusChanged(bool boundToCloud)
 {
     QnMutexLocker lock(&m_mutex);
-    m_cloudUserInfoPool.clear();
+    if (!boundToCloud)
+        m_cloudUserInfoPool.clear();
     cloudBindingStatusChangedUnsafe(lock, boundToCloud);
 }
