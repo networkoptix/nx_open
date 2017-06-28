@@ -37,8 +37,12 @@ angular.module('nxCommon').controller('ViewCtrl',
         $scope.liveOnly = true;
         $scope.activeCamera = null;
 
-        var timeLatency = 0;
         var minTimeLag = 2000;// Two seconds
+
+        $scope.serverTime = {
+            timeLatency: 0,
+            timeZoneOffset: 0
+        };
 
         $scope.activeResolution = 'Auto';
         // TODO: detect better resolution here?
@@ -64,8 +68,6 @@ angular.module('nxCommon').controller('ViewCtrl',
         ];
 
         $scope.volumeLevel = typeof($scope.storage.volumeLevel) === 'number' ? $scope.storage.volumeLevel : 50;
-
-        $scope.serverTime = {};
 
         if(window.jscd.mobile) {
             $scope.mobileStore = window.jscd.os === 'iOS'?'appstore':'googleplay';
@@ -202,8 +204,10 @@ angular.module('nxCommon').controller('ViewCtrl',
             position = position?parseInt(position):oldTimePosition;
 
             if ($scope.activeCamera) {
-                $scope.positionProvider = cameraRecords.getPositionProvider([$scope.activeCamera.physicalId], systemAPI, timeLatency);
-                $scope.activeVideoRecords = cameraRecords.getRecordsProvider([$scope.activeCamera.physicalId], systemAPI, 640, timeLatency);
+                $scope.positionProvider = cameraRecords.getPositionProvider([$scope.activeCamera.physicalId], systemAPI,
+                                                                            $scope.serverTime.timeLatency);
+                $scope.activeVideoRecords = cameraRecords.getRecordsProvider([$scope.activeCamera.physicalId], systemAPI,
+                                                                              640, $scope.serverTime.timeLatency);
                 $scope.liveOnly = true;
                 if($scope.canViewArchive) {
                     $scope.activeVideoRecords.archiveReadyPromise.then(function (hasArchive) {
@@ -238,7 +242,7 @@ angular.module('nxCommon').controller('ViewCtrl',
                 return;
             }
 
-            $scope.positionProvider.init(playing, timeLatency, $scope.positionProvider.playing);
+            $scope.positionProvider.init(playing, $scope.serverTime.timeLatency, $scope.positionProvider.playing);
             if(live){
                 playing = (new Date()).getTime();
             }else{
@@ -394,14 +398,14 @@ angular.module('nxCommon').controller('ViewCtrl',
             var serverTime = parseInt(result.data.reply.utcTime);
             var clientTime = clientDate.getTime();
             if(Math.abs(clientTime - serverTime) > minTimeLag){
-                timeLatency = clientTime - serverTime;
+                $scope.serverTime.timeLatency = clientTime - serverTime;
             }
             
             $scope.serverTime.timeZoneOffset = parseInt(result.data.reply.timeZoneOffset);
-            $scope.serverTime.timeLatency = timeLatency;
 
             if(Config.webclient.useServerTime){
-                timeLatency = $scope.serverTime.timeZoneOffset + clientDate.getTimezoneOffset() * 60000 - timeLatency;
+                $scope.serverTime.timeLatency =
+                    $scope.serverTime.timeZoneOffset + clientDate.getTimezoneOffset() * 60000 - $scope.serverTime.timeLatency;
             }
         });
 
