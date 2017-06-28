@@ -92,7 +92,6 @@ if(LINUX)
 endif()
 
 if(ANDROID)
-    include(android-ndk-workaround)
     include(android-apk)
 endif()
 
