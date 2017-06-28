@@ -1,5 +1,7 @@
 #include "db_structure_updater.h"
 
+#include <nx/utils/log/log.h>
+
 #include "async_sql_query_executor.h"
 #include "sql_query_execution_helper.h"
 #include "query.h"
@@ -66,8 +68,9 @@ bool DbStructureUpdater::updateStructSync()
         m_queryExecutor->executeUpdateQuerySync(
             std::bind(&DbStructureUpdater::updateDbToMultipleSchema, this, _1));
     }
-    catch (db::Exception /*e*/)
+    catch (db::Exception e)
     {
+        NX_ERROR(this, lm("Error updating db schema \"%1\". %2").arg(m_schemaName).arg(e.what()));
         return false;
     }
 
@@ -100,8 +103,9 @@ bool DbStructureUpdater::isDbVersionTableExists(QueryContext* queryContext)
         selectDbVersionQuery.exec();
         return true;
     }
-    catch (Exception /*e*/)
+    catch (Exception e)
     {
+        NX_VERBOSE(this, lm("db_version_data table presence check failed. %1").arg(e.what()));
         // It is better to check error type here, but qt does not always return proper error code.
         return false;
     }
@@ -109,10 +113,12 @@ bool DbStructureUpdater::isDbVersionTableExists(QueryContext* queryContext)
 
 void DbStructureUpdater::createInitialSchema(QueryContext* queryContext)
 {
+    NX_VERBOSE(this, lm("Creating maintenance structure"));
+
     SqlQuery createInitialSchemaQuery(*queryContext->connection());
     createInitialSchemaQuery.prepare(R"sql(
         CREATE TABLE db_version_data (
-            schema_name VARCHAR2(1024) NOT NULL PRIMARY KEY,
+            schema_name VARCHAR(128) NOT NULL PRIMARY KEY,
             db_version INTEGER NOT NULL DEFAULT 0
         );
     )sql");
@@ -130,8 +136,9 @@ bool DbStructureUpdater::isDbVersionTableSupportsMultipleSchemas(QueryContext* q
         selectDbVersionQuery.exec();
         return true;
     }
-    catch (Exception /*e*/)
+    catch (Exception e)
     {
+        NX_VERBOSE(this, lm("db_version_data.schema_name field presence check failed. %1").arg(e.what()));
         // It is better to check error type here, but qt does not always return proper error code.
         return false;
     }
@@ -139,27 +146,37 @@ bool DbStructureUpdater::isDbVersionTableSupportsMultipleSchemas(QueryContext* q
 
 void DbStructureUpdater::updateDbVersionTable(QueryContext* queryContext)
 {
-    SqlQuery::exec(
-        *queryContext->connection(),
-        R"sql(
-            ALTER TABLE db_version_data RENAME TO db_version_data_old;
-        )sql");
+    NX_VERBOSE(this, lm("Updating db_version_data table"));
 
-    SqlQuery::exec(
-        *queryContext->connection(),
-        R"sql(
-            CREATE TABLE db_version_data (
-                schema_name VARCHAR2(1024) NOT NULL PRIMARY KEY,
-                db_version INTEGER NOT NULL DEFAULT 0
-            );
-        )sql");
+    try
+    {
+        SqlQuery::exec(
+            *queryContext->connection(),
+            R"sql(
+                ALTER TABLE db_version_data RENAME TO db_version_data_old;
+            )sql");
 
-    SqlQuery::exec(
-        *queryContext->connection(),
-        R"sql(
-            INSERT INTO db_version_data(schema_name, db_version)
-            SELECT "", db_version FROM db_version_data_old
-        )sql");
+        SqlQuery::exec(
+            *queryContext->connection(),
+            R"sql(
+                CREATE TABLE db_version_data (
+                    schema_name VARCHAR(128) NOT NULL PRIMARY KEY,
+                    db_version INTEGER NOT NULL DEFAULT 0
+                );
+            )sql");
+
+        SqlQuery::exec(
+            *queryContext->connection(),
+            R"sql(
+                INSERT INTO db_version_data(schema_name, db_version)
+                SELECT "", db_version FROM db_version_data_old
+            )sql");
+    }
+    catch (Exception e)
+    {
+        NX_DEBUG(this, lm("db_version_data table update failed. %1").arg(e.what()));
+        throw;
+    }
 }
 
 void DbStructureUpdater::setDbSchemaNameTo(
