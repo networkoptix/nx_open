@@ -29,7 +29,7 @@ QString QnMobileAppInfo::version() const
             QString::number(nx::utils::SoftwareVersion(QnAppInfo::applicationVersion()).build()),
             QnAppInfo::applicationRevision());
     }
-    return QnAppInfo::applicationVersion();
+    return QnMobileClientAppInfo::applicationVersion();
 }
 
 QString QnMobileAppInfo::cloudName() const
