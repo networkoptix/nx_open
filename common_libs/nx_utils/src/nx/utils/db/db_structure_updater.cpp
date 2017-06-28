@@ -1,341 +1,200 @@
 #include "db_structure_updater.h"
 
-#include <functional>
-
-#include <QtSql/QSqlError>
-#include <QtSql/QSqlQuery>
-
 #include <nx/utils/log/log.h>
 
 #include "async_sql_query_executor.h"
+#include "sql_query_execution_helper.h"
+#include "query.h"
+#include "types.h"
 
 namespace nx {
 namespace utils {
 namespace db {
 
-namespace {
-
-struct SqlReplacementContext
-{
-    QByteArray key;
-    QByteArray defaultValue;
-    /** map<Sql driver, replacement>. */
-    std::map<RdbmsDriverType, QByteArray> replacementsByDriverName;
-};
-
-typedef std::vector<SqlReplacementContext> ReplacementsDictionary;
-
-static ReplacementsDictionary initializeReplacements()
-{
-    ReplacementsDictionary replacements;
-
-    {
-        SqlReplacementContext replacement;
-        replacement.key = "%bigint_primary_key_auto_increment%";
-        replacement.replacementsByDriverName.emplace(
-            RdbmsDriverType::sqlite, "INTEGER PRIMARY KEY AUTOINCREMENT");
-        replacement.defaultValue = "BIGINT PRIMARY KEY AUTO_INCREMENT"; //< As in Mysql.
-        replacements.push_back(std::move(replacement));
-    }
-
-    return replacements;
-}
-
-static const ReplacementsDictionary kSqlReplacements = initializeReplacements();
-
-static const char kCreateDbVersionTable[] = 
-R"sql(
-
-CREATE TABLE db_version_data (
-    db_version      integer NOT NULL DEFAULT 0
-);
-
-INSERT INTO db_version_data (db_version) VALUES (0);
-
-)sql";
-
-} // namespace
-
-
 DbStructureUpdater::DbStructureUpdater(
-    std::string /*dbManagerName*/,
+    const std::string& schemaName,
     AbstractAsyncSqlQueryExecutor* const queryExecutor)
     :
-    m_queryExecutor(queryExecutor),
-    m_initialVersion(0)
+    m_schemaUpdater(schemaName, queryExecutor),
+    m_schemaName(schemaName),
+    m_queryExecutor(queryExecutor)
 {
-    m_updateScripts.emplace_back(QByteArray(kCreateDbVersionTable));
 }
 
 void DbStructureUpdater::setInitialVersion(unsigned int version)
 {
-    m_initialVersion = version;
+    m_schemaUpdater.setInitialVersion(version);
 }
 
 void DbStructureUpdater::addUpdateScript(QByteArray updateScript)
 {
-    m_updateScripts.emplace_back(std::move(updateScript));
+    m_schemaUpdater.addUpdateScript(std::move(updateScript));
 }
 
 void DbStructureUpdater::addUpdateScript(
     std::map<RdbmsDriverType, QByteArray> scriptByDbType)
 {
-    m_updateScripts.emplace_back(std::move(scriptByDbType));
+    m_schemaUpdater.addUpdateScript(std::move(scriptByDbType));
 }
 
 void DbStructureUpdater::addUpdateFunc(DbUpdateFunc dbUpdateFunc)
 {
-    m_updateScripts.emplace_back(std::move(dbUpdateFunc));
+    m_schemaUpdater.addUpdateFunc(std::move(dbUpdateFunc));
 }
 
 void DbStructureUpdater::addFullSchemaScript(
     unsigned int version,
     QByteArray createSchemaScript)
 {
-    NX_ASSERT(version > 0);
-    m_fullSchemaScriptByVersion.emplace(version, std::move(createSchemaScript));
+    m_schemaUpdater.addFullSchemaScript(version, std::move(createSchemaScript));
 }
 
 unsigned int DbStructureUpdater::maxKnownVersion() const
 {
-    return m_initialVersion + m_updateScripts.size();
+    return m_schemaUpdater.maxKnownVersion();
 }
 
 void DbStructureUpdater::setVersionToUpdateTo(unsigned int version)
 {
-    m_versionToUpdateTo = version;
+    return m_schemaUpdater.setVersionToUpdateTo(version);
 }
 
 bool DbStructureUpdater::updateStructSync()
 {
-    nx::utils::promise<DBResult> dbUpdatePromise;
-    auto future = dbUpdatePromise.get_future();
+    using namespace std::placeholders;
 
-    // Starting async operation.
-    m_queryExecutor->executeUpdate(
-        std::bind(&DbStructureUpdater::updateDbInternal, this, std::placeholders::_1),
-        [&dbUpdatePromise](nx::utils::db::QueryContext* /*connection*/, DBResult dbResult)
-        {
-            dbUpdatePromise.set_value(dbResult);
-        });
-
-    // Waiting for completion.
-    future.wait();
-    return future.get() == DBResult::ok;
-}
-
-DBResult DbStructureUpdater::updateDbInternal(nx::utils::db::QueryContext* const queryContext)
-{
-    DbSchemaState dbState = analyzeDbSchemaState(queryContext);
-    if (dbState.version < m_initialVersion)
+    try
     {
-        NX_LOGX(lit("DB of version %1 cannot be upgraded! Minimal supported version is %2")
-            .arg(dbState.version).arg(m_initialVersion), cl_logERROR);
-        return DBResult::notFound;
+        m_queryExecutor->executeUpdateQuerySync(
+            std::bind(&DbStructureUpdater::updateStructInternal, this, _1));
     }
-
-    if (!dbState.someSchemaExists)
+    catch (db::Exception e)
     {
-        const auto dbResult = createInitialSchema(queryContext, &dbState);
-        if (dbResult != DBResult::ok)
-            return dbResult;
-    }
-
-    auto dbResult = applyScriptsMissingInCurrentDb(queryContext, &dbState);
-    if (dbResult != DBResult::ok)
-        return dbResult;
-
-    return updateDbVersion(queryContext, dbState);
-}
-
-DbStructureUpdater::DbSchemaState DbStructureUpdater::analyzeDbSchemaState(
-    nx::utils::db::QueryContext* const queryContext)
-{
-    DbStructureUpdater::DbSchemaState dbSchemaState{ m_initialVersion, false };
-
-    //reading current DB version
-    QSqlQuery fetchDbVersionQuery(*queryContext->connection());
-    fetchDbVersionQuery.prepare(lit("SELECT db_version FROM db_version_data"));
-    //absense of table db_version_data is normal: DB is just empty
-    if (fetchDbVersionQuery.exec() && fetchDbVersionQuery.next())
-    {
-        dbSchemaState.version = fetchDbVersionQuery.value(lit("db_version")).toUInt();
-        dbSchemaState.someSchemaExists = true;
-    }
-
-    return dbSchemaState;
-}
-
-DBResult DbStructureUpdater::createInitialSchema(
-    nx::utils::db::QueryContext* const queryContext,
-    DbSchemaState* dbSchemaState)
-{
-    if (!execSqlScript(queryContext, kCreateDbVersionTable, RdbmsDriverType::unknown))
-    {
-        NX_LOG(lit("DbStructureUpdater. Failed to apply kCreateDbVersionTable script. %1")
-            .arg(queryContext->connection()->lastError().text()), cl_logWARNING);
-        return DBResult::ioError;
-    }
-    dbSchemaState->version = 1;
-
-    if (!m_fullSchemaScriptByVersion.empty())
-    {
-        // Applying full schema.
-        if (!execSqlScript(
-                queryContext,
-                m_fullSchemaScriptByVersion.rbegin()->second,
-                RdbmsDriverType::unknown))
-        {
-            NX_LOG(lit("DbStructureUpdater. Failed to create schema of version %1: %2")
-                .arg(m_fullSchemaScriptByVersion.rbegin()->first)
-                .arg(queryContext->connection()->lastError().text()), cl_logWARNING);
-            return DBResult::ioError;
-        }
-        dbSchemaState->version = m_fullSchemaScriptByVersion.rbegin()->first;
-    }
-
-    dbSchemaState->someSchemaExists = true;
-
-    return DBResult::ok;
-}
-
-DBResult DbStructureUpdater::applyScriptsMissingInCurrentDb(
-    nx::utils::db::QueryContext* queryContext,
-    DbSchemaState* dbState)
-{
-    while (gotScriptForUpdate(dbState))
-    {
-        const auto dbResult = applyNextUpdateScript(queryContext, dbState);
-        if (dbResult != DBResult::ok)
-            return dbResult;
-    }
-
-    return DBResult::ok;
-}
-
-bool DbStructureUpdater::gotScriptForUpdate(DbSchemaState* dbState) const
-{
-    auto versionToUpdateTo = m_initialVersion + m_updateScripts.size();
-    if (m_versionToUpdateTo)
-        versionToUpdateTo = *m_versionToUpdateTo;
-
-    return static_cast<size_t>(dbState->version) < versionToUpdateTo;
-}
-
-DBResult DbStructureUpdater::applyNextUpdateScript(
-    nx::utils::db::QueryContext* queryContext,
-    DbSchemaState* dbState)
-{
-    NX_LOGX(lm("Updating structure to version %1")
-        .arg(dbState->version)/*.arg(m_updateScripts[dbState->version - m_initialVersion].sqlScript)*/,
-        cl_logDEBUG2);
-
-    if (!execDbUpdate(m_updateScripts[dbState->version - m_initialVersion], queryContext))
-    {
-        NX_LOG(lit("DbStructureUpdater. Failure updating to version %1: %2")
-            .arg(dbState->version).arg(queryContext->connection()->lastError().text()),
-            cl_logWARNING);
-        return DBResult::ioError;
-    }
-
-    ++dbState->version;
-
-    return DBResult::ok;
-}
-
-DBResult DbStructureUpdater::updateDbVersion(
-    nx::utils::db::QueryContext* const queryContext,
-    const DbSchemaState& dbSchemaState)
-{
-    QSqlQuery updateDbVersionQuery(*queryContext->connection());
-    updateDbVersionQuery.prepare(lit("UPDATE db_version_data SET db_version = :dbVersion"));
-    updateDbVersionQuery.bindValue(lit(":dbVersion"), dbSchemaState.version);
-    return updateDbVersionQuery.exec() ? DBResult::ok : DBResult::ioError;
-}
-
-bool DbStructureUpdater::execDbUpdate(
-    const DbUpdate& dbUpdate,
-    nx::utils::db::QueryContext* const queryContext)
-{
-    if (!dbUpdate.dbTypeToSqlScript.empty())
-    {
-        if (!execStructureUpdateTask(dbUpdate.dbTypeToSqlScript, queryContext))
-            return false;
-    }
-
-    if (dbUpdate.func)
-    {
-        if (dbUpdate.func(queryContext) != nx::utils::db::DBResult::ok)
-        {
-            NX_LOGX(lm("Error executing update function"), cl_logWARNING);
-            return false;
-        }
+        NX_ERROR(this, lm("Error updating db schema \"%1\". %2").arg(m_schemaName).arg(e.what()));
+        return false;
     }
 
     return true;
 }
 
-bool DbStructureUpdater::execStructureUpdateTask(
-    const std::map<RdbmsDriverType, QByteArray>& dbTypeToScript,
-    nx::utils::db::QueryContext* const queryContext)
+void DbStructureUpdater::updateStructInternal(QueryContext* queryContext)
 {
-    const auto driverType = m_queryExecutor->connectionOptions().driverType;
+    updateDbToMultipleSchema(queryContext);
+    m_schemaUpdater.updateStruct(queryContext);
+}
 
-    std::map<RdbmsDriverType, QByteArray>::const_iterator selectedScriptIter =
-        selectSuitableScript(dbTypeToScript, driverType);
-    if (selectedScriptIter == dbTypeToScript.end())
+void DbStructureUpdater::updateDbToMultipleSchema(QueryContext* queryContext)
+{
+    if (!isDbVersionTableExists(queryContext))
     {
-        NX_LOGX(lm("Could not find script version for DB %1. Aborting...")
-            .arg(driverType), cl_logDEBUG1);
+        createInitialSchema(queryContext);
+    }
+    else if (!isDbVersionTableSupportsMultipleSchemas(queryContext))
+    {
+        updateDbVersionTable(queryContext);
+        setDbSchemaNameTo(queryContext, m_schemaName);
+    }
+ 
+    // db_version_data table is present and supports multiple schemas. Nothing to do here.
+}
+
+bool DbStructureUpdater::isDbVersionTableExists(QueryContext* queryContext)
+{
+    SqlQuery selectDbVersionQuery(*queryContext->connection());
+    try
+    {
+        selectDbVersionQuery.prepare(R"sql(
+            SELECT count(*) FROM db_version_data
+        )sql");
+        selectDbVersionQuery.exec();
+        return true;
+    }
+    catch (Exception e)
+    {
+        NX_VERBOSE(this, lm("db_version_data table presence check failed. %1").arg(e.what()));
+        // It is better to check error type here, but qt does not always return proper error code.
         return false;
     }
-
-    return execSqlScript(
-        queryContext,
-        selectedScriptIter->second,
-        selectedScriptIter->first);
 }
 
-std::map<RdbmsDriverType, QByteArray>::const_iterator DbStructureUpdater::selectSuitableScript(
-    const std::map<RdbmsDriverType, QByteArray>& dbTypeToScript,
-    RdbmsDriverType driverType) const
+void DbStructureUpdater::createInitialSchema(QueryContext* queryContext)
 {
-    auto properScriptIter = dbTypeToScript.find(driverType);
-    if (properScriptIter == dbTypeToScript.end())
-        properScriptIter = dbTypeToScript.find(RdbmsDriverType::unknown);
-    if (properScriptIter == dbTypeToScript.end())
-        return dbTypeToScript.end();
+    NX_VERBOSE(this, lm("Creating maintenance structure"));
 
-    return properScriptIter;
+    SqlQuery createInitialSchemaQuery(*queryContext->connection());
+    createInitialSchemaQuery.prepare(R"sql(
+        CREATE TABLE db_version_data (
+            schema_name VARCHAR(128) NOT NULL PRIMARY KEY,
+            db_version INTEGER NOT NULL DEFAULT 0
+        );
+    )sql");
+    createInitialSchemaQuery.exec();
 }
 
-bool DbStructureUpdater::execSqlScript(
-    nx::utils::db::QueryContext* const queryContext,
-    QByteArray sqlScript,
-    RdbmsDriverType sqlScriptDialect)
+bool DbStructureUpdater::isDbVersionTableSupportsMultipleSchemas(QueryContext* queryContext)
 {
-    QByteArray scriptText;
-    if (sqlScriptDialect == RdbmsDriverType::unknown)
-        scriptText = fixSqlDialect(sqlScript, m_queryExecutor->connectionOptions().driverType);
-    else
-        scriptText = sqlScript;
-
-    return m_queryExecutor->execSqlScriptSync(scriptText, queryContext) == DBResult::ok;
-}
-
-QByteArray DbStructureUpdater::fixSqlDialect(
-    QByteArray initialScript, RdbmsDriverType targetDialect)
-{
-    QByteArray script = initialScript;
-    for (const auto& replacementCtx: kSqlReplacements)
+    SqlQuery selectDbVersionQuery(*queryContext->connection());
+    try
     {
-        const auto it = replacementCtx.replacementsByDriverName.find(targetDialect);
-        if (it != replacementCtx.replacementsByDriverName.end())
-            script.replace(replacementCtx.key, it->second);
-        else
-            script.replace(replacementCtx.key, replacementCtx.defaultValue);
+        selectDbVersionQuery.prepare(R"sql(
+            SELECT db_version, schema_name FROM db_version_data
+        )sql");
+        selectDbVersionQuery.exec();
+        return true;
     }
-    return script;
+    catch (Exception e)
+    {
+        NX_VERBOSE(this, lm("db_version_data.schema_name field presence check failed. %1").arg(e.what()));
+        // It is better to check error type here, but qt does not always return proper error code.
+        return false;
+    }
+}
+
+void DbStructureUpdater::updateDbVersionTable(QueryContext* queryContext)
+{
+    NX_VERBOSE(this, lm("Updating db_version_data table"));
+
+    try
+    {
+        SqlQuery::exec(
+            *queryContext->connection(),
+            R"sql(
+                ALTER TABLE db_version_data RENAME TO db_version_data_old;
+            )sql");
+
+        SqlQuery::exec(
+            *queryContext->connection(),
+            R"sql(
+                CREATE TABLE db_version_data (
+                    schema_name VARCHAR(128) NOT NULL PRIMARY KEY,
+                    db_version INTEGER NOT NULL DEFAULT 0
+                );
+            )sql");
+
+        SqlQuery::exec(
+            *queryContext->connection(),
+            R"sql(
+                INSERT INTO db_version_data(schema_name, db_version)
+                SELECT "", db_version FROM db_version_data_old
+            )sql");
+    }
+    catch (Exception e)
+    {
+        NX_DEBUG(this, lm("db_version_data table update failed. %1").arg(e.what()));
+        throw;
+    }
+}
+
+void DbStructureUpdater::setDbSchemaNameTo(
+    QueryContext* queryContext,
+    const std::string& schemaName)
+{
+    SqlQuery setDbSchemaNameQuery(*queryContext->connection());
+    setDbSchemaNameQuery.prepare(R"sql(
+        UPDATE db_version_data SET schema_name=:schemaName
+    )sql");
+    setDbSchemaNameQuery.bindValue(":schemaName", QString::fromStdString(schemaName));
+    setDbSchemaNameQuery.exec();
 }
 
 } // namespace db
