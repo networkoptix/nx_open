@@ -66,7 +66,7 @@ bool DbStructureUpdater::updateStructSync()
     try
     {
         m_queryExecutor->executeUpdateQuerySync(
-            std::bind(&DbStructureUpdater::updateDbToMultipleSchema, this, _1));
+            std::bind(&DbStructureUpdater::updateStructInternal, this, _1));
     }
     catch (db::Exception e)
     {
@@ -74,7 +74,13 @@ bool DbStructureUpdater::updateStructSync()
         return false;
     }
 
-    return m_schemaUpdater.updateStructSync();
+    return true;
+}
+
+void DbStructureUpdater::updateStructInternal(QueryContext* queryContext)
+{
+    updateDbToMultipleSchema(queryContext);
+    m_schemaUpdater.updateStruct(queryContext);
 }
 
 void DbStructureUpdater::updateDbToMultipleSchema(QueryContext* queryContext)

@@ -98,46 +98,30 @@ void DbStructureUpdater::setVersionToUpdateTo(unsigned int version)
     m_versionToUpdateTo = version;
 }
 
-bool DbStructureUpdater::updateStructSync()
-{
-    nx::utils::promise<DBResult> dbUpdatePromise;
-    auto future = dbUpdatePromise.get_future();
-
-    // Starting async operation.
-    m_queryExecutor->executeUpdate(
-        std::bind(&DbStructureUpdater::updateDbInternal, this, std::placeholders::_1),
-        [&dbUpdatePromise](nx::utils::db::QueryContext* /*connection*/, DBResult dbResult)
-        {
-            dbUpdatePromise.set_value(dbResult);
-        });
-
-    // Waiting for completion.
-    future.wait();
-    return future.get() == DBResult::ok;
-}
-
-DBResult DbStructureUpdater::updateDbInternal(nx::utils::db::QueryContext* const queryContext)
+void DbStructureUpdater::updateStruct(QueryContext* const queryContext)
 {
     DbSchemaState dbState = analyzeDbSchemaState(queryContext);
     if (dbState.version < m_initialVersion)
     {
         NX_LOGX(lit("DB of version %1 cannot be upgraded! Minimal supported version is %2")
             .arg(dbState.version).arg(m_initialVersion), cl_logERROR);
-        return DBResult::notFound;
+        throw Exception(DBResult::notFound);
     }
 
     if (!dbState.someSchemaExists)
     {
         const auto dbResult = createInitialSchema(queryContext, &dbState);
         if (dbResult != DBResult::ok)
-            return dbResult;
+            throw Exception(dbResult);
     }
 
     auto dbResult = applyScriptsMissingInCurrentDb(queryContext, &dbState);
     if (dbResult != DBResult::ok)
-        return dbResult;
+        throw Exception(dbResult);
 
-    return updateDbVersion(queryContext, dbState);
+    dbResult = updateDbVersion(queryContext, dbState);
+    if (dbResult != DBResult::ok)
+        throw Exception(dbResult);
 }
 
 DbStructureUpdater::DbSchemaState DbStructureUpdater::analyzeDbSchemaState(

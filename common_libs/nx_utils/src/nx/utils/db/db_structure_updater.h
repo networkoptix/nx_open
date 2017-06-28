@@ -60,6 +60,7 @@ private:
     std::string m_schemaName;
     AbstractAsyncSqlQueryExecutor* m_queryExecutor;
 
+    void updateStructInternal(QueryContext* queryContext);
     void updateDbToMultipleSchema(QueryContext* queryContext);
     bool isDbVersionTableExists(QueryContext* queryContext);
     void createInitialSchema(QueryContext* queryContext);

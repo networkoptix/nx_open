@@ -46,7 +46,10 @@ public:
 
     void setVersionToUpdateTo(unsigned int version);
 
-    bool updateStructSync();
+    /**
+     * @throws db::Exception
+     */
+    void updateStruct(QueryContext* const dbConnection);
 
 private:
     struct DbUpdate
@@ -84,8 +87,6 @@ private:
     std::map<unsigned int, QByteArray> m_fullSchemaScriptByVersion;
     std::vector<DbUpdate> m_updateScripts;
     boost::optional<unsigned int> m_versionToUpdateTo;
-
-    DBResult updateDbInternal(nx::utils::db::QueryContext* const dbConnection);
 
     DbSchemaState analyzeDbSchemaState(nx::utils::db::QueryContext* const queryContext);
 
