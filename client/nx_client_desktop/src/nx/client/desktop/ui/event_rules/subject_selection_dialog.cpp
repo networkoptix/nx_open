@@ -16,6 +16,7 @@
 #include <utils/common/scoped_painter_rollback.h>
 #include <nx/utils/string.h>
 
+#include <nx/client/desktop/ui/common/item_view_utils.h>
 #include <nx/client/desktop/ui/common/natural_string_sort_proxy_model.h>
 
 namespace nx {
@@ -32,9 +33,6 @@ SubjectSelectionDialog::SubjectSelectionDialog(QWidget* parent, Qt::WindowFlags 
     m_userListDelegate(new UserListDelegate(this))
 {
     ui->setupUi(this);
-
-    m_roles->setCheckable(true);
-    m_roles->setPredefinedRoleIdsEnabled(true);
 
     auto filterRoles = new QSortFilterProxyModel(m_roles);
     filterRoles->setFilterCaseSensitivity(Qt::CaseInsensitive);
@@ -71,7 +69,13 @@ SubjectSelectionDialog::SubjectSelectionDialog(QWidget* parent, Qt::WindowFlags 
     ui->usersTreeView->setItemDelegateForColumn(
         UserListModel::IndicatorColumn, indicatorDelegate);
 
-    // TODO: #vkutin Space single- and batch-toggle! Click-entire-line toggle! Shift-click toggle!
+    ui->allUsersCheckableLine->setUserCheckable(false); //< Entire row clicks are handled instead.
+
+    ItemViewUtils::setupDefaultAutoToggle(ui->allUsersCheckableLine->view(),
+        CheckableLineWidget::CheckColumn);
+
+    ItemViewUtils::setupDefaultAutoToggle(ui->rolesTreeView, RoleListModel::CheckColumn);
+    ItemViewUtils::setupDefaultAutoToggle(ui->usersTreeView, UserListModel::CheckColumn);
 
     auto setupTreeView =
         [this](QnTreeView* treeView)
