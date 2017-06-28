@@ -368,7 +368,8 @@
                     "user": "admin",
                     "password": "12345"
                 }
-            ]
+            ],
+            "unauthorizedTimeoutSec": 185
         },        
         {
             "keys": [

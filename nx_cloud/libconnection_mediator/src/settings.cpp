@@ -294,7 +294,7 @@ void Settings::loadSettings()
     {
 #ifdef Q_OS_LINUX
         m_general.dataDir = QString("/opt/%1/%2/var")
-            .arg(nx::utils::linuxOrganizationName()).arg(kModuleName);
+            .arg(nx::utils::AppInfo::linuxOrganizationName()).arg(kModuleName);
 #else
         const QStringList& dataDirList = QStandardPaths::standardLocations(QStandardPaths::DataLocation);
         m_general.dataDir = dataDirList.isEmpty() ? QString() : dataDirList[0];

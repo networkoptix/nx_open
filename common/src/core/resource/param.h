@@ -57,6 +57,7 @@ namespace Qn
     static const QString LOW_STREAM_AVAILABLE_BITRATES_PARAM_NAME = lit("lowStreamAvailableBitrates");
     static const QString HIGH_STREAM_BITRATE_BOUNDS_PARAM_NAME = lit("highStreamBitrateBounds");
     static const QString LOW_STREAM_BITRATE_BOUNDS_PARAM_NAME = lit("lowStreamBitrateBounds");
+    static const QString kUnauthrizedTimeoutParamName = lit("unauthorizedTimeoutSec");
 
     static const QString ADVANCED_PARAMETER_OVERLOADS_PARAM_NAME = lit("advancedParameterOverloads");
 
