@@ -37,8 +37,6 @@ angular.module('nxCommon').controller('ViewCtrl',
         $scope.liveOnly = true;
         $scope.activeCamera = null;
 
-        var minTimeLag = 2000;// Two seconds
-
         $scope.activeResolution = 'Auto';
         // TODO: detect better resolution here?
         var transcodingResolutions = ['Auto', '1080p', '720p', '640p', '320p', '240p'];
@@ -386,22 +384,9 @@ angular.module('nxCommon').controller('ViewCtrl',
 
 
         systemAPI.getTime().then(function(result){
-            var clientDate = new Date();
-
-            var serverTime = parseInt(result.data.reply.utcTime);
-            var clientTime = clientDate.getTime();
-
-            var latency = 0;
-            if(Math.abs(clientTime - serverTime) > minTimeLag){
-                latency = clientTime - serverTime;
-            }
-            
+            var serverUtcTime = parseInt(result.data.reply.utcTime);
             var timeZoneOffset = parseInt(result.data.reply.timeZoneOffset);
-
-            if(Config.webclient.useServerTime){
-                latency = timeZoneOffset + clientDate.getTimezoneOffset() * 60000 - latency;
-            }
-            serverTime.init(Config.webclient.useServerTime, timeZoneOffset, latency);
+            serverTime.init(Config.webclient.useServerTime, serverUtcTime, timeZoneOffset);
         });
 
         function requestResources(){

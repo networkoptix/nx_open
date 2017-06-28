@@ -22,12 +22,20 @@ function serverTime(date, reverse){
         return date;
     }
     var currentTime = new Date(date);
-    return (currentTime.getTime() + currentTime.getTimezoneOffset() * 60000) + serverTime.timeZoneOffset - serverTime.timeLatency;
+    return currentTime.getTime() + serverTime.timeLatency;
 };
-serverTime.init = function(useServerTime, timeZoneOffset, timeLatency ){
+serverTime.init = function(useServerTime, serverTime, timeZoneOffset){
+    var minTimeLag = 2000;// Two seconds
+    var clientDate = new Date();
+    var clientTime = clientDate.getTime();
+    var latency = 0;
+    if(Math.abs(clientTime - serverTime) > minTimeLag){
+        latency = clientTime - serverTime;
+    }
+
     serverTime.useServerTime = useServerTime;
     serverTime.timeZoneOffset = timeZoneOffset;
-    serverTime.timeLatency = timeLatency;
+    serverTime.timeLatency = latency;
 };
 
 //Record
