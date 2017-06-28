@@ -37,7 +37,7 @@ angular.module('nxCommon').controller('ViewCtrl',
         $scope.liveOnly = true;
         $scope.activeCamera = null;
 
-        var timeCorrection = 0;
+        var timeLatency = 0;
         var minTimeLag = 2000;// Two seconds
 
         $scope.activeResolution = 'Auto';
@@ -202,8 +202,8 @@ angular.module('nxCommon').controller('ViewCtrl',
             position = position?parseInt(position):oldTimePosition;
 
             if ($scope.activeCamera) {
-                $scope.positionProvider = cameraRecords.getPositionProvider([$scope.activeCamera.physicalId], systemAPI, timeCorrection);
-                $scope.activeVideoRecords = cameraRecords.getRecordsProvider([$scope.activeCamera.physicalId], systemAPI, 640, timeCorrection);
+                $scope.positionProvider = cameraRecords.getPositionProvider([$scope.activeCamera.physicalId], systemAPI, timeLatency);
+                $scope.activeVideoRecords = cameraRecords.getRecordsProvider([$scope.activeCamera.physicalId], systemAPI, 640, timeLatency);
                 $scope.liveOnly = true;
                 if($scope.canViewArchive) {
                     $scope.activeVideoRecords.archiveReadyPromise.then(function (hasArchive) {
@@ -238,7 +238,7 @@ angular.module('nxCommon').controller('ViewCtrl',
                 return;
             }
 
-            $scope.positionProvider.init(playing, timeCorrection, $scope.positionProvider.playing);
+            $scope.positionProvider.init(playing, timeLatency, $scope.positionProvider.playing);
             if(live){
                 playing = (new Date()).getTime();
             }else{
@@ -394,14 +394,14 @@ angular.module('nxCommon').controller('ViewCtrl',
             var serverTime = parseInt(result.data.reply.utcTime);
             var clientTime = clientDate.getTime();
             if(Math.abs(clientTime - serverTime) > minTimeLag){
-                timeCorrection = clientTime - serverTime;
+                timeLatency = clientTime - serverTime;
             }
             
             $scope.serverTime.timeZoneOffset = parseInt(result.data.reply.timeZoneOffset);
-            $scope.serverTime.latency = timeCorrection;
+            $scope.serverTime.timeLatency = timeLatency;
 
             if(Config.webclient.useServerTime){
-                timeCorrection = $scope.serverTime.timeZoneOffset + clientDate.getTimezoneOffset() * 60000 - timeCorrection;
+                timeLatency = $scope.serverTime.timeZoneOffset + clientDate.getTimezoneOffset() * 60000 - timeLatency;
             }
         });
 
