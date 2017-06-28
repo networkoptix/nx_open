@@ -708,6 +708,32 @@ QLatin1String toString(Value val)
 }
 }
 
+static bool isMessageBodyForbiddenByHeaders(const HttpHeaders& headers)
+{
+    auto contentTypeIter = headers.find("Content-Type");
+    if (contentTypeIter == headers.end())
+        return true;
+
+    auto contentLengthIter = headers.find("Content-Length");
+    if (contentLengthIter != headers.end() &&
+        contentLengthIter->second.toUInt() == 0)
+    {
+        return true;
+    }
+
+    return false;
+}
+
+bool isMessageBodyPresent(const Response& response)
+{
+    if (!StatusCode::isMessageBodyAllowed(response.statusLine.statusCode))
+        return false;
+
+    if (isMessageBodyForbiddenByHeaders(response.headers))
+        return false;
+
+    return true;
+}
 
 
 ////////////////////////////////////////////////////////////

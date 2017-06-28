@@ -102,9 +102,13 @@ void ProxyWorker::onMessageFromTargetHost(nx_http::Message message)
         .arg(nx_http::StatusCode::toString(statusCode))
         .arg(contentType.isEmpty() ? nx::String("none") : contentType));
 
-    if (!messageBodyNeedsConvertion(*message.response))
+    if (nx_http::isMessageBodyPresent(*message.response) &&
+        !messageBodyNeedsConvertion(*message.response))
+    {
         return startMessageBodyStreaming(std::move(message));
+    }
 
+    // Will send message with the full body when available.
     m_responseMessage = std::move(message);
 }
 
@@ -163,12 +167,14 @@ void ProxyWorker::onSomeMessageBodyRead(nx::Buffer someMessageBody)
 
 void ProxyWorker::onMessageEnd()
 {
-    updateMessageHeaders(m_responseMessage.response);
-    
-    auto msgBody = prepareFixedMessageBody();
+    std::unique_ptr<nx_http::AbstractMsgBodySource> msgBody;
+    if (nx_http::isMessageBodyPresent(*m_responseMessage.response))
+    {
+        updateMessageHeaders(m_responseMessage.response);
+        msgBody = prepareFixedMessageBody();
+    }
 
     const auto statusCode = m_responseMessage.response->statusLine.statusCode;
-
     m_responseSender->sendResponse(
         nx_http::RequestResult(
             static_cast<nx_http::StatusCode::Value>(statusCode),
