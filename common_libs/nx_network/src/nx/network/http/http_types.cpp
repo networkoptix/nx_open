@@ -710,10 +710,6 @@ QLatin1String toString(Value val)
 
 static bool isMessageBodyForbiddenByHeaders(const HttpHeaders& headers)
 {
-    auto contentTypeIter = headers.find("Content-Type");
-    if (contentTypeIter == headers.end())
-        return true;
-
     auto contentLengthIter = headers.find("Content-Length");
     if (contentLengthIter != headers.end() &&
         contentLengthIter->second.toUInt() == 0)
