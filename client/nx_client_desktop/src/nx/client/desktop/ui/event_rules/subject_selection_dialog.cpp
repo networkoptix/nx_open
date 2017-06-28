@@ -12,7 +12,6 @@
 #include <ui/style/globals.h>
 #include <ui/style/skin.h>
 #include <ui/widgets/common/snapped_scrollbar.h>
-#include <ui/widgets/common/item_view_auto_hider.h>
 #include <utils/common/scoped_painter_rollback.h>
 #include <nx/utils/string.h>
 
@@ -33,6 +32,7 @@ SubjectSelectionDialog::SubjectSelectionDialog(QWidget* parent, Qt::WindowFlags 
     m_userListDelegate(new UserListDelegate(this))
 {
     ui->setupUi(this);
+    ui->nothingFoundLabel->setHidden(true);
 
     auto filterRoles = new QSortFilterProxyModel(m_roles);
     filterRoles->setFilterCaseSensitivity(Qt::CaseInsensitive);
@@ -101,20 +101,22 @@ SubjectSelectionDialog::SubjectSelectionDialog(QWidget* parent, Qt::WindowFlags 
     connect(ui->showAllUsers, &QPushButton::toggled,
         this, &SubjectSelectionDialog::showAllUsersChanged);
 
-    const auto updateFilterText =
+    const auto updateFilter =
         [this, filterRoles]()
         {
-            m_users->setFilterFixedString(ui->searchLineEdit->text());
-            filterRoles->setFilterFixedString(ui->searchLineEdit->text());
+            const auto filter = ui->searchLineEdit->text().trimmed();
+            m_users->setFilterFixedString(filter);
+            filterRoles->setFilterFixedString(filter);
+            ui->allUsersCheckableLine->setVisible(filter.isEmpty());
         };
 
-    connect(ui->searchLineEdit, &QnSearchLineEdit::textChanged, this, updateFilterText);
-    connect(ui->searchLineEdit, &QnSearchLineEdit::enterKeyPressed, this, updateFilterText);
+    connect(ui->searchLineEdit, &QnSearchLineEdit::textChanged, this, updateFilter);
+    connect(ui->searchLineEdit, &QnSearchLineEdit::enterKeyPressed, this, updateFilter);
     connect(ui->searchLineEdit, &QnSearchLineEdit::escKeyPressed, this,
-        [this, updateFilterText]()
+        [this, updateFilter]()
         {
             ui->searchLineEdit->clear();
-            updateFilterText();
+            updateFilter();
         });
 
     const auto connectToModelChanges =
@@ -133,6 +135,23 @@ SubjectSelectionDialog::SubjectSelectionDialog(QWidget* parent, Qt::WindowFlags 
     connectToModelChanges(m_users);
     connectToModelChanges(m_roles);
 
+    const auto updateVisibility =
+        [this]()
+        {
+            const bool noRoles = !ui->rolesTreeView->model()->rowCount();
+            const bool noUsers = !ui->usersTreeView->model()->rowCount();
+            ui->rolesGroupBox->setHidden(noRoles);
+            ui->usersGroupBox->setHidden(noUsers);
+            ui->nothingFoundLabel->setVisible(noRoles && noUsers);
+        };
+
+    connect(ui->usersTreeView->model(), &QAbstractItemModel::rowsInserted, this, updateVisibility);
+    connect(ui->usersTreeView->model(), &QAbstractItemModel::rowsRemoved, this, updateVisibility);
+    connect(ui->usersTreeView->model(), &QAbstractItemModel::modelReset, this, updateVisibility);
+    connect(ui->rolesTreeView->model(), &QAbstractItemModel::rowsInserted, this, updateVisibility);
+    connect(ui->rolesTreeView->model(), &QAbstractItemModel::rowsRemoved, this, updateVisibility);
+    connect(ui->rolesTreeView->model(), &QAbstractItemModel::modelReset, this, updateVisibility);
+
     ui->allUsersCheckableLine->setText(tr("All Users"));
     setupTreeView(ui->allUsersCheckableLine->view());
 
@@ -146,6 +165,9 @@ SubjectSelectionDialog::SubjectSelectionDialog(QWidget* parent, Qt::WindowFlags 
             const bool checked = checkState == Qt::Checked;
             ui->rolesGroupBox->setEnabled(!checked);
             ui->usersGroupBox->setEnabled(!checked);
+            ui->searchLineEdit->setEnabled(!checked);
+            if (checked)
+                ui->searchLineEdit->clear();
             m_roles->setAllUsers(checked);
             m_users->setAllUsers(checked);
             emit changed();
@@ -156,9 +178,6 @@ SubjectSelectionDialog::SubjectSelectionDialog(QWidget* parent, Qt::WindowFlags 
 
     allUsersCheckStateChanged(ui->allUsersCheckableLine->checkState());
     validateAllUsers();
-
-    QnItemViewAutoHider::create(ui->rolesTreeView, tr("No user roles found"));
-    QnItemViewAutoHider::create(ui->usersTreeView, tr("No users found"));
 }
 
 SubjectSelectionDialog::~SubjectSelectionDialog()

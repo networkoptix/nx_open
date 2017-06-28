@@ -230,6 +230,16 @@
            </widget>
           </item>
           <item>
+           <widget class="QLabel" name="nothingFoundLabel">
+            <property name="text">
+             <string>Nothing matches your search.</string>
+            </property>
+            <property name="alignment">
+             <set>Qt::AlignCenter</set>
+            </property>
+           </widget>
+          </item>
+          <item>
            <spacer name="verticalSpacer">
             <property name="orientation">
              <enum>Qt::Vertical</enum>
