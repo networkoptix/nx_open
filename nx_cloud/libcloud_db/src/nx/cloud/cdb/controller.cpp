@@ -112,7 +112,7 @@ void Controller::performDataMigrations()
 {
     using namespace std::placeholders;
 
-    NX_INFO(this, lm("Performing data migrations..."));
+    NX_INFO(this, "Performing data migrations...");
 
     try
     {
