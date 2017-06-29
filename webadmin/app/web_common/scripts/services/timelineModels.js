@@ -6,8 +6,11 @@ In data structures we always store "display time"
 In server requests - we always use server time
 */
 var timeManager = {
-    useServerTime: true
+    useServerTime: true,
+    timeLatency: 0,
+    timeZoneOffset: 0
 };
+
 
 timeManager.serverToLocal = function(date){
     return Math.max(date + this.timeLatency,0);
@@ -19,9 +22,9 @@ timeManager.localToServer = function(date){
 
 timeManager.displayToServer = function(date){
     if(this.useServerTime){
-        return this.localToServer(date);  // Save server time
+        return date; // Translate server time to localtime
     }
-    return date; // Translate server time to localtime
+    return this.localToServer(date);  // Save server time
 };
 timeManager.serverToDisplay = function(date){
     if(this.useServerTime){
@@ -32,7 +35,7 @@ timeManager.serverToDisplay = function(date){
 
 timeManager.localToDisplay = function(date){
     if(this.useServerTime){
-        return this.localToServer(date);
+        return this.serverToDisplay(this.localToServer(date));
     }
     return date;
 };
@@ -55,7 +58,7 @@ timeManager.translate = function(date, reverse){
     }
     return date - latency;
 };
-timeManager.init = function(useServerTime, serverTime, timeZoneOffset){
+timeManager.init = function(useServerTime, serverTime, serverTimeZoneOffset){
     var minTimeLag = 2000;// Two seconds
     var clientDate = new Date();
     var clientTime = clientDate.getTime();
@@ -65,8 +68,7 @@ timeManager.init = function(useServerTime, serverTime, timeZoneOffset){
     }
 
     this.useServerTime = useServerTime;
-    this.timeLatency = latency;
-
+    this.timeLatency = latency; // time latency handles the situation when time is not synchronised
     this.serverTimeZoneOffset = serverTimeZoneOffset;
     this.clientTimeZoneOffset = -clientDate.getTimezoneOffset() * 60000;
     // For some reason local timezone offset has wrong sign, so we sum them instead of subtractions
@@ -489,7 +491,7 @@ CameraRecordsProvider.prototype.getIntervalRecords = function (start,end,level,d
 
     // Splice existing intervals and check, if we need an update from server
     var result = [];
-    this.selectRecords(result,timeManager.displayToServer(start),timeManager.displayToServer(end),level,null,debugLevel);
+    this.selectRecords(result, start, end, level, null, debugLevel);
 
     /*this.logcounter = this.logcounter||0;
     this.logcounter ++;
@@ -503,7 +505,7 @@ CameraRecordsProvider.prototype.getIntervalRecords = function (start,end,level,d
 
     var needUpdate = !debugLevel && !this.checkRequestedIntervalCache(start,end,level);
     if(needUpdate){ // Request update
-        this.requestInterval(start, end, level);
+        this.requestInterval(timeManager.displayToServer(start), timeManager.displayToServer(end), level);
     }
 
     // Return splice - as is
