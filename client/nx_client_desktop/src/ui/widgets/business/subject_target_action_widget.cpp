@@ -106,12 +106,6 @@ void QnSubjectTargetActionWidget::updateSubjectsButton()
     if (!m_subjectsButton || !model())
         return;
 
-    const auto params = model()->actionParams();
-
-    QnUserResourceList users;
-    QList<QnUuid> roles;
-    userRolesManager()->usersAndRoles(params.additionalResources, users, roles);
-
     const auto icon =
         [](const QString& path) -> QIcon
         {
@@ -119,21 +113,30 @@ void QnSubjectTargetActionWidget::updateSubjectsButton()
             return qnSkin->icon(path, QString(), &suffixes);
         };
 
-    if (!params.allUsers && users.isEmpty() && roles.isEmpty())
+    const auto params = model()->actionParams();
+    if (params.allUsers)
     {
-        m_subjectsButton->setText(vms::event::StringsHelper::needToSelectUserText());
-        m_subjectsButton->setIcon(icon(lit("tree/user_alert.png")));
+        m_subjectsButton->setText(vms::event::StringsHelper::allUsersText());
+        m_subjectsButton->setIcon(icon(lit("tree/users.png")));
     }
     else
     {
-        m_subjectsButton->setText(params.allUsers
-            ? vms::event::StringsHelper::allUsersText()
-            : m_helper->actionSubjects(users, roles));
+        QnUserResourceList users;
+        QList<QnUuid> roles;
+        userRolesManager()->usersAndRoles(params.additionalResources, users, roles);
 
-        const bool multiple = params.allUsers || users.size() > 1 || !roles.empty();
-
-        m_subjectsButton->setIcon(icon(multiple
-            ? lit("tree/users.png")
-            : lit("tree/user.png")));
+        if (users.isEmpty() && roles.isEmpty())
+        {
+            m_subjectsButton->setText(vms::event::StringsHelper::needToSelectUserText());
+            m_subjectsButton->setIcon(icon(lit("tree/user_alert.png")));
+        }
+        else
+        {
+            const bool multiple = users.size() > 1 || !roles.empty();
+            m_subjectsButton->setText(m_helper->actionSubjects(users, roles));
+            m_subjectsButton->setIcon(icon(multiple
+                ? lit("tree/users.png")
+                : lit("tree/user.png")));
+        }
     }
 }
