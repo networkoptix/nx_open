@@ -1363,9 +1363,7 @@ void MessageBus::gotTransaction(
     //NX_ASSERT(!context(connection)->isRemotePeerSubscribedTo(peerId)); //< loop
     auto transactionDescriptor = getTransactionDescriptorByTransaction(tran);
 
-#if 0
     // process special cases
-	// TODO: potential tranasction loop for non-persistent transactions should be handled somehow
     switch (tran.command)
     {
         case ApiCommand::forcePrimaryTimeServer:
@@ -1386,7 +1384,6 @@ void MessageBus::gotTransaction(
         default:
             break; //< Not a special case
     }
-#endif
 
     if (m_db)
     {
