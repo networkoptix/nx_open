@@ -37,116 +37,73 @@ QnLayoutItemData createItem(
     result.resource.uniqueId = cameraUniqueId;
     result.combinedGeometry = combinedGeomtry;
     return result;
-};
+}
 
 } // namespace
 
-class QnLiteClientLayoutHelperPrivate: public QObject
+namespace nx {
+namespace client {
+namespace mobile {
+namespace resource {
+
+class LiteClientLayoutHelper::Private: public Connective<QObject>
 {
-    QnLiteClientLayoutHelper* q_ptr;
-    Q_DECLARE_PUBLIC(QnLiteClientLayoutHelper)
+    LiteClientLayoutHelper* q;
 
 public:
-    QnLiteClientLayoutHelperPrivate(QnLiteClientLayoutHelper* parent);
+    Private(LiteClientLayoutHelper* parent);
 
+    void at_layoutAboutToBeChanged();
+    void at_layoutChanged();
     void at_layoutPropertyChanged(const QnResourcePtr& resource, const QString& key);
     void at_layoutItemChanged(const QnResourcePtr& resource, const QnLayoutItemData& item);
     void at_layoutItemRemoved(const QnResourcePtr& resource, const QnLayoutItemData& item);
-
-public:
-    QnLayoutResourcePtr layout;
 };
 
-QnLiteClientLayoutHelper::QnLiteClientLayoutHelper(QObject* parent):
+LiteClientLayoutHelper::LiteClientLayoutHelper(QObject* parent):
     base_type(parent),
-    d_ptr(new QnLiteClientLayoutHelperPrivate(this))
+    d(new Private(this))
+{
+    connect(this, &LiteClientLayoutHelper::layoutAboutToBeChanged,
+        d, &Private::at_layoutAboutToBeChanged);
+    connect(this, &LiteClientLayoutHelper::layoutChanged,
+        d, &Private::at_layoutChanged);
+}
+
+LiteClientLayoutHelper::~LiteClientLayoutHelper()
 {
 }
 
-QnLiteClientLayoutHelper::~QnLiteClientLayoutHelper()
+QPoint LiteClientLayoutHelper::displayCell() const
 {
-}
+    const auto layout = this->layout();
 
-QString QnLiteClientLayoutHelper::layoutId() const
-{
-    Q_D(const QnLiteClientLayoutHelper);
-    return d->layout ? d->layout->getId().toString() : QString();
-}
-
-void QnLiteClientLayoutHelper::setLayoutId(const QString& layoutId)
-{
-    setLayout(resourcePool()->getResourceById<QnLayoutResource>(QnUuid::fromStringSafe(layoutId)));
-}
-
-QnLayoutResourcePtr QnLiteClientLayoutHelper::layout() const
-{
-    Q_D(const QnLiteClientLayoutHelper);
-    return d->layout;
-}
-
-void QnLiteClientLayoutHelper::setLayout(const QnLayoutResourcePtr& layout)
-{
-    Q_D(QnLiteClientLayoutHelper);
-    if (d->layout == layout)
-        return;
-
-    if (d->layout)
-        disconnect(d->layout, nullptr, this, nullptr);
-
-    d->layout = layout;
-    emit layoutChanged();
-
-    if (d->layout)
-    {
-        connect(d->layout, &QnLayoutResource::propertyChanged,
-            d, &QnLiteClientLayoutHelperPrivate::at_layoutPropertyChanged);
-        connect(d->layout, &QnLayoutResource::itemAdded,
-            d, &QnLiteClientLayoutHelperPrivate::at_layoutItemChanged);
-        connect(d->layout, &QnLayoutResource::itemChanged,
-            d, &QnLiteClientLayoutHelperPrivate::at_layoutItemChanged);
-        connect(d->layout, &QnLayoutResource::itemRemoved,
-            d, &QnLiteClientLayoutHelperPrivate::at_layoutItemRemoved);
-
-        emit displayCellChanged();
-        emit singleCameraIdChanged();
-    }
-}
-
-QPoint QnLiteClientLayoutHelper::displayCell() const
-{
-    Q_D(const QnLiteClientLayoutHelper);
-
-    if (!d->layout)
+    if (!layout)
         return kInvalidPoint;
 
-    return pointFromString(d->layout->getProperty(kDisplayCellProperty));
+    return pointFromString(layout->getProperty(kDisplayCellProperty));
 }
 
-void QnLiteClientLayoutHelper::setDisplayCell(const QPoint& cell)
+void LiteClientLayoutHelper::setDisplayCell(const QPoint& cell)
 {
-    Q_D(QnLiteClientLayoutHelper);
+    const auto layout = this->layout();
 
-    if (!d->layout)
+    if (!layout)
         return;
 
-    d->layout->setProperty(kDisplayCellProperty, pointToString(cell));
+    layout->setProperty(kDisplayCellProperty, pointToString(cell));
 
-    propertyDictionary()->saveParams(d->layout->getId());
+    propertyDictionary()->saveParams(layout->getId());
 }
 
-QnLiteClientLayoutHelper::DisplayMode QnLiteClientLayoutHelper::displayMode() const
+LiteClientLayoutHelper::DisplayMode LiteClientLayoutHelper::displayMode() const
 {
     return displayCell() == kInvalidPoint
         ? DisplayMode::MultipleCameras : DisplayMode::SingleCamera;
 }
 
-QString QnLiteClientLayoutHelper::singleCameraId() const
+QString LiteClientLayoutHelper::singleCameraId() const
 {
-    Q_D(const QnLiteClientLayoutHelper);
-
-    if (!d->layout)
-        return QString();
-
     const auto cell = displayCell();
     if (cell == kInvalidPoint)
         return QString();
@@ -154,13 +111,8 @@ QString QnLiteClientLayoutHelper::singleCameraId() const
     return cameraIdOnCell(cell.x(), cell.y());
 }
 
-void QnLiteClientLayoutHelper::setSingleCameraId(const QString& cameraId)
+void LiteClientLayoutHelper::setSingleCameraId(const QString& cameraId)
 {
-    Q_D(QnLiteClientLayoutHelper);
-
-    if (!d->layout)
-        return;
-
     const auto cell = displayCell();
     if (cell == kInvalidPoint)
         return;
@@ -168,37 +120,33 @@ void QnLiteClientLayoutHelper::setSingleCameraId(const QString& cameraId)
     setCameraIdOnCell(cell.x(), cell.y(), cameraId);
 }
 
-QString QnLiteClientLayoutHelper::cameraIdOnCell(int x, int y) const
+QString LiteClientLayoutHelper::cameraIdOnCell(int x, int y) const
 {
-    Q_D(const QnLiteClientLayoutHelper);
+    const auto layout = this->layout();
 
-    if (!d->layout)
+    if (!layout)
         return QString();
 
-    const auto items = d->layout->getItems();
-    const auto it = std::find_if(items.begin(), items.end(),
-        [x, y](const QnLayoutItemData& item)
-        {
-            return item.combinedGeometry.x() == x && item.combinedGeometry.y() == y;
-        });
+    for (const auto& item: layout->getItems())
+    {
+        if (item.combinedGeometry.x() == x && item.combinedGeometry.y() == y)
+            return item.resource.id.toString();
+    }
 
-    if (it == items.end())
-        return QString();
-
-    return it->resource.id.toString();
+    return QString();
 }
 
-void QnLiteClientLayoutHelper::setCameraIdOnCell(int x, int y, const QString& cameraId)
+void LiteClientLayoutHelper::setCameraIdOnCell(int x, int y, const QString& cameraId)
 {
-    Q_D(QnLiteClientLayoutHelper);
+    const auto layout = this->layout();
 
-    if (!d->layout)
+    if (!layout)
         return;
 
     const auto id = QnUuid::fromStringSafe(cameraId);
     const auto camera = resourcePool()->getResourceById<QnVirtualCameraResource>(id);
 
-    auto items = d->layout->getItems();
+    auto items = layout->getItems();
     auto it = std::find_if(items.begin(), items.end(),
         [x, y](const QnLayoutItemData& item)
         {
@@ -210,13 +158,13 @@ void QnLiteClientLayoutHelper::setCameraIdOnCell(int x, int y, const QString& ca
         if (id.isNull() || camera.isNull())
             return;
 
-        d->layout->addItem(createItem(id, camera->getUniqueId(), QRectF(x, y, 1, 1)));
+        layout->addItem(createItem(id, camera->getUniqueId(), QRectF(x, y, 1, 1)));
     }
     else
     {
         if (id.isNull() || camera.isNull())
         {
-            d->layout->removeItem(*it);
+            layout->removeItem(*it);
         }
         else
         {
@@ -224,16 +172,16 @@ void QnLiteClientLayoutHelper::setCameraIdOnCell(int x, int y, const QString& ca
                 return;
 
             const auto current = *it;
-            d->layout->removeItem(current);
+            layout->removeItem(current);
             const auto newItem = createItem(id, camera->getUniqueId(), current.combinedGeometry);
-            d->layout->addItem(newItem);
+            layout->addItem(newItem);
         }
     }
 
-    qnResourcesChangesManager->saveLayout(d->layout, [](const QnLayoutResourcePtr&){});
+    qnResourcesChangesManager->saveLayout(layout, [](const QnLayoutResourcePtr&){});
 }
 
-QnLayoutResourcePtr QnLiteClientLayoutHelper::createLayoutForServer(const QnUuid& serverId) const
+QnLayoutResourcePtr LiteClientLayoutHelper::createLayoutForServer(const QnUuid& serverId) const
 {
     const auto server = resourcePool()->getResourceById<QnMediaServerResource>(serverId);
     if (!server)
@@ -251,7 +199,7 @@ QnLayoutResourcePtr QnLiteClientLayoutHelper::createLayoutForServer(const QnUuid
     return layout;
 }
 
-QnLayoutResourcePtr QnLiteClientLayoutHelper::findLayoutForServer(const QnUuid& serverId) const
+QnLayoutResourcePtr LiteClientLayoutHelper::findLayoutForServer(const QnUuid& serverId) const
 {
     if (serverId.isNull())
         return QnLayoutResourcePtr();
@@ -271,20 +219,48 @@ QnLayoutResourcePtr QnLiteClientLayoutHelper::findLayoutForServer(const QnUuid& 
     return *resources.begin();
 }
 
-QnLiteClientLayoutHelperPrivate::QnLiteClientLayoutHelperPrivate(QnLiteClientLayoutHelper* parent):
-    QObject(parent),
-    q_ptr(parent)
+LiteClientLayoutHelper::Private::Private(LiteClientLayoutHelper* parent):
+    q(parent)
 {
 }
 
-void QnLiteClientLayoutHelperPrivate::at_layoutPropertyChanged(
-    const QnResourcePtr& resource, const QString& key)
+void LiteClientLayoutHelper::Private::at_layoutAboutToBeChanged()
 {
-    NX_ASSERT(resource == layout);
-    if (resource != layout)
+    const auto layout = q->layout();
+    if (!layout)
         return;
 
-    Q_Q(QnLiteClientLayoutHelper);
+    layout->disconnect(this);
+}
+
+void LiteClientLayoutHelper::Private::at_layoutChanged()
+{
+    const auto layout = q->layout();
+
+    if (!layout)
+        return;
+
+    connect(layout, &QnLayoutResource::propertyChanged,
+        this, &Private::at_layoutPropertyChanged);
+    connect(layout, &QnLayoutResource::itemAdded,
+        this, &Private::at_layoutItemChanged);
+    connect(layout, &QnLayoutResource::itemChanged,
+        this, &Private::at_layoutItemChanged);
+    connect(layout, &QnLayoutResource::itemRemoved,
+        this, &Private::at_layoutItemRemoved);
+
+    emit q->displayCellChanged();
+    emit q->singleCameraIdChanged();
+}
+
+void LiteClientLayoutHelper::Private::at_layoutPropertyChanged(
+    const QnResourcePtr& resource, const QString& key)
+{
+    if (resource != q->layout())
+    {
+        NX_ASSERT(resource == q->layout());
+        return;
+    }
 
     if (key == kDisplayCellProperty)
     {
@@ -293,14 +269,14 @@ void QnLiteClientLayoutHelperPrivate::at_layoutPropertyChanged(
     }
 }
 
-void QnLiteClientLayoutHelperPrivate::at_layoutItemChanged(
+void LiteClientLayoutHelper::Private::at_layoutItemChanged(
     const QnResourcePtr& resource, const QnLayoutItemData& item)
 {
-    NX_ASSERT(resource == layout);
-    if (resource != layout)
+    if (resource != q->layout())
+    {
+        NX_ASSERT(resource == q->layout());
         return;
-
-    Q_Q(QnLiteClientLayoutHelper);
+    }
 
     const auto x = static_cast<int>(item.combinedGeometry.x());
     const auto y = static_cast<int>(item.combinedGeometry.y());
@@ -311,14 +287,14 @@ void QnLiteClientLayoutHelperPrivate::at_layoutItemChanged(
         emit q->singleCameraIdChanged();
 }
 
-void QnLiteClientLayoutHelperPrivate::at_layoutItemRemoved(
+void LiteClientLayoutHelper::Private::at_layoutItemRemoved(
     const QnResourcePtr& resource, const QnLayoutItemData& item)
 {
-    NX_ASSERT(resource == layout);
-    if (resource != layout)
+    if (resource != q->layout())
+    {
+        NX_ASSERT(resource == q->layout());
         return;
-
-    Q_Q(QnLiteClientLayoutHelper);
+    }
 
     const auto x = static_cast<int>(item.combinedGeometry.x());
     const auto y = static_cast<int>(item.combinedGeometry.y());
@@ -327,3 +303,8 @@ void QnLiteClientLayoutHelperPrivate::at_layoutItemRemoved(
     if (QPoint(x, y) == q->displayCell())
         emit q->singleCameraIdChanged();
 }
+
+} // namespace resource
+} // namespace mobile
+} // namespace client
+} // namespace nx

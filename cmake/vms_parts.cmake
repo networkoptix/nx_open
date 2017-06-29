@@ -37,7 +37,7 @@ if("${platform}" STREQUAL "macosx")
 endif()
 
 if(WINDOWS)
-set(_withTrayTool ON)
+    set(_withTrayTool ON)
 endif()
 
 option(withMediaServer "Enable media server" ${_withMediaServer})

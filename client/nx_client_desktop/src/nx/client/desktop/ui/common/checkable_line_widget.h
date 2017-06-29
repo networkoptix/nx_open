@@ -32,6 +32,9 @@ public:
     Qt::CheckState checkState() const;
     void setCheckState(Qt::CheckState value);
 
+    bool userCheckable() const;
+    void setUserCheckable(bool value);
+
     QVariant data(int role) const;
     bool setData(const QVariant& value, int role);
 

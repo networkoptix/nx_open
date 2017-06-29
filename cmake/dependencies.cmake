@@ -172,15 +172,10 @@ function(get_dependencies)
         if(server-external_version)
             nx_rdep_add_package(any/server-external)
         else()
-            hg_last_commit_branch("${PROJECT_SOURCE_DIR}" _branch)
-            set(server_external_path)
-            while(NOT server_external_path AND _branch)
-                nx_rdep_add_package(any/server-external-${_branch} OPTIONAL
-                    PATH_VARIABLE server_external_path)
-                hg_parent_branch("${PROJECT_SOURCE_DIR}" ${_branch} _branch)
-            endwhile()
+            nx_rdep_add_package(any/server-external-${branch} OPTIONAL
+                PATH_VARIABLE server_external_path)
             if(NOT server_external_path)
-                message(FATAL_ERROR "Package server-external not found.")
+                nx_rdep_add_package(any/server-external-${releaseVersion.short})
             endif()
         endif()
 

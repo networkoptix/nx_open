@@ -8,8 +8,8 @@
 
 #include <ui/style/globals.h>
 
+#include <nx/client/ptz/ptz_helpers.h>
 #include <nx/utils/collection.h>
-#include <nx/utils/string.h>
 
 namespace {
     static const qreal speedLowest  = 0.15;
@@ -105,12 +105,9 @@ void QnPtzTourSpotsModel::setSpots(const QnPtzTourSpotList &spots) {
     endResetModel();
 }
 
-QnPtzPresetList QnPtzTourSpotsModel::sortedPresets() const {
-    QnPtzPresetList result = m_presets;
-    std::sort(result.begin(), result.end(),  [](const QnPtzPreset &l, const QnPtzPreset &r) {
-        return nx::utils::naturalStringLess(l.name, r.name);
-    });
-    return result;
+QnPtzPresetList QnPtzTourSpotsModel::sortedPresets() const
+{
+    return nx::client::core::ptz::helpers::sortedPresets(m_presets);
 }
 
 const QnPtzPresetList& QnPtzTourSpotsModel::presets() const {

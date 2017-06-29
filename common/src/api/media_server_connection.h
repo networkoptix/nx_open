@@ -265,7 +265,12 @@ protected:
         const char* slot);
 
     void trace(int handle, int obj, const QString& message = QString());
+
 private:
+    void addOldVersionPtzParams(const QnNetworkResourcePtr& camera, QnRequestParamList& params);
+
+private:
+    QnSoftwareVersion m_serverVersion;
     QString m_serverId; // for debug purposes so storing in string to avoid conversions
     QString m_proxyAddr;
     int m_proxyPort;

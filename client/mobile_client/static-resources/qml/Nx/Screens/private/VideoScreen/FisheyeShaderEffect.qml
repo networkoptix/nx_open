@@ -6,12 +6,15 @@ ShaderEffect
     /* Source parameters: */
     property alias sourceItem: shaderSource.sourceItem
 
-    readonly property size sourceSize: sourceItem 
+    readonly property size sourceSize: sourceItem
         ? Qt.size(sourceItem.width, sourceItem.height)
         : Qt.size(0.0, 0.0)
 
-    property int lensProjectionType: Utils3D.SphereProjectionTypes.Equidistant
-    property int viewProjectionType: lensProjectionType // Utils3D.SphereProjectionTypes.Stereographic
+    /* Equidistant projection is the most common among lenses, but it requires 32-bit float
+     * precision support on fragment shader to work well (due to low precision trigonometry).
+     * Therefore we choose somewhat similar equisolid projection as default. */
+    property int lensProjectionType: Utils3D.SphereProjectionTypes.Equisolid
+    property int viewProjectionType: lensProjectionType
 
     blending: false
 
@@ -21,7 +24,7 @@ ShaderEffect
     property vector2d fieldOffset: Qt.vector2d(0.0, 0.0)
     property real fieldStretch: 1.0
     property real fieldRotation: 0.0
-                           
+
     /* Camera parameters: */
 
     property real viewScale: 1.0
@@ -51,7 +54,6 @@ ShaderEffect
     {
         id: shaderSource
         hideSource: true
-        format: ShaderEffectSource.RGB
         visible: false
     }
 
@@ -78,10 +80,25 @@ ShaderEffect
 
     readonly property vector2d viewCenter: Qt.vector2d(0.5, 0.5).plus(viewShift)
 
+    readonly property string commonShaderHeader: "
+        #version 100
+        /* This is required to counter QOpenGLShaderProgram code prefixing: */
+        #undef lowp
+        #undef mediump
+        #undef highp
+        #ifdef GL_ES
+            precision lowp sampler2D;
+            precision mediump int;
+            #ifdef GL_FRAGMENT_PRECISION_HIGH
+                precision highp float;
+            #else
+                precision mediump float;
+            #endif
+        #endif"
+
     /* Vertex shader code: */
 
-    vertexShader: "
-        #version 110
+    vertexShader: commonShaderHeader + "
         uniform vec2 projectionCoordsScale;
         uniform vec2 viewCenter;
         uniform float viewScale;
@@ -100,35 +117,37 @@ ShaderEffect
 
     /* Fragment shader code: */
 
-    fragmentShader: "
-        #version 110
+    fragmentShader: commonShaderHeader + "
         varying vec2 projectionCoords;
 
         uniform mat4 textureMatrix;
         uniform mat4 viewRotationMatrix;
         uniform sampler2D sourceTexture;
-        uniform float qt_Opacity;
 
         const float pi = 3.1415926;
 
         vec4 texture2DBlackBorder(sampler2D sampler, vec2 coord)
         {
-             /* Turn outside areas to black without conditional operator: */
-             bool isInside = all(bvec4(coord.x >= 0.0, coord.x <= 1.0, coord.y >= 0.0, coord.y <= 1.0));
-             return texture2D(sampler, coord) * vec4(vec3(float(isInside)), 1.0);
+            /* Turn outside areas to black without conditional operator: */
+            bool isInside = all(bvec4(coord.x >= 0.0, coord.x <= 1.0, coord.y >= 0.0, coord.y <= 1.0));
+            return texture2D(sampler, coord) * vec4(vec3(float(isInside)), 1.0);
         }
 
         /* Projection functions should be written with the following consideration:
          *  a unit hemisphere is projected into a unit circle. */
-        vec2 project(vec3 coords); 
+        vec2 project(vec3 coords);
         vec3 unproject(vec2 coords);
 
-        void main() 
+        void main()
         {
-             vec4 pointOnSphere = vec4(unproject(projectionCoords), 1.0);
-             vec2 transformedProjectionCoords = project((viewRotationMatrix * pointOnSphere).xyz);
-             vec2 textureCoords = (textureMatrix * vec4(transformedProjectionCoords, 0.0, 1.0)).xy;
-             gl_FragColor = texture2DBlackBorder(sourceTexture, textureCoords);
+            vec3 pointOnSphere = unproject(projectionCoords);
+            vec3 rotatedPointOnSphere = (viewRotationMatrix * vec4(pointOnSphere, 1.0)).xyz;
+
+            vec2 textureCoords = rotatedPointOnSphere.z < 0.999
+                ? (textureMatrix * vec4(project(rotatedPointOnSphere), 0.0, 1.0)).xy
+                : vec2(2.0); // somewhere outside
+
+            gl_FragColor = texture2DBlackBorder(sourceTexture, textureCoords);
         }"
         + projectFunctionText()
         + unprojectFunctionText()
@@ -142,7 +161,7 @@ ShaderEffect
                 return "
                     vec2 project(vec3 coords)
                     {
-                         return coords.xy / (1.0 - coords.z);
+                        return coords.xy / (1.0 - coords.z);
                     }"
             }
 
@@ -151,7 +170,7 @@ ShaderEffect
                 return "
                     vec2 project(vec3 coords)
                     {
-                         return coords.xy / sqrt(1.0 - coords.z);
+                        return coords.xy / sqrt(1.0 - coords.z);
                     }"
             }
 
@@ -160,8 +179,8 @@ ShaderEffect
                 return "
                     vec2 project(vec3 coords)
                     {
-                         float theta = acos(clamp(-coords.z, -1.0, 1.0));
-                         return coords.xy * (theta / (length(coords.xy) * (pi / 2.0)));
+                        float theta = acos(clamp(-coords.z, -1.0, 1.0));
+                        return coords.xy * (theta / (length(coords.xy) * (pi / 2.0)));
                     }"
             }
         }
@@ -176,9 +195,9 @@ ShaderEffect
                 return "
                     vec3 unproject(vec2 coords)
                     {
-                         float r = length(coords);
-                         float theta = clamp(r, 0.0, 2.0) * (pi / 2.0);
-                         return vec3(coords * sin(theta) / r, -cos(theta));
+                        float r = length(coords);
+                        float theta = clamp(r, 0.0, 2.0) * (pi / 2.0);
+                        return vec3(coords * sin(theta) / r, -cos(theta));
                     }"
             }
 
@@ -187,8 +206,8 @@ ShaderEffect
                 return "
                     vec3 unproject(vec2 coords)
                     {
-                         float r2 = dot(coords, coords);
-                         return vec3(coords * sqrt(2.0 - r2), r2 - 1.0);
+                        float r2 = clamp(dot(coords, coords), 0.0, 2.0);
+                        return vec3(coords * sqrt(2.0 - r2), r2 - 1.0);
                     }"
             }
 
@@ -197,8 +216,8 @@ ShaderEffect
                 return "
                     vec3 unproject(vec2 coords)
                     {
-                         float r2 = dot(coords, coords);
-                         return vec3(coords * 2.0, r2 - 1.0) / (r2 + 1.0);
+                        float r2 = dot(coords, coords);
+                        return vec3(coords * 2.0, r2 - 1.0) / (r2 + 1.0);
                     }"
             }
         }

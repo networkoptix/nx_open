@@ -7,7 +7,6 @@
 #include <core/resource_management/resource_pool.h>
 #include <core/resource_management/user_roles_manager.h>
 #include <ui/dialogs/resource_selection_dialog.h>
-#include <ui/style/resource_icon_cache.h>
 #include <ui/style/custom_style.h>
 #include <ui/style/skin.h>
 
@@ -113,10 +112,17 @@ void QnSubjectTargetActionWidget::updateSubjectsButton()
     QList<QnUuid> roles;
     userRolesManager()->usersAndRoles(params.additionalResources, users, roles);
 
+    const auto icon =
+        [](const QString& path) -> QIcon
+        {
+            static const QnIcon::SuffixesList suffixes {{ QnIcon::Normal, lit("selected") }};
+            return qnSkin->icon(path, QString(), &suffixes);
+        };
+
     if (!params.allUsers && users.isEmpty() && roles.isEmpty())
     {
         m_subjectsButton->setText(vms::event::StringsHelper::needToSelectUserText());
-        m_subjectsButton->setIcon(qnSkin->icon(lit("tree/user_alert.png")));
+        m_subjectsButton->setIcon(icon(lit("tree/user_alert.png")));
     }
     else
     {
@@ -126,8 +132,8 @@ void QnSubjectTargetActionWidget::updateSubjectsButton()
 
         const bool multiple = params.allUsers || users.size() > 1 || !roles.empty();
 
-        m_subjectsButton->setIcon(qnResIconCache->icon(multiple
-            ? QnResourceIconCache::Users
-            : QnResourceIconCache::User));
+        m_subjectsButton->setIcon(icon(multiple
+            ? lit("tree/users.png")
+            : lit("tree/user.png")));
     }
 }

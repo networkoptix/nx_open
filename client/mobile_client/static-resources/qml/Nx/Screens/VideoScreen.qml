@@ -8,6 +8,8 @@ import Nx.Settings 1.0
 import com.networkoptix.qml 1.0
 
 import "private/VideoScreen"
+import "private/VideoScreen/utils.js" as VideoScreenUtils
+import "private/VideoScreen/Ptz"
 
 PageBase
 {
@@ -62,19 +64,24 @@ PageBase
 
         readonly property bool applicationActive: Qt.application.state === Qt.ApplicationActive
 
-        property real uiOpacity: 1.0
+        property bool uiVisible: true
+        property real uiOpacity: uiVisible ? 1.0 : 0.0
+
         Behavior on uiOpacity
         {
-            NumberAnimation { duration: 500; easing.type: Easing.OutCubic }
+            NumberAnimation { duration: 250; easing.type: Easing.OutCubic }
         }
 
-        property real navigationOpacity: 1.0
-        Behavior on navigationOpacity
+        property bool controlsVisible: true
+        property real controlsOpacity: controlsVisible ? 1.0 : 0.0
+        Behavior on controlsOpacity
         {
-            NumberAnimation { duration: 500; easing.type: Easing.OutCubic }
+            NumberAnimation { duration: 250; easing.type: Easing.OutCubic }
         }
 
         property real cameraUiOpacity: 1.0
+
+        property int mode: VideoScreenUtils.VideoScreenMode.Navigation
 
         Timer
         {
@@ -90,8 +97,8 @@ PageBase
                 if (videoScreenController.serverOffline)
                 {
                     exitFullscreen()
-                    navigationOpacity = 0.0
-                    uiOpacity = 1.0
+                    controlsVisible = false
+                    uiVisible = true
                 }
                 else if (videoScreenController.cameraOffline)
                 {
@@ -100,13 +107,13 @@ PageBase
             }
             else
             {
-                d.navigationOpacity = 1.0
+                d.controlsVisible = true
             }
         }
 
         onApplicationActiveChanged:
         {
-            if (!applicationActive)
+            if (!applicationActive && !ptzPanel.moveOnTapMode)
                 showUi()
         }
     }
@@ -129,6 +136,7 @@ PageBase
         }
 
         opacity: d.uiOpacity
+        visible: opacity > 0
         titleOpacity: d.cameraUiOpacity
 
         controls:
@@ -157,11 +165,21 @@ PageBase
             text: qsTr("Change Quality")
             onClicked:
             {
+                var customQualities = [ 1080, 720, 480, 360 ]
+                var allVideoQualities =
+                    [ MediaPlayer.LowVideoQuality, MediaPlayer.HighVideoQuality ]
+                        .concat(customQualities)
+
+                var player = videoScreenController.mediaPlayer
+
                 var dialog = Workflow.openDialog(
                     "Screens/private/VideoScreen/QualityDialog.qml",
                     {
-                        "actualQuality": videoScreenController.mediaPlayer.currentResolution,
-                        "activeQuality": videoScreenController.mediaPlayer.videoQuality
+                        "actualQuality": player.currentResolution,
+                        "activeQuality": player.videoQuality,
+                        "customQualities": customQualities,
+                        "availableVideoQualities":
+                            player.availableVideoQualities(allVideoQualities)
                     }
                 )
 
@@ -208,12 +226,17 @@ PageBase
     Component
     {
         id: scalableVideoComponent
-        ScalableVideo 
+
+        ScalableVideo
         {
             mediaPlayer: videoScreenController.mediaPlayer
             resourceHelper: videoScreenController.resourceHelper
             videoCenterHeightOffsetFactor: 1 / 3
-            onClicked: toggleUi()
+            onClicked:
+            {
+                if (!ptzPanel.moveOnTapMode)
+                    toggleUi()
+            }
         }
     }
 
@@ -285,15 +308,100 @@ PageBase
             }
         }
 
+        Image
+        {
+            width: parent.width
+            height: sourceSize.height
+            anchors.bottom: parent.bottom
+            sourceSize.height: 56 * 2
+            source: lp("/images/timeline_gradient.png")
+
+            visible: (d.mode == VideoScreenUtils.VideoScreenMode.Ptz && d.uiVisible)
+                || ptzPanel.moveOnTapMode || navigationLoader.visible;
+            opacity: visible ? 1 : 0
+
+            Behavior on opacity
+            {
+                NumberAnimation { duration: 250; easing.type: Easing.OutCubic }
+            }
+        }
+
         PtzPanel
         {
             id: ptzPanel
 
-            x: 8
-            width: parent.width - x * 2
+            width: parent.width
             anchors.bottom: parent.bottom
 
             controller.resourceId: videoScreenController.resourceHelper.resourceId
+            customRotation: videoScreenController.resourceHelper.customRotation
+
+            opacity: Math.min(d.uiOpacity, d.controlsOpacity)
+            visible: opacity > 0 && d.mode === VideoScreenUtils.VideoScreenMode.Ptz
+
+            onCloseButtonClicked: d.mode = VideoScreenUtils.VideoScreenMode.Navigation
+
+            onMoveOnTapModeChanged:
+            {
+                if (ptzPanel.moveOnTapMode)
+                {
+                    hideUi()
+                    moveOnTapOverlay.open()
+                    video.item.fitToBounds()
+
+                    // Workaround. Overwise it moves content to wrong place.
+                    // TODO: investigate and get rid of this workaround
+                    video.item.fitToBounds()
+                }
+                else
+                {
+                    showUi()
+                    moveOnTapOverlay.close()
+                }
+            }
+
+            Connections
+            {
+                target: moveOnTapOverlay
+                onClicked:
+                {
+                    if (videoScreenController.resourceHelper.fisheyeParams.enabled || !video.item)
+                        return
+
+                    var mapped = mapToItem(video.item, pos.x, pos.y)
+                    var data = video.item.getMoveViewportData(mapped)
+                    if (!data)
+                        return
+
+                    ptzPanel.moveViewport(data.viewport, data.aspect)
+                    preloader.pos = pos
+                    preloader.visible = true
+                }
+
+                onVisibleChanged:
+                {
+                    if (moveOnTapOverlay.visible)
+                        return
+
+                    showUi()
+                    ptzPanel.moveOnTapMode = false
+                }
+            }
+        }
+
+        PtzViewportMovePreloader
+        {
+            id: preloader
+
+            parent: videoScreen
+            visible: false
+        }
+
+        MoveOnTapOverlay
+        {
+            id: moveOnTapOverlay
+
+            parent: videoScreen
         }
 
         Loader
@@ -303,8 +411,8 @@ PageBase
             anchors.bottom: parent.bottom
             width: parent.width
 
-            visible: opacity > 0 && !ptzPanel.visible
-            opacity: Math.min(d.uiOpacity, d.navigationOpacity)
+            visible: opacity > 0 && d.mode === VideoScreenUtils.VideoScreenMode.Navigation
+            opacity: Math.min(d.uiOpacity, d.controlsOpacity)
 
             sourceComponent:
                 videoScreenController.accessRightsHelper.canViewArchive
@@ -351,7 +459,7 @@ PageBase
                     ptzAvailable: ptzPanel.controller.available
                         && videoScreenController.accessRightsHelper.canManagePtz
                         && !videoScreenController.offline
-                    onPtzButtonClicked: ptzPanel.visible = true
+                    onPtzButtonClicked: d.mode = VideoScreenUtils.VideoScreenMode.Ptz
                 }
             }
 
@@ -362,10 +470,13 @@ PageBase
                 LiveVideoNavigation
                 {
                     videoScreenController: d.controller
+                    ptzAvailable: ptzPanel.controller.available
+                        && videoScreenController.accessRightsHelper.canManagePtz
+                        && !videoScreenController.offline
+                    onPtzButtonClicked: d.mode = VideoScreenUtils.VideoScreenMode.Ptz
                 }
             }
         }
-
     }
 
     Rectangle
@@ -420,11 +531,17 @@ PageBase
         model: camerasModel
     }
 
+    onActivePageChanged:
+    {
+        if (activePage)
+            videoScreenController.start()
+    }
+
     Component.onDestruction: exitFullscreen()
 
     function hideUi()
     {
-        d.uiOpacity = 0.0
+        d.uiVisible = false
         if (Utils.isMobile())
             enterFullscreen()
     }
@@ -432,12 +549,12 @@ PageBase
     function showUi()
     {
         exitFullscreen()
-        d.uiOpacity = 1.0
+        d.uiVisible = true
     }
 
     function toggleUi()
     {
-        if (navigationLoader.visible)
+        if (d.uiVisible)
             hideUi()
         else
             showUi()
