@@ -40,6 +40,14 @@ const double minPtzZoomRectSize = 0.08;
 
 const qreal itemUnzoomThreshold = 0.975; /* In sync with hardcoded constant in workbench_controller */ // TODO: #Elric
 
+QVector3D truncate(QVector3D value)
+{
+    return QVector3D(
+        trunc(value.x() * 100) / 100.0,
+        trunc(value.y() * 100) / 100.0,
+        trunc(value.z() * 100) / 100.0);
+}
+
 Qt::Orientations capabilitiesToMode(Ptz::Capabilities capabilities)
 {
     Qt::Orientations result = 0;
@@ -58,6 +66,83 @@ Qt::Orientations capabilitiesToMode(Ptz::Capabilities capabilities)
 
 } // namespace
 
+class PtzInstrument::MovementFilter: public QObject
+{
+    using base_type = QObject;
+
+public:
+    MovementFilter(
+        QnMediaResourceWidget* widget,
+        PtzInstrument* parent);
+
+    virtual ~MovementFilter();
+
+    void updateFilteringSpeed(const QVector3D& speed);
+
+    void stopMovement();
+
+private:
+    void setMovementSpeed(const QVector3D& speed);
+
+    void onTimeout();
+
+private:
+    PtzInstrument * const m_parent = nullptr;
+    QnMediaResourceWidget * const m_widget = nullptr;
+    QTimer m_filteringTimer;
+    QVector3D m_targetSpeed;
+    QVector3D m_filteringSpeed;
+};
+
+PtzInstrument::MovementFilter::MovementFilter(
+    QnMediaResourceWidget* widget,
+    PtzInstrument* parent)
+    :
+    m_parent(parent),
+    m_widget(widget)
+{
+    static constexpr int kFilteringTimerIntervalMs = 150;
+    m_filteringTimer.setInterval(kFilteringTimerIntervalMs);
+    connect(&m_filteringTimer, &QTimer::timeout, this, &MovementFilter::onTimeout);
+}
+
+PtzInstrument::MovementFilter::~MovementFilter()
+{
+    m_filteringTimer.stop();
+    setMovementSpeed(QVector3D(0, 0, 0));
+}
+
+void PtzInstrument::MovementFilter::onTimeout()
+{
+    setMovementSpeed(m_filteringSpeed);
+}
+
+void PtzInstrument::MovementFilter::stopMovement()
+{
+    updateFilteringSpeed(QVector3D());
+}
+
+void PtzInstrument::MovementFilter::updateFilteringSpeed(const QVector3D& speed)
+{
+    if (speed.isNull())
+        setMovementSpeed(m_filteringSpeed);
+
+    const auto truncatedSpeed = truncate(speed);
+    if (m_filteringSpeed == truncatedSpeed)
+        return;
+
+    m_filteringSpeed = truncatedSpeed;
+    m_filteringTimer.start(); // Restarts in case of it's started already
+}
+
+void PtzInstrument::MovementFilter::setMovementSpeed(const QVector3D& speed)
+{
+    if (speed == m_targetSpeed)
+        return;
+
+    m_targetSpeed = speed;
+    m_parent->ptzMove(m_widget, m_targetSpeed);
+}
 
 // -------------------------------------------------------------------------- //
 // PtzInstrument
@@ -647,6 +732,10 @@ void PtzInstrument::startDrag(DragInfo* /*info*/)
     {
         case ContinuousMovement:
         case VirtualMovement:
+            m_movementFilter.reset(target()->dewarpingParams().enabled
+                ? nullptr
+                : new MovementFilter(target(), this));
+
             targetManipulator()->setCursor(Qt::BlankCursor);
             target()->setCursor(Qt::BlankCursor);
 
@@ -706,8 +795,12 @@ void PtzInstrument::dragMove(DragInfo* info)
                 elementsWidget()->mapFromItem(target(), mouseItemPos));
             arrowItem->setSize(QSizeF(arrowSize, arrowSize));
 
-            ptzMove(target(), QVector3D(speed));
-            break;
+            if (m_movementFilter)
+                m_movementFilter->updateFilteringSpeed(QVector3D(speed));
+            else
+                ptzMove(target(), QVector3D(speed));
+
+             break;
         }
 
         case ViewportMovement:
@@ -794,7 +887,10 @@ void PtzInstrument::finishDragProcess(DragInfo* info)
         switch (m_movement)
         {
             case ContinuousMovement:
-                ptzMove(target(), QVector3D(0.0, 0.0, 0.0));
+                if (m_movementFilter)
+                    m_movementFilter->stopMovement();
+                else
+                    ptzMove(target(), QVector3D(0, 0, 0));
                 break;
 
             case ViewportMovement:
