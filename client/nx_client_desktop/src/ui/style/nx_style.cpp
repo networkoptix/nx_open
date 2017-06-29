@@ -46,6 +46,7 @@
 #include <ui/delegates/styled_combo_box_delegate.h>
 #include <ui/widgets/common/abstract_preferences_widget.h>
 #include <ui/widgets/common/input_field.h>
+#include <ui/widgets/common/scroll_bar_proxy.h>
 #include <ui/widgets/calendar_widget.h>
 
 #include <utils/common/delayed.h>
@@ -3507,8 +3508,10 @@ int QnNxStyle::pixelMetric(
             return 16;
         }
 
+        case PM_ScrollView_ScrollBarOverlap:
+            return qobject_cast<const QnScrollBarProxy*>(widget) ? 1 : 0;
         case PM_ScrollBarExtent:
-            return 8;
+            return qobject_cast<const QnScrollBarProxy*>(widget) ? 9 : 8;
         case PM_ScrollBarSliderMin:
             return 24;
 
