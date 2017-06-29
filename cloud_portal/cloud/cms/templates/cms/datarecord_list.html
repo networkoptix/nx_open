@@ -15,13 +15,11 @@
 					<tbody>
 						{% for record in object_list%}
 							<tr>
-							<form action="/admin/cms/review_page/" method="get">
+							<form action="{% url 'review_page' record.data_structure.context.name record.language.code %}" method="get">
 								<td>{{record.data_structure.context.name}}</td>
 								<td>{{record.language.code}}</td>
 								<td>{{record}}</td>
 								<td>
-									<input type="hidden" name="context" value="{{record.data_structure.context.name}}"/>
-									<input type="hidden" name="language" value="{{record.language.code}}"/>
 									<button type="submit">Review Context</button>
 								</td>
 							</form>

@@ -8,7 +8,7 @@
 
 {% block content%}
 <h1>Context for Product</h1>
-<form action="/admin/cms/review_page/" method="post" class="aligned">
+<form action="{% url 'context_editor' %}" method="post" class="aligned">
     {% csrf_token %}
     {% for field in form %}
         <div class="form-row">
@@ -19,10 +19,19 @@
             {% endif %}
         </div>
     {% endfor %}
+
+    <div class="submit-row">
+        <button type="submit" name="GetDataStructures">Get Data Structures</button>
+        <button type="submit" name="SaveDraft">Save Draft</button>
+        <button type="reset" value="Reset">Reset</button>
+    </div>
+    {% if post_made %}
     <div class="submit-row">
         <button type="submit" name="Preview">Preview Page</button>
+        <button type="submit" name="SendReview">Send For Review</button>
         <button type="submit" name="Publish">Publish Page</button>
     </div>
+    {% endif %}
 </form>
 
 {% if preview_link %}

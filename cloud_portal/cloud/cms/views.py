@@ -73,18 +73,18 @@ def check_if_form_touched(data, key_for_delete):
 	return False
 
 
-def handle_get_view(request):
-	request_data = request.query_params
-	context, context_id, language_id = None, 0, 0
-	if request_data:
-		context = Context.objects.get(name=request_data['context'])
+def handle_get_view(context_name, language_code):
+	context, language, context_id, language_id = None, None, 0, 0
+	if context_name:
+		context = Context.objects.get(name=context_name)
 		context_id = context.id
-		if 'language' in request_data and request_data['language']:
-			language_id = Language.objects.get(code=request_data['language']).id
+	if language_code:
+		language = Language.objects.get(code=language_code)
+		language_id = language.id
 
-	form = CustomForm(initial={'language': language_id, 'context': context_id})
+	form = CustomContextForm(initial={'language': language_id, 'context': context_id})
 	if context:
-		form.add_fields(context)
+		form.add_fields(context, language)
 
 	return form, True
 
@@ -93,7 +93,7 @@ def handle_post_view(request):
 	request_data = request.data
 	context, language = get_post_request_params(request_data)
 
-	form = CustomForm(initial={'language': language.id, 'context': context.id})
+	form = CustomContextForm(initial={'language': language.id, 'context': context.id})
 	preview_link = ""
 	post_made = False
 
@@ -102,7 +102,7 @@ def handle_post_view(request):
 	
 	if 'GetDataStructures' in request_data:
 		post_made = True
-		form.add_fields(context)
+		form.add_fields(context, language)
 
 	elif 'Preview' in request_data:
 		if check_if_form_touched(request_data, 'Preview'):
@@ -136,30 +136,31 @@ def handle_post_view(request):
 
 # Create your views here.
 @api_view(["GET", "POST"])
-def context_edit_view(request):
+def context_edit_view(request, context=None, language=None):
+
+	print(context, language)
 	if request.method == "GET":
-		form, post_made = handle_get_view(request)
-		return render(request, 'page_edit_form.html', {'form': form, 'post_made': post_made})
+		form, post_made = handle_get_view(context, language)
+		return render(request, 'context_editor.html', {'form': form, 'post_made': post_made})
 
 	else:
 		form, post_made, preview_link = handle_post_view(request)
-		return render(request, 'page_edit_form.html', {'form': form, 'post_made': post_made, 'preview_link': preview_link})
+		return render(request, 'context_editor.html', {'form': form, 'post_made': post_made, 'preview_link': preview_link})
 
 
 @api_view(["GET", "POST"])
-def partner_publish_view(request):
+def partner_review_view(request, context=None, language=None):
 	if request.method == "GET":
-		form, post_made = handle_get_view(request)
-		return render(request, 'partner_publish.html', {'form': form})
+		form, post_made = handle_get_view(context, language)
+		return render(request, 'partner_version_review.html', {'form': form})
 
 	else:
 		form, post_made, preview_link = handle_post_view(request)
-		return render(request, 'partner_publish.html', {'form': form, 'preview_link': preview_link})
+		return render(request, 'partner_version_review.html', {'form': form, 'preview_link': preview_link})
 
 class VersionsViewer(ListView):
 	def get_queryset(self):
-		id = self.request.GET['id']
-		query = ContentVersion.objects.get(id=id).datarecord_set.all()
+		query = ContentVersion.objects.get(id=self.kwargs['id']).datarecord_set.all()
 		return query.order_by('data_structure__context__name', 'language__code')
 
 	template = "datarecord_list.html"
