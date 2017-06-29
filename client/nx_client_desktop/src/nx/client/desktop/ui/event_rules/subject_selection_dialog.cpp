@@ -8,8 +8,9 @@
 #include <core/resource/user_resource.h>
 #include <core/resource_management/user_roles_manager.h>
 #include <ui/common/indents.h>
-#include <ui/style/custom_style.h>
+#include <ui/style/helper.h>
 #include <ui/style/globals.h>
+#include <ui/style/nx_style.h>
 #include <ui/style/skin.h>
 #include <ui/widgets/common/snapped_scrollbar.h>
 #include <utils/common/scoped_painter_rollback.h>
@@ -151,6 +152,11 @@ SubjectSelectionDialog::SubjectSelectionDialog(QWidget* parent, Qt::WindowFlags 
     connect(ui->rolesTreeView->model(), &QAbstractItemModel::rowsInserted, this, updateVisibility);
     connect(ui->rolesTreeView->model(), &QAbstractItemModel::rowsRemoved, this, updateVisibility);
     connect(ui->rolesTreeView->model(), &QAbstractItemModel::modelReset, this, updateVisibility);
+
+    // Customized top margin for panel content:
+    static constexpr int kContentTopMargin = 8;
+    QnNxStyle::setGroupBoxContentTopMargin(ui->usersGroupBox, kContentTopMargin);
+    QnNxStyle::setGroupBoxContentTopMargin(ui->rolesGroupBox, kContentTopMargin);
 
     ui->allUsersCheckableLine->setText(tr("All Users"));
     setupTreeView(ui->allUsersCheckableLine->view());

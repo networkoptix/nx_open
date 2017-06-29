@@ -210,6 +210,27 @@ namespace
         return color.alpha() == 255;
     }
 
+    QMargins groupBoxContentsMargins(bool panel, const QWidget* widget)
+    {
+        QMargins margins = panel
+            ? Metrics::kPanelContentMargins
+            : Metrics::kGroupBoxContentMargins;
+
+        if (widget)
+        {
+            bool ok = false;
+            const int top = widget->property(Properties::kGroupBoxContentTopMargin).toInt(&ok);
+            if (ok)
+                margins.setTop(top);
+        }
+
+        margins.setTop(margins.top() + (panel
+            ? Metrics::kPanelHeaderHeight
+            : Metrics::kGroupBoxTopMargin));
+
+        return margins;
+    }
+
     /* Checks whether a widget is in-place line edit in an item view: */
     bool isItemViewEdit(const QWidget* widget)
     {
@@ -2678,7 +2699,7 @@ QRect QnNxStyle::subControlRect(
         {
             if (auto groupBox = qstyleoption_cast<const QStyleOptionGroupBox*>(option))
             {
-                bool panel = groupBox->features.testFlag(QStyleOptionFrame::Flat);
+                const bool panel = groupBox->features.testFlag(QStyleOptionFrame::Flat);
                 switch (subControl)
                 {
                     case SC_GroupBoxFrame:
@@ -2770,20 +2791,8 @@ QRect QnNxStyle::subControlRect(
 
                     case SC_GroupBoxContents:
                     {
-                        if (panel)
-                        {
-                            return option->rect.adjusted(
-                                Metrics::kPanelContentMargins.left(),
-                                Metrics::kPanelContentMargins.top() + Metrics::kPanelHeaderHeight,
-                               -Metrics::kPanelContentMargins.right(),
-                               -Metrics::kPanelContentMargins.bottom());
-                        }
-
-                        return option->rect.adjusted(
-                            Metrics::kGroupBoxContentMargins.left(),
-                            Metrics::kGroupBoxContentMargins.top() + Metrics::kGroupBoxTopMargin,
-                           -Metrics::kGroupBoxContentMargins.right(),
-                           -Metrics::kGroupBoxContentMargins.bottom());
+                        const auto contentsMargins = groupBoxContentsMargins(panel, widget);
+                        return option->rect.marginsRemoved(contentsMargins);
                     }
 
                     default:
@@ -3244,18 +3253,11 @@ QSize QnNxStyle::sizeFromContents(
             if (auto groupBox = qstyleoption_cast<const QStyleOptionGroupBox*>(option))
             {
                 const bool panel = groupBox->features.testFlag(QStyleOptionFrame::Flat);
-                if (panel)
-                {
-                    return size + QSize(
-                        Metrics::kPanelContentMargins.left() + Metrics::kPanelContentMargins.right(),
-                        Metrics::kPanelContentMargins.top() + Metrics::kPanelContentMargins.bottom() + Metrics::kPanelHeaderHeight);
-                }
-                else
-                {
-                    return size + QSize(
-                        Metrics::kGroupBoxContentMargins.left() + Metrics::kGroupBoxContentMargins.right(),
-                        Metrics::kGroupBoxContentMargins.top() + Metrics::kGroupBoxContentMargins.bottom() + Metrics::kGroupBoxTopMargin);
-                }
+                const auto contentsMargins = groupBoxContentsMargins(panel, widget);
+
+                return size + QSize(
+                    contentsMargins.left() + contentsMargins.right(),
+                    contentsMargins.top()  + contentsMargins.bottom());
             }
 
             break;
@@ -4223,6 +4225,13 @@ bool QnNxStyle::eventFilter(QObject* object, QEvent* event)
     }
 
     return base_type::eventFilter(object, event);
+}
+
+void QnNxStyle::setGroupBoxContentTopMargin(QGroupBox* box, int margin)
+{
+    NX_EXPECT(box);
+    box->setProperty(style::Properties::kGroupBoxContentTopMargin, margin);
+    box->setContentsMargins(groupBoxContentsMargins(box->isFlat(), box));
 }
 
 namespace {
