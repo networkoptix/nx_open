@@ -236,7 +236,11 @@ int main(int argc, char** argv)
 #endif
 
     const QnStartupParameters startupParams = QnStartupParameters::fromCommandLineArg(argc, argv);
-    if (!startupParams.hiDpiDisabled) //< Double negation to keep startup params semantics.
+    if (startupParams.hiDpiDisabled)
+    {
+        QApplication::setAttribute(Qt::AA_DisableHighDpiScaling);
+    }
+    else
     {
         // These attributes must be set before application instance is created.
         QApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
