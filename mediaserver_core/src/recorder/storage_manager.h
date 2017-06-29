@@ -19,7 +19,7 @@
 
 #include "recording/time_period_list.h"
 #include "device_file_catalog.h"
-#include "business/business_fwd.h"
+#include <nx/vms/event/event_fwd.h>
 #include "utils/db/db_helper.h"
 #include "storage_db.h"
 #include <nx/utils/uuid.h>
@@ -166,9 +166,9 @@ public:
     QnScheduleSync* scheduleSync() const;
 signals:
     void noStoragesAvailable();
-    void storageFailure(const QnResourcePtr &storageRes, QnBusiness::EventReason reason);
+    void storageFailure(const QnResourcePtr &storageRes, nx::vms::event::EventReason reason);
     void rebuildFinished(QnSystemHealth::MessageType msgType);
-    void backupFinished(qint64 backedUpToMs, QnBusiness::EventReason);
+    void backupFinished(qint64 backedUpToMs, nx::vms::event::EventReason);
 public slots:
     void at_archiveRangeChanged(const QnStorageResourcePtr &resource, qint64 newStartTimeMs, qint64 newEndTimeMs);
     void onNewResource(const QnResourcePtr &resource);

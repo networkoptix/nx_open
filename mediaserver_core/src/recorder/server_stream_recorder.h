@@ -14,7 +14,7 @@
 #include <nx/streaming/abstract_media_stream_data_provider.h>
 #include <recorder/dualstreaming_helper.h>
 
-#include <business/business_fwd.h>
+#include <nx/vms/event/event_fwd.h>
 
 class QnServerStreamRecorder: public QnStreamRecorder
 {
@@ -55,7 +55,7 @@ signals:
     void fpsChanged(QnServerStreamRecorder* recorder, float value);
     void motionDetected(QnResourcePtr resource, bool value, qint64 time, QnConstAbstractDataPacketPtr motion);
 
-    void storageFailure(QnResourcePtr mServerRes, qint64 timestamp, QnBusiness::EventReason reasonCode, QnResourcePtr storageRes);
+    void storageFailure(QnResourcePtr mServerRes, qint64 timestamp, nx::vms::event::EventReason reasonCode, QnResourcePtr storageRes);
 protected:
     virtual bool processData(const QnAbstractDataPacketPtr& data);
 

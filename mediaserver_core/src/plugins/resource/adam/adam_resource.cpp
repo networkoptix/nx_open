@@ -3,14 +3,14 @@
 #include <functional>
 #include <memory>
 
-#include <business/business_event_rule.h>
 #include <nx_ec/dummy_handler.h>
 #include <utils/common/synctime.h>
 #include <common/common_module.h>
 #include <core/resource/resource_data.h>
 #include <core/resource_management/resource_data_pool.h>
 #include <nx/fusion/model_functions.h>
-#include <business/events/network_issue_business_event.h>
+#include <nx/vms/event/rule.h>
+#include <nx/vms/event/events/network_issue_event.h>
 #include <modbus/modbus_client.h>
 
 #include "adam_resource.h"
@@ -114,7 +114,7 @@ bool QnAdamResource::startInputPortMonitoringAsync(std::function<void(bool)>&& c
         emit networkIssue(
             toSharedPointer(this),
             qnSyncTime->currentUSecsSinceEpoch(),
-            QnBusiness::EventReason::NetworkNoResponseFromDevice,
+            nx::vms::event::EventReason::networkNoResponseFromDevice,
             QString());
 
         if (isFatal)

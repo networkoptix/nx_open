@@ -287,7 +287,7 @@ TimelineWorkbenchPanel::TimelineWorkbenchPanel(
             item->timeSlider()->hurryKineticAnimations();
         });
 
-    //TODO: #vkutin #GDM #common Check if this still works (installSceneEventFilter might be required)
+    // TODO: #vkutin #GDM #common Check if this still works (installSceneEventFilter might be required)
     installEventHandler(m_resizerWidget, QEvent::GraphicsSceneWheel, this,
         &TimelineWorkbenchPanel::at_sliderResizerWidget_wheelEvent);
 

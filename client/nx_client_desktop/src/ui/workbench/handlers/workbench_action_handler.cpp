@@ -20,7 +20,7 @@
 #include <api/network_proxy_factory.h>
 #include <api/global_settings.h>
 
-#include <business/business_action_parameters.h>
+#include <nx/vms/event/action_parameters.h>
 
 #include <camera/resource_display.h>
 #include <camera/cam_display.h>
@@ -1213,18 +1213,18 @@ void ActionHandler::at_openBusinessLogAction_triggered() {
 
     const auto parameters = menu()->currentParameters(sender());
 
-    QnBusiness::EventType eventType = parameters.argument(Qn::EventTypeRole, QnBusiness::AnyBusinessEvent);
+    vms::event::EventType eventType = parameters.argument(Qn::EventTypeRole, vms::event::anyEvent);
     auto cameras = parameters.resources().filtered<QnVirtualCameraResource>();
     QSet<QnUuid> ids;
     for (auto camera: cameras)
         ids << camera->getId();
 
     // show diagnostics if Issues action was triggered
-    if (eventType != QnBusiness::AnyBusinessEvent || !ids.isEmpty())
+    if (eventType != vms::event::anyEvent || !ids.isEmpty())
     {
         businessEventsLogDialog()->disableUpdateData();
         businessEventsLogDialog()->setEventType(eventType);
-        businessEventsLogDialog()->setActionType(QnBusiness::DiagnosticsAction);
+        businessEventsLogDialog()->setActionType(vms::event::diagnosticsAction);
         auto now = QDateTime::currentMSecsSinceEpoch();
         businessEventsLogDialog()->setDateRange(now, now);
         businessEventsLogDialog()->setCameraList(ids);
@@ -1483,7 +1483,7 @@ void ActionHandler::at_cameraIssuesAction_triggered()
 {
     menu()->trigger(action::OpenBusinessLogAction,
         menu()->currentParameters(sender())
-        .withArgument(Qn::EventTypeRole, QnBusiness::AnyCameraEvent));
+        .withArgument(Qn::EventTypeRole, vms::event::anyCameraEvent));
 }
 
 void ActionHandler::at_cameraBusinessRulesAction_triggered() {
@@ -1541,7 +1541,7 @@ void ActionHandler::at_serverLogsAction_triggered()
 void ActionHandler::at_serverIssuesAction_triggered()
 {
     menu()->trigger(action::OpenBusinessLogAction,
-        {Qn::EventTypeRole, QnBusiness::AnyServerEvent});
+        {Qn::EventTypeRole, vms::event::anyServerEvent});
 }
 
 void ActionHandler::at_pingAction_triggered()

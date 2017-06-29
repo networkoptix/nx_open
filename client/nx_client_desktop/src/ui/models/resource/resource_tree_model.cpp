@@ -937,7 +937,7 @@ void QnResourceTreeModel::at_resPool_resourceRemoved(const QnResourcePtr &resour
 
 void QnResourceTreeModel::rebuildTree()
 {
-    //TODO: #vkutin #gdm Implement "model reset" logic for the tree.
+    // TODO: #vkutin #gdm Implement "model reset" logic for the tree.
     // Currently it's not handled, "rows inserted/removed" is handled instead.
 
     m_rootNodes[Qn::CurrentUserNode]->setResource(context()->user());

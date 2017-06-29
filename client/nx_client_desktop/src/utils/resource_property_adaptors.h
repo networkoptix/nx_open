@@ -5,8 +5,9 @@
 
 #include <client/client_model_types.h>
 
-#include <business/business_fwd.h>
+#include <nx/vms/event/event_fwd.h>
 
+// TODO: #vkutin Think of a better name, location and namespace.
 class QnBusinessEventsFilterResourcePropertyAdaptor: public QnLexicalResourcePropertyAdaptor<quint64> {
     Q_OBJECT
     typedef QnLexicalResourcePropertyAdaptor<quint64> base_type;
@@ -14,10 +15,10 @@ class QnBusinessEventsFilterResourcePropertyAdaptor: public QnLexicalResourcePro
 public:
     QnBusinessEventsFilterResourcePropertyAdaptor(QObject *parent = NULL);
 
-    bool isAllowed(QnBusiness::EventType eventType) const;
+    bool isAllowed(nx::vms::event::EventType eventType) const;
 
-    QList<QnBusiness::EventType> watchedEvents() const;
-    void setWatchedEvents( const QList<QnBusiness::EventType> &events );
+    QList<nx::vms::event::EventType> watchedEvents() const;
+    void setWatchedEvents( const QList<nx::vms::event::EventType> &events );
 };
 
 

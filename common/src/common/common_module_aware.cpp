@@ -151,7 +151,7 @@ QnLayoutTourManager* QnCommonModuleAware::layoutTourManager() const
     return m_commonModule ? m_commonModule->layoutTourManager() : nullptr;
 }
 
-QnEventRuleManager* QnCommonModuleAware::eventRuleManager() const
+nx::vms::event::RuleManager* QnCommonModuleAware::eventRuleManager() const
 {
     NX_ASSERT(m_initialized);
     return m_commonModule ? m_commonModule->eventRuleManager() : nullptr;
