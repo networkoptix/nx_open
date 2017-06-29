@@ -1,9 +1,9 @@
-#include "business_logic_composite.h"
+#include "controller.h"
 
 namespace nx {
 namespace hpm {
 
-BusinessLogicComposite::BusinessLogicComposite(
+Controller::Controller(
     const conf::Settings& settings,
     nx::stun::MessageDispatcher* stunMessageDispatcher)
 :
@@ -35,17 +35,17 @@ BusinessLogicComposite::BusinessLogicComposite(
     }
 }
 
-PeerRegistrator& BusinessLogicComposite::listeningPeerRegistrator()
+PeerRegistrator& Controller::listeningPeerRegistrator()
 {
     return m_listeningPeerRegistrator;
 }
 
-ListeningPeerPool& BusinessLogicComposite::listeningPeerPool()
+ListeningPeerPool& Controller::listeningPeerPool()
 {
     return m_listeningPeerPool;
 }
 
-void BusinessLogicComposite::stop()
+void Controller::stop()
 {
     m_cloudConnectProcessor.stop();
 }
