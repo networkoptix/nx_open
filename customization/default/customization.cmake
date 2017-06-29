@@ -64,19 +64,19 @@ set(sign.password "qweasd123")
 set(sign.cer "app.p12")
 set(sign.intermediate.cer "")
 
-# Allowed languages (first is default)
-set(translations
-     en_US
-     en_GB
-     fr_FR
-     de_DE
-     ru_RU
-     es_ES
-     ja_JP
-     ko_KR
-     tr_TR
-     zh_CN
-     zh_TW
-     he_IL
-     hu_HU
+# Localization
+set(defaultTranslation en_US)
+set(additionalTranslations
+    en_GB
+    fr_FR
+    de_DE
+    ru_RU
+    es_ES
+    ja_JP
+    ko_KR
+    tr_TR
+    zh_CN
+    zh_TW
+    he_IL
+    hu_HU
 )

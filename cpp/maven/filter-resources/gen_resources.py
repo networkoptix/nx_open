@@ -4,8 +4,8 @@ from os.path import dirname, join, exists, isfile
 from os import listdir
 from sets import Set
 
-def splitted(value):
-    return [s for s in [s.strip() for s in value.split(',')] if len(s) > 0]
+def splitted(value, sep=' '):
+    return [s for s in [s.strip() for s in value.split(sep)] if len(s) > 0]
 
 template_file='template.pro'
 skip_template_file = 'template.skip'
@@ -14,10 +14,9 @@ output_pro_file='${project.artifactId}.pro'
 translations_dir='${basedir}/translations'
 translations_target_dir='${project.build.directory}/resources/translations'
 ldpath='${qt.dir}/lib'
-translations=['${translation1}', '${translation2}', '${translation3}', '${translation4}', '${translation5}', '${translation6}', '${translation7}', '${translation8}', '${translation9}', '${translation10}',
-              '${translation11}','${translation12}','${translation13}','${translation14}','${translation15}','${translation16}','${translation17}','${translation18}','${translation19}','${translation20}']
+translations=['${defaultTranslation}'] + splitted('${additionalTranslations}')
 qml_files = [ ".qml", ".js", "qmldir" ]
-additional_qrc_pathes = splitted("${additionalQrcPathes}")
+additional_qrc_pathes = splitted("${additionalQrcPathes}", sep=',')
 os.environ["DYLD_FRAMEWORK_PATH"] = '${qt.dir}/lib'
 os.environ["DYLD_LIBRARY_PATH"] = '${libdir}/lib/${build.configuration}:${arch.dir}'
 os.environ["LD_LIBRARY_PATH"] = '${libdir}/lib/${build.configuration}'
