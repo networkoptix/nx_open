@@ -203,6 +203,7 @@ void QnCommonModule::bindModuleinformation(const QnMediaServerResourcePtr &serve
     connect(m_globalSettings, &QnGlobalSettings::localSystemIdChanged, this, &QnCommonModule::resetCachedValue);
     connect(m_globalSettings, &QnGlobalSettings::cloudSettingsChanged, this, &QnCommonModule::resetCachedValue);
 
+    resetCachedValue();
 }
 
 void QnCommonModule::setRemoteGUID(const QnUuid &guid)
@@ -264,6 +265,10 @@ void QnCommonModule::setModuleInformation(const QnModuleInformation& moduleInfor
 
         isReadOnlyChanged = m_moduleInformation.ecDbReadOnly != moduleInformation.ecDbReadOnly;
         m_moduleInformation = moduleInformation;
+
+        // TODO: This is generally a bad idea to fill some structure in setter and always replace
+        //     some of the values by internal logic. It has to be redesigned.
+        m_dirtyModuleInformation = true;
     }
     if (isReadOnlyChanged)
         emit readOnlyChanged(moduleInformation.ecDbReadOnly);
@@ -281,7 +286,6 @@ QnModuleInformation QnCommonModule::moduleInformation()
         }
         return m_moduleInformation;
     }
-
 }
 
 void QnCommonModule::resetCachedValue()
