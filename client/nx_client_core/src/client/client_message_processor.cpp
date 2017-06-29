@@ -3,10 +3,14 @@
 #include <api/app_server_connection.h>
 #include <api/global_settings.h>
 
+#include <client_core/client_core_module.h>
+
 #include <core/resource_management/resource_pool.h>
+#include <core/resource_management/resource_discovery_manager.h>
+#include <core/resource_management/layout_tour_state_manager.h>
+
 #include <core/resource/media_server_resource.h>
 #include <core/resource/layout_resource.h>
-#include <core/resource_management/resource_discovery_manager.h>
 
 #include <nx_ec/ec_api.h>
 #include <nx/network/socket_global.h>
@@ -123,6 +127,14 @@ void QnClientMessageProcessor::disconnectFromConnection(const ec2::AbstractECCon
 {
     base_type::disconnectFromConnection(connection);
     connection->getMiscNotificationManager()->disconnect(this);
+}
+
+void QnClientMessageProcessor::handleTourAddedOrUpdated(const ec2::ApiLayoutTourData& tour)
+{
+    if (qnClientCoreModule->layoutTourStateManager()->isChanged(tour.id))
+        return;
+
+    base_type::handleTourAddedOrUpdated(tour);
 }
 
 void QnClientMessageProcessor::onResourceStatusChanged(
