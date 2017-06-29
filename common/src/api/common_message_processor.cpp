@@ -175,8 +175,8 @@ void QnCommonMessageProcessor::connectToConnection(const ec2::AbstractECConnecti
 
     connect(layoutTourManager,
         &ec2::AbstractLayoutTourNotificationManager::addedOrUpdated,
-        this->layoutTourManager(),
-        &QnLayoutTourManager::addOrUpdateTour,
+        this,
+        &QnCommonMessageProcessor::handleTourAddedOrUpdated,
         Qt::DirectConnection);
 
     connect(layoutTourManager,
@@ -472,6 +472,11 @@ void QnCommonMessageProcessor::on_broadcastBusinessAction( const QnAbstractBusin
 void QnCommonMessageProcessor::on_execBusinessAction( const QnAbstractBusinessActionPtr& action )
 {
     execBusinessActionInternal(action);
+}
+
+void QnCommonMessageProcessor::handleTourAddedOrUpdated(const ec2::ApiLayoutTourData& tour)
+{
+    layoutTourManager()->addOrUpdateTour(tour);
 }
 
 void QnCommonMessageProcessor::resetResourceTypes(const ec2::ApiResourceTypeDataList& resTypes)

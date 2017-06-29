@@ -92,6 +92,8 @@ protected:
         ec2::NotificationSource source) = 0;
     virtual void execBusinessActionInternal(const QnAbstractBusinessActionPtr& /*action*/) {}
 
+    virtual void handleTourAddedOrUpdated(const ec2::ApiLayoutTourData& tour);
+
     void resetResourceTypes(const ec2::ApiResourceTypeDataList& resTypes);
     void resetResources(const ec2::ApiFullInfoData& fullData);
     void resetLicenses(const ec2::ApiLicenseDataList& licenses);

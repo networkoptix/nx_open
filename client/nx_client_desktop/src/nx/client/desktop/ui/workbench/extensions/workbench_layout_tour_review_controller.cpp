@@ -3,8 +3,11 @@
 #include <QtCore/QScopedValueRollback>
 #include <QtWidgets/QAction>
 
+#include <client_core/client_core_module.h>
+
 #include <core/resource_access/resource_access_filter.h>
 #include <core/resource_management/layout_tour_manager.h>
+#include <core/resource_management/layout_tour_state_manager.h>
 #include <core/resource_management/resource_pool.h>
 #include <core/resource_management/resource_runtime_data.h>
 #include <core/resource/layout_resource.h>
@@ -586,8 +589,10 @@ void LayoutTourReviewController::at_saveCurrentLayoutTourAction_triggered()
     fillTourItems(&tour.items);
     tour.settings.manual = workbench()->currentLayout()->data(Qn::LayoutTourIsManualRole).toBool();
     layoutTourManager()->addOrUpdateTour(tour);
+    qnClientCoreModule->layoutTourStateManager()->markChanged(tour.id, true);
 
     m_saveToursQueue.insert(tour.id);
+    qDebug() << "tour" << tour.name << "save operation is queued";
     m_saveToursOperation->requestOperation();
 }
 

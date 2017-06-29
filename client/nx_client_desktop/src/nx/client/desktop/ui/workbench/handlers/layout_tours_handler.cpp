@@ -4,8 +4,11 @@
 
 #include <common/common_module.h>
 
+#include <client_core/client_core_module.h>
+
 #include <core/resource_management/resource_pool.h>
 #include <core/resource_management/layout_tour_manager.h>
+#include <core/resource_management/layout_tour_state_manager.h>
 #include <core/resource/user_resource.h>
 
 #include <nx_ec/ec_api.h>
@@ -216,8 +219,17 @@ void LayoutToursHandler::saveTourToServer(const ec2::ApiLayoutTourData& tour)
     NX_EXPECT(layoutTourManager()->tour(tour.id).isValid());
     if (const auto connection = commonModule()->ec2Connection())
     {
-        connection->getLayoutTourManager(Qn::kSystemAccess)->save(tour, this,
-            [](int /*reqId*/, ec2::ErrorCode /*errorCode*/) {});
+        qDebug() << "tour" << tour.name << "save request sent to server";
+        int reqId = connection->getLayoutTourManager(Qn::kSystemAccess)->save(tour, this,
+            [tour](int /*reqId*/, ec2::ErrorCode errorCode)
+            {
+                qnClientCoreModule->layoutTourStateManager()->markBeingSaved(tour.id, false);
+                if (errorCode == ec2::ErrorCode::ok)
+                    qnClientCoreModule->layoutTourStateManager()->markChanged(tour.id, false);
+            });
+        const bool success = (reqId > 0);
+        if (success)
+            qnClientCoreModule->layoutTourStateManager()->markBeingSaved(tour.id, true);
     };
 }
 
