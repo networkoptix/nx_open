@@ -219,7 +219,6 @@ void LayoutToursHandler::saveTourToServer(const ec2::ApiLayoutTourData& tour)
     NX_EXPECT(layoutTourManager()->tour(tour.id).isValid());
     if (const auto connection = commonModule()->ec2Connection())
     {
-        qDebug() << "tour" << tour.name << "save request sent to server";
         int reqId = connection->getLayoutTourManager(Qn::kSystemAccess)->save(tour, this,
             [tour](int /*reqId*/, ec2::ErrorCode errorCode)
             {

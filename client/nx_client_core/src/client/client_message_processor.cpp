@@ -131,17 +131,9 @@ void QnClientMessageProcessor::disconnectFromConnection(const ec2::AbstractECCon
 
 void QnClientMessageProcessor::handleTourAddedOrUpdated(const ec2::ApiLayoutTourData& tour)
 {
-    qDebug() << "tour" << tour.name << "added or updated with items" << tour.items.size();
-    if (qnClientCoreModule->layoutTourStateManager()->isBeingSaved(tour.id))
-    {
-        qDebug() << "tour" << tour.name << "is being saved, skip update";
-        return;
-    }
     if (qnClientCoreModule->layoutTourStateManager()->isChanged(tour.id))
-    {
-        qDebug() << "tour" << tour.name << "is changed, skip update";
         return;
-    }
+
     base_type::handleTourAddedOrUpdated(tour);
 }
 

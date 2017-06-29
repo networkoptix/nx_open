@@ -592,7 +592,6 @@ void LayoutTourReviewController::at_saveCurrentLayoutTourAction_triggered()
     qnClientCoreModule->layoutTourStateManager()->markChanged(tour.id, true);
 
     m_saveToursQueue.insert(tour.id);
-    qDebug() << "tour" << tour.name << "save operation is queued";
     m_saveToursOperation->requestOperation();
 }
 
