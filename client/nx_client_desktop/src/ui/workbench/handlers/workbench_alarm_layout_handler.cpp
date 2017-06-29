@@ -81,7 +81,7 @@ QnWorkbenchAlarmLayoutHandler::QnWorkbenchAlarmLayoutHandler(QObject *parent):
     connect(messageProcessor, &QnCommonMessageProcessor::businessActionReceived, this,
         [this](const vms::event::AbstractActionPtr& action)
         {
-            if (action->actionType() != vms::event::ShowOnAlarmLayoutAction)
+            if (action->actionType() != vms::event::showOnAlarmLayoutAction)
                 return;
 
             if (!context()->user())
