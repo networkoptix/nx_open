@@ -14,9 +14,9 @@
 #include <utils/common/util.h>
 #include <utils/math/math.h>
 #include <utils/crypt/symmetrical.h>
-#include <common/static_common_module.h>
 #include "core/resource/resource_data.h"
 #include "core/resource_management/resource_data_pool.h"
+#include <common/common_module.h>
 
 namespace {
 
@@ -179,7 +179,7 @@ QSize QnPhysicalCameraResource::getNearestResolution(const QSize& resolution, fl
 
 CameraDiagnostics::Result QnPhysicalCameraResource::initInternal()
 {
-    auto resData = qnStaticCommon->dataPool()->data(toSharedPointer(this));
+    auto resData = qnCommon->dataPool()->data(toSharedPointer(this));
     int timeoutSec = resData.value<int>(lit("unauthorizedTimeoutSec"));
     auto credentials = getAuth();
     auto status = getStatus();
