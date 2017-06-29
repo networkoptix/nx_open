@@ -79,7 +79,7 @@ def handle_get_view(request):
 	if request_data:
 		context = Context.objects.get(name=request_data['context'])
 		context_id = context.id
-		if request_data['language']:
+		if 'language' in request_data and request_data['language']:
 			language_id = Language.objects.get(code=request_data['language']).id
 
 	form = CustomForm(initial={'language': language_id, 'context': context_id})
@@ -136,7 +136,7 @@ def handle_post_view(request):
 
 # Create your views here.
 @api_view(["GET", "POST"])
-def page_edit_view(request):
+def context_edit_view(request):
 	if request.method == "GET":
 		form, post_made = handle_get_view(request)
 		return render(request, 'page_edit_form.html', {'form': form, 'post_made': post_made})
@@ -156,9 +156,12 @@ def partner_publish_view(request):
 		form, post_made, preview_link = handle_post_view(request)
 		return render(request, 'partner_publish.html', {'form': form, 'preview_link': preview_link})
 
-
 class VersionsViewer(ListView):
-	queryset = DataRecord.objects.order_by('data_structure__context__name', '-version__id', 'language__code')
+	def get_queryset(self):
+		id = self.request.GET['id']
+		query = ContentVersion.objects.get(id=id).datarecord_set.all()
+		return query.order_by('data_structure__context__name', 'language__code')
+
 	template = "datarecord_list.html"
 
 	fields = "__all__"
