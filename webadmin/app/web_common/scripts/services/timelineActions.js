@@ -102,7 +102,7 @@ TimelineActions.prototype.updatePosition = function(){
                         self.scope.lastPlayedPosition = self.nextPlayedPosition;
                         return;
                     }
-                    self.scaleManager.tryToSetLiveDate(value, self.positionProvider.liveMode, (new Date()).getTime());
+                    self.scaleManager.tryToSetLiveDate(value, self.positionProvider.liveMode);
                 });
         }
     }
@@ -115,7 +115,7 @@ TimelineActions.prototype.setAnchorCoordinate = function(mouseX){
 
     this.stopAnimatingMove(); // Instantly jump to new position
     this.scope.lastPlayedPosition = position;
-    this.scaleManager.tryToSetLiveDate(position, this.positionProvider.liveMode, (new Date()).getTime());
+    this.scaleManager.tryToSetLiveDate(position, this.positionProvider.liveMode);
 
     return position;
 };

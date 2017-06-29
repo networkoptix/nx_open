@@ -117,7 +117,7 @@ angular.module('nxCommon')
                 function initTimeline(){
                     var now = (new Date()).getTime();
                     scope.scaleManager.setStart(scope.recordsProvider && scope.recordsProvider.chunksTree ? scope.recordsProvider.chunksTree.start : (now - timelineConfig.initialInterval));
-                    scope.scaleManager.setEnd(now);
+                    scope.scaleManager.setEnd(now, true);
 
                     timelineActions.fullZoomOut(); // Animate full zoom out
                 }

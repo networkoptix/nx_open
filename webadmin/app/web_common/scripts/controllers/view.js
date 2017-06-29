@@ -386,7 +386,7 @@ angular.module('nxCommon').controller('ViewCtrl',
         systemAPI.getTime().then(function(result){
             var serverUtcTime = parseInt(result.data.reply.utcTime);
             var timeZoneOffset = parseInt(result.data.reply.timeZoneOffset);
-            serverTime.init(Config.webclient.useServerTime, serverUtcTime, timeZoneOffset);
+            timeManager.init(Config.webclient.useServerTime, serverUtcTime, timeZoneOffset);
         });
 
         function requestResources(){

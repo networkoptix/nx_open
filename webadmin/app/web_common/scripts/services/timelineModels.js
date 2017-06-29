@@ -1,6 +1,8 @@
 'use strict';
 
-
+/*
+About server/local time - we always store everything as it needs to be displayed. Including
+*/
 /*
 Input: date to be corrected
 Output: date adjusted to server time
@@ -10,21 +12,53 @@ Summary: 1)We convert the input date into a Date object.
          4)Adding the server's timezone and minus the timeLatency sets the
            local time to the server's time.
 */
-
-function serverTime(date, reverse){
-    /*if(reverse){
-        return date - serverTime.timeLatency;
-    }else{
-        return date + serverTime.timeLatency;
-    }*/
-
-    if(!serverTime.useServerTime){
-        return date;
-    }
-    var currentTime = new Date(date);
-    return currentTime.getTime() + serverTime.timeLatency;
+var timeManager = {
+    useServerTime: true
 };
-serverTime.init = function(useServerTime, serverTime, timeZoneOffset){
+
+timeManager.displayToServer = function(date){
+    if(this.useServerTime){
+        return date - this.timeLatency;  // Save server time
+    }
+    return date; // Translate server time to localtime
+};
+timeManager.serverToDisplay = function(date){
+    if(this.useServerTime){
+        return date;  // Save server time
+    }
+    return date + this.timeLatency; // Translate server time to localtime
+};
+
+timeManager.localToServer = function(date){
+    return Math.max(date - this.timeLatency,0); // Translate server time to localtime
+};
+
+timeManager.localToDisplay = function(date){
+    if(!this.useServerTime){
+        return date;    // Save local time
+    }
+    return date - this.timeLatency; // Translate local time to server time
+};
+
+timeManager.nowToDisplay = function(){
+    return this.localToDisplay((new Date().getTime()));
+};
+timeManager.nowToServer = function(){
+    return this.localToServer((new Date().getTime()));
+};
+
+timeManager.translate = function(date, reverse){
+    var latency = this.timeLatency;
+
+    /*if(this.useServerTime){
+        return date;
+    }*/
+    if(reverse){
+        return date + latency;
+    }
+    return date - latency;
+};
+timeManager.init = function(useServerTime, serverTime, timeZoneOffset){
     var minTimeLag = 2000;// Two seconds
     var clientDate = new Date();
     var clientTime = clientDate.getTime();
@@ -33,9 +67,9 @@ serverTime.init = function(useServerTime, serverTime, timeZoneOffset){
         latency = clientTime - serverTime;
     }
 
-    serverTime.useServerTime = useServerTime;
-    serverTime.timeZoneOffset = timeZoneOffset;
-    serverTime.timeLatency = latency;
+    this.useServerTime = useServerTime;
+    this.timeZoneOffset = timeZoneOffset;
+    this.timeLatency = latency;
 };
 
 //Record
@@ -272,32 +306,27 @@ function CameraRecordsProvider(cameras, mediaserver, $q, width) {
     this.$q = $q;
     this.chunksTree = null;
     this.requestedCache = [];
-    this.timeLatency = 0;
     var self = this;
     //1. request first detailization to get initial bounds
 
     var archiveReadyDefer = $q.defer();
     this.archiveReadyPromise = archiveReadyDefer.promise;
-    this.lastRequested = self.now();
-    this.requestInterval(0, self.now() + 10000, 0).then(function () {
+    this.lastRequested = timeManager.nowToServer(); // lastrequested is always servertime
+    this.requestInterval(0, this.lastRequested + 10000, 0).then(function () {
         archiveReadyDefer.resolve(!!self.chunksTree);
         if(!self.chunksTree){
             return; //No chunks for this camera
         }
 
         // Depends on this interval - choose minimum interval, which contains all records and request deeper detailization
-        var nextLevel = RulerModel.getLevelIndex(self.now() - self.chunksTree.start,width);
+        var nextLevel = RulerModel.getLevelIndex(self.nowToDisplay() - self.chunksTree.start,width);
         if(nextLevel<RulerModel.levels.length-1) {
-            self.requestInterval(self.chunksTree.start, self.now(), nextLevel + 1);
+            self.requestInterval(timeManager.displayToServer(self.chunksTree.start), timeManager.nowToServer(), nextLevel + 1);
         }
     });
 
     //2. getCameraHistory
 }
-
-CameraRecordsProvider.prototype.now = function(){
-    return (new Date()).getTime();
-};
 
 CameraRecordsProvider.prototype.cacheRequestedInterval = function (start,end,level){
     for(var i=0;i<level+1;i++){
@@ -366,7 +395,7 @@ CameraRecordsProvider.prototype.checkRequestedIntervalCache = function (start,en
 };
 
 CameraRecordsProvider.prototype.updateLastMinute = function(lastMinuteDuration, level){
-    var now = this.now();
+    var now = timeManager.nowToServer();
 
     if(now - this.lastRequested > lastMinuteDuration/2) {
         this.requestInterval(now - lastMinuteDuration, now + 10000,level);
@@ -382,6 +411,7 @@ CameraRecordsProvider.prototype.abort = function (reason){
 };
 
 CameraRecordsProvider.prototype.requestInterval = function (start,end,level){
+    // requestInterval operates with server time always
     var deferred = this.$q.defer();
     //this.start = start;
     //this.end = end;
@@ -396,14 +426,7 @@ CameraRecordsProvider.prototype.requestInterval = function (start,end,level){
     if(self.currentRequest){
         return;
     }
-    self.currentRequest = this.mediaserver.getRecords(
-        this.cameras[0],
-        Math.max(start - this.timeLatency,0),
-        end - this.timeLatency,
-        detailization,
-        null,
-        levelData.name
-    );
+    self.currentRequest = this.mediaserver.getRecords(this.cameras[0], start, end, detailization, null, levelData.name);
 
     self.currentRequest.then(function (data) {
 
@@ -413,7 +436,7 @@ CameraRecordsProvider.prototype.requestInterval = function (start,end,level){
 
             _.forEach(chunks,function(chunk){
                 chunk.durationMs = parseInt(chunk.durationMs);
-                chunk.startTimeMs = parseInt(chunk.startTimeMs) + self.timeLatency;
+                chunk.startTimeMs = timeManager.serverToDisplay(parseInt(chunk.startTimeMs));
             });
 
             var chunksToIterate = chunks.length;
@@ -425,7 +448,7 @@ CameraRecordsProvider.prototype.requestInterval = function (start,end,level){
             for (var i = 0; i < chunksToIterate; i++) {
                 var endChunk = chunks[i].startTimeMs + chunks[i].durationMs;
                 if (chunks[i].durationMs < 0) {
-                    endChunk = (new Date()).getTime();// current moment
+                    endChunk = timeManager.nowToDisplay();// current moment
                 }
                 var addchunk = new Chunk(null, chunks[i].startTimeMs, endChunk, level);
                 self.addChunk(addchunk, null);
@@ -464,7 +487,7 @@ CameraRecordsProvider.prototype.getIntervalRecords = function (start,end,level,d
 
     // Splice existing intervals and check, if we need an update from server
     var result = [];
-    this.selectRecords(result,start,end,level,null,debugLevel);
+    this.selectRecords(result,timeManager.displayToServer(start),timeManager.displayToServer(end),level,null,debugLevel);
 
     /*this.logcounter = this.logcounter||0;
     this.logcounter ++;
@@ -681,14 +704,12 @@ function ShortCache(cameras, mediaserver, $q){
     this.requestDetailization = 1;//the deepest detailization possible
     this.limitChunks = 100; // limit for number of chunks
     this.checkpointsFrequency = 60 * 1000;//Checkpoints - not often that once in a minute
-
-    this.timeLatency = 0;
 }
 ShortCache.prototype.init = function(start, isPlaying){
     this.liveMode = false;
     if(!start){
         this.liveMode = true;
-        start = (new Date()).getTime();
+        start = timeManager.nowToDisplay();
     }
     this.start = start;
     this.playedPosition = start;
@@ -712,7 +733,7 @@ ShortCache.prototype.abort = function(reason){
     }
 };
 
-ShortCache.prototype.update = function(requestPosition,position){
+ShortCache.prototype.update = function(requestPosition, position){
     //Request from current moment to 1.5 minutes to future
 
     // Save them to this.currentDetailization
@@ -729,11 +750,10 @@ ShortCache.prototype.update = function(requestPosition,position){
 
     this.abort("update again");
     // Get next {{limitChunks}} chunks
-    //console.log("Start Time: %s\tEnd Time: %s",Math.max(requestPosition-this.timeLatency,0),(new Date()).getTime()+100000 - this.timeLatency);
     this.currentRequest = this.mediaserver.getRecords(
         this.cameras[0],
-        Math.max(requestPosition - this.timeLatency,0),
-        (new Date()).getTime() + 100000 - this.timeLatency,
+        timeManager.displayToServer(requestPosition),
+        timeManager.nowToServer() + 100000,
         this.requestDetailization,
         this.limitChunks
     );
@@ -745,10 +765,10 @@ ShortCache.prototype.update = function(requestPosition,position){
 
         _.forEach(chunks,function(chunk){
             chunk.durationMs = parseInt(chunk.durationMs);
-            chunk.startTimeMs = parseInt(chunk.startTimeMs) + self.timeLatency;
+            chunk.startTimeMs = timeManager.serverToDisplay(parseInt(chunk.startTimeMs));
 
             if(chunk.durationMs == -1){
-                chunk.durationMs = (new Date()).getTime() - chunk.startTimeMs;//in future
+                chunk.durationMs = timeManager.nowToDisplay() - chunk.startTimeMs;//in future
             }
         });
 
@@ -846,7 +866,7 @@ ShortCache.prototype.setPlayingPosition = function(position){
     if(i == this.currentDetailization.length){ // We have no good detailization for this moment - pretend to be playing live
 
         if(!this.updating){
-            this.playedPosition = (new Date()).getTime();
+            this.playedPosition = timeManager.nowToDisplay();
             this.liveMode = true;
         }
     }
@@ -898,7 +918,7 @@ function ScaleManager (minMsPerPixel, maxMsPerPixel, defaultIntervalInMS, initia
 
 // Setup total boundaries
     this.viewportWidth = initialWidth;
-    this.end = (new Date()).getTime();
+    this.end = timeManager.nowToDisplay();
     this.start = this.end - defaultIntervalInMS;
     this.updateTotalInterval();
 
@@ -920,12 +940,13 @@ ScaleManager.prototype.setViewportWidth = function(width){ // For initialization
     this.updateCurrentInterval();
 };
 ScaleManager.prototype.setStart = function(start){// Update the begining end of the timeline. Live mode must be supported here
-    this.start = serverTime(start);
+    this.start = start; //Start is always right
     this.updateTotalInterval();
 };
 ScaleManager.prototype.setEnd = function(end){ // Update right end of the timeline. Live mode must be supported here
     var needZoomOut = !this.checkZoomOut();
-    this.end = serverTime(end);
+    this.end = end;
+
     this.updateTotalInterval();
     if(needZoomOut){
         this.zoom(1);
@@ -1018,7 +1039,7 @@ ScaleManager.prototype.checkWatchPlaying = function(date,liveMode){
     }
 };
 
-ScaleManager.prototype.tryToSetLiveDate = function(playing, liveMode, end){
+ScaleManager.prototype.tryToSetLiveDate = function(playing, liveMode){
     this.playedPosition = playing;
     this.liveMode = liveMode;
 
@@ -1026,6 +1047,7 @@ ScaleManager.prototype.tryToSetLiveDate = function(playing, liveMode, end){
         return;
     }
 
+    var end = timeManager.nowToDisplay();
     if(playing > this.end && liveMode){
         this.setEnd(playing);
     }else if(end > this.end){
