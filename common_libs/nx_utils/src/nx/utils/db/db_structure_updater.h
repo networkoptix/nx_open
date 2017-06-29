@@ -1,22 +1,10 @@
 #pragma once
 
-#include <vector>
-
-#include <boost/optional.hpp>
-
-#include <QtCore/QByteArray>
-
-#include <nx/utils/move_only_func.h>
-#include <nx/utils/std/future.h>
-
-#include "types.h"
+#include "detail/detail_db_structure_updater.h"
 
 namespace nx {
 namespace utils {
 namespace db {
-
-class AbstractAsyncSqlQueryExecutor;
-class QueryContext;
 
 /**
  * Updates are executed in order they have been added to DbStructureUpdater instance.
@@ -26,11 +14,10 @@ class QueryContext;
 class NX_UTILS_API DbStructureUpdater
 {
 public:
-    typedef nx::utils::MoveOnlyFunc<nx::utils::db::DBResult(nx::utils::db::QueryContext*)>
-        DbUpdateFunc;
+    using DbUpdateFunc = MoveOnlyFunc<DBResult(QueryContext*)>;
 
     DbStructureUpdater(
-        std::string dbManagerName,
+        const std::string& schemaName,
         AbstractAsyncSqlQueryExecutor* const queryExecutor);
 
     DbStructureUpdater(const DbStructureUpdater&) = delete;
@@ -69,81 +56,19 @@ public:
     bool updateStructSync();
 
 private:
-    struct DbUpdate
-    {
-        /** Can be empty. */
-        std::map<RdbmsDriverType, QByteArray> dbTypeToSqlScript;
-        /** Can be empty. */
-        DbUpdateFunc func;
+    detail::DbStructureUpdater m_schemaUpdater;
+    std::string m_schemaName;
+    AbstractAsyncSqlQueryExecutor* m_queryExecutor;
 
-        DbUpdate(QByteArray _sqlScript)
-        {
-            dbTypeToSqlScript.emplace(RdbmsDriverType::unknown, std::move(_sqlScript));
-        }
-
-        DbUpdate(std::map<RdbmsDriverType, QByteArray> dbTypeToSqlScript):
-            dbTypeToSqlScript(std::move(dbTypeToSqlScript))
-        {
-        }
-
-        DbUpdate(DbUpdateFunc _func):
-            func(std::move(_func))
-        {
-        }
-    };
-
-    struct DbSchemaState
-    {
-        unsigned int version;
-        bool someSchemaExists;
-    };
-
-    AbstractAsyncSqlQueryExecutor* const m_queryExecutor;
-    unsigned int m_initialVersion;
-    std::map<unsigned int, QByteArray> m_fullSchemaScriptByVersion;
-    std::vector<DbUpdate> m_updateScripts;
-    boost::optional<unsigned int> m_versionToUpdateTo;
-
-    DBResult updateDbInternal(nx::utils::db::QueryContext* const dbConnection);
-
-    DbSchemaState analyzeDbSchemaState(nx::utils::db::QueryContext* const queryContext);
-
-    DBResult createInitialSchema(
-        nx::utils::db::QueryContext* const queryContext,
-        DbSchemaState* dbSchemaState);
-
-    DBResult applyScriptsMissingInCurrentDb(
-        nx::utils::db::QueryContext* queryContext,
-        DbSchemaState* dbState);
-
-    bool gotScriptForUpdate(DbSchemaState* dbState) const;
-
-    DBResult applyNextUpdateScript(
-        nx::utils::db::QueryContext* queryContext,
-        DbSchemaState* dbState);
-
-    DBResult updateDbVersion(
-        nx::utils::db::QueryContext* const queryContext,
-        const DbSchemaState& dbSchemaState);
-
-    bool execDbUpdate(
-        const DbUpdate& dbUpdate,
-        nx::utils::db::QueryContext* const queryContext);
-
-    bool execStructureUpdateTask(
-        const std::map<RdbmsDriverType, QByteArray>& dbTypeToScript,
-        nx::utils::db::QueryContext* const dbConnection);
-
-    std::map<RdbmsDriverType, QByteArray>::const_iterator selectSuitableScript(
-        const std::map<RdbmsDriverType, QByteArray>& dbTypeToScript,
-        RdbmsDriverType driverType) const;
-
-    bool execSqlScript(
-        nx::utils::db::QueryContext* const queryContext,
-        QByteArray sqlScript,
-        RdbmsDriverType sqlScriptDialect);
-
-    QByteArray fixSqlDialect(QByteArray initialScript, RdbmsDriverType targetDialect);
+    void updateStructInternal(QueryContext* queryContext);
+    void updateDbToMultipleSchema(QueryContext* queryContext);
+    bool isDbVersionTableExists(QueryContext* queryContext);
+    void createInitialSchema(QueryContext* queryContext);
+    bool isDbVersionTableSupportsMultipleSchemas(QueryContext* queryContext);
+    void updateDbVersionTable(QueryContext* queryContext);
+    void setDbSchemaNameTo(
+        QueryContext* queryContext,
+        const std::string& schemaName);
 };
 
 } // namespace db

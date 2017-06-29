@@ -411,6 +411,8 @@ public:
     StringType toMultipartString(const ConstBufferRefType& boundary) const;
 };
 
+NX_NETWORK_API bool isMessageBodyPresent(const Response& response);
+
 class NX_NETWORK_API RtspResponse:
     public Response
 {

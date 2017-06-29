@@ -89,25 +89,62 @@ private:
     CustomExecSqlScriptFunc m_customExecSqlScriptFunc;
 };
 
-class DbStructureUpdater:
+//-------------------------------------------------------------------------------------------------
+
+class BasicDbStructureUpdaterTestSetup:
     public BaseDbTest
 {
-    using BaseType = BaseDbTest;
+    using base_type = BaseDbTest;
+
+public:
+    BasicDbStructureUpdaterTestSetup()
+    {
+        using namespace std::placeholders;
+
+        base_type::initializeDatabase();
+
+        m_testAsyncSqlQueryExecutor = std::make_unique<TestAsyncSqlQueryExecutor>(
+            asyncSqlQueryExecutor().get());
+        m_testAsyncSqlQueryExecutor->setCustomExecSqlScriptFunc(
+            std::bind(&BasicDbStructureUpdaterTestSetup::execSqlScript, this, _1, _2));
+    }
+
+protected:
+    std::list<QByteArray> m_executedScripts;
+
+    TestAsyncSqlQueryExecutor& testAsyncSqlQueryExecutor()
+    {
+        return *m_testAsyncSqlQueryExecutor;
+    }
+
+    virtual DBResult execSqlScript(
+        const QByteArray& script,
+        nx::utils::db::QueryContext* const /*queryContext*/)
+    {
+        m_executedScripts.push_back(script);
+        return DBResult::ok;
+    }
+
+private:
+    std::unique_ptr<TestAsyncSqlQueryExecutor> m_testAsyncSqlQueryExecutor;
+};
+
+//-------------------------------------------------------------------------------------------------
+
+class DbStructureUpdater:
+    public BasicDbStructureUpdaterTestSetup
+{
+    using base_type = BasicDbStructureUpdaterTestSetup;
 
 public:
     DbStructureUpdater():
         m_updateResult(false)
     {
-        using namespace std::placeholders;
-
         initializeDatabase();
 
-        m_testAsyncSqlQueryExecutor = std::make_unique<TestAsyncSqlQueryExecutor>(
-            asyncSqlQueryExecutor().get());
-        m_testAsyncSqlQueryExecutor->setCustomExecSqlScriptFunc(
-            std::bind(&DbStructureUpdater::execSqlScript, this, _1, _2));
-
-        m_dbUpdater = std::make_unique<db::DbStructureUpdater>(kCdbStructureName, m_testAsyncSqlQueryExecutor.get());
+        m_dbUpdater = std::make_unique<db::DbStructureUpdater>(
+            kCdbStructureName,
+            &testAsyncSqlQueryExecutor());
     }
 
 protected:
@@ -128,7 +165,7 @@ protected:
 
     void emulateConnectionToDb(RdbmsDriverType dbType)
     {
-        m_testAsyncSqlQueryExecutor->connectionOptions().driverType = dbType;
+        testAsyncSqlQueryExecutor().connectionOptions().driverType = dbType;
     }
 
     void whenUpdatedDb()
@@ -137,12 +174,12 @@ protected:
         m_updateResult = m_dbUpdater->updateStructSync();
     }
 
-    void assertIfInvokedNotDefaultScript()
+    void assertDefaultScriptHasBeenInvoked()
     {
-        assertIfInvokedScriptForDbmsOtherThan(RdbmsDriverType::unknown);
+        assertInvokedScriptForDbms(RdbmsDriverType::unknown);
     }
 
-    void assertIfInvokedScriptForDbmsOtherThan(RdbmsDriverType dbType)
+    void assertInvokedScriptForDbms(RdbmsDriverType dbType)
     {
         ASSERT_TRUE(m_updateResult);
 
@@ -163,12 +200,12 @@ protected:
         }
     }
 
-    void assertIfUpdateSucceeded()
+    void assertUpdateFailed()
     {
         ASSERT_FALSE(m_updateResult);
     }
 
-    void assertIfThereWasNoInvokationOf(const QByteArray& script)
+    void assertThereWasInvokationOf(const QByteArray& script)
     {
         ASSERT_TRUE(
             std::find(m_executedScripts.cbegin(), m_executedScripts.cend(), script) !=
@@ -176,27 +213,25 @@ protected:
     }
 
 private:
-    std::unique_ptr<TestAsyncSqlQueryExecutor> m_testAsyncSqlQueryExecutor;
     std::unique_ptr<nx::utils::db::DbStructureUpdater> m_dbUpdater;
-    std::list<QByteArray> m_executedScripts;
     std::multimap<QByteArray, RdbmsDriverType> m_registeredScripts;
     std::map<RdbmsDriverType, QByteArray> m_dbTypeToScript;
     bool m_updateResult;
 
     void initializeDatabase()
     {
-        BaseType::initializeDatabase();
-
         // Creating initial structure.
         nx::utils::db::DbStructureUpdater updater(kCdbStructureName, asyncSqlQueryExecutor().get());
         ASSERT_TRUE(updater.updateStructSync());
     }
 
-    DBResult execSqlScript(
+    virtual DBResult execSqlScript(
         const QByteArray& script,
-        nx::utils::db::QueryContext* const queryContext)
+        nx::utils::db::QueryContext* const queryContext) override
     {
-        m_executedScripts.push_back(script);
+        auto dbResult = base_type::execSqlScript(script, queryContext);
+        if (dbResult != DBResult::ok)
+            return dbResult;
 
         if (m_registeredScripts.find(script) == m_registeredScripts.end())
             return asyncSqlQueryExecutor()->execSqlScriptSync(script, queryContext);
@@ -212,7 +247,7 @@ TEST_F(DbStructureUpdater, different_sql_scripts_for_different_dbms)
     emulateConnectionToDb(RdbmsDriverType::mysql);
 
     whenUpdatedDb();
-    assertIfInvokedScriptForDbmsOtherThan(RdbmsDriverType::mysql);
+    assertInvokedScriptForDbms(RdbmsDriverType::mysql);
 }
 
 TEST_F(DbStructureUpdater, default_script_gets_called_if_no_dbms_specific_script_supplied)
@@ -222,7 +257,7 @@ TEST_F(DbStructureUpdater, default_script_gets_called_if_no_dbms_specific_script
     emulateConnectionToDb(RdbmsDriverType::oracle);
 
     whenUpdatedDb();
-    assertIfInvokedNotDefaultScript();
+    assertDefaultScriptHasBeenInvoked();
 }
 
 TEST_F(DbStructureUpdater, update_fails_if_no_suitable_script_found)
@@ -232,7 +267,7 @@ TEST_F(DbStructureUpdater, update_fails_if_no_suitable_script_found)
     emulateConnectionToDb(RdbmsDriverType::oracle);
 
     whenUpdatedDb();
-    assertIfUpdateSucceeded();
+    assertUpdateFailed();
 }
 
 TEST_F(DbStructureUpdater, proper_dialect_fix_is_applied)
@@ -243,7 +278,96 @@ TEST_F(DbStructureUpdater, proper_dialect_fix_is_applied)
     registerDefaultUpdateScript(initialScript);
     emulateConnectionToDb(RdbmsDriverType::sqlite);
     whenUpdatedDb();
-    assertIfThereWasNoInvokationOf(sqliteAdaptedScript);
+    assertThereWasInvokationOf(sqliteAdaptedScript);
+}
+
+//-------------------------------------------------------------------------------------------------
+
+static const char* firstSchemaName = "schema1";
+static const char* secondSchemaName = "schema2";
+
+static constexpr int kOldDbSchemaVersion = 3;
+
+class DbStructureUpdaterMultipleSchemas:
+    public BasicDbStructureUpdaterTestSetup
+{
+protected:
+    void givenUpdatedDb()
+    {
+        db::DbStructureUpdater updater(
+            firstSchemaName,
+            &testAsyncSqlQueryExecutor());
+        addScripts(&updater, firstSchemaName, nullptr);
+        ASSERT_TRUE(updater.updateStructSync());
+        m_executedScripts.clear();
+    }
+
+    void givenDbBeforeMultipleSchemaSupportIntroduction()
+    {
+        testAsyncSqlQueryExecutor().executeSqlSync(R"sql(
+            CREATE TABLE db_version_data (
+                db_version INTEGER NOT NULL DEFAULT 0
+            );
+        )sql");
+
+        testAsyncSqlQueryExecutor().executeSqlSync(
+            lm("INSERT INTO db_version_data(db_version) VALUES (%1);")
+                .arg(kOldDbSchemaVersion).toUtf8());
+        m_initialDbVersion = kOldDbSchemaVersion;
+    }
+
+    void whenLaunchedUpdaterWithAnotherSchema()
+    {
+        db::DbStructureUpdater updater(
+            secondSchemaName,
+            &testAsyncSqlQueryExecutor());
+        addScripts(&updater, secondSchemaName, &m_expectedScripts);
+
+        // NOTE: version 1 - is an empty database.
+        for (int i = 0; i < m_initialDbVersion-1; ++i)
+            m_expectedScripts.pop_front();
+
+        ASSERT_TRUE(updater.updateStructSync());
+    }
+
+    void thenScriptsOfAnotherSchemaWereExecuted()
+    {
+        ASSERT_EQ(m_expectedScripts, m_executedScripts);
+    }
+
+private:
+    std::list<QByteArray> m_expectedScripts;
+    int m_initialDbVersion = 0;
+
+    void addScripts(
+        db::DbStructureUpdater* updater,
+        const std::string& schemaName,
+        std::list<QByteArray>* scripts)
+    {
+        for (int i = 0; i < 7; ++i)
+        {
+            const auto script = lm("schema_%1_script_%2").arg(schemaName).arg(i).toUtf8();
+            updater->addUpdateScript(script);
+            if (scripts)
+                scripts->push_back(script);
+        }
+    }
+};
+
+TEST_F(DbStructureUpdaterMultipleSchemas, second_schema_is_applied)
+{
+    givenUpdatedDb();
+    whenLaunchedUpdaterWithAnotherSchema();
+    thenScriptsOfAnotherSchemaWereExecuted();
+}
+
+TEST_F(
+    DbStructureUpdaterMultipleSchemas,
+    updating_db_created_before_introducing_multiple_schema_support)
+{
+    givenDbBeforeMultipleSchemaSupportIntroduction();
+    whenLaunchedUpdaterWithAnotherSchema();
+    thenScriptsOfAnotherSchemaWereExecuted();
 }
 
 } // namespace test

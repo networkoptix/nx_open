@@ -147,6 +147,23 @@ protected:
         supplier->removeUser("vasya");
     }
 
+    void whenAllUsersRemoved()
+    {
+        supplier->removeUser("vasya");
+        supplier->removeUser("petya");
+    }
+
+    void whenClearCalled()
+    {
+        userInfoPool.clear();
+    }
+
+
+    void thenCommonNonceShouldBeNull ()
+    {
+        ASSERT_FALSE((bool)userInfoPool.newestMostCommonNonce());
+    }
+
     void thenSecondStillCanAuth()
     {
         ASSERT_FALSE(userInfoPool.authenticate(
@@ -201,6 +218,19 @@ TEST_F(CloudUserInfoPool, commonNonce_twoUsers_onlyFirstNonceIsCommon_SecondRemo
     thenSecondStillCanAuth();
 }
 
+TEST_F(CloudUserInfoPool, allUsersRemoved_nonceCleared)
+{
+    given2UsersInfosWithCommonFirstNonce();
+    whenAllUsersRemoved();
+    thenCommonNonceShouldBeNull();
+}
+
+TEST_F(CloudUserInfoPool, clear)
+{
+    given2UsersInfosWithCommonFirstNonce();
+    whenClearCalled();
+    thenCommonNonceShouldBeNull();
+}
 
 }
 

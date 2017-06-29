@@ -99,6 +99,7 @@ public:
         const nx_http::Method::ValueType& method,
         const nx_http::header::Authorization& authHeader) const;
     boost::optional<nx::Buffer> newestMostCommonNonce() const;
+    void clear();
 
 private:
     virtual void userInfoChanged(

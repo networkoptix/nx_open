@@ -55,6 +55,7 @@ public:
 
     /**
      * @param queryFunc throws nx::utils::db::Exception.
+     * @throws nx::utils::db::Exception.
      */
     template<typename QueryFunc, typename... OutputData>
     void executeUpdateQuerySync(QueryFunc queryFunc)
@@ -79,7 +80,13 @@ public:
     }
 
     /**
+     * @throws nx::utils::db::Exception.
+     */
+    void executeSqlSync(QByteArray sqlStatement);
+
+    /**
      * @param queryFunc throws nx::utils::db::Exception.
+     * @throws nx::utils::db::Exception.
      */
     template<typename QueryFunc>
     typename std::result_of<QueryFunc(nx::utils::db::QueryContext*)>::type 

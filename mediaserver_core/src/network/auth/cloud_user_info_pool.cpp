@@ -176,7 +176,10 @@ boost::optional<nx::Buffer> CloudUserInfoPool::newestMostCommonNonce() const
 {
     QnMutexLocker lock(&m_mutex);
     if (!m_nonce.isNull())
+    {
+        NX_VERBOSE(this, lm("providing nonce %1").arg(m_nonce));
         return m_nonce;
+    }
 
     NX_VERBOSE(this, lm("Could not find nonce"));
     return boost::none;
@@ -276,7 +279,6 @@ void CloudUserInfoPool::updateNonce()
     }
 
     logNonceUpdates(nonceToCount, nonceToMaxTs);
-    NX_ASSERT(!m_nonce.isEmpty());
 }
 
 void CloudUserInfoPool::removeInfoForUser(const nx::Buffer& userName)
@@ -294,6 +296,15 @@ void CloudUserInfoPool::removeInfoForUser(const nx::Buffer& userName)
 void CloudUserInfoPool::userInfoRemoved(const nx::Buffer& userName)
 {
     QnMutexLocker lock(&m_mutex);
-    NX_VERBOSE(this, lm("Removing cloud user info for user %1"));
+    NX_VERBOSE(this, lm("Removing cloud user info for user %1").arg(userName));
     removeInfoForUser(userName);
+    updateNonce();
+}
+
+void CloudUserInfoPool::clear()
+{
+    QnMutexLocker lock(&m_mutex);
+    NX_VERBOSE(this, "Removing all users info");
+    m_nonce.clear();
+    m_cloudUserInfoRecordList.clear();
 }
