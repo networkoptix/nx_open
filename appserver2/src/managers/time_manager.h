@@ -332,7 +332,7 @@ private:
         const TimePriorityKey& syncTimeKey);
 
 private slots:
-    void onNewConnectionEstablished(QnTransactionTransportBase* transport );
+    void onNewConnectionEstablished(QnAbstractTransactionTransport* transport );
     void onPeerLost(QnUuid peer, Qn::PeerType peerType);
     void onDbManagerInitialized();
     void onTimeSynchronizationSettingsChanged();

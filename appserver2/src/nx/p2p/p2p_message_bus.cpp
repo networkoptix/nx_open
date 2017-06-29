@@ -807,6 +807,7 @@ void MessageBus::at_stateChanged(
                 emitPeerFoundLostSignals();
                 startReading(connection);
             }
+            emit newDirectConnectionEstablished(connection.data());
             break;
         case Connection::State::Unauthorized:
         case Connection::State::Error:
@@ -1619,7 +1620,7 @@ QVector<QnTransportConnectionInfo> MessageBus::connectionsInfo() const
     for (const auto& connection: m_connections)
     {
         QnTransportConnectionInfo info;
-        info.url = connection->remoteUrl();
+        info.url = connection->remoteAddr();
         info.state = toString(connection->state());
         info.isIncoming = connection->direction() == Connection::Direction::incoming;
         info.remotePeerId = connection->remotePeer().id;

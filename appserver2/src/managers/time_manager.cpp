@@ -389,13 +389,10 @@ void TimeSynchronizationManager::start(const std::shared_ptr<Ec2DirectConnection
     if (m_connection)
         onDbManagerInitialized();
 
-    if (const auto& bus = dynamic_cast<QnTransactionMessageBus*>(m_messageBus))
-    {
-        // todo: p2p. add p2p implementation here
-        connect(bus, &QnTransactionMessageBus::newDirectConnectionEstablished,
-            this, &TimeSynchronizationManager::onNewConnectionEstablished,
-            Qt::DirectConnection);
-    }
+    connect(m_messageBus, &QnTransactionMessageBusBase::newDirectConnectionEstablished,
+        this, &TimeSynchronizationManager::onNewConnectionEstablished,
+        Qt::DirectConnection);
+
     connect(m_messageBus, &QnTransactionMessageBus::peerLost,
                 this, &TimeSynchronizationManager::onPeerLost,
                 Qt::DirectConnection );
@@ -780,13 +777,13 @@ void TimeSynchronizationManager::remotePeerTimeSyncUpdate(
     syncTimeWithAllKnownServers(*lock);
 }
 
-void TimeSynchronizationManager::onNewConnectionEstablished( QnTransactionTransportBase* transport )
+void TimeSynchronizationManager::onNewConnectionEstablished(QnAbstractTransactionTransport* transport )
 {
     using namespace std::placeholders;
 
     if (transport->remotePeer().peerType != Qn::PT_Server)
         return;
-
+#if 0
     if( transport->isIncoming() )
     {
         //peer connected to us
@@ -799,7 +796,10 @@ void TimeSynchronizationManager::onNewConnectionEstablished( QnTransactionTransp
         //listening time change signals fom remote peer which cannot connect to us
         transport->setHttpChunkExtensonHandler(
             std::bind(&TimeSynchronizationManager::onTransactionReceived, this, _1, _2));
-
+    }
+#endif
+    if (!transport->isIncoming())
+    {
         //we can connect to the peer
         const QUrl remoteAddr = transport->remoteAddr();
         //saving credentials has been used to establish connection
