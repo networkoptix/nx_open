@@ -135,7 +135,7 @@ QnResourceTreeModel::QnResourceTreeModel(Scope scope, QObject *parent):
         &QnResourceTreeModel::at_resPool_resourceAdded);
     connect(resourcePool(), &QnResourcePool::resourceRemoved, this,
         &QnResourceTreeModel::at_resPool_resourceRemoved);
-    connect(snapshotManager(), &QnWorkbenchLayoutSnapshotManager::flagsChanged, this,
+    connect(snapshotManager(), &QnWorkbenchLayoutSnapshotManager::layoutFlagsChanged, this,
         &QnResourceTreeModel::at_snapshotManager_flagsChanged);
     connect(context(), &QnWorkbenchContext::userChanged, this,
         &QnResourceTreeModel::rebuildTree);

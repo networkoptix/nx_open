@@ -297,20 +297,7 @@ namespace Qn
     Q_DECLARE_FLAGS(MarginFlags, MarginFlag)
     Q_DECLARE_OPERATORS_FOR_FLAGS(MarginFlags)
 
-    /**
-     * Flags describing the differences between instances of the same resource
-     * on the client and on the Server.
-     */
-    enum ResourceSavingFlag
-    {
-        /** Resource is currently being saved to Server. */
-        ResourceIsBeingSaved = 0x1,
 
-        /** Unsaved changes are present in the resource. */
-        ResourceIsChanged = 0x2
-    };
-    Q_DECLARE_FLAGS(ResourceSavingFlags, ResourceSavingFlag)
-    Q_DECLARE_OPERATORS_FOR_FLAGS(ResourceSavingFlags)
 
     enum class CellSpacing
     {

@@ -3101,28 +3101,19 @@ void QnWorkbenchVideoWallHandler::saveVideowallAndReviewLayout(const QnVideoWall
         ? QnWorkbenchLayout::instance(layout)
         : QnWorkbenchLayout::instance(videowall);
 
-    QnLayoutResourcePtr workbenchResource = workbenchLayout->resource();
-
-    auto callback = [this, workbenchResource](int reqId, ec2::ErrorCode errorCode)
+    if (const auto reviewLayout = workbenchLayout->resource())
     {
-        Q_UNUSED(reqId);
-        if (!workbenchResource)
+        auto callback =
+            [this, id = reviewLayout->getId()](int /*reqId*/, ec2::ErrorCode errorCode)
+            {
+                snapshotManager()->markBeingSaved(id, false);
+                if (errorCode != ec2::ErrorCode::ok)
+                    return;
+                snapshotManager()->markChanged(id, false);
+            };
+        if (saveReviewLayout(reviewLayout, callback))
             return;
-
-        snapshotManager()->setFlags(workbenchResource, snapshotManager()->flags(workbenchResource) & ~Qn::ResourceIsBeingSaved);
-        if (errorCode != ec2::ErrorCode::ok)
-            return;
-        snapshotManager()->setFlags(workbenchResource, snapshotManager()->flags(workbenchResource) & ~Qn::ResourceIsChanged);
-    };
-
-    //TODO: #GDM #VW #LOW refactor common code to common place
-    if (saveReviewLayout(workbenchLayout, callback))
-    {
-        if (workbenchResource)
-            snapshotManager()->setFlags(workbenchResource, snapshotManager()->flags(workbenchResource) | Qn::ResourceIsBeingSaved);
     }
-    else
-    { // e.g. workbench layout is empty
-        qnResourcesChangesManager->saveVideoWall(videowall, [](const QnVideoWallResourcePtr &) {});
-    }
+
+    qnResourcesChangesManager->saveVideoWall(videowall, [](const QnVideoWallResourcePtr &) {});
 }
