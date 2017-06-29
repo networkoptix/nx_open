@@ -1,16 +1,9 @@
 'use strict';
 
 /*
-About server/local time - we always store everything as it needs to be displayed. Including
-*/
-/*
-Input: date to be corrected
-Output: date adjusted to server time
-Summary: 1)We convert the input date into a Date object.
-         2)We convert the timezone offset from minutes to ms.
-         3)Add timezone offset to current time in ms.
-         4)Adding the server's timezone and minus the timeLatency sets the
-           local time to the server's time.
+timeManager is for server/local time conversions.
+In data structures we always store "display time"
+In server requests - we always use server time
 */
 var timeManager = {
     useServerTime: true

@@ -115,9 +115,9 @@ angular.module('nxCommon')
                     });
                 }
                 function initTimeline(){
-                    var now = (new Date()).getTime();
+                    var now = timeManager.nowToDisplay();
                     scope.scaleManager.setStart(scope.recordsProvider && scope.recordsProvider.chunksTree ? scope.recordsProvider.chunksTree.start : (now - timelineConfig.initialInterval));
-                    scope.scaleManager.setEnd(now, true);
+                    scope.scaleManager.setEnd(timeManager.nowToDisplay());
 
                     timelineActions.fullZoomOut(); // Animate full zoom out
                 }
