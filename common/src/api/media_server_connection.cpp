@@ -953,7 +953,7 @@ int QnMediaServerConnection::getEventLogAsync(
         params << QnRequestParam("action", (int) actionType);
 
     return sendAsyncGetRequestLogged(EventLogObject,
-        params, QN_STRINGIZE_TYPE(vms::event::ActionDataListPtr), target, slot);
+        params, QN_STRINGIZE_TYPE(nx::vms::event::ActionDataListPtr), target, slot);
 }
 
 int QnMediaServerConnection::installUpdate(

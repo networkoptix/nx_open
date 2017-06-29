@@ -288,7 +288,7 @@ void QnEventLogDialog::query(qint64 fromMsec, qint64 toMsec,
             eventType,
             actionType,
             QnUuid(),
-            this, SLOT(at_gotEvents(int, const vms::event::ActionDataListPtr&, int)));
+            this, SLOT(at_gotEvents(int, const nx::vms::event::ActionDataListPtr&, int)));
 
         m_requests << handle;
 
