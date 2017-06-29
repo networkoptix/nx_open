@@ -31,6 +31,8 @@ public:
     QSqlQuery& impl();
     const QSqlQuery& impl() const;
 
+    static void exec(QSqlDatabase connection, const QByteArray& queryText);
+
 private:
     QSqlQuery m_sqlQuery;
 

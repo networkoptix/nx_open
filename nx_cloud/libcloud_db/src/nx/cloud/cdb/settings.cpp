@@ -223,6 +223,12 @@ const Http& Settings::http() const
     return m_http;
 }
 
+void Settings::setDbConnectionOptions(
+    const nx::utils::db::ConnectionOptions& options)
+{
+    m_dbConnectionOptions = options;
+}
+
 std::list<SocketAddress> Settings::endpointsToListen() const
 {
     const QStringList& httpAddrToListenStrList = settings().value(

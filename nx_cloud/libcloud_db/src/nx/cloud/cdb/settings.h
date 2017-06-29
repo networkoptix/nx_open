@@ -129,6 +129,8 @@ public:
     const ModuleFinder& moduleFinder() const;
     const Http& http() const;
 
+    void setDbConnectionOptions(const nx::utils::db::ConnectionOptions& options);
+
 private:
     nx::utils::log::Settings m_logging;
     nx::utils::log::Settings m_vmsSynchronizationLogging;

@@ -27,8 +27,8 @@ protected:
 
 private:
     const ConnectionOptions m_dbConnectionOptions;
-    std::unique_ptr<AsyncSqlQueryExecutor> m_queryExecutor;
     StatisticsCollector m_statisticsCollector;
+    std::unique_ptr<AsyncSqlQueryExecutor> m_queryExecutor;
     DbStructureUpdater m_dbStructureUpdater;
 
     bool updateDbStructure();
