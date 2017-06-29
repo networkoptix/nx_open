@@ -341,7 +341,7 @@ private:
     void sendRuntimeData(const P2pConnectionPtr& connection, const QList<ApiPersistentIdData>& peers);
     void cleanupRuntimeInfo(const ec2::ApiPersistentIdData& peer);
 
-    /** Don't show connection in 'aliveMessage' due to most client connections should stay local for current server */
+    /**  Local connections are not supposed to be shown in 'aliveMessage' */
     bool isLocalConnection(const ApiPersistentIdData& peer) const;
 public:
     bool needStartConnection(

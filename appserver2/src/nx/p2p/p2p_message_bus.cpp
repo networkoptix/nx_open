@@ -1060,7 +1060,7 @@ struct SendTransactionToTransportFuction
     {
         ApiPersistentIdData tranId(transaction.peerID, transaction.persistentInfo.dbID);
         NX_ASSERT(bus->context(connection)->isRemotePeerSubscribedTo(tranId));
-        NX_ASSERT(!(ApiPersistentIdData(connection->remotePeer()) == tranId));
+        NX_ASSERT(!(ApiPersistentIdData(connection->remotePeer()) == tranId, "Loop detected"));
 
         switch (connection->remotePeer().dataFormat)
         {
