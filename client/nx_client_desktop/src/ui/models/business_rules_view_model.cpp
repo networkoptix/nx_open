@@ -127,10 +127,10 @@ Qt::ItemFlags QnBusinessRulesViewModel::flags(const QModelIndex &index) const {
             const auto actionType = m_rules[index.row()]->actionType();
             if (vms::event::requiresCameraResource(actionType)
                     || vms::event::requiresUserResource(actionType)
-                    || actionType == vms::event::ShowPopupAction
-                    || actionType == vms::event::PlaySoundAction
-                    || actionType == vms::event::PlaySoundOnceAction
-                    || actionType == vms::event::SayTextAction)
+                    || actionType == vms::event::showPopupAction
+                    || actionType == vms::event::playSoundAction
+                    || actionType == vms::event::playSoundOnceAction
+                    || actionType == vms::event::sayTextAction)
                 flags |= Qt::ItemIsEditable;
         }
         break;
@@ -313,8 +313,8 @@ void QnBusinessRulesViewModel::at_soundModel_listChanged()
 {
     for (int i = 0; i < m_rules.size(); i++)
     {
-        if (m_rules[i]->actionType() != vms::event::PlaySoundAction
-            && m_rules[i]->actionType() != vms::event::PlaySoundOnceAction)
+        if (m_rules[i]->actionType() != vms::event::playSoundAction
+            && m_rules[i]->actionType() != vms::event::playSoundOnceAction)
         {
             continue;
         }
@@ -327,8 +327,8 @@ void QnBusinessRulesViewModel::at_soundModel_itemChanged(const QString& filename
 {
     for (int i = 0; i < m_rules.size(); i++)
     {
-        if ((m_rules[i]->actionType() != vms::event::PlaySoundAction
-            && m_rules[i]->actionType() != vms::event::PlaySoundOnceAction)
+        if ((m_rules[i]->actionType() != vms::event::playSoundAction
+            && m_rules[i]->actionType() != vms::event::playSoundOnceAction)
             || m_rules[i]->actionParams().url != filename)
         {
             continue;

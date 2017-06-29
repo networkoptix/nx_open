@@ -9,7 +9,7 @@ CameraDisconnectedEvent::CameraDisconnectedEvent(
     const QnResourcePtr& cameraResource,
     qint64 timeStamp)
     :
-    base_type(CameraDisconnectEvent, cameraResource, timeStamp)
+    base_type(cameraDisconnectEvent, cameraResource, timeStamp)
 {
 }
 

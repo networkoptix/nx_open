@@ -37,7 +37,7 @@ enum BusinessEventType
 
 enum BusinessActionType
 {
-    UndefinedAction,
+    undefinedAction,
     CameraOutput,
     Bookmark,
     CameraRecording,
@@ -65,31 +65,31 @@ enum BusinessActionType
 
 int EventTypesMap[][2] =
 {
-    { eventV22::Camera_Motion,        nx::vms::event::CameraMotionEvent     },
-    { eventV22::Camera_Input,         nx::vms::event::CameraInputEvent      },
-    { eventV22::Camera_Disconnect,    nx::vms::event::CameraDisconnectEvent },
-    { eventV22::Storage_Failure,      nx::vms::event::StorageFailureEvent   },
-    { eventV22::Network_Issue,        nx::vms::event::NetworkIssueEvent     },
-    { eventV22::Camera_Ip_Conflict,   nx::vms::event::CameraIpConflictEvent },
-    { eventV22::MediaServer_Failure,  nx::vms::event::ServerFailureEvent    },
-    { eventV22::MediaServer_Conflict, nx::vms::event::ServerConflictEvent   },
-    { eventV22::MediaServer_Started,  nx::vms::event::ServerStartEvent      },
+    { eventV22::Camera_Motion,        nx::vms::event::cameraMotionEvent     },
+    { eventV22::Camera_Input,         nx::vms::event::cameraInputEvent      },
+    { eventV22::Camera_Disconnect,    nx::vms::event::cameraDisconnectEvent },
+    { eventV22::Storage_Failure,      nx::vms::event::storageFailureEvent   },
+    { eventV22::Network_Issue,        nx::vms::event::networkIssueEvent     },
+    { eventV22::Camera_Ip_Conflict,   nx::vms::event::cameraIpConflictEvent },
+    { eventV22::MediaServer_Failure,  nx::vms::event::serverFailureEvent    },
+    { eventV22::MediaServer_Conflict, nx::vms::event::serverConflictEvent   },
+    { eventV22::MediaServer_Started,  nx::vms::event::serverStartEvent      },
     { -1,                                  -1                               }
 };
 
 int ActionTypesMap[][2] =
 {
-    { eventV22::CameraOutput,        nx::vms::event::CameraOutputAction     },
-    { eventV22::Bookmark,            nx::vms::event::BookmarkAction         },
-    { eventV22::CameraRecording,     nx::vms::event::CameraRecordingAction  },
-    { eventV22::PanicRecording,      nx::vms::event::PanicRecordingAction   },
-    { eventV22::SendMail,            nx::vms::event::SendMailAction         },
-    { eventV22::Diagnostics,         nx::vms::event::DiagnosticsAction      },
-    { eventV22::ShowPopup,           nx::vms::event::ShowPopupAction        },
+    { eventV22::CameraOutput,        nx::vms::event::cameraOutputAction     },
+    { eventV22::Bookmark,            nx::vms::event::bookmarkAction         },
+    { eventV22::CameraRecording,     nx::vms::event::cameraRecordingAction  },
+    { eventV22::PanicRecording,      nx::vms::event::panicRecordingAction   },
+    { eventV22::SendMail,            nx::vms::event::sendMailAction         },
+    { eventV22::Diagnostics,         nx::vms::event::diagnosticsAction      },
+    { eventV22::ShowPopup,           nx::vms::event::showPopupAction        },
     { eventV22::CameraOutputInstant, eventV23::CameraOutputOnceAction       },
-    { eventV22::PlaySound,           nx::vms::event::PlaySoundOnceAction    },
-    { eventV22::SayText,             nx::vms::event::SayTextAction          },
-    { eventV22::PlaySoundRepeated,   nx::vms::event::PlaySoundAction        },
+    { eventV22::PlaySound,           nx::vms::event::playSoundOnceAction    },
+    { eventV22::SayText,             nx::vms::event::sayTextAction          },
+    { eventV22::PlaySoundRepeated,   nx::vms::event::playSoundAction        },
     { -1,                                 -1                                }
 };
 
@@ -153,7 +153,7 @@ struct ShowPopupParametersV31Alpha
 struct BusinessActionParameters31Beta
 {
     bool needConfirmation = false;
-    vms::event::ActionType targetActionType = vms::event::UndefinedAction;
+    vms::event::ActionType targetActionType = vms::event::undefinedAction;
     QnUuid actionResourceId;
     QString url;
     QString emailAddress;
@@ -275,7 +275,7 @@ bool migrateBusinessRulesToV30(const QSqlDatabase& database)
 
     /* Updating duration field. */
     query.addBindValue(eventV23::CameraOutputOnceAction);
-    query.addBindValue(nx::vms::event::CameraOutputAction);
+    query.addBindValue(nx::vms::event::cameraOutputAction);
     if (!nx::utils::db::SqlQueryExecutionHelper::execSQLQuery(&query, Q_FUNC_INFO))
         return false;
 
@@ -298,7 +298,7 @@ bool migrateBusinessRulesToV30(const QSqlDatabase& database)
 
         if (data.actionType == eventV23::CameraOutputOnceAction)
         {
-            if (!doRemap(database, data.id, nx::vms::event::CameraOutputAction, "action_type"))
+            if (!doRemap(database, data.id, nx::vms::event::cameraOutputAction, "action_type"))
                 return false;
         }
 
@@ -321,7 +321,7 @@ bool migrateBusinessRulesToV31Alpha(const QSqlDatabase& database)
     if (!nx::utils::db::SqlQueryExecutionHelper::prepareSQLQuery(&query, sqlText, Q_FUNC_INFO))
         return false;
 
-    query.addBindValue(vms::event::ShowPopupAction);
+    query.addBindValue(vms::event::showPopupAction);
     if (!nx::utils::db::SqlQueryExecutionHelper::execSQLQuery(&query, Q_FUNC_INFO))
         return false;
 
@@ -364,12 +364,12 @@ bool migrateBusinessActionsAllUsers(const QSqlDatabase& database)
     if (!nx::utils::db::SqlQueryExecutionHelper::prepareSQLQuery(&query, sqlText, Q_FUNC_INFO))
         return false;
 
-    query.addBindValue(vms::event::ShowPopupAction);
-    query.addBindValue(vms::event::ShowOnAlarmLayoutAction);
-    query.addBindValue(vms::event::BookmarkAction);
-    query.addBindValue(vms::event::PlaySoundAction);
-    query.addBindValue(vms::event::PlaySoundOnceAction);
-    query.addBindValue(vms::event::SayTextAction);
+    query.addBindValue(vms::event::showPopupAction);
+    query.addBindValue(vms::event::showOnAlarmLayoutAction);
+    query.addBindValue(vms::event::bookmarkAction);
+    query.addBindValue(vms::event::playSoundAction);
+    query.addBindValue(vms::event::playSoundOnceAction);
+    query.addBindValue(vms::event::sayTextAction);
     if (!nx::utils::db::SqlQueryExecutionHelper::execSQLQuery(&query, Q_FUNC_INFO))
         return false;
 
@@ -410,7 +410,7 @@ bool migrateBusinessEventsAllUsers(const QSqlDatabase& database)
     if (!nx::utils::db::SqlQueryExecutionHelper::prepareSQLQuery(&query, sqlText, Q_FUNC_INFO))
         return false;
 
-    query.addBindValue(vms::event::SoftwareTriggerEvent);
+    query.addBindValue(vms::event::softwareTriggerEvent);
     if (!nx::utils::db::SqlQueryExecutionHelper::execSQLQuery(&query, Q_FUNC_INFO))
         return false;
 

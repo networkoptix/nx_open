@@ -262,9 +262,9 @@ QWidget* QnBusinessRuleItemDelegate::createEditor(QWidget *parent, const QStyleO
             connect(btn, SIGNAL(commit()), this, SLOT(at_editor_commit()));
 
             vms::event::EventType eventType = index.data(Qn::EventTypeRole).value<vms::event::EventType>();
-            if (eventType == vms::event::CameraMotionEvent)
+            if (eventType == vms::event::cameraMotionEvent)
                 btn->setDialogDelegate(new QnCheckResourceAndWarnDelegate<QnCameraMotionPolicy>(btn));
-            else if (eventType == vms::event::CameraInputEvent)
+            else if (eventType == vms::event::cameraInputEvent)
                 btn->setDialogDelegate(new QnCheckResourceAndWarnDelegate<QnCameraInputPolicy>(btn));
 
             return btn;
@@ -276,34 +276,34 @@ QWidget* QnBusinessRuleItemDelegate::createEditor(QWidget *parent, const QStyleO
             QnSelectResourcesDialogButton* btn = new QnSelectResourcesDialogButton(parent);
             connect(btn, SIGNAL(commit()), this, SLOT(at_editor_commit()));
 
-            if (actionType == vms::event::CameraRecordingAction)
+            if (actionType == vms::event::cameraRecordingAction)
             {
                 btn->setDialogDelegate(new QnCheckResourceAndWarnDelegate<QnCameraRecordingPolicy>(btn));
             }
-            else if (actionType == vms::event::BookmarkAction)
+            else if (actionType == vms::event::bookmarkAction)
             {
                 btn->setDialogDelegate(new QnCheckResourceAndWarnDelegate<QnBookmarkActionPolicy>(btn));
             }
-            else if (actionType == vms::event::CameraOutputAction)
+            else if (actionType == vms::event::cameraOutputAction)
             {
                 btn->setDialogDelegate(new QnCheckResourceAndWarnDelegate<QnCameraOutputPolicy>(btn));
             }
-            else if (actionType == vms::event::ExecutePtzPresetAction)
+            else if (actionType == vms::event::executePtzPresetAction)
             {
                 btn->setDialogDelegate(new QnCheckResourceAndWarnDelegate<QnExecPtzPresetPolicy>(btn));
             }
-            else if (actionType == vms::event::SendMailAction)
+            else if (actionType == vms::event::sendMailAction)
             {
                 btn->setDialogDelegate(new QnSendEmailActionDelegate(btn));
                 btn->setSelectionTarget(QnResourceSelectionDialog::Filter::users);
             }
-            else if (actionType == vms::event::ShowPopupAction)
+            else if (actionType == vms::event::showPopupAction)
             {
                 btn->setSelectionTarget(QnResourceSelectionDialog::Filter::users);
             }
-            else if (actionType == vms::event::PlaySoundAction ||
-                actionType == vms::event::PlaySoundOnceAction ||
-                actionType == vms::event::SayTextAction)
+            else if (actionType == vms::event::playSoundAction ||
+                actionType == vms::event::playSoundOnceAction ||
+                actionType == vms::event::sayTextAction)
             {
                 btn->setDialogDelegate(new QnCheckResourceAndWarnDelegate<QnCameraAudioTransmitPolicy>(btn));
             }
@@ -313,7 +313,7 @@ QWidget* QnBusinessRuleItemDelegate::createEditor(QWidget *parent, const QStyleO
         {
             QComboBox* comboBox = new QComboBox(parent);
             comboBox->setMaxVisibleItems(comboBoxMaxVisibleItems);
-            for (vms::event::EventType eventType : m_lexComparator->lexSortedEvents())
+            for (const auto eventType: m_lexComparator->lexSortedEvents())
                 comboBox->addItem(m_businessStringsHelper->eventName(eventType), eventType);
             return comboBox;
         }

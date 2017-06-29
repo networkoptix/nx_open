@@ -7,7 +7,7 @@ namespace vms {
 namespace event {
 
 InstantEvent::InstantEvent(EventType eventType, const QnResourcePtr& resource, qint64 timeStamp):
-    base_type(eventType, resource, UndefinedState, timeStamp)
+    base_type(eventType, resource, EventState::undefined, timeStamp)
 {
     NX_ASSERT(!hasToggleState(eventType));
 }
@@ -15,7 +15,7 @@ InstantEvent::InstantEvent(EventType eventType, const QnResourcePtr& resource, q
 bool InstantEvent::isEventStateMatched(EventState state, ActionType /*actionType*/) const
 {
     // Rule MUST contain 'Not Defined' event state filter
-    return state == UndefinedState;
+    return state == EventState::undefined;
 }
 
 } // namespace event

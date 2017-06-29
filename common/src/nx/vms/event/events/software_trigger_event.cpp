@@ -13,7 +13,7 @@ SoftwareTriggerEvent::SoftwareTriggerEvent(
     qint64 timeStampUs,
     EventState toggleState)
     :
-    base_type(event::SoftwareTriggerEvent, resource, toggleState, timeStampUs),
+    base_type(softwareTriggerEvent, resource, toggleState, timeStampUs),
     m_triggerId(triggerId),
     m_userId(userId)
 {

@@ -806,7 +806,7 @@ QString QnServerDb::getRequestStr(
         request += QString(lit(" and event_resource_guid in (%1) ")).arg(idList);
     }
 
-    if (eventType != vms::event::UndefinedEvent && eventType != vms::event::AnyEvent)
+    if (eventType != vms::event::undefinedEvent && eventType != vms::event::anyEvent)
     {
         if (vms::event::hasChild(eventType))
         {
@@ -824,7 +824,7 @@ QString QnServerDb::getRequestStr(
             request += QString(lit(" and event_type = %1 ")).arg((int) eventType);
         }
     }
-    if (actionType != vms::event::UndefinedAction)
+    if (actionType != vms::event::undefinedAction)
         request += QString(lit(" and action_type = %1 ")).arg((int) actionType);
     if (!businessRuleId.isNull())
     {
@@ -925,8 +925,8 @@ void QnServerDb::getAndSerializeActions(
         int flags = 0;
         vms::event::EventType eventType =
             (vms::event::EventType) actionsQuery.value(eventTypeIdx).toInt();
-        if (eventType == vms::event::CameraMotionEvent ||
-            eventType == vms::event::CameraInputEvent)
+        if (eventType == vms::event::cameraMotionEvent ||
+            eventType == vms::event::cameraInputEvent)
         {
             QnUuid eventResId = QnUuid::fromRfc4122(actionsQuery.value(eventResIdx).toByteArray());
             QnNetworkResourcePtr camRes =

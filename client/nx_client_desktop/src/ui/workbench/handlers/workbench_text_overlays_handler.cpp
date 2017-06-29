@@ -115,7 +115,7 @@ QnWorkbenchTextOverlaysHandler::~QnWorkbenchTextOverlaysHandler()
 void QnWorkbenchTextOverlaysHandler::at_eventActionReceived(
     const vms::event::AbstractActionPtr& businessAction)
 {
-    if (businessAction->actionType() != vms::event::ShowTextOverlayAction)
+    if (businessAction->actionType() != vms::event::showTextOverlayAction)
         return;
 
     if (!context()->user())
@@ -125,7 +125,7 @@ void QnWorkbenchTextOverlaysHandler::at_eventActionReceived(
 
     const auto state = businessAction->getToggleState();
     const bool isProlongedAction = businessAction->isProlonged();
-    const bool couldBeInstantEvent = (state == vms::event::UndefinedState);
+    const bool couldBeInstantEvent = (state == vms::event::EventState::undefined);
 
     /* Do not accept instant events for prolonged actions. */
     if (isProlongedAction && couldBeInstantEvent)
@@ -147,7 +147,7 @@ void QnWorkbenchTextOverlaysHandler::at_eventActionReceived(
     const int timeoutMs = isProlongedAction ? -1 : actionParams.durationMs;
 
     const auto id = businessAction->getRuleId();
-    const bool finished = isProlongedAction && (state == vms::event::InactiveState);
+    const bool finished = isProlongedAction && (state == vms::event::EventState::inactive);
 
     Q_D(QnWorkbenchTextOverlaysHandler);
 

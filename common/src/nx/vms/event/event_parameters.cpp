@@ -10,9 +10,9 @@ namespace vms {
 namespace event {
 
 EventParameters::EventParameters():
-    eventType(UndefinedEvent),
+    eventType(undefinedEvent),
     eventTimestampUsec(0),
-    reasonCode(NoReason)
+    reasonCode(EventReason::none)
 {
 }
 
@@ -21,34 +21,34 @@ QnUuid EventParameters::getParamsHash() const
     QByteArray paramKey(QByteArray::number(eventType));
     switch (eventType)
     {
-        case ServerFailureEvent:
-        case StorageFailureEvent:
-            paramKey += '_' + QByteArray::number(reasonCode);
-            if (reasonCode == StorageIoErrorReason
-                || reasonCode == StorageTooSlowReason
-                || reasonCode == StorageFullReason
-                || reasonCode == SystemStorageFullReason
-                || reasonCode == LicenseRemoved)
+        case serverFailureEvent:
+        case storageFailureEvent:
+            paramKey += '_' + QByteArray::number(int(reasonCode));
+            if (reasonCode == EventReason::storageIoError
+                || reasonCode == EventReason::storageTooSlow
+                || reasonCode == EventReason::storageFull
+                || reasonCode == EventReason::systemStorageFull
+                || reasonCode == EventReason::licenseRemoved)
             {
                 paramKey += '_' + description.toUtf8();
             }
             break;
 
-        case SoftwareTriggerEvent:
+        case softwareTriggerEvent:
             return QnUuid::createUuid(); //< Warning: early return.
             break;
 
-        case CameraInputEvent:
+        case cameraInputEvent:
             paramKey += '_' + inputPortId.toUtf8();
             break;
 
-        case CameraDisconnectEvent:
+        case cameraDisconnectEvent:
             paramKey += '_' + eventResourceId.toByteArray();
             break;
 
-        case NetworkIssueEvent:
+        case networkIssueEvent:
             paramKey += '_' + eventResourceId.toByteArray();
-            paramKey += '_' + QByteArray::number(reasonCode);
+            paramKey += '_' + QByteArray::number(int(reasonCode));
             break;
 
         default:

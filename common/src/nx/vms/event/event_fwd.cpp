@@ -3,9 +3,9 @@
 #include <nx/fusion/model_functions.h>
 
 QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(nx::vms::event, EventState,
-    (nx::vms::event::ActiveState, "Active")
-    (nx::vms::event::InactiveState, "Inactive")
-    (nx::vms::event::UndefinedState, "Undefined"))
+    (nx::vms::event::EventState::active, "Active")
+    (nx::vms::event::EventState::inactive, "Inactive")
+    (nx::vms::event::EventState::undefined, "Undefined"))
 
 QN_DEFINE_METAOBJECT_ENUM_LEXICAL_FUNCTIONS(nx::vms::event, EventReason)
 QN_DEFINE_METAOBJECT_ENUM_LEXICAL_FUNCTIONS(nx::vms::event, EventType)

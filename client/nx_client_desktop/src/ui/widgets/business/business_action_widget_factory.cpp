@@ -21,28 +21,28 @@ QnAbstractBusinessParamsWidget* QnBusinessActionWidgetFactory::createWidget(
 {
     switch (actionType)
     {
-        case vms::event::CameraOutputAction:
+        case vms::event::cameraOutputAction:
             return new QnCameraOutputBusinessActionWidget(parent);
-        case vms::event::CameraRecordingAction:
+        case vms::event::cameraRecordingAction:
             return new QnRecordingBusinessActionWidget(parent);
-        case vms::event::SendMailAction:
+        case vms::event::sendMailAction:
             return new QnSendmailBusinessActionWidget(parent);
-        case vms::event::ShowPopupAction:
+        case vms::event::showPopupAction:
             return new QnPopupBusinessActionWidget(parent);
-        case vms::event::PlaySoundAction:
-        case vms::event::PlaySoundOnceAction:
+        case vms::event::playSoundAction:
+        case vms::event::playSoundOnceAction:
             return new QnPlaySoundBusinessActionWidget(parent);
-        case vms::event::SayTextAction:
+        case vms::event::sayTextAction:
             return new QnSayTextBusinessActionWidget(parent);
-        case vms::event::BookmarkAction:
+        case vms::event::bookmarkAction:
             return new QnBookmarkBusinessActionWidget(parent);
-        case vms::event::ExecutePtzPresetAction:
+        case vms::event::executePtzPresetAction:
             return new QnExecPtzPresetBusinessActionWidget(parent);
-        case vms::event::ShowTextOverlayAction:
+        case vms::event::showTextOverlayAction:
             return new QnShowTextOverlayActionWidget(parent);
-        case vms::event::ShowOnAlarmLayoutAction:
+        case vms::event::showOnAlarmLayoutAction:
             return new QnShowOnAlarmLayoutActionWidget(parent);
-        case vms::event::ExecHttpRequestAction:
+        case vms::event::execHttpRequestAction:
             return new QnExecHttpRequestActionWidget(parent);
         default:
             break;

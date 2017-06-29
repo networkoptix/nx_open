@@ -15,7 +15,7 @@ class SoftwareTriggerEvent: public ProlongedEvent
 public:
     SoftwareTriggerEvent(const QnResourcePtr& resource,
         const QString& triggerId, const QnUuid& userId, qint64 timeStampUs,
-        EventState toggleState = UndefinedState);
+        EventState toggleState = EventState::undefined);
 
     const QString& triggerId() const;
 

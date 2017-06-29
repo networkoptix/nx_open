@@ -51,7 +51,7 @@ private:
         QString recipients;
 
         SendEmailAggregationKey():
-            eventType(vms::event::UndefinedEvent)
+            eventType(vms::event::undefinedEvent)
         {
         }
 

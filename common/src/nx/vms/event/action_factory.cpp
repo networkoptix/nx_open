@@ -36,7 +36,7 @@ AbstractActionPtr ActionFactory::instantiateAction(
 
     if (hasToggleState(event->getEventType()) && hasToggleState(rule->actionType()))
     {
-        EventState value = state != UndefinedState ? state : event->getToggleState();
+        EventState value = state != EventState::undefined ? state : event->getToggleState();
         result->setToggleState(value);
     }
 
@@ -68,32 +68,32 @@ AbstractActionPtr ActionFactory::createAction(
 {
     switch (actionType)
     {
-        case CameraOutputAction:
-            return AbstractActionPtr(new class CameraOutputAction(runtimeParams));
-        case CameraRecordingAction:
-            return AbstractActionPtr(new class RecordingAction(runtimeParams));
-        case PanicRecordingAction:
-            return AbstractActionPtr(new class PanicAction(runtimeParams));
-        case SendMailAction:
-            return AbstractActionPtr(new class SendMailAction(runtimeParams));
-        case BookmarkAction:
-            return AbstractActionPtr(new class BookmarkAction(runtimeParams));
+        case cameraOutputAction:
+            return AbstractActionPtr(new CameraOutputAction(runtimeParams));
+        case cameraRecordingAction:
+            return AbstractActionPtr(new RecordingAction(runtimeParams));
+        case panicRecordingAction:
+            return AbstractActionPtr(new PanicAction(runtimeParams));
+        case sendMailAction:
+            return AbstractActionPtr(new SendMailAction(runtimeParams));
+        case bookmarkAction:
+            return AbstractActionPtr(new BookmarkAction(runtimeParams));
 
-        case UndefinedAction:
-        case DiagnosticsAction:
-        case ShowPopupAction:
-        case PlaySoundOnceAction:
-        case PlaySoundAction:
-        case SayTextAction:
-        case ExecutePtzPresetAction:
-        case ShowTextOverlayAction:
-        case ShowOnAlarmLayoutAction:
-        case ExecHttpRequestAction:
-            return AbstractActionPtr(new class CommonAction(actionType, runtimeParams));
+        case undefinedAction:
+        case diagnosticsAction:
+        case showPopupAction:
+        case playSoundOnceAction:
+        case playSoundAction:
+        case sayTextAction:
+        case executePtzPresetAction:
+        case showTextOverlayAction:
+        case showOnAlarmLayoutAction:
+        case execHttpRequestAction:
+            return AbstractActionPtr(new CommonAction(actionType, runtimeParams));
 
         default:
             NX_ASSERT(false, Q_FUNC_INFO, "All action types must be handled.");
-            return AbstractActionPtr(new class CommonAction(actionType, runtimeParams));
+            return AbstractActionPtr(new CommonAction(actionType, runtimeParams));
     }
 }
 

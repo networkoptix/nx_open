@@ -17,7 +17,7 @@ struct ActionParameters
       */
     bool needConfirmation = false;
 
-    ActionType targetActionType = UndefinedAction;
+    ActionType targetActionType = undefinedAction;
 
     /** Additional parameter for event log convenience. Does not filled when the action really occurs. */
     QnUuid actionResourceId;

@@ -13,22 +13,22 @@ bool requiresCameraResource(ActionType actionType)
 {
     switch (actionType)
     {
-        case UndefinedAction:
-        case PanicRecordingAction:
-        case SendMailAction:
-        case DiagnosticsAction:
-        case ShowPopupAction:
+        case undefinedAction:
+        case panicRecordingAction:
+        case sendMailAction:
+        case diagnosticsAction:
+        case showPopupAction:
             return false;
 
-        case PlaySoundOnceAction:
-        case PlaySoundAction:
-        case SayTextAction:
-        case CameraOutputAction:
-        case BookmarkAction:
-        case CameraRecordingAction:
-        case ExecutePtzPresetAction:
-        case ShowTextOverlayAction:
-        case ShowOnAlarmLayoutAction:
+        case playSoundOnceAction:
+        case playSoundAction:
+        case sayTextAction:
+        case cameraOutputAction:
+        case bookmarkAction:
+        case cameraRecordingAction:
+        case executePtzPresetAction:
+        case showTextOverlayAction:
+        case showOnAlarmLayoutAction:
             return true;
 
         default:
@@ -40,23 +40,23 @@ bool requiresUserResource(ActionType actionType)
 {
     switch (actionType)
     {
-        case UndefinedAction:
-        case PanicRecordingAction:
-        case CameraOutputAction:
-        case BookmarkAction:
-        case CameraRecordingAction:
-        case DiagnosticsAction:
-        case ShowPopupAction:
-        case PlaySoundOnceAction:
-        case PlaySoundAction:
-        case SayTextAction:
-        case ExecutePtzPresetAction:
-        case ShowTextOverlayAction:
-        case ShowOnAlarmLayoutAction:
-        case ExecHttpRequestAction:
+        case undefinedAction:
+        case panicRecordingAction:
+        case cameraOutputAction:
+        case bookmarkAction:
+        case cameraRecordingAction:
+        case diagnosticsAction:
+        case showPopupAction:
+        case playSoundOnceAction:
+        case playSoundAction:
+        case sayTextAction:
+        case executePtzPresetAction:
+        case showTextOverlayAction:
+        case showOnAlarmLayoutAction:
+        case execHttpRequestAction:
             return false;
 
-        case SendMailAction:
+        case sendMailAction:
             return true;
 
         default:
@@ -69,24 +69,24 @@ bool hasToggleState(ActionType actionType)
 {
     switch (actionType)
     {
-        case UndefinedAction:
-        case SendMailAction:
-        case DiagnosticsAction:
-        case ShowPopupAction:
-        case PlaySoundOnceAction:
-        case SayTextAction:
-        case ExecutePtzPresetAction:
-        case ShowOnAlarmLayoutAction:
+        case undefinedAction:
+        case sendMailAction:
+        case diagnosticsAction:
+        case showPopupAction:
+        case playSoundOnceAction:
+        case sayTextAction:
+        case executePtzPresetAction:
+        case showOnAlarmLayoutAction:
             return false;
-        case ExecHttpRequestAction:
+        case execHttpRequestAction:
             return false;
 
-        case CameraOutputAction:
-        case CameraRecordingAction:
-        case PanicRecordingAction:
-        case PlaySoundAction:
-        case BookmarkAction:
-        case ShowTextOverlayAction:
+        case cameraOutputAction:
+        case cameraRecordingAction:
+        case panicRecordingAction:
+        case playSoundAction:
+        case bookmarkAction:
+        case showTextOverlayAction:
             return true;
 
         default:
@@ -108,10 +108,10 @@ bool supportsDuration(ActionType actionType)
 {
     switch (actionType)
     {
-        case BookmarkAction:
-        case ShowTextOverlayAction:
-        case CameraOutputAction:
-        case CameraRecordingAction:
+        case bookmarkAction:
+        case showTextOverlayAction:
+        case cameraOutputAction:
+        case cameraRecordingAction:
             return true;
         default:
             return false;
@@ -122,10 +122,10 @@ bool allowsAggregation(ActionType actionType)
 {
     switch (actionType)
     {
-        case BookmarkAction:
-        case ShowTextOverlayAction:
-        case CameraOutputAction:
-        case PlaySoundAction:
+        case bookmarkAction:
+        case showTextOverlayAction:
+        case cameraOutputAction:
+        case playSoundAction:
             return false;
 
         default:
@@ -140,10 +140,10 @@ bool isActionProlonged(ActionType actionType, const ActionParameters &parameters
 
     switch (actionType)
     {
-        case BookmarkAction:
-        case ShowTextOverlayAction:
-        case CameraOutputAction:
-        case CameraRecordingAction:
+        case bookmarkAction:
+        case showTextOverlayAction:
+        case cameraOutputAction:
+        case cameraRecordingAction:
             return parameters.durationMs <= 0;
 
         default:
@@ -156,27 +156,27 @@ bool isActionProlonged(ActionType actionType, const ActionParameters &parameters
 QList<ActionType> allActions()
 {
     static QList<ActionType> result {
-        CameraOutputAction,
-        BookmarkAction,
-        CameraRecordingAction,
-        PanicRecordingAction,
-        SendMailAction,
-        DiagnosticsAction,
-        ShowPopupAction,
-        PlaySoundAction,
-        PlaySoundOnceAction,
-        SayTextAction,
-        ExecutePtzPresetAction,
-        ShowTextOverlayAction,
-        ShowOnAlarmLayoutAction,
-        ExecHttpRequestAction };
+        cameraOutputAction,
+        bookmarkAction,
+        cameraRecordingAction,
+        panicRecordingAction,
+        sendMailAction,
+        diagnosticsAction,
+        showPopupAction,
+        playSoundAction,
+        playSoundOnceAction,
+        sayTextAction,
+        executePtzPresetAction,
+        showTextOverlayAction,
+        showOnAlarmLayoutAction,
+        execHttpRequestAction };
 
     return result;
 }
 
 AbstractAction::AbstractAction(const ActionType actionType, const EventParameters& runtimeParams):
     m_actionType(actionType),
-    m_toggleState(UndefinedState),
+    m_toggleState(EventState::undefined),
     m_receivedFromRemoteHost(false),
     m_runtimeParams(runtimeParams),
     m_aggregationCount(1)

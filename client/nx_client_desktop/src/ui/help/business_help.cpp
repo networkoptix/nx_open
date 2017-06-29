@@ -11,30 +11,30 @@ int eventHelpId(vms::event::EventType type)
 {
     switch (type)
     {
-        case vms::event::CameraMotionEvent:
+        case vms::event::cameraMotionEvent:
             return Qn::EventsActions_CameraMotion_Help;
-        case vms::event::CameraInputEvent:
+        case vms::event::cameraInputEvent:
             return Qn::EventsActions_CameraInput_Help;
-        case vms::event::CameraDisconnectEvent:
+        case vms::event::cameraDisconnectEvent:
             return Qn::EventsActions_CameraDisconnected_Help;
-        case vms::event::StorageFailureEvent:
+        case vms::event::storageFailureEvent:
             return Qn::EventsActions_StorageFailure_Help;
-        case vms::event::NetworkIssueEvent:
+        case vms::event::networkIssueEvent:
             return Qn::EventsActions_NetworkIssue_Help;
-        case vms::event::CameraIpConflictEvent:
+        case vms::event::cameraIpConflictEvent:
             return Qn::EventsActions_CameraIpConflict_Help;
-        case vms::event::ServerFailureEvent:
+        case vms::event::serverFailureEvent:
             return Qn::EventsActions_MediaServerFailure_Help;
-        case vms::event::ServerConflictEvent:
+        case vms::event::serverConflictEvent:
             return Qn::EventsActions_MediaServerConflict_Help;
-        case vms::event::ServerStartEvent:
+        case vms::event::serverStartEvent:
             return Qn::EventsActions_MediaServerStarted_Help;
-        case vms::event::LicenseIssueEvent:
+        case vms::event::licenseIssueEvent:
             return Qn::EventsActions_LicenseIssue_Help;
-        case vms::event::BackupFinishedEvent:
+        case vms::event::backupFinishedEvent:
             return Qn::EventsActions_BackupFinished_Help;
         default:
-            return type >= vms::event::UserDefinedEvent
+            return type >= vms::event::userDefinedEvent
                 ? Qn::EventsActions_Generic_Help
                 : -1;
     }
@@ -44,33 +44,33 @@ int actionHelpId(vms::event::ActionType type)
 {
     switch (type)
     {
-        case vms::event::CameraOutputAction:
+        case vms::event::cameraOutputAction:
             return Qn::EventsActions_CameraOutput_Help;
-        case vms::event::CameraRecordingAction:
+        case vms::event::cameraRecordingAction:
             return Qn::EventsActions_StartRecording_Help;
-        case vms::event::PanicRecordingAction:
+        case vms::event::panicRecordingAction:
             return Qn::EventsActions_StartPanicRecording_Help;
-        case vms::event::SendMailAction:
+        case vms::event::sendMailAction:
             return Qn::EventsActions_SendMail_Help;
-        case vms::event::ShowPopupAction:
+        case vms::event::showPopupAction:
             return Qn::EventsActions_ShowNotification_Help;
-        case vms::event::PlaySoundOnceAction:
+        case vms::event::playSoundOnceAction:
             return Qn::EventsActions_PlaySound_Help;
-        case vms::event::PlaySoundAction:
+        case vms::event::playSoundAction:
             return Qn::EventsActions_PlaySoundRepeated_Help;
-        case vms::event::SayTextAction:
+        case vms::event::sayTextAction:
             return Qn::EventsActions_Speech_Help;
-        case vms::event::DiagnosticsAction:
+        case vms::event::diagnosticsAction:
             return Qn::EventsActions_Diagnostics_Help;
-        case vms::event::ShowOnAlarmLayoutAction:
+        case vms::event::showOnAlarmLayoutAction:
             return Qn::EventsActions_ShowOnAlarmLayout_Help;
-        case vms::event::BookmarkAction:
+        case vms::event::bookmarkAction:
             return Qn::EventsActions_Bookmark_Help;
-        case vms::event::ExecutePtzPresetAction:
+        case vms::event::executePtzPresetAction:
             return Qn::EventsActions_ExecutePtzPreset_Help;
-        case vms::event::ShowTextOverlayAction:
+        case vms::event::showTextOverlayAction:
             return Qn::EventsActions_ShowTextOverlay_Help;
-        case vms::event::ExecHttpRequestAction:
+        case vms::event::execHttpRequestAction:
             return Qn::EventsActions_ExecHttpRequest_Help;
         default:
             return -1;

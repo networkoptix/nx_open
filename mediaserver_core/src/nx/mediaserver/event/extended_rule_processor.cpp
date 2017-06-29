@@ -145,55 +145,55 @@ struct EmailAttachmentData
     {
         switch (eventType)
         {
-            case vms::event::CameraMotionEvent:
+            case vms::event::cameraMotionEvent:
                 templatePath = lit(":/email_templates/camera_motion.mustache");
                 imageName = lit("camera.png");
                 break;
-            case vms::event::CameraInputEvent:
+            case vms::event::cameraInputEvent:
                 templatePath = lit(":/email_templates/camera_input.mustache");
                 imageName = lit("camera.png");
                 break;
-            case vms::event::CameraDisconnectEvent:
+            case vms::event::cameraDisconnectEvent:
                 templatePath = lit(":/email_templates/camera_disconnect.mustache");
                 imageName = lit("camera.png");
                 break;
-            case vms::event::StorageFailureEvent:
+            case vms::event::storageFailureEvent:
                 templatePath = lit(":/email_templates/storage_failure.mustache");
                 imageName = lit("storage.png");
                 break;
-            case vms::event::NetworkIssueEvent:
+            case vms::event::networkIssueEvent:
                 templatePath = lit(":/email_templates/network_issue.mustache");
                 imageName = lit("server.png");
                 break;
-            case vms::event::CameraIpConflictEvent:
+            case vms::event::cameraIpConflictEvent:
                 templatePath = lit(":/email_templates/camera_ip_conflict.mustache");
                 imageName = lit("camera.png");
                 break;
-            case vms::event::ServerFailureEvent:
+            case vms::event::serverFailureEvent:
                 templatePath = lit(":/email_templates/mediaserver_failure.mustache");
                 imageName = lit("server.png");
                 break;
-            case vms::event::ServerConflictEvent:
+            case vms::event::serverConflictEvent:
                 templatePath = lit(":/email_templates/mediaserver_conflict.mustache");
                 imageName = lit("server.png");
                 break;
-            case vms::event::ServerStartEvent:
+            case vms::event::serverStartEvent:
                 templatePath = lit(":/email_templates/mediaserver_started.mustache");
                 imageName = lit("server.png");
                 break;
-            case vms::event::LicenseIssueEvent:
+            case vms::event::licenseIssueEvent:
                 templatePath = lit(":/email_templates/license_issue.mustache");
                 imageName = lit("license.png");
                 break;
-            case vms::event::BackupFinishedEvent:
+            case vms::event::backupFinishedEvent:
                 templatePath = lit(":/email_templates/backup_finished.mustache");
                 imageName = lit("server.png");
                 break;
-            case vms::event::UserDefinedEvent:
+            case vms::event::userDefinedEvent:
                 templatePath = lit(":/email_templates/generic_event.mustache");
                 imageName = lit("server.png");
                 break;
-            case vms::event::SoftwareTriggerEvent:
+            case vms::event::softwareTriggerEvent:
                 templatePath = lit(":/email_templates/software_trigger.mustache");
                 break;
             default:
@@ -243,7 +243,7 @@ void ExtendedRuleProcessor::prepareAdditionActionParams(const vms::event::Abstra
 {
     switch (action->actionType())
     {
-        case vms::event::SendMailAction:
+        case vms::event::sendMailAction:
             // Add user's email addresses to action emailAddress field and filter invalid addresses
             if (auto emailAction = action.dynamicCast<class vms::event::SendMailAction>())
                 updateRecipientsList(emailAction);
@@ -261,32 +261,32 @@ bool ExtendedRuleProcessor::executeActionInternal(const vms::event::AbstractActi
     {
         switch (action->actionType())
         {
-            case vms::event::SendMailAction:
+            case vms::event::sendMailAction:
                 result = sendMail(action.dynamicCast<class vms::event::SendMailAction>());
                 break;
-            case vms::event::BookmarkAction:
+            case vms::event::bookmarkAction:
                 result = executeBookmarkAction(action);
                 break;
-            case vms::event::CameraOutputAction:
+            case vms::event::cameraOutputAction:
                 result = triggerCameraOutput(action.dynamicCast<class vms::event::CameraOutputAction>());
                 break;
-            case vms::event::CameraRecordingAction:
+            case vms::event::cameraRecordingAction:
                 result = executeRecordingAction(action.dynamicCast<class vms::event::RecordingAction>());
                 break;
-            case vms::event::PanicRecordingAction:
+            case vms::event::panicRecordingAction:
                 result = executePanicAction(action.dynamicCast<class vms::event::PanicAction>());
                 break;
-            case vms::event::ExecutePtzPresetAction:
+            case vms::event::executePtzPresetAction:
                 result = executePtzAction(action);
                 break;
-            case vms::event::ExecHttpRequestAction:
+            case vms::event::execHttpRequestAction:
                 result = executeHttpRequestAction(action);
                 break;
-            case vms::event::SayTextAction:
+            case vms::event::sayTextAction:
                 result = executeSayTextAction(action);
                 break;
-            case vms::event::PlaySoundAction:
-            case vms::event::PlaySoundOnceAction:
+            case vms::event::playSoundAction:
+            case vms::event::playSoundOnceAction:
                 result = executePlaySoundAction(action);
             default:
                 break;
@@ -317,7 +317,7 @@ bool ExtendedRuleProcessor::executePlaySoundAction(
         return false;
 
 
-    if (action->actionType() == vms::event::PlaySoundOnceAction)
+    if (action->actionType() == vms::event::playSoundOnceAction)
     {
         auto url = lit("dbfile://notifications/") + params.url;
 
@@ -337,13 +337,13 @@ bool ExtendedRuleProcessor::executePlaySoundAction(
     {
 
         QnAbstractStreamDataProviderPtr provider;
-        if (action->getToggleState() == vms::event::ActiveState)
+        if (action->getToggleState() == vms::event::EventState::active)
         {
             provider = QnAudioStreamerPool::instance()->getActionDataProvider(action);
             transmitter->subscribe(provider, QnAbstractAudioTransmitter::kContinuousNotificationPriority);
             provider->startIfNotRunning();
         }
-        else if (action->getToggleState() == vms::event::InactiveState)
+        else if (action->getToggleState() == vms::event::EventState::inactive)
         {
             provider = QnAudioStreamerPool::instance()->getActionDataProvider(action);
             transmitter->unsubscribe(provider.data());
@@ -392,7 +392,7 @@ bool ExtendedRuleProcessor::executePanicAction(const vms::event::PanicActionPtr&
         return true; // ignore panic business action if panic mode turn on by user
 
     Qn::PanicMode val = Qn::PM_None;
-    if (action->getToggleState() == vms::event::ActiveState)
+    if (action->getToggleState() == vms::event::EventState::active)
         val =  Qn::PM_BusinessEvents;
     mediaServer->setPanicMode(val);
     commonModule()->propertyDictionary()->saveParams(mediaServer->getId());
@@ -474,7 +474,7 @@ bool ExtendedRuleProcessor::executeRecordingAction(const vms::event::RecordingAc
     {
         auto toggleState = action->getToggleState();
         // todo: if camera is offline function return false. Need some tries on timer event
-        if (toggleState == vms::event::ActiveState || //< Prolonged actions starts
+        if (toggleState == vms::event::EventState::active || //< Prolonged actions starts
             action->getDurationSec() > 0) //< Instant action
         {
             rez = qnRecordingManager->startForcedRecording(
@@ -529,7 +529,7 @@ bool ExtendedRuleProcessor::triggerCameraOutput(const vms::event::CameraOutputAc
     }
     QString relayOutputId = action->getRelayOutputId();
     int autoResetTimeout = qMax(action->getRelayAutoResetTimeout(), 0); //truncating negative values to avoid glitches
-    bool on = action->getToggleState() != vms::event::InactiveState;
+    bool on = action->getToggleState() != vms::event::EventState::inactive;
 
     return securityCam->setRelayOutputState(
                 relayOutputId,
@@ -645,7 +645,7 @@ void ExtendedRuleProcessor::sendEmailAsync(
 
     // TODO: #vkutin #gdm Need to refactor aggregation entirely.
     // I can't figure a proper abstraction for it at this point.
-    const int aggregatedCount = action->getRuntimeParams().eventType == vms::event::SoftwareTriggerEvent
+    const int aggregatedCount = action->getRuntimeParams().eventType == vms::event::softwareTriggerEvent
         ? action->aggregationInfo().toList().count()
         : aggregatedResCount;
 
@@ -662,7 +662,7 @@ void ExtendedRuleProcessor::sendEmailAsync(
 
     if (!m_emailManager->sendEmail(emailSettings, data))
     {
-        vms::event::AbstractActionPtr action(new class vms::event::SystemHealthAction(QnSystemHealth::EmailSendError));
+        vms::event::AbstractActionPtr action(new vms::event::SystemHealthAction(QnSystemHealth::EmailSendError));
         broadcastAction(action);
         NX_LOG(lit("Error processing action SendMail."), cl_logWARNING);
     }
@@ -672,8 +672,8 @@ bool ExtendedRuleProcessor::sendMail(const vms::event::SendMailActionPtr& action
 {
     // QnMutexLocker lk(&m_mutex); <- m_mutex is already locked down the stack.
 
-    if( action->getRuntimeParams().eventType != vms::event::CameraDisconnectEvent &&
-        action->getRuntimeParams().eventType != vms::event::NetworkIssueEvent )
+    if( action->getRuntimeParams().eventType != vms::event::cameraDisconnectEvent &&
+        action->getRuntimeParams().eventType != vms::event::networkIssueEvent )
     {
         return sendMailInternal(action, 1);
     }
@@ -691,7 +691,7 @@ bool ExtendedRuleProcessor::sendMail(const vms::event::SendMailActionPtr& action
 
     if (!aggregatedData.action)
     {
-        aggregatedData.action = vms::event::SendMailActionPtr(new class vms::event::SendMailAction(*action));
+        aggregatedData.action = vms::event::SendMailActionPtr(new vms::event::SendMailAction(*action));
         using namespace std::placeholders;
         aggregatedData.periodicTaskID = nx::utils::TimerManager::instance()->addTimer(
             std::bind(&ExtendedRuleProcessor::sendAggregationEmail, this, aggregationKey),
@@ -741,8 +741,8 @@ QVariantMap ExtendedRuleProcessor::eventDescriptionMap(
 
     switch (eventType)
     {
-        case vms::event::CameraMotionEvent:
-        case vms::event::CameraInputEvent:
+        case vms::event::cameraMotionEvent:
+        case vms::event::cameraInputEvent:
         {
             auto camRes = resourcePool()->getResourceById<QnVirtualCameraResource>(action->getRuntimeParams().eventResourceId);
             cameraHistoryPool()->updateCameraHistorySync(camRes);
@@ -763,7 +763,7 @@ QVariantMap ExtendedRuleProcessor::eventDescriptionMap(
             break;
         }
 
-        case vms::event::SoftwareTriggerEvent:
+        case vms::event::softwareTriggerEvent:
         {
             contextMap[tpTriggerName] = params.caption.trimmed().isEmpty()
                 ? helper.defaultSoftwareTriggerName()
@@ -790,7 +790,7 @@ QVariantMap ExtendedRuleProcessor::eventDescriptionMap(
             break;
         }
 
-        case vms::event::UserDefinedEvent:
+        case vms::event::userDefinedEvent:
         {
             auto metadata = action->getRuntimeParams().metadata;
             if (!metadata.cameraRefs.empty())
@@ -897,21 +897,21 @@ QVariantMap ExtendedRuleProcessor::eventDetailsMap(
 
     switch (params.eventType)
     {
-        case vms::event::CameraDisconnectEvent:
-        case vms::event::SoftwareTriggerEvent:
+        case vms::event::cameraDisconnectEvent:
+        case vms::event::softwareTriggerEvent:
         {
             detailsMap[tpSource] = helper.getResoureNameFromParams(params, detailLevel);
             detailsMap[tpSourceIP] = helper.getResoureIPFromParams(params);
             break;
         }
 
-        case vms::event::CameraInputEvent:
+        case vms::event::cameraInputEvent:
         {
             detailsMap[tpInputPort] = params.inputPortId;
             break;
         }
 
-        case vms::event::NetworkIssueEvent:
+        case vms::event::networkIssueEvent:
         {
             detailsMap[tpSource] = helper.getResoureNameFromParams(params, detailLevel);
             detailsMap[tpSourceIP] = helper.getResoureIPFromParams(params);
@@ -919,17 +919,17 @@ QVariantMap ExtendedRuleProcessor::eventDetailsMap(
             break;
         }
 
-        case vms::event::StorageFailureEvent:
-        case vms::event::ServerFailureEvent:
-        case vms::event::LicenseIssueEvent:
-        case vms::event::BackupFinishedEvent:
+        case vms::event::storageFailureEvent:
+        case vms::event::serverFailureEvent:
+        case vms::event::licenseIssueEvent:
+        case vms::event::backupFinishedEvent:
         {
             detailsMap[tpReason] = helper.eventReason(params);
 
             // Fill event-specific reason context here
             QVariantMap reasonContext;
 
-            if (params.reasonCode == vms::event::LicenseRemoved)
+            if (params.reasonCode == vms::event::EventReason::licenseRemoved)
             {
                 QVariantList disabledCameras;
 
@@ -946,7 +946,7 @@ QVariantMap ExtendedRuleProcessor::eventDetailsMap(
             break;
         }
 
-        case vms::event::CameraIpConflictEvent:
+        case vms::event::cameraIpConflictEvent:
         {
             detailsMap[lit("cameraConflictAddress")] = params.caption;
             QVariantList conflicts;
@@ -963,7 +963,7 @@ QVariantMap ExtendedRuleProcessor::eventDetailsMap(
             break;
         }
 
-        case vms::event::ServerConflictEvent:
+        case vms::event::serverConflictEvent:
         {
             QnCameraConflictList conflicts;
             conflicts.sourceServer = params.caption;

@@ -12,7 +12,7 @@ NetworkIssueEvent::NetworkIssueEvent(
     EventReason reasonCode,
     const QString& reasonParamsEncoded)
     :
-    base_type(event::NetworkIssueEvent, resource, timeStamp, reasonCode, reasonParamsEncoded)
+    base_type(networkIssueEvent, resource, timeStamp, reasonCode, reasonParamsEncoded)
 {
 }
 

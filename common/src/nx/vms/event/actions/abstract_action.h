@@ -105,7 +105,7 @@ public:
         VideoLinkExists = 1
     };
 
-    ActionData(): actionType(UndefinedAction), flags(0) {}
+    ActionData(): actionType(undefinedAction), flags(0) {}
     bool hasFlags(int value) const { return flags & value; }
 
     ActionType actionType;

@@ -39,8 +39,8 @@ QnBookmarkBusinessActionWidget::QnBookmarkBusinessActionWidget(QWidget *parent) 
     {
         // Prolonged type of event has changed. In case of instant
         // action event state should be updated
-        if (checked && (model()->eventType() == vms::event::UserDefinedEvent))
-            model()->setEventState(vms::event::UndefinedState);
+        if (checked && (model()->eventType() == vms::event::userDefinedEvent))
+            model()->setEventState(vms::event::EventState::undefined);
 
         ui->recordAfterWidget->setEnabled(!checked);
     });

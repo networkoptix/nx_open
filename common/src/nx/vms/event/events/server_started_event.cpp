@@ -5,7 +5,7 @@ namespace vms {
 namespace event {
 
 ServerStartedEvent::ServerStartedEvent(const QnResourcePtr& resource, qint64 timeStamp):
-    base_type(ServerStartEvent, resource, timeStamp)
+    base_type(serverStartEvent, resource, timeStamp)
 {
 }
 

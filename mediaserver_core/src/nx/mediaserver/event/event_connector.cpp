@@ -43,7 +43,7 @@ void EventConnector::at_motionDetected(const QnResourcePtr& resource, bool value
 {
     vms::event::MotionEventPtr event(new vms::event::MotionEvent(
         resource,
-        value ? vms::event::ActiveState : vms::event::InactiveState,
+        value ? vms::event::EventState::active : vms::event::EventState::inactive,
         timeStamp,
         metadata));
 
@@ -53,7 +53,7 @@ void EventConnector::at_motionDetected(const QnResourcePtr& resource, bool value
 void EventConnector::at_cameraDisconnected(const QnResourcePtr& resource, qint64 timeStamp)
 {
     vms::event::CameraDisconnectedEventPtr event(
-        new class vms::event::CameraDisconnectedEvent(resource, timeStamp));
+        new vms::event::CameraDisconnectedEvent(resource, timeStamp));
     qnEventRuleProcessor->processEvent(event);
 }
 
@@ -66,7 +66,7 @@ void EventConnector::at_storageFailure(const QnResourcePtr& server, qint64 timeS
     if (url.contains(lit("://")))
         url = QUrl(url).toString(QUrl::RemoveUserInfo);
 
-    vms::event::StorageFailureEventPtr event(new class vms::event::StorageFailureEvent(
+    vms::event::StorageFailureEventPtr event(new vms::event::StorageFailureEvent(
         server, timeStamp, reasonCode, url));
 
     qnEventRuleProcessor->processEvent(event);
@@ -79,7 +79,7 @@ void EventConnector::at_storageFailure(const QnResourcePtr& server, qint64 timeS
     if (url.contains(lit("://")))
         url = QUrl(url).toString(QUrl::RemoveUserInfo);
 
-    vms::event::StorageFailureEventPtr event(new class vms::event::StorageFailureEvent(
+    vms::event::StorageFailureEventPtr event(new vms::event::StorageFailureEvent(
         server, timeStamp, reasonCode, url));
 
     qnEventRuleProcessor->processEvent(event);
@@ -88,7 +88,7 @@ void EventConnector::at_storageFailure(const QnResourcePtr& server, qint64 timeS
 void EventConnector::at_serverFailure(const QnResourcePtr& resource, qint64 timeStamp,
     vms::event::EventReason reasonCode, const QString& reasonText)
 {
-    vms::event::ServerFailureEventPtr event(new class vms::event::ServerFailureEvent(
+    vms::event::ServerFailureEventPtr event(new vms::event::ServerFailureEvent(
         resource, timeStamp, reasonCode, reasonText));
 
     qnEventRuleProcessor->processEvent(event);
@@ -97,7 +97,7 @@ void EventConnector::at_serverFailure(const QnResourcePtr& resource, qint64 time
 void EventConnector::at_licenseIssueEvent(const QnResourcePtr& resource,
     qint64 timeStamp, vms::event::EventReason reasonCode, const QString& reasonText)
 {
-    vms::event::LicenseIssueEventPtr event(new class vms::event::LicenseIssueEvent(
+    vms::event::LicenseIssueEventPtr event(new vms::event::LicenseIssueEvent(
         resource, timeStamp, reasonCode, reasonText));
 
     qnEventRuleProcessor->processEvent(event);
@@ -105,7 +105,7 @@ void EventConnector::at_licenseIssueEvent(const QnResourcePtr& resource,
 
 void EventConnector::at_serverStarted(const QnResourcePtr& resource, qint64 timeStamp)
 {
-    vms::event::ServerStartedEventPtr event(new class vms::event::ServerStartedEvent(
+    vms::event::ServerStartedEventPtr event(new vms::event::ServerStartedEvent(
         resource, timeStamp));
 
     qnEventRuleProcessor->processEvent(event);
@@ -114,7 +114,7 @@ void EventConnector::at_serverStarted(const QnResourcePtr& resource, qint64 time
 void EventConnector::at_cameraIPConflict(const QnResourcePtr& resource,
     const QHostAddress& hostAddress, const QStringList& macAddrList , qint64 timeStamp)
 {
-    vms::event::IpConflictEventPtr event(new class vms::event::IpConflictEvent(
+    vms::event::IpConflictEventPtr event(new vms::event::IpConflictEvent(
         resource, hostAddress, macAddrList, timeStamp));
 
     qnEventRuleProcessor->processEvent(event);
@@ -128,7 +128,7 @@ void EventConnector::at_networkIssue(const QnResourcePtr& resource, qint64 timeS
     if (++netIssueCounter % 10)
         return; // mutex is not nessessary here
 #endif
-    vms::event::NetworkIssueEventPtr event(new class vms::event::NetworkIssueEvent(
+    vms::event::NetworkIssueEventPtr event(new vms::event::NetworkIssueEvent(
         resource, timeStamp, reasonCode, reasonParamsEncoded));
 
     qnEventRuleProcessor->processEvent(event);
@@ -140,9 +140,9 @@ void EventConnector::at_cameraInput(const QnResourcePtr& resource,
     if (!resource)
         return;
 
-    vms::event::CameraInputEventPtr event(new class vms::event::CameraInputEvent(
+    vms::event::CameraInputEventPtr event(new vms::event::CameraInputEvent(
         resource->toSharedPointer(),
-        value ? vms::event::ActiveState : vms::event::InactiveState,
+        value ? vms::event::EventState::active : vms::event::EventState::inactive,
         timeStampUsec,
         inputPortID));
 
@@ -156,7 +156,7 @@ void EventConnector::at_softwareTrigger(const QnResourcePtr& resource,
     if (!resource)
         return;
 
-    vms::event::SoftwareTriggerEventPtr event(new class vms::event::SoftwareTriggerEvent(
+    vms::event::SoftwareTriggerEventPtr event(new vms::event::SoftwareTriggerEvent(
         resource->toSharedPointer(), triggerId, userId, timeStamp, toggleState));
 
     qnEventRuleProcessor->processEvent(event);
@@ -166,7 +166,7 @@ void EventConnector::at_customEvent(const QString& resourceName, const QString& 
     const QString& description, const vms::event::EventMetaData& metadata,
     vms::event::EventState eventState, qint64 timeStampUsec)
 {
-    vms::event::CustomEventPtr event(new class vms::event::CustomEvent(
+    vms::event::CustomEventPtr event(new vms::event::CustomEvent(
         eventState, timeStampUsec, resourceName, caption, description, metadata));
 
     qnEventRuleProcessor->processEvent(event);
@@ -175,7 +175,7 @@ void EventConnector::at_customEvent(const QString& resourceName, const QString& 
 void EventConnector::at_serverConflict(const QnResourcePtr& resource, qint64 timeStamp,
     const QnCameraConflictList& conflicts)
 {
-    vms::event::ServerConflictEventPtr event(new class vms::event::ServerConflictEvent(
+    vms::event::ServerConflictEventPtr event(new vms::event::ServerConflictEvent(
         resource, timeStamp, conflicts));
 
     qnEventRuleProcessor->processEvent(event);
@@ -184,7 +184,7 @@ void EventConnector::at_serverConflict(const QnResourcePtr& resource, qint64 tim
 void EventConnector::at_serverConflict(const QnResourcePtr& resource, qint64 timeStamp,
     const QnModuleInformation& conflictModule, const QUrl& url)
 {
-    vms::event::ServerConflictEventPtr event(new class vms::event::ServerConflictEvent(
+    vms::event::ServerConflictEventPtr event(new vms::event::ServerConflictEvent(
         resource, timeStamp, conflictModule, url));
 
     qnEventRuleProcessor->processEvent(event);
@@ -192,7 +192,7 @@ void EventConnector::at_serverConflict(const QnResourcePtr& resource, qint64 tim
 
 void EventConnector::at_archiveBackupFinished(const QnResourcePtr& resource, qint64 timeStamp, vms::event::EventReason reasonCode, const QString& reasonText)
 {
-    vms::event::BackupFinishedEventPtr event(new class vms::event::BackupFinishedEvent(
+    vms::event::BackupFinishedEventPtr event(new vms::event::BackupFinishedEvent(
         resource, timeStamp, reasonCode, reasonText));
 
     qnEventRuleProcessor->processEvent(event);
@@ -200,7 +200,7 @@ void EventConnector::at_archiveBackupFinished(const QnResourcePtr& resource, qin
 
 void EventConnector::at_noStorages(const QnResourcePtr& resource)
 {
-    vms::event::SystemHealthActionPtr action(new class vms::event::SystemHealthAction(
+    vms::event::SystemHealthActionPtr action(new vms::event::SystemHealthAction(
         QnSystemHealth::StoragesNotConfigured, resource->getId()));
     qnEventRuleProcessor->broadcastAction(action);
 }
@@ -208,7 +208,7 @@ void EventConnector::at_noStorages(const QnResourcePtr& resource)
 void EventConnector::at_archiveRebuildFinished(const QnResourcePtr& resource,
     QnSystemHealth::MessageType msgType)
 {
-    vms::event::SystemHealthActionPtr action(new class vms::event::SystemHealthAction(
+    vms::event::SystemHealthActionPtr action(new vms::event::SystemHealthAction(
         msgType, resource->getId()));
     qnEventRuleProcessor->broadcastAction(action);
 }
@@ -229,9 +229,9 @@ bool EventConnector::createEventFromParams(const vms::event::EventParameters& pa
         };
 
     auto resource = resourcePool()->getResourceById(params.eventResourceId);
-    const bool isOnState = eventState == vms::event::ActiveState;
+    const bool isOnState = eventState == vms::event::EventState::active;
 
-    if (params.eventType >= vms::event::UserDefinedEvent)
+    if (params.eventType >= vms::event::userDefinedEvent)
     {
         if (!check(params.resourceName.isEmpty() && params.caption.isEmpty()
                 && params.description.isEmpty(),
@@ -247,7 +247,7 @@ bool EventConnector::createEventFromParams(const vms::event::EventParameters& pa
 
     switch (params.eventType)
     {
-        case vms::event::CameraMotionEvent:
+        case vms::event::cameraMotionEvent:
         {
             if (!check(resource, lit("'CameraMotionEvent' requires 'resource' parameter")))
                 return false;
@@ -257,7 +257,7 @@ bool EventConnector::createEventFromParams(const vms::event::EventParameters& pa
             return true;
         }
 
-        case vms::event::CameraInputEvent:
+        case vms::event::cameraInputEvent:
         {
             if (!check(resource, lit("'CameraInputEvent' requires 'resource' parameter")))
                 return false;
@@ -266,7 +266,7 @@ bool EventConnector::createEventFromParams(const vms::event::EventParameters& pa
             return true;
         }
 
-        case vms::event::SoftwareTriggerEvent:
+        case vms::event::softwareTriggerEvent:
         {
             if (!check(resource, lit("'SoftwareTriggerEvent' requires 'resource' parameter")))
                 return false;
@@ -276,7 +276,7 @@ bool EventConnector::createEventFromParams(const vms::event::EventParameters& pa
             return true;
         }
 
-        case vms::event::CameraDisconnectEvent:
+        case vms::event::cameraDisconnectEvent:
         {
             if (!check(resource, lit("'CameraDisconnectEvent' requires 'resource' parameter")))
                 return false;
@@ -285,7 +285,7 @@ bool EventConnector::createEventFromParams(const vms::event::EventParameters& pa
             return true;
         }
 
-        case vms::event::StorageFailureEvent:
+        case vms::event::storageFailureEvent:
         {
             if (!resource)
                 resource = resourcePool()->getResourceById(params.sourceServerId);
@@ -295,7 +295,7 @@ bool EventConnector::createEventFromParams(const vms::event::EventParameters& pa
             return true;
         }
 
-        case vms::event::NetworkIssueEvent:
+        case vms::event::networkIssueEvent:
         {
             if (!check(resource, lit("'NetworkIssueEvent' requires 'resource' parameter")))
                 return false;
@@ -305,7 +305,7 @@ bool EventConnector::createEventFromParams(const vms::event::EventParameters& pa
             return true;
         }
 
-        case vms::event::CameraIpConflictEvent:
+        case vms::event::cameraIpConflictEvent:
         {
             if (!resource)
                 resource = resourcePool()->getResourceById(params.sourceServerId);
@@ -316,7 +316,7 @@ bool EventConnector::createEventFromParams(const vms::event::EventParameters& pa
             return true;
         }
 
-        case vms::event::ServerFailureEvent:
+        case vms::event::serverFailureEvent:
         {
             if (!resource)
                 resource = resourcePool()->getResourceById(params.sourceServerId);
@@ -326,7 +326,7 @@ bool EventConnector::createEventFromParams(const vms::event::EventParameters& pa
             return true;
         }
 
-        case vms::event::ServerConflictEvent:
+        case vms::event::serverConflictEvent:
         {
             if (!resource)
                 resource = resourcePool()->getResourceById(params.sourceServerId);
@@ -338,7 +338,7 @@ bool EventConnector::createEventFromParams(const vms::event::EventParameters& pa
             return true;
         }
 
-        case vms::event::ServerStartEvent:
+        case vms::event::serverStartEvent:
         {
             if (!resource)
                 resource = resourcePool()->getResourceById(params.sourceServerId);
@@ -347,7 +347,7 @@ bool EventConnector::createEventFromParams(const vms::event::EventParameters& pa
             return true;
         }
 
-        case vms::event::LicenseIssueEvent:
+        case vms::event::licenseIssueEvent:
         {
             if (!resource)
                 resource = resourcePool()->getResourceById(params.sourceServerId);
@@ -357,7 +357,7 @@ bool EventConnector::createEventFromParams(const vms::event::EventParameters& pa
             return true;
         }
 
-        case vms::event::BackupFinishedEvent:
+        case vms::event::backupFinishedEvent:
         {
             if (!resource)
                 resource = resourcePool()->getResourceById(params.sourceServerId);

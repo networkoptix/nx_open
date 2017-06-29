@@ -1696,7 +1696,7 @@ void MediaServerProcess::at_connectionOpened()
         qnEventRuleConnector->at_serverFailure(
             resPool->getResourceById<QnMediaServerResource>(serverGuid()),
             m_firstRunningTime * 1000,
-            nx::vms::event::ServerStartedReason,
+            nx::vms::event::EventReason::serverStarted,
             QString());
     }
     if (!m_startMessageSent)

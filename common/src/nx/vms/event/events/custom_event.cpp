@@ -16,7 +16,7 @@ CustomEvent::CustomEvent(
     const QString& description,
     EventMetaData metadata)
     :
-    base_type(UserDefinedEvent, QnResourcePtr(), toggleState, timeStamp),
+    base_type(userDefinedEvent, QnResourcePtr(), toggleState, timeStamp),
     m_resourceName(resourceName),
     m_caption(caption),
     m_description(description),
@@ -26,7 +26,7 @@ CustomEvent::CustomEvent(
 
 bool CustomEvent::isEventStateMatched(EventState state, ActionType actionType) const
 {
-    return state == UndefinedState
+    return state == EventState::undefined
         || state == getToggleState()
         || hasToggleState(actionType);
 }

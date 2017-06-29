@@ -13,11 +13,11 @@ QnAbstractBusinessParamsWidget* QnBusinessEventWidgetFactory::createWidget(
 {
     switch (eventType)
     {
-        case vms::event::CameraInputEvent:
+        case vms::event::cameraInputEvent:
             return new QnCameraInputBusinessEventWidget(parent);
-        case vms::event::SoftwareTriggerEvent:
+        case vms::event::softwareTriggerEvent:
             return new QnSoftwareTriggerBusinessEventWidget(parent);
-        case vms::event::UserDefinedEvent:
+        case vms::event::userDefinedEvent:
             return new QnCustomBusinessEventWidget(parent);
         default:
             return new QnEmptyBusinessEventWidget(parent);

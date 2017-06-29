@@ -1213,18 +1213,18 @@ void ActionHandler::at_openBusinessLogAction_triggered() {
 
     const auto parameters = menu()->currentParameters(sender());
 
-    vms::event::EventType eventType = parameters.argument(Qn::EventTypeRole, vms::event::AnyEvent);
+    vms::event::EventType eventType = parameters.argument(Qn::EventTypeRole, vms::event::anyEvent);
     auto cameras = parameters.resources().filtered<QnVirtualCameraResource>();
     QSet<QnUuid> ids;
     for (auto camera: cameras)
         ids << camera->getId();
 
     // show diagnostics if Issues action was triggered
-    if (eventType != vms::event::AnyEvent || !ids.isEmpty())
+    if (eventType != vms::event::anyEvent || !ids.isEmpty())
     {
         businessEventsLogDialog()->disableUpdateData();
         businessEventsLogDialog()->setEventType(eventType);
-        businessEventsLogDialog()->setActionType(vms::event::DiagnosticsAction);
+        businessEventsLogDialog()->setActionType(vms::event::diagnosticsAction);
         auto now = QDateTime::currentMSecsSinceEpoch();
         businessEventsLogDialog()->setDateRange(now, now);
         businessEventsLogDialog()->setCameraList(ids);
@@ -1483,7 +1483,7 @@ void ActionHandler::at_cameraIssuesAction_triggered()
 {
     menu()->trigger(action::OpenBusinessLogAction,
         menu()->currentParameters(sender())
-        .withArgument(Qn::EventTypeRole, vms::event::AnyCameraEvent));
+        .withArgument(Qn::EventTypeRole, vms::event::anyCameraEvent));
 }
 
 void ActionHandler::at_cameraBusinessRulesAction_triggered() {
@@ -1541,7 +1541,7 @@ void ActionHandler::at_serverLogsAction_triggered()
 void ActionHandler::at_serverIssuesAction_triggered()
 {
     menu()->trigger(action::OpenBusinessLogAction,
-        {Qn::EventTypeRole, vms::event::AnyServerEvent});
+        {Qn::EventTypeRole, vms::event::anyServerEvent});
 }
 
 void ActionHandler::at_pingAction_triggered()

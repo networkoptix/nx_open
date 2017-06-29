@@ -32,8 +32,8 @@ int QnEventLog2RestHandler::executeGet(
     QnTimePeriod period(-1, -1);
     QnSecurityCamResourceList resList;
     QString errStr;
-    vms::event::EventType eventType = vms::event::UndefinedEvent;
-    vms::event::ActionType actionType = vms::event::UndefinedAction;
+    vms::event::EventType eventType = vms::event::undefinedEvent;
+    vms::event::ActionType actionType = vms::event::undefinedAction;
     QnUuid ruleId;
 
     nx::camera_id_helper::findAllCamerasByFlexibleIds(

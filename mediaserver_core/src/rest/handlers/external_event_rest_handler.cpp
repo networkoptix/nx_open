@@ -29,7 +29,7 @@ int QnExternalEventRestHandler::executeGet(
 {
     vms::event::EventParameters businessParams;
     QString errStr;
-    vms::event::EventState eventState = vms::event::UndefinedState;
+    vms::event::EventState eventState = vms::event::EventState::undefined;
     bool ok;
 
     if (params.contains("event_type"))
@@ -53,7 +53,7 @@ int QnExternalEventRestHandler::executeGet(
     if (params.contains("state"))
     {
         eventState = QnLexical::deserialized<vms::event::EventState>(
-            params["state"], vms::event::UndefinedState, &ok);
+            params["state"], vms::event::EventState::undefined, &ok);
         if (!ok)
         {
             result.setError(QnRestResult::InvalidParameter,
@@ -104,8 +104,8 @@ int QnExternalEventRestHandler::executeGet(
 
     businessParams.sourceServerId = owner->commonModule()->moduleGUID();
 
-    if (businessParams.eventType == vms::event::UndefinedEvent)
-        businessParams.eventType = vms::event::UserDefinedEvent; // default value for type is 'CustomEvent'
+    if (businessParams.eventType == vms::event::undefinedEvent)
+        businessParams.eventType = vms::event::userDefinedEvent; // default value for type is 'CustomEvent'
 
     const auto& userId = owner->accessRights().userId;
 

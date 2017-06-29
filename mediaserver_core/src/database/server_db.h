@@ -38,8 +38,8 @@ public:
     nx::vms::event::ActionDataList getActions(
         const QnTimePeriod& period,
         const QnResourceList& resList,
-        const nx::vms::event::EventType& eventType = nx::vms::event::UndefinedEvent,
-        const nx::vms::event::ActionType& actionType = nx::vms::event::UndefinedAction,
+        const nx::vms::event::EventType& eventType = nx::vms::event::undefinedEvent,
+        const nx::vms::event::ActionType& actionType = nx::vms::event::undefinedAction,
         const QnUuid& businessRuleId = QnUuid()) const;
 
     void getAndSerializeActions(

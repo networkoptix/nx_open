@@ -10,49 +10,49 @@ using namespace nx;
 
 QnNotificationLevel::Value QnNotificationLevel::valueOf(const vms::event::AbstractActionPtr &businessAction)
 {
-    if (businessAction->actionType() == vms::event::PlaySoundAction)
+    if (businessAction->actionType() == vms::event::playSoundAction)
         return Value::CommonNotification;
 
-    if (businessAction->actionType() == vms::event::ShowOnAlarmLayoutAction)
+    if (businessAction->actionType() == vms::event::showOnAlarmLayoutAction)
         return Value::CriticalNotification;
 
     auto params = businessAction->getRuntimeParams();
     vms::event::EventType eventType = params.eventType;
 
-    if (eventType >= vms::event::UserDefinedEvent)
+    if (eventType >= vms::event::userDefinedEvent)
         return Value::CommonNotification;
 
     switch (eventType)
     {
         /* Green notifications */
-        case vms::event::CameraMotionEvent:
-        case vms::event::CameraInputEvent:
-        case vms::event::ServerStartEvent:
-        case vms::event::SoftwareTriggerEvent:
+        case vms::event::cameraMotionEvent:
+        case vms::event::cameraInputEvent:
+        case vms::event::serverStartEvent:
+        case vms::event::softwareTriggerEvent:
             return Value::CommonNotification;
 
         /* Yellow notifications */
-        case vms::event::NetworkIssueEvent:
-        case vms::event::CameraIpConflictEvent:
-        case vms::event::ServerConflictEvent:
+        case vms::event::networkIssueEvent:
+        case vms::event::cameraIpConflictEvent:
+        case vms::event::serverConflictEvent:
             return Value::ImportantNotification;
 
         /* Red notifications */
-        case vms::event::CameraDisconnectEvent:
-        case vms::event::StorageFailureEvent:
-        case vms::event::ServerFailureEvent:
-        case vms::event::LicenseIssueEvent:
+        case vms::event::cameraDisconnectEvent:
+        case vms::event::storageFailureEvent:
+        case vms::event::serverFailureEvent:
+        case vms::event::licenseIssueEvent:
             return Value::CriticalNotification;
 
-        case vms::event::BackupFinishedEvent:
+        case vms::event::backupFinishedEvent:
         {
             vms::event::EventReason reason = static_cast<vms::event::EventReason>(params.reasonCode);
             bool isCriticalNotification =
-                reason == vms::event::BackupFailedChunkError ||
-                reason == vms::event::BackupFailedNoBackupStorageError ||
-                reason == vms::event::BackupFailedSourceFileError ||
-                reason == vms::event::BackupFailedSourceStorageError ||
-                reason == vms::event::BackupFailedTargetFileError;
+                reason == vms::event::EventReason::backupFailedChunkError ||
+                reason == vms::event::EventReason::backupFailedNoBackupStorageError ||
+                reason == vms::event::EventReason::backupFailedSourceFileError ||
+                reason == vms::event::EventReason::backupFailedSourceStorageError ||
+                reason == vms::event::EventReason::backupFailedTargetFileError;
 
             if (isCriticalNotification)
                 return Value::CriticalNotification;

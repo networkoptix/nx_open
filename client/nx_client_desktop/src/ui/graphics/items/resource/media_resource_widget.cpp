@@ -324,7 +324,7 @@ QnMediaResourceWidget::QnMediaResourceWidget(QnWorkbenchContext* context, QnWork
     connect(qnCommonMessageProcessor, &QnCommonMessageProcessor::businessActionReceived, this,
         [this](const vms::event::AbstractActionPtr &businessAction)
         {
-            if (businessAction->actionType() != vms::event::ExecutePtzPresetAction)
+            if (businessAction->actionType() != vms::event::executePtzPresetAction)
                 return;
             const auto &actionParams = businessAction->getParams();
             if (actionParams.actionResourceId != m_resource->toResource()->getId())
@@ -2338,7 +2338,7 @@ QnMediaResourceWidget::SoftwareTrigger* QnMediaResourceWidget::createTriggerIfRe
 
     std::function<void()> clientSideHandler;
 
-    if (rule->actionType() == nx::vms::event::BookmarkAction
+    if (rule->actionType() == nx::vms::event::bookmarkAction
         && !rule->actionParams().needConfirmation)
     {
         clientSideHandler =
@@ -2358,7 +2358,7 @@ QnMediaResourceWidget::SoftwareTrigger* QnMediaResourceWidget::createTriggerIfRe
 
 bool QnMediaResourceWidget::isRelevantTriggerRule(const vms::event::RulePtr& rule) const
 {
-    if (rule->isDisabled() || rule->eventType() != vms::event::SoftwareTriggerEvent)
+    if (rule->isDisabled() || rule->eventType() != vms::event::softwareTriggerEvent)
         return false;
 
     const auto resourceId = m_resource->toResource()->getId();
@@ -2413,7 +2413,7 @@ void QnMediaResourceWidget::configureTriggerButton(QnSoftwareTriggerButton* butt
                 if (!button->isLive())
                     return;
 
-                const auto requestId = invokeTrigger(id, resultHandler, vms::event::ActiveState);
+                const auto requestId = invokeTrigger(id, resultHandler, vms::event::EventState::active);
                 const bool success = requestId != rest::Handle();
                 button->setProperty(kTriggerRequestIdProperty, requestId);
                 button->setState(success
@@ -2434,7 +2434,7 @@ void QnMediaResourceWidget::configureTriggerButton(QnSoftwareTriggerButton* butt
                 if (button->state() == QnSoftwareTriggerButton::State::Failure)
                     return;
 
-                const auto requestId = invokeTrigger(id, resultHandler, vms::event::InactiveState);
+                const auto requestId = invokeTrigger(id, resultHandler, vms::event::EventState::inactive);
                 const bool success = requestId != rest::Handle();
                 button->setProperty(kTriggerRequestIdProperty, requestId);
                 button->setState(success

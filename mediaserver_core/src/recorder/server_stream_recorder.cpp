@@ -128,7 +128,7 @@ void QnServerStreamRecorder::at_recordingFinished(const StreamRecorderErrorStruc
                 emit storageFailure(
                     m_mediaServer,
                     qnSyncTime->currentUSecsSinceEpoch(),
-                    nx::vms::event::StorageIoErrorReason ,
+                    nx::vms::event::EventReason::storageIoError,
                     status.storage
                 );
             m_diskErrorWarned = true;
@@ -223,7 +223,7 @@ bool QnServerStreamRecorder::cleanupQueueIfOverflow()
         emit storageFailure(
             m_mediaServer,
             qnSyncTime->currentUSecsSinceEpoch(),
-            nx::vms::event::StorageTooSlowReason,
+            nx::vms::event::EventReason::storageTooSlow,
             m_recordingContextVector[slowestStorageIndex].storage
             );
     }

@@ -2355,19 +2355,19 @@ void QnWorkbenchDisplay::at_notificationsHandler_businessActionAdded(const vms::
      */
     QSet<QnResourcePtr> targetResources;
     vms::event::ActionType actionType = businessAction->actionType();
-    if (actionType == vms::event::ShowOnAlarmLayoutAction)
+    if (actionType == vms::event::showOnAlarmLayoutAction)
     {
         if (QnResourcePtr resource = resourcePool()->getResourceById(businessAction->getParams().actionResourceId))
             targetResources.insert(resource);
     }
     else
     {
-        Q_ASSERT_X(actionType == vms::event::ShowPopupAction || actionType == vms::event::PlaySoundAction,
+        Q_ASSERT_X(actionType == vms::event::showPopupAction || actionType == vms::event::playSoundAction,
             Q_FUNC_INFO, "Invalid action type");
         vms::event::EventParameters eventParams = businessAction->getRuntimeParams();
         if (QnResourcePtr resource = resourcePool()->getResourceById(eventParams.eventResourceId))
             targetResources.insert(resource);
-        if (eventParams.eventType >= vms::event::UserDefinedEvent)
+        if (eventParams.eventType >= vms::event::userDefinedEvent)
             targetResources.unite(resourcePool()->getResources<QnResource>(eventParams.metadata.cameraRefs).toSet());
     }
 

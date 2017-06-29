@@ -11,7 +11,7 @@ namespace vms {
 namespace event {
 
 CameraOutputAction::CameraOutputAction(const EventParameters& runtimeParams):
-    base_type(event::CameraOutputAction, runtimeParams)
+    base_type(cameraOutputAction, runtimeParams)
 {
 //     if (instant)
 //         m_params.relayAutoResetTimeout = kInstantActionAutoResetTimeoutMs; // default value for instant action

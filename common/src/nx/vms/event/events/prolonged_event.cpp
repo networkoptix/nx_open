@@ -20,7 +20,7 @@ ProlongedEvent::ProlongedEvent(
 
 bool ProlongedEvent::isEventStateMatched(EventState state, ActionType actionType) const
 {
-    return state == UndefinedState
+    return state == EventState::undefined
         || state == getToggleState()
         || hasToggleState(actionType);
 }

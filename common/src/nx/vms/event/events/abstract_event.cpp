@@ -11,11 +11,11 @@ bool hasChild(EventType eventType)
 {
     switch (eventType)
     {
-        case AnyCameraEvent:
+        case anyCameraEvent:
             return true;
-        case AnyServerEvent:
+        case anyServerEvent:
             return true;
-        case AnyEvent:
+        case anyEvent:
             return true;
         default:
             return false;
@@ -26,24 +26,24 @@ EventType parentEvent(EventType eventType)
 {
     switch (eventType)
     {
-        case CameraDisconnectEvent:
-        case NetworkIssueEvent:
-        case CameraIpConflictEvent:
-            return AnyCameraEvent;
+        case cameraDisconnectEvent:
+        case networkIssueEvent:
+        case cameraIpConflictEvent:
+            return anyCameraEvent;
 
-        case StorageFailureEvent:
-        case ServerFailureEvent:
-        case ServerConflictEvent:
-        case ServerStartEvent:
-        case LicenseIssueEvent:
-        case BackupFinishedEvent:
-            return AnyServerEvent;
+        case storageFailureEvent:
+        case serverFailureEvent:
+        case serverConflictEvent:
+        case serverStartEvent:
+        case licenseIssueEvent:
+        case backupFinishedEvent:
+            return anyServerEvent;
 
-        case AnyEvent:
-            return UndefinedEvent;
+        case anyEvent:
+            return undefinedEvent;
 
         default:
-            return AnyEvent;
+            return anyEvent;
     }
 }
 
@@ -51,30 +51,30 @@ QList<EventType> childEvents(EventType eventType)
 {
     switch (eventType)
     {
-        case AnyCameraEvent:
+        case anyCameraEvent:
             return {
-                CameraDisconnectEvent,
-                NetworkIssueEvent,
-                CameraIpConflictEvent,
-                SoftwareTriggerEvent };
+                cameraDisconnectEvent,
+                networkIssueEvent,
+                cameraIpConflictEvent,
+                softwareTriggerEvent };
 
-        case AnyServerEvent:
+        case anyServerEvent:
             return {
-                StorageFailureEvent,
-                ServerFailureEvent,
-                ServerConflictEvent,
-                ServerStartEvent,
-                LicenseIssueEvent,
-                BackupFinishedEvent };
+                storageFailureEvent,
+                serverFailureEvent,
+                serverConflictEvent,
+                serverStartEvent,
+                licenseIssueEvent,
+                backupFinishedEvent };
 
-        case AnyEvent:
+        case anyEvent:
             return {
-                CameraMotionEvent,
-                CameraInputEvent,
-                AnyCameraEvent,
-                AnyServerEvent,
-                UserDefinedEvent,
-                SoftwareTriggerEvent };
+                cameraMotionEvent,
+                cameraInputEvent,
+                anyCameraEvent,
+                anyServerEvent,
+                userDefinedEvent,
+                softwareTriggerEvent };
 
         default:
             return {};
@@ -84,19 +84,19 @@ QList<EventType> childEvents(EventType eventType)
 QList<EventType> allEvents()
 {
     static const QList<EventType> result {
-        CameraMotionEvent,
-        CameraInputEvent,
-        CameraDisconnectEvent,
-        StorageFailureEvent,
-        NetworkIssueEvent,
-        CameraIpConflictEvent,
-        ServerFailureEvent,
-        ServerConflictEvent,
-        ServerStartEvent,
-        LicenseIssueEvent,
-        BackupFinishedEvent,
-        SoftwareTriggerEvent,
-        UserDefinedEvent };
+        cameraMotionEvent,
+        cameraInputEvent,
+        cameraDisconnectEvent,
+        storageFailureEvent,
+        networkIssueEvent,
+        cameraIpConflictEvent,
+        serverFailureEvent,
+        serverConflictEvent,
+        serverStartEvent,
+        licenseIssueEvent,
+        backupFinishedEvent,
+        softwareTriggerEvent,
+        userDefinedEvent };
 
     return result;
 }
@@ -111,11 +111,11 @@ bool hasToggleState(EventType eventType)
 {
     switch (eventType)
     {
-        case AnyEvent:
-        case CameraMotionEvent:
-        case CameraInputEvent:
-        case UserDefinedEvent:
-        case SoftwareTriggerEvent:
+        case anyEvent:
+        case cameraMotionEvent:
+        case cameraInputEvent:
+        case userDefinedEvent:
+        case softwareTriggerEvent:
             return true;
 
         default:
@@ -126,10 +126,10 @@ bool hasToggleState(EventType eventType)
 QList<EventState> allowedEventStates(EventType eventType)
 {
     QList<EventState> result;
-    if (!hasToggleState(eventType) || eventType == UserDefinedEvent || eventType == SoftwareTriggerEvent)
-        result << UndefinedState;
+    if (!hasToggleState(eventType) || eventType == userDefinedEvent || eventType == softwareTriggerEvent)
+        result << EventState::undefined;
     if (hasToggleState(eventType))
-        result << ActiveState << InactiveState;
+        result << EventState::active << EventState::inactive;
     return result;
 }
 
@@ -137,10 +137,10 @@ bool requiresCameraResource(EventType eventType)
 {
     switch (eventType)
     {
-        case CameraMotionEvent:
-        case CameraInputEvent:
-        case CameraDisconnectEvent:
-        case SoftwareTriggerEvent:
+        case cameraMotionEvent:
+        case cameraInputEvent:
+        case cameraDisconnectEvent:
+        case softwareTriggerEvent:
             return true;
 
         default:
@@ -152,7 +152,7 @@ bool requiresServerResource(EventType eventType)
 {
     switch (eventType)
     {
-        case StorageFailureEvent:
+        case storageFailureEvent:
             return false; //TODO: #GDM #Business restore when will work fine
         default:
             return false;
@@ -164,10 +164,10 @@ bool isSourceCameraRequired(EventType eventType)
 {
     switch (eventType)
     {
-        case CameraMotionEvent:
-        case CameraInputEvent:
-        case CameraDisconnectEvent:
-        case NetworkIssueEvent:
+        case cameraMotionEvent:
+        case cameraInputEvent:
+        case cameraDisconnectEvent:
+        case networkIssueEvent:
             return true;
 
         default:
@@ -179,11 +179,11 @@ bool isSourceServerRequired(EventType eventType)
 {
     switch (eventType)
     {
-        case StorageFailureEvent:
-        case BackupFinishedEvent:
-        case ServerFailureEvent:
-        case ServerConflictEvent:
-        case ServerStartEvent:
+        case storageFailureEvent:
+        case backupFinishedEvent:
+        case serverFailureEvent:
+        case serverConflictEvent:
+        case serverStartEvent:
             return true;
 
         default:

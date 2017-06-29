@@ -10,7 +10,7 @@ ServerFailureEvent::ServerFailureEvent(
     EventReason reasonCode,
     const QString& reasonText)
     :
-    base_type(event::ServerFailureEvent, resource, timeStamp, reasonCode, reasonText)
+    base_type(serverFailureEvent, resource, timeStamp, reasonCode, reasonText)
 {
 }
 

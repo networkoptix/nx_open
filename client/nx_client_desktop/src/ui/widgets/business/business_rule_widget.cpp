@@ -199,11 +199,11 @@ void QnBusinessRuleWidget::at_model_dataChanged(Fields fields)
         QString actionAtLabelText;
         switch (m_model->actionType())
         {
-            case vms::event::SendMailAction:
+            case vms::event::sendMailAction:
                 //: "to" is from the sentence "Send email _to_:"
                 actionAtLabelText = tr("to");
                 break;
-            case vms::event::ShowOnAlarmLayoutAction:
+            case vms::event::showOnAlarmLayoutAction:
                 actionAtLabelText = QnDeviceDependentStrings::getDefaultNameFromSet(
                     resourcePool(),
                     tr("Devices"),
@@ -223,7 +223,7 @@ void QnBusinessRuleWidget::at_model_dataChanged(Fields fields)
 
     if (fields & (Field::eventType | Field::actionType | Field::actionParams))
     {
-        if (m_model->eventType() == vms::event::SoftwareTriggerEvent)
+        if (m_model->eventType() == vms::event::softwareTriggerEvent)
         {
             /* SoftwareTriggerEvent is prolonged if its action is prolonged. */
             ui->eventStatesComboBox->setVisible(false);
@@ -451,9 +451,9 @@ void QnBusinessRuleWidget::at_eventResourcesHolder_clicked()
     QnResourceSelectionDialog dialog(QnResourceSelectionDialog::Filter::cameras, this); //TODO: #GDM #Business or servers?
 
     vms::event::EventType eventType = m_model->eventType();
-    if (eventType == vms::event::CameraMotionEvent)
+    if (eventType == vms::event::cameraMotionEvent)
         dialog.setDelegate(new QnCheckResourceAndWarnDelegate<QnCameraMotionPolicy>(this));
-    else if (eventType == vms::event::CameraInputEvent)
+    else if (eventType == vms::event::cameraInputEvent)
         dialog.setDelegate(new QnCheckResourceAndWarnDelegate<QnCameraInputPolicy>(this));
     dialog.setSelectedResources(m_model->eventResources());
 
@@ -483,7 +483,7 @@ void QnBusinessRuleWidget::at_actionResourcesHolder_clicked()
         auto params = m_model->actionParams();
         dialog.setAllUsers(params.allUsers);
 
-        if (m_model->actionType() == vms::event::SendMailAction)
+        if (m_model->actionType() == vms::event::sendMailAction)
         {
             QSharedPointer<QnSendEmailActionDelegate> dialogDelegate(
                 new QnSendEmailActionDelegate(this));
@@ -522,17 +522,17 @@ void QnBusinessRuleWidget::at_actionResourcesHolder_clicked()
         QnResourceSelectionDialog dialog(target, this);
 
         vms::event::ActionType actionType = m_model->actionType();
-        if (actionType == vms::event::CameraRecordingAction)
+        if (actionType == vms::event::cameraRecordingAction)
             dialog.setDelegate(new QnCheckResourceAndWarnDelegate<QnCameraRecordingPolicy>(this));
-        if (actionType == vms::event::BookmarkAction)
+        if (actionType == vms::event::bookmarkAction)
             dialog.setDelegate(new QnCheckResourceAndWarnDelegate<QnBookmarkActionPolicy>(this));
-        else if (actionType == vms::event::CameraOutputAction)
+        else if (actionType == vms::event::cameraOutputAction)
             dialog.setDelegate(new QnCheckResourceAndWarnDelegate<QnCameraOutputPolicy>(this));
-        else if (actionType == vms::event::ExecutePtzPresetAction)
+        else if (actionType == vms::event::executePtzPresetAction)
             dialog.setDelegate(new QnCheckResourceAndWarnDelegate<QnExecPtzPresetPolicy>(this));
-        else if (actionType == vms::event::SendMailAction)
+        else if (actionType == vms::event::sendMailAction)
             dialog.setDelegate(new QnSendEmailActionDelegate(this));
-        else if (actionType == vms::event::PlaySoundAction || actionType == vms::event::PlaySoundOnceAction || actionType == vms::event::SayTextAction)
+        else if (actionType == vms::event::playSoundAction || actionType == vms::event::playSoundOnceAction || actionType == vms::event::sayTextAction)
             dialog.setDelegate(new QnCheckResourceAndWarnDelegate<QnCameraAudioTransmitPolicy>(this));
 
         dialog.setSelectedResources(m_model->actionResources());

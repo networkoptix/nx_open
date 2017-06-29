@@ -15,7 +15,7 @@ public:
         const RulePtr& rule,
         const AbstractEventPtr& event,
         const QnUuid& moduleGuid,
-        EventState state = UndefinedState);
+        EventState state = EventState::undefined);
 
     static AbstractActionPtr instantiateAction(
         const RulePtr& rule,

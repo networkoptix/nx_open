@@ -155,12 +155,12 @@ QnAbstractMediaDataPtr QnMulticodecRtpReader::getNextData()
         QString reasonParamsEncoded;
         vms::event::EventReason reason;
         if (elapsed > m_rtpFrameTimeoutMs) {
-            reason = vms::event::NetworkNoFrameReason;
+            reason = vms::event::EventReason::networkNoFrame;
             reasonParamsEncoded = vms::event::NetworkIssueEvent::encodeTimeoutMsecs(elapsed);
             NX_LOG(QString(lit("RTP read timeout for camera %1. Reopen stream")).arg(getResource()->getUniqueId()), cl_logWARNING);
         }
         else {
-            reason = vms::event::NetworkConnectionClosedReason;
+            reason = vms::event::EventReason::networkConnectionClosed;
             reasonParamsEncoded = vms::event::NetworkIssueEvent::encodePrimaryStream(m_role != Qn::CR_SecondaryLiveVideo);
             NX_LOG(QString(lit("RTP connection was forcibly closed by camera %1. Reopen stream")).arg(getResource()->getUniqueId()), cl_logWARNING);
         }
@@ -436,7 +436,7 @@ void QnMulticodecRtpReader::at_packetLost(quint32 prev, quint32 next)
 
     emit networkIssue(resource,
                       qnSyncTime->currentUSecsSinceEpoch(),
-                      vms::event::NetworkRtpPacketLossReason,
+                      vms::event::EventReason::networkRtpPacketLoss,
                       vms::event::NetworkIssueEvent::encodePacketLossSequence(prev, next));
 
 }

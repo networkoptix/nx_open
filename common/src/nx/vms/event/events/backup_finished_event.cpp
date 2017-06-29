@@ -10,7 +10,7 @@ BackupFinishedEvent::BackupFinishedEvent(
     EventReason reasonCode,
     const QString& reasonText)
     :
-    base_type(event::BackupFinishedEvent, resource, timeStamp, reasonCode, reasonText)
+    base_type(backupFinishedEvent, resource, timeStamp, reasonCode, reasonText)
 {
 }
 

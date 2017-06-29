@@ -51,10 +51,10 @@ int QnDebugEventsRestHandler::testNetworkIssue(
         if (param.isEmpty())
             param = vms::event::NetworkIssueEvent::encodeTimeoutMsecs(5000);
 
-        vms::event::NetworkIssueEventPtr networkEvent(new class vms::event::NetworkIssueEvent(
+        vms::event::NetworkIssueEventPtr networkEvent(new vms::event::NetworkIssueEvent(
             camera,
             qnSyncTime->currentUSecsSinceEpoch(),
-            vms::event::NetworkNoFrameReason,
+            vms::event::EventReason::networkNoFrame,
             param));
 
         qnEventRuleProcessor->processEvent(networkEvent);
@@ -65,10 +65,10 @@ int QnDebugEventsRestHandler::testNetworkIssue(
         if (param.isEmpty())
             param = vms::event::NetworkIssueEvent::encodePrimaryStream(true);
 
-        vms::event::NetworkIssueEventPtr networkEvent(new class vms::event::NetworkIssueEvent(
+        vms::event::NetworkIssueEventPtr networkEvent(new vms::event::NetworkIssueEvent(
             camera,
             qnSyncTime->currentUSecsSinceEpoch(),
-            vms::event::NetworkConnectionClosedReason,
+            vms::event::EventReason::networkConnectionClosed,
             param));
 
         qnEventRuleProcessor->processEvent(networkEvent);
@@ -79,10 +79,10 @@ int QnDebugEventsRestHandler::testNetworkIssue(
         if (param.isEmpty())
             param = vms::event::NetworkIssueEvent::encodePacketLossSequence(1234, 5678);
 
-        vms::event::NetworkIssueEventPtr networkEvent(new class vms::event::NetworkIssueEvent(
+        vms::event::NetworkIssueEventPtr networkEvent(new vms::event::NetworkIssueEvent(
             camera,
             qnSyncTime->currentUSecsSinceEpoch(),
-            vms::event::NetworkRtpPacketLossReason,
+            vms::event::EventReason::networkRtpPacketLoss,
             param));
 
         qnEventRuleProcessor->processEvent(networkEvent);
@@ -104,7 +104,7 @@ int QnDebugEventsRestHandler::testCameraDisconnected(
     if (!cameraId.isEmpty())
         camera = owner->resourcePool()->getResourceByUniqueId<QnVirtualCameraResource>(cameraId);
 
-    vms::event::CameraDisconnectedEventPtr event(new class vms::event::CameraDisconnectedEvent(
+    vms::event::CameraDisconnectedEventPtr event(new vms::event::CameraDisconnectedEvent(
         camera, qnSyncTime->currentUSecsSinceEpoch()));
 
     qnEventRuleProcessor->processEvent(event);

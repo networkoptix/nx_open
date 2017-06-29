@@ -29,8 +29,8 @@ QnCameraOutputBusinessActionWidget::QnCameraOutputBusinessActionWidget(QWidget* 
 
             // Prolonged type of event has changed. In case of instant
             // action event state should be updated
-            if (checked && (model()->eventType() == nx::vms::event::UserDefinedEvent))
-                model()->setEventState(nx::vms::event::UndefinedState);
+            if (checked && (model()->eventType() == nx::vms::event::userDefinedEvent))
+                model()->setEventState(nx::vms::event::EventState::undefined);
 
             emit paramsChanged();
         });

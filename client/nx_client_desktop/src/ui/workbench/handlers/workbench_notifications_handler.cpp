@@ -125,13 +125,13 @@ void QnWorkbenchNotificationsHandler::addNotification(const vms::event::Abstract
 
     if (!isAdmin)
     {
-        if (eventType == vms::event::LicenseIssueEvent || eventType == vms::event::NetworkIssueEvent)
+        if (eventType == vms::event::licenseIssueEvent || eventType == vms::event::networkIssueEvent)
             return;
     }
 
-    if (eventType >= vms::event::SystemHealthEvent && eventType <= vms::event::MaxSystemHealthEvent)
+    if (eventType >= vms::event::systemHealthEvent && eventType <= vms::event::maxSystemHealthEvent)
     {
-        int healthMessage = eventType - vms::event::SystemHealthEvent;
+        int healthMessage = eventType - vms::event::systemHealthEvent;
         addSystemHealthEvent(QnSystemHealth::MessageType(healthMessage), action);
         return;
     }
@@ -139,7 +139,7 @@ void QnWorkbenchNotificationsHandler::addNotification(const vms::event::Abstract
     if (!context()->user())
         return;
 
-    if (action->actionType() == vms::event::ShowOnAlarmLayoutAction)
+    if (action->actionType() == vms::event::showOnAlarmLayoutAction)
     {
         /* Skip action if it contains list of users, and we are not on the list. */
         if (!QnBusiness::actionAllowedForUser(action->getParams(), context()->user()))
@@ -149,9 +149,9 @@ void QnWorkbenchNotificationsHandler::addNotification(const vms::event::Abstract
     bool alwaysNotify = false;
     switch (action->actionType())
     {
-        case vms::event::ShowOnAlarmLayoutAction:
-        case vms::event::PlaySoundAction:
-            //case vms::event::PlaySoundOnceAction: -- handled outside without notification
+        case vms::event::showOnAlarmLayoutAction:
+        case vms::event::playSoundAction:
+            //case vms::event::playSoundOnceAction: -- handled outside without notification
             alwaysNotify = true;
             break;
 
@@ -370,14 +370,14 @@ void QnWorkbenchNotificationsHandler::at_eventManager_actionReceived(
 
     switch (action->actionType())
     {
-        case vms::event::ShowPopupAction:
-        case vms::event::ShowOnAlarmLayoutAction:
+        case vms::event::showPopupAction:
+        case vms::event::showOnAlarmLayoutAction:
         {
             addNotification(action);
             break;
         }
 
-        case vms::event::PlaySoundOnceAction:
+        case vms::event::playSoundOnceAction:
         {
             QString filename = action->getParams().url;
             QString filePath = context()->instance<ServerNotificationCache>()->getFullPath(filename);
@@ -387,15 +387,15 @@ void QnWorkbenchNotificationsHandler::at_eventManager_actionReceived(
             break;
         }
 
-        case vms::event::PlaySoundAction:
+        case vms::event::playSoundAction:
         {
             switch (action->getToggleState())
             {
-                case vms::event::ActiveState:
+                case vms::event::EventState::active:
                     addNotification(action);
                     break;
 
-                case vms::event::InactiveState:
+                case vms::event::EventState::inactive:
                     emit notificationRemoved(action);
                     break;
 
@@ -405,7 +405,7 @@ void QnWorkbenchNotificationsHandler::at_eventManager_actionReceived(
             break;
         }
 
-        case vms::event::SayTextAction:
+        case vms::event::sayTextAction:
         {
             AudioPlayer::sayTextAsync(action->getParams().sayText);
             break;

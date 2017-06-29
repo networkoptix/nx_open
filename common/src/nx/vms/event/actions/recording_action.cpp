@@ -7,7 +7,7 @@ namespace vms {
 namespace event {
 
 RecordingAction::RecordingAction(const EventParameters& runtimeParams):
-    base_type(CameraRecordingAction, runtimeParams)
+    base_type(cameraRecordingAction, runtimeParams)
 {
 }
 

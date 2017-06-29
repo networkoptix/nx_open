@@ -36,27 +36,27 @@ QString StringsHelper::actionName(ActionType value) const
 {
     switch (value)
     {
-        case UndefinedAction:         return QString();
-        case BookmarkAction:          return tr("Bookmark");
-        case PanicRecordingAction:    return tr("Panic recording");
-        case SendMailAction:          return tr("Send Email");
-        case DiagnosticsAction:       return tr("Write to log");
-        case ShowPopupAction:         return tr("Show notification");
-        case PlaySoundAction:         return tr("Repeat sound");
-        case PlaySoundOnceAction:     return tr("Play sound");
-        case SayTextAction:           return tr("Speak");
-        case ExecutePtzPresetAction:  return tr("Execute PTZ preset");
-        case ShowTextOverlayAction:   return tr("Show text overlay");
-        case ShowOnAlarmLayoutAction: return tr("Show on Alarm Layout");
-        case ExecHttpRequestAction:   return tr("Do HTTP request");
+        case undefinedAction:         return QString();
+        case bookmarkAction:          return tr("Bookmark");
+        case panicRecordingAction:    return tr("Panic recording");
+        case sendMailAction:          return tr("Send Email");
+        case diagnosticsAction:       return tr("Write to log");
+        case showPopupAction:         return tr("Show notification");
+        case playSoundAction:         return tr("Repeat sound");
+        case playSoundOnceAction:     return tr("Play sound");
+        case sayTextAction:           return tr("Speak");
+        case executePtzPresetAction:  return tr("Execute PTZ preset");
+        case showTextOverlayAction:   return tr("Show text overlay");
+        case showOnAlarmLayoutAction: return tr("Show on Alarm Layout");
+        case execHttpRequestAction:   return tr("Do HTTP request");
 
-        case CameraOutputAction:
+        case cameraOutputAction:
             return QnDeviceDependentStrings::getDefaultNameFromSet(
                 resourcePool(),
                 tr("Device output"),
                 tr("Camera output"));
 
-        case CameraRecordingAction:
+        case cameraRecordingAction:
             return QnDeviceDependentStrings::getDefaultNameFromSet(
                 resourcePool(),
                 tr("Device recording"),
@@ -72,49 +72,49 @@ QString StringsHelper::actionName(ActionType value) const
 
 QString StringsHelper::eventName(EventType value, int count) const
 {
-    if (value >= UserDefinedEvent)
+    if (value >= userDefinedEvent)
     {
         QString result = tr("Generic Event");
-        if (value > UserDefinedEvent)
-            result += lit(" (%1)").arg((int)value - (int)UserDefinedEvent); // reserved for future use
+        if (value > userDefinedEvent)
+            result += lit(" (%1)").arg((int)value - (int)userDefinedEvent); // reserved for future use
         return result;
     }
 
     switch (value)
     {
-        case CameraMotionEvent:    return tr("Motion on Cameras", "", count);
-        case StorageFailureEvent:  return tr("Storage Failure");
-        case NetworkIssueEvent:    return tr("Network Issue");
-        case ServerFailureEvent:   return tr("Server Failure");
-        case ServerConflictEvent:  return tr("Server Conflict");
-        case ServerStartEvent:     return tr("Server Started");
-        case LicenseIssueEvent:    return tr("License Issue");
-        case BackupFinishedEvent:  return tr("Archive backup finished");
+        case cameraMotionEvent:    return tr("Motion on Cameras", "", count);
+        case storageFailureEvent:  return tr("Storage Failure");
+        case networkIssueEvent:    return tr("Network Issue");
+        case serverFailureEvent:   return tr("Server Failure");
+        case serverConflictEvent:  return tr("Server Conflict");
+        case serverStartEvent:     return tr("Server Started");
+        case licenseIssueEvent:    return tr("License Issue");
+        case backupFinishedEvent:  return tr("Archive backup finished");
 
-        case AnyServerEvent:       return tr("Any Server Issue");
-        case AnyEvent:             return tr("Any Event");
+        case anyServerEvent:       return tr("Any Server Issue");
+        case anyEvent:             return tr("Any Event");
 
-        case SoftwareTriggerEvent: return tr("Software Trigger");
+        case softwareTriggerEvent: return tr("Software Trigger");
 
-        case CameraInputEvent:
+        case cameraInputEvent:
             return QnDeviceDependentStrings::getDefaultNameFromSet(
                 resourcePool(),
                     tr("Input Signal on Devices", "", count),
                     tr("Input Signal on Cameras", "", count));
 
-        case CameraDisconnectEvent:
+        case cameraDisconnectEvent:
             return QnDeviceDependentStrings::getDefaultNameFromSet(
                 resourcePool(),
                 tr("Devices Disconnected", "", count),
                 tr("Cameras Disconnected", "", count));
 
-        case CameraIpConflictEvent:
+        case cameraIpConflictEvent:
             return QnDeviceDependentStrings::getDefaultNameFromSet(
                 resourcePool(),
                 tr("Devices IP Conflict", "", count),
                 tr("Cameras IP Conflict", "", count));
 
-        case AnyCameraEvent:
+        case anyCameraEvent:
             return QnDeviceDependentStrings::getDefaultNameFromSet(
                 resourcePool(),
                 tr("Any Device Issue"),
@@ -134,50 +134,50 @@ QString StringsHelper::eventAtResource(const EventParameters& params,
 
     switch (params.eventType)
     {
-        case UndefinedEvent:
+        case undefinedEvent:
             return tr("Undefined event has occurred on %1").arg(resourceName);
 
-        case CameraDisconnectEvent:
+        case cameraDisconnectEvent:
             return QnDeviceDependentStrings::getNameFromSet(resourcePool(),
                 QnCameraDeviceStringSet(
                     tr("Device %1 was disconnected"),
                     tr("Camera %1 was disconnected"),
                     tr("I/O Module %1 was disconnected")), camera).arg(resourceName);
 
-        case CameraInputEvent:
+        case cameraInputEvent:
             return tr("Input on %1").arg(resourceName);
 
-        case CameraMotionEvent:
+        case cameraMotionEvent:
             return tr("Motion on %1").arg(resourceName);
 
-        case StorageFailureEvent:
+        case storageFailureEvent:
             return tr("Storage Failure at %1").arg(resourceName);
 
-        case NetworkIssueEvent:
+        case networkIssueEvent:
             return tr("Network Issue at %1").arg(resourceName);
 
-        case ServerFailureEvent:
+        case serverFailureEvent:
             return tr("Server \"%1\" Failure").arg(resourceName);
 
-        case CameraIpConflictEvent:
+        case cameraIpConflictEvent:
             return QnDeviceDependentStrings::getDefaultNameFromSet(resourcePool(),
                 tr("Device IP Conflict at %1", "Device IP Conflict at <server_name>"),
                 tr("Camera IP Conflict at %1", "Camera IP Conflict at <server_name>"))
                 .arg(resourceName);
 
-        case ServerConflictEvent:
+        case serverConflictEvent:
             return tr("Server \"%1\" Conflict").arg(resourceName);
 
-        case ServerStartEvent:
+        case serverStartEvent:
             return tr("Server \"%1\" Started").arg(resourceName);
 
-        case LicenseIssueEvent:
+        case licenseIssueEvent:
             return tr("Server \"%1\" has a license problem").arg(resourceName);
 
-        case BackupFinishedEvent:
+        case backupFinishedEvent:
             return tr("Server \"%1\" has finished an archive backup").arg(resourceName);
 
-        case UserDefinedEvent:
+        case userDefinedEvent:
         {
             if (!params.caption.isEmpty())
                 return params.caption;
@@ -187,7 +187,7 @@ QString StringsHelper::eventAtResource(const EventParameters& params,
                 : tr("Generic Event at %1").arg(params.resourceName);
         }
 
-        case SoftwareTriggerEvent:
+        case softwareTriggerEvent:
             return tr("Software trigger %1 at %2")
                 .arg(getSoftwareTriggerName(params))
                 .arg(resourceName);
@@ -199,7 +199,7 @@ QString StringsHelper::eventAtResource(const EventParameters& params,
 
 QString StringsHelper::eventAtResources(const EventParameters& params) const
 {
-    if (params.eventType == SoftwareTriggerEvent)
+    if (params.eventType == softwareTriggerEvent)
     {
         return tr("Software Trigger %1 has been activated multiple times")
             .arg(getSoftwareTriggerName(params));
@@ -237,7 +237,7 @@ QStringList StringsHelper::eventDescription(const AbstractActionPtr& action,
     if (!sourceText.isEmpty())
         result << tr("Source: %1").arg(sourceText);
 
-    if (eventType >= UserDefinedEvent)
+    if (eventType >= userDefinedEvent)
     {
         if (!params.caption.isEmpty())
             result << tr("Caption: %1").arg(params.caption);
@@ -262,23 +262,23 @@ QStringList StringsHelper::eventDetails(const EventParameters& params) const
     QStringList result;
     switch (params.eventType)
     {
-        case CameraInputEvent:
+        case cameraInputEvent:
         {
             result << tr("Input Port: %1").arg(params.inputPortId);
             break;
         }
 
-        case StorageFailureEvent:
-        case NetworkIssueEvent:
-        case ServerFailureEvent:
-        case LicenseIssueEvent:
-        case BackupFinishedEvent:
+        case storageFailureEvent:
+        case networkIssueEvent:
+        case serverFailureEvent:
+        case licenseIssueEvent:
+        case backupFinishedEvent:
         {
             result << tr("Reason: %1").arg(eventReason(params));
             break;
         }
 
-        case CameraIpConflictEvent:
+        case cameraIpConflictEvent:
         {
             result << tr("Conflicting Address: %1").arg(params.caption);
             int n = 0;
@@ -288,7 +288,7 @@ QStringList StringsHelper::eventDetails(const EventParameters& params) const
             break;
         }
 
-        case ServerConflictEvent:
+        case serverConflictEvent:
         {
             if (!params.description.isEmpty())
             {
@@ -314,15 +314,15 @@ QStringList StringsHelper::eventDetails(const EventParameters& params) const
             break;
         }
 
-        case ServerStartEvent:
+        case serverStartEvent:
             break;
 
-        case UserDefinedEvent:
+        case userDefinedEvent:
             if (!params.description.isEmpty())
                 result << params.description;
             break;
 
-        case SoftwareTriggerEvent:
+        case softwareTriggerEvent:
             result << tr("Trigger: %1").arg(getSoftwareTriggerName(params));
             break;
 
@@ -394,13 +394,13 @@ QString StringsHelper::eventReason(const EventParameters& params) const
     QString result;
     switch (params.reasonCode)
     {
-        case NetworkNoFrameReason:
+        case EventReason::networkNoFrame:
         {
             int msecs = NetworkIssueEvent::decodeTimeoutMsecs(reasonParamsEncoded, 5000);
             result = tr("No data received during last %n seconds.", "", msecs / 1000);
             break;
         }
-        case NetworkConnectionClosedReason:
+        case EventReason::networkConnectionClosed:
         {
             bool isPrimaryStream = NetworkIssueEvent::decodePrimaryStream(reasonParamsEncoded, true);
 
@@ -413,7 +413,7 @@ QString StringsHelper::eventReason(const EventParameters& params) const
                 result = tr("Connection to camera (secondary stream) was unexpectedly closed.");
             break;
         }
-        case NetworkRtpPacketLossReason:
+        case EventReason::networkRtpPacketLoss:
         {
             NetworkIssueEvent::PacketLossSequence seq = NetworkIssueEvent::decodePacketLossSequence(reasonParamsEncoded);
             if (seq.valid)
@@ -422,82 +422,82 @@ QString StringsHelper::eventReason(const EventParameters& params) const
                 result = tr("RTP packet loss detected.");
             break;
         }
-        case NetworkNoResponseFromDevice:
+        case EventReason::networkNoResponseFromDevice:
         {
             return tr("Device does not respond to network requests.");
         }
-        case ServerTerminatedReason:
+        case EventReason::serverTerminated:
         {
             result = tr("Connection to server is lost.");
             break;
         }
-        case ServerStartedReason:
+        case EventReason::serverStarted:
         {
             result = tr("Server stopped unexpectedly.");
             break;
         }
-        case StorageIoErrorReason:
+        case EventReason::storageIoError:
         {
             QString storageUrl = reasonParamsEncoded;
             result = tr("I/O error has occurred at %1.").arg(storageUrl);
             break;
         }
-        case StorageTooSlowReason:
+        case EventReason::storageTooSlow:
         {
             QString storageUrl = reasonParamsEncoded;
             result = tr("Not enough HDD/SSD speed for recording to %1.").arg(storageUrl);
             break;
         }
-        case StorageFullReason:
+        case EventReason::storageFull:
         {
             QString storageUrl = reasonParamsEncoded;
             result = tr("HDD/SSD disk \"%1\" is full. Disk contains too much data that is not managed by VMS.").arg(storageUrl);
             break;
         }
-        case SystemStorageFullReason:
+        case EventReason::systemStorageFull:
         {
             QString storageUrl = reasonParamsEncoded;
             result = tr("System disk \"%1\" is almost full.").arg(storageUrl);
             break;
         }
-        case BackupFailedNoBackupStorageError:
+        case EventReason::backupFailedNoBackupStorageError:
         {
             result = tr("Archive backup failed: No available backup storages with sufficient free space");
             break;
         }
-        case BackupFailedSourceStorageError:
+        case EventReason::backupFailedSourceStorageError:
         {
             result = tr("Archive backup failed: Target storage failure");
             break;
         }
-        case BackupFailedSourceFileError:
+        case EventReason::backupFailedSourceFileError:
         {
             result = tr("Archive backup failed: Source file open/read error");
             break;
         }
-        case BackupFailedTargetFileError:
+        case EventReason::backupFailedTargetFileError:
         {
             result = tr("Archive backup failed: Target file create/write error");
             break;
         }
-        case BackupFailedChunkError:
+        case EventReason::backupFailedChunkError:
         {
             result = tr("Archive backup failed: File catalog error");
             break;
         }
-        case BackupEndOfPeriod:
+        case EventReason::backupEndOfPeriod:
         {
             qint64 timeStampMs = params.description.toLongLong();
             QDateTime dt = QDateTime::fromMSecsSinceEpoch(timeStampMs);
             // todo: #gdm add server/client timezone conversion
             result = tr("Archive backup finished, but is not fully completed because backup time is over. Data is backed up to %1").arg(dt.toString(Qt::DefaultLocaleShortDate));
         }
-        case BackupDone:
+        case EventReason::backupDone:
         {
             result = tr("Archive backup is successfully completed");
             break;
         }
-        case BackupCancelled:
+        case EventReason::backupCancelled:
         {
             qint64 timeStampMs = params.description.toLongLong();
             QDateTime dt = QDateTime::fromMSecsSinceEpoch(timeStampMs);
@@ -505,7 +505,7 @@ QString StringsHelper::eventReason(const EventParameters& params) const
             result = tr("Archive backup is canceled by user. Data is backed up to %1").arg(dt.toString(Qt::DefaultLocaleShortDate));
             break;
         }
-        case LicenseRemoved:
+        case EventReason::licenseRemoved:
         {
             QnVirtualCameraResourceList disabledCameras;
             for (const auto& id: reasonParamsEncoded.split(L';'))
@@ -601,11 +601,11 @@ QString StringsHelper::toggleStateToString(EventState state) const
 {
     switch (state)
     {
-        case ActiveState:
+        case EventState::active:
             return tr("start");
-        case InactiveState:
+        case EventState::inactive:
             return tr("stop");
-        case UndefinedState:
+        case EventState::undefined:
             return QString();
         default:
             return QString();
@@ -650,7 +650,7 @@ QString StringsHelper::getSoftwareTriggerName(const QString& id)
 
 QString StringsHelper::getSoftwareTriggerName(const EventParameters& params)
 {
-    NX_ASSERT(params.eventType == SoftwareTriggerEvent);
+    NX_ASSERT(params.eventType == softwareTriggerEvent);
     return getSoftwareTriggerName(params.caption);
 }
 

@@ -10,7 +10,7 @@ LicenseIssueEvent::LicenseIssueEvent(
     EventReason reasonCode,
     const QString& reasonText)
     :
-    base_type(event::LicenseIssueEvent, resource, timeStamp, reasonCode, reasonText)
+    base_type(licenseIssueEvent, resource, timeStamp, reasonCode, reasonText)
 {
 }
 

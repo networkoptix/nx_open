@@ -97,7 +97,7 @@ QnEventLogDialog::QnEventLogDialog(QWidget *parent):
 
     // init events model
     {
-        QStandardItem* rootItem = createEventTree(0, vms::event::AnyEvent);
+        QStandardItem* rootItem = createEventTree(0, vms::event::anyEvent);
         m_eventTypesModel->appendRow(rootItem);
         ui->eventComboBox->setModel(m_eventTypesModel);
     }
@@ -105,7 +105,7 @@ QnEventLogDialog::QnEventLogDialog(QWidget *parent):
     // init actions model
     {
         QStandardItem *anyActionItem = new QStandardItem(tr("Any Action"));
-        anyActionItem->setData(vms::event::UndefinedAction);
+        anyActionItem->setData(vms::event::undefinedAction);
         anyActionItem->setData(false, ProlongedActionRole);
         m_actionTypesModel->appendRow(anyActionItem);
 
@@ -200,7 +200,7 @@ bool QnEventLogDialog::isFilterExist() const
     QModelIndex idx = ui->eventComboBox->currentIndex();
     if (idx.isValid()) {
         vms::event::EventType eventType = (vms::event::EventType) m_eventTypesModel->itemFromIndex(idx)->data().toInt();
-        if (eventType != vms::event::UndefinedEvent && eventType != vms::event::AnyEvent)
+        if (eventType != vms::event::undefinedEvent && eventType != vms::event::anyEvent)
             return true;
     }
 
@@ -213,9 +213,9 @@ bool QnEventLogDialog::isFilterExist() const
 void QnEventLogDialog::reset()
 {
     disableUpdateData();
-    setEventType(vms::event::AnyEvent);
+    setEventType(vms::event::anyEvent);
     setCameraList(QSet<QnUuid>());
-    setActionType(vms::event::UndefinedAction);
+    setActionType(vms::event::undefinedAction);
     ui->dateRangeWidget->reset();
     enableUpdateData();
 }
@@ -228,22 +228,22 @@ void QnEventLogDialog::updateData()
     }
     m_updateDisabled = true;
 
-    vms::event::EventType eventType = vms::event::UndefinedEvent;
+    vms::event::EventType eventType = vms::event::undefinedEvent;
     {
         QModelIndex idx = ui->eventComboBox->currentIndex();
         if (idx.isValid())
             eventType = (vms::event::EventType) m_eventTypesModel->itemFromIndex(idx)->data().toInt();
 
-        bool serverIssue = vms::event::parentEvent(eventType) == vms::event::AnyServerEvent || eventType == vms::event::AnyServerEvent;
+        bool serverIssue = vms::event::parentEvent(eventType) == vms::event::anyServerEvent || eventType == vms::event::anyServerEvent;
         ui->cameraButton->setEnabled(!serverIssue);
         if (serverIssue)
             setCameraList(QSet<QnUuid>());
 
-        bool istantOnly = !vms::event::hasToggleState(eventType) && eventType != vms::event::UndefinedEvent;
+        bool istantOnly = !vms::event::hasToggleState(eventType) && eventType != vms::event::undefinedEvent;
         updateActionList(istantOnly);
     }
 
-    vms::event::ActionType actionType = vms::event::UndefinedAction;
+    vms::event::ActionType actionType = vms::event::undefinedAction;
     {
         int idx = ui->actionComboBox->currentIndex();
         actionType = (vms::event::ActionType) m_actionTypesModel->index(idx, 0).data(Qt::UserRole+1).toInt();
@@ -317,7 +317,7 @@ void QnEventLogDialog::retranslateUi()
     {
         const auto item = m_actionTypesModel->item(row);
         const auto type = static_cast<vms::event::ActionType>(item->data().toInt());
-        if (type == vms::event::UndefinedAction)
+        if (type == vms::event::undefinedAction)
             continue;
 
         const QString actionName = m_helper->actionName(type);
@@ -440,7 +440,7 @@ void QnEventLogDialog::at_filterAction_triggered()
 
     vms::event::EventType eventType = m_model->eventType(idx.row());
     vms::event::EventType parentEventType = vms::event::parentEvent(eventType);
-    if (parentEventType != vms::event::AnyEvent && parentEventType != vms::event::UndefinedEvent)
+    if (parentEventType != vms::event::anyEvent && parentEventType != vms::event::undefinedEvent)
         eventType = parentEventType;
 
     QSet<QnUuid> camList;
@@ -451,7 +451,7 @@ void QnEventLogDialog::at_filterAction_triggered()
     disableUpdateData();
     setEventType(eventType);
     setCameraList(camList);
-    setActionType(vms::event::UndefinedAction);
+    setActionType(vms::event::undefinedAction);
     enableUpdateData();
 }
 

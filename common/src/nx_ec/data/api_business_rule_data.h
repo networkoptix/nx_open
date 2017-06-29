@@ -10,7 +10,7 @@ namespace ec2
 {
     struct ApiBusinessRuleData: ApiIdData {
         ApiBusinessRuleData():
-            eventType(nx::vms::event::UndefinedEvent), eventState(nx::vms::event::UndefinedState), actionType(nx::vms::event::UndefinedAction),
+            eventType(nx::vms::event::undefinedEvent), eventState(nx::vms::event::EventState::undefined), actionType(nx::vms::event::undefinedAction),
             aggregationPeriod(0), disabled(false), system(false) {}
 
         nx::vms::event::EventType eventType;
@@ -35,7 +35,7 @@ namespace ec2
 
     struct ApiBusinessActionData: ApiData
     {
-        ApiBusinessActionData(): ApiData(), actionType(nx::vms::event::UndefinedAction), toggleState(nx::vms::event::UndefinedState), receivedFromRemoteHost(false), aggregationCount(0) {}
+        ApiBusinessActionData(): ApiData(), actionType(nx::vms::event::undefinedAction), toggleState(nx::vms::event::EventState::undefined), receivedFromRemoteHost(false), aggregationCount(0) {}
 
         nx::vms::event::ActionType actionType;
         nx::vms::event::EventState toggleState;

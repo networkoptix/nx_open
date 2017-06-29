@@ -255,7 +255,7 @@ bool QnEventLogModel::hasVideoLink(const vms::event::ActionData& action) const
         return true;
     }
 
-    if (eventType >= vms::event::UserDefinedEvent)
+    if (eventType >= vms::event::userDefinedEvent)
     {
         for (const QnUuid& id: action.eventParams.metadata.cameraRefs)
         {
@@ -336,7 +336,7 @@ QVariant QnEventLogModel::iconData(Column column, const vms::event::ActionData& 
         case ActionCameraColumn:
         {
             vms::event::ActionType actionType = action.actionType;
-            if (actionType == vms::event::SendMailAction)
+            if (actionType == vms::event::sendMailAction)
             {
                 if (!action.actionParams.emailAddress.isEmpty())
                 {
@@ -350,8 +350,8 @@ QVariant QnEventLogModel::iconData(Column column, const vms::event::ActionData& 
                     return QVariant();
                 }
             }
-            else if (actionType == vms::event::ShowPopupAction
-                  || actionType == vms::event::ShowOnAlarmLayoutAction)
+            else if (actionType == vms::event::showPopupAction
+                  || actionType == vms::event::showOnAlarmLayoutAction)
             {
                 QnUserResourceList users;
                 QList<QnUuid> roles;
@@ -408,16 +408,16 @@ QString QnEventLogModel::textData(Column column, const vms::event::ActionData& a
         {
             switch (action.actionType)
             {
-                case vms::event::SendMailAction:
+                case vms::event::sendMailAction:
                     return action.actionParams.emailAddress;
 
-                case vms::event::ShowPopupAction:
-                case vms::event::ShowOnAlarmLayoutAction:
+                case vms::event::showPopupAction:
+                case vms::event::showOnAlarmLayoutAction:
                     return action.actionParams.allUsers
                         ? tr("All users")
                         : getSubjectsText(action.actionParams.additionalResources);
 
-                case vms::event::ExecHttpRequestAction:
+                case vms::event::execHttpRequestAction:
                     return QUrl(action.actionParams.url).toString(QUrl::RemoveUserInfo);
 
                 default:
@@ -428,10 +428,10 @@ QString QnEventLogModel::textData(Column column, const vms::event::ActionData& a
         {
             switch (action.actionType)
             {
-                case vms::event::ShowOnAlarmLayoutAction:
+                case vms::event::showOnAlarmLayoutAction:
                     return getResourceNameString(action.actionParams.actionResourceId);
 
-                case vms::event::ShowTextOverlayAction:
+                case vms::event::showTextOverlayAction:
                 {
                     const auto text = action.actionParams.text.trimmed();
                     if (!text.isEmpty())
@@ -444,7 +444,7 @@ QString QnEventLogModel::textData(Column column, const vms::event::ActionData& a
             vms::event::EventType eventType = action.eventParams.eventType;
             QString result;
 
-            if (eventType == vms::event::CameraMotionEvent)
+            if (eventType == vms::event::cameraMotionEvent)
             {
                 if (hasVideoLink(action))
                 {
@@ -479,7 +479,7 @@ QString QnEventLogModel::tooltip(Column column, const vms::event::ActionData& ac
     static const auto kDelimiter = L'\n';
     static const int kMaxResourcesCount = 20;
 
-    if (column == ActionCameraColumn && action.actionType == vms::event::ShowOnAlarmLayoutAction)
+    if (column == ActionCameraColumn && action.actionType == vms::event::showOnAlarmLayoutAction)
     {
         const auto& users = action.actionParams.additionalResources;
 
@@ -513,8 +513,8 @@ QString QnEventLogModel::tooltip(Column column, const vms::event::ActionData& ac
     QString result = textData(column, action);
     //TODO: #GDM #3.1 following block must be moved to ::eventDetails method. Problem is to display
     // too long text in the column (::textData() method).
-    if (action.eventParams.eventType == vms::event::LicenseIssueEvent
-        && action.eventParams.reasonCode == vms::event::LicenseRemoved)
+    if (action.eventParams.eventType == vms::event::licenseIssueEvent
+        && action.eventParams.reasonCode == vms::event::EventReason::licenseRemoved)
     {
         QStringList disabledCameras;
         for (const QString& stringId: action.eventParams.description.split(L';'))
@@ -696,7 +696,7 @@ vms::event::EventType QnEventLogModel::eventType(int row) const
         const vms::event::ActionData& action = m_index->at(row);
         return action.eventParams.eventType;
     }
-    return vms::event::UndefinedEvent;
+    return vms::event::undefinedEvent;
 }
 
 QnResourcePtr QnEventLogModel::eventResource(int row) const
@@ -714,7 +714,7 @@ qint64 QnEventLogModel::eventTimestamp(int row) const
     if (row >= 0)
     {
         const vms::event::ActionData& action = m_index->at(row);
-        const bool accessDenied = ((action.eventParams.eventType == vms::event::CameraMotionEvent)
+        const bool accessDenied = ((action.eventParams.eventType == vms::event::cameraMotionEvent)
             && !hasAccessToArchive(action.eventParams.eventResourceId));
 
         return (accessDenied ? AV_NOPTS_VALUE : action.eventParams.eventTimestampUsec);

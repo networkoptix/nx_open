@@ -947,9 +947,9 @@ int QnMediaServerConnection::getEventLogAsync(
     }
     if (!businessRuleId.isNull())
         params << QnRequestParam("brule_id", businessRuleId);
-    if (eventType != vms::event::UndefinedEvent)
+    if (eventType != vms::event::undefinedEvent)
         params << QnRequestParam("event", (int) eventType);
-    if (actionType != vms::event::UndefinedAction)
+    if (actionType != vms::event::undefinedAction)
         params << QnRequestParam("action", (int) actionType);
 
     return sendAsyncGetRequestLogged(EventLogObject,

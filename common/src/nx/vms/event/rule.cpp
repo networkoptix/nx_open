@@ -21,10 +21,10 @@ static const QList<QnUuid> kOwnerRoleIds {
 
 Rule::Rule() :
     m_id(),
-    m_eventType(UndefinedEvent),
-    m_eventState(ActiveState), //< By default, rule triggers on toggle event start.
+    m_eventType(undefinedEvent),
+    m_eventState(EventState::active), //< By default, rule triggers on toggle event start.
                                //< For example, if motion starts/stops, send alert on start only.
-    m_actionType(UndefinedAction),
+    m_actionType(undefinedAction),
     m_aggregationPeriod(0),
     m_disabled(false),
     m_system(false)
@@ -199,7 +199,7 @@ Rule::Rule(
     EventType bEventType, const QList<QnUuid>& subjectIds, bool allUsers)
 {
     m_disabled = false;
-    m_eventState = UndefinedState;
+    m_eventState = EventState::undefined;
 
     m_id = intToGuid(internalId, "vms_businessrule");
     m_aggregationPeriod = aggregationPeriod;
@@ -255,22 +255,22 @@ void Rule::removeResource(const QnUuid& resId)
 RuleList Rule::getDefaultRules()
 {
     RuleList result;
-    result << RulePtr(new Rule(1,  30,      0, ShowPopupAction,   CameraDisconnectEvent, {}, true));
-    result << RulePtr(new Rule(2,  30,      0, ShowPopupAction,   StorageFailureEvent,   {}, true));
-    result << RulePtr(new Rule(3,  30,      0, ShowPopupAction,   NetworkIssueEvent,     {}, true));
-    result << RulePtr(new Rule(4,  30,      0, ShowPopupAction,   CameraIpConflictEvent, {}, true));
-    result << RulePtr(new Rule(5,  30,      0, ShowPopupAction,   ServerFailureEvent,    {}, true));
-    result << RulePtr(new Rule(6,  30,      0, ShowPopupAction,   ServerConflictEvent,   {}, true));
-    result << RulePtr(new Rule(7,  21600,   0, SendMailAction,    CameraDisconnectEvent, kOwnerRoleIds));
-    result << RulePtr(new Rule(8,  24*3600, 0, SendMailAction,    StorageFailureEvent,   kOwnerRoleIds));
-    result << RulePtr(new Rule(9,  21600,   0, SendMailAction,    NetworkIssueEvent,     kOwnerRoleIds));
-    result << RulePtr(new Rule(10, 21600,   0, SendMailAction,    CameraIpConflictEvent, kOwnerRoleIds));
-    result << RulePtr(new Rule(11, 21600,   0, SendMailAction,    ServerFailureEvent,    kOwnerRoleIds));
-    result << RulePtr(new Rule(12, 21600,   0, SendMailAction,    ServerConflictEvent,   kOwnerRoleIds));
-    result << RulePtr(new Rule(20, 21600,   0, SendMailAction,    ServerStartEvent,      kOwnerRoleIds));
+    result << RulePtr(new Rule(1,  30,      0, showPopupAction,   cameraDisconnectEvent, {}, true));
+    result << RulePtr(new Rule(2,  30,      0, showPopupAction,   storageFailureEvent,   {}, true));
+    result << RulePtr(new Rule(3,  30,      0, showPopupAction,   networkIssueEvent,     {}, true));
+    result << RulePtr(new Rule(4,  30,      0, showPopupAction,   cameraIpConflictEvent, {}, true));
+    result << RulePtr(new Rule(5,  30,      0, showPopupAction,   serverFailureEvent,    {}, true));
+    result << RulePtr(new Rule(6,  30,      0, showPopupAction,   serverConflictEvent,   {}, true));
+    result << RulePtr(new Rule(7,  21600,   0, sendMailAction,    cameraDisconnectEvent, kOwnerRoleIds));
+    result << RulePtr(new Rule(8,  24*3600, 0, sendMailAction,    storageFailureEvent,   kOwnerRoleIds));
+    result << RulePtr(new Rule(9,  21600,   0, sendMailAction,    networkIssueEvent,     kOwnerRoleIds));
+    result << RulePtr(new Rule(10, 21600,   0, sendMailAction,    cameraIpConflictEvent, kOwnerRoleIds));
+    result << RulePtr(new Rule(11, 21600,   0, sendMailAction,    serverFailureEvent,    kOwnerRoleIds));
+    result << RulePtr(new Rule(12, 21600,   0, sendMailAction,    serverConflictEvent,   kOwnerRoleIds));
+    result << RulePtr(new Rule(20, 21600,   0, sendMailAction,    serverStartEvent,      kOwnerRoleIds));
 
-    result << RulePtr(new Rule(22, 21600,   0, SendMailAction,    LicenseIssueEvent,     kOwnerRoleIds));
-    result << RulePtr(new Rule(23, 30,      0, ShowPopupAction,   LicenseIssueEvent,     {}, true));
+    result << RulePtr(new Rule(22, 21600,   0, sendMailAction,    licenseIssueEvent,     kOwnerRoleIds));
+    result << RulePtr(new Rule(23, 30,      0, showPopupAction,   licenseIssueEvent,     {}, true));
 
     result << getSystemRules() << getRulesUpd43() << getRulesUpd48();
     return result;
@@ -279,28 +279,28 @@ RuleList Rule::getDefaultRules()
 RuleList Rule::getSystemRules()
 {
     return {
-        RulePtr(new Rule(900013, 30, 1, DiagnosticsAction, CameraDisconnectEvent)),
-        RulePtr(new Rule(900014, 30, 1, DiagnosticsAction, StorageFailureEvent)),
-        RulePtr(new Rule(900015, 30, 1, DiagnosticsAction, NetworkIssueEvent)),
-        RulePtr(new Rule(900016, 30, 1, DiagnosticsAction, CameraIpConflictEvent)),
-        RulePtr(new Rule(900017, 30, 1, DiagnosticsAction, ServerFailureEvent)),
-        RulePtr(new Rule(900018, 30, 1, DiagnosticsAction, ServerConflictEvent)),
-        RulePtr(new Rule(900019, 0,  1, DiagnosticsAction, ServerStartEvent)),
-        RulePtr(new Rule(900021, 30, 1, DiagnosticsAction, LicenseIssueEvent)) };
+        RulePtr(new Rule(900013, 30, 1, diagnosticsAction, cameraDisconnectEvent)),
+        RulePtr(new Rule(900014, 30, 1, diagnosticsAction, storageFailureEvent)),
+        RulePtr(new Rule(900015, 30, 1, diagnosticsAction, networkIssueEvent)),
+        RulePtr(new Rule(900016, 30, 1, diagnosticsAction, cameraIpConflictEvent)),
+        RulePtr(new Rule(900017, 30, 1, diagnosticsAction, serverFailureEvent)),
+        RulePtr(new Rule(900018, 30, 1, diagnosticsAction, serverConflictEvent)),
+        RulePtr(new Rule(900019, 0,  1, diagnosticsAction, serverStartEvent)),
+        RulePtr(new Rule(900021, 30, 1, diagnosticsAction, licenseIssueEvent)) };
 }
 
 RuleList Rule::getRulesUpd43()
 {
     return {
-        RulePtr(new Rule(24,     0, 0, ShowPopupAction,   UserDefinedEvent, {}, true)),
-        RulePtr(new Rule(900022, 0, 1, DiagnosticsAction, UserDefinedEvent)) };
+        RulePtr(new Rule(24,     0, 0, showPopupAction,   userDefinedEvent, {}, true)),
+        RulePtr(new Rule(900022, 0, 1, diagnosticsAction, userDefinedEvent)) };
 }
 
 RuleList Rule::getRulesUpd48()
 {
     return {
-        RulePtr(new Rule(900023, 0, 0, ShowPopupAction,   BackupFinishedEvent, {}, true)),
-        RulePtr(new Rule(900024, 0, 1, DiagnosticsAction, BackupFinishedEvent)) };
+        RulePtr(new Rule(900023, 0, 0, showPopupAction,   backupFinishedEvent, {}, true)),
+        RulePtr(new Rule(900024, 0, 1, diagnosticsAction, backupFinishedEvent)) };
 }
 
 } // namespace event
