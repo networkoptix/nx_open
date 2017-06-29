@@ -39,7 +39,7 @@ function(add_android_apk target)
         "    \"ndk\": \"${CMAKE_ANDROID_NDK}\",\n"
         "    \"toolchain-prefix\": \"${CMAKE_CXX_ANDROID_TOOLCHAIN_MACHINE}\",\n"
         "    \"tool-prefix\": \"${CMAKE_CXX_ANDROID_TOOLCHAIN_MACHINE}\",\n"
-        "    \"toolchain-version\": \"${CMAKE_ANDROID_NDK_TOOLCHAIN_VERSION}\",\n"
+        "    \"toolchain-version\": \"4.9\",\n"
         "    \"ndk-host\": \"${CMAKE_ANDROID_NDK_TOOLCHAIN_HOST_TAG}\",\n"
         "    \"target-architecture\": \"${CMAKE_ANDROID_ARCH_ABI}\",\n"
         "    \"android-package-source-directory\": \"${APK_PACKAGE_SOURCE}\",\n"

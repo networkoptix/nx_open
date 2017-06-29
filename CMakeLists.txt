@@ -32,7 +32,10 @@ project(vms VERSION 3.1.0)
 
 set(releaseVersion ${PROJECT_VERSION})
 set(releaseVersion.short ${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR})
-set(releaseVersion.full ${PROJECT_VERSION}.${buildNumber})
+set(releaseVersion.full ${releaseVersion}.${buildNumber})
+
+set(mobileClientVersion 17.2)
+set(mobileClientVersion.full ${mobileClientVersion}.${buildNumber})
 
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
@@ -92,7 +95,6 @@ if(LINUX)
 endif()
 
 if(ANDROID)
-    include(android-ndk-workaround)
     include(android-apk)
 endif()
 

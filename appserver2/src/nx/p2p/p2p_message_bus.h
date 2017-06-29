@@ -89,7 +89,7 @@ public:
         ApiPersistentIdData peerId(tran.peerID, tran.params.peer.persistentId);
         m_lastRuntimeInfo[peerId] = tran.params;
         for (const auto& connection : m_connections)
-            sendTransactionImpl(connection, tran);
+            sendTransactionImpl(connection, tran, TransportHeader());
     }
 
     template<class T>
@@ -97,7 +97,15 @@ public:
     {
         QnMutexLocker lock(&m_mutex);
         for (const auto& connection: m_connections)
-            sendTransactionImpl(connection, tran);
+            sendTransactionImpl(connection, tran, TransportHeader());
+    }
+
+    template<class T>
+    void sendTransaction(const ec2::QnTransaction<T>& tran, const TransportHeader& header)
+    {
+        QnMutexLocker lock(&m_mutex);
+        for (const auto& connection : m_connections)
+            sendTransactionImpl(connection, tran, header);
     }
 
     template<class T>
@@ -113,12 +121,18 @@ public:
 
 private:
     template<class T>
-    void sendTransactionImpl(const P2pConnectionPtr& connection, const ec2::QnTransaction<T>& tran)
+    void sendTransactionImpl(
+        const P2pConnectionPtr& connection,
+        const ec2::QnTransaction<T>& tran,
+        TransportHeader transportHeader)
     {
         NX_ASSERT(tran.command != ApiCommand::NotDefined);
 
         if (!connection->shouldTransactionBeSentToPeer(tran))
             return; //< This peer doesn't handle transactions of such type.
+
+        if (transportHeader.via.find(connection->remotePeer().id) != transportHeader.via.end())
+            return; //< Already processed by remote peer
 
         const ApiPersistentIdData remotePeer(connection->remotePeer());
         const auto& descriptor = ec2::getTransactionDescriptorByTransaction(tran);
@@ -166,8 +180,18 @@ private:
                 m_jsonTranSerializer->serializedTransactionWithoutHeader(tran) + QByteArray("\r\n"));
             break;
         case Qn::UbjsonFormat:
-            connection->sendMessage(MessageType::pushTransactionData,
-                m_ubjsonTranSerializer->serializedTransactionWithoutHeader(tran));
+            if (descriptor->isPersistent)
+            {
+                connection->sendMessage(MessageType::pushTransactionData,
+                    m_ubjsonTranSerializer->serializedTransactionWithoutHeader(tran));
+            }
+            else
+            {
+                TransportHeader header(transportHeader);
+                header.via.insert(localPeer().id);
+                connection->sendMessage(MessageType::pushImpersistentBroadcastTransaction,
+                    m_ubjsonTranSerializer->serializedTransactionWithHeader(tran, header));
+            }
             break;
         default:
             qWarning() << "Client has requested data in an unsupported format"
@@ -176,11 +200,10 @@ private:
         }
     }
 
-
     template<class T>
     void sendUnicastTransaction(const QnTransaction<T>& tran, const QnPeerSet& dstPeers)
     {
-        QMap<P2pConnectionPtr, UnicastTransactionRecords> dstByConnection;
+        QMap<P2pConnectionPtr, TransportHeader> dstByConnection;
 
         // split dstPeers by connection
         for (const auto& peer : dstPeers)
@@ -188,7 +211,7 @@ private:
             qint32 distance = kMaxDistance;
             auto dstPeer = routeToPeerVia(peer, &distance);
             if (auto& connection = m_connections.value(dstPeer))
-                dstByConnection[connection].push_back(UnicastTransactionRecord(peer, distance + 1));
+                dstByConnection[connection].dstPeers.push_back(peer);
         }
         sendUnicastTransactionImpl(tran, dstByConnection);
     }
@@ -196,15 +219,21 @@ private:
     template<class T>
     void sendUnicastTransactionImpl(
         const QnTransaction<T>& tran,
-        const QMap<P2pConnectionPtr,UnicastTransactionRecords>& dstByConnection)
+        const QMap<P2pConnectionPtr, TransportHeader>& dstByConnection)
     {
         for (auto itr = dstByConnection.begin(); itr != dstByConnection.end(); ++itr)
         {
             const auto& connection = itr.key();
+            TransportHeader transportHeader = itr.value();
+
+            if (transportHeader.via.find(connection->remotePeer().id) != transportHeader.via.end())
+                continue; //< Already processed by remote peer
+
             switch (connection->remotePeer().dataFormat)
             {
             case Qn::JsonFormat:
-                if (itr->size() == 1 && itr.value()[0].dstPeer == connection->remotePeer().id)
+                if (transportHeader.dstPeers.size() == 1
+                    && transportHeader.dstPeers[0] == connection->remotePeer().id)
                 {
                     connection->sendMessage(
                         m_jsonTranSerializer->serializedTransactionWithoutHeader(tran) + QByteArray("\r\n"));
@@ -215,9 +244,9 @@ private:
                 }
                 break;
             case Qn::UbjsonFormat:
-                connection->sendMessage(MessageType::pushUnicastTransaction,
-                    serializeUnicastHeader(itr.value()).append(
-                    m_ubjsonTranSerializer->serializedTransactionWithoutHeader(tran)));
+                transportHeader.via.insert(localPeer().id);
+                connection->sendMessage(MessageType::pushImpersistentUnicastTransaction,
+                    m_ubjsonTranSerializer->serializedTransactionWithHeader(tran, transportHeader));
                 break;
             default:
                 qWarning() << "Client has requested data in an unsupported format"
@@ -266,9 +295,10 @@ private:
     bool handleResolvePeerNumberResponse(const P2pConnectionPtr& connection, const QByteArray& data);
     bool handlePeersMessage(const P2pConnectionPtr& connection, const QByteArray& data);
     bool handleSubscribeForDataUpdates(const P2pConnectionPtr& connection, const QByteArray& data);
-    bool handlePushTransactionData(const P2pConnectionPtr& connection, const QByteArray& data);
+    bool handlePushTransactionData(const P2pConnectionPtr& connection, const QByteArray& data, const TransportHeader& header);
     bool handlePushTransactionList(const P2pConnectionPtr& connection, const QByteArray& tranList);
-    bool handleUnicastTransaction(const P2pConnectionPtr& connection, const QByteArray& tranList);
+    template <typename Function>
+    bool handleTransactionWithHeader(const P2pConnectionPtr& connection, const QByteArray& data, Function function);
 
     friend struct GotTransactionFuction;
     friend struct GotUnicastTransactionFuction;
@@ -276,21 +306,25 @@ private:
 
     void gotTransaction(
         const QnTransaction<ApiUpdateSequenceData> &tran,
-        const P2pConnectionPtr& connection);
+        const P2pConnectionPtr& connection,
+        const TransportHeader& transportHeader);
     void gotTransaction(
         const QnTransaction<ApiRuntimeData> &tran,
-        const P2pConnectionPtr& connection);
+        const P2pConnectionPtr& connection,
+        const TransportHeader& transportHeader);
 
     template <class T>
-    void gotTransaction(const QnTransaction<T>& tran,const P2pConnectionPtr& connection);
+    void gotTransaction(const QnTransaction<T>& tran,const P2pConnectionPtr& connection, const TransportHeader& transportHeader);
 
     template <class T>
     void gotUnicastTransaction(
         const QnTransaction<T>& tran,
         const P2pConnectionPtr& connection,
-        const UnicastTransactionRecords& records);
+        const TransportHeader& records);
 
-    void proxyFillerTransaction(const ec2::QnAbstractTransaction& tran);
+    void proxyFillerTransaction(
+        const ec2::QnAbstractTransaction& tran,
+        const TransportHeader& transportHeader);
     bool needSubscribeDelay();
     void connectSignals(const P2pConnectionPtr& connection);
     void resotreAfterDbError();
@@ -307,7 +341,7 @@ private:
     void sendRuntimeData(const P2pConnectionPtr& connection, const QList<ApiPersistentIdData>& peers);
     void cleanupRuntimeInfo(const ec2::ApiPersistentIdData& peer);
 
-    /** Don't show connection in 'aliveMessage' due to most client connections should stay local for current server */
+    /**  Local connections are not supposed to be shown in 'aliveMessage' */
     bool isLocalConnection(const ApiPersistentIdData& peer) const;
 public:
     bool needStartConnection(

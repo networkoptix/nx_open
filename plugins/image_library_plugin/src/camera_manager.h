@@ -73,7 +73,7 @@ private:
     nxpt::ScopedRef<ImageLibraryPlugin> m_pluginRef;
     nxcip::CameraInfo m_info;
     unsigned int m_capabilities;
-    std::auto_ptr<MediaEncoder> m_encoder[2];
+    std::unique_ptr<MediaEncoder> m_encoder[2];
     mutable DirContentsManager m_dirContentsManager;
 };
 

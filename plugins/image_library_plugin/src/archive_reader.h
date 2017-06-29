@@ -73,7 +73,7 @@ public:
 
 private:
     nxpt::CommonRefManager m_refManager;
-    std::auto_ptr<StreamReader> m_streamReader;
+    std::unique_ptr<StreamReader> m_streamReader;
     DirContentsManager* const m_dirContentsManager;
 };
 
