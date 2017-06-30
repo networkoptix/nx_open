@@ -339,7 +339,15 @@ bool ModuleConnector::Module::saveConnection(
     m_disconnectTimer.reset();
 
     auto socket = client->takeSocket();
-    if (!socket->setRecvTimeout(0) || !socket->setKeepAlive(kKeepAliveOptions))
+    std::chrono::milliseconds recvTimeout;
+    if (!socket->setKeepAlive(kKeepAliveOptions))
+    {
+        recvTimeout = kKeepAliveOptions.maxDelay();
+        NX_VERBOSE(this, lm("Unable to set keep alive for %1 (%2), drop connection in %3").args(
+            m_id, SystemError::getLastOSErrorText(), recvTimeout));
+    }
+
+    if (!socket->setRecvTimeout(recvTimeout))
     {
         NX_WARNING(this, lm("Unable to save connection to %1: %2").args(
             m_id, SystemError::getLastOSErrorText()));
@@ -354,8 +362,8 @@ bool ModuleConnector::Module::saveConnection(
     m_socket->readSomeAsync(buffer.get(),
         [this, buffer](SystemError::ErrorCode code, size_t size)
         {
-            NX_VERBOSE(this, lm("Unexpectd connection read size=%1: %2").args(
-                size, SystemError::toString(code)));
+            NX_VERBOSE(this, lm("Unexpected connection to %1 read size=%2: %3").args(
+                m_id, size, SystemError::toString(code)));
 
             m_socket.reset();
             connectToGroup(m_endpoints.begin()); //< Reconnect attempt.
