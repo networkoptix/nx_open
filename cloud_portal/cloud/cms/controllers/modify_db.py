@@ -4,9 +4,21 @@ from notifications.tasks import send_email
 
 from api.models import Account
 from cms.models import *
+from cms.forms import *
 
-def get_post_request_params(request_data): 
+def get_context_and_language(request_data): 
 	return Context.objects.get(id=request_data['context']), Language.objects.get(id=request_data['language'])
+
+
+def get_post_parameters(request):
+	context, language = get_context_and_language(request.data)
+	
+	form = CustomContextForm(initial={'language': language.id, 'context': context.id})
+	
+	customization = Customization.objects.get(name=settings.CUSTOMIZATION)		
+	user = Account.objects.get(email=request.user)
+
+	return context, language, form, customization, user 
 
 
 def accept_latest_draft(user):
@@ -69,3 +81,33 @@ def alter_records_version(contexts, customization, old_version, new_version):
 			for record in records:
 				record.version = new_version
 				record.save()
+
+
+def generate_preview(customization, language, data_structures, request_data, user):
+	save_unrevisioned_records(customization, language, data_structures, request_data, user)
+	fill_content(customization_name=settings.CUSTOMIZATION)
+	return context.url + "?preview"
+
+
+def publish_latest_version(user):
+	accept_latest_draft(user)
+	fill_content(customization_name=settings.CUSTOMIZATION, preview=False)
+
+
+def send_version_for_review(customization, language, data_structures, request_data, user):
+	old_versions = ContentVersion.objects.filter(accepted_date=None)
+
+	if old_versions.exists():
+		old_version = old_versions.latest('created_date')
+		alter_records_version(Context.objects.all(), customization, old_version, None)
+		old_version.delete()
+
+	save_unrevisioned_records(customization, language, data_structures, request_data, user)
+
+	version = ContentVersion(customization=customization, name="N/A", created_by=user)
+	version.save()
+
+	alter_records_version(Context.objects.all(), customization, None, version)
+	#TODO add notification need to make template for this
+	#notify_version_ready()
+
