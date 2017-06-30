@@ -1063,10 +1063,14 @@ void QnWorkbenchDisplay::bringToFront(QnWorkbenchItem *item)
 
 bool QnWorkbenchDisplay::addItemInternal(QnWorkbenchItem *item, bool animate, bool startDisplay)
 {
-    if (m_widgets.size() >= qnRuntime->maxSceneItems())
+    int maxItems = m_lightMode.testFlag(Qn::LightModeSingleItem)
+        ? 1
+        : qnSettings->maxSceneVideoItems();
+
+    if (m_widgets.size() >= maxItems)
     {
         NX_LOG(lit("QnWorkbenchDisplay::addItemInternal: item count limit exceeded %1")
-            .arg(qnRuntime->maxSceneItems()), cl_logDEBUG1);
+            .arg(maxItems), cl_logDEBUG1);
         qnDeleteLater(item);
         return false;
     }
