@@ -34,7 +34,7 @@ Item
 
     signal connectRequested();
 
-    height: collapsedArea.height + expandedArea.height;
+    height: collapsedArea.height + expandedArea.height + collapsedArea.y
 
     anchors.left: (parent ? parent.left : undefined);
     anchors.right: (parent ? parent.right : undefined);
@@ -71,15 +71,16 @@ Item
         onDataChanged: { control.impl.updatePasswordData(startRow); }
     }
 
-    Column
+    Item
     {
         id: collapsedArea;
 
-        topPadding: 12;
-        anchors.left: parent.left;
-        anchors.right: parent.right;
+        property int spacing: hostChooseItem.isMasked || userChooseItem.isMasked ? 8 : 2
 
-        spacing: (hostChooseItem.isMasked || userChooseItem.isMasked ? 8 : 2);
+        y: 12
+        width: parent.width
+        //(userChooseItem.visible || indicatorsRow.opacity == 0 ? bottomControls.height : 0)
+        height: hostChooseItem.height + spacing + bottomControls.height
 
         InfoItem
         {
@@ -87,6 +88,7 @@ Item
 
             model: control.hostsModel;
 
+            anchors.top: parent.top
             anchors.left: parent.left
             anchors.right: parent.right
 
@@ -109,9 +111,15 @@ Item
 
         Item
         {
+            id: bottomControls
+
+            anchors.top: hostChooseItem.bottom
+            anchors.topMargin: collapsedArea.spacing
             width: parent.width
-            height: Math.max(userChooseItem.height, indicatorsRow.height)
-            visible: userChooseItem.visible || indicatorsRow.opacity == 1
+            height: Math.max(
+                userChooseItem.visible ? userChooseItem.height : 0,
+                indicatorsRow.opacity == 1 ? indicatorsRow.height : 0)
+            clip: !userChooseItem.visible || indicatorsRow.opacity == 0
 
             InfoItem
             {
