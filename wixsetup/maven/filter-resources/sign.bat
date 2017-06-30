@@ -4,7 +4,7 @@ SET CERTIFICATE=${sign.intermediate.cer}
 
 IF ["${beta}"] == ["false"] IF ["${installer.token}"] == ["true"] (
     call ${environment.dir}\bin\signtool.exe sign /td sha256 /fd sha256 http://timestamp.digicert.com /d "${company.name} ${display.product.name}" %*
-    exit %ERRORLEVEL%
+    exit 0
 )
 
 IF NOT [%PASSWORD%] == [] (
