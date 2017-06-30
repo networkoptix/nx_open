@@ -4145,6 +4145,7 @@ bool QnPlOnvifResource::isCameraForcedToOnvif(const QString& manufacturer, const
 
 bool QnPlOnvifResource::initialize2WayAudio()
 {
+    // TODO: move this function to the PhysicalCamResource class
     const QnResourceData resourceData = qnCommon->dataPool()->data(toSharedPointer(this));
     TwoWayAudioParams params = resourceData.value<TwoWayAudioParams>(Qn::TWO_WAY_AUDIO_PARAM_NAME);
     if (params.codec.isEmpty() || params.urlPath.isEmpty())
