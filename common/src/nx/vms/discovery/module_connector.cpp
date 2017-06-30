@@ -12,7 +12,7 @@ static const auto kUrl =
     lit("http://%1/api/moduleInformation?showAddresses=false&keepConnectionOpen");
 
 static const KeepAliveOptions kKeepAliveOptions(
-    std::chrono::seconds(10), std::chrono::seconds(5), 5);
+    std::chrono::seconds(10), std::chrono::seconds(3), 5);
 
 static const network::RetryPolicy kDefaultDetryPolicy(
     network::RetryPolicy::kInfiniteRetries, std::chrono::seconds(5), 2, std::chrono::minutes(10));
@@ -334,12 +334,10 @@ bool ModuleConnector::Module::saveConnection(
 
     for (const auto& client: m_httpClients)
         client->pleaseStopSync();
-    m_httpClients.clear();
 
-    // TODO: Currently mediaserver keepAlive timeout is set to 5 seconds, it means we will go
-    // for reconnect attempt every timeout. It looks like we do not have any options for
-    // old servers.
-    // For new servers we could use WebSocket streams to reduce traffic to WebSocket keep alives.
+    m_httpClients.clear();
+    m_disconnectTimer.reset();
+
     auto socket = client->takeSocket();
     if (!socket->setRecvTimeout(0) || !socket->setKeepAlive(kKeepAliveOptions))
     {
@@ -361,6 +359,11 @@ bool ModuleConnector::Module::saveConnection(
 
             m_socket.reset();
             connectToGroup(m_endpoints.begin()); //< Reconnect attempt.
+
+            // Make sure we report disconnect in a limited time.
+            m_disconnectTimer.reset(new network::aio::Timer(m_timer.getAioThread()));
+            m_disconnectTimer->start(kKeepAliveOptions.inactivityPeriodBeforeFirstProbe,
+                [this](){ m_parent->m_disconnectedHandler(m_id); });
         });
 
     auto ip = m_socket->getForeignAddress().address;
