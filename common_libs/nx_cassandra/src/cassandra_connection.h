@@ -5,13 +5,32 @@
 namespace nx {
 namespace cassandra {
 
-class AsyncConnection
+class Query
 {
 public:
-    AsyncConnection(const char* host);
-    ~AsyncConnection();
+private:
+};
 
-    void init(nx::utils::MoveOnlyFunc<void(CassError)> initCb);
+class QueryResult
+{
+public:
+private:
+};
+
+class Connection
+{
+public:
+    Connection(const char* host);
+    ~Connection();
+
+    void initAsync(nx::utils::MoveOnlyFunc<void(CassError)> initCb);
+    CassError initSync();
+
+    void queryAsync(
+        const Query& query,
+        nx::utils::MoveOnlyFunc<void(CassError, const QueryResult&)> queryCb);
+
+    boost::optional<QueryResult> querySync(const Query& query);
 
 private:
     CassCluster* m_cluster = nullptr;
