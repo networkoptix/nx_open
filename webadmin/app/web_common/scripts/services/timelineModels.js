@@ -349,7 +349,7 @@ function CameraRecordsProvider(cameras, mediaserver, $q, width) {
     //2. getCameraHistory
 }
 
-CameraRecordsProvider.prototype.cacheRequestedInterval = function (start,end,level){
+CameraRecordsProvider.prototype.cacheRequestedInterval = function (start, end, level){
     for(var i=0;i<level+1;i++){
         if(i >= this.requestedCache.length){
             this.requestedCache.push([{start:start,end:end}]); //Add new cache level
@@ -367,8 +367,8 @@ CameraRecordsProvider.prototype.cacheRequestedInterval = function (start,end,lev
                 break;
             }
 
-            this.requestedCache[i][j].start = Math.min(start,this.requestedCache[i][j].start);
-            this.requestedCache[i][j].end = Math.max(end,this.requestedCache[i][j].end);
+            this.requestedCache[i][j].start = Math.min(start, this.requestedCache[i][j].start);
+            this.requestedCache[i][j].end = Math.max(end, this.requestedCache[i][j].end);
             break;
         }
     }
@@ -395,7 +395,7 @@ CameraRecordsProvider.prototype.getBlindSpotsInCache = function(start,end,level)
     return result;
 };
 
-CameraRecordsProvider.prototype.checkRequestedIntervalCache = function (start,end,level) {
+CameraRecordsProvider.prototype.checkRequestedIntervalCache = function (start, end, level) {
     if(typeof(this.requestedCache[level])=='undefined'){
         return false;
     }
@@ -432,6 +432,10 @@ CameraRecordsProvider.prototype.abort = function (reason){
 };
 
 CameraRecordsProvider.prototype.requestInterval = function (start,end,level){
+    if(start > end){
+        console.error("Start is more than end, that is impossible");
+    }
+
     // requestInterval operates with server time always
     var deferred = this.$q.defer();
     //this.start = start;
@@ -475,7 +479,7 @@ CameraRecordsProvider.prototype.requestInterval = function (start,end,level){
                 self.addChunk(addchunk, null);
             }
 
-            self.cacheRequestedInterval(timeManager.serverToDisplay(start),timeManager.serverToDisplay(end),level);
+            self.cacheRequestedInterval(timeManager.serverToDisplay(start), timeManager.serverToDisplay(end), level);
 
             deferred.resolve(self.chunksTree);
 
@@ -519,6 +523,14 @@ CameraRecordsProvider.prototype.getIntervalRecords = function (start, end, level
         }
         this.debug();
     }*/
+
+
+    if(timeManager.displayToServer(end) > this.lastRequested){ // If we want data from future
+        end = timeManager.serverToDisplay(this.lastRequested); // Limit the request with latest lastminute update
+        if(start > end){  // if start is in future as well - just return what we have
+            return result;
+        }
+    }
 
     var needUpdate = !debugLevel && !this.checkRequestedIntervalCache(start,end,level);
     if(needUpdate){ // Request update
