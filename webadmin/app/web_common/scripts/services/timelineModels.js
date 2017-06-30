@@ -22,16 +22,17 @@ timeManager.localToServer = function(date){
 
 timeManager.displayToServer = function(date){
     if(this.useServerTime){
-        return date; // Translate server time to localtime
+        return date + this.timeZoneOffset; // Translate server time to localtime
     }
     return this.localToServer(date);  // Save server time
 };
 timeManager.serverToDisplay = function(date){
     if(this.useServerTime){
-        return date;  // Save server time
+        return date - this.timeZoneOffset;  // Save server time
     }
     return this.serverToLocal(date); // Translate server time to localtime
 };
+
 
 timeManager.localToDisplay = function(date){
     if(this.useServerTime){
@@ -39,12 +40,18 @@ timeManager.localToDisplay = function(date){
     }
     return date;
 };
+timeManager.displayToLocal = function(date){
+    if(this.useServerTime){
+        return this.serverToLocal(this.displayToServer(date));
+    }
+    return date;
+};
 
 timeManager.nowToDisplay = function(){
-    return this.localToDisplay((new Date().getTime()));
+    return this.localToDisplay(this.nowLocal());
 };
 timeManager.nowToServer = function(){
-    return this.localToServer((new Date().getTime()));
+    return this.localToServer(this.nowLocal());
 };
 
 timeManager.translate = function(date, reverse){
@@ -58,6 +65,16 @@ timeManager.translate = function(date, reverse){
     }
     return date - latency;
 };
+timeManager.nowLocal = function(){
+    return (new Date()).getTime();
+}
+timeManager.debug = function(message, date){
+    console.log(message, {
+        display: new Date(date),
+        toServer: new Date(this.displayToServer(date)),
+        toLocal: new Date(this.displayToLocal(date))
+    });
+}
 timeManager.init = function(useServerTime, serverTime, serverTimeZoneOffset){
     var minTimeLag = 2000;// Two seconds
     var clientDate = new Date();
@@ -366,7 +383,7 @@ CameraRecordsProvider.prototype.getBlindSpotsInCache = function(start,end,level)
     for(var i = 0;i < levelCache.length;i++) {
 
         if(start < levelCache[i].start){
-            result.push ({start:start,end:levelCache[i].start});
+            result.push ({start:start,end:levelCache[i].start,blindSpotsInCache:true});
         }
 
         start = Math.max(start,levelCache[i].end);//Move start
@@ -458,7 +475,7 @@ CameraRecordsProvider.prototype.requestInterval = function (start,end,level){
                 self.addChunk(addchunk, null);
             }
 
-            self.cacheRequestedInterval(start,end,level);
+            self.cacheRequestedInterval(timeManager.serverToDisplay(start),timeManager.serverToDisplay(end),level);
 
             deferred.resolve(self.chunksTree);
 
@@ -478,7 +495,7 @@ CameraRecordsProvider.prototype.requestInterval = function (start,end,level){
  * @param level
  * @return Array
  */
-CameraRecordsProvider.prototype.getIntervalRecords = function (start,end,level,debugLevel){
+CameraRecordsProvider.prototype.getIntervalRecords = function (start, end, level, debugLevel){
 
     if(start instanceof Date)
     {
@@ -507,7 +524,6 @@ CameraRecordsProvider.prototype.getIntervalRecords = function (start,end,level,d
     if(needUpdate){ // Request update
         this.requestInterval(timeManager.displayToServer(start), timeManager.displayToServer(end), level);
     }
-
     // Return splice - as is
     return result;
 };
@@ -653,7 +669,6 @@ CameraRecordsProvider.prototype.selectRecords = function(result, start, end, lev
     if(parent.end <= start || parent.start >= end ){ // Not intresected
         return;
     }
-
     if(parent.level == level){
         result.push(parent); // Good chunk!
         return;
@@ -1331,5 +1346,5 @@ ScaleManager.prototype.zoomAroundPoint = function(zoomValue, coordinate){
 };
 
 ScaleManager.prototype.lastMinute = function(){
-    return (new Date(this.end - this.lastMinuteInterval)).getTime();
+    return this.end - this.lastMinuteInterval;
 };
