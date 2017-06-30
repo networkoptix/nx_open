@@ -82,7 +82,7 @@ public:
     void switchToSoftwareDecoding();
 
 private:
-    std::auto_ptr<QnAbstractVideoDecoder> m_decoder;
+    std::unique_ptr<QnAbstractVideoDecoder> m_decoder;
     //!Used to initialize new decoder object in case of decoder switching
     QnCompressedVideoDataPtr m_mediaSequenceHeader;
     const QnAbstractVideoDecoderPlugin& m_decoderFactory;

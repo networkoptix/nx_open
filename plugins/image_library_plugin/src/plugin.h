@@ -78,7 +78,7 @@ public:
 
 private:
     nxpt::CommonRefManager m_refManager;
-    std::auto_ptr<DiscoveryManager> m_discoveryManager;
+    std::unique_ptr<DiscoveryManager> m_discoveryManager;
 };
 
 #endif  //IMAGE_LIBRARY_PLUGIN_H

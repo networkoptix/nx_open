@@ -114,7 +114,7 @@ bool AudioPlayer::sayTextAsync( const QString& text, QObject* target, const char
 
 QString AudioPlayer::getTagValue( const QString& filePath, const QString& tagName )
 {
-    std::auto_ptr<AudioPlayer> audioPlayer( new AudioPlayer() );
+    std::unique_ptr<AudioPlayer> audioPlayer( new AudioPlayer() );
     if( !audioPlayer->open( filePath ) )
         return QString();
     return audioPlayer->getTagValue( tagName );
@@ -146,7 +146,7 @@ bool AudioPlayer::open( QIODevice* dataSource )
 
 bool AudioPlayer::open( const QString& filePath )
 {
-    std::auto_ptr<QFile> srcFile( new QFile( filePath ) );
+    std::unique_ptr<QFile> srcFile( new QFile( filePath ) );
     if( !srcFile->open(QFile::ReadOnly) )
         return false;
     return open( srcFile.release() );
@@ -303,7 +303,7 @@ bool AudioPlayer::openNonSafe( QIODevice* dataSource )
     const QString& temporaryResUrl = lit("%1://%2").arg(lit("qiodev")).arg(temporaryFilePath);
     m_storage->registerResourceData( temporaryFilePath, dataSource );
 
-    std::auto_ptr<QnAviArchiveDelegate> mediaFileReader( new QnAviArchiveDelegate() );
+    std::unique_ptr<QnAviArchiveDelegate> mediaFileReader( new QnAviArchiveDelegate() );
     mediaFileReader->setStorage( m_storage );
 
     QnResourcePtr res( new LocalAudioFileResource() );

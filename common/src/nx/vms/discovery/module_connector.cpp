@@ -8,19 +8,25 @@ namespace nx {
 namespace vms {
 namespace discovery {
 
-static const auto kUrl = lit("http://%1/api/moduleInformation?showAddresses=false&keepConnectionOpen");
+static const auto kUrl =
+    lit("http://%1/api/moduleInformation?showAddresses=false&keepConnectionOpen");
+
 static const KeepAliveOptions kKeepAliveOptions(
-    std::chrono::seconds(60), std::chrono::seconds(10), 3);
+    std::chrono::seconds(10), std::chrono::seconds(5), 5);
+
+static const network::RetryPolicy kDefaultDetryPolicy(
+    network::RetryPolicy::kInfiniteRetries, std::chrono::seconds(5), 2, std::chrono::minutes(10));
 
 ModuleConnector::ModuleConnector(network::aio::AbstractAioThread* thread):
     network::aio::BasicPollable(thread),
-    m_reconnectInterval(std::chrono::minutes(1))
+    m_retryPolicy(kDefaultDetryPolicy)
 {
 }
 
-void ModuleConnector::setReconnectInterval(std::chrono::milliseconds interval)
+void ModuleConnector::setReconnectPolicy(network::RetryPolicy value)
 {
-    m_reconnectInterval = interval;
+    NX_ASSERT(m_modules.size() == 0);
+    m_retryPolicy = value;
 }
 
 void ModuleConnector::setConnectHandler(ConnectedHandler handler)
@@ -101,9 +107,9 @@ void ModuleConnector::stopWhileInAioThread()
 
 ModuleConnector::Module::Module(ModuleConnector* parent, const QnUuid& id):
     m_parent(parent),
-    m_id(id)
+    m_id(id),
+    m_timer(parent->m_retryPolicy, parent->getAioThread())
 {
-    m_timer.bindToAioThread(parent->getAioThread());
     NX_DEBUG(this, lm("New %1").args(m_id));
 }
 
@@ -184,10 +190,13 @@ boost::optional<ModuleConnector::Module::Endpoints::iterator>
     else
         group = getGroup(kOther);
 
-    if (insertIntoGroup(group, std::move(endpoint)))
+    if (insertIntoGroup(group, endpoint))
+    {
+        NX_DEBUG(this, lm("Save endpoint %1 to %2").args(endpoint, group->first));
         return group;
-    else
-        return boost::none;
+    }
+
+    return boost::none;
 }
 
 void ModuleConnector::Module::connectToGroup(Endpoints::iterator endpointsGroup)
@@ -204,18 +213,20 @@ void ModuleConnector::Module::connectToGroup(Endpoints::iterator endpointsGroup)
     {
         if (!m_id.isNull())
         {
-            const auto reconnectInterval = m_parent->m_reconnectInterval;
-            NX_VERBOSE(this, lm("No more endpoints, retry in %1").arg(reconnectInterval));
-            m_timer.start(reconnectInterval, [this](){ connectToGroup(m_endpoints.begin()); });
+            const auto reconnectInterval = m_parent->m_retryPolicy;
+            m_timer.scheduleNextTry([this](){ connectToGroup(m_endpoints.begin()); });
+            NX_VERBOSE(this, lm("No more endpoints, retry in %1").arg(m_timer.currentDelay()));
             m_parent->m_disconnectedHandler(m_id);
         }
 
         return;
     }
 
+    if (m_timer.timeToEvent())
+        m_timer.cancelSync();
+
     // Initiate parallel connects to each endpoint in a group.
     size_t endpointsInProgress = 0;
-    m_timer.cancelSync();
     for (const auto& endpoint: endpointsGroup->second)
     {
         if (m_forbiddenEndpoints.count(endpoint))
@@ -355,6 +366,7 @@ bool ModuleConnector::Module::saveConnection(
     auto ip = m_socket->getForeignAddress().address;
     NX_VERBOSE(this, lm("Connected to %1 by %2 ip %3").args(m_id, endpoint, ip));
     m_parent->m_connectedHandler(information, std::move(endpoint), std::move(ip));
+    m_timer.reset();
     return true;
 }
 

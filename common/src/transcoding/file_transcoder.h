@@ -136,7 +136,7 @@ private:
     QnFfmpegTranscoder m_transcoder;
     int m_resultCode;
     State m_state;
-    std::auto_ptr<QIODevice> m_dest;
+    std::unique_ptr<QIODevice> m_dest;
     //!in millis. 0 - no limit
     unsigned int m_transcodeDurationLimit;
     unsigned int m_transcodedDataDuration;

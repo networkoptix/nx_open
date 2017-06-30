@@ -2240,8 +2240,8 @@ void QuickSyncVideoDecoder::saveToAVFrame(
 
 mfxStatus QuickSyncVideoDecoder::readSequenceHeader( mfxBitstream* const inputStream, mfxVideoParam* const streamParams )
 {
-    std::auto_ptr<SPSUnit> sps;
-    std::auto_ptr<PPSUnit> pps;
+    std::unique_ptr<SPSUnit> sps;
+    std::unique_ptr<PPSUnit> pps;
     bool spsFound = false;
     bool ppsFound = false;
 

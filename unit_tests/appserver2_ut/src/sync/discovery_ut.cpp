@@ -13,6 +13,8 @@
 static const std::chrono::milliseconds kDiscoveryTimeouts(100);
 size_t kInitialServerCount = 3;
 size_t kAdditionalServerCount = 2;
+nx::network::RetryPolicy kReconnectPolicy(
+    nx::network::RetryPolicy::kInfiniteRetries, kDiscoveryTimeouts, 1, kDiscoveryTimeouts);
 
 class DiscoveryTest: public testing::Test
 {
@@ -22,8 +24,8 @@ protected:
     void addServer()
     {
         static int instanceCounter = 0;
-        const auto tmpDir = QDir::homePath() + "/ec2_discovery_ut.data"
-            + QString::number(instanceCounter++);
+        const auto tmpDir = nx::utils::TestOptions::temporaryDirectoryPath() +
+            lit("/ec2_discovery_ut.data") + QString::number(instanceCounter++);
         QDir(tmpDir).removeRecursively();
 
         auto server = std::make_unique<MediaServer>();
@@ -39,7 +41,7 @@ protected:
             module->commonModule()->moduleGUID(), server->moduleInstance()->endpoint()));
 
         const auto discoveryManager = module->commonModule()->moduleDiscoveryManager();
-        discoveryManager->setReconnectInterval(kDiscoveryTimeouts);
+        discoveryManager->setReconnectPolicy(kReconnectPolicy);
         discoveryManager->setMulticastInterval(kDiscoveryTimeouts);
         discoveryManager->start();
         m_servers.emplace(module->commonModule()->moduleGUID(), std::move(server));

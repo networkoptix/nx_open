@@ -23,62 +23,41 @@
 
 namespace {
 
-typedef QMultiMap<int, QScreen*> SortedScreens;
-
-// TODO: #ynikitenkov develop totally correct function -
-// now it correct only for one horizontal line positioned screen
-QPoint screenRelatedToGlobal(const QPoint& point, QScreen* screen)
+/*
+ * Workaround geometry calculations when client is located on several screens with different DPI.
+ * Geometry logic for Qt screens is following: screen position is given in device coordinates,
+ * but screen size is in logical coordinates. For example, 4K monitor to the left of main one
+ * with DPI 2x will have geometry (-3840, 0, 1920*1080).
+ */
+QPoint screenRelatedToGlobal(const QPoint& point, QScreen* sourceScreen)
 {
-    const auto geometry = screen->geometry();
+    const auto geometry = sourceScreen->geometry();
     if (geometry.contains(point))
         return point;
 
-    const auto topLeft = geometry.topLeft();
-    const auto left = topLeft.x();
+    const auto sourceDpi = sourceScreen->devicePixelRatio();
+    const auto topLeft = geometry.topLeft(); //< Absolute position in pixels
+
+    // This point may lay on other screen really. Position in logical coordinates using dpi from
+    // the screen where the biggest part of the client window is located.
     auto scaledPointOnScreen = (point - topLeft);
+    const auto globalPoint = (scaledPointOnScreen * sourceDpi) + topLeft; //< Device coordinates.
 
-    const bool backwardSearch = ((scaledPointOnScreen.x() < 0)
-        || (scaledPointOnScreen.y() < 0));
+    // Looking for the screen where point is really located.
+    for (auto targetScreen: QGuiApplication::screens())
+    {
+        if (targetScreen == sourceScreen)
+            continue;
 
-    if (!backwardSearch)
-        scaledPointOnScreen -= QPoint(geometry.width(), 0);
+        const auto targetGeometry = targetScreen->geometry();
+        const auto dpi = targetScreen->devicePixelRatio();
 
-    const auto pixelPointOnScreen = scaledPointOnScreen * screen->devicePixelRatio();
-    SortedScreens tmp;
-    for (auto src : QGuiApplication::screens())
-        tmp.insert(src->geometry().left(), src);
+        const auto dpiPointOnScreen = (globalPoint - targetGeometry.topLeft()) / dpi;
+        if (targetGeometry.contains(dpiPointOnScreen))
+            return dpiPointOnScreen;
+    }
 
-    // Searching for appropriate screen
-    const auto xSorted = tmp.values().toVector();
-    const auto it = std::find_if(xSorted.begin(), xSorted.end(),
-        [screen](const QScreen* value)
-        {
-            return (value == screen);
-        });
-
-    if (it == xSorted.end())
-        return point;
-
-    const auto itRealScreen = (backwardSearch
-        ? (it == xSorted.begin() ? xSorted.end() : it - 1)
-        : (it == (xSorted.end() - 1) ? xSorted.end() : it + 1));
-
-    if (itRealScreen == xSorted.end())
-        return QPoint();
-
-    // We've found prev screen
-    QScreen *appropriate = *itRealScreen;
-    const auto targetGeometry = appropriate->geometry();
-    const auto offset = (backwardSearch ? QPoint(targetGeometry.width(), 0) : QPoint());
-    const auto factor = appropriate->devicePixelRatio();
-    const auto targetTopLeft = targetGeometry.topLeft();
-
-    const auto result = targetTopLeft + offset + pixelPointOnScreen / factor;;
-    if (appropriate->geometry().contains(result))
-        return result;
-
-    // Looking for next screen
-    return screenRelatedToGlobal(result, appropriate);
+    return point;
 }
 
 QScreen* getScreen(const QPoint& scaled)
@@ -223,16 +202,17 @@ public:
         if (event->type() != QEvent::Show)
             return QObject::eventFilter(watched, event);
 
-        QWidget* properWidget = dynamic_cast<QnEmulatedFrameWidget*>(watched);  // Main window
+        QWidget* properWidget = qobject_cast<QnEmulatedFrameWidget*>(watched); //< Main window.
         if (!properWidget)
-            properWidget = dynamic_cast<QDialog*>(watched); // Any dialog
+            properWidget = qobject_cast<QDialog*>(watched); //< Any dialog.
         if (!properWidget)
             return QObject::eventFilter(watched, event);
 
         const auto parentWindow = getParentWindow(properWidget);
+        NX_EXPECT(parentWindow);
         const auto geometry = properWidget->geometry();
-        const auto fixedPos = screenRelatedToGlobal(
-            parentWindow->geometry().topLeft(), parentWindow->screen());
+        const auto globalPos = parentWindow->geometry().topLeft();
+        const auto fixedPos = screenRelatedToGlobal(globalPos, parentWindow->screen());
         parentWindow->setScreen(getScreen(fixedPos));
         parentWindow->setPosition(fixedPos);
         return QObject::eventFilter(watched, event);
@@ -253,7 +233,7 @@ class ContextMenuEventCorrector : public QObject
 public:
     bool eventFilter(QObject* watched, QEvent* event)
     {
-        if (event->type() != QEvent::ContextMenu)
+        //if (event->type() != QEvent::ContextMenu)
             return QObject::eventFilter(watched, event);
 
         const auto contextMenuEvent = static_cast<QContextMenuEvent*>(event);
@@ -264,8 +244,8 @@ public:
 
         if (nativeEvent && parentWindow)
         {
-            const auto targetPos = screenRelatedToGlobal(
-                contextMenuEvent->globalPos(), parentWindow->screen());
+            const auto globalPos = contextMenuEvent->globalPos();
+            const auto targetPos = screenRelatedToGlobal(globalPos, parentWindow->screen());
             auto fixedEvent = ProxyContextMenuEvent(contextMenuEvent->pos(), targetPos);
             if (!qApp->sendEvent(watched, &fixedEvent) || !fixedEvent.isAccepted())
                 return QObject::eventFilter(watched, event);

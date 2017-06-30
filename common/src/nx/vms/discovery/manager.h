@@ -33,9 +33,9 @@ public:
     Manager(QnCommonModule* commonModule, bool clientMode, QnResourcePool* resourcePool);
     virtual ~Manager() override;
 
-    void setReconnectInterval(std::chrono::milliseconds interval);
-    void setUpdateInterfacesInterval(std::chrono::milliseconds interval);
-    void setMulticastInterval(std::chrono::milliseconds interval);
+    void setReconnectPolicy(network::RetryPolicy value);
+    void setUpdateInterfacesInterval(std::chrono::milliseconds value);
+    void setMulticastInterval(std::chrono::milliseconds value);
 
     void start();
     void stop();
