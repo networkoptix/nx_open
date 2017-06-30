@@ -8,7 +8,7 @@
 
 {% block content%}
 <h1>Context for Product</h1>
-<form action="{% url 'review_page_no_args'%}" method="post" class="aligned">
+<form action="{% url 'review_page'%}" method="post" class="aligned">
     {% csrf_token %}
     {% for field in form %}
         <div class="form-row">

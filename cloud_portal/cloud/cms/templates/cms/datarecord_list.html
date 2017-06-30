@@ -9,6 +9,7 @@
 					<thead>
 						<th>Context</th>
 						<th>Language</th>
+						<th>Field</th>
 						<th>Value</th>
 						<th></th>
 					</thead>
@@ -18,6 +19,7 @@
 							<form action="{% url 'review_page' record.data_structure.context.name record.language.code %}" method="get">
 								<td>{{record.data_structure.context.name}}</td>
 								<td>{{record.language.code}}</td>
+								<td>{{record.data_structure.name}}
 								<td>{{record}}</td>
 								<td>
 									<button type="submit">Review Context</button>
