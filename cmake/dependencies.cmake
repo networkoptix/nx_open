@@ -75,7 +75,6 @@ function(detect_package_versions)
     set(gmock_version ${_gmock_version} CACHE STRING "")
     set(directx_version ${_directx_version} CACHE STRING "")
     set(server-external_version "" CACHE STRING "")
-
     set(help_version "${customization}-${releaseVersion.short}" PARENT_SCOPE)
 endfunction()
 

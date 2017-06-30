@@ -2,6 +2,7 @@ import os, sys, subprocess
 from subprocess import Popen, PIPE
 
 # Windows only
+target_bin_path = '${target_bin_path}'.replace("/", "\\")
 qtdir = '${qt.dir}'.replace("/", "\\")
 qmldir = os.path.join(qtdir, 'qml')
 qmldir_nxtool = os.path.join('${root.dir}/nxtool/static-resources/src', 'qml')
@@ -9,13 +10,10 @@ qmldir_nxtool = os.path.join('${root.dir}/nxtool/static-resources/src', 'qml')
 os.environ["PATH"] = "%s;%s\\bin" % (os.environ['PATH'], qtdir)
 
 # Windows only so we can use Windows syntax here
-commands = ['${environment.dir}\\bin\\windeployqt.exe ${libdir}\\bin\\${build.configuration}\desktop_client.exe --qmldir %s --no-translations --force --no-libraries --no-plugins --dir qml' % qmldir,\
-'del /f/q qml\QtWebProcess.exe'
-'heat dir %s -wixvar -nologo -sfrag -suid -sreg -ag -srd -dir WebHelp -out ClientQml.wxs -cg ClientQmlComponent -dr ClientQml -var var.ClientQmlDir' % qmldir
-]
+commands = ['heat dir %s -wixvar -nologo -sfrag -suid -sreg -ag -srd -dir WebHelp -out ClientQml.wxs -cg ClientQmlComponent -dr ClientQml -var var.ClientQmlDir' % qmldir]
 
 if __name__ == '__main__':
-    cmd = '${environment.dir}\\bin\\windeployqt.exe ${libdir}\\bin\\${build.configuration}\desktop_client.exe --qmldir %s --no-translations --force --no-libraries --no-plugins --dir clientqml' % qmldir
+    cmd = '${qt.dir}\\bin\\windeployqt.exe %s\\desktop_client.exe --qmldir %s --no-translations --force --no-libraries --no-plugins --dir clientqml' % (target_bin_path, qmldir)
     p = subprocess.Popen(cmd, shell=True, stdout=PIPE, stderr=subprocess.STDOUT)
     out, err = p.communicate()
     print out
@@ -39,7 +37,7 @@ if __name__ == '__main__':
         os.unlink('nxtoolqml/QtWebProcess.exe')
 
     if '${nxtool}' == 'true':
-        p = subprocess.Popen('${environment.dir}\\bin\\windeployqt.exe ${libdir}\\bin\\${build.configuration}\\nxtool.exe --qmldir %s --no-translations --force --no-libraries --no-plugins --dir nxtoolqml' % qmldir_nxtool, shell=True, stdout=PIPE)
+        p = subprocess.Popen('${qt.dir}\\bin\\windeployqt.exe %s\\nxtool.exe --qmldir %s --no-translations --force --no-libraries --no-plugins --dir nxtoolqml' % (target_bin_path, qmldir_nxtool), shell=True, stdout=PIPE)
         out, err = p.communicate()
         print out
         p.wait()

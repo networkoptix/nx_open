@@ -2,7 +2,7 @@ import os, sys, subprocess, shutil
 from subprocess import Popen, PIPE, STDOUT
 from os.path import dirname, join, exists, isfile
 
-properties_dir='${root.dir}/wixsetup/${arch}'
+properties_dir='${project.build.directory}'
 
 generated_items = [
     ('fonts', ''),
@@ -20,7 +20,7 @@ if '${nxtool}' == 'true':
     generated_items += [('qtquickcontrols', '')]
 
 for wxs, args in generated_items:
-    p = subprocess.Popen('${init.python.dir}/python generate-{}-wxs.py {}'.format(wxs, args), shell=True, stdout=PIPE, stderr=STDOUT)
+    p = subprocess.Popen('python generate-{}-wxs.py {}'.format(wxs, args), shell=True, stdout=PIPE, stderr=STDOUT)
     out, err = p.communicate()
     print ('\n++++++++++++++++++++++Applying heat to generate-%s-wxs.py for %s ++++++++++++++++++++++' % (wxs, args))
     print out
