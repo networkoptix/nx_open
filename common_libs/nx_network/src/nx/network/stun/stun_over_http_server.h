@@ -27,7 +27,7 @@ public:
         using CreateStunOverHttpConnectionHandler =
             nx_http::server::handler::CreateTunnelHandler<nx::stun::ServerConnection>;
 
-        httpMessageDispatcher->registerRequestProcessor<CreateStunOverHttpConnectionHandler>(
+        httpMessageDispatcher->template registerRequestProcessor<CreateStunOverHttpConnectionHandler>(
             stunOverHttpPath,
             [this]()
             {
