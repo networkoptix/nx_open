@@ -411,7 +411,7 @@ void LayoutTourReviewController::updateItemsLayout()
         auto existing = std::find_if(layoutItems.begin(), layoutItems.end(),
             [this, item](QnWorkbenchItem* existing)
             {
-                const auto resource = resourcePool()->getResourceByUniqueId(existing->resourceUid());
+                const auto resource = existing->resource();
                 return resource && resource->getId() == item.resourceId;
             });
 
@@ -507,7 +507,8 @@ bool LayoutTourReviewController::fillTourItems(ec2::ApiLayoutTourItemDataList* i
     QnWorkbenchItem::sortByGeometry(&layoutItems);
     for (auto item: layoutItems)
     {
-        const auto resource = resourcePool()->getResourceByUniqueId(item->resourceUid());
+        const auto resource = item->resource();
+        NX_ASSERT(resource);
         if (!resource)
             continue;
 

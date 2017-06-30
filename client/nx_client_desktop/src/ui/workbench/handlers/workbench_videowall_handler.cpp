@@ -224,7 +224,6 @@ void addItemToLayout(const QnLayoutResourcePtr &layout, const QnVideoWallItemInd
     else
         itemData.flags = Qn::PendingGeometryAdjustment;
     itemData.resource.id = firstIdx.videowall()->getId();
-    itemData.resource.uniqueId = firstIdx.videowall()->getUniqueId();
     setIndices(itemData, indices);
     layout->addItem(itemData);
 }
@@ -861,12 +860,17 @@ void QnWorkbenchVideoWallHandler::handleMessage(const QnVideoWallControlMessage 
             if (workbench()->currentLayout()->item(uuid))
                 return;
 
+            //TODO: #GDM Allow dropping of the local files outside of media folders.
             QString resourceUid = message[resourceKey];
+            const auto resource = resourcePool()->getResourceByUniqueId(resourceUid);
+            if (!resource)
+                return;
+
             QRect geometry = QJson::deserialized<QRect>(message[geometryKey].toUtf8());
             QRectF zoomRect = QJson::deserialized<QRectF>(message[zoomRectKey].toUtf8());
             qreal rotation = QJson::deserialized<qreal>(message[rotationKey].toUtf8());
             int checkedButtons = QJson::deserialized<int>(message[checkedButtonsKey].toUtf8());
-            QnWorkbenchItem* item = new QnWorkbenchItem(resourceUid, uuid, workbench()->currentLayout());
+            QnWorkbenchItem* item = new QnWorkbenchItem(resource, uuid, workbench()->currentLayout());
             item->setGeometry(geometry);
             item->setZoomRect(zoomRect);
             item->setRotation(rotation);
@@ -1412,7 +1416,8 @@ QnLayoutResourcePtr QnWorkbenchVideoWallHandler::constructLayout(const QnResourc
             item.uuid = QnUuid::createUuid();
             item.combinedGeometry = QRect(i % matrixWidth, i / matrixWidth, 1, 1);
             item.resource.id = resource->getId();
-            item.resource.uniqueId = resource->getUniqueId();
+            if (resource->hasFlags(Qn::local_media))
+                item.resource.uniqueId = resource->getUniqueId();
             layout->addItem(item);
             i++;
         }
@@ -2485,7 +2490,7 @@ void QnWorkbenchVideoWallHandler::at_workbenchLayout_itemAdded_controlMode(QnWor
 
     QnVideoWallControlMessage message(QnVideoWallControlMessage::LayoutItemAdded);
     message[uuidKey] = item->uuid().toString();
-    message[resourceKey] = item->resourceUid();
+    message[resourceKey] = item->resource()->getUniqueId();
     message[geometryKey] = QString::fromUtf8(QJson::serialized(item->geometry()));
     message[zoomRectKey] = QString::fromUtf8(QJson::serialized(item->zoomRect()));
     message[rotationKey] = QString::fromUtf8(QJson::serialized(item->rotation()));

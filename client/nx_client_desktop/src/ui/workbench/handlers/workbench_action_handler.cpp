@@ -372,7 +372,8 @@ void ActionHandler::addToLayout(const QnLayoutResourcePtr &layout, const QnResou
 
     QnLayoutItemData data;
     data.resource.id = resource->getId();
-    data.resource.uniqueId = resource->getUniqueId();
+    if (resource->hasFlags(Qn::local_media))
+        data.resource.uniqueId = resource->getUniqueId();
     data.uuid = QnUuid::createUuid();
     data.flags = Qn::PendingGeometryAdjustment;
     data.zoomRect = params.zoomWindow;
@@ -1424,7 +1425,8 @@ void ActionHandler::at_thumbnailsSearchAction_triggered()
         item.uuid = QnUuid::createUuid();
         item.combinedGeometry = QRect(i % matrixWidth, i / matrixWidth, 1, 1);
         item.resource.id = resource->getId();
-        item.resource.uniqueId = resource->getUniqueId();
+        if (resource->hasFlags(Qn::local_media))
+            item.resource.uniqueId = resource->getUniqueId();
         item.contrastParams = widget->item()->imageEnhancement();
         item.dewarpingParams = widget->item()->dewarpingParams();
         item.rotation = widget->item()->rotation();

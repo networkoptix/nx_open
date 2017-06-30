@@ -1063,9 +1063,15 @@ void QnWorkbenchController::at_zoomTargetChanged(QnMediaResourceWidget *widget, 
     QnLayoutItemData data = widget->item()->data();
     delete widget;
 
+    const auto resource = zoomTargetWidget->resource()->toResourcePtr();
+    NX_EXPECT(resource);
+    if (!resource)
+        return;
+
     data.uuid = QnUuid::createUuid();
-    data.resource.id = zoomTargetWidget->resource()->toResource()->getId();
-    data.resource.uniqueId = zoomTargetWidget->resource()->toResource()->getUniqueId();
+    data.resource.id = resource->getId();
+    if (resource->hasFlags(Qn::local_media))
+        data.resource.uniqueId = resource->getUniqueId();
     data.zoomTargetUuid = zoomTargetWidget->item()->uuid();
     data.rotation = zoomTargetWidget->item()->rotation();
     data.zoomRect = zoomRect;

@@ -22,7 +22,6 @@ class QnWorkbenchLayout;
 class QnWorkbenchItem: public QObject, public QnConnectionContextAware
 {
     Q_OBJECT
-    Q_PROPERTY(QString resourceUid READ resourceUid)
     Q_PROPERTY(QnUuid uuid READ uuid)
     Q_PROPERTY(qreal rotation READ rotation WRITE setRotation)
 
@@ -30,11 +29,11 @@ public:
     /**
      * Constructor.
      *
-     * \param resourceUid               Unique identifier of the resource associated with this item.
+     * \param resource                  Resource associated with this item.
      * \param uuid                      Universally unique identifier of this item.
      * \param parent                    Parent of this object.
      */
-    QnWorkbenchItem(const QString &resourceUid, const QnUuid &uuid, QObject *parent = NULL);
+    QnWorkbenchItem(const QnResourcePtr& resource, const QnUuid& uuid, QObject* parent = nullptr);
 
     /**
      * Constructor.
@@ -42,7 +41,7 @@ public:
      * \param data                      Item data to create an item from.
      * \param parent                    Parent of this object.
      */
-    QnWorkbenchItem(const QnLayoutItemData &data, QObject *parent = NULL);
+    QnWorkbenchItem(const QnLayoutItemData& data, QObject* parent = nullptr);
 
     /**
      * Virtual destructor.
@@ -79,12 +78,9 @@ public:
     }
 
     /**
-     * \returns                         Unique identifier of the resource associated with this item.
+     * \returns                         Resource associated with this item.
      */
-    const QString &resourceUid() const
-    {
-        return m_resourceUid;
-    }
+    QnResourcePtr resource() const;
 
     /**
      * \returns                         Universally unique identifier of this item.
@@ -340,13 +336,12 @@ private:
     friend class QnWorkbenchLayout;
 
     /** Layout that this item belongs to. */
-    QnWorkbenchLayout *m_layout;
-
-    /** Unique identifier of the resource associated with this item. */
-    QString m_resourceUid;
+    QnWorkbenchLayout* m_layout;
 
     /** Universal unique identifier of this item. */
-    QnUuid m_uuid;
+    const QnUuid m_uuid;
+
+    const QnResourcePtr m_resource;
 
     /** Grid-relative geometry of an item, in grid cells. */
     QRect m_geometry;

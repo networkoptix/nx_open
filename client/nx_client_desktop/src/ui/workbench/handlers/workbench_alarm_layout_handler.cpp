@@ -153,7 +153,7 @@ void QnWorkbenchAlarmLayoutHandler::openCamerasInAlarmLayout( const QnVirtualCam
 
     for (const QnVirtualCameraResourcePtr &camera: sortedCameras)
     {
-        auto existingItems = layout->items(camera->getUniqueId());
+        auto existingItems = layout->items(camera);
 
         /* If the camera is already on layout, just take it to LIVE */
         if (!existingItems.isEmpty())

@@ -13,20 +13,17 @@
 #include "workbench_layout.h"
 
 
-QnWorkbenchItem::QnWorkbenchItem(const QString &resourceUid, const QnUuid &uuid, QObject *parent):
+QnWorkbenchItem::QnWorkbenchItem(const QnResourcePtr& resource, const QnUuid &uuid, QObject *parent):
     QObject(parent),
     m_layout(NULL),
-    m_resourceUid(resourceUid),
+    m_resource(resource),
     m_uuid(uuid),
     m_flags(0),
     m_rotation(0.0),
     m_displayInfo(false)
 {
-    if (resourceUid.isEmpty())
-        return;
-
-    QnResourcePtr resource = resourcePool()->getResourceByUniqueId(resourceUid);
-    if (!resource)
+    NX_ASSERT(m_resource);
+    if (!m_resource)
         return;
 
     QString forcedRotation = resource->getProperty(QnMediaResource::rotationKey());
@@ -37,21 +34,13 @@ QnWorkbenchItem::QnWorkbenchItem(const QString &resourceUid, const QnUuid &uuid,
 QnWorkbenchItem::QnWorkbenchItem(const QnLayoutItemData &data, QObject *parent):
     QObject(parent),
     m_layout(NULL),
-    m_resourceUid(data.resource.uniqueId),  //TODO: #GDM looks like way outdated hack
+    m_resource(resourcePool()->getResourceByDescriptor(data.resource)),
     m_uuid(data.uuid),
     m_flags(0),
     m_rotation(0.0),
     m_displayInfo(false)
 {
-    if (m_resourceUid.isEmpty())
-    {
-        qnWarning("Creating a workbench item from item data with invalid unique id.");
-        // TODO: #Elric fix layout item data conventions.
-
-        QnResourcePtr resource = resourcePool()->getResourceById(data.resource.id);
-        if (resource)
-            m_resourceUid = resource->getUniqueId(); // TODO: #Elric add warning if NULL?
-    }
+    NX_ASSERT(m_resource);
 
     setFlags(static_cast<Qn::ItemFlags>(data.flags));
     setRotation(data.rotation);
@@ -70,13 +59,13 @@ QnWorkbenchItem::~QnWorkbenchItem()
 
 QnLayoutItemData QnWorkbenchItem::data() const
 {
-    QnResourcePtr resource = resourcePool()->getResourceByUniqueId(m_resourceUid);
+    NX_EXPECT(m_resource);
 
     QnLayoutItemData data;
-
     data.uuid = m_uuid;
-    data.resource.uniqueId = m_resourceUid;
-    data.resource.id = resource ? resource->getId() : QnUuid();
+    if (m_resource->hasFlags(Qn::local_media))
+        data.resource.uniqueId = m_resource->getUniqueId();
+    data.resource.id = m_resource ? m_resource->getId() : QnUuid();
     data.flags = flags();
     data.rotation = rotation();
     data.combinedGeometry = combinedGeometry();
@@ -91,12 +80,8 @@ QnLayoutItemData QnWorkbenchItem::data() const
 
 bool QnWorkbenchItem::update(const QnLayoutItemData &data)
 {
-#ifdef _DEBUG
-    NX_ASSERT(data.uuid == uuid());
-    QnResourcePtr resource = resourcePool()->getResourceByUniqueId(resourceUid());
-    QnUuid localId = resource ? resource->getId() : QnUuid();
-    NX_ASSERT(data.resource.id == localId || data.resource.uniqueId == m_resourceUid);
-#endif
+    NX_EXPECT(data.uuid == uuid());
+    NX_EXPECT(m_resource == resourcePool()->getResourceByDescriptor(data.resource));
 
     bool result = true;
 
@@ -115,12 +100,8 @@ bool QnWorkbenchItem::update(const QnLayoutItemData &data)
 
 void QnWorkbenchItem::submit(QnLayoutItemData &data) const
 {
-#ifdef _DEBUG
-    NX_ASSERT(data.uuid == uuid());
-    QnResourcePtr resource = resourcePool()->getResourceByUniqueId(resourceUid());
-    QnUuid localId = resource ? resource->getId() : QnUuid();
-    NX_ASSERT(data.resource.id == localId || data.resource.uniqueId == m_resourceUid);
-#endif
+    NX_EXPECT(data.uuid == uuid());
+    NX_EXPECT(m_resource == resourcePool()->getResourceByDescriptor(data.resource));
 
     data.flags = flags();
     data.rotation = rotation();
@@ -130,6 +111,11 @@ void QnWorkbenchItem::submit(QnLayoutItemData &data) const
     data.zoomTargetUuid = zoomTargetItem() ? zoomTargetItem()->uuid() : QnUuid();
     data.combinedGeometry = combinedGeometry();
     data.displayInfo = displayInfo();
+}
+
+QnResourcePtr QnWorkbenchItem::resource() const
+{
+    return m_resource;
 }
 
 bool QnWorkbenchItem::setGeometry(const QRect &geometry)
@@ -344,8 +330,6 @@ QVariant QnWorkbenchItem::data(Qn::ItemDataRole role) const
 {
     switch (role)
     {
-        case Qn::ResourceUidRole:
-            return resourceUid();
         case Qn::ItemUuidRole:
             return QVariant::fromValue<QnUuid>(uuid());
         case Qn::ItemGeometryRole:
@@ -374,9 +358,6 @@ void QnWorkbenchItem::setData(Qn::ItemDataRole role, const QVariant &value)
     QVariant localValue = qnResourceRuntimeDataManager->layoutItemData(m_uuid, role);
     switch (role)
     {
-        case Qn::ResourceUidRole:
-            NX_ASSERT(value.toString() == resourceUid());
-            break;
         case Qn::ItemUuidRole:
             NX_ASSERT(value.value<QnUuid>() == uuid());
             break;

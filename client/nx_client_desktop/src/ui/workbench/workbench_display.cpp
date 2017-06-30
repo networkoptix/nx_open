@@ -1970,7 +1970,7 @@ void QnWorkbenchDisplay::at_workbench_currentLayoutChanged()
             m_loader->pleaseStop();
         }
 
-        if (QnMediaResourcePtr resource = resourcePool()->getResourceByUniqueId((**layout->items().begin()).resourceUid()).dynamicCast<QnMediaResource>())
+        if (auto resource = (*layout->items().begin())->resource().dynamicCast<QnMediaResource>())
         {
             m_loader = new QnThumbnailsLoader(resource, QnThumbnailsLoader::Mode::Strict);
 
