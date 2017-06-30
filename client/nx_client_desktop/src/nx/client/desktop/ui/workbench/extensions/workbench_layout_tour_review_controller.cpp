@@ -469,7 +469,7 @@ void LayoutTourReviewController::addItemToReviewLayout(
     const QPointF& position,
     bool pinItem)
 {
-    if (layout->getItems().size() > qnRuntime->maxSceneItems())
+    if (layout->getItems().size() >= qnRuntime->maxSceneItems())
         return;
 
     QnLayoutItemData itemData;
