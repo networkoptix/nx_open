@@ -1,5 +1,9 @@
 #include "cloud_url_helper.h"
 
+#include <common/common_module.h>
+
+#include <client_core/client_core_module.h>
+
 #include <nx/network/app_info.h>
 #include <nx/vms/utils/system_uri.h>
 
@@ -50,6 +54,15 @@ QUrl QnCloudUrlHelper::restorePasswordUrl() const
 QUrl QnCloudUrlHelper::faqUrl() const
 {
     return makeUrl(lit("/content/faq"), false);
+}
+
+QUrl QnCloudUrlHelper::viewSystemUrl() const
+{
+    const auto systemId = qnClientCoreModule->commonModule()->globalSettings()->cloudSystemId();
+    if (systemId.isEmpty())
+        return mainUrl();
+
+    return makeUrl(lit("/systems/%1/view").arg(systemId));
 }
 
 QUrl QnCloudUrlHelper::makeUrl(const QString& path, bool auth) const

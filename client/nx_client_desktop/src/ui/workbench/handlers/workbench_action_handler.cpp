@@ -1141,7 +1141,7 @@ void ActionHandler::at_webClientAction_triggered()
 
     if (nx::network::isCloudServer(server))
     {
-        menu()->trigger(action::OpenCloudMainUrl);
+        menu()->trigger(action::OpenCloudViewSystemUrl);
     }
     else
     {

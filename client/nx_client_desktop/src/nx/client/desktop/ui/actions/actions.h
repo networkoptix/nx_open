@@ -1088,6 +1088,11 @@ enum IDType
     OpenCloudMainUrl,
 
     /**
+     * Opens cloud system view in the browser.
+     */
+    OpenCloudViewSystemUrl,
+
+    /**
      * Opens cloud account management page in the browser.
      */
     OpenCloudManagementUrl,
