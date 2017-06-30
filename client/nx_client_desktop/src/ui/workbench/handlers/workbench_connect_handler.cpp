@@ -721,7 +721,7 @@ void QnWorkbenchConnectHandler::handleStateChanged(LogicalState logicalValue,
 {
     const auto resourceModeAction = action(action::ResourcesModeAction);
 
-    qDebug() << "QnWorkbenchConnectHandler state changed" << logicalValue << physicalValue;
+    NX_DEBUG(this) "State changed" << logicalValue << physicalValue;
     switch (logicalValue)
     {
         case LogicalState::disconnected:
