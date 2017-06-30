@@ -18,8 +18,7 @@ class StunServer
 public:
     StunServer(const conf::Settings& settings);
 
-    bool bind();
-    bool listen();
+    void listen();
     void stopAcceptingNewRequests();
 
     const std::vector<SocketAddress>& endpoints() const;
@@ -30,8 +29,9 @@ private:
     nx::stun::MessageDispatcher m_stunMessageDispatcher;
     std::unique_ptr<nx::network::server::MultiAddressServer<stun::SocketServer>> m_tcpStunServer;
     std::unique_ptr<nx::network::server::MultiAddressServer<stun::UdpServer>> m_udpStunServer;
-
     std::vector<SocketAddress> m_endpoints;
+
+    bool bind();
 };
 
 } // namespace hpm

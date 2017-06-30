@@ -17,10 +17,54 @@ StunServer::StunServer(const conf::Settings& settings):
     m_udpStunServer(std::make_unique<nx::network::server::MultiAddressServer<stun::UdpServer>>(
         &m_stunMessageDispatcher))
 {
+    if (!bind())
+        throw std::runtime_error("Error binding to specified STUN address");
+}
+
+void StunServer::listen()
+{
+    if (!m_tcpStunServer->listen())
+    {
+        throw std::runtime_error(
+            lm("Error listening on TCP addresses %1")
+                .arg(containerString(m_endpoints)).toStdString());
+    }
+
+    if (!m_udpStunServer->listen())
+    {
+        throw std::runtime_error(
+            lm("Error listening on UDP addresses %1")
+                .arg(containerString(m_endpoints)).toStdString());
+    }
+
+    NX_LOGX(lit("STUN Server is listening on %1")
+        .arg(containerString(m_endpoints)), cl_logALWAYS);
+}
+
+void StunServer::stopAcceptingNewRequests()
+{
+    m_tcpStunServer->pleaseStopSync();
+    m_udpStunServer->forEachListener(&stun::UdpServer::stopReceivingMessagesSync);
+}
+
+const std::vector<SocketAddress>& StunServer::endpoints() const
+{
+    return m_endpoints;
+}
+
+nx::stun::MessageDispatcher& StunServer::dispatcher()
+{
+    return m_stunMessageDispatcher;
 }
 
 bool StunServer::bind()
 {
+    if (m_settings.stun().addrToListenList.empty())
+    {
+        NX_LOGX("No STUN address to listen", cl_logALWAYS);
+        return false;
+    }
+
     m_tcpStunServer->forEachListener(
         [this](stun::SocketServer* server)
         {
@@ -44,41 +88,6 @@ bool StunServer::bind()
     }
 
     return true;
-}
-
-bool StunServer::listen()
-{
-    if (!m_tcpStunServer->listen())
-    {
-        NX_LOGX(lit("Can not listen on TCP addresses %1")
-            .arg(containerString(m_endpoints)), cl_logERROR);
-        return false;
-    }
-
-    if (!m_udpStunServer->listen())
-    {
-        NX_LOGX(lit("Can not listen on UDP addresses %1")
-            .arg(containerString(m_endpoints)), cl_logERROR);
-        return false;
-    }
-
-    return true;
-}
-
-void StunServer::stopAcceptingNewRequests()
-{
-    m_tcpStunServer->pleaseStopSync();
-    m_udpStunServer->forEachListener(&stun::UdpServer::stopReceivingMessagesSync);
-}
-
-const std::vector<SocketAddress>& StunServer::endpoints() const
-{
-    return m_endpoints;
-}
-
-nx::stun::MessageDispatcher& StunServer::dispatcher()
-{
-    return m_stunMessageDispatcher;
 }
 
 } // namespace hpm
