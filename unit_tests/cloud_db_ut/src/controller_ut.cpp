@@ -37,13 +37,7 @@ protected:
 
     void whenMigratedData()
     {
-        const std::string dbName = dbConnectionOptions().dbName.toStdString();
-
-        std::array<const char*, 4> args = {
-            "-db/driverName", "QSQLITE",
-            "-db/name", dbName.c_str()
-        };
-        m_settings.load(static_cast<int>(args.size()), args.data());
+        m_settings.setDbConnectionOptions(dbConnectionOptions());
         m_controller = std::make_unique<cdb::Controller>(m_settings);
         m_controller.reset();
     }

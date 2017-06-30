@@ -71,6 +71,13 @@ const QSqlQuery& SqlQuery::impl() const
     return m_sqlQuery;
 }
 
+void SqlQuery::exec(QSqlDatabase connection, const QByteArray& queryText)
+{
+    SqlQuery query(connection);
+    query.prepare(queryText);
+    query.exec();
+}
+
 DBResult SqlQuery::getLastErrorCode()
 {
     switch (m_sqlQuery.lastError().type())
