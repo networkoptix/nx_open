@@ -6,6 +6,7 @@
 #include <nx/network/stun/async_client_user.h>
 #include <nx/network/stun/message_dispatcher.h>
 #include <nx/network/stun/stream_socket_server.h>
+#include <nx/network/system_socket.h>
 #include <nx/utils/random.h>
 #include <nx/utils/std/cpp14.h>
 #include <nx/utils/test_support/sync_queue.h>
@@ -28,6 +29,10 @@ public:
     ~StunClient()
     {
         m_stunClient->pleaseStopSync();
+
+        if (m_tcpConnectionToTheServer)
+            m_tcpConnectionToTheServer->pleaseStopSync();
+
         if (m_server)
         {
             m_server->pleaseStopSync();
@@ -76,6 +81,34 @@ protected:
         startServer();
     }
 
+    void givenServerThatRandomlyClosesConnections()
+    {
+        using namespace std::placeholders;
+
+        dispatcher().registerRequestProcessor(
+            kTestMethodNumber,
+            std::bind(&StunClient::randomlyCloseConnection, this, _1, _2));
+
+        startServer();
+    }
+
+    void givenConnectedClient()
+    {
+        m_stunClient->connect(m_serverEndpoint, false);
+    }
+
+    void givenTcpConnectionToTheServer()
+    {
+        m_tcpConnectionToTheServer = std::make_unique<nx::network::TCPSocket>(AF_INET);
+        ASSERT_TRUE(m_tcpConnectionToTheServer->connect(m_server->address()));
+    }
+    
+    void givenStunClientWithPredefinedConnection()
+    {
+        m_stunClient = std::make_shared<nx::stun::AsyncClient>(
+            std::move(m_tcpConnectionToTheServer));
+    }
+
     void whenServerTerminatedAbruptly()
     {
         m_server->pleaseStopSync();
@@ -84,11 +117,15 @@ protected:
 
     void whenClientSendsRequestToTheServer()
     {
-        using namespace std::placeholders;
-
-        m_stunClient->connect(m_serverEndpoint, false);
-
         sendRequest();
+    }
+
+    void whenIssuedMultipleRequests()
+    {
+        connectClientToTheServer();
+
+        for (int i = 0; i < kNumberOfRequestsToSend; ++i)
+            sendRequest();
     }
 
     void verifyClientProcessedConnectionCloseProperly()
@@ -96,9 +133,75 @@ protected:
         ASSERT_NE(SystemError::noError, m_connectionClosedPromise.get_future().get());
     }
 
+    void thenResponseIsReceived()
+    {
+        getNextRequestResult();
+    }
+
     void thenErrorResultIsReported()
     {
         ASSERT_NE(SystemError::noError, getNextRequestResult());
+    }
+
+    void thenEveryRequestResultHasBeenReceived()
+    {
+        for (int i = 0; i < kNumberOfRequestsToSend; ++i)
+            getNextRequestResult();
+    }
+
+private:
+    static constexpr int kNumberOfRequestsToSend = 1024;
+
+    std::shared_ptr<nx::stun::AsyncClient> m_stunClient;
+    nx::utils::promise<SystemError::ErrorCode> m_connectionClosedPromise;
+    nx::utils::SyncQueue<SystemError::ErrorCode> m_requestResult;
+    SocketAddress m_serverEndpoint;
+    nx::stun::MessageDispatcher m_dispatcher;
+    std::unique_ptr<stun::SocketServer> m_server;
+    std::unique_ptr<nx::network::TCPSocket> m_tcpConnectionToTheServer;
+
+    void closeConnection(
+        std::shared_ptr<stun::AbstractServerConnection> connection,
+        nx::stun::Message /*message*/)
+    {
+        connection->close();
+    }
+
+    void sendResponse(
+        std::shared_ptr<stun::AbstractServerConnection> connection,
+        nx::stun::Message request)
+    {
+        nx::stun::Message response(
+            stun::Header(
+                stun::MessageClass::successResponse,
+                request.header.method,
+                request.header.transactionId));
+        connection->sendMessage(std::move(response));
+    }
+
+    void storeRequestResult(
+        SystemError::ErrorCode sysErrorCode,
+        stun::Message /*response*/)
+    {
+        m_requestResult.push(sysErrorCode);
+    }
+
+    void randomlyCloseConnection(
+        std::shared_ptr<stun::AbstractServerConnection> connection,
+        nx::stun::Message request)
+    {
+        if (nx::utils::random::number<int>(0, 1) > 0)
+        {
+            connection->close();
+            return;
+        }
+
+        nx::stun::Message response(
+            stun::Header(
+                stun::MessageClass::successResponse,
+                request.header.method,
+                request.header.transactionId));
+        connection->sendMessage(std::move(response));
     }
 
     void startServer()
@@ -155,38 +258,6 @@ protected:
     {
         return m_requestResult.pop();
     }
-
-private:
-    std::shared_ptr<nx::stun::AsyncClient> m_stunClient;
-    nx::utils::promise<SystemError::ErrorCode> m_connectionClosedPromise;
-    nx::utils::SyncQueue<SystemError::ErrorCode> m_requestResult;
-    SocketAddress m_serverEndpoint;
-    nx::stun::MessageDispatcher m_dispatcher;
-    std::unique_ptr<stun::SocketServer> m_server;
-
-    void closeConnection(
-        std::shared_ptr<stun::AbstractServerConnection> connection,
-        nx::stun::Message /*message*/)
-    {
-        connection->close();
-    }
-
-    void sendResponse(
-        std::shared_ptr<stun::AbstractServerConnection> connection,
-        nx::stun::Message request)
-    {
-        nx::stun::Message response(
-            stun::Header(
-                stun::MessageClass::successResponse,
-                request.header.method,
-                request.header.transactionId));
-        connection->sendMessage(std::move(response));
-    }
-
-    void storeRequestResult(SystemError::ErrorCode sysErrorCode, stun::Message /*response*/)
-    {
-        m_requestResult.push(sysErrorCode);
-    }
 };
 
 TEST_F(StunClient, proper_cancellation_when_connection_terminated_by_remote_side)
@@ -199,74 +270,33 @@ TEST_F(StunClient, proper_cancellation_when_connection_terminated_by_remote_side
 TEST_F(StunClient, request_result_correctly_reported_on_connection_break)
 {
     givenServerThatBreaksConnectionAfterReceivingRequest();
+    givenConnectedClient();
     whenClientSendsRequestToTheServer();
     thenErrorResultIsReported();
 }
 
-class FtStunClient:
-    public StunClient
-{
-public:
-    static constexpr int kNumberOfRequestsToSend = 1024;
-
-protected:
-    void givenServerThatRandomlyClosesConnections()
-    {
-        using namespace std::placeholders;
-
-        dispatcher().registerRequestProcessor(
-            kTestMethodNumber,
-            std::bind(&FtStunClient::randomlyCloseConnection, this, _1, _2));
-
-        startServer();
-    }
-
-    void whenIssuedMultipleRequests()
-    {
-        connectClientToTheServer();
-
-        for (int i = 0; i < kNumberOfRequestsToSend; ++i)
-            sendRequest();
-    }
-
-    void thenEveryRequestResultHasBeenReceived()
-    {
-        for (int i = 0; i < kNumberOfRequestsToSend; ++i)
-            getNextRequestResult();
-    }
-
-private:
-    void randomlyCloseConnection(
-        std::shared_ptr<stun::AbstractServerConnection> connection,
-        nx::stun::Message request)
-    {
-        if (nx::utils::random::number<int>(0, 1) > 0)
-        {
-            connection->close();
-            return;
-        }
-
-        nx::stun::Message response(
-            stun::Header(
-                stun::MessageClass::successResponse,
-                request.header.method,
-                request.header.transactionId));
-        connection->sendMessage(std::move(response));
-    }
-};
-
-TEST_F(FtStunClient, every_request_result_is_delivered)
+TEST_F(StunClient, every_request_result_is_delivered)
 {
     givenServerThatRandomlyClosesConnections();
     whenIssuedMultipleRequests();
     thenEveryRequestResultHasBeenReceived();
 }
 
-//-------------------------------------------------------------------------------------------------
-// FtStunClientUser
+TEST_F(StunClient, uses_prepared_connection)
+{
+    givenRegularStunServer();
+    givenTcpConnectionToTheServer();
+    givenStunClientWithPredefinedConnection();
 
-class FtStunClientUser:
-    public FtStunClient
+    whenClientSendsRequestToTheServer();
+    thenResponseIsReceived();
+}
+
+//-------------------------------------------------------------------------------------------------
+// StunClientUser
+
+class StunClientUser:
+    public StunClient
 {
 protected:
     void assertIfResponseReportedAfterClientRemoval()
@@ -304,10 +334,8 @@ protected:
     }
 };
 
-TEST_F(FtStunClientUser, correct_cancellation)
+TEST_F(StunClientUser, correct_cancellation)
 {
-    using namespace std::placeholders;
-
     givenRegularStunServer();
     givenClientConnectedToServer();
     assertIfResponseReportedAfterClientRemoval();
