@@ -1,26 +1,33 @@
 #pragma once
 
+#include <common/common_module_aware.h>
+
 #include "actions/abstract_business_action.h"
 #include "events/abstract_business_event.h"
 #include "business_aggregation_info.h"
 #include "business_fwd.h"
 
-class QnBusinessStringsHelper: public QObject
+class QnBusinessStringsHelper: public QObject, public QnCommonModuleAware
 {
     Q_OBJECT
+    using base_type = QObject;
 public:
-    static QString actionName(QnBusiness::ActionType value);
+    QnBusinessStringsHelper(QnCommonModule* commonModule);
+
+    QString actionName(QnBusiness::ActionType value) const;
 
     /**
      * Name of the event in common, e.g. 'Motion on Camera'
      * Used primarily in lists where all event types are enumerated.
      */
-    static QString eventName(QnBusiness::EventType value, int count = 1);
+    QString eventName(QnBusiness::EventType value, int count = 1) const;
 
     /** Event <event> occurred on the <resource> */
-    static QString eventAtResource(const QnBusinessEventParameters &params, Qn::ResourceInfoLevel detailLevel);
+    QString eventAtResource(const QnBusinessEventParameters &params,
+        Qn::ResourceInfoLevel detailLevel) const;
+
     /** Multiple <event> events occurred */
-    static QString eventAtResources(const QnBusinessEventParameters &params);
+    QString eventAtResources(const QnBusinessEventParameters &params) const;
 
     /**
      * @brief eventDescription      Form full event description, split to lines.
@@ -33,36 +40,46 @@ public:
      *                                  Time: 5 times, first time at 15.00 on 19.06.2013
      *                                  ...
      */
-    static QStringList eventDescription(const QnAbstractBusinessActionPtr& action,
+    QStringList eventDescription(const QnAbstractBusinessActionPtr& action,
                                     const QnBusinessAggregationInfo& aggregationInfo,
-                                    Qn::ResourceInfoLevel detailLevel);
+                                    Qn::ResourceInfoLevel detailLevel) const;
 
-    static QStringList eventDetailsWithTimestamp(const QnBusinessEventParameters &params, int aggregationCount);
-    static QStringList eventDetails(const QnBusinessEventParameters &params);
+    QStringList eventDetailsWithTimestamp(const QnBusinessEventParameters &params,
+        int aggregationCount) const;
+
+    QStringList eventDetails(const QnBusinessEventParameters &params) const;
 
     //TODO: #vasilenko isPublic field is not used, why?
-    static QString urlForCamera(const QnUuid& id, qint64 timestampUsec, bool isPublic);
+    QString urlForCamera(const QnUuid& id, qint64 timestampUsec, bool isPublic) const;
 
-    static QString toggleStateToString(QnBusiness::EventState state);
-    static QString eventTypeString(QnBusiness::EventType eventType,
+    QString toggleStateToString(QnBusiness::EventState state) const;
+    QString eventTypeString(QnBusiness::EventType eventType,
                                    QnBusiness::EventState eventState,
                                    QnBusiness::ActionType actionType,
-                                   const QnBusinessActionParameters &actionParams);
-    static QString bruleDescriptionText(const QnBusinessEventRulePtr& bRule);
-    static QnResourcePtr eventSource(const QnBusinessEventParameters &params);
+                                   const QnBusinessActionParameters &actionParams) const;
+    QString bruleDescriptionText(const QnBusinessEventRulePtr& bRule) const;
+    QnResourcePtr eventSource(const QnBusinessEventParameters &params) const;
 
     /** Details of event: aggregation info, date and time, other info, split by lines. */
-    static QStringList aggregatedEventDetails(const QnAbstractBusinessActionPtr& action,
-                                              const QnBusinessAggregationInfo& aggregationInfo);
-    static QString eventReason(const QnBusinessEventParameters& params);
+    QStringList aggregatedEventDetails(
+        const QnAbstractBusinessActionPtr& action,
+        const QnBusinessAggregationInfo& aggregationInfo) const;
 
-    static QString eventTimestamp(const QnBusinessEventParameters &params, int aggregationCount);
-	static QString eventTimestampTime(const QnBusinessEventParameters &params);
-	static QString eventTimestampDate(const QnBusinessEventParameters &params);
+    QString eventReason(const QnBusinessEventParameters& params) const;
 
-    static QString eventTimestampShort(const QnBusinessEventParameters &params, int aggregationCount);
+    QString eventTimestamp(const QnBusinessEventParameters &params, int aggregationCount) const;
+	QString eventTimestampTime(const QnBusinessEventParameters &params) const;
+	QString eventTimestampDate(const QnBusinessEventParameters &params) const;
+
+    QString eventTimestampShort(const QnBusinessEventParameters &params, int aggregationCount) const;
 
 
-	static QString getResoureNameFromParams(const QnBusinessEventParameters& params, Qn::ResourceInfoLevel detailLevel);
-	static QString getResoureIPFromParams(const QnBusinessEventParameters& params);
+	QString getResoureNameFromParams(const QnBusinessEventParameters& params,
+        Qn::ResourceInfoLevel detailLevel) const;
+
+	QString getResoureIPFromParams(const QnBusinessEventParameters& params) const;
+
+    static QString defaultSoftwareTriggerName();
+    static QString getSoftwareTriggerName(const QString& id);
+    static QString getSoftwareTriggerName(const QnBusinessEventParameters& params);
 };

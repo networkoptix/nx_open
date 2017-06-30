@@ -38,7 +38,7 @@ protected:
     {
         QnSettings settings("company_name", "app", "mod");
         settings.parseArgs(argc, args);
-        m_optionsUnderTest.loadFromSettings(&settings);
+        m_optionsUnderTest.loadFromSettings(settings);
     }
 
     void assertIfNotOnlySpecifiedFieldsWereOverridden()

@@ -3,20 +3,20 @@
 
 #include "ec2_statictics_reporter.h"
 
-#include <utils/common/concurrent.h>
+#include <nx/utils/concurrent.h>
 #include <nx/utils/thread/mutex.h>
 
 #include <QDir>
 #include <QSettings>
 #include <set>
-
+#include <common/common_module_aware.h>
 
 namespace ec2 {
 
-class CrashReporter
+class CrashReporter: public QnCommonModuleAware
 {
 public:
-    CrashReporter();
+    CrashReporter(QnCommonModule* commonModule);
     ~CrashReporter();
 
     /** Scans for local reports and sends them to the statistics server asynchronously
@@ -41,13 +41,13 @@ private:
     friend class ReportData;
 
     QnMutex m_mutex;
-    QnConcurrent::QnFuture<bool> m_activeCollection;
+    nx::utils::concurrent::Future<bool> m_activeCollection;
     nx_http::AsyncHttpClientPtr m_activeHttpClient;
     bool m_terminated;
     boost::optional<qint64> m_timerId;
 };
 
-class ReportData : public QObject
+class ReportData: public QObject
 {
     Q_OBJECT
 

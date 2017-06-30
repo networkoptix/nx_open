@@ -6,12 +6,12 @@
 #include "media_server_user_attributes.h"
 #include <nx/fusion/model_functions.h>
 
-QnMediaServerUserAttributes::QnMediaServerUserAttributes()
-    : serverId()
-    , maxCameras(0)
-    , isRedundancyEnabled(false)
-    , name()
-    , backupSchedule()
+QnMediaServerUserAttributes::QnMediaServerUserAttributes():
+    serverId(),
+    maxCameras(0),
+    isRedundancyEnabled(false),
+    name(),
+    backupSchedule()
 {
 }
 

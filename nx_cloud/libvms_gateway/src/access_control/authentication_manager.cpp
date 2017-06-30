@@ -10,14 +10,15 @@
 
 #include <boost/optional.hpp>
 
-#include <nx/network/auth_restriction_list.h>
+#include <nx/network/app_info.h>
+#include <nx/network/http/auth_restriction_list.h>
 #include <nx/network/http/auth_tools.h>
 #include <nx/network/http/buffer_source.h>
 #include <nx/network/http/server/fusion_request_result.h>
+#include <nx/network/http/server/http_server_connection.h>
 
-#include <http/custom_headers.h>
-#include <utils/common/app_info.h>
-#include <utils/common/guard.h>
+#include <nx/network/http/custom_headers.h>
+#include <nx/utils/scope_guard.h>
 #include <nx/fusion/serialization/json.h>
 #include <nx/fusion/serialization/lexical.h>
 
@@ -33,8 +34,8 @@ namespace gateway {
 using namespace nx_http;
 
 AuthenticationManager::AuthenticationManager(
-    const QnAuthMethodRestrictionList& authRestrictionList,
-    const stree::StreeManager& stree)
+    const nx_http::AuthMethodRestrictionList& authRestrictionList,
+    const nx::utils::stree::StreeManager& stree)
 :
     m_authRestrictionList(authRestrictionList),
     m_stree(stree),
@@ -47,32 +48,22 @@ void AuthenticationManager::authenticate(
     const nx_http::Request& request,
     nx_http::server::AuthenticationCompletionHandler completionHandler)
 {
-    bool authenticationResult = false;
-    stree::ResourceContainer authInfo;
-    boost::optional<nx_http::header::WWWAuthenticate> wwwAuthenticate;
-    nx_http::HttpHeaders responseHeaders;
-    std::unique_ptr<nx_http::AbstractMsgBodySource> msgBody;
-    auto scopedGuard = makeScopedGuard(
-        [&authenticationResult, &authInfo, &wwwAuthenticate,
-            &responseHeaders, &msgBody, &completionHandler]() mutable
+    nx_http::server::AuthenticationResult authenticationResult;
+    auto scopedGuard = makeScopeGuard(
+        [&authenticationResult, &completionHandler]() mutable
         {
-            completionHandler(
-                authenticationResult,
-                std::move(authInfo),
-                std::move(wwwAuthenticate),
-                std::move(responseHeaders),
-                std::move(msgBody));
+            completionHandler(std::move(authenticationResult));
         });
 
     const auto allowedAuthMethods = m_authRestrictionList.getAllowedAuthMethods(request);
     if (allowedAuthMethods & AuthMethod::noAuth)
     {
-        authenticationResult = true;
+        authenticationResult.isSucceeded = true;
         return;
     }
     if (!(allowedAuthMethods & AuthMethod::httpDigest))
     {
-        authenticationResult = false;
+        authenticationResult.isSucceeded = false;
         return;
     }
 
@@ -88,13 +79,13 @@ void AuthenticationManager::authenticate(
     }
 
     //performing stree search
-    stree::ResourceContainer authTraversalResult;
-    stree::ResourceContainer inputRes;
+    nx::utils::stree::ResourceContainer authTraversalResult;
+    nx::utils::stree::ResourceContainer inputRes;
     if (authzHeader && !authzHeader->userid().isEmpty())
         inputRes.put(attr::userName, authzHeader->userid());
     SocketResourceReader socketResources(*connection.socket());
     HttpRequestResourceReader httpRequestResources(request);
-    const auto authSearchInputData = stree::MultiSourceResourceReader(
+    const auto authSearchInputData = nx::utils::stree::MultiSourceResourceReader(
         socketResources,
         httpRequestResources,
         inputRes);
@@ -105,7 +96,7 @@ void AuthenticationManager::authenticate(
     {
         if (authenticated.get().toBool())
         {
-            authenticationResult = true;
+            authenticationResult.isSucceeded = true;
             return;
         }
     }
@@ -114,15 +105,15 @@ void AuthenticationManager::authenticate(
         (authzHeader->authScheme != header::AuthScheme::digest) ||
         (authzHeader->userid().isEmpty()))
     {
-        addWWWAuthenticateHeader(&wwwAuthenticate);
-        authenticationResult = false;
+        addWWWAuthenticateHeader(&authenticationResult.wwwAuthenticate);
+        authenticationResult.isSucceeded = false;
         return;
     }
 
     if (!validateNonce(authzHeader->digest->params["nonce"]))
     {
-        addWWWAuthenticateHeader(&wwwAuthenticate);
-        authenticationResult = false;
+        addWWWAuthenticateHeader(&authenticationResult.wwwAuthenticate);
+        authenticationResult.isSucceeded = false;
         return;
     }
 
@@ -140,7 +131,7 @@ void AuthenticationManager::authenticate(
     {
         if (validateHa1Func(foundHa1.get().toString().toLatin1()))
         {
-            authenticationResult = true;
+            authenticationResult.isSucceeded = true;
             return;
         }
     }
@@ -151,17 +142,17 @@ void AuthenticationManager::authenticate(
                 realm(),
                 password.get().toString())))
         {
-            authenticationResult = true;
+            authenticationResult.isSucceeded = true;
             return;
         }
     }
 
-    authenticationResult = false;
+    authenticationResult.isSucceeded = false;
 }
 
 nx::String AuthenticationManager::realm()
 {
-    return QnAppInfo::realm().toUtf8();
+    return nx::network::AppInfo::realm().toUtf8();
 }
 
 bool AuthenticationManager::validateNonce(const nx_http::StringType& nonce)

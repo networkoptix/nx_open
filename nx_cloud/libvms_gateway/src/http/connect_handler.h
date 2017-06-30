@@ -12,12 +12,12 @@ class Settings;
 class RunTimeOptions;
 } // namespace conf
 
-class ConnectHandler
-:
+class ConnectHandler:
     public nx_http::AbstractHttpRequestHandler,
-    public StreamConnectionHolder<nx_http::AsyncMessagePipeline>
+    public network::server::StreamConnectionHolder<nx_http::deprecated::AsyncMessagePipeline>
 {
-    typedef StreamConnectionHolder<nx_http::AsyncMessagePipeline> super;
+    using base_type = 
+        network::server::StreamConnectionHolder<nx_http::deprecated::AsyncMessagePipeline>;
 
 public:
     ConnectHandler(
@@ -26,14 +26,14 @@ public:
 
     virtual void processRequest(
         nx_http::HttpServerConnection* const connection,
-        stree::ResourceContainer authInfo,
+        nx::utils::stree::ResourceContainer authInfo,
         nx_http::Request request,
         nx_http::Response* const response,
         nx_http::RequestProcessedHandler completionHandler) override;
 
     virtual void closeConnection(
         SystemError::ErrorCode closeReason,
-        nx_http::AsyncMessagePipeline* connection) override;
+        nx_http::deprecated::AsyncMessagePipeline* connection) override;
 
 private:
     typedef AbstractCommunicatingSocket Socket;

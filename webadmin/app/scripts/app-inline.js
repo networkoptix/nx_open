@@ -1,6 +1,7 @@
 'use strict';
 
 angular.module('webadminApp', [
+    'nxCommon',
     'ngResource',
     'ngSanitize',
     'ngRoute',

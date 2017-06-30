@@ -9,37 +9,9 @@
 
 namespace ec2
 {
-    class QnRestTransactionReceiver
-    :
-        public QnRestRequestHandler
-    {
-    public:
-        QnRestTransactionReceiver();
-
-        //!Implementation of QnRestRequestHandler::executeGet
-        virtual int executeGet(const QString& /*path*/,
-            const QnRequestParamList& /*params*/,
-            QByteArray& /*result*/,
-            QByteArray&, /*contentType*/
-            const QnRestConnectionProcessor* owner) override;
-
-        //!Implementation of QnRestRequestHandler::executePost
-        virtual int executePost(
-            const QString& path,
-            const QnRequestParamList& /*params*/,
-            const QByteArray& body,
-            const QByteArray& srcBodyContentType,
-            QByteArray& resultBody,
-            QByteArray& contentType,
-            const QnRestConnectionProcessor* ) override;
-
-    private:
-        QnRestTransactionReceiver( const QnRestTransactionReceiver& );
-        QnRestTransactionReceiver& operator=( const QnRestTransactionReceiver& );
-    };
-
 
     class QnHttpTransactionReceiverPrivate;
+    class QnTransactionMessageBus;
 
     /*!
         Using this HTTP handler because REST does not support HTTP interleaving
@@ -49,7 +21,10 @@ namespace ec2
         public QnTCPConnectionProcessor
     {
     public:
-        QnHttpTransactionReceiver( QSharedPointer<AbstractStreamSocket> socket, QnTcpListener* owner );
+        QnHttpTransactionReceiver(
+            QnTransactionMessageBus* messageBus,
+            QSharedPointer<AbstractStreamSocket> socket,
+            QnTcpListener* owner );
         virtual ~QnHttpTransactionReceiver();
 
     protected:

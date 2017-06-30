@@ -7,8 +7,8 @@
 
 #include <string>
 
-#include <plugins/videodecoder/stree/resourcecontainer.h>
-#include <plugins/videodecoder/stree/resourcenameset.h>
+#include <nx/utils/stree/resourcecontainer.h>
+#include <nx/utils/stree/resourcenameset.h>
 
 
 namespace DecoderParameter
@@ -80,7 +80,7 @@ namespace DecoderParameter
 
 class DecoderResourcesNameset
 :
-    public stree::ResourceNameSet
+    public nx::utils::stree::ResourceNameSet
 {
 public:
     DecoderResourcesNameset();
@@ -89,7 +89,7 @@ public:
 //!Parameters of running decoding session
 class DecoderStreamDescription
 :
-    public stree::ResourceContainer
+    public nx::utils::stree::ResourceContainer
 {
 public:
 };
@@ -101,20 +101,20 @@ public:
 */
 class MediaStreamParameterSumContainer
 :
-    public stree::AbstractResourceReader
+    public nx::utils::stree::AbstractResourceReader
 {
 public:
     MediaStreamParameterSumContainer(
-        const stree::ResourceNameSet& rns,
-        const stree::AbstractResourceReader& rc1,
-        const stree::AbstractResourceReader& rc2 );
+        const nx::utils::stree::ResourceNameSet& rns,
+        const nx::utils::stree::AbstractResourceReader& rc1,
+        const nx::utils::stree::AbstractResourceReader& rc2 );
 
     virtual bool getAsVariant( int resID, QVariant* const value ) const;
 
 private:
-    const stree::ResourceNameSet& m_rns;
-    const stree::AbstractResourceReader& m_rc1;
-    const stree::AbstractResourceReader& m_rc2;
+    const nx::utils::stree::ResourceNameSet& m_rns;
+    const nx::utils::stree::AbstractResourceReader& m_rc1;
+    const nx::utils::stree::AbstractResourceReader& m_rc2;
 };
 
 #endif  //VIDEODECODERPLUGINTYPES_H

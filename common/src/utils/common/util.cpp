@@ -1,13 +1,13 @@
 #include "utils/common/util.h"
 
 #if !defined(Q_OS_WIN) && !defined(Q_OS_ANDROID)
-#   include <sys/statvfs.h>
-#   include <sys/time.h>
+    #include <sys/statvfs.h>
+    #include <sys/time.h>
 #endif
 
 #ifdef Q_OS_WIN32
-#   include <windows.h>
-#   include <mmsystem.h>
+    #include <windows.h>
+    #include <mmsystem.h>
 #endif
 
 #include <QtCore/QDateTime>
@@ -24,6 +24,49 @@
 #include <nx/utils/thread/mutex.h>
 
 #if defined (Q_OS_WIN32)
+
+namespace {
+
+static HANDLE driveHandleByString(const QString& driveString)
+{
+    QString driveSysString = QString(lit("\\\\.\\%1:")).arg(driveString[0]);
+
+    return CreateFile(
+        (LPCWSTR)driveSysString.data(),
+        FILE_READ_ATTRIBUTES,
+        FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE,
+        NULL,
+        OPEN_EXISTING,
+        0,
+        NULL);
+}
+
+static bool mediaIsInserted(HANDLE driveHandle)
+{
+    DWORD bytesReturned;
+    return DeviceIoControl(
+        driveHandle,
+        IOCTL_STORAGE_CHECK_VERIFY2,
+        NULL, 0,
+        NULL, 0,
+        &bytesReturned,
+        NULL);
+}
+
+} // <anonymous>
+
+bool mediaIsInserted(const QString& driveString)
+{
+    auto handle = driveHandleByString(driveString);
+    if (handle == INVALID_HANDLE_VALUE)
+        return false;
+
+    auto result = mediaIsInserted(handle);
+    CloseHandle(handle);
+
+    return result;
+}
+
 WinDriveInfoList getWinDrivesInfo()
 {
     WinDriveInfoList result;
@@ -41,37 +84,27 @@ WinDriveInfoList getWinDrivesInfo()
 
         WinDriveInfo driveInfo;
         driveInfo.path = drive;
-        QString driveSysString = QString(lit("\\\\.\\%1:")).arg(drive[0]);
 
-        HANDLE driveHandle = CreateFile((LPCWSTR) driveSysString.data(),
-                                        FILE_READ_ATTRIBUTES,
-                                        FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE,
-                                        NULL,
-                                        OPEN_EXISTING,
-                                        0,
-                                        NULL);
+        auto driveHandle = driveHandleByString(drive);
         if (driveHandle == INVALID_HANDLE_VALUE)
             continue;
-        WORD bytesReturned;
-        bool success = DeviceIoControl(driveHandle,
-                                        IOCTL_STORAGE_CHECK_VERIFY2,
-                                        NULL, 0,
-                                        NULL, 0,
-                                        (LPDWORD)&bytesReturned,
-                                        NULL);
-        if (!success)
+
+        if (!mediaIsInserted(driveHandle))
         {
             CloseHandle(driveHandle);
             continue;
         }
+
         driveInfo.access |= WinDriveInfo::Readable;
-        success = DeviceIoControl(driveHandle,
-                                  IOCTL_DISK_IS_WRITABLE,
-                                  NULL, 0,
-                                  NULL, 0,
-                                  (LPDWORD)&bytesReturned,
-                                  NULL);
-        driveInfo.access |= success ? WinDriveInfo::Writable : 0;
+        DWORD bytesReturned;
+        BOOL isWritable = DeviceIoControl(
+            driveHandle,
+            IOCTL_DISK_IS_WRITABLE,
+            NULL, 0,
+            NULL, 0,
+            &bytesReturned,
+            NULL);
+        driveInfo.access |= isWritable ? WinDriveInfo::Writable : 0;
         driveInfo.type = GetDriveType((LPCWSTR) driveInfo.path.data());
 
         CloseHandle(driveHandle);
@@ -411,40 +444,4 @@ QByteArray formatJSonString(const QByteArray& data)
     result.resize(formatJSonStringInternal(data.data(), data.data() + data.size(), 0));
     formatJSonStringInternal(data.data(), data.data() + data.size(), result.data());
     return result;
-}
-
-static const char* weekDaysStr[] = { "Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun" };
-static const char* months[] = { "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec" };
-
-QByteArray dateTimeToHTTPFormat(const QDateTime& value)
-{
-    static const int SECONDS_PER_MINUTE = 60;
-    static const int SECONDS_PER_HOUR = 3600;
-
-    if( value.isNull() || !value.isValid() )
-        return QByteArray();
-
-    const QDate& date = value.date();
-    const QTime& time = value.time();
-    const int offsetFromUtcSeconds = value.offsetFromUtc();
-    const int offsetFromUtcHHMM =
-        (offsetFromUtcSeconds / SECONDS_PER_HOUR) * 100 +
-        (offsetFromUtcSeconds % SECONDS_PER_HOUR) / SECONDS_PER_MINUTE;
-
-    char strDateBuf[256];
-    sprintf( strDateBuf, "%s, %02d %s %d %02d:%02d:%02d %+05d",
-        weekDaysStr[date.dayOfWeek()-1],
-        date.day(),
-        months[date.month()-1],
-        date.year(),
-        time.hour(),
-        time.minute(),
-        time.second(),
-        offsetFromUtcHHMM );
-
-    return QByteArray( strDateBuf );
-
-
-
-    //return QString(lit("%1 GMT")).arg(QLocale::c().toString(value.toUTC(), lit("ddd, dd MMM yyyy HH:mm:ss")));
 }

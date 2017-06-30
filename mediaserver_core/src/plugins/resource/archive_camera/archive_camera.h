@@ -6,8 +6,9 @@
 
 class QnArchiveCamResourceSearcher : public QnAbstractNetworkResourceSearcher
 {
+    using base_type = QnAbstractNetworkResourceSearcher;
 public:
-    QnArchiveCamResourceSearcher();
+    QnArchiveCamResourceSearcher(QnCommonModule* commonModule);
 
     virtual void pleaseStop() override;
 
@@ -22,7 +23,7 @@ public:
     virtual QList<QnResourcePtr> checkHostAddr(const QUrl& url, const QAuthenticator& auth, bool doMultichannelCheck) override;
 };
 
-class QnArchiveCamResource 
+class QnArchiveCamResource
     : public QnPhysicalCameraResource
 {
     Q_OBJECT
@@ -33,7 +34,7 @@ public:
     virtual void checkIfOnlineAsync(std::function<void(bool)> completionHandler) override;
 
     virtual QString getDriverName() const override;
-    virtual void setIframeDistance(int frames, int timems); 
+    virtual void setIframeDistance(int frames, int timems);
     virtual void setMotionMaskPhysical(int channel) override;
 
     static QString cameraName();

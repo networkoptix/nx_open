@@ -10,7 +10,7 @@ class QnPlDlinkResourceSearcher : public QnAbstractNetworkResourceSearcher
 {
 
 public:
-    QnPlDlinkResourceSearcher();
+    QnPlDlinkResourceSearcher(QnCommonModule* commonModule);
 
     QnResourceList findResources(void);
 

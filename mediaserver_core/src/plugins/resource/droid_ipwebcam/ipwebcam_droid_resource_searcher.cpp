@@ -9,7 +9,9 @@
 
 
 
-QnPlIpWebCamResourceSearcher::QnPlIpWebCamResourceSearcher()
+QnPlIpWebCamResourceSearcher::QnPlIpWebCamResourceSearcher(QnCommonModule* commonModule):
+    QnAbstractResourceSearcher(commonModule),
+    base_type(commonModule)
 {
 }
 
@@ -82,7 +84,7 @@ struct AnDroidDev
         if (sock->connect(QHostAddress(ip).toString(), 8080, AbstractCommunicatingSocket::kDefaultTimeoutMillis))
         {
             android = true;
-            
+
             localAddr = sock->getLocalAddress().address.toString();
         }
 
@@ -131,7 +133,7 @@ QnResourceList QnPlIpWebCamResourceSearcher::findResources()
 
         while(curr <= max_ip)
         {
-            QnResourcePtr nd = qnResPool->getResourceByUrl(QHostAddress(curr).toString());
+            QnResourcePtr nd = resourcePool()->getResourceByUrl(QHostAddress(curr).toString());
             if (nd)
             {
                 // such dev alredy exists;
@@ -179,7 +181,7 @@ QnResourceList QnPlIpWebCamResourceSearcher::findResources()
                 resource->setName(name);
                 resource->setMAC(QnMacAddress(smac));
                 resource->setHostAddress(QHostAddress(ad.ip).toString());
-                
+
                 result.push_back(resource);
 
 

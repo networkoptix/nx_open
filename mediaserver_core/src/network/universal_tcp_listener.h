@@ -5,6 +5,7 @@
 #include <nx/network/cloud/abstract_cloud_system_credentials_provider.h>
 #include <nx/network/multiple_server_socket.h>
 #include <nx/utils/thread/mutex.h>
+#include <nx/network/http/http_mod_manager.h>
 
 
 class CloudConnectionManager;
@@ -15,15 +16,17 @@ class QnUniversalTcpListener
 {
 public:
     QnUniversalTcpListener(
+        QnCommonModule* commonModule,
         const CloudConnectionManager& cloudConnectionManager,
         const QHostAddress& address,
         int port,
         int maxConnections,
         bool useSsl);
     ~QnUniversalTcpListener();
-        
-    void addProxySenderConnections(const SocketAddress& proxyUrl, int size);
 
+    void addProxySenderConnections(const SocketAddress& proxyUrl, int size);
+    nx_http::HttpModManager* httpModManager() const;
+    virtual void applyModToRequest(nx_http::Request* request) override;
 protected:
     virtual QnTCPConnectionProcessor* createRequestProcessor(
         QSharedPointer<AbstractStreamSocket> clientSocket) override;
@@ -31,7 +34,6 @@ protected:
         bool sslNeeded,
         const SocketAddress& localAddress) override;
     virtual void destroyServerSocket(AbstractStreamServerSocket* serverSocket) override;
-    
 private:
     const CloudConnectionManager& m_cloudConnectionManager;
     nx::network::MultipleServerSocket* m_multipleServerSocket;
@@ -39,6 +41,7 @@ private:
     QnMutex m_mutex;
     bool m_boundToCloud;
     nx::hpm::api::SystemCredentials m_cloudCredentials;
+    std::unique_ptr<nx_http::HttpModManager> m_httpModManager;
 
     void onCloudBindingStatusChanged(
         boost::optional<nx::hpm::api::SystemCredentials> cloudCredentials);

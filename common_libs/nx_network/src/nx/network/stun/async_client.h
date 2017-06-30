@@ -12,7 +12,7 @@
 namespace nx {
 namespace stun {
 
-typedef nx_api::BaseStreamProtocolConnectionEmbeddable<
+typedef nx::network::server::BaseStreamProtocolConnectionEmbeddable<
     Message,
     MessageParser,
     MessageSerializer> MessagePipeline;
@@ -22,7 +22,7 @@ typedef nx_api::BaseStreamProtocolConnectionEmbeddable<
  */
 class NX_NETWORK_API AsyncClient:
     public AbstractAsyncClient,
-    public StreamConnectionHolder<MessagePipeline>
+    public nx::network::server::StreamConnectionHolder<MessagePipeline>
 {
 public:
     typedef MessagePipeline BaseConnectionType;

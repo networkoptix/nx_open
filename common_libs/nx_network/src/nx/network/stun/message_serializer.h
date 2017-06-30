@@ -25,28 +25,28 @@ public:
     /** Serializes full message increasing \a buffer if needed.
         \param bytesWritten Serialized message length is written here
         */
-    nx_api::SerializerState::Type serialize( nx::Buffer* const buffer, size_t* const bytesWritten );
+    nx::network::server::SerializerState serialize( nx::Buffer* const buffer, size_t* const bytesWritten );
 
     static nx::Buffer serialized(const Message& message);
 
 private:
     // header serialization
-    nx_api::SerializerState::Type serializeHeader( MessageSerializerBuffer* buffer );
-    nx_api::SerializerState::Type serializeHeaderInitial( MessageSerializerBuffer* buffer );
+    nx::network::server::SerializerState serializeHeader( MessageSerializerBuffer* buffer );
+    nx::network::server::SerializerState serializeHeaderInitial( MessageSerializerBuffer* buffer );
     // We cannot serialize header before we finish serialization of the body/attributes
     // So this method is just make a mark internally.
-    nx_api::SerializerState::Type serializeHeaderLengthStart ( MessageSerializerBuffer* buffer );
+    nx::network::server::SerializerState serializeHeaderLengthStart ( MessageSerializerBuffer* buffer );
     // transaction id and magic cookie serialization
-    nx_api::SerializerState::Type serializeMagicCookieAndTransactionID( MessageSerializerBuffer* buffer );
+    nx::network::server::SerializerState serializeMagicCookieAndTransactionID( MessageSerializerBuffer* buffer );
     // attribute serialization
-    nx_api::SerializerState::Type serializeAttributes( MessageSerializerBuffer* buffer , std::uint16_t* length );
-    nx_api::SerializerState::Type serializeAttributeTypeAndLength( MessageSerializerBuffer* buffer ,const attrs::Attribute* attribute , std::uint16_t** value_pos );
-    nx_api::SerializerState::Type serializeAttributeValue( MessageSerializerBuffer* buffer ,const attrs::Attribute* attribute , std::size_t* value );
+    nx::network::server::SerializerState serializeAttributes( MessageSerializerBuffer* buffer , std::uint16_t* length );
+    nx::network::server::SerializerState serializeAttributeTypeAndLength( MessageSerializerBuffer* buffer ,const attrs::Attribute* attribute , std::uint16_t** value_pos );
+    nx::network::server::SerializerState serializeAttributeValue( MessageSerializerBuffer* buffer ,const attrs::Attribute* attribute , std::size_t* value );
     // value 
-    nx_api::SerializerState::Type serializeAttributeValue_XORMappedAddress( MessageSerializerBuffer* buffer ,const attrs::XorMappedAddress& , std::size_t* value );
-    nx_api::SerializerState::Type serializeAttributeValue_Fingerprint( MessageSerializerBuffer* buffer ,const attrs::FingerPrint& , std::size_t* value );
-    nx_api::SerializerState::Type serializeAttributeValue_ErrorCode( MessageSerializerBuffer* buffer ,const attrs::ErrorCode& , std::size_t* value );
-    nx_api::SerializerState::Type serializeAttributeValue_Buffer( MessageSerializerBuffer* buffer ,const attrs::BufferedValue& , std::size_t* value );
+    nx::network::server::SerializerState serializeAttributeValue_XORMappedAddress( MessageSerializerBuffer* buffer ,const attrs::XorMappedAddress& , std::size_t* value );
+    nx::network::server::SerializerState serializeAttributeValue_Fingerprint( MessageSerializerBuffer* buffer ,const attrs::FingerPrint& , std::size_t* value );
+    nx::network::server::SerializerState serializeAttributeValue_ErrorCode( MessageSerializerBuffer* buffer ,const attrs::ErrorCode& , std::size_t* value );
+    nx::network::server::SerializerState serializeAttributeValue_Buffer( MessageSerializerBuffer* buffer ,const attrs::BufferedValue& , std::size_t* value );
     // this function will do minimum checking for the message object
     bool checkMessageIntegratiy();
     // This helper function ensure that while we traveling the attributes of a message, the MessageIntegrity and the

@@ -77,8 +77,8 @@
 
 #include <licensing/license.h>
 
-#include <network/multicast_module_finder.h>
 #include <network/system_description.h>
+#include <network/networkoptixmodulerevealcommon.h>
 
 #include <nx_ec/ec_api.h>
 #include <nx_ec/data/api_lock_data.h>
@@ -92,6 +92,7 @@
 #include <nx_ec/data/api_resource_type_data.h>
 #include <nx_ec/data/api_license_data.h>
 #include <nx_ec/data/api_layout_data.h>
+#include <nx_ec/data/api_layout_tour_data.h>
 #include <nx_ec/data/api_camera_data.h>
 #include <nx_ec/data/api_business_rule_data.h>
 #include <nx_ec/data/api_access_rights_data.h>
@@ -112,7 +113,6 @@ namespace {
     bool qn_commonMetaTypes_initialized = false;
 }
 
-QN_DEFINE_ENUM_STREAM_OPERATORS(Qn::Corner)
 QN_DEFINE_ENUM_STREAM_OPERATORS(Qn::ResourceInfoLevel);
 
 void QnCommonMetaTypes::initialize() {
@@ -139,6 +139,8 @@ void QnCommonMetaTypes::initialize() {
     qRegisterMetaType<QnResourceTypeList>();
     qRegisterMetaType<QnResourcePtr>();
     qRegisterMetaType<QnResourceList>();
+    qRegisterMetaType<Qn::ResourceFlags>();
+    QMetaType::registerConverter<Qn::ResourceFlags, int>();
     qRegisterMetaType<Qn::ResourceStatus>();
     qRegisterMetaType<Qn::BitratePerGopType>();
     qRegisterMetaType<QnBusiness::EventReason>();
@@ -203,7 +205,7 @@ void QnCommonMetaTypes::initialize() {
 
     qRegisterMetaType<TypeSpecificParamMap>();
     qRegisterMetaType<QnCameraAdvancedParamValue>();
-	qRegisterMetaType<QnCameraAdvancedParamValueList>();
+    qRegisterMetaType<QnCameraAdvancedParamValueList>();
 
     qRegisterMetaType<QVector<int> >(); /* This one is used by QAbstractItemModel. */
 
@@ -244,8 +246,8 @@ void QnCommonMetaTypes::initialize() {
     qRegisterMetaType<QnPtzMapperPtr>();
     qRegisterMetaType<Qn::PtzDataFields>();
     qRegisterMetaType<Qn::PtzCommand>();
-    qRegisterMetaType<Qn::PtzTraits>();
-    qRegisterMetaType<Qn::PtzCapabilities>();
+    qRegisterMetaType<Ptz::Traits>();
+    qRegisterMetaType<Ptz::Capabilities>();
 
     qRegisterMetaType<QnOnvifConfigDataPtr>();
 
@@ -256,9 +258,6 @@ void QnCommonMetaTypes::initialize() {
 
     qRegisterMetaType<QnMediaDewarpingParams>();
     qRegisterMetaType<QnItemDewarpingParams>();
-
-    qRegisterMetaType<Qn::Corner>();
-    qRegisterMetaTypeStreamOperators<Qn::Corner>();
 
     qRegisterMetaType<QnConnectionInfo>();
     qRegisterMetaType<Qn::PanicMode>();
@@ -294,6 +293,8 @@ void QnCommonMetaTypes::initialize() {
     qRegisterMetaType<ec2::QnPeerTimeInfo>( "QnPeerTimeInfo" );
     qRegisterMetaType<ec2::QnPeerTimeInfoList>( "QnPeerTimeInfoList" );
     qRegisterMetaType<ec2::ApiPeerAliveData>( "ApiPeerAliveData" );
+    qRegisterMetaType<ec2::ApiPeerData>("ApiPeerData");
+    qRegisterMetaType<ec2::ApiPeerData>();
     qRegisterMetaType<ec2::ApiDiscoveryDataList>( "ApiDiscoveryDataList" );
     qRegisterMetaType<ec2::ApiDiscoveryData>( "ApiDiscoveryData" );
     qRegisterMetaType<ec2::ApiDiscoveredServerData>("ApiDiscoveredServerData");
@@ -333,6 +334,7 @@ void QnCommonMetaTypes::initialize() {
     qRegisterMetaType<ec2::ApiMediaServerUserAttributesData>("ec2::ApiMediaServerUserAttributesData");
     qRegisterMetaType<ec2::ApiStorageData>("ec2::ApiStorageData");
     qRegisterMetaType<ec2::ApiResourceParamWithRefDataList>("ec2::ApiResourceParamWithRefDataList");
+    qRegisterMetaType<ec2::ApiLayoutTourData>("ec2::ApiLayoutTourData");
 
     qRegisterMetaType<QnUuid>();
     qRegisterMetaTypeStreamOperators<QnUuid>();
@@ -357,8 +359,8 @@ void QnCommonMetaTypes::initialize() {
     qRegisterMetaType<Qn::StatusChangeReason>("Qn::StatusChangeReason");
 
     QnJsonSerializer::registerSerializer<QnPtzMapperPtr>();
-    QnJsonSerializer::registerSerializer<Qn::PtzTraits>();
-    QnJsonSerializer::registerSerializer<Qn::PtzCapabilities>();
+    QnJsonSerializer::registerSerializer<Ptz::Traits>();
+    QnJsonSerializer::registerSerializer<Ptz::Capabilities>();
     QnJsonSerializer::registerSerializer<QList<QMap<QString, QString>>>();
 
     QnJsonSerializer::registerSerializer<QnOnvifConfigDataPtr>();

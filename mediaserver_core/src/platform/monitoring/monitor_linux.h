@@ -5,7 +5,7 @@
 #include <QtConcurrent/QtConcurrent>
 #include <boost/optional.hpp>
 #include "sigar_monitor.h"
-#include <utils/common/systemerror.h>
+#include <nx/utils/system_error.h>
 #include <nx/utils/thread/mutex.h>
 
 class QnLinuxMonitorPrivate;

@@ -10,5 +10,5 @@ struct CloudManagerGroup
     CdbNonceFetcher authenticationNonceFetcher;
     CloudUserAuthenticator userAuthenticator;
 
-    CloudManagerGroup(AbstractNonceProvider* defaultNonceFetcher);
+    CloudManagerGroup(QnCommonModule* commonModule, AbstractNonceProvider* defaultNonceFetcher);
 };

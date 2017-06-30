@@ -1,6 +1,4 @@
-# YOU MUST FIX THE LINES BELOW to make sure it will generate a merge conflict
+# YOU MUST FIX THE COMMENT to make sure it will generate a merge conflict
 # if somebody also updates the protocol version.
 # Prefer to use issue number and title as a comment.
-
-#VMS-5388: Some data is not shown if log in to Server with Cloud account
-set(nxec.ec2ProtoVersion "3025")
+set(nxec.ec2ProtoVersion "3027") #VMS-6451 Somebody forgot to update proto version

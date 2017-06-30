@@ -1,5 +1,4 @@
-#ifndef _STREAM_RECORDER_H__
-#define _STREAM_RECORDER_H__
+#pragma once
 
 #ifdef ENABLE_DATA_PROVIDERS
 
@@ -15,7 +14,7 @@ extern "C"
     #include <libavformat/avformat.h>
 }
 
-#include <utils/common/cryptographic_hash.h>
+#include <nx/utils/cryptographic_hash.h>
 
 #include <core/ptz/item_dewarping_params.h>
 
@@ -32,12 +31,16 @@ extern "C"
 
 #include <recording/stream_recorder_data.h>
 #include <boost/optional.hpp>
+#include <common/common_module_aware.h>
 
 class QnAbstractMediaStreamDataProvider;
 class QnFfmpegAudioTranscoder;
 class QnFfmpegVideoTranscoder;
 
-class QnStreamRecorder : public QnAbstractDataConsumer, public QnResourceConsumer
+class QnStreamRecorder:
+    public QnAbstractDataConsumer,
+    public QnResourceConsumer,
+    public QnCommonModuleAware
 {
     Q_OBJECT
 
@@ -177,7 +180,7 @@ private:
     bool m_needCalcSignature;
     QnAbstractMediaStreamDataProvider* m_mediaProvider;
 
-    QnCryptographicHash m_mdctx;
+    nx::utils::QnCryptographicHash m_mdctx;
 #ifdef SIGN_FRAME_ENABLED
     QImage m_logo;
 #endif
@@ -206,5 +209,3 @@ private:
 };
 
 #endif // ENABLE_DATA_PROVIDERS
-
-#endif // _STREAM_RECORDER_H__

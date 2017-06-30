@@ -1,5 +1,5 @@
-#include "license.h"
 
+#include "license.h"
 #include <cassert>
 
 #include <QtCore/QCryptographicHash>
@@ -11,6 +11,8 @@
 #include <openssl/pem.h>
 #include <openssl/bio.h>
 #include <openssl/err.h>
+
+#include <licensing/license_validator.h>
 
 #include <utils/common/app_info.h>
 #include <common/common_globals.h>
@@ -119,19 +121,13 @@ LicenseTypeInfo::LicenseTypeInfo(Qn::LicenseType licenseType, const QnLatin1Arra
 // QnLicense
 // -------------------------------------------------------------------------- //
 QnLicense::QnLicense()
-:
-    m_cameraCount(0),
-    m_isValid1(false),
-    m_isValid2(false)
 {
 }
 
-QnLicense::QnLicense(const QByteArray &licenseBlock)
-    : m_rawLicense(licenseBlock),
-      m_isValid1(false),
-      m_isValid2(false)
+QnLicense::QnLicense(const QByteArray& licenseBlock):
+    m_rawLicense(licenseBlock)
 {
-    loadLicenseBlock( licenseBlock );
+    loadLicenseBlock(licenseBlock);
 }
 
 QnLicense::~QnLicense()
@@ -218,20 +214,6 @@ QString QnLicense::longDisplayName(Qn::LicenseType licenseType) {
     return QString();
 }
 
-QnUuid QnLicense::serverId() const {
-    for(const QnPeerRuntimeInfo& info: QnRuntimeInfoManager::instance()->items()->getItems())
-    {
-        if (info.data.peer.peerType != Qn::PT_Server)
-            continue;
-
-        bool hwKeyOK = info.data.hardwareIds.contains(m_hardwareId);
-        bool brandOK = m_brand.isEmpty() || (m_brand == info.data.brand);
-        if (hwKeyOK && brandOK)
-            return info.uuid;
-    }
-    return QnUuid();
-}
-
 QString QnLicense::name() const
 {
     return m_name;
@@ -269,6 +251,11 @@ QByteArray QnLicense::signature() const
     return m_signature;
 }
 
+bool QnLicense::isValidSignature() const
+{
+    return m_isValid1 || m_isValid2;
+}
+
 QString QnLicense::xclass() const
 {
     return m_class;
@@ -303,111 +290,6 @@ QByteArray QnLicense::rawLicense() const
     return m_rawLicense;
 }
 
-bool QnLicense::gotError(ErrorCode* errCode, ErrorCode errorCode) const
-{
-    if (errCode)
-        *errCode = errorCode;
-    return errorCode == NoError;
-}
-
-bool checkForARMBox(const QString& value)
-{
-    return !value.isEmpty();
-}
-
-/*
-   >= v1.5, shoud have hwid1, hwid2 or hwid3, and have brand
-   v1.4 license may have or may not have brand, depending on was activation was done before or after 1.5 is released
-   We just allow empty brand for all, because we believe license is correct.
-*/
-bool QnLicense::isValid(ErrorCode* errCode, ValidationMode mode) const
-{
-    if (!m_isValid1 && !m_isValid2 && mode != VM_CheckInfo)
-        return gotError(errCode, InvalidSignature);
-
-    QnPeerRuntimeInfo info = QnRuntimeInfoManager::instance()->items()->getItem(mode == VM_Regular ? serverId() : qnCommon->remoteGUID());
-
-    // #TODO: #ynikitenkov It does not make sense in case of VM_JustAdded. #refactor
-    if (info.uuid.isNull())
-        return gotError(errCode, InvalidHardwareID); // peer where license was activated not found
-
-    if (!m_brand.isEmpty() && m_brand != info.data.brand)
-        return gotError(errCode, InvalidBrand);
-
-    if (expirationTime() > 0 && qnSyncTime->currentMSecsSinceEpoch() > expirationTime()) // TODO: #Elric make NEVER an INT64_MAX
-        return gotError(errCode, Expired);
-
-    bool isArmBox = checkForARMBox(info.data.box);
-    if (isArmBox && !isAllowedForArm())
-        return gotError(errCode, InvalidType); // strict allowed license type for ARM devices
-
-    if (isArmBox && type() == Qn::LC_Edge)
-        return isValidEdgeLicense(errCode, mode);
-
-    if (type() == Qn::LC_Start)
-        return isValidStartLicense(errCode, mode);
-
-    if (type() == Qn::LC_Invalid)
-        return gotError(errCode, FutureLicense);
-
-    return gotError(errCode, NoError);
-}
-
-QString QnLicense::validationInfo(ValidationMode mode) const {
-    ErrorCode code;
-    if (isValid(&code, mode))
-        return lit("Ok");
-
-    return errorMessage(code);
-}
-
-bool QnLicense::isValidEdgeLicense(ErrorCode* errCode, ValidationMode mode) const {
-    for(const QnLicensePtr& license: qnLicensePool->getLicenses()) {
-        // skip other license types and current license itself
-        if (license->type() != type() || license->key() == key())
-            continue;
-
-        // Only single EDGE license per ARM device is allowed
-        if (license->hardwareId() == hardwareId()) {
-            if (mode != VM_Regular)
-                return gotError(errCode, TooManyLicensesPerDevice); // mark current as invalid for any of special (non regular) mode
-            else if (license->key() < key())
-                return gotError(errCode, TooManyLicensesPerDevice); // mark the most least license as valid
-        }
-    }
-
-    return gotError(errCode, NoError);
-}
-
-bool QnLicense::isValidStartLicense(ErrorCode* errCode, ValidationMode mode) const {
-    Q_UNUSED(mode);
-
-    // Only single Start license per system is allowed
-    for(const QnLicensePtr& license: qnLicensePool->getLicenses()) {
-        // skip other license types and current license itself
-        if (license->type() != type() || license->key() == key())
-            continue;
-
-        // skip other licenses if they have less channels
-        if (license->cameraCount() < cameraCount())
-            continue;
-
-        if (license->cameraCount() > cameraCount())
-            return gotError(errCode, TooManyLicensesPerDevice); // mark current as invalid if it has less channels
-
-        // we found another license with the same number of channels
-        if (license->key() < key())
-            return gotError(errCode, TooManyLicensesPerDevice); // mark the most least license as valid
-    }
-
-    return gotError(errCode, NoError);
-}
-
-bool QnLicense::isAllowedForArm() const {
-    return ::licenseTypeInfo[type()].allowedForARM;
-}
-
-
 QByteArray QnLicense::toString() const
 {
     return m_rawLicense;
@@ -421,33 +303,6 @@ qint64 QnLicense::expirationTime() const
     QDateTime result = QDateTime::fromString(m_expiration, QLatin1String("yyyy-MM-dd hh:mm:ss"));
     result.setTimeSpec(Qt::UTC); /* Expiration is stored as UTC date-time. */
     return result.toMSecsSinceEpoch();
-}
-
-QString QnLicense::errorMessage(ErrorCode errCode)
-{
-    switch (errCode)
-    {
-    case NoError:
-        return QString();
-    case InvalidSignature:
-        return tr("Invalid signature");
-    case InvalidHardwareID:
-        return tr("Server with matching hardware ID not found");
-    case InvalidBrand:
-        return tr("Invalid customization");
-    case Expired:
-        return tr("License is expired"); // license is out of date
-    case InvalidType:
-        return tr("Invalid type");
-    case TooManyLicensesPerDevice:
-        return tr("Only single license is allowed for this device");
-    case FutureLicense:
-        return tr("This license type requires higher software version");
-    default:
-        return tr("Unknown error");
-    }
-
-    return QString();
 }
 
 Qn::LicenseType QnLicense::type() const
@@ -567,7 +422,8 @@ QList<QByteArray> QnLicenseListHelper::allLicenseKeys() const {
     return m_licenseDict.keys();
 }
 
-int QnLicenseListHelper::totalLicenseByType(Qn::LicenseType licenseType, bool ignoreValidity) const
+int QnLicenseListHelper::totalLicenseByType(Qn::LicenseType licenseType,
+    QnLicenseValidator* validator) const
 {
     if (licenseType == Qn::LC_Free)
         return std::numeric_limits<int>::max();
@@ -576,10 +432,13 @@ int QnLicenseListHelper::totalLicenseByType(Qn::LicenseType licenseType, bool ig
 
     for (const QnLicensePtr& license: m_licenseDict.values())
     {
-        if (license->type() == licenseType
-            && (ignoreValidity || license->isValid())
-            )
-            result += license->cameraCount();
+        if (license->type() != licenseType)
+            continue;
+
+        if (validator && !validator->isValid(license))
+            continue;
+
+        result += license->cameraCount();
     }
     return result;
 }
@@ -594,11 +453,11 @@ void QnLicenseListHelper::update(const QnLicenseList& licenseList) {
 // -------------------------------------------------------------------------- //
 // QnLicensePool
 // -------------------------------------------------------------------------- //
-class QnLicensePoolInstance: public QnLicensePool {};
-Q_GLOBAL_STATIC(QnLicensePoolInstance, qn_licensePool_instance)
-
-QnLicensePool::QnLicensePool():
-    m_mutex(QnMutex::Recursive)
+QnLicensePool::QnLicensePool(QObject* parent):
+    QObject(parent),
+    QnCommonModuleAware(parent),
+    m_mutex(QnMutex::Recursive),
+    m_licenseValidator(new QnLicenseValidator(this))
 {
     if (!qApp)
         return;
@@ -610,9 +469,8 @@ void QnLicensePool::at_timer()
 {
     for(const QnLicensePtr& license: m_licenseDict)
     {
-        QnLicense::ErrorCode errCode;
-        license->isValid(&errCode);
-        if (errCode == QnLicense::Expired) {
+        if (validateLicense(license) == QnLicenseErrorCode::Expired)
+        {
             qint64 experationDelta = qnSyncTime->currentMSecsSinceEpoch() - license->expirationTime();
             if (experationDelta < m_timer.interval()) {
                 emit licensesChanged();
@@ -622,11 +480,6 @@ void QnLicensePool::at_timer()
     }
 }
 
-QnLicensePool *QnLicensePool::instance()
-{
-    return qn_licensePool_instance();
-}
-
 QnLicenseList QnLicensePool::getLicenses() const
 {
     QnMutexLocker locker( &m_mutex );
@@ -634,13 +487,9 @@ QnLicenseList QnLicensePool::getLicenses() const
     return m_licenseDict.values();
 }
 
-bool QnLicensePool::isLicenseMatchesCurrentSystem(const QnLicensePtr &license) {
-    return license->isValid(0);
-}
-
-bool QnLicensePool::isLicenseValid(QnLicensePtr license, QnLicense::ErrorCode* errCode) const
+bool QnLicensePool::isLicenseValid(const QnLicensePtr& license) const
 {
-    return license->isValid(errCode);
+    return m_licenseValidator->isValid(license);
 }
 
 bool QnLicensePool::addLicense_i(const QnLicensePtr &license)
@@ -650,7 +499,7 @@ bool QnLicensePool::addLicense_i(const QnLicensePtr &license)
 
     m_licenseDict[license->key()] = license;
     // We check if m_brand is empty to allow v1.4 licenses to still work
-    return isLicenseMatchesCurrentSystem(license);
+    return isLicenseValid(license);
 }
 
 void QnLicensePool::addLicense(const QnLicensePtr &license)
@@ -719,10 +568,11 @@ bool QnLicensePool::isEmpty() const
 
 
 QVector<QString> QnLicensePool::hardwareIds() const {
-    return QnRuntimeInfoManager::instance()->remoteInfo().data.hardwareIds;
+    return commonModule()->runtimeInfoManager()->remoteInfo().data.hardwareIds;
 }
 
-QString QnLicensePool::currentHardwareId() const {
+QString QnLicensePool::currentHardwareId() const
+{
     QString hardwareId;
 
     // hardwareIds is a ordered list
@@ -743,6 +593,17 @@ QString QnLicensePool::currentHardwareId() const {
     return hardwareId;
 }
 
-int QnLicensePool::camerasPerAnalogEncoder() {
+QnLicenseValidator* QnLicensePool::validator() const
+{
+    return m_licenseValidator;
+}
+
+QnLicenseErrorCode QnLicensePool::validateLicense(const QnLicensePtr& license) const
+{
+    return m_licenseValidator->validate(license);
+}
+
+int QnLicensePool::camerasPerAnalogEncoder()
+{
     return camerasPerAnalogEncoderCount;
 }

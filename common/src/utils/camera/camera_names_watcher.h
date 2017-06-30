@@ -4,17 +4,18 @@
 #include <QtCore/QCoreApplication>
 
 #include <nx/utils/uuid.h>
+#include <common/common_module_aware.h>
 
 namespace utils {
 
-class QnCameraNamesWatcher: public QObject
+class QnCameraNamesWatcher: public QObject, public QnCommonModuleAware
 {
     Q_OBJECT
 
     typedef QObject base_type;
 
 public:
-    explicit QnCameraNamesWatcher(QObject *parent = nullptr);
+    explicit QnCameraNamesWatcher(QnCommonModule* commonModule);
     ~QnCameraNamesWatcher();
     QString getCameraName(const QnUuid& cameraId);
 

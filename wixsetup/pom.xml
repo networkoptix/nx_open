@@ -2,12 +2,12 @@
     <parent>
         <artifactId>hdwitness</artifactId>
         <groupId>com.networkoptix.hdwitness</groupId>
-        <version>3.0.0-SNAPSHOT</version>
+        <version>3.1.0-SNAPSHOT</version>
         <relativePath>..</relativePath>
     </parent>
 
     <groupId>com.networkoptix.hdwitness</groupId>
-    <version>3.0.0-SNAPSHOT</version>
+    <version>3.1.0-SNAPSHOT</version>
     <modelVersion>4.0.0</modelVersion>
     <artifactId>wixsetup</artifactId>
     <packaging>pom</packaging>
@@ -23,7 +23,7 @@
         <ClientFontsDir>${libdir}\bin\${build.configuration}\fonts</ClientFontsDir>
         <ClientQmlDir>${libdir}\bin\${build.configuration}\qml</ClientQmlDir>
         <VC14RedistPath>${environment.dir}/packages/${rdep.target}/vcredist-2015</VC14RedistPath>
-        <rdep.packages>vcredist-2015 vmaxproxy-2.1</rdep.packages>
+        <rdep.packages>vcredist-2015 vmaxproxy-2.1 any/help</rdep.packages>
     </properties>
 
     <dependencies>
@@ -61,6 +61,15 @@
             <type>pom</type>
             <scope>system</scope>
             <systemPath>${root.dir}/client/activex_client/pom.xml</systemPath>
+        </dependency>
+
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>nxcontrol</artifactId>
+            <version>${project.version}</version>
+            <type>pom</type>
+            <scope>system</scope>
+            <systemPath>${root.dir}/plugins/nxinterface/pom.xml</systemPath>
         </dependency>
     </dependencies>
 
@@ -229,7 +238,7 @@
                                 <descriptor>${project.build.directory}/assembly-update-client.xml</descriptor>
                             </descriptors>
                             <outputDirectory>${project.build.directory}/pack</outputDirectory>
-                            
+
                             <appendAssemblyId>false</appendAssemblyId>
                             <finalName>${artifact.name.client_update}</finalName>
                         </configuration>
@@ -244,7 +253,7 @@
                             <descriptors>
                                 <descriptor>${project.build.directory}/assembly-testcamera.xml</descriptor>
                             </descriptors>
-                            <outputDirectory>${project.build.directory}/pack</outputDirectory>                           
+                            <outputDirectory>${project.build.directory}/pack</outputDirectory>
                             <appendAssemblyId>false</appendAssemblyId>
                             <finalName>${artifact.name.testcamera}</finalName>
                         </configuration>
@@ -362,6 +371,24 @@
             </activation>
             <properties>
                 <nxtool>true</nxtool>
+            </properties>
+        </profile>
+        <profile>
+            <id>paxton-installer</id>
+            <activation>
+                <os>
+                    <family>Windows</family>
+                </os>
+                <property>
+                    <name>arch</name>
+                    <value>x86</value>
+                </property>
+                <file>
+                    <missing>../customization/${customization}/paxton.skip</missing>
+                </file>
+            </activation>
+            <properties>
+                <paxton>true</paxton>
             </properties>
         </profile>
     </profiles>

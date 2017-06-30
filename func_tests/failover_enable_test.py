@@ -8,6 +8,7 @@
 
 import pytest
 import time
+from test_utils.utils import SimpleNamespace
 import server_api_data_generators as generator
 
 
@@ -30,17 +31,19 @@ def counter():
 
 
 @pytest.fixture
-def env(env_builder, server, camera_factory, counter):
-    one = server()
-    two = server()
-    three = server()
-    built_env = env_builder(merge_servers=[one, two, three],
-                            one=one, two=two, three=three)
+def env(server_factory, camera_factory, counter):
+    one = server_factory('one')
+    two = server_factory('two')
+    three = server_factory('three')
+    one.merge([two, three])
     # Create cameras
-    for srv in built_env.servers.values():
-        add_cameras_to_server(srv, camera_factory, counter, 2)
-    return built_env
-
+    for server in [one, two, three]:
+        add_cameras_to_server(server, camera_factory, counter, 2)
+    return SimpleNamespace(
+        one=one,
+        two=two,
+        three=three,
+        )
 
 def add_cameras_to_server(server, camera_factory, counter, count):
     for i in range(count):

@@ -2,16 +2,16 @@
     <parent>
         <artifactId>cpp</artifactId>
         <groupId>com.networkoptix.hdwitness</groupId>
-        <version>3.0.0-SNAPSHOT</version>
+        <version>3.1.0-SNAPSHOT</version>
         <relativePath>../cpp</relativePath>
     </parent>
 
     <groupId>com.networkoptix.hdwitness</groupId>
-    <version>3.0.0-SNAPSHOT</version>
+    <version>3.1.0-SNAPSHOT</version>
     <modelVersion>4.0.0</modelVersion>
     <artifactId>appserver2</artifactId>
     <packaging>pom</packaging>
-    <name>Nx Witness AppServer2 Library</name>    
+    <name>Nx Witness AppServer2 Library</name>
 
     <properties>
         <guid>${appserver2.guid}</guid>
@@ -20,14 +20,14 @@
         <buildLib>sharedlib</buildLib>
 
         <qt.libs>core gui network xml sql concurrent</qt.libs>
-        <global.libs>-lcommon -lnx_streaming -lnx_network -lnx_fusion -lnx_utils -lcloud_db_client</global.libs>
+        <global.libs>-lcommon -lnx_network -lnx_fusion -lnx_utils -lcloud_db_client -lnx_kit</global.libs>
         <windows.oslibs>Ws2_32.lib DbgHelp.lib -lIphlpapi -lwinmm</windows.oslibs>
         <mac.oslibs>-lbz2 -lz -framework IOKit -framework CoreServices</mac.oslibs>
 
         <windows.defines>EC2_LIB_API=__declspec(dllexport)</windows.defines>
 
         <rdep.packages>openssl ffmpeg</rdep.packages>
-    </properties>	
+    </properties>
 
     <dependencies>
         <dependency>
@@ -50,21 +50,12 @@
 
         <dependency>
             <groupId>${project.groupId}</groupId>
-            <artifactId>nx_streaming</artifactId>
-            <version>${project.version}</version>
-            <type>pom</type> 
-            <scope>system</scope>
-            <systemPath>${root.dir}/common_libs/nx_streaming/pom.xml</systemPath>
-        </dependency>  
-
-        <dependency>
-            <groupId>${project.groupId}</groupId>
             <artifactId>nx_fusion</artifactId>
             <version>${project.version}</version>
             <type>pom</type>
             <scope>system</scope>
             <systemPath>${root.dir}/common_libs/nx_fusion/pom.xml</systemPath>
-        </dependency>         
+        </dependency>
 
         <dependency>
             <groupId>${project.groupId}</groupId>
@@ -74,7 +65,7 @@
             <scope>system</scope>
             <systemPath>${root.dir}/nx_cloud/cloud_db_client/pom.xml</systemPath>
         </dependency>
-    </dependencies>    
+    </dependencies>
 
     <profiles>
         <profile>
@@ -83,7 +74,7 @@
                 <os>
                     <family>Windows</family>
                 </os>
-            </activation>            
+            </activation>
             <properties>
                 <buildLib>staticlib</buildLib>
             </properties>

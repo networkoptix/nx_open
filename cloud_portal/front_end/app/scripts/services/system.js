@@ -3,7 +3,7 @@
 // Special service for operating with systems at high-level
 
 angular.module('cloudApp')
-    .factory('system', ['cloudApi', 'mediaserver', '$q', 'uuid2', '$log', function (cloudApi, mediaserver, $q, uuid2, $log) {
+    .factory('system', ['cloudApi', 'systemAPI', '$q', 'uuid2', '$log', function (cloudApi, systemAPI, $q, uuid2, $log) {
 
         var systems = {};
 
@@ -19,19 +19,31 @@ angular.module('cloudApp')
             this.accessRole = '';
             
             this.currentUserEmail = currentUserEmail;
-            this.mediaserver = mediaserver(systemId);
+            var self = this;
+            this.mediaserver = systemAPI(currentUserEmail, systemId, null, function(){
+                // Unauthorised request handler
+                // Some options here:
+                // * Access was revoked
+                // * System was disconnected from cloud
+                // * Password was changed
+                // * Nonce expired
+
+                // We try to update nonce and auth on the server again
+                // Other cases are not distinguishable
+                return self.updateSystemAuth(true);
+            });
             this.updateSystemState();
         }
-
-        system.prototype.updateSystemAuth = function(){
+        system.prototype.updateSystemAuth = function(force){
             var self = this;
-            if(self.auth){ //no need to update
-                return;
+            if(!force && self.auth){ //no need to update
+                return $q.resolve(true);
             }
+            self.auth = false;
             return cloudApi.getSystemAuth(self.id).then(function(data){
-                self.auth = data.data.auth;
-                return self.mediaserver.login(self.auth);
-            })
+                self.auth = true;
+                return self.mediaserver.setAuthKeys(data.data.authGet, data.data.authPost, data.data.authPlay);
+            });
         };
         system.prototype.updateSystemState = function(){
             this.stateMessage = '';
@@ -332,7 +344,7 @@ angular.module('cloudApp')
             }); // Anyway - send another request to cloud_db to remove myself
         }
 
-        system.prototype.update = function(){
+        system.prototype.update = function(secondAttempt){
             var self = this;
             self.infoPromise = null; //Clear cache
             return self.getInfo().then(function(){

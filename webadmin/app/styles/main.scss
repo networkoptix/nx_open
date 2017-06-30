@@ -2,6 +2,11 @@ $icon-font-path: "../fonts/";
 
 @import '../bower_components/sass-bootstrap/lib/_variables.scss';
 @import '_languages';
+@import '../web_common/styles/common';
+
+.webclient{
+    margin-top: -20px !important;
+}
 
 @mixin icon{
   display: inline-block;
@@ -41,10 +46,14 @@ $radio-panels-selected-border: $gray-light;
   font-family: "Roboto";
 }
 
-/* Space out content a bit */
+/* Space out content a bit  */
 body {
   padding-bottom: 20px;
   height:100%;
+}
+
+html.webclient-page{
+    overflow: hidden;
 }
 
 @media only screen and (device-width: 768px) {

@@ -2,12 +2,12 @@
     <parent>
         <artifactId>hdwitness</artifactId>
         <groupId>com.networkoptix.hdwitness</groupId>
-        <version>3.0.0-SNAPSHOT</version>
+        <version>3.1.0-SNAPSHOT</version>
         <relativePath>..</relativePath>
     </parent>
 
     <groupId>com.networkoptix.hdwitness</groupId>
-    <version>3.0.0-SNAPSHOT</version>
+    <version>3.1.0-SNAPSHOT</version>
     <modelVersion>4.0.0</modelVersion>
     <artifactId>client</artifactId>
     <packaging>pom</packaging>
@@ -22,8 +22,8 @@
     <modules>
         <module>applauncher</module>
         <module>desktop_client</module>
-        <module>libclient</module>
-        <module>libclient_core</module>
+        <module>nx_client_desktop</module>
+        <module>nx_client_core</module>
         <module>minilauncher</module>
         <module>mobile_client</module>
     </modules>

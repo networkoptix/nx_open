@@ -11,7 +11,7 @@
 #include <QtCore/QThread>
 
 #include <utils/common/command_line_parser.h>
-#include <nx/utils/log/log.h>
+#include <nx/utils/log/log_initializer.h>
 #include <utils/common/app_info.h>
 #include <nx/network/socket_global.h>
 
@@ -155,13 +155,14 @@ int main(int argc, char* argv[])
     //initialize logging based on args
     if (!logFilePath.isEmpty() && !logLevel.isEmpty())
     {
-        cl_log.create(logFilePath, 1024 * 1024 * 10, 5, cl_logWARNING);
-        QnLog::initLog(logLevel);
-    }
+        nx::utils::log::Settings settings;
+        settings.level = nx::utils::log::Level::warning;
+        settings.maxFileSize = 1024 * 1024 * 10;
+        settings.maxBackupCount = 5;
 
-    NX_LOG(QnApplauncherAppInfo::applicationName() + " started", cl_logALWAYS);
-    NX_LOG("Software version: " + QnAppInfo::applicationVersion(), cl_logALWAYS);
-    NX_LOG("Software revision: " + QnAppInfo::applicationRevision(), cl_logALWAYS);
+        nx::utils::log::initialize(
+            settings, QString(), QnApplauncherAppInfo::applicationName(), QString(), logFilePath);
+    }
 
     InstallationManager installationManager;
 
@@ -327,7 +328,7 @@ int doInstallation(
 #include <fstream>
 #include <string.h>
 
-#include <nx/network/http/httpclient.h>
+#include <nx/network/http/http_client.h>
 
 //--rsync --dir=c:/temp/1 --url=enk.me/clients/2.1/default/windows/x64/
 //--rsync --dir=c:/tmp/1/ --url=downloads.hdwitness.com/clients/2.1/default/windows/x64/

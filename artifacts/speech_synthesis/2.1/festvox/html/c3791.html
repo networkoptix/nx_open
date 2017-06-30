@@ -1,0 +1,335 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>Festival's Scheme Programming Language</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REL="HOME"
+TITLE="Building Synthetic Voices"
+HREF="book1.html"><LINK
+REL="PREVIOUS"
+TITLE="Festival Details"
+HREF="c3788.html"><LINK
+REL="NEXT"
+TITLE="Data Types"
+HREF="x3843.html"></HEAD
+><BODY
+CLASS="CHAPTER"
+BGCOLOR="#FFFFFF"
+TEXT="#000000"
+LINK="#0000FF"
+VLINK="#840084"
+ALINK="#0000FF"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="3"
+ALIGN="center"
+>Building Synthetic Voices</TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="bottom"
+><A
+HREF="c3788.html"
+ACCESSKEY="P"
+>&#60;&#60;&#60; Previous</A
+></TD
+><TD
+WIDTH="80%"
+ALIGN="center"
+VALIGN="bottom"
+></TD
+><TD
+WIDTH="10%"
+ALIGN="right"
+VALIGN="bottom"
+><A
+HREF="x3843.html"
+ACCESSKEY="N"
+>Next &#62;&#62;&#62;</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="CHAPTER"
+><H1
+><A
+NAME="AEN3791"
+></A
+>Festival's Scheme Programming Language</H1
+><P
+>This chapter acts as a reference guide for the particular dialect of 
+the Scheme programming language used in the Festival Speech Synthesis 
+systems. The Scheme programming language is a dialect of Lisp 
+designed to be more consistent. It was chosen for the basic 
+scripting language in Festival because: 
+<P
+></P
+><UL
+><LI
+STYLE="list-style-type: disc"
+><P
+>&#13;it is a very easy language for machines to parse and interpret, thus 
+the foot print for the interpreter proper is very small </P
+></LI
+><LI
+STYLE="list-style-type: disc"
+><P
+>&#13;it offers garbage collection making managing objects safe and easy. </P
+></LI
+><LI
+STYLE="list-style-type: disc"
+><P
+>&#13;it offers a general consistent datastructure for representing parameters, 
+rules etc. </P
+></LI
+><LI
+STYLE="list-style-type: disc"
+><P
+>&#13;it was familiar to the authors </P
+></LI
+><LI
+STYLE="list-style-type: disc"
+><P
+>&#13;its is suitable for use as an embedded system </P
+></LI
+></UL
+>
+Having a scripting language in Festival is actually one of the 
+fundamental properties that makes Festival a useful system. The fact 
+that new voices and languages in many cases can be added without 
+changing the underlying C++ code makes the system mouch more powerful 
+and accessible than a more monolithic system that requires recompilation 
+for any parameter changes. As there is sometimes confusion we 
+should make it clear that Festival contains its own Scheme interpreter 
+as part of the system. Festival can be view as a Scheme interpreter 
+that has had basic addition to its function to include modules 
+that can do speech synthesis, no external Scheme interperter is 
+required to use Festival. </P
+><P
+>The actual interpreter used in Festival is based on George Carret's 
+SIOD, "Scheme in one Defun". But this has been substantially enhanced 
+from its small elegant beginnings into something that might be better 
+called "Scheme in one directory". Although there is a standard for 
+Scheme the version in Festival does not fully follow it, for both good 
+and bad reasons. Thus finding in order for people to be able to program 
+in Festival's Scheme we provide this chapter to list the core type, 
+functions, etc and some examples. We do not pretend to be teaching 
+programming here but as we know many people who are interested in 
+building voices are not primarily programmers, some guidance on the 
+language and its usage will make the simple programming that is 
+required in building voices, more accessible. </P
+><P
+>For reference the Scheme Revised Revised Revised report describes the 
+standard definition [<SPAN
+CLASS="CITATION"
+>srrrr90</SPAN
+>]. For a good introduction to 
+programming in general that happens to use Scheme as its example 
+language we recommend [<SPAN
+CLASS="CITATION"
+>abelson85</SPAN
+>]. Also for those who are 
+unfamiliar with the use of Lisp-like scripting languages we recommend a 
+close look as GNU Emacs which uses Lisp as its underlying scripting 
+language, knowledge of the internals of Emacs did to some extent 
+influence the scripting language design of Festival. </P
+><DIV
+CLASS="SECT1"
+><H1
+CLASS="SECT1"
+><A
+NAME="AEN3809"
+>Overview</A
+></H1
+><P
+>"Lots of brackets" is what comes to most people's minds when considering 
+Lisp and its various derivatives such as Scheme. At the start this can 
+seem daunting and it is true that parenthesis errors can cuase problems. 
+But with an editor that does proper bracket matching, brackets can 
+actually be helpful in code structure rather than a hindrance. </P
+><P
+>The fundamental structure is the <I
+CLASS="EMPHASIS"
+>s-expression</I
+>. It consists of an 
+atom, or a list of s-expressions. This simply defined recursive 
+structure allows complex structures to easily be specified. For 
+example 
+<A
+NAME="AEN3814"
+></A
+><BLOCKQUOTE
+CLASS="BLOCKQUOTE"
+><P
+CLASS="LITERALLAYOUT"
+>3<br>
+(1&nbsp;2&nbsp;3)<br>
+(a&nbsp;(b&nbsp;c)&nbsp;d)<br>
+((a&nbsp;b)&nbsp;(d&nbsp;e))</P
+></BLOCKQUOTE
+>
+Unlike other programming languages Scheme's data and code are 
+in the same format, s-expressions. Thus s-expression 
+are evaluated, recursively. 
+<P
+></P
+><DIV
+CLASS="VARIABLELIST"
+><DL
+><DT
+><I
+CLASS="EMPHASIS"
+>Symbols:</I
+></DT
+><DD
+><P
+>are treated as variables and evaluated return their currently set value. </P
+></DD
+><DT
+><I
+CLASS="EMPHASIS"
+>Strings and numbers:</I
+></DT
+><DD
+><P
+>evalutate to themselves. </P
+></DD
+><DT
+><I
+CLASS="EMPHASIS"
+>Lists:</I
+></DT
+><DD
+><P
+>The each member of the list is evaluated and the first item in 
+the list is treated as a function and applied using the remainer of the 
+list as arguments to the function. </P
+></DD
+></DL
+></DIV
+>
+Thus the s-expression 
+<A
+NAME="AEN3832"
+></A
+><BLOCKQUOTE
+CLASS="BLOCKQUOTE"
+><P
+CLASS="LITERALLAYOUT"
+>(+&nbsp;1&nbsp;2)</P
+></BLOCKQUOTE
+>
+when evaluated will return <CODE
+CLASS="VARNAME"
+>3</CODE
+> as the symbol <CODE
+CLASS="VARNAME"
+>+</CODE
+> 
+is bound to a function that adds it arguments. </P
+><P
+>Variables may be set using the <CODE
+CLASS="VARNAME"
+>set!</CODE
+> function which takes 
+a variable name and a value as arguments 
+<A
+NAME="AEN3838"
+></A
+><BLOCKQUOTE
+CLASS="BLOCKQUOTE"
+><P
+CLASS="LITERALLAYOUT"
+>(set!&nbsp;a&nbsp;3)</P
+></BLOCKQUOTE
+>
+The <CODE
+CLASS="VARNAME"
+>set!</CODE
+> function is unusual in that it does not evaluate its 
+first argument. If it did you have to explcitly quote it or set some 
+other variable to have a value of <CODE
+CLASS="VARNAME"
+>a</CODE
+> to get the desired effect. </P
+><P
+>quoting, define </P
+></DIV
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="c3788.html"
+ACCESSKEY="P"
+>&#60;&#60;&#60; Previous</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="book1.html"
+ACCESSKEY="H"
+>Home</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="x3843.html"
+ACCESSKEY="N"
+>Next &#62;&#62;&#62;</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>Festival Details</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+>&nbsp;</TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>Data Types</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

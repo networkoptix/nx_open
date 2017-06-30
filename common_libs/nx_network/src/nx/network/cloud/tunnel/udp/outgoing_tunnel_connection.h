@@ -52,8 +52,8 @@ public:
  */
 class NX_NETWORK_API OutgoingTunnelConnection:
     public AbstractOutgoingTunnelConnection,
-    public StreamConnectionHolder<
-		nx_api::BaseStreamProtocolConnectionEmbeddable<
+    public nx::network::server::StreamConnectionHolder<
+		nx::network::server::BaseStreamProtocolConnectionEmbeddable<
 			nx::stun::Message,
             nx::stun::MessageParser,
             nx::stun::MessageSerializer>>
@@ -87,7 +87,7 @@ public:
         nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode)> handler) override;
 
 private:
-    typedef nx_api::BaseStreamProtocolConnectionEmbeddable<
+    typedef nx::network::server::BaseStreamProtocolConnectionEmbeddable<
         nx::stun::Message,
         nx::stun::MessageParser,
         nx::stun::MessageSerializer

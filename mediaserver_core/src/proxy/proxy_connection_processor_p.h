@@ -1,5 +1,4 @@
-#ifndef __PROXY_CONNECTION_PROCESSOR_PRIV_H_
-#define __PROXY_CONNECTION_PROCESSOR_PRIV_H_
+#pragma once
 
 #include <chrono>
 
@@ -14,6 +13,7 @@ public:
     QnProxyConnectionProcessorPrivate():
         QnTCPConnectionProcessorPrivate(),
         connectTimeout(5000),
+        messageBus(nullptr),
         lastIoTimePoint(std::chrono::steady_clock::now())
     {
     }
@@ -22,10 +22,8 @@ public:
     }
 
     QSharedPointer<AbstractStreamSocket> dstSocket;
-    QnUniversalTcpListener* owner;
     QUrl lastConnectedUrl;
     std::chrono::milliseconds connectTimeout;
-    std::chrono::steady_clock::time_point lastIoTimePoint;
+    ec2::QnTransactionMessageBusBase* messageBus;
+	std::chrono::steady_clock::time_point lastIoTimePoint;
 };
-
-#endif // __PROXY_CONNECTION_PROCESSOR_PRIV_H_

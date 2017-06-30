@@ -11,14 +11,16 @@
 
 namespace ec2 {
 
-class QnTimeSyncRestHandler
-:
-    public QnRestRequestHandler
+class Ec2DirectConnectionFactory;
+
+class QnTimeSyncRestHandler: public QnRestRequestHandler
 {
 public:
     static const QString PATH;
     //!used to pass time sync information between peers
     static const QByteArray TIME_SYNC_HEADER_NAME;
+
+    QnTimeSyncRestHandler(Ec2DirectConnectionFactory* connection);
 
     //!Implementation of \a QnRestRequestHandler::executeGet
     virtual int executeGet(
@@ -36,6 +38,8 @@ public:
         QByteArray& result,
         QByteArray& resultContentType,
         const QnRestConnectionProcessor* ) override;
+private:
+    Ec2DirectConnectionFactory* m_appServerConnection;
 };
 
 }

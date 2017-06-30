@@ -44,7 +44,7 @@ AbstractHttpRequestHandler::~AbstractHttpRequestHandler()
 bool AbstractHttpRequestHandler::processRequest(
     nx_http::HttpServerConnection* const connection,
     nx_http::Message&& requestMsg,
-    stree::ResourceContainer&& authInfo,
+    nx::utils::stree::ResourceContainer&& authInfo,
     ResponseIsReadyHandler completionHandler)
 {
     NX_ASSERT(requestMsg.type == nx_http::MessageType::request);
@@ -70,6 +70,17 @@ bool AbstractHttpRequestHandler::processRequest(
         m_responseMsg.response,
         std::move(httpRequestProcessedHandler));
     return true;
+}
+
+void AbstractHttpRequestHandler::setRequestPathParams(
+    std::vector<StringType> params)
+{
+    m_requestPathParams = std::move(params);
+}
+
+const std::vector<StringType>& AbstractHttpRequestHandler::requestPathParams() const
+{
+    return m_requestPathParams;
 }
 
 nx_http::Response* AbstractHttpRequestHandler::response()

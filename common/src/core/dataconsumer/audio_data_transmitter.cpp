@@ -1,18 +1,17 @@
-#ifdef ENABLE_DATA_PROVIDERS
-
 #include "audio_data_transmitter.h"
-#include <utils/common/sleep.h>
-#include <core/resource/resource.h>
+
+#if defined(ENABLE_DATA_PROVIDERS)
 
 #include <set>
-#include <QFile>
+
+#include <utils/common/sleep.h>
+#include <core/resource/resource.h>
 
 QnAbstractAudioTransmitter::QnAbstractAudioTransmitter():
     QnAbstractDataConsumer(1000),
     m_transmittedPacketDuration(0),
     m_prevUsedProvider(nullptr)
 {
-
 }
 
 void QnAbstractAudioTransmitter::endOfRun()
@@ -26,7 +25,7 @@ void QnAbstractAudioTransmitter::endOfRun()
 void QnAbstractAudioTransmitter::makeRealTimeDelay(const QnConstCompressedAudioDataPtr& audioData)
 {
     m_transmittedPacketDuration += audioData->getDurationMs();
-    qint64  diff = m_transmittedPacketDuration - m_elapsedTimer.elapsed();
+    qint64 diff = m_transmittedPacketDuration - m_elapsedTimer.elapsed();
     if(diff > 0)
         QnSleep::msleep(diff);
 }
@@ -46,7 +45,7 @@ bool QnAbstractAudioTransmitter::processData(const QnAbstractDataPacketPtr &data
     {
         QnMutexLocker lock(&m_mutex);
         if (m_providers.empty() || m_providers.begin()->second.data() != data->dataProvider)
-            return true; //< data from non active provider
+            return true; //< Data from non-active provider.
     }
 
     if (auto audioData = std::dynamic_pointer_cast<const QnCompressedAudioData>(data))
@@ -73,7 +72,8 @@ void QnAbstractAudioTransmitter::unsubscribe(QnAbstractStreamDataProvider* dataP
     unsubscribeUnsafe(dataProvider);
 }
 
-void QnAbstractAudioTransmitter::removePacketsByProvider(QnAbstractStreamDataProvider* dataProvider)
+void QnAbstractAudioTransmitter::removePacketsByProvider(
+    QnAbstractStreamDataProvider* dataProvider)
 {
     bool removeSince = false;
     std::set<QnAbstractStreamDataProvider*> providersToFlush;
@@ -125,14 +125,15 @@ void QnAbstractAudioTransmitter::subscribe(
     if (!dataProvider)
         return;
 
-    // add timestamp to priority class (6 lower bytes is timestamp, 2 high byte priorityClass)
-    qint64 priority = ((qint64)priorityClass << 48) + QDateTime::currentMSecsSinceEpoch();
+    // Add a timestamp to the priority class (6 lower bytes are the timestamp, 2 higher bytes are
+    // the priorityClass).
+    qint64 priority = ((qint64) priorityClass << 48) + QDateTime::currentMSecsSinceEpoch();
 
     QnMutexLocker lock(&m_mutex);
     for (auto itr = m_providers.begin(); itr != m_providers.end(); ++itr)
     {
         if (itr->second == dataProvider)
-            return; // already exists
+            return; //< Already exists.
     }
 
     m_providers.emplace(priority, dataProvider);
@@ -148,4 +149,4 @@ void QnAbstractAudioTransmitter::subscribe(
     start();
 }
 
-#endif // ENABLE_DATA_PROVIDERS
+#endif // defined(ENABLE_DATA_PROVIDERS)

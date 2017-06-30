@@ -1,67 +1,15 @@
 #include "authutil.h"
+
 #include <QCryptographicHash>
 
 #include <nx/fusion/model_functions.h>
+#include <nx/utils/string.h>
 
-template <class T, class T2>
-QList<T> smartSplitInternal(const T& data, const T2 delimiter, const T2 quoteChar, bool keepEmptyParts)
+QMap<QByteArray, QByteArray> parseAuthData(const QByteArray& authData, char delimiter)
 {
-    bool quoted = false;
-    QList<T> rez;
-    if (data.isEmpty())
-        return rez;
-
-    int lastPos = 0;
-    for (int i = 0; i < data.size(); ++i)
-    {
-        if (data[i] == quoteChar)
-            quoted = !quoted;
-        else if (data[i] == delimiter && !quoted)
-        {
-            T value = data.mid(lastPos, i - lastPos);
-            if (!value.isEmpty() || keepEmptyParts)
-                rez << value;
-            lastPos = i + 1;
-        }
-    }
-    rez << data.mid(lastPos, data.size() - lastPos);
-
-    return rez;
-}
-
-QList<QByteArray> smartSplit(const QByteArray& data, const char delimiter)
-{
-    return smartSplitInternal(data, delimiter, '\"', true);
-}
-
-QStringList smartSplit(const QString& data, const QChar delimiter, QString::SplitBehavior splitBehavior )
-{
-    return smartSplitInternal(data, delimiter, QChar(L'\"'), splitBehavior == QString::KeepEmptyParts);
-}
-
-template <class T, class T2>
-T unquoteStrInternal(const T& v, T2 quoteChar)
-{
-    T value = v.trimmed();
-    int pos1 = value.startsWith(quoteChar) ? 1 : 0;
-    int pos2 = value.endsWith(quoteChar) ? 1 : 0;
-    return value.mid(pos1, value.length()-pos1-pos2);
-}
-
-QByteArray unquoteStr(const QByteArray& v)
-{
-    return unquoteStrInternal(v, '\"');
-}
-
-QString unquoteStr(const QString& v)
-{
-    return unquoteStrInternal(v, L'\"');
-}
-
-QMap<QByteArray, QByteArray> parseAuthData(const QByteArray &authData, char delimiter) {
     QMap<QByteArray, QByteArray> result;
 
-    const QList<QByteArray>& authParams = smartSplit(authData, delimiter);
+    const QList<QByteArray>& authParams = nx::utils::smartSplit(authData, delimiter);
 
     for (int i = 0; i < authParams.size(); ++i)
     {
@@ -71,7 +19,7 @@ QMap<QByteArray, QByteArray> parseAuthData(const QByteArray &authData, char deli
             return QMap<QByteArray, QByteArray>();
 
         QByteArray key = data.left(pos);
-        QByteArray value = unquoteStr(data.mid(pos+1));
+        QByteArray value = nx::utils::unquoteStr(data.mid(pos+1));
 
         result[key] = value;
     }
@@ -82,11 +30,39 @@ QMap<QByteArray, QByteArray> parseAuthData(const QByteArray &authData, char deli
 QByteArray createUserPasswordDigest(
     const QString& userName,
     const QString& password,
-    const QString& realm )
+    const QString& realm)
 {
     QCryptographicHash md5(QCryptographicHash::Md5);
-    md5.addData(QString(lit("%1:%2:%3")).arg(userName.toLower(), realm, password).toLatin1());
+    md5.addData(userName.toLower().toUtf8());
+    md5.addData(":");
+    md5.addData(realm.toUtf8());
+    md5.addData(":");
+    md5.addData(password.toUtf8());
     return md5.result().toHex();
+}
+
+QByteArray createHttpQueryAuthParam(
+    const QString& userName,
+    const QByteArray& digest,
+    const QByteArray& method,
+    QByteArray nonce)
+{
+    // Calculating HA2.
+    QCryptographicHash md5(QCryptographicHash::Md5);
+    md5.addData(method);
+    md5.addData(":");
+    const QByteArray& partialHa2 = md5.result().toHex();
+
+    // Calculating authentication digest.
+    md5.reset();
+    md5.addData(digest);
+    md5.addData(":");
+    md5.addData(nonce);
+    md5.addData(":");
+    md5.addData(partialHa2);
+    const QByteArray& simplifiedHa2 = md5.result().toHex();
+
+    return (userName.toUtf8().toLower() + ":" + nonce + ":" + simplifiedHa2).toBase64();
 }
 
 QByteArray createHttpQueryAuthParam(
@@ -96,31 +72,8 @@ QByteArray createHttpQueryAuthParam(
     const QByteArray& method,
     QByteArray nonce)
 {
-    return createHttpQueryAuthParam(userName, createUserPasswordDigest(userName, password, realm), method, nonce);
-}
-
-QByteArray createHttpQueryAuthParam(
-    const QString& userName,
-    const QByteArray& digest,
-    const QByteArray& method,
-    QByteArray nonce)
-{
-    //calculating "HA2"
-    QCryptographicHash md5Hash( QCryptographicHash::Md5 );
-    md5Hash.addData( method );
-    md5Hash.addData( ":" );
-    const QByteArray nedoHa2 = md5Hash.result().toHex();
-
-    //calculating auth digest
-    md5Hash.reset();
-    md5Hash.addData( digest );
-    md5Hash.addData( ":" );
-    md5Hash.addData( nonce );
-    md5Hash.addData( ":" );
-    md5Hash.addData( nedoHa2 );
-    const QByteArray& authDigest = md5Hash.result().toHex();
-
-    return (userName.toUtf8().toLower() + ":" + nonce + ":" + authDigest).toBase64();
+    const auto& digest = createUserPasswordDigest(userName, password, realm);
+    return createHttpQueryAuthParam(userName, digest, method, nonce);
 }
 
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES((NonceReply), (json), _Fields)

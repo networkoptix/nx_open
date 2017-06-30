@@ -14,7 +14,7 @@
 #include <utils/crypt/symmetrical.h>
 
 #include <nx_ec/data/api_resource_data.h>
-
+#include <common/common_module.h>
 
 namespace
 {
@@ -45,6 +45,8 @@ namespace
 
     const QString kArecontRtspEnabled(lit("arecontRtspEnabled"));
     const bool kArecontRtspEnabledDefault = false;
+    const QString kSequentialFlirOnvifSearcherEnabled(lit("sequentialFlirOnvifSearcherEnabled"));
+    const bool kSequentialFlirOnvifSearcherEnabledDefault = false;
     const QString kProxyConnectTimeout(lit("proxyConnectTimeoutSec"));
     const int kProxyConnectTimeoutDefault = 5;
 
@@ -69,9 +71,10 @@ namespace
 using namespace nx::settings_names;
 
 QnGlobalSettings::QnGlobalSettings(QObject *parent):
-    base_type(parent)
+    base_type(parent),
+    QnCommonModuleAware(parent)
 {
-    NX_ASSERT(qnResPool);
+    NX_ASSERT(commonModule()->resourcePool());
 
     m_allAdaptors
         << initEmailAdaptors()
@@ -83,25 +86,33 @@ QnGlobalSettings::QnGlobalSettings(QObject *parent):
         << initMiscAdaptors()
         ;
 
-    connect(qnResPool, &QnResourcePool::resourceAdded, this,
-        &QnGlobalSettings::at_resourcePool_resourceAdded);
-    connect(qnResPool, &QnResourcePool::resourceRemoved, this,
-        &QnGlobalSettings::at_resourcePool_resourceRemoved);
+    connect(this, &QnGlobalSettings::adminUserFound, this, &QnGlobalSettings::at_adminUserAdded, Qt::QueuedConnection);
+    connect(commonModule()->resourcePool(), &QnResourcePool::resourceAdded, this,
+        [this](const QnResourcePtr& resource)
+        {
+            if (resource->getId() == QnUserResource::kAdminGuid)
+                emit adminUserFound(resource);
+        }, Qt::DirectConnection);
+
+    connect(commonModule()->resourcePool(), &QnResourcePool::resourceRemoved, this,
+        &QnGlobalSettings::at_resourcePool_resourceRemoved, Qt::DirectConnection);
     initialize();
 }
 
-QnGlobalSettings::~QnGlobalSettings() {
-    disconnect(qnResPool, NULL, this, NULL);
-    if(m_admin)
-        at_resourcePool_resourceRemoved(m_admin);
+QnGlobalSettings::~QnGlobalSettings()
+{
+//     disconnect(commonModule()->resourcePool(), NULL, this, NULL);
+//     if(m_admin)
+//         at_resourcePool_resourceRemoved(m_admin);
 }
 
 void QnGlobalSettings::initialize()
 {
     if (isInitialized())
         return;
-    for (const QnResourcePtr &resource : qnResPool->getResources())
-        at_resourcePool_resourceAdded(resource);
+    const QnResourcePtr &resource = commonModule()->resourcePool()->getResourceById(QnUserResource::kAdminGuid);
+    if (resource)
+        at_adminUserAdded(resource);
 }
 
 bool QnGlobalSettings::isInitialized() const
@@ -326,6 +337,11 @@ QnGlobalSettings::AdaptorList QnGlobalSettings::initMiscAdaptors()
         kArecontRtspEnabledDefault,
         this);
 
+    m_sequentialFlirOnvifSearcherEnabledAdaptor = new QnLexicalResourcePropertyAdaptor<bool>(
+        kSequentialFlirOnvifSearcherEnabled,
+        kSequentialFlirOnvifSearcherEnabledDefault,
+        this);
+
     m_maxRecorderQueueSizeBytes = new QnLexicalResourcePropertyAdaptor<int>(
         kMaxRecorderQueueSizeBytesName,
         kMaxRecorderQueueSizeBytesDefault,
@@ -375,6 +391,7 @@ QnGlobalSettings::AdaptorList QnGlobalSettings::initMiscAdaptors()
         << m_upnpPortMappingEnabledAdaptor
         << m_cloudHostAdaptor
         << m_arecontRtspEnabledAdaptor
+        << m_sequentialFlirOnvifSearcherEnabledAdaptor
         << m_maxRecorderQueueSizeBytes
         << m_maxRecorderQueueSizePackets
         << m_rtpFrameTimeoutMs
@@ -447,7 +464,8 @@ void QnGlobalSettings::setAutoDiscoveryEnabled(bool enabled)
     m_autoDiscoveryEnabledAdaptor->setValue(enabled);
 }
 
-void QnGlobalSettings::at_resourcePool_resourceAdded(const QnResourcePtr &resource) {
+void QnGlobalSettings::at_adminUserAdded(const QnResourcePtr &resource)
+{
     if(m_admin)
         return;
 
@@ -469,7 +487,8 @@ void QnGlobalSettings::at_resourcePool_resourceAdded(const QnResourcePtr &resour
     emit initialized();
 }
 
-void QnGlobalSettings::at_resourcePool_resourceRemoved(const QnResourcePtr &resource) {
+void QnGlobalSettings::at_resourcePool_resourceRemoved(const QnResourcePtr &resource) 
+{
     if (!m_admin || resource != m_admin)
         return;
 
@@ -556,7 +575,7 @@ void QnGlobalSettings::synchronizeNow()
     //NX_ASSERT(m_admin, Q_FUNC_INFO, "Invalid sync state");
     if (!m_admin)
         return;
-    propertyDictionary->saveParamsAsync(m_admin->getId());
+    propertyDictionary()->saveParamsAsync(m_admin->getId());
 }
 
 bool QnGlobalSettings::resynchronizeNowSync()
@@ -566,7 +585,7 @@ bool QnGlobalSettings::resynchronizeNowSync()
         NX_ASSERT(m_admin, Q_FUNC_INFO, "Invalid sync state");
         if (!m_admin)
             return false;
-        propertyDictionary->markAllParamsDirty(m_admin->getId());
+        propertyDictionary()->markAllParamsDirty(m_admin->getId());
     }
     return  synchronizeNowSync();
 }
@@ -580,7 +599,7 @@ bool QnGlobalSettings::synchronizeNowSync()
     NX_ASSERT(m_admin, Q_FUNC_INFO, "Invalid sync state");
     if (!m_admin)
         return false;
-    return propertyDictionary->saveParams(m_admin->getId());
+    return propertyDictionary()->saveParams(m_admin->getId());
 }
 
 bool QnGlobalSettings::takeFromSettings(QSettings* settings, const QnResourcePtr& mediaServer)
@@ -615,7 +634,7 @@ bool QnGlobalSettings::takeFromSettings(QSettings* settings, const QnResourcePtr
                 changed = true;
                 m_statisticsAllowedAdaptor->setValue(QnOptionalBool(value));
             }
-            propertyDictionary->removeProperty(mediaServer->getId(), kStatisticsReportAllowed);
+            propertyDictionary()->removeProperty(mediaServer->getId(), kStatisticsReportAllowed);
         }
     }
 
@@ -810,6 +829,11 @@ bool QnGlobalSettings::isSynchronizingTimeWithInternet() const
     return m_synchronizeTimeWithInternetAdaptor->value();
 }
 
+void QnGlobalSettings::setSynchronizingTimeWithInternet(bool value)
+{
+    m_synchronizeTimeWithInternetAdaptor->setValue(value);
+}
+
 QString QnGlobalSettings::cloudAccountName() const
 {
     return m_cloudAccountNameAdaptor->value();
@@ -887,6 +911,16 @@ void QnGlobalSettings::setMaxRtpRetryCount(int newVal)
     m_maxRtpRetryCount->setValue(newVal);
 }
 
+bool QnGlobalSettings::sequentialFlirOnvifSearcherEnabled() const
+{
+    return m_sequentialFlirOnvifSearcherEnabledAdaptor->value();
+}
+
+void QnGlobalSettings::setSequentialFlirOnvifSearcherEnabled(bool newVal)
+{
+    m_sequentialFlirOnvifSearcherEnabledAdaptor->setValue(newVal);
+}
+
 int QnGlobalSettings::rtpFrameTimeoutMs() const
 {
     return m_rtpFrameTimeoutMs->value();
@@ -922,7 +956,7 @@ const QList<QnAbstractResourcePropertyAdaptor*>& QnGlobalSettings::allSettings()
     return m_allAdaptors;
 }
 
-bool QnGlobalSettings::isGlobalSetting(const ec2::ApiResourceParamWithRefData& param) const
+bool QnGlobalSettings::isGlobalSetting(const ec2::ApiResourceParamWithRefData& param)
 {
-    return m_admin && m_admin->getId() == param.resourceId;
+    return QnUserResource::kAdminGuid == param.resourceId;
 }

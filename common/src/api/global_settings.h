@@ -18,6 +18,7 @@
 
 #include <core/resource/resource_fwd.h>
 #include <nx_ec/data/api_resource_data.h>
+#include <common/common_module_aware.h>
 
 class QnAbstractResourcePropertyAdaptor;
 
@@ -81,12 +82,13 @@ const QString kKeepAliveProbeCountKey(lit("ec2KeepAliveProbeCount"));
 } // namespace settings_names
 } // namespace nx
 
-class QnGlobalSettings: public Connective<QObject>, public Singleton<QnGlobalSettings> {
+class QnGlobalSettings: public Connective<QObject>, public QnCommonModuleAware
+{
     Q_OBJECT
     typedef Connective<QObject> base_type;
 
 public:
-    QnGlobalSettings(QObject *parent = NULL);
+    QnGlobalSettings(QObject* parent = nullptr);
     virtual ~QnGlobalSettings();
 
     void initialize();
@@ -191,7 +193,10 @@ public:
 
     std::chrono::seconds serverDiscoveryAliveCheckTimeout() const;
     bool isTimeSynchronizationEnabled() const;
+
     bool isSynchronizingTimeWithInternet() const;
+    void setSynchronizingTimeWithInternet(bool value);
+
     bool takeCameraOwnershipWithoutLock() const;
 
     // -- Cloud settings
@@ -213,7 +218,7 @@ public:
     // -- Misc settings
 
     bool isNewSystem() const { return localSystemId().isNull(); }
-    /** Media server put cloud host here from QnAppInfo::defaultCloudHost */
+    /** Media server put cloud host here from nx::network::AppInfo::defaultCloudHost */
     QString cloudHost() const;
     void setCloudHost(const QString& value);
 
@@ -222,6 +227,9 @@ public:
 
     int maxRtpRetryCount() const;
     void setMaxRtpRetryCount(int newVal);
+
+    bool sequentialFlirOnvifSearcherEnabled() const;
+    void setSequentialFlirOnvifSearcherEnabled(bool newVal);
 
     int rtpFrameTimeoutMs() const;
     void setRtpFrameTimeoutMs(int newValue);
@@ -234,12 +242,13 @@ public:
     */
     const QList<QnAbstractResourcePropertyAdaptor*>& allSettings() const;
 
-    bool isGlobalSetting(const ec2::ApiResourceParamWithRefData& param) const;
+    static bool isGlobalSetting(const ec2::ApiResourceParamWithRefData& param);
 
     int maxRecorderQueueSizeBytes() const;
     int maxRecorderQueueSizePackets() const;
 
 signals:
+    void adminUserFound(const QnResourcePtr& resource); //use queued signal to prevent previous behavior
     void initialized();
 
     void systemNameChanged();
@@ -272,7 +281,7 @@ private:
     AdaptorList initCloudAdaptors();
     AdaptorList initMiscAdaptors();
 
-    void at_resourcePool_resourceAdded(const QnResourcePtr &resource);
+    void at_adminUserAdded(const QnResourcePtr &resource);
     void at_resourcePool_resourceRemoved(const QnResourcePtr &resource);
 
 private:
@@ -313,7 +322,7 @@ private:
     QnResourcePropertyAdaptor<int> *m_portAdaptor;
     QnResourcePropertyAdaptor<int> *m_timeoutAdaptor;
     /** Flag that we are using simple smtp settings set */
-    QnResourcePropertyAdaptor<bool> *m_simpleAdaptor;   //TODO: #GDM #Common think where else we can store it
+    QnResourcePropertyAdaptor<bool> *m_simpleAdaptor;
 
     // set of ldap settings adaptors
     QnResourcePropertyAdaptor<QUrl> *m_ldapUriAdaptor;
@@ -338,6 +347,7 @@ private:
     // misc adaptors
     QnResourcePropertyAdaptor<QString>* m_systemNameAdaptor;
     QnResourcePropertyAdaptor<bool>* m_arecontRtspEnabledAdaptor;
+    QnResourcePropertyAdaptor<bool>* m_sequentialFlirOnvifSearcherEnabledAdaptor;
     QnResourcePropertyAdaptor<QString>* m_cloudHostAdaptor;
 
     QnResourcePropertyAdaptor<int>* m_maxRecorderQueueSizeBytes;
@@ -353,4 +363,4 @@ private:
     QnUserResourcePtr m_admin;
 };
 
-#define qnGlobalSettings QnGlobalSettings::instance()
+#define qnGlobalSettings commonModule()->globalSettings()

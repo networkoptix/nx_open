@@ -24,7 +24,7 @@ void MessageSerializer::setMessage(const Message* message)
 }
 
 // Serialization class implementation
-nx_api::SerializerState::Type MessageSerializer::serializeHeaderInitial( MessageSerializerBuffer* buffer ) {
+nx::network::server::SerializerState MessageSerializer::serializeHeaderInitial( MessageSerializerBuffer* buffer ) {
     std::bitset<16> initial(0);
     // 1. Setting the method bits.
     initial[0] = m_message->header.method & (1<<0);
@@ -45,63 +45,63 @@ nx_api::SerializerState::Type MessageSerializer::serializeHeaderInitial( Message
     initial[8] = message_class & (1<<1);
     // 3. write to the buffer
     if( buffer->WriteUint16(static_cast<std::uint16_t>(initial.to_ulong())) == NULL ) {
-        return nx_api::SerializerState::needMoreBufferSpace;
+        return nx::network::server::SerializerState::needMoreBufferSpace;
     } else {
-        return nx_api::SerializerState::done;
+        return nx::network::server::SerializerState::done;
     }
 }
 
-nx_api::SerializerState::Type MessageSerializer::serializeHeaderLengthStart( MessageSerializerBuffer* buffer ) {
+nx::network::server::SerializerState MessageSerializer::serializeHeaderLengthStart( MessageSerializerBuffer* buffer ) {
     if( buffer->WriteMessageLength() == NULL ) 
-        return nx_api::SerializerState::needMoreBufferSpace;
+        return nx::network::server::SerializerState::needMoreBufferSpace;
     else
-        return nx_api::SerializerState::done;
+        return nx::network::server::SerializerState::done;
 }
 
-nx_api::SerializerState::Type MessageSerializer::serializeMagicCookieAndTransactionID( MessageSerializerBuffer* buffer ) {
+nx::network::server::SerializerState MessageSerializer::serializeMagicCookieAndTransactionID( MessageSerializerBuffer* buffer ) {
     // Magic cookie
     if( buffer->WriteUint32( MAGIC_COOKIE ) == NULL ) {
-        return nx_api::SerializerState::needMoreBufferSpace;
+        return nx::network::server::SerializerState::needMoreBufferSpace;
     }
 
     NX_ASSERT(m_message->header.transactionId.size() == 12);
     // Transaction ID
     if( buffer->WriteBytes( m_message->header.transactionId.data(),
                             m_message->header.transactionId.size() ) == NULL ) {
-        return nx_api::SerializerState::needMoreBufferSpace;
+        return nx::network::server::SerializerState::needMoreBufferSpace;
     }
-    return nx_api::SerializerState::done;
+    return nx::network::server::SerializerState::done;
 }
 
-nx_api::SerializerState::Type MessageSerializer::serializeHeader( MessageSerializerBuffer* buffer ) {
+nx::network::server::SerializerState MessageSerializer::serializeHeader( MessageSerializerBuffer* buffer ) {
     NX_ASSERT( m_message->header.messageClass != MessageClass::unknown );
     NX_ASSERT( m_message->header.method != MethodType::invalid );
     NX_ASSERT( m_message->header.transactionId != Header::nullTransactionId );
-    if( serializeHeaderInitial(buffer) == nx_api::SerializerState::needMoreBufferSpace )
-        return nx_api::SerializerState::needMoreBufferSpace;
-    if( serializeHeaderLengthStart(buffer) == nx_api::SerializerState::needMoreBufferSpace )
-        return nx_api::SerializerState::needMoreBufferSpace;
-    if( serializeMagicCookieAndTransactionID(buffer) == nx_api::SerializerState::needMoreBufferSpace )
-        return nx_api::SerializerState::needMoreBufferSpace;
-    return nx_api::SerializerState::done;
+    if( serializeHeaderInitial(buffer) == nx::network::server::SerializerState::needMoreBufferSpace )
+        return nx::network::server::SerializerState::needMoreBufferSpace;
+    if( serializeHeaderLengthStart(buffer) == nx::network::server::SerializerState::needMoreBufferSpace )
+        return nx::network::server::SerializerState::needMoreBufferSpace;
+    if( serializeMagicCookieAndTransactionID(buffer) == nx::network::server::SerializerState::needMoreBufferSpace )
+        return nx::network::server::SerializerState::needMoreBufferSpace;
+    return nx::network::server::SerializerState::done;
 }
 
-nx_api::SerializerState::Type MessageSerializer::serializeAttributeTypeAndLength( MessageSerializerBuffer* buffer , const attrs::Attribute* attribute  , std::uint16_t** value_pos ) {
+nx::network::server::SerializerState MessageSerializer::serializeAttributeTypeAndLength( MessageSerializerBuffer* buffer , const attrs::Attribute* attribute  , std::uint16_t** value_pos ) {
     if( buffer->WriteUint16(static_cast<std::uint16_t>(attribute->getType())) == NULL ) {
-        return nx_api::SerializerState::needMoreBufferSpace;
+        return nx::network::server::SerializerState::needMoreBufferSpace;
     }
 
     // NOTE: actual attribute lenght gets rewrited in /fn serializeAttributes
     // TODO: refactor to get rig of this dummy place holder
     *value_pos = reinterpret_cast<std::uint16_t*>(buffer->WriteUint16(0));
     if( *value_pos == NULL ) {
-        return nx_api::SerializerState::needMoreBufferSpace;
+        return nx::network::server::SerializerState::needMoreBufferSpace;
     }
 
-    return nx_api::SerializerState::done;
+    return nx::network::server::SerializerState::done;
 }
 
-nx_api::SerializerState::Type MessageSerializer::serializeAttributeValue(
+nx::network::server::SerializerState MessageSerializer::serializeAttributeValue(
     MessageSerializerBuffer* buffer,
     const attrs::Attribute* attribute,
     std::size_t* bytesWritten)
@@ -130,12 +130,12 @@ nx_api::SerializerState::Type MessageSerializer::serializeAttributeValue(
             if( attribute->getType() > attrs::unknown )
                 return serializeAttributeValue_Buffer( buffer , *static_cast<const Unknown*>(attribute) , bytesWritten);
             NX_ASSERT(0);
-            return nx_api::SerializerState::done;
+            return nx::network::server::SerializerState::done;
         }
     }
 }
 
-nx_api::SerializerState::Type MessageSerializer::serializeAttributeValue_XORMappedAddress(
+nx::network::server::SerializerState MessageSerializer::serializeAttributeValue_XORMappedAddress(
     MessageSerializerBuffer* buffer,
     const attrs::XorMappedAddress& attribute,
     std::size_t* bytesWritten)
@@ -143,14 +143,14 @@ nx_api::SerializerState::Type MessageSerializer::serializeAttributeValue_XORMapp
     NX_ASSERT( attribute.family == XorMappedAddress::IPV4 || attribute.family == XorMappedAddress::IPV6 );
     std::size_t cur_pos = buffer->position();
     if( buffer->WriteUint16(attribute.family) == NULL ) 
-        return nx_api::SerializerState::needMoreBufferSpace;
+        return nx::network::server::SerializerState::needMoreBufferSpace;
     // Writing the port to the output stream. Based on RFC , the port value needs to be XOR with
     // the high part of the MAGIC COOKIE value and then convert to the network byte order.
     if( buffer->WriteUint16( attribute.port ^ MAGIC_COOKIE_HIGH ) == NULL )
-        return nx_api::SerializerState::needMoreBufferSpace;
+        return nx::network::server::SerializerState::needMoreBufferSpace;
     if( attribute.family == XorMappedAddress::IPV4 ) {
         if( buffer->WriteUint32(attribute.address.ipv4 ^ MAGIC_COOKIE) == NULL )
-            return nx_api::SerializerState::needMoreBufferSpace;
+            return nx::network::server::SerializerState::needMoreBufferSpace;
     } else {
         std::uint16_t xor_addr[8];
         xor_addr[0] = attribute.address.ipv6.array[0] ^ MAGIC_COOKIE_LOW;
@@ -163,13 +163,13 @@ nx_api::SerializerState::Type MessageSerializer::serializeAttributeValue_XORMapp
         }
 
         if( buffer->WriteIPV6Address(xor_addr) == NULL )
-            return nx_api::SerializerState::needMoreBufferSpace;
+            return nx::network::server::SerializerState::needMoreBufferSpace;
     }
     *bytesWritten = buffer->position()-cur_pos;
-    return nx_api::SerializerState::done;
+    return nx::network::server::SerializerState::done;
 }
 
-nx_api::SerializerState::Type MessageSerializer::serializeAttributeValue_Fingerprint( MessageSerializerBuffer* buffer ,const attrs::FingerPrint& attribute , std::size_t* value ) {
+nx::network::server::SerializerState MessageSerializer::serializeAttributeValue_Fingerprint( MessageSerializerBuffer* buffer ,const attrs::FingerPrint& attribute , std::size_t* value ) {
     NX_ASSERT( buffer->size() >= 24 ); // Header + FingerprintHeader
     // Ignore original FingerPrint message
     Q_UNUSED(attribute);
@@ -193,46 +193,46 @@ nx_api::SerializerState::Type MessageSerializer::serializeAttributeValue_Fingerp
     // Serialize this message into the buffer body
     buffer->WriteUint32(xor_result);
     *value = 4;
-    return nx_api::SerializerState::done;
+    return nx::network::server::SerializerState::done;
 }
 
-nx_api::SerializerState::Type MessageSerializer::serializeAttributeValue_Buffer( MessageSerializerBuffer* buffer ,const attrs::BufferedValue& attribute , std::size_t* value ) {
+nx::network::server::SerializerState MessageSerializer::serializeAttributeValue_Buffer( MessageSerializerBuffer* buffer ,const attrs::BufferedValue& attribute , std::size_t* value ) {
     std::size_t cur_pos = buffer->position();
     if( buffer->WriteBytes( attribute.getBuffer().constData() , attribute.getBuffer().size() ) == NULL )
-        return nx_api::SerializerState::needMoreBufferSpace ;
+        return nx::network::server::SerializerState::needMoreBufferSpace ;
     // The size of the STUN attributes should be the size before padding bytes
     *value = buffer->position()-cur_pos;
     // Padding the UnknownAttributes to the boundary of 4
     std::size_t padding_size = calculatePaddingSize(attribute.getBuffer().size());
     for( std::size_t i = attribute.getBuffer().size() ; i < padding_size ; ++i ) {
         if( buffer->WriteByte(0) == NULL )
-            return nx_api::SerializerState::needMoreBufferSpace;
+            return nx::network::server::SerializerState::needMoreBufferSpace;
     }
-    return nx_api::SerializerState::done;
+    return nx::network::server::SerializerState::done;
 }
 
-nx_api::SerializerState::Type MessageSerializer::serializeAttributeValue_ErrorCode( MessageSerializerBuffer* buffer ,const attrs::ErrorCode&  attribute , std::size_t* value ) {
+nx::network::server::SerializerState MessageSerializer::serializeAttributeValue_ErrorCode( MessageSerializerBuffer* buffer ,const attrs::ErrorCode&  attribute , std::size_t* value ) {
     std::size_t cur_pos = buffer->position();
     std::uint32_t error_header = (attribute.getClass() << 8) | attribute.getNumber();
     if( buffer->WriteUint32(error_header) == NULL )
-        return nx_api::SerializerState::needMoreBufferSpace;
+        return nx::network::server::SerializerState::needMoreBufferSpace;
     if( attribute.getBuffer().size() == 0 ) {
         // This is an empty reason phase 
         *value = buffer->position() - cur_pos;
-        return nx_api::SerializerState::done;
+        return nx::network::server::SerializerState::done;
     }
     // UTF8 string 
     nx::Buffer utf8_bytes = attribute.getBuffer();
     if( buffer->WriteBytes( utf8_bytes.constData() , utf8_bytes.size() ) == NULL )
-        return nx_api::SerializerState::needMoreBufferSpace;
+        return nx::network::server::SerializerState::needMoreBufferSpace;
     *value = buffer->position() - cur_pos;
     // Padding
     std::size_t padding_size = calculatePaddingSize(utf8_bytes.size());
     for( std::size_t i = utf8_bytes.size() ; i < padding_size ; ++i ) {
         if( buffer->WriteByte(0) == NULL )
-            return nx_api::SerializerState::needMoreBufferSpace;
+            return nx::network::server::SerializerState::needMoreBufferSpace;
     }
-    return nx_api::SerializerState::done;
+    return nx::network::server::SerializerState::done;
 }
 
 bool MessageSerializer::travelAllAttributes( const std::function<bool(const attrs::Attribute*)>& callback ) {
@@ -256,13 +256,13 @@ bool MessageSerializer::travelAllAttributes( const std::function<bool(const attr
     return true;
 }
 
-nx_api::SerializerState::Type MessageSerializer::serializeAttributes( MessageSerializerBuffer* buffer , std::uint16_t* length ) {
+nx::network::server::SerializerState MessageSerializer::serializeAttributes( MessageSerializerBuffer* buffer , std::uint16_t* length ) {
     bool ret = travelAllAttributes(
         [length,this,buffer]( const Attribute* attribute ) {
             std::uint16_t* attribute_len;
             std::size_t attribute_value_size;
-            if( serializeAttributeTypeAndLength(buffer,attribute,&attribute_len) == nx_api::SerializerState::needMoreBufferSpace ||
-                serializeAttributeValue(buffer,attribute,&attribute_value_size) == nx_api::SerializerState::needMoreBufferSpace ) {
+            if( serializeAttributeTypeAndLength(buffer,attribute,&attribute_len) == nx::network::server::SerializerState::needMoreBufferSpace ||
+                serializeAttributeValue(buffer,attribute,&attribute_value_size) == nx::network::server::SerializerState::needMoreBufferSpace ) {
                     return false;
             }
             // Checking for really large message may round our body size 
@@ -272,7 +272,7 @@ nx_api::SerializerState::Type MessageSerializer::serializeAttributes( MessageSer
             *length += static_cast<std::uint16_t>(4 + padding_attribute_value_size);
             return true;
         });
-    return ret ? nx_api::SerializerState::done : nx_api::SerializerState::needMoreBufferSpace;
+    return ret ? nx::network::server::SerializerState::done : nx::network::server::SerializerState::needMoreBufferSpace;
 }
 
 bool MessageSerializer::checkMessageIntegratiy() {
@@ -311,7 +311,7 @@ bool MessageSerializer::checkMessageIntegratiy() {
     return true;
 }
 
-nx_api::SerializerState::Type MessageSerializer::serialize(
+nx::network::server::SerializerState MessageSerializer::serialize(
     nx::Buffer* const user_buffer,
     size_t* const bytesWritten )
 {
@@ -328,17 +328,17 @@ nx_api::SerializerState::Type MessageSerializer::serialize(
         MessageSerializerBuffer buffer(user_buffer);
         *bytesWritten = user_buffer->size();
         // header serialization
-        if( serializeHeader(&buffer) == nx_api::SerializerState::needMoreBufferSpace )
+        if( serializeHeader(&buffer) == nx::network::server::SerializerState::needMoreBufferSpace )
             continue;
         // attributes serialization
         std::uint16_t length = 0;
-        if( serializeAttributes(&buffer,&length) == nx_api::SerializerState::needMoreBufferSpace )
+        if( serializeAttributes(&buffer,&length) == nx::network::server::SerializerState::needMoreBufferSpace )
             continue;
         // setting the header value 
         buffer.WriteMessageLength(length);
         m_initialized = false;
         *bytesWritten = user_buffer->size() - *bytesWritten;
-        return nx_api::SerializerState::done;
+        return nx::network::server::SerializerState::done;
     }
 }
 

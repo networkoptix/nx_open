@@ -468,8 +468,7 @@ QString bytesToString(uint64_t bytes, int precision)
     if (suffix == 0)
         return lm("%1").arg(number, 0, 'g', precision);
 
-    return lm("%1%2").arg(number, 0, 'g', precision).arg(
-        QChar::fromLatin1(kByteSuffexes[suffix - 1]));
+    return lm("%1%2").arg(number, 0, 'g', precision).arg(kByteSuffexes[suffix - 1]);
 }
 
 uint64_t stringToBytes(const QString& str, bool* isOk)
@@ -597,6 +596,74 @@ QString removeMnemonics(QString text)
      * (not match '&') match '&' (not match whitespace or '&')
      */
     return text.remove(QRegularExpression(lit("(?<!&)&(?!([\\s&]|$))")));
+}
+
+template <class T, class T2>
+static QList<T> smartSplitInternal(
+    const T& data,
+    const T2 delimiter,
+    const T2 quoteChar, 
+    bool keepEmptyParts)
+{
+    bool quoted = false;
+    QList<T> rez;
+    if (data.isEmpty())
+        return rez;
+
+    int lastPos = 0;
+    for (int i = 0; i < data.size(); ++i)
+    {
+        if (data[i] == quoteChar)
+            quoted = !quoted;
+        else if (data[i] == delimiter && !quoted)
+        {
+            T value = data.mid(lastPos, i - lastPos);
+            if (!value.isEmpty() || keepEmptyParts)
+                rez << value;
+            lastPos = i + 1;
+        }
+    }
+    rez << data.mid(lastPos, data.size() - lastPos);
+
+    return rez;
+}
+
+QList<QByteArray> smartSplit(
+    const QByteArray& data,
+    const char delimiter)
+{
+    return smartSplitInternal(data, delimiter, '\"', true);
+}
+
+QStringList smartSplit(
+    const QString& data,
+    const QChar delimiter,
+    QString::SplitBehavior splitBehavior)
+{
+    return smartSplitInternal(
+        data, 
+        delimiter,
+        QChar(L'\"'),
+        splitBehavior == QString::KeepEmptyParts);
+}
+
+template <class T, class T2>
+static T unquoteStrInternal(const T& v, T2 quoteChar)
+{
+    T value = v.trimmed();
+    int pos1 = value.startsWith(quoteChar) ? 1 : 0;
+    int pos2 = value.endsWith(quoteChar) ? 1 : 0;
+    return value.mid(pos1, value.length() - pos1 - pos2);
+}
+
+QByteArray unquoteStr(const QByteArray& v)
+{
+    return unquoteStrInternal(v, '\"');
+}
+
+QString unquoteStr(const QString& v)
+{
+    return unquoteStrInternal(v, L'\"');
 }
 
 } // namespace utils

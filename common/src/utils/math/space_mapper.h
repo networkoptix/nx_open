@@ -1,9 +1,7 @@
 #ifndef QN_SPACE_MAPPER_H
 #define QN_SPACE_MAPPER_H
 
-#ifndef Q_MOC_RUN
-#include <boost/array.hpp>
-#endif
+#include <array>
 
 #include <QtCore/QVariant>
 #include <QtCore/QStringList>
@@ -100,7 +98,7 @@ public:
     }
 
 private:
-    boost::array<QnSpaceMapperPtr<qreal>, 3> m_mappers;
+    std::array<QnSpaceMapperPtr<qreal>, 3> m_mappers;
 };
 
 

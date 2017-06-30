@@ -1,5 +1,7 @@
 #pragma once
 
+#include <common/common_module_aware.h>
+
 #include <core/resource_access/resource_access_subject.h>
 
 #include <nx/utils/singleton.h>
@@ -9,13 +11,12 @@
 
 class QnResourceAccessSubjectsCache:
     public Connective<QObject>,
-    public Singleton<QnResourceAccessSubjectsCache>
+    public QnCommonModuleAware
 {
     Q_OBJECT
-    typedef Connective<QObject> base_type;
-
+    using base_type = Connective<QObject>;
 public:
-    QnResourceAccessSubjectsCache(QObject* parent = nullptr);
+    QnResourceAccessSubjectsCache(QObject* parent);
 
     /** List of all subjects of the resources access: users and roles. */
     QList<QnResourceAccessSubject> allSubjects() const;
@@ -39,5 +40,3 @@ private:
     QHash<QnUuid, QnUuid> m_roleIdByUserId;
     QHash<QnUuid, QList<QnResourceAccessSubject>> m_usersByRoleId;
 };
-
-#define qnResourceAccessSubjectsCache QnResourceAccessSubjectsCache::instance()

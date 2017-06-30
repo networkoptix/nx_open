@@ -818,7 +818,7 @@ namespace nxcip
             Passing zero in speed should stop PTZ movement.
 
             This function is expected to be implemented if this controller has
-            at least one of the <tt>Qn::ContinuousPtzCapabilities</tt>.
+            at least one of the <tt>Ptz::ContinuousPtzCapabilities</tt>.
 
             \param panSpeed
             \param tiltSpeed
@@ -970,6 +970,20 @@ namespace nxcip
             In case of live stream \a cSeq is ignored
         */
         virtual unsigned int cSeq() const = 0;
+    };
+
+
+    // {65E9548D-0BA6-48CB-A217-AE6AE270CE7D}
+    static const nxpl::NX_GUID IID_MediaDataPacket2 = { { 0x65, 0xe9, 0x54, 0x8d, 0x0b, 0xa6, 0x48, 0xcb, 0xa2, 0x17, 0xae, 0x6a, 0xe2, 0x70, 0xce, 0x7d } };
+
+    class MediaDataPacket2: public MediaDataPacket
+    {
+    public:
+        //! Returns pointer to extradata blob.
+        virtual const char* extradata() const = 0;
+
+        //! Returns size of extradata blob in bytes.
+        virtual int extradataSize() const = 0;
     };
 
 

@@ -5,8 +5,8 @@
 
 #pragma once
 
-#include <plugins/videodecoder/stree/resourcecontainer.h>
-#include <nx/network/http/httptypes.h>
+#include <nx/utils/stree/resourcecontainer.h>
+#include <nx/network/http/http_types.h>
 
 
 namespace nx {
@@ -16,7 +16,7 @@ namespace gateway {
 //TODO #ak this is a copy-paste. move to common or somewhere else. Deal with attr enum
 class HttpRequestResourceReader
 :
-    public stree::AbstractResourceReader
+    public nx::utils::stree::AbstractResourceReader
 {
 public:
     HttpRequestResourceReader(const nx_http::Request& request);

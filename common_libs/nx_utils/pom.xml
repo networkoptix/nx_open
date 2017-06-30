@@ -3,12 +3,12 @@
     <parent>
         <artifactId>common_libs</artifactId>
         <groupId>com.networkoptix.hdwitness</groupId>
-        <version>3.0.0-SNAPSHOT</version>
+        <version>3.1.0-SNAPSHOT</version>
         <relativePath>..</relativePath>
     </parent>
 
     <groupId>com.networkoptix.hdwitness</groupId>
-    <version>3.0.0-SNAPSHOT</version>
+    <version>3.1.0-SNAPSHOT</version>
     <modelVersion>4.0.0</modelVersion>
     <artifactId>nx_utils</artifactId>
     <packaging>pom</packaging>
@@ -18,13 +18,24 @@
         <guid>${nx_utils.guid}</guid>
         <template>lib</template>
         <buildLib>sharedLib</buildLib>
-        <qt.libs>core</qt.libs>
-        <global.libs></global.libs>
-        <windows.oslibs>DbgHelp.lib -lIphlpapi -lOle32 -lSecur32 -lwinmm</windows.oslibs>
+        <qt.libs>core xml</qt.libs>
+        <global.libs>-lnx_kit</global.libs>
+        <windows.oslibs>-lws2_32 DbgHelp.lib -lIphlpapi -lOle32 -lSecur32 -lwinmm</windows.oslibs>
         <mac.oslibs>-framework IOKit -framework CoreFoundation</mac.oslibs>
-
+        <rdep.packages>openssl</rdep.packages>
         <windows.defines>_USING_V110_SDK71_</windows.defines>
     </properties>
+
+    <dependencies>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>nx_kit</artifactId>
+            <version>${project.version}</version>
+            <type>pom</type>
+            <scope>system</scope>
+            <systemPath>${root.dir}/nx_kit/pom.xml</systemPath>
+        </dependency>
+    </dependencies>
 
     <profiles>
         <profile>

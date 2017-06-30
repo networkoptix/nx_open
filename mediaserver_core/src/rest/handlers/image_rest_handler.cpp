@@ -18,6 +18,7 @@ extern "C" {
 #include <core/resource_access/resource_access_manager.h>
 #include <nx/utils/log/log.h>
 #include <api/helpers/camera_id_helper.h>
+#include <common/common_module.h>
 
 int QnImageRestHandler::noVideoError(QByteArray& result, qint64 time) const
 {
@@ -57,6 +58,7 @@ int QnImageRestHandler::executeGet(
 
     QString notFoundCameraId = QString::null;
     QnSecurityCamResourcePtr camera = nx::camera_id_helper::findCameraByFlexibleIds(
+        owner->resourcePool(),
         &notFoundCameraId,
         params.toHash(),
         {kCameraIdParam, kDeprecatedResIdParam, kDeprecatedPhysicalIdParam});
@@ -144,7 +146,7 @@ int QnImageRestHandler::executeGet(
         return CODE_INVALID_PARAMETER;
     }
 
-    if (!qnResourceAccessManager->hasPermission(
+    if (!owner->commonModule()->resourceAccessManager()->hasPermission(
         owner->accessRights(), camera, Qn::Permission::ReadPermission))
     {
         return nx_http::StatusCode::forbidden;

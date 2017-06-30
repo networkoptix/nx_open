@@ -120,7 +120,7 @@ def change_password(request):
     try:
         Account.change_password(request.user.email, old_password, new_password)
     except APINotAuthorisedException as error:
-        raise APIRequestException('Wrong old password', ErrorCodes.wrong_parameters,
+        raise APIRequestException('Wrong old password', ErrorCodes.wrong_old_password,
                                   error_data={'old_password': error.error_data})
 
     request.session['password'] = new_password

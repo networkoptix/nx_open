@@ -1,7 +1,10 @@
 #pragma once
 
+#include <chrono>
 #include <list>
 #include <map>
+
+#include <nx/utils/basic_factory.h>
 
 #include "abstract_cross_nat_connector.h"
 #include "abstract_tunnel_connector.h"
@@ -12,28 +15,30 @@ namespace nx {
 namespace network {
 namespace cloud {
 
-class NX_NETWORK_API ConnectorFactory
+struct TunnelConnectorContext
 {
+    std::unique_ptr<AbstractTunnelConnector> connector;
+    std::chrono::milliseconds startDelay = std::chrono::milliseconds::zero();
+};
+
+using CloudConnectors = std::list<TunnelConnectorContext>;
+
+typedef CloudConnectors (ConnectorFactoryFunc)(
+    const AddressEntry& /*targetAddress*/,
+    const nx::String& /*connectSessionId*/,
+    const hpm::api::ConnectResponse& /*response*/,
+    std::unique_ptr<UDPSocket> /*udpSocket*/);
+
+class NX_NETWORK_API ConnectorFactory:
+    public nx::utils::BasicFactory<ConnectorFactoryFunc>
+{
+    using base_type = nx::utils::BasicFactory<ConnectorFactoryFunc>;
+
 public:
-    typedef std::list<std::unique_ptr<AbstractTunnelConnector>> CloudConnectors;
-    typedef std::function<
-        std::unique_ptr<AbstractCrossNatConnector>(
-            const AddressEntry& /*targetAddress*/)> FactoryFunc;
+    ConnectorFactory();
 
-    static CloudConnectors createCloudConnectors(
-        const AddressEntry& targetAddress,
-        const nx::String& connectSessionId,
-        const hpm::api::ConnectResponse& response,
-        std::unique_ptr<UDPSocket> udpSocket);
+    static ConnectorFactory& instance();
 
-    static std::unique_ptr<AbstractCrossNatConnector>
-        createCrossNatConnector(const AddressEntry& address);
-    
-    /**
-     * Replace factory with custom func. 
-     * For debug purpose only!
-     */
-    static FactoryFunc setFactoryFunc(FactoryFunc newFactoryFunc);
     /**
      * Enable/disable cloud connectors. Debug only!
      * @param cloudConnectTypeMask Bitset with values from nx::network::cloud::CloudConnectType enum.
@@ -41,6 +46,33 @@ public:
      */
     static void setEnabledCloudConnectMask(int cloudConnectTypeMask);
     static int getEnabledCloudConnectMask();
+
+private:
+    CloudConnectors defaultFactoryFunction(
+        const AddressEntry& targetAddress,
+        const nx::String& connectSessionId,
+        const hpm::api::ConnectResponse& response,
+        std::unique_ptr<UDPSocket> udpSocket);
+};
+
+//-------------------------------------------------------------------------------------------------
+
+using CrossNatConnectorFactoryFunction = 
+    std::unique_ptr<AbstractCrossNatConnector>(const AddressEntry&);
+
+class NX_NETWORK_API CrossNatConnectorFactory:
+    public nx::utils::BasicFactory<CrossNatConnectorFactoryFunction>
+{
+    using base_type = nx::utils::BasicFactory<CrossNatConnectorFactoryFunction>;
+
+public:
+    CrossNatConnectorFactory();
+
+    static CrossNatConnectorFactory& instance();
+
+private:
+    std::unique_ptr<AbstractCrossNatConnector> defaultFactoryFunction(
+        const AddressEntry& address);
 };
 
 } // namespace cloud

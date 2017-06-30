@@ -36,6 +36,8 @@ Vagrant.configure("2") do |config|
     end
 
     box.vm.hostname = "{{ box.box_name }}"
+    # Uncomment it to provide access to a box by forwarding ssh port
+    # box.vm.network :forwarded_port, guest: 22, host: {{ box.ssh_forwarded_port }},  host_ip: "0.0.0.0", id: "ssh", auto_correct: true
     box.vm.network :forwarded_port, guest: {{ box.rest_api_internal_port }}, host: {{ box.rest_api_forwarded_port }}
 
     {% for command in box.vm_commands -%}

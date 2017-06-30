@@ -5,7 +5,7 @@
 #include <deque>
 
 #include <QByteArray>
-#include <QElapsedTimer>
+#include <QtCore/QElapsedTimer>
 #include <QSet>
 
 #include <transaction/transaction.h>
@@ -22,7 +22,7 @@
 #include <nx/network/aio/timer.h>
 #include <nx/network/http/asynchttpclient.h>
 #include <nx/network/http/auth_cache.h>
-#include <nx/network/http/httpstreamreader.h>
+#include <nx/network/http/http_stream_reader.h>
 #include <nx/network/http/http_message_stream_parser.h>
 #include <nx/network/http/multipart_content_parser.h>
 #include <nx/utils/thread/mutex.h>
@@ -31,7 +31,8 @@
 #include <utils/common/id.h>
 
 #include "connection_guard.h"
-
+#include <common/common_module_aware.h>
+#include "abstract_transaction_transport.h"
 
 namespace ec2
 {
@@ -53,7 +54,7 @@ namespace ConnectionType
 
 
 class QnTransactionTransportBase:
-    public QObject,
+    public QnAbstractTransactionTransport,
     public nx::network::aio::BasicPollable
 {
     Q_OBJECT
@@ -103,6 +104,7 @@ public:
 
     /** Initializer for incoming connection. */
     QnTransactionTransportBase(
+        const QnUuid& localSystemId,
         const QnUuid& connectionGuid,
         ConnectionLockGuard connectionLockGuard,
         const ApiPeerData& localPeer,
@@ -114,6 +116,7 @@ public:
         int keepAliveProbeCount);
     //!Initializer for outgoing connection
     QnTransactionTransportBase(
+        const QnUuid& localSystemId,
         ConnectionGuardSharedState* const connectionGuardSharedState,
         const ApiPeerData& localPeer,
         std::chrono::milliseconds tcpKeepAliveTimeout,
@@ -153,8 +156,8 @@ public:
     bool isNeedResync() const { return m_needResync; }
     void setNeedResync(bool value)  {m_needResync = value;} // synchronization process in progress
 
-    const ec2::ApiPeerData& localPeer() const;
-    const ec2::ApiPeerData& remotePeer() const;
+    virtual const ec2::ApiPeerData& localPeer() const override;
+    virtual const ec2::ApiPeerData& remotePeer() const override;
     QUrl remoteAddr() const;
     SocketAddress remoteSocketAddr() const;
     int remotePeerProtocolVersion() const;
@@ -205,8 +208,6 @@ public:
 
     void setKeepAliveEnabled(bool value);
 
-    static bool skipTransactionForMobileClient(ApiCommand::Value command);
-
 signals:
     void gotTransaction(
         Qn::SerializationFormat tranFormat,
@@ -219,47 +220,6 @@ signals:
 protected:
     virtual void fillAuthInfo(const nx_http::AsyncHttpClientPtr& httpClient, bool authByKey) = 0;
     virtual void onSomeDataReceivedFromRemotePeer() {};
-
-    template<class T>
-    void sendTransactionImpl(const QnTransaction<T> &transaction, const QnTransactionTransportHeader& _header)
-    {
-        QnTransactionTransportHeader header(_header);
-        NX_ASSERT(header.processedPeers.contains(m_localPeer.id));
-        header.fillSequence();
-#ifdef _DEBUG
-
-        for (const QnUuid& peer : header.dstPeers)
-        {
-            NX_ASSERT(!peer.isNull());
-            //NX_ASSERT(peer != m_localPeer.id);
-        }
-#endif
-        NX_ASSERT(!transaction.isLocal() || m_remotePeer.isClient(), Q_FUNC_INFO, "Invalid transaction type to send!");
-        NX_LOG(QnLog::EC2_TRAN_LOG, lit("send transaction %1 to peer %2").arg(transaction.toString()).arg(remotePeer().id.toString()), cl_logDEBUG1);
-
-        if (m_remotePeer.peerType == Qn::PT_OldMobileClient && skipTransactionForMobileClient(transaction.command))
-            return;
-
-        switch (m_remotePeer.dataFormat)
-        {
-            case Qn::JsonFormat:
-                if (m_remotePeer.peerType == Qn::PT_OldMobileClient)
-                    addData(QnJsonTransactionSerializer::instance()->serializedTransactionWithoutHeader(transaction, header) + QByteArray("\r\n"));
-                else
-                    addData(QnJsonTransactionSerializer::instance()->serializedTransactionWithHeader(transaction, header));
-                break;
-                //case Qn::BnsFormat:
-                //    addData(QnBinaryTransactionSerializer::instance()->serializedTransactionWithHeader(transaction, header));
-                //    break;
-            case Qn::UbjsonFormat:
-                addData(QnUbjsonTransactionSerializer::instance()->serializedTransactionWithHeader(transaction, header));
-                break;
-            default:
-                qWarning() << "Client has requested data in an unsupported format" << m_remotePeer.dataFormat;
-                addData(QnUbjsonTransactionSerializer::instance()->serializedTransactionWithHeader(transaction, header));
-                break;
-        }
-    }
 
     /** Post serialized data to the send queue */
     void addData(QByteArray data);
@@ -290,6 +250,7 @@ private:
         none,
     };
 
+    QnUuid m_localSystemId;
     const ApiPeerData m_localPeer;
     ApiPeerData m_remotePeer;
 
@@ -327,8 +288,8 @@ private:
     ConnectionType::Type m_connectionType;
     const PeerRole m_peerRole;
     QByteArray m_contentEncoding;
-    std::shared_ptr<AbstractByteStreamFilter> m_incomingTransactionStreamParser;
-    std::shared_ptr<AbstractByteStreamFilter> m_sizedDecoder;
+    std::shared_ptr<nx::utils::bstream::AbstractByteStreamFilter> m_incomingTransactionStreamParser;
+    std::shared_ptr<nx::utils::bstream::AbstractByteStreamFilter> m_sizedDecoder;
     bool m_compressResponseMsgBody;
     QnUuid m_connectionGuid;
     ConnectionGuardSharedState* const m_connectionGuardSharedState;
@@ -357,6 +318,7 @@ private:
 
 private:
     QnTransactionTransportBase(
+        const QnUuid& localSystemId,
         ConnectionGuardSharedState* const connectionGuardSharedState,
         const ApiPeerData& localPeer,
         PeerRole peerRole,

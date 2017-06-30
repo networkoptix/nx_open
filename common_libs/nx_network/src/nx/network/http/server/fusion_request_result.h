@@ -11,7 +11,7 @@
 #include <nx/fusion/model_functions_fwd.h>
 #include <nx/fusion/fusion/fusion_fwd.h>
 
-#include "../httptypes.h"
+#include "../http_types.h"
 
 
 namespace nx_http {
@@ -57,6 +57,12 @@ public:
         QString _errorText);
 
     nx_http::StatusCode::Value httpStatusCode() const;
+    void setHttpStatusCode(nx_http::StatusCode::Value statusCode);
+
+private:
+    boost::optional<nx_http::StatusCode::Value> m_httpStatusCode;
+
+    nx_http::StatusCode::Value calculateHttpStatusCode() const;
 };
 
 #define FusionRequestResult_Fields (errorClass)(resultCode)(errorDetail)(errorText)

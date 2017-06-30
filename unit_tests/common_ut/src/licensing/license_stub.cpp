@@ -2,10 +2,6 @@
 
 static QUuid initialKey = QUuid::createUuid();
 
-/************************************************************************/
-/* QnLicenseStub                                                        */
-/************************************************************************/
-
 QnLicenseStub::QnLicenseStub(Qn::LicenseType licenseType, int count):
     m_type(licenseType),
     m_armServer(false)
@@ -15,43 +11,52 @@ QnLicenseStub::QnLicenseStub(Qn::LicenseType licenseType, int count):
     setCameraCount(count);
 }
 
-bool QnLicenseStub::isValid(ErrorCode* errCode /* = 0 */, ValidationMode mode /* = VM_Regular */) const {
-    QN_UNUSED(errCode, mode);
-
-    if (isArmServer() && !isAllowedForArm())
-        return false;
-
-    // Only single Start license per system is allowed
-    if (type() == Qn::LC_Start)
-        return isValidStartLicense();
-
-    return true;
-}
-
-Qn::LicenseType QnLicenseStub::type() const  {
+Qn::LicenseType QnLicenseStub::type() const
+{
     return m_type;
 }
 
-bool QnLicenseStub::isArmServer() const {
+bool QnLicenseStub::isArmServer() const
+{
     return m_armServer;
 }
 
-void QnLicenseStub::setArmServer(bool value) {
+void QnLicenseStub::setArmServer(bool value)
+{
     m_armServer = value;
 }
 
-/************************************************************************/
-/* QnFutureLicenseStub                                                  */
-/************************************************************************/
-
-QnFutureLicenseStub::QnFutureLicenseStub(int count) {
+QnFutureLicenseStub::QnFutureLicenseStub(int count)
+{
     ++initialKey.data1;
     setKey(initialKey.toByteArray());
     setClass("some-future-class");
     setCameraCount(count);
 }
 
-bool QnFutureLicenseStub::isValid(ErrorCode* errCode /* = 0 */, ValidationMode mode /* = VM_Regular */) const {
-    QN_UNUSED(errCode, mode);
-    return true;
+QLicenseStubValidator::QLicenseStubValidator(QObject* parent):
+    base_type(parent)
+{
+}
+
+QnLicenseErrorCode QLicenseStubValidator::validate(const QnLicensePtr& license, ValidationMode mode) const
+{
+    auto futureStub = dynamic_cast<QnFutureLicenseStub*>(license.data());
+    if (futureStub)
+        return QnLicenseErrorCode::NoError;
+
+    auto stub = dynamic_cast<QnLicenseStub*>(license.data());
+    if (stub)
+    {
+        if (stub->isArmServer() && !isAllowedForArm(license))
+            return QnLicenseErrorCode::InvalidType;
+
+        // Only single Start license per system is allowed
+        if (license->type() == Qn::LC_Start)
+            return isValidStartLicense(license);
+
+        return QnLicenseErrorCode::NoError;
+    }
+
+    return base_type::validate(license, mode);
 }

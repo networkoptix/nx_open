@@ -6,15 +6,15 @@
 #include <core/resource_management/resource_searcher.h>
 #include <plugins/resource/upnp/upnp_resource_searcher.h>
 #include <plugins/resource/mdns/mdns_listener.h>
-#include <nx/network/upnp/upnp_device_searcher.h>
+#include <nx/network/upnp/upnp_search_handler.h>
 
-class QnPlISDResourceSearcher : 
+class QnPlISDResourceSearcher:
 	public QnAbstractNetworkResourceSearcher,
 	public nx_upnp::SearchHandler
 {
 
 public:
-    QnPlISDResourceSearcher();
+    QnPlISDResourceSearcher(QnCommonModule* commonModule);
 
     virtual QnResourcePtr createResource(
         const QnUuid &resourceTypeId,

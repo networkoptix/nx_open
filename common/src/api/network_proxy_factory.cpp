@@ -8,19 +8,30 @@
 #include <core/resource/media_server_resource.h>
 #include <core/resource/security_cam_resource.h>
 #include <network/router.h>
-#include "http/custom_headers.h"
+#include <nx/network/http/custom_headers.h>
 #include "utils/common/synctime.h"
 #include "network/authutil.h"
 #include <network/tcp_listener.h>
+#include <common/common_module.h>
 
 
 // -------------------------------------------------------------------------- //
 // QnNetworkProxyFactory
 // -------------------------------------------------------------------------- //
-QnNetworkProxyFactory::QnNetworkProxyFactory() {}
-QnNetworkProxyFactory::~QnNetworkProxyFactory() {}
+QnNetworkProxyFactory::QnNetworkProxyFactory(QnCommonModule* commonModule):
+    QnCommonModuleAware(commonModule)
+{
+}
 
-QUrl QnNetworkProxyFactory::urlToResource(const QUrl &baseUrl, const QnResourcePtr &resource, const QString &proxyQueryParameterName) {
+QnNetworkProxyFactory::~QnNetworkProxyFactory()
+{
+}
+
+QUrl QnNetworkProxyFactory::urlToResource(
+    const QUrl &baseUrl,
+    const QnResourcePtr &resource,
+    const QString &proxyQueryParameterName) const
+{
     QnMediaServerResourcePtr via;
     const QNetworkProxy &proxy = proxyToResource(resource, &via);
 
@@ -79,14 +90,14 @@ QList<QNetworkProxy> QnNetworkProxyFactory::queryProxy(const QNetworkProxyQuery 
     if (resourceGuid.isNull())
         return QList<QNetworkProxy>() << QNetworkProxy(QNetworkProxy::NoProxy);
 
-    return QList<QNetworkProxy>() << proxyToResource(qnResPool->getIncompatibleResourceById(resourceGuid, true));
+    return QList<QNetworkProxy>() << proxyToResource(commonModule()->resourcePool()->getIncompatibleResourceById(resourceGuid, true));
 }
 
 QNetworkProxy QnNetworkProxyFactory::proxyToResource(
     const QnResourcePtr &resource,
-    QnMediaServerResourcePtr* const via )
+    QnMediaServerResourcePtr* const via ) const
 {
-    if (!QnRouter::instance())
+    if (!commonModule()->router())
         return QNetworkProxy(QNetworkProxy::NoProxy);
 
     QnMediaServerResourcePtr server;
@@ -102,10 +113,11 @@ QNetworkProxy QnNetworkProxyFactory::proxyToResource(
         server = resource.dynamicCast<QnMediaServerResource>();
     }
 
-    if (server)
+    const auto& connection = commonModule()->ec2Connection();
+    if (server && connection)
     {
         QnUuid id = server->getOriginalGuid();
-        QnRoute route = QnRouter::instance()->routeTo(id);
+        QnRoute route = commonModule()->router()->routeTo(id);
         if (!route.gatewayId.isNull() || camera) {
             NX_ASSERT(!route.addr.isNull() || route.reverseConnect);
 
@@ -114,9 +126,9 @@ QNetworkProxy QnNetworkProxyFactory::proxyToResource(
                 return QNetworkProxy(QNetworkProxy::NoProxy);
 
             if( via )
-                *via = qnResPool->getResourceById<QnMediaServerResource>( route.id );
+                *via = server->resourcePool()->getResourceById<QnMediaServerResource>( route.id );
 
-            const auto& url = QnAppServerConnectionFactory::url();
+            const auto& url = connection->connectionInfo().ecUrl;
             return QNetworkProxy(QNetworkProxy::HttpProxy,
                                  route.addr.address.toString(), route.addr.port,
                                  url.userName(), url.password());

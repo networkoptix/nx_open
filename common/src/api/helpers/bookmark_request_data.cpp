@@ -45,9 +45,9 @@ QnGetBookmarksRequestData::QnGetBookmarksRequestData():
 {
 }
 
-void QnGetBookmarksRequestData::loadFromParams(const QnRequestParamList& params)
+void QnGetBookmarksRequestData::loadFromParams(QnResourcePool* resourcePool, const QnRequestParamList& params)
 {
-    QnMultiserverRequestData::loadFromParams(params);
+    QnMultiserverRequestData::loadFromParams(resourcePool, params);
 
     if (params.contains(kStartTimeParam))
         filter.startTimeMs = nx::utils::parseDateTime(params.value(kStartTimeParam)) / kUsPerMs;
@@ -67,7 +67,7 @@ void QnGetBookmarksRequestData::loadFromParams(const QnRequestParamList& params)
 
     filter.text = params.value(kFilterParam);
 
-    nx::camera_id_helper::findAllCamerasByFlexibleIds(&cameras, params,
+    nx::camera_id_helper::findAllCamerasByFlexibleIds(resourcePool, &cameras, params,
         {kCameraIdParam, kDeprecatedPhysicalIdParam, kDeprecatedMacParam});
 }
 
@@ -114,9 +114,10 @@ int QnGetBookmarkTagsRequestData::unlimited()
     return std::numeric_limits<int>().max();
 }
 
-void QnGetBookmarkTagsRequestData::loadFromParams(const QnRequestParamList& params)
+void QnGetBookmarkTagsRequestData::loadFromParams(QnResourcePool* resourcePool,
+    const QnRequestParamList& params)
 {
-    QnMultiserverRequestData::loadFromParams(params);
+    QnMultiserverRequestData::loadFromParams(resourcePool, params);
     limit = QnLexical::deserialized<int>(params.value(kLimitParam), unlimited());
 }
 
@@ -147,9 +148,10 @@ QnUpdateBookmarkRequestData::QnUpdateBookmarkRequestData(const QnCameraBookmark&
 {
 }
 
-void QnUpdateBookmarkRequestData::loadFromParams(const QnRequestParamList& params)
+void QnUpdateBookmarkRequestData::loadFromParams(QnResourcePool* resourcePool,
+    const QnRequestParamList& params)
 {
-    QnMultiserverRequestData::loadFromParams(params);
+    QnMultiserverRequestData::loadFromParams(resourcePool, params);
     bookmark.guid = QnLexical::deserialized<QnUuid>(params.value(kGuidParam));
     bookmark.name = params.value(kNameParam);
     bookmark.description = params.value(kDescriptionParam);
@@ -158,6 +160,7 @@ void QnUpdateBookmarkRequestData::loadFromParams(const QnRequestParamList& param
     bookmark.durationMs = QnLexical::deserialized<qint64>(params.value(kDurationParam));
 
     QnSecurityCamResourcePtr camera = nx::camera_id_helper::findCameraByFlexibleIds(
+        resourcePool,
         /*outNotFoundCameraId*/ nullptr,
         params.toHash(),
         {kCameraIdParam, kDeprecatedPhysicalIdParam, kDeprecatedMacParam});
@@ -206,9 +209,10 @@ QnDeleteBookmarkRequestData::QnDeleteBookmarkRequestData(const QnUuid& bookmarkI
 {
 }
 
-void QnDeleteBookmarkRequestData::loadFromParams(const QnRequestParamList& params)
+void QnDeleteBookmarkRequestData::loadFromParams(QnResourcePool* resourcePool,
+    const QnRequestParamList& params)
 {
-    QnMultiserverRequestData::loadFromParams(params);
+    QnMultiserverRequestData::loadFromParams(resourcePool, params);
     bookmarkId = QnLexical::deserialized<QnUuid>(params.value(kGuidParam));
 }
 

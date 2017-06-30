@@ -1,27 +1,25 @@
 #include "test_setup.h"
 
 #include <nx/network/test_support/socket_test_helper.h>
-#include <nx/utils/random.cpp>
+#include <nx/utils/random.h>
 
-#include <QTcpSocket>
 #include <QNetworkProxy>
+#include <QTcpSocket>
 
 namespace nx {
 namespace cloud {
 namespace gateway {
 namespace test {
 
-class VmsGatewayConnectTest
-:
-    public VmsGatewayFunctionalTest
+class VmsGatewayConnectTest:
+    public BasicComponentTest
 {
 public:
-    VmsGatewayConnectTest()
-    :
-      server(
-          network::test::TestTrafficLimitType::outgoing,
-          network::test::TestConnection::kReadBufferSize,
-          network::test::TestTransmissionMode::pong)
+    VmsGatewayConnectTest():
+        server(
+            network::test::TestTrafficLimitType::outgoing,
+            network::test::TestConnection::kReadBufferSize,
+            network::test::TestTransmissionMode::pong)
     {
         NX_CRITICAL(server.start());
     }
@@ -79,7 +77,7 @@ TEST_F(VmsGatewayConnectTest, DISABLED_IpForbidden)
     server.pleaseStopSync();
 }
 
-}   // namespace test
-}   // namespace gateway
-}   // namespace cloud
-}   // namespace nx
+} // namespace test
+} // namespace gateway
+} // namespace cloud
+} // namespace nx

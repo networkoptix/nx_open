@@ -9,6 +9,8 @@
 #include <business/events/abstract_business_event.h>
 #include <business/actions/abstract_business_action.h>
 #include "nx_ec/impl/ec_api_impl.h"
+#include <common/common_module_aware.h>
+#include <nx/utils/singleton.h>
 
 class QnApiSerializer;
 
@@ -18,14 +20,15 @@ class QnApiSerializer;
 * This class check event/action rules and send businessAction to destination
 */
 
-class QnBusinessMessageBus: public QThread
+class QnBusinessMessageBus:
+    public QThread,
+    public Singleton<QnBusinessMessageBus>,
+    public QnCommonModuleAware
 {
     Q_OBJECT
 public:
-    QnBusinessMessageBus();
+    QnBusinessMessageBus(QnCommonModule* commonModule);
     virtual ~QnBusinessMessageBus();
-
-    static QnBusinessMessageBus* instance();
 
     //int deliveryBusinessEvent(QnAbstractBusinessEventPtr bEvent, const QUrl& url);
 

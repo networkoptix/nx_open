@@ -218,7 +218,9 @@ Control
                 sourceSize: Qt.size(videoOutput.sourceRect.width, videoOutput.sourceRect.height)
                 visible: mediaPlayer.playing
 
-                item: VideoOutput
+                item: videoOutput
+
+                VideoOutput
                 {
                     id: videoOutput
                     player: mediaPlayer

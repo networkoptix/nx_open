@@ -46,7 +46,7 @@ void LayoutCamerasWatcher::setLayout(const QnLayoutResourcePtr& layout)
 
     for (const auto& item: layout->getItems())
     {
-        const auto camera = qnResPool->getResourceById<QnVirtualCameraResource>(item.resource.id);
+        const auto camera = resourcePool()->getResourceById<QnVirtualCameraResource>(item.resource.id);
         if (camera)
             addCamera(camera);
     }
@@ -55,7 +55,7 @@ void LayoutCamerasWatcher::setLayout(const QnLayoutResourcePtr& layout)
         [this](const QnLayoutResourcePtr&, const QnLayoutItemData& item)
         {
             if (const auto camera =
-                qnResPool->getResourceById<QnVirtualCameraResource>(item.resource.id))
+                resourcePool()->getResourceById<QnVirtualCameraResource>(item.resource.id))
             {
                 addCamera(camera);
             }

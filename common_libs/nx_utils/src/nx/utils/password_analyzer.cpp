@@ -9,27 +9,29 @@
 //#define ALLOW_ANY_PASSWORD
 #endif
 
-using namespace nx::utils;
+namespace {
 
-namespace
-{
-    /* Minimal length of a password: */
-    const int kMinimumLength = 8;
+/* Minimal length of a password: */
+const int kMinimumLength = 8;
 
-    /* Minimal acceptable number of character categories: */
-    const int kMinimumCategories = 2;
+/* Minimal acceptable number of character categories: */
+const int kMinimumCategories = 2;
 
-    /* Preferred number of character categories: */
-    const int kPreferredCategories = 3;
+/* Preferred number of character categories: */
+const int kPreferredCategories = 3;
 
-    /* Whether a space is allowed (in the middle): */
-    const bool kAllowSpace = true;
+/* Whether a space is allowed (in the middle): */
+const bool kAllowSpace = true;
 
-    /* Allowed non-unicode special characters for a password: */
-    const QByteArray kAllowedSymbols = "~!@#$%^&*()-=_+[]{};:,.<>?`'\"|/\\";
-}
+/* Allowed non-unicode special characters for a password: */
+const QByteArray kAllowedSymbols = "~!@#$%^&*()-=_+[]{};:,.<>?`'\"|/\\";
 
-PasswordStrength nx::utils::passwordStrength(const QString& password)
+} // namespace
+
+namespace nx {
+namespace utils {
+
+PasswordStrength passwordStrength(const QString& password)
 {
 #ifdef ALLOW_ANY_PASSWORD
     return PasswordStrength::Good;
@@ -72,3 +74,6 @@ PasswordStrength nx::utils::passwordStrength(const QString& password)
 
     return PasswordStrength::Good;
 }
+
+} // namespace utils
+} // namespace nx

@@ -1,11 +1,13 @@
 #include "password_data.h"
 
 #include <nx/fusion/model_functions.h>
+#include <nx/network/app_info.h>
 #include <nx/network/http/auth_tools.h>
 #include <nx/utils/random.h>
 
 #include <utils/common/app_info.h>
-#include <utils/crypt/linux_passwd_crypt.h>
+#include <nx/utils/crypt/linux_passwd_crypt.h>
+#include <utils/crypt/symmetrical.h>
 
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES((PasswordData), (json), _Fields)
 
@@ -23,20 +25,30 @@ PasswordData::PasswordData(const QnRequestParams &params)
 }
 
 
-PasswordData PasswordData::calculateHashes(const QString& username, const QString& password)
+PasswordData PasswordData::calculateHashes(const QString& username, const QString& password, bool isLdap)
 {
     PasswordData result;
-    result.realm = QnAppInfo::realm();
+    result.realm = nx::network::AppInfo::realm();
 
     QByteArray salt = QByteArray::number(nx::utils::random::number(), 16);
-    QCryptographicHash md5(QCryptographicHash::Md5);
-    md5.addData(salt);
-    md5.addData(password.toUtf8());
-    QByteArray hash = "md5$";
-    result.passwordHash.append(salt);
-    result.passwordHash.append("$");
-    result.passwordHash.append(md5.result().toHex());
 
+    QByteArray hash = isLdap ? "LDAP" : "md5";
+    hash.append('$');
+    hash.append(salt);
+    hash.append("$");
+    if (isLdap)
+    {
+        auto encodedPassword = nx::utils::encodeSimple(password.toUtf8(), QByteArray::fromHex(salt));
+        hash.append(encodedPassword.toHex());
+    }
+    else
+    {
+        QCryptographicHash md5(QCryptographicHash::Md5);
+        md5.addData(salt);
+        md5.addData(password.toUtf8());
+        hash.append(md5.result().toHex());
+    }
+    result.passwordHash = hash;
     result.passwordDigest = nx_http::calcHa1(
         username.toLower(),
         result.realm,

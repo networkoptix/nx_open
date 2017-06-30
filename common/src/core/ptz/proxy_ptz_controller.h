@@ -1,61 +1,64 @@
-#ifndef QN_PROXY_PTZ_CONTROLLER_H
-#define QN_PROXY_PTZ_CONTROLLER_H
+#pragma once
 
-#include "abstract_ptz_controller.h"
+#include <core/ptz/abstract_ptz_controller.h>
 
 /**
  * A simple controller that proxies all requests into another controller.
  */
-class QnProxyPtzController: public QnAbstractPtzController {
-    Q_OBJECT;
-    typedef QnAbstractPtzController base_type;
+class QnProxyPtzController: public QnAbstractPtzController
+{
+    Q_OBJECT
+    using base_type = QnAbstractPtzController;
 
 public:
-    QnProxyPtzController(const QnPtzControllerPtr &baseController);
-    virtual ~QnProxyPtzController();
+    QnProxyPtzController(const QnPtzControllerPtr& controller = QnPtzControllerPtr());
 
-    QnPtzControllerPtr baseController() const                                                                   { return m_baseController; }
+    void setBaseController(const QnPtzControllerPtr& controller);
+    QnPtzControllerPtr baseController() const;
 
-    virtual Qn::PtzCapabilities getCapabilities() override                                                      { return m_baseController->getCapabilities(); }
+public: // Overrides section
+    virtual Ptz::Capabilities getCapabilities() const override;
 
-    virtual bool continuousMove(const QVector3D &speed) override                                                { return m_baseController->continuousMove(speed); }
-    virtual bool continuousFocus(qreal speed) override                                                          { return m_baseController->continuousFocus(speed); }
-    virtual bool absoluteMove(Qn::PtzCoordinateSpace space, const QVector3D &position, qreal speed) override    { return m_baseController->absoluteMove(space, position, speed); }
-    virtual bool viewportMove(qreal aspectRatio, const QRectF &viewport, qreal speed) override                  { return m_baseController->viewportMove(aspectRatio, viewport, speed); }
+    virtual bool continuousMove(const QVector3D& speed) override;
+    virtual bool continuousFocus(qreal speed) override;
+    virtual bool absoluteMove(
+        Qn::PtzCoordinateSpace space,
+        const QVector3D& position,
+        qreal speed) override;
+    virtual bool viewportMove(qreal aspectRatio, const QRectF& viewport, qreal speed) override;
 
-    virtual bool getPosition(Qn::PtzCoordinateSpace space, QVector3D *position) override                        { return m_baseController->getPosition(space, position); }
-    virtual bool getLimits(Qn::PtzCoordinateSpace space, QnPtzLimits *limits) override                          { return m_baseController->getLimits(space, limits); }
-    virtual bool getFlip(Qt::Orientations *flip) override                                                       { return m_baseController->getFlip(flip); }
+    virtual bool getPosition(Qn::PtzCoordinateSpace space, QVector3D* position) const override;
+    virtual bool getLimits(Qn::PtzCoordinateSpace space, QnPtzLimits* limits) const override;
+    virtual bool getFlip(Qt::Orientations* flip) const override;
 
-    virtual bool createPreset(const QnPtzPreset &preset) override                                               { return m_baseController->createPreset(preset); }
-    virtual bool updatePreset(const QnPtzPreset &preset) override                                               { return m_baseController->updatePreset(preset); }
-    virtual bool removePreset(const QString &presetId) override                                                 { return m_baseController->removePreset(presetId); }
-    virtual bool activatePreset(const QString &presetId, qreal speed) override                                  { return m_baseController->activatePreset(presetId, speed); }
-    virtual bool getPresets(QnPtzPresetList *presets) override                                                  { return m_baseController->getPresets(presets); }
+    virtual bool createPreset(const QnPtzPreset& preset) override;
+    virtual bool updatePreset(const QnPtzPreset& preset) override;
+    virtual bool removePreset(const QString& presetId) override;
+    virtual bool activatePreset(const QString& presetId, qreal speed) override;
+    virtual bool getPresets(QnPtzPresetList* presets) const override;
 
-    virtual bool createTour(const QnPtzTour &tour) override                                                     { return m_baseController->createTour(tour); }
-    virtual bool removeTour(const QString &tourId) override                                                     { return m_baseController->removeTour(tourId); }
-    virtual bool activateTour(const QString &tourId) override                                                   { return m_baseController->activateTour(tourId); }
-    virtual bool getTours(QnPtzTourList *tours) override                                                        { return m_baseController->getTours(tours); }
+    virtual bool createTour(const QnPtzTour& tour) override;
+    virtual bool removeTour(const QString& tourId) override;
+    virtual bool activateTour(const QString& tourId) override;
+    virtual bool getTours(QnPtzTourList* tours) const override;
 
-    virtual bool getActiveObject(QnPtzObject *activeObject) override                                            { return m_baseController->getActiveObject(activeObject); }
-    virtual bool updateHomeObject(const QnPtzObject &homeObject) override                                       { return m_baseController->updateHomeObject(homeObject); }
-    virtual bool getHomeObject(QnPtzObject *homeObject) override                                                { return m_baseController->getHomeObject(homeObject); }
+    virtual bool getActiveObject(QnPtzObject* activeObject) const override;
+    virtual bool updateHomeObject(const QnPtzObject& homeObject) override;
+    virtual bool getHomeObject(QnPtzObject* homeObject) const override;
 
-    virtual bool getAuxilaryTraits(QnPtzAuxilaryTraitList *auxilaryTraits)                                      { return m_baseController->getAuxilaryTraits(auxilaryTraits); }
-    virtual bool runAuxilaryCommand(const QnPtzAuxilaryTrait &trait, const QString &data)                       { return m_baseController->runAuxilaryCommand(trait, data); }
+    virtual bool getAuxilaryTraits(QnPtzAuxilaryTraitList* auxilaryTraits) const override;
+    virtual bool runAuxilaryCommand(const QnPtzAuxilaryTrait& trait, const QString& data) override;
 
-    virtual bool getData(Qn::PtzDataFields query, QnPtzData *data) override                                     { return base_type::getData(query, data); /* This is important because of base implementation! */ }
+    virtual bool getData(Qn::PtzDataFields query, QnPtzData* data) const override;
+
+signals:
+    void finishedLater(Qn::PtzCommand command, const QVariant& data);
+    void baseControllerChanged();
 
 protected:
-    virtual void baseFinished(Qn::PtzCommand command, const QVariant &data)                                     { emit finished(command, data); }
-    virtual void baseChanged(Qn::PtzDataFields fields)                                                          { emit changed(fields); }
-
-    Q_SIGNAL void finishedLater(Qn::PtzCommand command, const QVariant &data);
+    virtual void baseFinished(Qn::PtzCommand command, const QVariant& data);
+    virtual void baseChanged(Qn::PtzDataFields fields);
 
 private:
-    QnPtzControllerPtr m_baseController;
+    QnPtzControllerPtr m_controller;
 };
-
-
-#endif // QN_PROXY_PTZ_CONTROLLER_H

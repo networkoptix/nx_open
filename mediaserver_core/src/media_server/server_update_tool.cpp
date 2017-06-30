@@ -19,6 +19,8 @@
 #include <common/common_module.h>
 #include <media_server/serverutil.h>
 #include <utils/common/delayed.h>
+#include <common/static_common_module.h>
+#include <media_server/media_server_module.h>
 
 namespace {
 
@@ -28,7 +30,7 @@ namespace {
     const int installationDelay = 15000;
 
     QDir getUpdatesDir() {
-        const QString& dataDir = MSSettings::roSettings()->value( "dataDir" ).toString();
+        const QString& dataDir = qnServerModule->roSettings()->value( "dataDir" ).toString();
         QDir dir = dataDir.isEmpty() ? QDir::temp() : dataDir;
         if (!dir.exists(updatesDirSuffix))
             dir.mkpath(updatesDirSuffix);
@@ -49,42 +51,41 @@ namespace {
     QString getUpdateFilePath(const QString &updateId) {
         return getUpdatesDir().absoluteFilePath(updateId + lit(".zip"));
     }
-
-    bool initializeUpdateLog(const QString &targetVersion, QString *logFileName) {
-        QString logDir = MSSettings::roSettings()->value(lit("logDir"), getDataDirectory() + lit("/log/")).toString();
-        if (logDir.isEmpty())
-            return false;
-
-        QString fileName = QDir(logDir).absoluteFilePath(updateLogFileName);
-        QFile logFile(fileName);
-        if (!logFile.open(QFile::Append))
-            return false;
-
-        QByteArray preface;
-        preface.append("================================================================================\n");
-        preface.append(QString(lit(" [%1] Starting system update:\n")).arg(QDateTime::currentDateTime().toString()));
-        preface.append(QString(lit("    Current version: %1\n")).arg(qnCommon->engineVersion().toString()));
-        preface.append(QString(lit("    Target version: %1\n")).arg(targetVersion));
-        preface.append("================================================================================\n");
-
-        logFile.write(preface);
-        logFile.close();
-
-        *logFileName = fileName;
-        return true;
-    }
-
-    ec2::AbstractECConnectionPtr connection2() {
-        return QnAppServerConnectionFactory::getConnection2();
-    }
-
 } // anonymous namespace
 
-QnServerUpdateTool::QnServerUpdateTool() :
+QnServerUpdateTool::QnServerUpdateTool(QnCommonModule* commonModule):
+    QnCommonModuleAware(commonModule),
     m_mutex(QnMutex::Recursive)
 {}
 
-QnServerUpdateTool::~QnServerUpdateTool() {}
+QnServerUpdateTool::~QnServerUpdateTool()
+{
+}
+
+bool QnServerUpdateTool::initializeUpdateLog(const QString& targetVersion, QString* logFileName) const
+{
+    QString logDir = qnServerModule->roSettings()->value(lit("logDir"), getDataDirectory() + lit("/log/")).toString();
+    if (logDir.isEmpty())
+        return false;
+
+    QString fileName = QDir(logDir).absoluteFilePath(updateLogFileName);
+    QFile logFile(fileName);
+    if (!logFile.open(QFile::Append))
+        return false;
+
+    QByteArray preface;
+    preface.append("================================================================================\n");
+    preface.append(QString(lit(" [%1] Starting system update:\n")).arg(QDateTime::currentDateTime().toString()));
+    preface.append(QString(lit("    Current version: %1\n")).arg(qnStaticCommon->engineVersion().toString()));
+    preface.append(QString(lit("    Target version: %1\n")).arg(targetVersion));
+    preface.append("================================================================================\n");
+
+    logFile.write(preface);
+    logFile.close();
+
+    *logFileName = fileName;
+    return true;
+}
 
 QnServerUpdateTool::ReplyCode QnServerUpdateTool::processUpdate(const QString &updateId, QIODevice *ioDevice, bool sync) {
     if (!m_fileMd5.isEmpty() && makeMd5(ioDevice) != m_fileMd5) {
@@ -115,11 +116,11 @@ QnServerUpdateTool::ReplyCode QnServerUpdateTool::processUpdate(const QString &u
     return NoReply;
 }
 
-void QnServerUpdateTool::sendReply(int code) {
+void QnServerUpdateTool::sendReply(int code)
+{
     NX_LOG(lit("QnServerUpdateTool: Update chunk reply [id = %1, code = %2].").arg(m_updateId).arg(code), cl_logDEBUG2);
-
-    connection2()->getUpdatesManager(Qn::kSystemAccess)->sendUpdateUploadResponce(
-                m_updateId, qnCommon->moduleGUID(), code, this, [this](int, ec2::ErrorCode) {});
+    commonModule()->ec2Connection()->getUpdatesManager(Qn::kSystemAccess)->sendUpdateUploadResponce(
+                m_updateId, commonModule()->moduleGUID(), code, this, [this](int, ec2::ErrorCode) {});
 }
 
 bool QnServerUpdateTool::addUpdateFile(const QString &updateId, const QByteArray &data) {
@@ -292,7 +293,8 @@ bool QnServerUpdateTool::installUpdate(const QString &updateId, UpdateType updat
         return false;
     }
 
-    if (!backupDatabase()) {
+    if (!backupDatabase(commonModule()->ec2Connection()))
+    {
         NX_LOG("QnServerUpdateTool: Could not create database backup.", cl_logERROR);
         return false;
     }
@@ -319,7 +321,7 @@ bool QnServerUpdateTool::installUpdate(const QString &updateId, UpdateType updat
         NX_LOG(lit("QnServerUpdateTool: The specified executable doesn't have an execute permission: %1").arg(executable), cl_logWARNING);
         executableFile.setPermissions(executableFile.permissions() | QFile::ExeOwner);
     }
-    if( cl_log.logLevel() >= cl_logDEBUG1 )
+    if (nx::utils::log::mainLogger()->isToBeLogged(nx::utils::log::Level::debug))
     {
         QString argumentsStr(" APPSERVER_PASSWORD=\"\" APPSERVER_PASSWORD_CONFIRM=\"\" SERVER_PASSWORD=\"\" SERVER_PASSWORD_CONFIRM=\"\"");
         for( const QString& arg: arguments )

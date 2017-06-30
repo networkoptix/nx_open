@@ -73,7 +73,7 @@ QString ResultCounter<Result>::stringStatus() const
     {
         QnMutexLocker lock(&m_mutex);
         for (const auto& c: m_counters)
-            returnCodes << lm("%1 [%2 time(s)]").strs(m_stringConvertor(c.first), c.second);
+            returnCodes << lm("%1 [%2 time(s)]").args(m_stringConvertor(c.first), c.second);
     }
 
     return returnCodes.join(QLatin1Literal("; "));

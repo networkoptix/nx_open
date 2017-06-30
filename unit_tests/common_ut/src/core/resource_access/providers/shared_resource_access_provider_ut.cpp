@@ -31,7 +31,7 @@ protected:
 
     virtual QnAbstractResourceAccessProvider* createAccessProvider() const override
     {
-        return new QnSharedResourceAccessProvider();
+        return new QnSharedResourceAccessProvider(commonModule());
     }
 };
 
@@ -62,7 +62,7 @@ TEST_F(QnSharedResourceAccessProviderTest, checkSource)
 {
     auto target = addCamera();
     auto user = addUser(Qn::NoGlobalPermissions);
-    qnSharedResourcesManager->setSharedResources(user, QSet<QnUuid>() << target->getId());
+    sharedResourcesManager()->setSharedResources(user, QSet<QnUuid>() << target->getId());
     ASSERT_EQ(accessProvider()->accessibleVia(user, target), kSource);
 }
 
@@ -70,14 +70,14 @@ TEST_F(QnSharedResourceAccessProviderTest, checkDirectAccessCamera)
 {
     auto target = addCamera();
     auto user = addUser(Qn::NoGlobalPermissions);
-    qnSharedResourcesManager->setSharedResources(user, QSet<QnUuid>() << target->getId());
+    sharedResourcesManager()->setSharedResources(user, QSet<QnUuid>() << target->getId());
     ASSERT_TRUE(accessProvider()->hasAccess(user, target));
 }
 
 TEST_F(QnSharedResourceAccessProviderTest, checkDirectAccessUser)
 {
     auto user = addUser(Qn::NoGlobalPermissions);
-    qnSharedResourcesManager->setSharedResources(user, QSet<QnUuid>() << user->getId());
+    sharedResourcesManager()->setSharedResources(user, QSet<QnUuid>() << user->getId());
 
     /* We can share only layout and media resources. */
     ASSERT_FALSE(accessProvider()->hasAccess(user, user));
@@ -87,7 +87,7 @@ TEST_F(QnSharedResourceAccessProviderTest, checkDirectAccessLayout)
 {
     auto target = addLayout();
     auto user = addUser(Qn::NoGlobalPermissions);
-    qnSharedResourcesManager->setSharedResources(user, QSet<QnUuid>() << target->getId());
+    sharedResourcesManager()->setSharedResources(user, QSet<QnUuid>() << target->getId());
     ASSERT_TRUE(accessProvider()->hasAccess(user, target));
 }
 
@@ -97,7 +97,7 @@ TEST_F(QnSharedResourceAccessProviderTest, checkDirectAccessOwnedLayout)
     auto user = addUser(Qn::NoGlobalPermissions);
     target->setParentId(user->getId());
     ASSERT_FALSE(target->isShared());
-    qnSharedResourcesManager->setSharedResources(user, QSet<QnUuid>() << target->getId());
+    sharedResourcesManager()->setSharedResources(user, QSet<QnUuid>() << target->getId());
 
     /* Only shared layouts may be accessible through sharing. */
     ASSERT_FALSE(accessProvider()->hasAccess(user, target));
@@ -109,7 +109,7 @@ TEST_F(QnSharedResourceAccessProviderTest, checkLayoutMadeShared)
     auto user = addUser(Qn::NoGlobalPermissions);
     target->setParentId(user->getId());
     ASSERT_FALSE(target->isShared());
-    qnSharedResourcesManager->setSharedResources(user, QSet<QnUuid>() << target->getId());
+    sharedResourcesManager()->setSharedResources(user, QSet<QnUuid>() << target->getId());
 
     /* Here layout became shared. */
     target->setParentId(QnUuid());
@@ -123,16 +123,16 @@ TEST_F(QnSharedResourceAccessProviderTest, checkAccessAdded)
     auto user = addUser(Qn::NoGlobalPermissions);
 
     awaitAccess(user, target);
-    qnSharedResourcesManager->setSharedResources(user, QSet<QnUuid>() << target->getId());
+    sharedResourcesManager()->setSharedResources(user, QSet<QnUuid>() << target->getId());
 }
 
 TEST_F(QnSharedResourceAccessProviderTest, checkAccessRemoved)
 {
     auto target = addCamera();
     auto user = addUser(Qn::NoGlobalPermissions);
-    qnSharedResourcesManager->setSharedResources(user, QSet<QnUuid>() << target->getId());
+    sharedResourcesManager()->setSharedResources(user, QSet<QnUuid>() << target->getId());
     awaitAccess(user, target, false);
-    qnSharedResourcesManager->setSharedResources(user, QSet<QnUuid>());
+    sharedResourcesManager()->setSharedResources(user, QSet<QnUuid>());
 }
 
 TEST_F(QnSharedResourceAccessProviderTest, checkRoleAccessGranted)
@@ -140,11 +140,11 @@ TEST_F(QnSharedResourceAccessProviderTest, checkRoleAccessGranted)
     auto target = addCamera();
 
     auto role = createRole(Qn::NoGlobalPermissions);
-    qnUserRolesManager->addOrUpdateUserRole(role);
+    userRolesManager()->addOrUpdateUserRole(role);
     auto user = addUser(Qn::NoGlobalPermissions);
     user->setUserRoleId(role.id);
     awaitAccess(user, target, true);
-    qnSharedResourcesManager->setSharedResources(role, QSet<QnUuid>() << target->getId());
+    sharedResourcesManager()->setSharedResources(role, QSet<QnUuid>() << target->getId());
 }
 
 TEST_F(QnSharedResourceAccessProviderTest, checkUserRoleChanged)
@@ -152,8 +152,8 @@ TEST_F(QnSharedResourceAccessProviderTest, checkUserRoleChanged)
     auto target = addCamera();
 
     auto role = createRole(Qn::NoGlobalPermissions);
-    qnUserRolesManager->addOrUpdateUserRole(role);
-    qnSharedResourcesManager->setSharedResources(role, QSet<QnUuid>() << target->getId());
+    userRolesManager()->addOrUpdateUserRole(role);
+    sharedResourcesManager()->setSharedResources(role, QSet<QnUuid>() << target->getId());
     auto user = addUser(Qn::NoGlobalPermissions);
     awaitAccess(user, target, true);
     user->setUserRoleId(role.id);
@@ -164,13 +164,13 @@ TEST_F(QnSharedResourceAccessProviderTest, checkRoleRemoved)
     auto target = addCamera();
 
     auto role = createRole(Qn::NoGlobalPermissions);
-    qnUserRolesManager->addOrUpdateUserRole(role);
+    userRolesManager()->addOrUpdateUserRole(role);
     auto user = addUser(Qn::NoGlobalPermissions);
     user->setUserRoleId(role.id);
-    qnSharedResourcesManager->setSharedResources(role, QSet<QnUuid>() << target->getId());
+    sharedResourcesManager()->setSharedResources(role, QSet<QnUuid>() << target->getId());
     ASSERT_TRUE(accessProvider()->hasAccess(user, target));
     awaitAccess(user, target, false);
-    qnUserRolesManager->removeUserRole(role.id);
+    userRolesManager()->removeUserRole(role.id);
     ASSERT_FALSE(accessProvider()->hasAccess(user, target));
 }
 
@@ -178,7 +178,7 @@ TEST_F(QnSharedResourceAccessProviderTest, accessProviders)
 {
     auto camera = addCamera();
     auto user = addUser(Qn::NoGlobalPermissions);
-    qnSharedResourcesManager->setSharedResources(user, QSet<QnUuid>() << camera->getId());
+    sharedResourcesManager()->setSharedResources(user, QSet<QnUuid>() << camera->getId());
     QnResourceList providers;
     accessProvider()->accessibleVia(user, camera, &providers);
     ASSERT_TRUE(providers.empty());

@@ -9,7 +9,7 @@
 #include <core/resource/camera_resource.h>
 #include <modbus/modbus_async_client.h>
 #include <plugins/common_interfaces/abstract_io_manager.h>
-#include <utils/common/safe_direct_connection.h>
+#include <nx/utils/safe_direct_connection.h>
 
 class QnAdamResource :
     public QnPhysicalCameraResource,
@@ -29,11 +29,7 @@ public:
     QnAdamResource();
     virtual ~QnAdamResource();
 
-    virtual void setIframeDistance(int frames, int timeMs) override
-    {
-        QN_UNUSED(frames);
-        QN_UNUSED(timeMs);
-    }
+    virtual void setIframeDistance(int frames, int timeMs) override;
 
     virtual QString getDriverName() const override;
 

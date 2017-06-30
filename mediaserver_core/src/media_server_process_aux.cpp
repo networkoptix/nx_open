@@ -7,6 +7,8 @@
 #include <core/resource/media_server_resource.h>
 #include <core/resource/storage_resource.h>
 #include <core/resource/user_resource.h>
+#include <common/common_module_aware.h>
+#include <media_server/media_server_module.h>
 
 namespace nx {
 namespace mserver_aux {
@@ -158,9 +160,16 @@ SystemNameProxyPtr createServerSystemNameProxy()
     return std::unique_ptr<SystemNameProxy>(new ServerSystemNameProxy);
 }
 
-class ServerSettingsProxy : public SettingsProxy
+class ServerSettingsProxy: public SettingsProxy, public QnCommonModuleAware
 {
 public:
+    ServerSettingsProxy(QnCommonModule* commonModule):
+        SettingsProxy(),
+        QnCommonModuleAware(commonModule)
+    {
+
+    }
+
     virtual QString systemName() const override
     {
         return qnGlobalSettings->systemName();
@@ -184,7 +193,7 @@ public:
     virtual bool isCloudInstanceChanged() const override
     {
         return !qnGlobalSettings->cloudHost().isEmpty() &&
-                qnGlobalSettings->cloudHost() != QnAppInfo::defaultCloudHost();
+                qnGlobalSettings->cloudHost() != nx::network::AppInfo::defaultCloudHost();
     }
 
     virtual bool isConnectedToCloud() const override
@@ -194,32 +203,32 @@ public:
 
     virtual bool isSystemIdFromSystemName() const override
     {
-        return MSSettings::roSettings()->value("systemIdFromSystemName").toInt() > 0;
+        return qnServerModule->roSettings()->value("systemIdFromSystemName").toInt() > 0;
     }
 
     virtual QString getMaxServerKey() const override
     {
         QString serverKey;
-        for (const auto server: qnResPool->getAllServers(Qn::AnyStatus))
+        for (const auto server: resourcePool()->getAllServers(Qn::AnyStatus))
             serverKey = qMax(serverKey, server->getAuthKey());
 
         return serverKey;
     }
 };
 
-SettingsProxyPtr createServerSettingsProxy()
+SettingsProxyPtr createServerSettingsProxy(QnCommonModule* commonModule)
 {
-    return std::unique_ptr<ServerSettingsProxy>(new ServerSettingsProxy);
+    return std::unique_ptr<ServerSettingsProxy>(new ServerSettingsProxy(commonModule));
 }
 
 bool needToResetSystem(bool isNewServerInstance, const SettingsProxy* settings)
 {
-    return isNewServerInstance ||
+    return isNewServerInstance || settings->localSystemId().isNull() ||
            (settings->isCloudInstanceChanged() && settings->isConnectedToCloud());
 }
 
 bool isNewServerInstance(
-    const BeforeRestoreDbData& restoreData, 
+    const BeforeRestoreDbData& restoreData,
     bool foundOwnServerInDb,
     bool noSetupWizardFlag)
 {
@@ -235,7 +244,7 @@ bool setUpSystemIdentity(
         SystemNameProxyPtr systemNameProxy)
 {
     LocalSystemIndentityHelper systemIdentityHelper(
-            restoreData, 
+            restoreData,
             std::move(systemNameProxy),
             settings);
 

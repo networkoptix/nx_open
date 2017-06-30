@@ -1,6 +1,7 @@
 #pragma once
 
-#include <utils/common/stoppable.h>
+#include <nx/utils/thread/stoppable.h>
+#include <nx/utils/move_only_func.h>
 
 namespace nx {
 namespace cloud {
@@ -8,8 +9,7 @@ namespace gateway {
 
 class VmsGatewayProcess;
 
-class VmsGatewayProcessPublic
-:
+class VmsGatewayProcessPublic:
     public QnStoppable
 {
 public:

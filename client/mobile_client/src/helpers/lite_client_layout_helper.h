@@ -1,11 +1,13 @@
 #pragma once
 
+#include <client_core/connection_context_aware.h>
+
 #include <core/resource/resource_fwd.h>
 #include <utils/common/id.h>
 #include <utils/common/connective.h>
 
 class QnLiteClientLayoutHelperPrivate;
-class QnLiteClientLayoutHelper: public Connective<QObject>
+class QnLiteClientLayoutHelper: public Connective<QObject>, public QnConnectionContextAware
 {
     Q_OBJECT
 
@@ -44,8 +46,8 @@ public:
     Q_INVOKABLE QString cameraIdOnCell(int x, int y) const;
     Q_INVOKABLE void setCameraIdOnCell(int x, int y, const QString& cameraId);
 
-    static QnLayoutResourcePtr createLayoutForServer(const QnUuid& serverId);
-    static QnLayoutResourcePtr findLayoutForServer(const QnUuid& serverId);
+    QnLayoutResourcePtr createLayoutForServer(const QnUuid& serverId) const;
+    QnLayoutResourcePtr findLayoutForServer(const QnUuid& serverId) const;
 
 signals:
     void layoutChanged();

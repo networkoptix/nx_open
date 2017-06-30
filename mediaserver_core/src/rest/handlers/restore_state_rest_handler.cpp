@@ -1,6 +1,6 @@
 #include "restore_state_rest_handler.h"
 
-#include <nx/network/http/httptypes.h>
+#include <nx/network/http/http_types.h>
 #include <rest/server/rest_connection_processor.h>
 #include <media_server/serverutil.h>
 #include <media_server/settings.h>
@@ -15,7 +15,7 @@ int QnRestoreStateRestHandler::executeGet(
     const QnRestConnectionProcessor* owner)
 {
     Q_UNUSED(path);
-    return execute(std::move(PasswordData(params)), owner->accessRights(), result);
+    return execute(std::move(PasswordData(params)), owner, result);
 }
 
 int QnRestoreStateRestHandler::executePost(
@@ -29,17 +29,19 @@ int QnRestoreStateRestHandler::executePost(
     Q_UNUSED(params);
 
     PasswordData passwordData = QJson::deserialized<PasswordData>(body);
-    return execute(std::move(passwordData), owner->accessRights(), result);
+    return execute(std::move(passwordData), owner, result);
 }
 
 int QnRestoreStateRestHandler::execute(
     PasswordData passwordData,
-    const Qn::UserAccessData& accessRights,
+    const QnRestConnectionProcessor* owner,
     QnJsonRestResult &result)
 {
-    if (QnPermissionsHelper::isSafeMode())
+    const Qn::UserAccessData& accessRights = owner->accessRights();
+
+    if (QnPermissionsHelper::isSafeMode(owner->commonModule()))
         return QnPermissionsHelper::safeModeError(result);
-    if (!QnPermissionsHelper::hasOwnerPermissions(accessRights))
+    if (!QnPermissionsHelper::hasOwnerPermissions(owner->resourcePool(), accessRights))
         return QnPermissionsHelper::notOwnerError(result);
 
     QString errStr;
@@ -49,7 +51,7 @@ int QnRestoreStateRestHandler::execute(
         return nx_http::StatusCode::ok;
     }
 
-    if (QnPermissionsHelper::isSafeMode())
+    if (QnPermissionsHelper::isSafeMode(owner->commonModule()))
         return QnPermissionsHelper::safeModeError(result);
 
     return nx_http::StatusCode::ok;
@@ -68,7 +70,7 @@ void QnRestoreStateRestHandler::afterExecute(
     QnJsonRestResult reply;
     if (QJson::deserialize(body, &reply) && reply.error == QnJsonRestResult::NoError)
     {
-        MSSettings::roSettings()->setValue(QnServer::kRemoveDbParamName, "1");
+        qnServerModule->roSettings()->setValue(QnServer::kRemoveDbParamName, "1");
         restartServer(0);
     }
 }

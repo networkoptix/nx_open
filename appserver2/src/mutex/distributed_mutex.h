@@ -10,6 +10,7 @@
 
 #include "nx_ec/data/api_lock_data.h"
 #include "transaction/transaction.h"
+#include <common/common_module_aware.h>
 
 namespace ec2
 {
@@ -42,6 +43,7 @@ namespace ec2
         void lockAsync(int timeoutMs = DEFAULT_LOCK_TIMEOUT);
         void unlock();
         bool checkUserData() const;
+
         virtual ~QnDistributedMutex();
 
         QString name() const { return m_name; }
@@ -49,7 +51,7 @@ namespace ec2
         friend class QnDistributedMutexManager;
 
         QnDistributedMutex(QnDistributedMutexManager* owner, const QString& name);
-        
+
         /* Try to lock within timeout */
         bool isLocking() const;
         bool isLocked() const;
@@ -60,8 +62,8 @@ namespace ec2
         void at_gotLockRequest(ApiLockData lockInfo);
         void at_gotLockResponse(ApiLockData lockInfo);
         //void at_gotUnlockRequest(ApiLockData lockInfo);
-        void at_newPeerFound(ec2::ApiPeerAliveData data);
-        void at_peerLost(ec2::ApiPeerAliveData data);
+        void at_newPeerFound(QnUuid peer, Qn::PeerType peerType);
+        void at_peerLost(QnUuid peer, Qn::PeerType peerType);
         void at_timeout();
     private:
         bool isAllPeersReady() const;
@@ -82,7 +84,7 @@ namespace ec2
         QByteArray m_userData;
     };
     //typedef QSharedPointer<QnDistributedMutex> QnDistributedMutexPtr;
-    
+
     /*
     * This class is using for provide extra information
     * For camera adding scenario under a mutex, this class should provide information
@@ -90,9 +92,14 @@ namespace ec2
     * It requires because of peer can catch mutex, but camera already exists on the other peer,
     * so that peer should tell about it camera in a response message
     */
-    class QnMutexUserDataHandler
+    class QnMutexUserDataHandler: public QnCommonModuleAware
     {
     public:
+        QnMutexUserDataHandler(QnCommonModule* commonModule):
+            QnCommonModuleAware(commonModule)
+        {
+        }
+
         virtual ~QnMutexUserDataHandler() {}
         virtual QByteArray getUserData(const QString& name) = 0;
         virtual bool checkUserData(const QString& name, const QByteArray& data) = 0;

@@ -173,7 +173,7 @@ TEST_F(DbAsyncSqlQueryExecutor, db_connection_reopens_after_error)
     executeUpdate("INSERT INTO company (name, yearFounded) VALUES ('Google', 1998)");
 
     const auto companies = executeSelect<Company>("SELECT * FROM company");
-    ASSERT_EQ(2, companies.size());
+    ASSERT_EQ(2U, companies.size());
 
     closeDatabase();
 }
@@ -191,7 +191,7 @@ TEST_F(DbAsyncSqlQueryExecutor, db_connection_does_not_reopen_after_recoverable_
     executeUpdate("INSERT INTO company (name, yearFounded) VALUES ('Google', 1998)");
 
     const auto companies = executeSelect<Company>("SELECT * FROM company");
-    ASSERT_EQ(2, companies.size());
+    ASSERT_EQ(2U, companies.size());
 
     closeDatabase();
 }
@@ -212,7 +212,7 @@ TEST_F(DbAsyncSqlQueryExecutor, many_recoverable_errors_in_a_row_cause_reconnect
     executeUpdate("INSERT INTO company (name, yearFounded) VALUES ('Google', 1998)");
 
     const auto companies = executeSelect<Company>("SELECT * FROM company");
-    ASSERT_EQ(2, companies.size());
+    ASSERT_EQ(2U, companies.size());
 
     closeDatabase();
 }

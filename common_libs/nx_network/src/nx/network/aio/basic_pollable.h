@@ -1,6 +1,7 @@
 #pragma once
 
 #include <nx/utils/object_destruction_flag.h>
+#include <nx/utils/std/future.h>
 
 #include "abstract_pollable.h"
 #include "pollable.h"
@@ -48,6 +49,32 @@ public:
     virtual void dispatch(nx::utils::MoveOnlyFunc<void()> func) override;
 
     bool isInSelfAioThread() const;
+
+    void cancelPostedCalls(nx::utils::MoveOnlyFunc<void()> completionHandler);
+    /**
+     * NOTE: Non blocking if called within object's aio thread.
+     */
+    void cancelPostedCallsSync();
+
+    template<typename Func>
+    void executeInAioThreadSync(Func func)
+    {
+        if (isInSelfAioThread())
+        {
+            func();
+        }
+        else
+        {
+            nx::utils::promise<void> done;
+            post(
+                [&done, &func]()
+                {
+                    func();
+                    done.set_value();
+                });
+            done.get_future().wait();
+        }
+    }
 
 protected:
     /** Cancel your asynchronous operations here. */

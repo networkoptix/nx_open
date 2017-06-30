@@ -6,7 +6,7 @@
 
 #include <nx/fusion/model_functions.h>
 #include <nx/network/simple_http_client.h>
-#include <nx/network/http/httptypes.h>
+#include <nx/network/http/http_types.h>
 #include <nx/network/http/asynchttpclient.h>
 
 namespace {

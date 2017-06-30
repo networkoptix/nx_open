@@ -3,11 +3,9 @@
 #include <sys/timeb.h>
 #include <sys/types.h>
 
-#include <nx/utils/thread/mutex.h>
-
-#include <nx/utils/log/log.h>
 #include <nx/network/socket_factory.h>
-#include <utils/tz/tz.h>
+#include <nx/utils/log/log.h>
+#include <nx/utils/thread/mutex.h>
 
 constexpr const size_t kMaxTimeStrLength = sizeof(quint32); 
 constexpr const int kSocketRecvTimeout = 7000;
@@ -53,7 +51,7 @@ void TimeProtocolClient::getTimeAsyncInAioThread(
     CompletionHandler completionHandler)
 {
     NX_LOGX(lm("rfc868 time_sync. Starting time synchronization with %1:%2")
-        .str(m_timeServerEndpoint).arg(kTimeProtocolDefaultPort),
+        .arg(m_timeServerEndpoint).arg(kTimeProtocolDefaultPort),
         cl_logDEBUG2);
 
     m_completionHandler = std::move(completionHandler);
@@ -93,7 +91,7 @@ void TimeProtocolClient::onConnectionEstablished(
 {
     NX_LOGX(lm("rfc868 time_sync. Connection to time server %1 "
             "completed with following result: %2")
-            .str(m_timeServerEndpoint).arg(SystemError::toString(errorCode)),
+            .arg(m_timeServerEndpoint).arg(SystemError::toString(errorCode)),
         cl_logDEBUG2);
 
     if (errorCode)
@@ -120,7 +118,7 @@ void TimeProtocolClient::onSomeBytesRead(
     if (errorCode)
     {
         NX_LOGX(lm("rfc868 time_sync. Failed to recv from %1. %2")
-            .str(m_timeServerEndpoint).arg(SystemError::toString(errorCode)),
+            .arg(m_timeServerEndpoint).arg(SystemError::toString(errorCode)),
             cl_logDEBUG1);
 
         m_completionHandler(-1, errorCode);
@@ -130,7 +128,7 @@ void TimeProtocolClient::onSomeBytesRead(
     if (bytesRead == 0)
     {
         NX_LOGX(lm("rfc868 time_sync. Connection to %1 has been closed. Received just %2 bytes")
-            .str(m_timeServerEndpoint).arg(m_timeStr.size()),
+            .arg(m_timeServerEndpoint).arg(m_timeStr.size()),
             cl_logDEBUG2);
 
         //connection closed
@@ -139,12 +137,12 @@ void TimeProtocolClient::onSomeBytesRead(
     }
 
     NX_LOGX(lm("rfc868 time_sync. Read %1 bytes from time server %2").
-        arg(bytesRead).str(m_timeServerEndpoint), cl_logDEBUG2);
+        arg(bytesRead).arg(m_timeServerEndpoint), cl_logDEBUG2);
 
     if (m_timeStr.size() >= m_timeStr.capacity())
     {
         NX_LOGX(lm("rfc868 time_sync. Read %1 from time server %2").
-            arg(m_timeStr.toHex()).str(m_timeServerEndpoint),
+            arg(m_timeStr.toHex()).arg(m_timeServerEndpoint),
             cl_logDEBUG1);
 
         //max data size has been read, ignoring futher data

@@ -57,8 +57,8 @@ copyLibsWithoutQt()
         libcommon.so
         libcloud_db_client.so
         libnx_fusion.so
+        libnx_kit.so
         libnx_network.so
-        libnx_streaming.so
         libnx_utils.so
         libnx_email.so
         libappserver2.so
@@ -72,11 +72,9 @@ copyLibsWithoutQt()
         libswresample.so
         libswscale.so
         libpostproc.so
-        libvmux.so
     )
 
     [ -e "$LIBS_DIR/libvpx.so" ] && LIBS_TO_COPY+=( libvpx.so )
-    [ -e "$LIBS_DIR/libcreateprocess.so" ] && LIBS_TO_COPY+=( libcreateprocess.so )
 
     local LIB
     for LIB in "${LIBS_TO_COPY[@]}"; do
@@ -127,7 +125,6 @@ copyBins()
     cp "$BINS_DIR/external.dat" "$INSTALL_DIR/$MODULE/bin/"
 
     mkdir -p "$INSTALL_DIR/$MODULE/bin/plugins/"
-    cp "$LIBS_DIR/libisd_native_plugin.so.DIMA" "$INSTALL_DIR/$MODULE/bin/plugins/libisd_native_plugin.so"
     cp "$LIBS_DIR/libcpro_ipnc_plugin.so.1.0.0" "$INSTALL_DIR/$MODULE/bin/plugins/"
 }
 

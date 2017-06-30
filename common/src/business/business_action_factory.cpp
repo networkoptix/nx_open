@@ -21,9 +21,14 @@ QVector<QnUuid> toIdList(const QnResourceList& list)
     return result;
 }
 
-QnAbstractBusinessActionPtr QnBusinessActionFactory::instantiateAction(const QnBusinessEventRulePtr &rule, const QnAbstractBusinessEventPtr &event, QnBusiness::EventState state) {
-    QnBusinessEventParameters runtimeParams = event->getRuntimeParams();
-    runtimeParams.sourceServerId = qnCommon->moduleGUID();
+QnAbstractBusinessActionPtr QnBusinessActionFactory::instantiateAction(
+    const QnBusinessEventRulePtr &rule,
+    const QnAbstractBusinessEventPtr &event,
+    const QnUuid& moduleGuid,
+    QnBusiness::EventState state)
+{
+    QnBusinessEventParameters runtimeParams = event->getRuntimeParamsEx(rule->eventParams());
+    runtimeParams.sourceServerId = moduleGuid;
 
     QnAbstractBusinessActionPtr result = createAction(rule->actionType(), runtimeParams);
 
@@ -39,17 +44,19 @@ QnAbstractBusinessActionPtr QnBusinessActionFactory::instantiateAction(const QnB
     return result;
 }
 
-QnAbstractBusinessActionPtr QnBusinessActionFactory::instantiateAction(const QnBusinessEventRulePtr &rule,
-                                                                       const QnAbstractBusinessEventPtr &event,
-                                                                       const QnBusinessAggregationInfo &aggregationInfo) {
-    QnAbstractBusinessActionPtr result = instantiateAction(rule, event);
+QnAbstractBusinessActionPtr QnBusinessActionFactory::instantiateAction(
+    const QnBusinessEventRulePtr &rule,
+    const QnAbstractBusinessEventPtr &event,
+    const QnUuid& moduleGuid,
+    const QnBusinessAggregationInfo &aggregationInfo)
+{
+    QnAbstractBusinessActionPtr result = instantiateAction(rule, event, moduleGuid);
     if (!result)
         return result;
     result->setAggregationCount(aggregationInfo.totalCount());
 
-    if (QnSendMailBusinessActionPtr sendMailAction = result.dynamicCast<QnSendMailBusinessAction>()) {
+    if (QnSendMailBusinessActionPtr sendMailAction = result.dynamicCast<QnSendMailBusinessAction>())
         sendMailAction->setAggregationInfo(aggregationInfo);
-    }
 
     return result;
 }
@@ -88,6 +95,6 @@ QnAbstractBusinessActionPtr QnBusinessActionFactory::createAction(const QnBusine
 QnAbstractBusinessActionPtr QnBusinessActionFactory::cloneAction(QnAbstractBusinessActionPtr action)
 {
     QnAbstractBusinessActionPtr result = createAction(action->actionType(), action->getRuntimeParams());
-    *result = *action;
+    result->assign(*action);
     return result;
 }

@@ -11,18 +11,17 @@
 
 #include <core/resource/resource_fwd.h>
 #include <nx/utils/uuid.h>
+#include <common/common_module_aware.h>
 
 class QnMServerFailureBusinessEvent;
 
 //!Monitors mediaserver's status change and sends business event if some server goes offline
-class MediaServerStatusWatcher
-:
-    public QObject
+class MediaServerStatusWatcher: public QObject, public QnCommonModuleAware
 {
     Q_OBJECT
 
 public:
-    MediaServerStatusWatcher();
+    MediaServerStatusWatcher(QnCommonModule* commonModule);
     ~MediaServerStatusWatcher();
 
 public slots:

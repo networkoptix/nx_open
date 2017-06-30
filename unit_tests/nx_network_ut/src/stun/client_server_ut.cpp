@@ -12,8 +12,7 @@
 #include <nx/utils/std/future.h>
 #include <nx/utils/test_support/sync_queue.h>
 
-#include <common/common_globals.h>
-#include <utils/common/guard.h>
+#include <nx/utils/scope_guard.h>
 
 namespace nx {
 namespace stun {
@@ -146,7 +145,7 @@ TEST_F(StunClientServerTest, Connectivity)
     const auto address = startServer();
     server.reset();
     client->connect(address);
-    auto clientGuard = makeScopedGuard([this]() { client->pleaseStopSync(); });
+    auto clientGuard = makeScopeGuard([this]() { client->pleaseStopSync(); });
 
     EXPECT_THAT(sendTestRequestSync(), testing::AnyOf(
         SystemError::connectionRefused, SystemError::connectionReset,
@@ -184,7 +183,7 @@ TEST_F(StunClientServerTest, Connectivity)
     startServer(address);
     reconnectEvents.pop(); // Automatic reconnect is expected, again.
 
-    while (server->totalConnectionsAccepted() == 0)
+    while (server->connectionCount() == 0)
         std::this_thread::sleep_for(std::chrono::milliseconds(10));
     ASSERT_EQ(1U, server->connectionCount()) << 
         "Total connections accepted: " << server->totalConnectionsAccepted();
@@ -316,7 +315,7 @@ TEST_F(StunClientServerTest, cancellation)
     const auto incrementTimer = [&timerTicks]() { ++timerTicks; };
     const auto timerPeriod = defaultSettings().reconnectPolicy.initialDelay / 2;
 
-    auto clientGuard = makeScopedGuard([this]() { client->pleaseStopSync(); });
+    auto clientGuard = makeScopeGuard([this]() { client->pleaseStopSync(); });
     client->connect(address);
     client->addOnReconnectedHandler(reconnectHandler);
     client->addConnectionTimer(timerPeriod, incrementTimer, nullptr);

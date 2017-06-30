@@ -1,0 +1,58 @@
+
+<!-- DTD for a simple markup which doc++ can produce.
+  -->
+
+<!entity % ITEMS	"cxxVariable|cxxFunction|xxMethod|cxxClass|cxxMacro|cxxUnion|cxxEntry">
+<!entity % ITEMSETS	"cxxPublic|cxxProtected|cxxPrivate|cxxItems">
+<!entity % LITERALS	"type|variable|method|function|expr">
+<!entity % DECLS	"name|args|%LITERALS;">
+<!entity % LINKS	"link|docppLink">
+<!entity % REFS		"docppRef">
+<!entity % INLINE	"math|imath">
+<!entity % INLINEEM	"graphic|%REFS;">
+<!entity % TEXTS	"memo|cxxdoc">
+<!entity % REFTEXT	"#PCDATA|%LINKS;|%REFS;">
+<!entity % CODESTUFF	"#PCDATA|%LINKS;|%DECLS;|parameter">
+<!entity % BLOCKS	"para|programListing">
+<!entity % TEXTSTUFF	"#PCDATA|%LINKS;|%DECLS;|parameter|%INLINE;|%INLINEEM;">
+<!entity % INFO		"refs?,parameters?,author?,version?,cxxInheritance?">
+<!entity % INHBITS	"before|anchor|after">
+
+<!element sane		- -	(%ITEMS;) >
+
+<!element (%ITEMS;)	- -     (type,name,args,memo,%INFO;,cxxdoc?,(%ITEMSETS;|%ITEMS;)*)>
+<!attlist (%ITEMS;)	id	CDATA	#IMPLIED
+			>
+<!element (%ITEMSETS;)	- -	(%ITEMS;)* >
+
+<!element cxxInheritance - -	(InheritanceEntry)*>
+<!element InheritanceEntry - -	(before,anchor,entry,after?)>
+
+<!element (%INHBITS;)	- -	CDATA>
+<!element entry		- -	(%CODESTUFF;)*>
+
+
+<!element (%DECLS;)	- -     (%CODESTUFF;)*>
+
+<!element (%TEXTS;)	- -     (%BLOCKS;)*>
+
+<!element (%LINKS;)	- -	(%TEXTSTUFF;)*>
+<!element (%INLINE;)	- -	(%TEXTSTUFF;)*>
+<!element (%INLINEEM;)	- -	EMPTY>
+<!attlist (%LINKS;|%REFS;)
+			linkend		CDATA	#REQUIRED
+			>
+
+<!ELEMENT (%BLOCKS;)		- O	(%TEXTSTUFF;)*>
+
+<!element refs		- -	(ref)*>
+<!element ref		- -	(%REFTEXT;)*>
+<!element author	- -	CDATA>
+<!element version	- -	CDATA>
+
+<!element parameters	- -	(parameter)*>
+<!element parameter	- -	(%CODESTUFF;)*>
+
+<!entity lt	"<">
+<!entity gt	">">
+<!entity amp	"&">

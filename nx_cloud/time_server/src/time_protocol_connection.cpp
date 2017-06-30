@@ -9,7 +9,7 @@ namespace nx {
 namespace time_server {
 
 TimeProtocolConnection::TimeProtocolConnection(
-    StreamConnectionHolder<TimeProtocolConnection>* socketServer,
+    network::server::StreamConnectionHolder<TimeProtocolConnection>* socketServer,
     std::unique_ptr<AbstractStreamSocket> _socket)
     :
     m_socketServer(socketServer),
@@ -35,7 +35,7 @@ void TimeProtocolConnection::startReadingConnection(
     //        std::chrono::system_clock::now().time_since_epoch()).count();
 
     NX_LOGX(lm("Sending %1 UTC time to %2")
-        .arg(utcTimeSeconds).str(m_socket->getForeignAddress()),
+        .arg(utcTimeSeconds).arg(m_socket->getForeignAddress()),
         cl_logDEBUG2);
 
     utcTimeSeconds += network::kSecondsFrom19000101To19700101;
@@ -63,7 +63,7 @@ void TimeProtocolConnection::onDataSent(
     if (errorCode != SystemError::noError)
     {
         NX_LOGX(lm("Failed to send to %1. %2")
-            .str(m_socket->getForeignAddress())
+            .arg(m_socket->getForeignAddress())
             .arg(SystemError::toString(errorCode)),
             cl_logDEBUG2);
     }

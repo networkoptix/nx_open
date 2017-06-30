@@ -3,14 +3,14 @@
 #include <QtCore/QBuffer>
 
 #include <nx/network/url/url_parse_helper.h>
+#include <nx/utils/app_info.h>
 #include <nx/utils/log/log.h>
+#include <nx/utils/scope_guard.h>
+#include <nx/utils/software_version.h>
+#include <nx/utils/stree/resourcecontainer.h>
+#include <nx/utils/stree/stree_manager.h>
 
-#include <plugins/videodecoder/stree/resourcecontainer.h>
-#include <plugins/videodecoder/stree/stree_manager.h>
-#include <utils/common/app_info.h>
-#include <utils/common/guard.h>
-#include <utils/common/software_version.h>
-
+#include "nx/network/app_info.h"
 #include "cloud_modules_xml_sax_handler.h"
 
 namespace nx {
@@ -50,10 +50,10 @@ CloudModuleUrlFetcher::CloudModuleUrlFetcher(
     m_moduleAttrName(m_nameset.findResourceByName(moduleName).id),
     m_endpointSelector(std::move(endpointSelector)),
     m_requestIsRunning(false),
-    m_modulesXmlUrl(QnAppInfo::defaultCloudModulesXmlUrl())
+    m_modulesXmlUrl(AppInfo::defaultCloudModulesXmlUrl())
 {
     NX_ASSERT(
-        m_moduleAttrName != stree::INVALID_RES_ID,
+        m_moduleAttrName != nx::utils::stree::INVALID_RES_ID,
         Q_FUNC_INFO,
         lit("Given bad cloud module name %1").arg(moduleName));
 
@@ -166,8 +166,8 @@ void CloudModuleUrlFetcher::onHttpClientDone(nx_http::AsyncHttpClientPtr client)
 
     QByteArray xmlData = client->fetchMessageBodyBuffer();
     QBuffer xmlDataSource(&xmlData);
-    std::unique_ptr<stree::AbstractNode> stree =
-        stree::StreeManager::loadStree(&xmlDataSource, m_nameset);
+    std::unique_ptr<nx::utils::stree::AbstractNode> stree =
+        nx::utils::stree::StreeManager::loadStree(&xmlDataSource, m_nameset);
     if (!stree)
     {
         return signalWaitingHandlers(
@@ -190,12 +190,12 @@ void CloudModuleUrlFetcher::onHttpClientDone(nx_http::AsyncHttpClientPtr client)
 }
 
 bool CloudModuleUrlFetcher::findModuleUrl(
-    const stree::AbstractNode& treeRoot,
+    const nx::utils::stree::AbstractNode& treeRoot,
     const int moduleAttrName,
     QUrl* const moduleUrl)
 {
-    stree::ResourceContainer inputData;
-    const QnSoftwareVersion productVersion(QnAppInfo::applicationVersion());
+    nx::utils::stree::ResourceContainer inputData;
+    const nx::utils::SoftwareVersion productVersion(nx::utils::AppInfo::applicationVersion());
     inputData.put(
         CloudInstanceSelectionAttributeNameset::vmsVersionMajor,
         productVersion.major());
@@ -210,16 +210,16 @@ bool CloudModuleUrlFetcher::findModuleUrl(
         productVersion.build());
     inputData.put(
         CloudInstanceSelectionAttributeNameset::vmsVersionFull,
-        QnAppInfo::applicationVersion());
+        nx::utils::AppInfo::applicationVersion());
     inputData.put(
         CloudInstanceSelectionAttributeNameset::vmsBeta,
-        QnAppInfo::beta() ? "true" : "false");
+        nx::utils::AppInfo::beta() ? "true" : "false");
     inputData.put(
         CloudInstanceSelectionAttributeNameset::vmsCustomization,
-        QnAppInfo::customizationName());
+        nx::utils::AppInfo::customizationName());
 
-    stree::ResourceContainer outputData;
-    treeRoot.get(stree::MultiSourceResourceReader(inputData, outputData), &outputData);
+    nx::utils::stree::ResourceContainer outputData;
+    treeRoot.get(nx::utils::stree::MultiSourceResourceReader(inputData, outputData), &outputData);
 
     QString foundEndpointStr;
     if (outputData.get(moduleAttrName, &foundEndpointStr))

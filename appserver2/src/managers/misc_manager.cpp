@@ -7,12 +7,17 @@
 namespace ec2 {
 
 void QnMiscNotificationManager::triggerNotification(
-    const QnTransaction<ApiSystemIdData> &transaction, 
+    const QnTransaction<ApiSystemIdData> &transaction,
     NotificationSource /*source*/)
 {
     emit systemIdChangeRequested(transaction.params.systemId,
                                    transaction.params.sysIdTime,
                                    transaction.params.tranLogTime);
+}
+
+void QnMiscNotificationManager::triggerNotification(const QnTransaction<ApiMiscData> &transaction)
+{
+    emit miscDataChanged(transaction.params.name, transaction.params.value);
 }
 
 template<class QueryProcessorType>
@@ -53,18 +58,6 @@ int QnMiscManager<QueryProcessorType>::changeSystemId(
     return reqId;
 }
 
-namespace {
-void updateRuntimeInfoAfterLicenseOverflowTransaction(const ApiLicenseOverflowData& params)
-{
-    QnPeerRuntimeInfo localInfo = QnRuntimeInfoManager::instance()->localInfo();
-    if (localInfo.data.prematureLicenseExperationDate != params.time) 
-    {
-        localInfo.data.prematureLicenseExperationDate = params.time;
-        QnRuntimeInfoManager::instance()->updateLocalItem(localInfo);
-    }
-}
-}
-
 template<class QueryProcessorType>
 int QnMiscManager<QueryProcessorType>::markLicenseOverflow(
         bool value,
@@ -82,8 +75,6 @@ int QnMiscManager<QueryProcessorType>::markLicenseOverflow(
         [handler, reqId, params](ErrorCode errorCode)
         {
             handler->done(reqId, errorCode);
-            if (errorCode == ErrorCode::ok)
-                updateRuntimeInfoAfterLicenseOverflowTransaction(params);
         }
     );
 
@@ -112,6 +103,50 @@ int QnMiscManager<QueryProcessorType>::cleanupDatabase(
 
     return reqId;
 }
+
+template<class T>
+int QnMiscManager<T>::saveMiscParam(const ec2::ApiMiscData& param, impl::SimpleHandlerPtr handler)
+{
+    const int reqID = generateRequestID();
+    m_queryProcessor->getAccess(m_userAccessData).processUpdateAsync(
+        ApiCommand::saveMiscParam, param,
+        [handler, reqID](ec2::ErrorCode errorCode)
+    {
+        handler->done(reqID, errorCode);
+    });
+    return reqID;
+}
+
+template<class T>
+int QnMiscManager<T>::saveRuntimeInfo(const ec2::ApiRuntimeData& data, impl::SimpleHandlerPtr handler)
+{
+    const int reqID = generateRequestID();
+    m_queryProcessor->getAccess(m_userAccessData).processUpdateAsync(
+        ApiCommand::runtimeInfoChanged, data,
+        [handler, reqID](ec2::ErrorCode errorCode)
+    {
+        handler->done(reqID, errorCode);
+    });
+    return reqID;
+}
+
+template<class T>
+int QnMiscManager<T>::getMiscParam(const QByteArray& paramName, impl::GetMiscParamHandlerPtr handler)
+{
+    const int reqID = generateRequestID();
+
+    auto queryDoneHandler = [reqID, handler, paramName](ErrorCode errorCode, const ApiMiscData& param)
+    {
+        ApiMiscData outData;
+        if (errorCode == ErrorCode::ok)
+            outData = param;
+        handler->done(reqID, errorCode, outData);
+    };
+    m_queryProcessor->getAccess(m_userAccessData).template processQueryAsync<QByteArray, ApiMiscData, decltype(queryDoneHandler)>
+        (ApiCommand::getMiscParam, paramName, queryDoneHandler);
+    return reqID;
+}
+
 
 template class QnMiscManager<ServerQueryProcessorAccess>;
 template class QnMiscManager<FixedUrlClientQueryProcessor>;

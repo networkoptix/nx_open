@@ -53,12 +53,10 @@ public:
     virtual ComposerHandler* composerHandler(const QString& cameraId) = 0;
 };
 
-const std::chrono::minutes kWriteInfoFilesInterval(5);
-
 class Writer
 {
 public:
-    Writer(WriterHandler* writeHandler, std::chrono::milliseconds writeInterval = kWriteInfoFilesInterval);
+    Writer(WriterHandler* writeHandler);
     void write();
 
 private:
@@ -69,13 +67,8 @@ private:
         QnServer::ChunksCatalog catalog,
         const QString& cameraId);
 
-protected:
-    void setWriteInterval(std::chrono::milliseconds interval);
-
 private:
     WriterHandler* m_handler;
-    std::chrono::milliseconds m_writeInterval;
-    std::chrono::time_point<std::chrono::steady_clock> m_lastWriteTime;
     QMap<QString, QByteArray> m_infoPathToCameraInfo;
     Composer m_composer;
 };
@@ -85,7 +78,7 @@ class ServerWriterHandler:
     public ComposerHandler
 {
 public: // WriterHandler
-    ServerWriterHandler(QnStorageManager* storageManager);
+    ServerWriterHandler(QnStorageManager* storageManager, QnResourcePool* resPool);
     virtual QStringList storagesUrls() const override;
     virtual QStringList camerasIds(QnServer::ChunksCatalog) const override;
     virtual bool needStop() const override;
@@ -102,6 +95,7 @@ public: // ComposerHandler
 
 private:
     QnStorageManager* m_storageManager;
+    QnResourcePool* m_resPool;
     QnSecurityCamResourcePtr m_camera;
 };
 
@@ -197,6 +191,8 @@ private:
 class ServerReaderHandler: public ReaderHandler
 {
 public:
+    ServerReaderHandler(const QnUuid& moduleId, QnResourcePool* resPool);
+
     virtual QnUuid moduleGuid() const override;
     virtual QnUuid archiveCamTypeId() const override;
     virtual bool isCameraInResPool(const QnUuid& cameraId) const override;
@@ -204,6 +200,8 @@ public:
 
 private:
     mutable QnUuid m_archiveCamTypeId;
+    QnUuid m_moduleId;
+    QnResourcePool* m_resPool;
 };
 
 }

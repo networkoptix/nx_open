@@ -6,7 +6,6 @@
 #include <tuple>
 #include <type_traits>
 
-#include <nx/network/aio/basic_pollable.h>
 #include <nx/network/aio/timer.h>
 #include <nx/network/cloud/address_resolver.h>
 #include <nx/network/cloud/data/connect_data.h>
@@ -14,12 +13,12 @@
 #include <nx/utils/move_only_func.h>
 #include <nx/utils/result_counter.h>
 #include <nx/utils/type_utils.h>
-#include <utils/common/systemerror.h>
+#include <nx/utils/system_error.h>
 
 #include "abstract_cross_nat_connector.h"
 #include "abstract_outgoing_tunnel_connection.h"
 #include "abstract_tunnel_connector.h"
-#include "connector_factory.h"
+#include "cloud_tunnel_connector_executor.h"
 
 namespace nx {
 namespace network {
@@ -36,10 +35,8 @@ public:
     CrossNatConnector(
         const AddressEntry& targetPeerAddress,
         boost::optional<SocketAddress> mediatorAddress = boost::none);
-    virtual ~CrossNatConnector();
 
     virtual void bindToAioThread(aio::AbstractAioThread* aioThread) override;
-    virtual void stopWhileInAioThread() override;
 
     virtual void connect(
         std::chrono::milliseconds timeout,
@@ -51,6 +48,7 @@ public:
     static utils::ResultCounter<nx::hpm::api::ResultCode>& mediatorResponseCounter();
 
 protected:
+    virtual void stopWhileInAioThread() override;
     virtual void messageReceived(
         SocketAddress sourceAddress,
         stun::Message msg) override;
@@ -59,7 +57,6 @@ protected:
 private:
     const AddressEntry m_targetPeerAddress;
     const nx::String m_connectSessionId;
-    ConnectorFactory::CloudConnectors m_connectors;
     ConnectCompletionHandler m_completionHandler;
     SocketAddress m_mediatorAddress;
     std::unique_ptr<nx::hpm::api::MediatorClientUdpConnection> m_mediatorUdpClient;
@@ -72,6 +69,7 @@ private:
     bool m_done;
     nx::hpm::api::ConnectionParameters m_connectionParameters;
     std::unique_ptr<aio::Timer> m_timer;
+    std::unique_ptr<ConnectorExecutor> m_cloudConnectorExecutor;
 
     static utils::ResultCounter<nx::hpm::api::ResultCode> s_mediatorResponseCounter;
 
@@ -83,11 +81,10 @@ private:
         nx::hpm::api::ResultCode resultCode,
         nx::hpm::api::ConnectResponse response);
     std::chrono::milliseconds calculateTimeLeftForConnect();
-    void startNatTraversing(
+    void start(
         std::chrono::milliseconds connectTimeout,
         nx::hpm::api::ConnectResponse response);
     void onConnectorFinished(
-        ConnectorFactory::CloudConnectors::iterator connectorIter,
         nx::hpm::api::NatTraversalResultCode resultCode,
         SystemError::ErrorCode errorCode,
         std::unique_ptr<AbstractOutgoingTunnelConnection> connection);

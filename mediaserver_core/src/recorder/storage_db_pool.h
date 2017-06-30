@@ -3,51 +3,27 @@
 #include "utils/db/db_helper.h"
 #include "storage_db.h"
 #include <QSharedPointer>
+#include <common/common_module_aware.h>
 
-template <class  T>
-class DependedSingleTone
+class QnStorageDbPool:
+    public QObject,
+    public Singleton<QnStorageDbPool>,
+    public QnCommonModuleAware
 {
-private:
-    static QWeakPointer<T> m_instance;
-protected:
-    DependedSingleTone<T>() {}
+    Q_OBJECT
 public:
-
-    static T* instance() {
-        return m_instance.data();
-    }
-    QSharedPointer<T> create()
-    {
-        QSharedPointer<T> result;
-        if (m_instance)
-            result = m_instance.toStrongRef();
-        else {
-            result = QSharedPointer<T>(new T());
-            m_instance = result.toWeakRef();
-        }
-        return result;
-    }
-};
-
-template<typename T> QWeakPointer<T> DependedSingleTone<T>::m_instance;
-
-class QnStorageDbPool: public DependedSingleTone<QnStorageDbPool>
-{
-public:
-    QnStorageDbPool();
-    
-    //static QnStorageDbPool* instance();
+    QnStorageDbPool(QnCommonModule* commonModule);
 
     QnStorageDbPtr getSDB(const QnStorageResourcePtr &storage);
     int getStorageIndex(const QnStorageResourcePtr& storage);
     void removeSDB(const QnStorageResourcePtr &storage);
 
-    static QString getLocalGuid();
+    static QString getLocalGuid(QnCommonModule* commonModule);
     void flush();
 private:
     mutable QnMutex m_sdbMutex;
     mutable QnMutex m_mutexStorageIndex;
-    
+
     QMap<QString, QnStorageDbPtr> m_chunksDB;
     QMap<QString, QSet<int> > m_storageIndexes;
 };

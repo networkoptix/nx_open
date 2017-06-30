@@ -9,10 +9,9 @@
 #include <QObject>
 #include <QThread>
 
+#include <nx/utils/thread/joinable.h>
 #include <nx/utils/thread/mutex.h>
 #include <nx/utils/thread/wait_condition.h>
-
-#include "joinable.h"
 
 
 //!Waits until QThread processes all events already-posted to its event loop

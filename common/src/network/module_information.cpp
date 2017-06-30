@@ -1,14 +1,12 @@
 #include "module_information.h"
 
 #include <QtNetwork/QNetworkInterface>
+#include <QtCore/QCryptographicHash>
 
 #include <nx/fusion/model_functions.h>
-#include <common/common_module.h>
+#include <nx/network/app_info.h>
+
 #include <nx_ec/ec_proto_version.h>
-#include <api/model/connection_info.h>
-#include <utils/common/app_info.h>
-#include <utils/common/software_version.h>
-#include <network/cloud_system_data.h>
 
 namespace {
 /*!
@@ -33,10 +31,10 @@ QnModuleInformation::QnModuleInformation():
     protoVersion(0),
     runtimeId(),
     serverFlags(0),
-    realm(QnAppInfo::realm()),
+    realm(nx::network::AppInfo::realm()),
     ecDbReadOnly(false),
     cloudSystemId(),
-    cloudHost(QnAppInfo::defaultCloudHost())
+    cloudHost(nx::network::AppInfo::defaultCloudHost())
 {
 }
 

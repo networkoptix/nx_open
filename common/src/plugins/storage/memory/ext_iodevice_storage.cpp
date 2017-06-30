@@ -8,8 +8,9 @@
 #include <nx/utils/thread/mutex.h>
 
 
-QnExtIODeviceStorageResource::QnExtIODeviceStorageResource()
-    : m_capabilities(0)
+QnExtIODeviceStorageResource::QnExtIODeviceStorageResource(QnCommonModule* commonModule):
+    base_type(commonModule),
+    m_capabilities(0)
 {
     m_capabilities |= QnAbstractStorageResource::cap::ListFile;
     m_capabilities |= QnAbstractStorageResource::cap::ReadFile;

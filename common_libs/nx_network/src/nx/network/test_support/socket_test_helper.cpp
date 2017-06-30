@@ -8,12 +8,11 @@
 #include <atomic>
 #include <iostream>
 
+#include <nx/utils/thread/barrier_handler.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/random.h>
 #include <nx/utils/std/cpp14.h>
 #include <nx/utils/string.h>
-
-#include <utils/math/math.h>
 
 namespace nx {
 namespace network {
@@ -238,7 +237,7 @@ void TestConnection::onConnected( SystemError::ErrorCode errorCode )
     if( errorCode != SystemError::noError )
     {
         NX_LOGX(lm("Connect to %1 error: %2")
-            .strs(m_remoteAddress, SystemError::toString(errorCode)), cl_logWARNING);
+            .args(m_remoteAddress, SystemError::toString(errorCode)), cl_logWARNING);
 
         return reportFinish( errorCode );
     }
@@ -581,6 +580,8 @@ void RandomDataTcpServer::pleaseStop(nx::utils::MoveOnlyFunc<void()> handler)
 
 bool RandomDataTcpServer::start(std::chrono::milliseconds rwTimeout)
 {
+    using namespace std::placeholders;
+
     m_rwTimeout = rwTimeout;
     if (!m_serverSocket)
         m_serverSocket = SocketFactory::createStreamServerSocket();
@@ -594,8 +595,7 @@ bool RandomDataTcpServer::start(std::chrono::milliseconds rwTimeout)
     }
 
     m_serverSocket->acceptAsync(std::bind(
-        &RandomDataTcpServer::onNewConnection, this,
-        std::placeholders::_1, std::placeholders::_2));
+        &RandomDataTcpServer::onNewConnection, this, _1, _2));
     return true;
 }
 
@@ -634,7 +634,7 @@ ConnectionTestStatistics RandomDataTcpServer::statistics() const
 
 void RandomDataTcpServer::onNewConnection(
     SystemError::ErrorCode errorCode,
-    AbstractStreamSocket* newConnection)
+    std::unique_ptr<AbstractStreamSocket> newConnection)
 {
     using namespace std::placeholders;
 
@@ -642,7 +642,7 @@ void RandomDataTcpServer::onNewConnection(
     if (errorCode == SystemError::noError)
     {
         auto testConnection = std::make_shared<TestConnection>(
-            std::unique_ptr<AbstractStreamSocket>(newConnection),
+            std::move(newConnection),
             m_limitType,
             m_trafficLimit,
             m_transmissionMode);
@@ -959,7 +959,7 @@ void AddressBinder::add(const SocketAddress& key, SocketAddress address)
     auto it = m_map.find(key);
     NX_CRITICAL(it != m_map.end());
     NX_CRITICAL(it->second.insert(std::move(address)).second);
-    NX_LOGX(lm("New address %1 is bound to %2").strs(address, key), cl_logDEBUG1);
+    NX_LOGX(lm("New address %1 is bound to %2").args(address, key), cl_logDEBUG1);
 }
 
 void AddressBinder::remove(const SocketAddress& key, const SocketAddress& address)
@@ -968,7 +968,7 @@ void AddressBinder::remove(const SocketAddress& key, const SocketAddress& addres
     auto it = m_map.find(key);
     NX_CRITICAL(it != m_map.end());
     NX_CRITICAL(it->second.erase(address));
-    NX_LOGX(lm("Address %1 is unbound from %2").strs(address, key), cl_logDEBUG1);
+    NX_LOGX(lm("Address %1 is unbound from %2").args(address, key), cl_logDEBUG1);
 }
 
 void AddressBinder::remove(const SocketAddress& key)
@@ -977,7 +977,7 @@ void AddressBinder::remove(const SocketAddress& key)
     auto it = m_map.find(key);
     NX_CRITICAL(it != m_map.end());
     m_map.erase(it);
-    NX_LOGX(lm("Key %1 is removed").str(key), cl_logDEBUG1);
+    NX_LOGX(lm("Key %1 is removed").arg(key), cl_logDEBUG1);
 }
 
 std::set<SocketAddress> AddressBinder::get(const SocketAddress& key) const
@@ -1027,7 +1027,7 @@ SocketAddress MultipleClientSocketTester::modifyAddress(const SocketAddress& add
         NX_CRITICAL(addressOpt);
 
         m_address = std::move(*addressOpt);
-        NX_LOGX(lm("Using %2 instead of %1").strs(address, m_address), cl_logDEBUG2);
+        NX_LOGX(lm("Using %2 instead of %1").args(address, m_address), cl_logDEBUG2);
     }
 
     return m_address;

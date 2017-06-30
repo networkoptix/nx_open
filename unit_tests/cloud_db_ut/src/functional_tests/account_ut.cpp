@@ -7,18 +7,18 @@
 #include <QtCore/QDir>
 #include <QtCore/QFile>
 
-#include <cdb/cloud_nonce.h>
-#include <data/account_data.h>
 #include <nx/fusion/model_functions.h>
 #include <nx/network/http/auth_tools.h>
 #include <nx/network/http/asynchttpclient.h>
-#include <nx/network/http/httpclient.h>
+#include <nx/network/http/http_client.h>
 #include <nx/network/http/server/fusion_request_result.h>
+#include <nx/utils/app_info.h>
 #include <nx/utils/test_support/utils.h>
 #include <nx/utils/time.h>
-#include <utils/common/app_info.h>
+#include <nx/utils/sync_call.h>
 
-#include <utils/common/sync_call.h>
+#include <nx/cloud/cdb/api/cloud_nonce.h>
+#include <nx/cloud/cdb/data/account_data.h>
 
 #include "email_manager_mocked.h"
 #include "test_setup.h"
@@ -73,7 +73,7 @@ TEST_F(Account, activation)
     api::AccountConfirmationCode activationCode;
     result = addAccount(&account1, &account1Password, &activationCode);
     ASSERT_EQ(result, api::ResultCode::ok);
-    ASSERT_EQ(account1.customization, QnAppInfo::customizationName().toStdString());
+    ASSERT_EQ(account1.customization, nx::utils::AppInfo::customizationName().toStdString());
     ASSERT_TRUE(!activationCode.code.empty());
 
     //only /account/activate and /account/reactivate are allowed for not activated account
@@ -97,7 +97,7 @@ TEST_F(Account, activation)
 
     result = getAccount(account1.email, account1Password, &account1);
     ASSERT_EQ(api::ResultCode::ok, result);
-    ASSERT_EQ(QnAppInfo::customizationName().toStdString(), account1.customization);
+    ASSERT_EQ(nx::utils::AppInfo::customizationName().toStdString(), account1.customization);
     ASSERT_EQ(api::AccountStatus::activated, account1.statusCode);
 }
 
@@ -124,7 +124,7 @@ TEST_F(Account, reactivation)
     api::AccountConfirmationCode activationCode;
     result = addAccount(&account1, &account1Password, &activationCode);
     ASSERT_EQ(result, api::ResultCode::ok);
-    ASSERT_EQ(account1.customization, QnAppInfo::customizationName().toStdString());
+    ASSERT_EQ(account1.customization, nx::utils::AppInfo::customizationName().toStdString());
     ASSERT_TRUE(!activationCode.code.empty());
 
     //reactivating account (e.g. we lost activation code)
@@ -142,7 +142,7 @@ TEST_F(Account, reactivation)
 
     result = getAccount(account1.email, account1Password, &account1);
     ASSERT_EQ(api::ResultCode::ok, result);
-    ASSERT_EQ(QnAppInfo::customizationName().toStdString(), account1.customization);
+    ASSERT_EQ(nx::utils::AppInfo::customizationName().toStdString(), account1.customization);
     ASSERT_EQ(api::AccountStatus::activated, account1.statusCode);
 
     //subsequent activation MUST fail
@@ -182,7 +182,7 @@ TEST_F(Account, reactivation_activated_account)
 
     result = getAccount(account1.email, account1Password, &account1);
     ASSERT_EQ(api::ResultCode::ok, result);
-    ASSERT_EQ(QnAppInfo::customizationName().toStdString(), account1.customization);
+    ASSERT_EQ(nx::utils::AppInfo::customizationName().toStdString(), account1.customization);
     ASSERT_EQ(api::AccountStatus::activated, account1.statusCode);
 
     //reactivating account (e.g. we lost activation code)
@@ -232,7 +232,7 @@ TEST_F(Account, general)
     {
         const auto result = bindRandomSystem(account1.email, account1Password, &system1);
         ASSERT_EQ(result, api::ResultCode::ok);
-        ASSERT_EQ(system1.customization, QnAppInfo::customizationName().toStdString());
+        ASSERT_EQ(system1.customization, nx::utils::AppInfo::customizationName().toStdString());
     }
 
     {
@@ -361,13 +361,13 @@ TEST_F(Account, request_query_decode)
         "test@yandex.ru",
         moduleInfo().realm.c_str(),
         account1Password.c_str()).constData();
-    account1.customization = QnAppInfo::customizationName().toStdString();
+    account1.customization = nx::utils::AppInfo::customizationName().toStdString();
 
     nx_http::HttpClient httpClient;
     QUrl url(
         lm("http://127.0.0.1:%1/cdb/account/register?email=%2&fullName=%3&passwordHa1=%4&customization=%5")
         .arg(endpoint().port).arg(account1.email).arg(account1.fullName)
-        .arg(account1.passwordHa1).arg(QnAppInfo::customizationName().toStdString()));
+        .arg(account1.passwordHa1).arg(nx::utils::AppInfo::customizationName().toStdString()));
     ASSERT_TRUE(httpClient.doGet(url));
     ASSERT_EQ(nx_http::StatusCode::ok, httpClient.response()->statusLine.statusCode);
     QByteArray responseBody;
@@ -380,7 +380,7 @@ TEST_F(Account, request_query_decode)
     //api::AccountConfirmationCode activationCode;
     //result = addAccount(&account1, &account1Password, &activationCode);
     //ASSERT_EQ(result, api::ResultCode::ok);
-    //ASSERT_EQ(account1.customization, QnAppInfo::customizationName().toStdString());
+    //ASSERT_EQ(account1.customization, nx::utils::AppInfo::customizationName().toStdString());
     //ASSERT_TRUE(!activationCode.code.empty());
 
     std::string activatedAccountEmail;
@@ -396,7 +396,7 @@ TEST_F(Account, request_query_decode)
     account1.email = "test@yandex.ru";
     result = getAccount(account1.email, account1Password, &account1);
     ASSERT_EQ(result, api::ResultCode::ok);
-    ASSERT_EQ(account1.customization, QnAppInfo::customizationName().toStdString());
+    ASSERT_EQ(account1.customization, nx::utils::AppInfo::customizationName().toStdString());
     ASSERT_EQ(account1.statusCode, api::AccountStatus::activated);
     ASSERT_EQ(account1.email, "test@yandex.ru");
 }
@@ -740,7 +740,7 @@ TEST_F(Account, reset_password_activates_account)
     api::AccountConfirmationCode activationCode;
     api::ResultCode result = addAccount(&account1, &account1Password, &activationCode);
     ASSERT_EQ(result, api::ResultCode::ok);
-    ASSERT_EQ(account1.customization, QnAppInfo::customizationName().toStdString());
+    ASSERT_EQ(account1.customization, nx::utils::AppInfo::customizationName().toStdString());
     ASSERT_TRUE(!activationCode.code.empty());
 
     //user did not activate account and forgot password
@@ -886,16 +886,28 @@ protected:
 
     void assertRegistrationTimestampIsCorrect()
     {
+        using namespace std::chrono;
+
         const auto account = getFreshAccountCopy();
-        ASSERT_GE(account.registrationTime, m_registrationTimeRange.first);
-        ASSERT_LE(account.registrationTime, m_registrationTimeRange.second);
+        ASSERT_GE(
+            nx::utils::floor<milliseconds>(account.registrationTime),
+            nx::utils::floor<milliseconds>(m_registrationTimeRange.first));
+        ASSERT_LE(
+            nx::utils::floor<milliseconds>(account.registrationTime),
+            nx::utils::floor<milliseconds>(m_registrationTimeRange.second));
     }
     
     void assertActivationTimestampIsCorrect()
     {
+        using namespace std::chrono;
+
         const auto account = getFreshAccountCopy();
-        ASSERT_GE(account.activationTime, m_activationTimeRange.first);
-        ASSERT_LE(account.activationTime, m_activationTimeRange.second);
+        ASSERT_GE(
+            nx::utils::floor<milliseconds>(account.activationTime),
+            nx::utils::floor<milliseconds>(m_activationTimeRange.first));
+        ASSERT_LE(
+            nx::utils::floor<milliseconds>(account.activationTime),
+            nx::utils::floor<milliseconds>(m_activationTimeRange.second));
     }
 
     void whenRestartedCloudDb()

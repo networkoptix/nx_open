@@ -2,8 +2,8 @@
 
 #include <nx/utils/log/log.h>
 
-#include <utils/common/guard.h>
-#include <utils/common/systemerror.h>
+#include <nx/utils/scope_guard.h>
+#include <nx/utils/system_error.h>
 
 namespace nx {
 namespace network {
@@ -50,7 +50,7 @@ SystemError::ErrorCode SystemResolver::resolve(
     std::deque<HostAddress>* resolvedAddresses)
 {
     auto resultCode = SystemError::noError;
-    const auto guard = makeScopedGuard([&]() { SystemError::setLastErrorCode(resultCode); });
+    const auto guard = makeScopeGuard([&]() { SystemError::setLastErrorCode(resultCode); });
     if (hostName.isEmpty())
         return SystemError::invalidData;
 
@@ -63,7 +63,7 @@ SystemError::ErrorCode SystemResolver::resolve(
         hints.ai_family = ipVersion;
 
     addrinfo* addressInfo = nullptr;
-    NX_LOGX(lm("Resolving %1 on DNS").str(hostName), cl_logDEBUG2);
+    NX_LOGX(lm("Resolving %1 on DNS").arg(hostName), cl_logDEBUG2);
     int status = getaddrinfo(hostName.toLatin1(), 0, &hints, &addressInfo);
 
     if (status == EAI_BADFLAGS)
@@ -75,7 +75,7 @@ SystemError::ErrorCode SystemResolver::resolve(
 
     if (status == 0)
     {
-        NX_LOGX(lm("Resolve of %1 on DNS completed successfully").str(hostName), cl_logDEBUG2);
+        NX_LOGX(lm("Resolve of %1 on DNS completed successfully").arg(hostName), cl_logDEBUG2);
     }
     else
     {
@@ -94,7 +94,7 @@ SystemError::ErrorCode SystemResolver::resolve(
         };
 
         NX_LOGX(lm("Resolve of %1 on DNS failed with result %2")
-            .str(hostName).str(SystemError::toString(resultCode)), cl_logDEBUG2);
+            .arg(hostName).arg(SystemError::toString(resultCode)), cl_logDEBUG2);
         return resultCode;
     }
 

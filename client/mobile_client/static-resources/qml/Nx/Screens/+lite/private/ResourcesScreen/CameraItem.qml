@@ -207,7 +207,9 @@ Control
                 videoRotation: resourceHelper.customRotation
                 sourceSize: Qt.size(videoOutput.sourceRect.width, videoOutput.sourceRect.height)
 
-                item: VideoOutput
+                item: videoOutput
+
+                VideoOutput
                 {
                     id: videoOutput
 

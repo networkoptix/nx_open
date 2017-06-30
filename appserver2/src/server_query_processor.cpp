@@ -42,7 +42,7 @@ ErrorCode detail::ServerQueryProcessor::removeObjParamsHelper(
     PostProcessList* const transactionsToSend)
 {
     ApiResourceParamWithRefDataList resourceParams;
-    dbManager(m_userAccessData).getResourceParamsNoLock(tran.params.id, resourceParams);
+    m_db.getResourceParamsNoLock(tran.params.id, resourceParams);
 
     return processMultiUpdateSync(
         ApiCommand::removeResourceParam,
@@ -75,16 +75,10 @@ ErrorCode detail::ServerQueryProcessor::removeResourceStatusHelper(
         transactionType);
 }
 
-detail::ServerQueryProcessor::PostProcessList& detail::ServerQueryProcessor::getStaticPostProcessList()
+detail::ServerQueryProcessor ServerQueryProcessorAccess::getAccess(
+    const Qn::UserAccessData userAccessData)
 {
-    static detail::ServerQueryProcessor::PostProcessList postProcessList;
-    return postProcessList;
-}
-
-QnMutex& detail::ServerQueryProcessor::getStaticUpdateMutex()
-{
-    static QnMutex updateMutex;
-    return updateMutex;
+    return detail::ServerQueryProcessor(this, userAccessData);
 }
 
 } //namespace ec2

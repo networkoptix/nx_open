@@ -29,3 +29,10 @@ QList<QnPlatformMonitor::PartitionSpace> QnPlatformMonitor::totalPartitionSpaceI
 
 QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(QnPlatformMonitor, PartitionType, LEXICAL_VALUES_FOR_PT)
 QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(QnPlatformMonitor, PartitionTypes, LEXICAL_VALUES_FOR_PT)
+
+QString toString(const QnPlatformMonitor::PartitionSpace& value)
+{
+    return lm("Partition(name='%1', path='%2', type=%3, space=%4/%5)").args(
+        value.devName, value.path, QnLexical::serialized(value.type),
+        value.freeBytes, value.sizeBytes);
+}

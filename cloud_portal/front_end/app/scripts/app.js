@@ -9,6 +9,7 @@ angular.module('cloudApp', [
     'ui.bootstrap',
     'ngStorage',
     'base64',
+    'nxCommon',
     'ngToast'
 ]).config(['$httpProvider', function ($httpProvider) {
     $httpProvider.defaults.xsrfCookieName = 'csrftoken';
@@ -79,15 +80,6 @@ angular.module('cloudApp', [
             templateUrl: Config.viewsDir + 'systems.html',
             controller: 'SystemsCtrl'
         })
-        .when('/systems/default', {
-            // Special mode - user will be redirected to default system if default system can be determined (if user has one system)
-            title: L.pageTitles.systems,
-            templateUrl: Config.viewsDir + 'systems.html',
-            controller: 'SystemsCtrl',
-            resolve: {
-                test: ['$route',function ($route) { $route.current.params.defaultMode = true; }]
-            }
-        })
         .when('/systems/:systemId', {
             title: L.pageTitles.system,
             templateUrl: Config.viewsDir + 'system.html',
@@ -100,6 +92,16 @@ angular.module('cloudApp', [
             resolve: {
                 test: ['$route',function ($route) { $route.current.params.callShare = true; }]
             }
+        })
+        .when('/systems/:systemId/view', {
+            title: L.pageTitles.view,
+            templateUrl: Config.viewsDir + 'view.html',
+            controller: 'ViewPageCtrl'
+        })
+        .when('/systems/:systemId/view/:cameraId', {
+            title: L.pageTitles.view,
+            templateUrl: Config.viewsDir + 'view.html',
+            controller: 'ViewPageCtrl'
         })
         .when('/activate', {
             title: L.pageTitles.activate,
@@ -199,28 +201,4 @@ angular.module('cloudApp', [
             title: L.pageTitles.pageNotFound,
             templateUrl: Config.viewsDir + '404.html'
         });
-}]).run(['$route', '$rootScope', '$location', 'page', function ($route, $rootScope, $location, page) {
-
-    $rootScope.C = Config;
-    $rootScope.L = L;
-
-    var original = $location.path;
-    $location.path = function (path, reload) {
-        if (reload === false) {
-            var lastRoute = $route.current;
-            var un = $rootScope.$on('$locationChangeSuccess', function () {
-                $route.current = lastRoute;
-                un();
-            });
-        }
-        return original.apply($location, [path]);
-    };
-
-    $rootScope.$on('$routeChangeSuccess', function (event, current, previous) {
-        if(current.$$route){
-            page.title(current.$$route.title);
-        }else{
-            page.title(L.pageTitles.pageNotFound);
-        }
-    });
 }]);

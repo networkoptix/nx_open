@@ -103,7 +103,7 @@ angular.module('cloudApp')
                             } else {
                                 self.success = true;
 
-                                if(successMessage){
+                                if(successMessage && data !== false){
                                     dialogs.notify(successMessage, 'success', holdAlerts);
                                 }
                                 deferred.resolve(data);

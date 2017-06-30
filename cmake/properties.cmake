@@ -9,7 +9,7 @@ set(minilauncher.binary.name "applauncher-bin")
 set(mediaserver.name "${company.name} Media Server")
 set(mediaserver.display.name "${display.product.name} Media Server")
 
-if(WIN32)
+if(WINDOWS)
     set(client.binary.name "${product.name}.exe")
     set(applauncher.binary.name "applauncher.exe")
     set(minilauncher.binary.name "${product.name} Launcher.exe")

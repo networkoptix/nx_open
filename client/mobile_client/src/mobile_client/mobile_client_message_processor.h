@@ -1,16 +1,16 @@
-#ifndef MOBILE_CLIENT_MESSAGE_PROCESSOR_H
-#define MOBILE_CLIENT_MESSAGE_PROCESSOR_H
+#pragma once
 
 #include <client/client_message_processor.h>
 #include <core/resource/resource_fwd.h>
 #include <utils/common/connective.h>
 
-class QnMobileClientMessageProcessor : public QnClientMessageProcessor {
+class QnMobileClientMessageProcessor : public QnClientMessageProcessor
+{
     Q_OBJECT
     typedef QnClientMessageProcessor base_type;
 
 public:
-    QnMobileClientMessageProcessor();
+    QnMobileClientMessageProcessor(QObject* parent = nullptr);
 
     bool isConnected() const;
 
@@ -23,4 +23,5 @@ private:
     void updateMainServerApiUrl(const QnMediaServerResourcePtr& server);
 };
 
-#endif // MOBILE_CLIENT_MESSAGE_PROCESSOR_H
+#define qnMobileClientMessageProcessor \
+    static_cast<QnMobileClientMessageProcessor*>(commonModule()->messageProcessor())

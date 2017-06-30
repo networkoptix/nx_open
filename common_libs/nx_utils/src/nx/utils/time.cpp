@@ -122,6 +122,9 @@ QString getCurrentTimeZoneId()
         if (id.isEmpty())
         {
             // Obtain time zone via POSIX functions (thread-safe).
+            NX_LOG(lit(
+                "getCurrentTimeZoneId(): QDateTime time zone id is empty, trying localtime_r()"),
+                cl_logDEBUG1);
             constexpr int kMaxTimeZoneSize = 32;
             struct timespec timespecTime;
             struct tm tmTime;
@@ -144,6 +147,7 @@ QString getCurrentTimeZoneId()
         id == "Etc/Universal" ||
         id == "Etc/Zulu")
     {
+        NX_LOG(lit("getCurrentTimeZoneId(): Converting %1 -> UTC").arg(id), cl_logDEBUG1);
         return "UTC";
     }
 

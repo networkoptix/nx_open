@@ -15,11 +15,11 @@
 
 #include <onvif/stdsoap2.h>
 
-#include <utils/common/joinable.h>
-#include <utils/common/stoppable.h>
+#include <nx/utils/thread/joinable.h>
+#include <nx/utils/thread/stoppable.h>
 #include <nx/network/socket.h>
-#include <nx/network/http/httptypes.h>
-#include <nx/network/http/httpstreamreader.h>
+#include <nx/network/http/http_types.h>
+#include <nx/network/http/http_stream_reader.h>
 
 #include "soap_wrapper.h"
 #include <onvif/soapDeviceBindingProxy.h>
@@ -285,7 +285,7 @@ private:
             parseBytesTillConnectionClosure(errorCode, bytesRead);
     }
 
-    void parseBytesWithHttpReader(SystemError::ErrorCode errorCode, std::size_t bytesRead)
+    void parseBytesWithHttpReader(SystemError::ErrorCode /*errorCode*/, std::size_t bytesRead)
     {
         static const int MIN_SOCKET_READ_SIZE = 4096;
         static const int READ_BUFFER_GROW_STEP = 4096;

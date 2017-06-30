@@ -5,7 +5,7 @@
 
 #include <nx/streaming/abstract_archive_delegate.h>
 #include "vmax480_stream_fetcher.h"
-#include "utils/common/long_runnable.h"
+#include "nx/utils/thread/long_runnable.h"
 #include "recording/time_period_list.h"
 #include "../../../../vmaxproxy/src/vmax480_helper.h"
 

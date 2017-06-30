@@ -5,6 +5,7 @@
 namespace nx {
 namespace utils {
 QByteArray encodeSimple(const QByteArray& data);
+QByteArray encodeSimple(const QByteArray& data, const QByteArray& extraKey);
 
 // NOTE: data to be encoded shouldn't contain '\0' because decrypted
 //       data is stripped at the first '\0' symbol. E.g. these below work

@@ -80,3 +80,8 @@
 #   define DEBUG_CODE(...)
 #   define RELEASE_CODE(...) __VA_ARGS__
 #endif
+
+//
+#ifndef BOOST_BIND_NO_PLACEHOLDERS
+#define BOOST_BIND_NO_PLACEHOLDERS
+#endif // BOOST_BIND_NO_PLACEHOLDERS

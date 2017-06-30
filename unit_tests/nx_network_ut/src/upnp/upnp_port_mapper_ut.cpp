@@ -1,10 +1,9 @@
 #include <gtest/gtest.h>
 
-#include "upnp_port_mapper_mocked.h"
-
-#include <common/common_globals.h>
-#include <api/global_settings.h>
+#include <nx/network/upnp/upnp_device_searcher.h>
 #include <nx/utils/test_support/sync_queue.h>
+
+#include "upnp_port_mapper_mocked.h"
 
 namespace nx_upnp {
 namespace test {
@@ -12,8 +11,9 @@ namespace test {
 class UpnpPortMapper: public ::testing::Test
 {
 public:
-    UpnpPortMapper() : deviceSearcher( nullptr ) {}
+    UpnpPortMapper() : deviceSearcher(deviceSearcherSettings) {}
     nx::utils::TimerManager timerManager;
+    DeviceSearcherDefaultSettings deviceSearcherSettings;
     DeviceSearcher deviceSearcher;
 
     static std::pair< quint16, PortMapper::Protocol > tcpPort( quint16 port )
@@ -126,7 +126,7 @@ TEST_F( UpnpPortMapper, CheckMappings )
 
 TEST_F( UpnpPortMapper, DISABLED_RealRouter )
 {
-    PortMapper portMapper( 10000 );
+    PortMapper portMapper( true, 10000 );
 
     EXPECT_TRUE( portMapper.enableMapping( 7001, PortMapper::Protocol::TCP,
                  [&]( SocketAddress ) {} ) );

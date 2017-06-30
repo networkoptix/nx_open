@@ -1,0 +1,25 @@
+<chapter>
+    <title>Utility Functions</title>
+
+<para>
+
+<sect1><title>Utility Classes and Functions</title>
+<toc depth=2></toc>
+
+&docpp-EST-Token-2;
+&docpp-UtilityFunctionsforstrings-2;
+&docpp-UtilityfunctionsforIO-2;
+</sect1>
+</chapter>
+
+<!--
+Local Variables:
+mode: sgml
+sgml-doctype: "speechtools.sgml"
+sgml-parent-document: ("speechtools.sgml" "chapter" "book")
+End:
+-->
+
+
+
+

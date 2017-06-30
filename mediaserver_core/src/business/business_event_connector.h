@@ -10,6 +10,8 @@
 #include "business/business_event_parameters.h"
 #include <server/server_globals.h>
 #include "health/system_health.h"
+#include <common/common_module_aware.h>
+#include <nx/utils/singleton.h>
 
 struct QnModuleInformation;
 
@@ -17,16 +19,16 @@ struct QnModuleInformation;
 * This class listening various logic events, covert these events to business events and send it to businessRuleProcessor
 */
 
-class QnBusinessEventConnector: public QObject
+class QnBusinessEventConnector:
+    public QObject,
+    public QnCommonModuleAware,
+    public Singleton<QnBusinessEventConnector>
 {
     Q_OBJECT
 
 public:
-    QnBusinessEventConnector();
+    QnBusinessEventConnector(QnCommonModule* commonModule);
     ~QnBusinessEventConnector();
-
-    static void initStaticInstance( QnBusinessEventConnector* );
-    static QnBusinessEventConnector* instance();
 
 public slots:
     /*!
@@ -54,7 +56,7 @@ public slots:
         \param value true, if input activated. false, if deactivated
     */
     void at_cameraInput(const QnResourcePtr &resource, const QString& inputPortID, bool value, qint64 timeStampUsec);
-    
+
     void at_customEvent(const QString &resourceName, const QString& caption, const QString& description, const QnEventMetaData& metadata, QnBusiness::EventState eventState, qint64 timeStamp);
 
     /*!
@@ -78,7 +80,12 @@ public slots:
 
     void at_archiveBackupFinished(const QnResourcePtr &resource, qint64 timeStamp, QnBusiness::EventReason reasonCode, const QString& reasonText);
 
-    bool createEventFromParams(const QnBusinessEventParameters& params, QnBusiness::EventState eventState, QString* errMessage = 0);
+    void at_softwareTrigger(const QnResourcePtr& resource, const QString& triggerId, const QnUuid& userId,
+        qint64 timeStamp, QnBusiness::EventState toggleState);
+
+    bool createEventFromParams(const QnBusinessEventParameters& params, QnBusiness::EventState eventState,
+        const QnUuid& userId = QnUuid(), QString* errMessage = nullptr);
+
 private slots:
     void onNewResource(const QnResourcePtr &resource);
 };

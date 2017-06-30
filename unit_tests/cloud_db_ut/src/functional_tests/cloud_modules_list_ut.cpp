@@ -4,14 +4,14 @@
 #include <list>
 
 #include <nx/network/cloud/cloud_module_url_fetcher.h>
-#include <nx/network/http/httpclient.h>
+#include <nx/network/http/http_client.h>
 #include <nx/utils/std/cpp14.h>
 #include <nx/utils/test_support/test_with_temporary_directory.h>
 #include <nx/utils/test_support/utils.h>
 #include <nx/utils/uuid.h>
 
-#include <cloud_db_client/src/cdb_request_path.h>
-#include <managers/cloud_module_url_provider.h>
+#include <nx/cloud/cdb/client/cdb_request_path.h>
+#include <nx/cloud/cdb/managers/cloud_module_url_provider.h>
 
 #include "test_setup.h"
 
@@ -99,16 +99,7 @@ TEST_F(CloudModuleUrlProvider, host_inserted_correctly)
 
 TEST_F(CloudModuleUrlProvider, not_found_template_file_causes_error)
 {
-    try
-    {
-        tryToLoadInvalidFile();
-    }
-    catch (std::exception)
-    {
-        return;
-    }
-    
-    FAIL();
+    ASSERT_ANY_THROW(tryToLoadInvalidFile());
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -142,7 +133,7 @@ protected:
             m_expectedHost, endpoint());
 
         FetcherType fetcher(std::make_unique<network::cloud::RandomEndpointSelector>());
-        auto fetcherGuard = makeScopedGuard([&fetcher]() { fetcher.pleaseStopSync(); });
+        auto fetcherGuard = makeScopeGuard([&fetcher]() { fetcher.pleaseStopSync(); });
 
         fetcher.setModulesXmlUrl(QUrl(lm("http://%1:%2%3")
             .arg(m_expectedHost).arg(endpoint().port).arg(kCloudModuleXmlPath)));

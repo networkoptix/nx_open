@@ -8,12 +8,14 @@
 
 #include <array>
 
+class QnCommonModule;
+
 class QnPlArecontResourceSearcher : public QnAbstractNetworkResourceSearcher
 {
     typedef std::array<unsigned char, 6> MacArray;
-
+    using base_type = QnAbstractNetworkResourceSearcher;
 public:
-    QnPlArecontResourceSearcher();
+    QnPlArecontResourceSearcher(QnCommonModule* commonModule);
 
     virtual QnResourcePtr createResource(const QnUuid &resourceTypeId, const QnResourceParams& params) override;
 
@@ -26,7 +28,7 @@ protected:
     virtual QString manufacture() const;
 
 private:
-    QnNetworkResourcePtr findResourceHelper(const MacArray &mac, 
+    QnNetworkResourcePtr findResourceHelper(const MacArray &mac,
                                             const SocketAddress &addr);
 };
 

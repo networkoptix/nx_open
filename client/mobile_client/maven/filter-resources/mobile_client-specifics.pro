@@ -3,7 +3,7 @@ TEMPLATE = app
 
 INCLUDEPATH += \
     ${root.dir}/appserver2/src \
-    ${root.dir}/client/libclient_core/src \
+    ${root.dir}/client/nx_client_core/src \
     ${root.dir}/common_libs/nx_vms_utils/src \
     ${root.dir}/nx_cloud/cloud_db_client/src/include
 
@@ -25,7 +25,6 @@ android {
         $$OUTPUT_PATH/lib/$$CONFIGURATION/libappserver2.a \
         $$OUTPUT_PATH/lib/$$CONFIGURATION/libnx_audio.a \
         $$OUTPUT_PATH/lib/$$CONFIGURATION/libnx_media.a \
-        $$OUTPUT_PATH/lib/$$CONFIGURATION/libnx_streaming.a
     
     ANDROID_EXTRA_LIBS += \
         $$OUTPUT_PATH/lib/$$CONFIGURATION/libcrypto.so \

@@ -12,7 +12,8 @@
 #include <core/resource/user_resource.h>
 #include <core/resource_management/resource_pool.h>
 #include <api/model/getnonce_reply.h>
-#include <nx/network/http/httpclient.h>
+#include <nx/network/http/http_client.h>
+#include <rest/server/rest_connection_processor.h>
 
 namespace {
     bool isResponseOK(const nx_http::HttpClient& client)
@@ -25,7 +26,11 @@ namespace {
     const int requestTimeoutMs = 10000;
 }
 
-int QnGetNonceRestHandler::executeGet(const QString& path, const QnRequestParams& params, QnJsonRestResult &result, const QnRestConnectionProcessor*)
+int QnGetNonceRestHandler::executeGet(
+    const QString& path,
+    const QnRequestParams& params,
+    QnJsonRestResult &result,
+    const QnRestConnectionProcessor* owner)
 {
     if (params.contains("url"))
     {
@@ -53,12 +58,12 @@ int QnGetNonceRestHandler::executeGet(const QString& path, const QnRequestParams
 
     QnGetNonceReply reply;
     reply.nonce = QnAuthHelper::instance()->generateNonce();
-    reply.realm = QnAppInfo::realm();
+    reply.realm = nx::network::AppInfo::realm();
 
     QString userName = params.value("userName");
     if (!userName.isEmpty())
     {
-        auto users = qnResPool->getResources<QnUserResource>().filtered(
+        auto users = owner->resourcePool()->getResources<QnUserResource>().filtered(
             [userName](const QnUserResourcePtr& user)
         {
             return user->getName() == userName;

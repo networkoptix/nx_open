@@ -12,7 +12,7 @@
 #include "core/resource/camera_resource.h"
 #include <nx/network/simple_http_client.h>
 #include <nx/network/http/asynchttpclient.h>
-#include <nx/network/http/linesplitter.h>
+#include <nx/network/http/line_splitter.h>
 #include <nx/network/http/asynchttpclient.h>
 #include "nx/streaming/media_data_packet.h"
 #include "../onvif/onvif_resource.h"

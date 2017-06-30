@@ -1,0 +1,2 @@
+nx_add_target(cloud_connect_integration_tests EXECUTABLE PUBLIC_LIBS libconnection_mediator libtraffic_relay GTest GMock)
+target_include_directories(cloud_connect_integration_tests PRIVATE "${PROJECT_SOURCE_DIR}/nx_cloud")

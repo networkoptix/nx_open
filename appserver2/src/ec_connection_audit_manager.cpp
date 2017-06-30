@@ -1,22 +1,26 @@
 #include "ec_connection_audit_manager.h"
-#include "audit/audit_manager.h"
-#include "utils/common/synctime.h"
-#include "core/resource_management/resource_pool.h"
-#include "core/resource/user_resource.h"
-#include "core/resource/media_server_resource.h"
-#include "core/resource/camera_resource.h"
-#include "api/common_message_processor.h"
-#include "business/business_strings_helper.h"
-#include "nx_ec/data/api_conversion_functions.h"
-#include "business/business_event_rule.h"
+
+#include <audit/audit_manager.h>
+#include <utils/common/synctime.h>
+#include <core/resource_management/resource_pool.h>
+#include <core/resource/user_resource.h>
+#include <core/resource/media_server_resource.h>
+#include <core/resource/camera_resource.h>
+#include <api/common_message_processor.h>
+#include <business/business_strings_helper.h>
+#include <business/business_event_rule.h>
+#include <business/event_rule_manager.h>
+#include <nx_ec/data/api_conversion_functions.h>
 #include <api/global_settings.h>
+#include <common/common_module.h>
+#include <nx_ec/ec_api.h>
 
 namespace ec2
 {
 
-    ECConnectionAuditManager::ECConnectionAuditManager(AbstractECConnection* ecConnection)
+    ECConnectionAuditManager::ECConnectionAuditManager(AbstractECConnection* ecConnection):
+        m_connection(ecConnection)
     {
-        Q_UNUSED(ecConnection)
     }
 
     void ECConnectionAuditManager::addAuditRecord(ApiCommand::Value command,  const ApiCameraAttributesDataList& params, const QnAuthSession& authInfo)
@@ -94,7 +98,8 @@ namespace ec2
         auditRecord.resources.push_back(params.id);
         QnBusinessEventRulePtr bRule(new QnBusinessEventRule());
         fromApiToResource(params, bRule);
-        auditRecord.addParam("description", QnBusinessStringsHelper::bruleDescriptionText(bRule).toUtf8());
+        QnBusinessStringsHelper helper(m_connection->commonModule());
+        auditRecord.addParam("description", helper.bruleDescriptionText(bRule).toUtf8());
 
         qnAuditManager->addAuditRecord(auditRecord);
     }
@@ -111,7 +116,7 @@ namespace ec2
     void ECConnectionAuditManager::addAuditRecord(ApiCommand::Value command,  const ApiResourceParamWithRefData& param, const QnAuthSession& authInfo)
     {
         Q_UNUSED(command);
-        if (qnGlobalSettings->isGlobalSetting(param))
+        if (QnGlobalSettings::isGlobalSetting(param))
             qnAuditManager->notifySettingsChanged(authInfo, param.name);
     }
 
@@ -124,17 +129,26 @@ namespace ec2
 
     void ECConnectionAuditManager::addAuditRecord(ApiCommand::Value command,  const ApiIdData& params, const QnAuthSession& authInfo)
     {
+        const auto& resPool = m_connection->commonModule()->resourcePool();
         Qn::AuditRecordType eventType = Qn::AR_NotDefined;
         QString description;
+        QnUuid resourceId;
         switch(command)
         {
+            case ApiCommand::removeStorage:
+                if (QnResourcePtr res = resPool->getResourceById(params.id))
+                {
+                    eventType = Qn::AR_ServerUpdate;
+                    resourceId = res->getParentId();
+                }
+                break;
             case ApiCommand::removeResource:
             case ApiCommand::removeResources:
             case ApiCommand::removeCamera:
             case ApiCommand::removeMediaServer:
             case ApiCommand::removeUser:
             {
-                if (QnResourcePtr res = qnResPool->getResourceById(params.id))
+                if (QnResourcePtr res = resPool->getResourceById(params.id))
                 {
                     description = res->getName();
                     if (res.dynamicCast<QnUserResource>())
@@ -152,11 +166,14 @@ namespace ec2
             case ApiCommand::removeEventRule:
             {
                 eventType = Qn::AR_BEventRemove;
-                auto msgProc = QnCommonMessageProcessor::instance();
-                if (msgProc) {
-                    QnBusinessEventRulePtr bRule = msgProc->businessRules().value(params.id);
+                auto ruleManager = m_connection->commonModule()->eventRuleManager();
+                if (ruleManager) {
+                    QnBusinessEventRulePtr bRule = ruleManager->rule(params.id);
                     if (bRule)
-                        description = QnBusinessStringsHelper::bruleDescriptionText(bRule);
+                    {
+                        QnBusinessStringsHelper helper(m_connection->commonModule());
+                        description = helper.bruleDescriptionText(bRule);
+                    }
                 }
                 break;
             }
@@ -167,10 +184,13 @@ namespace ec2
             }
         }
 
-        if (eventType != Qn::AR_NotDefined) {
+        if (eventType != Qn::AR_NotDefined)
+        {
             auto auditRecord = qnAuditManager->prepareRecord(authInfo, eventType);
             if (!description.isEmpty())
                 auditRecord.addParam("description", description.toUtf8());
+            if (!resourceId.isNull())
+                auditRecord.resources.push_back(resourceId);
             qnAuditManager->addAuditRecord(auditRecord);
         }
     }
@@ -193,5 +213,10 @@ namespace ec2
         Q_UNUSED(command);
         Q_UNUSED(params);
         qnAuditManager->addAuditRecord(qnAuditManager->prepareRecord(authInfo, Qn::AR_DatabaseRestore));
+    }
+
+    AbstractECConnection* ECConnectionAuditManager::ec2Connection() const
+    {
+        return m_connection;
     }
 }

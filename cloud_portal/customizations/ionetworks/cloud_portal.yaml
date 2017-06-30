@@ -18,7 +18,7 @@ cloud_portal:
 cloud_gateway:
     url: 'http://$VMS_GATEWAY_HOST:$VMS_GATEWAY_PORT'
 
-mail_from: 'service@networkoptix.com'
+mail_from: 'support@ioezio.com'
 
 mail_prefix: '[EZ Pro Cloud]'
 

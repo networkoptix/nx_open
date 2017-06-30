@@ -25,7 +25,7 @@ ApiLayoutItemData::ApiLayoutItemData():
 }
 
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(
-    (ApiLayoutItemData)(ApiLayoutItemWithRefData)(ApiLayoutData),
+    (ApiLayoutItemData)(ApiLayoutData),
     (ubjson)(xml)(json)(sql_record)(csv_record),
     _Fields)
 

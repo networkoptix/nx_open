@@ -6,6 +6,8 @@
 
 #include <api/helpers/request_helpers_fwd.h>
 
+class QnCommonModule;
+
 class QnMultiserverThumbnailRestHandler: public QnFusionRestHandler
 {
 public:
@@ -13,11 +15,16 @@ public:
     virtual int executeGet(const QString& path, const QnRequestParamList& params, QByteArray& result, QByteArray& contentType, const QnRestConnectionProcessor *processor) override;
 
     // todo: remove ownerPort from params
-    int getScreenshot(const QnThumbnailRequestData &request, QByteArray& result, QByteArray& contentType, int ownerPort);
+    int getScreenshot(
+        QnCommonModule* commonModule,
+        const QnThumbnailRequestData &request,
+        QByteArray& result,
+        QByteArray& contentType,
+        int ownerPort);
 
 private:
     /** Calculate server where the request should be executed. */
-    QnMediaServerResourcePtr targetServer(const QnThumbnailRequestData &request) const;
+    QnMediaServerResourcePtr targetServer(QnCommonModule* commonModule, const QnThumbnailRequestData &request) const;
 
     int getThumbnailLocal(const QnThumbnailRequestData &request, QByteArray& result, QByteArray& contentType) const;
     int getThumbnailRemote(const QnMediaServerResourcePtr &server, const QnThumbnailRequestData &request, QByteArray& result, QByteArray& contentType, int ownerPort) const;

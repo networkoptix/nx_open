@@ -23,6 +23,7 @@
 #include "utils/db/db_helper.h"
 #include "storage_db.h"
 #include <nx/utils/uuid.h>
+#include <nx/utils/timer_manager.h>
 #include <set>
 #include <unordered_map>
 #include "api/model/rebuild_archive_reply.h"
@@ -39,15 +40,17 @@
 #include <functional>
 #include "storage_db_pool.h"
 #include "health/system_health.h"
+#include <common/common_module_aware.h>
 
 class QnAbstractMediaStreamDataProvider;
 class TestStorageThread;
 class RebuildAsyncTask;
 class ScanMediaFilesTask;
+class AuxiliaryTask;
 class QnUuid;
 class QnScheduleSync;
 
-class QnStorageManager: public QObject
+class QnStorageManager: public QObject, public QnCommonModuleAware
 {
     Q_OBJECT
     friend class TestHelper;
@@ -60,7 +63,7 @@ public:
 
     static const qint64 BIG_STORAGE_THRESHOLD_COEFF = 10; // use if space >= 1/10 from max storage space
 
-    QnStorageManager(QnServer::StoragePool kind);
+    QnStorageManager(QnCommonModule* commonModule, QnServer::StoragePool kind);
     virtual ~QnStorageManager();
     static QnStorageManager* normalInstance();
     static QnStorageManager* backupInstance();
@@ -128,6 +131,7 @@ public:
     bool hasRebuildingStorages() const;
 
     void clearSpace(bool forced=false);
+    void checkSystemStorageSpace();
     void removeEmptyDirs(const QnStorageResourcePtr &storage);
 
     bool clearOldestSpace(const QnStorageResourcePtr &storage, bool useMinArchiveDays);
@@ -153,7 +157,7 @@ public:
     void initDone();
     QnStorageResourcePtr findStorageByOldIndex(int oldIndex);
 
-    static void migrateSqliteDatabase(const QnStorageResourcePtr & storage);
+    void migrateSqliteDatabase(const QnStorageResourcePtr & storage) const;
     /*
     * Return camera list with existing archive. Camera Unique ID is used as camera ID
     */
@@ -194,7 +198,7 @@ private:
         std::function<bool (const QnStorageResourcePtr& storage)> filter) const;
 
     QnStorageResourcePtr getUsedWritableStorageByIndex(int storageIndex);
-		
+
     void changeStorageStatus(const QnStorageResourcePtr &fileStorage, Qn::ResourceStatus status);
     DeviceFileCatalogPtr getFileCatalogInternal(const QString& cameraUniqueId, QnServer::ChunksCatalog catalog);
 
@@ -232,10 +236,13 @@ private:
         int64_t                     duration,
         const QnStorageResourcePtr  &storage
     );
-    static void updateCameraHistory();
+    void updateCameraHistory() const;
     static std::vector<QnUuid> getCamerasWithArchive();
     int64_t calculateNxOccupiedSpace(int storageIndex) const;
     QnStorageResourcePtr getStorageByIndex(int index) const;
+    bool getSqlDbPath(const QnStorageResourcePtr &storage, QString &dbFolderPath) const;
+    void startAuxTimerTasks();
+
 private:
     const QnServer::StoragePool m_role;
     StorageMap                  m_storageRoots;
@@ -262,6 +269,7 @@ private:
 
     friend class RebuildAsyncTask;
     friend class ScanMediaFilesTask;
+    friend class AuxiliaryTask;
 
     ScanMediaFilesTask* m_rebuildArchiveThread;
 
@@ -272,7 +280,6 @@ private:
     QElapsedTimer m_clearBookmarksTimer;
     QElapsedTimer m_removeEmtyDirTimer;
     QMap<QString, qint64> m_lastCatalogTimes;
-    QSharedPointer <QnStorageDbPool> m_storageDbPoolRef;
     std::unique_ptr<QnScheduleSync> m_scheduleSync;
     std::atomic<bool> m_firstStoragesTestDone;
 
@@ -280,6 +287,9 @@ private:
     nx::recorder::SpaceInfo m_spaceInfo;
     nx::caminfo::ServerWriterHandler m_camInfoWriterHandler;
     nx::caminfo::Writer m_camInfoWriter;
+
+    nx::utils::StandaloneTimerManager m_auxTasksTimerManager;
+    bool m_lowSysStorageSpaceWarnShown;
 };
 
 #define qnNormalStorageMan QnStorageManager::normalInstance()

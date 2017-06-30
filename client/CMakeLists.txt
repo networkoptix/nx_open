@@ -1,13 +1,10 @@
-nx_rdep_add_package(any/qtsingleguiapplication)
-nx_rdep_add_package(any/roboto-ttf)
-nx_rdep_add_package(any/roboto-mono-ttf)
-
-add_subdirectory(libclient_core)
+add_subdirectory(nx_client_core)
 
 if(withDesktopClient)
     find_package(Qt5
         COMPONENTS
             Widgets
+            OpenGL
             QuickWidgets
             WebKit
             WebKitWidgets)
@@ -16,7 +13,7 @@ if(withDesktopClient)
         find_package(Qt5 COMPONENTS X11Extras)
     endif()
 
-    add_subdirectory(libclient)
+    add_subdirectory(nx_client_desktop)
     add_subdirectory(desktop_client)
     add_subdirectory(applauncher)
 endif()

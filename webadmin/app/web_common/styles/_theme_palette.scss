@@ -1,0 +1,160 @@
+/* Palette spec is here: http://4yppjt.axshare.com/#p=colors */
+
+$dark_core:    #53707F;
+$dark_core_index: 17;
+$dark_offset:  #050708;
+
+$light_core:    #FFF;
+$light_core_index:  1;
+$light_offset:  #0A0807;
+
+$blue8:         #43C2FF;
+$blue9:			#39B2EF;
+$blue10:        #2FA2DB;
+$blue11:        #2592C3;
+$blue12:        #1B82AD;
+$blue13:		#117297;
+$blue14:		#076281;
+
+
+$green_l4: #56E829;
+$green_l3: #51D22A;
+$green_l2: #4CBC28;
+$green_l1: #44A624;
+$green_main: #3A911E;
+$green_d1: #32731E;
+$green_d2: #2A551E;
+$green_d3: #223925;
+
+
+$dark1: #000000;
+$dark2: #080707;
+$dark3: #0D0E0F;
+$dark4: #121517;
+$dark5: #171C1F;
+$dark6: #1C2327;
+$dark7: #212A2F;
+$dark8: #263137;
+$dark9: #2B383F;
+$dark10: #303F47;
+$dark11: #35464F;
+$dark12: #3A4D57;
+$dark13: #3F545F;
+$dark14: #445B67;
+$dark15: #49626F;
+$dark16: #4E6977;
+$dark17: #53707F;
+
+
+$light1: #FFFFFF;
+$light2: #F5F7F8;
+$light3: #EBEFF1;
+$light4: #E1E7EA;
+$light5: #D7DFE3;
+$light6: #CDD7DC;
+$light7: #C3CFD5;
+$light8: #B9C7CE;
+$light9: #AFBFC7;
+$light10: #A5B7C0;
+$light11: #9BAFB9;
+$light12: #91A7B2;
+$light13: #879FAB;
+$light14: #7D97A4;
+$light15: #738F9D;
+$light16: #698796;
+$light17: #5F7F8F;
+
+
+$additional_light1: #FAFBFB;
+$additional_light2: #F0F3F4;
+$additional_light3: #E6EBED;
+$additional_light4: #DCE3E6;
+
+
+$brand_l4:  #77D2FF;
+$brand_l3:  #5ECBFF;
+$brand_l2:  #43C2FF;
+$brand_l1:  #39B2EF;
+$brand_core: #2FA2DB;
+$brand_d1:  #2592C3;
+$brand_d2:  #1B82AD;
+$brand_d3:  #117297;
+$brand_d4:  #076281;
+
+
+$green_main:  #3A911E;
+$red_main:  #C22626;
+$yellow_main:  #FBBC05;
+
+
+$shadow:                  $dark5;
+$shadow_d1:               $dark4;
+$shadow_d3:               $dark2;
+$base:                    $dark7;
+$window:                  $dark7;
+$dark:                    $dark9;
+$mid:                     $dark10;
+$button:                  $dark11;
+
+$brightText:              $light1;
+$buttonText:              $light4;
+$text:                    $light4;
+$light:                   $light10;
+$light_l2:                $light8;
+$windowText:              $light16;
+
+$link:                    $blue10;
+$linkVisited:             $blue11;
+
+
+$brandContrast:           white;
+
+
+
+
+
+$button_l1:   $dark12;
+$button:      $dark11;
+$button_d1:   $dark10;
+$button_d2:   $dark9;
+$button_d3:   $dark8;
+
+
+
+.dark1	{background-color: $dark1	;}
+.dark2	{background-color: $dark2	;}
+.dark3	{background-color: $dark3	;}
+.dark4	{background-color: $dark4	;}
+.dark5	{background-color: $dark5	;}
+.dark6	{background-color: $dark6	;}
+.dark7	{background-color: $dark7	;}
+.dark8	{background-color: $dark8	;}
+.dark9	{background-color: $dark9	;}
+.dark10	{background-color: $dark10	;}
+.dark11	{background-color: $dark11	;}
+.dark12	{background-color: $dark12	;}
+.dark13	{background-color: $dark13	;}
+.dark14	{background-color: $dark14	;}
+.dark15	{background-color: $dark15	;}
+.dark16	{background-color: $dark16	;}
+.dark17	{background-color: $dark17	;}
+
+.light1	{background-color: $light1	;}
+.light2	{background-color: $light2	;}
+.light3	{background-color: $light3	;}
+.light4	{background-color: $light4	;}
+.light5	{background-color: $light5	;}
+.light6	{background-color: $light6	;}
+.light7	{background-color: $light7	;}
+.light8	{background-color: $light8	;}
+.light9	{background-color: $light9	;}
+.light10	{background-color: $light10	;}
+.light11	{background-color: $light11	;}
+.light12	{background-color: $light12	;}
+.light13	{background-color: $light13	;}
+.light14	{background-color: $light14	;}
+.light15	{background-color: $light15	;}
+.light16	{background-color: $light16	;}
+.light17	{background-color: $light17	;}
+
+.dark1:after{content: $dark1;}

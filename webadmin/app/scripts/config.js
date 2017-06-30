@@ -3,7 +3,8 @@
 
 var Config = {
     viewsDir: 'views/', //'lang_' + lang + '/views/';
-
+    viewsDirCommon: 'web_common/views/',
+    webadminSystemApiCompatibility: true,
     defaultLanguage: 'en_US',
     supportedLanguages:[
         'en_US', 'ru'
@@ -39,7 +40,9 @@ var Config = {
     debug: {
         video: true, // videowindow.js - disable loader, allow rightclick
         videoFormat: false,//'flashls', // videowindow.js - force video player
-        chunksOnTimeline: false // timeline.js - draw debug events
+        chunksOnTimeline: false, // timeline.js - draw debug events
+        jshlsHideError: true, //components\jshls.js - Hide errors used in local env
+        jshlsDebug: false //components\jshls.js - Create hls player in debug mode
     },
     helpLinks: [
         // Additional Links to show in help
@@ -113,7 +116,12 @@ var Config = {
         systemNameForId: {label: 'System name', type: 'text'},
         takeCameraOwnershipWithoutLock: {label: 'Take cameras ownership without lock', type: 'checkbox'},
         timeSynchronizationEnabled: {label: 'Time synchronization enabled', type: 'checkbox'},
-        upnpPortMappingEnabled: {label: 'UPNP port mapping enabled', type: 'checkbox'}
+        upnpPortMappingEnabled: {label: 'UPNP port mapping enabled', type: 'checkbox'},
+    },
+    webclient:{
+        useServerTime: true,
+        disableVolume: true,
+        reloadInterval: 5*1000
     },
     debugEvents: {
         events: [

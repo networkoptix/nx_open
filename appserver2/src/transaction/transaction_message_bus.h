@@ -6,7 +6,6 @@
 #include <QTime>
 
 #include <common/common_module.h>
-#include <utils/common/enable_multi_thread_direct_connection.h>
 
 #include <nx_ec/ec_api.h>
 #include "nx_ec/data/api_lock_data.h"
@@ -18,32 +17,37 @@
 #include "runtime_transaction_log.h"
 #include "transport_connection_info.h"
 
-#include <transaction/binary_transaction_serializer.h>
-#include <transaction/json_transaction_serializer.h>
-
-#include "connection_guard_shared_state.h"
+#include "transaction_message_bus_base.h"
 
 class QTimer;
 class QnRuntimeTransactionLog;
 
 namespace ec2 {
 class ECConnectionNotificationManager;
+class TimeSynchronizationManager;
 
-class QnTransactionMessageBus
-    :
-    public QObject,
-    public EnableMultiThreadDirectConnection<QnTransactionMessageBus>
+class QnTransactionMessageBus:
+    public QnTransactionMessageBusBase
 {
-    Q_OBJECT
+    Q_OBJECT;
+    using base_type = QnTransactionMessageBusBase;
 public:
-    QnTransactionMessageBus(Qn::PeerType peerType);
+    QnTransactionMessageBus(
+        detail::QnDbManager* db,
+        Qn::PeerType peerType,
+        QnCommonModule* commonModule,
+        QnJsonTransactionSerializer* jsonTranSerializer,
+        QnUbjsonTransactionSerializer* ubjsonTranSerializer);
+
     virtual ~QnTransactionMessageBus();
 
-    static QnTransactionMessageBus* instance();
+    //void addConnectionToPeer(const QUrl& url);
+    //void removeConnectionFromPeer(const QUrl& url);
+    virtual void addOutgoingConnectionToPeer(const QnUuid& id, const QUrl& url) override;
+    virtual void removeOutgoingConnectionFromPeer(const QnUuid& id) override;
 
-    void addConnectionToPeer(const QUrl& url);
-    void removeConnectionFromPeer(const QUrl& url);
-    QList<QnTransportConnectionInfo> connectionsInfo() const;
+
+    virtual QVector<QnTransportConnectionInfo> connectionsInfo() const override;
     void gotConnectionFromRemotePeer(const QnUuid& connectionGuid,
         ConnectionLockGuard connectionLockGuard,
         QSharedPointer<AbstractStreamSocket> socket,
@@ -77,15 +81,7 @@ public:
 
     ApiPeerData localPeer() const;
 
-    void start();
-    void stop();
-
-    /*!
-        \param handler Control of life-time of this object is out of scope of this class
-    */
-    void setHandler(ECConnectionNotificationManager* handler);
-
-    void removeHandler(ECConnectionNotificationManager* handler);
+    virtual void stop() override;
 
     template<class T>
     void sendTransaction(const QnTransaction<T>& tran, const QnPeerSet& dstPeers = QnPeerSet())
@@ -94,8 +90,8 @@ public:
         QnMutexLocker lock(&m_mutex);
         if (m_connections.isEmpty())
             return;
-        QnTransactionTransportHeader ttHeader(connectedServerPeers() << qnCommon->moduleGUID(), dstPeers);
-        ttHeader.fillSequence();
+        QnTransactionTransportHeader ttHeader(connectedServerPeers() << commonModule()->moduleGUID(), dstPeers);
+        ttHeader.fillSequence(commonModule()->moduleGUID(), commonModule()->runningInstanceGUID());
         sendTransactionInternal(tran, ttHeader);
     }
 
@@ -105,53 +101,32 @@ public:
         dstPeerId.isNull() ? sendTransaction(tran) : sendTransaction(tran, QnPeerSet() << dstPeerId);
     }
 
-    struct RoutingRecord
-    {
-        RoutingRecord(): distance(0), lastRecvTime(0) {}
-        RoutingRecord(int distance, qint64 lastRecvTime): distance(distance), lastRecvTime(lastRecvTime) {}
-
-        int distance;
-        qint64 lastRecvTime;
-    };
-
     typedef QMap<QnUuid, RoutingRecord> RoutingInfo;
     struct AlivePeerInfo
     {
-        AlivePeerInfo(): peer(QnUuid(), QnUuid(), Qn::PT_Server) {}
-        AlivePeerInfo(const ApiPeerData &peer): peer(peer) {}
+        AlivePeerInfo() : peer(QnUuid(), QnUuid(), Qn::PT_Server) {}
+        AlivePeerInfo(const ApiPeerData &peer) : peer(peer) {}
         ApiPeerData peer;
 
         RoutingInfo routingInfo; // key: route throw, value - distance in hops
-        //QSet<QnUuid> proxyVia;
-        //bool directAccess;
     };
     typedef QMap<QnUuid, AlivePeerInfo> AlivePeersMap;
 
     /*
-    * Return all alive peers
-    */
+     * Return all alive peers
+     */
     AlivePeersMap alivePeers() const;
 
     /*
-    * Return all alive server peers
-    */
-    AlivePeersMap aliveServerPeers() const;
+     * Return all alive server peers
+     */
+    QMap<QnUuid, ApiPeerData> aliveServerPeers() const;
     AlivePeersMap aliveClientPeers() const;
 
-    /*
-    * Return routing information: how to access to a dstPeer.
-    * if peer can be access directly then return same value as input.
-    * If can't find route info then return null value.
-    * Otherwise return route gateway.
-    */
-    QnUuid routeToPeerVia(const QnUuid& dstPeer, int* distance) const;
-
-    ConnectionGuardSharedState* connectionGuardSharedState();
-
+    virtual QSet<QnUuid> directlyConnectedClientPeers() const override;
+    virtual void dropConnections() override;
 signals:
-    void peerLost(ApiPeerAliveData data);
-    //!Emitted when a new peer has joined cluster or became online
-    void peerFound(ApiPeerAliveData data);
+
     //!Emitted on a new direct connection to a remote peer has been established
     void newDirectConnectionEstablished(QnTransactionTransport* transport);
 
@@ -159,12 +134,18 @@ signals:
     //void gotUnlockRequest(ApiLockData);
     void gotLockResponse(ApiLockData);
 
-    void remotePeerUnauthorized(const QnUuid& id);
-
     public slots:
-    void dropConnections();
     void reconnectAllPeers();
 
+    /*
+    * Return routing information: how to access to a dstPeer.
+    * if peer can be access directly then return same value as input.
+    * If can't find route info then return null value.
+    * Otherwise return route gateway.
+    */
+    virtual QnUuid routeToPeerVia(const QnUuid& dstPeer, int* distance) const override;
+
+    virtual int distanceToPeer(const QnUuid& dstPeer) const override;
 private:
     friend class QnTransactionTransport;
     friend struct GotTransactionFuction;
@@ -229,7 +210,6 @@ private:
     void connectToPeerEstablished(const ApiPeerData &peerInfo);
     void connectToPeerLost(const QnUuid& id);
     void handlePeerAliveChanged(const ApiPeerData& peer, bool isAlive, bool sendTran);
-    QnTransaction<ApiDiscoveredServerDataList> prepareModulesDataTransaction() const;
     bool isPeerUsing(const QUrl& url);
     void onGotServerAliveInfo(const QnTransaction<ApiPeerAliveData> &tran, QnTransactionTransport* transport, const QnTransactionTransportHeader& ttHeader);
     bool onGotServerRuntimeInfo(const QnTransaction<ApiRuntimeData> &tran, QnTransactionTransport* transport, const QnTransactionTransportHeader& ttHeader);
@@ -245,7 +225,6 @@ private:
 
     void addAlivePeerInfo(const ApiPeerData& peerData, const QnUuid& gotFromPeer, int distance);
     void removeAlivePeer(const QnUuid& id, bool sendTran, bool isRecursive = false);
-    bool readApiFullInfoData(QnTransactionTransport* transport, ApiFullInfoData* data);
     bool sendInitialData(QnTransactionTransport* transport);
     void printTranState(const QnTranState& tranState);
     template <class T> void proxyTransaction(const QnTransaction<T> &tran, const QnTransactionTransportHeader &transportHeader);
@@ -256,11 +235,11 @@ private:
     void removePeersWithTimeout(const QSet<QnUuid>& lostPeers);
     QSet<QnUuid> checkAlivePeerRouteTimeout();
     void updateLastActivity(QnTransactionTransport* sender, const QnTransactionTransportHeader& transportHeader);
-    int distanceToPeer(const QnUuid& dstPeer) const;
     void addDelayedAliveTran(QnTransaction<ApiPeerAliveData>&& tranToSend, int timeout);
     void sendDelayedAliveTran();
     void reconnectAllPeers(QnMutexLockerBase* const /*lock*/);
 
+    QUrl updateOutgoingUrl(const QUrl& srcUrl) const;
 private slots:
     void at_stateChanged(QnTransactionTransport::State state);
     void at_gotTransaction(
@@ -275,32 +254,26 @@ private slots:
     void onEc2ConnectionSettingsChanged(const QString& key);
 
 private:
-    /** Info about us. */
-    Qn::PeerType m_localPeerType;
-
-    //QScopedPointer<QnBinaryTransactionSerializer> m_binaryTranSerializer;
-    QScopedPointer<QnJsonTransactionSerializer> m_jsonTranSerializer;
-    QScopedPointer<QnUbjsonTransactionSerializer> m_ubjsonTranSerializer;
-
     struct RemoteUrlConnectInfo
     {
-        RemoteUrlConnectInfo() { lastConnectedTime.invalidate(); }
+        RemoteUrlConnectInfo(const QnUuid& id = QnUuid()):
+            id(id)
+        {
+            lastConnectedTime.invalidate();
+        }
         QElapsedTimer lastConnectedTime;
         QnUuid discoveredPeer;
         QElapsedTimer discoveredTimeout;
+        QnUuid id;
     };
 
     QMap<QUrl, RemoteUrlConnectInfo> m_remoteUrls;
-    ECConnectionNotificationManager* m_handler;
     QTimer* m_timer;
-    mutable QnMutex m_mutex;
-    QThread *m_thread;
     QnConnectionMap m_connections;
 
-    AlivePeersMap m_alivePeers;
     QVector<QnTransactionTransport*> m_connectingConnections;
 
-    QMap<QnTranStateKey, int> m_lastTransportSeq;
+    QMap<ApiPersistentIdData, int> m_lastTransportSeq;
 
     // alive control
     QElapsedTimer m_aliveSendTimer;
@@ -317,9 +290,9 @@ private:
     QMap<QnUuid, DelayedAliveData> m_delayedAliveTran;
     QElapsedTimer m_relativeTimer;
 
-    ConnectionGuardSharedState m_connectionGuardSharedState;
+    AlivePeersMap m_alivePeers; //< alive peers in a system
+
 };
 
 } //namespace ec2
 
-#define qnTransactionBus ec2::QnTransactionMessageBus::instance()

@@ -9,6 +9,7 @@
 #include <rest/helpers/permissions_helper.h>
 #include <rest/handlers/private/multiserver_bookmarks_rest_handler_p.h>
 #include <core/resource_access/resource_access_manager.h>
+#include <common/common_module.h>
 
 namespace {
 
@@ -36,21 +37,23 @@ static int checkPermissions(
     QByteArray* outContentType,
     const QnRestConnectionProcessor* processor)
 {
+    const auto& commonModule = processor->commonModule();
+
     Qn::GlobalPermission requiredPermission = Qn::GlobalViewBookmarksPermission;
     if (isModifyingOperation(op))
     {
-        if (QnPermissionsHelper::isSafeMode())
+        if (QnPermissionsHelper::isSafeMode(commonModule))
         {
-            const QnMultiserverRequestData request(params);
+            const QnMultiserverRequestData request(commonModule->resourcePool(), params);
             return QnPermissionsHelper::safeModeError(
                 *outBody, *outContentType, request.format, request.extraFormatting);
         }
         requiredPermission = Qn::GlobalManageBookmarksPermission;
     }
-    if (!qnResourceAccessManager->hasGlobalPermission(
+    if (!commonModule->resourceAccessManager()->hasGlobalPermission(
         processor->accessRights(), requiredPermission))
     {
-        const QnMultiserverRequestData request(params);
+        const QnMultiserverRequestData request(commonModule->resourcePool(), params);
         return QnPermissionsHelper::permissionsError(
             *outBody, *outContentType, request.format, request.extraFormatting);
     }
@@ -62,6 +65,7 @@ static const QString kInvalidParamsMessage =
     lit("Missing parameter(s) or invalid parameter values");
 
 static int performAddOrUpdate(
+    QnCommonModule* commonModule,
     QnBookmarkOperation op,
     int ownerPort,
     const QnRequestParamList& params,
@@ -69,7 +73,7 @@ static int performAddOrUpdate(
     QByteArray* outContentType)
 {
     auto request =
-        QnMultiserverRequestData::fromParams<QnUpdateBookmarkRequestData>(params);
+        QnMultiserverRequestData::fromParams<QnUpdateBookmarkRequestData>(commonModule->resourcePool(), params);
     if (!request.isValid())
     {
         return QnFusionRestHandler::makeError(nx_http::StatusCode::badRequest,
@@ -80,8 +84,8 @@ static int performAddOrUpdate(
 
     QnUpdateBookmarkRequestContext context(request, ownerPort);
     bool ok = (op == QnBookmarkOperation::Add)
-        ? QnMultiserverBookmarksRestHandlerPrivate::addBookmark(context)
-        : QnMultiserverBookmarksRestHandlerPrivate::updateBookmark(context);
+        ? QnMultiserverBookmarksRestHandlerPrivate::addBookmark(commonModule, context)
+        : QnMultiserverBookmarksRestHandlerPrivate::updateBookmark(commonModule, context);
     if (!ok)
     {
         return QnFusionRestHandler::makeError(nx_http::StatusCode::badRequest,
@@ -97,13 +101,14 @@ static int performAddOrUpdate(
 }
 
 static int performDelete(
+    QnCommonModule* commonModule,
     int ownerPort,
     const QnRequestParamList& params,
     QByteArray* outBody,
     QByteArray* outContentType)
 {
     auto request =
-        QnDeleteBookmarkRequestData::fromParams<QnDeleteBookmarkRequestData>(params);
+        QnDeleteBookmarkRequestData::fromParams<QnDeleteBookmarkRequestData>(commonModule->resourcePool(), params);
     if (!request.isValid())
     {
         return QnFusionRestHandler::makeError(nx_http::StatusCode::badRequest,
@@ -113,7 +118,7 @@ static int performDelete(
     }
 
     QnDeleteBookmarkRequestContext context(request, ownerPort);
-    if (!QnMultiserverBookmarksRestHandlerPrivate::deleteBookmark(context))
+    if (!QnMultiserverBookmarksRestHandlerPrivate::deleteBookmark(commonModule, context))
     {
         return QnFusionRestHandler::makeError(nx_http::StatusCode::internalServerError,
             lit("Can't delete bookmark"),
@@ -124,13 +129,14 @@ static int performDelete(
 }
 
 static int performGetTags(
+    QnCommonModule* commonModule,
     int ownerPort,
     const QnRequestParamList& params,
     QByteArray* outBody,
     QByteArray* outContentType)
 {
     auto request =
-        QnGetBookmarkTagsRequestData::fromParams<QnGetBookmarkTagsRequestData>(params);
+        QnGetBookmarkTagsRequestData::fromParams<QnGetBookmarkTagsRequestData>(commonModule->resourcePool(), params);
     if (!request.isValid())
     {
         return QnFusionRestHandler::makeError(nx_http::StatusCode::badRequest,
@@ -141,20 +147,21 @@ static int performGetTags(
 
     QnGetBookmarkTagsRequestContext context(request, ownerPort);
     QnCameraBookmarkTagList outputData =
-        QnMultiserverBookmarksRestHandlerPrivate::getBookmarkTags(context);
+        QnMultiserverBookmarksRestHandlerPrivate::getBookmarkTags(commonModule, context);
     QnFusionRestHandlerDetail::serialize(
         outputData, *outBody, *outContentType, request.format, request.extraFormatting);
     return nx_http::StatusCode::ok;
 }
 
 static int performGet(
+    QnCommonModule* commonModule,
     int ownerPort,
     const QnRequestParamList& params,
     QByteArray* outBody,
     QByteArray* outContentType)
 {
     QnGetBookmarksRequestData request =
-        QnMultiserverRequestData::fromParams<QnGetBookmarksRequestData>(params);
+        QnMultiserverRequestData::fromParams<QnGetBookmarksRequestData>(commonModule->resourcePool(), params);
     if (!request.isValid())
     {
         return QnFusionRestHandler::makeError(nx_http::StatusCode::badRequest,
@@ -165,7 +172,7 @@ static int performGet(
 
     QnGetBookmarksRequestContext context(request, ownerPort);
     QnCameraBookmarkList outputData =
-        QnMultiserverBookmarksRestHandlerPrivate::getBookmarks(context);
+        QnMultiserverBookmarksRestHandlerPrivate::getBookmarks(commonModule, context);
     QnFusionRestHandlerDetail::serialize(
         outputData, *outBody, *outContentType, request.format, request.extraFormatting);
     return nx_http::StatusCode::ok;
@@ -186,6 +193,7 @@ int QnMultiserverBookmarksRestHandler::executeGet(
     QByteArray& contentType,
     const QnRestConnectionProcessor* processor)
 {
+    const auto& commonModule = processor->commonModule();
     QString action = extractAction(path);
     QnBookmarkOperation op = QnMultiserverBookmarksRestHandlerPrivate::getOperation(action);
 
@@ -199,15 +207,15 @@ int QnMultiserverBookmarksRestHandler::executeGet(
     {
         case QnBookmarkOperation::Add:
         case QnBookmarkOperation::Update:
-            return performAddOrUpdate(op, ownerPort, params, &result, &contentType);
+            return performAddOrUpdate(commonModule, op, ownerPort, params, &result, &contentType);
 
         case QnBookmarkOperation::Delete:
-            return performDelete(ownerPort, params, &result, &contentType);
+            return performDelete(commonModule, ownerPort, params, &result, &contentType);
 
         case QnBookmarkOperation::GetTags:
-            return performGetTags(ownerPort, params, &result, &contentType);
+            return performGetTags(commonModule, ownerPort, params, &result, &contentType);
 
         default:
-            return performGet(ownerPort, params, &result, &contentType);
+            return performGet(commonModule, ownerPort, params, &result, &contentType);
     }
 }

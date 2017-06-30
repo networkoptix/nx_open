@@ -7,7 +7,7 @@
 
 #include <gtest/gtest.h>
 
-#include <nx/network/http/httpclient.h>
+#include <nx/network/http/http_client.h>
 #include <nx/utils/log/log_message.h>
 #include <nx/utils/random.h>
 #include <nx/utils/system_utils.h>
@@ -16,7 +16,7 @@
 #include <nx/utils/test_support/utils.h>
 #include <nx/utils/thread/sync_queue.h>
 
-#include <dao/rdb/system_data_object.h>
+#include <nx/cloud/cdb/dao/rdb/system_data_object.h>
 
 #include "test_setup.h"
 
@@ -1203,13 +1203,15 @@ protected:
     
     void assertRegistrationTimestampIsValid()
     {
+        using namespace std::chrono;
+
         const auto system = fetchSystem(m_system.id);
         ASSERT_GE(
-            system.registrationTime,
-            nx::utils::floor<std::chrono::milliseconds>(m_registrationTimeValidRange.first));
+            nx::utils::floor<milliseconds>(system.registrationTime),
+            nx::utils::floor<milliseconds>(m_registrationTimeValidRange.first));
         ASSERT_LE(
-            system.registrationTime,
-            nx::utils::floor<std::chrono::milliseconds>(m_registrationTimeValidRange.second));
+            nx::utils::floor<milliseconds>(system.registrationTime),
+            nx::utils::floor<milliseconds>(m_registrationTimeValidRange.second));
     }
     
 private:

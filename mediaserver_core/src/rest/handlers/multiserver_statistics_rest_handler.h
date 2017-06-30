@@ -3,8 +3,8 @@
 
 #include <rest/server/fusion_rest_handler.h>
 
-class StatisticsActionHandler;
-typedef QSharedPointer<StatisticsActionHandler> StatisticsActionHandlerPtr;
+class AbstractStatisticsActionHandler;
+typedef QSharedPointer<AbstractStatisticsActionHandler> StatisticsActionHandlerPtr;
 
 class QnMultiserverStatisticsRestHandler : public QnFusionRestHandler
 {
@@ -32,8 +32,7 @@ public:
 
 private:
     typedef std::function<int (const StatisticsActionHandlerPtr &handler)> RunHandlerFunc;
-    int processRequest(const QString &fullPath
-        , const RunHandlerFunc &runHandler);
+    int processRequest(const QString &fullPath, const RunHandlerFunc &runHandler);
 
 private:
     typedef QHash<QString, StatisticsActionHandlerPtr> HandlersHash;

@@ -7,8 +7,8 @@
 
 #include <network/tcp_connection_priv.h>
 #include <network/tcp_listener.h>
-#include <nx/network/http/httpclient.h>
-#include <http/custom_headers.h>
+#include <nx/network/http/http_client.h>
+#include <nx/network/http/custom_headers.h>
 
 #include <core/resource/user_resource.h>
 #include <core/resource/media_server_resource.h>
@@ -28,7 +28,7 @@ bool QnJsonAggregatorRestHandler::executeCommad(
         urlQuery.addQueryItem(itr.key(), itr.value());
     url.setQuery(urlQuery);
 
-    auto server = qnResPool->getResourceById<QnMediaServerResource>(qnCommon->moduleGUID());
+    auto server = owner->resourcePool()->getResourceById<QnMediaServerResource>(owner->commonModule()->moduleGUID());
     if (!server)
     {
         result.setError(QnJsonRestResult::CantProcessRequest, lit("Internal server error while executing request '%1'").arg(command));
@@ -38,7 +38,7 @@ bool QnJsonAggregatorRestHandler::executeCommad(
     nx_http::HttpClient client;
     client.setUserName(server->getId().toString());
     client.setUserPassword(server->getAuthKey());
-    auto user = qnResPool->getResourceById<QnUserResource>(owner->accessRights().userId);
+    auto user = owner->resourcePool()->getResourceById<QnUserResource>(owner->accessRights().userId);
     if (user)
         client.addAdditionalHeader(Qn::CUSTOM_USERNAME_HEADER_NAME, user->getName().toUtf8());
     if (!client.doGet(url))

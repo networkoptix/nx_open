@@ -9,9 +9,9 @@
 
 class QnPlAxisResourceSearcher : public QnMdnsResourceSearcher
 {
-
+    using base_type = QnMdnsResourceSearcher;
 public:
-    QnPlAxisResourceSearcher();
+    QnPlAxisResourceSearcher(QnCommonModule* commonModule);
 
     virtual QnResourcePtr createResource(const QnUuid &resourceTypeId, const QnResourceParams& params) override;
 

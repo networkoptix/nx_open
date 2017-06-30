@@ -42,7 +42,7 @@ HostAddress::HostAddress( const QString& addrStr ):
 }
 
 HostAddress::HostAddress( const char* addrStr ):
-    m_string( QLatin1String(addrStr) )
+    HostAddress( QString::fromLatin1(addrStr) )
 {
 }
 
@@ -325,16 +325,6 @@ QString SocketAddress::toString() const
 std::string SocketAddress::toStdString() const
 {
     return toString().toStdString();
-}
-
-QUrl SocketAddress::toUrl(const QString& scheme) const
-{
-    QUrl url;
-    url.setScheme(scheme.isEmpty() ? lit("http") : scheme);
-    url.setHost(address.toString());
-    if (port > 0)
-        url.setPort(port);
-    return url;
 }
 
 bool SocketAddress::isNull() const

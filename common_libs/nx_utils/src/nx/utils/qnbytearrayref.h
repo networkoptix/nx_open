@@ -30,7 +30,8 @@ public:
     QnByteArrayConstRef mid( size_type offset, size_type count = npos ) const;
     bool isEmpty() const;
     int indexOf(char sep) const;
-    bool startsWith( const_pointer str, size_type len = npos ) const;
+    bool startsWith(const_pointer str, size_type len = npos) const;
+    bool startsWith(value_type) const;
     uint toUInt() const;
     float toFloat() const;
     value_type front() const;

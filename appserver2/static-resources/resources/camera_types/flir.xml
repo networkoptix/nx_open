@@ -1,3 +1,4 @@
+<?xml version="1.0"?>
 <resources>
     <oem name = "FLIR">
     <resource name="FLIR_COMMON" id="c9001f9d-230f-435d-a7a9-2e99b3b6a049" type="Camera"/>

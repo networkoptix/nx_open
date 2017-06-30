@@ -1,5 +1,6 @@
-#ifndef __SERVER_STREAM_RECORDER_H__
-#define __SERVER_STREAM_RECORDER_H__
+#pragma once
+
+#include <QtCore/QElapsedTimer>
 
 #include <server/server_globals.h>
 
@@ -39,7 +40,7 @@ public:
     * Both primary and secondary streams are recorded.
     * Panic mode recording has higher priority (fps may be increased if panic mode activated)
     */
-    void startForcedRecording(Qn::StreamQuality quality, int fps, int beforeThreshold, int afterThreshold, int maxDuration);
+    void startForcedRecording(Qn::StreamQuality quality, int fps, int beforeThreshold, int afterThreshold, int maxDurationSec);
 
     /*
     * Switch from forced recording mode to normal recording mode specified by schedule task
@@ -121,6 +122,8 @@ private:
     QnMediaServerResourcePtr m_mediaServer;
     QnScheduleTask m_panicSchedileRecord;   // panic mode. Highest recording priority
     QnScheduleTask m_forcedSchedileRecord;  // special recording mode (recording action). Priority higher than regular schedule
+    QElapsedTimer m_forcedSchedileRecordTimer;
+    int m_forcedScheduleRecordDurationMs;
     bool m_usedPanicMode;
     bool m_usedSpecialRecordingMode;
     bool m_lastMotionState; // true if motion in progress
@@ -135,5 +138,3 @@ private:
     bool m_usePrimaryRecorder;
     bool m_useSecondaryRecorder;
 };
-
-#endif // __SERVER_STREAM_RECORDER_H__

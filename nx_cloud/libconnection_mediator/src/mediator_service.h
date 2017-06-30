@@ -6,9 +6,10 @@
 
 #include <nx/network/connection_server/multi_address_server.h>
 #include <nx/utils/move_only_func.h>
+#include <nx/utils/service.h>
 #include <nx/utils/std/future.h>
 
-#include <utils/common/stoppable.h>
+#include <nx/utils/thread/stoppable.h>
 
 namespace nx_http {
 
@@ -33,30 +34,23 @@ class ListeningPeerPool;
 class StunServer;
 
 class MediatorProcess:
-    public QnStoppable
+    public nx::utils::Service
 {
+    using base_type = nx::utils::Service;
+
 public:
     MediatorProcess(int argc, char **argv);
 
-    //!Implementation of QnStoppable::pleaseStop
-    virtual void pleaseStop() override;
-
-    void setOnStartedEventHandler(
-        nx::utils::MoveOnlyFunc<void(bool /*result*/)> handler);
     const std::vector<SocketAddress>& httpEndpoints() const;
     const std::vector<SocketAddress>& stunEndpoints() const;
-
-    int exec();
-
     ListeningPeerPool* listeningPeerPool() const;
 
+protected:
+    virtual std::unique_ptr<nx::utils::AbstractServiceSettings> createSettings() override;
+    virtual int serviceMain(const nx::utils::AbstractServiceSettings& settings) override;
+
 private:
-    std::unique_ptr<QSettings> m_settings;
-    int m_argc;
-    char** m_argv;
-    nx::utils::MoveOnlyFunc<void(bool /*result*/)> m_startedEventHandler;
     std::vector<SocketAddress> m_httpEndpoints;
-    nx::utils::promise<void> m_processTerminationEvent;
     BusinessLogicComposite* m_businessLogicComposite;
     StunServer* m_stunServerComposite;
 
@@ -66,7 +60,7 @@ private:
         const conf::Settings& settings,
         const PeerRegistrator& peerRegistrator,
         std::unique_ptr<nx_http::MessageDispatcher>* const httpMessageDispatcher,
-        std::unique_ptr<MultiAddressServer<nx_http::HttpStreamSocketServer>>* const
+        std::unique_ptr<nx::network::server::MultiAddressServer<nx_http::HttpStreamSocketServer>>* const
             multiAddressHttpServer);
 };
 

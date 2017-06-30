@@ -1,13 +1,8 @@
-#ifndef QN_SERIALIZATION_BINARY_STREAM_H
-#define QN_SERIALIZATION_BINARY_STREAM_H
+#pragma once
 
 #include "binary_fwd.h"
 
-#ifndef QN_NO_QT
-#   include <QtCore/QByteArray>
-#endif
-
-#ifndef QN_NO_QT
+#include <QtCore/QByteArray>
 
 template<>
 class QnInputBinaryStream<QByteArray>
@@ -73,9 +68,6 @@ private:
     QByteArray *m_data;
 };
 
-#endif // QN_NO_QT
-
-
 /* Disable conversion wrapping for stream types as they are not convertible to anything
  * anyway. Also when wrapping is enabled, ADL fails to find template overloads. */
 
@@ -90,6 +82,3 @@ QnOutputBinaryStream<Output> disable_user_conversions(QnOutputBinaryStream<Outpu
 {
     return value;
 }
-
-
-#endif // QN_SERIALIZATION_BINARY_STREAM_H

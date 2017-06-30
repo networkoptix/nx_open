@@ -1,0 +1,15 @@
+separator ;
+filename ../lib/example_data/kdt_001.il
+separator ;
+nfields 2
+name intevents
+timing_style event
+intonation_style tilt
+#
+	 0.40310 26 	phrase_start ; ev.f0 120.335 ; time 0.403097 ; 
+	 1.00000 26 	a ; int_event 1 ; ev.f0 126.04 ; time 0.999999 ; tilt.amp 21.3901 ; tilt.dur 0.29 ; tilt.tilt 0.483891 ; 
+	 1.26000 26 	afb ; int_event 1 ; ev.f0 120.447 ; time 1.26 ; tilt.amp 11.9286 ; tilt.dur 0.24 ; tilt.tilt -1 ; 
+	 1.72000 26 	a ; int_event 1 ; ev.f0 125.077 ; time 1.72 ; tilt.amp 18.0792 ; tilt.dur 0.26 ; tilt.tilt 0.567867 ; 
+	 2.04000 26 	a ; int_event 1 ; ev.f0 128.473 ; time 2.04 ; tilt.amp 19.3316 ; tilt.dur 0.27 ; tilt.tilt -0.21705 ; 
+	 2.76000 26 	afb ; int_event 1 ; ev.f0 115.2 ; time 2.76 ; tilt.amp 40.8284 ; tilt.dur 0.45 ; tilt.tilt 0.026982 ; 
+	 3.01408 26 	phrase_end ; ev.f0 89.1348 ; time 3.01408 ; 

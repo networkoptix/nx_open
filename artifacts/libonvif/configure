@@ -1,0 +1,106 @@
+#!/bin/bash
+
+function generateMakefile()
+{
+read -d '' MakefileContents<<EOF
+ARCH=$TARGET_ARCH
+CROSS_PREFIX=$CROSS_PREFIX
+OPENSSL_INCLUDE=$OPENSSL_DIR/include/
+OPENSSL_LIBS=$OPENSSL_DIR/lib/
+CXXFLAGS=-Wno-vla
+CXXFLAGS+=$CXXFLAGS
+
+
+CXX=\$(CROSS_PREFIX)g++
+AR=\$(CROSS_PREFIX)ar
+#NX_BUILDENV=`pwd`/../../build_environment/\$(ARCH)/build/
+ARFLAGS=rcs
+#INCLUDES=-I\$(NX_BUILDENV)/include/ -I\$(OPENSSL_INCLUDE)
+INCLUDES=-I\$(OPENSSL_INCLUDE)
+DEFINES=-DWITH_OPENSSL -DWITH_PURE_VIRTUAL
+
+CXXFLAGS_DEBUG=-fPIC -ggdb3 \$(CXXFLAGS)
+DEBUG_OBJECTS_DIR=.build/\$(ARCH)/debug/
+debug_objects := \$(patsubst src/%.cpp,\$(DEBUG_OBJECTS_DIR)/%.o,\$(wildcard src/*.cpp)) \$(patsubst src/%.c,\$(DEBUG_OBJECTS_DIR)/%.o,\$(wildcard src/*.c))
+DEBUG_TARGET=\$(DEBUG_OBJECTS_DIR)/libonvif.a
+
+CXXFLAGS_RELEASE=-fPIC -O2 \$(CXXFLAGS)
+RELEASE_OBJECTS_DIR=.build/\$(ARCH)/release/
+release_objects := \$(patsubst src/%.cpp,\$(RELEASE_OBJECTS_DIR)/%.o,\$(wildcard src/*.cpp)) \$(patsubst src/%.c,\$(RELEASE_OBJECTS_DIR)/%.o,\$(wildcard src/*.c))
+RELEASE_TARGET=\$(RELEASE_OBJECTS_DIR)/libonvif.a
+
+
+\$(DEBUG_OBJECTS_DIR): 
+		mkdir -p \$(DEBUG_OBJECTS_DIR)
+\$(DEBUG_OBJECTS_DIR)/%.o: src/%.c
+		\$(CXX) \$(CXXFLAGS_DEBUG) \$(DEFINES) \$(INCLUDES) -c -o \$@ \$^
+\$(DEBUG_OBJECTS_DIR)/%.o: src/%.cpp
+		\$(CXX) \$(CXXFLAGS_DEBUG) \$(DEFINES) \$(INCLUDES) -c -o \$@ \$^
+\$(DEBUG_TARGET): \$(DEBUG_OBJECTS_DIR) \$(debug_objects)
+		\$(AR) \$(ARFLAGS) \$(DEBUG_TARGET) \$(debug_objects)
+debug: \$(DEBUG_TARGET)
+
+
+\$(RELEASE_OBJECTS_DIR): 
+		mkdir -p \$(RELEASE_OBJECTS_DIR)
+\$(RELEASE_OBJECTS_DIR)/%.o: src/%.c
+		\$(CXX) \$(CXXFLAGS_RELEASE) \$(DEFINES) \$(INCLUDES) -c -o \$@ \$^
+\$(RELEASE_OBJECTS_DIR)/%.o: src/%.cpp
+		\$(CXX) \$(CXXFLAGS_RELEASE) \$(DEFINES) \$(INCLUDES) -c -o \$@ \$^
+\$(RELEASE_TARGET): \$(RELEASE_OBJECTS_DIR) \$(release_objects)
+		\$(AR) \$(ARFLAGS) \$(RELEASE_TARGET) \$(release_objects)
+release: \$(RELEASE_TARGET)
+
+
+all: \$(TARGET)
+
+clean:
+		rm -rf \$(DEBUG_OBJECTS_DIR)
+		rm -rf \$(RELEASE_OBJECTS_DIR)
+EOF
+
+    echo "$MakefileContents" > Makefile
+    return 0
+}
+
+
+TARGET_ARCH=
+CROSS_PREFIX=
+OPENSSL_DIR=/usr
+CXXFLAGS=
+
+
+function printHelp()
+{
+    echo "
+  -h, --help                This help message
+  --target-arch=            Target host architecture name
+  --cross-prefix=           Prefix for compiler tools
+  --with-openssl=           Path to openssl installation dir. By default $OPENSSL_DIR
+  --cxxflags=               Additional c++ compiler flags
+
+  Sample configuration:
+    ./configure --target-arch=arm-2013.11 --cross-prefix=/usr/local/codesourcery/arm-2013.11/bin/arm-none-linux-gnueabi- --with-openssl=/usr/local/ssl/ --cxxflags=\"-mfloat-abi=softfp\"
+    ./configure --target-arch=armv7 --cross-prefix=/usr/local/linaro-multilib-2013.09/bin/arm-linux-gnueabihf- --with-openssl=/usr/local/ssl/ --cxxflags=\"-march=armv7 -mfloat-abi=hard -mfpu=neon\"
+    ./configure --target-arch=x64
+    ./configure --target-arch=armv6l --cross-prefix=\$(RPI_TOOLS)/arm-bcm2708/gcc-linaro-arm-linux-gnueabihf-raspbian/bin/arm-linux-gnueabihf- --with-openssl=/home/ak/develop/buildenv/rfs/ --cxxflags=\"-mfloat-abi=softfp\"
+"
+}
+
+for i in "$@"
+do
+    if [ "$i" == "-h" -o "$i" == "--help"  ] ; then
+        printHelp
+        exit 0
+    elif [[ "$i" =~ "--target-arch=" ]] ; then
+        TARGET_ARCH="`echo $i | sed 's/--target-arch=\(.*\)/\1/'`"
+    elif [[ "$i" =~ "--cross-prefix=" ]] ; then
+        CROSS_PREFIX="`echo $i | sed 's/--cross-prefix=\(.*\)/\1/'`"
+    elif [[ "$i" =~ "--with-openssl=" ]] ; then
+        OPENSSL_DIR="`echo $i | sed 's/--with-openssl=\(.*\)/\1/'`"
+    elif [[ "$i" =~ "--cxxflags=" ]] ; then
+        CXXFLAGS="`echo $i | sed 's/--cxxflags=\(.*\)/\1/'`"
+    fi
+done
+
+generateMakefile

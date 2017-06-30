@@ -10,6 +10,13 @@
 namespace nx {
 namespace db {
 
+QString toString(DBResult result)
+{
+    return QnLexical::serialized(result);
+}
+
+//-------------------------------------------------------------------------------------------------
+
 namespace {
 
 const QLatin1String kDbDriverName("db/driverName");
@@ -49,51 +56,51 @@ ConnectionOptions::ConnectionOptions():
 {
 }
 
-void ConnectionOptions::loadFromSettings(QnSettings* const settings)
+void ConnectionOptions::loadFromSettings(const QnSettings& settings)
 {
     using namespace std::chrono;
 
-    if (settings->contains(kDbDriverName))
+    if (settings.contains(kDbDriverName))
     {
         driverType = QnLexical::deserialized<nx::db::RdbmsDriverType>(
-            settings->value(kDbDriverName).toString(),
+            settings.value(kDbDriverName).toString(),
             nx::db::RdbmsDriverType::unknown);
     }
 
-    if (settings->contains(kDbHostName))
-        hostName = settings->value(kDbHostName).toString();
-    if (settings->contains(kDbPort))
-        port = settings->value(kDbPort).toInt();
-    if (settings->contains(kDbName))
-        dbName = settings->value(kDbName).toString();
-    if (settings->contains(kDbUserName))
-        userName = settings->value(kDbUserName).toString();
-    if (settings->contains(kDbPassword))
-        password = settings->value(kDbPassword).toString();
-    if (settings->contains(kDbConnectOptions))
-        connectOptions = settings->value(kDbConnectOptions).toString();
-    if (settings->contains(kDbEncoding))
-        encoding = settings->value(kDbEncoding).toString();
+    if (settings.contains(kDbHostName))
+        hostName = settings.value(kDbHostName).toString();
+    if (settings.contains(kDbPort))
+        port = settings.value(kDbPort).toInt();
+    if (settings.contains(kDbName))
+        dbName = settings.value(kDbName).toString();
+    if (settings.contains(kDbUserName))
+        userName = settings.value(kDbUserName).toString();
+    if (settings.contains(kDbPassword))
+        password = settings.value(kDbPassword).toString();
+    if (settings.contains(kDbConnectOptions))
+        connectOptions = settings.value(kDbConnectOptions).toString();
+    if (settings.contains(kDbEncoding))
+        encoding = settings.value(kDbEncoding).toString();
 
-    if (settings->contains(kDbMaxConnections))
+    if (settings.contains(kDbMaxConnections))
     {
-        maxConnectionCount = settings->value(kDbMaxConnections).toInt();
+        maxConnectionCount = settings.value(kDbMaxConnections).toInt();
         if (maxConnectionCount <= 0)
             maxConnectionCount = std::thread::hardware_concurrency();
     }
 
-    if (settings->contains(kDbInactivityTimeout))
+    if (settings.contains(kDbInactivityTimeout))
     {
         inactivityTimeout = duration_cast<seconds>(
             nx::utils::parseTimerDuration(
-                settings->value(kDbInactivityTimeout).toString()));
+                settings.value(kDbInactivityTimeout).toString()));
     }
 
-    if (settings->contains(kDbMaxPeriodQueryWaitsForAvailableConnection))
+    if (settings.contains(kDbMaxPeriodQueryWaitsForAvailableConnection))
     {
         maxPeriodQueryWaitsForAvailableConnection = duration_cast<seconds>(
             nx::utils::parseTimerDuration(
-                settings->value(kDbMaxPeriodQueryWaitsForAvailableConnection).toString()));
+                settings.value(kDbMaxPeriodQueryWaitsForAvailableConnection).toString()));
     }
 }
 
@@ -112,6 +119,28 @@ bool ConnectionOptions::operator==(const ConnectionOptions& rhs) const
         inactivityTimeout == rhs.inactivityTimeout &&
         maxPeriodQueryWaitsForAvailableConnection == rhs.maxPeriodQueryWaitsForAvailableConnection &&
         maxErrorsInARowBeforeClosingConnection == rhs.maxErrorsInARowBeforeClosingConnection;
+}
+
+//-------------------------------------------------------------------------------------------------
+
+Exception::Exception(DBResult dbResult):
+    base_type(QnLexical::serialized(dbResult).toStdString()),
+    m_dbResult(dbResult)
+{
+}
+
+Exception::Exception(
+    DBResult dbResult,
+    const std::string& errorDescription)
+    :
+    base_type(errorDescription),
+    m_dbResult(dbResult)
+{
+}
+
+DBResult Exception::dbResult() const
+{
+    return m_dbResult;
 }
 
 } // namespace db

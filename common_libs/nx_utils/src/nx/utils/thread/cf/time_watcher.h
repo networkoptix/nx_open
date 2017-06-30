@@ -6,9 +6,6 @@
 #include <condition_variable>
 #include <atomic>
 #include <thread>
-
-#include <nx/utils/std/thread.h>
-
 #include "common.h"
 
 namespace cf {
@@ -49,7 +46,7 @@ private:
   std::condition_variable cond_;
   std::mutex mutex_;
   std::set<record> record_set_;
-  nx::utils::thread watcher_thread_;
+  std::thread watcher_thread_;
   std::atomic<bool> need_stop_ = {false};
   std::chrono::time_point<std::chrono::steady_clock> wakeup_time_;
 };

@@ -1,10 +1,15 @@
+#define _WINSOCKAPI_
+
 #include <memory>
 #include <QtCore>
 #include "recorder/storage_db.h"
 #include "recorder/storage_db_pool.h"
 #include "plugins/storage/file_storage/file_storage_resource.h"
 #include <core/resource_management/status_dictionary.h>
+
+#include <common/static_common_module.h>
 #include <common/common_module.h>
+
 #include <core/resource_management/resource_properties.h>
 #include <utils/common/util.h>
 #include <utils/common/writer_pool.h>
@@ -137,20 +142,23 @@ int main(int argc, char** argv)
     QCoreApplication::setApplicationVersion("1.0");
     qInstallMessageHandler(&messageHandler);
 
-    std::unique_ptr<QnCommonModule> commonModule = std::unique_ptr<QnCommonModule>(new QnCommonModule);
+    QnStaticCommonModule staticCommon;
+    std::unique_ptr<QnCommonModule> commonModule = std::unique_ptr<QnCommonModule>(
+        new QnCommonModule(true));
     commonModule->setModuleGUID(QnUuid("{A680980C-70D1-4545-A5E5-72D89E33648B}"));
-
-    std::unique_ptr<QnResourceStatusDictionary> statusDictionary = std::unique_ptr<QnResourceStatusDictionary>(new QnResourceStatusDictionary);
-    std::unique_ptr<QnResourcePropertyDictionary> propDictionary = std::unique_ptr<QnResourcePropertyDictionary>(new QnResourcePropertyDictionary);
-    std::unique_ptr<QnStorageDbPool> dbPool = std::unique_ptr<QnStorageDbPool>(new QnStorageDbPool);
-    MSSettings::initializeROSettings();
+//
+//     std::unique_ptr<QnResourceStatusDictionary> statusDictionary = std::unique_ptr<QnResourceStatusDictionary>(new QnResourceStatusDictionary);
+//     std::unique_ptr<QnResourcePropertyDictionary> propDictionary = std::unique_ptr<QnResourcePropertyDictionary>(new QnResourcePropertyDictionary);
+    std::unique_ptr<QnStorageDbPool> dbPool = std::unique_ptr<QnStorageDbPool>(
+        new QnStorageDbPool(commonModule.get()));
+    //MSSettings::initializeROSettings();
     QnWriterPool writerPool;
 
 
     aux::Config cfg;
     aux::parseArgs(app, cfg);
 
-    QnFileStorageResourcePtr fileStorage(new QnFileStorageResource);
+    QnFileStorageResourcePtr fileStorage(new QnFileStorageResource(commonModule.get()));
     fileStorage->setUrl(QFileInfo(cfg.fileName).absolutePath());
     if (fileStorage->initOrUpdate() != Qn::StorageInit_Ok)
         qFatal("Failed to initialize file storage");

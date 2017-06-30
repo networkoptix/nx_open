@@ -9,24 +9,25 @@
 #include <QtCore/QObject>
 #include <QtCore/QString>
 
-#include <cdb/connection.h>
+#include <nx/cloud/cdb/api/connection.h>
 #include <core/resource/resource_fwd.h>
 #include <nx/network/cloud/abstract_cloud_system_credentials_provider.h>
 #include <nx/network/retry_timer.h>
 #include <nx/utils/thread/mutex.h>
-#include <utils/common/safe_direct_connection.h>
-#include <utils/common/subscription.h>
-
+#include <nx/utils/safe_direct_connection.h>
+#include <nx/utils/subscription.h>
+#include <common/common_module_aware.h>
 
 class CloudConnectionManager:
     public QObject,
     public Qn::EnableSafeDirectConnection,
-    public nx::hpm::api::AbstractCloudSystemCredentialsProvider
+    public nx::hpm::api::AbstractCloudSystemCredentialsProvider,
+    public QnCommonModuleAware
 {
     Q_OBJECT
 
 public:
-    CloudConnectionManager();
+    CloudConnectionManager(QnCommonModule* commonModule);
     ~CloudConnectionManager();
 
     virtual boost::optional<nx::hpm::api::SystemCredentials>

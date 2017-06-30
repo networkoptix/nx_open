@@ -23,7 +23,7 @@ class QnAdamResourceSearcher : public QnAbstractNetworkResourceSearcher
     };
 
 public:
-    QnAdamResourceSearcher();
+    QnAdamResourceSearcher(QnCommonModule* commonModule);
     ~QnAdamResourceSearcher();
 
     virtual QString manufacture() const override;

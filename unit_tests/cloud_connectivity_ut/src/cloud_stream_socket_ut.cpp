@@ -25,8 +25,16 @@ NX_NETWORK_CLIENT_SOCKET_TEST_CASE(
 TEST(CloudStreamSocketTcpByIp, TransferSyncSsl)
 {
     network::test::socketTransferSync(
-        [&]() { return std::make_unique<SslServerSocket>(new TCPServerSocket(AF_INET), false); },
-        []() { return std::make_unique<SslSocket>(new CloudStreamSocket(AF_INET), false); });
+        [&]()
+        {
+            return std::make_unique<deprecated::SslServerSocket>(
+                std::make_unique<TCPServerSocket>(AF_INET), false);
+        },
+        []()
+        {
+            return std::make_unique<deprecated::SslSocket>(
+                std::make_unique<CloudStreamSocket>(AF_INET), false);
+        });
 }
 
 class TestTcpServerSocket:
@@ -82,8 +90,16 @@ NX_NETWORK_CLIENT_SOCKET_TEST_CASE_EX(
 TEST_F(CloudStreamSocketTcpByHost, TransferSyncSsl)
 {
     network::test::socketTransferSync(
-        [&]() { return std::make_unique<SslServerSocket>(new TestTcpServerSocket(testHost), false); },
-        []() { return std::make_unique<SslSocket>(new CloudStreamSocket(AF_INET), false); },
+        [&]()
+        {
+            return std::make_unique<deprecated::SslServerSocket>(
+                std::make_unique<TestTcpServerSocket>(testHost), false);
+        },
+        []()
+        {
+            return std::make_unique<deprecated::SslSocket>(
+                std::make_unique<CloudStreamSocket>(AF_INET), false);
+        },
         SocketAddress(testHost));
 }
 
@@ -125,7 +141,7 @@ TEST_F(CloudStreamSocketTest, simple)
         bytesToSendThroughConnection,
         network::test::TestTransmissionMode::spam);
     ASSERT_TRUE(server.start());
-    auto serverGuard = makeScopedGuard([&server]() { server.pleaseStopSync(); });
+    auto serverGuard = makeScopeGuard([&server]() { server.pleaseStopSync(); });
 
     const auto serverAddress = server.addressBeingListened();
 
@@ -133,7 +149,7 @@ TEST_F(CloudStreamSocketTest, simple)
     nx::network::SocketGlobals::addressResolver().addFixedAddress(
         tempHostName,
         serverAddress);
-    auto tempHostNameGuard = makeScopedGuard(
+    auto tempHostNameGuard = makeScopeGuard(
         [&tempHostName, &serverAddress]()
         {
             nx::network::SocketGlobals::addressResolver().removeFixedAddress(
@@ -242,7 +258,7 @@ TEST_F(CloudStreamSocketTest, cancellation)
         tempHostName,
         serverAddress);
 
-    const auto scopedGuard = makeScopedGuard(
+    const auto scopedGuard = makeScopeGuard(
         [&]()
         {
             nx::network::SocketGlobals::addressResolver().removeFixedAddress(
@@ -476,18 +492,19 @@ public:
     CloudStreamSocketShutdown():
         m_terminated(false)
     {
+        using namespace std::placeholders;
+
         if (!SocketGlobals::mediatorConnector().mediatorAddress())
             SocketGlobals::mediatorConnector().mockupAddress(serverAddress());
 
-        m_oldFactory =
-            ConnectorFactory::setFactoryFunc(
-                std::bind(&CloudStreamSocketShutdown::connectorFactoryFunc, this, 
-                    std::placeholders::_1));
+        m_oldFactory = CrossNatConnectorFactory::instance().setCustomFunc(
+            std::bind(&CloudStreamSocketShutdown::connectorFactoryFunc, this, _1));
     }
 
     ~CloudStreamSocketShutdown()
     {
-        ConnectorFactory::setFactoryFunc(m_oldFactory);
+        CrossNatConnectorFactory::instance().setCustomFunc(
+            std::move(m_oldFactory));
         if (m_clientSocket)
         {
             m_clientSocket->pleaseStopSync();
@@ -542,7 +559,7 @@ private:
     std::unique_ptr<CloudStreamSocket> m_clientSocket;
     nx::utils::thread m_socketReadThread;
     bool m_terminated;
-    ConnectorFactory::FactoryFunc m_oldFactory;
+    CrossNatConnectorFactory::Function m_oldFactory;
     nx::utils::promise<void> m_socketInRecv;
     nx::utils::promise<bool> m_continueReadingSocket;
 

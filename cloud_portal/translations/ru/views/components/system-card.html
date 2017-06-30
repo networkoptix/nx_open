@@ -6,7 +6,8 @@
         <p>
             <button class="btn btn-default" ng-click="rename()">Переименовать систему</button>
         </p>
-        <button class="btn btn-default" ng-click="disconnect()">Отсоединить от <span class="product-name">{{PRODUCT_NAME}}</span></button>
+        <button class="btn btn-default" ng-click="disconnect()">Отсоединить от
+            <span class="product-name">{{PRODUCT_NAME}}</span></button>
     </div>
 </div>
 
@@ -23,6 +24,6 @@
         <p ng-if="system.permissions.isAdmin">
             <button class="btn btn-default" ng-click="rename()">Переименовать систему</button>
         </p>
-        <button class="btn btn-default" ng-click="delete()">Отсоединить от моей учетной записи</button>
+        <button class="btn btn-default" ng-click="delete()">Отвязать от учетной записи</button>
     </div>
 </div>

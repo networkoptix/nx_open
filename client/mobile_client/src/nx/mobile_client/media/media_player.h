@@ -30,6 +30,9 @@ public:
     bool playing() const;
     bool failed() const;
 
+protected:
+    virtual QnCommonModule* commonModule() const override;
+
 signals:
     void resourceIdChanged();
     void loadingChanged();

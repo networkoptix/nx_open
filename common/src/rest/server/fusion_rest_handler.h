@@ -1,7 +1,7 @@
 #pragma once
 
 #include <nx/fusion/serialization/lexical_functions.h>
-#include <nx/network/http/httptypes.h>
+#include <nx/network/http/http_types.h>
 #include <nx/fusion/model_functions.h>
 #include <utils/common/util.h>
 
@@ -43,6 +43,20 @@ static void serialize(
 }
 
 template <class OutputData>
+static void serializeJsonRestReply(
+    const OutputData& outputData, const QnRequestParamList& params, QByteArray& result,
+    QByteArray& contentType, const QnRestResult& restResult)
+{
+    QnJsonRestResult jsonRestResult(restResult);
+    jsonRestResult.setReply(outputData);
+    result = QJson::serialized(jsonRestResult);
+    if (params.contains(lit("extraFormatting")))
+        formatJSonString(result);
+
+    contentType = Qn::serializationFormatToHttpContentType(Qn::JsonFormat);
+}
+
+template <class OutputData>
 static void serializeRestReply(
     const OutputData& outputData, const QnRequestParamList& params, QByteArray& result,
     QByteArray& contentType, const QnRestResult& restResult)
@@ -57,15 +71,11 @@ static void serializeRestReply(
             result = QnUbjson::serialized(ubjsonRestResult);
             break;
         }
+
         case Qn::JsonFormat:
-        {
-            QnJsonRestResult jsonRestResult(restResult);
-            jsonRestResult.setReply(outputData);
-            result = QJson::serialized(jsonRestResult);
-            if (params.contains(lit("extraFormatting")))
-                formatJSonString(result);
-            break;
-        }
+            serializeJsonRestReply(outputData, params, result, contentType, restResult);
+            return;
+
         default:
             break; //< not implemented, no content data
     }

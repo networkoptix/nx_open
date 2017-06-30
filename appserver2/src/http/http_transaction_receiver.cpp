@@ -9,7 +9,7 @@
 #include <rest/server/rest_connection_processor.h>
 #include <network/tcp_connection_priv.h>
 
-#include "http/custom_headers.h"
+#include <nx/network/http/custom_headers.h>
 #include "transaction/transaction_message_bus.h"
 #include "transaction/transaction_transport.h"
 #include "settings.h"
@@ -20,47 +20,6 @@ namespace ec2
     ////////////////////////////////////////////////////////////
     //// class QnRestTransactionReceiver
     ////////////////////////////////////////////////////////////
-
-    QnRestTransactionReceiver::QnRestTransactionReceiver()
-    {
-    }
-
-    int QnRestTransactionReceiver::executeGet(
-        const QString& /*path*/,
-        const QnRequestParamList& /*params*/,
-        QByteArray& /*result*/,
-        QByteArray&, /*contentType*/ 
-        const QnRestConnectionProcessor* /*owner*/)
-    {
-        return nx_http::StatusCode::badRequest;
-    }
-
-    int QnRestTransactionReceiver::executePost(
-        const QString& /*path*/,
-        const QnRequestParamList& /*params*/,
-        const QByteArray& body,
-        const QByteArray& /*srcBodyContentType*/,
-        QByteArray& /*resultBody*/,
-        QByteArray& /*contentType*/,
-        const QnRestConnectionProcessor* connection )
-    {
-        auto connectionGuidIter = connection->request().headers.find( Qn::EC2_CONNECTION_GUID_HEADER_NAME );
-        if( connectionGuidIter == connection->request().headers.end() )
-            return nx_http::StatusCode::forbidden;
-        const QnUuid connectionGuid( connectionGuidIter->second );
-
-        if( !QnTransactionMessageBus::instance()->gotTransactionFromRemotePeer(
-                connectionGuid,
-                connection->request(),
-                body))
-        {
-            return nx_http::StatusCode::notFound;
-        }
-
-        return nx_http::StatusCode::ok;
-    }
-
-
 
     ////////////////////////////////////////////////////////////
     //// class QnHttpTransactionReceiver
@@ -73,21 +32,25 @@ namespace ec2
     public:
 
         QnHttpTransactionReceiverPrivate()
-        : 
-            QnTCPConnectionProcessorPrivate()
+        :
+            QnTCPConnectionProcessorPrivate(),
+            messageBus(nullptr)
         {
         }
+
+        QnTransactionMessageBus* messageBus;
     };
 
     QnHttpTransactionReceiver::QnHttpTransactionReceiver(
+        QnTransactionMessageBus* messageBus,
         QSharedPointer<AbstractStreamSocket> socket,
-        QnTcpListener* _owner )
+        QnTcpListener* owner )
     :
-        QnTCPConnectionProcessor( new QnHttpTransactionReceiverPrivate, socket )
+        QnTCPConnectionProcessor( new QnHttpTransactionReceiverPrivate, socket, owner)
     {
-        Q_UNUSED(_owner)
-
         setObjectName( "QnHttpTransactionReceiver" );
+        Q_D(QnHttpTransactionReceiver);
+        d->messageBus = messageBus;
     }
 
     QnHttpTransactionReceiver::~QnHttpTransactionReceiver()
@@ -98,11 +61,13 @@ namespace ec2
     void QnHttpTransactionReceiver::run()
     {
         Q_D(QnHttpTransactionReceiver);
+
         initSystemThreadId();
 
+        const auto& globalSettings = d->messageBus->commonModule()->globalSettings();
         if( !d->socket->setRecvTimeout(
-                std::chrono::milliseconds(QnGlobalSettings::instance()->connectionKeepAliveTimeout()).count() * 
-                QnGlobalSettings::instance()->keepAliveProbeCount()) ||
+                std::chrono::milliseconds(globalSettings->connectionKeepAliveTimeout()).count() *
+            globalSettings->keepAliveProbeCount()) ||
             !d->socket->setNoDelay(true) )
         {
             const int osErrorCode = SystemError::getLastOSErrorCode();
@@ -117,7 +82,7 @@ namespace ec2
             if( !connectionGuid.isNull() )
             {
                 //waiting for connection to be ready to receive more transactions
-                QnTransactionMessageBus::instance()->waitForNewTransactionsReady( connectionGuid );
+                d->messageBus->waitForNewTransactionsReady( connectionGuid );
             }
 
             if( !readSingleRequest() )
@@ -130,7 +95,7 @@ namespace ec2
                 }
                 break;
             }
-            
+
             if( d->request.requestLine.method != nx_http::Method::POST &&
                 d->request.requestLine.method != nx_http::Method::PUT )
             {
@@ -149,7 +114,7 @@ namespace ec2
             if( connectionGuid.isNull() )
             {
                 connectionGuid = requestConnectionGuid;
-                QnTransactionMessageBus::instance()->waitForNewTransactionsReady( connectionGuid ); // wait while transaction transport goes to the ReadyForStreamingState
+                d->messageBus->waitForNewTransactionsReady( connectionGuid ); // wait while transaction transport goes to the ReadyForStreamingState
             }
             else if( requestConnectionGuid != connectionGuid )
             {
@@ -158,7 +123,7 @@ namespace ec2
                 break;
             }
 
-            if( !QnTransactionMessageBus::instance()->gotTransactionFromRemotePeer(
+            if( !d->messageBus->gotTransactionFromRemotePeer(
                     connectionGuid,
                     d->request,
                     d->requestBody ) )
@@ -191,6 +156,6 @@ namespace ec2
         }
 
         if( !connectionGuid.isNull() )
-            QnTransactionMessageBus::instance()->connectionFailure( connectionGuid );
+            d->messageBus->connectionFailure( connectionGuid );
     }
 }

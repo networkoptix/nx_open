@@ -48,6 +48,8 @@
 
 #include "nx/utils/type_utils.h"
 
+class QnCommonModule;
+
 namespace ec2 {
 
 class QnTransactionLog;
@@ -60,12 +62,17 @@ class QnCameraNotificationManager;
 class QnUserNotificationManager;
 class QnBusinessEventNotificationManager;
 class QnLayoutNotificationManager;
+class QnLayoutTourNotificationManager;
 class QnVideowallNotificationManager;
 class QnWebPageNotificationManager;
 class QnStoredFileNotificationManager;
 class QnUpdatesNotificationManager;
 class QnMiscNotificationManager;
 class QnDiscoveryNotificationManager;
+namespace detail
+{
+    class QnDbManager;
+}
 
 enum class RemotePeerAccess
 {
@@ -108,22 +115,22 @@ namespace detail {
 struct NoneType {};
 
 template<typename ParamType>
-using CheckSavePermissionFuncType = std::function<bool(const Qn::UserAccessData& accessData, const ParamType&)>;
+using CheckSavePermissionFuncType = std::function<bool(QnCommonModule* commonModule, const Qn::UserAccessData& accessData, const ParamType&)>;
 
 template<typename ParamType>
-using CheckReadPermissionFuncType = std::function<bool(const Qn::UserAccessData& accessData, ParamType&)>;
+using CheckReadPermissionFuncType = std::function<bool(QnCommonModule* commonModule, const Qn::UserAccessData& accessData, ParamType&)>;
 
 template<typename ParamType>
-using FilterByReadPermissionFuncType = std::function<void(const Qn::UserAccessData& accessData, ParamType&)>;
+using FilterByReadPermissionFuncType = std::function<void(QnCommonModule* commonModule, const Qn::UserAccessData& accessData, ParamType&)>;
 
 template<typename ParamType>
-using FilterBySavePermissionFuncType = std::function<void(const Qn::UserAccessData& accessData, ParamType&)>;
+using FilterBySavePermissionFuncType = std::function<void(QnCommonModule* commonModule, const Qn::UserAccessData& accessData, ParamType&)>;
 
 template<typename ParamType>
-using CheckRemotePeerAccessFuncType = std::function<RemotePeerAccess(const Qn::UserAccessData& accessData, const ParamType&)>;
+using CheckRemotePeerAccessFuncType = std::function<RemotePeerAccess(QnCommonModule* commonModule, const Qn::UserAccessData& accessData, const ParamType&)>;
 
 template<typename ParamType>
-using GetTransactionTypeFuncType = std::function<ec2::TransactionType::Value(const ParamType&)>;
+using GetTransactionTypeFuncType = std::function<ec2::TransactionType::Value(QnCommonModule*, const ParamType&, detail::QnDbManager*)>;
 
 template<typename ParamType>
 using GetHashFuncType = std::function<QnUuid(ParamType const &)>;
@@ -147,6 +154,7 @@ struct NotificationParams
     QnUserNotificationManager* userNotificationManager;
     QnBusinessEventNotificationManager* businessEventNotificationManager;
     QnLayoutNotificationManager* layoutNotificationManager;
+    QnLayoutTourNotificationManager* layoutTourNotificationManager;
     QnVideowallNotificationManager* videowallNotificationManager;
     QnWebPageNotificationManager* webPageNotificationManager;
     QnStoredFileNotificationManager* storedFileNotificationManager;

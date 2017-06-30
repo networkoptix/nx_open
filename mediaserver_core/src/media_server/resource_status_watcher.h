@@ -10,11 +10,12 @@
 
 class QnResourceStatusWatcher:
     public QObject,
+    public QnCommonModuleAware,
     public Singleton<QnResourceStatusWatcher>
 {
     Q_OBJECT
 public:
-    QnResourceStatusWatcher();
+    QnResourceStatusWatcher(QnCommonModule* commonModule);
     void updateResourceStatus(const QnResourcePtr& resource);
 signals:
     void statusChanged(const QnResourcePtr& resource);

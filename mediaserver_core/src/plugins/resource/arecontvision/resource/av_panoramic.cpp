@@ -1,7 +1,7 @@
 #ifdef ENABLE_ARECONT
 
 #include <nx/utils/log/log.h>
-#include <nx/network/http/httptypes.h>
+#include <nx/network/http/http_types.h>
 
 #include "../dataprovider/av_rtsp_stream_reader.h"
 #include "../dataprovider/panoramic_cpul_tftp_dataprovider.h"
@@ -10,7 +10,8 @@
 #include "av_resource.h"
 #include "av_panoramic.h"
 #include "core/resource_management/resource_properties.h"
-
+#include "core/resource/resource.h"
+#include <common/common_module.h>
 
 #define MAX_RESPONSE_LEN (4*1024)
 
@@ -181,7 +182,7 @@ QnConstResourceVideoLayoutPtr QnArecontPanoramicResource::getDefaultVideoLayout(
     if (m_defaultVideoLayout)
         return m_defaultVideoLayout;
 
-    QnResourceTypePtr resType = qnResTypePool->getResourceType(getTypeId()); 
+    QnResourceTypePtr resType = qnResTypePool->getResourceType(getTypeId());
     if (resType)
         m_defaultVideoLayout = QnResourceVideoLayoutPtr(QnCustomResourceVideoLayout::fromString(resType->defaultValue(Qn::VIDEO_LAYOUT_PARAM_NAME)));
     else
@@ -222,11 +223,11 @@ QnConstResourceVideoLayoutPtr QnArecontPanoramicResource::getVideoLayout(const Q
         layout = m_rotatedLayout;
     }
 
-    QString oldVideoLayout = propertyDictionary->value(resourceId, Qn::VIDEO_LAYOUT_PARAM_NAME); // get from kvpairs directly. do not read default value from resourceTypes
+    QString oldVideoLayout = commonModule()->propertyDictionary()->value(resourceId, Qn::VIDEO_LAYOUT_PARAM_NAME); // get from kvpairs directly. do not read default value from resourceTypes
     QString newVideoLayout = layout->toString();
     if (newVideoLayout != oldVideoLayout) {
-        propertyDictionary->setValue(resourceId, Qn::VIDEO_LAYOUT_PARAM_NAME, newVideoLayout);
-        propertyDictionary->saveParams(resourceId );
+        commonModule()->propertyDictionary()->setValue(resourceId, Qn::VIDEO_LAYOUT_PARAM_NAME, newVideoLayout);
+        commonModule()->propertyDictionary()->saveParams(resourceId );
     }
 
     return layout;

@@ -1,35 +1,34 @@
-#ifndef __EC2_FULL_DATA_H_
-#define __EC2_FULL_DATA_H_
+#pragma once
 
-#include "api_globals.h"
-#include "api_data.h"
+#include <nx_ec/data/api_data.h>
 
-namespace ec2
+namespace ec2 {
+
+struct ApiFullInfoData: ApiData
 {
-    struct ApiFullInfoData: ApiData {
-        ApiResourceTypeDataList resourceTypes;
-        ApiMediaServerDataList servers;
-        ApiMediaServerUserAttributesDataList serversUserAttributesList;
-        ApiCameraDataList cameras;
-        ApiCameraAttributesDataList cameraUserAttributesList;
-        ApiUserDataList users;
-        ApiUserRoleDataList userRoles;
-        ApiAccessRightsDataList accessRights;
-        ApiLayoutDataList layouts;
-        ApiVideowallDataList videowalls;
-        ApiBusinessRuleDataList rules;
-        ApiServerFootageDataList cameraHistory;
-        ApiLicenseDataList licenses;
-        ApiDiscoveryDataList discoveryData;
-        ApiResourceParamWithRefDataList allProperties;
-        ApiStorageDataList storages;
-        ApiResourceStatusDataList resStatusList;
-        ApiWebPageDataList webPages;
-    };
+    ApiResourceTypeDataList resourceTypes;
+    ApiMediaServerDataList servers;
+    ApiMediaServerUserAttributesDataList serversUserAttributesList;
+    ApiCameraDataList cameras;
+    ApiCameraAttributesDataList cameraUserAttributesList;
+    ApiUserDataList users;
+    ApiUserRoleDataList userRoles;
+    ApiAccessRightsDataList accessRights;
+    ApiLayoutDataList layouts;
+    ApiVideowallDataList videowalls;
+    ApiBusinessRuleDataList rules;
+    ApiServerFootageDataList cameraHistory;
+    ApiLicenseDataList licenses;
+    ApiDiscoveryDataList discoveryData;
+    ApiResourceParamWithRefDataList allProperties;
+    ApiStorageDataList storages;
+    ApiResourceStatusDataList resStatusList;
+    ApiWebPageDataList webPages;
+    ApiLayoutTourDataList layoutTours;
+};
 #define ApiFullInfoData_Fields (resourceTypes)(servers)(serversUserAttributesList)(cameras)(cameraUserAttributesList)(users)(layouts)(videowalls)(rules)\
-                               (cameraHistory)(licenses)(discoveryData)(allProperties)(storages)(resStatusList)(webPages)(accessRights)(userRoles)
+                               (cameraHistory)(licenses)(discoveryData)(allProperties)(storages)(resStatusList)(webPages)(accessRights)(userRoles)\
+                               (layoutTours)
 
 } // namespace ec2
-
-#endif // __EC2_FULL_DATA_H_
 

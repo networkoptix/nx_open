@@ -1,0 +1,320 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>Building letter-to-sound rules by hand</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REL="HOME"
+TITLE="Building Synthetic Voices"
+HREF="book1.html"><LINK
+REL="UP"
+TITLE="Lexicons"
+HREF="c1379.html"><LINK
+REL="PREVIOUS"
+TITLE="Out of vocabulary words"
+HREF="x1405.html"><LINK
+REL="NEXT"
+TITLE="Building letter-to-sound rules automatically"
+HREF="x1469.html"></HEAD
+><BODY
+CLASS="SECT1"
+BGCOLOR="#FFFFFF"
+TEXT="#000000"
+LINK="#0000FF"
+VLINK="#840084"
+ALINK="#0000FF"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="3"
+ALIGN="center"
+>Building Synthetic Voices</TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="bottom"
+><A
+HREF="x1405.html"
+ACCESSKEY="P"
+>&#60;&#60;&#60; Previous</A
+></TD
+><TD
+WIDTH="80%"
+ALIGN="center"
+VALIGN="bottom"
+>Lexicons</TD
+><TD
+WIDTH="10%"
+ALIGN="right"
+VALIGN="bottom"
+><A
+HREF="x1469.html"
+ACCESSKEY="N"
+>Next &#62;&#62;&#62;</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="SECT1"
+><H1
+CLASS="SECT1"
+><A
+NAME="AEN1429"
+>Building letter-to-sound rules by hand</A
+></H1
+><P
+> 
+For many languages there is a systematic relationship between the
+written form of a word and its pronunciation. For some languages this
+can be fairly easy to write down, by hand. In Festival there is a
+letter to sound rule system that allows rules to be written, but we
+also provided a method for building rule sets automatically which will
+often be more useful.  The choice of using hand-written or
+automatically trained rules depends on the language you are dealing
+with and the relationship it has between its orthography and its phone
+set.</P
+><P
+>For well defined languages like Spanish and Croatian writting rules by
+hand can be more simple than training.  Training requires an existing
+set of lexical entries to train from and that may be your decision
+criteria.  Hand written letter to sound rules are context dependent
+re-write rules which are applied in sequence mapping strings letters
+to string of phones (though the system does not explicitly care what
+the types of the strings actually will be used for.</P
+><P
+>The basic form of the rules is
+<A
+NAME="AEN1438"
+></A
+><BLOCKQUOTE
+CLASS="BLOCKQUOTE"
+><P
+CLASS="LITERALLAYOUT"
+>(&nbsp;LC&nbsp;[&nbsp;alpha&nbsp;]&nbsp;RC&nbsp;=&#62;&nbsp;beta&nbsp;)</P
+></BLOCKQUOTE
+>
+Which is interpreter as <CODE
+CLASS="VARNAME"
+>alpha</CODE
+>, a string
+of one or more symbols on the input tape is written to 
+<CODE
+CLASS="VARNAME"
+>beta</CODE
+>, a string of zero or more symbols on
+the output tape, when in the presence of <CODE
+CLASS="VARNAME"
+>LC</CODE
+>,
+a left context of zero or more input symbols, and <CODE
+CLASS="VARNAME"
+>RC</CODE
+>
+a right context on zero or more input symbols.  Note the input
+tape and the output tape are different, allthough the input and
+output alphabets need not be distinct the left hand
+side of a rule only can refer to the input tape and never to anything
+that has been produce by a right hand side.  Thus 
+rules within a ruleset cannot "feed" or "bleed" themselves.  It is
+possible to cascade multiple rule sets, but we will discuss that
+below.</P
+><P
+>For example to desl with the pronunciation of the letters "ch" 
+word initially in English we may right two rules like this
+<A
+NAME="AEN1445"
+></A
+><BLOCKQUOTE
+CLASS="BLOCKQUOTE"
+><P
+CLASS="LITERALLAYOUT"
+>(&nbsp;#&nbsp;[&nbsp;c&nbsp;h&nbsp;]&nbsp;r&nbsp;=&#62;&nbsp;k&nbsp;)<br>
+(&nbsp;#&nbsp;[&nbsp;c&nbsp;h&nbsp;]&nbsp;=&#62;&nbsp;ch&nbsp;)</P
+></BLOCKQUOTE
+>
+To deal with words like "christmas", and "chair".  Note the
+<CODE
+CLASS="VARNAME"
+>#</CODE
+> symbol is special and used to denote
+a word boundary.  LTS rule may refer to word boundary but cannot refer
+to prevous or following words, you would need to do this with
+some form of post-lexical rule (See <A
+HREF="x1615.html"
+>the Section called <I
+>Post-lexical rules</I
+></A
+>)
+where the word is within some context.  In the above rules we are
+mapping <I
+CLASS="EMPHASIS"
+>two</I
+> letters <I
+CLASS="EMPHASIS"
+>c</I
+>
+and <I
+CLASS="EMPHASIS"
+>h</I
+> to a single phone <I
+CLASS="EMPHASIS"
+>k</I
+>
+or <I
+CLASS="EMPHASIS"
+>ch</I
+>.  Also note the order of these rules.
+The first rule is more specific than the second.  This is should
+appear first to deal with the specific case.  In the order were
+reversed <CODE
+CLASS="VARNAME"
+>k</CODE
+> could never apply as the <CODE
+CLASS="VARNAME"
+>ch</CODE
+>
+would cover that case too.</P
+><P
+>Thus LTS rules should be written with the most specific cases first
+and typically end in a default case.  Their should be a default
+case for all individual letters in the language's alphabet without
+and context restrictions mapping to some default phone.  Therefore
+following the above rules there would be other <CODE
+CLASS="VARNAME"
+>c</CODE
+>
+rules with various contexts but the final one should probably be
+<A
+NAME="AEN1458"
+></A
+><BLOCKQUOTE
+CLASS="BLOCKQUOTE"
+><P
+CLASS="LITERALLAYOUT"
+>(&nbsp;[&nbsp;c&nbsp;]&nbsp;=&#62;&nbsp;k&nbsp;)</P
+></BLOCKQUOTE
+></P
+><P
+>As it is a common error in writting these rules, it is worth
+repeating.  If a rule set is to be universally applicable
+<I
+CLASS="EMPHASIS"
+>all</I
+> letters in the input alphabet must have at a
+rule mapping them to some phone.</P
+><P
+>The section to be mapped (within square brackets) and the section it
+is mapped into (after the "=&#62;") must be items in the input and output
+alphabets and may not include sets or regular expression operators.
+This does mean more rules need to be explicitly written than you
+might like, but that will also help you not forget some rules
+that are required.</P
+><P
+>For some languages it is conveninet to write a number of rules sets.
+For example, one to map the input in lower case, and maybe deal with
+alternate treatments of accent characters e.g. re-write the ASCII "e'"
+as <SPAN
+CLASS="COMMENT"
+>AWB: e acute</SPAN
+>.  Also we have used rule tests to
+post process the generated phone string to add stress and syllable
+breaks.</P
+><P
+>Finally some people have stressed that writing good letter to sound
+rules is hard.  We would disagree with this, from our experience
+writing good letter to sound rules by hand is
+<I
+CLASS="EMPHASIS"
+>very</I
+> hard and <I
+CLASS="EMPHASIS"
+>very</I
+> skilled
+and <I
+CLASS="EMPHASIS"
+>very</I
+> laborious.  For anything but the
+simplest of languages writting rules by hand requires much more
+time that people typically have, and will still contain errors (even
+with an exception list).  However hand rules sets may be ideal
+in some circumstances.</P
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="x1405.html"
+ACCESSKEY="P"
+>&#60;&#60;&#60; Previous</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="book1.html"
+ACCESSKEY="H"
+>Home</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="x1469.html"
+ACCESSKEY="N"
+>Next &#62;&#62;&#62;</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>Out of vocabulary words</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="c1379.html"
+ACCESSKEY="U"
+>Up</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>Building letter-to-sound rules automatically</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

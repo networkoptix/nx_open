@@ -5,10 +5,11 @@
 
 #include <QtNetwork/QNetworkInterface>
 
-#include "utils/common/long_runnable.h"
+#include "nx/utils/thread/long_runnable.h"
 
-#include <nx/network/http/httptypes.h>
+#include <nx/network/http/http_types.h>
 #include <nx/network/abstract_socket.h>
+#include <common/common_module_aware.h>
 
 
 class TCPSocket;
@@ -16,7 +17,7 @@ class QnTCPConnectionProcessor;
 
 class QnTcpListenerPrivate;
 
-class QnTcpListener: public QnLongRunnable
+class QnTcpListener: public QnLongRunnable, public QnCommonModuleAware
 {
     Q_OBJECT;
 
@@ -27,7 +28,12 @@ public:
 
     void setAuth(const QByteArray& userName, const QByteArray& password);
 
-    explicit QnTcpListener( const QHostAddress& address, int port, int maxConnections = DEFAULT_MAX_CONNECTIONS, bool useSSL = true );
+    explicit QnTcpListener(
+        QnCommonModule* commonModule,
+        const QHostAddress& address,
+        int port,
+        int maxConnections = DEFAULT_MAX_CONNECTIONS,
+        bool useSSL = true );
     virtual ~QnTcpListener();
 
     //!Bind to local address:port, specified in constructor
@@ -62,6 +68,8 @@ public:
     /** Norlimize url path. cut off web prefix and '/' chars */
     static QString normalizedPath(const QString& path);
 
+    virtual void applyModToRequest(nx_http::Request* /*request*/) {}
+
 signals:
     void portChanged();
 
@@ -82,7 +90,6 @@ protected:
     virtual void destroyServerSocket(AbstractStreamServerSocket* serverSocket);
 
     void setLastError(SystemError::ErrorCode error);
-
 private:
     void removeDisconnectedConnections();
     void removeAllConnections();

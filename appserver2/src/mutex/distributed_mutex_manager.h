@@ -1,5 +1,4 @@
-#ifndef __DISTRIBUTED_MUTEX_MANAGER_H_
-#define __DISTRIBUTED_MUTEX_MANAGER_H_
+#pragma once
 
 #include "nx_ec/data/api_lock_data.h"
 #include "transaction/transaction.h"
@@ -9,6 +8,7 @@ namespace ec2
 
     class QnMutexUserDataHandler;
     class QnDistributedMutex;
+    class QnTransactionMessageBus;
 
     class QnDistributedMutexManager: public QObject
     {
@@ -16,16 +16,15 @@ namespace ec2
     public:
         static const int DEFAULT_TIMEOUT = 1000 * 30;
 
-        QnDistributedMutexManager();
+        QnDistributedMutexManager(QnTransactionMessageBus* messageBus);
         QnDistributedMutex* createMutex(const QString& name);
 
-        static void initStaticInstance(QnDistributedMutexManager*);
-        static QnDistributedMutexManager* instance();
-
         void setUserDataHandler(QnMutexUserDataHandler* userDataHandler);
+
+        QnTransactionMessageBus* messageBus() const;
     signals:
-        void peerFound(ec2::ApiPeerAliveData data);
-        void peerLost(ec2::ApiPeerAliveData data);
+        void peerFound(QnUuid data, Qn::PeerType peerType);
+        void peerLost(QnUuid data, Qn::PeerType peerType);
     private:
         qint64 newTimestamp();
     private:
@@ -40,9 +39,8 @@ namespace ec2
     private:
         QMap<QString, QnDistributedMutex*> m_mutexList;
         mutable QnMutex m_mutex;
-        qint64 m_timestamp;
-        QnMutexUserDataHandler* m_userDataHandler;
+        qint64 m_timestamp{1};
+        QnMutexUserDataHandler* m_userDataHandler{nullptr};
+        QnTransactionMessageBus* m_messageBus{nullptr};
     };
 }
-
-#endif // __DISTRIBUTED_MUTEX_MANAGER_H_

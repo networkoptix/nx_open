@@ -11,6 +11,10 @@
 #include <axclient/axclient_module.h>
 #include <axclient/axclient_window.h>
 
+#include <common/common_module.h>
+
+#include <client_core/client_core_module.h>
+
 #include <nx/utils/crash_dump/systemexcept.h>
 
 #include <core/resource_management/resource_pool.h>
@@ -198,7 +202,9 @@ QString AxHDWitness::resourceListXml()
     writer.writeStartDocument();
     writer.writeStartElement(lit("resources"));
 
-    for (const QnVirtualCameraResourcePtr &camera : qnResPool->getAllCameras(QnResourcePtr(), true))
+    const auto resPool = qnClientCoreModule->commonModule()->resourcePool();
+
+    for (const QnVirtualCameraResourcePtr &camera: resPool->getAllCameras(QnResourcePtr(), true))
     {
         writer.writeStartElement(lit("resource"));
         writer.writeAttribute(lit("uniqueId"), camera->getUniqueId());

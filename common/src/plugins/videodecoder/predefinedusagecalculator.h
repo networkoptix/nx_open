@@ -7,17 +7,23 @@
 
 #include <memory>
 
-#include <nx/utils/thread/mutex.h>
 #include <QtCore/QString>
 
-#include "stree/resourcenameset.h"
+#include <nx/utils/stree/resourcenameset.h>
+#include <nx/utils/thread/mutex.h>
 
 #include "abstractvideodecoderusagecalculator.h"
 #include "videodecoderplugintypes.h"
 
+namespace nx {
+namespace utils {
 namespace stree {
-    class AbstractNode;
-};
+
+class AbstractNode;
+
+} // namespace stree
+} // namespace utils
+} // namespace nx
 
 class PluginUsageWatcher;
 
@@ -32,24 +38,24 @@ public:
         \param usageWatcher
     */
     PredefinedUsageCalculator(
-        const stree::ResourceNameSet& rns,
+        const nx::utils::stree::ResourceNameSet& rns,
         const QString& predefinedDataFilePath,
         PluginUsageWatcher* const usageWatcher );
     
     //!Implementation of AbstractVideoDecoderUsageCalculator::isEnoughHWResourcesForAnotherDecoder
     virtual bool isEnoughHWResourcesForAnotherDecoder(
-        const stree::AbstractResourceReader& mediaStreamParams,
-        const stree::AbstractResourceReader& curUsageParams ) const override;
+        const nx::utils::stree::AbstractResourceReader& mediaStreamParams,
+        const nx::utils::stree::AbstractResourceReader& curUsageParams ) const override;
 
 private:
-    const stree::ResourceNameSet& m_rns;
+    const nx::utils::stree::ResourceNameSet& m_rns;
     const QString m_predefinedDataFilePath;
     //PluginUsageWatcher* const m_usageWatcher;
-    std::unique_ptr<stree::AbstractNode> m_currentTree;
+    std::unique_ptr<nx::utils::stree::AbstractNode> m_currentTree;
     mutable QnMutex m_treeMutex;
 
     void updateTree();
-    std::unique_ptr<stree::AbstractNode> loadXml(const QString& filePath);
+    std::unique_ptr<nx::utils::stree::AbstractNode> loadXml(const QString& filePath);
 };
 
 #endif  //PREDEFINEDUSAGECALCULATOR_H

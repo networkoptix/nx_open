@@ -9,43 +9,39 @@
 
 #include <QtCore/QByteArray>
 #include <QtCore/QElapsedTimer>
-#include <QtNetwork/QHostAddress>
 #include <QtCore/QObject>
 #include <QtCore/QString>
 
-#include <api/global_settings.h>
-#include <utils/common/long_runnable.h>
-#include <utils/common/stoppable.h>
-
-#include <nx/utils/async_operation_guard.h>
-#include <nx/utils/timer_manager.h>
+#include <nx/network/async_stoppable.h>
 #include <nx/network/aio/aio_event_handler.h>
-#include <nx/network/http/httptypes.h>
+#include <nx/network/http/http_types.h>
 #include <nx/network/http/asynchttpclient.h>
 #include <nx/network/nettools.h>
 #include <nx/network/socket.h>
+#include <nx/utils/async_operation_guard.h>
 #include <nx/utils/atomic_unique_ptr.h>
+#include <nx/utils/thread/long_runnable.h>
+#include <nx/utils/timer_manager.h>
+
+#include "upnp_search_handler.h"
 
 namespace nx_upnp {
 
-//!Receives discovered devices info
-class NX_NETWORK_API SearchHandler
+class NX_NETWORK_API AbstractDeviceSearcherSettings
 {
 public:
-    virtual ~SearchHandler() {}
+    virtual ~AbstractDeviceSearcherSettings() = default;
 
-    /*!
-        \param localInterfaceAddress Local interface address, device has been discovered on
-        \param discoveredDevAddress Discovered device address
-        \param devInfo Parameters, received by parsing \a xmlDevInfo
-        \param xmlDevInfo xml data as defined in [UPnP Device Architecture 1.1, section 2.3]
-        \return true, if device has been recognized and processed successfully, false otherwise. If true, packet WILL NOT be passed to other processors
-    */
-    virtual bool processPacket(
-        const QHostAddress& localInterfaceAddress,
-        const SocketAddress& discoveredDevAddress,
-        const DeviceInfo& devInfo,
-        const QByteArray& xmlDevInfo ) = 0;
+    virtual int cacheTimeout() const = 0;
+    virtual bool isUpnpMulticastEnabled() const = 0;
+};
+
+class NX_NETWORK_API DeviceSearcherDefaultSettings:
+    public AbstractDeviceSearcherSettings
+{
+public:
+    virtual int cacheTimeout() const override;
+    virtual bool isUpnpMulticastEnabled() const override;
 };
 
 //!Discovers UPnP devices on network and passes found devices info to registered handlers
@@ -56,8 +52,7 @@ public:
     \note Class methods are thread-safe with the only exception: \a saveDiscoveredDevicesSnapshot() and \a processDiscoveredDevices() calls MUST be serialized by calling entity
     \note this class is single-tone
 */
-class NX_NETWORK_API DeviceSearcher
-:
+class NX_NETWORK_API DeviceSearcher:
     public QObject,
     public nx::utils::TimerEventHandler,
     public QnStoppable
@@ -73,7 +68,7 @@ public:
         \param discoverTryTimeoutMS Timeout between UPnP discover packet dispatch.
     */
     explicit DeviceSearcher(
-        QnGlobalSettings* globalSettings,
+        const AbstractDeviceSearcherSettings& settings,
         unsigned int discoverTryTimeoutMS = DEFAULT_DISCOVER_TRY_TIMEOUT_MS );
     virtual ~DeviceSearcher();
 
@@ -102,9 +97,9 @@ public:
         \param handlerToUse If NULL, all handlers are used, otherwise packets are passed to \a handlerToUse only
     */
     void processDiscoveredDevices( SearchHandler* handlerToUse = NULL );
+    int cacheTimeout() const;
 
     static DeviceSearcher* instance();
-    static int cacheTimeout();
 
 private:
     class DiscoveredDeviceInfo
@@ -144,7 +139,7 @@ private:
         nx::Buffer buf;
     };
 
-    const QnGlobalSettings* m_globalSettings;
+    const AbstractDeviceSearcherSettings& m_settings;
     const unsigned int m_discoverTryTimeoutMS;
     mutable QnMutex m_mutex;
     quint64 m_timerID;
@@ -195,14 +190,6 @@ private:
 
 private slots:
     void onDeviceDescriptionXmlRequestDone( nx_http::AsyncHttpClientPtr httpClient );
-};
-
-class NX_NETWORK_API SearchAutoHandler
-        : public SearchHandler
-{
-public:
-    SearchAutoHandler( const QString& devType = QString() );
-    virtual ~SearchAutoHandler();
 };
 
 } // namespace nx_upnp

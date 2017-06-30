@@ -42,7 +42,7 @@ void QnSyncTime::updateTime(int /*reqID*/, ec2::ErrorCode errorCode, qint64 newT
 
     QnMutexLocker lock( &m_mutex );
     qint64 oldTime = m_lastReceivedTime + m_timer.elapsed();
-    
+
     m_lastReceivedTime = newTime;
     m_timer.restart();
     m_syncTimeRequestIssued = false;
@@ -112,15 +112,14 @@ qint64 QnSyncTime::currentMSecsSinceEpoch()
 
     if (
         (
-            m_lastReceivedTime == 0 
-        ||  m_timer.elapsed() > EcTimeUpdatePeriod 
+            m_lastReceivedTime == 0
+        ||  m_timer.elapsed() > EcTimeUpdatePeriod
         || qAbs(localTime-m_lastLocalTime) > EcTimeUpdatePeriod
-        ) 
-        && !m_syncTimeRequestIssued 
-        && QnAppServerConnectionFactory::getConnection2())
+        )
+        && !m_syncTimeRequestIssued)
     {
-        ec2::AbstractECConnectionPtr appServerConnection = QnAppServerConnectionFactory::getConnection2();
-        if( appServerConnection ) 
+        ec2::AbstractECConnectionPtr appServerConnection = QnAppServerConnectionFactory::ec2Connection();
+        if( appServerConnection )
         {
             appServerConnection->getTimeManager(Qn::kSystemAccess)->getCurrentTime( this, (void(QnSyncTime::*)(int, ec2::ErrorCode, qint64))&QnSyncTime::updateTime );
             m_syncTimeRequestIssued = true;

@@ -3,26 +3,29 @@
 #include <QtGui/QGuiApplication>
 #include <QtGui/QDesktopServices>
 
-#include <common/common_module.h>
-#include <core/resource_management/resource_pool.h>
-#include <core/resource_management/resources_changes_manager.h>
-#include <core/resource/mobile_client_camera_factory.h>
-#include <client_core/client_core_settings.h>
 #include <api/app_server_connection.h>
+
+#include <common/common_module.h>
+#include <common/static_common_module.h>
+
+
+#include <client_core/client_core_module.h>
+
+
+#include <core/resource_management/resource_pool.h>
+#include <core/resource/mobile_client_camera_factory.h>
 #include <api/session_manager.h>
 #include <api/global_settings.h>
 #include <api/runtime_info_manager.h>
 #include <api/simple_network_proxy_factory.h>
-#include <utils/common/long_runnable.h>
+#include <nx/utils/thread/long_runnable.h>
 #include <utils/common/app_info.h>
-#include <network/module_finder.h>
-#include <network/multicast_module_finder.h>
+#include <nx/vms/discovery/manager.h>
 #include <network/router.h>
 #include <cloud/cloud_connection.h>
 #include <watchers/user_watcher.h>
 #include <watchers/available_cameras_watcher.h>
 #include <watchers/cloud_status_watcher.h>
-#include <watchers/server_address_watcher.h>
 #include <finders/systems_finder.h>
 #include <client/system_weights_manager.h>
 #include <utils/media/ffmpeg_initializer.h>
@@ -37,6 +40,7 @@
 #include <nx/mobile_client/settings/migration_helper.h>
 #include <nx/mobile_client/settings/settings_migration.h>
 #include <client_core/client_core_settings.h>
+#include <core/ptz/client_ptz_controller_pool.h>
 
 using namespace nx::mobile_client;
 
@@ -46,7 +50,6 @@ QnMobileClientModule::QnMobileClientModule(
     :
     QObject(parent)
 {
-    Q_INIT_RESOURCE(appserver2);
     Q_INIT_RESOURCE(mobile_client);
 
     QnMobileClientMetaTypes::initialize();
@@ -62,83 +65,63 @@ QnMobileClientModule::QnMobileClientModule(
     translationManager->updateTranslation();
 
     /* Init singletons. */
-    QnCommonModule *common = new QnCommonModule(this);
-    common->setModuleGUID(QnUuid::createUuid());
-    nx::network::SocketGlobals::outgoingTunnelPool().assignOwnPeerId("mc", common->moduleGUID());
+    m_clientCoreModule = new QnClientCoreModule(this);
+
+    auto commonModule = m_clientCoreModule->commonModule();
+    commonModule->setModuleGUID(QnUuid::createUuid());
+    nx::network::SocketGlobals::outgoingTunnelPool().assignOwnPeerId("mc", commonModule->moduleGUID());
 
     // TODO: #mu ON/OFF switch in settings?
     nx::network::SocketGlobals::mediatorConnector().enable(true);
 
     // TODO: #mshevchenko Remove when client_core_module is created.
-    common->store(new QnFfmpegInitializer());
+    commonModule->store(translationManager);
 
-    common->store(translationManager);
-    common->store(new QnClientCoreSettings());
-    common->store(new QnMobileClientSettings);
+    commonModule->store(new QnMobileClientSettings);
     settings::migrateSettings();
-    common->store(new QnSessionManager());
 
-    common->store(new QnLongRunnablePool());
-    common->store(new QnMobileClientMessageProcessor());
-    common->store(new QnCameraHistoryPool());
-    common->store(new QnRuntimeInfoManager());
-    common->store(new QnMobileClientCameraFactory());
+    commonModule->store(new QnLongRunnablePool());
+    commonModule->createMessageProcessor<QnMobileClientMessageProcessor>();
 
-    common->store(new QnResourcesChangesManager());
+    commonModule->instance<QnCameraHistoryPool>();
+    commonModule->store(new QnMobileClientCameraFactory());
 
-    auto userWatcher = common->store(new QnUserWatcher());
-
-    auto availableCamerasWatcher = common->store(new QnAvailableCamerasWatcher());
-    connect(userWatcher, &QnUserWatcher::userChanged,
-        availableCamerasWatcher, &QnAvailableCamerasWatcher::setUser);
-
-    common->store(new QnCloudConnectionProvider());
-    common->store(new QnCloudStatusWatcher());
-    QNetworkProxyFactory::setApplicationProxyFactory(new QnSimpleNetworkProxyFactory());
-
-    QnAppServerConnectionFactory::setDefaultFactory(QnMobileClientCameraFactory::instance());
+    auto userWatcher = commonModule->store(new QnUserWatcher());
 
     ec2::ApiRuntimeData runtimeData;
-    runtimeData.peer.id = qnCommon->moduleGUID();
-    runtimeData.peer.instanceId = qnCommon->runningInstanceGUID();
-    runtimeData.peer.peerType = Qn::PT_MobileClient;
+    runtimeData.peer.id = commonModule->moduleGUID();
+    runtimeData.peer.instanceId = commonModule->runningInstanceGUID();
+    runtimeData.peer.peerType = qnStaticCommon->localPeerType();
     runtimeData.peer.dataFormat = Qn::JsonFormat;
-    runtimeData.brand = QnAppInfo::productNameShort();
+    runtimeData.brand = qnStaticCommon->brand();
     runtimeData.customization = QnAppInfo::customizationName();
     if (!startupParameters.videowallInstanceGuid.isNull())
         runtimeData.videoWallInstanceGuid = startupParameters.videowallInstanceGuid;
-    QnRuntimeInfoManager::instance()->updateLocalItem(runtimeData);
+    commonModule->runtimeInfoManager()->updateLocalItem(runtimeData);
 
-    auto moduleFinder = common->store(new QnModuleFinder(true));
-    moduleFinder->multicastModuleFinder()->setCheckInterfacesTimeout(10 * 1000);
-    moduleFinder->start();
+    auto availableCamerasWatcher = commonModule->instance<QnAvailableCamerasWatcher>();
+    connect(userWatcher, &QnUserWatcher::userChanged,
+        availableCamerasWatcher, &QnAvailableCamerasWatcher::setUser);
 
-    common->store(new QnRouter(moduleFinder));
-    
-    const auto getter = []() { return qnClientCoreSettings->knownServerUrls(); };
-    const auto setter =
-        [](const QnServerAddressWatcher::UrlsList& values)
-        {
-            qnClientCoreSettings->setKnownServerUrls(values);
-            qnClientCoreSettings->save();
-        };
-    common->store(new QnServerAddressWatcher(getter, setter));
+    commonModule->store(new QnCloudConnectionProvider());
+    m_cloudStatusWatcher = commonModule->store(new QnCloudStatusWatcher(commonModule, /*isMobile*/ true));
+    QNetworkProxyFactory::setApplicationProxyFactory(new QnSimpleNetworkProxyFactory(commonModule));
 
-    common->store(new QnSystemsFinder());
-    common->store(new QnSystemsWeightsManager());
+    commonModule->instance<QnSystemsFinder>();
+    commonModule->store(new QnSystemsWeightsManager());
 
-    common->store(new settings::SessionsMigrationHelper());
+    commonModule->store(new settings::SessionsMigrationHelper());
 
     connect(qApp, &QGuiApplication::applicationStateChanged, this,
-        [moduleFinder](Qt::ApplicationState state)
+        [moduleManager = commonModule->moduleDiscoveryManager()](Qt::ApplicationState state)
         {
             switch (state)
             {
                 case Qt::ApplicationActive:
-                    moduleFinder->start();
+                    moduleManager->start();
                     break;
                 case Qt::ApplicationSuspended:
-                    moduleFinder->pleaseStop();
+                    moduleManager->stop();
                     break;
                 default:
                     break;
@@ -150,4 +133,9 @@ QnMobileClientModule::~QnMobileClientModule()
 {
     qApp->disconnect(this);
     QNetworkProxyFactory::setApplicationProxyFactory(nullptr);
+}
+
+QnCloudStatusWatcher* QnMobileClientModule::cloudStatusWatcher() const
+{
+    return m_cloudStatusWatcher;
 }

@@ -39,6 +39,7 @@ public:
     void setPassword(const QString& password);
 
     void generateHash();
+    QString decodeLDAPPassword() const;
 
     bool checkLocalUserPassword(const QString &password);
 
@@ -52,7 +53,7 @@ public:
     void setRealm( const QString& realm );
 
     // Do not use this method directly.
-    // Use qnResourceAccessManager::globalPermissions(user) instead
+    // Use resourceAccessManager()::globalPermissions(user) instead
     Qn::GlobalPermissions getRawPermissions() const;
     void setRawPermissions(Qn::GlobalPermissions permissions);
 

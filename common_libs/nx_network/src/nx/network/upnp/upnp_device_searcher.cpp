@@ -3,17 +3,13 @@
 #include <algorithm>
 #include <memory>
 
+#include <QtCore/QDateTime>
 #include <QtXml/QXmlDefaultHandler>
 
-#include <common/common_globals.h>
 #include <nx/network/socket_global.h>
 #include <nx/network/system_socket.h>
-
-#include <utils/common/app_info.h>
-#include <utils/common/concurrent.h>
-
-#include <QDateTime>
-
+#include <nx/utils/app_info.h>
+#include <nx/utils/concurrent.h>
 
 using namespace std;
 using namespace nx::network;
@@ -22,20 +18,31 @@ static const QHostAddress groupAddress(QLatin1String("239.255.255.250"));
 static const int GROUP_PORT = 1900;
 static const unsigned int MAX_UPNP_RESPONSE_PACKET_SIZE = 512*1024;
 static const int XML_DESCRIPTION_LIVE_TIME_MS = 5*60*1000;
-static const int PARTIAL_DISCOVERY_XML_DESCRIPTION_LIVE_TIME_MS = 24*60*60*1000;
 static const unsigned int READ_BUF_CAPACITY = 64*1024+1;    //max UDP packet size
 
 namespace nx_upnp {
 
+int DeviceSearcherDefaultSettings::cacheTimeout() const
+{
+    return XML_DESCRIPTION_LIVE_TIME_MS;
+}
+
+bool DeviceSearcherDefaultSettings::isUpnpMulticastEnabled() const
+{
+    return true;
+}
+
+
 static DeviceSearcher* UPNPDeviceSearcherInstance = nullptr;
 
 const QString DeviceSearcher::DEFAULT_DEVICE_TYPE = lit("%1 Server")
-        .arg(QnAppInfo::organizationName());
+        .arg(nx::utils::AppInfo::organizationName());
 
 DeviceSearcher::DeviceSearcher(
-    QnGlobalSettings* globalSettings, unsigned int discoverTryTimeoutMS )
+    const AbstractDeviceSearcherSettings& settings,
+    unsigned int discoverTryTimeoutMS )
 :
-    m_globalSettings(globalSettings),
+    m_settings(settings),
     m_discoverTryTimeoutMS( discoverTryTimeoutMS == 0 ? DEFAULT_DISCOVER_TRY_TIMEOUT_MS : discoverTryTimeoutMS ),
     m_timerID( 0 ),
     m_terminated( false ),
@@ -196,6 +203,11 @@ void DeviceSearcher::processDiscoveredDevices( SearchHandler* handlerToUse )
     }
 }
 
+int DeviceSearcher::cacheTimeout() const
+{
+    return m_settings.cacheTimeout();
+}
+
 DeviceSearcher* DeviceSearcher::instance()
 {
     return UPNPDeviceSearcherInstance;
@@ -283,20 +295,9 @@ void DeviceSearcher::onSomeBytesRead(
         startFetchDeviceXml( uuidStr, descriptionUrl, remoteHost );
 }
 
-static bool isUpnpMulticastEnabled(const QnGlobalSettings* settings)
-{
-    if (!settings)
-        return true;
-
-    if (settings->isNewSystem())
-        return false;
-
-    return settings->isAutoDiscoveryEnabled() || settings->isUpnpPortMappingEnabled();
-}
-
 void DeviceSearcher::dispatchDiscoverPackets()
 {
-    if (!isUpnpMulticastEnabled(m_globalSettings))
+    if (!m_settings.isUpnpMulticastEnabled())
         return;
 
     for(const  QnInterfaceAndAddr& iface: getAllIPv4Interfaces() )
@@ -506,25 +507,13 @@ QHostAddress DeviceSearcher::findBestIface( const HostAddress& host )
     return oldAddress;
 }
 
-int DeviceSearcher::cacheTimeout()
-{
-    if( auto settings = QnGlobalSettings::instance() )
-    {
-        const auto disabledVendors = settings->disabledVendorsSet();
-        if( disabledVendors.size() == 1 && disabledVendors.contains( lit("all=partial") ) )
-            return PARTIAL_DISCOVERY_XML_DESCRIPTION_LIVE_TIME_MS;
-    }
-
-    return XML_DESCRIPTION_LIVE_TIME_MS;
-}
-
 const DeviceSearcher::UPNPDescriptionCacheItem* DeviceSearcher::findDevDescriptionInCache( const QByteArray& uuid )
 {
     std::map<QByteArray, UPNPDescriptionCacheItem>::iterator it = m_upnpDescCache.find( uuid );
     if( it == m_upnpDescCache.end() )
         return NULL;
 
-    if( m_cacheTimer.elapsed() - it->second.creationTimestamp > cacheTimeout() )
+    if( m_cacheTimer.elapsed() - it->second.creationTimestamp > m_settings.cacheTimeout() )
     {
         //item has expired
         m_upnpDescCache.erase( it );
@@ -541,7 +530,7 @@ void DeviceSearcher::updateItemInCache( DiscoveredDeviceInfo info )
     cacheItem.xmlDevInfo = info.xmlDevInfo;
     cacheItem.creationTimestamp = m_cacheTimer.elapsed();
 
-    QnConcurrent::run(
+    nx::utils::concurrent::run(
         QThreadPool::globalInstance(),
         [ this, info = std::move(info), guard = m_handlerGuard.sharedGuard() ]()
         {
@@ -593,17 +582,6 @@ void DeviceSearcher::onDeviceDescriptionXmlRequestDone( nx_http::AsyncHttpClient
         return;
     httpClient->pleaseStopSync();
     m_httpClients.erase( httpClient );
-}
-
-SearchAutoHandler::SearchAutoHandler(const QString& devType)
-{
-    DeviceSearcher::instance()->registerHandler( this, devType );
-}
-
-SearchAutoHandler::~SearchAutoHandler()
-{
-    if( auto searcher = DeviceSearcher::instance() )
-        searcher->unregisterHandler( this );
 }
 
 } // namespace nx_upnp

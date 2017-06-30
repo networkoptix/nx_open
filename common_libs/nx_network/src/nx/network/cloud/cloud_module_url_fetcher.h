@@ -16,8 +16,8 @@
 #include <nx/utils/async_operation_guard.h>
 #include <nx/utils/move_only_func.h>
 
-#include <plugins/videodecoder/stree/node.h>
-#include <plugins/videodecoder/stree/resourcenameset.h>
+#include <nx/utils/stree/node.h>
+#include <nx/utils/stree/resourcenameset.h>
 
 #include "endpoint_selector.h"
 
@@ -26,7 +26,7 @@ namespace network {
 namespace cloud {
 
 class CloudInstanceSelectionAttributeNameset:
-    public stree::ResourceNameSet
+    public nx::utils::stree::ResourceNameSet
 {
 public:
     enum AttributeType
@@ -115,7 +115,7 @@ private:
 
     void onHttpClientDone(nx_http::AsyncHttpClientPtr client);
     bool findModuleUrl(
-        const stree::AbstractNode& treeRoot,
+        const nx::utils::stree::AbstractNode& treeRoot,
         const int moduleAttrName,
         QUrl* const moduleEndpoint);
     void signalWaitingHandlers(

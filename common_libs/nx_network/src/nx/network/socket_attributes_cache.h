@@ -1,21 +1,17 @@
-/**********************************************************
-* Jan 29, 2016
-* a.kolesnikov
-***********************************************************/
-
 #pragma once
 
 #include <boost/optional.hpp>
 
-#include <utils/common/systemerror.h>
+#include <nx/utils/system_error.h>
 
 #include "nx/network/abstract_socket.h"
-
 
 namespace nx {
 namespace network {
 
-/** Socket configuration attributes ready to apply to any \class AbstractSocket */
+/**
+ * Socket configuration attributes ready to apply to any AbstractSocket.
+ */
 class SocketAttributes
 {
 public:
@@ -30,7 +26,7 @@ public:
     bool applyTo(AbstractSocket* const socket) const
     {
         if (aioThread)
-            socket->bindToAioThread(*aioThread); //< success or assert
+            socket->bindToAioThread(*aioThread); //< Success or assert.
 
         return
             apply(socket, &AbstractSocket::setReuseAddrFlag, reuseAddrFlag) &&
@@ -52,10 +48,15 @@ protected:
     }
 };
 
-/** Saves socket attributes and applies them to a given socket */
+NX_NETWORK_API bool verifySocketAttributes(
+    const AbstractSocket& socket,
+    const SocketAttributes& attributes);
+
+/**
+ * Saves socket attributes and applies them to a given socket.
+ */
 template<class ParentType, class SocketAttributesHolderType>
-class AbstractSocketAttributesCache
-:
+class AbstractSocketAttributesCache:
     public ParentType
 {
 public:
@@ -63,9 +64,8 @@ public:
         m_delegate(delegate)
     {
     }
-    virtual ~AbstractSocketAttributesCache()
-    {
-    }
+    virtual ~AbstractSocketAttributesCache() = default;
+
     virtual bool setReuseAddrFlag(bool val) override
     {
         return setAttributeValue(
@@ -277,9 +277,10 @@ protected:
     }
 };
 
-/** Socket configuration attributes ready to apply to any \class AbstractStreamSocket */
-class StreamSocketAttributes
-:
+/**
+ * Socket configuration attributes ready to apply to any AbstractStreamSocket.
+ */
+class StreamSocketAttributes:
     public SocketAttributes
 {
 public:
@@ -295,10 +296,11 @@ public:
     }
 };
 
-/** Saves socket attributes and applies them to a given socket */
+/**
+ * Saves socket attributes and applies them to a given socket.
+ */
 template<class ParentType>
-class AbstractStreamSocketAttributesCache
-:
+class AbstractStreamSocketAttributesCache:
     public AbstractSocketAttributesCache<ParentType, StreamSocketAttributes>
 {
 public:
@@ -306,6 +308,7 @@ public:
         AbstractSocketAttributesCache<ParentType, StreamSocketAttributes>(delegate)
     {
     }
+
     virtual bool setNoDelay(bool val) override
     {
         return this->setAttributeValue(
@@ -359,5 +362,5 @@ public:
     }
 };
 
-}   //network
-}   //nx
+} // namespace network
+} // namespace nx

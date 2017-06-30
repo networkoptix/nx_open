@@ -1,26 +1,26 @@
 #include <gtest/gtest.h>
 
 #include <nx/fusion/model_functions.h>
+#include <nx/utils/counter.h>
 #include <nx/utils/random.h>
 #include <nx/utils/std/cpp14.h>
 #include <nx/utils/test_support/utils.h>
 #include <nx/utils/time.h>
-
-#include <utils/common/counter.h>
 #include <utils/db/async_sql_query_executor.h>
 #include <utils/db/request_execution_thread.h>
 #include <utils/db/test_support/test_with_db_helper.h>
 
-#include <ec2/dao/memory/transaction_data_object_in_memory.h>
-#include <ec2/data_conversion.h>
-#include <ec2/outgoing_transaction_dispatcher.h>
-#include <ec2/transaction_log.h>
 #include <nx_ec/ec_proto_version.h>
-#include <test_support/business_data_generator.h>
+
+#include <nx/cloud/cdb/data/account_data.h>
+#include <nx/cloud/cdb/data/system_data.h>
+#include <nx/cloud/cdb/ec2/dao/memory/transaction_data_object_in_memory.h>
+#include <nx/cloud/cdb/ec2/data_conversion.h>
+#include <nx/cloud/cdb/ec2/outgoing_transaction_dispatcher.h>
+#include <nx/cloud/cdb/ec2/transaction_log.h>
+#include <nx/cloud/cdb/test_support/business_data_generator.h>
 
 #include "base_persistent_data_test.h"
-#include "data/account_data.h"
-#include "data/system_data.h"
 #include "test_outgoing_transaction_dispatcher.h"
 
 namespace nx {
@@ -139,9 +139,10 @@ protected:
     void whenGeneratedTransactionLocally()
     {
         auto queryContext = getQueryContext();
-        auto transaction = transactionLog()->prepareLocalTransaction<::ec2::ApiCommand::saveUser>(
+        auto transaction = transactionLog()->prepareLocalTransaction(
             queryContext.get(),
             m_systemId.c_str(),
+            ::ec2::ApiCommand::saveUser,
             m_transactionData);
         if (!m_initialTransaction)
             m_initialTransaction = transaction;
@@ -203,9 +204,10 @@ protected:
     void whenReceivedOwnOldTransactionWithLesserSequence()
     {
         auto queryContext = getQueryContext();
-        auto transaction = transactionLog()->prepareLocalTransaction<::ec2::ApiCommand::saveUser>(
+        auto transaction = transactionLog()->prepareLocalTransaction(
             queryContext.get(),
             m_systemId.c_str(),
+            ::ec2::ApiCommand::saveUser,
             m_transactionData);
         transaction.persistentInfo.sequence -= 2;
         if (!m_initialTransaction)
@@ -486,7 +488,7 @@ private:
     api::SystemSharingEx m_sharing;
     QnMutex m_mutex;
     QnWaitCondition m_cond;
-    QnCounter m_startedAsyncCallsCounter;
+    nx::utils::Counter m_startedAsyncCallsCounter;
 
     nx::db::DBResult doSomeDataModifications(nx::db::QueryContext* queryContext)
     {
@@ -563,11 +565,11 @@ private:
         convert(m_sharing, &userData);
         userData.isCloud = true;
         userData.fullName = QString::fromStdString(m_accountToShareWith.fullName);
-        auto dbResult = m_transactionLog->generateTransactionAndSaveToLog<
-            ::ec2::ApiCommand::saveUser>(
-                queryContext,
-                m_sharing.systemId.c_str(),
-                std::move(userData));
+        auto dbResult = m_transactionLog->generateTransactionAndSaveToLog(
+            queryContext,
+            m_sharing.systemId.c_str(),
+            ::ec2::ApiCommand::saveUser,
+            std::move(userData));
         ASSERT_EQ(nx::db::DBResult::ok, dbResult);
     }
 
@@ -709,11 +711,11 @@ private:
         convert(sharing, &userData);
         userData.isCloud = true;
         userData.fullName = QString::fromStdString(accountToShareWith.fullName);
-        auto dbResult = transactionLog()->generateTransactionAndSaveToLog<
-            ::ec2::ApiCommand::saveUser>(
-                queryContext,
-                sharing.systemId.c_str(),
-                std::move(userData));
+        auto dbResult = transactionLog()->generateTransactionAndSaveToLog(
+            queryContext,
+            sharing.systemId.c_str(),
+            ::ec2::ApiCommand::saveUser,
+            std::move(userData));
         NX_GTEST_ASSERT_EQ(nx::db::DBResult::ok, dbResult);
 
         std::this_thread::sleep_for(

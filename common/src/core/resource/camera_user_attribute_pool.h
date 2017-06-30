@@ -1,16 +1,11 @@
-/**********************************************************
-* 1 oct 2014
-* akolesnikov
-***********************************************************/
-
-#ifndef CAMERA_USER_ATTRIBUTE_POOL_H
-#define CAMERA_USER_ATTRIBUTE_POOL_H
+#pragma once
 
 #include <core/resource/general_attribute_pool.h>
 
 #include <nx/utils/singleton.h>
 
 #include "camera_user_attributes.h"
+#include "common/common_module_aware.h"
 
 
 //!Pool of \a QnCameraUserAttributes
@@ -26,18 +21,15 @@
     \a QnCameraUserAttributePool::ScopedLock constructor will block if element with id \a resourceID is already used
 */
 
-class QnCameraUserAttributePool
-:
+class QnCameraUserAttributePool:
     public QObject,
     public QnGeneralAttributePool<QnUuid, QnCameraUserAttributesPtr>,
-    public Singleton<QnCameraUserAttributePool>
+    public QnCommonModuleAware
 {
     Q_OBJECT
 public:
-    QnCameraUserAttributePool(QObject *parent = NULL);
+    QnCameraUserAttributePool(QObject* parent);
     virtual ~QnCameraUserAttributePool();
 
     QnCameraUserAttributesList getAttributesList( const QList<QnUuid>& idList );
 };
-
-#endif  //CAMERA_USER_ATTRIBUTE_POOL_H

@@ -1,0 +1,25 @@
+P {
+	font-size:12pt;font-family:Palatino, Ariel, serif;
+	}
+
+DIV.function {
+	margin-bottom: 12pt;
+	}
+
+.simplesectFunction {
+	font-size:12pt;font-family:Palatino, Ariel, serif;
+	margin-bottom:0pt;
+	}
+
+TABLE.synopsys { 
+	margin-top:-12pt;
+	margin-bottom:-18pt;
+	border-left-width:20pt;
+	}
+
+DIV.function P { margin-top:6pt; }
+
+.synopsys TT { 
+	font-size:12pt;font-family:monospace;
+	}
+

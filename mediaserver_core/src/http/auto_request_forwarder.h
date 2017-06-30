@@ -1,27 +1,23 @@
-/**********************************************************
-* Jul 28, 2015
-* a.kolesnikov
-***********************************************************/
-
-#ifndef NX_AUTO_REQUEST_FORWARDER_H
-#define NX_AUTO_REQUEST_FORWARDER_H
+#pragma once
 
 #include <core/resource/resource_fwd.h>
-#include <nx/network/auth_restriction_list.h>
-#include <nx/network/http/httptypes.h>
+#include <nx/network/http/auth_restriction_list.h>
+#include <nx/network/http/http_types.h>
+#include <common/common_module_aware.h>
 
 
 //!Forwards requests addressed to resources belonging to other servers
-class QnAutoRequestForwarder
+class QnAutoRequestForwarder: public QnCommonModuleAware
 {
 public:
+    QnAutoRequestForwarder(QnCommonModule* commonModule);
+
     //!Analyzes request and adds proxy information if needed
     void processRequest( nx_http::Request* const request );
 
     void addPathToIgnore(const QString& pathWildcardMask);
-
 private:
-    QnAuthMethodRestrictionList m_restrictionList;
+    nx_http::AuthMethodRestrictionList m_restrictionList;
 
     bool findCameraGuid(
         const nx_http::Request& request,
@@ -52,5 +48,3 @@ private:
         nx_http::Request* const request,
         const QnMediaServerResourcePtr& serverRes);
 };
-
-#endif  //NX_AUTO_REQUEST_FORWARDER_H

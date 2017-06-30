@@ -64,7 +64,7 @@ QnResourceCriterion::QnResourceCriterion(Qn::CameraCapabilities cameraCapabiliti
     m_customCriterion(NULL)
 {}
 
-QnResourceCriterion::QnResourceCriterion(Qn::PtzCapabilities ptzCapabilities, const char *propertyName, Operation matchOperation, Operation mismatchOperation):
+QnResourceCriterion::QnResourceCriterion(Ptz::Capabilities ptzCapabilities, const char *propertyName, Operation matchOperation, Operation mismatchOperation):
     m_matchOperation(matchOperation),
     m_mismatchOperation(mismatchOperation),
     m_nextOperation(Next),
@@ -236,7 +236,7 @@ QnResourceCriterion::Operation QnResourceCriterion::check(const QnResourcePtr &r
         if(value.userType() == QVariant::StringList) {
             if(value.toStringList().contains(m_targetValue.toString(), Qt::CaseInsensitive))
                 result = Accept;
-        } else if(value.userType() == QVariant::Int) {
+        } else if(value.canConvert(QVariant::Int)) {
             int mask = m_targetValue.toInt();
             if((value.toInt() & mask) == mask)
                 result = Accept;

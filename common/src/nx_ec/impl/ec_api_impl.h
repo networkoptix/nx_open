@@ -172,18 +172,22 @@ namespace ec2
             void onGetKvPairsDone               (int reqID, const ec2::ErrorCode, const ec2::ApiResourceParamWithRefDataList&);
             void onGetStatusListDone            (int reqID, const ec2::ErrorCode, const ec2::ApiResourceStatusDataList&);
             void onSaveKvPairsDone              (int reqID, const ec2::ErrorCode, const ec2::ApiResourceParamWithRefDataList&);
+            void onGetMiscParamDone             (int reqID, const ec2::ErrorCode, const ec2::ApiMiscData&);
             void onSaveBusinessRuleDone         (int reqID, const ec2::ErrorCode, const QnBusinessEventRulePtr&);
             void onGetServersDone               (int reqID, const ec2::ErrorCode, const ec2::ApiMediaServerDataList&);
-            void onGetServerUserAttributesDone  (int reqID, const ec2::ErrorCode, const QnMediaServerUserAttributesList&);
+            void onGetServerUserAttributesDone  (int reqID, const ec2::ErrorCode, const ec2::ApiMediaServerUserAttributesDataList&);
+            void onGetServersExDone             (int reqID, const ec2::ErrorCode, const ec2::ApiMediaServerDataExList&);
             void onGetStoragesDone              (int reqID, const ec2::ErrorCode, const ec2::ApiStorageDataList&);
             void onGetCamerasDone               (int reqID, const ec2::ErrorCode, const ec2::ApiCameraDataList&);
             void onGetCameraUserAttributesDone  (int reqID, const ec2::ErrorCode, const ec2::ApiCameraAttributesDataList&);
+            void onGetCamerasExDone             (int reqID, const ec2::ErrorCode, const ec2::ApiCameraDataExList&);
             void onGetCamerasHistoryDone        (int reqID, const ec2::ErrorCode, const ec2::ApiServerFootageDataList&);
             void onGetUsersDone                 (int reqID, const ec2::ErrorCode, const ec2::ApiUserDataList&);
             void onGetUserRolesDone             (int reqID, const ec2::ErrorCode, const ec2::ApiUserRoleDataList&);
             void onGetBusinessRulesDone         (int reqID, const ec2::ErrorCode, const QnBusinessEventRuleList&);
             void onGetLicensesDone              (int reqID, const ec2::ErrorCode, const QnLicenseList&);
             void onGetLayoutsDone               (int reqID, const ec2::ErrorCode, const ec2::ApiLayoutDataList&);
+            void onGetLayoutToursDone           (int reqID, const ec2::ErrorCode, const ec2::ApiLayoutTourDataList&);
             void onGetStoredFileDone            (int reqID, const ec2::ErrorCode, const QByteArray&);
             void onListDirectoryDone            (int reqID, const ec2::ErrorCode, const QStringList&);
             void onCurrentTimeDone              (int reqID, const ec2::ErrorCode, const qint64&);
@@ -217,11 +221,13 @@ namespace ec2
         DEFINE_TWO_ARG_HANDLER(GetKvPairs,                  ec2::ErrorCode, ec2::ApiResourceParamWithRefDataList)
         DEFINE_TWO_ARG_HANDLER(GetStatusList,               ec2::ErrorCode, ec2::ApiResourceStatusDataList)
         DEFINE_TWO_ARG_HANDLER(SaveKvPairs,                 ec2::ErrorCode, ec2::ApiResourceParamWithRefDataList)
+        DEFINE_TWO_ARG_HANDLER(GetMiscParam,                ec2::ErrorCode, ec2::ApiMiscData)
 
         //////////////////////////////////////////////////////////
         ///////// Handlers for AbstractMediaServerManager
         //////////////////////////////////////////////////////////
         DEFINE_TWO_ARG_HANDLER(GetServers,                  ec2::ErrorCode, ec2::ApiMediaServerDataList)
+        DEFINE_TWO_ARG_HANDLER(GetServersEx,                ec2::ErrorCode, ec2::ApiMediaServerDataExList)
         DEFINE_TWO_ARG_HANDLER(GetServerUserAttributes,     ec2::ErrorCode, ec2::ApiMediaServerUserAttributesDataList)
         DEFINE_TWO_ARG_HANDLER(GetStorages,                 ec2::ErrorCode, ec2::ApiStorageDataList)
 
@@ -229,6 +235,7 @@ namespace ec2
         ///////// Handlers for AbstractCameraManager
         //////////////////////////////////////////////////////////
         DEFINE_TWO_ARG_HANDLER(GetCameras,                  ec2::ErrorCode, ec2::ApiCameraDataList)
+        DEFINE_TWO_ARG_HANDLER(GetCamerasEx,                ec2::ErrorCode, ec2::ApiCameraDataExList)
         DEFINE_TWO_ARG_HANDLER(GetCameraUserAttributes,     ec2::ErrorCode, ec2::ApiCameraAttributesDataList)
         DEFINE_TWO_ARG_HANDLER(GetCamerasHistory,           ec2::ErrorCode, ec2::ApiServerFootageDataList)
 
@@ -236,6 +243,9 @@ namespace ec2
         ///////// Handlers for AbstractLayoutManager
         //////////////////////////////////////////////////////////
         DEFINE_TWO_ARG_HANDLER(GetLayouts,                  ec2::ErrorCode, ec2::ApiLayoutDataList)
+
+        // Handlers for AbstractLayoutTourManager.
+        DEFINE_TWO_ARG_HANDLER(GetLayoutTours, ec2::ErrorCode, ec2::ApiLayoutTourDataList)
 
         //////////////////////////////////////////////////////////
         ///////// Handlers for AbstractVideowallManager

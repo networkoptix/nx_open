@@ -6,35 +6,35 @@
 #include <nx/utils/std/cpp14.h>
 #include "nx_ec/data/api_conversion_functions.h"
 #include "transaction/transaction_message_bus.h"
-
+#include "connection_factory.h"
 
 namespace ec2
 {
-    Ec2DirectConnection::Ec2DirectConnection(ServerQueryProcessorAccess *queryProcessor,
+    Ec2DirectConnection::Ec2DirectConnection(
+        const Ec2DirectConnectionFactory* connectionFactory,
+        ServerQueryProcessorAccess *queryProcessor,
         const QnConnectionInfo& connectionInfo,
         const QUrl& dbUrl)
     :
-        BaseEc2Connection<ServerQueryProcessorAccess>( queryProcessor ),
-        m_transactionLog( new QnTransactionLog(detail::QnDbManager::instance()) ),
+        BaseEc2Connection<ServerQueryProcessorAccess>( connectionFactory, queryProcessor ),
         m_connectionInfo( connectionInfo ),
         m_isInitialized( false )
     {
-        m_isInitialized = detail::QnDbManager::instance()->init(dbUrl);
+        // todo: #singletone. Only one connection for each connection factory allowed now
+        m_isInitialized = queryProcessor->getDb()->init(dbUrl);
 
-        QnTransactionMessageBus::instance()->setHandler( notificationManager() );
+        connectionFactory->messageBus()->setHandler(notificationManager());
 
         // NOTE: Ec2StaticticsReporter can only be created after connection is established
         if (m_isInitialized)
         {
-            m_staticticsReporter = std::make_unique<Ec2StaticticsReporter>(
-                getMediaServerManager(Qn::kSystemAccess));
+            m_staticticsReporter = std::make_unique<Ec2StaticticsReporter>(this);
         }
     }
 
     Ec2DirectConnection::~Ec2DirectConnection()
     {
-        if (QnTransactionMessageBus::instance())
-            QnTransactionMessageBus::instance()->removeHandler( notificationManager() );
+        m_connectionFactory->messageBus()->removeHandler(notificationManager());
     }
 
     QnConnectionInfo Ec2DirectConnection::connectionInfo() const
@@ -42,9 +42,9 @@ namespace ec2
         return m_connectionInfo;
     }
 
-    QString Ec2DirectConnection::authInfo() const
+    void Ec2DirectConnection::updateConnectionUrl(const QUrl& /*url*/)
     {
-        return QString();
+        NX_EXPECT(false, "Should never get here");
     }
 
     bool Ec2DirectConnection::initialized() const
@@ -56,4 +56,21 @@ namespace ec2
     {
         return m_staticticsReporter.get();
     }
+
+    Timestamp Ec2DirectConnection::getTransactionLogTime() const
+    {
+        auto transactionLog = m_queryProcessor->getDb()->transactionLog();
+        NX_ASSERT(transactionLog);
+        return transactionLog ? transactionLog->getTransactionLogTime() : Timestamp();
+    }
+
+    void Ec2DirectConnection::setTransactionLogTime(Timestamp value)
+    {
+        NX_ASSERT(m_queryProcessor->getDb());
+        auto transactionLog = m_queryProcessor->getDb()->transactionLog();
+        if (transactionLog)
+            transactionLog->setTransactionLogTime(value);
+    }
+
+
 }

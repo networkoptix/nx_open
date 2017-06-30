@@ -1,0 +1,435 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>Building a Unit Selection Cluster Voice</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REL="HOME"
+TITLE="Building Synthetic Voices"
+HREF="book1.html"><LINK
+REL="UP"
+TITLE="Unit selection databases"
+HREF="c2641.html"><LINK
+REL="PREVIOUS"
+TITLE="Unit selection databases"
+HREF="c2641.html"><LINK
+REL="NEXT"
+TITLE="Diphones from general databases"
+HREF="x3144.html"></HEAD
+><BODY
+CLASS="SECT1"
+BGCOLOR="#FFFFFF"
+TEXT="#000000"
+LINK="#0000FF"
+VLINK="#840084"
+ALINK="#0000FF"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="3"
+ALIGN="center"
+>Building Synthetic Voices</TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="bottom"
+><A
+HREF="c2641.html"
+ACCESSKEY="P"
+>&#60;&#60;&#60; Previous</A
+></TD
+><TD
+WIDTH="80%"
+ALIGN="center"
+VALIGN="bottom"
+>Unit selection databases</TD
+><TD
+WIDTH="10%"
+ALIGN="right"
+VALIGN="bottom"
+><A
+HREF="x3144.html"
+ACCESSKEY="N"
+>Next &#62;&#62;&#62;</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="SECT1"
+><H1
+CLASS="SECT1"
+><A
+NAME="AEN3082"
+>Building a Unit Selection Cluster Voice</A
+></H1
+><P
+> 
+
+The previous section gives the low level details ofin
+the building of a cluster unit selection voice.  This section
+gives a higher level view with explict command that you 
+should run.
+
+The steps involved in building a unit selection voices are basically
+the same as that for building a limited domain voice (<A
+HREF="c941.html"
+>the Chapter called <I
+>Limited domain synthesis</I
+></A
+>).  Though in for general voices, in constrast
+to ldom voice, it is much more important to get all parts correct,
+from pitchmarks to labeling.&#13;</P
+><P
+>The following tasks are required: 
+<P
+></P
+><UL
+><LI
+STYLE="list-style-type: disc"
+><P
+>Read and understand all the issues regarding the following
+steps</P
+></LI
+><LI
+STYLE="list-style-type: disc"
+><P
+>Design the prompts</P
+></LI
+><LI
+STYLE="list-style-type: disc"
+><P
+>Record the prompts</P
+></LI
+><LI
+STYLE="list-style-type: disc"
+><P
+>Autolabel the prompts</P
+></LI
+><LI
+STYLE="list-style-type: disc"
+><P
+>Build utterance structures for recorded utterances</P
+></LI
+><LI
+STYLE="list-style-type: disc"
+><P
+>Extract pitchmark and build LPC coefficients</P
+></LI
+><LI
+STYLE="list-style-type: disc"
+><P
+>Building a clunit based synthesizer from the utterances</P
+></LI
+><LI
+STYLE="list-style-type: disc"
+><P
+>Testing and tuning</P
+></LI
+></UL
+></P
+><P
+>The following are the commands that you must type (assuming all the
+other hardwork has been done beforehand.  It is assume that the
+environment variables <TT
+CLASS="FILENAME"
+>FESTVOXDIR</TT
+> and
+<TT
+CLASS="FILENAME"
+>ESTDIR</TT
+> have been set to point to their respective
+directories.  For example as
+<A
+NAME="AEN3109"
+></A
+><BLOCKQUOTE
+CLASS="BLOCKQUOTE"
+><P
+CLASS="LITERALLAYOUT"
+>export&nbsp;FESTVOXDIR=/home/awb/projects/festvox<br>
+export&nbsp;ESTDIR=/home/awb/projects/1.4.3/speech_tools</P
+></BLOCKQUOTE
+>
+Next you must select a name for the voice, by convention we use
+three part names consisting of a institution name, a language, and
+a speaker.  Make a directory of that name and change directory into it
+<A
+NAME="AEN3111"
+></A
+><BLOCKQUOTE
+CLASS="BLOCKQUOTE"
+><P
+CLASS="LITERALLAYOUT"
+>mkdir&nbsp;cmu_us_awb<br>
+cd&nbsp;cmu_us_awb</P
+></BLOCKQUOTE
+>
+There is a basic set up script that will construct the directory
+structure and copy in the template files for voice building.
+If a fourth argument is given, it can be name
+one of the standard prompts list.</P
+><P
+>For example the simplest is
+<TT
+CLASS="FILENAME"
+>uniphone</TT
+>.  This contains three sentences which
+contain each of the US English phonemes once (if spoken appropriately).
+This prompt set is hopelessly minimal for any high quality synthesis
+but allows us to illustrate the process and allow you to build a voice
+quickly.
+<A
+NAME="AEN3115"
+></A
+><BLOCKQUOTE
+CLASS="BLOCKQUOTE"
+><P
+CLASS="LITERALLAYOUT"
+>$FESTVOXDIR/src/unitsel/setup_clunits&nbsp;cmu&nbsp;us&nbsp;awb&nbsp;uniphone</P
+></BLOCKQUOTE
+>
+Alternatively you can copy in a prompt list into the etc directory.
+The format of these should be in the standard "data" format 
+as in
+<A
+NAME="AEN3117"
+></A
+><BLOCKQUOTE
+CLASS="BLOCKQUOTE"
+><P
+CLASS="LITERALLAYOUT"
+>(&nbsp;uniph_0001&nbsp;"a&nbsp;whole&nbsp;joy&nbsp;was&nbsp;reaping."&nbsp;)<br>
+(&nbsp;uniph_0002&nbsp;"but&nbsp;they've&nbsp;gone&nbsp;south."&nbsp;)<br>
+(&nbsp;uniph_0003&nbsp;"you&nbsp;should&nbsp;fetch&nbsp;azure&nbsp;mike."&nbsp;)</P
+></BLOCKQUOTE
+>
+
+Note the spaces after the initial left parenthesis are significant,
+and double quotes and backslashes within the quote part must be
+escaped (with backslash) as is common in Perl or Festival itself.&#13;</P
+><P
+>&#13;The next stage is to generate waveforms to act as prompts, or timing
+cues even if the prompts are not actually played.  The files are also
+used in aligning the spoken data.
+
+<A
+NAME="AEN3120"
+></A
+><BLOCKQUOTE
+CLASS="BLOCKQUOTE"
+><P
+CLASS="LITERALLAYOUT"
+>festival&nbsp;-b&nbsp;festvox/build_clunits.scm&nbsp;'(build_prompts&nbsp;"etc/uniphone.data")'</P
+></BLOCKQUOTE
+>
+
+Use whatever prompt file you are intending to use.  Note that you may
+want to add lexical entries to
+<TT
+CLASS="FILENAME"
+>festvox/WHATEVER_lexicon.scm</TT
+> and other text
+analysis things as desired.  The purpose is that the prompt files
+match the phonemes that the voice talent will actually say.&#13;</P
+><P
+>You may now record, assuming you have prepared the recording studio,
+gotten written permission to record your speaker (and explained
+to them what the resulting voice might be used for), checked recording
+levels and sound levels and shield the electrical equipment as
+much as possible.
+<A
+NAME="AEN3124"
+></A
+><BLOCKQUOTE
+CLASS="BLOCKQUOTE"
+><P
+CLASS="LITERALLAYOUT"
+>./bin/prompt_them&nbsp;etc/uniphone.data</P
+></BLOCKQUOTE
+>
+After recording the recorded files should be in <TT
+CLASS="FILENAME"
+>wav/</TT
+>.
+It is wise to check that the are actually there and sound like you expected.
+Getting the recording quality as high as possible is fundamental to
+the success of building a voice.</P
+><P
+>Now we must label the spoken prompts.  We do this my matching
+the synthesized prompts with the spoken ones.  As we know where the
+phonemes begin and end in the synthesized prompts we can then map
+that onto the spoken ones and find the phoneme segments.  This
+technique works fairly well, but it is far from perfect and it 
+is worthwhile to at least check the result, and most probably fix
+the result by hand.
+<A
+NAME="AEN3128"
+></A
+><BLOCKQUOTE
+CLASS="BLOCKQUOTE"
+><P
+CLASS="LITERALLAYOUT"
+>./bin/make_labs&nbsp;prompt-wav/*.wav</P
+></BLOCKQUOTE
+>
+Especially in the case of the uniphone synthesizer, where there is
+one and only one occurrence of each phone they all must be correct
+so its important to check the labels by hand.  Note for
+large collections you may find the full Sphinx based labeling
+technique better <A
+HREF="x3272.html"
+>the Section called <I
+>Labeling with Full Acoustic Models</I
+> in the Chapter called <I
+>Labeling Speech</I
+></A
+>).</P
+><P
+>After labeling we can build the utterance structure using the prompt
+list and the now labeled phones and durations.
+<A
+NAME="AEN3132"
+></A
+><BLOCKQUOTE
+CLASS="BLOCKQUOTE"
+><P
+CLASS="LITERALLAYOUT"
+>festival&nbsp;-b&nbsp;festvox/build_clunits.scm&nbsp;'(build_utts&nbsp;"etc/uniphone.data")'</P
+></BLOCKQUOTE
+></P
+><P
+>The next stages are concerned with signal analysis, specifically pitch
+marking and cepstral parameter extraction.  There are a number of
+methods for pitch mark extraction and a number of parameters within
+these files that may need tuning.  Good pitch periods are important.
+See <A
+HREF="x862.html"
+>the Section called <I
+>Extracting pitchmarks from waveforms</I
+> in the Chapter called <I
+>Basic Requirements</I
+></A
+> .  In its simplest
+case the follow may work
+<A
+NAME="AEN3136"
+></A
+><BLOCKQUOTE
+CLASS="BLOCKQUOTE"
+><P
+CLASS="LITERALLAYOUT"
+>./bin/make_pm_wave&nbsp;wav/*.wav</P
+></BLOCKQUOTE
+></P
+><P
+>The next stage it find the Mel Frequency Cepstral Coefficents.  This
+is done pitch synchronously and hence depends on the pitch periods extracted
+above.  These are used for clustering and for join measurements.
+<A
+NAME="AEN3139"
+></A
+><BLOCKQUOTE
+CLASS="BLOCKQUOTE"
+><P
+CLASS="LITERALLAYOUT"
+>./bin/make_mcep&nbsp;wav/*.wav</P
+></BLOCKQUOTE
+></P
+><P
+>Now we can do the main part of the build, building the cluster unit
+selection synthesizer.  This consists of a number os
+stages all based on the controlling Festival script.  The
+parameters of which are described above.
+<A
+NAME="AEN3142"
+></A
+><BLOCKQUOTE
+CLASS="BLOCKQUOTE"
+><P
+CLASS="LITERALLAYOUT"
+>festival&nbsp;-b&nbsp;festvox/build_clunits.scm&nbsp;'(build_clunits&nbsp;"etc/uniphone.data")'</P
+></BLOCKQUOTE
+>
+For large databases this can take some time to run as there is a 
+squared aspect to this based on the number of instances of 
+each unit type.</P
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="c2641.html"
+ACCESSKEY="P"
+>&#60;&#60;&#60; Previous</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="book1.html"
+ACCESSKEY="H"
+>Home</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="x3144.html"
+ACCESSKEY="N"
+>Next &#62;&#62;&#62;</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>Unit selection databases</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="c2641.html"
+ACCESSKEY="U"
+>Up</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>Diphones from general databases</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

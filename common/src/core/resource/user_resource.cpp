@@ -6,18 +6,20 @@
 
 #include <utils/common/synctime.h>
 #include <core/resource_management/resource_properties.h>
+#include <utils/crypt/symmetrical.h>
+#include <common/common_module.h>
+#include "resource.h"
 
 namespace {
     static const int LDAP_PASSWORD_PROLONGATION_PERIOD_SEC = 5 * 60;
     static const int MSEC_PER_SEC = 1000;
 }
 
-
 const QnUuid QnUserResource::kAdminGuid("99cbc715-539b-4bfe-856f-799b45b69b1e");
 
 QnUserResource::QnUserResource(QnUserType userType):
     m_userType(userType),
-    m_realm(QnAppInfo::realm()),
+    m_realm(nx::network::AppInfo::realm()),
     m_permissions(0),
     m_userRoleId(),
     m_isOwner(false),
@@ -113,13 +115,24 @@ void QnUserResource::setPassword(const QString& password)
     emit passwordChanged(::toSharedPointer(this));
 }
 
+QString QnUserResource::decodeLDAPPassword() const
+{
+    QList<QByteArray> parts = getHash().split('$');
+    if (parts.size() != 3 || parts[0] != "LDAP")
+        return QString();
+
+    QByteArray salt = QByteArray::fromHex(parts[1]);
+    QByteArray encodedPassword = QByteArray::fromHex(parts[2]);
+    return QString::fromUtf8(nx::utils::encodeSimple(encodedPassword, salt));
+}
+
 void QnUserResource::generateHash()
 {
     QString password = getPassword();
     if (password.isEmpty())
         return;
 
-    auto hashes = PasswordData::calculateHashes(getName(), password);
+    auto hashes = PasswordData::calculateHashes(getName(), password, isLdap());
 
     setRealm(hashes.realm);
     setHash(hashes.passwordHash);
@@ -297,7 +310,9 @@ void QnUserResource::setEmail(const QString& email)
 
 QString QnUserResource::fullName() const
 {
-    QString result = propertyDictionary->value(getId(), Qn::USER_FULL_NAME);
+    QString result;
+    if (commonModule())
+        result = commonModule()->propertyDictionary()->value(getId(), Qn::USER_FULL_NAME);
     QnMutexLocker locker(&m_mutex);
     return result.isNull() ? m_fullName : result;
 }
@@ -305,7 +320,9 @@ QString QnUserResource::fullName() const
 ec2::ApiResourceParamWithRefDataList QnUserResource::params() const
 {
     ec2::ApiResourceParamWithRefDataList result;
-    QString value = propertyDictionary->value(getId(), Qn::USER_FULL_NAME);
+    QString value;
+    if (commonModule())
+        value = commonModule()->propertyDictionary()->value(getId(), Qn::USER_FULL_NAME);
     if (value.isEmpty() && !fullName().isEmpty() && isCloud())
         value = fullName(); //< move fullName to property dictionary to sync data with cloud correctly
     if (!value.isEmpty())

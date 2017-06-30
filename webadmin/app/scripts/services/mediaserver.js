@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('webadminApp')
-    .factory('mediaserver', function ($http, $modal, $q, $localStorage, $location, $log, nativeClient) {
+    .factory('mediaserver', function ($http, $modal, $q, $localStorage, $location, $log, nativeClient, systemAPI) {
 
         var mediaserver = {};
         var cacheModuleInfo = null;
@@ -15,9 +15,6 @@ angular.module('webadminApp')
                 var pair = params[i].split('=');
                 if(pair[0] === 'proxy'){
                     proxy = '/web/proxy/' + pair[1];
-                    if(pair[1] === 'demo'){
-                        proxy = Config.demo;
-                    }
                     break;
                 }
             }
@@ -202,7 +199,7 @@ angular.module('webadminApp')
 
                 return auth;
             },
-            login:function(login,password){
+            login:function(login, password){
                 login = login.toLowerCase();
                 var self = this;
 
@@ -236,6 +233,7 @@ angular.module('webadminApp')
                             $localStorage.auth = auth;
                             $localStorage.authRtsp = authRtsp;
 
+                            systemAPI.setAuthKeys(auth, null, authRtsp);
                             $log.log("Login3: cookieLogin success!");
                             return data.data.reply;
                         });
@@ -245,12 +243,6 @@ angular.module('webadminApp')
             },
             url:function(){
                 return proxy;
-            },
-            mediaDemo:function(){
-                if(proxy === Config.demo){
-                    return Config.demoMedia;
-                }
-                return false;
             },
             logUrl:function(params){
                 return proxy + '/web/api/showLog' + (params||'');
@@ -262,18 +254,6 @@ angular.module('webadminApp')
                 return $localStorage.authRtsp; // auth_rtsp
             },
 
-            previewUrl:function(cameraPhysicalId,time,width,height){
-                if( Config.allowDebugMode) { //TODO: remove this hack later!
-                    return '';
-                }
-
-                return proxy + '/web/api/image' +
-                    '?physicalId=' + cameraPhysicalId +
-                    (width? '&width=' + width:'') +
-                    (height? '&height=' + height:'') +
-                    ('&time=' + (time || 'LATEST')); // mb LATEST?
-
-            },
             hasProxy:function(){
                 return proxy !=='';
             },
@@ -442,20 +422,10 @@ angular.module('webadminApp')
             getStorages: function(){ return wrapGet(proxy + '/web/api/storageSpace'); },
             saveStorages:function(info){return wrapPost(proxy + '/web/ec2/saveStorages',info); },
             discoveredPeers:function(){return wrapGet(proxy + '/web/api/discoveredPeers?showAddresses=true'); },
-            getMediaServer: function(id){return wrapGet(proxy + '/web/ec2/getMediaServersEx?id=' + id.replace('{','').replace('}','')); },
-            getMediaServers: function(){return wrapGet(proxy + '/web/ec2/getMediaServersEx'); },
-            getResourceTypes:function(){return wrapGet(proxy + '/web/ec2/getResourceTypes'); },
 
             getLayouts:function(){return wrapGet(proxy + '/web/ec2/getLayouts'); },
             getUsers:function(){return wrapGet(proxy + '/web/ec2/getUsers'); },
 
-            getCameras:function(id){
-                if(typeof(id)!=='undefined'){
-                    return wrapGet(proxy + '/web/ec2/getCamerasEx?id=' + id.replace('{','').replace('}',''));
-                }
-                return wrapGet(proxy + '/web/ec2/getCamerasEx');
-            },
-            saveMediaServer: function(info){return wrapPost(proxy + '/web/ec2/saveMediaServer',info); },
             statistics:function(url){
                 url = url || proxy;
                 return wrapGet(url + '/web/api/statistics?salt=' + (new Date()).getTime());
@@ -465,9 +435,6 @@ angular.module('webadminApp')
                     cacheCurrentUser = wrapGet(proxy + '/web/api/getCurrentUser');
                 }
                 return cacheCurrentUser;
-            },
-            getTime:function(){
-                return wrapGet(proxy + '/web/api/gettime?local');
             },
             getTimeZones:function(){
                 return wrapGet(proxy + '/web/api/getTimeZones');
@@ -502,50 +469,7 @@ angular.module('webadminApp')
                     cloudAccountName: cloudAccountName
                 });
             },
-            /*
-            // This method is not used anymore
-            clearCloudSystemCredentials: function(){
-                return wrapPost(proxy + '/web/api/saveCloudSystemCredentials',{
-                    reset: true
-                });
-            },
-            */
-            getRecords:function(serverUrl, physicalId, startTime, endTime, detail, limit, label, periodsType){
 
-                //console.log('getRecords',serverUrl,physicalId,startTime,endTime,detail,periodsType);
-                var d = new Date();
-                if(typeof(startTime)==='undefined'){
-                    startTime = d.getTime() - 30*24*60*60*1000;
-                }
-                if(typeof(endTime)==='undefined'){
-                    endTime = d.getTime() + 100*1000;
-                }
-                if(typeof(detail)==='undefined'){
-                    detail = (endTime - startTime) / 1000;
-                }
-
-                if(typeof(periodsType)==='undefined'){
-                    periodsType = 0;
-                }
-
-                if(serverUrl !== '/' && serverUrl !== '' && serverUrl !== null){
-                    serverUrl = '/web/proxy/'+ serverUrl + '/';
-                }
-                if( proxy === Config.demo){
-                    serverUrl = proxy + '/';
-                }
-
-                //RecordedTimePeriods
-                return  wrapGet(serverUrl + 'ec2/recordedTimePeriods' +
-                    '?' + (label||'') +
-                    '&physicalId=' + physicalId +
-                    '&startTime=' + startTime +
-                    '&endTime=' + endTime +
-                    '&detail=' + detail +
-                    '&periodsType=' + periodsType +
-                    (limit?'&limit=' + limit:'') +
-                    '&flat&keepSmallChunks');
-            },
             debugFunctionUrl:function(url,getParams){
                 var delimeter = url.indexOf('?')>=0? '&':'?';
                 return proxy + url + delimeter + $.param(getParams);

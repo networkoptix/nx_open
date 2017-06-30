@@ -11,7 +11,7 @@
 class QnMServerAuditManager: public QnAuditManager
 {
 public:
-    QnMServerAuditManager();
+    QnMServerAuditManager(QObject* parent);
     ~QnMServerAuditManager();
 protected:
     virtual int addAuditRecordInternal(const QnAuditRecord& record) override;

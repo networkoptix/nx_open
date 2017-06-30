@@ -67,14 +67,17 @@
                 <Directory Id="ServerPlugins" Name="plugins">
                     <Component Id="ServerRtspPlugin">
                         <File Id="genericrtspplugin.dll" Name="genericrtspplugin.dll" Source="$(var.PluginsDir)\genericrtspplugin.dll" DiskId="10" />
-                    </Component>                    
+                    </Component>
                     <Component Id="ServerHttpPlugin">
                         <File Id="mjpg_link.dll" Name="mjpg_link.dll" Source="$(var.PluginsDir)\mjpg_link.dll" DiskId="10" />
+                    </Component> 
+                    <Component Id="ServerMulticastPlugin">
+                        <File Id="generic_multicast_plugin.dll" Name="generic_multicast_plugin.dll" Source="$(var.PluginsDir)\generic_multicast_plugin.dll" DiskId="10" />
                     </Component>                                              
                 </Directory>
 
-                <Directory Id="$(var.customization)ServerVoxDir" Name="vox"/>                                                
-                
+                <Directory Id="$(var.customization)ServerVoxDir" Name="vox"/>
+
                 <Component Id="ServerSigar">
                     <File Id="sigar.dll" Name="sigar.dll" Source="$(var.SourceDir)\sigar.dll" DiskId="6" />
                 </Component>
@@ -105,7 +108,10 @@
             <Component>
                 <File Id="udt.dll" Name="udt.dll" Source="$(var.SourceDir)/udt.dll" DiskId="4" />
             </Component>
-        </ComponentGroup>    
+            <Component>
+                <File Id="nx_kit.dll" Name="nx_kit.dll" Source="$(var.SourceDir)/nx_kit.dll" DiskId="4" />
+            </Component>
+        </ComponentGroup>
 
         <!-- Component groups -->
         <ComponentGroup Id="ServerFFmpegLibraries" Directory="${customization}MediaServerDir">
@@ -129,7 +135,7 @@
             </Component>
             <Component>
                 <File Id="swresample.dll" Name="swresample-2.dll" Source="$(var.SourceDir)/swresample-2.dll" DiskId="3"/>
-            </Component>               
+            </Component>
             <Component>
                 <File Id="libogg.dll" Name="libogg.dll" Source="$(var.SourceDir)/libogg.dll" DiskId="3"/>
             </Component>
@@ -145,8 +151,8 @@
             <Component>
                 <File Id="ServerWebData" Name="external.dat" Source="$(var.SourceDir)/external.dat" DiskId="10" />
             </Component>
-        </ComponentGroup>            
-        
+        </ComponentGroup>
+
         <ComponentGroup Id="ServerQTLibraries" Directory="${customization}MediaServerDir">
             <Component>
                 <File Id="Qt5Core.dll" Name="Qt5Core.dll" Source="$(var.QtDir)\Qt5Core.dll" DiskId="7"/>
@@ -155,8 +161,8 @@
                 <File Id="Qt5Gui.dll" Name="Qt5Gui.dll" Source="$(var.QtDir)\Qt5Gui.dll" DiskId="7"/>
             </Component>
             <Component>
-                <File Id="Qt5Concurrent.dll" Name="Qt5Concurrent.dll" Source="$(var.QtDir)\Qt5Concurrent.dll" DiskId="8" />                
-            </Component>              
+                <File Id="Qt5Concurrent.dll" Name="Qt5Concurrent.dll" Source="$(var.QtDir)\Qt5Concurrent.dll" DiskId="8" />
+            </Component>
             <Component>
                 <File Id="Qt5Multimedia.dll" Name="Qt5Multimedia.dll" Source="$(var.QtDir)\Qt5Multimedia.dll" DiskId="8" />
             </Component>
@@ -172,23 +178,26 @@
             <Component>
                 <File Id="Qt5Sql.dll" Name="Qt5Sql.dll" Source="$(var.QtDir)\Qt5Sql.dll" DiskId="8"/>
             </Component>
-            
             <Component>
-                <File Id="icudt58.dll" Name="icudt58.dll" Source="$(var.QtDir)\icudt58.dll" DiskId="5" />                
-            </Component>                 
+                <File Id="Qt5WebSockets.dll" Name="Qt5WebSockets.dll" Source="$(var.QtDir)\Qt5WebSockets.dll" DiskId="8"/>
+            </Component>
+
             <Component>
-                <File Id="icuin58.dll" Name="icuin58.dll" Source="$(var.QtDir)\icuin58.dll" DiskId="5" />                
-            </Component>                 
+                <File Id="icudt58.dll" Name="icudt58.dll" Source="$(var.QtDir)\icudt58.dll" DiskId="5" />
+            </Component>
             <Component>
-                <File Id="icuuc58.dll" Name="icuuc58.dll" Source="$(var.QtDir)\icuuc58.dll" DiskId="5" />                
-            </Component>                 
+                <File Id="icuin58.dll" Name="icuin58.dll" Source="$(var.QtDir)\icuin58.dll" DiskId="5" />
+            </Component>
+            <Component>
+                <File Id="icuuc58.dll" Name="icuuc58.dll" Source="$(var.QtDir)\icuuc58.dll" DiskId="5" />
+            </Component>
         </ComponentGroup>
-        
+
         <ComponentGroup Id="ServerQuazip" Directory="${customization}MediaServerDir">
             <Component>
-                <File Id="quazip.dll" Name="quazip.dll" Source="$(var.SourceDir)\quazip.dll" DiskId="6" />                
+                <File Id="quazip.dll" Name="quazip.dll" Source="$(var.SourceDir)\quazip.dll" DiskId="6" />
             </Component>
-        </ComponentGroup>          
+        </ComponentGroup>
 
         <ComponentGroup Id="ServerOpenSSL" Directory="${customization}MediaServerDir">
             <Component>
@@ -207,7 +216,7 @@
             <Component>
                 <File Id="VmaxProxyPid.dat" Name="pid.dat" Source="$(var.SourceDir)/vmaxproxy/pid.dat" DiskId="10"/>
             </Component>
-        </ComponentGroup>                            
+        </ComponentGroup>
         <?endif?>
 
         <Feature Id="ServerFeature" Title="${display.product.name} Media Server" Level="1"
@@ -224,22 +233,24 @@
             <ComponentGroupRef Id="ServerFFmpegLibraries"/>
             <ComponentRef Id="ServerRtspPlugin"/>
             <ComponentRef Id="ServerHttpPlugin"/>
+            <ComponentRef Id="ServerMulticastPlugin"/>
             <ComponentGroupRef Id="ServerQTLibraries" />
             <ComponentGroupRef Id="ServerQuazip" />
             <ComponentGroupRef Id="ServerOpenSSL"/>
-            <ComponentGroupRef Id="ServerVoxComponent"/>            
+            <ComponentGroupRef Id="ServerVoxComponent"/>
             <ComponentRef Id="ServerSigar"/>
 
 
-            <?if $(var.vmax) = true?>   
+            <?if $(var.vmax) = true?>
             <ComponentRef Id="vmaxproxy.exe"/>
             <ComponentRef Id="VmaxProxyQTLibraries"/>
             <ComponentGroupRef Id="VmaxProxySDK"/>
-            <?endif?>       
+            <?endif?>
 
             <ComponentRef Id="traytool.exe"/>
             <ComponentGroupRef Id="TrayToolLibs"/>
             <ComponentGroupRef Id="TrayToolQTLibraries"/>
+            <ComponentGroupRef Id="TrayToolOpenSSL"/>
             <ComponentGroupRef Id="ServerVcrt14ComponentGroup"/>
             <ComponentGroupRef Id="TraytoolPlatforms" />
             <ComponentGroupRef Id="TraytoolVcrt14ComponentGroup"/>

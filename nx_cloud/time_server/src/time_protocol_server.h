@@ -8,9 +8,10 @@ namespace nx {
 namespace time_server {
 
 class TimeProtocolServer:
-    public StreamSocketServer<TimeProtocolServer, TimeProtocolConnection>
+    public network::server::StreamSocketServer<TimeProtocolServer, TimeProtocolConnection>
 {
-    typedef StreamSocketServer<TimeProtocolServer, TimeProtocolConnection> base_type;
+    using base_type = 
+        network::server::StreamSocketServer<TimeProtocolServer, TimeProtocolConnection>;
 
 public:
     TimeProtocolServer(

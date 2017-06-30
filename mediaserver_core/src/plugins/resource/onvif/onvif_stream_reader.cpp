@@ -12,7 +12,7 @@
 #include "nx/utils/log/log.h"
 #include <utils/common/sleep.h>
 #include <utils/common/synctime.h>
-#include <nx/network/http/httptypes.h>
+#include <nx/network/http/http_types.h>
 #include <utils/media/nalUnits.h>
 #include <utils/common/app_info.h>
 #include <network/tcp_connection_priv.h>
@@ -21,6 +21,7 @@
 #include <core/resource/resource_data_structures.h>
 #include <core/resource/param.h>
 #include <core/resource_management/resource_properties.h>
+#include <common/static_common_module.h>
 
 static const int MAX_CAHCE_URL_TIME = 1000 * 300;
 
@@ -91,7 +92,7 @@ CameraDiagnostics::Result QnOnvifStreamReader::openStreamInternal(bool isCameraC
 
     postStreamConfigureHook();
 
-    auto resData = qnCommon->dataPool()->data(m_onvifRes);
+    auto resData = qnStaticCommon->dataPool()->data(m_onvifRes);
     if (resData.contains(Qn::PREFERRED_AUTH_SCHEME_PARAM_NAME))
     {
         auto authScheme = nx_http::header::AuthScheme::fromString(
@@ -304,7 +305,7 @@ void QnOnvifStreamReader::printProfile(const Profile& profile, bool isPrimary) c
 
 bool QnOnvifStreamReader::executePreConfigurationRequests()
 {
-    auto resData = qnCommon->dataPool()->data(m_onvifRes);
+    auto resData = qnStaticCommon->dataPool()->data(m_onvifRes);
 
     auto requests = resData.value<QnHttpConfigureRequestList>(
         Qn::PRE_SRTEAM_CONFIGURE_REQUESTS_PARAM_NAME);
@@ -341,7 +342,7 @@ bool QnOnvifStreamReader::executePreConfigurationRequests()
 void QnOnvifStreamReader::updateVideoEncoder(VideoEncoder& encoder, bool isPrimary, const QnLiveStreamParams& params) const
 {
 
-    auto resData = qnCommon->dataPool()->data(m_onvifRes);
+    auto resData = qnStaticCommon->dataPool()->data(m_onvifRes);
     bool useEncodingInterval = resData.value<bool>
         (Qn::CONTROL_FPS_VIA_ENCODING_INTERVAL_PARAM_NAME);
 
@@ -558,7 +559,7 @@ CameraDiagnostics::Result QnOnvifStreamReader::fetchUpdateProfile(
     ProfilesReq request;
     ProfilesResp response;
 
-    auto resData = qnCommon->dataPool()->data(m_onvifRes);
+    auto resData = qnStaticCommon->dataPool()->data(m_onvifRes);
     bool useExistingProfiles = resData.value<bool>(
         Qn::USE_EXISTING_ONVIF_PROFILES_PARAM_NAME);
 

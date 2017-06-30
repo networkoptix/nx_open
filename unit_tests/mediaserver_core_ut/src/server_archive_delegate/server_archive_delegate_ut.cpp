@@ -36,7 +36,8 @@ extern "C" {
 #include <cmath>
 #include <stdio.h>
 
-#include "../utils.h"
+#include <test_support/utils.h>
+#include "media_server/media_server_module.h"
 
 const QString cameraFolder("camera");
 const QString lqFolder("low_quality");
@@ -47,13 +48,17 @@ class TestHelper
    static const int DEFAULT_TIME_GAP_MS = 15001;
 
 public:
-    TestHelper(QStringList &&paths, int fileCount)
-        : m_storageUrls(std::move(paths)),
-          m_timeLine(DEFAULT_TIME_GAP_MS),
-          m_fileCount(fileCount)
+    TestHelper(
+        QnCommonModule* commonModule,
+        QStringList &&paths,
+        int fileCount)
+    :
+        m_storageUrls(std::move(paths)),
+        m_timeLine(DEFAULT_TIME_GAP_MS),
+        m_fileCount(fileCount)
     {
         generateTestData();
-        createStorages();
+        createStorages(commonModule);
         loadMedia();
     }
 
@@ -294,7 +299,7 @@ private:
             pathString = lit("%2/%1/%3").arg(cameraFolder).arg(quality).arg(pathString);
             auto fullDirPath = QDir(root).absoluteFilePath(pathString);
             decltype(curStartTime + curDuration) error = -1;
-            
+
             if (!QDir().mkpath(fullDirPath))
             {
                 qDebug() << "Create directory" << fullDirPath << "failed";
@@ -342,10 +347,10 @@ private:
         }
     }
 
-    void createStorages()
+    void createStorages(QnCommonModule* commonModule)
     {
         for (int i = 0; i < m_storageUrls.size(); ++i) {
-            QnStorageResourcePtr storage = QnStorageResourcePtr(new QnFileStorageResource);
+            QnStorageResourcePtr storage = QnStorageResourcePtr(new QnFileStorageResource(commonModule));
             storage->setUrl(m_storageUrls[i]);
             storage->setId(QnUuid::createUuid());
             storage->setUsedForWriting(true);
@@ -450,56 +455,24 @@ TEST(ServerArchiveDelegate_playback_test, Main)
     auto storageUrl_1 = *storageWorkDir1.getDirName();
     auto storageUrl_2 = *storageWorkDir2.getDirName();
 
-    std::unique_ptr<QnCommonModule> commonModule;
-    if (!qnCommon) {
-        commonModule = std::unique_ptr<QnCommonModule>(new QnCommonModule);
-    }
-    commonModule->setModuleGUID(QnUuid("{A680980C-70D1-4545-A5E5-72D89E33648B}"));
-    MSSettings::initializeROSettings();
+    auto platformAbstraction = std::unique_ptr<QnPlatformAbstraction>(new QnPlatformAbstraction());
+    std::unique_ptr<QnMediaServerModule> serverModule(new QnMediaServerModule());
+    serverModule->commonModule()->setModuleGUID(QnUuid("{A680980C-70D1-4545-A5E5-72D89E33648B}"));
 
-    std::unique_ptr<QnStorageManager> normalStorageManager;
-    if (!qnNormalStorageMan) {
-        normalStorageManager = std::unique_ptr<QnStorageManager>(
-                new QnStorageManager(QnServer::StoragePool::Normal));
-    }
-    normalStorageManager->stopAsyncTasks();
+    qnNormalStorageMan->stopAsyncTasks();
 
-    std::unique_ptr<QnStorageManager> backupStorageManager;
-    if (!qnBackupStorageMan) {
-        backupStorageManager = std::unique_ptr<QnStorageManager>(
-                new QnStorageManager(QnServer::StoragePool::Backup));
-    }
-    backupStorageManager->stopAsyncTasks();
+    qnBackupStorageMan->stopAsyncTasks();
 
-    std::unique_ptr<QnResourceStatusDictionary> statusDictionary;
-    if (!qnStatusDictionary) {
-        statusDictionary = std::unique_ptr<QnResourceStatusDictionary>(
-                new QnResourceStatusDictionary);
-    }
-
-    std::unique_ptr<QnResourcePropertyDictionary> propDictionary;
-    if (!propertyDictionary) {
-        propDictionary = std::unique_ptr<QnResourcePropertyDictionary>(
-                new QnResourcePropertyDictionary);
-    }
-
-    std::unique_ptr<QnStorageDbPool> dbPool;
-    if (!qnStorageDbPool) {
-        dbPool = std::unique_ptr<QnStorageDbPool>(new QnStorageDbPool);
-    }
-
-    auto platformAbstraction = std::unique_ptr<QnPlatformAbstraction>(new QnPlatformAbstraction(0));
-
-    MSSettings::roSettings()->remove(lit("NORMAL_SCAN_ARCHIVE_FROM"));
-    MSSettings::roSettings()->remove(lit("BACKUP_SCAN_ARCHIVE_FROM"));
+    serverModule->roSettings()->remove(lit("NORMAL_SCAN_ARCHIVE_FROM"));
+    serverModule->roSettings()->remove(lit("BACKUP_SCAN_ARCHIVE_FROM"));
 #if defined (__arm__)
-    TestHelper testHelper(std::move(QStringList() << storageUrl_1 << storageUrl_2), 5);
+    TestHelper testHelper(serverModule->commonModule(), std::move(QStringList() << storageUrl_1 << storageUrl_2), 5);
 #else
-    TestHelper testHelper(std::move(QStringList() << storageUrl_1 << storageUrl_2), 200);
+    TestHelper testHelper(serverModule->commonModule(), std::move(QStringList() << storageUrl_1 << storageUrl_2), 200);
 #endif
     testHelper.print();
 
-    QnNetworkResourcePtr cameraResource = QnNetworkResourcePtr(new QnNetworkResource);
+    QnNetworkResourcePtr cameraResource = QnNetworkResourcePtr(new QnNetworkResource());
     cameraResource->setPhysicalId(cameraFolder);
 
     QnFfmpegInitializer ffmpegHolder;

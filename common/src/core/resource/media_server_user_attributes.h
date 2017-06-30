@@ -48,12 +48,11 @@ Q_DECLARE_METATYPE(QnMediaServerUserAttributesList)
 class QnMediaServerUserAttributesPool
 :
     public QObject,
-    public QnGeneralAttributePool<QnUuid, QnMediaServerUserAttributesPtr>,
-    public Singleton<QnMediaServerUserAttributesPool>
+    public QnGeneralAttributePool<QnUuid, QnMediaServerUserAttributesPtr>
 {
     Q_OBJECT
 public:
-    QnMediaServerUserAttributesPool(QObject *parent = NULL);
+    QnMediaServerUserAttributesPool(QObject *parent);
 
     QnMediaServerUserAttributesList getAttributesList( const QList<QnUuid>& idList );
 };

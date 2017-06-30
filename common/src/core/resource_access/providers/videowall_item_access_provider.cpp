@@ -9,22 +9,16 @@
 #include <core/resource/layout_resource.h>
 #include <core/resource/user_resource.h>
 #include <core/resource/videowall_resource.h>
-
-namespace {
-
-QnLayoutResourceList getLayoutsForVideoWall(const QnVideoWallResourcePtr& videoWall)
-{
-    return qnResPool->getResourcesByParentId(videoWall->getId()).filtered<QnLayoutResource>();
-}
-
-}
+#include <common/common_module.h>
 
 QnVideoWallItemAccessProvider::QnVideoWallItemAccessProvider(QObject* parent):
     base_type(parent),
     m_itemAggregator(new QnLayoutItemAggregator())
 {
-    connect(qnGlobalPermissionsManager, &QnGlobalPermissionsManager::globalPermissionsChanged,
-        this, &QnVideoWallItemAccessProvider::updateAccessBySubject);
+    connect(globalPermissionsManager(),
+        &QnGlobalPermissionsManager::globalPermissionsChanged,
+        this,
+        &QnVideoWallItemAccessProvider::updateAccessBySubject);
 
     connect(m_itemAggregator, &QnLayoutItemAggregator::itemAdded, this,
         &QnVideoWallItemAccessProvider::handleItemAdded);
@@ -44,7 +38,7 @@ QnAbstractResourceAccessProvider::Source QnVideoWallItemAccessProvider::baseSour
 bool QnVideoWallItemAccessProvider::calculateAccess(const QnResourceAccessSubject& subject,
     const QnResourcePtr& resource) const
 {
-    if (!qnGlobalPermissionsManager->hasGlobalPermission(subject, Qn::GlobalControlVideoWallPermission))
+    if (!globalPermissionsManager()->hasGlobalPermission(subject, Qn::GlobalControlVideoWallPermission))
         return false;
 
     if (resource->hasFlags(Qn::layout))
@@ -65,7 +59,7 @@ void QnVideoWallItemAccessProvider::fillProviders(
     const QnResourcePtr& resource,
     QnResourceList& providers) const
 {
-    if (!qnGlobalPermissionsManager->hasGlobalPermission(subject, Qn::GlobalControlVideoWallPermission))
+    if (!globalPermissionsManager()->hasGlobalPermission(subject, Qn::GlobalControlVideoWallPermission))
         return;
 
     if (resource->hasFlags(Qn::layout))
@@ -120,6 +114,11 @@ void QnVideoWallItemAccessProvider::handleResourceAdded(const QnResourcePtr& res
     }
 }
 
+QnLayoutResourceList QnVideoWallItemAccessProvider::getLayoutsForVideoWall(const QnVideoWallResourcePtr& videoWall) const
+{
+    return commonModule()->resourcePool()->getResourcesByParentId(videoWall->getId()).filtered<QnLayoutResource>();
+}
+
 void QnVideoWallItemAccessProvider::handleResourceRemoved(const QnResourcePtr& resource)
 {
     base_type::handleResourceRemoved(resource);
@@ -143,7 +142,8 @@ void QnVideoWallItemAccessProvider::handleResourceRemoved(const QnResourcePtr& r
 
 void QnVideoWallItemAccessProvider::afterUpdate()
 {
-    for (auto layout: qnResPool->getResources<QnLayoutResource>())
+    const auto& resPool = commonModule()->resourcePool();
+    for (auto layout: resPool->getResources<QnLayoutResource>())
         updateAccessToLayout(layout);
 
     base_type::afterUpdate();
@@ -175,7 +175,8 @@ void QnVideoWallItemAccessProvider::handleItemAdded(const QnUuid& resourceId)
     if (isUpdating())
         return;
 
-    if (auto resource = qnResPool->getResourceById(resourceId))
+    const auto& resPool = commonModule()->resourcePool();
+    if (auto resource = resPool->getResourceById(resourceId))
         updateAccessToResource(resource);
 }
 
@@ -184,6 +185,7 @@ void QnVideoWallItemAccessProvider::handleItemRemoved(const QnUuid& resourceId)
     if (isUpdating())
         return;
 
-    if (auto resource = qnResPool->getResourceById(resourceId))
+    const auto& resPool = commonModule()->resourcePool();
+    if (auto resource = resPool->getResourceById(resourceId))
         updateAccessToResource(resource);
 }

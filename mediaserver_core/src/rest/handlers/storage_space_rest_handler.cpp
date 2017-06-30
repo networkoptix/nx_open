@@ -20,18 +20,22 @@
 
 #include <utils/common/app_info.h>
 #include <utils/common/util.h>
-#include <nx/network/http/httptypes.h>
+#include <nx/network/http/http_types.h>
+#include <rest/server/rest_connection_processor.h>
 
 namespace
 {
     const QString kFastRequestKey("fast");
 }
 
-QnStorageSpaceRestHandler::QnStorageSpaceRestHandler():
-    m_monitor(qnPlatform->monitor())
+QnStorageSpaceRestHandler::QnStorageSpaceRestHandler()
 {}
 
-int QnStorageSpaceRestHandler::executeGet(const QString& path, const QnRequestParams& params, QnJsonRestResult& result, const QnRestConnectionProcessor* owner)
+int QnStorageSpaceRestHandler::executeGet(
+    const QString& path,
+    const QnRequestParams& params,
+    QnJsonRestResult& result,
+    const QnRestConnectionProcessor* owner)
 {
     QN_UNUSED(path, owner);
 
@@ -63,7 +67,7 @@ int QnStorageSpaceRestHandler::executeGet(const QString& path, const QnRequestPa
 
     if (!fastRequest)
     {
-        for (const QnStorageSpaceData& optionalStorage: getOptionalStorages())
+        for (const QnStorageSpaceData& optionalStorage: getOptionalStorages(owner->commonModule()))
             reply.storages.push_back(optionalStorage);
     }
 
@@ -94,7 +98,7 @@ QList<QString> QnStorageSpaceRestHandler::getStoragePaths() const
     return storagePaths;
 }
 
-QnStorageSpaceDataList QnStorageSpaceRestHandler::getOptionalStorages() const
+QnStorageSpaceDataList QnStorageSpaceRestHandler::getOptionalStorages(QnCommonModule* commonModule) const
 {
     QnStorageSpaceDataList result;
 
@@ -106,8 +110,9 @@ QnStorageSpaceDataList QnStorageSpaceRestHandler::getOptionalStorages() const
     };
 
     /* Enumerate auto-generated storages on all possible partitions. */
+    QnPlatformMonitor* monitor = qnPlatform->monitor();
     QList<QnPlatformMonitor::PartitionSpace> partitions =
-        m_monitor->totalPartitionSpaceInfo(
+        monitor->totalPartitionSpaceInfo(
         QnPlatformMonitor::LocalDiskPartition | QnPlatformMonitor::NetworkPartition
         );
 
@@ -144,7 +149,7 @@ QnStorageSpaceDataList QnStorageSpaceRestHandler::getOptionalStorages() const
         data.storageType = QnLexical::serialized(partition.type);
 
         QnStorageResourcePtr storage = QnStorageResourcePtr(
-            QnStoragePluginFactory::instance()->createStorage(data.url, false));
+            QnStoragePluginFactory::instance()->createStorage(commonModule, data.url, false));
 
         if (storage)
         {

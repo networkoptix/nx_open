@@ -6,13 +6,18 @@
 #include "get_system_name_rest_handler.h"
 
 #include <common/common_module.h>
-#include <nx/network/http/httptypes.h>
+#include <nx/network/http/http_types.h>
 #include <api/global_settings.h>
+#include <rest/server/rest_connection_processor.h>
 
 
-int QnGetSystemIdRestHandler::executeGet(const QString& /*path*/, const QnRequestParamList& /*params*/, QByteArray& result, QByteArray& contentType, const QnRestConnectionProcessor*)
+int QnGetSystemIdRestHandler::executeGet(
+    const QString& /*path*/,
+    const QnRequestParamList& /*params*/,
+    QByteArray& result, QByteArray& contentType,
+    const QnRestConnectionProcessor* owner)
 {
-    result = qnGlobalSettings->localSystemId().toByteArray();
+    result = owner->commonModule()->globalSettings()->localSystemId().toByteArray();
     contentType = "application/text";
     return nx_http::StatusCode::ok;
 }

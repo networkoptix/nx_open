@@ -3,7 +3,6 @@
 
 #include <memory>
 
-#include <QtCore/QElapsedTimer>
 #include <QCryptographicHash>
 
 #include <nx/network/nettools.h>
@@ -11,18 +10,18 @@
 #include <nx/network/ping.h>
 #include <nx/network/socket.h>
 #include <nx/network/socket_global.h>
-#include <nx/network/http/httptypes.h>
+#include <nx/network/http/http_types.h>
 #include <nx/network/rtsp/rtsp_types.h>
 #include "resource_consumer.h"
-#include "utils/common/long_runnable.h"
+#include "nx/utils/thread/long_runnable.h"
 #include <utils/crypt/symmetrical.h>
 
 #include <recording/time_period_list.h>
 #include <nx_ec/data/api_camera_data.h>
 
 
-QnNetworkResource::QnNetworkResource():
-    base_type(),
+QnNetworkResource::QnNetworkResource(QnCommonModule* commonModule):
+    base_type(commonModule),
     m_authenticated(true),
     m_networkStatus(0),
     m_networkTimeout(1000 * 10),
@@ -114,13 +113,24 @@ void QnNetworkResource::setDefaultAuth(const QAuthenticator &auth)
                         .arg(auth.password())));
 }
 
-QAuthenticator QnNetworkResource::getResourceAuth(const QnUuid &resourceId, const QnUuid &resourceTypeId)
+QAuthenticator QnNetworkResource::getResourceAuth(
+    QnCommonModule* commonModule,
+    const QnUuid &resourceId,
+    const QnUuid &resourceTypeId)
 {
     //TODO: #GDM think about code duplication
     NX_ASSERT(!resourceId.isNull() && !resourceTypeId.isNull(), Q_FUNC_INFO, "Invalid input, reading from local data is requred");
-    QString value = getResourceProperty(Qn::CAMERA_CREDENTIALS_PARAM_NAME, resourceId, resourceTypeId);
+    QString value = getResourceProperty(
+        commonModule,
+        Qn::CAMERA_CREDENTIALS_PARAM_NAME,
+        resourceId,
+        resourceTypeId);
     if (value.isNull())
-        value = getResourceProperty(Qn::CAMERA_DEFAULT_CREDENTIALS_PARAM_NAME, resourceId, resourceTypeId);
+        value = getResourceProperty(
+            commonModule,
+            Qn::CAMERA_DEFAULT_CREDENTIALS_PARAM_NAME,
+            resourceId,
+            resourceTypeId);
 
     value = nx::utils::decodeStringFromHexStringAES128CBC(value);
 

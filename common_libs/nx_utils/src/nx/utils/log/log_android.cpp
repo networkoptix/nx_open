@@ -1,43 +1,56 @@
-#include "log.h"
+#include "log_writers.h"
 
 #include <android/log.h>
 
 #include <QtCore/QCoreApplication>
 
-namespace {
+namespace nx {
+namespace utils {
+namespace log {
 
-android_LogPriority toAndroidLogLevel(QnLogLevel logLevel)
+static android_LogPriority toAndroidLogLevel(Level logLevel)
 {
     switch (logLevel)
     {
-        case cl_logUNKNOWN:
+        case Level::undefined:
             return ANDROID_LOG_UNKNOWN;
-        case cl_logNONE:
+
+        case Level::none:
             return ANDROID_LOG_SILENT;
-        case cl_logALWAYS:
-            return ANDROID_LOG_INFO;
-        case cl_logERROR:
+
+        case Level::always:
+            // The highest log level, treated as error just to be sure it makes it to the log.
             return ANDROID_LOG_ERROR;
-        case cl_logWARNING:
+
+        case Level::error:
+            return ANDROID_LOG_ERROR;
+
+        case Level::warning:
             return ANDROID_LOG_WARN;
-        case cl_logINFO:
+
+        case Level::info:
             return ANDROID_LOG_INFO;
-        case cl_logDEBUG1:
+
+        case Level::debug:
             return ANDROID_LOG_DEBUG;
-        case cl_logDEBUG2:
+
+        case Level::verbose:
             return ANDROID_LOG_VERBOSE;
+
         default:
             return ANDROID_LOG_DEFAULT;
     }
 }
 
-} // namespace
-
-void QnLog::writeToStdout(const QString& str, QnLogLevel logLevel)
+void StdOut::writeImpl(Level level, const QString& message)
 {
     __android_log_print(
-        toAndroidLogLevel(logLevel),
+        toAndroidLogLevel(level),
         QCoreApplication::applicationName().toUtf8().constData(),
         "%s",
-        str.toUtf8().constData());
+        message.toUtf8().constData());
 }
+
+} // namespace log
+} // namespace utils
+} // namespace nx

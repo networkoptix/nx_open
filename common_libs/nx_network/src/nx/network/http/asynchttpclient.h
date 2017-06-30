@@ -14,7 +14,7 @@
 #include "nx/network/aio/timer.h"
 
 #include "auth_cache.h"
-#include "httpstreamreader.h"
+#include "http_stream_reader.h"
 
 namespace nx_http {
 
@@ -31,16 +31,16 @@ struct AuthInfo
 class AsyncHttpClientPtr;
 
 /**
- * Http client. All operations are done asynchronously.
+ * HTTP client. All operations are done asynchronously.
  *
  * To get new instance use AsyncHttpClient::create
  * This class methods are not thread-safe
  * All signals are emitted from io::AIOService threads
  * State is changed just before emitting signal
- * @warning It is strongly recommended to listen for AsyncHttpClient::someMessageBodyAvailable() signal and
+ * WARNING: It is strongly recommended to listen for AsyncHttpClient::someMessageBodyAvailable() signal and
  *  read current message body buffer with AsyncHttpClient::fetchMessageBodyBuffer() call every time
  *  to avoid internal message body buffer to consume too much memory.
- * @warning It is strongly recommended to connect to signals using Qt::DirectConnection and slot MUST NOT use blocking calls.
+ * WARNING: It is strongly recommended to connect to signals using Qt::DirectConnection and slot MUST NOT use blocking calls.
  */
 class NX_NETWORK_API AsyncHttpClient:
     public QObject,
@@ -248,7 +248,7 @@ public:
     /**
      * Caller uses it to report that message body has ended (it may be tricky to detect message body end in some cases).
      * @note May be invoked within someMessageBodyAvailable handler only.
-     * @warning It is a hack. Use it only if you strongly know what you are doing.
+     * WARNING: It is a hack. Use it only if you strongly know what you are doing.
      */
     void forceEndOfMsgBody();
 
@@ -275,7 +275,7 @@ signals:
      *   can be read with AsyncHttpClient::fetchMessageBodyBuffer() call.
      * Responsibility for preventing internal message body buffer 
      *   to grow beyond reasonable sizes lies on user of this class.
-     * @warning It is strongly recommended to call AsyncHttpClient::fetchMessageBodyBuffer() 
+     * WARNING: It is strongly recommended to call AsyncHttpClient::fetchMessageBodyBuffer() 
      *   every time on receiving this signal
     */
     void someMessageBodyAvailable(nx_http::AsyncHttpClientPtr);

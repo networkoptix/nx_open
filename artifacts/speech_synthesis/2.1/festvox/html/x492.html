@@ -1,0 +1,583 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<HTML
+><HEAD
+><TITLE
+>Utterance access</TITLE
+><META
+NAME="GENERATOR"
+CONTENT="Modular DocBook HTML Stylesheet Version 1.79"><LINK
+REL="HOME"
+TITLE="Building Synthetic Voices"
+HREF="book1.html"><LINK
+REL="UP"
+TITLE="A Practical Speech Synthesis System"
+HREF="c180.html"><LINK
+REL="PREVIOUS"
+TITLE="Modules"
+HREF="x380.html"><LINK
+REL="NEXT"
+TITLE="Utterance building"
+HREF="x591.html"></HEAD
+><BODY
+CLASS="SECT1"
+BGCOLOR="#FFFFFF"
+TEXT="#000000"
+LINK="#0000FF"
+VLINK="#840084"
+ALINK="#0000FF"
+><DIV
+CLASS="NAVHEADER"
+><TABLE
+SUMMARY="Header navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TH
+COLSPAN="3"
+ALIGN="center"
+>Building Synthetic Voices</TH
+></TR
+><TR
+><TD
+WIDTH="10%"
+ALIGN="left"
+VALIGN="bottom"
+><A
+HREF="x380.html"
+ACCESSKEY="P"
+>&#60;&#60;&#60; Previous</A
+></TD
+><TD
+WIDTH="80%"
+ALIGN="center"
+VALIGN="bottom"
+>A Practical Speech Synthesis System</TD
+><TD
+WIDTH="10%"
+ALIGN="right"
+VALIGN="bottom"
+><A
+HREF="x591.html"
+ACCESSKEY="N"
+>Next &#62;&#62;&#62;</A
+></TD
+></TR
+></TABLE
+><HR
+ALIGN="LEFT"
+WIDTH="100%"></DIV
+><DIV
+CLASS="SECT1"
+><H1
+CLASS="SECT1"
+><A
+NAME="AEN492"
+>Utterance access</A
+></H1
+><P
+>&#13;A set of simple access methods exist for utterances, relations, 
+items and features, both in Scheme and C++. As much as possible these 
+access methods are as similar as possible. </P
+><P
+>As the users of this document will primarily be accessing utterance via 
+Scheme we will describe the basic Scheme functions available for access 
+and give some examples of idioms to achieve various standard functions. </P
+><P
+>In general the required arguments to a lisp function are reflected in 
+the first parts of the name of the function. Thus 
+<CODE
+CLASS="VARNAME"
+>item.relation.next</CODE
+> requires an item, and relation name and will 
+return the next item in that named relation from the given one. </P
+><P
+>A listing a short description of the major utterance access and 
+manipulation functions is given in the Festival manual. </P
+><P
+>An important notion to be aware of is that an item is always viewed 
+through so particular relation. For example, assuming 
+a typically utterance called <CODE
+CLASS="VARNAME"
+>utt1</CODE
+>. 
+<A
+NAME="AEN503"
+></A
+><BLOCKQUOTE
+CLASS="BLOCKQUOTE"
+><P
+CLASS="LITERALLAYOUT"
+>(set!&nbsp;seg1&nbsp;(utt.relation.first&nbsp;utt1&nbsp;'Segment))</P
+></BLOCKQUOTE
+>
+<CODE
+CLASS="VARNAME"
+>seg1</CODE
+> is an item viewed from the <CODE
+CLASS="VARNAME"
+>Segment</CODE
+> relation. Calling 
+<CODE
+CLASS="VARNAME"
+>item.next</CODE
+> on this will return the next item in the <CODE
+CLASS="VARNAME"
+>Segment</CODE
+> 
+relation. A <CODE
+CLASS="VARNAME"
+>Segment</CODE
+> item may also be in the <CODE
+CLASS="VARNAME"
+>SylStructure</CODE
+> 
+item. If we traverse it using next in that relation we will hit 
+the end when we come to the end of the segments in that syllable. </P
+><P
+>&#13;You may <I
+CLASS="EMPHASIS"
+>view</I
+> a given item from a specified relation by 
+requesting a view from that. In Scheme <CODE
+CLASS="VARNAME"
+>nil</CODE
+> will 
+be returned if the item is not in the relation. The 
+function <CODE
+CLASS="VARNAME"
+>item.relation</CODE
+> takes an item and relation 
+name and returns the item as view from that relation. </P
+><P
+>Here is a short example to help illustrate the basic 
+structure. 
+<A
+NAME="AEN518"
+></A
+><BLOCKQUOTE
+CLASS="BLOCKQUOTE"
+><P
+CLASS="LITERALLAYOUT"
+>(set!&nbsp;utt1&nbsp;(utt.synth&nbsp;(Utterance&nbsp;Text&nbsp;"A&nbsp;short&nbsp;example.")))</P
+></BLOCKQUOTE
+>
+The first segment in <CODE
+CLASS="VARNAME"
+>utt!</CODE
+> will be silence. 
+<A
+NAME="AEN521"
+></A
+><BLOCKQUOTE
+CLASS="BLOCKQUOTE"
+><P
+CLASS="LITERALLAYOUT"
+>(set!&nbsp;seg1&nbsp;(utt.relation.first&nbsp;utt1&nbsp;'Segment))</P
+></BLOCKQUOTE
+>
+This item will be a silence as can shown by 
+<A
+NAME="AEN523"
+></A
+><BLOCKQUOTE
+CLASS="BLOCKQUOTE"
+><P
+CLASS="LITERALLAYOUT"
+>(item.name&nbsp;seg1)</P
+></BLOCKQUOTE
+>
+If we find the next item we will get the schwa representing the 
+indefinite article. 
+<A
+NAME="AEN525"
+></A
+><BLOCKQUOTE
+CLASS="BLOCKQUOTE"
+><P
+CLASS="LITERALLAYOUT"
+>(set!&nbsp;seg2&nbsp;(item.next&nbsp;seg1))<br>
+(item.name&nbsp;seg2)</P
+></BLOCKQUOTE
+>
+Let us move onto the "sh" to illustrate the different between 
+traversing the <CODE
+CLASS="VARNAME"
+>Segment</CODE
+> relation as opposed to the 
+<CODE
+CLASS="VARNAME"
+>SylStructure</CODE
+> 
+<A
+NAME="AEN529"
+></A
+><BLOCKQUOTE
+CLASS="BLOCKQUOTE"
+><P
+CLASS="LITERALLAYOUT"
+>(set!&nbsp;seg3&nbsp;(item.next&nbsp;seg2))</P
+></BLOCKQUOTE
+>
+Let use define a function which will take an item, print its 
+name name call next on it <I
+CLASS="EMPHASIS"
+>in the same relation</I
+> and 
+continue until it reaches the end. 
+<A
+NAME="AEN532"
+></A
+><BLOCKQUOTE
+CLASS="BLOCKQUOTE"
+><P
+CLASS="LITERALLAYOUT"
+>(define&nbsp;(toend&nbsp;item)&nbsp;<br>
+&nbsp;&nbsp;(if&nbsp;item<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(begin<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(print&nbsp;(item.name&nbsp;item))<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(toend&nbsp;(item.next&nbsp;item)))))</P
+></BLOCKQUOTE
+>
+If we call this function on <CODE
+CLASS="VARNAME"
+>seg3</CODE
+> which is in the <CODE
+CLASS="VARNAME"
+>Segment</CODE
+> 
+relation we will get a list of all segments until the end of the utterance 
+<A
+NAME="AEN536"
+></A
+><BLOCKQUOTE
+CLASS="BLOCKQUOTE"
+><P
+CLASS="LITERALLAYOUT"
+>festival&#62;&nbsp;(toend&nbsp;seg3)<br>
+"sh"<br>
+"oo"<br>
+"t"<br>
+"i"<br>
+"g"<br>
+"z"<br>
+"aa"<br>
+"m"<br>
+"p"<br>
+"@"<br>
+"l"<br>
+"#"<br>
+nil<br>
+festival&#62;</P
+></BLOCKQUOTE
+>
+However if we first changed the view of seg3 to the <CODE
+CLASS="VARNAME"
+>SylStructure</CODE
+> 
+relation we will be traversing the leaf nodes of the syllable structure 
+tree which will terminate at the end of that syllable. 
+<A
+NAME="AEN539"
+></A
+><BLOCKQUOTE
+CLASS="BLOCKQUOTE"
+><P
+CLASS="LITERALLAYOUT"
+>festival&#62;&nbsp;(toend&nbsp;(item.relation&nbsp;seg3&nbsp;'SylStructure)<br>
+"sh"<br>
+"oo"<br>
+"t"<br>
+nil<br>
+festival&#62;&nbsp;</P
+></BLOCKQUOTE
+>
+Note that <CODE
+CLASS="VARNAME"
+>item.next</CODE
+> returns the item immediately to the next in 
+that relation. Thus it return <CODE
+CLASS="VARNAME"
+>nil</CODE
+> when the end of a sub-tree is 
+found. <CODE
+CLASS="VARNAME"
+>item.next</CODE
+> is most often used for traversing simple lists 
+through it is defined for any of the structure supported by relations. 
+The function <CODE
+CLASS="VARNAME"
+>item.next_item</CODE
+> allows traversal of any relation 
+returning a next item until it has visiting them all. In the simple 
+list case this this equivalent to <CODE
+CLASS="VARNAME"
+>item.next</CODE
+> but in the tree case 
+it will traverse the tree in <I
+CLASS="EMPHASIS"
+>pre-order</I
+> that is it will visit 
+roots before their daughters, and before their next siblings. </P
+><P
+>&#13;
+Scheme is particularly adept at using functions as first class 
+objects. A typical traversal idiom is to apply so 
+function to each item in a a relation. For example support 
+we have a function <I
+CLASS="EMPHASIS"
+>PredictDuration</I
+> which takes a single item 
+and assigns a duration. We can apply this to each item in the 
+<CODE
+CLASS="VARNAME"
+>Segment</CODE
+> relation 
+<A
+NAME="AEN554"
+></A
+><BLOCKQUOTE
+CLASS="BLOCKQUOTE"
+><P
+CLASS="LITERALLAYOUT"
+>(mapcar<br>
+&nbsp;PredictDuration<br>
+&nbsp;(utt.relation.items&nbsp;utt1&nbsp;'Segment))</P
+></BLOCKQUOTE
+>
+The function <CODE
+CLASS="VARNAME"
+>utt.relation.items</CODE
+> returns all items in the 
+relation as a simple lisp list. </P
+><P
+>Another method to traverse the items in a relation is use 
+the <CODE
+CLASS="VARNAME"
+>while</CODE
+> looping paradigm which many people are more 
+familiar with. 
+<A
+NAME="AEN559"
+></A
+><BLOCKQUOTE
+CLASS="BLOCKQUOTE"
+><P
+CLASS="LITERALLAYOUT"
+>(let&nbsp;((f&nbsp;(utt.relation.first&nbsp;utt1&nbsp;'Segment)))<br>
+&nbsp;&nbsp;(while&nbsp;f<br>
+&nbsp;&nbsp;&nbsp;(PredictDuration&nbsp;f)<br>
+&nbsp;&nbsp;&nbsp;(set!&nbsp;f&nbsp;(item.next_item&nbsp;f))))</P
+></BLOCKQUOTE
+></P
+><P
+>If you wish to traverse only the leaves of a tree you 
+may call <CODE
+CLASS="VARNAME"
+>utt.relation.leafs</CODE
+> instead of 
+<CODE
+CLASS="VARNAME"
+>utt.relation.items</CODE
+>. A leaf is defined to be an item with 
+no daughters. Or in the <CODE
+CLASS="VARNAME"
+>while</CODE
+> case, there isn't standardly 
+defined a <CODE
+CLASS="VARNAME"
+>item.next_leaf</CODE
+> but code easily be defined 
+as 
+<A
+NAME="AEN566"
+></A
+><BLOCKQUOTE
+CLASS="BLOCKQUOTE"
+><P
+CLASS="LITERALLAYOUT"
+>(define&nbsp;(item.next_leaf&nbsp;i)<br>
+&nbsp;&nbsp;(let&nbsp;((n&nbsp;(item.next_item&nbsp;i)))<br>
+&nbsp;&nbsp;&nbsp;(cond<br>
+&nbsp;&nbsp;&nbsp;&nbsp;((null&nbsp;n)&nbsp;nil)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;((item.daughters&nbsp;n)&nbsp;(item.next_leaf&nbsp;n))<br>
+&nbsp;&nbsp;&nbsp;&nbsp;(t&nbsp;n))))</P
+></BLOCKQUOTE
+></P
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="AEN568"
+>Features as pathnames</A
+></H2
+><P
+>&#13;Rather than explicitly calling a set of functions to find your way round 
+an utterance we also allow access through a linear flat <I
+CLASS="EMPHASIS"
+>pathname</I
+> 
+mechanism. This mechanism is read-only but can succinctly access not 
+just features on a given item but features on related items too. </P
+><P
+>For example rather than calling an explicit next function 
+to find the name of the following item thus 
+<A
+NAME="AEN575"
+></A
+><BLOCKQUOTE
+CLASS="BLOCKQUOTE"
+><P
+CLASS="LITERALLAYOUT"
+>(item.name&nbsp;(item.next&nbsp;i))</P
+></BLOCKQUOTE
+>
+You can access it via the pathname 
+<A
+NAME="AEN577"
+></A
+><BLOCKQUOTE
+CLASS="BLOCKQUOTE"
+><P
+CLASS="LITERALLAYOUT"
+>(item.feat&nbsp;i&nbsp;"n.name")</P
+></BLOCKQUOTE
+>
+Festival will interpret the feature name as a pathname. In addition 
+to traversing the current relation you can switch between 
+relations via the element <CODE
+CLASS="VARNAME"
+>R:</CODE
+><I
+CLASS="EMPHASIS"
+>relationname</I
+>. Thus to 
+find the stress value of an segment item <CODE
+CLASS="VARNAME"
+>seg</CODE
+> we need 
+to switch to the <CODE
+CLASS="VARNAME"
+>SylStructure</CODE
+> relation, find its parent 
+and check the <CODE
+CLASS="VARNAME"
+>stress</CODE
+> feature value. 
+<A
+NAME="AEN584"
+></A
+><BLOCKQUOTE
+CLASS="BLOCKQUOTE"
+><P
+CLASS="LITERALLAYOUT"
+>(item.feat&nbsp;seg&nbsp;"R:SylStructure.parent.stress")</P
+></BLOCKQUOTE
+>
+Feature pathnames make the definition of various prediction 
+models much easier. CART trees for example simply specify 
+a pathname as a feature, dumping features for training is also 
+a simple task. Full function access is still useful when 
+manipulation of the data is required but as most access is 
+simply to find values pathnames are the most efficient way to 
+access information in an utterance. </P
+></DIV
+><DIV
+CLASS="SECT2"
+><H2
+CLASS="SECT2"
+><A
+NAME="AEN586"
+>Access idioms</A
+></H2
+><P
+>For example suppose you wish to traverse each segment in an 
+utterance replace all vowels in unstressed syllables with a 
+schwa (a rather over-aggressive reduction strategy but it servers 
+for this illustrative example. 
+<A
+NAME="AEN589"
+></A
+><BLOCKQUOTE
+CLASS="BLOCKQUOTE"
+><P
+CLASS="LITERALLAYOUT"
+>(define&nbsp;(reduce_vowels&nbsp;utt)<br>
+&nbsp;(mapcar<br>
+&nbsp;&nbsp;(lambda&nbsp;(segment)<br>
+&nbsp;&nbsp;&nbsp;(if&nbsp;(and&nbsp;(string-equal&nbsp;"+"&nbsp;(item.feat&nbsp;segment&nbsp;"ph_vc"))<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(string-equal&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"1"&nbsp;(item.feat&nbsp;segment&nbsp;"R:SylStructure.parent.stress")))<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(item.set_name&nbsp;segment&nbsp;"@")))<br>
+&nbsp;&nbsp;(utt.relation.items&nbsp;'Segment)))</P
+></BLOCKQUOTE
+></P
+></DIV
+></DIV
+><DIV
+CLASS="NAVFOOTER"
+><HR
+ALIGN="LEFT"
+WIDTH="100%"><TABLE
+SUMMARY="Footer navigation table"
+WIDTH="100%"
+BORDER="0"
+CELLPADDING="0"
+CELLSPACING="0"
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+><A
+HREF="x380.html"
+ACCESSKEY="P"
+>&#60;&#60;&#60; Previous</A
+></TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="book1.html"
+ACCESSKEY="H"
+>Home</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+><A
+HREF="x591.html"
+ACCESSKEY="N"
+>Next &#62;&#62;&#62;</A
+></TD
+></TR
+><TR
+><TD
+WIDTH="33%"
+ALIGN="left"
+VALIGN="top"
+>Modules</TD
+><TD
+WIDTH="34%"
+ALIGN="center"
+VALIGN="top"
+><A
+HREF="c180.html"
+ACCESSKEY="U"
+>Up</A
+></TD
+><TD
+WIDTH="33%"
+ALIGN="right"
+VALIGN="top"
+>Utterance building</TD
+></TR
+></TABLE
+></DIV
+></BODY
+></HTML
+>

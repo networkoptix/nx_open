@@ -1,12 +1,13 @@
 #include "abstract_socket.h"
 
-#include <nx/network/aio/pollable.h>
 #include <nx/utils/thread/mutex_lock_analyzer.h>
 #include <nx/utils/unused.h>
 
-////////////////////////////////////////////////////////////
-//// class AbstractSocket
-////////////////////////////////////////////////////////////
+#include "aio/pollable.h"
+
+//-------------------------------------------------------------------------------------------------
+// class AbstractSocket.
+
 bool AbstractSocket::bind(const QString& localAddress, unsigned short localPort)
 {
     return bind(SocketAddress(localAddress, localPort));
@@ -20,16 +21,15 @@ bool AbstractSocket::isInSelfAioThread() const
     return p->isInSelfAioThread();
 }
 
-////////////////////////////////////////////////////////////
-//// class AbstractCommunicatingSocket
-////////////////////////////////////////////////////////////
+//-------------------------------------------------------------------------------------------------
+// class AbstractCommunicatingSocket.
 
 bool AbstractCommunicatingSocket::connect(
     const QString& foreignAddress,
     unsigned short foreignPort,
     unsigned int timeoutMillis)
 {
-    //TODO #ak this method MUST replace the previous one
+    // TODO: #ak this method MUST replace the previous one
     return connect(SocketAddress(foreignAddress, foreignPort), timeoutMillis);
 }
 
@@ -37,16 +37,11 @@ bool AbstractCommunicatingSocket::connect(
     const SocketAddress& remoteSocketAddress,
     std::chrono::milliseconds timeoutMillis)
 {
-    //TODO #ak this method MUST replace the previous one
+    // TODO: #ak this method MUST replace the previous one
     return connect(remoteSocketAddress, timeoutMillis.count());
 }
 
 int AbstractCommunicatingSocket::send(const QByteArray& data)
-{
-    return send(data.constData(), data.size());
-}
-
-int AbstractCommunicatingSocket::send(const QnByteArray& data)
 {
     return send(data.constData(), data.size());
 }

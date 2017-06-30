@@ -1,5 +1,4 @@
-#ifndef __UBJSON_TRANSACTION_SERIALIZER_H_
-#define __UBJSON_TRANSACTION_SERIALIZER_H_
+#pragma once
 
 #include <memory>
 
@@ -16,10 +15,10 @@ namespace ec2
     /**
      * This class serialized a transaction into a byte array.
      */
-    class QnUbjsonTransactionSerializer: public Singleton<QnUbjsonTransactionSerializer>
+    class QnUbjsonTransactionSerializer
     {
     public:
-        struct CacheKey 
+        struct CacheKey
         {
             CacheKey() {}
             CacheKey(const QnAbstractTransaction::PersistentInfo& persistentInfo, const ApiCommand::Value& command): persistentInfo(persistentInfo), command(command) {}
@@ -39,13 +38,15 @@ namespace ec2
         {
         }
 
-        void addToCache(const QnAbstractTransaction::PersistentInfo& key, ApiCommand::Value command, const QByteArray& data) {
+        void addToCache(const QnAbstractTransaction::PersistentInfo& key, ApiCommand::Value command, const QByteArray& data)
+        {
             QnMutexLocker lock( &m_mutex );
             m_cache.insert(CacheKey(key, command), new QByteArray(data), data.size());
         }
 
         template<class T>
-        QByteArray serializedTransaction(const QnTransaction<T>& tran) {
+        QByteArray serializedTransaction(const QnTransaction<T>& tran)
+        {
             QnMutexLocker lock( &m_mutex );
             Q_UNUSED(lock);
 
@@ -68,11 +69,19 @@ namespace ec2
         }
 
         template<class T>
-        QByteArray serializedTransactionWithHeader(const QnTransaction<T> &tran, const QnTransactionTransportHeader &header) {
+        QByteArray serializedTransactionWithHeader(const QnTransaction<T> &tran, const QnTransactionTransportHeader &header)
+        {
             return serializedTransactionWithHeader(serializedTransaction(tran), header);
         }
 
-        QByteArray serializedTransactionWithHeader(const QByteArray &serializedTran, const QnTransactionTransportHeader &header) {
+        template<class T>
+        QByteArray serializedTransactionWithoutHeader(const QnTransaction<T> &tran)
+        {
+            return serializedTransaction(tran);
+        }
+
+        QByteArray serializedTransactionWithHeader(const QByteArray &serializedTran, const QnTransactionTransportHeader &header)
+        {
             QByteArray result;
             QnUbjsonWriter<QByteArray> stream(&result);
             QnUbjson::serialize(header, &stream);
@@ -87,10 +96,6 @@ namespace ec2
         QCache<CacheKey, const QByteArray> m_cache;
     };
 
-#ifndef QN_NO_QT
     uint qHash(const QnUbjsonTransactionSerializer::CacheKey &id);
-#endif
 
 }
-
-#endif // __UBJSON_TRANSACTION_SERIALIZER_H_

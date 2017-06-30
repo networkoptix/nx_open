@@ -8,7 +8,7 @@
 #include <utils/media/audioformat.h>
 
 #include <utils/timer.h>
-#include <utils/common/safe_direct_connection.h>
+#include <nx/utils/safe_direct_connection.h>
 
 class AudioDevice;
 typedef struct ALCdevice_struct ALCdevice;
@@ -108,7 +108,7 @@ private:
     uint m_size;
     bool m_isValid;
     ALCdevice* m_device;
-    quint8* m_proxyBuffer;
+    quint8* m_proxyBuffer = nullptr;
     int m_proxyBufferLen;
     bool m_deinitialized;
     bool m_paused;

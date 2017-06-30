@@ -180,9 +180,8 @@ void AioTaskQueue::addSockToPollset(
         {
             const SystemError::ErrorCode errorCode = SystemError::getLastOSErrorCode();
             failedToAddToPollset = true;
-            NX_LOG(lm("Failed to add %1(%2) to pollset. %3")
-                .strs(boost::core::demangle(typeid(*socket).name()), (void*)socket,
-                    SystemError::toString(errorCode)), cl_logWARNING);
+            NX_LOG(lm("Failed to add %1 to pollset. %2")
+                .args(socket, SystemError::toString(errorCode)), cl_logWARNING);
         }
     }
     socket->impl()->eventTypeToUserData[eventType] = handlingData.get();

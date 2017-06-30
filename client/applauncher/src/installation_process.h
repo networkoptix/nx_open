@@ -13,11 +13,11 @@
 #include <QString>
 
 #include <api/applauncher_api.h>
-#include <utils/common/stoppable.h>
-#include <utils/common/joinable.h>
+#include <nx/utils/thread/stoppable.h>
+#include <nx/utils/thread/joinable.h>
 #include <nx/network/http/asynchttpclient.h>
-#include <plugins/videodecoder/stree/node.h>
-#include <plugins/videodecoder/stree/resourcenameset.h>
+#include <nx/utils/stree/node.h>
+#include <nx/utils/stree/resourcenameset.h>
 
 #include "rdir_syncher.h"
 #include "rns_product_parameters.h"
@@ -90,7 +90,7 @@ private:
     std::shared_ptr<RDirSyncher> m_syncher;
     QString m_errorText;
     mutable std::mutex m_mutex;
-    std::unique_ptr<stree::AbstractNode> m_currentTree;
+    std::unique_ptr<nx::utils::stree::AbstractNode> m_currentTree;
     int64_t m_totalBytesDownloaded;
     std::map<QString, int64_t> m_unfinishedFilesBytesDownloaded;
     int64_t m_totalBytesToDownload;

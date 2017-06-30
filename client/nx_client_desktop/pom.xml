@@ -1,0 +1,158 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+
+    <parent>
+        <artifactId>cpp</artifactId>
+        <groupId>com.networkoptix.hdwitness</groupId>
+        <version>3.1.0-SNAPSHOT</version>
+        <relativePath>../../cpp</relativePath>
+    </parent>
+
+    <groupId>com.networkoptix.hdwitness</groupId>
+    <version>3.1.0-SNAPSHOT</version>
+    <modelVersion>4.0.0</modelVersion>
+    <artifactId>nx_client_desktop</artifactId>
+    <packaging>pom</packaging>
+    <name>Nx Witness Client Library</name>
+
+    <properties>
+        <guid>${nx_client_desktop.guid}</guid>
+        <product.title>${client.name}</product.title>
+        <product.display.title>${client.display.name}</product.display.title>
+        <template>lib</template>
+        <root.dir>${basedir}/../..</root.dir>
+        <targetName>client</targetName>
+
+        <qt.libs>core gui gui-private widgets-private network opengl xml sql multimedia concurrent webkit webkitwidgets qml quick quickwidgets</qt.libs>
+        <global.libs>-lcommon -lnx_network -lnx_audio -lappserver2 -lnx_client_core -lnx_speech_synthesizer -ludt -lcloud_db_client -lnx_vms_utils -lnx_fusion -lnx_utils -lvms_gateway</global.libs>
+        <windows.oslibs>DbgHelp.lib -lws2_32 -lIphlpapi -lwinmm -ld3d9</windows.oslibs>
+        <linux.oslibs>-lz -lopenal -lX11 -lXfixes -lGL -lGLU -lXss</linux.oslibs>
+        <mac.oslibs>-lbz2 -lz -framework IOKit -framework CoreServices -framework OpenAL</mac.oslibs>
+
+        <windows.defines>EC2_LIB_API=__declspec(dllimport)</windows.defines>
+        <buildLib>sharedlib</buildLib>
+        <rdep.packages>openssl ffmpeg quazip festival any/festival-vox any/roboto-ttf any/roboto-mono-ttf any/help</rdep.packages>
+        <rdep.windows.packages>openal directx-JUN2010</rdep.windows.packages>
+    </properties>
+
+    <dependencies>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>common</artifactId>
+            <version>${project.version}</version>
+            <type>pom</type>
+            <scope>system</scope>
+            <systemPath>${root.dir}/common/pom.xml</systemPath>
+        </dependency>
+
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>nx_network</artifactId>
+            <version>${project.version}</version>
+            <type>pom</type>
+            <scope>system</scope>
+            <systemPath>${root.dir}/common_libs/nx_network/pom.xml</systemPath>
+        </dependency>
+
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>nx_fusion</artifactId>
+            <version>${project.version}</version>
+            <type>pom</type>
+            <scope>system</scope>
+            <systemPath>${root.dir}/common_libs/nx_fusion/pom.xml</systemPath>
+        </dependency>
+
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>nx_audio</artifactId>
+            <version>${project.version}</version>
+            <type>pom</type>
+            <scope>system</scope>
+            <systemPath>${root.dir}/common_libs/nx_audio/pom.xml</systemPath>
+        </dependency>
+
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>appserver2</artifactId>
+            <version>${project.version}</version>
+            <type>pom</type>
+            <scope>system</scope>
+            <systemPath>${root.dir}/appserver2/pom.xml</systemPath>
+        </dependency>
+
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>nx_client_core</artifactId>
+            <version>${project.version}</version>
+            <type>pom</type>
+            <scope>system</scope>
+            <systemPath>${root.dir}/client/nx_client_core/pom.xml</systemPath>
+        </dependency>
+
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>nx_speech_synthesizer</artifactId>
+            <version>${project.version}</version>
+            <type>pom</type>
+            <scope>system</scope>
+            <systemPath>${root.dir}/common_libs/nx_speech_synthesizer/pom.xml</systemPath>
+        </dependency>
+
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>libvms_gateway</artifactId>
+            <version>${project.version}</version>
+            <type>pom</type>
+            <scope>system</scope>
+            <systemPath>${root.dir}/nx_cloud/libvms_gateway/pom.xml</systemPath>
+        </dependency>
+    </dependencies>
+
+    <profiles>
+        <profile>
+            <id>windows</id>
+            <activation>
+                <os>
+                    <family>Windows</family>
+                </os>
+            </activation>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.codehaus.mojo</groupId>
+                        <artifactId>exec-maven-plugin</artifactId>
+                        <version>1.1.1</version>
+                        <executions>
+                            <execution>
+                                <id>launcher-compile</id>
+                                <phase>generate-sources</phase>
+                                <goals>
+                                    <goal>exec</goal>
+                                </goals>
+                                <configuration>
+                                    <executable>build-${arch}.bat</executable>
+                                    <workingDirectory>${basedir}/launcher</workingDirectory>
+                                    <arguments>
+                                        <commandlineArgs>${build.configuration}</commandlineArgs>
+                                    </arguments>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+
+        <profile>
+            <id>windows-staticlib</id>
+            <activation>
+                <os>
+                    <family>Windows</family>
+                </os>
+            </activation>
+            <properties>
+                <buildLib>staticlib</buildLib>
+            </properties>
+        </profile>
+   </profiles>
+</project>

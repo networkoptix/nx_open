@@ -27,11 +27,11 @@ namespace {
             return 0;
         } else {
             /* Zoom speed is an int in [2, 7] range. */
-            return qMin(7, qFloor(2.0 + 6.0 * qAbs(zoomSpeed))) * qSign(zoomSpeed); 
+            return qMin(7, qFloor(2.0 + 6.0 * qAbs(zoomSpeed))) * qSign(zoomSpeed);
         }
 #else
-        /* Even though zoom speed is specified to be in [2, 7] range, 
-         * passing values other than 2 makes the camera ignore STOP commands. 
+        /* Even though zoom speed is specified to be in [2, 7] range,
+         * passing values other than 2 makes the camera ignore STOP commands.
          * This is the case for KCM8111, untested on other models => enabling it for all models. */
         if(qFuzzyIsNull(zoomSpeed)) {
             return 0;
@@ -109,8 +109,8 @@ public:
         InvalidPtzValue = 0xDEADF00D
     };
 
-    QnActiPtzControllerPrivate(const QnActiResourcePtr &resource): 
-        resource(resource), 
+    QnActiPtzControllerPrivate(const QnActiResourcePtr &resource):
+        resource(resource),
         pendingCommand(Qn::InvalidPtzCommand),
         currentSpeed(InvalidPtzValue, InvalidPtzValue, InvalidPtzValue),
         currentPosition(InvalidPtzValue, InvalidPtzValue, InvalidPtzValue)
@@ -119,7 +119,7 @@ public:
     virtual ~QnActiPtzControllerPrivate() {}
 
     void init();
-    
+
     bool query(const QString &request, QByteArray *body = NULL, bool keepAllData = false) const;
     bool continuousZoomQuery(int zoomSpeed);
     bool continuousPanTiltQuery(int panSpeed, int tiltSpeed);
@@ -140,7 +140,7 @@ public:
     /* Unprotected block. */
 
     QnActiResourcePtr resource;
-    Qn::PtzCapabilities capabilities;
+    Ptz::Capabilities capabilities;
     Qt::Orientations flip;
 
     /* Block protected with mutex. */
@@ -174,12 +174,12 @@ void QnActiPtzControllerPrivate::init() {
     if(!zoomData.startsWith("ZOOM_CAP_GET="))
         return;
 
-    capabilities = Qn::ContinuousPtzCapabilities | Qn::AbsolutePtzCapabilities | Qn::DevicePositioningPtzCapability | Qn::FlipPtzCapability;
+    capabilities = Ptz::ContinuousPtzCapabilities | Ptz::AbsolutePtzCapabilities | Ptz::DevicePositioningPtzCapability | Ptz::FlipPtzCapability;
 
     // TODO: #PTZ
 #if 0
     if (!m_isFlipped)
-        m_capabilities &= ~Qn::AbsolutePtzCapabilities; // acti 8111 has bug for absolute position if flip turned off
+        m_capabilities &= ~Ptz::AbsolutePtzCapabilities; // acti 8111 has bug for absolute position if flip turned off
 #endif
 }
 
@@ -269,14 +269,14 @@ bool QnActiPtzControllerPrivate::processQueriesLocked() {
             break;
         }
         case Qn::AbsoluteDeviceMovePtzCommand: {
-            /* Stop first. 
+            /* Stop first.
              * If we don't do that, absolute movement will not work. */
             if(currentSpeed.zoom != 0)
                 status = status & continuousZoomQuery(0);
             if(currentSpeed.pan != 0 || currentSpeed.tilt != 0)
                 status = status & continuousPanTiltQuery(0, 0);
 
-            /* Issue commands EVEN if position wasn't changed. 
+            /* Issue commands EVEN if position wasn't changed.
              * This is because acti cameras sometimes outright ignore absolute move commands. */
             status = status & absolutePanTiltQuery(position.pan, position.tilt, speed.pan);
             status = status & absoluteZoomQuery(position.zoom);
@@ -371,7 +371,8 @@ QnActiPtzController::~QnActiPtzController() {
     return;
 }
 
-Qn::PtzCapabilities QnActiPtzController::getCapabilities() {
+Ptz::Capabilities QnActiPtzController::getCapabilities() const
+{
     return d->capabilities;
 }
 
@@ -382,11 +383,12 @@ bool QnActiPtzController::continuousMove(const QVector3D &speed) {
 bool QnActiPtzController::absoluteMove(Qn::PtzCoordinateSpace space, const QVector3D &position, qreal speed) {
     if(space != Qn::DevicePtzCoordinateSpace)
         return false;
-    
+
     return d->absoluteMove(ActiPtzVector(position.x(), position.y(), position.z()), toActiPanTiltSpeed(qBound(0.01, speed, 1.0))); /* We don't want to get zero speed, hence 0.01 bound. */
 }
 
-bool QnActiPtzController::getPosition(Qn::PtzCoordinateSpace space, QVector3D *position) {
+bool QnActiPtzController::getPosition(Qn::PtzCoordinateSpace space, QVector3D *position) const
+{
     if(space != Qn::DevicePtzCoordinateSpace)
         return false;
 
@@ -398,7 +400,8 @@ bool QnActiPtzController::getPosition(Qn::PtzCoordinateSpace space, QVector3D *p
     return true;
 }
 
-bool QnActiPtzController::getFlip(Qt::Orientations *flip) {
+bool QnActiPtzController::getFlip(Qt::Orientations *flip) const
+{
     *flip = d->flip;
     return true;
 }

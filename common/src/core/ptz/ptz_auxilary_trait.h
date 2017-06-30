@@ -7,20 +7,20 @@
 #include <boost/operators.hpp>
 #endif
 
-#include "ptz_fwd.h"
-
+#include <core/ptz/ptz_fwd.h>
+#include <core/ptz/ptz_constants.h>
 
 class QnPtzAuxilaryTrait: public boost::equality_comparable1<QnPtzAuxilaryTrait> {
 public:
-    QnPtzAuxilaryTrait(): m_standardTrait(Qn::NoPtzTraits) {}
+    QnPtzAuxilaryTrait(): m_standardTrait(Ptz::NoPtzTraits) {}
     QnPtzAuxilaryTrait(const QString &name);
-    QnPtzAuxilaryTrait(Qn::PtzTrait standardTrait);
+    QnPtzAuxilaryTrait(Ptz::Trait standardTrait);
 
     const QString &name() const {
         return m_name;
     }
 
-    Qn::PtzTrait standardTrait() const {
+    Ptz::Trait standardTrait() const {
         return m_standardTrait;
     }
 
@@ -29,12 +29,12 @@ public:
     }
 
 private:
-    Qn::PtzTrait m_standardTrait;
+    Ptz::Trait m_standardTrait;
     QString m_name;
 };
 
 Q_DECLARE_METATYPE(QnPtzAuxilaryTrait)
-Q_DECLARE_METATYPE(QnPtzAuxilaryTraitList);
+Q_DECLARE_METATYPE(QnPtzAuxilaryTraitList)
 
 
 #endif // QN_PTZ_AUXILARY_TRAIT_H
