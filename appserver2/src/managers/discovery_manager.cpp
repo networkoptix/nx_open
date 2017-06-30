@@ -2,7 +2,6 @@
 
 #include <api/global_settings.h>
 #include <common/common_module.h>
-#include <nx/vms/discovery/manager.h>
 
 #include "fixed_url_client_query_processor.h"
 #include "server_query_processor.h"
@@ -173,54 +172,65 @@ void QnDiscoveryManager<QueryProcessorType>::monitorServerDiscovery()
 template<>
 void QnDiscoveryManager<ServerQueryProcessorAccess>::monitorServerDiscovery()
 {
-    const auto messageBus = m_queryProcessor->messageBus();
-    QObject::connect(messageBus, &QnTransactionMessageBus::peerFound,
-        [messageBus](QnUuid peerId, Qn::PeerType peerType)
-        {
-            if (!ApiPeerData::isClient(peerType))
-                return;
-
-            const auto servers = getServers(messageBus->commonModule()->moduleDiscoveryManager());
-            QnTransaction<ApiDiscoveredServerDataList> transaction(
-                ApiCommand::discoveredServersList, messageBus->commonModule()->moduleGUID(), servers);
-
-            sendTransaction(messageBus, transaction, peerId);
-        });
-
-    const auto sendServerStatus =
-        [messageBus](const ApiDiscoveredServerData& serverData)
-        {
-            const auto peers = messageBus->directlyConnectedClientPeers();
-            if (peers.isEmpty())
-                return;
-
-            QnTransaction<ApiDiscoveredServerData> transaction(
-                ApiCommand::discoveredServerChanged, messageBus->commonModule()->moduleGUID(), serverData);
-
-            sendTransaction(messageBus, transaction, peers);
-        };
-
-    const auto updateServerStatus =
-        [settings = messageBus->commonModule()->globalSettings(), sendServerStatus](
-            nx::vms::discovery::ModuleEndpoint module)
-        {
-            sendServerStatus(makeServer(module, settings->localSystemId()));
-        };
-
-    const auto discoveryManager = messageBus->commonModule()->moduleDiscoveryManager();
-    QObject::connect(discoveryManager, &nx::vms::discovery::Manager::found, updateServerStatus);
-    QObject::connect(discoveryManager, &nx::vms::discovery::Manager::changed, updateServerStatus);
-    QObject::connect(discoveryManager, &nx::vms::discovery::Manager::lost,
-        [sendServerStatus](QnUuid id)
-        {
-            ApiDiscoveredServerData serverData;
-            serverData.id = id;
-            serverData.status = Qn::ResourceStatus::Offline;
-            sendServerStatus(serverData);
-        });
+    m_customData = std::make_unique<DiscoveryMonitor>(m_queryProcessor->messageBus());
 }
 
 template class QnDiscoveryManager<ServerQueryProcessorAccess>;
 template class QnDiscoveryManager<FixedUrlClientQueryProcessor>;
+
+DiscoveryMonitor::DiscoveryMonitor(QnTransactionMessageBusBase* messageBus):
+    m_messageBus(messageBus),
+    m_common(messageBus->commonModule())
+{
+    QObject::connect(messageBus, &QnTransactionMessageBus::peerFound,
+        this, &DiscoveryMonitor::clientFound);
+
+    m_common->moduleDiscoveryManager()->onSignals(this, &DiscoveryMonitor::serverFound,
+        &DiscoveryMonitor::serverFound, &DiscoveryMonitor::serverLost);
+
+    //moveToThread(m_messageBus->thread());
+}
+
+DiscoveryMonitor::~DiscoveryMonitor()
+{
+    m_messageBus->disconnect(this);
+    m_common->moduleDiscoveryManager()->disconnect(this);
+}
+
+void DiscoveryMonitor::clientFound(QnUuid peerId, Qn::PeerType peerType)
+{
+    if (!ApiPeerData::isClient(peerType))
+        return;
+
+    send(ApiCommand::discoveredServersList,
+        getServers(m_common->moduleDiscoveryManager()), peerId);
+}
+
+void DiscoveryMonitor::serverFound(nx::vms::discovery::ModuleEndpoint module)
+{
+    const auto s = makeServer(module, m_common->globalSettings()->localSystemId());
+    m_serverCache.emplace(s.id, s);
+    send(ApiCommand::discoveredServerChanged, s, m_messageBus->directlyConnectedClientPeers());
+}
+
+void DiscoveryMonitor::serverLost(QnUuid id)
+{
+    const auto it = m_serverCache.find(id);
+    if (it == m_serverCache.end())
+        return;
+
+    auto s = it->second;
+    m_serverCache.erase(it);
+
+    s.status = Qn::ResourceStatus::Offline;
+    send(ApiCommand::discoveredServerChanged, s, m_messageBus->directlyConnectedClientPeers());
+}
+
+template<typename Transaction, typename Target>
+void DiscoveryMonitor::send(ApiCommand::Value command, Transaction data, const Target& target)
+{
+    QnTransaction<Transaction> t(command, m_common->moduleGUID(), std::move(data));
+    sendTransaction(m_messageBus, std::move(t), target);
+}
 
 } // namespace ec2
