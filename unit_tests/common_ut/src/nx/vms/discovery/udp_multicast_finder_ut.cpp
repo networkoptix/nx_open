@@ -1,8 +1,9 @@
 #include <gtest/gtest.h>
 
+#include <nx/fusion/serialization/json.h>
 #include <nx/utils/log/log.h>
-#include <nx/utils/test_support/sync_queue.h>
 #include <nx/utils/random.h>
+#include <nx/utils/test_support/sync_queue.h>
 #include <nx/vms/discovery/udp_multicast_finder.h>
 
 namespace nx {
@@ -13,10 +14,13 @@ namespace test {
 class DiscoveryUdpMulticastFinder: public testing::Test
 {
 public:
+    DiscoveryUdpMulticastFinder(): systemId(QnUuid::createUuid()) {}
+
     QnModuleInformationWithAddresses makeModuleInformation() const
     {
         QnModuleInformationWithAddresses module;
         module.id = QnUuid::createUuid();
+        module.localSystemId = systemId;
         module.type = lit("test");
         module.customization = lit("test");
         module.brand = lit("test");
@@ -34,18 +38,21 @@ public:
 
 protected:
     UdpMulticastFinder moduleFinder;
+    QnUuid systemId;
 };
 
 TEST_F(DiscoveryUdpMulticastFinder, Base)
 {
-    moduleFinder.setSendInterval(std::chrono::milliseconds(500));
-    moduleFinder.setMulticastEndpoint({
-        UdpMulticastFinder::kMulticastEndpoint.address,
-        nx::utils::random::number<uint16_t>(6000, 50000)});
-
     utils::TestSyncMultiQueue<QnModuleInformationWithAddresses, SocketAddress> discoveryQueue;
+    moduleFinder.setSendInterval(std::chrono::milliseconds(500));
     moduleFinder.updateInterfaces();
-    moduleFinder.listen(discoveryQueue.pusher());
+    moduleFinder.listen(
+        [this, &discoveryQueue](
+            const QnModuleInformationWithAddresses& module, const SocketAddress& endpoint)
+        {
+            if (module.localSystemId == systemId)
+                discoveryQueue.push(module, endpoint);
+        });
 
     const auto interfaceCount = (size_t) getLocalIpV4AddressList().size();
     const auto waitForDiscovery =
@@ -53,9 +60,8 @@ TEST_F(DiscoveryUdpMulticastFinder, Base)
         {
             for (size_t i = 0; i < interfaceCount; ++i)
             {
-                const auto actual = discoveryQueue.pop();
-                const auto size = discoveryQueue.size();
-                EXPECT_EQ(information, actual.first) << size;
+                EXPECT_EQ(QJson::serialized(information),
+                    QJson::serialized(discoveryQueue.pop().first)) << discoveryQueue.size();
             }
         };
 
