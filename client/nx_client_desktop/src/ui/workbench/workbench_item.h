@@ -336,7 +336,7 @@ private:
     friend class QnWorkbenchLayout;
 
     /** Layout that this item belongs to. */
-    QnWorkbenchLayout* m_layout;
+    QnWorkbenchLayout* m_layout = nullptr;
 
     /** Universal unique identifier of this item. */
     const QnUuid m_uuid;
@@ -356,14 +356,14 @@ private:
     ImageCorrectionParams m_imageEnhancement;
 
     /** Item flags. */
-    Qn::ItemFlags m_flags;
+    Qn::ItemFlags m_flags = 0;
 
     /** Rotation, in degrees. */
-    qreal m_rotation;
+    qreal m_rotation = 0.0;
 
     /** Current item dewarping parameters. */
     QnItemDewarpingParams m_itemDewarpingParams;
 
     /** Should the info be always displayed on the item. */
-    bool m_displayInfo;
+    bool m_displayInfo = false;
 };

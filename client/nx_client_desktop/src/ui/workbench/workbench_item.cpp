@@ -13,14 +13,10 @@
 #include "workbench_layout.h"
 
 
-QnWorkbenchItem::QnWorkbenchItem(const QnResourcePtr& resource, const QnUuid &uuid, QObject *parent):
+QnWorkbenchItem::QnWorkbenchItem(const QnResourcePtr& resource, const QnUuid& uuid, QObject* parent):
     QObject(parent),
-    m_layout(NULL),
-    m_resource(resource),
     m_uuid(uuid),
-    m_flags(0),
-    m_rotation(0.0),
-    m_displayInfo(false)
+    m_resource(resource)
 {
     NX_ASSERT(m_resource);
     if (!m_resource)
@@ -31,14 +27,10 @@ QnWorkbenchItem::QnWorkbenchItem(const QnResourcePtr& resource, const QnUuid &uu
         m_rotation = forcedRotation.toInt();
 }
 
-QnWorkbenchItem::QnWorkbenchItem(const QnLayoutItemData &data, QObject *parent):
+QnWorkbenchItem::QnWorkbenchItem(const QnLayoutItemData& data, QObject* parent):
     QObject(parent),
-    m_layout(NULL),
-    m_resource(resourcePool()->getResourceByDescriptor(data.resource)),
     m_uuid(data.uuid),
-    m_flags(0),
-    m_rotation(0.0),
-    m_displayInfo(false)
+    m_resource(resourcePool()->getResourceByDescriptor(data.resource))
 {
     NX_ASSERT(m_resource);
 
