@@ -27,6 +27,7 @@ BaseHttpAudioTransmitter::BaseHttpAudioTransmitter(QnSecurityCamResource* res):
     QnAbstractAudioTransmitter(),
     m_resource(res),
     m_state(TransmitterState::WaitingForConnection),
+    m_bitrateKbps(0),
     m_transcoder(nullptr),
     m_socket(nullptr),
     m_uploadMethod(nx_http::Method::POST)
@@ -65,6 +66,12 @@ void BaseHttpAudioTransmitter::setOutputFormat(const QnAudioFormat& format)
     m_outputFormat = format;
 }
 
+void BaseHttpAudioTransmitter::setBitrate(int value)
+{
+    QnMutexLocker lock(&m_mutex);
+    m_bitrateKbps = value;
+}
+
 void BaseHttpAudioTransmitter::setAudioUploadHttpMethod(nx_http::StringType method)
 {
     QnMutexLocker lock(&m_mutex);
@@ -82,6 +89,8 @@ void BaseHttpAudioTransmitter::prepare()
     QnMutexLocker lock(&m_mutex);
     m_transcoder.reset(new QnFfmpegAudioTranscoder(toFfmpegCodec(m_outputFormat.codec())));
     m_transcoder->setSampleRate(m_outputFormat.sampleRate());
+    if (m_bitrateKbps > 0)
+        m_transcoder->setBitrate(m_bitrateKbps);
 }
 
 bool BaseHttpAudioTransmitter::processAudioData(const QnConstCompressedAudioDataPtr& audioData)
@@ -199,7 +208,7 @@ bool BaseHttpAudioTransmitter::startTransmission()
                 url,
                 contentType(),
                 contentBody,
-                true);
+                !contentBody.isEmpty());
     }
     else if (m_uploadMethod == nx_http::Method::PUT)
     {

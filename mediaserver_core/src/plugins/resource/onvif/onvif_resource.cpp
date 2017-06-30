@@ -755,6 +755,9 @@ CameraDiagnostics::Result QnPlOnvifResource::initInternal()
 
     m_portNamePrefixToIgnore = resourceData.value<QString>(QString("portNamePrefixToIgnore"), QString());
 
+    if (initialize2WayAudio())
+        setCameraCapabilities(getCameraCapabilities() | Qn::AudioTransmitCapability);
+
     saveParams();
 
     return CameraDiagnostics::NoErrorResult();
@@ -4138,6 +4141,37 @@ bool QnPlOnvifResource::isCameraForcedToOnvif(const QString& manufacturer, const
         return true;
 
     return false;
+}
+
+bool QnPlOnvifResource::initialize2WayAudio()
+{
+    const QnResourceData resourceData = qnCommon->dataPool()->data(toSharedPointer(this));
+    TwoWayAudioParams params = resourceData.value<TwoWayAudioParams>(Qn::TWO_WAY_AUDIO_PARAM_NAME);
+    if (params.codec.isEmpty() || params.urlPath.isEmpty())
+        return false;
+
+    QnAudioFormat format;
+    format.setCodec(params.codec);
+    format.setSampleRate(params.sampleRate * 1000);
+    format.setChannelCount(params.channels);
+    auto audioTransmitter = new QnBasicAudioTransmitter(this);
+    m_audioTransmitter.reset(audioTransmitter);
+    m_audioTransmitter->setOutputFormat(format);
+    m_audioTransmitter->setBitrate(params.bitrateKbps * 1000);
+    audioTransmitter->setContentType(params.contentType.toUtf8());
+
+    QUrl url(getUrl());
+    url.setScheme(lit("http"));
+    if (url.host().isEmpty())
+        url.setHost(getHostAddress());
+    url.setPath(params.urlPath);
+    QUrlQuery query;
+    for (auto itr = params.urlQueryParams.begin(); itr != params.urlQueryParams.end(); ++itr)
+        query.addQueryItem(itr.key(), itr.value());
+    url.setQuery(query);
+    audioTransmitter->setTransmissionUrl(url);
+
+    return true;
 }
 
 #endif //ENABLE_ONVIF
