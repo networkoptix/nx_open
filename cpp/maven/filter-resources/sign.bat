@@ -5,8 +5,7 @@ SET SIGNCER=${static.customization.dir}/wixsetup/${sign.cer}
 SET TIMESTAMP=
 IF NOT ["${beta}"] == ["true"] (
     SET TIMESTAMP=/tr http://tsa.startssl.com/rfc3161
-)
-ELSE (
+) ELSE (
     SET TIMESTAMP=/tr http://timestamp.digicert.com
 )
 
