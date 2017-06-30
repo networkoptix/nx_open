@@ -361,13 +361,8 @@ void ActionHandler::addToLayout(const QnLayoutResourcePtr &layout, const QnResou
             layout->removeItem(*(layout->getItems().begin()));
     }
 
-    int maxItems = (qnSettings->lightMode() & Qn::LightModeSingleItem)
-        ? 1
-        : qnSettings->maxSceneVideoItems();
-
-    if (layout->getItems().size() >= maxItems)
+    if (layout->getItems().size() >= qnRuntime->maxSceneItems())
         return;
-
 
     if (!menu()->canTrigger(action::OpenInLayoutAction, action::Parameters(resource)
         .withArgument(Qn::LayoutResourceRole, layout)))
@@ -668,9 +663,7 @@ void ActionHandler::at_openInLayoutAction_triggered()
 
     QPointF position = parameters.argument<QPointF>(Qn::ItemPositionRole);
 
-    int maxItems = (qnSettings->lightMode() & Qn::LightModeSingleItem)
-        ? 1
-        : qnSettings->maxSceneVideoItems();
+    const int maxItems = qnRuntime->maxSceneItems();
 
     bool adjustAspectRatio = layout->getItems().isEmpty() || !layout->hasCellAspectRatio();
 

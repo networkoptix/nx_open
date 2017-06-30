@@ -5,6 +5,8 @@
 
 #include <client_core/client_core_module.h>
 
+#include <client/client_runtime_settings.h>
+
 #include <core/resource_access/resource_access_filter.h>
 #include <core/resource_management/layout_tour_manager.h>
 #include <core/resource_management/layout_tour_state_manager.h>
@@ -448,7 +450,9 @@ void LayoutTourReviewController::resetReviewLayout(const QnLayoutResourcePtr& la
         qnResourceRuntimeDataManager->cleanupData(itemId);
     layout->setItems(QnLayoutItemDataList());
 
-    const auto grid = createItemGrid({0, 0}, (int)items.size());
+    const int gridSize = std::min((int)items.size(), qnRuntime->maxSceneItems());
+
+    const auto grid = createItemGrid({0, 0}, gridSize);
     GridWalker walker(grid);
 
     for (const auto& item: items)
@@ -465,6 +469,9 @@ void LayoutTourReviewController::addItemToReviewLayout(
     const QPointF& position,
     bool pinItem)
 {
+    if (layout->getItems().size() > qnRuntime->maxSceneItems())
+        return;
+
     QnLayoutItemData itemData;
     itemData.uuid = QnUuid::createUuid();
     itemData.combinedGeometry = QRectF(position, kCellSize);

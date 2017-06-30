@@ -1071,14 +1071,10 @@ void QnWorkbenchController::at_zoomTargetChanged(QnMediaResourceWidget *widget, 
     data.dewarpingParams.panoFactor = 1; // zoom target must always be dewarped by 90 degrees
     data.dewarpingParams.enabled = zoomTargetWidget->resource()->getDewarpingParams().enabled;  // zoom items on fisheye cameras must always be dewarped
 
-    int maxItems = (qnSettings->lightMode() & Qn::LightModeSingleItem)
-            ? 1
-            : qnSettings->maxSceneVideoItems();
-
     QnLayoutResourcePtr layout = workbench()->currentLayout()->resource();
     if (!layout)
         return;
-    if (layout->getItems().size() >= maxItems)
+    if (layout->getItems().size() >= qnRuntime->maxSceneItems())
         return;
     layout->addItem(data);
 }
