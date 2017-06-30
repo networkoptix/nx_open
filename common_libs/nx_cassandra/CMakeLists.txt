@@ -10,6 +10,7 @@ endif()
 nx_add_target(nx_cassandra LIBRARY ${library_type}
     PUBLIC_LIBS
         nx_utils
+        openssl
         cassandra)
 
 target_compile_definitions(nx_cassandra
