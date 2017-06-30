@@ -1130,18 +1130,25 @@ void ActionHandler::at_openBusinessRulesAction_triggered()
 
 void ActionHandler::at_webClientAction_triggered()
 {
-    static const auto kPath = lit("/static/index.html");
-    static const auto kFragment = lit("/view");
-
     const auto server = commonModule()->currentServer();
     if (!server)
         return;
 
 #ifdef WEB_CLIENT_SUPPORTS_PROXY
+#error Reimplement VMS-6586
     openInBrowser(server, kPath, kFragment);
-#else
-    openInBrowserDirectly(server, kPath, kFragment);
 #endif
+
+    if (nx::network::isCloudServer(server))
+    {
+        menu()->trigger(action::OpenCloudMainUrl);
+    }
+    else
+    {
+        static const auto kPath = lit("/static/index.html");
+        static const auto kFragment = lit("/view");
+        openInBrowserDirectly(server, kPath, kFragment);
+    }
 }
 
 void ActionHandler::at_webAdminAction_triggered()
