@@ -1651,12 +1651,12 @@ void MediaServerProcess::at_portMappingChanged(QString address)
     SocketAddress mappedAddress(address);
     if (mappedAddress.port)
     {
-        NX_LOGX(lit("New external address %1 has been mapped")
-                .arg(address), cl_logALWAYS);
-
         auto it = m_forwardedAddresses.emplace(mappedAddress.address, 0).first;
         if (it->second != mappedAddress.port)
         {
+            NX_LOGX(lit("New external address %1 has been mapped")
+                    .arg(address), cl_logALWAYS);
+
             it->second = mappedAddress.port;
             updateAddressesList();
         }
