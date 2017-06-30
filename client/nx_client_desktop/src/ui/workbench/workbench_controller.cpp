@@ -15,6 +15,8 @@
 #include <QtCore/QFileInfo>
 #include <QtCore/QSettings>
 
+#include <client/client_runtime_settings.h>
+
 #include <utils/common/util.h>
 #include <utils/common/checked_cast.h>
 #include <utils/common/delete_later.h>
