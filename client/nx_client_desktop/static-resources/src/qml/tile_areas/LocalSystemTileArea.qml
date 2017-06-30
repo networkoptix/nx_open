@@ -79,7 +79,6 @@ Item
 
         y: 12
         width: parent.width
-        //(userChooseItem.visible || indicatorsRow.opacity == 0 ? bottomControls.height : 0)
         height: hostChooseItem.height + spacing + bottomControls.height
 
         InfoItem
