@@ -12,7 +12,7 @@ StunServer::StunServer(const conf::Settings& settings):
     m_settings(settings),
     m_tcpStunServer(std::make_unique<nx::network::server::MultiAddressServer<stun::SocketServer>>(
         &m_stunMessageDispatcher,
-        false,
+        /* ssl required? */ false,
         nx::network::NatTraversalSupport::disabled)),
     m_udpStunServer(std::make_unique<nx::network::server::MultiAddressServer<stun::UdpServer>>(
         &m_stunMessageDispatcher))
