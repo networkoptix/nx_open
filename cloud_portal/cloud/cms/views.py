@@ -8,8 +8,20 @@ from cloud import settings
 
 from .controllers.filldata import fill_content
 from .controllers.modify_db import *
+from .forms import *
 
 from django.views.generic.list import ListView
+
+def get_post_parameters(request):
+	context, language = get_context_and_language(request.data)
+	
+	form = CustomContextForm(initial={'language': language.id, 'context': context.id})
+	
+	customization = Customization.objects.get(name=settings.CUSTOMIZATION)		
+	user = Account.objects.get(email=request.user)
+
+	return context, language, form, customization, user 
+
 
 def handle_get_view(context_name, language_code):
 	context, language, context_id, language_id = None, None, 0, 0
@@ -20,11 +32,11 @@ def handle_get_view(context_name, language_code):
 		language = Language.objects.get(code=language_code)
 		language_id = language.id
 
-	form = CustomContextForm(initial={'language': language_id, 'context': context_id})
+	form = CustomContextForm(initial={'language': language_id})
 	if context:
 		form.add_fields(context, language)
 
-	return form
+	return context, form
 	
 
 def handle_post_context_edit_view(request):
@@ -33,7 +45,7 @@ def handle_post_context_edit_view(request):
 	preview_link = ""
 	post_made = False
 	
-	if 'GetDataStructures' in request_data:
+	if 'GetDataRecords' in request_data:
 		post_made = True
 		form.add_fields(context, language)
 
@@ -49,7 +61,7 @@ def handle_post_context_edit_view(request):
 	elif 'SendReview' in request_data:
 		send_version_for_review(customization, language, context.datastructure_set.all(), request_data, user)
 
-	return form, post_made, preview_link
+	return context, form, post_made, preview_link
 
 
 def handle_post_partner_review(request):
@@ -64,29 +76,29 @@ def handle_post_partner_review(request):
 	elif 'Publish' in request.data:
 		publish_latest_version(user)
 
-	return form, preview_link
+	return context, form, preview_link
 
 
 # Create your views here.
 @api_view(["GET", "POST"])
 def context_edit_view(request, context=None, language=None):
 	if request.method == "GET":
-		form = handle_get_view(context, language)
-		return render(request, 'context_editor.html', {'form': form, 'post_made': True})
+		context, form = handle_get_view(context, language)
+		return render(request, 'context_editor.html', {'context': context, 'form': form})
 
 	else:
-		form, post_made, preview_link = handle_post_context_edit_view(request)
-		return render(request, 'context_editor.html', {'form': form, 'post_made': post_made, 'preview_link': preview_link})
+		context, form, post_made, preview_link = handle_post_context_edit_view(request)
+		return render(request, 'context_editor.html', {'context': context, 'form': form, 'preview_link': preview_link})
 
 
 @api_view(["GET", "POST"])
 def partner_review_view(request, context=None, language=None):
 	if request.method == "GET":
-		form = handle_get_view(context, language)
-		return render(request, 'partner_version_review.html', {'form': form})
+		context, form = handle_get_view(context, language)
+		return render(request, 'partner_version_review.html', {'context': context, 'form': form})
 
 	else:
-		form, preview_link = handle_post_partner_review(request)
+		context, form, preview_link = handle_post_partner_review(request)
 		return render(request, 'partner_version_review.html', {'form': form, 'preview_link': preview_link})
 
 

@@ -4,22 +4,9 @@ from notifications.tasks import send_email
 
 from api.models import Account
 from cms.models import *
-from cms.forms import *
 
 def get_context_and_language(request_data): 
 	return Context.objects.get(id=request_data['context']), Language.objects.get(id=request_data['language'])
-
-
-def get_post_parameters(request):
-	context, language = get_context_and_language(request.data)
-	
-	form = CustomContextForm(initial={'language': language.id, 'context': context.id})
-	
-	customization = Customization.objects.get(name=settings.CUSTOMIZATION)		
-	user = Account.objects.get(email=request.user)
-
-	return context, language, form, customization, user 
-
 
 def accept_latest_draft(user):
 	unaccepted_version = ContentVersion.objects.filter(accepted_date=None).latest('created_date')
@@ -38,9 +25,15 @@ def save_unrevisioned_records(customization, language, data_structures, request_
 	for data_structure in data_structures:
 		data_structure_name = data_structure.name
 		
-		latest_unapproved_record = data_structure.datarecord_set.filter(customization=customization, language=language, version=None).exclude(created_by=None)
+		latest_unapproved_record = data_structure.datarecord_set.filter(customization=customization,
+																		language=language,
+																		version=None)\
+																.exclude(created_by=None)
 		
-		latest_approved_record = data_structure.datarecord_set.filter(customization=customization,language=language).exclude(version=None, created_by=None)
+		latest_approved_record = data_structure.datarecord_set.filter(customization=customization,
+																	  language=language)\
+															  .exclude(version=None,
+															  		   created_by=None)
 		
 		new_record_value = request_data[data_structure_name]
 
@@ -67,7 +60,8 @@ def save_unrevisioned_records(customization, language, data_structures, request_
 def remove_links_to_old_version(old_version, customization, contexts):
 	for context in contexts:
 		for data_structure in context.datastructure_set.all():
-			for record in data_structure.datarecord_set.filter(customization=customization, version=old_version):
+			for record in data_structure.datarecord_set.filter(customization=customization,
+															   version=old_version):
 				record.version = None
 				record.save()
 
@@ -77,7 +71,9 @@ def remove_links_to_old_version(old_version, customization, contexts):
 def alter_records_version(contexts, customization, old_version, new_version):
 	for context in contexts:
 		for data_structure in context.datastructure_set.all():
-			records = data_structure.datarecord_set.filter(customization=customization, version=old_version).exclude(created_by=None)
+			records = data_structure.datarecord_set.filter(customization=customization,
+														   version=old_version)\
+												   .exclude(created_by=None)
 			for record in records:
 				record.version = new_version
 				record.save()

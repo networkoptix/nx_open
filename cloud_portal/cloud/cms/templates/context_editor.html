@@ -7,8 +7,17 @@
 {% endblock %}
 
 {% block content%}
-<h1>Context for Product</h1>
-<form action="{% url 'context_editor' %}" method="post" class="aligned">
+<h1>{{context.name}} for {{context.product.name}}</h1>
+<fieldset>
+    <div>{{context.description}}</div>
+    {% if context.translatable %}
+    <div>Page can be translated</div>
+    {% endif %}
+    {% if context.url %}
+    <div> Link to Page: {{context.url}}</div>
+    {% endif %}
+</fieldset>
+<form action="{% url 'context_editor' context.id %}" method="post" class="aligned">
     {% csrf_token %}
     {% for field in form %}
         <div class="form-row">
@@ -21,17 +30,12 @@
     {% endfor %}
 
     <div class="submit-row">
-        <button type="submit" name="GetDataStructures">Get Data Structures</button>
-        <button type="submit" name="SaveDraft">Save Draft</button>
-        <button type="reset" value="Reset">Reset</button>
+        <button class="button" type="submit" name="GetDataRecords">Get Data Records</button>
+        <button class="button" type="submit" name="SaveDraft">Save Draft</button>
+        <button class="button" type="submit" name="Preview">Save and Preview</button>
+        <button class="button" type="submit" name="SendReview">Send for Review</button>
+        <button class="button" type="reset"  name="Reset">Clear Entries</button>
     </div>
-    {% if post_made %}
-    <div class="submit-row">
-        <button type="submit" name="Preview">Preview Page</button>
-        <button type="submit" name="SendReview">Send For Review</button>
-        <button type="submit" name="Publish">Publish Page</button>
-    </div>
-    {% endif %}
 </form>
 
 {% if preview_link %}

@@ -15,7 +15,7 @@ class ContextAdmin(admin.ModelAdmin):
     list_display = ('product', 'name', 'description', 'url', 'translatable', 'context_actions')
 
     def context_actions(self, obj):
-        return format_html('<a class="button" href="/admin/cms/context_editor/{}/">Edit Context</a>',
+        return format_html('<a class="button" href="/admin/cms/context_editor/{}/">edit content</a>',
                             obj.name)
 
     context_actions.short_description = 'Admin Options'
@@ -52,7 +52,7 @@ class ContentVersionAdmin(admin.ModelAdmin):
                     'content_version_actions')
 
     def content_version_actions(self, obj):
-        return format_html('<a class="button" href="/admin/cms/review_version/{}/">View Data Records</a>',
+        return format_html('<a class="button" href="/admin/cms/review_version/{}/">review version</a>',
                             obj.id)
 
     content_version_actions.short_description = "Admin Options"
