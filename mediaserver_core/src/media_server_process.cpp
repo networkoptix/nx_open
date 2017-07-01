@@ -170,6 +170,7 @@
 #include <rest/handlers/discovered_peers_rest_handler.h>
 #include <rest/handlers/log_level_rest_handler.h>
 #include <rest/handlers/multiserver_chunks_rest_handler.h>
+#include <rest/handlers/multiserver_time_rest_handler.h>
 #include <rest/handlers/camera_history_rest_handler.h>
 #include <rest/handlers/multiserver_bookmarks_rest_handler.h>
 #include <rest/handlers/save_cloud_system_credentials.h>
@@ -1807,7 +1808,9 @@ void MediaServerProcess::registerRestHandlers(
     reg("api/ptz", new QnPtzRestHandler());
     reg("api/image", new QnImageRestHandler()); //< deprecated
     reg("api/createEvent", new QnExternalBusinessEventRestHandler());
-    reg("api/gettime", new QnTimeRestHandler());
+    static const char kGetTimePath[] = "api/gettime";
+    reg(kGetTimePath, new QnTimeRestHandler());
+    reg("ec2/getTimeOfServers", new QnMultiserverTimeRestHandler(QLatin1String("/") + kGetTimePath));
     reg("api/getTimeZones", new QnGetTimeZonesRestHandler());
     reg("api/getNonce", new QnGetNonceRestHandler());
     reg("api/cookieLogin", new QnCookieLoginRestHandler());
