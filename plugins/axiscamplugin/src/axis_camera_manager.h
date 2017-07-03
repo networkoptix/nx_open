@@ -103,7 +103,7 @@ private:
     mutable std::vector<AxisMediaEncoder*> m_encoders;
     bool m_audioEnabled;
     mutable bool m_relayIOInfoRead;
-    mutable std::auto_ptr<AxisRelayIOManager> m_relayIOManager;
+    mutable std::unique_ptr<AxisRelayIOManager> m_relayIOManager;
     mutable unsigned int m_cameraCapabilities;
     mutable unsigned int m_inputPortCount;
     mutable unsigned int m_outputPortCount;

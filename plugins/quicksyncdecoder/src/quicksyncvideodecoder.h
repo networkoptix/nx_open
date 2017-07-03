@@ -268,9 +268,9 @@ private:
     AbstractDecoderEventReceiver* const m_eventReceiver;
     MFXVideoSessionEx m_mfxSession;
     DecoderState m_state;
-    std::auto_ptr<MFXVideoDECODE> m_decoder;
+    std::unique_ptr<MFXVideoDECODE> m_decoder;
 #ifdef SCALE_WITH_MFX
-    std::auto_ptr<MFXVideoVPP> m_processor;
+    std::unique_ptr<MFXVideoVPP> m_processor;
 #endif
     mfxVideoParam m_srcStreamParam;
     mfxSyncPoint m_syncPoint;
@@ -309,8 +309,8 @@ private:
     size_t m_totalInputFrames;
     size_t m_totalOutputFrames;
     DWORD m_prevInputFrameMs;
-    std::auto_ptr<SPSUnit> m_sps;
-    std::auto_ptr<PPSUnit> m_pps;
+    std::unique_ptr<SPSUnit> m_sps;
+    std::unique_ptr<PPSUnit> m_pps;
     DWORD m_prevOutPictureClock;
     int m_recursionDepth;
     MotionInfoContainerType m_srcMotionInfo;

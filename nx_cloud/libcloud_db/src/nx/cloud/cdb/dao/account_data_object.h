@@ -6,8 +6,8 @@
 
 #include <nx/utils/basic_factory.h>
 
-#include <utils/db/types.h>
-#include <utils/db/query_context.h>
+#include <nx/utils/db/types.h>
+#include <nx/utils/db/query_context.h>
 
 #include "../data/account_data.h"
 
@@ -20,45 +20,45 @@ class AbstractAccountDataObject
 public:
     virtual ~AbstractAccountDataObject() = default;
 
-    virtual nx::db::DBResult insert(
-        nx::db::QueryContext* queryContext,
+    virtual nx::utils::db::DBResult insert(
+        nx::utils::db::QueryContext* queryContext,
         const api::AccountData& account) = 0;
 
-    virtual nx::db::DBResult update(
-        nx::db::QueryContext* queryContext,
+    virtual nx::utils::db::DBResult update(
+        nx::utils::db::QueryContext* queryContext,
         const api::AccountData& account) = 0;
 
-    virtual nx::db::DBResult fetchAccountByEmail(
-        nx::db::QueryContext* queryContext,
+    virtual nx::utils::db::DBResult fetchAccountByEmail(
+        nx::utils::db::QueryContext* queryContext,
         const std::string& accountEmail,
         data::AccountData* const accountData) = 0;
 
-    virtual nx::db::DBResult fetchAccounts(
-        nx::db::QueryContext* queryContext,
+    virtual nx::utils::db::DBResult fetchAccounts(
+        nx::utils::db::QueryContext* queryContext,
         std::vector<data::AccountData>* accounts) = 0;
 
     // TODO: #ak Replace QDateTime with std::chrono::steady_clock::time_point
     virtual void insertEmailVerificationCode(
-        nx::db::QueryContext* queryContext,
+        nx::utils::db::QueryContext* queryContext,
         const std::string& accountEmail,
         const std::string& emailVerificationCode,
         const QDateTime& codeExpirationTime) = 0;
 
     virtual boost::optional<std::string> getVerificationCodeByAccountEmail(
-        nx::db::QueryContext* queryContext,
+        nx::utils::db::QueryContext* queryContext,
         const std::string& accountEmail) = 0;
 
-    virtual nx::db::DBResult getAccountEmailByVerificationCode(
-        nx::db::QueryContext* queryContext,
+    virtual nx::utils::db::DBResult getAccountEmailByVerificationCode(
+        nx::utils::db::QueryContext* queryContext,
         const data::AccountConfirmationCode& verificationCode,
         std::string* accountEmail) = 0;
 
-    virtual nx::db::DBResult removeVerificationCode(
-        nx::db::QueryContext* queryContext,
+    virtual nx::utils::db::DBResult removeVerificationCode(
+        nx::utils::db::QueryContext* queryContext,
         const data::AccountConfirmationCode& verificationCode) = 0;
 
-    virtual nx::db::DBResult updateAccountToActiveStatus(
-        nx::db::QueryContext* queryContext,
+    virtual nx::utils::db::DBResult updateAccountToActiveStatus(
+        nx::utils::db::QueryContext* queryContext,
         const std::string& accountEmail,
         std::chrono::system_clock::time_point activationTime) = 0;
 
@@ -66,7 +66,7 @@ public:
      * @param activateAccountIfNotActive TODO: #ak Remove this argument.
      */
     virtual void updateAccount(
-        nx::db::QueryContext* queryContext,
+        nx::utils::db::QueryContext* queryContext,
         const std::string& accountEmail,
         const api::AccountUpdateData& accountUpdateData,
         bool activateAccountIfNotActive) = 0;

@@ -556,7 +556,10 @@ void QnPlOnvifResource::setCroppingPhysical(QRect /*cropping*/)
 
 CameraDiagnostics::Result QnPlOnvifResource::initInternal()
 {
-    QnPhysicalCameraResource::initInternal();
+    auto result = QnPhysicalCameraResource::initInternal();
+    if (!result)
+        return result;
+
     setCodec(H264, true);
     setCodec(H264, false);
 
@@ -580,7 +583,7 @@ CameraDiagnostics::Result QnPlOnvifResource::initInternal()
 
     DeviceSoapWrapper deviceSoapWrapper(deviceOnvifUrl.toStdString(), auth.user(), auth.password(), m_timeDrift);
     CapabilitiesResp capabilitiesResponse;
-    auto result = fetchOnvifCapabilities( &deviceSoapWrapper, &capabilitiesResponse );
+    result = fetchOnvifCapabilities( &deviceSoapWrapper, &capabilitiesResponse );
     if( !result )
         return result;
 

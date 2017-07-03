@@ -43,8 +43,8 @@ bool TransactionDataObject::TransactionKey::operator<(const TransactionKey& rhs)
 //-------------------------------------------------------------------------------------------------
 // TransactionDataObject
 
-nx::db::DBResult TransactionDataObject::insertOrReplaceTransaction(
-    nx::db::QueryContext* /*queryContext*/,
+nx::utils::db::DBResult TransactionDataObject::insertOrReplaceTransaction(
+    nx::utils::db::QueryContext* /*queryContext*/,
     const dao::TransactionData& transactionData)
 {
     TransactionSourceKey sourcePeerKey{
@@ -62,19 +62,19 @@ nx::db::DBResult TransactionDataObject::insertOrReplaceTransaction(
     if (!insertionPair.second)
         m_transactions.replace(insertionPair.first, std::move(transaction));
 
-    return nx::db::DBResult::ok;
+    return nx::utils::db::DBResult::ok;
 }
 
-nx::db::DBResult TransactionDataObject::updateTimestampHiForSystem(
-    nx::db::QueryContext* /*queryContext*/,
+nx::utils::db::DBResult TransactionDataObject::updateTimestampHiForSystem(
+    nx::utils::db::QueryContext* /*queryContext*/,
     const nx::String& /*systemId*/,
     quint64 /*newValue*/)
 {
-    return nx::db::DBResult::ok;
+    return nx::utils::db::DBResult::ok;
 }
 
-nx::db::DBResult TransactionDataObject::fetchTransactionsOfAPeerQuery(
-    nx::db::QueryContext* /*queryContext*/,
+nx::utils::db::DBResult TransactionDataObject::fetchTransactionsOfAPeerQuery(
+    nx::utils::db::QueryContext* /*queryContext*/,
     const nx::String& systemId,
     const QString& peerId,
     const QString& dbInstanceId,
@@ -100,7 +100,7 @@ nx::db::DBResult TransactionDataObject::fetchTransactionsOfAPeerQuery(
         transactions->push_back(std::move(logRecord));
     }
 
-    return nx::db::DBResult::ok;
+    return nx::utils::db::DBResult::ok;
 }
 
 } // namespace memory

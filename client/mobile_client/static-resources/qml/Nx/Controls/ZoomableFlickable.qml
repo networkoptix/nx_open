@@ -320,8 +320,14 @@ Item
 
             anchors.fill: parent
 
-            onClicked: rootItem.clicked()
+            propagateComposedEvents: true
+
             onDoubleClicked: rootItem.doubleClicked()
+            onClicked:
+            {
+                rootItem.clicked()
+                mouse.accepted = false
+            }
 
             onWheel:
             {

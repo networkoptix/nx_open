@@ -6,6 +6,7 @@
 #include "decodedpicturetoopengluploader.h"
 
 #include <algorithm>
+#include <memory>
 
 
 #ifdef _WIN32
@@ -1548,14 +1549,14 @@ void DecodedPictureToOpenGLUploader::uploadDecodedPicture(
         QSharedPointer<CLVideoDecoderOutput> decodedPictureCopy( new CLVideoDecoderOutput() );
         decodedPictureCopy->reallocate( decodedPicture->width, decodedPicture->height, decodedPicture->format );
         CLVideoDecoderOutput::copy( decodedPicture.data(), decodedPictureCopy.data() );
-        std::auto_ptr<AVPacketUploader> avPacketUploader( new AVPacketUploader( emptyPictureBuf, decodedPictureCopy, this ) );
+        std::unique_ptr<AVPacketUploader> avPacketUploader( new AVPacketUploader( emptyPictureBuf, decodedPictureCopy, this ) );
         avPacketUploader->setAutoDelete( true );
         m_uploadThread->push( avPacketUploader.release() );
 #elif defined(UPLOAD_SYSMEM_FRAMES_IN_GUI_THREAD)
         m_framesWaitingUploadInGUIThread.push_back( new AVPacketUploader( emptyPictureBuf, decodedPicture, this ) );
 #else
         //using uploading thread, blocking till upload is completed
-        std::auto_ptr<AVPacketUploader> avPacketUploader( new AVPacketUploader( emptyPictureBuf, decodedPicture, this ) );
+        std::unique_ptr<AVPacketUploader> avPacketUploader( new AVPacketUploader( emptyPictureBuf, decodedPicture, this ) );
         m_uploadThread->push( avPacketUploader.get() );
         while( !avPacketUploader->done() )
         {

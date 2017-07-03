@@ -36,7 +36,7 @@ public:
     QString getText() const;
 
     Qn::ValidationResult getLastResult() const;
-    bool setLastResult(Qn::ValidationResult result);
+    void setLastResult(Qn::ValidationResult result);
     void clearValidationResult();
 
 public:
@@ -51,6 +51,9 @@ public:
     const BaseInputField::AccessorPtr textAccessor;
     const BaseInputField::AccessorPtr readOnlyAccessor;
     const BaseInputField::AccessorPtr placeholderAccessor;
+
+private:
+    void updateVisualState();
 
 private:
     Qn::ValidationResult lastResult;
@@ -68,7 +71,7 @@ BaseInputFieldPrivate::BaseInputFieldPrivate(
     title(new QLabel(parent)),
     hint(new QnWordWrappedLabel(parent)),
     input(inputInstance),
-    defaultPalette(),
+    defaultPalette(),    
 
     textAccessor(textAccessor),
     readOnlyAccessor(readOnlyAccessor),
@@ -85,15 +88,29 @@ Qn::ValidationResult BaseInputFieldPrivate::getLastResult() const
     return lastResult;
 }
 
-bool BaseInputFieldPrivate::setLastResult(Qn::ValidationResult result)
+void BaseInputFieldPrivate::updateVisualState()
+{
+    setHintText(lastResult.errorMessage);
+
+    QPalette palette = defaultPalette;
+    if (lastResult.state != QValidator::Acceptable)
+        setWarningStyle(&palette);
+
+    if (!input->hasFocus())
+        input->setPalette(palette);
+
+    hint->setPalette(palette);
+}
+
+void BaseInputFieldPrivate::setLastResult(Qn::ValidationResult result)
 {
     if (lastResult.state == result.state)
-        return false;
+        return;
 
     lastResult = result;
 
+    updateVisualState();
     emit parent->isValidChanged();
-    return true;
 }
 
 void BaseInputFieldPrivate::clearValidationResult()
@@ -313,21 +330,9 @@ bool BaseInputField::validate()
 
     d->input->ensurePolished();
     const auto result = calculateValidationResult();
-    if (!d->setLastResult(result))
-        return lastValidationResult() != QValidator::Invalid;
 
-    d->setHintText(result.errorMessage);
-
-    QPalette palette = d->defaultPalette;
-    if (result.state != QValidator::Acceptable)
-        setWarningStyle(&palette);
-
-    if (!d->input->hasFocus())
-        d->input->setPalette(palette);
-
-    d->hint->setPalette(palette);
-
-    return result.state != QValidator::Invalid;
+    d->setLastResult(result);
+    return lastValidationResult() != QValidator::Invalid;
 }
 
 void BaseInputField::updateDisplayStateDelayed()
@@ -345,7 +350,6 @@ void BaseInputField::clear()
 
 bool BaseInputField::isValid() const
 {
-    Q_D(const BaseInputField);
     return calculateValidationResult().state == QValidator::Acceptable;
 }
 

@@ -320,20 +320,18 @@ angular.module('nxCommon')
             if(typeof(periodsType)==='undefined'){
                 periodsType = 0;
             }
-
+            var params={
+                physicalId: physicalId,
+                startTime: startTime,
+                endTime: endTime,
+                detail: detail,
+                periodsType: periodsType
+            }
+            if(limit){
+                params.limit = limit
+            }
             //RecordedTimePeriods
-            return  this._get('/ec2/recordedTimePeriods' +
-            '?' + (label||'') +
-            (limit?'&limit=' + limit:'') +
-            '&physicalId=' + physicalId +
-            '&startTime=' + startTime +
-            '&endTime=' + endTime +
-            '&detail=' + detail +
-            '&periodsType=' + periodsType +
-            '&flat&keepSmallChunks');
-            //http://10.1.5.129:7001/web/ec2/recordedTimePeriods?1h&            physicalId=urn_uuid_32306235-3032-6666-3238-000df120b502&startTime=1488920406724&endTime=1494626406724&detail=3600000&periodsType=0&flat&keepSmallChunks
-
-            //http://localhost:10000/web/ec2/recordedTimePeriods?&limit=100&physicalId=urn_uuid_32306235-3032-6666-3238-000df120b502&startTime=1494625266744&endTime=1494625366744&detail=1      &periodsType=0&flat&keepSmallChunks
+            return this._get('/ec2/recordedTimePeriods?flat&keepSmallChunks&' + (label||''),params);
         };
         /* End of Working with archive*/
 

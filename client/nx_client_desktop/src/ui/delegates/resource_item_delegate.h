@@ -22,9 +22,11 @@ class QnResourceItemDelegate : public Customized<QStyledItemDelegate>
 public:
     enum Option
     {
-        NoOptions      = 0x0,
-        RecordingIcons = 0x1,
-        ProblemIcons   = 0x2
+        NoOptions           = 0x0,
+        RecordingIcons      = 0x1,
+        ProblemIcons        = 0x2,
+        HighlightChecked    = 0x4,
+        ValidateOnlyChecked = 0x8
     };
     Q_DECLARE_FLAGS(Options, Option)
 
@@ -56,6 +58,9 @@ public:
 
     virtual QSize sizeHint(const QStyleOptionViewItem& styleOption,
         const QModelIndex& index) const override;
+
+    int checkBoxColumn() const;
+    void setCheckBoxColumn(int value);
 
 protected:
     static const QStyle::StateFlag State_Error
@@ -90,6 +95,8 @@ private:
     ItemState itemStateForVideoWallItem(const QModelIndex& index) const;
     ItemState itemStateForLayoutTour(const QModelIndex& index) const;
 
+    QVariant rowCheckState(const QModelIndex& index) const;
+
 private:
     QPointer<QnWorkbench> m_workbench;
     QIcon m_recordingIcon;
@@ -100,6 +107,7 @@ private:
     int m_rowSpacing;
     Qn::ResourceInfoLevel m_customInfoLevel;
     Options m_options;
+    int m_checkBoxColumn = -1;
     mutable QnTextPixmapCache m_textPixmapCache;
 };
 

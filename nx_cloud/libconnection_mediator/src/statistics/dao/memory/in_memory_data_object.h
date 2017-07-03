@@ -14,12 +14,12 @@ class InMemoryDataObject:
     public AbstractDataObject
 {
 public:
-    virtual nx::db::DBResult save(
-        nx::db::QueryContext* /*queryContext*/,
+    virtual nx::utils::db::DBResult save(
+        nx::utils::db::QueryContext* /*queryContext*/,
         ConnectSession connectionRecord) override;
 
-    virtual nx::db::DBResult readAllRecords(
-        nx::db::QueryContext* /*queryContext*/,
+    virtual nx::utils::db::DBResult readAllRecords(
+        nx::utils::db::QueryContext* /*queryContext*/,
         std::deque<ConnectSession>* connectionRecords) override;
 
     const std::deque<ConnectSession>& records() const;

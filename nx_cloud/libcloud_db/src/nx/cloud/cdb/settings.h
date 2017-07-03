@@ -11,7 +11,7 @@
 #include <nx/utils/basic_service_settings.h>
 
 #include <utils/common/command_line_parser.h>
-#include <utils/db/types.h>
+#include <nx/utils/db/types.h>
 #include <utils/email/email.h>
 
 #include "ec2/p2p_sync_settings.h"
@@ -118,7 +118,7 @@ public:
     std::list<SocketAddress> endpointsToListen() const;
     
     const nx::utils::log::Settings& vmsSynchronizationLogging() const;
-    const db::ConnectionOptions& dbConnectionOptions() const;
+    const nx::utils::db::ConnectionOptions& dbConnectionOptions() const;
     const Auth& auth() const;
     const Notification& notification() const;
     const AccountManager& accountManager() const;
@@ -129,10 +129,12 @@ public:
     const ModuleFinder& moduleFinder() const;
     const Http& http() const;
 
+    void setDbConnectionOptions(const nx::utils::db::ConnectionOptions& options);
+
 private:
     nx::utils::log::Settings m_logging;
     nx::utils::log::Settings m_vmsSynchronizationLogging;
-    db::ConnectionOptions m_dbConnectionOptions;
+    nx::utils::db::ConnectionOptions m_dbConnectionOptions;
     Auth m_auth;
     Notification m_notification;
     AccountManager m_accountManager;

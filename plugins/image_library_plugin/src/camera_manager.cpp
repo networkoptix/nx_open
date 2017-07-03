@@ -143,7 +143,7 @@ int CameraManager::createDtsArchiveReader( nxcip::DtsArchiveReader** dtsArchiveR
 
 int CameraManager::find( nxcip::ArchiveSearchOptions* searchOptions, nxcip::TimePeriods** timePeriods ) const
 {
-    std::auto_ptr<TimePeriods> resTimePeriods( new TimePeriods() );
+    std::unique_ptr<TimePeriods> resTimePeriods( new TimePeriods() );
     resTimePeriods->timePeriods.push_back( std::make_pair( m_dirContentsManager.minTimestamp(), m_dirContentsManager.maxTimestamp() ) );
     *timePeriods = resTimePeriods.release();
     return nxcip::NX_NO_ERROR;

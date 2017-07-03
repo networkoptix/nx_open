@@ -7,24 +7,13 @@
 #include <core/ptz/abstract_ptz_controller.h>
 #include <core/ptz/client_ptz_controller_pool.h>
 #include <core/resource_management/resource_pool.h>
+#include <nx/client/ptz/ptz_helpers.h>
 
 namespace {
 
 static constexpr int kIdRoleId = Qt::UserRole + 1;
 static const auto kRoleNames = QHash<int, QByteArray>{
     {kIdRoleId, "id"}};
-
-QnPtzPresetList getPresets(const QnPtzControllerPtr& controller)
-{
-    if (!controller)
-        return QnPtzPresetList();
-
-    QnPtzPresetList presets;
-    if (!controller->getPresets(&presets))
-        return QnPtzPresetList();
-
-    return presets;
-}
 
 } // namespace
 
@@ -48,7 +37,7 @@ PtzPresetModel::PtzPresetModel(QObject* parent):
             const auto resource = qnClientCoreModule->commonModule()
                 ->resourcePool()->getResourceById(d->uniqueResourceId);
             const auto controller = qnClientCoreModule->ptzControllerPool()->controller(resource);
-            const auto presets = getPresets(controller);
+            const auto presets = core::ptz::helpers::getSortedPresets(controller);
 
             if (presets == d->presets)
                 return;

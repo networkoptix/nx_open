@@ -1,16 +1,16 @@
 function(set_distribution_names)
-    set(distribution_name_prefix ${installer.name})
+    set(prefix ${installer.name})
     if(beta)
         set(beta_suffix "-beta")
-        set(distribution_name_suffix
-            "${releaseVersion.full}-${platform}${beta_suffix}-${cloudGroup}")
+        set(suffix "${platform}${beta_suffix}-${cloudGroup}")
     else()
         set(beta_suffix)
-        set(distribution_name_suffix)
+        set(suffix)
     endif()
 
-    set(client_distribution_name
-        "${distribution_name_prefix}-client-${distribution_name_suffix}"
+    set(client_distribution_name "${prefix}-client-${releaseVersion.full}-${suffix}"
+        PARENT_SCOPE)
+    set(mobile_client_distribution_name "${prefix}-client-${mobileClientVersion.full}-${suffix}"
         PARENT_SCOPE)
 endfunction()
 

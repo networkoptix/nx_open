@@ -40,6 +40,8 @@ ToolBarBase
             background: null
             inputMethodHints: Qt.ImhNoPredictiveText | Qt.ImhNoAutoUppercase
             cursorColor: color
+
+            onAccepted: Qt.inputMethod.hide()
         }
 
         IconButton

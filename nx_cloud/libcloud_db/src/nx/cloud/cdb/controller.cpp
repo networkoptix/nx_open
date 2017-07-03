@@ -112,7 +112,7 @@ void Controller::performDataMigrations()
 {
     using namespace std::placeholders;
 
-    NX_INFO(this, lm("Performing data migrations..."));
+    NX_INFO(this, "Performing data migrations...");
 
     try
     {
@@ -128,7 +128,7 @@ void Controller::performDataMigrations()
     }
 }
 
-void Controller::generateUserAuthRecords(nx::db::QueryContext* queryContext)
+void Controller::generateUserAuthRecords(nx::utils::db::QueryContext* queryContext)
 {
     const auto allSystemSharings = m_systemManager.fetchAllSharings();
     for (const auto& sharing: allSystemSharings)

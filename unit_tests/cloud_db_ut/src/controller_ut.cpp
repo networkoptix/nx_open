@@ -2,8 +2,8 @@
 
 #include <gtest/gtest.h>
 
-#include <utils/db/async_sql_query_executor.h>
-#include <utils/db/test_support/test_with_db_helper.h>
+#include <nx/utils/db/async_sql_query_executor.h>
+#include <nx/utils/db/test_support/test_with_db_helper.h>
 
 #include <nx/cloud/cdb/controller.h>
 
@@ -14,12 +14,12 @@ namespace cdb {
 namespace test {
 
 class Controller:
-    public db::test::TestWithDbHelper,
+    public nx::utils::db::test::TestWithDbHelper,
     public ::testing::Test
 {
 public:
     Controller():
-        db::test::TestWithDbHelper("cdb", QString())
+        nx::utils::db::test::TestWithDbHelper("cdb", QString())
     {
     }
 
@@ -37,13 +37,7 @@ protected:
 
     void whenMigratedData()
     {
-        const std::string dbName = dbConnectionOptions().dbName.toStdString();
-
-        std::array<const char*, 4> args = {
-            "-db/driverName", "QSQLITE",
-            "-db/name", dbName.c_str()
-        };
-        m_settings.load(static_cast<int>(args.size()), args.data());
+        m_settings.setDbConnectionOptions(dbConnectionOptions());
         m_controller = std::make_unique<cdb::Controller>(m_settings);
         m_controller.reset();
     }

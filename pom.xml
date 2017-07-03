@@ -180,7 +180,7 @@
         <libjpeg-turbo.version>1.4.2</libjpeg-turbo.version>
         <vmux.version>1.0.0</vmux.version>
         <cpro.version>1.0.0</cpro.version>
-        <server-external.version>default</server-external.version>
+        <server-external.version>${parsedVersion.majorVersion}.${parsedVersion.minorVersion}</server-external.version>
         <help.version>${customization}-${parsedVersion.majorVersion}.${parsedVersion.minorVersion}</help.version>
         <gcc.version>4.9.4</gcc.version>
 
