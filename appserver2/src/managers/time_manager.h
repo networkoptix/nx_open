@@ -146,8 +146,6 @@ public:
     /** Called when primary time server has been changed by user. */
     void onGotPrimariTimeServerTran(const QnTransaction<ApiIdData>& tran);
     void primaryTimeServerChanged(const ApiIdData& serverId);
-    void peerSystemTimeReceived( const QnTransaction<ApiPeerSystemTimeData>& tran );
-    void knownPeersSystemTimeReceived( const QnTransaction<ApiPeerSystemTimeDataList>& tran );
     /** Returns synchronized time with time priority key (not local, but the one used). */
     TimeSyncInfo getTimeSyncInfo() const;
     /** Returns value of internal monotonic clock. */
@@ -156,7 +154,6 @@ public:
     void forgetSynchronizedTime();
     /** Reset sync time and resynce. */
     void forceTimeResync();
-    ApiPeerSystemTimeDataList getKnownPeersSystemTime() const;
     void processTimeSyncInfoHeader(
         const QnUuid& peerID,
         const nx_http::StringType& serializedTimeSync,
@@ -235,7 +232,6 @@ private:
     TimePriorityKey m_localTimePriorityKey;
     mutable QnMutex m_mutex;
     TimeSyncInfo m_usedTimeSyncInfo;
-    quint64 m_broadcastSysTimeTaskID;
     quint64 m_internetSynchronizationTaskID;
     quint64 m_manualTimerServerSelectionCheckTaskID;
     quint64 m_checkSystemTimeTaskID;
@@ -244,8 +240,6 @@ private:
     bool m_terminated;
     std::shared_ptr<Ec2DirectConnection> m_connection;
     QnTransactionMessageBusBase* m_messageBus;
-    /** TimeSyncInfo::syncTime stores local time on specified server. */
-    std::map<QnUuid, TimeSyncInfo> m_systemTimeByPeer;
     const Qn::PeerType m_peerType;
     nx::utils::TimerManager* const m_timerManager;
     std::unique_ptr<AbstractAccurateTimeFetcher> m_timeSynchronizer;
@@ -274,7 +268,6 @@ private:
         qint64 remotePeerSyncTime,
         const TimePriorityKey& remotePeerTimePriorityKey,
         qint64 timeErrorEstimation );
-    void broadcastLocalSystemTime( quint64 taskID );
     void checkIfManualTimeServerSelectionIsRequired( quint64 taskID );
     /** Periodically synchronizing time with internet (if possible). */
     void syncTimeWithInternet( quint64 taskID );
@@ -285,7 +278,6 @@ private:
     qint64 currentMSecsSinceEpoch() const;
 
     void updateRuntimeInfoPriority(quint64 priority);
-    void peerSystemTimeReceivedNonSafe( const ApiPeerSystemTimeData& tran );
     qint64 getSyncTimeNonSafe() const;
     void startSynchronizingTimeWithPeer(
         const QnUuid& peerID,

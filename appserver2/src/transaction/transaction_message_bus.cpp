@@ -638,12 +638,6 @@ void QnTransactionMessageBus::gotTransaction(const QnTransaction<T> &tran, QnTra
         case ApiCommand::forcePrimaryTimeServer:
             m_timeSyncManager->onGotPrimariTimeServerTran(tran);
             break;
-        case ApiCommand::broadcastPeerSystemTime:
-            m_timeSyncManager->peerSystemTimeReceived(tran);
-            break;
-        case ApiCommand::getKnownPeersSystemTime:
-            m_timeSyncManager->knownPeersSystemTimeReceived(tran);
-            break;
         case ApiCommand::runtimeInfoChanged:
             if (!onGotServerRuntimeInfo(tran, sender, transportHeader))
                 return; // already processed. do not proxy and ignore transaction
@@ -942,16 +936,6 @@ bool QnTransactionMessageBus::sendInitialData(QnTransactionTransport* transport)
         sendRuntimeInfo(transport, processedPeers, QnTranState());
         transport->sendTransaction(tran, processedPeers);
         transport->setReadSync(true);
-
-        //sending local time information on known servers
-        if (m_timeSyncManager)
-        {
-            QnTransaction<ApiPeerSystemTimeDataList> tran;
-            tran.params = m_timeSyncManager->getKnownPeersSystemTime();
-            tran.command = ApiCommand::getKnownPeersSystemTime;
-            tran.peerID = commonModule()->moduleGUID();
-            transport->sendTransaction(tran, processedPeers);
-        }
     }
     else if (transport->remotePeer().peerType == Qn::PT_OldMobileClient)
     {

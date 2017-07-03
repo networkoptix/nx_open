@@ -246,14 +246,6 @@ void MessageBus::sendInitialDataToClient(const P2pConnectionPtr& connection)
         }
         sendTransactionImpl(connection, tran, TransportHeader());
     }
-
-    {
-        QnTransaction<ApiPeerSystemTimeDataList> tran;
-        tran.params = m_timeSyncManager->getKnownPeersSystemTime();
-        tran.command = ApiCommand::getKnownPeersSystemTime;
-        tran.peerID = commonModule()->moduleGUID();
-        sendTransactionImpl(connection, tran, TransportHeader());
-    }
 }
 
 void MessageBus::connectSignals(const P2pConnectionPtr& connection)
@@ -1367,18 +1359,9 @@ void MessageBus::gotTransaction(
     // process special cases
     switch (tran.command)
     {
+        //TODO: move it to the global setting param or emit this data via NotificationManager
         case ApiCommand::forcePrimaryTimeServer:
             m_timeSyncManager->onGotPrimariTimeServerTran(tran);
-            if (localPeer().isServer())
-                sendTransaction(tran, transportHeader); //< Proxy
-            return;
-        case ApiCommand::broadcastPeerSystemTime:
-            m_timeSyncManager->peerSystemTimeReceived(tran);
-            if (localPeer().isServer())
-                sendTransaction(tran, transportHeader); //< Proxy
-            return;
-        case ApiCommand::getKnownPeersSystemTime:
-            m_timeSyncManager->knownPeersSystemTimeReceived(tran);
             if (localPeer().isServer())
                 sendTransaction(tran, transportHeader); //< Proxy
             return;
