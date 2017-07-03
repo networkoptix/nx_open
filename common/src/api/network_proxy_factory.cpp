@@ -60,7 +60,7 @@ QUrl QnNetworkProxyFactory::urlToResource(
                     proxy.user(),
                     proxy.password(),
                     via->realm(),
-                    nx_http::Method::Get,
+                    nx_http::Method::get,
                     nonce)));
             url.setQuery(urlQuery);
         }

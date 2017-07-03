@@ -313,16 +313,16 @@ bool isMessageBodyAllowed(int statusCode)
 }
 }
 
-const StringType Method::Get("GET");
-const StringType Method::Head("HEAD");
-const StringType Method::Post("POST");
-const StringType Method::Put("PUT");
-const StringType Method::Delete("DELETE");
-const StringType Method::Options("OPTIONS");
+const StringType Method::get("GET");
+const StringType Method::head("HEAD");
+const StringType Method::post("POST");
+const StringType Method::put("PUT");
+const StringType Method::delete_("DELETE");
+const StringType Method::options("OPTIONS");
 
 bool Method::isMessageBodyAllowed(ValueType method)
 {
-    return method != Get && method != Head && method != Delete;
+    return method != get && method != head && method != delete_;
 }
 
 //namespace Version

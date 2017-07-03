@@ -110,8 +110,8 @@ void QnTransactionTcpProcessor::run()
         nx_http::header::KeepAlive(
             commonModule->globalSettings()->connectionKeepAliveTimeout()).toString());
 
-    if( d->request.requestLine.method == nx_http::Method::Post ||
-        d->request.requestLine.method == nx_http::Method::Put )
+    if( d->request.requestLine.method == nx_http::Method::post ||
+        d->request.requestLine.method == nx_http::Method::put )
     {
         auto connectionGuidIter = d->request.headers.find( Qn::EC2_CONNECTION_GUID_HEADER_NAME );
         if( connectionGuidIter == d->request.headers.end() )

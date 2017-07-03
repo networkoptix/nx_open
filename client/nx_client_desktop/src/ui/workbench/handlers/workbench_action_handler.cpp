@@ -2198,7 +2198,7 @@ void ActionHandler::at_nonceReceived(QnAsyncHttpClientReply *reply)
         const auto appserverUrl = commonModule()->currentUrl();
         const auto authParam = createHttpQueryAuthParam(
             appserverUrl.userName(), appserverUrl.password(),
-            auth.realm, nx_http::Method::Get, auth.nonce.toUtf8());
+            auth.realm, nx_http::Method::get, auth.nonce.toUtf8());
 
         QUrl targetUrl(request.url);
         QUrlQuery urlQuery(targetUrl);
