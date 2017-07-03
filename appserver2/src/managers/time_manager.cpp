@@ -558,22 +558,14 @@ void TimeSynchronizationManager::peerSystemTimeReceived( const QnTransaction<Api
     QnMutexLocker lock( &m_mutex );
 
     peerSystemTimeReceivedNonSafe( tran.params );
-
-    lock.unlock();
-    WhileExecutingDirectCall callGuard( this );
-    emit peerTimeChanged( tran.params.peerID, getSyncTime(), tran.params.peerSysTime );
 }
 
 void TimeSynchronizationManager::knownPeersSystemTimeReceived( const QnTransaction<ApiPeerSystemTimeDataList>& tran )
 {
     for( const ApiPeerSystemTimeData& data: tran.params )
     {
-        {
-            QnMutexLocker lock( &m_mutex );
-            peerSystemTimeReceivedNonSafe( data );
-        }
-        WhileExecutingDirectCall callGuard( this );
-        emit peerTimeChanged( data.peerID, getSyncTime(), data.peerSysTime );
+        QnMutexLocker lock( &m_mutex );
+        peerSystemTimeReceivedNonSafe( data );
     }
 }
 
@@ -615,20 +607,6 @@ void TimeSynchronizationManager::forceTimeResync()
             m_timerManager->modifyTimerDelay(
                 m_broadcastSysTimeTaskID, std::chrono::milliseconds::zero());
     }
-}
-
-QnPeerTimeInfoList TimeSynchronizationManager::getPeerTimeInfoList() const
-{
-    QnMutexLocker lock( &m_mutex );
-
-    //list<pair<peerid, time> >
-    QnPeerTimeInfoList peers;
-
-    const qint64 currentClock = m_monotonicClock.elapsed();
-    for( auto it = m_systemTimeByPeer.cbegin(); it != m_systemTimeByPeer.cend(); ++it )
-        peers.push_back( QnPeerTimeInfo( it->first, it->second.syncTime + (currentClock - it->second.monotonicClockValue) ) );
-
-    return peers;
 }
 
 ApiPeerSystemTimeDataList TimeSynchronizationManager::getKnownPeersSystemTime() const

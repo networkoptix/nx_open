@@ -605,12 +605,7 @@ bool QnTimeServerSelectionModel::calculateSameTimezone() const
 
 void QnTimeServerSelectionModel::resetData(qint64 currentSyncTime)
 {
-    if (auto connection = commonModule()->ec2Connection())
-    {
-        auto timeManager = connection->getTimeManager(Qn::kSystemAccess);
-        for (const auto& info : timeManager->getPeerTimeInfoList())
-            m_serverOffsetCache[info.peerId] = info.time - currentSyncTime;
-    }
+    updateTimeOffset();
 
     /* Fill table with current data. */
     ScopedReset modelReset(this);

@@ -24,9 +24,6 @@ namespace ec2
         connect(timeSyncManager, &TimeSynchronizationManager::timeChanged,
             this, &QnTimeNotificationManager<QueryProcessorType>::timeChanged,
             Qt::DirectConnection);
-        connect(timeSyncManager, &TimeSynchronizationManager::peerTimeChanged,
-            this, &QnTimeNotificationManager<QueryProcessorType>::peerTimeChanged,
-            Qt::DirectConnection);
     }
 
     template<typename QueryProcessorType>
@@ -51,12 +48,6 @@ namespace ec2
     template<class QueryProcessorType>
     QnTimeManager<QueryProcessorType>::~QnTimeManager()
     {
-    }
-
-    template<class QueryProcessorType>
-    QnPeerTimeInfoList QnTimeManager<QueryProcessorType>::getPeerTimeInfoList() const
-    {
-        return m_timeSyncManager->getPeerTimeInfoList();
     }
 
     template<class QueryProcessorType>

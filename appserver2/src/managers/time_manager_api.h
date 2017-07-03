@@ -35,8 +35,6 @@ namespace ec2
             const Qn::UserAccessData &userAccessData );
         virtual ~QnTimeManager();
 
-        //!Implementation of AbstractTimeManager::getPeerTimeInfoList
-        virtual QnPeerTimeInfoList getPeerTimeInfoList() const override;
         //!Implementation of AbstractTimeManager::getCurrentTimeImpl
         virtual int getCurrentTimeImpl( impl::CurrentTimeHandlerPtr handler ) override;
         //!Implementation of AbstractTimeManager::forcePrimaryTimeServerImpl

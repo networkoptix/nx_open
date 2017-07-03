@@ -165,7 +165,6 @@ void QnCommonMessageProcessor::connectToConnection(const ec2::AbstractECConnecti
     auto timeManager = connection->getTimeNotificationManager();
     connect(timeManager, &ec2::AbstractTimeNotificationManager::timeServerSelectionRequired,    this, &QnCommonMessageProcessor::timeServerSelectionRequired);
     connect(timeManager, &ec2::AbstractTimeNotificationManager::timeChanged,                    this, &QnCommonMessageProcessor::syncTimeChanged);
-    connect(timeManager, &ec2::AbstractTimeNotificationManager::peerTimeChanged,                this, &QnCommonMessageProcessor::peerTimeChanged);
 
     auto discoveryManager = connection->getDiscoveryNotificationManager();
     connect(discoveryManager, &ec2::AbstractDiscoveryNotificationManager::discoveryInformationChanged, this, &QnCommonMessageProcessor::on_gotDiscoveryData);
@@ -558,18 +557,6 @@ void QnCommonMessageProcessor::resetTime()
             return;
 
         emit syncTimeChanged(syncTime);
-
-        ec2::QnPeerTimeInfoList peers = m_connection->getTimeManager(Qn::kSystemAccess)->getPeerTimeInfoList();
-        for (const ec2::QnPeerTimeInfo &info : peers)
-        {
-            if (!runtimeManager->hasItem(info.peerId))
-            {
-                qWarning() << "Time for peer" << info.peerId << "received before peer was found";
-                continue;
-            }
-            NX_ASSERT(ec2::ApiPeerData::isServer(runtimeManager->item(info.peerId).data.peer.peerType));
-            emit peerTimeChanged(info.peerId, syncTime, info.time);
-        }
     });
 }
 

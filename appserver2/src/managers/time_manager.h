@@ -156,7 +156,6 @@ public:
     void forgetSynchronizedTime();
     /** Reset sync time and resynce. */
     void forceTimeResync();
-    QnPeerTimeInfoList getPeerTimeInfoList() const;
     ApiPeerSystemTimeDataList getKnownPeersSystemTime() const;
     void processTimeSyncInfoHeader(
         const QnUuid& peerID,
@@ -172,14 +171,6 @@ signals:
     void primaryTimeServerSelectionRequired();
     /** Emitted when synchronized time has been changed. */
     void timeChanged( qint64 syncTime );
-    /**
-     * Emitted when peer peerId local time has changed.
-     * @param peerId.
-     * @param syncTime Synchronized time (UTC, millis from epoch) corresponding to peerLocalTime.
-     * @param peerLocalTime Peer local time (UTC, millis from epoch).
-     */
-    void peerTimeChanged(const QnUuid &peerId, qint64 syncTime, qint64 peerLocalTime);
-
 private:
     struct RemotePeerTimeInfo
     {
