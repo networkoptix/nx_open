@@ -211,7 +211,7 @@
         <additional.defines/>
         <customization.defines/>
 
-        <additionalQrcPathes/>
+        <additionalQrcPaths/>
 
         <!-- QT libs used by ALL modules (to be included in the installer. It is necessary to specify the particular libs in the corresponding modules) -->
         <qtlibs>
