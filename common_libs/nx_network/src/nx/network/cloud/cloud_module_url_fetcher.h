@@ -73,8 +73,8 @@ protected:
         nx_http::StatusCode::Value statusCode) override;
 
 private:
-    std::unique_ptr<AbstractEndpointSelector> m_endpointSelector;
     const int m_moduleAttrName;
+    std::unique_ptr<AbstractEndpointSelector> m_endpointSelector;
     boost::optional<QUrl> m_url;
 };
 
