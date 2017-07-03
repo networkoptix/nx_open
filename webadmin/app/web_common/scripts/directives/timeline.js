@@ -13,8 +13,7 @@ angular.module('nxCommon')
                 canPlayLive: '=',
                 ngClick: '&',
                 positionHandler: '=',
-                volumeLevel: '=',
-                serverTime: '='
+                volumeLevel: '='
             },
             templateUrl: Config.viewsDirCommon + 'components/timeline.html',
             link: function (scope, element/*, attrs*/) {
@@ -77,7 +76,6 @@ angular.module('nxCommon')
                     timelineConfig.zoomAccuracyMs,
                     timelineConfig.lastMinuteDuration,
                     timelineConfig.minPixelsPerLevel,
-                    Config.webclient.useServerTime,
                     $q); //Init boundariesProvider
 
                 var animationState = {
@@ -117,9 +115,9 @@ angular.module('nxCommon')
                     });
                 }
                 function initTimeline(){
-                    var now = (new Date()).getTime();
+                    var now = timeManager.nowToDisplay();
                     scope.scaleManager.setStart(scope.recordsProvider && scope.recordsProvider.chunksTree ? scope.recordsProvider.chunksTree.start : (now - timelineConfig.initialInterval));
-                    scope.scaleManager.setEnd(now);
+                    scope.scaleManager.setEnd(timeManager.nowToDisplay());
 
                     timelineActions.fullZoomOut(); // Animate full zoom out
                 }
@@ -201,9 +199,6 @@ angular.module('nxCommon')
                 // High-level Handlers
                 function scrollbarClickOrHold(left){
                     timelineActions.scrollingStart(left, timelineConfig.scrollSpeed * scope.viewportWidth);
-                }
-                function scrollbarDblClick(mouseX){
-                    timelineActions.animateScroll(mouseX / scope.viewportWidth);
                 }
 
                 function scrollButtonClickOrHold(left){
@@ -316,14 +311,6 @@ angular.module('nxCommon')
                     if(mouseOverElements.rightButton){
                         scrollButtonDblClick(false);
                         return;
-                    }
-                    if(mouseOverElements.timeline){
-                        timelineActions.zoomInToPoint(mouseX);
-                        return;
-                    }
-
-                    if(mouseOverElements.scrollbar && !mouseOverElements.scrollbarSlider){
-                        scrollbarDblClick(mouseXOverTimeline);
                     }
                 }
                 function viewportMouseDown(event){
@@ -439,10 +426,6 @@ angular.module('nxCommon')
                     if(scope.positionProvider && scope.positionProvider.liveMode) {
                         goToLive (true);
                     }
-                });
-
-                scope.$watch('serverTime.timeZoneOffset', function(){
-                    scope.scaleManager.updateServerOffset(scope.serverTime);
                 });
 
                 if(scope.positionProvider) {
