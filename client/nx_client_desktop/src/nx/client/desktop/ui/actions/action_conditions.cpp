@@ -220,13 +220,13 @@ public:
     {
     }
 
-    ActionVisibility ResourceCondition::check(const QnResourceList& resources,
+    ActionVisibility check(const QnResourceList& resources,
         QnWorkbenchContext* /*context*/)
     {
         return checkInternal<QnResourcePtr>(resources) ? EnabledAction : InvisibleAction;
     }
 
-    ActionVisibility ResourceCondition::check(const QnResourceWidgetList& widgets,
+    ActionVisibility check(const QnResourceWidgetList& widgets,
         QnWorkbenchContext* /*context*/)
     {
         return checkInternal<QnResourceWidget*>(widgets) ? EnabledAction : InvisibleAction;
