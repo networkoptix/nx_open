@@ -68,7 +68,7 @@ bool DbStructureUpdater::updateStructSync()
         m_queryExecutor->executeUpdateQuerySync(
             std::bind(&DbStructureUpdater::updateStructInternal, this, _1));
     }
-    catch (db::Exception e)
+    catch (const db::Exception& e)
     {
         NX_ERROR(this, lm("Error updating db schema \"%1\". %2").arg(m_schemaName).arg(e.what()));
         return false;
@@ -109,7 +109,7 @@ bool DbStructureUpdater::dbVersionTableExists(QueryContext* queryContext)
         selectDbVersionQuery.exec();
         return true;
     }
-    catch (Exception e)
+    catch (const Exception& e)
     {
         NX_VERBOSE(this, lm("db_version_data table presence check failed. %1").arg(e.what()));
         // It is better to check error type here, but qt does not always return proper error code.
@@ -142,7 +142,7 @@ bool DbStructureUpdater::dbVersionTableSupportsMultipleSchemas(QueryContext* que
         selectDbVersionQuery.exec();
         return true;
     }
-    catch (Exception e)
+    catch (const Exception& e)
     {
         NX_VERBOSE(this, lm("db_version_data.schema_name field presence check failed. %1").arg(e.what()));
         // It is better to check error type here, but qt does not always return proper error code.
@@ -184,7 +184,7 @@ void DbStructureUpdater::updateDbVersionTable(QueryContext* queryContext)
                 DROP TABLE db_version_data_old;
             )sql");
     }
-    catch (Exception e)
+    catch (const Exception& e)
     {
         NX_DEBUG(this, lm("db_version_data table update failed. %1").arg(e.what()));
         throw;
