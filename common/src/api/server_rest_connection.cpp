@@ -382,20 +382,44 @@ QUrl ServerConnection::prepareUrl(const QString& path, const QnRequestParamList&
     return result;
 }
 
-template <class T>
+template<typename T, typename std::enable_if<std::is_base_of<RestResultWithDataBase, T>::value>::type* = nullptr>
 T parseMessageBody(const Qn::SerializationFormat& format, const nx_http::BufferType& msgBody, bool* success)
 {
     switch(format)
     {
-    case Qn::JsonFormat:
-        return QJson::deserialized(msgBody, T(), success);
-    case Qn::UbjsonFormat:
-        return QnUbjson::deserialized(msgBody, T(), success);
-    default:
-        if (success)
-            *success = false;
-        NX_ASSERT(0, Q_FUNC_INFO, "Unsupported data format");
-        break;
+        case Qn::JsonFormat:
+        {
+            auto restResult = QJson::deserialized(msgBody, QnJsonRestResult(), success);
+            return T(restResult, restResult.deserialized<decltype(T::data)>());
+        }
+        case Qn::UbjsonFormat:
+        {
+            auto restResult = QnUbjson::deserialized(msgBody, QnUbjsonRestResult(), success);
+            return T(restResult, restResult.deserialized<decltype(T::data)>());
+        }
+        default:
+            if (success)
+                *success = false;
+            NX_ASSERT(0, Q_FUNC_INFO, "Unsupported data format");
+            break;
+    }
+    return T();
+}
+
+template<typename T, typename std::enable_if<!std::is_base_of<RestResultWithDataBase, T>::value>::type* = nullptr>
+T parseMessageBody(const Qn::SerializationFormat& format, const nx_http::BufferType& msgBody, bool* success)
+{
+    switch(format)
+    {
+        case Qn::JsonFormat:
+            return QJson::deserialized(msgBody, T(), success);
+        case Qn::UbjsonFormat:
+            return QnUbjson::deserialized(msgBody, T(), success);
+        default:
+            if (success)
+                *success = false;
+            NX_ASSERT(0, Q_FUNC_INFO, "Unsupported data format");
+            break;
     }
     return T();
 }
@@ -683,5 +707,12 @@ void ServerConnection::onHttpClientDone(int requestId, nx_http::AsyncHttpClientP
     if (callback)
         callback(requestId, systemError, statusCode, contentType, messageBody);
 };
+
+Handle ServerConnection::getTimeOfServersAsync(
+    Result<MultiServerTimeData>::type callback,
+    QThread* targetThread)
+{
+    return executeGet(lit("/ec2/getTimeOfServers"), QnRequestParamList(), callback, targetThread);
+}
 
 } // namespace rest

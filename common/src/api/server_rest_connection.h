@@ -15,16 +15,38 @@
 #include <business/business_fwd.h>
 #include <core/resource/resource_fwd.h>
 #include <common/common_module_aware.h>
+#include <api/model/time_reply.h>
 
 /*
-* New class for HTTP requests to mediaServer. It should be used instead of deprecated class QnMediaServerConnection.
-* It class can be used either for client and server side.
-* Class calls callback methods from IO thread. So, caller code should be thread-safe.
-* Client MUST NOT make requests in callbacks as it will cause a deadlock.
-*/
+ * New class for HTTP requests to mediaServer. It should be used instead of deprecated class QnMediaServerConnection.
+ * It class can be used either for client and server side.
+ * Class calls callback methods from IO thread. So, caller code should be thread-safe.
+ * Client MUST NOT make requests in callbacks as it will cause a deadlock.
+ */
 
 namespace rest
 {
+    struct RestResultWithDataBase: public QnRestResult
+    {
+        RestResultWithDataBase() {}
+        RestResultWithDataBase(const QnRestResult& other): QnRestResult(other) {}
+    };
+
+    template <typename T>
+    struct RestResultWithData: public RestResultWithDataBase
+    {
+        RestResultWithData() {}
+        RestResultWithData(const QnRestResult& restResult, const T& data): 
+            RestResultWithDataBase(restResult),
+            data(data)
+        {
+        }
+
+        T data;
+    };
+
+    using MultiServerTimeData = RestResultWithData<ApiMultiserverServerDateTimeDataList>;
+
     class ServerConnection:
         public QObject,
         public QnCommonModuleAware,
@@ -155,6 +177,10 @@ namespace rest
             const QString& fileName,
             GetCallback callback,
             QThread* targetThread = nullptr);
+
+        Handle getTimeOfServersAsync(
+            Result<MultiServerTimeData>::type callback,
+            QThread *targetThread = nullptr);
 
         /**
         * Cancel running request by known requestID. If request is canceled, callback isn't called.
