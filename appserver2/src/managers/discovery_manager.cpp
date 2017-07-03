@@ -179,22 +179,20 @@ template class QnDiscoveryManager<ServerQueryProcessorAccess>;
 template class QnDiscoveryManager<FixedUrlClientQueryProcessor>;
 
 DiscoveryMonitor::DiscoveryMonitor(QnTransactionMessageBusBase* messageBus):
-    m_messageBus(messageBus),
-    m_common(messageBus->commonModule())
+    QnCommonModuleAware(messageBus->commonModule()),
+    m_messageBus(messageBus)
 {
     QObject::connect(messageBus, &QnTransactionMessageBus::peerFound,
         this, &DiscoveryMonitor::clientFound);
 
-    m_common->moduleDiscoveryManager()->onSignals(this, &DiscoveryMonitor::serverFound,
+    commonModule()->moduleDiscoveryManager()->onSignals(this, &DiscoveryMonitor::serverFound,
         &DiscoveryMonitor::serverFound, &DiscoveryMonitor::serverLost);
-
-    //moveToThread(m_messageBus->thread());
 }
 
 DiscoveryMonitor::~DiscoveryMonitor()
 {
     m_messageBus->disconnect(this);
-    m_common->moduleDiscoveryManager()->disconnect(this);
+    commonModule()->moduleDiscoveryManager()->disconnect(this);
 }
 
 void DiscoveryMonitor::clientFound(QnUuid peerId, Qn::PeerType peerType)
@@ -203,12 +201,12 @@ void DiscoveryMonitor::clientFound(QnUuid peerId, Qn::PeerType peerType)
         return;
 
     send(ApiCommand::discoveredServersList,
-        getServers(m_common->moduleDiscoveryManager()), peerId);
+        getServers(commonModule()->moduleDiscoveryManager()), peerId);
 }
 
 void DiscoveryMonitor::serverFound(nx::vms::discovery::ModuleEndpoint module)
 {
-    const auto s = makeServer(module, m_common->globalSettings()->localSystemId());
+    const auto s = makeServer(module, globalSettings()->localSystemId());
     m_serverCache.emplace(s.id, s);
     send(ApiCommand::discoveredServerChanged, s, m_messageBus->directlyConnectedClientPeers());
 }
@@ -229,7 +227,7 @@ void DiscoveryMonitor::serverLost(QnUuid id)
 template<typename Transaction, typename Target>
 void DiscoveryMonitor::send(ApiCommand::Value command, Transaction data, const Target& target)
 {
-    QnTransaction<Transaction> t(command, m_common->moduleGUID(), std::move(data));
+    QnTransaction<Transaction> t(command, commonModule()->moduleGUID(), std::move(data));
     sendTransaction(m_messageBus, std::move(t), target);
 }
 

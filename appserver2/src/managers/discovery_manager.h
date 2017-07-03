@@ -49,8 +49,9 @@ namespace ec2
         std::unique_ptr<QObject> m_customData;
     };
 
-    // NOTE: Can not be moved in anonimous namespace in cpp because of bug in GCC 4.8.
-    class DiscoveryMonitor: public QObject
+    // NOTE: Can not be moved in anonymous namespace in the cpp because of a bug in GCC 4.8:
+    //     vtable for DiscoveryMonitor is not found when linking exe.
+    class DiscoveryMonitor: public QObject, public QnCommonModuleAware
     {
         Q_OBJECT
 
@@ -69,7 +70,6 @@ namespace ec2
 
     private:
         QnTransactionMessageBusBase* m_messageBus;
-        QnCommonModule* m_common;
         std::map<QnUuid, ApiDiscoveredServerData> m_serverCache;
     };
 
