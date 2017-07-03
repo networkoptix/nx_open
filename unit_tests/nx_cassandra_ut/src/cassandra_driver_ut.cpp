@@ -32,6 +32,20 @@ protected:
                 ASSERT_EQ(CASS_OK, result);
                 createTable();
             };
+
+        m_createTableCb =
+            [this](CassError result)
+            {
+                ASSERT_EQ(CASS_OK, result);
+                insertSome();
+            };
+
+        m_insertCb =
+            [this](CassError result)
+            {
+                ASSERT_EQ(CASS_OK, result);
+                selectSome();
+            };
     }
 
     void givenSelectRequestSetAsInsertCb()
@@ -48,10 +62,28 @@ private:
     nx::cassandra::Connection m_connection;
     MoveOnlyFunc<void(CassError)> m_connectCb;
     MoveOnlyFunc<void(CassError)> m_createKeySpaceCb;
+    MoveOnlyFunc<void(CassError)> m_createTableCb;
+    MoveOnlyFunc<void(CassError)> m_insertCb;
 
-    void createKeySpace() {}
-    void createTable() {}
+    void createKeySpace()
+    {
 
+    }
+
+    void createTable()
+    {
+
+    }
+
+    void insertSome()
+    {
+
+    }
+
+    void selectSome()
+    {
+
+    }
 };
 
 TEST_F(Connection, InsertSelect_Async)

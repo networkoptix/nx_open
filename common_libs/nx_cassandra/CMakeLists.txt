@@ -9,9 +9,8 @@ endif()
 
 nx_add_target(nx_cassandra LIBRARY ${library_type}
     PUBLIC_LIBS
-        nx_utils
-        openssl
-        cassandra)
+        cassandra
+        nx_utils)
 
 target_compile_definitions(nx_cassandra
     PRIVATE NX_NETWORK_API=${API_EXPORT_MACRO}
