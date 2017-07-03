@@ -95,6 +95,5 @@ private:
     mutable bool m_sameTimezone;
     mutable bool m_sameTimezoneValid;
 
-    rest::QnConnectionPtr m_apiConnection;
     rest::Handle m_currentRequest;
 };
