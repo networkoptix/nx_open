@@ -27,8 +27,13 @@
 
 #include <boost/algorithm/cxx11/any_of.hpp>
 #include <algorithm>
+#include <api/model/time_reply.h>
+#include <core/resource/media_server_resource.h>
 
 namespace {
+
+    static const int kUpdateTimeoutMs = 1000 * 5;
+
     template<class T>
     QVector<T> sortedVector(const QVector<T>& unsorted)
     {
@@ -79,34 +84,15 @@ QnTimeServerSelectionModel::QnTimeServerSelectionModel(QObject* parent):
     QnWorkbenchContextAware(parent),
     m_hasInternetAccess(false),
     m_sameTimezone(false),
-    m_sameTimezoneValid(false)
+    m_sameTimezoneValid(false),
+    m_currentRequest(rest::Handle())
 {
     auto processor = qnCommonMessageProcessor;
+    auto resPool = commonModule()->resourcePool();
+    auto server = resPool->getResourceById<QnMediaServerResource>(commonModule()->remoteGUID());
+    m_apiConnection = server->restConnection();
 
-    /* Handle peer time updates. */
-    connect(processor, &QnCommonMessageProcessor::peerTimeChanged, this,
-        [this](const QnUuid& peerId, qint64 syncTime, qint64 peerTime)
-        {
-            /* Store received value to use it later. */
-            qint64 offset = peerTime - syncTime;
-            m_serverOffsetCache[peerId] = offset;
-            PRINT_DEBUG("get time for peer " + peerId.toByteArray());
-
-            /* Check if the server is already online. */
-            int idx = qnIndexOf(m_items,
-                [peerId](const Item& item)
-                {
-                    return item.peerId == peerId;
-                });
-
-            if (idx < 0)
-                return;
-
-            m_items[idx].offset = offset;
-            m_items[idx].ready = true;
-            PRINT_DEBUG("peer " + peerId.toByteArray() + " is ready");
-            emit dataChanged(index(idx, TimeColumn), index(idx, OffsetColumn), kTextRoles);
-        });
+    updateTimeOffset();
 
     connect(processor, &QnCommonMessageProcessor::syncTimeChanged, this,
         [this](qint64 syncTime)
@@ -212,6 +198,41 @@ QnTimeServerSelectionModel::QnTimeServerSelectionModel(QObject* parent):
 
     /* Requesting initial time. */
     resetData(qnSyncTime->currentMSecsSinceEpoch());
+}
+
+void QnTimeServerSelectionModel::updateTimeOffset()
+{
+    if (m_currentRequest)
+        return;
+
+    m_currentRequest = m_apiConnection->getTimeOfServersAsync(
+        [this](bool success, int handle, rest::MultiServerTimeData data)
+    {
+        auto syncTime = qnSyncTime->currentMSecsSinceEpoch();
+        for (const auto& record: data.data)
+        {
+            /* Store received value to use it later. */
+            qint64 offset = record.timeSinseEpochMs - syncTime;
+            m_serverOffsetCache[record.serverId] = offset;
+            PRINT_DEBUG("get time for peer " + peerId.toByteArray());
+
+            /* Check if the server is already online. */
+            int idx = qnIndexOf(m_items,
+                [record](const Item& item)
+            {
+                return item.peerId == record.serverId;
+            });
+
+            if (idx < 0)
+                return;
+
+            m_items[idx].offset = offset;
+            m_items[idx].ready = true;
+            PRINT_DEBUG("peer " + peerId.toByteArray() + " is ready");
+            emit dataChanged(index(idx, TimeColumn), index(idx, OffsetColumn), kTextRoles);
+        }
+        m_currentRequest = rest::Handle(); //< reset
+    });
 }
 
 void QnTimeServerSelectionModel::updateFirstItemCheckbox()

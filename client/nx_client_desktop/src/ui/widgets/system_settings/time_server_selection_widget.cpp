@@ -130,11 +130,23 @@ QnTimeServerSelectionWidget::QnTimeServerSelectionWidget(QWidget *parent /* = NU
     connect(m_model, &QnTimeServerSelectionModel::dataChanged,
         this, &QnAbstractPreferencesWidget::hasChangesChanged);
 
+    static const int kUpdateTimeMs = 1000;
+    static const int kUpdateTimeOffsetMs = 5000;
     auto updateTime =
         [this]()
         {
+            static const int k = kUpdateTimeOffsetMs / kUpdateTimeMs;
             if (isVisible())
+            {
+                if (m_timeCounter % k == 0)
+                    m_model->updateTimeOffset();
+                ++m_timeCounter;
                 this->updateTime();
+            }
+            else
+            {
+                m_timeCounter = 0;
+            }
         };
 
     connect(qnSyncTime, &QnSyncTime::timeChanged, this, updateTime);

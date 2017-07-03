@@ -1,6 +1,7 @@
 #pragma once
 
 #include <QtCore/QAbstractTableModel>
+#include <QtCore/QTimer>
 
 #include <client/client_color_types.h>
 #include <utils/common/connective.h>
@@ -8,7 +9,7 @@
 #include <ui/workbench/workbench_context_aware.h>
 #include <nx/utils/scoped_model_operations.h>
 #include <nx/utils/uuid.h>
-
+#include <api/server_rest_connection.h>
 
 struct QnPeerRuntimeInfo;
 
@@ -58,7 +59,7 @@ public:
 
     const QVector<QColor>& colors() const;
     void setColors(const QVector<QColor>& colors);
-
+    void updateTimeOffset();
 signals:
     void hasInternetAccessChanged();
 
@@ -72,7 +73,6 @@ private:
     void updateFirstItemCheckbox();
 
     void updateHasInternetAccess();
-
 private:
     struct Item
     {
@@ -94,4 +94,7 @@ private:
 
     mutable bool m_sameTimezone;
     mutable bool m_sameTimezoneValid;
+
+    rest::QnConnectionPtr m_apiConnection;
+    rest::Handle m_currentRequest;
 };
