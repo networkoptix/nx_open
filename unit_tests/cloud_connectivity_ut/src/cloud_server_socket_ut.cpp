@@ -517,7 +517,7 @@ protected:
             });
     }
 
-    void TearDown() override
+    virtual void TearDown() override
     {
         const auto kTotalConnects = kThreadCount * kClientCount * kPeerCount;
         for (size_t i = 0; i < kTotalConnects; ++i)
@@ -526,6 +526,9 @@ protected:
         m_server->pleaseStopSync();
         for (auto& thread : m_threads)
             thread.join();
+
+        for (auto& socket: m_connectSockets)
+            socket.second->pleaseStopSync();
 
         EXPECT_GE(m_acceptedSockets.size(), kTotalConnects);
         for (auto& socket : m_acceptedSockets)

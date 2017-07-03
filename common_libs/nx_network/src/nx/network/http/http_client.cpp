@@ -42,6 +42,16 @@ bool HttpClient::doGet(const QUrl& url)
             &nx_http::AsyncHttpClient::doGet), _1, url));
 }
 
+bool HttpClient::doUpgrade(
+    const QUrl& url,
+    const StringType& protocolToUpgradeTo)
+{
+    using namespace std::placeholders;
+    return doRequest(std::bind(
+        static_cast<void(AsyncHttpClient::*)(const QUrl&, const StringType&)>(
+            &nx_http::AsyncHttpClient::doUpgrade), _1, url, protocolToUpgradeTo));
+}
+
 bool HttpClient::doPost(
     const QUrl& url,
     const nx_http::StringType& contentType,

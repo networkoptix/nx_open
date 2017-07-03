@@ -75,7 +75,7 @@ void DbStructureUpdater::addUpdateScript(
     m_updateScripts.emplace_back(std::move(scriptByDbType));
 }
 
-void DbStructureUpdater::addUpdateFunc(DbUpdateFunc dbUpdateFunc)
+void DbStructureUpdater::addUpdateFunc(UpdateFunc dbUpdateFunc)
 {
     m_updateScripts.emplace_back(std::move(dbUpdateFunc));
 }
