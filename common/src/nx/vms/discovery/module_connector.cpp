@@ -339,7 +339,7 @@ bool ModuleConnector::Module::saveConnection(
     m_disconnectTimer.reset();
 
     auto socket = client->takeSocket();
-    std::chrono::milliseconds recvTimeout;
+    std::chrono::milliseconds recvTimeout(0);
     if (!socket->setKeepAlive(kKeepAliveOptions))
     {
         recvTimeout = kKeepAliveOptions.maxDelay();
