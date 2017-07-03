@@ -31,6 +31,7 @@ namespace settings_names {
 const QString kNameDisabledVendors(lit("disabledVendors"));
 const QString kNameCameraSettingsOptimization(lit("cameraSettingsOptimization"));
 const QString kNameAutoUpdateThumbnails(lit("autoUpdateThumbnails"));
+const QString kUseTextEmailFormat(lit("useTextEmailFormat"));
 const QString kNameAuditTrailEnabled(lit("auditTrailEnabled"));
 const QString kAuditTrailPeriodDaysName(lit("auditTrailPeriodDays"));
 const QString kEventLogPeriodDaysName(lit("eventLogPeriodDays"));
@@ -120,6 +121,12 @@ public:
      */
     bool isAutoUpdateThumbnailsEnabled() const;
     void setAutoUpdateThumbnailsEnabled(bool value);
+
+    /**
+     * Send text email instead of HTML email in event rules/actions
+     */
+    bool isUseTextEmailFormat() const;
+    void setUseTextEmailFormat(bool value);
 
     bool isAuditTrailEnabled() const;
     void setAuditTrailEnabled(bool value);
@@ -250,6 +257,7 @@ signals:
     void eventLogPeriodDaysChanged();
     void cameraSettingsOptimizationChanged();
     void autoUpdateThumbnailsChanged();
+    void useTextEmailFormatChanged();
     void autoDiscoveryChanged();
     void emailSettingsChanged();
     void ldapSettingsChanged();
@@ -278,6 +286,7 @@ private:
 private:
     QnResourcePropertyAdaptor<bool> *m_cameraSettingsOptimizationAdaptor;
     QnResourcePropertyAdaptor<bool> *m_autoUpdateThumbnailsAdaptor;
+    QnResourcePropertyAdaptor<bool> *m_useTextEmailFormatAdaptor;
     QnResourcePropertyAdaptor<bool> *m_auditTrailEnabledAdaptor;
     QnResourcePropertyAdaptor<int>* m_auditTrailPeriodDaysAdaptor;
     QnResourcePropertyAdaptor<int>* m_eventLogPeriodDaysAdaptor;
