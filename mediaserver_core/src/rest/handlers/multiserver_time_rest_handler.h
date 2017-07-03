@@ -3,7 +3,7 @@
 #include <rest/server/fusion_rest_handler.h>
 
 /**
- * Returns local PC time and time zone for all servers in the system.
+ * @return Local PC time and time zone for all servers in the system.
  */
 class QnMultiserverTimeRestHandler: public QnFusionRestHandler
 {

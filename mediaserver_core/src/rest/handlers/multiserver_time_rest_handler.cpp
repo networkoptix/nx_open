@@ -14,53 +14,54 @@
 
 namespace {
 
-    using DummyType = int;
-    typedef QnMultiserverRequestContext<DummyType> QnTimeRequestContext;
+using DummyType = int;
+typedef QnMultiserverRequestContext<DummyType> QnTimeRequestContext;
 
-    static void loadRemoteDataAsync(
-        QnCommonModule* commonModule,
-        ApiMultiserverServerDateTimeDataList& outputData,
-        const QnMediaServerResourcePtr& server,
-        QnTimeRequestContext* ctx,
-        const QString& urlPath)
-    {
-        auto requestCompletionFunc =
-            [ctx, &outputData, server]
-            ( SystemError::ErrorCode osErrorCode, int statusCode, nx_http::BufferType msgBody)
+static void loadRemoteDataAsync(
+    QnCommonModule* commonModule,
+    ApiMultiserverServerDateTimeDataList& outputData,
+    const QnMediaServerResourcePtr& server,
+    QnTimeRequestContext* ctx,
+    const QString& urlPath)
+{
+    auto requestCompletionFunc =
+        [ctx, &outputData, server]
+        (SystemError::ErrorCode osErrorCode, int statusCode, nx_http::BufferType msgBody)
+        {
+            bool success = false;
+            ApiServerDateTimeData remoteData;
+            QnTimeReply timeData;
+            if (osErrorCode == SystemError::noError && statusCode == nx_http::StatusCode::ok)
             {
-                bool success = false;
-                ApiServerDateTimeData remoteData;
-                QnTimeReply timeData;
-                if (osErrorCode == SystemError::noError && statusCode == nx_http::StatusCode::ok)
+                QnJsonRestResult jsonReply;
+                success = QJson::deserialize(msgBody, &jsonReply)
+                    && QJson::deserialize(jsonReply.reply, &timeData);
+            }
+            if (success)
+            {
+                remoteData.serverId = server->getId();
+                remoteData.timeSinseEpochMs = timeData.utcTime;
+                remoteData.timeZoneOffsetMs = timeData.timeZoneOffset;
+                remoteData.timeZoneId = timeData.timezoneId;
+            }
+            ctx->executeGuarded(
+                [ctx, success, &remoteData, &outputData]()
                 {
-                    QnJsonRestResult jsonReply;
-                    success = QJson::deserialize(msgBody, &jsonReply)
-                        && QJson::deserialize(jsonReply.reply, &timeData);
-                }
-                if (success)
-                {
-                    remoteData.serverId = server->getId();
-                    remoteData.timeSinseEpochMs = timeData.utcTime;
-                    remoteData.timeZoneOffsetMs = timeData.timeZoneOffset;
-                    remoteData.timeZoneId = timeData.timezoneId;
-                }
-                ctx->executeGuarded(
-                    [ctx, success, &remoteData, &outputData]()
-                    {
-                        if (success)
-                            outputData.push_back(std::move(remoteData));
-                        ctx->requestProcessed();
-                    });
-            };
+                    if (success)
+                        outputData.push_back(std::move(remoteData));
+                    ctx->requestProcessed();
+                });
+        };
 
-        QUrl apiUrl(server->getApiUrl());
-        apiUrl.setPath(urlPath);
-        apiUrl.setQuery("local"); //< Use device (OS) time.
+    QUrl apiUrl(server->getApiUrl());
+    apiUrl.setPath(urlPath);
+    apiUrl.setQuery("local"); //< Use device (OS) time.
 
-        runMultiserverDownloadRequest(commonModule->router(), apiUrl, server, requestCompletionFunc, ctx);
-    }
+    auto router = commonModule->router();
+    runMultiserverDownloadRequest(router, apiUrl, server, requestCompletionFunc, ctx);
+}
+
 } // namespace
-
 
 QnMultiserverTimeRestHandler::QnMultiserverTimeRestHandler(const QString& getTimeApiMethodPath):
     QnFusionRestHandler(),

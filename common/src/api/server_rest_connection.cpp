@@ -382,10 +382,14 @@ QUrl ServerConnection::prepareUrl(const QString& path, const QnRequestParamList&
     return result;
 }
 
-template<typename T, typename std::enable_if<std::is_base_of<RestResultWithDataBase, T>::value>::type* = nullptr>
-T parseMessageBody(const Qn::SerializationFormat& format, const nx_http::BufferType& msgBody, bool* success)
+template<typename T,
+    typename std::enable_if<std::is_base_of<RestResultWithDataBase, T>::value>::type* = nullptr>
+T parseMessageBody(
+    const Qn::SerializationFormat& format,
+    const nx_http::BufferType& msgBody,
+    bool* success)
 {
-    switch(format)
+    switch (format)
     {
         case Qn::JsonFormat:
         {
@@ -406,10 +410,14 @@ T parseMessageBody(const Qn::SerializationFormat& format, const nx_http::BufferT
     return T();
 }
 
-template<typename T, typename std::enable_if<!std::is_base_of<RestResultWithDataBase, T>::value>::type* = nullptr>
-T parseMessageBody(const Qn::SerializationFormat& format, const nx_http::BufferType& msgBody, bool* success)
+template<typename T,
+    typename std::enable_if<!std::is_base_of<RestResultWithDataBase, T>::value>::type* = nullptr>
+T parseMessageBody(
+    const Qn::SerializationFormat& format,
+    const nx_http::BufferType& msgBody,
+    bool* success)
 {
-    switch(format)
+    switch (format)
     {
         case Qn::JsonFormat:
             return QJson::deserialized(msgBody, T(), success);
@@ -523,7 +531,10 @@ void invoke(REST_CALLBACK(ResultType) callback,
 }
 
 template <typename ResultType>
-Handle ServerConnection::executeRequest(const nx_http::ClientPool::Request& request, REST_CALLBACK(ResultType) callback, QThread* targetThread)
+Handle ServerConnection::executeRequest(
+    const nx_http::ClientPool::Request& request,
+    REST_CALLBACK(ResultType) callback,
+    QThread* targetThread)
 {
     if (callback)
     {
@@ -549,7 +560,10 @@ Handle ServerConnection::executeRequest(const nx_http::ClientPool::Request& requ
     return sendRequest(request);
 }
 
-Handle ServerConnection::executeRequest(const nx_http::ClientPool::Request& request, REST_CALLBACK(QByteArray) callback, QThread* targetThread)
+Handle ServerConnection::executeRequest(
+    const nx_http::ClientPool::Request& request,
+    REST_CALLBACK(QByteArray) callback,
+    QThread* targetThread)
 {
     if (callback)
     {
@@ -563,7 +577,9 @@ Handle ServerConnection::executeRequest(const nx_http::ClientPool::Request& requ
             (Handle id, SystemError::ErrorCode osErrorCode, int statusCode, nx_http::StringType contentType, nx_http::BufferType msgBody)
             {
                 Q_UNUSED(contentType)
-                bool success = (osErrorCode == SystemError::noError && statusCode >= nx_http::StatusCode::ok && statusCode <= nx_http::StatusCode::partialContent);
+                bool success = (osErrorCode == SystemError::noError
+                    && statusCode >= nx_http::StatusCode::ok
+                    && statusCode <= nx_http::StatusCode::partialContent);
 
                 if (targetThread && targetThreadGuard.isNull())
                     return;
@@ -575,7 +591,10 @@ Handle ServerConnection::executeRequest(const nx_http::ClientPool::Request& requ
     return sendRequest(request);
 }
 
-Handle ServerConnection::executeRequest(const nx_http::ClientPool::Request& request, REST_CALLBACK(EmptyResponseType) callback, QThread* targetThread)
+Handle ServerConnection::executeRequest(
+    const nx_http::ClientPool::Request& request,
+    REST_CALLBACK(EmptyResponseType) callback,
+    QThread* targetThread)
 {
     if (callback)
     {
@@ -588,7 +607,9 @@ Handle ServerConnection::executeRequest(const nx_http::ClientPool::Request& requ
             [callback, targetThread, targetThreadGuard, serverId, timer]
             (Handle id, SystemError::ErrorCode osErrorCode, int statusCode, nx_http::StringType, nx_http::BufferType)
             {
-                bool success = (osErrorCode == SystemError::noError && statusCode >= nx_http::StatusCode::ok && statusCode <= nx_http::StatusCode::partialContent);
+                bool success = (osErrorCode == SystemError::noError
+                    && statusCode >= nx_http::StatusCode::ok
+                    && statusCode <= nx_http::StatusCode::partialContent);
 
                 if (targetThread && targetThreadGuard.isNull())
                     return;
@@ -613,7 +634,8 @@ nx_http::ClientPool::Request ServerConnection::prepareRequest(
     const nx_http::StringType& contentType,
     const nx_http::StringType& messageBody)
 {
-    const auto server =  commonModule()->resourcePool()->getResourceById<QnMediaServerResource>(m_serverId);
+    auto resPool = commonModule()->resourcePool();
+    const auto server = resPool->getResourceById<QnMediaServerResource>(m_serverId);
     if (!server)
         return nx_http::ClientPool::Request();
     const auto connection = commonModule()->ec2Connection();
@@ -672,7 +694,9 @@ nx_http::ClientPool::Request ServerConnection::prepareRequest(
     return request;
 }
 
-Handle ServerConnection::sendRequest(const nx_http::ClientPool::Request& request, HttpCompletionFunc callback)
+Handle ServerConnection::sendRequest(
+    const nx_http::ClientPool::Request& request,
+    HttpCompletionFunc callback)
 {
     auto httpPool = nx_http::ClientPool::instance();
     QnMutexLocker lock(&m_mutex);
