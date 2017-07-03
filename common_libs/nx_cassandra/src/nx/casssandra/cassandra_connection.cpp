@@ -1,3 +1,4 @@
+#include <string.h>
 #include "cassandra_connection.h"
 
 using namespace nx::utils;
@@ -29,7 +30,7 @@ void* makeErrorCbConnectionContext(Connection* connection, MoveOnlyFunc<void(Cas
 static void onDone(CassFuture* future, void* data)
 {
     CassError result = cass_future_error_code(future);
-    ErrorCbConnectionContext* ctx = (Context*)data;
+    ErrorCbConnectionContext* ctx = (ErrorCbConnectionContext*)data;
     ctx->cb(result);
     ctx->free();
 }
@@ -64,7 +65,7 @@ void* makeQueryCbConnectionContext(
 static void onPrepare(CassFuture* future, void* data)
 {
     CassError result = cass_future_error_code(future);
-    QueryCbConnectionContext* ctx = (Context*)data;
+    QueryCbConnectionContext* ctx = (QueryCbConnectionContext*)data;
     ctx->cb(result, Query(future));
     ctx->free();
 }
@@ -76,7 +77,7 @@ struct SelectCbConnectionContext
     Query query;
     MoveOnlyFunc<void(CassError, const QueryResult&)> cb;
 
-    QueryCbConnectionContext(
+    SelectCbConnectionContext(
         nx::cassandra::Connection* ctx,
         Query query,
         MoveOnlyFunc<void(CassError, const QueryResult&)> cb)
@@ -103,11 +104,49 @@ void* makeSelectCbConnectionContext(
 static void onSelect(CassFuture* future, void* data)
 {
     CassError result = cass_future_error_code(future);
-    ExecuteCbConnectionContext* ctx = (Context*)data;
+    SelectCbConnectionContext* ctx = (SelectCbConnectionContext*)data;
     ctx->cb(result, QueryResult(future));
     ctx->free();
 }
 
+
+struct UpdateCbConnectionContext
+{
+    nx::cassandra::Connection* ctx;
+    Query query;
+    MoveOnlyFunc<void(CassError)> cb;
+
+    UpdateCbConnectionContext(
+        nx::cassandra::Connection* ctx,
+        Query query,
+        MoveOnlyFunc<void(CassError)> cb)
+        :
+        ctx(ctx),
+        query(std::move(query)),
+        cb(std::move(cb))
+    {}
+
+    void free()
+    {
+        delete this;
+    }
+};
+
+void* makeUpdateCbConnectionContext(
+    Connection* connection,
+    Query query,
+    MoveOnlyFunc<void(CassError)> cb)
+{
+    return new UpdateCbConnectionContext(connection, std::move(query), std::move(cb));
+}
+
+static void onUpdate(CassFuture* future, void* data)
+{
+    CassError result = cass_future_error_code(future);
+    UpdateCbConnectionContext* ctx = (UpdateCbConnectionContext*)data;
+    ctx->cb(result);
+    ctx->free();
+}
 } // namespace
 
 namespace nx {
@@ -127,6 +166,12 @@ Query::Query(CassFuture* future)
     m_statement = cass_prepared_bind(m_prepared);
 }
 
+Query::~Query()
+{
+    if (m_statement)
+        cass_statement_free(m_statement);
+}
+
 bool Query::bind(const std::string& key, const std::string& value)
 {
     if (!m_statement)
@@ -140,70 +185,145 @@ bool Query::bind(const std::string& key, const std::string& value)
     return result == CASS_OK;
 }
 
+#define NX_CASS_BIND_BASIC_VALUE(type) \
+    if (!m_statement) \
+        return false; \
+    \
+    auto result = cass_statement_bind_##type##_by_name_n( \
+        m_statement, \
+        key.data(), key.size(), \
+        (cass_##type##_t)value); \
+    \
+    return result == CASS_OK;
+
 bool Query::bind(const std::string& key, bool value)
 {
-    if (!m_statement)
-        return false;
-
-    auto result = cass_statement_bind_bool_by_name_n(
-        m_statement,
-        key.data(), key.size(),
-        (cass_bool_t)value);
-
-    return result == CASS_OK;
+    NX_CASS_BIND_BASIC_VALUE(bool);
 }
 
 bool Query::bind(const std::string& key, double value)
 {
-    if (!m_statement)
-        return false;
-
-    auto result = cass_statement_bind_double_by_name_n(
-        m_statement,
-        key.data(), key.size(),
-        (cass_double_t)value);
-
-    return result == CASS_OK;
+    NX_CASS_BIND_BASIC_VALUE(double);
 }
 
 bool Query::bind(const std::string& key, float value)
 {
-    if (!m_statement)
-        return false;
-
-    auto result = cass_statement_bind_float_by_name_n(
-        m_statement,
-        key.data(), key.size(),
-        (cass_float_t)value);
-
-    return result == CASS_OK;
+    NX_CASS_BIND_BASIC_VALUE(float);
 }
 
 bool Query::bind(const std::string& key, int32_t value)
 {
-    if (!m_statement)
-        return false;
-
-    auto result = cass_statement_bind_int32_by_name_n(
-        m_statement,
-        key.data(), key.size(),
-        (cass_int32_t)value);
-
-    return result == CASS_OK;
+    NX_CASS_BIND_BASIC_VALUE(int32);
 }
 
 bool Query::bind(const std::string& key, int64_t value)
 {
-    if (!m_statement)
+    NX_CASS_BIND_BASIC_VALUE(int64);
+}
+
+#undef NX_CASS_BIND_BASIC_VALUE
+
+/** ---------------------------------- QueryResult ----------------------------------------------*/
+
+QueryResult::QueryResult(CassFuture* future)
+{
+    if (cass_future_error_code(future) != CASS_OK)
+        return;
+
+    m_result = cass_future_get_result(future);
+    if (!m_result)
+        return;
+
+    m_iterator = cass_iterator_from_result(m_result);
+}
+
+QueryResult::~QueryResult()
+{
+    if (m_result)
+        cass_result_free(m_result);
+
+    if (m_iterator)
+        cass_iterator_free(m_iterator);
+}
+
+bool QueryResult::next()
+{
+    if (!m_iterator)
         return false;
 
-    auto result = cass_statement_bind_int64_by_name_n(
-        m_statement,
-        key.data(), key.size(),
-        (cass_int64_t)value);
+    return cass_iterator_next(m_iterator);
+}
+
+bool QueryResult::get(const std::string& key, std::string* value) const
+{
+    if (!m_iterator)
+        return false;
+
+    const CassRow* row = cass_iterator_get_row(m_iterator);
+    if (!row)
+        return false;
+
+    const char* val;
+    size_t valSize;
+    auto result = cass_value_get_string(
+                cass_row_get_column_by_name_n(row, key.data(), key.size()),
+                &val,
+                &valSize);
+
+    if (result == CASS_OK)
+    {
+        value->resize(valSize);
+        memcpy((void*)value->data(), val, valSize);
+    }
 
     return result == CASS_OK;
 }
+
+#define NX_CASS_GET_BASIC_VALUE(type) \
+    if (!m_iterator) \
+        return false; \
+    \
+    const CassRow* row = cass_iterator_get_row(m_iterator); \
+    if (!row) \
+        return false; \
+    \
+    cass_##type##_t val; \
+    auto result = cass_value_get_##type( \
+            cass_row_get_column_by_name_n(row, key.data(), key.size()), \
+            &val); \
+    \
+    if (result == CASS_OK) \
+        *value = val; \
+    \
+    return result == CASS_OK;
+
+
+bool QueryResult::get(const std::string& key, bool* value) const
+{
+    NX_CASS_GET_BASIC_VALUE(bool);
+}
+
+bool QueryResult::get(const std::string& key, double* value) const
+{
+    NX_CASS_GET_BASIC_VALUE(double);
+}
+
+bool QueryResult::get(const std::string& key, float* value) const
+{
+    NX_CASS_GET_BASIC_VALUE(float);
+}
+
+bool QueryResult::get(const std::string& key, int32_t* value) const
+{
+    NX_CASS_GET_BASIC_VALUE(int32);
+}
+
+bool QueryResult::get(const std::string& key, int64_t* value) const
+{
+    NX_CASS_GET_BASIC_VALUE(int64);
+}
+
+#undef NX_CASS_GET_BASIC_VALUE
 
 /** ------------------------------- Connection --------------------------------------------------*/
 
@@ -259,27 +379,15 @@ void Connection::executeSelectAsync(
 
 void Connection::executeUpdateAsync(
     Query query,
-    nx::utils::MoveOnlyFunc<void(CassError)> executeCb)
+    nx::utils::MoveOnlyFunc<void(CassError)> updateCb)
 {
     CassFuture* future = cass_session_connect(m_session, m_cluster);
     cass_future_set_callback(
         future,
-        &onDone,
-        makeErrorCbConnectionContext(this, std::move(initCb)));
+        &onUpdate,
+        makeUpdateCbConnectionContext(this, std::move(query), std::move(updateCb)));
     cass_future_free(future);
 }
-
-//void Connection::queryAsync(
-//    const Query& /*query*/,
-//    nx::utils::MoveOnlyFunc<void(CassError, const QueryResult&)> /*queryCb*/)
-//{
-
-//}
-
-//boost::optional<QueryResult> Connection::querySync(const Query& /*query*/)
-//{
-//    return boost::none;
-//}
 
 Connection::~Connection()
 {
