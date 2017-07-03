@@ -37,7 +37,7 @@ void DbStructureUpdater::addUpdateScript(
     m_schemaUpdater.addUpdateScript(std::move(scriptByDbType));
 }
 
-void DbStructureUpdater::addUpdateFunc(DbUpdateFunc dbUpdateFunc)
+void DbStructureUpdater::addUpdateFunc(UpdateFunc dbUpdateFunc)
 {
     m_schemaUpdater.addUpdateFunc(std::move(dbUpdateFunc));
 }
@@ -85,20 +85,20 @@ void DbStructureUpdater::updateStructInternal(QueryContext* queryContext)
 
 void DbStructureUpdater::updateDbToMultipleSchema(QueryContext* queryContext)
 {
-    if (!isDbVersionTableExists(queryContext))
+    if (!dbVersionTableExists(queryContext))
     {
         createInitialSchema(queryContext);
     }
-    else if (!isDbVersionTableSupportsMultipleSchemas(queryContext))
+    else if (!dbVersionTableSupportsMultipleSchemas(queryContext))
     {
         updateDbVersionTable(queryContext);
-        setDbSchemaNameTo(queryContext, m_schemaName);
+        setDbSchemaName(queryContext, m_schemaName);
     }
  
     // db_version_data table is present and supports multiple schemas. Nothing to do here.
 }
 
-bool DbStructureUpdater::isDbVersionTableExists(QueryContext* queryContext)
+bool DbStructureUpdater::dbVersionTableExists(QueryContext* queryContext)
 {
     SqlQuery selectDbVersionQuery(*queryContext->connection());
     try
@@ -131,7 +131,7 @@ void DbStructureUpdater::createInitialSchema(QueryContext* queryContext)
     createInitialSchemaQuery.exec();
 }
 
-bool DbStructureUpdater::isDbVersionTableSupportsMultipleSchemas(QueryContext* queryContext)
+bool DbStructureUpdater::dbVersionTableSupportsMultipleSchemas(QueryContext* queryContext)
 {
     SqlQuery selectDbVersionQuery(*queryContext->connection());
     try
@@ -177,6 +177,12 @@ void DbStructureUpdater::updateDbVersionTable(QueryContext* queryContext)
                 INSERT INTO db_version_data(schema_name, db_version)
                 SELECT "", db_version FROM db_version_data_old
             )sql");
+
+        SqlQuery::exec(
+            *queryContext->connection(),
+            R"sql(
+                DROP TABLE db_version_data_old;
+            )sql");
     }
     catch (Exception e)
     {
@@ -185,7 +191,7 @@ void DbStructureUpdater::updateDbVersionTable(QueryContext* queryContext)
     }
 }
 
-void DbStructureUpdater::setDbSchemaNameTo(
+void DbStructureUpdater::setDbSchemaName(
     QueryContext* queryContext,
     const std::string& schemaName)
 {
