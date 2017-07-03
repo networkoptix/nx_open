@@ -455,15 +455,23 @@ void QnClientModule::initLog(const QnStartupParameters& startupParams)
     logSettings.maxBackupCount = 5;
 
     nx::utils::log::initialize(
-        logSettings, dataLocation, qApp->applicationName(), qApp->applicationFilePath());
+        logSettings,
+        dataLocation,
+        qApp->applicationName(),
+        qApp->applicationFilePath(),
+        lit("log_file") + logFileNameSuffix);
 
     const auto ec2logger = nx::utils::log::addLogger({QnLog::EC2_TRAN_LOG});
     if (ec2TranLogLevel != lit("none"))
     {
         logSettings.level = nx::utils::log::levelFromString(ec2TranLogLevel);
         nx::utils::log::initialize(
-            logSettings, dataLocation, qApp->applicationName(), qApp->applicationFilePath(),
-            QLatin1String("ec2_tran"), ec2logger);
+            logSettings,
+            dataLocation,
+            qApp->applicationName(),
+            qApp->applicationFilePath(),
+            lit("ec2_tran") + logFileNameSuffix,
+            ec2logger);
     }
 
     defaultMsgHandler = qInstallMessageHandler(myMsgHandler);
