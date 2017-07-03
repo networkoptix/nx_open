@@ -3,23 +3,23 @@
 #include <QtCore/QScopedValueRollback>
 #include <QtWidgets/QPushButton>
 
-#include <business/business_action_parameters.h>
-#include <business/business_strings_helper.h>
 #include <core/resource/user_resource.h>
 #include <core/resource_management/resource_pool.h>
 #include <core/resource_management/user_roles_manager.h>
 #include <ui/dialogs/resource_selection_dialog.h>
-#include <ui/style/resource_icon_cache.h>
 #include <ui/style/custom_style.h>
 #include <ui/style/skin.h>
 
 #include <nx/client/desktop/ui/event_rules/subject_selection_dialog.h>
+#include <nx/vms/event/action_parameters.h>
+#include <nx/vms/event/strings_helper.h>
 
+using namespace nx;
 using namespace nx::client::desktop::ui;
 
 QnSubjectTargetActionWidget::QnSubjectTargetActionWidget(QWidget* parent):
     base_type(parent),
-    m_helper(new QnBusinessStringsHelper(commonModule()))
+    m_helper(new vms::event::StringsHelper(commonModule()))
 {
 }
 
@@ -27,14 +27,14 @@ QnSubjectTargetActionWidget::~QnSubjectTargetActionWidget()
 {
 }
 
-void QnSubjectTargetActionWidget::at_model_dataChanged(QnBusiness::Fields fields)
+void QnSubjectTargetActionWidget::at_model_dataChanged(Fields fields)
 {
     if (!model() || m_updating)
         return;
 
     QScopedValueRollback<bool> updatingRollback(m_updating, true);
 
-    if (fields.testFlag(QnBusiness::ActionParamsField))
+    if (fields.testFlag(Field::actionParams))
         updateSubjectsButton();
 }
 
@@ -57,7 +57,7 @@ void QnSubjectTargetActionWidget::selectSubjects()
         [&dialog]()
         {
             dialog.showAlert(!dialog.allUsers() && dialog.checkedSubjects().empty()
-                ? QnBusinessStringsHelper::needToSelectUserText()
+                ? vms::event::StringsHelper::needToSelectUserText()
                 : QString());
         };
 
@@ -106,27 +106,37 @@ void QnSubjectTargetActionWidget::updateSubjectsButton()
     if (!m_subjectsButton || !model())
         return;
 
+    const auto icon =
+        [](const QString& path) -> QIcon
+        {
+            static const QnIcon::SuffixesList suffixes {{ QnIcon::Normal, lit("selected") }};
+            return qnSkin->icon(path, QString(), &suffixes);
+        };
+
     const auto params = model()->actionParams();
-
-    QnUserResourceList users;
-    QList<QnUuid> roles;
-    userRolesManager()->usersAndRoles(params.additionalResources, users, roles);
-
-    if (!params.allUsers && users.isEmpty() && roles.isEmpty())
+    if (params.allUsers)
     {
-        m_subjectsButton->setText(QnBusinessStringsHelper::needToSelectUserText());
-        m_subjectsButton->setIcon(qnSkin->icon(lit("tree/user_alert.png")));
+        m_subjectsButton->setText(vms::event::StringsHelper::allUsersText());
+        m_subjectsButton->setIcon(icon(lit("tree/users.png")));
     }
     else
     {
-        m_subjectsButton->setText(params.allUsers
-            ? QnBusinessStringsHelper::allUsersText()
-            : m_helper->actionSubjects(users, roles));
+        QnUserResourceList users;
+        QList<QnUuid> roles;
+        userRolesManager()->usersAndRoles(params.additionalResources, users, roles);
 
-        const bool multiple = params.allUsers || users.size() > 1 || !roles.empty();
-
-        m_subjectsButton->setIcon(qnResIconCache->icon(multiple
-            ? QnResourceIconCache::Users
-            : QnResourceIconCache::User));
+        if (users.isEmpty() && roles.isEmpty())
+        {
+            m_subjectsButton->setText(vms::event::StringsHelper::needToSelectUserText());
+            m_subjectsButton->setIcon(icon(lit("tree/user_alert.png")));
+        }
+        else
+        {
+            const bool multiple = users.size() > 1 || !roles.empty();
+            m_subjectsButton->setText(m_helper->actionSubjects(users, roles));
+            m_subjectsButton->setIcon(icon(multiple
+                ? lit("tree/users.png")
+                : lit("tree/user.png")));
+        }
     }
 }

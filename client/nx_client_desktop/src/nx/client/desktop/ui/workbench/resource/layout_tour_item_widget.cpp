@@ -131,8 +131,9 @@ void LayoutTourItemWidget::initOverlay()
 
     auto updateIcon = [this, icon]
         {
-            const auto pixmap = qnResIconCache->icon(resource())
+            auto pixmap = qnResIconCache->icon(resource())
                 .pixmap(1024, 1024, QIcon::Normal, QIcon::On);
+            pixmap.setDevicePixelRatio(qApp->devicePixelRatio());
             icon->setPixmap(pixmap);
         };
     updateIcon();

@@ -125,7 +125,11 @@ void QnResourceSearchSynchronizer::update()
     QSet<QnResourcePtr> removed = m_searchResult - searchResult;
     for (const auto& resource: added)
     {
-        auto item = new QnWorkbenchItem(resource->getUniqueId(), QnUuid::createUuid());
+        NX_ASSERT(resource);
+        if (!resource)
+            continue;
+
+        auto item = new QnWorkbenchItem(resource, QnUuid::createUuid());
 
         m_resourceByLayoutItem[item] = resource;
         m_layoutItemByResource[resource] = item;

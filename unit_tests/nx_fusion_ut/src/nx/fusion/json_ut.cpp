@@ -124,6 +124,14 @@ TEST_F(QnFusionTestFixture, enumValue)
     ASSERT_EQ(flag, QJson::deserialized<nx::TestFlag>(value));
 }
 
+TEST_F(QnFusionTestFixture, enumValueCaseSensitive)
+{
+    const auto value = str("Flag0");
+    nx::TestFlag flag = nx::Flag0;
+    ASSERT_EQ(flag, QJson::deserialized<nx::TestFlag>(value.toLower()));
+    ASSERT_EQ(flag, QJson::deserialized<nx::TestFlag>(value.toUpper()));
+}
+
 TEST_F(QnFusionTestFixture, flagsValue)
 {
     const auto value = str("Flag1|Flag2");

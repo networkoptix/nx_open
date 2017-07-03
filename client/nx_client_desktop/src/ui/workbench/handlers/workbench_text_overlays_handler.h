@@ -3,7 +3,7 @@
 #include <QtCore/QObject>
 #include <QtCore/QScopedPointer>
 
-#include <business/business_fwd.h>
+#include <nx/vms/event/event_fwd.h>
 
 #include <ui/workbench/workbench_context_aware.h>
 
@@ -11,7 +11,8 @@
 
 class QnResourceWidget;
 class QnWorkbenchTextOverlaysHandlerPrivate;
-class QnBusinessStringsHelper;
+
+namespace nx { namespace vms { namespace event { class StringsHelper; }}}
 
 class QnWorkbenchTextOverlaysHandler:
     public Connective<QObject>,
@@ -25,11 +26,11 @@ public:
     virtual ~QnWorkbenchTextOverlaysHandler();
 
 private:
-    void at_businessActionReceived(const QnAbstractBusinessActionPtr& businessAction);
+    void at_eventActionReceived(const nx::vms::event::AbstractActionPtr& businessAction);
     void at_resourceWidgetAdded(QnResourceWidget* widget);
 
 private:
     Q_DECLARE_PRIVATE(QnWorkbenchTextOverlaysHandler);
     const QScopedPointer<QnWorkbenchTextOverlaysHandlerPrivate> d_ptr;
-    QScopedPointer<QnBusinessStringsHelper> m_helper;
+    QScopedPointer<nx::vms::event::StringsHelper> m_helper;
 };

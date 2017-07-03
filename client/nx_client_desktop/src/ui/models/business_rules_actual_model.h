@@ -34,11 +34,11 @@ public slots:
     void saveRule(const QModelIndex& index);
 
 private slots:
-    void at_resources_saved(int handle, ec2::ErrorCode errorCode, const QnBusinessEventRulePtr& rule);
+    void at_resources_saved(int handle, ec2::ErrorCode errorCode, const nx::vms::event::RulePtr& rule);
 
-    void at_ruleAddedOrUpdated(const QnBusinessEventRulePtr& rule);
+    void at_ruleAddedOrUpdated(const nx::vms::event::RulePtr& rule);
     void at_ruleRemoved(const QnUuid& id);
-    void at_rulesReset(const QnBusinessEventRuleList& rules);
+    void at_rulesReset(const nx::vms::event::RuleList& rules);
 
 private:
     QMap<int, QnBusinessRuleViewModelPtr> m_savingRules;

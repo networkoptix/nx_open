@@ -7,15 +7,15 @@
 
 #include <core/resource/resource_fwd.h>
 #include <core/resource/shared_resource_pointer.h>
-
 #include <ui/delegates/resource_selection_dialog_delegate.h>
 #include <ui/style/custom_style.h>
 
-struct QnBusinessActionParameters;
+#include <nx/vms/event/event_fwd.h>
 
 namespace QnBusiness {
 
-bool actionAllowedForUser(const QnBusinessActionParameters& params, const QnUserResourcePtr& user);
+bool actionAllowedForUser(const nx::vms::event::ActionParameters& params,
+    const QnUserResourcePtr& user);
 
 } // namespace QnBusiness
 

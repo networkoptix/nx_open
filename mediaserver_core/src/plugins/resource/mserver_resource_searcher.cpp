@@ -1,26 +1,22 @@
 #include "mserver_resource_searcher.h"
 
-#include <business/events/mserver_conflict_business_event.h>
-#include <nx/network/nettools.h>
-#include <nx/network/system_socket.h>
-#include "utils/common/sleep.h"
-#include "utils/common/synctime.h"
-#include "utils/common/util.h" /* For DEFAULT_APPSERVER_HOST. */
-
+#include <api/global_settings.h>
+#include <common/common_module.h>
 #include <core/dataprovider/live_stream_provider.h>
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/resource.h>
 #include <core/resource/network_resource.h>
 #include <core/resource/media_server_resource.h>
-
-#include <business/business_event_connector.h>
-
 #include <media_server/serverutil.h>
 #include <media_server/settings.h>
-#include "common/common_module.h"
-#include <api/global_settings.h>
-#include "media_server/media_server_module.h"
-
+#include <media_server/media_server_module.h>
+#include <utils/common/sleep.h>
+#include <utils/common/synctime.h>
+#include <utils/common/util.h> /* For DEFAULT_APPSERVER_HOST. */
+#include <nx/mediaserver/event/event_connector.h>
+#include <nx/vms/event/events/server_conflict_event.h>
+#include <nx/network/nettools.h>
+#include <nx/network/system_socket.h>
 
 using nx::network::UDPSocket;
 
@@ -246,7 +242,7 @@ void QnMServerResourceSearcher::readDataFromSocket()
         conflicts.sourceServer = localAppServerHost();
         QnMediaServerResourcePtr mediaServer = qSharedPointerDynamicCast<QnMediaServerResource> (resourcePool()->getResourceById(serverGuid()));
         if (mediaServer)
-            qnBusinessRuleConnector->at_mediaServerConflict(mediaServer, qnSyncTime->currentUSecsSinceEpoch(), conflicts);
+            qnEventRuleConnector->at_serverConflict(mediaServer, qnSyncTime->currentUSecsSinceEpoch(), conflicts);
     }
 }
 

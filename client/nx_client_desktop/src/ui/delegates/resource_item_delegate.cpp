@@ -522,7 +522,7 @@ QnResourceItemDelegate::ItemState QnResourceItemDelegate::itemStateForMediaResou
     const auto centralItem = workbench()->item(Qn::CentralRole);
     QnResourcePtr resource = index.data(Qn::ResourceRole).value<QnResourcePtr>();
 
-    if (centralItem && centralItem->resourceUid() == resource->getUniqueId())
+    if (centralItem && centralItem->resource() == resource)
         return ItemState::accented;
 
     if (currentLayout->layoutResourceIds().contains(resource->getId()))

@@ -36,7 +36,7 @@ void QnWorkbenchPtzDialogWatcher::closePtzManageDialog(QnWorkbenchItem *item) {
     if (!dialog->isVisible() || dialog->resource().isNull())
         return;
 
-    if (item && item->resourceUid() != dialog->resource()->getUniqueId())
+    if (item && item->resource() != dialog->resource())
         return;
 
     if (dialog->isModified())

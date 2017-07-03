@@ -570,12 +570,14 @@ void SoftwareTriggerButtonPrivate::ensureImages()
     m_successPixmap = generatePixmap(
         q->palette().color(QPalette::Dark),
         q->palette().color(QPalette::Text),
-        qnSkin->pixmap(lit("soft_triggers/confirmation_success.png")));
+        qnSkin->pixmap(lit("soft_triggers/confirmation_success.png"),
+            QSize(), Qt::KeepAspectRatio, Qt::FastTransformation, true));
 
     m_failurePixmap = generatePixmap(
         q->palette().color(QPalette::Highlight),
         QColor(),
-        qnSkin->pixmap(lit("soft_triggers/confirmation_failure.png")));
+        qnSkin->pixmap(lit("soft_triggers/confirmation_failure.png"),
+            QSize(), Qt::KeepAspectRatio, Qt::FastTransformation, true));
 
     m_failureFramePixmap = generatePixmap(
         QColor(),
@@ -587,7 +589,9 @@ void SoftwareTriggerButtonPrivate::ensureImages()
         q->palette().color(QPalette::Text),
         QPixmap());
 
-    auto goToLivePixmap = qnSkin->pixmap(lit("soft_triggers/go-to-live.png"));
+    auto goToLivePixmap = qnSkin->pixmap(lit("soft_triggers/go-to-live.png"),
+        QSize(), Qt::KeepAspectRatio, Qt::FastTransformation, true);
+
     m_goToLivePixmap = generatePixmap(
         q->palette().color(QPalette::Midlight),
         QColor(),

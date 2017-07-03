@@ -524,7 +524,7 @@ void QnClientModule::initSkin(const QnStartupParameters& startupParams)
 
     QnCustomization customization;
     customization.add(QnCustomization(skin->path("customization_common.json")));
-    customization.add(QnCustomization(skin->path("customization_base.json")));
+    customization.add(QnCustomization(skin->path("skin.json")));
 
     QScopedPointer<QnCustomizer> customizer(new QnCustomizer(customization));
     customizer->customize(qnGlobals);

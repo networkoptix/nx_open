@@ -5,7 +5,7 @@
 
 #include <core/resource/resource_fwd.h>
 #include <core/resource/camera_bookmark_fwd.h>
-#include <business/business_fwd.h>
+#include <nx/vms/event/event_fwd.h>
 #include <nx_ec/ec_api_fwd.h>
 #include <utils/email/email_fwd.h>
 #include <utils/common/ldap_fwd.h>
@@ -16,13 +16,13 @@ class QnCommonModule;
 
 namespace ec2
 {
-    void fromApiToResource(const ApiBusinessRuleData& src, QnBusinessEventRulePtr& dst);
-    void fromResourceToApi(const QnBusinessEventRulePtr& src, ApiBusinessRuleData& dst);
-    void fromApiToResourceList(const ApiBusinessRuleDataList& src, QnBusinessEventRuleList& dst);
-    void fromResourceListToApi(const QnBusinessEventRuleList& src, ApiBusinessRuleDataList& dst);
+    void fromApiToResource(const ApiBusinessRuleData& src, nx::vms::event::RulePtr& dst);
+    void fromResourceToApi(const nx::vms::event::RulePtr& src, ApiBusinessRuleData& dst);
+    void fromApiToResourceList(const ApiBusinessRuleDataList& src, nx::vms::event::RuleList& dst);
+    void fromResourceListToApi(const nx::vms::event::RuleList& src, ApiBusinessRuleDataList& dst);
 
-    void fromResourceToApi(const QnAbstractBusinessActionPtr& src, ApiBusinessActionData& dst);
-    void fromApiToResource(const ApiBusinessActionData& src, QnAbstractBusinessActionPtr& dst);
+    void fromResourceToApi(const nx::vms::event::AbstractActionPtr& src, ApiBusinessActionData& dst);
+    void fromApiToResource(const ApiBusinessActionData& src, nx::vms::event::AbstractActionPtr& dst);
 
     void fromApiToResource(
         const ApiCameraData& src,

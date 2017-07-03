@@ -423,7 +423,7 @@ void QnWorkbenchPtzHandler::at_ptzActivatePresetByIndexAction_triggered()
         return;
 
     auto presetIndex = menu()->currentParameters(sender())
-        .argument<uint>(Qn::ItemDataRole::PtzPresetIndexRole);
+        .argument(Qn::ItemDataRole::PtzPresetIndexRole).toInt();
 
     QnPtzPresetList presetList;
     controller->getPresets(&presetList);

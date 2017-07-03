@@ -395,7 +395,7 @@ QnWorkbenchConnectHandler::QnWorkbenchConnectHandler(QObject* parent):
                                   // windowed/welcomescreen/fullscreen state
                                   // BETWEEN their slots processing MainMenuAction.
                                   //
-                                  //TODO: #vkutin #gdm #ynikitenkov Lift this limitation in the future
+                                  // TODO: #vkutin #gdm #ynikitenkov Lift this limitation in the future
 
     connect(display(), &QnWorkbenchDisplay::widgetAdded, this,
         [resourceModeAction]() { resourceModeAction->setChecked(true); });
@@ -721,7 +721,7 @@ void QnWorkbenchConnectHandler::handleStateChanged(LogicalState logicalValue,
 {
     const auto resourceModeAction = action(action::ResourcesModeAction);
 
-    qDebug() << "QnWorkbenchConnectHandler state changed" << logicalValue << physicalValue;
+    NX_DEBUG(this) "State changed" << logicalValue << physicalValue;
     switch (logicalValue)
     {
         case LogicalState::disconnected:

@@ -697,7 +697,7 @@ void MainWindow::updateDwmState()
         /* Can't set to (0, 0, 0, 0) on Windows as in fullScreen mode context menu becomes invisible.
          * Looks like Qt bug: https://bugreports.qt.io/browse/QTBUG-7556 */
 #ifdef Q_OS_WIN
-        //TODO: #vkutin #GDM Mouse in the leftmost pixel doesn't trigger autohidden workbench tree show
+        // TODO: #vkutin #GDM Mouse in the leftmost pixel doesn't trigger autohidden workbench tree show
         setContentsMargins(1, 0, 0, 0); //FIXME
 #else
         setContentsMargins(0, 0, 0, 0);

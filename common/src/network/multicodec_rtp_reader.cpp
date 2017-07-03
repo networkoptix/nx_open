@@ -5,8 +5,8 @@
 #include <QtCore/QSettings>
 #include <set>
 
-#include <business/events/reasoned_business_event.h>
-#include <business/events/network_issue_business_event.h>
+#include <nx/vms/event/events/reasoned_event.h>
+#include <nx/vms/event/events/network_issue_event.h>
 #include <common/common_module.h>
 #include <core/resource_management/resource_data_pool.h>
 #include <api/global_settings.h>
@@ -30,6 +30,7 @@
 #include "api/app_server_connection.h"
 #include <common/static_common_module.h>
 
+using namespace nx;
 
 namespace {
 static const int RTSP_RETRY_COUNT = 6;
@@ -152,15 +153,15 @@ QnAbstractMediaDataPtr QnMulticodecRtpReader::getNextData()
     if (isRtpFail || elapsed > m_rtpFrameTimeoutMs)
     {
         QString reasonParamsEncoded;
-        QnBusiness::EventReason reason;
+        vms::event::EventReason reason;
         if (elapsed > m_rtpFrameTimeoutMs) {
-            reason = QnBusiness::NetworkNoFrameReason;
-            reasonParamsEncoded = QnNetworkIssueBusinessEvent::encodeTimeoutMsecs(elapsed);
+            reason = vms::event::EventReason::networkNoFrame;
+            reasonParamsEncoded = vms::event::NetworkIssueEvent::encodeTimeoutMsecs(elapsed);
             NX_LOG(QString(lit("RTP read timeout for camera %1. Reopen stream")).arg(getResource()->getUniqueId()), cl_logWARNING);
         }
         else {
-            reason = QnBusiness::NetworkConnectionClosedReason;
-            reasonParamsEncoded = QnNetworkIssueBusinessEvent::encodePrimaryStream(m_role != Qn::CR_SecondaryLiveVideo);
+            reason = vms::event::EventReason::networkConnectionClosed;
+            reasonParamsEncoded = vms::event::NetworkIssueEvent::encodePrimaryStream(m_role != Qn::CR_SecondaryLiveVideo);
             NX_LOG(QString(lit("RTP connection was forcibly closed by camera %1. Reopen stream")).arg(getResource()->getUniqueId()), cl_logWARNING);
         }
 
@@ -435,8 +436,8 @@ void QnMulticodecRtpReader::at_packetLost(quint32 prev, quint32 next)
 
     emit networkIssue(resource,
                       qnSyncTime->currentUSecsSinceEpoch(),
-                      QnBusiness::NetworkRtpPacketLossReason,
-                      QnNetworkIssueBusinessEvent::encodePacketLossSequence(prev, next));
+                      vms::event::EventReason::networkRtpPacketLoss,
+                      vms::event::NetworkIssueEvent::encodePacketLossSequence(prev, next));
 
 }
 
