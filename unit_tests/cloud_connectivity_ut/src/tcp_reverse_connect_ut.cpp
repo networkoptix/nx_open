@@ -5,6 +5,7 @@
 #include <nx/network/cloud/cloud_stream_socket.h>
 #include <nx/network/socket_global.h>
 #include <nx/network/ssl_socket.h>
+#include <nx/network/url/url_builder.h>
 #include <nx/network/test_support/simple_socket_test_helper.h>
 #include <nx/network/test_support/socket_test_helper.h>
 
@@ -29,7 +30,8 @@ protected:
             m_system, boost::none, hpm::ServerTweak::noListenToConnect);
 
         ASSERT_NE(nullptr, m_server);
-        SocketGlobals::mediatorConnector().mockupAddress(m_mediator.stunEndpoint());
+        SocketGlobals::mediatorConnector().mockupAddress(
+            url::Builder().setScheme("stun").setEndpoint(m_mediator.stunEndpoint()));
         SocketGlobals::mediatorConnector().enable(true);
     }
 

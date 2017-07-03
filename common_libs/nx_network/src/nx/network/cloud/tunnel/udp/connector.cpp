@@ -16,7 +16,6 @@
 #include "rendezvous_connector_with_verification.h"
 #include "nx/network/nettools.h"
 
-
 namespace nx {
 namespace network {
 namespace cloud {
@@ -34,7 +33,7 @@ TunnelConnector::TunnelConnector(
     m_udpSocket(std::move(udpSocket)),
     m_remotePeerCloudConnectVersion(hpm::api::kDefaultCloudConnectVersion)
 {
-    NX_ASSERT(nx::network::SocketGlobals::mediatorConnector().mediatorAddress());
+    NX_ASSERT(nx::network::SocketGlobals::mediatorConnector().udpEndpoint());
     NX_CRITICAL(m_udpSocket);
     m_localAddress = m_udpSocket->getLocalAddress();
 

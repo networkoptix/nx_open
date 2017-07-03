@@ -9,6 +9,7 @@
 #include <nx/network/ssl_socket.h>
 #include <nx/network/test_support/simple_socket_test_helper.h>
 #include <nx/network/test_support/socket_test_helper.h>
+#include <nx/network/url/url_builder.h>
 #include <nx/utils/test_support/test_options.h>
 
 namespace nx {
@@ -47,7 +48,9 @@ public:
                 m_server->serverId(),
                 m_system.authKey));
 
-        SocketGlobals::mediatorConnector().mockupAddress(mediator().stunEndpoint());
+        SocketGlobals::mediatorConnector().mockupAddress(
+            nx::network::url::Builder().setScheme("stun")
+                .setEndpoint(mediator().stunEndpoint()));
         SocketGlobals::mediatorConnector().enable(true);
     }
 

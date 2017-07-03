@@ -445,7 +445,7 @@ AddressResolver::RequestInfo::RequestInfo(
 
 bool AddressResolver::isMediatorAvailable() const
 {
-    return (bool) SocketGlobals::mediatorConnector().mediatorAddress();
+    return SocketGlobals::mediatorConnector().isConnected();
 }
 
 void AddressResolver::tryFastDomainResolve(HaInfoIterator info)
