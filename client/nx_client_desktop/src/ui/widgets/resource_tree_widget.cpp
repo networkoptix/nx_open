@@ -131,7 +131,6 @@ private:
 QnResourceTreeWidget::QnResourceTreeWidget(QWidget *parent):
     base_type(parent),
     ui(new Ui::QnResourceTreeWidget()),
-    m_criterion(),
     m_itemDelegate(nullptr),
     m_resourceProxyModel(nullptr),
     m_checkboxesVisible(true),
@@ -227,18 +226,6 @@ void QnResourceTreeWidget::setModel(QAbstractItemModel *model)
     {
         ui->resourcesTreeView->setModel(NULL);
     }
-}
-
-const QnResourceCriterion &QnResourceTreeWidget::criterion() const
-{
-    return m_criterion;
-}
-
-void QnResourceTreeWidget::setCriterion(const QnResourceCriterion &criterion)
-{
-    m_criterion = criterion;
-
-    updateFilter();
 }
 
 QItemSelectionModel* QnResourceTreeWidget::selectionModel()
@@ -474,12 +461,8 @@ void QnResourceTreeWidget::updateFilter()
         return;
     }
 
-    m_resourceProxyModel->clearCriteria();
-    m_resourceProxyModel->addCriterion(QnResourceCriterionGroup(filter));
-    m_resourceProxyModel->addCriterion(m_criterion);
-    m_resourceProxyModel->addCriterion(QnResourceCriterion(Qn::server));
-
-    m_resourceProxyModel->setFilterEnabled(!filter.isEmpty() || !m_criterion.isNull());
+    m_resourceProxyModel->setQuery({filter});
+    m_resourceProxyModel->setFilterEnabled(!filter.isEmpty());
     if (!filter.isEmpty())
         ui->resourcesTreeView->expandAll();
 }

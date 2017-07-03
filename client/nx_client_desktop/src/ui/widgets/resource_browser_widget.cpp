@@ -239,7 +239,7 @@ void QnResourceBrowserWidget::setCurrentTab(Tab tab)
 {
     if (tab < 0 || tab >= TabCount)
     {
-        qnWarning("Invalid resource tree widget tab '%1'.", static_cast<int>(tab));
+        NX_ASSERT(false, lm("Invalid resource tree widget tab '%1'.").arg((int)tab));
         return;
     }
 
@@ -256,7 +256,7 @@ bool QnResourceBrowserWidget::isLayoutSearchable(QnWorkbenchLayout* layout) cons
 
 QnResourceSearchProxyModel* QnResourceBrowserWidget::layoutModel(QnWorkbenchLayout* layout, bool create) const
 {
-    QnResourceSearchProxyModel* result = layout->property(kSearchModelPropertyName).value<QnResourceSearchProxyModel*>();
+    auto result = layout->property(kSearchModelPropertyName).value<QnResourceSearchProxyModel*>();
     if (create && !result)
     {
         result = new QnResourceSearchProxyModel(layout);
@@ -267,16 +267,13 @@ QnResourceSearchProxyModel* QnResourceBrowserWidget::layoutModel(QnWorkbenchLayo
         result->setDynamicSortFilter(true);
         result->setSourceModel(m_resourceModel);
         layout->setProperty(kSearchModelPropertyName, QVariant::fromValue<QnResourceSearchProxyModel*>(result));
-
-        //initial filter setup
-        setupInitialModelCriteria(result);
     }
     return result;
 }
 
 QnResourceSearchSynchronizer* QnResourceBrowserWidget::layoutSynchronizer(QnWorkbenchLayout* layout, bool create) const
 {
-    QnResourceSearchSynchronizer* result = layout->property(kSearchSynchronizerPropertyName).value<QnResourceSearchSynchronizer*>();
+    auto result = layout->property(kSearchSynchronizerPropertyName).value<QnResourceSearchSynchronizer*>();
     if (create && !result && isLayoutSearchable(layout))
     {
         result = new QnResourceSearchSynchronizer(layout);
@@ -800,19 +797,14 @@ void QnResourceBrowserWidget::timerEvent(QTimerEvent* event)
 
         if (workbench())
         {
-            QnWorkbenchLayout* layout = workbench()->currentLayout();
-            QnResourceSearchProxyModel* model = layoutModel(layout, true);
+            const auto layout = workbench()->currentLayout();
+            const auto model = layoutModel(layout, true);
 
             QString filter = ui->filterLineEdit->text();
-            Qn::ResourceFlags flags = static_cast<Qn::ResourceFlags>(ui->typeComboBox->itemData(ui->typeComboBox->currentIndex()).toInt());
-            QnResourceSearchQuery query(filter, flags);
+            const auto flags = static_cast<Qn::ResourceFlags>(ui->typeComboBox->itemData(
+                ui->typeComboBox->currentIndex()).toInt());
 
-            /* Checking manually until initial model criteria is here */
-            if (model->query() == query)
-                return;
-
-            model->setQuery(query);
-            setupInitialModelCriteria(model);
+            model->setQuery({filter, flags});
         }
     }
 }
@@ -833,12 +825,10 @@ void QnResourceBrowserWidget::paintEvent(QPaintEvent* event)
 
 void QnResourceBrowserWidget::at_workbench_currentLayoutAboutToBeChanged()
 {
-    QnWorkbenchLayout* layout = workbench()->currentLayout();
+    auto layout = workbench()->currentLayout();
+    layout->disconnect(this);
 
-    disconnect(layout, nullptr, this, nullptr);
-
-    QnResourceSearchSynchronizer* synchronizer = layoutSynchronizer(layout, false);
-    if (synchronizer)
+    if (auto synchronizer = layoutSynchronizer(layout, false))
         synchronizer->disableUpdates();
     setLayoutFilter(layout, ui->filterLineEdit->text());
 
@@ -850,10 +840,9 @@ void QnResourceBrowserWidget::at_workbench_currentLayoutAboutToBeChanged()
 
 void QnResourceBrowserWidget::at_workbench_currentLayoutChanged()
 {
-    QnWorkbenchLayout* layout = workbench()->currentLayout();
+    auto layout = workbench()->currentLayout();
 
-    QnResourceSearchSynchronizer* synchronizer = layoutSynchronizer(layout, false);
-    if (synchronizer)
+    if (auto synchronizer = layoutSynchronizer(layout, false))
         synchronizer->enableUpdates();
 
     at_tabWidget_currentChanged(ui->tabWidget->currentIndex());
@@ -917,22 +906,6 @@ void QnResourceBrowserWidget::at_thumbnailClicked()
         return;
 
     menu()->trigger(action::OpenInCurrentLayoutAction, m_tooltipResource);
-}
-
-void QnResourceBrowserWidget::setupInitialModelCriteria(QnResourceSearchProxyModel* model) const
-{
-    /* Always accept servers for administrator users. */
-    if (accessController()->hasGlobalPermission(Qn::GlobalAdminPermission))
-    {
-        model->addCriterion(QnResourceCriterion(Qn::server));
-    }
-    else
-    {
-        /* Always skip servers for common users, but always show user and layouts */
-        model->addCriterion(QnResourceCriterion(Qn::server, QnResourceProperty::flags, QnResourceCriterion::Reject, QnResourceCriterion::Next));
-        model->addCriterion(QnResourceCriterion(Qn::user));
-        model->addCriterion(QnResourceCriterion(Qn::layout));
-    }
 }
 
 void QnResourceBrowserWidget::handleItemActivated(const QModelIndex& index, bool withMouse)

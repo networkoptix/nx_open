@@ -16,7 +16,6 @@
 #include <core/resource_access/resource_access_filter.h>
 #include <core/resource_access/providers/resource_access_provider.h>
 #include <core/resource_management/layout_tour_manager.h>
-#include <core/resource_management/resource_criterion.h>
 #include <core/resource_management/resource_pool.h>
 #include <core/resource_management/user_roles_manager.h>
 #include <core/resource/fake_media_server.h>
@@ -208,6 +207,78 @@ public:
 
 private:
     CheckDelegate m_delegate;
+};
+
+class ResourceCondition: public Condition
+{
+public:
+    using CheckDelegate = std::function<bool(const QnResourcePtr& resource)>;
+
+    ResourceCondition(CheckDelegate delegate, MatchMode matchMode):
+        m_delegate(delegate),
+        m_matchMode(matchMode)
+    {
+    }
+
+    ActionVisibility ResourceCondition::check(const QnResourceList& resources,
+        QnWorkbenchContext* /*context*/)
+    {
+        return checkInternal<QnResourcePtr>(resources) ? EnabledAction : InvisibleAction;
+    }
+
+    ActionVisibility ResourceCondition::check(const QnResourceWidgetList& widgets,
+        QnWorkbenchContext* /*context*/)
+    {
+        return checkInternal<QnResourceWidget*>(widgets) ? EnabledAction : InvisibleAction;
+    }
+
+     template<class Item, class ItemSequence>
+     bool checkInternal(const ItemSequence &sequence)
+     {
+         int count = 0;
+
+         for (const Item& item : sequence)
+         {
+             bool matches = checkOne(item);
+
+             if (matches && m_matchMode == Any)
+                 return true;
+
+             if (!matches && m_matchMode == All)
+                 return false;
+
+             if (matches)
+                 count++;
+         }
+
+         if (m_matchMode == Any)
+             return false;
+
+         if (m_matchMode == All)
+             return true;
+
+         if (m_matchMode == ExactlyOne)
+             return count == 1;
+
+         NX_EXPECT(false, lm("Invalid match mode '%1'.").arg(static_cast<int>(m_matchMode)));
+         return false;
+     }
+
+     bool checkOne(const QnResourcePtr &resource)
+     {
+         return m_delegate(resource);
+     }
+
+     bool checkOne(QnResourceWidget* widget)
+     {
+         if (auto resource = ParameterTypes::resource(widget))
+             return m_delegate(resource);
+         return false;
+     }
+
+private:
+    CheckDelegate m_delegate;
+    MatchMode m_matchMode;
 };
 
 TimePeriodType periodType(const QnTimePeriod& period)
@@ -449,65 +520,6 @@ ActionVisibility ClearMotionSelectionCondition::check(const QnResourceWidgetList
     }
 
     return hasDisplayedGrid ? DisabledAction : InvisibleAction;
-}
-
-ResourceCondition::ResourceCondition(const QnResourceCriterion &criterion, MatchMode matchMode):
-    m_criterion(criterion),
-    m_matchMode(matchMode)
-{
-}
-
-ActionVisibility ResourceCondition::check(const QnResourceList& resources, QnWorkbenchContext* /*context*/)
-{
-    return checkInternal<QnResourcePtr>(resources) ? EnabledAction : InvisibleAction;
-}
-
-ActionVisibility ResourceCondition::check(const QnResourceWidgetList& widgets, QnWorkbenchContext* /*context*/)
-{
-    return checkInternal<QnResourceWidget*>(widgets) ? EnabledAction : InvisibleAction;
-}
-
-template<class Item, class ItemSequence>
-bool ResourceCondition::checkInternal(const ItemSequence &sequence)
-{
-    int count = 0;
-
-    for (const Item& item : sequence)
-    {
-        bool matches = checkOne(item);
-
-        if (matches && m_matchMode == Any)
-            return true;
-
-        if (!matches && m_matchMode == All)
-            return false;
-
-        if (matches)
-            count++;
-    }
-
-    if (m_matchMode == Any)
-        return false;
-
-    if (m_matchMode == All)
-        return true;
-
-    if (m_matchMode == ExactlyOne)
-        return count == 1;
-
-    NX_EXPECT(false, lm("Invalid match mode '%1'.").arg(static_cast<int>(m_matchMode)));
-    return false;
-}
-
-bool ResourceCondition::checkOne(const QnResourcePtr &resource)
-{
-    return m_criterion.check(resource) == QnResourceCriterion::Accept;
-}
-
-bool ResourceCondition::checkOne(QnResourceWidget* widget)
-{
-    QnResourcePtr resource = ParameterTypes::resource(widget);
-    return resource ? checkOne(resource) : false;
 }
 
 ActionVisibility ResourceRemovalCondition::check(const Parameters& parameters, QnWorkbenchContext* context)
@@ -1663,7 +1675,11 @@ ConditionWrapper isSafeMode()
 
 ConditionWrapper hasFlags(Qn::ResourceFlags flags, MatchMode matchMode)
 {
-    return new ResourceCondition(QnResourceCriterionExpressions::hasFlags(flags), matchMode);
+    return new ResourceCondition(
+        [flags](const QnResourcePtr& resource)
+        {
+            return resource->hasFlags(flags);
+        }, matchMode);
 }
 
 ConditionWrapper treeNodeType(QSet<Qn::NodeType> types)

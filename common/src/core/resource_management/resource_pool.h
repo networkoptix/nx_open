@@ -11,7 +11,6 @@
 
 #include <core/resource/resource_fwd.h>
 #include <core/resource/resource.h>
-#include <core/resource_management/resource_criterion.h>
 
 #include <nx/utils/singleton.h>
 #include <utils/common/connective.h>

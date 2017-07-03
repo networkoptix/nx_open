@@ -6,7 +6,6 @@
 #include <QtWidgets/QWidget>
 
 #include <core/resource/resource_fwd.h>
-#include <core/resource_management/resource_criterion.h>
 
 class QAbstractItemView;
 class QSortFilterProxyModel;
@@ -47,10 +46,6 @@ public:
     void setModel(QAbstractItemModel *model);
 
     QItemSelectionModel *selectionModel();
-
-    const QnResourceCriterion &criterion() const;
-    void setCriterion(const QnResourceCriterion &criterion);
-
     void setWorkbench(QnWorkbench *workbench);
 
     void edit();
@@ -156,8 +151,6 @@ private slots:
 
 private:
     QScopedPointer<Ui::QnResourceTreeWidget> ui;
-
-    QnResourceCriterion m_criterion;
 
     QnResourceItemDelegate *m_itemDelegate;
 
