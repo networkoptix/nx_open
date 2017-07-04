@@ -76,6 +76,7 @@ angular.module('nxCommon')
                     timelineConfig.zoomAccuracyMs,
                     timelineConfig.lastMinuteDuration,
                     timelineConfig.minPixelsPerLevel,
+                    timelineConfig.minScrollBarWidth,
                     $q); //Init boundariesProvider
 
                 var animationState = {
@@ -329,8 +330,9 @@ angular.module('nxCommon')
                     if(mouseOverElements.scrollbar && !mouseOverElements.scrollbarSlider){
                         var scrollLeft = true;
                         //checking if mouse is to the left or right of the scrollbar
-                        if(scope.scaleManager.getRelativeCenter() * canvas.width < mouseXOverTimeline)
+                        if(scope.scaleManager.getRelativeCenter() * canvas.width < mouseXOverTimeline){
                             scrollLeft = false;
+                        }
                         scrollbarClickOrHold(scrollLeft);
                     }
                 }

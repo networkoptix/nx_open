@@ -928,10 +928,11 @@ ShortCache.prototype.setPlayingPosition = function(position){
 
 
 
-function ScaleManager (minMsPerPixel, maxMsPerPixel, defaultIntervalInMS, initialWidth, stickToLiveMs, zoomAccuracyMs,
-                       lastMinuteInterval, minPixelsPerLevel, $q){
+function ScaleManager(minMsPerPixel, maxMsPerPixel, defaultIntervalInMS, initialWidth, stickToLiveMs, zoomAccuracyMs,
+                       lastMinuteInterval, minPixelsPerLevel, minScrollBarWidth, $q){
     this.absMaxMsPerPixel = maxMsPerPixel;
     this.minMsPerPixel = minMsPerPixel;
+    this.minScrollBarWidth = minScrollBarWidth;
     this.stickToLiveMs = stickToLiveMs;
     this.zoomAccuracyMs = zoomAccuracyMs;
     this.minPixelsPerLevel = minPixelsPerLevel;
