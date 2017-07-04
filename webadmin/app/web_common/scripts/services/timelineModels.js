@@ -1215,14 +1215,17 @@ ScaleManager.prototype.screenCoordinateToDate = function(coordinate){
 // If we move scroll right or left - we are loosing old anchor and setting new.
 // If we are zooming - we are zooming around anchor.
 
-ScaleManager.prototype.getRelativeCenter = function(){
-    return ((this.visibleStart + this.visibleEnd) / 2 - this.start) / (this.end - this.start);
+
+ScaleManager.prototype.getRelativePosition = function(){
+    var availableWidth = (this.end - this.start) - (this.visibleEnd - this.visibleStart);
+    if(availableWidth == 0){
+        return 0;
+    }
+    return (this.visibleStart - this.start) / availableWidth;
 };
 ScaleManager.prototype.getRelativeWidth = function(){
     return this.msPerPixel * this.viewportWidth / (this.end - this.start);
 };
-
-
 
 ScaleManager.prototype.canScroll = function(left){
     if(left){
@@ -1233,31 +1236,29 @@ ScaleManager.prototype.canScroll = function(left){
         && !(this.watchPlayingPosition && this.liveMode);
 };
 ScaleManager.prototype.scrollSlider = function(){
-
-    var relativeCenter =  this.getRelativeCenter();
     var relativeWidth =  this.getRelativeWidth();
-
     var scrollBarSliderWidth = Math.max(this.viewportWidth * relativeWidth, this.minScrollBarWidth);
-    // Correction for width if it has minimum width
-    var startCoordinate = this.bound( 0, (this.viewportWidth * relativeCenter - scrollBarSliderWidth/2), this.viewportWidth - scrollBarSliderWidth) ;
+    var scrollingWidth = this.viewportWidth - scrollBarSliderWidth;
+
+    var scrollValue =  this.getRelativePosition();
+    var startCoordinate = this.bound(0, scrollingWidth * scrollValue, scrollingWidth);
 
     return {
         width: scrollBarSliderWidth,
         start: startCoordinate,
-        scroll: startCoordinate / (this.viewportWidth - scrollBarSliderWidth)
+        scroll: scrollValue,
+        scrollingWidth: scrollingWidth
     }
-
-}
+};
 ScaleManager.prototype.scroll = function(value){
     if(typeof (value) == "undefined"){
-        return this.getRelativeCenter();
+        //instead of scrolling by center - we always determine scroll value by left position
+        return this.getRelativePosition();
     }
-    value = this.bound(0,value,1);
-    //scroll right or left by relative value - move anchor
-
-    var achcorDate = this.anchorDate; //Save anchorDate
-    this.setAnchorDateAndPoint(this.start + value * (this.end-this.start),0.5); //Move viewport
-    this.tryToRestoreAnchorDate(achcorDate); //Try to restore anchorDate
+    var anchorDate = this.anchorDate; //Save anchorDate
+    var availableWidth = (this.end - this.start) - (this.visibleEnd - this.visibleStart);
+    this.setAnchorDateAndPoint(this.start + value * availableWidth, 0); //Move viewport
+    this.tryToRestoreAnchorDate(anchorDate); //Try to restore anchorDate
 };
 
 ScaleManager.prototype.getScrollByPixelsTarget = function(pixels){
