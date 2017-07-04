@@ -47,8 +47,8 @@ void QnRestUpdatePeerTask::doStart()
 
     for (const auto& id: peers())
     {
-        QnFakeMediaServerResourcePtr server =
-            resourcePool()->getIncompatibleResourceById(id).dynamicCast<QnFakeMediaServerResource>();
+        const auto server = resourcePool()->getIncompatibleResourceById(id)
+            .dynamicCast<QnFakeMediaServerResource>();
         NX_ASSERT(server,
             Q_FUNC_INFO, "An incompatible server resource is expected here.");
 

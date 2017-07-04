@@ -1136,7 +1136,6 @@ void QnWorkbenchConnectHandler::clearConnection()
         idList.push_back(res->getId());
 
     resourcePool()->removeResources(resourcesToRemove);
-    resourcePool()->removeResources(resourcePool()->getAllIncompatibleResources());
 
     cameraUserAttributesPool()->clear();
     mediaServerUserAttributesPool()->clear();

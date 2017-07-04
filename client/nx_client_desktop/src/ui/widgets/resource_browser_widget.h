@@ -29,7 +29,6 @@ class QnWorkbenchContext;
 
 class HoverFocusProcessor;
 
-class QnResourceCriterion;
 class QnResourcePreviewWidget;
 class QnResourceTreeModel;
 class QnResourceSearchProxyModel;
@@ -120,8 +119,6 @@ private:
 
     void killSearchTimer();
     void showContextMenuAt(const QPoint& pos, bool ignoreSelection = false);
-
-    void setupInitialModelCriteria(QnResourceSearchProxyModel* model) const;
 
     void handleItemActivated(const QModelIndex& index, bool withMouse);
 

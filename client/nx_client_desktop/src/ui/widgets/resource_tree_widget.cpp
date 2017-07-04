@@ -31,6 +31,8 @@
 #include <ui/workbench/workbench_layout.h>
 #include <ui/workaround/hidpi_workarounds.h>
 
+#include <utils/common/event_processors.h>
+
 // -------------------------------------------------------------------------- //
 // QnResourceTreeSortProxyModel
 // -------------------------------------------------------------------------- //
@@ -131,7 +133,6 @@ private:
 QnResourceTreeWidget::QnResourceTreeWidget(QWidget *parent):
     base_type(parent),
     ui(new Ui::QnResourceTreeWidget()),
-    m_criterion(),
     m_itemDelegate(nullptr),
     m_resourceProxyModel(nullptr),
     m_checkboxesVisible(true),
@@ -175,6 +176,24 @@ QnResourceTreeWidget::QnResourceTreeWidget(QWidget *parent):
         &QnResourceTreeWidget::updateFilter);
     connect(ui->filterLineEdit, &QLineEdit::editingFinished, this,
         &QnResourceTreeWidget::updateFilter);
+
+    installEventHandler(ui->filterLineEdit, QEvent::KeyPress, this,
+        [this](QObject* /*object*/, QEvent* event)
+        {
+            QKeyEvent* keyEvent = static_cast<QKeyEvent*>(event);
+            switch (keyEvent->key())
+            {
+                case Qt::Key_Enter:
+                case Qt::Key_Return:
+                    if (keyEvent->modifiers().testFlag(Qt::ControlModifier))
+                        emit filterCtrlEnterPressed();
+                    else
+                        emit filterEnterPressed();
+                    break;
+                default:
+                    break;
+            }
+        });
 
     ui->resourcesTreeView->installEventFilter(this);
 }
@@ -229,16 +248,9 @@ void QnResourceTreeWidget::setModel(QAbstractItemModel *model)
     }
 }
 
-const QnResourceCriterion &QnResourceTreeWidget::criterion() const
+QSortFilterProxyModel* QnResourceTreeWidget::searchModel() const
 {
-    return m_criterion;
-}
-
-void QnResourceTreeWidget::setCriterion(const QnResourceCriterion &criterion)
-{
-    m_criterion = criterion;
-
-    updateFilter();
+    return m_resourceProxyModel;
 }
 
 QItemSelectionModel* QnResourceTreeWidget::selectionModel()
@@ -474,12 +486,8 @@ void QnResourceTreeWidget::updateFilter()
         return;
     }
 
-    m_resourceProxyModel->clearCriteria();
-    m_resourceProxyModel->addCriterion(QnResourceCriterionGroup(filter));
-    m_resourceProxyModel->addCriterion(m_criterion);
-    m_resourceProxyModel->addCriterion(QnResourceCriterion(Qn::server));
-
-    m_resourceProxyModel->setFilterEnabled(!filter.isEmpty() || !m_criterion.isNull());
+    m_resourceProxyModel->setQuery({filter});
+    m_resourceProxyModel->setFilterEnabled(!filter.isEmpty());
     if (!filter.isEmpty())
         ui->resourcesTreeView->expandAll();
 }

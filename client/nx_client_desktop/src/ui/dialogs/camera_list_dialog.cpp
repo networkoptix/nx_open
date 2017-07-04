@@ -157,17 +157,9 @@ void QnCameraListDialog::updateWindowTitle() {
     resize({ sizeHint().width(), height() });
 }
 
-void QnCameraListDialog::updateCriterion() {
-    QString text = ui->filterLineEdit->text();
-
-    QString searchString = text.isEmpty()
-        ? lit("*")
-        : lit("*%1*").arg(text);
-    m_resourceSearch->clearCriteria();
-    m_resourceSearch->addCriterion(QnResourceCriterion(QRegExp(searchString, Qt::CaseInsensitive, QRegExp::Wildcard)));
-    m_resourceSearch->addCriterion(QnResourceCriterion(Qn::desktop_camera, QnResourceProperty::flags, QnResourceCriterion::Reject, QnResourceCriterion::Next));
-
-
+void QnCameraListDialog::updateCriterion()
+{
+    m_resourceSearch->setQuery({ui->filterLineEdit->text()});
 }
 
 void QnCameraListDialog::at_camerasView_doubleClicked(const QModelIndex &index) {

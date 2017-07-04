@@ -203,6 +203,7 @@ void QnCommonMessageProcessor::disconnectFromConnection(const ec2::AbstractECCon
     connection->getDiscoveryNotificationManager()->disconnect(this);
     connection->getTimeNotificationManager()->disconnect(this);
     connection->getMiscNotificationManager()->disconnect(this);
+    connection->getLayoutTourNotificationManager()->disconnect(this);
 
     layoutTourManager()->resetTours();
 }
