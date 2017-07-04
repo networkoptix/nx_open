@@ -224,7 +224,7 @@ void QnTimeServerSelectionModel::updateTimeOffset()
                     });
 
                 if (idx < 0)
-                    return;
+                    break;
 
                 m_items[idx].offset = offset;
                 m_items[idx].ready = true;
