@@ -699,12 +699,14 @@ function TimelineCanvasRender(canvas, timelineConfig, recordsProvider, scaleMana
     function drawOrCheckScrollButtons(context, mouseX, mouseY, isScrolling){
 
         var canScrollRight = self.scaleManager.canScroll(false);
-        var mouseNearRightBorder = mouseX > self.canvas.width - timelineConfig.scrollButtonsWidth && mouseX < self.canvas.width;
-        var mouseOverRightScrollButton = canScrollRight && mouseNearRightBorder;
+        var mouseNearRightBorder = mouseX > self.canvas.width - timelineConfig.borderAreaWidth && mouseX < self.canvas.width;
+        var mouseOverRightScrollButton = canScrollRight &&
+                                        (mouseX > self.canvas.width - timelineConfig.scrollButtonsWidth && mouseX < self.canvas.width);
 
         var canScrollLeft = self.scaleManager.canScroll(true);
-        var mouseNearLeftBorder = mouseX < timelineConfig.scrollButtonsWidth && mouseX > 0;
-        var mouseOverLeftScrollButton = canScrollLeft && mouseNearLeftBorder;
+        var mouseNearLeftBorder = mouseX < timelineConfig.borderAreaWidth && mouseX > 0;
+        var mouseOverLeftScrollButton = canScrollLeft &&
+                                        (mouseX < timelineConfig.scrollButtonsWidth && mouseX > 0);
 
         var mouseInRightButton = mouseOverRightScrollButton && isScrolling;
         var mouseInLeftButton = mouseOverLeftScrollButton && isScrolling;

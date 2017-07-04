@@ -324,11 +324,7 @@ void QnVideowallItemWidget::dragEnterEvent(QGraphicsSceneDragDropEvent *event)
     const auto ids = data.getIds();
 
     const auto resources = resourcePool()->getResources(ids);
-    m_dragged.resources = resources.filtered([](const QnResourcePtr& resource)
-        {
-            return QnResourceAccessFilter::isDroppable(resource);
-        });
-
+    m_dragged.resources = resources.filtered(QnResourceAccessFilter::isDroppable);
     m_dragged.videoWallItems = resourcePool()->getVideoWallItemsByUuid(ids);
 
     if (m_dragged.resources.empty() && m_dragged.videoWallItems.empty())

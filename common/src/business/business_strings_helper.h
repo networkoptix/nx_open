@@ -84,6 +84,9 @@ public:
     QString actionSubjects(const QnUserResourceList& users, const QList<QnUuid>& roles,
         bool showName = true) const;
 
+    static QString allUsersText();
+    static QString needToSelectUserText();
+
     static QString defaultSoftwareTriggerName();
     static QString getSoftwareTriggerName(const QString& id);
     static QString getSoftwareTriggerName(const QnBusinessEventParameters& params);

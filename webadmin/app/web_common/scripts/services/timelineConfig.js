@@ -155,6 +155,7 @@ function TimelineConfig(){
         scrollButtonsHoverColor: [105,135,150,0.5],  //$light16
         scrollButtonsActiveColor: [105,135,150,0.4],  //$light16
         scrollButtonsWidth: 24,
+        borderAreaWidth: 64,
         scrollButtonsHeight: 48/100,
         scrollButtonsArrowLineWidth:2,
         scrollButtonsArrowColor:[255,255,255,0.8],  //$light1

@@ -1,19 +1,20 @@
-
 #include "mediaserver_api.h"
 
 #include <QJsonDocument>
 
-#include <api/model/ping_reply.h>
-#include <rest/server/json_rest_result.h>
 #include <nx/utils/log/log.h>
 
+#include <api/model/ping_reply.h>
+#include <rest/server/json_rest_result.h>
 
 namespace nx {
 namespace hpm {
 
-MediaserverApiBase::MediaserverApiBase( AbstractCloudDataProvider* cloudData,
-                                        nx::stun::MessageDispatcher* dispatcher )
-    : RequestProcessor( cloudData )
+MediaserverApiBase::MediaserverApiBase(
+    AbstractCloudDataProvider* cloudData,
+    nx::stun::MessageDispatcher* dispatcher )
+    :
+    RequestProcessor( cloudData )
 {
     using namespace std::placeholders;
     const auto result =

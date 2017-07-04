@@ -3,9 +3,8 @@
 #include <functional>
 #include <iostream>
 
-#include <common/common_globals.h>
-#include <nx/utils/log/log.h>
 #include <nx/network/stun/extension/stun_extension_types.h>
+#include <nx/utils/log/log.h>
 
 #include "listening_peer_pool.h"
 #include "data/listening_peer.h"

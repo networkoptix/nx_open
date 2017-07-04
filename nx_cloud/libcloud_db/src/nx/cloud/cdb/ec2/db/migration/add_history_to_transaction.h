@@ -1,6 +1,6 @@
 #pragma once
 
-#include <utils/db/query_context.h>
+#include <nx/utils/db/query_context.h>
 
 #include <database/migrations/add_history_attributes_to_transaction.h>
 
@@ -18,7 +18,7 @@ namespace after {
 typedef ::ec2::migration::add_history::after::QnAbstractTransaction QnAbstractTransaction;
 } // namespace before
 
-nx::db::DBResult migrate(nx::db::QueryContext* const queryContext);
+nx::utils::db::DBResult migrate(nx::utils::db::QueryContext* const queryContext);
 
 } // namespace addHistoryToTransaction
 } // namespace migration

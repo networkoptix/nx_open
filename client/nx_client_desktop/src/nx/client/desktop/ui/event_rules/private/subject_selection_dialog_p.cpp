@@ -7,7 +7,6 @@
 #include <core/resource/user_resource.h>
 #include <core/resource_management/resource_pool.h>
 #include <core/resource_management/user_roles_manager.h>
-#include <core/resource_access/resource_access_subjects_cache.h>
 #include <nx/utils/uuid.h>
 #include <ui/models/user_roles_model.h>
 #include <ui/style/globals.h>
@@ -44,7 +43,11 @@ void SubjectSelectionDialog::RoleListModel::setUserValidator(Qn::UserValidator u
 {
     m_userValidator = userValidator;
     m_validationStates.clear();
+    emitDataChanged();
+}
 
+void SubjectSelectionDialog::RoleListModel::emitDataChanged()
+{
     const int lastRow = rowCount() - 1;
     if (lastRow >= 0)
     {
@@ -56,6 +59,9 @@ void SubjectSelectionDialog::RoleListModel::setUserValidator(Qn::UserValidator u
 
 QVariant SubjectSelectionDialog::RoleListModel::data(const QModelIndex& index, int role) const
 {
+    if (m_allUsers && role == Qt::CheckStateRole && index.column() == CheckColumn)
+        return qVariantFromValue<int>(Qt::Checked);
+
     if (role != Qn::ValidationStateRole)
         return base_type::data(index, role);
 
@@ -71,12 +77,20 @@ QVariant SubjectSelectionDialog::RoleListModel::data(const QModelIndex& index, i
     if (iter != m_validationStates.end())
         return qVariantFromValue(iter.value());
 
-    const auto state = validate(roleId);
+    const auto state = validateRole(roleId);
     m_validationStates[roleId] = state;
     return qVariantFromValue(state);
 }
 
-QValidator::State SubjectSelectionDialog::RoleListModel::validate(const QnUuid& roleId) const
+QValidator::State SubjectSelectionDialog::RoleListModel::validateRole(const QnUuid& roleId) const
+{
+    return m_userValidator
+        ? validateUsers(resourceAccessSubjectsCache()->usersInRole(roleId))
+        : QValidator::Acceptable;
+}
+
+QValidator::State SubjectSelectionDialog::RoleListModel::validateUsers(
+    const QList<QnResourceAccessSubject>& subjects) const
 {
     if (!m_userValidator)
         return QValidator::Acceptable;
@@ -91,9 +105,10 @@ QValidator::State SubjectSelectionDialog::RoleListModel::validate(const QnUuid& 
 
     int composition = noUsers;
 
-    for (const auto& subject: resourceAccessSubjectsCache()->usersInRole(roleId))
+    for (const auto& subject: subjects)
     {
-        NX_EXPECT(subject.isUser());
+        if (!subject.isUser() || !subject.user()->isEnabled())
+            continue;
         composition |= (m_userValidator(subject.user()) ? validUsers : invalidUsers);
         if (composition == mixedUsers)
             break; //< No need to iterate further.
@@ -127,6 +142,20 @@ QSet<QnUuid> SubjectSelectionDialog::RoleListModel::checkedUsers() const
     }
 
     return checkedUsers;
+}
+
+bool SubjectSelectionDialog::RoleListModel::allUsers() const
+{
+    return m_allUsers;
+}
+
+void SubjectSelectionDialog::RoleListModel::setAllUsers(bool value)
+{
+    if (m_allUsers == value)
+        return;
+
+    m_allUsers = value;
+    emitDataChanged();
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -223,13 +252,13 @@ QVariant SubjectSelectionDialog::UserListModel::data(const QModelIndex& index, i
 {
     switch (role)
     {
+        case Qt::CheckStateRole:
+            return index.column() == CheckColumn && m_allUsers
+                ? qVariantFromValue<int>(Qt::Checked)
+                : base_type::data(index, role);
+
         case Qn::ValidRole:
             return isValid(index);
-
-        case Qt::ForegroundRole:
-            return isValid(index) || !isChecked(index)
-                ? QVariant()
-                : QBrush(qnGlobals->errorTextColor());
 
         case Qt::DecorationRole:
         {
@@ -291,6 +320,20 @@ void SubjectSelectionDialog::UserListModel::setUserValidator(Qn::UserValidator u
     columnsChanged(0, columnCount() - 1);
 }
 
+bool SubjectSelectionDialog::UserListModel::allUsers() const
+{
+    return m_allUsers;
+}
+
+void SubjectSelectionDialog::UserListModel::setAllUsers(bool value)
+{
+    if (m_allUsers == value)
+        return;
+
+    m_allUsers = value;
+    columnsChanged(0, ColumnCount - 1);
+}
+
 void SubjectSelectionDialog::UserListModel::columnsChanged(int firstColumn, int lastColumn,
     const QVector<int> roles)
 {
@@ -311,6 +354,8 @@ SubjectSelectionDialog::RoleListDelegate::RoleListDelegate(QObject* parent):
     base_type(parent),
     QnCommonModuleAware(parent)
 {
+    setOptions(HighlightChecked | ValidateOnlyChecked);
+    setCheckBoxColumn(RoleListModel::CheckColumn);
 }
 
 SubjectSelectionDialog::RoleListDelegate::~RoleListDelegate()
@@ -321,21 +366,9 @@ void SubjectSelectionDialog::RoleListDelegate::initStyleOption(QStyleOptionViewI
     const QModelIndex& index) const
 {
     base_type::initStyleOption(option, index);
-
-    const bool checked = index.sibling(index.row(), QnUserRolesModel::CheckColumn)
-        .data(Qt::CheckStateRole).toInt() == Qt::Checked;
-
-    const auto validationState = index.data(Qn::ValidationStateRole).value<QValidator::State>();
-
-    const bool red = checked
-        && validationState == QValidator::Invalid
-        && !option->state.testFlag(QStyle::State_Selected);
-
-    if (red)
-        option->state |= State_Error; //< Our constant, not Qt.
-
     if (index.column() == QnUserRolesModel::NameColumn)
     {
+        const auto validationState = index.data(Qn::ValidationStateRole).value<QValidator::State>();
         option->icon = validationState == QValidator::Acceptable
             ? qnSkin->icon(lit("tree/users.png"))
             : qnSkin->icon(lit("tree/users_alert.png"));
@@ -343,15 +376,6 @@ void SubjectSelectionDialog::RoleListDelegate::initStyleOption(QStyleOptionViewI
         option->decorationSize = QnSkin::maximumSize(option->icon);
         option->features |= QStyleOptionViewItem::HasDecoration;
     }
-}
-
-SubjectSelectionDialog::RoleListDelegate::ItemState
-    SubjectSelectionDialog::RoleListDelegate::itemState(const QModelIndex& index) const
-{
-    const auto checkIndex = index.sibling(index.row(), QnUserRolesModel::CheckColumn);
-    return checkIndex.data(Qt::CheckStateRole).toInt() == Qt::Checked
-        ? ItemState::selected
-        : ItemState::normal;
 }
 
 void SubjectSelectionDialog::RoleListDelegate::getDisplayInfo(const QModelIndex& index,
@@ -367,25 +391,20 @@ void SubjectSelectionDialog::RoleListDelegate::getDisplayInfo(const QModelIndex&
 //-------------------------------------------------------------------------------------------------
 // SubjectSelectionDialog::UserListDelegate
 
+SubjectSelectionDialog::UserListDelegate::UserListDelegate(QObject* parent):
+    base_type(parent)
+{
+    setOptions(HighlightChecked | ValidateOnlyChecked);
+    setCheckBoxColumn(UserListModel::CheckColumn);
+}
+
 void SubjectSelectionDialog::UserListDelegate::initStyleOption(
     QStyleOptionViewItem* option,
     const QModelIndex& index) const
 {
     base_type::initStyleOption(option, index);
-    if (index.data(Qn::ValidRole).toBool())
-        return;
-
-    if (index.column() == UserListModel::NameColumn)
-    {
-        const auto checkIndex = index.sibling(index.row(), UserListModel::CheckColumn);
-        const bool checked = checkIndex.data(Qt::CheckStateRole).toInt() == Qt::Checked;
-        const bool selected = option->state.testFlag(QStyle::State_Selected);
-
-        if (!selected && checked)
-            option->state |= State_Error; //< Our constant, not Qt.
-
+    if (index.column() == UserListModel::NameColumn && !index.data(Qn::ValidRole).toBool())
         option->icon = qnSkin->icon(lit("tree/user_alert.png"));
-    }
 }
 
 //-------------------------------------------------------------------------------------------------

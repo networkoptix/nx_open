@@ -236,6 +236,8 @@ void OnvifResourceInformationFetcher::findResources(
             manufacturer = existResource->getVendor();
         if (mac.isEmpty())
             mac = existResource->getMAC().toString();
+        if (firmware.isEmpty())
+            firmware = existResource->getFirmware();
     }
 
     if (model.isEmpty() || manufacturer.isEmpty() || firmware.isEmpty() ||

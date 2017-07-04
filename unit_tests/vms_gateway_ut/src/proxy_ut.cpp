@@ -69,6 +69,8 @@ public:
     boost::optional<bool> m_securityExpectation;
 };
 
+//-------------------------------------------------------------------------------------------------
+
 class Proxy:
     public BasicComponentTest
 {
@@ -128,6 +130,8 @@ private:
     QnMutex m_mutex;
     boost::optional<bool> m_securityExpectation{boost::none};
 };
+
+//-------------------------------------------------------------------------------------------------
 
 TEST_F(Proxy, IpSpecified)
 {
@@ -356,6 +360,73 @@ TEST_F(Proxy, ModRewrite)
         .arg(endpoint().toString())
         .arg(testHttpServer()->serverAddress().toString())
         .arg(testPathAndQuery)));
+}
+
+//-------------------------------------------------------------------------------------------------
+
+static const char* kEmptyResourcePath = "/proxy/empty";
+
+class ProxyNewTest:
+    public Proxy
+{
+    using base_type = Proxy;
+
+protected:
+    void whenRequestEmptyResource()
+    {
+        fetchResource(kEmptyResourcePath);
+    }
+
+    void thenEmptyResponseIsDelivered()
+    {
+        ASSERT_EQ(nx_http::StatusCode::noContent, m_response->statusLine.statusCode);
+        ASSERT_TRUE(m_msgBody.isEmpty());
+    }
+
+private:
+    boost::optional<nx_http::Response> m_response;
+    nx::Buffer m_msgBody;
+
+    virtual void SetUp() override
+    {
+        using namespace std::placeholders;
+
+        base_type::SetUp();
+
+        testHttpServer()->registerRequestProcessorFunc(
+            kEmptyResourcePath,
+            std::bind(&ProxyNewTest::returnEmptyHttpResponse, this, _1, _2, _3, _4, _5));
+
+        ASSERT_TRUE(startAndWaitUntilStarted());
+    }
+
+    void returnEmptyHttpResponse(
+        nx_http::HttpServerConnection* const /*connection*/,
+        nx::utils::stree::ResourceContainer /*authInfo*/,
+        nx_http::Request /*request*/,
+        nx_http::Response* const /*response*/,
+        nx_http::RequestProcessedHandler completionHandler)
+    {
+        completionHandler(nx_http::StatusCode::noContent);
+    }
+
+    void fetchResource(const char* path)
+    {
+        const QUrl url(lm("http://%1/%2%3").arg(endpoint()).arg(testHttpServer()->serverAddress()).arg(path));
+        nx_http::HttpClient httpClient;
+        ASSERT_TRUE(httpClient.doGet(url));
+        ASSERT_NE(nullptr, httpClient.response());
+
+        m_response = *httpClient.response();
+        while (!httpClient.eof())
+            m_msgBody += httpClient.fetchMessageBodyBuffer();
+    }
+};
+
+TEST_F(ProxyNewTest, response_contains_no_content)
+{
+    whenRequestEmptyResource();
+    thenEmptyResponseIsDelivered();
 }
 
 } // namespace test

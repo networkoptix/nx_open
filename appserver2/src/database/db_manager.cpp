@@ -58,6 +58,7 @@
 #include "restype_xml_parser.h"
 #include "business/business_event_rule.h"
 #include "settings.h"
+#include <database/api/db_resource_api.h>
 
 #include <nx/fusion/model_functions.h>
 
@@ -1240,7 +1241,7 @@ bool QnDbManager::removeWrongSupportedMotionTypeForONVIF()
 bool QnDbManager::cleanupDanglingDbObjects()
 {
     const QString kCleanupScript(":/updates/68_cleanup_db.sql");
-    return QnDbHelper::execSQLFile(kCleanupScript, m_sdb);
+    return nx::utils::db::SqlQueryExecutionHelper::execSQLFile(kCleanupScript, m_sdb);
 }
 
 bool QnDbManager::fixBusinessRules()
@@ -1515,6 +1516,12 @@ bool QnDbManager::afterInstallUpdate(const QString& updateName)
 
     if (updateName.endsWith(lit("/93_migrate_show_popup_action.sql")))
         return ec2::db::migrateBusinessRulesToV31Alpha(m_sdb) && resyncIfNeeded(ResyncRules);
+
+    if (updateName.endsWith(lit("/94_migrate_business_actions_all_users.sql")))
+        return ec2::db::migrateBusinessActionsAllUsers(m_sdb) && resyncIfNeeded(ResyncRules);
+
+    if (updateName.endsWith(lit("/95_migrate_business_events_all_users.sql")))
+        return ec2::db::migrateBusinessEventsAllUsers(m_sdb) && resyncIfNeeded(ResyncRules);
 
     NX_LOG(lit("SQL update %1 does not require post-actions.").arg(updateName), cl_logDEBUG1);
     return true;

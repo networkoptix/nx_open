@@ -1,5 +1,6 @@
 #pragma once
 
+#include <set>
 #include <QtCore/QtGlobal>
 #include <QtCore/QMetaType>
 #include <QtCore/QString>
@@ -26,9 +27,10 @@ enum class MessageType
     resolvePeerNumberResponse,
     alivePeers,
     subscribeForDataUpdates,
-    pushTransactionData,
-    pushTransactionList, //< for UbJson format only
-    pushUnicastTransaction, //< for non persistent transactions only
+    pushTransactionData, //< transaction data
+    pushTransactionList, //< for UbJson format only. transaction list
+    pushImpersistentBroadcastTransaction, //< transportHeader + transaction data
+    pushImpersistentUnicastTransaction, //< transportHeader + transaction data
 
     counter
 };
@@ -85,6 +87,7 @@ struct PeerNumberResponseRecord: public ec2::ApiPersistentIdData
 
 struct BidirectionRoutingInfo;
 
+#if 0
 struct UnicastTransactionRecord
 {
     UnicastTransactionRecord() {}
@@ -98,12 +101,21 @@ struct UnicastTransactionRecord
     quint8 ttl = 0;
 };
 using UnicastTransactionRecords = std::vector<UnicastTransactionRecord>;
+#endif
+
+struct TransportHeader
+{
+    std::set<QnUuid> via;
+    std::vector<QnUuid> dstPeers;
+};
+#define TransportHeader_Fields (via)
 
 static const qint32 kMaxDistance = std::numeric_limits<qint32>::max();
 static const qint32 kMaxOnlineDistance = 16384;
-static const char* kP2pProtoName = "nxp2p";
+extern const char* const kP2pProtoName;
 
 } // namespace p2p
 } // namespace nx
 
 QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES((nx::p2p::MessageType), (metatype)(lexical))
+//QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES((nx::p2p::TransportHeader), (ubjson))

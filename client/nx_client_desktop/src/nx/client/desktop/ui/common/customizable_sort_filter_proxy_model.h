@@ -22,15 +22,19 @@ public:
     using LessPredicate = std::function<bool (const QModelIndex&, const QModelIndex&)>;
     void setCustomLessThan(LessPredicate lessThan);
 
-    virtual bool lessThan(const QModelIndex& sourceLeft,
-        const QModelIndex& sourceRight) const override;
-
     // Filtering.
 
     using AcceptPredicate = std::function<bool (int, const QModelIndex&)>;
 
     void setCustomFilterAcceptsRow(AcceptPredicate filterAcceptsRow);
     void setCustomFilterAcceptsColumn(AcceptPredicate filterAcceptsColumn);
+
+    bool baseFilterAcceptsRow(int sourceRow, const QModelIndex& sourceParent) const;
+    bool baseFilterAcceptsColumn(int sourceColumn, const QModelIndex& sourceParent) const;
+
+protected:
+    virtual bool lessThan(const QModelIndex& sourceLeft,
+        const QModelIndex& sourceRight) const override;
 
     virtual bool filterAcceptsRow(int sourceRow,
         const QModelIndex& sourceParent) const override;

@@ -2,6 +2,8 @@
 #include "private/subject_selection_dialog_p.h"
 #include <ui_subject_selection_dialog.h> //< generated file
 
+#include <QtGui/QStandardItemModel>
+
 #include <common/common_module_aware.h>
 #include <core/resource/user_resource.h>
 #include <core/resource_management/user_roles_manager.h>
@@ -69,7 +71,7 @@ SubjectSelectionDialog::SubjectSelectionDialog(QWidget* parent, Qt::WindowFlags 
     ui->usersTreeView->setItemDelegateForColumn(
         UserListModel::IndicatorColumn, indicatorDelegate);
 
-    //TODO: #vkutin Space single- and batch-toggle!
+    // TODO: #vkutin Space single- and batch-toggle! Click-entire-line toggle! Shift-click toggle!
 
     auto setupTreeView =
         [this](QnTreeView* treeView)
@@ -127,6 +129,30 @@ SubjectSelectionDialog::SubjectSelectionDialog(QWidget* parent, Qt::WindowFlags 
     connectToModelChanges(m_users);
     connectToModelChanges(m_roles);
 
+    ui->allUsersCheckableLine->setText(tr("All Users"));
+    setupTreeView(ui->allUsersCheckableLine->view());
+
+    auto allUsersDelegate = new UserListDelegate(this);
+    allUsersDelegate->setCheckBoxColumn(CheckableLineWidget::CheckColumn);
+    ui->allUsersCheckableLine->view()->setItemDelegate(allUsersDelegate);
+
+    const auto allUsersCheckStateChanged =
+        [this](Qt::CheckState checkState)
+        {
+            const bool checked = checkState == Qt::Checked;
+            ui->rolesGroupBox->setEnabled(!checked);
+            ui->usersGroupBox->setEnabled(!checked);
+            m_roles->setAllUsers(checked);
+            m_users->setAllUsers(checked);
+            emit changed();
+        };
+
+    connect(ui->allUsersCheckableLine, &CheckableLineWidget::checkStateChanged,
+        this, allUsersCheckStateChanged);
+
+    allUsersCheckStateChanged(ui->allUsersCheckableLine->checkState());
+    validateAllUsers();
+
     QnItemViewAutoHider::create(ui->rolesTreeView, tr("No user roles found"));
     QnItemViewAutoHider::create(ui->usersTreeView, tr("No users found"));
 }
@@ -160,6 +186,20 @@ void SubjectSelectionDialog::setUserValidator(Qn::UserValidator userValidator)
 {
     m_users->setUserValidator(userValidator);
     m_roles->setUserValidator(userValidator);
+    validateAllUsers();
+}
+
+void SubjectSelectionDialog::validateAllUsers()
+{
+    auto validationState = m_roles->validateUsers(
+        resourceAccessSubjectsCache()->allSubjects());
+
+    QIcon icon = (validationState == QValidator::Acceptable
+        ? qnSkin->icon(lit("tree/users.png"))
+        : qnSkin->icon(lit("tree/users_alert.png")));
+
+    ui->allUsersCheckableLine->setIcon(icon);
+    ui->allUsersCheckableLine->setData(validationState, Qn::ValidationStateRole);
 }
 
 void SubjectSelectionDialog::setCheckedSubjects(const QSet<QnUuid>& ids)
@@ -191,7 +231,41 @@ QSet<QnUuid> SubjectSelectionDialog::checkedSubjects() const
 
 QSet<QnUuid> SubjectSelectionDialog::totalCheckedUsers() const
 {
-    return m_users->checkedUsers().unite(m_roles->checkedUsers());
+    if (!allUsers())
+        return m_users->checkedUsers().unite(m_roles->checkedUsers());
+
+    QSet<QnUuid> allUserIds;
+    for (const auto& subject: resourceAccessSubjectsCache()->allSubjects())
+    {
+        if (const auto& user = subject.user())
+            allUserIds.insert(user->getId());
+    }
+
+    return allUserIds;
+}
+
+bool SubjectSelectionDialog::allUsers() const
+{
+    return allUsersSelectorEnabled() && ui->allUsersCheckableLine->checked();
+}
+
+void SubjectSelectionDialog::setAllUsers(bool value)
+{
+    if (allUsersSelectorEnabled())
+        ui->allUsersCheckableLine->setChecked(value);
+}
+
+bool SubjectSelectionDialog::allUsersSelectorEnabled() const
+{
+    return !ui->allUsersCheckableLine->isHidden();
+}
+
+void SubjectSelectionDialog::setAllUsersSelectorEnabled(bool value)
+{
+    const bool disabled = !value;
+    ui->allUsersCheckableLine->setHidden(disabled);
+    if (disabled)
+        ui->allUsersCheckableLine->setChecked(false);
 }
 
 void SubjectSelectionDialog::showAlert(const QString& text)

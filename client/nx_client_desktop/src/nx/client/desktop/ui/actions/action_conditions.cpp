@@ -2,6 +2,8 @@
 
 #include <QtWidgets/QAction>
 
+#include <boost/algorithm/cxx11/all_of.hpp>
+#include <boost/algorithm/cxx11/any_of.hpp>
 #include <boost/range/algorithm/count_if.hpp>
 
 #include <api/app_server_connection.h>
@@ -1058,14 +1060,7 @@ bool OpenInLayoutCondition::canOpen(const QnResourceList& resources,
     const QnLayoutResourcePtr& layout) const
 {
     if (!layout)
-    {
-        return any_of(resources, QnResourceAccessFilter::isOpenableInLayout)
-            || any_of(resources,
-                [](const QnResourcePtr& resource)
-                {
-                    return resource->hasFlags(Qn::layout);
-                });
-    }
+        return any_of(resources, QnResourceAccessFilter::isDroppable);
 
     bool isExportedLayout = layout->isFile();
 

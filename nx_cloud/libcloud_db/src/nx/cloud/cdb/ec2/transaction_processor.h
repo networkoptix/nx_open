@@ -8,7 +8,7 @@
 #include <common/common_globals.h>
 #include <transaction/transaction_transport_header.h>
 #include <transaction/transaction.h>
-#include <utils/db/async_sql_query_executor.h>
+#include <nx/utils/db/async_sql_query_executor.h>
 
 #include "serialization/transaction_deserializer.h"
 #include "transaction_log.h"
@@ -222,12 +222,12 @@ public:
     typedef ::ec2::QnTransaction<TransactionDataType> Ec2Transaction;
 
     typedef nx::utils::MoveOnlyFunc<
-        nx::db::DBResult(
-            nx::db::QueryContext*, nx::String /*systemId*/, Ec2Transaction, AuxiliaryArgType*)
+        nx::utils::db::DBResult(
+            nx::utils::db::QueryContext*, nx::String /*systemId*/, Ec2Transaction, AuxiliaryArgType*)
     > ProcessEc2TransactionFunc;
 
     typedef nx::utils::MoveOnlyFunc<
-        void(nx::db::QueryContext*, nx::db::DBResult, AuxiliaryArgType)
+        void(nx::utils::db::QueryContext*, nx::utils::db::DBResult, AuxiliaryArgType)
     > OnTranProcessedFunc;
 
     /**
@@ -273,7 +273,7 @@ private:
             [this,
                 auxiliaryArgPtr,
                 transactionContext = std::move(transactionContext)](
-                    nx::db::QueryContext* queryContext) mutable
+                    nx::utils::db::QueryContext* queryContext) mutable
             {
                 return processTransactionInDbConnectionThread(
                     queryContext,
@@ -281,8 +281,8 @@ private:
                     auxiliaryArgPtr);
             },
             [this, auxiliaryArg = std::move(auxiliaryArg), handler = std::move(handler)](
-                nx::db::QueryContext* queryContext,
-                nx::db::DBResult dbResult) mutable
+                nx::utils::db::QueryContext* queryContext,
+                nx::utils::db::DBResult dbResult) mutable
             {
                 dbProcessingCompleted(
                     queryContext,
@@ -292,8 +292,8 @@ private:
             });
     }
 
-    nx::db::DBResult processTransactionInDbConnectionThread(
-        nx::db::QueryContext* queryContext,
+    nx::utils::db::DBResult processTransactionInDbConnectionThread(
+        nx::utils::db::QueryContext* queryContext,
         TransactionContext transactionContext,
         AuxiliaryArgType* const auxiliaryArg)
     {
@@ -306,7 +306,7 @@ private:
         const auto transactionCommand = 
             transactionContext.transaction.get().command;
 
-        if (dbResultCode == nx::db::DBResult::cancelled)
+        if (dbResultCode == nx::utils::db::DBResult::cancelled)
         {
             NX_LOGX(QnLog::EC2_TRAN_LOG, 
                 lm("Ec2 transaction log skipped transaction %1 received from (%2, %3)")
@@ -316,7 +316,7 @@ private:
                 cl_logDEBUG1);
             return dbResultCode;
         }
-        else if (dbResultCode != nx::db::DBResult::ok)
+        else if (dbResultCode != nx::utils::db::DBResult::ok)
         {
             NX_LOGX(QnLog::EC2_TRAN_LOG, 
                 lm("Error saving transaction %1 received from (%2, %3) to the log. %4")
@@ -333,7 +333,7 @@ private:
             transactionContext.transportHeader.systemId,
             std::move(transactionContext.transaction.take()),
             auxiliaryArg);
-        if (dbResultCode != nx::db::DBResult::ok)
+        if (dbResultCode != nx::utils::db::DBResult::ok)
         {
             NX_LOGX(QnLog::EC2_TRAN_LOG, 
                 lm("Error processing transaction %1 received from %2. %3")
@@ -346,8 +346,8 @@ private:
     }
 
     void dbProcessingCompleted(
-        nx::db::QueryContext* queryContext,
-        nx::db::DBResult dbResult,
+        nx::utils::db::QueryContext* queryContext,
+        nx::utils::db::DBResult dbResult,
         AuxiliaryArgType auxiliaryArg,
         TransactionProcessedHandler completionHandler)
     {
@@ -356,12 +356,12 @@ private:
 
         switch (dbResult)
         {
-            case nx::db::DBResult::ok:
-            case nx::db::DBResult::cancelled:
+            case nx::utils::db::DBResult::ok:
+            case nx::utils::db::DBResult::cancelled:
                 return completionHandler(api::ResultCode::ok);
             default:
                 return completionHandler(
-                    dbResult == nx::db::DBResult::retryLater
+                    dbResult == nx::utils::db::DBResult::retryLater
                     ? api::ResultCode::retryLater
                     : api::ResultCode::dbError);
         }

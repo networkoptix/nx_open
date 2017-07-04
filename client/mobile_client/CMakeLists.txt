@@ -37,7 +37,7 @@ if(box STREQUAL "bpi")
 endif()
 
 if(ANDROID)
-    set(project.version.name "${releaseVersion}")
+    set(project.version.name "${mobileClientVersion}")
     set(project.version.code "${buildNumber}")
 
     file(COPY "maven/bin-resources/android" DESTINATION "${CMAKE_CURRENT_BINARY_DIR}")
@@ -53,7 +53,7 @@ if(ANDROID)
     get_target_property(OPENAL_LIBS openal INTERFACE_LINK_LIBRARIES)
 
     add_android_apk(mobile_client.apk TARGET mobile_client
-        APK_NAME "${client_distribution_name}.apk"
+        APK_NAME "${mobile_client_distribution_name}.apk"
         PACKAGE_SOURCE "${CMAKE_CURRENT_BINARY_DIR}/android"
         QML_ROOT_PATH "${CMAKE_CURRENT_LIST_DIR}/static-resources/qml"
         EXTRA_LIBS ${OPENSSL_LIBS} ${FFMPEG_LIBS} ${OPENAL_LIBS}

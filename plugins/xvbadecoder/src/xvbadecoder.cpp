@@ -501,7 +501,7 @@ bool QnXVBADecoder::decode( const QnCompressedVideoDataPtr data, CLVideoDecoderO
     m_pictureDescriptorDecodeInput.num_of_buffers_in_list = 2;
 
 #ifdef USE_SOURCE_BUFFER
-    std::auto_ptr<XVBABufferDescriptor> dataBufferDescriptor( new XVBABufferDescriptor() );
+    std::unique_ptr<XVBABufferDescriptor> dataBufferDescriptor( new XVBABufferDescriptor() );
     memset( dataBufferDescriptor.get(), 0, sizeof(*dataBufferDescriptor) );
     dataBufferDescriptor->size = sizeof(*dataBufferDescriptor);
     dataBufferDescriptor->bufferXVBA = const_cast<char*>(data->data.data());

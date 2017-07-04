@@ -1,7 +1,7 @@
 #include "mobile_app_info.h"
 
 #include <nx/network/app_info.h>
-
+#include <nx/utils/software_version.h>
 #include <utils/common/app_info.h>
 #include <mobile_client/mobile_client_app_info.h>
 
@@ -24,7 +24,12 @@ QString QnMobileAppInfo::organizationName() const
 QString QnMobileAppInfo::version() const
 {
     if (QnAppInfo::beta())
-        return lit("%1 (rev: %2)").arg(QnAppInfo::applicationVersion(), QnAppInfo::applicationRevision());
+    {
+        return lit("%1.%2 (rev: %3)").arg(
+            QnMobileClientAppInfo::applicationVersion(),
+            QString::number(nx::utils::SoftwareVersion(QnAppInfo::applicationVersion()).build()),
+            QnAppInfo::applicationRevision());
+    }
     return QnAppInfo::applicationVersion();
 }
 

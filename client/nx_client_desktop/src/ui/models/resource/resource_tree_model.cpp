@@ -625,10 +625,6 @@ QVariant QnResourceTreeModel::data(const QModelIndex &index, int role) const
     if (index.column() == Qn::CustomColumn && role <= Qt::UserRole)
         return m_customColumnDelegate ? m_customColumnDelegate->data(index, role) : QVariant();
 
-    /* And Qn::DisabledRole is delegated to Qt::CheckStateRole of the check column: */
-    if (role == Qn::DisabledRole)
-        return index.sibling(index.row(), Qn::CheckColumn).data(Qt::CheckStateRole).toInt() != Qt::Checked;
-
     return node(index)->data(role, index.column());
 }
 
@@ -976,13 +972,9 @@ void QnResourceTreeModel::handleDrop(const QnResourceList& sourceResources, cons
         return;
 
     /* We can add media resources to layout */
-    if (QnLayoutResourcePtr layout = targetResource.dynamicCast<QnLayoutResource>())
+    if (const auto layout = targetResource.dynamicCast<QnLayoutResource>())
     {
-        QnResourceList droppable = sourceResources.filtered(
-            [](const QnResourcePtr& resource)
-            {
-                return QnResourceAccessFilter::isOpenableInLayout(resource);
-            });
+        const auto droppable = sourceResources.filtered(QnResourceAccessFilter::isOpenableInLayout);
 
         if (!droppable.isEmpty())
         {
@@ -993,14 +985,14 @@ void QnResourceTreeModel::handleDrop(const QnResourceList& sourceResources, cons
     }
 
     /* Drop layout on user means sharing this layout. */
-    else if (QnUserResourcePtr targetUser = targetResource.dynamicCast<QnUserResource>())
+    else if (const auto targetUser = targetResource.dynamicCast<QnUserResource>())
     {
         /* Technically it works right, but layout becomes shared and appears in "Shared layouts"
          * node, not under user, where it was dragged. Disabling to not confuse user. */
         if (targetUser->userRole() == Qn::UserRole::CustomUserRole)
             return;
 
-        for (const QnLayoutResourcePtr &sourceLayout : sourceResources.filtered<QnLayoutResource>())
+        for (const auto& sourceLayout: sourceResources.filtered<QnLayoutResource>())
         {
             if (sourceLayout->isFile())
                 continue;
@@ -1012,7 +1004,7 @@ void QnResourceTreeModel::handleDrop(const QnResourceList& sourceResources, cons
     }
 
     /* Drop camera on server allows to move servers between cameras. */
-    else if (QnMediaServerResourcePtr server = targetResource.dynamicCast<QnMediaServerResource>())
+    else if (const auto server = targetResource.dynamicCast<QnMediaServerResource>())
     {
         if (server->hasFlags(Qn::fake))
             return;
@@ -1021,7 +1013,7 @@ void QnResourceTreeModel::handleDrop(const QnResourceList& sourceResources, cons
         if (mimeData->data(pureTreeResourcesOnlyMimeType) != QByteArray("1"))
             return;
 
-        QnVirtualCameraResourceList cameras = sourceResources.filtered<QnVirtualCameraResource>();
+        const auto cameras = sourceResources.filtered<QnVirtualCameraResource>();
         if (!cameras.empty())
         {
             menu()->trigger(action::MoveCameraAction, action::Parameters(cameras)
