@@ -1251,6 +1251,33 @@ ScaleManager.prototype.scrollSlider = function(){
     }
 };
 ScaleManager.prototype.scroll = function(value){
+/*
+    How scrolling actually works:
+
+    We need two-way translation between visible dates and scrollbar coordinates.
+    Lets look closer at scrollbar scrollSlider.start coordinate on the screen and visibleStart date on the timeline.
+    They need to be consistent at any time.
+
+    scrollSlider.start belongs to [0, viewportWidth - scrollSlider.width]
+    So we can introduce relative coordinate for it:
+    relativePosition =  scrollSlider.start / (viewportWidth - scrollSlider.width)
+    relativePosition belongs to [0,1]
+    
+
+    visibleStart belongs to [start, end - visibleWidth]
+    visibleWidth = visibleEnd-visibleStart - visible time interval on the timeline
+    start - the left date on the timeline (start of the timeline)
+    end - the right date on the timeline (current datetime - live position)
+
+    So we can introduce relative coordinate for it:
+    relativePosition = (visibleStart - start) / ((end - start) - visibleWidth) =
+                       (visibleStart - start) / ((end - start) - (visibleEnd - visibleWidth))
+
+    relativePosition belongs to [0,1]
+
+
+    So we use this relativePosition as a scroll value
+*/
     if(typeof (value) == "undefined"){
         //instead of scrolling by center - we always determine scroll value by left position
         return this.getRelativePosition();
