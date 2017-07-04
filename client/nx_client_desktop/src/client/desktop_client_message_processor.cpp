@@ -37,7 +37,6 @@ void QnDesktopClientMessageProcessor::disconnectFromConnection(const ec2::Abstra
     base_type::disconnectFromConnection(connection);
 
     connection->getDiscoveryNotificationManager()->disconnect(this);
-    connection->getLayoutTourNotificationManager()->disconnect(this);
 }
 
 void QnDesktopClientMessageProcessor::onGotInitialNotification(const ec2::ApiFullInfoData& fullData)
