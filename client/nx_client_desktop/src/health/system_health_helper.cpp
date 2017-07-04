@@ -2,10 +2,13 @@
 
 #include <nx/vms/event/actions/abstract_action.h>
 
+#include <helpers/cloud_url_helper.h>
 #include <nx/network/app_info.h>
 #include <nx/utils/string.h>
-
+#include <ui/style/helper.h>
 #include <utils/common/app_info.h>
+#include <utils/common/html.h>
+#include <watchers/cloud_status_watcher.h>
 
 QString QnSystemHealthStringsHelper::messageTitle(QnSystemHealth::MessageType messageType)
 {
@@ -55,14 +58,33 @@ QString QnSystemHealthStringsHelper::messageText(QnSystemHealth::MessageType mes
 
         case QnSystemHealth::CloudPromo:
         {
-            const QString kLearnMoreText = tr("Learn more");
-            const QString kCloudBeta = lit("<b>%1</b> Beta").arg(nx::network::AppInfo::cloudName());
+            const bool isLoggedIntoCloud =
+                qnCloudStatusWatcher->status() != QnCloudStatusWatcher::LoggedOut;
 
-            const QString kMessage = tr("Check out %1 &mdash; connect to your servers from anywhere",
-                "%1 is the cloud name (like 'Nx Cloud')").arg(kCloudBeta);
+            const QString kCloudNameText = lit("<b>%1</b>").arg(nx::network::AppInfo::cloudName());
+            const QString kMessage = isLoggedIntoCloud
+                ? tr("Connect your system to %1 &mdash; make it accessible from anywhere!",
+                    "%1 is the cloud name (like 'Nx Cloud')").arg(kCloudNameText)
+                : tr("Check out %1 &mdash; connect to your system from anywhere!",
+                    "%1 is the cloud name (like 'Nx Cloud')").arg(kCloudNameText);
 
-            const QString kTemplate = lit("<p>%1</p><p><a href=\"settings\">%2</a></p>");
-            return kTemplate.arg(kMessage, kLearnMoreText);
+            using nx::vms::utils::SystemUri;
+            QnCloudUrlHelper urlHelper(
+                SystemUri::ReferralSource::DesktopClient,
+                SystemUri::ReferralContext::None);
+
+            static const QString kTemplate = lit(R"html(
+                <style>td {padding-top: %4px; padding-right: %4px}</style>
+                <p>%1</p>
+                <table cellpadding="0" cellspacing="0">
+                <tr><td>%2</td><td>%3</td></tr>
+                </table>
+            )html");
+
+            return kTemplate.arg(kMessage)
+                .arg(makeHref(tr("Learn more"), urlHelper.aboutUrl()))
+                .arg(makeHref(tr("Connect"), lit("settings")))
+                .arg(style::Metrics::kStandardPadding);
         }
         default:
             break;
