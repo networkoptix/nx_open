@@ -56,9 +56,22 @@ public:
     bool hidePasswordIndicatorWhenEmpty;
 };
 
+//-------------------------------------------------------------------------------------------------
+
+QnInputField* QnInputField::create(
+    const QString& text,
+    const Qn::TextValidateFunction& validator,
+    QWidget* parent)
+{
+    const auto result = new QnInputField(parent);
+    result->setValidator(validator);
+    result->setText(text);
+    return result;
+}
+
 QnInputField::QnInputField(QWidget* parent /*= nullptr*/) :
     base_type(new QLineEdit(), accessor("text"),
-        accessor("readOnly"), accessor("placeholderText"), parent),
+        accessor("readOnly"), accessor("placeholderText"), true, parent),
     d_ptr(new QnInputFieldPrivate(this))
 {
     const auto lineEdit = qobject_cast<QLineEdit*>(input());
@@ -66,10 +79,10 @@ QnInputField::QnInputField(QWidget* parent /*= nullptr*/) :
     connect(lineEdit, &QLineEdit::textChanged, this,
         [this]()
         {
-            emit textChanged(text());
-
             Q_D(QnInputField);
             d->updatePasswordIndicatorVisibility();
+
+            emit textChanged(text());
         });
 }
 
@@ -79,25 +92,21 @@ QnInputField::~QnInputField()
 
 QLineEdit::EchoMode QnInputField::echoMode() const
 {
-    Q_D(const QnInputField);
     return toLineEdit(input())->echoMode();
 }
 
 void QnInputField::setEchoMode(QLineEdit::EchoMode value)
 {
-    Q_D(QnInputField);
     toLineEdit(input())->setEchoMode(value);
 }
 
 QString QnInputField::inputMask() const
 {
-    Q_D(const QnInputField);
     return toLineEdit(input())->inputMask();
 }
 
 void QnInputField::setInputMask(const QString& inputMask)
 {
-    Q_D(QnInputField);
     return toLineEdit(input())->setInputMask(inputMask);
 }
 
