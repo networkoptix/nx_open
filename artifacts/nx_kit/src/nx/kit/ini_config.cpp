@@ -16,6 +16,10 @@
     #define NX_INI_CONFIG_DEFAULT_OUTPUT &std::cerr
 #endif
 
+#if !defined(NX_INI_CONFIG_DEFAULT_INI_FILES_DIR)
+    #define NX_INI_CONFIG_DEFAULT_INI_FILES_DIR nullptr
+#endif
+
 namespace nx {
 namespace kit {
 
@@ -256,8 +260,17 @@ struct IniConfig::Impl
 
     static std::ostream*& output()
     {
-        static std::ostream* output = NX_INI_CONFIG_DEFAULT_OUTPUT;
+        static std::ostream* output = (NX_INI_CONFIG_DEFAULT_OUTPUT);
         return output;
+    }
+
+    static std::string& iniFilesDir()
+    {
+        static std::string iniFilesDir =
+            ((NX_INI_CONFIG_DEFAULT_INI_FILES_DIR) != nullptr)
+                ? NX_INI_CONFIG_DEFAULT_INI_FILES_DIR
+                : "";
+        return iniFilesDir;
     }
 
     template<typename Value>
@@ -325,8 +338,8 @@ std::string IniConfig::Impl::validateIniFile(const char* iniFile)
 
 std::string IniConfig::Impl::determineIniDir()
 {
-    if (!isEnabled())
-        return "";
+    if (!iniFilesDir().empty() || !isEnabled())
+        return iniFilesDir();
 
     #if defined(ANDROID) || defined(__ANDROID__)
         // NOTE: On Android, QDir::iniFileDir() and std::tmpnam() return non-existing "/tmp".
@@ -481,6 +494,11 @@ void IniConfig::reload()
 /*static*/ void IniConfig::setOutput(std::ostream* output)
 {
     Impl::output() = output;
+}
+
+/*static*/ void IniConfig::setIniFilesDir(const char* iniFilesDir)
+{
+    Impl::iniFilesDir() = (iniFilesDir != nullptr) ? iniFilesDir : "";
 }
 
 IniConfig::IniConfig(const char* iniFile):
