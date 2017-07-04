@@ -9,12 +9,8 @@ namespace nx {
 namespace network {
 namespace cloud {
 
-CloudModuleUrlFetcher::CloudModuleUrlFetcher(
-    const QString& moduleName,
-    std::unique_ptr<AbstractEndpointSelector> endpointSelector)
-    :
-    m_moduleAttrName(nameset().findResourceByName(moduleName).id),
-    m_endpointSelector(std::move(endpointSelector))
+CloudModuleUrlFetcher::CloudModuleUrlFetcher(const QString& moduleName):
+    m_moduleAttrName(nameset().findResourceByName(moduleName).id)
 {
     NX_ASSERT(
         m_moduleAttrName != nx::utils::stree::INVALID_RES_ID,

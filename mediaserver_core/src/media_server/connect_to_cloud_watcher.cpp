@@ -19,8 +19,7 @@ namespace {
 using namespace nx::network::cloud;
 
 QnConnectToCloudWatcher::QnConnectToCloudWatcher(ec2::QnTransactionMessageBusBase* messageBus):
-    m_cdbEndPointFetcher(
-        new CloudDbUrlFetcher(std::make_unique<RandomEndpointSelector>())),
+    m_cdbEndPointFetcher(new CloudDbUrlFetcher()),
     m_messageBus(messageBus)
 {
     m_timer.setSingleShot(true);

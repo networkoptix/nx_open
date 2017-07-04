@@ -49,9 +49,7 @@ public:
         nx::utils::AsyncOperationGuard m_guard;
     };
 
-    CloudModuleUrlFetcher(
-        const QString& moduleName,
-        std::unique_ptr<AbstractEndpointSelector> endpointSelector);
+    CloudModuleUrlFetcher(const QString& moduleName);
 
     /**
      * Retrieves endpoint if unknown. 
@@ -65,7 +63,6 @@ public:
     void setUrl(QUrl endpoint);
 
 protected:
-    virtual void stopWhileInAioThread() override;
     virtual bool analyzeXmlSearchResult(
         const nx::utils::stree::ResourceContainer& searchResult) override;
     virtual void invokeHandler(
@@ -74,7 +71,6 @@ protected:
 
 private:
     const int m_moduleAttrName;
-    std::unique_ptr<AbstractEndpointSelector> m_endpointSelector;
     boost::optional<QUrl> m_url;
 };
 
@@ -84,8 +80,7 @@ class NX_NETWORK_API CloudDbUrlFetcher:
     public CloudModuleUrlFetcher
 {
 public:
-    CloudDbUrlFetcher(
-        std::unique_ptr<AbstractEndpointSelector> endpointSelector);
+    CloudDbUrlFetcher();
 };
 
 } // namespace cloud
