@@ -2,11 +2,21 @@ from datetime import datetime
 
 from notifications.tasks import send_email
 
+from .filldata import fill_content
 from api.models import Account
 from cms.models import *
 
-def get_context_and_language(request_data): 
-	return Context.objects.get(id=request_data['context']), Language.objects.get(id=request_data['language'])
+def get_context_and_language(request_data, context_name, language_id):
+	context = Context.objects.get(name=context_name) if context_name else None
+	language = Language.objects.get(id=language_id) if language_id else None
+	
+	if not context and 'context' in request_data and request_data['context']:
+		context = Context.objects.get(id=request_data['context'])
+	
+	if not language and 'language' in request_data and request_data['language']: 
+		language = Language.objects.get(id=request_data['language'])
+
+	return context, language
 
 def accept_latest_draft(user):
 	unaccepted_version = ContentVersion.objects.filter(accepted_date=None).latest('created_date')
@@ -79,8 +89,7 @@ def alter_records_version(contexts, customization, old_version, new_version):
 				record.save()
 
 
-def generate_preview(customization, language, data_structures, request_data, user):
-	save_unrevisioned_records(customization, language, data_structures, request_data, user)
+def generate_preview():
 	fill_content(customization_name=settings.CUSTOMIZATION)
 	return context.url + "?preview"
 

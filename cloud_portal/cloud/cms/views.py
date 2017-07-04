@@ -6,51 +6,64 @@ from django.core.exceptions import PermissionDenied
 from django.shortcuts import render
 from cloud import settings
 
-from .controllers.filldata import fill_content
 from .controllers.modify_db import *
 from .forms import *
 
 from django.views.generic.list import ListView
 
-def get_post_parameters(request):
-	context, language = get_context_and_language(request.data)
-	
-	form = CustomContextForm(initial={'language': language.id, 'context': context.id})
-	
+def get_post_parameters(request, context_name, language_id):
+	context, language = get_context_and_language(request.data, context_name, language_id)
 	customization = Customization.objects.get(name=settings.CUSTOMIZATION)		
 	user = Account.objects.get(email=request.user)
+
+	if not language and 'language' in request.session:
+		languange = Language.objects.get(code=request.session['language'])
+
+	if not language:
+		language = customization.default_language
+	
+	form = CustomContextForm(initial={'language': language.id, 'context': context.id})
 
 	return context, language, form, customization, user 
 
 
-def handle_get_view(context_name, language_code):
-	context, language, context_id, language_id = None, None, 0, 0
+def handle_get_view(request, context_name, language_code):
+	context, language, context_id = None, None, 0
 	if context_name:
 		context = Context.objects.get(name=context_name)
 		context_id = context.id
+	
 	if language_code:
 		language = Language.objects.get(code=language_code)
-		language_id = language.id
+
+	elif 'language' in request.session:
+		language = Language.objects.get(code=request.session['language'])
+
+	else:
+		language = Customization.objects.get(name=settings.CUSTOMIZATION).default_language
+
+	language_id = language.id
 
 	form = CustomContextForm(initial={'language': language_id})
 	if context:
 		form.add_fields(context, language)
 
-	return context, form
+	return context, form, language
 	
 
-def handle_post_context_edit_view(request):
-	context, language, form, customization, user = get_post_parameters(request)
+def handle_post_context_edit_view(request, context_name, language_id):
+	context, language, form, customization, user = get_post_parameters(request, context_name, language_id)
 	request_data = request.data
 	preview_link = ""
-	post_made = False
 	
-	if 'GetDataRecords' in request_data:
-		post_made = True
-		form.add_fields(context, language)
+	if 'languageChanged' in request_data:	
+		if 'currentLanguage' in request_data and request_data['currentLanguage']:
+			last_language = Language.objects.get(id=request_data['currentLanguage'])
+			save_unrevisioned_records(customization, last_language, context.datastructure_set.all(), request_data, user)
 
 	elif 'Preview' in request_data:
-		preview_link = generate_preview(customization, language, context.datastructure_set.all(), request_data, user)
+		save_unrevisioned_records(customization, language, context.datastructure_set.all(), request_data, user)
+		preview_link = generate_preview()
 
 	elif 'Publish' in request.data:
 		publish_latest_version(user)
@@ -61,52 +74,45 @@ def handle_post_context_edit_view(request):
 	elif 'SendReview' in request_data:
 		send_version_for_review(customization, language, context.datastructure_set.all(), request_data, user)
 
-	return context, form, post_made, preview_link
+	form.add_fields(context, language)
 
-
-def handle_post_partner_review(request):
-	request_data = request.data
-	preview_link = ""
-	form = None
-
-	if 'Preview' in request_data:
-		context, language, form, customization, user = get_post_parameters(request)
-		preview_link = generate_preview(customization, language, context.datastructure_set.all(), request_data, user)
-
-	elif 'Publish' in request.data:
-		publish_latest_version(user)
-
-	return context, form, preview_link
+	return context, form, language, preview_link
 
 
 # Create your views here.
 @api_view(["GET", "POST"])
 def context_edit_view(request, context=None, language=None):
 	if request.method == "GET":
-		context, form = handle_get_view(context, language)
-		return render(request, 'context_editor.html', {'context': context, 'form': form})
+		context, form, language = handle_get_view(request, context, language)
+		return render(request, 'context_editor.html', {'context': context, 'form': form, 'language': language})
 
 	else:
-		context, form, post_made, preview_link = handle_post_context_edit_view(request)
-		return render(request, 'context_editor.html', {'context': context, 'form': form, 'preview_link': preview_link})
+		context, form, language, preview_link = handle_post_context_edit_view(request, context, language)
+		return render(request, 'context_editor.html', {'context': context, 'form': form, 'language': language, 'preview_link': preview_link})
 
 
-@api_view(["GET", "POST"])
+@api_view(["POST"])
 def partner_review_view(request, context=None, language=None):
-	if request.method == "GET":
-		context, form = handle_get_view(context, language)
-		return render(request, 'partner_version_review.html', {'context': context, 'form': form})
+	if "Preview" in request.data:
+		preview_link = generate_preview()
+		return redirect(preview_link)
+	elif "Publish" in request.data:
+		publish_latest_version(request.user)	
+	return response('OK')	
 
-	else:
-		context, form, preview_link = handle_post_partner_review(request)
-		return render(request, 'partner_version_review.html', {'form': form, 'preview_link': preview_link})
 
+@api_view(["GET"])
+def review_version_view(request, version_id=None):
 
-class VersionsViewer(ListView):
-	def get_queryset(self):
-		query = ContentVersion.objects.get(id=self.kwargs['id']).datarecord_set.all()
-		return query.order_by('data_structure__context__name', 'language__code')
+	data_records = ContentVersion.objects.get(id=version_id).datarecord_set.all()\
+											 .order_by('data_structure__context__name', 'language__code')
+	
+	contexts = {}
+	for record in data_records:
+		context_name = record.data_structure.context.name
+		if  context_name in contexts:
+			contexts[context_name].append(record)
+		else:
+			contexts[context_name] = [record]
 
-	template = "datarecord_list.html"
-
-	fields = "__all__"
+	return render(request, 'review_records.html', {'version_number': version_id, 'contexts': contexts})

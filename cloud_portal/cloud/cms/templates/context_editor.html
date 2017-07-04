@@ -6,6 +6,7 @@
     <link rel="stylesheet" type="text/css" href="{% static 'admin/css/forms.css' %}"/>
 {% endblock %}
 
+
 {% block content%}
 <h1>{{context.name}} for {{context.product.name}}</h1>
 <fieldset>
@@ -17,7 +18,10 @@
     <div> Link to Page: {{context.url}}</div>
     {% endif %}
 </fieldset>
-<form action="{% url 'context_editor' context.id %}" method="post" class="aligned">
+<form id="contextForm" action="{% url 'context_editor' context.name %}" method="post" class="aligned">
+    <input type="hidden" name="context" value="{{context.name}}">
+    <input type="hidden" name="currentLanguage" value="{{language.id}}">
+    <input type="hidden" id="languageChanged">
     {% csrf_token %}
     {% for field in form %}
         <div class="form-row">
@@ -30,7 +34,6 @@
     {% endfor %}
 
     <div class="submit-row">
-        <button class="button" type="submit" name="GetDataRecords">Get Data Records</button>
         <button class="button" type="submit" name="SaveDraft">Save Draft</button>
         <button class="button" type="submit" name="Preview">Save and Preview</button>
         <button class="button" type="submit" name="SendReview">Send for Review</button>
@@ -41,11 +44,20 @@
 {% if preview_link %}
 <div class="submit-row">
 <button onClick="openPreview()">Open Preview</button>
-
+{% endif %}
 <script>
     function openPreview(){
         window.open("{{preview_link}}");
     }
+
+    function languageChanged(){
+        document.getElementById('languageChanged').name = "languageChanged";
+        document.getElementById('contextForm').submit();
+    }
+
+
+    var langSelector = document.getElementById('id_language');
+
+    langSelector.addEventListener('change', languageChanged, false);
 </script>
-{% endif %}
 {% endblock%}

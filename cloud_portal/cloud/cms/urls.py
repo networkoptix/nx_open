@@ -6,9 +6,7 @@ urlpatterns = [
 	url(r'context_editor/(?P<context>.+?)/', context_edit_view, name="context_editor"),
 	url(r'context_editor/', context_edit_view, name="context_editor"),
 
-	url(r'review_page/(?P<context>.+?)/(?P<language>.+?)/', partner_review_view, name="review_page"),
-	url(r'review_page/(?P<context>.+?)/', partner_review_view, name="review_page"),
 	url(r'review_page/', partner_review_view, name="review_page"),
 	
-	url(r'review_version/(?P<id>.+?)/', VersionsViewer.as_view()),
+	url(r'review_version/(?P<version_id>.+?)/', review_version_view),
 ]
