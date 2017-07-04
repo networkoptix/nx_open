@@ -119,7 +119,7 @@ bool QnDbHelper::QnDbTransaction::dbCommit(const QString& event)
     }
     else
     {
-        NX_VERBOSE(this, lm("Failed commit in %1 on (%2): %3").args(
+        NX_WARNING(this, lm("Failed commit in %1 on (%2): %3").args(
             m_database.databaseName(), event, m_database.lastError()));
         return false;
     }
