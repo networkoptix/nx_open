@@ -7,9 +7,9 @@
 #include <core/resource/media_server_resource.h>
 #include <core/resource/camera_resource.h>
 #include <api/common_message_processor.h>
-#include <business/business_strings_helper.h>
-#include <business/business_event_rule.h>
-#include <business/event_rule_manager.h>
+#include <nx/vms/event/strings_helper.h>
+#include <nx/vms/event/rule.h>
+#include <nx/vms/event/rule_manager.h>
 #include <nx_ec/data/api_conversion_functions.h>
 #include <api/global_settings.h>
 #include <common/common_module.h>
@@ -96,10 +96,10 @@ namespace ec2
         Q_UNUSED(command);
         QnAuditRecord auditRecord = qnAuditManager->prepareRecord(authInfo, Qn::AR_BEventUpdate);
         auditRecord.resources.push_back(params.id);
-        QnBusinessEventRulePtr bRule(new QnBusinessEventRule());
-        fromApiToResource(params, bRule);
-        QnBusinessStringsHelper helper(m_connection->commonModule());
-        auditRecord.addParam("description", helper.bruleDescriptionText(bRule).toUtf8());
+        nx::vms::event::RulePtr rule(new nx::vms::event::Rule());
+        fromApiToResource(params, rule);
+        nx::vms::event::StringsHelper helper(m_connection->commonModule());
+        auditRecord.addParam("description", helper.ruleDescriptionText(rule).toUtf8());
 
         qnAuditManager->addAuditRecord(auditRecord);
     }
@@ -168,11 +168,11 @@ namespace ec2
                 eventType = Qn::AR_BEventRemove;
                 auto ruleManager = m_connection->commonModule()->eventRuleManager();
                 if (ruleManager) {
-                    QnBusinessEventRulePtr bRule = ruleManager->rule(params.id);
-                    if (bRule)
+                    nx::vms::event::RulePtr rule = ruleManager->rule(params.id);
+                    if (rule)
                     {
-                        QnBusinessStringsHelper helper(m_connection->commonModule());
-                        description = helper.bruleDescriptionText(bRule);
+                        nx::vms::event::StringsHelper helper(m_connection->commonModule());
+                        description = helper.ruleDescriptionText(rule);
                     }
                 }
                 break;

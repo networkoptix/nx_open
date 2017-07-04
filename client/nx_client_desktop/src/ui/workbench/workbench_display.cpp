@@ -96,7 +96,8 @@
 
 #include <nx/utils/log/log.h>
 
-using namespace nx::client::desktop::ui;
+using namespace nx;
+using namespace client::desktop::ui;
 
 namespace {
 
@@ -1062,7 +1063,7 @@ void QnWorkbenchDisplay::bringToFront(QnWorkbenchItem *item)
 
 bool QnWorkbenchDisplay::addItemInternal(QnWorkbenchItem *item, bool animate, bool startDisplay)
 {
-    int maxItems = (m_lightMode & Qn::LightModeSingleItem)
+    int maxItems = m_lightMode.testFlag(Qn::LightModeSingleItem)
         ? 1
         : qnSettings->maxSceneVideoItems();
 
@@ -1969,7 +1970,7 @@ void QnWorkbenchDisplay::at_workbench_currentLayoutChanged()
             m_loader->pleaseStop();
         }
 
-        if (QnMediaResourcePtr resource = resourcePool()->getResourceByUniqueId((**layout->items().begin()).resourceUid()).dynamicCast<QnMediaResource>())
+        if (auto resource = (*layout->items().begin())->resource().dynamicCast<QnMediaResource>())
         {
             m_loader = new QnThumbnailsLoader(resource, QnThumbnailsLoader::Mode::Strict);
 
@@ -2334,7 +2335,7 @@ void QnWorkbenchDisplay::at_resourcePool_resourceRemoved(const QnResourcePtr& re
     }
 }
 
-void QnWorkbenchDisplay::at_notificationsHandler_businessActionAdded(const QnAbstractBusinessActionPtr &businessAction)
+void QnWorkbenchDisplay::at_notificationsHandler_businessActionAdded(const vms::event::AbstractActionPtr &businessAction)
 {
     if (m_lightMode & Qn::LightModeNoNotifications)
         return;
@@ -2353,20 +2354,20 @@ void QnWorkbenchDisplay::at_notificationsHandler_businessActionAdded(const QnAbs
      * In second case we should manually collect resources from event sources.
      */
     QSet<QnResourcePtr> targetResources;
-    QnBusiness::ActionType actionType = businessAction->actionType();
-    if (actionType == QnBusiness::ShowOnAlarmLayoutAction)
+    vms::event::ActionType actionType = businessAction->actionType();
+    if (actionType == vms::event::showOnAlarmLayoutAction)
     {
         if (QnResourcePtr resource = resourcePool()->getResourceById(businessAction->getParams().actionResourceId))
             targetResources.insert(resource);
     }
     else
     {
-        Q_ASSERT_X(actionType == QnBusiness::ShowPopupAction || actionType == QnBusiness::PlaySoundAction,
+        Q_ASSERT_X(actionType == vms::event::showPopupAction || actionType == vms::event::playSoundAction,
             Q_FUNC_INFO, "Invalid action type");
-        QnBusinessEventParameters eventParams = businessAction->getRuntimeParams();
+        vms::event::EventParameters eventParams = businessAction->getRuntimeParams();
         if (QnResourcePtr resource = resourcePool()->getResourceById(eventParams.eventResourceId))
             targetResources.insert(resource);
-        if (eventParams.eventType >= QnBusiness::UserDefinedEvent)
+        if (eventParams.eventType >= vms::event::userDefinedEvent)
             targetResources.unite(resourcePool()->getResources<QnResource>(eventParams.metadata.cameraRefs).toSet());
     }
 
@@ -2383,7 +2384,7 @@ void QnWorkbenchDisplay::at_notificationsHandler_businessActionAdded(const QnAbs
     }
 }
 
-void QnWorkbenchDisplay::showSplashOnResource(const QnResourcePtr &resource, const QnAbstractBusinessActionPtr &businessAction)
+void QnWorkbenchDisplay::showSplashOnResource(const QnResourcePtr &resource, const vms::event::AbstractActionPtr &businessAction)
 {
     if (m_lightMode & Qn::LightModeNoNotifications)
         return;

@@ -4,7 +4,6 @@
 #include <QtCore/QtMath>
 #include <QtCore/QScopedValueRollback>
 
-#include <business/business_strings_helper.h>
 #include <core/resource_management/user_roles_manager.h>
 #include <core/resource/user_resource.h>
 #include <ui/common/aligner.h>
@@ -15,7 +14,9 @@
 #include <ui/workaround/widgets_signals_workaround.h>
 
 #include <nx/client/desktop/ui/event_rules/subject_selection_dialog.h>
+#include <nx/vms/event/strings_helper.h>
 
+using namespace nx;
 using namespace nx::client::desktop::ui;
 
 namespace {
@@ -27,12 +28,13 @@ static constexpr int kDropdownIconSize = 40;
 QnSoftwareTriggerBusinessEventWidget::QnSoftwareTriggerBusinessEventWidget(QWidget* parent) :
     base_type(parent),
     ui(new Ui::SoftwareTriggerBusinessEventWidget),
-    m_helper(new QnBusinessStringsHelper(commonModule()))
+    m_helper(new vms::event::StringsHelper(commonModule()))
 {
     ui->setupUi(this);
 
     ui->usersButton->setMaximumWidth(QWIDGETSIZE_MAX);
-    ui->triggerIdLineEdit->setPlaceholderText(QnBusinessStringsHelper::defaultSoftwareTriggerName());
+    ui->triggerIdLineEdit->setPlaceholderText(
+        nx::vms::event::StringsHelper::defaultSoftwareTriggerName());
 
     connect(ui->triggerIdLineEdit, &QLineEdit::textChanged, this,
         &QnSoftwareTriggerBusinessEventWidget::paramsChanged);
@@ -71,14 +73,14 @@ void QnSoftwareTriggerBusinessEventWidget::updateTabOrder(QWidget* before, QWidg
     setTabOrder(ui->iconComboBox, after);
 }
 
-void QnSoftwareTriggerBusinessEventWidget::at_model_dataChanged(QnBusiness::Fields fields)
+void QnSoftwareTriggerBusinessEventWidget::at_model_dataChanged(Fields fields)
 {
     if (!model() || m_updating)
         return;
 
     QScopedValueRollback<bool> updatingRollback(m_updating, true);
 
-    if (fields.testFlag(QnBusiness::EventParamsField))
+    if (fields.testFlag(Field::eventParams))
     {
         const auto params = model()->eventParams();
         ui->triggerIdLineEdit->setText(params.caption);
@@ -120,7 +122,7 @@ void QnSoftwareTriggerBusinessEventWidget::at_usersButton_clicked()
         [&dialog]()
         {
             dialog.showAlert(!dialog.allUsers() && dialog.checkedSubjects().empty()
-                ? QnBusinessStringsHelper::needToSelectUserText()
+                ? vms::event::StringsHelper::needToSelectUserText()
                 : QString());
         };
 
@@ -150,7 +152,7 @@ void QnSoftwareTriggerBusinessEventWidget::updateUsersButton()
 
     if (params.metadata.allUsers)
     {
-        ui->usersButton->setText(QnBusinessStringsHelper::allUsersText());
+        ui->usersButton->setText(vms::event::StringsHelper::allUsersText());
         ui->usersButton->setIcon(qnResIconCache->icon(QnResourceIconCache::Users));
     }
     else
@@ -161,7 +163,7 @@ void QnSoftwareTriggerBusinessEventWidget::updateUsersButton()
 
         if (users.isEmpty() && roles.isEmpty())
         {
-            ui->usersButton->setText(QnBusinessStringsHelper::needToSelectUserText());
+            ui->usersButton->setText(vms::event::StringsHelper::needToSelectUserText());
             ui->usersButton->setIcon(qnSkin->icon(lit("tree/user_alert.png")));
         }
         else

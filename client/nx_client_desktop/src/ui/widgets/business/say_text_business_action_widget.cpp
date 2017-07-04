@@ -3,7 +3,6 @@
 
 #include <QtCore/QScopedValueRollback>
 
-#include <business/business_action_parameters.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource_management/resource_pool.h>
 #include <nx/audio/audiodevice.h>
@@ -11,6 +10,8 @@
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
 #include <utils/media/audio_player.h>
+
+#include <nx/vms/event/action_parameters.h>
 
 QnSayTextBusinessActionWidget::QnSayTextBusinessActionWidget(QWidget *parent) :
     base_type(parent),
@@ -64,7 +65,7 @@ void QnSayTextBusinessActionWidget::updateTabOrder(QWidget* before, QWidget* aft
     setTabOrder(ui->testButton,        after);
 }
 
-void QnSayTextBusinessActionWidget::at_model_dataChanged(QnBusiness::Fields fields)
+void QnSayTextBusinessActionWidget::at_model_dataChanged(Fields fields)
 {
     if (!model() || m_updating)
         return;
@@ -73,8 +74,8 @@ void QnSayTextBusinessActionWidget::at_model_dataChanged(QnBusiness::Fields fiel
 
     QScopedValueRollback<bool> updatingRollback(m_updating, true);
 
-    auto params = model()->actionParams();
-    if (fields & QnBusiness::ActionParamsField)
+    const auto params = model()->actionParams();
+    if (fields.testFlag(Field::actionParams))
     {
         ui->textEdit->setText(params.sayText);
         ui->playToClient->setChecked(params.playToClient);

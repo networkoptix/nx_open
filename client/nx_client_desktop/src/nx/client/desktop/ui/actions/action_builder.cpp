@@ -3,8 +3,6 @@
 #include <QtGui/QKeySequence>
 #include <QtGui/QGuiApplication>
 
-#include <core/resource_management/resource_criterion.h>
-
 #include <nx/client/desktop/ui/actions/action_conditions.h>
 #include <nx/client/desktop/ui/actions/action.h>
 #include <ui/style/noptix_style.h>
@@ -182,13 +180,6 @@ Builder Builder::conditionalText(const QString& text, ConditionWrapper&& conditi
     return *this;
 }
 
-Builder Builder::conditionalText(const QString& text, const QnResourceCriterion& criterion,
-    MatchMode matchMode)
-{
-    m_action->addConditionalText(new ResourceCondition(criterion, matchMode), text);
-    return *this;
-}
-
 Builder Builder::checkable(bool isCheckable)
 {
     m_action->setCheckable(isCheckable);
@@ -210,13 +201,6 @@ Builder Builder::showCheckBoxInMenu(bool show)
 Builder Builder::accent(Qn::ButtonAccent value)
 {
     m_action->setAccent(value);
-    return *this;
-}
-
-Builder Builder::condition(const QnResourceCriterion& criterion, MatchMode matchMode)
-{
-    NX_ASSERT(!m_action->hasCondition());
-    m_action->setCondition(new ResourceCondition(criterion, matchMode));
     return *this;
 }
 

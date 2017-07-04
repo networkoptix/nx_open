@@ -133,7 +133,6 @@ namespace Qn
         ResourceFlagsRole,                          /**< Role for resource flags. Value of type int (Qn::ResourceFlags). */
         ResourceSearchStringRole,                   /**< Role for resource search string. Value of type QString. */
         ResourceStatusRole,                         /**< Role for resource status. Value of type int (Qn::ResourceStatus). */
-        ResourceUidRole,                            /**< Role for resource unique id. Value of type QString. */
         ResourceIconKeyRole,                        /**< Role for resource custom icon key. Value of type QString. */
 
         VideoWallGuidRole,                          /**< Role for videowall resource unique id. Value of type QnUuid. */
@@ -250,9 +249,9 @@ namespace Qn
         ShortTextRole,                              /**< Role for short text. Value of type QString. */
         PriorityRole,                               /**< Role for priority value. Value of type quint64. */
 
-        EventTypeRole,                              /**< Role for business event type. Value of type QnBusiness::EventType. */
+        EventTypeRole,                              /**< Role for business event type. Value of type nx::vms::event::EventType. */
         EventResourcesRole,                         /**< Role for business event resources list. Value of type QSet<QnUuid>. */
-        ActionTypeRole,                             /**< Role for business action type. Value of type QnBusiness::ActionType. */
+        ActionTypeRole,                             /**< Role for business action type. Value of type nx::vms::event::ActionType. */
         ActionResourcesRole,                        /**< Role for business action resources list. Value of type QSet<QnUuid>. */
 
         StorageUrlRole,                             /**< Role for storing real storage Url in storage_url_dialog. */
@@ -297,20 +296,7 @@ namespace Qn
     Q_DECLARE_FLAGS(MarginFlags, MarginFlag)
     Q_DECLARE_OPERATORS_FOR_FLAGS(MarginFlags)
 
-    /**
-     * Flags describing the differences between instances of the same resource
-     * on the client and on the Server.
-     */
-    enum ResourceSavingFlag
-    {
-        /** Resource is currently being saved to Server. */
-        ResourceIsBeingSaved = 0x1,
 
-        /** Unsaved changes are present in the resource. */
-        ResourceIsChanged = 0x2
-    };
-    Q_DECLARE_FLAGS(ResourceSavingFlags, ResourceSavingFlag)
-    Q_DECLARE_OPERATORS_FOR_FLAGS(ResourceSavingFlags)
 
     enum class CellSpacing
     {

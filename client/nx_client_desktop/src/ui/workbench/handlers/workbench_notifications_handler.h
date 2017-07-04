@@ -1,11 +1,10 @@
-#ifndef WORKBENCH_NOTIFICATIONS_HANDLER_H
-#define WORKBENCH_NOTIFICATIONS_HANDLER_H
+#pragma once
 
 #include <QtCore/QObject>
 
 #include <api/model/kvpair.h>
-#include <business/actions/abstract_business_action.h>
-#include <business/events/abstract_business_event.h>
+#include <nx/vms/event/actions/abstract_action.h>
+#include <nx/vms/event/events/abstract_event.h>
 #include <core/resource/resource_fwd.h>
 #include <health/system_health.h>
 #include <ui/workbench/workbench_state_manager.h>
@@ -16,27 +15,30 @@
 class QnWorkbenchUserEmailWatcher;
 class QnBusinessEventsFilterResourcePropertyAdaptor;
 
-class QnWorkbenchNotificationsHandler : public Connective<QObject>, public QnSessionAwareDelegate
+class QnWorkbenchNotificationsHandler:
+    public Connective<QObject>,
+    public QnSessionAwareDelegate
 {
     Q_OBJECT
+    using base_type = Connective<QObject>;
 
-    typedef Connective<QObject> base_type;
 public:
-    explicit QnWorkbenchNotificationsHandler(QObject *parent = 0);
+    explicit QnWorkbenchNotificationsHandler(QObject* parent = nullptr);
     virtual ~QnWorkbenchNotificationsHandler();
 
     void addSystemHealthEvent(QnSystemHealth::MessageType message);
-    void addSystemHealthEvent(QnSystemHealth::MessageType message, const QnAbstractBusinessActionPtr &businessAction);
+    void addSystemHealthEvent(QnSystemHealth::MessageType message,
+        const nx::vms::event::AbstractActionPtr& action);
 
     virtual bool tryClose(bool force) override;
     virtual void forcedUpdate() override;
 
 signals:
-    void systemHealthEventAdded( QnSystemHealth::MessageType message, const QVariant& params );
-    void systemHealthEventRemoved( QnSystemHealth::MessageType message, const QVariant& params );
+    void systemHealthEventAdded( QnSystemHealth::MessageType message, const QVariant& params);
+    void systemHealthEventRemoved( QnSystemHealth::MessageType message, const QVariant& params);
 
-    void notificationAdded(const QnAbstractBusinessActionPtr& businessAction);
-    void notificationRemoved(const QnAbstractBusinessActionPtr& businessAction);
+    void notificationAdded(const nx::vms::event::AbstractActionPtr& action);
+    void notificationRemoved(const nx::vms::event::AbstractActionPtr& action);
 
     void cleared();
 
@@ -48,13 +50,13 @@ private slots:
     void at_userEmailValidityChanged(const QnUserResourcePtr &user, bool isValid);
 
     void at_eventManager_connectionClosed();
-    void at_eventManager_actionReceived(const QnAbstractBusinessActionPtr& businessAction);
+    void at_eventManager_actionReceived(const nx::vms::event::AbstractActionPtr& action);
 
     void at_settings_valueChanged(int id);
     void at_emailSettingsChanged();
 
 private:
-    void addNotification(const QnAbstractBusinessActionPtr& businessAction);
+    void addNotification(const nx::vms::event::AbstractActionPtr& businessAction);
 
     /**
      * Check that system health message can be displayed to admins only.
@@ -62,16 +64,16 @@ private:
     bool adminOnlyMessage(QnSystemHealth::MessageType message);
 
     void setSystemHealthEventVisible(QnSystemHealth::MessageType message, bool visible);
-    void setSystemHealthEventVisible(QnSystemHealth::MessageType message, const QnResourcePtr& resource, bool visible);
+    void setSystemHealthEventVisible(QnSystemHealth::MessageType message,
+        const QnResourcePtr& resource, bool visible);
 
-    void setSystemHealthEventVisibleInternal(QnSystemHealth::MessageType message, const QVariant& params, bool visible);
+    void setSystemHealthEventVisibleInternal(QnSystemHealth::MessageType message,
+        const QVariant& params, bool visible);
 
     void checkAndAddSystemHealthMessage(QnSystemHealth::MessageType message);
 
 private:
-    QnWorkbenchUserEmailWatcher *m_userEmailWatcher;
-    QnBusinessEventsFilterResourcePropertyAdaptor *m_adaptor;
+    QnWorkbenchUserEmailWatcher* m_userEmailWatcher;
+    QnBusinessEventsFilterResourcePropertyAdaptor* m_adaptor;
     quint64 m_popupSystemHealthFilter;
 };
-
-#endif // WORKBENCH_NOTIFICATIONS_HANDLER_H

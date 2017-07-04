@@ -189,7 +189,7 @@ enum IDType
      * Opens the Business Events Log dialog.
      * Supports cameras list in the resources field as a cameras filter.
      * Parameters:
-     * <tt>QnBusiness::EventType EventTypeRole</tt> --- filter by event type.
+     * <tt>nx::vms::event::EventType EventTypeRole</tt> --- filter by event type.
      */
     OpenBusinessLogAction,
 
@@ -1086,6 +1086,11 @@ enum IDType
      * Opens cloud portal in the browser.
      */
     OpenCloudMainUrl,
+
+    /**
+     * Opens cloud system view in the browser.
+     */
+    OpenCloudViewSystemUrl,
 
     /**
      * Opens cloud account management page in the browser.

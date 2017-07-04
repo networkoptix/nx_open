@@ -1,7 +1,7 @@
 #include "ptz_preset_business_action_widget.h"
 #include "ui_ptz_preset_business_action_widget.h"
 
-#include <business/business_action_parameters.h>
+#include <nx/vms/event/action_parameters.h>
 
 #include <core/resource/camera_resource.h>
 #include <core/resource_management/resource_pool.h>
@@ -17,6 +17,8 @@
 #include "core/ptz/activity_ptz_controller.h"
 #include "ui/fisheye/fisheye_ptz_controller.h"
 #include "ui/workaround/widgets_signals_workaround.h"
+
+using namespace nx;
 
 QnExecPtzPresetBusinessActionWidget::QnExecPtzPresetBusinessActionWidget(QWidget *parent) :
     base_type(parent),
@@ -37,13 +39,13 @@ void QnExecPtzPresetBusinessActionWidget::updateTabOrder(QWidget *before, QWidge
     setTabOrder(ui->presetComboBox, after);
 }
 
-void QnExecPtzPresetBusinessActionWidget::at_model_dataChanged(QnBusiness::Fields fields) {
+void QnExecPtzPresetBusinessActionWidget::at_model_dataChanged(Fields fields) {
     if (!model())
         return;
 
     QN_SCOPED_VALUE_ROLLBACK(&m_updating, true);
 
-    if (fields & QnBusiness::ActionResourcesField)
+    if (fields.testFlag(Field::actionResources))
     {
         ui->presetComboBox->clear();
         m_presets.clear();
@@ -54,7 +56,7 @@ void QnExecPtzPresetBusinessActionWidget::at_model_dataChanged(QnBusiness::Field
         setupPtzController(cameras[0]);
     }
 
-    if (fields & (QnBusiness::ActionParamsField | QnBusiness::ActionResourcesField))
+    if (fields & (Field::actionParams | Field::actionResources))
         updateComboboxItems(model()->actionParams().presetId);
 }
 
@@ -81,7 +83,7 @@ void QnExecPtzPresetBusinessActionWidget::setupPtzController(const QnVirtualCame
     connect(m_ptzController.data(), &QnAbstractPtzController::changed, this,
         [this](Qn::PtzDataFields fields)
         {
-            if (fields & Qn::PresetsPtzField)
+            if (fields.testFlag(Qn::PresetsPtzField))
                 updateComboboxItems(ui->presetComboBox->currentData().toString());
         });
     m_ptzController->getPresets(&m_presets);
@@ -102,7 +104,7 @@ void QnExecPtzPresetBusinessActionWidget::paramsChanged()
     if (!model() || m_updating)
         return;
 
-    QnBusinessActionParameters params = model()->actionParams();
+    vms::event::ActionParameters params = model()->actionParams();
     params.presetId = ui->presetComboBox->itemData(ui->presetComboBox->currentIndex()).toString();
     model()->setActionParams(params);
 }

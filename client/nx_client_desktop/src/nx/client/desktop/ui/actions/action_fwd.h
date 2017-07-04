@@ -6,8 +6,6 @@ class QAction;
 class QActionGroup;
 class QMenu;
 
-class QnResourceCriterion;
-
 namespace nx {
 namespace client {
 namespace desktop {

@@ -1,10 +1,8 @@
+#pragma once
 /**********************************************************
 * 22 sep 2014
 * a.kolesnikov
 ***********************************************************/
-
-#ifndef NX_MSERVER_STATUS_WATCHER_H
-#define NX_MSERVER_STATUS_WATCHER_H
 
 #include <QObject>
 #include <QElapsedTimer>
@@ -12,6 +10,7 @@
 #include <core/resource/resource_fwd.h>
 #include <nx/utils/uuid.h>
 #include <common/common_module_aware.h>
+#include <nx/vms/event/events/events_fwd.h>
 
 class QnMServerFailureBusinessEvent;
 
@@ -34,11 +33,9 @@ private:
     {
         OfflineServerData() { timer.start(); }
         QElapsedTimer timer;
-        QSharedPointer<QnMServerFailureBusinessEvent> serverData;
+        nx::vms::event::ServerFailureEventPtr serverData;
     };
 
     QMap<QnUuid, OfflineServerData> m_candidatesToError;
     QSet<QnUuid> m_onlineServers;
 };
-
-#endif  //NX_MSERVER_STATUS_WATCHER_H

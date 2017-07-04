@@ -7,7 +7,7 @@
 
 #include <core/ptz/ptz_fwd.h>
 #include <core/resource/camera_bookmark_fwd.h>
-#include <business/business_fwd.h>
+#include <nx/vms/event/event_fwd.h>
 
 #include <api/model/camera_diagnostics_reply.h>
 #include <api/model/storage_space_reply.h>
@@ -54,7 +54,7 @@ signals:
     void finished(int status, const QnTestEmailSettingsReply &reply, int handle, const QString &errorString);
     void finished(int status, const QnCameraDiagnosticsReply &reply, int handle, const QString &errorString);
     void finished(int status, const QnManualCameraSearchReply &reply, int handle, const QString &errorString);
-    void finished(int status, const QnBusinessActionDataListPtr &reply, int handle, const QString &errorString);
+    void finished(int status, const nx::vms::event::ActionDataListPtr &reply, int handle, const QString &errorString);
     void finished(int status, const QImage &reply, int handle, const QString &errorString);
     void finished(int status, const QString &reply, int handle, const QString &errorString);
     void finished(int status, const QnPtzPresetList &reply, int handle, const QString &errorString);

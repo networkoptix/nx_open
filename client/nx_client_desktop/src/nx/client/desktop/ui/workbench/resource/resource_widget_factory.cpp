@@ -38,13 +38,9 @@ QnResourceWidget* ResourceWidgetFactory::createWidget(QnWorkbenchContext* contex
         return nullptr;
     }
 
-    const auto resource = context->resourcePool()->getResourceByUniqueId(item->resourceUid());
+    const auto resource = item->resource();
     if (!resource)
-    {
-        NX_LOG(lit("ResourceWidgetFactory: invalid resource id %1")
-            .arg(item->resourceUid()), cl_logDEBUG1);
         return nullptr;
-    }
 
     const auto requiredPermission = QnResourceAccessFilter::isShareableMedia(resource)
         ? Qn::ViewContentPermission

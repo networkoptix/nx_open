@@ -9,21 +9,21 @@
 #include <nx/network/ping.h>
 #include <nx/network/ip_range_checker.h>
 
-#include "api/app_server_connection.h"
-#include "business/business_event_connector.h"
-#include "core/dataprovider/live_stream_provider.h"
+#include <api/app_server_connection.h>
+#include <nx/mediaserver/event/event_connector.h>
+#include <core/dataprovider/live_stream_provider.h>
 #include <core/resource/camera_resource.h>
-#include "core/resource/network_resource.h"
-#include "core/resource/abstract_storage_resource.h"
-#include "core/resource/storage_resource.h"
-#include "core/resource_management/resource_pool.h"
+#include <core/resource/network_resource.h>
+#include <core/resource/abstract_storage_resource.h>
+#include <core/resource/storage_resource.h>
+#include <core/resource_management/resource_pool.h>
 #include <core/resource_management/resource_properties.h>
-#include "core/resource_management/resource_searcher.h"
-#include "plugins/storage/dts/abstract_dts_searcher.h"
-#include "plugins/resource/desktop_camera/desktop_camera_resource.h"
-#include "common/common_module.h"
-#include "data_only_camera_resource.h"
-#include "media_server/settings.h"
+#include <core/resource_management/resource_searcher.h>
+#include <core/resource_management/data_only_camera_resource.h>
+#include <plugins/storage/dts/abstract_dts_searcher.h>
+#include <plugins/resource/desktop_camera/desktop_camera_resource.h>
+#include <common/common_module.h>
+#include <media_server/settings.h>
 
 #include <nx_ec/data/api_conversion_functions.h>
 #include <nx_ec/managers/abstract_camera_manager.h>
@@ -39,8 +39,10 @@ QnMServerResourceDiscoveryManager::QnMServerResourceDiscoveryManager(QnCommonMod
     QnResourceDiscoveryManager(commonModule)
 {
     netStateTime.restart();
-    connect(this, &QnMServerResourceDiscoveryManager::cameraDisconnected, qnBusinessRuleConnector, &QnBusinessEventConnector::at_cameraDisconnected);
-    m_serverOfflineTimeout = qnServerModule->roSettings()->value("redundancyTimeout", m_serverOfflineTimeout/1000).toInt() * 1000;
+    connect(this, &QnMServerResourceDiscoveryManager::cameraDisconnected,
+        qnEventRuleConnector, &nx::mediaserver::event::EventConnector::at_cameraDisconnected);
+    m_serverOfflineTimeout = qnServerModule->roSettings()->value(
+        "redundancyTimeout", m_serverOfflineTimeout/1000).toInt() * 1000;
     m_serverOfflineTimeout = qMax(1000, m_serverOfflineTimeout);
     m_foreignResourcesRetryCount = 0;
 }

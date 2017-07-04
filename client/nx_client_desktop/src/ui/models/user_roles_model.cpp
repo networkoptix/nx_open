@@ -81,7 +81,7 @@ int QnUserRolesModel::columnCount(const QModelIndex& parent) const
     if (parent.isValid())
         return 0;
 
-    return isCheckable() ? 2 : 1;
+    return hasCheckBoxes() ? 2 : 1;
 }
 
 void QnUserRolesModel::setCustomRoleStrings(const QString& name, const QString& description)
@@ -90,20 +90,32 @@ void QnUserRolesModel::setCustomRoleStrings(const QString& name, const QString& 
     d->setCustomRoleStrings(name, description);
 }
 
-bool QnUserRolesModel::isCheckable() const
+bool QnUserRolesModel::hasCheckBoxes() const
 {
     Q_D(const QnUserRolesModel);
-    return d->m_checkable;
+    return d->m_hasCheckBoxes;
 }
 
-void QnUserRolesModel::setCheckable(bool value)
+void QnUserRolesModel::setHasCheckBoxes(bool value)
 {
     Q_D(QnUserRolesModel);
-    if (d->m_checkable == value)
+    if (d->m_hasCheckBoxes == value)
         return;
 
     ScopedReset reset(this);
-    d->m_checkable = value;
+    d->m_hasCheckBoxes = value;
+}
+
+bool QnUserRolesModel::userCheckable() const
+{
+    Q_D(const QnUserRolesModel);
+    return d->m_userCheckable;
+}
+
+void QnUserRolesModel::setUserCheckable(bool value)
+{
+    Q_D(QnUserRolesModel);
+    d->m_userCheckable = value;
 }
 
 bool QnUserRolesModel::predefinedRoleIdsEnabled() const
@@ -130,7 +142,7 @@ Qt::ItemFlags QnUserRolesModel::flags(const QModelIndex& index) const
         return Qt::NoItemFlags;
 
     Qt::ItemFlags flags = Qt::ItemIsEnabled | Qt::ItemIsSelectable;
-    if (isCheckable() && index.column() == CheckColumn)
+    if (userCheckable() && index.column() == CheckColumn)
         flags |= Qt::ItemIsUserCheckable;
 
     return flags;
@@ -190,7 +202,7 @@ bool QnUserRolesModel::setData(const QModelIndex& index, const QVariant& value, 
     if (index.model() != this || !hasIndex(index.row(), index.column(), index.parent()))
         return false;
 
-    if (!isCheckable() || index.column() != CheckColumn || role != Qt::CheckStateRole)
+    if (!hasCheckBoxes() || index.column() != CheckColumn || role != Qt::CheckStateRole)
         return false;
 
     const bool checked = value.toInt() == Qt::Checked;

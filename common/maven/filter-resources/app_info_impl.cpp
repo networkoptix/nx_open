@@ -91,7 +91,7 @@ QString QnAppInfo::customizationName()
 
 QString QnAppInfo::defaultLanguage()
 {
-    return QStringLiteral("${translation1}");
+    return QStringLiteral("${defaultTranslation}");
 }
 
 QString QnAppInfo::clientExecutableName()

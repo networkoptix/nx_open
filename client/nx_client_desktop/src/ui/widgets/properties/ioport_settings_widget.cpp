@@ -78,7 +78,7 @@ QnIOPortSettingsWidget::QnIOPortSettingsWidget(QWidget* parent):
     QnSnappedScrollBar* scrollBar = new QnSnappedScrollBar(window());
     ui->table->setVerticalScrollBar(scrollBar->proxyScrollBar());
 
-    //TODO: #vkutin #gdm #common Change to usual hasChanges/hasChangesChanged logic
+    // TODO: #vkutin #gdm #common Change to usual hasChanges/hasChangesChanged logic
     connect(m_model, &QAbstractItemModel::dataChanged,
         this, &QnIOPortSettingsWidget::dataChanged);
     connect(ui->enableTileInterfaceCheckBox, &QCheckBox::clicked,
