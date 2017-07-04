@@ -92,8 +92,8 @@ static void updateTreeItem(QnResourceTreeWidget* tree, const QnWorkbenchItem* it
     if (!item)
         return;
 
-    auto resourcePool = qnClientCoreModule->commonModule()->resourcePool();
-    const auto resource = resourcePool->getResourceByUniqueId(item->resourceUid());
+    const auto resource = item->resource();
+    NX_ASSERT(resource);
     if (!resource)
         return;
 

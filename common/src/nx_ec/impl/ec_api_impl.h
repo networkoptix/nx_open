@@ -13,7 +13,7 @@
 #include <nx_ec/ec_api_fwd.h>
 #include <api/model/connection_info.h>
 #include <api/model/kvpair.h>
-#include <business/business_fwd.h>
+#include <nx/vms/event/event_fwd.h>
 #include <core/resource/resource_fwd.h>
 #include <core/resource/resource_type.h>
 #include <core/resource/camera_bookmark_fwd.h>
@@ -175,7 +175,7 @@ namespace ec2
             void onGetStatusListDone            (int reqID, const ec2::ErrorCode, const ec2::ApiResourceStatusDataList&);
             void onSaveKvPairsDone              (int reqID, const ec2::ErrorCode, const ec2::ApiResourceParamWithRefDataList&);
             void onGetMiscParamDone             (int reqID, const ec2::ErrorCode, const ec2::ApiMiscData&);
-            void onSaveBusinessRuleDone         (int reqID, const ec2::ErrorCode, const QnBusinessEventRulePtr&);
+            void onSaveBusinessRuleDone         (int reqID, const ec2::ErrorCode, const nx::vms::event::RulePtr&);
             void onGetServersDone               (int reqID, const ec2::ErrorCode, const ec2::ApiMediaServerDataList&);
             void onGetServerUserAttributesDone  (int reqID, const ec2::ErrorCode, const ec2::ApiMediaServerUserAttributesDataList&);
             void onGetServersExDone             (int reqID, const ec2::ErrorCode, const ec2::ApiMediaServerDataExList&);
@@ -186,7 +186,7 @@ namespace ec2
             void onGetCamerasHistoryDone        (int reqID, const ec2::ErrorCode, const ec2::ApiServerFootageDataList&);
             void onGetUsersDone                 (int reqID, const ec2::ErrorCode, const ec2::ApiUserDataList&);
             void onGetUserRolesDone             (int reqID, const ec2::ErrorCode, const ec2::ApiUserRoleDataList&);
-            void onGetBusinessRulesDone         (int reqID, const ec2::ErrorCode, const QnBusinessEventRuleList&);
+            void onGetBusinessRulesDone         (int reqID, const ec2::ErrorCode, const nx::vms::event::RuleList&);
             void onGetLicensesDone              (int reqID, const ec2::ErrorCode, const QnLicenseList&);
             void onGetLayoutsDone               (int reqID, const ec2::ErrorCode, const ec2::ApiLayoutDataList&);
             void onGetLayoutToursDone           (int reqID, const ec2::ErrorCode, const ec2::ApiLayoutTourDataList&);
@@ -273,8 +273,8 @@ namespace ec2
         //////////////////////////////////////////////////////////
         ///////// Handlers for AbstractBusinessEventManager
         //////////////////////////////////////////////////////////
-        DEFINE_TWO_ARG_HANDLER(GetBusinessRules, ec2::ErrorCode, QnBusinessEventRuleList)
-        DEFINE_TWO_ARG_HANDLER(SaveBusinessRule, ec2::ErrorCode, QnBusinessEventRulePtr)
+        DEFINE_TWO_ARG_HANDLER(GetBusinessRules, ec2::ErrorCode, nx::vms::event::RuleList)
+        DEFINE_TWO_ARG_HANDLER(SaveBusinessRule, ec2::ErrorCode, nx::vms::event::RulePtr)
 
         //////////////////////////////////////////////////////////
         ///////// Handlers for AbstractLicenseManager

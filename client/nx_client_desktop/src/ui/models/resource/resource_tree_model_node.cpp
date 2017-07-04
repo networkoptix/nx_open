@@ -558,9 +558,13 @@ bool QnResourceTreeModelNode::calculateBastard() const
         if (m_flags.testFlag(Qn::local_server))
             return true;
 
-        /* Hide exported cameras inside of exported layouts. */
-        if (m_flags.testFlag(Qn::exported_media))
+        // Hide exported camera resources inside of exported layouts. Layout items are displayed instead.
+        if (m_flags.testFlag(Qn::exported_media)
+            && m_parent
+            && m_parent->m_flags.testFlag(Qn::exported_layout))
+        {
             return true;
+        }
 
         /* Hide storages. */
         if (m_resource.dynamicCast<QnStorageResource>())

@@ -2,7 +2,7 @@
 
 #include <QtGui/QColor>
 
-#include <business/business_fwd.h>
+#include <nx/vms/event/event_fwd.h>
 #include <health/system_health.h>
 
 namespace QnNotificationLevel {
@@ -20,7 +20,7 @@ enum class Value
     LevelCount
 };
 
-Value valueOf(const QnAbstractBusinessActionPtr &businessAction);
+Value valueOf(const nx::vms::event::AbstractActionPtr &businessAction);
 Value valueOf(QnSystemHealth::MessageType messageType);
 
 QColor notificationColor(Value level);

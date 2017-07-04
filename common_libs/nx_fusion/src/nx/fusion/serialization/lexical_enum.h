@@ -38,7 +38,7 @@ namespace QnLexicalDetail {
 
 class QnEnumLexicalSerializerData {
 public:
-    QnEnumLexicalSerializerData(): m_caseSensitivity(Qt::CaseSensitive), m_flagged(false), m_numeric(false) {}
+    QnEnumLexicalSerializerData(): m_caseSensitivity(Qt::CaseInsensitive), m_flagged(false), m_numeric(false) {}
 
     void load(const QMetaObject *metaObject, const char *enumName);
 

@@ -254,7 +254,7 @@ qint64 Sound::playTimeElapsedUsec()
         m_timer.restart();
         softResultUs = openalResultUs;
     }
-    return softResultUs + extraAudioDelayUs();
+    return std::max(0LL, softResultUs + extraAudioDelayUs());
 }
 
 bool Sound::isBufferUnderflow()
@@ -314,7 +314,9 @@ bool Sound::isFormatSupported(const QnAudioFormat& format)
 
 QAudio::State Sound::state() const
 {
-    if (m_paused)
+    if (m_deinitialized)
+        return QAudio::StoppedState;
+    else if (m_paused)
         return QAudio::SuspendedState;
     else if (m_isValid)
         return QAudio::ActiveState;

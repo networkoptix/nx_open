@@ -2,8 +2,8 @@
 
 #include <QtWidgets/QLayout>
 
-#include <business/business_action_parameters.h>
-#include <business/business_strings_helper.h>
+#include <nx/vms/event/action_parameters.h>
+#include <nx/vms/event/strings_helper.h>
 
 #include <common/common_module.h>
 #include <client_core/client_core_module.h>
@@ -302,7 +302,7 @@ QString QnSendEmailActionDelegate::getText(const QSet<QnUuid>& ids, const bool d
     }
 
     if (explicitUsers == 0 && roles.empty() && additional.isEmpty())
-        return QnBusinessStringsHelper::needToSelectUserText();
+        return nx::vms::event::StringsHelper::needToSelectUserText();
 
     if (!detailed)
     {
@@ -390,7 +390,8 @@ bool QnSendEmailActionDelegate::isValidUser(const QnUserResourcePtr& user)
 namespace QnBusiness {
 
 // TODO: #vkutin It's here until full refactoring.
-bool actionAllowedForUser(const QnBusinessActionParameters& params, const QnUserResourcePtr& user)
+bool actionAllowedForUser(const nx::vms::event::ActionParameters& params,
+    const QnUserResourcePtr& user)
 {
     if (!user)
         return false;

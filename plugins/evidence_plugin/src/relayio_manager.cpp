@@ -61,7 +61,7 @@ RelayIOManager::RelayIOManager(
 
 
 #if 0
-    std::auto_ptr<SyncHttpClient> httpClient;
+    std::unique_ptr<SyncHttpClient> httpClient;
     if( !httpClient.get() )
         httpClient.reset( new SyncHttpClient(
             CameraPlugin::instance()->networkAccessManager(),

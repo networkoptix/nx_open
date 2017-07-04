@@ -79,7 +79,7 @@ public:
 
 private:
     nxpt::CommonRefManager m_refManager;
-    std::auto_ptr<AxisCameraDiscoveryManager> m_discoveryManager;
+    std::unique_ptr<AxisCameraDiscoveryManager> m_discoveryManager;
     //!Used with QNetworkAccessManager
     QThread m_networkEventLoopThread;
     QNetworkAccessManager m_networkAccessManager;

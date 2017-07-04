@@ -577,6 +577,9 @@ void initialize(Manager* manager, Action* root)
         .flags(NoTarget)
         .text(ContextMenu::tr("Open %1 Portal...", "Open Nx Cloud Portal").arg(nx::network::AppInfo::cloudName()));
 
+    factory(OpenCloudViewSystemUrl)
+        .flags(NoTarget);
+
     factory(OpenCloudManagementUrl)
         .flags(NoTarget)
         .text(ContextMenu::tr("Account Settings..."));

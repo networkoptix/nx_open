@@ -132,7 +132,7 @@ QnResourceWidget::QnResourceWidget(QnWorkbenchContext *context, QnWorkbenchItem 
     setTransformOrigin(Center);
 
     /* Initialize resource. */
-    m_resource = resourcePool()->getResourceByUniqueId(item->resourceUid());
+    m_resource = item->resource();
     connect(m_resource, &QnResource::nameChanged, this, &QnResourceWidget::updateTitleText);
     connect(m_resource, &QnResource::statusChanged, this,
         [this]
@@ -173,9 +173,6 @@ QnResourceWidget::QnResourceWidget(QnWorkbenchContext *context, QnWorkbenchItem 
     addOverlayWidget(m_statusOverlay, detail::OverlayParams(UserVisible, true, false, StatusLayer));
     setOverlayWidgetVisible(m_statusOverlay, false, false);
 
-    /* Initialize resource. */
-    m_resource = resourcePool()->getResourceByUniqueId(item->resourceUid());
-    connect(m_resource, &QnResource::nameChanged, this, &QnResourceWidget::updateTitleText);
     setChannelLayout(qn_resourceWidget_defaultContentLayout);
 
     m_aspectRatio = defaultAspectRatio();

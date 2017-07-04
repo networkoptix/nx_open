@@ -78,7 +78,7 @@ void DecodedPictureToOpenGLUploadThread::run()
         if( !toRun )
             break;
 
-        std::auto_ptr<UploadFrameRunnable> toRunDeleter( toRun->autoDelete() ? toRun : NULL );
+        std::unique_ptr<UploadFrameRunnable> toRunDeleter( toRun->autoDelete() ? toRun : NULL );
         toRun->run();
     }
 
@@ -136,7 +136,7 @@ bool DecodedPictureToOpenGLUploaderContextPool::ensureThereAreContextsSharedWith
         {
 //#if !(defined(GL_COPY_AGGREGATION) && defined(UPLOAD_TO_GL_IN_GUI_THREAD))
             //creating gl context (inside QGLWidget)
-            std::auto_ptr<GLContext> newContext( new GLContext( shareWidget ) );
+            std::unique_ptr<GLContext> newContext( new GLContext( shareWidget ) );
             QSharedPointer<DecodedPictureToOpenGLUploadThread> uploadThread( new DecodedPictureToOpenGLUploadThread( newContext.release() ) );
 //#else
 //            //no need to create additional context

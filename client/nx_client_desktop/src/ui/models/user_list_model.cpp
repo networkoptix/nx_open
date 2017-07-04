@@ -118,7 +118,7 @@ QnUserResourcePtr QnUserListModelPrivate::user(const QModelIndex& index) const
     return users[index.row()];
 }
 
-//TODO: #vkutin #common Move this function to more suitable place. Rewrite it if needed.
+// TODO: #vkutin #common Move this function to more suitable place. Rewrite it if needed.
 QString QnUserListModelPrivate::permissionsString(const QnUserResourcePtr& user) const
 {
     QStringList permissionStrings;
@@ -386,7 +386,7 @@ QVariant QnUserListModel::data(const QModelIndex& index, int role) const
             break;
         }
 
-        //TODO: #vkutin #common Refactor this role
+        // TODO: #vkutin #common Refactor this role
         case Qn::DisabledRole:
         {
             if (index.column() == EnabledColumn)

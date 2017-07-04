@@ -125,7 +125,7 @@ placeholder{ /* Hack to have full-screen */
     }
 }
 
-.placeholder.preloader-small>.placeholder-content>.placeholder-preloader{
+.preloader-small .placeholder>.placeholder-content>.placeholder-preloader{
     @include preloader($preloader_circle_color, $preloader_small_circle_size, $preloader_small_circle_distance);
 }
 

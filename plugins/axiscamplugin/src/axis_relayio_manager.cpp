@@ -28,7 +28,7 @@ AxisRelayIOManager::AxisRelayIOManager(
     m_outputPortCount( outputPortCount ),
     m_multipartedParsingState( waitingDelimiter )
 {
-    std::auto_ptr<SyncHttpClient> httpClient;
+    std::unique_ptr<SyncHttpClient> httpClient;
     if( !httpClient.get() )
         httpClient.reset( new SyncHttpClient(
             AxisCameraPlugin::instance()->networkAccessManager(),

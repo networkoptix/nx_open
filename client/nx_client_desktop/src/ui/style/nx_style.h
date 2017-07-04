@@ -5,6 +5,8 @@
 #include <ui/style/generic_palette.h>
 #include <ui/common/geometry.h>
 
+class QGroupBox;
+
 class QnNxStylePrivate;
 class QnNxStyle : public QCommonStyle, public QnGeometry
 {
@@ -69,6 +71,8 @@ public:
      */
     static void paintCosmeticFrame(QPainter* painter, const QRectF& rect,
         const QColor& color, int frameWidth, int frameShift);
+
+    static void setGroupBoxContentTopMargin(QGroupBox* box, int margin);
 
     static QnNxStyle *instance();
 

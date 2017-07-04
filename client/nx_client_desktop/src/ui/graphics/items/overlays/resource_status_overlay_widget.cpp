@@ -375,7 +375,7 @@ void QnStatusOverlayWidget::updateAreasSizes()
     QTransform sceneToViewport = view->viewportTransform();
     qreal scale = 1.0 / std::sqrt(sceneToViewport.m11() * sceneToViewport.m11() + sceneToViewport.m12() * sceneToViewport.m12());
 
-    //TODO: #vkutin #ynikitenkov Localize visibility matters in ONE place!
+    // TODO: #vkutin #ynikitenkov Localize visibility matters in ONE place!
     bool showExtras = m_visibleControls.testFlag(Control::kButton);
 
     const qreal minHeight = 95 * scale; // TODO: #ynikitenkov Change for description

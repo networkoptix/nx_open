@@ -15,7 +15,7 @@ QString QnMobileClientAppInfo::applicationDisplayName()
 
 QString QnMobileClientAppInfo::applicationVersion()
 {
-    return QStringLiteral("${parsedVersion.majorVersion}.${parsedVersion.minorVersion}");
+    return QStringLiteral("${mobileClientVersion}");
 }
 
 bool QnMobileClientAppInfo::defaultLiteMode()
