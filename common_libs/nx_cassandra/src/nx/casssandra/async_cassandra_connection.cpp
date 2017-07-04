@@ -367,6 +367,18 @@ AsyncConnection::AsyncConnection(const char* host):
     m_cluster(cass_cluster_new()),
     m_session(cass_session_new())
 {
+    // This is will increase the number of threads handling IO to 2 (This alone might be enough to fix the issue).
+//    cass_cluster_set_num_threads_io(m_cluster, 2);
+
+//    // Or you can also increase the number of connections per thread
+//    cass_cluster_set_core_connections_per_host(m_cluster, 2);
+//    cass_cluster_set_max_connections_per_host(m_cluster, 4);
+
+//    // Or increase the number of request that will queue waiting for a thread.
+//    cass_cluster_set_pending_requests_low_water_mark(m_cluster, 5000);
+//    cass_cluster_set_pending_requests_high_water_mark(m_cluster, 10000);
+
+
     cass_cluster_set_contact_points(m_cluster, host);
 }
 
@@ -452,7 +464,7 @@ void AsyncConnection::executeUpdate(
     Query query,
     nx::utils::MoveOnlyFunc<void(CassError)> updateCb)
 {
-    CassFuture* future = cass_session_connect(m_session, m_cluster);
+    CassFuture* future = cass_session_execute(m_session, query.m_statement);
     cass_future_set_callback(
         future,
         &onUpdate,

@@ -12,87 +12,43 @@ class Connection: public ::testing::Test
 protected:
     Connection(): m_connection("127.0.0.1") {}
 
-    void whenConnectionIsEstablished()
+    void assertCassError(CassError expected, CassError desired)
     {
-        m_connection.init([this](CassError result) { m_connectCb(result); });
+        ASSERT_EQ(expected, desired);
     }
 
-    void givenQueringChainOfCreateInsertRequestsSetAsConnectCb()
+    void whenSomeTestDataInserted()
     {
-        m_connectCb =
-            [this](CassError result)
-            {
-                ASSERT_EQ(CASS_OK, result);
-                createKeySpace();
-            };
-
-        m_createKeySpaceCb =
-            [this](CassError result)
-            {
-                ASSERT_EQ(CASS_OK, result);
-                createTable();
-            };
-
-        m_createTableCb =
-            [this](CassError result)
-            {
-                ASSERT_EQ(CASS_OK, result);
-                insertSome();
-            };
-
-        m_insertCb =
-            [this](CassError result)
-            {
-                ASSERT_EQ(CASS_OK, result);
-                selectSome();
-            };
+        m_connection.init()
+            .then(
+                [this](cf::future<CassError> connectFuture) mutable
+                {
+                    assertCassError(CASS_OK, connectFuture.get());
+                    return m_connection.prepareQuery(
+                        "CREATE KEYSPACE test_space WITH replication = { \
+                            'class': 'SimpleStrategy', 'replication_factor': '2' };");
+                })
+            .then(
+                [this](cf::future<std::pair<CassError, Query>> prepareKeySpaceFuture) mutable
+                {
+                    auto held = prepareKeySpaceFuture.get();
+                    assertCassError(CASS_OK, held.first);
+                    return m_connection.executeUpdate(std::move(held.second));
+                })
+            .then(
+                [this](cf::future<CassError> executeCreateKeySpaceFuture)
+                {
+                    assertCassError(CASS_OK, executeCreateKeySpaceFuture.get());
+                    return cf::unit();
+                }).wait();
     }
 
-    void givenSelectRequestSetAsInsertCb()
-    {
-
-    }
-
-    void thenInsertedDataShouldBeEqualToSelected()
-    {
-
-    }
-
-private:
     nx::cassandra::AsyncConnection m_connection;
-    MoveOnlyFunc<void(CassError)> m_connectCb;
-    MoveOnlyFunc<void(CassError)> m_createKeySpaceCb;
-    MoveOnlyFunc<void(CassError)> m_createTableCb;
-    MoveOnlyFunc<void(CassError)> m_insertCb;
-
-    void createKeySpace()
-    {
-
-    }
-
-    void createTable()
-    {
-
-    }
-
-    void insertSome()
-    {
-
-    }
-
-    void selectSome()
-    {
-
-    }
 };
 
 TEST_F(Connection, InsertSelect_Async)
 {
-    givenQueringChainOfCreateInsertRequestsSetAsConnectCb();
-    givenSelectRequestSetAsInsertCb();
-    whenConnectionIsEstablished();
-
-    thenInsertedDataShouldBeEqualToSelected();
+    whenSomeTestDataInserted();
 }
 
 } // namespace test
