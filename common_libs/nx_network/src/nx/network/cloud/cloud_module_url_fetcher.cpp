@@ -47,13 +47,6 @@ void CloudModuleUrlFetcher::get(nx_http::AuthInfo auth, Handler handler)
     initiateModulesXmlRequestIfNeeded(auth, std::move(handler));
 }
 
-void CloudModuleUrlFetcher::stopWhileInAioThread()
-{
-    base_type::stopWhileInAioThread();
-
-    m_endpointSelector.reset();
-}
-
 bool CloudModuleUrlFetcher::analyzeXmlSearchResult(
     const nx::utils::stree::ResourceContainer& searchResult)
 {
@@ -110,10 +103,8 @@ void CloudModuleUrlFetcher::ScopedOperation::get(
 //-------------------------------------------------------------------------------------------------
 // class CloudDbUrlFetcher
 
-CloudDbUrlFetcher::CloudDbUrlFetcher(
-    std::unique_ptr<AbstractEndpointSelector> endpointSelector)
-    :
-    CloudModuleUrlFetcher(kCloudDbModuleName, std::move(endpointSelector))
+CloudDbUrlFetcher::CloudDbUrlFetcher():
+    CloudModuleUrlFetcher(kCloudDbModuleName)
 {
 }
 
