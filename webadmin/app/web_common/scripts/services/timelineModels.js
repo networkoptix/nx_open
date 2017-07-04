@@ -340,7 +340,7 @@ function CameraRecordsProvider(cameras, mediaserver, $q, width) {
         }
 
         // Depends on this interval - choose minimum interval, which contains all records and request deeper detailization
-        var nextLevel = RulerModel.getLevelIndex(self.nowToDisplay() - self.chunksTree.start,width);
+        var nextLevel = RulerModel.getLevelIndex(timeManager.nowToDisplay() - self.chunksTree.start,width);
         if(nextLevel<RulerModel.levels.length-1) {
             self.requestInterval(timeManager.displayToServer(self.chunksTree.start), timeManager.nowToServer(), nextLevel + 1);
         }
