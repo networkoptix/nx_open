@@ -1232,7 +1232,22 @@ ScaleManager.prototype.canScroll = function(left){
     return this.visibleEnd != this.end
         && !(this.watchPlayingPosition && this.liveMode);
 };
+ScaleManager.prototype.scrollSlider = function(){
 
+    var relativeCenter =  this.getRelativeCenter();
+    var relativeWidth =  this.getRelativeWidth();
+
+    scrollBarSliderWidth = Math.max(this.viewportWidth * relativeWidth, this.minScrollBarWidth);
+    // Correction for width if it has minimum width
+    var startCoordinate = this.bound( 0, (this.viewportWidth * relativeCenter - scrollBarSliderWidth/2), this.viewportWidth - scrollBarSliderWidth) ;
+
+    return {
+        width: scrollBarSliderWidth,
+        start: startCoordinate,
+        scroll: startCoordinate / (this.viewportWidth - scrollBarSliderWidth)
+    }
+
+}
 ScaleManager.prototype.scroll = function(value){
     if(typeof (value) == "undefined"){
         return this.getRelativeCenter();
