@@ -261,6 +261,7 @@
 #include <common/static_common_module.h>
 #include <recorder/storage_db_pool.h>
 #include <transaction/message_bus_selector.h>
+#include <managers/discovery_manager.h>
 
 #if !defined(EDGE_SERVER)
     #include <nx_speech_synthesizer/text_to_wav.h>
@@ -2563,6 +2564,7 @@ void MediaServerProcess::run()
     ec2ConnectionFactory->setConfParams(std::move(confParams));
     ec2::AbstractECConnectionPtr ec2Connection;
     QnConnectionInfo connectInfo;
+    std::unique_ptr<ec2::QnDiscoveryMonitor> discoveryMonitor;
 
     while (!needToStop())
     {
@@ -2574,7 +2576,9 @@ void MediaServerProcess::run()
             auto connectionResult = QnConnectionValidator::validateConnection(connectInfo, errorCode);
             if (connectionResult == Qn::SuccessConnectionResult)
             {
-                ec2Connection->getDiscoveryManager(Qn::kSystemAccess)->monitorServerDiscovery();
+                discoveryMonitor = std::make_unique<ec2::QnDiscoveryMonitor>(
+                    ec2ConnectionFactory->messageBus());
+
                 NX_LOG(QString::fromLatin1("Connected to local EC2"), cl_logWARNING);
                 break;
             }
@@ -3097,6 +3101,7 @@ void MediaServerProcess::run()
 
     qWarning()<<"QnMain event loop has returned. Destroying objects...";
 
+    discoveryMonitor.reset();
     m_crashReporter.reset();
 
     //cancelling dumping system usage

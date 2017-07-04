@@ -164,38 +164,27 @@ int QnDiscoveryManager<QueryProcessorType>::getDiscoveryData(impl::GetDiscoveryD
     return reqID;
 }
 
-template<class QueryProcessorType>
-void QnDiscoveryManager<QueryProcessorType>::monitorServerDiscovery()
-{
-}
-
-template<>
-void QnDiscoveryManager<ServerQueryProcessorAccess>::monitorServerDiscovery()
-{
-    m_customData = std::make_unique<DiscoveryMonitor>(m_queryProcessor->messageBus());
-}
-
 template class QnDiscoveryManager<ServerQueryProcessorAccess>;
 template class QnDiscoveryManager<FixedUrlClientQueryProcessor>;
 
-DiscoveryMonitor::DiscoveryMonitor(QnTransactionMessageBusBase* messageBus):
+QnDiscoveryMonitor::QnDiscoveryMonitor(QnTransactionMessageBusBase* messageBus):
     QnCommonModuleAware(messageBus->commonModule()),
     m_messageBus(messageBus)
 {
     QObject::connect(messageBus, &QnTransactionMessageBus::peerFound,
-        this, &DiscoveryMonitor::clientFound);
+        this, &QnDiscoveryMonitor::clientFound);
 
-    commonModule()->moduleDiscoveryManager()->onSignals(this, &DiscoveryMonitor::serverFound,
-        &DiscoveryMonitor::serverFound, &DiscoveryMonitor::serverLost);
+    commonModule()->moduleDiscoveryManager()->onSignals(this, &QnDiscoveryMonitor::serverFound,
+        &QnDiscoveryMonitor::serverFound, &QnDiscoveryMonitor::serverLost);
 }
 
-DiscoveryMonitor::~DiscoveryMonitor()
+QnDiscoveryMonitor::~QnDiscoveryMonitor()
 {
     m_messageBus->disconnect(this);
     commonModule()->moduleDiscoveryManager()->disconnect(this);
 }
 
-void DiscoveryMonitor::clientFound(QnUuid peerId, Qn::PeerType peerType)
+void QnDiscoveryMonitor::clientFound(QnUuid peerId, Qn::PeerType peerType)
 {
     if (!ApiPeerData::isClient(peerType))
         return;
@@ -204,14 +193,14 @@ void DiscoveryMonitor::clientFound(QnUuid peerId, Qn::PeerType peerType)
         getServers(commonModule()->moduleDiscoveryManager()), peerId);
 }
 
-void DiscoveryMonitor::serverFound(nx::vms::discovery::ModuleEndpoint module)
+void QnDiscoveryMonitor::serverFound(nx::vms::discovery::ModuleEndpoint module)
 {
     const auto s = makeServer(module, globalSettings()->localSystemId());
     m_serverCache.emplace(s.id, s);
     send(ApiCommand::discoveredServerChanged, s, m_messageBus->directlyConnectedClientPeers());
 }
 
-void DiscoveryMonitor::serverLost(QnUuid id)
+void QnDiscoveryMonitor::serverLost(QnUuid id)
 {
     const auto it = m_serverCache.find(id);
     if (it == m_serverCache.end())
@@ -225,7 +214,7 @@ void DiscoveryMonitor::serverLost(QnUuid id)
 }
 
 template<typename Transaction, typename Target>
-void DiscoveryMonitor::send(ApiCommand::Value command, Transaction data, const Target& target)
+void QnDiscoveryMonitor::send(ApiCommand::Value command, Transaction data, const Target& target)
 {
     QnTransaction<Transaction> t(command, commonModule()->moduleGUID(), std::move(data));
     sendTransaction(m_messageBus, std::move(t), target);

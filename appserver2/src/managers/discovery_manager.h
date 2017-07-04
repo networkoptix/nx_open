@@ -35,8 +35,6 @@ namespace ec2
             const Qn::UserAccessData &userAccessData);
         virtual ~QnDiscoveryManager();
 
-        virtual void monitorServerDiscovery() override;
-
     protected:
         virtual int discoverPeer(const QnUuid &id, const QUrl &url, impl::SimpleHandlerPtr handler) override;
         virtual int addDiscoveryInformation(const QnUuid &id, const QUrl &url, bool ignore, impl::SimpleHandlerPtr handler) override;
@@ -49,22 +47,18 @@ namespace ec2
         std::unique_ptr<QObject> m_customData;
     };
 
-    // NOTE: Can not be moved in anonymous namespace in the cpp because of a bug in GCC 4.8:
-    //     vtable for DiscoveryMonitor is not found when linking exe.
-    class DiscoveryMonitor: public QObject, public QnCommonModuleAware
+    // TODO: Could probably be moved to mediaserver, as it is used only there.
+    class QnDiscoveryMonitor: public QObject, public QnCommonModuleAware
     {
-        Q_OBJECT
-
     public:
-        DiscoveryMonitor(QnTransactionMessageBusBase* messageBus);
-        virtual ~DiscoveryMonitor();
+        QnDiscoveryMonitor(QnTransactionMessageBusBase* messageBus);
+        virtual ~QnDiscoveryMonitor();
 
-    private slots:
+    private:
         void clientFound(QnUuid peerId, Qn::PeerType peerType);
         void serverFound(nx::vms::discovery::ModuleEndpoint module);
         void serverLost(QnUuid id);
 
-    private:
         template<typename Transaction, typename Target>
         void send(ApiCommand::Value command, Transaction data, const Target& target);
 
