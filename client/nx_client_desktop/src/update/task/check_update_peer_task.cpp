@@ -162,8 +162,7 @@ QnCheckForUpdateResult::Value QnCheckForUpdatesPeerTask::checkUpdateCoverage()
     bool needUpdate = false;
     for (const auto& peerId: peers())
     {
-        const auto server = resourcePool()->getIncompatibleResourceById(peerId, true)
-            .dynamicCast<QnMediaServerResource>();
+        const auto server = resourcePool()->getIncompatibleResourceById(peerId, true);
         if (!server)
             continue;
 
@@ -205,8 +204,7 @@ bool QnCheckForUpdatesPeerTask::isDowngradeAllowed()
         [targetVersion = m_target.version, this]
         (const QnUuid& serverId)
         {
-            const auto server = resourcePool()->getIncompatibleResourceById(serverId, true)
-                .dynamicCast<QnMediaServerResource>();
+            const auto server = resourcePool()->getIncompatibleResourceById(serverId, true);
             if (!server)
                 return true;
 
