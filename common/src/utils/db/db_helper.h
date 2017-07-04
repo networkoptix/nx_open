@@ -24,6 +24,7 @@ public:
         virtual bool beginTran();
         virtual void rollback();
         virtual bool commit();
+        bool dbCommit(const QString& event);
     protected:
         friend class QnDbTransactionLocker;
         friend class QnDbHelper;
