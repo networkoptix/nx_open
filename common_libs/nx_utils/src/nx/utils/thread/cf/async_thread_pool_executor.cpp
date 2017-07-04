@@ -7,7 +7,7 @@ async_thread_pool_executor::worker_thread::worker_thread() {
     std::unique_lock<std::mutex> lock(m_);
     while (!need_stop_) {
       start_cond_.wait(lock, [this] {
-        return (bool)task_ || need_stop_; 
+        return (bool)task_ || need_stop_;
       });
       if (need_stop_)
         return;
@@ -64,18 +64,18 @@ async_thread_pool_executor::async_thread_pool_executor(size_t size)
     std::unique_lock<std::mutex> lock(mutex_);
     while (!need_stop_) {
       cond_.wait(lock, [this] {
-        return need_stop_ || (!task_queue_.empty() && 
-                              available_count_ > 0); 
+        return need_stop_ || (!task_queue_.empty() &&
+                              available_count_ > 0);
       });
       while (!task_queue_.empty() && available_count_ > 0) {
         if (need_stop_)
           return;
-        auto ready_it = std::find_if(tp_.begin(), tp_.end(), 
+        auto ready_it = std::find_if(tp_.begin(), tp_.end(),
         [](const worker_thread& worker) {
             return worker.available();
         });
         if (ready_it == tp_.end())
-          throw std::runtime_error("No available workers");
+          break;
         auto task = task_queue_.front();
         task_queue_.pop();
         --available_count_;

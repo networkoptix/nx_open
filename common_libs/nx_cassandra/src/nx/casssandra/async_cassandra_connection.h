@@ -1,6 +1,9 @@
+#pragma once
+
 #include <string>
 #include <cassandra.h>
 #include <nx/utils/move_only_func.h>
+#include <nx/utils/thread/cf/cfuture.h>
 #include <nx/utils/thread/mutex.h>
 
 namespace nx {
@@ -10,13 +13,14 @@ class Query
 {
 public:
     Query(CassFuture* future);
+    Query() = default;
     ~Query();
 
     Query(const Query&) = delete;
     Query& operator=(const Query&) = delete;
 
-    Query(Query&&) = default;
-    Query& operator=(Query&&) = default;
+    Query(Query&&);
+    Query& operator=(Query&&);
 
 
     bool bind(const std::string& key, const std::string& value);
@@ -30,20 +34,21 @@ private:
     const CassPrepared* m_prepared = nullptr;
     CassStatement* m_statement = nullptr;
 
-    friend class Connection;
+    friend class AsyncConnection;
 };
 
 class QueryResult
 {
 public:
     QueryResult(CassFuture* future);
+    QueryResult() = default;
     ~QueryResult();
 
     QueryResult(const QueryResult&) = delete;
     QueryResult& operator=(const QueryResult&) = delete;
 
-    QueryResult(QueryResult&&) = default;
-    QueryResult& operator=(QueryResult&&) = default;
+    QueryResult(QueryResult&&);
+    QueryResult& operator=(QueryResult&&);
 
     bool next();
     bool get(const std::string& key, std::string* value) const;
@@ -61,39 +66,41 @@ private:
     CassRow* nextRow() const;
 };
 
-class Connection
+class AsyncConnection
 {
 public:
-    Connection(const char* host);
-    ~Connection();
+    AsyncConnection(const char* host);
+    ~AsyncConnection();
 
-    Connection(const Connection&) = delete;
-    Connection& operator=(const Connection&) = delete;
+    AsyncConnection(const AsyncConnection&) = delete;
+    AsyncConnection& operator=(const AsyncConnection&) = delete;
 
-    Connection(Connection&&) = default;
-    Connection& operator=(Connection&&) = default;
+    AsyncConnection(AsyncConnection&&) = default;
+    AsyncConnection& operator=(AsyncConnection&&) = default;
 
-    void initAsync(nx::utils::MoveOnlyFunc<void(CassError)> initCb);
-    CassError initSync();
+    void init(nx::utils::MoveOnlyFunc<void(CassError)> initCb);
 
-    void prepareQueryAsync(
+    void prepareQuery(
         const char* queryString,
         nx::utils::MoveOnlyFunc<void(CassError, Query query)> prepareCb);
 
-    void executeSelectAsync(
+    void executeSelect(
         Query query,
-        nx::utils::MoveOnlyFunc<void(CassError, const QueryResult& result)> selectCb);
+        nx::utils::MoveOnlyFunc<void(CassError, QueryResult result)> selectCb);
 
-    void executeUpdateAsync(
+    void executeUpdate(
         Query query,
         nx::utils::MoveOnlyFunc<void(CassError)> updateCb);
+
+    cf::future<CassError> init();
+    cf::future<std::pair<CassError, Query>> prepareQuery(const char* queryString);
+    cf::future<std::pair<CassError, QueryResult>> executeSelect(Query query);
+    cf::future<CassError> executeUpdate(Query query);
 
 private:
     CassCluster* m_cluster = nullptr;
     CassSession* m_session = nullptr;
     QnMutex m_mutex;
-
-    friend void onConnect(CassFuture* future, void* data);
 };
 
 } // namespace cassandra

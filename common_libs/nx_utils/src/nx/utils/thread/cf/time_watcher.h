@@ -18,30 +18,25 @@ class time_watcher {
     : time(std::chrono::steady_clock::now() + timeout),
       task(task) {}
   };
-  
+
   friend bool operator < (const record& lhs, const record& rhs) {
     return lhs.time < rhs.time;
   }
-  
+
 public:
   time_watcher();
   ~time_watcher();
-  
-  template<typename Rep, typename Period>
-  void add(const detail::task_type& task,
-           const std::chrono::duration<Rep, Period>& timeout) {
-    {
-      std::lock_guard<std::mutex> lock(mutex_);
-      record_set_.emplace(
-          std::chrono::duration_cast<std::chrono::milliseconds>(timeout),
-          task);
-    }
+
+  void add(const detail::task_type& task, std::chrono::milliseconds timeout) {
+    std::lock_guard<std::mutex> lock(mutex_);
+    record_set_.emplace(timeout, task);
     cond_.notify_one();
   }
-  
-  private:
-    bool time_has_come() const;
-  
+
+private:
+  bool time_has_come() const;
+  std::chrono::time_point<std::chrono::steady_clock> year_forward();
+
 private:
   std::condition_variable cond_;
   std::mutex mutex_;

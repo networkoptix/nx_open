@@ -1,5 +1,5 @@
 #include <gtest/gtest.h>
-#include <nx/casssandra/cassandra_connection.h>
+#include <nx/casssandra/async_cassandra_connection.h>
 
 namespace nx {
 namespace cassandra {
@@ -14,7 +14,7 @@ protected:
 
     void whenConnectionIsEstablished()
     {
-        m_connection.initAsync([this](CassError result) { m_connectCb(result); });
+        m_connection.init([this](CassError result) { m_connectCb(result); });
     }
 
     void givenQueringChainOfCreateInsertRequestsSetAsConnectCb()
@@ -59,7 +59,7 @@ protected:
     }
 
 private:
-    nx::cassandra::Connection m_connection;
+    nx::cassandra::AsyncConnection m_connection;
     MoveOnlyFunc<void(CassError)> m_connectCb;
     MoveOnlyFunc<void(CassError)> m_createKeySpaceCb;
     MoveOnlyFunc<void(CassError)> m_createTableCb;

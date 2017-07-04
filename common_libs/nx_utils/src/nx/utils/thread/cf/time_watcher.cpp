@@ -1,17 +1,20 @@
+#include <iostream>
 #include "time_watcher.h"
 
 namespace cf {
 time_watcher::time_watcher()
-: wakeup_time_(std::chrono::time_point<std::chrono::steady_clock>::max()) {
+: wakeup_time_(year_forward()){
   watcher_thread_ = std::thread([this] {
     while (!need_stop_) {
       std::unique_lock<std::mutex> lock(mutex_);
-      cond_.wait_until(lock, wakeup_time_, [this] {
-        bool thc = time_has_come();
-        if (!thc && !record_set_.empty())
+      if (!record_set_.empty())
+        wakeup_time_ = record_set_.begin()->time;
+      while (!need_stop_ && !time_has_come()) {
+        cond_.wait_until(lock, wakeup_time_);
+        if (!time_has_come() && !record_set_.empty()) {
           wakeup_time_ = record_set_.begin()->time;
-        return need_stop_ || thc;
-      });
+        }
+      }
       if (need_stop_)
         return;
       while (time_has_come()) {
@@ -19,7 +22,7 @@ time_watcher::time_watcher()
         record_set_.erase(record_set_.begin());
       }
       wakeup_time_ = record_set_.empty() ?
-          std::chrono::time_point<std::chrono::steady_clock>::max() :
+          year_forward() :
           record_set_.begin()->time;
     }
   });
@@ -37,4 +40,9 @@ bool time_watcher::time_has_come() const {
     return false;
   return record_set_.cbegin()->time <= std::chrono::steady_clock::now();
 }
+
+std::chrono::time_point<std::chrono::steady_clock> time_watcher::year_forward() {
+  return std::chrono::steady_clock::now() + std::chrono::hours(365 * 24);
+}
+
 }
