@@ -13,6 +13,7 @@
 #include <nx/network/http/http_client.h>
 #include <nx/network/socket_global.h>
 #include <nx/network/socket.h>
+#include <nx/network/url/url_builder.h>
 #include <nx/utils/random.h>
 #include <nx/utils/std/cpp14.h>
 #include <nx/utils/string.h>
@@ -104,7 +105,8 @@ bool MediatorFunctionalTest::waitUntilStarted()
         return false;
     m_httpPort = httpEndpoints.front().port;
 
-    network::SocketGlobals::mediatorConnector().mockupAddress(stunEndpoint());
+    network::SocketGlobals::mediatorConnector().mockupAddress(
+        nx::network::url::Builder().setScheme("stun").setEndpoint(stunEndpoint()));
     network::SocketGlobals::mediatorConnector().enable(true);
 
     return true;

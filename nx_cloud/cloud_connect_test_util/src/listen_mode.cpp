@@ -71,7 +71,6 @@ public:
             socket(nullptr),
             listeningAddress(QString::fromUtf8(serverId))
         {
-            mediatorConnector->mockupAddress(network::SocketGlobals::mediatorConnector());
             mediatorConnector->setSystemCredentials(
                 hpm::api::SystemCredentials(systemId, serverId, authKey));
 

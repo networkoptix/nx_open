@@ -9,7 +9,7 @@
 #include <nx/utils/std/future.h>
 
 #include "abstract_cloud_system_credentials_provider.h"
-#include "cloud_module_url_fetcher.h"
+#include "connection_mediator_url_fetcher.h"
 #include "mediator_client_connections.h"
 #include "mediator_server_connections.h"
 
@@ -37,18 +37,19 @@ public:
     std::unique_ptr<MediatorServerTcpConnection> systemConnection();
 
     /** Injects mediator address (tests only) */
-    void mockupAddress( SocketAddress address, bool suppressWarning = false );
-    void mockupAddress( const MediatorConnector& connector );
+    void mockupAddress( QUrl mediatorUrl, bool suppressWarning = false );
 
     void setSystemCredentials( boost::optional<SystemCredentials> value );
     virtual boost::optional<SystemCredentials> getSystemCredentials() const;
 
-    boost::optional<SocketAddress> mediatorAddress() const;
+    boost::optional<SocketAddress> udpEndpoint() const;
+    bool isConnected() const;
 
     static void setStunClientSettings(stun::AbstractAsyncClient::Settings stunClientSettings);
 
 private:
     void fetchEndpoint();
+    void useMediatorUrl(QUrl url);
 
     mutable QnMutex m_mutex;
     boost::optional< SystemCredentials > m_credentials;
@@ -57,8 +58,9 @@ private:
     boost::optional< nx::utils::future< bool > > m_future;
 
     std::shared_ptr< stun::AbstractAsyncClient > m_stunClient;
-    std::unique_ptr<nx::network::cloud::ConnectionMediatorUrlFetcher> m_endpointFetcher;
+    std::unique_ptr<nx::network::cloud::ConnectionMediatorUrlFetcher> m_mediatorUrlFetcher;
     boost::optional<SocketAddress> m_mediatorAddress;
+    boost::optional<SocketAddress> m_mediatorUdpEndpoint;
     std::unique_ptr<nx::network::RetryTimer> m_fetchEndpointRetryTimer;
 
     virtual void stopWhileInAioThread() override;

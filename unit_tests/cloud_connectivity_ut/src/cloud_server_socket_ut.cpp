@@ -9,6 +9,7 @@
 #include <nx/network/test_support/simple_socket_test_helper.h>
 #include <nx/network/test_support/socket_test_helper.h>
 #include <nx/network/test_support/stun_async_client_mock.h>
+#include <nx/network/url/url_builder.h>
 #include <nx/utils/random.h>
 #include <nx/utils/std/future.h>
 #include <nx/utils/std/thread.h>
@@ -608,7 +609,9 @@ protected:
                 server->serverId(),
                 system.authKey));
 
-        SocketGlobals::mediatorConnector().mockupAddress(m_mediator.stunEndpoint());
+        SocketGlobals::mediatorConnector().mockupAddress(
+            nx::network::url::Builder().setScheme("stun")
+                .setEndpoint(m_mediator.stunEndpoint()));
         SocketGlobals::mediatorConnector().enable(true);
     }
 
