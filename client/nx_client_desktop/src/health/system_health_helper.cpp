@@ -73,13 +73,12 @@ QString QnSystemHealthStringsHelper::messageText(QnSystemHealth::MessageType mes
                 SystemUri::ReferralSource::DesktopClient,
                 SystemUri::ReferralContext::None);
 
-            static const QString kTemplate = lit(R"html(
-                <style>td {padding-top: %4px; padding-right: %4px}</style>
-                <p>%1</p>
-                <table cellpadding="0" cellspacing="0">
-                <tr><td>%2</td><td>%3</td></tr>
-                </table>
-            )html");
+            static const QString kTemplate = QString::fromLatin1(
+                "<style>td {padding-top: %4px; padding-right: %4px}</style>"
+                "<p>%1</p>"
+                "<table cellpadding='0' cellspacing='0'>"
+                "<tr><td>%2</td><td>%3</td></tr>"
+                "</table>");
 
             return kTemplate.arg(kMessage)
                 .arg(makeHref(tr("Learn more"), urlHelper.aboutUrl()))
