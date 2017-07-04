@@ -810,8 +810,6 @@ void initialize(Manager* manager, Action* root)
     factory(OpenInFolderAction)
         .flags(Scene | Tree | SingleTarget | ResourceTarget | LayoutItemTarget)
         .text(ContextMenu::tr("Open Containing Folder"))
-        .shortcut(lit("Ctrl+Enter"))
-        .shortcut(lit("Ctrl+Return"))
         .autoRepeat(false)
         .condition(new OpenInFolderCondition());
 

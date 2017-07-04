@@ -31,6 +31,8 @@
 #include <ui/workbench/workbench_layout.h>
 #include <ui/workaround/hidpi_workarounds.h>
 
+#include <utils/common/event_processors.h>
+
 // -------------------------------------------------------------------------- //
 // QnResourceTreeSortProxyModel
 // -------------------------------------------------------------------------- //
@@ -175,6 +177,24 @@ QnResourceTreeWidget::QnResourceTreeWidget(QWidget *parent):
     connect(ui->filterLineEdit, &QLineEdit::editingFinished, this,
         &QnResourceTreeWidget::updateFilter);
 
+    installEventHandler(ui->filterLineEdit, QEvent::KeyPress, this,
+        [this](QObject* /*object*/, QEvent* event)
+        {
+            QKeyEvent* keyEvent = static_cast<QKeyEvent*>(event);
+            switch (keyEvent->key())
+            {
+                case Qt::Key_Enter:
+                case Qt::Key_Return:
+                    if (keyEvent->modifiers().testFlag(Qt::ControlModifier))
+                        emit filterCtrlEnterPressed();
+                    else
+                        emit filterEnterPressed();
+                    break;
+                default:
+                    break;
+            }
+        });
+
     ui->resourcesTreeView->installEventFilter(this);
 }
 
@@ -226,6 +246,11 @@ void QnResourceTreeWidget::setModel(QAbstractItemModel *model)
     {
         ui->resourcesTreeView->setModel(NULL);
     }
+}
+
+QSortFilterProxyModel* QnResourceTreeWidget::searchModel() const
+{
+    return m_resourceProxyModel;
 }
 
 QItemSelectionModel* QnResourceTreeWidget::selectionModel()

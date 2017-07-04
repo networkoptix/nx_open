@@ -45,6 +45,8 @@ public:
     QAbstractItemModel *model() const;
     void setModel(QAbstractItemModel *model);
 
+    QSortFilterProxyModel* searchModel() const;
+
     QItemSelectionModel *selectionModel();
     void setWorkbench(QnWorkbench *workbench);
 
@@ -137,6 +139,10 @@ signals:
      * This signal is emitted when the tree ends a recursive operation.
      */
     void afterRecursiveOperation();
+
+    void filterEnterPressed();
+    void filterCtrlEnterPressed();
+
 private slots:
     void at_treeView_spacePressed(const QModelIndex &index);
     void at_treeView_clicked(const QModelIndex &index);
