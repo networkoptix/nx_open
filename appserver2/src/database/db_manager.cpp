@@ -184,7 +184,7 @@ void QnDbManager::QnDbTransactionExt::rollback()
 
 bool QnDbManager::QnDbTransactionExt::commit()
 {
-    const bool rez = dbCommit("ext");
+    const bool rez = dbCommit("ext commit");
     m_lazyTranInProgress = false;
     if (rez)
     {
