@@ -1237,7 +1237,7 @@ ScaleManager.prototype.scrollSlider = function(){
     var relativeCenter =  this.getRelativeCenter();
     var relativeWidth =  this.getRelativeWidth();
 
-    scrollBarSliderWidth = Math.max(this.viewportWidth * relativeWidth, this.minScrollBarWidth);
+    var scrollBarSliderWidth = Math.max(this.viewportWidth * relativeWidth, this.minScrollBarWidth);
     // Correction for width if it has minimum width
     var startCoordinate = this.bound( 0, (this.viewportWidth * relativeCenter - scrollBarSliderWidth/2), this.viewportWidth - scrollBarSliderWidth) ;
 
