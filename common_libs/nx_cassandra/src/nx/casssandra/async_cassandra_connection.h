@@ -13,6 +13,7 @@ class Query
 {
 public:
     Query(CassFuture* future);
+    Query(CassStatement* statement);
     Query() = default;
     ~Query();
 
@@ -88,14 +89,26 @@ public:
         Query query,
         nx::utils::MoveOnlyFunc<void(CassError, QueryResult result)> selectCb);
 
+    void executeSelect(
+        const char* queryString,
+        nx::utils::MoveOnlyFunc<void(CassError, QueryResult result)> selectCb);
+
     void executeUpdate(
         Query query,
         nx::utils::MoveOnlyFunc<void(CassError)> updateCb);
 
+    void executeUpdate(
+        const char* queryString,
+        nx::utils::MoveOnlyFunc<void(CassError)> updateCb);
+
     cf::future<CassError> init();
     cf::future<std::pair<CassError, Query>> prepareQuery(const char* queryString);
+
     cf::future<std::pair<CassError, QueryResult>> executeSelect(Query query);
+    cf::future<std::pair<CassError, QueryResult>> executeSelect(const char* queryString);
+
     cf::future<CassError> executeUpdate(Query query);
+    cf::future<CassError> executeUpdate(const char* queryString);
 
 private:
     CassCluster* m_cluster = nullptr;
