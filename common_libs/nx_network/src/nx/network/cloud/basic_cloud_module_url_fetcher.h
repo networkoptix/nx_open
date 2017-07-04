@@ -246,7 +246,7 @@ private:
             nx::utils::AppInfo::applicationVersion());
         inputData.put(
             CloudInstanceSelectionAttributeNameset::vmsBeta,
-            nx::utils::AppInfo::beta() ? "true" : "false");
+            QString::fromLatin1(nx::utils::AppInfo::beta() ? "true" : "false"));
         inputData.put(
             CloudInstanceSelectionAttributeNameset::vmsCustomization,
             nx::utils::AppInfo::customizationName());
