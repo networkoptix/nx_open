@@ -44,7 +44,6 @@ namespace ec2
     private:
         QueryProcessorType* const m_queryProcessor;
         Qn::UserAccessData m_userAccessData;
-        std::unique_ptr<QObject> m_customData;
     };
 
     // TODO: Could probably be moved to mediaserver, as it is used only there.
