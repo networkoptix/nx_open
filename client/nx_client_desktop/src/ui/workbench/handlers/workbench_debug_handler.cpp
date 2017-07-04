@@ -34,9 +34,9 @@
 #include <nx/utils/log/log.h>
 #include <nx/utils/std/cpp14.h>
 
-#ifdef _DEBUG
+//#ifdef _DEBUG
 #define DEBUG_ACTIONS
-#endif
+//#endif
 
 using namespace nx::client::desktop::ui;
 
