@@ -1,0 +1,34 @@
+{{#systemName}}
+{{systemName}}
+{{#systemSignature}}
+{{systemSignature}}
+{{/systemSignature}}
+{{#cloudOwnerEmail}}
+{{cloudOwnerEmail}}
+{{/cloudOwnerEmail}}
+{{/systemName}}
+
+{{event}} {{#source}}from {{source}}{{/source}}
+{{#caption}}
+{{caption}}
+{{/caption}} {{#description}}
+{{description}}
+{{/description}} {{#hasCameras}}
+
+Related cameras: 
+{{#cameras}}
+{{name}} ({{cameraIP}})
+{{#urlint}}
+Play archive from the local network: {{urlint}}
+{{/urlint}} {{#urlext}}
+Play archive from the web: {{urlext}}
+{{/urlext}}
+{{/cameras}} {{/hasCameras}}
+{{#aggregated}}
+{{timestampDate}} {{timestampTime}}
+{{/aggregated}}
+
+
+Website: {{companyUrl}}
+Support: {{supportLinkText}}
+

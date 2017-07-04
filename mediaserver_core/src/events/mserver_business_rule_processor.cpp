@@ -586,20 +586,31 @@ bool QnMServerBusinessRuleProcessor::sendMailInternal( const QnSendMailBusinessA
 
 void QnMServerBusinessRuleProcessor::sendEmailAsync(QnSendMailBusinessActionPtr action, QStringList recipients, int aggregatedResCount)
 {
+    bool isHtml = !qnGlobalSettings->isUseTextEmailFormat();
+
     QnEmailAttachmentList attachments;
     QVariantMap contextMap = eventDescriptionMap(action, action->aggregationInfo(), attachments);
     QnEmailAttachmentData attachmentData(action->getRuntimeParams().eventType);  //TODO: https://networkoptix.atlassian.net/browse/VMS-2831
     QnEmailSettings emailSettings = QnGlobalSettings::instance()->emailSettings();
     QString cloudOwnerAccount = QnGlobalSettings::instance()->cloudAccountName();
 
-    attachments.append(QnEmailAttachmentPtr(new QnEmailAttachment(tpProductLogo, lit(":/skin/email_attachments/productLogo.png"), tpImageMimeType)));
-    attachments.append(QnEmailAttachmentPtr(new QnEmailAttachment(tpSystemIcon, lit(":/skin/email_attachments/systemIcon.png"), tpImageMimeType)));
-    contextMap[tpProductLogoFilename] = lit("cid:") + tpProductLogo;
-    contextMap[tpSystemIcon] = lit("cid:") + tpSystemIcon;
+    if (isHtml)
+    {
+        attachments.append(QnEmailAttachmentPtr(new QnEmailAttachment(tpProductLogo, lit(":/skin/email_attachments/productLogo.png"), tpImageMimeType)));
+        attachments.append(QnEmailAttachmentPtr(new QnEmailAttachment(tpSystemIcon, lit(":/skin/email_attachments/systemIcon.png"), tpImageMimeType)));
+
+        contextMap[tpProductLogoFilename] = lit("cid:") + tpProductLogo;
+        contextMap[tpSystemIcon] = lit("cid:") + tpSystemIcon;
+    }
+
     if (!cloudOwnerAccount.isEmpty())
     {
-        attachments.append(QnEmailAttachmentPtr(new QnEmailAttachment(tpOwnerIcon, lit(":/skin/email_attachments/ownerIcon.png"), tpImageMimeType)));
-        contextMap[tpOwnerIcon] = lit("cid:") + tpOwnerIcon;
+        if (isHtml)
+        {
+            attachments.append(QnEmailAttachmentPtr(new QnEmailAttachment(tpOwnerIcon, lit(":/skin/email_attachments/ownerIcon.png"), tpImageMimeType)));
+            contextMap[tpOwnerIcon] = lit("cid:") + tpOwnerIcon;
+        }
+
         contextMap[tpCloudOwnerEmail] = cloudOwnerAccount;
 
         const auto allUsers = qnResPool->getResources<QnUserResource>();
@@ -615,7 +626,6 @@ void QnMServerBusinessRuleProcessor::sendEmailAsync(QnSendMailBusinessActionPtr 
 
     QnEmailAddress supportEmail(emailSettings.supportEmail);
 
-//    contextMap[tpEventLogoFilename] = lit("cid:") + attachmentData.imageName;
     contextMap[tpCompanyName] = QnAppInfo::organizationName();
     contextMap[tpCompanyUrl] = QnAppInfo::companyUrl();
     contextMap[tpSupportLink] = supportEmail.isValid()
@@ -631,7 +641,14 @@ void QnMServerBusinessRuleProcessor::sendEmailAsync(QnSendMailBusinessActionPtr 
     contextMap[tpSourceIP] = QnBusinessStringsHelper::getResoureIPFromParams(action->getRuntimeParams());
 
     QString messageBody;
-    renderTemplateFromFile(attachmentData.templatePath, contextMap, &messageBody);
+    if (isHtml)
+        renderTemplateFromFile(attachmentData.templatePath, contextMap, &messageBody);
+
+    QString messagePlainBody;
+    QFileInfo fileInfo(attachmentData.templatePath);
+    QString plainTemplatePath = fileInfo.dir().path() + lit("/") + fileInfo.baseName() + lit("_plain.mustache");
+    renderTemplateFromFile(plainTemplatePath, contextMap, &messagePlainBody);
+
 
     ec2::ApiEmailData data(
         recipients,
@@ -639,6 +656,7 @@ void QnMServerBusinessRuleProcessor::sendEmailAsync(QnSendMailBusinessActionPtr 
         ? QnBusinessStringsHelper::eventAtResources(action->getRuntimeParams())
         : QnBusinessStringsHelper::eventAtResource(action->getRuntimeParams(), Qn::RI_WithUrl),
         messageBody,
+        messagePlainBody,
         emailSettings.timeout,
         attachments
         );
