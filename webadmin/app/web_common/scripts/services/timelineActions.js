@@ -362,12 +362,15 @@ TimelineActions.prototype.updateState = function(){
 TimelineActions.prototype.scrollbarSliderDragStart = function(mouseX){
     this.scaleManager.stopWatching();
     this.catchScrollBar = mouseX;
+    var scrollSlider = this.scaleManager.scrollSlider();
+    this.catchScrollStart = scrollSlider.start;
+    this.scrollSliderWidth = scrollSlider.width;
 };
 TimelineActions.prototype.scrollbarSliderDrag = function(mouseX){
     if(this.catchScrollBar) {
         var moveScroll = mouseX - this.catchScrollBar;
-        this.scaleManager.scroll(this.scaleManager.scroll() + moveScroll / this.scaleManager.viewportWidth);
-        this.catchScrollBar = mouseX;
+        var targetScroll = (this.catchScrollStart + moveScroll) / (this.scaleManager.viewportWidth - this.scrollSliderWidth);
+        this.scaleManager.scroll(targetScroll);
         return moveScroll !== 0;
     }
     return false;
