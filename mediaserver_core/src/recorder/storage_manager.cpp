@@ -1502,11 +1502,13 @@ void QnStorageManager::removeEmptyDirs(const QnStorageResourcePtr &storage)
 void QnStorageManager::updateCameraHistory() const
 {
     auto archivedListNew = getCamerasWithArchive();
+    NX_VERBOSE(this, lm("Got %1 cameras with archive").arg(archivedListNew.size()));
 
     std::vector<QnUuid> archivedListOld =
         cameraHistoryPool()->getServerFootageData(commonModule()->moduleGUID());
     std::sort(archivedListOld.begin(), archivedListOld.end());
 
+    NX_VERBOSE(this, lm("Got %1 old cameras with archive").arg(archivedListOld.size()));
     if (archivedListOld == archivedListNew)
         return;
 
@@ -1519,6 +1521,11 @@ void QnStorageManager::updateCameraHistory() const
                     << ec2::toString(errCode);
         return;
     }
+    else
+    {
+        NX_VERBOSE(this, "addCameraHistoryItem success");
+    }
+
     cameraHistoryPool()->setServerFootageData(commonModule()->moduleGUID(),
                                               archivedListNew);
     return;
