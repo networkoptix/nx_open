@@ -167,10 +167,10 @@ bool QnDbManager::QnDbTransactionExt::beginTran()
     m_mutex.lockForWrite();
 
     if (m_lazyTranInProgress)
-        m_database.commit();
+        dbCommit(lit("lazy before new"));
+
     m_lazyTranInProgress = false;
     m_database.transaction();
-
 
     m_tranLog->beginTran();
     return true;
@@ -186,15 +186,15 @@ void QnDbManager::QnDbTransactionExt::rollback()
 
 bool QnDbManager::QnDbTransactionExt::commit()
 {
-    const bool rez = m_database.commit();
+    const bool rez = dbCommit("ext");
     m_lazyTranInProgress = false;
-    if (rez) {
+    if (rez)
+    {
+        // Commit only on success, otherwise rollback is expected.
         m_tranLog->commit();
         m_mutex.unlock();
     }
-    else {
-        qWarning() << "Commit failed to database" << m_database.databaseName() << "error:"  << m_database.lastError(); // do not unlock mutex. Rollback is expected
-    }
+
     return rez;
 }
 
@@ -203,7 +203,7 @@ void QnDbManager::QnDbTransactionExt::physicalCommitLazyData()
     if (m_lazyTranInProgress)
     {
         m_lazyTranInProgress = false;
-        m_database.commit();
+        dbCommit("phisical commit lazy");
         m_tranLog->commit(); //< Just in case. It does nothing.
     }
 }
