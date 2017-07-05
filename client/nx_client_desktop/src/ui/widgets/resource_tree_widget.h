@@ -147,8 +147,8 @@ private:
     void at_treeView_spacePressed(const QModelIndex &index);
     void at_treeView_clicked(const QModelIndex &index);
 
-    Q_SLOT void at_resourceProxyModel_rowsInserted(const QModelIndex &parent, int start, int end);
-    void at_resourceProxyModel_rowsInserted(const QModelIndex &index);
+    void at_resourceProxyModel_rowsInserted(const QModelIndex& parent, int start, int end);
+    void expandNodeIfNeeded(const QModelIndex& index);
 
     void initializeFilter();
     void updateColumns();

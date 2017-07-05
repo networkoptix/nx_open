@@ -207,10 +207,13 @@ void QnResourceTreeWidget::setModel(QAbstractItemModel *model)
 
         ui->resourcesTreeView->setModel(m_resourceProxyModel);
 
-        connect(m_resourceProxyModel, SIGNAL(rowsInserted(const QModelIndex &, int, int)), this, SLOT(at_resourceProxyModel_rowsInserted(const QModelIndex &, int, int)));
-        connect(m_resourceProxyModel, &QnResourceSearchProxyModel::beforeRecursiveOperation, this, &QnResourceTreeWidget::beforeRecursiveOperation);
-        connect(m_resourceProxyModel, &QnResourceSearchProxyModel::afterRecursiveOperation, this, &QnResourceTreeWidget::afterRecursiveOperation);
-        at_resourceProxyModel_rowsInserted(QModelIndex());
+        connect(m_resourceProxyModel, &QAbstractItemModel::rowsInserted, this,
+            &QnResourceTreeWidget::at_resourceProxyModel_rowsInserted);
+        connect(m_resourceProxyModel, &QnResourceSearchProxyModel::beforeRecursiveOperation, this,
+            &QnResourceTreeWidget::beforeRecursiveOperation);
+        connect(m_resourceProxyModel, &QnResourceSearchProxyModel::afterRecursiveOperation, this,
+            &QnResourceTreeWidget::afterRecursiveOperation);
+        expandNodeIfNeeded(QModelIndex());
 
         updateFilter();
         updateColumns();
@@ -530,13 +533,14 @@ void QnResourceTreeWidget::at_treeView_clicked(const QModelIndex &index)
     }
 }
 
-void QnResourceTreeWidget::at_resourceProxyModel_rowsInserted(const QModelIndex &parent, int start, int end)
+void QnResourceTreeWidget::at_resourceProxyModel_rowsInserted(const QModelIndex& parent,
+    int start, int end)
 {
     for (int i = start; i <= end; i++)
-        at_resourceProxyModel_rowsInserted(m_resourceProxyModel->index(i, 0, parent));
+        expandNodeIfNeeded(m_resourceProxyModel->index(i, 0, parent));
 }
 
-void QnResourceTreeWidget::at_resourceProxyModel_rowsInserted(const QModelIndex &index)
+void QnResourceTreeWidget::expandNodeIfNeeded(const QModelIndex& index)
 {
     /* Auto-expand certain nodes. */
     switch (index.data(Qn::NodeTypeRole).value<Qn::NodeType>())
