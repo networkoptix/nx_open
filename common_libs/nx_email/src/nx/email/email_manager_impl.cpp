@@ -76,13 +76,15 @@ SmtpOperationResult EmailManagerImpl::sendEmail(
 
     MimeMultiPart *mainPart = new MimeMultiPart(MimeMultiPart::Alternative);
     MimeMultiPart *bodyPart = new MimeMultiPart(MimeMultiPart::Related);
-    if (!data.body.isEmpty()) {
+    if (!data.body.isEmpty())
+    {
         mainPart->addPart(new MimeText(data.plainBody));
         bodyPart->addPart(new MimeHtml(data.body));
 
         for (const QnEmailAttachmentPtr& attachment: data.attachments)
             bodyPart->addPart(new MimeInlineFile(attachment->content, attachment->filename, attachment->mimetype));
-    } else {
+    } else
+    {
         bodyPart->addPart(new MimeText(data.plainBody));
 
         for (const QnEmailAttachmentPtr& attachment: data.attachments)
