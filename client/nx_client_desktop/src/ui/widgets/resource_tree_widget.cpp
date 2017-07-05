@@ -580,7 +580,7 @@ void QnResourceTreeWidget::initializeFilter()
     installEventHandler(ui->filterLineEdit, QEvent::KeyPress, this,
         [this](QObject* /*object*/, QEvent* event)
         {
-            QKeyEvent* keyEvent = static_cast<QKeyEvent*>(event);
+            const auto keyEvent = static_cast<QKeyEvent*>(event);
             switch (keyEvent->key())
             {
                 case Qt::Key_Enter:
