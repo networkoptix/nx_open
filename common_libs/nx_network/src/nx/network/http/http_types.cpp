@@ -592,7 +592,11 @@ bool Request::parse(const ConstBufferRefType& data)
 void Request::serialize(BufferType* const dstBuffer) const
 {
     //estimating required buffer size
-    dstBuffer->reserve(dstBuffer->size() + estimateSerializedDataSize(requestLine) + estimateSerializedDataSize(headers) + 2 + messageBody.size());
+    dstBuffer->reserve(dstBuffer->size()
+        + estimateSerializedDataSize(requestLine)
+        + estimateSerializedDataSize(headers)
+        + 2
+        + messageBody.size());
 
     //serializing
     requestLine.serialize(dstBuffer);

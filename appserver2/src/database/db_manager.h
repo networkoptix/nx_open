@@ -6,23 +6,23 @@
 
 #include <common/common_module_aware.h>
 
-#include "nx_ec/ec_api.h"
-#include "transaction/transaction.h"
+#include <nx_ec/ec_api.h>
 #include <nx_ec/data/api_lock_data.h>
 #include "nx_ec/data/api_fwd.h"
 #include "nx_ec/data/api_misc_data.h"
-#include "utils/db/db_helper.h"
-#include "transaction/transaction_log.h"
+#include <utils/db/db_helper.h>
 #include "nx_ec/data/api_runtime_data.h"
 #include <nx/utils/log/log.h>
-#include <nx/utils/unused.h>
 #include <nx/utils/singleton.h>
-#include "nx/utils/type_utils.h"
 #include "core/resource_access/user_access_data.h"
 #include "core/resource_access/resource_access_manager.h"
 #include "core/resource/user_resource.h"
-#include <database/api/db_resource_api.h>
 #include <nx/fusion/serialization/sql.h>
+
+#include <database/api/db_resource_api.h>
+
+#include "transaction/transaction.h"
+#include "transaction/transaction_log.h"
 
 struct BeforeRestoreDbData;
 
@@ -49,6 +49,7 @@ enum ApiObjectType
     ApiObject_Storage,
     ApiObject_WebPage,
 };
+
 struct ApiObjectInfo
 {
     ApiObjectInfo() {}
@@ -57,6 +58,7 @@ struct ApiObjectInfo
     ApiObjectType type;
     QnUuid id;
 };
+
 class ApiObjectInfoList: public std::vector<ApiObjectInfo>
 {
 public:
@@ -71,12 +73,6 @@ public:
 };
 
 class QnDbManagerAccess;
-
-enum class TransactionLockType
-{
-    Regular, //< do commit as soon as commit() function called
-    Lazy //< delay commit unless regular commit() called
-};
 
 namespace detail
 {
@@ -697,6 +693,7 @@ namespace detail
 
         QString getDatabaseName(const QString& baseName);
         void resetPreparedStatements();
+
     private:
         QnUuid m_storageTypeId;
         QnUuid m_serverTypeId;
@@ -727,6 +724,8 @@ namespace detail
         std::unique_ptr<QSqlQuery> m_cameraUserAttrQuery;
         std::unique_ptr<QSqlQuery> m_insCameraScheduleQuery;
         std::unique_ptr<QSqlQuery> m_kvPairQuery;
+
+        // TODO: #mshevchenko: Move to pimpl, remove include.
         ec2::database::api::Context m_resourceContext;
     };
 

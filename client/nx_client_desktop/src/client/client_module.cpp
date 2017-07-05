@@ -57,7 +57,6 @@
 #include <vms_gateway_embeddable.h>
 #include <nx/utils/log/log_initializer.h>
 #include <nx_ec/dummy_handler.h>
-#include <nx_ec/ec2_lib.h>
 
 #include <platform/platform_abstraction.h>
 

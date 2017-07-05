@@ -16,6 +16,12 @@ namespace ec2
 
     class QnUbjsonTransactionSerializer;
 
+    enum class TransactionLockType
+    {
+        Regular, //< do commit as soon as commit() function called
+        Lazy //< delay commit unless regular commit() called
+    };
+
     class QnTransactionLog
     {
     public:

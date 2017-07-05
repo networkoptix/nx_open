@@ -6,7 +6,7 @@
 
 #include "ec2_thread_pool.h"
 #include "fixed_url_client_query_processor.h"
-#include "database/db_manager.h"
+#include <database/db_manager.h>
 #include "transaction/transaction_log.h"
 #include "server_query_processor.h"
 #include "nx_ec/data/api_business_rule_data.h"

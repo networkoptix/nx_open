@@ -2,8 +2,6 @@
 
 #include <QtSql/QSqlQuery>
 
-#include <database/api/db_resource_api.h>
-
 #include <nx_ec/data/api_layout_data.h>
 
 #include <nx/fusion/model_functions.h>
