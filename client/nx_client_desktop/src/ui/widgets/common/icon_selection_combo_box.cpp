@@ -91,7 +91,7 @@ void QnIconSelectionComboBox::setPixmaps(const QString& path,
     for (const auto& name : names)
     {
         const auto fullName = path + lit("/") + name + ext;
-        const auto pixmap = qnSkin->pixmap(fullName);
+        const auto pixmap = qnSkin->pixmap(fullName, true);
         if (!pixmap.isNull())
             pixmaps.push_back({ name, pixmap });
     }

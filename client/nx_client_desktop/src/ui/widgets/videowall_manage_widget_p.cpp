@@ -186,8 +186,7 @@ void QnVideowallManageWidgetPrivate::BaseModelItem::paint(QPainter* painter, con
             painter->drawRect(dilated(QRect(innerRect.left(), innerRect.top() + innerRect.height(), innerRect.width(), 0), transformationOffset));
         }
 #endif
-        paintPixmap(painter, body, qnSkin->pixmap("videowall_settings/move.png", QSize(),
-            Qt::KeepAspectRatio, Qt::FastTransformation, true));
+        paintPixmap(painter, body, qnSkin->pixmap("videowall_settings/move.png"));
         paintDeleteButton(painter);
 
         QPainterPath anchorPath;
@@ -308,10 +307,7 @@ void QnVideowallManageWidgetPrivate::FreeSpaceItem::paint(QPainter* painter, con
         return;
     base_type::paint(painter, process);
     if (!process.isRunning())
-    {
-        paintPixmap(painter, bodyRect(), qnSkin->pixmap("buttons/plus.png", QSize(),
-            Qt::KeepAspectRatio, Qt::FastTransformation, true));
-    }
+        paintPixmap(painter, bodyRect(), qnSkin->pixmap("buttons/plus.png"));
 }
 
 QColor QnVideowallManageWidgetPrivate::FreeSpaceItem::baseColor() const {
