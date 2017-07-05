@@ -114,7 +114,7 @@ QStringList ComboBoxField::items() const
 
 bool ComboBoxField::setRowHidden(int index, bool value)
 {
-    const auto listView = dynamic_cast<QListView*>(combobox()->view());
+    const auto listView = qobject_cast<QListView*>(combobox()->view());
     if (!listView)
     {
         NX_EXPECT(false, "Invalid item view delegate");

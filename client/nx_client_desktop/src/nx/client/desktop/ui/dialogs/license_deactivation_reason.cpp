@@ -11,6 +11,8 @@
 
 namespace {
 
+using namespace nx::client::desktop::ui;
+
 Qn::TextValidateFunction reasonComboBoxValidator(
     const QStringList& reasons,
     const QString& errorText)
@@ -26,8 +28,6 @@ Qn::TextValidateFunction reasonComboBoxValidator(
 
     return validator;
 }
-
-using namespace nx::client::desktop::ui;
 
 bool isLastSelectedOption(ComboBoxField* field)
 {
@@ -56,6 +56,8 @@ namespace desktop {
 namespace ui {
 namespace dialogs {
 
+using namespace nx::client::desktop::ui;
+
 LicenseDeactivationReason::LicenseDeactivationReason(
     const license::RequestInfo& info,
     QWidget* parent)
@@ -80,8 +82,6 @@ LicenseDeactivationReason::~LicenseDeactivationReason()
 
 QWidget* LicenseDeactivationReason::createWidget(QPushButton* nextButton)
 {
-    using namespace nx::client::desktop::ui;
-
     auto widget = new QWidget();
     widget->setFocusPolicy(Qt::TabFocus);
 
@@ -167,7 +167,7 @@ QStringList LicenseDeactivationReason::reasons()
     static const QStringList kReasons{
         tr("- Choose one -"),
         tr("I'm upgrading my machine"),
-        tr("I'm accidentally assigned the license to a wrong machine"),
+        tr("I accidentally assigned the license to a wrong machine"),
         tr("Other Reason")};
 
     return kReasons;
