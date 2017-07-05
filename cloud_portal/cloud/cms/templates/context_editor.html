@@ -6,7 +6,6 @@
     <link rel="stylesheet" type="text/css" href="{% static 'admin/css/forms.css' %}"/>
 {% endblock %}
 
-
 {% block content%}
 <h1>{{context.name}} for {{context.product.name}}</h1>
 <fieldset>
@@ -18,8 +17,7 @@
     <div> Link to Page: {{context.url}}</div>
     {% endif %}
 </fieldset>
-<form id="contextForm" action="{% url 'context_editor' context.name %}" method="post" class="aligned">
-    <input type="hidden" name="context" value="{{context.name}}">
+<form id="contextForm" action="{% url 'context_editor' context.id %}" method="post" class="aligned">
     <input type="hidden" name="currentLanguage" value="{{language.id}}">
     <input type="hidden" id="languageChanged">
     {% csrf_token %}
@@ -37,7 +35,7 @@
         <button class="button" type="submit" name="SaveDraft">Save Draft</button>
         <button class="button" type="submit" name="Preview">Save and Preview</button>
         <button class="button" type="submit" name="SendReview">Send for Review</button>
-        <button class="button" type="reset"  name="Reset">Clear Entries</button>
+        <button class="button" type="reset"  name="Reset">Reset</button>
     </div>
 </form>
 

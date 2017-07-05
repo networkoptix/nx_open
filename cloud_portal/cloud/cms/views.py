@@ -11,8 +11,8 @@ from .forms import *
 
 from django.views.generic.list import ListView
 
-def get_post_parameters(request, context_name, language_id):
-	context, language = get_context_and_language(request.data, context_name, language_id)
+def get_post_parameters(request, context_id, language_id):
+	context, language = get_context_and_language(request.data, context_id, language_id)
 	customization = Customization.objects.get(name=settings.CUSTOMIZATION)		
 	user = Account.objects.get(email=request.user)
 
@@ -27,11 +27,10 @@ def get_post_parameters(request, context_name, language_id):
 	return context, language, form, customization, user 
 
 
-def handle_get_view(request, context_name, language_code):
-	context, language, context_id = None, None, 0
-	if context_name:
-		context = Context.objects.get(name=context_name)
-		context_id = context.id
+def handle_get_view(request, context_id, language_code):
+	context, language, = None, None
+	if context_id:
+		context = Context.objects.get(id=context_id)
 	
 	if language_code:
 		language = Language.objects.get(code=language_code)
@@ -51,8 +50,8 @@ def handle_get_view(request, context_name, language_code):
 	return context, form, language
 	
 
-def handle_post_context_edit_view(request, context_name, language_id):
-	context, language, form, customization, user = get_post_parameters(request, context_name, language_id)
+def handle_post_context_edit_view(request, context_id, language_id):
+	context, language, form, customization, user = get_post_parameters(request, context_id, language_id)
 	request_data = request.data
 	preview_link = ""
 	

@@ -6,8 +6,8 @@ from .filldata import fill_content
 from api.models import Account
 from cms.models import *
 
-def get_context_and_language(request_data, context_name, language_id):
-	context = Context.objects.get(name=context_name) if context_name else None
+def get_context_and_language(request_data, context_id, language_id):
+	context = Context.objects.get(id=context_id) if context_id else None
 	language = Language.objects.get(id=language_id) if language_id else None
 	
 	if not context and 'context' in request_data and request_data['context']:
@@ -56,7 +56,7 @@ def save_unrevisioned_records(customization, language, data_structures, request_
 		elif latest_approved_record:
 			if latest_approved_record.latest('created_date').value == new_record_value:
 				continue
-		elif not new_record_value:
+		elif not latest_unapproved_record and data_structure.default == new_record_value:
 			continue
 
 		record = DataRecord(data_structure=data_structure,

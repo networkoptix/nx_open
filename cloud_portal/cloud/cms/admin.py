@@ -16,7 +16,7 @@ class ContextAdmin(admin.ModelAdmin):
 
     def context_actions(self, obj):
         return format_html('<a class="button" href="/admin/cms/context_editor/{}/">edit content</a>',
-                            obj.name)
+                            obj.id)
 
     context_actions.short_description = 'Admin Options'
     context_actions.allow_tags = True
