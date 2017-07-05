@@ -236,7 +236,7 @@ void QnResourceTreeModelOtherSystemsNode::rebuild()
     if (!canSeeFakeServers())
         return;
 
-    for (const auto& resource: resourcePool()->getAllIncompatibleResources())
+    for (const auto& resource: resourcePool()->getIncompatibleServers())
     {
         const auto server = resource.dynamicCast<QnFakeMediaServerResource>();
         NX_ASSERT(server);

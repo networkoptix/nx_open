@@ -154,7 +154,7 @@ QnMediaServerResourceList QnMediaServerUpdateTool::actualTargets() const {
 
     auto result = resourcePool()->getAllServers(Qn::Online);
 
-    for (const auto& server: resourcePool()->getAllIncompatibleResources())
+    for (const auto& server: resourcePool()->getIncompatibleServers())
     {
         if (helpers::serverBelongsToCurrentSystem(server))
         {

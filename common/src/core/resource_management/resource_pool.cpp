@@ -132,13 +132,13 @@ void QnResourcePool::addResources(const QnResourceList& resources, bool mainPool
                 m_cache.resourceAdded(resource);
                 newResources.insert(resource->getId(), resource);
             }
-            m_incompatibleResources.remove(resource->getId());
+            m_incompatibleServers.remove(resource->getId());
         }
         else
         {
             auto server = resource.dynamicCast<QnMediaServerResource>();
             NX_EXPECT(server, "Only fake servers allowed here");
-            if (insertOrUpdateResource(server, &m_incompatibleResources))
+            if (insertOrUpdateResource(server, &m_incompatibleServers))
                 newResources.insert(resource->getId(), resource);
         }
 
@@ -233,10 +233,10 @@ void QnResourcePool::removeResources(const QnResourceList& resources)
         }
         else
         {
-            const auto iter = m_incompatibleResources.find(resource->getId());
-            if (iter != m_incompatibleResources.end())
+            const auto iter = m_incompatibleServers.find(resource->getId());
+            if (iter != m_incompatibleServers.end())
             {
-                m_incompatibleResources.erase(iter);
+                m_incompatibleServers.erase(iter);
                 appendRemovedResource(resource);
             }
         }
@@ -572,13 +572,13 @@ QnLayoutResourceList QnResourcePool::getLayoutsWithResource(const QnUuid &camera
     return result;
 }
 
-QnMediaServerResourcePtr QnResourcePool::getIncompatibleResourceById(const QnUuid& id,
+QnMediaServerResourcePtr QnResourcePool::getIncompatibleServerById(const QnUuid& id,
     bool useCompatible) const
 {
     QnMutexLocker locker(&m_resourcesMtx);
 
-    auto it = m_incompatibleResources.find(id);
-    if (it != m_incompatibleResources.end())
+    auto it = m_incompatibleServers.find(id);
+    if (it != m_incompatibleServers.end())
         return it.value();
 
     if (useCompatible)
@@ -587,10 +587,10 @@ QnMediaServerResourcePtr QnResourcePool::getIncompatibleResourceById(const QnUui
     return QnMediaServerResourcePtr();
 }
 
-QnMediaServerResourceList QnResourcePool::getAllIncompatibleResources() const
+QnMediaServerResourceList QnResourcePool::getIncompatibleServers() const
 {
     QnMutexLocker locker(&m_resourcesMtx);
-    return m_incompatibleResources.values();
+    return m_incompatibleServers.values();
 }
 
 QnVideoWallItemIndex QnResourcePool::getVideoWallItemByUuid(const QnUuid &uuid) const {
