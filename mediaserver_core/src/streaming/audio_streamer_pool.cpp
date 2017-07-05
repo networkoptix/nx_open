@@ -3,7 +3,7 @@
 #include <nx/utils/unused.h>
 #include <core/resource_management/resource_pool.h>
 #include <camera/camera_pool.h>
-#include <business/actions/abstract_business_action.h>
+#include <nx/vms/event/actions/abstract_action.h>
 #include <plugins/resource/avi/avi_resource.h>
 #include <proxy/2wayaudio/proxy_audio_transmitter.h>
 #include <common/common_module.h>
@@ -144,12 +144,12 @@ bool QnAudioStreamerPool::startStopStreamToResource(QnAbstractStreamDataProvider
     return true;
 }
 
-QString QnAudioStreamerPool::calcActionUniqueKey(const QnAbstractBusinessActionPtr &action) const
+QString QnAudioStreamerPool::calcActionUniqueKey(const nx::vms::event::AbstractActionPtr& action) const
 {
-    return action->getBusinessRuleId().toString();
+    return action->getRuleId().toString();
 }
 
-QnAbstractStreamDataProviderPtr QnAudioStreamerPool::getActionDataProvider(const QnAbstractBusinessActionPtr &action)
+QnAbstractStreamDataProviderPtr QnAudioStreamerPool::getActionDataProvider(const nx::vms::event::AbstractActionPtr& action)
 {
     QnMutexLocker lock(&m_prolongedProvidersMutex);
     auto type = action->actionType();
@@ -160,7 +160,7 @@ QnAbstractStreamDataProviderPtr QnAudioStreamerPool::getActionDataProvider(const
         return m_actionDataProviders[actionKey];
 
     QnAbstractStreamDataProviderPtr provider;
-    if (type == QnBusiness::PlaySoundAction)
+    if (type == nx::vms::event::playSoundAction)
     {
         const auto filePath = lit("dbfile://notifications/") + params.url;
         QnAviResourcePtr resource(new QnAviResource(filePath));
@@ -178,7 +178,7 @@ QnAbstractStreamDataProviderPtr QnAudioStreamerPool::getActionDataProvider(const
     return provider;
 }
 
-bool QnAudioStreamerPool::destroyActionDataProvider(const QnAbstractBusinessActionPtr &action)
+bool QnAudioStreamerPool::destroyActionDataProvider(const nx::vms::event::AbstractActionPtr& action)
 {
     QnMutexLocker lock(&m_prolongedProvidersMutex);
     auto actionKey = calcActionUniqueKey(action);

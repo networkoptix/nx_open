@@ -3,7 +3,7 @@
 #include <QtCore/QString>
 #include <QtCore/QObject>
 
-#include "business/business_fwd.h"
+#include <nx/vms/event/event_fwd.h>
 
 namespace QnSystemHealth {
 

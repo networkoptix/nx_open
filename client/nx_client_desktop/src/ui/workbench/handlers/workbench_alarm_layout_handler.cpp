@@ -5,7 +5,7 @@
 #include <api/runtime_info_manager.h>
 #include <nx/streaming/archive_stream_reader.h>
 
-#include <business/actions/abstract_business_action.h>
+#include <nx/vms/event/actions/abstract_action.h>
 #include <business/business_resource_validation.h>
 
 #include <camera/resource_display.h>
@@ -43,6 +43,7 @@
 #include <utils/common/delayed.h>
 #include <nx/client/desktop/ui/workbench/layouts/layout_factory.h>
 
+using namespace nx;
 using namespace nx::client::desktop::ui;
 
 namespace {
@@ -78,30 +79,30 @@ QnWorkbenchAlarmLayoutHandler::QnWorkbenchAlarmLayoutHandler(QObject *parent):
     const auto messageProcessor = qnClientMessageProcessor;
 
     connect(messageProcessor, &QnCommonMessageProcessor::businessActionReceived, this,
-        [this](const QnAbstractBusinessActionPtr &businessAction)
+        [this](const vms::event::AbstractActionPtr& action)
         {
-            if (businessAction->actionType() != QnBusiness::ShowOnAlarmLayoutAction)
+            if (action->actionType() != vms::event::showOnAlarmLayoutAction)
                 return;
 
             if (!context()->user())
                 return;
 
-            const auto params = businessAction->getParams();
+            const auto params = action->getParams();
 
             /* Skip action if it contains list of users and we are not on the list. */
-            if (!QnBusiness::actionAllowedForUser(businessAction->getParams(), context()->user()))
+            if (!QnBusiness::actionAllowedForUser(action->getParams(), context()->user()))
                 return;
 
-            auto targetCameras = resourcePool()->getResources<QnVirtualCameraResource>(businessAction->getResources());
-            if (businessAction->getParams().useSource)
-                targetCameras << resourcePool()->getResources<QnVirtualCameraResource>(businessAction->getSourceResources());
+            auto targetCameras = resourcePool()->getResources<QnVirtualCameraResource>(action->getResources());
+            if (action->getParams().useSource)
+                targetCameras << resourcePool()->getResources<QnVirtualCameraResource>(action->getSourceResources());
             targetCameras = accessController()->filtered(targetCameras, Qn::ViewContentPermission);
             targetCameras = targetCameras.toSet().toList();
 
             if (targetCameras.isEmpty())
                 return;
 
-            ActionKey key(businessAction->getBusinessRuleId(), businessAction->getRuntimeParams().eventTimestampUsec);
+            ActionKey key(action->getRuleId(), action->getRuntimeParams().eventTimestampUsec);
             if (m_processingActions.contains(key))
                 return; /* See m_processingActions comment. */
 
@@ -152,7 +153,7 @@ void QnWorkbenchAlarmLayoutHandler::openCamerasInAlarmLayout( const QnVirtualCam
 
     for (const QnVirtualCameraResourcePtr &camera: sortedCameras)
     {
-        auto existingItems = layout->items(camera->getUniqueId());
+        auto existingItems = layout->items(camera);
 
         /* If the camera is already on layout, just take it to LIVE */
         if (!existingItems.isEmpty())

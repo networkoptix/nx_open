@@ -20,7 +20,7 @@
 #include <api/network_proxy_factory.h>
 #include <api/global_settings.h>
 
-#include <business/business_action_parameters.h>
+#include <nx/vms/event/action_parameters.h>
 
 #include <camera/resource_display.h>
 #include <camera/cam_display.h>
@@ -361,13 +361,8 @@ void ActionHandler::addToLayout(const QnLayoutResourcePtr &layout, const QnResou
             layout->removeItem(*(layout->getItems().begin()));
     }
 
-    int maxItems = (qnSettings->lightMode() & Qn::LightModeSingleItem)
-        ? 1
-        : qnSettings->maxSceneVideoItems();
-
-    if (layout->getItems().size() >= maxItems)
+    if (layout->getItems().size() >= qnRuntime->maxSceneItems())
         return;
-
 
     if (!menu()->canTrigger(action::OpenInLayoutAction, action::Parameters(resource)
         .withArgument(Qn::LayoutResourceRole, layout)))
@@ -377,7 +372,8 @@ void ActionHandler::addToLayout(const QnLayoutResourcePtr &layout, const QnResou
 
     QnLayoutItemData data;
     data.resource.id = resource->getId();
-    data.resource.uniqueId = resource->getUniqueId();
+    if (resource->hasFlags(Qn::local_media))
+        data.resource.uniqueId = resource->getUniqueId();
     data.uuid = QnUuid::createUuid();
     data.flags = Qn::PendingGeometryAdjustment;
     data.zoomRect = params.zoomWindow;
@@ -668,9 +664,7 @@ void ActionHandler::at_openInLayoutAction_triggered()
 
     QPointF position = parameters.argument<QPointF>(Qn::ItemPositionRole);
 
-    int maxItems = (qnSettings->lightMode() & Qn::LightModeSingleItem)
-        ? 1
-        : qnSettings->maxSceneVideoItems();
+    const int maxItems = qnRuntime->maxSceneItems();
 
     bool adjustAspectRatio = layout->getItems().isEmpty() || !layout->hasCellAspectRatio();
 
@@ -1137,18 +1131,25 @@ void ActionHandler::at_openBusinessRulesAction_triggered()
 
 void ActionHandler::at_webClientAction_triggered()
 {
-    static const auto kPath = lit("/static/index.html");
-    static const auto kFragment = lit("/view");
-
     const auto server = commonModule()->currentServer();
     if (!server)
         return;
 
 #ifdef WEB_CLIENT_SUPPORTS_PROXY
+#error Reimplement VMS-6586
     openInBrowser(server, kPath, kFragment);
-#else
-    openInBrowserDirectly(server, kPath, kFragment);
 #endif
+
+    if (nx::network::isCloudServer(server))
+    {
+        menu()->trigger(action::OpenCloudViewSystemUrl);
+    }
+    else
+    {
+        static const auto kPath = lit("/static/index.html");
+        static const auto kFragment = lit("/view");
+        openInBrowserDirectly(server, kPath, kFragment);
+    }
 }
 
 void ActionHandler::at_webAdminAction_triggered()
@@ -1213,18 +1214,18 @@ void ActionHandler::at_openBusinessLogAction_triggered() {
 
     const auto parameters = menu()->currentParameters(sender());
 
-    QnBusiness::EventType eventType = parameters.argument(Qn::EventTypeRole, QnBusiness::AnyBusinessEvent);
+    vms::event::EventType eventType = parameters.argument(Qn::EventTypeRole, vms::event::anyEvent);
     auto cameras = parameters.resources().filtered<QnVirtualCameraResource>();
     QSet<QnUuid> ids;
     for (auto camera: cameras)
         ids << camera->getId();
 
     // show diagnostics if Issues action was triggered
-    if (eventType != QnBusiness::AnyBusinessEvent || !ids.isEmpty())
+    if (eventType != vms::event::anyEvent || !ids.isEmpty())
     {
         businessEventsLogDialog()->disableUpdateData();
         businessEventsLogDialog()->setEventType(eventType);
-        businessEventsLogDialog()->setActionType(QnBusiness::DiagnosticsAction);
+        businessEventsLogDialog()->setActionType(vms::event::diagnosticsAction);
         auto now = QDateTime::currentMSecsSinceEpoch();
         businessEventsLogDialog()->setDateRange(now, now);
         businessEventsLogDialog()->setCameraList(ids);
@@ -1424,7 +1425,8 @@ void ActionHandler::at_thumbnailsSearchAction_triggered()
         item.uuid = QnUuid::createUuid();
         item.combinedGeometry = QRect(i % matrixWidth, i / matrixWidth, 1, 1);
         item.resource.id = resource->getId();
-        item.resource.uniqueId = resource->getUniqueId();
+        if (resource->hasFlags(Qn::local_media))
+            item.resource.uniqueId = resource->getUniqueId();
         item.contrastParams = widget->item()->imageEnhancement();
         item.dewarpingParams = widget->item()->dewarpingParams();
         item.rotation = widget->item()->rotation();
@@ -1483,7 +1485,7 @@ void ActionHandler::at_cameraIssuesAction_triggered()
 {
     menu()->trigger(action::OpenBusinessLogAction,
         menu()->currentParameters(sender())
-        .withArgument(Qn::EventTypeRole, QnBusiness::AnyCameraEvent));
+        .withArgument(Qn::EventTypeRole, vms::event::anyCameraEvent));
 }
 
 void ActionHandler::at_cameraBusinessRulesAction_triggered() {
@@ -1541,7 +1543,7 @@ void ActionHandler::at_serverLogsAction_triggered()
 void ActionHandler::at_serverIssuesAction_triggered()
 {
     menu()->trigger(action::OpenBusinessLogAction,
-        {Qn::EventTypeRole, QnBusiness::AnyServerEvent});
+        {Qn::EventTypeRole, vms::event::anyServerEvent});
 }
 
 void ActionHandler::at_pingAction_triggered()

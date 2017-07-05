@@ -19,8 +19,8 @@
 #include "core/resource_management/resource_pool.h"
 #include "core/resource/media_server_resource.h"
 #include "core/dataprovider/spush_media_stream_provider.h"
-#include <business/business_event_connector.h>
-#include <business/events/reasoned_business_event.h>
+#include <nx/mediaserver/event/event_connector.h>
+#include <nx/vms/event/events/reasoned_event.h>
 #include "plugins/storage/file_storage/file_storage_resource.h"
 #include "nx/streaming/media_data_packet.h"
 #include <media_server/serverutil.h>
@@ -78,9 +78,18 @@ QnServerStreamRecorder::QnServerStreamRecorder(
 
     connect(this, &QnStreamRecorder::recordingFinished, this, &QnServerStreamRecorder::at_recordingFinished);
 
-    connect(this, SIGNAL(motionDetected(QnResourcePtr, bool, qint64, QnConstAbstractDataPacketPtr)), qnBusinessRuleConnector, SLOT(at_motionDetected(const QnResourcePtr&, bool, qint64, QnConstAbstractDataPacketPtr)));
-    connect(this, SIGNAL(storageFailure(QnResourcePtr, qint64, QnBusiness::EventReason, QnResourcePtr)), qnBusinessRuleConnector, SLOT(at_storageFailure(const QnResourcePtr&, qint64, QnBusiness::EventReason, const QnResourcePtr&)));
-    connect(dev.data(), SIGNAL(propertyChanged(const QnResourcePtr &, const QString &)),          this, SLOT(at_camera_propertyChanged(const QnResourcePtr &, const QString &)));
+    connect(this, &QnServerStreamRecorder::motionDetected, qnEventRuleConnector,
+        &nx::mediaserver::event::EventConnector::at_motionDetected);
+
+    using storageFailureWithResource = void (nx::mediaserver::event::EventConnector::*)
+        (const QnResourcePtr&, qint64, nx::vms::event::EventReason, const QnResourcePtr&);
+
+    connect(this, &QnServerStreamRecorder::storageFailure, qnEventRuleConnector,
+        storageFailureWithResource(&nx::mediaserver::event::EventConnector::at_storageFailure));
+
+    connect(dev.data(), &QnResource::propertyChanged, this,
+        &QnServerStreamRecorder::at_camera_propertyChanged);
+
     at_camera_propertyChanged(m_device, QString());
 }
 
@@ -88,7 +97,6 @@ QnServerStreamRecorder::~QnServerStreamRecorder()
 {
     stop();
 }
-
 
 void QnServerStreamRecorder::at_camera_propertyChanged(const QnResourcePtr &, const QString & key)
 {
@@ -120,7 +128,7 @@ void QnServerStreamRecorder::at_recordingFinished(const StreamRecorderErrorStruc
                 emit storageFailure(
                     m_mediaServer,
                     qnSyncTime->currentUSecsSinceEpoch(),
-                    QnBusiness::StorageIoErrorReason ,
+                    nx::vms::event::EventReason::storageIoError,
                     status.storage
                 );
             m_diskErrorWarned = true;
@@ -215,11 +223,11 @@ bool QnServerStreamRecorder::cleanupQueueIfOverflow()
         emit storageFailure(
             m_mediaServer,
             qnSyncTime->currentUSecsSinceEpoch(),
-            QnBusiness::StorageTooSlowReason,
+            nx::vms::event::EventReason::storageTooSlow,
             m_recordingContextVector[slowestStorageIndex].storage
             );
     }
-    //emit storageFailure(m_mediaServer, qnSyncTime->currentUSecsSinceEpoch(), QnBusiness::StorageTooSlowReason, m_storage);
+    //emit storageFailure(m_mediaServer, qnSyncTime->currentUSecsSinceEpoch(), nx::vms::event::StorageTooSlowReason, m_storage);
 
     qWarning() << "HDD/SSD is slowing down recording for camera " << m_device->getUniqueId() << ". "<<m_dataQueue.size()<<" frames have been dropped!";
     markNeedKeyData();

@@ -44,7 +44,7 @@
 
     <?define mirrorListUrl = "${mirrorListUrl}"?>
     <?define quicksync = "${quicksync}"?>
-    <?define translation1 = "${translation1}"?>
+    <?define defaultTranslation = "${defaultTranslation}"?>
 
 
     <?if $(var.arch) = x86?>

@@ -1,10 +1,9 @@
 #pragma once
 
-#include <QtCore/QObject>
-
 #include <nx_ec/ec_api.h>
 
 #include <core/resource/resource_fwd.h>
+#include <core/resource_management/abstract_save_state_manager.h>
 
 #include <api/abstract_reply_processor.h>
 
@@ -25,10 +24,13 @@ class QnWorkbenchLayoutSnapshotManager;
  *
  * It also provides some functions for layout and snapshot manipulation.
  */
-class QnWorkbenchLayoutSnapshotManager: public Connective<QObject>, public QnWorkbenchContextAware {
-    Q_OBJECT;
-    typedef Connective<QObject> base_type;
+class QnWorkbenchLayoutSnapshotManager:
+    public QnAbstractSaveStateManager,
+    public QnWorkbenchContextAware
+{
+    Q_OBJECT
 
+    using base_type = QnAbstractSaveStateManager;
 public:
     QnWorkbenchLayoutSnapshotManager(QObject *parent = NULL);
     virtual ~QnWorkbenchLayoutSnapshotManager();
@@ -41,23 +43,20 @@ public:
     void store(const QnLayoutResourcePtr &resource);
     void restore(const QnLayoutResourcePtr &resource);
 
-    Qn::ResourceSavingFlags flags(const QnLayoutResourcePtr &resource) const;
-    Qn::ResourceSavingFlags flags(QnWorkbenchLayout *layout) const;
-    void setFlags(const QnLayoutResourcePtr &resource, Qn::ResourceSavingFlags flags);
+    SaveStateFlags flags(const QnLayoutResourcePtr &resource) const;
+    SaveStateFlags flags(QnWorkbenchLayout *layout) const;
+    void setFlags(const QnLayoutResourcePtr &resource, SaveStateFlags flags);
 
-    bool isChanged(const QnLayoutResourcePtr &resource) const;
-    bool isSaveable(const QnLayoutResourcePtr &resource) const;
-    bool isModified(const QnLayoutResourcePtr &resource) const;
-
+    bool isChanged(const QnLayoutResourcePtr& layout) const;
+    bool isSaveable(const QnLayoutResourcePtr& layout) const;
+    bool isModified(const QnLayoutResourcePtr& layout) const;
 
 signals:
-    void flagsChanged(const QnLayoutResourcePtr &resource);
+    void layoutFlagsChanged(const QnLayoutResourcePtr &resource);
 
-protected:
+private:
     void connectTo(const QnLayoutResourcePtr &resource);
     void disconnectFrom(const QnLayoutResourcePtr &resource);
-
-protected slots:
 
     void at_resourcePool_resourceAdded(const QnResourcePtr &resource);
     void at_resourcePool_resourceRemoved(const QnResourcePtr &resource);
@@ -70,7 +69,4 @@ private:
 
     /** Layout state storage that this object manages. */
     QnWorkbenchLayoutSnapshotStorage *m_storage;
-
-    /** Layout to flags mapping. */
-    QHash<QnLayoutResourcePtr, Qn::ResourceSavingFlags> m_flagsByLayout;
 };

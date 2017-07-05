@@ -135,7 +135,7 @@ void QnMergeSystemsDialog::updateKnownSystems()
 {
     ui->urlComboBox->clear();
 
-    for (const QnMediaServerResourcePtr& server: resourcePool()->getAllIncompatibleResources().filtered<QnMediaServerResource>())
+    for (const auto& server: resourcePool()->getAllIncompatibleResources())
     {
         QString url = server->getApiUrl().toString();
         QString label = QnResourceDisplayInfo(server).toString(qnSettings->extraInfoInTree());

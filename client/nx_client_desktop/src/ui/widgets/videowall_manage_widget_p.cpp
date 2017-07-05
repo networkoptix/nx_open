@@ -123,16 +123,20 @@ QPainterPath QnVideowallManageWidgetPrivate::BaseModelItem::bodyPath() const {
     return path;
 }
 
-int QnVideowallManageWidgetPrivate::BaseModelItem::fontSize() const {
+int QnVideowallManageWidgetPrivate::BaseModelItem::fontSize() const
+{
+    const auto dpi = qApp->devicePixelRatio();
     if (isPartOfScreen())
-        return baseFontSize * partScreenCoeff;
-    return baseFontSize;
+        return baseFontSize * partScreenCoeff * dpi;
+    return baseFontSize * dpi;
 }
 
-int QnVideowallManageWidgetPrivate::BaseModelItem::iconSize() const {
+int QnVideowallManageWidgetPrivate::BaseModelItem::iconSize() const
+{
+    const auto dpi = qApp->devicePixelRatio();
     if (isPartOfScreen())
-        return baseIconSize * partScreenCoeff;
-    return baseIconSize;
+        return baseIconSize * partScreenCoeff * dpi;
+    return baseIconSize * dpi;
 }
 
 void QnVideowallManageWidgetPrivate::BaseModelItem::paint(QPainter* painter, const TransformationProcess &process) const {
@@ -182,7 +186,8 @@ void QnVideowallManageWidgetPrivate::BaseModelItem::paint(QPainter* painter, con
             painter->drawRect(dilated(QRect(innerRect.left(), innerRect.top() + innerRect.height(), innerRect.width(), 0), transformationOffset));
         }
 #endif
-        paintPixmap(painter, body, qnSkin->pixmap("videowall_settings/move.png"));
+        paintPixmap(painter, body, qnSkin->pixmap("videowall_settings/move.png", QSize(),
+            Qt::KeepAspectRatio, Qt::FastTransformation, true));
         paintDeleteButton(painter);
 
         QPainterPath anchorPath;
@@ -303,7 +308,10 @@ void QnVideowallManageWidgetPrivate::FreeSpaceItem::paint(QPainter* painter, con
         return;
     base_type::paint(painter, process);
     if (!process.isRunning())
-        paintPixmap(painter, bodyRect(), qnSkin->pixmap("buttons/plus.png"));
+    {
+        paintPixmap(painter, bodyRect(), qnSkin->pixmap("buttons/plus.png", QSize(),
+            Qt::KeepAspectRatio, Qt::FastTransformation, true));
+    }
 }
 
 QColor QnVideowallManageWidgetPrivate::FreeSpaceItem::baseColor() const {
@@ -461,11 +469,20 @@ QnVideowallManageWidgetPrivate::QnVideowallManageWidgetPrivate(QnVideowallManage
     q_ptr(q)
 {
     QDesktopWidget* desktop = qApp->desktop();
-    for (int i = 0; i < desktop->screenCount(); ++i) {
-        ModelScreen screen(i, desktop->screenGeometry(i), q);
-        m_screens << screen;
+    for (int i = 0; i < desktop->screenCount(); ++i)
+    {
+        auto screen = desktop->screen(i);
+        NX_ASSERT(screen);
+        if (!screen)
+            continue;
 
-        m_unitedGeometry = m_unitedGeometry.united(screen.geometry);
+        auto rect = screen->geometry();
+        auto dpi = screen->devicePixelRatio();
+        rect.setWidth(rect.width() * dpi);
+        rect.setHeight(rect.height() * dpi);
+        m_unitedGeometry = m_unitedGeometry.united(rect);
+
+        m_screens.append({i, rect, q});
     }
 }
 
@@ -524,7 +541,19 @@ void QnVideowallManageWidgetPrivate::loadFromResource(const QnVideoWallResourceP
     QList<QRect> screens;
     QDesktopWidget* desktop = qApp->desktop();
     for (int i = 0; i < desktop->screenCount(); ++i)
-        screens << desktop->screenGeometry(i);
+    {
+        auto screen = desktop->screen(i);
+        NX_ASSERT(screen);
+        if (!screen)
+            continue;
+
+        auto rect = screen->geometry();
+        auto dpi = screen->devicePixelRatio();
+        rect.setWidth(rect.width() * dpi);
+        rect.setHeight(rect.height() * dpi);
+
+        screens << rect;
+    }
 
     QnUuid pcUuid = qnSettings->pcUuid();
 

@@ -1,9 +1,10 @@
 #include "popup_business_action_widget.h"
 #include "ui_popup_business_action_widget.h"
 
-#include <business/business_action_parameters.h>
-#include <nx/client/desktop/ui/actions/action_manager.h>
 #include <ui/workbench/workbench_context.h>
+
+#include <nx/client/desktop/ui/actions/action_manager.h>
+#include <nx/vms/event/action_parameters.h>
 
 using namespace nx::client::desktop::ui;
 

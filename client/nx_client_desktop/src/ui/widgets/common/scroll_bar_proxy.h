@@ -4,9 +4,10 @@
 
 class QAbstractScrollArea;
 
-class QnScrollBarProxy : public QScrollBar
+class QnScrollBarProxy: public QScrollBar
 {
-    typedef QScrollBar base_type;
+    Q_OBJECT
+    using base_type = QScrollBar;
 
 public:
     QnScrollBarProxy(QWidget* parent = nullptr);

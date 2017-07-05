@@ -4,7 +4,9 @@
 
 #include <ui/widgets/business/abstract_business_params_widget.h>
 
+namespace nx { namespace vms { namespace event {
 class QnBusinessStringsHelper;
+}}} // namespace nx::vms::event
 
 class QnSubjectTargetActionWidget: public QnAbstractBusinessParamsWidget
 {
@@ -16,9 +18,9 @@ public:
     virtual ~QnSubjectTargetActionWidget() override;
 
 protected:
-    virtual void at_model_dataChanged(QnBusiness::Fields fields) override;
+    virtual void at_model_dataChanged(Fields fields) override;
 
-    //TODO: #vkutin #3.2 Refactor this along with all event/action widgets.
+    // TODO: #vkutin #3.2 Refactor this along with all event/action widgets.
     void setSubjectsButton(QPushButton* button);
 
 private:
@@ -27,5 +29,5 @@ private:
 
 private:
     QPushButton* m_subjectsButton = nullptr;
-    QScopedPointer<QnBusinessStringsHelper> m_helper;
+    QScopedPointer<nx::vms::event::StringsHelper> m_helper;
 };

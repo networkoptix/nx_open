@@ -11,7 +11,7 @@ namespace ui {
 // Proxy model that can be used to add/remove/rearrange columns in the source model.
 // Data for added columns must be handled in subclasses (override flags(), data(), setData()).
 // Model's inherited from QSortFilterProxyModel but cannot be used for rows sorting/filtering.
-//TODO: #vkutin Inherit from QAbstractProxyModel and handle all source model signals.
+// TODO: #vkutin Inherit from QAbstractProxyModel and handle all source model signals.
 class ColumnRemapProxyModel: public QSortFilterProxyModel
 {
     Q_OBJECT

@@ -115,7 +115,7 @@ QnStartupParameters QnStartupParameters::fromCommandLineArg(int argc, char** arg
     NX_EXPECT(!unparsed.empty());
     for (int i = 1; i < unparsed.size(); ++i)
     {
-        QByteArray source = unparsed[i].toUtf8(); //< String was created using ::fromUtf8 conversion
+        const auto source = unparsed[i].toUtf8(); //< String was created using ::fromUtf8 conversion
         QString fileName = QFile::decodeName(source);
         result.files.append(fromNativePath(fileName));
     }

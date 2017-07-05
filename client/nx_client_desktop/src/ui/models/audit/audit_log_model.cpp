@@ -6,7 +6,7 @@
 
 #include "api/common_message_processor.h"
 
-#include "business/business_strings_helper.h"
+#include <nx/vms/event/strings_helper.h>
 
 #include <client_core/client_core_module.h>
 
@@ -33,7 +33,9 @@
 #include <utils/common/qtimespan.h>
 #include <utils/math/math.h>
 
-typedef QnBusinessActionData* QnLightBusinessActionP;
+using namespace nx;
+
+typedef vms::event::ActionData* QnLightBusinessActionP;
 
 const QByteArray QnAuditLogModel::ChildCntParamName("childCnt");
 const QByteArray QnAuditLogModel::CheckedParamName("checked");
@@ -484,7 +486,7 @@ QString QnAuditLogModel::htmlData(const Column& column, const QnAuditRecord* dat
 }
 
 QString QnAuditLogModel::makeSearchPattern(const QnAuditRecord* record) const {
-    //TODO: #vkutin Do we really want TimestampColumn, EndTimestampColumn, DurationColumn here?
+    // TODO: #vkutin Do we really want TimestampColumn, EndTimestampColumn, DurationColumn here?
     Column columnsToFilter[] =
     {
         TimestampColumn,

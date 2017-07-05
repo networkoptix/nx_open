@@ -138,7 +138,7 @@ void QnMediaServerUpdateTool::setTargets(const QSet<QnUuid> &targets, bool clien
     m_enableClientUpdates = client;
 
     foreach (const QnUuid &id, targets) {
-        QnMediaServerResourcePtr server = resourcePool()->getIncompatibleResourceById(id, true).dynamicCast<QnMediaServerResource>();
+        auto server = resourcePool()->getIncompatibleResourceById(id, true);
         if (!server)
             continue;
 
@@ -152,17 +152,13 @@ QnMediaServerResourceList QnMediaServerUpdateTool::actualTargets() const {
     if (!m_targets.isEmpty())
         return m_targets;
 
-    QnMediaServerResourceList result;
-    foreach (const QnMediaServerResourcePtr &server, resourcePool()->getResourcesWithFlag(Qn::server).filtered<QnMediaServerResource>()) {
-        if (server->getStatus() == Qn::Online)
-            result.append(server);
-    }
+    auto result = resourcePool()->getAllServers(Qn::Online);
 
-    foreach (const QnMediaServerResourcePtr &server, resourcePool()->getAllIncompatibleResources().filtered<QnMediaServerResource>())
+    for (const auto& server: resourcePool()->getAllIncompatibleResources())
     {
-        if (helpers::serverBelongsToCurrentSystem(server) &&
-            server.dynamicCast<QnFakeMediaServerResource>())
+        if (helpers::serverBelongsToCurrentSystem(server))
         {
+            NX_EXPECT(server.dynamicCast<QnFakeMediaServerResource>());
             result.append(server);
         }
     }

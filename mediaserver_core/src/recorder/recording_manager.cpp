@@ -21,9 +21,9 @@
 #include <nx/utils/log/log.h>
 #include "utils/common/synctime.h"
 #include "plugins/storage/dts/abstract_dts_reader_factory.h"
-#include <business/business_event_rule.h>
-#include <business/business_rule_processor.h>
-#include <business/business_event_connector.h>
+#include <nx/vms/event/rule.h>
+#include <nx/mediaserver/event/rule_processor.h>
+#include <nx/mediaserver/event/event_connector.h>
 #include <media_server/serverutil.h>
 #include "licensing/license.h"
 #include "mutex/camera_data_handler.h"
@@ -61,7 +61,7 @@ QnRecordingManager::QnRecordingManager(
 {
     m_tooManyRecordingCnt = 0;
     m_licenseMutex = nullptr;
-    connect(this, &QnRecordingManager::recordingDisabled, qnBusinessRuleConnector, &QnBusinessEventConnector::at_licenseIssueEvent);
+    connect(this, &QnRecordingManager::recordingDisabled, qnEventRuleConnector, &nx::mediaserver::event::EventConnector::at_licenseIssueEvent);
     m_recordingStopTime = qMin(LICENSE_RECORDING_STOP_TIME, qnServerModule->roSettings()->value("forceStopRecordingTime", LICENSE_RECORDING_STOP_TIME).toLongLong());
     m_recordingStopTime *= 1000 * 60;
 
@@ -657,7 +657,7 @@ void QnRecordingManager::at_licenseMutexLocked()
     if (!disabledCameras.isEmpty()) {
         QnResourcePtr resource = resourcePool()->getResourceById(commonModule()->moduleGUID());
         //TODO: #gdm move (de)serializing of encoded reason params to common place
-        emit recordingDisabled(resource, qnSyncTime->currentUSecsSinceEpoch(), QnBusiness::LicenseRemoved, disabledCameras.join(L';'));
+        emit recordingDisabled(resource, qnSyncTime->currentUSecsSinceEpoch(), nx::vms::event::EventReason::licenseRemoved, disabledCameras.join(L';'));
     }
 }
 

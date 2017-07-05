@@ -58,7 +58,7 @@ void QnSwitchItemDelegate::initStyleOption(QStyleOptionViewItem* option, const Q
 {
     base_type::initStyleOption(option, index);
 
-    //TODO: #vkutin #common Refactor this role
+    // TODO: #vkutin #common Refactor this role
     if (index.data(Qn::DisabledRole).toBool())
         option->state &= ~QStyle::State_Enabled;
 

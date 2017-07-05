@@ -157,7 +157,7 @@ void QnCameraMotionMaskWidget::setCamera(const QnResourcePtr& resource)
     if (m_camera)
     {
         /* Add single item to the layout. */
-        QnWorkbenchItem *item = new QnWorkbenchItem(resource->getUniqueId(), QnUuid::createUuid(), this);
+        QnWorkbenchItem* item = new QnWorkbenchItem(resource, QnUuid::createUuid(), this);
         item->setPinned(true);
         item->setGeometry(QRect(0, 0, 1, 1));
         item->setRotation(0);

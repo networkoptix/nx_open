@@ -32,79 +32,85 @@ QnWorkbenchLayoutSnapshotManager::QnWorkbenchLayoutSnapshotManager(QObject *pare
     m_storage(new QnWorkbenchLayoutSnapshotStorage(this))
 {
     /* Start listening to changes. */
-    connect(resourcePool(),  &QnResourcePool::resourceRemoved, this,   &QnWorkbenchLayoutSnapshotManager::at_resourcePool_resourceRemoved);
-    connect(resourcePool(),  &QnResourcePool::resourceAdded,   this,   &QnWorkbenchLayoutSnapshotManager::at_resourcePool_resourceAdded);
+    connect(resourcePool(), &QnResourcePool::resourceRemoved, this,
+        &QnWorkbenchLayoutSnapshotManager::at_resourcePool_resourceRemoved);
+    connect(resourcePool(), &QnResourcePool::resourceAdded, this,
+        &QnWorkbenchLayoutSnapshotManager::at_resourcePool_resourceAdded);
 
-    for(const QnLayoutResourcePtr &layout: resourcePool()->getResources<QnLayoutResource>())
+    for (const QnLayoutResourcePtr &layout : resourcePool()->getResources<QnLayoutResource>())
         at_resourcePool_resourceAdded(layout);
+
+    connect(this, &QnAbstractSaveStateManager::flagsChanged, this,
+        [this](const QnUuid& id, SaveStateFlags /*flags*/)
+        {
+            if (const auto layout = resourcePool()->getResourceById<QnLayoutResource>(id))
+                emit layoutFlagsChanged(layout);
+        });
 }
 
 QnWorkbenchLayoutSnapshotManager::~QnWorkbenchLayoutSnapshotManager()
-{}
+{
+}
 
-Qn::ResourceSavingFlags QnWorkbenchLayoutSnapshotManager::flags(
+QnAbstractSaveStateManager::SaveStateFlags QnWorkbenchLayoutSnapshotManager::flags(
     const QnLayoutResourcePtr& layout) const
 {
     NX_EXPECT(layout);
-
-    const auto pos = m_flagsByLayout.find(layout);
-    if (pos == m_flagsByLayout.end())
-        return Qn::ResourceSavingFlags();
-
-    return *pos;
+    if (!layout)
+        return SaveStateFlags();
+    return base_type::flags(layout->getId());
 }
 
-Qn::ResourceSavingFlags QnWorkbenchLayoutSnapshotManager::flags(QnWorkbenchLayout* layout) const
+QnAbstractSaveStateManager::SaveStateFlags QnWorkbenchLayoutSnapshotManager::flags(
+    QnWorkbenchLayout* layout) const
 {
-    NX_EXPECT(layout);
+    NX_EXPECT(layout); //< Layout resource can be null.
     if (!layout || !layout->resource())
-        return Qn::ResourceSavingFlags();
+        return SaveStateFlags();
 
     return flags(layout->resource());
 }
 
 void QnWorkbenchLayoutSnapshotManager::setFlags(const QnLayoutResourcePtr& layout,
-    Qn::ResourceSavingFlags flags)
+    SaveStateFlags flags)
 {
     NX_EXPECT(layout && layout->resourcePool(),
         "Could not set flags to resource which is not in pool");
 
-    NX_EXPECT(!flags.testFlag(Qn::ResourceIsBeingSaved)
+    if (!layout)
+        return;
+
+    NX_EXPECT(!flags.testFlag(IsBeingSaved)
         || accessController()->hasPermissions(layout, Qn::SavePermission),
         "Saving unsaveable resource");
 
-    if (m_flagsByLayout.value(layout) == flags)
-        return;
-
-    m_flagsByLayout[layout] = flags;
-
-    emit flagsChanged(layout);
+    base_type::setFlags(layout->getId(), flags);
 }
 
 bool QnWorkbenchLayoutSnapshotManager::isChanged(const QnLayoutResourcePtr &layout) const
 {
-    return flags(layout).testFlag(Qn::ResourceIsChanged);
+    return base_type::isChanged(layout->getId());
 }
 
 bool QnWorkbenchLayoutSnapshotManager::isSaveable(const QnLayoutResourcePtr &layout) const
 {
-    Qn::ResourceSavingFlags flags = this->flags(layout);
-    if (flags.testFlag(Qn::ResourceIsBeingSaved))
-        return false;
-
     if (layout->hasFlags(Qn::local))
         return true;
 
-    return flags.testFlag(Qn::ResourceIsChanged);
+    return base_type::isSaveable(layout->getId());
 }
 
-bool QnWorkbenchLayoutSnapshotManager::isModified(const QnLayoutResourcePtr &resource) const
+bool QnWorkbenchLayoutSnapshotManager::isModified(const QnLayoutResourcePtr &layout) const
 {
-    return (flags(resource) & (Qn::ResourceIsChanged | Qn::ResourceIsBeingSaved)) == Qn::ResourceIsChanged; /* Changed and not being saved. */
+    /* Changed and not being saved. */
+    return base_type::isSaveable(layout->getId());
 }
 
 bool QnWorkbenchLayoutSnapshotManager::save(const QnLayoutResourcePtr &layout, SaveLayoutResultFunction callback)
 {
+    NX_EXPECT(accessController()->hasPermissions(layout, Qn::SavePermission),
+        "Saving unsaveable resource");
+
     if (commonModule()->isReadOnly())
         return false;
 
@@ -120,24 +126,25 @@ bool QnWorkbenchLayoutSnapshotManager::save(const QnLayoutResourcePtr &layout, S
     ec2::fromResourceToApi(layout, apiLayout);
 
     int reqID = commonModule()->ec2Connection()->getLayoutManager(Qn::kSystemAccess)->save(
-        apiLayout, this, [this, layout, callback](int reqID, ec2::ErrorCode errorCode)
-    {
-        Q_UNUSED(reqID);
-
-        setFlags(layout, flags(layout) & ~Qn::ResourceIsBeingSaved);
-
-        /* Check if all OK */
-        bool success = errorCode == ec2::ErrorCode::ok;
-        if (success)
+        apiLayout, this, [this, layout, callback](int /*reqID*/, ec2::ErrorCode errorCode)
         {
-            m_storage->store(layout);
-            setFlags(layout, 0); /* Not local, not being saved, not changed. */
-        }
+        markBeingSaved(layout->getId(), false);
 
-        if (callback)
-            callback(success, layout);
-    });
-    return reqID > 0;
+            /* Check if all OK */
+            bool success = errorCode == ec2::ErrorCode::ok;
+            if (success)
+            {
+                m_storage->store(layout);
+                clean(layout->getId()); //< Not changed, not being saved.
+            }
+
+            if (callback)
+                callback(success, layout);
+        });
+    bool success = reqID > 0;
+    if (success)
+        markBeingSaved(layout->getId(), true);
+    return success;
 }
 
 QnWorkbenchLayoutSnapshot QnWorkbenchLayoutSnapshotManager::snapshot(const QnLayoutResourcePtr &layout) const
@@ -150,7 +157,8 @@ QnWorkbenchLayoutSnapshot QnWorkbenchLayoutSnapshotManager::snapshot(const QnLay
 
 void QnWorkbenchLayoutSnapshotManager::store(const QnLayoutResourcePtr &resource)
 {
-    if(!resource) {
+    if (!resource)
+    {
         qnNullWarning(resource);
         return;
     }
@@ -158,16 +166,15 @@ void QnWorkbenchLayoutSnapshotManager::store(const QnLayoutResourcePtr &resource
     /* We don't want to get queued layout change signals that are not yet delivered,
      * so there are no options but to disconnect. */
     disconnectFrom(resource);
-    {
-        m_storage->store(resource);
-    }
+    m_storage->store(resource);
     connectTo(resource);
-
-    setFlags(resource, flags(resource) & ~Qn::ResourceIsChanged);
+    markChanged(resource->getId(), false);
 }
 
-void QnWorkbenchLayoutSnapshotManager::restore(const QnLayoutResourcePtr &resource) {
-    if(!resource) {
+void QnWorkbenchLayoutSnapshotManager::restore(const QnLayoutResourcePtr &resource)
+{
+    if (!resource)
+    {
         qnNullWarning(resource);
         return;
     }
@@ -188,32 +195,34 @@ void QnWorkbenchLayoutSnapshotManager::restore(const QnLayoutResourcePtr &resour
     }
     connectTo(resource);
 
-    if(QnWorkbenchLayoutSynchronizer *synchronizer = QnWorkbenchLayoutSynchronizer::instance(resource))
+    if (QnWorkbenchLayoutSynchronizer *synchronizer = QnWorkbenchLayoutSynchronizer::instance(resource))
         synchronizer->reset();
 
-    setFlags(resource, flags(resource) & ~Qn::ResourceIsChanged);
+    markChanged(resource->getId(), false);
 }
 
-void QnWorkbenchLayoutSnapshotManager::connectTo(const QnLayoutResourcePtr &resource) {
-    connect(resource,  &QnResource::nameChanged,                    this,   &QnWorkbenchLayoutSnapshotManager::at_resource_changed);
-    connect(resource,  &QnResource::parentIdChanged,                this,   &QnWorkbenchLayoutSnapshotManager::at_resource_changed);
-    connect(resource,  &QnLayoutResource::itemAdded,                this,   &QnWorkbenchLayoutSnapshotManager::at_layout_changed);
-    connect(resource,  &QnLayoutResource::itemRemoved,              this,   &QnWorkbenchLayoutSnapshotManager::at_layout_changed);
-    connect(resource,  &QnLayoutResource::lockedChanged,            this,   &QnWorkbenchLayoutSnapshotManager::at_layout_changed);
-    connect(resource,  &QnLayoutResource::cellAspectRatioChanged,   this,   &QnWorkbenchLayoutSnapshotManager::at_layout_changed);
-    connect(resource,  &QnLayoutResource::cellSpacingChanged,       this,   &QnWorkbenchLayoutSnapshotManager::at_layout_changed);
-    connect(resource,  &QnLayoutResource::backgroundImageChanged,   this,   &QnWorkbenchLayoutSnapshotManager::at_layout_changed);
-    connect(resource,  &QnLayoutResource::backgroundSizeChanged,    this,   &QnWorkbenchLayoutSnapshotManager::at_layout_changed);
-    connect(resource,  &QnLayoutResource::backgroundOpacityChanged, this,   &QnWorkbenchLayoutSnapshotManager::at_layout_changed);
+void QnWorkbenchLayoutSnapshotManager::connectTo(const QnLayoutResourcePtr &resource)
+{
+    connect(resource, &QnResource::nameChanged, this, &QnWorkbenchLayoutSnapshotManager::at_resource_changed);
+    connect(resource, &QnResource::parentIdChanged, this, &QnWorkbenchLayoutSnapshotManager::at_resource_changed);
+    connect(resource, &QnLayoutResource::itemAdded, this, &QnWorkbenchLayoutSnapshotManager::at_layout_changed);
+    connect(resource, &QnLayoutResource::itemRemoved, this, &QnWorkbenchLayoutSnapshotManager::at_layout_changed);
+    connect(resource, &QnLayoutResource::lockedChanged, this, &QnWorkbenchLayoutSnapshotManager::at_layout_changed);
+    connect(resource, &QnLayoutResource::cellAspectRatioChanged, this, &QnWorkbenchLayoutSnapshotManager::at_layout_changed);
+    connect(resource, &QnLayoutResource::cellSpacingChanged, this, &QnWorkbenchLayoutSnapshotManager::at_layout_changed);
+    connect(resource, &QnLayoutResource::backgroundImageChanged, this, &QnWorkbenchLayoutSnapshotManager::at_layout_changed);
+    connect(resource, &QnLayoutResource::backgroundSizeChanged, this, &QnWorkbenchLayoutSnapshotManager::at_layout_changed);
+    connect(resource, &QnLayoutResource::backgroundOpacityChanged, this, &QnWorkbenchLayoutSnapshotManager::at_layout_changed);
 
     /* This one is handled separately because it should not lead to marking layout as modified if layout is not opened right now. */
-    connect(resource,  &QnLayoutResource::itemChanged,              this,   &QnWorkbenchLayoutSnapshotManager::at_layout_itemChanged);
+    connect(resource, &QnLayoutResource::itemChanged, this, &QnWorkbenchLayoutSnapshotManager::at_layout_itemChanged);
 
-    connect(resource,  &QnLayoutResource::storeRequested,           this,   &QnWorkbenchLayoutSnapshotManager::store);
+    connect(resource, &QnLayoutResource::storeRequested, this, &QnWorkbenchLayoutSnapshotManager::store);
 }
 
-void QnWorkbenchLayoutSnapshotManager::disconnectFrom(const QnLayoutResourcePtr &resource) {
-    disconnect(resource, NULL, this, NULL);
+void QnWorkbenchLayoutSnapshotManager::disconnectFrom(const QnLayoutResourcePtr &resource)
+{
+    resource->disconnect(this);
 }
 
 // -------------------------------------------------------------------------- //
@@ -228,7 +237,7 @@ void QnWorkbenchLayoutSnapshotManager::at_resourcePool_resourceAdded(const QnRes
     /* Consider it saved by default. */
     m_storage->store(layoutResource);
 
-    setFlags(layoutResource, Qn::ResourceSavingFlags());
+    clean(layoutResource->getId()); //< Not changed, not being saved.
 
     /* Subscribe to changes to track changed status. */
     connectTo(layoutResource);
@@ -236,19 +245,17 @@ void QnWorkbenchLayoutSnapshotManager::at_resourcePool_resourceAdded(const QnRes
 
 void QnWorkbenchLayoutSnapshotManager::at_resourcePool_resourceRemoved(const QnResourcePtr &resource)
 {
-    QnLayoutResourcePtr layoutResource = resource.dynamicCast<QnLayoutResource>();
-    if (!layoutResource)
-        return;
-
-    m_storage->remove(layoutResource);
-    m_flagsByLayout.remove(layoutResource);
-
-    disconnectFrom(layoutResource);
+    if (const auto layout = resource.dynamicCast<QnLayoutResource>())
+    {
+        m_storage->remove(layout);
+        clean(layout->getId());
+        disconnectFrom(layout);
+    }
 }
 
-void QnWorkbenchLayoutSnapshotManager::at_layout_changed(const QnLayoutResourcePtr &resource)
+void QnWorkbenchLayoutSnapshotManager::at_layout_changed(const QnLayoutResourcePtr& layout)
 {
-    setFlags(resource, flags(resource) | Qn::ResourceIsChanged);
+    markChanged(layout->getId(), true);
 }
 
 void QnWorkbenchLayoutSnapshotManager::at_resource_changed(const QnResourcePtr &resource)
