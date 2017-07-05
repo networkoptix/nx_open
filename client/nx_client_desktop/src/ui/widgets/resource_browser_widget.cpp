@@ -136,6 +136,8 @@ QnResourceBrowserWidget::QnResourceBrowserWidget(QWidget* parent, QnWorkbenchCon
     ui->resourceTreeWidget->setCheckboxesVisible(false);
     ui->resourceTreeWidget->setGraphicsTweaks(Qn::HideLastRow | Qn::BypassGraphicsProxy);
     ui->resourceTreeWidget->setEditingEnabled();
+
+#ifdef _TREE_SEARCH_32
     ui->resourceTreeWidget->setFilterVisible();
 
     auto getFilteredResources =
@@ -176,20 +178,20 @@ QnResourceBrowserWidget::QnResourceBrowserWidget(QWidget* parent, QnWorkbenchCon
             return result;
         };
 
-
     connect(ui->resourceTreeWidget, &QnResourceTreeWidget::filterEnterPressed, this,
         [this, getFilteredResources]
         {
             auto selected = getFilteredResources();
             menu()->trigger(action::OpenInCurrentLayoutAction, {selected});
-
         });
+
     connect(ui->resourceTreeWidget, &QnResourceTreeWidget::filterCtrlEnterPressed, this,
         [this, getFilteredResources]
         {
             auto selected = getFilteredResources();
             menu()->trigger(action::OpenInNewTabAction, {selected});
         });
+#endif
 
     ui->searchTreeWidget->setCheckboxesVisible(false);
 

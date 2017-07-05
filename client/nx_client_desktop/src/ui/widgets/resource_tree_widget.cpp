@@ -142,11 +142,7 @@ QnResourceTreeWidget::QnResourceTreeWidget(QWidget *parent):
 {
     ui->setupUi(this);
 
-    // TODO: #vkutin replace with SearchLineEdit
-    ui->filterLineEdit->addAction(qnSkin->icon("theme/input_search.png"),
-        QLineEdit::LeadingPosition);
-    ui->filterLineEdit->setClearButtonEnabled(true);
-    ui->filter->setVisible(false);
+    initializeFilter();
 
     m_itemDelegate = new QnResourceItemDelegate(this);
     m_itemDelegate->setFixedHeight(0); // automatic height
@@ -171,29 +167,6 @@ QnResourceTreeWidget::QnResourceTreeWidget(QWidget *parent):
         &QnResourceTreeWidget::at_treeView_spacePressed);
     connect(ui->resourcesTreeView, &QnTreeView::clicked, this,
         &QnResourceTreeWidget::at_treeView_clicked);
-
-    connect(ui->filterLineEdit, &QLineEdit::textChanged, this,
-        &QnResourceTreeWidget::updateFilter);
-    connect(ui->filterLineEdit, &QLineEdit::editingFinished, this,
-        &QnResourceTreeWidget::updateFilter);
-
-    installEventHandler(ui->filterLineEdit, QEvent::KeyPress, this,
-        [this](QObject* /*object*/, QEvent* event)
-        {
-            QKeyEvent* keyEvent = static_cast<QKeyEvent*>(event);
-            switch (keyEvent->key())
-            {
-                case Qt::Key_Enter:
-                case Qt::Key_Return:
-                    if (keyEvent->modifiers().testFlag(Qt::ControlModifier))
-                        emit filterCtrlEnterPressed();
-                    else
-                        emit filterEnterPressed();
-                    break;
-                default:
-                    break;
-            }
-        });
 
     ui->resourcesTreeView->installEventFilter(this);
 }
@@ -585,6 +558,38 @@ void QnResourceTreeWidget::at_resourceProxyModel_rowsInserted(const QModelIndex 
     }
 
     at_resourceProxyModel_rowsInserted(index, 0, m_resourceProxyModel->rowCount(index) - 1);
+}
+
+void QnResourceTreeWidget::initializeFilter()
+{
+    // TODO: #vkutin replace with SearchLineEdit
+    ui->filterLineEdit->addAction(qnSkin->icon("theme/input_search.png"),
+        QLineEdit::LeadingPosition);
+    ui->filterLineEdit->setClearButtonEnabled(true);
+    ui->filter->setVisible(false);
+
+    connect(ui->filterLineEdit, &QLineEdit::textChanged, this,
+        &QnResourceTreeWidget::updateFilter);
+    connect(ui->filterLineEdit, &QLineEdit::editingFinished, this,
+        &QnResourceTreeWidget::updateFilter);
+
+    installEventHandler(ui->filterLineEdit, QEvent::KeyPress, this,
+        [this](QObject* /*object*/, QEvent* event)
+        {
+            QKeyEvent* keyEvent = static_cast<QKeyEvent*>(event);
+            switch (keyEvent->key())
+            {
+                case Qt::Key_Enter:
+                case Qt::Key_Return:
+                    if (keyEvent->modifiers().testFlag(Qt::ControlModifier))
+                        emit filterCtrlEnterPressed();
+                    else
+                        emit filterEnterPressed();
+                    break;
+                default:
+                    break;
+            }
+        });
 }
 
 void QnResourceTreeWidget::update(const QnResourcePtr& resource)
