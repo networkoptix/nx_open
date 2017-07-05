@@ -27,7 +27,7 @@ public:
 private:
     QWidget* createWidget(QPushButton* nextButton);
 
-    static QStringList reasons();
+    static const QStringList reasons();
 
 private:
     license::RequestInfo m_info;

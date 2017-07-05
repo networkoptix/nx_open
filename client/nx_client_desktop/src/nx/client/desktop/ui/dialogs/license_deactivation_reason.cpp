@@ -162,7 +162,7 @@ QWidget* LicenseDeactivationReason::createWidget(QPushButton* nextButton)
     return widget;
 }
 
-QStringList LicenseDeactivationReason::reasons()
+const QStringList LicenseDeactivationReason::reasons()
 {
     static const auto kReasons = {
         tr("- Choose one -"),
@@ -170,7 +170,7 @@ QStringList LicenseDeactivationReason::reasons()
         tr("I'm accidentally assigned the license to a wrong machine"),
         tr("Other Reason")};
 
-    return {kReasons};
+    return kReasons;
 }
 
 license::RequestInfo LicenseDeactivationReason::info()
