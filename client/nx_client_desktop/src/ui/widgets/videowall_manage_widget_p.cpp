@@ -125,18 +125,18 @@ QPainterPath QnVideowallManageWidgetPrivate::BaseModelItem::bodyPath() const {
 
 int QnVideowallManageWidgetPrivate::BaseModelItem::fontSize() const
 {
-    const auto dpi = qApp->devicePixelRatio();
+    const auto dpr = qApp->devicePixelRatio();
     if (isPartOfScreen())
-        return baseFontSize * partScreenCoeff * dpi;
-    return baseFontSize * dpi;
+        return baseFontSize * partScreenCoeff * dpr;
+    return baseFontSize * dpr;
 }
 
 int QnVideowallManageWidgetPrivate::BaseModelItem::iconSize() const
 {
-    const auto dpi = qApp->devicePixelRatio();
+    const auto dpr = qApp->devicePixelRatio();
     if (isPartOfScreen())
-        return baseIconSize * partScreenCoeff * dpi;
-    return baseIconSize * dpi;
+        return baseIconSize * partScreenCoeff * dpr;
+    return baseIconSize * dpr;
 }
 
 void QnVideowallManageWidgetPrivate::BaseModelItem::paint(QPainter* painter, const TransformationProcess &process) const {
@@ -477,9 +477,8 @@ QnVideowallManageWidgetPrivate::QnVideowallManageWidgetPrivate(QnVideowallManage
             continue;
 
         auto rect = screen->geometry();
-        auto dpi = screen->devicePixelRatio();
-        rect.setWidth(rect.width() * dpi);
-        rect.setHeight(rect.height() * dpi);
+        auto dpr = screen->devicePixelRatio();
+        rect.setSize(rect.size() * dpr);
         m_unitedGeometry = m_unitedGeometry.united(rect);
 
         m_screens.append({i, rect, q});
@@ -548,9 +547,8 @@ void QnVideowallManageWidgetPrivate::loadFromResource(const QnVideoWallResourceP
             continue;
 
         auto rect = screen->geometry();
-        auto dpi = screen->devicePixelRatio();
-        rect.setWidth(rect.width() * dpi);
-        rect.setHeight(rect.height() * dpi);
+        auto dpr = screen->devicePixelRatio();
+        rect.setSize(rect.size() * dpr);
 
         screens << rect;
     }
