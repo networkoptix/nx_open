@@ -131,10 +131,6 @@ angular.module('nxCommon')
 
                     timelineActions.updateState();
                     timelineRender.Draw( mouseXOverTimeline, mouseYOverTimeline, timelineActions.scrollingNow, timelineActions.catchScrollBar);
-
-                    if(scope.loading){
-                        scope.loading = false;
-                    }
                 }
 
 
@@ -435,10 +431,11 @@ angular.module('nxCommon')
                 }
                 scope.$watch('recordsProvider',function(){ // RecordsProvider was changed - means new camera was selected
                     if(scope.recordsProvider) {
+                        scope.loading = true;
                         scope.recordsProvider.ready.then(initTimeline);// reinit timeline here
                         scope.recordsProvider.archiveReadyPromise.then(function(hasArchive){
                             scope.emptyArchive = !hasArchive;
-                            scope.loading = hasArchive;
+                            scope.loading = false;
                         });
 
                         timelineRender.setRecordsProvider(scope.recordsProvider);
