@@ -178,17 +178,17 @@ QSharedPointer<CLVideoDecoderOutput> QnGetImageHelper::getImage(const QnSecurity
     if (dstSize.height() < 1)
         dstSize.setHeight(360); //on edge instead of full-size image we return 360p
 #endif
-
-    //if requested size is less than 128 in any dimension then upscaling to 128
-    if( dstSize.height() < 128 && dstSize.height() > 0 )
+    static constexpr int kMinSize = QnThumbnailRequestData::kMinimumSize;
+    //if requested size is less than kMinSize in any dimension then upscaling to kMinSize
+    if( dstSize.height() < kMinSize && dstSize.height() > 0 )
     {
-        dstSize.setWidth( dstSize.width() * 128 / dstSize.height() );
-        dstSize.setHeight( 128 );
+        dstSize.setWidth( dstSize.width() * kMinSize / dstSize.height() );
+        dstSize.setHeight(kMinSize);
     }
-    if( dstSize.width() < 128 && dstSize.width() > 0 )
+    if( dstSize.width() < kMinSize && dstSize.width() > 0 )
     {
-        dstSize.setWidth( 128 );
-        dstSize.setHeight( dstSize.height() * 128 / dstSize.width() );
+        dstSize.setWidth(kMinSize);
+        dstSize.setHeight( dstSize.height() * kMinSize / dstSize.width() );
     }
 
     bool useHQ = true;

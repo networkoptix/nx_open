@@ -38,7 +38,7 @@ struct QnThumbnailRequestData: public QnMultiserverRequestData
 
     static const qint64 kLatestThumbnail = -1;
     static const int kDefaultRotation = -1;
-    static const int kMinimumSize = 128;
+    static const int kMinimumSize = 32;
 
     /** Target camera. */
     QnVirtualCameraResourcePtr camera;
