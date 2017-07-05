@@ -334,15 +334,19 @@ function CameraRecordsProvider(cameras, mediaserver, $q, width) {
     this.archiveReadyPromise = archiveReadyDefer.promise;
     this.lastRequested = timeManager.nowToServer(); // lastrequested is always servertime
     this.requestInterval(0, this.lastRequested + 10000, 0).then(function () {
-        archiveReadyDefer.resolve(!!self.chunksTree);
         if(!self.chunksTree){
+            archiveReadyDefer.resolve(false);
             return; //No chunks for this camera
         }
 
         // Depends on this interval - choose minimum interval, which contains all records and request deeper detailization
         var nextLevel = RulerModel.getLevelIndex(timeManager.nowToDisplay() - self.chunksTree.start,width);
         if(nextLevel<RulerModel.levels.length-1) {
-            self.requestInterval(timeManager.displayToServer(self.chunksTree.start), timeManager.nowToServer(), nextLevel + 1);
+            self.requestInterval(timeManager.displayToServer(self.chunksTree.start),
+                                 timeManager.nowToServer(),
+                                 nextLevel + 1).then(function(){
+                                    archiveReadyDefer.resolve(true);
+                                 });
         }
     });
 
