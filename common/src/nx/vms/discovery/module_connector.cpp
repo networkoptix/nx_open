@@ -3,6 +3,7 @@
 #include <nx/utils/log/log.h>
 #include <rest/server/json_rest_result.h>
 #include <nx/network/socket_global.h>
+#include <nx/utils/app_info.h>
 
 namespace nx {
 namespace vms {
@@ -11,15 +12,13 @@ namespace discovery {
 static const auto kUrl =
     lit("http://%1/api/moduleInformation?showAddresses=false&keepConnectionOpen");
 
-static const KeepAliveOptions kKeepAliveOptions(
-    std::chrono::seconds(10), std::chrono::seconds(3), 5);
-
-static const network::RetryPolicy kDefaultDetryPolicy(
-    network::RetryPolicy::kInfiniteRetries, std::chrono::seconds(5), 2, std::chrono::minutes(10));
+std::chrono::seconds kDisconnectTimeout(10);
+static const network::RetryPolicy kDefaultRetryPolicy(
+    network::RetryPolicy::kInfiniteRetries, std::chrono::seconds(5), 2, std::chrono::minutes(1));
 
 ModuleConnector::ModuleConnector(network::aio::AbstractAioThread* thread):
     network::aio::BasicPollable(thread),
-    m_retryPolicy(kDefaultDetryPolicy)
+    m_retryPolicy(kDefaultRetryPolicy)
 {
 }
 
@@ -339,15 +338,7 @@ bool ModuleConnector::Module::saveConnection(
     m_disconnectTimer.reset();
 
     auto socket = client->takeSocket();
-    std::chrono::milliseconds recvTimeout(0);
-    if (!socket->setKeepAlive(kKeepAliveOptions))
-    {
-        recvTimeout = kKeepAliveOptions.maxDelay();
-        NX_VERBOSE(this, lm("Unable to set keep alive for %1 (%2), drop connection in %3").args(
-            m_id, SystemError::getLastOSErrorText(), recvTimeout));
-    }
-
-    if (!socket->setRecvTimeout(recvTimeout))
+    if (!socket->setRecvTimeout(kDisconnectTimeout))
     {
         NX_WARNING(this, lm("Unable to save connection to %1: %2").args(
             m_id, SystemError::getLastOSErrorText()));
@@ -370,7 +361,7 @@ bool ModuleConnector::Module::saveConnection(
 
             // Make sure we report disconnect in a limited time.
             m_disconnectTimer.reset(new network::aio::Timer(m_timer.getAioThread()));
-            m_disconnectTimer->start(kKeepAliveOptions.inactivityPeriodBeforeFirstProbe,
+            m_disconnectTimer->start(kDisconnectTimeout,
                 [this](){ m_parent->m_disconnectedHandler(m_id); });
         });
 
