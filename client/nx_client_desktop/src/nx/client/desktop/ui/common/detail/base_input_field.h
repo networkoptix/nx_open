@@ -29,9 +29,10 @@ public:
     using AccessorPtr = QSharedPointer<AbstractAccessor>;
     explicit BaseInputField(
         QWidget* inputInstance,
-        const AccessorPtr& textAccessor,
-        const AccessorPtr& readOnlyAccessor,
-        const AccessorPtr& placeholderAccessor,
+        const AccessorPtr& textAccessor = AccessorPtr(),
+        const AccessorPtr& readOnlyAccessor = AccessorPtr(),
+        const AccessorPtr& placeholderAccessor = AccessorPtr(),
+        bool useWarningStyleForControl = true,
         QWidget* parent = nullptr);
 
     virtual ~BaseInputField();
@@ -58,6 +59,8 @@ public:
     bool isValid() const;
 
 public:
+    void setIntermediateResult();
+
     virtual Qn::ValidationResult calculateValidationResult() const;
 
     bool validate();

@@ -101,6 +101,18 @@ bool overrideLayout(QWidget* parent)
     return messageBox.exec() != QDialogButtonBox::Cancel;
 }
 
+bool overrideLayoutTour(QWidget* parent)
+{
+    QnSessionAwareMessageBox messageBox(parent);
+    messageBox.setIcon(QnMessageBoxIcon::Question);
+    messageBox.setText(tr("Overwrite existing layout tour?"));
+    messageBox.setInformativeText(tr("There is another layout tour with the same name."));
+    messageBox.setStandardButtons(QDialogButtonBox::Cancel);
+    messageBox.addCustomButton(QnMessageBoxCustomButton::Overwrite,
+        QDialogButtonBox::AcceptRole, Qn::ButtonAccent::Warning);
+    return messageBox.exec() != QDialogButtonBox::Cancel;
+}
+
 bool changeUserLocalLayout(QWidget* parent,
     const QnResourceList& stillAccessible)
 {

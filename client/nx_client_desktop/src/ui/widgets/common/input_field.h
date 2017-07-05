@@ -26,6 +26,11 @@ class QnInputField : public nx::client::desktop::ui::detail::BaseInputField
     using base_type = nx::client::desktop::ui::detail::BaseInputField;
 
 public:
+    static QnInputField* create(
+        const QString& text,
+        const Qn::TextValidateFunction& validator,
+        QWidget* parent = nullptr);
+
     explicit QnInputField(QWidget* parent = nullptr);
     virtual ~QnInputField();
 

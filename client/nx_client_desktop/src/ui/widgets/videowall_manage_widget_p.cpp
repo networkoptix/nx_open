@@ -125,18 +125,18 @@ QPainterPath QnVideowallManageWidgetPrivate::BaseModelItem::bodyPath() const {
 
 int QnVideowallManageWidgetPrivate::BaseModelItem::fontSize() const
 {
-    const auto dpi = qApp->devicePixelRatio();
+    const auto dpr = qApp->devicePixelRatio();
     if (isPartOfScreen())
-        return baseFontSize * partScreenCoeff * dpi;
-    return baseFontSize * dpi;
+        return baseFontSize * partScreenCoeff * dpr;
+    return baseFontSize * dpr;
 }
 
 int QnVideowallManageWidgetPrivate::BaseModelItem::iconSize() const
 {
-    const auto dpi = qApp->devicePixelRatio();
+    const auto dpr = qApp->devicePixelRatio();
     if (isPartOfScreen())
-        return baseIconSize * partScreenCoeff * dpi;
-    return baseIconSize * dpi;
+        return baseIconSize * partScreenCoeff * dpr;
+    return baseIconSize * dpr;
 }
 
 void QnVideowallManageWidgetPrivate::BaseModelItem::paint(QPainter* painter, const TransformationProcess &process) const {
@@ -186,8 +186,7 @@ void QnVideowallManageWidgetPrivate::BaseModelItem::paint(QPainter* painter, con
             painter->drawRect(dilated(QRect(innerRect.left(), innerRect.top() + innerRect.height(), innerRect.width(), 0), transformationOffset));
         }
 #endif
-        paintPixmap(painter, body, qnSkin->pixmap("videowall_settings/move.png", QSize(),
-            Qt::KeepAspectRatio, Qt::FastTransformation, true));
+        paintPixmap(painter, body, qnSkin->pixmap("videowall_settings/move.png"));
         paintDeleteButton(painter);
 
         QPainterPath anchorPath;
@@ -308,10 +307,7 @@ void QnVideowallManageWidgetPrivate::FreeSpaceItem::paint(QPainter* painter, con
         return;
     base_type::paint(painter, process);
     if (!process.isRunning())
-    {
-        paintPixmap(painter, bodyRect(), qnSkin->pixmap("buttons/plus.png", QSize(),
-            Qt::KeepAspectRatio, Qt::FastTransformation, true));
-    }
+        paintPixmap(painter, bodyRect(), qnSkin->pixmap("buttons/plus.png"));
 }
 
 QColor QnVideowallManageWidgetPrivate::FreeSpaceItem::baseColor() const {
@@ -477,9 +473,8 @@ QnVideowallManageWidgetPrivate::QnVideowallManageWidgetPrivate(QnVideowallManage
             continue;
 
         auto rect = screen->geometry();
-        auto dpi = screen->devicePixelRatio();
-        rect.setWidth(rect.width() * dpi);
-        rect.setHeight(rect.height() * dpi);
+        auto dpr = screen->devicePixelRatio();
+        rect.setSize(rect.size() * dpr);
         m_unitedGeometry = m_unitedGeometry.united(rect);
 
         m_screens.append({i, rect, q});
@@ -548,9 +543,8 @@ void QnVideowallManageWidgetPrivate::loadFromResource(const QnVideoWallResourceP
             continue;
 
         auto rect = screen->geometry();
-        auto dpi = screen->devicePixelRatio();
-        rect.setWidth(rect.width() * dpi);
-        rect.setHeight(rect.height() * dpi);
+        auto dpr = screen->devicePixelRatio();
+        rect.setSize(rect.size() * dpr);
 
         screens << rect;
     }

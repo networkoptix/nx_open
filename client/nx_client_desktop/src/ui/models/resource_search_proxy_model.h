@@ -28,6 +28,11 @@ struct QnResourceSearchQuery
     {
         return text == other.text && flags == other.flags;
     }
+
+    bool isEmpty() const
+    {
+        return flags == 0 && text.isEmpty();
+    }
 };
 
 /**
