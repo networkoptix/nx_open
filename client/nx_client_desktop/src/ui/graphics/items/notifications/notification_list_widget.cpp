@@ -351,6 +351,11 @@ void QnNotificationListWidget::addItem(QnNotificationWidget *item, bool locked)
     updateGeometry();
 }
 
+bool QnNotificationListWidget::containsItem(QnNotificationWidget *item) const
+{
+    return m_itemDataByItem.contains(item);
+}
+
 void QnNotificationListWidget::removeItem(QnNotificationWidget *item)
 {
     if (!m_itemDataByItem.contains(item))

@@ -63,6 +63,7 @@ private:
     void handleShowPopupAction(
         const nx::vms::event::AbstractActionPtr& businessAction,
         QnNotificationWidget* widget);
+    void handleHidePopupAction(const nx::vms::event::AbstractActionPtr& businessAction);
 
     void showEventAction(const nx::vms::event::AbstractActionPtr& businessAction);
     void hideEventAction(const nx::vms::event::AbstractActionPtr& businessAction);
@@ -92,6 +93,7 @@ private:
     QIcon iconForAction(const nx::vms::event::AbstractActionPtr& action) const;
 
     void cleanUpItem(QnNotificationWidget* item);
+
 private:
     QnNotificationListWidget *m_list;
     GraphicsWidget* m_headerWidget;
@@ -101,6 +103,7 @@ private:
     QMultiHash<QnUuid, QnNotificationWidget*> m_itemsByEventRuleId;
     QPointer<QnBlinkingImageButtonWidget> m_blinker;
     std::unique_ptr<nx::vms::event::StringsHelper> m_helper;
+    QHash<QString, QnNotificationWidget*> m_customPopupItems;
 };
 
 #endif // NOTIFICATIONS_COLLECTION_WIDGET_H

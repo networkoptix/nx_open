@@ -24,6 +24,7 @@ public:
 
     void addItem(QnNotificationWidget *item, bool locked = false);
     void removeItem(QnNotificationWidget *item);
+    bool containsItem(QnNotificationWidget *item) const;
     void clear();
 
     QSizeF visibleSize() const;

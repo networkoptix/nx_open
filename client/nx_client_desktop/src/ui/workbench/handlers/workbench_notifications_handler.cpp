@@ -367,6 +367,9 @@ void QnWorkbenchNotificationsHandler::at_eventManager_actionReceived(
 
     switch (action->actionType())
     {
+        case vms::event::hidePopupAction:
+            emit notificationRemoved(action);
+            break;
         case vms::event::showPopupAction:
         case vms::event::showOnAlarmLayoutAction:
         {

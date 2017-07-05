@@ -237,6 +237,12 @@ void QnNotificationsCollectionWidget::loadThumbnailForItem(
     item->setImageProvider(new QnMultiImageProvider(std::move(providers), Qt::Vertical, kMultiThumbnailSpacing, item));
 }
 
+QString getIdentifierFromAction(const vms::event::AbstractActionPtr& businessAction)
+{
+    // TODO: #ynikitenkov Change me before review
+    return QnUuid::createUuid().toString();
+}
+
 void QnNotificationsCollectionWidget::handleShowPopupAction(
     const vms::event::AbstractActionPtr& businessAction,
     QnNotificationWidget* widget)
@@ -285,6 +291,19 @@ void QnNotificationsCollectionWidget::handleShowPopupAction(
 
             action(action::BookmarksModeAction)->setChecked(true);
         });
+
+    m_customPopupItems.insert(getIdentifierFromAction(businessAction), widget);
+}
+
+void QnNotificationsCollectionWidget::handleHidePopupAction(
+    const nx::vms::event::AbstractActionPtr& businessAction)
+{
+    const auto id = getIdentifierFromAction(businessAction);
+    const auto it = m_customPopupItems.find(id);
+    if (it == m_customPopupItems.end())
+        return;
+
+    cleanUpItem(it.value());
 }
 
 void QnNotificationsCollectionWidget::showEventAction(const vms::event::AbstractActionPtr& action)
@@ -515,10 +534,7 @@ void QnNotificationsCollectionWidget::hideEventAction(const vms::event::Abstract
     if (action->actionType() == vms::event::playSoundAction)
     {
         for (QnNotificationWidget* item: m_itemsByEventRuleId.values(ruleId))
-        {
-            m_list->removeItem(item);
             cleanUpItem(item);
-        }
     }
 
     QnResourcePtr resource = resourcePool()->getResourceById(action->getRuntimeParams().eventResourceId);
@@ -529,7 +545,6 @@ void QnNotificationsCollectionWidget::hideEventAction(const vms::event::Abstract
     if (!item)
         return;
 
-    m_list->removeItem(item);
     cleanUpItem(item);
 }
 
@@ -769,9 +784,8 @@ void QnNotificationsCollectionWidget::hideSystemHealthMessage(QnSystemHealth::Me
     if (!resource)
     {
         for (QnNotificationWidget* item : m_itemsByMessageType.values(message))
-            m_list->removeItem(item);
+            cleanUpItem(item);
 
-        m_itemsByMessageType.remove(message);
         return;
     }
 
@@ -779,8 +793,7 @@ void QnNotificationsCollectionWidget::hideSystemHealthMessage(QnSystemHealth::Me
     if (!target)
         return;
 
-    m_list->removeItem(target);
-    m_itemsByMessageType.remove(message, target);
+    cleanUpItem(target);
 }
 
 void QnNotificationsCollectionWidget::hideAll()
@@ -823,6 +836,9 @@ void QnNotificationsCollectionWidget::at_notificationCache_fileDownloaded(const 
 
 void QnNotificationsCollectionWidget::cleanUpItem(QnNotificationWidget* item)
 {
+    if (m_list->containsItem(item))
+        m_list->removeItem(item);
+
     for (QnSystemHealth::MessageType messageType : m_itemsByMessageType.keys(item))
         m_itemsByMessageType.remove(messageType, item);
 
@@ -831,6 +847,9 @@ void QnNotificationsCollectionWidget::cleanUpItem(QnNotificationWidget* item)
 
     for (QString soundPath : m_itemsByLoadingSound.keys(item))
         m_itemsByLoadingSound.remove(soundPath, item);
+
+    const auto key = m_customPopupItems.key(item);
+    m_customPopupItems.remove(key);
 }
 
 void QnNotificationsCollectionWidget::paint(QPainter* painter,
