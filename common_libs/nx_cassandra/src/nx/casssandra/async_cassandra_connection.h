@@ -59,12 +59,41 @@ public:
     bool get(const std::string& key, int32_t* value) const;
     bool get(const std::string& key, int64_t* value) const;
 
+    bool get(int index, std::string* value) const;
+    bool get(int index, bool* value) const;
+    bool get(int index, double* value) const;
+    bool get(int index, float* value) const;
+    bool get(int index, int32_t* value) const;
+    bool get(int index, int64_t* value) const;
 
 private:
     const CassResult* m_result = nullptr;
     CassIterator* m_iterator = nullptr;
 
     CassRow* nextRow() const;
+
+    template<typename GetIndexFunc>
+    bool get(GetIndexFunc getIndexFunc, std::string* value) const
+    {
+        if (!m_iterator)
+            return false;
+
+        const CassRow* row = cass_iterator_get_row(m_iterator);
+        if (!row)
+            return false;
+
+        const char* val;
+        size_t valSize;
+        auto result = cass_value_get_string(getIndexFunc(row), &val, &valSize);
+
+        if (result == CASS_OK)
+        {
+            value->resize(valSize);
+            memcpy((void*)value->data(), val, valSize);
+        }
+
+        return result == CASS_OK;
+    }
 };
 
 class AsyncConnection

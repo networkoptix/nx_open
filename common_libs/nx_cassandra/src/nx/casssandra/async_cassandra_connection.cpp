@@ -296,30 +296,15 @@ bool QueryResult::next()
 
 bool QueryResult::get(const std::string& key, std::string* value) const
 {
-    if (!m_iterator)
-        return false;
-
-    const CassRow* row = cass_iterator_get_row(m_iterator);
-    if (!row)
-        return false;
-
-    const char* val;
-    size_t valSize;
-    auto result = cass_value_get_string(
-                cass_row_get_column_by_name_n(row, key.data(), key.size()),
-                &val,
-                &valSize);
-
-    if (result == CASS_OK)
-    {
-        value->resize(valSize);
-        memcpy((void*)value->data(), val, valSize);
-    }
-
-    return result == CASS_OK;
+    return get(
+        [&key](const CassRow* row)
+        {
+            return cass_row_get_column_by_name_n(row, key.data(), key.size());
+        },
+        value);
 }
 
-#define NX_CASS_GET_BASIC_VALUE(type) \
+#define NX_CASS_GET_BASIC_VALUE(type, getIndexFactory) \
     if (!m_iterator) \
         return false; \
     \
@@ -328,9 +313,7 @@ bool QueryResult::get(const std::string& key, std::string* value) const
         return false; \
     \
     cass_##type##_t val; \
-    auto result = cass_value_get_##type( \
-            cass_row_get_column_by_name_n(row, key.data(), key.size()), \
-            &val); \
+    auto result = cass_value_get_##type(getIndexFactory(row), &val); \
     \
     if (result == CASS_OK) \
         *value = val; \
@@ -338,51 +321,92 @@ bool QueryResult::get(const std::string& key, std::string* value) const
     return result == CASS_OK;
 
 
+#define NX_CASS_GET_BASIC_VALUE_BY_INDEX(type) \
+    NX_CASS_GET_BASIC_VALUE( \
+        type, \
+        [index](const CassRow* row) { return cass_row_get_column(row, index); })
+
+
+#define NX_CASS_GET_BASIC_VALUE_BY_NAME(type) \
+    NX_CASS_GET_BASIC_VALUE( \
+        type, \
+        [&key](const CassRow* row) \
+        { \
+            return cass_row_get_column_by_name_n(row, key.data(), key.size()); \
+        })
+
+
 bool QueryResult::get(const std::string& key, bool* value) const
 {
-    NX_CASS_GET_BASIC_VALUE(bool);
+    NX_CASS_GET_BASIC_VALUE_BY_NAME(bool);
 }
 
 bool QueryResult::get(const std::string& key, double* value) const
 {
-    NX_CASS_GET_BASIC_VALUE(double);
+    NX_CASS_GET_BASIC_VALUE_BY_NAME(double);
 }
 
 bool QueryResult::get(const std::string& key, float* value) const
 {
-    NX_CASS_GET_BASIC_VALUE(float);
+    NX_CASS_GET_BASIC_VALUE_BY_NAME(float);
 }
 
 bool QueryResult::get(const std::string& key, int32_t* value) const
 {
-    NX_CASS_GET_BASIC_VALUE(int32);
+    NX_CASS_GET_BASIC_VALUE_BY_NAME(int32);
 }
 
 bool QueryResult::get(const std::string& key, int64_t* value) const
 {
-    NX_CASS_GET_BASIC_VALUE(int64);
+    NX_CASS_GET_BASIC_VALUE_BY_NAME(int64);
 }
 
+bool QueryResult::get(int index, std::string* value) const
+{
+    return get(
+        [index](const CassRow* row)
+        {
+            return cass_row_get_column(row, index);
+        },
+        value);
+}
+
+bool QueryResult::get(int index, bool* value) const
+{
+    NX_CASS_GET_BASIC_VALUE_BY_INDEX(bool);
+}
+
+bool QueryResult::get(int index, double* value) const
+{
+    NX_CASS_GET_BASIC_VALUE_BY_INDEX(double);
+}
+
+bool QueryResult::get(int index, float* value) const
+{
+    NX_CASS_GET_BASIC_VALUE_BY_INDEX(float);
+}
+
+bool QueryResult::get(int index, int32_t* value) const
+{
+    NX_CASS_GET_BASIC_VALUE_BY_INDEX(int32);
+}
+
+bool QueryResult::get(int index, int64_t* value) const
+{
+    NX_CASS_GET_BASIC_VALUE_BY_INDEX(int64);
+}
+
+#undef NX_CASS_GET_BASIC_VALUE_BY_NAME
+#undef NX_CASS_GET_BASIC_VALUE_BY_INDEX
 #undef NX_CASS_GET_BASIC_VALUE
 
-/** ------------------------------- AsyncConnection --------------------------------------------------*/
+
+/** ------------------------------- AsyncConnection ---------------------------------------------*/
 
 AsyncConnection::AsyncConnection(const char* host):
     m_cluster(cass_cluster_new()),
     m_session(cass_session_new())
 {
-    // This is will increase the number of threads handling IO to 2 (This alone might be enough to fix the issue).
-//    cass_cluster_set_num_threads_io(m_cluster, 2);
-
-//    // Or you can also increase the number of connections per thread
-//    cass_cluster_set_core_connections_per_host(m_cluster, 2);
-//    cass_cluster_set_max_connections_per_host(m_cluster, 4);
-
-//    // Or increase the number of request that will queue waiting for a thread.
-//    cass_cluster_set_pending_requests_low_water_mark(m_cluster, 5000);
-//    cass_cluster_set_pending_requests_high_water_mark(m_cluster, 10000);
-
-
     cass_cluster_set_contact_points(m_cluster, host);
 }
 
