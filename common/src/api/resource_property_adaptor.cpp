@@ -2,7 +2,7 @@
 
 #include <core/resource/resource.h>
 
-//TODO: #vkutin #GDM #common This class seems too complicated now.
+// TODO: #vkutin #GDM #common This class seems too complicated now.
 // 1. Is dynamic resource switching via setResource really needed?
 // 2. Since we moved DB sync out of this class, queueing changes seems no longer needed.
 

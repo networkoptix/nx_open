@@ -4,7 +4,7 @@
 #include <QtWidgets/QToolButton>
 
 //DEPRECATED!
-//TODO: #vkutin #common Eventually replace this with QnSelectableButton
+// TODO: #vkutin #common Eventually replace this with QnSelectableButton
 class QnCheckedButton: public QToolButton {
     Q_OBJECT
 

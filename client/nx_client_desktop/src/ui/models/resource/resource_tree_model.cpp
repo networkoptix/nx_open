@@ -135,7 +135,7 @@ QnResourceTreeModel::QnResourceTreeModel(Scope scope, QObject *parent):
         &QnResourceTreeModel::at_resPool_resourceAdded);
     connect(resourcePool(), &QnResourcePool::resourceRemoved, this,
         &QnResourceTreeModel::at_resPool_resourceRemoved);
-    connect(snapshotManager(), &QnWorkbenchLayoutSnapshotManager::flagsChanged, this,
+    connect(snapshotManager(), &QnWorkbenchLayoutSnapshotManager::layoutFlagsChanged, this,
         &QnResourceTreeModel::at_snapshotManager_flagsChanged);
     connect(context(), &QnWorkbenchContext::userChanged, this,
         &QnResourceTreeModel::rebuildTree);
@@ -937,7 +937,7 @@ void QnResourceTreeModel::at_resPool_resourceRemoved(const QnResourcePtr &resour
 
 void QnResourceTreeModel::rebuildTree()
 {
-    //TODO: #vkutin #gdm Implement "model reset" logic for the tree.
+    // TODO: #vkutin #gdm Implement "model reset" logic for the tree.
     // Currently it's not handled, "rows inserted/removed" is handled instead.
 
     m_rootNodes[Qn::CurrentUserNode]->setResource(context()->user());

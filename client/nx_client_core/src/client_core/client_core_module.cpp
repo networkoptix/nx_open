@@ -7,7 +7,9 @@
 
 #include <nx/core/access/access_types.h>
 #include <core/ptz/client_ptz_controller_pool.h>
+
 #include <core/resource_management/resources_changes_manager.h>
+#include <core/resource_management/layout_tour_state_manager.h>
 
 #include <utils/media/ffmpeg_initializer.h>
 
@@ -25,17 +27,18 @@ QnClientCoreModule::QnClientCoreModule(QObject* parent):
 
     m_commonModule = new QnCommonModule(true, nx::core::access::Mode::cached, this);
 
-    commonModule()->store(new QnClientCoreSettings());
-    commonModule()->store(new QnFfmpegInitializer());
+    m_commonModule->store(new QnClientCoreSettings());
+    m_commonModule->store(new QnFfmpegInitializer());
 
     NX_ASSERT(nx::utils::TimerManager::instance());
     m_connectionFactory.reset(getConnectionFactory(qnStaticCommon->localPeerType(),
-        nx::utils::TimerManager::instance(), commonModule()));
+        nx::utils::TimerManager::instance(), m_commonModule));
 
-    commonModule()->instance<QnResourcesChangesManager>();
-    commonModule()->instance<QnClientPtzControllerPool>();
+    m_commonModule->instance<QnResourcesChangesManager>();
+    m_commonModule->instance<QnClientPtzControllerPool>();
+    m_commonModule->instance<QnLayoutTourStateManager>();
 
-    commonModule()->store(new watchers::KnownServerConnections(commonModule()));
+    m_commonModule->store(new watchers::KnownServerConnections(m_commonModule));
 }
 
 QnClientCoreModule::~QnClientCoreModule()
@@ -56,4 +59,9 @@ ec2::AbstractECConnectionFactory* QnClientCoreModule::connectionFactory() const
 QnPtzControllerPool* QnClientCoreModule::ptzControllerPool() const
 {
     return m_commonModule->instance<QnClientPtzControllerPool>();
+}
+
+QnLayoutTourStateManager* QnClientCoreModule::layoutTourStateManager() const
+{
+    return m_commonModule->instance<QnLayoutTourStateManager>();
 }

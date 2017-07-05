@@ -5,17 +5,21 @@
 #include <ui/widgets/business/software_trigger_business_event_widget.h>
 #include <ui/widgets/business/custom_business_event_widget.h>
 
-QnAbstractBusinessParamsWidget* QnBusinessEventWidgetFactory::createWidget(QnBusiness::EventType eventType, QWidget *parent,
-                                                                           QnWorkbenchContext *context) {
-    Q_UNUSED(context);
-    switch (eventType) {
-    case QnBusiness::CameraInputEvent:
-        return new QnCameraInputBusinessEventWidget(parent);
-    case QnBusiness::SoftwareTriggerEvent:
-        return new QnSoftwareTriggerBusinessEventWidget(parent);
-    case QnBusiness::UserDefinedEvent:
-        return new QnCustomBusinessEventWidget(parent);
-    default:
-        return new QnEmptyBusinessEventWidget(parent);
+using namespace nx;
+
+QnAbstractBusinessParamsWidget* QnBusinessEventWidgetFactory::createWidget(
+    vms::event::EventType eventType, QWidget* parent,
+    QnWorkbenchContext* /*context*/)
+{
+    switch (eventType)
+    {
+        case vms::event::cameraInputEvent:
+            return new QnCameraInputBusinessEventWidget(parent);
+        case vms::event::softwareTriggerEvent:
+            return new QnSoftwareTriggerBusinessEventWidget(parent);
+        case vms::event::userDefinedEvent:
+            return new QnCustomBusinessEventWidget(parent);
+        default:
+            return new QnEmptyBusinessEventWidget(parent);
     }
 }

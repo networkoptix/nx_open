@@ -211,6 +211,8 @@
         <additional.defines/>
         <customization.defines/>
 
+        <additionalQrcPaths/>
+
         <!-- QT libs used by ALL modules (to be included in the installer. It is necessary to specify the particular libs in the corresponding modules) -->
         <qtlibs>
             Core, Network, Xml, Concurrent, Sql, Multimedia, OpenGL, Widgets, Gui, X11Extras,
@@ -319,6 +321,7 @@
                         </goals>
                         <configuration>
                             <files>
+                                <file>${root.dir}/ec2_proto_version.properties</file>
                                 <file>${root.dir}/customization/default-values.properties</file>
                                 <file>${customization.dir}/build.properties</file>
                                 <file>${customization.dir}/license.properties</file>

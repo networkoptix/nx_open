@@ -49,6 +49,8 @@
 #include <nx/utils/log/log.h>
 #include <nx/utils/datetime.h>
 
+using namespace nx;
+
 namespace {
 
 // TODO: Introduce constants for API methods registered in media_server_process.cpp.
@@ -248,7 +250,7 @@ void QnMediaServerReplyProcessor::processReply(const QnHTTPRawResponse& response
             break;
         case EventLogObject:
         {
-            QnBusinessActionDataListPtr events(new QnBusinessActionDataList);
+            vms::event::ActionDataListPtr events(new vms::event::ActionDataList);
             if (response.status == 0)
                 QnEventSerializer::deserialize(events, response.msgBody);
             emitFinished(this, response.status, events, handle);
@@ -930,8 +932,8 @@ int QnMediaServerConnection::getStatisticsAsync(QObject* target, const char* slo
 }
 
 int QnMediaServerConnection::getEventLogAsync(
-    qint64 dateFrom, qint64 dateTo, QnResourceList camList, QnBusiness::EventType eventType,
-    QnBusiness::ActionType actionType, QnUuid businessRuleId, QObject* target, const char* slot)
+    qint64 dateFrom, qint64 dateTo, QnResourceList camList, vms::event::EventType eventType,
+    vms::event::ActionType actionType, QnUuid businessRuleId, QObject* target, const char* slot)
 {
     QnRequestParamList params;
     params << QnRequestParam("from", dateFrom);
@@ -945,13 +947,13 @@ int QnMediaServerConnection::getEventLogAsync(
     }
     if (!businessRuleId.isNull())
         params << QnRequestParam("brule_id", businessRuleId);
-    if (eventType != QnBusiness::UndefinedEvent)
+    if (eventType != vms::event::undefinedEvent)
         params << QnRequestParam("event", (int) eventType);
-    if (actionType != QnBusiness::UndefinedAction)
+    if (actionType != vms::event::undefinedAction)
         params << QnRequestParam("action", (int) actionType);
 
     return sendAsyncGetRequestLogged(EventLogObject,
-        params, QN_STRINGIZE_TYPE(QnBusinessActionDataListPtr), target, slot);
+        params, QN_STRINGIZE_TYPE(nx::vms::event::ActionDataListPtr), target, slot);
 }
 
 int QnMediaServerConnection::installUpdate(

@@ -3,8 +3,7 @@
 
 #include <QtCore/QScopedValueRollback>
 
-#include <business/business_action_parameters.h>
-#include <business/actions/camera_output_business_action.h>
+#include <nx/vms/event/action_parameters.h>
 
 #include <core/resource/camera_resource.h>
 #include <core/resource_management/resource_pool.h>
@@ -16,7 +15,7 @@
 
 #include <utils/common/scoped_value_rollback.h>
 
-QnCameraOutputBusinessActionWidget::QnCameraOutputBusinessActionWidget(QWidget *parent) :
+QnCameraOutputBusinessActionWidget::QnCameraOutputBusinessActionWidget(QWidget* parent):
     base_type(parent),
     ui(new Ui::CameraOutputBusinessActionWidget)
 {
@@ -30,14 +29,15 @@ QnCameraOutputBusinessActionWidget::QnCameraOutputBusinessActionWidget(QWidget *
 
             // Prolonged type of event has changed. In case of instant
             // action event state should be updated
-            if (checked && (model()->eventType() == QnBusiness::UserDefinedEvent))
-                model()->setEventState(QnBusiness::UndefinedState);
+            if (checked && (model()->eventType() == nx::vms::event::userDefinedEvent))
+                model()->setEventState(nx::vms::event::EventState::undefined);
 
             emit paramsChanged();
         });
 
     connect(ui->relayComboBox, QnComboboxCurrentIndexChanged, this,
         &QnCameraOutputBusinessActionWidget::paramsChanged);
+
     connect(ui->fixedDurationSpinBox, QnSpinboxIntValueChanged, this,
         &QnCameraOutputBusinessActionWidget::paramsChanged);
 
@@ -47,7 +47,7 @@ QnCameraOutputBusinessActionWidget::QnCameraOutputBusinessActionWidget(QWidget *
 QnCameraOutputBusinessActionWidget::~QnCameraOutputBusinessActionWidget()
 {}
 
-void QnCameraOutputBusinessActionWidget::updateTabOrder(QWidget *before, QWidget *after)
+void QnCameraOutputBusinessActionWidget::updateTabOrder(QWidget* before, QWidget* after)
 {
     setTabOrder(before, ui->relayComboBox);
     setTabOrder(ui->relayComboBox, ui->fixedDurationCheckBox);
@@ -55,22 +55,22 @@ void QnCameraOutputBusinessActionWidget::updateTabOrder(QWidget *before, QWidget
     setTabOrder(ui->fixedDurationSpinBox, after);
 }
 
-void QnCameraOutputBusinessActionWidget::at_model_dataChanged(QnBusiness::Fields fields)
+void QnCameraOutputBusinessActionWidget::at_model_dataChanged(Fields fields)
 {
     if (!model())
         return;
 
     QScopedValueRollback<bool> rollback(m_updating, true);
 
-    if (fields.testFlag(QnBusiness::EventTypeField))
+    if (fields.testFlag(Field::eventType))
     {
-        bool hasToggleState = QnBusiness::hasToggleState(model()->eventType());
+        bool hasToggleState = nx::vms::event::hasToggleState(model()->eventType());
         if (!hasToggleState)
             ui->fixedDurationCheckBox->setChecked(true);
         setReadOnly(ui->fixedDurationCheckBox, !hasToggleState);
     }
 
-    if (fields.testFlag(QnBusiness::ActionResourcesField))
+    if (fields.testFlag(Field::actionResources))
     {
         QnIOPortDataList outputPorts;
         bool inited = false;
@@ -112,10 +112,9 @@ void QnCameraOutputBusinessActionWidget::at_model_dataChanged(QnBusiness::Fields
             ui->relayComboBox->addItem(relayOutput.getName(), relayOutput.id);
     }
 
-    if (fields.testFlag(QnBusiness::ActionParamsField))
+    if (fields.testFlag(Field::actionParams))
     {
-        QnBusinessActionParameters params = model()->actionParams();
-
+        const auto params = model()->actionParams();
         QString text = params.relayOutputId;
         if (ui->relayComboBox->itemData(ui->relayComboBox->currentIndex()).toString() != text)
             ui->relayComboBox->setCurrentIndex(ui->relayComboBox->findData(text));
@@ -134,10 +133,11 @@ void QnCameraOutputBusinessActionWidget::paramsChanged()
     if (!model() || m_updating)
         return;
 
-    QnBusinessActionParameters params = model()->actionParams();
+    auto params = model()->actionParams();
     params.relayOutputId = ui->relayComboBox->itemData(ui->relayComboBox->currentIndex()).toString();
     params.durationMs = ui->fixedDurationCheckBox->isChecked()
         ? ui->fixedDurationSpinBox->value() * 1000
         : 0;
+
     model()->setActionParams(params);
 }

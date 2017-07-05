@@ -63,7 +63,7 @@ protected:
             QObject::connect(
                 server->moduleInstance()->commonModule()->messageProcessor(),
                 &QnCommonMessageProcessor::businessActionReceived,
-                [this](const QnAbstractBusinessActionPtr& /*action*/)
+                [this](const nx::vms::event::AbstractActionPtr& /*action*/)
                 {
                     ++m_actionReceived;
                 });

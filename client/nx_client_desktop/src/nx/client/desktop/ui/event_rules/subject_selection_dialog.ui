@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Dialog</string>
+   <string>Select Users</string>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout_2">
    <property name="spacing">
@@ -33,7 +33,7 @@
     <widget class="QWidget" name="mainWidget" native="true">
      <layout class="QVBoxLayout" name="verticalLayout">
       <property name="spacing">
-       <number>16</number>
+       <number>13</number>
       </property>
       <property name="leftMargin">
        <number>16</number>
@@ -45,7 +45,7 @@
        <number>16</number>
       </property>
       <property name="bottomMargin">
-       <number>16</number>
+       <number>0</number>
       </property>
       <item>
        <widget class="QnSearchLineEdit" name="searchLineEdit" native="true"/>
@@ -70,7 +70,7 @@
            <x>0</x>
            <y>0</y>
            <width>368</width>
-           <height>368</height>
+           <height>390</height>
           </rect>
          </property>
          <property name="sizePolicy">
@@ -81,7 +81,7 @@
          </property>
          <layout class="QVBoxLayout" name="verticalLayout_5">
           <property name="spacing">
-           <number>16</number>
+           <number>13</number>
           </property>
           <property name="leftMargin">
            <number>0</number>
@@ -93,7 +93,7 @@
            <number>0</number>
           </property>
           <property name="bottomMargin">
-           <number>0</number>
+           <number>16</number>
           </property>
           <item>
            <widget class="QGroupBox" name="rolesGroupBox">
@@ -227,6 +227,16 @@
               </widget>
              </item>
             </layout>
+           </widget>
+          </item>
+          <item>
+           <widget class="QLabel" name="nothingFoundLabel">
+            <property name="text">
+             <string>Nothing matches your search.</string>
+            </property>
+            <property name="alignment">
+             <set>Qt::AlignCenter</set>
+            </property>
            </widget>
           </item>
           <item>

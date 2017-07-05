@@ -205,7 +205,15 @@ void QnAxClientWindow::maximizeItem(const QString &uniqueId) {
     if (!m_context)
         return;
 
-    QSet<QnWorkbenchItem *> items = m_context->workbench()->currentLayout()->items(uniqueId);
+    QnUuid uuid = QnUuid::fromStringSafe(uniqueId);
+    if (uuid.isNull())
+        return;
+
+    const auto resource = resourcePool()->getResourceById(uuid);
+    if (!resource)
+        return;
+
+    QSet<QnWorkbenchItem *> items = m_context->workbench()->currentLayout()->items(resource);
     if(items.isEmpty())
         return;
     m_context->menu()->trigger(action::MaximizeItemAction, m_context->display()->widget(*items.begin()));
@@ -215,7 +223,15 @@ void QnAxClientWindow::unmaximizeItem(const QString &uniqueId) {
     if (!m_context)
         return;
 
-    QSet<QnWorkbenchItem *> items = m_context->workbench()->currentLayout()->items(uniqueId);
+    QnUuid uuid = QnUuid::fromStringSafe(uniqueId);
+    if (uuid.isNull())
+        return;
+
+    const auto resource = resourcePool()->getResourceById(uuid);
+    if (!resource)
+        return;
+
+    QSet<QnWorkbenchItem *> items = m_context->workbench()->currentLayout()->items(resource);
     if(items.isEmpty())
         return;
     m_context->menu()->trigger(action::UnmaximizeItemAction, m_context->display()->widget(*items.begin()));

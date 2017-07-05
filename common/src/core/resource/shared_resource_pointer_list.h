@@ -1,5 +1,4 @@
-#ifndef QN_SHARED_RESOURCE_POINTER_LIST_H
-#define QN_SHARED_RESOURCE_POINTER_LIST_H
+#pragma once
 
 #include <iterator>
 
@@ -8,8 +7,6 @@
 
 #include "shared_resource_pointer.h"
 #include <functional>
-
-class QnResourceCriterion;
 
 template<class Resource>
 class QnSharedResourcePointerList: public QList<QnSharedResourcePointer<Resource> > {
@@ -35,15 +32,6 @@ public:
     bool operator!=(const QList<QnSharedResourcePointer<OtherResource> > &other) const {
         return !(*this == other);
     }
-
-
-    /** 
-     * This function is defined in <tt>resource_criterion.h</tt>.
-     * 
-     * \param criterion                 Resource criterion to use for filtering.
-     * \returns                         Filtered list of resources.
-     */
-    QnSharedResourcePointerList<Resource> filtered(const QnResourceCriterion &criterion) const;
 
     template<class OtherResource>
     QnSharedResourcePointerList<OtherResource> filtered() const {
@@ -72,5 +60,3 @@ public:
         return result;
     }
 };
-
-#endif // QN_SHARED_RESOURCE_POINTER_LIST_H

@@ -1,11 +1,13 @@
 #include "bookmark_business_action_widget.h"
 #include "ui_bookmark_business_action_widget.h"
 
-#include <business/business_action_parameters.h>
+#include <nx/vms/event/action_parameters.h>
 
 #include <utils/common/scoped_value_rollback.h>
 #include <ui/common/read_only.h>
 #include <ui/workaround/widgets_signals_workaround.h>
+
+using namespace nx;
 
 namespace {
 
@@ -37,8 +39,8 @@ QnBookmarkBusinessActionWidget::QnBookmarkBusinessActionWidget(QWidget *parent) 
     {
         // Prolonged type of event has changed. In case of instant
         // action event state should be updated
-        if (checked && (model()->eventType() == QnBusiness::UserDefinedEvent))
-            model()->setEventState(QnBusiness::UndefinedState);
+        if (checked && (model()->eventType() == vms::event::userDefinedEvent))
+            model()->setEventState(vms::event::EventState::undefined);
 
         ui->recordAfterWidget->setEnabled(!checked);
     });
@@ -66,7 +68,7 @@ void QnBookmarkBusinessActionWidget::updateUserSelectionControls()
     ui->selectUsersButton->setVisible(visible);
 }
 
-void QnBookmarkBusinessActionWidget::at_model_dataChanged(QnBusiness::Fields fields)
+void QnBookmarkBusinessActionWidget::at_model_dataChanged(Fields fields)
 {
     if (!model() || m_updating)
         return;
@@ -74,15 +76,15 @@ void QnBookmarkBusinessActionWidget::at_model_dataChanged(QnBusiness::Fields fie
     base_type::at_model_dataChanged(fields);
     QN_SCOPED_VALUE_ROLLBACK(&m_updating, true);
 
-    if (fields.testFlag(QnBusiness::EventTypeField))
+    if (fields.testFlag(Field::eventType))
     {
-        bool hasToggleState = QnBusiness::hasToggleState(model()->eventType());
+        bool hasToggleState = vms::event::hasToggleState(model()->eventType());
         if (!hasToggleState)
             ui->fixedDurationCheckBox->setChecked(true);
         setReadOnly(ui->fixedDurationCheckBox, !hasToggleState);
     }
 
-    if (fields.testFlag(QnBusiness::ActionParamsField))
+    if (fields.testFlag(Field::actionParams))
     {
         const auto params = model()->actionParams();
         ui->tagsLineEdit->setText(params.tags);
@@ -107,7 +109,7 @@ void QnBookmarkBusinessActionWidget::paramsChanged() {
 
     QN_SCOPED_VALUE_ROLLBACK(&m_updating, true);
 
-    QnBusinessActionParameters params = model()->actionParams();
+    vms::event::ActionParameters params = model()->actionParams();
     params.tags = ui->tagsLineEdit->text();
     params.durationMs = (ui->fixedDurationCheckBox->isChecked() ? ui->durationSpinBox->value() * msecPerSecond : 0);
     params.recordBeforeMs = ui->recordBeforeSpinBox->value() * msecPerSecond;

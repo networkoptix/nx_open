@@ -71,7 +71,7 @@ BaseInputFieldPrivate::BaseInputFieldPrivate(
     title(new QLabel(parent)),
     hint(new QnWordWrappedLabel(parent)),
     input(inputInstance),
-    defaultPalette(),    
+    defaultPalette(),
 
     textAccessor(textAccessor),
     readOnlyAccessor(readOnlyAccessor),

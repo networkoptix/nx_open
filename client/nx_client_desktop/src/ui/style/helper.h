@@ -84,6 +84,7 @@ namespace style
         static const char* kMenuNoMouseReplayRect;  /**< Name of a property to hold rectangle in global logical coordinates (QRect).
                                                             If menu is closed by click in this rectangle it won't replay mouse event. */
         static const char* kComboBoxPopupWidth;     /**< Name of a property to hold width of combo box popup. */
+        static const char* kGroupBoxContentTopMargin; /**< Name of a property to hold group box top content margins without header (int). */
     };
 
     /** Flags of additional slider features */

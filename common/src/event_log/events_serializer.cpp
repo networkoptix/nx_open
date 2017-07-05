@@ -3,8 +3,8 @@
 #include <QtCore/QDebug>
 #include <QtCore/QElapsedTimer>
 
-#include <business/business_action_parameters.h>
-#include <business/business_event_parameters.h>
+#include <nx/vms/event/action_parameters.h>
+#include <nx/vms/event/event_parameters.h>
 
 #include <utils/math/math.h>
 #include <nx/fusion/model_functions.h>
@@ -25,12 +25,12 @@ inline QnUuid readQnId(quint8* &curPtr)
     return QnUuid::fromRfc4122(uuid);
 }
 
-void QnEventSerializer::deserialize(QnBusinessActionDataListPtr& eventsPtr, const QByteArray& data)
+void QnEventSerializer::deserialize(nx::vms::event::ActionDataListPtr& eventsPtr, const QByteArray& data)
 {
     QElapsedTimer t;
     t.restart();
 
-    QnBusinessActionDataList& events = *(eventsPtr.data());
+    nx::vms::event::ActionDataList& events = *(eventsPtr.data());
 
     if (data.size() < 4)
         return;
@@ -49,10 +49,10 @@ void QnEventSerializer::deserialize(QnBusinessActionDataListPtr& eventsPtr, cons
     events.resize(sz);
     for (int i = 0; i < sz; ++i)
     {
-        QnBusinessActionData& action = events[i];
+        nx::vms::event::ActionData& action = events[i];
         action.flags = readInt(curPtr);
         NX_EXPECT(curPtr <= dataEnd);
-        action.actionType = (QnBusiness::ActionType) readInt(curPtr);
+        action.actionType = (nx::vms::event::ActionType) readInt(curPtr);
         NX_EXPECT(curPtr <= dataEnd);
         action.businessRuleId = readQnId(curPtr);
         NX_EXPECT(curPtr <= dataEnd);
@@ -68,7 +68,7 @@ void QnEventSerializer::deserialize(QnBusinessActionDataListPtr& eventsPtr, cons
                 return;
             }
             QByteArray ba = QByteArray::fromRawData((const char*)curPtr, runTimeParamsLen);
-            action.eventParams = QnUbjson::deserialized<QnBusinessEventParameters>(ba);
+            action.eventParams = QnUbjson::deserialized<nx::vms::event::EventParameters>(ba);
             curPtr += runTimeParamsLen;
             NX_EXPECT(curPtr <= dataEnd);
         }
@@ -83,7 +83,7 @@ void QnEventSerializer::deserialize(QnBusinessActionDataListPtr& eventsPtr, cons
                 return;
             }
             QByteArray ba = QByteArray::fromRawData((const char*)curPtr, actionParamsLen);
-            action.actionParams = QnUbjson::deserialized<QnBusinessActionParameters>(ba);
+            action.actionParams = QnUbjson::deserialized<nx::vms::event::ActionParameters>(ba);
             curPtr += actionParamsLen;
             NX_EXPECT(curPtr <= dataEnd);
         }

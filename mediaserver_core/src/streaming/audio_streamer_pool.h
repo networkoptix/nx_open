@@ -1,7 +1,7 @@
 #pragma once
 
 #include <nx/utils/singleton.h>
-#include <business/business_fwd.h>
+#include <nx/vms/event/event_fwd.h>
 #include <core/dataprovider/spush_media_stream_provider.h>
 #include <utils/common/request_param.h>
 #include <common/common_module_aware.h>
@@ -26,11 +26,11 @@ public:
     bool startStopStreamToResource(const QnUuid& clientId, const QnUuid& resourceId, Action action, QString& error, const QnRequestParams &params);
     bool startStopStreamToResource(QnAbstractStreamDataProviderPtr desktopDataProvider, const QnUuid& resourceId, Action action, QString &error);
 
-    QnAbstractStreamDataProviderPtr getActionDataProvider(const QnAbstractBusinessActionPtr &action);
-    bool destroyActionDataProvider(const QnAbstractBusinessActionPtr &action);
+    QnAbstractStreamDataProviderPtr getActionDataProvider(const nx::vms::event::AbstractActionPtr& action);
+    bool destroyActionDataProvider(const nx::vms::event::AbstractActionPtr& action);
 
 private:
-    QString calcActionUniqueKey(const QnAbstractBusinessActionPtr &action) const;
+    QString calcActionUniqueKey(const nx::vms::event::AbstractActionPtr& action) const;
 
     QnVideoCameraPtr getTransmitSource(const QnUuid& clientId) const;
     QnSecurityCamResourcePtr getTransmitDestination(const QnUuid& resourceId) const;

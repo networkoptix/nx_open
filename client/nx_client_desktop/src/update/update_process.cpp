@@ -108,7 +108,7 @@ void QnUpdateProcess::run() {
     result.protocolChanged = m_protocolChanged;
 
     for (const QnUuid &id: m_failedPeerIds) {
-        if (QnMediaServerResourcePtr server = resourcePool()->getIncompatibleResourceById(id, true).dynamicCast<QnMediaServerResource>())
+        if (auto server = resourcePool()->getIncompatibleResourceById(id, true))
             result.failedServers.append(server);
     }
 
@@ -240,7 +240,7 @@ void QnUpdateProcess::at_checkForUpdatesTaskFinished(QnCheckForUpdatesPeerTask* 
     m_clientUpdateFile = task->clientUpdateFile();
 
     foreach (const QnUuid &serverId, m_target.targets) {
-        QnMediaServerResourcePtr server = resourcePool()->getIncompatibleResourceById(serverId, true).dynamicCast<QnMediaServerResource>();
+        auto server = resourcePool()->getIncompatibleResourceById(serverId, true);
         if (!server)
             continue;
 

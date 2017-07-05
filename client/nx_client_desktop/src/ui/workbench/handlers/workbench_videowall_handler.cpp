@@ -224,7 +224,6 @@ void addItemToLayout(const QnLayoutResourcePtr &layout, const QnVideoWallItemInd
     else
         itemData.flags = Qn::PendingGeometryAdjustment;
     itemData.resource.id = firstIdx.videowall()->getId();
-    itemData.resource.uniqueId = firstIdx.videowall()->getUniqueId();
     setIndices(itemData, indices);
     layout->addItem(itemData);
 }
@@ -749,8 +748,9 @@ void QnWorkbenchVideoWallHandler::openVideoWallItem(const QnVideoWallResourcePtr
         return;
 
     workbench()->clear();
+    // Action is disabled in videowall mode to make sure it is not displayed in the context menu.
     if (layout)
-        menu()->trigger(action::OpenInNewTabAction, layout);
+        menu()->triggerForced(action::OpenInNewTabAction, layout);
 }
 
 void QnWorkbenchVideoWallHandler::closeInstanceDelayed()
@@ -861,12 +861,17 @@ void QnWorkbenchVideoWallHandler::handleMessage(const QnVideoWallControlMessage 
             if (workbench()->currentLayout()->item(uuid))
                 return;
 
+            //TODO: #GDM Allow dropping of the local files outside of media folders.
             QString resourceUid = message[resourceKey];
+            const auto resource = resourcePool()->getResourceByUniqueId(resourceUid);
+            if (!resource)
+                return;
+
             QRect geometry = QJson::deserialized<QRect>(message[geometryKey].toUtf8());
             QRectF zoomRect = QJson::deserialized<QRectF>(message[zoomRectKey].toUtf8());
             qreal rotation = QJson::deserialized<qreal>(message[rotationKey].toUtf8());
             int checkedButtons = QJson::deserialized<int>(message[checkedButtonsKey].toUtf8());
-            QnWorkbenchItem* item = new QnWorkbenchItem(resourceUid, uuid, workbench()->currentLayout());
+            QnWorkbenchItem* item = new QnWorkbenchItem(resource, uuid, workbench()->currentLayout());
             item->setGeometry(geometry);
             item->setZoomRect(zoomRect);
             item->setRotation(rotation);
@@ -1412,7 +1417,8 @@ QnLayoutResourcePtr QnWorkbenchVideoWallHandler::constructLayout(const QnResourc
             item.uuid = QnUuid::createUuid();
             item.combinedGeometry = QRect(i % matrixWidth, i / matrixWidth, 1, 1);
             item.resource.id = resource->getId();
-            item.resource.uniqueId = resource->getUniqueId();
+            if (resource->hasFlags(Qn::local_media))
+                item.resource.uniqueId = resource->getUniqueId();
             layout->addItem(item);
             i++;
         }
@@ -2485,7 +2491,7 @@ void QnWorkbenchVideoWallHandler::at_workbenchLayout_itemAdded_controlMode(QnWor
 
     QnVideoWallControlMessage message(QnVideoWallControlMessage::LayoutItemAdded);
     message[uuidKey] = item->uuid().toString();
-    message[resourceKey] = item->resourceUid();
+    message[resourceKey] = item->resource()->getUniqueId();
     message[geometryKey] = QString::fromUtf8(QJson::serialized(item->geometry()));
     message[zoomRectKey] = QString::fromUtf8(QJson::serialized(item->zoomRect()));
     message[rotationKey] = QString::fromUtf8(QJson::serialized(item->rotation()));
@@ -3101,28 +3107,19 @@ void QnWorkbenchVideoWallHandler::saveVideowallAndReviewLayout(const QnVideoWall
         ? QnWorkbenchLayout::instance(layout)
         : QnWorkbenchLayout::instance(videowall);
 
-    QnLayoutResourcePtr workbenchResource = workbenchLayout->resource();
-
-    auto callback = [this, workbenchResource](int reqId, ec2::ErrorCode errorCode)
+    if (const auto reviewLayout = workbenchLayout->resource())
     {
-        Q_UNUSED(reqId);
-        if (!workbenchResource)
+        auto callback =
+            [this, id = reviewLayout->getId()](int /*reqId*/, ec2::ErrorCode errorCode)
+            {
+                snapshotManager()->markBeingSaved(id, false);
+                if (errorCode != ec2::ErrorCode::ok)
+                    return;
+                snapshotManager()->markChanged(id, false);
+            };
+        if (saveReviewLayout(reviewLayout, callback))
             return;
-
-        snapshotManager()->setFlags(workbenchResource, snapshotManager()->flags(workbenchResource) & ~Qn::ResourceIsBeingSaved);
-        if (errorCode != ec2::ErrorCode::ok)
-            return;
-        snapshotManager()->setFlags(workbenchResource, snapshotManager()->flags(workbenchResource) & ~Qn::ResourceIsChanged);
-    };
-
-    //TODO: #GDM #VW #LOW refactor common code to common place
-    if (saveReviewLayout(workbenchLayout, callback))
-    {
-        if (workbenchResource)
-            snapshotManager()->setFlags(workbenchResource, snapshotManager()->flags(workbenchResource) | Qn::ResourceIsBeingSaved);
     }
-    else
-    { // e.g. workbench layout is empty
-        qnResourcesChangesManager->saveVideoWall(videowall, [](const QnVideoWallResourcePtr &) {});
-    }
+
+    qnResourcesChangesManager->saveVideoWall(videowall, [](const QnVideoWallResourcePtr &) {});
 }

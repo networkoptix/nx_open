@@ -13,7 +13,7 @@
 QnResourceTreeModelLayoutNodeManager::QnResourceTreeModelLayoutNodeManager(QnResourceTreeModel* model):
     base_type(model)
 {
-    connect(snapshotManager(), &QnWorkbenchLayoutSnapshotManager::flagsChanged, this,
+    connect(snapshotManager(), &QnWorkbenchLayoutSnapshotManager::layoutFlagsChanged, this,
         [this](const QnLayoutResourcePtr& layout)
         {
             resourceChainCall(layout, &QnResourceTreeModelNode::setModified,
