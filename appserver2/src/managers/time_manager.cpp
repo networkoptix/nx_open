@@ -1188,6 +1188,19 @@ void TimeSynchronizationManager::syncTimeWithAllKnownServers(
     }
 }
 
+void TimeSynchronizationManager::resyncTimeWithPeer(const QnUuid& peerId)
+{
+    QnMutexLocker lock(&m_mutex);
+    auto peerCtx = m_peersToSendTimeSyncTo.find(peerId);
+    if (peerCtx == m_peersToSendTimeSyncTo.end())
+        return;
+    NX_LOGX(lm("Scheduling time synchronization with peer %1")
+        .arg(peerCtx->first.toString()), cl_logDEBUG2);
+    m_timerManager->modifyTimerDelay(
+        peerCtx->second.syncTimerID.get(),
+        std::chrono::milliseconds::zero());
+}
+
 void TimeSynchronizationManager::onBeforeSendingTransaction(
     QnTransactionTransportBase* /*transport*/,
     nx_http::HttpHeaders* const headers)

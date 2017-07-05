@@ -158,7 +158,7 @@ public:
         const QnUuid& peerID,
         const nx_http::StringType& serializedTimeSync,
         boost::optional<qint64> requestRttMillis);
-
+    void resyncTimeWithPeer(const QnUuid& peerId);
 signals:
     /**
      * Emitted when there is ambiguity while choosing primary time server automatically.

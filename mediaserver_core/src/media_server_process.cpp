@@ -2657,8 +2657,19 @@ void MediaServerProcess::run()
         miscManager->cleanupDatabaseSync(kCleanupDbObjects, kCleanupTransactionLog);
     }
 
-    connect( ec2Connection->getTimeNotificationManager().get(), &ec2::AbstractTimeNotificationManager::timeChanged,
-             QnSyncTime::instance(), (void(QnSyncTime::*)(qint64))&QnSyncTime::updateTime );
+    connect(ec2Connection->getTimeNotificationManager().get(), &ec2::AbstractTimeNotificationManager::timeChanged,
+        [this](qint64 newTime)
+        {
+            QnSyncTime::instance()->updateTime(newTime);
+
+            using namespace ec2;
+            QnTransaction<ApiPeerSyncTimeData> tran(
+                ApiCommand::broadcastPeerSyncTime,
+                commonModule()->moduleGUID());
+            tran.params.syncTimeMs = newTime;
+            sendTransaction(commonModule()->ec2Connection()->messageBus(), tran);
+        }
+        );
 
     std::unique_ptr<QnMServerResourceSearcher> mserverResourceSearcher(new QnMServerResourceSearcher(commonModule()));
 

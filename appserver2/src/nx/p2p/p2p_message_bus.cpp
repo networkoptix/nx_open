@@ -1365,6 +1365,9 @@ void MessageBus::gotTransaction(
             if (localPeer().isServer())
                 sendTransaction(tran, transportHeader); //< Proxy
             return;
+        case ApiCommand::broadcastPeerSyncTime:
+            m_timeSyncManager->resyncTimeWithPeer(tran.peerID);
+            return; // do not proxy.
         default:
             break; //< Not a special case
     }
