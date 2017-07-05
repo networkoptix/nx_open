@@ -170,7 +170,7 @@ QStringList LicenseDeactivationReason::reasons()
         tr("I'm accidentally assigned the license to a wrong machine"),
         tr("Other Reason")};
 
-    return kReasons;
+    return {kReasons};
 }
 
 license::RequestInfo LicenseDeactivationReason::info()
