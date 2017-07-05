@@ -58,7 +58,7 @@ public:
 
     void addResource(const QnResourcePtr &resource);
     // TODO: We need to remove this function. Client should use separate instance of resource pool instead
-    void addIncompatibleResource(const QnMediaServerResourcePtr& server);
+    void addIncompatibleServer(const QnMediaServerResourcePtr& server);
 
     void beginTran();
     void commit();

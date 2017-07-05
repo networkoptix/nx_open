@@ -92,7 +92,7 @@ void QnResourcePool::addResource(const QnResourcePtr &resource)
         addResources(QnResourceList() << resource);
 }
 
-void QnResourcePool::addIncompatibleResource(const QnMediaServerResourcePtr& server)
+void QnResourcePool::addIncompatibleServer(const QnMediaServerResourcePtr& server)
 {
     addResources(QnResourceList() << server, false);
 }

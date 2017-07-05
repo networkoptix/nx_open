@@ -264,7 +264,7 @@ void QnIncompatibleServerWatcherPrivate::addResource(const ec2::ApiDiscoveredSer
             fakeUuidByServerUuid[serverData.id] = server->getId();
             serverUuidByFakeUuid[server->getId()] = serverData.id;
         }
-        resourcePool()->addIncompatibleResource(server);
+        resourcePool()->addIncompatibleServer(server);
 
         NX_LOG(lit("QnIncompatibleServerWatcher: Add incompatible server %1 at %2 [%3]")
             .arg(serverData.id.toString())
