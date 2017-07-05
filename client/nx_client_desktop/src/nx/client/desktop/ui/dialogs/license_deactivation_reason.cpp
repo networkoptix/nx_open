@@ -162,9 +162,9 @@ QWidget* LicenseDeactivationReason::createWidget(QPushButton* nextButton)
     return widget;
 }
 
-const QStringList LicenseDeactivationReason::reasons()
+QStringList LicenseDeactivationReason::reasons()
 {
-    static const auto kReasons = {
+    static const QStringList kReasons{
         tr("- Choose one -"),
         tr("I'm upgrading my machine"),
         tr("I'm accidentally assigned the license to a wrong machine"),
