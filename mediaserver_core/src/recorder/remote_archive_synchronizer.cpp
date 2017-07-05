@@ -39,6 +39,8 @@ using namespace nx::core::resource;
 RemoteArchiveSynchronizer::RemoteArchiveSynchronizer():
     m_terminated(false)
 {
+    qDebug() << "Creating remote archive synchronizer.";
+    NX_LOGX(lit("Starting archive synchronization."), cl_logDEBUG1);
     connect(
         qnResPool,
         &QnResourcePool::resourceAdded,
