@@ -340,7 +340,7 @@ function CameraRecordsProvider(cameras, mediaserver, $q, width) {
         }
 
         // Depends on this interval - choose minimum interval, which contains all records and request deeper detailization
-        var nextLevel = RulerModel.getLevelIndex(self.nowToDisplay() - self.chunksTree.start,width);
+        var nextLevel = RulerModel.getLevelIndex(timeManager.nowToDisplay() - self.chunksTree.start,width);
         if(nextLevel<RulerModel.levels.length-1) {
             self.requestInterval(timeManager.displayToServer(self.chunksTree.start), timeManager.nowToServer(), nextLevel + 1);
         }
@@ -928,10 +928,11 @@ ShortCache.prototype.setPlayingPosition = function(position){
 
 
 
-function ScaleManager (minMsPerPixel, maxMsPerPixel, defaultIntervalInMS, initialWidth, stickToLiveMs, zoomAccuracyMs,
-                       lastMinuteInterval, minPixelsPerLevel, $q){
+function ScaleManager(minMsPerPixel, maxMsPerPixel, defaultIntervalInMS, initialWidth, stickToLiveMs, zoomAccuracyMs,
+                       lastMinuteInterval, minPixelsPerLevel, minScrollBarWidth, $q){
     this.absMaxMsPerPixel = maxMsPerPixel;
     this.minMsPerPixel = minMsPerPixel;
+    this.minScrollBarWidth = minScrollBarWidth;
     this.stickToLiveMs = stickToLiveMs;
     this.zoomAccuracyMs = zoomAccuracyMs;
     this.minPixelsPerLevel = minPixelsPerLevel;
@@ -1214,14 +1215,17 @@ ScaleManager.prototype.screenCoordinateToDate = function(coordinate){
 // If we move scroll right or left - we are loosing old anchor and setting new.
 // If we are zooming - we are zooming around anchor.
 
-ScaleManager.prototype.getRelativeCenter = function(){
-    return ((this.visibleStart + this.visibleEnd) / 2 - this.start) / (this.end - this.start);
+
+ScaleManager.prototype.getRelativePosition = function(){
+    var availableWidth = (this.end - this.start) - (this.visibleEnd - this.visibleStart);
+    if(availableWidth == 0){
+        return 0;
+    }
+    return (this.visibleStart - this.start) / availableWidth;
 };
 ScaleManager.prototype.getRelativeWidth = function(){
     return this.msPerPixel * this.viewportWidth / (this.end - this.start);
 };
-
-
 
 ScaleManager.prototype.canScroll = function(left){
     if(left){
@@ -1231,17 +1235,57 @@ ScaleManager.prototype.canScroll = function(left){
     return this.visibleEnd != this.end
         && !(this.watchPlayingPosition && this.liveMode);
 };
+ScaleManager.prototype.scrollSlider = function(){
+    var relativeWidth =  this.getRelativeWidth();
+    var scrollBarSliderWidth = Math.max(this.viewportWidth * relativeWidth, this.minScrollBarWidth);
+    var scrollingWidth = this.viewportWidth - scrollBarSliderWidth;
 
-ScaleManager.prototype.scroll = function(value){
-    if(typeof (value) == "undefined"){
-        return this.getRelativeCenter();
+    var scrollValue =  this.getRelativePosition();
+    var startCoordinate = this.bound(0, scrollingWidth * scrollValue, scrollingWidth);
+
+    return {
+        width: scrollBarSliderWidth,
+        start: startCoordinate,
+        scroll: scrollValue,
+        scrollingWidth: scrollingWidth
     }
-    value = this.bound(0,value,1);
-    //scroll right or left by relative value - move anchor
+};
+ScaleManager.prototype.scroll = function(value){
+/*
+    How scrolling actually works:
 
-    var achcorDate = this.anchorDate; //Save anchorDate
-    this.setAnchorDateAndPoint(this.start + value * (this.end-this.start),0.5); //Move viewport
-    this.tryToRestoreAnchorDate(achcorDate); //Try to restore anchorDate
+    We need two-way translation between visible dates and scrollbar coordinates.
+    Lets look closer at scrollbar scrollSlider.start coordinate on the screen and visibleStart date on the timeline.
+    They need to be consistent at any time.
+
+    scrollSlider.start belongs to [0, viewportWidth - scrollSlider.width]
+    So we can introduce relative coordinate for it:
+    relativePosition =  scrollSlider.start / (viewportWidth - scrollSlider.width)
+    relativePosition belongs to [0,1]
+    
+
+    visibleStart belongs to [start, end - visibleWidth]
+    visibleWidth = visibleEnd-visibleStart - visible time interval on the timeline
+    start - the left date on the timeline (start of the timeline)
+    end - the right date on the timeline (current datetime - live position)
+
+    So we can introduce relative coordinate for it:
+    relativePosition = (visibleStart - start) / ((end - start) - visibleWidth) =
+                       (visibleStart - start) / ((end - start) - (visibleEnd - visibleWidth))
+
+    relativePosition belongs to [0,1]
+
+
+    So we use this relativePosition as a scroll value
+*/
+    if(typeof (value) == "undefined"){
+        //instead of scrolling by center - we always determine scroll value by left position
+        return this.getRelativePosition();
+    }
+    var anchorDate = this.anchorDate; //Save anchorDate
+    var availableWidth = (this.end - this.start) - (this.visibleEnd - this.visibleStart);
+    this.setAnchorDateAndPoint(this.start + value * availableWidth, 0); //Move viewport
+    this.tryToRestoreAnchorDate(anchorDate); //Try to restore anchorDate
 };
 
 ScaleManager.prototype.getScrollByPixelsTarget = function(pixels){
