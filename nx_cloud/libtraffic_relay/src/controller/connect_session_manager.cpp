@@ -101,10 +101,15 @@ void ConnectSessionManager::createClientSession(
         std::chrono::duration_cast<std::chrono::seconds>(
             m_settings.connectingPeer().connectSessionIdleTimeout);
 
-    const auto peerName = 
-        m_listeningPeerPool->findListeningPeerByDomain(request.targetPeerName);
+    const auto peerName = m_listeningPeerPool->findListeningPeerByDomain(request.targetPeerName);
     if (peerName.empty())
     {
+        NX_VERBOSE(this, lm("Session %1. Failed to find peer %2 on the current relay")
+           .arg(request.desiredSessionId)
+           .arg(request.targetPeerName));
+
+        auto remoteRelayName = m_remoteRelayPeerPool.findRelayByDomainName(request.targetPeerName);
+
         NX_LOGX(lm("Session %1. Listening peer %2 was not found")
             .arg(request.desiredSessionId).arg(request.targetPeerName), cl_logDEBUG1);
         return completionHandler(
