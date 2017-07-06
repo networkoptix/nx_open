@@ -101,7 +101,9 @@ def review_version_request(request, context=None, language=None):
 		preview_link = generate_preview()
 		return redirect(preview_link)
 	elif "Publish" in request.data:
-		publish_latest_version(request.user)	
+		publish_latest_version(request.user)
+		return Response("Published")
+	return Response("Invalid")
 		
 
 

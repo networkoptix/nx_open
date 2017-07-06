@@ -38,13 +38,11 @@ def save_unrevisioned_records(customization, language, data_structures, request_
 		
 		latest_unapproved_record = data_structure.datarecord_set.filter(customization=customization,
 																		language=language,
-																		version=None)\
-																.exclude(created_by=None)
+																		version=None)
 		
 		latest_approved_record = data_structure.datarecord_set.filter(customization=customization,
 																	  language=language)\
-															  .exclude(version=None,
-															  		   created_by=None)
+															  .exclude(version=None)
 		
 		new_record_value = request_data[data_structure_name]
 
@@ -70,15 +68,10 @@ def alter_records_version(contexts, customization, old_version, new_version):
 	for context in contexts:
 		for data_structure in context.datastructure_set.all():
 			records = data_structure.datarecord_set.filter(customization=customization,
-														   version=old_version)\
-												   .exclude(created_by=None)
-			
-			for language in languages:
-				record = records.filter(language=language)
-				if record.exists():
-					record = record.latest('created_date')
-					record.version = new_version
-					record.save()
+														   version=old_version)
+			for record in records:
+				record.version = new_version
+				record.save()
 
 
 def generate_preview(context=None):
