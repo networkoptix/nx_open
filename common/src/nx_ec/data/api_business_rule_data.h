@@ -10,15 +10,15 @@ namespace ec2
 {
     struct ApiBusinessRuleData: ApiIdData {
         ApiBusinessRuleData():
-            eventType(QnBusiness::UndefinedEvent), eventState(QnBusiness::UndefinedState), actionType(QnBusiness::UndefinedAction),
+            eventType(nx::vms::event::undefinedEvent), eventState(nx::vms::event::EventState::undefined), actionType(nx::vms::event::undefinedAction),
             aggregationPeriod(0), disabled(false), system(false) {}
 
-        QnBusiness::EventType eventType;
+        nx::vms::event::EventType eventType;
         std::vector<QnUuid>  eventResourceIds;
         QnLatin1Array eventCondition;
-        QnBusiness::EventState eventState;
+        nx::vms::event::EventState eventState;
 
-        QnBusiness::ActionType actionType;
+        nx::vms::event::ActionType actionType;
         std::vector<QnUuid> actionResourceIds;
         QnLatin1Array actionParams;
 
@@ -35,10 +35,10 @@ namespace ec2
 
     struct ApiBusinessActionData: ApiData
     {
-        ApiBusinessActionData(): ApiData(), actionType(QnBusiness::UndefinedAction), toggleState(QnBusiness::UndefinedState), receivedFromRemoteHost(false), aggregationCount(0) {}
+        ApiBusinessActionData(): ApiData(), actionType(nx::vms::event::undefinedAction), toggleState(nx::vms::event::EventState::undefined), receivedFromRemoteHost(false), aggregationCount(0) {}
 
-        QnBusiness::ActionType actionType;
-        QnBusiness::EventState toggleState;
+        nx::vms::event::ActionType actionType;
+        nx::vms::event::EventState toggleState;
         bool receivedFromRemoteHost;
         std::vector<QnUuid> resourceIds;
         QByteArray params;

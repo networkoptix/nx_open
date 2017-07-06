@@ -40,6 +40,8 @@ QnWorkbenchCloudHandler::QnWorkbenchCloudHandler(QObject* parent):
         &QnWorkbenchCloudHandler::at_logoutFromCloudAction_triggered);
     connect(action(action::OpenCloudMainUrl), &QAction::triggered, this,
         &QnWorkbenchCloudHandler::at_openCloudMainUrlAction_triggered);
+    connect(action(action::OpenCloudViewSystemUrl), &QAction::triggered, this,
+        [this]{QDesktopServices::openUrl(m_cloudUrlHelper->viewSystemUrl());});
     connect(action(action::OpenCloudManagementUrl), &QAction::triggered, this,
         &QnWorkbenchCloudHandler::at_openCloudManagementUrlAction_triggered);
 

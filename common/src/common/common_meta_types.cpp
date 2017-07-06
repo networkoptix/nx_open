@@ -70,10 +70,10 @@
 
 #include <core/onvif/onvif_config_data.h>
 
-#include <business/actions/abstract_business_action.h>
-#include <business/events/abstract_business_event.h>
-#include <business/business_event_rule.h>
-#include <business/business_fwd.h>
+#include <nx/vms/event/actions/abstract_action.h>
+#include <nx/vms/event/events/abstract_event.h>
+#include <nx/vms/event/rule.h>
+#include <nx/vms/event/event_fwd.h>
 
 #include <licensing/license.h>
 
@@ -143,7 +143,7 @@ void QnCommonMetaTypes::initialize() {
     QMetaType::registerConverter<Qn::ResourceFlags, int>();
     qRegisterMetaType<Qn::ResourceStatus>();
     qRegisterMetaType<Qn::BitratePerGopType>();
-    qRegisterMetaType<QnBusiness::EventReason>();
+    qRegisterMetaType<nx::vms::event::EventReason>();
 
     qRegisterMetaType<QnUserResourcePtr>();
     qRegisterMetaType<QnLayoutResourcePtr>();
@@ -214,12 +214,13 @@ void QnCommonMetaTypes::initialize() {
     qRegisterMetaType<StreamRecorderErrorStruct>();
 #endif
 
-    qRegisterMetaType<QnAbstractBusinessActionPtr>();
-    qRegisterMetaType<QnAbstractBusinessActionList>();
-    qRegisterMetaType<QnBusinessActionDataListPtr>();
-    qRegisterMetaType<QnAbstractBusinessEventPtr>();
-    qRegisterMetaType<QnBusinessEventRulePtr>();
-    qRegisterMetaType<QnBusinessEventRuleList>();
+    qRegisterMetaType<nx::vms::event::AbstractActionPtr>();
+    qRegisterMetaType<nx::vms::event::AbstractActionList>();
+    qRegisterMetaType<nx::vms::event::ActionDataListPtr>();
+    qRegisterMetaType<nx::vms::event::AbstractEventPtr>();
+    qRegisterMetaType<nx::vms::event::RulePtr>();
+    qRegisterMetaType<nx::vms::event::RuleList>();
+
     qRegisterMetaType<QnAbstractDataPacketPtr>();
     qRegisterMetaType<QnConstAbstractDataPacketPtr>();
 

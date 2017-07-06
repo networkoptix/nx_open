@@ -8,7 +8,7 @@
 #include <QtGui/QStandardItem>
 #include <QtGui/QStandardItemModel>
 
-#include <business/business_event_rule.h>
+#include <nx/vms/event/rule.h>
 
 #include <ui/dialogs/common/session_aware_dialog.h>
 
@@ -18,14 +18,13 @@
 #include <utils/common/request_param.h>
 
 namespace Ui {
-    class BusinessRulesDialog;
-}
+class BusinessRulesDialog;
+} // namespace Ui
 
-class QnBusinessRulesDialog : public QnSessionAwareButtonBoxDialog
+class QnBusinessRulesDialog: public QnSessionAwareButtonBoxDialog
 {
     Q_OBJECT
-
-    typedef QnSessionAwareButtonBoxDialog base_type;
+    using base_type = QnSessionAwareButtonBoxDialog;
 
 public:
     explicit QnBusinessRulesDialog(QWidget *parent = 0);
@@ -73,7 +72,9 @@ private slots:
     void retranslateUi();
 
 private:
-    Q_DISABLE_COPY(QnBusinessRulesDialog)
+    Q_DISABLE_COPY(QnBusinessRulesDialog);
+
+    using Column = QnBusinessRuleViewModel::Column;
 
     void createActions();
 

@@ -129,10 +129,12 @@ protected:
     template<typename FetcherType>
     void whenRequestedModuleUrlWithFetcher()
     {
+        using namespace std::placeholders;
+
         network::SocketGlobals::addressResolver().addFixedAddress(
             m_expectedHost, endpoint());
 
-        FetcherType fetcher(std::make_unique<network::cloud::RandomEndpointSelector>());
+        FetcherType fetcher;
         auto fetcherGuard = makeScopeGuard([&fetcher]() { fetcher.pleaseStopSync(); });
 
         fetcher.setModulesXmlUrl(QUrl(lm("http://%1:%2%3")
@@ -140,12 +142,13 @@ protected:
         for (const auto& header: m_additionalHttpHeaders)
             fetcher.addAdditionalHttpHeaderForGetRequest(header.first, header.second);
         nx::utils::promise<void> done;
-        fetcher.get(
+        auto completionHandler = 
             [this, &done](nx_http::StatusCode::Value statusCode, QUrl moduleUrl)
             {
                 m_fetchUrlResult = {statusCode, moduleUrl};
                 done.set_value();
-            });
+            };
+        fetcher.get(std::bind(completionHandler, _1, _2));
 
         done.get_future().wait();
 

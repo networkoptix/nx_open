@@ -48,6 +48,11 @@ public:
 
     bool isDesktopMode() const;
 
+    /**
+     * Actual maximum value of scene items.
+     */
+    static int maxSceneItems();
+
 private:
     QN_BEGIN_PROPERTY_STORAGE(VARIABLE_COUNT)
         QN_DECLARE_RW_PROPERTY(bool,    isSoftwareYuv,          setSoftwareYuv,             SOFTWARE_YUV,               false)

@@ -9,7 +9,7 @@
                 <Component Id="DefaultLanguage">
                     <RegistryKey Root="HKCU"
                              Key="Software\[Manufacturer]\$(var.nxtoolName)">
-                        <RegistryValue Type="string" Name="translationPath" Value=":/translations/common_$(var.translation1).qm"/>
+                        <RegistryValue Type="string" Name="translationPath" Value=":/translations/common_$(var.defaultTranslation).qm"/>
                     </RegistryKey>
                 </Component>
 

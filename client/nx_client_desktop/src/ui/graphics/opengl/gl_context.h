@@ -107,7 +107,7 @@ public:
 private:
     SYS_GL_CTX_HANDLE m_handle;
     SYS_PAINT_DEVICE_HANDLE m_dc;
-    std::auto_ptr<QWidget> m_widget;
+    std::unique_ptr<QWidget> m_widget;
     WId m_winID;
     unsigned int m_previousErrorCode;
 #ifdef Q_OS_WIN

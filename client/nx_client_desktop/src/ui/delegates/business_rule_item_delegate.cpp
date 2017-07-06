@@ -6,10 +6,12 @@
 #include <QtWidgets/QLayout>
 #include <QtWidgets/QComboBox>
 
-#include <business/business_action_parameters.h>
-#include <business/business_strings_helper.h>
+// TODO: #vkutin Think about proper location and namespace.
 #include <business/business_resource_validation.h>
 #include <business/business_types_comparator.h>
+
+#include <nx/vms/event/action_parameters.h>
+#include <nx/vms/event/strings_helper.h>
 
 #include <client_core/client_core_module.h>
 
@@ -25,12 +27,13 @@
 #include <ui/style/helper.h>
 #include <ui/widgets/business/aggregation_widget.h>
 #include <ui/workbench/workbench_context.h>
-
-#include <nx/client/desktop/utils/server_notification_cache.h>
 #include <utils/math/color_transformations.h>
 
 #include <nx/client/desktop/ui/event_rules/subject_selection_dialog.h>
+#include <nx/client/desktop/utils/server_notification_cache.h>
 
+
+using namespace nx;
 using namespace nx::client::desktop::ui;
 
 namespace {
@@ -86,11 +89,11 @@ void QnSelectResourcesDialogButton::at_clicked()
         SubjectSelectionDialog dialog(this);
         auto ids = m_resources;
 
-        //TODO: #vkutin #3.2 Temporary workaround to pass "all users" as a special uuid.
+        // TODO: #vkutin #3.2 Temporary workaround to pass "all users" as a special uuid.
         dialog.setAllUsers(ids.remove(QnBusinessRuleViewModel::kAllUsersId));
         dialog.setCheckedSubjects(ids);
 
-        //TODO: #vkutin Hack till #3.2
+        // TODO: #vkutin Hack till #3.2
         const bool isEmail = dynamic_cast<QnSendEmailActionDelegate*>(m_dialogDelegate) != nullptr;
         dialog.setAllUsersSelectorEnabled(!isEmail);
 
@@ -116,7 +119,7 @@ void QnSelectResourcesDialogButton::at_clicked()
                 else
                 {
                     dialog.showAlert(!dialog.allUsers() && dialog.checkedSubjects().empty()
-                        ? QnBusinessStringsHelper::needToSelectUserText()
+                        ? vms::event::StringsHelper::needToSelectUserText()
                         : QString());
                 }
             };
@@ -160,11 +163,11 @@ void QnSelectResourcesDialogButton::paintEvent(QPaintEvent *event)
 ///////////////////////////////////////////////////////////////////////////////////////
 //---------------- QnBusinessRuleItemDelegate ---------------------------------------//
 ///////////////////////////////////////////////////////////////////////////////////////
-QnBusinessRuleItemDelegate::QnBusinessRuleItemDelegate(QObject *parent):
+QnBusinessRuleItemDelegate::QnBusinessRuleItemDelegate(QObject* parent):
     base_type(parent),
     QnWorkbenchContextAware(parent),
     m_lexComparator(new QnBusinessTypesComparator()),
-    m_businessStringsHelper(new QnBusinessStringsHelper(qnClientCoreModule->commonModule()))
+    m_businessStringsHelper(new vms::event::StringsHelper(qnClientCoreModule->commonModule()))
 {
 }
 
@@ -172,39 +175,39 @@ QnBusinessRuleItemDelegate::~QnBusinessRuleItemDelegate()
 {
 }
 
-int QnBusinessRuleItemDelegate::optimalWidth(int column, const QFontMetrics& metrics)
+int QnBusinessRuleItemDelegate::optimalWidth(Column column, const QFontMetrics& metrics)
 {
     const int kExtraSpace =
         style::Metrics::kStandardPadding //< dropdown text indent
         + style::Metrics::kButtonHeight; //< dropdown arrow
 
-    switch (column)
+    switch (Column(column))
     {
-        case QnBusiness::EventColumn:
+        case Column::event:
         {
-            QnBusinessStringsHelper helper(qnClientCoreModule->commonModule());
-            auto eventWidth = [&metrics, &helper](QnBusiness::EventType eventType)
+            vms::event::StringsHelper helper(qnClientCoreModule->commonModule());
+            auto eventWidth = [&metrics, &helper](vms::event::EventType eventType)
                 {
                     return metrics.width(helper.eventName(eventType));
                 };
             int result = -1;
-            for (QnBusiness::EventType eventType: QnBusiness::allEvents())
+            for (vms::event::EventType eventType: vms::event::allEvents())
                 result = qMax(result, eventWidth(eventType));
             return kExtraSpace + result;
         }
-        case QnBusiness::ActionColumn:
+        case Column::action:
         {
-            QnBusinessStringsHelper helper(qnClientCoreModule->commonModule());
-            auto actionWidth = [&metrics, &helper](QnBusiness::ActionType actionType)
+            vms::event::StringsHelper helper(qnClientCoreModule->commonModule());
+            auto actionWidth = [&metrics, &helper](vms::event::ActionType actionType)
                 {
                     return metrics.width(helper.actionName(actionType));
                 };
             int result = -1;
-            for (QnBusiness::ActionType actionType: QnBusiness::allActions())
+            for (vms::event::ActionType actionType: vms::event::allActions())
                 result = qMax(result, actionWidth(actionType));
             return kExtraSpace + result;
         }
-        case QnBusiness::AggregationColumn:
+        case Column::aggregation:
         {
             return QnAggregationWidget::optimalWidth();
         }
@@ -250,84 +253,84 @@ void QnBusinessRuleItemDelegate::paint(QPainter* painter, const QStyleOptionView
 
 QWidget* QnBusinessRuleItemDelegate::createEditor(QWidget *parent, const QStyleOptionViewItem &option, const QModelIndex &index) const
 {
-    switch (index.column())
+    switch (Column(index.column()))
     {
-        case QnBusiness::SourceColumn:
+        case Column::source:
         {
             QnSelectResourcesDialogButton* btn = new QnSelectResourcesDialogButton(parent);
             //TODO: #GDM #Business server selection dialog?
             connect(btn, SIGNAL(commit()), this, SLOT(at_editor_commit()));
 
-            QnBusiness::EventType eventType = index.data(Qn::EventTypeRole).value<QnBusiness::EventType>();
-            if (eventType == QnBusiness::CameraMotionEvent)
+            vms::event::EventType eventType = index.data(Qn::EventTypeRole).value<vms::event::EventType>();
+            if (eventType == vms::event::cameraMotionEvent)
                 btn->setDialogDelegate(new QnCheckResourceAndWarnDelegate<QnCameraMotionPolicy>(btn));
-            else if (eventType == QnBusiness::CameraInputEvent)
+            else if (eventType == vms::event::cameraInputEvent)
                 btn->setDialogDelegate(new QnCheckResourceAndWarnDelegate<QnCameraInputPolicy>(btn));
 
             return btn;
         }
-        case QnBusiness::TargetColumn:
+        case Column::target:
         {
-            QnBusiness::ActionType actionType = index.data(Qn::ActionTypeRole).value<QnBusiness::ActionType>();
+            vms::event::ActionType actionType = index.data(Qn::ActionTypeRole).value<vms::event::ActionType>();
 
             QnSelectResourcesDialogButton* btn = new QnSelectResourcesDialogButton(parent);
             connect(btn, SIGNAL(commit()), this, SLOT(at_editor_commit()));
 
-            if (actionType == QnBusiness::CameraRecordingAction)
+            if (actionType == vms::event::cameraRecordingAction)
             {
                 btn->setDialogDelegate(new QnCheckResourceAndWarnDelegate<QnCameraRecordingPolicy>(btn));
             }
-            else if (actionType == QnBusiness::BookmarkAction)
+            else if (actionType == vms::event::bookmarkAction)
             {
                 btn->setDialogDelegate(new QnCheckResourceAndWarnDelegate<QnBookmarkActionPolicy>(btn));
             }
-            else if (actionType == QnBusiness::CameraOutputAction)
+            else if (actionType == vms::event::cameraOutputAction)
             {
                 btn->setDialogDelegate(new QnCheckResourceAndWarnDelegate<QnCameraOutputPolicy>(btn));
             }
-            else if (actionType == QnBusiness::ExecutePtzPresetAction)
+            else if (actionType == vms::event::executePtzPresetAction)
             {
                 btn->setDialogDelegate(new QnCheckResourceAndWarnDelegate<QnExecPtzPresetPolicy>(btn));
             }
-            else if (actionType == QnBusiness::SendMailAction)
+            else if (actionType == vms::event::sendMailAction)
             {
                 btn->setDialogDelegate(new QnSendEmailActionDelegate(btn));
                 btn->setSelectionTarget(QnResourceSelectionDialog::Filter::users);
             }
-            else if (actionType == QnBusiness::ShowPopupAction)
+            else if (actionType == vms::event::showPopupAction)
             {
                 btn->setSelectionTarget(QnResourceSelectionDialog::Filter::users);
             }
-            else if (actionType == QnBusiness::PlaySoundAction ||
-                actionType == QnBusiness::PlaySoundOnceAction ||
-                actionType == QnBusiness::SayTextAction)
+            else if (actionType == vms::event::playSoundAction ||
+                actionType == vms::event::playSoundOnceAction ||
+                actionType == vms::event::sayTextAction)
             {
                 btn->setDialogDelegate(new QnCheckResourceAndWarnDelegate<QnCameraAudioTransmitPolicy>(btn));
             }
             return btn;
         }
-        case QnBusiness::EventColumn:
+        case Column::event:
         {
             QComboBox* comboBox = new QComboBox(parent);
             comboBox->setMaxVisibleItems(comboBoxMaxVisibleItems);
-            for (QnBusiness::EventType eventType : m_lexComparator->lexSortedEvents())
+            for (const auto eventType: m_lexComparator->lexSortedEvents())
                 comboBox->addItem(m_businessStringsHelper->eventName(eventType), eventType);
             return comboBox;
         }
-        case QnBusiness::ActionColumn:
+        case Column::action:
         {
-            bool instantOnly = !QnBusiness::hasToggleState(index.data(Qn::EventTypeRole).value<QnBusiness::EventType>());
+            bool instantOnly = !vms::event::hasToggleState(index.data(Qn::EventTypeRole).value<vms::event::EventType>());
             QComboBox* comboBox = new QComboBox(parent);
             comboBox->setMaxVisibleItems(comboBoxMaxVisibleItems);
-            for (QnBusiness::ActionType actionType : m_lexComparator->lexSortedActions())
+            for (vms::event::ActionType actionType : m_lexComparator->lexSortedActions())
             {
-                if (instantOnly && !QnBusiness::canBeInstant(actionType))
+                if (instantOnly && !vms::event::canBeInstant(actionType))
                     continue;
                 comboBox->addItem(m_businessStringsHelper->actionName(actionType), actionType);
             }
             return comboBox;
         }
-        case QnBusiness::AggregationColumn:
+        case Column::aggregation:
         {
             QnAggregationWidget* widget = new QnAggregationWidget(parent);
             widget->setShort(true);
@@ -343,9 +346,9 @@ QWidget* QnBusinessRuleItemDelegate::createEditor(QWidget *parent, const QStyleO
 
 void QnBusinessRuleItemDelegate::setEditorData(QWidget *editor, const QModelIndex &index) const
 {
-    switch (index.column())
+    switch (Column(index.column()))
     {
-        case QnBusiness::SourceColumn:
+        case Column::source:
         {
             if (QnSelectResourcesDialogButton* btn = dynamic_cast<QnSelectResourcesDialogButton *>(editor))
             {
@@ -355,7 +358,7 @@ void QnBusinessRuleItemDelegate::setEditorData(QWidget *editor, const QModelInde
             }
             break;
         }
-        case QnBusiness::TargetColumn:
+        case Column::target:
         {
             if (QnSelectResourcesDialogButton* btn = dynamic_cast<QnSelectResourcesDialogButton *>(editor))
             {
@@ -365,21 +368,21 @@ void QnBusinessRuleItemDelegate::setEditorData(QWidget *editor, const QModelInde
             }
             break;
         }
-        case QnBusiness::EventColumn:
+        case Column::event:
             if (QComboBox* comboBox = dynamic_cast<QComboBox *>(editor))
             {
-                comboBox->setCurrentIndex(comboBox->findData(index.data(Qn::EventTypeRole).value<QnBusiness::EventType>()));
+                comboBox->setCurrentIndex(comboBox->findData(index.data(Qn::EventTypeRole).value<vms::event::EventType>()));
                 connect(comboBox, SIGNAL(currentIndexChanged(int)), this, SLOT(at_editor_commit()));
             }
             return;
-        case QnBusiness::ActionColumn:
+        case Column::action:
             if (QComboBox* comboBox = dynamic_cast<QComboBox *>(editor))
             {
-                comboBox->setCurrentIndex(comboBox->findData(index.data(Qn::ActionTypeRole).value<QnBusiness::ActionType>()));
+                comboBox->setCurrentIndex(comboBox->findData(index.data(Qn::ActionTypeRole).value<vms::event::ActionType>()));
                 connect(comboBox, SIGNAL(currentIndexChanged(int)), this, SLOT(at_editor_commit()));
             }
             return;
-        case QnBusiness::AggregationColumn:
+        case Column::aggregation:
             if (QnAggregationWidget* widget = dynamic_cast<QnAggregationWidget *>(editor))
             {
                 widget->setValue(index.data(Qt::EditRole).toInt());
@@ -395,27 +398,26 @@ void QnBusinessRuleItemDelegate::setEditorData(QWidget *editor, const QModelInde
 
 void QnBusinessRuleItemDelegate::setModelData(QWidget *editor, QAbstractItemModel *model, const QModelIndex &index) const
 {
-    switch (index.column())
+    switch (Column(index.column()))
     {
-        case QnBusiness::SourceColumn:
-        case QnBusiness::TargetColumn:
+        case Column::source:
+        case Column::target:
         {
             if (QnSelectResourcesDialogButton* btn = dynamic_cast<QnSelectResourcesDialogButton *>(editor))
             {
                 model->setData(index, qVariantFromValue(btn->resources()));
                 return;
             }
-
             break;
         }
-        case QnBusiness::EventColumn:
-        case QnBusiness::ActionColumn:
+        case Column::event:
+        case Column::action:
             if (QComboBox* comboBox = dynamic_cast<QComboBox *>(editor))
             {
                 model->setData(index, comboBox->itemData(comboBox->currentIndex()));
             }
             return;
-        case QnBusiness::AggregationColumn:
+        case Column::aggregation:
             if (QnAggregationWidget* widget = dynamic_cast<QnAggregationWidget *>(editor))
             {
                 model->setData(index, widget->value());
@@ -444,10 +446,10 @@ void QnBusinessRuleItemDelegate::at_editor_commit()
 void QnBusinessRuleItemDelegate::updateEditorGeometry(QWidget* editor,
     const QStyleOptionViewItem& option, const QModelIndex& index) const
 {
-    switch (index.column())
+    switch (Column(index.column()))
     {
-        case QnBusiness::EventColumn:
-        case QnBusiness::ActionColumn:
+        case Column::event:
+        case Column::action:
             editor->setGeometry(option.rect);
             break;
 

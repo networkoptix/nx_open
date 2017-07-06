@@ -219,17 +219,18 @@ void LayoutsHandler::saveLayout(const QnLayoutResourcePtr &layout)
     else if (!layout->data().value(Qn::VideoWallResourceRole).value<QnVideoWallResourcePtr>().isNull())
     {
         //TODO: #GDM #VW #LOW refactor common code to common place
+        NX_EXPECT(accessController()->hasPermissions(layout, Qn::SavePermission),
+            "Saving unsaveable resource");
         if (context()->instance<QnWorkbenchVideoWallHandler>()->saveReviewLayout(layout,
-                [this, layout](int reqId, ec2::ErrorCode errorCode)
+                [this, layout](int /*reqId*/, ec2::ErrorCode errorCode)
                 {
-                    Q_UNUSED(reqId);
-                    snapshotManager()->setFlags(layout, snapshotManager()->flags(layout) & ~Qn::ResourceIsBeingSaved);
+                    snapshotManager()->markBeingSaved(layout->getId(), false);
                     if (errorCode != ec2::ErrorCode::ok)
                         return;
-                    snapshotManager()->setFlags(layout, snapshotManager()->flags(layout) & ~Qn::ResourceIsChanged);
+                    snapshotManager()->markChanged(layout->getId(), false);
                 }))
         {
-            snapshotManager()->setFlags(layout, snapshotManager()->flags(layout) | Qn::ResourceIsBeingSaved);
+            snapshotManager()->markBeingSaved(layout->getId(), true);
         }
     }
     else
@@ -749,7 +750,7 @@ bool LayoutsHandler::closeLayouts(
     {
         for (const QnLayoutResourcePtr &resource : resources)
         {
-            bool changed = snapshotManager()->flags(resource).testFlag(Qn::ResourceIsChanged);
+            bool changed = snapshotManager()->isChanged(resource);
             if (!changed)
                 continue;
 

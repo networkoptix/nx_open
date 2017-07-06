@@ -1,6 +1,8 @@
 #include "business_types_comparator.h"
 
-#include <business/business_strings_helper.h>
+#include <nx/vms/event/strings_helper.h>
+
+using namespace nx;
 
 QnBusinessTypesComparator::QnBusinessTypesComparator(QObject* parent):
     base_type(parent)
@@ -8,22 +10,22 @@ QnBusinessTypesComparator::QnBusinessTypesComparator(QObject* parent):
     initLexOrdering();
 }
 
-bool QnBusinessTypesComparator::lexicographicalLessThan( QnBusiness::EventType left, QnBusiness::EventType right ) const {
+bool QnBusinessTypesComparator::lexicographicalLessThan( vms::event::EventType left, vms::event::EventType right ) const {
     return toLexEventType(left) < toLexEventType(right);
 }
 
-bool QnBusinessTypesComparator::lexicographicalLessThan( QnBusiness::ActionType left, QnBusiness::ActionType right ) const {
+bool QnBusinessTypesComparator::lexicographicalLessThan( vms::event::ActionType left, vms::event::ActionType right ) const {
     return toLexActionType(left) < toLexActionType(right);
 }
 
 void QnBusinessTypesComparator::initLexOrdering()
 {
-    QnBusinessStringsHelper helper(commonModule());
+    vms::event::StringsHelper helper(commonModule());
 
     // event types to lex order
     int maxType = 0;
     QMap<QString, int> eventTypes;
-    for (auto eventType: QnBusiness::allEvents()) {
+    for (auto eventType: vms::event::allEvents()) {
         eventTypes.insert(helper.eventName(eventType), eventType);
         if (maxType < eventType)
             maxType = eventType;
@@ -37,7 +39,7 @@ void QnBusinessTypesComparator::initLexOrdering()
     // action types to lex order
     maxType = 0;
     QMap<QString, int> actionTypes;
-    for (auto actionType: QnBusiness::allActions()) {
+    for (auto actionType: vms::event::allActions()) {
         actionTypes.insert(helper.actionName(actionType), actionType);
         if (maxType < actionType)
             maxType = actionType;
@@ -49,30 +51,30 @@ void QnBusinessTypesComparator::initLexOrdering()
         m_actionTypeToLexOrder[actionType] = count++;
 }
 
-int QnBusinessTypesComparator::toLexEventType( QnBusiness::EventType eventType ) const {
+int QnBusinessTypesComparator::toLexEventType( vms::event::EventType eventType ) const {
     return m_eventTypeToLexOrder[eventType];
 }
 
-int QnBusinessTypesComparator::toLexActionType( QnBusiness::ActionType actionType ) const {
+int QnBusinessTypesComparator::toLexActionType( vms::event::ActionType actionType ) const {
     return m_actionTypeToLexOrder[actionType];
 }
 
-QList<QnBusiness::EventType> QnBusinessTypesComparator::lexSortedEvents() const
+QList<vms::event::EventType> QnBusinessTypesComparator::lexSortedEvents() const
 {
-    auto events = QnBusiness::allEvents();
+    auto events = vms::event::allEvents();
     std::sort(events.begin(), events.end(),
-        [this](QnBusiness::EventType l, QnBusiness::EventType r)
+        [this](vms::event::EventType l, vms::event::EventType r)
         {
             return lexicographicalLessThan(l, r);
         });
     return events;
 }
 
-QList<QnBusiness::ActionType> QnBusinessTypesComparator::lexSortedActions() const
+QList<vms::event::ActionType> QnBusinessTypesComparator::lexSortedActions() const
 {
-    auto actions = QnBusiness::allActions();
+    auto actions = vms::event::allActions();
     std::sort(actions.begin(), actions.end(),
-        [this](QnBusiness::ActionType l, QnBusiness::ActionType r)
+        [this](vms::event::ActionType l, vms::event::ActionType r)
         {
             return lexicographicalLessThan(l, r);
         });

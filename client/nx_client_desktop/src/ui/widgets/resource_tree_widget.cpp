@@ -62,7 +62,7 @@ public:
     {
         if (index.column() == Qn::CheckColumn && role == Qt::CheckStateRole)
         {
-            //TODO: #vkutin #GDM #common Maybe move these signals to QnResourceTreeModel
+            // TODO: #vkutin #GDM #common Maybe move these signals to QnResourceTreeModel
             emit beforeRecursiveOperation();
             base_type::setData(index, value, Qt::CheckStateRole);
             emit afterRecursiveOperation();
@@ -141,7 +141,7 @@ QnResourceTreeWidget::QnResourceTreeWidget(QWidget *parent):
 {
     ui->setupUi(this);
 
-    //TODO: #vkutin replace with SearchLineEdit
+    // TODO: #vkutin replace with SearchLineEdit
     ui->filterLineEdit->addAction(qnSkin->icon("theme/input_search.png"),
         QLineEdit::LeadingPosition);
     ui->filterLineEdit->setClearButtonEnabled(true);

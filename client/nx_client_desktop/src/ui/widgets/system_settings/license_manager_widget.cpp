@@ -606,7 +606,7 @@ QString QnLicenseManagerWidget::getLicenseDescription(const QnLicensePtr& licens
     }
 
     const auto key = QString::fromStdString(license->key().constData());
-    const auto channelsCountString = tr("%n channels", "", license->cameraCount());
+    const auto channelsCountString = tr("%n channels.", "", license->cameraCount());
 
     return lit("%1%2%3, %4").arg(key, kHtmlDelimiter, license->displayName(), channelsCountString);
 }
@@ -665,8 +665,14 @@ QString QnLicenseManagerWidget::getDeactivationErrorMessage(
         result += licenseDescription + kEmptyLine + error;
     }
 
-    result += tr("Please contact Customer Support");
-    return result.join(kMessageDelimiter);
+    static const auto kContactCustomerSupportText = tr("Please contact Customer Support.");
+    if (errors.count() > 1)
+    {
+        result.append(kContactCustomerSupportText);
+        return result.join(kMessageDelimiter);
+    }
+
+    return result.join(kMessageDelimiter) + kEmptyLine + kContactCustomerSupportText;
 }
 
 void QnLicenseManagerWidget::showDeactivationErrorsDialog(
@@ -680,7 +686,7 @@ void QnLicenseManagerWidget::showDeactivationErrorsDialog(
 
     const bool totalFail = licenses.size() == errorsCount;
     const auto standardButton = totalFail ? QDialogButtonBox::Ok : QDialogButtonBox::Cancel;
-    QnMessageBox dialog(QnMessageBoxIcon::Critical, text, QString(),
+    QnMessageBox dialog(QnMessageBoxIcon::Information, text, QString(),
         standardButton, QDialogButtonBox::NoButton);
 
     const auto button = new QPushButton(lit("Copy to clipboard"), &dialog);
@@ -701,7 +707,7 @@ void QnLicenseManagerWidget::showDeactivationErrorsDialog(
     else
     {
         const auto deactivateButton = dialog.addButton(
-            tr("Deactivate %n other", "", licenses.size() - errorsCount),
+            tr("Deactivate %n Other", "", licenses.size() - errorsCount),
             QDialogButtonBox::YesRole, Qn::ButtonAccent::Warning);
         connect(deactivateButton, &QAbstractButton::clicked, this,
             [this, licenses, errors]()
@@ -746,7 +752,7 @@ void QnLicenseManagerWidget::deactivateLicenses(const QnLicenseList& licenses)
                     return;
 
                 case Result::ConnectionError:
-                    QnMessageBox::critical(this,
+                    QnMessageBox::information(this,
                         tr("Cannot connect to the License Server"),
                         tr("Please make sure your server has active Internet connection or check firewall settings."));
                     return;

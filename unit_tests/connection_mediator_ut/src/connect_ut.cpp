@@ -15,6 +15,7 @@
 #include <nx/network/stun/extension/stun_extension_types.h>
 #include <nx/network/http/http_client.h>
 #include <nx/network/http/test_http_server.h>
+#include <nx/network/url/url_builder.h>
 #include <nx/network/socket_global.h>
 #include <nx/utils/crypt/linux_passwd_crypt.h>
 #include <nx/utils/std/cpp14.h>
@@ -51,7 +52,8 @@ protected:
 
         EXPECT_TRUE(server->endpoints().size());
         m_address = SocketAddress(HostAddress::localhost, server->endpoints().front().port);
-        network::SocketGlobals::mediatorConnector().mockupAddress(m_address);
+        network::SocketGlobals::mediatorConnector().mockupAddress(
+            nx::network::url::Builder().setScheme("stun").setEndpoint(m_address));
     }
 
     nx::stun::MessageDispatcher stunMessageDispatcher;

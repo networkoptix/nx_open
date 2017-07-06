@@ -276,7 +276,7 @@ void QnStorageAnalyticsWidget::setupTableView(QnTableView* table, QAbstractItemM
     connect(table, &QTableView::customContextMenuRequested, this, &QnStorageAnalyticsWidget::at_eventsGrid_customContextMenuRequested);
 
     /* For now bitrates in Statistics and Forecast are linked. */
-    //TODO: #vkutin #GDM in the future maybe make independent settings and queries.
+    // TODO: #vkutin #GDM in the future maybe make independent settings and queries.
 
     auto otherTable = table == ui->statsTable
         ? ui->forecastTable

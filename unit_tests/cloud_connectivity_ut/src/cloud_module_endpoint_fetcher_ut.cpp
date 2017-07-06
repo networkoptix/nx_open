@@ -31,7 +31,6 @@ class CloudModuleUrlFetcher:
 {
 public:
     CloudModuleUrlFetcher(const char* modulesXmlBody = nullptr):
-        m_fetcher(std::make_unique<nx::network::cloud::RandomEndpointSelector>()),
         m_modulesXmlBody(modulesXmlBody ? modulesXmlBody : modulesXmlWithUrls)
     {
         init();
@@ -47,9 +46,7 @@ protected:
 
     QUrl fetchModuleUrl(const char* moduleName)
     {
-        auto fetcher = std::make_unique<cloud::CloudModuleUrlFetcher>(
-            moduleName,
-            std::make_unique<nx::network::cloud::RandomEndpointSelector>());
+        auto fetcher = std::make_unique<cloud::CloudModuleUrlFetcher>(moduleName);
         auto fetcherGuard = makeScopeGuard([&fetcher]() { fetcher->pleaseStopSync(); });
         fetcher->setModulesXmlUrl(m_modulesUrl);
 

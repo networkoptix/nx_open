@@ -143,10 +143,10 @@ QnAbstractVideoDecoder* QuicksyncDecoderPlugin::create(
 
     NX_LOG( QString::fromLatin1("QuicksyncDecoderPlugin. Creating decoder..."), cl_logINFO );
 
-    std::auto_ptr<VideoDecoderSwitcher> videoDecoderSwitcher( new VideoDecoderSwitcher( NULL, data, *this ) );
+    std::unique_ptr<VideoDecoderSwitcher> videoDecoderSwitcher( new VideoDecoderSwitcher( NULL, data, *this ) );
 
     //parsing media sequence header to determine necessary parameters
-    std::auto_ptr<QuickSyncVideoDecoder> decoder( new QuickSyncVideoDecoder(
+    std::unique_ptr<QuickSyncVideoDecoder> decoder( new QuickSyncVideoDecoder(
         m_mfxSession.get(),
         d3d9Ctx.d3d9manager,
         m_usageWatcher.get(),

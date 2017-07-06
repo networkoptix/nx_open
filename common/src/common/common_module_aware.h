@@ -19,7 +19,8 @@ class QnMediaServerUserAttributesPool;
 class QnResourceStatusDictionary;
 class QnGlobalSettings;
 class QnLayoutTourManager;
-class QnEventRuleManager;
+
+namespace nx { namespace vms { namespace event { class RuleManager; }}}
 
 class QnCommonModuleAware
 {
@@ -53,7 +54,7 @@ public:
     QnResourceStatusDictionary* statusDictionary() const;
     QnGlobalSettings* globalSettings() const;
     QnLayoutTourManager* layoutTourManager() const;
-    QnEventRuleManager* eventRuleManager() const;
+    nx::vms::event::RuleManager* eventRuleManager() const;
 
 private:
     void init(QObject *parent);

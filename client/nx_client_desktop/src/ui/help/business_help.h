@@ -1,15 +1,13 @@
-#ifndef QN_BUSINESS_HELP_H
-#define QN_BUSINESS_HELP_H
+#pragma once
 
-#include <business/business_fwd.h>
+#include <nx/vms/event/event_fwd.h>
 #include <health/system_health.h>
 
+// TODO: #vkutin Think of a proper namespace
 namespace QnBusiness {
 
-    int eventHelpId(QnBusiness::EventType type);
-    int actionHelpId(QnBusiness::ActionType type);
-    int healthHelpId(QnSystemHealth::MessageType type);
+int eventHelpId(nx::vms::event::EventType type);
+int actionHelpId(nx::vms::event::ActionType type);
+int healthHelpId(QnSystemHealth::MessageType type);
 
-} // namespace QnBusiness 
-
-#endif // QN_BUSINESS_HELP_H
+} // namespace QnBusiness

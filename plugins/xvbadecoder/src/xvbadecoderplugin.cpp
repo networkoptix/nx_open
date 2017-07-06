@@ -76,7 +76,7 @@ QnAbstractVideoDecoder* QnXVBADecoderPlugin::create(
     cl_log.log( QString::fromAscii("XVBADecoderPlugin. Creating decoder..."), cl_logINFO );
 
     //parsing media sequence header to determine necessary parameters
-    std::auto_ptr<QnXVBADecoder> decoder( new QnXVBADecoder( glContext, data, m_usageWatcher.get() ) );
+    std::unique_ptr<QnXVBADecoder> decoder( new QnXVBADecoder( glContext, data, m_usageWatcher.get() ) );
     if( !decoder->isHardwareAccelerationEnabled() )
         return NULL;
 

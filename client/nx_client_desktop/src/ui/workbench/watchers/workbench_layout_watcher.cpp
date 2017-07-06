@@ -51,7 +51,8 @@ void QnWorkbenchLayoutWatcher::at_resourcePool_resourceAdded(const QnResourcePtr
         if (resource)
         {
             data.resource.id = resource->getId();
-            data.resource.uniqueId = resource->getUniqueId();
+            if (resource->hasFlags(Qn::local_media))
+                data.resource.uniqueId = resource->getUniqueId();
             layout->updateItem(data);
         }
         else

@@ -72,7 +72,7 @@ public:
             return Qt::NoItemFlags;
 
         Qt::ItemFlags result = Qt::ItemIsEnabled | Qt::ItemNeverHasChildren;
-        if (index.column() == CheckColumn)
+        if (userCheckable && index.column() == CheckColumn)
             result |= Qt::ItemIsUserCheckable;
 
         return result;
@@ -140,6 +140,9 @@ private:
         return index.model() == this && index.row() == 0
             && index.column() >= 0 && index.column() < ColumnCount;
     }
+
+public:
+    bool userCheckable = true;
 
 private:
     QHash<int, QVariant> m_data;
@@ -237,6 +240,16 @@ Qt::CheckState CheckableLineWidget::checkState() const
 void CheckableLineWidget::setCheckState(Qt::CheckState value)
 {
     setData(qVariantFromValue<int>(value), Qt::CheckStateRole);
+}
+
+bool CheckableLineWidget::userCheckable() const
+{
+    return m_data->model->userCheckable;
+}
+
+void CheckableLineWidget::setUserCheckable(bool value)
+{
+    m_data->model->userCheckable = value;
 }
 
 QVariant CheckableLineWidget::data(int role) const

@@ -3,6 +3,7 @@
 #include <nx/network/cloud/abstract_cloud_system_credentials_provider.h>
 #include <nx/network/http/http_async_client.h>
 #include <nx/network/socket_global.h>
+#include <nx/network/url/url_builder.h>
 
 #include <libconnection_mediator/src/mediator_service.h>
 #include <libtraffic_relay/src/model/listening_peer_pool.h>
@@ -60,7 +61,8 @@ void BasicTestFixture::SetUp()
 
     ASSERT_TRUE(m_mediator.startAndWaitUntilStarted());
 
-    SocketGlobals::mediatorConnector().mockupAddress(m_mediator.stunEndpoint());
+    SocketGlobals::mediatorConnector().mockupAddress(
+        nx::network::url::Builder().setScheme("stun").setEndpoint(m_mediator.stunEndpoint()));
 
     m_stunClient = std::make_shared<nx::stun::AsyncClient>();
     m_stunClient->connect(m_mediator.moduleInstance()->impl()->stunEndpoints()[0]);

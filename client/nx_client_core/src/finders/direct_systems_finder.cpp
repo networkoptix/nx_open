@@ -36,8 +36,8 @@ QnDirectSystemsFinder::QnDirectSystemsFinder(QObject *parent)
         return;
 
     moduleManager->onSignals(this,
-        &QnDirectSystemsFinder::addServer,
-        &QnDirectSystemsFinder::updatePrimaryAddress,
+        &QnDirectSystemsFinder::updateServerData,
+        &QnDirectSystemsFinder::updateServerData,
         &QnDirectSystemsFinder::removeServer);
 }
 
@@ -80,7 +80,7 @@ void QnDirectSystemsFinder::removeSystem(const SystemsHash::iterator& it)
     emit systemLost(system->id());
 }
 
-void QnDirectSystemsFinder::addServer(nx::vms::discovery::ModuleEndpoint module)
+void QnDirectSystemsFinder::updateServerData(nx::vms::discovery::ModuleEndpoint module)
 {
     const auto systemId = helpers::getTargetSystemId(module);
 
@@ -106,7 +106,7 @@ void QnDirectSystemsFinder::addServer(nx::vms::discovery::ModuleEndpoint module)
                 module.id, current->id()), cl_logDEBUG2);
 
             // Just update system
-            updateServer(systemIt, module);
+            updateServerInternal(systemIt, module);
             return;
         }
         removeServer(module.id);
@@ -166,7 +166,7 @@ void QnDirectSystemsFinder::removeServer(QnUuid id)
     removeSystem(systemIt);
 }
 
-void QnDirectSystemsFinder::updateServer(
+void QnDirectSystemsFinder::updateServerInternal(
     const SystemsHash::iterator systemIt, nx::vms::discovery::ModuleEndpoint module)
 {
     const bool serverIsInKnownSystem = (systemIt != m_systems.end());
@@ -185,7 +185,7 @@ void QnDirectSystemsFinder::updateServer(
     // remove server from current system and add to new
     const auto serverHost = systemDescription->getServerHost(module.id);
     removeServer(module.id);
-    addServer(module);
+    updateServerData(module);
 
     module.endpoint = nx::network::url::getEndpoint(serverHost);
     updatePrimaryAddress(std::move(module));
@@ -208,7 +208,7 @@ void QnDirectSystemsFinder::updatePrimaryAddress(nx::vms::discovery::ModuleEndpo
     else if (!serverIsInKnownSystem)
     {
         // Primary address was changed from cloud to direct
-        addServer(module);
+        updateServerData(module);
         systemIt = getSystemItByServer(module.id);
         if (systemIt == m_systems.end())
             return;

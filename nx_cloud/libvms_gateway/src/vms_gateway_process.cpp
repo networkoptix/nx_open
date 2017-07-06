@@ -4,6 +4,7 @@
 #include <nx/network/http/server/http_message_dispatcher.h>
 #include <nx/network/socket_global.h>
 #include <nx/network/ssl/ssl_engine.h>
+#include <nx/network/url/url_builder.h>
 
 #include <nx/utils/app_info.h>
 #include <nx/utils/log/log.h>
@@ -148,7 +149,8 @@ void VmsGatewayProcess::initializeCloudConnect(const conf::Settings& settings)
     if (!settings.general().mediatorEndpoint.isEmpty())
     {
         nx::network::SocketGlobals::mediatorConnector().mockupAddress(
-            SocketAddress(settings.general().mediatorEndpoint));
+            nx::network::url::Builder().setScheme("stun")
+                .setEndpoint(SocketAddress(settings.general().mediatorEndpoint)).toUrl());
     }
     nx::network::SocketGlobals::mediatorConnector().enable(true);
 
