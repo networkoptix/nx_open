@@ -731,6 +731,10 @@ table.webclient-window>tbody>tr>td{
   }
   .view-panel{
     padding-bottom: 160px;
+
+    &.no-archive{
+      padding-bottom: 60px !important;
+    }
   }
   div.text-center{
     margin: 0 !important;
