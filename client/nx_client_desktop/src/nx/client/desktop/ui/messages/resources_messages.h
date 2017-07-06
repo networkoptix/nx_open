@@ -29,6 +29,7 @@ bool deleteSharedLayouts(QWidget* parent, const QnResourceList& layouts);
 bool deleteLocalLayouts(QWidget* parent, const QnResourceList& stillAccessible);
 
 bool removeItemsFromLayout(QWidget* parent, const QnResourceList& resources);
+bool removeItemsFromLayoutTour(QWidget* parent, const QnResourceList& resources);
 
 bool changeVideoWallLayout(QWidget* parent, const QnResourceList& inaccessible);
 

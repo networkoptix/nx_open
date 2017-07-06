@@ -284,6 +284,17 @@
     </message>
 </context>
 <context>
+    <name>MoveOnTapOverlay</name>
+    <message>
+        <source>Tap on the image to position your camera</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>CANCEL</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>NoCameraItem</name>
     <message>
         <source>No image</source>

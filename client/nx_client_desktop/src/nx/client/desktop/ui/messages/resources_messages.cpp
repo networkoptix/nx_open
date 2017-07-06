@@ -205,6 +205,26 @@ bool removeItemsFromLayout(QWidget* parent,
     return result != QDialogButtonBox::Cancel;
 }
 
+bool removeItemsFromLayoutTour(QWidget* parent, const QnResourceList& resources)
+{
+    /* Check if user have already silenced this warning. */
+    if (qnClientShowOnce->testFlag(kRemoveItemsFromLayoutShowOnceKey))
+        return true;
+
+    QnSessionAwareMessageBox messageBox(parent);
+    messageBox.setIcon(QnMessageBoxIcon::Warning);
+    messageBox.setText(tr("Remove %n items from layout tour?", "", resources.size()));
+    messageBox.setStandardButtons(QDialogButtonBox::Cancel);
+    messageBox.addButton(tr("Remove"), QDialogButtonBox::AcceptRole, Qn::ButtonAccent::Warning);
+    messageBox.addCustomWidget(new QnResourceListView(resources, true, &messageBox));
+    messageBox.setCheckBoxEnabled();
+    const auto result = messageBox.exec();
+    if (messageBox.isChecked())
+        qnClientShowOnce->setFlag(kRemoveItemsFromLayoutShowOnceKey);
+
+    return result != QDialogButtonBox::Cancel;
+}
+
 bool changeVideoWallLayout(QWidget* parent,
     const QnResourceList& inaccessible)
 {

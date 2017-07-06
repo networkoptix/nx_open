@@ -839,7 +839,8 @@
     "nx::client::desktop::ui::LayoutPreviewPainter": {
         "frameColor": "dark1",
         "fontColor": "light16",
-        "backgroundColor": "dark7"
+        "backgroundColor": "dark7",
+        "itemBackgroundColor": "dark5"
     },
 
     "QnHudOverlayWidget": {
