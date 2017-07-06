@@ -33,7 +33,7 @@ static const QString kCameraIdParam = lit("cameraId");
 static const QString kTimeParam = lit("time");
 static const QString kRotateParam = lit("rotate");
 static const QString kHeightParam = lit("height");
-static const QString koldWidthParam = lit("widht");
+static const QString kDeprecatedWidthParam = lit("widht");
 static const QString kWidthParam = lit("width");
 static const QString kImageFormatParam = lit("imageFormat");
 static const QString kRoundMethodParam = lit("method");
@@ -84,7 +84,7 @@ void QnThumbnailRequestData::loadFromParams(QnResourcePool* resourcePool,
     if (params.contains(kWidthParam))
         size.setWidth(QnLexical::deserialized<int>(params.value(kWidthParam), size.width()));
     else
-        size.setWidth(QnLexical::deserialized<int>(params.value(koldWidthParam), size.width()));
+        size.setWidth(QnLexical::deserialized<int>(params.value(kDeprecatedWidthParam), size.width()));
     imageFormat = QnLexical::deserialized<ThumbnailFormat>(
         params.value(kImageFormatParam), imageFormat);
     roundMethod = QnLexical::deserialized<RoundMethod>(
