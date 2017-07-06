@@ -61,6 +61,7 @@ describe('Check that for any language', function () {
             p.selectNextLang(index);
             p.helper.createUserAnyLang(p.brandText, p.brandText+'Name', p.brandText+'LastName', newUserEmail, p.helper.userPassword);
             p.helper.login(p.helper.userEmailOwner);
+            p.helper.openSystemByLink();
             p.helper.shareSystemWith(newUserEmail, p.helper.roles.admin);
             p.helper.logout();
             // now login with new user to see the system

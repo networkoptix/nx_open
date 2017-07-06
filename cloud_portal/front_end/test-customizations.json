@@ -1,15 +1,15 @@
 [
-  {"brand":"default","portal": "http://cloud-prod.hdw.mx", "text": "Nx Cloud"},
-  {"brand":"cox","portal": "http://cox.cloud-prod.hdw.mx", "text": "Cox Cloud"},
-  {"brand":"default_cn","portal": "http://nx-cn.cloud-prod.hdw.mx", "text": "Nx Cloud"},
-  {"brand":"default_zh_CN","portal": "http://nx-zh.cloud-prod.hdw.mx", "text": "Nx Cloud"},
-  {"brand":"digitalwatchdog","portal": "http://dw.cloud-prod.hdw.mx", "text": "DW Cloud"},
-  {"brand":"digitalwatchdog_global","portal": "http://dwglobal.cloud-prod.hdw.mx", "text": "DW Cloud"},
-  {"brand":"ionetworks","portal": "http://ionetworks.cloud-prod.hdw.mx", "text": "EZ Pro Cloud"},
-  {"brand":"ipera","portal": "http://ipera.cloud-prod.hdw.mx", "text": "FlyView Cloud"},
-  {"brand":"nutech","portal": "http://nutech.cloud-prod.hdw.mx", "text": "NTN Cloud"},
-  {"brand":"ust","portal": "http://ust.cloud-prod.hdw.mx", "text": "DTV Cloud"},
-  {"brand":"vista","portal": "http://vista.cloud-prod.hdw.mx", "text": "Qloud"},
-  {"brand":"vmsdemoblue","portal": "http://vmsdemoblue.cloud-prod.hdw.mx", "text": "VMS Demo Cloud"},
-  {"brand":"vmsdemoorange","portal": "http://vmsdemoorange.cloud-prod.hdw.mx", "text": "VMS Demo Cloud"}
+  {"brand":"default","portal": "http://cloud-test.hdw.mx", "text": "Nx Cloud"},
+  {"brand":"cox","portal": "http://cox.cloud-test.hdw.mx", "text": "Cox Cloud"},
+  {"brand":"default_cn","portal": "http://nx-cn.cloud-test.hdw.mx", "text": "Nx Cloud"},
+  {"brand":"default_zh_CN","portal": "http://nx-zh.cloud-test.hdw.mx", "text": "Nx Cloud"},
+  {"brand":"digitalwatchdog","portal": "http://dw.cloud-test.hdw.mx", "text": "DW Cloud"},
+  {"brand":"digitalwatchdog_global","portal": "http://dwglobal.cloud-test.hdw.mx", "text": "DW Cloud"},
+  {"brand":"ionetworks","portal": "http://ionetworks.cloud-test.hdw.mx", "text": "EZ Pro Cloud"},
+  {"brand":"ipera","portal": "http://ipera.cloud-test.hdw.mx", "text": "FlyView Cloud"},
+  {"brand":"nutech","portal": "http://nutech.cloud-test.hdw.mx", "text": "NTN Cloud"},
+  {"brand":"ust","portal": "http://ust.cloud-test.hdw.mx", "text": "DTV Cloud"},
+  {"brand":"vista","portal": "http://vista.cloud-test.hdw.mx", "text": "Qloud"},
+  {"brand":"vmsdemoblue","portal": "http://vmsdemoblue.cloud-test.hdw.mx", "text": "VMS Demo Cloud"},
+  {"brand":"vmsdemoorange","portal": "http://vmsdemoorange.cloud-test.hdw.mx", "text": "VMS Demo Cloud"}
 ]

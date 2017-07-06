@@ -7,7 +7,7 @@ var AlertSuite = function () {
     this.alertMessages = {
         loginIncorrect: 'Incorrect Email or password',
         loginNotActive: 'This account is not activated yet. Send activation link again',
-        registerSuccess: 'Account registered. Confirmation message is sent to Email',
+        registerSuccess: 'Account is created.\nConfirmation message is sent to',
         registerConfirmSuccess: 'Your account is successfully activated',
         registerConfirmError: 'Account is already activated or confirmation code is incorrect',
         accountSuccess: 'Your account was successfully saved.',

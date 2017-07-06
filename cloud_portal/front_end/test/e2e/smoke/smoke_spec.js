@@ -14,37 +14,40 @@ describe('Smoke test:', function () {
         helper.logout();
     });
 
-    fit("check needed user exists of create one", function () {
+    it("check needed user exists of create one", function () {
         helper.createUserIfMissing(null, null, helper.userEmailOwner);
         helper.createUserIfMissing(null, null, helper.userEmailSmoke);
         helper.createUserIfMissing(null, null, helper.userEmailCustom);
     });
 
-    fit("can login and logout", function () {
+    it("can login and logout", function () {
         helper.login();
     });
 
-    fit("can view system list", function () {
-        var systemsList = element.all(by.repeater('system in systems'));
-
+    it("can view system list", function () {
         helper.login();
         helper.get(helper.urls.systems);
         expect(browser.getCurrentUrl()).toContain('systems');
         expect(helper.htmlBody.getText()).toContain('Systems');
-        expect(systemsList.first().isDisplayed()).toBe(true);
-        expect(element(by.cssContainingText('h2', 'katya_korneevas')).isDisplayed()).toBe(true);
+        expect(helper.allSystems.first().isDisplayed()).toBe(true);
+        expect(element(by.cssContainingText('h2', helper.systemName)).isDisplayed()).toBe(true);
     });
 
-    fit("can view system page", function () {
+    it("can view system page", function () {
         var userStrings = element.all(by.repeater('user in system.users'));
         var userList = helper.getParentOf(userStrings.first());
 
         helper.login();
-        helper.get(helper.urls.systems);
         expect(browser.getCurrentUrl()).toContain('systems');
-        expect(element(by.cssContainingText('h2', 'katya_korneevas_property')).isDisplayed()).toBe(true);
 
-        element.all(by.cssContainingText('h2', 'katya_korneevas_property')).first().click();
+        // If system is the only one and it is already opened, do nothing.
+        // Otherwise, open first online system with specified name
+        element(by.cssContainingText('h1', helper.systemName)).isPresent().then(function (isPresent) {
+            if(!isPresent) {
+                expect(helper.getOnlineSystemsWithName(helper.systemName).first().isDisplayed()).toBe(true);
+                helper.onlineSystemsWithCurrentName.first().click();
+            }
+        });
 
         browser.sleep(1000);
         helper.waitIfNotPresent(userList, 100);
@@ -60,21 +63,19 @@ describe('Smoke test:', function () {
     it("can open system", function () {
         helper.login(helper.userEmailOwner);
         helper.getSysPage(helper.systemLink);
-        browser.pause();
         expect(helper.loginSysPageSuccessElement.isPresent()).toBe(true);
     });
 
     it("can share system with existing user", function () {
         var newUserEmail = helper.getRandomEmail();
         helper.createUser('Mark', 'Hamill', newUserEmail);
-
         helper.login(helper.userEmailOwner);
+        helper.openSystemFromSystemList(); // name will be taken from helper.systemName
         helper.shareSystemWith(newUserEmail, helper.roles.admin);
         helper.logout();
-        // now login with new user to see the system
+        // Now login with new user to see the system
         helper.login(newUserEmail);
-        helper.getSysPage(helper.systemLink);
-        browser.waitForAngular();
+        helper.openSystemByLink(helper.systemLink);
         expect(helper.loginSysPageSuccessElement.isPresent()).toBe(true);
     });
 
@@ -87,7 +88,7 @@ describe('Smoke test:', function () {
         expect(helper.loginSysPageSuccessElement.isPresent()).toBe(true);
     });
 
-    fit("can restore password", function () {
+    it("can restore password", function () {
         helper.restorePassword(helper.userEmailSmoke, 'qweasd1234');
         helper.login(helper.userEmailSmoke, 'qweasd1234');
         // expect(helper.loginNoSysSuccessElement.isPresent()).toBe(true);

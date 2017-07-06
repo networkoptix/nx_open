@@ -19,7 +19,7 @@ var Helper = function () {
     var h = this;
 
     this.basePassword = 'qweasd123';
-    this.systemLink = '/c76e0f50-49ce-41c2-a47d-7d831a375f23';
+    this.systemLink = '/6edfa407-8e99-4f64-bde7-2986668bc87a';
     this.systemName = 'ek-U16';
 
     this.get = function (opt_url) {
@@ -92,7 +92,8 @@ var Helper = function () {
         },
         logout: {
             navbar: element(by.css('header')).element(by.css('.navbar')),
-            dropdownToggle: element(by.css('header')).element(by.css('.navbar')).element(by.css('.dropdown-toggle')),
+            dropdownToggle: h.getParentOf(element(by.css('span.glyphicon-user'))),
+            // dropdownToggle: element(by.css('header')).element(by.css('.navbar')).all(by.css('.dropdown-toggle')).get(1),
             dropdownMenu: element(by.css('header')).element(by.css('.navbar')).element(by.css('[uib-dropdown-menu]')),
             logoutLink: element(by.css('header')).element(by.css('.navbar')).all(by.css('a[ng-click="logout()"]')).first(),
             alreadyLoggedIn: element(by.css('.authorized.modal-open')),
@@ -123,6 +124,7 @@ var Helper = function () {
         return email;
     };
     //this.userEmail = 'noptixqa+owner@gmail.com';
+    this.userEmailSubstring = 'noptixqa'; // this will be used to check if any user with chosen mailbox is logged in
     this.userEmail = 'noptixqa+1@gmail.com'; // valid existing email
     this.userEmail2 = 'noptixqa+2@gmail.com';
     this.userEmailWrong = 'nonexistingperson@gmail.com';
@@ -172,12 +174,48 @@ var Helper = function () {
     this.userPasswordHierog = '您都可以享受源源不絕的好禮及優惠';
     this.userPasswordWrong = 'qweqwe123';
 
-    this.loginSuccessElement = element(by.css('.auth-visible')); // some element on page, that is only visible when user is authenticated
+    this.loginSuccessElement = element(by.css('span.glyphicon-user')); // some element on page, that is only visible when user is authenticated
     this.loginNoSysSuccessElement = element(by.cssContainingText('span','You have no Systems connected to')); // some element on page, that is only visible when user is authenticated
     this.loginSysPageSuccessElement = element.all(by.css('[ng-if="gettingSystem.success"]')).get(0); // some element on page, that is only visible when user is authenticated
     this.loginSysPageClosedSuccessElement = element(by.cssContainingText('.no-data-panel-body','You do not have access to the system information.')); // some element on page, that is only visible when user is authenticated
-    //this.loggedOutElement = element(by.css('.container.ng-scope')).all(by.css('.auth-hidden')).first(); // some element on page visible to not auth user
     this.htmlBody = element(by.css('body'));
+
+    this.systemsList = this.getParentOf(element(by.cssContainingText('h1', 'Systems'))).element(by.css('div.row'));
+    this.allSystems = this.systemsList.all(by.css('div.system-button'));
+
+    this.systemsWithCurrentName = this.allSystems.filter(function (system) {
+        return system.getText().then(function (text) {
+            // Check that system tile contains declared system name inside
+            return h.isSubstr(text, h.systemName);
+        });
+    });
+
+    this.onlineSystemsWithCurrentName = this.systemsWithCurrentName.filter(function (system) {
+        return system.element(by.cssContainingText('button', 'Open in ')).isPresent().then(function (isPresent) {
+            return isPresent
+        });
+    });
+
+    this.getSystemsWithName = function (name) {
+        var name = name || h.systemName;
+
+        return h.allSystems.filter(function (system) {
+            return system.getText().then(function (text) {
+                // Check that system tile contains declared system name inside
+                return h.isSubstr(text, name);
+            });
+        });
+    };
+
+    this.getOnlineSystemsWithName = function (name) {
+        var name = name || h.systemName;
+
+        return h.getSystemsWithName().filter(function (system) {
+            return system.element(by.cssContainingText('button', 'Open in ')).isPresent().then(function (isPresent) {
+                return isPresent
+            });
+        });
+    };
 
     this.checkElementFocusedBy = function(element, attribute) {
         expect(element.getAttribute(attribute)).toEqual(browser.driver.switchTo().activeElement().getAttribute(attribute));
@@ -192,23 +230,10 @@ var Helper = function () {
 
         this.loginFromCurrPage(email, password);
 
-        //TODO: rewrite using OR condition
         // Check that element that is visible only for authorized user is displayed on page
         return h.loginSuccessElement.isPresent().then( function (isPresent) {
             if (!isPresent) {
-                h.loginNoSysSuccessElement.isPresent().then( function (isPresent) {
-                    if (!isPresent) {
-                        h.loginSysPageSuccessElement.isPresent().then( function (isPresent) {
-                            if (!isPresent) {
-                                h.loginSysPageClosedSuccessElement.isPresent().then( function (isPresent) {
-                                    if (!isPresent) {
-                                        return protractor.promise.rejected('Login failed');
-                                    }
-                                });
-                            }
-                        });
-                    }
-                });
+                return protractor.promise.rejected('Login failed');
             }
         });
     };
@@ -230,18 +255,15 @@ var Helper = function () {
 
     this.logout = function() {
 
-        expect(h.forms.logout.dropdownToggle.isPresent()).toBe(true);
-        h.forms.logout.dropdownToggle.getText().then(function(text) {
-            if(h.isSubstr(text, 'noptixqa')) {
+        h.loginSuccessElement.isDisplayed().then(function(isDisplayed) {
+            if(isDisplayed) {
+                browser.sleep(1000);
                 h.forms.logout.dropdownToggle.click().then(function () {
                     h.forms.logout.logoutLink.click();
                 });
+                browser.sleep(1500);
 
-                browser.sleep(500);
-
-                // Check that element that is visible only for authorized user is NOT displayed on page
-                //TODO: find out why it fails
-                //expect(h.loginSuccessElement.isPresent()).toBe(false);
+                expect(h.loginSuccessElement.isDisplayed()).toBe(false);
             }
             else {
                 console.log('FAILED TO LOG OUT: user is already logged out');
@@ -498,13 +520,38 @@ var Helper = function () {
         h.alert.catchAlert( h.alert.alertMessages.accountSuccess, h.alert.alertTypes.success);
     };
 
-    this.shareSystemWith = function(email, role, systemLink) {
-        var sharedRole = role || 'Administrator';
+    this.openSystemByLink = function (systemLink) {
         var systemLinkCode = systemLink || h.systemLink;
-        var roleOption = h.forms.share.roleField.element(by.cssContainingText('option', sharedRole));
 
         this.getSysPage(systemLinkCode);
         browser.waitForAngular();
+    };
+
+    // Opens first online system with specified name.
+    this.openSystemFromSystemList = function(name) {
+        var name = name || h.systemName;
+
+        // In case any other page (except systems list or system page) is opened, open system list
+        h.systemsList.isPresent().then(function (isPresent) {
+            if(!isPresent) {
+                h.get(h.urls.systems); // if user is not redirected to system list, open it manually
+            }
+        });
+
+        // If system is the only one and it is already opened, do nothing.
+        // Otherwise, open first online system with specified name
+        element(by.cssContainingText('h1', name)).isPresent().then(function (isPresent) {
+            if(!isPresent) {
+                expect(h.getOnlineSystemsWithName(name).first().isDisplayed()).toBe(true);
+                h.onlineSystemsWithCurrentName.first().click();
+            }
+        });
+    };
+
+    this.shareSystemWith = function(email, role) {
+        var sharedRole = role || 'Administrator';
+        var roleOption = h.forms.share.roleField.element(by.cssContainingText('option', sharedRole));
+
         h.forms.share.shareButton.click();
         h.forms.share.emailField.sendKeys(email);
         h.forms.share.roleField.click();
@@ -520,6 +567,7 @@ var Helper = function () {
         var userEmail = email || h.getRandomEmail();
         var password = password || h.password;
 
+        h.openSystemByLink();
         h.shareSystemWith(userEmail);
         h.getEmailedLink(userEmail, h.emailSubjects.invite, 'register').then( function(url) {
             h.get(url);
@@ -547,6 +595,7 @@ var Helper = function () {
         var userEmail = email || h.getRandomEmail();
         var password = password || h.password;
 
+        h.openSystemByLink();
         h.shareSystemWith(userEmail);
         h.getEmailedLinkCustomAnyLang(userEmail, portalText , 'register').then( function(url) {
             h.get(url);
@@ -583,7 +632,9 @@ var Helper = function () {
             if((emailAddress === mail.headers.to) && (mail.subject.includes(emailSubject))) {
                 console.log("Catch email to: " + mail.headers.to);
                 deferred.fulfill(mail);
-                notifier.stop();
+                // notifier.stop();
+                // commented out because causes  "ReferenceError: self is not defined" at Notifier.stop
+                // (/home/ekorneeva/develop/nx_vms/cloud_portal/front_end/node_modules/mail-notifier/index.js:106:5)
                 notifier.removeListener("mail", onMail);
                 return;
             }
