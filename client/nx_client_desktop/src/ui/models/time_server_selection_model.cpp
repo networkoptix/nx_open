@@ -6,7 +6,6 @@
 
 #include <common/common_module.h>
 
-#include <core/resource_management/resource_pool.h>
 #include <core/resource_management/resource_changes_listener.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource/resource_display_info.h>
@@ -199,8 +198,7 @@ void QnTimeServerSelectionModel::updateTimeOffset()
     if (m_currentRequest)
         return;
 
-    const auto resPool = commonModule()->resourcePool();
-    const auto server = resPool->getResourceById<QnMediaServerResource>(commonModule()->remoteGUID());
+    const auto server = commonModule()->currentServer();
     if (!server)
         return;
     auto apiConnection = server->restConnection();
