@@ -84,8 +84,7 @@ QnLoginToCloudDialog::QnLoginToCloudDialog(QWidget* parent) :
 
     ui->cloudWelcomeLabel->setText(tr("Welcome to %1!", "%1 is the cloud name (like 'Nx Cloud')")
         .arg(nx::network::AppInfo::cloudName()));
-    ui->cloudImageLabel->setPixmap(qnSkin->pixmap("cloud/cloud_64.png",
-        QSize(), Qt::IgnoreAspectRatio, Qt::SmoothTransformation, true));
+    ui->cloudImageLabel->setPixmap(qnSkin->pixmap("cloud/cloud_64.png"));
 
     QFont welcomeFont(ui->cloudWelcomeLabel->font());
     welcomeFont.setPixelSize(kWelcomeFontPixelSize);
