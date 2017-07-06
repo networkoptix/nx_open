@@ -1157,6 +1157,17 @@ APPLY(2001, forcePrimaryTimeServer, ApiIdData, \
                        InvalidFilterFunc(), /* Filter read func */ \
                        AllowForAllAccessOut(), /* Check remote peer rights for outgoing transaction */ \
                        RegularTransactionType()) /* regular transaction type */ \
+APPLY(2002, broadcastPeerSystemTime, ApiPeerSystemTimeData, \
+                       false, \
+                       true, \
+                       InvalidGetHashHelper(), \
+                       EmptyNotificationHelper(), \
+                       AdminOnlyAccess(), /* save permission checker */ \
+                       AllowForAllAccess(), /* read permission checker */ \
+                       InvalidFilterFunc(), /* Filter save func */ \
+                       InvalidFilterFunc(), /* Filter read func */ \
+                       AllowForAllAccessOut(), /* Check remote peer rights for outgoing transaction */ \
+                       RegularTransactionType()) /* regular transaction type */ \
 APPLY(2003, getCurrentTime, ApiTimeData, \
                        false, \
                        false, \
@@ -1180,16 +1191,16 @@ APPLY(2004, changeSystemId, ApiSystemIdData, \
                        InvalidFilterFunc(), /* Filter read func */ \
                        AllowForAllAccessOut(), /* Check remote peer rights for outgoing transaction */ \
                        RegularTransactionType()) /* regular transaction type */ \
-APPLY(2005, broadcastPeerSyncTime, ApiPeerSyncTimeData, \
+APPLY(2005, getKnownPeersSystemTime, ApiPeerSystemTimeDataList, \
                        false, \
-                       true, \
+                       false, \
                        InvalidGetHashHelper(), \
-                       EmptyNotificationHelper(), \
-                       AdminOnlyAccess(), /* save permission checker */ \
-                       AllowForAllAccess(), /* read permission checker */ \
-                       InvalidFilterFunc(), /* Filter save func */ \
-                       InvalidFilterFunc(), /* Filter read func */ \
-                       AllowForAllAccessOut(), /* Check remote peer rights for outgoing transaction */ \
+                       InvalidTriggerNotificationHelper(), \
+                       InvalidAccess(), /* save permission checker */ \
+                       InvalidAccess(), /* read permission checker */ \
+                       FilterListByAccess<AdminOnlyAccess>(), /* Filter save func */ \
+                       FilterListByAccess<AllowForAllAccess>(), /* Filter read func */ \
+                       ReadListAccessOut<AllowForAllAccess>(), /* Check remote peer rights for outgoing transaction */ \
                        RegularTransactionType()) /* regular transaction type */ \
 APPLY(2006, markLicenseOverflow, ApiLicenseOverflowData, \
                        true, \
@@ -1224,6 +1235,17 @@ APPLY(2008, cleanupDatabase, ApiCleanupDatabaseData, \
                        InvalidFilterFunc(), /* Filter read func */ \
                        AllowForAllAccessOut(),      \
                        LocalTransactionType()) /* Check remote peer rights for outgoing transaction */ \
+APPLY(2009, broadcastPeerSyncTime, ApiPeerSyncTimeData, \
+                       false, \
+                       true, \
+                       InvalidGetHashHelper(), \
+                       EmptyNotificationHelper(), \
+                       AdminOnlyAccess(), /* save permission checker */ \
+                       AllowForAllAccess(), /* read permission checker */ \
+                       InvalidFilterFunc(), /* Filter save func */ \
+                       InvalidFilterFunc(), /* Filter read func */ \
+                       AllowForAllAccessOut(), /* Check remote peer rights for outgoing transaction */ \
+                       RegularTransactionType()) /* regular transaction type */ \
 APPLY(5001, getStatisticsReport, ApiSystemStatistics, \
                        false, \
                        false, \

@@ -641,6 +641,9 @@ void QnTransactionMessageBus::gotTransaction(const QnTransaction<T> &tran, QnTra
         case ApiCommand::broadcastPeerSyncTime:
             m_timeSyncManager->resyncTimeWithPeer(tran.peerID);
             return; // do not proxy.
+        case ApiCommand::broadcastPeerSystemTime:
+        case ApiCommand::getKnownPeersSystemTime:
+            return; // Ignore deprecated transactions
         case ApiCommand::runtimeInfoChanged:
             if (!onGotServerRuntimeInfo(tran, sender, transportHeader))
                 return; // already processed. do not proxy and ignore transaction
