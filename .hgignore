@@ -34,6 +34,7 @@ vms*.pro
 .idea
 .branch.properties
 .cloudHost.properties
+.customization.properties
 x86/*
 x64/*
 target/*

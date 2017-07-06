@@ -331,7 +331,7 @@
                         </configuration>
                     </execution>
                     <execution>
-                        <id>get-cloud-url-property</id>
+                        <id>get-generated-properties</id>
                         <phase>initialize</phase>
                         <goals>
                             <goal>read-project-properties</goal>
@@ -339,6 +339,7 @@
                         <configuration>
                             <files>
                                 <file>${root.dir}/.cloudHost.properties</file>
+                                <file>${root.dir}/.customization.properties</file>
                             </files>
                             <quiet>true</quiet>
                         </configuration>
