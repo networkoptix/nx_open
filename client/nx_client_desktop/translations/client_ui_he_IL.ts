@@ -2794,11 +2794,6 @@
     <name>SubjectSelectionDialog</name>
     <message>
       <location filename="../src/nx/client/desktop/ui/event_rules/subject_selection_dialog.ui"/>
-      <source>Dialog</source>
-      <translation>דיאלוג</translation>
-    </message>
-    <message>
-      <location/>
       <source>Roles</source>
       <translation>תפקידים</translation>
     </message>
@@ -2806,6 +2801,16 @@
       <location/>
       <source>Show all users</source>
       <translation>הצג את כל המשתמשים</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Select Users</source>
+      <translation type="unfinished">Select Users</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Nothing matches your search.</source>
+      <translation type="unfinished">Nothing matches your search.</translation>
     </message>
   </context>
   <context>
