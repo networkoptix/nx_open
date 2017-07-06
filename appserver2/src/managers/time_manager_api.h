@@ -20,7 +20,7 @@ namespace ec2
         QnTimeNotificationManager(TimeSynchronizationManager* timeSyncManager);
         ~QnTimeNotificationManager();
     private:
-        TimeSynchronizationManager* m_timeSyncManager;
+        QPointer<TimeSynchronizationManager> m_timeSyncManager;
     };
 
     template<class QueryProcessorType>

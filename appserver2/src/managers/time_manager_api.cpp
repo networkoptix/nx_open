@@ -30,7 +30,8 @@ namespace ec2
     QnTimeNotificationManager<QueryProcessorType>::~QnTimeNotificationManager()
     {
         //safely disconnecting from TimeSynchronizationManager
-        m_timeSyncManager->disconnectAndJoin( this );
+        if (m_timeSyncManager)
+            m_timeSyncManager->disconnectAndJoin( this );
     }
 
     template<class QueryProcessorType>
