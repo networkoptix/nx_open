@@ -1,0 +1,57 @@
+{% extends "admin/base_site.html" %}
+{% load i18n admin_urls admin_static %}
+
+{% block content %}
+	<h1>Revisions for Version {{version.id}}</h1>
+	{% if not version.accepted_date %}
+	<form action="{% url 'review_page_actions' %}" method="post">
+		{% csrf_token %}
+		<div class="submit-row">
+	        <button class="button" type="submit" name="Preview">Preview</button>
+	        <button class="button" type="submit" name="Publish">Publish</button>
+    	</div>
+	</form>
+	{% endif %}
+	<div class="content-main">
+		<div class="module">
+			<div class="results">
+			{% for context_name, records in contexts.items %}
+				<h2>{{context_name}} for {{records.0.data_structure.context.product.name}}</h2>
+				<fieldset>
+				    <h3>{{records.0.data_structure.context.description}}</h3>
+				    {% if records.0.data_structure.context.translatable %}
+				    <h3>Page can be translated</h3>
+				    {% endif %}
+				    {% if records.0.data_structure.context.url %}
+				    <h3> Link to Page: {{records.0.data_structure.context.url}}</h3>
+				    {% endif %}
+				</fieldset>
+				<table>
+					<thead>
+						<th>Language</th>
+						<th>Field</th>
+						<th>Value</th>
+						<th></th>
+					</thead>
+					<tbody>
+						{% for record in records%}
+							<tr>
+							<form action="{% url 'context_editor' record.data_structure.context.id record.language.code %}" method="get">
+								<td>{{record.language.code}}</td>
+								<td>{{record.data_structure.name}}</td>
+								<td>{{record}}</td>
+								<td>
+									<button type="submit">Edit Record</button>
+								</td>
+							</form>
+							</tr>
+						{% endfor %}
+					</tbody>
+				</table>
+				<br>
+				<br>
+			{% endfor %}
+			</div>
+		</div>
+	</div>
+{% endblock %}
