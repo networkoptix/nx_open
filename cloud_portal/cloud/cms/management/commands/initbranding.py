@@ -37,6 +37,7 @@ class Command(BaseCommand):
                     continue
                 data_record = DataRecord(data_structure_id=data_structure.id,
                                          customization_id=custom.id,
+                                         language=custom.default_language,
                                          value=value)
                 data_record.save()  # write to database
         self.stdout.write(self.style.SUCCESS('Successfully initiated database records for CMS'))
