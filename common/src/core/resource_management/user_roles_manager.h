@@ -34,11 +34,18 @@ public:
         return result;
     }
 
+    // Splits subject id list into valid users and valid role ids (including predefined).
+    template<class IDList> //< std::vector, std::set, QVector, QSet and QList are supported.
+    void usersAndRoles(const IDList& ids, QnUserResourceList& users, QList<QnUuid>& roles);
+
     // Checks if there is a custom user role with specified uuid.
     bool hasRole(const QnUuid& id) const;
 
     // Returns information structure for custom user role with specified uuid.
     ec2::ApiUserRoleData userRole(const QnUuid& id) const;
+
+    // Returns custom or predefined role id for specified user.
+    static QnUuid unifiedUserRoleId(const QnUserResourcePtr& user);
 
     // Returns list of predefined user roles.
     static const QList<Qn::UserRole>& predefinedRoles();
@@ -52,12 +59,18 @@ public:
     // Returns human-readable name of specified user role.
     static QString userRoleName(Qn::UserRole userRole);
 
+    // Returns human-readable name of specified user role.
+    QString userRoleName(const QnUuid& userRoleId);
+
     // Returns human-readable name of user role of specified user.
     QString userRoleName(const QnUserResourcePtr& user) const;
 
     // Returns pseudo-uuid for predefined user role.
     // For Qn::CustomUserRole and Qn::CustomPermissions returns null uuid.
     static QnUuid predefinedRoleId(Qn::UserRole userRole);
+
+    // Returns list of ids of predefined admin roles.
+    static const QList<QnUuid>& adminRoleIds();
 
     // Returns predefined user role for corresponding pseudo-uuid.
     // For null uuid returns Qn::CustomPermissions.
@@ -84,7 +97,9 @@ signals:
     void userRoleRemoved(const ec2::ApiUserRoleData& userRole);
 
 private:
-    mutable QnMutex m_mutex;
+    bool isValidRoleId(const QnUuid& id) const; //< This function is not thread-safe.
 
+private:
+    mutable QnMutex m_mutex;
     QHash<QnUuid, ec2::ApiUserRoleData> m_roles;
 };

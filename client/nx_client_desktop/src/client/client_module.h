@@ -36,6 +36,7 @@ private:
     void initNetwork        (const QnStartupParameters& startupParams);
     void initSkin           (const QnStartupParameters& startupParams);
     void initLocalResources (const QnStartupParameters& startupParams);
+    void initLocalInfo(const QnStartupParameters& startupParams);
 
 private:
     QScopedPointer<QnStaticCommonModule> m_staticCommon;

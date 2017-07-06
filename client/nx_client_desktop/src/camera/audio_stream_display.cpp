@@ -117,6 +117,9 @@ void QnAudioStreamDisplay::enqueueData(QnCompressedAudioDataPtr data, qint64 min
 {
     QnMutexLocker lock(&m_audioQueueMutex);
 
+    if (!createDecoder(data))
+        return;
+
     m_lastAudioTime = data->timestamp;
     m_audioQueue.enqueue(data);
 
@@ -181,17 +184,22 @@ bool QnAudioStreamDisplay::initFormatConvertRule(QnAudioFormat format)
     return false; //< conversion rule not found
 }
 
-bool QnAudioStreamDisplay::putData(QnCompressedAudioDataPtr data, qint64 minTime)
+bool QnAudioStreamDisplay::createDecoder(const QnCompressedAudioDataPtr& data)
 {
-    QnMutexLocker lock(&m_audioQueueMutex);
-
     if (m_decoders[data->compressionType] == nullptr)
     {
         m_decoders[data->compressionType] = QnAudioDecoderFactory::createDecoder(data);
         if (m_decoders[data->compressionType] == nullptr)
             return false;
     }
+    return true;
+}
 
+bool QnAudioStreamDisplay::putData(QnCompressedAudioDataPtr data, qint64 minTime)
+{
+    QnMutexLocker lock(&m_audioQueueMutex);
+    if (!createDecoder(data))
+        return false;
 
     m_lastAudioTime = data->timestamp;
     static const int MAX_BUFFER_LEN = 3000;
@@ -202,14 +210,15 @@ bool QnAudioStreamDisplay::putData(QnCompressedAudioDataPtr data, qint64 minTime
     // audio_device buffer); audio_device buffer is small, and we need to put the data from the
     // packets. To do it, we call this function with null pointer.
 
-    int bufferSize = msInBuffer();
-    if (bufferSize < m_bufferMs / 10)
+    int bufferSizeMs = msInBuffer();
+    if (bufferSizeMs < m_bufferMs / 10)
     {
         m_tooFewDataDetected = true;
-        m_startBufferingTime = data->timestamp - bufferSize;
+        m_startBufferingTime = data->timestamp - bufferSizeMs * 1000;
     }
 
-    if (m_tooFewDataDetected && data && data->timestamp < minTime)
+    bool CanDropLateAudio = !m_sound || m_sound->state() != QAudio::State::ActiveState;
+    if (CanDropLateAudio && data && data->timestamp < minTime)
     {
         clearAudioBuffer();
         m_startBufferingTime = data->timestamp;
@@ -219,11 +228,11 @@ bool QnAudioStreamDisplay::putData(QnCompressedAudioDataPtr data, qint64 minTime
     if (data != 0)
     {
         m_audioQueue.enqueue(data);
-        bufferSize = msInBuffer();
+        bufferSizeMs = msInBuffer();
     }
 
 
-    if (bufferSize >= m_tooFewDataDetected * m_prebufferMs
+    if (bufferSizeMs >= m_tooFewDataDetected * m_prebufferMs
         || m_audioQueue.size() >= MAX_BUFFER_LEN)
     {
         playCurrentBuffer();

@@ -57,7 +57,7 @@ public:
 private:
     nxpt::CommonRefManager m_refManager;
     CameraManager* m_cameraManager;
-    std::auto_ptr<StreamReader> m_streamReader;
+    std::unique_ptr<StreamReader> m_streamReader;
     unsigned int m_frameDurationUsec;
     int m_encoderNumber;
 };

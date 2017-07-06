@@ -24,10 +24,11 @@
 #include <common/common_module.h>
 #include <common/static_common_module.h>
 
-#include <core/resource/media_server_resource.h>
 #include <core/resource_management/resource_pool.h>
+#include <core/resource/media_server_resource.h>
+#include <core/resource/user_resource.h>
 
-#include <client/client_translation_manager.h>
+#include <client/client_runtime_settings.h>
 
 #include <licensing/license.h>
 #include <licensing/license_validator.h>
@@ -46,6 +47,7 @@
 #include <ui/delegates/license_list_item_delegate.h>
 #include <ui/dialogs/license_details_dialog.h>
 #include <ui/widgets/common/snapped_scrollbar.h>
+#include <ui/workbench/workbench_context.h>
 #include <ui/utils/table_export_helper.h>
 
 #include <utils/license_usage_helper.h>
@@ -142,6 +144,7 @@ protected:
 
 QnLicenseManagerWidget::QnLicenseManagerWidget(QWidget *parent) :
     base_type(parent),
+    QnWorkbenchContextAware(parent),
     ui(new Ui::LicenseManagerWidget),
     m_model(new QnLicenseListModel(this)),
     m_validator(new QnLicenseValidator(this))
@@ -437,7 +440,7 @@ void QnLicenseManagerWidget::updateFromServer(const QByteArray &licenseKey, bool
     params.addQueryItem(lit("box"), runtimeData.box);
     params.addQueryItem(lit("brand"), runtimeData.brand);
     params.addQueryItem(lit("version"), qnStaticCommon->engineVersion().toString());
-    params.addQueryItem(lit("lang"), commonModule()->instance<QnClientTranslationManager>()->getCurrentLanguage());
+    params.addQueryItem(lit("lang"), qnRuntime->locale());
 
     if (!runtimeData.nx1mac.isEmpty())
     {
@@ -603,7 +606,7 @@ QString QnLicenseManagerWidget::getLicenseDescription(const QnLicensePtr& licens
     }
 
     const auto key = QString::fromStdString(license->key().constData());
-    const auto channelsCountString = tr("%n channels", "", license->cameraCount());
+    const auto channelsCountString = tr("%n channels.", "", license->cameraCount());
 
     return lit("%1%2%3, %4").arg(key, kHtmlDelimiter, license->displayName(), channelsCountString);
 }
@@ -662,8 +665,14 @@ QString QnLicenseManagerWidget::getDeactivationErrorMessage(
         result += licenseDescription + kEmptyLine + error;
     }
 
-    result += tr("Please contact Customer Support");
-    return result.join(kMessageDelimiter);
+    static const auto kContactCustomerSupportText = tr("Please contact Customer Support.");
+    if (errors.count() > 1)
+    {
+        result.append(kContactCustomerSupportText);
+        return result.join(kMessageDelimiter);
+    }
+
+    return result.join(kMessageDelimiter) + kEmptyLine + kContactCustomerSupportText;
 }
 
 void QnLicenseManagerWidget::showDeactivationErrorsDialog(
@@ -677,7 +686,7 @@ void QnLicenseManagerWidget::showDeactivationErrorsDialog(
 
     const bool totalFail = licenses.size() == errorsCount;
     const auto standardButton = totalFail ? QDialogButtonBox::Ok : QDialogButtonBox::Cancel;
-    QnMessageBox dialog(QnMessageBoxIcon::Critical, text, QString(),
+    QnMessageBox dialog(QnMessageBoxIcon::Information, text, QString(),
         standardButton, QDialogButtonBox::NoButton);
 
     const auto button = new QPushButton(lit("Copy to clipboard"), &dialog);
@@ -698,7 +707,7 @@ void QnLicenseManagerWidget::showDeactivationErrorsDialog(
     else
     {
         const auto deactivateButton = dialog.addButton(
-            tr("Deactivate %n other", "", licenses.size() - errorsCount),
+            tr("Deactivate %n Other", "", licenses.size() - errorsCount),
             QDialogButtonBox::YesRole, Qn::ButtonAccent::Warning);
         connect(deactivateButton, &QAbstractButton::clicked, this,
             [this, licenses, errors]()
@@ -743,7 +752,7 @@ void QnLicenseManagerWidget::deactivateLicenses(const QnLicenseList& licenses)
                     return;
 
                 case Result::ConnectionError:
-                    QnMessageBox::critical(this,
+                    QnMessageBox::information(this,
                         tr("Cannot connect to the License Server"),
                         tr("Please make sure your server has active Internet connection or check firewall settings."));
                     return;
@@ -808,7 +817,8 @@ void QnLicenseManagerWidget::updateButtons()
     const bool canRemoveAny = std::any_of(selected.cbegin(), selected.cend(),
         [this](const QnLicensePtr& license) { return canRemoveLicense(license); });
 
-    const bool canDeactivateAny = std::any_of(selected.cbegin(), selected.cend(),
+    const bool isOwner = context()->user() && context()->user()->isOwner();
+    const bool canDeactivateAny = isOwner && std::any_of(selected.cbegin(), selected.cend(),
         [this](const QnLicensePtr& license) { return canDeactivateLicense(license); });
 
     m_isRemoveTakeAwayOperation = canRemoveAny || !canDeactivateAny;

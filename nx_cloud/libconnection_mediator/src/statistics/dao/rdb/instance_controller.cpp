@@ -8,10 +8,13 @@ namespace stats {
 namespace dao {
 namespace rdb {
 
-InstanceController::InstanceController(const nx::db::ConnectionOptions& connectionOptions):
-    nx::db::InstanceController(connectionOptions)
+InstanceController::InstanceController(const nx::utils::db::ConnectionOptions& connectionOptions):
+    nx::utils::db::InstanceController(connectionOptions)
 {
     dbStructureUpdater().addUpdateScript(kCreateConnectSessionStatisticsTable);
+
+    if (!initialize())
+        throw std::runtime_error("Could not connect to DB");
 }
 
 } // namespace rdb

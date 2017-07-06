@@ -5,12 +5,14 @@
 #include <QtSql/QSqlQuery>
 #include <QtSql/QSqlRecord>
 
+#include <nx/utils/db/sql_query_execution_helper.h>
 #include <nx/utils/thread/mutex.h>
 #include <nx/utils/uuid.h>
 
 class QSqlDatabase;
 
-class QnDbHelper
+class QnDbHelper:
+    public nx::utils::db::SqlQueryExecutionHelper
 {
 public:
     class QnDbTransaction
@@ -22,6 +24,7 @@ public:
         virtual bool beginTran();
         virtual void rollback();
         virtual bool commit();
+        bool dbCommit(const QString& event);
     protected:
         friend class QnDbTransactionLocker;
         friend class QnDbHelper;
@@ -59,17 +62,6 @@ public:
     bool applyUpdates(const QString &dirName);
     virtual bool beforeInstallUpdate(const QString& updateName);
     virtual bool afterInstallUpdate(const QString& updateName);
-
-    static bool execSQLQuery(const QString& query, QSqlDatabase& database, const char* details);
-    /*!
-        \param scriptData SQL commands separated with ;
-    */
-    static bool execSQLScript(const QByteArray& scriptData, QSqlDatabase& database);
-    //!Reads file \a fileName and calls \a QnDbHelper::execSQLScript
-    static bool execSQLFile(const QString& fileName, QSqlDatabase& database);
-
-    static bool execSQLQuery(QSqlQuery *query, const char* details);
-    static bool prepareSQLQuery(QSqlQuery *query, const QString &queryStr, const char* details);
 
     template <class T>
     static void assertSorted(std::vector<T> &data)
@@ -248,8 +240,7 @@ protected:
     bool isObjectExists(const QString& objectType, const QString& objectName, QSqlDatabase& database);
     void addDatabase(const QString& fileName, const QString& dbname);
     void removeDatabase();
-private:
-    static bool validateParams(const QSqlQuery& query);
+
 protected:
     QSqlDatabase m_sdb;
     mutable QnReadWriteLock m_mutex;

@@ -2,6 +2,7 @@
 #include "storage/storage_test_helper.h"
 #include "media_server_process.h"
 #include "media_server_process_aux.h"
+#include <nx/core/access/access_types.h>
 #include "core/resource_management/resource_pool.h"
 #include "core/resource/storage_resource.h"
 #include "media_server_process.h"
@@ -34,7 +35,7 @@ TEST(SaveRestoreStoragesInfoFromConfig, main)
     qint64 spaceLimit1 = 50 * 1024 * 1024l;
     qint64 spaceLimit2 = 255 * 1024 * 1024l;
 
-    QnCommonModule commonModule(/*clientMode*/ false);
+    QnCommonModule commonModule(/*clientMode*/ false, nx::core::access::Mode::direct);
     nx::ut::utils::FileStorageTestHelper storageTestHelper;
     auto storage1 = storageTestHelper.createStorage(&commonModule, path1, spaceLimit1);
     auto storage2 = storageTestHelper.createStorage(&commonModule, path2, spaceLimit2);

@@ -11,6 +11,7 @@
 #include <QtGui/QIcon>
 #include <QtGui/QDragEnterEvent>
 
+// TODO: #vkutin Think of a proper location and namespace.
 #include <business/business_resource_validation.h>
 
 #include <core/resource/device_dependent_strings.h>
@@ -32,10 +33,17 @@
 #include <ui/widgets/business/business_event_widget_factory.h>
 #include <ui/widgets/business/business_action_widget_factory.h>
 #include <ui/workbench/workbench_context.h>
-#include <ui/workbench/workbench_resource.h>
 
 #include <client/client_settings.h>
 #include <utils/common/scoped_value_rollback.h>
+#include <nx/client/desktop/utils/mime_data.h>
+
+#include <nx/client/desktop/ui/event_rules/subject_selection_dialog.h>
+
+using namespace nx::client::desktop;
+using namespace nx::client::desktop::ui;
+
+using namespace nx;
 
 namespace {
 
@@ -142,60 +150,60 @@ void QnBusinessRuleWidget::setModel(const QnBusinessRuleViewModelPtr &model)
     }
 
     connect(m_model, &QnBusinessRuleViewModel::dataChanged, this, &QnBusinessRuleWidget::at_model_dataChanged);
-    at_model_dataChanged(QnBusiness::AllFieldsMask);
+    at_model_dataChanged(Field::all);
 }
 
-void QnBusinessRuleWidget::at_model_dataChanged(QnBusiness::Fields fields)
+void QnBusinessRuleWidget::at_model_dataChanged(Fields fields)
 {
     if (!m_model || m_updating)
         return;
 
     QN_SCOPED_VALUE_ROLLBACK(&m_updating, true);
 
-    if (fields & QnBusiness::EventTypeField)
+    if (fields & Field::eventType)
     {
 
         QModelIndexList eventTypeIdx = m_model->eventTypesModel()->match(
             m_model->eventTypesModel()->index(0, 0), Qt::UserRole + 1, (int)m_model->eventType(), 1, Qt::MatchExactly);
         ui->eventTypeComboBox->setCurrentIndex(eventTypeIdx.isEmpty() ? 0 : eventTypeIdx.first().row());
 
-        bool isResourceRequired = QnBusiness::isResourceRequired(m_model->eventType());
+        bool isResourceRequired = vms::event::isResourceRequired(m_model->eventType());
         ui->eventResourcesWidget->setVisible(isResourceRequired);
 
         initEventParameters();
     }
 
-    if (fields & QnBusiness::EventStateField)
+    if (fields & Field::eventState)
     {
         QModelIndexList stateIdx = m_model->eventStatesModel()->match(
             m_model->eventStatesModel()->index(0, 0), Qt::UserRole + 1, (int)m_model->eventState(), 1, Qt::MatchExactly);
         ui->eventStatesComboBox->setCurrentIndex(stateIdx.isEmpty() ? 0 : stateIdx.first().row());
     }
 
-    if (fields & QnBusiness::EventResourcesField)
+    if (fields & Field::eventResources)
     {
-        ui->eventResourcesHolder->setText(m_model->data(QnBusiness::SourceColumn).toString());
-        ui->eventResourcesHolder->setIcon(iconHelper(m_model->data(QnBusiness::SourceColumn,
+        ui->eventResourcesHolder->setText(m_model->data(Column::source).toString());
+        ui->eventResourcesHolder->setIcon(iconHelper(m_model->data(Column::source,
             Qt::DecorationRole).value<QIcon>()));
     }
 
-    if (fields & QnBusiness::ActionTypeField)
+    if (fields & Field::actionType)
     {
         QModelIndexList actionTypeIdx = m_model->actionTypesModel()->match(m_model->actionTypesModel()->index(0, 0), Qt::UserRole + 1, (int)m_model->actionType(), 1, Qt::MatchExactly);
         ui->actionTypeComboBox->setCurrentIndex(actionTypeIdx.isEmpty() ? 0 : actionTypeIdx.first().row());
 
-        bool isResourceRequired = QnBusiness::requiresCameraResource(m_model->actionType())
-            || QnBusiness::requiresUserResource(m_model->actionType());
+        bool isResourceRequired = vms::event::requiresCameraResource(m_model->actionType())
+            || vms::event::requiresUserResource(m_model->actionType());
         ui->actionResourcesWidget->setVisible(isResourceRequired);
 
         QString actionAtLabelText;
         switch (m_model->actionType())
         {
-            case QnBusiness::SendMailAction:
+            case vms::event::sendMailAction:
                 //: "to" is from the sentence "Send email _to_:"
                 actionAtLabelText = tr("to");
                 break;
-            case QnBusiness::ShowOnAlarmLayoutAction:
+            case vms::event::showOnAlarmLayoutAction:
                 actionAtLabelText = QnDeviceDependentStrings::getDefaultNameFromSet(
                     resourcePool(),
                     tr("Devices"),
@@ -208,38 +216,38 @@ void QnBusinessRuleWidget::at_model_dataChanged(QnBusiness::Fields fields)
         }
         ui->actionAtLabel->setText(actionAtLabelText);
 
-        ui->aggregationWidget->setVisible(QnBusiness::allowsAggregation(m_model->actionType()));
+        ui->aggregationWidget->setVisible(vms::event::allowsAggregation(m_model->actionType()));
 
         initActionParameters();
     }
 
-    if (fields & (QnBusiness::EventTypeField | QnBusiness::ActionTypeField | QnBusiness::ActionParamsField))
+    if (fields & (Field::eventType | Field::actionType | Field::actionParams))
     {
-        if (m_model->eventType() == QnBusiness::SoftwareTriggerEvent)
+        if (m_model->eventType() == vms::event::softwareTriggerEvent)
         {
             /* SoftwareTriggerEvent is prolonged if its action is prolonged. */
             ui->eventStatesComboBox->setVisible(false);
         }
         else
         {
-            const bool isEventProlonged = QnBusiness::hasToggleState(m_model->eventType());
+            const bool isEventProlonged = vms::event::hasToggleState(m_model->eventType());
             ui->eventStatesComboBox->setVisible(isEventProlonged && !m_model->isActionProlonged());
         }
     }
 
-    if (fields & (QnBusiness::ActionResourcesField | QnBusiness::ActionTypeField | QnBusiness::ActionParamsField))
+    if (fields & (Field::actionResources | Field::actionType | Field::actionParams))
     {
-        ui->actionResourcesHolder->setText(m_model->data(QnBusiness::TargetColumn, Qn::ShortTextRole).toString());
-        ui->actionResourcesHolder->setIcon(iconHelper(m_model->data(QnBusiness::TargetColumn,
+        ui->actionResourcesHolder->setText(m_model->data(Column::target, Qn::ShortTextRole).toString());
+        ui->actionResourcesHolder->setIcon(iconHelper(m_model->data(Column::target,
             Qt::DecorationRole).value<QIcon>()));
     }
 
-    if (fields & QnBusiness::AggregationField)
+    if (fields & Field::aggregation)
     {
         ui->aggregationWidget->setValue(m_model->aggregationPeriod());
     }
 
-    if (fields & QnBusiness::CommentsField)
+    if (fields & Field::comments)
     {
         QString text = m_model->comments();
         if (ui->commentsLineEdit->text() != text)
@@ -308,11 +316,11 @@ void QnBusinessRuleWidget::initActionParameters()
 
     const auto getTabBeforeTarget = [this]() -> QWidget *
     {
-        if (const bool aggregationIsVisible = QnBusiness::allowsAggregation(m_model->actionType()))
+        if (const bool aggregationIsVisible = vms::event::allowsAggregation(m_model->actionType()))
             return ui->aggregationWidget->lastTabItem();
 
-        const bool resourceIsVisible = QnBusiness::requiresCameraResource(m_model->actionType())
-            || QnBusiness::requiresUserResource(m_model->actionType());
+        const bool resourceIsVisible = vms::event::requiresCameraResource(m_model->actionType())
+            || vms::event::requiresUserResource(m_model->actionType());
         if (resourceIsVisible)
             return ui->actionResourcesHolder;
 
@@ -343,7 +351,9 @@ bool QnBusinessRuleWidget::eventFilter(QObject *object, QEvent *event)
     if (event->type() == QEvent::DragEnter)
     {
         QDragEnterEvent* de = static_cast<QDragEnterEvent*>(event);
-        m_dropResources = QnWorkbenchResource::deserializeResources(de->mimeData());
+
+        MimeData data(de->mimeData());
+        m_dropResources = resourcePool()->getResources(data.getIds());
         if (!m_dropResources.empty())
             de->acceptProposedAction();
         return true;
@@ -398,7 +408,7 @@ void QnBusinessRuleWidget::at_eventTypeComboBox_currentIndexChanged(int index)
         return;
 
     int typeIdx = m_model->eventTypesModel()->item(index)->data().toInt();
-    QnBusiness::EventType val = (QnBusiness::EventType)typeIdx;
+    vms::event::EventType val = (vms::event::EventType)typeIdx;
     m_model->setEventType(val);
 }
 
@@ -407,11 +417,11 @@ void QnBusinessRuleWidget::at_eventStatesComboBox_currentIndexChanged(int index)
     if (!m_model || m_updating || index == -1)
         return;
 
-    if (!QnBusiness::hasToggleState(m_model->eventType()) || m_model->isActionProlonged())
+    if (!vms::event::hasToggleState(m_model->eventType()) || m_model->isActionProlonged())
         return;
 
     int typeIdx = m_model->eventStatesModel()->item(index)->data().toInt();
-    QnBusiness::EventState val = (QnBusiness::EventState) typeIdx;
+    vms::event::EventState val = (vms::event::EventState) typeIdx;
     m_model->setEventState(val);
 }
 
@@ -421,7 +431,7 @@ void QnBusinessRuleWidget::at_actionTypeComboBox_currentIndexChanged(int index)
         return;
 
     int typeIdx = m_model->actionTypesModel()->item(index)->data().toInt();
-    QnBusiness::ActionType val = (QnBusiness::ActionType)typeIdx;
+    vms::event::ActionType val = (vms::event::ActionType)typeIdx;
     m_model->setActionType(val);
 }
 
@@ -440,10 +450,10 @@ void QnBusinessRuleWidget::at_eventResourcesHolder_clicked()
 
     QnResourceSelectionDialog dialog(QnResourceSelectionDialog::Filter::cameras, this); //TODO: #GDM #Business or servers?
 
-    QnBusiness::EventType eventType = m_model->eventType();
-    if (eventType == QnBusiness::CameraMotionEvent)
+    vms::event::EventType eventType = m_model->eventType();
+    if (eventType == vms::event::cameraMotionEvent)
         dialog.setDelegate(new QnCheckResourceAndWarnDelegate<QnCameraMotionPolicy>(this));
-    else if (eventType == QnBusiness::CameraInputEvent)
+    else if (eventType == vms::event::cameraInputEvent)
         dialog.setDelegate(new QnCheckResourceAndWarnDelegate<QnCameraInputPolicy>(this));
     dialog.setSelectedResources(m_model->eventResources());
 
@@ -458,34 +468,79 @@ void QnBusinessRuleWidget::at_actionResourcesHolder_clicked()
         return;
 
     QnResourceSelectionDialog::Filter target;
-    if (QnBusiness::requiresCameraResource(m_model->actionType()))
+    if (vms::event::requiresCameraResource(m_model->actionType()))
         target = QnResourceSelectionDialog::Filter::cameras;
-    else if (QnBusiness::requiresUserResource(m_model->actionType()))
+    else if (vms::event::requiresUserResource(m_model->actionType()))
         target = QnResourceSelectionDialog::Filter::users;
     else
         return;
 
-    QnResourceSelectionDialog dialog(target, this);
+    if (target == QnResourceSelectionDialog::Filter::users)
+    {
+        SubjectSelectionDialog dialog(this);
+        dialog.setCheckedSubjects(m_model->actionResources());
 
-    QnBusiness::ActionType actionType = m_model->actionType();
-    if (actionType == QnBusiness::CameraRecordingAction)
-        dialog.setDelegate(new QnCheckResourceAndWarnDelegate<QnCameraRecordingPolicy>(this));
-    if (actionType == QnBusiness::BookmarkAction)
-        dialog.setDelegate(new QnCheckResourceAndWarnDelegate<QnBookmarkActionPolicy>(this));
-    else if (actionType == QnBusiness::CameraOutputAction)
-        dialog.setDelegate(new QnCheckResourceAndWarnDelegate<QnCameraOutputPolicy>(this));
-    else if (actionType == QnBusiness::ExecutePtzPresetAction)
-        dialog.setDelegate(new QnCheckResourceAndWarnDelegate<QnExecPtzPresetPolicy>(this));
-    else if (actionType == QnBusiness::SendMailAction)
-        dialog.setDelegate(new QnSendEmailActionDelegate(this));
-    else if (actionType == QnBusiness::PlaySoundAction || actionType == QnBusiness::PlaySoundOnceAction || actionType == QnBusiness::SayTextAction)
-        dialog.setDelegate(new QnCheckResourceAndWarnDelegate<QnCameraAudioTransmitPolicy>(this));
+        auto params = m_model->actionParams();
+        dialog.setAllUsers(params.allUsers);
 
-    dialog.setSelectedResources(m_model->actionResources());
+        if (m_model->actionType() == vms::event::sendMailAction)
+        {
+            QSharedPointer<QnSendEmailActionDelegate> dialogDelegate(
+                new QnSendEmailActionDelegate(this));
 
-    if (dialog.exec() != QDialog::Accepted)
-        return;
-    m_model->setActionResources(dialog.selectedResources());
+            dialog.setAllUsersSelectorEnabled(false); //< No spam, baby.
+
+            dialog.setUserValidator(
+                [dialogDelegate](const QnUserResourcePtr& user)
+                {
+                    // TODO: #vkutin This adapter is rather sub-optimal.
+                    return dialogDelegate->isValid(user->getId());
+                });
+
+            const auto updateAlert =
+                [&dialog, dialogDelegate]
+                {
+                    // TODO: #vkutin #3.2 Full updates like this are slow. Refactor in 3.2.
+                    dialog.showAlert(dialogDelegate->validationMessage(
+                        dialog.totalCheckedUsers()));
+                };
+
+            connect(&dialog, &SubjectSelectionDialog::changed, this, updateAlert);
+            updateAlert();
+        }
+
+        if (dialog.exec() != QDialog::Accepted)
+            return;
+
+        m_model->setActionResources(dialog.checkedSubjects());
+
+        params.allUsers = dialog.allUsers();
+        m_model->setActionParams(params);
+    }
+    else
+    {
+        QnResourceSelectionDialog dialog(target, this);
+
+        vms::event::ActionType actionType = m_model->actionType();
+        if (actionType == vms::event::cameraRecordingAction)
+            dialog.setDelegate(new QnCheckResourceAndWarnDelegate<QnCameraRecordingPolicy>(this));
+        if (actionType == vms::event::bookmarkAction)
+            dialog.setDelegate(new QnCheckResourceAndWarnDelegate<QnBookmarkActionPolicy>(this));
+        else if (actionType == vms::event::cameraOutputAction)
+            dialog.setDelegate(new QnCheckResourceAndWarnDelegate<QnCameraOutputPolicy>(this));
+        else if (actionType == vms::event::executePtzPresetAction)
+            dialog.setDelegate(new QnCheckResourceAndWarnDelegate<QnExecPtzPresetPolicy>(this));
+        else if (actionType == vms::event::sendMailAction)
+            dialog.setDelegate(new QnSendEmailActionDelegate(this));
+        else if (actionType == vms::event::playSoundAction || actionType == vms::event::playSoundOnceAction || actionType == vms::event::sayTextAction)
+            dialog.setDelegate(new QnCheckResourceAndWarnDelegate<QnCameraAudioTransmitPolicy>(this));
+
+        dialog.setSelectedResources(m_model->actionResources());
+
+        if (dialog.exec() != QDialog::Accepted)
+            return;
+        m_model->setActionResources(dialog.selectedResources());
+    }
 }
 
 void QnBusinessRuleWidget::at_scheduleButton_clicked()

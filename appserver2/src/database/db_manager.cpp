@@ -10,7 +10,7 @@
 #include "managers/time_manager.h"
 #include "nx_ec/data/api_business_rule_data.h"
 #include "nx_ec/data/api_discovery_data.h"
-#include "business/business_fwd.h"
+#include <nx/vms/event/event_fwd.h>
 #include "utils/common/synctime.h"
 #include "utils/crypt/symmetrical.h"
 
@@ -24,7 +24,7 @@
 #include <database/api/db_layout_tour_api.h>
 #include <database/api/db_webpage_api.h>
 
-#include <database/migrations/business_rules_db_migration.h>
+#include <database/migrations/event_rules_db_migration.h>
 #include <database/migrations/user_permissions_db_migration.h>
 #include <database/migrations/accessible_resources_db_migration.h>
 #include <database/migrations/legacy_transaction_migration.h>
@@ -56,14 +56,17 @@
 #include <nx/utils/log/log.h>
 #include "nx_ec/data/api_camera_data_ex.h"
 #include "restype_xml_parser.h"
-#include "business/business_event_rule.h"
+#include <nx/vms/event/rule.h>
 #include "settings.h"
+#include <database/api/db_resource_api.h>
 
 #include <nx/fusion/model_functions.h>
 
 static const QString RES_TYPE_MSERVER = "mediaserver";
 static const QString RES_TYPE_CAMERA = "camera";
 static const QString RES_TYPE_STORAGE = "storage";
+
+using namespace nx;
 
 namespace ec2
 {
@@ -132,7 +135,7 @@ bool businessRuleObjectUpdater(ApiBusinessRuleData& data)
 {
     if (data.actionParams.size() <= 4) //< keep empty json
         return false;
-    auto deserializedData = QJson::deserialized<QnBusinessActionParameters>(data.actionParams);
+    auto deserializedData = QJson::deserialized<vms::event::ActionParameters>(data.actionParams);
     data.actionParams = QJson::serialized(deserializedData);
     return true;
 }
@@ -164,10 +167,10 @@ bool QnDbManager::QnDbTransactionExt::beginTran()
     m_mutex.lockForWrite();
 
     if (m_lazyTranInProgress)
-        m_database.commit();
+        dbCommit(lit("lazy before new"));
+
     m_lazyTranInProgress = false;
     m_database.transaction();
-
 
     m_tranLog->beginTran();
     return true;
@@ -183,15 +186,15 @@ void QnDbManager::QnDbTransactionExt::rollback()
 
 bool QnDbManager::QnDbTransactionExt::commit()
 {
-    const bool rez = m_database.commit();
+    const bool rez = dbCommit("ext commit");
     m_lazyTranInProgress = false;
-    if (rez) {
+    if (rez)
+    {
+        // Commit only on success, otherwise rollback is expected.
         m_tranLog->commit();
         m_mutex.unlock();
     }
-    else {
-        qWarning() << "Commit failed to database" << m_database.databaseName() << "error:"  << m_database.lastError(); // do not unlock mutex. Rollback is expected
-    }
+
     return rez;
 }
 
@@ -200,7 +203,7 @@ void QnDbManager::QnDbTransactionExt::physicalCommitLazyData()
     if (m_lazyTranInProgress)
     {
         m_lazyTranInProgress = false;
-        m_database.commit();
+        dbCommit("phisical commit lazy");
         m_tranLog->commit(); //< Just in case. It does nothing.
     }
 }
@@ -1240,7 +1243,7 @@ bool QnDbManager::removeWrongSupportedMotionTypeForONVIF()
 bool QnDbManager::cleanupDanglingDbObjects()
 {
     const QString kCleanupScript(":/updates/68_cleanup_db.sql");
-    return QnDbHelper::execSQLFile(kCleanupScript, m_sdb);
+    return nx::utils::db::SqlQueryExecutionHelper::execSQLFile(kCleanupScript, m_sdb);
 }
 
 bool QnDbManager::fixBusinessRules()
@@ -1363,11 +1366,11 @@ bool QnDbManager::afterInstallUpdate(const QString& updateName)
     if (updateName.endsWith(lit("/32_default_business_rules.sql")))
     {
         //TODO: #GDM move to migration
-        for (const auto& bRule : QnBusinessEventRule::getSystemRules())
+        for (const auto& rule: vms::event::Rule::getSystemRules())
         {
-            ApiBusinessRuleData bRuleData;
-            fromResourceToApi(bRule, bRuleData);
-            if (updateBusinessRule(bRuleData) != ErrorCode::ok)
+            ApiBusinessRuleData ruleData;
+            fromResourceToApi(rule, ruleData);
+            if (updateBusinessRule(ruleData) != ErrorCode::ok)
                 return false;
         }
         return resyncIfNeeded(ResyncRules);
@@ -1394,11 +1397,11 @@ bool QnDbManager::afterInstallUpdate(const QString& updateName)
     if (updateName.endsWith(lit("/43_add_business_rules.sql")))
     {
         //TODO: #GDM move to migration
-        for (const auto& bRule : QnBusinessEventRule::getRulesUpd43())
+        for (const auto& rule: vms::event::Rule::getRulesUpd43())
         {
-            ApiBusinessRuleData bRuleData;
-            fromResourceToApi(bRule, bRuleData);
-            if (updateBusinessRule(bRuleData) != ErrorCode::ok)
+            ApiBusinessRuleData ruleData;
+            fromResourceToApi(rule, ruleData);
+            if (updateBusinessRule(ruleData) != ErrorCode::ok)
                 return false;
         }
         return resyncIfNeeded(ResyncRules);
@@ -1407,11 +1410,11 @@ bool QnDbManager::afterInstallUpdate(const QString& updateName)
     if (updateName.endsWith(lit("/48_add_business_rules.sql")))
     {
         //TODO: #GDM move to migration
-        for (const auto& bRule : QnBusinessEventRule::getRulesUpd48())
+        for (const auto& rule: vms::event::Rule::getRulesUpd48())
         {
-            ApiBusinessRuleData bRuleData;
-            fromResourceToApi(bRule, bRuleData);
-            if (updateBusinessRule(bRuleData) != ErrorCode::ok)
+            ApiBusinessRuleData ruleData;
+            fromResourceToApi(rule, ruleData);
+            if (updateBusinessRule(ruleData) != ErrorCode::ok)
                 return false;
         }
         return resyncIfNeeded(ResyncRules);
@@ -1513,6 +1516,14 @@ bool QnDbManager::afterInstallUpdate(const QString& updateName)
     if (updateName.endsWith(lit("/92_rename_recording_param_name.sql")))
         return updateBusinessActionParameters();
 
+    if (updateName.endsWith(lit("/93_migrate_show_popup_action.sql")))
+        return ec2::db::migrateBusinessRulesToV31Alpha(m_sdb) && resyncIfNeeded(ResyncRules);
+
+    if (updateName.endsWith(lit("/94_migrate_business_actions_all_users.sql")))
+        return ec2::db::migrateBusinessActionsAllUsers(m_sdb) && resyncIfNeeded(ResyncRules);
+
+    if (updateName.endsWith(lit("/95_migrate_business_events_all_users.sql")))
+        return ec2::db::migrateBusinessEventsAllUsers(m_sdb) && resyncIfNeeded(ResyncRules);
 
     NX_LOG(lit("SQL update %1 does not require post-actions.").arg(updateName), cl_logDEBUG1);
     return true;

@@ -2,12 +2,15 @@
 
 #include <gtest/gtest.h>
 
+#include <nx/cloud/cdb/api/connection.h>
+#include <nx/cloud/cdb/test_support/business_data_generator.h>
+#include <nx/network/app_info.h>
+#include <nx/network/http/auth_tools.h>
 #include <nx/utils/string.h>
 #include <nx/utils/sync_call.h>
 #include <nx/utils/test_support/utils.h>
 
 #include <api/app_server_connection.h>
-#include <nx/cloud/cdb/api/connection.h>
 #include <media_server/settings.h>
 
 using namespace nx::cdb;
@@ -43,26 +46,27 @@ bool MediaServerCloudIntegrationTest::startMediaServer()
 
 bool MediaServerCloudIntegrationTest::registerRandomCloudAccount()
 {
-    api::AccountData accountData;
-    if (m_cdb.addActivatedAccount(&accountData, &m_accountPassword) != api::ResultCode::ok)
+    if (m_cdb.addActivatedAccount(&m_ownerAccount, &m_ownerAccount.password) !=
+            api::ResultCode::ok)
+    {
         return false;
-    m_accountEmail = accountData.email;
+    }
     return true;
 }
 
 bool MediaServerCloudIntegrationTest::registerCloudSystem()
 {
-    if (m_cdb.bindRandomSystem(m_accountEmail, m_accountPassword, &m_cloudSystem) !=
+    if (m_cdb.bindRandomSystem(m_ownerAccount.email, m_ownerAccount.password, &m_cloudSystem) !=
             api::ResultCode::ok)
     {
         return false;
     }
 
     if (m_cdb.getSystemSharing(
-            m_accountEmail,
-            m_accountPassword,
+            m_ownerAccount.email,
+            m_ownerAccount.password,
             m_cloudSystem.id,
-            m_accountEmail,
+            m_ownerAccount.email,
             &m_systemOwnerInfo) != nx::cdb::api::ResultCode::ok)
     {
         return false;
@@ -78,7 +82,7 @@ bool MediaServerCloudIntegrationTest::saveCloudCredentialsToMediaServer()
     CloudCredentialsData cloudData;
     cloudData.cloudSystemID = QString::fromStdString(m_cloudSystem.id);
     cloudData.cloudAuthKey = QString::fromStdString(m_cloudSystem.authKey);
-    cloudData.cloudAccountName = QString::fromStdString(m_accountEmail);
+    cloudData.cloudAccountName = QString::fromStdString(m_ownerAccount.email);
     return
         mserverClient.saveCloudSystemCredentials(std::move(cloudData)).error ==
         QnJsonRestResult::NoError;
@@ -118,8 +122,8 @@ MediaServerClient MediaServerCloudIntegrationTest::prepareMediaServerClient()
 MediaServerClient MediaServerCloudIntegrationTest::prepareMediaServerClientFromCloudOwner()
 {
     MediaServerClient mediaServerClient(mediaServerEndpoint());
-    mediaServerClient.setUserName(m_accountEmail.c_str());
-    mediaServerClient.setPassword(m_accountPassword.c_str());
+    mediaServerClient.setUserName(m_ownerAccount.email.c_str());
+    mediaServerClient.setPassword(m_ownerAccount.password.c_str());
     return mediaServerClient;
 }
 
@@ -151,15 +155,102 @@ void MediaServerCloudIntegrationTest::connectSystemToCloud()
 
     if (m_ownerCredentials.first.isEmpty())
     {
-        m_ownerCredentials.first = m_accountEmail.c_str();
-        m_ownerCredentials.second = m_accountPassword.c_str();
+        m_ownerCredentials.first = m_ownerAccount.email.c_str();
+        m_ownerCredentials.second = m_ownerAccount.password.c_str();
     }
+}
+
+void MediaServerCloudIntegrationTest::changeCloudOwnerAccountPassword()
+{
+    const auto newPassword = nx::utils::generateRandomName(7).toStdString();
+
+    api::AccountUpdateData update;
+    update.passwordHa1 = nx_http::calcHa1(
+        m_ownerAccount.email.c_str(),
+        nx::network::AppInfo::realm().toStdString().c_str(),
+        newPassword.c_str()).constData();
+    ASSERT_EQ(
+        nx::cdb::api::ResultCode::ok,
+        cdb()->updateAccount(m_ownerAccount.email, m_ownerAccount.password, update));
+
+    m_ownerAccount.password = newPassword;
+    if (m_ownerCredentials.first.toStdString() == m_ownerAccount.email)
+        m_ownerCredentials.second = QString::fromStdString(m_ownerAccount.password);
 }
 
 void MediaServerCloudIntegrationTest::switchToDefaultCredentials()
 {
     m_ownerCredentials.first.clear();
     m_ownerCredentials.second.clear();
+}
+
+void MediaServerCloudIntegrationTest::waitForCloudDataSynchronizedToTheMediaServer()
+{
+    const auto newAccount = cdb()->addActivatedAccount2();
+    cdb()->shareSystemEx(
+        m_ownerAccount,
+        m_cloudSystem,
+        newAccount.email,
+        nx::cdb::api::SystemAccessRole::viewer);
+
+    auto mediaServerClient = prepareMediaServerClient();
+
+    for (;;)
+    {
+        ::ec2::ApiUserDataList users;
+        ASSERT_EQ(::ec2::ErrorCode::ok, mediaServerClient.ec2GetUsers(&users));
+        const auto userIter = std::find_if(
+            users.begin(), users.end(),
+            [&newAccount](const ::ec2::ApiUserData& elem)
+            {
+                return elem.name.toStdString() == newAccount.email;
+            });
+        if (userIter != users.end())
+            break;
+        std::this_thread::sleep_for(std::chrono::milliseconds(100));
+    }
+}
+
+::ec2::ApiUserData MediaServerCloudIntegrationTest::inviteRandomCloudUser()
+{
+    const auto userEmail = 
+        nx::cdb::test::BusinessDataGenerator::generateRandomEmailAddress();
+    ::ec2::ApiUserData userData;
+    userData.id = guidFromArbitraryData(userEmail);
+    userData.typeId = QnUuid("{774e6ecd-ffc6-ae88-0165-8f4a6d0eafa7}");
+    userData.isCloud = true;
+    userData.isEnabled = true;
+    userData.email = QString::fromStdString(userEmail);
+    userData.name = QString::fromStdString(userEmail);
+    //userData.userRoleId = QnUuid::createUuid();
+    userData.realm = nx::network::AppInfo::realm();
+    userData.hash = "password_is_in_cloud";
+    userData.digest = "password_is_in_cloud";
+    userData.permissions = Qn::GlobalLiveViewerPermissionSet;
+
+    auto mediaServerClient = prepareMediaServerClient();
+    NX_GTEST_ASSERT_EQ(::ec2::ErrorCode::ok, mediaServerClient.ec2SaveUser(userData));
+
+    return userData;
+}
+
+void MediaServerCloudIntegrationTest::waitForUserToAppearInCloud(const std::string& email)
+{
+    using namespace nx::cdb::api;
+
+    for (;;)
+    {
+        std::vector<SystemSharingEx> sharings;
+        ASSERT_EQ(ResultCode::ok, cdb()->getSystemSharings(
+            m_ownerAccount.email, m_ownerAccount.password,
+            m_cloudSystem.id, &sharings));
+        auto accountIter = std::find_if(
+            sharings.begin(), sharings.end(),
+            [&email](const SystemSharingEx& sharing) { return sharing.accountEmail == email; });
+        if (accountIter != sharings.end())
+            break;
+        std::this_thread::sleep_for(std::chrono::milliseconds(100));
+    }
 }
 
 void MediaServerCloudIntegrationTest::init()

@@ -1,3 +1,5 @@
+set(defaultSkin "dark_blue")
+
 # Components Namings
 set(parent.customization "default")
 set(display.product.name "Nx Witness")
@@ -58,41 +60,23 @@ set(liteDeviceName "Nx1")
 set(freeLicenseKey "0000-0000-0000-0005")
 
 # Installer Customizations
-set(installer.language "en-us")
 set(sign.password "qweasd123")
 set(sign.cer "app.p12")
 set(sign.intermediate.cer "")
 
-# Allowed languages (first is default)
-set(translations
-     en_US
-     en_GB
-     fr
-     de
-     ru
-     es
-     ja
-     ko
-     th
-     zh_CN
-     zh_TW
-     vi_VN
-     pl
-     hu
-     he
-    )
-
-set(translation1 "en_US")
-set(translation2 "en_GB")
-set(translation3 "fr")
-set(translation4 "de")
-set(translation5 "ru")
-set(translation6 "es")
-set(translation7 "ja")
-set(translation8 "ko")
-set(translation9 "th")
-set(translation10 "zh_CN")
-set(translation11 "zh_TW")
-set(translation12 "vi_VN")
-set(translation13 "pl")
-set(translation14 "hu")
+# Localization
+set(defaultTranslation en_US)
+set(additionalTranslations
+    en_GB
+    fr_FR
+    de_DE
+    ru_RU
+    es_ES
+    ja_JP
+    ko_KR
+    tr_TR
+    zh_CN
+    zh_TW
+    he_IL
+    hu_HU
+)

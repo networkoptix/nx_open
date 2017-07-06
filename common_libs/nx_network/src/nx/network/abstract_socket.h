@@ -356,32 +356,23 @@ struct NX_NETWORK_API StreamSocketInfo
 
 struct NX_NETWORK_API KeepAliveOptions
 {
-    /** Timeout, in seconds, with no activity until the first keep-alive packet is sent. */
-    std::chrono::seconds time;
-
-    /**
-     * Interval, in seconds, between when successive keep-alive packets are sent if no
-     * acknowledgement is received.
-     */
-    std::chrono::seconds interval;
-
+    std::chrono::seconds inactivityPeriodBeforeFirstProbe;
+    std::chrono::seconds probeSendPeriod;
     /**
      * The number of unacknowledged probes to send before considering the connection dead and
      * notifying the application layer.
      */
     size_t probeCount;
 
-    /** Maximum time before lost connection can be acknowledged. */
-    std::chrono::seconds maxDelay() const;
-
     KeepAliveOptions(
-        std::chrono::seconds time = std::chrono::seconds::zero(),
-        std::chrono::seconds interval = std::chrono::seconds::zero(),
+        std::chrono::seconds inactivityPeriodBeforeFirstProbe = std::chrono::seconds::zero(),
+        std::chrono::seconds probeSendPeriod = std::chrono::seconds::zero(),
         size_t probeCount = 0);
 
-    KeepAliveOptions(size_t time, size_t interval, size_t count);
     bool operator==(const KeepAliveOptions& rhs) const;
 
+    /** Maximum time before lost connection can be acknowledged. */
+    std::chrono::seconds maxDelay() const;
     QString toString() const;
     static boost::optional<KeepAliveOptions> fromString(const QString& string);
 };

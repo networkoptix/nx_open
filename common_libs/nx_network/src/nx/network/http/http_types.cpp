@@ -313,11 +313,17 @@ bool isMessageBodyAllowed(int statusCode)
 }
 }
 
-const StringType Method::GET("GET");
-const StringType Method::HEAD("HEAD");
-const StringType Method::POST("POST");
-const StringType Method::PUT("PUT");
-const StringType Method::OPTIONS("OPTIONS");
+const StringType Method::Get("GET");
+const StringType Method::Head("HEAD");
+const StringType Method::Post("POST");
+const StringType Method::Put("PUT");
+const StringType Method::Delete("DELETE");
+const StringType Method::Options("OPTIONS");
+
+bool Method::isMessageBodyAllowed(ValueType method)
+{
+    return method != Get && method != Head && method != Delete;
+}
 
 //namespace Version
 //{
@@ -702,6 +708,28 @@ QLatin1String toString(Value val)
 }
 }
 
+static bool isMessageBodyForbiddenByHeaders(const HttpHeaders& headers)
+{
+    auto contentLengthIter = headers.find("Content-Length");
+    if (contentLengthIter != headers.end() &&
+        contentLengthIter->second.toUInt() == 0)
+    {
+        return true;
+    }
+
+    return false;
+}
+
+bool isMessageBodyPresent(const Response& response)
+{
+    if (!StatusCode::isMessageBodyAllowed(response.statusLine.statusCode))
+        return false;
+
+    if (isMessageBodyForbiddenByHeaders(response.headers))
+        return false;
+
+    return true;
+}
 
 
 ////////////////////////////////////////////////////////////
@@ -814,40 +842,34 @@ const StringType kUserAgent = "User-Agent";
 
 namespace AuthScheme
 {
-const char* toString(Value val)
+const char* toString( Value val )
 {
-    switch (val)
+    switch( val )
     {
         case basic:
             return "Basic";
         case digest:
             return "Digest";
-        case automatic:
-            return "Automatic";
         default:
             return "None";
     }
 }
 
-Value fromString(const char* str)
+Value fromString( const char* str )
 {
-    if (::strcasecmp(str, "Basic") == 0)
+    if( ::strcasecmp( str, "Basic" ) == 0 )
         return basic;
-    if (::strcasecmp(str, "Digest") == 0)
+    if( ::strcasecmp( str, "Digest" ) == 0 )
         return digest;
-    if (::strcasecmp(str, "Automatic") == 0)
-        return automatic;
     return none;
 }
 
-Value fromString(const ConstBufferRefType& str)
+Value fromString( const ConstBufferRefType& str )
 {
-    if (str == "Basic")
+    if( str == "Basic" )
         return basic;
-    if (str == "Digest")
+    if( str == "Digest" )
         return digest;
-    if (str == "Automatic")
-        return automatic;
     return none;
 }
 }

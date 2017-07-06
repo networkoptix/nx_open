@@ -1,5 +1,7 @@
 #include "time_based_nonce_provider.h"
 
+#include <nx/utils/log/log.h>
+
 #include <utils/common/synctime.h>
 
 static const qint64 NONCE_TIMEOUT = 1000000ll * 60 * 5;
@@ -48,6 +50,8 @@ bool TimeBasedNonceProvider::isNonceValid(const QByteArray& nonce) const
         else
             ++itr;
     }
+
+    NX_VERBOSE(this, lm("Nonce %1 is %2").arg(nonce).arg(rez ? "valid" : "not valid"));
 
     return rez;
 }

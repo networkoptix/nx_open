@@ -48,7 +48,7 @@ protected:
         const auto dbResult = executeSelectQuerySync(
             std::bind(&dao::rdb::SystemSharingDataObject::fetchAllUserSharings,
                 systemSharingDao(), _1, &sharings));
-        ASSERT_EQ(db::DBResult::ok, dbResult);
+        ASSERT_EQ(nx::utils::db::DBResult::ok, dbResult);
 
         ASSERT_EQ(1U, sharings.size());
         ASSERT_EQ(api::SystemAccessRole::advancedViewer, sharings[0].accessRole);

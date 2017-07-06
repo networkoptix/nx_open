@@ -76,7 +76,7 @@ protected:
         MediaServerClient client(mediaServerEndpoint());
         client.setUserName("admin");
         client.setPassword("admin");
-        
+
         for (;;)
         {
             QnModuleInformation moduleInformation;
@@ -95,14 +95,14 @@ private:
     }
 };
 
-TEST_F(FtConfiguringNewSystem, cloud_system)
+TEST_F(FtConfiguringNewSystem, DISABLED_cloud_system)
 {
     givenSystemCredentialsRegisteredInCloud();
     whenConfiguredMediaServerAsCloudSystem();
     thenSystemMustBeAccessibleWithCloudOwnerCredentials();
 }
 
-TEST_F(FtConfiguringNewSystem, reconfiguring_cloud_system)
+TEST_F(FtConfiguringNewSystem, DISABLED_reconfiguring_cloud_system)
 {
     configureCloudSystem();
     detachSystemFromCloud();

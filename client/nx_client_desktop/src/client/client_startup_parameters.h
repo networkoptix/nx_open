@@ -7,9 +7,13 @@
 
 struct QnStartupParameters
 {
-    enum { kInvalidScreen = -1 };
-
-    QnStartupParameters();
+    static const int kInvalidScreen = -1;
+    static const bool kFullScreenDisabledByDefault =
+#if defined Q_OS_MAC
+        true;
+#else
+        false;
+#endif
 
     static QnStartupParameters fromCommandLineArg(int argc, char **argv);
 
@@ -22,23 +26,24 @@ struct QnStartupParameters
 
     bool isDevMode() const;
 
-    int screen;
+    int screen = kInvalidScreen;
     const static QString kScreenKey;
 
-    bool allowMultipleClientInstances;
+    bool allowMultipleClientInstances = false;
     const static QString kAllowMultipleClientInstancesKey;
 
-    bool skipMediaFolderScan;
-    bool ignoreVersionMismatch;
-    bool vsyncDisabled;
-    bool clientUpdateDisabled;
-    bool softwareYuv;
-    bool forceLocalSettings;
-    bool fullScreenDisabled;
-    bool showFullInfo;
-    bool exportedMode;  /*< Client was run from an exported video exe-file. */
+    bool skipMediaFolderScan = false;
+    bool ignoreVersionMismatch = false;
+    bool vsyncDisabled = false;
+    bool clientUpdateDisabled = false;
+    bool softwareYuv = false;
+    bool forceLocalSettings = false;
+    bool fullScreenDisabled = kFullScreenDisabledByDefault;
+    bool showFullInfo = false;
+    bool exportedMode = false;  /*< Client was run from an exported video exe-file. */
+    bool hiDpiDisabled = false;
 
-    bool selfUpdateMode;
+    bool selfUpdateMode = false;
     const static QString kSelfUpdateKey;
 
     QString devModeKey;
@@ -47,7 +52,6 @@ struct QnStartupParameters
     QString instantDrop;
     QString logLevel;
     QString ec2TranLogLevel;
-    QString dynamicTranslationPath;
     QString lightMode;
     QnUuid videoWallGuid;
     QnUuid videoWallItemGuid;
@@ -60,4 +64,6 @@ struct QnStartupParameters
 
     QString enforceSocketType;
     QString enforceMediatorEndpoint;
+
+    QStringList files; //< File paths passed to the client.
 };

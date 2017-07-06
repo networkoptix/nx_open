@@ -20,6 +20,7 @@
 
 #include <nx/client/desktop/ui/actions/actions.h>
 #include <nx/client/desktop/ui/actions/action_manager.h>
+#include <nx/client/desktop/ui/common/item_view_utils.h>
 #include <ui/common/indents.h>
 #include <ui/delegates/resource_item_delegate.h>
 #include <ui/delegates/customizable_item_delegate.h>
@@ -36,6 +37,8 @@
 
 #include <nx/utils/string.h>
 #include <nx/utils/app_info.h>
+
+using namespace  nx::client::desktop::ui;
 
 namespace {
 
@@ -79,6 +82,8 @@ QnAccessibleResourcesWidget::QnAccessibleResourcesWidget(
     connect(this, &QnAccessibleResourcesWidget::controlsChanged,
         m_accessibleResourcesModel, &QnAccessibleResourcesModel::setAllChecked);
 
+    // TODO: #vkutin #3.2 Replace controlsTreeView with CheckableLineWidget
+
     ui->resourcesTreeView->setModel(m_accessibleResourcesModel);
     ui->controlsTreeView->setModel(m_controlsModel);
     ui->controlsTreeView->setVisible(m_controlsVisible);
@@ -108,6 +113,8 @@ QnAccessibleResourcesWidget::QnAccessibleResourcesWidget(
         });
 
     auto itemDelegate = new QnResourceItemDelegate(this);
+    itemDelegate->setOptions(QnResourceItemDelegate::HighlightChecked);
+    itemDelegate->setCheckBoxColumn(QnAccessibleResourcesModel::CheckColumn);
     itemDelegate->setCustomInfoLevel(Qn::RI_FullInfo);
 
     auto setupTreeView = [itemDelegate](QnTreeView* treeView)
@@ -121,7 +128,6 @@ QnAccessibleResourcesWidget::QnAccessibleResourcesWidget(
             treeView->header()->setSectionResizeMode(QnAccessibleResourcesModel::NameColumn,
                 QHeaderView::Stretch);
             treeView->setProperty(style::Properties::kSideIndentation, QVariant::fromValue(kIndents));
-            treeView->setIgnoreDefaultSpace(true);
         };
     setupTreeView(ui->resourcesTreeView);
     setupTreeView(ui->controlsTreeView);
@@ -172,55 +178,14 @@ QnAccessibleResourcesWidget::QnAccessibleResourcesWidget(
 
     ui->resourcesTreeView->setMouseTracking(true);
 
-    auto toggleCheckbox = [this](const QModelIndex& index)
-        {
-            auto tree = static_cast<QnTreeView*>(sender());
-            bool controlsView = tree == ui->controlsTreeView;
+    ItemViewUtils::setupDefaultAutoToggle(ui->controlsTreeView, QnResourceListModel::CheckColumn);
 
-            if (!controlsView && qApp->keyboardModifiers())
-                return;
+    ItemViewUtils::setupDefaultAutoToggle(ui->resourcesTreeView,
+        QnAccessibleResourcesModel::CheckColumn);
 
-            QAbstractItemModel* model = tree->model();
-            int column = (controlsView)
-                ? static_cast<int>(QnResourceListModel::CheckColumn)
-                : static_cast<int>(QnAccessibleResourcesModel::CheckColumn);
-            QModelIndex checkboxIdx = index.sibling(index.row(), column);
-            int newCheckValue = checkboxIdx.data(Qt::CheckStateRole).toInt() != Qt::Checked ? Qt::Checked : Qt::Unchecked;
-            model->setData(checkboxIdx, newCheckValue, Qt::CheckStateRole);
-        };
+    connect(ui->resourcesTreeView, &QAbstractItemView::entered,
+        this, &QnAccessibleResourcesWidget::updateThumbnail);
 
-    connect(ui->resourcesTreeView, &QnTreeView::clicked, this, toggleCheckbox);
-    connect(ui->controlsTreeView, &QnTreeView::clicked, this, toggleCheckbox);
-
-    auto batchToggleCheckboxes = [this](const QModelIndex& index)
-        {
-            Q_UNUSED(index);
-            QnTreeView* tree = static_cast<QnTreeView*>(sender());
-            QAbstractItemModel* model = tree->model();
-            int column = (tree == ui->controlsTreeView)
-                ? static_cast<int>(QnResourceListModel::CheckColumn)
-                : static_cast<int>(QnAccessibleResourcesModel::CheckColumn);
-            QModelIndexList selectedRows = tree->selectionModel()->selectedRows(column);
-
-            /* If any of selected rows were unchecked check all, otherwise uncheck all: */
-            bool wasUnchecked = boost::algorithm::any_of(selectedRows, [this](const QModelIndex& index)
-            {
-                return index.data(Qt::CheckStateRole).toInt() != Qt::Checked;
-            });
-
-            int newCheckValue = wasUnchecked ? Qt::Checked : Qt::Unchecked;
-
-            for (QModelIndex index : selectedRows)
-                model->setData(index, newCheckValue, Qt::CheckStateRole);
-        };
-
-    connect(ui->resourcesTreeView, &QnTreeView::spacePressed, this, batchToggleCheckboxes);
-    connect(ui->controlsTreeView,  &QnTreeView::spacePressed, this, batchToggleCheckboxes);
-
-    connect(ui->resourcesTreeView, &QnTreeView::selectionChanging,
-        this, &QnAccessibleResourcesWidget::handleSelectionChanging);
-
-    connect(ui->resourcesTreeView, &QAbstractItemView::entered, this, &QnAccessibleResourcesWidget::updateThumbnail);
     updateThumbnail();
 }
 
@@ -543,37 +508,5 @@ void QnAccessibleResourcesWidget::at_itemViewKeyPress(QObject* watched, QEvent* 
             default:
                 break;
         }
-    }
-}
-
-/* Shift-mouseclick selection process should set checkboxes
- * in all affected rows to the state the originating row has. */
-void QnAccessibleResourcesWidget::handleSelectionChanging(
-    QItemSelectionModel::SelectionFlags selectionFlags,
-    const QModelIndex& index, const QEvent* event)
-{
-    const bool specialHandling = event && event->type() == QEvent::MouseButtonPress
-        && static_cast<const QMouseEvent*>(event)->modifiers().testFlag(Qt::ShiftModifier);
-
-    if (!specialHandling)
-        return;
-
-    const auto current = ui->resourcesTreeView->currentIndex(); //< originating item
-    if (!current.isValid() || !index.isValid() || !selectionFlags.testFlag(QItemSelectionModel::Select))
-        return;
-
-    const auto newCheckValue = current.sibling(current.row(),
-        QnAccessibleResourcesModel::CheckColumn).data(Qt::CheckStateRole);
-
-    QAbstractItemModel* model = ui->resourcesTreeView->model();
-
-    QPair<int, int> range(index.row(), current.row());
-    if (range.first > range.second)
-        qSwap(range.first, range.second);
-
-    for (int i = range.first; i <= range.second; ++i)
-    {
-        model->setData(index.sibling(i, QnAccessibleResourcesModel::CheckColumn),
-            newCheckValue, Qt::CheckStateRole);
     }
 }

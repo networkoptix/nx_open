@@ -203,7 +203,7 @@ void Connection::onHttpClientDone()
         {
             using namespace std::placeholders;
             fillAuthInfo(m_credentialsSource == CredentialsSource::serverKey);
-            m_httpClient->doPost(
+            m_httpClient->doGet(
                 m_remotePeerUrl,
                 std::bind(&Connection::onHttpClientDone, this));
         }
@@ -442,7 +442,6 @@ bool Connection::handleMessage(const nx::Buffer& message)
 #endif
 
     MessageType messageType = (MessageType)message[offset];
-    NX_ASSERT(!m_remotePeer.persistentId.isNull());
     emit gotMessage(weakPointer(), messageType, message.mid(offset + 1));
 
     return true;

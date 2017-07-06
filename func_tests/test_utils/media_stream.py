@@ -75,8 +75,8 @@ class RtspMediaStream(object):
         self.user = user
         self.password = password
 
-    def load_archive_stream_metadata(self, temp_file_name, pos=None, duration=None):
-        temp_file_path = temp_file_name + '.avi'
+    def load_archive_stream_metadata(self, artifact_factory, pos=None, duration=None):
+        temp_file_path = artifact_factory(ext='.avi', name='media-avi', type_name='video-avi', content_type='video/avi').produce_file_path()
         log.info('RTSP request: %r', self.url)
         from_cap = cv2.VideoCapture(self.url)
         assert from_cap.isOpened(), 'Failed to open RTSP url: %r' % self.url
@@ -156,8 +156,8 @@ class WebmMediaStream(object):
         self.user = user
         self.password = password
 
-    def load_archive_stream_metadata(self, temp_file_name, pos=None, duration=None):
-        temp_file_path = temp_file_name + '.webm'
+    def load_archive_stream_metadata(self, artifact_factory, pos=None, duration=None):
+        temp_file_path = artifact_factory(ext='.webm', name='media-webm', type_name='video-webm', content_type='video/webm').produce_file_path()
         params = dict(pos=0)
         metadata = load_stream_metadata_from_http(
             'webm', self.url, self.user, self.password, params, temp_file_path)
@@ -166,16 +166,15 @@ class WebmMediaStream(object):
 
 class DirectHlsMediaStream(object):
 
-    def __init__(self, server_url, user, password, camera_mac_addr, format='mkv'):
-        self.url = '%shls/%s.%s' % (server_url, camera_mac_addr, format)
+    def __init__(self, server_url, user, password, camera_mac_addr):
+        self.url = '%shls/%s.mkv' % (server_url, camera_mac_addr)
         self.user = user
         self.password = password
-        self.format = format
 
-    def load_archive_stream_metadata(self, temp_file_name, pos, duration):
+    def load_archive_stream_metadata(self, artifact_factory, pos, duration):
         assert isinstance(pos, datetime), repr(pos)
         assert isinstance(duration, timedelta), repr(duration)
-        temp_file_path = temp_file_name + '.%s' % self.format
+        temp_file_path = artifact_factory(ext='.mkv', name='media-mkv', type_name='video-mkv', content_type='video/x-matroska').produce_file_path()
         pos_ms = int(datetime_utc_to_timestamp(pos) * 1000)
         duration_sec = int(duration.total_seconds() + 1)  # round to next value
         params = dict(pos=pos_ms, duration=duration_sec)
@@ -192,18 +191,18 @@ class M3uHlsMediaStream(object):
         self.password = password
         self.camera_mac_addr = camera_mac_addr
 
-    def load_archive_stream_metadata(self, temp_file_name, pos=None, duration=None):
-        loader = M3uHlsMediaMetainfoLoader(self.server_url, self.user, self.password, temp_file_name)
+    def load_archive_stream_metadata(self, artifact_factory, pos=None, duration=None):
+        loader = M3uHlsMediaMetainfoLoader(self.server_url, self.user, self.password, artifact_factory)
         return loader.run(self.camera_mac_addr)
 
 
 class M3uHlsMediaMetainfoLoader(object):
 
-    def __init__(self, server_url, user, password, temp_file_name):
+    def __init__(self, server_url, user, password, artifact_factory):
         self.server_url = server_url
         self.user = user
         self.password = password
-        self.temp_file_name = temp_file_name
+        self.artifact_factory = artifact_factory
         self.collected_metainfo_list = []
         self.file_counter = 0
 
@@ -236,6 +235,9 @@ class M3uHlsMediaMetainfoLoader(object):
 
     def _process_media_response(self, response):
         self.file_counter += 1
-        temp_file_path = self.temp_file_name + '-%d.mpeg' % self.file_counter
+        artifact_factory = self.artifact_factory(
+            [str(self.file_counter)], ext='.mpeg',
+            name='media-%d-mpeg' % self.file_counter, type_name='video-mpeg', content_type='video/mpeg')
+        temp_file_path = artifact_factory.produce_file_path()
         metadata = load_stream_metadata_from_http_response('hls', response, temp_file_path)
         self.collected_metainfo_list.append(metadata)

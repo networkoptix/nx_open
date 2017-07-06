@@ -37,6 +37,8 @@ public:
     RoleDescription roleByRow(int row) const;
     int count() const;
 
+    QnUuid id(int row, bool predefinedRoleIdsEnabled) const;
+
     void setCustomRoleStrings(const QString& name, const QString& description);
 
 private:
@@ -58,7 +60,8 @@ private:
     QString m_customRoleName;
     QString m_customRoleDescription;
 
-    bool m_checkable = false;
+    bool m_hasCheckBoxes = false;
+    bool m_userCheckable = true;
     bool m_predefinedRoleIdsEnabled = false;
     QSet<QPersistentModelIndex> m_checked;
 };

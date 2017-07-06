@@ -33,7 +33,8 @@
 #include "http/http_transaction_receiver.h"
 #include "mutex/distributed_mutex_manager.h"
 #include <http/p2p_connection_listener.h>
-#include "config.h"
+
+#include <ini.h>
 
 namespace ec2 {
 
@@ -174,14 +175,14 @@ int Ec2DirectConnectionFactory::connectAsync(
 void Ec2DirectConnectionFactory::registerTransactionListener(
     QnHttpConnectionListener* httpConnectionListener)
 {
-    if (auto bus = dynamic_cast<QnTransactionMessageBus*> (m_bus.get()))
+    if (auto bus = dynamic_cast<QnTransactionMessageBus*>(m_bus.get()))
     {
         httpConnectionListener->addHandler<QnTransactionTcpProcessor, QnTransactionMessageBus>(
             "HTTP", "ec2/events", bus);
         httpConnectionListener->addHandler<QnHttpTransactionReceiver, QnTransactionMessageBus>(
             "HTTP", kIncomingTransactionsPath, bus);
     }
-    else if (auto bus = dynamic_cast<nx::p2p::MessageBus*> (m_bus.get()))
+    else if (auto bus = dynamic_cast<nx::p2p::MessageBus*>(m_bus.get()))
     {
         httpConnectionListener->addHandler<nx::p2p::ConnectionProcessor>(
             "HTTP", QnTcpListener::normalizedPath(nx::p2p::ConnectionProcessor::kUrlPath));
@@ -1640,6 +1641,7 @@ void Ec2DirectConnectionFactory::remoteConnectionFinished(
         case ec2::ErrorCode::forbidden:
         case ec2::ErrorCode::ldap_temporary_unauthorized:
         case ec2::ErrorCode::cloud_temporary_unauthorized:
+        case ec2::ErrorCode::disabled_user_unauthorized:
             break;
 
         default:
@@ -1681,7 +1683,8 @@ void Ec2DirectConnectionFactory::remoteTestConnectionFinished(
         || errorCode == ErrorCode::unauthorized
         || errorCode == ErrorCode::forbidden
         || errorCode == ErrorCode::ldap_temporary_unauthorized
-        || errorCode == ErrorCode::cloud_temporary_unauthorized)
+        || errorCode == ErrorCode::cloud_temporary_unauthorized
+        || errorCode == ErrorCode::disabled_user_unauthorized)
     {
         handler->done(reqId, errorCode, connectionInfo);
         QnMutexLocker lk(&m_mutex);

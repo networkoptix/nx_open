@@ -64,9 +64,6 @@ void QnAccessibleResourcesModel::setSubject(const QnResourceAccessSubject& subje
 
 QVariant QnAccessibleResourcesModel::data(const QModelIndex& index, int role) const
 {
-    if (role == Qn::DisabledRole && m_allChecked)
-        return false;
-
     switch (index.column())
     {
         case IndirectAccessColumn:
@@ -81,10 +78,10 @@ QVariant QnAccessibleResourcesModel::data(const QModelIndex& index, int role) co
                     const auto accessLevels = resourceAccessProvider()->accessLevels(m_subject,
                         resource);
 
-                    if (accessLevels.contains(QnAbstractResourceAccessProvider::Source::layout))
+                    if (accessLevels.contains(nx::core::access::Source::layout))
                         return qnResIconCache->icon(QnResourceIconCache::SharedLayout);
 
-                    if (accessLevels.contains(QnAbstractResourceAccessProvider::Source::videowall))
+                    if (accessLevels.contains(nx::core::access::Source::videowall))
                         return qnResIconCache->icon(QnResourceIconCache::VideoWall);
 
                     return QVariant();
@@ -96,9 +93,6 @@ QVariant QnAccessibleResourcesModel::data(const QModelIndex& index, int role) co
                     resourceAccessProvider()->accessibleVia(m_subject, resource, &providers);
                     return getTooltip(providers);
                 }
-
-                case Qn::DisabledRole:
-                    return index.sibling(index.row(), NameColumn).data(role);
 
                 default:
                     return QVariant();

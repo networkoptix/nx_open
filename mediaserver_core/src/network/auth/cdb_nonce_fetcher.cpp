@@ -93,11 +93,9 @@ nx::Buffer CdbNonceFetcher::generateNonceTrailer()
 
 QByteArray CdbNonceFetcher::generateNonce()
 {
-#ifdef ENABLE_CLOUD_USER_OFFLINE_LOGIN
     auto cloudPreviouslyProvidedNonce = m_cloudUserInfoPool.newestMostCommonNonce();
     if (cloudPreviouslyProvidedNonce)
         return *cloudPreviouslyProvidedNonce + generateNonceTrailer();
-#endif
 
     if (!m_cloudConnectionManager->boundToCloud())
         return m_defaultGenerator->generateNonce();
@@ -131,8 +129,13 @@ QByteArray CdbNonceFetcher::generateNonce()
 
 bool CdbNonceFetcher::isNonceValid(const QByteArray& nonce) const
 {
+    NX_VERBOSE(this, lm("Verifying nonce %1").arg(nonce));
     if (isValidCloudNonce(nonce))
+    {
+        NX_VERBOSE(this, lm("Nonce %1 is a valid cloud nonce").arg(nonce));
         return true;
+    }
+    NX_VERBOSE(this, lm("Passing nonce %1 verification to a default verificator").arg(nonce));
     return m_defaultGenerator->isNonceValid(nonce);
 }
 
@@ -147,11 +150,15 @@ bool CdbNonceFetcher::isValidCloudNonce(const QByteArray& nonce) const
         const std::string cloudNonceBase(nonce.constData(), nonce.size() - kNonceTrailerLength);
         const auto cloudSystemCredentials = m_cloudConnectionManager->getSystemCredentials();
         if (!cloudSystemCredentials)
+        {
+            NX_VERBOSE(this, "NO cloud system credentials");
             return false;   //we can't say if that nonce is ok for us
+        }
         return nx::cdb::api::isValidCloudNonceBase(
             cloudNonceBase,
             cloudSystemCredentials->systemId.constData());
     }
+    NX_VERBOSE(this, "Nonce size < trailer size or trailer is not magic");
     return false;
 }
 
@@ -174,7 +181,7 @@ nx::cdb::api::ResultCode CdbNonceFetcher::initializeConnectionToCloudSync()
         return resultCode;
 
     QnMutexLocker lock(&m_mutex);
-    
+
     cloudBindingStatusChangedUnsafe(lock, true);
     saveCloudNonce(std::move(cloudNonce));
 
@@ -321,5 +328,7 @@ void CdbNonceFetcher::cloudBindingStatusChangedUnsafe(
 void CdbNonceFetcher::cloudBindingStatusChanged(bool boundToCloud)
 {
     QnMutexLocker lock(&m_mutex);
+    if (!boundToCloud)
+        m_cloudUserInfoPool.clear();
     cloudBindingStatusChangedUnsafe(lock, boundToCloud);
 }

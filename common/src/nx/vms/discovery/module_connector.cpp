@@ -8,18 +8,25 @@ namespace nx {
 namespace vms {
 namespace discovery {
 
-static const auto kUrl = lit("http://%1/api/moduleInformation?showAddresses=false");
-static const KeepAliveOptions kKeepAliveOptions(60, 10, 3);
+static const auto kUrl =
+    lit("http://%1/api/moduleInformation?showAddresses=false&keepConnectionOpen");
+
+static const KeepAliveOptions kKeepAliveOptions(
+    std::chrono::seconds(10), std::chrono::seconds(5), 5);
+
+static const network::RetryPolicy kDefaultDetryPolicy(
+    network::RetryPolicy::kInfiniteRetries, std::chrono::seconds(5), 2, std::chrono::minutes(10));
 
 ModuleConnector::ModuleConnector(network::aio::AbstractAioThread* thread):
     network::aio::BasicPollable(thread),
-    m_reconnectInterval(std::chrono::minutes(1))
+    m_retryPolicy(kDefaultDetryPolicy)
 {
 }
 
-void ModuleConnector::setReconnectInterval(std::chrono::milliseconds interval)
+void ModuleConnector::setReconnectPolicy(network::RetryPolicy value)
 {
-    m_reconnectInterval = interval;
+    NX_ASSERT(m_modules.size() == 0);
+    m_retryPolicy = value;
 }
 
 void ModuleConnector::setConnectHandler(ConnectedHandler handler)
@@ -100,9 +107,9 @@ void ModuleConnector::stopWhileInAioThread()
 
 ModuleConnector::Module::Module(ModuleConnector* parent, const QnUuid& id):
     m_parent(parent),
-    m_id(id)
+    m_id(id),
+    m_timer(parent->m_retryPolicy, parent->getAioThread())
 {
-    m_timer.bindToAioThread(parent->getAioThread());
     NX_DEBUG(this, lm("New %1").args(m_id));
 }
 
@@ -118,27 +125,16 @@ ModuleConnector::Module::~Module()
 void ModuleConnector::Module::addEndpoints(std::set<SocketAddress> endpoints)
 {
     NX_VERBOSE(this, lm("Add endpoints %1").container(endpoints));
-    const auto getGroup =
-        [&](Priority p)
-        {
-            return m_endpoints.emplace(p, std::set<SocketAddress>()).first;
-        };
-
-    const auto insertIntoGroup =
-        [&](Endpoints::iterator groupIterator, SocketAddress endpoint)
-        {
-            auto& group = groupIterator->second;
-            return group.insert(std::move(endpoint)).second;
-        };
-
     if (m_id.isNull())
     {
         // For unknown server connect to every new endpoint.
-        const auto group = getGroup(kDefault);
         for (const auto& endpoint: endpoints)
         {
-            if (insertIntoGroup(group, endpoint) && !m_parent->m_isPassiveMode)
-                connectToEndpoint(endpoint, group);
+            if (auto group = saveEndpoint(endpoint))
+            {
+                if (!m_parent->m_isPassiveMode)
+                    connectToEndpoint(endpoint, group.get());
+            }
         }
     }
     else
@@ -146,19 +142,7 @@ void ModuleConnector::Module::addEndpoints(std::set<SocketAddress> endpoints)
         // For known server sort endpoints by accessibility type and connect by order.
         bool hasNewEndpoints = false;
         for (auto& endpoint: endpoints)
-        {
-            Endpoints::iterator group;
-            if (endpoint.address == HostAddress::localhost)
-                group = getGroup(kLocalHost);
-            else if (endpoint.address.isLocal())
-                group = getGroup(kLocalNetwork);
-            else if (endpoint.address.isIpAddress())
-                group = getGroup(kIp); //< TODO: Consider to check if we have such interface.
-            else
-                group = getGroup(kOther);
-
-            hasNewEndpoints |= insertIntoGroup(group, std::move(endpoint));
-        }
+            hasNewEndpoints |= (bool) saveEndpoint(std::move(endpoint));
 
         if (hasNewEndpoints)
             ensureConnection();
@@ -178,6 +162,43 @@ void ModuleConnector::Module::setForbiddenEndpoints(std::set<SocketAddress> endp
     m_forbiddenEndpoints = std::move(endpoints);
 }
 
+boost::optional<ModuleConnector::Module::Endpoints::iterator>
+    ModuleConnector::Module::saveEndpoint(SocketAddress endpoint)
+{
+    const auto getGroup =
+        [&](Priority p)
+        {
+            return m_endpoints.emplace(p, std::set<SocketAddress>()).first;
+        };
+
+    const auto insertIntoGroup =
+        [&](Endpoints::iterator groupIterator, SocketAddress endpoint)
+        {
+            auto& group = groupIterator->second;
+            return group.insert(std::move(endpoint)).second;
+        };
+
+    Endpoints::iterator group;
+    if (m_id.isNull())
+        group = getGroup(kDefault);
+    if (endpoint.address == HostAddress::localhost)
+        group = getGroup(kLocalHost);
+    else if (endpoint.address.isLocal())
+        group = getGroup(kLocalNetwork);
+    else if (endpoint.address.isIpAddress())
+        group = getGroup(kIp); //< TODO: Consider to check if we have such interface.
+    else
+        group = getGroup(kOther);
+
+    if (insertIntoGroup(group, endpoint))
+    {
+        NX_DEBUG(this, lm("Save endpoint %1 to %2").args(endpoint, group->first));
+        return group;
+    }
+
+    return boost::none;
+}
+
 void ModuleConnector::Module::connectToGroup(Endpoints::iterator endpointsGroup)
 {
     if (m_parent->m_isPassiveMode)
@@ -192,18 +213,20 @@ void ModuleConnector::Module::connectToGroup(Endpoints::iterator endpointsGroup)
     {
         if (!m_id.isNull())
         {
-            const auto reconnectInterval = m_parent->m_reconnectInterval;
-            NX_VERBOSE(this, lm("No more endpoints, retry in %1").arg(reconnectInterval));
-            m_timer.start(reconnectInterval, [this](){ connectToGroup(m_endpoints.begin()); });
+            const auto reconnectInterval = m_parent->m_retryPolicy;
+            m_timer.scheduleNextTry([this](){ connectToGroup(m_endpoints.begin()); });
+            NX_VERBOSE(this, lm("No more endpoints, retry in %1").arg(m_timer.currentDelay()));
             m_parent->m_disconnectedHandler(m_id);
         }
 
         return;
     }
 
+    if (m_timer.timeToEvent())
+        m_timer.cancelSync();
+
     // Initiate parallel connects to each endpoint in a group.
     size_t endpointsInProgress = 0;
-    m_timer.cancelSync();
     for (const auto& endpoint: endpointsGroup->second)
     {
         if (m_forbiddenEndpoints.count(endpoint))
@@ -302,7 +325,11 @@ bool ModuleConnector::Module::saveConnection(
    SocketAddress endpoint, nx_http::AsyncHttpClientPtr client, const QnModuleInformation& information)
 {
     NX_ASSERT(!m_id.isNull());
-    if (m_socket || m_id.isNull())
+    if (m_id.isNull())
+        return false;
+
+    saveEndpoint(endpoint);
+    if (m_socket)
         return true;
 
     for (const auto& client: m_httpClients)
@@ -339,6 +366,7 @@ bool ModuleConnector::Module::saveConnection(
     auto ip = m_socket->getForeignAddress().address;
     NX_VERBOSE(this, lm("Connected to %1 by %2 ip %3").args(m_id, endpoint, ip));
     m_parent->m_connectedHandler(information, std::move(endpoint), std::move(ip));
+    m_timer.reset();
     return true;
 }
 

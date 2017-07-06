@@ -2,6 +2,7 @@
 
 #include <algorithm>
 #include <QtCore/QVector>
+#include <QtCore/QScopedValueRollback>
 
 #include <common/common_globals.h>
 
@@ -80,7 +81,7 @@ int QnUserRolesModel::columnCount(const QModelIndex& parent) const
     if (parent.isValid())
         return 0;
 
-    return isCheckable() ? 2 : 1;
+    return hasCheckBoxes() ? 2 : 1;
 }
 
 void QnUserRolesModel::setCustomRoleStrings(const QString& name, const QString& description)
@@ -89,20 +90,32 @@ void QnUserRolesModel::setCustomRoleStrings(const QString& name, const QString& 
     d->setCustomRoleStrings(name, description);
 }
 
-bool QnUserRolesModel::isCheckable() const
+bool QnUserRolesModel::hasCheckBoxes() const
 {
     Q_D(const QnUserRolesModel);
-    return d->m_checkable;
+    return d->m_hasCheckBoxes;
 }
 
-void QnUserRolesModel::setCheckable(bool value)
+void QnUserRolesModel::setHasCheckBoxes(bool value)
 {
     Q_D(QnUserRolesModel);
-    if (d->m_checkable == value)
+    if (d->m_hasCheckBoxes == value)
         return;
 
     ScopedReset reset(this);
-    d->m_checkable = value;
+    d->m_hasCheckBoxes = value;
+}
+
+bool QnUserRolesModel::userCheckable() const
+{
+    Q_D(const QnUserRolesModel);
+    return d->m_userCheckable;
+}
+
+void QnUserRolesModel::setUserCheckable(bool value)
+{
+    Q_D(QnUserRolesModel);
+    d->m_userCheckable = value;
 }
 
 bool QnUserRolesModel::predefinedRoleIdsEnabled() const
@@ -129,7 +142,7 @@ Qt::ItemFlags QnUserRolesModel::flags(const QModelIndex& index) const
         return Qt::NoItemFlags;
 
     Qt::ItemFlags flags = Qt::ItemIsEnabled | Qt::ItemIsSelectable;
-    if (isCheckable() && index.column() == CheckColumn)
+    if (userCheckable() && index.column() == CheckColumn)
         flags |= Qt::ItemIsUserCheckable;
 
     return flags;
@@ -169,10 +182,7 @@ QVariant QnUserRolesModel::data(const QModelIndex& index, int role) const
 
         /* Role uuid (for custom roles): */
         case Qn::UuidRole:
-            return QVariant::fromValue(
-                roleModel.roleType != Qn::UserRole::CustomUserRole && d->m_predefinedRoleIdsEnabled
-                    ? QnUserRolesManager::predefinedRoleId(roleModel.roleType)
-                    : roleModel.roleUuid);
+            return QVariant::fromValue(d->id(index.row(), d->m_predefinedRoleIdsEnabled));
 
         /* Role permissions (for built-in roles): */
         case Qn::GlobalPermissionsRole:
@@ -192,7 +202,7 @@ bool QnUserRolesModel::setData(const QModelIndex& index, const QVariant& value, 
     if (index.model() != this || !hasIndex(index.row(), index.column(), index.parent()))
         return false;
 
-    if (!isCheckable() || index.column() != CheckColumn || role != Qt::CheckStateRole)
+    if (!hasCheckBoxes() || index.column() != CheckColumn || role != Qt::CheckStateRole)
         return false;
 
     const bool checked = value.toInt() == Qt::Checked;
@@ -208,4 +218,36 @@ bool QnUserRolesModel::setData(const QModelIndex& index, const QVariant& value, 
         index.sibling(index.row(), columnCount() - 1));
 
     return true;
+}
+
+QSet<QnUuid> QnUserRolesModel::checkedRoles() const
+{
+    QSet<QnUuid> result;
+
+    Q_D(const QnUserRolesModel);
+    for (const auto& index: d->m_checked)
+        result.insert(d->id(index.row(), true));
+
+    return result;
+}
+
+void QnUserRolesModel::setCheckedRoles(const QSet<QnUuid>& ids)
+{
+    Q_D(QnUserRolesModel);
+    d->m_checked.clear();
+
+    QHash<QnUuid, int> rowById;
+    for (int row = 0; row < d->count(); ++row)
+        rowById[d->id(row, true)] = row;
+
+    for (const auto& id: ids)
+    {
+        const int row = rowById.value(id, -1);
+        if (row >= 0)
+            d->m_checked.insert(createIndex(row, CheckColumn));
+    }
+
+    emit dataChanged(
+        createIndex(0, 0),
+        createIndex(rowCount() - 1, columnCount() - 1));
 }

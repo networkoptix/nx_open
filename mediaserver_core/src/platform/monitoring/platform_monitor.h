@@ -67,6 +67,7 @@ public:
         SwapPartition           = 0x08,
         NetworkPartition        = 0x10,
         UnknownPartition        = 0x20,
+        UsbDiskPartition        = 0x40
     };
     Q_DECLARE_FLAGS(PartitionTypes, PartitionType)
 

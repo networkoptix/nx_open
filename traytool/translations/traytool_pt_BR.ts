@@ -1,117 +1,117 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
-<TS version="2.1" language="pt_BR" sourcelanguage="en_US">
-<context>
+<TS version="2.1" language="pt-BR" sourcelanguage="en">
+  <context>
     <name>QObject</name>
     <message>
-        <source>System Tray</source>
-        <translation>Barra do sistema</translation>
+      <source>System Tray</source>
+      <translation>Barra do sistema</translation>
     </message>
     <message>
-        <source>There is no system tray on this system.</source>
-        <translation type="unfinished"></translation>
+      <source>There is no system tray on this system.</source>
+      <translation>Não existe uma 'barra de sistema' neste sistema.</translation>
     </message>
     <message>
-        <source>Application will now quit.</source>
-        <translation type="unfinished"></translation>
+      <source>Application will now quit.</source>
+      <translation>A aplicação vai fechar agora.</translation>
     </message>
-</context>
-<context>
+  </context>
+  <context>
     <name>QnElevationChecker</name>
     <message>
-        <source>Insufficient rights to manage services.</source>
-        <translation type="unfinished">Privilégios insuficientes para gerenciar os serviços</translation>
+      <source>Insufficient rights to manage services.</source>
+      <translation>Privilégio insuficiente para gerir os serviços.</translation>
     </message>
     <message>
-        <source>UAC must be enabled to request privileges for non-admin users.</source>
-        <translation type="unfinished">É necessário habilitar o UAC para requerir privilégios para usuários não-admin</translation>
+      <source>UAC must be enabled to request privileges for non-admin users.</source>
+      <translation>É necessário activar o UAC para requerer privilégios para utilizadores não-admin.</translation>
     </message>
-</context>
-<context>
+  </context>
+  <context>
     <name>QnSystrayWindow</name>
     <message>
-        <source>&amp;Quit</source>
-        <translation>&amp;Fechar</translation>
+      <source>Access denied.</source>
+      <translation>Acesso proibido.</translation>
     </message>
     <message>
-        <source>No %1 services installed</source>
-        <translation>%1 de serviços instalados</translation>
+      <source>Specified database does not exist.</source>
+      <translation>A base de dados especificada não existe.</translation>
     </message>
     <message>
-        <source>Access denied.</source>
-        <translation>Acesso proibido.</translation>
+      <source>Specified parameter is invalid.</source>
+      <translation>O parâmetro específico é inválido.</translation>
     </message>
     <message>
-        <source>Specified database does not exist.</source>
-        <translation>O banco de dados especificado não existe.</translation>
+      <source>Could not access installed services</source>
+      <translation>Não foi possível acede aos serviços instalados</translation>
     </message>
     <message>
-        <source>Specified parameter is invalid.</source>
-        <translation>Um parâmetro específico está inválido.</translation>
+      <source>No %1 services installed</source>
+      <translation>Nenhuns serviços %1 instalados</translation>
     </message>
     <message>
-        <source>Could not access installed services</source>
-        <translation>Não foi possivel acessar os serviços instalados</translation>
+      <source>&amp;Quit</source>
+      <translation>&amp;Fechar</translation>
     </message>
     <message>
-        <source>An error has occurred while trying to access installed services:</source>
-        <translation type="unfinished"></translation>
+      <source>An error has occurred while trying to access installed services:</source>
+      <translation>Ocorreu um erro enquanto tentava aceder aos serviços instalados:</translation>
     </message>
     <message>
-        <source>Server has been stopped</source>
-        <translation type="unfinished"></translation>
+      <source>Server has been stopped</source>
+      <translation type="unfinished">Server has been stopped</translation>
     </message>
     <message>
-        <source>Server has been started</source>
-        <translation type="unfinished"></translation>
+      <source>Server has been started</source>
+      <translation type="unfinished">Server has been started</translation>
     </message>
     <message>
-        <source>Server will be stopped. Continue?</source>
-        <translation type="unfinished"></translation>
+      <source>Server will be stopped. Continue?</source>
+      <translation>O Servidor Media vai ser parado. Continuar?</translation>
     </message>
     <message>
-        <source>Show Server Log</source>
-        <translation type="unfinished"></translation>
+      <source>Show Server Log</source>
+      <translation type="unfinished">Show Server Log</translation>
     </message>
     <message>
-        <source>Start Server</source>
-        <translation type="unfinished"></translation>
+      <source>Start Server</source>
+      <translation type="unfinished">Start Server</translation>
     </message>
     <message>
-        <source>Stop Server</source>
-        <translation type="unfinished"></translation>
+      <source>Stop Server</source>
+      <translation type="unfinished">Stop Server</translation>
     </message>
     <message>
-        <source>Server Web Page</source>
-        <translation type="unfinished"></translation>
+      <source>Server Web Page</source>
+      <translation type="unfinished">Server Web Page</translation>
     </message>
     <message>
-        <source>stopped</source>
-        <translation type="unfinished"></translation>
+      <source>stopped</source>
+      <translation type="unfinished">stopped</translation>
     </message>
     <message>
-        <source>starting</source>
-        <translation type="unfinished"></translation>
+      <source>starting</source>
+      <translation type="unfinished">starting</translation>
     </message>
     <message>
-        <source>stopping</source>
-        <translation type="unfinished"></translation>
+      <source>stopping</source>
+      <translation type="unfinished">stopping</translation>
     </message>
     <message>
-        <source>started</source>
-        <translation type="unfinished"></translation>
+      <source>started</source>
+      <translation type="unfinished">started</translation>
     </message>
     <message>
-        <source>resuming</source>
-        <translation type="unfinished"></translation>
+      <source>resuming</source>
+      <translation type="unfinished">resuming</translation>
     </message>
     <message>
-        <source>paused</source>
-        <translation type="unfinished"></translation>
+      <source>paused</source>
+      <translation type="unfinished">paused</translation>
     </message>
     <message>
-        <source>pausing</source>
-        <translation type="unfinished"></translation>
+      <source>pausing</source>
+      <translation type="unfinished">pausing</translation>
     </message>
-</context>
+  </context>
 </TS>

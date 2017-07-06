@@ -17,20 +17,25 @@ using AccountDataObject = cdb::dao::rdb::AccountDataObject;
 using SystemDataObject = cdb::dao::rdb::SystemDataObject;
 using SystemSharingDataObject = cdb::dao::rdb::SystemSharingDataObject;
 
-BasePersistentDataTest::BasePersistentDataTest(DbInitializationType dbInitializationType):
-    db::test::TestWithDbHelper("cdb", QString()),
+DaoHelper::DaoHelper(const nx::utils::db::ConnectionOptions& dbConnectionOptions):
+    m_dbConnectionOptions(dbConnectionOptions),
     m_systemDbController(m_settings)
 {
-    if (dbInitializationType == DbInitializationType::immediate)
-        initializeDatabase();
 }
 
-const std::unique_ptr<DbInstanceController>& BasePersistentDataTest::persistentDbManager() const
+void DaoHelper::initializeDatabase()
+{
+    m_persistentDbManager = std::make_unique<DbInstanceController>(
+        m_dbConnectionOptions,
+        m_dbVersionToUpdateTo);
+}
+
+const std::unique_ptr<DbInstanceController>& DaoHelper::persistentDbManager() const
 {
     return m_persistentDbManager;
 }
 
-api::AccountData BasePersistentDataTest::insertRandomAccount()
+api::AccountData DaoHelper::insertRandomAccount()
 {
     using namespace std::placeholders;
 
@@ -38,37 +43,50 @@ api::AccountData BasePersistentDataTest::insertRandomAccount()
     const auto dbResult = executeUpdateQuerySync(
         std::bind(&AccountDataObject::insert, &m_accountDbController,
             _1, account));
-    NX_GTEST_ASSERT_EQ(nx::db::DBResult::ok, dbResult);
+    NX_GTEST_ASSERT_EQ(nx::utils::db::DBResult::ok, dbResult);
     m_accounts.push_back(account);
     return account;
 }
 
-api::SystemData BasePersistentDataTest::insertRandomSystem(const api::AccountData& account)
+api::SystemData DaoHelper::insertRandomSystem(const api::AccountData& account)
 {
     using namespace std::placeholders;
 
     auto system = cdb::test::BusinessDataGenerator::generateRandomSystem(account);
-    const auto dbResult = executeUpdateQuerySync(
+
+    auto dbResult = executeUpdateQuerySync(
         std::bind(&SystemDataObject::insert, &m_systemDbController,
             _1, system, account.id));
-    NX_GTEST_ASSERT_EQ(nx::db::DBResult::ok, dbResult);
+    NX_GTEST_ASSERT_EQ(nx::utils::db::DBResult::ok, dbResult);
+
+    api::SystemSharingEx sharing;
+    sharing.systemId = system.id;
+    sharing.accountId = account.id;
+    sharing.accessRole = api::SystemAccessRole::owner;
+    sharing.isEnabled = true;
+    sharing.vmsUserId = guidFromArbitraryData(account.email).toSimpleByteArray().toStdString();
+    dbResult = executeUpdateQuerySync(
+        std::bind(&SystemSharingDataObject::insertOrReplaceSharing, &m_systemSharingController,
+            _1, sharing));
+
+    NX_GTEST_ASSERT_EQ(nx::utils::db::DBResult::ok, dbResult);
     m_systems.push_back(system);
     return system;
 }
 
-void BasePersistentDataTest::insertSystemSharing(const api::SystemSharingEx& sharing)
+void DaoHelper::insertSystemSharing(const api::SystemSharingEx& sharing)
 {
     using namespace std::placeholders;
 
     const auto dbResult = executeUpdateQuerySync(
         std::bind(&SystemSharingDataObject::insertOrReplaceSharing,
             &m_systemSharingController, _1, sharing));
-    ASSERT_EQ(nx::db::DBResult::ok, dbResult);
+    ASSERT_EQ(nx::utils::db::DBResult::ok, dbResult);
 }
 
-void BasePersistentDataTest::deleteSystemSharing(const api::SystemSharingEx& sharing)
+void DaoHelper::deleteSystemSharing(const api::SystemSharingEx& sharing)
 {
-    const nx::db::InnerJoinFilterFields sqlFilter =
+    const nx::utils::db::InnerJoinFilterFields sqlFilter =
         {{"account_id", ":accountId",
            QnSql::serialized_field(sharing.accountId)}};
 
@@ -77,39 +95,57 @@ void BasePersistentDataTest::deleteSystemSharing(const api::SystemSharingEx& sha
     const auto dbResult = executeUpdateQuerySync(
         std::bind(&SystemSharingDataObject::deleteSharing,
             &m_systemSharingController, _1, sharing.systemId, sqlFilter));
-    ASSERT_EQ(nx::db::DBResult::ok, dbResult);
+    ASSERT_EQ(nx::utils::db::DBResult::ok, dbResult);
 }
 
-const api::AccountData& BasePersistentDataTest::getAccount(std::size_t index) const
+const api::AccountData& DaoHelper::getAccount(std::size_t index) const
 {
     return m_accounts[index];
 }
 
-const data::SystemData& BasePersistentDataTest::getSystem(std::size_t index) const
+const data::SystemData& DaoHelper::getSystem(std::size_t index) const
 {
     return m_systems[index];
 }
 
-const std::vector<api::AccountData>& BasePersistentDataTest::accounts() const
+const std::vector<api::AccountData>& DaoHelper::accounts() const
 {
     return m_accounts;
 }
 
-const std::vector<data::SystemData>& BasePersistentDataTest::systems() const
+const std::vector<data::SystemData>& DaoHelper::systems() const
 {
     return m_systems;
 }
 
-SystemSharingDataObject& BasePersistentDataTest::systemSharingDao()
+SystemSharingDataObject& DaoHelper::systemSharingDao()
 {
     return m_systemSharingController;
 }
 
-void BasePersistentDataTest::initializeDatabase()
+dao::rdb::UserAuthentication& DaoHelper::userAuthentication()
 {
-    m_persistentDbManager =
-        std::make_unique<DbInstanceController>(dbConnectionOptions());
-    ASSERT_TRUE(m_persistentDbManager->initialize());
+    return m_userAuthentication;
+}
+
+void DaoHelper::setDbVersionToUpdateTo(unsigned int dbVersion)
+{
+    m_dbVersionToUpdateTo = dbVersion;
+}
+
+nx::utils::db::AsyncSqlQueryExecutor& DaoHelper::queryExecutor()
+{
+    return m_persistentDbManager->queryExecutor();
+}
+
+//-------------------------------------------------------------------------------------------------
+
+BasePersistentDataTest::BasePersistentDataTest(DbInitializationType dbInitializationType):
+    nx::utils::db::test::TestWithDbHelper("cdb", QString()),
+    DaoHelper(dbConnectionOptions())
+{
+    if (dbInitializationType == DbInitializationType::immediate)
+        initializeDatabase();
 }
 
 } // namespace test

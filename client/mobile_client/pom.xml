@@ -6,7 +6,7 @@
     </parent>
 
     <groupId>com.networkoptix.hdwitness</groupId>
-    <version>3.1.0-SNAPSHOT</version>
+    <version>17.2-SNAPSHOT</version>
     <modelVersion>4.0.0</modelVersion>
     <artifactId>mobile_client</artifactId>
     <packaging>pom</packaging>
@@ -18,6 +18,8 @@
         <product.title>${mobile_client.name}</product.title>
         <product.display.title>${mobile_client.display.name}</product.display.title>
         <template>app</template>
+
+        <mobileClientVersion>${parsedVersion.majorVersion}.${parsedVersion.minorVersion}</mobileClientVersion>
 
         <qt.libs>core qml quick quick-private concurrent network sql multimedia qtmultimediaquicktools_private xml webchannel websockets</qt.libs>
         <!-- !!! DO NOT REMOVE DUPLICATES FROM global.libs UNLESS YOU KNOW WHAT YOU'RE DOING !!! -->
@@ -47,7 +49,7 @@
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>nx_client_core</artifactId>
-            <version>${project.version}</version>
+            <version>3.1.0-SNAPSHOT</version>
             <type>pom</type>
             <scope>system</scope>
             <systemPath>${root.dir}/client/nx_client_core/pom.xml</systemPath>
@@ -55,7 +57,7 @@
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>nx_audio</artifactId>
-            <version>${project.version}</version>
+            <version>3.1.0-SNAPSHOT</version>
             <type>pom</type>
             <scope>system</scope>
             <systemPath>${root.dir}/common_libs/nx_audio/pom.xml</systemPath>
@@ -63,7 +65,7 @@
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>nx_media</artifactId>
-            <version>${project.version}</version>
+            <version>3.1.0-SNAPSHOT</version>
             <type>pom</type>
             <scope>system</scope>
             <systemPath>${root.dir}/common_libs/nx_media/pom.xml</systemPath>
@@ -163,6 +165,20 @@
                 </plugins>
             </build>
         </profile>
+        <profile>
+            <id>itunes</id>
+            <activation>
+                <property>
+                    <name>itunes</name>
+                    <value>true</value>
+                </property>
+            </activation>
+            <properties>
+                <provisioning_profile>${static.customization.dir}/mobile_client/ios/provisioning_profiles/testing.mobileprovision</provisioning_profile>
+                <mobile_client_entitlements>mobile_client-beta.entitlements</mobile_client_entitlements>
+            </properties>
+        </profile>
+
         <profile>
             <id>mobile-ios</id>
             <activation>

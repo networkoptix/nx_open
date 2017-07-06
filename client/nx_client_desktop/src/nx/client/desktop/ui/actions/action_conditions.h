@@ -7,8 +7,8 @@
 #include <client/client_globals.h>
 
 #include <core/resource/resource_fwd.h>
-#include <core/resource_management/resource_criterion.h>
 #include <core/ptz/ptz_fwd.h>
+#include <core/ptz/ptz_constants.h>
 
 #include <ui/workbench/workbench_context_aware.h>
 
@@ -153,30 +153,6 @@ class ClearMotionSelectionCondition: public Condition
 public:
     virtual ActionVisibility check(const QnResourceWidgetList& widgets, QnWorkbenchContext* context) override;
 };
-
-/**
- * ResourceCriterion-based action Condition.
- */
-class ResourceCondition: public Condition
-{
-public:
-    ResourceCondition(
-        const QnResourceCriterion &criterion,
-        MatchMode matchMode);
-    virtual ActionVisibility check(const QnResourceList& resources, QnWorkbenchContext* context) override;
-    virtual ActionVisibility check(const QnResourceWidgetList& widgets, QnWorkbenchContext* context) override;
-
-protected:
-    template<class Item, class ItemSequence>
-    bool checkInternal(const ItemSequence &sequence);
-    bool checkOne(const QnResourcePtr &resource);
-    bool checkOne(QnResourceWidget* widget);
-
-private:
-    QnResourceCriterion m_criterion;
-    MatchMode m_matchMode;
-};
-
 
 /**
  * Condition for resource removal.
@@ -455,13 +431,6 @@ public:
     virtual ActionVisibility check(const Parameters& parameters, QnWorkbenchContext* context) override;
 };
 
-/** Display action only if user is logged in. */
-class LoggedInCondition: public Condition
-{
-public:
-    virtual ActionVisibility check(const Parameters& parameters, QnWorkbenchContext* context) override;
-};
-
 class BrowseLocalFilesCondition: public Condition
 {
 public:
@@ -611,6 +580,12 @@ namespace condition {
 
 /** Visible always. */
 ConditionWrapper always();
+
+/** Visible when user is logged in (or at least logging in). */
+ConditionWrapper isLoggedIn();
+
+/** Check a condition only in the given scope */
+ConditionWrapper scoped(ActionScope scope, ConditionWrapper&& condition);
 
 /** Visible in preview search mode only. */
 ConditionWrapper isPreviewSearchMode();

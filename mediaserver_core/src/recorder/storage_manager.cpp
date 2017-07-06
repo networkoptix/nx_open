@@ -624,7 +624,8 @@ bool QnStorageManager::getSqlDbPath(
     QString storageUrl = storage->getUrl();
     QString dbRefFilePath;
 
-    dbRefFilePath = closeDirPath(storageUrl) + dbRefFileName.arg(QnStorageDbPool::getLocalGuid(commonModule()));
+    dbRefFilePath = closeDirPath(storageUrl) + dbRefFileName.arg(QnStorageDbPool::getLocalGuid(
+        commonModule()->moduleGUID()));
     QByteArray dbRefGuidStr;
 
     //checking for file db_ref.guid existence
@@ -659,7 +660,7 @@ void QnStorageManager::migrateSqliteDatabase(const QnStorageResourcePtr & storag
     if (!getSqlDbPath(storage, dbPath))
         return;
 
-    QString simplifiedGUID = QnStorageDbPool::getLocalGuid(commonModule());
+    QString simplifiedGUID = QnStorageDbPool::getLocalGuid(commonModule()->moduleGUID());
     QString oldFileName = closeDirPath(dbPath) + QString::fromLatin1("media.sqlite");
     QString fileName =
         closeDirPath(dbPath) +
@@ -1535,7 +1536,7 @@ void QnStorageManager::checkSystemStorageSpace()
                 && storage->getFreeSpace() < kMinSystemStorageFreeSpace)
             {
                 m_lowSysStorageSpaceWarnShown = true;
-                emit storageFailure(storage, QnBusiness::SystemStorageFullReason);
+                emit storageFailure(storage, nx::vms::event::EventReason::systemStorageFull);
             }
             else if (storage->getFreeSpace() > kMinSystemStorageFreeSpace * 2)
             {
@@ -2003,7 +2004,7 @@ bool QnStorageManager::clearOldestSpace(const QnStorageResourcePtr &storage, boo
 
     if (toDelete > 0 && !useMinArchiveDays) {
         if (!m_diskFullWarned[storage->getId()]) {
-            emit storageFailure(storage, QnBusiness::StorageFullReason);
+            emit storageFailure(storage, nx::vms::event::EventReason::storageFull);
             m_diskFullWarned[storage->getId()] = true;
         }
     }
@@ -2131,7 +2132,7 @@ void QnStorageManager::changeStorageStatus(const QnStorageResourcePtr &fileStora
 
     fileStorage->setStatus(status);
     if (status == Qn::Offline)
-        emit storageFailure(fileStorage, QnBusiness::StorageIoErrorReason);
+        emit storageFailure(fileStorage, nx::vms::event::EventReason::storageIoError);
 }
 
 void QnStorageManager::startAuxTimerTasks()

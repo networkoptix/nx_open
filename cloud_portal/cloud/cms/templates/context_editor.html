@@ -1,0 +1,61 @@
+{% extends "admin/base_site.html" %}
+{% load i18n admin_urls admin_static %}
+
+{% block extrastyle %}
+    {{ block.super }}
+    <link rel="stylesheet" type="text/css" href="{% static 'admin/css/forms.css' %}"/>
+{% endblock %}
+
+{% block content%}
+<h1>{{context.name}} for {{context.product.name}}</h1>
+<fieldset>
+    <div>{{context.description}}</div>
+    {% if context.translatable %}
+    <div>Page can be translated</div>
+    {% endif %}
+    {% if context.url %}
+    <div> Link to Page: {{context.url}}</div>
+    {% endif %}
+</fieldset>
+<form id="contextForm" action="{% url 'context_editor' context.id %}" method="post" class="aligned">
+    <input type="hidden" name="currentLanguage" value="{{language.id}}">
+    <input type="hidden" id="languageChanged">
+    {% csrf_token %}
+    {% for field in form %}
+        <div class="form-row">
+            {{field.label_tag}}
+            {{field}}
+            {% if field.help_text %}
+            <p class="help">{{field.help_text}}</p>
+            {% endif %}
+        </div>
+    {% endfor %}
+
+    <div class="submit-row">
+        <button class="button" type="submit" name="SaveDraft">Save Draft</button>
+        <button class="button" type="submit" name="Preview">Save and Preview</button>
+        <button class="button" type="submit" name="SendReview">Send for Review</button>
+        <button class="button" type="reset"  name="Reset">Reset</button>
+    </div>
+</form>
+
+{% if preview_link %}
+<div class="submit-row">
+<button onClick="openPreview()">Open Preview</button>
+{% endif %}
+<script>
+    function openPreview(){
+        window.open("{{preview_link}}");
+    }
+
+    function languageChanged(){
+        document.getElementById('languageChanged').name = "languageChanged";
+        document.getElementById('contextForm').submit();
+    }
+
+
+    var langSelector = document.getElementById('id_language');
+
+    langSelector.addEventListener('change', languageChanged, false);
+</script>
+{% endblock%}

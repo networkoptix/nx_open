@@ -180,7 +180,7 @@
         <libjpeg-turbo.version>1.4.2</libjpeg-turbo.version>
         <vmux.version>1.0.0</vmux.version>
         <cpro.version>1.0.0</cpro.version>
-        <server-external.version>default</server-external.version>
+        <server-external.version>${parsedVersion.majorVersion}.${parsedVersion.minorVersion}</server-external.version>
         <help.version>${customization}-${parsedVersion.majorVersion}.${parsedVersion.minorVersion}</help.version>
         <gcc.version>4.9.4</gcc.version>
 
@@ -210,6 +210,8 @@
 
         <additional.defines/>
         <customization.defines/>
+
+        <additionalQrcPaths/>
 
         <!-- QT libs used by ALL modules (to be included in the installer. It is necessary to specify the particular libs in the corresponding modules) -->
         <qtlibs>
@@ -319,6 +321,7 @@
                         </goals>
                         <configuration>
                             <files>
+                                <file>${root.dir}/ec2_proto_version.properties</file>
                                 <file>${root.dir}/customization/default-values.properties</file>
                                 <file>${customization.dir}/build.properties</file>
                                 <file>${customization.dir}/license.properties</file>

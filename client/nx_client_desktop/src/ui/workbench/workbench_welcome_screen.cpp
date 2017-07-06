@@ -6,22 +6,22 @@
 #include <QtQuick/QQuickView>
 #include <QtQml/QQmlContext>
 
-#include <client/client_runtime_settings.h>
-
 #include <QtWidgets/QAction>
 #include <QtWidgets/QApplication>
 #include <QtWidgets/QProxyStyle>
 #include <QtWidgets/QStackedWidget>
 #include <QtWidgets/QWhatsThis>
 
-#include <common/common_module.h>
-#include <core/resource/resource_fwd.h>
-#include <core/resource/resource.h>
+#include <client/startup_tile_manager.h>
+#include <client/forgotten_systems_manager.h>
+#include <client_core/client_core_settings.h>
+#include <client/client_runtime_settings.h>
 
-#include <watchers/cloud_status_watcher.h>
-#include <utils/common/delayed.h>
-#include <utils/common/app_info.h>
-#include <utils/connection_diagnostics_helper.h>
+#include <common/common_module.h>
+
+#include <core/resource/resource.h>
+#include <core/resource/file_processor.h>
+
 #include <nx/client/desktop/ui/actions/actions.h>
 #include <nx/client/desktop/ui/actions/action_manager.h>
 #include <ui/workbench/workbench_context.h>
@@ -29,16 +29,18 @@
 #include <ui/dialogs/login_dialog.h>
 #include <ui/dialogs/common/non_modal_dialog_constructor.h>
 #include <ui/dialogs/setup_wizard_dialog.h>
-#include <ui/workbench/workbench_resource.h>
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
-#include <client/startup_tile_manager.h>
-#include <client/forgotten_systems_manager.h>
-#include <client_core/client_core_settings.h>
+
 #include <finders/systems_finder.h>
 #include <helpers/system_helpers.h>
+#include <watchers/cloud_status_watcher.h>
+
 #include <utils/common/app_info.h>
 #include <utils/common/util.h>
+#include <utils/common/delayed.h>
+#include <utils/common/app_info.h>
+#include <utils/connection_diagnostics_helper.h>
 
 using namespace nx::client::desktop::ui;
 
@@ -92,9 +94,7 @@ QnGenericPalette extractPalette()
 
 QnResourceList extractResources(const UrlsList& urls)
 {
-    QMimeData data;
-    data.setUrls(urls);
-    return QnWorkbenchResource::deserializeResources(&data);
+    return QnFileProcessor::createResourcesForFiles(QnFileProcessor::findAcceptedFiles(urls));
 }
 
 // Extracts url from string and changes port to default if it is invalid
@@ -582,9 +582,10 @@ QColor QnWorkbenchWelcomeScreen::colorWithAlpha(QColor color, qreal alpha)
     return color;
 }
 
-void QnWorkbenchWelcomeScreen::hideSystem(const QString& systemId)
+void QnWorkbenchWelcomeScreen::hideSystem(const QString& systemId, const QString& localSystemId)
 {
     qnForgottenSystemsManager->forgetSystem(systemId);
+    qnForgottenSystemsManager->forgetSystem(localSystemId);
 }
 
 bool QnWorkbenchWelcomeScreen::eventFilter(QObject* obj, QEvent* event)

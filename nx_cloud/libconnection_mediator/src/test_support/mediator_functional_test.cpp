@@ -7,7 +7,6 @@
 #include <thread>
 #include <tuple>
 
-#include <common/common_globals.h>
 #include <nx/fusion/serialization/json.h>
 #include <nx/fusion/serialization/lexical.h>
 #include <nx/network/http/auth_tools.h>

@@ -241,5 +241,12 @@ AVCodecID SeamlessVideoDecoder::currentCodec() const
     return d->prevFrameInfo.codec;
 }
 
+AbstractVideoDecoder* SeamlessVideoDecoder::currentDecoder() const
+{
+    Q_D(const SeamlessVideoDecoder);
+    QMutexLocker lock(&mutex);
+    return d->videoDecoder.get();
+}
+
 } // namespace media
 } // namespace nx

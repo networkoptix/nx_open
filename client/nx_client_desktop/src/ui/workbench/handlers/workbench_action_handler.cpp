@@ -20,7 +20,7 @@
 #include <api/network_proxy_factory.h>
 #include <api/global_settings.h>
 
-#include <business/business_action_parameters.h>
+#include <nx/vms/event/action_parameters.h>
 
 #include <camera/resource_display.h>
 #include <camera/cam_display.h>
@@ -36,6 +36,7 @@
 #include <common/common_module.h>
 
 #include <core/resource_access/resource_access_filter.h>
+#include <core/resource_management/layout_tour_manager.h>
 
 #include <core/resource/resource.h>
 #include <core/resource/device_dependent_strings.h>
@@ -121,7 +122,6 @@
 #include <ui/workbench/workbench_item.h>
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_layout_snapshot_manager.h>
-#include <ui/workbench/workbench_resource.h>
 #include <ui/workbench/workbench_access_controller.h>
 #include <ui/workbench/workbench_state_manager.h>
 #include <ui/workbench/workbench_navigator.h>
@@ -142,7 +142,7 @@
 #include <utils/applauncher_utils.h>
 #include <nx/client/desktop/utils/local_file_cache.h>
 #include <utils/common/delete_later.h>
-#include <utils/common/mime_data.h>
+#include <nx/client/desktop/utils/mime_data.h>
 #include <utils/common/event_processors.h>
 #include <nx/utils/string.h>
 #include <utils/common/time.h>
@@ -173,8 +173,6 @@
 #include "ui/widgets/palette_widget.h"
 #include "network/authutil.h"
 #include <core/resource/fake_media_server.h>
-
-using namespace nx::client::desktop::ui;
 
 namespace {
 
@@ -269,6 +267,8 @@ ActionHandler::ActionHandler(QObject *parent) :
 
     connect(action(action::OpenCurrentLayoutInNewWindowAction), SIGNAL(triggered()), this, SLOT(at_openCurrentLayoutInNewWindowAction_triggered()));
     connect(action(action::OpenNewWindowAction), SIGNAL(triggered()), this, SLOT(at_openNewWindowAction_triggered()));
+    connect(action(action::ReviewLayoutTourInNewWindowAction), &QAction::triggered, this,
+        &ActionHandler::at_reviewLayoutTourInNewWindowAction_triggered);
 
     connect(action(action::MediaFileSettingsAction), &QAction::triggered, this, &ActionHandler::at_mediaFileSettingsAction_triggered);
     connect(action(action::CameraIssuesAction), SIGNAL(triggered()), this, SLOT(at_cameraIssuesAction_triggered()));
@@ -361,13 +361,8 @@ void ActionHandler::addToLayout(const QnLayoutResourcePtr &layout, const QnResou
             layout->removeItem(*(layout->getItems().begin()));
     }
 
-    int maxItems = (qnSettings->lightMode() & Qn::LightModeSingleItem)
-        ? 1
-        : qnSettings->maxSceneVideoItems();
-
-    if (layout->getItems().size() >= maxItems)
+    if (layout->getItems().size() >= qnRuntime->maxSceneItems())
         return;
-
 
     if (!menu()->canTrigger(action::OpenInLayoutAction, action::Parameters(resource)
         .withArgument(Qn::LayoutResourceRole, layout)))
@@ -377,7 +372,8 @@ void ActionHandler::addToLayout(const QnLayoutResourcePtr &layout, const QnResou
 
     QnLayoutItemData data;
     data.resource.id = resource->getId();
-    data.resource.uniqueId = resource->getUniqueId();
+    if (resource->hasFlags(Qn::local_media))
+        data.resource.uniqueId = resource->getUniqueId();
     data.uuid = QnUuid::createUuid();
     data.flags = Qn::PendingGeometryAdjustment;
     data.zoomRect = params.zoomWindow;
@@ -429,20 +425,21 @@ QnResourceList ActionHandler::addToResourcePool(const QString &file) const {
     return QnFileProcessor::createResourcesForFiles(QnFileProcessor::findAcceptedFiles(file));
 }
 
-void ActionHandler::openResourcesInNewWindow(const QnResourceList &resources) {
-    QMimeData mimeData;
-    QnWorkbenchResource::serializeResources(resources, QnWorkbenchResource::resourceMimeTypes(), &mimeData);
-    QnMimeData data(&mimeData);
-    QByteArray serializedData;
-    QDataStream stream(&serializedData, QIODevice::WriteOnly);
-    stream << data;
-
+void ActionHandler::openResourcesInNewWindow(const QnResourceList &resources)
+{
     QStringList arguments;
-    if (context()->user())
-        arguments << QLatin1String("--delayed-drop");
-    else
-        arguments << QLatin1String("--instant-drop");
-    arguments << QLatin1String(serializedData.toBase64().data());
+
+    if (!resources.isEmpty())
+    {
+        if (context()->user())
+            arguments << QLatin1String("--delayed-drop");
+        else
+            arguments << QLatin1String("--instant-drop");
+
+        MimeData data;
+        data.setResources(resources);
+        arguments << data.serialized();
+    }
 
     openNewWindow(arguments);
 }
@@ -537,7 +534,8 @@ QnSystemAdministrationDialog *ActionHandler::systemAdministrationDialog() const 
     return m_systemAdministrationDialog.data();
 }
 
-void ActionHandler::submitDelayedDrops() {
+void ActionHandler::submitDelayedDrops()
+{
     if (m_delayedDropGuard)
         return;
 
@@ -547,54 +545,34 @@ void ActionHandler::submitDelayedDrops() {
     if (!context()->workbench()->currentLayout()->resource())
         return;
 
+    QScopedValueRollback<bool> guard(m_delayedDropGuard, true);
 
-    QN_SCOPED_VALUE_ROLLBACK(&m_delayedDropGuard, true);
+    QnResourceList resources;
+    ec2::ApiLayoutTourDataList tours;
 
-    foreach(const QnMimeData &data, m_delayedDrops) {
-        QMimeData mimeData;
-        data.toMimeData(&mimeData);
+    for (const auto& data: m_delayedDrops)
+    {
+        const auto ids = data.getIds();
+        resources.append(resourcePool()->getResources(ids));
+        for (const auto& tour: layoutTourManager()->tours(ids))
+            tours.push_back(tour);
 
-        QnResourceList resources = QnWorkbenchResource::deserializeResources(&mimeData);
-        QnLayoutResourceList layouts = resources.filtered<QnLayoutResource>();
-        if (!layouts.isEmpty()) {
-            workbench()->clear();
-            menu()->trigger(action::OpenInNewTabAction, layouts);
-        }
-        else {
-            menu()->trigger(action::OpenInCurrentLayoutAction, resources);
-        }
+        const auto urls = data.getUrls();
+        resources.append(QnFileProcessor::createResourcesForFiles(
+            QnFileProcessor::findAcceptedFiles(urls)));
     }
 
     m_delayedDrops.clear();
-}
 
-void ActionHandler::submitInstantDrop() {
-
-    if (commonModule()->instance<QnResourceDiscoveryManager>()->state() == QnResourceDiscoveryManager::InitialSearch) {
-        // local resources are not ready yet
-        QTimer::singleShot(100, this, SLOT(submitInstantDrop()));
+    if (resources.empty() && tours.empty())
         return;
-    }
 
-    foreach(const QnMimeData &data, m_instantDrops) {
-        QMimeData mimeData;
-        data.toMimeData(&mimeData);
-
-        QnResourceList resources = QnWorkbenchResource::deserializeResources(&mimeData);
-
-        QnLayoutResourceList layouts = resources.filtered<QnLayoutResource>();
-        if (!layouts.isEmpty()) {
-            workbench()->clear();
-            menu()->trigger(action::OpenInNewTabAction, layouts);
-        }
-        else {
-            menu()->trigger(action::OpenInCurrentLayoutAction, resources);
-        }
-    }
-    m_instantDrops.clear();
+    workbench()->clear();
+    if (!resources.empty())
+        menu()->trigger(action::OpenInNewTabAction, resources);
+    for (const auto& tour: tours)
+        menu()->trigger(action::ReviewLayoutTourAction, {Qn::UuidRole, tour.id});
 }
-
-
 
 // -------------------------------------------------------------------------- //
 // Handlers
@@ -686,9 +664,7 @@ void ActionHandler::at_openInLayoutAction_triggered()
 
     QPointF position = parameters.argument<QPointF>(Qn::ItemPositionRole);
 
-    int maxItems = (qnSettings->lightMode() & Qn::LightModeSingleItem)
-        ? 1
-        : qnSettings->maxSceneVideoItems();
+    const int maxItems = qnRuntime->maxSceneItems();
 
     bool adjustAspectRatio = layout->getItems().isEmpty() || !layout->hasCellAspectRatio();
 
@@ -817,7 +793,7 @@ void ActionHandler::at_openInNewTabAction_triggered()
     if (action(action::ToggleLayoutTourModeAction)->isChecked())
         menu()->trigger(action::ToggleLayoutTourModeAction);
 
-    const auto parameters = menu()->currentParameters(sender());
+    auto parameters = menu()->currentParameters(sender());
 
     const auto layouts = parameters.resources().filtered<QnLayoutResource>();
     for (const auto& layout: layouts)
@@ -836,9 +812,10 @@ void ActionHandler::at_openInNewTabAction_triggered()
     const auto openable = parameters.resources().filtered(QnResourceAccessFilter::isOpenableInLayout);
     if (openable.empty())
         return;
+    parameters.setResources(openable);
 
     menu()->trigger(action::OpenNewTabAction);
-    menu()->trigger(action::DropResourcesAction, openable);
+    menu()->trigger(action::DropResourcesAction, parameters);
 }
 
 void ActionHandler::at_openInNewWindowAction_triggered()
@@ -865,6 +842,17 @@ void ActionHandler::at_openCurrentLayoutInNewWindowAction_triggered()
 void ActionHandler::at_openNewWindowAction_triggered()
 {
     openNewWindow(QStringList());
+}
+
+void ActionHandler::at_reviewLayoutTourInNewWindowAction_triggered()
+{
+    // For now place method here until openNewWindow code would be shared.
+    const auto parameters = menu()->currentParameters(sender());
+    auto id = parameters.argument<QnUuid>(Qn::UuidRole);
+
+    MimeData data;
+    data.setIds({id});
+    openNewWindow({lit("--delayed-drop"), data.serialized()});
 }
 
 void ActionHandler::at_cameraListChecked(int status, const QnCameraListReply& reply, int handle)
@@ -1028,7 +1016,7 @@ void ActionHandler::at_dropResourcesAction_triggered()
 void ActionHandler::at_delayedDropResourcesAction_triggered() {
     QByteArray data = menu()->currentParameters(sender()).argument<QByteArray>(Qn::SerializedDataRole);
     QDataStream stream(&data, QIODevice::ReadOnly);
-    QnMimeData mimeData;
+    MimeData mimeData;
     stream >> mimeData;
     if (stream.status() != QDataStream::Ok || mimeData.formats().empty())
         return;
@@ -1042,13 +1030,23 @@ void ActionHandler::at_instantDropResourcesAction_triggered()
 {
     QByteArray data = menu()->currentParameters(sender()).argument<QByteArray>(Qn::SerializedDataRole);
     QDataStream stream(&data, QIODevice::ReadOnly);
-    QnMimeData mimeData;
+    MimeData mimeData;
     stream >> mimeData;
     if (stream.status() != QDataStream::Ok || mimeData.formats().empty())
         return;
-    m_instantDrops.push_back(mimeData);
 
-    submitInstantDrop();
+    const auto ids = mimeData.getIds();
+    auto resources = resourcePool()->getResources(ids);
+
+    const auto urls = mimeData.getUrls();
+    resources.append(QnFileProcessor::createResourcesForFiles(
+        QnFileProcessor::findAcceptedFiles(urls)));
+
+    if (resources.empty())
+        return;
+
+    workbench()->clear();
+    menu()->trigger(action::OpenInNewTabAction, resources);
 }
 
 void ActionHandler::at_openFileAction_triggered() {
@@ -1133,18 +1131,25 @@ void ActionHandler::at_openBusinessRulesAction_triggered()
 
 void ActionHandler::at_webClientAction_triggered()
 {
-    static const auto kPath = lit("/static/index.html");
-    static const auto kFragment = lit("/view");
-
     const auto server = commonModule()->currentServer();
     if (!server)
         return;
 
 #ifdef WEB_CLIENT_SUPPORTS_PROXY
+#error Reimplement VMS-6586
     openInBrowser(server, kPath, kFragment);
-#else
-    openInBrowserDirectly(server, kPath, kFragment);
 #endif
+
+    if (nx::network::isCloudServer(server))
+    {
+        menu()->trigger(action::OpenCloudViewSystemUrl);
+    }
+    else
+    {
+        static const auto kPath = lit("/static/index.html");
+        static const auto kFragment = lit("/view");
+        openInBrowserDirectly(server, kPath, kFragment);
+    }
 }
 
 void ActionHandler::at_webAdminAction_triggered()
@@ -1209,18 +1214,18 @@ void ActionHandler::at_openBusinessLogAction_triggered() {
 
     const auto parameters = menu()->currentParameters(sender());
 
-    QnBusiness::EventType eventType = parameters.argument(Qn::EventTypeRole, QnBusiness::AnyBusinessEvent);
+    vms::event::EventType eventType = parameters.argument(Qn::EventTypeRole, vms::event::anyEvent);
     auto cameras = parameters.resources().filtered<QnVirtualCameraResource>();
     QSet<QnUuid> ids;
     for (auto camera: cameras)
         ids << camera->getId();
 
     // show diagnostics if Issues action was triggered
-    if (eventType != QnBusiness::AnyBusinessEvent || !ids.isEmpty())
+    if (eventType != vms::event::anyEvent || !ids.isEmpty())
     {
         businessEventsLogDialog()->disableUpdateData();
         businessEventsLogDialog()->setEventType(eventType);
-        businessEventsLogDialog()->setActionType(QnBusiness::DiagnosticsAction);
+        businessEventsLogDialog()->setActionType(vms::event::diagnosticsAction);
         auto now = QDateTime::currentMSecsSinceEpoch();
         businessEventsLogDialog()->setDateRange(now, now);
         businessEventsLogDialog()->setCameraList(ids);
@@ -1420,7 +1425,8 @@ void ActionHandler::at_thumbnailsSearchAction_triggered()
         item.uuid = QnUuid::createUuid();
         item.combinedGeometry = QRect(i % matrixWidth, i / matrixWidth, 1, 1);
         item.resource.id = resource->getId();
-        item.resource.uniqueId = resource->getUniqueId();
+        if (resource->hasFlags(Qn::local_media))
+            item.resource.uniqueId = resource->getUniqueId();
         item.contrastParams = widget->item()->imageEnhancement();
         item.dewarpingParams = widget->item()->dewarpingParams();
         item.rotation = widget->item()->rotation();
@@ -1479,7 +1485,7 @@ void ActionHandler::at_cameraIssuesAction_triggered()
 {
     menu()->trigger(action::OpenBusinessLogAction,
         menu()->currentParameters(sender())
-        .withArgument(Qn::EventTypeRole, QnBusiness::AnyCameraEvent));
+        .withArgument(Qn::EventTypeRole, vms::event::anyCameraEvent));
 }
 
 void ActionHandler::at_cameraBusinessRulesAction_triggered() {
@@ -1537,7 +1543,7 @@ void ActionHandler::at_serverLogsAction_triggered()
 void ActionHandler::at_serverIssuesAction_triggered()
 {
     menu()->trigger(action::OpenBusinessLogAction,
-        {Qn::EventTypeRole, QnBusiness::AnyServerEvent});
+        {Qn::EventTypeRole, vms::event::anyServerEvent});
 }
 
 void ActionHandler::at_pingAction_triggered()
@@ -2194,7 +2200,7 @@ void ActionHandler::at_nonceReceived(QnAsyncHttpClientReply *reply)
         const auto appserverUrl = commonModule()->currentUrl();
         const auto authParam = createHttpQueryAuthParam(
             appserverUrl.userName(), appserverUrl.password(),
-            auth.realm, nx_http::Method::GET, auth.nonce.toUtf8());
+            auth.realm, nx_http::Method::Get, auth.nonce.toUtf8());
 
         QUrl targetUrl(request.url);
         QUrlQuery urlQuery(targetUrl);

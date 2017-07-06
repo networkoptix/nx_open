@@ -5,8 +5,8 @@
 #include <QtCore/QSettings>
 #include <set>
 
-#include <business/events/reasoned_business_event.h>
-#include <business/events/network_issue_business_event.h>
+#include <nx/vms/event/events/reasoned_event.h>
+#include <nx/vms/event/events/network_issue_event.h>
 #include <common/common_module.h>
 #include <core/resource_management/resource_data_pool.h>
 #include <api/global_settings.h>
@@ -30,6 +30,7 @@
 #include "api/app_server_connection.h"
 #include <common/static_common_module.h>
 
+using namespace nx;
 
 namespace {
 static const int RTSP_RETRY_COUNT = 6;
@@ -63,14 +64,14 @@ QnMulticodecRtpReader::QnMulticodecRtpReader(
     std::unique_ptr<AbstractStreamSocket> tcpSock)
 :
     QnResourceConsumer(res),
-    m_RtpSession(std::move(tcpSock)),
+    m_RtpSession(/*shouldGuessAuthDigest*/ false, std::move(tcpSock)),
     m_timeHelper(res->getUniqueId()),
     m_pleaseStop(false),
     m_gotSomeFrame(false),
     m_role(Qn::CR_Default),
     m_gotData(false),
     m_rtpStarted(false),
-    m_prefferedAuthScheme(nx_http::header::AuthScheme::basic)
+    m_prefferedAuthScheme(nx_http::header::AuthScheme::digest)
 {
     const auto& globalSettings = res->commonModule()->globalSettings();
     m_rtpFrameTimeoutMs = globalSettings->rtpFrameTimeoutMs();
@@ -81,6 +82,7 @@ QnMulticodecRtpReader::QnMulticodecRtpReader(
         m_RtpSession.setTCPTimeout(netRes->getNetworkTimeout());
     else
         m_RtpSession.setTCPTimeout(1000 * 10);
+
     QnMediaResourcePtr mr = qSharedPointerDynamicCast<QnMediaResource>(res);
     m_numberOfVideoChannels = 1;
     m_customVideoLayout.clear();
@@ -151,15 +153,15 @@ QnAbstractMediaDataPtr QnMulticodecRtpReader::getNextData()
     if (isRtpFail || elapsed > m_rtpFrameTimeoutMs)
     {
         QString reasonParamsEncoded;
-        QnBusiness::EventReason reason;
+        vms::event::EventReason reason;
         if (elapsed > m_rtpFrameTimeoutMs) {
-            reason = QnBusiness::NetworkNoFrameReason;
-            reasonParamsEncoded = QnNetworkIssueBusinessEvent::encodeTimeoutMsecs(elapsed);
+            reason = vms::event::EventReason::networkNoFrame;
+            reasonParamsEncoded = vms::event::NetworkIssueEvent::encodeTimeoutMsecs(elapsed);
             NX_LOG(QString(lit("RTP read timeout for camera %1. Reopen stream")).arg(getResource()->getUniqueId()), cl_logWARNING);
         }
         else {
-            reason = QnBusiness::NetworkConnectionClosedReason;
-            reasonParamsEncoded = QnNetworkIssueBusinessEvent::encodePrimaryStream(m_role != Qn::CR_SecondaryLiveVideo);
+            reason = vms::event::EventReason::networkConnectionClosed;
+            reasonParamsEncoded = vms::event::NetworkIssueEvent::encodePrimaryStream(m_role != Qn::CR_SecondaryLiveVideo);
             NX_LOG(QString(lit("RTP connection was forcibly closed by camera %1. Reopen stream")).arg(getResource()->getUniqueId()), cl_logWARNING);
         }
 
@@ -434,8 +436,8 @@ void QnMulticodecRtpReader::at_packetLost(quint32 prev, quint32 next)
 
     emit networkIssue(resource,
                       qnSyncTime->currentUSecsSinceEpoch(),
-                      QnBusiness::NetworkRtpPacketLossReason,
-                      QnNetworkIssueBusinessEvent::encodePacketLossSequence(prev, next));
+                      vms::event::EventReason::networkRtpPacketLoss,
+                      vms::event::NetworkIssueEvent::encodePacketLossSequence(prev, next));
 
 }
 

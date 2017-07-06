@@ -6,7 +6,6 @@
 #include <QtWidgets/QWidget>
 
 #include <core/resource/resource_fwd.h>
-#include <core/resource_management/resource_criterion.h>
 
 class QAbstractItemView;
 class QSortFilterProxyModel;
@@ -46,11 +45,9 @@ public:
     QAbstractItemModel *model() const;
     void setModel(QAbstractItemModel *model);
 
+    QSortFilterProxyModel* searchModel() const;
+
     QItemSelectionModel *selectionModel();
-
-    const QnResourceCriterion &criterion() const;
-    void setCriterion(const QnResourceCriterion &criterion);
-
     void setWorkbench(QnWorkbench *workbench);
 
     void edit();
@@ -142,13 +139,18 @@ signals:
      * This signal is emitted when the tree ends a recursive operation.
      */
     void afterRecursiveOperation();
-private slots:
+
+    void filterEnterPressed();
+    void filterCtrlEnterPressed();
+
+private:
     void at_treeView_spacePressed(const QModelIndex &index);
     void at_treeView_clicked(const QModelIndex &index);
 
-    void at_resourceProxyModel_rowsInserted(const QModelIndex &parent, int start, int end);
-    void at_resourceProxyModel_rowsInserted(const QModelIndex &index);
+    void at_resourceProxyModel_rowsInserted(const QModelIndex& parent, int start, int end);
+    void expandNodeIfNeeded(const QModelIndex& index);
 
+    void initializeFilter();
     void updateColumns();
     void updateFilter();
 
@@ -156,8 +158,6 @@ private slots:
 
 private:
     QScopedPointer<Ui::QnResourceTreeWidget> ui;
-
-    QnResourceCriterion m_criterion;
 
     QnResourceItemDelegate *m_itemDelegate;
 

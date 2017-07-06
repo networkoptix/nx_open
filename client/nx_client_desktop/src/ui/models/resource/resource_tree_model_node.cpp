@@ -558,9 +558,13 @@ bool QnResourceTreeModelNode::calculateBastard() const
         if (m_flags.testFlag(Qn::local_server))
             return true;
 
-        /* Hide exported cameras inside of exported layouts. */
-        if (m_flags.testFlag(Qn::exported_media))
+        // Hide exported camera resources inside of exported layouts. Layout items are displayed instead.
+        if (m_flags.testFlag(Qn::exported_media)
+            && m_parent
+            && m_parent->m_flags.testFlag(Qn::exported_layout))
+        {
             return true;
+        }
 
         /* Hide storages. */
         if (m_resource.dynamicCast<QnStorageResource>())
@@ -725,11 +729,19 @@ Qt::ItemFlags QnResourceTreeModelNode::flags(int column) const
     case Qn::LayoutItemNode:
     case Qn::SharedLayoutNode:
     case Qn::SharedResourceNode:
-        if(m_flags & (Qn::media | Qn::layout | Qn::server | Qn::user | Qn::videowall | Qn::web_page))
+    {
+        // Any of flags is sufficient.
+        if (m_flags & (Qn::media | Qn::layout | Qn::server | Qn::videowall))
+            result |= Qt::ItemIsDragEnabled;
+
+        // Web page is a combination of flags.
+        if (m_flags.testFlag(Qn::web_page))
             result |= Qt::ItemIsDragEnabled;
         break;
+    }
     case Qn::VideoWallItemNode: //TODO: #GDM #VW drag of empty item on scene should create new layout
     case Qn::RecorderNode:
+    case Qn::LayoutTourNode:
         result |= Qt::ItemIsDragEnabled;
         break;
     default:

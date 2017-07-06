@@ -120,7 +120,7 @@ TEST(IoServerMonitorTest, main)
     QUrl url = launcher.apiUrl();
     url.setPath("/api/iomonitor");
     QUrlQuery query;
-    query.addQueryItem(Qn::CAMERA_UNIQUE_ID_HEADER_NAME, kTestCamPhysicalId);
+    query.addQueryItem(Qn::PHYSICAL_ID_URL_QUERY_ITEM, kTestCamPhysicalId);
     url.setQuery(query);
 
     auto contentParser = std::make_shared<nx_http::MultipartContentParser>();

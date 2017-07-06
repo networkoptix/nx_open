@@ -299,13 +299,13 @@ MainWindow::MainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::WindowF
     addAction(action(action::AdjustVideoAction));
     addAction(action(action::TogglePanicModeAction));
     addAction(action(action::ToggleLayoutTourModeAction));
-    addAction(action(action::ReviewLayoutTourAction));
     addAction(action(action::DebugIncrementCounterAction));
     addAction(action(action::DebugDecrementCounterAction));
     addAction(action(action::DebugControlPanelAction));
     addAction(action(action::SystemAdministrationAction));
     if (auto screenRecordingAction = action(action::ToggleScreenRecordingAction))
         addAction(screenRecordingAction);
+    addAction(action(action::ShowFpsAction));
 
     connect(action(action::MaximizeAction), &QAction::toggled, this,
         &MainWindow::setMaximized);
@@ -652,6 +652,7 @@ bool MainWindow::handleKeyPress(int key)
     {
         case Qt::Key_Backspace:
         case Qt::Key_Left:
+        case Qt::Key_Up:
         case Qt::Key_PageUp:
         {
             menu()->trigger(action::PreviousLayoutAction);
@@ -661,6 +662,7 @@ bool MainWindow::handleKeyPress(int key)
         case Qt::Key_Return:
         case Qt::Key_Space:
         case Qt::Key_Right:
+        case Qt::Key_Down:
         case Qt::Key_PageDown:
         {
             menu()->trigger(action::NextLayoutAction);
@@ -695,7 +697,7 @@ void MainWindow::updateDwmState()
         /* Can't set to (0, 0, 0, 0) on Windows as in fullScreen mode context menu becomes invisible.
          * Looks like Qt bug: https://bugreports.qt.io/browse/QTBUG-7556 */
 #ifdef Q_OS_WIN
-        //TODO: #vkutin #GDM Mouse in the leftmost pixel doesn't trigger autohidden workbench tree show
+        // TODO: #vkutin #GDM Mouse in the leftmost pixel doesn't trigger autohidden workbench tree show
         setContentsMargins(1, 0, 0, 0); //FIXME
 #else
         setContentsMargins(0, 0, 0, 0);

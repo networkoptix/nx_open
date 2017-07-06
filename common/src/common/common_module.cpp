@@ -11,7 +11,7 @@
 #include <api/runtime_info_manager.h>
 #include <api/common_message_processor.h>
 
-#include <business/event_rule_manager.h>
+#include <nx/vms/event/rule_manager.h>
 
 #include <common/common_meta_types.h>
 
@@ -48,6 +48,8 @@
 
 #include <api/session_manager.h>
 #include <network/router.h>
+
+using namespace nx;
 
 namespace {
 
@@ -122,7 +124,10 @@ qint64 BeforeRestoreDbData::getSpaceLimitForStorage(const QString& url) const
 
 // ------------------- QnCommonModule --------------------
 
-QnCommonModule::QnCommonModule(bool clientMode, QObject *parent):
+QnCommonModule::QnCommonModule(bool clientMode,
+    core::access::Mode resourceAccessMode,
+    QObject* parent)
+    :
     QObject(parent),
     m_messageProcessor(nullptr)
 {
@@ -140,7 +145,7 @@ QnCommonModule::QnCommonModule(bool clientMode, QObject *parent):
 
     m_resourcePool = new QnResourcePool(this);  /*< Depends on nothing. */
     m_layoutTourManager = new QnLayoutTourManager(this); //< Depends on nothing.
-    m_eventRuleManager = new QnEventRuleManager(this); //< Depends on nothing.
+    m_eventRuleManager = new nx::vms::event::RuleManager(this); //< Depends on nothing.
 
     m_moduleDiscoveryManager = new nx::vms::discovery::Manager(this, clientMode, m_resourcePool);
     // TODO: bind m_moduleDiscoveryManager to resPool server changes
@@ -150,18 +155,26 @@ QnCommonModule::QnCommonModule(bool clientMode, QObject *parent):
     m_resourceAccessSubjectCache = new QnResourceAccessSubjectsCache(this); /*< Depends on respool and roles. */
     m_sharedResourceManager = new QnSharedResourcesManager(this);   /*< Depends on respool and roles. */
 
-    m_resourceAccessProvider = new QnResourceAccessProvider(this);   /*< Depends on respool, roles and shared resources. */
+    // Depends on respool, roles and shared resources.
+    m_resourceAccessProvider = new QnResourceAccessProvider(resourceAccessMode, this);
 
-    m_globalPermissionsManager = new QnGlobalPermissionsManager(this); /* Depends on respool. */
+    // Depends on respool.
+    m_globalPermissionsManager = new QnGlobalPermissionsManager(resourceAccessMode, this);
     m_runtimeInfoManager = new QnRuntimeInfoManager(this);
 
-    /* Some of base providers depend on QnGlobalPermissionsManager and QnSharedResourcesManager. */
-    m_resourceAccessProvider->addBaseProvider(new QnPermissionsResourceAccessProvider(this));
-    m_resourceAccessProvider->addBaseProvider(new QnSharedResourceAccessProvider(this));
-    m_resourceAccessProvider->addBaseProvider(new QnSharedLayoutItemAccessProvider(this));
-    m_resourceAccessProvider->addBaseProvider(new QnVideoWallItemAccessProvider(this));
 
-    m_resourceAccessManager = new QnResourceAccessManager(this);    /*< Depends on access provider. */
+    // Some of base providers depend on QnGlobalPermissionsManager and QnSharedResourcesManager.
+    m_resourceAccessProvider->addBaseProvider(
+        new QnPermissionsResourceAccessProvider(resourceAccessMode, this));
+    m_resourceAccessProvider->addBaseProvider(
+        new QnSharedResourceAccessProvider(resourceAccessMode, this));
+    m_resourceAccessProvider->addBaseProvider(
+        new QnSharedLayoutItemAccessProvider(resourceAccessMode, this));
+    m_resourceAccessProvider->addBaseProvider(
+        new QnVideoWallItemAccessProvider(resourceAccessMode, this));
+
+    // Depends on access provider.
+    m_resourceAccessManager = new QnResourceAccessManager(resourceAccessMode, this);
 
 
     m_globalSettings = new QnGlobalSettings(this);

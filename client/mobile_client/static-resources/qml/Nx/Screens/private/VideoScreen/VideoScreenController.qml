@@ -153,14 +153,15 @@ Object
         }
     }
 
-    Component.onCompleted:
+    Component.onDestruction: setKeepScreenOn(false)
+
+    function start()
     {
         if (cameraOffline || cameraUnauthorized || resourceId === "")
             return
 
-        mediaPlayer.playLive()
+        playLive()
     }
-    Component.onDestruction: setKeepScreenOn(false)
 
     function play()
     {
@@ -170,8 +171,7 @@ Object
 
     function playLive()
     {
-        mediaPlayer.position = -1
-        play()
+        mediaPlayer.playLive()
     }
 
     function stop()

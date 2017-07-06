@@ -74,6 +74,7 @@ function(detect_package_versions)
     set(gtest_version ${_gtest_version} CACHE STRING "")
     set(gmock_version ${_gmock_version} CACHE STRING "")
     set(directx_version ${_directx_version} CACHE STRING "")
+    set(server-external_version "" CACHE STRING "")
 
     set(help_version "${customization}-${releaseVersion.short}" PARENT_SCOPE)
 endfunction()
@@ -98,6 +99,7 @@ function(get_dependencies)
     endif()
 
     nx_rdep_add_package(qt PATH_VARIABLE QT_DIR)
+    file(TO_CMAKE_PATH "${QT_DIR}" QT_DIR)
     set(QT_DIR ${QT_DIR} PARENT_SCOPE)
 
     nx_rdep_add_package(any/boost)
@@ -167,9 +169,14 @@ function(get_dependencies)
         nx_rdep_add_package(any/apidoctool PATH_VARIABLE APIDOCTOOL_PATH)
         set(APIDOCTOOL_PATH ${APIDOCTOOL_PATH} PARENT_SCOPE)
 
-        nx_rdep_add_package(any/server-external-${branch} OPTIONAL PATH_VARIABLE server_external_path)
-        if(NOT server_external_path)
-            nx_rdep_add_package(any/server-external-${releaseVersion})
+        if(server-external_version)
+            nx_rdep_add_package(any/server-external)
+        else()
+            nx_rdep_add_package(any/server-external-${branch} OPTIONAL
+                PATH_VARIABLE server_external_path)
+            if(NOT server_external_path)
+                nx_rdep_add_package(any/server-external-${releaseVersion.short})
+            endif()
         endif()
 
         if(LINUX AND arch MATCHES "arm|aarch64")

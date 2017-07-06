@@ -12,7 +12,7 @@
 #include <rest/server/json_rest_result.h>
 #include <nx/utils/safe_direct_connection.h>
 #include <api/http_client_pool.h>
-#include <business/business_fwd.h>
+#include <nx/vms/event/event_fwd.h>
 #include <core/resource/resource_fwd.h>
 #include <common/common_module_aware.h>
 
@@ -68,7 +68,7 @@ namespace rest
         Handle twoWayAudioCommand(const QnUuid& cameraId, bool start, GetCallback callback, QThread* targetThread = 0);
 
         Handle softwareTriggerCommand(const QnUuid& cameraId, const QString& triggerId,
-            QnBusiness::EventState toggleState, GetCallback callback, QThread* targetThread = nullptr);
+            nx::vms::event::EventState toggleState, GetCallback callback, QThread* targetThread = nullptr);
 
         Handle getStatisticsSettingsAsync(Result<QByteArray>::type callback
             , QThread *targetThread = nullptr);
@@ -177,6 +177,20 @@ namespace rest
             const QnRequestParamList& params,
             const nx_http::StringType& contentType,
             const nx_http::StringType& messageBody,
+            REST_CALLBACK(ResultType) callback,
+            QThread* targetThread);
+
+        template <typename ResultType> Handle executePut(
+            const QString& path,
+            const QnRequestParamList& params,
+            const nx_http::StringType& contentType,
+            const nx_http::StringType& messageBody,
+            REST_CALLBACK(ResultType) callback,
+            QThread* targetThread);
+
+        template <typename ResultType> Handle executeDelete(
+            const QString& path,
+            const QnRequestParamList& params,
             REST_CALLBACK(ResultType) callback,
             QThread* targetThread);
 

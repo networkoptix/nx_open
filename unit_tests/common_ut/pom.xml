@@ -12,7 +12,7 @@
     <modelVersion>4.0.0</modelVersion>
     <artifactId>common_ut</artifactId>
     <packaging>pom</packaging>
-    <name>VMS Common Libraryrary Unit Tests</name>
+    <name>VMS Common Library Unit Tests</name>
 
     <properties>
         <root.dir>${basedir}/../..</root.dir>

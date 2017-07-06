@@ -22,11 +22,11 @@ public: // overrides
     QnSystemDescriptionPtr getSystem(const QString &id) const override;
 
 private:
-    void addServer(nx::vms::discovery::ModuleEndpoint module);
+    void updateServerData(nx::vms::discovery::ModuleEndpoint module);
     void removeServer(QnUuid id);
 
     typedef QHash<QString, QnSystemDescription::PointerType> SystemsHash;
-    void updateServer(
+    void updateServerInternal(
         const SystemsHash::iterator systemIt, nx::vms::discovery::ModuleEndpoint module);
 
     void updatePrimaryAddress(nx::vms::discovery::ModuleEndpoint module);

@@ -219,17 +219,18 @@ void LayoutsHandler::saveLayout(const QnLayoutResourcePtr &layout)
     else if (!layout->data().value(Qn::VideoWallResourceRole).value<QnVideoWallResourcePtr>().isNull())
     {
         //TODO: #GDM #VW #LOW refactor common code to common place
+        NX_EXPECT(accessController()->hasPermissions(layout, Qn::SavePermission),
+            "Saving unsaveable resource");
         if (context()->instance<QnWorkbenchVideoWallHandler>()->saveReviewLayout(layout,
-                [this, layout](int reqId, ec2::ErrorCode errorCode)
+                [this, layout](int /*reqId*/, ec2::ErrorCode errorCode)
                 {
-                    Q_UNUSED(reqId);
-                    snapshotManager()->setFlags(layout, snapshotManager()->flags(layout) & ~Qn::ResourceIsBeingSaved);
+                    snapshotManager()->markBeingSaved(layout->getId(), false);
                     if (errorCode != ec2::ErrorCode::ok)
                         return;
-                    snapshotManager()->setFlags(layout, snapshotManager()->flags(layout) & ~Qn::ResourceIsChanged);
+                    snapshotManager()->markChanged(layout->getId(), false);
                 }))
         {
-            snapshotManager()->setFlags(layout, snapshotManager()->flags(layout) | Qn::ResourceIsBeingSaved);
+            snapshotManager()->markBeingSaved(layout->getId(), true);
         }
     }
     else
@@ -406,8 +407,13 @@ void LayoutsHandler::removeLayoutItems(const QnLayoutItemIndexList& items, bool 
 {
     if (items.size() > 1)
     {
-        const bool confirm = ui::resources::removeItemsFromLayout(mainWindow(),
-            action::ParameterTypes::resources(items));
+        const auto layout = items.first().layout();
+        const bool isLayoutTour = !layout->data(Qn::LayoutTourUuidRole).value<QnUuid>().isNull();
+        const auto resources = action::ParameterTypes::resources(items);
+
+        const bool confirm = isLayoutTour
+            ? ui::resources::removeItemsFromLayoutTour(mainWindow(), resources)
+            : ui::resources::removeItemsFromLayout(mainWindow(), resources);
 
         if (!confirm)
             return;
@@ -541,7 +547,7 @@ bool LayoutsHandler::confirmChangeSharedLayout(const LayoutChange& change)
         [this, layout = change.layout](const QnUserResourcePtr& user)
         {
             return resourceAccessProvider()->accessibleVia(user, layout) ==
-                QnAbstractResourceAccessProvider::Source::shared;
+                nx::core::access::Source::shared;
         });
 
     /* Do not warn if there are no such users - no side effects in any case. */
@@ -562,7 +568,7 @@ bool LayoutsHandler::confirmDeleteSharedLayouts(const QnLayoutResourceList& layo
                 [this, user](const QnLayoutResourcePtr& layout)
                 {
                     return resourceAccessProvider()->accessibleVia(user, layout) ==
-                        QnAbstractResourceAccessProvider::Source::shared;
+                        nx::core::access::Source::shared;
                 });
         });
 
@@ -655,7 +661,7 @@ bool LayoutsHandler::confirmStopSharingLayouts(const QnResourceAccessSubject& su
 
         QnResourceList providers;
         auto accessSource = resourceAccessProvider()->accessibleVia(subject, resource, &providers);
-        if (accessSource != QnAbstractResourceAccessProvider::Source::layout)
+        if (accessSource != nx::core::access::Source::layout)
             continue;
 
         QSet<QnUuid> providerIds;
@@ -749,7 +755,7 @@ bool LayoutsHandler::closeLayouts(
     {
         for (const QnLayoutResourcePtr &resource : resources)
         {
-            bool changed = snapshotManager()->flags(resource).testFlag(Qn::ResourceIsChanged);
+            bool changed = snapshotManager()->isChanged(resource);
             if (!changed)
                 continue;
 
@@ -986,7 +992,7 @@ void LayoutsHandler::at_stopSharingLayoutAction_triggered()
     QnLayoutResourceList sharedLayouts;
     for (auto resource: params.resources().filtered<QnLayoutResource>())
     {
-        if (resourceAccessProvider()->accessibleVia(subject, resource) == QnAbstractResourceAccessProvider::Source::shared)
+        if (resourceAccessProvider()->accessibleVia(subject, resource) == nx::core::access::Source::shared)
             sharedLayouts << resource;
     }
     if (sharedLayouts.isEmpty())

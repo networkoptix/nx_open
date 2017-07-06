@@ -15,6 +15,8 @@
 #include <QtCore/QFileInfo>
 #include <QtCore/QSettings>
 
+#include <client/client_runtime_settings.h>
+
 #include <utils/common/util.h>
 #include <utils/common/checked_cast.h>
 #include <utils/common/delete_later.h>
@@ -1061,9 +1063,15 @@ void QnWorkbenchController::at_zoomTargetChanged(QnMediaResourceWidget *widget, 
     QnLayoutItemData data = widget->item()->data();
     delete widget;
 
+    const auto resource = zoomTargetWidget->resource()->toResourcePtr();
+    NX_EXPECT(resource);
+    if (!resource)
+        return;
+
     data.uuid = QnUuid::createUuid();
-    data.resource.id = zoomTargetWidget->resource()->toResource()->getId();
-    data.resource.uniqueId = zoomTargetWidget->resource()->toResource()->getUniqueId();
+    data.resource.id = resource->getId();
+    if (resource->hasFlags(Qn::local_media))
+        data.resource.uniqueId = resource->getUniqueId();
     data.zoomTargetUuid = zoomTargetWidget->item()->uuid();
     data.rotation = zoomTargetWidget->item()->rotation();
     data.zoomRect = zoomRect;
@@ -1071,14 +1079,10 @@ void QnWorkbenchController::at_zoomTargetChanged(QnMediaResourceWidget *widget, 
     data.dewarpingParams.panoFactor = 1; // zoom target must always be dewarped by 90 degrees
     data.dewarpingParams.enabled = zoomTargetWidget->resource()->getDewarpingParams().enabled;  // zoom items on fisheye cameras must always be dewarped
 
-    int maxItems = (qnSettings->lightMode() & Qn::LightModeSingleItem)
-            ? 1
-            : qnSettings->maxSceneVideoItems();
-
     QnLayoutResourcePtr layout = workbench()->currentLayout()->resource();
     if (!layout)
         return;
-    if (layout->getItems().size() >= maxItems)
+    if (layout->getItems().size() >= qnRuntime->maxSceneItems())
         return;
     layout->addItem(data);
 }

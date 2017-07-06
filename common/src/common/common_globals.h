@@ -243,8 +243,8 @@ QN_DECLARE_METAOBJECT_HEADER(Qn,
         local_live_cam = live_cam | local | network,
         server_live_cam = live_cam | remote,// | network,
         server_archive = remote | media | video | audio | streamprovider,
-        local_video = url | local | media | video | audio | streamprovider,     /**< Local media file. */
-        local_image = url | local | media | still_image | streamprovider,    /**< Local still image file. */
+        local_video = local_media | video | audio | streamprovider,     /**< Local media file. */
+        local_image = local_media | still_image | streamprovider,    /**< Local still image file. */
 
         web_page = url | remote,   /**< Web-page resource */
         fake_server = remote_server | fake
@@ -527,10 +527,11 @@ QN_DECLARE_METAOBJECT_HEADER(Qn,
         Auth_WrongInternalLogin, // invalid login used for internal auth scheme
         Auth_WrongDigest,   // invalid or empty digest
         Auth_WrongPassword, // invalid password
-        Auth_Forbidden,     // no auth mehod found or custom auth scheme without login/password is failed
+        Auth_Forbidden,     // no auth method found or custom auth scheme without login/password is failed
         Auth_PasswordExpired, // Password is expired
         Auth_LDAPConnectError,   // can't connect to the LDAP system to authenticate
-        Auth_CloudConnectError   // can't connect to the Cloud to authenticate
+        Auth_CloudConnectError,   // can't connect to the Cloud to authenticate
+        Auth_DisabledUser,    // disabled user
     };
     QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(AuthResult)
     QString toString(AuthResult value);
@@ -748,7 +749,8 @@ QN_DECLARE_METAOBJECT_HEADER(Qn,
         IncompatibleCloudHostConnectionResult,      /*< Server has different cloud host. */
         IncompatibleVersionConnectionResult,        /*< Server version is too low. */
         IncompatibleProtocolConnectionResult,       /*< Ec2 protocol versions differs.*/
-        ForbiddenConnectionResult                   /*< Connection is not allowed yet. Try again later*/
+        ForbiddenConnectionResult,                   /*< Connection is not allowed yet. Try again later*/
+        DisabledUserConnectionResult                /*< Disabled user*/
     };
 
     /**

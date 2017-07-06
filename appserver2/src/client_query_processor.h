@@ -189,6 +189,8 @@ namespace ec2
                             return handler( ErrorCode::ldap_temporary_unauthorized, OutputData() );
                         else if (authResult == Qn::Auth_CloudConnectError)
                             return handler( ErrorCode::cloud_temporary_unauthorized, OutputData() );
+                        else if (authResult == Qn::Auth_DisabledUser)
+                            return handler(ErrorCode::disabled_user_unauthorized, OutputData());
                     }
                     return handler( ErrorCode::unauthorized, OutputData() );
                 }

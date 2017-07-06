@@ -1,0 +1,169 @@
+<div class="container">
+    <div class="row">
+        <div class="col-md-4 col-md-push-8">
+            <system-info></system-info>
+        </div>
+        <div class="col-md-8 col-md-pull-4">
+            <alert type="danger" ng-if="settings.flags.noHDD">
+                이 장치는 하드디스크가 장착된 상태에서 사용가능합니다..<br>
+               전원을 끄고 하드디스크를 설치 하세요
+            </alert>
+            <alert type="danger" ng-if="!settings.flags.noHDD && settings.flags.noNetwork">
+                이 장치에 네트워크 연결이 필요 합니다. <br>로컬 네트워크 or 인터넷에 연결하세요
+            </alert>
+            <alert type="danger" ng-if="!settings.flags.noHDD && !settings.flags.noNetwork && settings.flags.wrongNetwork">
+                이 장치는 네트워크 구성이 잘못 되었습니다.. <br>네트워크에 연결하거나 올바른 IP 주소를 설정 합니다.
+            </alert>
+
+
+            <tabset ng-hide="settings.flags.brokenSystem || settings.flags.cleanSystem">
+                <tab heading="{{L.settings.tabs.server}}" active="active.server">
+                    <div>
+                        <form novalidate name="settingsForm" class="form-horizontal" role="form" >
+                            <h3>포트:</h3>
+                            <div class="form-group" ng-class="{'has-error':!settingsForm.port.$valid}">
+                                <div class="col-xs-6">
+                                    <input type="number" class="form-control" id="port" placeholder="포트:" name="port" ng-model="settings.port"
+                                           min="1"  max="65000"
+                                           pattern ="^\d*$" required>
+                                </div>
+
+                                <div class="col-xs-6">
+                                    <button type="button" class="btn btn-primary" ng-disabled="!settingsForm.$valid" ng-click="save()">포트 변경</button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+
+                    <div>
+                        <h3>서버를 리셋</h3>
+                        <p>이 작업은 서버 (데이터베이스 및 리셋 구성 지우기) 를 기본값으로 되돌립니다.. 서버는 현재 시스템에서 분리 될 것입니다. 비디오 녹화데이터는 그대로 유지 됩니다.</p>
+                        <p><button type="button" class="btn btn-default" ng-click="openRestoreDefaultsDialog()">공장 기본값 복원</button></p>
+                    </div>
+                    <div>
+                        <h3>재시작</h3>
+                        <p><button type="button" class="btn btn-default" ng-click="restart()"> 서버 다시 시작</button>                             <button type="button" class="btn btn-default" ng-if="canHardwareRestart" ng-click="hardwareRestart()"> 재 부 팅</button></p>
+                    </div>
+                    <div ng-if="user.isOwner">
+                        <form novalidate name="rootPasswordForm" class="form-horizontal" role="form" >
+                            <h3>관리자 암호 변경</h3>
+                            <p>If System is local (not connected to the cloud) this will change the password for user "admin" and the recovery (root) password on some servers.<br>
+                                Otherwise this will change the recovery password only.</p>
+                            <div class="col-sm-6">
+                                <password-input auto-focus="false" ng-model="settings.rootPassword"></password-input>
+                            </div>
+
+                            <div class="col-sm-6">
+                                <button type="button" class="btn btn-primary" ng-disabled="!rootPasswordForm.$valid"
+                                        ng-click="changePassword()">암호 변경</button>
+                            </div>
+                        </form>
+                    </div>
+                </tab>
+
+                <tab heading="{{L.settings.tabs.system}}" active="active.system">
+                    <div>
+                        <h3>이름</h3>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <input class="form-control" type="text" ng-model="settings.systemName">
+                            </div>
+
+                            <div class="col-md-6">
+                                <button type="button" class="btn btn-default" ng-click="renameSystem()">시스템 이름 바꾸기</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div ng-if="canMerge" >
+                        <form class="form-horizontal" >
+                            <h3>시스템 병합</h3>
+                            <p><button type="button" class="btn btn-default" ng-click="openJoinDialog()">병합 시스템</button></p>
+                        </form>
+                    </div>
+
+                    <div>
+                        <h3>{{Config.cloud.productName}}</h3>
+
+                        <div ng-if="cloudSystemID">
+                            <p>이 시스템은 {{Config.cloud.productName}}, 시스템 소유자에 연결: <b>{{cloudAccountName}}</b></p>
+                            <p ng-if="canConnectToCloud"><button class="btn btn-default" ng-click="disconnectFromCloud()">{{Config.cloud.productName}}에서 분리</button></p>
+                            <p><a ng-if="!mode.liteClient"
+                                  ng-href="{{Config.cloud.portalUrl}}{{Config.cloud.portalSystemUrl.replace('{systemId}',cloudSystemID) + Config.cloud.webadminContext}}"
+                                  target="_blank">{{Config.cloud.productName}} 포탈으로 이동</a></p>
+                        </div>
+
+                        <div ng-if="!cloudSystemID">
+                            <alert type="warning">This system is not linked to {{Config.cloud.productName}}
+                                <a ng-if="!mode.liteClient"
+                                   ng-href="{{Config.cloud.portalUrl}}"
+                                   target="_blank">Learn more</a></alert>
+                            <alert type="error" ng-if="!hasInternetOnServer">셋업을 실행하려면 서버를 인터넷에 연결하세요 {{Config.cloud.productName}}</alert>
+                            <alert type="error" ng-if="hasInternetOnServer && !hasInternetOnClient">{{Config.cloud.productName}} 시스템에 연결 하는 데 인터넷 연결이 필요합니다.</alert>
+                            <p ng-if="canConnectToCloud"  ><button class="btn btn-default" ng-click="connectToCloud()" ng-disabled="!hasInternetOnServer ||!hasInternetOnClient"> {{Config.cloud.productName}}에 연결</button>                                 <a ng-if="!mode.liteClient" class="btn btn-default" ng-href="{{Config.cloud.portalUrl + Config.cloud.portalRegisterUrl + Config.cloud.webadminContext}}" target="_blank"> {{Config.cloud.productName}} 계정 만들기</a></p>
+                        </div>
+                    </div>
+                </tab>
+
+                <tab heading="{{L.settings.tabs.device}}" active="active.device" ng-if="controlDevice">
+                    <div ng-if="settings.flags.canSetupNetwork">
+                        <h3>장치 네트워크 설정</h3>                         <network-settings settings="networkSettings[0]" ng-if="networkSettings"> </network-settings> <button class="btn btn-default" ng-click="saveNetworkSettings()"> 설정을 저장 하 고 장치를 재 부팅</button>
+                    </div>
+                    <div ng-if="settings.flags.canSetupTime">
+                        <h3>날짜와 시간</h3>
+                        <form name="timeSettings">
+                            <table>
+                                <tbody>
+                                    <tr>
+                                        <td><label for="timeZone">표준시간대</label></td>
+                                        <td><label for="date">날짜</label></td>
+                                        <td><label for="time">시간</label></td>
+                                        <td></td>
+                                    </tr>
+                                    <tr>
+                                        <td><select class="form-control"
+                                                    ng-options="zone.id as zone.name for zone in timeZones"
+                                                    id="timeZone"
+                                                    name="timeZone"
+                                                    ng-model="dateTimeSettings.timeZone"
+                                                    required></select></td>
+                                        <td>
+                                            <div class="input-group">
+                                                <input type="text"
+                                                       id="date" name="date"
+                                                       class="form-control"
+                                                       datepicker-popup="{{Config.dateSettingsFormat}}"
+                                                       ng-model="dateTimeSettings.dateTime"
+                                                       required
+ is-open="dateTimeSettings.openDate"
+                                                       close-text="Close" />
+                                                <span class="input-group-btn">
+                                                    <button type="button"
+                                                            class="btn btn-default"
+                                                            ng-click="openDatePicker($event)"><i class="glyphicon glyphicon-calendar"></i></button>
+                                                </span>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <input class="form-control" ng-model="dateTimeSettings.dateTime" ui-timepicker>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </form>
+                        <button class="btn btn-default" ng-click="saveDateTime()">날짜 및 시간 저장</button>
+                    </div>
+                    <div ng-if="(canRestoreSettings || canRestoreSettingsNotNetwork)">
+                        <h3>서버 설정 복원</h3>
+                        <p><button type="button" class="btn btn-default" ng-if="canRestoreSettings" ng-click="restoreSettings()"> 전체 복원</button>                             <button type="button" class="btn btn-default" ng-if="canRestoreSettingsNotNetwork" ng-click="restoreSettingsNotNetwork()"> 모든 것을 복원 하지만 네트워크 제외</button></p>
+                    </div>
+                    <div ng-if="canRunClient || canStopClient">
+                        <h3>서버에서 클라이언트 응용 프로그램을 실행</h3>
+                        <p><button type="button" class="btn btn-default" ng-if="canRunClient" ng-click="runClient()"> 클라이언트 실행</button>                             <button type="button" class="btn btn-default" ng-if="canStopClient" ng-click="stopClient()"> 클라이언트 중지</button></p>
+                        <p>키보드/마우스 또는 모바일 응용 프로그램을 이용하여 제어 합니다.</p>
+                    </div>
+                </tab>
+            </tabset>
+        </div>
+    </div>
+</div>

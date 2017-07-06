@@ -1,5 +1,7 @@
 #include "db_instance_controller.h"
 
+#include <nx/utils/log/log.h>
+
 #include "structure_update_statements.h"
 #include "../../ec2/db/migration/add_history_to_transaction.h"
 
@@ -14,8 +16,32 @@ constexpr auto kDbRepeatedConnectionAttemptDelay = std::chrono::seconds(5);
 
 } // namespace
 
-DbInstanceController::DbInstanceController(const nx::db::ConnectionOptions& dbConnectionOptions):
-    nx::db::InstanceController(dbConnectionOptions)
+DbInstanceController::DbInstanceController(
+    const nx::utils::db::ConnectionOptions& dbConnectionOptions,
+    boost::optional<unsigned int> dbVersionToUpdateTo)
+    :
+    nx::utils::db::InstanceController(dbConnectionOptions),
+    m_userAuthRecordsMigrationNeeded(false)
+{
+    initializeStructureMigration();
+    if (dbVersionToUpdateTo)
+        dbStructureUpdater().setVersionToUpdateTo(*dbVersionToUpdateTo);
+
+    if (!initialize())
+    {
+        NX_LOG(lit("Failed to initialize DB connection"), cl_logALWAYS);
+        throw nx::utils::db::Exception(
+            nx::utils::db::DBResult::ioError,
+            "Failed to initialize connection to DB");
+    }
+}
+
+bool DbInstanceController::isUserAuthRecordsMigrationNeeded() const
+{
+    return m_userAuthRecordsMigrationNeeded;
+}
+
+void DbInstanceController::initializeStructureMigration()
 {
     dbStructureUpdater().addFullSchemaScript(13, db::kCreateDbVersion13);
 
@@ -50,13 +76,22 @@ DbInstanceController::DbInstanceController(const nx::db::ConnectionOptions& dbCo
     dbStructureUpdater().addUpdateScript(db::kRenameGroupToRole);
     dbStructureUpdater().addUpdateScript(db::kSetIsEnabledToTrueWhereUndefined);
     dbStructureUpdater().addUpdateScript(
-        {{nx::db::RdbmsDriverType::mysql, db::kRestoreSystemToAccountReferenceUniquenessMySql},
-         {nx::db::RdbmsDriverType::unknown, db::kRestoreSystemToAccountReferenceUniquenessSqlite}});
+        {{nx::utils::db::RdbmsDriverType::mysql, db::kRestoreSystemToAccountReferenceUniquenessMySql},
+         {nx::utils::db::RdbmsDriverType::unknown, db::kRestoreSystemToAccountReferenceUniquenessSqlite}});
     dbStructureUpdater().addUpdateScript(db::kAddAccountTimestamps);
     dbStructureUpdater().addUpdateScript(db::kAddSystemRegistrationTimestamp);
     dbStructureUpdater().addUpdateScript(db::kAddSystemHealthStateHistory);
+
+    // Version 3.1.
+
     dbStructureUpdater().addUpdateScript(db::kAddSystemUserAuthInfo);
     dbStructureUpdater().addUpdateScript(db::kAddSystemNonce);
+    dbStructureUpdater().addUpdateFunc(
+        [this](nx::utils::db::QueryContext*)
+        {
+            m_userAuthRecordsMigrationNeeded = true;
+            return nx::utils::db::DBResult::ok;
+        });
 }
 
 } // namespace rdb

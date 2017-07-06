@@ -84,6 +84,8 @@ Qn::ConnectionResult QnConnectionValidator::validateConnection(
         return Qn::LdapTemporaryUnauthorizedConnectionResult;
     else if (networkError == ec2::ErrorCode::cloud_temporary_unauthorized)
         return Qn::CloudTemporaryUnauthorizedConnectionResult;
+    else if (networkError == ec2::ErrorCode::disabled_user_unauthorized)
+        return Qn::DisabledUserConnectionResult;
     else if (networkError == ec2::ErrorCode::forbidden)
         return Qn::ForbiddenConnectionResult;
 

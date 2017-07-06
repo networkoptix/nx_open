@@ -58,11 +58,11 @@ public:
         const ParametersType& parameters = ParametersType(),
         bool defaultAction = false);
 
+    using ButtonHandler = std::function<void ()>;
     void addTextButton(
         const QIcon& icon,
         const QString& text,
-        ActionType actionId = nx::client::desktop::ui::action::NoAction,
-        const ParametersType& parameters = ParametersType());
+        const ButtonHandler& handler);
 
     QnNotificationLevel::Value notificationLevel() const;
     void setNotificationLevel(QnNotificationLevel::Value notificationLevel);

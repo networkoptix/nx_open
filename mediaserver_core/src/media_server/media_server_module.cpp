@@ -25,7 +25,6 @@
 #include "settings.h"
 
 #include <utils/common/delayed.h>
-#include <business/business_message_bus.h>
 #include <plugins/storage/dts/vmax480/vmax480_tcp_server.h>
 #include <streaming/streaming_chunk_cache.h>
 #include <recorder/file_deletor.h>
@@ -34,7 +33,10 @@
 #include <recorder/storage_manager.h>
 #include <common/static_common_module.h>
 #include <utils/common/app_info.h>
+#include <nx/mediaserver/event/event_message_bus.h>
 #include <nx/mediaserver/unused_wallpapers_watcher.h>
+
+#include <nx/core/access/access_types.h>
 #include <core/resource_management/resource_pool.h>
 
 #include <nx/vms/common/p2p/downloader/downloader.h>
@@ -81,7 +83,7 @@ QnMediaServerModule::QnMediaServerModule(
 
     m_settings = store(new MSSettings(roSettingsPath, rwSettingsPath));
 
-    m_commonModule = store(new QnCommonModule(/*clientMode*/ false));
+    m_commonModule = store(new QnCommonModule(/*clientMode*/ false, nx::core::access::Mode::direct));
 #ifdef ENABLE_VMAX
     // It depend on Vmax480Resources in the pool. Pool should be cleared before QnVMax480Server destructor.
     store(new QnVMax480Server(commonModule()));
@@ -114,11 +116,11 @@ QnMediaServerModule::QnMediaServerModule(
         m_settings->delayBeforeSettingMasterFlag()));
     m_unusedWallpapersWatcher = store(new nx::mediaserver::UnusedWallpapersWatcher(commonModule()));
 
-    store(new QnBusinessMessageBus(commonModule()));
+    store(new nx::mediaserver::event::EventMessageBus(commonModule()));
 
     store(new QnServerPtzControllerPool(commonModule()));
 
-    store(new QnStorageDbPool(commonModule()));
+    store(new QnStorageDbPool(commonModule()->moduleGUID()));
 
     m_streamingChunkCache = store(new StreamingChunkCache(commonModule()));
 

@@ -21,7 +21,7 @@ int main(int argc, char** argv)
         argc, argv,
         [](const nx::utils::ArgumentParser& args)
         {
-            nx::db::ConnectionOptions connectionOptions;
+            nx::utils::db::ConnectionOptions connectionOptions;
             QString driverName;
             args.read("db/driverName", &driverName);
             args.read("db/hostName", &connectionOptions.hostName);
@@ -31,8 +31,11 @@ int main(int argc, char** argv)
             args.read("db/password", &connectionOptions.password);
             args.read("db/connectOptions", &connectionOptions.connectOptions);
             args.read("db/maxConnections", &connectionOptions.maxConnectionCount);
-            connectionOptions.driverType =
-                QnLexical::deserialized<nx::db::RdbmsDriverType>(driverName, connectionOptions.driverType);
+            if (!driverName.isEmpty())
+            {
+                connectionOptions.driverType = nx::utils::db::rdbmsDriverTypeFromString(
+                    driverName.toStdString().c_str());
+            }
 
             nx::cdb::CdbFunctionalTest::setDbConnectionOptions(
                 std::move(connectionOptions));

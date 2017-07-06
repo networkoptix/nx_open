@@ -6,15 +6,17 @@
 #include <core/resource/resource_fwd.h>
 
 #include <ui/dialogs/resource_selection_dialog.h>
+#include <ui/models/business_rule_view_model.h>
 #include <ui/workbench/workbench_context_aware.h>
 
 typedef QVector<QnUuid> IDList;
 class QnBusinessTypesComparator;
-class QnBusinessStringsHelper;
 
-class QnSelectResourcesDialogButton: public QPushButton {
+namespace nx { namespace vms { namespace event { class QnBusinessStringsHelper; }}}
+
+class QnSelectResourcesDialogButton: public QPushButton
+{
     Q_OBJECT
-
     typedef QPushButton base_type;
 
 public:
@@ -28,6 +30,7 @@ public:
 
     QnResourceSelectionDialog::Filter selectionTarget() const;
     void setSelectionTarget(QnResourceSelectionDialog::Filter target);
+
 signals:
     void commit();
 
@@ -37,21 +40,24 @@ protected:
 
 private slots:
     void at_clicked();
+
 private:
     QSet<QnUuid> m_resources;
     QnResourceSelectionDialogDelegate* m_dialogDelegate;
     QnResourceSelectionDialog::Filter m_target;
 };
 
-class QnBusinessRuleItemDelegate: public QStyledItemDelegate, public QnWorkbenchContextAware {
+class QnBusinessRuleItemDelegate: public QStyledItemDelegate, public QnWorkbenchContextAware
+{
     Q_OBJECT
-
     typedef QStyledItemDelegate base_type;
-public:
-    explicit QnBusinessRuleItemDelegate(QObject *parent = 0);
-    ~QnBusinessRuleItemDelegate();
 
-    static int optimalWidth(int column, const QFontMetrics &metrics);
+public:
+    explicit QnBusinessRuleItemDelegate(QObject* parent = nullptr);
+    virtual ~QnBusinessRuleItemDelegate() override;
+
+    using Column = QnBusinessRuleViewModel::Column;
+    static int optimalWidth(Column column, const QFontMetrics& metrics);
 
     virtual void updateEditorGeometry(QWidget* editor, const QStyleOptionViewItem& option,
         const QModelIndex& index) const override;
@@ -64,10 +70,11 @@ protected:
     virtual void paint(QPainter* painter, const QStyleOptionViewItem& option, const QModelIndex& index) const override;
 
     virtual bool eventFilter(QObject *object, QEvent *event) override;
+
 private slots:
     void at_editor_commit();
 
 private:
     QScopedPointer<QnBusinessTypesComparator> m_lexComparator;
-    QScopedPointer<QnBusinessStringsHelper> m_businessStringsHelper;
+    QScopedPointer<nx::vms::event::StringsHelper> m_businessStringsHelper;
 };

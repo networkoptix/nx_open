@@ -6,6 +6,7 @@
 #include <QtGui/QColor>
 
 #include <common/common_meta_types.h>
+#include <utils/common/app_info.h>
 
 #include <core/resource/resource_display_info.h>
 
@@ -53,8 +54,7 @@ public:
         LAST_USED_CONNECTION,
         CUSTOM_CONNECTIONS,
 
-        EXTRA_TRANSLATIONS_PATH,
-        TRANSLATION_PATH,
+        LOCALE,
 
         EXTRA_PTZ_MAPPINGS_PATH,
 
@@ -187,9 +187,8 @@ private:
         QN_DECLARE_RW_PROPERTY(QnConnectionData,            lastUsedConnection,     setLastUsedConnection,      LAST_USED_CONNECTION,       QnConnectionData())
         QN_DECLARE_RW_PROPERTY(QUrl,                        lastLocalConnectionUrl, setLastLocalConnectionUrl,  LAST_LOCAL_CONNECTION_URL,  QUrl())
         QN_DECLARE_RW_PROPERTY(QnConnectionDataList,        customConnections,      setCustomConnections,       CUSTOM_CONNECTIONS,         QnConnectionDataList())
-        QN_DECLARE_RW_PROPERTY(QString,                     extraTranslationsPath,  setExtraTranslationsPath,   EXTRA_TRANSLATIONS_PATH,    QLatin1String(""))
         QN_DECLARE_RW_PROPERTY(QString,                     extraPtzMappingsPath,   setExtraPtzMappingsPath,    EXTRA_PTZ_MAPPINGS_PATH,    QLatin1String(""))
-        QN_DECLARE_RW_PROPERTY(QString,                     translationPath,        setTranslationPath,         TRANSLATION_PATH,           QLatin1String(":/translations/common_en_US.qm"))
+        QN_DECLARE_RW_PROPERTY(QString,                     locale,                 setLocale,                  LOCALE,                     QnAppInfo::defaultLanguage())
 
         /* Updates-related settings */
         QN_DECLARE_RW_PROPERTY(QString,                     updateFeedUrl,          setUpdateFeedUrl,           UPDATE_FEED_URL,            QString())

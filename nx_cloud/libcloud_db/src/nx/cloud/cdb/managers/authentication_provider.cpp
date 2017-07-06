@@ -13,7 +13,6 @@
 
 #include <nx/cloud/cdb/client/data/auth_data.h>
 
-#include "account_manager.h"
 #include "temporary_account_password_manager.h"
 #include "../dao/user_authentication_data_object_factory.h"
 #include "../settings.h"
@@ -27,7 +26,7 @@ namespace cdb {
 
 AuthenticationProvider::AuthenticationProvider(
     const conf::Settings& settings,
-    const AbstractAccountManager& accountManager,
+    AbstractAccountManager* accountManager,
     AbstractSystemSharingManager* systemSharingManager,
     const AbstractTemporaryAccountPasswordManager& temporaryAccountCredentialsManager,
     ec2::AbstractVmsP2pCommandBus* vmsP2pCommandBus)
@@ -39,12 +38,14 @@ AuthenticationProvider::AuthenticationProvider(
     m_authenticationDataObject(dao::UserAuthenticationDataObjectFactory::instance().create()),
     m_vmsP2pCommandBus(vmsP2pCommandBus)
 {
+    m_accountManager->addExtension(this);
     m_systemSharingManager->addSystemSharingExtension(this);
 }
 
 AuthenticationProvider::~AuthenticationProvider()
 {
     m_systemSharingManager->removeSystemSharingExtension(this);
+    m_accountManager->removeExtension(this);
 }
 
 void AuthenticationProvider::getCdbNonce(
@@ -112,46 +113,61 @@ void AuthenticationProvider::getAuthenticationResponse(
     completionHandler(api::ResultCode::ok, std::move(response));
 }
 
-nx::db::DBResult AuthenticationProvider::afterSharingSystem(
-    nx::db::QueryContext* const queryContext,
+nx::utils::db::DBResult AuthenticationProvider::afterSharingSystem(
+    nx::utils::db::QueryContext* const queryContext,
     const api::SystemSharing& sharing,
     SharingType sharingType)
 {
     if (sharingType == SharingType::invite)
-        return nx::db::DBResult::ok;
+        return nx::utils::db::DBResult::ok;
 
     NX_DEBUG(this, lm("Updating authentication information of user %1 of system %2")
         .arg(sharing.accountEmail).arg(sharing.systemId));
 
     const auto nonce = fetchOrCreateNonce(queryContext, sharing.systemId);
         
-    const auto account = m_accountManager.findAccountByUserName(sharing.accountEmail);
+    const auto account = m_accountManager->findAccountByUserName(sharing.accountEmail);
     if (!account)
-        throw nx::db::Exception(nx::db::DBResult::notFound);
+        throw nx::utils::db::Exception(nx::utils::db::DBResult::notFound);
     if (account->statusCode != api::AccountStatus::activated)
     {
         NX_VERBOSE(this, lm("Ignoring not-activated account %1").arg(sharing.accountEmail));
-        return nx::db::DBResult::ok;
+        return nx::utils::db::DBResult::ok;
     }
 
-    auto authRecord = generateAuthRecord(sharing.systemId, *account, nonce);
+    addUserAuthRecord(
+        queryContext,
+        sharing.systemId,
+        sharing.vmsUserId,
+        *account,
+        nonce);
+    return nx::utils::db::DBResult::ok;
+}
 
-    api::AuthInfo userAuthRecords;
-    userAuthRecords.records.push_back(std::move(authRecord));
-    m_authenticationDataObject->insertUserAuthRecords(
-        queryContext, sharing.systemId, account->id, userAuthRecords);
-
-    generateUpdateUserAuthInfoTransaction(
-        queryContext, sharing, userAuthRecords);
-
-    return nx::db::DBResult::ok;
+void AuthenticationProvider::afterUpdatingAccountPassword(
+    nx::utils::db::QueryContext* const queryContext,
+    const api::AccountData& account)
+{
+    const auto systems = m_authenticationDataObject->fetchAccountSystems(
+        queryContext, account.id);
+    m_authenticationDataObject->deleteAccountAuthRecords(
+        queryContext, account.id);
+    for (const auto& system: systems)
+    {
+        addUserAuthRecord(
+            queryContext,
+            system.systemId,
+            system.vmsUserId,
+            account,
+            system.nonce);
+    }
 }
 
 boost::optional<AuthenticationProvider::AccountWithEffectivePassword>
     AuthenticationProvider::getAccountByLogin(const std::string& login) const
 {
     std::string passwordHa1;
-    auto account = m_accountManager.findAccountByUserName(login.c_str());
+    auto account = m_accountManager->findAccountByUserName(login.c_str());
     if (account)
     {
         passwordHa1 = account->passwordHa1;
@@ -163,7 +179,7 @@ boost::optional<AuthenticationProvider::AccountWithEffectivePassword>
             m_temporaryAccountCredentialsManager.getCredentialsByLogin(login);
         if (temporaryCredentials)
         {
-            account = m_accountManager.findAccountByUserName(
+            account = m_accountManager->findAccountByUserName(
                 temporaryCredentials->accountEmail);
             passwordHa1 = temporaryCredentials->passwordHa1;
         }
@@ -219,7 +235,7 @@ api::AuthResponse AuthenticationProvider::prepareResponse(
 }
 
 std::string AuthenticationProvider::fetchOrCreateNonce(
-    nx::db::QueryContext* const queryContext,
+    nx::utils::db::QueryContext* const queryContext,
     const std::string& systemId)
 {
     auto nonce = m_authenticationDataObject->fetchSystemNonce(
@@ -233,8 +249,25 @@ std::string AuthenticationProvider::fetchOrCreateNonce(
     return *nonce;
 }
 
+void AuthenticationProvider::addUserAuthRecord(
+    nx::utils::db::QueryContext* const queryContext,
+    const std::string& systemId,
+    const std::string& vmsUserId,
+    const api::AccountData& account,
+    const std::string& nonce)
+{
+    auto authRecord = generateAuthRecord(account, nonce);
+
+    api::AuthInfo userAuthRecords;
+    userAuthRecords.records.push_back(std::move(authRecord));
+    m_authenticationDataObject->insertUserAuthRecords(
+        queryContext, systemId, account.id, userAuthRecords);
+
+    generateUpdateUserAuthInfoTransaction(
+        queryContext, systemId, vmsUserId, userAuthRecords);
+}
+
 api::AuthInfoRecord AuthenticationProvider::generateAuthRecord(
-    const std::string& /*systemId*/,
     const api::AccountData& account,
     const std::string& nonce)
 {
@@ -254,22 +287,23 @@ void AuthenticationProvider::removeExpiredRecords(
 }
 
 void AuthenticationProvider::generateUpdateUserAuthInfoTransaction(
-    nx::db::QueryContext* const queryContext,
-    const api::SystemSharing& sharing,
+    nx::utils::db::QueryContext* const queryContext,
+    const std::string& systemId,
+    const std::string& vmsUserId,
     const api::AuthInfo& userAuthenticationRecords)
 {
     ::ec2::ApiResourceParamWithRefData userAuthenticationInfoAttribute;
     userAuthenticationInfoAttribute.name = api::kVmsUserAuthInfoAttributeName;
     userAuthenticationInfoAttribute.resourceId = 
-        QnUuid::fromStringSafe(sharing.vmsUserId.c_str());
+        QnUuid::fromStringSafe(vmsUserId.c_str());
     userAuthenticationInfoAttribute.value = 
         QString::fromUtf8(QJson::serialized(userAuthenticationRecords));
     const auto dbResult = m_vmsP2pCommandBus->saveResourceAttribute(
         queryContext,
-        sharing.systemId,
+        systemId,
         std::move(userAuthenticationInfoAttribute));
-    if (dbResult != nx::db::DBResult::ok)
-        throw nx::db::Exception(dbResult);
+    if (dbResult != nx::utils::db::DBResult::ok)
+        throw nx::utils::db::Exception(dbResult);
 }
 
 } // namespace cdb

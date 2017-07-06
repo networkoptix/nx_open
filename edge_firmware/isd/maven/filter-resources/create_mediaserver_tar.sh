@@ -96,7 +96,7 @@ copyQtLibs()
 
     mkdir -p "$INSTALL_DIR/$MODULE/lib/"
 
-    QT_LIBS_TO_COPY=( Core Gui Xml XmlPatterns Concurrent Network Sql Multimedia )
+    QT_LIBS_TO_COPY=(Core Gui Xml XmlPatterns Concurrent Network Sql Multimedia WebSockets)
 
     local QT_LIB
     for QT_LIB in "${QT_LIBS_TO_COPY[@]}"; do

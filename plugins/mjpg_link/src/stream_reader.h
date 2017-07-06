@@ -61,6 +61,7 @@ private:
     };
 
     nxpt::CommonRefManager m_refManager;
+    CyclicAllocator m_allocator;
     nxcip::CameraInfo m_cameraInfo;
     float m_fps;
     int m_encoderNumber;
@@ -74,7 +75,6 @@ private:
     bool m_terminated;
     QnWaitCondition m_cond;
     QnMutex m_mutex;
-    CyclicAllocator m_allocator;
     std::atomic<int> m_isInGetNextData;
     nxpl::TimeProvider* const m_timeProvider;
  

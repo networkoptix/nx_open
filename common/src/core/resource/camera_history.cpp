@@ -16,12 +16,13 @@
 #include <utils/common/delayed.h>
 #include "utils/common/synctime.h"
 #include <api/common_message_processor.h>
-#include <business/actions/abstract_business_action.h>
-#include <business/business_action_parameters.h>
+#include <nx/vms/event/actions/abstract_action.h>
+#include <nx/vms/event/action_parameters.h>
 #include <health/system_health.h>
 #include <nx/utils/log/log.h>
 #include <common/common_module.h>
 
+using namespace nx;
 
 namespace {
     static const int kDefaultHistoryCheckDelay = 1000 * 15;
@@ -138,23 +139,23 @@ void QnCameraHistoryPool::setMessageProcessor(const QnCommonMessageProcessor* me
     if (messageProcessor)
     {
         connect(messageProcessor, &QnCommonMessageProcessor::businessActionReceived, this,
-            [this](const QnAbstractBusinessActionPtr &businessAction)
-        {
-            QnBusiness::EventType eventType = businessAction->getRuntimeParams().eventType;
-            if (eventType >= QnBusiness::SystemHealthEvent && eventType <= QnBusiness::MaxSystemHealthEvent) {
-                QnSystemHealth::MessageType healthMessage = QnSystemHealth::MessageType(eventType - QnBusiness::SystemHealthEvent);
-                if (healthMessage == QnSystemHealth::ArchiveRebuildFinished || healthMessage == QnSystemHealth::ArchiveFastScanFinished)
-                {
-                    auto cameras = getServerFootageData(businessAction->getRuntimeParams().eventResourceId);
-                    for (const auto &cameraId : cameras)
-                        invalidateCameraHistory(cameraId);
+            [this](const vms::event::AbstractActionPtr& businessAction)
+            {
+                vms::event::EventType eventType = businessAction->getRuntimeParams().eventType;
+                if (eventType >= vms::event::systemHealthEvent && eventType <= vms::event::maxSystemHealthEvent) {
+                    QnSystemHealth::MessageType healthMessage = QnSystemHealth::MessageType(eventType - vms::event::systemHealthEvent);
+                    if (healthMessage == QnSystemHealth::ArchiveRebuildFinished || healthMessage == QnSystemHealth::ArchiveFastScanFinished)
+                    {
+                        auto cameras = getServerFootageData(businessAction->getRuntimeParams().eventResourceId);
+                        for (const auto &cameraId : cameras)
+                            invalidateCameraHistory(cameraId);
 
-                    for (const auto &cameraId : cameras)
-                        if (QnSecurityCamResourcePtr camera = toCamera(cameraId))
-                            emit cameraFootageChanged(camera);
+                        for (const auto &cameraId : cameras)
+                            if (QnSecurityCamResourcePtr camera = toCamera(cameraId))
+                                emit cameraFootageChanged(camera);
+                    }
                 }
-            }
-        });
+            });
     }
     m_messageProcessor = messageProcessor;
 }

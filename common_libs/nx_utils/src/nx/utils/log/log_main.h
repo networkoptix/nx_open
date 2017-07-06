@@ -37,7 +37,7 @@ class NX_UTILS_API Helper
 public:
     Helper(Level level, const QString& tag);
     void log(const QString& message);
-    operator bool() const;
+    explicit operator bool() const;
 
 protected:
    const Level m_level;
@@ -57,7 +57,9 @@ class NX_UTILS_API Stream: public Helper
 public:
     Stream(Level level, const QString& tag);
     ~Stream();
-    operator bool() const;
+
+    /** Oprator logic is reversed to support tricky syntax: if (stream) {} else stream << */
+    explicit operator bool() const;
 
     template<typename Value>
     Stream& operator<<(const Value& value)
@@ -95,7 +97,7 @@ Stream makeStream(Level level, const Tag& tag)
 
 /**
  * Usage:
- *     NX_<LEVEL>(TAG) MESSAGE; //< Writes MESSAGE to log if LEVEL and TAG allow.
+ *     NX_<LEVEL>(TAG) MESSAGE [<< ...]; //< Writes MESSAGE to log if LEVEL and TAG allow.
  *     NX_<LEVEL>(TAG, MESSAGE); //< The same as above, but shorter syntax;
  *
  * Examples:

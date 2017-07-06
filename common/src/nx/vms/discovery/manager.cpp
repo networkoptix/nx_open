@@ -1,5 +1,6 @@
 #include "manager.h"
 
+#include <api/global_settings.h>
 #include <common/common_module.h>
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/media_server_resource.h>
@@ -27,19 +28,19 @@ Manager::~Manager()
     m_moduleConnector->pleaseStopSync();
 }
 
-void Manager::setReconnectInterval(std::chrono::milliseconds interval)
+void Manager::setReconnectPolicy(network::RetryPolicy value)
 {
-    m_moduleConnector->setReconnectInterval(interval);
+    m_moduleConnector->setReconnectPolicy(value);
 }
 
-void Manager::setUpdateInterfacesInterval(std::chrono::milliseconds interval)
+void Manager::setUpdateInterfacesInterval(std::chrono::milliseconds value)
 {
-    m_multicastFinder->setUpdateInterfacesInterval(interval);
+    m_multicastFinder->setUpdateInterfacesInterval(value);
 }
 
-void Manager::setMulticastInterval(std::chrono::milliseconds interval)
+void Manager::setMulticastInterval(std::chrono::milliseconds value)
 {
-    m_multicastFinder->setSendInterval(interval);
+    m_multicastFinder->setSendInterval(value);
 }
 
 ModuleEndpoint::ModuleEndpoint(QnModuleInformation old, SocketAddress endpoint):
@@ -221,6 +222,15 @@ void Manager::initializeMulticastFinders(bool clientMode)
                     m_multicastFinder->multicastInformation(s->getModuleInformationWithAddresses());
             });
     }
+
+    m_multicastFinder->setIsMulticastEnabledFunction(
+        [common = commonModule()]()
+        {
+            if (const auto settings = common->globalSettings())
+                return !settings->isInitialized() || settings->isAutoDiscoveryEnabled();
+
+            return false;
+        });
 
     DeprecatedMulticastFinder::Options options;
     if (clientMode)

@@ -37,8 +37,8 @@ admins:
 
 languages:
     - en_US
-    - fr
-    - es
+    - fr_FR
+    - es_ES
 
 queue_name: '$INSTANCE_NAME'
 

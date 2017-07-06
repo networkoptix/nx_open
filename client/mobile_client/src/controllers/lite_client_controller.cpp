@@ -14,7 +14,7 @@
 #include <nx_ec/data/api_conversion_functions.h>
 #include <managers/videowall_manager.h>
 #include <utils/common/id.h>
-#include <helpers/lite_client_layout_helper.h>
+#include <nx/client/mobile/resource/lite_client_layout_helper.h>
 
 namespace {
 
@@ -22,13 +22,15 @@ namespace {
 
 } // namespace
 
+using namespace nx::client::mobile;
+
 class QnLiteClientControllerPrivate: public QObject, public QnConnectionContextAware
 {
     Q_DECLARE_PUBLIC(QnLiteClientController)
     QnLiteClientController* q_ptr;
 
 public:
-    QnLiteClientLayoutHelper* layoutHelper;
+    resource::LiteClientLayoutHelper* layoutHelper;
     QTimer* startStopTimer;
     QnMediaServerResourcePtr server;
     QnUuid serverId;
@@ -128,7 +130,7 @@ bool QnLiteClientController::isServerOnline() const
     return d->serverOnline;
 }
 
-QnLiteClientLayoutHelper*QnLiteClientController::layoutHelper() const
+nx::client::mobile::resource::LiteClientLayoutHelper* QnLiteClientController::layoutHelper() const
 {
     Q_D(const QnLiteClientController);
     return d->layoutHelper;
@@ -191,7 +193,7 @@ void QnLiteClientController::stopLiteClient()
 QnLiteClientControllerPrivate::QnLiteClientControllerPrivate(QnLiteClientController* parent):
     QObject(parent),
     q_ptr(parent),
-    layoutHelper(new QnLiteClientLayoutHelper(parent)),
+    layoutHelper(new resource::LiteClientLayoutHelper(parent)),
     startStopTimer(new QTimer(parent))
 {
     startStopTimer->setInterval(kStartStopTimeoutMs);

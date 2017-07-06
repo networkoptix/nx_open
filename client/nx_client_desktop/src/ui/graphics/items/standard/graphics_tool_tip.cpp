@@ -75,7 +75,7 @@ GraphicsToolTipLabel::GraphicsToolTipLabel(const QString& text, QGraphicsItem* n
     embedded->setForegroundRole(QPalette::ToolTipText);
     embedded->setBackgroundRole(QPalette::ToolTipBase);
 /*
-    //TODO: #vkutin #ynikitenkov fix shadow in HiDpi
+    // TODO: #vkutin #ynikitenkov fix shadow in HiDpi
 
     QGraphicsDropShadowEffect* shadow = new QGraphicsDropShadowEffect();
     shadow->setXOffset(toolTipMargin);

@@ -85,7 +85,7 @@ protected:
     void thenUpgradeRequestIsCorrect()
     {
         const auto httpRequest = m_upgradeRequests.pop();
-        ASSERT_EQ(nx_http::Method::OPTIONS, httpRequest.requestLine.method);
+        ASSERT_EQ(nx_http::Method::Options, httpRequest.requestLine.method);
         ASSERT_EQ("Upgrade", nx_http::getHeaderValue(httpRequest.headers, "Connection"));
         ASSERT_EQ(kUpgradeTo, nx_http::getHeaderValue(httpRequest.headers, "Upgrade"));
     }

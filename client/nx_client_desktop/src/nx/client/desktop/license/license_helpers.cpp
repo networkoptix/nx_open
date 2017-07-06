@@ -72,7 +72,7 @@ QN_DEFINE_METAOBJECT_ENUM_LEXICAL_FUNCTIONS(nx::client::desktop::license::Deacti
 namespace {
 
 static const auto kDeactivateLicenseUrl =
-    QUrl::fromUserInput(lit("http://nxlicensed.hdw.mx/nxlicensed/api/v1/deactivate"));
+    QUrl::fromUserInput(lit("http://licensing.networkoptix.com/nxlicensed/api/v1/deactivate/"));
 
 using namespace nx::client::desktop::license;
 using ErrorCode = Deactivator::ErrorCode;
@@ -231,24 +231,24 @@ QString Deactivator::errorDescription(ErrorCode error)
         case ErrorCode::noError:
             return QString();
         case ErrorCode::unknownError:
-            return tr("Unknown error");
-
+            return tr("Unknown error.");
         case ErrorCode::keyDoesntExist:
-            return tr("License does not exist");
+            return tr("License does not exist.");
         case ErrorCode::keyIsDisabled:
-            return tr("License is disabled");
+            return tr("License is disabled.");
         case ErrorCode::keyIsNotActivated:
-            return tr("License is inactive");
+            return tr("License is inactive.");
         case ErrorCode::keyIsInvalid:
-            return tr("Invalid license");
+            return tr("Invalid license.");
         case ErrorCode::keyIsTrial:
-            return tr("License is trial");
+            return tr("License is trial.");
         case ErrorCode::deactivationIsPending:
-            return tr("License is in deactivation process");
+            return tr("License is in pending deactivation state, but has not been deactivated yet.");
         case ErrorCode::invalidHardwareId:
-            return tr("Invalid hardware id");
+            return tr("Hardware ID of Media Server with"
+                    " this license does not match Hardware ID on which license was activated.");
         case ErrorCode::limitExceeded:
-            return tr("Limit exceeded");
+            return tr("Number of deactivations exceeded limit for this license.");
     }
 
     NX_EXPECT(false, "We don't expect to be here");

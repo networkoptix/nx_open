@@ -3,6 +3,11 @@
 angular.module('webadminApp')
     .factory('mediaserver', function ($http, $modal, $q, $localStorage, $location, $log, nativeClient, systemAPI) {
 
+
+        if($localStorage.auth){
+            systemAPI.setAuthKeys($localStorage.auth, null, $localStorage.authRtsp);
+        }
+
         var mediaserver = {};
         var cacheModuleInfo = null;
         var cacheCurrentUser = null;

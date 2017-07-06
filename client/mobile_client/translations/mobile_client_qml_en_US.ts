@@ -284,6 +284,17 @@
     </message>
 </context>
 <context>
+    <name>MoveOnTapOverlay</name>
+    <message>
+        <source>Tap on the image to position your camera</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>CANCEL</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>NoCameraItem</name>
     <message>
         <source>No image</source>
@@ -301,6 +312,20 @@
     <name>OfflineDummy</name>
     <message>
         <source>You are not connected to any System</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>PresetsButton</name>
+    <message>
+        <source>PRESETS</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>PresetsDialog</name>
+    <message>
+        <source>PTZ Presets</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

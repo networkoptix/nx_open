@@ -1,4 +1,4 @@
-#pragma once 
+#pragma once
 
 #include <QByteArray>
 
@@ -16,15 +16,14 @@ static const QByteArray CUSTOM_CHANGE_REALM_HEADER_NAME = "X-Nx-Allow-Update-Rea
 static const QByteArray AUTH_SESSION_HEADER_NAME = "X-Auth-Session";
 static const QByteArray USER_HOST_HEADER_NAME = "X-User-Host";
 static const QByteArray USER_AGENT_HEADER_NAME = "User-Agent";
-static const QByteArray CAMERA_UNIQUE_ID_HEADER_NAME = "physicalId";
 static const QByteArray REALM_HEADER_NAME = "X-Nx-Realm";
 static const QByteArray AUTH_RESULT_HEADER_NAME = "X-Auth-Result";
 static const QByteArray HA1_DIGEST_HEADER_NAME = "X-Nx-Digest";
 static const QByteArray CRYPT_SHA512_HASH_HEADER_NAME = "X-Nx-Crypt-Sha512";
-/**
- * Guid of peer which initiated request.
- */
+
+/** Guid of peer which initiated request. */
 static const QByteArray PEER_GUID_HEADER_NAME = "X-Nx-Peer-Guid";
+
 static const QByteArray EFFECTIVE_USER_NAME_HEADER_NAME = "X-Nx-Effective-User";
 static const QByteArray API_RESULT_CODE_HEADER_NAME = "X-Nx-Result-Code";
 static const QByteArray RTT_MS_HEADER_NAME = "X-Nx-rtt-ms";
@@ -42,10 +41,10 @@ static const QByteArray EC2_RUNTIME_GUID_HEADER_NAME = "X-runtime-guid";
 static const QByteArray EC2_DB_GUID_HEADER_NAME = "Nx-db-guid";
 static const QByteArray EC2_SYSTEM_IDENTITY_HEADER_NAME = "X-system-identity-time";
 static const QByteArray EC2_INTERNAL_RTP_FORMAT = "X-FFMPEG-RTP";
-/**
- * Name of HTTP header holding ec2 proto version.
- */
+
+/** Name of HTTP header holding ec2 proto version. */
 static const QByteArray EC2_PROTO_VERSION_HEADER_NAME = "X-Nx-EC-PROTO-VERSION";
+
 static const QByteArray EC2_CLOUD_HOST_HEADER_NAME = "X-Nx-EC-CLOUD-HOST";
 static const QByteArray EC2_BASE64_ENCODING_REQUIRED_HEADER_NAME = "X-Nx-base64-encoding-required";
 static const QByteArray EC2_MEDIA_ROLE = "X-Media-Role";
@@ -53,5 +52,8 @@ static const QByteArray EC2_MEDIA_ROLE = "X-Media-Role";
 static const QByteArray DESKTOP_CAMERA_NO_VIDEO_HEADER_NAME = "X-no-video";
 
 static const QByteArray URL_QUERY_AUTH_KEY_NAME = "auth";
+
+/** Url query item used in api/iomonitor and deprecated api/image. */
+static const QByteArray PHYSICAL_ID_URL_QUERY_ITEM = "cameraId";
 
 } // namespace Qn

@@ -8,7 +8,7 @@ class QnPermissionsResourceAccessProvider: public QnBaseResourceAccessProvider
     using base_type = QnBaseResourceAccessProvider;
 
 public:
-    QnPermissionsResourceAccessProvider(QObject* parent = nullptr);
+    QnPermissionsResourceAccessProvider(Mode mode, QObject* parent = nullptr);
     virtual ~QnPermissionsResourceAccessProvider();
 
 protected:

@@ -23,7 +23,7 @@ qint32 getResourceInternalId(
         const QString queryStr = R"sql(SELECT id from vms_resource where guid = ?)sql";
 
         context->getIdQuery->setForwardOnly(true);
-        if (!QnDbHelper::prepareSQLQuery(context->getIdQuery.get(), queryStr, Q_FUNC_INFO))
+        if (!nx::utils::db::SqlQueryExecutionHelper::prepareSQLQuery(context->getIdQuery.get(), queryStr, Q_FUNC_INFO))
             return 0;
     }
 
@@ -56,7 +56,7 @@ bool insertOrReplaceResource(
                 WHERE id = :internalId
             )sql";
 
-            if (!QnDbHelper::prepareSQLQuery(context->updQuery.get(), queryStr, Q_FUNC_INFO))
+            if (!nx::utils::db::SqlQueryExecutionHelper::prepareSQLQuery(context->updQuery.get(), queryStr, Q_FUNC_INFO))
                 return false;
         }
         context->updQuery->bindValue(":internalId", *internalId);
@@ -74,14 +74,14 @@ bool insertOrReplaceResource(
                 (:id, :typeId, :parentId, :name, :url)
             )sql";
 
-            if (!QnDbHelper::prepareSQLQuery(context->insQuery.get(), queryStr, Q_FUNC_INFO))
+            if (!nx::utils::db::SqlQueryExecutionHelper::prepareSQLQuery(context->insQuery.get(), queryStr, Q_FUNC_INFO))
                 return false;
         }
         query = context->insQuery.get();
     }
     QnSql::bind(data, query);
 
-    if (!QnDbHelper::execSQLQuery(query, Q_FUNC_INFO))
+    if (!nx::utils::db::SqlQueryExecutionHelper::execSQLQuery(query, Q_FUNC_INFO))
         return false;
 
     if (*internalId == 0)
@@ -97,11 +97,11 @@ bool deleteResourceInternal(Context* context, int internalId)
     )sql");
 
     QSqlQuery query(context->database);
-    if (!QnDbHelper::prepareSQLQuery(&query, queryStr, Q_FUNC_INFO))
+    if (!nx::utils::db::SqlQueryExecutionHelper::prepareSQLQuery(&query, queryStr, Q_FUNC_INFO))
         return false;
 
     query.addBindValue(internalId);
-    return QnDbHelper::execSQLQuery(&query, Q_FUNC_INFO);
+    return nx::utils::db::SqlQueryExecutionHelper::execSQLQuery(&query, Q_FUNC_INFO);
 }
 
 } // namespace api

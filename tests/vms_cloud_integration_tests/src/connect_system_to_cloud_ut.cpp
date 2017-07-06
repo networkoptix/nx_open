@@ -5,6 +5,11 @@
 #include <api/global_settings.h>
 #include <core/resource/user_resource.h>
 #include <nx/utils/sync_call.h>
+#include <nx/utils/std/future.h>
+#include <nx/cloud/cdb/api/cloud_nonce.h>
+#include <network/auth/cdb_nonce_fetcher.h>
+#include <network/auth/time_based_nonce_provider.h>
+#include <nx/network/http/http_client.h>
 
 #include <test_support/mediaserver_launcher.h>
 #include "mediaserver_cloud_integration_test_setup.h"
@@ -23,22 +28,13 @@ protected:
     void whenSetCloudSystemIdToEmptyString()
     {
         auto mediaServerClient = prepareMediaServerClient();
-        
+
         ec2::ApiResourceParamWithRefDataList params;
         params.resize(1);
         params.back().resourceId = QnUserResource::kAdminGuid;
         params.back().name = nx::settings_names::kNameCloudSystemId;
         params.back().value = QString();
-
-        ec2::ErrorCode resultCode = ec2::ErrorCode::ok;
-        std::tie(resultCode) =
-            makeSyncCall<ec2::ErrorCode>(
-                std::bind(
-                    &MediaServerClient::ec2SetResourceParams,
-                    &mediaServerClient,
-                    std::move(params),
-                    std::placeholders::_1));
-        ASSERT_EQ(ec2::ErrorCode::ok, resultCode);
+        ASSERT_EQ(ec2::ErrorCode::ok, mediaServerClient.ec2SetResourceParams(params));
 
         switchToDefaultCredentials();
     }
@@ -49,7 +45,7 @@ protected:
         for (;;)
         {
             QnModuleInformation moduleInformation;
-            QnJsonRestResult resultCode = 
+            QnJsonRestResult resultCode =
                 mediaServerClient.getModuleInformation(&moduleInformation);
             ASSERT_EQ(QnJsonRestResult::NoError, resultCode.error);
 
@@ -77,7 +73,7 @@ protected:
             std::this_thread::sleep_for(kRetryRequestDelay);
         }
     }
-    
+
     void thenCloudAttributesShouldBeRemoved()
     {
         auto mediaServerClient = prepareMediaServerClient();
@@ -87,7 +83,7 @@ protected:
             ec2::ErrorCode resultCode = mediaServerClient.ec2GetSettings(&vmsSettings);
             ASSERT_EQ(ec2::ErrorCode::ok, resultCode);
 
-            const auto cloudSettingsAreEmpty = 
+            const auto cloudSettingsAreEmpty =
                 getValueByName(vmsSettings, nx::settings_names::kNameCloudAccountName).isEmpty() &&
                 getValueByName(vmsSettings, nx::settings_names::kNameCloudSystemId).isEmpty() &&
                 getValueByName(vmsSettings, nx::settings_names::kNameCloudAuthKey).isEmpty();
@@ -191,9 +187,70 @@ protected:
     {
         switchToDefaultCredentials();
     }
+
+    void thenAnyRequestShouldAuthWithCloudNonce()
+    {
+        assertResponseNonce(true);
+    }
+
+    void thenAnyRequestShouldAuthWithNONCloudNonce()
+    {
+        assertResponseNonce(false);
+    }
+
+private:
+    void assertResponseNonce(bool isCloud)
+    {
+        auto endpoint = mediaServerEndpoint();
+
+        QUrl url("http://somehost/ec2/getUsers");
+        url.setHost(endpoint.address.toString());
+        url.setPort(endpoint.port);
+
+        nx_http::HttpClient httpClient;
+        httpClient.doGet(url);
+
+        auto response = httpClient.response();
+        ASSERT_EQ(nx_http::StatusCode::unauthorized, response->statusLine.statusCode);
+
+        auto authHeaderIt = response->headers.find("WWW-Authenticate");
+        ASSERT_NE(authHeaderIt, httpClient.response()->headers.cend());
+
+        nx_http::header::DigestAuthorization auth;
+        ASSERT_TRUE(auth.parse(authHeaderIt->second));
+
+        ASSERT_NE(auth.digest->params.find("nonce"), auth.digest->params.cend());
+        auto nonceString = auth.digest->params["nonce"];
+
+        nx::Buffer nonceWithoutTrailer;
+        nx::Buffer trailer;
+
+        auto parseResult = CdbNonceFetcher::parseCloudNonce(
+            nonceString,
+            &nonceWithoutTrailer,
+            &trailer);
+
+        if (!isCloud)
+        {
+            TimeBasedNonceProvider defaultNonceChecker;
+            ASSERT_FALSE(parseResult);
+            ASSERT_TRUE(defaultNonceChecker.isNonceValid(nonceString));
+        }
+        else
+        {
+            uint32_t ts;
+            std::string hash;
+
+            ASSERT_TRUE(parseResult);
+            ASSERT_TRUE(nx::cdb::api::parseCloudNonceBase(
+                nonceWithoutTrailer.toStdString(),
+                &ts,
+                &hash));
+        }
+    }
 };
 
-TEST_F(FtDisconnectSystemFromCloud, disconnect_by_mserver_api_call_local_admin_present)
+TEST_F(FtDisconnectSystemFromCloud, DISABLED_disconnect_by_mserver_api_call_local_admin_present)
 {
     givenServerWithLocalAdminConnectedToTheCloud();
 
@@ -203,7 +260,7 @@ TEST_F(FtDisconnectSystemFromCloud, disconnect_by_mserver_api_call_local_admin_p
     thenCloudAttributesShouldBeRemoved();
 }
 
-TEST_F(FtDisconnectSystemFromCloud, disconnect_by_mserver_api_call_cloud_owner_only)
+TEST_F(FtDisconnectSystemFromCloud, DISABLED_disconnect_by_mserver_api_call_cloud_owner_only)
 {
     givenServerConnectedToTheCloudWithCloudOwnerOnly();
 
@@ -213,4 +270,13 @@ TEST_F(FtDisconnectSystemFromCloud, disconnect_by_mserver_api_call_cloud_owner_o
     thenCloudUsersShouldBeRemoved();
     thenCloudAttributesShouldBeRemoved();
     thenSystemStateShouldBecomeNew();
+}
+
+TEST_F(FtDisconnectSystemFromCloud, AfterDisconnect_NonCloudNonce)
+{
+    givenServerConnectedToTheCloudWithCloudOwnerOnly();
+    thenAnyRequestShouldAuthWithCloudNonce();
+
+    whenInvokedDetachFromCloudRestMethod();
+    thenAnyRequestShouldAuthWithNONCloudNonce();
 }

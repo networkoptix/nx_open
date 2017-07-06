@@ -119,13 +119,6 @@ QnJsonRestResult MediaServerClient::detachFromCloud(const DetachFromCloudData& r
 //-------------------------------------------------------------------------------------------------
 // /ec2/ requests
 
-void MediaServerClient::ec2SetResourceParams(
-    const ec2::ApiResourceParamWithRefDataList& inputData,
-    std::function<void(ec2::ErrorCode)> completionHandler)
-{
-    performAsyncEc2Call("ec2/setResourceParams", inputData, std::move(completionHandler));
-}
-
 void MediaServerClient::ec2GetUsers(
     std::function<void(ec2::ErrorCode, ec2::ApiUserDataList)> completionHandler)
 {
@@ -143,6 +136,25 @@ ec2::ErrorCode MediaServerClient::ec2GetUsers(ec2::ApiUserDataList* result)
         result);
 }
 
+void MediaServerClient::ec2SaveUser(
+    const ec2::ApiUserData& request,
+    std::function<void(ec2::ErrorCode)> completionHandler)
+{
+    performAsyncEc2Call("ec2/saveUser", request, std::move(completionHandler));
+}
+
+ec2::ErrorCode MediaServerClient::ec2SaveUser(const ec2::ApiUserData& request)
+{
+    using Ec2SaveUserAsyncFuncPointer =
+        void(MediaServerClient::*)(
+            const ec2::ApiUserData& request,
+            std::function<void(ec2::ErrorCode)>);
+
+    return syncCallWrapper(
+        static_cast<Ec2SaveUserAsyncFuncPointer>(&MediaServerClient::ec2SaveUser),
+        request);
+}
+
 void MediaServerClient::ec2GetSettings(
     std::function<void(ec2::ErrorCode, ec2::ApiResourceParamDataList)> completionHandler)
 {
@@ -158,6 +170,27 @@ ec2::ErrorCode MediaServerClient::ec2GetSettings(ec2::ApiResourceParamDataList* 
     return syncCallWrapper(
         static_cast<Ec2GetSettingsAsyncFuncPointer>(&MediaServerClient::ec2GetSettings),
         result);
+}
+
+void MediaServerClient::ec2SetResourceParams(
+    const ec2::ApiResourceParamWithRefDataList& inputData,
+    std::function<void(ec2::ErrorCode)> completionHandler)
+{
+    performAsyncEc2Call("ec2/setResourceParams", inputData, std::move(completionHandler));
+}
+
+ec2::ErrorCode MediaServerClient::ec2SetResourceParams(
+    const ec2::ApiResourceParamWithRefDataList& request)
+{
+    using Ec2SetResourceParamsAsyncFuncPointer =
+        void(MediaServerClient::*)(
+            const ec2::ApiResourceParamWithRefDataList&,
+            std::function<void(ec2::ErrorCode)>);
+
+    return syncCallWrapper(
+        static_cast<Ec2SetResourceParamsAsyncFuncPointer>(
+            &MediaServerClient::ec2SetResourceParams),
+        request);
 }
 
 void MediaServerClient::ec2GetResourceParams(

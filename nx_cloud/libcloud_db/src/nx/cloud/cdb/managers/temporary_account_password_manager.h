@@ -10,7 +10,7 @@
 #include <nx/utils/thread/mutex.h>
 #include <nx/utils/stree/resourcecontainer.h>
 
-#include <utils/db/async_sql_query_executor.h>
+#include <nx/utils/db/async_sql_query_executor.h>
 
 #include "managers_types.h"
 #include "../access_control/abstract_authentication_data_provider.h"
@@ -50,11 +50,45 @@ public:
     TemporaryAccountCredentials_Fields (id)(accessRightsStr)
 
 //-------------------------------------------------------------------------------------------------
+namespace data {
 
-class AbstractTemporaryAccountPasswordManager
+class Credentials
+{
+public:
+    std::string login;
+    std::string password;
+};
+
+} // namespace data
+
+class AbstractTemporaryAccountPasswordManager:
+    public AbstractAuthenticationDataProvider
 {
 public:
     virtual ~AbstractTemporaryAccountPasswordManager() = default;
+
+    virtual void registerTemporaryCredentials(
+        const AuthorizationInfo& authzInfo,
+        data::TemporaryAccountCredentials tmpPasswordData,
+        std::function<void(api::ResultCode)> completionHandler) = 0;
+
+    virtual void addRandomCredentials(data::TemporaryAccountCredentials* const data) = 0;
+
+    virtual nx::utils::db::DBResult registerTemporaryCredentials(
+        nx::utils::db::QueryContext* const queryContext,
+        data::TemporaryAccountCredentials tempPasswordData) = 0;
+
+    virtual nx::utils::db::DBResult fetchTemporaryCredentials(
+        nx::utils::db::QueryContext* const queryContext,
+        const data::TemporaryAccountCredentials& tempPasswordData,
+        data::Credentials* credentials) = 0;
+
+    virtual nx::utils::db::DBResult removeTemporaryPasswordsFromDbByAccountEmail(
+        nx::utils::db::QueryContext* const queryContext,
+        std::string accountEmail) = 0;
+    
+    virtual void removeTemporaryPasswordsFromCacheByAccountEmail(
+        std::string accountEmail) = 0;
 
     virtual boost::optional<TemporaryAccountCredentialsEx> getCredentialsByLogin(
         const std::string& login) const = 0;
@@ -63,13 +97,12 @@ public:
 //-------------------------------------------------------------------------------------------------
 
 class TemporaryAccountPasswordManager:
-    public AbstractTemporaryAccountPasswordManager,
-    public AbstractAuthenticationDataProvider
+    public AbstractTemporaryAccountPasswordManager
 {
 public:
     TemporaryAccountPasswordManager(
         const conf::Settings& settings,
-        nx::db::AsyncSqlQueryExecutor* const dbManager) noexcept(false);
+        nx::utils::db::AsyncSqlQueryExecutor* const dbManager) noexcept(false);
     virtual ~TemporaryAccountPasswordManager();
 
     virtual void authenticateByName(
@@ -79,30 +112,36 @@ public:
         nx::utils::stree::ResourceContainer* const authProperties,
         nx::utils::MoveOnlyFunc<void(api::ResultCode)> completionHandler) override;
 
-    void registerTemporaryCredentials(
+    virtual void registerTemporaryCredentials(
         const AuthorizationInfo& authzInfo,
         data::TemporaryAccountCredentials tmpPasswordData,
-        std::function<void(api::ResultCode)> completionHandler);
+        std::function<void(api::ResultCode)> completionHandler) override;
 
-    std::string generateRandomPassword() const;
     /**
      * Adds password and password digest.
      * If data->login is empty, random login is generated.
      */
-    void addRandomCredentials(data::TemporaryAccountCredentials* const data);
+    virtual void addRandomCredentials(data::TemporaryAccountCredentials* const data) override;
 
-    nx::db::DBResult removeTemporaryPasswordsFromDbByAccountEmail(
-        nx::db::QueryContext* const queryContext,
-        std::string accountEmail);
-    void removeTemporaryPasswordsFromCacheByAccountEmail(
-        std::string accountEmail);
+    virtual nx::utils::db::DBResult removeTemporaryPasswordsFromDbByAccountEmail(
+        nx::utils::db::QueryContext* const queryContext,
+        std::string accountEmail) override;
+    virtual void removeTemporaryPasswordsFromCacheByAccountEmail(
+        std::string accountEmail) override;
 
-    nx::db::DBResult registerTemporaryCredentials(
-        nx::db::QueryContext* const queryContext,
-        data::TemporaryAccountCredentials tempPasswordData);
+    virtual nx::utils::db::DBResult registerTemporaryCredentials(
+        nx::utils::db::QueryContext* const queryContext,
+        data::TemporaryAccountCredentials tempPasswordData) override;
+
+    virtual nx::utils::db::DBResult fetchTemporaryCredentials(
+        nx::utils::db::QueryContext* const queryContext,
+        const data::TemporaryAccountCredentials& tempPasswordData,
+        data::Credentials* credentials) override;
 
     virtual boost::optional<TemporaryAccountCredentialsEx> getCredentialsByLogin(
         const std::string& login) const override;
+
+    std::string generateRandomPassword() const;
 
 private:
     typedef boost::multi_index::multi_index_container<
@@ -128,7 +167,7 @@ private:
     constexpr static const int kIndexByAccountEmail = 2;
 
     const conf::Settings& m_settings;
-    nx::db::AsyncSqlQueryExecutor* const m_dbManager;
+    nx::utils::db::AsyncSqlQueryExecutor* const m_dbManager;
     nx::utils::Counter m_startedAsyncCallsCounter;
     TemporaryCredentialsDictionary m_temporaryCredentials;
     mutable QnMutex m_mutex;
@@ -138,16 +177,16 @@ private:
     void removeTemporaryCredentialsFromDbDelayed(
         const TemporaryAccountCredentialsEx& temporaryCredentials);
 
-    nx::db::DBResult fillCache();
-    nx::db::DBResult fetchTemporaryPasswords(nx::db::QueryContext* queryContext);
+    nx::utils::db::DBResult fillCache();
+    nx::utils::db::DBResult fetchTemporaryPasswords(nx::utils::db::QueryContext* queryContext);
 
-    nx::db::DBResult insertTempPassword(
-        nx::db::QueryContext* const queryContext,
+    nx::utils::db::DBResult insertTempPassword(
+        nx::utils::db::QueryContext* const queryContext,
         TemporaryAccountCredentialsEx tempPasswordData);
     void saveTempPasswordToCache(TemporaryAccountCredentialsEx tempPasswordData);
 
-    nx::db::DBResult deleteTempPassword(
-        nx::db::QueryContext* const queryContext,
+    nx::utils::db::DBResult deleteTempPassword(
+        nx::utils::db::QueryContext* const queryContext,
         std::string tempPasswordID);
    
     boost::optional<const TemporaryAccountCredentialsEx&> findMatchingCredentials(
@@ -163,6 +202,14 @@ private:
         const QnMutexLockerBase& lk,
         Index& index,
         Iterator it);
+
+    void parsePasswordString(
+        const std::string& passwordString,
+        std::string* passwordHa1,
+        std::string* password);
+    std::string preparePasswordString(
+        const std::string& passwordHa1,
+        const std::string& password);
 };
 
 } // namespace cdb

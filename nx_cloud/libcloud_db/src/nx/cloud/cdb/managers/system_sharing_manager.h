@@ -1,7 +1,7 @@
 #pragma once
 
-#include <utils/db/query_context.h>
-#include <utils/db/types.h>
+#include <nx/utils/db/query_context.h>
+#include <nx/utils/db/types.h>
 
 #include <nx/cloud/cdb/api/system_data.h>
 
@@ -22,8 +22,8 @@ public:
     /**
      * Called as the last step of adding NEW sharing (not updating existing one).
      */
-    virtual nx::db::DBResult afterSharingSystem(
-        nx::db::QueryContext* const queryContext,
+    virtual nx::utils::db::DBResult afterSharingSystem(
+        nx::utils::db::QueryContext* const queryContext,
         const api::SystemSharing& sharing,
         SharingType sharingType) = 0;
 };

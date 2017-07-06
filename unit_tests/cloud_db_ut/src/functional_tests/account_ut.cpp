@@ -19,12 +19,14 @@
 
 #include <nx/cloud/cdb/api/cloud_nonce.h>
 #include <nx/cloud/cdb/data/account_data.h>
+#include <nx/cloud/cdb/test_support/business_data_generator.h>
 
 #include "email_manager_mocked.h"
 #include "test_setup.h"
 
 namespace nx {
 namespace cdb {
+namespace test {
 
 namespace {
 
@@ -844,6 +846,8 @@ TEST_F(Account, created_while_sharing)
     ASSERT_EQ(newAccountAccessRoleInSystem1, systems[0].accessRole);
 }
 
+//-------------------------------------------------------------------------------------------------
+
 class AccountNewTest:
     public Account
 {
@@ -853,10 +857,14 @@ public:
     AccountNewTest():
         m_timeShift(nx::utils::test::ClockType::system)
     {
-        NX_GTEST_ASSERT_TRUE(startAndWaitUntilStarted());
     }
 
 protected:
+    virtual void SetUp() override
+    {
+        ASSERT_TRUE(startAndWaitUntilStarted());
+    }
+
     void givenNotActivatedAccount()
     {
         m_registrationTimeRange.first = 
@@ -915,6 +923,11 @@ protected:
         ASSERT_TRUE(restart());
     }
 
+    const AccountWithPassword& account() const
+    {
+        return m_account;
+    }
+
 private:
     using TimeRange =
         std::pair<std::chrono::system_clock::time_point, std::chrono::system_clock::time_point>;
@@ -953,5 +966,90 @@ TEST_F(AccountNewTest, account_timestamps)
     assertActivationTimestampIsCorrect();
 }
 
+//-------------------------------------------------------------------------------------------------
+
+class AccountInvite:
+    public AccountNewTest
+{
+    using base_type = AccountNewTest;
+
+public:
+    ~AccountInvite()
+    {
+        EMailManagerFactory::setFactory(std::move(m_emailManagerFactoryBak));
+    }
+
+protected:
+    virtual void SetUp() override
+    {
+        using namespace std::placeholders;
+
+        constexpr const std::size_t kSystemCount = 7;
+
+        m_emailManager.setOnReceivedNotification(
+            std::bind(&AccountInvite::notificationReceived, this, _1));
+
+        m_emailManagerFactoryBak = EMailManagerFactory::setFactory(
+            [this](const conf::Settings& /*settings*/)
+            {
+                return std::make_unique<EmailManagerStub>(&m_emailManager);
+            });
+
+        base_type::SetUp();
+
+        m_newAccountEmail = BusinessDataGenerator::generateRandomEmailAddress();
+
+        givenNotActivatedAccount();
+        whenActivatedAccount();
+
+        m_systems.resize(kSystemCount);
+        for (auto& system : m_systems)
+            system = addRandomSystemToAccount(account());
+    }
+
+    void whenInvitedSameNotRegisteredUserToMultipleSystems()
+    {
+        for (auto& system: m_systems)
+        {
+            ASSERT_EQ(
+                api::ResultCode::ok,
+                shareSystem(account(), system.id, m_newAccountEmail, api::SystemAccessRole::cloudAdmin));
+        }
+    }
+
+    void thenSameInviteCodeHasBeenDelivered()
+    {
+        ASSERT_EQ(m_systems.size(), m_inviteNotifications.size());
+        std::set<std::string> inviteCodes;
+        for (const auto& notification: m_inviteNotifications)
+        {
+            inviteCodes.insert(notification.message.code);
+            ASSERT_EQ(1U, inviteCodes.size());
+        }
+    }
+
+private:
+    TestEmailManager m_emailManager;
+    std::string m_newAccountEmail;
+    std::vector<api::SystemData> m_systems;
+    EMailManagerFactory::FactoryFunc m_emailManagerFactoryBak;
+    std::vector<InviteUserNotification> m_inviteNotifications;
+
+    void notificationReceived(const nx::cdb::AbstractNotification& notification)
+    {
+        const auto inviteNotification = 
+            dynamic_cast<const InviteUserNotification*>(&notification);
+        if (inviteNotification)
+            m_inviteNotifications.push_back(*inviteNotification);
+    }
+};
+
+TEST_F(AccountInvite, invite_code_from_multiple_systems_match)
+{
+    whenInvitedSameNotRegisteredUserToMultipleSystems();
+    thenSameInviteCodeHasBeenDelivered();
+}
+
+} // namespace test
 } // namespace cdb
 } // namespace nx

@@ -89,7 +89,8 @@ QnLayoutResourcePtr QnLayoutResource::createFromResource(const QnResourcePtr& re
     item.uuid = QnUuid::createUuid();
     item.combinedGeometry = QRect(0, 0, 1, 1);
     item.resource.id = resource->getId();
-    item.resource.uniqueId = resource->getUniqueId();
+    if (resource->hasFlags(Qn::local_media))
+        item.resource.uniqueId = resource->getUniqueId();
     layout->addItem(item);
 
     return layout;

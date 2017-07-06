@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>643</width>
-    <height>131</height>
+    <height>84</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -27,16 +27,36 @@
     <number>0</number>
    </property>
    <item>
-    <layout class="QVBoxLayout" name="verticalLayout_2">
+    <layout class="QHBoxLayout" name="horizontalLayout_2">
      <item>
       <widget class="QCheckBox" name="playToClient">
        <property name="text">
-        <string>Speak to user</string>
+        <string>Speak to users</string>
        </property>
        <property name="checked">
         <bool>true</bool>
        </property>
       </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="selectUsersButton">
+       <property name="text">
+        <string notr="true">&lt;All users&gt;</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <spacer name="horizontalSpacer">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>40</width>
+         <height>20</height>
+        </size>
+       </property>
+      </spacer>
      </item>
     </layout>
    </item>

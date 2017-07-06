@@ -27,4 +27,4 @@ Config.allowDebugMode = false;
 Config.productName = 'FlyView';
 Config.cloud.productName = 'FlyView Cloud';
 
-Config.supportedLanguages = ['ru'];
+Config.supportedLanguages = ['ru_RU'];

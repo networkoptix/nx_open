@@ -14,8 +14,8 @@
 #include <core/resource/media_server_resource.h>
 #include <core/resource_management/resource_pool.h>
 
-#include <business/events/abstract_business_event.h>
-#include <business/business_strings_helper.h>
+#include <nx/vms/event/events/abstract_event.h>
+#include <nx/vms/event/strings_helper.h>
 
 #include <client/client_globals.h>
 #include <client/client_settings.h>
@@ -44,6 +44,7 @@
 
 #include <nx/utils/log/log.h>
 
+using namespace nx;
 using namespace nx::client::desktop::ui;
 
 namespace {
@@ -70,7 +71,7 @@ QnEventLogDialog::QnEventLogDialog(QWidget *parent):
     m_updateDisabled(false),
     m_dirty(false),
     m_lastMouseButton(Qt::NoButton),
-    m_helper(new QnBusinessStringsHelper(commonModule()))
+    m_helper(new vms::event::StringsHelper(commonModule()))
 {
     ui->setupUi(this);
 
@@ -96,7 +97,7 @@ QnEventLogDialog::QnEventLogDialog(QWidget *parent):
 
     // init events model
     {
-        QStandardItem* rootItem = createEventTree(0, QnBusiness::AnyBusinessEvent);
+        QStandardItem* rootItem = createEventTree(0, vms::event::anyEvent);
         m_eventTypesModel->appendRow(rootItem);
         ui->eventComboBox->setModel(m_eventTypesModel);
     }
@@ -104,15 +105,15 @@ QnEventLogDialog::QnEventLogDialog(QWidget *parent):
     // init actions model
     {
         QStandardItem *anyActionItem = new QStandardItem(tr("Any Action"));
-        anyActionItem->setData(QnBusiness::UndefinedAction);
+        anyActionItem->setData(vms::event::undefinedAction);
         anyActionItem->setData(false, ProlongedActionRole);
         m_actionTypesModel->appendRow(anyActionItem);
 
 
-        for (QnBusiness::ActionType actionType: QnBusiness::allActions()) {
+        for (vms::event::ActionType actionType: vms::event::allActions()) {
             QStandardItem *item = new QStandardItem(m_helper->actionName(actionType));
             item->setData(actionType);
-            item->setData(QnBusiness::hasToggleState(actionType), ProlongedActionRole);
+            item->setData(vms::event::hasToggleState(actionType), ProlongedActionRole);
 
             QList<QStandardItem *> row;
             row << item;
@@ -178,7 +179,7 @@ QnEventLogDialog::QnEventLogDialog(QWidget *parent):
 QnEventLogDialog::~QnEventLogDialog() {
 }
 
-QStandardItem* QnEventLogDialog::createEventTree(QStandardItem* rootItem, QnBusiness::EventType value)
+QStandardItem* QnEventLogDialog::createEventTree(QStandardItem* rootItem, vms::event::EventType value)
 {
     QStandardItem* item = new QStandardItem(m_helper->eventName(value));
     item->setData(value);
@@ -186,7 +187,7 @@ QStandardItem* QnEventLogDialog::createEventTree(QStandardItem* rootItem, QnBusi
     if (rootItem)
         rootItem->appendRow(item);
 
-    foreach(QnBusiness::EventType value, QnBusiness::childEvents(value))
+    foreach(vms::event::EventType value, vms::event::childEvents(value))
         createEventTree(item, value);
     return item;
 }
@@ -198,8 +199,8 @@ bool QnEventLogDialog::isFilterExist() const
 
     QModelIndex idx = ui->eventComboBox->currentIndex();
     if (idx.isValid()) {
-        QnBusiness::EventType eventType = (QnBusiness::EventType) m_eventTypesModel->itemFromIndex(idx)->data().toInt();
-        if (eventType != QnBusiness::UndefinedEvent && eventType != QnBusiness::AnyBusinessEvent)
+        vms::event::EventType eventType = (vms::event::EventType) m_eventTypesModel->itemFromIndex(idx)->data().toInt();
+        if (eventType != vms::event::undefinedEvent && eventType != vms::event::anyEvent)
             return true;
     }
 
@@ -212,9 +213,9 @@ bool QnEventLogDialog::isFilterExist() const
 void QnEventLogDialog::reset()
 {
     disableUpdateData();
-    setEventType(QnBusiness::AnyBusinessEvent);
+    setEventType(vms::event::anyEvent);
     setCameraList(QSet<QnUuid>());
-    setActionType(QnBusiness::UndefinedAction);
+    setActionType(vms::event::undefinedAction);
     ui->dateRangeWidget->reset();
     enableUpdateData();
 }
@@ -227,25 +228,25 @@ void QnEventLogDialog::updateData()
     }
     m_updateDisabled = true;
 
-    QnBusiness::EventType eventType = QnBusiness::UndefinedEvent;
+    vms::event::EventType eventType = vms::event::undefinedEvent;
     {
         QModelIndex idx = ui->eventComboBox->currentIndex();
         if (idx.isValid())
-            eventType = (QnBusiness::EventType) m_eventTypesModel->itemFromIndex(idx)->data().toInt();
+            eventType = (vms::event::EventType) m_eventTypesModel->itemFromIndex(idx)->data().toInt();
 
-        bool serverIssue = QnBusiness::parentEvent(eventType) == QnBusiness::AnyServerEvent || eventType == QnBusiness::AnyServerEvent;
+        bool serverIssue = vms::event::parentEvent(eventType) == vms::event::anyServerEvent || eventType == vms::event::anyServerEvent;
         ui->cameraButton->setEnabled(!serverIssue);
         if (serverIssue)
             setCameraList(QSet<QnUuid>());
 
-        bool istantOnly = !QnBusiness::hasToggleState(eventType) && eventType != QnBusiness::UndefinedEvent;
+        bool istantOnly = !vms::event::hasToggleState(eventType) && eventType != vms::event::undefinedEvent;
         updateActionList(istantOnly);
     }
 
-    QnBusiness::ActionType actionType = QnBusiness::UndefinedAction;
+    vms::event::ActionType actionType = vms::event::undefinedAction;
     {
         int idx = ui->actionComboBox->currentIndex();
-        actionType = (QnBusiness::ActionType) m_actionTypesModel->index(idx, 0).data(Qt::UserRole+1).toInt();
+        actionType = (vms::event::ActionType) m_actionTypesModel->index(idx, 0).data(Qt::UserRole+1).toInt();
     }
 
     query(ui->dateRangeWidget->startTimeMs(),
@@ -272,8 +273,8 @@ void QnEventLogDialog::updateData()
 }
 
 void QnEventLogDialog::query(qint64 fromMsec, qint64 toMsec,
-                             QnBusiness::EventType eventType,
-                             QnBusiness::ActionType actionType)
+                             vms::event::EventType eventType,
+                             vms::event::ActionType actionType)
 {
     m_requests.clear();
     m_allEvents.clear();
@@ -287,14 +288,14 @@ void QnEventLogDialog::query(qint64 fromMsec, qint64 toMsec,
             eventType,
             actionType,
             QnUuid(),
-            this, SLOT(at_gotEvents(int, const QnBusinessActionDataListPtr&, int)));
+            this, SLOT(at_gotEvents(int, const nx::vms::event::ActionDataListPtr&, int)));
 
         m_requests << handle;
 
         const auto timerCallback =
             [this, handle]
             {
-                at_gotEvents(kTimeoutStatus, QnBusinessActionDataListPtr(), handle);
+                at_gotEvents(kTimeoutStatus, vms::event::ActionDataListPtr(), handle);
             };
 
         executeDelayedParented(timerCallback, kQueryTimeoutMs, this);
@@ -315,8 +316,8 @@ void QnEventLogDialog::retranslateUi()
     for (int row = 0; row != m_actionTypesModel->rowCount(); ++row)
     {
         const auto item = m_actionTypesModel->item(row);
-        const auto type = static_cast<QnBusiness::ActionType>(item->data().toInt());
-        if (type == QnBusiness::UndefinedAction)
+        const auto type = static_cast<vms::event::ActionType>(item->data().toInt());
+        if (type == vms::event::undefinedAction)
             continue;
 
         const QString actionName = m_helper->actionName(type);
@@ -326,7 +327,7 @@ void QnEventLogDialog::retranslateUi()
     ui->eventRulesButton->setVisible(menu()->canTrigger(action::BusinessEventsAction));
 }
 
-void QnEventLogDialog::at_gotEvents(int httpStatus, const QnBusinessActionDataListPtr& events, int requestNum)
+void QnEventLogDialog::at_gotEvents(int httpStatus, const vms::event::ActionDataListPtr& events, int requestNum)
 {
     if (!m_requests.contains(requestNum))
         return;
@@ -394,7 +395,7 @@ void QnEventLogDialog::at_eventsGrid_clicked(const QModelIndex& idx)
     }
 }
 
-void QnEventLogDialog::setEventType(QnBusiness::EventType value)
+void QnEventLogDialog::setEventType(vms::event::EventType value)
 {
     QModelIndexList found = m_eventTypesModel->match(
                 m_eventTypesModel->index(0, 0),
@@ -423,7 +424,7 @@ void QnEventLogDialog::setCameraList(const QSet<QnUuid>& ids)
     updateData();
 }
 
-void QnEventLogDialog::setActionType(QnBusiness::ActionType value)
+void QnEventLogDialog::setActionType(vms::event::ActionType value)
 {
     for (int i = 0; i < m_actionTypesModel->rowCount(); ++i)
     {
@@ -437,9 +438,9 @@ void QnEventLogDialog::at_filterAction_triggered()
 {
     QModelIndex idx = ui->gridEvents->currentIndex();
 
-    QnBusiness::EventType eventType = m_model->eventType(idx.row());
-    QnBusiness::EventType parentEventType = QnBusiness::parentEvent(eventType);
-    if (parentEventType != QnBusiness::AnyBusinessEvent && parentEventType != QnBusiness::UndefinedEvent)
+    vms::event::EventType eventType = m_model->eventType(idx.row());
+    vms::event::EventType parentEventType = vms::event::parentEvent(eventType);
+    if (parentEventType != vms::event::anyEvent && parentEventType != vms::event::undefinedEvent)
         eventType = parentEventType;
 
     QSet<QnUuid> camList;
@@ -450,7 +451,7 @@ void QnEventLogDialog::at_filterAction_triggered()
     disableUpdateData();
     setEventType(eventType);
     setCameraList(camList);
-    setActionType(QnBusiness::UndefinedAction);
+    setActionType(vms::event::undefinedAction);
     enableUpdateData();
 }
 

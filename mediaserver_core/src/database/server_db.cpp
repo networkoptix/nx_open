@@ -2,13 +2,14 @@
 
 #include <QtCore/QtEndian>
 
-#include <business/actions/abstract_business_action.h>
-#include <business/events/abstract_business_event.h>
+#include <nx/vms/event/actions/abstract_action.h>
+#include <nx/vms/event/events/abstract_event.h>
 
 #include <core/resource/camera_resource.h>
 #include <core/resource/network_resource.h>
 #include <core/resource/camera_bookmark.h>
 #include <core/resource_management/resource_pool.h>
+#include <core/resource_management/user_roles_manager.h>
 
 #include <media_server/serverutil.h>
 
@@ -23,6 +24,8 @@
 #include <api/global_settings.h>
 #include <common/common_module.h>
 #include <media_server/media_server_module.h>
+
+using namespace nx;
 
 namespace {
 
@@ -57,7 +60,7 @@ inline qint64 toInt64(const QByteArray& ba)
     return result;
 }
 
-QnBusinessActionParameters convertOldActionParameters(const QByteArray& value)
+vms::event::ActionParameters convertOldActionParameters(const QByteArray& value)
 {
     enum Param
     {
@@ -77,10 +80,13 @@ QnBusinessActionParameters convertOldActionParameters(const QByteArray& value)
         ParamCount
     };
 
-    QnBusinessActionParameters result;
+    vms::event::ActionParameters result;
 
     if (value.isEmpty())
         return result;
+
+    static const std::vector<QnUuid> kAdminRoles(
+        QnUserRolesManager::adminRoleIds().toVector().toStdVector());
 
     int i = 0;
     int prevPos = -1;
@@ -100,7 +106,11 @@ QnBusinessActionParameters convertOldActionParameters(const QByteArray& value)
                 result.emailAddress = QString::fromUtf8(field.data(), field.size());
                 break;
             case UserGroupParam:
-                result.userGroup = static_cast<QnBusiness::UserGroup>(toInt(field));
+                enum { kAdminOnly = 1 };
+                if (toInt(field) == kAdminOnly)
+                    result.additionalResources = kAdminRoles;
+                else
+                    result.additionalResources.clear();
                 break;
             case FpsParam:
                 result.fps = toInt(field);
@@ -139,7 +149,7 @@ QnBusinessActionParameters convertOldActionParameters(const QByteArray& value)
     return result;
 }
 
-QnBusinessEventParameters convertOldEventParameters(
+vms::event::EventParameters convertOldEventParameters(
     const QByteArray& value, QnUuid* actionResourceId)
 {
     enum Param
@@ -156,7 +166,7 @@ QnBusinessEventParameters convertOldEventParameters(
         ParamCount
     };
 
-    QnBusinessEventParameters result;
+    vms::event::EventParameters result;
 
     if (value.isEmpty())
         return result;
@@ -176,7 +186,7 @@ QnBusinessEventParameters convertOldEventParameters(
             switch ((Param) i)
             {
                 case EventTypeParam:
-                    result.eventType = (QnBusiness::EventType) toInt(field);
+                    result.eventType = (vms::event::EventType) toInt(field);
                     break;
                 case EventTimestampParam:
                     result.eventTimestampUsec = toInt64(field);
@@ -191,7 +201,7 @@ QnBusinessEventParameters convertOldEventParameters(
                     result.inputPortId = QString::fromUtf8(field.data(), field.size());
                     break;
                 case ReasonCodeParam:
-                    result.reasonCode = (QnBusiness::EventReason) toInt(field);
+                    result.reasonCode = (vms::event::EventReason) toInt(field);
                     break;
                 case ReasonParamsEncodedParam:
                 {
@@ -546,7 +556,7 @@ bool QnServerDb::migrateBusinessParamsUnderTransaction()
             // Check if data is in Ubjson already.
             if (!packed.isEmpty() && packed[0] == L'[')
                 return packed;
-            QnBusinessActionParameters ap = convertOldActionParameters(packed);
+            vms::event::ActionParameters ap = convertOldActionParameters(packed);
             ap.actionResourceId = actionResourceId;
             return QnUbjson::serialized(ap);
         };
@@ -557,7 +567,7 @@ bool QnServerDb::migrateBusinessParamsUnderTransaction()
             // Check if data is in Ubjson already.
             if (!packed.isEmpty() && packed[0] == L'[')
                 return packed;
-            QnBusinessEventParameters rp = convertOldEventParameters(packed, actionResourceId);
+            vms::event::EventParameters rp = convertOldEventParameters(packed, actionResourceId);
             return QnUbjson::serialized(rp);
         };
 
@@ -712,7 +722,7 @@ bool QnServerDb::removeLogForRes(const QnUuid& resId)
     return rez;
 }
 
-bool QnServerDb::saveActionToDB(const QnAbstractBusinessActionPtr& action)
+bool QnServerDb::saveActionToDB(const vms::event::AbstractActionPtr& action)
 {
     QnWriteLocker lock(&m_mutex);
 
@@ -734,13 +744,13 @@ bool QnServerDb::saveActionToDB(const QnAbstractBusinessActionPtr& action)
     qint64 timestampUsec = action->getRuntimeParams().eventTimestampUsec;
     QnUuid eventResId = action->getRuntimeParams().eventResourceId;
 
-    QnBusinessActionParameters actionParams = action->getParams();
+    auto actionParams = action->getParams();
 
     insQuery.bindValue(":timestamp", timestampUsec/1000000);
     insQuery.bindValue(":action_type", (int) action->actionType());
     insQuery.bindValue(":action_params", QnUbjson::serialized(actionParams));
     insQuery.bindValue(":runtime_params", QnUbjson::serialized(action->getRuntimeParams()));
-    insQuery.bindValue(":business_rule_guid", action->getBusinessRuleId().toRfc4122());
+    insQuery.bindValue(":business_rule_guid", action->getRuleId().toRfc4122());
     insQuery.bindValue(":toggle_state", (int) action->getToggleState());
     insQuery.bindValue(":aggregation_count", action->getAggregationCount());
 
@@ -764,8 +774,8 @@ bool QnServerDb::saveActionToDB(const QnAbstractBusinessActionPtr& action)
 QString QnServerDb::getRequestStr(
     const QnTimePeriod& period,
     const QnResourceList& resList,
-    const QnBusiness::EventType& eventType,
-    const QnBusiness::ActionType& actionType,
+    const vms::event::EventType& eventType,
+    const vms::event::ActionType& actionType,
     const QnUuid& businessRuleId) const
 {
     QString request(lit("SELECT * FROM runtime_actions where"));
@@ -796,13 +806,13 @@ QString QnServerDb::getRequestStr(
         request += QString(lit(" and event_resource_guid in (%1) ")).arg(idList);
     }
 
-    if (eventType != QnBusiness::UndefinedEvent && eventType != QnBusiness::AnyBusinessEvent)
+    if (eventType != vms::event::undefinedEvent && eventType != vms::event::anyEvent)
     {
-        if (QnBusiness::hasChild(eventType))
+        if (vms::event::hasChild(eventType))
         {
-            QList<QnBusiness::EventType> events = QnBusiness::childEvents(eventType);
+            QList<vms::event::EventType> events = vms::event::childEvents(eventType);
             QString eventTypeStr;
-            for(QnBusiness::EventType evnt: events) {
+            for(vms::event::EventType evnt: events) {
                 if (!eventTypeStr.isEmpty())
                     eventTypeStr += QLatin1Char(',');
                 eventTypeStr += QString::number((int) evnt);
@@ -814,7 +824,7 @@ QString QnServerDb::getRequestStr(
             request += QString(lit(" and event_type = %1 ")).arg((int) eventType);
         }
     }
-    if (actionType != QnBusiness::UndefinedAction)
+    if (actionType != vms::event::undefinedAction)
         request += QString(lit(" and action_type = %1 ")).arg((int) actionType);
     if (!businessRuleId.isNull())
     {
@@ -825,14 +835,14 @@ QString QnServerDb::getRequestStr(
     return request;
 }
 
-QnBusinessActionDataList QnServerDb::getActions(
+vms::event::ActionDataList QnServerDb::getActions(
     const QnTimePeriod& period,
     const QnResourceList& resList,
-    const QnBusiness::EventType& eventType,
-    const QnBusiness::ActionType& actionType,
+    const vms::event::EventType& eventType,
+    const vms::event::ActionType& actionType,
     const QnUuid& businessRuleId) const
 {
-    QnBusinessActionDataList result;
+    vms::event::ActionDataList result;
     QString request = getRequestStr(period, resList, eventType, actionType, businessRuleId);
 
     QnWriteLocker lock(&m_mutex);
@@ -851,12 +861,12 @@ QnBusinessActionDataList QnServerDb::getActions(
 
     while (query.next())
     {
-        QnBusinessActionData actionData;
+        vms::event::ActionData actionData;
 
-        actionData.actionType = (QnBusiness::ActionType) query.value(actionTypeIdx).toInt();
-        actionData.actionParams = QnUbjson::deserialized<QnBusinessActionParameters>(
+        actionData.actionType = (vms::event::ActionType) query.value(actionTypeIdx).toInt();
+        actionData.actionParams = QnUbjson::deserialized<vms::event::ActionParameters>(
             query.value(actionParamIdx).toByteArray());
-        actionData.eventParams = QnUbjson::deserialized<QnBusinessEventParameters>(
+        actionData.eventParams = QnUbjson::deserialized<vms::event::EventParameters>(
             query.value(runtimeParamIdx).toByteArray());
         actionData.businessRuleId = QnUuid::fromRfc4122(
             query.value(businessRuleIdx).toByteArray());
@@ -883,8 +893,8 @@ void QnServerDb::getAndSerializeActions(
     QByteArray& result,
     const QnTimePeriod& period,
     const QnResourceList& resList,
-    const QnBusiness::EventType& eventType,
-    const QnBusiness::ActionType& actionType,
+    const vms::event::EventType& eventType,
+    const vms::event::ActionType& actionType,
     const QnUuid& businessRuleId) const
 {
     QString request = getRequestStr(period, resList, eventType, actionType, businessRuleId);
@@ -913,10 +923,10 @@ void QnServerDb::getAndSerializeActions(
     while (actionsQuery.next())
     {
         int flags = 0;
-        QnBusiness::EventType eventType =
-            (QnBusiness::EventType) actionsQuery.value(eventTypeIdx).toInt();
-        if (eventType == QnBusiness::CameraMotionEvent ||
-            eventType == QnBusiness::CameraInputEvent)
+        vms::event::EventType eventType =
+            (vms::event::EventType) actionsQuery.value(eventTypeIdx).toInt();
+        if (eventType == vms::event::cameraMotionEvent ||
+            eventType == vms::event::cameraInputEvent)
         {
             QnUuid eventResId = QnUuid::fromRfc4122(actionsQuery.value(eventResIdx).toByteArray());
             QnNetworkResourcePtr camRes =
@@ -926,7 +936,7 @@ void QnServerDb::getAndSerializeActions(
                 if (QnStorageManager::isArchiveTimeExists(
                     camRes->getUniqueId(), actionsQuery.value(timestampIdx).toInt() * 1000ll))
                 {
-                    flags |= QnBusinessActionData::VideoLinkExists;
+                    flags |= vms::event::ActionData::VideoLinkExists;
                 }
             }
         }

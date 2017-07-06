@@ -44,6 +44,7 @@ QnGraphicsMessageBoxHolder::~QnGraphicsMessageBoxHolder()
 void QnGraphicsMessageBoxHolder::addItem(QGraphicsLayoutItem *item)
 {
     m_layout->addItem(item);
+    m_layout->setAlignment(item, Qt::AlignHCenter);
 }
 
 void QnGraphicsMessageBoxHolder::removeItem(QGraphicsLayoutItem *item)

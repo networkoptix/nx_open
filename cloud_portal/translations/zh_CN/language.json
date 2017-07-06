@@ -1,5 +1,4 @@
 {
-  "language":"zh_CN",
   "language_name":"简体中文",
   "productName":"{{PRODUCT_NAME}}",
   "clientProtocol":"{{CLIENT_PROTOCOL}}:",
@@ -30,6 +29,7 @@
     "restorePassword":"重置密码-",
     "restorePasswordSuccess":"保存的密码-",
     "restorePasswordCode":"重置密码-",
+    "view":"View cameras - ",
     "contentPage":"",
     "debug":"调试",
     "login":"登录-",
@@ -85,7 +85,6 @@
   },
   "errorCodes":{
     "ok":"ok",
-    "cantChangePasswordPrefix":"无法保存密码",
     "cantSendActivationPrefix":"不能发送确认电子邮件",
     "cantDisconnectSystemPrefix":"不能删除系统",
     "cantUnshareWithMeSystemPrefix":"不能删除系统",
@@ -95,6 +94,7 @@
     "cantRegisterPrefix":"出现错误",
     "cantGetSystemInfoPrefix":"系统信息不可用",
     "cantChangeAccountPrefix":"无法保存更改",
+    "cantChangePasswordPrefix":"无法保存密码",
     "cantActivatePrefix":"无法激活您的帐户",
     "cantSendConfirmationPrefix":"不能发送确认电子邮件",
     "cloudInvalidResponse":"云 DB 返回了意外的响应",
@@ -109,14 +109,15 @@
     "alreadyExists":"此帐户已存在",
     "unknownError":"发生意外的错误",
     "accountAlreadyActivated":"此帐户已激活",
-    "EmailNotFound":"帐户不存在",
+    "emailNotFound":"帐户不存在",
     "EmailAlreadyExists":"此电子邮件已被注册",
     "oldPasswordMistmatch":"当前密码不正确",
     "passwordMismatch":"错误的密码。",
     "cantEditYourself":"不允许更改自己的权限",
     "cantEditAdmin":"此用户具有管理员权限",
     "cantOpenClient":"{{VMS_NAME}} 应用程序未检测到。<a href=\"/download\"> 下载</a>",
-    "lostConnection":"连接到 {{systemName}} 失去了"
+    "lostConnection":"连接到 {{systemName}} 失去了",
+    "thisSystem":"the system"
   },
   "passwordRequirements":{
     "minLengthMessage":"密码必须包含至少 8 个字符",
@@ -211,5 +212,9 @@
   "regActions":{
     "passwordLabel":"密码",
     "createAccount":"创建帐户"
+  },
+  "header":{
+    "allSystems":"All Systems",
+    "systems":"系统"
   }
 }
