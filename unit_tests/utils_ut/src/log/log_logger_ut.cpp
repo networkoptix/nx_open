@@ -54,7 +54,7 @@ TEST(LogLogger, Filters)
     const auto buffer = new Buffer();
 
     Logger logger(Level::info, std::unique_ptr<AbstractWriter>(buffer));
-    ASSERT_EQ((size_t) 0, logger.exceptionFilters().size());
+    ASSERT_EQ((size_t) 0, logger.levelFilters().size());
 
     EXPECT_TRUE(logger.isToBeLogged(Level::warning, QLatin1String("nx::first::className1")));
     EXPECT_TRUE(logger.isToBeLogged(Level::warning, QLatin1String("nx::second::className2")));
@@ -67,8 +67,8 @@ TEST(LogLogger, Filters)
     logger.log(Level::debug, QLatin1String("nx::second::className4"), "ddd");
     ASSERT_EQ((size_t) 2, buffer->takeMessages().size());
 
-    logger.setExceptionFilters({QLatin1String("nx::first")});
-    ASSERT_EQ((size_t) 1, logger.exceptionFilters().size());
+    logger.setLevelFilters(levelFiltersFromString("nx::first"));
+    ASSERT_EQ((size_t) 1, logger.levelFilters().size());
 
     EXPECT_TRUE(logger.isToBeLogged(Level::warning, QLatin1String("nx::first::className1")));
     EXPECT_TRUE(logger.isToBeLogged(Level::warning, QLatin1String("nx::second::className2")));
@@ -81,8 +81,8 @@ TEST(LogLogger, Filters)
     logger.log(Level::debug, QLatin1String("nx::second::className4"), "ddd");
     ASSERT_EQ((size_t) 3, buffer->takeMessages().size());
 
-    logger.setExceptionFilters({QLatin1String("nx::second"), QLatin1String("nx::third")});
-    ASSERT_EQ((size_t) 2, logger.exceptionFilters().size());
+    logger.setLevelFilters(levelFiltersFromString("nx::second,nx::third"));
+    ASSERT_EQ((size_t) 2, logger.levelFilters().size());
 
     EXPECT_TRUE(logger.isToBeLogged(Level::warning, QLatin1String("nx::first::className1")));
     EXPECT_TRUE(logger.isToBeLogged(Level::warning, QLatin1String("nx::second::className2")));

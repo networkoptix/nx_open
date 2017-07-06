@@ -46,7 +46,7 @@ class CmdLineArguments
 {
 public:
     QString logLevel;
-    QString exceptionFilters;
+    QString logLevelFilters;
 
     // Log level of http requests log.
     QString msgLogLevel;

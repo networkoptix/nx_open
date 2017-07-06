@@ -16,7 +16,7 @@ public:
         logger = addLogger({lit("SomeTag"), lit("nx::utils::log::test")});
         logger->setDefaultLevel(levelFromString("INFO"));
         logger->setWriter(std::unique_ptr<AbstractWriter>(buffer = new Buffer));
-        logger->setExceptionFilters({lit("nx::utils::log::test")});
+        logger->setLevelFilters(levelFiltersFromString("nx::utils::log::test"));
     }
 
     ~LogMainTest()

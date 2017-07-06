@@ -3,32 +3,39 @@
 #include "assert.h"
 #include "log_message.h"
 
+#include <nx/utils/literal.h>
+
 namespace nx {
 namespace utils {
 namespace log {
 
+bool operator<=(Level left, Level right)
+{
+    return static_cast<int>(left) <= static_cast<int>(right);
+}
+
 Level levelFromString(const QString& levelString)
 {
     const auto level = levelString.toLower();
-    if (level == QLatin1String("none"))
+    if (level == lit("none") || level == lit("n"))
         return Level::none;
 
-    if (level == QLatin1String("always"))
+    if (level == lit("always") || level == lit("a"))
         return Level::always;
 
-    if (level == QLatin1String("error"))
+    if (level == lit("error") || level == lit("e"))
         return Level::error;
 
-    if (level == QLatin1String("warning"))
+    if (level == lit("warning") || level == lit("w"))
         return Level::warning;
 
-    if (level == QLatin1String("info"))
+    if (level == lit("info") || level == lit("i"))
         return Level::info;
 
-    if (level == QLatin1String("debug") || level == QLatin1String("debug1"))
+    if (level == lit("debug") || level == lit("debug1") || level == lit("d"))
         return Level::debug;
 
-    if (level == QLatin1String("verbose") || level == QLatin1String("debug2"))
+    if (level == lit("verbose") || level == lit("debug2") || level == lit("v"))
         return Level::verbose;
 
     return Level::undefined;
@@ -65,6 +72,51 @@ QString toString(Level level)
 
     NX_ASSERT(false, lm("Unknown level: %1").arg(static_cast<int>(level)));
     return QLatin1String("unknown");
+}
+
+LevelFilters levelFiltersFromString(const QString& levelFilters)
+{
+    LevelFilters filters;
+    for (const auto& group: levelFilters.splitRef(';', QString::SkipEmptyParts))
+    {
+        const auto parts = group.split('-');
+        if (parts.size() == 0 || parts.size() > 2)
+        {
+            qWarning() << Q_FUNC_INFO << "wrong format in group" << group << "in" << levelFilters;
+            continue;
+        }
+
+        auto level = Level::verbose;
+        if (parts.size() == 2)
+        {
+            const auto levelPart = parts[1].toString();
+            const auto parsedLevel = levelFromString(levelPart);
+            if (parsedLevel == Level::undefined)
+            {
+                qWarning() << Q_FUNC_INFO << "invalid level" << levelPart << "in group" << group
+                    << "in" << levelFilters;
+                continue;
+            }
+
+            level = parsedLevel;
+        }
+
+        const auto nameParts = parts[0].split(',');
+        for (const auto& part: nameParts)
+        {
+            const auto name = part.toString();
+            if (filters.count(name))
+            {
+                qWarning() << Q_FUNC_INFO << "duplicate name" << name << "in group" << group
+                    << "in" << levelFilters;
+                continue;
+            }
+
+            filters.emplace(name, level);
+        }
+    }
+
+    return filters;
 }
 
 } // namespace log

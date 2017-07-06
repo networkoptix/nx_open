@@ -12,7 +12,7 @@ class NX_UTILS_API Logger
 {
 public:
     /** Initializes log with minimal level and writers, no writers means std out and err. */
-    Logger(Level level = Level::none, std::unique_ptr<AbstractWriter> writer = nullptr);
+    Logger(Level defaultLevel = Level::none, std::unique_ptr<AbstractWriter> writer = nullptr);
 
     /** Writes message to every writer if it is to be logged. */
     void log(Level level, const QString& tag, const QString& message);
@@ -27,9 +27,9 @@ public:
     Level defaultLevel() const;
     void setDefaultLevel(Level level);
 
-    /** Makes this logger log all messages with tag starting with one of filters. */
-    std::set<QString> exceptionFilters() const;
-    void setExceptionFilters(std::set<QString> filters);
+    /** Custom levels for messages which tag starting with one of the filters. */
+    LevelFilters levelFilters() const;
+    void setLevelFilters(LevelFilters filters);
 
     void setWriters(std::vector<std::unique_ptr<AbstractWriter>> writers = {});
     void setWriter(std::unique_ptr<AbstractWriter> writer);
@@ -40,7 +40,7 @@ private:
     mutable QnMutex m_mutex;
     Level m_defaultLevel = Level::none;
     std::vector<std::unique_ptr<AbstractWriter>> m_writers;
-    std::set<QString> m_exceptionFilters;
+    LevelFilters m_levelFilters;
 };
 
 } // namespace log

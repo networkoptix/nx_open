@@ -23,17 +23,17 @@ void initialize(
     if (!logger)
         logger = mainLogger();
 
-    if (settings.level == Level::undefined)
+    if (settings.defaultLevel == Level::undefined)
         return;
 
     // Can not be reinitialized if initialized globally.
     if (!isInitializedGlobally.load())
     {
-        if (settings.level == Level::none)
+        if (settings.defaultLevel == Level::none)
             return;
 
-        logger->setDefaultLevel(settings.level);
-        logger->setExceptionFilters(settings.exceptionFilers);
+        logger->setDefaultLevel(settings.defaultLevel);
+        logger->setLevelFilters(settings.levelFilters);
         if (baseName != QLatin1String("-"))
         {
             const auto logDir = settings.directory.isEmpty()
@@ -63,7 +63,7 @@ void initialize(
 
     const auto filePath = logger->filePath();
     write(lm("Log level: %1, maxFileSize: %2, maxBackupCount: %3, file: %4").args(
-        toString(settings.level).toUpper(), nx::utils::bytesToString(settings.maxFileSize),
+        toString(settings.defaultLevel).toUpper(), nx::utils::bytesToString(settings.maxFileSize),
         settings.maxBackupCount, filePath ? *filePath : QString::fromUtf8("-")));
 }
 
@@ -79,14 +79,8 @@ void initializeGlobally(const nx::utils::ArgumentParser& arguments)
         logger->setDefaultLevel(level);
     }
 
-    if (const auto value = arguments.get("log-exception-filters", "lef"))
-    {
-        std::set<QString> filters;
-        for (const auto f: value->split(QLatin1String(",")))
-            filters.insert(f);
-
-        logger->setExceptionFilters(filters);
-    }
+    if (const auto value = arguments.get("log-level-filters", "llf"))
+        logger->setLevelFilters(levelFiltersFromString(*value));
 
     if (const auto value = arguments.get("log-file", "lf"))
     {
