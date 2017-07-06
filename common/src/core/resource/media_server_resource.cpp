@@ -550,15 +550,19 @@ QnModuleInformation QnMediaServerResource::getModuleInformation() const
             getProperty(safeModePropertyName), moduleInformation.ecDbReadOnly);
     }
 
-    const auto& settings = resourcePool()->commonModule()->globalSettings();
-    moduleInformation.localSystemId = settings->localSystemId();
-    moduleInformation.systemName = settings->systemName();
+    if (auto module = commonModule())
+    {
+        const auto& settings = module->globalSettings();
+        moduleInformation.localSystemId = settings->localSystemId();
+        moduleInformation.systemName = settings->systemName();
+        moduleInformation.cloudSystemId = settings->cloudSystemId();
+    }
+
     moduleInformation.id = getId();
     moduleInformation.port = getPort();
     moduleInformation.version = getVersion();
     moduleInformation.systemInformation = getSystemInfo();
     moduleInformation.serverFlags = getServerFlags();
-    moduleInformation.cloudSystemId = settings->cloudSystemId();
 
     return moduleInformation;
 }
