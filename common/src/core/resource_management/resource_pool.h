@@ -58,7 +58,7 @@ public:
 
     void addResource(const QnResourcePtr &resource);
     // TODO: We need to remove this function. Client should use separate instance of resource pool instead
-    void addIncompatibleResource(const QnMediaServerResourcePtr& server);
+    void addIncompatibleServer(const QnMediaServerResourcePtr& server);
 
     void beginTran();
     void commit();
@@ -166,10 +166,10 @@ public:
     QnResourceList getResourcesWithParentId(QnUuid id) const;
     QnResourceList getResourcesWithTypeId(QnUuid id) const;
 
-    QnMediaServerResourcePtr getIncompatibleResourceById(const QnUuid& id,
+    QnMediaServerResourcePtr getIncompatibleServerById(const QnUuid& id,
         bool useCompatible = false) const;
 
-    QnMediaServerResourceList getAllIncompatibleResources() const;
+    QnMediaServerResourceList getIncompatibleServers() const;
 
 
     QnUserResourcePtr getAdministrator() const;
@@ -251,6 +251,6 @@ private:
 
     QnResourceList m_tmpResources;
     QHash<QnUuid, QnResourcePtr> m_resources;
-    QHash<QnUuid, QnMediaServerResourcePtr> m_incompatibleResources;
+    QHash<QnUuid, QnMediaServerResourcePtr> m_incompatibleServers;
     mutable QnUserResourcePtr m_adminResource;
 };

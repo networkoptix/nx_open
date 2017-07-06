@@ -13,9 +13,8 @@ public:
 
     virtual void set(QObject *object, const QVariant &value) const = 0;
 
-    virtual ~AbstractAccessor() {};
+    virtual ~AbstractAccessor() {}
 };
-
 
 /**
  * Accessor that wraps the given functors.
@@ -56,6 +55,12 @@ AbstractAccessor *newAccessor(const Getter &getter, const Setter &setter) {
  */
 class PropertyAccessor: public AbstractAccessor {
 public:
+    using Pointer = QSharedPointer<PropertyAccessor>;
+    static const Pointer create(const QByteArray& propertyName)
+    {
+        return Pointer(new PropertyAccessor(propertyName));
+    }
+
     PropertyAccessor(const QByteArray &propertyName): m_propertyName(propertyName) {}
 
     virtual QVariant get(const QObject *object) const override {

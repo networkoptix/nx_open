@@ -90,7 +90,8 @@ QList<QNetworkProxy> QnNetworkProxyFactory::queryProxy(const QNetworkProxyQuery 
     if (resourceGuid.isNull())
         return QList<QNetworkProxy>() << QNetworkProxy(QNetworkProxy::NoProxy);
 
-    return QList<QNetworkProxy>() << proxyToResource(commonModule()->resourcePool()->getIncompatibleResourceById(resourceGuid, true));
+    return QList<QNetworkProxy>() << proxyToResource(
+        commonModule()->resourcePool()->getIncompatibleServerById(resourceGuid, true));
 }
 
 QNetworkProxy QnNetworkProxyFactory::proxyToResource(
