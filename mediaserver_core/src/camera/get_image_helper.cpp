@@ -59,8 +59,9 @@ QSize QnGetImageHelper::updateDstSize(const QSharedPointer<QnSecurityCamResource
     else {
         dstSize = QSize(outFrame->width * sar, outFrame->height);
     }
-    dstSize.setWidth(qMin(dstSize.width(), outFrame->width * sar));
-    dstSize.setHeight(qMin(dstSize.height(), outFrame->height));
+    static constexpr int kMaxSize = QnThumbnailRequestData::kMaximumSize;
+    dstSize.setWidth(qMin(dstSize.width(), qMax(kMaxSize, outFrame->width) * sar));
+    dstSize.setHeight(qMin(dstSize.height(), qMax(kMaxSize, outFrame->height)));
 
     qreal customAR = res->customAspectRatio();
     if (!qFuzzyIsNull(customAR))
