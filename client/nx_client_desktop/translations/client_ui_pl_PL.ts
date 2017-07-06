@@ -6,7 +6,7 @@
     <message>
       <location filename="../src/ui/dialogs/about_dialog.ui"/>
       <source>About</source>
-      <translation type="unfinished">About</translation>
+      <translation>Informacje o programie</translation>
     </message>
     <message>
       <location/>
@@ -371,7 +371,7 @@
     <message>
       <location/>
       <source>Name</source>
-      <translation type="unfinished">Name</translation>
+      <translation>Nazwa</translation>
     </message>
     <message>
       <location/>
@@ -465,7 +465,7 @@
     <message>
       <location/>
       <source>Delete</source>
-      <translation type="unfinished">Delete</translation>
+      <translation>Usuń</translation>
     </message>
     <message>
       <location/>
@@ -702,7 +702,7 @@
     <message>
       <location/>
       <source>Restore Defaults</source>
-      <translation type="unfinished">Restore Defaults</translation>
+      <translation>Przywróć domyślne</translation>
     </message>
     <message>
       <location/>
@@ -1122,7 +1122,7 @@
     <message>
       <location/>
       <source>Size</source>
-      <translation type="unfinished">Size</translation>
+      <translation>Rozmiar</translation>
     </message>
     <message>
       <location/>
@@ -1160,7 +1160,7 @@
     <message>
       <location/>
       <source>Remove</source>
-      <translation type="unfinished">Remove</translation>
+      <translation>Usuń</translation>
     </message>
     <message>
       <location/>
@@ -1429,7 +1429,7 @@
     <message>
       <location/>
       <source>Remove</source>
-      <translation type="unfinished">Remove</translation>
+      <translation>Usuń</translation>
     </message>
     <message>
       <location/>
@@ -1559,7 +1559,7 @@
     <message>
       <location/>
       <source>Delete</source>
-      <translation type="unfinished">Delete</translation>
+      <translation>Usuń</translation>
     </message>
     <message>
       <location/>
@@ -1780,7 +1780,7 @@
     <message>
       <location/>
       <source>Delete</source>
-      <translation type="unfinished">Delete</translation>
+      <translation>Usuń</translation>
     </message>
     <message>
       <location/>
@@ -2004,7 +2004,7 @@
     <message>
       <location/>
       <source>Remove</source>
-      <translation type="unfinished">Remove</translation>
+      <translation>Usuń</translation>
     </message>
     <message>
       <location/>
@@ -2022,7 +2022,7 @@
     <message>
       <location filename="../src/ui/widgets/system_settings/server_updates_widget.ui"/>
       <source>Cancel</source>
-      <translation type="unfinished">Cancel</translation>
+      <translation>Anuluj</translation>
     </message>
     <message>
       <location/>
@@ -2088,7 +2088,7 @@
     <message>
       <location/>
       <source>Options</source>
-      <translation type="unfinished">Options</translation>
+      <translation>Opcje</translation>
     </message>
     <message>
       <location/>
@@ -2353,7 +2353,7 @@
     <message>
       <location/>
       <source>Name</source>
-      <translation type="unfinished">Name</translation>
+      <translation>Nazwa</translation>
     </message>
     <message>
       <location/>
@@ -2500,7 +2500,7 @@
     <message>
       <location/>
       <source>Name</source>
-      <translation type="unfinished">Name</translation>
+      <translation>Nazwa</translation>
     </message>
     <message>
       <location/>
@@ -2555,7 +2555,7 @@
     <message>
       <location/>
       <source>Reset</source>
-      <translation type="unfinished">Reset</translation>
+      <translation>Zresetuj</translation>
     </message>
     <message>
       <location/>
@@ -2649,7 +2649,7 @@
     <message>
       <location/>
       <source>Cancel</source>
-      <translation type="unfinished">Cancel</translation>
+      <translation>Anuluj</translation>
     </message>
   </context>
   <context>
@@ -2662,7 +2662,7 @@
     <message>
       <location/>
       <source>Name</source>
-      <translation type="unfinished">Name</translation>
+      <translation>Nazwa</translation>
     </message>
     <message>
       <location/>
@@ -2711,7 +2711,7 @@
     <message>
       <location filename="../src/ui/widgets/properties/storage_config_widget.ui"/>
       <source>Cancel</source>
-      <translation type="unfinished">Cancel</translation>
+      <translation>Anuluj</translation>
     </message>
     <message>
       <location/>
@@ -2759,7 +2759,7 @@
     <message>
       <location filename="../src/ui/widgets/properties/storage_rebuild_widget.ui"/>
       <source>Cancel</source>
-      <translation type="unfinished">Cancel</translation>
+      <translation>Anuluj</translation>
     </message>
   </context>
   <context>
@@ -2794,11 +2794,6 @@
     <name>SubjectSelectionDialog</name>
     <message>
       <location filename="../src/nx/client/desktop/ui/event_rules/subject_selection_dialog.ui"/>
-      <source>Dialog</source>
-      <translation type="unfinished">Dialog</translation>
-    </message>
-    <message>
-      <location/>
       <source>Roles</source>
       <translation type="unfinished">Roles</translation>
     </message>
@@ -2806,6 +2801,16 @@
       <location/>
       <source>Show all users</source>
       <translation type="unfinished">Show all users</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Select Users</source>
+      <translation type="unfinished">Select Users</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Nothing matches your search.</source>
+      <translation type="unfinished">Nothing matches your search.</translation>
     </message>
   </context>
   <context>
@@ -2857,7 +2862,7 @@
     <message>
       <location filename="../src/ui/widgets/properties/user_role_settings_widget.ui"/>
       <source>Name</source>
-      <translation type="unfinished">Name</translation>
+      <translation>Nazwa</translation>
     </message>
     <message>
       <location/>

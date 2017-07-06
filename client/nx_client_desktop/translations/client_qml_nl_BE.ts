@@ -27,15 +27,15 @@
     <name>LocalSystemTileExpandedAreaPart</name>
     <message>
       <source>Login</source>
-      <translation type="unfinished">Login</translation>
+      <translation>Login</translation>
     </message>
     <message>
       <source>Password</source>
-      <translation type="unfinished">Password</translation>
+      <translation>Wachtwoord</translation>
     </message>
     <message>
       <source>Save password</source>
-      <translation type="unfinished">Save password</translation>
+      <translation>Wachtwoord opslaan</translation>
     </message>
     <message>
       <source>Auto-login</source>
@@ -65,7 +65,7 @@
     </message>
     <message>
       <source>OFFLINE</source>
-      <translation type="unfinished">OFFLINE</translation>
+      <translation>OFFLINE</translation>
     </message>
     <message>
       <source>UNREACHABLE</source>
@@ -88,7 +88,7 @@
     </message>
     <message>
       <source>Loading...</source>
-      <translation type="unfinished">Loading...</translation>
+      <translation>Laden...</translation>
     </message>
     <message>
       <source>Connect to Another Server...</source>
@@ -96,7 +96,7 @@
     </message>
     <message>
       <source>Connect to Server...</source>
-      <translation type="unfinished">Connect to Server...</translation>
+      <translation>Verbinden met server...</translation>
     </message>
   </context>
 </TS>
