@@ -2,14 +2,16 @@
 {% load i18n admin_urls admin_static %}
 
 {% block content %}
-	<h1>Revisions for Version {{version_number}}</h1>
-	<form action="{% url 'review_page' %}" method="post">
+	<h1>Revisions for Version {{version.id}}</h1>
+	{% if not version.accepted_date %}
+	<form action="{% url 'review_page_actions' %}" method="post">
 		{% csrf_token %}
 		<div class="submit-row">
 	        <button class="button" type="submit" name="Preview">Preview</button>
 	        <button class="button" type="submit" name="Publish">Publish</button>
     	</div>
 	</form>
+	{% endif %}
 	<div class="content-main">
 		<div class="module">
 			<div class="results">

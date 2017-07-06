@@ -1,5 +1,6 @@
 from __future__ import unicode_literals
 from django.contrib import admin
+from django.urls import reverse
 from django.utils.html import format_html
 from models import *
 
@@ -15,8 +16,8 @@ class ContextAdmin(admin.ModelAdmin):
     list_display = ('product', 'name', 'description', 'url', 'translatable', 'context_actions')
 
     def context_actions(self, obj):
-        return format_html('<a class="button" href="/admin/cms/context_editor/{}/">edit content</a>',
-                            obj.id)
+        return format_html('<a class="button" href="{}">edit content</a>',
+                            reverse('context_editor', args=[obj.id]))
 
     context_actions.short_description = 'Admin Options'
     context_actions.allow_tags = True
@@ -52,8 +53,8 @@ class ContentVersionAdmin(admin.ModelAdmin):
                     'content_version_actions')
 
     def content_version_actions(self, obj):
-        return format_html('<a class="button" href="/admin/cms/review_version/{}/">review version</a>',
-                            obj.id)
+        return format_html('<a class="button" href="{}">review version</a>',
+                            reverse('review_version', args=[obj.id]))
 
     content_version_actions.short_description = "Admin Options"
     content_version_actions.allow_tags = True

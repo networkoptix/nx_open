@@ -3,7 +3,7 @@ from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated, AllowAny, IsAdminUser
 from rest_framework.response import Response
 from django.core.exceptions import PermissionDenied
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from cloud import settings
 
 from .controllers.modify_db import *
@@ -62,7 +62,7 @@ def handle_post_context_edit_view(request, context_id, language_id):
 
 	elif 'Preview' in request_data:
 		save_unrevisioned_records(customization, language, context.datastructure_set.all(), request_data, user)
-		preview_link = generate_preview()
+		preview_link = generate_preview(context)
 
 	elif 'Publish' in request.data:
 		publish_latest_version(user)
@@ -71,7 +71,7 @@ def handle_post_context_edit_view(request, context_id, language_id):
 		save_unrevisioned_records(customization, language, context.datastructure_set.all(), request_data, user)
 
 	elif 'SendReview' in request_data:
-		send_version_for_review(customization, language, context.datastructure_set.all(), request_data, user)
+		send_version_for_review(customization, language, context.datastructure_set.all(), context.product, request_data, user)
 
 	form.add_fields(context, language)
 
@@ -83,28 +83,33 @@ def handle_post_context_edit_view(request, context_id, language_id):
 def context_edit_view(request, context=None, language=None):
 	if request.method == "GET":
 		context, form, language = handle_get_view(request, context, language)
-		return render(request, 'context_editor.html', {'context': context, 'form': form, 'language': language})
+		return render(request, 'context_editor.html', {'context': context,
+													   'form': form,
+													   'language': language})
 
 	else:
 		context, form, language, preview_link = handle_post_context_edit_view(request, context, language)
-		return render(request, 'context_editor.html', {'context': context, 'form': form, 'language': language, 'preview_link': preview_link})
+		return render(request, 'context_editor.html', {'context': context,
+													   'form': form,
+													   'language': language,
+													   'preview_link': preview_link})
 
 
 @api_view(["POST"])
-def partner_review_view(request, context=None, language=None):
+def review_version_request(request, context=None, language=None):
 	if "Preview" in request.data:
 		preview_link = generate_preview()
 		return redirect(preview_link)
 	elif "Publish" in request.data:
 		publish_latest_version(request.user)	
-	return response('OK')	
+		
 
 
 @api_view(["GET"])
 def review_version_view(request, version_id=None):
+	version = ContentVersion.objects.get(id=version_id)
+	data_records = version.datarecord_set.all().order_by('data_structure__context__name', 'language__code')
 
-	data_records = ContentVersion.objects.get(id=version_id).datarecord_set.all()\
-											 .order_by('data_structure__context__name', 'language__code')
 	
 	contexts = {}
 	for record in data_records:
@@ -114,4 +119,4 @@ def review_version_view(request, version_id=None):
 		else:
 			contexts[context_name] = [record]
 
-	return render(request, 'review_records.html', {'version_number': version_id, 'contexts': contexts})
+	return render(request, 'review_records.html', {'version': version, 'contexts': contexts})

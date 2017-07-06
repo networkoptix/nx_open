@@ -18,6 +18,7 @@ def get_context_and_language(request_data, context_id, language_id):
 
 	return context, language
 
+
 def accept_latest_draft(user):
 	unaccepted_version = ContentVersion.objects.filter(accepted_date=None).latest('created_date')
 	unaccepted_version.accepted_by = user
@@ -48,15 +49,12 @@ def save_unrevisioned_records(customization, language, data_structures, request_
 		new_record_value = request_data[data_structure_name]
 
 		if latest_unapproved_record.exists():
-			latest_unapproved_record = latest_unapproved_record.latest('created_date')
-			if new_record_value == latest_unapproved_record.value:
+			if new_record_value == latest_unapproved_record.latest('created_date').value:
 			   	continue
-			latest_unapproved_record.delete()
-		
-		elif latest_approved_record:
-			if latest_approved_record.latest('created_date').value == new_record_value:
+		elif latest_approved_record.exists():
+			if new_record_value == latest_approved_record.latest('created_date').value:
 				continue
-		elif not latest_unapproved_record and data_structure.default == new_record_value:
+		elif data_structure.default == new_record_value:
 			continue
 
 		record = DataRecord(data_structure=data_structure,
@@ -67,31 +65,25 @@ def save_unrevisioned_records(customization, language, data_structures, request_
 		record.save()
 
 
-def remove_links_to_old_version(old_version, customization, contexts):
-	for context in contexts:
-		for data_structure in context.datastructure_set.all():
-			for record in data_structure.datarecord_set.filter(customization=customization,
-															   version=old_version):
-				record.version = None
-				record.save()
-
-	old_version.delete()
-
-
 def alter_records_version(contexts, customization, old_version, new_version):
+	languages = Language.objects.all()
 	for context in contexts:
 		for data_structure in context.datastructure_set.all():
 			records = data_structure.datarecord_set.filter(customization=customization,
 														   version=old_version)\
 												   .exclude(created_by=None)
-			for record in records:
-				record.version = new_version
-				record.save()
+			
+			for language in languages:
+				record = records.filter(language=language)
+				if record.exists():
+					record = record.latest('created_date')
+					record.version = new_version
+					record.save()
 
 
-def generate_preview():
+def generate_preview(context=None):
 	fill_content(customization_name=settings.CUSTOMIZATION)
-	return context.url + "?preview"
+	return '/' + context.url + "?preview" if context else "/?preview"
 
 
 def publish_latest_version(user):
@@ -99,12 +91,12 @@ def publish_latest_version(user):
 	fill_content(customization_name=settings.CUSTOMIZATION, preview=False)
 
 
-def send_version_for_review(customization, language, data_structures, request_data, user):
+def send_version_for_review(customization, language, data_structures, product, request_data, user):
 	old_versions = ContentVersion.objects.filter(accepted_date=None)
 
 	if old_versions.exists():
 		old_version = old_versions.latest('created_date')
-		alter_records_version(Context.objects.all(), customization, old_version, None)
+		alter_records_version(Context.objects.filter(product=product), customization, old_version, None)
 		old_version.delete()
 
 	save_unrevisioned_records(customization, language, data_structures, request_data, user)
@@ -112,7 +104,7 @@ def send_version_for_review(customization, language, data_structures, request_da
 	version = ContentVersion(customization=customization, name="N/A", created_by=user)
 	version.save()
 
-	alter_records_version(Context.objects.all(), customization, None, version)
+	alter_records_version(Context.objects.filter(product=product), customization, None, version)
 	#TODO add notification need to make template for this
 	#notify_version_ready()
 
