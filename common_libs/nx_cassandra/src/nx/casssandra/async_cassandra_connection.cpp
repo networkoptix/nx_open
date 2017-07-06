@@ -192,6 +192,9 @@ Query::~Query()
 {
     if (m_statement)
         cass_statement_free(m_statement);
+
+    if (m_prepared)
+        cass_prepared_free(m_prepared);
 }
 
 bool Query::bind(const std::string& key, const std::string& value)
