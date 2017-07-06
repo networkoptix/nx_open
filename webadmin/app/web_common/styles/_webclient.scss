@@ -216,19 +216,17 @@ table.webclient-window>tbody>tr>td{
 
   &>*{
     background: transparent;
-    height: 44px;
+    height: 100%
   }
   .icon-left{
     position: absolute;
     text-align: center;
     line-height: 54px;
-    height: 100%;
     width: 44px;
     float: left;
   }
 
   .icons-right{
-    height: 100%;
     float: right;
     display: inline-block;
     position: relative;
@@ -283,6 +281,7 @@ table.webclient-window>tbody>tr>td{
     outline: none !important;
     font-size: 16px;
     border-bottom: 1px solid $light6;
+    line-height: 44px;
     
     &:hover{
       background-color: $light2;
