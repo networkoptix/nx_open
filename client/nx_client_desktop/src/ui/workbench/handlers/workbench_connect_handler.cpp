@@ -96,6 +96,7 @@ namespace {
 
 static const int kVideowallCloseTimeoutMSec = 10000;
 static const int kMessagesDelayMs = 5000;
+static constexpr int kReconnectDelayMs = 3000;
 
 bool isConnectionToCloud(const QUrl& url)
 {
@@ -758,7 +759,7 @@ void QnWorkbenchConnectHandler::reconnectStep()
             [this]
             {
                 reconnectStep();
-            }, 3000, m_reconnectHelper.data());
+            }, kReconnectDelayMs, m_reconnectHelper.data());
     }
     return;
 }
