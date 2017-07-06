@@ -66,7 +66,7 @@ void BaseHttpAudioTransmitter::setOutputFormat(const QnAudioFormat& format)
     m_outputFormat = format;
 }
 
-void BaseHttpAudioTransmitter::setBitrate(int value)
+void BaseHttpAudioTransmitter::setBitrateKbps(int value)
 {
     QnMutexLocker lock(&m_mutex);
     m_bitrateKbps = value;

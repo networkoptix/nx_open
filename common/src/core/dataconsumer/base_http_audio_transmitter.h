@@ -22,7 +22,7 @@ public:
     BaseHttpAudioTransmitter(QnSecurityCamResource* res);
     virtual ~BaseHttpAudioTransmitter();
     virtual void setOutputFormat(const QnAudioFormat& format) override;
-    virtual void setBitrate(int value) override;
+    virtual void setBitrateKbps(int value) override;
     virtual void setAudioUploadHttpMethod(nx_http::StringType method);
     virtual bool isInitialized() const override;
     virtual void prepare() override;

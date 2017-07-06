@@ -42,7 +42,7 @@ public:
     /**
      * Set output bitrate. Optional. If not set default bitrate will be used.
      */
-    virtual void setBitrate(int value) {}
+    virtual void setBitrateKbps(int /*value*/) {}
 
     /**
      * Returns true if transmitter is ready to use

@@ -50,6 +50,7 @@
 
 #include <plugins/utils/multisensor_data_provider.h>
 #include <core/resource_management/resource_properties.h>
+#include <core/dataconsumer/basic_audio_transmitter.h>
 
 //!assumes that camera can only work in bistable mode (true for some (or all?) DW cameras)
 #define SIMULATE_RELAY_PORT_MOMOSTABLE_MODE
@@ -755,7 +756,7 @@ CameraDiagnostics::Result QnPlOnvifResource::initInternal()
 
     m_portNamePrefixToIgnore = resourceData.value<QString>(QString("portNamePrefixToIgnore"), QString());
 
-    if (initialize2WayAudio())
+    if (initializeTwoWayAudio())
         setCameraCapabilities(getCameraCapabilities() | Qn::AudioTransmitCapability);
 
     saveParams();
@@ -4143,7 +4144,7 @@ bool QnPlOnvifResource::isCameraForcedToOnvif(const QString& manufacturer, const
     return false;
 }
 
-bool QnPlOnvifResource::initialize2WayAudio()
+bool QnPlOnvifResource::initializeTwoWayAudio()
 {
     // TODO: move this function to the PhysicalCamResource class
     const QnResourceData resourceData = qnCommon->dataPool()->data(toSharedPointer(this));
@@ -4158,7 +4159,7 @@ bool QnPlOnvifResource::initialize2WayAudio()
     auto audioTransmitter = new QnBasicAudioTransmitter(this);
     m_audioTransmitter.reset(audioTransmitter);
     m_audioTransmitter->setOutputFormat(format);
-    m_audioTransmitter->setBitrate(params.bitrateKbps * 1000);
+    m_audioTransmitter->setBitrateKbps(params.bitrateKbps * 1000);
     audioTransmitter->setContentType(params.contentType.toUtf8());
 
     QUrl url(getUrl());

@@ -25,7 +25,6 @@
 #include <nx/network/simple_http_client.h>
 #include "nx/streaming/media_data_packet.h"
 #include "soap_wrapper.h"
-#include "basic_audio_transmitter.h"
 
 class onvifXsd__AudioEncoderConfigurationOption;
 class onvifXsd__VideoSourceConfigurationOptions;
@@ -564,7 +563,7 @@ private:
     void fillFullUrlInfo( const CapabilitiesResp& response );
     CameraDiagnostics::Result getVideoEncoderTokens(MediaSoapWrapper& soapWrapper, QStringList* result, VideoConfigsResp *confResponse);
     QString getInputPortNumberFromString(const QString& portName);
-    bool initialize2WayAudio();
+    bool initializeTwoWayAudio();
 
     mutable QnMutex m_physicalParamsMutex;
     std::unique_ptr<QnOnvifImagingProxy> m_imagingParamsProxy;

@@ -59,7 +59,7 @@ nx_http::StringType QnBasicAudioTransmitter::contentType() const
     if (!m_contentType.isNull())
         return m_contentType;
 
-    if (m_outputFormat.codec() == "MULAW")
+    if (m_outputFormat.codec() == lit("MULAW"))
     {
         if (m_outputFormat.sampleRate() == 8000)
             return QByteArray("audio/basic");
@@ -68,11 +68,11 @@ nx_http::StringType QnBasicAudioTransmitter::contentType() const
             .arg((m_outputFormat.sampleRate() * 8) / 1000)
             .toLatin1();
     }
-    else if (m_outputFormat.codec() == "G726")
+    else if (m_outputFormat.codec() == lit("G726"))
     {
         return QByteArray("audio/G726-32");
     }
-    else if (m_outputFormat.codec() == "AAC")
+    else if (m_outputFormat.codec() == lit("AAC"))
     {
         return QByteArray("audio/mpeg4-generic");
     }
