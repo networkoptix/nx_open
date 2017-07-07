@@ -190,6 +190,7 @@ namespace detail
         void setTimeSyncManager(TimeSynchronizationManager* timeSyncManager);
         QnTransactionLog* transactionLog() const;
         virtual bool tuneDBAfterOpen(QSqlDatabase* const sqlDb) override;
+        ec2::database::api::QueryCache::Pool* queryCachePool();
 
     signals:
         //!Emitted after \a QnDbManager::init was successfully executed
@@ -692,7 +693,6 @@ namespace detail
         bool resyncIfNeeded(ResyncFlags flags);
 
         QString getDatabaseName(const QString& baseName);
-        void resetPreparedStatements();
 
     private:
         QnUuid m_storageTypeId;
@@ -720,12 +720,11 @@ namespace detail
         QnTransactionLog* m_tranLog;
         TimeSynchronizationManager* m_timeSyncManager;
 
+        ec2::database::api::QueryCache::Pool m_queryCachePool;
         ec2::database::api::QueryCache m_insertCameraQuery;
         ec2::database::api::QueryCache m_insertCameraUserAttrQuery;
         ec2::database::api::QueryCache m_insertCameraScheduleQuery;
         ec2::database::api::QueryCache m_insertKvPairQuery;
-
-        // TODO: #mshevchenko: Move to pimpl, remove include.
         ec2::database::api::QueryContext m_resourceQueries;
     };
 

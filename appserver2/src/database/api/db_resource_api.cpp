@@ -13,6 +13,51 @@ namespace ec2 {
 namespace database {
 namespace api {
 
+void QueryCache::Pool::reset()
+{
+    for (const auto& c: m_caches)
+        c->m_query.reset();
+}
+
+QueryCache::QueryCache(Pool* pool):
+    m_pool(pool)
+{
+    m_pool->m_caches.insert(this);
+}
+
+QueryCache::~QueryCache()
+{
+    m_pool->m_caches.erase(this);
+}
+
+static void finish(QSqlQuery* q)
+{
+    q->finish();
+}
+
+QueryCache::Guard::Guard(QSqlQuery* q):
+    std::unique_ptr<QSqlQuery, void(*)(QSqlQuery*)>(q, &finish)
+{
+}
+
+QueryCache::Guard QueryCache::get(const QSqlDatabase& db, const char* query)
+{
+    return get(db, [&](QSqlQuery* q) { q->prepare(query); return true; });
+}
+
+QueryContext::QueryContext(const QSqlDatabase& database, QueryCache::Pool* cachePool):
+    m_database(database),
+    m_getId(cachePool),
+    m_insert(cachePool),
+    m_update(cachePool)
+{
+}
+
+const QSqlDatabase& QueryContext::database() const
+{
+    return m_database;
+}
+
 qint32 getResourceInternalId(
     QueryContext* context,
     const QnUuid& guid)

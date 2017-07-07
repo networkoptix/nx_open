@@ -6,21 +6,33 @@
 #include <nx_ec/data/api_fwd.h>
 
 #include <memory>
+#include <set>
 
 namespace ec2 {
 namespace database {
 namespace api {
 
+// TODO: Move out somewhere.
 class QueryCache
 {
 public:
+    class Pool
+    {
+    public:
+        void reset();
+
+    private:
+        friend class QueryCache;
+        std::set<QueryCache*> m_caches;
+    };
+
+    QueryCache(Pool* pool);
+    ~QueryCache();
+
     class Guard: public std::unique_ptr<QSqlQuery, void(*)(QSqlQuery*)>
     {
-        static void finish(QSqlQuery* q) { q->finish(); }
-
     public:
-        Guard(QSqlQuery* q = nullptr):
-            std::unique_ptr<QSqlQuery, void(*)(QSqlQuery*)>(q, &finish) {}
+        Guard(QSqlQuery* q = nullptr);
     };
 
     template<typename Init>
@@ -36,22 +48,18 @@ public:
         return Guard(m_query.get());
     }
 
-    Guard get(const QSqlDatabase& db, const char* query)
-    {
-        return get(db, [&](QSqlQuery* q) { q->prepare(query); return true; });
-    }
-
-    void reset() { m_query.reset(); }
+    Guard get(const QSqlDatabase& db, const char* query);
 
 private:
+    Pool* m_pool;
     std::unique_ptr<QSqlQuery> m_query;
 };
 
 class QueryContext
 {
 public:
-    QueryContext(const QSqlDatabase& database): m_database(database) {}
-    const QSqlDatabase& database() { return m_database; }
+    QueryContext(const QSqlDatabase& database, QueryCache::Pool* cachePool);
+    const QSqlDatabase& database() const;
 
     template<typename Init>
     QueryCache::Guard getId(const Init& init) { return m_getId.get(m_database, init); }
@@ -62,18 +70,11 @@ public:
     template<typename Init>
     QueryCache::Guard update(const Init& init) { return m_update.get(m_database, init); }
 
-    void reset()
-    {
-        m_getId.reset();
-        m_insert.reset();
-        m_update.reset();
-    }
-
 private:
+    const QSqlDatabase& m_database;
     QueryCache m_getId;
     QueryCache m_insert;
     QueryCache m_update;
-    const QSqlDatabase& m_database;
 };
 
 // TODO: Those functions should probably be united in a class.

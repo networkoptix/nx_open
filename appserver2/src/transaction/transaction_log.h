@@ -114,7 +114,7 @@ namespace ec2
             const QnAbstractTransaction &tranID,
             const QnUuid &hash,
             const QByteArray &data);
-        void resetPreparedStatements();
+
     private:
         friend class detail::QnDbManager;
         ErrorCode updateSequenceNoLock(const QnUuid& peerID, const QnUuid& dbID, int sequence);

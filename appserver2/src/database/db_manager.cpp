@@ -256,7 +256,11 @@ QnDbManager::QnDbManager(QnCommonModule* commonModule):
     m_resyncFlags(),
     m_tranLog(nullptr),
     m_timeSyncManager(nullptr),
-    m_resourceQueries(m_sdb)
+    m_insertCameraQuery(&m_queryCachePool),
+    m_insertCameraUserAttrQuery(&m_queryCachePool),
+    m_insertCameraScheduleQuery(&m_queryCachePool),
+    m_insertKvPairQuery(&m_queryCachePool),
+    m_resourceQueries(m_sdb, &m_queryCachePool)
 {
 }
 
@@ -699,7 +703,8 @@ bool QnDbManager::init(const QUrl& dbUrl)
         if (!locker.commit())
             return false;
     } // end of DB update
-    resetPreparedStatements();
+
+    m_queryCachePool.reset();
     if (!execSQLScript("vacuum;", m_sdb))
         qWarning() << "failed to vacuum ecs database" << Q_FUNC_INFO;
 
@@ -4069,18 +4074,14 @@ bool QnDbManager::tuneDBAfterOpen(QSqlDatabase* const sqlDb)
 {
     if (!QnDbHelper::tuneDBAfterOpen(sqlDb))
         return false;
-    m_tranLog->resetPreparedStatements();
-    resetPreparedStatements();
+
+    m_queryCachePool.reset();
     return true;
 }
 
-void QnDbManager::resetPreparedStatements()
+ec2::database::api::QueryCache::Pool* QnDbManager::queryCachePool()
 {
-    m_resourceQueries.reset();
-    m_insertCameraQuery.reset();
-    m_insertCameraUserAttrQuery.reset();
-    m_insertCameraScheduleQuery.reset();
-    m_insertKvPairQuery.reset();
+    return &m_queryCachePool;
 }
 
 // TODO: Change to a function. ATTENTION: Macro contains "return".

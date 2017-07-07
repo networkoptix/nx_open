@@ -22,7 +22,9 @@ QnTransactionLog::QnTransactionLog(
     QnUbjsonTransactionSerializer* tranSerializer)
 :
     m_dbManager(db),
-    m_tranSerializer(tranSerializer)
+    m_tranSerializer(tranSerializer),
+    m_insertTransactionQuery(db->queryCachePool()),
+    m_updateSequenceQuery(db->queryCachePool())
 {
     m_lastTimestamp = Timestamp::fromInteger(0);
     m_baseTime = 0;
@@ -283,12 +285,6 @@ ErrorCode QnTransactionLog::updateSequenceNoLock(const QnUuid& peerID, const QnU
 
     m_commitData.state.values[key] = sequence;
     return ErrorCode::ok;
-}
-
-void QnTransactionLog::resetPreparedStatements()
-{
-    m_insertTransactionQuery.reset();
-    m_updateSequenceQuery.reset();
 }
 
 ErrorCode QnTransactionLog::saveToDB(
