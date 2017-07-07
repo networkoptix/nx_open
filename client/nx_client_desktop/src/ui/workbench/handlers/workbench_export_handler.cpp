@@ -35,7 +35,7 @@
 #include <ui/dialogs/common/file_messages.h>
 #include <ui/dialogs/common/progress_dialog.h>
 #include <ui/dialogs/common/session_aware_dialog.h>
-#include <ui/dialogs/export_timelapse_dialog.h>
+#include <nx/client/desktop/ui/dialogs/rapid_review_dialog.h>
 #include <ui/graphics/items/resource/media_resource_widget.h>
 #include <ui/workbench/workbench.h>
 #include <ui/workbench/workbench_layout.h>
@@ -130,9 +130,12 @@ QnWorkbenchExportHandler::QnWorkbenchExportHandler(QObject *parent):
     base_type(parent),
     QnWorkbenchContextAware(parent)
 {
-    connect(action(action::ExportTimeSelectionAction), &QAction::triggered, this, &QnWorkbenchExportHandler::at_exportTimeSelectionAction_triggered);
-    connect(action(action::ExportLayoutAction), &QAction::triggered, this, &QnWorkbenchExportHandler::at_exportLayoutAction_triggered);
-    connect(action(action::ExportTimelapseAction), &QAction::triggered, this, &QnWorkbenchExportHandler::at_exportTimelapseAction_triggered);
+    connect(action(action::ExportTimeSelectionAction), &QAction::triggered, this,
+        &QnWorkbenchExportHandler::at_exportTimeSelectionAction_triggered);
+    connect(action(action::ExportLayoutAction), &QAction::triggered, this,
+        &QnWorkbenchExportHandler::at_exportLayoutAction_triggered);
+    connect(action(action::ExportRapidReviewAction), &QAction::triggered, this,
+        &QnWorkbenchExportHandler::at_exportRapidReviewAction_triggered);
 }
 
 QString QnWorkbenchExportHandler::binaryFilterName() const
@@ -270,7 +273,7 @@ void QnWorkbenchExportHandler::exportTimeSelectionInternal(
 
 
     bool wasLoggedIn = !context()->user().isNull();
-    static const qint64 kTimelapseBaseFrameStepMs = 1000 / QnExportTimelapseDialog::kResultFps;
+    static const qint64 kTimelapseBaseFrameStepMs = 1000 /  dialogs::ExportRapidReview::kResultFps;
     qint64 exportSpeed = qMax(1ll, timelapseFrameStepMs / kTimelapseBaseFrameStepMs);
     // TODO: #Elric implement more precise estimation
     if (durationMs / exportSpeed > maxRecordingDurationMsec && timelapseFrameStepMs == 0)
@@ -888,8 +891,7 @@ void QnWorkbenchExportHandler::at_exportLayoutAction_triggered()
     doAskNameAndExportLocalLayout(exportPeriod, layout, Qn::LayoutExport);
 }
 
-
-void QnWorkbenchExportHandler::at_exportTimelapseAction_triggered()
+void QnWorkbenchExportHandler::at_exportRapidReviewAction_triggered()
 {
     const auto parameters = menu()->currentParameters(sender());
     QnTimePeriod period = parameters.argument<QnTimePeriod>(Qn::TimePeriodRole);
@@ -905,7 +907,7 @@ void QnWorkbenchExportHandler::at_exportTimelapseAction_triggered()
         Q_ASSERT_X(durationMs > 0, Q_FUNC_INFO, "Intersected periods must not be empty or infinite");
     }
 
-    if (durationMs < QnExportTimelapseDialog::kMinimalSourcePeriodLength)
+    if (durationMs < dialogs::ExportRapidReview::kMinimalSourcePeriodLength)
     {
         QnMessageBox::warning(mainWindow(),
             tr("Too short period selected"),
@@ -913,9 +915,8 @@ void QnWorkbenchExportHandler::at_exportTimelapseAction_triggered()
         return;
     }
 
-    QScopedPointer<QnExportTimelapseDialog> dialog(new QnExportTimelapseDialog(mainWindow()));
+    auto dialog = std::make_unique<dialogs::ExportRapidReview>(mainWindow());
     dialog->setWindowModality(Qt::ApplicationModal);
-
     dialog->setSourcePeriodLengthMs(durationMs);
     int speed = qnSettings->timelapseSpeed();
     if (speed > 0)

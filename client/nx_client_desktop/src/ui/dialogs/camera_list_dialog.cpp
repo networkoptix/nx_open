@@ -157,7 +157,7 @@ void QnCameraListDialog::updateWindowTitle() {
     setWindowTitle(title);
 
     ui->camerasView->horizontalHeader()->resizeSections(QHeaderView::ResizeToContents);
-    resize({ sizeHint().width(), height() });
+    resize({ sizeHint().width(), height() }); //TODO: #vkutin foo-foo
 }
 
 void QnCameraListDialog::updateCriterion()
