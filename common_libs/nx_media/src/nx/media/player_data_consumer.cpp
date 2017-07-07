@@ -498,12 +498,13 @@ qint64 PlayerDataConsumer::getExternalTime() const
 void PlayerDataConsumer::setAudioEnabled(bool value)
 {
     m_audioEnabled = value;
-    if (auto audio = audioOutput())
+    QnMutexLocker lock(&m_decoderMutex);
+    if (m_audioOutput)
     {
         if (!value)
-            audio->suspend();
-        else if (!audio->isBuffering())
-            audio->resume();
+            m_audioOutput->suspend();
+        else if (!m_audioOutput->isBuffering())
+            m_audioOutput->resume();
     }
 }
 
