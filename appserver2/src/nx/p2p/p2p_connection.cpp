@@ -116,7 +116,7 @@ Connection::~Connection()
     waitToStop.get_future().wait();
 }
 
-QUrl Connection::remoteUrl() const
+QUrl Connection::remoteAddr() const
 {
     if (m_direction == Direction::outgoing)
         return m_remotePeerUrl;
@@ -277,6 +277,14 @@ void Connection::onHttpClientDone()
         setState(State::Error);
         m_httpClient.reset();
         return;
+    }
+
+    //saving credentials we used to authorize request
+    if (m_httpClient->request().headers.find(nx_http::header::Authorization::NAME) !=
+        m_httpClient->request().headers.end())
+    {
+        QnMutexLocker lock(&m_mutex);
+        m_httpAuthCacheItem = m_httpClient->authCacheItem();
     }
 
     auto socket = m_httpClient->takeSocket();
@@ -445,6 +453,12 @@ bool Connection::handleMessage(const nx::Buffer& message)
     emit gotMessage(weakPointer(), messageType, message.mid(offset + 1));
 
     return true;
+}
+
+nx_http::AuthInfoCache::AuthorizationCacheItem Connection::authData() const
+{
+    QnMutexLocker lock(&m_mutex);
+    return m_httpAuthCacheItem;
 }
 
 QObject* Connection::opaqueObject()

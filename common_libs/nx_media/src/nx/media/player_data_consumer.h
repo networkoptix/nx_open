@@ -84,6 +84,7 @@ public:
 
     /** Turn on / off audio. It allowed to call from other thread. */
     void setAudioEnabled(bool value);
+    bool isAudioEnabled() const;
 signals:
     /** Hint to render to display current data with no delay due to seek operation in progress. */
     void hurryUp();
@@ -179,6 +180,7 @@ private:
     MultiSensorHelper m_awaitingFramesMask;
     int m_emptyPacketCounter;
     std::atomic<bool> m_audioEnabled;
+    std::atomic_bool m_needResetAudio = false;
 };
 
 } // namespace media

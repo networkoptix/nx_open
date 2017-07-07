@@ -5,7 +5,7 @@
 #include <QtSql/QSqlError>
 
 #include "common/common_module.h"
-#include "database/db_manager.h"
+#include <database/db_manager.h>
 #include "transaction.h"
 #include "transaction/ubjson_transaction_serializer.h"
 #include <nx/utils/log/log.h>
@@ -22,7 +22,9 @@ QnTransactionLog::QnTransactionLog(
     QnUbjsonTransactionSerializer* tranSerializer)
 :
     m_dbManager(db),
-    m_tranSerializer(tranSerializer)
+    m_tranSerializer(tranSerializer),
+    m_insertTransactionQuery(db->queryCachePool()),
+    m_updateSequenceQuery(db->queryCachePool())
 {
     m_lastTimestamp = Timestamp::fromInteger(0);
     m_baseTime = 0;
@@ -268,28 +270,21 @@ ErrorCode QnTransactionLog::updateSequenceNoLock(const QnUuid& peerID, const QnU
             .arg(qnStaticCommon->moduleDisplayName(peerID)));
     }
 
-    if (!m_updateSequenceQuery)
+    const auto query = m_updateSequenceQuery.get(m_dbManager->getDB(),
+        "INSERT OR REPLACE INTO transaction_sequence values (?, ?, ?)");
+
+    query->addBindValue(peerID.toRfc4122());
+    query->addBindValue(dbID.toRfc4122());
+    query->addBindValue(sequence);
+
+    if (!query->exec())
     {
-        m_updateSequenceQuery.reset(new QSqlQuery(m_dbManager->getDB()));
-        //query.prepare("INSERT OR REPLACE INTO transaction_sequence (peer_guid, db_guid, sequence) values (?, ?, ?)");
-        m_updateSequenceQuery->prepare("INSERT OR REPLACE INTO transaction_sequence values (?, ?, ?)");
-    }
-    m_updateSequenceQuery->addBindValue(peerID.toRfc4122());
-    m_updateSequenceQuery->addBindValue(dbID.toRfc4122());
-    m_updateSequenceQuery->addBindValue(sequence);
-    if (!m_updateSequenceQuery->exec())
-    {
-        qWarning() << Q_FUNC_INFO << m_updateSequenceQuery->lastError().text();
+        qWarning() << Q_FUNC_INFO << query->lastError().text();
         return ErrorCode::failure;
     }
+
     m_commitData.state.values[key] = sequence;
     return ErrorCode::ok;
-}
-
-void QnTransactionLog::resetPreparedStatements()
-{
-    m_insTranQuery.reset();
-    m_updateSequenceQuery.reset();
 }
 
 ErrorCode QnTransactionLog::saveToDB(
@@ -308,30 +303,28 @@ ErrorCode QnTransactionLog::saveToDB(
     if (tran.peerID == m_dbManager->commonModule()->moduleGUID() && tran.persistentInfo.dbID == m_dbManager->getID())
         NX_ASSERT(tran.persistentInfo.timestamp > 0);
 
-    if (!m_insTranQuery)
-    {
-        m_insTranQuery.reset(new QSqlQuery(m_dbManager->getDB()));
-        m_insTranQuery->prepare(
-            R"sql(
-            INSERT OR REPLACE INTO transaction_log(peer_guid, db_guid, sequence, timestamp_hi, timestamp, tran_guid, tran_data, tran_type)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-            )sql");
-    }
+    const auto query = m_insertTransactionQuery.get(m_dbManager->getDB(), R"sql(
+        INSERT OR REPLACE INTO transaction_log(
+            peer_guid, db_guid, sequence, timestamp_hi, timestamp, tran_guid, tran_data, tran_type
+        ) VALUES (
+            ?, ?, ?, ?, ?, ?, ?, ?
+        ))sql");
 
+    query->addBindValue(tran.peerID.toRfc4122());
+    query->addBindValue(tran.persistentInfo.dbID.toRfc4122());
+    query->addBindValue(tran.persistentInfo.sequence);
+    query->addBindValue(tran.persistentInfo.timestamp.sequence);
+    query->addBindValue(tran.persistentInfo.timestamp.ticks);
+    query->addBindValue(hash.toRfc4122());
+    query->addBindValue(data);
+    query->addBindValue(tran.transactionType);
 
-    m_insTranQuery->addBindValue(tran.peerID.toRfc4122());
-    m_insTranQuery->addBindValue(tran.persistentInfo.dbID.toRfc4122());
-    m_insTranQuery->addBindValue(tran.persistentInfo.sequence);
-    m_insTranQuery->addBindValue(tran.persistentInfo.timestamp.sequence);
-    m_insTranQuery->addBindValue(tran.persistentInfo.timestamp.ticks);
-    m_insTranQuery->addBindValue(hash.toRfc4122());
-    m_insTranQuery->addBindValue(data);
-    m_insTranQuery->addBindValue(tran.transactionType);
-    if (!m_insTranQuery->exec())
+    if (!query->exec())
     {
-        qWarning() << Q_FUNC_INFO << m_insTranQuery->lastError().text();
+        qWarning() << Q_FUNC_INFO << query->lastError().text();
         return ErrorCode::failure;
     }
+
     #ifdef TRANSACTION_LOG_DEBUG
         qDebug() << "add record to transaction log. Transaction=" << toString(tran.command) << "timestamp=" << tran.timestamp << "producedOnCurrentPeer=" << (tran.peerID == commonModule()->moduleGUID());
     #endif

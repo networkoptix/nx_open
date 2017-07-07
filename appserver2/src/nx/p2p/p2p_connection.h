@@ -76,6 +76,8 @@ public:
 
     virtual const ApiPeerData& localPeer() const override { return m_localPeer; }
     virtual const ApiPeerData& remotePeer() const override { return m_remotePeer; }
+    virtual bool isIncoming() const override { return m_direction == Direction::incoming;  }
+    virtual nx_http::AuthInfoCache::AuthorizationCacheItem authData() const override;
 
     State state() const;
     void setState(State state);
@@ -89,7 +91,7 @@ public:
     QObject* opaqueObject();
 
     const Qn::UserAccessData& userAccessData() const { return m_userAccessData; }
-    QUrl remoteUrl() const;
+    virtual QUrl remoteAddr() const override;
 signals:
     void gotMessage(QWeakPointer<Connection> connection, nx::p2p::MessageType messageType, const QByteArray& payload);
     void stateChanged(QWeakPointer<Connection> connection, Connection::State state);
@@ -141,6 +143,9 @@ private:
 
     int m_sendSequence = 0;
     int m_lastReceivedSequence = 0;
+
+    nx_http::AuthInfoCache::AuthorizationCacheItem m_httpAuthCacheItem;
+    mutable QnMutex m_mutex;
 };
 
 QString toString(Connection::State value);

@@ -7,7 +7,7 @@
 #include "nx_ec/data/api_conversion_functions.h"
 #include "transaction/transaction_message_bus.h"
 #include "connection_factory.h"
-#include "database/db_manager.h"
+#include <database/db_manager.h>
 
 namespace ec2
 {

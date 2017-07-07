@@ -65,8 +65,8 @@ bool nx::utils::db::SqlQueryExecutionHelper::execSQLQuery(QSqlQuery *query, cons
     {
         auto error = query->lastError();
         NX_ASSERT(error.type() != QSqlError::StatementError,
-            error.text() + lit(":\n") + query->lastQuery());
-        NX_LOG(lit("%1 %2").arg(QLatin1String(details)).arg(error.text()), cl_logERROR);
+            lm("Unable to execute SQL query in %1: %2\n%3")
+                .args(details, error.text(), query->lastQuery()));
 
         return false;
     }
@@ -77,8 +77,8 @@ bool nx::utils::db::SqlQueryExecutionHelper::prepareSQLQuery(QSqlQuery *query, c
 {
     if (!query->prepare(queryStr))
     {
-        NX_LOG(lit("%1 %2").arg(QLatin1String(details)).arg(query->lastError().text()), cl_logERROR);
-        NX_ASSERT(false, details, "Unable to prepare SQL query");
+        NX_ASSERT(false, lm("Unable to prepare SQL query in %1: %2\n%3")
+            .args(details, query->lastError().text(), queryStr));
         return false;
     }
     return true;

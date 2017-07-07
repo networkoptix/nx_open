@@ -1,9 +1,10 @@
 #pragma once
 
-#include <nx_ec/ec_api.h>
-#include <nx_ec/data/api_discovery_data.h>
-#include <transaction/transaction.h>
 #include <common/common_module_aware.h>
+#include <nx_ec/data/api_discovery_data.h>
+#include <nx_ec/ec_api.h>
+#include <nx/vms/discovery/manager.h>
+#include <transaction/transaction.h>
 
 namespace ec2
 {
@@ -34,8 +35,6 @@ namespace ec2
             const Qn::UserAccessData &userAccessData);
         virtual ~QnDiscoveryManager();
 
-        virtual void monitorServerDiscovery() override;
-
     protected:
         virtual int discoverPeer(const QnUuid &id, const QUrl &url, impl::SimpleHandlerPtr handler) override;
         virtual int addDiscoveryInformation(const QnUuid &id, const QUrl &url, bool ignore, impl::SimpleHandlerPtr handler) override;
@@ -45,6 +44,26 @@ namespace ec2
     private:
         QueryProcessorType* const m_queryProcessor;
         Qn::UserAccessData m_userAccessData;
+    };
+
+    // TODO: Could probably be moved to mediaserver, as it is used only there.
+    class QnDiscoveryMonitor: public QObject, public QnCommonModuleAware
+    {
+    public:
+        QnDiscoveryMonitor(QnTransactionMessageBusBase* messageBus);
+        virtual ~QnDiscoveryMonitor();
+
+    private:
+        void clientFound(QnUuid peerId, Qn::PeerType peerType);
+        void serverFound(nx::vms::discovery::ModuleEndpoint module);
+        void serverLost(QnUuid id);
+
+        template<typename Transaction, typename Target>
+        void send(ApiCommand::Value command, Transaction data, const Target& target);
+
+    private:
+        QnTransactionMessageBusBase* m_messageBus;
+        std::map<QnUuid, ApiDiscoveredServerData> m_serverCache;
     };
 
 } // namespace ec2
