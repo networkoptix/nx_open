@@ -47,6 +47,7 @@ private:
         void addEndpoints(std::set<SocketAddress> endpoints);
         void ensureConnection();
         void setForbiddenEndpoints(std::set<SocketAddress> endpoints);
+        QString pointerId() const;
 
     private:
         enum Priority { kDefault, kLocalHost, kLocalNetwork, kIp, kOther };

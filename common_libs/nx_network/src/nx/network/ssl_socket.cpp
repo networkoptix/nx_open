@@ -1563,6 +1563,12 @@ bool SslSocket::shutdown()
     return d->wrappedSocket->shutdown();
 }
 
+QString SslSocket::pointerId() const
+{
+    Q_D(const SslSocket);
+    return toString(d->wrappedSocket);
+}
+
 void SslSocket::connectAsync(
     const SocketAddress& addr,
     nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode)> handler)

@@ -106,6 +106,8 @@ public:
     static QnUuid physicalIdToId(const QString& uniqId);
     virtual void initializationDone() override;
 
+    virtual QString pointerId() const override;
+
 private:
     //QAuthenticator m_auth;
     bool m_authenticated;

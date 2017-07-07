@@ -83,6 +83,7 @@ public:
     virtual void pleaseStopSync(bool checkForLocks = true) override;
 
     virtual bool isInSelfAioThread() const override;
+    virtual QString pointerId() const override;
 
 private:
     typedef nx::utils::promise<std::pair<SystemError::ErrorCode, size_t>>*

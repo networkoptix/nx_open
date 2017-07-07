@@ -40,6 +40,8 @@ public:
         nx::Buffer* const buf,
         std::function<void(SystemError::ErrorCode, size_t)> handler) override;
 
+    virtual QString pointerId() const override;
+
 private:
     std::unique_ptr<AbstractStreamSocket> m_socket;
     Buffer m_internalRecvBuffer;

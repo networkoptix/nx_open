@@ -109,12 +109,12 @@ ModuleConnector::Module::Module(ModuleConnector* parent, const QnUuid& id):
     m_id(id),
     m_timer(parent->m_retryPolicy, parent->getAioThread())
 {
-    NX_DEBUG(this, lm("New %1").args(m_id));
+    NX_DEBUG(this) "New";
 }
 
 ModuleConnector::Module::~Module()
 {
-    NX_DEBUG(this, lm("Delete %1").args(m_id));
+    NX_DEBUG(this) "Delete";
     NX_ASSERT(m_timer.isInSelfAioThread());
     m_socket.reset();
     for (const auto& client: m_httpClients)
@@ -159,6 +159,11 @@ void ModuleConnector::Module::setForbiddenEndpoints(std::set<SocketAddress> endp
     NX_VERBOSE(this, lm("Forbid endpoints %1").container(endpoints));
     NX_ASSERT(!m_id.isNull(), "Does not make sense to block endpoints for unknown servers");
     m_forbiddenEndpoints = std::move(endpoints);
+}
+
+QString ModuleConnector::Module::pointerId() const
+{
+    return m_id.toSimpleString();
 }
 
 boost::optional<ModuleConnector::Module::Endpoints::iterator>
@@ -243,7 +248,7 @@ void ModuleConnector::Module::connectToGroup(Endpoints::iterator endpointsGroup)
 void ModuleConnector::Module::connectToEndpoint(
     const SocketAddress& endpoint, Endpoints::iterator endpointsGroup)
 {
-    NX_VERBOSE(this, lm("Attempt to connect to %1 by %2").args(m_id, endpoint));
+    NX_VERBOSE(this, lm("Attempt to connect by %1").arg(endpoint));
     const auto client = nx_http::AsyncHttpClient::create();
     m_httpClients.insert(client);
     client->bindToAioThread(m_timer.getAioThread());
@@ -366,7 +371,7 @@ bool ModuleConnector::Module::saveConnection(
         });
 
     auto ip = m_socket->getForeignAddress().address;
-    NX_VERBOSE(this, lm("Connected to %1 by %2 ip %3").args(m_id, endpoint, ip));
+    NX_VERBOSE(this, lm("Connected by %1 (ip %2)").args(endpoint, ip));
     m_parent->m_connectedHandler(information, std::move(endpoint), std::move(ip));
     m_timer.reset();
     return true;

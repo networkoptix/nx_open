@@ -357,6 +357,11 @@ bool CloudStreamSocket::isInSelfAioThread() const
     return m_aioThreadBinder.isInSelfAioThread();
 }
 
+QString CloudStreamSocket::pointerId() const
+{
+    return toString(m_socketDelegate.get());
+}
+
 void CloudStreamSocket::connectToEntriesAsync(
     std::deque<AddressEntry> dnsEntries,
     int port,

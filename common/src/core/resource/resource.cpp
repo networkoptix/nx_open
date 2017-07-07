@@ -1233,6 +1233,11 @@ QnCommonModule* QnResource::commonModule() const
     return nullptr;
 }
 
+QString QnResource::pointerId() const
+{
+    return getId().toSimpleString();
+}
+
 bool QnResource::saveParams()
 {
     return commonModule()->propertyDictionary()->saveParams(getId());

@@ -341,6 +341,8 @@ public:
     virtual void pleaseStop(nx::utils::MoveOnlyFunc<void()> handler) override;
     virtual void pleaseStopSync(bool checkForLocks = true) override;
 
+    virtual QString pointerId() const;
+
 private:
     void readAsyncAtLeastImpl(
         nx::Buffer* const buffer, size_t minimalSize,
@@ -508,6 +510,8 @@ public:
      * NOTE: If called within socket's aio thread, then does not block.
      */
     virtual void cancelIOSync() = 0;
+
+    virtual QString pointerId() const;
 };
 
 static const QString BROADCAST_ADDRESS(QLatin1String("255.255.255.255"));

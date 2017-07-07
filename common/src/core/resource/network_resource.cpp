@@ -336,6 +336,11 @@ void QnNetworkResource::initializationDone()
         setStatus(Qn::Online);
 }
 
+QString QnNetworkResource::pointerId() const
+{
+    return getPhysicalId();
+}
+
 void QnNetworkResource::setAuth(const QString &user, const QString &password)
 {
     QAuthenticator auth;

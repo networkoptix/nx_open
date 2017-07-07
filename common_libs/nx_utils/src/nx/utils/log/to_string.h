@@ -56,19 +56,33 @@ NX_UTILS_API QString toString(const std::chrono::microseconds& value);
 
 NX_UTILS_API QString toString(const std::type_info& value);
 NX_UTILS_API QString demangleTypeName(const char* type);
-NX_UTILS_API QString pointerTypeName(const void* /*p*/);
+NX_UTILS_API QString pointerTypeName(const void* value);
 
 template<typename T>
-QString pointerTypeName(const T* /*p*/)
+QString pointerTypeName(const T* value)
 {
-    return toString(typeid(T));
+    return value ? toString(typeid(*value)) : toString(typeid(T));
+}
+
+template<typename T>
+QString pointerIdSfinae(const T* value, decltype(&T::pointerId))
+{
+    return value ? value->pointerId() : QString();
+}
+
+template<typename T>
+QString pointerIdSfinae(const T* /*value*/, ...)
+{
+    return QString();
 }
 
 template<typename T>
 QString toString(const T* value)
 {
-    return QString(QLatin1String("%1(0x%2)"))
-        .arg(pointerTypeName(value)).arg(reinterpret_cast<qulonglong>(value), 0, 16);
+    const auto pointerId = pointerIdSfinae(value, 0);
+    return QStringLiteral("%1(0x%2%3)")
+        .arg(pointerTypeName(value)).arg(reinterpret_cast<qulonglong>(value), 0, 16)
+        .arg(pointerId.isEmpty() ? QString() : (QStringLiteral(", ") + pointerId));
 }
 
 template<typename T>

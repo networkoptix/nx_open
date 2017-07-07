@@ -115,6 +115,11 @@ void BufferedStreamSocket::readSomeAsync(
         });
 }
 
+QString BufferedStreamSocket::pointerId() const
+{
+    return toString(m_socket);
+}
+
 void BufferedStreamSocket::triggerCatchRecvEvent(SystemError::ErrorCode resultCode)
 {
     post(
