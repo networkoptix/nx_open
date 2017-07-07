@@ -18,9 +18,6 @@ public:
     Qt::Alignment alignment() const;
     void setAlignment(Qt::Alignment alignment);
 
-    bool useHeaderShift() const;
-    void setUseHeaderShift(bool useHeaderShift);
-
     bool useItemViewPaddingWhenVisible() const;
     void setUseItemViewPaddingWhenVisible(bool useItemViewPaddingWhenVisible);
 
