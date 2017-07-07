@@ -7,26 +7,23 @@
 {% endblock %}
 
 {% block content%}
-<h1>{{context.name}} for {{context.product.name}}</h1>
+<h1>{{ context.name }} for {{ context.product.name }}</h1>
 <fieldset>
-    <div>{{context.description}}</div>
-    {% if context.translatable %}
-    <div>Page can be translated</div>
-    {% endif %}
+    <div>{{ context.description }}</div>
     {% if context.url %}
-    <div> Link to Page: {{context.url}}</div>
+    <div> Link to Page: {{ context.url }}</div>
     {% endif %}
 </fieldset>
 <form id="contextForm" action="{% url 'context_editor' context.id %}" method="post" class="aligned">
-    <input type="hidden" name="currentLanguage" value="{{language.id}}">
+    <input type="hidden" name="currentLanguage" value="{{ language.id }}">
     <input type="hidden" id="languageChanged">
     {% csrf_token %}
     {% for field in form %}
         <div class="form-row">
-            {{field.label_tag}}
-            {{field}}
+            {{ field.label_tag }}
+            {{ field }}
             {% if field.help_text %}
-            <p class="help">{{field.help_text}}</p>
+            <p class="help">{{ field.help_text }}</p>
             {% endif %}
         </div>
     {% endfor %}
@@ -45,11 +42,13 @@
 {% endif %}
 <script>
     function openPreview(){
-        window.open("{{preview_link}}");
+        window.open("{{ preview_link }}");
     }
 
     function languageChanged(){
-        document.getElementById('languageChanged').name = "languageChanged";
+        if(confirm('Do you want to save changes?')){
+            document.getElementById('languageChanged').name = "languageChanged";
+        }
         document.getElementById('contextForm').submit();
     }
 

@@ -101,3 +101,15 @@ def send_version_for_review(customization, language, data_structures, product, r
 	#TODO add notification need to make template for this
 	#notify_version_ready()
 
+def get_records_for_version(version):
+	data_records = version.datarecord_set.all().order_by('data_structure__context__name',
+														 'language__code')
+	contexts = {}
+
+	for record in data_records:
+		context_name = record.data_structure.context.name
+		if  context_name in contexts:
+			contexts[context_name].append(record)
+		else:
+			contexts[context_name] = [record]
+	return contexts

@@ -2,14 +2,21 @@ from __future__ import absolute_import
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated, AllowAny, IsAdminUser
 from rest_framework.response import Response
+
+from django.contrib import messages
 from django.core.exceptions import PermissionDenied
 from django.shortcuts import render, redirect
+from django.urls import reverse
+
 from cloud import settings
 
 from .controllers.modify_db import *
 from .forms import *
 
-from django.views.generic.list import ListView
+from django.contrib.admin import AdminSite
+class MyAdminSite(AdminSite):
+            pass
+mysite = MyAdminSite()
 
 def get_post_parameters(request, context_id, language_id):
 	context, language = get_context_and_language(request.data, context_id, language_id)
@@ -59,19 +66,21 @@ def handle_post_context_edit_view(request, context_id, language_id):
 		if 'currentLanguage' in request_data and request_data['currentLanguage']:
 			last_language = Language.objects.get(id=request_data['currentLanguage'])
 			save_unrevisioned_records(customization, last_language, context.datastructure_set.all(), request_data, user)
+		messages.success(request._request, "Changes have been saved.")
 
 	elif 'Preview' in request_data:
 		save_unrevisioned_records(customization, language, context.datastructure_set.all(), request_data, user)
 		preview_link = generate_preview(context)
-
-	elif 'Publish' in request.data:
-		publish_latest_version(user)
+		messages.success(request._request, "Changes have been saved. Preview has been created.")
 
 	elif 'SaveDraft' in request_data:
 		save_unrevisioned_records(customization, language, context.datastructure_set.all(), request_data, user)
+		messages.success(request._request, "Changes have been saved.")
 
 	elif 'SendReview' in request_data:
 		send_version_for_review(customization, language, context.datastructure_set.all(), context.product, request_data, user)
+		messages.success(request._request, "Changes have been saved. A new version has been created.")
+		return None, None, None, None
 
 	form.add_fields(context, language)
 
@@ -85,14 +94,26 @@ def context_edit_view(request, context=None, language=None):
 		context, form, language = handle_get_view(request, context, language)
 		return render(request, 'context_editor.html', {'context': context,
 													   'form': form,
-													   'language': language})
+													   'language': language,
+													   'user': request.user,
+													   'has_permission': mysite.has_permission(request),
+													   'site_url': mysite.site_url,
+													   'title': 'Content Editor'})
 
 	else:
 		context, form, language, preview_link = handle_post_context_edit_view(request, context, language)
+		
+		if 'SendReview' in request.data:
+			return redirect(reverse('review_version', args=[ContentVersion.objects.latest('created_date').id]))
+
 		return render(request, 'context_editor.html', {'context': context,
 													   'form': form,
 													   'language': language,
-													   'preview_link': preview_link})
+													   'preview_link': preview_link,
+													   'user': request.user,
+													   'has_permission': mysite.has_permission(request),
+													   'site_url': mysite.site_url,
+													   'title': 'Content Editor'})
 
 
 @api_view(["POST"])
@@ -102,7 +123,15 @@ def review_version_request(request, context=None, language=None):
 		return redirect(preview_link)
 	elif "Publish" in request.data:
 		publish_latest_version(request.user)
-		return Response("Published")
+		version = ContentVersion.objects.latest('created_date')
+		contexts = get_records_for_version(version)
+		messages.success(request._request, "Version " + version.id +" has been published")
+		return render(request, 'review_records.html', {'version': version.id,
+													   'contexts': contexts,
+													   'user': request.user,
+													   'has_permission': mysite.has_permission(request),
+													   'site_url': mysite.site_url,
+													   'title': 'Review A version'})
 	return Response("Invalid")
 		
 
@@ -110,15 +139,11 @@ def review_version_request(request, context=None, language=None):
 @api_view(["GET"])
 def review_version_view(request, version_id=None):
 	version = ContentVersion.objects.get(id=version_id)
-	data_records = version.datarecord_set.all().order_by('data_structure__context__name', 'language__code')
-
-	
-	contexts = {}
-	for record in data_records:
-		context_name = record.data_structure.context.name
-		if  context_name in contexts:
-			contexts[context_name].append(record)
-		else:
-			contexts[context_name] = [record]
-
-	return render(request, 'review_records.html', {'version': version, 'contexts': contexts})
+	contexts = get_records_for_version(version)
+	return render(request, 'review_records.html', {'version': version,
+												   'contexts': contexts,
+												   'user': request.user,
+												   'has_permission': mysite.has_permission(request),
+												   'site_url': mysite.site_url,
+												   'title': 'Review a Version'
+												   })
