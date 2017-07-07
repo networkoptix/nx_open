@@ -430,7 +430,15 @@ angular.module('nxCommon').controller('ViewCtrl',
                 topAlertHeight = topAlert.outerHeight() + 1; // -1 here is a hack.
             }
 
-            var viewportHeight = (windowHeight - headerHeight - topAlertHeight) + 'px';
+            var viewportHeight = windowHeight - headerHeight - topAlertHeight;
+
+            //If the view port height isnt its full height timeout unil it is
+            //50px is the height of the nav bar in its collapsed state
+            if(viewportHeight  < windowHeight - 50){
+                $timeout(updateHeights,100);
+                return;
+            }
+            viewportHeight = viewportHeight  + 'px';
 
             $camerasPanel.css('height',viewportHeight );
             $viewPanel.css('height',viewportHeight );
