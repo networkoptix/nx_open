@@ -1,4 +1,5 @@
 import os.path
+import datetime
 import argparse
 import yaml
 import re
@@ -18,6 +19,9 @@ TIMEDELTA_REGEXP = re.compile(r'^((?P<days>\d+?)d)?((?P<hours>\d+?)h)?((?P<minut
 
 def timedelta_constructor(loader, node):
     value = loader.construct_scalar(node)
+    return str_to_timedelta(value)
+
+def str_to_timedelta(value):
     match = TIMEDELTA_REGEXP.match(value)
     try:
         if not match: return timedelta(seconds=int(duration_str))
@@ -42,6 +46,22 @@ def timedelta_representer(dumper, data):
 yaml.add_constructor(u'!timedelta', timedelta_constructor)
 yaml.add_representer(timedelta, timedelta_representer)
 yaml.add_implicit_resolver(u'!timedelta', TIMEDELTA_REGEXP)
+
+
+class TestParameter(object):
+
+    @classmethod
+    def from_str(cls, s):
+        name_value = s.split('=')
+        test_param = name_value[0].split('.')
+        if len(name_value) != 2 or len(test_param) != 2:
+            raise argparse.ArgumentTypeError('test-parameter is expected in format "test.param=value": %s' % s)
+        return cls(test_param[0], test_param[1], name_value[1])
+
+    def __init__(self, test_id, parameter, value):
+        self.test_id = test_id
+        self.parameter = parameter
+        self.value = value
 
 
 class TestsConfig(object):
@@ -74,6 +94,11 @@ class TestsConfig(object):
         self.physical_installation_host_list = physical_installation_host_list  # PhysicalInstallationHostConfig list
         self.tests = tests or {}  # dict, full test name -> dict
 
+    def update_with_tests_params(self, test_params):
+        for p in test_params:
+            self.tests.setdefault(p.test_id, {})[p.parameter] = p.value
+        print [(p.test_id, p.parameter, p.value) for p in test_params]
+
     def update(self, other):
         assert isinstance(other, TestsConfig), repr(other)
         self.physical_installation_host_list += other.physical_installation_host_list
@@ -104,7 +129,20 @@ class SingleTestConfig(object):
     def __init__(self, config=None):
         self._config = config or {}  # dict
 
+    # parameters in config file and parameters which do not have defaults in test are ignored
     def with_defaults(self, **kw):
-        return SimpleNamespace(
-            **{name: self._config.get(name.lower(), default_value)
-               for name, default_value in kw.items()})
+        config = {}
+        for name, default_value in kw.items():
+            value = self._config.get(name.lower())
+            if value is not None:
+                config[name] = self._cast_value(value, type(default_value))
+            else:
+                config[name] = default_value
+        return SimpleNamespace(**config)
+
+    def _cast_value(self, value, t):
+        if t is int:
+            return int(value)
+        if t is datetime.timedelta:
+            return str_to_timedelta(value)
+        return value

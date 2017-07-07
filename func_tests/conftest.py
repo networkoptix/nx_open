@@ -9,7 +9,7 @@ import logging
 import pytest
 from netaddr import IPAddress
 from test_utils.utils import SimpleNamespace
-from test_utils.config import TestsConfig, SingleTestConfig
+from test_utils.config import TestParameter, TestsConfig, SingleTestConfig
 from test_utils.artifact import ArtifactFactory
 from test_utils.customization import read_customization_company_name
 from test_utils.host import SshHostConfig
@@ -93,6 +93,8 @@ def pytest_addoption(parser):
                      help='Change log level (%s). Default is %s' % (', '.join(log_levels), log_levels[0]))
     parser.addoption('--tests-config-file', type=TestsConfig.from_yaml_file, nargs='*',
                      help='Configuration file for tests, in yaml format.')
+    parser.addoption('--test-parameter', type=TestParameter.from_str, nargs='*',
+                     help='Configuration parameter for a test, in format: --test-parameter=test.param=value')
 
 
 @pytest.fixture(scope='session')
@@ -108,6 +110,7 @@ def run_options(request):
     bin_dir = request.config.getoption('--bin-dir')
     assert bin_dir, 'Argument --bin-dir is required'
     tests_config = TestsConfig.merge_config_list(request.config.getoption('--tests-config-file'))
+    tests_config.update_with_tests_params(request.config.getoption('--test-parameter'))
     return SimpleNamespace(
         cloud_group=request.config.getoption('--cloud-group'),
         customization=request.config.getoption('--customization'),
