@@ -186,8 +186,11 @@ cp -R ./opt $BUILD_DIR
 cp -Rfv $DEBS_DIR $BUILD_DIR/opt
 
 if [ "${box}" = "bpi" ] && [ ! -z "$WITH_CLIENT" ]; then
-    # Copy ffmpeg 3.0.2 libs.
-    cp -av $LIBS_DIR/ffmpeg $BUILD_DIR/$TARGET_LIB_DIR/
+    # Copy libs of ffmpeg for proxydecoder, if they exist.
+    if [ -d "$LIBS_DIR/ffmpeg" ]; then
+        cp -av "$LIBS_DIR/ffmpeg" "$BUILD_DIR/$TARGET_LIB_DIR/"
+    fi
+    
     # Copy lite_client bin.
     mkdir -p $BUILD_DIR/$PREFIX_DIR/lite_client/bin/
     mkdir -p $DEBUG_DIR/$PREFIX_DIR/lite_client/bin/
@@ -201,6 +204,7 @@ if [ "${box}" = "bpi" ] && [ ! -z "$WITH_CLIENT" ]; then
             $BUILD_DIR/$PREFIX_DIR/lite_client/bin/mobile_client
         $TOOLCHAIN_PREFIX"strip" -g $BUILD_DIR/$PREFIX_DIR/lite_client/bin/mobile_client
     fi
+
     # Create symlink for rpath needed by mediaserver binary.
     ln -s "../lib" "$BUILD_DIR/$PREFIX_DIR/mediaserver/lib"
 
