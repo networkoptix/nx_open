@@ -299,6 +299,11 @@ void QnResourceTreeWidget::setCustomColumnDelegate(QnResourceTreeModelCustomColu
     updateColumns();
 }
 
+void QnResourceTreeWidget::setAutoExpandPolicy(AutoExpandPolicy policy)
+{
+    m_autoExpandPolicy = policy;
+}
+
 void QnResourceTreeWidget::setGraphicsTweaks(Qn::GraphicsTweaksFlags flags)
 {
     if (m_graphicsTweaksFlags == flags)
@@ -434,8 +439,6 @@ void QnResourceTreeWidget::updateFilter()
     }
 
     m_resourceProxyModel->setQuery(filter);
-    if (!filter.isEmpty())
-        ui->resourcesTreeView->expandAll();
 }
 
 
@@ -512,24 +515,12 @@ void QnResourceTreeWidget::at_resourceProxyModel_rowsInserted(const QModelIndex&
 
 void QnResourceTreeWidget::expandNodeIfNeeded(const QModelIndex& index)
 {
-    // Auto-expand certain nodes. Actual for main resource tree only. //TODO: #GDM move out?
-    switch (index.data(Qn::NodeTypeRole).value<Qn::NodeType>())
-    {
-        case Qn::ResourceNode:
-        {
-            const auto resource = index.data(Qn::ResourceRole).value<QnResourcePtr>();
-            if (!resource || !resource->hasFlags(Qn::server))
-                break;
-        }
-        /* FALL THROUGH */
-        case Qn::ServersNode:
-        case Qn::UserResourcesNode:
-            ui->resourcesTreeView->expand(index);
-            break;
+    bool needExpand = m_autoExpandPolicy
+        ? m_autoExpandPolicy(index)
+        : true;
 
-        default:
-            break;
-    }
+    if (needExpand)
+        ui->resourcesTreeView->expand(index);
 
     at_resourceProxyModel_rowsInserted(index, 0, m_resourceProxyModel->rowCount(index) - 1);
 }
