@@ -97,7 +97,6 @@ class TestsConfig(object):
     def update_with_tests_params(self, test_params):
         for p in test_params:
             self.tests.setdefault(p.test_id, {})[p.parameter] = p.value
-        print [(p.test_id, p.parameter, p.value) for p in test_params]
 
     def update(self, other):
         assert isinstance(other, TestsConfig), repr(other)
