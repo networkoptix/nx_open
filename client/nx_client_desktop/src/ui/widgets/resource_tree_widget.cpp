@@ -42,22 +42,8 @@ class QnResourceTreeSortProxyModel: public QnResourceSearchProxyModel
 
 public:
     QnResourceTreeSortProxyModel(QObject *parent = NULL):
-        base_type(parent),
-        m_filterEnabled(false)
+        base_type(parent)
     {
-    }
-
-    bool isFilterEnabled()
-    {
-        return m_filterEnabled;
-    }
-
-    void setFilterEnabled(bool enabled)
-    {
-        if (m_filterEnabled == enabled)
-            return;
-        m_filterEnabled = enabled;
-        invalidateFilter();
     }
 
     virtual bool setData(const QModelIndex& index, const QVariant& value, int role = Qt::EditRole) override
@@ -110,20 +96,6 @@ protected:
 
         return resourceLessThan(left, right);
     }
-
-    virtual bool filterAcceptsRow(int sourceRow, const QModelIndex &sourceParent) const override
-    {
-        if (!m_filterEnabled)
-            return true;
-
-        QModelIndex root = (sourceParent.column() > Qn::NameColumn)
-            ? sourceParent.sibling(sourceParent.row(), Qn::NameColumn)
-            : sourceParent;
-        return base_type::filterAcceptsRow(sourceRow, root);
-    }
-
-private:
-    bool m_filterEnabled;
 };
 
 
@@ -203,7 +175,6 @@ void QnResourceTreeWidget::setModel(QAbstractItemModel *model)
         m_resourceProxyModel->setSortRole(Qt::DisplayRole);
         m_resourceProxyModel->setSortCaseSensitivity(Qt::CaseInsensitive);
         m_resourceProxyModel->sort(Qn::NameColumn);
-        m_resourceProxyModel->setFilterEnabled(false);
 
         ui->resourcesTreeView->setModel(m_resourceProxyModel);
 
@@ -463,7 +434,6 @@ void QnResourceTreeWidget::updateFilter()
     }
 
     m_resourceProxyModel->setQuery({filter});
-    m_resourceProxyModel->setFilterEnabled(!filter.isEmpty());
     if (!filter.isEmpty())
         ui->resourcesTreeView->expandAll();
 }
@@ -542,7 +512,7 @@ void QnResourceTreeWidget::at_resourceProxyModel_rowsInserted(const QModelIndex&
 
 void QnResourceTreeWidget::expandNodeIfNeeded(const QModelIndex& index)
 {
-    /* Auto-expand certain nodes. */
+    // Auto-expand certain nodes. Actual for main resource tree only. //TODO: #GDM move out?
     switch (index.data(Qn::NodeTypeRole).value<Qn::NodeType>())
     {
         case Qn::ResourceNode:

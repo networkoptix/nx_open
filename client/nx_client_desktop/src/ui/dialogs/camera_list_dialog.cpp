@@ -48,6 +48,9 @@ QnCameraListDialog::QnCameraListDialog(QWidget *parent):
     ui->camerasView->setHorizontalScrollBar(horizontalScrollBar->proxyScrollBar());
 
     m_resourceSearch->setSourceModel(m_model);
+    m_resourceSearch->setFilterCaseSensitivity(Qt::CaseInsensitive);
+    m_resourceSearch->setFilterRole(Qn::ResourceSearchStringRole);
+
     updateCriterion();
 
     connect(m_resourceSearch,   &QAbstractItemModel::rowsInserted,              this,   &QnCameraListDialog::updateWindowTitleLater);

@@ -321,6 +321,7 @@ QnResourceSearchProxyModel* QnResourceBrowserWidget::layoutModel(QnWorkbenchLayo
         result->setSortCaseSensitivity(Qt::CaseInsensitive);
         result->setDynamicSortFilter(true);
         result->setSourceModel(m_resourceModel);
+        result->setDefaultBehavior(QnResourceSearchProxyModel::DefaultBehavior::showNone);
 
         layout->setProperty(kSearchModelPropertyName, QVariant::fromValue<QnResourceSearchProxyModel*>(result));
     }
