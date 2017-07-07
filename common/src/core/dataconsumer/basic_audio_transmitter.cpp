@@ -1,32 +1,23 @@
-#include "axis_audio_transmitter.h"
+#include "basic_audio_transmitter.h"
 
 namespace
 {
-    const QString kAxisAudioTransmitUrl("/axis-cgi/audio/transmit.cgi");
     const std::chrono::milliseconds kTransmissionTimeout(3000);
 } // namespace
 
-QnAxisAudioTransmitter::QnAxisAudioTransmitter(QnSecurityCamResource* res):
+QnBasicAudioTransmitter::QnBasicAudioTransmitter(QnSecurityCamResource* res):
     BaseHttpAudioTransmitter(res),
     m_noAuth(false)
 {
 }
 
-bool QnAxisAudioTransmitter::isCompatible(const QnAudioFormat& format) const
-{
-    return
-        format.codec() == "AAC" ||
-        //format.codec() == "G726" ||
-        format.codec() == "MULAW";
-}
-
-bool QnAxisAudioTransmitter::sendData(
+bool QnBasicAudioTransmitter::sendData(
     const QnAbstractMediaDataPtr& data)
 {
     return base_type::sendBuffer(m_socket.get(), data->data(), data->dataSize());
 }
 
-void QnAxisAudioTransmitter::prepareHttpClient(const nx_http::AsyncHttpClientPtr& httpClient)
+void QnBasicAudioTransmitter::prepareHttpClient(const nx_http::AsyncHttpClientPtr& httpClient)
 {
     auto auth = m_resource->getAuth();
     m_noAuth = auth.user().isEmpty() && auth.password().isEmpty();
@@ -36,34 +27,39 @@ void QnAxisAudioTransmitter::prepareHttpClient(const nx_http::AsyncHttpClientPtr
     httpClient->setDisablePrecalculatedAuthorization(true);
 }
 
-bool QnAxisAudioTransmitter::isReadyForTransmission(
+bool QnBasicAudioTransmitter::isReadyForTransmission(
     nx_http::AsyncHttpClientPtr /*httpClient*/,
     bool isRetryAfterUnauthorizedResponse) const
 {
     return isRetryAfterUnauthorizedResponse || m_noAuth;
 }
 
-QUrl QnAxisAudioTransmitter::transmissionUrl() const
+QUrl QnBasicAudioTransmitter::transmissionUrl() const
 {
-    QUrl url(m_resource->getUrl());
-
-    url.setScheme(lit("http"));
-    if (url.host().isEmpty())
-        url.setHost(m_resource->getHostAddress());
-
-    url.setPath(kAxisAudioTransmitUrl);
-
-    return url;
+    return m_url;
 }
 
-std::chrono::milliseconds QnAxisAudioTransmitter::transmissionTimeout() const
+void QnBasicAudioTransmitter::setTransmissionUrl(const QUrl& url)
+{
+    m_url = url;
+}
+
+std::chrono::milliseconds QnBasicAudioTransmitter::transmissionTimeout() const
 {
     return kTransmissionTimeout;
 }
 
-nx_http::StringType QnAxisAudioTransmitter::contentType() const
+void QnBasicAudioTransmitter::setContentType(const nx_http::StringType& contentType)
 {
-    if (m_outputFormat.codec() == "MULAW")
+    m_contentType = contentType;
+}
+
+nx_http::StringType QnBasicAudioTransmitter::contentType() const
+{
+    if (!m_contentType.isNull())
+        return m_contentType;
+
+    if (m_outputFormat.codec() == lit("MULAW"))
     {
         if (m_outputFormat.sampleRate() == 8000)
             return QByteArray("audio/basic");
@@ -72,11 +68,11 @@ nx_http::StringType QnAxisAudioTransmitter::contentType() const
             .arg((m_outputFormat.sampleRate() * 8) / 1000)
             .toLatin1();
     }
-    else if (m_outputFormat.codec() == "G726")
+    else if (m_outputFormat.codec() == lit("G726"))
     {
         return QByteArray("audio/G726-32");
     }
-    else if (m_outputFormat.codec() == "AAC")
+    else if (m_outputFormat.codec() == lit("AAC"))
     {
         return QByteArray("audio/mpeg4-generic");
     }

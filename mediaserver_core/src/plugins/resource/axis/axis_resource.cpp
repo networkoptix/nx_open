@@ -118,10 +118,9 @@ private:
 QnPlAxisResource::QnPlAxisResource():
     m_lastMotionReadTime(0),
     m_inputIoMonitor(Qn::PT_Input),
-    m_outputIoMonitor(Qn::PT_Output),
-    m_audioTransmitter(new QnAxisAudioTransmitter(this))
+    m_outputIoMonitor(Qn::PT_Output)
 {
-
+    m_audioTransmitter.reset(new QnAxisAudioTransmitter(this));
     setVendor(lit("Axis"));
     connect( this, &QnResource::propertyChanged, this, &QnPlAxisResource::at_propertyChanged, Qt::DirectConnection );
 }
@@ -1443,14 +1442,6 @@ void QnPlAxisResource::at_propertyChanged(const QnResourcePtr & res, const QStri
                     res->updateIOSettings();
             });
     }
-}
-
-QnAudioTransmitterPtr QnPlAxisResource::getAudioTransmitter()
-{
-    if (!isInitialized())
-        return nullptr;
-
-    return m_audioTransmitter;
 }
 
 QList<QnCameraAdvancedParameter> QnPlAxisResource::getParamsByIds(const QSet<QString>& ids) const

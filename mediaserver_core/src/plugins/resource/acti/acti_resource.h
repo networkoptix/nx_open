@@ -61,8 +61,6 @@ public:
 
     QString getRtspUrl(int actiChannelNum) const; // in range 1..N
 
-    virtual QnAudioTransmitterPtr getAudioTransmitter() override;
-
     /*!
         \param localAddress If not NULL, filled with local ip address, used to connect to camera
     */
@@ -226,7 +224,6 @@ private:
     QnCameraAdvancedParams m_advancedParameters;
     QnCameraAdvancedParams m_advancedParametersCache;
 
-    QnAudioTransmitterPtr m_audioTransmitter;
 };
 
 #endif // #ifdef ENABLE_ACTI
