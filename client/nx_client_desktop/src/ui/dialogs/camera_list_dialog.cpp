@@ -162,7 +162,7 @@ void QnCameraListDialog::updateWindowTitle() {
 
 void QnCameraListDialog::updateCriterion()
 {
-    m_resourceSearch->setQuery({ui->filterLineEdit->text()});
+    m_resourceSearch->setQuery(ui->filterLineEdit->text());
 }
 
 void QnCameraListDialog::at_camerasView_doubleClicked(const QModelIndex &index) {

@@ -433,7 +433,7 @@ void QnResourceTreeWidget::updateFilter()
         return;
     }
 
-    m_resourceProxyModel->setQuery({filter});
+    m_resourceProxyModel->setQuery(filter);
     if (!filter.isEmpty())
         ui->resourcesTreeView->expandAll();
 }
