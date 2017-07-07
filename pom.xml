@@ -321,7 +321,6 @@
                         </goals>
                         <configuration>
                             <files>
-                                <file>${root.dir}/ec2_proto_version.properties</file>
                                 <file>${root.dir}/customization/default-values.properties</file>
                                 <file>${customization.dir}/build.properties</file>
                                 <file>${customization.dir}/license.properties</file>
@@ -338,6 +337,7 @@
                         </goals>
                         <configuration>
                             <files>
+                                <file>${root.dir}/.ec_protocol.properties</file>
                                 <file>${root.dir}/.cloudHost.properties</file>
                                 <file>${root.dir}/.customization.properties</file>
                             </files>
