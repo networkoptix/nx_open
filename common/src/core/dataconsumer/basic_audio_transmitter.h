@@ -1,5 +1,7 @@
 #pragma once
 
+#if defined(ENABLE_DATA_PROVIDERS)
+
 #include <core/dataconsumer/base_http_audio_transmitter.h>
 #include <core/resource/security_cam_resource.h>
 #include <nx/network/http/asynchttpclient.h>
@@ -29,3 +31,5 @@ private:
     QUrl m_url;
     nx_http::StringType m_contentType;
 };
+
+#endif // ENABLE_DATA_PROVIDERS

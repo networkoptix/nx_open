@@ -1,3 +1,5 @@
+#if defined(ENABLE_DATA_PROVIDERS)
+
 #include "basic_audio_transmitter.h"
 
 namespace
@@ -81,4 +83,6 @@ nx_http::StringType QnBasicAudioTransmitter::contentType() const
         return QByteArray("audio/basic");
     }
 }
+
+#endif // ENABLE_DATA_PROVIDERS
 
