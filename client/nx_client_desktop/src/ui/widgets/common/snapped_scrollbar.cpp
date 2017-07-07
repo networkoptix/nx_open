@@ -128,7 +128,7 @@ QnScrollBarProxy *QnSnappedScrollBar::proxyScrollBar() const
 QnSnappedScrollBarPrivate::QnSnappedScrollBarPrivate(QnSnappedScrollBar *parent) :
     q_ptr(parent),
     alignment(Qt::AlignRight | Qt::AlignBottom),
-    useHeaderShift(true),
+    useHeaderShift(false),
     useItemViewPaddingWhenVisible(false),
     useMaximumSpace(false)
 {
@@ -162,33 +162,27 @@ void QnSnappedScrollBarPrivate::updateGeometry()
 
     if (q->orientation() == Qt::Vertical)
     {
-        if (useMaximumSpace)
-            geometry.setHeight(parentRect.height());
-        else
-            geometry.setHeight(proxyScrollbar->height());
+        geometry.setHeight(useMaximumSpace ? parentRect.height() : proxyScrollbar->height());
 
         if (alignment.testFlag(Qt::AlignRight))
             geometry.moveRight(parentRect.right());
         else if (alignment.testFlag(Qt::AlignLeft))
             geometry.moveLeft(parentRect.left());
 
-        if (useHeaderShift)
-            geometry.setTop(geometry.top() + headerSize(proxyScrollbar->parentWidget(), Qt::Horizontal).height());
+        if (!useMaximumSpace && useHeaderShift)
+            geometry.setTop(geometry.top() - headerSize(proxyScrollbar->parentWidget(), Qt::Horizontal).height());
     }
     else
     {
-        if (useMaximumSpace)
-            geometry.setWidth(parentRect.width());
-        else
-            geometry.setWidth(proxyScrollbar->width());
+        geometry.setWidth(useMaximumSpace ? parentRect.width() : proxyScrollbar->width());
 
         if (alignment.testFlag(Qt::AlignBottom))
             geometry.moveBottom(parentRect.bottom());
         else if (alignment.testFlag(Qt::AlignTop))
             geometry.moveTop(parentRect.top());
 
-        if (useHeaderShift)
-            geometry.setLeft(geometry.left() + headerSize(proxyScrollbar->parentWidget(), Qt::Vertical).width());
+        if (!useMaximumSpace && useHeaderShift)
+            geometry.setLeft(geometry.left() - headerSize(proxyScrollbar->parentWidget(), Qt::Vertical).width());
     }
 
     q->setGeometry(geometry);
