@@ -155,8 +155,7 @@ run_watchdog()
 
 initialize_if_needed()
 {
-    if [ ! -f "$INITIALIZED_FLAG"]; then
-    {
+    if [ ! -f "$INITIALIZED_FLAG" ]; then
         echo "First run: initialization BEGIN"
 
         # Register autostart for Debian 8, if not yet.
@@ -179,7 +178,7 @@ initialize_if_needed()
 
         touch "$INITIALIZED_FLAG"
         echo "First run: initialization END"
-    }
+    fi
 }
 
 #--------------------------------------------------------------------------------------------------
