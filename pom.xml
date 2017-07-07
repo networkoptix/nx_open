@@ -322,7 +322,6 @@
                         <configuration>
                             <files>
                                 <file>${root.dir}/customization/default-values.properties</file>
-                                <file>${customization.dir}/build.properties</file>
                                 <file>${customization.dir}/license.properties</file>
                                 <file>${root.dir}/.branch.properties</file>
                                 <!-- <file>${root.dir}/appserver/appserver-${arch}.properties</file> -->
