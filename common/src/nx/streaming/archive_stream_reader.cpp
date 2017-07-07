@@ -770,6 +770,11 @@ begin_label:
             }
         }
     }
+    else if (m_currentData->dataType == QnAbstractMediaData::AUDIO)
+    {
+        if (m_skipFramesToTime && m_currentData->timestamp < m_skipFramesToTime)
+            goto begin_label;
+    }
     else if (m_currentData->dataType == QnAbstractMediaData::EMPTY_DATA)
     {
         m_skipFramesToTime = 0;
