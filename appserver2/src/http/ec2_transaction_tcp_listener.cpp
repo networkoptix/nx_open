@@ -8,7 +8,7 @@
 #include "network/tcp_connection_priv.h"
 #include "transaction/transaction_message_bus.h"
 #include "nx_ec/data/api_full_info_data.h"
-#include "database/db_manager.h"
+#include <database/db_manager.h>
 #include "common/common_module.h"
 #include "transaction/transaction_transport.h"
 #include <nx/network/http/custom_headers.h>
@@ -110,8 +110,8 @@ void QnTransactionTcpProcessor::run()
         nx_http::header::KeepAlive(
             commonModule->globalSettings()->connectionKeepAliveTimeout()).toString());
 
-    if( d->request.requestLine.method == nx_http::Method::Post ||
-        d->request.requestLine.method == nx_http::Method::Put )
+    if( d->request.requestLine.method == nx_http::Method::post ||
+        d->request.requestLine.method == nx_http::Method::put )
     {
         auto connectionGuidIter = d->request.headers.find( Qn::EC2_CONNECTION_GUID_HEADER_NAME );
         if( connectionGuidIter == d->request.headers.end() )

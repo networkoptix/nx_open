@@ -258,7 +258,11 @@ QnDbManager::QnDbManager(QnCommonModule* commonModule):
     m_resyncFlags(),
     m_tranLog(nullptr),
     m_timeSyncManager(nullptr),
-    m_resourceContext(m_sdb)
+    m_insertCameraQuery(&m_queryCachePool),
+    m_insertCameraUserAttrQuery(&m_queryCachePool),
+    m_insertCameraScheduleQuery(&m_queryCachePool),
+    m_insertKvPairQuery(&m_queryCachePool),
+    m_resourceQueries(m_sdb, &m_queryCachePool)
 {
 }
 
@@ -360,26 +364,27 @@ bool QnDbManager::init(const QUrl& dbUrl)
             return false;
         }
 
-
-        QSqlQuery identityTimeQuery(m_sdb);
-        identityTimeQuery.setForwardOnly(true);
-        identityTimeQuery.prepare("SELECT data FROM misc_data WHERE key = ?");
-        identityTimeQuery.addBindValue("gotDbDumpTime");
-        if (identityTimeQuery.exec() && identityTimeQuery.next())
         {
-            qint64 dbRestoreTime = identityTimeQuery.value(0).toLongLong();
-            if (dbRestoreTime)
+            QSqlQuery identityTimeQuery(m_sdb);
+            identityTimeQuery.setForwardOnly(true);
+            identityTimeQuery.prepare("SELECT data FROM misc_data WHERE key = ?");
+            identityTimeQuery.addBindValue("gotDbDumpTime");
+            if (identityTimeQuery.exec() && identityTimeQuery.next())
             {
-                identityTimeQuery.prepare("DELETE FROM misc_data WHERE key = ?");
-                identityTimeQuery.addBindValue("gotDbDumpTime");
-                if (!identityTimeQuery.exec())
+                qint64 dbRestoreTime = identityTimeQuery.value(0).toLongLong();
+                if (dbRestoreTime)
                 {
-                    qWarning() << "can't initialize Server sqlLite database " << m_sdb.databaseName() << ". Error: " << m_sdb.lastError().text();
-                    return false;
-                }
+                    identityTimeQuery.prepare("DELETE FROM misc_data WHERE key = ?");
+                    identityTimeQuery.addBindValue("gotDbDumpTime");
+                    if (!identityTimeQuery.exec())
+                    {
+                        qWarning() << "can't initialize Server sqlLite database " << m_sdb.databaseName() << ". Error: " << m_sdb.lastError().text();
+                        return false;
+                    }
 
-                qint64 currentIdentityTime = commonModule()->systemIdentityTime();
-                commonModule()->setSystemIdentityTime(qMax(currentIdentityTime + 1, dbRestoreTime), commonModule()->moduleGUID());
+                    qint64 currentIdentityTime = commonModule()->systemIdentityTime();
+                    commonModule()->setSystemIdentityTime(qMax(currentIdentityTime + 1, dbRestoreTime), commonModule()->moduleGUID());
+                }
             }
         }
 
@@ -700,7 +705,8 @@ bool QnDbManager::init(const QUrl& dbUrl)
         if (!locker.commit())
             return false;
     } // end of DB update
-    resetPreparedStatements();
+
+    m_queryCachePool.reset();
     if (!execSQLScript("vacuum;", m_sdb))
         qWarning() << "failed to vacuum ecs database" << Q_FUNC_INFO;
 
@@ -1501,7 +1507,7 @@ bool QnDbManager::afterInstallUpdate(const QString& updateName)
 
     if (updateName.endsWith(lit("/85_add_default_webpages.sql")))
     {
-        return ec2::database::migrations::addDefaultWebpages(&m_resourceContext)
+        return ec2::database::migrations::addDefaultWebpages(&m_resourceQueries)
             && resyncIfNeeded(ResyncWebPages);
     }
 
@@ -1510,7 +1516,7 @@ bool QnDbManager::afterInstallUpdate(const QString& updateName)
 
     if (updateName.endsWith(lit("/87_migrate_videowall_layouts.sql")))
     {
-        return ec2::database::migrations::reparentVideoWallLayouts(&m_resourceContext)
+        return ec2::database::migrations::reparentVideoWallLayouts(&m_resourceQueries)
             && resyncIfNeeded({ResyncLayouts, ResyncVideoWalls});
     }
     if (updateName.endsWith(lit("/92_rename_recording_param_name.sql")))
@@ -1608,20 +1614,19 @@ QnDbManager::~QnDbManager()
 
 ErrorCode QnDbManager::insertAddParam(const ApiResourceParamWithRefData& param)
 {
-    if (!m_kvPairQuery)
-    {
-        m_kvPairQuery.reset(new QSqlQuery(m_sdb));
-        m_kvPairQuery->prepare("INSERT OR REPLACE INTO vms_kvpair(resource_guid, name, value) VALUES(?, ?, ?)");
-    }
+    const auto query = m_insertKvPairQuery.get(m_sdb,
+        "INSERT OR REPLACE INTO vms_kvpair(resource_guid, name, value) VALUES(?, ?, ?)");
 
-    m_kvPairQuery->bindValue(0, QnSql::serialized_field(param.resourceId));
-    m_kvPairQuery->bindValue(1, QnSql::serialized_field(param.name));
-    m_kvPairQuery->bindValue(2, QnSql::serialized_field(param.value));
-    if (!m_kvPairQuery->exec())
+    query->bindValue(0, QnSql::serialized_field(param.resourceId));
+    query->bindValue(1, QnSql::serialized_field(param.name));
+    query->bindValue(2, QnSql::serialized_field(param.value));
+
+    if (!query->exec())
     {
-        qWarning() << Q_FUNC_INFO << m_kvPairQuery->lastError().text();
+        qWarning() << Q_FUNC_INFO << query->lastError().text();
         return ErrorCode::dbError;
     }
+
     return ErrorCode::ok;
 }
 
@@ -1679,7 +1684,7 @@ ErrorCode QnDbManager::fetchResourceParams( const QnQueryFilter& filter, ApiReso
 
 qint32 QnDbManager::getResourceInternalId( const QnUuid& guid )
 {
-    return database::api::getResourceInternalId(&m_resourceContext, guid);
+    return database::api::getResourceInternalId(&m_resourceQueries, guid);
 }
 
 QnUuid QnDbManager::getResourceGuid(const qint32 &internalId) {
@@ -1694,7 +1699,7 @@ QnUuid QnDbManager::getResourceGuid(const qint32 &internalId) {
 
 ErrorCode QnDbManager::insertOrReplaceResource(const ApiResourceData& data, qint32* internalId)
 {
-    if (!database::api::insertOrReplaceResource(&m_resourceContext, data, internalId))
+    if (!database::api::insertOrReplaceResource(&m_resourceQueries, data, internalId))
         return ErrorCode::dbError;
     return ErrorCode::ok;
 }
@@ -1790,25 +1795,24 @@ ErrorCode QnDbManager::insertOrReplaceUserRole(const ApiUserRoleData& data)
 
 ErrorCode QnDbManager::insertOrReplaceCamera(const ApiCameraData& data, qint32 internalId)
 {
-    if (!m_insCameraQuery)
-    {
-        m_insCameraQuery.reset(new QSqlQuery(m_sdb));
-        m_insCameraQuery->prepare("\
-            INSERT OR REPLACE INTO vms_camera (vendor, manually_added, resource_ptr_id, group_name, group_id,\
-            mac, model, status_flags, physical_id) VALUES\
-            (:vendor, :manuallyAdded, :internalId, :groupName, :groupId, :mac, :model, :statusFlags, :physicalId)\
-        ");
-    }
+    const auto query = m_insertCameraQuery.get(m_sdb, R"sql(
+        INSERT OR REPLACE INTO vms_camera (
+            vendor, manually_added, resource_ptr_id, group_name, group_id,
+            mac, model, status_flags, physical_id
+        ) VALUES (
+            :vendor, :manuallyAdded, :internalId, :groupName, :groupId,
+            :mac, :model, :statusFlags, :physicalId
+        ))sql");
 
-    QnSql::bind(data, m_insCameraQuery.get());
-    m_insCameraQuery->bindValue(":internalId", internalId);
-    if (m_insCameraQuery->exec())
+    QnSql::bind(data, query.get());
+    query->bindValue(":internalId", internalId);
+    if (query->exec())
     {
         return ErrorCode::ok;
     }
     else
     {
-        qWarning() << Q_FUNC_INFO << m_insCameraQuery->lastError().text();
+        qWarning() << Q_FUNC_INFO << query->lastError().text();
         return ErrorCode::dbError;
     }
 }
@@ -1827,56 +1831,51 @@ ErrorCode QnDbManager::removeCameraAttributes(const QnUuid& id)
 
 ErrorCode QnDbManager::insertOrReplaceCameraAttributes(const ApiCameraAttributesData& data, qint32* const internalId)
 {
-    if (!m_cameraUserAttrQuery)
+    const auto query = m_insertCameraUserAttrQuery.get(m_sdb, R"sql(
+        INSERT OR REPLACE INTO vms_camera_user_attributes (
+            camera_guid,
+            camera_name,
+            group_name,
+            audio_enabled,
+            control_enabled,
+            region,
+            schedule_enabled,
+            motion_type,
+            secondary_quality,
+            dewarping_params,
+            min_archive_days,
+            max_archive_days,
+            preferred_server_id,
+            license_used,
+            failover_priority,
+            backup_type
+        ) VALUES (
+            :cameraId,
+            :cameraName,
+            :userDefinedGroupName,
+            :audioEnabled,
+            :controlEnabled,
+            :motionMask,
+            :scheduleEnabled,
+            :motionType,
+            :secondaryStreamQuality,
+            :dewarpingParams,
+            :minArchiveDays,
+            :maxArchiveDays,
+            :preferredServerId,
+            :licenseUsed,
+            :failoverPriority,
+            :backupType
+        ))sql");
+
+    QnSql::bind(data, query.get());
+    if( !query->exec() )
     {
-        m_cameraUserAttrQuery.reset(new QSqlQuery(m_sdb));
-        m_cameraUserAttrQuery->prepare("\
-            INSERT OR REPLACE INTO vms_camera_user_attributes ( \
-                camera_guid,                    \
-                camera_name,                    \
-                group_name,                     \
-                audio_enabled,                  \
-                control_enabled,                \
-                region,                         \
-                schedule_enabled,               \
-                motion_type,                    \
-                secondary_quality,              \
-                dewarping_params,               \
-                min_archive_days,               \
-                max_archive_days,               \
-                preferred_server_id,            \
-                license_used,                   \
-                failover_priority,              \
-                backup_type                     \
-                )                               \
-             VALUES (                           \
-                :cameraId,                      \
-                :cameraName,                    \
-                :userDefinedGroupName,          \
-                :audioEnabled,                  \
-                :controlEnabled,                \
-                :motionMask,                    \
-                :scheduleEnabled,               \
-                :motionType,                    \
-                :secondaryStreamQuality,        \
-                :dewarpingParams,               \
-                :minArchiveDays,                \
-                :maxArchiveDays,                \
-                :preferredServerId,             \
-                :licenseUsed,                   \
-                :failoverPriority,              \
-                :backupType                     \
-                )                               \
-            ");
-    }
-    QnSql::bind(data, m_cameraUserAttrQuery.get());
-    if( !m_cameraUserAttrQuery->exec() )
-    {
-        NX_LOG( lit("DB error in %1: %2").arg(Q_FUNC_INFO).arg(m_cameraUserAttrQuery->lastError().text()), cl_logERROR);
+        NX_LOG( lit("DB error in %1: %2").arg(Q_FUNC_INFO).arg(query->lastError().text()), cl_logERROR);
         return ErrorCode::dbError;
     }
 
-    *internalId = m_cameraUserAttrQuery->lastInsertId().toInt();
+    *internalId = query->lastInsertId().toInt();
     return ErrorCode::ok;
 }
 
@@ -1982,25 +1981,22 @@ ErrorCode QnDbManager::updateCameraSchedule(const std::vector<ApiScheduleTaskDat
     if (errCode != ErrorCode::ok)
         return errCode;
 
-    if (!m_insCameraScheduleQuery)
-    {
-        m_insCameraScheduleQuery.reset(new QSqlQuery(m_sdb));
-        m_insCameraScheduleQuery->prepare("INSERT INTO vms_scheduletask ("
-            "camera_attrs_id, start_time, end_time, do_record_audio, record_type,"
-            "day_of_week, before_threshold, after_threshold, stream_quality, fps"
-            ") VALUES ("
-            ":internalId, :startTime, :endTime, :recordAudio, :recordingType,"
-            ":dayOfWeek, :beforeThreshold, :afterThreshold, :streamQuality, :fps"
-            ")");
-    }
+    const auto query = m_insertCameraScheduleQuery.get(m_sdb, R"sql(
+        INSERT INTO vms_scheduletask (
+            camera_attrs_id, start_time, end_time, do_record_audio, record_type,
+            day_of_week, before_threshold, after_threshold, stream_quality, fps
+        ) VALUES (
+            :internalId, :startTime, :endTime, :recordAudio, :recordingType,
+            :dayOfWeek, :beforeThreshold, :afterThreshold, :streamQuality, :fps
+        ))sql");
 
-    m_insCameraScheduleQuery->bindValue(":internalId", internalId);
+    query->bindValue(":internalId", internalId);
     for(const ApiScheduleTaskData& task: scheduleTasks)
     {
-        QnSql::bind(task, m_insCameraScheduleQuery.get());
-        if (!m_insCameraScheduleQuery->exec())
+        QnSql::bind(task, query.get());
+        if (!query->exec())
         {
-            qWarning() << Q_FUNC_INFO << m_insCameraScheduleQuery->lastError().text();
+            qWarning() << Q_FUNC_INFO << query->lastError().text();
             return ErrorCode::dbError;
         }
     }
@@ -2345,7 +2341,7 @@ ErrorCode QnDbManager::removeBusinessRule( const QnUuid& guid )
 
 ErrorCode QnDbManager::saveLayout(const ApiLayoutData& params)
 {
-    if (!database::api::saveLayout(&m_resourceContext, params))
+    if (!database::api::saveLayout(&m_resourceQueries, params))
         return ErrorCode::dbError;
     return ErrorCode::ok;
 }
@@ -2621,7 +2617,7 @@ ErrorCode QnDbManager::removeServer(const QnUuid& guid)
 
 ErrorCode QnDbManager::removeLayout(const QnUuid& id)
 {
-    return database::api::removeLayout(&m_resourceContext, id)
+    return database::api::removeLayout(&m_resourceQueries, id)
         ? ErrorCode::ok
         : ErrorCode::dbError;
 }
@@ -4080,18 +4076,14 @@ bool QnDbManager::tuneDBAfterOpen(QSqlDatabase* const sqlDb)
 {
     if (!QnDbHelper::tuneDBAfterOpen(sqlDb))
         return false;
-    m_tranLog->resetPreparedStatements();
-    resetPreparedStatements();
+
+    m_queryCachePool.reset();
     return true;
 }
 
-void QnDbManager::resetPreparedStatements()
+ec2::database::api::QueryCache::Pool* QnDbManager::queryCachePool()
 {
-    m_resourceContext.reset();
-    m_insCameraQuery.reset();
-    m_cameraUserAttrQuery.reset();
-    m_insCameraScheduleQuery.reset();
-    m_kvPairQuery.reset();
+    return &m_queryCachePool;
 }
 
 // TODO: Change to a function. ATTENTION: Macro contains "return".
@@ -4610,7 +4602,7 @@ ErrorCode QnDbManager::insertOrReplaceVideowall(const ApiVideowallData& data, qi
 
 ErrorCode QnDbManager::saveWebPage(const ApiWebPageData& params)
 {
-    if (!database::api::saveWebPage(&m_resourceContext, params))
+    if (!database::api::saveWebPage(&m_resourceQueries, params))
         return ErrorCode::dbError;
     return ErrorCode::ok;
 }

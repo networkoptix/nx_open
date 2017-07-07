@@ -3,6 +3,7 @@
 #include <QtCore/QObject>
 #include <nx_ec/data/api_peer_data.h>
 #include "transaction.h"
+#include <nx/network/http/auth_cache.h>
 
 namespace ec2 {
 
@@ -16,6 +17,9 @@ namespace ec2 {
     public:
         virtual const ec2::ApiPeerData& localPeer() const = 0;
         virtual const ec2::ApiPeerData& remotePeer() const = 0;
+        virtual QUrl remoteAddr() const = 0;
+        virtual bool isIncoming() const = 0;
+        virtual nx_http::AuthInfoCache::AuthorizationCacheItem authData() const = 0;
 
         bool shouldTransactionBeSentToPeer(const QnAbstractTransaction& transaction);
     };

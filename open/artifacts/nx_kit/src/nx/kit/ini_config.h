@@ -50,19 +50,27 @@ class NX_KIT_API IniConfig
 {
 public:
     /**
-     * If needed, reading .ini files can be disabled defining a project-level macro:
+     * If needed, reading .ini files can be disabled defining a macro at compiling ini_config.cpp:
      * -DNX_INI_CONFIG_DISABLED - minimizes performance overhead and freezes values at defaults.
-     * @return Whether the macro NX_INI_CONFIG_DISABLED is defined.
+     * @return Whether the macro NX_INI_CONFIG_DISABLED was defined.
      */
     static bool isEnabled();
 
     /**
      * Change the output stream, affecting all instances, null means silent. Before this call, all
-     * output goes to std::cerr, which can be changed defining a project-level macro:
+     * output goes to std::cerr, which can be changed defining a macro at compiling ini_config.cpp:
      * -DNX_INI_CONFIG_DEFAULT_OUTPUT=<stream-address>, where <stream-address> can be e.g.
      * '&std::cout', or 'nullptr' for no output.
      */
     static void setOutput(std::ostream* output);
+
+    /**
+     * Use the specified directory for .ini files. If iniFileDir is null or empty, and also before
+     * this call, a platform-dependent system temp directory is used, which can be changed defining
+     * a macro at compiling ini_config.cpp:
+     * -DNX_INI_CONFIG_DEFAULT_INI_FILES_DIR=<enquoted-path-with-trailing-slash-or-backslash>
+     */
+    static void setIniFilesDir(const char* iniFilesDir);
 
     /** @param iniFile Name of .ini file without a path but including ".ini" suffix. */
     explicit IniConfig(const char* iniFile);
