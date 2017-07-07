@@ -7,6 +7,8 @@
 
 #include "transaction_descriptor.h"
 
+#include <database/api/db_resource_api.h>
+
 namespace ec2
 {
     static const char ADD_HASH_DATA[] = "$$_HASH_$$";
@@ -150,8 +152,8 @@ namespace ec2
         Timestamp m_lastTimestamp;
         CommitData m_commitData;
         QnUbjsonTransactionSerializer* m_tranSerializer;
-        std::unique_ptr<QSqlQuery> m_insTranQuery;
-        std::unique_ptr<QSqlQuery> m_updateSequenceQuery;
+        ec2::database::api::QueryCache m_insertTransactionQuery;
+        ec2::database::api::QueryCache m_updateSequenceQuery;
     };
 };
 

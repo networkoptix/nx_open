@@ -55,6 +55,14 @@ bool QnDbHelper::tuneDBAfterOpen(QSqlDatabase* const sqlDb)
         return false;
     }
 
+    QSqlQuery limitWalQuery(*sqlDb);
+    limitWalQuery.prepare(lit("PRAGMA journal_size_limit = 16777216")); //< 16 MB
+    if( !limitWalQuery.exec() )
+    {
+        qWarning() << "Failed to limit WAL mode on sqlLite database!" << limitWalQuery.lastError().text();
+        return false;
+    }
+
     QSqlQuery enableFKQuery(*sqlDb);
     enableFKQuery.prepare(lit("PRAGMA foreign_keys = ON"));
     if( !enableFKQuery.exec() )

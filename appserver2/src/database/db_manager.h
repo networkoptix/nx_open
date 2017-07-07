@@ -720,13 +720,13 @@ namespace detail
         QnTransactionLog* m_tranLog;
         TimeSynchronizationManager* m_timeSyncManager;
 
-        std::unique_ptr<QSqlQuery> m_insCameraQuery;
-        std::unique_ptr<QSqlQuery> m_cameraUserAttrQuery;
-        std::unique_ptr<QSqlQuery> m_insCameraScheduleQuery;
-        std::unique_ptr<QSqlQuery> m_kvPairQuery;
+        ec2::database::api::QueryCache m_insertCameraQuery;
+        ec2::database::api::QueryCache m_insertCameraUserAttrQuery;
+        ec2::database::api::QueryCache m_insertCameraScheduleQuery;
+        ec2::database::api::QueryCache m_insertKvPairQuery;
 
         // TODO: #mshevchenko: Move to pimpl, remove include.
-        ec2::database::api::Context m_resourceContext;
+        ec2::database::api::QueryContext m_resourceQueries;
     };
 
 } // namespace detail

@@ -25,7 +25,7 @@ bool fetchLayouts(const QSqlDatabase& database, const QnUuid& id, ApiLayoutDataL
 * @returns True if operation was successful, false otherwise.
 */
 bool saveLayout(
-    ec2::database::api::Context* resourceContext,
+    ec2::database::api::QueryContext* resourceContext,
     const ApiLayoutData& layout);
 
 /**
@@ -35,7 +35,7 @@ bool saveLayout(
 * @returns True if operation was successful, false otherwise.
 */
 bool removeLayout(
-    ec2::database::api::Context* resourceContext,
+    ec2::database::api::QueryContext* resourceContext,
     const QnUuid& id);
 
 } // namespace api
