@@ -46,7 +46,8 @@ PlayerDataConsumer::PlayerDataConsumer(
     m_lastFrameTimeUs(AV_NOPTS_VALUE),
     m_lastDisplayedTimeUs(AV_NOPTS_VALUE),
     m_emptyPacketCounter(0),
-    m_audioEnabled(true)
+    m_audioEnabled(true),
+    m_needResetAudio(true)
 {
     Qn::directConnect(archiveReader.get(), &QnArchiveStreamReader::beforeJump,
         this, &PlayerDataConsumer::onBeforeJump);
