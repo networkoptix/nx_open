@@ -47,7 +47,7 @@ PlayerDataConsumer::PlayerDataConsumer(
     m_lastDisplayedTimeUs(AV_NOPTS_VALUE),
     m_emptyPacketCounter(0),
     m_audioEnabled(true),
-    m_needResetAudio(true)
+    m_needToResetAudio(true)
 {
     Qn::directConnect(archiveReader.get(), &QnArchiveStreamReader::beforeJump,
         this, &PlayerDataConsumer::onBeforeJump);
@@ -122,20 +122,20 @@ ConstAudioOutputPtr PlayerDataConsumer::audioOutput() const
 
 bool PlayerDataConsumer::processData(const QnAbstractDataPacketPtr& data)
 {
-    if (m_needResetAudio)
+    if (m_needToResetAudio)
     {
-        m_needResetAudio = false;
+        m_needToResetAudio = false;
         QnMutexLocker lock(&m_decoderMutex);
         m_audioOutput.reset();
     }
 
-    auto mediaData = std::dynamic_pointer_cast<QnAbstractMediaData>(data);
+    const auto mediaData = std::dynamic_pointer_cast<QnAbstractMediaData>(data);
     if (!mediaData)
         return true;
 
     if (!checkSequence(mediaData->opaque))
     {
-        //NX_LOG(lit("PlayerDataConsumer::processData(): Ignoring old frame"), cl_logDEBUG2);
+        NX_VERBOSE(this, lm("PlayerDataConsumer::processData(): Ignoring old frame"));
         return true; //< No error. Just ignore the old frame.
     }
 
@@ -179,13 +179,10 @@ QnCompressedVideoDataPtr PlayerDataConsumer::queueVideoFrame(
 {
     QnMutexLocker lock(&m_queueMutex);
 
-    if (!m_audioOutput)
-        return videoFrame; //< Pre-decoding queue is not required.
-
     m_predecodeQueue.push_back(videoFrame);
 
     QnCompressedVideoDataPtr result = m_predecodeQueue.front();
-    if (result->timestamp < m_audioOutput->playbackPositionUsec())
+    if (!m_audioOutput || result->timestamp < m_audioOutput->playbackPositionUsec())
     {
         // Frame time is earlier than the audio buffer, no need to delay it anyway.
         m_predecodeQueue.pop_front();
@@ -292,7 +289,7 @@ void PlayerDataConsumer::clearUnprocessedData()
     QnMutexLocker lock(&m_queueMutex);
     m_decodedVideo.clear();
     m_predecodeQueue.clear();
-    m_needResetAudio = true;
+    m_needToResetAudio = true;
     m_queueWaitCond.wakeAll();
 }
 
@@ -363,19 +360,21 @@ bool PlayerDataConsumer::processAudioFrame(const QnCompressedAudioDataPtr& data)
     m_audioOutput->write(decodedFrame);
 
 
-    auto currentPos = m_audioOutput->playbackPositionUsec();
+    const auto currentPos = m_audioOutput->playbackPositionUsec();
 
-    QnMutexLocker lock(&m_queueMutex);
-    while (!m_audioOutput->isBuffering()
-        && !m_predecodeQueue.empty()
-        && m_predecodeQueue.front()->timestamp < currentPos)
     {
-        QnCompressedVideoDataPtr videoFrame = m_predecodeQueue.front();
-        m_predecodeQueue.pop_front();
-        lock.unlock();
-        if (!processVideoFrame(videoFrame))
-            return false;
-        lock.relock();
+        QnMutexLocker lock(&m_queueMutex);
+        while (!m_audioOutput->isBuffering()
+            && !m_predecodeQueue.empty()
+            && m_predecodeQueue.front()->timestamp < currentPos)
+        {
+            QnCompressedVideoDataPtr videoFrame = m_predecodeQueue.front();
+            m_predecodeQueue.pop_front();
+            lock.unlock();
+            if (!processVideoFrame(videoFrame))
+                return false;
+            lock.relock();
+        }
     }
     return true;
 }
