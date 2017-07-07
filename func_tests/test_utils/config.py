@@ -81,17 +81,21 @@ class TestsConfig(object):
         tests = d.get('tests')
         return cls(installations, tests)
 
-    @staticmethod
-    def merge_config_list(config_list):
-        if not config_list:
+    @classmethod
+    def merge_config_list(cls, config_list, test_params):
+        if config_list:
+            config = config_list[0]
+            for other in config_list[1:]:
+                config.update(other)
+        elif test_params:
+            config = cls()
+        else:
             return None
-        config = config_list[0]
-        for other in config_list[1:]:
-            config.update(other)
+        config.update_with_tests_params(test_params)
         return config
 
-    def __init__(self, physical_installation_host_list, tests=None):
-        self.physical_installation_host_list = physical_installation_host_list  # PhysicalInstallationHostConfig list
+    def __init__(self, physical_installation_host_list=None, tests=None):
+        self.physical_installation_host_list = physical_installation_host_list or []  # PhysicalInstallationHostConfig list
         self.tests = tests or {}  # dict, full test name -> dict
 
     def update_with_tests_params(self, test_params):
@@ -140,6 +144,8 @@ class SingleTestConfig(object):
         return SimpleNamespace(**config)
 
     def _cast_value(self, value, t):
+        if not isinstance(value, (str, unicode)):
+            return value
         if t is int:
             return int(value)
         if t is datetime.timedelta:

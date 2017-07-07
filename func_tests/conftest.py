@@ -109,8 +109,10 @@ def run_options(request):
         vm_ssh_host_config = None
     bin_dir = request.config.getoption('--bin-dir')
     assert bin_dir, 'Argument --bin-dir is required'
-    tests_config = TestsConfig.merge_config_list(request.config.getoption('--tests-config-file'))
-    tests_config.update_with_tests_params(request.config.getoption('--test-parameter'))
+    tests_config = TestsConfig.merge_config_list(
+        request.config.getoption('--tests-config-file'),
+        request.config.getoption('--test-parameter'),
+        )
     return SimpleNamespace(
         cloud_group=request.config.getoption('--cloud-group'),
         customization=request.config.getoption('--customization'),
