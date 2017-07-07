@@ -6,10 +6,12 @@
 #include <nx/utils/log/log.h>
 #include <nx/utils/std/cpp14.h>
 #include <nx/utils/uuid.h>
+#include <nx/casssandra/async_cassandra_connection.h>
 
 #include "traffic_relay.h"
 #include "../model/client_session_pool.h"
 #include "../model/listening_peer_pool.h"
+#include "../model/remote_relay_peer_pool.h"
 #include "../settings.h"
 
 namespace nx {
@@ -26,7 +28,8 @@ ConnectSessionManager::ConnectSessionManager(
     m_settings(settings),
     m_clientSessionPool(clientSessionPool),
     m_listeningPeerPool(listeningPeerPool),
-    m_trafficRelay(trafficRelay)
+    m_trafficRelay(trafficRelay),
+    m_remoteRelayPool(new model::RemoteRelayPeerPool)
 {
 }
 
@@ -101,25 +104,81 @@ void ConnectSessionManager::createClientSession(
         std::chrono::duration_cast<std::chrono::seconds>(
             m_settings.connectingPeer().connectSessionIdleTimeout);
 
-    const auto peerName = m_listeningPeerPool->findListeningPeerByDomain(request.targetPeerName);
-    if (peerName.empty())
+    struct Context
     {
-        NX_VERBOSE(this, lm("Session %1. Failed to find peer %2 on the current relay")
-           .arg(request.desiredSessionId)
-           .arg(request.targetPeerName));
+        CreateClientSessionHandler handler;
+        api::CreateClientSessionRequest request;
+        api::CreateClientSessionResponse response;
+        bool peerFound = false;
 
-        auto remoteRelayName = m_remoteRelayPeerPool.findRelayByDomainName(request.targetPeerName);
+        Context(
+            CreateClientSessionHandler handler,
+            const api::CreateClientSessionRequest& request,
+            const api::CreateClientSessionResponse& response)
+            :
+            handler(std::move(handler)),
+            request(request),
+            response(response)
+        {}
+    };
 
-        NX_LOGX(lm("Session %1. Listening peer %2 was not found")
-            .arg(request.desiredSessionId).arg(request.targetPeerName), cl_logDEBUG1);
-        return completionHandler(
-            api::ResultCode::notFound,
-            std::move(response));
-    }
+    auto sharedContext = std::make_shared<Context>(
+        std::move(completionHandler),
+        request,
+        response);
 
-    response.sessionId = m_clientSessionPool->addSession(
-        request.desiredSessionId, peerName);
-    completionHandler(api::ResultCode::ok, std::move(response));
+    cf::async(m_asyncExecutor,
+        [this, sharedContext]
+        {
+            const auto peerName = m_listeningPeerPool->findListeningPeerByDomain(
+                sharedContext->request.targetPeerName);
+            if (!peerName.empty())
+            {
+                sharedContext->response.sessionId = m_clientSessionPool->addSession(
+                    sharedContext->request.desiredSessionId, peerName);
+                sharedContext->handler(api::ResultCode::ok, std::move(sharedContext->response));
+                sharedContext->peerFound = true;
+
+                return cf::unit();
+            }
+
+            return cf::unit();
+        })
+        .then(
+            [this, sharedContext](cf::future<cf::unit> /*result*/)
+            {
+                if (sharedContext->peerFound)
+                    return cf::make_ready_future(std::string());
+
+                NX_VERBOSE(this, lm("Session %1. Failed to find peer %2 on the current relay")
+                   .arg(sharedContext->request.desiredSessionId)
+                   .arg(sharedContext->request.targetPeerName));
+
+                return m_remoteRelayPool->findRelayByDomain(
+                    sharedContext->request.targetPeerName);
+            })
+        .then(
+            [this, sharedContext](cf::future<std::string> result)
+            {
+                if (result.get().empty() && !sharedContext->peerFound)
+                {
+                    NX_LOGX(lm("Session %1. Listening peer %2 was not found")
+                        .arg(sharedContext->request.desiredSessionId)
+                        .arg(sharedContext->request.targetPeerName), cl_logDEBUG1);
+                    sharedContext->handler(
+                        api::ResultCode::notFound,
+                        std::move(sharedContext->response));
+
+                    return cf::unit();
+                }
+
+                sharedContext->response.redirectHost = result.get();
+                sharedContext->handler(
+                    api::ResultCode::needRedirect,
+                    std::move(sharedContext->response));
+
+                return cf::unit();
+            });
 }
 
 void ConnectSessionManager::connectToPeer(

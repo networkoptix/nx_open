@@ -1,6 +1,14 @@
 #pragma once
 
+#include <memory>
+#include <nx/utils/thread/cf/cfuture.h>
+
 namespace nx {
+
+namespace cassandra {
+class AsyncConnection;
+}
+
 namespace cloud {
 namespace relay {
 namespace model {
@@ -8,10 +16,16 @@ namespace model {
 class RemoteRelayPeerPool
 {
 public:
-    std::string findListeningPeerByDomain(const std::string& domainName) const;
+    RemoteRelayPeerPool();
+
+    cf::future<std::string> findRelayByDomain(const std::string& domainName) const;
     bool addPeer(const std::string& domainName, const std::string& peerName);
 
 private:
+    std::unique_ptr<cassandra::AsyncConnection> m_cassConnection;
+    bool m_dbReady = false;
+
+    void prepareDbStructure();
 };
 
 } // namespace model
