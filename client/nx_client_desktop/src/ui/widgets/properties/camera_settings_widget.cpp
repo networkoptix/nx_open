@@ -6,7 +6,6 @@
 
 #include <core/resource/device_dependent_strings.h>
 #include <core/resource/camera_resource.h>
-#include <core/resource_management/resource_criterion.h>
 
 #include <nx/client/desktop/ui/actions/action_manager.h>
 #include <ui/workbench/workbench_context.h>

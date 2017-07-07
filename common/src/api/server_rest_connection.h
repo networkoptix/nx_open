@@ -12,7 +12,7 @@
 #include <rest/server/json_rest_result.h>
 #include <nx/utils/safe_direct_connection.h>
 #include <api/http_client_pool.h>
-#include <business/business_fwd.h>
+#include <nx/vms/event/event_fwd.h>
 #include <core/resource/resource_fwd.h>
 #include <common/common_module_aware.h>
 #include <api/model/time_reply.h>
@@ -91,7 +91,7 @@ public:
     Handle twoWayAudioCommand(const QnUuid& cameraId, bool start, GetCallback callback, QThread* targetThread = 0);
 
     Handle softwareTriggerCommand(const QnUuid& cameraId, const QString& triggerId,
-        QnBusiness::EventState toggleState, GetCallback callback, QThread* targetThread = nullptr);
+            nx::vms::event::EventState toggleState, GetCallback callback, QThread* targetThread = nullptr);
 
     Handle getStatisticsSettingsAsync(Result<QByteArray>::type callback
         , QThread *targetThread = nullptr);

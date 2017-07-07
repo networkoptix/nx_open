@@ -1,11 +1,13 @@
 #include "show_text_overlay_action_widget.h"
 #include "ui_show_text_overlay_action_widget.h"
 
-#include <business/business_action_parameters.h>
+#include <nx/vms/event/action_parameters.h>
 
 #include <utils/common/scoped_value_rollback.h>
 #include <ui/common/read_only.h>
 #include <ui/workaround/widgets_signals_workaround.h>
+
+using namespace nx;
 
 namespace {
 
@@ -63,8 +65,8 @@ QnShowTextOverlayActionWidget::QnShowTextOverlayActionWidget(QWidget *parent)
     {
         // Prolonged type of event has changed. In case of instant
         // action event state should be updated
-        if (checked && (model()->eventType() == QnBusiness::UserDefinedEvent))
-            model()->setEventState(QnBusiness::UndefinedState);
+        if (checked && (model()->eventType() == vms::event::userDefinedEvent))
+            model()->setEventState(vms::event::EventState::undefined);
     });
 }
 
@@ -80,25 +82,25 @@ void QnShowTextOverlayActionWidget::updateTabOrder(QWidget *before, QWidget *aft
     setTabOrder(ui->customTextEdit, after);
 }
 
-void QnShowTextOverlayActionWidget::at_model_dataChanged(QnBusiness::Fields fields) {
+void QnShowTextOverlayActionWidget::at_model_dataChanged(Fields fields) {
     if (!model() || m_updating)
         return;
 
     QN_SCOPED_VALUE_ROLLBACK(&m_updating, true);
 
-    if (fields.testFlag(QnBusiness::EventTypeField))
+    if (fields.testFlag(Field::eventType))
     {
-        bool hasToggleState = QnBusiness::hasToggleState(model()->eventType());
+        bool hasToggleState = vms::event::hasToggleState(model()->eventType());
         if (!hasToggleState)
             ui->fixedDurationCheckBox->setChecked(true);
         setReadOnly(ui->fixedDurationCheckBox, !hasToggleState);
 
-        const bool canUseSource = ((model()->eventType() >= QnBusiness::UserDefinedEvent)
+        const bool canUseSource = ((model()->eventType() >= vms::event::userDefinedEvent)
             || (requiresCameraResource(model()->eventType())));
         ui->useSourceCheckBox->setEnabled(canUseSource);
     }
 
-    if (fields.testFlag(QnBusiness::ActionParamsField)) {
+    if (fields.testFlag(Field::actionParams)) {
         const auto params = model()->actionParams();
 
         const bool isFixedFuration = (params.durationMs > 0);
@@ -124,7 +126,7 @@ void QnShowTextOverlayActionWidget::paramsChanged() {
 
     QN_SCOPED_VALUE_ROLLBACK(&m_updating, true);
 
-    QnBusinessActionParameters params = model()->actionParams();
+    vms::event::ActionParameters params = model()->actionParams();
 
     params.durationMs = ui->fixedDurationCheckBox->isChecked() ? ui->durationSpinBox->value() * msecPerSecond : 0;
     params.text = ui->customTextCheckBox->isChecked() ? ui->customTextEdit->toPlainText() : QString();

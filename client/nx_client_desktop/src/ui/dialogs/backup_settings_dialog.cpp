@@ -69,7 +69,7 @@ QnBackupSettingsDialog::QnBackupSettingsDialog(QWidget* parent) :
     connect(ui->backupResourcesButton, &QPushButton::clicked, this,
         [this]()
         {
-            //TODO: #vkutin #GDM #common In read-only mode display a different dialog
+            // TODO: #vkutin #GDM #common In read-only mode display a different dialog
             // to view only selected cameras
 
             QSet<QnUuid> ids;

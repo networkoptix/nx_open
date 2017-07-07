@@ -37,10 +37,11 @@
 
 #include <appserver/processor.h>
 
-#include <business/business_event_connector.h>
-#include <business/business_event_rule.h>
-#include <business/business_rule_processor.h>
-#include <business/events/reasoned_business_event.h>
+#include <nx/vms/event/rule.h>
+#include <nx/vms/event/events/reasoned_event.h>
+#include <nx/mediaserver/event/event_connector.h>
+#include <nx/mediaserver/event/rule_processor.h>
+#include <nx/mediaserver/event/extended_rule_processor.h>
 
 #include <camera/camera_pool.h>
 
@@ -63,8 +64,6 @@
 #include <core/resource/camera_resource.h>
 #include <core/resource/videowall_resource.h>
 #include <core/resource/camera_resource.h>
-
-#include <events/mserver_business_rule_processor.h>
 
 #include <media_server/media_server_app_info.h>
 #include <media_server/mserver_status_watcher.h>
@@ -120,13 +119,13 @@
 #include <recorder/schedule_sync.h>
 
 #include <rest/handlers/acti_event_rest_handler.h>
-#include <rest/handlers/business_event_log_rest_handler.h>
-#include "rest/handlers/business_log2_rest_handler.h"
+#include <rest/handlers/event_log_rest_handler.h>
+#include <rest/handlers/event_log2_rest_handler.h>
 #include <rest/handlers/get_system_name_rest_handler.h>
 #include <rest/handlers/camera_diagnostics_rest_handler.h>
 #include <rest/handlers/camera_settings_rest_handler.h>
 #include <rest/handlers/crash_server_handler.h>
-#include <rest/handlers/external_business_event_rest_handler.h>
+#include <rest/handlers/external_event_rest_handler.h>
 #include <rest/handlers/favicon_rest_handler.h>
 #include <rest/handlers/image_rest_handler.h>
 #include <rest/handlers/log_rest_handler.h>
@@ -274,6 +273,8 @@
 #if defined(__arm__)
     #include "nx1/info.h"
 #endif
+
+using namespace nx;
 
 // This constant is used while checking for compatibility.
 // Do not change it until you know what you're doing.
@@ -1534,7 +1535,7 @@ void MediaServerProcess::loadResourcesFromECS(
 
     {
         //loading business rules
-        QnBusinessEventRuleList rules;
+        vms::event::RuleList rules;
         while( (rez = ec2Connection->getBusinessEventManager(Qn::kSystemAccess)->getBusinessRulesSync(&rules)) != ec2::ErrorCode::ok )
         {
             qDebug() << "QnMain::run(): Can't get business rules. Reason: " << ec2::toString(rez);
@@ -1543,7 +1544,7 @@ void MediaServerProcess::loadResourcesFromECS(
                 return;
         }
 
-        for(const QnBusinessEventRulePtr &rule: rules)
+        for (const auto& rule: rules)
             messageProcessor->on_businessEventAddedOrUpdated(rule);
     }
 
@@ -1690,11 +1691,21 @@ void MediaServerProcess::at_connectionOpened()
 {
     if (isStopping())
         return;
+
     const auto& resPool = commonModule()->resourcePool();
     if (m_firstRunningTime)
-        qnBusinessRuleConnector->at_mserverFailure(resPool->getResourceById<QnMediaServerResource>(serverGuid()), m_firstRunningTime*1000, QnBusiness::ServerStartedReason, QString());
-    if (!m_startMessageSent) {
-        qnBusinessRuleConnector->at_mserverStarted(resPool->getResourceById<QnMediaServerResource>(serverGuid()), qnSyncTime->currentUSecsSinceEpoch());
+    {
+        qnEventRuleConnector->at_serverFailure(
+            resPool->getResourceById<QnMediaServerResource>(serverGuid()),
+            m_firstRunningTime * 1000,
+            nx::vms::event::EventReason::serverStarted,
+            QString());
+    }
+    if (!m_startMessageSent)
+    {
+        qnEventRuleConnector->at_serverStarted(
+            resPool->getResourceById<QnMediaServerResource>(serverGuid()),
+            qnSyncTime->currentUSecsSinceEpoch());
         m_startMessageSent = true;
     }
     m_firstRunningTime = 0;
@@ -1703,7 +1714,7 @@ void MediaServerProcess::at_connectionOpened()
 void MediaServerProcess::at_serverModuleConflict(nx::vms::discovery::ModuleEndpoint module)
 {
     const auto& resPool = commonModule()->resourcePool();
-    qnBusinessRuleConnector->at_mediaServerConflict(
+    qnEventRuleConnector->at_serverConflict(
         resPool->getResourceById<QnMediaServerResource>(commonModule()->moduleGUID()),
         qnSyncTime->currentUSecsSinceEpoch(),
         module,
@@ -1716,7 +1727,9 @@ void MediaServerProcess::at_timer()
         return;
 
     //TODO: #2.4 #GDM This timer make two totally different functions. Split it.
-    qnServerModule->runTimeSettings()->setValue("lastRunningTime", qnSyncTime->currentMSecsSinceEpoch());
+    qnServerModule->runTimeSettings()->setValue(
+        "lastRunningTime", qnSyncTime->currentMSecsSinceEpoch());
+
     const auto& resPool = commonModule()->resourcePool();
     QnResourcePtr mServer = resPool->getResourceById(commonModule()->moduleGUID());
     if (!mServer)
@@ -1729,30 +1742,32 @@ void MediaServerProcess::at_timer()
 void MediaServerProcess::at_storageManager_noStoragesAvailable() {
     if (isStopping())
         return;
-    qnBusinessRuleConnector->at_NoStorages(m_mediaServer);
+    qnEventRuleConnector->at_noStorages(m_mediaServer);
 }
 
-void MediaServerProcess::at_storageManager_storageFailure(const QnResourcePtr& storage, QnBusiness::EventReason reason) {
+void MediaServerProcess::at_storageManager_storageFailure(const QnResourcePtr& storage,
+    nx::vms::event::EventReason reason)
+{
     if (isStopping())
         return;
-    qnBusinessRuleConnector->at_storageFailure(m_mediaServer, qnSyncTime->currentUSecsSinceEpoch(), reason, storage);
+    qnEventRuleConnector->at_storageFailure(m_mediaServer, qnSyncTime->currentUSecsSinceEpoch(), reason, storage);
 }
 
 void MediaServerProcess::at_storageManager_rebuildFinished(QnSystemHealth::MessageType msgType) {
     if (isStopping())
         return;
-    qnBusinessRuleConnector->at_archiveRebuildFinished(m_mediaServer, msgType);
+    qnEventRuleConnector->at_archiveRebuildFinished(m_mediaServer, msgType);
 }
 
 void MediaServerProcess::at_archiveBackupFinished(
     qint64                      backedUpToMs,
-    QnBusiness::EventReason     code
+    nx::vms::event::EventReason code
 )
 {
     if (isStopping())
         return;
 
-    qnBusinessRuleConnector->at_archiveBackupFinished(
+    qnEventRuleConnector->at_archiveBackupFinished(
         m_mediaServer,
         qnSyncTime->currentUSecsSinceEpoch(),
         code,
@@ -1764,7 +1779,7 @@ void MediaServerProcess::at_cameraIPConflict(const QHostAddress& host, const QSt
 {
     if (isStopping())
         return;
-    qnBusinessRuleConnector->at_cameraIPConflict(
+    qnEventRuleConnector->at_cameraIPConflict(
         m_mediaServer,
         host,
         macAddrList,
@@ -1808,7 +1823,7 @@ void MediaServerProcess::registerRestHandlers(
     reg("api/manualCamera", new QnManualCameraAdditionRestHandler());
     reg("api/ptz", new QnPtzRestHandler());
     reg("api/image", new QnImageRestHandler()); //< deprecated
-    reg("api/createEvent", new QnExternalBusinessEventRestHandler());
+    reg("api/createEvent", new QnExternalEventRestHandler());
     static const char kGetTimePath[] = "api/gettime";
     reg(kGetTimePath, new QnTimeRestHandler());
     reg("ec2/getTimeOfServers", new QnMultiserverTimeRestHandler(QLatin1String("/") + kGetTimePath));
@@ -1828,8 +1843,8 @@ void MediaServerProcess::registerRestHandlers(
     reg("api/pingSystem", new QnPingSystemRestHandler());
     reg("api/rebuildArchive", new QnRebuildArchiveRestHandler());
     reg("api/backupControl", new QnBackupControlRestHandler());
-    reg("api/events", new QnBusinessEventLogRestHandler(), kViewLogs); //< deprecated
-    reg("api/getEvents", new QnBusinessLog2RestHandler(), kViewLogs); //< new version
+    reg("api/events", new QnEventLogRestHandler(), kViewLogs); //< deprecated
+    reg("api/getEvents", new QnEventLog2RestHandler(), kViewLogs); //< new version
     reg("api/showLog", new QnLogRestHandler());
     reg("api/getSystemId", new QnGetSystemIdRestHandler());
     reg("api/doCameraDiagnosticsStep", new QnCameraDiagnosticsRestHandler());
@@ -2470,17 +2485,19 @@ void MediaServerProcess::run()
     //by following delegating hls authentication to target server
     QnAuthHelper::instance()->restrictionList()->allow( lit("*/proxy/*/hls/*"), nx_http::AuthMethod::noAuth );
 
-    std::unique_ptr<QnBusinessRuleProcessor> mserverBusinessRuleProcessor(new QnMServerBusinessRuleProcessor(commonModule()));
+    std::unique_ptr<mediaserver::event::RuleProcessor> eventRuleProcessor(
+        new mediaserver::event::ExtendedRuleProcessor(commonModule()));
 
     std::unique_ptr<QnVideoCameraPool> videoCameraPool( new QnVideoCameraPool(commonModule()) );
 
     std::unique_ptr<QnMotionHelper> motionHelper(new QnMotionHelper());
 
-    std::unique_ptr<QnBusinessEventConnector> businessEventConnector(new QnBusinessEventConnector(commonModule()) );
+    std::unique_ptr<mediaserver::event::EventConnector> eventConnector(
+        new mediaserver::event::EventConnector(commonModule()) );
     auto stopQThreadFunc = []( QThread* obj ){ obj->quit(); obj->wait(); delete obj; };
     std::unique_ptr<QThread, decltype(stopQThreadFunc)> connectorThread( new QThread(), stopQThreadFunc );
     connectorThread->start();
-    qnBusinessRuleConnector->moveToThread(connectorThread.get());
+    qnEventRuleConnector->moveToThread(connectorThread.get());
 
     CameraDriverRestrictionList cameraDriverRestrictionList;
 
@@ -3159,9 +3176,9 @@ void MediaServerProcess::run()
     connectorThread->wait();
 
     //deleting object from wrong thread, but its no problem, since object's thread has been stopped and no event can be delivered to the object
-    businessEventConnector.reset();
+    eventConnector.reset();
 
-    mserverBusinessRuleProcessor.reset();
+    eventRuleProcessor.reset();
 
     motionHelper.reset();
 

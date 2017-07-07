@@ -49,7 +49,7 @@
     <name>CredentialsEditor</name>
     <message>
       <source>Email</source>
-      <translation type="unfinished">Email</translation>
+      <translation>อีเมลล์</translation>
     </message>
     <message>
       <source>Password</source>
@@ -108,7 +108,7 @@
     </message>
     <message>
       <source>Delete connection?</source>
-      <translation type="unfinished">Delete connection?</translation>
+      <translation>ลบการเชื่อมต่อ</translation>
     </message>
     <message>
       <source>Login cannot be empty</source>
@@ -134,7 +134,7 @@
     <name>DialogButtonBox</name>
     <message>
       <source>OK</source>
-      <translation type="unfinished">OK</translation>
+      <translation>ตกลง</translation>
     </message>
     <message>
       <source>Cancel</source>
@@ -154,11 +154,11 @@
     </message>
     <message>
       <source>Abort</source>
-      <translation type="unfinished">Abort</translation>
+      <translation>เกี่ยวกับ</translation>
     </message>
     <message>
       <source>Retry</source>
-      <translation type="unfinished">Retry</translation>
+      <translation>ลองอีกครั้ง</translation>
     </message>
   </context>
   <context>
@@ -284,6 +284,17 @@
     </message>
   </context>
   <context>
+    <name>MoveOnTapOverlay</name>
+    <message>
+      <source>Tap on the image to position your camera</source>
+      <translation type="unfinished">Tap on the image to position your camera</translation>
+    </message>
+    <message>
+      <source>CANCEL</source>
+      <translation type="unfinished">CANCEL</translation>
+    </message>
+  </context>
+  <context>
     <name>NoCameraItem</name>
     <message>
       <source>No image</source>
@@ -406,7 +417,7 @@
     </message>
     <message>
       <source>Users</source>
-      <translation type="unfinished">Users</translation>
+      <translation>ผู้ใช้งาน</translation>
     </message>
   </context>
   <context>
@@ -444,11 +455,11 @@
     </message>
     <message>
       <source>Connect to Server...</source>
-      <translation type="unfinished">Connect to Server...</translation>
+      <translation>เชื่อมต่อกับเซิร์ฟเวอร์ ...</translation>
     </message>
     <message>
       <source>Connect to Another Server...</source>
-      <translation type="unfinished">Connect to Another Server...</translation>
+      <translation>เชื่อมต่อไปยังเซิร์ฟเวอร์อื่น ...</translation>
     </message>
     <message>
       <source>No Systems found</source>
@@ -545,7 +556,7 @@
     </message>
     <message>
       <source>Select All</source>
-      <translation type="unfinished">Select All</translation>
+      <translation>เลือกทั้งหมด</translation>
     </message>
   </context>
   <context>
@@ -598,7 +609,7 @@
     </message>
     <message>
       <source>Information</source>
-      <translation type="unfinished">Information</translation>
+      <translation>ข้อมูล</translation>
     </message>
     <message>
       <source>Select camera</source>

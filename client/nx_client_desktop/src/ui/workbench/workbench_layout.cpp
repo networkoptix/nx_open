@@ -236,7 +236,7 @@ void QnWorkbenchLayout::notifyTitleChanged()
 
 void QnWorkbenchLayout::addItem(QnWorkbenchItem* item)
 {
-    NX_EXPECT(item);
+    NX_EXPECT(item && item->resource());
     if (!item)
         return;
 
@@ -262,7 +262,7 @@ void QnWorkbenchLayout::addItem(QnWorkbenchItem* item)
         NX_DEBUG(kItemMapTag, lm("Add item to cell %1").arg(item->geometry()));
     }
     m_rectSet.insert(item->geometry());
-    m_itemsByUid[item->resourceUid()].insert(item);
+    m_itemsByResource[item->resource()].insert(item);
     m_itemByUuid[item->uuid()] = item;
 
     emit itemAdded(item);
@@ -288,7 +288,7 @@ void QnWorkbenchLayout::removeItem(QnWorkbenchItem* item)
         NX_DEBUG(kItemMapTag, lm("Item removed from cell %1").arg(item->geometry()));
     }
     m_rectSet.remove(item->geometry());
-    m_itemsByUid[item->resourceUid()].remove(item);
+    m_itemsByResource[item->resource()].remove(item);
     m_itemByUuid.remove(item->uuid());
 
     item->m_layout = nullptr;
@@ -612,10 +612,10 @@ QSet<QnWorkbenchItem*> QnWorkbenchLayout::items(const QList<QRect>& regions) con
     return m_itemMap.values(regions);
 }
 
-const QSet<QnWorkbenchItem*>& QnWorkbenchLayout::items(const QString& resourceUniqueId) const
+const QSet<QnWorkbenchItem*>& QnWorkbenchLayout::items(const QnResourcePtr& resource) const
 {
-    auto pos = m_itemsByUid.find(resourceUniqueId);
-    return pos == m_itemsByUid.end() ? m_noItems : pos.value();
+    auto pos = m_itemsByResource.find(resource);
+    return pos == m_itemsByResource.end() ? m_noItems : pos.value();
 }
 
 const QSet<QnWorkbenchItem*>& QnWorkbenchLayout::items() const

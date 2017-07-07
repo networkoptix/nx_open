@@ -7,7 +7,6 @@
 #include <functional>
 #include <memory>
 
-#include <business/business_event_rule.h>
 #include <nx_ec/dummy_handler.h>
 
 #include <api/app_server_connection.h>

@@ -89,14 +89,14 @@ rest::Handle ServerConnection::twoWayAudioCommand(const QnUuid& cameraId, bool s
 }
 
 rest::Handle ServerConnection::softwareTriggerCommand(const QnUuid& cameraId, const QString& triggerId,
-    QnBusiness::EventState toggleState, GetCallback callback, QThread* targetThread)
+    nx::vms::event::EventState toggleState, GetCallback callback, QThread* targetThread)
 {
     QnRequestParamList params;
     params.insert(lit("timestamp"), lit("%1").arg(qnSyncTime->currentMSecsSinceEpoch()));
-    params.insert(lit("event_type"), QnLexical::serialized(QnBusiness::SoftwareTriggerEvent));
+    params.insert(lit("event_type"), QnLexical::serialized(nx::vms::event::softwareTriggerEvent));
     params.insert(lit("inputPortId"), triggerId);
     params.insert(lit("eventResourceId"), cameraId.toString());
-    if (toggleState != QnBusiness::UndefinedState)
+    if (toggleState != nx::vms::event::EventState::undefined)
         params.insert(lit("state"), QnLexical::serialized(toggleState));
     return executeGet(lit("/api/createEvent"), params, callback, targetThread);
 }

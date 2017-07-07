@@ -4,8 +4,11 @@
 
 #include <common/common_module.h>
 
+#include <client_core/client_core_module.h>
+
 #include <core/resource_management/resource_pool.h>
 #include <core/resource_management/layout_tour_manager.h>
+#include <core/resource_management/layout_tour_state_manager.h>
 #include <core/resource/user_resource.h>
 
 #include <nx_ec/ec_api.h>
@@ -13,6 +16,7 @@
 #include <nx/client/desktop/ui/actions/action_manager.h>
 #include <ui/dialogs/common/message_box.h>
 #include <ui/dialogs/common/session_aware_dialog.h>
+#include <nx/client/desktop/ui/messages/resources_messages.h>
 #include <ui/style/skin.h>
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench.h>
@@ -80,7 +84,31 @@ LayoutToursHandler::LayoutToursHandler(QObject* parent):
             auto tour = layoutTourManager()->tour(id);
             if (!tour.isValid())
                 return;
-            tour.name = parameters.argument<QString>(Qn::ResourceNameRole);
+
+            const auto userId = context()->user()->getId();
+
+            const QString name = parameters.argument<QString>(Qn::ResourceNameRole).trimmed();
+
+            // Ask to override tour with the same name (if any).
+            for (const auto& other: layoutTourManager()->tours())
+            {
+                if (other.id == id)
+                    continue;
+
+                if (other.parentId != userId)
+                    continue;
+
+                if (other.name == name)
+                {
+                    if (!ui::resources::overrideLayoutTour(mainWindow()))
+                        return;
+
+                    layoutTourManager()->removeTour(other.id);
+                    removeTourFromServer(other.id);
+                }
+            }
+
+            tour.name = name;
             layoutTourManager()->addOrUpdateTour(tour);
             saveTourToServer(tour);
         });
@@ -216,8 +244,16 @@ void LayoutToursHandler::saveTourToServer(const ec2::ApiLayoutTourData& tour)
     NX_EXPECT(layoutTourManager()->tour(tour.id).isValid());
     if (const auto connection = commonModule()->ec2Connection())
     {
-        connection->getLayoutTourManager(Qn::kSystemAccess)->save(tour, this,
-            [](int /*reqId*/, ec2::ErrorCode /*errorCode*/) {});
+        int reqId = connection->getLayoutTourManager(Qn::kSystemAccess)->save(tour, this,
+            [tour](int /*reqId*/, ec2::ErrorCode errorCode)
+            {
+                qnClientCoreModule->layoutTourStateManager()->markBeingSaved(tour.id, false);
+                if (errorCode == ec2::ErrorCode::ok)
+                    qnClientCoreModule->layoutTourStateManager()->markChanged(tour.id, false);
+            });
+        const bool success = (reqId > 0);
+        if (success)
+            qnClientCoreModule->layoutTourStateManager()->markBeingSaved(tour.id, true);
     };
 }
 

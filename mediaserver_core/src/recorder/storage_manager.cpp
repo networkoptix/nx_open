@@ -1543,7 +1543,7 @@ void QnStorageManager::checkSystemStorageSpace()
                 && storage->getFreeSpace() < kMinSystemStorageFreeSpace)
             {
                 m_lowSysStorageSpaceWarnShown = true;
-                emit storageFailure(storage, QnBusiness::SystemStorageFullReason);
+                emit storageFailure(storage, nx::vms::event::EventReason::systemStorageFull);
             }
             else if (storage->getFreeSpace() > kMinSystemStorageFreeSpace * 2)
             {
@@ -2011,7 +2011,7 @@ bool QnStorageManager::clearOldestSpace(const QnStorageResourcePtr &storage, boo
 
     if (toDelete > 0 && !useMinArchiveDays) {
         if (!m_diskFullWarned[storage->getId()]) {
-            emit storageFailure(storage, QnBusiness::StorageFullReason);
+            emit storageFailure(storage, nx::vms::event::EventReason::storageFull);
             m_diskFullWarned[storage->getId()] = true;
         }
     }
@@ -2139,7 +2139,7 @@ void QnStorageManager::changeStorageStatus(const QnStorageResourcePtr &fileStora
 
     fileStorage->setStatus(status);
     if (status == Qn::Offline)
-        emit storageFailure(fileStorage, QnBusiness::StorageIoErrorReason);
+        emit storageFailure(fileStorage, nx::vms::event::EventReason::storageIoError);
 }
 
 void QnStorageManager::startAuxTimerTasks()

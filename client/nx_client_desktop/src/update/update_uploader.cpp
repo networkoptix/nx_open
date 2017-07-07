@@ -98,7 +98,7 @@ bool QnUpdateUploader::uploadUpdate(const QString &updateId, const QString &file
 
     m_progressById.clear();
     foreach (const QnUuid &peerId, peers) {
-        QnMediaServerResourcePtr server = resourcePool()->getIncompatibleResourceById(peerId, true).dynamicCast<QnMediaServerResource>();
+        auto server = resourcePool()->getIncompatibleServerById(peerId, true);
         if (!server)
             return false;
 

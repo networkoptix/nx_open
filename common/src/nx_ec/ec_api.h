@@ -282,12 +282,12 @@ namespace ec2
         Q_OBJECT
     public:
     signals:
-        void addedOrUpdated( QnBusinessEventRulePtr businessRule, NotificationSource source);
+        void addedOrUpdated( nx::vms::event::RulePtr businessRule, NotificationSource source);
         void removed( QnUuid id );
-        void businessActionBroadcasted( const QnAbstractBusinessActionPtr& businessAction );
+        void businessActionBroadcasted( const nx::vms::event::AbstractActionPtr& businessAction );
         void businessRuleReset( const ec2::ApiBusinessRuleDataList& rules );
-        void gotBroadcastAction(const QnAbstractBusinessActionPtr& action);
-        void execBusinessAction(const QnAbstractBusinessActionPtr& action);
+        void gotBroadcastAction(const nx::vms::event::AbstractActionPtr& action);
+        void execBusinessAction(const nx::vms::event::AbstractActionPtr& action);
     };
 
     typedef std::shared_ptr<AbstractBusinessEventNotificationManager> AbstractBusinessEventNotificationManagerPtr;
@@ -301,14 +301,14 @@ namespace ec2
         virtual ~AbstractBusinessEventManager() {}
 
         /*!
-            \param handler Functor with params: (ErrorCode, const QnBusinessEventRuleList&)
+            \param handler Functor with params: (ErrorCode, const nx::vms::event::RuleList&)
         */
         template<class TargetType, class HandlerType> int getBusinessRules( TargetType* target, HandlerType handler ) {
             return getBusinessRules( std::static_pointer_cast<impl::GetBusinessRulesHandler>(
                 std::make_shared<impl::CustomGetBusinessRulesHandler<TargetType, HandlerType>>(target, handler)) );
         }
 
-        ErrorCode getBusinessRulesSync(QnBusinessEventRuleList* const businessEventList ) {
+        ErrorCode getBusinessRulesSync(nx::vms::event::RuleList* const businessEventList ) {
             int(AbstractBusinessEventManager::*fn)(impl::GetBusinessRulesHandlerPtr) = &AbstractBusinessEventManager::getBusinessRules;
             return impl::doSyncCall<impl::GetBusinessRulesHandler>( std::bind(fn, this, std::placeholders::_1), businessEventList );
         }
@@ -316,7 +316,7 @@ namespace ec2
         /*!
             \param handler Functor with params: (ErrorCode)
         */
-        template<class TargetType, class HandlerType> int save( const QnBusinessEventRulePtr& rule, TargetType* target, HandlerType handler ) {
+        template<class TargetType, class HandlerType> int save( const nx::vms::event::RulePtr& rule, TargetType* target, HandlerType handler ) {
             return save( rule, std::static_pointer_cast<impl::SaveBusinessRuleHandler>(
                 std::make_shared<impl::CustomSaveBusinessRuleHandler<TargetType, HandlerType>>(target, handler)) );
         }
@@ -330,11 +330,11 @@ namespace ec2
         /*!
             \param handler Functor with params: (ErrorCode)
         */
-        template<class TargetType, class HandlerType> int broadcastBusinessAction( const QnAbstractBusinessActionPtr& businessAction, TargetType* target, HandlerType handler ) {
+        template<class TargetType, class HandlerType> int broadcastBusinessAction( const nx::vms::event::AbstractActionPtr& businessAction, TargetType* target, HandlerType handler ) {
             return broadcastBusinessAction( businessAction, std::static_pointer_cast<impl::SimpleHandler>(
                 std::make_shared<impl::CustomSimpleHandler<TargetType, HandlerType>>(target, handler)) );
         }
-        template<class TargetType, class HandlerType> int sendBusinessAction( const QnAbstractBusinessActionPtr& businessAction, const QnUuid& dstPeer, TargetType* target, HandlerType handler ) {
+        template<class TargetType, class HandlerType> int sendBusinessAction( const nx::vms::event::AbstractActionPtr& businessAction, const QnUuid& dstPeer, TargetType* target, HandlerType handler ) {
             return sendBusinessAction( businessAction, dstPeer, std::static_pointer_cast<impl::SimpleHandler>(
                 std::make_shared<impl::CustomSimpleHandler<TargetType, HandlerType>>(target, handler)) );
         }
@@ -350,10 +350,10 @@ namespace ec2
 
     private:
         virtual int getBusinessRules( impl::GetBusinessRulesHandlerPtr handler ) = 0;
-        virtual int save( const QnBusinessEventRulePtr& rule, impl::SaveBusinessRuleHandlerPtr handler ) = 0;
+        virtual int save( const nx::vms::event::RulePtr& rule, impl::SaveBusinessRuleHandlerPtr handler ) = 0;
         virtual int deleteRule( QnUuid ruleId, impl::SimpleHandlerPtr handler ) = 0;
-        virtual int broadcastBusinessAction( const QnAbstractBusinessActionPtr& businessAction, impl::SimpleHandlerPtr handler ) = 0;
-        virtual int sendBusinessAction( const QnAbstractBusinessActionPtr& businessAction, const QnUuid& id, impl::SimpleHandlerPtr handler ) = 0;
+        virtual int broadcastBusinessAction( const nx::vms::event::AbstractActionPtr& businessAction, impl::SimpleHandlerPtr handler ) = 0;
+        virtual int sendBusinessAction( const nx::vms::event::AbstractActionPtr& businessAction, const QnUuid& id, impl::SimpleHandlerPtr handler ) = 0;
         virtual int resetBusinessRules( impl::SimpleHandlerPtr handler ) = 0;
     };
 

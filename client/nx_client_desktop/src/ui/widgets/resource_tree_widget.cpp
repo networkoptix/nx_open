@@ -31,6 +31,8 @@
 #include <ui/workbench/workbench_layout.h>
 #include <ui/workaround/hidpi_workarounds.h>
 
+#include <utils/common/event_processors.h>
+
 // -------------------------------------------------------------------------- //
 // QnResourceTreeSortProxyModel
 // -------------------------------------------------------------------------- //
@@ -62,7 +64,7 @@ public:
     {
         if (index.column() == Qn::CheckColumn && role == Qt::CheckStateRole)
         {
-            //TODO: #vkutin #GDM #common Maybe move these signals to QnResourceTreeModel
+            // TODO: #vkutin #GDM #common Maybe move these signals to QnResourceTreeModel
             emit beforeRecursiveOperation();
             base_type::setData(index, value, Qt::CheckStateRole);
             emit afterRecursiveOperation();
@@ -131,7 +133,6 @@ private:
 QnResourceTreeWidget::QnResourceTreeWidget(QWidget *parent):
     base_type(parent),
     ui(new Ui::QnResourceTreeWidget()),
-    m_criterion(),
     m_itemDelegate(nullptr),
     m_resourceProxyModel(nullptr),
     m_checkboxesVisible(true),
@@ -141,11 +142,7 @@ QnResourceTreeWidget::QnResourceTreeWidget(QWidget *parent):
 {
     ui->setupUi(this);
 
-    //TODO: #vkutin replace with SearchLineEdit
-    ui->filterLineEdit->addAction(qnSkin->icon("theme/input_search.png"),
-        QLineEdit::LeadingPosition);
-    ui->filterLineEdit->setClearButtonEnabled(true);
-    ui->filter->setVisible(false);
+    initializeFilter();
 
     m_itemDelegate = new QnResourceItemDelegate(this);
     m_itemDelegate->setFixedHeight(0); // automatic height
@@ -170,11 +167,6 @@ QnResourceTreeWidget::QnResourceTreeWidget(QWidget *parent):
         &QnResourceTreeWidget::at_treeView_spacePressed);
     connect(ui->resourcesTreeView, &QnTreeView::clicked, this,
         &QnResourceTreeWidget::at_treeView_clicked);
-
-    connect(ui->filterLineEdit, &QLineEdit::textChanged, this,
-        &QnResourceTreeWidget::updateFilter);
-    connect(ui->filterLineEdit, &QLineEdit::editingFinished, this,
-        &QnResourceTreeWidget::updateFilter);
 
     ui->resourcesTreeView->installEventFilter(this);
 }
@@ -215,10 +207,13 @@ void QnResourceTreeWidget::setModel(QAbstractItemModel *model)
 
         ui->resourcesTreeView->setModel(m_resourceProxyModel);
 
-        connect(m_resourceProxyModel, SIGNAL(rowsInserted(const QModelIndex &, int, int)), this, SLOT(at_resourceProxyModel_rowsInserted(const QModelIndex &, int, int)));
-        connect(m_resourceProxyModel, &QnResourceSearchProxyModel::beforeRecursiveOperation, this, &QnResourceTreeWidget::beforeRecursiveOperation);
-        connect(m_resourceProxyModel, &QnResourceSearchProxyModel::afterRecursiveOperation, this, &QnResourceTreeWidget::afterRecursiveOperation);
-        at_resourceProxyModel_rowsInserted(QModelIndex());
+        connect(m_resourceProxyModel, &QAbstractItemModel::rowsInserted, this,
+            &QnResourceTreeWidget::at_resourceProxyModel_rowsInserted);
+        connect(m_resourceProxyModel, &QnResourceSearchProxyModel::beforeRecursiveOperation, this,
+            &QnResourceTreeWidget::beforeRecursiveOperation);
+        connect(m_resourceProxyModel, &QnResourceSearchProxyModel::afterRecursiveOperation, this,
+            &QnResourceTreeWidget::afterRecursiveOperation);
+        expandNodeIfNeeded(QModelIndex());
 
         updateFilter();
         updateColumns();
@@ -229,16 +224,9 @@ void QnResourceTreeWidget::setModel(QAbstractItemModel *model)
     }
 }
 
-const QnResourceCriterion &QnResourceTreeWidget::criterion() const
+QSortFilterProxyModel* QnResourceTreeWidget::searchModel() const
 {
-    return m_criterion;
-}
-
-void QnResourceTreeWidget::setCriterion(const QnResourceCriterion &criterion)
-{
-    m_criterion = criterion;
-
-    updateFilter();
+    return m_resourceProxyModel;
 }
 
 QItemSelectionModel* QnResourceTreeWidget::selectionModel()
@@ -474,12 +462,8 @@ void QnResourceTreeWidget::updateFilter()
         return;
     }
 
-    m_resourceProxyModel->clearCriteria();
-    m_resourceProxyModel->addCriterion(QnResourceCriterionGroup(filter));
-    m_resourceProxyModel->addCriterion(m_criterion);
-    m_resourceProxyModel->addCriterion(QnResourceCriterion(Qn::server));
-
-    m_resourceProxyModel->setFilterEnabled(!filter.isEmpty() || !m_criterion.isNull());
+    m_resourceProxyModel->setQuery({filter});
+    m_resourceProxyModel->setFilterEnabled(!filter.isEmpty());
     if (!filter.isEmpty())
         ui->resourcesTreeView->expandAll();
 }
@@ -549,13 +533,14 @@ void QnResourceTreeWidget::at_treeView_clicked(const QModelIndex &index)
     }
 }
 
-void QnResourceTreeWidget::at_resourceProxyModel_rowsInserted(const QModelIndex &parent, int start, int end)
+void QnResourceTreeWidget::at_resourceProxyModel_rowsInserted(const QModelIndex& parent,
+    int start, int end)
 {
     for (int i = start; i <= end; i++)
-        at_resourceProxyModel_rowsInserted(m_resourceProxyModel->index(i, 0, parent));
+        expandNodeIfNeeded(m_resourceProxyModel->index(i, 0, parent));
 }
 
-void QnResourceTreeWidget::at_resourceProxyModel_rowsInserted(const QModelIndex &index)
+void QnResourceTreeWidget::expandNodeIfNeeded(const QModelIndex& index)
 {
     /* Auto-expand certain nodes. */
     switch (index.data(Qn::NodeTypeRole).value<Qn::NodeType>())
@@ -577,6 +562,38 @@ void QnResourceTreeWidget::at_resourceProxyModel_rowsInserted(const QModelIndex 
     }
 
     at_resourceProxyModel_rowsInserted(index, 0, m_resourceProxyModel->rowCount(index) - 1);
+}
+
+void QnResourceTreeWidget::initializeFilter()
+{
+    // TODO: #vkutin replace with SearchLineEdit
+    ui->filterLineEdit->addAction(qnSkin->icon("theme/input_search.png"),
+        QLineEdit::LeadingPosition);
+    ui->filterLineEdit->setClearButtonEnabled(true);
+    ui->filter->setVisible(false);
+
+    connect(ui->filterLineEdit, &QLineEdit::textChanged, this,
+        &QnResourceTreeWidget::updateFilter);
+    connect(ui->filterLineEdit, &QLineEdit::editingFinished, this,
+        &QnResourceTreeWidget::updateFilter);
+
+    installEventHandler(ui->filterLineEdit, QEvent::KeyPress, this,
+        [this](QObject* /*object*/, QEvent* event)
+        {
+            const auto keyEvent = static_cast<QKeyEvent*>(event);
+            switch (keyEvent->key())
+            {
+                case Qt::Key_Enter:
+                case Qt::Key_Return:
+                    if (keyEvent->modifiers().testFlag(Qt::ControlModifier))
+                        emit filterCtrlEnterPressed();
+                    else
+                        emit filterEnterPressed();
+                    break;
+                default:
+                    break;
+            }
+        });
 }
 
 void QnResourceTreeWidget::update(const QnResourcePtr& resource)

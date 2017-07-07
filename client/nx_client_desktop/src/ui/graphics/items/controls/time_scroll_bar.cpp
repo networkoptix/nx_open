@@ -131,7 +131,7 @@ void QnTimeScrollBar::mouseMoveEvent(QGraphicsSceneMouseEvent* event)
 
     // copy-paste from the base class, but it's needed to prevent double-setting of slider value
 
-    //TODO: #vkutin #common Figure out WTF is this copypaste
+    // TODO: #vkutin #common Figure out WTF is this copypaste
 
     AbstractLinearGraphicsSlider::mouseMoveEvent(event);
 

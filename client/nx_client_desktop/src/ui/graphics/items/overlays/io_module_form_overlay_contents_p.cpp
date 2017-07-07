@@ -251,7 +251,7 @@ void QnIoModuleFormOverlayContentsPrivate::OutputPortItem::paint(QPainter* paint
     auto labelRect = buttonRect.adjusted(kButtonMargin, 0.0, -kIndicatorWidth, 0.0);
     paintLabel(painter, labelRect, Qt::AlignLeft);
 
-    //TODO: #vkutin #apats Icon for disabled state is required
+    // TODO: #vkutin #apats Icon for disabled state is required
     auto icon = qnSkin->icon(lit("io/button_indicator_off.png"), lit("io/button_indicator_on.png"));
     auto iconState = isOn() ? QIcon::On : QIcon::Off;
     auto iconRect = buttonRect;

@@ -5,6 +5,8 @@
 #include "skin.h"
 #include "icon_pixmap_accessor.h"
 
+#include <nx/utils/log/assert.h>
+
 namespace {
 
 void decompose(const QString& path, QString* prefix, QString* suffix)
@@ -152,7 +154,7 @@ void QnNoptixIconLoader::loadIconInternal(
 
     /* Create normal icon. */
     QnIconBuilder builder;
-    QPixmap basePixmap = skin->pixmap(name);
+    QPixmap basePixmap = skin->pixmap(name, false);
     builder.addPixmap(basePixmap, QnIcon::Normal, QnIcon::Off);
 
     for (auto suffix: *suffixes)
@@ -165,7 +167,7 @@ void QnNoptixIconLoader::loadIconInternal(
         {
             path = prefix + lit("_") + suffix.second + extension;
             if (skin->hasFile(path))
-                builder.addPixmap(skin->pixmap(path), suffix.first, QnIcon::Off);
+                builder.addPixmap(skin->pixmap(path, false), suffix.first, QnIcon::Off);
         }
     }
 
@@ -179,7 +181,7 @@ void QnNoptixIconLoader::loadIconInternal(
 
     if (skin->hasFile(path))
     {
-        baseCheckedPixmap = skin->pixmap(path);
+        baseCheckedPixmap = skin->pixmap(path, false);
         builder.addPixmap(baseCheckedPixmap, QnIcon::On);
     }
 
@@ -194,7 +196,7 @@ void QnNoptixIconLoader::loadIconInternal(
         {
             path = prefix + lit("_") + suffix.second + extension;
             if (skin->hasFile(path))
-                builder.addPixmap(skin->pixmap(path), suffix.first, QnIcon::On);
+                builder.addPixmap(skin->pixmap(path, false), suffix.first, QnIcon::On);
         }
     }
 

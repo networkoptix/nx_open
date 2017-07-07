@@ -47,7 +47,7 @@ QPixmap QnCheckedButton::generatePixmap(int size, const QColor &color, const QCo
         qreal trOffset = cellSize / 6.4 + 0.5;
         qreal trSize = cellSize / 64.0 * 6.0 - 0.5;
 
-        //TODO: #vkutin #common Code duplication with QnScheduleGridWidget
+        // TODO: #vkutin #common Code duplication with QnScheduleGridWidget
         std::array<QPointF, 4> points({
             QPointF(cellSize - trOffset - trSize, trOffset),
             QPointF(cellSize - trOffset, trOffset + trSize),

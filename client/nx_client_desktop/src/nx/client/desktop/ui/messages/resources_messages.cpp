@@ -101,6 +101,18 @@ bool overrideLayout(QWidget* parent)
     return messageBox.exec() != QDialogButtonBox::Cancel;
 }
 
+bool overrideLayoutTour(QWidget* parent)
+{
+    QnSessionAwareMessageBox messageBox(parent);
+    messageBox.setIcon(QnMessageBoxIcon::Question);
+    messageBox.setText(tr("Overwrite existing layout tour?"));
+    messageBox.setInformativeText(tr("There is another layout tour with the same name."));
+    messageBox.setStandardButtons(QDialogButtonBox::Cancel);
+    messageBox.addCustomButton(QnMessageBoxCustomButton::Overwrite,
+        QDialogButtonBox::AcceptRole, Qn::ButtonAccent::Warning);
+    return messageBox.exec() != QDialogButtonBox::Cancel;
+}
+
 bool changeUserLocalLayout(QWidget* parent,
     const QnResourceList& stillAccessible)
 {
@@ -182,6 +194,26 @@ bool removeItemsFromLayout(QWidget* parent,
     QnSessionAwareMessageBox messageBox(parent);
     messageBox.setIcon(QnMessageBoxIcon::Warning);
     messageBox.setText(tr("Remove %n items from layout?", "", resources.size()));
+    messageBox.setStandardButtons(QDialogButtonBox::Cancel);
+    messageBox.addButton(tr("Remove"), QDialogButtonBox::AcceptRole, Qn::ButtonAccent::Warning);
+    messageBox.addCustomWidget(new QnResourceListView(resources, true, &messageBox));
+    messageBox.setCheckBoxEnabled();
+    const auto result = messageBox.exec();
+    if (messageBox.isChecked())
+        qnClientShowOnce->setFlag(kRemoveItemsFromLayoutShowOnceKey);
+
+    return result != QDialogButtonBox::Cancel;
+}
+
+bool removeItemsFromLayoutTour(QWidget* parent, const QnResourceList& resources)
+{
+    /* Check if user have already silenced this warning. */
+    if (qnClientShowOnce->testFlag(kRemoveItemsFromLayoutShowOnceKey))
+        return true;
+
+    QnSessionAwareMessageBox messageBox(parent);
+    messageBox.setIcon(QnMessageBoxIcon::Warning);
+    messageBox.setText(tr("Remove %n items from layout tour?", "", resources.size()));
     messageBox.setStandardButtons(QDialogButtonBox::Cancel);
     messageBox.addButton(tr("Remove"), QDialogButtonBox::AcceptRole, Qn::ButtonAccent::Warning);
     messageBox.addCustomWidget(new QnResourceListView(resources, true, &messageBox));

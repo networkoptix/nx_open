@@ -4,8 +4,8 @@
 
 #include <QtGui/QStandardItemModel>
 
-#include <business/business_event_rule.h>
-#include <business/business_fwd.h>
+#include <nx/vms/event/rule.h>
+#include <nx/vms/event/event_fwd.h>
 
 #include <core/resource/resource_fwd.h>
 
@@ -13,94 +13,92 @@
 
 #include <nx/utils/uuid.h>
 
-namespace QnBusiness {
-    enum Columns {
-        ModifiedColumn,
-        DisabledColumn,
-        EventColumn,
-        SourceColumn,
-        SpacerColumn,
-        ActionColumn,
-        TargetColumn,
-        AggregationColumn
+typedef QVector<QnUuid> IDList;
+namespace nx { namespace vms { namespace event { class StringsHelper; }}}
+
+class QnBusinessRuleViewModel: public QObject, public QnWorkbenchContextAware
+{
+    Q_OBJECT
+    using base_type = QObject;
+
+public:
+    enum class Column
+    {
+        modified,
+        disabled,
+        event,
+        source,
+        spacer,
+        action,
+        target,
+        aggregation
     };
 
-    QList<Columns> allColumns();
+    static QList<Column> allColumns();
 
-    enum Field {
-        ModifiedField           = 0x00000001,
-        EventTypeField          = 0x00000002,
-        EventResourcesField     = 0x00000004,
-        EventParamsField        = 0x00000008,
-        EventStateField         = 0x00000010,
-        ActionTypeField         = 0x00000020,
-        ActionResourcesField    = 0x00000040,
-        ActionParamsField       = 0x00000080,
-        AggregationField        = 0x00000100,
-        DisabledField           = 0x00000200,
-        CommentsField           = 0x00000400,
-        ScheduleField           = 0x00000800,
-        AllFieldsMask           = 0x0000FFFF
+    enum class Field
+    {
+        modified = 0x00000001,
+        eventType = 0x00000002,
+        eventResources = 0x00000004,
+        eventParams = 0x00000008,
+        eventState = 0x00000010,
+        actionType = 0x00000020,
+        actionResources = 0x00000040,
+        actionParams = 0x00000080,
+        aggregation = 0x00000100,
+        disabled = 0x00000200,
+        comments = 0x00000400,
+        schedule = 0x00000800,
+        all = 0x0000FFFF
     };
     Q_DECLARE_FLAGS(Fields, Field)
-
-}
-
-Q_DECLARE_OPERATORS_FOR_FLAGS(QnBusiness::Fields)
-
-typedef QVector<QnUuid> IDList;
-class QnBusinessStringsHelper;
-
-class QnBusinessRuleViewModel: public QObject, public QnWorkbenchContextAware {
-    Q_OBJECT
-
-    typedef QObject base_type;
 
 public:
     QnBusinessRuleViewModel(QObject *parent = 0);
     virtual ~QnBusinessRuleViewModel();
 
-    QVariant data(const int column, const int role = Qt::DisplayRole) const;
-    bool setData(const int column, const QVariant &value, int role);
+    QVariant data(Column column, const int role = Qt::DisplayRole) const;
+    bool setData(Column column, const QVariant& value, int role);
 
-    void loadFromRule(QnBusinessEventRulePtr businessRule);
-    QnBusinessEventRulePtr createRule() const;
+    void loadFromRule(nx::vms::event::RulePtr businessRule);
+    nx::vms::event::RulePtr createRule() const;
 
-    QString getText(const int column, const bool detailed = true) const;
-    QString getToolTip(const int column) const;
-    QIcon getIcon(const int column) const;
-    int getHelpTopic(const int column) const;
+    QString getText(Column column, const bool detailed = true) const;
+    QString getToolTip(Column column) const;
+    QIcon getIcon(Column column) const;
+    int getHelpTopic(Column column) const;
 
-    bool isValid(int column) const;
-    bool isValid() const; //checks validity for all row
+    bool isValid(Column column) const;
+    bool isValid() const; //checks validity for entire row
 
     QnUuid id() const;
 
     bool isModified() const;
     void setModified(bool value);
 
-    QnBusiness::EventType eventType() const;
-    void setEventType(const QnBusiness::EventType value);
+    nx::vms::event::EventType eventType() const;
+    void setEventType(const nx::vms::event::EventType value);
 
     QSet<QnUuid> eventResources() const;
     void setEventResources(const QSet<QnUuid>& value);
 
-    QnBusinessEventParameters eventParams() const;
-    void setEventParams(const QnBusinessEventParameters& params);
+    nx::vms::event::EventParameters eventParams() const;
+    void setEventParams(const nx::vms::event::EventParameters& params);
 
-    QnBusiness::EventState eventState() const;
-    void setEventState(QnBusiness::EventState state);
+    nx::vms::event::EventState eventState() const;
+    void setEventState(nx::vms::event::EventState state);
 
-    QnBusiness::ActionType actionType() const;
-    void setActionType(const QnBusiness::ActionType value);
+    nx::vms::event::ActionType actionType() const;
+    void setActionType(const nx::vms::event::ActionType value);
 
     QSet<QnUuid> actionResources() const;
     void setActionResources(const QSet<QnUuid>& value);
 
     bool isActionProlonged() const;
 
-    QnBusinessActionParameters actionParams() const;
-    void setActionParams(const QnBusinessActionParameters& params);
+    nx::vms::event::ActionParameters actionParams() const;
+    void setActionParams(const nx::vms::event::ActionParameters& params);
 
     int aggregationPeriod() const;
     void setAggregationPeriod(int secs);
@@ -124,11 +122,11 @@ public:
     QStandardItemModel* actionTypesModel();
 
 public:
-    //TODO: #vkutin #3.2 Temporary workaround to pass "all users" as a special uuid.
+    // TODO: #vkutin #3.2 Temporary workaround to pass "all users" as a special uuid.
     static const QnUuid kAllUsersId;
 
 signals:
-    void dataChanged(QnBusiness::Fields fields);
+    void dataChanged(Fields fields);
 
 private:
     void updateActionTypesModel();
@@ -145,19 +143,19 @@ private:
 
     QString getAggregationText() const;
 
-    static QString toggleStateToModelString(QnBusiness::EventState value);
+    static QString toggleStateToModelString(nx::vms::event::EventState value);
 private:
     QnUuid m_id;
     bool m_modified;
 
-    QnBusiness::EventType m_eventType;
+    nx::vms::event::EventType m_eventType;
     QSet<QnUuid> m_eventResources;
-    QnBusinessEventParameters m_eventParams;
-    QnBusiness::EventState m_eventState;
+    nx::vms::event::EventParameters m_eventParams;
+    nx::vms::event::EventState m_eventState;
 
-    QnBusiness::ActionType m_actionType;
+    nx::vms::event::ActionType m_actionType;
     QSet<QnUuid> m_actionResources;
-    QnBusinessActionParameters m_actionParams;
+    nx::vms::event::ActionParameters m_actionParams;
 
     int m_aggregationPeriodSec;
     bool m_disabled;
@@ -168,7 +166,9 @@ private:
     QStandardItemModel *m_eventStatesModel;
     QStandardItemModel *m_actionTypesModel;
 
-    std::unique_ptr<QnBusinessStringsHelper> m_helper;
+    std::unique_ptr<nx::vms::event::StringsHelper> m_helper;
 };
 
 typedef QSharedPointer<QnBusinessRuleViewModel> QnBusinessRuleViewModelPtr;
+
+Q_DECLARE_OPERATORS_FOR_FLAGS(QnBusinessRuleViewModel::Fields)

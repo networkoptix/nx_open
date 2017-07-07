@@ -20,7 +20,7 @@
 
 #include <api/app_server_connection.h>
 
-#include <business/event_rule_manager.h>
+#include <nx/vms/event/rule_manager.h>
 
 #include <core/resource_access/user_access_data.h>
 #include <core/resource_access/shared_resources_manager.h>
@@ -46,7 +46,7 @@
 #include <core/resource/storage_resource.h>
 #include <core/resource/resource_factory.h>
 
-#include <business/business_event_rule.h>
+#include <nx/vms/event/rule.h>
 
 #include "common/common_module.h"
 #include "utils/common/synctime.h"
@@ -56,6 +56,7 @@
 
 #include <nx/utils/log/log.h>
 
+using namespace nx;
 
 QnCommonMessageProcessor::QnCommonMessageProcessor(QObject *parent):
     base_type(parent),
@@ -174,8 +175,8 @@ void QnCommonMessageProcessor::connectToConnection(const ec2::AbstractECConnecti
 
     connect(layoutTourManager,
         &ec2::AbstractLayoutTourNotificationManager::addedOrUpdated,
-        this->layoutTourManager(),
-        &QnLayoutTourManager::addOrUpdateTour,
+        this,
+        &QnCommonMessageProcessor::handleTourAddedOrUpdated,
         Qt::DirectConnection);
 
     connect(layoutTourManager,
@@ -201,6 +202,7 @@ void QnCommonMessageProcessor::disconnectFromConnection(const ec2::AbstractECCon
     connection->getDiscoveryNotificationManager()->disconnect(this);
     connection->getTimeNotificationManager()->disconnect(this);
     connection->getMiscNotificationManager()->disconnect(this);
+    connection->getLayoutTourNotificationManager()->disconnect(this);
 
     layoutTourManager()->resetTours();
 }
@@ -441,7 +443,7 @@ void QnCommonMessageProcessor::on_licenseRemoved(const QnLicensePtr &license) {
     licensePool()->removeLicense(license);
 }
 
-void QnCommonMessageProcessor::on_businessEventAddedOrUpdated(const QnBusinessEventRulePtr& rule)
+void QnCommonMessageProcessor::on_businessEventAddedOrUpdated(const vms::event::RulePtr& rule)
 {
     eventRuleManager()->addOrUpdateRule(rule);
 }
@@ -451,26 +453,31 @@ void QnCommonMessageProcessor::on_businessEventRemoved(const QnUuid& id)
     eventRuleManager()->removeRule(id);
 }
 
-void QnCommonMessageProcessor::on_businessActionBroadcasted( const QnAbstractBusinessActionPtr& /* businessAction */ )
+void QnCommonMessageProcessor::on_businessActionBroadcasted( const vms::event::AbstractActionPtr& /* businessAction */ )
 {
     // nothing to do for a while
 }
 
 void QnCommonMessageProcessor::on_businessRuleReset(const ec2::ApiBusinessRuleDataList& rules)
 {
-    QnBusinessEventRuleList ruleList;
+    vms::event::RuleList ruleList;
     fromApiToResourceList(rules, ruleList);
     eventRuleManager()->resetRules(ruleList);
 }
 
-void QnCommonMessageProcessor::on_broadcastBusinessAction( const QnAbstractBusinessActionPtr& action )
+void QnCommonMessageProcessor::on_broadcastBusinessAction( const vms::event::AbstractActionPtr& action )
 {
     emit businessActionReceived(action);
 }
 
-void QnCommonMessageProcessor::on_execBusinessAction( const QnAbstractBusinessActionPtr& action )
+void QnCommonMessageProcessor::on_execBusinessAction( const vms::event::AbstractActionPtr& action )
 {
     execBusinessActionInternal(action);
+}
+
+void QnCommonMessageProcessor::handleTourAddedOrUpdated(const ec2::ApiLayoutTourData& tour)
+{
+    layoutTourManager()->addOrUpdateTour(tour);
 }
 
 void QnCommonMessageProcessor::resetResourceTypes(const ec2::ApiResourceTypeDataList& resTypes)

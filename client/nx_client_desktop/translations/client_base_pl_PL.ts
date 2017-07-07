@@ -80,7 +80,7 @@ to view more bookmarks</translation>
     </message>
     <message>
       <source>Help</source>
-      <translation type="unfinished">Help</translation>
+      <translation>Pomoc</translation>
     </message>
     <message>
       <source>Event Log...</source>
@@ -327,7 +327,7 @@ to view more bookmarks</translation>
     </message>
     <message>
       <source>Exit</source>
-      <translation type="unfinished">Exit</translation>
+      <translation>Zakończ</translation>
     </message>
     <message>
       <source>Mark Selection Start</source>
@@ -383,7 +383,7 @@ to view more bookmarks</translation>
     </message>
     <message>
       <source>Open</source>
-      <translation type="unfinished">Open</translation>
+      <translation>Otwórz</translation>
     </message>
     <message>
       <source>Monitor</source>
@@ -443,7 +443,7 @@ to view more bookmarks</translation>
     </message>
     <message>
       <source>Delete</source>
-      <translation type="unfinished">Delete</translation>
+      <translation>Usuń</translation>
     </message>
     <message>
       <source>Stop Video Wall</source>
@@ -751,7 +751,7 @@ to view more bookmarks</translation>
     </message>
     <message>
       <source>Close</source>
-      <translation type="unfinished">Close</translation>
+      <translation>Zamknij</translation>
     </message>
     <message>
       <source>Close All But This</source>
@@ -924,40 +924,40 @@ to view more bookmarks</translation>
   <context>
     <name>Deactivator</name>
     <message>
-      <source>Unknown error</source>
-      <translation type="unfinished">Unknown error</translation>
+      <source>Unknown error.</source>
+      <translation type="unfinished">Unknown error.</translation>
     </message>
     <message>
-      <source>License does not exist</source>
-      <translation type="unfinished">License does not exist</translation>
+      <source>License does not exist.</source>
+      <translation type="unfinished">License does not exist.</translation>
     </message>
     <message>
-      <source>License is disabled</source>
-      <translation type="unfinished">License is disabled</translation>
+      <source>License is disabled.</source>
+      <translation type="unfinished">License is disabled.</translation>
     </message>
     <message>
-      <source>License is inactive</source>
-      <translation type="unfinished">License is inactive</translation>
+      <source>License is inactive.</source>
+      <translation type="unfinished">License is inactive.</translation>
     </message>
     <message>
-      <source>Invalid license</source>
-      <translation type="unfinished">Invalid license</translation>
+      <source>Invalid license.</source>
+      <translation type="unfinished">Invalid license.</translation>
     </message>
     <message>
-      <source>License is trial</source>
-      <translation type="unfinished">License is trial</translation>
+      <source>License is trial.</source>
+      <translation type="unfinished">License is trial.</translation>
     </message>
     <message>
-      <source>License is in deactivation process</source>
-      <translation type="unfinished">License is in deactivation process</translation>
+      <source>License is in pending deactivation state, but has not been deactivated yet.</source>
+      <translation type="unfinished">License is in pending deactivation state, but has not been deactivated yet.</translation>
     </message>
     <message>
-      <source>Invalid hardware id</source>
-      <translation type="unfinished">Invalid hardware id</translation>
+      <source>Hardware ID of Media Server with this license does not match Hardware ID on which license was activated.</source>
+      <translation type="unfinished">Hardware ID of Media Server with this license does not match Hardware ID on which license was activated.</translation>
     </message>
     <message>
-      <source>Limit exceeded</source>
-      <translation type="unfinished">Limit exceeded</translation>
+      <source>Number of deactivations exceeded limit for this license.</source>
+      <translation type="unfinished">Number of deactivations exceeded limit for this license.</translation>
     </message>
   </context>
   <context>
@@ -972,7 +972,7 @@ to view more bookmarks</translation>
     </message>
     <message>
       <source>Top</source>
-      <translation type="unfinished">Top</translation>
+      <translation>Do góry</translation>
     </message>
     <message>
       <source>Right Edge</source>
@@ -980,7 +980,7 @@ to view more bookmarks</translation>
     </message>
     <message>
       <source>Bottom</source>
-      <translation type="unfinished">Bottom</translation>
+      <translation>W dół</translation>
     </message>
     <message>
       <source>Page Left</source>
@@ -1000,19 +1000,19 @@ to view more bookmarks</translation>
     </message>
     <message>
       <source>Scroll Left</source>
-      <translation type="unfinished">Scroll Left</translation>
+      <translation>Przewiń w lewo</translation>
     </message>
     <message>
       <source>Scroll Up</source>
-      <translation type="unfinished">Scroll Up</translation>
+      <translation>Przewiń w górę</translation>
     </message>
     <message>
       <source>Scroll Right</source>
-      <translation type="unfinished">Scroll Right</translation>
+      <translation>Przewiń w prawo</translation>
     </message>
     <message>
       <source>Scroll Down</source>
-      <translation type="unfinished">Scroll Down</translation>
+      <translation>Przewiń w dół</translation>
     </message>
   </context>
   <context>
@@ -1081,11 +1081,11 @@ to view more bookmarks</translation>
     <name>PtzOverlayWidget</name>
     <message>
       <source>Zoom In</source>
-      <translation type="unfinished">Zoom In</translation>
+      <translation>Przybliż</translation>
     </message>
     <message>
       <source>Zoom Out</source>
-      <translation type="unfinished">Zoom Out</translation>
+      <translation>Oddalenie</translation>
     </message>
     <message>
       <source>Focus Far</source>
@@ -1258,7 +1258,7 @@ to view more bookmarks</translation>
     </message>
     <message>
       <source>Select All</source>
-      <translation type="unfinished">Select All</translation>
+      <translation>Zaznacz wszystko</translation>
     </message>
     <message>
       <source>Export selected records to a file</source>
@@ -1357,7 +1357,7 @@ to view more bookmarks</translation>
     <name>QnAuditLogModel</name>
     <message>
       <source>Unknown</source>
-      <translation type="unfinished">Unknown</translation>
+      <translation>Nieznany</translation>
     </message>
     <message>
       <source>Unsuccessful login</source>
@@ -1793,7 +1793,7 @@ to view more bookmarks</translation>
     </message>
     <message>
       <source>&amp;Delete</source>
-      <translation type="unfinished">&amp;Delete</translation>
+      <translation>&amp;Usuń</translation>
     </message>
     <message>
       <source>&amp;Schedule...</source>
@@ -2188,7 +2188,7 @@ to view more bookmarks</translation>
     </message>
     <message>
       <source>Select All</source>
-      <translation type="unfinished">Select All</translation>
+      <translation>Zaznacz wszystko</translation>
     </message>
     <message>
       <source>Devices List for %1</source>
@@ -2253,7 +2253,7 @@ to view more bookmarks</translation>
     </message>
     <message>
       <source>Name</source>
-      <translation type="unfinished">Name</translation>
+      <translation>Nazwa</translation>
     </message>
     <message>
       <source>Vendor</source>
@@ -2775,7 +2775,7 @@ to %1</translation>
     </message>
     <message>
       <source>Download</source>
-      <translation type="unfinished">Download</translation>
+      <translation>Pobrane</translation>
     </message>
     <message>
       <source>Restart</source>
@@ -2837,6 +2837,10 @@ to %1</translation>
     <message>
       <source>Connection to Server could not be established.</source>
       <translation type="unfinished">Connection to Server could not be established.</translation>
+    </message>
+    <message>
+      <source>This user is disabled by system administrator.</source>
+      <translation type="unfinished">This user is disabled by system administrator.</translation>
     </message>
   </context>
   <context>
@@ -3080,7 +3084,7 @@ to %1</translation>
     </message>
     <message>
       <source>Select All</source>
-      <translation type="unfinished">Select All</translation>
+      <translation>Zaznacz wszystko</translation>
     </message>
     <message>
       <source>Clear Filter</source>
@@ -3392,7 +3396,7 @@ to %1</translation>
     <name>QnIOPortsViewModel</name>
     <message>
       <source>Type</source>
-      <translation type="unfinished">Type</translation>
+      <translation>Rodzaj</translation>
     </message>
     <message>
       <source>Default state</source>
@@ -3400,12 +3404,12 @@ to %1</translation>
     </message>
     <message>
       <source>Name</source>
-      <translation type="unfinished">Name</translation>
+      <translation>Nazwa</translation>
     </message>
     <message>
       <source>Unknown</source>
       <comment>IO Port Type</comment>
-      <translation type="unfinished">Unknown</translation>
+      <translation>Nieznany</translation>
     </message>
     <message>
       <source>Disabled</source>
@@ -3612,7 +3616,7 @@ to %1</translation>
     </message>
     <message>
       <source>Name</source>
-      <translation type="unfinished">Name</translation>
+      <translation>Nazwa</translation>
     </message>
   </context>
   <context>
@@ -3689,7 +3693,7 @@ to %1</translation>
     <name>QnLicenseListModel</name>
     <message>
       <source>Type</source>
-      <translation type="unfinished">Type</translation>
+      <translation>Rodzaj</translation>
     </message>
     <message>
       <source>License Key</source>
@@ -3887,14 +3891,6 @@ to %1</translation>
       <translation type="unfinished">This license is already activated and linked to hardware ID %1 on %2</translation>
     </message>
     <message numerus="yes">
-      <source>%n channels</source>
-      <translation type="unfinished">
-        <numerusform>%n channels</numerusform>
-        <numerusform>%n channels</numerusform>
-        <numerusform>%n channels</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
       <source>Deactivate licenses?</source>
       <translation type="unfinished">
         <numerusform>Deactivate licenses?</numerusform>
@@ -3920,18 +3916,6 @@ to %1</translation>
         <numerusform>%1 of %n licenses cannot be deactivated</numerusform>
         <numerusform>%1 of %n licenses cannot be deactivated</numerusform>
         <numerusform>%1 of %n licenses cannot be deactivated</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>Please contact Customer Support</source>
-      <translation type="unfinished">Please contact Customer Support</translation>
-    </message>
-    <message numerus="yes">
-      <source>Deactivate %n other</source>
-      <translation type="unfinished">
-        <numerusform>Deactivate %n other</numerusform>
-        <numerusform>Deactivate %n other</numerusform>
-        <numerusform>Deactivate %n other</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -3972,11 +3956,31 @@ to %1</translation>
     </message>
     <message>
       <source>Remove</source>
-      <translation type="unfinished">Remove</translation>
+      <translation>Usuń</translation>
     </message>
     <message>
       <source>Deactivate</source>
       <translation type="unfinished">Deactivate</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n channels.</source>
+      <translation type="unfinished">
+        <numerusform>%n channels.</numerusform>
+        <numerusform>%n channels.</numerusform>
+        <numerusform>%n channels.</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Please contact Customer Support.</source>
+      <translation type="unfinished">Please contact Customer Support.</translation>
+    </message>
+    <message numerus="yes">
+      <source>Deactivate %n Other</source>
+      <translation type="unfinished">
+        <numerusform>Deactivate %n Other</numerusform>
+        <numerusform>Deactivate %n Other</numerusform>
+        <numerusform>Deactivate %n Other</numerusform>
+      </translation>
     </message>
   </context>
   <context>
@@ -3995,7 +3999,7 @@ to %1</translation>
     </message>
     <message>
       <source>All files (*.*)</source>
-      <translation type="unfinished">All files (*.*)</translation>
+      <translation>Wszystkie pliki (*.*)</translation>
     </message>
     <message>
       <source>Failed to open file</source>
@@ -4358,11 +4362,11 @@ to %1</translation>
     </message>
     <message>
       <source>Delete</source>
-      <translation type="unfinished">Delete</translation>
+      <translation>Usuń</translation>
     </message>
     <message>
       <source>Reset</source>
-      <translation type="unfinished">Reset</translation>
+      <translation>Zresetuj</translation>
     </message>
     <message>
       <source>Skip</source>
@@ -4596,7 +4600,7 @@ to %1</translation>
     <name>QnProgressDialog</name>
     <message>
       <source>Cancel</source>
-      <translation type="unfinished">Cancel</translation>
+      <translation>Anuluj</translation>
     </message>
   </context>
   <context>
@@ -4614,7 +4618,7 @@ to %1</translation>
     <name>QnPtzManageModel</name>
     <message>
       <source>Name</source>
-      <translation type="unfinished">Name</translation>
+      <translation>Nazwa</translation>
     </message>
     <message>
       <source>Hotkey</source>
@@ -4622,7 +4626,7 @@ to %1</translation>
     </message>
     <message>
       <source>Home</source>
-      <translation type="unfinished">Home</translation>
+      <translation>Katalog domowy</translation>
     </message>
     <message>
       <source>Details</source>
@@ -5056,7 +5060,7 @@ to %1</translation>
     <name>QnResourceWidget</name>
     <message>
       <source>Close</source>
-      <translation type="unfinished">Close</translation>
+      <translation>Zamknij</translation>
     </message>
     <message>
       <source>Information</source>
@@ -5116,7 +5120,7 @@ to %1</translation>
     <name>QnSearchBookmarksModel</name>
     <message>
       <source>Name</source>
-      <translation type="unfinished">Name</translation>
+      <translation>Nazwa</translation>
     </message>
     <message>
       <source>Start time</source>
@@ -5217,10 +5221,6 @@ to %1</translation>
   </context>
   <context>
     <name>QnSendEmailActionDelegate</name>
-    <message>
-      <source>Select at least one user</source>
-      <translation type="unfinished">Select at least one user</translation>
-    </message>
     <message numerus="yes">
       <source>%n Users</source>
       <translation type="unfinished">
@@ -5246,32 +5246,32 @@ to %1</translation>
       </translation>
     </message>
     <message>
-      <source>User %1 has invalid Email address</source>
-      <translation type="unfinished">User %1 has invalid Email address</translation>
-    </message>
-    <message numerus="yes">
-      <source>%n of %1 users have invalid Email address</source>
-      <translation type="unfinished">
-        <numerusform>%n of %1 users have invalid Email address</numerusform>
-        <numerusform>%n of %1 users have invalid Email address</numerusform>
-        <numerusform>%n of %1 users have invalid Email address</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>Invalid Email address %1</source>
-      <translation type="unfinished">Invalid Email address %1</translation>
-    </message>
-    <message numerus="yes">
-      <source>%n of %1 additional Email addresses are invalid</source>
-      <translation type="unfinished">
-        <numerusform>%n of %1 additional Email addresses are invalid</numerusform>
-        <numerusform>%n of %1 additional Email addresses are invalid</numerusform>
-        <numerusform>%n of %1 additional Email addresses are invalid</numerusform>
-      </translation>
-    </message>
-    <message>
       <source>Send Email to %1</source>
       <translation type="unfinished">Send Email to %1</translation>
+    </message>
+    <message>
+      <source>User %1 has invalid email address</source>
+      <translation type="unfinished">User %1 has invalid email address</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n of %1 users have invalid email address</source>
+      <translation type="unfinished">
+        <numerusform>%n of %1 users have invalid email address</numerusform>
+        <numerusform>%n of %1 users have invalid email address</numerusform>
+        <numerusform>%n of %1 users have invalid email address</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Invalid email address %1</source>
+      <translation type="unfinished">Invalid email address %1</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n of %1 additional email addresses are invalid</source>
+      <translation type="unfinished">
+        <numerusform>%n of %1 additional email addresses are invalid</numerusform>
+        <numerusform>%n of %1 additional email addresses are invalid</numerusform>
+        <numerusform>%n of %1 additional email addresses are invalid</numerusform>
+      </translation>
     </message>
   </context>
   <context>
@@ -5884,7 +5884,7 @@ to %1</translation>
     <name>QnStorageAnalyticsWidget</name>
     <message>
       <source>Select All</source>
-      <translation type="unfinished">Select All</translation>
+      <translation>Zaznacz wszystko</translation>
     </message>
     <message>
       <source>Export Selection to File...</source>
@@ -6032,7 +6032,7 @@ to %1</translation>
     </message>
     <message>
       <source>Remove</source>
-      <translation type="unfinished">Remove</translation>
+      <translation>Usuń</translation>
     </message>
     <message>
       <source>Inaccessible</source>
@@ -6123,13 +6123,6 @@ to %1</translation>
     <message>
       <source>It is not recommended to use one recording location for different servers.</source>
       <translation type="unfinished">It is not recommended to use one recording location for different servers.</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnSubjectTargetActionWidget</name>
-    <message>
-      <source>Select at least one user...</source>
-      <translation type="unfinished">Select at least one user...</translation>
     </message>
   </context>
   <context>
@@ -6266,17 +6259,26 @@ to %1</translation>
       <translation type="unfinished">System is running in safe mode.</translation>
     </message>
     <message>
-      <source>Check out %1 &amp;mdash; connect to your servers from anywhere</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-      <translation type="unfinished">Check out %1 &amp;mdash; connect to your servers from anywhere</translation>
-    </message>
-    <message>
       <source>You cannot receive System notifications by Email.</source>
       <translation type="unfinished">You cannot receive System notifications by Email.</translation>
     </message>
     <message>
       <source>They cannot receive System notifications by Email.</source>
       <translation type="unfinished">They cannot receive System notifications by Email.</translation>
+    </message>
+    <message>
+      <source>Connect your system to %1 &amp;mdash; make it accessible from anywhere!</source>
+      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
+      <translation type="unfinished">Connect your system to %1 &amp;mdash; make it accessible from anywhere!</translation>
+    </message>
+    <message>
+      <source>Check out %1 &amp;mdash; connect to your system from anywhere!</source>
+      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
+      <translation type="unfinished">Check out %1 &amp;mdash; connect to your system from anywhere!</translation>
+    </message>
+    <message>
+      <source>Connect</source>
+      <translation type="unfinished">Connect</translation>
     </message>
   </context>
   <context>
@@ -6552,7 +6554,7 @@ to %1</translation>
     </message>
     <message>
       <source>Name</source>
-      <translation type="unfinished">Name</translation>
+      <translation>Nazwa</translation>
     </message>
     <message>
       <source>Local user</source>
@@ -6625,7 +6627,7 @@ to %1</translation>
     </message>
     <message>
       <source>Name</source>
-      <translation type="unfinished">Name</translation>
+      <translation>Nazwa</translation>
     </message>
     <message>
       <source>Role</source>
@@ -6780,7 +6782,7 @@ to %1</translation>
     </message>
     <message>
       <source>Name</source>
-      <translation type="unfinished">Name</translation>
+      <translation>Nazwa</translation>
     </message>
     <message>
       <source>Email</source>
@@ -6887,7 +6889,7 @@ to %1</translation>
     <name>QnWebpageDialog</name>
     <message>
       <source>Name</source>
-      <translation type="unfinished">Name</translation>
+      <translation>Nazwa</translation>
     </message>
     <message>
       <source>URL</source>
@@ -7464,20 +7466,12 @@ to %1</translation>
   <context>
     <name>nx::client::desktop::ui::LayoutTourDropPlaceholder</name>
     <message>
-      <source>Drag layout here to add it to the tour</source>
-      <translation type="unfinished">Drag layout here to add it to the tour</translation>
+      <source>Drag layout or camera here to add it to the tour</source>
+      <translation type="unfinished">Drag layout or camera here to add it to the tour</translation>
     </message>
   </context>
   <context>
     <name>nx::client::desktop::ui::SubjectSelectionDialog</name>
-    <message>
-      <source>No user roles found</source>
-      <translation type="unfinished">No user roles found</translation>
-    </message>
-    <message>
-      <source>No users found</source>
-      <translation type="unfinished">No users found</translation>
-    </message>
     <message>
       <source>Users</source>
       <translation type="unfinished">Users</translation>
@@ -7485,6 +7479,10 @@ to %1</translation>
     <message>
       <source>Custom Users</source>
       <translation type="unfinished">Custom Users</translation>
+    </message>
+    <message>
+      <source>All Users</source>
+      <translation type="unfinished">All Users</translation>
     </message>
   </context>
   <context>
@@ -7531,7 +7529,7 @@ to %1</translation>
     </message>
     <message>
       <source>Name</source>
-      <translation type="unfinished">Name</translation>
+      <translation>Nazwa</translation>
     </message>
     <message>
       <source>Email</source>
@@ -7540,6 +7538,22 @@ to %1</translation>
     <message>
       <source>Reason for deactivation</source>
       <translation type="unfinished">Reason for deactivation</translation>
+    </message>
+    <message>
+      <source>- Choose one -</source>
+      <translation type="unfinished">- Choose one -</translation>
+    </message>
+    <message>
+      <source>I&apos;m upgrading my machine</source>
+      <translation type="unfinished">I&apos;m upgrading my machine</translation>
+    </message>
+    <message>
+      <source>I accidentally assigned the license to a wrong machine</source>
+      <translation type="unfinished">I accidentally assigned the license to a wrong machine</translation>
+    </message>
+    <message>
+      <source>Other Reason</source>
+      <translation type="unfinished">Other Reason</translation>
     </message>
   </context>
   <context>
@@ -7680,7 +7694,7 @@ to %1</translation>
     </message>
     <message>
       <source>Remove</source>
-      <translation type="unfinished">Remove</translation>
+      <translation>Usuń</translation>
     </message>
     <message>
       <source>You are going to delete some resources to which you have access from Video Wall only. You will not see them in your resource list after it and will not be able to add them to Video Wall again.</source>
@@ -7758,6 +7772,22 @@ to %1</translation>
       <source>They may be auto-discovered again after removing.</source>
       <translation type="unfinished">They may be auto-discovered again after removing.</translation>
     </message>
+    <message>
+      <source>Overwrite existing layout tour?</source>
+      <translation type="unfinished">Overwrite existing layout tour?</translation>
+    </message>
+    <message>
+      <source>There is another layout tour with the same name.</source>
+      <translation type="unfinished">There is another layout tour with the same name.</translation>
+    </message>
+    <message numerus="yes">
+      <source>Remove %n items from layout tour?</source>
+      <translation type="unfinished">
+        <numerusform>Remove %n items from layout tour?</numerusform>
+        <numerusform>Remove %n items from layout tour?</numerusform>
+        <numerusform>Remove %n items from layout tour?</numerusform>
+      </translation>
+    </message>
   </context>
   <context>
     <name>nx::client::desktop::ui::videowall</name>
@@ -7771,7 +7801,7 @@ to %1</translation>
     </message>
     <message>
       <source>Close</source>
-      <translation type="unfinished">Close</translation>
+      <translation>Zamknij</translation>
     </message>
     <message>
       <source>Keep</source>
@@ -7862,7 +7892,7 @@ to %1</translation>
     </message>
     <message>
       <source>All files (*.*)</source>
-      <translation type="unfinished">All files (*.*)</translation>
+      <translation>Wszystkie pliki (*.*)</translation>
     </message>
     <message>
       <source>Open File</source>

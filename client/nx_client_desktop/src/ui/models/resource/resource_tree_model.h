@@ -64,7 +64,7 @@ public:
 
     QnResourceTreeModelNodePtr rootNode(Qn::NodeType nodeType) const;
 
-    //TODO: #vkutin Shouldn't be public
+    // TODO: #vkutin Shouldn't be public
     QnResourceTreeModelNodeManager* nodeManager() const;
     QnResourceTreeModelLayoutNodeManager* layoutNodeManager() const;
 
@@ -130,7 +130,7 @@ private:
     std::array<QnResourceTreeModelNodePtr, Qn::NodeTypeCount> m_rootNodes;
 
     /** Mapping for resource nodes by resource. */
-    //TODO: #vkutin #GDM Remove duplication with QnResourceTreeModelNodeManager
+    // TODO: #vkutin #GDM Remove duplication with QnResourceTreeModelNodeManager
     QHash<QnResourcePtr, QnResourceTreeModelNodePtr> m_resourceNodeByResource;
 
     /** Mapping for recorder nodes by parent node. */

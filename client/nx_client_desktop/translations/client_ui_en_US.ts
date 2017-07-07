@@ -2794,17 +2794,22 @@
     <name>SubjectSelectionDialog</name>
     <message>
         <location filename="../src/nx/client/desktop/ui/event_rules/subject_selection_dialog.ui"/>
-        <source>Dialog</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location/>
         <source>Roles</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location/>
         <source>Show all users</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Select Users</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Nothing matches your search.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

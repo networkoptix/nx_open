@@ -20,8 +20,7 @@ QPixmap getTriggerPixmap(const QString& name)
     if (name.isEmpty())
         return QPixmap();
 
-    return qnSkin->pixmap(QnSoftwareTriggerPixmaps::pixmapsPath() + name + kPixmapExtension,
-        QSize(), Qt::KeepAspectRatio, Qt::FastTransformation, true);
+    return qnSkin->pixmap(QnSoftwareTriggerPixmaps::pixmapsPath() + name + kPixmapExtension, true);
 }
 
 } // namespace

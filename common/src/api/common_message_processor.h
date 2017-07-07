@@ -6,7 +6,7 @@
 
 #include <api/model/kvpair.h>
 
-#include <business/business_fwd.h>
+#include <nx/vms/event/event_fwd.h>
 
 #include "nx_ec/ec_api.h"
 #include "nx_ec/data/api_peer_alive_data.h"
@@ -63,8 +63,8 @@ signals:
     void fileUpdated(const QString &filename);
     void fileRemoved(const QString &filename);
 
-    void businessActionReceived(const QnAbstractBusinessActionPtr& action);
-    void execBusinessAction(const QnAbstractBusinessActionPtr& action);
+    void businessActionReceived(const nx::vms::event::AbstractActionPtr& action);
+    void execBusinessAction(const nx::vms::event::AbstractActionPtr& action);
 
     void videowallControlMessageReceived(const ec2::ApiVideowallControlMessageData& message);
 
@@ -89,7 +89,9 @@ protected:
         const QnResourcePtr &resource,
         Qn::ResourceStatus status,
         ec2::NotificationSource source) = 0;
-    virtual void execBusinessActionInternal(const QnAbstractBusinessActionPtr& /*action*/) {}
+    virtual void execBusinessActionInternal(const nx::vms::event::AbstractActionPtr& /*action*/) {}
+
+    virtual void handleTourAddedOrUpdated(const ec2::ApiLayoutTourData& tour);
 
     void resetResourceTypes(const ec2::ApiResourceTypeDataList& resTypes);
     void resetResources(const ec2::ApiFullInfoData& fullData);
@@ -103,7 +105,7 @@ protected:
     virtual QnResourceFactory* getResourceFactory() const = 0;
 
 public slots:
-    void on_businessEventAddedOrUpdated(const QnBusinessEventRulePtr &rule);
+    void on_businessEventAddedOrUpdated(const nx::vms::event::RulePtr &rule);
     void on_licenseChanged(const QnLicensePtr &license);
     void on_licenseRemoved(const QnLicensePtr &license);
 
@@ -132,10 +134,10 @@ private slots:
     void on_mediaServerUserAttributesRemoved(const QnUuid& serverId);
 
     void on_businessEventRemoved(const QnUuid &id);
-    void on_businessActionBroadcasted(const QnAbstractBusinessActionPtr &businessAction);
+    void on_businessActionBroadcasted(const nx::vms::event::AbstractActionPtr& businessAction);
     void on_businessRuleReset(const ec2::ApiBusinessRuleDataList& rules);
-    void on_broadcastBusinessAction(const QnAbstractBusinessActionPtr& action);
-    void on_execBusinessAction( const QnAbstractBusinessActionPtr& action );
+    void on_broadcastBusinessAction(const nx::vms::event::AbstractActionPtr& action);
+    void on_execBusinessAction( const nx::vms::event::AbstractActionPtr& action );
 private:
     template <class Datatype> void updateResources(const std::vector<Datatype>& resList, QHash<QnUuid, QnResourcePtr>& remoteResources);
 protected:

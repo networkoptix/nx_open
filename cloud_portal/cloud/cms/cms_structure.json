@@ -1,0 +1,48 @@
+{
+  "product":"cloud_portal",
+  "contexts":[
+    {
+      "name":"branding",
+      "description":"common branding constants",
+      "translatable": false,
+      "values":[
+        ["{{PRODUCT_NAME}}","VMS Demo Cloud","Name for cloud"],
+        ["{{CLIENT_PROTOCOL}}","demo-vms","URL protocol for calling native clients from browser"],
+        ["{{VMS_NAME}}","VMS Demonstration","Name of the VMS customization. Must be short!"],
+        ["{{downloadLink}}","http://www.networkoptix.com/live-demo#fulltrial","Emergency link for downloading applications (in case if cloud is down)"],
+        ["{{supportLink}}","http://support.networkoptix.com","Support link. If you use phone number here - make sure you format the link correctly like 'tel:...'"],
+        ["{{supportLinkText}}","http://support.networkoptix.com","Text to be shown on the support link"],
+        ["{{companyUrl}}","http://networkoptix.com","Company main web site"],
+        ["{{iOSappID}}","L6FE34GJWM.com.networkoptix.NxMobile","App ID for iOS mobile application"],
+        ["{{IOS_APP_LINK}}","disabled","Link for iOS application in Apple AppStore"],
+        ["{{ANDROID_APP_LINK}}","disabled","Link for Android application in Google Play"],
+        ["{{COMPANY_NAME}}", "Network Optix", "The name of the company itself"]
+      ]
+    },
+    {
+      "name": "Landing page",
+      "file_path": "static/lang_{{language}}/views/static/landing.html",
+      "url": "/content/about",
+      "translatable": true,
+      "values":[
+        ["%SUBTITLE%","A simple way to connect to, manage and expand any {{VMS_NAME}}"],
+        ["%BLOCK1_TITLE%","Connect from Anywhere"],
+        ["%BLOCK1_CONTENT%","Login to System from anywhere with your Email address & password"],
+        ["%BLOCK2_TITLE%","Simple User Management"],
+        ["%BLOCK2_CONTENT%","Share access with an unlimited number of users and custom roles"],
+        ["%BLOCK3_TITLE%","Multiple System Management"],
+        ["%BLOCK3_CONTENT%","Link many Systems to a single account for quick access & management"]
+      ]
+    },
+    {
+      "name": "Eula",
+      "description":"End user license agreement",
+      "file_path": "static/lang_{{language}}/views/static/eula.html",
+      "url": "/content/eula",
+      "translatable": true,
+      "values":[
+        ["%CONTENT%","End user licence agreement.","End user license agreement", "HTML"]
+      ]
+    }
+  ]
+}

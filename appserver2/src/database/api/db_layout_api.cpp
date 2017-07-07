@@ -117,6 +117,7 @@ bool updateItems(const QSqlDatabase& database, const ApiLayoutData& layout, qint
         INSERT INTO vms_layoutitem (
             uuid,
             resource_guid,
+            path,
             layout_id,
             left,
             right,
@@ -135,6 +136,7 @@ bool updateItems(const QSqlDatabase& database, const ApiLayoutData& layout, qint
         ) VALUES (
             :id,
             :resourceId,
+            :resourcePath,
             :layoutId,
             :left,
             :right,
@@ -215,6 +217,7 @@ bool fetchLayouts(const QSqlDatabase& database, const QnUuid& id, ApiLayoutDataL
             r.guid as layoutId,
             li.uuid as id,
             li.resource_guid as resourceId,
+            li.path as resourcePath,
             li.left,
             li.right,
             li.top,

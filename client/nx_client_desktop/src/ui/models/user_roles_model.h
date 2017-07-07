@@ -34,7 +34,7 @@ public:
     enum Column
     {
         NameColumn = 0,
-        CheckColumn = 1 //< exists if isCheckable()
+        CheckColumn = 1 //< exists if hasCheckBoxes()
     };
 
     explicit QnUserRolesModel(QObject* parent = nullptr, DisplayRoleFlags flags = DefaultRoleFlags);
@@ -56,8 +56,11 @@ public:
 
     /* Role selection support. */
 
-    bool isCheckable() const;
-    void setCheckable(bool value);
+    bool hasCheckBoxes() const;
+    void setHasCheckBoxes(bool value);
+
+    bool userCheckable() const;
+    void setUserCheckable(bool value);
 
     QSet<QnUuid> checkedRoles() const; //< Returns predefined and user role ids.
     void setCheckedRoles(const QSet<QnUuid>& ids);

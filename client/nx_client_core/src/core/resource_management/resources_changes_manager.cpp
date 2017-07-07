@@ -32,7 +32,7 @@
 
 namespace {
 
-//TODO: #vkutin #common Move this function to some common helpers file
+// TODO: #vkutin #common Move this function to some common helpers file
 template<class... Args>
 auto safeProcedure(std::function<void(Args...)> proc)
 {

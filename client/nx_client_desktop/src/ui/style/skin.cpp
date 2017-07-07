@@ -19,6 +19,8 @@
 #include "noptix_icon_loader.h"
 #include "nx_style.h"
 
+#include <nx/utils/log/assert.h>
+
 namespace {
 
 static const QSize kHugeSize(100000, 100000);
@@ -123,39 +125,30 @@ QIcon QnSkin::icon(const QIcon& icon)
     return m_iconLoader->polish(icon);
 }
 
-
-QPixmap QnSkin::pixmap(const char* name,
-    const QSize& size,
-    Qt::AspectRatioMode aspectMode,
-    Qt::TransformationMode mode,
-    bool correctDevicePixelRatio)
+QPixmap QnSkin::pixmap(const char* name, bool correctDevicePixelRatio)
 {
-    return pixmap(QString::fromLatin1(name), size, aspectMode, mode, correctDevicePixelRatio);
+    return pixmap(QString::fromLatin1(name), correctDevicePixelRatio);
 }
 
-QPixmap QnSkin::pixmap(const QString& name,
-    const QSize& size,
-    Qt::AspectRatioMode aspectMode,
-    Qt::TransformationMode mode,
-    bool correctDevicePixelRatio)
+QPixmap QnSkin::pixmap(const QString& name, bool correctDevicePixelRatio)
 {
     static const auto kHiDpiSuffix = lit("@2x");
 
     auto result =
-        [this, name, size, aspectMode, mode]()
+        [this, name]()
         {
             if (isHiDpi())
             {
                 QFileInfo info(name);
                 const auto suffix = info.completeSuffix();
-                const auto newName = info.path() + lit("/") + info.completeBaseName() + kHiDpiSuffix
-                    + (suffix.isEmpty() ? QString() : lit(".") + info.suffix());
-                auto result = getPixmapInternal(newName, size, aspectMode, mode);
+                const auto newName = info.path() + L'/' + info.completeBaseName() + kHiDpiSuffix
+                    + (suffix.isEmpty() ? QString() : L'.' + info.suffix());
+                auto result = getPixmapInternal(newName);
                 if (!result.isNull())
                     return result;
             }
 
-            return getPixmapInternal(name, size, aspectMode, mode);
+            return getPixmapInternal(name);
         }();
 
     if (correctDevicePixelRatio)
@@ -164,28 +157,15 @@ QPixmap QnSkin::pixmap(const QString& name,
     return result;
 }
 
-QPixmap QnSkin::getPixmapInternal(const QString& name, const QSize& size, Qt::AspectRatioMode aspectMode, Qt::TransformationMode mode)
+QPixmap QnSkin::getPixmapInternal(const QString& name)
 {
-    QString key = name;
-    if (!size.isEmpty())
-        key += QString(QLatin1String("_%1x%2_%3_%4")).arg(int(size.width())).arg(int(size.height())).arg(int(aspectMode)).arg(int(mode));
-
     QPixmap pixmap;
-    if (!QPixmapCache::find(key, &pixmap))
+    if (!QPixmapCache::find(name, &pixmap))
     {
         pixmap = QPixmap::fromImage(QImage(path(name)), Qt::OrderedDither | Qt::OrderedAlphaDither);
         pixmap.setDevicePixelRatio(1); // Force to use not scaled images
-        if (!pixmap.isNull())
-        {
-            if (!size.isEmpty() && size != pixmap.size())
-                pixmap = pixmap.scaled(size, aspectMode, mode);
-        }
-        else if (!name.contains(lit("@2x")))
-        {
-            qnWarning("Cannot load image '%1'", name);
-        }
-
-        QPixmapCache::insert(key, pixmap);
+        NX_EXPECT(!pixmap.isNull() || name.contains(lit("@2x")));
+        QPixmapCache::insert(name, pixmap);
     }
 
     return pixmap;
