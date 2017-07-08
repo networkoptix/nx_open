@@ -23,7 +23,7 @@
 			    <h3>Page can be translated</h3>
 			    {% endif %}
 			    {% if records.0.data_structure.context.url %}
-			    <h3> Link to Page: {{ records.0.data_structure.context.url }}</h3>
+			    <h3> Link to Page: <a href="{{ records.0.data_structure.context.url }}">{{ records.0.data_structure.context.url }}</a></h3>
 			    {% endif %}
 			</fieldset>
 			<table style="width: 100%">

@@ -11,7 +11,7 @@
 <fieldset>
     <div>{{ context.description }}</div>
     {% if context.url %}
-    <div> Link to Page: {{ context.url }}</div>
+    <div> Link to Page: <a href="{{context.url}}">{{ context.url }}</a></div>
     {% endif %}
 </fieldset>
 <form id="contextForm" action="{% url 'context_editor' context.id %}" method="post" class="aligned">

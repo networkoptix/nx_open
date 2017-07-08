@@ -31,6 +31,7 @@ DATA_TYPES = (
     (0, 'Text'),
     (1, 'Image'),
     (2, 'HTML'),
+    (3, 'Long Text')
 )
 
 
@@ -49,7 +50,7 @@ class DataStructure(models.Model):
 
     @staticmethod
     def get_type(name):
-        return next((type[0] for type in DATA_TYPES if DATA_TYPES[1] == name), 0)
+        return next((type[0] for type in DATA_TYPES if type[1] == name), 0)
 
 
 # CMS settings. Release engineer can change that
