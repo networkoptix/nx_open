@@ -72,6 +72,8 @@ private:
 
     void checkAndAddSystemHealthMessage(QnSystemHealth::MessageType message);
 
+    void handleAcknowledgeEventAction();
+
 private:
     QnWorkbenchUserEmailWatcher* m_userEmailWatcher;
     QnBusinessEventsFilterResourcePropertyAdaptor* m_adaptor;

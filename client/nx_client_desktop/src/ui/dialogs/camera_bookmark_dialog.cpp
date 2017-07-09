@@ -23,6 +23,14 @@ QnCameraBookmarkDialog::QnCameraBookmarkDialog(QWidget *parent) :
     });
 }
 
+QnCameraBookmarkDialog::QnCameraBookmarkDialog(
+    const nx::vms::event::AbstractActionPtr& action,
+    QWidget* parent)
+{
+ // TODO: implement me before review
+}
+
+
 QnCameraBookmarkDialog::~QnCameraBookmarkDialog() {}
 
 const QnCameraBookmarkTagList &QnCameraBookmarkDialog::tags() const {

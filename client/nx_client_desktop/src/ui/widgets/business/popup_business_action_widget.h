@@ -26,5 +26,8 @@ private slots:
     void at_settingsButton_clicked();
 
 private:
+    void parametersChanged();
+
+private:
     QScopedPointer<Ui::PopupBusinessActionWidget> ui;
 };

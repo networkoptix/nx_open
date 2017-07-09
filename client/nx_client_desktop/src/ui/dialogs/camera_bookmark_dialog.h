@@ -3,6 +3,7 @@
 
 #include <QtCore/QScopedPointer>
 
+#include <nx/vms/event/event_fwd.h>
 #include <core/resource/camera_bookmark_fwd.h>
 #include <ui/dialogs/common/session_aware_dialog.h>
 
@@ -18,6 +19,11 @@ class QnCameraBookmarkDialog : public QnSessionAwareButtonBoxDialog
 
 public:
     explicit QnCameraBookmarkDialog(QWidget *parent = 0);
+
+    QnCameraBookmarkDialog(
+        const nx::vms::event::AbstractActionPtr& action,
+        QWidget* parent = nullptr);
+
     ~QnCameraBookmarkDialog();
 
     const QnCameraBookmarkTagList &tags() const;

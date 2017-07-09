@@ -242,18 +242,39 @@ QString getIdentifierFromAction(const vms::event::AbstractActionPtr& businessAct
     // TODO: #ynikitenkov Change me before review
     return QnUuid::createUuid().toString();
 }
+/*
+            {
+                // TODO: change this
+                for (const auto bookmark: bookmarks)
+                    qnCameraBookmarksManager->addCameraBookmark(bookmark);
+
+                static constexpr int kHintTimeoutMs = 5000;
+                const auto message = bookmarks.count() == 1
+                    ? tr("Bookmark created")
+                    : tr("%n bookmarks created", "", bookmarks.count());
+                QnGraphicsMessageBox::information(message, kHintTimeoutMs);
+
+                action(action::BookmarksModeAction)->setChecked(true);
+            });
+    */
 
 void QnNotificationsCollectionWidget::handleShowPopupAction(
     const vms::event::AbstractActionPtr& businessAction,
     QnNotificationWidget* widget)
 {
     const auto params = businessAction->getParams();
-    if (params.targetActionType == vms::event::undefinedAction)
+    if (!params.needConfirmation)
         return;
 
-    if (params.targetActionType != vms::event::bookmarkAction)
-        return;
+    widget->addTextButton(qnSkin->icon("buttons/bookmark.png"), tr("Bookmark it"),
+        [this, businessAction]()
+        {
+            nx::client::desktop::ui::action::Parameters params;
+            params.setArgument(Qn::ActionDataRole, businessAction);
+            menu()->trigger(action::AcknowledgeEventAction, params);
+        });
 
+    /*
     QnCameraBookmarkList bookmarks;
     for (const auto& resourceId: businessAction->getResources())
     {
@@ -277,33 +298,8 @@ void QnNotificationsCollectionWidget::handleShowPopupAction(
     if (bookmarks.isEmpty())
         return;
 
-    widget->addTextButton(qnSkin->icon("buttons/bookmark.png"), tr("Bookmark it"),
-        [this, bookmarks]()
-        {
-            for (const auto bookmark: bookmarks)
-                qnCameraBookmarksManager->addCameraBookmark(bookmark);
-
-            static constexpr int kHintTimeoutMs = 5000;
-            const auto message = bookmarks.count() == 1
-                ? tr("Bookmark created")
-                : tr("%n bookmarks created", "", bookmarks.count());
-            QnGraphicsMessageBox::information(message, kHintTimeoutMs);
-
-            action(action::BookmarksModeAction)->setChecked(true);
-        });
-
+        */
     m_customPopupItems.insert(getIdentifierFromAction(businessAction), widget);
-}
-
-void QnNotificationsCollectionWidget::handleHidePopupAction(
-    const nx::vms::event::AbstractActionPtr& businessAction)
-{
-    const auto id = getIdentifierFromAction(businessAction);
-    const auto it = m_customPopupItems.find(id);
-    if (it == m_customPopupItems.end())
-        return;
-
-    cleanUpItem(it.value());
 }
 
 void QnNotificationsCollectionWidget::showEventAction(const vms::event::AbstractActionPtr& action)
@@ -529,6 +525,18 @@ void QnNotificationsCollectionWidget::showEventAction(const vms::event::Abstract
 
 void QnNotificationsCollectionWidget::hideEventAction(const vms::event::AbstractActionPtr& action)
 {
+
+    if (action->actionType() == vms::event::hidePopupAction)
+    {
+        const auto id = getIdentifierFromAction(action);
+        const auto it = m_customPopupItems.find(id);
+        if (it != m_customPopupItems.end())
+        {
+            cleanUpItem(it.value());
+            return;
+        }
+    }
+
     QnUuid ruleId = action->getRuleId();
 
     if (action->actionType() == vms::event::playSoundAction)

@@ -304,8 +304,6 @@ void QnNotificationWidget::addTextButton(
         {
             if (handler)
                 handler();
-
-            closeTriggered();
         });
 
     auto proxy = new QGraphicsProxyWidget();

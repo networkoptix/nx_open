@@ -63,7 +63,6 @@ private:
     void handleShowPopupAction(
         const nx::vms::event::AbstractActionPtr& businessAction,
         QnNotificationWidget* widget);
-    void handleHidePopupAction(const nx::vms::event::AbstractActionPtr& businessAction);
 
     void showEventAction(const nx::vms::event::AbstractActionPtr& businessAction);
     void hideEventAction(const nx::vms::event::AbstractActionPtr& businessAction);

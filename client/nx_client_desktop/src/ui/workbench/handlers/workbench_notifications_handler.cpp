@@ -8,6 +8,7 @@
 #include <api/app_server_connection.h>
 #include <business/business_resource_validation.h>
 #include <client/client_settings.h>
+#include <client/client_globals.h>
 #include <client/client_message_processor.h>
 #include <client/client_show_once_settings.h>
 #include <common/common_module.h>
@@ -24,9 +25,10 @@
 #include <utils/common/warnings.h>
 #include <utils/email/email.h>
 #include <utils/media/audio_player.h>
-
+#include <nx/client/desktop/ui/actions/action_manager.h>
 #include <nx/client/desktop/utils/server_notification_cache.h>
 #include <nx/vms/event/strings_helper.h>
+#include <ui/dialogs/camera_bookmark_dialog.h>
 
 using namespace nx;
 using namespace nx::client::desktop;
@@ -103,11 +105,27 @@ QnWorkbenchNotificationsHandler::QnWorkbenchNotificationsHandler(QObject *parent
 
     connect(qnGlobalSettings, &QnGlobalSettings::emailSettingsChanged, this,
         &QnWorkbenchNotificationsHandler::at_emailSettingsChanged);
+
+    connect(action(action::AcknowledgeEventAction), &QAction::triggered,
+        this, &QnWorkbenchNotificationsHandler::handleAcknowledgeEventAction);
 }
 
 QnWorkbenchNotificationsHandler::~QnWorkbenchNotificationsHandler()
 {
+}
 
+void QnWorkbenchNotificationsHandler::handleAcknowledgeEventAction()
+{
+    const auto actionParams = menu()->currentParameters(sender());
+    const auto businessAction =
+        actionParams.argument<vms::event::AbstractActionPtr>(Qn::ActionDataRole);
+
+    const QScopedPointer<QDialog> bookmarksDialog(
+        new QnCameraBookmarkDialog(businessAction, mainWindow()));
+    if (bookmarksDialog->exec() == QDialogButtonBox::Ok)
+    {
+        // Hide notification
+    }
 }
 
 void QnWorkbenchNotificationsHandler::clear()
