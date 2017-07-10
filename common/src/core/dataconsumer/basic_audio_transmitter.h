@@ -15,6 +15,7 @@ public:
     QnBasicAudioTransmitter(QnSecurityCamResource* res);
     void setTransmissionUrl(const QUrl& url);
     void setContentType(const nx_http::StringType& contentType);
+    void setNoAuth(bool value);
 protected:
     virtual bool sendData(const QnAbstractMediaDataPtr& data) override;
     virtual void prepareHttpClient(const nx_http::AsyncHttpClientPtr& httpClient) override;

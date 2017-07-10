@@ -15,6 +15,8 @@ AVCodecID toFfmpegCodec(const QString& codec)
         return AV_CODEC_ID_ADPCM_G726;
     else if (codec == lit("MULAW"))
         return AV_CODEC_ID_PCM_MULAW;
+    else if (codec == lit("ALAW"))
+        return AV_CODEC_ID_PCM_ALAW;
     else if (codec == lit("PCM_S16LE"))
         return AV_CODEC_ID_PCM_S16LE;
     else
