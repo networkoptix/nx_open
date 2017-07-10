@@ -1,0 +1,60 @@
+#pragma once
+
+#include <boost/optional/optional.hpp>
+
+#include <plugins/resource/onvif/onvif_resource.h>
+
+#include <nx/network/http/http_client.h>
+
+namespace nx {
+namespace mediaserver_core {
+namespace plugins {
+
+class VivotekResource: public QnPlOnvifResource
+{
+    using base_type = QnPlOnvifResource; 
+
+    struct StreamCodecCapabilities
+    {
+        bool h264 = false;
+        bool mpeg4 = false;
+        bool mjpeg = false;
+        bool svc = false;
+    };
+
+public:
+    virtual CameraDiagnostics::Result initializeMedia(
+        const CapabilitiesResp& onvifCapabilities) override;
+
+    virtual void afterConfigureStream(Qn::ConnectionRole role) override;
+
+private:
+    bool fetchHevcSupport();
+
+    boost::optional<bool> hasHevcSupport() const;
+    bool streamSupportsHevc(Qn::ConnectionRole role) const;
+    bool setHevcForStream(Qn::ConnectionRole role);
+
+    bool parseStreamCodecCapabilities(
+        const QString& codecCapabilitiesString,
+        std::vector<StreamCodecCapabilities>& outCapabilities) const;
+
+    void tuneHttpClient(nx_http::HttpClient& httpClient) const;
+
+    bool parseResponse(
+        const nx::Buffer& response,
+        QString* outName,
+        QString* outValue) const;
+
+    bool doVivotekRequest(const QUrl& url, QString* outParameterName, QString* outParameterValue) const;
+    boost::optional<QString> getVivotekParameter(const QString& param) const;
+    bool setVivotekParameter(const QString& parameterName, const QString& parameterValue) const;
+
+private:
+    boost::optional<bool> m_hasHevcSupport;
+    std::vector<StreamCodecCapabilities> m_streamCodecCapabilities;
+};
+
+} // namespace plugins
+} // namespace mediaserver_core
+} // namespace nx
