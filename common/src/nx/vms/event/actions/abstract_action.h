@@ -39,7 +39,6 @@ protected:
 public:
     virtual ~AbstractAction();
 
-    void setActionType(ActionType actionType);
     ActionType actionType() const;
 
     /**

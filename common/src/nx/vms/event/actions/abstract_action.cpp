@@ -192,11 +192,6 @@ ActionType AbstractAction::actionType() const
     return m_actionType;
 }
 
-void AbstractAction::setActionType(ActionType actionType)
-{
-    m_actionType = actionType;
-}
-
 void AbstractAction::setResources(const QVector<QnUuid>& resources)
 {
     m_resources = resources;

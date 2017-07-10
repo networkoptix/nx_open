@@ -153,7 +153,6 @@ struct ShowPopupParametersV31Alpha
 struct BusinessActionParameters31Beta
 {
     bool needConfirmation = false;
-    vms::event::ActionType targetActionType = vms::event::undefinedAction;
     QnUuid actionResourceId;
     QString url;
     QString emailAddress;
@@ -174,7 +173,7 @@ struct BusinessActionParameters31Beta
     bool playToClient = true;
     QString contentType;
 };
-#define BusinessActionParameters31Beta_Fields (targetActionType)(needConfirmation)(actionResourceId)\
+#define BusinessActionParameters31Beta_Fields (needConfirmation)(actionResourceId)\
     (url)(emailAddress)(fps)(streamQuality)(recordAfter)(relayOutputId)(sayText)(tags)(text)\
     (durationMs)(additionalResources)(allUsers)(forced)(presetId)(useSource)(recordBeforeMs)\
     (playToClient)(contentType)
