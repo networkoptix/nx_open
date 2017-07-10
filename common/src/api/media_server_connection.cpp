@@ -1106,9 +1106,12 @@ int QnMediaServerConnection::recordedTimePeriods(
 }
 
 int QnMediaServerConnection::addBookmarkAsync(
-    const QnCameraBookmark& bookmark, QObject* target, const char* slot)
+    const QnCameraBookmark& bookmark,
+    const nx::vms::event::ActionData& data,
+    QObject* target,
+    const char* slot)
 {
-    QnUpdateBookmarkRequestData request(bookmark);
+    QnUpdateBookmarkRequestData request(bookmark, data);
     request.format = Qn::SerializationFormat::UbjsonFormat;
     return sendAsyncGetRequestLogged(ec2BookmarkAddObject, request.toParams(), nullptr ,target, slot);
 }

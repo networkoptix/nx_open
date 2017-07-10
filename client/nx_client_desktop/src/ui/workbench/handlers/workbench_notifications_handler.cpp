@@ -14,6 +14,7 @@
 #include <common/common_module.h>
 #include <core/resource/resource.h>
 #include <core/resource/user_resource.h>
+#include <core/resource/camera_bookmark.h>
 #include <core/resource_management/resource_pool.h>
 #include <core/resource_management/user_roles_manager.h>
 #include <nx/client/desktop/ui/actions/action_parameters.h>
@@ -28,7 +29,9 @@
 #include <nx/client/desktop/ui/actions/action_manager.h>
 #include <nx/client/desktop/utils/server_notification_cache.h>
 #include <nx/vms/event/strings_helper.h>
+#include <nx/vms/event/actions/common_action.h>
 #include <ui/dialogs/camera_bookmark_dialog.h>
+#include <camera/camera_bookmarks_manager.h>
 
 using namespace nx;
 using namespace nx::client::desktop;
@@ -39,6 +42,8 @@ namespace {
 static const QString kCloudPromoShowOnceKey(lit("CloudPromoNotification"));
 
 } // namespace
+
+using namespace nx::vms::event;
 
 QnWorkbenchNotificationsHandler::QnWorkbenchNotificationsHandler(QObject *parent):
     base_type(parent),
@@ -120,13 +125,19 @@ void QnWorkbenchNotificationsHandler::handleAcknowledgeEventAction()
     const auto businessAction =
         actionParams.argument<vms::event::AbstractActionPtr>(Qn::ActionDataRole);
 
-    const QScopedPointer<QDialog> bookmarksDialog(
+    const QScopedPointer<QnCameraBookmarkDialog> bookmarksDialog(
         new QnCameraBookmarkDialog(businessAction, mainWindow()));
 
     connect(bookmarksDialog, &QnButtonBoxDialog::accepted, this,
-        [this, businessAction]()
+        [this, businessAction, dialog = bookmarksDialog.data()]()
         {
-            // TODO: add bookmark, insert record to event/action log, send hidePopup notification. BEFORE REVIEW
+            const auto action = AbstractActionPtr(new CommonAction(
+                ActionType::bookmarkAction, businessAction->getRuntimeParams()));
+            const auto bookmarks = dialog->bookmarks();
+            for (const auto& bookmark: bookmarks)
+            {
+                qnCameraBookmarksManager->addAcknowledge(bookmark, action);
+            }
             emit notificationRemoved(businessAction);
         });
 

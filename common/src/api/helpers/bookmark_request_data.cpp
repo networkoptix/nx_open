@@ -149,6 +149,16 @@ QnUpdateBookmarkRequestData::QnUpdateBookmarkRequestData(const QnCameraBookmark&
 {
 }
 
+QnUpdateBookmarkRequestData::QnUpdateBookmarkRequestData(
+    const QnCameraBookmark& bookmark,
+    const nx::vms::event::ActionData& data)
+    :
+    QnMultiserverRequestData(),
+    bookmark(bookmark),
+    actionData(data)
+{
+}
+
 void QnUpdateBookmarkRequestData::loadFromParams(QnResourcePool* resourcePool,
     const QnRequestParamList& params)
 {

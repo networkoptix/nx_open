@@ -40,6 +40,9 @@ struct QnUpdateBookmarkRequestData: public QnMultiserverRequestData
 {
     QnUpdateBookmarkRequestData();
     QnUpdateBookmarkRequestData(const QnCameraBookmark& bookmark);
+    QnUpdateBookmarkRequestData(
+        const QnCameraBookmark& bookmark,
+        const nx::vms::event::ActionData& data);
 
     virtual void loadFromParams(QnResourcePool* resourcePool,
         const QnRequestParamList& params) override;

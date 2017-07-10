@@ -205,7 +205,12 @@ public:
 
     int backupControlActionAsync(Qn::BackupAction action, QObject* target, const char* slot);
 
-    int addBookmarkAsync(const QnCameraBookmark& bookmark, QObject* target, const char* slot);
+    int addBookmarkAsync(
+        const QnCameraBookmark& bookmark,
+        const nx::vms::event::ActionData& data,
+        QObject* target,
+        const char* slot);
+
     int updateBookmarkAsync(const QnCameraBookmark& bookmark, QObject* target, const char* slot);
     int deleteBookmarkAsync(const QnUuid& bookmarkId, QObject* target, const char* slot);
 
