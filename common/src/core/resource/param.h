@@ -83,7 +83,6 @@ namespace Qn
     static const QString VIDEO_MULTIRESOURCE_CHANNEL_MAPPING_PARAM_NAME = lit("multiresourceVideoChannelMapping");
     static const QString NO_RECORDING_PARAMS_PARAM_NAME = lit("noRecordingParams");
     static const QString PARSE_ONVIF_NOTIFICATIONS_WITH_HTTP_READER = lit("parseOnvifNotificationsWithHttpReader");
-    static const QString HAS_HEVC_SUPPORT_PARAM_NAME = lit("hasHevcSupport");
 
     // Mediaserver info for Statistics
     static const QString CPU_ARCHITECTURE = lit("cpuArchitecture");

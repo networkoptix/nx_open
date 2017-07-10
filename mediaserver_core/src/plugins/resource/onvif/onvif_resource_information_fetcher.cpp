@@ -1,3 +1,4 @@
+
 #ifdef ENABLE_ONVIF
 
 #include "onvif_resource_information_fetcher.h"
@@ -5,27 +6,26 @@
 #include <memory>
 #include <mutex>
 
-#include <onvif/soapDeviceBindingProxy.h>
-#include <plugins/resource/onvif/onvif_resource.h>
-#include <plugins/resource/onvif/onvif_searcher_hooks.h>
-#include <plugins/resource/digitalwatchdog/digital_watchdog_resource.h>
-#include <plugins/resource/archive_camera/archive_camera.h>
-#include <plugins/resource/sony/sony_resource.h>
-#include <plugins/resource/flex_watch/flexwatch_resource.h>
-#include <plugins/resource/axis/axis_onvif_resource.h>
-#include <plugins/resource/avigilon/avigilon_resource.h>
+#include "onvif_resource.h"
+#include "onvif/soapDeviceBindingProxy.h"
+#include "onvif_searcher_hooks.h"
+#include "../digitalwatchdog/digital_watchdog_resource.h"
+#include "../archive_camera/archive_camera.h"
+#include "../sony/sony_resource.h"
+#include "core/resource_management/resource_pool.h"
+#include "plugins/resource/flex_watch/flexwatch_resource.h"
+#include "plugins/resource/axis/axis_onvif_resource.h"
+#include "plugins/resource/avigilon/avigilon_resource.h"
 #include <plugins/resource/pelco/optera/optera_resource.h>
-#include <plugins/resource/flir/flir_onvif_resource.h>
-#include <plugins/resource/vista/vista_resource.h>
-#include <plugins/resource/hikvision/hikvision_onvif_resource.h>
-#include <plugins/resource/flir/flir_onvif_resource.h>
-#include <plugins/resource/vivotek/vivotek_resource.h>
+#include "plugins/resource/flir/flir_onvif_resource.h"
+#include "../vista/vista_resource.h"
 #include <core/resource/resource_data.h>
 #include <core/resource_management/resource_data_pool.h>
-#include <core/resource_management/resource_pool.h>
 #include <common/common_module.h>
-#include <common/static_common_module.h>
+#include <plugins/resource/hikvision/hikvision_onvif_resource.h>
 #include <nx/utils/log/log.h>
+#include <common/static_common_module.h>
+#include <plugins/resource/flir/flir_onvif_resource.h>
 
 using namespace nx::plugins;
 using namespace nx::plugins::onvif;
@@ -432,8 +432,6 @@ QnPlOnvifResourcePtr OnvifResourceInformationFetcher::createOnvifResourceByManuf
         resource = QnPlOnvifResourcePtr(new QnHikvisionOnvifResource());
     else if (manufacture.toLower().contains(QLatin1String("flir")))
         resource = QnPlOnvifResourcePtr(new nx::plugins::flir::OnvifResource());
-    else if (manufacture.toLower().contains(QLatin1String("vivotek")))
-        resource = QnPlOnvifResourcePtr(new nx::mediaserver_core::plugins::VivotekResource());
     else
         resource = QnPlOnvifResourcePtr(new QnPlOnvifResource());
 
