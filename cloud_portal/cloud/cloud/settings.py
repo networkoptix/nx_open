@@ -32,7 +32,7 @@ CUSTOMIZATION = conf['customization']
 SECRET_KEY = '03-b9bxxpjxsga(qln0@3szw3+xnu%6ph_l*sz-xr_4^xxrj!_'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = True
 
 ALLOWED_HOSTS = ['*']
 
@@ -51,6 +51,7 @@ INSTALLED_APPS = (
     'corsheaders',
     'notifications',
     'api',
+    'cms'
 )
 
 MIDDLEWARE_CLASSES = (
@@ -111,7 +112,6 @@ DATABASES = {
         }
     }
 }
-
 
 CACHES = {
     'default': {
@@ -188,8 +188,6 @@ LOGGING = {
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/1.8/howto/static-files/
-
-STATIC_ROOT = '/app/app/static/common/static'
 
 STATIC_URL = '/static/'
 
@@ -307,6 +305,7 @@ NOTIFICATIONS_AUTO_SUBSCRIBE = False
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 STATIC_LOCATION = os.path.join(BASE_DIR, "static")
+STATIC_ROOT = '/app/app/static/common/static'
 
 
 LANGUAGES = conf['languages']

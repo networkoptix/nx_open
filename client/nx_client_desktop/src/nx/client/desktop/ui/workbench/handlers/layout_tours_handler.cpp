@@ -16,6 +16,7 @@
 #include <nx/client/desktop/ui/actions/action_manager.h>
 #include <ui/dialogs/common/message_box.h>
 #include <ui/dialogs/common/session_aware_dialog.h>
+#include <nx/client/desktop/ui/messages/resources_messages.h>
 #include <ui/style/skin.h>
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench.h>
@@ -83,7 +84,31 @@ LayoutToursHandler::LayoutToursHandler(QObject* parent):
             auto tour = layoutTourManager()->tour(id);
             if (!tour.isValid())
                 return;
-            tour.name = parameters.argument<QString>(Qn::ResourceNameRole);
+
+            const auto userId = context()->user()->getId();
+
+            const QString name = parameters.argument<QString>(Qn::ResourceNameRole).trimmed();
+
+            // Ask to override tour with the same name (if any).
+            for (const auto& other: layoutTourManager()->tours())
+            {
+                if (other.id == id)
+                    continue;
+
+                if (other.parentId != userId)
+                    continue;
+
+                if (other.name == name)
+                {
+                    if (!ui::resources::overrideLayoutTour(mainWindow()))
+                        return;
+
+                    layoutTourManager()->removeTour(other.id);
+                    removeTourFromServer(other.id);
+                }
+            }
+
+            tour.name = name;
             layoutTourManager()->addOrUpdateTour(tour);
             saveTourToServer(tour);
         });

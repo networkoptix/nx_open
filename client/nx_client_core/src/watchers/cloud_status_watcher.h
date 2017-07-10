@@ -66,7 +66,10 @@ public:
 
     void logSession(const QString& cloudSystemId);
 
-    QnEncodedCredentials createTemporaryCredentials() const;
+    /**
+     * Get temporary credentials for one-time use. Fast sequential calls will get the same result.
+     */
+    QnEncodedCredentials createTemporaryCredentials();
 
     Status status() const;
 

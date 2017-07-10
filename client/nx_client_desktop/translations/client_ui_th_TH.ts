@@ -295,7 +295,7 @@
     <message>
       <location/>
       <source>Server Settings</source>
-      <translation type="unfinished">Server Settings</translation>
+      <translation>การตั้งค่าเซิร์ฟเวอร์</translation>
     </message>
     <message>
       <location/>
@@ -371,7 +371,7 @@
     <message>
       <location/>
       <source>Name</source>
-      <translation type="unfinished">Name</translation>
+      <translation>ชื่อ</translation>
     </message>
     <message>
       <location/>
@@ -386,7 +386,7 @@
     <message>
       <location/>
       <source>Tags</source>
-      <translation type="unfinished">Tags</translation>
+      <translation>แท็ก</translation>
     </message>
     <message>
       <location/>
@@ -475,7 +475,7 @@
     <message>
       <location/>
       <source>Event Log...</source>
-      <translation type="unfinished">Event Log...</translation>
+      <translation>บันทึกเหตุการณ์ ...</translation>
     </message>
   </context>
   <context>
@@ -849,7 +849,7 @@
     <message>
       <location/>
       <source>Recording</source>
-      <translation type="unfinished">Recording</translation>
+      <translation>การบันทึก</translation>
     </message>
     <message>
       <location/>
@@ -864,7 +864,7 @@
     <message>
       <location/>
       <source>Show FPS</source>
-      <translation type="unfinished">Show FPS</translation>
+      <translation>โชร์ FPS</translation>
     </message>
     <message>
       <location/>
@@ -884,7 +884,7 @@
     <message>
       <location/>
       <source>Motion + Lo-Res</source>
-      <translation type="unfinished">Motion + Lo-Res</translation>
+      <translation>การเคลื่อนไหว + Lo-Res</translation>
     </message>
   </context>
   <context>
@@ -1122,7 +1122,7 @@
     <message>
       <location/>
       <source>Size</source>
-      <translation type="unfinished">Size</translation>
+      <translation>ขนาด</translation>
     </message>
     <message>
       <location/>
@@ -1831,12 +1831,12 @@
     <message>
       <location filename="../src/ui/dialogs/attach_to_videowall_dialog.ui"/>
       <source>Attach to Video Wall...</source>
-      <translation type="unfinished">Attach to Video Wall...</translation>
+      <translation>แนบไปกับ Video Wall...</translation>
     </message>
     <message>
       <location/>
       <source>Preview</source>
-      <translation type="unfinished">Preview</translation>
+      <translation>แสดงตัวอย่าง</translation>
     </message>
   </context>
   <context>
@@ -1950,7 +1950,7 @@
     <message>
       <location/>
       <source>Login:</source>
-      <translation type="unfinished">Login:</translation>
+      <translation>ชื่อผู้ใช้:</translation>
     </message>
     <message>
       <location/>
@@ -1968,7 +1968,7 @@
     <message>
       <location/>
       <source>Play</source>
-      <translation type="unfinished">Play</translation>
+      <translation>เล่น</translation>
     </message>
     <message>
       <location/>
@@ -2134,7 +2134,7 @@
     <message>
       <location/>
       <source>Enable</source>
-      <translation type="unfinished">Enable</translation>
+      <translation>เปิดใช้งาน</translation>
     </message>
     <message>
       <location/>
@@ -2271,12 +2271,12 @@
     <message>
       <location/>
       <source>Source</source>
-      <translation type="unfinished">Source</translation>
+      <translation>ทรัพยากร</translation>
     </message>
     <message>
       <location/>
       <source>Screen</source>
-      <translation type="unfinished">Screen</translation>
+      <translation>หน้าจอ</translation>
     </message>
   </context>
   <context>
@@ -2353,7 +2353,7 @@
     <message>
       <location/>
       <source>Name</source>
-      <translation type="unfinished">Name</translation>
+      <translation>ชื่อ</translation>
     </message>
     <message>
       <location/>
@@ -2500,7 +2500,7 @@
     <message>
       <location/>
       <source>Name</source>
-      <translation type="unfinished">Name</translation>
+      <translation>ชื่อ</translation>
     </message>
     <message>
       <location/>
@@ -2555,7 +2555,7 @@
     <message>
       <location/>
       <source>Reset</source>
-      <translation type="unfinished">Reset</translation>
+      <translation>รีเซ็ต</translation>
     </message>
     <message>
       <location/>
@@ -2662,7 +2662,7 @@
     <message>
       <location/>
       <source>Name</source>
-      <translation type="unfinished">Name</translation>
+      <translation>ชื่อ</translation>
     </message>
     <message>
       <location/>
@@ -2794,11 +2794,6 @@
     <name>SubjectSelectionDialog</name>
     <message>
       <location filename="../src/nx/client/desktop/ui/event_rules/subject_selection_dialog.ui"/>
-      <source>Dialog</source>
-      <translation type="unfinished">Dialog</translation>
-    </message>
-    <message>
-      <location/>
       <source>Roles</source>
       <translation type="unfinished">Roles</translation>
     </message>
@@ -2806,6 +2801,16 @@
       <location/>
       <source>Show all users</source>
       <translation type="unfinished">Show all users</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Select Users</source>
+      <translation type="unfinished">Select Users</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Nothing matches your search.</source>
+      <translation type="unfinished">Nothing matches your search.</translation>
     </message>
   </context>
   <context>
@@ -2857,12 +2862,12 @@
     <message>
       <location filename="../src/ui/widgets/properties/user_role_settings_widget.ui"/>
       <source>Name</source>
-      <translation type="unfinished">Name</translation>
+      <translation>ชื่อ</translation>
     </message>
     <message>
       <location/>
       <source>Users</source>
-      <translation type="unfinished">Users</translation>
+      <translation>ผู้ใช้งาน</translation>
     </message>
     <message>
       <location/>

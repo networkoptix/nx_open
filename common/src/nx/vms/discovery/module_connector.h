@@ -67,6 +67,7 @@ private:
         network::RetryTimer m_timer;
         std::set<nx_http::AsyncHttpClientPtr> m_httpClients;
         std::unique_ptr<AbstractStreamSocket> m_socket;
+        std::unique_ptr<network::aio::Timer> m_disconnectTimer;
     };
 
     Module* getModule(const QnUuid& id);

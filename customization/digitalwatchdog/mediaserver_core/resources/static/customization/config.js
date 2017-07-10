@@ -36,4 +36,4 @@ Config.allowDebugMode = false;
 Config.productName = 'DW Spectrum';
 Config.cloud.productName = 'DW Cloud';
 
-Config.supportedLanguages = ['en_US', 'fr', 'es'];
+Config.supportedLanguages = ['en_US', 'fr_FR', 'es_ES'];

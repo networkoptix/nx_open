@@ -933,8 +933,7 @@ void QnStorageConfigWidget::updateBackupUi(const QnBackupStatusData& reply, int 
             else
             {
                 ui->realtimeBackupStatusLabel->setText(tr("Realtime backup is set up."));
-                ui->realtimeIconLabel->setPixmap(qnSkin->pixmap(lit("archive_backup/backup_ready.png"),
-                    QSize(), Qt::IgnoreAspectRatio, Qt::SmoothTransformation, true));
+                ui->realtimeIconLabel->setPixmap(qnSkin->pixmap("archive_backup/backup_ready.png"));
             }
 
             ui->backupPages->setCurrentWidget(ui->backupRealtimePage);

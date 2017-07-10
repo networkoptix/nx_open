@@ -43,7 +43,7 @@
     </message>
     <message>
       <source>Connect</source>
-      <translation type="unfinished">Connect</translation>
+      <translation>เชื่อมต่อ</translation>
     </message>
   </context>
   <context>
@@ -92,11 +92,11 @@
     </message>
     <message>
       <source>Connect to Another Server...</source>
-      <translation type="unfinished">Connect to Another Server...</translation>
+      <translation>เชื่อมต่อไปยังเซิร์ฟเวอร์อื่น ...</translation>
     </message>
     <message>
       <source>Connect to Server...</source>
-      <translation type="unfinished">Connect to Server...</translation>
+      <translation>เชื่อมต่อกับเซิร์ฟเวอร์ ...</translation>
     </message>
   </context>
 </TS>

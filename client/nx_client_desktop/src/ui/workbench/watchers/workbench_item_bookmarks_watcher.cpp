@@ -80,9 +80,9 @@ namespace
         };
 
         const auto captionHtml = elideHtml(htmlFormattedParagraph(
-            bookmark.name, kCaptionPixelSize, true), kCaptionMaxLength);
+            bookmark.name.toHtmlEscaped(), kCaptionPixelSize, true), kCaptionMaxLength);
         const auto descHtml = elideHtml(htmlFormattedParagraph(
-            bookmark.description, kDescriptionPixeSize), kDescriptionMaxLength);
+            bookmark.description.toHtmlEscaped(), kDescriptionPixeSize), kDescriptionMaxLength);
 
         static const auto kHtmlPageTemplate = lit("<html><head><style>* {text-ident: 0; margin-top: 0; margin-bottom: 0; margin-left: 0; margin-right: 0; color: white;}</style></head><body>%1</body></html>");
         static const auto kComplexHtml = lit("%1%2");

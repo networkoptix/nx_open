@@ -16,7 +16,7 @@ branding_messages = {}
 
 
 def read_branding():
-    branding_file = 'branding.ts'
+    branding_file = '../branding.ts'
     tree = eTree.parse(branding_file)
     root = tree.getroot()
     for context in root.iter('context'):
@@ -60,7 +60,7 @@ def save_content(filename, content):
 def process_files(lang, root_directory, xml_filename):
     # 1. Copy all sources to target dir
 
-    xml_filename = os.path.join("../../..", "translations", lang, xml_filename)
+    xml_filename = os.path.join("../../../..", "translations", lang, xml_filename)
     tree = eTree.parse(xml_filename)
 
     root = tree.getroot()
@@ -122,7 +122,7 @@ def generate_languages_files(languages):
 
         process_files(lang, 'static', 'cloud_portal.ts')
 
-        language_json_filename = os.path.join("../../..", "translations", lang, 'language.json')
+        language_json_filename = os.path.join("../../../..", "translations", lang, 'language.json')
 
         with open(language_json_filename, 'r') as file_descriptor:
             data = json.load(file_descriptor)
@@ -139,7 +139,7 @@ def brand_file(filename):
     save_content(filename, active_content)
 
 
-def brand_directory(directory, file_filter, exclude_file = None):
+def brand_directory(directory, file_filter, exclude_file=None):
     all_strings = []
     for root, dirs, files in os.walk(directory):
         for filename in files:

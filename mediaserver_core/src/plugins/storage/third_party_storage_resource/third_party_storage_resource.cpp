@@ -207,7 +207,7 @@ void QnThirdPartyStorageResource::openStorage(
     QnMutexLocker lock(&m_mutex);
 
     int ecode;
-    nx_spl::Storage* spRaw = sf->createStorage(commonModule(), storageUrl, &ecode);
+    nx_spl::Storage* spRaw = sf->createStorage(storageUrl, &ecode);
 
     if (ecode != nx_spl::error::NoError)
     {

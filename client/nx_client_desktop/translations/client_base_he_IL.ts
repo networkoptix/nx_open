@@ -923,40 +923,40 @@ to view more bookmarks</source>
   <context>
     <name>Deactivator</name>
     <message>
-      <source>Unknown error</source>
-      <translation>שגיאה לא ידועה</translation>
+      <source>Unknown error.</source>
+      <translation>שגיאה לא ידועה.</translation>
     </message>
     <message>
-      <source>License does not exist</source>
-      <translation>הרישיון אינו קיים</translation>
+      <source>License does not exist.</source>
+      <translation type="unfinished">License does not exist.</translation>
     </message>
     <message>
-      <source>License is disabled</source>
-      <translation>הרישיון אינו זמין</translation>
+      <source>License is disabled.</source>
+      <translation type="unfinished">License is disabled.</translation>
     </message>
     <message>
-      <source>License is inactive</source>
-      <translation>הרישיון אינו פעיל</translation>
+      <source>License is inactive.</source>
+      <translation type="unfinished">License is inactive.</translation>
     </message>
     <message>
-      <source>Invalid license</source>
-      <translation>רישיון לא חוקי</translation>
+      <source>Invalid license.</source>
+      <translation type="unfinished">Invalid license.</translation>
     </message>
     <message>
-      <source>License is trial</source>
-      <translation>הרישיון הוא רשיון לניסיון</translation>
+      <source>License is trial.</source>
+      <translation type="unfinished">License is trial.</translation>
     </message>
     <message>
-      <source>License is in deactivation process</source>
-      <translation>הרישיון בתהליך השבתה</translation>
+      <source>License is in pending deactivation state, but has not been deactivated yet.</source>
+      <translation type="unfinished">License is in pending deactivation state, but has not been deactivated yet.</translation>
     </message>
     <message>
-      <source>Invalid hardware id</source>
-      <translation>מזהה חומרה לא חוקי</translation>
+      <source>Hardware ID of Media Server with this license does not match Hardware ID on which license was activated.</source>
+      <translation type="unfinished">Hardware ID of Media Server with this license does not match Hardware ID on which license was activated.</translation>
     </message>
     <message>
-      <source>Limit exceeded</source>
-      <translation>חריגה ממגבלה</translation>
+      <source>Number of deactivations exceeded limit for this license.</source>
+      <translation type="unfinished">Number of deactivations exceeded limit for this license.</translation>
     </message>
   </context>
   <context>
@@ -2861,6 +2861,10 @@ to %1</source>
       <source>Connection to Server could not be established.</source>
       <translation>לא ניתן לבצע חיבור לשרת.</translation>
     </message>
+    <message>
+      <source>This user is disabled by system administrator.</source>
+      <translation type="unfinished">This user is disabled by system administrator.</translation>
+    </message>
   </context>
   <context>
     <name>QnConnectionTestingDialog</name>
@@ -3920,15 +3924,6 @@ to %1</source>
       <translation>רישיון זה הוא כבר הופעל ומקושר אל החומרה עם מזהה %1 על %2</translation>
     </message>
     <message numerus="yes">
-      <source>%n channels</source>
-      <translation>
-        <numerusform>%n ערוצים</numerusform>
-        <numerusform>%n ערוצים</numerusform>
-        <numerusform>%n ערוצים</numerusform>
-        <numerusform>%n ערוצים</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
       <source>Deactivate licenses?</source>
       <translation>
         <numerusform>להשבית רישיונות?</numerusform>
@@ -3957,19 +3952,6 @@ to %1</source>
         <numerusform>%1 מתוך %n רישיונות לא ניתנים להשבתה</numerusform>
         <numerusform>%1 מתוך %n רישיונות לא ניתנים להשבתה</numerusform>
         <numerusform>%1 מתוך %n רישיונות לא ניתנים להשבתה</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>Please contact Customer Support</source>
-      <translation>אנא פנה למוקד תמיכת לקוחות</translation>
-    </message>
-    <message numerus="yes">
-      <source>Deactivate %n other</source>
-      <translation>
-        <numerusform>השבת %n אחרים</numerusform>
-        <numerusform>השבת %n אחרים</numerusform>
-        <numerusform>השבת %n אחרים</numerusform>
-        <numerusform>השבת %n אחרים</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -4017,6 +3999,28 @@ to %1</source>
     <message>
       <source>Deactivate</source>
       <translation>השבת</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n channels.</source>
+      <translation type="unfinished">
+        <numerusform>%n channels.</numerusform>
+        <numerusform>%n channels.</numerusform>
+        <numerusform>%n channels.</numerusform>
+        <numerusform>%n channels.</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Please contact Customer Support.</source>
+      <translation type="unfinished">Please contact Customer Support.</translation>
+    </message>
+    <message numerus="yes">
+      <source>Deactivate %n Other</source>
+      <translation type="unfinished">
+        <numerusform>Deactivate %n Other</numerusform>
+        <numerusform>Deactivate %n Other</numerusform>
+        <numerusform>Deactivate %n Other</numerusform>
+        <numerusform>Deactivate %n Other</numerusform>
+      </translation>
     </message>
   </context>
   <context>
@@ -5271,10 +5275,6 @@ to %1</source>
   </context>
   <context>
     <name>QnSendEmailActionDelegate</name>
-    <message>
-      <source>Select at least one user</source>
-      <translation>בחר לפחות משתמש אחד</translation>
-    </message>
     <message numerus="yes">
       <source>%n Users</source>
       <translation>
@@ -5303,34 +5303,34 @@ to %1</source>
       </translation>
     </message>
     <message>
-      <source>User %1 has invalid Email address</source>
-      <translation>למשתמש %1 יש כתובת מייל לא חוקית</translation>
-    </message>
-    <message numerus="yes">
-      <source>%n of %1 users have invalid Email address</source>
-      <translation>
-        <numerusform>ל %n מתוך%1 משתמשים יש כתובת מייל לא חוקית</numerusform>
-        <numerusform>ל %n מתוך%1 משתמשים יש כתובת מייל לא חוקית</numerusform>
-        <numerusform>ל %n מתוך%1 משתמשים יש כתובת מייל לא חוקית</numerusform>
-        <numerusform>ל %n מתוך%1 משתמשים יש כתובת מייל לא חוקית</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>Invalid Email address %1</source>
-      <translation>כתובת מייל לא תקינה %1</translation>
-    </message>
-    <message numerus="yes">
-      <source>%n of %1 additional Email addresses are invalid</source>
-      <translation>
-        <numerusform>%n מתוך %1 של כתובות דואר אלקטרוני נוספות אינן תקינות</numerusform>
-        <numerusform>%n מתוך %1 של כתובות דואר אלקטרוני נוספות אינן תקינות</numerusform>
-        <numerusform>%n מתוך %1 של כתובות דואר אלקטרוני נוספות אינן תקינות</numerusform>
-        <numerusform>%n מתוך %1 של כתובות דואר אלקטרוני נוספות אינן תקינות</numerusform>
-      </translation>
-    </message>
-    <message>
       <source>Send Email to %1</source>
       <translation>שלח מייל אל %1</translation>
+    </message>
+    <message>
+      <source>User %1 has invalid email address</source>
+      <translation type="unfinished">User %1 has invalid email address</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n of %1 users have invalid email address</source>
+      <translation type="unfinished">
+        <numerusform>%n of %1 users have invalid email address</numerusform>
+        <numerusform>%n of %1 users have invalid email address</numerusform>
+        <numerusform>%n of %1 users have invalid email address</numerusform>
+        <numerusform>%n of %1 users have invalid email address</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Invalid email address %1</source>
+      <translation type="unfinished">Invalid email address %1</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n of %1 additional email addresses are invalid</source>
+      <translation type="unfinished">
+        <numerusform>%n of %1 additional email addresses are invalid</numerusform>
+        <numerusform>%n of %1 additional email addresses are invalid</numerusform>
+        <numerusform>%n of %1 additional email addresses are invalid</numerusform>
+        <numerusform>%n of %1 additional email addresses are invalid</numerusform>
+      </translation>
     </message>
   </context>
   <context>
@@ -6187,13 +6187,6 @@ to %1</source>
     </message>
   </context>
   <context>
-    <name>QnSubjectTargetActionWidget</name>
-    <message>
-      <source>Select at least one user...</source>
-      <translation>בחר לפחות משתמש אחד...</translation>
-    </message>
-  </context>
-  <context>
     <name>QnSystemAdministrationDialog</name>
     <message>
       <source>General</source>
@@ -6327,17 +6320,26 @@ to %1</source>
       <translation>המערכת פועלת במצב בטוח.</translation>
     </message>
     <message>
-      <source>Check out %1 &amp;mdash; connect to your servers from anywhere</source>
-      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
-      <translation>בדוק את %1 &amp;mdash; כדי להתחבר לשרתים שלך מכל מקום</translation>
-    </message>
-    <message>
       <source>You cannot receive System notifications by Email.</source>
       <translation>לא ניתן לקבל הודעות מערכת בדוא"ל.</translation>
     </message>
     <message>
       <source>They cannot receive System notifications by Email.</source>
       <translation>הם אינם יכולים לקבל הודעות מערכת באמצעות אימייל.</translation>
+    </message>
+    <message>
+      <source>Connect your system to %1 &amp;mdash; make it accessible from anywhere!</source>
+      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
+      <translation type="unfinished">Connect your system to %1 &amp;mdash; make it accessible from anywhere!</translation>
+    </message>
+    <message>
+      <source>Check out %1 &amp;mdash; connect to your system from anywhere!</source>
+      <comment>%1 is the cloud name (like &apos;Nx Cloud&apos;)</comment>
+      <translation type="unfinished">Check out %1 &amp;mdash; connect to your system from anywhere!</translation>
+    </message>
+    <message>
+      <source>Connect</source>
+      <translation>חיבור</translation>
     </message>
   </context>
   <context>
@@ -7539,20 +7541,12 @@ to %1</source>
   <context>
     <name>nx::client::desktop::ui::LayoutTourDropPlaceholder</name>
     <message>
-      <source>Drag layout here to add it to the tour</source>
-      <translation>גרור פריסה כאן כדי להוסיף אותה לסיור</translation>
+      <source>Drag layout or camera here to add it to the tour</source>
+      <translation type="unfinished">Drag layout or camera here to add it to the tour</translation>
     </message>
   </context>
   <context>
     <name>nx::client::desktop::ui::SubjectSelectionDialog</name>
-    <message>
-      <source>No user roles found</source>
-      <translation>לא נמצאו תפקידי משתמש</translation>
-    </message>
-    <message>
-      <source>No users found</source>
-      <translation>לא נמצאו משתמשים</translation>
-    </message>
     <message>
       <source>Users</source>
       <translation>משתמשים</translation>
@@ -7560,6 +7554,10 @@ to %1</source>
     <message>
       <source>Custom Users</source>
       <translation>משתמשים מותאמים אישית</translation>
+    </message>
+    <message>
+      <source>All Users</source>
+      <translation>כל המשתמשים</translation>
     </message>
   </context>
   <context>
@@ -7615,6 +7613,22 @@ to %1</source>
     <message>
       <source>Reason for deactivation</source>
       <translation>סיבה להשבתה</translation>
+    </message>
+    <message>
+      <source>- Choose one -</source>
+      <translation type="unfinished">- Choose one -</translation>
+    </message>
+    <message>
+      <source>I&apos;m upgrading my machine</source>
+      <translation type="unfinished">I&apos;m upgrading my machine</translation>
+    </message>
+    <message>
+      <source>I accidentally assigned the license to a wrong machine</source>
+      <translation type="unfinished">I accidentally assigned the license to a wrong machine</translation>
+    </message>
+    <message>
+      <source>Other Reason</source>
+      <translation type="unfinished">Other Reason</translation>
     </message>
   </context>
   <context>
@@ -7848,6 +7862,23 @@ to %1</source>
     <message>
       <source>They may be auto-discovered again after removing.</source>
       <translation>הם עשויים להתגלות באופן אוטומטי שוב לאחר הסרתם.</translation>
+    </message>
+    <message>
+      <source>Overwrite existing layout tour?</source>
+      <translation type="unfinished">Overwrite existing layout tour?</translation>
+    </message>
+    <message>
+      <source>There is another layout tour with the same name.</source>
+      <translation type="unfinished">There is another layout tour with the same name.</translation>
+    </message>
+    <message numerus="yes">
+      <source>Remove %n items from layout tour?</source>
+      <translation type="unfinished">
+        <numerusform>Remove %n items from layout tour?</numerusform>
+        <numerusform>Remove %n items from layout tour?</numerusform>
+        <numerusform>Remove %n items from layout tour?</numerusform>
+        <numerusform>Remove %n items from layout tour?</numerusform>
+      </translation>
     </message>
   </context>
   <context>

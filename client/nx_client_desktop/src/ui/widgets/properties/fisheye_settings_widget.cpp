@@ -25,22 +25,14 @@ QnFisheyeSettingsWidget::QnFisheyeSettingsWidget(QWidget* parent):
 
     setHelpTopic(this, Qn::CameraSettings_Dewarping_Help);
 
-    ui->sizeIcon1->setPixmap(qnSkin->pixmap(lit("fisheye/circle_small.png"),
-        QSize(), Qt::IgnoreAspectRatio, Qt::SmoothTransformation, true));
-    ui->sizeIcon2->setPixmap(qnSkin->pixmap(lit("fisheye/circle_big.png"),
-        QSize(), Qt::IgnoreAspectRatio, Qt::SmoothTransformation, true));
-    ui->xOffsetIcon1->setPixmap(qnSkin->pixmap(lit("fisheye/arrow_left.png"),
-        QSize(), Qt::IgnoreAspectRatio, Qt::SmoothTransformation, true));
-    ui->xOffsetIcon2->setPixmap(qnSkin->pixmap(lit("fisheye/arrow_right.png"),
-        QSize(), Qt::IgnoreAspectRatio, Qt::SmoothTransformation, true));
-    ui->yOffsetIcon1->setPixmap(qnSkin->pixmap(lit("fisheye/arrow_down.png"),
-        QSize(), Qt::IgnoreAspectRatio, Qt::SmoothTransformation, true));
-    ui->yOffsetIcon2->setPixmap(qnSkin->pixmap(lit("fisheye/arrow_up.png"),
-        QSize(), Qt::IgnoreAspectRatio, Qt::SmoothTransformation, true));
-    ui->ellipticityIcon1->setPixmap(qnSkin->pixmap(lit("fisheye/ellipse_vertical.png"),
-        QSize(), Qt::IgnoreAspectRatio, Qt::SmoothTransformation, true));
-    ui->ellipticityIcon2->setPixmap(qnSkin->pixmap(lit("fisheye/ellipse_horizontal.png"),
-        QSize(), Qt::IgnoreAspectRatio, Qt::SmoothTransformation, true));
+    ui->sizeIcon1->setPixmap(qnSkin->pixmap("fisheye/circle_small.png"));
+    ui->sizeIcon2->setPixmap(qnSkin->pixmap("fisheye/circle_big.png"));
+    ui->xOffsetIcon1->setPixmap(qnSkin->pixmap("fisheye/arrow_left.png"));
+    ui->xOffsetIcon2->setPixmap(qnSkin->pixmap("fisheye/arrow_right.png"));
+    ui->yOffsetIcon1->setPixmap(qnSkin->pixmap("fisheye/arrow_down.png"));
+    ui->yOffsetIcon2->setPixmap(qnSkin->pixmap("fisheye/arrow_up.png"));
+    ui->ellipticityIcon1->setPixmap(qnSkin->pixmap("fisheye/ellipse_vertical.png"));
+    ui->ellipticityIcon2->setPixmap(qnSkin->pixmap("fisheye/ellipse_horizontal.png"));
 
     connect(ui->angleSpinBox, QnDoubleSpinBoxValueChanged, this, &QnFisheyeSettingsWidget::dataChanged);
     connect(ui->calibrateWidget, &QnFisheyeCalibrationWidget::dataChanged, this, &QnFisheyeSettingsWidget::dataChanged);

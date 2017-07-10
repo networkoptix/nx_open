@@ -169,6 +169,7 @@
 #include <rest/handlers/discovered_peers_rest_handler.h>
 #include <rest/handlers/log_level_rest_handler.h>
 #include <rest/handlers/multiserver_chunks_rest_handler.h>
+#include <rest/handlers/multiserver_time_rest_handler.h>
 #include <rest/handlers/camera_history_rest_handler.h>
 #include <rest/handlers/multiserver_bookmarks_rest_handler.h>
 #include <rest/handlers/save_cloud_system_credentials.h>
@@ -259,6 +260,7 @@
 #include <common/static_common_module.h>
 #include <recorder/storage_db_pool.h>
 #include <transaction/message_bus_selector.h>
+#include <managers/discovery_manager.h>
 
 #if !defined(EDGE_SERVER)
     #include <nx_speech_synthesizer/text_to_wav.h>
@@ -1652,12 +1654,12 @@ void MediaServerProcess::at_portMappingChanged(QString address)
     SocketAddress mappedAddress(address);
     if (mappedAddress.port)
     {
-        NX_LOGX(lit("New external address %1 has been mapped")
-                .arg(address), cl_logALWAYS);
-
         auto it = m_forwardedAddresses.emplace(mappedAddress.address, 0).first;
         if (it->second != mappedAddress.port)
         {
+            NX_LOGX(lit("New external address %1 has been mapped")
+                    .arg(address), cl_logALWAYS);
+
             it->second = mappedAddress.port;
             updateAddressesList();
         }
@@ -1822,7 +1824,9 @@ void MediaServerProcess::registerRestHandlers(
     reg("api/ptz", new QnPtzRestHandler());
     reg("api/image", new QnImageRestHandler()); //< deprecated
     reg("api/createEvent", new QnExternalEventRestHandler());
-    reg("api/gettime", new QnTimeRestHandler());
+    static const char kGetTimePath[] = "api/gettime";
+    reg(kGetTimePath, new QnTimeRestHandler());
+    reg("ec2/getTimeOfServers", new QnMultiserverTimeRestHandler(QLatin1String("/") + kGetTimePath));
     reg("api/getTimeZones", new QnGetTimeZonesRestHandler());
     reg("api/getNonce", new QnGetNonceRestHandler());
     reg("api/cookieLogin", new QnCookieLoginRestHandler());
@@ -2577,6 +2581,7 @@ void MediaServerProcess::run()
     ec2ConnectionFactory->setConfParams(std::move(confParams));
     ec2::AbstractECConnectionPtr ec2Connection;
     QnConnectionInfo connectInfo;
+    std::unique_ptr<ec2::QnDiscoveryMonitor> discoveryMonitor;
 
     while (!needToStop())
     {
@@ -2588,7 +2593,9 @@ void MediaServerProcess::run()
             auto connectionResult = QnConnectionValidator::validateConnection(connectInfo, errorCode);
             if (connectionResult == Qn::SuccessConnectionResult)
             {
-                ec2Connection->getDiscoveryManager(Qn::kSystemAccess)->monitorServerDiscovery();
+                discoveryMonitor = std::make_unique<ec2::QnDiscoveryMonitor>(
+                    ec2ConnectionFactory->messageBus());
+
                 NX_LOG(QString::fromLatin1("Connected to local EC2"), cl_logWARNING);
                 break;
             }
@@ -2667,8 +2674,19 @@ void MediaServerProcess::run()
         miscManager->cleanupDatabaseSync(kCleanupDbObjects, kCleanupTransactionLog);
     }
 
-    connect( ec2Connection->getTimeNotificationManager().get(), &ec2::AbstractTimeNotificationManager::timeChanged,
-             QnSyncTime::instance(), (void(QnSyncTime::*)(qint64))&QnSyncTime::updateTime );
+    connect(ec2Connection->getTimeNotificationManager().get(), &ec2::AbstractTimeNotificationManager::timeChanged,
+        [this](qint64 newTime)
+        {
+            QnSyncTime::instance()->updateTime(newTime);
+
+            using namespace ec2;
+            QnTransaction<ApiPeerSyncTimeData> tran(
+                ApiCommand::broadcastPeerSyncTime,
+                commonModule()->moduleGUID());
+            tran.params.syncTimeMs = newTime;
+            sendTransaction(commonModule()->ec2Connection()->messageBus(), tran);
+        }
+        );
 
     std::unique_ptr<QnMServerResourceSearcher> mserverResourceSearcher(new QnMServerResourceSearcher(commonModule()));
 
@@ -3111,6 +3129,7 @@ void MediaServerProcess::run()
 
     qWarning()<<"QnMain event loop has returned. Destroying objects...";
 
+    discoveryMonitor.reset();
     m_crashReporter.reset();
 
     //cancelling dumping system usage

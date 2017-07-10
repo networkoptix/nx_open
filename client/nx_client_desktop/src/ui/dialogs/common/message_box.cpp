@@ -495,8 +495,7 @@ QPixmap QnMessageBox::getPixmapByIconId(QnMessageBoxIcon icon)
         case QnMessageBoxIcon::Question:
             return standardPixmap(QStyle::SP_MessageBoxQuestion);
         case QnMessageBoxIcon::Success:
-            return qnSkin->pixmap("standard_icons/message_box_success.png",
-                QSize(), Qt::IgnoreAspectRatio, Qt::FastTransformation, true);
+            return qnSkin->pixmap("standard_icons/message_box_success.png");
         default:
             return QPixmap();
     }
