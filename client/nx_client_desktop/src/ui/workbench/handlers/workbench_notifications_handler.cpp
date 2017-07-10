@@ -123,9 +123,7 @@ void QnWorkbenchNotificationsHandler::handleAcknowledgeEventAction()
     const QScopedPointer<QDialog> bookmarksDialog(
         new QnCameraBookmarkDialog(businessAction, mainWindow()));
     if (bookmarksDialog->exec() == QDialogButtonBox::Ok)
-    {
-        // Hide notification
-    }
+        emit notificationRemoved(businessAction);
 }
 
 void QnWorkbenchNotificationsHandler::clear()

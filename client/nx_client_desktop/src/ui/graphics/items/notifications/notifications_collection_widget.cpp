@@ -274,31 +274,6 @@ void QnNotificationsCollectionWidget::handleShowPopupAction(
             menu()->trigger(action::AcknowledgeEventAction, params);
         });
 
-    /*
-    QnCameraBookmarkList bookmarks;
-    for (const auto& resourceId: businessAction->getResources())
-    {
-        const auto camera = resourcePool()->getResourceById<QnSecurityCamResource>(resourceId);
-        if (!camera)
-        {
-            NX_EXPECT(false, "Invalid camera resource");
-            continue;
-        }
-
-        const auto bookmark = helpers::bookmarkFromAction(businessAction, camera, commonModule());
-        if (!bookmark.isValid())
-        {
-            NX_EXPECT(false, "Invalid bookmark");
-            continue;
-        }
-
-        bookmarks.append(bookmark);
-    }
-
-    if (bookmarks.isEmpty())
-        return;
-
-        */
     m_customPopupItems.insert(getIdentifierFromAction(businessAction), widget);
 }
 

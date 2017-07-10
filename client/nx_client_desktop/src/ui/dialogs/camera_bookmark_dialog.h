@@ -33,8 +33,18 @@ public:
     void submitData(QnCameraBookmark &bookmark) const;
 
     virtual void accept() override;
+
+protected:
+    virtual void initializeButtonBox() override;
+
+private:
+    void initialize();
+
+    void updateOkButtonAvailability();\
+
 private:
     QScopedPointer<Ui::QnCameraBookmarkDialog> ui;
+    QnCameraBookmarkList m_actionBookmarks;
 };
 
 #endif // ADD_CAMERA_BOOKMARK_DIALOG_H

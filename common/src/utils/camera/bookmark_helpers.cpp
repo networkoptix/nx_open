@@ -31,8 +31,7 @@ QnCameraBookmark helpers::bookmarkFromAction(
     }
 
     const auto actionParams = action->getParams();
-    if (action->actionType() != vms::event::bookmarkAction
-        && actionParams.targetActionType != vms::event::bookmarkAction)
+    if (action->actionType() != vms::event::showPopupAction)
     {
         NX_EXPECT(false, "Invalid action");
         return QnCameraBookmark();

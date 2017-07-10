@@ -12,6 +12,8 @@ namespace {
     const int defaultTimeoutIdx = 0;
 }
 
+using namespace nx::client::desktop::ui;
+
 QnBookmarkWidget::QnBookmarkWidget(QWidget *parent):
     QWidget(parent),
     ui(new Ui::BookmarkWidget),
@@ -37,16 +39,13 @@ QnBookmarkWidget::QnBookmarkWidget(QWidget *parent):
         updateTagsList();
     });
 
-    ui->nameInputField->setValidator(Qn::defaultNonEmptyValidator(tr("Name cannot be empty.")));
+    const auto validator = Qn::defaultNonEmptyValidator(tr("Name cannot be empty."));
+    ui->nameInputField->setValidator(validator);
 
-    connect(ui->nameInputField, &QnInputField::textChanged, this, [this]()
-    {
-        bool wasValid = m_isValid;
-        m_isValid = ui->nameInputField->isValid();
-
-        if (wasValid != m_isValid)
-            emit validChanged();
-    });
+    connect(ui->nameInputField, &QnInputField::isValidChanged,
+        this, &QnBookmarkWidget::validChanged);
+    connect(ui->descriptionTextEdit, &TextEditField::isValidChanged,
+        this, &QnBookmarkWidget::validChanged);
 
     // TODO: #3.0 #rvasilenko Remove when bookmark timeout will be implemented.
     // Then change defaultTimeoutIdx constant value to '3'.
@@ -67,7 +66,7 @@ void QnBookmarkWidget::setTags(const QnCameraBookmarkTagList &tags) {
 
 void QnBookmarkWidget::loadData(const QnCameraBookmark &bookmark) {
     ui->nameInputField->setText(bookmark.name);
-    ui->descriptionTextEdit->setPlainText(bookmark.description);
+    ui->descriptionTextEdit->setText(bookmark.description);
 
     QDateTime start = QDateTime::fromMSecsSinceEpoch(bookmark.startTimeMs);
     ui->timeoutComboBox->clear();
@@ -86,16 +85,17 @@ void QnBookmarkWidget::loadData(const QnCameraBookmark &bookmark) {
     updateTagsList();
 }
 
-void QnBookmarkWidget::submitData(QnCameraBookmark &bookmark) const {
+void QnBookmarkWidget::submitData(QnCameraBookmark &bookmark) const
+{
     bookmark.name = ui->nameInputField->text().trimmed();
-    bookmark.description = ui->descriptionTextEdit->toPlainText().trimmed();
+    bookmark.description = ui->descriptionTextEdit->text().trimmed();
     bookmark.timeout = ui->timeoutComboBox->currentData().toLongLong();
     bookmark.tags = m_selectedTags;
 }
 
 bool QnBookmarkWidget::isValid() const
 {
-    return ui->nameInputField->isValid();
+    return ui->nameInputField->isValid() && ui->descriptionTextEdit->isValid();
 }
 
 void QnBookmarkWidget::updateTagsList() {
@@ -114,4 +114,10 @@ void QnBookmarkWidget::updateTagsList() {
 
     ui->tagsListLabel->setText(html.arg(tags.join(lit(", "))));
     update();
+}
+
+void QnBookmarkWidget::setDescriptionMandatory()
+{
+    const auto validator = Qn::defaultNonEmptyValidator(tr("Description cannot be empty"));
+    ui->descriptionTextEdit->setValidator(validator);
 }
