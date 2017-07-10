@@ -26,15 +26,15 @@ angular.module('nxCommon')
                     }
                     
                     //If position has been selected then there is an archive no message is required
-                    if('positionSelected' in scope.flags && scope.flags['positionSelected'])
+                    if(scope.flags.positionSelected != undefined)
                     {
                         scope.alertType = null;
                         return;
                     }
 
                     //if status is online dont show any message
-                    if(!scope.alertType && 'status' in scope.flags 
-                                        && !(scope.flags['status'] == "Online" || scope.flags['status'] == "Recording"))
+                    if(!scope.alertType && scope.flags.status != undefined
+                                        && !(scope.flags.status == "Online" || scope.flags.status == "Recording"))
                     {
                         scope.alertType = 'status';
                     }
@@ -49,7 +49,7 @@ angular.module('nxCommon')
                     if(scope.alertType == 'status'){
                         scope.title = L.common.cameraStates[(scope.flags[scope.alertType]).toLowerCase()];
                         scope.message = null;
-                        scope.iconClass = scope.flags['status'] == 'Offline' ? 'camera-view-offline' : 'camera-view-unauthorized';
+                        scope.iconClass = scope.flags.status == 'Offline' ? 'camera-view-offline' : 'camera-view-unauthorized';
                     }
                     else{
                         scope.iconClass = 'camera-view-error';
