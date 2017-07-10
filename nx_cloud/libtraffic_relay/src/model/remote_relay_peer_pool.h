@@ -1,6 +1,7 @@
 #pragma once
 
 #include <memory>
+#include <string>
 #include <nx/utils/thread/cf/cfuture.h>
 
 namespace nx {
@@ -26,6 +27,7 @@ private:
     bool m_dbReady = false;
 
     void prepareDbStructure();
+    std::string whereStringForFind(const std::string& domainName);
 };
 
 } // namespace model

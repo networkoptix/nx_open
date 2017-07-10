@@ -1,5 +1,8 @@
+#include <sstream>
+#include <boost/algorithm/string.hpp>
 #include "remote_relay_peer_pool.h"
 #include <nx/utils/log/log.h>
+#include <nx/utils/std/algorithm.h>
 #include <nx/casssandra/async_cassandra_connection.h>
 
 namespace nx {
@@ -57,7 +60,7 @@ void RemoteRelayPeerPool::prepareDbStructure()
 }
 
 cf::future<std::string> RemoteRelayPeerPool::findRelayByDomain(
-        const std::string& /*domainName*/) const
+        const std::string& domainName) const
 {
     if (!m_dbReady)
         return cf::make_ready_future(std::string());
@@ -71,7 +74,7 @@ cf::future<std::string> RemoteRelayPeerPool::findRelayByDomain(
 
     return m_cassConnection->executeSelect("SELECT listen_address from system.local;")
         .then(
-            [this, sharedContext](
+            [this, sharedContext, domainName](
                 cf::future<std::pair<CassError, cassandra::QueryResult>> resultFuture)
             {
                 auto result = resultFuture.get();
@@ -97,10 +100,8 @@ cf::future<std::string> RemoteRelayPeerPool::findRelayByDomain(
                 }
 
                 return m_cassConnection->prepareQuery(
-                    "SELECT relay_id, domain_suffix_1, domain_suffix_2, \
-                            domain_suffix_3, domain_name_tail \
-                     FROM cdb.relay_servers \
-                     WHERE relay_id != ?;");
+                    ("SELECT relay_id \
+                     FROM cdb.relay_servers " + whereStringForFind(domainName)).c_str());
             })
         .then(
             [this, sharedContext](cf::future<std::pair<CassError, cassandra::Query>> prepareFuture)
@@ -150,6 +151,47 @@ bool RemoteRelayPeerPool::addPeer(const std::string& /*domainName*/, const std::
         return false;
 }
 
+
+std::string RemoteRelayPeerPool::whereStringForFind(const std::string& domainName)
+{
+    auto reversedDomainName = nx::utils::reverseWords(domainName, ".");
+
+    std::vector<std::string> domainParts;
+    boost::split(domainParts, reversedDomainName, boost::is_any_of("."));
+    int partsCount = (int)domainParts.size();
+
+    std::stringstream ss;
+    ss << " WHERE ";
+
+    auto addDomainSuffixParam =
+        [&partsCount](std::stringstream* ss, const std::vector<std::string>& parts,
+            int index, bool first = false)
+        {
+            if (first)
+                *ss << " AND ";
+
+            if (partsCount > index)
+                *ss << "domain_suffix_" << index + 1 << " = '" << parts[index] << "'";
+        };
+
+    addDomainSuffixParam(&ss, domainParts, 0, true);
+    for (int i = 1; i < 3; ++i)
+        addDomainSuffixParam(&ss, domainParts, i);
+
+    if (domainParts.size() > 3)
+    {
+        ss << " AND domain_name_tail = ";
+        for (int i = 3; i < partsCount; ++i)
+        {
+            ss << domainParts[i];
+            if (i != partsCount - 1)
+                ss << ".";
+        }
+    }
+
+    ss << ";";
+    return ss.str();
+}
 
 } // namespace model
 } // namespace relay
