@@ -12,7 +12,8 @@ namespace {
 
 static const auto kCurrentTextPropertyName = lit("currentText").toLatin1();
 static const auto kReadOnlyPropertyName = lit("readOnly").toLatin1();
-}
+
+} // namespace
 
 namespace nx {
 namespace client {
