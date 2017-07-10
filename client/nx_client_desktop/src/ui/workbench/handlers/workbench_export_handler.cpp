@@ -3,6 +3,8 @@
 #include <QtWidgets/QAction>
 #include <QtWidgets/QComboBox>
 
+#include <nx/utils/std/cpp14.h>
+
 #include <client/client_settings.h>
 #include <client/client_runtime_settings.h>
 
