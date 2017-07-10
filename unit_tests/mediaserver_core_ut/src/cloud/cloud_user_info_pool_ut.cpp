@@ -159,29 +159,29 @@ protected:
     }
 
 
-    void thenCommonNonceShouldBeNull ()
+    void thenCommonNonceShouldBeNull()
     {
         ASSERT_FALSE((bool)userInfoPool.newestMostCommonNonce());
     }
 
     void thenSecondStillCanAuth()
     {
-        ASSERT_FALSE(userInfoPool.authenticate(
+        ASSERT_EQ(Qn::Auth_WrongLogin, userInfoPool.authenticate(
             kTestMethod,
             generateAuthHeader("vasya", *userInfoPool.newestMostCommonNonce())));
 
-        ASSERT_TRUE(userInfoPool.authenticate(
+        ASSERT_EQ(Qn::Auth_OK, userInfoPool.authenticate(
             kTestMethod,
             generateAuthHeader("petya", *userInfoPool.newestMostCommonNonce())));
     }
 
     void thenBothUsersCanAuthenticateUsingNewestMostCommonNonce()
     {
-        ASSERT_TRUE(userInfoPool.authenticate(
+        ASSERT_EQ(Qn::Auth_OK, userInfoPool.authenticate(
             kTestMethod,
             generateAuthHeader("vasya", *userInfoPool.newestMostCommonNonce())));
 
-        ASSERT_TRUE(userInfoPool.authenticate(
+        ASSERT_EQ(Qn::Auth_OK, userInfoPool.authenticate(
             kTestMethod,
             generateAuthHeader("petya", *userInfoPool.newestMostCommonNonce())));
     }
