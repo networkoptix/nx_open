@@ -269,8 +269,8 @@ public:
     virtual int suggestBitrateKbps(Qn::StreamQuality quality, QSize resolution, int fps, Qn::ConnectionRole role = Qn::CR_Default) const override;
 
     QnMutex* getStreamConfMutex();
-    void beforeConfigureStream();
-    void afterConfigureStream();
+    virtual void beforeConfigureStream(Qn::ConnectionRole role);
+    virtual void afterConfigureStream(Qn::ConnectionRole role);
 
     double getClosestAvailableFps(double desiredFps);
 
@@ -285,6 +285,14 @@ protected:
     void setAudioCodec(AUDIO_CODECS c);
 
     virtual CameraDiagnostics::Result initInternal() override;
+    virtual CameraDiagnostics::Result initOnvifCapabilitiesAndUrls(
+        CapabilitiesResp* outCapabilitiesResponse,
+        DeviceSoapWrapper** outDeviceSoapWrapper);
+    virtual CameraDiagnostics::Result initializeMedia(const CapabilitiesResp& onvifCapabilities);
+    virtual CameraDiagnostics::Result initializePtz(const CapabilitiesResp& onvifCapabilities);
+    virtual CameraDiagnostics::Result initializeIo(const CapabilitiesResp& onvifCapabilities);
+    virtual CameraDiagnostics::Result initializeAdvancedParameters(const CapabilitiesResp& onvifCapabilities);
+
     virtual QnAbstractStreamDataProvider* createLiveDataProvider() override;
 
     virtual void setCroppingPhysical(QRect cropping);
@@ -303,8 +311,6 @@ protected:
     virtual CameraDiagnostics::Result customInitialization(const CapabilitiesResp& /*capabilitiesResponse*/) {
         return CameraDiagnostics::NoErrorResult();
     }
-
-
 
 private:
     void setMaxFps(int f);
