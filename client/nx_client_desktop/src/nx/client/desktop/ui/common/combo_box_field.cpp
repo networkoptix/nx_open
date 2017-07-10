@@ -10,8 +10,8 @@
 
 namespace {
 
-static const auto kCurrentTextPropertyName = lit("currentText").toLatin1();
-static const auto kReadOnlyPropertyName = lit("readOnly").toLatin1();
+static const auto kCurrentTextPropertyName = QByteArray("currentText");
+static const auto kReadOnlyPropertyName = QByteArray("readOnly");
 
 } // namespace
 
