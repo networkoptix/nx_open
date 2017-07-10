@@ -248,7 +248,13 @@ bool QnMultiserverBookmarksRestHandlerPrivate::addBookmark(
     QnUpdateBookmarkRequestContext &context)
 {
     /* This request always executed locally. */
-    return qnServerDb->addBookmark(context.request().bookmark);
+    if (!qnServerDb->addBookmark(context.request().bookmark))
+        return false;
+
+    const auto& actionData = context.request().actionData;
+    if (actionData.actionType != nx::vms::event::ActionType::undefinedAction)
+        qnServerDb->saveActionToDB(actionData);
+    return true;
 }
 
 bool QnMultiserverBookmarksRestHandlerPrivate::updateBookmark(
