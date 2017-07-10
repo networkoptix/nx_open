@@ -45,8 +45,18 @@
         window.open("{{ preview_link }}");
     }
 
+    function wasTouched(){
+        var touched = false;
+        var inputs = document.getElementsByTagName('input');
+        for(i=0;i<inputs.length;++i){
+            if(inputs[i].defaultValue != inputs[i].value){
+                touched = true;
+            }
+        }
+        return touched;
+    }
     function languageChanged(){
-        if(confirm('Do you want to save changes?')){
+        if(wasTouched() && confirm('Do you want to save changes?')){
             document.getElementById('languageChanged').name = "languageChanged";
         }
         document.getElementById('contextForm').submit();
@@ -54,7 +64,8 @@
 
 
     var langSelector = document.getElementById('id_language');
-
-    langSelector.addEventListener('change', languageChanged, false);
+    if(langSelector){
+        langSelector.addEventListener('change', languageChanged, false);
+    }
 </script>
 {% endblock%}
