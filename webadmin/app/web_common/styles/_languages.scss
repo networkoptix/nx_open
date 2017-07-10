@@ -23,7 +23,7 @@
     max-height: 11px;
     background-repeat: no-repeat;
     display: inline-block;
-    background-image: url('/static/images/languages.png');
+    background-image: url('../web_common/images/icons/languages.png');
 }
 
 .lang-sm {
@@ -34,7 +34,7 @@
     max-height: 16px;
     background-repeat: no-repeat;
     display: inline-block;
-    background-image: url('/static/images/languages.png');
+    background-image: url('../web_common/images/icons/languages.png');
 }
 
 .lang-lg {
@@ -45,50 +45,50 @@
     max-height: 22px;
     background-repeat: no-repeat;
     display: inline-block;
-    background-image: url('/static/images/languages.png');
+    background-image: url('../web_common/images/icons/languages.png');
 }
 
 /* Positions in our sprite for xs-sized images */
-.lang-xs[lang=ar] { background-position: 0px     0px; }
+.lang-xs[lang=ar_SA] { background-position: 0px     0px; }
 .lang-xs[lang=be] { background-position: 0px   -11px; }
 .lang-xs[lang=bg] { background-position: 0px   -22px; }
 .lang-xs[lang=cs] { background-position: 0px   -33px; }
 .lang-xs[lang=da] { background-position: 0px   -44px; }
-.lang-xs[lang=de] { background-position: 0px   -55px; }
+.lang-xs[lang=de_DE] { background-position: 0px   -55px; }
 .lang-xs[lang=el] { background-position: 0px   -66px; }
 .lang-xs[lang=en] { background-position: 0px   -77px; }
-.lang-xs[lang=es] { background-position: 0px   -88px; }
+.lang-xs[lang=es_ES] { background-position: 0px   -88px; }
 .lang-xs[lang=et] { background-position: 0px   -99px; }
 .lang-xs[lang=fi] { background-position: 0px  -110px; }
-.lang-xs[lang=fr] { background-position: 0px  -121px; }
+.lang-xs[lang=fr_FR] { background-position: 0px  -121px; }
 .lang-xs[lang=ga] { background-position: 0px  -132px; }
 .lang-xs[lang=hi] { background-position: 0px  -143px; }
-.lang-xs[lang=hr] { background-position: 0px  -154px; }
-.lang-xs[lang=hu] { background-position: 0px  -165px; }
+.lang-xs[lang=hr_HR] { background-position: 0px  -154px; }
+.lang-xs[lang=hu_HU] { background-position: 0px  -165px; }
 .lang-xs[lang=in] { background-position: 0px  -176px; }
 .lang-xs[lang=is] { background-position: 0px  -187px; }
 .lang-xs[lang=it] { background-position: 0px  -198px; }
-.lang-xs[lang=he] { background-position: 0px  -209px; }
-.lang-xs[lang=ja] { background-position: 0px  -220px; }
-.lang-xs[lang=ko] { background-position: 0px  -231px; }
+.lang-xs[lang=he_IL] { background-position: 0px  -209px; }
+.lang-xs[lang=ja_JP] { background-position: 0px  -220px; }
+.lang-xs[lang=ko_KR] { background-position: 0px  -231px; }
 .lang-xs[lang=lt] { background-position: 0px  -242px; }
 .lang-xs[lang=lv] { background-position: 0px  -253px; }
 .lang-xs[lang=mk] { background-position: 0px  -264px; }
 .lang-xs[lang=ms] { background-position: 0px  -275px; }
 .lang-xs[lang=mt] { background-position: 0px  -286px; }
-.lang-xs[lang=nl] { background-position: 0px  -297px; }
+.lang-xs[lang=nk_NL] { background-position: 0px  -297px; }
 .lang-xs[lang=no] { background-position: 0px  -308px; }
-.lang-xs[lang=pl] { background-position: 0px  -319px; }
-.lang-xs[lang=pt] { background-position: 0px  -330px; }
+.lang-xs[lang=pl_PL] { background-position: 0px  -319px; }
+.lang-xs[lang=pt_PT] { background-position: 0px  -330px; }
 .lang-xs[lang=ro] { background-position: 0px  -341px; }
-.lang-xs[lang=ru] { background-position: 0px  -352px; }
+.lang-xs[lang=ru_RU] { background-position: 0px  -352px; }
 .lang-xs[lang=sk] { background-position: 0px  -363px; }
 .lang-xs[lang=sl] { background-position: 0px  -374px; }
 .lang-xs[lang=sq] { background-position: 0px  -385px; }
 .lang-xs[lang=sr] { background-position: 0px  -396px; }
 .lang-xs[lang=sv] { background-position: 0px  -407px; }
-.lang-xs[lang=th] { background-position: 0px  -418px; }
-.lang-xs[lang=tr] { background-position: 0px  -429px; }
+.lang-xs[lang=th_TH] { background-position: 0px  -418px; }
+.lang-xs[lang=tr_TR] { background-position: 0px  -429px; }
 .lang-xs[lang=uk] { background-position: 0px  -440px; }
 .lang-xs[lang=vi] { background-position: 0px  -451px; }
 .lang-xs[lang=zh] { background-position: 0px  -462px; }
@@ -99,41 +99,41 @@
 .lang-sm[lang=bg] { background-position: 0px  -516px; }
 .lang-sm[lang=cs] { background-position: 0px  -532px; }
 .lang-sm[lang=da] { background-position: 0px  -548px; }
-.lang-sm[lang=de] { background-position: 0px  -564px; }
+.lang-sm[lang=de_DE] { background-position: 0px  -564px; }
 .lang-sm[lang=el] { background-position: 0px  -580px; }
 .lang-sm[lang=en] { background-position: 0px  -596px; }
-.lang-sm[lang=es] { background-position: 0px  -612px; }
+.lang-sm[lang=es_ES] { background-position: 0px  -612px; }
 .lang-sm[lang=et] { background-position: 0px  -628px; }
 .lang-sm[lang=fi] { background-position: 0px  -644px; }
-.lang-sm[lang=fr] { background-position: 0px  -660px; }
+.lang-sm[lang=fr_FR] { background-position: 0px  -660px; }
 .lang-sm[lang=ga] { background-position: 0px  -676px; }
 .lang-sm[lang=hi] { background-position: 0px  -692px; }
-.lang-sm[lang=hr] { background-position: 0px  -708px; }
-.lang-sm[lang=hu] { background-position: 0px  -724px; }
+.lang-sm[lang=hr_HR] { background-position: 0px  -708px; }
+.lang-sm[lang=hu_HU] { background-position: 0px  -724px; }
 .lang-sm[lang=in] { background-position: 0px  -740px; }
 .lang-sm[lang=is] { background-position: 0px  -756px; }
 .lang-sm[lang=it] { background-position: 0px  -772px; }
-.lang-sm[lang=he] { background-position: 0px  -788px; }
-.lang-sm[lang=ja] { background-position: 0px  -804px; }
-.lang-sm[lang=ko] { background-position: 0px  -820px; }
+.lang-sm[lang=he_IL] { background-position: 0px  -788px; }
+.lang-sm[lang=ja_JP] { background-position: 0px  -804px; }
+.lang-sm[lang=ko_KR] { background-position: 0px  -820px; }
 .lang-sm[lang=lt] { background-position: 0px  -836px; }
 .lang-sm[lang=lv] { background-position: 0px  -852px; }
 .lang-sm[lang=mk] { background-position: 0px  -868px; }
 .lang-sm[lang=ms] { background-position: 0px  -884px; }
 .lang-sm[lang=mt] { background-position: 0px  -900px; }
-.lang-sm[lang=nl] { background-position: 0px  -916px; }
+.lang-sm[lang=nk_NL] { background-position: 0px  -916px; }
 .lang-sm[lang=no] { background-position: 0px  -932px; }
-.lang-sm[lang=pl] { background-position: 0px  -948px; }
-.lang-sm[lang=pt] { background-position: 0px  -964px; }
+.lang-sm[lang=pl_PL] { background-position: 0px  -948px; }
+.lang-sm[lang=pt_PT] { background-position: 0px  -964px; }
 .lang-sm[lang=ro] { background-position: 0px  -980px; }
-.lang-sm[lang=ru] { background-position: 0px  -996px; }
+.lang-sm[lang=ru_RU] { background-position: 0px  -996px; }
 .lang-sm[lang=sk] { background-position: 0px -1012px; }
 .lang-sm[lang=sl] { background-position: 0px -1028px; }
 .lang-sm[lang=sq] { background-position: 0px -1044px; }
 .lang-sm[lang=sr] { background-position: 0px -1060px; }
 .lang-sm[lang=sv] { background-position: 0px -1076px; }
-.lang-sm[lang=th] { background-position: 0px -1092px; }
-.lang-sm[lang=tr] { background-position: 0px -1108px; }
+.lang-sm[lang=th_TH] { background-position: 0px -1092px; }
+.lang-sm[lang=tr_TR] { background-position: 0px -1108px; }
 .lang-sm[lang=uk] { background-position: 0px -1124px; }
 .lang-sm[lang=vi] { background-position: 0px -1140px; }
 .lang-sm[lang=zh] { background-position: 0px -1156px; }
@@ -144,41 +144,41 @@
 .lang-lg[lang=bg] { background-position: 0px -1232px; }
 .lang-lg[lang=cs] { background-position: 0px -1254px; }
 .lang-lg[lang=da] { background-position: 0px -1276px; }
-.lang-lg[lang=de] { background-position: 0px -1298px; }
+.lang-lg[lang=de_DE] { background-position: 0px -1298px; }
 .lang-lg[lang=el] { background-position: 0px -1320px; }
 .lang-lg[lang=en] { background-position: 0px -1342px; }
-.lang-lg[lang=es] { background-position: 0px -1364px; }
+.lang-lg[lang=es_ES] { background-position: 0px -1364px; }
 .lang-lg[lang=et] { background-position: 0px -1386px; }
 .lang-lg[lang=fi] { background-position: 0px -1408px; }
-.lang-lg[lang=fr] { background-position: 0px -1430px; }
+.lang-lg[lang=fr_FR] { background-position: 0px -1430px; }
 .lang-lg[lang=ga] { background-position: 0px -1452px; }
 .lang-lg[lang=hi] { background-position: 0px -1474px; }
-.lang-lg[lang=hr] { background-position: 0px -1496px; }
-.lang-lg[lang=hu] { background-position: 0px -1518px; }
+.lang-lg[lang=hr_HR] { background-position: 0px -1496px; }
+.lang-lg[lang=hu_HU] { background-position: 0px -1518px; }
 .lang-lg[lang=in] { background-position: 0px -1540px; }
 .lang-lg[lang=is] { background-position: 0px -1562px; }
 .lang-lg[lang=it] { background-position: 0px -1584px; }
-.lang-lg[lang=he] { background-position: 0px -1606px; }
-.lang-lg[lang=ja] { background-position: 0px -1628px; }
-.lang-lg[lang=ko] { background-position: 0px -1650px; }
+.lang-lg[lang=he_IL] { background-position: 0px -1606px; }
+.lang-lg[lang=ja_JP] { background-position: 0px -1628px; }
+.lang-lg[lang=ko_KR] { background-position: 0px -1650px; }
 .lang-lg[lang=lt] { background-position: 0px -1672px; }
 .lang-lg[lang=lv] { background-position: 0px -1694px; }
 .lang-lg[lang=mk] { background-position: 0px -1716px; }
 .lang-lg[lang=ms] { background-position: 0px -1738px; }
 .lang-lg[lang=mt] { background-position: 0px -1760px; }
-.lang-lg[lang=nl] { background-position: 0px -1782px; }
+.lang-lg[lang=nk_NL] { background-position: 0px -1782px; }
 .lang-lg[lang=no] { background-position: 0px -1804px; }
-.lang-lg[lang=pl] { background-position: 0px -1826px; }
-.lang-lg[lang=pt] { background-position: 0px -1848px; }
+.lang-lg[lang=pl_PL] { background-position: 0px -1826px; }
+.lang-lg[lang=pt_PT] { background-position: 0px -1848px; }
 .lang-lg[lang=ro] { background-position: 0px -1870px; }
-.lang-lg[lang=ru] { background-position: 0px -1892px; }
+.lang-lg[lang=ru_RU] { background-position: 0px -1892px; }
 .lang-lg[lang=sk] { background-position: 0px -1914px; }
 .lang-lg[lang=sl] { background-position: 0px -1936px; }
 .lang-lg[lang=sq] { background-position: 0px -1958px; }
 .lang-lg[lang=sr] { background-position: 0px -1980px; }
 .lang-lg[lang=sv] { background-position: 0px -2002px; }
-.lang-lg[lang=th] { background-position: 0px -2024px; }
-.lang-lg[lang=tr] { background-position: 0px -2046px; }
+.lang-lg[lang=th_TH] { background-position: 0px -2024px; }
+.lang-lg[lang=tr_TR] { background-position: 0px -2046px; }
 .lang-lg[lang=uk] { background-position: 0px -2068px; }
 .lang-lg[lang=vi] { background-position: 0px -2090px; }
 .lang-lg[lang=zh] { background-position: 0px -2112px; }
@@ -278,9 +278,9 @@ Additional languages
 
 
 
-.lang-xs[lang=pt_PT] { background-position: 0px  -330px; }
-.lang-sm[lang=pt_PT] { background-position: 0px  -964px; }
-.lang-lg[lang=pt_PT] { background-position: 0px -1848px; }
+.lang-xs[lang=pt_PT_PT] { background-position: 0px  -330px; }
+.lang-sm[lang=pt_PT_PT] { background-position: 0px  -964px; }
+.lang-lg[lang=pt_PT_PT] { background-position: 0px -1848px; }
 
 .lang-xs[lang=vi_VN] { background-position: 0px  -451px; }
 .lang-sm[lang=vi_VN] { background-position: 0px -1140px; }
@@ -310,24 +310,24 @@ Additional languages
   */
 
 .lang-xs[lang=en_GB] { background-position: 0px  -2167px; }
-.lang-xs[lang=fil] { background-position: 0px   -2178px; }
-.lang-xs[lang=km] { background-position: 0px   -2189px; }
-.lang-xs[lang=nl_BE] { background-position: 0px   -2200px; }
+.lang-xs[lang=fil_PH] { background-position: 0px   -2178px; }
+.lang-xs[lang=km_KH] { background-position: 0px   -2189px; }
+.lang-xs[lang=nk_BE] { background-position: 0px   -2200px; }
 .lang-xs[lang=pt_BR] { background-position: 0px   -2211px; }
 .lang-xs[lang=zh_TW] { background-position: 0px   -2222px; }
 
 
 .lang-sm[lang=en_GB] { background-position: 0px  -2249px; }
-.lang-sm[lang=fil] { background-position: 0px   -2265px; }
-.lang-sm[lang=km] { background-position: 0px   -2281px; }
-.lang-sm[lang=nl_BE] { background-position: 0px   -2297px; }
+.lang-sm[lang=fil_PH] { background-position: 0px   -2265px; }
+.lang-sm[lang=km_KH] { background-position: 0px   -2281px; }
+.lang-sm[lang=nk_BE] { background-position: 0px   -2297px; }
 .lang-sm[lang=pt_BR] { background-position: 0px   -2313px; }
 .lang-sm[lang=zh_TW] { background-position: 0px   -2329px; }
 
 
 .lang-lg[lang=en_GB] { background-position: 0px  -2367px; }
-.lang-lg[lang=fil] { background-position: 0px   -2389px; }
-.lang-lg[lang=km] { background-position: 0px   -2411px; }
-.lang-lg[lang=nl_BE] { background-position: 0px   -2433px; }
+.lang-lg[lang=fil_PH] { background-position: 0px   -2389px; }
+.lang-lg[lang=km_KH] { background-position: 0px   -2411px; }
+.lang-lg[lang=nk_BE] { background-position: 0px   -2433px; }
 .lang-lg[lang=pt_BR] { background-position: 0px   -2455px; }
 .lang-lg[lang=zh_TW] { background-position: 0px   -2477px; }
