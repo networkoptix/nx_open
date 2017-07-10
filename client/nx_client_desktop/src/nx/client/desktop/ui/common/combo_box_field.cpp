@@ -10,17 +10,8 @@
 
 namespace {
 
-Qn::TextValidateFunction initializationValidator()
-{
-    const auto validator =
-        [](const QString& /*text*/)
-        {
-            return Qn::ValidationResult(QValidator::Intermediate);
-        };
-
-    return validator;
-}
-
+static const auto kCurrentTextPropertyName = lit("currentText").toLatin1();
+static const auto kReadOnlyPropertyName = lit("readOnly").toLatin1();
 }
 
 namespace nx {
@@ -43,20 +34,23 @@ ComboBoxField::ComboBoxField(
     const Qn::TextValidateFunction& validator,
     QWidget* parent)
     :
-    ComboBoxField(parent)
+    base_type(new QComboBox(),
+        PropertyAccessor::create(kCurrentTextPropertyName),
+        PropertyAccessor::create(kReadOnlyPropertyName),
+        AccessorPtr(),
+        false,
+        parent)
 {
-    setValidator(initializationValidator());
     setItems(items);
     setCurrentIndex(currentIndex);
     setValidator(validator);
-
     initialize();
 }
 
 ComboBoxField::ComboBoxField(QWidget* parent):
     base_type(new QComboBox(),
-        PropertyAccessor::create("currentText"),
-        PropertyAccessor::create("readOnly"),
+        PropertyAccessor::create(kCurrentTextPropertyName),
+        PropertyAccessor::create(kReadOnlyPropertyName),
         AccessorPtr(),
         false,
         parent)
