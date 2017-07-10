@@ -30,15 +30,12 @@ class CustomContextForm(forms.ModelForm):
 
 			record_value = latest_record.latest('created_date').value if latest_record.exists() else data_structure.default
 
-			if data_structure.type == 3:
-				self.fields[ds_name] = forms.CharField(required=False,
-													   label=ds_name,
-													   help_text=ds_description,
-													   initial=record_value,
-													   widget=forms.Textarea)
-			else:
-				self.fields[ds_name] = forms.CharField(required=False,
-												   	   label=ds_name,
-												   	   help_text=ds_description,
-												   	   initial=record_value,
-												   	   widget=forms.TextInput(attrs={'size':80}))
+			widget_type = forms.TextInput(attrs={'size': 80})
+			if data_structure.type == DataStructure.get_type("Long Text") or data_structure.type == DataStructure.get_type("HTML"):
+				widget_type = forms.Textarea
+
+			self.fields[ds_name] = forms.CharField(required=False,
+												   label=ds_name,
+												   help_text=ds_description,
+												   initial=record_value,
+												   widget=widget_type)
