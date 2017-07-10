@@ -59,7 +59,7 @@ private:
 
     std::shared_ptr< stun::AbstractAsyncClient > m_stunClient;
     std::unique_ptr<nx::network::cloud::ConnectionMediatorUrlFetcher> m_mediatorUrlFetcher;
-    boost::optional<SocketAddress> m_mediatorAddress;
+    boost::optional<QUrl> m_mediatorUrl;
     boost::optional<SocketAddress> m_mediatorUdpEndpoint;
     std::unique_ptr<nx::network::RetryTimer> m_fetchEndpointRetryTimer;
 
