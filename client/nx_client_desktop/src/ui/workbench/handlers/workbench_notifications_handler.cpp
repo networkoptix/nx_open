@@ -122,8 +122,15 @@ void QnWorkbenchNotificationsHandler::handleAcknowledgeEventAction()
 
     const QScopedPointer<QDialog> bookmarksDialog(
         new QnCameraBookmarkDialog(businessAction, mainWindow()));
-    if (bookmarksDialog->exec() == QDialogButtonBox::Ok)
-        emit notificationRemoved(businessAction);
+
+    connect(bookmarksDialog, &QnButtonBoxDialog::accepted, this,
+        [this, businessAction]()
+        {
+            // TODO: add bookmark, insert record to event/action log, send hidePopup notification. BEFORE REVIEW
+            emit notificationRemoved(businessAction);
+        });
+
+    bookmarksDialog->exec();
 }
 
 void QnWorkbenchNotificationsHandler::clear()

@@ -20,6 +20,7 @@ QnCameraBookmarkList extractBookmarksFromAction(
 {
     QnCameraBookmarkList bookmarks;
 
+    // TODO: fill bookmark length BEFORE REVIEW
     const auto addBookmarkByResourceId =
         [action, commonModule, resourcePool, &bookmarks](const QnUuid& resourceId)
         {
@@ -108,6 +109,25 @@ void QnCameraBookmarkDialog::setTags(const QnCameraBookmarkTagList &tags) {
 
 void QnCameraBookmarkDialog::loadData(const QnCameraBookmark &bookmark) {
     ui->bookmarkWidget->loadData(bookmark);
+}
+
+QnCameraBookmarkList QnCameraBookmarkDialog::bookmarks() const
+{
+    QnCameraBookmark bookmark;
+    ui->bookmarkWidget->submitData(bookmark);
+
+    if (m_actionBookmarks.isEmpty())
+        return QnCameraBookmarkList() << bookmark;
+
+    QnCameraBookmarkList result;
+    for (auto currentBookmark: m_actionBookmarks)
+    {
+        currentBookmark.name = bookmark.name;
+        currentBookmark.description = bookmark.description;
+        currentBookmark.tags = bookmark.tags;
+        result.append(currentBookmark);
+    }
+    return result;
 }
 
 void QnCameraBookmarkDialog::submitData(QnCameraBookmark &bookmark) const {

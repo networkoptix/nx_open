@@ -34,6 +34,8 @@ public:
 
     virtual void accept() override;
 
+    QnCameraBookmarkList bookmarks() const;
+
 protected:
     virtual void initializeButtonBox() override;
 
