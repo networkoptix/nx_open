@@ -8,6 +8,21 @@
 #include <ui/workaround/widgets_signals_workaround.h>
 #include <utils/math/math.h>
 
+namespace {
+
+Qn::TextValidateFunction initializationValidator()
+{
+    const auto validator =
+        [](const QString& /*text*/)
+        {
+            return Qn::ValidationResult(QValidator::Intermediate);
+        };
+
+    return validator;
+}
+
+}
+
 namespace nx {
 namespace client {
 namespace desktop {
@@ -30,6 +45,7 @@ ComboBoxField::ComboBoxField(
     :
     ComboBoxField(parent)
 {
+    setValidator(initializationValidator());
     setItems(items);
     setCurrentIndex(currentIndex);
     setValidator(validator);
