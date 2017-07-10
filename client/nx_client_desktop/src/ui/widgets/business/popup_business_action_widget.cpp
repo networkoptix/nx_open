@@ -28,6 +28,15 @@ QnPopupBusinessActionWidget::~QnPopupBusinessActionWidget()
 {
 }
 
+void QnPopupBusinessActionWidget::at_model_dataChanged(Fields fields)
+{
+    if (!model() || m_updating)
+        return;
+
+    if (fields.testFlag(Field::actionParams))
+        ui->forceAcknoledgementCheckBox->setChecked(model()->actionParams().needConfirmation);
+}
+
 void QnPopupBusinessActionWidget::updateTabOrder(QWidget* before, QWidget* after)
 {
     setTabOrder(before, ui->selectUsersButton);
