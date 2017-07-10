@@ -7,6 +7,8 @@
 #include <core/resource/resource_fwd.h>
 #include <utils/common/request_param.h>
 
+#include <nx/vms/event/actions/abstract_action.h>
+
 struct QnGetBookmarksRequestData: public QnMultiserverRequestData
 {
     QnGetBookmarksRequestData();
@@ -45,6 +47,7 @@ struct QnUpdateBookmarkRequestData: public QnMultiserverRequestData
     virtual bool isValid() const override;
 
     QnCameraBookmark bookmark;
+    nx::vms::event::ActionData actionData;
 };
 
 struct QnDeleteBookmarkRequestData: public QnMultiserverRequestData

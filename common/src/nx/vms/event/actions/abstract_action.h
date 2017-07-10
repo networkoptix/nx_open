@@ -118,6 +118,7 @@ public:
 };
 
 #define ActionData_Fields (actionType)(actionParams)(eventParams)(businessRuleId)(aggregationCount)(flags)
+
 QN_FUSION_DECLARE_FUNCTIONS(ActionData, (ubjson)(json)(xml)(csv_record));
 
 } // namespace event

@@ -722,12 +722,23 @@ bool QnServerDb::removeLogForRes(const QnUuid& resId)
     return rez;
 }
 
-bool QnServerDb::saveActionToDB(const vms::event::AbstractActionPtr& action)
+nx::vms::event::ActionData dataFromAction(const vms::event::AbstractActionPtr& action)
+{
+    nx::vms::event::ActionData result;
+
+    result.actionType = action->actionType();
+    result.actionParams = action->getParams();
+    result.eventParams = action->getRuntimeParams();
+    result.eventParams.toggleState = action->getToggleState();
+    result.businessRuleId = action->getRuleId();
+    result.aggregationCount = action->getAggregationCount();
+
+    return result;
+}
+
+bool QnServerDb::saveActionToDB(const nx::vms::event::ActionData& data)
 {
     QnWriteLocker lock(&m_mutex);
-
-    if (action->isReceivedFromRemoteHost())
-        return false; //< Server should save the action before proxing locally.
 
     if (!m_sdb.isOpen())
         return false;
@@ -741,25 +752,26 @@ bool QnServerDb::saveActionToDB(const vms::event::AbstractActionPtr& action)
             :toggle_state, :aggregation_count, :event_type, :event_resource_guid, :action_resource_guid);
     )");
 
-    qint64 timestampUsec = action->getRuntimeParams().eventTimestampUsec;
-    QnUuid eventResId = action->getRuntimeParams().eventResourceId;
+    const auto& runtimeParams = data.eventParams;
+    const auto& actionParams = data.actionParams;
 
-    auto actionParams = action->getParams();
+    qint64 timestampUsec = data.eventParams.eventTimestampUsec;
+    QnUuid eventResId = data.eventParams.eventResourceId;
 
     insQuery.bindValue(":timestamp", timestampUsec/1000000);
-    insQuery.bindValue(":action_type", (int) action->actionType());
+    insQuery.bindValue(":action_type", (int) data.actionType);
     insQuery.bindValue(":action_params", QnUbjson::serialized(actionParams));
-    insQuery.bindValue(":runtime_params", QnUbjson::serialized(action->getRuntimeParams()));
-    insQuery.bindValue(":business_rule_guid", action->getRuleId().toRfc4122());
-    insQuery.bindValue(":toggle_state", (int) action->getToggleState());
-    insQuery.bindValue(":aggregation_count", action->getAggregationCount());
+    insQuery.bindValue(":runtime_params", QnUbjson::serialized(runtimeParams));
+    insQuery.bindValue(":business_rule_guid", data.businessRuleId.toRfc4122());
+    insQuery.bindValue(":toggle_state", (int) runtimeParams.toggleState);
+    insQuery.bindValue(":aggregation_count", data.aggregationCount);
 
-    insQuery.bindValue(":event_type", (int) action->getRuntimeParams().eventType);
+    insQuery.bindValue(":event_type", (int) runtimeParams.eventType);
     insQuery.bindValue(":event_resource_guid", eventResId.toRfc4122());
     insQuery.bindValue(":action_resource_guid",
-        !actionParams.actionResourceId.isNull()
-            ? actionParams.actionResourceId.toRfc4122()
-            : QByteArray());
+        actionParams.actionResourceId.isNull()
+            ? QByteArray()
+            : actionParams.actionResourceId.toRfc4122());
 
     bool rez = execSQLQuery(&insQuery, Q_FUNC_INFO);
     if (rez)
@@ -769,6 +781,14 @@ bool QnServerDb::saveActionToDB(const vms::event::AbstractActionPtr& action)
     }
 
     return rez;
+}
+
+bool QnServerDb::saveActionToDB(const vms::event::AbstractActionPtr& action)
+{
+    if (action->isReceivedFromRemoteHost())
+        return false; //< Server should save the action before proxing locally.
+
+    return saveActionToDB(dataFromAction(action));
 }
 
 QString QnServerDb::getRequestStr(

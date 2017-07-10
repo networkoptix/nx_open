@@ -33,6 +33,7 @@ public:
 
     void setEventLogPeriod(qint64 periodUsec);
     bool saveActionToDB(const nx::vms::event::AbstractActionPtr& action);
+    bool saveActionToDB(const nx::vms::event::ActionData& data);
     bool removeLogForRes(const QnUuid& resId);
 
     nx::vms::event::ActionDataList getActions(

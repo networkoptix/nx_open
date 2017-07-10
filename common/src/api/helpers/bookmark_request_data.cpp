@@ -30,6 +30,7 @@ static const QString kDescriptionParam = lit("description");
 static const QString kTimeoutParam = lit("timeout");
 static const QString kDurationParam = lit("duration");
 static const QString kTagParam = lit("tag");
+static const QString kActionData = lit("actionData");
 
 static const qint64 kUsPerMs = 1000;
 
@@ -170,6 +171,12 @@ void QnUpdateBookmarkRequestData::loadFromParams(QnResourcePool* resourcePool,
         bookmark.cameraId = camera->getId();
 
     bookmark.tags = params.allValues(kTagParam).toSet();
+
+    if (params.contains(kActionData))
+    {
+        const auto actionDataParameter = params.value(kActionData);
+        actionData = QJson::deserialized<nx::vms::event::ActionData>(actionDataParameter.toLatin1());
+    }
 }
 
 QnRequestParamList QnUpdateBookmarkRequestData::toParams() const
@@ -185,6 +192,9 @@ QnRequestParamList QnUpdateBookmarkRequestData::toParams() const
     result.insert(kCameraIdParam, bookmark.cameraId.toString());
     for (const QString& tag: bookmark.tags)
         result.insert(kTagParam, tag);
+
+    if (actionData.actionType != nx::vms::event::ActionType::undefinedAction)
+        result.insert(kActionData, QString::fromLatin1(QJson::serialized(actionData)));
 
     return result;
 }
