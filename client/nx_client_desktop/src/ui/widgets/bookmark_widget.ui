@@ -36,9 +36,6 @@
    </item>
    <item row="1" column="1">
     <widget class="nx::client::desktop::ui::TextEditField" name="descriptionTextEdit">
-     <property name="tabChangesFocus">
-      <bool>true</bool>
-     </property>
     </widget>
    </item>
    <item row="3" column="0">

@@ -17,8 +17,6 @@ struct ActionParameters
       */
     bool needConfirmation = false;
 
-    ActionType targetActionType = undefinedAction;
-
     /** Additional parameter for event log convenience. Does not filled when the action really occurs. */
     QnUuid actionResourceId;
 
@@ -79,7 +77,7 @@ struct ActionParameters
     bool isDefault() const;
 };
 
-#define ActionParameters_Fields (targetActionType)(needConfirmation)(actionResourceId)\
+#define ActionParameters_Fields (needConfirmation)(actionResourceId)\
     (url)(emailAddress)(fps)(streamQuality)(recordAfter)(relayOutputId)(sayText)(tags)(text)\
     (durationMs)(additionalResources)(allUsers)(forced)(presetId)(useSource)(recordBeforeMs)\
     (playToClient)(contentType)
