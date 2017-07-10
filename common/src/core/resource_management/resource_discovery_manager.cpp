@@ -78,7 +78,7 @@ QnResourceDiscoveryManager::QnResourceDiscoveryManager()
     m_ready( false ),
     m_state( InitialSearch ),
     m_discoveryUpdateIdx(0),
-    m_serverOfflineTimeout(20 * 1000)
+    m_serverOfflineTimeout(QnMediaServerResource::kMinFailoverTimeoutMs)
 {
     connect(qnResPool, &QnResourcePool::resourceRemoved, this, &QnResourceDiscoveryManager::at_resourceDeleted, Qt::DirectConnection);
     connect(qnResPool, &QnResourcePool::resourceAdded, this, &QnResourceDiscoveryManager::at_resourceAdded, Qt::DirectConnection);

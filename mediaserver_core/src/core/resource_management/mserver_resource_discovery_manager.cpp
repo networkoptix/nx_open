@@ -29,7 +29,7 @@
 #include <nx_ec/managers/abstract_camera_manager.h>
 
 static const int NETSTATE_UPDATE_TIME = 1000 * 30;
-static const int RETRY_COUNT_FOR_FOREIGN_RESOURCES = 2;
+static const int RETRY_COUNT_FOR_FOREIGN_RESOURCES = 1;
 
 QnMServerResourceDiscoveryManager::QnMServerResourceDiscoveryManager()
 {
