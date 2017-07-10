@@ -129,10 +129,10 @@ void QnWorkbenchNotificationsHandler::handleAcknowledgeEventAction()
         new QnCameraBookmarkDialog(businessAction, mainWindow()));
 
     connect(bookmarksDialog, &QnButtonBoxDialog::accepted, this,
-        [this, businessAction, dialog = bookmarksDialog.data()]()
+        [this, businessAction,
+            action = CommonAction::createCopy(ActionType::bookmarkAction, businessAction),
+            dialog = bookmarksDialog.data()]()
         {
-            const auto action = AbstractActionPtr(new CommonAction(
-                ActionType::bookmarkAction, businessAction->getRuntimeParams()));
             const auto bookmarks = dialog->bookmarks();
             for (const auto& bookmark: bookmarks)
             {

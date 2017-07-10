@@ -3,7 +3,8 @@
 // 11 dec 2012    Andrey Kolesnikov
 ////////////////////////////////////////////////////////////
 
-#include "abstract_action.h"
+#include <nx/vms/event/event_fwd.h>
+#include <nx/vms/event/actions/abstract_action.h>
 
 namespace nx {
 namespace vms {
@@ -18,6 +19,10 @@ class CommonAction: public AbstractAction
 
 public:
     explicit CommonAction(ActionType actionType, const EventParameters& runtimeParams);
+
+    static const AbstractActionPtr createCopy(
+        ActionType actionType,
+        const AbstractActionPtr& source);
 };
 
 } // namespace event
