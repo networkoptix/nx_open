@@ -722,20 +722,6 @@ bool QnServerDb::removeLogForRes(const QnUuid& resId)
     return rez;
 }
 
-nx::vms::event::ActionData dataFromAction(const vms::event::AbstractActionPtr& action)
-{
-    nx::vms::event::ActionData result;
-
-    result.actionType = action->actionType();
-    result.actionParams = action->getParams();
-    result.eventParams = action->getRuntimeParams();
-    result.eventParams.toggleState = action->getToggleState();
-    result.businessRuleId = action->getRuleId();
-    result.aggregationCount = action->getAggregationCount();
-
-    return result;
-}
-
 bool QnServerDb::saveActionToDB(const nx::vms::event::ActionData& data)
 {
     QnWriteLocker lock(&m_mutex);
@@ -788,7 +774,7 @@ bool QnServerDb::saveActionToDB(const vms::event::AbstractActionPtr& action)
     if (action->isReceivedFromRemoteHost())
         return false; //< Server should save the action before proxing locally.
 
-    return saveActionToDB(dataFromAction(action));
+    return saveActionToDB(action->toActionData());
 }
 
 QString QnServerDb::getRequestStr(
