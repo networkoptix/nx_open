@@ -100,9 +100,9 @@
         <CustomAction Id="CloseAppLauncherAction2" BinaryKey="WixCA" DllEntry="CAQuietExec"
                       Execute="deferred" Return="ignore" Impersonate="no" />
 
-        <MajorUpgrade AllowSameVersionUpgrades="yes"
+        <MajorUpgrade 
+            AllowDowngrades="yes"
             Schedule="afterInstallInitialize"
-            DowngradeErrorMessage="A later version of [ProductName] is already installed. Setup will now exit."
             MigrateFeatures="yes" />
 
         <InstallUISequence>
