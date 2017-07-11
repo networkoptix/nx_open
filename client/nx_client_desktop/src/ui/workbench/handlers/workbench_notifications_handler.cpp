@@ -129,38 +129,33 @@ void QnWorkbenchNotificationsHandler::handleAcknowledgeEventAction()
     const QScopedPointer<QnCameraBookmarkDialog> bookmarksDialog(
         new QnCameraBookmarkDialog(businessAction, mainWindow()));
 
-    connect(bookmarksDialog, &QnButtonBoxDialog::accepted, this,
-        [this, businessAction,
-            action = CommonAction::createCopy(ActionType::bookmarkAction, businessAction),
-            dialog = bookmarksDialog.data()]()
+    if (bookmarksDialog->exec() != QDialog::Accepted)
+        return;
+
+    const auto bookmarks = bookmarksDialog->bookmarks();
+
+    const auto repliesRemaining = QSharedPointer<int>(new int(bookmarks.size()));
+    const auto anySuccessReply = QSharedPointer<bool>(new bool(false));
+
+    const auto creationCallback =
+        [this, businessAction, repliesRemaining, anySuccessReply](bool success)
         {
-            const auto bookmarks = dialog->bookmarks();
+            if (success)
+                *anySuccessReply = true;
 
-            const auto repliesRemaining = QSharedPointer<int>(new int(bookmarks.size()));
-            const auto anySuccessReply = QSharedPointer<bool>(new bool(false));
+            auto& counter = *repliesRemaining;
+            if (--counter || !*anySuccessReply)
+                return;
 
-            const auto creationCallback =
-                [this, businessAction, repliesRemaining, anySuccessReply](bool success)
-                {
-                    if (success)
-                        *anySuccessReply = true;
+            const auto action = CommonAction::createBroadcastAction(
+                ActionType::hidePopupAction, businessAction->getParams());
+            commonModule()->currentServer()->apiConnection()->broadcastAction(action);
+            emit notificationRemoved(businessAction);
+        };
 
-                    auto& counter = *repliesRemaining;
-                    if (--counter || !*anySuccessReply)
-                        return;
-
-                    const auto action = CommonAction::createBroadcastAction(
-                        ActionType::hidePopupAction, businessAction->getParams());
-                    commonModule()->currentServer()->apiConnection()->broadcastAction(action);
-
-             //       emit notificationRemoved(businessAction);
-                };
-
-            for (const auto& bookmark: bookmarks)
-                qnCameraBookmarksManager->addAcknowledge(bookmark, action, creationCallback);
-        });
-
-    bookmarksDialog->exec();
+    const auto action = CommonAction::createCopy(ActionType::bookmarkAction, businessAction);
+    for (const auto& bookmark: bookmarks)
+        qnCameraBookmarksManager->addAcknowledge(bookmark, action, creationCallback);
 }
 
 void QnWorkbenchNotificationsHandler::clear()
