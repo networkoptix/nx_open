@@ -122,8 +122,11 @@ public:
         const unsigned int currentTick = GetTickCount();
         if( currentTick - m_startCalcTick > 5000 )
         {
-            NX_LOG( lit("In previous %1 ms to video mem moved %2 Mb. Transfer rate %3 Mb/second").
-                arg(currentTick - m_startCalcTick).arg(m_bytes/1000000.0).arg(m_bytes /1000.0 / (currentTick - m_startCalcTick)), cl_logDEBUG1 );
+            NX_DEBUG(this,
+                lm("In previous %1 ms to video mem moved %2 Mb. Transfer rate %3 Mb/second.")
+                    .arg(currentTick - m_startCalcTick)
+                    .arg(m_bytes / 1000000.0)
+                    .arg(m_bytes / 1000.0 / (currentTick - m_startCalcTick)));
             m_startCalcTick = currentTick;
             m_bytes = 0;
         }
@@ -173,7 +176,7 @@ public:
 
         /* Maximal texture size. */
         int maxTextureSize = QnGlFunctions::estimatedInteger(GL_MAX_TEXTURE_SIZE);
-        NX_LOG(QString(QLatin1String("OpenGL max texture size: %1.")).arg(maxTextureSize), cl_logINFO);
+        NX_INFO(this, lm("OpenGL max texture size: %1.").arg(maxTextureSize));
 
         /* Clamp constant. */
 //        clampConstant = GL_CLAMP;
@@ -808,7 +811,7 @@ public:
                 return; //m_pictureBuf has been changed (running has been cancelled?)
             if( pictureBuf == NULL )
             {
-                NX_LOG( lit("AsyncPicDataUploader. Picture upload has been cancelled..."), cl_logDEBUG1 );
+                NX_DEBUG(this, "Picture upload has been cancelled...");
                 m_picDataRef.clear();
                 m_uploader->pictureDataUploadCancelled( this );
                 return; //running has been cancelled from outside
@@ -843,7 +846,9 @@ public:
                 m_lineSizes,
                 true ) )
         {
-            NX_LOG( lit("AsyncPicDataUploader. Failed to move to opengl memory frame (pts %1) data. Skipping frame...").arg(pictureBuf->pts()), cl_logDEBUG1 );
+            NX_DEBUG(this,
+                lm("Failed to move to opengl memory frame (pts %1) data. Skipping frame...")
+                    .arg(pictureBuf->pts()));
             m_picDataRef.clear();
             m_uploader->pictureDataUploadFailed( this, pictureBuf );
             return;
@@ -924,8 +929,10 @@ private:
             decAtomicLambda );
         if( !m_picDataRef->isValid() )
         {
-            NX_LOG( lit("AsyncPicDataUploader. Frame (pts %1, 0x%2) data ref has been invalidated (1). Releasing...").
-                arg(pictureBuf->pts()).arg((size_t)m_picDataRef->syncCtx(), 0, 16), cl_logDEBUG1 );
+            NX_DEBUG(this,
+                lm("Frame (pts %1, 0x%2) data ref has been invalidated (1). Releasing...")
+                    .arg(pictureBuf->pts())
+                    .arg((size_t)m_picDataRef->syncCtx(), 0, 16));
             return false;
         }
 
@@ -936,14 +943,17 @@ private:
         HRESULT res = surf->GetDesc( &surfDesc );
         if( res != D3D_OK )
         {
-            NX_LOG( lit("AsyncPicDataUploader. Failed to get dxva surface info (%1). Ignoring decoded picture...").arg(res), cl_logERROR );
+            NX_ERROR(this,
+                lm("Failed to get dxva surface info (%1). Ignoring decoded picture...").arg(res));
             return false;
         }
 
         if( surfDesc.Format != (D3DFORMAT)MAKEFOURCC('N','V','1','2') )
         {
-            NX_LOG( lit("AsyncPicDataUploader. Dxva surface format %1 while only NV12 (%2) is supported. Ignoring decoded picture...").
-                arg(surfDesc.Format).arg(MAKEFOURCC('N','V','1','2')), cl_logERROR );
+            NX_ERROR(this,
+                lm("Dxva surface format %1 while only NV12 (%2) is supported."
+                   "Ignoring decoded picture...")
+                    .arg(surfDesc.Format).arg(MAKEFOURCC('N','V','1','2')));
             return false;
         }
 
@@ -961,7 +971,7 @@ private:
         res = surf->LockRect( &lockedRect, &rectToLock, D3DLOCK_NOSYSLOCK | D3DLOCK_READONLY );
         if( res != D3D_OK )
         {
-            NX_LOG( lit("AsyncPicDataUploader. Failed to map dxva surface. Ignoring decoded picture..."), cl_logERROR );
+            NX_ERROR(this, "Failed to map dxva surface. Ignoring decoded picture...");
             return false;
         }
 #endif
@@ -982,8 +992,9 @@ private:
 #ifndef DISABLE_FRAME_DOWNLOAD
                 surf->UnlockRect();
 #endif
-                NX_LOG( lit("AsyncPicDataUploader. Frame (pts %1, 0x%2) could not be uploaded due to memory allocation error. Releasing...").
-                    arg(pictureBuf->pts()).arg((size_t)m_picDataRef->syncCtx(), 0, 16), cl_logDEBUG1 );
+                NX_DEBUG(this,
+                    lm("Frame (pts %1, 0x%2) could not be uploaded due to memory allocation error. Releasing...")
+                        .arg(pictureBuf->pts()).arg((size_t)m_picDataRef->syncCtx(), 0, 16));
                 return false;
             }
         }
@@ -1014,8 +1025,9 @@ private:
                 lockedRect.Pitch ) )
         {
             surf->UnlockRect();
-            NX_LOG( lit("AsyncPicDataUploader. Frame (pts %1, 0x%2) data ref has been invalidated (2). Releasing...").
-                arg(pictureBuf->pts()).arg((size_t)m_picDataRef->syncCtx(), 0, 16), cl_logDEBUG1 );
+            NX_DEBUG(this,
+                lm("Frame (pts %1, 0x%2) data ref has been invalidated (2). Releasing...")
+                    .arg(pictureBuf->pts()).arg((size_t)m_picDataRef->syncCtx(), 0, 16));
             return false;
         }
 #ifdef RENDERER_SUPPORTS_NV12
@@ -1029,8 +1041,9 @@ private:
                 lockedRect.Pitch ) )
         {
             surf->UnlockRect();
-            NX_LOG( lit("AsyncPicDataUploader. Frame (pts %1, 0x%2) data ref has been invalidated (3). Releasing...").
-                arg(pictureBuf->pts()).arg((size_t)m_picDataRef->syncCtx(), 0, 16), cl_logDEBUG1 );
+            NX_DEBUG(this,
+                lm("Frame (pts %1, 0x%2) data ref has been invalidated (3). Releasing...")
+                    .arg(pictureBuf->pts()).arg((size_t)m_picDataRef->syncCtx(), 0, 16));
             return false;
         }
 #else
@@ -1045,8 +1058,9 @@ private:
                 targetPitch / 2 ) )
         {
             surf->UnlockRect();
-            NX_LOG( lit("AsyncPicDataUploader. Frame (pts %1, 0x%2) data ref has been invalidated (4). Releasing...").
-                arg(pictureBuf->pts()).arg((size_t)m_picDataRef->syncCtx(), 0, 16), cl_logDEBUG1 );
+            NX_DEBUG(this,
+                lm("Frame (pts %1, 0x%2) data ref has been invalidated (4). Releasing...")
+                    .arg(pictureBuf->pts()).arg((size_t)m_picDataRef->syncCtx(), 0, 16));
             return false;
         }
 #endif
@@ -1382,7 +1396,8 @@ void DecodedPictureToOpenGLUploader::uploadDecodedPicture(
     const QSharedPointer<CLVideoDecoderOutput>& decodedPicture,
     const QRectF displayedRect )
 {
-    NX_LOG( lit( "Uploading decoded picture to gl textures. dts %1" ).arg(decodedPicture->pkt_dts), cl_logDEBUG2 );
+    NX_VERBOSE(this,
+        lm("Uploading decoded picture to gl textures. dts %1").arg(decodedPicture->pkt_dts));
 
     m_hardwareDecoderUsed = decodedPicture->flags & QnAbstractMediaData::MediaFlags_HWDecodingUsed;
 
@@ -1412,8 +1427,12 @@ void DecodedPictureToOpenGLUploader::uploadDecodedPicture(
                 //this condition allows to use single PictureBuffer for rendering
                 emptyPictureBuf = m_renderedPictures.front();
                 m_renderedPictures.pop_front();
-                NX_LOG( lit( "Taking (1) rendered picture (pts %1) buffer for upload (pts %2). (%3, %4)" ).
-                    arg(emptyPictureBuf->pts()).arg(decodedPicture->pkt_dts).arg(m_renderedPictures.size()).arg(m_picturesWaitingRendering.size()), cl_logDEBUG2 );
+                NX_VERBOSE(this,
+                    lm("Taking (1) rendered picture (pts %1) buffer for upload (pts %2). (%3, %4)")
+                        .arg(emptyPictureBuf->pts())
+                        .arg(decodedPicture->pkt_dts)
+                        .arg(m_renderedPictures.size())
+                        .arg(m_picturesWaitingRendering.size()));
             }
             else
 #endif
@@ -1421,7 +1440,7 @@ void DecodedPictureToOpenGLUploader::uploadDecodedPicture(
             {
                 emptyPictureBuf = m_emptyBuffers.front();
                 m_emptyBuffers.pop_front();
-                NX_LOG( lit( "Found empty buffer" ), cl_logDEBUG2 );
+                NX_VERBOSE(this, "Found empty buffer");
             }
             else if( (!m_asyncUploadUsed && !m_renderedPictures.empty())
                   || (m_asyncUploadUsed && (m_renderedPictures.size() > (m_picturesWaitingRendering.empty() ? 1U : 0U))) )  //reserving one uploaded picture (preferring picture
@@ -1431,8 +1450,12 @@ void DecodedPictureToOpenGLUploader::uploadDecodedPicture(
                 //selecting oldest rendered picture
                 emptyPictureBuf = m_renderedPictures.front();
                 m_renderedPictures.pop_front();
-                NX_LOG( lit( "Taking (2) rendered picture (pts %1) buffer for upload (pts %2). (%3, %4)" ).
-                    arg(emptyPictureBuf->pts()).arg(decodedPicture->pkt_dts).arg(m_renderedPictures.size()).arg(m_picturesWaitingRendering.size()), cl_logDEBUG2 );
+                NX_VERBOSE(this,
+                    lm("Taking (2) rendered picture (pts %1) buffer for upload (pts %2). (%3, %4)")
+                        .arg(emptyPictureBuf->pts())
+                        .arg(decodedPicture->pkt_dts)
+                        .arg(m_renderedPictures.size())
+                        .arg(m_picturesWaitingRendering.size()));
             }
             else if( ((!m_asyncUploadUsed && !m_picturesWaitingRendering.empty())
                        || (m_asyncUploadUsed && (m_picturesWaitingRendering.size() > (m_renderedPictures.empty() ? 1U : 0U))))
@@ -1441,8 +1464,11 @@ void DecodedPictureToOpenGLUploader::uploadDecodedPicture(
                 //looks like rendering does not catch up with decoding. Ignoring oldest decoded frame...
                 emptyPictureBuf = m_picturesWaitingRendering.front();
                 m_picturesWaitingRendering.pop_front();
-                NX_LOG( lit( "Ignoring uploaded frame with pts %1. Playback does not catch up with uploading. (%2, %3)..." ).
-                    arg(emptyPictureBuf->pts()).arg(m_renderedPictures.size()).arg(m_picturesWaitingRendering.size()), cl_logDEBUG1 );
+                NX_DEBUG(this,
+                    lm("Ignoring uploaded frame with pts %1. Playback does not catch up with uploading. (%2, %3)...")
+                        .arg(emptyPictureBuf->pts())
+                        .arg(m_renderedPictures.size())
+                        .arg(m_picturesWaitingRendering.size()));
             }
 #ifdef UPLOAD_SYSMEM_FRAMES_IN_GUI_THREAD
             else if( !m_asyncUploadUsed && !m_framesWaitingUploadInGUIThread.empty() )
@@ -1454,8 +1480,11 @@ void DecodedPictureToOpenGLUploader::uploadDecodedPicture(
                 {
                     if( (*it)->isRunning() || (*it)->picture()->m_skippingForbidden )
                         continue;
-                    NX_LOG( lit( "Ignoring decoded frame with timestamp %1 (%2). Playback does not catch up with decoding" ).
-                        arg((*it)->picture()->m_pts).arg(QDateTime::fromMSecsSinceEpoch((*it)->picture()->m_pts/1000).toString(QLatin1String("hh:mm:ss.zzz"))), cl_logDEBUG2 );
+                    NX_VERBOSE(this,
+                        lm("Ignoring decoded frame with timestamp %1 (%2). Playback does not catch up with decoding.")
+                            .arg((*it)->picture()->m_pts)
+                            .arg(QDateTime::fromMSecsSinceEpoch((*it)->picture()->m_pts / 1000)
+                                .toString(QLatin1String("hh:mm:ss.zzz"))));
                     emptyPictureBuf = (*it)->picture();
                     delete (*it);
                     m_framesWaitingUploadInGUIThread.erase( it );
@@ -1474,19 +1503,22 @@ void DecodedPictureToOpenGLUploader::uploadDecodedPicture(
                         quint64 prevPicPts = 0;
                         if( m_usedAsyncUploaders.back()->replacePicture( nextPicSequenceValue(), decodedPicture, decodedPicture->picData, displayedRect, &prevPicPts ) )
                         {
-                            NX_LOG( lit( "Cancelled upload of decoded frame with pts %1 in favor of frame with pts %2" ).
-                                arg(prevPicPts).arg(decodedPicture->pkt_dts), cl_logDEBUG1 );
+                            NX_DEBUG(this,
+                                lm("Cancelled upload of decoded frame with pts %1 in favor of frame with pts %2.")
+                                    .arg(prevPicPts).arg(decodedPicture->pkt_dts));
                             decodedPicture->picData.clear();
                             return;
                         }
                     }
 
                     //ignoring decoded picture so that not to stop decoder
-                    NX_LOG( lit( "Ignoring decoded frame with pts %1. Uploading does not catch up with decoding..." ).arg(decodedPicture->pkt_dts), cl_logDEBUG1 );
+                    NX_DEBUG(this,
+                        lm("Ignoring decoded frame with pts %1. Uploading does not catch up with decoding...")
+                            .arg(decodedPicture->pkt_dts));
                     decodedPicture->picData.clear();
                     return;
                 }
-                NX_LOG( lit( "Waiting for a picture gl buffer to get free" ), cl_logDEBUG1 );
+                NX_DEBUG(this, "Waiting for a picture gl buffer to get free");
                 //waiting for a picture buffer to get free
                 m_cond.wait( lk.mutex() );
                 continue;
@@ -1620,7 +1652,9 @@ DecodedPictureToOpenGLUploader::UploadedPicture* DecodedPictureToOpenGLUploader:
             return NULL;
 #endif
         m_picturesWaitingRendering.pop_front();
-        NX_LOG( lit( "Taking uploaded picture (pts %1, seq %2) for first-time rendering" ).arg(pic->pts()).arg(pic->m_sequence), cl_logDEBUG2 );
+        NX_VERBOSE(this,
+            lm("Taking uploaded picture (pts %1, seq %2) for first-time rendering.")
+                .arg(pic->pts()).arg(pic->m_sequence));
     }
     else if( !m_renderedPictures.empty() )
     {
@@ -1631,11 +1665,13 @@ DecodedPictureToOpenGLUploader::UploadedPicture* DecodedPictureToOpenGLUploader:
             return NULL;
 #endif
         m_renderedPictures.pop_back();
-        NX_LOG( lit( "Taking previously shown uploaded picture (pts %1, seq %2) for rendering" ).arg(pic->pts()).arg(pic->m_sequence), cl_logDEBUG2 );
+        NX_VERBOSE(this,
+            lm("Taking previously shown uploaded picture (pts %1, seq %2) for rendering.")
+                .arg(pic->pts()).arg(pic->m_sequence));
     }
     else
     {
-        NX_LOG( lit( "Failed to find picture for rendering. No data from decoder?" ), cl_logDEBUG2 );
+        NX_VERBOSE(this, "Failed to find picture for rendering. No data from decoder?");
         return NULL;
     }
 
@@ -1794,7 +1830,7 @@ void DecodedPictureToOpenGLUploader::pictureDrawingFinished( UploadedPicture* co
 
     QnMutexLocker lk( &m_mutex );
 
-    NX_LOG( lit( "Finished rendering of picture (pts %1)" ).arg(picture->pts()), cl_logDEBUG2 );
+    NX_VERBOSE(this, lm("Finished rendering of picture (pts %1).").arg(picture->pts()));
 
     //m_picturesBeingRendered holds only one picture
     std::deque<UploadedPicture*>::iterator it = std::find( m_picturesBeingRendered.begin(), m_picturesBeingRendered.end(), picture );
@@ -2022,7 +2058,7 @@ bool DecodedPictureToOpenGLUploader::uploadDataToGl(
         m_initializedCtx = const_cast<QGLContext*>(QGLContext::currentContext());
 #endif
 
-    //NX_LOG( lit("DecodedPictureToOpenGLUploader::uploadDataToGl. %1").arg((size_t)this), cl_logINFO );
+    //NX_INFO(this, lm("uploadDataToGl. %1").arg((size_t) this));
 
     //waiting for all operations with textures (submitted by renderer) are finished
     //emptyPictureBuf->m_glFence.sync();
@@ -2107,8 +2143,16 @@ bool DecodedPictureToOpenGLUploader::uploadDataToGl(
 #endif
 #endif
 
-            NX_LOG( lit("uploading to gl texture. id = %1, i = %2, lineSizes[i] = %3, r_w[i] = %4, qPower2Ceil(r_w[i],ROUND_COEFF) = %5, h[i] = %6, planes[i] = %7").
-                arg(texture->id()).arg(i).arg(lineSizes[i]).arg(r_w[i]).arg(qPower2Ceil(r_w[i],ROUND_COEFF)).arg(h[i]).arg((size_t)planes[i]), cl_logDEBUG2 );
+            NX_VERBOSE(this,
+                lm("Uploading to gl texture. id = %1, i = %2, lineSizes[i] = %3, r_w[i] = %4, "
+                    "qPower2Ceil(r_w[i],ROUND_COEFF) = %5, h[i] = %6, planes[i] = %7")
+                    .arg(texture->id())
+                    .arg(i)
+                    .arg(lineSizes[i])
+                    .arg(r_w[i])
+                    .arg(qPower2Ceil(r_w[i],ROUND_COEFF))
+                    .arg(h[i])
+                    .arg(reinterpret_cast<size_t>(planes[i])));
             glBindTexture( GL_TEXTURE_2D, texture->id() );
             glCheckError("glBindTexture");
 
@@ -2223,7 +2267,8 @@ bool DecodedPictureToOpenGLUploader::uploadDataToGl(
                         lineSizes[0], lineSizes[1], opacity()*255);
                 }
                 else {
-                    NX_LOG("CPU does not contain SSE2 module. Color space convert is not implemented", cl_logWARNING);
+                    NX_WARNING(this,
+                        "CPU does not contain SSE2 module. Color space convert is not implemented.");
                 }
                 break;
 
@@ -2237,7 +2282,8 @@ bool DecodedPictureToOpenGLUploader::uploadDataToGl(
                         lineSizes[0], lineSizes[1], opacity()*255);
                 }
                 else {
-                    NX_LOG("CPU does not contain SSE2 module. Color space convert is not implemented", cl_logWARNING);
+                    NX_WARNING(this,
+                        "CPU does not contain SSE2 module. Color space convert is not implemented.");
                 }
                 break;
 
@@ -2251,7 +2297,8 @@ bool DecodedPictureToOpenGLUploader::uploadDataToGl(
                         lineSizes[0], lineSizes[1], opacity()*255);
                 }
                 else {
-                    NX_LOG("CPU does not contain SSE2 module. Color space convert is not implemented", cl_logWARNING);
+                    NX_WARNING(this,
+                        "CPU does not contain SSE2 module. Color space convert is not implemented.");
                 }
                 break;
 

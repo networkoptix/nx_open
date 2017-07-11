@@ -103,9 +103,9 @@ int remapValue(int oldVal, const int remapData[][2])
     return oldVal;
 }
 
-struct BusinessRuleRemapData
+struct EventRuleRemapData
 {
-    BusinessRuleRemapData() : id(0), eventType(0), actionType(0) {}
+    EventRuleRemapData() : id(0), eventType(0), actionType(0) {}
 
     int id;
     int eventType;
@@ -150,7 +150,7 @@ struct ShowPopupParametersV31Alpha
 };
 #define ShowPopupParametersV31Alpha_Fields (additionalResources)
 
-struct BusinessActionParameters31Beta
+struct ActionParameters31Beta
 {
     bool needConfirmation = false;
     vms::event::ActionType targetActionType = vms::event::undefinedAction;
@@ -174,7 +174,7 @@ struct BusinessActionParameters31Beta
     bool playToClient = true;
     QString contentType;
 };
-#define BusinessActionParameters31Beta_Fields (targetActionType)(needConfirmation)(actionResourceId)\
+#define ActionParameters31Beta_Fields (targetActionType)(needConfirmation)(actionResourceId)\
     (url)(emailAddress)(fps)(streamQuality)(recordAfter)(relayOutputId)(sayText)(tags)(text)\
     (durationMs)(additionalResources)(allUsers)(forced)(presetId)(useSource)(recordBeforeMs)\
     (playToClient)(contentType)
@@ -187,7 +187,7 @@ struct EventMetaData31Beta
 };
 #define EventMetaData31Beta_Fields (cameraRefs)(instigators)(allUsers)
 
-struct BusinessEventParameters31Beta
+struct EventParameters31Beta
 {
     vms::event::EventType eventType;
     qint64 eventTimestampUsec;
@@ -200,7 +200,7 @@ struct BusinessEventParameters31Beta
     QString description;
     EventMetaData31Beta metadata;
 };
-#define BusinessEventParameters31Beta_Fields \
+#define EventParameters31Beta_Fields \
     (eventType)(eventTimestampUsec)(eventResourceId)(resourceName)(sourceServerId) \
     (reasonCode)(inputPortId)(caption)(description)(metadata)
 
@@ -209,9 +209,9 @@ struct BusinessEventParameters31Beta
     (CameraOutputParametersV30)\
     (ShowPopupParametersV30)\
     (ShowPopupParametersV31Alpha)\
-    (BusinessActionParameters31Beta)\
+    (ActionParameters31Beta)\
     (EventMetaData31Beta)\
-    (BusinessEventParameters31Beta)
+    (EventParameters31Beta)
 
 QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(MIGRATION_ACTION_PARAM_TYPES, (json))
 
@@ -230,7 +230,7 @@ bool doRemap(const QSqlDatabase& database, int id, const QVariant& newVal, const
     return nx::utils::db::SqlQueryExecutionHelper::execSQLQuery(&query, Q_FUNC_INFO);
 }
 
-bool migrateBusinessRulesToV23(const QSqlDatabase& database)
+bool migrateRulesToV23(const QSqlDatabase& database)
 {
     QSqlQuery query(database);
     query.setForwardOnly(true);
@@ -240,17 +240,17 @@ bool migrateBusinessRulesToV23(const QSqlDatabase& database)
     if (!nx::utils::db::SqlQueryExecutionHelper::execSQLQuery(&query, Q_FUNC_INFO))
         return false;
 
-    QVector<BusinessRuleRemapData> oldData;
+    QVector<EventRuleRemapData> oldData;
     while (query.next())
     {
-        BusinessRuleRemapData data;
+        EventRuleRemapData data;
         data.id = query.value("id").toInt();
         data.eventType = query.value("event_type").toInt();
         data.actionType = query.value("action_type").toInt();
         oldData << data;
     }
 
-    for (const BusinessRuleRemapData& remapData : oldData)
+    for (const EventRuleRemapData& remapData : oldData)
     {
         if (!doRemap(database, remapData.id, remapValue(remapData.eventType, EventTypesMap), "event_type"))
             return false;
@@ -261,7 +261,7 @@ bool migrateBusinessRulesToV23(const QSqlDatabase& database)
     return true;
 }
 
-bool migrateBusinessRulesToV30(const QSqlDatabase& database)
+bool migrateRulesToV30(const QSqlDatabase& database)
 {
     QSqlQuery query(database);
     query.setForwardOnly(true);
@@ -279,17 +279,17 @@ bool migrateBusinessRulesToV30(const QSqlDatabase& database)
     if (!nx::utils::db::SqlQueryExecutionHelper::execSQLQuery(&query, Q_FUNC_INFO))
         return false;
 
-    QVector<BusinessRuleRemapData> oldData;
+    QVector<EventRuleRemapData> oldData;
     while (query.next())
     {
-        BusinessRuleRemapData data;
+        EventRuleRemapData data;
         data.id = query.value("id").toInt();
         data.actionType = query.value("action_type").toInt();
         data.actionParams = query.value("action_params").toByteArray();
         oldData << data;
     }
 
-    for (const BusinessRuleRemapData& data: oldData)
+    for (const EventRuleRemapData& data: oldData)
     {
         auto oldParams = QJson::deserialized<CameraOutputParametersV23>(data.actionParams);
         CameraOutputParametersV30 newParams;
@@ -309,7 +309,7 @@ bool migrateBusinessRulesToV30(const QSqlDatabase& database)
     return true;
 }
 
-bool migrateBusinessRulesToV31Alpha(const QSqlDatabase& database)
+bool migrateRulesToV31Alpha(const QSqlDatabase& database)
 {
     QSqlQuery query(database);
     query.setForwardOnly(true);
@@ -325,16 +325,16 @@ bool migrateBusinessRulesToV31Alpha(const QSqlDatabase& database)
     if (!nx::utils::db::SqlQueryExecutionHelper::execSQLQuery(&query, Q_FUNC_INFO))
         return false;
 
-    QVector<BusinessRuleRemapData> oldData;
+    QVector<EventRuleRemapData> oldData;
     while (query.next())
     {
-        BusinessRuleRemapData data;
+        EventRuleRemapData data;
         data.id = query.value("id").toInt();
         data.actionParams = query.value("action_params").toByteArray();
         oldData << data;
     }
 
-    for (const BusinessRuleRemapData& data: oldData)
+    for (const EventRuleRemapData& data: oldData)
     {
         auto oldParams = QJson::deserialized<ShowPopupParametersV30>(data.actionParams);
         ShowPopupParametersV31Alpha newParams;
@@ -351,7 +351,7 @@ bool migrateBusinessRulesToV31Alpha(const QSqlDatabase& database)
     return true;
 }
 
-bool migrateBusinessActionsAllUsers(const QSqlDatabase& database)
+bool migrateActionsAllUsers(const QSqlDatabase& database)
 {
     QSqlQuery query(database);
     query.setForwardOnly(true);
@@ -373,18 +373,18 @@ bool migrateBusinessActionsAllUsers(const QSqlDatabase& database)
     if (!nx::utils::db::SqlQueryExecutionHelper::execSQLQuery(&query, Q_FUNC_INFO))
         return false;
 
-    QVector<BusinessRuleRemapData> oldData;
+    QVector<EventRuleRemapData> oldData;
     while (query.next())
     {
-        BusinessRuleRemapData data;
+        EventRuleRemapData data;
         data.id = query.value("id").toInt();
         data.actionParams = query.value("action_params").toByteArray();
         oldData << data;
     }
 
-    for (const BusinessRuleRemapData& data: oldData)
+    for (const EventRuleRemapData& data: oldData)
     {
-        auto params = QJson::deserialized<BusinessActionParameters31Beta>(data.actionParams);
+        auto params = QJson::deserialized<ActionParameters31Beta>(data.actionParams);
         const bool allUsers = params.additionalResources.empty();
 
         if (params.allUsers == allUsers)
@@ -398,7 +398,7 @@ bool migrateBusinessActionsAllUsers(const QSqlDatabase& database)
     return true;
 }
 
-bool migrateBusinessEventsAllUsers(const QSqlDatabase& database)
+bool migrateEventsAllUsers(const QSqlDatabase& database)
 {
     QSqlQuery query(database);
     query.setForwardOnly(true);
@@ -425,7 +425,7 @@ bool migrateBusinessEventsAllUsers(const QSqlDatabase& database)
     for (const auto& old: oldData)
     {
         const int id = old.first;
-        auto params = QJson::deserialized<BusinessEventParameters31Beta>(old.second);
+        auto params = QJson::deserialized<EventParameters31Beta>(old.second);
 
         const bool allUsers = params.metadata.instigators.empty();
         if (params.metadata.allUsers == allUsers)

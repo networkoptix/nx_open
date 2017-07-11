@@ -473,6 +473,12 @@ void QnClientModule::initLog(const QnStartupParameters& startupParams)
             ec2logger);
     }
 
+    {
+        // TODO: #dklychkov #3.1 or #3.2 Remove this block when log filters are implemented.
+        const auto logger = nx::utils::log::addLogger({lit("DecodedPictureToOpenGLUploader")});
+        logger->setDefaultLevel(nx::utils::log::Level::info);
+    }
+
     defaultMsgHandler = qInstallMessageHandler(myMsgHandler);
 }
 

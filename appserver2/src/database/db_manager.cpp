@@ -1463,7 +1463,7 @@ bool QnDbManager::afterInstallUpdate(const QString& updateName)
         return resyncIfNeeded(ResyncLayouts);
 
     if (updateName.endsWith(lit("/58_migrate_camera_output_action.sql")))
-        return ec2::db::migrateBusinessRulesToV30(m_sdb) && resyncIfNeeded(ResyncRules);
+        return ec2::db::migrateRulesToV30(m_sdb) && resyncIfNeeded(ResyncRules);
 
     if (updateName.endsWith(lit("/52_fix_onvif_mt.sql")))
         return removeWrongSupportedMotionTypeForONVIF(); //TODO: #rvasilenko consistency break
@@ -1523,13 +1523,13 @@ bool QnDbManager::afterInstallUpdate(const QString& updateName)
         return updateBusinessActionParameters();
 
     if (updateName.endsWith(lit("/93_migrate_show_popup_action.sql")))
-        return ec2::db::migrateBusinessRulesToV31Alpha(m_sdb) && resyncIfNeeded(ResyncRules);
+        return ec2::db::migrateRulesToV31Alpha(m_sdb) && resyncIfNeeded(ResyncRules);
 
     if (updateName.endsWith(lit("/94_migrate_business_actions_all_users.sql")))
-        return ec2::db::migrateBusinessActionsAllUsers(m_sdb) && resyncIfNeeded(ResyncRules);
+        return ec2::db::migrateActionsAllUsers(m_sdb) && resyncIfNeeded(ResyncRules);
 
     if (updateName.endsWith(lit("/95_migrate_business_events_all_users.sql")))
-        return ec2::db::migrateBusinessEventsAllUsers(m_sdb) && resyncIfNeeded(ResyncRules);
+        return ec2::db::migrateEventsAllUsers(m_sdb) && resyncIfNeeded(ResyncRules);
 
     NX_LOG(lit("SQL update %1 does not require post-actions.").arg(updateName), cl_logDEBUG1);
     return true;
@@ -1561,7 +1561,7 @@ bool QnDbManager::createDatabase()
         if (!execSQLFile(lit(":/00_update_2.2_stage0.sql"), m_sdb))
             return false;
 
-        if (!ec2::db::migrateBusinessRulesToV23(m_sdb))
+        if (!ec2::db::migrateRulesToV23(m_sdb))
             return false;
 
         if (!m_dbJustCreated)

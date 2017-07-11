@@ -89,8 +89,9 @@ LayoutToursHandler::LayoutToursHandler(QObject* parent):
 
             const QString name = parameters.argument<QString>(Qn::ResourceNameRole).trimmed();
 
-            // Ask to override tour with the same name (if any).
-            for (const auto& other: layoutTourManager()->tours())
+            // Ask to override tour with the same name (if any). Create local copy to avoid crash.
+            const auto tours = layoutTourManager()->tours();
+            for (const auto& other: tours)
             {
                 if (other.id == id)
                     continue;
