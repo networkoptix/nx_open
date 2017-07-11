@@ -833,6 +833,7 @@ QIcon QnBusinessRuleViewModel::getIcon(Column column) const
                     QnUserResourceList users;
                     QList<QnUuid> roles;
                     userRolesManager()->usersAndRoles(m_actionParams.additionalResources, users, roles);
+                    users = users.filtered([](const QnUserResourcePtr& user) { return user->isEnabled(); });
                     return (users.size() > 1 || !roles.empty())
                         ? qnResIconCache->icon(QnResourceIconCache::Users)
                         : qnResIconCache->icon(QnResourceIconCache::User);
@@ -1071,6 +1072,7 @@ QString QnBusinessRuleViewModel::getTargetText(const bool detailed) const
             QnUserResourceList users;
             QList<QnUuid> roles;
             userRolesManager()->usersAndRoles(m_actionParams.additionalResources, users, roles);
+            users = users.filtered([](const QnUserResourcePtr& user) { return user->isEnabled(); });
             return m_helper->actionSubjects(users, roles);
         }
         case vms::event::bookmarkAction:

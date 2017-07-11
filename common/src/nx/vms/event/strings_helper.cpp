@@ -667,6 +667,7 @@ QString StringsHelper::actionSubjects(const RulePtr& rule, bool showName) const
     else
         userRolesManager()->usersAndRoles(rule->actionParams().additionalResources, users, roles);
 
+    users = users.filtered([](const QnUserResourcePtr& user) { return user->isEnabled(); });
     return actionSubjects(users, roles, showName);
 }
 
