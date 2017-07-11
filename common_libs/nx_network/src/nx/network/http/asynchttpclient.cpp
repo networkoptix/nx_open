@@ -342,7 +342,7 @@ void AsyncHttpClient::doUpgrade(
     m_contentLocationUrl = url;
     m_additionalHeaders.emplace("Connection", "Upgrade");
     m_additionalHeaders.emplace("Upgrade", protocolToUpgradeTo);
-    composeRequest(nx_http::Method::Options);
+    composeRequest(nx_http::Method::options);
     initiateHttpMessageDelivery();
 }
 
