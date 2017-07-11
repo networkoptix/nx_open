@@ -597,23 +597,3 @@ QnAspectRatio QnVirtualCameraResource::aspectRatio() const
 
     return QnAspectRatio();
 }
-
-bool QnVirtualCameraResource::areNativePtzPresetsDisabled()
-{
-    const auto value = !getProperty(Qn::DISABLE_NATIVE_PTZ_PRESETS_PARAM_NAME).isEmpty();
-
-    connect(this, &QnResource::propertyChanged,
-        [this, value](const QnResourcePtr& /*resource*/, const QString& key)
-        {
-            if (key == Qn::DISABLE_NATIVE_PTZ_PRESETS_PARAM_NAME
-                && value != !getProperty(Qn::DISABLE_NATIVE_PTZ_PRESETS_PARAM_NAME).isEmpty())
-            {
-                // Force camera reconnect so new value will be in use.
-                qWarning() << "---" << getName() << "new DISABLE_NATIVE_PTZ_PRESETS_PARAM_NAME" << !value;
-                setStatus(Qn::Offline);
-            }
-        });
-
-    return value;
-
-}

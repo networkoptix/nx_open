@@ -62,8 +62,17 @@ QnPtzControllerPtr QnServerPtzControllerPool::createController(const QnResourceP
         if(QnViewportPtzController::extends(controller->getCapabilities()))
             controller.reset(new QnViewportPtzController(controller));
 
-        if(QnPresetPtzController::extends(controller->getCapabilities(),
-                /*disableNative*/ camera->areNativePtzPresetsDisabled()))
+        bool disableNativePresets = false;
+        if(controller->getCapabilities() & Ptz::NativePresetsPtzCapability)
+        {
+            disableNativePresets = !resource->getProperty(
+                Qn::DISABLE_NATIVE_PTZ_PRESETS_PARAM_NAME).isEmpty();
+
+            connect(resource, &QnResource::propertyChanged, this,
+                &QnServerPtzControllerPool::at_cameraPropertyChanged, Qt::UniqueConnection);
+        }
+
+        if(QnPresetPtzController::extends(controller->getCapabilities(), disableNativePresets))
             controller.reset(new QnPresetPtzController(controller));
 
         if(QnTourPtzController::extends(controller->getCapabilities()))
@@ -98,6 +107,16 @@ QnPtzControllerPtr QnServerPtzControllerPool::createController(const QnResourceP
 
 void QnServerPtzControllerPool::at_addCameraDone(int, ec2::ErrorCode, const QnVirtualCameraResourceList &)
 {
+}
+
+void QnServerPtzControllerPool::at_cameraPropertyChanged(
+    const QnResourcePtr &resource, const QString& key)
+{
+    if (key == Qn::DISABLE_NATIVE_PTZ_PRESETS_PARAM_NAME)
+    {
+        // Camera reinitialization is required.
+        resource->setStatus(Qn::Offline);
+    }
 }
 
 void QnServerPtzControllerPool::at_controllerAboutToBeChanged(const QnResourcePtr &resource) {

@@ -146,8 +146,8 @@ void QnCameraExpertSettingsWidget::updateFromResources(const QnVirtualCameraReso
     int forcedMotionStreamIndex = -1;
     bool allCamerasSupportForceMotion = true;
 
-    int supportNativePtz = 0;
-    int disableNativePtz = 0;
+    int supportedNativePtzCount = 0;
+    int disabledNativePtzCount = 0;
 
     int camCnt = 0;
     foreach(const QnVirtualCameraResourcePtr &camera, cameras)
@@ -222,10 +222,10 @@ void QnCameraExpertSettingsWidget::updateFromResources(const QnVirtualCameraReso
         }
 
         if (camera->getPtzCapabilities() & Ptz::NativePresetsPtzCapability)
-            ++supportNativePtz;
+            ++supportedNativePtzCount;
 
         if (!camera->getProperty(Qn::DISABLE_NATIVE_PTZ_PRESETS_PARAM_NAME).isEmpty())
-            ++disableNativePtz;
+            ++disabledNativePtzCount;
 
         camCnt++;
     }
@@ -302,10 +302,10 @@ void QnCameraExpertSettingsWidget::updateFromResources(const QnVirtualCameraReso
     else
         ui->settingsDisableControlCheckBox->setCheckState(Qt::PartiallyChecked);
 
-    ui->groupBoxPtzControl->setEnabled(supportNativePtz);
-    if (supportNativePtz && disableNativePtz == supportNativePtz)
+    ui->groupBoxPtzControl->setEnabled(supportedNativePtzCount);
+    if (supportedNativePtzCount != 0 && disabledNativePtzCount == supportedNativePtzCount)
         ui->checkBoxDisableNativePtzPresets->setChecked(Qt::Checked);
-    else if (disableNativePtz)
+    else if (disabledNativePtzCount != 0)
         ui->checkBoxDisableNativePtzPresets->setChecked(Qt::PartiallyChecked);
     else
         ui->checkBoxDisableNativePtzPresets->setChecked(Qt::Unchecked);
