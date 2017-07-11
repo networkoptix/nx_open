@@ -278,10 +278,10 @@ bool RuleProcessor::executeActionInternal(const vms::event::AbstractActionPtr& a
             return true;
 
         case vms::event::showPopupAction:
+            action->getParams().actionId = QnUuid::createUuid();
         case vms::event::showOnAlarmLayoutAction:
         case vms::event::showTextOverlayAction:
             return broadcastAction(action);
-
         default:
             break;
     }

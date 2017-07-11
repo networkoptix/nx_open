@@ -20,9 +20,13 @@ class CommonAction: public AbstractAction
 public:
     explicit CommonAction(ActionType actionType, const EventParameters& runtimeParams);
 
-    static const AbstractActionPtr createCopy(
+    static AbstractActionPtr createCopy(
         ActionType actionType,
         const AbstractActionPtr& source);
+
+    static AbstractActionPtr createBroadcastAction(
+        ActionType type,
+        const ActionParameters& params);
 };
 
 } // namespace event

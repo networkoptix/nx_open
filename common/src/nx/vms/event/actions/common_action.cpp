@@ -13,7 +13,7 @@ CommonAction::CommonAction(ActionType actionType, const EventParameters& runtime
 {
 }
 
-const AbstractActionPtr CommonAction::createCopy(
+AbstractActionPtr CommonAction::createCopy(
     ActionType actionType,
     const AbstractActionPtr& source)
 {
@@ -26,6 +26,15 @@ const AbstractActionPtr CommonAction::createCopy(
     result->setReceivedFromRemoteHost(source->isReceivedFromRemoteHost());
     result->setAggregationCount(source->getAggregationCount());
 
+    return result;
+}
+
+AbstractActionPtr CommonAction::createBroadcastAction(
+    ActionType type,
+    const ActionParameters& params)
+{
+    AbstractActionPtr result(new CommonAction(type, EventParameters()));
+    result->setParams(params);
     return result;
 }
 

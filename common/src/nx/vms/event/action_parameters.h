@@ -13,6 +13,11 @@ struct ActionParameters
     ActionParameters();
 
     /**
+      * Identifier of action which is used in showPopupAction.
+      */
+    QnUuid actionId;
+
+    /**
       * Shows if action should be confirmed by user. Currently used for bookmarks confirmation
       */
     bool needConfirmation = false;
