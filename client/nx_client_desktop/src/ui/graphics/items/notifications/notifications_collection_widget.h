@@ -102,7 +102,7 @@ private:
     QMultiHash<QnUuid, QnNotificationWidget*> m_itemsByEventRuleId;
     QPointer<QnBlinkingImageButtonWidget> m_blinker;
     std::unique_ptr<nx::vms::event::StringsHelper> m_helper;
-    QHash<QString, QnNotificationWidget*> m_customPopupItems;
+    QHash<QnUuid, QnNotificationWidget*> m_customPopupItems;
 };
 
 #endif // NOTIFICATIONS_COLLECTION_WIDGET_H

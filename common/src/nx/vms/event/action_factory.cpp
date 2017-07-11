@@ -89,6 +89,7 @@ AbstractActionPtr ActionFactory::createAction(
         case showTextOverlayAction:
         case showOnAlarmLayoutAction:
         case execHttpRequestAction:
+        case hidePopupAction:
             return AbstractActionPtr(new CommonAction(actionType, runtimeParams));
 
         default:

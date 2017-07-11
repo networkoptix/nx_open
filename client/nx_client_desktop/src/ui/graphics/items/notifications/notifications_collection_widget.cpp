@@ -237,11 +237,6 @@ void QnNotificationsCollectionWidget::loadThumbnailForItem(
     item->setImageProvider(new QnMultiImageProvider(std::move(providers), Qt::Vertical, kMultiThumbnailSpacing, item));
 }
 
-QString getIdentifierFromAction(const vms::event::AbstractActionPtr& businessAction)
-{
-    // TODO: #ynikitenkov Change me before review
-    return QnUuid::createUuid().toString();
-}
 /*
             {
                 // TODO: change this
@@ -274,7 +269,7 @@ void QnNotificationsCollectionWidget::handleShowPopupAction(
             menu()->trigger(action::AcknowledgeEventAction, params);
         });
 
-    m_customPopupItems.insert(getIdentifierFromAction(businessAction), widget);
+    m_customPopupItems.insert(businessAction->getParams().actionId, widget);
 }
 
 void QnNotificationsCollectionWidget::showEventAction(const vms::event::AbstractActionPtr& action)
@@ -503,7 +498,7 @@ void QnNotificationsCollectionWidget::hideEventAction(const vms::event::Abstract
 
     if (action->actionType() == vms::event::hidePopupAction)
     {
-        const auto id = getIdentifierFromAction(action);
+        const auto id = action->getParams().actionId;
         const auto it = m_customPopupItems.find(id);
         if (it != m_customPopupItems.end())
         {

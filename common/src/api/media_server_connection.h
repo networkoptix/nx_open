@@ -72,6 +72,8 @@ public:
     int getParamsAsync(const QnNetworkResourcePtr& camera, const QStringList& keys,
         QObject* target, const char* slot);
 
+    int broadcastAction(const nx::vms::event::AbstractActionPtr& action);
+
 	/**
      * Set camera params.
      *

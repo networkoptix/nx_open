@@ -13,7 +13,7 @@ struct ActionParameters
     ActionParameters();
 
     /**
-      * Identifier of action which is used in showPopupAction.
+      * Identifier of action which is used in show/hide popup action.
       */
     QnUuid actionId;
 
@@ -82,7 +82,7 @@ struct ActionParameters
     bool isDefault() const;
 };
 
-#define ActionParameters_Fields (needConfirmation)(actionResourceId)\
+#define ActionParameters_Fields (actionId)(needConfirmation)(actionResourceId)\
     (url)(emailAddress)(fps)(streamQuality)(recordAfter)(relayOutputId)(sayText)(tags)(text)\
     (durationMs)(additionalResources)(allUsers)(forced)(presetId)(useSource)(recordBeforeMs)\
     (playToClient)(contentType)

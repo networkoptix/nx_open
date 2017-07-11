@@ -15,6 +15,7 @@
 #include <core/resource/resource.h>
 #include <core/resource/user_resource.h>
 #include <core/resource/camera_bookmark.h>
+#include <core/resource/media_server_resource.h>
 #include <core/resource_management/resource_pool.h>
 #include <core/resource_management/user_roles_manager.h>
 #include <nx/client/desktop/ui/actions/action_parameters.h>
@@ -134,11 +135,29 @@ void QnWorkbenchNotificationsHandler::handleAcknowledgeEventAction()
             dialog = bookmarksDialog.data()]()
         {
             const auto bookmarks = dialog->bookmarks();
+
+            const auto repliesRemaining = QSharedPointer<int>(new int(bookmarks.size()));
+            const auto anySuccessReply = QSharedPointer<bool>(new bool(false));
+
+            const auto creationCallback =
+                [this, businessAction, repliesRemaining, anySuccessReply](bool success)
+                {
+                    if (success)
+                        *anySuccessReply = true;
+
+                    auto& counter = *repliesRemaining;
+                    if (--counter || !*anySuccessReply)
+                        return;
+
+                    const auto action = CommonAction::createBroadcastAction(
+                        ActionType::hidePopupAction, businessAction->getParams());
+                    commonModule()->currentServer()->apiConnection()->broadcastAction(action);
+
+             //       emit notificationRemoved(businessAction);
+                };
+
             for (const auto& bookmark: bookmarks)
-            {
-                qnCameraBookmarksManager->addAcknowledge(bookmark, action);
-            }
-            emit notificationRemoved(businessAction);
+                qnCameraBookmarksManager->addAcknowledge(bookmark, action, creationCallback);
         });
 
     bookmarksDialog->exec();
@@ -402,6 +421,7 @@ void QnWorkbenchNotificationsHandler::at_eventManager_actionReceived(
     switch (action->actionType())
     {
         case vms::event::hidePopupAction:
+            qDebug() << "------------- hide popup" << action->getParams().actionId;
             emit notificationRemoved(action);
             break;
         case vms::event::showPopupAction:

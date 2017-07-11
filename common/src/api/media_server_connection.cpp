@@ -46,6 +46,9 @@
 #include <api/model/getnonce_reply.h>
 #include "common/common_module.h"
 
+#include <nx_ec/data/api_business_rule_data.h>
+#include <nx_ec/data/api_conversion_functions.h>
+
 #include <nx/utils/log/log.h>
 #include <nx/utils/datetime.h>
 
@@ -114,6 +117,7 @@ QN_DEFINE_LEXICAL_ENUM(RequestObject,
     (ec2BookmarkUpdateObject, "ec2/bookmarks/update")
     (ec2BookmarkDeleteObject, "ec2/bookmarks/delete")
     (ec2BookmarkTagsObject, "ec2/bookmarks/tags")
+    (ec2BroadcastAction, "ec2/broadcastAction")
     (MergeLdapUsersObject, "mergeLdapUsers")
 );
 
@@ -480,6 +484,19 @@ int QnMediaServerConnection::getParamsAsync(
 
     return sendAsyncGetRequestLogged(GetParamsObject,
         params, QN_STRINGIZE_TYPE(QnCameraAdvancedParamValueList), target, slot);
+}
+
+int QnMediaServerConnection::broadcastAction(const nx::vms::event::AbstractActionPtr& action)
+{
+    ec2::ApiBusinessActionData data;
+    ec2::fromResourceToApi(action, data);
+
+    nx_http::HttpHeaders headers;
+    headers.emplace(nx_http::header::kContentType, "application/json");
+
+    return sendAsyncPostRequestLogged(ec2BroadcastAction,
+        std::move(headers), QnRequestParamList(), QJson::serialized(data),
+        nullptr, nullptr, nullptr);
 }
 
 int QnMediaServerConnection::setParamsAsync(
