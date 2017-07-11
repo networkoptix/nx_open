@@ -5,6 +5,8 @@
 
 #include <core/resource/resource_fwd.h>
 
+class QnUuid;
+
 namespace Qn {
 
 struct ValidationResult
@@ -28,7 +30,7 @@ TextValidateFunction defaultNonEmptyValidator(const QString& errorMessage);
 TextValidateFunction defaultPasswordValidator(bool allowEmpty, const QString& emptyPasswordMessage = QString());
 TextValidateFunction defaultConfirmationValidator(TextAccessorFunction primaryText, const QString& errorMessage);
 
-using UserValidator = std::function<bool(const QnUserResourcePtr&)>;
+using UserValidator = std::function<bool (const QnUserResourcePtr&)>;
+using RoleValidator = std::function<QValidator::State (const QnUuid&)>;
 
 } // namespace Qn
-
