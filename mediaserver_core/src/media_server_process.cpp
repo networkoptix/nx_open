@@ -207,8 +207,6 @@
 #include <nx/network/cloud/mediator_connector.h>
 #include <nx/network/cloud/tunnel/tunnel_acceptor_factory.h>
 
-#include <nx/mediaserver/rest/broadcast_action_handler.h>
-
 #include <utils/common/app_info.h>
 #include <transcoding/ffmpeg_video_transcoder.h>
 
@@ -1886,7 +1884,6 @@ void MediaServerProcess::registerRestHandlers(
     reg("ec2/bookmarks", new QnMultiserverBookmarksRestHandler("ec2/bookmarks"));
     reg("api/mergeLdapUsers", new QnMergeLdapUsersRestHandler());
     reg("ec2/updateInformation", new QnUpdateInformationRestHandler());
-    reg("ec2/broadcastAction", new nx::mediaserver::rest::BroadcastActionHandler());
     reg("ec2/cameraThumbnail", new QnMultiserverThumbnailRestHandler("ec2/cameraThumbnail"));
     reg("ec2/statistics", new QnMultiserverStatisticsRestHandler("ec2/statistics"));
 
