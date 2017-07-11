@@ -60,9 +60,6 @@ public:
         int role = Qt::DisplayRole) const override;
 
 private:
-    static QString systemCreatorName();
-
-private:
     class Impl;
     Impl * const m_impl;
 };

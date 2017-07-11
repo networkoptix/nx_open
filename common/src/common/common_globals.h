@@ -513,8 +513,11 @@ QN_DECLARE_METAOBJECT_HEADER(Qn,
         BookmarkName,
         BookmarkStartTime,
         BookmarkDuration,
-        BookmarkCreationTime,   //< TODO: BEFORE REVIEW: check if sorting is enabled for this column at the server side
-        BookmarkCreator,        //< TODO: #ynikitenkov implement manual sorting! #high?
+        BookmarkCreationTime,   //< Sorted manually!
+                                // TODO: #ynikitenkov add migration from older version to prevent
+                                // empty/zero creation time. It would allow as to sort bookmarks
+                                // by database, not manually, which is faster.
+        BookmarkCreator,        //< Sorted manually!
         BookmarkTags,           //< Sorted manually!
         BookmarkCameraName      //< Sorted manually!
     };

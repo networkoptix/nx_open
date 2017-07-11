@@ -1,7 +1,6 @@
 
 #include "search_bookmarks_model.h"
 
-#include <core/resource/user_resource.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/camera_bookmark.h>
 #include <core/resource_management/resource_pool.h>
@@ -13,6 +12,7 @@
 #include <ui/workbench/watchers/workbench_server_time_watcher.h>
 #include <ui/style/resource_icon_cache.h>
 
+#include <utils/camera/bookmark_helpers.h>
 #include <utils/camera/camera_names_watcher.h>
 #include <utils/common/qtimespan.h>
 #include <nx/utils/collection.h>
@@ -90,8 +90,6 @@ public:
         , int role);
 
     QDateTime displayTime(qint64 millisecondsSinceEpoch);
-
-    QString creatorName(const QnUuid& userId);
 
 private:
     typedef QHash<QString, QString> UniqIdToStringHash;
@@ -176,18 +174,6 @@ QDateTime QnSearchBookmarksModel::Impl::displayTime(qint64 millisecondsSinceEpoc
 {
     const auto timeWatcher = context()->instance<QnWorkbenchServerTimeWatcher>();
     return timeWatcher->displayTime(millisecondsSinceEpoch);
-}
-
-QString QnSearchBookmarksModel::Impl::creatorName(const QnUuid& userId)
-{
-    if (userId.isNull())
-        return QString();
-
-    if (userId == QnCameraBookmark::systemUserId())
-        return QnSearchBookmarksModel::systemCreatorName();
-
-    const auto userResource = resourcePool()->getResourceById<QnUserResource>(userId);
-    return userResource ? userResource->getName() : QString();
 }
 
 void QnSearchBookmarksModel::Impl::setRange(qint64 utcStartTimeMs
@@ -289,7 +275,7 @@ QVariant QnSearchBookmarksModel::Impl::getData(const QModelIndex &index
     case kCreationTime:
         return displayTime(bookmark.creationTimeMs());
     case kCreator:
-        return creatorName(bookmark.creatorId);
+        return helpers::getBookmarkCreatorName(bookmark, resourcePool());
     case kLength:
         return QTimeSpan(bookmark.durationMs).normalized().toApproximateString(
             QTimeSpan::kDoNotSuppressSecondUnit);

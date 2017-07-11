@@ -5,6 +5,7 @@
 
 #include <nx/fusion/model_functions.h>
 #include <utils/camera/camera_names_watcher.h>
+#include <utils/camera/bookmark_helpers.h>
 #include <common/common_module.h>
 
 namespace
@@ -102,29 +103,70 @@ namespace
 
         switch(sortOrder.column)
         {
-        case Qn::BookmarkName:
-            return makePredByGetter([](const QnCameraBookmark &bookmark) { return bookmark.name; }, isAscending);
-        case Qn::BookmarkStartTime:
-            return makePredByGetter([](const QnCameraBookmark &bookmark) { return bookmark.startTimeMs; } , isAscending);
-        case Qn::BookmarkDuration:
-            return makePredByGetter([](const QnCameraBookmark &bookmark) { return bookmark.durationMs; } , isAscending);
-        case Qn::BookmarkTags:
-        {
-            static const auto tagsGetter = [](const QnCameraBookmark &bookmark)
-                { return QnCameraBookmark::tagsToString(bookmark.tags); };
-            return makePredByGetter(tagsGetter, isAscending);
-        }
-        case Qn::BookmarkCameraName:
-        {
-            static utils::QnCameraNamesWatcher namesWatcher(commonModule);
-            static const auto cameraNameGetter = [](const QnCameraBookmark &bookmark)
-                { return namesWatcher.getCameraName(bookmark.cameraId); };
+            case Qn::BookmarkName:
+            {
+                return makePredByGetter(
+                    [](const QnCameraBookmark &bookmark)
+                    {
+                        return bookmark.name;
+                    }, isAscending);
+            }
+            case Qn::BookmarkStartTime:
+            {
+                return makePredByGetter(
+                    [](const QnCameraBookmark &bookmark)
+                    {
+                        return bookmark.startTimeMs;
+                    }, isAscending);
+            }
+            case Qn::BookmarkDuration:
+            {
+                return makePredByGetter(
+                    [](const QnCameraBookmark &bookmark)
+                    {
+                        return bookmark.durationMs;
+                    }, isAscending);
+            }
+            case Qn::BookmarkCreationTime:
+            {
+                return makePredByGetter(
+                    [](const QnCameraBookmark &bookmark)
+                    {
+                        return bookmark.creationTimeMs();
+                    }, isAscending);
+            }
+            case Qn::BookmarkTags:
+            {
+                static const auto tagsGetter =
+                    [](const QnCameraBookmark &bookmark)
+                    {
+                        return QnCameraBookmark::tagsToString(bookmark.tags);
+                    };
+                return makePredByGetter(tagsGetter, isAscending);
+            }
+            case Qn::BookmarkCreator:
+            {
+                const auto creatorGetter =
+                    [commonModule](const QnCameraBookmark& bookmark)
+                    {
+                        auto resourcePool = commonModule->resourcePool();
+                        return helpers::getBookmarkCreatorName(bookmark, resourcePool);
+                    };
+                return makePredByGetter(creatorGetter, isAscending);
+            }
+            case Qn::BookmarkCameraName:
+            {
+                static utils::QnCameraNamesWatcher namesWatcher(commonModule);
+                static const auto cameraNameGetter = [](const QnCameraBookmark &bookmark)
+                    { return namesWatcher.getCameraName(bookmark.cameraId); };
 
-            return makePredByGetter(cameraNameGetter, isAscending);
+                return makePredByGetter(cameraNameGetter, isAscending);
+            }
+            default:
+            {
+                NX_ASSERT(false, Q_FUNC_INFO, "Invalid bookmark sorting field!");
+                return BinaryPredicate();
         }
-        default:
-            NX_ASSERT(false, Q_FUNC_INFO, "Invalid bookmark sorting field!");
-            return BinaryPredicate();
         };
     };
 
@@ -310,7 +352,6 @@ QnCameraBookmark::QnCameraBookmark():
 {
 }
 
-
 QnCameraBookmarkList QnCameraBookmark::mergeCameraBookmarks(
     QnCommonModule* commonModule,
     const QnMultiServerCameraBookmarkList &source,
@@ -326,12 +367,22 @@ QnCameraBookmarkList QnCameraBookmark::mergeCameraBookmarks(
 
     const int intermediateLimit = (sparsing.used ? QnCameraBookmarkSearchFilter::kNoLimit : limit);
     QnCameraBookmarkList result;
-    if (sortOrder.column == Qn::BookmarkCameraName)
-        result = mergeSortedBookmarks(sortEachList(commonModule, source, sortOrder), pred, intermediateLimit);
-    else if (sortOrder.column == Qn::BookmarkTags)
-        result = mergeSortedBookmarks(sortEachList(commonModule, source, sortOrder), pred, intermediateLimit);
-    else
-        result = mergeSortedBookmarks(source, pred, intermediateLimit);
+    switch(sortOrder.column)
+    {
+        case Qn::BookmarkCreationTime:
+        case Qn::BookmarkCreator:
+        case Qn::BookmarkCameraName:
+        case Qn::BookmarkTags:
+        {
+            const auto bookmarksList = sortEachList(commonModule, source, sortOrder);
+            result = mergeSortedBookmarks(bookmarksList, pred, intermediateLimit);
+        }
+        default:
+        {
+            // All data by other columns is sorted by database.
+            result = mergeSortedBookmarks(source, pred, intermediateLimit);
+        }
+    }
 
     if (!sparsing.used)
         return result;

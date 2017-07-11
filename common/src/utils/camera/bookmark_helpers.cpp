@@ -2,8 +2,10 @@
 #include "bookmark_helpers.h"
 
 #include <utils/math/math.h>
+#include <core/resource/user_resource.h>
 #include <core/resource/camera_bookmark.h>
 #include <core/resource/security_cam_resource.h>
+#include <core/resource_management/resource_pool.h>
 
 #include <nx/vms/event/strings_helper.h>
 #include <nx/vms/event/actions/abstract_action.h>
@@ -18,6 +20,25 @@ bool isChangedEnough(qint64 first, qint64 second, qint64 minDiff)
 }
 
 } // namespace
+
+QString helpers::getBookmarkCreatorName(
+    const QnCameraBookmark& bookmark,
+    QnResourcePool* resourcePool)
+{
+    static const auto kSystemEventText =
+        QObject::tr("System Event", "Shows that bookmark was created by system event");
+
+    if (bookmark.isCreatedInOlderVMS())
+        return QString();
+
+    if (bookmark.isCreatedBySystem())
+        return kSystemEventText;
+
+    const auto userResource = resourcePool->getResourceById<QnUserResource>(
+        bookmark.creatorId);
+    return userResource ? userResource->getName() : QString();
+
+}
 
 QnCameraBookmark helpers::bookmarkFromAction(
     const vms::event::AbstractActionPtr& action,
