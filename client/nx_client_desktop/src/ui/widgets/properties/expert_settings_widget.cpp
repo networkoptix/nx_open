@@ -385,7 +385,7 @@ void QnCameraExpertSettingsWidget::submitToResources(const QnVirtualCameraResour
         {
                 camera->setProperty(
                     Qn::DISABLE_NATIVE_PTZ_PRESETS_PARAM_NAME,
-                    (disableNativePtz == Qt::Checked) ? lit("true") : lit(""));
+                    (disableNativePtz == Qt::Checked) ? lit("true") : QString());
         }
     }
 }
