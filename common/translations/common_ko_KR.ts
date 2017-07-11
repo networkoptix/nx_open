@@ -84,457 +84,6 @@
     </message>
   </context>
   <context>
-    <name>QnBusinessStringsHelper</name>
-    <message>
-      <source>Bookmark</source>
-      <translation>북마크(책갈피)</translation>
-    </message>
-    <message>
-      <source>Panic recording</source>
-      <translation>긴급 저장</translation>
-    </message>
-    <message>
-      <source>Write to log</source>
-      <translation>로그 기록</translation>
-    </message>
-    <message>
-      <source>Show notification</source>
-      <translation>알림 보기</translation>
-    </message>
-    <message>
-      <source>Repeat sound</source>
-      <translation>음원 반복</translation>
-    </message>
-    <message>
-      <source>Play sound</source>
-      <translation>음원 재생</translation>
-    </message>
-    <message>
-      <source>Speak</source>
-      <translation>음성출력</translation>
-    </message>
-    <message>
-      <source>Storage Failure</source>
-      <translation>저장기 오류</translation>
-    </message>
-    <message>
-      <source>Network Issue</source>
-      <translation>네트워크 이슈</translation>
-    </message>
-    <message>
-      <source>Server Failure</source>
-      <translation>서버 오류</translation>
-    </message>
-    <message>
-      <source>Server Conflict</source>
-      <translation>서버 충돌</translation>
-    </message>
-    <message>
-      <source>Server Started</source>
-      <translation>서버 시작 됨</translation>
-    </message>
-    <message>
-      <source>License Issue</source>
-      <translation>인증키 이슈</translation>
-    </message>
-    <message>
-      <source>Any Server Issue</source>
-      <translation>모든 서버 이슈</translation>
-    </message>
-    <message>
-      <source>Any Event</source>
-      <translation>모든 이벤트</translation>
-    </message>
-    <message>
-      <source>Undefined event has occurred on %1</source>
-      <translation>%1에 정의되지 않은 이벤트 발생</translation>
-    </message>
-    <message>
-      <source>Input on %1</source>
-      <translation>%1의 입력</translation>
-    </message>
-    <message>
-      <source>Motion on %1</source>
-      <translation>%1의 모션</translation>
-    </message>
-    <message>
-      <source>Storage Failure at %1</source>
-      <translation>%1 내 저장기 오류</translation>
-    </message>
-    <message>
-      <source>Network Issue at %1</source>
-      <translation>%1 내 네트워크 오류</translation>
-    </message>
-    <message>
-      <source>Server &quot;%1&quot; Failure</source>
-      <translation type="unfinished">Server &quot;%1&quot; Failure</translation>
-    </message>
-    <message>
-      <source>Server &quot;%1&quot; Conflict</source>
-      <translation type="unfinished">Server &quot;%1&quot; Conflict</translation>
-    </message>
-    <message>
-      <source>Server &quot;%1&quot; Started</source>
-      <translation type="unfinished">Server &quot;%1&quot; Started</translation>
-    </message>
-    <message>
-      <source>Event: %1</source>
-      <translation>이벤트: %1</translation>
-    </message>
-    <message>
-      <source>Source: %1</source>
-      <translation>소스: %1</translation>
-    </message>
-    <message>
-      <source>Reason: %1</source>
-      <translation>원인: %1</translation>
-    </message>
-    <message>
-      <source>Conflicting Server #%1: %2</source>
-      <extracomment>Conflicting Server #5: 10.0.2.1</extracomment>
-      <translation>%1 서버 충돌 중: %2</translation>
-    </message>
-    <message>
-      <source>Time: %1 on %2</source>
-      <comment>%1 means time, %2 means date</comment>
-      <translation>시간: %2 의 %1</translation>
-    </message>
-    <message numerus="yes">
-      <source>First occurrence: %1 on %2 (%n times total)</source>
-      <comment>%1 means time, %2 means date</comment>
-      <translation>
-        <numerusform>첫번째 발생: %2의 %1 (%n 전체 시간)</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>RTP packet loss detected, prev seq.=%1 next seq.=%2.</source>
-      <translation>RTP 패킷 손실이 발생함, prev seq.=%1 next seq.=%2.</translation>
-    </message>
-    <message>
-      <source>RTP packet loss detected.</source>
-      <translation>RTP 패킷 손실이 발생함.</translation>
-    </message>
-    <message>
-      <source>I/O error has occurred at %1.</source>
-      <translation>%1에 I/O 오류 발생.</translation>
-    </message>
-    <message>
-      <source>Not enough HDD/SSD speed for recording to %1.</source>
-      <translation>%1. 에 저장을 위한 HDD/SSD 속도 정보.</translation>
-    </message>
-    <message>
-      <source>Conflicting Server: %1</source>
-      <translation>서버 충돌: %1</translation>
-    </message>
-    <message>
-      <source>start</source>
-      <translation>시작</translation>
-    </message>
-    <message>
-      <source>stop</source>
-      <translation>멈춤</translation>
-    </message>
-    <message>
-      <source>While %1</source>
-      <translation>%1 동안</translation>
-    </message>
-    <message>
-      <source>On %1 %2</source>
-      <translation>%1 %2에</translation>
-    </message>
-    <message>
-      <source>An unknown event has occurred</source>
-      <translation>알지 못하는 이벤트 발생</translation>
-    </message>
-    <message>
-      <source>Connection to server is lost.</source>
-      <translation>서버 접속 연결 실패.</translation>
-    </message>
-    <message numerus="yes">
-      <source>No data received during last %n seconds.</source>
-      <translation>
-        <numerusform>%n 초간 데이터 받기 실패.</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>Generic Event</source>
-      <translation>일반 이벤트</translation>
-    </message>
-    <message>
-      <source>Caption: %1</source>
-      <translation>캡션: %1</translation>
-    </message>
-    <message>
-      <source>Connection to camera (primary stream) was unexpectedly closed.</source>
-      <translation>카메라 메인스트림 연결이 예상치 못하게 끊겼습니다.</translation>
-    </message>
-    <message>
-      <source>Connection to camera (secondary stream) was unexpectedly closed.</source>
-      <translation>카메라 2nd 스트림이 에상치 못하게 끊겼습니다.</translation>
-    </message>
-    <message>
-      <source>Device output</source>
-      <translation>장치 출력</translation>
-    </message>
-    <message>
-      <source>Camera output</source>
-      <translation>카메라 출력</translation>
-    </message>
-    <message>
-      <source>Device recording</source>
-      <translation>장치 녹화</translation>
-    </message>
-    <message>
-      <source>Camera recording</source>
-      <translation>카메라 녹화</translation>
-    </message>
-    <message>
-      <source>Any Device Issue</source>
-      <translation>모든 장치 문제</translation>
-    </message>
-    <message>
-      <source>Any Camera Issue</source>
-      <translation>모든 카메라 문제</translation>
-    </message>
-    <message>
-      <source>Device %1 was disconnected</source>
-      <translation>장치%1 연결 끊김</translation>
-    </message>
-    <message>
-      <source>Camera %1 was disconnected</source>
-      <translation>카메라 %1연결끊김</translation>
-    </message>
-    <message>
-      <source>Device IP Conflict at %1</source>
-      <extracomment>Device IP Conflict at &lt;server_name&gt;</extracomment>
-      <translation>%1에서 장치 IP 충돌</translation>
-    </message>
-    <message>
-      <source>Camera IP Conflict at %1</source>
-      <extracomment>Camera IP Conflict at &lt;server_name&gt;</extracomment>
-      <translation>%1에서 카메라 IP 충돌</translation>
-    </message>
-    <message>
-      <source>Connection to device was unexpectedly closed.</source>
-      <translation>장치 연결이 예상치 못하게 끊김.</translation>
-    </message>
-    <message>
-      <source>Execute PTZ preset</source>
-      <translation>PTZ 프리셋 실행</translation>
-    </message>
-    <message>
-      <source>Show text overlay</source>
-      <translation>텍스트 오버레이 표시</translation>
-    </message>
-    <message>
-      <source>Show on Alarm Layout</source>
-      <translation>알람 레이아웃에 표시</translation>
-    </message>
-    <message>
-      <source>Archive backup finished</source>
-      <translation>아카이브 백업 완료</translation>
-    </message>
-    <message>
-      <source>Generic Event at %1</source>
-      <translation>%1에서 일반 이벤트</translation>
-    </message>
-    <message>
-      <source>Input Port: %1</source>
-      <translation>%1의 입력</translation>
-    </message>
-    <message>
-      <source>Archive backup is successfully completed</source>
-      <translation>아카이브 백업이 성공적으로 완료</translation>
-    </message>
-    <message>
-      <source>I/O Module %1 was disconnected</source>
-      <translation>I/O 모듈 %1이 끊어졌습니다.</translation>
-    </message>
-    <message>
-      <source>Conflicting Address: %1</source>
-      <translation>충돌 주소: %1</translation>
-    </message>
-    <message>
-      <source>Archive backup failed: No available backup storages with sufficient free space</source>
-      <translation>아카이브 백업 실패: 충분 한 공간이 없습니다</translation>
-    </message>
-    <message>
-      <source>Archive backup failed: Target storage failure</source>
-      <translation>아카이브 백업 실패: 대상 저장 실패</translation>
-    </message>
-    <message>
-      <source>Archive backup failed: Source file open/read error</source>
-      <translation>아카이브 백업 실패: 소스 파일 열기/읽기 오류</translation>
-    </message>
-    <message>
-      <source>Archive backup failed: Target file create/write error</source>
-      <translation>아카이브 백업 실패: 대상으로 파일 생성/쓰기 오류</translation>
-    </message>
-    <message>
-      <source>Archive backup failed: File catalog error</source>
-      <translation>아카이브 백업 실패: 파일 카탈로그 오류</translation>
-    </message>
-    <message>
-      <source>Archive backup is canceled by user. Data is backed up to %1</source>
-      <translation>아카이브 백업 사용자에 의해 취소 됩니다. %1에 데이터 백업</translation>
-    </message>
-    <message>
-      <source>Do HTTP request</source>
-      <translation>HTTP 요청</translation>
-    </message>
-    <message>
-      <source>%2 &lt;b&gt;%1&lt;/b&gt;</source>
-      <comment>%1 means time, %2 means date</comment>
-      <translation type="unfinished">%2 &lt;b&gt;%1&lt;/b&gt;</translation>
-    </message>
-    <message numerus="yes">
-      <source>%n times, first: %2 &lt;b&gt;%1&lt;/b&gt;</source>
-      <comment>%1 means time, %2 means date</comment>
-      <translation type="unfinished">
-        <numerusform>%n times, first: %2 &lt;b&gt;%1&lt;/b&gt;</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>Device does not respond to network requests.</source>
-      <translation>장치는 네트워크 요청에 응답 하지 않습니다.</translation>
-    </message>
-    <message>
-      <source>Server stopped unexpectedly.</source>
-      <translation>서버는 예기치 않게 중단 되었습니다.</translation>
-    </message>
-    <message>
-      <source>Not enough licenses. Recording has been disabled on following devices:</source>
-      <translation>라이센스가 충분하지 않습니다. 다음 장치에서 녹화 비활성화 되었습니다.</translation>
-    </message>
-    <message>
-      <source>Not enough licenses. Recording has been disabled on following cameras:</source>
-      <translation>라이센스가 충분하지 않습니다. 다음 장치에서 녹화 비활성화 되었습니다.</translation>
-    </message>
-    <message>
-      <source>Not enough licenses. Recording has been disabled on following I/O modules:</source>
-      <translation>라이센스가 충분하지 않습니다. 다음 장치에서 녹화 비활성화 되었습니다.</translation>
-    </message>
-    <message numerus="yes">
-      <source>Motion on Cameras</source>
-      <translation>
-        <numerusform>카메라에 모션</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>Input Signal on Devices</source>
-      <translation>
-        <numerusform>장치에 입력된 신호</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>Input Signal on Cameras</source>
-      <translation>
-        <numerusform>카메라에 입력된 신호</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>Devices Disconnected</source>
-      <translation>
-        <numerusform>장치 연결끊김</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>Cameras Disconnected</source>
-      <translation>
-        <numerusform>카메라 연결이 끊어졌습니다.</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>Devices IP Conflict</source>
-      <translation>
-        <numerusform>장치 IP 충돌</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>Cameras IP Conflict</source>
-      <translation>
-        <numerusform>카메라 IP 충돌</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>Server &quot;%1&quot; has a license problem</source>
-      <translation type="unfinished">Server &quot;%1&quot; has a license problem</translation>
-    </message>
-    <message>
-      <source>Server &quot;%1&quot; has finished an archive backup</source>
-      <translation type="unfinished">Server &quot;%1&quot; has finished an archive backup</translation>
-    </message>
-    <message>
-      <source>Archive backup finished, but is not fully completed because backup time is over. Data is backed up to %1</source>
-      <translation>아카이브 백업 완료, 하지만 백업 시간 초과 때문에 완전히 완료 되지 않습니다. %1의 데이터 백업</translation>
-    </message>
-    <message>
-      <source>MAC #%1: %2</source>
-      <extracomment>MAC #2: D0-50-99-38-1E-12</extracomment>
-      <translation>맥 #%1: %2</translation>
-    </message>
-    <message>
-      <source>Send Email</source>
-      <translation>이메일 전송</translation>
-    </message>
-    <message>
-      <source>Software Trigger</source>
-      <translation type="unfinished">Software Trigger</translation>
-    </message>
-    <message>
-      <source>Software trigger %1 at %2</source>
-      <translation type="unfinished">Software trigger %1 at %2</translation>
-    </message>
-    <message>
-      <source>Software Trigger %1 has been activated multiple times</source>
-      <translation type="unfinished">Software Trigger %1 has been activated multiple times</translation>
-    </message>
-    <message>
-      <source>Multiple %1 events have occured</source>
-      <translation type="unfinished">Multiple %1 events have occured</translation>
-    </message>
-    <message>
-      <source>Trigger: %1</source>
-      <translation type="unfinished">Trigger: %1</translation>
-    </message>
-    <message>
-      <source>HDD/SSD disk &quot;%1&quot; is full. Disk contains too much data that is not managed by VMS.</source>
-      <translation type="unfinished">HDD/SSD disk &quot;%1&quot; is full. Disk contains too much data that is not managed by VMS.</translation>
-    </message>
-    <message>
-      <source>System disk &quot;%1&quot; is almost full.</source>
-      <translation type="unfinished">System disk &quot;%1&quot; is almost full.</translation>
-    </message>
-    <message>
-      <source>Default Trigger</source>
-      <translation type="unfinished">Default Trigger</translation>
-    </message>
-    <message>
-      <source>All Users</source>
-      <translation type="unfinished">All Users</translation>
-    </message>
-    <message>
-      <source>Role</source>
-      <translation type="unfinished">Role</translation>
-    </message>
-    <message numerus="yes">
-      <source>%n Users</source>
-      <translation type="unfinished">
-        <numerusform>%n Users</numerusform>
-      </translation>
-    </message>
-    <message numerus="yes">
-      <source>%n Roles</source>
-      <translation type="unfinished">
-        <numerusform>%n Roles</numerusform>
-      </translation>
-    </message>
-    <message>
-      <source>All Administrators</source>
-      <translation type="unfinished">All Administrators</translation>
-    </message>
-  </context>
-  <context>
     <name>QnCameraDiagnosticsErrorCodeStrings</name>
     <message>
       <source>OK</source>
@@ -862,7 +411,7 @@
     </message>
     <message>
       <source>Start</source>
-      <translation type="unfinished">Start</translation>
+      <translation>시작:</translation>
     </message>
     <message>
       <source>Analog Encoder</source>
@@ -1470,6 +1019,461 @@
     <message>
       <source>Has access to whole System and can manage it. Can create users.</source>
       <translation>전체 시스템에 액세스할 수 있으며 그것을 관리할 수 있습니다. 사용자를 만들 수 있습니다.</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::event::StringsHelper</name>
+    <message>
+      <source>Bookmark</source>
+      <translation>북마크(책갈피)</translation>
+    </message>
+    <message>
+      <source>Panic recording</source>
+      <translation>긴급 저장</translation>
+    </message>
+    <message>
+      <source>Send Email</source>
+      <translation>이메일 전송</translation>
+    </message>
+    <message>
+      <source>Write to log</source>
+      <translation>로그 기록</translation>
+    </message>
+    <message>
+      <source>Show notification</source>
+      <translation>알림 보기</translation>
+    </message>
+    <message>
+      <source>Repeat sound</source>
+      <translation>음원 반복</translation>
+    </message>
+    <message>
+      <source>Play sound</source>
+      <translation>음원 재생</translation>
+    </message>
+    <message>
+      <source>Speak</source>
+      <translation>음성출력</translation>
+    </message>
+    <message>
+      <source>Execute PTZ preset</source>
+      <translation>PTZ 프리셋 실행</translation>
+    </message>
+    <message>
+      <source>Show text overlay</source>
+      <translation>텍스트 오버레이 표시</translation>
+    </message>
+    <message>
+      <source>Show on Alarm Layout</source>
+      <translation>알람 레이아웃에 표시</translation>
+    </message>
+    <message>
+      <source>Do HTTP request</source>
+      <translation>HTTP 요청</translation>
+    </message>
+    <message>
+      <source>Device output</source>
+      <translation>장치 출력</translation>
+    </message>
+    <message>
+      <source>Camera output</source>
+      <translation>카메라 출력</translation>
+    </message>
+    <message>
+      <source>Device recording</source>
+      <translation>장치 녹화</translation>
+    </message>
+    <message>
+      <source>Camera recording</source>
+      <translation>카메라 녹화</translation>
+    </message>
+    <message>
+      <source>Generic Event</source>
+      <translation>일반 이벤트</translation>
+    </message>
+    <message numerus="yes">
+      <source>Motion on Cameras</source>
+      <translation>
+        <numerusform>카메라에 모션</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Storage Failure</source>
+      <translation>저장 실패</translation>
+    </message>
+    <message>
+      <source>Network Issue</source>
+      <translation>네트워크 문제</translation>
+    </message>
+    <message>
+      <source>Server Failure</source>
+      <translation>서버 오류</translation>
+    </message>
+    <message>
+      <source>Server Conflict</source>
+      <translation>서버 충돌</translation>
+    </message>
+    <message>
+      <source>Server Started</source>
+      <translation>서버 시작 됨</translation>
+    </message>
+    <message>
+      <source>License Issue</source>
+      <translation>인증키 이슈</translation>
+    </message>
+    <message>
+      <source>Archive backup finished</source>
+      <translation>아카이브 백업 완료</translation>
+    </message>
+    <message>
+      <source>Any Server Issue</source>
+      <translation>모든 서버 이슈</translation>
+    </message>
+    <message>
+      <source>Any Event</source>
+      <translation>모든 이벤트</translation>
+    </message>
+    <message>
+      <source>Software Trigger</source>
+      <translation type="unfinished">Software Trigger</translation>
+    </message>
+    <message numerus="yes">
+      <source>Input Signal on Devices</source>
+      <translation>
+        <numerusform>장치에 입력된 신호</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Input Signal on Cameras</source>
+      <translation>
+        <numerusform>카메라에 입력된 신호</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Devices Disconnected</source>
+      <translation>
+        <numerusform>장치 연결끊김</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Cameras Disconnected</source>
+      <translation>
+        <numerusform>카메라 연결이 끊어졌습니다.</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Devices IP Conflict</source>
+      <translation>
+        <numerusform>장치 IP 충돌</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Cameras IP Conflict</source>
+      <translation>
+        <numerusform>카메라 IP 충돌</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Any Device Issue</source>
+      <translation>모든 장치 문제</translation>
+    </message>
+    <message>
+      <source>Any Camera Issue</source>
+      <translation>모든 카메라 문제</translation>
+    </message>
+    <message>
+      <source>Undefined event has occurred on %1</source>
+      <translation>%1에 정의되지 않은 이벤트 발생</translation>
+    </message>
+    <message>
+      <source>Device %1 was disconnected</source>
+      <translation>장치%1 연결 끊김</translation>
+    </message>
+    <message>
+      <source>Camera %1 was disconnected</source>
+      <translation>카메라 %1연결끊김</translation>
+    </message>
+    <message>
+      <source>I/O Module %1 was disconnected</source>
+      <translation>I/O 모듈 %1이 끊어졌습니다.</translation>
+    </message>
+    <message>
+      <source>Input on %1</source>
+      <translation>%1의 입력</translation>
+    </message>
+    <message>
+      <source>Motion on %1</source>
+      <translation>%1의 모션</translation>
+    </message>
+    <message>
+      <source>Storage Failure at %1</source>
+      <translation>%1 내 저장기 오류</translation>
+    </message>
+    <message>
+      <source>Network Issue at %1</source>
+      <translation>%1 내 네트워크 오류</translation>
+    </message>
+    <message>
+      <source>Server &quot;%1&quot; Failure</source>
+      <translation type="unfinished">Server &quot;%1&quot; Failure</translation>
+    </message>
+    <message>
+      <source>Device IP Conflict at %1</source>
+      <comment>Device IP Conflict at &lt;server_name&gt;</comment>
+      <translation>%1에서 장치 IP 충돌</translation>
+    </message>
+    <message>
+      <source>Camera IP Conflict at %1</source>
+      <comment>Camera IP Conflict at &lt;server_name&gt;</comment>
+      <translation>%1에서 카메라 IP 충돌</translation>
+    </message>
+    <message>
+      <source>Server &quot;%1&quot; Conflict</source>
+      <translation type="unfinished">Server &quot;%1&quot; Conflict</translation>
+    </message>
+    <message>
+      <source>Server &quot;%1&quot; Started</source>
+      <translation type="unfinished">Server &quot;%1&quot; Started</translation>
+    </message>
+    <message>
+      <source>Server &quot;%1&quot; has a license problem</source>
+      <translation type="unfinished">Server &quot;%1&quot; has a license problem</translation>
+    </message>
+    <message>
+      <source>Server &quot;%1&quot; has finished an archive backup</source>
+      <translation type="unfinished">Server &quot;%1&quot; has finished an archive backup</translation>
+    </message>
+    <message>
+      <source>Generic Event at %1</source>
+      <translation>%1에서 일반 이벤트</translation>
+    </message>
+    <message>
+      <source>Software trigger %1 at %2</source>
+      <translation type="unfinished">Software trigger %1 at %2</translation>
+    </message>
+    <message>
+      <source>An unknown event has occurred</source>
+      <translation>알지 못하는 이벤트 발생</translation>
+    </message>
+    <message>
+      <source>Software Trigger %1 has been activated multiple times</source>
+      <translation type="unfinished">Software Trigger %1 has been activated multiple times</translation>
+    </message>
+    <message>
+      <source>Multiple %1 events have occured</source>
+      <translation type="unfinished">Multiple %1 events have occured</translation>
+    </message>
+    <message>
+      <source>Event: %1</source>
+      <translation>이벤트: %1</translation>
+    </message>
+    <message>
+      <source>Source: %1</source>
+      <translation>소스: %1</translation>
+    </message>
+    <message>
+      <source>Caption: %1</source>
+      <translation>캡션: %1</translation>
+    </message>
+    <message>
+      <source>Input Port: %1</source>
+      <translation>%1의 입력</translation>
+    </message>
+    <message>
+      <source>Reason: %1</source>
+      <translation>원인: %1</translation>
+    </message>
+    <message>
+      <source>Conflicting Address: %1</source>
+      <translation>충돌 주소: %1</translation>
+    </message>
+    <message>
+      <source>MAC #%1: %2</source>
+      <extracomment>MAC #2: D0-50-99-38-1E-12</extracomment>
+      <translation>맥 #%1: %2</translation>
+    </message>
+    <message>
+      <source>Conflicting Server #%1: %2</source>
+      <extracomment>Conflicting Server #5: 10.0.2.1</extracomment>
+      <translation>%1 서버 충돌 중: %2</translation>
+    </message>
+    <message>
+      <source>Conflicting Server: %1</source>
+      <translation>서버 충돌: %1</translation>
+    </message>
+    <message>
+      <source>Trigger: %1</source>
+      <translation type="unfinished">Trigger: %1</translation>
+    </message>
+    <message>
+      <source>%2 &lt;b&gt;%1&lt;/b&gt;</source>
+      <comment>%1 means time, %2 means date</comment>
+      <translation type="unfinished">%2 &lt;b&gt;%1&lt;/b&gt;</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n times, first: %2 &lt;b&gt;%1&lt;/b&gt;</source>
+      <comment>%1 means time, %2 means date</comment>
+      <translation type="unfinished">
+        <numerusform>%n times, first: %2 &lt;b&gt;%1&lt;/b&gt;</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Time: %1 on %2</source>
+      <comment>%1 means time, %2 means date</comment>
+      <translation>시간: %2 의 %1</translation>
+    </message>
+    <message numerus="yes">
+      <source>First occurrence: %1 on %2 (%n times total)</source>
+      <comment>%1 means time, %2 means date</comment>
+      <translation>
+        <numerusform>첫번째 발생: %2의 %1 (%n 전체 시간)</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>No data received during last %n seconds.</source>
+      <translation>
+        <numerusform>%n 초간 데이터 받기 실패.</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Connection to device was unexpectedly closed.</source>
+      <translation>장치 연결이 예상치 못하게 끊김.</translation>
+    </message>
+    <message>
+      <source>Connection to camera (primary stream) was unexpectedly closed.</source>
+      <translation>카메라 메인스트림 연결이 예상치 못하게 끊겼습니다.</translation>
+    </message>
+    <message>
+      <source>Connection to camera (secondary stream) was unexpectedly closed.</source>
+      <translation>카메라 2nd 스트림이 에상치 못하게 끊겼습니다.</translation>
+    </message>
+    <message>
+      <source>RTP packet loss detected, prev seq.=%1 next seq.=%2.</source>
+      <translation>RTP 패킷 손실이 발생함, prev seq.=%1 next seq.=%2.</translation>
+    </message>
+    <message>
+      <source>RTP packet loss detected.</source>
+      <translation>RTP 패킷 손실이 발생함.</translation>
+    </message>
+    <message>
+      <source>Device does not respond to network requests.</source>
+      <translation>장치는 네트워크 요청에 응답 하지 않습니다.</translation>
+    </message>
+    <message>
+      <source>Connection to server is lost.</source>
+      <translation>서버 접속 연결 실패.</translation>
+    </message>
+    <message>
+      <source>Server stopped unexpectedly.</source>
+      <translation>서버는 예기치 않게 중단 되었습니다.</translation>
+    </message>
+    <message>
+      <source>I/O error has occurred at %1.</source>
+      <translation>%1에 I/O 오류 발생.</translation>
+    </message>
+    <message>
+      <source>Not enough HDD/SSD speed for recording to %1.</source>
+      <translation>%1. 에 저장을 위한 HDD/SSD 속도 정보.</translation>
+    </message>
+    <message>
+      <source>HDD/SSD disk &quot;%1&quot; is full. Disk contains too much data that is not managed by VMS.</source>
+      <translation type="unfinished">HDD/SSD disk &quot;%1&quot; is full. Disk contains too much data that is not managed by VMS.</translation>
+    </message>
+    <message>
+      <source>System disk &quot;%1&quot; is almost full.</source>
+      <translation type="unfinished">System disk &quot;%1&quot; is almost full.</translation>
+    </message>
+    <message>
+      <source>Archive backup failed: No available backup storages with sufficient free space</source>
+      <translation>아카이브 백업 실패: 충분 한 공간이 없습니다</translation>
+    </message>
+    <message>
+      <source>Archive backup failed: Target storage failure</source>
+      <translation>아카이브 백업 실패: 대상 저장 실패</translation>
+    </message>
+    <message>
+      <source>Archive backup failed: Source file open/read error</source>
+      <translation>아카이브 백업 실패: 소스 파일 열기/읽기 오류</translation>
+    </message>
+    <message>
+      <source>Archive backup failed: Target file create/write error</source>
+      <translation>아카이브 백업 실패: 대상으로 파일 생성/쓰기 오류</translation>
+    </message>
+    <message>
+      <source>Archive backup failed: File catalog error</source>
+      <translation>아카이브 백업 실패: 파일 카탈로그 오류</translation>
+    </message>
+    <message>
+      <source>Archive backup finished, but is not fully completed because backup time is over. Data is backed up to %1</source>
+      <translation>아카이브 백업 완료, 하지만 백업 시간 초과 때문에 완전히 완료 되지 않습니다. %1의 데이터 백업</translation>
+    </message>
+    <message>
+      <source>Archive backup is successfully completed</source>
+      <translation>아카이브 백업이 성공적으로 완료</translation>
+    </message>
+    <message>
+      <source>Archive backup is canceled by user. Data is backed up to %1</source>
+      <translation>아카이브 백업 사용자에 의해 취소 됩니다. %1에 데이터 백업</translation>
+    </message>
+    <message>
+      <source>Not enough licenses. Recording has been disabled on following devices:</source>
+      <translation>라이센스가 충분하지 않습니다. 다음 장치에서 녹화 비활성화 되었습니다.</translation>
+    </message>
+    <message>
+      <source>Not enough licenses. Recording has been disabled on following cameras:</source>
+      <translation>라이센스가 충분하지 않습니다. 다음 장치에서 녹화 비활성화 되었습니다.</translation>
+    </message>
+    <message>
+      <source>Not enough licenses. Recording has been disabled on following I/O modules:</source>
+      <translation>라이센스가 충분하지 않습니다. 다음 장치에서 녹화 비활성화 되었습니다.</translation>
+    </message>
+    <message>
+      <source>start</source>
+      <translation>시작</translation>
+    </message>
+    <message>
+      <source>stop</source>
+      <translation>멈춤</translation>
+    </message>
+    <message>
+      <source>While %1</source>
+      <translation>%1 동안</translation>
+    </message>
+    <message>
+      <source>On %1 %2</source>
+      <translation>%1 %2에</translation>
+    </message>
+    <message>
+      <source>Trigger Name</source>
+      <translation type="unfinished">Trigger Name</translation>
+    </message>
+    <message>
+      <source>Role</source>
+      <translation>역할</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n Users</source>
+      <translation>
+        <numerusform>%n 사용자</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n Roles</source>
+      <translation>
+        <numerusform>%n 역할</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>All Administrators</source>
+      <translation type="unfinished">All Administrators</translation>
+    </message>
+    <message>
+      <source>All Users</source>
+      <translation>모든 사용자</translation>
+    </message>
+    <message>
+      <source>Select at least one user</source>
+      <translation>최소 하나의 사용자를 선택하세요</translation>
     </message>
   </context>
   <context>

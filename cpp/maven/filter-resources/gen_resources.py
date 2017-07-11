@@ -16,7 +16,7 @@ translations_target_dir='${project.build.directory}/resources/translations'
 ldpath='${qt.dir}/lib'
 translations=['${defaultTranslation}'] + splitted('${additionalTranslations}')
 qml_files = [ ".qml", ".js", "qmldir" ]
-additional_qrc_pathes = splitted("${additionalQrcPathes}", sep=',')
+additional_qrc_paths = splitted("${additionalQrcPaths}", sep=',')
 os.environ["DYLD_FRAMEWORK_PATH"] = '${qt.dir}/lib'
 os.environ["DYLD_LIBRARY_PATH"] = '${libdir}/lib/${build.configuration}:${arch.dir}'
 os.environ["LD_LIBRARY_PATH"] = '${libdir}/lib/${build.configuration}'
@@ -45,7 +45,7 @@ def fileIsAllowed(file, exclusions):
             return False
     return True
 
-def genqrc(qrcname, qrcprefix, pathes, exclusions):
+def genqrc(qrcname, qrcprefix, paths, exclusions):
     os.path = posixpath
 
     qrcfile = open(qrcname, 'w')
@@ -56,7 +56,7 @@ def genqrc(qrcname, qrcprefix, pathes, exclusions):
 
     aliases = Set()
 
-    for path in pathes:
+    for path in paths:
         for root, dirs, files in os.walk(path):
             parent = root[len(path) + 1:]
             for f in files:
@@ -173,7 +173,7 @@ if __name__ == '__main__':
         'build/${project.artifactId}.qrc',
         '/',
         ['${customization.dir}/icons/all', '${project.build.directory}/resources']
-            + additional_qrc_pathes
+            + additional_qrc_paths
             + ['${project.basedir}/static-resources'],
         exceptions)
 
@@ -193,6 +193,9 @@ if __name__ == '__main__':
         append_file(template_file, output_pro_file)
 
     append_file(specifics_file, output_pro_file)
+
+    with open(output_pro_file, 'a') as dst:
+        dst.write("\nQMAKE_CXXFLAGS -= -Werror\n")
 
     with open(output_pro_file, "a") as f:
         gentext(f, '${project.build.sourceDirectory}', ['.cpp', '.c'], 'SOURCES += ')

@@ -22,7 +22,6 @@ public:
 public:
     QPointer<QnScrollBarProxy> proxyScrollbar;
     Qt::Alignment alignment;
-    bool useHeaderShift;
     bool useItemViewPaddingWhenVisible;
     bool useMaximumSpace;
 };

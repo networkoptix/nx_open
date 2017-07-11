@@ -35,6 +35,7 @@
     (QnStatisticsDataItem)\
     (QnStatisticsReply)\
     (QnTimeReply)\
+    (ApiServerDateTimeData)\
     (QnTestEmailSettingsReply)\
     (QnCompatibilityItem)\
     (QnPingReply)\

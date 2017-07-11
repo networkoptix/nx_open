@@ -6,6 +6,7 @@
 #include <core/resource/camera_resource.h>
 #include <core/resource/layout_resource.h>
 
+#include <ui/common/palette.h>
 #include <ui/style/globals.h>
 #include <ui/style/helper.h>
 #include <ui/style/nx_style.h>
@@ -29,6 +30,7 @@ LayoutPreviewPainter::LayoutPreviewPainter(
     m_thumbnailManager(thumbnailManager),
     m_frameColor(Qt::black),
     m_backgroundColor(Qt::darkGray),
+    m_itemBackgroundColor(Qt::black),
     m_fontColor(Qt::white),
     m_busyIndicator(new QnBusyIndicator())
 {
@@ -68,6 +70,16 @@ QColor LayoutPreviewPainter::backgroundColor() const
 void LayoutPreviewPainter::setBackgroundColor(const QColor& value)
 {
     m_backgroundColor = value;
+}
+
+QColor LayoutPreviewPainter::itemBackgroundColor() const
+{
+    return m_itemBackgroundColor;
+}
+
+void LayoutPreviewPainter::setItemBackgroundColor(const QColor& value)
+{
+    m_itemBackgroundColor = value;
 }
 
 QColor LayoutPreviewPainter::fontColor() const
@@ -266,6 +278,7 @@ void LayoutPreviewPainter::paintItem(QPainter* painter, const QRectF& itemRect,
                 pw->setProperty(style::Properties::kDontPolishFontProperty, true);
                 pw->setAlignment(Qt::AlignCenter);
                 pw->setGeometry(QnGeometry::eroded(itemRect.toRect(), kMargin));
+                setPaletteColor(pw.data(), QPalette::Window, m_itemBackgroundColor);
 
                 const int devicePixelRatio = painter->device()->devicePixelRatio();
 

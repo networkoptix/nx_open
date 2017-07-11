@@ -41,16 +41,19 @@ void resetButtonStyle(QAbstractButton* button)
 {
     button->setProperty(style::Properties::kAccentStyleProperty, false);
     button->setProperty(style::Properties::kWarningStyleProperty, false);
+    button->update();
 }
 
 void setAccentStyle(QAbstractButton *button)
 {
     button->setProperty(style::Properties::kAccentStyleProperty, true);
+    button->update();
 }
 
 void setWarningButtonStyle(QAbstractButton* button)
 {
     button->setProperty(style::Properties::kWarningStyleProperty, true);
+    button->update();
 }
 
 void setTabShape(QTabBar* tabBar, style::TabShape tabShape)

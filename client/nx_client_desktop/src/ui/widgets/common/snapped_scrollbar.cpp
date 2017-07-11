@@ -6,37 +6,6 @@
 #include <QtWidgets/QTableView>
 #include <QtWidgets/QHeaderView>
 
-namespace
-{
-    QSize headerSize(QWidget *widget, Qt::Orientation orientation)
-    {
-        QAbstractItemView *itemView = nullptr;
-
-        while (!itemView && widget)
-        {
-            itemView = qobject_cast<QAbstractItemView *>(widget);
-            widget = widget->parentWidget();
-        }
-
-        if (!itemView)
-            return QSize();
-
-        if (orientation == Qt::Horizontal)
-        {
-            if (const QTableView *table = qobject_cast<const QTableView *>(itemView))
-                return table->horizontalHeader()->size();
-            else if (const QTreeView *tree = qobject_cast<const QTreeView *>(itemView))
-                return tree->header()->size();
-        }
-        else
-        {
-            if (const QTableView *table = qobject_cast<const QTableView *>(itemView))
-                return table->verticalHeader()->size();
-        }
-        return QSize();
-    }
-}
-
 QnSnappedScrollBar::QnSnappedScrollBar(QWidget *parent)
     : base_type(Qt::Vertical, parent),
       d_ptr(new QnSnappedScrollBarPrivate(this))
@@ -68,23 +37,6 @@ void QnSnappedScrollBar::setAlignment(Qt::Alignment alignment)
 
     d->alignment = alignment;
     updateGeometry();
-}
-
-bool QnSnappedScrollBar::useHeaderShift() const
-{
-    Q_D(const QnSnappedScrollBar);
-    return d->useHeaderShift;
-}
-
-void QnSnappedScrollBar::setUseHeaderShift(bool useHeaderShift)
-{
-    Q_D(QnSnappedScrollBar);
-
-    if (d->useHeaderShift == useHeaderShift)
-        return;
-
-    d->useHeaderShift = useHeaderShift;
-    d->updateGeometry();
 }
 
 bool QnSnappedScrollBar::useItemViewPaddingWhenVisible() const
@@ -128,7 +80,6 @@ QnScrollBarProxy *QnSnappedScrollBar::proxyScrollBar() const
 QnSnappedScrollBarPrivate::QnSnappedScrollBarPrivate(QnSnappedScrollBar *parent) :
     q_ptr(parent),
     alignment(Qt::AlignRight | Qt::AlignBottom),
-    useHeaderShift(true),
     useItemViewPaddingWhenVisible(false),
     useMaximumSpace(false)
 {
@@ -162,33 +113,21 @@ void QnSnappedScrollBarPrivate::updateGeometry()
 
     if (q->orientation() == Qt::Vertical)
     {
-        if (useMaximumSpace)
-            geometry.setHeight(parentRect.height());
-        else
-            geometry.setHeight(proxyScrollbar->height());
+        geometry.setHeight(useMaximumSpace ? parentRect.height() : proxyScrollbar->height());
 
         if (alignment.testFlag(Qt::AlignRight))
             geometry.moveRight(parentRect.right());
         else if (alignment.testFlag(Qt::AlignLeft))
             geometry.moveLeft(parentRect.left());
-
-        if (useHeaderShift)
-            geometry.setTop(geometry.top() + headerSize(proxyScrollbar->parentWidget(), Qt::Horizontal).height());
     }
     else
     {
-        if (useMaximumSpace)
-            geometry.setWidth(parentRect.width());
-        else
-            geometry.setWidth(proxyScrollbar->width());
+        geometry.setWidth(useMaximumSpace ? parentRect.width() : proxyScrollbar->width());
 
         if (alignment.testFlag(Qt::AlignBottom))
             geometry.moveBottom(parentRect.bottom());
         else if (alignment.testFlag(Qt::AlignTop))
             geometry.moveTop(parentRect.top());
-
-        if (useHeaderShift)
-            geometry.setLeft(geometry.left() + headerSize(proxyScrollbar->parentWidget(), Qt::Vertical).width());
     }
 
     q->setGeometry(geometry);

@@ -24,7 +24,6 @@
 #include <utils/common/warnings.h>
 #include <utils/email/email.h>
 #include <utils/media/audio_player.h>
-#include <watchers/cloud_status_watcher.h>
 
 #include <nx/client/desktop/utils/server_notification_cache.h>
 #include <nx/vms/event/strings_helper.h>
@@ -320,17 +319,15 @@ void QnWorkbenchNotificationsHandler::checkAndAddSystemHealthMessage(QnSystemHea
         {
             const bool isOwner = context()->user()
                 && context()->user()->userRole() == Qn::UserRole::Owner;
-            const bool isLoggedIntoCloud = qnCloudStatusWatcher->status() != QnCloudStatusWatcher::LoggedOut;
 
             const bool canShow =
                 // show only to owners
                 isOwner
-                // hide if we are already in the cloud
-                && !isLoggedIntoCloud
                 // only if system is not connected to the cloud
                 && qnGlobalSettings->cloudSystemId().isNull()
                 // and if user did not close notification manually at least once
                 && !qnClientShowOnce->testFlag(kCloudPromoShowOnceKey);
+
             setSystemHealthEventVisible(message, canShow);
             return;
         }

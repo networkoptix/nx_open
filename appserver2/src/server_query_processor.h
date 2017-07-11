@@ -5,7 +5,7 @@
 #include <nx/utils/concurrent.h>
 
 #include "ec2_thread_pool.h"
-#include "database/db_manager.h"
+#include <database/db_manager.h>
 #include "transaction/transaction.h"
 #include "transaction/transaction_log.h"
 #include <transaction/binary_transaction_serializer.h>

@@ -33,7 +33,7 @@
         <rdep.packages>openssl ffmpeg quazip festival any/festival-vox any/roboto-ttf any/roboto-mono-ttf any/help</rdep.packages>
         <rdep.windows.packages>openal directx-JUN2010</rdep.windows.packages>
 
-        <additionalQrcPathes>${basedir}/skins/${defaultSkin}</additionalQrcPathes>
+        <additionalQrcPaths>${basedir}/skins/${defaultSkin}</additionalQrcPaths>
     </properties>
 
     <dependencies>

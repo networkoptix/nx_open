@@ -119,7 +119,7 @@ private:
     {
         nx_http::Message requestMsg(nx_http::MessageType::request);
         requestMsg.request->requestLine.url = requestPath;
-        requestMsg.request->requestLine.method = nx_http::Method::Get;
+        requestMsg.request->requestLine.method = nx_http::Method::get;
         requestMsg.request->requestLine.version = nx_http::http_1_1;
 
         addAuthorizationHeader(nonceData, requestMsg.request);

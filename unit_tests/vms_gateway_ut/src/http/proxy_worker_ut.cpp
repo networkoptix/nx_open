@@ -98,7 +98,7 @@ private:
     void initializeProxyWorker(const nx::String& path)
     {
         nx_http::Request translatedRequest;
-        translatedRequest.requestLine.method = nx_http::Method::Get;
+        translatedRequest.requestLine.method = nx_http::Method::get;
         translatedRequest.requestLine.url = path;
         translatedRequest.requestLine.version = nx_http::http_1_1;
 
