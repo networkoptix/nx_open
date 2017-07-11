@@ -56,6 +56,7 @@ public:
     CameraMediaStreamInfo defaultStream() const;
 
     QnAspectRatio aspectRatio() const;
+    bool areNativePtzPresetsDisabled();
 
 protected:
 

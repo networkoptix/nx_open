@@ -120,7 +120,7 @@ static void myMsgHandler(QtMsgType type, const QMessageLogContext& ctx, const QS
 #endif
     }
 
-    NX_EXPECT(!msg.contains(lit("QObject::connect")));
+    NX_EXPECT(!msg.contains(lit("QObject::connect")), msg);
     qnLogMsgHandler(type, ctx, msg);
 }
 

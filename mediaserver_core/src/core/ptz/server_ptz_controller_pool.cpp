@@ -1,21 +1,19 @@
 #include "server_ptz_controller_pool.h"
 
-#include <common/common_module.h>
-
 #include <api/app_server_connection.h>
-
-#include <core/resource_management/resource_data_pool.h>
-#include <core/resource/camera_resource.h>
-
-#include <core/ptz/mapped_ptz_controller.h>
-#include <core/ptz/viewport_ptz_controller.h>
-#include <core/ptz/workaround_ptz_controller.h>
-#include <core/ptz/preset_ptz_controller.h>
-#include <core/ptz/tour_ptz_controller.h>
+#include <common/common_module.h>
+#include <common/static_common_module.h>
 #include <core/ptz/activity_ptz_controller.h>
 #include <core/ptz/home_ptz_controller.h>
-#include <common/static_common_module.h>
+#include <core/ptz/mapped_ptz_controller.h>
+#include <core/ptz/preset_ptz_controller.h>
 #include <core/ptz/ptz_controller_pool.h>
+#include <core/ptz/tour_ptz_controller.h>
+#include <core/ptz/viewport_ptz_controller.h>
+#include <core/ptz/workaround_ptz_controller.h>
+#include <core/resource/camera_resource.h>
+#include <core/resource_management/resource_data_pool.h>
+#include <core/resource/param.h>
 
 QnServerPtzControllerPool::QnServerPtzControllerPool(QObject *parent):
     base_type(parent)
@@ -64,7 +62,8 @@ QnPtzControllerPtr QnServerPtzControllerPool::createController(const QnResourceP
         if(QnViewportPtzController::extends(controller->getCapabilities()))
             controller.reset(new QnViewportPtzController(controller));
 
-        if(QnPresetPtzController::extends(controller->getCapabilities()))
+        if(QnPresetPtzController::extends(controller->getCapabilities(),
+                /*disableNative*/ camera->areNativePtzPresetsDisabled()))
             controller.reset(new QnPresetPtzController(controller));
 
         if(QnTourPtzController::extends(controller->getCapabilities()))

@@ -79,6 +79,7 @@ namespace Qn
     static const QString FORCE_ONVIF_PARAM_NAME = lit("forceONVIF");
     static const QString IGNORE_ONVIF_PARAM_NAME = lit("ignoreONVIF");
     static const QString PTZ_CAPABILITIES_PARAM_NAME = lit("ptzCapabilities");
+    static const QString DISABLE_NATIVE_PTZ_PRESETS_PARAM_NAME = lit("disableNativePtzPresets");
 	static const QString DW_REBRANDED_TO_ISD_MODEL = lit("isdDwCam");
     static const QString ONVIF_VENDOR_SUBTYPE = lit("onvifVendorSubtype");
     static const QString DO_NOT_ADD_VENDOR_TO_DEVICE_NAME = lit("doNotAddVendorToDeviceName");

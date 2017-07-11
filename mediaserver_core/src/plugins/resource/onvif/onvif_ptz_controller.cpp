@@ -92,7 +92,7 @@ QnOnvifPtzController::QnOnvifPtzController(const QnPlOnvifResourcePtr &resource)
     if(focusEnabled)
         m_capabilities |= initContinuousFocus();
     if(presetsEnabled && !m_resource->getPtzUrl().isEmpty())
-        m_capabilities |=  Ptz::PresetsPtzCapability; //initPresets();
+        m_capabilities |= (Ptz::PresetsPtzCapability | Ptz::NativePresetsPtzCapability);
 
     // TODO: #PTZ #Elric actually implement flip!
 }
