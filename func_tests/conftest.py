@@ -94,8 +94,8 @@ def pytest_addoption(parser):
                      help='Change log level (%s). Default is %s' % (', '.join(log_levels), log_levels[0]))
     parser.addoption('--tests-config-file', type=TestsConfig.from_yaml_file, nargs='*',
                      help='Configuration file for tests, in yaml format.')
-    parser.addoption('--test-parameter', type=TestParameter.from_str, nargs='*',
-                     help='Configuration parameter for a test, in format: --test-parameter=test.param=value')
+    parser.addoption('--test-parameters', type=TestParameter.from_str,
+                     help='Configuration parameters for a test, in format: --test-parameter=test.param1=value1,test.param2=value2')
 
 
 @pytest.fixture(scope='session')
@@ -112,7 +112,7 @@ def run_options(request):
     assert bin_dir, 'Argument --bin-dir is required'
     tests_config = TestsConfig.merge_config_list(
         request.config.getoption('--tests-config-file'),
-        request.config.getoption('--test-parameter'),
+        request.config.getoption('--test-parameters'),
         )
     return SimpleNamespace(
         cloud_group=request.config.getoption('--cloud-group'),

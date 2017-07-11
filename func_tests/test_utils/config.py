@@ -51,12 +51,15 @@ yaml.add_implicit_resolver(u'!timedelta', TIMEDELTA_REGEXP)
 class TestParameter(object):
 
     @classmethod
-    def from_str(cls, s):
-        name_value = s.split('=')
-        test_param = name_value[0].split('.')
-        if len(name_value) != 2 or len(test_param) != 2:
-            raise argparse.ArgumentTypeError('test-parameter is expected in format "test.param=value": %s' % s)
-        return cls(test_param[0], test_param[1], name_value[1])
+    def from_str(cls, str_list):
+        parameters = []
+        for s in str_list.split(','):
+            name_value = s.split('=')
+            test_param = name_value[0].split('.')
+            if len(name_value) != 2 or len(test_param) != 2:
+                raise argparse.ArgumentTypeError('test-parameter is expected in format "test.param=value": %s' % s)
+            parameters.append(cls(test_param[0], test_param[1], name_value[1]))
+        return parameters
 
     def __init__(self, test_id, parameter, value):
         self.test_id = test_id
@@ -91,14 +94,14 @@ class TestsConfig(object):
             config = cls()
         else:
             return None
-        config.update_with_tests_params(test_params)
+        config._update_with_tests_params(test_params)
         return config
 
     def __init__(self, physical_installation_host_list=None, tests=None):
         self.physical_installation_host_list = physical_installation_host_list or []  # PhysicalInstallationHostConfig list
         self.tests = tests or {}  # dict, full test name -> dict
 
-    def update_with_tests_params(self, test_params):
+    def _update_with_tests_params(self, test_params):
         for p in test_params:
             self.tests.setdefault(p.test_id, {})[p.parameter] = p.value
 
